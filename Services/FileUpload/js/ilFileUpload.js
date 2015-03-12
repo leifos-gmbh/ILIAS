@@ -3,10 +3,15 @@
 ; (function ($, window, document, undefined)
 {
     // constants
-    var DEBUG_ENABLED = false;
+    var DEBUG_ENABLED = true;
     var DRAG_LEAVE_DELAY = 50;
     var OVERLAY_HIDE_ID = "overlay_hide_timeout";
     var FILE_DRAG_AND_DROP_SUPPORTED = isFileDragAndDropSupported();
+	var SubmitEntireFormEnum = {
+		ALWAYS : "always",
+		NEVER: "never",
+		FINALLY: "finally"
+	};
 
     // variables
     var overlaysVisible = false;
@@ -32,7 +37,7 @@
         if (DEBUG_ENABLED)
             konsole.log("konsole initialized");
     }
-    log = function ()
+    var log = function ()
     {
         if (DEBUG_ENABLED)
             konsole.log.apply(konsole, arguments);
@@ -44,7 +49,7 @@
         this.length = 0;
         var items = {};
 
-        this.get = function (key, value)
+        this.get = function (key)
         {
             if (this.contains(key))
                 return items[key];
@@ -111,6 +116,7 @@
         this.sizeFormatted = getFormattedFileSize(file.size);
         this.canExtract = false;
         this.canUpload = true;
+	    this.isDeletionEnabled = false;
 
         // private variables
         var self = this;
@@ -122,6 +128,7 @@
 
         var $html = null;
         var $cancelButton = null;
+	    var $addButton = null;
         var $options = null;
         var $progressBar = null;
         var $progressPercentage = null;
@@ -151,7 +158,7 @@
             }
             else // set error
             {
-                this.setError(this, errorText);
+                this.setError(this, errorText); // TODO which error text should be set here?
             }
 
             // extract possible?
@@ -167,6 +174,8 @@
             // add click handler
             $cancelButton = $html.find("#cancel_" + this.id);
             $cancelButton.bind("click", onCancelClicked);
+
+	        $html.find(".ilFileUploadEntryAdd").hide();
 
             return $html;
         };
@@ -254,14 +263,31 @@
 
             // show error
             $html.addClass("ilFileUploadError");
+	        if (errorText == il.FileUpload.texts.maxNumberOfFilesExceeded) {
+		        $html.addClass("ilFileUploadErrorExceeded");
+	        }
+
             $html.find(".ilFileUploadEntryError").show();
 
             // enable remove button
             $cancelButton.prop("disabled", false);
 
             // remove options
-            $options.remove();
+	        $options.hide();
+	        $html.find(".ilFileUploadEntryHeader").unbind("click", onToggleOptions);
         };
+
+	    /**
+	     * Removes the 'too many files' error for this file.
+	     */
+	    this.unsetMaxNumberOfFilesExceededError = function () {
+		    this.canUpload = true;
+		    this.unsetAddToQueueButton();
+		    $html.removeClass("ilFileUploadError");
+		    $html.removeClass("ilFileUploadErrorExceeded");
+		    $html.find(".ilFileUploadEntryError").hide();
+		    $html.find(".ilFileUploadEntryHeader").bind("click", onToggleOptions);
+	    };
 
         /**
          * Disables this file for uploading.
@@ -292,9 +318,31 @@
             uploadDone = true;
             isUploading = false;
 
-            $cancelButton.remove();
+	        // TODO Add a deletion button, that triggers a deletion request, when deletion is allowed
+	        if (!this.isDeletionEnabled)
+	        {
+	            $cancelButton.remove();
+	        }
             $html.addClass("ilFileUploadSuccess");
         };
+
+	    /**
+	     * Sets an add button, to enable adding an excess file to the upload queue.
+	     */
+	    this.setAddToQueueButton = function (updateFileElementsCallback)
+	    {
+		    $addButton = $html.find('#add_' + this.id);
+		    $addButton.bind('click', updateFileElementsCallback, onAddClicked);
+		    $html.find(".ilFileUploadEntryAdd").show();
+	    };
+
+	    /**
+	     * Remove the add button.
+	     */
+	    this.unsetAddToQueueButton = function ()
+	    {
+		    $html.find(".ilFileUploadEntryAdd").hide();
+	    };
 
         /**
          * Removes the HTML that belongs to this file.
@@ -395,12 +443,12 @@
         {
             var isChecked = $(this).prop("checked");
             log("File.onExtractChanged (%s): checked = %s", self.id, isChecked);
-            
+
             $html.find(".ilFileUploadEntryKeepStructure").toggle(isChecked);
             $html.find(".ilFileUploadEntryTitle").toggle(!isChecked);
             $html.find(".ilFileUploadEntryDescription").toggle(!isChecked);
-        };
-		
+        }
+
         /**
          * Toggles the visibility of the file details.
          */
@@ -440,7 +488,24 @@
                     self.uploadData.jqXHR.abort();
                 }
             }
+            // delete existing file?
+            else if (uploadDone && self.isDeletionEnabled)
+            {
+				self.uploadData.delete();
+            }
         }
+
+	    /**
+	     * Called when a file should be added to the upload queue.
+	     */
+	    function onAddClicked(e)
+	    {
+		    log("File.onAddClicked (%s, uploaded=%s)", self.id, uploadDone);
+		    self.unsetMaxNumberOfFilesExceededError();
+		    $html.find(".ilFileUploadEntryAdd").hide();
+		    e.stopPropagation();
+		    arguments[0].handleObj.data.call(); // callback to updateFileElements()
+	    }
     };
 
     /**
@@ -453,6 +518,7 @@
             invalidFileType: "The file is of the wrong type.",
             fileZeroBytes: "The file size is 0 bytes or it is a folder.",
             uploadWasZeroBytes: "The upload failed as this is a folder, the file size is 0 bytes or the file was renamed meanwhile.",
+	        maxNumberOfFilesExceeded: "Too many files added.",
             cancelAllQuestion: "Do you really want to cancel all pending uploads?",
             extractionFailed: "The extraction of the archive and its directories failed. Probably because you don't have the rights to create folders or categories within this object.",
             uploading: "Uploading...",
@@ -471,6 +537,9 @@
             allowedExtensions: [],
             supportedArchives: ["zip"],
             reloadPageWhenDone: false,
+            submitEntireForm: SubmitEntireFormEnum.NEVER,
+	        getFileList: false,
+	        allowDeletingFiles: false,
 
             // HTML elements
             fileRowTemplateId: "fileupload_row_tmpl",
@@ -523,7 +592,8 @@
             init();
 
             // create list where to add the files
-            var $fileList = $("<div id='ilFileUploadList_" + id + "' class='ilFileUploadList'><div class='ilFileUploadListTitle'>" + options.listTitle + "</div></div>");
+            var $fileList = $("<div id='ilFileUploadList_" + id +
+	            "' class='ilFileUploadList'><div class='ilFileUploadListTitle'>" + options.listTitle + "</div></div>");
 
             if (isCurrentObj)
                 $fileLists.prepend($fileList);
@@ -613,11 +683,11 @@
             reloadPage = false;
 
             // cancel all pending uploads
-            for (var index in fileUploads)
+	        $.each(fileUploads, function (index, upload)
             {
-                fileUploads[index].cancelAllUploads();
-                fileUploads[index].removeAllFiles();
-            }
+	            upload.cancelAllUploads();
+	            upload.removeAllFiles();
+            });
 
             // restore state for next call
             expandAll(false);
@@ -631,10 +701,10 @@
         {
             log("Manager.expandAll: %s", show ? "show" : "hide");
 
-            for (var index in fileUploads)
-            {
-                fileUploads[index].expandAll(show);
-            }
+	        $.each(fileUploads, function (index, upload)
+	        {
+		        upload.expandAll(show);
+	        });
 
             // update the show/hide labels
             if (show)
@@ -647,7 +717,7 @@
                 $hideOptions.hide();
                 $showOptions.show();
             }
-        };
+        }
 
         /**
          * Callback that starts the upload of the files.
@@ -693,11 +763,14 @@
             }
 
             // cancel all pending uploads
-            for (var index in fileUploads)
-            {
-                fileUploads[index].cancelAllUploads();
-                fileUploads[index].removeAllFiles();
-            }
+	        $.each(fileUploads, function (index, upload)
+	        {
+		        upload.cancelAllUploads();
+		        upload.removeAllFiles();
+	        });
+	        
+	        isUploadInProgress = false;
+	        hide();
         }
 
         /**
@@ -777,7 +850,7 @@
                 if (file.isUploadPending())
                 {
                     hasUploadableFiles = true;
-                    return true;
+                    return false;
                 }
             });
 
@@ -790,7 +863,7 @@
          */
         function startNextUpload()
         {
-            // no uploads? 
+            // no uploads?
             if (!isUploadInProgress)
                 return;
 
@@ -805,7 +878,7 @@
                 if (file.isUploadPending())
                 {
                     nextFile = file;
-                    return true;
+                    return false;
                 }
             });
 
@@ -848,7 +921,6 @@
     {
         // variables
         var self = this;
-        var id = id;
         var isManaged = false;
         var supportedArchivesRegex = null;
         var allowedExtensionsRegex = null;
@@ -861,6 +933,13 @@
         var isUploadInProgress = false;
         var reloadPageWhenDone = false;
         var overlayTimeoutId = null;
+	    var fileHashValue = null;
+	    var submitEntireForm = SubmitEntireFormEnum.NEVER;
+	    var postvar = null;
+	    var submitButtonName = null;
+		var getFileList = false;
+	    var allowDeletingFiles = false;
+	    var maxNumberOfFiles = null;
 
         // jquery variables
         var $inputField = null;
@@ -873,6 +952,7 @@
         var $showOptions = null;
         var $hideOptions = null;
         var $fileCount = null;
+	    var $form = null;
 
         // callbacks
         var onFileAdded = null;
@@ -890,7 +970,7 @@
         {
             log("Upload.init (Id=%s)", id);
 
-            // the plugin's final properties are the merged default and 
+            // the plugin's final properties are the merged default and
             // user-provided options (if any)
             var settings = $.extend(true, {}, il.FileUpload.defaults, options);
 
@@ -907,6 +987,12 @@
             maxFileSize = settings.maxFileSize;
             fileCountText = $fileCount.text();
             reloadPageWhenDone = settings.reloadPageWhenDone;
+	        submitEntireForm = settings.submitEntireForm;
+	        postvar = $inputField.prop('name') ? $inputField.prop('name') : settings.fileInput;
+	        submitButtonName = settings.submitButton;
+	        getFileList = settings.getFileList;
+	        allowDeletingFiles = settings.allowDeletingFiles;
+	        maxNumberOfFiles = settings.maxNumberOfFiles;
 
             // set callbacks
             onFileAdded = settings.onFileAdded;
@@ -920,7 +1006,19 @@
             // not managed? there's some stuff we have to do on our own
             if (!isManaged)
             {
-                var $form = $inputField.closest("form");
+                $form = $inputField.closest("form");
+	            $form.submit(function() {
+		            // disable file uploads
+		            $form.find('input[id^=ilFileUploadInput_][type=file]').prop('disabled', true);
+		            // append submit command for ilCtrl
+		            var cmd = $("<input>")
+			            .attr("type", "hidden")
+			            .attr("name", $submitButton.prop('name'))
+			            .val($submitButton.val());
+		            $form.append($(cmd));
+                });
+
+	            fileHashValue = $form.find("#ilfilehash").val();
 
                 // use url of form
                 url = $form.attr("action");
@@ -948,16 +1046,17 @@
                 // create empty jquery objects
                 $submitButton = $cancelButton = $();
                 $showOptions = $hideOptions = $();
+	            $form = $();
             }
-			
+
             // build archive regex
             if (settings.supportedArchives && settings.supportedArchives.length > 0)
                 supportedArchivesRegex = new RegExp("\\.(" + settings.supportedArchives.join("|") + ")$", "i");
-			
-            // build archive regex
+
+            // build extension regex
             if (settings.allowedExtensions && settings.allowedExtensions.length > 0)
                 allowedExtensionsRegex = new RegExp("\\.(" + settings.allowedExtensions.join("|") + ")$", "i");
-			
+
             // drag and drop supported?
             if (FILE_DRAG_AND_DROP_SUPPORTED)
             {
@@ -1004,7 +1103,7 @@
                 type: "POST",
                 pasteZone: null,
                 paramName: paramName,
-				
+
                 // callbacks
                 drop: filesDropped,
                 dragover: dropZoneDragOver,
@@ -1019,6 +1118,8 @@
 
             // we're ready to rumble!
             log(" -> upload URL: %s", fileUpload.options.url);
+
+	        loadExistingfiles();
 
             // update the file elements
             updateFileElements();
@@ -1106,8 +1207,25 @@
                 return;
             }
 
-            cancelAllUploads();
+            self.cancelAllUploads();
         }
+
+	    function loadExistingfiles()
+	    {
+		    if (getFileList)
+		    {
+			    var data = {getExistingFiles : 1, is_async_file_upload: 1, cmd: submitButtonName};
+			    data[postvar] = $fileList.attr('id');
+			    $.ajax({
+				    url: fileUpload.options.url,
+				    data: data,
+				    dataType: 'json',
+				    context: $fileList
+			    }).done(function (result) {
+				    existingFileAdded(result);
+			    });
+		    }
+	    }
 
         /**
          * Called when the user leaves or refreshes the page.
@@ -1118,8 +1236,8 @@
             if (isUploadInProgress)
                 return il.FileUpload.texts.cancelAllQuestion;
         }
-		
-        /*
+
+        /**
          * Called when the user drags over the drop zone.
          */
         function dropZoneDragOver(e)
@@ -1143,7 +1261,7 @@
             $overlay.addClass("ilFileDragOver");
         }
 
-        /*
+        /**
          * Called when the user leaves the drop zone while dragging.
          */
         function dropZoneDragLeave(e)
@@ -1154,7 +1272,7 @@
                 $overlay.removeClass("ilFileDragOver");
             });
         }
-		
+
         /**
          * Called when a file was dropped by the user on the drop zone.
          */
@@ -1165,6 +1283,7 @@
             // remove drag over effects
             $.doTimeout(overlayTimeoutId);
             $overlay.removeClass("ilFileDragOver");
+	        hideDropZoneOverlays();
         }
 
         /**
@@ -1187,6 +1306,11 @@
                 // add to files
                 var file = new ilFile(fileId, addedFile, fileUpload, data);
                 file.canExtract = supportedArchivesRegex ? file.name.match(supportedArchivesRegex) : false;
+	            
+	            if (allowDeletingFiles)
+	            {
+		            enableDeletingFile(file);
+	            }
 
                 log("  -> %s: %s (%s)", fileId, file.name, file.sizeFormatted);
 
@@ -1197,7 +1321,13 @@
                 var errorText = null;
 
                 // check for errors
-                if (file.size != null && file.size < 1)
+	            if (allowedExtensionsRegex && !file.name.match(allowedExtensionsRegex))
+	            {
+		            // wrong extension
+		            log(" -> %s: file type is not allowed (type = %s)!", fileId, file.ext);
+		            errorText = il.FileUpload.texts.invalidFileType;
+	            }
+	            else if (file.size != null && file.size < 1)
                 {
                     // folder or empty file
                     log(" -> %s: file is 0 bytes or a folder!", fileId);
@@ -1209,11 +1339,10 @@
                     log(" -> %s: file is too large (limit = %s)!", fileId, getFormattedFileSize(maxFileSize));
                     errorText = il.FileUpload.texts.fileTooLarge;
                 }
-                else if (allowedExtensionsRegex && !file.name.match(allowedExtensionsRegex))
-                {
-                    // wrong extension
-                    log(" -> %s: file type is not allowed (type = %s)!", fileId, file.ext);
-                    errorText = il.FileUpload.texts.invalidFileType;
+                else if (maxNumberOfFiles && maxNumberOfFiles <= files.length - $fileList.find(".ilFileUploadError").size()) {
+	                // max number of files exceeded
+	                log(" -> Too many files (queued files = %s, max files = %s)!", files.length, maxNumberOfFiles);
+	                errorText = il.FileUpload.texts.maxNumberOfFilesExceeded;
                 }
 
                 // add file element at first position
@@ -1233,14 +1362,74 @@
             updateFileElements();
         }
 
+	    function existingFileAdded(data) {
+		    log("Upload.existingFileAdded (Id=%s)", id);
+
+		    $.each(data.files.reverse(), function (index, addedFile)
+		    {
+			    // file already added?
+			    if (containsFile(addedFile))
+				    return;
+
+			    // increase file count
+			    fileCount++;
+
+			    // add to files.
+			    var uploadData = [];
+			    uploadData["files"] = addedFile;
+			    if (addedFile.id == undefined)
+			    {
+				    addedFile.id ="file_" + id + "_" + fileCount;
+			    }
+			    var file = new ilFile(addedFile.id, addedFile, fileUpload, uploadData);
+			    // set file parameters
+				file.size = addedFile.size;
+			    file.sizeFormatted = getFormattedFileSize(file.size);
+			    file.canExtract = supportedArchivesRegex ? file.name.match(supportedArchivesRegex) : false;
+			    if (allowDeletingFiles)
+			    {
+				    enableDeletingFile(file);
+			    }
+
+			    log("  -> %s: %s (%s)", file.id, file.name, file.sizeFormatted);
+
+			    // load html template for the file
+			    var $html = file.loadHtmlTemplate(fileRowTemplateId);
+			    $html.find("#title_" + file.id).val(addedFile.title).prop("disabled", true);
+			    $html.find("#desc_" + file.id).val(addedFile.description).prop("disabled", true);
+
+			    // add file element at first position
+			    file.setUploadSuccess();
+			    $fileList.children().eq(0).after($html);
+
+			    // add to list and notify listeners
+			    files.add(file.id, file);
+			    if (onFileAdded != null)
+				    onFileAdded(file);
+		    });
+
+		    updateFileElements();
+	    }
+
         /**
          * Initiates uploading the added files to the server.
          */
         function uploadFiles(e)
         {
-            e.preventDefault();
+	        // Send standard form data if there is no file to upload
+	        var validCount = files.length - $fileList.find(".ilFileUploadError").size() - $fileList.find(".ilFileUploadSuccess").size();
+	        if (validCount == 0 && submitEntireForm != SubmitEntireFormEnum.NEVER)
+	        {
+		        // disable file upload data
+		        $inputField.find('input').prop('disabled', true);
+		        log("Upload.uploadFiles no files to upload (Count=%s). Proceed with standard form submit.", files.length);
+		        // TODO maybe disable all file uploads? similar to $form.find('input[id^=ilFileUploadInput_][type=file]')
+		        // return to standard submit button processing
+		        return;
+	        }
 
-            log("Upload.uploadFiles (Count=%s)", files.length);
+	        log("Upload.uploadFiles (Count=%s)", files.length);
+	        e.preventDefault();
 
             // disable upload button
             $submitButton.prop("disabled", true);
@@ -1251,11 +1440,7 @@
             // submit each file
             files.each(function (id, file)
             {
-                if (file.isUploadFinished())
-                {
-                    removeFile(file);
-                }
-                else if (!file.isUploadDone())
+                if (!file.isUploadDone())
                 {
                     isUploadInProgress = true;
                     file.submit();
@@ -1268,10 +1453,44 @@
          */
         function fileSubmit(e, data)
         {
-            // add file specific form data
-            var file = files.get(data.id);
-            data.formData = file.getFormData();
+	        // add file specific form data
+	        var file = files.get(data.id);
+			var formData;
+	        if (!isManaged && submitEntireForm == SubmitEntireFormEnum.ALWAYS)
+	        {
+		        // here, formData is an array of objects due to the serializeArray() method
+		        // get all form data except
+				formData = getNonFileUploadFormData();
+		        formData.push({name: 'is_async_file_upload', value: 1});
+		        data.formData = formData;
+	        }
+	        else
+	        {
+		        // here, formData is an Object
+		        formData = { ilfilehash : fileHashValue, is_async_file_upload : 1 };
+		        formData[postvar] = JSON.stringify(file.getFormData());
+		        // append the command button name such that ilCtrl can forward the command
+		        formData["cmd[" + submitButtonName + "]"] = $submitButton.val();
+
+		        if (submitEntireForm == SubmitEntireFormEnum.NEVER)
+		        {
+			        // legacy form data submission: file data is sent directly
+					jQuery.extend(formData, file.getFormData());
+		        }
+		        data.formData = formData;
+	        }
         }
+
+
+	    function getNonFileUploadFormData()
+	    {
+		    var formData = $form.find('input[type!=submit], textarea, select').filter(function() {
+			    return $(this).closest('.ilFileUploadContainer').length === 0 || $(this) == $cancelButton;
+		    }).serializeArray();
+		    // append the command button name such that ilCtrl can forward the command
+		    formData.push({name : $submitButton.prop('name'), value: $submitButton.val()});
+		    return formData;
+	    }
 
         /**
          * Called when a file is submitted to the server.
@@ -1329,6 +1548,11 @@
 
             // get the file data
             var file = files.get(data.id);
+	        if (file == null)
+	        {
+		        log(" -> File with id %s not found in the list. Upload Cancelled?", data.id);
+		        return;
+	        }
 
             if (result.debug)
                 log(" -> Debug: %s", result.debug);
@@ -1350,12 +1574,27 @@
 
             updateUploadInProgress();
 
-            // all files uploaded?
-            if (allUploadsSuccessful())
+	        if (!isUploadInProgress)
+	        {
+		        // Enable input button after completion of file upload
+		        $fileSelectButton.removeClass("disabled");
+		        $fileSelectButton.find("input").prop("disabled", false);
+            }
+
+	        // all files successfully uploaded?
+	        if (allUploadsSuccessful())
             {
-                // lets go back to the previous page
-                if ($cancelButton.size() > 0)
-                    $cancelButton.click();
+	            if (submitEntireForm == SubmitEntireFormEnum.NEVER)
+	            {
+		            // lets go back to the previous page (legacy behaviour)
+		            if ($cancelButton.size() > 0)
+			            $cancelButton.click();
+	            }
+	            else if (submitEntireForm == SubmitEntireFormEnum.FINALLY)
+	            {
+		            // send the remaining form data
+		            $form.trigger('submit');
+	            }
             }
         }
 
@@ -1445,27 +1684,82 @@
             file.setUploadProgress(progress, progressText);
         }
 
-        /**
-		 * Updates the file elements.
-		 */
-        function updateFileElements()
-        {
-            var count = files.length;
-            if (count > 0)
-            {
-                var validCount = count - $fileList.find(".ilFileUploadError").size();
+	    function checkMaxFileLimit(validCount, uploadReadyCount) 
+	    {
+		    var tooManyCount = $fileList.find(".ilFileUploadErrorExceeded").size();
+		    
+		    if (tooManyCount > 0) 
+		    {
+			    if (maxNumberOfFiles >= tooManyCount + validCount) 
+			    {
+				    // Automatically enable files that were discarded due to too many files
+				    $.each($fileList.find(".ilFileUploadErrorExceeded"), function (index, disabledFile) 
+				    {
+					    files.get(disabledFile.id).unsetMaxNumberOfFilesExceededError();
+					    uploadReadyCount++;
+				    });
+			    }
+			    else if (validCount < maxNumberOfFiles)
+			    {
+				    // Let the user enable a specific file via an add button
+				    $.each($fileList.find(".ilFileUploadErrorExceeded"), function (index, disabledFile) 
+				    {
+					    files.get(disabledFile.id).setAddToQueueButton(updateFileElements.bind(this));
+				    });
+			    }
+			    else if (validCount >= maxNumberOfFiles) 
+			    {
+				    // Remove add buttons
+				    $.each($fileList.find(".ilFileUploadErrorExceeded"), function (index, disabledFile) 
+				    {
+					    files.get(disabledFile.id).unsetAddToQueueButton();
+				    });
+
+			    }
+		    }
+		    
+		    return uploadReadyCount;
+	    }
+
+	    /**
+	     * Updates the file elements.
+	     */
+	    function updateFileElements()
+	    {
+		    var count = files.length;
+		    if (count > 0)
+		    {
+			    var existingCount = $fileList.find(".ilFileUploadSuccess").size();
+			    var validCount = count - $fileList.find(".ilFileUploadError").size();
+                var uploadReadyCount = validCount - existingCount;
+	            uploadReadyCount = checkMaxFileLimit(validCount, uploadReadyCount);
 
                 $fileList.show();
-                $submitButton.prop("disabled", validCount == 0);
-                if (validCount > 0)
-                    $fileCount.text(fileCountText.replace("%s", validCount)).show();
+                $submitButton.prop("disabled", uploadReadyCount == 0 || isUploadInProgress || 
+	                $fileList.find(".ilFileUploadErrorExceeded").size() > 0);
+	            // disable all form buttons except the submit and cancel button
+	            if (!isManaged)
+	            {
+		            $form.find("input[type=submit]").filter(function() {
+			            return $(this).prop("name") != $submitButton.prop("name")
+				            && $(this).prop("name") != $cancelButton.prop("name");
+		            }).prop("disabled", true);
+	            }
+                if (uploadReadyCount > 0)
+                    $fileCount.text(fileCountText.replace("%s", uploadReadyCount)).show();
                 else
                     $fileCount.hide();
             }
             else
             {
                 $fileList.hide();
-                $submitButton.prop("disabled", true);
+	            // enable all form buttons
+	            if (!isManaged && !isUploadInProgress)
+	            {
+		            $form.find("input[type=submit]").prop("disabled", false);
+		            $fileSelectButton.removeClass("disabled");
+		            $fileSelectButton.find("input").prop("disabled", false);
+	            }
                 $fileCount.hide();
             }
         }
@@ -1482,7 +1776,7 @@
                 if (!file.isUploadSuccessful())
                 {
                     allSuccessful = false;
-                    return true;
+                    return false;
                 }
             });
 
@@ -1514,7 +1808,7 @@
 
             isUploadInProgress = fileCount > uploadedCount;
         }
-		
+
         /**
          * Checks whether a file is already within the file list.
          */
@@ -1523,14 +1817,33 @@
             var fileFound = false;
             files.each(function (id, fileData)
             {
-                if (fileData.name == getFileName(file) && fileData.size == file.size)
+                if ((fileData.name == getFileName(file) && fileData.size == file.size) || fileData.id == file.id)
                 {
                     fileFound = true;
-                    return true;
+                    return false;
                 }
             });
             return fileFound;
         }
+
+	    function enableDeletingFile(file)
+	    {
+		    file.uploadData["delete"] = function()
+		    {
+			    var data = {deleteId : file.id, is_async_file_upload: 1};
+			    data[postvar] = $fileList.attr('id');
+			    data["cmd[" + submitButtonName + "]"] = $submitButton.val();
+			    $.ajax({
+				    type: 'POST',
+				    url: fileUpload.options.url,
+				    data: data,
+				    dataType: 'json',
+				    context: $fileList
+			    });
+			    removeFile(file);
+		    };
+		    file.isDeletionEnabled = true;
+	    }
     };
     window.ilFileUpload = ilFileUpload;
 

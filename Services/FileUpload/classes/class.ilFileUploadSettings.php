@@ -17,6 +17,10 @@ class ilFileUploadSettings
 	const CONCURRENT_UPLOADS_DEFAULT = 3;
 	const CONCURRENT_UPLOADS_MAX = 10;
 	
+	const SUBMIT_ENTIRE_FORM_NEVER = "never";
+	const SUBMIT_ENTIRE_FORM_ALWAYS = "always";
+	const SUBMIT_ENTIRE_FORM_AFTER_FILE_UPLOADS = "finally";
+	
 	/**
 	 * The instance of the ilFileUploadSettings.
 	 * @var ilFileUploadSettings

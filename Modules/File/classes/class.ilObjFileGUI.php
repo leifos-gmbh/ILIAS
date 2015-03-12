@@ -2,6 +2,7 @@
 /* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 require_once "./Services/Object/classes/class.ilObject2GUI.php";
+require_once "./Services/Form/interfaces/interface.ilFileUploadHandler.php";
 require_once "./Modules/File/classes/class.ilObjFile.php";
 require_once "./Modules/File/classes/class.ilObjFileAccess.php";
 
@@ -17,7 +18,7 @@ require_once "./Modules/File/classes/class.ilObjFileAccess.php";
 *
 * @ingroup ModulesFile
 */
-class ilObjFileGUI extends ilObject2GUI
+class ilObjFileGUI extends ilObject2GUI implements ilFileUploadHandler
 {
 	function getType()
 	{
@@ -189,6 +190,10 @@ class ilObjFileGUI extends ilObject2GUI
 		
 		// use drag-and-drop upload if configured
 		require_once("Services/FileUpload/classes/class.ilFileUploadSettings.php");
+		/*
+		 * TODO this check should be handled automatically within isDragDropFileInputGUI.
+		 * Otherwise all users of ilDragDropFileInputGUI must somehow know that they should check whether isDragAndDropUploadEnabled.
+		 */
 		if (ilFileUploadSettings::isDragAndDropUploadEnabled())
 		{
 			$forms[] = $this->initMultiUploadForm();
@@ -845,7 +850,6 @@ class ilObjFileGUI extends ilObject2GUI
 			include_once("./Services/Preview/classes/class.ilPreviewGUI.php");
 			
 			// get context for access checks later on
-            $context;
 			switch ($this->id_type)
 			{
 				case self::WORKSPACE_NODE_ID:
@@ -977,14 +981,30 @@ class ilObjFileGUI extends ilObject2GUI
 		$dnd_form_gui = new ilPropertyFormGUI();
 		$dnd_form_gui->setMultipart(true);
 		$dnd_form_gui->setHideLabels();
-		
-		// file input
+
+        $dnd_form_gui->addItem(new ilTextInputGUI("Demo Text Input","demo_text"));
+
+        // file input
 		include_once("Services/Form/classes/class.ilDragDropFileInputGUI.php");
-		$dnd_input = new ilDragDropFileInputGUI($this->lng->txt("files"), "upload_files");
+		$dnd_input = new ilDragDropFileInputGUI($this, $this->lng->txt("files"), "upload_files");
 		$dnd_input->setArchiveSuffixes(array("zip"));
 		$dnd_input->setCommandButtonNames("uploadFiles", "cancel");
+		$dnd_input->setSuffixes(array('jpg')); // just for the demo
+		$dnd_input->setAcceptMimeTypes(array('image/jpg')); // just for the demo
+		// Display a list of existing files? (This makes more sense in other objects, where files are just one of many properties)
+		$dnd_input->setListExistingFiles(TRUE); // just for the demo
+		// Toggle delete requests? (Deleting is not implemented, but the method onDeleteUploadedFile gets called)
+		$dnd_input->setDeletingFilesAllowed(TRUE); // just for the demo
+		// Since we are only interested in files, we don't need to wait for additional form data
+		$dnd_input->setFormSubmitMode(ilFileUploadSettings::SUBMIT_ENTIRE_FORM_NEVER); // just for the demo
+        // Send post data along with each file (might be useful if post data is needed to process files).
+        $dnd_input->setFormSubmitMode(ilFileUploadSettings::SUBMIT_ENTIRE_FORM_ALWAYS); // just for the demo
+		// The new default behaviour of ilDragDropFileInputGUI sends all 
+		$dnd_input->setFormSubmitMode(ilFileUploadSettings::SUBMIT_ENTIRE_FORM_AFTER_FILE_UPLOADS); // just for the demo
+		$dnd_input->setRequired(TRUE);
+		$dnd_input->setMaxNumberOfFiles(4); // just for the demo
 		$dnd_form_gui->addItem($dnd_input);
-		
+
 		// add commands
 		$dnd_form_gui->addCommandButton("uploadFiles", $this->lng->txt("upload_files"));
 		$dnd_form_gui->addCommandButton("cancel", $this->lng->txt("cancel"));
@@ -1005,14 +1025,6 @@ class ilObjFileGUI extends ilObject2GUI
 	 */
 	public function uploadFiles()
 	{
-		include_once("./Services/JSON/classes/class.ilJsonUtil.php");
-		
-		$response = new stdClass();	
-		$response->error = null;
-		$response->debug = null;	
-		
-		$files = $_FILES;
-		
 		// #14249 - race conditions because of concurrent uploads
 		$after_creation_callback = (int)$_REQUEST["crtcb"];
 		if($after_creation_callback)
@@ -1022,51 +1034,29 @@ class ilObjFileGUI extends ilObject2GUI
 		}
 		
 		// load form
+		/** @var ilPropertyFormGUI $dnd_form_gui */
 		$dnd_form_gui = $this->initMultiUploadForm();
-		if ($dnd_form_gui->checkInput())
-		{
-			try
-			{
-				if (!$this->checkPermissionBool("create", "", "file"))
-				{
-					$response->error = $this->lng->txt("permission_denied");
-				}
-				else
-				{
-					// handle the file
-					$fileresult = $this->handleFileUpload($dnd_form_gui->getInput("upload_files"));
-					if ($fileresult)
-						$response = (object)array_merge((array)$response, (array)$fileresult);
-				}
-			}
-			catch (Exception $ex)
-			{
-				$response->error = $ex->getMessage() . " ## " . $ex->getTraceAsString();
-			}
-		}
-		else
-		{
-			$dnd_input = $dnd_form_gui->getItemByPostVar("upload_files");
-			$response->error = $dnd_input->getAlert();
-		}
-		
-		if($after_creation_callback &&
-			sizeof($this->after_creation_callback_objects))
-		{			
-			foreach($this->after_creation_callback_objects as $new_file_obj)
-			{				
-				ilObject2GUI::handleAfterSaveCallback($new_file_obj, $after_creation_callback);
-			}
-			unset($this->after_creation_callback_objects);
-		}
+		if ($dnd_form_gui->checkInput()) {
+			$this->clearCompletedFileUploads($dnd_form_gui);
 
-		// send response object (don't use 'application/json' as IE wants to download it!)
-		header('Vary: Accept');
-		header('Content-type: text/plain');
-		echo ilJsonUtil::encode($response);
+			if($after_creation_callback &&
+				sizeof($this->after_creation_callback_objects))
+			{
+				foreach($this->after_creation_callback_objects as $new_file_obj)
+				{
+					ilObject2GUI::handleAfterSaveCallback($new_file_obj, $after_creation_callback);
+				}
+				unset($this->after_creation_callback_objects);
+			}
+
+
+			// After all uploads are completed, redirect to parent
+			$this->ctrl->setParameterByClass("ilrepositorygui", "ref_id", $this->parent_id);
+			$this->ctrl->redirectByClass("ilrepositorygui");
+			return;
+		}
 		
-		// no further processing!
-		exit;
+		$this->tpl->setContent($dnd_form_gui->getHTML());
 	}	
 	
 	/**
@@ -1175,23 +1165,6 @@ class ilObjFileGUI extends ilObject2GUI
 			}
 
 			ilUtil::delDir($newDir);
-			
-			// #15404
-			if($this->id_type != self::WORKSPACE_NODE_ID)
-			{
-				foreach(ilFileUtils::getNewObjects() as $parent_ref_id => $objects)
-				{
-					if($parent_ref_id != $this->parent_id)
-					{
-						continue;
-					}
-
-					foreach($objects as $object)
-					{
-						$this->after_creation_callback_objects[] = $object;
-					}
-				}	
-			}
 		}
 		else
 		{
@@ -1433,5 +1406,86 @@ class ilObjFileGUI extends ilObject2GUI
 		return $lg;
 	}
 
+	/**
+	 * @param ilFileUploadInputGUI $item
+	 * @param stdClass             $response
+	 * @param bool                 $is_valid
+	 * @param array                $file
+	 *
+	 * @return stdClass $response
+	 */
+	public function onFileUpload(ilFileUploadInputGUI $item, $response, $is_valid, $file) {
+		if ($is_valid) {
+			try
+			{
+				if (!$this->checkPermissionBool("create", "", "file"))
+				{
+					$response->error = $this->lng->txt("permission_denied");
+				}
+				else
+				{
+					// handle the file
+					/**
+					 * We can do this here, directly with each file upload request, but we could also enable
+					 * ilDragDropFileInputGUI's persistFile method by setting 
+					 * setFormSubmitMode(ilFileUploadSettings::SUBMIT_ENTIRE_FORM_AFTER_FILE_UPLOADS).
+					 * Then we can access the files array in the post var using $form->getInput("upload_files").
+					 */
+					$fileresult = $this->handleFileUpload($file);
+					if ($fileresult)
+						$response = (object)array_merge((array)$response, (array)$fileresult);
+				}
+			}
+			catch (Exception $ex)
+			{
+				$response->error = $ex->getMessage() . " ## " . $ex->getTraceAsString();
+			}
+		}
+
+		return $response;
+	}
+
+	/**
+	 * @param ilFileUploadInputGUI $item
+	 * @param stdClass             $response
+	 *
+	 * @return stdClass $response
+	 */
+	public function onListUploadedFiles(ilFileUploadInputGUI $item, $response) {
+		/*
+		 * Example code (ilDragDropFileInputGUI's helper method 'createListUploadedFilesResponse' could be used to
+		 * create the response for an array of ilObjFile objects
+		 */
+		$files = array();
+		$file1 = array('name' => 'test file1.pdf', 'description' => 'test description', 'size' => 81234,
+			'title' => 'title 1', 'id' => 'file1');
+		$files[$file1['id']] = $file1;
+		$file2 = array('name' => 'test file2.pdf', 'size' => 1234, 'id' => 'file2');
+		$files[$file2['id']] = $file2;
+
+		$response->files = array_values($files);
+
+		return $response;
+	}
+
+	/**
+	 * @param ilFileUploadInputGUI $item
+	 * @param string               $file_id
+	 *
+	 * @return stdClass $response
+	 */
+	public function onDeleteUploadedFile(ilFileUploadInputGUI $item, $file_id) {
+		// TODO: Implement onDeleteUploadedFile() method.
+	}
+
+	/**
+	 * @param ilPropertyFormGUI $dnd_form_gui
+	 */
+	protected function clearCompletedFileUploads(ilPropertyFormGUI $dnd_form_gui) {
+		$dnd_input = $dnd_form_gui->getItemByPostVar("upload_files");
+		if ($dnd_input instanceof ilDragDropFileInputGUI) {
+			$dnd_input->clearHandledUploadsFromCache();
+		}
+	}
 } // END class.ilObjFileGUI
 ?>

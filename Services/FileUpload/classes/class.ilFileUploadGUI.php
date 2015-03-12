@@ -8,6 +8,7 @@ require_once("./Services/FileUpload/classes/class.ilFileUploadSettings.php");
  * User interface class for drag and drop file upload.
  *
  * @author Stefan Born <stefan.born@phzh.ch>
+ * @author Fabio Heer
  * @version $Id$
  * 
  * @package ServicesFileUpload
@@ -21,24 +22,26 @@ class ilFileUploadGUI
 	private $ref_id = null;
 	private $current_obj = false;
 	private $max_file_size = null;
+	private $max_number_of_files = null;
 	private $suffixes = array();
 	private $archive_suffixes = array();
 	private $input_field_name = "upload_files";
 	private $input_field_id = null;
 	private $use_form = false;
 	private $drop_area_id = null;
-	private $submit_button_name = null;
-	private $cancel_button_name = null;
+	private $submit_button_name = "uploadFiles";
+	private $cancel_button_name = "cancel";
 	private $file_list_id = null;
 	private $file_select_button_id = null;
+	private $submit_entire_form = ilFileUploadSettings::SUBMIT_ENTIRE_FORM_NEVER;
+	private $get_file_list = false;
+	private $delete_uploaded_files_allowed = false;
 	
 	/**
 	 * Creates a new file upload GUI.
 	 */
 	public function __construct($a_drop_zone_id, $a_ref_id = null, $current_obj = false) 
 	{
-		global $ilCtrl;
-		
 		$this->drop_zone_id = $a_drop_zone_id;
 		$this->ref_id = $a_ref_id;
 		$this->current_obj = $current_obj;
@@ -70,7 +73,7 @@ class ilFileUploadGUI
 	 */
 	public function getHTML()
 	{
-		global $lng, $ilCtrl, $tpl;
+		global $tpl;
 		
 		// get values
 		$id = $this->ref_id;
@@ -85,7 +88,7 @@ class ilFileUploadGUI
 			return "";			
 			
 		if ($url != null)
-			$options->url = $this->getUploadUrl();
+			$options->url = $url;
 		
 		// get title and replace quotes with HTML entities
 		if ($this->ref_id != null && !$this->use_form)
@@ -103,10 +106,8 @@ class ilFileUploadGUI
 			$options->fileInput = $this->input_field_name;
 		
 		// buttons
-		if ($this->submit_button_name != null)
-			$options->submitButton = $this->submit_button_name;
-		if ($this->cancel_button_name != null)
-			$options->cancelButton = $this->cancel_button_name;
+		$options->submitButton = $this->submit_button_name;
+		$options->cancelButton = $this->cancel_button_name;
 		
 		// drop area
 		if ($this->drop_area_id != null)
@@ -120,25 +121,30 @@ class ilFileUploadGUI
 		if ($this->file_select_button_id != null)
 			$options->fileSelectButton = $this->makeJqueryId($this->file_select_button_id);
 		
+		$options->getFileList = $this->hasGetFileList();
+		$options->allowDeletingFiles = $this->hasDeleteUploadedFilesAllowed();
+		
 		// max size
 		$max_size = $this->getMaxFileSize();
 		if ($max_size != null)
 			$options->maxFileSize = $max_size;
+
+		// max number of files
+		$max_number_of_files = $this->getMaxNumberOfFiles();
+		if ($max_number_of_files != null)
+			$options->maxNumberOfFiles = $max_number_of_files;
+		
+		$options->submitEntireForm = $this->submit_entire_form;
 		
 		// allowed extensions
-		$allowed_suffixes = $this->buildSuffixList($this->getSuffixes());
-		if ($allowed_suffixes != "")
-			$options->allowedExtensions = "[" . $allowed_suffixes . "]";
+		$options->allowedExtensions = $this->getSuffixes(); 
 		
 		// supported archive extensions
-		$supported_archives = $this->buildSuffixList($this->getArchiveSuffixes());
-		if ($supported_archives != "")
-			$options->supportedArchives = "[" . $supported_archives . "]";
+		$options->supportedArchives = $this->getArchiveSuffixes();
 		
 		// inject load script
 		include_once("./Services/JSON/classes/class.ilJsonUtil.php");
 		
-		$onLoadCode = "";
 		if ($this->use_form)
 			$onLoadCode = "var fileUpload$id = new ilFileUpload($id, " . ilJsonUtil::encode($options) . ");";
 		else
@@ -176,6 +182,7 @@ class ilFileUploadGUI
 		$tpl_shared->setVariable("ERROR_MSG_WRONG_FILE_TYPE", $lng->txt("form_msg_file_wrong_file_type"));
 		$tpl_shared->setVariable("ERROR_MSG_EMPTY_FILE_OR_FOLDER", $lng->txt("error_empty_file_or_folder"));
 		$tpl_shared->setVariable("ERROR_MSG_UPLOAD_ZERO_BYTES", $lng->txt("error_upload_was_zero_bytes"));
+		$tpl_shared->setVariable("ERROR_MSG_TOO_MANY_FILES", $lng->txt("form_msg_file_too_many_files"));
 		$tpl_shared->setVariable("QUESTION_CANCEL_ALL", $lng->txt("cancel_file_upload"));
 		$tpl_shared->setVariable("ERROR_MSG_EXTRACT_FAILED", $lng->txt("error_extraction_failed"));
 		$tpl_shared->setVariable("PROGRESS_UPLOADING", $lng->txt("uploading"));
@@ -196,14 +203,18 @@ class ilFileUploadGUI
 		$tpl_panel->setVariable("TXT_HEADER", $lng->txt("upload_files_title"));
 		$tpl_panel->setVariable("TXT_SHOW_ALL_DETAILS", $lng->txt('show_all_details')); 
 		$tpl_panel->setVariable("TXT_HIDE_ALL_DETAILS", $lng->txt('hide_all_details'));
-			
+		$tpl_panel->setVariable("SUBMIT_BUTTON", $this->submit_button_name);
+		$tpl_panel->setVariable("CANCEL_BUTTON", $this->cancel_button_name);
+		$tpl_panel->setVariable("TXT_SUBMIT_BUTTON", $lng->txt("upload_files"));
+		$tpl_panel->setVariable("TXT_CANCEL_BUTTON", $lng->txt("cancel"));
+
 		$tpl_shared->setCurrentBlock("fileupload_panel_tmpl");
 		$tpl_shared->setVariable("PANEL_TEMPLATE_HTML", $tpl_panel->get());
 		$tpl_shared->parseCurrentBlock();
 			
 		// load row template
 		$tpl_row = new ilTemplate("tpl.fileupload_row_template.html", true, true, "Services/FileUpload");
-		$tpl_row->setVariable("IMG_ALERT", ilUtil::getImagePath("icon_alert.svg"));
+		$tpl_row->setVariable("IMG_ALERT", ilUtil::getImagePath("icon_alert_s.gif"));
 		$tpl_row->setVariable("ALT_ALERT", $lng->txt("alert"));
 		$tpl_row->setVariable("TXT_CANCEL", $lng->txt("cancel"));
 		$tpl_row->setVariable("TXT_REMOVE", $lng->txt("remove"));
@@ -225,22 +236,13 @@ class ilFileUploadGUI
 		return $tpl_shared->get();
 	}
 	
-	protected function buildSuffixList($suffixes)
-	{
-		$list = $delim = "";
-		
-		if (is_array($suffixes) && count($suffixes) > 0)
-		{
-			foreach($suffixes as $suffix)
-			{
-				$list .= $delim . "\"" . $suffix . "\"";
-				$delim = ", ";
-			}
-		}
-		
-		return $list;
-	}
-	
+	/**
+	 * Enable the form submit mode
+	 *
+	 * @param string $input_field_id
+	 * @param string $a_submit_name
+	 * @param string $a_cancel_name
+	 */
 	public function enableFormSubmit($input_field_id, $a_submit_name, $a_cancel_name)
 	{
 		$this->use_form = true;
@@ -252,21 +254,39 @@ class ilFileUploadGUI
 	/**
 	 * Sets the maximum file size in bytes.
 	 *
-	 * @param	int	$a_max_size	The maximum file size in bytes.
+	 * @param	int	$max_size	The maximum file size in bytes.
 	 */
-	public function setMaxFileSize($a_max)
+	public function setMaxFileSize($max_size)
 	{
-		$this->max_file_size = $a_max;
+		$this->max_file_size = $max_size;
 	}
 	
 	/**
-	 * Gets the maximum file size in bytes.
+	 * @return int the maximum file size in bytes.
 	 */
 	public function getMaxFileSize()
 	{
 		return $this->max_file_size;
 	}	
 	
+	/**
+	 * Sets the maximum number of files.
+	 *
+	 * @param	int	$a_max_number_of_files.
+	 */
+	public function setMaxNumberOfFiles($a_max_number_of_files)
+	{
+		$this->max_number_of_files = $a_max_number_of_files;
+	}
+
+	/**
+	 * Gets the maximum number of files.
+	 */
+	public function getMaxNumberOfFiles()
+	{
+		return $this->max_number_of_files;
+	}
+
 	/**
 	 * Set accepted archive suffixes.
 	 *
@@ -347,6 +367,38 @@ class ilFileUploadGUI
 		return $this->file_list_id;
 	}
 	
+	/**
+	 * @param bool $get_file_list
+	 */
+	public function setGetFileList($get_file_list)
+	{
+		$this->get_file_list = (bool)$get_file_list;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function hasGetFileList()
+	{
+		return $this->get_file_list;
+	}
+
+	/**
+	 * @param bool $delete_uploaded_files_allowed
+	 */
+	public function setDeleteUploadedFilesAllowed($delete_uploaded_files_allowed)
+	{
+		$this->delete_uploaded_files_allowed = (bool)$delete_uploaded_files_allowed;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function hasDeleteUploadedFilesAllowed()
+	{
+		return $this->delete_uploaded_files_allowed;
+	}
+
 	public function setFileSelectButtonId($a_id)
 	{
 		$this->file_select_button_id = $a_id;
@@ -357,8 +409,37 @@ class ilFileUploadGUI
 		return $this->file_select_button_id;
 	}
 	
+	/**
+	 * @param string $form_submit_mode use the constants in ilFileUploadSettings to set a value.
+	 *                                 set "ilFileUploadSettings::SUBMIT_ENTIRE_FORM_NEVER" in order to only receive
+	 *                                 (asynchronous) file upload POST requests.
+	 *                                 set "ilFileUploadSettings::SUBMIT_ENTIRE_FORM_ALWAYS" to receive the file upload
+	 *                                 data along its parent form data
+	 *                                 set "ilFileUploadSettings::SUBMIT_ENTIRE_FORM_AFTER_FILE_UPLOADS" to receive
+	 *                                 first all file upload requests and then the parent form data.
+	 */
+	public function setSubmitEntireForm($form_submit_mode)
+	{
+		switch ($form_submit_mode)
+		{
+			case ilFileUploadSettings::SUBMIT_ENTIRE_FORM_NEVER:
+			case ilFileUploadSettings::SUBMIT_ENTIRE_FORM_ALWAYS:
+			case ilFileUploadSettings::SUBMIT_ENTIRE_FORM_AFTER_FILE_UPLOADS:
+				$this->submit_entire_form = $form_submit_mode;
+				break;
+		}
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getSubmitEntireForm() {
+		return $this->submit_entire_form;
+	}
+
 	private function getUploadUrl()
 	{
+		/** @var ilCtrl $ilCtrl */
 		global $ilCtrl;
 		
 		// return null when the form is used
@@ -376,7 +457,12 @@ class ilFileUploadGUI
 	
 		return $ilCtrl->getFormActionByClass(self::FILE_OBJ_GUI_CLASS, "uploadFiles", "", true, false);
 	}
-	
+
+	/**
+	 * @param string $a_id
+	 *
+	 * @return string
+	 */
 	private function makeJqueryId($a_id)
 	{
 		if ($a_id != null && count($a_id) > 0)

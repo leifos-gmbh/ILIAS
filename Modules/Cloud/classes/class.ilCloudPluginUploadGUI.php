@@ -73,6 +73,7 @@ class ilCloudPluginUploadGUI extends ilCloudPluginGUI
         $this->form->setMultipart(true);
         $this->form->setHideLabels();
 
+	    // TODO needs to be adjusted to the new ilDragDropFileInputGUI implementation
         $file = new ilDragDropFileInputGUI($lng->txt("cld_upload_flies"), "upload_files");
         $file->setRequired(true);
         $this->form->addItem($file);

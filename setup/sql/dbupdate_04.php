@@ -5774,3 +5774,68 @@ $ilDB->manipulate(
 
 
 ?>
+<#4473>
+<?php
+if (!$ilDB->tableExists("il_fileupload_cache")) {
+    $fields = array(
+        'id' => array(
+            'type' => 'integer',
+            'length' => 4,
+            'notnull' => TRUE
+        ),
+        'upload_id' => array(
+            'type' => 'text',
+            'length' => 255,
+            'notnull' => TRUE
+        ),
+        'name' => array(
+            'type' => 'text',
+            'length' => 255,
+            'notnull' => TRUE
+        ),
+        'type' => array(
+            'type' => 'text',
+            'length' => 32,
+            'notnull' => TRUE
+        ),
+        'tmp_name' => array(
+            'type' => 'text',
+            'length' => 255,
+            'notnull' => TRUE
+        ),
+        'error' => array(
+            'type' => 'integer',
+            'length' => 2,
+            'notnull' => TRUE
+        ),
+        'file_size' => array(
+            'type' => 'integer',
+            'length' => 4,
+            'notnull' => TRUE
+        ),
+        'extract' => array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => TRUE
+        ),
+        'title' => array(
+            'type' => 'text',
+            'length' => 255,
+            'notnull' => TRUE
+        ),
+        'description' => array(
+            'type' => 'text',
+            'length' => 1000,
+            'notnull' => FALSE
+        ),
+        'keep_structure' => array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => TRUE
+        )
+    );
+    $ilDB->createTable("il_fileupload_cache", $fields);
+    $ilDB->addPrimaryKey("il_fileupload_cache", array( 'id' ));
+    $ilDB->createSequence("il_fileupload_cache");
+}
+?>

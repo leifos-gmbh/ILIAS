@@ -27,7 +27,6 @@ button.submit:disabled:hover {
     height: 100%;
     -webkit-box-shadow: -2px 0 5px rgba(0, 0, 0, .2);
     box-shadow: -2px 0 5px rgba(0, 0, 0, .2);
-	z-index: 2000;
 }
 
 div.ilFileUploadHeader {
@@ -291,10 +290,9 @@ td.ilFileUploadEntryFileName {
 	padding: 2px 0;
 	width: 22px;
 	text-align: center;
-	line-height: 15px;
 }
-.ilFileUploadSuccess .ilFileUploadEntryCancel {
-    background: transparent url(../../../../templates/default/images/icon_ok.svg) no-repeat 2px 50%;
+.ilFileUploadSuccess .ilFileUploadEntryProgress {
+    background: transparent url(../../../../templates/default/images/icon_ok.svg) no-repeat 95% center;   
 }
 
 /* file options */

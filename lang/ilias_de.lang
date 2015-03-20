@@ -7738,6 +7738,7 @@ form#:#form_msg_file_size_exceeds#:#Die hochzuladende Datei überschreitet die m
 form#:#form_msg_file_upload_stopped_ext#:#Upload durch PHP-Extension abgebrochen.
 form#:#form_msg_file_virus_found#:#In der hochzuladenden Datei wurde ein Virus gefunden!
 form#:#form_msg_file_wrong_file_type#:#Falscher Dateityp
+form#:#form_msg_file_too_many_files#:#Zu viele Dateien
 form#:#form_msg_formula_is_required#:#Bitte geben Sie eine korrekte Formel an.
 form#:#form_msg_numeric_value_required#:#Bitte geben Sie einen numerischen Wert ein.
 form#:#form_msg_value_too_high#:#Wert ist zu hoch. Bitte geben Sie einen niedrigeren Wert ein.
@@ -7749,6 +7750,7 @@ form#:#form_password_required_for_auth#:#Für die gewählte Authentifizierungmet
 form#:#form_please_select#:#Bitte auswählen
 form#:#form_retype_password#:#Passwort nochmals eingeben
 form#:#form_seconds#:#Sekunden
+form#:#form_max_files#:#Maximal erlaubte Anzahl Dateien: %u
 forum#:#activate_current_and_childs#:#Alle Beitrage freischalten
 forum#:#activate_new_posts#:#Neue Beiträge freischalten
 forum#:#activate_only_current#:#Nur diesen Beitrag freischalten

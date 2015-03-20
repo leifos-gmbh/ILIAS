@@ -6607,9 +6607,9 @@ feed#:#feed_proxy_port_info#:#Proxy port for socket connection
 feed#:#feed_proxy_port#:#Proxy Port
 feed#:#feed_proxy#:#Proxy Host
 feed#:#feed_settings#:#External Web Feeds Settings
-file#:#file_new_version_info#:#Create new file version. Previous versions will not be modified.
+file#:#file_new_version_info#:#Create new file version. Old versions will not be modified.
 file#:#file_new_version#:#Create New Version
-file#:#replace_file_info#:#All previous file versions will be deleted.
+file#:#replace_file_info#:#All former file versions will be deleted.
 form#:#form_days#:#Days
 form#:#form_file_input#:#File Input
 form#:#form_format#:#Format
@@ -6629,6 +6629,7 @@ form#:#form_msg_file_size_exceeds#:#The uploaded file exceeds the max. allowed f
 form#:#form_msg_file_upload_stopped_ext#:#File upload stopped by extension.
 form#:#form_msg_file_virus_found#:#Virus found in uploaded file.
 form#:#form_msg_file_wrong_file_type#:#Wrong file type.
+form#:#form_msg_file_too_many_files#:#Too many files.
 form#:#form_msg_formula_is_required#:#Please enter a correct formula.
 form#:#form_msg_numeric_value_required#:#Please enter a numeric value.
 form#:#form_msg_value_too_high#:#Value too high. Please enter a lower value.
@@ -6639,6 +6640,7 @@ form#:#form_password_not_allowed_for_auth#:#It is not possible to change the pas
 form#:#form_password_required_for_auth#:#Password is required for the chosen authentication method.
 form#:#form_retype_password#:#Retype Password
 form#:#form_seconds#:#Seconds
+form#:#form_max_files#:#Number of allowed files: %u
 forum#:#activate_current_and_childs#:#Activate All Postings
 forum#:#activate_new_posts#:#Activate Postings
 forum#:#activate_only_current#:#Activate Current

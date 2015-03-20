@@ -10,7 +10,8 @@ require_once "./Modules/File/classes/class.ilObjFileAccess.php";
 * GUI class for file objects.
 *
 * @author Sascha Hofmann <shofmann@databay.de> 
-* @author Stefan Born <stefan.born@phzh.ch> 
+* @author Stefan Born <stefan.born@phzh.ch>
+* @author Timon Amstutz <timon.amstutz@ilub.unibe.ch>
 * @version $Id$
 *
 * @ilCtrl_Calls ilObjFileGUI: ilMDEditorGUI, ilInfoScreenGUI, ilPermissionGUI, ilShopPurchaseGUI, ilObjectCopyGUI

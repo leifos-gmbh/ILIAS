@@ -25,6 +25,7 @@
  * Interface ilFileUploadHandler
  * 
  * @author  Fabio Heer
+ * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version $Id$
  * @ingroup ServicesForm
  */

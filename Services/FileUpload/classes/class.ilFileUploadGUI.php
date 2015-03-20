@@ -9,6 +9,7 @@ require_once("./Services/FileUpload/classes/class.ilFileUploadSettings.php");
  *
  * @author Stefan Born <stefan.born@phzh.ch>
  * @author Fabio Heer
+ * @author Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version $Id$
  * 
  * @package ServicesFileUpload

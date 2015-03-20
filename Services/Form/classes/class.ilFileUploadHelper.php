@@ -25,7 +25,8 @@ require_once('Services/Form/interfaces/interface.ilFileUploadHandler.php');
 /**
  * Class ilFileUploadHandler
  *
- * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
+ * @author  Fabio Heer
+ * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version $Id$
  */
 class ilFileUploadHelper {

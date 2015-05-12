@@ -7483,6 +7483,10 @@ div.ilSideBarContent {
   height: 0px;
   display: none;
 }
+.il_VAccordionContentDef > div,
+.il_HAccordionContentDef > div {
+  overflow: auto;
+}
 /* Modules/ScormAicc */
 table.il_ScormTable {
   color: #222;
@@ -7908,6 +7912,7 @@ blockquote.ilForumQuote {
   margin: 0 20px 10px;
   padding: 5px;
   border: 1px solid #B6B6B6;
+  font-size: 90%;
 }
 div.ilForumQuoteHead {
   font-weight: bold;
@@ -8445,6 +8450,7 @@ span.ilCalColSpan {
   width: 24px;
   height: 25px;
   float: left;
+  text-align: center;
 }
 ul.ilCalSel li img {
   margin-top: 6px;
@@ -9872,6 +9878,12 @@ div#ilContRepIntro img {
 /* Modules/LearningModule */
 .ilLMMenu {
   clear: both;
+}
+body.ilLMNoMenu .ilFixedTopSpacer {
+  padding-top: 0px;
+}
+body.ilLMNoMenu .ilLeftNav {
+  top: 0px;
 }
 button.ilAreaClose {
   width: 20px;

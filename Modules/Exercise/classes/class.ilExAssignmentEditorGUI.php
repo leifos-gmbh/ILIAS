@@ -349,10 +349,39 @@ class ilExAssignmentEditorGUI
 	{
 		global $lng;
 		
-		if($a_form->checkInput())
-		{			
-			$valid = true;
+		$protected_peer_review_groups = false;
+		
+		if($this->assignment)
+		{
+			if($this->assignment->getPeerReview())
+			{
+				include_once "Modules/Exercise/classes/class.ilExPeerReview.php";
+				$peer_review = new ilExPeerReview($this->assignment);	
+				if($peer_review->hasPeerReviewGroups())
+				{
+					$protected_peer_review_groups = true;
+				}
+			}
 			
+			if($this->assignment->getFeedbackFile())
+			{									
+				$a_form->getItemByPostVar("fb_file")->setRequired(false); // #15467
+			}
+		}
+		
+		$valid = $a_form->checkInput();	
+		
+		if($protected_peer_review_groups)
+		{
+			// checkInput() will add alert to disabled fields
+			$a_form->getItemByPostVar("deadline")->setAlert(null);
+			$a_form->getItemByPostVar("deadline2")->setAlert(null);
+			$a_form->getItemByPostVar("peer_min")->setAlert(null);
+			$a_form->getItemByPostVar("peer_char")->setAlert(null);
+		}	
+		
+		if($valid)
+		{														
 			// dates
 			
 			$time_start = $a_form->getInput("start_time_cb")
@@ -369,26 +398,13 @@ class ilExAssignmentEditorGUI
 				: null;		
 			
 			// handle disabled elements
-			$protected_peer_review_groups = false;
-			if($this->assignment && 
-				$this->assignment->getPeerReview())
+			if($protected_peer_review_groups)
 			{
-				include_once "Modules/Exercise/classes/class.ilExPeerReview.php";
-				$peer_review = new ilExPeerReview($this->assignment);	
-				if($peer_review->hasPeerReviewGroups())
-				{				
-					$protected_peer_review_groups = true;
-					$time_deadline = $this->assignment->getDeadline();		
-					$time_deadline_ext = $this->assignment->getExtendedDeadline();		
-					$time_peer = $a_form->getInput("peer_dl_tgl")
-						? $a_form->getItemByPostVar("peer_dl")->getDate()->get(IL_CAL_UNIX)
-						: null;
-					
-					// checkInput() will add alert to disabled fields
-					$a_form->getItemByPostVar("deadline")->setAlert(null);
-					$a_form->getItemByPostVar("deadline2")->setAlert(null);
-					$a_form->getItemByPostVar("peer_min")->setAlert(null);
-				}
+				$time_deadline = $this->assignment->getDeadline();		
+				$time_deadline_ext = $this->assignment->getExtendedDeadline();		
+				$time_peer = $a_form->getInput("peer_dl_tgl")
+					? $a_form->getItemByPostVar("peer_dl")->getDate()->get(IL_CAL_UNIX)
+					: null;									
 			}
 					
 			// no deadline?
@@ -701,6 +717,8 @@ class ilExAssignmentEditorGUI
 			}		
 		}		
 		
+		$a_form->setValuesByArray($values);
+		
 		// global feedback		
 		if($this->assignment->getFeedbackFile())
 		{						
@@ -710,9 +728,7 @@ class ilExAssignmentEditorGUI
 		}
 		$a_form->getItemByPostVar("fb_cron")->setChecked($this->assignment->hasFeedbackCron());			
 		$a_form->getItemByPostVar("fb_date")->setValue($this->assignment->getFeedbackDate());					
-		
-		$a_form->setValuesByArray($values);
-		
+						
 		$this->handleDisabledFields($a_form);
 	}
 	
@@ -748,7 +764,11 @@ class ilExAssignmentEditorGUI
 		$a_form->getItemByPostVar("peer_file")->setChecked($this->assignment->hasPeerReviewFileUpload());
 		$a_form->getItemByPostVar("peer_prsl")->setChecked($this->assignment->hasPeerReviewPersonalized());
 		$a_form->getItemByPostVar("peer_unlock")->setValue($this->assignment->getPeerReviewSimpleUnlock());
-		$a_form->getItemByPostVar("peer_valid")->setValue($this->assignment->getPeerReviewValid());
+		
+		if($this->enable_peer_review_completion)
+		{
+			$a_form->getItemByPostVar("peer_valid")->setValue($this->assignment->getPeerReviewValid());
+		}
 
 		if ($this->assignment->getPeerReviewChars() > 0)
 		{

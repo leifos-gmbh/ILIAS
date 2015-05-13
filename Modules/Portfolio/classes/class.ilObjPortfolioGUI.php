@@ -10,7 +10,8 @@ include_once('./Modules/Portfolio/classes/class.ilObjPortfolioBaseGUI.php');
  * @version $Id$
  *
  * @ilCtrl_Calls ilObjPortfolioGUI: ilPortfolioPageGUI, ilPageObjectGUI
- * @ilCtrl_Calls ilObjPortfolioGUI: ilWorkspaceAccessGUI, ilNoteGUI, ilObjStyleSheetGUI
+ * @ilCtrl_Calls ilObjPortfolioGUI: ilWorkspaceAccessGUI, ilNoteGUI
+ * @ilCtrl_Calls ilObjPortfolioGUI: ilObjStyleSheetGUI, ilPortfolioExerciseGUI
  *
  * @ingroup ModulesPortfolio
  */
@@ -119,6 +120,13 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
 					$this->object->update();
 					$this->ctrl->redirectByClass("ilobjstylesheetgui", "edit");
 				}
+				break;
+				
+			case "ilportfolioexercisegui":
+				$this->ctrl->setReturn($this, "view");
+				include_once "Modules/Portfolio/classes/class.ilPortfolioExerciseGUI.php";
+				$gui = new ilPortfolioExerciseGUI($this->user_id, $this->object->getId());
+				$this->ctrl->forwardCommand($gui);
 				break;
 			
 			default:		

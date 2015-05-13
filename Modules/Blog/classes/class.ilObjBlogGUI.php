@@ -15,7 +15,7 @@ require_once "./Services/PersonalDesktop/interfaces/interface.ilDesktopItemHandl
 * @ilCtrl_Calls ilObjBlogGUI: ilBlogPostingGUI, ilWorkspaceAccessGUI, ilPortfolioPageGUI
 * @ilCtrl_Calls ilObjBlogGUI: ilInfoScreenGUI, ilNoteGUI, ilCommonActionDispatcherGUI
 * @ilCtrl_Calls ilObjBlogGUI: ilPermissionGUI, ilObjectCopyGUI, ilRepositorySearchGUI
-* @ilCtrl_Calls ilObjBlogGUI: ilExportGUI, ilObjStyleSheetGUI
+* @ilCtrl_Calls ilObjBlogGUI: ilExportGUI, ilObjStyleSheetGUI, ilBlogExerciseGUI
 *
 * @extends ilObject2GUI
 */
@@ -668,6 +668,13 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 					$this->ctrl->redirectByClass("ilobjstylesheetgui", "edit");
 				}
 				break;
+				
+			case "ilblogexercisegui":
+				$this->ctrl->setReturn($this, "render");
+				include_once "Modules/Blog/classes/class.ilBlogExerciseGUI.php";
+				$gui = new ilBlogExerciseGUI($this->node_id);
+				$this->ctrl->forwardCommand($gui);
+				break;
 
 			default:				
 				if($cmd != "gethtml")
@@ -823,36 +830,11 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 			$ilToolbar->addButtonInstance($button);
 						
 			// exercise blog?			
-			include_once "Modules/Exercise/classes/class.ilObjExercise.php";			
-			$exercises = ilObjExercise::findUserFiles($ilUser->getId(), $this->node_id);
+			include_once "Modules/Blog/classes/class.ilBlogExerciseGUI.php";			
+			$exercises = ilBlogExerciseGUI::checkExercise($this->node_id);
 			if($exercises)
-			{
-				$info = array();				
-				foreach($exercises as $exercise)
-				{					
-					// #9988
-					$active_ref = false;
-					foreach(ilObject::_getAllReferences($exercise["obj_id"]) as $ref_id)
-					{
-						if(!$tree->isSaved($ref_id))
-						{
-							$active_ref = true;
-							break;
-						}
-					}
-					if($active_ref)
-					{					
-						$part = $this->getExerciseInfo($exercise["ass_id"]);
-						if($part)
-						{
-							$info[] = $part;
-						}
-					}
-				}				
-				if(sizeof($info))
-				{
-					ilUtil::sendInfo(implode("<br />", $info));										
-				}
+			{				
+				ilUtil::sendInfo($exercises);														
 			}
 		}
 								

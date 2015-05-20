@@ -215,6 +215,8 @@ class ilMainMenuGUI
 
 			// online help
 			$this->renderHelpButtons();
+
+			$this->renderAwareness();
 		}
 
 		if($this->getMode() == self::MODE_FULL)
@@ -1086,8 +1088,18 @@ class ilMainMenuGUI
 			$ilCtrl->setTargetScript($ts);
 		}
 	}
-	
-	
+
+	/**
+	 * Render awareness tool
+	 */
+	function renderAwareness()
+	{
+		include_once("./Services/Awareness/classes/class.ilAwarenessGUI.php");
+		$aw = ilAwarenessGUI::getInstance();
+
+		$this->tpl->setVariable("AWARENESS", $aw->getMainMenuHTML());
+	}
+
 	/**
 	 * Toggle rendering of main menu, search, user info
 	 * 

@@ -2,7 +2,7 @@
 
 /* Copyright (c) 1998-2014 ILIAS open source, Extended GPL, see docs/LICENSE */
 
-include_once("./Services/Awareness/classes/class.ilAwarenessProvider.php");
+include_once("./Services/Awareness/classes/class.ilAwarenessUserProvider.php");
 
 /**
  * Test provider, adds all users
@@ -11,7 +11,7 @@ include_once("./Services/Awareness/classes/class.ilAwarenessProvider.php");
  * @version $Id$
  * @ingroup ServicesAwareness
  */
-class ilAwarenessProviderAllUsers extends ilAwarenessProvider
+class ilAwarenessUserProviderAllUsers extends ilAwarenessUserProvider
 {
 	/**
 	 * Collect all users

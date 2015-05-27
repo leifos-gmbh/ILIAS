@@ -3,18 +3,18 @@
 /* Copyright (c) 1998-2014 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 /**
- *  
+ * Awareness providers are
  *
  * @author Alex Killing <alex.killing@gmx.de>
- * @version $Id\$
+ * @version $Id$
  * @ingroup 
  */
-class ilAwarenessProviderFactory
+class ilAwarenessUserProviderFactory
 {
 	protected static $providers = array(
 		array (
 			"component" => "Services/Awareness",
-			"class" => "ilAwarenessProviderAllUsers"
+			"class" => "ilAwarenessUserProviderAllUsers"
 		)
 	);
 

@@ -59,12 +59,14 @@ class ilAwarenessGUI
 			$tpl->setCurrentBlock("user");
 			if ($u->public_profile)
 			{
-				$tpl->setVariable("USERNAME", $u->lastname.", ".$u->firstname." [".$u->login."]");
+				$tpl->setVariable("UNAME", $u->lastname.", ".$u->firstname);
 			}
 			else
 			{
-				$tpl->setVariable("USERNAME", "[".$u->login."]");
+				$tpl->setVariable("UNAME", "&nbsp;");
 			}
+			$tpl->setVariable("UACCOUNT", $u->login);
+
 			$tpl->setVariable("USERIMAGE", $u->img);
 			$tpl->setVariable("CNT", $cnt);
 			$tpl->parseCurrentBlock();

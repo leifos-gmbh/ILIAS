@@ -23,8 +23,8 @@ class ilAwarenessAct
 	protected function __construct($a_user_id)
 	{
 		$this->user_id = $a_user_id;
-		include_once("./Services/Awareness/classes/class.ilAwarenessCollector.php");
-		$this->collector = ilAwarenessCollector::getInstance($a_user_id);
+		include_once("./Services/Awareness/classes/class.ilAwarenessUserCollector.php");
+		$this->collector = ilAwarenessUserCollector::getInstance($a_user_id);
 	}
 
 	/**

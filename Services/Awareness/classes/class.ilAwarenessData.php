@@ -53,7 +53,8 @@ class ilAwarenessData
 			$obj->firstname = $n["firstname"];
 			$obj->login = $n["login"];
 			$obj->id = $n["id"];
-			$obj->img = $n["img"];
+			//$obj->img = $n["img"];
+			$obj->img = ilObjUser::_getPersonalPicturePath($n["id"], "xsmall");
 			$obj->public_profile = $n["public_profile"];
 			$data[] = $obj;
 		}

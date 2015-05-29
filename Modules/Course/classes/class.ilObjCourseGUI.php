@@ -1752,6 +1752,10 @@ class ilObjCourseGUI extends ilContainerGUI
 			}
 			$tmp_data['notification'] = $this->object->getMembersObject()->isNotificationEnabled($usr_id) ? 1 : 0;
 			$tmp_data['blocked'] = $this->object->getMembersObject()->isBlocked($usr_id) ? 1 : 0;
+			// cognos-blu-patch: begin
+			$tmp_data['contact'] = $this->object->getMembersObject()->isContact($usr_id) ? 1 : 0;
+			// cognos-blu-patch: end
+			
 			$tmp_data['usr_id'] = $usr_id;
 		
 			if($this->show_tracking)
@@ -2141,8 +2145,11 @@ class ilObjCourseGUI extends ilContainerGUI
 		$visible_members = array_intersect(array_unique((array) $_POST['visible_member_ids']),$this->object->getMembersObject()->getAdmins());
 		$passed = is_array($_POST['passed']) ? $_POST['passed'] : array();
 		$notification = is_array($_POST['notification']) ? $_POST['notification'] : array();
+		// cognos-blu-patch: begin
+		$contact = is_array($_POST['contact']) ? $_POST['contact'] : array();
 		
-		$this->updateParticipantsStatus('admins',$visible_members,$passed,$notification,array());
+		$this->updateParticipantsStatus('admins',$visible_members,$passed,$notification,array(),$contact);
+		// cognos-blu-patch: end
 	}
 	
 	/**
@@ -2159,8 +2166,11 @@ class ilObjCourseGUI extends ilContainerGUI
 		$visible_members = array_intersect(array_unique((array) $_POST['visible_member_ids']),$this->object->getMembersObject()->getTutors());
 		$passed = is_array($_POST['passed']) ? $_POST['passed'] : array();
 		$notification = is_array($_POST['notification']) ? $_POST['notification'] : array();
+		// cognos-blu-patch: begin
+		$contact = is_array($_POST['contact']) ? $_POST['contact'] : array();
 
-		$this->updateParticipantsStatus('admins',$visible_members,$passed,$notification,array());
+		$this->updateParticipantsStatus('admins',$visible_members,$passed,$notification,array(),$contact);
+		// cognos-blu-patch: end
 	}
 	
 	/**
@@ -2177,8 +2187,11 @@ class ilObjCourseGUI extends ilContainerGUI
 		$visible_members = array_intersect(array_unique((array) $_POST['visible_member_ids']),$this->object->getMembersObject()->getMembers());
 		$passed = is_array($_POST['passed']) ? $_POST['passed'] : array();
 		$blocked = is_array($_POST['blocked']) ? $_POST['blocked'] : array();
+		// cognos-blu-patch: begin
+		$contact = is_array($_POST['contact']) ? $_POST['contact'] : array();
 		
-		$this->updateParticipantsStatus('members',$visible_members,$passed,array(),$blocked);
+		$this->updateParticipantsStatus('members',$visible_members,$passed,array(),$blocked, $contact);
+		// cognos-blu-patch: end
 	
 	}
 
@@ -2201,8 +2214,11 @@ class ilObjCourseGUI extends ilContainerGUI
 
 		$passed = is_array($_POST['passed']) ? $_POST['passed'] : array();
 		$blocked = is_array($_POST['blocked']) ? $_POST['blocked'] : array();
+		// cognos-blu-patch: begin
+		$contact = is_array($_POST['contact']) ? $_POST['contact'] : array();
 
-		$this->updateParticipantsStatus('members',$users,$passed,array(),$blocked);
+		$this->updateParticipantsStatus('members',$users,$passed,array(),$blocked,$contact);
+		// cognos-blu-patch: end
 	}
 	
 	/**
@@ -2239,10 +2255,11 @@ class ilObjCourseGUI extends ilContainerGUI
 		}
 	}
 
-	function updateParticipantsStatus($type,$visible_members,$passed,$notification,$blocked)
+	// cognos-blu-patch: begin
+	function updateParticipantsStatus($type,$visible_members,$passed,$notification,$blocked,$contact)
+	// cognos-blu-patch: end
 	{
 		global $ilAccess,$ilErr,$ilUser,$rbacadmin;
-
 		foreach($visible_members as $member_id)
 		{
 			$this->object->getMembersObject()->updatePassed($member_id,in_array($member_id,$passed),true);
@@ -2253,6 +2270,9 @@ class ilObjCourseGUI extends ilContainerGUI
 			{
 				case 'admins';
 					$this->object->getMembersObject()->updateNotification($member_id,in_array($member_id,$notification));
+					// cognos-blu-patch: begin
+					$this->object->getMembersObject()->updateContact($member_id,in_array($member_id,$contact));
+					// cognos-blu-patch: end
 					$this->object->getMembersObject()->updateBlocked($member_id,false);
 					break;
 					
@@ -2266,8 +2286,10 @@ class ilObjCourseGUI extends ilContainerGUI
 						$this->object->getMembersObject()->sendNotification($this->object->getMembersObject()->NOTIFY_BLOCK_MEMBER,$member_id);
 					}					
 					$this->object->getMembersObject()->updateNotification($member_id,false);
+					// cognos-blu-patch: begin
+					$this->object->getMembersObject()->updateContact($member_id,FALSE);
+					// cognos-blu-patch: end
 					$this->object->getMembersObject()->updateBlocked($member_id,in_array($member_id,$blocked));
-					
 					
 					break;
 			}

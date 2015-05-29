@@ -146,7 +146,7 @@
 	}
 
 	#awareness-content .dropdown-menu {
-		background-color: #F6F6F6;
+		background-color: #f0f0f0;
 		padding: 10px 0;
 		font-size: 12px;
 	}
@@ -165,8 +165,8 @@
 		border-left: 11px solid transparent;
 		border-right: 11px solid transparent;
 		border-top: 11px solid #fff;
-		margin-top: -13px;
-		margin-left: 90px;
+		margin-top: -10px;
+		margin-left: 100px;
 		position: absolute;
 	}
 
@@ -181,7 +181,7 @@
 			<div class="media" id="dropdownMenu{CNT}" data-toggle="dropdown" aria-expanded="true">
 				<div class="media-left">
 					<a href="#">
-						<img class="media-object" src="{USERIMAGE}" alt="...">
+						<img class="media-object" src="{USERIMAGE}" alt="">
 					</a>
 				</div>
 				<div class="media-body">
@@ -190,10 +190,12 @@
 				</div>
 			</div>
 			<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu{CNT}">
-				<li role="presentation"><a role="menuitem" tabindex="-1" href="#"><div class="arrow-down"></div>Action{CNT}</a></li>
-				<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Another action</a></li>
-				<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Something else here</a></li>
-				<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Separated link</a></li>
+				<!-- BEGIN feature -->
+				<li role="presentation">
+					<!-- BEGIN arrow --><div class="arrow-down"></div><!-- END arrow -->
+					<a role="menuitem" tabindex="-1" href="{FEATURE_HREF}">{FEATURE_TEXT}</a>
+				</li>
+				<!-- END feature -->
 			</ul>
 		</div>
 		<!-- END user -->

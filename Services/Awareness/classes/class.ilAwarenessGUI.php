@@ -44,9 +44,12 @@ class ilAwarenessGUI
 		$act = ilAwarenessAct::getInstance($ilUser->getId());
 		$users = $act->getAwarenessData();
 
-		$tpl->setCurrentBlock("status_text");
-		$tpl->setVariable("STATUS_TXT", count($users));
-		$tpl->parseCurrentBlock();
+		if (count($users) > 0)
+		{
+			$tpl->setCurrentBlock("status_text");
+			$tpl->setVariable("STATUS_TXT", count($users));
+			$tpl->parseCurrentBlock();
+		}
 
 		$ucnt = 0;
 		foreach ($users as $u)

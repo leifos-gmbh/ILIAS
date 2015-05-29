@@ -409,7 +409,7 @@ abstract class ilParticipant
 					'usr_id' => array('integer',$a_usr_id)
 				),
 				array(
-					'contact'=> array('integer',$a_usr_id)
+					'contact'=> array('integer',$a_contact)
 				)
 		);
 		$this->participants_status[$a_usr_id]['contact'] = $a_contact;

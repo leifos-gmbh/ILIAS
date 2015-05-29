@@ -778,12 +778,31 @@ abstract class ilParticipants
 					'usr_id' => array('integer',$a_usr_id)
 				),
 				array(
-					'contact'=> array('integer',$a_usr_id)
+					'contact'=> array('integer',$a_contact)
 				)
 		);
 		$this->participants_status[$a_usr_id]['contact'] = $a_contact;
 		return TRUE;
 	}
+	
+	/**
+	 * get user ids which are confirgured as contact
+	 * @return array
+	 */
+	public function getContacts()
+	{
+		$contacts = array();
+		foreach((array) $this->participants_status as $usr_id => $status)
+		{
+			if($status['contact'])
+			{
+				$contacts[] = $usr_id;
+			}
+		}
+		return $contacts;
+	}
+	
+	
 	// cognos-blu-patch: end
 
 	/**

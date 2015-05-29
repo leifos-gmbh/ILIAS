@@ -297,7 +297,6 @@ class ilObjCourseGUI extends ilContainerGUI
 		global $ilErr,$ilAccess, $ilUser, $ilSetting;
 
 		$this->checkPermission('visible');
-		
 		// Fill meta header tags
 		include_once('Services/MetaData/classes/class.ilMDUtils.php');
 		ilMDUtils::_fillHTMLMetaTags($this->object->getId(),$this->object->getId(),'crs');
@@ -1618,6 +1617,9 @@ class ilObjCourseGUI extends ilContainerGUI
 		
 		$a_new_object->getMemberObject()->add($ilUser->getId(),IL_CRS_ADMIN);
 		$a_new_object->getMemberObject()->updateNotification($ilUser->getId(),1);
+		// cognos-blu-patch: begin
+		$a_new_object->getMemberObject()->updateContact($ilUser->getId(),1);
+		// cognos-blu-patch: end
 		$a_new_object->update();
 		
 		// BEGIN ChangeEvent: Record write event.
@@ -2271,7 +2273,7 @@ class ilObjCourseGUI extends ilContainerGUI
 				case 'admins';
 					$this->object->getMembersObject()->updateNotification($member_id,in_array($member_id,$notification));
 					// cognos-blu-patch: begin
-					$this->object->getMembersObject()->updateContact($member_id,in_array($member_id,$contact));
+					$this->object->getMembersObject()->updateContact($member_id,in_array($member_id,$contact) ? TRUE : FALSE);
 					// cognos-blu-patch: end
 					$this->object->getMembersObject()->updateBlocked($member_id,false);
 					break;
@@ -2286,8 +2288,14 @@ class ilObjCourseGUI extends ilContainerGUI
 						$this->object->getMembersObject()->sendNotification($this->object->getMembersObject()->NOTIFY_BLOCK_MEMBER,$member_id);
 					}					
 					$this->object->getMembersObject()->updateNotification($member_id,false);
+					
 					// cognos-blu-patch: begin
-					$this->object->getMembersObject()->updateContact($member_id,FALSE);
+					
+					// check if member is admin or tutor: otherwise reset contact flag
+					if(!$this->object->getMembersObject()->isAdmin($member_id) and !$this->object->getMembersObject()->isTutor($member_id))
+					{
+						$this->object->getMembersObject()->updateContact($member_id,FALSE);
+					}
 					// cognos-blu-patch: end
 					$this->object->getMembersObject()->updateBlocked($member_id,in_array($member_id,$blocked));
 					
@@ -2417,6 +2425,9 @@ class ilObjCourseGUI extends ilContainerGUI
 		$notifications = $_POST['notification'] ? $_POST['notification'] : array();
 		$passed = $_POST['passed'] ? $_POST['passed'] : array();
 		$blocked = $_POST['blocked'] ? $_POST['blocked'] : array();
+		// cognos-blu-patch: begin
+		$contact = $_POST['contact'] ? $_POST['contact'] : array();
+		// cognos-blu-patch: end
 		
 		// Determine whether the user has the 'edit_permission' permission
 		$hasEditPermissionAccess = 
@@ -2512,6 +2523,16 @@ class ilObjCourseGUI extends ilContainerGUI
 			$this->object->getMembersObject()->sendNotification(
 				$this->object->getMembersObject()->NOTIFY_STATUS_CHANGED,
 				$usr_id);
+			
+			// cognos-blu-patch: begin
+			$this->object->getMembersObject()->updateContact($usr_id,FALSE);
+			if(
+					($this->object->getMembersObject()->isAdmin($usr_id) or $this->object->getMembersObject()->isTutor($usr_id)) and 
+					in_array($usr_id,$contact))
+			{
+				$this->object->getMembersObject()->updateContact($usr_id,TRUE);
+			}
+			// cognos-blu-patch: end
 			
 			$this->updateLPFromStatus($usr_id,in_array($usr_id,$passed));	
 		}

@@ -2525,12 +2525,16 @@ class ilObjCourseGUI extends ilContainerGUI
 				$usr_id);
 			
 			// cognos-blu-patch: begin
-			$this->object->getMembersObject()->updateContact($usr_id,FALSE);
 			if(
-					($this->object->getMembersObject()->isAdmin($usr_id) or $this->object->getMembersObject()->isTutor($usr_id)) and 
-					in_array($usr_id,$contact))
+				($GLOBALS['rbacreview']->isAssigned($usr_id, $this->object->getDefaultAdminRole()) or $GLOBALS['rbacreview']->isAssigned($usr_id, $this->object->getDefaultTutorRole())) and
+				in_array($usr_id,$contact)
+			)
 			{
 				$this->object->getMembersObject()->updateContact($usr_id,TRUE);
+			}
+			else
+			{
+				$this->object->getMembersObject()->updateContact($usr_id,FALSE);
 			}
 			// cognos-blu-patch: end
 			

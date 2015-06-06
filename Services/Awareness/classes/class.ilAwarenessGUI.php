@@ -36,13 +36,19 @@ class ilAwarenessGUI
 	{
 		global $ilUser;
 
+		$awrn_set = new ilSetting("awrn");
+		if (!$awrn_set->get("awrn_enabled", false))
+		{
+			return "";
+		}
+
 		$tpl = new ilTemplate("tpl.awareness.html", true, true, "Services/Awareness");
-
-
 
 		include_once("./Services/Awareness/classes/class.ilAwarenessAct.php");
 		$act = ilAwarenessAct::getInstance($ilUser->getId());
 		$users = $act->getAwarenessData();
+
+		$act->notifyOnNewOnlineContacts();
 
 		if (count($users) > 0)
 		{
@@ -90,6 +96,5 @@ class ilAwarenessGUI
 
 		return $tpl->get();
 	}
-
 }
 ?>

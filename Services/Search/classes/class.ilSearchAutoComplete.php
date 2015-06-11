@@ -15,6 +15,10 @@ class ilSearchAutoComplete
 	 */
 	public static function getLuceneList($a_str)
 	{
+		// uzk-patch: begin
+		include_once './Services/JSON/classes/class.ilJsonUtil.php';
+		return ilJsonUtil::encode(array());
+		// uzk-patch: end
 		include_once './Services/Search/classes/Lucene/class.ilLuceneQueryParser.php';
 		$qp = new ilLuceneQueryParser('title:'.$a_str.'*');
 		$qp->parse();

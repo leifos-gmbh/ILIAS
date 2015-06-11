@@ -37,7 +37,8 @@
 									// prevent that the autocomplete list disappears when blur occurs
 									e.stopImmediatePropagation();
 								});
-
+								// uzk-patch: begin
+								/*
 								$("#main_menu_search").autocomplete({
 									source: "{AC_DATASOURCE}",
 									appendTo: "#mm_search_menu_ac",
@@ -48,15 +49,16 @@
 											of: $("#mm_search_menu_ac")
 										})
 									},
-									/*close: function(event, ui) {
+									close: function(event, ui) {
 									 alert("close");
 									 console.log(event);
 									 console.log(ui);
 									 return false;
-									 },*/
+									 },
 									minLength: 3
 								});
-
+								*/
+								// uzk-patch: end
 								/*$("#main_menu_search").bind("focusin click", function(e) {
 									il.Overlay.show(e, "mm_search_menu", "main_menu_search",
 											false, 'tl', 'bl');

@@ -71,5 +71,100 @@ il.Util.addOnLoad(function() {
 });
 </script>
 <!-- END on_load_code -->
+<!-- uzk-patch: begin -->
+<!-- BEGIN multiple_request_prevention -->
+<div id="dialog_modal-general" title="{TXT_PLEASE_WAIT}" style="display: none;">
+	<p><img src="{SRC_SPINNING_WHEEL}" alt="" style="vertical-align: middle; margin-right: 5px;" />{TXT_WAITING_INFORMATION}</p>
+</div>
+<div id="dialog_modal-search" title="{TXT_PLEASE_WAIT}" style="display: none;">
+	<p><img src="{SRC_SPINNING_WHEEL}" alt="" style="vertical-align: middle; margin-right: 5px;" />{TXT_WAITING_INFORMATION_SEARCH}</p>
+</div>
+<script type="text/javascript">
+	$(function() {
+		var btn = $.fn.button.noConflict(); // reverts $.fn.button to jqueryui btn
+		$.fn.btn = btn; // assigns bootstrap button functionality to $.fn.btn
+		// Folder download
+		$(".dropdown-menu a[href*='downloadFolder'], input.submit[name*='downloadExportFile']").live("click", function() {
+			$("#dialog_modal-general").dialog({
+				height:        140,
+				width:         340,
+				modal:         true,
+				closeOnEscape: true,
+				resizable:     false,
+				draggable:     false,
+				open: function() {
+					$('button.ui-dialog-titlebar-close').attr("style", "display: block !important; color: black !important;");
+					if ($.browser.webkit) {
+						$('button.ui-dialog-titlebar-close').css("padding", 0);
+					}
+				},
+				beforeClose: function() {
+					$('button.ui-dialog-titlebar-close').attr("style", "display: none !important;");
+				}
+			});
+		});
+
+		// Member views in groups and courses
+		var $context = $("ul#ilTab a, ul#ilSubTab a").filter(function () {
+			return (
+			$(this).attr("href").toLowerCase().indexOf("cmd=members&") !== -1 &&
+			(
+			$(this).attr("href").toLowerCase().indexOf("cmdclass=ilobjcoursegui") !== -1 ||
+			$(this).attr("href").toLowerCase().indexOf("cmdclass=ilobjgroupgui") !== -1
+			)
+			) || (
+			$(this).attr("href").toLowerCase().indexOf("cmd=show") !== -1 &&
+			$(this).attr("href").toLowerCase().indexOf("cmdclass=ilcourseparticipantsgroupsgui") !== -1
+			) ? true : false;
+		});
+
+		if ($context.size() > 0) {
+			$([
+				$("div.ilTableHeaderTitle a, div.ilTableOuter a, div.ilTableNav a").filter(function() {
+					return $(this).hasClass("ilTableMenuItem") || $(this).hasClass("ilAccAnchor") ? false : true;
+				}),
+				$context
+			]).each(function() {
+				$(this).click(function() {
+					showWaitbox("#dialog_modal-general");
+				});
+			});
+
+			$("div#il_center_col form").filter(function() {
+				return $(this).find("input.submit[name*='downloadExportFile']").size() == 0 ? true : false;
+			}).on('submit', function () {
+				showWaitbox("#dialog_modal-general");
+			});
+		}
+
+		// Searchbox in header
+		$("#mm_search_form").on('submit', function() {
+			showWaitbox("#dialog_modal-search");
+		});
+
+		$("#il_search_toolbar").closest("form").on('submit', function() {
+			showWaitbox("#dialog_modal-search");
+		});
+
+		function showWaitbox(selector) {
+			$(selector).dialog({
+				height: 140,
+				width: 340,
+				modal: true,
+				closeOnEscape: false,
+				resizable: false,
+				draggable: false,
+				open: function() {
+					$('button.ui-dialog-titlebar-close').attr("style", "display: none !important;");
+				},
+				beforeClose: function() {
+					return false;
+				}
+			});
+		}
+	});
+</script>
+<!-- END multiple_request_prevention -->
+<!-- uzk-patch: end -->
 </body>
 </html>

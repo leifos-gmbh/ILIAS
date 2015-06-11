@@ -21,7 +21,26 @@ class ilFormGUI
 	protected $id;
 	protected $name;
 	protected $prevent_double_submission = false;
-	
+	// uzk-patch: begin
+	/**
+	 * @var bool
+	 */
+	protected $waitbox_status = true;
+
+	/**
+	 * @param null|bool $status
+	 * @return bool
+	 */
+	public function isWaitboxEnabled($status = null)
+	{
+		if(null === $status)
+		{
+			return $this->waitbox_status;
+		}
+
+		$this->waitbox_status = $status;
+	}
+	// uzk-patch: end
 	/**
 	* Constructor
 	*
@@ -278,6 +297,32 @@ class ilFormGUI
 		{
 			$tpl->setVariable("FORM_CLOSE_TAG", "</form>");
 		}
+		// uzk-patch: begin
+		/**
+		 * @global $ilClientIniFile ilIniFile
+		 * @global $lng ilLanguage
+		 */
+		global $ilClientIniFile, $lng;
+
+		if(
+			$this->waitbox_status &&
+			$ilClientIniFile instanceof ilIniFile &&
+			$ilClientIniFile->readVariable('system', 'PREVENT_MULTIPLE_FORM_SUBMITS') == 1
+		)
+		{
+			require_once 'Services/jQuery/classes/class.iljQueryUtil.php';
+			iljQueryUtil::initjQuery();
+			iljQueryUtil::initjQueryUI();
+			$GLOBALS['tpl']->addCss(ilUtil::getStyleSheetLocation('filesystem', 'jqueryui.css'));
+
+			$hash = md5(uniqid(rand(), true));
+			$tpl->setVariable('TABLE_ID', $hash);
+			$tpl->setVariable('TABLE_ID_JS', $hash);
+			$tpl->setVariable('TXT_PLEASE_WAIT', $lng->txt('mfs_please_wait'));
+			$tpl->setVariable('TXT_WAITING_INFORMATION', $lng->txt('mfs_please_wait_info'));
+			$tpl->setVariable('SRC_SPINNING_WHEEL', ilUtil::getImagePath('loader.svg'));
+		}
+		// uzk-patch: end
 		return $tpl->get();
 	}
 

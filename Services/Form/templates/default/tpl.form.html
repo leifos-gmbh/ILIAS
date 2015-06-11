@@ -1,5 +1,38 @@
 {FORM_OPEN_TAG}
-<div class="form-horizontal">
+<!-- uzk-patch: begin -->
+<div class="form-horizontal" <!-- BEGIN std_table_id --> id="il_property_form_table_{TABLE_ID}"<!-- END std_table_id -->>
+<!-- BEGIN multiple_submit_prevention -->
+<div id="il_property_form_table_dialog_modal_{TABLE_ID_JS}" title="{TXT_PLEASE_WAIT}" style="display: none;">
+	<p><img src="{SRC_SPINNING_WHEEL}" alt="" style="vertical-align: middle; margin-right: 5px;" />{TXT_WAITING_INFORMATION}</p>
+</div>
+<script>
+	$(function() {
+		$("#il_property_form_table_{TABLE_ID_JS} input[type=submit]").filter(function() {
+			return $(this).attr("id") != "ilCharSelectorToggleForm" && $(this).attr("id") != "gaptrigger";
+		}).click(function() {
+			var $clickedButton = this;
+			$("#il_property_form_table_{TABLE_ID_JS} input[type=submit]").filter(function() {
+				return $clickedButton == this ? false : true
+			}).attr("disabled", "disabled");
+			$("#il_property_form_table_dialog_modal_{TABLE_ID_JS}").dialog({
+				height: 140,
+				width: 340,
+				modal: true,
+				closeOnEscape: false,
+				resizable: false,
+				draggable: false,
+				open: function() {
+					$('button.ui-dialog-titlebar-close').attr("style", "display: none !important;");
+				},
+				beforeClose: function() {
+					return false;
+				}
+			});
+		});
+	});
+</script>
+<!-- END multiple_submit_prevention -->
+<!-- uzk-patch: end -->
 {FORM_CONTENT}
 </div>
 {FORM_CLOSE_TAG}

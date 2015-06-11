@@ -468,7 +468,30 @@ class ilTemplate extends ilTemplateX
 		{
 			$this->addILIASFooter();
 		}
+		// uzk-patch: begin
+		if($this->tplName == 'tpl.main.html')
+		{
+			/**
+			 * @global ilIniFile
+			 * @global ilLanguage
+			 */
+			global $ilClientIniFile, $lng;
 
+			if($ilClientIniFile instanceof ilIniFile &&
+				$ilClientIniFile->readVariable('system', 'PREVENT_MULTIPLE_REQUESTS_AFTER_FOLDER_DOWNLOAD') == 1)
+			{
+				require_once 'Services/jQuery/classes/class.iljQueryUtil.php';
+				iljQueryUtil::initjQuery();
+				iljQueryUtil::initjQueryUI();
+				$this->addCss(ilUtil::getStyleSheetLocation('filesystem','jqueryui.css'));
+
+				$this->setVariable('TXT_PLEASE_WAIT', $lng->txt('mfs_please_wait'));
+				$this->setVariable('TXT_WAITING_INFORMATION', $lng->txt('mfs_please_wait_info'));
+				$this->setVariable('TXT_WAITING_INFORMATION_SEARCH', $lng->txt('mfs_please_wait_info_search'));
+				$this->setVariable('SRC_SPINNING_WHEEL', ilUtil::getImagePath('loader.svg'));
+			}
+		}
+		// uzk-patch: end
 		// set standard parts (tabs and title icon)
 		$this->fillBodyClass();
 		if ($a_fill_tabs)
@@ -537,7 +560,12 @@ class ilTemplate extends ilTemplateX
 				$this->parseCurrentBlock();
 			}
 		}
-		
+		// uzk-patch: begin
+		else if($this->tplName == 'tpl.main.html')
+		{
+			$this->fillCssFiles();
+		}
+		// uzk-patch: end
 		if ($part == "DEFAULT" or is_bool($part))
 		{
 			$html = parent::get();
@@ -846,7 +874,15 @@ class ilTemplate extends ilTemplateX
 		global $ilias, $ilClientIniFile, $ilCtrl, $ilDB, $ilSetting, $lng;
 		
 		$ftpl = new ilTemplate("tpl.footer.html", true, true, "Services/UICore");
-		
+		// uzk-patch: begin
+		$host = gethostbyaddr($_SERVER['SERVER_ADDR']);
+		$host_parts = explode('.', $host);
+		$ftpl->setVariable("SERVER_NAME", $host_parts[0]);
+		$ftpl->setVariable("NUM_ACTIVE_USER_SESSIONS", ilSession::getNumberOfActiveUserSessions());
+		$ftpl->setVariable("NUM_ACTIVE_ANONYMOUS_SESSIONS", ilSession::getNumberOfActiveAnonymousSessions());
+		$ftpl->setVariable("TXT_ACTIVE_USERS", $lng->txt('footer_active_users'));
+		$ftpl->setVariable("TXT_ACTIVE_ANONYMOUS", $lng->txt('footer_active_anonymous'));
+		// uzk-patch: end
 		$ftpl->setVariable("ILIAS_VERSION", $ilias->getSetting("ilias_version"));
 		
 		$link_items = array();

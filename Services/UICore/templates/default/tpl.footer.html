@@ -3,7 +3,13 @@
 <a href="{URL_ITEM}"<!-- BEGIN blank --> target="_blank"<!-- END blank -->>{TXT_ITEM}</a>
 <!-- BEGIN item_separator --> | <!-- END item_separator -->
 <!-- END items -->
-
+<!-- uzk-patch: begin -->
+<p>
+	{SERVER_NAME} |
+	{TXT_ACTIVE_USERS}: {NUM_ACTIVE_USER_SESSIONS} |
+	{TXT_ACTIVE_ANONYMOUS}: {NUM_ACTIVE_ANONYMOUS_SESSIONS}
+</p>
+<!-- uzk-patch: end -->
 <!-- BEGIN dev_bl -->
 <div style="background-color: white; color: black; border: 1px dashed grey; padding: 10px; margin-top: 25px;">
 {MEMORY_USAGE}

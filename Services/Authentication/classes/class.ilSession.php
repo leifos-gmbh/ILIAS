@@ -413,6 +413,66 @@ class ilSession
 	{
 		return self::$closing_context;
 	}
+	// uzk-patch: begin
+	public static function getNumberOfActiveUserSessions()
+	{
+		/**
+		 * @var $ilDB      ilDB
+		 * @var $ilSetting ilSetting
+		 */
+		global $ilDB, $ilSetting;
+
+		if(time() < $ilSetting->get('session_count_users_online_expire', 0))
+		{
+			return $ilSetting->get('session_count_users_online', 0);
+		}
+		else
+		{
+			$query  = "
+				SELECT COUNT(DISTINCT ud.usr_id) users
+				FROM usr_session u
+				INNER JOIN usr_data ud ON ud.usr_id = u.user_id
+				WHERE expires > UNIX_TIMESTAMP() AND ctime + 600 > UNIX_TIMESTAMP() AND ud.usr_id != %s
+			";
+			$result = $ilDB->queryF($query, array('integer'), array(ANONYMOUS_USER_ID));
+			$row    = $ilDB->fetchAssoc($result);
+
+			$ilSetting->set('session_count_users_online', $row['users']);
+			$ilSetting->set('session_count_users_online_expire', time() + (60 * 2.5));
+
+			return $row['users'];
+		}
+	}
+
+	public static function getNumberOfActiveAnonymousSessions()
+	{
+		/**
+		 * @var $ilDB      ilDB
+		 * @var $ilSetting ilSetting
+		 */
+		global $ilDB, $ilSetting;
+
+		if(time() < $ilSetting->get('session_count_anon_online_expire', 0))
+		{
+			return $ilSetting->get('session_count_anon_online', 0);
+		}
+		else
+		{
+			$query  = "
+				SELECT COUNT(session_id) users
+				FROM usr_session u
+				WHERE expires > UNIX_TIMESTAMP() AND ctime + 600 > UNIX_TIMESTAMP() AND user_id IN(%s, %s)
+			";
+			$result = $ilDB->queryF($query, array('integer', 'integer'), array(0, ANONYMOUS_USER_ID));
+			$row    = $ilDB->fetchAssoc($result);
+
+			$ilSetting->set('session_count_anon_online', $row['users']);
+			$ilSetting->set('session_count_anon_online_expire', time() + (60 * 2.5));
+
+			return $row['users'];
+		}
+	}
+	// uzk-patch: end
 }
 
 ?>

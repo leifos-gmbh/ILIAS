@@ -754,10 +754,16 @@ class ilObjectGUI
 	{
 		$forms = array(
 			self::CFORM_NEW => $this->initCreateForm($a_new_type),
-			self::CFORM_IMPORT => $this->initImportForm($a_new_type),
-			self::CFORM_CLONE => $this->fillCloneTemplate(null, $a_new_type)
+			// uzk-patch: begin
+			self::CFORM_IMPORT => $this->initImportForm($a_new_type)
+			//, self::CFORM_CLONE => $this->fillCloneTemplate(null, $a_new_type)
+			// uzk-patch: end
 			);
-		
+		// uzk-patch: begin
+		$exclude_types = array('sess', 'file', 'cat', 'fold', 'crs');
+		if(!in_array($a_new_type, $exclude_types))
+			$forms[self::CFORM_CLONE] = $this->fillCloneTemplate(null, $a_new_type);
+		// uzk-patch: end
 		return $forms;
 	}
 

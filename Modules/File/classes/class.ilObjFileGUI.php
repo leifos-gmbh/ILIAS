@@ -203,9 +203,20 @@ class ilObjFileGUI extends ilObject2GUI
 		if($this->id_type != self::WORKSPACE_NODE_ID)
 		{
 			$forms[self::CFORM_IMPORT] = $this->initImportForm('file');
+			// uzk-patch: begin
+			if( FALSE ) /* no copying of objects supported due to performance issues */
+			// uzk-patch: end
 			$forms[self::CFORM_CLONE] = $this->fillCloneTemplate(null, "file");		
-		}			
-		
+		}
+		// uzk-patch: begin
+		foreach($forms as $form)
+		{
+			/**
+			 * @var $form ilPropertyFormGUI
+			 */
+			$form->isWaitboxEnabled(false);
+		}
+		// uzk-patch: end
 		return $forms;
 	}
 

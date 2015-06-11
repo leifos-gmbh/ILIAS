@@ -164,9 +164,17 @@ il.Help = {
 		if (!il.Help.tt_activated) {
 			tips.qtip('disable', true);
 			$('#help_tt_switch_on').css('visibility', 'hidden');
+			// uzk-patch: begin
+			$('#help_tt_enable').removeClass('ilNoDisplay');
+			$('#help_tt_disable').addClass('ilNoDisplay');
+			// uzk-patch: end
 		} else {
 			tips.qtip('enable');
 			$('#help_tt_switch_on').css('visibility', 'visible');
+			// uzk-patch: begin
+			$('#help_tt_enable').addClass('ilNoDisplay');
+			$('#help_tt_disable').removeClass('ilNoDisplay');
+			// uzk-patch: end
 		}
 	},
 

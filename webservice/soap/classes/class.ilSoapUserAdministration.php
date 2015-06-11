@@ -1264,7 +1264,10 @@ class ilSoapUserAdministration extends ilSoapAdministration
 	        foreach ($a_keyvalues as $keyvalue)
 	        {
 	            if (strlen($keyvalue) >= 3) {
-	                $field_query []= $keyfield." like '%".$keyvalue."%'";
+					// uzk-patch: begin
+					//$field_query []= $keyfield." like '%".$keyvalue."%'";
+					$field_query[] = $keyfield. " = ".$ilDB->quote($keyvalue, 'text'); // Bitte nur eindeutige Zuordnungen hier!
+					// uzk-patch: end
 	            }
 
 	        }

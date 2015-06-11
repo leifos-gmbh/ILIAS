@@ -840,6 +840,18 @@ class ilSurveyExecutionGUI
 			$this->tpl->setVariable("BTN_NEXT", $this->lng->txt("survey_next"));
 		}
 		$this->tpl->parseCurrentBlock();
+		// uzk-patch: begin
+		$this->tpl->setCurrentBlock($navigationblock . "_next2");
+		if ($nextpage === 1)
+		{
+			$this->tpl->setVariable("BTN_NEXT", $this->lng->txt("survey_finish"));
+		}
+		else
+		{
+			$this->tpl->setVariable("BTN_NEXT", $this->lng->txt("survey_next"));
+		}
+		$this->tpl->parseCurrentBlock();
+		// uzk-patch: end
 	}
 
 	function preview()

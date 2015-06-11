@@ -1277,10 +1277,27 @@ class ilObjectListGUI
 					// leaf objects we only display 'object new/changed'
 					// events
 					$isContainer = in_array($this->type, array('cat', 'fold', 'crs', 'grp'));
+					// uzk-patch: begin
+					global $ilSetting;
+					$hide_events_obj_type = unserialize($ilSetting->get('hide_event_message'));
+					$hide_events = array();
+					if(!is_array($hide_events_obj_type)) $hide_events_obj_type = array();
+					foreach($hide_events_obj_type as $key => $value)
+					{
+						# $options[$key]= $this->lng->txt($key);
+						if($value)
+						{
+							$hide_events[] = $key;
+						}
+					}
+					$hideEventMessage = in_array($this->type, $hide_events) ? true : false;
+					// uzk-patch: end
 					if($isContainer)
 					{
 						$state = ilChangeEvent::_lookupInsideChangeState($this->obj_id, $ilUser->getId());
-						if($state > 0)
+						// uzk-patch: begin
+						if($state > 0 && !$hideEventMessage)
+						// uzk-patch: end
 						{
 							$props[] = array(
 								"alert" => true,
@@ -1296,7 +1313,9 @@ class ilObjectListGUI
 					elseif($this->type == "file")
 					{
 						$state = ilChangeEvent::_lookupChangeState($this->obj_id, $ilUser->getId());
-						if($state > 0)
+						// uzk-patch: begin
+						if($state > 0 && !$hideEventMessage)
+						// uzk-patch: end
 						{
 							$props[] = array(
 								"alert" => true,

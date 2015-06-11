@@ -1,0 +1,36 @@
+/* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+* ILIAS language file
+*
+* @module		language file English
+* @modulegroup	language
+* @author 		Nadia Ahmad <nahmad@databay.de>
+* @version		$Id$
+*/
+// The language file starts beyond the HTML-comment below. DO NOT modify this line!
+// To edit your language file with a spreadsheet (i.e. Excel or StarCalc) remove all lines
+// from the first line to the HTML-comment. After editing paste the lines in place again.
+// NOTICE: Character coding of all ILIAS lang files is UTF-8! Please set your editor
+// to the corresponding mode!
+// Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
+<!-- language file start -->
+common#:#footer_active_users#:#Active Users
+common#:#footer_active_anonymous#:#Users in Public Area
+trac#:#exception#:#Exception
+common#:#mfs_please_wait#:#Please wait...
+common#:#mfs_please_wait_info#:#Your request will be being processed. Please have some patience.
+common#:#mfs_please_wait_info_search#:#Your search request will be being processed. Please have some patience.
+wsp#:#wsp_permission_shared_user#:#Me
+wsp#:#wsp_permission_shared_course#:#From my courses
+wsp#:#wsp_permission_shared_group#:#From my groups
+wsp#:#wsp_permission_shared_all#:#Shared with everyone
+wsp#:#wsp_copy_from_repository#:#Copy to Personal Workspace
+wsp#:#wsp_move_from_repository#:#Move to Personal Workspace
+tbl#:#tbl_more#:#More
+wsp#:#wsp_share_with_users_and_notify#:#Share with users and send notifications
+wsp#:#wsp_share_notification_subject#:#Share "%s"
+wsp#:#wsp_share_notification_salutation#:#Hello %s,
+wsp#:#wsp_share_notification_body#:#A workspace object has been shared with you
+wsp#:#wsp_share_notification_link#:#Link
+wsp#:#wsp_share_notification_download_link#:#Download
+wsp#:#wsp_share_with_members_and_notify#:#Share with members and send notifications

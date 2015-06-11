@@ -1,0 +1,36 @@
+/* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+* ILIAS language file
+*
+* @module		language file German
+* @modulegroup	language
+* @author 		Nadia Ahmad <nahmad@databay.de>
+* @version		$Id$
+*/
+// The language file starts beyond the HTML-comment below. DO NOT modify this line!
+// To edit your language file with a spreadsheet (i.e. Excel or StarCalc) remove all lines
+// from the first line to the HTML-comment. After editing paste the lines in place again.
+// NOTICE: Character coding of all ILIAS lang files is UTF-8! Please set your editor
+// to the corresponding mode!
+// Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
+<!-- language file start -->
+common#:#footer_active_users#:#Aktive Benutzer
+common#:#footer_active_anonymous#:#Benutzer im öffentl. Bereich
+trac#:#exception#:#Ausnahme
+common#:#mfs_please_wait#:#Bitte warten...
+common#:#mfs_please_wait_info#:#Ihre Anfrage wird bearbeitet. Bitte warten Sie!
+common#:#mfs_please_wait_info_search#:#Suche läuft, bitte warten!
+wsp#:#wsp_permission_shared_user#:#Mich
+wsp#:#wsp_permission_shared_course#:#Aus meinen Kursen
+wsp#:#wsp_permission_shared_group#:#Aus meinen Gruppen
+wsp#:#wsp_permission_shared_all#:#Für Alle freigegebene Ressourcen
+wsp#:#wsp_copy_from_repository#:#In meinen Arbeitsraum kopieren
+wsp#:#wsp_move_from_repository#:#In meinen Arbeitsraum verschieben
+tbl#:#tbl_more#:#Mehr
+wsp#:#wsp_share_with_users_and_notify#:#Für Benutzer freigeben und per Email benachrichtigen
+wsp#:#wsp_share_notification_subject#:#Freigabe "%s"
+wsp#:#wsp_share_notification_salutation#:#Hallo %s,
+wsp#:#wsp_share_notification_body#:#Ein Objekt wurde für Sie im Arbeitsraum freigegeben
+wsp#:#wsp_share_notification_link#:#Link
+wsp#:#wsp_share_notification_download_link#:#Download
+wsp#:#wsp_share_with_members_and_notify#:#Für Mitglieder freigeben und per Email benachrichtigen

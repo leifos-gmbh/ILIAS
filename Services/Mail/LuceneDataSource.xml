@@ -21,11 +21,15 @@
 			WHERE mail_id IN (?);
 		</Query>
 		<Param format="list" type="int" value="mail_id" />
+		<!-- uzk-patch: begin -->
+		<!-- 
 		<DataSource type="Directory" action="append">
 			<PathCreator name="MailAttachmentPathCreator" />
 			<Field store="YES" index="ANALYZED" name="mattachment">
 				<Transformer name="LinefeedSanitizer" />
 			</Field>
 		</DataSource>
+		-->
+		<!-- uzk-patch: end -->
 	</DataSource>
 </DataSource>

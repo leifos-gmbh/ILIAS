@@ -308,7 +308,9 @@ class ilMailFolderTableGUI extends ilTable2GUI
 				$query_parser->setFields(array(
 					'title'       => (bool)$this->filter['mail_filter_subject'],
 					'content'     => (bool)$this->filter['mail_filter_body'],
-					'mattachment' => (bool)$this->filter['mail_filter_attach'],
+					// uzk-patch: begin
+					//'mattachment' => (bool)$this->filter['mail_filter_attach'],
+					// uzk-patch: end
 					'msender'     => (bool)$this->filter['mail_filter_sender'],
 					'mrcp'        => (bool)$this->filter['mail_filter_recipients']
 				));
@@ -593,13 +595,15 @@ class ilMailFolderTableGUI extends ilTable2GUI
 		$ci->readFromSession();
 		$this->filter['mail_filter_body'] = (int)$ci->getChecked();
 
-		$this->sub_filter[] = $ci = new ilCheckboxInputGUI($this->lng->txt('mail_filter_attach'), 'mail_filter_attach');
+		// uzk-patch: begin
+		/*$this->sub_filter[] = $ci = new ilCheckboxInputGUI($this->lng->txt('mail_filter_attach'), 'mail_filter_attach');
 		$ci->setOptionTitle($this->lng->txt('mail_filter_attach'));
 		$ci->setValue(1);
 		$ti->addSubItem($ci);
 		$ci->setParent($this);
 		$ci->readFromSession();
-		$this->filter['mail_filter_attach'] = (int)$ci->getChecked();
+		$this->filter['mail_filter_attach'] = (int)$ci->getChecked();*/
+		// uzk-patch: end
 	}
 
 	/**

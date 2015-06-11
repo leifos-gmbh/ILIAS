@@ -56,8 +56,7 @@ class ilAdvancedMDFieldDefinitionSelectMulti extends ilAdvancedMDFieldDefinition
 		$missing = array_diff($old, $new);
 		if(sizeof($missing))
 		{		
-			$this->confirmed_objects = $a_form->getInput("conf");
-			$this->confirmed_objects = $this->confirmed_objects[$this->getFieldId()];
+			$this->confirmed_objects = $this->buildConfirmedObjects($a_form);
 			if(!is_array($this->confirmed_objects))
 			{									
 				$search = ilADTFactory::getInstance()->getSearchBridgeForDefinitionInstance($this->getADTDefinition(), false, false);							
@@ -155,14 +154,20 @@ class ilAdvancedMDFieldDefinitionSelectMulti extends ilAdvancedMDFieldDefinition
 						{
 							// find changed option in old value
 							$old_value = explode(ilADTMultiEnumDBBridge::SEPARATOR, $old_values[$item]);
-							$old_idx = array_keys($old_value, $old_option);
+							// remove separators
+							array_shift($old_value);
+							array_pop($old_value);
+							$old_idx = array_keys($old_value, $old_option);							
 							if(sizeof($old_idx))
 							{
 								// switch option
 								$old_idx = array_pop($old_idx);						
-								$old_value[$old_idx] = $new_option;			
-								$new_value = array_unique($old_value);
-								$new_value = implode(ilADTMultiEnumDBBridge::SEPARATOR, $new_value);
+								$old_value[$old_idx] = $new_option;									
+								$new_value = array_unique($old_value);	
+								// add separators
+								$new_value = ilADTMultiEnumDBBridge::SEPARATOR.
+									implode(ilADTMultiEnumDBBridge::SEPARATOR, $new_value).
+									ilADTMultiEnumDBBridge::SEPARATOR;
 								
 								$primary = array(
 									"obj_id" => array("integer", $obj_id),
@@ -174,12 +179,19 @@ class ilAdvancedMDFieldDefinitionSelectMulti extends ilAdvancedMDFieldDefinition
 							}
 						}			
 					}
-				}
+										
+					if($sub_type == "wpg")
+					{
+						// #15763 - adapt advmd page lists
+						include_once "Modules/Wiki/classes/class.ilPCAMDPageList.php";
+						ilPCAMDPageList::migrateField($obj_id, $this->getFieldId(), $old_option, $new_option, true);												
+					}	
+				}				
 			}			
 			
 			$this->confirmed_objects = array();
 		}	
-				
+			
 		parent::update();		
 	}
 	

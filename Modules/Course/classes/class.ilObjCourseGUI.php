@@ -22,6 +22,7 @@ require_once "./Services/Container/classes/class.ilContainerGUI.php";
 * @ilCtrl_Calls ilObjCourseGUI: ilContainerStartObjectsGUI, ilContainerStartObjectsPageGUI
 * @ilCtrl_Calls ilObjCourseGUI: ilMailMemberSearchGUI
 * @ilCtrl_Calls ilObjCourseGUI: ilLOPageGUI, ilObjectMetaDataGUI
+* @ilCtrl_Calls ilObjCourseGUI: ilObjectDeletionGUI
 *
 * @extends ilContainerGUI
 */
@@ -4438,6 +4439,15 @@ class ilObjCourseGUI extends ilContainerGUI
 				$cp->setType('crs');
 				$this->ctrl->forwardCommand($cp);
 				break;
+			
+			// begin-patch fhoev delete
+			case 'ilobjectdeletiongui':
+				include_once './Services/Object/classes/class.ilObjectDeletionGUI.php';
+				$del = new ilObjectDeletionGUI($this,$this->object->getRefId());
+				$this->ctrl->forwardCommand($del);
+				break;
+			// end-patch fhoev delete
+			
 				
 			case "ilobjstylesheetgui":
 				$this->forwardToStyleSheet();

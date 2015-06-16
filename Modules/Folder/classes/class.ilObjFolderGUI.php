@@ -12,7 +12,7 @@
 * @ilCtrl_Calls ilObjFolderGUI: ilCourseContentGUI, ilLearningProgressGUI
 * @ilCtrl_Calls ilObjFolderGUI: ilInfoScreenGUI, ilContainerPageGUI, ilColumnGUI
 * @ilCtrl_Calls ilObjFolderGUI: ilObjectCopyGUI, ilObjStyleSheetGUI
-* @ilCtrl_Calls ilObjFolderGUI: ilExportGUI, ilCommonActionDispatcherGUI, ilDidacticTemplateGUI
+* @ilCtrl_Calls ilObjFolderGUI: ilExportGUI, ilCommonActionDispatcherGUI, ilDidacticTemplateGUI, ilObjectDeletionGUI
 *
 * @extends ilObjectGUI
 */
@@ -134,7 +134,15 @@ class ilObjFolderGUI extends ilContainerGUI
 				$cp->setType('fold');
 				$this->ctrl->forwardCommand($cp);
 				break;
-
+			
+			case 'ilobjectdeletiongui':
+				include_once './Services/Object/classes/class.ilObjectDeletionGUI.php';
+				$del = new ilObjectDeletionGUI($this,$this->object->getRefId());
+				$this->ctrl->forwardCommand($del);
+				break;
+			// end-patch fhoev delete
+			
+			
 			case "ilobjstylesheetgui":
 				$this->forwardToStyleSheet();
 				break;

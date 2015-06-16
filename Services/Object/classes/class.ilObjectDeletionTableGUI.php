@@ -9,7 +9,6 @@ include_once './Services/Table/classes/class.ilTable2GUI.php';
  * @author Stefan Meyer <smeyer.ilias@gmx.de>
  * @version $Id$
  * 
- * @ilCtrl_Calls ilObjectDeletionGUI: 
  *
  * @ingroup ServicesObject
  */

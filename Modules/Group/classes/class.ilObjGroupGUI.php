@@ -17,7 +17,7 @@ include_once('./Modules/Group/classes/class.ilObjGroup.php');
 * @ilCtrl_Calls ilObjGroupGUI: ilRepositorySearchGUI, ilPublicUserProfileGUI, ilObjCourseGroupingGUI, ilObjStyleSheetGUI
 * @ilCtrl_Calls ilObjGroupGUI: ilCourseContentGUI, ilColumnGUI, ilContainerPageGUI, ilObjectCopyGUI
 * @ilCtrl_Calls ilObjGroupGUI: ilObjectCustomUserFieldsGUI, ilMemberAgreementGUI, ilExportGUI, ilMemberExportGUI
-* @ilCtrl_Calls ilObjGroupGUI: ilCommonActionDispatcherGUI, ilObjectServiceSettingsGUI, ilSessionOverviewGUI
+* @ilCtrl_Calls ilObjGroupGUI: ilCommonActionDispatcherGUI, ilObjectServiceSettingsGUI, ilSessionOverviewGUI, ilObjectDeletionGUI
 * 
 *
 * @extends ilObjectGUI
@@ -157,6 +157,14 @@ class ilObjGroupGUI extends ilContainerGUI
 				$this->ctrl->forwardCommand($cp);
 				break;
 
+			// begin-patch fhoev delete
+			case 'ilobjectdeletiongui':
+				include_once './Services/Object/classes/class.ilObjectDeletionGUI.php';
+				$del = new ilObjectDeletionGUI($this,$this->object->getRefId());
+				$this->ctrl->forwardCommand($del);
+				break;
+			// end-patch fhoev delete
+			
 			case "ilobjstylesheetgui":
 				$this->forwardToStyleSheet();
 				break;

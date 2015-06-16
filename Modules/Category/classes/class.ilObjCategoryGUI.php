@@ -14,7 +14,7 @@ require_once "./Services/Container/classes/class.ilContainerGUI.php";
 * @ilCtrl_Calls ilObjCategoryGUI: ilPermissionGUI, ilContainerPageGUI, ilContainerLinkListGUI, ilObjUserGUI, ilObjUserFolderGUI
 * @ilCtrl_Calls ilObjCategoryGUI: ilInfoScreenGUI, ilObjStyleSheetGUI, ilCommonActionDispatcherGUI, ilObjectTranslationGUI
 * @ilCtrl_Calls ilObjCategoryGUI: ilColumnGUI, ilObjectCopyGUI, ilUserTableGUI, ilDidacticTemplateGUI, ilExportGUI
-* @ilCtrl_Calls ilObjCategoryGUI: ilObjTaxonomyGUI
+* @ilCtrl_Calls ilObjCategoryGUI: ilObjTaxonomyGUI, ilObjectDeletionGUI
 * 
 * @ingroup ModulesCategory
 */
@@ -153,6 +153,16 @@ class ilObjCategoryGUI extends ilContainerGUI
 				$cp->setType('cat');
 				$this->ctrl->forwardCommand($cp);
 				break;
+			
+			// begin-patch fhoev delete
+			case 'ilobjectdeletiongui':
+				$this->prepareOutput();
+				include_once './Services/Object/classes/class.ilObjectDeletionGUI.php';
+				$del = new ilObjectDeletionGUI($this,$this->object->getRefId());
+				$this->ctrl->forwardCommand($del);
+				break;
+			// end-patch fhoev delete
+			
 				
 			case "ilobjstylesheetgui":
 				$this->forwardToStyleSheet();

@@ -11,7 +11,7 @@
 *
 * @ilCtrl_Calls ilObjRootFolderGUI: ilPermissionGUI, ilContainerPageGUI, ilContainerLinkListGUI, 
 * @ilCtrl_Calls ilObjRootFolderGUI: ilColumnGUI, ilObjectCopyGUI, ilObjStyleSheetGUI
-* @ilCtrl_Calls ilObjRootFolderGUI: ilCommonActionDispatcherGUI, ilObjectTranslationGUI
+* @ilCtrl_Calls ilObjRootFolderGUI: ilCommonActionDispatcherGUI, ilObjectTranslationGUI, ilObjectDeletionGUI
 * 
 * @extends ilObjectGUI
 */
@@ -152,6 +152,16 @@ class ilObjRootFolderGUI extends ilContainerGUI
 				$cp->setType('root');
 				$this->ctrl->forwardCommand($cp);
 				break;
+			
+			// begin-patch fhoev delete
+			case 'ilobjectdeletiongui':
+				$this->prepareOutput();
+				$GLOBALS['ilTabs']->clearTargets();
+				include_once './Services/Object/classes/class.ilObjectDeletionGUI.php';
+				$del = new ilObjectDeletionGUI($this,$this->object->getRefId());
+				$this->ctrl->forwardCommand($del);
+				break;
+			// end-patch fhoev delete
 				
 			case "ilobjstylesheetgui":
 				$this->forwardToStyleSheet();
@@ -174,7 +184,6 @@ class ilObjRootFolderGUI extends ilContainerGUI
 				break;
 
 			default:
-				
 				// fix bug http://www.ilias.de/mantis/view.php?id=10305
 				if ($cmd == "infoScreen")
 				{

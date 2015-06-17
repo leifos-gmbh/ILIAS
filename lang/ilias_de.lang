@@ -16169,3 +16169,5 @@ content#:#cont_error#:#Es ist leider ein Fehler aufgetreten
 crs#:#crs_mail_context_member_info#:#Für die Kontakt-Emails auf der Infoseite eines Kurses 
 crs#:#crs_mail_context_tutor_info#:#Für die Teilnehmer-Emails auf den Mitglieds- und Lernfortschrittsansichten eines Kurses
 sahs#:#sahs_mail_context_lp_info#:#Für die Teilnehmer-Emails auf den Lernfortschrittsansichten eines SCORM-Moduls
+obj#:#obj_tbl_col_subobjects#:#Anzahl Unterobjekte
+obj#:#obj_filter_level#:#Ebenen im Magazinbaum

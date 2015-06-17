@@ -59,7 +59,7 @@ class ilObjectDeletionTableGUI extends ilTable2GUI
 		$this->addColumn('','','1px');
 		$this->addColumn($this->lng->txt('title'),'');
 		$this->addColumn($this->lng->txt('obj_tbl_col_subobjects'),'');
-		$this->addColumn($this->lng->txt('obj_tbl_col_notice'),'');
+		#$this->addColumn($this->lng->txt('obj_tbl_col_notice'),'');
 		
 		
 		$this->addMultiCommand('deleteSelectedItems', $this->lng->txt('delete'));

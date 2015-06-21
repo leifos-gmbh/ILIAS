@@ -67,11 +67,12 @@ class ilAwarenessAct
 	 *
 	 * @return ilAwarenessData awareness data
 	 */
-	function getAwarenessData()
+	function getAwarenessData($a_filter)
 	{
 		include_once("./Services/Awareness/classes/class.ilAwarenessData.php");
 		$data = ilAwarenessData::getInstance($this->user_id);
 		$data->setRefId($this->getRefId());
+		$data->setFilter($a_filter);
 		return $data->getData();
 	}
 

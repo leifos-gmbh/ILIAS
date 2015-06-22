@@ -105,7 +105,8 @@
 			$('.ilAwarenessItem').on('shown.bs.dropdown', function () {
 				t.fixHeight();
 			}).on('hidden.bs.dropdown', function () {
-				t.fixHeight();
+				// if done, height is corrected, but dd is not opened if clicked (when other dd has been opened before)
+//				t.fixHeight();
 			});
 
 			$("#il_awrn_filter_form").submit(function (e) {

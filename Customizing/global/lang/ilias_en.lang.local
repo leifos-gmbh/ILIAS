@@ -23,3 +23,6 @@ mmbr#:#mmbr_awrn_my_groups_courses#:#My Groups and Courses
 mmbr#:#mmbr_awrn_my_groups_courses_info#:#All members of groups or courses of the current user are listed.
 crs#:#crs_awrn_current_course#:#Current Course
 crs#:#crs_awrn_current_course_info#:#If the user navigates to a course in the repository, all members of the course are listed.
+awrn#:#awrn_caching_period#:#Caching Period
+awrn#:#awrn_caching_period_info#:#Time that is waited before the number of users in the top bar is updated and new online users are determined.
+awrn#:#awrn_seconds#:#sec

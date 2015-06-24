@@ -16,8 +16,9 @@ awrn#:#awrn_online_only#:#Online Only
 awrn#:#awrn_incl_offline#:#Online and Offline
 contact#:#contact_awrn_ap_contacts#:#Approved Contacts
 contact#:#contact_awrn_ap_contacts_info#:#All contacts approved by the user are listed.
-adm#:#adm_awrn_support_contacts#:#System Support Contacts
+adm#:#adm_support_contacts#:#System Support Contacts
 adm#:#adm_awrn_support_contacts_info#:#All system contacts are listed.
+adm#:#adm_support_contacts_info#:#Support contacts used in the footer link and (if activated) in the awareness tool. Comma separated list of account logins.
 mmbr#:#mmbr_awrn_my_groups_courses#:#My Groups and Courses
 mmbr#:#mmbr_awrn_my_groups_courses_info#:#All members of groups or courses of the current user are listed.
 crs#:#crs_awrn_current_course#:#Current Course

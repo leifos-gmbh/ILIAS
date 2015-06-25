@@ -28,3 +28,5 @@ awrn#:#awrn_caching_period_info#:#Dieser Zeitraum wird gewartet, bevor die Anzah
 awrn#:#awrn_seconds#:#Sek.
 awrn#:#awrn_max_nr_entries#:#Anzahl max. Einträge
 awrn#:#awrn_max_nr_entries_info#:#Diese Anzahl an Einträgen wird maximal in der Awareness-Liste angezeigt.
+awrn#:#awrn_hide_from_awareness#:#Hide Me From Awareness Tool
+awrn#:#awrn_hide_from_awareness_info#:#The awareness tool is in the top bar and listing selected users (e.g. contacts or members of your courses).

@@ -1,0 +1,12 @@
+ <!-- language file start -->
+configuration#:#Configuration
+central_category#:#Course Template Category
+category_set#:#The category has been updated.
+main_menu_title#:#Course Templates
+create_new_template#:#Create New Template
+create_new_course#:#Create New Course
+create_template_form_title#:#Create New Course Template
+create_template_action#:#Create Template
+create_course_form_title#:#Create New Course From Template
+create_course_action#:#Create Course
+create_course_template#:#Course Template

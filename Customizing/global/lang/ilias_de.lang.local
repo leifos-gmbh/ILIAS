@@ -26,3 +26,5 @@ crs#:#crs_awrn_current_course_info#:#If the user navigates to a course in the re
 awrn#:#awrn_caching_period#:#Caching-Zeitraum
 awrn#:#awrn_caching_period_info#:#Dieser Zeitraum wird gewartet, bevor die Anzahl der Benutzer in der Top-Anzeige aktualisiert wird und bevor neue Online-Benutzer ermittelt werden.
 awrn#:#awrn_seconds#:#Sek.
+awrn#:#awrn_max_nr_entries#:#Anzahl max. Einträge
+awrn#:#awrn_max_nr_entries_info#:#Diese Anzahl an Einträgen wird maximal in der Awareness-Liste angezeigt.

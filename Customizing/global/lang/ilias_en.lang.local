@@ -26,3 +26,5 @@ crs#:#crs_awrn_current_course_info#:#If the user navigates to a course in the re
 awrn#:#awrn_caching_period#:#Caching Period
 awrn#:#awrn_caching_period_info#:#Time that is waited before the number of users in the top bar is updated and new online users are determined.
 awrn#:#awrn_seconds#:#sec
+awrn#:#awrn_max_nr_entries#:#Max. Number of Items
+awrn#:#awrn_max_nr_entries_info#:#Maximum number of items in the awareness list.

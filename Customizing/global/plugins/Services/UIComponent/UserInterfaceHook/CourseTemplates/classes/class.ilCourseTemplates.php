@@ -10,6 +10,7 @@
 class ilCourseTemplates
 {
 	protected $plugin_id; 
+	protected static $templates; 
 	
 	protected function __construct($a_plugin_id)
 	{
@@ -50,14 +51,86 @@ class ilCourseTemplates
 	{
 		global $tree;
 		
-		$cat_ref_id = $this->getGlobalTemplateCategory();
-		
-		$options = array();
-		foreach($tree->getSubTree($tree->getNodeData($cat_ref_id), true, "crs") as $item)
-		{
-			$options[$item["ref_id"]] = "[".$item["ref_id"]."] ".$item["title"];
+		if(!is_array(self::$templates))
+		{					
+			$cat_ref_id = $this->getGlobalTemplateCategory();
+			$tmpl_ids = $this->getCoursesWithTemplateStatus();
+
+			$valid = array();
+			foreach($tree->getSubTree($tree->getNodeData($cat_ref_id), true, "crs") as $item)
+			{
+				if(!in_array($item["obj_id"], $tmpl_ids) ||
+					$tree->isDeleted($item["ref_id"]))
+				{
+					continue;
+				}
+				$valid[$item["ref_id"]] = "[".$item["ref_id"]."] ".$item["title"];
+			}
+
+			self::$templates = $valid;
 		}
 		
-		return $options;
+		return self::$templates;
+	}
+	
+	public function setCourseTemplateStatus($a_crs_obj_id)
+	{
+		global $ilDB, $ilUser;				
+		
+		$ilDB->replace("crs_templates",
+			array(
+				"crs_id"=>array("integer", $a_crs_obj_id)
+			),
+			array(
+				"usr_id"=>array("integer", $ilUser->getId()),
+				"tstamp"=>array("integer", time()),			
+			)
+		);		
+	}
+	
+	public function getCoursesWithTemplateStatus()
+	{
+		global $ilDB;
+		
+		$tmpl_ids = array();
+		$set = $ilDB->query("SELECT crs_id".
+			" FROM crs_templates".
+			" WHERE parent IS NULL");
+		while($row = $ilDB->fetchAssoc($set))
+		{
+			$tmpl_ids[] = $row["crs_id"];					
+		}
+		return $tmpl_ids;
+	}
+	
+	public function getCoursesFromTemplate()
+	{
+		global $ilDB;
+		
+		$tmpl_ids = array();
+		$set = $ilDB->query("SELECT crs_id, parent".
+			" FROM crs_templates".
+			" WHERE parent IS NOT NULL");
+		while($row = $ilDB->fetchAssoc($set))
+		{
+			$tmpl_ids[$row["crs_id"]] = $row["parent"];					
+		}
+		return $tmpl_ids;
+	}
+	
+	public function setCourseFromTemplateStatus($a_tmpl_obj_id, $a_crs_obj_id)
+	{
+		global $ilDB, $ilUser;				
+		
+		$ilDB->replace("crs_templates",
+			array(
+				"crs_id"=>array("integer", $a_crs_obj_id)
+			),
+			array(
+				"usr_id"=>array("integer", $ilUser->getId()),
+				"tstamp"=>array("integer", time()),	
+				"parent"=>array("integer", $a_tmpl_obj_id)
+			)
+		);		
 	}
 }

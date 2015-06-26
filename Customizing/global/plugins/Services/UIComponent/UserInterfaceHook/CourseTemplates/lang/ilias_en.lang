@@ -10,3 +10,5 @@ create_template_action#:#Create Template
 create_course_form_title#:#Create New Course From Template
 create_course_action#:#Create Course
 create_course_template#:#Course Template
+course_list_gui_property_template#:#Course Template
+course_list_gui_property_from_template#:#From Course Template

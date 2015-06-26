@@ -10,3 +10,5 @@ create_template_action#:#Vorlage erstellen
 create_course_form_title#:#Neuen Kurs aus Vorlage erstellen
 create_course_action#:#Kurs erstellen
 create_course_template#:#Kursvorlage
+course_list_gui_property_template#:#Kursvorlage 
+course_list_gui_property_from_template#:#Von Kursvorlage 

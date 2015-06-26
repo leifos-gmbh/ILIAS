@@ -14,8 +14,6 @@ include_once "Services/Object/classes/class.ilObjectListGUI.php";
  */
 class ilObjCourseListGUI extends ilObjectListGUI
 {
-	protected static $template_data; // [array]
-	
 	/**
 	* constructor
 	*
@@ -84,44 +82,6 @@ class ilObjCourseListGUI extends ilObjectListGUI
 		global $lng, $ilUser;
 																
 		$props = parent::getProperties();
-		
-		
-		// PATCH BEGIN
-		
-		// preload templates data
-		if(!is_array(self::$template_data))
-		{						
-			$pl = ilPluginAdmin::getPluginObject("Services", "UIComponent", "uihk", "CourseTemplates");
-			if($pl)
-			{
-				$templates = $pl->getCourseTemplatesInstance();
-				self::$template_data["templates"] = $templates->getCoursesWithTemplateStatus();				
-				self::$template_data["copies"] = $templates->getCoursesFromTemplate();
-				self::$template_data["template_title"] = $pl->txt("course_list_gui_property_template");
-				self::$template_data["copy_title"] = $pl->txt("course_list_gui_property_from_template");
-			}	
-			else
-			{
-				self::$template_data = array("templates"=>array(), "copies"=>array());
-			}
-		}		
-		
-		// is valid course template?
-		if(in_array($this->obj_id, self::$template_data["templates"]))
-		{
-			$props[] = array("alert" => false, "property" => "",
-				"value" => self::$template_data["template_title"]);			
-		}
-		
-		// is course copied from template?
-		if(array_key_exists($this->obj_id, self::$template_data["copies"]))
-		{
-			$props[] = array("alert" => false, "property" => self::$template_data["copy_title"],
-				"value" => ilObject::_lookupTitle(self::$template_data["copies"][$this->obj_id]));			
-		}
-		
-		// PATCH END
-		
 		
 		// offline
 		include_once 'Modules/Course/classes/class.ilObjCourseAccess.php';

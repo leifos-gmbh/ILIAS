@@ -1308,7 +1308,19 @@ class ilObjectListGUI
 			}
 			// END ChangeEvent: display changes.
 		}
+		
+		
+		// PATCH BEGIN
+		
+		// user interface plugin slot (not used for HTML transformation?!)
+		include_once("./Services/UIComponent/classes/class.ilUIHookProcessor.php");
+		$uip = new ilUIHookProcessor("Services/Object", "object_list_gui",
+			array("object_list_gui" => $this, "obj_id" => $this->obj_id));
+		$uip->getHTML("");
+		
+		// PATCH END
 
+		
 		return $props;
 	}
 	

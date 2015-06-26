@@ -13,6 +13,8 @@ include_once("./Services/UIComponent/classes/class.ilUIHookPluginGUI.php");
  */
 class ilCourseTemplatesUIHookGUI extends ilUIHookPluginGUI
 {
+	protected static $template_data; // [array]
+	
 	function getHTML($a_comp, $a_part, $a_par = array())
 	{		
 		global $ilCtrl;
@@ -58,6 +60,53 @@ class ilCourseTemplatesUIHookGUI extends ilUIHookPluginGUI
 			$html = $mmle_html.$drop."</ul>";
 												
 			return array("mode" => ilUIHookPluginGUI::REPLACE, "html" => $html);
+		}
+		else if($a_comp == "Services/Object" && 
+			$a_part == "object_list_gui")
+		{				
+			// add course template info to course list gui
+			$list_gui = $a_par["object_list_gui"];
+			if(get_class($list_gui) == "ilObjCourseListGUI")
+			{
+				$pl = $this->getPluginObject();		
+				$ct = $pl->getCourseTemplatesInstance();
+
+				if(!$ct->getGlobalTemplateCategory())
+				{
+					return;
+				}
+				
+				$obj_id = $a_par["obj_id"];
+								
+				// preload templates data
+				if(!is_array(self::$template_data))
+				{																
+					self::$template_data["templates"] = $ct->getCoursesWithTemplateStatus();				
+					self::$template_data["copies"] = $ct->getCoursesFromTemplate();
+					self::$template_data["template_title"] = $pl->txt("course_list_gui_property_template");
+					self::$template_data["copy_title"] = $pl->txt("course_list_gui_property_from_template");					
+				}		
+
+				// is valid course template?
+				if(in_array($obj_id, self::$template_data["templates"]))
+				{
+					$list_gui->addCustomProperty(
+						"", 
+						self::$template_data["template_title"],
+						true
+					);							
+				}
+
+				// is course copied from template?
+				if(array_key_exists($obj_id, self::$template_data["copies"]))
+				{
+					$list_gui->addCustomProperty(
+						self::$template_data["copy_title"], 
+						ilObject::_lookupTitle(self::$template_data["copies"][$obj_id]),
+						true
+					);			
+				}				
+			}			
 		}
 		
 		return array("mode" => ilUIHookPluginGUI::KEEP, "html" => "");

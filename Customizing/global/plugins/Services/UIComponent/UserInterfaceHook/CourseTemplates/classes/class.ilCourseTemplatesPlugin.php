@@ -26,6 +26,11 @@ class ilCourseTemplatesPlugin extends ilUserInterfaceHookPlugin
 		include_once $this->getClassesDirectory()."/class.ilCourseTemplates.php";
 		return ilCourseTemplates::getInstance($this->getId());
 	}
+	
+	public function initRepositorySelectorInput()
+	{
+		include_once $this->getClassesDirectory()."/class.ilJSRepositorySelectorInputGUI.php";
+	}
 }
 
 ?>

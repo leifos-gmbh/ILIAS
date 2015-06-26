@@ -32,8 +32,7 @@ class ilCourseTemplatesEditorGUI
 		
 		switch($next_class)
 		{
-			case "ilpropertyformgui":
-				$ilCtrl->setReturn($this, "createCourse");
+			case "ilpropertyformgui":				
 				include_once "Services/Form/classes/class.ilPropertyFormGUI.php";
 				$form = $this->initCourseForm();
 				$ilCtrl->forwardCommand($form);
@@ -167,11 +166,10 @@ class ilCourseTemplatesEditorGUI
 		);
 		$form->addItem($tmpl);
 		
-		/*
-		include_once "Services/Form/classes/class.ilRepositorySelectorInputGUI.php";
-		$tgt = new ilRepositorySelectorInputGUI($lng->txt("target"), "tgt");
+		$this->plugin->initRepositorySelectorInput();
+		$tgt = new ilJSRepositorySelectorInputGUI($lng->txt("target"), "tgt");
+		$tgt->setRequired(true);
 		$form->addItem($tgt);
-		*/
 		
 		$title = new ilTextInputGUI($lng->txt("title"), "title");
 		$title->setRequired(true);
@@ -187,18 +185,28 @@ class ilCourseTemplatesEditorGUI
 	
 	protected function saveCourse()
 	{
+		global $lng;
+		
 		$form = $this->initCourseForm();
 		if($form->checkInput())
-		{
-			$ref_id = $this->createCourseFromTemplate(
-				$form->getInput("tmpl"), 
-				1, // :TODO:
-				$form->getInput("title"), 
-				$form->getInput("desc")
-			);
-			
-			include_once "Services/Link/classes/class.ilLink.php";
-			ilUtil::redirect(ilLink::_getLink($ref_id));
+		{			
+			if($form->getInput("tgt") != $this->templates->getGlobalTemplateCategory())
+			{			
+				$ref_id = $this->createCourseFromTemplate(
+					$form->getInput("tmpl"), 
+					$form->getInput("tgt"),
+					$form->getInput("title"), 
+					$form->getInput("desc")
+				);
+
+				include_once "Services/Link/classes/class.ilLink.php";
+				ilUtil::redirect(ilLink::_getLink($ref_id));
+			}
+			else
+			{
+				$form->getItemByPostVar("tgt")->setAlert($this->plugin->txt("cannot_create_course_in_template_category"));
+				ilUtil::sendFailure($lng->txt("form_input_not_valid"));
+			}
 		}
 		
 		$form->setValuesByPost();

@@ -45,8 +45,19 @@ class ilCourseTemplatesUIHookGUI extends ilUIHookPluginGUI
 				$crs_url = $ilCtrl->getLinkTargetByClass(array("iluipluginroutergui", "ilcoursetemplateseditorgui"), "createCourse");		
 				$drop->addItem($pl->txt("create_new_course"), "", $crs_url);
 			}
+			
+			$mmle_tpl = new ilTemplate("tpl.main_menu_list_entries.html", true, true, "Services/MainMenu");
+			$mmle_html = $a_par["main_menu_gui"]->renderMainMenuListEntries($mmle_tpl);
+			$mmle_html = substr(trim($mmle_html), 0, -5); // remove closing ul
+			
+			// convert div to li
+			$drop = $drop->getHTML();
+			$drop = str_replace('<div class="btn-group">', '<li class="dropdown">', $drop);
+			$drop = str_replace('</div>', '</li>', $drop);
+			
+			$html = $mmle_html.$drop."</ul>";
 												
-			return array("mode" => ilUIHookPluginGUI::APPEND, "html" => $drop->getHTML());
+			return array("mode" => ilUIHookPluginGUI::REPLACE, "html" => $html);
 		}
 		
 		return array("mode" => ilUIHookPluginGUI::KEEP, "html" => "");

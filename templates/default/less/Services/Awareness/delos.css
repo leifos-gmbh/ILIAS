@@ -91,7 +91,7 @@
   background-position: right 10px top 50%;
 }
 .ilAwarenessDropDown .media-body.ilAwarenessOnline {
-  background-image: url('templates/default/images/scorm/completed.svg');
+  background-image: url('tescorm/completed.svg');
 }
 .ilAwarenessLoader {
   display: block;

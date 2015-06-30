@@ -125,7 +125,7 @@ class ilObjectDeletionTableGUI extends ilTable2GUI
 		
 		
 		include_once './Services/Link/classes/class.ilLink.php';
-		//$this->tpl->setVariable('OBJ_LINK',ilLink::_getLink($set['ref_id'], $set['type']));
+		$this->tpl->setVariable('OBJ_TITLE_LINK',ilLink::_getLink($set['ref_id'], $set['type']));
 		$this->tpl->setVariable('OBJ_TITLE',$set['title']);
 		
 		

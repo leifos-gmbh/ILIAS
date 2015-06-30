@@ -491,6 +491,16 @@ class ilSoapFunctions {
 		return $sou->ilCloneDependencies($sid,$copy_identifier);
 	}
 	
+	public static function ilObjectDeletion($sid)
+	{
+		include_once './webservice/soap/classes/class.ilSoapUtils.php';
+		$sou = new ilSoapUtils();
+		$sou->disableSOAPCheck();
+		$sou->ignoreUserAbort();
+		
+		return $sou->ilObjectDeletion($sid);
+	}
+	
 	public static function handleECSTasks($sid,$a_server_id)
 	{
 		include_once './webservice/soap/classes/class.ilSoapUtils.php';
@@ -1113,3 +1123,4 @@ class ilSoapFunctions {
 		throw new SoapFault('SOAP-ENV:Server', "Function '{$name}' does not exist");
 	}
 }
+?>

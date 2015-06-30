@@ -16,6 +16,26 @@ class ilCourseTemplatesPlugin extends ilUserInterfaceHookPlugin
 		return "CourseTemplates";
 	}
 	
+	public function isAccessible()
+	{
+		global $rbacsystem;
+		
+		// admin privileges
+		if(!$rbacsystem->checkAccess("visible,read", SYSTEM_FOLDER_ID))
+		{
+			return false;
+		}
+				
+		// plugin must have valid configuration
+		$ct = $this->getCourseTemplatesInstance();
+		if(!$ct->getGlobalTemplateCategory())
+		{
+			return false;
+		}
+				
+		return true;
+	}
+	
 	/**
 	 * Get instance of ilCourseTemplates
 	 * 
@@ -27,9 +47,12 @@ class ilCourseTemplatesPlugin extends ilUserInterfaceHookPlugin
 		return ilCourseTemplates::getInstance($this->getId());
 	}
 	
-	public function initRepositorySelectorInput()
+	public function getUIHookGUI()
 	{
-		include_once $this->getClassesDirectory()."/class.ilJSRepositorySelectorInputGUI.php";
+		include_once $this->getClassesDirectory()."/class.ilCourseTemplatesUIHookGUI.php";
+		$gui = new ilCourseTemplatesUIHookGUI();
+		$gui->setPluginObject($this);
+		return $gui;
 	}
 }
 

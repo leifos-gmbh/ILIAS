@@ -25,8 +25,15 @@ class ilCourseTemplatesEditorGUI
 	{
 		global $ilCtrl, $tpl;
 		
+		if(!$this->plugin->isAccessible())
+		{
+			return;
+		}
+		
 		$tpl->getStandardTemplate();
 		
+		$tpl->setTitle($this->plugin->txt("editor_title"));
+	
 		$next_class = $ilCtrl->getNextClass();
 		$cmd = $ilCtrl->getCmd();
 		
@@ -50,6 +57,26 @@ class ilCourseTemplatesEditorGUI
 	//
 	// templates
 	//
+	
+	protected function listTemplates()
+	{
+		global $ilToolbar, $ilCtrl, $tpl;
+						
+		$ilToolbar->addButton(
+			$this->plugin->txt("create_new_template"), 
+			$ilCtrl->getLinkTarget($this, "createTemplate"));
+		
+		if($this->templates->getAvailableTemplates())
+		{
+			$ilToolbar->addButton(
+				$this->plugin->txt("create_new_course"), 
+				$ilCtrl->getLinkTarget($this, "createCourse"));
+		}
+		
+		$this->plugin->includeClass("class.ilCourseTemplatesTableGUI.php");
+		$tbl = new ilCourseTemplatesTableGUI($this, "listTemplates", $this->plugin, $this->templates);
+		$tpl->setContent($tbl->getHTML());
+	}
 	
 	protected function createTemplate(ilPropertyFormGUI $a_form = null)
 	{
@@ -80,13 +107,13 @@ class ilCourseTemplatesEditorGUI
 		$form->addItem($desc);
 		
 		$form->addCommandButton("saveTemplate", $this->plugin->txt("create_template_action"));
+		$form->addCommandButton("listTemplates", $lng->txt("cancel"));
 		
 		return $form;
 	}
 	
 	protected function saveTemplate()
-	{
-		
+	{		
 		$form = $this->initTemplateForm();
 		if($form->checkInput())
 		{
@@ -166,7 +193,7 @@ class ilCourseTemplatesEditorGUI
 		);
 		$form->addItem($tmpl);
 		
-		$this->plugin->initRepositorySelectorInput();
+		$this->plugin->includeClass("class.ilJSRepositorySelectorInputGUI.php");
 		$tgt = new ilJSRepositorySelectorInputGUI($lng->txt("target"), "tgt");
 		$tgt->setRequired(true);
 		$form->addItem($tgt);
@@ -179,6 +206,7 @@ class ilCourseTemplatesEditorGUI
 		$form->addItem($desc);
 		
 		$form->addCommandButton("saveCourse", $this->plugin->txt("create_course_action"));
+		$form->addCommandButton("listTemplates", $lng->txt("cancel"));
 		
 		return $form;
 	}

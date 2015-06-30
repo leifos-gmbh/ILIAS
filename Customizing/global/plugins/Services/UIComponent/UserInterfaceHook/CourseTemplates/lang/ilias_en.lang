@@ -13,3 +13,4 @@ create_course_template#:#Course Template
 course_list_gui_property_template#:#Course Template
 course_list_gui_property_from_template#:#From Course Template
 cannot_create_course_in_template_category#:#A course cannot be created in the template category.
+editor_title#:#Course Templates 

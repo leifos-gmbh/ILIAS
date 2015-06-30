@@ -47,23 +47,33 @@ class ilCourseTemplates
 		$set->set("cat_ref_id", $a_ref_id);			
 	}
 	
-	public function getAvailableTemplates()
+	public function getTemplatesData()
 	{
 		global $tree;
-		
+				
+		$cat_ref_id = $this->getGlobalTemplateCategory();
+		$tmpl_ids = $this->getCoursesWithTemplateStatus();
+
+		$valid = array();
+		foreach($tree->getSubTree($tree->getNodeData($cat_ref_id), true, "crs") as $item)
+		{
+			if(!in_array($item["obj_id"], $tmpl_ids) ||
+				$tree->isDeleted($item["ref_id"]))
+			{
+				continue;
+			}			
+			$valid[] = $item;			
+		}
+		return $valid;
+	}
+	
+	public function getAvailableTemplates()
+	{		
 		if(!is_array(self::$templates))
 		{					
-			$cat_ref_id = $this->getGlobalTemplateCategory();
-			$tmpl_ids = $this->getCoursesWithTemplateStatus();
-
 			$valid = array();
-			foreach($tree->getSubTree($tree->getNodeData($cat_ref_id), true, "crs") as $item)
+			foreach($this->getTemplatesData() as $item)
 			{
-				if(!in_array($item["obj_id"], $tmpl_ids) ||
-					$tree->isDeleted($item["ref_id"]))
-				{
-					continue;
-				}
 				$valid[$item["ref_id"]] = "[".$item["ref_id"]."] ".$item["title"];
 			}
 

@@ -13,3 +13,4 @@ create_course_template#:#Kursvorlage
 course_list_gui_property_template#:#Kursvorlage 
 course_list_gui_property_from_template#:#Von Kursvorlage 
 cannot_create_course_in_template_category#:#Ein Kurs kann nicht in der Vorlagen-Kategorie erstellt werden.
+editor_title#:#Kursvorlagen

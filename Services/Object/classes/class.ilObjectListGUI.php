@@ -2329,14 +2329,27 @@ class ilObjectListGUI
 		if($this->checkCommandAccess('delete','',$this->ref_id,$this->type))
 		{
 			// begin-patch fhoev delete
-			$this->ctrl->setParameterByClass('ilobjectdeletiongui','ref_id',$this->container_obj->object->getRefId());
-			$this->ctrl->setParameterByClass('ilobjectdeletiongui','item_ref_id',$this->getCommandId());
-			
-			$this->insertCommand(
-					$this->ctrl->getLinkTargetByClass('ilobjectdeletiongui','showSelection'),
-					$this->lng->txt('delete')
-			);
-			$this->adm_commands_included = TRUE;
+			if($htis->context == self::CONTEXT_REPOSITORY)
+			{
+				$this->ctrl->setParameterByClass('ilobjectdeletiongui','ref_id',$this->container_obj->object->getRefId());
+				$this->ctrl->setParameterByClass('ilobjectdeletiongui','item_ref_id',$this->getCommandId());
+
+				$this->insertCommand(
+						$this->ctrl->getLinkTargetByClass('ilobjectdeletiongui','showSelection'),
+						$this->lng->txt('delete')
+				);
+				$this->adm_commands_included = TRUE;
+			}
+			else
+			{
+				$this->ctrl->setParameter($this->container_obj, "ref_id",
+					$this->container_obj->object->getRefId());
+				$this->ctrl->setParameter($this->container_obj, "item_ref_id", $this->getCommandId());
+				$cmd_link = $this->ctrl->getLinkTarget($this->container_obj, "delete");
+				$this->insertCommand($cmd_link, $this->lng->txt("delete"), "",
+					ilUtil::getImagePath("cmd_delete_s.png"));
+				$this->adm_commands_included = true;
+			}
 			// end-patch fhoev delete
 		}
 	}

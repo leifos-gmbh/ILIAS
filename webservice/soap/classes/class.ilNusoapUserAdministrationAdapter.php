@@ -808,6 +808,16 @@ class ilNusoapUserAdministrationAdapter
 								SERVICE_USE,
 								'ILIAS ilCloneDependencies(): Only for internal usage.'.
 								'Syntax, parameters may change in future releases. ');
+		// object deletion
+		$this->server->register('ilObjectDeletion',
+				array('sid' => 'xsd:string'),
+				array('success' => 'xsd:boolean'),
+				SERVICE_NAMESPACE,
+				SERVICE_NAMESPACE.'#ilObjectDeletion',
+				SERVICE_STYLE,
+				SERVICE_USE,
+				'ILIAS delete objects as background task'
+		);
 
 		$this->server->register('saveQuestionResult',
 								array('sid' => 'xsd:string',

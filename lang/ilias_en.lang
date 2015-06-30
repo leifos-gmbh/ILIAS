@@ -16171,3 +16171,4 @@ crs#:#crs_mail_context_tutor_info#:#For the participant emails on the member and
 sahs#:#sahs_mail_context_lp_info#:#For the participant emails on the learning progress screens of a scorm module
 obj#:#obj_tbl_col_subobjects#:#Number of Subobjects
 obj#:#obj_filter_level#:#Levels in the Repository Tree
+obj#:#obj_deletion_progress#:#Progress of Deletion

@@ -142,9 +142,17 @@ class ilObjectDeletionGUI
 		ilSession::clear('object_deletion_filter');
 		$GLOBALS['ilCtrl']->returnToParent($this);
 	}
-
-
+	
 	/**
+	 * Cancel delete
+	 * @return type
+	 */
+	protected function cancelDelete()
+	{
+		return $this->cancel();
+	}
+
+		/**
 	 * show selection of deleteable objects
 	 */
 	protected function showSelection()
@@ -191,9 +199,16 @@ class ilObjectDeletionGUI
 			ilUtil::sendFailure($this->lng->txt('select_one'));
 			return $this->showContainerConfirmation();
 		}
-		
-		$this->doDelete((array) $_REQUEST['objects']);
-		$GLOBALS['ilCtrl']->returnToParent($this);
+
+		// try to delete 
+		if($this->doDelete((array) $_REQUEST['objects']))
+		{
+			$GLOBALS['ilCtrl']->returnToParent($this);
+		}
+		else
+		{
+			$this->showDeletionProgress((array) $_REQUEST['objects']);
+		}
 	}
 	
 	/**
@@ -201,8 +216,48 @@ class ilObjectDeletionGUI
 	 */
 	protected function deleteAllItems()
 	{
-		$this->doDelete((array) $this->getSelectedFilteredObjects());
-		$GLOBALS['ilCtrl']->returnToParent($this);
+		// try to delete
+		if($this->doDelete((array) $this->getSelectedFilteredObjects()))
+		{
+			$GLOBALS['ilCtrl']->returnToParent($this);
+		}
+		else
+		{
+			// deletion in progress
+			$this->showDeletionProgress((array) $this->getSelectedFilteredObjects());
+		}
+	}
+	
+	
+	/**
+	 * Show deletion progress
+	 */
+	protected function showDeletionProgress($a_selected_objects)
+	{
+		include_once './Services/Object/classes/class.ilObjectDeletionProgressTableGUI.php';
+		$progress = new ilObjectDeletionProgressTableGUI($this, 'showDeletionProgress', $this->getContainerRefId());
+		$progress->setObjects($a_selected_objects);
+		$progress->init();
+		$progress->parse();
+		
+		$GLOBALS['tpl']->setContent($progress->getHTML());
+	}
+	
+	/**
+	 * Ajax update progress
+	 */
+	protected function updateProgress()
+	{
+		$json = new stdClass();
+		$json->percentage = null;
+		$json->performed_steps = null;
+		$json->required_steps = count((array) $GLOBALS['tree']->getSubTreeIds((int) $_REQUEST['rating_id']));
+		$json->id = (int) $_REQUEST['rating_id'];
+		
+		$GLOBALS['ilLog']->write(__METHOD__.': '.print_r($json,TRUE));
+		
+		echo json_encode($json);
+		exit;
 	}
 
 		/**
@@ -231,19 +286,40 @@ class ilObjectDeletionGUI
 	 */
 	protected function doDelete($a_objects)
 	{
-		ilSession::set('saved_post', $a_objects);
+		ilObjUser::_writePref($GLOBALS['ilUser']->getId(), 'obj_deletion_queue', serialize($a_objects));
 		
-		$GLOBALS['ilLog']->write(__METHOD__.' '.print_r($a_objects,TRUE));
+		// Start cloning process using soap call
+		include_once 'Services/WebServices/SOAP/classes/class.ilSoapClient.php';
+
+		$soap_client = new ilSoapClient();
+		$soap_client->setResponseTimeout(1);
+		$soap_client->enableWSDL(TRUE);
+
+		$GLOBALS['ilLog']->write(__METHOD__.': Trying to call Soap client...');
+		if($soap_client->init())
+		{
+			// Duplicate session to avoid logout problems with backgrounded SOAP calls
+			$new_session_id = ilSession::_duplicate($_COOKIE['PHPSESSID']);
+			$GLOBALS['ilLog']->write(__METHOD__.': Calling soap clone method...');
+			$res = $soap_client->call('ilObjectDeletion',array($new_session_id.'::'.$_COOKIE['ilClientId']));
+			
+			$GLOBALS['ilLog']->write(__METHOD__.': SOAP response is '. $res);
+			
+			return (bool) $res;
+		}
+		else
+		{
+			ilSession::set('saved_post', $a_objects);
+			$GLOBALS['ilLog']->write(__METHOD__.' '.print_r($a_objects,TRUE));
+
+			include_once './Services/Repository/classes/class.ilRepUtilGUI.php';
+			$ru = new ilRepUtilGUI($this);
+			$ru->deleteObjects((int) $this->getContainerRefId(), ilSession::get('saved_post'));
+			ilSession::clear('saved_post');
+			return TRUE;
+		}
 		
-		include_once './Services/Repository/classes/class.ilRepUtilGUI.php';
-		$ru = new ilRepUtilGUI($this);
-		$ru->deleteObjects((int) $this->getContainerRefId(), ilSession::get('saved_post'));
-		ilSession::clear('saved_post');
 	}
-	
-	
-	
-	
 	
 	/**
 	 * Init selected objects for deletion
@@ -280,7 +356,8 @@ class ilObjectDeletionGUI
 		
 		foreach($this->getSelectedObjects() as $ref_id)
 		{
-			if($a = $GLOBALS['tree']->getSubTreeTypes($ref_id,array('rolf')))
+			$childs_ids = $GLOBALS['tree']->getFilteredChilds(array('rolf'),$ref_id);
+			if(count($childs_ids))
 			{
 				$this->has_subobjects = TRUE;
 				break;

@@ -16171,3 +16171,4 @@ crs#:#crs_mail_context_tutor_info#:#Für die Teilnehmer-Emails auf den Mitglieds
 sahs#:#sahs_mail_context_lp_info#:#Für die Teilnehmer-Emails auf den Lernfortschrittsansichten eines SCORM-Moduls
 obj#:#obj_tbl_col_subobjects#:#Anzahl Unterobjekte
 obj#:#obj_filter_level#:#Ebenen im Magazinbaum
+obj#:#obj_deletion_progress#:#Fortschritt des Löschvorgangs

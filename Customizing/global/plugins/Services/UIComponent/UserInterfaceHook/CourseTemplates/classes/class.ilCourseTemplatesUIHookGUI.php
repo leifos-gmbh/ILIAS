@@ -93,6 +93,7 @@ class ilCourseTemplatesUIHookGUI extends ilUIHookPluginGUI
 					$list_gui->addCustomProperty(
 						"", 
 						self::$template_data["template_title"],
+						true,
 						true
 					);							
 				}
@@ -103,6 +104,7 @@ class ilCourseTemplatesUIHookGUI extends ilUIHookPluginGUI
 					$list_gui->addCustomProperty(
 						self::$template_data["copy_title"], 
 						ilObject::_lookupTitle(self::$template_data["copies"][$obj_id]),
+						false,
 						true
 					);			
 				}				

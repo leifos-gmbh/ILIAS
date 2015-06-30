@@ -15243,3 +15243,4 @@ cron#:#cron_result_status_fail#:#Failed
 wiki#:#wiki_unhide_meta_adv_records#:#Show additional properties
 obj#:#obj_tbl_col_subobjects#:#Number of Subobjects
 obj#:#obj_filter_level#:#Levels in the Repository Tree
+obj#:#obj_deletion_progress#:#Progress of Deletion

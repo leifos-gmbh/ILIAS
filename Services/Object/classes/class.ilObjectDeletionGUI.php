@@ -157,6 +157,11 @@ class ilObjectDeletionGUI
 	 */
 	protected function showSelection()
 	{
+		if(!$GLOBALS['rbacreview']->isAssigned($GLOBALS['ilUser']->getId(),SYSTEM_ROLE_ID))
+		{
+			return $this->showConfirmation();
+		}
+		
 		if(!$this->has_subobjects)
 		{
 			return $this->showConfirmation();

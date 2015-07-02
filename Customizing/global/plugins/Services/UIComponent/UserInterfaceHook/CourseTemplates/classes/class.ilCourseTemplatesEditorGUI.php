@@ -161,13 +161,25 @@ class ilCourseTemplatesEditorGUI
 	
 	protected function copyTemplate()
 	{
-		global $rbacsystem, $ilCtrl;
+		global $rbacsystem, $ilCtrl, $tree;
 		
 		$src_ref_id = (int)$_GET["tid"];
 		if($src_ref_id &&
 			$rbacsystem->checkAccess("copy", $src_ref_id))
 		{
-			$this->createTemplateFromTemplate($src_ref_id);
+			$new_ref_id = $this->createTemplateFromTemplate($src_ref_id);
+			
+			if(sizeof($tree->getSubTree($tree->getNodeData($src_ref_id))) > 1)
+			{
+				$ilCtrl->setParameter($this, "src_ref_id", $src_ref_id);
+				$ilCtrl->setParameter($this, "tgt_ref_id", $new_ref_id);
+				return $this->selectTemplateSubItems($src_ref_id);
+			}
+			else
+			{
+				include_once "Services/Link/classes/class.ilLink.php";
+				ilUtil::redirect(ilLink::_getLink($new_ref_id, "crs"));
+			}
 		}
 		
 		$ilCtrl->redirect($this, "listTemplates");		
@@ -175,7 +187,7 @@ class ilCourseTemplatesEditorGUI
 	
 	protected function createTemplateFromTemplate($a_template_ref_id)
 	{
-		global $tree, $lng;
+		global $lng;
 		
 		// (source) course template
 		include_once "Modules/Course/classes/class.ilObjCourse.php";
@@ -189,25 +201,26 @@ class ilCourseTemplatesEditorGUI
 		$new_tmpl->setTitle($new_tmpl->getTitle()." ".$lng->txt("copy_of_suffix"));		
 		$new_tmpl->update();
 	
-		// copy all sub-objects
-		include_once "Services/CopyWizard/classes/class.ilCopyWizardOptions.php";
-		$options = array();
-		foreach($tree->getSubTree($tree->getNodeData($a_template_ref_id)) as $sub_item)
-		{			
-			$options[$sub_item["ref_id"]] = array("type"=>ilCopyWizardOptions::COPY_WIZARD_COPY);
-		}
-		
-		// crs into crs is possible (see "Adopt Content")
-		$src_tmpl->cloneAllObject(
-			$_COOKIE["PHPSESSID"], 
-			$_COOKIE["ilClientId"],
-			"crs", 
-			$new_tmpl->getRefId(), 
-			$src_tmpl->getRefId(), 
-			$options
-		);
-		
 		return $new_tmpl->getRefId();
+	}
+	
+	protected function selectTemplateSubItems($a_tmpl_ref_id)
+	{
+		global $tpl, $lng;
+		
+		// see ilObjectCopyGUI::showItemSelection()
+		
+		ilUtil::sendInfo($lng->txt('crs_copy_threads_info'));
+		include_once './Services/Object/classes/class.ilObjectCopySelectionTableGUI.php';
+		
+		$tpl->addJavaScript('./Services/CopyWizard/js/ilContainer.js');
+		$tpl->setVariable('BODY_ATTRIBUTES','onload="ilDisableChilds(\'cmd\');"');
+
+		$table = new ilObjectCopySelectionTableGUI($this, 'showItemSelection', 'crs', 'listTemplates');
+		$table->setExternalSorting(true); // somehow necessary
+		$table->parseSource($a_tmpl_ref_id);
+		
+		$tpl->setContent($table->getHTML());
 	}
 		
 	
@@ -264,7 +277,7 @@ class ilCourseTemplatesEditorGUI
 	
 	protected function saveCourse()
 	{
-		global $lng, $ilAccess;
+		global $lng, $ilAccess, $ilCtrl, $tree;
 		
 		$form = $this->initCourseForm();
 		if($form->checkInput())
@@ -282,15 +295,26 @@ class ilCourseTemplatesEditorGUI
 			}
 			else
 			{
+				$tmpl_ref_id = $form->getInput("tmpl");
+				
 				$ref_id = $this->createCourseFromTemplate(
-					$form->getInput("tmpl"), 
+					$tmpl_ref_id, 
 					$tgt_ref_id,
 					$form->getInput("title"), 
 					$form->getInput("desc")
 				);
-
-				include_once "Services/Link/classes/class.ilLink.php";
-				ilUtil::redirect(ilLink::_getLink($ref_id));
+				
+				if(sizeof($tree->getSubTree($tree->getNodeData($tmpl_ref_id))) > 1)
+				{
+					$ilCtrl->setParameter($this, "src_ref_id", $tmpl_ref_id);
+					$ilCtrl->setParameter($this, "tgt_ref_id", $ref_id);
+					return $this->selectTemplateSubItems($tmpl_ref_id);
+				}
+				else
+				{
+					include_once "Services/Link/classes/class.ilLink.php";
+					ilUtil::redirect(ilLink::_getLink($ref_id, "crs"));
+				}
 			}
 			
 		}
@@ -299,10 +323,40 @@ class ilCourseTemplatesEditorGUI
 		$this->createCourse($form);
 	}
 	
-	protected function createCourseFromTemplate($a_template_ref_id, $a_target_ref_id, $a_title, $a_desc)
+	protected function copyContainer()
 	{
-		global $tree;
+		global $ilCtrl;
 		
+		$src_ref_id = (int)$_REQUEST["src_ref_id"];
+		$tgt_ref_id = (int)$_REQUEST["tgt_ref_id"];
+		$options = $_POST["cp_options"];
+		
+		if($src_ref_id &&
+			$tgt_ref_id &&
+			sizeof($options))
+		{		
+			include_once "Modules/Course/classes/class.ilObjCourse.php";
+			$tmpl = new ilObjCourse($src_ref_id);
+
+			// crs into crs is possible (see "Adopt Content")
+			$tmpl->cloneAllObject(
+				$_COOKIE["PHPSESSID"], 
+				$_COOKIE["ilClientId"],
+				"crs", 
+				$tgt_ref_id, 
+				$tmpl->getRefId(), 
+				$options
+			);
+			
+			include_once "Services/Link/classes/class.ilLink.php";
+			ilUtil::redirect(ilLink::_getLink($tgt_ref_id, "crs"));
+		}
+		
+		$ilCtrl->redirect($this, "listTemplates");		
+	}
+	
+	protected function createCourseFromTemplate($a_template_ref_id, $a_target_ref_id, $a_title, $a_desc)
+	{		
 		// (source) course template
 		include_once "Modules/Course/classes/class.ilObjCourse.php";
 		$tmpl = new ilObjCourse($a_template_ref_id);
@@ -319,24 +373,6 @@ class ilCourseTemplatesEditorGUI
 		}
 		$new_crs->update();
 	
-		// copy all sub-objects
-		include_once "Services/CopyWizard/classes/class.ilCopyWizardOptions.php";
-		$options = array();
-		foreach($tree->getSubTree($tree->getNodeData($a_template_ref_id)) as $sub_item)
-		{			
-			$options[$sub_item["ref_id"]] = array("type"=>ilCopyWizardOptions::COPY_WIZARD_COPY);
-		}
-		
-		// crs into crs is possible (see "Adopt Content")
-		$tmpl->cloneAllObject(
-			$_COOKIE["PHPSESSID"], 
-			$_COOKIE["ilClientId"],
-			"crs", 
-			$new_crs->getRefId(), 
-			$tmpl->getRefId(), 
-			$options
-		);
-		
 		return $new_crs->getRefId();
 	}
 }

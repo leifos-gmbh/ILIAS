@@ -71,10 +71,10 @@ class ilCourseTemplatesTableGUI extends ilTable2GUI
 						}
 					}
 				}
+				
+				asort($crs_info);
 			}
-			
-			asort($crs_info);
-			
+									
 			$data[] = array(
 				"ref_id" => $item["ref_id"],
 				"title" => $item["title"],

@@ -3501,22 +3501,51 @@ function getAnswerFeedbackPoints()
 			ilUtil::delDir(CLIENT_WEB_DIR . "/assessment/tst_" . $this->getTestId());
 		}
 	}
+	
+	public function removeTestResults(ilTestParticipantData $participantData)
+	{
+		if( count($participantData->getAnonymousActiveIds()) )
+		{
+			$this->removeTestResultsByActiveIds($participantData->getAnonymousActiveIds());
+		}
 
-	public function removeTestResults($userIds)
+		if( count($participantData->getUserIds()) )
+		{
+			/* @var ilTestLP $testLP */
+			require_once 'Services/Object/classes/class.ilObjectLP.php';
+			$testLP = ilObjectLP::getInstance($this->getId());
+			$testLP->resetLPDataForUserIds($participantData->getUserIds(), false);
+		}
+
+		if( count($participantData->getActiveIds()) )
+		{
+			$this->removeTestActives($participantData->getActiveIds());
+		}
+	}
+
+	public function removeTestResultsByUserIds($userIds)
+	{
+		global $ilDB, $lng;
+		
+		require_once 'Modules/Test/classes/class.ilTestParticipantData.php';
+		$participantData = new ilTestParticipantData($ilDB, $lng);
+		$participantData->setUserIds($userIds);
+		$participantData->load($this->getTestId());
+
+		$IN_userIds = $ilDB->in('usr_id', $participantData->getUserIds(), false, 'integer');
+		$ilDB->manipulateF("DELETE FROM usr_pref WHERE $IN_userIds AND keyword = %s",
+			array('text'), array("tst_password_".$this->getTestId())
+		);
+		
+		if( count($participantData->getActiveIds()) )
+		{
+			$this->removeTestResultsByActiveIds($participantData->getActiveIds());
+		}
+	}
+
+	public function removeTestResultsByActiveIds($activeIds)
 	{
 		global $ilDB;
-
-		$IN_userIds = $ilDB->in('user_fi', $userIds, false, 'integer');
-		$res = $ilDB->queryF(
-			"SELECT active_id FROM tst_active WHERE test_fi = %s AND $IN_userIds",
-			array('integer'), array($this->getTestId())
-		);
-
-		$activeIds = array();
-		while( $row = $ilDB->fetchAssoc($res) )
-		{
-			$activeIds[] = $row['active_id'];
-		}
 
 		$IN_activeIds = $ilDB->in('active_fi', $activeIds, false, 'integer');
 
@@ -3540,16 +3569,6 @@ function getAnswerFeedbackPoints()
 		}
 
 		include_once ("./Modules/Test/classes/class.ilObjAssessmentFolder.php");
-		if (ilObjAssessmentFolder::_enabledAssessmentLogging())
-		{
-			$this->logAction(sprintf($this->lng->txtlng("assessment", "log_selected_user_data_removed", ilObjAssessmentFolder::_getLogLanguage()), $this->userLookupFullName($this->_getUserIdFromActiveId($active_id))));
-		}
-
-		$IN_userIds = $ilDB->in('usr_id', $userIds, false, 'integer');
-		$ilDB->manipulateF(
-			"DELETE FROM usr_pref WHERE $IN_userIds AND keyword = %s",
-			array('text'), array("tst_password_".$this->getTestId())
-		);
 
 		foreach ($activeIds as $active_id)
 		{
@@ -3558,6 +3577,11 @@ function getAnswerFeedbackPoints()
 			if (@is_dir(CLIENT_WEB_DIR . "/assessment/tst_" . $this->getTestId() . "/$active_id"))
 			{
 				ilUtil::delDir(CLIENT_WEB_DIR . "/assessment/tst_" . $this->getTestId() . "/$active_id");
+			}
+			
+			if (ilObjAssessmentFolder::_enabledAssessmentLogging())
+			{
+				$this->logAction(sprintf($this->lng->txtlng("assessment", "log_selected_user_data_removed", ilObjAssessmentFolder::_getLogLanguage()), $this->userLookupFullName($this->_getUserIdFromActiveId($active_id))));
 			}
 		}
 
@@ -9120,45 +9144,6 @@ function getAnswerFeedbackPoints()
 	}
 
 	/**
-	* Returns a new, unused test access code
-	*
-	* @return	string A new test access code
-	*/
-	function createNewAccessCode()
-	{
-		// create a 5 character code
-		$codestring = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-		mt_srand();
-		$code = "";
-		for ($i = 1; $i <=5; $i++)
-		{
-			$index = mt_rand(0, strlen($codestring)-1);
-			$code .= substr($codestring, $index, 1);
-		}
-		
-		// todo: separate the code "building" from the code "creation", because the following self calling construction
-		// is not testable and leads btw in non required double queries if a random value is allready used in db anytime
-		
-		// verify it against the database
-		while ($this->isAccessCodeUsed($code))
-		{
-			$code = $this->createNewAccessCode();
-		}
-		return $code;
-	}
-
-	function isAccessCodeUsed($code)
-	{
-		global $ilDB;
-
-		$result = $ilDB->queryF("SELECT anonymous_id FROM tst_active WHERE test_fi = %s AND anonymous_id = %s",
-			array('integer', 'text'),
-			array($this->getTestId(), $code)
-		);
-		return ($result->numRows() > 0) ? true : false;
-	}
-
-	/**
 	 * @deprecated: use ilTestParticipantData instead
 	 */
 	public static function _getUserIdFromActiveId($active_id)
@@ -9177,35 +9162,6 @@ function getAnswerFeedbackPoints()
 		{
 			return -1;
 		}
-	}
-
-	function getAccessCodeSession()
-	{
-		$id = $this->getTestId();
-		if (!is_array($_SESSION["tst_access_code"]))
-		{
-			return "";
-		}
-		else
-		{
-			return $_SESSION["tst_access_code"]["$id"];
-		}
-	}
-
-	function setAccessCodeSession($access_code)
-	{
-		$id = $this->getTestId();
-		if (!is_array($_SESSION["tst_access_code"]))
-		{
-			$_SESSION["tst_access_code"] = array();
-		}
-		$_SESSION["tst_access_code"]["$id"] = $access_code;
-	}
-
-	function unsetAccessCodeSession()
-	{
-		$id = $this->getTestId();
-		unset($_SESSION["tst_access_code"]["$id"]);
 	}
 
 	/**

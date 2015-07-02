@@ -58,6 +58,8 @@ class ilCourseTemplatesUIHookGUI extends ilUIHookPluginGUI
 	
 	protected function renderListGUI(ilObjectListGUI $a_list_gui, $a_obj_id)
 	{
+		global $rbacsystem;
+		
 		$pl = $this->getPluginObject();		
 		$ct = $pl->getCourseTemplatesInstance();
 
@@ -84,12 +86,16 @@ class ilCourseTemplatesUIHookGUI extends ilUIHookPluginGUI
 		// is course copied from template?
 		if(array_key_exists($a_obj_id, self::$template_data["copies"]))
 		{
-			$a_list_gui->addCustomProperty(
-				self::$template_data["copy_title"], 
-				ilObject::_lookupTitle(self::$template_data["copies"][$a_obj_id]),
-				false,
-				true
-			);			
+			// only course admins should see template info
+			if($rbacsystem->checkAccess("write", array_pop(ilObject::_getAllReferences($a_obj_id))))
+			{			
+				$a_list_gui->addCustomProperty(
+					self::$template_data["copy_title"], 
+					ilObject::_lookupTitle(self::$template_data["copies"][$a_obj_id]),
+					false,
+					true
+				);		
+			}
 		}				
 	}	
 		

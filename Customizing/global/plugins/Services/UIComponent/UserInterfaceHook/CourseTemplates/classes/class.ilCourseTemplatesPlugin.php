@@ -32,8 +32,9 @@ class ilCourseTemplatesPlugin extends ilUserInterfaceHookPlugin
 		{
 			return false;
 		}
-				
-		return true;
+		
+		// has to be able to create courses in central template category
+		return $rbacsystem->checkAccess("create_crs", $ct->getGlobalTemplateCategory());
 	}
 	
 	/**

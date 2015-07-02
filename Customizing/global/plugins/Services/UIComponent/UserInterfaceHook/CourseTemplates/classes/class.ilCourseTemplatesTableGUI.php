@@ -27,7 +27,8 @@ class ilCourseTemplatesTableGUI extends ilTable2GUI
 		$this->addColumn($lng->txt("title"), "title");
 		$this->addColumn($lng->txt("description"));
 		$this->addColumn($lng->txt("online"), "online");
-		$this->addColumn($lng->txt("objs_crs"));		
+		$this->addColumn($lng->txt("objs_crs"));
+		$this->addColumn($lng->txt("action"));
 		
 		$this->setDefaultOrderField("title");	
 		
@@ -75,6 +76,7 @@ class ilCourseTemplatesTableGUI extends ilTable2GUI
 			asort($crs_info);
 			
 			$data[] = array(
+				"ref_id" => $item["ref_id"],
 				"title" => $item["title"],
 				"desc" => ilObject::_lookupDescription($item["obj_id"]),
 				"url" => ilLink::_getLink($item["ref_id"]),
@@ -107,7 +109,7 @@ class ilCourseTemplatesTableGUI extends ilTable2GUI
 	
 	protected function fillRow($set)
 	{
-		global $lng;
+		global $lng, $rbacsystem, $ilCtrl;
 
 		if(is_array($set["crs"]))
 		{
@@ -120,14 +122,25 @@ class ilCourseTemplatesTableGUI extends ilTable2GUI
 			}
 		}
 				
+		if($rbacsystem->checkAccess("copy", $set["ref_id"]))
+		{		
+			$ilCtrl->setParameter($this->getParentObject(), "tid", $set["ref_id"]);
+			$url = $ilCtrl->getLinkTarget($this->getParentObject(), "copyTemplate");
+			$ilCtrl->setParameter($this->getParentObject(), "tid", "");
+			
+			$this->tpl->setCurrentBlock("action_bl");		
+			$this->tpl->setVariable("ACTION_TITLE", $lng->txt("copy"));
+			$this->tpl->setVariable("ACTION_URL", $url);
+			$this->tpl->parseCurrentBlock();			
+		}
+
 		$this->tpl->setVariable("URL", $set["url"]);
 		$this->tpl->setVariable("TITLE", $set["title"]);		
 		$this->tpl->setVariable("DESC", nl2br(trim($set["desc"])));		
 		$this->tpl->setVariable("ONLINE", $set["online"] 
 			? $lng->txt("yes")
-			: $lng->txt("no"));		
+			: $lng->txt("no"));			
 	}
-
 }
 	
 ?>

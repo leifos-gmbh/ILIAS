@@ -158,6 +158,57 @@ class ilCourseTemplatesEditorGUI
 		
 		return $crs;
 	}
+	
+	protected function copyTemplate()
+	{
+		global $rbacsystem, $ilCtrl;
+		
+		$src_ref_id = (int)$_GET["tid"];
+		if($src_ref_id &&
+			$rbacsystem->checkAccess("copy", $src_ref_id))
+		{
+			$this->createTemplateFromTemplate($src_ref_id);
+		}
+		
+		$ilCtrl->redirect($this, "listTemplates");		
+	}
+	
+	protected function createTemplateFromTemplate($a_template_ref_id)
+	{
+		global $tree, $lng;
+		
+		// (source) course template
+		include_once "Modules/Course/classes/class.ilObjCourse.php";
+		$src_tmpl = new ilObjCourse($a_template_ref_id);
+		
+		// (target) create template copy from template
+		$new_tmpl = $src_tmpl->cloneObject($this->templates->getGlobalTemplateCategory());
+		$this->templates->setCourseTemplateStatus($new_tmpl->getId());
+		
+		// adopt form title/description
+		$new_tmpl->setTitle($new_tmpl->getTitle()." ".$lng->txt("copy_of_suffix"));		
+		$new_tmpl->update();
+	
+		// copy all sub-objects
+		include_once "Services/CopyWizard/classes/class.ilCopyWizardOptions.php";
+		$options = array();
+		foreach($tree->getSubTree($tree->getNodeData($a_template_ref_id)) as $sub_item)
+		{			
+			$options[$sub_item["ref_id"]] = array("type"=>ilCopyWizardOptions::COPY_WIZARD_COPY);
+		}
+		
+		// crs into crs is possible (see "Adopt Content")
+		$src_tmpl->cloneAllObject(
+			$_COOKIE["PHPSESSID"], 
+			$_COOKIE["ilClientId"],
+			"crs", 
+			$new_tmpl->getRefId(), 
+			$src_tmpl->getRefId(), 
+			$options
+		);
+		
+		return $new_tmpl->getRefId();
+	}
 		
 	
 	//
@@ -213,16 +264,27 @@ class ilCourseTemplatesEditorGUI
 	
 	protected function saveCourse()
 	{
-		global $lng;
+		global $lng, $ilAccess;
 		
 		$form = $this->initCourseForm();
 		if($form->checkInput())
 		{			
-			if($form->getInput("tgt") != $this->templates->getGlobalTemplateCategory())
+			$tgt_ref_id = $form->getInput("tgt");
+			if($tgt_ref_id == $this->templates->getGlobalTemplateCategory())
 			{			
+				$form->getItemByPostVar("tgt")->setAlert($this->plugin->txt("cannot_create_course_in_template_category"));
+				ilUtil::sendFailure($lng->txt("form_input_not_valid"));
+			}
+			else if(!$ilAccess->checkAccess("create_crs", "", $tgt_ref_id))
+			{
+				$form->getItemByPostVar("tgt")->setAlert($lng->txt("permission_denied"));
+				ilUtil::sendFailure($lng->txt("form_input_not_valid"));
+			}
+			else
+			{
 				$ref_id = $this->createCourseFromTemplate(
 					$form->getInput("tmpl"), 
-					$form->getInput("tgt"),
+					$tgt_ref_id,
 					$form->getInput("title"), 
 					$form->getInput("desc")
 				);
@@ -230,11 +292,7 @@ class ilCourseTemplatesEditorGUI
 				include_once "Services/Link/classes/class.ilLink.php";
 				ilUtil::redirect(ilLink::_getLink($ref_id));
 			}
-			else
-			{
-				$form->getItemByPostVar("tgt")->setAlert($this->plugin->txt("cannot_create_course_in_template_category"));
-				ilUtil::sendFailure($lng->txt("form_input_not_valid"));
-			}
+			
 		}
 		
 		$form->setValuesByPost();

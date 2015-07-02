@@ -69,12 +69,19 @@ class ilCourseTemplates
 	
 	public function getAvailableTemplates()
 	{		
+		global $rbacsystem;
+		
 		if(!is_array(self::$templates))
 		{					
+			include_once "Modules/Course/classes/class.ilObjCourseAccess.php";
 			$valid = array();
 			foreach($this->getTemplatesData() as $item)
 			{
-				$valid[$item["ref_id"]] = "[".$item["ref_id"]."] ".$item["title"];
+				if($rbacsystem->checkAccess("copy", $item["ref_id"]) &&
+					ilObjCourseAccess::_isActivated($item["obj_id"]))
+				{				
+					$valid[$item["ref_id"]] = "[".$item["ref_id"]."] ".$item["title"];
+				}
 			}
 
 			self::$templates = $valid;

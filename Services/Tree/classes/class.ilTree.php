@@ -2655,5 +2655,84 @@ class ilTree
 				$a_force_join_reference, 
 				$a_fields);
 	}
+	
+	
+	/**
+	 * get all node ids in the subtree under specified node id, filter by object ids
+	 *
+	 * @param int $a_node_id
+	 * @param array $a_obj_ids
+	 * @param array $a_fields
+	 * @return	array	
+	 */
+	public function getSubTreeFilteredByObjIds($a_node_id, array $a_obj_ids, array $a_fields = array())
+	{
+		global $ilDB;
+		
+		$node = $this->getNodeData($a_node_id);
+		if(!sizeof($node))
+		{
+			return;
+		}
+		
+		$res = array();
+		
+		$query = $this->getTreeImplementation()->getSubTreeQuery($node, '', true, array($this->ref_pk));
+		
+		$fields = '*';
+		if(count($a_fields))
+		{
+			$fields = implode(',',$a_fields);
+		}
+		
+		$query = "SELECT ".$fields.
+			" FROM ".$this->getTreeTable().
+			" ".$this->buildJoin().
+			" WHERE ".$this->getTableReference().".".$this->ref_pk." IN (".$query.")".
+			" AND ".$ilDB->in($this->getObjectDataTable().".".$this->obj_pk, $a_obj_ids, "", "integer");
+		$set = $ilDB->query($query);
+		while($row = $ilDB->fetchAssoc($set))
+		{
+			$res[] = $row;
+		}
+		
+		return $res;
+	}
+	
+	public function deleteNode($a_tree_id,$a_node_id)
+	{
+		global $ilDB;
+		
+		$query = 'DELETE FROM tree where '.
+				'child = '.$ilDB->quote($a_node_id,'integer').' '.
+				'AND tree = '.$ilDB->quote($a_tree_id,'integer');
+		$ilDB->manipulate($query);
+	}
+	
+	/**
+	 * Lookup object types in trash
+	 * @global type $ilDB
+	 * @return type
+	 */
+	public function lookupTrashedObjectTypes()
+	{
+		global $ilDB;
+		
+		$query = 'SELECT DISTINCT(o.type) type FROM tree t JOIN object_reference r ON child = r.ref_id '.
+				'JOIN object_data o on r.obj_id = o.obj_id '.
+				'WHERE tree < '.$ilDB->quote(0,'integer').' '.
+				'AND child = -tree '.
+				'GROUP BY o.type';
+		$res = $ilDB->query($query);
+		
+		$types_deleted = array();
+		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		{
+			$types_deleted[] = $row->type;
+		}
+		return $types_deleted;
+	}
+	
+	
 } // END class.tree
 ?>

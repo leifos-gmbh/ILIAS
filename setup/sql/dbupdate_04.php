@@ -5895,3 +5895,46 @@ $ilDB->manipulate("DELETE FROM il_dcl_datatype_prop WHERE title = " . $ilDB->quo
 <?php
 	$ilCtrlStructureReader->getStructure();
 ?>
+
+<#4484>
+<?php
+if(!$ilDB->tableExists('sysc_tasks'))
+{
+	$fields = array (
+    'id'    => array(
+    		'type' => 'integer',
+    		'length'  => 4,
+    		'notnull' => true),
+	
+	'grp_id' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => TRUE),
+
+    'title'   => array(
+    		'type' => 'text',
+    		'notnull' => false,
+    		'length' => 64,
+    		'fixed' => true),
+
+	'description' => array(
+			"type" => "text",
+			"notnull" => false,
+		 	"length" => 64,
+		 	"fixed" => true),
+
+	'last_update' => array(
+			"type" => "timestamp",
+			"notnull" => false),
+		
+	'status' => array(
+			"type" => "integer",
+			"notnull" => true,
+			'length' => 1,
+			'default' => 0)
+	  );
+  $ilDB->createTable('sysc_tasks', $fields);
+  $ilDB->addPrimaryKey('sysc_tasks', array('id'));
+  $ilDB->createSequence("sysc_tasks");
+}
+?>

@@ -5953,3 +5953,7 @@ if(!$ilDB->tableColumnExists('sysc_tasks','identifier'))
         ));
 }
 ?>
+<#4486>
+<?php
+	$ilCtrlStructureReader->getStructure();
+?>

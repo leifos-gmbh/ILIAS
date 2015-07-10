@@ -144,17 +144,15 @@ class ilExSubmissionTextGUI extends ilExSubmissionBaseGUI
 		$deadline = max($this->assignment->getDeadline(), $this->assignment->getExtendedDeadline());
 		if($deadline)
 		{
-			$dl_info = ilDatePresentation::formatDate(new ilDateTime($deadline, IL_CAL_UNIX));
+			// extended deadline date should not be presented anywhere
+			// see ilExAssignmentGUI::addSchedule()
+			$dl_info = ilDatePresentation::formatDate(new ilDateTime($this->assignment->getDeadline(), IL_CAL_UNIX));
 					
-			// extended deadline warning			
-			if(time() >  $this->assignment->getDeadline())
+			// #16151 - extended deadline warning (only after deadline passed)
+			if($this->assignment->getDeadline() < time())
 			{							
 				$dl = ilDatePresentation::formatDate(new ilDateTime($this->assignment->getDeadline(),IL_CAL_UNIX));
-				$dl = "<br />".sprintf($this->lng->txt("exc_late_submission_warning"), $dl);				
-				if(time() >  $this->assignment->getDeadline())
-				{
-					$dl = '<span class="warning">'.$dl.'</span>';		
-				}
+				$dl = '<br /><span class="warning">'.sprintf($this->lng->txt("exc_late_submission_warning"), $dl).'</span>';							
 				$dl_info .= $dl;
 			}
 			

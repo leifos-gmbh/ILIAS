@@ -228,6 +228,11 @@ class ilExerciseManagementGUI
 				"selectAssignment");
 			$ilToolbar->addSeparator();
 		}
+		// #16165 - if only 1 assignment dropdown is not displayed;
+		else if($this->assignment)
+		{
+			$ilCtrl->setParameter($this, "ass_id", $this->assignment->getId());
+		}
 		
 		// add member
 		include_once './Services/Search/classes/class.ilRepositorySearchGUI.php';
@@ -241,33 +246,34 @@ class ilExerciseManagementGUI
 				'add_from_container'    => $this->exercise->getRefId()
 			)
 		);
-		
-		$ilToolbar->addSeparator();
-		
-		// we do not want the ilRepositorySearchGUI form action		
-		$ilToolbar->setFormAction($ilCtrl->getFormAction($this));
-		
-		$ilCtrl->setParameter($this, "ass_id", $this->assignment->getId());
-		
-		if($this->assignment->getType() == ilExAssignment::TYPE_UPLOAD_TEAM)
-		{
-			include_once("./Modules/Exercise/classes/class.ilExAssignmentTeam.php");
-			if(ilExAssignmentTeam::getAdoptableGroups($this->exercise->getRefId()))
-			{
-				// multi-feedback
-				$ilToolbar->addButton($this->lng->txt("exc_adopt_group_teams"),
-					$this->ctrl->getLinkTarget($this, "adoptTeamsFromGroup"));
-			}
-		}		
-		else
-		{	
-			// multi-feedback
-			$ilToolbar->addButton($this->lng->txt("exc_multi_feedback"),
-				$this->ctrl->getLinkTarget($this, "showMultiFeedback"));
-		}
-		
+				
+		// #16168 - no assignments
 		if (count($ass) > 0)
-		{							
+		{	
+			$ilToolbar->addSeparator();
+
+			// we do not want the ilRepositorySearchGUI form action		
+			$ilToolbar->setFormAction($ilCtrl->getFormAction($this));
+
+			$ilCtrl->setParameter($this, "ass_id", $this->assignment->getId());
+
+			if($this->assignment->getType() == ilExAssignment::TYPE_UPLOAD_TEAM)
+			{
+				include_once("./Modules/Exercise/classes/class.ilExAssignmentTeam.php");
+				if(ilExAssignmentTeam::getAdoptableGroups($this->exercise->getRefId()))
+				{
+					// multi-feedback
+					$ilToolbar->addButton($this->lng->txt("exc_adopt_group_teams"),
+						$this->ctrl->getLinkTarget($this, "adoptTeamsFromGroup"));
+				}
+			}		
+			else
+			{	
+				// multi-feedback
+				$ilToolbar->addButton($this->lng->txt("exc_multi_feedback"),
+					$this->ctrl->getLinkTarget($this, "showMultiFeedback"));
+			}
+					
 			if($this->assignment->getType() == ilExAssignment::TYPE_TEXT)
 			{
 				$ilToolbar->addSeparator();

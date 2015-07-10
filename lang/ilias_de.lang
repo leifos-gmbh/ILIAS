@@ -15246,7 +15246,7 @@ meta#:#md_adv_confirm_definition_select_option_all#:#Alle vorhandenen Einträge 
 meta#:#md_adv_confirm_definition_select_option_single#:#Jeden vorhandenen Eintrag einzeln entscheiden
 meta#:#md_adv_confirm_definition_select_option_all_action#:#Neuer Wert
 file#:#file_import#:#Dateiimport
-dcl#:#dcl_boolean_desc#:#Auswahlfeld für "zutreffend"/"nicht zutreffend"
+dcl#:#dcl_boolean_desc#:#Auswahlfeld für zutreffend nicht zutreffend
 dcl#:#dcl_text_desc#:#Eingabefeld für Text, Links oder E-Mail-Adressen
 dcl#:#dcl_integer_desc#:#Eingabefeld für ganze Zahlen. Nicht erlaubt sind Brüche und Dezimalzahlen.
 dcl#:#dcl_datetime_desc#:#Datumseingabe per Auswahlmenü oder Kalender
@@ -15310,4 +15310,32 @@ content#:#cont_wiki_link_dialog#:#Link zu einer Wikiseite (Dialog)
 link#:#link_link#:#Link
 common#:#toggle_dropdown#:#Toggle Dropdown
 forum#:#reply_to_postings#:#Antworten
-forum#:#add_new_answer#:#Neuer Beitrag 
+forum#:#add_new_answer#:#Neuer Beitrag
+exc#:#xxx#:#asd
+sysc#:#sysc_overview#:#Übersicht
+sysc#:#sysc_groups#:#Systemcheck-Gruppen
+sysc#:#sysc_grp_tree#:#Magazinbaum
+sysc#:#sysc_grp_tree_desc#:#Analysiert und repariert die Datenintegrität des Magazinbaums
+sysc#:#sysc_completed_num#:#Erfüllte Aufgaben
+sysc#:#sysc_failed_num#:#Nicht erfüllte Aufgaben
+sysc#:#sysc_task_overview#:#Aufgaben
+sysc#:#sysc_action_validate#:#Überprüfen
+sysc#:#sysc_action_repair#:#Reparieren
+sysc#:#sysc_task_tree_duplicates#:#Doppelte Einträge in der Baumstruktur
+sysc#:#sysc_task_tree_duplicates_desc#:#Durchsucht das System nach doppelten Einträgen in Magazinbaum.
+sysc#:#sysc_task_tree_dump#:#Baum auflisten
+sysc#:#sysc_task_tree_dump_desc#:#Analysiert die Baumstruktur und listet alle Baumknoten zusammen mit den Analysedaten auf.
+sysc#:#sysc_action_list_tree#:#Dump der Baumstruktur erzeugen
+sysc#:#sysc_action_show_tree#:#Baumstruktur anzeigen
+sysc#:#sysc_tree_duplicate_failures#:#Es wurden doppelte Einträge in der Baumstruktur gefunden. Anzahl doppelter Einträge:
+sysc#:#sysc_message_success#:#Es wurden keine Fehler festgestellt.
+sysc#:#sysc_tree_list_failures#:#Ein Dump des Magazinbaums wurde erstellt. Anzahl gefundener Fehler:
+sysc#:#sysc_status_na#:#Noch nicht ausgeführt
+sysc#:#sysc_status_running#:#Wird durchgeführt
+sysc#:#sysc_status_failed#:#Fehlgschlagen
+sysc#:#sysc_status_completed#:#Erfüllt
+sysc#:#sysc_task_tree_missing#:#Fehlende Einträge in der Baumstruktur
+sysc#:#sysc_task_tree_missing_desc#:#Durchsucht das System nach fehlenden Einträgen in der Baumstruktur
+sysc#:#sysc_message_tree_missing_confirm#:#Möchten sie die fehlenden Einträge in der Baumstruktur wieder herstellen?
+sysc#:#sysc_btn_tree_missing#:#Wiederherstellung starten
+sysc#:#sysc_tree_missing_failures#:#Es gibt fehlende Einträge in der Baumstruktur. Anzahl fehlender Einträge:

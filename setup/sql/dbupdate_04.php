@@ -5938,3 +5938,18 @@ if(!$ilDB->tableExists('sysc_tasks'))
   $ilDB->createSequence("sysc_tasks");
 }
 ?>
+<#4485>
+<?php
+
+if(!$ilDB->tableColumnExists('sysc_tasks','identifier')) 
+{
+    $ilDB->addTableColumn(
+        'sysc_tasks',
+        'identifier',
+        array(
+            'type' => 'text',
+			'length' => 64,
+            'notnull' => false
+        ));
+}
+?>

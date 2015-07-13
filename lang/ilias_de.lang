@@ -15339,3 +15339,5 @@ sysc#:#sysc_task_tree_missing_desc#:#Durchsucht das System nach fehlenden Eintr�
 sysc#:#sysc_message_tree_missing_confirm#:#Möchten sie die fehlenden Einträge in der Baumstruktur wieder herstellen?
 sysc#:#sysc_btn_tree_missing#:#Wiederherstellung starten
 sysc#:#sysc_tree_missing_failures#:#Es gibt fehlende Einträge in der Baumstruktur. Anzahl fehlender Einträge:
+sysc#:#sysc_cron_empty_trash#:#Papierkorb löschen
+sysc#:#sysc_cron_empty_trash_desc#:#Wenn aktiviert, werden Objekte des Papierkorbs automatisch anhand bestimmter Kriterien (Alter, Objekttyp, Anzahl) aus dem System entfernt.

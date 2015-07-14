@@ -56,7 +56,7 @@ class ilAwarenessGUI
 		global $ilUser;
 
 		$awrn_set = new ilSetting("awrn");
-		if (!$awrn_set->get("awrn_enabled", false))
+		if (!$awrn_set->get("awrn_enabled", false) || ANONYMOUS_USER_ID == $ilUser->getId())
 		{
 			return "";
 		}

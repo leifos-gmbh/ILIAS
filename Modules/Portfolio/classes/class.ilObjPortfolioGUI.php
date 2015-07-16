@@ -1097,7 +1097,10 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
 			if($ass->getExerciseId() == $exc->getId() &&
 				$ass->getType() == ilExAssignment::TYPE_PORTFOLIO)
 			{				
-				$exc->addResourceObject($target_id, $ass_id, $ilUser->getId());
+				// #16205
+				include_once "Modules/Exercise/classes/class.ilExSubmission.php";			
+				$sub = new ilExSubmission($ass, $ilUser->getId());
+				$sub->addResourceObject($target_id);
 			}
 		}
 		

@@ -2,31 +2,31 @@
 crs#:#crs_mem_contact#:#Betreuer
 awrn#:#awareness_now_online#:#Jetzt Online
 awrn#:#awareness_now_online_users#:#[ONLINE_USER_NAMES]
-common#:#obj_awra_desc#:#Manage awareness tool
-common#:#obj_awra#:#Awareness Tool
-awrn#:#awareness_settings#:#Settings
-awrn#:#awrn_enable#:#Enable Awareness Tool
-crs#:#crs_mem_contacts#:#Support Contacts
-user#:#user_awrn_all_users#:#All Users
-user#:#user_awrn_all_users_info#:#All users of the platform are listed.
-crs#:#crs_awrn_support_contacts#:#Course Support Contacts
-crs#:#crs_awrn_support_contacts_info#:#All support contacts of courses with membership of the current user are listed.
-awrn#:#awrn_inactive#:#Not Listed
-awrn#:#awrn_online_only#:#Online Only
-awrn#:#awrn_incl_offline#:#Online and Offline
-contact#:#contact_awrn_ap_contacts#:#Approved Contacts
-contact#:#contact_awrn_ap_contacts_info#:#All contacts approved by the user are listed.
-adm#:#adm_support_contacts#:#System Support Contacts
-adm#:#adm_awrn_support_contacts_info#:#All system contacts are listed.
-adm#:#adm_support_contacts_info#:#Support contacts used in the footer link and (if activated) in the awareness tool. Comma separated list of account logins.
-mmbr#:#mmbr_awrn_my_groups_courses#:#My Groups and Courses
-mmbr#:#mmbr_awrn_my_groups_courses_info#:#All members of groups or courses of the current user are listed.
-crs#:#crs_awrn_current_course#:#Current Course
-crs#:#crs_awrn_current_course_info#:#If the user navigates to a course in the repository, all members of the course are listed.
+common#:#obj_awra_desc#:#„Wer ist online?“-Anzeige administrieren
+common#:#obj_awra#:#„Wer ist online?“-Anzeige
+awrn#:#awareness_settings#:#Einstellungen
+awrn#:#awrn_enable#:#Aktiviere „Wer ist online?“-Anzeige
+crs#:#crs_mem_contacts#:#Kursbetreuer
+user#:#user_awrn_all_users#:#Alle Benutzer
+user#:#user_awrn_all_users_info#:#Alle Benutzer der Plattform werden aufgelistet.
+crs#:#crs_awrn_support_contacts#:#Kursbetreuer
+crs#:#crs_awrn_support_contacts_info#:#Alle Kursbetreuer von Kursen in denen der Benutzer Mitglied ist werden aufgelistet.
+awrn#:#awrn_inactive#:#Keine Anzeige
+awrn#:#awrn_online_only#:#Nur Online
+awrn#:#awrn_incl_offline#:#Online und Offline
+contact#:#contact_awrn_ap_contacts#:#Bestätigte Kontakte
+contact#:#contact_awrn_ap_contacts_info#:#Alle bestätigten Kontakte werden aufgelistet.
+adm#:#adm_support_contacts#:#Systembetreuer
+adm#:#adm_awrn_support_contacts_info#:#Alle Systembetreuer werden aufgelistet.
+adm#:#adm_support_contacts_info#:#Systembetreuer, welche in der Fußzeile verlinkt werden und (wenn aktiviert) in der „Wer ist online?“-Anzeige. Komma-separierte Liste von Benutzer-Logins.
+mmbr#:#mmbr_awrn_my_groups_courses#:#Meine Kurse und Gruppen
+mmbr#:#mmbr_awrn_my_groups_courses_info#:#Alle Mitglieder aus Kursen und Gruppen des aktuellen Benutzers werden aufgelistet.
+crs#:#crs_awrn_current_course#:#Aktueller Kurs
+crs#:#crs_awrn_current_course_info#:#Innerhalb eines Kurses werden alle Mitglieder des Kurses aufgelistet.
 awrn#:#awrn_caching_period#:#Caching-Zeitraum
 awrn#:#awrn_caching_period_info#:#Dieser Zeitraum wird gewartet, bevor die Anzahl der Benutzer in der Top-Anzeige aktualisiert wird und bevor neue Online-Benutzer ermittelt werden.
 awrn#:#awrn_seconds#:#Sek.
 awrn#:#awrn_max_nr_entries#:#Anzahl max. Einträge
 awrn#:#awrn_max_nr_entries_info#:#Diese Anzahl an Einträgen wird maximal in der Awareness-Liste angezeigt.
-awrn#:#awrn_hide_from_awareness#:#Hide Me From Awareness Tool
-awrn#:#awrn_hide_from_awareness_info#:#The awareness tool is in the top bar and listing selected users (e.g. contacts or members of your courses).
+awrn#:#awrn_hide_from_awareness#:#Mich nicht in „Wer ist online?“-Anzeige auflisten
+awrn#:#awrn_hide_from_awareness_info#:#Die „Wer ist online?“-Anzeige erscheint im Kopf der Anwendung und listet bestimmte Benutzer auf (z.B. Kontakte oder Kursmitglieder).

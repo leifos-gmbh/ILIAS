@@ -6,21 +6,21 @@ common#:#obj_awra_desc#:#„Wer ist online?“-Anzeige administrieren
 common#:#obj_awra#:#„Wer ist online?“-Anzeige
 awrn#:#awareness_settings#:#Einstellungen
 awrn#:#awrn_enable#:#Aktiviere „Wer ist online?“-Anzeige
-crs#:#crs_mem_contacts#:#Kursbetreuer
+crs#:#crs_mem_contacts#:#Tutorielle Betreuung
 user#:#user_awrn_all_users#:#Alle Benutzer
 user#:#user_awrn_all_users_info#:#Alle Benutzer der Plattform werden aufgelistet.
-crs#:#crs_awrn_support_contacts#:#Kursbetreuer
-crs#:#crs_awrn_support_contacts_info#:#Alle Kursbetreuer von Kursen in denen der Benutzer Mitglied ist werden aufgelistet.
+crs#:#crs_awrn_support_contacts#:#Tutorielle Betreuung
+crs#:#crs_awrn_support_contacts_info#:#Die Benutzer der tutoriellen Betreuung werden aufgelistet. Die Benutzer werden im Reiter Mitglieder des Kurses der tutoriellen Betreuung zugeordnet.
 awrn#:#awrn_inactive#:#Keine Anzeige
 awrn#:#awrn_online_only#:#Nur Online
 awrn#:#awrn_incl_offline#:#Online und Offline
 contact#:#contact_awrn_ap_contacts#:#Bestätigte Kontakte
-contact#:#contact_awrn_ap_contacts_info#:#Alle bestätigten Kontakte werden aufgelistet.
-adm#:#adm_support_contacts#:#Systembetreuer
-adm#:#adm_awrn_support_contacts_info#:#Alle Systembetreuer werden aufgelistet.
-adm#:#adm_support_contacts_info#:#Systembetreuer, welche in der Fußzeile verlinkt werden und (wenn aktiviert) in der „Wer ist online?“-Anzeige. Komma-separierte Liste von Benutzer-Logins.
+contact#:#contact_awrn_ap_contacts_info#:#Alle bestätigten Kontakte eines Benutzers werden aufgelistet.
+adm#:#adm_support_contacts#:#Technische Betreuung
+adm#:#adm_awrn_support_contacts_info#:#Die Benutzer der technischen Betreuung werden aufgelistet. Die Benutzer werden im Bereich "Allgemeine Einstellungen" > "Kontaktinformationen" der technischen Betreuung zugeordnet.
+adm#:#adm_support_contacts_info#:#Technische Betreuer werden in der Fußzeile verlinkt und (wenn aktiviert) in der „Wer ist online?“-Anzeige aufgelistet. Komma-separierte Liste von Benutzer-Logins.
 mmbr#:#mmbr_awrn_my_groups_courses#:#Meine Kurse und Gruppen
-mmbr#:#mmbr_awrn_my_groups_courses_info#:#Alle Mitglieder aus Kursen und Gruppen des aktuellen Benutzers werden aufgelistet.
+mmbr#:#mmbr_awrn_my_groups_courses_info#:#Alle Mitglieder von Gruppen und Kursen eines Benutzers werden aufgelistet.
 crs#:#crs_awrn_current_course#:#Aktueller Kurs
 crs#:#crs_awrn_current_course_info#:#Innerhalb eines Kurses werden alle Mitglieder des Kurses aufgelistet.
 awrn#:#awrn_caching_period#:#Caching-Zeitraum
@@ -29,4 +29,5 @@ awrn#:#awrn_seconds#:#Sek.
 awrn#:#awrn_max_nr_entries#:#Anzahl max. Einträge
 awrn#:#awrn_max_nr_entries_info#:#Diese Anzahl an Einträgen wird maximal in der Awareness-Liste angezeigt.
 awrn#:#awrn_hide_from_awareness#:#Mich nicht in „Wer ist online?“-Anzeige auflisten
-awrn#:#awrn_hide_from_awareness_info#:#Die „Wer ist online?“-Anzeige erscheint im Kopf der Anwendung und listet bestimmte Benutzer auf (z.B. Kontakte oder Kursmitglieder).
+awrn#:#awrn_hide_from_awareness_info#:#Die „Wer ist online?“-Anzeige erscheint oben im Kopf der Anwendung und listet ausgewählte Benutzer auf (z.B. Kontakte oder Mitglieder Ihrer Kurse).
+common#:#contact_sysadmin#:#Technische Betreuung kontaktieren

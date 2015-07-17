@@ -61,6 +61,9 @@ class ilObjectCopyProgressTableGUI extends ilTable2GUI
 	{
 		$this->tpl->setVariable('VAL_ID', $set['ref_id']);
 		$this->tpl->setVariable('OBJ_TITLE', $set['title']);
+		
+		include_once './Services/Link/classes/class.ilLink.php';
+		$this->tpl->setVariable('OBJ_LINK',  ilLink::_getLink($set['ref_id']));
 
 		if (strlen($set['description']))
 		{

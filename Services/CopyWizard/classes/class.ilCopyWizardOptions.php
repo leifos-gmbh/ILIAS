@@ -85,14 +85,13 @@ class ilCopyWizardOptions
 	}
 	
 	
+	/**
+	 * 
+	 * @return int required steps: used for progress bar
+	 */
 	public function getRequiredSteps()
 	{
-		
-		$GLOBALS['ilLog']->write(__METHOD__.': '.print_r($this->options[0],TRUE));
-		$GLOBALS['ilLog']->write(__METHOD__.': '.print_r($this->options[-1],TRUE));
-		
-		
-		return count($this->options[0]) + count($this->options[-1]);
+		return count((array) $this->options[0]) + count((array) $this->options[-1]);
 	}
 	
 	

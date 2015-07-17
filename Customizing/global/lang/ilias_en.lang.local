@@ -34,3 +34,5 @@ wsp#:#wsp_share_notification_body#:#A workspace object has been shared with you
 wsp#:#wsp_share_notification_link#:#Link
 wsp#:#wsp_share_notification_download_link#:#Download
 wsp#:#wsp_share_with_members_and_notify#:#Share with members and send notifications
+obj#:#obj_target_location#:#Target Location
+obj#:#obj_copy_progress#:#Copy Progress

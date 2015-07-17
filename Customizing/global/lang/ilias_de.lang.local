@@ -34,3 +34,5 @@ wsp#:#wsp_share_notification_body#:#Ein Objekt wurde für Sie im Arbeitsraum fre
 wsp#:#wsp_share_notification_link#:#Link
 wsp#:#wsp_share_notification_download_link#:#Download
 wsp#:#wsp_share_with_members_and_notify#:#Für Mitglieder freigeben und per Email benachrichtigen
+obj#:#obj_target_location#:#Zielordner
+obj#:#obj_copy_progress#:#Fortschritt des Kopierens

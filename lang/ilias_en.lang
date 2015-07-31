@@ -528,6 +528,104 @@ assessment#:#kiosk_show_title#:#Show Test Title
 assessment#:#kiosk#:#Exam View
 assessment#:#last_update#:#Last Update
 assessment#:#legend#:#Legend
+assessment#:#qpl_lac_legend_header_common#:#Expression Logic
+assessment#:#qpl_lac_desc_logical_and#:#Logical AND
+assessment#:#qpl_lac_desc_logical_or#:#Logical OR
+assessment#:#qpl_lac_desc_negation#:#Negation
+assessment#:#qpl_lac_desc_brackets#:#Brackets
+assessment#:#qpl_lac_desc_res_of_quest_n#:#Result of n-th Question
+assessment#:#qpl_lac_desc_res_of_cur_quest#:#Result of Current Question
+assessment#:#qpl_lac_desc_res_of_answ_m_of_quest_n#:#Result of m-th Answer of n-th Question
+assessment#:#qpl_lac_desc_res_of_answ_m_of_cur_quest#:#Result of m-th Answer of Current Question
+assessment#:#qpl_lac_legend_header_quest_specific#:#Question Specific Expressions
+assessment#:#qpl_lac_legend_label_operators#:#Operators
+assessment#:#qpl_lac_desc_compare_with_quest_res#:#Compare the Result with the Reached Points in Percent
+assessment#:#qpl_lac_desc_compare_with_number#:#Compare the Result with the Number n
+assessment#:#qpl_lac_desc_compare_with_text#:#Compare the Result with the text TEXT
+assessment#:#qpl_lac_desc_compare_with_assignment#:#Compare the Result with the Matching n:m
+assessment#:#qpl_lac_desc_compare_with_sequence#:#Compare the Result with the Answer Sequence ($a,..,z$)
+assessment#:#qpl_lac_desc_compare_with_answer_n#:#Compare the Result with the n-th Answer of the Question
+assessment#:#qpl_lac_desc_compare_with_exact_sequence#:#Compare the Result with exactly the Given Sequence
+assessment#:#qpl_lac_desc_compare_answer_exist#:#Compare if there is an Answer for a Question/Gap
+assessment#:#lacex_example_header#:#Examples
+assessment#:#lacex_assQuestion_PercentageResultExpression_e#:#R >= %75%
+assessment#:#lacex_assQuestion_PercentageResultExpression_d#:#The questions answer result is equal to or greater than 75%
+assessment#:#lacex_assQuestion_EmptyAnswerExpression_e#:#R = ?
+assessment#:#lacex_assQuestion_EmptyAnswerExpression_d#:#The question was not answered
+assessment#:#lacex_assSingleChoice_NumberOfResultExpression_e#:#R = +2+
+assessment#:#lacex_assSingleChoice_NumberOfResultExpression_d#:#While answering the question the second answer option was chosen
+assessment#:#lacex_assMultipleChoice_NumberOfResultExpression_e#:#R = +2+
+assessment#:#lacex_assMultipleChoice_NumberOfResultExpression_d#:#While answering the question the second answer option was chosen
+assessment#:#lacex_assMultipleChoice_ExclusiveResultExpression_e#:#R = *1,3,4*
+assessment#:#lacex_assMultipleChoice_ExclusiveResultExpression_d#:#Exactly the answer options 1, 3 and 4 were chosen while answering the question
+assessment#:#lacex_assErrorText_NumberOfResultExpression_e#:#R = +2+
+assessment#:#lacex_assErrorText_NumberOfResultExpression_d#:#While answering the question the second answer option was chosen
+assessment#:#lacex_assErrorText_ExclusiveResultExpression_e#:#R = *1,3,4*
+assessment#:#lacex_assErrorText_ExclusiveResultExpression_d#:#Exactly the answer options 1, 3 and 4 were chosen while answering the question
+assessment#:#lacex_assImagemapQuestion_NumberOfResultExpression_e#:#R = +2+
+assessment#:#lacex_assImagemapQuestion_NumberOfResultExpression_d#:#While answering the question the second answer option was chosen
+assessment#:#lacex_assImagemapQuestion_ExclusiveResultExpression_e#:#R = *1,3,4*
+assessment#:#lacex_assImagemapQuestion_ExclusiveResultExpression_d#:#Exactly the answer options 1, 3 and 4 were chosen while answering the question
+assessment#:#lacex_assNumeric_NumericResultExpression_e#:#R = #4.7#
+assessment#:#lacex_assNumeric_NumericResultExpression_d#:#The question was answered with the numeric value 4.7
+assessment#:#lacex_assOrderingQuestion_OrderingResultExpression_e#:#R = $2,5,1,4,3$
+assessment#:#lacex_assOrderingQuestion_OrderingResultExpression_d#:#The question's elements were ordered as follows: 2, 5, 1, 4, 3
+assessment#:#lacex_assOrderingHorizontal_OrderingResultExpression_e#:#R = $2,5,1,4,3$
+assessment#:#lacex_assOrderingHorizontal_OrderingResultExpression_d#:#The question's elements were ordered as follows: 2, 5, 1, 4, 3
+assessment#:#lacex_assMatchingQuestion_MatchingResultExpression_e#:#R = ;1:2; & R = ;2:3; & R = ;3:1;
+assessment#:#lacex_assMatchingQuestion_MatchingResultExpression_d#:#The question's terms were assigned to defintions as follows: 1 => 2 and 2 => 3 and 3 => 1
+assessment#:#lacex_assTextSubset_StringResultExpression_e#:#R[2] = ~sodium chloride~
+assessment#:#lacex_assTextSubset_StringResultExpression_d#:#For the second answer option the answer „sodium chloride“ was entered
+assessment#:#lacex_assFormulaQuestion_NumericResultExpression_e#:#R[1] = #3.14159#
+assessment#:#lacex_assFormulaQuestion_NumericResultExpression_d#:#The first answer option was answered with the numeric value 3.14159
+assessment#:#lacex_assClozeTest_NumericResultExpression_e#:#R[2] = #5#
+assessment#:#lacex_assClozeTest_NumericResultExpression_d#:#The second answer option is a numeric gap and was answered with the numeric value 5
+assessment#:#lacex_assClozeTest_StringResultExpression_1_e#:#R[1] = ~Monday~
+assessment#:#lacex_assClozeTest_StringResultExpression_1_d#:#The first answer option is a text gap and was answered with „Monday“
+assessment#:#lacex_assClozeTest_StringResultExpression_2_e#:#R[4] = ~Green~
+assessment#:#lacex_assClozeTest_StringResultExpression_2_d#:#The fourth answer option is a select gap and the option labeled as „Green“ was selected
+assessment#:#lacex_assClozeTest_NumberOfResultExpression_e#:#R[4] = +2+
+assessment#:#lacex_assClozeTest_NumberOfResultExpression_d#:#The fourth answer option is a select gap and the second option was selected
+assessment#:#qpl_skill_point_eval_mode_quest_result#:#Question Result
+assessment#:#qpl_skill_point_eval_mode_solution_compare#:#Solution Compare
+assessment#:#qpl_skill_point_eval_by_quest_result#:#Evaluation of Competence Points by Question Result
+assessment#:#qpl_skill_point_eval_by_solution_compare#:#Evaluation of Competence Points by Solution Compare
+assessment#:#tst_solution_compare_cfg#:#Configuration for Solution Compare
+assessment#:#tst_sol_comp_expressions#:#Comparison Expressions
+assessment#:#ass_lac_hide_legend_btn#:#Hide Legend
+assessment#:#ass_lac_show_legend_btn#:#Show Legend
+assessment#:#ass_lac_validation_error#:#Errors occured while validating the conditional expression(s)!
+assessment#:#ass_lac_expression#:#Expression
+assessment#:#ass_lac_question_not_exist#:#The question with index "Q%s" does not exist in this set.
+assessment#:#ass_lac_question_not_reachable#:#The question with index "Q%s" is not reachable in this node.
+assessment#:#ass_lac_expression_not_supported#:#The Expression "%s" is not supported.
+assessment#:#ass_lac_operator_not_supported#:#The Operator "%s" is not supported.
+assessment#:#ass_lac_unable_to_parse_condition#:#The condition "%s" can not be validated.
+assessment#:#ass_lac_missing_bracket#:#There are not enough "%s"-Brackets in the condition.
+assessment#:#ass_lac_invalid_statement#:#The expression at position "%s" is not valid. Please check your input according to the supported expression (see legend).
+assessment#:#ass_lac_duplicate_element#:#Duplicate key "%s" in condition.
+assessment#:#ass_lac_answer_index_not_exist#:#The question with index "Q%s" does not have an answer with the index "%s".
+assessment#:#ass_lac_answer_index_not_exist_cur_qst#:#The current question does not have an answer with the index "%s".
+assessment#:#ass_lac_answer_value_not_exists#:#The value "%s" does not exist in question Q%s[%s].
+assessment#:#ass_lac_answer_value_not_exists_one_answer#:#The value "%s" does not exist in question Q%s.
+assessment#:#ass_lac_answer_value_not_exists_cur_qst#:#The value "%s" does not exist in the answer with index "%s" of current question.
+assessment#:#ass_lac_answer_value_not_exists_cur_qst_one_answer#:#The value "%s" does not exist in the current question.
+assessment#:#ass_lac_expression_not_supported_by_question#:#The question "Q%s" does not support the Expression "%s".
+assessment#:#ass_lac_expression_not_supported_by_cur_question#:#The current question does not support the Expression "%s".
+assessment#:#ass_lac_operator_not_supported_by_expression#:#The Operator "%s" can not be used in comparison with the expression "%s".
+assessment#:#tst_skill_triggerings_num_req_answers#:#Required Amount of Answers for Competence Triggers
+assessment#:#tst_skill_triggerings_num_req_answers_desc#:#Competences aren't triggered before this amount of answered questions contributes to the competence level calculation.
+assessment#:#qpl_qst_skl_usg_skill_col#:#Competence
+assessment#:#qpl_qst_skl_usg_numq_col#:#Number of Questions in Pool adressing this competence
+assessment#:#qpl_qst_skl_usg_sklpnt_col#:#Total Sum of Competence-Points per Competence
+assessment#:#tst_qst_skl_cfg_in_pool_hint_rndquestset#:#The Competence-Question-Assignment for tests with mode "%s" is to be done in the corresponding question pool(s):<br />%s<br /><br />The configuration of threshold values is to be done here in the test.
+assessment#:#tst_qst_skl_cfg_in_pool_hint_dynquestset#:#The Competence-Question-Assignment for tests with mode "%s" is to be done in the corresponding question pool:<br />%s<br /><br />The configuration of threshold values is to be done here in the test.
+assessment#:#qpl_qst_skl_selection_for_question_header#:#Compence Assignments for Question: %s
+assessment#:#tst_save_comp_points#:#Save Competence Points
+assessment#:#tst_msg_skl_qst_assign_points_saved#:#The competence points has been saved.
+assessment#:#tst_skl_level_thresholds_missing#:#There are missing thresholds for the relevant competences!
+assessment#:#tst_skl_level_thresholds_link#:#Configure Competence-Thresholds
+assessment#:#tst_skl_res_interpretation_hint_msg#:#Please consider that competence results from a single test has a limited significance. The more information is collected per competence, the merrier valid the significance will be. Should there are single competences without any entry, there is to less information collected.
 assessment#:#locked#:#locked
 assessment#:#log_answer_changed_points#:#Manual change of points of test person %s from %d to %d points by %s
 assessment#:#log_could_not_enter_test_due_to_simultaneous_users#:#The user could not enter the test because the maximum number of simultaneous users has been reached
@@ -537,6 +635,7 @@ assessment#:#log_mark_added#:#Mark added
 assessment#:#log_mark_changed#:#Mark changed
 assessment#:#log_mark_removed#:#Mark removed
 assessment#:#log_modified_test#:#The test was modified
+assessment#:#tst_results_presentation_description#:#If "Show Pass Details for running tests" is selected, the question titles and the reached points for every question in the test pass are available if the test is not finished. If "Show Solutions in Test Results" is selected, the detailed question solution is available to participants in the test results presentation. This includes the exact scoring of every answer, otherwise only an overview with the question titles and the reached points is shown. If the list of answers is selected, an overview of all questions with the answers of the participant is generated. This list will be offered on the Info Page and at the end of a test prior to the final submission. If "Show Answer-Specific Feedback in Test Results" is selected, the answer specific feedback will be shown in the test results next to the questions. If "Results print view (answers only)" is selected, the ILIAS content you place around a question using the "Edit content" tab page will not be visible in a print-out. If you want to save some paper space, select this option. If "Show Signature Placeholder" is selected, a signature placeholder will be shown for printout. If "Show Suggested Solution" is selected, the suggested solutions of questions (if existent) will be shown in the test results overview.
 assessment#:#log_question_added#:#Question added at position
 assessment#:#log_question_position_changed#:#Question position changed
 assessment#:#log_question_removed#:#Question removed
@@ -1060,6 +1159,7 @@ assessment#:#tst_reset_processing_time_desc#:#The duration will be reset to the 
 assessment#:#tst_reset_processing_time#:#Reset duration for every test pass
 assessment#:#tst_result_user_name_pass#:#Results of Test Pass %s for %s
 assessment#:#tst_result_user_name#:#Test Results for %s
+assessment#:#tst_result_pass#:#Results of Test Pass
 assessment#:#tst_results_access_always#:#Immediately
 assessment#:#tst_results_access_always_desc#:#Participants can access their results on the ‘Info’-tab immediately after starting the test pass and while still taking the test. Additionally ILIAS will present them with their test results immediately after finishing  the test.
 assessment#:#tst_results_access_date#:#Date
@@ -1314,22 +1414,28 @@ assessment#:#tst_change_dyn_test_question_selection#:#Change Current Question Se
 assessment#:#tst_dyn_test_msg_currently_finished_completely#:#Currently you have answered all questions from the selected question pool successfully. You can proceed the test when there are new or edited questions in the question pool.
 assessment#:#tst_dyn_test_msg_currently_finished_selection#:#With the current question selection you have answered all questions successfully. Change the question selection to proceed the test.
 assessment#:#tst_activate_skill_service#:#Activate Competence Service
-assessment#:#tst_disabled_skl_due_to_non_fixed_quest_set_type#:#Competence service has been deactivated due to test mode with non fixed set of questions.
-assessment#:#tst_cannot_enable_skl_due_to_non_fixed_quest_set_type#:#Competence Service activation is not possible due to test mode with non fixed set of questions.
 assessment#:#tst_tab_competences#:#Competences
-assessment#:#tst_skl_sub_tab_quest_assign#:#Question/Competence Assignment
+assessment#:#qpl_tab_competences#:#Competences
+assessment#:#qpl_skl_sub_tab_quest_assign#:#Question/Competence Assignment
+assessment#:#qpl_skl_sub_tab_usages#:#Assignment Frequency
 assessment#:#tst_skl_sub_tab_thresholds#:#Competence Thresholds
 assessment#:#tst_msg_skl_lvl_thresholds_saved#:#The competence thresholds has been saved.
-assessment#:#tst_msg_skl_qst_assign_points_saved#:#The competence points has been saved.
 assessment#:#tst_competence#:#Competence
-assessment#:#tst_assign_competence#:#Assign Competence
-assessment#:#tst_remove_competence#:#Remove Competence
+assessment#:#tst_manage_competence_assigns#:#Manage Competence Assignments
+assessment#:#tst_edit_competence_assign#:#Edit Assignment Properties
+assessment#:#tst_view_competence_assign#:#View Assignment Properties
+assessment#:#qpl_qst_skl_assign_properties_modified#:#The assignment's properties has been modified.
+assessment#:#qpl_qst_skl_assigns_updated#:#The competence assignments has been updated.
+assessment#:#qpl_sync_quest_skl_assigns_confirmation#:#The question was inserted from another repository object. Should the question's original be updated with the current config of competence assignments?
+assessment#:#qpl_qst_skl_assign_synced_to_orig#:#The competence assignments has been synchronised to the questions original.
+assessment#:#qpl_save_skill_assigns_update#:#Save Competence Assignments
+assessment#:#qpl_cancel_skill_assigns_update#:#Cancel
 assessment#:#tst_comp_points#:#Competence Points
-assessment#:#tst_save_comp_points#:#Save Competence Points
+assessment#:#tst_comp_eval_mode#:#Evaluation by
 assessment#:#tst_num_questions#:#Number of Questions
 assessment#:#tst_max_comp_points#:#Max. Competence Points
 assessment#:#tst_level#:#Competence Level
-assessment#:#tst_threshold#:#Thresholds
+assessment#:#tst_threshold#:#Thresholds (in %)
 assessment#:#tst_save_thresholds#:#Save Thresholds
 assessment#:#tst_show_comp_results#:#Show Competence Results
 assessment#:#tst_analysis#:#Analysis
@@ -15349,3 +15455,20 @@ sysc#:#sysc_task_tree_missing_reference#:#Missing Object References
 sysc#:#sysc_task_tree_missing_reference_desc#:#Searches and repairs missing object references in the repository tree.
 sysc#:#sysc_task_structure#:#Tree structure
 sysc#:#sysc_task_structure_desc#:#Analyzes and corrects the repository tree structure.
+mail#:#mail_orphaned_mails#:#Delete old or orphaned mails
+mail#:#mail_threshold#:#Threshold
+mail#:#mail_threshold_info#:#Internal messages that are older than the defined threshold value here, will be deleted (including possibly existing attachments). <br> Please keep in mind that on the first run of this cronjob  a lot of messages will be deleted and because of this it is not possible to send a mail as a warning.
+mail#:#mail_orphaned_mails_desc#:#Delete old or orphaned mails
+mail#:#only_inbox_trash#:#Only consider inbox / trash
+mail#:#only_inbox_trash_info#:#If enabled, emails are only deleted if they are located in the Inbox and Trash of the respective user. Otherwise, all messages are deleted regardless of the folder. 
+mail#:#mail_notify_orphaned#:#Notification Mail
+mail#:#mail_notify_orphaned_info#:#If you enter a value here is larger than or equal to 1, ILIAS will send an email to the user before an internal mail is deleted. Please make sure that an external e-mail reception is possible.
+mail#:#orphaned_mail_subject#:#Notification about orphaned mails
+mail#:#orphaned_mail_body#:#There are old or orphaned mails in the following mailboxes. Please note, that these mails will be deleted automatically soon.
+prtt#:#prtt_portfolio_created#:#Portfolio Template added
+forum#:#frm_censorship#:#Censor
+forum#:#frm_revoke_censorship#:#Revoke Censorship
+forum#:#frm_censorship_applied#:#The censorship has been successfully applied.
+forum#:#frm_censorship_revoked#:#The censorship has been successfully revoked.
+forum#:#frm_mark_as_read#:#Mark as read
+forum#:#frm_mark_as_unread#:#Mark as unread

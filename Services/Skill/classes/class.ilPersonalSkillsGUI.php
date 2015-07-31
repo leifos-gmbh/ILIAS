@@ -163,7 +163,7 @@ class ilPersonalSkillsGUI
 		$ilToolbar->addFormButton($lng->txt("skmg_add_skill"),
 			"listSkillsForAdd");
 		$ilToolbar->setFormAction($ilCtrl->getFormAction($this));
-		
+			
 		$skills = ilPersonalSkill::getSelectedUserSkills($ilUser->getId());
 		$html = "";
 		foreach ($skills as $s)

@@ -327,15 +327,42 @@ class ilObjTestGUI extends ilObjectGUI
 				$this->prepareOutput();
 				$this->addHeaderAction();
 				require_once 'Modules/Test/classes/class.ilTestSkillAdministrationGUI.php';
-				$gui = new ilTestSkillAdministrationGUI($ilias, $this->ctrl, $ilAccess, $ilTabs, $this->tpl, $this->lng, $ilDB, $this->object, $this->ref_id);
+				$gui = new ilTestSkillAdministrationGUI($ilias, $this->ctrl, $ilAccess, $ilTabs, $this->tpl, $this->lng, $ilDB, $tree, $ilPluginAdmin, $this->object, $this->ref_id);
 				$this->ctrl->forwardCommand($gui);
 				break;
 
 			case 'iltestskillevaluationgui':
 				$this->prepareOutput();
 				$this->addHeaderAction();
+				
+				require_once 'Modules/TestQuestionPool/classes/class.ilAssQuestionList.php';
+				if( $this->object->isDynamicTest() )
+				{
+					require_once 'Modules/Test/classes/class.ilObjTestDynamicQuestionSetConfig.php';
+					$dynamicQuestionSetConfig = new ilObjTestDynamicQuestionSetConfig($tree, $ilDB, $ilPluginAdmin, $this->object);
+					$dynamicQuestionSetConfig->loadFromDb();
+					$questionList = new ilAssQuestionList($ilDB, $this->lng, $ilPluginAdmin);
+					$questionList->setParentObjId($dynamicQuestionSetConfig->getSourceQuestionPoolId());
+					$questionList->setQuestionInstanceTypeFilter(ilAssQuestionList::QUESTION_INSTANCE_TYPE_ORIGINALS);
+				}
+				else
+				{
+					$questionList = new ilAssQuestionList($ilDB, $this->lng, $ilPluginAdmin);
+					$questionList->setParentObjId($this->object->getId());
+					$questionList->setQuestionInstanceTypeFilter(ilAssQuestionList::QUESTION_INSTANCE_TYPE_DUPLICATES);
+				}
+				$questionList->load();
+
+				require_once 'Modules/Test/classes/class.ilTestSessionFactory.php';
+				$testSessionFactory = new ilTestSessionFactory($this->object);
+				$testSession = $testSessionFactory->getSession();
+				$testResults = $this->object->getTestResult($testSession->getActiveId(), $testSession->getPass(), true);
+
 				require_once 'Modules/Test/classes/class.ilTestSkillEvaluationGUI.php';
-				$gui = new ilTestSkillEvaluationGUI($this->ctrl, $ilTabs, $this->tpl, $this->lng, $ilDB, $this->object);
+				$gui = new ilTestSkillEvaluationGUI($this->ctrl, $ilTabs, $this->tpl, $this->lng, $ilDB, $this->object->getTestId(),$this->object->getRefId(), $this->object->getId());
+				$gui->setQuestionList($questionList);
+				$gui->setTestSession($testSession);
+				$gui->setTestResults($testResults);
 				$this->ctrl->forwardCommand($gui);
 				break;
 
@@ -3363,6 +3390,9 @@ class ilObjTestGUI extends ilObjectGUI
 		global $ilAccess, $ilUser, $ilToolbar;
 		
 		require_once 'Modules/Test/classes/class.ilTestDynamicQuestionSetFilterSelection.php';
+		
+		require_once 'Services/UIComponent/Button/classes/class.ilLinkButton.php';
+		require_once 'Services/UIComponent/Button/classes/class.ilSubmitButton.php';
 
 		$testQuestionSetConfig = $this->testQuestionSetConfigFactory->getQuestionSetConfig();
 		$testSession = $this->testSessionFactory->getSession();
@@ -3439,20 +3469,29 @@ class ilObjTestGUI extends ilObjectGUI
 						
 						if ($existingPasses > $closedPasses)
 						{
-							$resumeTestLabel = $this->lng->txt("tst_resume_test");
-							$big_button[] = array('resumePlayer', $resumeTestLabel, true);
+							$btn = ilSubmitButton::getInstance();
+							$btn->setCaption('tst_resume_test');
+							$btn->setCommand('resumePlayer');
+							$btn->setPrimary(true);
+							$big_button[] = $btn;
 						}
 						else
 						{
-							$resumeTestLabel = $this->object->getStartTestLabel($testSession->getActiveId());
-							$big_button[] = array('startPlayer', $resumeTestLabel, true);
+							$btn = ilSubmitButton::getInstance();
+							$btn->setCaption($this->object->getStartTestLabel($testSession->getActiveId()), false);
+							$btn->setCommand('startPlayer');
+							$btn->setPrimary(true);
+							$big_button[] = $btn;
 						}
 					}
 					else
 					{
 						// start new test
-
-						$big_button[] = array("startPlayer", $this->object->getStartTestLabel($testSession->getActiveId()), true);
+						$btn = ilSubmitButton::getInstance();
+						$btn->setCaption($this->object->getStartTestLabel($testSession->getActiveId()), false);
+						$btn->setCommand('startPlayer');
+						$btn->setPrimary(true);
+						$big_button[] = $btn;
 					}
 				}
 				else
@@ -3470,27 +3509,31 @@ class ilObjTestGUI extends ilObjectGUI
 					
 					if ($this->object->canShowTestResults($testSession, $ilUser->getId()) && count($testPassesSelector->getReportablePasses())) 
 					{
-						//$info->addFormButton("outUserResultsOverview", $this->lng->txt("tst_show_results"));
-
-						$big_button[] = array(
-							array('ilTestEvaluationGUI', 'outUserResultsOverview'),
-							$this->lng->txt("tst_show_results"), false
-						);
+						$btn = ilLinkButton::getInstance();
+						$btn->setCaption('tst_show_comp_results');
+						$btn->setUrl($this->ctrl->getLinkTargetByClass('ilTestEvaluationGUI',  'outUserResultsOverview'));
+						$btn->setPrimary(false);
+						$big_button[] = $btn;
 
 						if ($this->object->getHighscoreEnabled())
 						{
 							// Can also compare results then
-							$big_button[] = array("outResultsToplist", $this->lng->txt("tst_show_toplist"), false);
+							$btn = ilSubmitButton::getInstance();
+							$btn->setCaption('tst_show_toplist');
+							$btn->setCommand('outResultsToplist');
+							$btn->setPrimary(false);
+							$big_button[] = $btn;
 						}
 
 						if( $this->object->isSkillServiceToBeConsidered() )
 						{
 							require_once 'Modules/Test/classes/class.ilTestSkillEvaluationGUI.php';
 
-							$big_button[] = array(
-								array('ilTestSkillEvaluationGUI', ilTestSkillEvaluationGUI::CMD_SHOW),
-								$this->lng->txt("tst_show_comp_results"), false
-							);
+							$btn = ilLinkButton::getInstance();
+							$btn->setCaption('tst_show_comp_results');
+							$btn->setUrl($this->ctrl->getLinkTargetByClass('ilTestSkillEvaluationGUI', ilTestSkillEvaluationGUI::CMD_SHOW));
+							$btn->setPrimary(false);
+							$big_button[] = $btn;
 						}
 					}
 					
@@ -3500,8 +3543,11 @@ class ilObjTestGUI extends ilObjectGUI
 			{
 				if ($this->object->canShowSolutionPrintview($ilUser->getId()))
 				{
-					//$info->addFormButton("outUserListOfAnswerPasses", $this->lng->txt("tst_list_of_answers_show"));
-					$big_button[] = array("outUserListOfAnswerPasses", $this->lng->txt("tst_list_of_answers_show"), false);
+					$btn = ilSubmitButton::getInstance();
+					$btn->setCaption('tst_list_of_answers_show');
+					$btn->setCommand('outUserListOfAnswerPasses');
+					$btn->setPrimary(false);
+					$big_button[] = $btn;
 				}
 			}
 			
@@ -3528,8 +3574,13 @@ class ilObjTestGUI extends ilObjectGUI
 
 			ilUtil::sendInfo($message);
 		}
-		
-		if( $ilAccess->checkAccess("write", "", $this->ref_id) )
+
+		if( $this->areSkillLevelThresholdsMissing() )
+		{
+			ilUtil::sendFailure($this->getSkillLevelThresholdsMissingInfo());
+		}
+
+		if($ilAccess->checkAccess("write", "", $this->ref_id))
 		{
 			$testQuestionSetConfig = $this->testQuestionSetConfigFactory->getQuestionSetConfig();
 			
@@ -3557,17 +3608,9 @@ class ilObjTestGUI extends ilObjectGUI
 
 			foreach($big_button as $button)
 			{
-				if( is_array($button[0]) )
-				{
-					$link = $this->ctrl->getLinkTargetByClass($button[0][0], $button[0][1]);
-					$ilToolbar->addButton($button[1], $link, '', '', '', '', $button[2] ? 'submit emphSubmit' : 'submit');
-				}
-				else
-				{
-					$ilToolbar->addFormButton($button[1], $button[0], "", $button[2]);
-				}
+				$ilToolbar->addButtonInstance($button);
 			}
-			
+
 			if($enter_anonymous_code)
 			{
 				if($big_button)
@@ -4199,11 +4242,11 @@ class ilObjTestGUI extends ilObjectGUI
 				// skill service
 				if( $this->object->isSkillServiceEnabled() && ilObjTest::isSkillManagementGloballyActivated() )
 				{
-					require_once 'Modules/Test/classes/class.ilTestSkillQuestionAssignmentsGUI.php';
+					require_once 'Modules/TestQuestionPool/classes/class.ilAssQuestionSkillAssignmentsGUI.php';
 
 					$link = $this->ctrl->getLinkTargetByClass(
-						array('ilTestSkillAdministrationGUI', 'ilTestSkillQuestionAssignmentsGUI'),
-						ilTestSkillQuestionAssignmentsGUI::CMD_SHOW_SKILL_QUEST_ASSIGNS
+						array('ilTestSkillAdministrationGUI', 'ilAssQuestionSkillAssignmentsGUI'),
+						ilAssQuestionSkillAssignmentsGUI::CMD_SHOW_SKILL_QUEST_ASSIGNS
 					);
 
 					$tabs_gui->addTarget('tst_tab_competences', $link, array(), array());
@@ -5150,6 +5193,7 @@ class ilObjTestGUI extends ilObjectGUI
 	private function populateDeleteDynamicTestResultsButton($testSession, &$big_button)
 	{
 		require_once 'Modules/Test/classes/confirmations/class.ilTestPassDeletionConfirmationGUI.php';
+		require_once 'Services/UIComponent/Button/classes/class.ilLinkButton.php';
 
 		$this->ctrl->setParameterByClass(
 			'iltestevaluationgui', 'context',
@@ -5158,12 +5202,12 @@ class ilObjTestGUI extends ilObjectGUI
 		
 		$this->ctrl->setParameterByClass('iltestevaluationgui', 'active_id', $testSession->getActiveId());
 		$this->ctrl->setParameterByClass('iltestevaluationgui', 'pass', $testSession->getPass());
-		
-		$big_button[] = array(
-			array('iltestevaluationgui', 'confirmDeletePass'),
-			$this->lng->txt("tst_delete_dyn_test_results_btn"),
-			false
-		);
+
+		$btn = ilLinkButton::getInstance();
+		$btn->setCaption('tst_delete_dyn_test_results_btn');
+		$btn->setUrl($this->ctrl->getLinkTargetByClass('iltestevaluationgui',  'confirmDeletePass'));
+		$btn->setPrimary(false);
+		$big_button[] = $btn;
 	}
 
 	/**
@@ -5182,5 +5226,66 @@ class ilObjTestGUI extends ilObjectGUI
 		}
 
 		return true;
+	}
+
+	private function areSkillLevelThresholdsMissing()
+	{
+		if( !$this->object->isSkillServiceEnabled() )
+		{
+			return false;
+		}
+		
+		if( $this->object->isDynamicTest() )
+		{
+			$questionSetConfig = $this->testQuestionSetConfigFactory->getQuestionSetConfig();
+			$questionContainerId = $questionSetConfig->getSourceQuestionPoolId();
+		}
+		else
+		{
+			$questionContainerId = $this->object->getId();
+		}
+		
+		global $ilDB;
+		
+		require_once 'Modules/TestQuestionPool/classes/class.ilAssQuestionSkillAssignmentList.php';
+		require_once 'Modules/Test/classes/class.ilTestSkillLevelThreshold.php';
+		
+		$assignmentList = new ilAssQuestionSkillAssignmentList($ilDB);
+		$assignmentList->setParentObjId($questionContainerId);
+		$assignmentList->loadFromDb();
+
+		foreach($assignmentList->getUniqueAssignedSkills() as $data)
+		{
+			foreach($data['skill']->getLevelData() as $level)
+			{
+				$treshold = new ilTestSkillLevelThreshold($ilDB);
+				$treshold->setTestId($this->object->getTestId());
+				$treshold->setSkillBaseId($data['skill_base_id']);
+				$treshold->setSkillTrefId($data['skill_tref_id']);
+				$treshold->setSkillLevelId($level['id']);
+				
+				if( !$treshold->dbRecordExists() )
+				{
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+	
+	private function getSkillLevelThresholdsMissingInfo()
+	{
+		require_once 'Modules/Test/classes/class.ilTestSkillLevelThresholdsGUI.php';
+		
+		$link = $this->ctrl->getLinkTargetByClass(
+			array('ilTestSkillAdministrationGUI', 'ilTestSkillLevelThresholdsGUI'),
+			ilTestSkillLevelThresholdsGUI::CMD_SHOW_SKILL_THRESHOLDS
+		);
+		
+		$msg = $this->lng->txt('tst_skl_level_thresholds_missing');
+		$msg .= '<br /><a href="'.$link.'">'.$this->lng->txt('tst_skl_level_thresholds_link').'</a>';
+		
+		return $msg;
 	}
 }

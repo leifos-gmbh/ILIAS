@@ -15343,3 +15343,9 @@ sysc#:#sysc_btn_tree_missing#:#Restore Missing
 sysc#:#sysc_tree_missing_failures#:#Found missing entries in the tree structure. Number of missing entries:
 sysc#:#sysc_cron_empty_trash#:#Delete Trash Bin
 sysc#:#sysc_cron_empty_trash_desc#:#If enabled, the repository trash bin will be purged by given criteria (age, object type or maximum number of objects).
+sysc#:#sysc_task_tree_missing_tree#:#Missing Entries in Repository Tree
+sysc#:#sysc_task_tree_missing_tree_desc#:#Searches and repairs missing entries in the repository tree.
+sysc#:#sysc_task_tree_missing_reference#:#Missing Object References
+sysc#:#sysc_task_tree_missing_reference_desc#:#Searches and repairs missing object references in the repository tree.
+sysc#:#sysc_task_structure#:#Tree structure
+sysc#:#sysc_task_structure_desc#:#Analyzes and corrects the repository tree structure.

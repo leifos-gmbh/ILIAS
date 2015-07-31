@@ -15341,3 +15341,9 @@ sysc#:#sysc_btn_tree_missing#:#Wiederherstellung starten
 sysc#:#sysc_tree_missing_failures#:#Es gibt fehlende Einträge in der Baumstruktur. Anzahl fehlender Einträge:
 sysc#:#sysc_cron_empty_trash#:#Papierkorb löschen
 sysc#:#sysc_cron_empty_trash_desc#:#Wenn aktiviert, werden Objekte des Papierkorbs automatisch anhand bestimmter Kriterien (Alter, Objekttyp, Anzahl) aus dem System entfernt.
+sysc#:#sysc_task_tree_missing_tree#:#Fehlende Einträge im Magazinbaum
+sysc#:#sysc_task_tree_missing_tree_desc#:#Sucht und repariert fehlende Einträge referenzierter Objekte im Magazinbaum.
+sysc#:#sysc_task_tree_missing_reference#:#Fehlende Referenzen
+sysc#:#sysc_task_tree_missing_reference_desc#:#Sucht und repariert fehlende Objekt-Referenzen für Einträge im Magazinbaum.
+sysc#:#sysc_task_structure#:#Baumstruktur
+sysc#:#sysc_task_structure_desc#:#Analyiert und korrigiert die Struktur des Magazinbaums

@@ -824,7 +824,7 @@ class ilExAssignment
 			$new_ass->setPeerReviewSimpleUnlock($d->getPeerReviewSimpleUnlock());
 			$new_ass->setFeedbackFile($d->getFeedbackFile());
 			$new_ass->setFeedbackDate($d->getFeedbackDate());
-			$new_ass->setFeedbackCron($d->getFeedbackFile());
+			$new_ass->setFeedbackCron($d->hasFeedbackCron()); // #16295
 			$new_ass->setTeamTutor($d->getTeamTutor());
 			$new_ass->setMaxFile($d->getMaxFile());
 			$new_ass->save();

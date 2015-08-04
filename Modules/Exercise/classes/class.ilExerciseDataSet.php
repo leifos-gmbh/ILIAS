@@ -107,7 +107,8 @@ class ilExerciseDataSet extends ilDataSet
 						,"FeedbackDate" => "integer"
 						,"FeedbackDir" => "directory"
 					);
-					
+				
+				/*
 				case "5.0.0":
 					return array(
 						"Id" => "integer",
@@ -131,8 +132,8 @@ class ilExerciseDataSet extends ilDataSet
 						,"FeedbackDate" => "integer"
 						,"FeedbackDir" => "directory"
 					);
-					
-				case "5.1.0":
+				*/					
+				case "5.0.0":
 					return array(
 						"Id" => "integer",
 						"ExerciseId" => "integer",
@@ -225,7 +226,7 @@ class ilExerciseDataSet extends ilDataSet
 						" WHERE ".
 						$ilDB->in("exc_id", $a_ids, false, "integer"));
 					break;
-				
+				/*
 				case "5.0.0":
 					$this->getDirectDataFromQuery("SELECT id, exc_id exercise_id, type, time_stamp deadline,".
 						" instruction, title, start_time, mandatory, order_nr, peer, peer_min, peer_dl peer_deadline,".
@@ -234,8 +235,8 @@ class ilExerciseDataSet extends ilDataSet
 						" WHERE ".
 						$ilDB->in("exc_id", $a_ids, false, "integer"));
 					break;
-				
-				case "5.1.0":
+				*/
+				case "5.0.0":
 					$this->getDirectDataFromQuery("SELECT id, exc_id exercise_id, type, time_stamp deadline, deadline2,".
 						" instruction, title, start_time, mandatory, order_nr, team_tutor, max_file, peer, peer_min,".
 						" peer_dl peer_deadline, peer_file, peer_prsl peer_personal, peer_char, peer_unlock, peer_valid,".

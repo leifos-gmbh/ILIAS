@@ -488,13 +488,36 @@ class ilTree
 	}
 
 	/**
-	* get child nodes of given node
-	* @access	public
-	* @param	integer		node_id
-	* @param	string		sort order of returned childs, optional (possible values: 'title','desc','last_update' or 'type')
-	* @param	string		sort direction, optional (possible values: 'DESC' or 'ASC'; defalut is 'ASC')
-	* @return	array		with node data of all childs or empty array
-	*/
+	 * Get node child ids
+	 * @global type $ilDB
+	 * @param type $a_node
+	 * @return type
+	 */
+	public function getChildIds($a_node)
+	{
+		global $ilDB;
+
+		$query = 'SELECT * FROM tree '.
+			'WHERE parent = '.$ilDB->quote($a_node,'integer').' '.
+			'AND tree > '.$ilDB->quote(0,'integer');
+		$res = $ilDB->query($query);
+
+		$childs = array();
+		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		{
+			$childs[] = $row->child;
+		}
+		return $childs;
+	}
+
+	/**
+	 * get child nodes of given node
+	 * @access	public
+	 * @param	integer		node_id
+	 * @param	string		sort order of returned childs, optional (possible values: 'title','desc','last_update' or 'type')
+	 * @param	string		sort direction, optional (possible values: 'DESC' or 'ASC'; defalut is 'ASC')
+	 * @return	array		with node data of all childs or empty array
+	 */
 	function getChilds($a_node_id, $a_order = "", $a_direction = "ASC")
 	{
 		global $ilBench,$ilDB, $ilObjDataCache, $ilUser;

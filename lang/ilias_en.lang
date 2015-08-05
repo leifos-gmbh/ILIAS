@@ -547,6 +547,45 @@ assessment#:#qpl_lac_desc_compare_with_sequence#:#Compare the Result with the An
 assessment#:#qpl_lac_desc_compare_with_answer_n#:#Compare the Result with the n-th Answer of the Question
 assessment#:#qpl_lac_desc_compare_with_exact_sequence#:#Compare the Result with exactly the Given Sequence
 assessment#:#qpl_lac_desc_compare_answer_exist#:#Compare if there is an Answer for a Question/Gap
+assessment#:#lacex_example_header#:#Examples
+assessment#:#lacex_assQuestion_PercentageResultExpression_e#:#R >= %75%
+assessment#:#lacex_assQuestion_PercentageResultExpression_d#:#The questions answer result is equal to or greater than 75%
+assessment#:#lacex_assQuestion_EmptyAnswerExpression_e#:#R = ?
+assessment#:#lacex_assQuestion_EmptyAnswerExpression_d#:#The question was not answered
+assessment#:#lacex_assSingleChoice_NumberOfResultExpression_e#:#R = +2+
+assessment#:#lacex_assSingleChoice_NumberOfResultExpression_d#:#While answering the question the second answer option was chosen
+assessment#:#lacex_assMultipleChoice_NumberOfResultExpression_e#:#R = +2+
+assessment#:#lacex_assMultipleChoice_NumberOfResultExpression_d#:#While answering the question the second answer option was chosen
+assessment#:#lacex_assMultipleChoice_ExclusiveResultExpression_e#:#R = *1,3,4*
+assessment#:#lacex_assMultipleChoice_ExclusiveResultExpression_d#:#Exactly the answer options 1, 3 and 4 were chosen while answering the question
+assessment#:#lacex_assErrorText_NumberOfResultExpression_e#:#R = +2+
+assessment#:#lacex_assErrorText_NumberOfResultExpression_d#:#While answering the question the second answer option was chosen
+assessment#:#lacex_assErrorText_ExclusiveResultExpression_e#:#R = *1,3,4*
+assessment#:#lacex_assErrorText_ExclusiveResultExpression_d#:#Exactly the answer options 1, 3 and 4 were chosen while answering the question
+assessment#:#lacex_assImagemapQuestion_NumberOfResultExpression_e#:#R = +2+
+assessment#:#lacex_assImagemapQuestion_NumberOfResultExpression_d#:#While answering the question the second answer option was chosen
+assessment#:#lacex_assImagemapQuestion_ExclusiveResultExpression_e#:#R = *1,3,4*
+assessment#:#lacex_assImagemapQuestion_ExclusiveResultExpression_d#:#Exactly the answer options 1, 3 and 4 were chosen while answering the question
+assessment#:#lacex_assNumeric_NumericResultExpression_e#:#R = #4.7#
+assessment#:#lacex_assNumeric_NumericResultExpression_d#:#The question was answered with the numeric value 4.7
+assessment#:#lacex_assOrderingQuestion_OrderingResultExpression_e#:#R = $2,5,1,4,3$
+assessment#:#lacex_assOrderingQuestion_OrderingResultExpression_d#:#The question's elements were ordered as follows: 2, 5, 1, 4, 3
+assessment#:#lacex_assOrderingHorizontal_OrderingResultExpression_e#:#R = $2,5,1,4,3$
+assessment#:#lacex_assOrderingHorizontal_OrderingResultExpression_d#:#The question's elements were ordered as follows: 2, 5, 1, 4, 3
+assessment#:#lacex_assMatchingQuestion_MatchingResultExpression_e#:#R = ;1:2; & R = ;2:3; & R = ;3:1;
+assessment#:#lacex_assMatchingQuestion_MatchingResultExpression_d#:#The question's terms were assigned to defintions as follows: 1 => 2 and 2 => 3 and 3 => 1
+assessment#:#lacex_assTextSubset_StringResultExpression_e#:#R[2] = ~sodium chloride~
+assessment#:#lacex_assTextSubset_StringResultExpression_d#:#For the second answer option the answer „sodium chloride“ was entered
+assessment#:#lacex_assFormulaQuestion_NumericResultExpression_e#:#R[1] = #3.14159#
+assessment#:#lacex_assFormulaQuestion_NumericResultExpression_d#:#The first answer option was answered with the numeric value 3.14159
+assessment#:#lacex_assClozeTest_NumericResultExpression_e#:#R[2] = #5#
+assessment#:#lacex_assClozeTest_NumericResultExpression_d#:#The second answer option is a numeric gap and was answered with the numeric value 5
+assessment#:#lacex_assClozeTest_StringResultExpression_1_e#:#R[1] = ~Monday~
+assessment#:#lacex_assClozeTest_StringResultExpression_1_d#:#The first answer option is a text gap and was answered with „Monday“
+assessment#:#lacex_assClozeTest_StringResultExpression_2_e#:#R[4] = ~Green~
+assessment#:#lacex_assClozeTest_StringResultExpression_2_d#:#The fourth answer option is a select gap and the option labeled as „Green“ was selected
+assessment#:#lacex_assClozeTest_NumberOfResultExpression_e#:#R[4] = +2+
+assessment#:#lacex_assClozeTest_NumberOfResultExpression_d#:#The fourth answer option is a select gap and the second option was selected
 assessment#:#qpl_skill_point_eval_mode_quest_result#:#Question Result
 assessment#:#qpl_skill_point_eval_mode_solution_compare#:#Solution Compare
 assessment#:#qpl_skill_point_eval_by_quest_result#:#Evaluation of Competence Points by Question Result
@@ -579,7 +618,8 @@ assessment#:#tst_skill_triggerings_num_req_answers_desc#:#Competences aren't tri
 assessment#:#qpl_qst_skl_usg_skill_col#:#Competence
 assessment#:#qpl_qst_skl_usg_numq_col#:#Number of Questions in Pool adressing this competence
 assessment#:#qpl_qst_skl_usg_sklpnt_col#:#Total Sum of Competence-Points per Competence
-assessment#:#tst_qst_skl_config_in_pool_hint_msg#:#The Competence-Question-Assignment for tests with mode "%s" is to be done in the corresponding question pool(s). The configuration of threshold values is to be done here in the test.
+assessment#:#tst_qst_skl_cfg_in_pool_hint_rndquestset#:#The Competence-Question-Assignment for tests with mode "%s" is to be done in the corresponding question pool(s):<br />%s<br /><br />The configuration of threshold values is to be done here in the test.
+assessment#:#tst_qst_skl_cfg_in_pool_hint_dynquestset#:#The Competence-Question-Assignment for tests with mode "%s" is to be done in the corresponding question pool:<br />%s<br /><br />The configuration of threshold values is to be done here in the test.
 assessment#:#qpl_qst_skl_selection_for_question_header#:#Compence Assignments for Question: %s
 assessment#:#tst_save_comp_points#:#Save Competence Points
 assessment#:#tst_msg_skl_qst_assign_points_saved#:#The competence points has been saved.
@@ -1119,6 +1159,7 @@ assessment#:#tst_reset_processing_time_desc#:#The duration will be reset to the 
 assessment#:#tst_reset_processing_time#:#Reset duration for every test pass
 assessment#:#tst_result_user_name_pass#:#Results of Test Pass %s for %s
 assessment#:#tst_result_user_name#:#Test Results for %s
+assessment#:#tst_result_pass#:#Results of Test Pass
 assessment#:#tst_results_access_always#:#Immediately
 assessment#:#tst_results_access_always_desc#:#Participants can access their results on the ‘Info’-tab immediately after starting the test pass and while still taking the test. Additionally ILIAS will present them with their test results immediately after finishing  the test.
 assessment#:#tst_results_access_date#:#Date
@@ -12663,6 +12704,8 @@ dcl#:#dcl_export_enabled#:#Allow export function for all users
 dcl#:#dcl_no_fields_yet#:#There are no fields defined for this table thus you cannot create any entries yet.
 dcl#:#dcl_create_fields#:#Please create at least one field in the tab ‘List Fields’.
 dcl#:#dcl_inconsistent_at#:#The Data Collection is inconsistent. A reference no longer exists.
+dcl#:#dcl_all_entries#:#All entries
+dcl#:#dcl_own_entries#:#Only own entries
 common#:#mail_member#:#Mail to Member
 exc#:#exc_type_upload_team#:#Team Upload
 exc#:#exc_team#:#Team
@@ -13351,6 +13394,10 @@ bibl#:#attr_order_bibtex#:#Attribute Order (Bibtex)
 bibl#:#attr_order_bibtex_info#:#default: isbn,issn,title
 bibl#:#attr_order_ris#:#Attribute Order (ris)
 bibl#:#attr_order_ris_info#:#default: sn,ti, t1
+bibl#:#news_title_created#:#New bibliography list added
+bibl#:#news_content_created#:#A new bibliography list has been added. You can view the entries by clicking the link to the item.
+bibl#:#news_title_updated#:#Bibliography list updated
+bibl#:#news_content_updated#:#The bibliography list has been modified. You can view the new entries by clicking the link to the item.
 rbac#:#bibl_visible#:#Bibliography is visible
 rbac#:#bibl_read#:#User can read bibliography content
 rbac#:#bibl_copy#:#Copy Bibliography
@@ -15390,3 +15437,58 @@ mail#:#mail_notify_orphaned_info#:#If you enter a value here is larger than or e
 mail#:#orphaned_mail_subject#:#Notification about orphaned mails
 mail#:#orphaned_mail_body#:#There are old or orphaned mails in the following mailboxes. Please note, that these mails will be deleted automatically soon.
 cntr#:#tab_back_to_repository#:#Back to Repository
+prtt#:#prtt_portfolio_created#:#Portfolio Template added
+forum#:#frm_censorship#:#Censor
+forum#:#frm_revoke_censorship#:#Revoke Censorship
+forum#:#frm_censorship_applied#:#The censorship has been successfully applied.
+forum#:#frm_censorship_revoked#:#The censorship has been successfully revoked.
+forum#:#frm_mark_as_read#:#Mark as read
+forum#:#frm_mark_as_unread#:#Mark as unread
+common#:#clientlist_clientlist#:#Client List
+common#:#clientlist_available_clients#:#Available Clients
+common#:#clientlist_installation_name#:#Installation Name
+common#:#clientlist_public_access#:#Public Access
+common#:#clientlist_login#:#Login
+common#:#clientlist_start_page#:#Start page
+common#:#clientlist_login_page#:#Login page
+forum#:#file_upload_allowed_fora_desc#:#If "Allow Attachments in Selected Forums" is selected, forum moderators can individually allow attaching files to postings in the settings of each forum. In new forums the upload of attachments will be disabled by default.
+forum#:#file_upload_allowed_fora#:#Attachments
+forum#:#file_upload_option_allow#:#Allow Attachments in All Forums
+forum#:#file_upload_option_disallow#:#Allow Attachments in Selected Forums
+forum#:#file_upload_allowed#:#Allow Attachments
+forum#:#allow_file_upload_desc#:#If enabled, users are able to attach files to their postings.
+sysc#:#sysc_overview#:#Overview
+sysc#:#sysc_groups#:#System Check Groups
+sysc#:#sysc_grp_tree#:#Repository Tree
+sysc#:#sysc_grp_tree_desc#:#Performs an analysis of the tree and prints all tree nodes along with analysis data.
+sysc#:#sysc_completed_num#:#Fullfilled Tasks
+sysc#:#sysc_failed_num#:#Not Fullfilled Tasks
+sysc#:#sysc_task_overview#:#Tasks
+sysc#:#sysc_action_validate#:#Validate
+sysc#:#sysc_action_repair#:#Repair
+sysc#:#sysc_task_tree_duplicates#:#Duplicate Entries in Repository Tree
+sysc#:#sysc_task_tree_duplicates_desc#:#Search for duplicate entries in the repository tree structure.
+sysc#:#sysc_task_tree_dump#:#List Tree
+sysc#:#sysc_task_tree_dump_desc#:#Analyses and prints the repository tree structure
+sysc#:#sysc_action_list_tree#:#Create Repository Tree Dump
+sysc#:#sysc_action_show_tree#:#Show Repository Tree Dump
+sysc#:#sysc_tree_duplicate_failures#:#Found duplicate entries in tree structure. Number of duoplicate entries
+sysc#:#sysc_message_success#:#No errors found
+sysc#:#sysc_tree_list_failures#:#A dump of the the repository tree has been created. Number of errors in tree structure:
+sysc#:#sysc_status_na#:#Not Executed
+sysc#:#sysc_status_running#:#Running
+sysc#:#sysc_status_failed#:#Failed
+sysc#:#sysc_status_completed#:#Completed
+sysc#:#sysc_task_tree_missing#:#Missing Entries in Repository Tree
+sysc#:#sysc_task_tree_missing_desc#:#Searches and repairs missing entries in the repository tree.
+sysc#:#sysc_message_tree_missing_confirm#:#Do you really want to restore missing entries in the repository tree structure?
+sysc#:#sysc_btn_tree_missing#:#Restore Missing
+sysc#:#sysc_tree_missing_failures#:#Found missing entries in the tree structure. Number of missing entries:
+sysc#:#sysc_cron_empty_trash#:#Delete Trash Bin
+sysc#:#sysc_cron_empty_trash_desc#:#If enabled, the repository trash bin will be purged by given criteria (age, object type or maximum number of objects).
+sysc#:#sysc_task_tree_missing_tree#:#Missing Entries in Repository Tree
+sysc#:#sysc_task_tree_missing_tree_desc#:#Searches and repairs missing entries in the repository tree.
+sysc#:#sysc_task_tree_missing_reference#:#Missing Object References
+sysc#:#sysc_task_tree_missing_reference_desc#:#Searches and repairs missing object references in the repository tree.
+sysc#:#sysc_task_structure#:#Tree structure
+sysc#:#sysc_task_structure_desc#:#Analyzes and corrects the repository tree structure.

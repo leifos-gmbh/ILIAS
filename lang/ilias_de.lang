@@ -658,6 +658,45 @@ assessment#:#qpl_lac_desc_compare_with_sequence#:#Vergleiche das Ergebnis mit de
 assessment#:#qpl_lac_desc_compare_with_answer_n#:#Vergleiche das Ergebnis mit der n-ten Antwort der Frage
 assessment#:#qpl_lac_desc_compare_with_exact_sequence#:#Vergleiche das Ergebnis, ob ausschließlich die angegebene Sequenz ausgewählt wurde
 assessment#:#qpl_lac_desc_compare_answer_exist#:#Vergleiche ob für eine Frage/Lücke einer Frage keine Antwort gegeben wurde
+assessment#:#lacex_example_header#:#Beispiele
+assessment#:#lacex_assQuestion_PercentageResultExpression_e#:#R >= %75%
+assessment#:#lacex_assQuestion_PercentageResultExpression_d#:#Wurden bei der aktuellen Frage, genau oder mehr als 75% der möglichen Punkte erreicht
+assessment#:#lacex_assQuestion_EmptyAnswerExpression_e#:#R = ?
+assessment#:#lacex_assQuestion_EmptyAnswerExpression_d#:#Es wurde keine Antwort für die Frage abgegeben
+assessment#:#lacex_assSingleChoice_NumberOfResultExpression_e#:#R = +2+
+assessment#:#lacex_assSingleChoice_NumberOfResultExpression_d#:#Bei der Beantwortung der Frage, wurde die 2te Antwortoption gewählt
+assessment#:#lacex_assMultipleChoice_NumberOfResultExpression_e#:#R = +2+
+assessment#:#lacex_assMultipleChoice_NumberOfResultExpression_d#:#Bei der Beantwortung der Frage, wurde die 2te Antwortoption gewählt
+assessment#:#lacex_assMultipleChoice_ExclusiveResultExpression_e#:#R = *1,3,4*
+assessment#:#lacex_assMultipleChoice_ExclusiveResultExpression_d#:#Für die Frage wurden genau die Antwortoptionen 1, 3 und 4 gewählt
+assessment#:#lacex_assErrorText_NumberOfResultExpression_e#:#R = +2+
+assessment#:#lacex_assErrorText_NumberOfResultExpression_d#:#Bei der Beantwortung der Frage, wurde die 2te Antwortoption gewählt
+assessment#:#lacex_assErrorText_ExclusiveResultExpression_e#:#R = *1,3,4*
+assessment#:#lacex_assErrorText_ExclusiveResultExpression_d#:#Für die Frage wurden genau die Antwortoptionen 1, 3 und 4 gewählt
+assessment#:#lacex_assImagemapQuestion_NumberOfResultExpression_e#:#R = +2+
+assessment#:#lacex_assImagemapQuestion_NumberOfResultExpression_d#:#Bei der Beantwortung der Frage, wurde die 2te Antwortoption gewählt
+assessment#:#lacex_assImagemapQuestion_ExclusiveResultExpression_e#:#R = *1,3,4*
+assessment#:#lacex_assImagemapQuestion_ExclusiveResultExpression_d#:#Für die Frage wurden genau die Antwortoptionen 1, 3 und 4 gewählt
+assessment#:#lacex_assNumeric_NumericResultExpression_e#:#R = #4.7#
+assessment#:#lacex_assNumeric_NumericResultExpression_d#:#Die Frage wurde mit dem Zahlenwert 4.7 beantwortet
+assessment#:#lacex_assOrderingQuestion_OrderingResultExpression_e#:#R = $2,5,1,4,3$
+assessment#:#lacex_assOrderingQuestion_OrderingResultExpression_d#:#Die zu sortierenden Elemente wurden in folgender Reihenfolge angeordnet: 2, 5, 1, 5, 3
+assessment#:#lacex_assOrderingHorizontal_OrderingResultExpression_e#:#R = $2,5,1,4,3$
+assessment#:#lacex_assOrderingHorizontal_OrderingResultExpression_d#:#Die zu sortierenden Elemente wurden in folgender Reihenfolge angeordnet: 2, 5, 1, 5, 3
+assessment#:#lacex_assMatchingQuestion_MatchingResultExpression_e#:#R = ;1:2; & R = ;2:3; & R = ;3:1;
+assessment#:#lacex_assMatchingQuestion_MatchingResultExpression_d#:#Die Elemente wurden wie folgt zugeordnet: 1 => 2 und 2 => 3 und 3 => 1
+assessment#:#lacex_assTextSubset_StringResultExpression_e#:#R[2] = ~Natriumchlorid~
+assessment#:#lacex_assTextSubset_StringResultExpression_d#:#Für die 2te Anwortoption wurde der Text „Natriumchlorid“ eingetragen
+assessment#:#lacex_assFormulaQuestion_NumericResultExpression_e#:#R[1] = #3.14159#
+assessment#:#lacex_assFormulaQuestion_NumericResultExpression_d#:#Die 1te Antwortoption wurde mit dem Zahlenwert 3.14159 beantwortet
+assessment#:#lacex_assClozeTest_NumericResultExpression_e#:#R[2] = #5#
+assessment#:#lacex_assClozeTest_NumericResultExpression_d#:#Bei der 2ten Antwortoption handelt es sich um eine numerische Lücke und diese wurde mit dem Zahlenwert 5 beantwortet
+assessment#:#lacex_assClozeTest_StringResultExpression_1_e#:#R[1] = ~Montag~
+assessment#:#lacex_assClozeTest_StringResultExpression_1_d#:#Bei der 1ten Antwortoption handelt es sich um eine Textlücke und diese wurde mit „Montag“ beantwortet
+assessment#:#lacex_assClozeTest_StringResultExpression_2_e#:#R[4] = ~Grün~
+assessment#:#lacex_assClozeTest_StringResultExpression_2_d#:#Bei der 4ten Antwortoption handelt es sich um eine Auswahllücke und es wurde die Antwortoption ausgewählt, dessen Label „Grün“ entspricht
+assessment#:#lacex_assClozeTest_NumberOfResultExpression_e#:#R[4] = +2+
+assessment#:#lacex_assClozeTest_NumberOfResultExpression_d#:#Bei der 4ten Antwortoption handelt es sich um eine Auswahllücke und es wurde dort die 2te Option ausgewählt
 assessment#:#qpl_skill_point_eval_mode_quest_result#:#Antwortergebnis
 assessment#:#qpl_skill_point_eval_mode_solution_compare#:#Lösungsvergleich
 assessment#:#qpl_skill_point_eval_by_quest_result#:#Ermittlung der Kompetenzpunkte über Antwortergebnis
@@ -690,7 +729,8 @@ assessment#:#tst_skill_triggerings_num_req_answers_desc#:#Kompetenzen werden ers
 assessment#:#qpl_qst_skl_usg_skill_col#:#Kompetenz
 assessment#:#qpl_qst_skl_usg_numq_col#:#Fragenanzahl im gesamten Pool, welche die Kompetenz adressieren
 assessment#:#qpl_qst_skl_usg_sklpnt_col#:#Summe aller Kompetenzpunkte je Kompetenz
-assessment#:#tst_qst_skl_config_in_pool_hint_msg#:#Die Fragen-Kompetenz-Zuordnung für Tests im Modus "%s" müssen grundsätzlich im zugeordneten Fragenpool vorgenommen werden. Die Vergabe der Kompetenz-Schwellwerte erfolgt hier im Test.
+assessment#:#tst_qst_skl_cfg_in_pool_hint_rndquestset#:#Die Fragen-Kompetenz-Zuordnung für Tests im Modus "%s" müssen grundsätzlich in den zugeordneten Fragenpools vorgenommen werden:<br />%s<br /><br />Die Vergabe der Kompetenz-Schwellwerte erfolgt hier im Test.
+assessment#:#tst_qst_skl_cfg_in_pool_hint_dynquestset#:#Die Fragen-Kompetenz-Zuordnung für Tests im Modus "%s" müssen grundsätzlich im zugeordneten Fragenpool vorgenommen werden:<br />%s<br /><br />Die Vergabe der Kompetenz-Schwellwerte erfolgt hier im Test.
 assessment#:#qpl_qst_skl_selection_for_question_header#:#Kompetenzzuordnung für die Frage: %s
 assessment#:#tst_save_comp_points#:#Speichere Kompetenz-Punkte
 assessment#:#tst_msg_skl_qst_assign_points_saved#:#Die Kompetenz-Punkte wurden gespeichert.
@@ -1288,6 +1328,7 @@ assessment#:#tst_result#:#Testergebnis
 assessment#:#tst_result_user_name#:#Testergebnisse für %s
 assessment#:#tst_result_user_name_pass#:#Ergebnisse von Testdurchlauf %s für %s
 assessment#:#tst_results#:#Testergebnisse
+assessment#:#tst_result_pass#:#Ergebnisse des Testdurchlaufs
 assessment#:#tst_results_access_enabled#:#Teilnehmer sehen Testergebnisse
 assessment#:#tst_results_access_enabled_desc#:#Teilnehmer erhalten Zugriff auf ihre Testergebnisse. Um diese einzusehen, klicken sie auf dem Reiter 'Info' den Button 'Testergebnisse anzeigen'.
 assessment#:#tst_results_access_setting#:#Zeitpunkt
@@ -12765,8 +12806,10 @@ dcl#:#dcl_locked#:#Gesperrt
 dcl#:#dcl_table_settings#:#Tabelleneinstellungen
 dcl#:#dcl_add_perm#:#Neuen Eintrag hinzufügen
 dcl#:#dcl_add_perm_desc#:#Benutzer können Einträge in dieser Tabelle erstellen.
-dcl#:#dcl_edit_perm#:#Alle Einträge bearbeiten
-dcl#:#dcl_delete_perm#:#Alle Einträge löschen
+dcl#:#dcl_edit_perm#:#Einträge bearbeiten
+dcl#:#dcl_delete_perm#:#Einträge löschen
+dcl#:#dcl_all_entries#:#Alle Einträge
+dcl#:#dcl_own_entries#:#Nur eigene Einträge
 dcl#:#dcl_edit_by_owner#:#Nur eigene Einträge bearbeiten oder löschen
 dcl#:#dcl_limited#:#Zeitlich begrenzte Bearbeitung
 dcl#:#dcl_limited_desc#:#Benutzer können Einträge nur bis zum gewählten Datum hinzufügen, bearbeiten und löschen.
@@ -13346,6 +13389,10 @@ bibl#:#attr_order_bibtex#:#Attribut-Reihenfolge (Bibtex)
 bibl#:#attr_order_bibtex_info#:#default: isbn,issn,title
 bibl#:#attr_order_ris#:#Attribut-Reihenfolge (ris)
 bibl#:#attr_order_ris_info#:#default: sn,ti, t1
+bibl#:#news_title_created#:#Neue Literaturliste hinzugefügt
+bibl#:#news_content_created#:#Eine neue Literaturliste wurde hinzugefügt. Die Einträge können eingesehen werden.
+bibl#:#news_title_updated#:#Literaturliste aktualisiert
+bibl#:#news_content_updated#:#Die Literaturliste wurde aktualisiert. Die neuen Einträge können eingesehen werden.
 rbac#:#bibl_visible#:#Literaturliste ist sichtbar
 rbac#:#bibl_read#:#Literaturliste lesen
 rbac#:#bibl_copy#:#Literaturliste kopieren
@@ -15385,3 +15432,58 @@ mail#:#only_inbox_trash_info#:#Fallls aktiviert, werden ausschließlich Mails ge
 mail#:#mail_notify_orphaned#:#Benachrichtigungsmail
 mail#:#mail_notify_orphaned_info#:#Wenn Sie hier einen Wert größer oder gleich 1 eintragen, sendet ILIAS eine E-Mail an den Benutzer bevor eine interne Mail gelöscht wird. Bitte stellen Sie sicher, dass ein externer E-Mail-Empfang möglich ist.
 cntr#:#tab_back_to_repository#:#Zurück zum Magazin
+prtt#:#prtt_portfolio_created#:#Portfoliovorlage wurde hinzugefügt
+forum#:#frm_censorship#:#Zensieren
+forum#:#frm_revoke_censorship#:#Zensur aufheben
+forum#:#frm_censorship_applied#:#Der Beitrag wurde erfolgreich zensiert.
+forum#:#frm_censorship_revoked#:#Die Zensur für den Beitrag wurde aufgehoben.
+forum#:#frm_mark_as_read#:#Als gelesen markieren
+forum#:#frm_mark_as_unread#:#Als ungelesen markieren
+common#:#clientlist_clientlist#:#Mandantenauswahl
+common#:#clientlist_available_clients#:#Mandantenauswahl
+common#:#clientlist_installation_name#:#Mandanten
+common#:#clientlist_public_access#:#Öffentlicher Bereich
+common#:#clientlist_login#:#Anmelden
+common#:#clientlist_start_page#:#Öffentlicher Bereich
+common#:#clientlist_login_page#:#Anmelden
+forum#:#file_upload_allowed_fora_desc#:#Wenn "Anhängen von Dateien in ausgewählten Foren erlauben" ausgewählt ist, können Moderatoren das Anhängen von Dateien in den jeweiligen Foren-Einstellungen gezielt aktivieren. Bei neuen Foren wird das Anhängen von Dateien standardmäßig deaktiviert.
+forum#:#file_upload_allowed_fora#:#Dateien anhängen
+forum#:#file_upload_option_allow#:#Anhängen von Dateien in allen Foren erlauben
+forum#:#file_upload_option_disallow#:#Anhängen von Dateien in ausgewählten Foren erlauben
+forum#:#file_upload_allowed#:#Erlaube das Anhängen von Dateien
+forum#:#allow_file_upload_desc#:#Wenn diese Option aktiviert ist, wird das Anhängen von Dateien in diesem Forum ermöglicht.
+sysc#:#sysc_overview#:#Übersicht
+sysc#:#sysc_groups#:#Systemcheck-Gruppen
+sysc#:#sysc_grp_tree#:#Magazinbaum
+sysc#:#sysc_grp_tree_desc#:#Analysiert und repariert die Datenintegrität des Magazinbaums
+sysc#:#sysc_completed_num#:#Erfüllte Aufgaben
+sysc#:#sysc_failed_num#:#Nicht erfüllte Aufgaben
+sysc#:#sysc_task_overview#:#Aufgaben
+sysc#:#sysc_action_validate#:#Überprüfen
+sysc#:#sysc_action_repair#:#Reparieren
+sysc#:#sysc_task_tree_duplicates#:#Doppelte Einträge in der Baumstruktur
+sysc#:#sysc_task_tree_duplicates_desc#:#Durchsucht das System nach doppelten Einträgen in Magazinbaum.
+sysc#:#sysc_task_tree_dump#:#Baum auflisten
+sysc#:#sysc_task_tree_dump_desc#:#Analysiert die Baumstruktur und listet alle Baumknoten zusammen mit den Analysedaten auf.
+sysc#:#sysc_action_list_tree#:#Dump der Baumstruktur erzeugen
+sysc#:#sysc_action_show_tree#:#Baumstruktur anzeigen
+sysc#:#sysc_tree_duplicate_failures#:#Es wurden doppelte Einträge in der Baumstruktur gefunden. Anzahl doppelter Einträge:
+sysc#:#sysc_message_success#:#Es wurden keine Fehler festgestellt.
+sysc#:#sysc_tree_list_failures#:#Ein Dump des Magazinbaums wurde erstellt. Anzahl gefundener Fehler:
+sysc#:#sysc_status_na#:#Noch nicht ausgeführt
+sysc#:#sysc_status_running#:#Wird durchgeführt
+sysc#:#sysc_status_failed#:#Fehlgschlagen
+sysc#:#sysc_status_completed#:#Erfüllt
+sysc#:#sysc_task_tree_missing#:#Fehlende Einträge in der Baumstruktur
+sysc#:#sysc_task_tree_missing_desc#:#Durchsucht das System nach fehlenden Einträgen in der Baumstruktur
+sysc#:#sysc_message_tree_missing_confirm#:#Möchten sie die fehlenden Einträge in der Baumstruktur wieder herstellen?
+sysc#:#sysc_btn_tree_missing#:#Wiederherstellung starten
+sysc#:#sysc_tree_missing_failures#:#Es gibt fehlende Einträge in der Baumstruktur. Anzahl fehlender Einträge:
+sysc#:#sysc_cron_empty_trash#:#Papierkorb löschen
+sysc#:#sysc_cron_empty_trash_desc#:#Wenn aktiviert, werden Objekte des Papierkorbs automatisch anhand bestimmter Kriterien (Alter, Objekttyp, Anzahl) aus dem System entfernt.
+sysc#:#sysc_task_tree_missing_tree#:#Fehlende Einträge im Magazinbaum
+sysc#:#sysc_task_tree_missing_tree_desc#:#Sucht und repariert fehlende Einträge referenzierter Objekte im Magazinbaum.
+sysc#:#sysc_task_tree_missing_reference#:#Fehlende Referenzen
+sysc#:#sysc_task_tree_missing_reference_desc#:#Sucht und repariert fehlende Objekt-Referenzen für Einträge im Magazinbaum.
+sysc#:#sysc_task_structure#:#Baumstruktur
+sysc#:#sysc_task_structure_desc#:#Analyiert und korrigiert die Struktur des Magazinbaums

@@ -2108,7 +2108,7 @@ class ilRbacReview
 	{
 		global $ilDB;
 		
-		$query = 'SELECT parent ref FROM rbac_fa '.
+		$query = 'SELECT parent p_ref FROM rbac_fa '.
 				'WHERE rol_id = '.$ilDB->quote($a_role_id,'integer').' '.
 				'AND assign = '.$ilDB->quote('y','text');
 		
@@ -2122,7 +2122,7 @@ class ilRbacReview
 		$res = $ilDB->query($query);
 		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
 		{
-			return $row->ref;
+			return $row->p_ref;
 		}
 		return 0;
 	}
@@ -2337,6 +2337,12 @@ class ilRbacReview
 	public function getAssignedCacheEntry($a_role_id,$a_user_id)
 	{
 		return self::$is_assigned_cache[$a_role_id][$a_user_id];
+	}
+
+
+	public function clearCaches() {
+		self::$is_assigned_cache = array();
+		self::$assigned_users_cache = array();
 	}
 
 } // END class.ilRbacReview

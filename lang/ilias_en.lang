@@ -15494,3 +15494,5 @@ sysc#:#sysc_task_structure#:#Tree structure
 sysc#:#sysc_task_structure_desc#:#Analyzes and corrects the repository tree structure.
 obj#:#obj_target_location#:#Target Location
 obj#:#obj_copy_progress#:#Copy Progress
+cntr#:#cntr_copy_repo_tree#:#Repository Tree
+cntr#:#cntr_copy_crs_grp#:#My Courses and Groups

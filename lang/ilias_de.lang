@@ -15487,6 +15487,7 @@ sysc#:#sysc_task_tree_missing_reference#:#Fehlende Referenzen
 sysc#:#sysc_task_tree_missing_reference_desc#:#Sucht und repariert fehlende Objekt-Referenzen für Einträge im Magazinbaum.
 sysc#:#sysc_task_structure#:#Baumstruktur
 sysc#:#sysc_task_structure_desc#:#Analyiert und korrigiert die Struktur des Magazinbaums
-common#:#msg_copy_clipboard_source#:#Now, please select the desired course, whose content should be copied and click the button ‘Next’.###25 06 2015 new variable
 obj#:#obj_target_location#:#Zielordner
 obj#:#obj_copy_progress#:#Fortschritt des Kopierens
+cntr#:#cntr_copy_repo_tree#:#Auswahl Magazinbaum
+cntr#:#cntr_copy_crs_grp#:#Auswahl Mitgliedschaften

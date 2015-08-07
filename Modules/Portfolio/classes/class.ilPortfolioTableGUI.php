@@ -31,7 +31,9 @@ class ilPortfolioTableGUI extends ilTable2GUI
 		$this->addColumn($this->lng->txt(""), "", "1");		
 		$this->addColumn($this->lng->txt("title"), "title", "50%");
 		$this->addColumn($this->lng->txt("online"), "is_online");
-		$this->addColumn($this->lng->txt("prtf_default_portfolio"), "is_default");		
+		// patch uzk start
+		// $this->addColumn($this->lng->txt("prtf_default_portfolio"), "is_default");		
+		// patch uzk end
 		$this->addColumn($this->lng->txt("actions"));
 
 		$this->setFormAction($ilCtrl->getFormAction($a_parent_obj));
@@ -110,6 +112,8 @@ class ilPortfolioTableGUI extends ilTable2GUI
 		
 		$ilCtrl->setParameterByClass("ilobjportfoliogui", "prt_id", "");		
 
+		/* 
+		// patch uzk start
 		if($a_set["is_online"])
 		{
 			if(!$a_set["is_default"])
@@ -130,7 +134,9 @@ class ilPortfolioTableGUI extends ilTable2GUI
 				$this->tpl->setVariable("TXT_ACTION", $lng->txt("prtf_unset_as_default"));
 				$this->tpl->parseCurrentBlock();
 			}
-		}	
+		}			 
+		// patch uzk end 
+		*/
 	}
 	
 }?>

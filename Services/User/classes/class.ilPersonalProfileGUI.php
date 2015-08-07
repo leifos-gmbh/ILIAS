@@ -1093,6 +1093,8 @@ class ilPersonalProfileGUI
 			}
 			$this->form->addItem($radg);
 			
+			/*
+			// patch uzk start
 			// #11773
 			if ($ilSetting->get('user_portfolios'))
 			{
@@ -1102,6 +1104,8 @@ class ilPersonalProfileGUI
 					$lng->txt("user_portfolios")."</a>";	
 				$info .= $prtf;
 			}
+			// patch uzk end
+			*/
 			
 			$radg->setInfo($info);
 		}

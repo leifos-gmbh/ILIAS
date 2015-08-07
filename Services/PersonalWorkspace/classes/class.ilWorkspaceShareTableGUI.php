@@ -84,8 +84,7 @@ class ilWorkspaceShareTableGUI extends ilTable2GUI
 		// $this->setDisableFilterHiding(true);
 		$this->enablePersistentFilters("wsp_");
 		// patch uzk end
-		
-		$this->setDisableFilterHiding(true);
+				
 		$this->setResetCommand("resetsharefilter");
 		$this->setFilterCommand("applysharefilter");
 			

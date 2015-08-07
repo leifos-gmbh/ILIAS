@@ -712,6 +712,20 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 		$this->ctrl->redirect($this);		 
 	}
 	
+	// patch uzk start
+	function copy_from_repository()
+	{
+		$_SESSION['clipboard']['repo2wsp'] = true;				
+		$this->copy();		
+	}
+	
+	function cut_from_repository()
+	{
+		$_SESSION['clipboard']['repo2wsp'] = true;				
+		$this->cut();		
+	}
+	// patch uzk end
+	
 	function shareFilter()
 	{
 		// patch uzk start

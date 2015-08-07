@@ -120,3 +120,42 @@ function ilTablePageSelection(el, cmd)
 	el.form.submit();
 	return false;
 }
+
+
+// patch uzk start
+
+var ilTableAjaxPagesSuccessHandler = function(o)
+{	
+	// empty response: remove buttons and loader
+	if(o.responseText == "---")
+	{
+		$('#apldr_' + o.argument.el_id + '_1').replaceWith("&nbsp;");
+		$('#apldr_' + o.argument.el_id + '_2').replaceWith("&nbsp;");
+		$('#tblap_' + o.argument.el_id).replaceWith(""); // loader
+		return;
+	}
+	// final "page": remove buttons
+	else if(o.responseText.substr(o.responseText.length-3) == "---")
+	{
+		$('#apldr_' + o.argument.el_id + '_1').replaceWith("&nbsp;");
+		$('#apldr_' + o.argument.el_id + '_2').replaceWith("&nbsp;");		
+		o.responseText = o.responseText.substr(0, o.responseText.length-3)
+	}	
+	$('#tblap_' + o.argument.el_id).replaceWith(o.responseText);
+}
+
+
+function ilTableAjaxPages(sUrl, el_id)
+{
+	// loader
+	var loadergif = document.createElement('img');
+	loadergif.src = "./templates/default/images/loader.svg";
+	loadergif.border = 0;
+	// $(loadergif).css("position", "absolute");	
+	$('#tblap_' + el_id).html(loadergif);
+	
+	il.Util.sendAjaxGetRequestToUrl(sUrl, {},  {el_id: el_id}, ilTableAjaxPagesSuccessHandler);	
+	return false;
+}
+
+// patch uzk end

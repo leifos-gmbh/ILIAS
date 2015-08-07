@@ -188,6 +188,30 @@ class ilObjectOwnershipManagementGUI
 		$ref_id = (int)$_REQUEST["ownid"];
 		$this->redirectCmd($ref_id, "ilPermissionGUI", "owner");			
 	}	
+	
+	// patch uzk start
+	
+	function copyToWsp()
+	{
+		$ref_id = (int)$_REQUEST["ownid"];
+		$this->redirectWsp($ref_id, "copy_from_repository");		
+	}
+	
+	function moveToWsp()
+	{
+		$ref_id = (int)$_REQUEST["ownid"];
+		$this->redirectWsp($ref_id, "cut_from_repository");				
+	}
+	
+	protected function redirectWsp($a_ref_id, $a_cmd)
+	{
+		global $ilCtrl;
+		
+		$ilCtrl->setParameterByClass("ilObjWorkspaceRootFolderGUI", "item_ref_id", $a_ref_id);
+		$ilCtrl->redirectByClass("ilObjWorkspaceRootFolderGUI", $a_cmd);		
+	}
+	
+	// patch uzk end
 }
 
 ?>

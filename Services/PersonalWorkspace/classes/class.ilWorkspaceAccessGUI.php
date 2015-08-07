@@ -148,11 +148,13 @@ class ilWorkspaceAccessGUI
 			$options["course"] = $this->lng->txt("wsp_set_permission_course");
 		}
 		
+		// patch uzk start
+		/*
 		if(!$this->getAccessHandler()->hasRegisteredPermission($this->node_id))
 		{
 			$options["registered"] = $this->lng->txt("wsp_set_permission_registered");
 		}
-		
+				
 		if($ilSetting->get("enable_global_profiles"))
 		{			
 			if(!$this->getAccessHandler()->hasGlobalPasswordPermission($this->node_id))
@@ -165,6 +167,8 @@ class ilWorkspaceAccessGUI
 				$options["all"] = $this->lng->txt("wsp_set_permission_all");		
 			}
 		}
+		*/
+		// patch uzk end
 		
 		include_once "Services/Form/classes/class.ilPropertyFormGUI.php";
 		$actions = new ilSelectInputGUI("", "action");		

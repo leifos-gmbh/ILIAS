@@ -94,7 +94,10 @@ class ilObjWorkspaceFolderTableGUI extends ilTable2GUI
 		$item_list_gui->enableNotes(true);		
 		$item_list_gui->enableCopy($objDefinition->allowCopy($node["type"]));
 		
-		if($node["type"] == "file")
+		// patch uzk start
+		if($node["type"] == "file" || 
+			$node["type"] == "blog")
+		// patch uzk end	
 		{
 			$item_list_gui->enableRepositoryTransfer(true);
 		}

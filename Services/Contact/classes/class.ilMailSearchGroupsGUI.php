@@ -478,7 +478,14 @@ class ilMailSearchGroupsGUI
 		}
 	}
 
-	function share()
+	// patch uzk start
+	
+	function shareAndNotify()
+	{
+		$this->share(true);
+	}
+
+	function share($a_notify = false)
 	{
 		global $lng;
 		
@@ -487,7 +494,7 @@ class ilMailSearchGroupsGUI
 			$ids = $_REQUEST["search_grp"];
 			if (sizeof($ids))
 			{
-				$this->addPermission($ids);
+				$this->addPermission($ids, $a_notify);					
 			}
 			else
 			{
@@ -500,7 +507,7 @@ class ilMailSearchGroupsGUI
 			$ids = $_REQUEST["search_members"];
 			if (sizeof($ids))
 			{
-				$this->addPermission($ids);
+				$this->addPermission($ids, $a_notify);					
 			}
 			else
 			{
@@ -514,7 +521,7 @@ class ilMailSearchGroupsGUI
 		}
 	}
 	
-	protected function addPermission($a_obj_ids)
+	protected function addPermission($a_obj_ids, $a_notify = false)
 	{
 		if(!is_array($a_obj_ids))
 		{
@@ -532,11 +539,19 @@ class ilMailSearchGroupsGUI
 		}
 		
 		if($added)
-		{
+		{			
+			if($a_notify)
+			{
+				include_once "Services/Contact/classes/class.ilMailSearchGUI.php";
+				ilMailSearchGUI::sendShareNotification($this->wsp_access_handler, $this->wsp_node_id, $a_obj_ids);
+			}
+			
 			ilUtil::sendSuccess($this->lng->txt("wsp_share_success"), true);
-		}
-		$this->ctrl->redirectByClass("ilworkspaceaccessgui", "share");		
+		}							
+		$this->ctrl->redirectByClass("ilworkspaceaccessgui", "share");				
 	}
+	
+	// patch uzk end	
 }
 
 ?>

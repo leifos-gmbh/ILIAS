@@ -137,6 +137,31 @@ class ilObjectOwnershipManagementTableGUI extends ilTable2GUI
 			$ilCtrl->getLinkTarget($this->parent_obj, "move"),
 			"", "", "");	
 		
+		// patch uzk start				
+		if(in_array($a_type, array("blog", "file")))
+		{
+			$valid = true;
+			if($a_type == "blog")
+			{
+				include_once "Modules/Blog/classes/class.ilObjBlog.php";
+				if(!ilObjBlog::isSingleAuthor(ilObject::_lookupObjId($a_ref_id)))
+				{
+					$valid = false;
+				}
+			}
+			if($valid)
+			{
+				$agui->addItem($lng->txt("wsp_copy_from_repository"), "", 
+					$ilCtrl->getLinkTarget($this->parent_obj, "copyToWsp"),
+					"", "", "");	
+
+				$agui->addItem($lng->txt("wsp_move_from_repository"), "", 
+					$ilCtrl->getLinkTarget($this->parent_obj, "moveToWsp"),
+					"", "", "");	
+			}
+		}		 			
+		// patch uzk end
+		
 		$agui->addItem($lng->txt("change_owner"), "", 
 			$ilCtrl->getLinkTarget($this->parent_obj, "changeOwner"),
 			"", "", "");		

@@ -20,6 +20,13 @@ class ilTablePropertiesStorage
 		"selfields" => array("storage" => "db"),
 		"selfilters" => array("storage" => "db"),
 		"filter_values" => array("storage" => "db")
+		// patch uzk start
+		,"wsp_acl_type" => array("storage" => "db")
+		,"wsp_obj_type" => array("storage" => "db")
+		,"wsp_user" => array("storage" => "db")
+		,"wsp_title" => array("storage" => "db")
+		,"wsp_acl_date" => array("storage" => "db")
+		// patch uzk end
 		);
 	
 	/**

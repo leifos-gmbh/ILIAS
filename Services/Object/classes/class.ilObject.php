@@ -1364,89 +1364,91 @@ class ilObject
  	* @access	public
 	* @return	boolean	true if object was removed completely; false if only a references was removed
 	*/
-	function delete()
+	// patch uzk start
+	function delete($a_force_referenced = false)	
 	{
 		global $rbacadmin, $log, $ilDB;
 
 		$remove = false;
-
-		// delete object_data entry
-		if ((!$this->referenced) || ($this->countReferences() == 1))
+		
+		if (!(bool)$a_force_referenced)
 		{
-			// check type match
-			$db_type = ilObject::_lookupType($this->getId());
-			if ($this->type != $db_type)
+			// delete object_data entry
+			if ((!$this->referenced) || ($this->countReferences() == 1))
 			{
-				$message = "ilObject::delete(): Type mismatch. Object with obj_id: ".$this->id." ".
-					"was instantiated by type '".$this->type."'. DB type is: ".$db_type;
-					
-				// write log entry
-				$log->write($message);
-					
-				// raise error
-				$this->ilias->raiseError("ilObject::delete(): Type mismatch. (".$this->type."/".$this->id.")",$this->ilias->error_obj->WARNING);
-			}
-			
-			// delete entry in object_data
-			$q = "DELETE FROM object_data ".
-				"WHERE obj_id = ".$ilDB->quote($this->getId(), "integer");
-			$ilDB->manipulate($q);
-
-			// delete long description
-			$query = "DELETE FROM object_description WHERE obj_id = ".
-				$ilDB->quote($this->getId(), "integer");
-			$ilDB->manipulate($query);
-
-			// write log entry
-			$log->write("ilObject::delete(), deleted object, obj_id: ".$this->getId().", type: ".
-				$this->getType().", title: ".$this->getTitle());
-			
-			// remove news
-			include_once("./Services/News/classes/class.ilNewsItem.php");
-			$news_item = new ilNewsItem();
-			$news_item->deleteNewsOfContext($this->getId(), $this->getType());
-			include_once("./Services/Block/classes/class.ilBlockSetting.php");
-			ilBlockSetting::_deleteSettingsOfBlock($this->getId(), "news");
-
-			include_once './Services/DidacticTemplate/classes/class.ilDidacticTemplateObjSettings.php';
-			ilDidacticTemplateObjSettings::deleteByObjId($this->getId());
-
-			/* remove notes (see infoscreen gui)
-			   as they can be seen as personal data we are keeping them for now
-			include_once("Services/Notes/classes/class.ilNote.php");
-			foreach(array(IL_NOTE_PRIVATE, IL_NOTE_PUBLIC) as $note_type)
-			{
-				foreach(ilNote::_getNotesOfObject($this->id, 0, $this->type, $note_type) as $note)
+				// check type match
+				$db_type = ilObject::_lookupType($this->getId());
+				if ($this->type != $db_type)
 				{
-					$note->delete();
+					$message = "ilObject::delete(): Type mismatch. Object with obj_id: ".$this->id." ".
+						"was instantiated by type '".$this->type."'. DB type is: ".$db_type;
+
+					// write log entry
+					$log->write($message);
+
+					// raise error
+					$this->ilias->raiseError("ilObject::delete(): Type mismatch. (".$this->type."/".$this->id.")",$this->ilias->error_obj->WARNING);
 				}
+
+				// delete entry in object_data
+				$q = "DELETE FROM object_data ".
+					"WHERE obj_id = ".$ilDB->quote($this->getId(), "integer");
+				$ilDB->manipulate($q);
+
+				// delete long description
+				$query = "DELETE FROM object_description WHERE obj_id = ".
+					$ilDB->quote($this->getId(), "integer");
+				$ilDB->manipulate($query);
+
+				// write log entry
+				$log->write("ilObject::delete(), deleted object, obj_id: ".$this->getId().", type: ".
+					$this->getType().", title: ".$this->getTitle());
+
+				// remove news
+				include_once("./Services/News/classes/class.ilNewsItem.php");
+				$news_item = new ilNewsItem();
+				$news_item->deleteNewsOfContext($this->getId(), $this->getType());
+				include_once("./Services/Block/classes/class.ilBlockSetting.php");
+				ilBlockSetting::_deleteSettingsOfBlock($this->getId(), "news");
+
+				include_once './Services/DidacticTemplate/classes/class.ilDidacticTemplateObjSettings.php';
+				ilDidacticTemplateObjSettings::deleteByObjId($this->getId());
+
+				/* remove notes (see infoscreen gui)
+				   as they can be seen as personal data we are keeping them for now
+				include_once("Services/Notes/classes/class.ilNote.php");
+				foreach(array(IL_NOTE_PRIVATE, IL_NOTE_PUBLIC) as $note_type)
+				{
+					foreach(ilNote::_getNotesOfObject($this->id, 0, $this->type, $note_type) as $note)
+					{
+						$note->delete();
+					}
+				}
+				*/
+
+				// BEGIN WebDAV: Delete WebDAV properties
+				$query = "DELETE FROM dav_property ".
+					"WHERE obj_id = ".$ilDB->quote($this->getId(),'integer');
+				$res = $ilDB->manipulate($query);
+				// END WebDAV: Delete WebDAV properties
+
+				include_once './Services/WebServices/ECS/classes/class.ilECSImport.php';
+				ilECSImport::_deleteByObjId($this->getId());
+
+				$remove = true;
 			}
-		    */
-						
-			// BEGIN WebDAV: Delete WebDAV properties
-			$query = "DELETE FROM dav_property ".
-				"WHERE obj_id = ".$ilDB->quote($this->getId(),'integer');
-			$res = $ilDB->manipulate($query);
-			// END WebDAV: Delete WebDAV properties
-
-			include_once './Services/WebServices/ECS/classes/class.ilECSImport.php';
-			ilECSImport::_deleteByObjId($this->getId());
-			
-			include_once("Services/AdvancedMetaData/classes/class.ilAdvancedMDValues.php");
-			ilAdvancedMDValues::_deleteByObjId($this->getId());
-
-			$remove = true;
-		}
-		else
-		{
-			// write log entry
-			$log->write("ilObject::delete(), object not deleted, number of references: ".
-				$this->countReferences().", obj_id: ".$this->getId().", type: ".
-				$this->getType().", title: ".$this->getTitle());
+			else
+			{
+				// write log entry
+				$log->write("ilObject::delete(), object not deleted, number of references: ".
+					$this->countReferences().", obj_id: ".$this->getId().", type: ".
+					$this->getType().", title: ".$this->getTitle());
+			}
 		}
 
 		// delete object_reference entry
-		if ($this->referenced)
+		if ($this->referenced || 
+			(bool)$a_force_referenced)
 		{			
 			include_once "Services/Object/classes/class.ilObjectActivation.php";
 			ilObjectActivation::deleteAllEntries($this->getRefId());
@@ -1476,11 +1478,8 @@ class ilObject
 
 			// Remove desktop items
 			ilUtil::removeItemFromDesktops($this->getRefId());
-		}
-
-		// remove conditions
-		if ($this->referenced)
-		{
+			
+			// remove conditions
 			$ch =& new ilConditionHandler();
 			$ch->delete($this->getRefId());
 			unset($ch);
@@ -1488,6 +1487,7 @@ class ilObject
 
 		return $remove;
 	}
+	// patch uzk end
 
 	/**
 	* init default roles settings

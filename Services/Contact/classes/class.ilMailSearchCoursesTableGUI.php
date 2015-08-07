@@ -104,6 +104,10 @@ class ilMailSearchCoursesTableGUI extends ilTable2GUI
 		{
 			$lng->loadLanguageModule("wsp");
 			$this->addMultiCommand('share',$lng->txt('wsp_share_with_members'));
+			
+			// patch uzk start
+			$this->addMultiCommand('shareAndNotify',$lng->txt('wsp_share_with_members_and_notify'));
+			// patch uzk end
 		}
 		$this->addMultiCommand('showMembers',$lng->txt('mail_list_members'));
 		

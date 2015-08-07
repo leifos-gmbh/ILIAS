@@ -211,11 +211,12 @@ abstract class ilObject2 extends ilObject
 	final function createReference() { return parent::createReference(); }
 	final function countReferences() { return parent::countReferences(); }
 
-	final function delete()
+	// patch uzk start
+	final function delete($a_force_referenced = false)
 	{
 		if($this->beforeDelete())
 		{
-			if(parent::delete())
+			if(parent::delete($a_force_referenced))
 			{
 				$this->doDelete();
 				$this->id = null;
@@ -224,7 +225,8 @@ abstract class ilObject2 extends ilObject
 		}		
 		return false;
 	}
-
+	// patch uzk end
+	
 	protected function doDelete()
 	{
 

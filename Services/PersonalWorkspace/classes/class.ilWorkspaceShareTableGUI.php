@@ -44,6 +44,11 @@ class ilWorkspaceShareTableGUI extends ilTable2GUI
 		parent::__construct($a_parent_obj, $a_parent_cmd);
 
 		$this->setId("il_tbl_wspsh");
+		
+		// patch uzk start		
+		$this->setAjaxPages(true);
+		$this->setLimit(25);
+		// patch uzk end
 
 		$this->setTitle($lng->txt("wsp_shared_resources"));
 
@@ -51,13 +56,17 @@ class ilWorkspaceShareTableGUI extends ilTable2GUI
 		$this->addColumn($this->lng->txt("firstname"), "firstname");		
 		$this->addColumn($this->lng->txt("login"), "login");
 		
+		// patch uzk start
+		$this->addColumn($this->lng->txt("wsp_shared_title"), "title");
+		
 		if(!$this->portfolio_mode)
 		{
 			$this->addColumn($this->lng->txt("wsp_shared_object_type"), "obj_type");
 		}
 		
-		$this->addColumn($this->lng->txt("wsp_shared_date"), "acl_date");
-		$this->addColumn($this->lng->txt("wsp_shared_title"), "title");
+		$this->addColumn($this->lng->txt("wsp_shared_date"), "acl_date");	
+		// patch uzk end
+		
 		$this->addColumn($this->lng->txt("wsp_shared_type"));
 		
 		if(!$this->portfolio_mode)
@@ -70,6 +79,11 @@ class ilWorkspaceShareTableGUI extends ilTable2GUI
 
 		$this->setFormAction($ilCtrl->getFormAction($a_parent_obj));
 		$this->setRowTemplate("tpl.shared_row.html", "Services/PersonalWorkspace");
+		
+		// patch uzk start		
+		// $this->setDisableFilterHiding(true);
+		$this->enablePersistentFilters("wsp_");
+		// patch uzk end
 		
 		$this->setDisableFilterHiding(true);
 		$this->setResetCommand("resetsharefilter");
@@ -115,27 +129,55 @@ class ilWorkspaceShareTableGUI extends ilTable2GUI
 				
 		$lng->loadLanguageModule("search");
 		
-		$item = $this->addFilterItemByMetaType("user", self::FILTER_TEXT, false, $lng->txt("wsp_shared_user_filter"));
-		$this->filter["user"] = $item->getValue();
+		// patch uzk start		
 				
-		// incoming back link (shared)
-		if((int)$_REQUEST["shr_id"] && !$this->filter["user"])
+		// see ilWorkspaceAccessGUI::share
+		$options = array();
+		$options["user"] = $lng->txt("wsp_permission_shared_user");
+		
+		if(sizeof($this->grp_ids))
+		{			
+			$options["group"] = $lng->txt("wsp_permission_shared_group");
+		}
+		
+		if(sizeof($this->crs_ids))
 		{
-			$this->filter["user"] = ilObjUser::_lookupName((int)$_REQUEST["shr_id"]);
-			$this->filter["user"] = $this->filter["user"]["login"];
-			$item->setValue($this->filter["user"]);
-		}				
+			$options["course"] = $lng->txt("wsp_permission_shared_course");
+		}
 		
-		$item = $this->addFilterItemByMetaType("title", self::FILTER_TEXT, false, $lng->txt("wsp_shared_title"));
-		$this->filter["title"] = $item->getValue();
+		/*
+		$options["registered"] = $lng->txt("wsp_set_permission_registered");
 		
-		$item = $this->addFilterItemByMetaType("acl_date", self::FILTER_DATE, false, $lng->txt("wsp_shared_date_filter"));
-		$this->filter["acl_date"] = $item->getDate();
+		if($ilSetting->get("enable_global_profiles"))
+		{						
+			$options["password"] = $this->lng->txt("wsp_set_permission_all_password");			
+			$options["all"] = $this->lng->txt("wsp_set_permission_all");					
+		}		
+		$options["all"] = $lng->txt("wsp_permission_shared_all");
+		*/ 
 		
+		if(sizeof($options))
+		{
+			// asort($options);				
+			$item = $this->addFilterItemByMetaType("acl_type", self::FILTER_SELECT_MULTI, false, $lng->txt("wsp_shared_type"));
+			$item->setOptions($options);
+						
+			// none == all for multi-checkbox
+			if(!is_array($item->getValue()) || 
+				!sizeof($item->getValue()))
+			{
+				$options = $item->getOptions();				
+				unset($options["all"]);
+				$this->setFilterValue($item, array_keys($options));				
+			}			
+			
+			$this->filter["acl_type"] = $item->getValue();
+		}
+			
 		if(!$this->portfolio_mode)
 		{
-			// see ilPersonalWorkspaceGUI::renderToolbar
-			$options = array(""=>$lng->txt("search_any"));
+			// see ilPersonalWorkspaceGUI::renderToolbar					 			
+			$options = array();						
 			$settings_map = array("blog" => "blogs",
 				"file" => "files");
 			// see ilObjWorkspaceFolderTableGUI	
@@ -154,52 +196,38 @@ class ilWorkspaceShareTableGUI extends ilTable2GUI
 		}
 		if(sizeof($options))
 		{
-			asort($options);
-			$item = $this->addFilterItemByMetaType("obj_type", self::FILTER_SELECT, false, $lng->txt("wsp_shared_object_type"));
+			asort($options);							
+			$item = $this->addFilterItemByMetaType("obj_type", self::FILTER_SELECT_MULTI, false, $lng->txt("wsp_shared_object_type"));			
 			$item->setOptions($options);
-			$this->filter["obj_type"] = $item->getValue();
-		}		
-		
-		// see ilWorkspaceAccessGUI::share
-		$options = array();
-		$options["user"] = $lng->txt("wsp_set_permission_single_user");
-		
-		if(sizeof($this->grp_ids))
-		{			
-			$options["group"] = $lng->txt("wsp_set_permission_group");
-		}
-		
-		if(sizeof($this->crs_ids))
-		{
-			$options["course"] = $lng->txt("wsp_set_permission_course");
-		}
-		
-		if(!$this->handler->hasRegisteredPermission($this->parent_node_id))
-		{
-			$options["registered"] = $lng->txt("wsp_set_permission_registered");
-		}
-		
-		if($ilSetting->get("enable_global_profiles"))
-		{			
-			if(!$this->handler->hasGlobalPasswordPermission($this->parent_node_id))
-			{
-				$options["password"] = $this->lng->txt("wsp_set_permission_all_password");
-			}
-
-			if(!$this->handler->hasGlobalPermission($this->parent_node_id))
-			{
-				$options["all"] = $this->lng->txt("wsp_set_permission_all");		
-			}
-		}
-		
-		if(sizeof($options))
-		{
-			// asort($options);
-			$item = $this->addFilterItemByMetaType("acl_type", self::FILTER_SELECT, false, $lng->txt("wsp_shared_type"));
-			$item->setOptions(array(""=>$lng->txt("search_any"))+$options);
-			$this->filter["acl_type"] = $item->getValue();
-		}
 						
+			// none == all for multi-checkbox
+			if(!is_array($item->getValue()) || 
+				!sizeof($item->getValue()))
+			{
+				$this->setFilterValue($item, array_keys($item->getOptions()));				
+			}			
+			
+			$this->filter["obj_type"] = $item->getValue();
+		}				
+				
+		$item = $this->addFilterItemByMetaType("user", self::FILTER_TEXT, false, $lng->txt("wsp_shared_user_filter"));
+		$this->filter["user"] = $item->getValue();
+				
+		// incoming back link (shared)
+		if((int)$_REQUEST["shr_id"] && !$this->filter["user"])
+		{
+			$this->filter["user"] = ilObjUser::_lookupName((int)$_REQUEST["shr_id"]);
+			$this->filter["user"] = $this->filter["user"]["login"];
+			$item->setValue($this->filter["user"]);
+		}						
+		
+		$item = $this->addFilterItemByMetaType("title", self::FILTER_TEXT, false, $lng->txt("wsp_shared_title"));
+		$this->filter["title"] = $item->getValue();
+		
+		$item = $this->addFilterItemByMetaType("acl_date", self::FILTER_DATE, false, $lng->txt("wsp_shared_date_filter"));
+		$this->filter["acl_date"] = $item->getDate();
+		
+		/*
 		if(sizeof($this->crs_ids) || sizeof($this->grp_ids))
 		{
 			$options = array();
@@ -216,6 +244,9 @@ class ilWorkspaceShareTableGUI extends ilTable2GUI
 			$item->setOptions(array(""=>$lng->txt("search_any"))+$options);
 			$this->filter["crsgrp"] = $item->getValue();
 		}
+		*/
+		
+		// patch uzk end			
 	}
 	
 	protected function importData()

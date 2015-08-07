@@ -212,6 +212,61 @@ class ilObjBlog extends ilObject2
 		}
 	}
 	
+	// patch uzk start
+	public function doWorkspaceToRepo(ilObjBlog $a_target_obj)
+	{
+		$this->clonePostings($a_target_obj);
+		
+	}
+	
+	public function doRepoToWorkspace(ilObjBlog $a_target_obj)
+	{
+		$this->clonePostings($a_target_obj);
+	}
+	
+	protected function clonePostings(ilObjBlog $a_target_obj)
+	{				
+		// see ilObjPortfolioBase::clonePagesAndSettings()
+		
+		$source_id = $this->getId();
+		$target_id = $a_target_obj->getId(); 
+		
+		include_once "Modules/Blog/classes/class.ilBlogPosting.php";
+		foreach(ilBlogPosting::getAllPostings($source_id) as $page)
+		{
+			$page_id = $page["id"];	
+			
+			$source_page = new ilBlogPosting($page_id);	
+			$source_page->setBlogId($source_id);
+			
+			$target_page = new ilBlogPosting();				
+			$target_page->setBlogId($target_id);
+			$target_page->setTitle($source_page->getTitle());
+			
+			// blog posting attributes
+			$target_page->setAuthor($source_page->getAuthor());
+			$target_page->setCreated($source_page->getCreated());
+			$target_page->setApproved($source_page->isApproved());
+						
+			$target_page->setXMLContent($source_page->copyXmlContent(true)); // copy mobs				
+			$target_page->create();		
+			
+			$target_page->update();	// handle mob usages!					
+		}		
+	}
+	
+	public static function isSingleAuthor($a_blog_id)
+	{
+		global $ilDB;
+		
+		$set = $ilDB->query("SELECT DISTINCT(author)".
+			" FROM il_blog_posting".
+			" WHERE blog_id = ".$ilDB->quote($a_blog_id, "integer"));
+		return ($ilDB->numRows($set) <= 1);
+	}
+	
+	// patch uzk end
+	
 	/**
 	 * Get notes status
 	 * 

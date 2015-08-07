@@ -19,9 +19,6 @@
 <div class="ilTableFilterSec" id = "tfil_{FIL_ID}" style="display:none;">
 <fieldset class="ilTableFilter">
 <legend class="ilTableFilter"><!--{TXT_FILTER}-->
-<!-- BEGIN filter_deactivation -->
-<a href="#" class="ilTableFilterDeactivator btn btn-link" id = "dtfil_{FILD_ID}" onclick="return ilHideTableFilter('tfil_{FILD_ID}', '{SAVE_URL}');">{TXT_HIDE}</a>
-<!-- END filter_deactivation -->
 </legend>
 <!-- BEGIN filter_select -->
 <input type="submit" class="btn btn-default" name="cmd[{HIDDEN_CMD_APPLY}]" style="display:none;" />
@@ -69,6 +66,9 @@
 	<!-- BEGIN filter_activation -->
 	<a class="btn btn-link ilTableFilterActivator" id = "atfil_{FILA_ID}" href="#" onclick="return ilShowTableFilter('tfil_{FILA_ID}', '{SAVE_URLA}');">{TXT_ACTIVATE_FILTER}</a>
 	<!-- END filter_activation -->
+	<!-- BEGIN filter_deactivation -->
+	<a href="#" class="ilTableFilterDeactivator submit" id = "dtfil_{FILD_ID}" onclick="return ilHideTableFilter('tfil_{FILD_ID}', '{SAVE_URL}');">{TXT_HIDE}</a>
+	<!-- END filter_deactivation -->	
 	<!-- BEGIN filter_hidden -->
 	<script type="text/javascript">
 	ilTableHideFilter['atfil_{FI_ID}'] = true;
@@ -182,6 +182,9 @@
   </tr>
 <!-- END tbl_content_row -->
 {TBL_CONTENT}
+<!-- BEGIN tbl_ajax_pages_bl -->
+<tr id="{TBL_AJAX_TARGET_ID}"><td><a name="{TBL_BOTTOM_ANCHOR}"></a></td></tr>
+<!-- END tbl_ajax_pages_bl -->
 <!-- BEGIN tbl_no_entries -->
   <tr class="{TBL_NO_ENTRY_CSS_ROW}">
   	<td style="text-align:center;" colspan="{TBL_NO_ENTRY_COLUMN_COUNT}">{TBL_NO_ENTRY_TEXT}</td>

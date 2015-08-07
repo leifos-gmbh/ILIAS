@@ -375,32 +375,33 @@ class ilWorkspaceAccessHandler
 		{
 			include_once "Services/PersonalWorkspace/classes/class.ilWorkspaceAccessGUI.php";
 			
-			switch($a_filter["acl_type"])
+			// patch uzk start
+			
+			$obj_ids = array();
+					
+			if(in_array("user", $a_filter["acl_type"]))
 			{
-				case "all":
-					$obj_ids = array(ilWorkspaceAccessGUI::PERMISSION_ALL);					
-					break;
-				
-				case "password":
-					$obj_ids = array(ilWorkspaceAccessGUI::PERMISSION_ALL_PASSWORD);			
-					break;
-				
-				case "registered":
-					$obj_ids = array(ilWorkspaceAccessGUI::PERMISSION_REGISTERED);		
-					break;
-				
-				case "course":
-					$obj_ids = $a_crs_ids;
-					break;
-								
-				case "group":
-					$obj_ids = $a_grp_ids;
-					break;
-				
-				case "user":
-					$obj_ids = array($ilUser->getId());	
-					break;								
+				$obj_ids[] = $ilUser->getId();	
 			}
+
+			if(in_array("all", $a_filter["acl_type"]))
+			{
+				$obj_ids[] = ilWorkspaceAccessGUI::PERMISSION_ALL;		
+				$obj_ids[] = ilWorkspaceAccessGUI::PERMISSION_ALL_PASSWORD;	
+				$obj_ids[] = ilWorkspaceAccessGUI::PERMISSION_REGISTERED;	
+			}
+
+			if(in_array("course", $a_filter["acl_type"]))
+			{
+				$obj_ids = array_merge($obj_ids, $a_crs_ids);	
+			}
+
+			if(in_array("group", $a_filter["acl_type"]))
+			{
+				$obj_ids = array_merge($obj_ids, $a_grp_ids);	
+			}											
+			
+			// patch uzk end
 		}
 		
 		$res = array();
@@ -414,10 +415,13 @@ class ilWorkspaceAccessHandler
 			" WHERE ".$ilDB->in("acl.object_id", $obj_ids, "", "integer").
 			" AND obj.owner <> ".$ilDB->quote($ilUser->getId(), "integer");
 		
+		// patch uzk start
 		if($a_filter["obj_type"])
 		{
-			$sql .= " AND obj.type = ".$ilDB->quote($a_filter["obj_type"], "text");
+			$sql .= " AND ".$ilDB->in("obj.type", $a_filter["obj_type"], "", "text");
 		}
+		// patch uzk end
+		
 		if($a_filter["title"] && strlen($a_filter["title"]) >= 3)
 		{
 			$sql .= " AND ".$ilDB->like("obj.title", "text", "%".$a_filter["title"]."%");
@@ -448,10 +452,12 @@ class ilWorkspaceAccessHandler
 			$sql .= " AND acl.tstamp > ".$ilDB->quote($dt->get(IL_CAL_UNIX), "integer");
 		}
 		
+		// patch uzk start
+		/*
 		if($a_filter["crsgrp"])
 		{
 			include_once "Services/Membership/classes/class.ilParticipants.php";
-			$part = ilParticipants::getInstanceByObjId($a_filter['crsgrp']);
+			$part = new ilParticipants($a_filter["crsgrp"]);
 			$part = $part->getParticipants();
 			if(!sizeof($part))
 			{
@@ -459,6 +465,8 @@ class ilWorkspaceAccessHandler
 			}
 			$sql .= " AND ".$ilDB->in("obj.owner", $part, "", "integer");					
 		}
+		*/
+		// patch uzk end
 	
 		// we use the oldest share date
 		$sql .= " ORDER BY acl.tstamp";

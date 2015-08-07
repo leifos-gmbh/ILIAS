@@ -268,8 +268,15 @@ class ilSharedResourceGUI
 				
 			case "file":
 			case "webr":
+				// patch uzk start
+				$cmd = "";
+				if(stristr($_GET["target"], "download"))
+				{
+					$cmd = "sendfile";
+				}				
 				$ilCtrl->setParameterByClass($gui, "wsp_id", $a_node_id);
-				$ilCtrl->redirectByClass($gui);
+				$ilCtrl->redirectByClass($gui, $cmd);
+				// patch uzk end
 				
 			case "prtf":
 				$ilCtrl->setParameterByClass($gui, "prt_id", $a_node_id);

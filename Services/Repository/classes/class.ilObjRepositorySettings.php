@@ -287,6 +287,20 @@ class ilObjRepositorySettings extends ilObject
 		
 		return $res;
 	}
+	
+	// patch aachen begin
+	
+	public static function deleteObjectType($a_type)
+	{
+		global $ilSetting;
+		
+		// see ilObjRepositorySettingsGUI::saveModules()
+		$ilSetting->delete("obj_dis_creation_".$a_type);
+		$ilSetting->delete("obj_add_new_pos_".$a_type);												
+		$ilSetting->delete("obj_add_new_pos_grp_".$a_type);		
+	}
+	
+	// patch aachen end
 }
 	
 ?>

@@ -212,7 +212,7 @@ abstract class ilRepositoryObjectPlugin extends ilPlugin
 		return true; 
 	}
 	
-	abstract protected function uninstallCustom();
+	// abstract protected function uninstallCustom();
 	
 	final protected function beforeUninstall()
 	{		
@@ -222,8 +222,9 @@ abstract class ilRepositoryObjectPlugin extends ilPlugin
 			$rep_util = new ilRepUtil();
 			$rep_util->deleteObjectType($this->getId());
 			
+			// disabled because down-patch!
 			// custom database tables may be needed by plugin repository object
-			$this->uninstallCustom();
+			// $this->uninstallCustom();
 
 			return true;
 		}

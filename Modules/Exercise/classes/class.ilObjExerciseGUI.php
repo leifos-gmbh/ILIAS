@@ -490,8 +490,12 @@ class ilObjExerciseGUI extends ilObjectGUI
 		{
 			$this->tabs_gui->clearTargets();
 			$this->tabs_gui->setBackTarget($this->lng->txt("back"), 
-				$this->ctrl->getLinkTarget($this, "submissionScreen"));		
-			
+				$this->ctrl->getLinkTarget($this, "submissionScreen"));
+
+			global $ilHelp;
+			$ilHelp->setScreenIdComponent("exc");
+			$ilHelp->setScreenId("upload_submission");
+
 			$this->initUploadForm();
 			$this->tpl->setContent($this->form->getHTML());
 		}
@@ -4007,9 +4011,17 @@ class ilObjExerciseGUI extends ilObjectGUI
 		
 		$this->checkPermission("read");		
 			
-		$ilTabs->activateTab("content");
-		$this->addContentSubTabs("content");
-		
+		//$ilTabs->activateTab("content");
+		//$this->addContentSubTabs("content");
+
+		$this->tabs_gui->clearTargets();
+		$this->tabs_gui->setBackTarget($this->lng->txt("back"),
+			$this->ctrl->getLinkTarget($this, "showOverview"));
+
+		global $ilHelp;
+		$ilHelp->setScreenIdComponent("exc");
+		$ilHelp->setScreenId("text_submission");
+
 		if($this->ass->getDeadline())
 		{
 			ilUtil::sendInfo($this->lng->txt("exc_edit_until").": ".
@@ -4265,14 +4277,22 @@ class ilObjExerciseGUI extends ilObjectGUI
 		$tpl->setContent($tbl->getHTML());		
 	}
 	
+	protected function canPeerReviewBeEdited()
+	{
+		// #16130
+		return ($this->ass &&
+			$this->ass->getPeerReview()  &&
+			$this->ass->getDeadline() &&
+			$this->ass->getDeadline() < time() &&
+			(!$this->ass->getPeerReviewDeadline() ||
+			$this->ass->getPeerReviewDeadline() > time()));
+	}
+	
 	function editPeerReviewObject()
 	{
 		global $ilCtrl, $ilUser, $tpl;
 				
-		if(!$this->ass || 
-			!$this->ass->getPeerReview() ||
-			!$this->ass->getDeadline() ||
-			$this->ass->getDeadline()-time() > 0)				
+		if(!$this->canPeerReviewBeEdited())				
 		{
 			$ilCtrl->redirect($this, "showOverview");
 		}
@@ -4319,8 +4339,7 @@ class ilObjExerciseGUI extends ilObjectGUI
 	{
 		global $ilUser, $ilCtrl;
 		
-		if(!$this->ass || 
-			!$this->ass->getPeerReview() ||
+		if(!$this->canPeerReviewBeEdited() ||
 			!sizeof($_POST["pc"]))				
 		{
 			$ilCtrl->redirect($this, "showOverview");
@@ -4340,7 +4359,7 @@ class ilObjExerciseGUI extends ilObjectGUI
 			$parts = explode("__", $idx);					
 			if($parts[0] == $ilUser->getId())
 			{
-				$this->ass->updatePeerReviewComment($parts[1], $value);				
+				$this->ass->updatePeerReviewComment($parts[1], ilUtil::stripSlashes($value)); // #16128					
 			}			
 		}
 		
@@ -4352,10 +4371,7 @@ class ilObjExerciseGUI extends ilObjectGUI
 	{
 		global $ilCtrl, $ilUser, $tpl;
 		
-		if(!$this->ass || 
-			!$this->ass->getPeerReview() ||
-			!$this->ass->getDeadline() ||
-			$this->ass->getDeadline()-time() > 0 ||
+		if(!$this->canPeerReviewBeEdited() ||
 			!sizeof($_POST["pc"]) ||
 			!$ilCtrl->isAsynch())				
 		{
@@ -4375,7 +4391,7 @@ class ilObjExerciseGUI extends ilObjectGUI
 		{
 			if($peer_id)
 			{
-				$this->ass->updatePeerReviewComment($peer_id, $value);				
+				$this->ass->updatePeerReviewComment($peer_id, ilUtil::stripSlashes($value)); // #16128				
 			}
 		}
 		
@@ -4408,16 +4424,13 @@ class ilObjExerciseGUI extends ilObjectGUI
 	{
 		global $ilCtrl;
 		
-		if(!$this->ass || 
-			!$this->ass->getPeerReview() ||
-			!$this->ass->getDeadline() ||
-			$this->ass->getDeadline()-time() > 0 ||
+		if(!$this->canPeerReviewBeEdited() ||
 			!(int)$_REQUEST["peer_id"])
 		{
 			$ilCtrl->redirect($this, "editPeerReview");	
 		}
 		
-		$this->ass->updatePeerReviewComment((int)$_REQUEST["peer_id"], trim($_POST["comm"]));		
+		$this->ass->updatePeerReviewComment((int)$_REQUEST["peer_id"], ilUtil::stripSlashes(trim($_POST["comm"])));	// #16128			
 		
 		ilUtil::sendInfo($this->lng->txt("exc_peer_review_updated"), true);
 		$ilCtrl->redirect($this, "editPeerReview");	

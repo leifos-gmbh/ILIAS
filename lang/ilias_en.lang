@@ -1062,6 +1062,7 @@ assessment#:#tst_reset_processing_time_desc#:#The duration will be reset to the 
 assessment#:#tst_reset_processing_time#:#Reset duration for every test pass
 assessment#:#tst_result_user_name_pass#:#Results of Test Pass %s for %s
 assessment#:#tst_result_user_name#:#Test Results for %s
+assessment#:#tst_result_pass#:#Results of Test Pass
 assessment#:#tst_results_access_always#:#Immediately
 assessment#:#tst_results_access_always_desc#:#Participants can access their results on the ‘Info’-tab immediately after starting the test pass and while still taking the test. Additionally ILIAS will present them with their test results immediately after finishing  the test.
 assessment#:#tst_results_access_date#:#Date
@@ -11021,7 +11022,7 @@ notes#:#notes_private_annotating#:#Private Annotation
 tagging#:#tagging_set_tag#:#Set Tags
 content#:#cont_link_to_internal#:#Link to ILIAS Resource
 content#:#cont_link_to_external#:#Link to External Website
-content#:#cont_link_to_wiki#:#Link to Wiki Page
+content#:#cont_link_to_wiki#:#Link to Wiki Page (Insert Brackets)
 content#:#cont_standard#:#Standard
 content#:#cont_char_style_com#:#Comment
 content#:#cont_char_style_quot#:#Quotation
@@ -13153,7 +13154,7 @@ blog#:#blog_toggle_draft_admin#:#Deactivate Blog Posting
 blog#:#blog_keywords_info#:#Use +/- icons to add and remove keywords.
 forum#:#merge#:#Merge
 forum#:#please_choose_target#:#Please choose a thread as merge target.
-forum#:#frm_sure_merge_threads#:#Are you sure you want to merge these threads? Warning: This action can not be undone! Eventually ILIAS swaps source and target thread if the first posting of the source thread is created earlier than the first posting of the target thread.
+forum#:#frm_sure_merge_threads#:#Are you sure you want to merge these threads? Warning: This action can not be undone.
 forum#:#not_allowed_to_merge_into_another_forum#:#It is not possible to merge threads of different forums.
 forum#:#frm_selected_merge_src#:#Selected Thread to Merge: %s
 forum#:#error_same_thread_ids#:#Source and target thread have to be different.
@@ -13284,6 +13285,10 @@ bibl#:#attr_order_bibtex#:#Attribute Order (Bibtex)
 bibl#:#attr_order_bibtex_info#:#default: isbn,issn,title
 bibl#:#attr_order_ris#:#Attribute Order (ris)
 bibl#:#attr_order_ris_info#:#default: sn,ti, t1
+bibl#:#news_title_created#:#New bibliography list added
+bibl#:#news_content_created#:#A new bibliography list has been added. You can view the entries by clicking the link to the item.
+bibl#:#news_title_updated#:#Bibliography list updated
+bibl#:#news_content_updated#:#The bibliography list has been modified. You can view the new entries by clicking the link to the item.
 rbac#:#bibl_visible#:#Bibliography is visible
 rbac#:#bibl_read#:#User can read bibliography content
 rbac#:#bibl_copy#:#Copy Bibliography
@@ -13821,6 +13826,7 @@ dcl#:#fieldtitle_allow_chars#:#Allowed chars: %s
 dcl#:#add_value#:#Add New Entry
 common#:#objs_orgu#:#Organisational Unit
 common#:#obj_orgu#:#Organisational Unit
+common#:#obj_orgu_description#:#Creating and editing organisational structure
 orgu#:#view_learning_progress#:#View Learning Progress
 orgu#:#il_orgu_employee#:#Employee
 orgu#:#orgu_staff_deassign#:#Are you sure you want to deassign these users from this role?
@@ -15243,3 +15249,49 @@ meta#:#md_adv_confirm_definition_select_option_all_action#:#New Value
 file#:#file_import#:#Import File
 cron#:#cron_result_status_fail#:#Failed
 wiki#:#wiki_unhide_meta_adv_records#:#Show additional properties
+content#:#cont_wiki_link_dialog#:#Link to Wiki Page (Dialog)
+link#:#link_link#:#Link
+prtt#:#prtt_portfolio_created#:#Portfolio Template added
+forum#:#frm_censorship#:#Censor
+forum#:#frm_revoke_censorship#:#Revoke Censorship
+forum#:#frm_censorship_applied#:#The censorship has been successfully applied.
+forum#:#frm_censorship_revoked#:#The censorship has been successfully revoked.
+forum#:#frm_mark_as_read#:#Mark as read
+forum#:#frm_mark_as_unread#:#Mark as unread
+sysc#:#sysc_overview#:#Overview
+sysc#:#sysc_groups#:#System Check Groups
+sysc#:#sysc_grp_tree#:#Repository Tree
+sysc#:#sysc_grp_tree_desc#:#Performs an analysis of the tree and prints all tree nodes along with analysis data.
+sysc#:#sysc_completed_num#:#Fullfilled Tasks
+sysc#:#sysc_failed_num#:#Not Fullfilled Tasks
+sysc#:#sysc_task_overview#:#Tasks
+sysc#:#sysc_action_validate#:#Validate
+sysc#:#sysc_action_repair#:#Repair
+sysc#:#sysc_task_tree_duplicates#:#Duplicate Entries in Repository Tree
+sysc#:#sysc_task_tree_duplicates_desc#:#Search for duplicate entries in the repository tree structure.
+sysc#:#sysc_task_tree_dump#:#List Tree
+sysc#:#sysc_task_tree_dump_desc#:#Analyses and prints the repository tree structure
+sysc#:#sysc_action_list_tree#:#Create Repository Tree Dump
+sysc#:#sysc_action_show_tree#:#Show Repository Tree Dump
+sysc#:#sysc_tree_duplicate_failures#:#Found duplicate entries in tree structure. Number of duoplicate entries
+sysc#:#sysc_message_success#:#No errors found
+sysc#:#sysc_tree_list_failures#:#A dump of the the repository tree has been created. Number of errors in tree structure:
+sysc#:#sysc_status_na#:#Not Executed
+sysc#:#sysc_status_running#:#Running
+sysc#:#sysc_status_failed#:#Failed
+sysc#:#sysc_status_completed#:#Completed
+sysc#:#sysc_task_tree_missing#:#Missing Entries in Repository Tree
+sysc#:#sysc_task_tree_missing_desc#:#Searches and repairs missing entries in the repository tree.
+sysc#:#sysc_message_tree_missing_confirm#:#Do you really want to restore missing entries in the repository tree structure?
+sysc#:#sysc_btn_tree_missing#:#Restore Missing
+sysc#:#sysc_tree_missing_failures#:#Found missing entries in the tree structure. Number of missing entries:
+sysc#:#sysc_cron_empty_trash#:#Delete Trash Bin
+sysc#:#sysc_cron_empty_trash_desc#:#If enabled, the repository trash bin will be purged by given criteria (age, object type or maximum number of objects).
+sysc#:#sysc_task_tree_missing_tree#:#Missing Entries in Repository Tree
+sysc#:#sysc_task_tree_missing_tree_desc#:#Searches and repairs missing entries in the repository tree.
+sysc#:#sysc_task_tree_missing_reference#:#Missing Object References
+sysc#:#sysc_task_tree_missing_reference_desc#:#Searches and repairs missing object references in the repository tree.
+sysc#:#sysc_task_structure#:#Tree structure
+sysc#:#sysc_task_structure_desc#:#Analyzes and corrects the repository tree structure.
+blog#:#blog_keywords_other#:#Other Keywords
+blog#:#blog_keywords_other_info#:#These keywords were set for other blog postings.

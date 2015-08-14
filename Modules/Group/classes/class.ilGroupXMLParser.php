@@ -142,6 +142,15 @@ class ilGroupXMLParser extends ilSaxParser
 		{
 			// GROUP DATA
 			case "group":
+				
+				// begin-patch fhoev
+				if ($a_attribs['importId'])
+				{
+					$this->group_data["importId"] = $a_attribs['importId'];
+				}
+				// end-patch fhoev			
+				
+				// DEFAULT
 				$this->group_data["admin"] = array();
 				$this->group_data["member"] = array();
 
@@ -354,8 +363,14 @@ class ilGroupXMLParser extends ilSaxParser
 		}
 
 		$this->__initGroupObject();
-	
-		$this->group_obj->setImportId($this->group_data["id"]);
+		
+		// begin-patch fhoev
+		if($this->group_data['importId'])
+		{
+			$this->group_obj->setImportId($this->group_data["importId"]);
+		}
+		// end-patch fhoev
+		
 		$this->group_obj->setTitle($this->group_data["title"]);
 		$this->group_obj->setDescription($this->group_data["description"]);
 		$this->group_obj->setInformation((string) $this->group_data['information']);

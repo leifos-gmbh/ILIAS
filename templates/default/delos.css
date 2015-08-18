@@ -8676,8 +8676,8 @@ input.ilOpenIDBox {
 #ilTopBarNav .badge {
   font-size: 9px;
   padding: 2px 4px;
-  margin-top: -3px;
-  margin-left: -5px;
+  margin-top: -5px;
+  margin-left: -4px;
   position: absolute;
 }
 #ilTopBarNav .ilBadgeSpacer {
@@ -8710,6 +8710,7 @@ input.ilOpenIDBox {
   padding: 10px;
   position: relative;
   min-width: 40px;
+  height: 40px;
   text-align: center;
   background-color: #767676;
   color: #f5f5f5;
@@ -10843,6 +10844,27 @@ div.ilChecklist ul li img {
   margin-top: -10px;
   margin-left: 100px;
 }
+#awareness_trigger {
+  display: block;
+}
+#awareness_trigger > span {
+  display: table-cell;
+}
+#awareness_trigger .ilBadgeSpacer {
+  display: inline-block;
+  height: 1px;
+}
+#awareness_hbadge {
+  display: block;
+  height: 16px;
+}
+#awareness_badge {
+  display: block;
+  height: 1px;
+}
+#awareness_badge .badge {
+  background-color: #A0A0A0;
+}
 .ilAwarenessDropDown h3.popover-title {
   display: none;
 }
@@ -10868,6 +10890,10 @@ div.ilChecklist ul li img {
 #il_awrn_filer_btn img {
   width: 10px;
   height: 10px;
+}
+#awareness-content .ilHighlighted {
+  background-color: #ffff9d;
+  color: #606060;
 }
 .noMargin {
   margin: 0;

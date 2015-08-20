@@ -495,8 +495,8 @@ class ilGroupXMLParser extends ilSaxParser
 		global $ilias,$ilUser;
 
 		$this->participants = new ilGroupParticipants($this->group_obj->getId());
-		$this->participants->add($ilUser->getId(),IL_GRP_ADMIN);
-		$this->participants->updateNotification($ilUser->getId(),true);
+		#$this->participants->add($ilUser->getId(),IL_GRP_ADMIN);
+		#$this->participants->updateNotification($ilUser->getId(),true);
 		
 		// attach ADMINs
 		if (count($this->group_data["admin"]["attach"]))

@@ -723,7 +723,7 @@ abstract class ilObjPortfolioBaseGUI extends ilObject2GUI
 	
 		// #10717
 		$this->tpl->setContent($content.
-			'<div class="ilClearFloat">'.$note.'</div>');					
+			'<div class="ilClearFloat">'.$notes.'</div>');					
 	}
 	
 	/**

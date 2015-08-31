@@ -190,6 +190,7 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 			// replacement of old syntax with new syntax
 			include_once("./Services/RTE/classes/class.ilRTE.php");
 			$this->question = ilRTE::_replaceMediaObjectImageSrc($this->question, 1);
+			$this->cloze_text = ilRTE::_replaceMediaObjectImageSrc($this->cloze_text, 1);
 			$this->setTextgapRating($data["textgap_rating"]);
 			$this->setEstimatedWorkingTime(substr($data["working_time"], 0, 2), substr($data["working_time"], 3, 2), substr($data["working_time"], 6, 2));
 			
@@ -903,11 +904,7 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 		}
 		// duplicate the question in database
 		$this_id = $this->getId();
-		
-		if( (int)$testObjId > 0 )
-		{
-			$thisObjId = $this->getObjId();
-		}
+		$thisObjId = $this->getObjId();
 		
 		$clone = $this;
 		include_once ("./Modules/TestQuestionPool/classes/class.assQuestion.php");
@@ -1519,7 +1516,7 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 	*/
 	function getRTETextWithMediaObjects()
 	{
-		return parent::getRTETextWithMediaObjects();
+		return parent::getRTETextWithMediaObjects() . $this->getClozeText();
 	}
 	function getGapCombinationsExists()
 	{
@@ -1595,7 +1592,7 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 		$result['type'] = (string) $this->getQuestionType();
 		$result['title'] = (string) $this->getTitle();
 		$result['question'] =  $this->formatSAQuestion(
-			$this->getQuestion() . '<br/>' . $this->getClozeText(), "\<span class\=\"latex\">", "\<\/span>"
+			$this->getQuestion() . '<br/>' . $this->getClozeText()
 		);
 		$result['nr_of_tries'] = (int) $this->getNrOfTries();
 		$result['shuffle'] = (bool) $this->getShuffle();

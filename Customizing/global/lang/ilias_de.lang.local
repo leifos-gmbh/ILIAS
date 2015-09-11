@@ -18,7 +18,7 @@ common#:#footer_active_users#:#Aktive Benutzer
 common#:#footer_active_anonymous#:#Benutzer im öffentl. Bereich
 trac#:#exception#:#Ausnahme
 common#:#mfs_please_wait#:#Bitte warten...
-common#:#mfs_please_wait_info#:#Ihre Anfrage wird bearbeitet. Bitte warten Sie!
+common#:#mfs_please_wait_info#:#Die Seite wird aktualisiert.
 common#:#mfs_please_wait_info_search#:#Suche läuft, bitte warten!
 wsp#:#wsp_permission_shared_user#:#Mich
 wsp#:#wsp_permission_shared_course#:#Aus meinen Kursen

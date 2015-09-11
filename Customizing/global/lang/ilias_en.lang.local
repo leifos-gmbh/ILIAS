@@ -18,7 +18,7 @@ common#:#footer_active_users#:#Active Users
 common#:#footer_active_anonymous#:#Users in Public Area
 trac#:#exception#:#Exception
 common#:#mfs_please_wait#:#Please wait...
-common#:#mfs_please_wait_info#:#Your request will be being processed. Please have some patience.
+common#:#mfs_please_wait_info#:#Refreshing page.
 common#:#mfs_please_wait_info_search#:#Your search request will be being processed. Please have some patience.
 wsp#:#wsp_permission_shared_user#:#Me
 wsp#:#wsp_permission_shared_course#:#From my courses

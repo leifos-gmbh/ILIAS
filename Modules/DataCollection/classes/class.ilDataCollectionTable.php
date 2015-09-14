@@ -785,8 +785,7 @@ class ilDataCollectionTable {
 	public function hasPermissionToViewRecord($ref_id, $record) {
 		global $ilUser, $rbacreview;
 		/** @var ilRbacReview $rbacreview */
-		// Owner of the DataCollection object and ILIAS Administrators can view each record by default
-		if ($this->getCollectionObject()->getOwner() == $ilUser->getId() || $rbacreview->isAssigned($ilUser->getId(), 2)) {
+		if (ilObjDataCollectionAccess::hasWriteAccess($ref_id)) {
 			return true;
 		}
 		if (ilObjDataCollectionAccess::hasReadAccess($ref_id)) {
@@ -1342,7 +1341,7 @@ class ilDataCollectionTable {
 			if ($id == 'owner' || $id == 'last_edit_by') {
 				$join_str .= "LEFT JOIN usr_data AS sort_usr_data_{$id} ON (sort_usr_data_{$id}.usr_id = record.{$id})";
 				$select_str .= " sort_usr_data_{$id}.login AS field_{$id},";
-			} else {
+			} elseif ($id != 'comments') {
 				$select_str .= " record.{$id} AS field_{$id},";
 			}
 		} else {
@@ -1538,26 +1537,51 @@ class ilDataCollectionTable {
 		}
 
 		// Build the query string
-		$sql = "SELECT DISTINCT record.id, record.owner, ";
+		$sql = "SELECT DISTINCT record.id, record.owner";
+		if($select_str) {
+			$sql .= ', ';
+		}
 		$sql .= rtrim($select_str, ',') . " FROM il_dcl_record AS record ";
 		$sql .= $join_str;
 		$sql .= " WHERE record.table_id = " . $ilDB->quote($this->getId(), 'integer') . $where_additions;
 		if ($has_nref) {
 			$sql .= " GROUP BY record.id";
 		}
-		$sql .= " ORDER BY field_{$id} {$direction}";
+		if($id != 'comments' && $sort_field->getDatatypeId() != ilDataCollectionDatatype::INPUTFORMAT_FORMULA) {
+			$sql .= " ORDER BY field_{$id} {$direction}";
+		}
+
 		$set = $ilDB->query($sql);
 		$total_record_ids = array();
 		// Save record-ids in session to enable prev/next links in detail view
 		$_SESSION['dcl_record_ids'] = array();
-		$is_allowed_to_view = ($this->getCollectionObject()->getOwner() == $ilUser->getId() || ($rbacreview->isAssigned($ilUser->getId(), 2)));
+		$is_allowed_to_view = ilObjDataCollectionAccess::hasWriteAccess(array_pop(ilObject::_getAllReferences($this->getObjId())));
 		while ($rec = $ilDB->fetchAssoc($set)) {
 			// Quick check if the current user is allowed to view the record
-			if (! $is_allowed_to_view && ($this->getViewOwnRecordsPerm() && $ilUser->getId() != $rec['owner'])) {
+			if (!$is_allowed_to_view && ($this->getViewOwnRecordsPerm() && $ilUser->getId() != $rec['owner'])) {
 				continue;
 			}
 			$total_record_ids[] = $rec['id'];
 			$_SESSION['dcl_record_ids'][] = $rec['id'];
+		}
+		// Sort by formula
+		if ($sort_field->getDatatypeId() == ilDataCollectionDatatype::INPUTFORMAT_FORMULA) {
+			$sort_array = array();
+			foreach ($total_record_ids as $id) {
+				$formula_field = ilDataCollectionCache::getRecordFieldCache(new ilDataCollectionRecord($id), $sort_field);
+				$sort_array[$id] = $formula_field->getValue();
+			}
+			switch ($direction) {
+				case 'asc':
+				case 'ASC':
+					asort($sort_array);
+					break;
+				case 'desc':
+				case 'DESC':
+					arsort($sort_array);
+					break;
+			}
+			$total_record_ids = array_keys($sort_array);
 		}
 		// Now slice the array to load only the needed records in memory
 		$record_ids = array_slice($total_record_ids, $offset, $limit);
@@ -1569,5 +1593,3 @@ class ilDataCollectionTable {
 		return array( 'records' => $records, 'total' => count($total_record_ids) );
 	}
 }
-
-?>

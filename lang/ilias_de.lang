@@ -7755,14 +7755,12 @@ form#:#form_retype_password#:#Passwort nochmals eingeben
 form#:#form_seconds#:#Sekunden
 forum#:#activate_current_and_childs#:#Alle Beitrage freischalten
 forum#:#activate_new_posts#:#Neue Beiträge freischalten
-forum#:#activate_only_current#:#Nur diesen Beitrag freischalten
+forum#:#activate_only_current#:#Beitrag freischalten
 forum#:#activate_post#:#Freischalten
-forum#:#activate_post_txt#:#Möchten Sie wirklich diesen Beitrag und ggf. alle seine Folgebeiträge freischalten? Bitte beachten Sie, dass auch alle Elternbeiträge aktiviert werden.
+forum#:#activate_post_txt#:#Möchten Sie diesen Beitrag freischalten?
 forum#:#add_re_to_subject#:#Beim Antworten auf einen Beitrag wird der Titel des vorhergehenden Beitrags übernommen und durch ein vorangestelltes Re: ergänzt.
 forum#:#add_re_to_subject_info#:#Wenn diese Option aktiviert ist, wird dem Beitragstitel der Zusatz 'Re:' hinzugefügt.
 forum#:#close_topics#:#Schließen
-forum#:#deactivate_current_and_childs#:#Alle Beitrage sperren
-forum#:#deactivate_post_txt#:#Möchten Sie wirklich diesen Beitrag und alle seine Folgebeiträge sperren?
 forum#:#empty_subject#:#Beim Antworten auf einen Beitrag bleibt die Titelzeile leer und muss vom Benutzer gefüllt werden.
 forum#:#enter_new_subject#:#Bitte geben Sie einen neuen Beitragstitel ein
 forum#:#fmr_copy_threads_info#:#Sie können hier Themen auswählen, die kopiert werden sollen. Es werden nur die Anfangsbeiträge, nicht deren Antworten kopiert.
@@ -12370,6 +12368,7 @@ dcl#:#dcl_edit_type#:#Typ bearbeiten
 dcl#:#dcl_activate_rating#:#Bewertung von Einträgen
 dcl#:#dcl_activate_approval#:#Aktivierung von Einträgen
 dcl#:#dcl_activate_notification#:#Benachrichtigung
+dcl#:#dcl_allowed_file_types#:#Erlaubte Dateitypen
 dcl#:#dcl_table_id#:#Tabellen ID
 dcl#:#dcl_add_new_record#:#Eintrag hinzufügen
 dcl#:#dcl_list_fields#:#Felder
@@ -12697,6 +12696,7 @@ dcl#:#dcl_notification_deactivate_dcl#:#Benachrichtigung deaktivieren
 dcl#:#dcl_notification_activated#:#Benachrichtigung aktiv
 dcl#:#dcl_notification_deactivated#:#Benachrichtigung inaktiv
 dcl#:#dcl_locked#:#Gesperrt
+dcl#:#dcl_locked_tooltip#:#Ein gesperrtes Feld lässt sich von Benutzern nicht mehr bearbeiten. Gilt nicht für Rollen mit dem Recht 'Einstellungen bearbeiten'
 dcl#:#dcl_table_settings#:#Tabelleneinstellungen
 dcl#:#dcl_add_perm#:#Neuen Eintrag hinzufügen
 dcl#:#dcl_edit_perm#:#Datensätze bearbeiten
@@ -13435,8 +13435,8 @@ survey#:#survey_reminder_frequency_days#:#Tage
 survey#:#survey_notification_target_group#:#Zielgruppe
 survey#:#survey_notification_target_group_parent_course#:#Alle Teilnehmer des übergeordneten Kurses/Gruppe
 survey#:#survey_notification_target_group_parent_course_inactive#:#Kein übergeordneter Kurs/Gruppe - keine Erinnerung möglich!
-survey#:#survey_notification_target_group_invited#:#Alle eingeladenen Teilnehmer
-survey#:#survey_notification_target_group_invited_info#:#Momentan eingeladene Benutzer: %s
+survey#:#survey_notification_target_group_invited#:#Teilnehmer, denen die Umfrage auf den persönlichen Schreibtisch gelegt wurde
+survey#:#survey_notification_target_group_invited_info#:#Aktuelle Anzahl der Empfänger: %s
 survey#:#survey_notification_tutor_setting#:#Eine E-Mail nachdem alle Teilnehmer beendet haben
 survey#:#survey_notification_tutor_recipients#:#Tutoren (Benutzername[n])
 survey#:#survey_notification_tutor_recipients_invalid#:#Bitte geben Sie Benutzer mit Schreibrecht an.
@@ -13798,6 +13798,10 @@ cld#:#cld_auth_failed_no_object_created#:#Authentifzierung fehlgeschlagen. Es wu
 common#:#objs_orgu#:#Organisationseinheiten
 common#:#obj_orgu#:#Organisationseinheit
 common#:#obj_orgu_description#:#Anlage und Verwaltung der Organisationsstruktur
+common#:#il_orgu_employee#:#Mitarbeiter
+common#:#il_orgu_superior#:#Vorgesetzte
+common#:#view_learning_progress#:#Zeige Lernfortschritt
+common#:#view_learning_progress_rec#:#Lernfortschritt rekursiv einsehen
 orgu#:#view_learning_progress#:#Lernfortschritt einsehen
 orgu#:#orgu_staff_deassign#:#Diese Benutzer aus der Rolle wirklich entfernen?
 orgu#:#orgu_msg_info_paste#:#Wählen Sie nun den gewünschten Ort, an dem die ausgewählten Objekte eingefügt werden sollen.
@@ -14464,6 +14468,8 @@ rbac#:#orgu_cat_administrate_users#:#Lokale Benutzerkonten können angelegt und 
 rbac#:#orgu_delete#:#Organisationseinheit löschen oder verschieben
 rbac#:#orgu_edit_permission#:#Rechteeinstellungen ändern
 rbac#:#rbac_create_orgu#:#Organisationseinheiten anlegen
+rbac#:#orgu_copy#:#Organisationseinheit kopieren
+rbac#:#orgu_view_learning_progress_rec#:#Lernfortschritt rekursiv einsehen
 book#:#book_post_booking_text_info#:#Verwenden Sie [PERIOD] und [OBJECT], um Buchungsdetails zum Infotext hinzuzufügen.
 blog#:#blog_abstract_shorten#:#Auszug kürzen
 blog#:#blog_abstract_shorten_length#:#Maximale Länge
@@ -14724,9 +14730,9 @@ user#:#delete_inactive_user_accounts_frequency#:#Intervall
 user#:#delete_inactive_user_accounts_frequency_desc#:#Intervall, mit welchem auf Löschung sowie auf E-Mail-Versand getestet wird.
 user#:#send_mail_to_inactive_users#:#Benachrichtigungsmail
 user#:#send_mail_to_inactive_users_suffix#:#Tage bis zur Löschung.
-user#:#send_mail_to_inactive_users_desc#:#Bevor ein Benutzeraccount gelöscht werden, sendet ILIAS eine E-Mail an den Benutzer. Durch ein erneutes Anmelden des Benutzers in ILIAS wird die Löschung um die eingestellte Zeitspanne aufgeschoben. Bitte stellen Sie sicher, dass ein externer Mail-Empfang möglich ist.
+user#:#send_mail_to_inactive_users_desc#:#Bevor ein Benutzeraccount gelöscht werden, sendet ILIAS eine E-Mail an den Benutzer. Durch ein erneutes Anmelden des Benutzers in ILIAS wird die Löschung um die eingestellte Zeitspanne aufgeschoben. Bitte stellen Sie sicher, dass ein externer Mail-Empfang möglich ist. Bei Aktivierung des Cronjobs mit Benachrichtigungsmail, kann es vorkommen, dass zu Beginn die Zeitspanne zwischen Benachrichtigung und Löschung geringer als die eingestellte Zeitspanne ist.  
 user#:#del_mail_subject#:#(ILIAS) – Ihr Benutzerkonto wird bald gelöscht
-user#:#del_mail_body#:#Hallo %1$s, %2$sSie haben sich seit längerer Zeit nicht mehr auf der Lernplattform %3$s angemeldet. Ihr Benutzerkonto wird daher in %4$s Tagen gelöscht. Bitte melden Sie sich erneut an, damit Ihr Benutzerkonto erhalten bleibt.
+user#:#del_mail_body#:#Hallo %1$s, %2$sSie haben sich seit längerer Zeit nicht mehr auf der Lernplattform %3$s angemeldet. Ihr Benutzerkonto wird daher vorraussichtlich am %4$s gelöscht. Bitte melden Sie sich erneut an, damit Ihr Benutzerkonto erhalten bleibt.
 user#:#send_mail_to_inactive_users_numbers_only#:#Bitte nur ganzzahlige, positive Werte eingeben. Ihre Eingabe wurde gerundet.
 user#:#send_mail_to_inactive_users_must_be_smaller_than#:#Dieser Wert muss kleiner sein, als der Wert "Vergangene Tage seit letzter Anmeldung".
 user#:#send_mail_reminder_window_too_small#:#Das Intervall ist zu groß um den Versand einer E-Mail vor der Löschung des Accounts zu gewährleisten.
@@ -15134,7 +15140,7 @@ survey#:#survey_access_codes_info#:#Benutzer erhalten Zugang zur Umfrage, indem 
 survey#:#survey_results_anonymization#:#Datenschutz
 survey#:#survey_results_personalized#:#Mit Namen
 survey#:#survey_results_personalized_info#:#Im Reiter 'Ergebnisse' werden Teilnehmer namentlich gelistet und ihre Antworten angezeigt. Alle Benutzer mit Zugang zu diesem Reiter können einsehen, wer welche Antworten gegeben hat.
-survey#:#survey_results_anonymized#:#Ohne Namen
+survey#:#survey_results_anonymized#:#Ohne Namen / Anonyme Umfrage
 survey#:#survey_results_anonymized_info#:#Im Reiter 'Ergebnisse' werden die Namen der Teilnehmer durch Codes ersetzt. Benutzer mit Zugang zu diesem Reiter können die Antworten keinem Namen zuordnen, sondern nur einem Benutzer "iTXaF" (Beispiel).
 survey#:#material_added_empty#:#Das Objekt enthält kein geeignetes Material.
 ecs#:#ecs_refresh_participants#:#ECS-Teilnehmer aktualisieren
@@ -15209,8 +15215,6 @@ mob#:#mob_object#:#Objekt
 content#:#cont_qtries_info#:#Standardwert "Anzahl der Versuche" für neu angelegte Fragen.
 lm#:#lm_copy#:#ILIAS-Lernmodul kopieren
 content#:#cont_settings#:#Lernmoduleinstellungen
-rbac#:#orgu_view_learning_progress_rec#:#Lernfortschritt rekursiv einsehen
-rbac#:#orgu_copy#:#Organisationseinheit kopieren
 exc#:#exc_no_team_yet_notice#:#Sie gehören noch keinem Team an!
 prtf#:#prtf_edit_embedded_blog#:#Blog "%s" bearbeiten
 exc#:#exc_manage_team#:#Team verwalten
@@ -15295,3 +15299,5 @@ sysc#:#sysc_task_structure#:#Baumstruktur
 sysc#:#sysc_task_structure_desc#:#Analyiert und korrigiert die Struktur des Magazinbaums
 blog#:#blog_keywords_other#:#Sonstige Schlagwörter
 blog#:#blog_keywords_other_info#:#Diese Schlagwörter sind für andere Blog-Einträge vergeben worden.
+forum#:#forums_thread_deleted#:#Das gewählte Thema einschließlich aller dazugehörigen Beiträge wurde gelöscht.
+forum#:#forums_threads_deleted#:#Die gewählten Themen einschließlich aller dazugehörigen Beiträge wurden gelöscht.

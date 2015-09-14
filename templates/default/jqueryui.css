@@ -329,7 +329,7 @@ button.ui-button::-moz-focus-inner {
 ----------------------------------*/
 .ui-widget {
 	font-family: sans-serif;
-	font-size: 1.1em;
+	font-size: 1em;
 }
 .ui-widget .ui-widget {
 	font-size: 1em;
@@ -344,7 +344,7 @@ button.ui-button::-moz-focus-inner {
 .ui-widget-content {
 	border: 1px solid #32475b;
 	background: #FFFFFF url("images/ui-bg_flat_0_FFFFFF_40x100.png") 50% 50% repeat-x;
-	color: #32475b;
+	color: #4d4d4d;
 }
 .ui-widget-content a {
 	color: #32475b;

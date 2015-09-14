@@ -140,6 +140,7 @@ class ilDataCollectionNReferenceField extends ilDataCollectionReferenceField {
 		$cut = false;
 		$tpl = new ilTemplate("tpl.reference_hover.html", true, true, "Modules/DataCollection");
 		$tpl->setCurrentBlock("reference_list");
+		$elements = array();
 		foreach ($values as $value) {
 			$ref_record = ilDataCollectionCache::getRecordCache($value);
 			if (!$ref_record->getTableId() OR !$record_field->getField() OR !$record_field->getField()->getTableId()) {
@@ -147,16 +148,34 @@ class ilDataCollectionNReferenceField extends ilDataCollectionReferenceField {
 				$record_field->setValue(NULL);
 				$record_field->doUpdate();
 			} else {
-				if ((strlen($html) < $this->max_reference_length)) {
-					$html .= $ref_record->getRecordFieldHTML($this->getField()->getFieldRef()) . ", ";
-				} else {
-					$cut = true;
-				}
-				$tpl->setCurrentBlock("reference");
-				$tpl->setVariable("CONTENT", $ref_record->getRecordFieldHTML($this->getField()->getFieldRef()));
-				$tpl->parseCurrentBlock();
+				$elements[] = array('value' => $ref_record->getRecordFieldHTML($this->getField()->getFieldRef()),
+									'sort' => $ref_record->getRecordFieldSortingValue($this->getField()->getFieldRef()));
 			}
 		}
+
+		//sort fetched elements
+		$is_numeric = false;
+		$ref_field = new ilDataCollectionField($record_field->getField()->getFieldRef());
+		switch ($ref_field->getDatatypeId()) {
+			case ilDataCollectionDatatype::INPUTFORMAT_DATETIME:
+			case ilDataCollectionDatatype::INPUTFORMAT_NUMBER:
+				$is_numeric = true;
+				break;
+		}
+		$elements = ilUtil::sortArray($elements, 'sort', 'asc', $is_numeric);
+
+		//concat
+		foreach($elements as $element) {
+			if ((strlen($html) < $this->max_reference_length)) {
+				$html .= $element['value'] . ", ";
+			} else {
+				$cut = true;
+			}
+			$tpl->setCurrentBlock("reference");
+			$tpl->setVariable("CONTENT", $element['value']);
+			$tpl->parseCurrentBlock();
+		}
+
 		$html = substr($html, 0, - 2);
 		if ($cut) {
 			$html .= "...";

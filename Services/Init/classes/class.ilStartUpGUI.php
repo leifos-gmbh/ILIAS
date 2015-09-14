@@ -1107,6 +1107,10 @@ class ilStartUpGUI
 		// reset cookie
 		$client_id = $_COOKIE["ilClientId"];
 		ilUtil::setCookie("ilClientId","");
+		
+		// uzk-patch: begin
+		ilUtil::redirect("login.php?client_id=" . $client_id . "&lang=" . $_GET['lang'] . "&referer=logout");
+		// uzk-patch: end
 
 		//instantiate logout template
 		self::initStartUpTemplate("tpl.logout.html");

@@ -1373,3 +1373,212 @@ if($ilDB->tableExists('style_folder_styles'))
 	$ilDB->addPrimaryKey('style_folder_styles', array('folder_id', 'style_id'));
 }
 ?>
+<#54>
+<?php
+//step 1/4 mob_parameter search for dublicates and store it in mob_parameter_tmp
+
+if ($ilDB->tableExists('mob_parameter'))
+{
+	$res = $ilDB->query("
+		SELECT med_item_id, name
+		FROM mob_parameter
+		GROUP BY med_item_id, name
+		HAVING COUNT(med_item_id) > 1
+	");
+
+	if($ilDB->numRows($res))
+	{
+		if(!$ilDB->tableExists('mob_parameter_tmp'))
+		{
+			$ilDB->createTable('mob_parameter_tmp', array(
+				'med_item_id' => array(
+					'type'  => 'integer',
+					'length'=> 8,
+					'notnull' => true,
+					'default' => 0
+				),
+				'name' => array(
+					'type'  => 'text',
+					'length'=> 50,
+					'notnull' => true,
+				)
+			));
+			$ilDB->addPrimaryKey('mob_parameter_tmp', array('med_item_id','name'));
+		}
+
+		while($row = $ilDB->fetchAssoc($res))
+		{
+			$ilDB->replace('mob_parameter_tmp', array(), array(
+				'med_item_id' => array('integer', $row['med_item_id']),
+				'name' => array('text', $row['name'])
+			));
+		}
+	}
+}
+?>
+<#55>
+<?php
+//step 2/4 mob_parameter deletes dublicates stored in mob_parameter_tmp
+
+if ($ilDB->tableExists('mob_parameter_tmp'))
+{
+	$res = $ilDB->query("
+		SELECT med_item_id, name
+		FROM mob_parameter_tmp
+");
+
+while($row = $ilDB->fetchAssoc($res))
+{
+	$res_data = $ilDB->query("
+		SELECT *
+		FROM mob_parameter
+		WHERE
+		med_item_id = ".$ilDB->quote($row['med_item_id'] ,'integer')." AND
+		name = ".$ilDB->quote($row['name'] ,'text')
+	);
+	$data = $ilDB->fetchAssoc($res_data);
+
+	$ilDB->manipulate("DELETE FROM mob_parameter WHERE".
+					  " med_item_id = " . $ilDB->quote($row['med_item_id'] ,'integer').
+					  " AND name = " . $ilDB->quote($row['name'] ,'integer')
+	);
+
+	$ilDB->manipulate("INSERT INTO mob_parameter (med_item_id, name, value) ".
+					  "VALUES ( ".
+					  $ilDB->quote($data['med_item_id'] ,'integer').', '.
+					  $ilDB->quote($data['name'] ,'text').', '.
+					  $ilDB->quote($data['value'] ,'text').
+					  ")");
+
+	$ilDB->manipulate("DELETE FROM mob_parameter_tmp WHERE".
+					  " med_item_id = " . $ilDB->quote($row['med_item_id'] ,'integer').
+					  " AND name = " . $ilDB->quote($row['name'] ,'text')
+	);
+}
+}
+?>
+<#56>
+<?php
+//step 3/4 mob_parameter adding primary key
+if( $ilDB->indexExistsByFields('mob_parameter', array('med_item_id')) )
+{
+	$ilDB->dropIndexByFields('mob_parameter', array('med_item_id'));
+}
+
+if($ilDB->tableExists('mob_parameter'))
+{
+	$ilDB->addPrimaryKey('mob_parameter', array('med_item_id', 'name'));
+}
+?>
+<#57>
+<?php
+//step 4/4 mob_parameter removes temp table
+
+if ($ilDB->tableExists('mob_parameter_tmp'))
+{
+	$ilDB->dropTable('mob_parameter_tmp');
+}
+?>
+<#6>
+<?php
+//step 1/4 link_check renames old table
+
+if ($ilDB->tableExists('link_check') && !$ilDB->tableExists('link_check_old'))
+{
+	$ilDB->renameTable("link_check", "link_check_old");
+}
+?>
+<#7>
+<?php
+//step 2/4 link_check creates new table with unique id and sequenz
+
+if (!$ilDB->tableExists('link_check'))
+{
+	$ilDB->createTable('link_check',array(
+		'id' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true
+		),
+		'obj_id' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true
+		),
+		'page_id' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true
+		),
+		'url' => array(
+			'type' => 'text',
+			'length' => 255,
+			'notnull' => false,
+			'default' => null
+		),
+		'parent_type' => array(
+			'type' => 'text',
+			'length' => 8,
+			'notnull' => false,
+			'default' => null
+		),
+		'http_status_code' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true
+		),
+		'last_check' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true
+		)
+	));
+	$ilDB->addPrimaryKey('link_check', array('id'));
+	$ilDB->addIndex('link_check',array('obj_id'),'i1');
+	$ilDB->createSequence('link_check');
+}
+?>
+<#8>
+<?php
+//step 3/4 link_check moves all data to new table
+
+if ($ilDB->tableExists('link_check') && $ilDB->tableExists('link_check_old'))
+{
+	$res = $ilDB->query("
+		SELECT *
+		FROM link_check_old
+	");
+
+	while($row = $ilDB->fetchAssoc($res))
+	{
+		$id = $ilDB->nextId('link_check');
+
+		$ilDB->manipulate("INSERT INTO link_check (id, obj_id, page_id, url, parent_type, http_status_code, last_check)".
+						  " VALUES (".
+						  $ilDB->quote($id, "integer").
+						  ",".$ilDB->quote($row['obj_id'], "integer").
+						  ",".$ilDB->quote($row['page_id'], "integer").
+						  ",".$ilDB->quote($row['url'], "text").
+						  ",".$ilDB->quote($row['parent_type'], "text").
+						  ",".$ilDB->quote($row['http_status_code'], "integer").
+						  ",".$ilDB->quote($row['last_check'], "integer").
+						  ")"
+		);
+
+		$ilDB->manipulateF(
+			"DELETE FROM link_check_old WHERE obj_id = %s AND page_id = %s AND url = %s AND parent_type = %s AND http_status_code = %s AND last_check = %s",
+			array('integer', 'integer', 'text', 'text', 'integer', 'integer'),
+			array($row['obj_id'], $row['page_id'], $row['url'], $row['parent_type'], $row['http_status_code'], $row['last_check'])
+		);
+	}
+}
+?>
+<#9>
+<?php
+//step 4/4 link_check removes old table
+
+if ($ilDB->tableExists('link_check_old'))
+{
+	$ilDB->dropTable('link_check_old');
+}
+?>

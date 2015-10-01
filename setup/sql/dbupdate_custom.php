@@ -1479,7 +1479,7 @@ if ($ilDB->tableExists('mob_parameter_tmp'))
 	$ilDB->dropTable('mob_parameter_tmp');
 }
 ?>
-<#6>
+<#58>
 <?php
 //step 1/4 link_check renames old table
 
@@ -1488,7 +1488,7 @@ if ($ilDB->tableExists('link_check') && !$ilDB->tableExists('link_check_old'))
 	$ilDB->renameTable("link_check", "link_check_old");
 }
 ?>
-<#7>
+<#59>
 <?php
 //step 2/4 link_check creates new table with unique id and sequenz
 
@@ -1538,7 +1538,7 @@ if (!$ilDB->tableExists('link_check'))
 	$ilDB->createSequence('link_check');
 }
 ?>
-<#8>
+<#60>
 <?php
 //step 3/4 link_check moves all data to new table
 
@@ -1573,7 +1573,7 @@ if ($ilDB->tableExists('link_check') && $ilDB->tableExists('link_check_old'))
 	}
 }
 ?>
-<#9>
+<#61>
 <?php
 //step 4/4 link_check removes old table
 
@@ -1581,4 +1581,337 @@ if ($ilDB->tableExists('link_check_old'))
 {
 	$ilDB->dropTable('link_check_old');
 }
+?>
+<#62>
+<?php
+$num_query = "
+	SELECT COUNT(*) cnt
+	FROM (
+		SELECT tree, child
+		FROM bookmark_tree
+		GROUP BY tree, child
+		HAVING COUNT(*) > 1
+	) duplicateBookmarkTree
+";
+$res  = $ilDB->query($num_query);
+$data = $ilDB->fetchAssoc($res);
+
+if($data['cnt'] > 0)
+{
+	echo "<pre>
+
+		Dear Administrator,
+
+		DO NOT REFRESH THIS PAGE UNLESS YOU HAVE READ THE FOLLOWING INSTRUCTIONS
+
+		The update process has been stopped due to a data consistency issue in table 'bookmark_tree'.
+		The values in field 'tree' and 'child' should be unique together, but there are dublicated values in these fields.
+		You have to review the data and apply manual fixes on your own risk. The duplicates can be determined with the following SQL string:
+
+		SELECT *
+		FROM bookmark_tree first
+		WHERE EXISTS (
+			SELECT second.tree, second.child
+			FROM bookmark_tree second
+			WHERE first.tree = second.tree AND first.child = second.child
+			GROUP BY second.tree, second.child
+			HAVING COUNT(second.tree) > 1
+		);
+
+		If you have fixed the Problem and try to rerun the update process, this warning will be skipped.
+
+		Please ensure to backup your current database before fixing the database.
+		Furthermore disable your client while fixing the database.
+
+		For further questions use our <a href='http://mantis.ilias.de'>Bugtracker</a> or write a message to the responsible <a href='http://www.ilias.de/docu/goto_docu_pg_9985_42.html'>Maintainer</a>.
+
+		Best regards,
+		The Bookmark maintainer
+
+	</pre>";
+
+	exit();
+}
+
+
+if($ilDB->tableExists('bookmark_tree'))
+{
+	$ilDB->addPrimaryKey('bookmark_tree', array('tree', 'child'));
+}
+
+?>
+<#63>
+<?php
+$num_query = "
+	SELECT COUNT(*) cnt
+	FROM (
+	SELECT lm_id, child
+	FROM lm_tree
+	GROUP BY lm_id, child
+	HAVING COUNT(*) > 1
+	) duplicateLMTree
+";
+$res  = $ilDB->query($num_query);
+$data = $ilDB->fetchAssoc($res);
+
+if($data['cnt'] > 0)
+{
+	echo "<pre>
+
+		Dear Administrator,
+
+		DO NOT REFRESH THIS PAGE UNLESS YOU HAVE READ THE FOLLOWING INSTRUCTIONS
+
+		The update process has been stopped due to a data consistency issue in table 'lm_tree'.
+		The values in field 'lm_id' and 'child' should be unique together, but there are dublicated values in these fields.
+		You have to review the data and apply manual fixes on your own risk. The duplicates can be determined with the following SQL string:
+
+		SELECT *
+		FROM lm_tree first
+		WHERE EXISTS (
+			SELECT second.lm_id, second.child
+			FROM lm_tree second
+			WHERE first.lm_id = second.lm_id AND first.child = second.child
+			GROUP BY second.lm_id, second.child
+			HAVING COUNT(second.lm_id) > 1
+		);
+
+		If you have fixed the Problem and try to rerun the update process, this warning will be skipped.
+
+		Please ensure to backup your current database before fixing the database.
+		Furthermore disable your client while fixing the database.
+
+		For further questions use our <a href='http://mantis.ilias.de'>Bugtracker</a> or write a message to the responsible <a href='http://www.ilias.de/docu/goto_docu_pg_9985_42.html'>Maintainer</a>.
+
+		Best regards,
+		The Learning Modules maintainer
+
+	</pre>";
+
+	exit();
+}
+
+
+if($ilDB->tableExists('lm_tree'))
+{
+	$ilDB->addPrimaryKey('lm_tree', array('lm_id', 'child'));
+}
+
+?>
+<#64>
+<?php
+$num_query = "
+	SELECT COUNT(*) cnt
+	FROM (
+		SELECT mep_id, child
+		FROM mep_tree
+		GROUP BY mep_id, child
+		HAVING COUNT(*) > 1
+	) duplicateMEPTree
+";
+$res  = $ilDB->query($num_query);
+$data = $ilDB->fetchAssoc($res);
+
+if($data['cnt'] > 0)
+{
+	echo "<pre>
+
+		Dear Administrator,
+
+		DO NOT REFRESH THIS PAGE UNLESS YOU HAVE READ THE FOLLOWING INSTRUCTIONS
+
+		The update process has been stopped due to a data consistency issue in table 'mep_tree'.
+		The values in field 'mep_id' and 'child' should be unique together, but there are dublicated values in these fields.
+		You have to review the data and apply manual fixes on your own risk. The duplicates can be determined with the following SQL string:
+
+		SELECT *
+		FROM mep_tree first
+		WHERE EXISTS (
+			SELECT second.mep_id, second.child
+			FROM mep_tree second
+			WHERE first.mep_id = second.mep_id AND first.child = second.child
+			GROUP BY second.mep_id, second.child
+			HAVING COUNT(second.mep_id) > 1
+		);
+
+		If you have fixed the Problem and try to rerun the update process, this warning will be skipped.
+
+		Please ensure to backup your current database before fixing the database.
+		Furthermore disable your client while fixing the database.
+
+		For further questions use our <a href='http://mantis.ilias.de'>Bugtracker</a> or write a message to the responsible <a href='http://www.ilias.de/docu/goto_docu_pg_9985_42.html'>Maintainer</a>.
+
+		Best regards,
+		The Media Pool maintainer
+
+	</pre>";
+
+	exit();
+}
+
+
+if($ilDB->tableExists('mep_tree'))
+{
+	$ilDB->addPrimaryKey('mep_tree', array('mep_id', 'child'));
+}
+
+?>
+<#65>
+<?php
+$num_query = "
+	SELECT COUNT(*) cnt
+	FROM (
+	SELECT skl_tree_id, child
+	FROM skl_tree
+	GROUP BY skl_tree_id, child
+	HAVING COUNT(*) > 1
+	) duplicateSKLTree
+";
+$res  = $ilDB->query($num_query);
+$data = $ilDB->fetchAssoc($res);
+
+if($data['cnt'] > 0)
+{
+	echo "<pre>
+
+		Dear Administrator,
+
+		DO NOT REFRESH THIS PAGE UNLESS YOU HAVE READ THE FOLLOWING INSTRUCTIONS
+
+		The update process has been stopped due to a data consistency issue in table 'skl_tree'.
+		The values in field 'skl_tree_id' and 'child' should be unique together, but there are dublicated values in these fields.
+		You have to review the data and apply manual fixes on your own risk. The duplicates can be determined with the following SQL string:
+
+		SELECT *
+		FROM skl_tree first
+		WHERE EXISTS (
+			SELECT second.skl_tree_id, second.child
+			FROM skl_tree second
+			WHERE first.skl_tree_id = second.skl_tree_id AND first.child = second.child
+			GROUP BY second.skl_tree_id, second.child
+			HAVING COUNT(second.skl_tree_id) > 1
+		);
+
+		If you have fixed the Problem and try to rerun the update process, this warning will be skipped.
+
+		Please ensure to backup your current database before fixing the database.
+		Furthermore disable your client while fixing the database.
+
+		For further questions use our <a href='http://mantis.ilias.de'>Bugtracker</a> or write a message to the responsible <a href='http://www.ilias.de/docu/goto_docu_pg_9985_42.html'>Maintainer</a>.
+
+		Best regards,
+		The Competence Managment maintainer
+
+	</pre>";
+
+	exit();
+}
+
+
+if($ilDB->tableExists('skl_tree'))
+{
+	$ilDB->addPrimaryKey('skl_tree', array('skl_tree_id', 'child'));
+}
+
+?>
+<#66>
+<?php
+//step 1/4 benchmark renames old table
+
+if ($ilDB->tableExists('benchmark') && !$ilDB->tableExists('benchmark_old'))
+{
+	$ilDB->renameTable("benchmark", "benchmark_old");
+}
+?>
+<#67>
+<?php
+//step 2/4 benchmark creates new table with unique id and sequenz
+
+if (!$ilDB->tableExists('benchmark'))
+{
+	$ilDB->createTable('benchmark',array(
+		'id' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true
+		),
+		"cdate" => array (
+			"notnull" => false,
+			"type" => "timestamp"
+		),
+		"module" => array (
+			"notnull" => false,
+			"length" => 150,
+			"fixed" => false,
+			"type" => "text"
+		),
+		"benchmark" => array (
+			"notnull" => false,
+			"length" => 150,
+			"fixed" => false,
+			"type" => "text"
+		),
+		"duration" => array (
+			"notnull" => false,
+			"type" => "float"
+		),
+		"sql_stmt" => array (
+			"notnull" => false,
+			"type" => "clob"
+		)
+	));
+	$ilDB->addPrimaryKey('benchmark', array('id'));
+	$ilDB->addIndex('benchmark',array("module","benchmark"),'i1');
+	$ilDB->createSequence('benchmark');
+}
+?>
+<#68>
+<?php
+//step 3/4 benchmark moves all data to new table
+
+if ($ilDB->tableExists('benchmark') && $ilDB->tableExists('benchmark_old'))
+{
+	$res = $ilDB->query("
+		SELECT *
+		FROM benchmark_old
+	");
+
+	while($row = $ilDB->fetchAssoc($res))
+	{
+		$id = $ilDB->nextId('benchmark');
+
+		$ilDB->insert("benchmark", array(
+			"id" => array("integer", $id),
+			"cdate" => array("timestamp", $row['cdate']),
+			"module" => array("text",$row['module']),
+			"benchmark" => array("text", $row['benchmark']),
+			"duration" => array("float", $row['duration']),
+			"sql_stmt" => array("clob", $row['sql_stmt'])
+		));
+
+		$ilDB->manipulateF(
+			"DELETE FROM benchmark_old WHERE cdate = %s AND module = %s AND benchmark = %s AND duration = %s ",
+			array('timestamp', 'text', 'text', 'float'),
+			array($row['cdate'], $row['module'], $row['benchmark'], $row['duration'])
+		);
+	}
+}
+?>
+<#69>
+<?php
+//step 4/4 benchmark removes old table
+
+if ($ilDB->tableExists('benchmark_old'))
+{
+	$ilDB->dropTable('benchmark_old');
+}
+?>
+<#70>
+<?php
+//step skl_user_skill_level adding primary key
+if($ilDB->tableExists('skl_user_skill_level'))
+{
+	$ilDB->addPrimaryKey('skl_user_skill_level', array('skill_id', 'tref_id', 'user_id', 'status_date', 'status', 'trigger_obj_id', 'self_eval'));
+}
+
 ?>

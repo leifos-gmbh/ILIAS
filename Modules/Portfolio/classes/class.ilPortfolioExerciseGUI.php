@@ -131,10 +131,10 @@ class ilPortfolioExerciseGUI
 		// submitted files
 		include_once "Modules/Exercise/classes/class.ilExSubmission.php";		
 		$submission = new ilExSubmission($ass, $a_user_id);
-		$submitted = $submission->getFiles();
-		if($submitted)
+		if($submission->hasSubmitted())
 		{
-			$submitted = array_pop($submitted);
+			// #16888
+			$submitted = $submission->getSelectedObject();				
 			
 			$ilCtrl->setParameterByClass("ilportfolioexercisegui", "ass", $a_assignment_id);
 			$dl_link = $ilCtrl->getLinkTargetByClass("ilportfolioexercisegui", "downloadExcSubFile");

@@ -84,9 +84,9 @@ class ilWorkspaceShareTableGUI extends ilTable2GUI
 		// $this->setDisableFilterHiding(true);
 		$this->enablePersistentFilters("wsp_");
 		// patch uzk end
-				
-		$this->setResetCommand("resetsharefilter");
-		$this->setFilterCommand("applysharefilter");
+
+		$this->setResetCommand("resetsharefilter", $this->lng->txt("wsp_shared_filter_reset_button"));
+		$this->setFilterCommand("applysharefilter", $this->lng->txt("wsp_shared_filter_button"));
 			
 		$this->initFilter();
 		
@@ -99,21 +99,27 @@ class ilWorkspaceShareTableGUI extends ilTable2GUI
 		
 		if($a_load_data)
 		{
+			/*
 			if(($this->filter["user"] && strlen($this->filter["user"]) > 3) ||
 				($this->filter["title"] && strlen($this->filter["title"]) > 3) ||
 				$this->filter["acl_date"] ||
 				$this->filter["obj_type"] ||
 				$this->filter["acl_type"] ||
 				$this->filter["crsgrp"])
-			{			
-				$this->importData();		
-				include_once "Services/User/classes/class.ilUserUtil.php";
-				return;
-			}
-
-			ilUtil::sendFailure($lng->txt("wsp_shared_mandatory_filter_info"));			
+			{			 
+			*/			
+			
+			// #16630
+			$this->importData();		
+			include_once "Services/User/classes/class.ilUserUtil.php";
+			return;	
+		}
+		else
+		{
+			ilUtil::sendInfo($lng->txt("wsp_shared_mandatory_filter_info"));		
 		}
 
+		// initial state: show filters only
 		$this->disable("header");
 		$this->disable("content");		
 	}

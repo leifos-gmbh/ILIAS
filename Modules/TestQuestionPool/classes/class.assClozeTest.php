@@ -1249,6 +1249,8 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 				);
 			}
 		}
+		
+		ksort($user_result); // this is required when identical scoring for same solutions is disabled
 
 		if ($returndetails)
 		{
@@ -1316,7 +1318,7 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 		
 		foreach($this->getSolutionSubmit() as $val1 => $val2)
 		{
-			$value = ilUtil::stripSlashes($val2, FALSE);
+			$value = trim(ilUtil::stripSlashes($val2, FALSE));
 			if (strlen($value))
 			{
 				$gap = $this->getGap(trim(ilUtil::stripSlashes($val1)));

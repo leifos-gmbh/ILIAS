@@ -5,7 +5,7 @@
 * @module			language file German
 * @modulegroup		language
 * @author			Matthias Kunkel <mkunkel@me.com>
-* @version			$Id$
+* @version			$Id: ilias_de.lang 60971 2015-10-05 10:40:13Z gitmgr $
 */
 // The language file starts beyond the HTML-comment below. DO NOT modify this line!
 // To edit your language file with a spreadsheet (i.e. Excel or StarCalc) remove all lines
@@ -403,10 +403,10 @@ assessment#:#circle#:#Kreis
 assessment#:#circle_click_center#:#Bitte klicken Sie auf den Mittelpunkt der gewünschten Region
 assessment#:#circle_click_circle#:#Bitte klicken Sie auf einen Punkt auf dem Umkreis der gewünschten Region
 assessment#:#clientip#:#Client IP
-assessment#:#close_text_hint#:#Um eine Lücke in den Text einzufügen, setzen Sie den Cursor an die entsprechende Position und betätigen den Button "Lücke erzeugen". Anschließend stehen weiter unten entsprechende Bearbeitungsbereiche zur Verfügung. Ebenso können Sie die Lücken zur Berarbeitung im Lückentext direkt anclicken.
+assessment#:#close_text_hint#:#Um eine Lücke in den Text einzufügen, setzen Sie den Cursor an die entsprechende Position und klicken Sie auf die Schaltfläche "Lücke erzeugen". Anschließend stehen weiter unten entsprechende Bearbeitungsbereiche zur Verfügung. Ebenso können Sie die Lücken zur Bearbeitung im Lückentext direkt anklicken.
 assessment#:#insert_gap#:#Lücke einfügen
 assessment#:#cloze_fixed_textlength#:#Länge des Textfeldes
-assessment#:#cloze_fixed_textlength_description#:#Wenn Sie hier einen Wert eintragen, werden Textlücken, welche keinen eigenen Wert für eine maximale Länge definieren, sowie numerische Lücken mit dieser Länge erzeugt, so dass es nicht möglich ist eine größere Anzahl an Zeichen einzugeben. Für numerische Lücken ist darüberhinaus zu beachten, dass das Dezimaltrennzeichen dabei mit gezählt wird.
+assessment#:#cloze_fixed_textlength_description#:#Wenn Sie hier einen Wert eintragen, werden Textlücken, welche keinen eigenen Wert für eine maximale Länge definieren, sowie numerische Lücken mit dieser Länge erzeugt, so dass es nicht möglich ist eine größere Anzahl an Zeichen einzugeben. Für numerische Lücken ist darüber hinaus zu beachten, dass das Dezimaltrennzeichen dabei mit gezählt wird.
 assessment#:#qpl_maxchars_info_numeric_question#:#Wenn Sie hier einen Wert eintragen, wird das Feld für die numerische Antwort mit der angegebenen Länge erzeugt, so dass es nicht möglich ist eine größere Anzahl an Zeichen einzugeben. Zu beachten ist dabei, dass das Dezimaltrennzeichen dabei mit gezählt wird.
 assessment#:#cloze_text#:#Lückentextfrage
 assessment#:#cloze_textgap_case_insensitive#:#Zwischen Groß- und Kleinschreibung wird nicht unterschieden
@@ -3988,7 +3988,7 @@ common#:#msg_obj_exists#:#Dieses Objekt existiert bereits in diesem Ordner!
 common#:#msg_obj_exists_in_folder#:#Das Objekt %s existiert bereits im Ordner %s.
 common#:#msg_obj_may_not_contain_objects_of_type#:#Das Objekt %s darf keine Objekte des folgenden Typs beinhalten: %s.
 common#:#msg_obj_modified#:#Änderungen gespeichert
-common#:#msg_obj_no_link#:#können nicht verknüpft werden
+common#:#msg_obj_no_link#:#Das Verknüpfen von Containerobjekten wie Kategorien, Kursen, Gruppen und Ordnern ist aus technischen Gründen leider nicht möglich. Verknüpfen Sie stattdessen die einzelnen Objekte der Container zum gewünschten Ort oder verwenden das Referenz-Objekt für Kurse und Kategorien.
 common#:#msg_obj_not_deletable_sold#:#Die folgenden Objekte können nicht gelöscht werden, da das Payment für sie aktiviert ist:
 common#:#msg_paste_object_not_in_itself#:#Es ist nicht möglich das Objekte %s in sich selbst einzufügen.
 common#:#msg_perm_adopted_from_itself#:#Es ist nicht möglich, die Rechteeinstellungen von der aktuellen Rolle bzw. Rollenvorlage selbst zu übernehmen.
@@ -5159,7 +5159,7 @@ common#:#user_added#:#Benutzer angelegt
 common#:#user_assignment#:#Benutzerzuweisung
 common#:#user_cant_receive_mail#:#Der Benutzer hat nicht das Recht das Mailsystem zu benutzen.
 common#:#user_comment#:#Benutzer-Kommentar
-common#:#user_deactivated#:#Benutzer wurde abgelehnt.
+common#:#user_deactivated#:#Die ausgewählten Benutzer wurden deaktiviert.
 common#:#user_defined_fields#:#Benutzerdefinierte Felder
 common#:#user_defined_list#:#Übersicht benutzerdefinierter Felder
 common#:#user_deleted#:#Benutzer gelöscht
@@ -9883,7 +9883,7 @@ rating#:#rat_one_rating#:#Eine Bewertung
 rating#:#rating_average_rating#:#Durchschnittliche Bewertung
 rating#:#rating_nr_users#:#%s Benutzer
 rating#:#rating_your_rating#:#Ihre Bewertung
-rbac#:#active_preconditions#:#Vorbedingungen
+rbac#:#active_preconditions#:#Definierte Vorbedingungen
 rbac#:#add_consultation_hours#:#Sprechstundentermine anlegen
 rbac#:#add_reply#:#Antwort anlegen
 rbac#:#add_thread#:#Thema anlegen
@@ -10028,9 +10028,9 @@ rbac#:#rbac_not_change_existing_objects#:#Vorhandene Objekte NICHT anpassen
 rbac#:#rbac_precondition_minimum_optional#:#Es müssen mindestens zwei Vorbedingungen optional verbleiben.
 rbac#:#rbac_precondition_mode#:#Modus
 rbac#:#rbac_precondition_mode_all#:#Alle Vorbedingungen
-rbac#:#rbac_precondition_mode_all_info#:#Alle Vorbedingungen müssen für einen Zugriff erfüllt werden.
+rbac#:#rbac_precondition_mode_all_info#:#Alle definierten Vorbedingungen müssen für einen Zugriff erfüllt werden.
 rbac#:#rbac_precondition_mode_subset#:#Untermenge der Vorbedingungen
-rbac#:#rbac_precondition_mode_subset_info#:#Eine Untermenge der Vorbedingungen müssen für einen Zugriff erfüllt werden. Einige Vorbedingungen können trotzdem verpflichtend sein.
+rbac#:#rbac_precondition_mode_subset_info#:#Eine Untermenge der definierten Vorbedingungen müssen für einen Zugriff erfüllt werden. Einige Vorbedingungen können trotzdem verpflichtend sein.
 rbac#:#rbac_precondition_save_obligatory#:#Verpflichtend speichern
 rbac#:#rbac_precondition_source#:#Vorbedingung durch
 rbac#:#rbac_precondition_target#:#Vorbedingung für Zugriff auf
@@ -11013,7 +11013,7 @@ survey#:#apply#:#Übernehmen
 survey#:#arithmetic_mean#:#Arithmetisches Mittel
 survey#:#ask_insert_questionblocks#:#Sind Sie sicher, dass Sie die folgenden Frageblöcke der Umfrage hinzufügen wollen?
 survey#:#ask_insert_questions#:#Sind Sie sicher, dass Sie die folgende(n) Frage(n) der Umfrage hinzufügen wollen?
-survey#:#back#:#<< Zurück
+survey#:#back#:#Zurück
 survey#:#before#:#vor
 survey#:#browse_for_questions#:#Aus Pool hinzufügen
 survey#:#cancel_survey#:#Umfrage unterbrechen
@@ -14579,7 +14579,7 @@ survey#:#svy_mail_own_results#:#Eigene Antworten per E-Mail versenden
 survey#:#svy_mail_own_results_subject#:#Umfrage "%s" - Ihre Antworten
 survey#:#svy_mail_own_results_body#:#nachfolgend ist Ihre Teilnahme gelistet.
 survey#:#svy_results_view_own#:#Teilnehmer kann eigene Antworten einsehen
-survey#:#svy_results_mail_own#:#Teilnehmer kann sich E-Mail eigenen Antworten senden
+survey#:#svy_results_mail_own#:#Teilnehmer kann sich E-Mail mit den eigenen Antworten senden
 exercise#:#exc_to_desktop_info#:#Nach Abgabe die Übung auf den Schreibtisch legen
 wiki#:#wiki_wpg#:#Wiki-Seite
 wiki#:#wiki_add_page_properties#:#Zusätzliche Eigenschaften von Wikiseiten
@@ -14832,7 +14832,7 @@ sess#:#sess_reg_added_to_wl#:#Sie sind in die Warteliste aufgenommen worden.
 rbac#:#condition_failed#:#Nicht bestanden
 rbac#:#condition_learning_progress#:#Status aus Lernfortschritt ableiten
 rbac#:#rbac_precondition_hide#:#Objekt verbergen
-rbac#:#rbac_precondition_hide_info#:#Das Objekt ist für Benutzer, die die Vorbedingungen nicht erfüllt haben, nicht sichtbar.
+rbac#:#rbac_precondition_hide_info#:#Dieses Objekt wird Benutzern solange nicht angezeigt, bis die definierten Vorbedingungen erfüllt sind.
 wsp#:#wsp_shared_table_title#:#Freigaben
 crs#:#crs_objective_status_configure#:#Checkliste Kurs
 crs#:#crs_objective_status_settings#:#Kurseinstellungen vornehmen
@@ -15301,3 +15301,10 @@ blog#:#blog_keywords_other#:#Sonstige Schlagwörter
 blog#:#blog_keywords_other_info#:#Diese Schlagwörter sind für andere Blog-Einträge vergeben worden.
 forum#:#forums_thread_deleted#:#Das gewählte Thema einschließlich aller dazugehörigen Beiträge wurde gelöscht.
 forum#:#forums_threads_deleted#:#Die gewählten Themen einschließlich aller dazugehörigen Beiträge wurden gelöscht.
+user#:#feedhash#:#Newsfeedhash
+wsp#:#wsp_shared_filter_reset_button#:#Suche zurücksetzen
+wsp#:#wsp_shared_filter_button#:#Suche
+exc#:#exc_direct_submit#:#Abgeben
+export#:#no_file#:#Keine Datei
+content#:#lm_no_download_files#:#Zurzeit stehen keine Download-Dateien zur Verfügung.
+rbac#:#feed_copy#:#Webfeed kopieren

@@ -55,7 +55,7 @@ class ilSearchAutoComplete
 		foreach($list as $entry)
 		{
 			$result[$i] = new stdClass();
-			$result[$i]->value = $entry;
+			$result[$i]->value = '"'.$entry.'"';
 			$i++;
 		}
 		include_once './Services/JSON/classes/class.ilJsonUtil.php';

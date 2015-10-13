@@ -609,7 +609,9 @@ class ilObjExerciseGUI extends ilObjectGUI
 		}
 
 		if($success)
-		{
+		{			
+			ilUtil::sendSuccess($this->lng->txt("file_added"), true);		
+			
 			$this->sendNotifications((int)$_GET["ass_id"]);
 			$this->object->handleSubmission((int)$_GET['ass_id']);
 		}
@@ -1097,6 +1099,7 @@ class ilObjExerciseGUI extends ilObjectGUI
 		}
 		else
 		{
+			/* #16921
 			// #9946 - create team for new user(s) for each team upload assignment
 			foreach(ilExAssignment::getAssignmentDataOfExercise($this->object->getId()) as $ass)
 			{
@@ -1109,10 +1112,11 @@ class ilObjExerciseGUI extends ilObjectGUI
 					}
 				}
 			}						
+			*/
 			
 			ilUtil::sendSuccess($this->lng->txt("exc_members_assigned"),true);
 		}
-//exit;
+
 		$this->ctrl->redirect($this, "members");
 		return true;
 	}
@@ -3252,7 +3256,7 @@ class ilObjExerciseGUI extends ilObjectGUI
 		$conf->setFormAction($this->ctrl->getFormAction($this, "directSubmit"));
 		
 		$conf->setHeaderText($txt);
-		$conf->setConfirm($this->lng->txt("submit"), "directSubmit");
+		$conf->setConfirm($this->lng->txt("exc_direct_submit"), "directSubmit");
 		$conf->setCancel($this->lng->txt("cancel"), "showOverview");
 		
 		$tpl->setContent($conf->getHTML());

@@ -504,7 +504,7 @@ abstract class ilTestOutputGUI extends ilTestPlayerAbstractGUI
 				FALSE, 												#graphical_output
 				false,				#result_output
 				true, 												#show_question_only
-				FALSE,												#show_feedback
+				$answer_feedback,									#show_feedback
 				false, 												#show_correct_solution
 				FALSE, 												#show_manual_scoring
 				true												#show_question_text
@@ -659,7 +659,7 @@ abstract class ilTestOutputGUI extends ilTestPlayerAbstractGUI
 			$this->tpl->setVariable("JAVASCRIPT_URL", $this->ctrl->getLinkTarget($this, "gotoQuestion"));
 		}
 
-		if ($question_gui->object->supportsJavascriptOutput())
+		if ($question_gui->object->requiresJsSwitch() && !$this->object->getForceJS())
 		{
 			$this->tpl->touchBlock("jsswitch");
 		}

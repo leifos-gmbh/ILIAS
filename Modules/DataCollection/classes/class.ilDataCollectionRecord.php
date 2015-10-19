@@ -83,12 +83,27 @@ class ilDataCollectionRecord {
 		global $ilDB;
 
 		$ilDB->update("il_dcl_record", array(
-			"table_id" => array( "integer", $this->getTableId() ),
-			"last_update" => array( "date", $this->getLastUpdate() ),
-			"owner" => array( "text", $this->getOwner() ),
-			"last_edit_by" => array( "text", $this->getLastEditBy() )
+			"table_id" => array(
+				"integer",
+				$this->getTableId()
+			),
+			"last_update" => array(
+				"date",
+				$this->getLastUpdate()
+			),
+			"owner" => array(
+				"text",
+				$this->getOwner()
+			),
+			"last_edit_by" => array(
+				"text",
+				$this->getLastEditBy()
+			)
 		), array(
-			"id" => array( "integer", $this->id )
+			"id" => array(
+				"integer",
+				$this->id
+			)
 		));
 
 		foreach ($this->getRecordFields() as $recordfield) {
@@ -276,7 +291,7 @@ class ilDataCollectionRecord {
 	/**
 	 * Set a field value
 	 *
-	 * @param int    $field_id
+	 * @param int $field_id
 	 * @param string $value
 	 */
 	public function setRecordFieldValue($field_id, $value) {
@@ -373,6 +388,28 @@ class ilDataCollectionRecord {
 	 * @param       $field_id
 	 * @param array $options
 	 *
+	 * @return array|mixed|string
+	 */
+	public function getRecordFieldSortingValue($field_id, array $options = array()) {
+		$this->loadRecordFields();
+		if (ilDataCollectionStandardField::_isStandardField($field_id)) {
+			$sort = $this->getStandardFieldHTML($field_id, $options);
+		} else {
+			if (is_object($this->recordfields[$field_id])) {
+				$sort = $this->recordfields[$field_id]->getSortingValue();
+			} else {
+				$sort = '';
+			}
+		}
+
+		return $sort;
+	}
+
+
+	/**
+	 * @param       $field_id
+	 * @param array $options
+	 *
 	 * @return array|string
 	 */
 	public function getRecordFieldSingleHTML($field_id, array $options = array()) {
@@ -387,8 +424,10 @@ class ilDataCollectionRecord {
 			 */
 			$html = $field->getSingleHTML($options, false);
 		}
-		$html = str_ireplace("{", "&#123;", $html);
-		$html = str_ireplace("}", "&#125;", $html);
+		// This is a workaround as templating in ILIAS currently has some issues with curly brackets.see: http://www.ilias.de/mantis/view.php?id=12681#bugnotes
+		// SW 14.10.2015 Uncommented again, as some fields are outputting javascript that was broken due to entity encode the curly brackets
+//		$html = str_ireplace("{", "&#123;", $html);
+//		$html = str_ireplace("}", "&#125;", $html);
 
 		return $html;
 	}
@@ -569,7 +608,7 @@ class ilDataCollectionRecord {
 	 * @param $obj_id
 	 */
 	public function deleteFile($obj_id) {
-		if (ilObject2::_lookupObjId($obj_id)) {
+		if (ilObject2::_exists($obj_id, false)) {
 			$file = new ilObjFile($obj_id, false);
 			$file->delete();
 		}

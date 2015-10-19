@@ -106,6 +106,23 @@ class ilPublicUserProfileGUI
 		$this->backurl = $a_backurl;
 		$ilCtrl->setParameter($this, "back_url", rawurlencode($a_backurl));
 	}
+	
+	protected function handleBackUrl()
+	{
+		global $ilMainMenu;
+				
+		$back = ($this->getBackUrl() != "")
+			? $this->getBackUrl()
+			: $_GET["back_url"];
+		
+		if(!$back)
+		{
+			// #15984
+			$back = 'ilias.php?baseClass=ilPersonalDesktopGUI';
+		}
+
+		$ilMainMenu->setTopBarBack($back);
+	}
 
 	/**
 	* Get Back Link URL.
@@ -177,6 +194,8 @@ class ilPublicUserProfileGUI
 				$portfolio_id = $this->getProfilePortfolio();
 				if($portfolio_id)
 				{					
+					$this->handleBackUrl();
+					
 					include_once "Modules/Portfolio/classes/class.ilObjPortfolioGUI.php";
 					$gui = new ilObjPortfolioGUI($portfolio_id); // #11876		
 					$gui->setAdditional($this->getAdditional());
@@ -233,13 +252,11 @@ class ilPublicUserProfileGUI
 		}
 		else
 		{
-			$this->renderTitle();
-			
 			if(!$is_active)
 			{
 				return;
-			}				
-			
+			}
+
 			// Check from Database if value
 			// of public_profile = "y" show user infomation
 			$user = new ilObjUser($this->getUserId());
@@ -248,8 +265,10 @@ class ilPublicUserProfileGUI
 				!$this->custom_prefs)
 			{
 				return;
-			}		
-			
+			}
+
+			$this->renderTitle();
+
 			return $this->getEmbeddable(true);	
 		}		
 	}
@@ -668,7 +687,7 @@ class ilPublicUserProfileGUI
 			$vcard->setAddress($adr[0], $adr[1], $adr[2], $adr[3], $adr[4], $adr[5], $adr[6]);
 		}
 		
-		ilUtil::deliverData(utf8_decode($vcard->buildVCard()), $vcard->getFilename(), $vcard->getMimetype());
+		ilUtil::deliverData($vcard->buildVCard(), $vcard->getFilename(), $vcard->getMimetype());
 	}
 	
 	/**
@@ -699,7 +718,7 @@ class ilPublicUserProfileGUI
 	
 	function renderTitle()
 	{
-		global $tpl, $ilTabs, $lng;
+		global $tpl;
 		
 		$tpl->resetHeaderBlock();
 		
@@ -707,16 +726,7 @@ class ilPublicUserProfileGUI
 		$tpl->setTitle(ilUserUtil::getNamePresentation($this->getUserId()));
 		$tpl->setTitleIcon(ilObjUser::_getPersonalPicturePath($this->getUserId(), "xxsmall"));
 		
-		$back = ($this->getBackUrl() != "")
-			? $this->getBackUrl()
-			: $_GET["back_url"];
-
-		if ($back != "")
-		{
-			$ilTabs->clearTargets();
-			$ilTabs->setBackTarget($lng->txt("back"),
-				$back);
-		}
+		$this->handleBackUrl();
 	}
 	
 	/**

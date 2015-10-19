@@ -367,15 +367,15 @@ class ilContainer extends ilObject
 		{
 			$file_name = $cont_dir."/icon_custom.svg";
 			ilUtil::moveUploadedFile($a_custom_icon, "icon_custom.svg", $file_name);
-		}
 
-		if ($file_name != "" && is_file($file_name))
-		{
-			ilContainer::_writeContainerSetting($this->getId(), "icon_custom", 1);
-		}
-		else
-		{
-			ilContainer::_writeContainerSetting($this->getId(), "icon_custom", 0);
+			if ($file_name != "" && is_file($file_name))
+			{
+				ilContainer::_writeContainerSetting($this->getId(), "icon_custom", 1);
+			}
+			else
+			{
+				ilContainer::_writeContainerSetting($this->getId(), "icon_custom", 0);
+			}
 		}
 	}
 
@@ -824,10 +824,10 @@ class ilContainer extends ilObject
 		// using long descriptions?
 		$short_desc = $ilSetting->get("rep_shorten_description");
 		$short_desc_max_length = $ilSetting->get("rep_shorten_description_length");
-		if(!$short_desc || $short_desc_max_length != ilObject::TITLE_LENGTH)
+		if(!$short_desc || $short_desc_max_length != ilObject::DESC_LENGTH)
 		{
 			// using (part of) shortened description
-			if($short_desc && $short_desc_max_length && $short_desc_max_length < ilObject::TITLE_LENGTH)
+			if($short_desc && $short_desc_max_length && $short_desc_max_length < ilObject::DESC_LENGTH)
 			{
 				foreach($objects as $key => $object)
 				{

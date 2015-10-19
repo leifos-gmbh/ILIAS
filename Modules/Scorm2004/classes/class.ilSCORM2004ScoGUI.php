@@ -565,18 +565,10 @@ die("deprecated");
 	
 	function downloadExportFile()
 	{
-		if(!isset($_POST["file"]))
-		{
-			$this->ilias->raiseError($this->lng->txt("no_checkbox"),$this->ilias->error_obj->MESSAGE);
-		}
-
-		if (count($_POST["file"]) > 1)
-		{
-			$this->ilias->raiseError($this->lng->txt("cont_select_max_one_item"),$this->ilias->error_obj->MESSAGE);
-		}
+		$file = str_replace("..", "", $_GET['file']);
 		$export = new ilSCORM2004Export($this->node_object);
-		$export_dir = $export->getExportDirectoryForType($_POST['type'][$_POST['file'][0]]);
-		ilUtil::deliverFile($export_dir."/".$_POST['file'][0], $_POST['file'][0]);
+		$export_dir = $export->getExportDirectoryForType($_GET['type']);
+		ilUtil::deliverFile($export_dir."/".$file, $file);
 	}
 	
 	/**
@@ -860,7 +852,7 @@ die("deprecated");
 		
 		$tpl->addBlockFile("ADM_CONTENT", "adm_content", "tpl.scormeditor_sco_import.html", "Modules/Scorm2004");
 		
-		$tpl->setVariable("TYPE_IMG",ilUtil::getImagePath('icon_slm.svg'));
+		$tpl->setVariable("TYPE_IMG",ilUtil::getImagePath('icon_lm.svg'));
 		$tpl->setVariable("ALT_IMG", $lng->txt("obj_sahs"));
 		
 		$tpl->setVariable("FORMACTION", $this->ctrl->getFormAction($this));

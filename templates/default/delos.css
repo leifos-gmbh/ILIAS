@@ -7455,6 +7455,11 @@ div.ilSideBarContent {
 .ui-menu .ui-menu-item a.ui-state-active {
   background-color: #FF9;
 }
+/* Icon Default */
+img.ilIcon {
+  width: 32px;
+  height: 32px;
+}
 /* Component Imports */
 /* Services/Accordion */
 .il_VAccordionHead,
@@ -7893,6 +7898,10 @@ a.ilTreeView:focus {
   border: 0;
   width: 20px;
   height: 20px;
+}
+img.il_ExplorerIcon {
+  height: 20px;
+  width: 20px;
 }
 /* Modules/Forum */
 a.postread,
@@ -10583,6 +10592,9 @@ a.ilSubmitInactive:active {
   background-color: #b0b0b0;
   border-color: #b0b0b0;
   cursor: default;
+}
+button > .glyphicon {
+  pointer-events: none;
 }
 /* Services/Rating */
 img.ilRatingIcon {

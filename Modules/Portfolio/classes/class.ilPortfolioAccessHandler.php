@@ -397,32 +397,48 @@ class ilPortfolioAccessHandler
 		{
 			include_once "Services/PersonalWorkspace/classes/class.ilWorkspaceAccessGUI.php";
 			
-			switch($a_filter["acl_type"])
+			// patch uzk start		
+			
+			$all_obj_ids = null;
+			
+			// parse multi-select
+			foreach($a_filter["acl_type"] as $item)
 			{
-				case "all":
-					$obj_ids = array(ilWorkspaceAccessGUI::PERMISSION_ALL);					
-					break;
+				switch($item)
+				{
+					case "all":
+						$obj_ids = array(ilWorkspaceAccessGUI::PERMISSION_ALL);					
+						break;
+
+					case "password":
+						$obj_ids = array(ilWorkspaceAccessGUI::PERMISSION_ALL_PASSWORD);			
+						break;
+
+					case "registered":
+						$obj_ids = array(ilWorkspaceAccessGUI::PERMISSION_REGISTERED);		
+						break;
+
+					case "course":
+						$obj_ids = $a_crs_ids;
+						break;
+
+					case "group":
+						$obj_ids = $a_grp_ids;
+						break;
+
+					case "user":
+						$obj_ids = array($ilUser->getId());	
+						break;								
+				}
 				
-				case "password":
-					$obj_ids = array(ilWorkspaceAccessGUI::PERMISSION_ALL_PASSWORD);			
-					break;
-				
-				case "registered":
-					$obj_ids = array(ilWorkspaceAccessGUI::PERMISSION_REGISTERED);		
-					break;
-				
-				case "course":
-					$obj_ids = $a_crs_ids;
-					break;
-								
-				case "group":
-					$obj_ids = $a_grp_ids;
-					break;
-				
-				case "user":
-					$obj_ids = array($ilUser->getId());	
-					break;								
+				$all_obj_ids = ($all_obj_ids === null)
+					?  $obj_ids
+					:  array_intersect($all_obj_ids, $obj_ids);				
 			}
+			
+			$obj_ids = $all_obj_ids;
+			
+			// patch uzk end
 		}
 		
 		$res = array();

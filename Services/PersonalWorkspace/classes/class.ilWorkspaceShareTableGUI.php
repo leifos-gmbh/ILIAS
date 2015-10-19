@@ -116,7 +116,10 @@ class ilWorkspaceShareTableGUI extends ilTable2GUI
 		}
 		else
 		{
-			ilUtil::sendInfo($lng->txt("wsp_shared_mandatory_filter_info"));		
+			// or else we might end up without any navigation
+			$this->setDisableFilterHiding(true);
+			
+			ilUtil::sendInfo($lng->txt("wsp_shared_mandatory_filter_info"));			
 		}
 
 		// initial state: show filters only

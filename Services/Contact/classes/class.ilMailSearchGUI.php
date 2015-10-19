@@ -151,12 +151,24 @@ class ilMailSearchGUI
 		
 		if(sizeof($user_ids))
 		{			
-			$tree = $a_wsp_access_handler->getTree();			
-			$obj_id = $tree->lookupObjectId($a_wsp_node_id);
+			// personal workspace
+			if(method_exists($a_wsp_access_handler, "getTree"))
+			{
+				$tree = $a_wsp_access_handler->getTree();			
+				$obj_id = $tree->lookupObjectId($a_wsp_node_id);	
+				
+				$link = $a_wsp_access_handler->getGotoLink($a_wsp_node_id, $obj_id);			
+			}
+			// portfolio
+			else
+			{
+				$obj_id = $a_wsp_node_id;
+				
+				include_once "Services/Link/classes/class.ilLink.php";
+				$link = ilLink::_getStaticLink($obj_id, "prtf");
+			}
 			$obj_type = ilObject::_lookupType($obj_id);
 			$obj_title = ilObject::_lookupTitle($obj_id);
-			
-			$link = $a_wsp_access_handler->getGotoLink($a_wsp_node_id, $obj_id);
 			
 			include_once "./Services/Language/classes/class.ilLanguageFactory.php";
 			

@@ -19,3 +19,10 @@ if(!$ilDB->tableExists('uzk_instance_stats'))
 	$ilDB->addPrimaryKey('uzk_instance_stats', array('keyword'));
 }
 ?>
+<#2>
+<?php
+if(!$ilDB->indexExistsByFields('conditions', array('target_ref_id')))
+{
+	$ilDB->addIndex('conditions', array('target_ref_id'), 'c1');
+}
+?>

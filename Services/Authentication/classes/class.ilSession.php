@@ -417,14 +417,15 @@ class ilSession
 	public static function getNumberOfActiveUserSessions()
 	{
 		/**
-		 * @var $ilDB      ilDB
-		 * @var $ilSetting ilSetting
+		 * @var $ilDB ilDB
 		 */
-		global $ilDB, $ilSetting;
+		global $ilDB;
 
-		if(time() < $ilSetting->get('session_count_users_online_expire', 0))
+		require_once 'Services/UzK/classes/class.ilUzkInstanceStatistics.php';
+
+		if(time() < ilUzkInstanceStatistics::getInstance()->get('session_count_users_online_expire', 0))
 		{
-			return $ilSetting->get('session_count_users_online', 0);
+			return ilUzkInstanceStatistics::getInstance()->get('session_count_users_online', 0);
 		}
 		else
 		{
@@ -437,8 +438,8 @@ class ilSession
 			$result = $ilDB->queryF($query, array('integer'), array(ANONYMOUS_USER_ID));
 			$row    = $ilDB->fetchAssoc($result);
 
-			$ilSetting->set('session_count_users_online', $row['users']);
-			$ilSetting->set('session_count_users_online_expire', time() + (60 * 2.5));
+			ilUzkInstanceStatistics::getInstance()->set('session_count_users_online', $row['users']);
+			ilUzkInstanceStatistics::getInstance()->set('session_count_users_online_expire', time() + (60 * 2.5));
 
 			return $row['users'];
 		}
@@ -447,14 +448,15 @@ class ilSession
 	public static function getNumberOfActiveAnonymousSessions()
 	{
 		/**
-		 * @var $ilDB      ilDB
-		 * @var $ilSetting ilSetting
+		 * @var $ilDB ilDB
 		 */
-		global $ilDB, $ilSetting;
+		global $ilDB;
 
-		if(time() < $ilSetting->get('session_count_anon_online_expire', 0))
+		require_once 'Services/UzK/classes/class.ilUzkInstanceStatistics.php';
+
+		if(time() < ilUzkInstanceStatistics::getInstance()->get('session_count_anon_online_expire', 0))
 		{
-			return $ilSetting->get('session_count_anon_online', 0);
+			return ilUzkInstanceStatistics::getInstance()->get('session_count_anon_online', 0);
 		}
 		else
 		{
@@ -466,8 +468,8 @@ class ilSession
 			$result = $ilDB->queryF($query, array('integer', 'integer'), array(0, ANONYMOUS_USER_ID));
 			$row    = $ilDB->fetchAssoc($result);
 
-			$ilSetting->set('session_count_anon_online', $row['users']);
-			$ilSetting->set('session_count_anon_online_expire', time() + (60 * 2.5));
+			ilUzkInstanceStatistics::getInstance()->set('session_count_anon_online', $row['users']);
+			ilUzkInstanceStatistics::getInstance()->set('session_count_anon_online_expire', time() + (60 * 2.5));
 
 			return $row['users'];
 		}

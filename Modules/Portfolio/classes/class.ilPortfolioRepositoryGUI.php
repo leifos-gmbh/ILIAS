@@ -321,7 +321,9 @@ class ilPortfolioRepositoryGUI
 		
 	protected function showOtherFilter()
 	{
-		$this->showOther(false);
+		// patch uzk start
+		$this->showOther(true);
+		// patch uzk end
 	}
 	
 	protected function showOther($a_load_data = true)

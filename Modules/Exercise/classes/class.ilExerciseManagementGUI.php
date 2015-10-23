@@ -514,6 +514,7 @@ class ilExerciseManagementGUI
 		if (count($mems) > 0)
 		{
 			$this->ctrl->setParameter($this, "vw", self::VIEW_PARTICIPANT);
+			$this->ctrl->setParameter($this, "part_id", $_GET["part_id"]);
 			
 			include_once("./Modules/Exercise/classes/class.ilExParticipantTableGUI.php");
 			$part_tab = new ilExParticipantTableGUI($this, "showParticipant",

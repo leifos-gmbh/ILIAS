@@ -357,7 +357,10 @@ class ilRadiusSettings
 		}
 		
 		include_once('./Services/AccessControl/classes/class.ilObjRole.php');
-		$roles = ilObjRole::_getRolesByAuthMode('radius');
+		// uzk-patch: begin
+		//$roles = ilObjRole::_getRolesByAuthMode('radius');
+		$roles = array();
+		// uzk-patch: end
 		$this->default_role = 0;
 		if (isset($roles[0]) && $roles[0])
 		{

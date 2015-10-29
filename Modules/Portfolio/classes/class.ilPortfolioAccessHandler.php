@@ -433,7 +433,7 @@ class ilPortfolioAccessHandler
 				
 				$all_obj_ids = ($all_obj_ids === null)
 					?  $obj_ids
-					:  array_intersect($all_obj_ids, $obj_ids);				
+					:  array_merge($all_obj_ids, $obj_ids);				
 			}
 			
 			$obj_ids = $all_obj_ids;

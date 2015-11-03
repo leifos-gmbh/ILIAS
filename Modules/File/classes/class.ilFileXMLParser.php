@@ -28,6 +28,9 @@ class ilFileXMLParser extends ilSaxParser
 	// begin-patch fm
 	static $CONTENT_REST = 5;
 	// end-patch fm
+	// uzk-patch: begin
+	static $CONTENT_FS_COPY = 99;
+	// uzk-patch: end
 
 	/**
 	 * Exercise object which has been parsed
@@ -188,6 +191,12 @@ class ilFileXMLParser extends ilSaxParser
 						$this->mode = ilFileXMLParser::$CONTENT_REST;
 					}
 					// end-patch fm
+					// uzk-patch: begin
+					else if($a_attribs['mode'] == 'FS_COPY')
+					{
+						$this->mode = ilFileXMLParser::$CONTENT_FS_COPY;
+					}
+					// uzk-patch: end
 			    }
 		}
 	}
@@ -249,6 +258,12 @@ class ilFileXMLParser extends ilSaxParser
 					$this->tmpFilename = $baseDecodedFilename;
 				}
 				// end-patch fm
+				// uzk-patch: begin
+				else if($this->mode == ilFileXMLParser::$CONTENT_FS_COPY)
+				{
+					$this->tmpFilename = $this->cdata;
+				}
+				// uzk-patch: end
 				else
 				{
 					if (!ilFileUtils::fastBase64Decode($this->tmpFilename, $baseDecodedFilename))
@@ -311,6 +326,13 @@ class ilFileXMLParser extends ilSaxParser
 			if ($this->isReadingFile && $this->mode != ilFileXMLParser::$CONTENT_COPY && $this->mode != ilFileXMLParser::$CONTENT_REST)
 			// begin-patch fm
 			{
+				// uzk-patch: begin
+				if($this->mode == ilFileXMLParser::$CONTENT_FS_COPY)
+				{
+					$this->cdata .= $a_data;
+					return;
+				}
+				// uzk-patch: end
   			$handle = fopen($this->tmpFilename, "a");
 				fwrite ($handle, $a_data);
 				fclose ($handle);

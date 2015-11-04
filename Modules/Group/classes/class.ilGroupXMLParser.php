@@ -284,6 +284,14 @@ class ilGroupXMLParser extends ilSaxParser
 			case 'ContainerSetting':
 				if($this->current_container_setting)
 				{
+					// uzk-patch: begin
+					if(!($this->group_obj instanceof ilObjGroup))
+					{
+						global $ilLog;
+						$ilLog->write('handlerEndTag: Missing group object -> ' . var_export($this->group_obj, 1));
+						$this->__initGroupObject();
+					}
+					// uzk-patch: end
 					ilContainer::_writeContainerSetting(
 						$this->group_obj->getId(), 
 						$this->current_container_setting, 
@@ -570,10 +578,16 @@ class ilGroupXMLParser extends ilSaxParser
 
 		if ($this->mode == ilGroupXMLParser::$CREATE)
 		{
-			$this->group_obj =& new ilObjGroup();
+			// uzk-patch: begin
+			$this->group_obj = new ilObjGroup();
+			// uzk-patch: end
 		} elseif ($this->mode == ilGroupXMLParser::$UPDATE) {
 			$this->group_obj = $this->grp;
 		}
+		// uzk-patch: begin
+		global $ilLog;
+		$ilLog->write('__initGroupObject with instance of ' . get_class($this->group_obj));
+		// uzk-patch: end
 
 		return true;
 	}
@@ -647,8 +661,9 @@ class ilGroupXMLParser extends ilSaxParser
 	public function setMode($mode) {
 		$this->mode = $mode;
 	}
-
-	public function setGroup(& $grp) {
+	// uzk-patch: begin
+	public function setGroup($grp) {
+	// uzk-patch: end
 		$this->grp = $grp;
 	}
 

@@ -130,12 +130,6 @@ class ilSoapGroupAdministration extends ilSoapAdministration
 			return $this->__raiseError('Reference id does not point to a group!','CLIENT_WRONG_TYPE');				
 		}
 
-		// uzk-patch: begin
-		if(!($grp instanceof ilObjGroup))
-		{
-			return $this->__raiseError('Reference id does not point to a group!','CLIENT_WRONG_TYPE');
-		}
-		// uzk-patch: end
 		include_once 'Modules/Group/classes/class.ilGroupXMLParser.php';
 		$xml_parser = new ilGroupXMLParser($grp_xml, -1);
 		$xml_parser->setMode(ilGroupXMLParser::$UPDATE);

@@ -3155,7 +3155,7 @@ class ilObjSurvey extends ilObject
 				}
 				foreach ($placeholders as $key => $mapping)
 				{									
-					if (!$this->hasAnonymizedResults())
+					if ($this->hasAnonymizedResults()) // #16480
 					{
 						$messagetext = str_replace('[' . $key . ']', '', $messagetext);
 					}
@@ -4342,12 +4342,11 @@ class ilObjSurvey extends ilObject
 		// Copy settings
 		$newObj = parent::cloneObject($a_target_id,$a_copy_id);
 		$this->cloneMetaData($newObj);
-		$newObj->updateMetaData();		
+		$newObj->updateMetaData();
 	 	
 		$newObj->setAuthor($this->getAuthor());
 		$newObj->setIntroduction($this->getIntroduction());
 		$newObj->setOutro($this->getOutro());
-		$newObj->setStatus($this->getStatus());
 		$newObj->setEvaluationAccess($this->getEvaluationAccess());
 		$newObj->setStartDate($this->getStartDate());
 		$newObj->setEndDate($this->getEndDate());
@@ -4399,6 +4398,14 @@ class ilObjSurvey extends ilObject
 				$question_pointer[$question_id] = $question->getId();
 				$mapping[$question_id] = $question->getId();				
 			}
+		}
+
+		//copy online status if object is not the root copy object
+		$cp_options = ilCopyWizardOptions::_getInstance($a_copy_id);
+
+		if(!$cp_options->isRootNode($this->getRefId()))
+		{
+			$newObj->setStatus($this->isOnline()?self::STATUS_ONLINE: self::STATUS_OFFLINE);
 		}
 
 		$newObj->saveToDb();		
@@ -6434,7 +6441,7 @@ class ilObjSurvey extends ilObject
 		
 		if($this->getTutorNotificationStatus())
 		{
-			$user_ids = $this->getNotificationTargetUserIds();
+			$user_ids = $this->getNotificationTargetUserIds(($this->getTutorNotificationTarget() == self::NOTIFICATION_INVITED_USERS));
 			if($user_ids)
 			{
 				$set = $ilDB->query("SELECT COUNT(*) numall FROM svy_finished".
@@ -6450,11 +6457,11 @@ class ilObjSurvey extends ilObject
 		}
 	}
 	
-	protected function getNotificationTargetUserIds()
+	protected function getNotificationTargetUserIds($a_use_invited)
 	{
 		global $tree;
 		
-		if($this->getTutorNotificationTarget() == self::NOTIFICATION_INVITED_USERS)
+		if((bool)$a_use_invited)
 		{
 			$user_ids = $this->getInvitedUsers();				
 		}
@@ -6558,10 +6565,13 @@ class ilObjSurvey extends ilObject
 		$cut->increment(IL_CAL_DAY, $this->getReminderFrequency()*-1);
 		if(!$this->getReminderLastSent() ||
 			$cut->get(IL_CAL_DATE) >= substr($this->getReminderLastSent(), 0, 10))					
-		{				
-			$user_ids = $this->getNotificationTargetUserIds();
+		{	
+			$missing_ids = array();
+				
+			// #16871
+			$user_ids = $this->getNotificationTargetUserIds(($this->getReminderTarget() == self::NOTIFICATION_INVITED_USERS));					
 			if($user_ids)
-			{
+			{				
 				// gather participants who already finished
 				$finished_ids = array();
 				$set = $ilDB->query("SELECT user_fi FROM svy_finished".
@@ -6595,7 +6605,7 @@ class ilObjSurvey extends ilObject
 			$this->setReminderLastSent($today);
 			$this->saveToDb();
 
-			return true;
+			return sizeof($missing_ids);
 		}
 		
 		return false;

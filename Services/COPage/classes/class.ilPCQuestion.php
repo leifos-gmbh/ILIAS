@@ -271,7 +271,8 @@ class ilPCQuestion extends ilPageContent
 				foreach($q_ids as $q_id)
 				{
 					$q_gui = assQuestionGUI::_getQuestionGUI("", $q_id);
-					if(!$q_gui->object->isComplete())
+					// object check due to #16557
+					if(is_object($q_gui->object) && !$q_gui->object->isComplete())
 					{
 						$a_output = str_replace("{{{{{Question;il__qst_".$q_id."}}}}}", 
 							"<i>".$lng->txt("cont_empty_question")."</i>", 
@@ -327,7 +328,7 @@ class ilPCQuestion extends ilPageContent
 		{
 			$js_files[] = "./Modules/Scorm2004/scripts/questions/pure.js";
 			$js_files[] = "./Modules/Scorm2004/scripts/questions/question_handling.js";
-
+			$js_files[] = "Modules/TestQuestionPool/js/ilMatchingQuestion.js";
 		}
 
 		if (!$this->getPage()->getPageConfig()->getEnableSelfAssessmentScorm() && $a_mode != IL_PAGE_PREVIEW
@@ -346,7 +347,8 @@ class ilPCQuestion extends ilPageContent
 	{
 		if ($this->getPage()->getPageConfig()->getEnableSelfAssessment())
 		{
-			return array("./Modules/Scorm2004/templates/default/question_handling.css");
+			return array("./Modules/Scorm2004/templates/default/question_handling.css",
+				"Modules/TestQuestionPool/templates/default/test_javascript.css");
 		}
 		return array();
 	}
@@ -444,7 +446,20 @@ class ilPCQuestion extends ilPageContent
 			foreach ($q_ids as $q_id)
 			{
 				$q_exporter = new ilQuestionExporter($a_no_interaction);
-				$js[$q_id] = $q_exporter->exportQuestion($q_id, null, $a_mode);
+				$image_path = null;
+				if ($a_mode == "offline")
+				{
+					if ($this->getPage()->getParentType() == "sahs")
+					{
+						$image_path = "./objects/";
+					}
+					if ($this->getPage()->getParentType() == "lm")
+					{
+						$image_path = "./assessment/0/".$q_id."/images/";
+					}
+				}
+
+				$js[$q_id] = $q_exporter->exportQuestion($q_id, $image_path, $a_mode);
 			}
 		}
 		return $js;

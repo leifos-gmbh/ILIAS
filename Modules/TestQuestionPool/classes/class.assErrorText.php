@@ -1224,8 +1224,8 @@ class assErrorText extends assQuestion implements ilObjQuestionScoringAdjustable
 		$result['nr_of_tries'] = (int) $this->getNrOfTries();
 		$result['shuffle'] = (bool) $this->getShuffle();
 		$result['feedback'] = array(
-			"onenotcorrect" => $this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), false),
-			"allcorrect" => $this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), true)
+			'onenotcorrect' => $this->formatSAQuestion($this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), false)),
+			'allcorrect' => $this->formatSAQuestion($this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), true))
 		);
 
 		$answers = array();
@@ -1355,17 +1355,19 @@ class assErrorText extends assQuestion implements ilObjQuestionScoringAdjustable
 	 */
 	public function getAvailableAnswerOptions($index = null)
 	{
+		$error_text_array = explode(' ', $this->errortext);
+		
 		if($index !== null)
 		{
-			if(array_key_exists($index, $this->errordata))
+			if(array_key_exists($index, $error_text_array))
 			{
-				return $this->errordata[$index];
+				return $error_text_array[$index];
 			}
 			return null;
 		}
 		else
 		{
-			return $this->getErrorData();
+			return $error_text_array;
 		}
 	}
 }

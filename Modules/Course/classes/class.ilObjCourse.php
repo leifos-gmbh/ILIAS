@@ -462,23 +462,26 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 		
 		// Results are stored in $this->items
 		parent::getSubItems($a_admin_panel_enabled,$a_include_side_block);
-	
-		// No sessions
-		if(!is_array($this->items['sess']) or !$this->items['sess'])
+			
+		$limit_sess = false;		
+		if(!$a_admin_panel_enabled &&
+			!$a_include_side_block &&
+			$this->items['sess'] &&
+			is_array($this->items['sess']) &&
+			$this->isSessionLimitEnabled() &&
+			$this->getViewMode() == ilContainer::VIEW_SESSIONS) // #16686
+		{
+			$limit_sess = true;
+		}
+		
+		if(!$limit_sess)
 		{
 			return $this->items[(int) $a_admin_panel_enabled][(int) $a_include_side_block];
 		}
-		// No session limit
-		if(!$this->isSessionLimitEnabled() or $a_admin_panel_enabled)
-		{
-			return $this->items[(int) $a_admin_panel_enabled][(int) $a_include_side_block];
-		}
+		
 
-		if($a_include_side_block)
-		{
-			return $this->items[(int) $a_admin_panel_enabled][(int) $a_include_side_block];
-		}
-
+		// do session limit
+		
 		// @todo move to gui class
 		if(isset($_GET['crs_prev_sess']))
 		{
@@ -1261,6 +1264,12 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 		$new_obj->setRegistrationAccessCode(ilMembershipRegistrationCodeUtils::generateCode());
 		$new_obj->setStatusDetermination($this->getStatusDetermination());
 		$new_obj->setMailToMembersType($this->getMailToMembersType());
+		
+		// #10271
+		$new_obj->setEnableCourseMap($this->getEnableCourseMap());
+		$new_obj->setLatitude($this->getLatitude());
+		$new_obj->setLongitude($this->getLongitude());
+		$new_obj->setLocationZoom($this->getLocationZoom());
 		
 		$new_obj->update();
 	}

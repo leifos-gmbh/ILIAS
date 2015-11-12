@@ -135,3 +135,25 @@ if(!$ilDB->tableExists('sysc_tasks'))
 	$ilDB->createSequence("sysc_tasks");
 }
 ?>
+<#10>
+<?php
+	$ilDB->modifyTableColumn('il_dcl_field', 'description', array("type" => "clob"));
+?>
+<#11>
+<?php
+	$ilCtrlStructureReader->getStructure();
+?>
+<#12>
+<?php
+	if(!$ilDB->indexExistsByFields('page_question',array('question_id')))
+	{
+		$ilDB->addIndex('page_question',array('question_id'),'i2');
+	}
+?>
+<#13>
+<?php
+	if(!$ilDB->indexExistsByFields('help_tooltip', array('tt_id', 'module_id')))
+	{
+		$ilDB->addIndex('help_tooltip', array('tt_id', 'module_id'), 'i1');
+	}
+?>

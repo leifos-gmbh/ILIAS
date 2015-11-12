@@ -276,6 +276,7 @@ class ilMailFolderGUI
 			$confirmation->setConfirm($this->lng->txt('confirm'), 'confirmDeleteMails');
 			$confirmation->setCancel($this->lng->txt('cancel'), 'cancelDeleteMails');
 			$this->tpl->setVariable('CONFIRMATION', $confirmation->getHTML());
+			$a_show_confirmation = true;
 		}
 
 		$folders = $this->mbox->getSubFolders();
@@ -362,7 +363,7 @@ class ilMailFolderGUI
 			}
 		}
 
-		if($a_show_confirmation == false)
+		if($a_show_confirmation == false && $this->askForConfirmation == false)
 		{
 			if('tree' != ilSession::get(ilMailGUI::VIEWMODE_SESSION_KEY))
 			{
@@ -722,6 +723,7 @@ class ilMailFolderGUI
 		require_once 'Services/Form/classes/class.ilPropertyFormGUI.php';
 
 		$form = new ilPropertyFormGUI();
+		$form->setPreventDoubleSubmission(false);
 		$form->setTableWidth('100%');
 		$this->ctrl->setParameter($this, 'mail_id', (int)$_GET['mail_id']);
 		$form->setFormAction($this->ctrl->getFormAction($this, 'showMail'));

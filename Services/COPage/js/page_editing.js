@@ -468,9 +468,24 @@ var ilCOPage =
 
 	cmdListIndent: function()
 	{
-		var ed = tinyMCE.get('tinytarget');
+		var blockq = false, range, ed = tinyMCE.get('tinytarget');
+
 		ed.focus();
 		ed.execCommand('Indent', false);
+		range = ed.selection.getRng(true);
+
+		// if path contains blockquote, top level list has been indented -> undo, see bug #0016243
+		cnode = range.startContainer;
+		while (cnode = cnode.parentNode) {
+			if (cnode.nodeName == "BLOCKQUOTE") {
+				blockq = true;
+			}
+		}
+		if (blockq) {
+			ed.execCommand('Undo', false);
+		}
+
+		//tinyMCE.execCommand('mceCleanup', false, 'tinytarget');
 		this.fixListClasses(false);
 		this.autoResize(ed);
 	},
@@ -1982,7 +1997,6 @@ function editParagraph(div_id, mode, switched)
 		oldOpenedMenu = openedMenu;
 		openedMenu = "";
 	}
-
 	ed_para = div_id;
 	ilCOPage.pc_id_str = "";
 
@@ -2083,6 +2097,7 @@ function editParagraph(div_id, mode, switched)
 		}
 		else
 		{
+
 			var ins_div = pdiv;
 		}
 
@@ -2090,7 +2105,6 @@ function editParagraph(div_id, mode, switched)
 		ta_div.id = 'tinytarget_div';
 		ta_div.style.position = 'absolute';
 		ta_div.style.left = '-200px';
-
 	}
 
 	// init tiny
@@ -2106,7 +2120,8 @@ function editParagraph(div_id, mode, switched)
 	}
 
 	var tinytarget = document.getElementById("tinytarget");
-	tinytarget.style.display = '';
+//	tinytarget.style.display = '';
+
 	if (!moved)
 	{
 		tinyMCE.init({
@@ -2240,7 +2255,6 @@ function editParagraph(div_id, mode, switched)
 
 					if(ev.keyCode == 9 && !ev.shiftKey)
 					{
-//						console.log("tab");
 						YAHOO.util.Event.preventDefault(ev);
 						YAHOO.util.Event.stopPropagation(ev);
 						if (ilCOPage.current_td != "")
@@ -2384,6 +2398,9 @@ function editParagraph(div_id, mode, switched)
 						ilCOPage.focusTiny(true);
 						cmd_called = false;
 					}
+
+					$('#tinytarget_ifr').contents().find("html").attr('lang', $('html').attr('lang'));
+					$('#tinytarget_ifr').contents().find("html").attr('dir', $('html').attr('dir'));
 				});
 			}
 
@@ -2392,12 +2409,12 @@ function editParagraph(div_id, mode, switched)
 	else	// moved (table editing)
 	{
 		//prepareTinyForEditing;
-		tinyMCE.execCommand('mceToggleEditor', false, 'tinytarget');
+		// this code line has been commented out
+		// with 5.0, not really sure why it has been needed before
+//		tinyMCE.execCommand('mceToggleEditor', false, 'tinytarget');
 		var ed = tinyMCE.get('tinytarget');
 		ed.setContent(pdiv.innerHTML);
 		ilCOPage.splitBR();
-//console.log("Setting content to: " + pdiv.innerHTML);
-//		ilCOPage.prepareTinyForEditing(true, false);
 		ilCOPage.synchInputRegion();
 		ilCOPage.focusTiny(false);
 		cmd_called = false;

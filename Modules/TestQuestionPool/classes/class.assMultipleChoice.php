@@ -907,9 +907,13 @@ class assMultipleChoice extends assQuestion implements ilObjQuestionScoringAdjus
 	protected function syncImages()
 	{
 		global $ilLog;
-		$question_id = $this->getOriginalId();
-		$imagepath = $this->getImagePath();
-		$imagepath_original = str_replace("/$this->id/images", "/$question_id/images", $imagepath);
+		
+		$imagepath = $this->getImagePath();  
+
+		$question_id = $this->getOriginalId(); 
+		$originalObjId = parent::lookupParentObjId($this->getOriginalId());
+		$imagepath_original = $this->getImagePath($question_id, $originalObjId);
+
 		ilUtil::delDir($imagepath_original);
 		foreach ($this->answers as $answer)
 		{
@@ -1034,8 +1038,8 @@ class assMultipleChoice extends assQuestion implements ilObjQuestionScoringAdjus
 		$result['nr_of_tries'] = (int) $this->getNrOfTries();
 		$result['shuffle'] = (bool) $this->getShuffle();
 		$result['feedback'] = array(
-			"onenotcorrect" => $this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), false),
-			"allcorrect" => $this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), true)
+			'onenotcorrect' => $this->formatSAQuestion($this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), false)),
+			'allcorrect' => $this->formatSAQuestion($this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), true))
 		);
 
 		$answers = array();

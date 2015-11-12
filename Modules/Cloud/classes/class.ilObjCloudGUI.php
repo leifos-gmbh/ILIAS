@@ -211,7 +211,7 @@ class ilObjCloudGUI extends ilObject2GUI {
 		// tab for the "show content" command
 		if ($ilAccess->checkAccess("read", "", $this->object->getRefId())) {
 			$ilTabs->addTab("content", $lng->txt("content"), $ilCtrl->getLinkTarget($this, "render"));
-			$ilTabs->addTab("id_info", $lng->txt("info"), $this->ctrl->getLinkTargetByClass("ilinfoscreengui", "showSummary"));
+			$ilTabs->addTab("id_info", $lng->txt("info_short"), $this->ctrl->getLinkTargetByClass("ilinfoscreengui", "showSummary"));
 		}
 
 		// a "properties" tab
@@ -305,6 +305,9 @@ class ilObjCloudGUI extends ilObject2GUI {
 			}
 			$services_group->addOption($option);
 		}
+
+		//Select first radio-button by default
+		$services_group->setValue(array_shift($services_group->getOptions())->getValue());
 
 		$form->addItem($services_group);
 

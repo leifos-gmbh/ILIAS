@@ -225,6 +225,7 @@ class ilNestedSetTree implements ilTreeImplementation
 						$ilDB->quote($a_parent_id,'integer'),
 						$ilDB->quote($this->getTree()->getTreeId(),'integer'));
 					$res = $ilDB->query($query);
+					$GLOBALS['ilLog']->write(__METHOD__.': ' . $query);
 					$r = $ilDB->fetchAssoc($res);
 
 					if ($r['parent'] == null)
@@ -258,6 +259,7 @@ class ilNestedSetTree implements ilTreeImplementation
 							$ilDB->quote($a_parent_id,'integer'),
 							$ilDB->quote($this->getTree()->getTreeId(),'integer'));
 						$res = $ilDB->query($query);
+						$GLOBALS['ilLog']->write(__METHOD__.': ' . $query);
 						$r = $ilDB->fetchAssoc($res);
 
 						if (isset($r['max_rgt']))
@@ -291,6 +293,7 @@ class ilNestedSetTree implements ilTreeImplementation
 							$ilDB->quote($parentRgt,'integer'),
 							$ilDB->quote((2 + $this->getTree()->getGap() * 2),'integer'),
 							$ilDB->quote($this->getTree()->getTreeId(),'integer'));
+						$GLOBALS['ilLog']->write(__METHOD__.': ' . $query);
 						$res = $ilDB->manipulate($query);
 					}
 				}
@@ -305,6 +308,7 @@ class ilNestedSetTree implements ilTreeImplementation
 						$ilDB->quote($a_parent_id,'integer'),
 						$ilDB->quote($this->getTree()->getTreeId(),'integer'));
 					$res = $ilDB->query($query);
+					$GLOBALS['ilLog']->write(__METHOD__.': ' . $query);
 					$r = $ilDB->fetchObject($res);
 
 					if ($r->parent == null)
@@ -329,6 +333,7 @@ class ilNestedSetTree implements ilTreeImplementation
 						$ilDB->quote($right,'integer'),
 						$ilDB->quote($right,'integer'),
 						$ilDB->quote($this->getTree()->getTreeId(),'integer'));
+					$GLOBALS['ilLog']->write(__METHOD__.': ' . $query);
 					$res = $ilDB->manipulate($query);
 				}
 

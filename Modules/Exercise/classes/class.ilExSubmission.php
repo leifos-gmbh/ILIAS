@@ -130,6 +130,15 @@ class ilExSubmission
 		return (bool)sizeof($this->getFiles());
 	}
 	
+	public function getSelectedObject()
+	{
+		$files = $this->getFiles();
+		if(sizeof($files))		
+		{
+			return array_pop($files);
+		}
+	}
+	
 	public function canSubmit()
 	{
 		return ($this->isOwner() &&

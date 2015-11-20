@@ -150,7 +150,8 @@ class ilExSubmissionObjectGUI extends ilExSubmissionBaseGUI
 			// remove invalid resource if no upload yet (see download below)
 			else if(substr($portfolio_file["filename"], -1) == "/")
 			{		
-				$this->submission->deleteResourceObject($portfolio_file["returned_id"]);							
+				// #16887
+				$a_submission->deleteResourceObject($portfolio_file["returned_id"]);							
 			}
 		}
 		if($a_submission->canSubmit())

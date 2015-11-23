@@ -318,8 +318,8 @@ class ilObjectDeletionGUI
 			$GLOBALS['ilLog']->write(__METHOD__.' '.print_r($a_objects,TRUE));
 
 			include_once './Services/Repository/classes/class.ilRepUtilGUI.php';
-			$ru = new ilRepUtilGUI($this);
-			$ru->deleteObjects((int) $this->getContainerRefId(), ilSession::get('saved_post'));
+			include_once './Services/Repository/classes/class.ilRepUtil.php';
+			ilRepUtil::deleteObjects((int) $this->getContainerRefId(), ilSession::get('saved_post'));
 			ilSession::clear('saved_post');
 			return TRUE;
 		}

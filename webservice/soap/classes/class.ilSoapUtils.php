@@ -308,14 +308,11 @@ class ilSoapUtils extends ilSoapAdministration
 			return $this->__raiseError($this->__getMessage(),$this->__getMessageCode());
 		}
 		
-		sleep(6);
-		
 		ilSession::set('saved_post', (array) unserialize(ilObjUser::_lookupPref($GLOBALS['ilUser']->getId(),'obj_deletion_queue')));
 		$GLOBALS['ilLog']->write(__METHOD__.': Delete request '.print_r(ilSession::get('saved_post'),TRUE));
 		
-		include_once './Services/Repository/classes/class.ilRepUtilGUI.php';
-		$ru = new ilRepUtilGUI($this);
-		$ru->deleteObjects(0, ilSession::get('saved_post'));
+		include_once './Services/Repository/classes/class.ilRepUtil.php';
+		ilRepUtil::deleteObjects(0, ilSession::get('saved_post'));
 		ilSession::clear('saved_post');
 		
 		return TRUE;

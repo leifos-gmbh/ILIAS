@@ -1006,6 +1006,7 @@ assessment#:#tst_password_form#:#Enter Test Password
 assessment#:#tst_password#:#Test Password
 assessment#:#tst_percent_solved#:#Percent Solved
 assessment#:#tst_position#:#Question %s of %s
+assessment#:#tst_position_without_total#:#Question %s
 assessment#:#tst_postpone_description#:#The participants may postpone questions to the end of the test.
 assessment#:#tst_postpone#:#Postpone Questions
 assessment#:#tst_print_date#:#Date of Print
@@ -5889,7 +5890,7 @@ crs#:#crs_unblocked_member_body#:#your membership in course "%s" has been restor
 crs#:#crs_unblocked_member#:#Access granted in course "%s"
 crs#:#crs_unblocked#:#Free entrance
 crs#:#crs_unlimited#:#Unlimited
-crs#:#crs_unsubscribe_member_body#:#we confirm your cancellation of membership in course "%s". We hope that you find an opportunity to participate in another course.
+crs#:#crs_unsubscribe_member_body#:#We confirm your cancellation of membership in course "%s".
 crs#:#crs_unsubscribe_member#:#Your cancellation of membership in course "%s"
 crs#:#crs_unsubscribe_sure#:#Are you sure you want to unsubscribe from this course?
 crs#:#crs_unsubscribed_from_crs#:#You have been unsubscribed from this course.
@@ -10168,7 +10169,7 @@ content#:#cont_edit_shape_whole_picture#:#Edit Shape (Whole Picture)
 common#:#settings_for_all_members#:#Notification activated for all course/group members
 common#:#settings_per_users#:#Settings per Course/Group Member
 user#:#enable_local_user_administration#:#Enable Local User Administration
-user#:#enable_local_user_administration_info#:#If enabled, local user accounts can be administrated in categories.
+user#:#enable_local_user_administration_info#:#If enabled, local user accounts can be administrated in categories and organisational units.
 user#:#restrict_user_access#:#Restricted Access to User Accounts
 user#:#restrict_user_access_info#:#Enabled this option only if you want to restrict the access to user accounts. If enabled access to local and global user accounts is only granted when a role has the permission ‘Read Access to User Account’.
 common#:#backto_lua#:#Back to Local User Administration
@@ -12983,7 +12984,7 @@ content#:#cont_credit_mode_info#:#This setting is only affective if the lesson m
 content#:#cont_sc_auto_review_info_12#:#Set the lesson mode to ‘review’ when a learner has completed or passed a SCO.
 content#:#cont_sc_usession_info#:#This setting activates periodical requests to the server to keep the session alive.
 content#:#cont_sequencing_info#:#Enable the sequencing and navigation behaviour as defined by the learning module.
-content#:#cont_time_from_lms_info#:#Strict (according to the SCORM standard) check of values sent by the learning module to ILIAS.
+content#:#cont_time_from_lms_info#:#Processing time is set by ILIAS, not by SCOs.
 survey#:#survey_question_pool_usage_active#:#Questions can be added optionally to a question pool
 survey#:#survey_question_pool_usage_active_info#:#Each time a question is created it has to be decided if a question pool is to be used. 
 survey#:#survey_question_pool_usage_inactive#:#Questions are created directly in the survey.
@@ -15306,3 +15307,8 @@ exc#:#exc_direct_submit#:#Submit
 export#:#no_file#:#No file
 content#:#lm_no_download_files#:#There are currently no files for download available.
 rbac#:#feed_copy#:#User can copy webfeed
+crs#:#crs_unsubscribe_member_explanation#:#You receive this message because you unsubscribed from the course mentioned above.
+content#:#cont_sqst#:#Survey Question (Assigned Material)
+mmbr#:#info_refuse_sure#:#Are you sure you want to refuse the following user(s)?
+administration#:#adm_user_starting_point_inherit#:#Use Standard-Settings
+administration#:#adm_user_starting_point_inherit_info#:#The settings that were made by the administrator of the platform as a whole will be used.

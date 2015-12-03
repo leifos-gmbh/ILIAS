@@ -1156,6 +1156,26 @@ class ilObjQuestionPool extends ilObject
 		$_SESSION["qpl_clipboard"][$question_id] = array("question_id" => $question_id, "action" => "move");
 	}
 	
+	public function cleanupClipboard($deletedQuestionId)
+	{
+		if( !isset($_SESSION['qpl_clipboard']) )
+		{
+			return;
+		}
+		
+		if( !isset($_SESSION['qpl_clipboard'][$deletedQuestionId]) )
+		{
+			return;
+		}
+
+		unset($_SESSION['qpl_clipboard'][$deletedQuestionId]);
+		
+		if( !count($_SESSION['qpl_clipboard']) )
+		{
+			unset($_SESSION['qpl_clipboard']);
+		}
+	}
+	
 /**
 * Returns true, if the question pool is writeable by a given user
 * 
@@ -1408,7 +1428,15 @@ class ilObjQuestionPool extends ilObject
 		global $ilLog;
 
 		$newObj = parent::cloneObject($a_target_id,$a_copy_id);
-		$newObj->setOnline($this->getOnline());
+
+		//copy online status if object is not the root copy object
+		$cp_options = ilCopyWizardOptions::_getInstance($a_copy_id);
+
+		if(!$cp_options->isRootNode($this->getRefId()))
+		{
+			$newObj->setOnline($this->getOnline());
+		}
+
 		$newObj->setShowTaxonomies($this->getShowTaxonomies());
 		$newObj->saveToDb();
 		

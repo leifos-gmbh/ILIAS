@@ -14,6 +14,8 @@ class ilTestPassesSelector
 	
 	protected $testOBJ;
 	
+	private $adminModeEnabled;
+	
 	private $activeId;
 	
 	private $lastFinishedPass;
@@ -22,6 +24,18 @@ class ilTestPassesSelector
 	{
 		$this->db = $db;
 		$this->testOBJ = $testOBJ;
+
+		$this->adminModeEnabled = false;
+	}
+
+	public function isAdminModeEnabled()
+	{
+		return $this->adminModeEnabled;
+	}
+
+	public function setAdminModeEnabled($adminModeEnabled)
+	{
+		$this->adminModeEnabled = $adminModeEnabled;
 	}
 
 	public function getActiveId()
@@ -54,9 +68,23 @@ class ilTestPassesSelector
 		return count($this->loadExistingPasses());
 	}
 
+	public function getClosedPasses()
+	{
+		$existingPasses = $this->loadExistingPasses();
+		$closedPasses = $this->fetchClosedPasses($existingPasses);
+
+		return $closedPasses;
+	}
+
 	public function getReportablePasses()
 	{
 		$existingPasses = $this->loadExistingPasses();
+		
+		if( $this->isAdminModeEnabled() )
+		{
+			return $existingPasses;
+		}
+			
 		$reportablePasses = $this->fetchReportablePasses($existingPasses);
 
 		return $reportablePasses;
@@ -101,6 +129,21 @@ class ilTestPassesSelector
 		}
 		
 		return $reportablePasses;
+	}
+	
+	private function fetchClosedPasses($existingPasses)
+	{
+		$closedPasses = array();
+		
+		foreach($existingPasses as $pass)
+		{
+			if( $this->isClosedPass($pass) )
+			{
+				$closedPasses[] = $pass;
+			}
+		}
+		
+		return $closedPasses;
 	}
 	
 	private function fetchLastPass($existingPasses)

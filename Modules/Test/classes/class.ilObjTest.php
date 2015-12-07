@@ -6192,7 +6192,7 @@ function getAnswerFeedbackPoints()
 			include_once "./Modules/TestQuestionPool/classes/class.ilObjQuestionPool.php";
 			foreach ($_SESSION["import_mob_xhtml"] as $mob)
 			{
-				$importfile = ilObjTest::_getImportDirectory() . '/' . $mob["uri"];
+				$importfile = ilObjTest::_getImportDirectory() . '/' . $_SESSION["tst_import_subdir"] . '/' . $mob["uri"];
 				if (file_exists($importfile))
 				{
 					$media_object =& ilObjMediaObject::_saveTempFileAsMediaObject(basename($importfile), $importfile, FALSE);
@@ -7246,6 +7246,15 @@ function getAnswerFeedbackPoints()
 		/** @var $newObj ilObjTest */
 		$newObj = parent::cloneObject($a_target_id,$a_copy_id);
 		$this->cloneMetaData($newObj);
+
+		//copy online status if object is not the root copy object
+		$cp_options = ilCopyWizardOptions::_getInstance($a_copy_id);
+
+		if(!$cp_options->isRootNode($this->getRefId()))
+		{
+			$newObj->setOnline($this->isOnline());
+		}
+
 		$newObj->setAnonymity($this->getAnonymity());
 		$newObj->setAnswerFeedback($this->getAnswerFeedback());
 		$newObj->setAnswerFeedbackPoints($this->getAnswerFeedbackPoints());
@@ -8375,7 +8384,7 @@ function getAnswerFeedbackPoints()
 			$testPassesSelector->setActiveId($active_id);
 			$testPassesSelector->setLastFinishedPass($testSession->getLastFinishedPass());
 
-			$closedPasses = $testPassesSelector->getReportablePasses();
+			$closedPasses = $testPassesSelector->getClosedPasses();
 
 			if( count($closedPasses) >= $this->getNrOfTries() )
 			{

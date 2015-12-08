@@ -164,6 +164,9 @@ abstract class ilObjPortfolioBaseGUI extends ilObject2GUI
 	
 	protected function setSettingsSubTabs($a_active)
 	{
+		// #17455
+		$this->lng->loadLanguageModule($this->getType());
+		
 		// general properties
 		$this->tabs_gui->addSubTab("properties",
 			$this->lng->txt($this->getType()."_properties"),
@@ -290,10 +293,14 @@ abstract class ilObjPortfolioBaseGUI extends ilObject2GUI
 
 		$ilToolbar->addSeparator();
 		
-		$button = ilLinkButton::getInstance();
-		$button->setCaption("export_html");
-		$button->setUrl($this->ctrl->getLinkTarget($this, "export"));
-		$ilToolbar->addButtonInstance($button);
+		// #16571
+		if($this->getType() == "prtf")
+		{
+			$button = ilLinkButton::getInstance();
+			$button->setCaption("export_html");
+			$button->setUrl($this->ctrl->getLinkTarget($this, "export"));
+			$ilToolbar->addButtonInstance($button);
+		}
 		
 		include_once "Modules/Portfolio/classes/class.ilPortfolioPageTableGUI.php";
 		$table = new ilPortfolioPageTableGUI($this, "view");
@@ -617,8 +624,12 @@ abstract class ilObjPortfolioBaseGUI extends ilObject2GUI
 		}
 		
 		global $ilMainMenu;
-		$ilMainMenu->setMode(ilMainMenuGUI::MODE_TOPBAR_ONLY);		
-		$ilMainMenu->setTopBarBack($back, $back_caption);
+		$ilMainMenu->setMode(ilMainMenuGUI::MODE_TOPBAR_ONLY);	
+		if($back)
+		{
+			// might already be set in ilPublicUserProfileGUI
+			$ilMainMenu->setTopBarBack($back, $back_caption);
+		}
 		
 		// render tabs
 		$current_blog = null;

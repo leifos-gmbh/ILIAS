@@ -207,7 +207,7 @@ class ilObjUser extends ilObject
 			$this->skin = $this->ilias->ini->readVariable("layout","skin");
 
 			$this->prefs["skin"] = $this->skin;
-			$this->prefs["show_users_online"] = "y";
+//			$this->prefs["show_users_online"] = "y";
 
 			//style (css)
 		 	$this->prefs["style"] = $this->ilias->ini->readVariable("layout","style");
@@ -691,7 +691,7 @@ class ilObjUser extends ilObject
 	/**
 	* Private function for lookup methods
 	*/
-	private function _lookup($a_user_id, $a_field)
+	private static function _lookup($a_user_id, $a_field)
 	{
 		global $ilDB;
 		
@@ -805,7 +805,7 @@ class ilObjUser extends ilObject
 	/**
 	* lookup login
 	*/
-	function _lookupLogin($a_user_id)
+	public static function  _lookupLogin($a_user_id)
 	{
 		return ilObjUser::_lookup($a_user_id, "login");
 	}
@@ -3298,16 +3298,16 @@ class ilObjUser extends ilObject
 					if(!isset($all_parent_path[$parent_ref]))
 					{					
 						// #15746
-						if($is_nested_set)
-						{
-							$par_left = $tree->getLeftValue($parent_ref);
-							$all_parent_path[$parent_ref] = sprintf("%010d", $par_left);
-						}
-						else
-						{
+						//if($is_nested_set)
+						//{
+						//	$par_left = $tree->getLeftValue($parent_ref);
+						//	$all_parent_path[$parent_ref] = sprintf("%010d", $par_left);
+						//}
+						//else
+						//{
 							$node = $tree->getNodeData($parent_ref);						
-							$all_parent_path[$parent_ref] = $node["path"];
-						}
+							$all_parent_path[$parent_ref] = $node["title"];
+						//}
 					}
 					
 					$parent_path = $all_parent_path[$parent_ref];
@@ -4962,7 +4962,7 @@ class ilObjUser extends ilObject
 			"JOIN rbac_fa fa ON fa.rol_id = ua.rol_id ".
 			"JOIN object_reference r1 ON r1.ref_id = fa.parent ".
 			"JOIN tree ON tree.child = r1.ref_id ".
-			"JOIN object_reference r2 ON r2.ref_id = tree.parent ".
+			"JOIN object_reference r2 ON r2.ref_id = tree.child ". // #17674 - rolf is gone
 			"JOIN object_data dat ON dat.obj_id = r2.obj_id ".
 			"WHERE ua.usr_id = ".$ilDB->quote($a_user_id, "integer")." ".
 			"AND fa.assign = ".$ilDB->quote("y", "text")." ".
@@ -5003,7 +5003,7 @@ class ilObjUser extends ilObject
 				"JOIN rbac_ua ua ON ua.usr_id = s.user_id ".
 				"JOIN rbac_fa fa ON fa.rol_id = ua.rol_id ".
 				"JOIN tree ON tree.child = fa.parent ".
-				"JOIN object_reference or1 ON or1.ref_id = tree.parent ".
+				"JOIN object_reference or1 ON or1.ref_id = tree.child ". // #17674 - rolf is gone
 				"JOIN object_data od ON od.obj_id = or1.obj_id ".
 				"LEFT JOIN usr_pref p ON (p.usr_id = ud.usr_id AND p.keyword = ".
 					$ilDB->quote("hide_own_online_status", "text").") ".

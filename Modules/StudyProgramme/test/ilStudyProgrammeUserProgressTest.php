@@ -2,8 +2,7 @@
 
 /* Copyright (c) 2015 Richard Klees <richard.klees@concepts-and-training.de> Extended GPL, see docs/LICENSE */
 
-require_once("mocks.php");
-require_once("./Services/User/classes/class.ilObjUser.php");
+require_once(__DIR__."/mocks.php");
 
 /**
  * TestCase for the progress of users at a programme.
@@ -234,7 +233,7 @@ class ilStudyProgrammeUserProgressTest extends PHPUnit_Framework_TestCase {
 		
 		// The root node will still be completed, as we do not go back from completed to some other
 		// status.
-		$this->assertEquals(ilStudyProgrammeProgress::STATUS_COMPLETED, $root_progress->getStatus());
+		$this->assertEquals(ilStudyProgrammeProgress::STATUS_IN_PROGRESS, $root_progress->getStatus());
 		$this->assertEquals(ilStudyProgrammeProgress::STATUS_IN_PROGRESS, $node1_progress->getStatus());
 		$this->assertEquals(ilStudyProgrammeProgress::STATUS_IN_PROGRESS, $node2_progress->getStatus());
 		$this->assertEquals(NULL, $node2_progress->getCompletionBy());

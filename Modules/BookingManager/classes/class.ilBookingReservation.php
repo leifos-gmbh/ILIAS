@@ -588,12 +588,12 @@ class ilBookingReservation
 			if($filter['to'])
 			{
 				$where[] = 'date_to <= '.$ilDB->quote($filter['to'], 'integer');
-			}
-			if($filter['user_id'])
-			{
-				$where[] = 'user_id = '.$ilDB->quote($filter['user_id'], 'integer');
-			}					
+			}							
 		}
+		if($filter['user_id']) // #16584
+		{
+			$where[] = 'user_id = '.$ilDB->quote($filter['user_id'], 'integer');
+		}	
 		/*
 		if($a_group_id)
 		{
@@ -660,7 +660,8 @@ class ilBookingReservation
 					$res[$idx]["week"] = date("W",  $row["date_from"]);				
 					$res[$idx]["weekday"] = date("w",  $row["date_from"]);				
 					$res[$idx]["can_be_cancelled"] = ($row["status"] != self::STATUS_CANCELLED &&
-						$row["date_from"] > time());					
+						$row["date_from"] > time());	
+					$res[$idx]["_sortdate"] = $row["date_from"]; 
 				}
 				else
 				{

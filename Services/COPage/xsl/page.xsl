@@ -2563,6 +2563,7 @@
 		</xsl:when>
 
 		<!-- all image mime types, except svg -->
+		<!-- image/svgxxx, see bug #15857 (reverted due to example clock.svg in the report)-->
 		<xsl:when test="substring($type, 1, 5) = 'image' and not(substring($type, 1, 9) = 'image/svg')">
 			<xsl:if test="$map_edit_mode != 'get_coords'">
 				<xsl:choose>
@@ -3498,7 +3499,7 @@
 				<xsl:if test="$mode != 'print'"><xsl:value-of select="@Behavior"/></xsl:if>
 				<xsl:if test="$mode = 'print'">ForceAllOpen</xsl:if>
 			</xsl:variable>
-			<xsl:if test="@Type = 'VerticalAccordion'">
+			<xsl:if test="@Type = 'VerticalAccordion' and $mode != 'print'">
 			<script type="text/javascript">
 				$(function () {
 					il.Accordion.add({
@@ -3518,7 +3519,7 @@
 					});
 			</script>
 			</xsl:if>
-			<xsl:if test="@Type = 'HorizontalAccordion'">
+			<xsl:if test="@Type = 'HorizontalAccordion' and $mode != 'print'">
 				<script type="text/javascript">
 					$(function () {
 					il.Accordion.add({
@@ -3538,7 +3539,7 @@
 					});
 				</script>
 			</xsl:if>
-			<xsl:if test="@Type = 'Carousel'">
+			<xsl:if test="@Type = 'Carousel' and $mode != 'print'">
 				<script type="text/javascript">
 					$(function () {
 					il.Accordion.add({

@@ -1253,7 +1253,7 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 	* @param integer $shuffle A flag indicating whether the answers are shuffled or not
 	* @see $shuffle
 	*/
-	public function setShuffle($shuffle)
+	public function setShuffle($shuffle = true)
 	{
 		switch ($shuffle)
 		{
@@ -1461,8 +1461,8 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 		$result['matching_mode'] = $this->getMatchingMode();
 		$result['shuffle'] = true;
 		$result['feedback'] = array(
-			"onenotcorrect" => $this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), false),
-			"allcorrect" => $this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), true)
+			'onenotcorrect' => $this->formatSAQuestion($this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), false)),
+			'allcorrect' => $this->formatSAQuestion($this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), true))
 		);
 				
 		$terms = array();
@@ -1522,6 +1522,16 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 		$result['reset_button_label'] = $lng->txt("reset_terms");
 
 		return json_encode($result);
+	}
+	
+	public function supportsJavascriptOutput()
+	{
+		return true;
+	}
+
+	public function supportsNonJsOutput()
+	{
+		return false;
 	}
 
 	public function setMatchingMode($matchingMode)

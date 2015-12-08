@@ -46,18 +46,23 @@ class ilDataCollectionRecordField {
 	 */
 	protected $db;
 
+	/**
+	 * @var ilLanguage
+	 */
+	protected $lng;
 
 	/**
 	 * @param ilDataCollectionRecord $record
 	 * @param ilDataCollectionField  $field
 	 */
 	public function __construct(ilDataCollectionRecord $record, ilDataCollectionField $field) {
-		global $ilCtrl, $ilUser, $ilDB;
+		global $ilCtrl, $ilUser, $ilDB, $lng;
 		$this->record = $record;
 		$this->field = $field;
 		$this->ctrl = $ilCtrl;
 		$this->user = $ilUser;
 		$this->db = $ilDB;
+		$this->lng = $lng;
 		$this->doRead();
 	}
 
@@ -66,23 +71,23 @@ class ilDataCollectionRecordField {
 	 * Read object data from database
 	 */
 	protected function doRead() {
+		if(!$this->record->getId())
+			return;
+
 		$query = "SELECT * FROM il_dcl_record_field WHERE field_id = " . $this->db->quote($this->field->getId(), "integer") . " AND record_id = "
 			. $this->db->quote($this->record->getId(), "integer");
 		$set = $this->db->query($query);
 		$rec = $this->db->fetchAssoc($set);
 		$this->id = $rec['id'];
-
-		if ($this->id == NULL) {
-			$this->doCreate();
-		}
+		
 		$this->loadValue();
 	}
 
 
 	/**
-	 * Create object in database
+	 * Creates an Id and a database entry.
 	 */
-	protected function doCreate() {
+	public function doCreate() {
 		$id = $this->db->nextId("il_dcl_record_field");
 		$query = "INSERT INTO il_dcl_record_field (id, record_id, field_id) VALUES (" . $this->db->quote($id, "integer") . ", "
 			. $this->db->quote($this->record->getId(), "integer") . ", " . $this->db->quote($this->field->getId(), "text") . ")";
@@ -186,7 +191,6 @@ class ilDataCollectionRecordField {
 	 */
 	public function getValueFromExcel($excel, $row, $col) {
 		$value = $excel->val($row, $col);
-		$value = utf8_encode($value);
 		if ($this->field->getDatatypeId() == ilDataCollectionDatatype::INPUTFORMAT_DATETIME) {
 			$value = array(
 				'date' => date('Y-m-d', strtotime($value)),
@@ -201,11 +205,7 @@ class ilDataCollectionRecordField {
 	 */
 	public function fillFormInput(&$form) {
 		$value = $this->getFormInput();
-		if (is_array($value)) {
-			$form->getItemByPostVar('field_'.$this->field->getId())->setValueByArray(array("field_".$this->field->getId() => $value));
-		} else {
-			$form->getItemByPostVar('field_' . $this->field->getId())->setValue($value);
-		}
+		$form->getItemByPostVar('field_'.$this->field->getId())->setValueByArray(array("field_".$this->field->getId() => $value));
 	}
 
 
@@ -256,6 +256,14 @@ class ilDataCollectionRecordField {
 		return $datatype->parseHTML($this->getValue(), $this, $link);
 	}
 
+	/**
+	 * @return string
+	 */
+	public function getSortingValue($link = true) {
+		$datatype = $this->field->getDatatype();
+
+		return $datatype->parseSortingValue($this->getValue(), $this, $link);
+	}
 
 	/**
 	 * @return string

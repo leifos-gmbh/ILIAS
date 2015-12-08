@@ -2,8 +2,7 @@
 
 /* Copyright (c) 2015 Richard Klees <richard.klees@concepts-and-training.de> Extended GPL, see docs/LICENSE */
 
-require_once("mocks.php");
-require_once("./Services/User/classes/class.ilObjUser.php");
+require_once(__DIR__."/mocks.php");
 
 /**
  * TestCase for the assignment of users to a programme.
@@ -193,5 +192,26 @@ class ilStudyProgrammeProgressCalculationTest extends PHPUnit_Framework_TestCase
 						   , $this->node1->getProgressForAssignment($ass_id)->getStatus());
 		$this->assertEquals( ilStudyProgrammeProgress::STATUS_COMPLETED
 						   , $this->node2->getProgressForAssignment($ass_id)->getStatus());
+	}
+
+	public function testInitialProgressOnOptionalNodes() {
+		$this->setUpNodes($this->root, array( "points" => 0
+		, "node1" => array( "points" => 100 
+				, "leaf11" => null
+				, "leaf12" => null
+				)
+		, "node2" => array( "points" => 100 
+				, "leaf21" => null
+				, "leaf22" => null
+				)
+		));
+
+		$user = $this->newUser();
+		$user_id = $user->getId();
+		$ass = $this->root->assignUser($user->getId());
+		$ass_id = $ass->getId();
+
+		$this->assertEquals( ilStudyProgrammeProgress::STATUS_COMPLETED
+						   , $this->root->getProgressForAssignment($ass_id)->getStatus());
 	}
 }

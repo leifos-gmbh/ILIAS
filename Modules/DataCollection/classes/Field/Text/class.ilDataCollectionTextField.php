@@ -14,16 +14,19 @@ class ilDataCollectionTextField extends ilDataCollectionRecordField
     public function fillFormInput(&$form)
     {
         $value = $this->getValue();
-        if ($this->hasProperty(ilDataCollectionField::PROPERTYID_TEXTAREA)) {
-            $breaks = array( "<br />" );
-            $input = str_ireplace($breaks, "", $value);
-        } elseif ($this->hasProperty(ilDataCollectionField::PROPERTYID_URL) && $json = json_decode($value)) {
+        $input = $value;
+
+        if ($this->hasProperty(ilDataCollectionField::PROPERTYID_URL) && $json = json_decode($value)) {
             $input = $json->link;
             $input_title = $json->title;
             $form->getItemByPostVar('field_' . $this->field->getId() . '_title')->setValue($input_title);
-        } else {
-            $input = $value;
         }
+
+        if ($this->hasProperty(ilDataCollectionField::PROPERTYID_TEXTAREA)) {
+            $breaks = array( "<br />" );
+            $input = str_ireplace($breaks, "", $input);
+        }
+
         $form->getItemByPostVar('field_' . $this->field->getId())->setValue($input);
     }
 
@@ -78,7 +81,6 @@ class ilDataCollectionTextField extends ilDataCollectionRecordField
 
     public function getValueFromExcel($excel, $row, $col) {
         $value = $excel->val($row, $col);
-        $value = utf8_encode($value);
         if ($this->hasProperty(ilDataCollectionField::PROPERTYID_URL)) {
             $title = '';
             if ($excel->val(1, $col+1) == $this->field->getTitle().'_title') {

@@ -691,7 +691,7 @@ class ilObjMediaObjectGUI extends ilObjectGUI
 		$a_mob->setDescription($format);
 
 		// determine width and height of known image types
-		$wh = ilObjMediaObject::_determineWidthHeight(500, 400, $format,
+		$wh = ilObjMediaObject::_determineWidthHeight($format,
 			$_POST["standard_type"], $mob_dir."/".$location, $media_item->getLocation(),
 			$_POST["standard_width_height"]["constr_prop"], ($_POST["standard_size"] == "original"),
 			$_POST["standard_width_height"]["width"], $_POST["standard_width_height"]["height"]);
@@ -774,7 +774,7 @@ class ilObjMediaObjectGUI extends ilObjectGUI
 			}
 
 			// determine width and height of known image types
-			$wh = ilObjMediaObject::_determineWidthHeight(500, 400, $format,
+			$wh = ilObjMediaObject::_determineWidthHeight($format,
 				$type, $mob_dir."/".$location, $media_item2->getLocation(),
 				$_POST["full_width_height"]["constr_prop"], ($_POST["full_size"] == "original"),
 				$_POST["full_width_height"]["width"], $_POST["full_width_height"]["height"]);
@@ -961,7 +961,7 @@ class ilObjMediaObjectGUI extends ilObjectGUI
 			$this->object->setDescription($format);
 			
 			// determine width and height of known image types
-			$wh = ilObjMediaObject::_determineWidthHeight(500, 400, $format,
+			$wh = ilObjMediaObject::_determineWidthHeight($format,
 				$_POST["standard_type"], $mob_dir."/".$location, $std_item->getLocation(),
 				$_POST["standard_width_height"]["constr_prop"], ($_POST["standard_size"] == "original"),
 				$_POST["standard_width_height"]["width"], $_POST["standard_width_height"]["height"]);
@@ -1093,7 +1093,7 @@ class ilObjMediaObjectGUI extends ilObjectGUI
 				}
 				
 				// determine width and height of known image types
-				$wh = ilObjMediaObject::_determineWidthHeight(500, 400, $format,
+				$wh = ilObjMediaObject::_determineWidthHeight($format,
 					$type, $mob_dir."/".$location, $full_item->getLocation(),
 					$_POST["full_width_height"]["constr_prop"], ($_POST["full_size"] == "original"),
 					$_POST["full_width_height"]["width"], $_POST["full_width_height"]["height"]);
@@ -1387,28 +1387,16 @@ class ilObjMediaObjectGUI extends ilObjectGUI
 	/**
 	* assign file to standard view
 	*/
-	function assignStandardObject()
-	{
-		if (!isset($_POST["file"]))
-		{
-			$this->ilias->raiseError($this->lng->txt("no_checkbox"),$this->ilias->error_obj->MESSAGE);
-		}
-
-		if (count($_POST["file"]) > 1)
-		{
-			$this->ilias->raiseError($this->lng->txt("cont_select_max_one_item"),$this->ilias->error_obj->MESSAGE);
-		}
-
+	function assignStandardObject($a_file)
+	{						
 		// determine directory
-		$cur_subdir = str_replace(".", "", $_GET["cdir"]);
+		$cur_subdir = dirname($a_file);
 		$mob_dir = ilUtil::getWebspaceDir()."/mobs/mm_".$this->object->getId();
 		$cur_dir = (!empty($cur_subdir))
 			? $mob_dir."/".$cur_subdir
 			: $mob_dir;
-		$file = $cur_dir."/".$_POST["file"][0];
-		$location = (!empty($cur_subdir))
-			? $cur_subdir."/".$_POST["file"][0]
-			: $_POST["file"][0];
+		$file = $cur_dir."/".basename($a_file);
+		$location = $a_file;
 
 		if(!is_file($file))
 		{
@@ -1429,28 +1417,16 @@ class ilObjMediaObjectGUI extends ilObjectGUI
 	/**
 	* assign file to fullscreen view
 	*/
-	function assignFullscreenObject()
-	{
-		if (!isset($_POST["file"]))
-		{
-			$this->ilias->raiseError($this->lng->txt("no_checkbox"),$this->ilias->error_obj->MESSAGE);
-		}
-
-		if (count($_POST["file"]) > 1)
-		{
-			$this->ilias->raiseError($this->lng->txt("cont_select_max_one_item"),$this->ilias->error_obj->MESSAGE);
-		}
-
+	function assignFullscreenObject($a_file)
+	{		
 		// determine directory
-		$cur_subdir = str_replace(".", "", $_GET["cdir"]);
+		$cur_subdir = dirname($a_file);
 		$mob_dir = ilUtil::getWebspaceDir()."/mobs/mm_".$this->object->getId();
 		$cur_dir = (!empty($cur_subdir))
 			? $mob_dir."/".$cur_subdir
 			: $mob_dir;
-		$file = $cur_dir."/".$_POST["file"][0];
-		$location = (!empty($cur_subdir))
-			? $cur_subdir."/".$_POST["file"][0]
-			: $_POST["file"][0];
+		$file = $cur_dir."/".basename($a_file);
+		$location = $a_file;
 
 		if(!is_file($file))
 		{

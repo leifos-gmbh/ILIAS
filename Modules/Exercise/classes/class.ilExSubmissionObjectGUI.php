@@ -76,7 +76,8 @@ class ilExSubmissionObjectGUI extends ilExSubmissionBaseGUI
 			// remove invalid resource if no upload yet (see download below)
 			else if(substr($selected_blog["filename"], -1) == "/")
 			{								
-				$this->submission->deleteResourceObject($selected_blog["returned_id"]); 
+				// #16887
+				$a_submission->deleteResourceObject($selected_blog["returned_id"]); 
 			}
 		}						
 		if($a_submission->canSubmit())
@@ -149,7 +150,8 @@ class ilExSubmissionObjectGUI extends ilExSubmissionBaseGUI
 			// remove invalid resource if no upload yet (see download below)
 			else if(substr($selected_prtf["filename"], -1) == "/")
 			{		
-				$this->submission->deleteResourceObject($selected_prtf["returned_id"]);							
+				// #16887
+				$a_submission->deleteResourceObject($selected_prtf["returned_id"]);							
 			}
 		}
 		if($a_submission->canSubmit())
@@ -566,7 +568,7 @@ class ilExSubmissionObjectGUI extends ilExSubmissionBaseGUI
 		$conf->setFormAction($this->ctrl->getFormAction($this, "directSubmit"));
 		
 		$conf->setHeaderText($txt);
-		$conf->setConfirm($this->lng->txt("submit"), "directSubmit");
+		$conf->setConfirm($this->lng->txt("exc_direct_submit"), "directSubmit");
 		$conf->setCancel($this->lng->txt("cancel"), "returnToParent");
 		
 		$tpl->setContent($conf->getHTML());

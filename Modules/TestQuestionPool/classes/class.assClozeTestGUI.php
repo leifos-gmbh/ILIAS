@@ -282,6 +282,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
 	{
 		// title
 		$title = new ilTextInputGUI($this->lng->txt("title"), "title");
+		$title->setMaxLength(100);
 		$title->setValue($this->object->getTitle());
 		$title->setRequired(TRUE);
 		$form->addItem($title);
@@ -417,7 +418,6 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
 		}
 		else
 		{
-			$cloze_text->setUseRte(TRUE);
 			$cloze_text->setRteTags(self::getSelfAssessmentTags());
 			$cloze_text->setUseTagsForRteOnly(false);
 		}
@@ -1093,7 +1093,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
 							$this->object->getShuffler()
 						));
 					}
-					$gaptemplate->setVariable("SOLUTION", $solutiontext);
+					$this->populateSolutiontextToGapTpl($gaptemplate, $gap, $solutiontext);
 					$output = preg_replace("/\[gap\].*?\[\/gap\]/", $gaptemplate->get(), $output, 1);
 					break;
 				case CLOZE_SELECT:
@@ -1129,7 +1129,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
 							$this->object->getShuffler()
 						));
 					}
-					$gaptemplate->setVariable("SOLUTION", $solutiontext);
+					$this->populateSolutiontextToGapTpl($gaptemplate, $gap, $solutiontext);
 					$output = preg_replace("/\[gap\].*?\[\/gap\]/", $gaptemplate->get(), $output, 1);
 					break;
 				case CLOZE_NUMERIC:
@@ -1154,7 +1154,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
 							$this->object->getShuffler()
 						));
 					}
-					$gaptemplate->setVariable("SOLUTION", $solutiontext);
+					$this->populateSolutiontextToGapTpl($gaptemplate, $gap, $solutiontext);
 					$output = preg_replace("/\[gap\].*?\[\/gap\]/", $gaptemplate->get(), $output, 1);
 					break;
 			}
@@ -1175,8 +1175,11 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
 		$feedback = '';
 		if($show_feedback)
 		{
-			$fb = $this->getGenericFeedbackOutput($active_id, $pass);
-			$feedback .=  strlen($fb) ? $fb : '';
+			if( !$this->isTestPresentationContext() )
+			{
+				$fb = $this->getGenericFeedbackOutput($active_id, $pass);
+				$feedback .= strlen($fb) ? $fb : '';
+			}
 			
 			$fb = $this->getSpecificFeedbackOutput($active_id, $pass);
 			$feedback .=  strlen($fb) ? $fb : '';
@@ -1426,17 +1429,14 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
 		{
 			return '';
 		}
-		
+
+		global $lng;
+
 		$feedback = '<table class="test_specific_feedback"><tbody>';
 
 		foreach ($this->object->gaps as $index => $answer)
 		{
-			$caption = $ordinal = $index+1 .': ';
-			foreach ($answer->items as $item)
-			{
-				$caption .= '"' . $item->getAnswertext().'" / ';
-			}
-			$caption = substr($caption, 0, strlen($caption)-3);
+			$caption = $lng->txt('gap').' '.($index+1) .': ';
 
 			$feedback .= '<tr><td>';
 
@@ -1585,5 +1585,40 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
 		$parts         = preg_split( '/\[gap \d*\]/', $question_text );
 		$question_text = implode( '[gap]', $parts );
 		return $question_text;
+	}
+
+	/**
+	 * @param $gaptemplate
+	 * @param $solutiontext
+	 */
+	private function populateSolutiontextToGapTpl($gaptemplate, $gap, $solutiontext)
+	{
+		if ($_GET['pdf'])
+		{
+			$gaptemplate->setCurrentBlock('gap_span');
+			$gaptemplate->setVariable('SPAN_SOLUTION', $solutiontext);
+		}
+		elseif($gap->getType() == CLOZE_SELECT)
+		{
+			$gaptemplate->setCurrentBlock('gap_select');
+			$gaptemplate->setVariable('SELECT_SOLUTION', $solutiontext);
+		}
+		else
+		{
+			$gap_size = $gap->getGapSize() > 0 ? $gap->getGapSize() : $this->object->getFixedTextLength();
+			
+			if($gap_size > 0)
+			{
+				$gaptemplate->setCurrentBlock('gap_size');
+				$gaptemplate->setVariable("GAP_SIZE", $gap_size);
+				$gaptemplate->parseCurrentBlock();
+			}
+			
+			$gaptemplate->setCurrentBlock('gap_input');
+			$gaptemplate->setVariable('INPUT_SOLUTION', $solutiontext);
+		}
+		
+		
+		$gaptemplate->parseCurrentBlock();
 	}
 }

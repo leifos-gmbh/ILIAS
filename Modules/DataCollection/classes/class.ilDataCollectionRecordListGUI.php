@@ -80,6 +80,8 @@ class ilDataCollectionRecordListGUI {
 	 * execute command
 	 */
 	public function executeCommand() {
+		global $ilCtrl;
+		$ilCtrl->saveParameter($this, 'mode');
 		$cmd = $this->ctrl->getCmd();
 
 		switch ($cmd) {
@@ -338,6 +340,7 @@ class ilDataCollectionRecordListGUI {
 					$warnings[] = "(" . $i . ", " . ilDataCollectionImporter::getExcelCharForInteger($col) . ") " . $e;
 				}
 			}
+
 			if (!$simulate) {
 				$record->doUpdate();
 			}
@@ -346,6 +349,7 @@ class ilDataCollectionRecordListGUI {
 				break;
 			}
 		}
+
 		$this->endImport($i - 2, $warnings);
 	}
 

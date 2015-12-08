@@ -584,7 +584,11 @@ class Mail_RFC822 {
         }
 
         // Check for any char from ASCII 0 - ASCII 127
-        if (!preg_match('/^[\\x00-\\x7E]+$/i', $atom, $matches)) {
+        // mjansen patch 16 Sep 2015 start
+        #16291
+        #17618
+        if (!preg_match('/^[\\x00-\\x7E\\x{00df}\x{00f3}]+$/ui', $atom, $matches)) {
+        // mjansen patch 16 Sep 2015 end
             return false;
         }
 

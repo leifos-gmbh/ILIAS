@@ -638,6 +638,9 @@ class ilAccountRegistrationGUI
 
 		$this->userObj->setTimeLimitFrom(time());
 
+		include_once './Services/User/classes/class.ilUserCreationContext.php';
+		ilUserCreationContext::getInstance()->addContext(ilUserCreationContext::CONTEXT_REGISTRATION);
+
 		$this->userObj->create();
 
 		
@@ -684,12 +687,13 @@ class ilAccountRegistrationGUI
 			$hits_per_page = 10;
 		}
 		$this->userObj->setPref("hits_per_page", $hits_per_page);
-		$show_online = $ilSetting->get("show_users_online");
+		/*$show_online = $ilSetting->get("show_users_online");
 		if ($show_online == "")
 		{
 			$show_online = "y";
 		}
-		$this->userObj->setPref("show_users_online", $show_online);
+		$this->userObj->setPref("show_users_online", $show_online);*/
+		$this->userObj->setPref('bs_allow_to_contact_me', 'y');
 		$this->userObj->writePrefs();
 
 		

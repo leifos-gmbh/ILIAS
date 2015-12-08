@@ -598,7 +598,7 @@ class assImagemapQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 		}
 
 		$questionoutput = $template->get();
-		$feedback = ($show_feedback) ? $this->getAnswerFeedbackOutput($active_id, $pass) : "";
+		$feedback = ($show_feedback && !$this->isTestPresentationContext()) ? $this->getAnswerFeedbackOutput($active_id, $pass) : "";
 		if (strlen($feedback)) $solutiontemplate->setVariable("FEEDBACK", $feedback);
 		$solutiontemplate->setVariable("SOLUTION_OUTPUT", $questionoutput);
 
@@ -615,7 +615,12 @@ class assImagemapQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 	{
 		if( is_object($this->getPreviewSession()) )
 		{
-			$user_solution = array_values($this->getPreviewSession()->getParticipantsSolution());
+			$user_solution = array();
+			
+			if( is_array($this->getPreviewSession()->getParticipantsSolution()) )
+			{
+				$user_solution = array_values($this->getPreviewSession()->getParticipantsSolution());
+			}
 			
 			include_once "./Modules/TestQuestionPool/classes/class.ilImagemapPreview.php";
 			$preview = new ilImagemapPreview($this->object->getImagePath().$this->object->getImageFilename());

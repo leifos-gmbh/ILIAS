@@ -43,7 +43,7 @@ class ilWorkspaceShareTableGUI extends ilTable2GUI
 		
 		parent::__construct($a_parent_obj, $a_parent_cmd);
 
-		$this->setId("il_tbl_wspsh");
+		$this->setId("il_tbl_wspsh".(int)$this->portfolio_mode);
 
 		$this->setTitle($lng->txt("wsp_shared_resources"));
 
@@ -72,35 +72,42 @@ class ilWorkspaceShareTableGUI extends ilTable2GUI
 		$this->setRowTemplate("tpl.shared_row.html", "Services/PersonalWorkspace");
 		
 		$this->setDisableFilterHiding(true);
-		$this->setResetCommand("resetsharefilter");
-		$this->setFilterCommand("applysharefilter");
+		$this->setResetCommand("resetsharefilter", $this->lng->txt("wsp_shared_filter_reset_button"));
+		$this->setFilterCommand("applysharefilter", $this->lng->txt("wsp_shared_filter_button"));
 			
 		$this->initFilter();
 		
-		// reset will remove all filters
+		// reset will remove all filters		
 		if($this->portfolio_mode &&
 			!$this->filter["obj_type"])
-		{
-			$this->filter["obj_type"] = "prtf";
+		{			
+			$this->filter["obj_type"] = "prtf";		
 		}
 		
+		// incoming request:  check for validity
 		if($a_load_data)
 		{
+			/*		
 			if(($this->filter["user"] && strlen($this->filter["user"]) > 3) ||
 				($this->filter["title"] && strlen($this->filter["title"]) > 3) ||
 				$this->filter["acl_date"] ||
 				$this->filter["obj_type"] ||
 				$this->filter["acl_type"] ||
 				$this->filter["crsgrp"])
-			{			
-				$this->importData();		
-				include_once "Services/User/classes/class.ilUserUtil.php";
-				return;
-			}
-
-			ilUtil::sendFailure($lng->txt("wsp_shared_mandatory_filter_info"));			
+			{		
+			*/
+			
+			// #16630
+			$this->importData();		
+			include_once "Services/User/classes/class.ilUserUtil.php";
+			return;				
+		}
+		else
+		{
+			ilUtil::sendInfo($lng->txt("wsp_shared_mandatory_filter_info"));		
 		}
 
+		// initial state: show filters only
 		$this->disable("header");
 		$this->disable("content");		
 	}

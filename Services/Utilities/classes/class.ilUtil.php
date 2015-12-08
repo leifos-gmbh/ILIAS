@@ -2064,7 +2064,7 @@ class ilUtil
 	* @static
 	* 
 	*/
-	public static function img($a_src, $a_alt = "", $a_width = "", $a_height = "", $a_border = 0, $a_id = "")
+	public static function img($a_src, $a_alt = "", $a_width = "", $a_height = "", $a_border = 0, $a_id = "", $a_class = "")
 	{
 		$img = '<img src="'.$a_src.'"';
 		if ($a_alt != "")
@@ -2078,6 +2078,10 @@ class ilUtil
 		if ($a_height != "")
 		{
 			$img.= ' height="'.$a_height.'"';
+		}
+		if ($a_class != "")
+		{
+			$img.= ' class="'.$a_class.'"';
 		}
 		if ($a_id != "")
 		{
@@ -2725,7 +2729,7 @@ class ilUtil
 			if ($a_allow == "")
 			{
 				$allow_array = array ("b", "i", "strong", "em", "code", "cite",
-					"gap", "sub", "sup", "pre", "strike");
+					"gap", "sub", "sup", "pre", "strike", "bdo");
 			}
 
 			// this currently removes parts of strings like "a <= b"
@@ -2757,7 +2761,7 @@ class ilUtil
 	public static function getSecureTags()
 	{
 		return array("strong", "em", "u", "strike", "ol", "li", "ul", "p", "div",
-			"i", "b", "code", "sup", "sub", "pre", "gap", "a", "img");
+			"i", "b", "code", "sup", "sub", "pre", "gap", "a", "img", "bdo");
 	}
 
 	public static function maskSecureTags($a_str, $allow_array)
@@ -3042,8 +3046,8 @@ class ilUtil
 	{
 		//$a_str = strip_tags($a_str, $a_allow);
 
-		$negativestr = "a,abbr,acronym,address,applet,area,b,base,basefont,".
-			"bdo,big,blockquote,body,br,button,caption,center,cite,code,col,".
+		$negativestr = "a,abbr,acronym,address,applet,area,base,basefont,".
+			"big,blockquote,body,br,button,caption,center,cite,code,col,".
 			"colgroup,dd,del,dfn,dir,div,dl,dt,em,fieldset,font,form,frame,".
 			"frameset,h1,h2,h3,h4,h5,h6,head,hr,html,i,iframe,img,input,ins,isindex,kbd,".
 			"label,legend,li,link,map,menu,meta,noframes,noscript,object,ol,".
@@ -3522,6 +3526,7 @@ class ilUtil
 		switch($a_desired_type)
 		{
 			case "jpg":
+			case "jpeg":
 			if ($im_types & IMG_JPG) return "jpg";
 			if ($im_types & IMG_GIF) return "gif";
 			if ($im_types & IMG_PNG) return "png";
@@ -3534,6 +3539,12 @@ class ilUtil
 			break;
 
 			case "png":
+			if ($im_types & IMG_PNG) return "png";
+			if ($im_types & IMG_JPG) return "jpg";
+			if ($im_types & IMG_GIF) return "gif";
+			break;
+
+			case "svg":
 			if ($im_types & IMG_PNG) return "png";
 			if ($im_types & IMG_JPG) return "jpg";
 			if ($im_types & IMG_GIF) return "gif";
@@ -3762,6 +3773,7 @@ class ilUtil
 		{
 			$cmd .= " ".$args;
 		}
+//ilUtil::printBacktrace(5);
 //echo "<br>".$cmd; exit;
 		exec($cmd, $arr);
 //		$ilLog->write("ilUtil::execQuoted: ".$cmd.".");

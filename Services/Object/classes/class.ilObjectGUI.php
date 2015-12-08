@@ -70,6 +70,7 @@ class ilObjectGUI
 	var $formaction;		// special formation (array "cmd" => "formaction")
 	var $return_location;	// special return location (array "cmd" => "location")
 	var $target_frame;	// special target frame (array "cmd" => "location")
+	protected $tmp_import_dir;	// directory used during import
 
 	var $tab_target_script;
 	var $actions;
@@ -737,7 +738,6 @@ class ilObjectGUI
 			{
 				$forms = array(self::CFORM_CLONE => $forms[self::CFORM_CLONE]);
 			}
-			
 			$tpl->setContent($this->getCreationFormsHTML($forms));
 		}
 	}
@@ -782,8 +782,19 @@ class ilObjectGUI
 		// no accordion if there is just one form
 		if(sizeof($a_forms) == 1)
 		{
-			$a_forms = array_shift($a_forms);			
-			return $a_forms->getHTML();			
+			$form_type = key($a_forms);
+			$a_forms = array_shift($a_forms);
+
+			// see bug #0016217
+			if(method_exists($this, "getCreationFormTitle"))
+			{
+				$form_title = $this->getCreationFormTitle($form_type);
+				if ($form_title != "")
+				{
+					$a_forms->setTitle($form_title);
+				}
+			}
+			return $a_forms->getHTML();
 		}
 		else
 		{
@@ -1283,7 +1294,7 @@ class ilObjectGUI
 	/**
 	 * Import
 	 */
-	protected function importFileObject($parent_id = null)
+	protected function importFileObject($parent_id = null, $a_catch_errors = true)
 	{
 		global $objDefinition, $tpl, $ilErr;
 
@@ -1306,7 +1317,7 @@ class ilObjectGUI
 		if ($form->checkInput())
 		{
 			// :todo: make some check on manifest file
-			
+
 			if($objDefinition->isContainer($new_type))
 			{
 				include_once './Services/Export/classes/class.ilImportContainer.php';
@@ -1318,8 +1329,24 @@ class ilObjectGUI
 				$imp = new ilImport((int)$parent_id);
 			}
 
-			$new_id = $imp->importObject(null, $_FILES["importfile"]["tmp_name"],
-				$_FILES["importfile"]["name"], $new_type);
+			try
+			{
+				$new_id = $imp->importObject(null, $_FILES["importfile"]["tmp_name"],
+					$_FILES["importfile"]["name"], $new_type);
+			}
+			catch (ilException $e)
+			{
+				$this->tmp_import_dir = $imp->getTemporaryImportDir();
+				if (!$a_catch_errors)
+				{
+					throw $e;
+				}
+				// display message and form again
+				ilUtil::sendFailure($this->lng->txt("obj_import_file_error")." <br />".$e->getMessage());
+				$form->setValuesByPost();
+				$tpl->setContent($form->getHtml());
+				return;
+			}
 
 			if ($new_id > 0)
 			{

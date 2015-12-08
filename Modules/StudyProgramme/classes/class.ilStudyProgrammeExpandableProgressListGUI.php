@@ -10,6 +10,7 @@
  */
 
 require_once("Modules/StudyProgramme/classes/class.ilStudyProgrammeProgressListGUI.php");
+require_once('./Modules/StudyProgramme/classes/class.ilObjStudyProgrammeAdmin.php');
 
 class ilStudyProgrammeExpandableProgressListGUI extends ilStudyProgrammeProgressListGUI {
 	/**
@@ -40,9 +41,11 @@ class ilStudyProgrammeExpandableProgressListGUI extends ilStudyProgrammeProgress
 	function __construct(ilStudyProgrammeUserProgress $a_progress) {
 		parent::__construct($a_progress);
 		
-		global $tpl, $rbacsystem;
+		global $tpl, $rbacsystem, $ilSetting, $ilAccess;
 		$this->il_tpl = $tpl;
 		$this->il_rbacsystem = $rbacsystem;
+		$this->il_setting = $ilSetting;
+		$this->il_access = $ilAccess;
 	}
 	
 	public function getIndent() {
@@ -113,21 +116,35 @@ class ilStudyProgrammeExpandableProgressListGUI extends ilStudyProgrammeProgress
 	}
 	
 	protected function getAccordionContentProgressesHTML() {
-		return implode("\n", array_map(function(ilStudyProgrammeUserProgress $progress) {
-			if (!$this->shouldShowSubProgress($progress)) {
+		// TODO: $this could be removed as soon as support for PHP 5.3 is dropped:
+		$self = $this;
+		// Make shouldShowSubProgress and newSubItem protected again afterwards, do
+		// the same in the derived class ilStudyProgrammeIndividualPlanProgressListGUI.
+		return implode("\n", array_map(function(ilStudyProgrammeUserProgress $progress) use ($self) {
+			if (!$self->shouldShowSubProgress($progress)) {
 				return "";
 			}
-			$gui = $this->newSubItem($progress);
-			$gui->setIndent($this->getIndent() + 1);
+			$gui = $self->newSubItem($progress);
+			$gui->setIndent($self->getIndent() + 1);
 			return $gui->getHTML();
 		}, $this->progress->getChildrenProgress()));
 	}
 	
-	protected function shouldShowSubProgress(ilStudyProgrammeUserProgress $a_progress) {
-		return $a_progress->isRelevant();
+	public function shouldShowSubProgress(ilStudyProgrammeUserProgress $a_progress) {
+		if($a_progress->isRelevant()) {
+			$prg = $a_progress->getStudyProgramme();
+			$can_read = $this->il_access->checkAccess("read", "", $prg->getRefId(), "prg", $prg->getId());
+			if($this->visible_on_pd_mode == ilObjStudyProgrammeAdmin::SETTING_VISIBLE_ON_PD_READ && !$can_read) {
+				return false;
+			}
+
+			return true;
+		}
+		
+		return false;
 	}
 	
-	protected function newSubItem(ilStudyProgrammeUserProgress $a_progress) {
+	public function newSubItem(ilStudyProgrammeUserProgress $a_progress) {
 		return new ilStudyProgrammeExpandableProgressListGUI($a_progress);
 	}
 	

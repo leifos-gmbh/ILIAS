@@ -140,7 +140,7 @@ class assQuestionImport
 	protected function getQplImportArchivDirectory()
 	{
 		include_once "./Modules/TestQuestionPool/classes/class.ilObjQuestionPool.php";
-		return ilObjQuestionPool::_getImportDirectory() . '/' . $_SESSION["qpl_import_subdir"];
+		return ilObjQuestionPool::_getImportDirectory();
 	}
 	
 	/**
@@ -149,7 +149,35 @@ class assQuestionImport
 	protected function getTstImportArchivDirectory()
 	{
 		include_once "./Modules/Test/classes/class.ilObjTest.php";
-		return ilObjTest::_getImportDirectory() . '/' . $_SESSION["tst_import_subdir"];
+		return ilObjTest::_getImportDirectory();
+	}
+	
+	protected function processNonAbstractedImageReferences($text, $sourceNic)
+	{
+		$reg = '/<img.*src=".*\\/mm_(\\d+)\\/(.*?)".*>/m';
+		$matches = null;
+		
+		if( preg_match_all($reg, $text, $matches) )
+		{
+			for($i = 0, $max = count($matches[1]); $i < $max; $i++)
+			{
+				$mobSrcId = $matches[1][$i];
+				$mobSrcName = $matches[2][$i];
+				$mobSrcLabel = 'il_'.$sourceNic.'_mob_'.$mobSrcId;
+
+				if (!is_array($_SESSION["import_mob_xhtml"]))
+				{
+					$_SESSION["import_mob_xhtml"] = array();
+				}
+
+				$_SESSION["import_mob_xhtml"][] = array(
+					"mob" => $mobSrcLabel, "uri" => 'objects/'.$mobSrcLabel.'/'.$mobSrcName
+				);
+			}
+		}
+
+		include_once "./Services/RTE/classes/class.ilRTE.php";
+		return ilRTE::_replaceMediaObjectImageSrc($text, 0, $sourceNic);
 	}
 	
 	/**

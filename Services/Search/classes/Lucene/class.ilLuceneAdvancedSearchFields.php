@@ -145,6 +145,12 @@ class ilLuceneAdvancedSearchFields
 		include_once './Services/MetaData/classes/class.ilMDUtilSelect.php';
 
 		$a_post_name = 'query['.$a_field_name.']';
+		
+		ilLoggerFactory::getLogger('sea')->debug('Query was: '. print_r($a_query,TRUE));
+		if(!is_array($a_query))
+		{
+			$a_query = array();
+		}
 
 		switch($a_field_name)
 		{
@@ -421,9 +427,10 @@ class ilLuceneAdvancedSearchFields
 				$field_form->setTitle($this->active_fields[$a_field_name]);			
 				$field_form->addToForm();
 				
-				// reload search values
-				if(isset($a_query[$a_field_name]))
-				{
+				// #17071 - reload search values
+				if(is_array($a_query) &&
+					array_key_exists($a_field_name, $a_query))
+				{				
 					$field_form->importFromPost($a_query);
 					$field_form->validate();
 				}								
@@ -613,13 +620,34 @@ class ilLuceneAdvancedSearchFields
 					
 				// Advanced meta data
 				$field_id = substr($a_field,4);
-				include_once './Services/AdvancedMetaData/classes/class.ilAdvancedMDFieldDefinition.php';
-				$field = ilAdvancedMDFieldDefinition::getInstance($field_id);
-				
+				include_once './Services/AdvancedMetaData/classes/class.ilAdvancedMDFieldDefinition.php';				
+				try 
+				{
+					// field might be invalid (cached query)
+					$field = ilAdvancedMDFieldDefinition::getInstance($field_id);
+				} 
+				catch (Exception $ex) 
+				{
+					return '';
+				}
+								
 				$adv_query = $field->getLuceneSearchString($a_query);
 				if($adv_query)
 				{
-					return 'advancedMetaData_'.$field_id.': '.$adv_query;				
+					// #17558
+					if(!is_array($adv_query))
+					{
+						return 'advancedMetaData_'.$field_id.': '.$adv_query;				
+					}
+					else
+					{
+						$res = array();
+						foreach($adv_query as $adv_query_item)
+						{
+							$res[] = 'advancedMetaData_'.$field_id.': '.$adv_query_item;				
+						}
+						return '('.implode(' OR ', $res).')';
+					}
 				}
 		}
 	}

@@ -25,6 +25,7 @@ class ilObjFile extends ilObject2
 	protected $rating;
 	
 	private $file_storage = null;
+	protected $log = null;
 
 
 	/**
@@ -37,6 +38,9 @@ class ilObjFile extends ilObject2
 	{
 		$this->version = 0;
 		$this->raise_upload_error = true;
+
+		$this->log = ilLoggerFactory::getLogger('file');
+
 		parent::__construct($a_id,$a_call_by_reference);
 		
 		if($this->getId())
@@ -45,6 +49,9 @@ class ilObjFile extends ilObject2
 		}
 	}
 
+	/**
+	 * Init type
+	 */
 	function initType()
 	{
 		$this->type = "file";
@@ -55,7 +62,7 @@ class ilObjFile extends ilObject2
 	* 
 	* @param bool upload mode (if enabled no entries in file_data will be done)
 	*/
-	protected function doCreate($a_upload = false, $a_prevent_meta_data_creation = false)
+	protected function doCreate($a_upload = false)
 	{
 		//BEGIN WebDAV Move Property creation into a method of its own.
 		$this->createProperties($a_upload);
@@ -70,7 +77,7 @@ class ilObjFile extends ilObject2
 	 * This method has been put into a separate operation, to allow a WebDAV Null resource
 	 * (class.ilObjNull.php) to become a file object.
 	 */
-	function createProperties($a_upload = false, $a_prevent_meta_data_creation = false)
+	function createProperties($a_upload = false)
 	{
 		global $ilDB,$tree;
 		
@@ -97,6 +104,17 @@ class ilObjFile extends ilObject2
 				1, 0, $this->getId());
 		}
 
+		// log creation
+		include_once("./Services/Utilities/classes/class.ilStr.php");
+		$this->log->debug("ilObjFile::createProperties, ID: ".$this->getId().
+			", Name: ".$this->getFileName().
+			", Type: ".$this->getFileType().
+			", Size: ".$this->getFileSize().
+			", Mode: ".$this->getMode().
+			", Name(Bytes): ".implode(":", ilStr::getBytesForString($this->getFileName()))
+		);
+		$this->log->logStack(ilLogLevel::DEBUG);
+
 		$q = "INSERT INTO file_data (file_id,file_name,file_type,file_size,version,f_mode) "
 			."VALUES (".$ilDB->quote($this->getId() ,'integer').","
 			.$ilDB->quote($this->getFileName() ,'text').","
@@ -104,14 +122,29 @@ class ilObjFile extends ilObject2
 			.$ilDB->quote((int) $this->getFileSize() ,'integer').","
 			.$ilDB->quote(1 ,'integer').",".$ilDB->quote($this->getMode() ,'text').")";
 		$res = $ilDB->manipulate($q);
-		
+
 		// no meta data handling for file list files
-		if ($this->getMode() != "filelist" && !$a_prevent_meta_data_creation)
+		if ($this->getMode() != "filelist")
 		{
 			$this->createMetaData();
 		}
 	}
 	//END WebDAV: Move Property creation into a method of its own.
+	
+	public function setNoMetaDataCreation($a_status)
+	{
+		$this->no_meta_data_creation = (bool)$a_status;
+	}
+	
+	protected function beforeCreateMetaData()
+	{
+		return !(bool)$this->no_meta_data_creation;
+	}
+	
+	protected function beforeUpdateMetaData()
+	{
+		return !(bool)$this->no_meta_data_creation;
+	}
 	
 	/**
 	* create file object meta data

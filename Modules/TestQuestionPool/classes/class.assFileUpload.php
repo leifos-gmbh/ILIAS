@@ -653,6 +653,8 @@ class assFileUpload extends assQuestion implements ilObjQuestionScoringAdjustabl
 
 		$this->getProcessLocker()->requestUserSolutionUpdateLock();
 
+		$this->updateCurrentSolutionsAuthorization($active_id, $pass, $authorized);
+
 		$entered_values = false;
 		if( $_POST['cmd'][$this->questionActionCmd] == $this->lng->txt('delete') )
 		{
@@ -1125,7 +1127,7 @@ class assFileUpload extends assQuestion implements ilObjQuestionScoringAdjustabl
 	 * @param integer $pass
 	 * @return boolean $answered
 	 */
-	public function isAnswered($active_id, $pass)
+	public function isAnswered($active_id, $pass = null)
 	{
 		$numExistingSolutionRecords = assQuestion::getNumExistingSolutionRecords($active_id, $pass, $this->getId());
 		

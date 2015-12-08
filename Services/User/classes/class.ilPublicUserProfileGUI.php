@@ -116,7 +116,24 @@ class ilPublicUserProfileGUI
 	{
 		return $this->backurl;
 	}
+		
+	protected function handleBackUrl()
+	{
+		global $ilMainMenu;
+				
+		$back = ($this->getBackUrl() != "")
+			? $this->getBackUrl()
+			: $_GET["back_url"];
+		
+		if(!$back)
+		{
+			// #15984
+			$back = 'ilias.php?baseClass=ilPersonalDesktopGUI';
+		}
 
+		$ilMainMenu->setTopBarBack($back);
+	}
+	
 	/**
 	 * Set custom preferences for public profile fields
 	 *
@@ -177,6 +194,8 @@ class ilPublicUserProfileGUI
 				$portfolio_id = $this->getProfilePortfolio();
 				if($portfolio_id)
 				{					
+					$this->handleBackUrl();
+					
 					include_once "Modules/Portfolio/classes/class.ilObjPortfolioGUI.php";
 					$gui = new ilObjPortfolioGUI($portfolio_id); // #11876		
 					$gui->setAdditional($this->getAdditional());
@@ -244,8 +263,7 @@ class ilPublicUserProfileGUI
 		}
 		else
 		{
-			$this->renderTitle();
-			
+
 			if(!$is_active)
 			{
 				ilUtil::redirect('ilias.php?baseClass=ilPersonalDesktopGUI');
@@ -254,13 +272,23 @@ class ilPublicUserProfileGUI
 			// Check from Database if value
 			// of public_profile = "y" show user infomation
 			$user = new ilObjUser($this->getUserId());
-			if ($user->getPref("public_profile") != "y" &&
-				($user->getPref("public_profile") != "g" || !$ilSetting->get('enable_global_profiles')) &&
+			$current = $user->getPref("public_profile");
+							
+			// #17462 - see ilPersonalProfileGUI::initPublicProfileForm()
+			if($user->getPref("public_profile") == "g" && !$ilSetting->get('enable_global_profiles'))
+			{
+				$current = "y";
+			}
+			
+			if ($current != "y" &&
+				($current != "g" || !$ilSetting->get('enable_global_profiles')) &&
 				!$this->custom_prefs)
 			{
 				ilUtil::redirect('ilias.php?baseClass=ilPersonalDesktopGUI');
 			}
-			
+
+			$this->renderTitle();
+
 			return $this->getEmbeddable(true);	
 		}		
 	}
@@ -313,6 +341,16 @@ class ilPublicUserProfileGUI
 		$tpl->setVariable("FIRSTNAME", $first_name);
 		$tpl->setVariable("LASTNAME", $user->getLastName());
 		
+		if($user->getBirthday() &&
+			$this->getPublicPref($user, "public_birthday") == "y")
+		{
+			// #17574
+			$tpl->setCurrentBlock("bday_bl");
+			$tpl->setVariable("TXT_BIRTHDAY", $lng->txt("birthday"));
+			$tpl->setVariable("VAL_BIRTHDAY", ilDatePresentation::formatDate(new ilDate($user->getBirthday(), IL_CAL_DATE)));
+			$tpl->parseCurrentBlock();
+		}
+		
 		if(!$this->offline)
 		{
 			// vcard
@@ -339,7 +377,8 @@ class ilPublicUserProfileGUI
 			$imagefile = basename($imagefile);			
 		}
 
-		if ($this->getPublicPref($user, "public_upload")=="y" && $imagefile != "")
+		if ($this->getPublicPref($user, "public_upload")=="y" && $imagefile != "" &&
+			($ilUser->getId() != ANONYMOUS_USER_ID || $user->getPref("public_profile") == "g"))
 		{
 			//Getting the flexible path of image form ini file
 			//$webspace_dir = ilUtil::getWebspaceDir("output");
@@ -591,6 +630,7 @@ class ilPublicUserProfileGUI
 				$tpl->parseCurrentBlock();
 			}
 		}
+
 		if(
 			$this->getUserId() != $ilUser->getId() &&
 			!$ilUser->isAnonymous() &&
@@ -601,6 +641,7 @@ class ilPublicUserProfileGUI
 			$button = ilBuddySystemLinkButton::getInstanceByUserId($user->getId());
 			$tpl->setVariable('BUDDY_HTML', $button->getHtml());
 		}
+
 		$goto = "";
 		if($a_add_goto)
 		{			
@@ -662,7 +703,8 @@ class ilPublicUserProfileGUI
 			"getZipcode" => "zipcode", "getCity" => "city", "getCountry" => "country",
 			"getPhoneOffice" => "phone_office", "getPhoneHome" => "phone_home",
 			"getPhoneMobile" => "phone_mobile", "getFax" => "fax", "getEmail" => "email",
-			"getHobby" => "hobby", "getMatriculation" => "matriculation", "getClientIP" => "client_ip");
+			"getHobby" => "hobby", "getMatriculation" => "matriculation", "getClientIP" => "client_ip",
+			"dummy" => "location");
 
 		$org = array();
 		$adr = array();
@@ -709,10 +751,13 @@ class ilPublicUserProfileGUI
 					case "hobby":
 						$vcard->setNote($user->$key());
 						break;
+					case "location":
+						$vcard->setPosition($user->getLatitude(), $user->getLongitude());
+						break;
 				}
 			}
 		}
-
+		
 		if (count($org))
 		{
 			$vcard->setOrganization(join(";", $org));
@@ -722,7 +767,7 @@ class ilPublicUserProfileGUI
 			$vcard->setAddress($adr[0], $adr[1], $adr[2], $adr[3], $adr[4], $adr[5], $adr[6]);
 		}
 		
-		ilUtil::deliverData(utf8_decode($vcard->buildVCard()), $vcard->getFilename(), $vcard->getMimetype());
+		ilUtil::deliverData($vcard->buildVCard(), $vcard->getFilename(), $vcard->getMimetype());
 	}
 	
 	/**
@@ -766,7 +811,7 @@ class ilPublicUserProfileGUI
 	
 	function renderTitle()
 	{
-		global $tpl, $ilTabs, $lng;
+		global $tpl;
 		
 		$tpl->resetHeaderBlock();
 		
@@ -774,16 +819,7 @@ class ilPublicUserProfileGUI
 		$tpl->setTitle(ilUserUtil::getNamePresentation($this->getUserId()));
 		$tpl->setTitleIcon(ilObjUser::_getPersonalPicturePath($this->getUserId(), "xxsmall"));
 		
-		$back = ($this->getBackUrl() != "")
-			? $this->getBackUrl()
-			: $_GET["back_url"];
-
-		if ($back != "")
-		{
-			$ilTabs->clearTargets();
-			$ilTabs->setBackTarget($lng->txt("back"),
-				$back);
-		}
+		$this->handleBackUrl();
 	}
 	
 	/**

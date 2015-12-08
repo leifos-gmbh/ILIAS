@@ -156,15 +156,9 @@ class ilInitialisation
 				break;
 		}
 		
-		$tz = $ilIliasIniFile->readVariable("server","timezone");
-		if ($tz != "")
-		{
-			if (function_exists('date_default_timezone_set'))
-			{
-				date_default_timezone_set($tz);
-			}
-		}
-		define ("IL_TIMEZONE", $ilIliasIniFile->readVariable("server","timezone"));
+		include_once './Services/Calendar/classes/class.ilTimeZone.php';
+		$tz = ilTimeZone::initDefaultTimeZone($ilIliasIniFile);
+		define ("IL_TIMEZONE", $tz);
 	}
 
 	/**
@@ -325,10 +319,12 @@ class ilInitialisation
 		define ("DEBUG",$ilClientIniFile->readVariable("system","DEBUG"));
 		define ("DEVMODE",$ilClientIniFile->readVariable("system","DEVMODE"));
 		define ("SHOWNOTICES",$ilClientIniFile->readVariable("system","SHOWNOTICES"));
+		define ("DEBUGTOOLS",$ilClientIniFile->readVariable("system","DEBUGTOOLS"));
 		define ("ROOT_FOLDER_ID",$ilClientIniFile->readVariable('system','ROOT_FOLDER_ID'));
 		define ("SYSTEM_FOLDER_ID",$ilClientIniFile->readVariable('system','SYSTEM_FOLDER_ID'));
 		define ("ROLE_FOLDER_ID",$ilClientIniFile->readVariable('system','ROLE_FOLDER_ID'));
 		define ("MAIL_SETTINGS_ID",$ilClientIniFile->readVariable('system','MAIL_SETTINGS_ID'));
+		define ("ERROR_HANDLER",$ilClientIniFile->readVariable('system', 'ERROR_HANDLER'));
 		
 		// this is for the online help installation, which sets OH_REF_ID to the
 		// ref id of the online module
@@ -571,6 +567,7 @@ class ilInitialisation
 			// init console log handler
 			include_once './Services/Logging/classes/public/class.ilLoggerFactory.php';
 			ilLoggerFactory::getInstance()->initUser($ilUser->getLogin());
+			ilLoggerFactory::getRootLogger()->debug('Using default timezone: '. IL_TIMEZONE);
 		}
 		else
 		{
@@ -780,15 +777,6 @@ class ilInitialisation
 		include_once './Services/Logging/classes/public/class.ilLoggerFactory.php';
 		$log = ilLoggerFactory::getRootLogger();
 		
-//		require_once "./Services/Logging/classes/class.ilLog.php";
-//		try
-//		{
-//			$log = new ilLog(ILIAS_LOG_DIR,ILIAS_LOG_FILE,CLIENT_ID,ILIAS_LOG_ENABLED,ILIAS_LOG_LEVEL);				
-//		}
-//		catch(ilLogException $e)
-//		{
-//			self::abortAndDie($e->getMessage());
-//		}
 		self::initGlobal("ilLog", $log);
 		// deprecated
 		self::initGlobal("log", $log);
@@ -842,7 +830,7 @@ class ilInitialisation
 			error_reporting(E_ALL);
 		}
 		
-		if(defined(DEBUGTOOLS) && DEBUGTOOLS)
+		if(defined('DEBUGTOOLS') && DEBUGTOOLS)
 		{
 			include_once "include/inc.debug.php";
 		}
@@ -959,6 +947,7 @@ class ilInitialisation
 
 		self::initIliasIniFile();
 
+		define('IL_INITIAL_WD', getcwd());
 		
 		// deprecated
 		self::initGlobal("ilias", "ILIAS", "./Services/Init/classes/class.ilias.php");				

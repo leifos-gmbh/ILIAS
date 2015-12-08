@@ -49,16 +49,10 @@ class ilRepositoryExplorer extends ilExplorer
 		if ($ilSetting->get("repository_tree_pres") == "" ||
 			($ilSetting->get("rep_tree_limit_grp_crs") && $a_top_node == 0))
 		{
-			$this->addFilter("root");
-			$this->addFilter("cat");
-			$this->addFilter('catr');
-			$this->addFilter('rcat');
-			$this->addFilter("grp");
-			$this->addFilter("icrs");
-			$this->addFilter('rgrp');
-			$this->addFilter("crs");
-			$this->addFilter('crsr');
-			$this->addFilter('rcrs');
+			foreach($objDefinition->getExplorerContainerTypes() as $type)
+			{
+				$this->addFilter($type);
+			}			
 			$this->setFiltered(true);
 			$this->setFilterMode(IL_FM_POSITIVE);
 		}
@@ -122,16 +116,16 @@ class ilRepositoryExplorer extends ilExplorer
 				$ilCtrl->setParameterByClass("ilrepositorygui", "ref_id", $_GET["ref_id"]);
 				return $link;
 
-			case "icrs":
-				$ilCtrl->setParameterByClass("ilobjilinccoursegui", "ref_id", $a_node_id);
-				$link = $ilCtrl->getLinkTargetByClass(array("ilrepositorygui", "ilobjilinccoursegui"), "");
-				$ilCtrl->setParameterByClass("ilobjilinccoursegui", "ref_id", $_GET["ref_id"]);
-				return $link;
-
 			case 'rcrs':
 				$ilCtrl->setParameterByClass("ilrepositorygui", "ref_id", $a_node_id);
 				$link = $ilCtrl->getLinkTargetByClass("ilrepositorygui", "infoScreen");
 				$ilCtrl->setParameterByClass("ilrepositorygui", "ref_id", $_GET["ref_id"]);
+				return $link;
+
+			case 'prg':
+				$ilCtrl->setParameterByClass("ilobjstudyprogrammegui", "ref_id", $a_node_id);
+				$link = $ilCtrl->getLinkTargetByClass("ilobjstudyprogrammegui", "view");
+				$ilCtrl->setParameterByClass("ilobjstudyprogrammegui", "ref_id", $_GET["ref_id"]);
 				return $link;
 
 			default:
@@ -175,6 +169,10 @@ class ilRepositoryExplorer extends ilExplorer
 
 			case 'rcrs':
 				$t_frame = ilFrameTargetInfo::_getFrame("RepositoryContent",'rcrs');
+				return $t_frame;
+
+			case 'prg':
+				$t_frame = ilFrameTargetInfo::_getFrame("RepositoryContent",'prg');
 				return $t_frame;
 
 			default:
@@ -258,6 +256,9 @@ class ilRepositoryExplorer extends ilExplorer
 			case 'catr':
 				include_once('./Services/ContainerReference/classes/class.ilContainerReferenceAccess.php');
 				return ilContainerReferenceAccess::_isAccessible($a_ref_id);
+			case 'prg': 
+					return $rbacsystem->checkAccess("visible", $a_ref_id);
+
 				
 
 			// all other types are only clickable, if read permission is given

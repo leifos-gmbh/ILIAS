@@ -46,6 +46,10 @@ require_once './Modules/Test/classes/class.ilTestExpressPage.php';
  */
 class ilObjTestGUI extends ilObjectGUI
 {
+	private static $infoScreenChildClasses = array(
+		'ilpublicuserprofilegui', 'ilobjportfoliogui'
+	);
+	
 	/** @var ilObjTest $object */
 	public $object = null;
 
@@ -1139,12 +1143,11 @@ class ilObjTestGUI extends ilObjectGUI
 			include_once "./Services/QTI/classes/class.ilQTIItem.php";
 			switch ($item["type"])
 			{
-				case "MULTIPLE CHOICE QUESTION":
+				case MULTIPLE_CHOICE_QUESTION_IDENTIFIER:
 				case QT_MULTIPLE_CHOICE_MR:
-					//$this->tpl->setVariable("QUESTION_TYPE", $this->lng->txt("qt_multiple_choice"));
 					$this->tpl->setVariable("QUESTION_TYPE", $this->lng->txt("assMultipleChoice"));
 					break;
-				case "SINGLE CHOICE QUESTION":
+				case SINGLE_CHOICE_QUESTION_IDENTIFIER:
 				case QT_MULTIPLE_CHOICE_SR:
 					$this->tpl->setVariable("QUESTION_TYPE", $this->lng->txt("assSingleChoice"));
 					break;
@@ -1154,39 +1157,59 @@ class ilObjTestGUI extends ilObjectGUI
 					break;
 				case LONG_MENU_QUESTION_IDENTIFIER:
 				case QT_LONG_MENU:
-					$this->tpl->setVariable("QUESTION_TYPE", $this->lng->txt("assKprimChoice"));
+					$this->tpl->setVariable("QUESTION_TYPE", $this->lng->txt("assLongMenu"));
 					break;
-				case "NUMERIC QUESTION":
+				case NUMERIC_QUESTION_IDENTIFIER:
 				case QT_NUMERIC:
 					$this->tpl->setVariable("QUESTION_TYPE", $this->lng->txt("assNumeric"));
 					break;
-				case "TEXTSUBSET QUESTION":
+				case FORMULA_QUESTION_IDENTIFIER:
+				case QT_FORMULA:
+					$this->tpl->setVariable("QUESTION_TYPE", $this->lng->txt("assFormulaQuestion"));
+					break;
+				case TEXTSUBSET_QUESTION_IDENTIFIER:
 				case QT_TEXTSUBSET:
 					$this->tpl->setVariable("QUESTION_TYPE", $this->lng->txt("assTextSubset"));
 					break;
-				case "CLOZE QUESTION":
+				case CLOZE_TEST_IDENTIFIER:
 				case QT_CLOZE:
 					$this->tpl->setVariable("QUESTION_TYPE", $this->lng->txt("assClozeTest"));
 					break;
-				case "IMAGE MAP QUESTION":
+				case ERROR_TEXT_IDENTIFIER:
+				case QT_ERRORTEXT:
+					$this->tpl->setVariable("QUESTION_TYPE", $this->lng->txt("assErrorText"));
+					break;
+				case IMAGEMAP_QUESTION_IDENTIFIER:
 				case QT_IMAGEMAP:
 					$this->tpl->setVariable("QUESTION_TYPE", $this->lng->txt("assImagemapQuestion"));
 					break;
-				case "JAVA APPLET QUESTION":
+				case JAVAAPPLET_QUESTION_IDENTIFIER:
 				case QT_JAVAAPPLET:
 					$this->tpl->setVariable("QUESTION_TYPE", $this->lng->txt("assJavaApplet"));
 					break;
-				case "MATCHING QUESTION":
+				case FLASHAPPLET_QUESTION_IDENTIFIER:
+				case QT_FLASHAPPLET:
+					$this->tpl->setVariable("QUESTION_TYPE", $this->lng->txt("assFlashApplet"));
+					break;
+				case MATCHING_QUESTION_IDENTIFIER:
 				case QT_MATCHING:
 					$this->tpl->setVariable("QUESTION_TYPE", $this->lng->txt("assMatchingQuestion"));
 					break;
-				case "ORDERING QUESTION":
+				case ORDERING_QUESTION_IDENTIFIER:
 				case QT_ORDERING:
 					$this->tpl->setVariable("QUESTION_TYPE", $this->lng->txt("assOrderingQuestion"));
 					break;
-				case "TEXT QUESTION":
+				case ORDERING_HORIZONTAL_IDENTIFIER:
+				case QT_ORDERING_HORIZONTAL:
+					$this->tpl->setVariable("QUESTION_TYPE", $this->lng->txt("assOrderingHorizontal"));
+					break;
+				case TEXT_QUESTION_IDENTIFIER:
 				case QT_TEXT:
 					$this->tpl->setVariable("QUESTION_TYPE", $this->lng->txt("assTextQuestion"));
+					break;
+				case FILE_UPLOAD_IDENTIFIER:
+				case QT_FILEUPLOAD:
+					$this->tpl->setVariable("QUESTION_TYPE", $this->lng->txt("assFileUpload"));
 					break;
 			}
 			$this->tpl->parseCurrentBlock();
@@ -3056,10 +3079,13 @@ class ilObjTestGUI extends ilObjectGUI
 			ilUtil::sendInfo($this->lng->txt("cannot_edit_test"), true);
 			$this->ctrl->redirect($this, "infoScreen");
 		}
+		
+		$isPdfDeliveryRequest = isset($_GET['pdf']) && $_GET['pdf'];
+		
 		$this->getQuestionsSubTabs();
 		$template = new ilTemplate("tpl.il_as_tst_print_test_confirm.html", TRUE, TRUE, "Modules/Test");
 
-		if(!array_key_exists("pdf", $_GET) || $_GET["pdf"] != 1) // #15243
+		if(!$isPdfDeliveryRequest) // #15243
 		{
 			$this->ctrl->setParameter($this, "pdf", "1");
 			$template->setCurrentBlock("pdf_export");
@@ -3079,23 +3105,28 @@ class ilObjTestGUI extends ilObjectGUI
 		$print_date = mktime(date("H"), date("i"), date("s"), date("m")  , date("d"), date("Y"));
 		$max_points= 0;
 		$counter = 1;
-					
+
+		require_once 'Modules/Test/classes/class.ilTestQuestionHeaderBlockBuilder.php';
+		$questionHeaderBlockBuilder = new ilTestQuestionHeaderBlockBuilder($this->lng);
+		$questionHeaderBlockBuilder->setHeaderMode($this->object->getTitleOutput());
+
 		foreach ($this->object->questions as $question) 
 		{		
 			$template->setCurrentBlock("question");
 			$question_gui = $this->object->createQuestionGUI("", $question);
-			$template->setVariable("COUNTER_QUESTION", $counter.".");
+			
+			if( $isPdfDeliveryRequest )
+			{
+				$question_gui->setOutputMode(assQuestionGUI::OUTPUT_MODE_PDF);
+			}
+
+			$questionHeaderBlockBuilder->setQuestionTitle($question_gui->object->getTitle());
+			$questionHeaderBlockBuilder->setQuestionPoints($question_gui->object->getMaximumPoints());
+			$questionHeaderBlockBuilder->setQuestionPosition($counter);
+			$template->setVariable("QUESTION_HEADER", $questionHeaderBlockBuilder->getHTML());
+
 			$template->setVariable("TXT_QUESTION_ID", $this->lng->txt('question_id_short'));
 			$template->setVariable("QUESTION_ID", $question_gui->object->getId());
-			$template->setVariable("QUESTION_TITLE", ilUtil::prepareFormOutput($question_gui->object->getTitle()));
-			if ($question_gui->object->getMaximumPoints() == 1)
-			{
-				$template->setVariable("QUESTION_POINTS", $question_gui->object->getMaximumPoints() . " " . $this->lng->txt("point"));
-			}
-			else
-			{
-				$template->setVariable("QUESTION_POINTS", $question_gui->object->getMaximumPoints() . " " . $this->lng->txt("points"));
-			}
 			$result_output = $question_gui->getSolutionOutput("", NULL, FALSE, TRUE, FALSE, $this->object->getShowSolutionFeedback());
 			if (strlen($result_output) == 0) $result_output = $question_gui->getPreview(FALSE);
 			$template->setVariable("SOLUTION_OUTPUT", $result_output);
@@ -3111,7 +3142,7 @@ class ilObjTestGUI extends ilObjectGUI
 		$template->setVariable("TXT_MAXIMUM_POINTS", ilUtil::prepareFormOutput($this->lng->txt("tst_maximum_points")));
 		$template->setVariable("VALUE_MAXIMUM_POINTS", ilUtil::prepareFormOutput($max_points));
 		
-		if (array_key_exists("pdf", $_GET) && ($_GET["pdf"] == 1))
+		if( $isPdfDeliveryRequest )
 		{
 			//$this->object->deliverPDFfromHTML($template->get(), $this->object->getTitle());
 			require_once 'class.ilTestPDFGenerator.php';
@@ -3149,20 +3180,20 @@ class ilObjTestGUI extends ilObjectGUI
 		$max_points= 0;
 		$counter = 1;
 
+		require_once 'Modules/Test/classes/class.ilTestQuestionHeaderBlockBuilder.php';
+		$questionHeaderBlockBuilder = new ilTestQuestionHeaderBlockBuilder($this->lng);
+		$questionHeaderBlockBuilder->setHeaderMode($this->object->getTitleOutput());
+		
 		foreach ($this->object->questions as $question)
 		{
 			$template->setCurrentBlock("question");
 			$question_gui = $this->object->createQuestionGUI("", $question);
-			$template->setVariable("COUNTER_QUESTION", $counter.".");
-			$template->setVariable("QUESTION_TITLE", ilUtil::prepareFormOutput($question_gui->object->getTitle()));
-			if ($question_gui->object->getMaximumPoints() == 1)
-			{
-				$template->setVariable("QUESTION_POINTS", $question_gui->object->getMaximumPoints() . " " . $this->lng->txt("point"));
-			}
-			else
-			{
-				$template->setVariable("QUESTION_POINTS", $question_gui->object->getMaximumPoints() . " " . $this->lng->txt("points"));
-			}
+			
+			$questionHeaderBlockBuilder->setQuestionTitle($question_gui->object->getTitle());
+			$questionHeaderBlockBuilder->setQuestionPoints($question_gui->object->getMaximumPoints());
+			$questionHeaderBlockBuilder->setQuestionPosition($counter);
+			$template->setVariable("QUESTION_HEADER", $questionHeaderBlockBuilder->getHTML());
+			
 			/** @var $question_gui assQuestionGUI  */
 			//$result_output = $question_gui->getTestOutput('', NULL, FALSE, FALSE, FALSE);
 			$result_output = $question_gui->getPreview(false);
@@ -3414,6 +3445,16 @@ class ilObjTestGUI extends ilObjectGUI
 		$this->defaultsObject();
 	}
 	
+	private function isCommandClassAnyInfoScreenChild()
+	{
+		if( in_array($this->ctrl->getCmdClass(), self::$infoScreenChildClasses) )
+		{
+			return true;
+		}
+		
+		return false;
+	}
+	
 	/**
 	* this one is called from the info button in the repository
 	* not very nice to set cmdClass/Cmd manually, if everything
@@ -3462,7 +3503,11 @@ class ilObjTestGUI extends ilObjectGUI
 		
 		if ($_GET['createRandomSolutions'])
 		{
+			global $ilCtrl;
+			
 			$this->object->createRandomSolutions($_GET['createRandomSolutions']);
+			
+			$ilCtrl->redirect($this);
 		}
 
 		if (!$ilAccess->checkAccess("read", "", $this->ref_id))
@@ -3472,7 +3517,12 @@ class ilObjTestGUI extends ilObjectGUI
 
 		include_once("./Services/InfoScreen/classes/class.ilInfoScreenGUI.php");
 		$info = new ilInfoScreenGUI($this);
-
+		
+		if( $this->isCommandClassAnyInfoScreenChild() )
+		{
+			return $this->ctrl->forwardCommand($info);
+		}
+		
 		$this->ctrl->setParameter($testPlayerGUI, "sequence", $testSession->getLastSequence());
 		
 		$info->setFormAction($this->ctrl->getFormAction($testPlayerGUI));
@@ -3522,7 +3572,7 @@ class ilObjTestGUI extends ilObjectGUI
 						$testPassesSelector->setActiveId($testSession->getActiveId());
 						$testPassesSelector->setLastFinishedPass($testSession->getLastFinishedPass());
 						
-						$closedPasses = $testPassesSelector->getReportablePasses();
+						$closedPasses = $testPassesSelector->getClosedPasses();
 						$existingPasses = $testPassesSelector->getExistingPasses();
 						
 						if ($existingPasses > $closedPasses)
@@ -3633,7 +3683,7 @@ class ilObjTestGUI extends ilObjectGUI
 			ilUtil::sendInfo($message);
 		}
 
-		if( $this->areSkillLevelThresholdsMissing() )
+		if( $this->object->isSkillServiceToBeConsidered() && $this->areSkillLevelThresholdsMissing() )
 		{
 			ilUtil::sendFailure($this->getSkillLevelThresholdsMissingInfo());
 		}
@@ -4223,7 +4273,6 @@ class ilObjTestGUI extends ilObjectGUI
 			case "singleResults":
 			case "exportEvaluation":
 			case "evalUserDetail":
-			case "passDetails":
 			case "outStatisticsResultsOverview":
 			case "statisticsPassDetails":
 				$this->getStatisticsSubTabs();

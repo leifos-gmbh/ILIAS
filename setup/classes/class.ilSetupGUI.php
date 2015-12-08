@@ -210,6 +210,9 @@ echo "<br>+".$client_id;
 		{
 			case NULL:
 			case "clientlist":
+				
+				$GLOBALS['ilLog']->warning('Achtung fehlerhaft');
+				
 				$this->setDisplayMode("view");
 				$this->displayClientList();
 				$this->active_tab = "clientlist";
@@ -520,7 +523,8 @@ echo "<br>+".$client_id;
 
 		$count = (int) round(count($languages) / 2);
 		$num = 1;
-
+		
+		sort($languages); // #16837
 		foreach ($languages as $lang_key)
 		{
 			/*
@@ -2319,8 +2323,9 @@ else
 
 		$ilGlobalCacheSettings = new ilGlobalCacheSettings();
 		$ilGlobalCacheSettings->readFromIniFile($ini);
-		$ilGlobalCacheSettings->setActive($_POST['global_cache_service_type'] > 0 ? true : false);
-		$ilGlobalCacheSettings->setService($_POST['global_cache_service_type']);
+		$service_type = $_POST['global_cache_service_type'];
+		$ilGlobalCacheSettings->setActive(($service_type >= 0) ? true : false);
+		$ilGlobalCacheSettings->setService($service_type);
 		$ilGlobalCacheSettings->resetActivatedComponents();
 		if (is_array($_POST['activate']) && count($_POST['activate']) > 0) {
 			foreach ($_POST['activate'] as $comp => $a) {
@@ -2620,7 +2625,7 @@ else
 
 				if ($dbupdate->getRunningStatus() > 0)
 				{
-					ilUtil::sendFailure($this->lng->txt("db_update_interrupted")."<br /><br />".
+					ilUtil::sendFailure($this->lng->txt("db_update_interrupted")." (Step ".$dbupdate->getRunningStatus().") <br /><br />".
 						$this->lng->txt("db_update_interrupted_avoid"));
 				}
 				else
@@ -2783,16 +2788,6 @@ else
 		include_once "./Services/Xml/classes/class.ilSaxParser.php";
 		include_once "./Services/Object/classes/class.ilObjectDefinition.php";
 
-		// #9019: init timezone		
-		$tz = $this->setup->ini->readVariable("server","timezone");
-		if ($tz != "")
-		{
-			if (function_exists('date_default_timezone_set'))
-			{
-				date_default_timezone_set($tz);
-			}
-			define ("IL_TIMEZONE", $tz);
-		}
 
 		// referencing db handler in language class
 		$ilDB = $this->setup->getClient()->db;
@@ -3291,16 +3286,16 @@ else
 		$this->form->addItem($ti);
 
 		// feedback recipient
-		$ti = new ilEmailInputGUI($lng->txt("feedback_recipient"), "feedback_recipient");
+		/*$ti = new ilEmailInputGUI($lng->txt("feedback_recipient"), "feedback_recipient");
 		$ti->setInfo($lng->txt("feedback_recipient_info"));
 		$ti->setRequired(true);
 		$ti->allowRFC822(true);
-		$this->form->addItem($ti);
+		$this->form->addItem($ti);*/
 
 		// error recipient
-		$ti = new ilEmailInputGUI($lng->txt("error_recipient"), "error_recipient");
+		/*$ti = new ilEmailInputGUI($lng->txt("error_recipient"), "error_recipient");
 		$ti->allowRFC822(true);
-		$this->form->addItem($ti);
+		$this->form->addItem($ti);*/
 
 		$this->form->addCommandButton("saveContact", $lng->txt("save"));
 
@@ -3349,8 +3344,8 @@ else
 			$this->setup->getClient()->setSetting("admin_email", $_POST["admin_email"]);
 			$this->setup->getClient()->setSetting("inst_institution", $_POST["inst_institution"]);
 			$this->setup->getClient()->setSetting("inst_name", $_POST["inst_name"]);
-			$this->setup->getClient()->setSetting("feedback_recipient", $_POST["feedback_recipient"]);
-			$this->setup->getClient()->setSetting("error_recipient", $_POST["error_recipient"]);
+			//$this->setup->getClient()->setSetting("feedback_recipient", $_POST["feedback_recipient"]);
+			//$this->setup->getClient()->setSetting("error_recipient", $_POST["error_recipient"]);
 
 			// update client.ini
 			$this->setup->getClient()->setName($_POST["inst_name"]);
@@ -3406,7 +3401,7 @@ else
 
 		}
 
-		$this->setButtonPrev("proxy");
+		$this->setButtonPrev("passwd");
 
 		if ($this->setup->getClient()->status["nic"]["status"])
 		{
@@ -3673,17 +3668,6 @@ else
 			return;
 		}
 		
-		// init timezone		
-		$tz = $this->setup->ini->readVariable("server","timezone");
-		if ($tz != "")
-		{
-			if (function_exists('date_default_timezone_set'))
-			{
-				date_default_timezone_set($tz);
-			}
-			define ("IL_TIMEZONE", $tz);
-		}		
-
 		// referencing does not work in dbupdate-script
 		$GLOBALS["ilDB"] = $this->setup->getClient()->getDB();
 // BEGIN WebDAV

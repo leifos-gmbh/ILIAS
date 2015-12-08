@@ -235,7 +235,7 @@ class ilObjWikiGUI extends ilObjectGUI
 				$cmd .= "Object";
 				if ($cmd != "infoScreenObject")
 				{
-					if (!in_array($cmd, array("createObject", "saveObject")))
+					if (!in_array($cmd, array("createObject", "saveObject", "importFileObject")))
 					{
 						$this->checkPermission("read");
 					}
@@ -781,7 +781,16 @@ class ilObjWikiGUI extends ilObjectGUI
 		$this->form_gui->addItem($page_toc);
 		
 		if($a_mode == "edit")
-		{		
+		{					
+			// advanced metadata auto-linking
+			include_once('Services/AdvancedMetaData/classes/class.ilAdvancedMDRecord.php');
+			if(count(ilAdvancedMDRecord::_getSelectedRecordsByObject("wiki", $this->object->getId(), "wpg")) > 0)
+			{			
+				$link_md = new ilCheckboxInputGUI($lng->txt("wiki_link_md_values"), "link_md_values");
+				$link_md->setInfo($lng->txt("wiki_link_md_values_info"));
+				$this->form_gui->addItem($link_md);
+			}		
+			
 			// additional features
 			$feat = new ilFormSectionHeaderGUI();
 			$feat->setTitle($this->lng->txt('obj_features'));
@@ -1238,6 +1247,14 @@ class ilObjWikiGUI extends ilObjectGUI
 		{
 			if (!$this->object->getTemplateSelectionOnCreation())
 			{
+				// check length
+				include_once("./Services/Utilities/classes/class.ilStr.php");
+				if (ilStr::strLen(ilWikiUtil::makeDbTitle($a_page)) > 200)
+				{
+					ilUtil::sendFailure($this->lng->txt("wiki_page_title_too_long")." (".$a_page.")", true);
+					$ilCtrl->setParameterByClass("ilwikipagegui", "page", ilWikiUtil::makeUrlTitle($_GET["from_page"]));
+					$ilCtrl->redirectByClass("ilwikipagegui", "preview");
+				}
 				$this->object->createWikiPage($a_page);
 
 				// redirect to newly created page
@@ -1354,8 +1371,12 @@ class ilObjWikiGUI extends ilObjectGUI
 					);
 				}				
 				include_once("./Services/Object/classes/class.ilObjectMetaDataGUI.php");				
-				$mdgui = new ilObjectMetaDataGUI(new ilObjWiki($wiki_id, false), "wpg", $a_wpg_id);				
-				$rcontent .= $mdgui->getBlockHTML($cmd);				
+				$wiki = new ilObjWiki($a_wiki_ref_id);
+				$callback = $wiki->getLinkMetadataValues()
+					? array($wiki, "decorateAdvMDValue")
+					: null;				
+				$mdgui = new ilObjectMetaDataGUI($wiki, "wpg", $a_wpg_id);				
+				$rcontent .= $mdgui->getBlockHTML($cmd, $callback); // #17291			
 			}
 		}
 			
@@ -1378,7 +1399,7 @@ class ilObjWikiGUI extends ilObjectGUI
 
 		$tpl->setRightContent($rcontent);
 	}
-
+	
 	/**
 	* Latest pages
 	*/

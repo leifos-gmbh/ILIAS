@@ -35,6 +35,7 @@ class ilTable2GUI extends ilTableGUI
 	protected $selected_column = array();
 	protected $show_templates = false;
 	protected $show_rows_selector = true; // JF, 2014-10-27
+	protected $rows_selector_off = false;
 
 	protected $nav_determined= false;
 	protected $limit_determined = false;
@@ -1055,10 +1056,12 @@ class ilTable2GUI extends ilTableGUI
 	* Set filter command
 	*
 	* @param	string		filter command
+	* @param	string		filter caption
 	*/
-	function setFilterCommand($a_val)
+	function setFilterCommand($a_val, $a_caption = null)
 	{
 		$this->filter_cmd = $a_val;
+		$this->filter_cmd_txt = $a_caption;
 	}
 
 	/**
@@ -1075,10 +1078,12 @@ class ilTable2GUI extends ilTableGUI
 	* Set reset filter command
 	*
 	* @param	string		reset command
+	* @param	string		reset caption
 	*/
-	function setResetCommand($a_val)
+	function setResetCommand($a_val, $a_caption = null)
 	{
 		$this->reset_cmd = $a_val;
+		$this->reset_cmd_txt = $a_caption;
 	}
 
 	/**
@@ -1187,10 +1192,10 @@ class ilTable2GUI extends ilTableGUI
 	
 	/**
 	 * Add Command button instance
-	 * 
-	 * @param ilButton $a_button
+	  
+	 * @param ilButtonBase $a_button
 	 */
-	function addCommandButtonInstance(ilButton $a_button)
+	function addCommandButtonInstance(ilButtonBase $a_button)
 	{
 		$this->buttons[] = $a_button;
 	}
@@ -1378,7 +1383,6 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 		foreach ((array) $this->column as $column)
 		{
 			$ccnt++;
-			
 			//tooltip
 			if ($column["tooltip"] != "")
 			{
@@ -1392,6 +1396,10 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 				{
 					$this->tpl->setVariable("TBL_COLUMN_WIDTH_NO_LINK"," width=\"".$column["width"]."\"");
 				}
+				if ($column["class"] != "")
+				{
+					$this->tpl->setVariable("TBL_COLUMN_CLASS_NO_LINK"," class=\"".$column["class"]."\"");
+				}
 				if (!$column["is_checkbox_action_column"])
 				{
 					$this->tpl->setVariable("TBL_HEADER_CELL_NO_LINK",
@@ -1403,7 +1411,6 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 						ilUtil::img(ilUtil::getImagePath("spacer.png"), $lng->txt("action")));
 				}
 				$this->tpl->setVariable("HEAD_CELL_NL_ID", "thc_".$this->getId()."_".$ccnt);
-				
 				if ($column["class"] != "")
 				{
 					$this->tpl->setVariable("TBL_HEADER_CLASS"," " . $column["class"]);
@@ -1435,6 +1442,10 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 			if ($column["width"] != "")
 			{
 				$this->tpl->setVariable("TBL_COLUMN_WIDTH"," width=\"".$column["width"]."\"");
+			}
+			if ($column["class"] != "")
+			{
+				$this->tpl->setVariable("TBL_COLUMN_CLASS"," class=\"".$column["class"]."\"");
 			}
 
 			$lng_sort_column = $this->lng->txt("sort_by_this_column");
@@ -1570,7 +1581,7 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 	/**
 	* Get HTML
 	*/
-	final public function getHTML()
+	public function getHTML()
 	{
 		global $lng, $ilCtrl, $ilUser;
 
@@ -1952,9 +1963,13 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 
 				$this->tpl->setCurrentBlock("filter_buttons");				
 				$this->tpl->setVariable("CMD_APPLY", $this->filter_cmd);
-				$this->tpl->setVariable("TXT_APPLY", $lng->txt("apply_filter"));
+				$this->tpl->setVariable("TXT_APPLY", $this->filter_cmd_txt 
+					? $this->filter_cmd_txt
+					: $lng->txt("apply_filter"));
 				$this->tpl->setVariable("CMD_RESET", $this->reset_cmd);
-				$this->tpl->setVariable("TXT_RESET", $lng->txt("reset_filter"));
+				$this->tpl->setVariable("TXT_RESET", $this->reset_cmd_txt 
+					? $this->reset_cmd_txt 
+					: $lng->txt("reset_filter"));
 			}
 			else if(count($opt_filter) > 0)
 			{
@@ -1981,31 +1996,68 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 	}
 	
 	/**
+	 * Check if filter element is based on adv md
+	 * 
+	 * @param ilAdvancedMDRecordGUI $a_gui
+	 * @param type $a_element
+	 * @return boolean
+	 */
+	protected function isAdvMDFilter(ilAdvancedMDRecordGUI $a_gui, $a_element)
+	{		
+		foreach($a_gui->getFilterElements(false) as $item)
+		{
+			if($item === $a_element)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
 	* Write filter values to session
 	*/
 	public function writeFilterToSession()
-	{
-		global $lng;
-		
-		$filter = $this->getFilterItems();
-		$opt_filter = $this->getFilterItems(true);
-		
-		foreach ($filter as $item)
+	{				
+		$advmd_record_gui = null;
+		if(method_exists($this, "getAdvMDRecordGUI"))
 		{
+			$advmd_record_gui = $this->getAdvMDRecordGUI();
+		}
+	
+		foreach ($this->getFilterItems() as $item)
+		{				
+			if($advmd_record_gui &&
+				$this->isAdvMDFilter($advmd_record_gui, $item))
+			{
+				continue;
+			}					
+			
 			if ($item->checkInput())
 			{
 				$item->setValueByArray($_POST);
 				$item->writeToSession();
 			}
 		}
-		foreach ($opt_filter as $item)
+		foreach ($this->getFilterItems(true) as $item)
 		{
+			if($advmd_record_gui &&
+				$this->isAdvMDFilter($advmd_record_gui, $item))
+			{
+				continue;
+			}	
+			
 			if ($item->checkInput())
 			{
 				$item->setValueByArray($_POST);
 				$item->writeToSession();
 			}
 		}
+		
+		if($advmd_record_gui)
+		{	
+			$advmd_record_gui->importFilter();
+		}	
 		
 		// #13209
 		unset($_REQUEST["tbltplcrt"]);
@@ -2314,7 +2366,7 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 				if ($this->getShowRowsSelector() && 
 					is_object($ilUser) &&
 					$this->getId() &&
-					$this->getLimit() < 9999) // JF, 2014-10-27
+					!$this->rows_selector_off) // JF, 2014-10-27
 				{
 					include_once("./Services/UIComponent/AdvancedSelectionList/classes/class.ilAdvancedSelectionListGUI.php");
 					$alist = new ilAdvancedSelectionListGUI();
@@ -2556,7 +2608,7 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 			{
 				if(!is_array($button))
 				{
-					if($button instanceof ilButton)
+					if($button instanceof ilButtonBase)
 					{	
 						$this->tpl->setVariable('BUTTON_OBJ', $button->render());	
 						
@@ -3365,6 +3417,18 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 	public function getPreventDoubleSubmission()
 	{
 		return $this->prevent_double_submission;
+	}
+	
+	function setLimit($a_limit = 0, $a_default_limit = 0)
+	{
+		parent::setLimit($a_limit, $a_default_limit);
+		
+		// #17077 - if limit is set "manually" to 9999, force rows selector off
+		if($a_limit == 9999 &&
+			$this->limit_determined)
+		{		
+			$this->rows_selector_off = true;
+		}
 	}
 }
 

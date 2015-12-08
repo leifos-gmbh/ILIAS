@@ -17,7 +17,7 @@ include_once("Services/Payment/classes/class.ilPaymentObject.php");
 * @ilCtrl_Calls ilRepositoryGUI: ilObjQuestionPoolGUI, ilObjSurveyQuestionPoolGUI, ilObjTestGUI
 * @ilCtrl_Calls ilRepositoryGUI: ilObjSurveyGUI, ilObjExerciseGUI, ilObjMediaPoolGUI, ilObjFileBasedLMGUI
 * @ilCtrl_Calls ilRepositoryGUI: ilObjCategoryGUI, ilObjRoleGUI, ilObjBlogGUI
-* @ilCtrl_Calls ilRepositoryGUI: ilObjiLincCourseGUI, ilObjiLincClassroomGUI, ilObjLinkResourceGUI
+* @ilCtrl_Calls ilRepositoryGUI: ilObjLinkResourceGUI
 * @ilCtrl_Calls ilRepositoryGUI: ilObjRootFolderGUI, ilObjMediaCastGUI, ilObjRemoteCourseGUI, ilObjSessionGUI
 * @ilCtrl_Calls ilRepositoryGUI: ilObjCourseReferenceGUI, ilObjCategoryReferenceGUI, ilObjDataCollectionGUI
 * @ilCtrl_Calls ilRepositoryGUI: ilObjPollGUI, ilObjRemoteCategoryGUI, ilObjRemoteWikiGUI, ilObjRemoteLearningModuleGUI
@@ -226,6 +226,9 @@ class ilRepositoryGUI
 				// Copy Category uses this call structure:
 				// RespositoryGUI -> CategoryGUI -> ilObjectCopyGUI
 				// Without this fix, the cmdClass ilObjectCopyGUI would never be reached
+				
+				ilLoggerFactory::getLogger('obj')->debug($this->ctrl->getNextClass().' <-> '. $class_name);
+				
 				if($this->ctrl->getNextClass() != strtolower('ilObj'.$class_name.'GUI'))
 				{
 					$this->ctrl->setCmdClass($next_class);
@@ -284,11 +287,6 @@ class ilRepositoryGUI
 						if(is_subclass_of($class_name, "ilObject2GUI"))
 						{
 							$this->gui_obj = new $class_name(null, ilObject2GUI::REPOSITORY_NODE_ID, $this->cur_ref_id);
-						}
-						// dirty walkaround for ilinc classrooms which need passed the ref_id of the parent iLinc course
-						else if ($class_name == 'ilObjiLincClassroomGUI')
-						{														
-							$this->gui_obj = new $class_name("", $this->cur_ref_id, true, false);
 						}
 						else
 						{

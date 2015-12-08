@@ -317,6 +317,7 @@ class assMatchingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 		}
 		$definitionvalues = $this->object->getDefinitions();
 		$definitions->setValues( $definitionvalues );
+		$definitions->checkInput();
 		$form->addItem( $definitions );
 
 		// Terms
@@ -333,6 +334,7 @@ class assMatchingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 			$this->object->addTerm( new assAnswerMatchingTerm() );
 		$termvalues = $this->object->getTerms();
 		$terms->setValues( $termvalues );
+		$terms->checkInput();
 		$form->addItem( $terms );
 
 		// Matching Pairs
@@ -570,8 +572,11 @@ class assMatchingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 		$feedback = '';
 		if($show_feedback)
 		{
-			$fb = $this->getGenericFeedbackOutput($active_id, $pass);
-			$feedback .=  strlen($fb) ? $fb : '';
+			if( !$this->isTestPresentationContext() )
+			{
+				$fb = $this->getGenericFeedbackOutput($active_id, $pass);
+				$feedback .= strlen($fb) ? $fb : '';
+			}
 			
 			$fb = $this->getSpecificFeedbackOutput($active_id, $pass);
 			$feedback .=  strlen($fb) ? $fb : '';

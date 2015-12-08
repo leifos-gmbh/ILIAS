@@ -2,8 +2,7 @@
 
 /* Copyright (c) 2015 Richard Klees <richard.klees@concepts-and-training.de> Extended GPL, see docs/LICENSE */
 
-require_once("mocks.php");
-require_once("./Services/User/classes/class.ilObjUser.php");
+require_once(__DIR__."/mocks.php");
 
 /**
  * TestCase for the learning progress of users at a programme.
@@ -174,7 +173,7 @@ class ilStudyProgrammeLPTest extends PHPUnit_Framework_TestCase {
 		
 		$node2_progress->unmarkAccredited();
 
-		$this->assertEquals( ilLPStatus::LP_STATUS_COMPLETED_NUM
+		$this->assertEquals( ilLPStatus::LP_STATUS_IN_PROGRESS_NUM
 						   , ilLPStatusWrapper::_determineStatus($this->root->getId(), $user->getId())
 						   );
 		$this->assertEquals( ilLPStatus::LP_STATUS_IN_PROGRESS_NUM

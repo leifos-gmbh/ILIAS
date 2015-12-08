@@ -21,13 +21,14 @@
 	+-----------------------------------------------------------------------------+
 */
 
-require_once("mocks.php");
+require_once(__DIR__."/mocks.php");
 
 /**
  * TestCase for the ilObjStudyProgramme
  *
  * @author Michael Herren <mh@studer-raimann.ch>
  * @author Richard Klees <richard.klees@concepts-and-training.de>
+ * @author Stefan Hecken <stefan.hecken@concepts-and-training.de>
  * @version 1.0.0
  */
 class ilObjStudyProgrammeTest extends PHPUnit_Framework_TestCase {
@@ -540,7 +541,7 @@ class ilObjStudyProgrammeTest extends PHPUnit_Framework_TestCase {
 		$children = $this->root_object->getChildren();
 		$child_l = $children[0];
 		
-		$all_possible_subobjects = $this->obj_definition->getSubObjects($this->root_object->getType());
+		$all_possible_subobjects = $this->root_object->getPossibleSubObjects();
 		// don't take rolfs into account, we don't need rolf anymore
 		unset($all_possible_subobjects["rolf"]);
 		
@@ -598,5 +599,12 @@ class ilObjStudyProgrammeTest extends PHPUnit_Framework_TestCase {
 							);
 		$rec = $ilDB->fetchAssoc($res);
 		$this->assertEquals(0, $rec["cnt"]);
+	}
+	
+	public function testCreatePermissionExists() {
+		// Ask for permission id for creation of "foobar" to check assumption
+		// that lookupCreateOperationIds just drops unknown object types.
+		$op_ids = ilRbacReview::lookupCreateOperationIds(array("prg", "foobar"));
+		$this->assertCount(1, $op_ids);
 	}
 }

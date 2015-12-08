@@ -960,11 +960,14 @@ class assFormulaQuestion extends assQuestion implements iQuestionCondition
 		$points = 0;
 		foreach($this->getResults() as $result)
 		{
+			$v = isset($user_solution[$result->getResult()]) ? $user_solution[$result->getResult()] : null;
+			$u = isset($user_solution[$result->getResult().'_unit']) ? $user_solution[$result->getResult().'_unit'] : null;
+			
 			$points += $result->getReachedPoints(
 				$this->getVariables(),
 				$this->getResults(),
-				$user_solution[$result->getResult()],
-				$user_solution[$result->getResult().'_unit'],
+				$v,
+				$u,
 				$this->unitrepository->getUnits());
 		}
 
@@ -1265,11 +1268,14 @@ class assFormulaQuestion extends assQuestion implements iQuestionCondition
 				$value = assFormulaQuestionResult::convertDecimalToCoprimeFraction($resVal);
 				if(is_array($value))
 				{
-					$frac_helper = $value[1];
-					$value =  $value[0];
+					$user_solution[$result->getResult()]["value"] = $value[0];
+					$user_solution[$result->getResult()]["frac_helper"] = $value[1];
 				}
-				$user_solution[$result->getResult()]["value"] = $value;
-				$user_solution[$result->getResult()]["frac_helper"] = $frac_helper;
+				else
+				{
+					$user_solution[$result->getResult()]["value"] = $value;
+					$user_solution[$result->getResult()]["frac_helper"] = null;
+				}
 			}
 			elseif($result->getPrecision() > 0)
 			{

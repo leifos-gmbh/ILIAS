@@ -895,6 +895,7 @@ class ilMimeTypeUtil {
 			self::VIDEO__X_MPEQ2A,
 		),
 		'mp3' => array(
+			self::AUDIO__MPEG,
 			self::AUDIO__MPEG3,
 			self::AUDIO__X_MPEG_3,
 			self::VIDEO__MPEG,
@@ -1521,11 +1522,13 @@ class ilMimeTypeUtil {
 			}
 		}
 
-		$finfo = finfo_open(FILEINFO_MIME_TYPE);
-		$info = finfo_file($finfo, $this->getPath());
-		finfo_close($finfo);
-		if ($info) {
-			return $info;
+		if (extension_loaded('Fileinfo') && is_file($this->getPath())) {
+			$finfo = finfo_open(FILEINFO_MIME_TYPE);
+			$info = finfo_file($finfo, $this->getPath());
+			finfo_close($finfo);
+			if ($info) {
+				return $info;
+			}
 		}
 
 		return $this->getFallback();

@@ -9,6 +9,7 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Handler\BrowserConsoleHandler;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\FingersCrossedHandler;
+use Monolog\Handler\NullHandler;
 use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
 
 
@@ -28,6 +29,8 @@ class ilLoggerFactory
 	const DEFAULT_FORMAT  = "[%suid%] [%datetime%] %channel%.%level_name%: %message% %context% %extra%\n";
 	
 	const ROOT_LOGGER = 'root';
+	const COMPONENT_ROOT = 'log_root';
+	const SETUP_LOGGER = 'setup';
 	
 	private static $instance = null;
 	
@@ -36,9 +39,11 @@ class ilLoggerFactory
 	private $enabled = FALSE;
 	private $loggers = array();
 	
-	protected function __construct()
+	protected function __construct(ilLoggingSettings $settings)
 	{
-		$this->init();
+		$this->settings = $settings;
+		$this->enabled = $this->getSettings()->isEnabled();
+		
 	}
 
 	/**
@@ -49,10 +54,23 @@ class ilLoggerFactory
 	{
 		if(!static::$instance)
 		{
-			static::$instance = new ilLoggerFactory();
+			include_once './Services/Logging/classes/class.ilLoggingDBSettings.php';
+			$settings = ilLoggingDBSettings::getInstance();
+			static::$instance = new ilLoggerFactory($settings);
 		}
 		return static::$instance;
 	}
+	
+	/**
+	 * get new instance
+	 * @param ilLoggingSettings $settings
+	 * @return \self
+	 */
+	public static function newInstance(ilLoggingSettings $settings)
+	{
+		return new self($settings);
+	}
+			
 	
 	/**
 	 * Get component logger
@@ -77,6 +95,7 @@ class ilLoggerFactory
 		return $factory->getComponentLogger(self::ROOT_LOGGER);
 	}
 	
+	
 	/**
 	 * Init user specific log options
 	 * @param type $a_login
@@ -91,12 +110,32 @@ class ilLoggerFactory
 		
 		foreach($this->loggers as $a_component_id => $logger)
 		{
-			$browser_handler = new BrowserConsoleHandler();
-			$browser_handler->setLevel($this->getSettings()->getLevelByComponent($a_component_id));
-			$browser_handler->setFormatter(new LineFormatter(static::DEFAULT_FORMAT, 'Y-m-d H:i:s.u',TRUE,TRUE));
-			
-			$logger->getLogger()->pushHandler($browser_handler);
+			if($this->isConsoleAvailable())
+			{
+				$browser_handler = new BrowserConsoleHandler();
+				$browser_handler->setLevel($this->getSettings()->getLevelByComponent($a_component_id));
+				$browser_handler->setFormatter(new LineFormatter(static::DEFAULT_FORMAT, 'Y-m-d H:i:s.u',TRUE,TRUE));
+				$logger->getLogger()->pushHandler($browser_handler);
+			}
 		}
+	}
+	
+	/**
+	 * Check if console handler is available
+	 * @return boolean
+	 */
+	protected function isConsoleAvailable()
+	{
+		include_once './Services/Context/classes/class.ilContext.php';
+		if(ilContext::getType() != ilContext::CONTEXT_WEB)
+		{
+			return FALSE;
+		}
+		if (isset($_GET["cmdMode"]) && $_GET["cmdMode"] == "asynch")
+		{
+			return FALSE;
+		}
+		return TRUE;
 	}
 	
 	/**
@@ -118,21 +157,11 @@ class ilLoggerFactory
 	}
 	
 	/**
-	 * Init factory
-	 */
-	protected function init()
-	{
-		include_once './Services/Logging/classes/class.ilLoggingSettings.php';
-		$this->settings = ilLoggingSettings::getInstance();
-		$this->enabled = ILIAS_LOG_ENABLED;
-	}
-	
-	/**
 	 * Get component logger
 	 * @param type $a_component_id
 	 * @return \Logger
 	 */
-	protected function getComponentLogger($a_component_id)
+	public function getComponentLogger($a_component_id)
 	{
 		if(isset($this->loggers[$a_component_id]))
 		{
@@ -151,9 +180,30 @@ class ilLoggerFactory
 				
 		}
 		
+		if(!$this->getSettings()->isEnabled())
+		{
+			$null_handler = new NullHandler();
+			$logger->pushHandler($null_handler);
+			
+			include_once './Services/Logging/classes/class.ilComponentLogger.php';
+			return $this->loggers[$a_component_id] = new ilComponentLogger($logger);
+		}
+		
+		
 		// standard stream handler
-		$stream_handler = new StreamHandler(ILIAS_LOG_DIR.'/'.ILIAS_LOG_FILE,TRUE);
-		$stream_handler->setLevel($this->getSettings()->getLevelByComponent($a_component_id));
+		$stream_handler = new StreamHandler(
+				$this->getSettings()->getLogDir().'/'.$this->getSettings()->getLogFile(),
+				TRUE
+		);
+		
+		if($a_component_id == self::ROOT_LOGGER)
+		{
+			$stream_handler->setLevel($this->getSettings()->getLevelByComponent(self::COMPONENT_ROOT));
+		}
+		else
+		{
+			$stream_handler->setLevel($this->getSettings()->getLevelByComponent($a_component_id));
+		}
 		
 		// format lines
 		$line_formatter = new LineFormatter(static::DEFAULT_FORMAT, 'Y-m-d H:i:s.u',TRUE,TRUE);
@@ -178,11 +228,14 @@ class ilLoggerFactory
 		{
 			if($this->getSettings()->isBrowserLogEnabledForUser($GLOBALS['ilUser']->getLogin()))
 			{
-				$browser_handler = new BrowserConsoleHandler();
-				#$browser_handler->setLevel($this->getSettings()->getLevelByComponent($a_component_id));
-				$browser_handler->setLevel($this->getSettings()->getLevel());
-				$browser_handler->setFormatter($line_formatter);
-				$logger->pushHandler($browser_handler);
+				if($this->isConsoleAvailable())
+				{
+					$browser_handler = new BrowserConsoleHandler();
+					#$browser_handler->setLevel($this->getSettings()->getLevelByComponent($a_component_id));
+					$browser_handler->setLevel($this->getSettings()->getLevel());
+					$browser_handler->setFormatter($line_formatter);
+					$logger->pushHandler($browser_handler);
+				}
 			}
 		}
 		
@@ -203,17 +256,6 @@ class ilLoggerFactory
 		$this->loggers[$a_component_id] = new ilComponentLogger($logger);
 		
 		return $this->loggers[$a_component_id];
-	}
-	
-	/**
-	 * on destruct automatically write memory peak usage
-	 */
-	public function __destruct()
-	{
-		if($this->getSettings()->isMemoryUsageEnabled())
-		{
-			$this->getRootLogger()->writeMemoryPeakUsage(ilLogLevel::INFO);
-		}
-	}
+	}	
 }
 ?>

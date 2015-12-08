@@ -268,8 +268,14 @@ class ilObjStudyProgramme extends ilContainer {
 						   ->update();
 		}
 		else {
-			$this->settings->setLPMode(ilStudyProgramme::MODE_POINTS)
-						   ->update();
+			if ($this->getAmountOfChildren() > 0) {
+				$this->settings->setLPMode(ilStudyProgramme::MODE_POINTS)
+							   ->update();
+			}
+			else {
+				$this->settings->setLPMode(ilStudyProgramme::MODE_UNDEFINED)
+							   ->update();
+			}
 		}
 	}
 	
@@ -325,6 +331,20 @@ class ilObjStudyProgramme extends ilContainer {
 		return $this;
 	}
 
+	/**
+	* Gets the SubType Object
+	*
+	* @return ilStudyProgrammeType
+	*/
+	public function getSubType() {
+		if($this->getSubtypeId() != "-") {
+			$subtype_id = $this->getSubtypeId();
+			return new ilStudyProgrammeType($subtype_id);
+		}
+
+		return null;
+	}
+
 	////////////////////////////////////
 	// TREE NAVIGATION
 	////////////////////////////////////
@@ -372,7 +392,7 @@ class ilObjStudyProgramme extends ilContainer {
 			$ref_ids = $ref_ids['prg'];
 
 			$this->children = array_map(function($node_data) {
-				return self::getInstanceByRefId($node_data["child"]);
+				return ilObjStudyProgramme::getInstanceByRefId($node_data["child"]);
 			}, $ref_ids);
 		}
 
@@ -487,11 +507,13 @@ class ilObjStudyProgramme extends ilContainer {
 			// TODO: find a better way to get all elements except StudyProgramme-children
 			$ref_ids = $this->tree->getChilds($this->getRefId());
 
-			$lp_children = array_map(function($node_data) {
-				$lp_obj = $this->object_factory->getInstanceByRefId($node_data["child"]);
+			// TODO: $this could be removed as soon as support for PHP 5.3 is dropped:
+			$self = $this;
+			$lp_children = array_map(function($node_data) use ($self) {
+				$lp_obj = $self->object_factory->getInstanceByRefId($node_data["child"]);
 
 				// filter out all StudyProgramme instances
-				return ($lp_obj instanceof $this)? null : $lp_obj;
+				return ($lp_obj instanceof $self)? null : $lp_obj;
 			}, $ref_ids);
 
 			$this->lp_children = array_filter($lp_children);
@@ -566,6 +588,35 @@ class ilObjStudyProgramme extends ilContainer {
 		}
 	}
 
+	/**
+	 * Get courses in this program that the given user already completed.
+	 *
+	 * @param	int		$a_user_id
+	 * @return	array	$obj_id => $ref_id
+	 */
+	public function getCompletedCourses($a_user_id) {
+		require_once("Services/ContainerReference/classes/class.ilContainerReference.php");
+		require_once("Services/Tracking/classes/class.ilLPStatus.php");
+
+		$node_data = $this->tree->getNodeData($this->getRefId());
+		$crsrs = $this->tree->getSubTree($node_data, true, "crsr");
+
+		$completed_crss = array();
+		foreach ($crsrs as $ref) {
+			$crs_id = ilContainerReference::_lookupTargetId($ref["obj_id"]);
+			if (ilLPStatus::_hasUserCompleted($crs_id, $a_user_id)) {
+				$completed_crss[] = array( "crs_id" => $crs_id
+										 , "prg_ref_id" => $ref["parent"]
+										 , "crsr_ref_id" => $ref["child"]
+										 , "crsr_id" => $ref["obj_id"]
+										 , "title" => ilContainerReference::_lookupTargetTitle($ref["obj_id"])
+										 );
+			}
+		}
+
+		return $completed_crss;
+	}
+
 	////////////////////////////////////
 	// TREE MANIPULATION
 	////////////////////////////////////
@@ -606,8 +657,13 @@ class ilObjStudyProgramme extends ilContainer {
 			throw new ilStudyProgrammeTreeException("Program already contains leafs.");
 		}
 		
+		if ($this->settings->getLPMode() !== ilStudyProgramme::MODE_POINTS) {
+			$this->settings->setLPMode(ilStudyProgramme::MODE_POINTS)
+						   ->update();
+		}
+		
 		$this->clearChildrenCache();
-		$this->addProgressForNewNodes($a_prg);
+		$this->addMissingProgresses();
 	}
 	
 	/**
@@ -797,8 +853,8 @@ class ilObjStudyProgramme extends ilContainer {
 		$ass_mod = ilStudyProgrammeAssignment::createFor($this->settings, $a_usr_id, $a_assigning_usr_id);
 		$ass = new ilStudyProgrammeUserAssignment($ass_mod);
 		
-		$this->applyToSubTreeNodes(function($node) use ($ass_mod, $a_assigning_usr_id) {
-			$progress = ilStudyProgrammeProgress::createFor($node->settings, $ass_mod);
+		$this->applyToSubTreeNodes(function(ilObjStudyProgramme $node) use ($ass_mod, $a_assigning_usr_id) {
+			$progress = $node->createProgressForAssignment($ass_mod);
 			if ($node->getStatus() != ilStudyProgramme::STATUS_ACTIVE) {
 				$progress->setStatus(ilStudyProgrammeProgress::STATUS_NOT_RELEVANT)
 						 ->update();
@@ -915,6 +971,16 @@ class ilObjStudyProgramme extends ilContainer {
 	////////////////////////////////////
 	
 	/**
+	 * Create a progress on this programme for the given assignment.
+	 *
+	 * @param	ilStudyProgrammeAssignment
+	 * @return	ilStudyProgrammeProgress
+	 */
+	public function createProgressForAssignment(ilStudyProgrammeAssignment $ass) {
+		return ilStudyProgrammeProgress::createFor($this->settings, $ass);
+	}
+
+	/**
 	 * Get the progresses the user has on this node.
 	 *
 	 * @param int $a_user_id
@@ -939,12 +1005,16 @@ class ilObjStudyProgramme extends ilContainer {
 		return ilStudyProgrammeUserProgress::getInstanceForAssignment($this->getId(), $a_assignment_id);
 	}
 	
-	protected function addProgressForNewNodes(ilObjStudyProgramme $a_prg) {
-		require_once("Modules/StudyProgramme/classes/model/class.ilStudyProgrammeProgress.php");
-		foreach ($this->getAssignmentsRaw() as $ass) {
-			$progress = ilStudyProgrammeProgress::createFor($a_prg->settings, $ass);
-			$progress->setStatus(ilStudyProgrammeProgress::STATUS_NOT_RELEVANT)
-					 ->update();
+	/**
+	 * Add missing progress records for all assignments of this programm.
+	 *
+	 * Use this after the structure of the programme was modified.
+	 *
+	 * @return null
+	 */
+	public function addMissingProgresses() {
+		foreach ($this->getAssignments() as $ass) {
+			$ass->addMissingProgresses();
 		}
 	}
 	
@@ -1130,6 +1200,25 @@ class ilObjStudyProgramme extends ilContainer {
 	public function getRawSettings() {
 		return $this->settings;
 	}
+
+	/**
+	* updates the selected custom icon in container folder by type
+	*
+	*/
+	public function updateCustomIcon() {
+		$subtype = $this->getSubType();
+
+		if($subtype) {
+			if(is_file($subtype->getIconPath(true))) {
+				$icon = $subtype->getIconPath(true);
+				$this->saveIcons($icon);
+			} else {
+				$this->removeCustomIcon();
+			}
+		} else {
+			$this->removeCustomIcon();
+		}
+	}
 	
 	////////////////////////////////////
 	// HOOKS
@@ -1156,16 +1245,50 @@ class ilObjStudyProgramme extends ilContainer {
 		
 		$parent = ilObjStudyProgramme::getInstanceByRefId($a_ref_id);
 
-		if (!$parent->hasChildren() && !$parent->hasLPChildren()) {
-			return $a_subobjects;
+		$mode = $parent->getLPMode();
+
+		switch ($mode) {
+			case ilStudyProgramme::MODE_UNDEFINED:
+				return $a_subobjects;
+			case ilStudyProgramme::MODE_POINTS:
+				return array("prg" => $a_subobjects["prg"]);
+			case ilStudyProgramme::MODE_LP_COMPLETED:
+				unset($a_subobjects["prg"]);
+				return $a_subobjects;
 		}
 
-		if ($parent->hasChildren()) {
-			return array("prg" => $a_subobjects["prg"]);
-		}
+		throw new ilException("Undefined mode for study programme: '$mode'");
+	}
 
-		unset($a_subobjects["prg"]);
-		return $a_subobjects;
+	////////////////////////////////////
+	// REWRITES FROM PARENT
+	////////////////////////////////////
+
+	/**
+	* save container icons
+	*/
+	function saveIcons($a_custom_icon)
+	{
+		global $ilDB;
+
+		$this->createContainerDirectory();
+		$cont_dir = $this->getContainerDirectory();
+		$file_name = "";
+		if ($a_custom_icon != "")
+		{
+			$file_name = $cont_dir."/icon_custom.svg";
+
+			ilUtil::moveUploadedFile($a_custom_icon, "icon_custom.svg", $file_name, true, "copy");
+
+			if ($file_name != "" && is_file($file_name))
+			{
+				ilContainer::_writeContainerSetting($this->getId(), "icon_custom", 1);
+			}
+			else
+			{
+				ilContainer::_writeContainerSetting($this->getId(), "icon_custom", 0);
+			}
+		}
 	}
 }
 

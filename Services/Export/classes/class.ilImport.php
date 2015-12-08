@@ -13,6 +13,7 @@ class ilImport
 	protected $install_id = "";
 	protected $install_url = "";
 	protected $entities = "";
+	protected $tmp_import_dir = "";
 
 	protected $mapping = null;
 	protected $skip_entity = array();
@@ -175,7 +176,9 @@ class ilImport
 
 		ilUtil::unzip($tmpdir."/".$a_filename);
 		$dir = $tmpdir."/".substr($a_filename, 0, strlen($a_filename) - 4);
-		
+
+		$this->setTemporaryImportDir($dir);
+
 		$GLOBALS['ilLog']->write(__METHOD__.': do import with dir '.$dir);
 		$new_id = $this->doImportObject($dir, $a_type, $a_comp, $tmpdir);
 		
@@ -184,7 +187,40 @@ class ilImport
 		
 		return $new_id;
 	}
-	
+
+	/**
+	 * Import from directory
+	 *
+	 * @param
+	 * @return
+	 */
+	function importFromDirectory($dir, $a_type, $a_comp)
+	{
+		$new_id = $this->doImportObject($dir, $a_type, $a_comp);
+		return $new_id;
+
+	}
+
+
+	/**
+	 * Set temporary import directory
+	 *
+	 * @param string $a_val temporary import directory (used to unzip and read import)
+	 */
+	protected function setTemporaryImportDir($a_val)
+	{
+		$this->tmp_import_dir = $a_val;
+	}
+
+	/**
+	 * Get temporary import directory
+	 *
+	 * @return string temporary import directory (used to unzip and read import)
+	 */
+	public function getTemporaryImportDir()
+	{
+		return $this->tmp_import_dir;
+	}
 	
 	/**
 	 * Import repository object export file
@@ -217,7 +253,10 @@ class ilImport
 		if (!is_file($dir."/manifest.xml"))
 		{
 			include_once("./Services/Export/exceptions/class.ilManifestFileNotFoundImportException.php");
-			$e = new ilManifestFileNotFoundImportException('Manifest file not found: "'.$dir."/manifest.xml".'".');
+			$mess = (DEVMODE)
+				? 'Manifest file not found: "'.$dir."/manifest.xml".'".'
+				: 'Manifest file not found: "manifest.xml."';
+			$e = new ilManifestFileNotFoundImportException($mess);
 			$e->setManifestDir($dir);
 			$e->setTmpDir($a_tmpdir);
 			throw $e;
@@ -225,6 +264,14 @@ class ilImport
 		$parser = new ilManifestParser($dir."/manifest.xml");
 		$this->mapping->setInstallUrl($parser->getInstallUrl());
 		$this->mapping->setInstallId($parser->getInstallId());
+
+		// check for correct type
+		if ($parser->getMainEntity() != $a_type)
+		{
+			include_once("./Services/Export/exceptions/class.ilImportObjectTypeMismatchException.php");
+			$e = new ilImportObjectTypeMismatchException("Object type does not match. Import file has type '".$parser->getMainEntity()."' but import being processed for '".$a_type."'.");
+			throw $e;
+		}
 
 		// process export files
 		$expfiles = $parser->getExportFiles();

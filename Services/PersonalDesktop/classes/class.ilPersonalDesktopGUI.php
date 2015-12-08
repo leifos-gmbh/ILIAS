@@ -52,6 +52,7 @@ class ilPersonalDesktopGUI
 
 		$ilMainMenu->setActive("desktop");
 		$this->lng->loadLanguageModule("pdesk");
+		$this->lng->loadLanguageModule("pd"); // #16813
 		
 		// catch hack attempts
 		if ($_SESSION["AccountId"] == ANONYMOUS_USER_ID)
@@ -284,7 +285,6 @@ class ilPersonalDesktopGUI
 	*/
 	function show()
 	{
-		
 		// preload block settings
 		include_once("Services/Block/classes/class.ilBlockSetting.php");
 		ilBlockSetting::preloadPDBlockSettings();

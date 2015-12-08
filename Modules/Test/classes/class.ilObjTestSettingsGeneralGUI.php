@@ -30,6 +30,7 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
 	
 	const INST_FB_HANDLING_OPT_NONE = 'none';
 	const INST_FB_HANDLING_OPT_FREEZE = 'freeze';
+	const INST_FB_HANDLING_OPT_FORCE = 'force';
 	const INST_FB_HANDLING_OPT_FORCE_AND_FREEZE = 'force_freeze';
 
 	/** @var ilCtrl $ctrl */
@@ -514,6 +515,16 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
 			$questSetType->setDisabled(true);
 		}
 		$form->addItem($questSetType);
+
+		// anonymity
+		$anonymity = new ilRadioGroupInputGUI($this->lng->txt('tst_anonymity'), 'anonymity');
+		if ($this->testOBJ->participantDataExist()) $anonymity->setDisabled(true);
+		$rb = new ilRadioOption($this->lng->txt('tst_anonymity_no_anonymization'), 0);
+		$anonymity->addOption($rb);
+		$rb = new ilRadioOption($this->lng->txt('tst_anonymity_anonymous_test'), 1);
+		$anonymity->addOption($rb);
+		$anonymity->setValue((int)$this->testOBJ->getAnonymity());
+		$form->addItem($anonymity);
 	}
 
 	/**
@@ -561,6 +572,12 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
 			{
 				$this->testOBJ->setQuestionSetType($form->getItemByPostVar('question_set_type')->getValue());
 			}
+		}
+
+		// anonymity setting
+		if( !$this->testOBJ->participantDataExist() && $this->formPropertyExists($form, 'anonymity') )
+		{
+			$this->testOBJ->setAnonymity($form->getItemByPostVar('anonymity')->getValue());
 		}
 	}
 
@@ -1121,6 +1138,12 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
 		);
 		$radioOption->setInfo($this->lng->txt('tst_instant_feedback_handling_force_and_freeze_desc'));
 		$radioGroup->addOption($radioOption);
+		$radioOption = new ilRadioOption(
+			$this->lng->txt('tst_instant_feedback_handling_force'),
+			self::INST_FB_HANDLING_OPT_FORCE
+		);
+		$radioOption->setInfo($this->lng->txt('tst_instant_feedback_handling_force_desc'));
+		$radioGroup->addOption($radioOption);
 		$radioGroup->setValue($this->getInstFbHandlingValue(
 			$this->testOBJ->isInstantFeedbackAnswerFixationEnabled(),
 			$this->testOBJ->isForceInstantFeedbackEnabled()
@@ -1457,6 +1480,11 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
 				$this->testOBJ->setForceInstantFeedbackEnabled(false);
 				break;
 
+			case self::INST_FB_HANDLING_OPT_FORCE:
+				$this->testOBJ->setInstantFeedbackAnswerFixationEnabled(false);
+				$this->testOBJ->setForceInstantFeedbackEnabled(true);
+				break;
+
 			case self::INST_FB_HANDLING_OPT_FORCE_AND_FREEZE:
 				$this->testOBJ->setInstantFeedbackAnswerFixationEnabled(true);
 				$this->testOBJ->setForceInstantFeedbackEnabled(true);
@@ -1466,16 +1494,12 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
 	
 	private function getInstFbHandlingValue($freezeAnswersEnabled, $forceInstFbEnabled)
 	{
-		if($freezeAnswersEnabled)
+		switch( true )
 		{
-			if($forceInstFbEnabled)
-			{
-				return self::INST_FB_HANDLING_OPT_FORCE_AND_FREEZE;
-			}
-			
-			return self::INST_FB_HANDLING_OPT_FREEZE;
+			case !$freezeAnswersEnabled && !$forceInstFbEnabled: return self::INST_FB_HANDLING_OPT_NONE;
+			case $freezeAnswersEnabled && !$forceInstFbEnabled: return self::INST_FB_HANDLING_OPT_FREEZE;
+			case !$freezeAnswersEnabled && $forceInstFbEnabled: return self::INST_FB_HANDLING_OPT_FORCE;
+			case $freezeAnswersEnabled && $forceInstFbEnabled: return self::INST_FB_HANDLING_OPT_FORCE_AND_FREEZE;
 		}
-		
-		return self::INST_FB_HANDLING_OPT_NONE;
 	}
 }

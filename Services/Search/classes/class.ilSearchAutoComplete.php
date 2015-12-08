@@ -51,7 +51,7 @@ class ilSearchAutoComplete
 		foreach($list as $entry)
 		{
 			$result[$i] = new stdClass();
-			$result[$i]->value = $entry;
+			$result[$i]->value = '"'.$entry.'"';
 			$i++;
 		}
 		include_once './Services/JSON/classes/class.ilJsonUtil.php';
@@ -68,7 +68,7 @@ class ilSearchAutoComplete
 		global $ilDB;
 
 		include_once './Services/Search/classes/class.ilSearchSettings.php';
-		if(ilSearchSettings::getInstance()->isLuceneUserSearchEnabled())
+		if(ilSearchSettings::getInstance()->enabledLucene())
 		{
 			return self::getLuceneList($a_str);
 		}
@@ -79,7 +79,7 @@ class ilSearchAutoComplete
 		$settings = new ilSearchSettings();
 		
 		$object_types = array('cat','dbk','crs','fold','frm','grp','lm','sahs','glo','mep','htlm','exc','file','qpl','tst','svy','spl',
-			'chat','icrs','icla','webr','mcst','sess','pg','st','gdf','wiki');
+			'chat', 'webr','mcst','sess','pg','st','gdf','wiki');
 
 		$set = $ilDB->query("SELECT title, obj_id FROM object_data WHERE "
 			.$ilDB->like('title', 'text', $a_str."%")." AND "

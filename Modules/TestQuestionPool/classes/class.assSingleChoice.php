@@ -1064,8 +1064,8 @@ class assSingleChoice extends assQuestion implements  ilObjQuestionScoringAdjust
 		$result['shuffle'] = (bool) $this->getShuffle();
 		
 		$result['feedback'] = array(
-			"onenotcorrect" => $this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), false),
-			"allcorrect" => $this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), true)
+			'onenotcorrect' => $this->formatSAQuestion($this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), false)),
+			'allcorrect' => $this->formatSAQuestion($this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), true))
 		);
 
 		$answers = array();
@@ -1114,6 +1114,7 @@ class assSingleChoice extends assQuestion implements  ilObjQuestionScoringAdjust
 		$value = rand(0, count($this->answers)-1);
 		$_POST["multiple_choice_result"] = (strlen($value)) ? (string)$value : '0';
 		$this->saveWorkingData($active_id, $pass);
+		$this->calculateResultsFromSolution($active_id, $pass);
 	}
 
 	function getMultilineAnswerSetting()
@@ -1179,7 +1180,7 @@ class assSingleChoice extends assQuestion implements  ilObjQuestionScoringAdjust
 	 * @param integer $pass
 	 * @return boolean $answered
 	 */
-	public function isAnswered($active_id, $pass)
+	public function isAnswered($active_id, $pass  = NULL)
 	{
 		$numExistingSolutionRecords = assQuestion::getNumExistingSolutionRecords($active_id, $pass, $this->getId());
 

@@ -44,7 +44,7 @@ class ilCourseXMLParser extends ilMDSaxParser implements ilSaxSubsetParser
 {
 	var $lng;
 	var $md_obj = null;			// current meta data object
-	
+
 	private $current_container_setting;
 
 	/**
@@ -129,6 +129,24 @@ class ilCourseXMLParser extends ilMDSaxParser implements ilSaxSubsetParser
 						$a_attribs['showMembers'] == 'Yes' ? true : false
 					);
 				}
+				// begin-patch fhoev
+				if(strlen($a_attribs['type']) && $a_attribs['type'] == 'stammkurs')
+				{
+					if(@include_once './Customizing/global/plugins/Services/EventHandling/EventHook/FhoevEvent/classes/class.ilFhoevEventPlugin.php')
+					{
+						$settings = ilFhoevEventSettings::getInstance();
+						if($settings->isActive() && $settings->getTemplateId())
+						{
+							include_once './Services/DidacticTemplate/classes/class.ilDidacticTemplateObjSettings.php';
+							$current_tpl_id = ilDidacticTemplateObjSettings::lookupTemplateId($this->course_obj->getRefId());
+							if($current_tpl_id != $settings->getTemplateId())
+							{
+								$this->course_obj->applyDidacticTemplate($settings->getTemplateId());
+							}
+						}
+					}
+				}
+				// begin-patch fhoev
 				break;
 
 			case 'Admin':

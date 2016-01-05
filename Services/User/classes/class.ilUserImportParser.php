@@ -299,7 +299,8 @@ class ilUserImportParser extends ilSaxParser
 		$this->localRoleCache = array();
 		$this->parentRolesCache = array();
 		$this->send_mail = false;
-		$this->mapping_mode = IL_USER_MAPPING_LOGIN;
+		#$this->mapping_mode = IL_USER_MAPPING_LOGIN;
+		$this->mapping_mode = IL_USER_MAPPING_ID;
 		
 		// get all active style  instead of only assigned ones -> cannot transfer all to another otherwise
 		$this->userStyles = array();
@@ -516,11 +517,37 @@ class ilUserImportParser extends ilSaxParser
 
 				// if we have an object id, store it
 				$this->user_id = -1;
-				if (!is_null($a_attribs["Id"]) && $this->getUserMappingMode() == IL_USER_MAPPING_ID)
+
+				// cognos-blu-patch: begin
+				// first check new import id
+				if(isset($a_attribs['ImportId']) && $a_attribs['ImportId'])
 				{
+					$this->userObj->setImportId($a_attribs['ImportId']);
+					$ids = ilObject::lookupObjIdsByImportId($this->userObj->getImportId(),'usr');
+					if(count($ids) > 1)
+					{
+						ilLoggerFactory::getLogger('usr')->error(
+								'Multiple user import ids found. Cannot import/update user with import id: '. 
+								$this->userObj->getImportId()
+						);
+						include_once './Services/User/exceptions/class.ilUserImportException.php';
+						throw new ilUserImportException('', ilUserImportException::ERR_MULTIPLE_IMPORT_IDS);
+					}
+					if(count($ids) == 1)
+					{
+						$this->user_id = current($ids);
+					}
+					
+				}
+				elseif (!is_null($a_attribs["Id"]) && $this->getUserMappingMode() == IL_USER_MAPPING_ID)
+				{
+					// cognos-blu-patch: end
 				    if (is_numeric($a_attribs["Id"]))
 				    {
 				        $this->user_id = $a_attribs["Id"];
+						// cognos-blu-patch: begin
+						$this->userObj->setImportId($a_attribs["Id"]);
+						// cognos-blu-patch: end
 				    }
 				    elseif ($id = ilUtil::__extractId ($a_attribs["Id"], IL_INST_ID))
 				    {
@@ -534,7 +561,8 @@ class ilUserImportParser extends ilSaxParser
 					$ilias->ini->readVariable("layout","style"));
 				
 				$this->userObj->setLanguage($a_attribs["Language"]);
-				$this->userObj->setImportId($a_attribs["Id"]);
+				// cognos-blu-patch: begin
+				// cognos-blu-patch: end
 				$this->action = (is_null($a_attribs["Action"])) ? "Insert" : $a_attribs["Action"];
 				$this->currPassword     = null;
 				$this->currPasswordType = null;
@@ -670,16 +698,45 @@ class ilUserImportParser extends ilSaxParser
 				$this->userCount++;
 				$this->userObj = new ilObjUser();
 				$this->userObj->setLanguage($a_attribs["Language"]);
+				// cognos-blu-patch: begin
 				$this->userObj->setImportId($a_attribs["Id"]);
+				// cognos-blu-patch: end
 				$this->currentPrefKey = null;
 				// if we have an object id, store it
 				$this->user_id = -1;
-
-                if (!is_null($a_attribs["Id"]) && $this->getUserMappingMode() == IL_USER_MAPPING_ID)
+				
+				// cognos-blu-patch: begin
+				// first check new import id
+				if(isset($a_attribs['ImportId']) && $a_attribs['ImportId'])
 				{
+					$this->userObj->setImportId($a_attribs['ImportId']);
+					$ids = ilObject::lookupObjIdsByImportId($this->userObj->getImportId(),'usr');
+					if(count($ids) > 1)
+					{
+						$this->logFailure(
+							$this->userObj->getImportId(),
+							sprintf(
+								$lng->txt("usrimport_xml_attribute_value_illegal"),
+								'User',
+								'Action',
+								$a_attribs['Action']
+							)
+						);
+					}
+					if(count($ids) == 1)
+					{
+						$this->user_id = current($ids);
+					}
+				}
+				elseif (!is_null($a_attribs["Id"]) && $this->getUserMappingMode() == IL_USER_MAPPING_ID)
+				{
+					// cognos-blu-patch: end
 				    if (is_numeric($a_attribs["Id"]))
 				    {
 				        $this->user_id = $a_attribs["Id"];
+						// cognos-blu-patch: begin
+						$this->userObj->setImportId($a_attribs["Id"]);
+						// cognos-blu-patch: end
 				    }
 				    elseif ($id = ilUtil::__extractId ($a_attribs["Id"], IL_INST_ID))
 				    {
@@ -1372,6 +1429,21 @@ class ilUserImportParser extends ilSaxParser
 							if($this->auth_mode_set)
 								$updateUser->setAuthMode($this->userObj->getAuthMode());
 							
+							if (! is_null($this->userObj->getInstantMessengerId("aim"))) $updateUser->setInstantMessengerId("aim", $this->userObj->getInstantMessengerId("aim"));
+							if (! is_null($this->userObj->getInstantMessengerId("msn"))) $updateUser->setInstantMessengerId("msn", $this->userObj->getInstantMessengerId("msn"));
+							if (! is_null($this->userObj->getInstantMessengerId("icq"))) $updateUser->setInstantMessengerId("icq", $this->userObj->getInstantMessengerId("icq"));
+							if (! is_null($this->userObj->getInstantMessengerId("yahoo"))) $updateUser->setInstantMessengerId("yahoo", $this->userObj->getInstantMessengerId("yahoo"));
+							if (! is_null($this->userObj->getInstantMessengerId("skype"))) $updateUser->setInstantMessengerId("skype", $this->userObj->getInstantMessengerId("skype"));
+							if (! is_null($this->userObj->getInstantMessengerId("jabber"))) $updateUser->setInstantMessengerId("jabber", $this->userObj->getInstantMessengerId("jabber"));
+							if (! is_null($this->userObj->getInstantMessengerId("voip"))) $updateUser->setInstantMessengerId("voip", $this->userObj->getInstantMessengerId("voip"));
+							
+							// cognos-blu-patch: begin
+							if($this->userObj->getImportId())
+							{
+								$updateUser->setImportId($this->userObj->getImportId());
+							}
+							// cognos-blu-patch: end
+
 							// Special handlin since it defaults to 7 (USER_FOLDER_ID)
 							if($this->time_limit_owner_set)
 							{

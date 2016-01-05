@@ -41,9 +41,13 @@ class ilUserException extends ilException
 	* @param	string	$a_message message
 	* 
 	*/
-	public function __construct($a_message)
+   // cognos-blu-patch: begin
+	public function __construct($a_message,$a_code = 0)
+	// cognos-blu-patch: end
 	{
-	 	parent::__construct($a_message);
+		// cognos-blu-patch: begin
+	 	parent::__construct($a_message,$a_code);
+		// cognos-blu-patch: end
 	}
 }
 ?>

@@ -222,12 +222,14 @@ class ilWorkspaceShareTableGUI extends ilTable2GUI
 		$this->filter["user"] = $item->getValue();
 				
 		// incoming back link (shared)
-		if((int)$_REQUEST["shr_id"] && !$this->filter["user"])
+		if((int)$_REQUEST["shr_id"] &&
+			!is_array($_SESSION["form_".$this->getId()]) && // #17747
+			!$this->filter["user"])
 		{
 			$this->filter["user"] = ilObjUser::_lookupName((int)$_REQUEST["shr_id"]);
 			$this->filter["user"] = $this->filter["user"]["login"];
 			$item->setValue($this->filter["user"]);
-		}						
+		}				
 		
 		$item = $this->addFilterItemByMetaType("title", self::FILTER_TEXT, false, $lng->txt("wsp_shared_title"));
 		$this->filter["title"] = $item->getValue();

@@ -2266,6 +2266,9 @@ class ilUserImportParser extends ilSaxParser
 	 */
 	function logWarning($aLogin, $aMessage)
 	{
+		// cognos-blu-patch: begin
+		ilLoggerFactory::getLogger('usr')->warning('User import: ' . $aLogin.' '.$aMessage);
+		// cognos-blu-patch: end
 		if (! array_key_exists($aLogin, $this->protocol))
 		{
 			$this->protocol[$aLogin] = array();
@@ -2287,6 +2290,9 @@ class ilUserImportParser extends ilSaxParser
 	 */
 	function logFailure($aLogin, $aMessage)
 	{
+		// cognos-blu-patch: begin
+		ilLoggerFactory::getLogger('usr')->error($aMessage);
+		// cognos-blu-patch: end
 		if (! array_key_exists($aLogin, $this->protocol))
 		{
 			$this->protocol[$aLogin] = array();
@@ -2307,6 +2313,9 @@ class ilUserImportParser extends ilSaxParser
 	 */
 	function logSuccess($aLogin, $userid, $action)
 	{
+		// cognos-blu-patch: begin
+		ilLoggerFactory::getLogger('usr')->info('Successfully imported: ' . $aLogin.' '.$action);
+		// cognos-blu-patch: end
 	    $this->user_mapping[$userid] = array("login" => $aLogin, "action" => $action, "message" => "successful");
 	}
 

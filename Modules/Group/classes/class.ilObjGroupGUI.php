@@ -475,7 +475,19 @@ class ilObjGroupGUI extends ilContainerGUI
 		$members_obj->add($ilUser->getId(),IL_GRP_ADMIN);
 		$members_obj->updateNotification($ilUser->getId(),$ilSetting->get('mail_grp_admin_notification', true));
 		
-
+		if(isset($GLOBALS['ilAppEventHandler']))
+		{
+			$GLOBALS['ilAppEventHandler']->raise(
+				'Modules/Group',
+				'afterCreation',
+				array(
+					'ref_id' => $this->object->getRefId(),
+					'obj_id' => $this->object->getId(),
+					'obj_type' => $this->object->getType()
+				)
+			);
+		}
+		
 		ilUtil::sendSuccess($this->lng->txt("grp_added"),true);		
 		$this->ctrl->setParameter($this,'ref_id',$this->object->getRefId());
 		$this->ctrl->redirect($this, "edit");

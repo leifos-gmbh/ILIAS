@@ -1,0 +1,7 @@
+<!-- language file start -->
+book#:#book_reservation_filter_period#:#Period for the reservation list
+book#:#book_reservation_filter_period_info#:#The default value for the period-filter in days from the current date.
+book#:#book_filter_past_reservations#:#Show past reservations
+book#:#book_deadline_options#:#Booking point in time
+book#:#book_deadline_hours#:#Deadline before booking slot
+book#:#book_deadline_slot_end#:#Allow booking in slots which already began

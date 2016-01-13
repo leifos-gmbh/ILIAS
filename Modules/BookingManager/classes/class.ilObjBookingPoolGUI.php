@@ -194,6 +194,13 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 		$public->setInfo($this->lng->txt("book_public_log_info"));
 		$a_form->addItem($public);		
 		
+		$period = new ilNumberInputGUI($this->lng->txt("book_reservation_filter_period"), "period");
+		$period->setInfo($this->lng->txt("book_reservation_filter_period_info"));
+		$period->setSuffix($this->lng->txt("days"));
+		$period->setSize(3);
+		$period->setMinValue(0);
+		$a_form->addItem($period);
+		
 		// additional features
 		$feat = new ilFormSectionHeaderGUI();
 		$feat->setTitle($this->lng->txt('obj_features'));
@@ -206,7 +213,8 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 		$a_values["online"] = !$this->object->isOffline();
 		$a_values["public"] = $this->object->hasPublicLog();
 		$a_values["stype"] = $this->object->getScheduleType();
-		$a_values["limit"] = $this->object->getOverallLimit();		
+		$a_values["limit"] = $this->object->getOverallLimit();	
+		$a_values["period"] = $this->object->getReservationFilterPeriod();
 	}
 
 	protected function updateCustom(ilPropertyFormGUI $a_form)
@@ -215,6 +223,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 		$this->object->setPublicLog($a_form->getInput('public'));
 		$this->object->setScheduleType($a_form->getInput('stype'));
 		$this->object->setOverallLimit($a_form->getInput('limit') ? $a_form->getInput('limit') : null);
+		$this->object->setReservationFilterPeriod((int)$a_form->getInput('period') ? $a_form->getInput('period') : null);
 		
 		include_once './Services/Container/classes/class.ilContainer.php';
 		include_once './Services/Object/classes/class.ilObjectServiceSettingsGUI.php';
@@ -658,14 +667,32 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 						$slot_to = mktime(substr($slot['to'], 0, 2), substr($slot['to'], 2, 2), 0, $date_info["mon"], $date_info["mday"], $date_info["year"]);
 
 						// always single object, we can sum up
-						$nr_available = (array)ilBookingReservation::getAvailableObject($object_ids, $slot_from, $slot_to-1, false, true);						
+						$nr_available = (array)ilBookingReservation::getAvailableObject($object_ids, $slot_from, $slot_to-1, false, true);		
 						
-						// check deadline
-						if($slot_from < (time()+$schedule->getDeadline()*60*60) || !array_sum($nr_available))
+						// any objects available?
+						if(!array_sum($nr_available))
 						{
 							continue;
+						}					
+						
+						// check deadline
+						if($schedule->getDeadline() >= 0)
+						{
+							// 0-n hours before slots begins
+							if($slot_from < (time()+$schedule->getDeadline()*60*60))
+							{
+								continue;
+							}
 						}
-
+						else
+						{
+							// running slots can be booked, only ended slots are invalid
+							if($slot_to < time())
+							{
+								continue;
+							}							
+						}
+						
 						// is slot active in current hour?
 						if((int)$slot['from'] < $period_to && (int)$slot['to'] > $period_from)
 						{

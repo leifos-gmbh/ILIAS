@@ -179,14 +179,7 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
 		if(is_array($a_filter_pre) && 
 			isset($a_filter_pre["object"]))
 		{			
-			$_SESSION["form_".$this->getId()]["object"] = serialize($a_filter_pre["object"]);			
-			if($this->has_schedule)
-			{
-				$_SESSION["form_".$this->getId()]["fromto"] = serialize(array(
-					"from" => serialize(new ilDateTime(date("Y-m-d"), IL_CAL_DATE)),
-					"to" => ""
-				));
-			}
+			$_SESSION["form_".$this->getId()]["object"] = serialize($a_filter_pre["object"]);						
 		}
 		
 		$this->objects = array();
@@ -209,14 +202,28 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
 		
 		if($this->has_schedule)
 		{
+			// default period: from:today [ to:(today + n days) ]
 			if(!$_SESSION["form_".$this->getId()]["fromto"])
-			{
-				// default: from today
+			{				
+				$from = new ilDateTime(date("Y-m-d"), IL_CAL_DATE); // today
+				$to = null;
+				
+				// add period end from pool settings?
+				include_once "Modules/BookingManager/classes/class.ilObjBookingPool.php";
+				$bpool = new ilObjBookingPool($this->pool_id, false);
+				$period = $bpool->getReservationFilterPeriod();
+				if($period)
+				{
+					$to = clone $from;
+					$to->increment(ilDateTime::DAY, $period);
+					$to = serialize($to);
+				}
+				
 				$_SESSION["form_".$this->getId()]["fromto"] = serialize(array(
-					"from" => serialize(new ilDateTime(date("Y-m-d"), IL_CAL_DATE)),
-					"to" => null
+					"from" => serialize($from),
+					"to" => $to
 				));			
-			}
+			}			
 			
 			$item = $this->addFilterItemByMetaType("fromto", ilTable2GUI::FILTER_DATE_RANGE, false, $this->lng->txt('book_fromto'));
 			$this->filter["fromto"] = $item->getDate();
@@ -251,7 +258,21 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
 				$item = $this->addFilterItemByMetaType("book_schedule_slot", ilTable2GUI::FILTER_SELECT);
 				$item->setOptions($options);
 				$this->filter["slot"] = $item->getValue();		
+			}		
+			
+			$item = new ilCheckboxInputGUI($this->lng->txt("book_filter_past_reservations"), "past");
+			$this->addFilterItem($item);
+			$item->readFromSession();
+			
+			// if period starts in the past we have to include past reservations
+			// :TODO: to be discussed
+			if(is_object($this->filter["fromto"]["from"]) &&
+				$this->filter["fromto"]["from"]->get(IL_CAL_DATE) < date("Y-m-d"))
+			{
+				$item->setChecked(true);
 			}			
+			
+			$this->filter["past"] = $item->getChecked();		
 		}
 		
 		// status
@@ -339,6 +360,8 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
 					$filter["to"] = $day_end->get(IL_CAL_UNIX);
 				}
 			}
+			
+			$filter["past"] = (bool)$this->filter["past"];			
 		}
 		
 		return $filter;

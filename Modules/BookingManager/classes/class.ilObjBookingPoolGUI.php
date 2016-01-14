@@ -223,7 +223,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 		$this->object->setPublicLog($a_form->getInput('public'));
 		$this->object->setScheduleType($a_form->getInput('stype'));
 		$this->object->setOverallLimit($a_form->getInput('limit') ? $a_form->getInput('limit') : null);
-		$this->object->setReservationFilterPeriod((int)$a_form->getInput('period') ? $a_form->getInput('period') : null);
+		$this->object->setReservationFilterPeriod(strlen($a_form->getInput('period')) ? (int)$a_form->getInput('period') : null);
 		
 		include_once './Services/Container/classes/class.ilContainer.php';
 		include_once './Services/Object/classes/class.ilObjectServiceSettingsGUI.php';

@@ -363,11 +363,10 @@ class ilObjBookingPool extends ilObject
 	 * @param int $a_value
 	 */
 	public function setReservationFilterPeriod($a_value = null)
-	{
-		$a_value = (int)$a_value;
-		if(!$a_value)
+	{		
+		if($a_value !== null)
 		{
-			$a_value = null;
+			$a_value = (int)$a_value;
 		}			
 		$this->reservation_period = $a_value;
 	}

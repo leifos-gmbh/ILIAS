@@ -212,10 +212,13 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
 				include_once "Modules/BookingManager/classes/class.ilObjBookingPool.php";
 				$bpool = new ilObjBookingPool($this->pool_id, false);
 				$period = $bpool->getReservationFilterPeriod();
-				if($period)
+				if($period !== null)
 				{
 					$to = clone $from;
-					$to->increment(ilDateTime::DAY, $period);
+					if($period)
+					{
+						$to->increment(ilDateTime::DAY, $period);
+					}
 					$to = serialize($to);
 				}
 				

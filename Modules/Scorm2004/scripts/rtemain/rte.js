@@ -45,12 +45,11 @@ function Runtime(cmiItem, onCommit, onTerminate, onDebug)
 	 */	 
 	function GetErrorString(param) 
 	{
-		if (typeof param !== 'string' && typeof param !== 'number') 
+		if (typeof param !== 'string') 
 		{
-			var returnValueF = 'GetErrorString param must contain an error code and should be a string';
 			if (logActive)
-				sendLogEntry(getMsecSinceStart(),'GetErrorString',String(param),"",returnValueF,"");
-			return returnValueF;
+				sendLogEntry(getMsecSinceStart(),'GetErrorString',String(param),"","false",201);
+			return setReturn(201, 'GetErrorString param must be empty string', '');
 		}
 		var e = Runtime.errors[param];
 		var returnValue = e && e.message ? String(e.message).substr(0,255) : '';
@@ -203,6 +202,21 @@ function Runtime(cmiItem, onCommit, onTerminate, onDebug)
 				//auto suspend
 				if (config.auto_suspend==true) cmiItem.cmi.exit="suspend";
 
+				//store only if score is equal or hiher than in precious attempt
+				var saveRespScore = true;
+				if (saveOnCommit == true && config.auto_review == 's') {
+
+					if (cmiItem.cmi.score.scaled == "" && saved_score_scaled > 0) {
+						saveRespScore = false; //special for Articulate
+					}
+					else if (cmiItem.cmi.score.scaled != "" && typeof parseFloat(cmiItem.cmi.score.scaled) == "number" && parseFloat(cmiItem.cmi.score.scaled) <= saved_score_scaled) {
+						saveRespScore = false;
+						window.document.getElementById("noCredit").style.display = "inline";
+					} else {
+						window.document.getElementById("noCredit").style.display = "none";
+					}
+				}
+
 				//store correct status in DB; returnValue because of IE;
 				var returnValue=false;
 				if(cmiItem.cmi.credit=="no-credit") {returnValue=true;}
@@ -211,7 +225,7 @@ function Runtime(cmiItem, onCommit, onTerminate, onDebug)
 					//statusHandler(cmiItem.scoid,"completion",statusValues[0]);
 					//statusHandler(cmiItem.scoid,"success",statusValues[1]);
 					returnValue = onCommit(cmiItem);
-					if (returnValue && saveOnCommit == true) {
+					if (returnValue && saveOnCommit == true && saveRespScore == true) {
 						if (config.fourth_edition) {
 							var sgo=saveSharedData(cmiItem);
 						}

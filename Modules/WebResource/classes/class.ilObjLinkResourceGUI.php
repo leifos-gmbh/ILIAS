@@ -12,7 +12,7 @@ require_once 'Services/LinkChecker/interfaces/interface.ilLinkCheckerGUIRowHandl
 * @author Stefan Meyer <smeyer.ilias@gmx.de> 
 * @version $Id$
 * 
-* @ilCtrl_Calls ilObjLinkResourceGUI: ilMDEditorGUI, ilPermissionGUI, ilInfoScreenGUI, ilObjectCopyGUI
+* @ilCtrl_Calls ilObjLinkResourceGUI: ilObjectMetaDataGUI, ilPermissionGUI, ilInfoScreenGUI, ilObjectCopyGUI
 * @ilCtrl_Calls ilObjLinkResourceGUI: ilExportGUI, ilWorkspaceAccessGUI, ilCommonActionDispatcherGUI
 * @ilCtrl_Calls ilObjLinkResourceGUI: ilPropertyFormGUI, ilInternalLinkGUI
 * 
@@ -59,7 +59,7 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
 				$this->infoScreenForward();	// forwards command
 				break;
 
-			case 'ilmdeditorgui':
+			case 'ilobjectmetadatagui':
 				if(!$ilAccess->checkAccess('write','',$this->object->getRefId()))
 				{
 					$ilErr->raiseError($this->lng->txt('permission_denied'),$ilErr->WARNING);
@@ -67,9 +67,8 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
 				
 				$this->prepareOutput();	
 				$ilTabs->activateTab('id_meta_data');
-				include_once 'Services/MetaData/classes/class.ilMDEditorGUI.php';
-				$md_gui =& new ilMDEditorGUI($this->object->getId(), 0, $this->object->getType());
-				$md_gui->addObserver($this->object,'MDUpdateListener','General');
+				include_once 'Services/Object/classes/class.ilObjectMetaDataGUI.php';
+				$md_gui = new ilObjectMetaDataGUI($this->object);	
 				$this->ctrl->forwardCommand($md_gui);
 				break;
 				
@@ -1412,9 +1411,15 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
 
 		if ($this->checkPermissionBool('write'))
 		{
-			$ilTabs->addTab("id_meta_data",
-				$lng->txt("meta_data"),
-				$this->ctrl->getLinkTargetByClass('ilmdeditorgui','listSection'));
+			include_once "Services/Object/classes/class.ilObjectMetaDataGUI.php";
+			$mdgui = new ilObjectMetaDataGUI($this->object);					
+			$mdtab = $mdgui->getTab();
+			if($mdtab)
+			{
+				$ilTabs->addTab("id_meta_data",
+					$lng->txt("meta_data"),
+					$mdtab);
+			}
 		}
 
 		if($this->checkPermissionBool('write'))
@@ -1471,7 +1476,7 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
 			// #10612
 			$parts = explode("|", $a_target);
 			
-			if($parts[0] == "term")
+			if ($parts[0] == "term")
 			{
 				// #16894
 				return ilLink::_getStaticLink(
@@ -1482,7 +1487,7 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
 				);
 			}
 			
-			if($parts[0] == "page")
+			if ($parts[0] == "page")
 			{
 				$parts[0] = "pg";				
 			}	
@@ -1496,7 +1501,7 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
 	function callDirectLink()
 	{
 		$obj_id = $this->object->getId();
-						
+
 		include_once './Modules/WebResource/classes/class.ilLinkResourceItems.php';
 		if(ilLinkResourceItems::_isSingular($obj_id))
 		{
@@ -1534,7 +1539,7 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
 				{
 				   $item = ilParameterAppender::_append($item);
 				}
-
+				ilLoggerFactory::getLogger('webr')->debug('Redirecting to: '. $item['target']);
 				$this->redirectToLink($this->ref_id, $obj_id, $item["target"]);
 			}
 		}

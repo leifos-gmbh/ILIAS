@@ -38,6 +38,23 @@ class ilRbacAdmin
 			$this->ilErr =& $ilErr;
 		}
 	}
+	
+	/**
+	 * Set blocked status
+	 * @param type $a_role_id
+	 * @param type $a_ref_id
+	 * @param type $a_blocked_status
+	 */
+	public function setBlockedStatus($a_role_id, $a_ref_id, $a_blocked_status)
+	{
+		global $ilDB;
+		
+		ilLoggerFactory::getLogger('crs')->logStack();
+		$query = 'UPDATE rbac_fa set blocked = '. $ilDB->quote($a_blocked_status,'integer').' '.
+				'WHERE rol_id = '.$ilDB->quote($a_role_id,'integer').' '.
+				'AND parent = '.$ilDB->quote($a_ref_id,'integer');
+		$ilDB->manipulate($query);
+	}
 
 	/**
 	 * deletes a user from rbac_ua
@@ -274,7 +291,26 @@ class ilRbacAdmin
 		$mapping = ilLDAPRoleGroupMapping::_getInstance();
 		$mapping->assign($a_rol_id,$a_usr_id); 
 		
-		return true;
+		
+		$ref_id = $GLOBALS['rbacreview']->getObjectReferenceOfRole($a_rol_id);
+		$obj_id = ilObject::_lookupObjId($ref_id);
+		$type = ilObject::_lookupType($obj_id);
+		
+		if(!$alreadyAssigned)
+		{
+			ilLoggerFactory::getInstance()->getLogger('ac')->debug('Raise event assign user');
+			$GLOBALS['ilAppEventHandler']->raise(
+					'Services/AccessControl',
+					'assignUser',
+					array(
+						'obj_id' => $obj_id,
+						'usr_id' => $a_usr_id,
+						'role_id' => $a_rol_id,
+						'type' => $type
+					)
+			);
+		}
+		return TRUE;
 	}
 
 	/**
@@ -305,7 +341,22 @@ class ilRbacAdmin
 		$mapping = ilLDAPRoleGroupMapping::_getInstance();
 		$mapping->deassign($a_rol_id,$a_usr_id); 
 		
-		return true;
+		$ref_id = $GLOBALS['rbacreview']->getObjectReferenceOfRole($a_rol_id);
+		$obj_id = ilObject::_lookupObjId($ref_id);
+		$type = ilObject::_lookupType($obj_id);
+		
+		ilLoggerFactory::getInstance()->getLogger('ac')->debug('Raise event deassign user');
+		$GLOBALS['ilAppEventHandler']->raise(
+				'Services/AccessControl',
+				'deassignUser',
+				array(
+					'obj_id' => $obj_id,
+					'usr_id' => $a_usr_id,
+					'role_id' => $a_rol_id,
+					'type' => $type
+				)
+		);
+		return TRUE;
 	}
 
 	/**
@@ -971,6 +1022,8 @@ class ilRbacAdmin
 		{
 			$a_assign = "n";
 		}
+		
+		ilLoggerFactory::getLogger('ac')->debug('Assign role to folder: ' . $a_rol_id.' '. $a_parent);
 
 		$query = sprintf('INSERT INTO rbac_fa (rol_id, parent, assign, protected) '.
 			'VALUES (%s,%s,%s,%s)',

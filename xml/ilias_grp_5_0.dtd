@@ -108,4 +108,3 @@
 <!ELEMENT ContainerSetting (#PCDATA)>
 <!ATTLIST ContainerSetting
 		id CDATA #REQUIRED>
-        

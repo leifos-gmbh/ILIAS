@@ -1,3 +1,5 @@
+## Directory-based project format:
+.idea/
 
 # /
 /.buildpath
@@ -12,10 +14,11 @@
 /nbproject
 /.idea
 /ilias.log
-/lang
+.DS_Store
 *~
 db_template_writer.php
-.DS_Store
+.svn
+
 
 # /Customizing/
 #uzk-patch: begin
@@ -374,3 +377,9 @@ db_template_writer.php
 
 # /xml/
 /xml/*.bak
+
+# /dicto
+/dicto/results/*
+!/dicto/results/README.md
+override.php
+virtual-data

@@ -338,7 +338,7 @@ class ilSurveyPageGUI
 	 */
 	protected function addQuestion($a_type, $a_use_pool, $a_pos, $a_special_position)
 	{
-		global $ilCtrl;
+		global $ilCtrl, $ilTabs;
 		
 		// get translated type
 		include_once "./Modules/SurveyQuestionPool/classes/class.ilObjSurveyQuestionPool.php";
@@ -382,12 +382,13 @@ class ilSurveyPageGUI
 		}
 
 		if($a_use_pool)
-		{
+		{												
 			$_GET["sel_question_types"] = $type_trans;
 			$_REQUEST["pgov_pos"] = $id;
 			$ilCtrl->setParameter($this->editor_gui, "pgov_pos", $id);
 			if(!$_POST["usage"])
 			{
+				$ilTabs->clearSubTabs(); // #17193		
 				$this->editor_gui->createQuestionObject();
 			}
 			else
@@ -1244,7 +1245,7 @@ class ilSurveyPageGUI
 			$button = ilLinkButton::getInstance();
 			$button->setCaption("survey_add_new_question");								
 			$button->setUrl($ilCtrl->getLinkTarget($this, "addQuestionToolbarForm"));										
-			$ilToolbar->addButtonInstance($button);		
+			$ilToolbar->addStickyItem($button);		
 
 			if($this->object->isPoolActive())
 			{
@@ -1270,7 +1271,7 @@ class ilSurveyPageGUI
 				$button = ilLinkButton::getInstance();
 				$button->setCaption("browse_for_questions");								
 				$button->setUrl($ilCtrl->getLinkTarget($this->editor_gui, $cmd));										
-				$ilToolbar->addButtonInstance($button);		
+				$ilToolbar->addStickyItem($button);		
 				
 				$ilCtrl->setParameter($this->editor_gui, "pgov", "");
 				$ilCtrl->setParameter($this->editor_gui, "pgov_pos", "");
@@ -1292,14 +1293,14 @@ class ilSurveyPageGUI
 			$button->setCaption("survey_prev_question");								
 			$button->setUrl($ilCtrl->getLinkTarget($this, "renderPage"));	
 			$button->setDisabled(!$this->has_previous_page);						
-			$ilToolbar->addButtonInstance($button);		
+			$ilToolbar->addStickyItem($button);		
 			
 			$ilCtrl->setParameter($this, "pg", $this->current_page+1);
 			$button = ilLinkButton::getInstance();
 			$button->setCaption("survey_next_question");								
 			$button->setUrl($ilCtrl->getLinkTarget($this, "renderPage"));	
 			$button->setDisabled(!$this->has_next_page);						
-			$ilToolbar->addButtonInstance($button);		
+			$ilToolbar->addStickyItem($button);		
 			
 			$ilCtrl->setParameter($this, "pg", $this->current_page); // #14615
 			
@@ -1717,7 +1718,7 @@ class ilSurveyPageGUI
 				$a_tpl->setVariable("URL_ACTION_CMD", $url);					
 				$a_tpl->parseCurrentBlock();
 			}		
-		}		
+		}	
 		
 		// add heading to content
 		if($a_content !== null &&
@@ -1769,7 +1770,7 @@ class ilSurveyPageGUI
 			$a_tpl->setCurrentBlock("list_item");
 			$a_tpl->setVariable("NODE_ID", $node_id);
 			$a_tpl->setVariable("NODE_DRAG", $drag);
-			$a_tpl->setVariable("TXT_NODE_TYPE", $caption);			
+			$a_tpl->setVariable("TXT_NODE_TYPE", $caption);		
 			if($selectable)
 			{
 				$a_tpl->setVariable("SELECTABLE", " selectable");

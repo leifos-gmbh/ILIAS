@@ -1917,6 +1917,62 @@ class ilRbacReview
 		return ilUtil::yn2tf($row['protected']);
 	}
 	
+	/**
+	 * Check if role is blocked at position
+	 * @global ilDB $ilDB
+	 * @param type $a_role_id
+	 * @param type $a_ref_id
+	 * @return boolean
+	 */
+	public function isBlockedAtPosition($a_role_id, $a_ref_id)
+	{
+		global $ilDB;
+		
+		$query = 'SELECT blocked from rbac_fa '.
+				'WHERE rol_id = '. $ilDB->quote($a_role_id,'integer').' '.
+				'AND parent = '.$ilDB->quote($a_ref_id,'integer');
+		$res = $ilDB->query($query);
+		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		{
+			return (bool) $row->blocked;
+		}
+		return FALSE;
+	}
+	
+	/**
+	 * Check if role is blocked in upper context
+	 * @param type $a_role_id
+	 * @param type $a_ref_id
+	 */
+	public function isBlockedInUpperContext($a_role_id, $a_ref_id)
+	{
+		global $ilDB, $tree;
+		
+		if($this->isBlockedAtPosition($a_role_id, $a_ref_id))
+		{
+			return FALSE;
+		}
+		$query = 'SELECT parent from rbac_fa '.
+				'WHERE rol_id = '.$ilDB->quote($a_role_id,'integer').' '.
+				'AND blocked = '.$ilDB->quote(1,'integer');
+		$res = $ilDB->query($query);
+		
+		$parent_ids = array();
+		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		{
+			$parent_ids[] = $row->parent;
+		}
+		
+		foreach($parent_ids as $parent_id)
+		{
+			if($tree->isGrandChild($parent_id, $a_ref_id))
+			{
+				return TRUE;
+			}
+		}
+		return FALSE;
+	}
+	
 	// this method alters the protected status of role regarding the current user's role assignment
 	// and current postion in the hierarchy.
 
@@ -2107,14 +2163,14 @@ class ilRbacReview
 	{
 		global $ilDB;
 		
-		$query = 'SELECT parent role_ref FROM rbac_fa '.
+		$query = 'SELECT parent p_ref FROM rbac_fa '.
 				'WHERE rol_id = '.$ilDB->quote($a_role_id,'integer').' '.
 				'AND assign = '.$ilDB->quote('y','text');
 		
 		$res = $ilDB->query($query);
 		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
 		{
-			return $row->role_ref;
+			return $row->p_ref;
 		}
 		return 0;
 	}
@@ -2329,6 +2385,12 @@ class ilRbacReview
 	public function getAssignedCacheEntry($a_role_id,$a_user_id)
 	{
 		return self::$is_assigned_cache[$a_role_id][$a_user_id];
+	}
+
+
+	public function clearCaches() {
+		self::$is_assigned_cache = array();
+		self::$assigned_users_cache = array();
 	}
 
 } // END class.ilRbacReview

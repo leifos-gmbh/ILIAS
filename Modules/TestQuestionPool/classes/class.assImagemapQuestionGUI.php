@@ -5,6 +5,7 @@ require_once './Modules/TestQuestionPool/classes/class.assQuestionGUI.php';
 require_once './Modules/TestQuestionPool/interfaces/interface.ilGuiQuestionScoringAdjustable.php';
 require_once './Modules/TestQuestionPool/interfaces/interface.ilGuiAnswerScoringAdjustable.php';
 include_once './Modules/Test/classes/inc.AssessmentConstants.php';
+require_once  'Services/WebAccessChecker/classes/class.ilWACSignedPath.php';
 
 /**
  * Image map question GUI representation
@@ -430,19 +431,17 @@ class assImagemapQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 		$this->ctrl->redirect($this, 'editQuestion');
 	}
 
-	function outQuestionForTest($formaction, $active_id, $pass = NULL, $is_postponed = FALSE, $use_post_solutions = FALSE, $show_feedback = FALSE)
+	protected function completeTestOutputFormAction($formaction, $active_id, $pass = NULL)
 	{
-		// TODO - BEGIN: what exactly is done here? cant we use the parent method? 
-
 		require_once './Modules/Test/classes/class.ilObjTest.php';
 		if (!ilObjTest::_getUsePreviousAnswers($active_id, true))
 		{
 			$pass = ilObjTest::_getPass($active_id);
-			$info =& $this->object->getSolutionValues($active_id, $pass);
+			$info = $this->object->getUserSolutionPreferingIntermediate($active_id, $pass);
 		}
 		else
 		{
-			$info =& $this->object->getSolutionValues($active_id, NULL);
+			$info = $this->object->getUserSolutionPreferingIntermediate($active_id, NULL);
 		}
 
 		if (count($info))
@@ -453,11 +452,7 @@ class assImagemapQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 			}
 		}
 
-		$test_output = $this->getTestOutput($active_id, $pass, $is_postponed, $use_post_solutions, $show_feedback);
-		$this->tpl->setVariable("QUESTION_OUTPUT", $test_output);
-		$this->tpl->setVariable("FORMACTION", $formaction);
-
-		// TODO - END: what exactly is done here? cant we use the parent method? 
+		return $formaction;
 	}
 
 	/**
@@ -555,7 +550,8 @@ class assImagemapQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 		{
 			$template->setVariable("QUESTIONTEXT", $this->object->prepareTextareaOutput($questiontext, TRUE));
 		}
-		$template->setVariable("IMG_SRC", "$imagepath");
+		
+		$template->setVariable("IMG_SRC", ilWACSignedPath::signFile($imagepath));
 		$template->setVariable("IMG_ALT", $this->lng->txt("imagemap"));
 		$template->setVariable("IMG_TITLE", $this->lng->txt("imagemap"));
 		if (($active_id > 0) && (!$show_correct_solution))
@@ -604,7 +600,7 @@ class assImagemapQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 		}
 
 		$questionoutput = $template->get();
-		$feedback = ($show_feedback) ? $this->getAnswerFeedbackOutput($active_id, $pass) : "";
+		$feedback = ($show_feedback && !$this->isTestPresentationContext()) ? $this->getAnswerFeedbackOutput($active_id, $pass) : "";
 		if (strlen($feedback)) $solutiontemplate->setVariable("FEEDBACK", $feedback);
 		$solutiontemplate->setVariable("SOLUTION_OUTPUT", $questionoutput);
 
@@ -650,7 +646,7 @@ class assImagemapQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 		include_once "./Services/UICore/classes/class.ilTemplate.php";
 		$template = new ilTemplate("tpl.il_as_qpl_imagemap_question_output.html", TRUE, TRUE, "Modules/TestQuestionPool");
 
-		if($this->getQuestionActionCmd())
+		if($this->getQuestionActionCmd()  && strlen($this->getTargetGuiClass()))
 		{
 			$hrefArea = $this->ctrl->getLinkTargetByClass($this->getTargetGuiClass(), $this->getQuestionActionCmd());
 		}
@@ -683,7 +679,7 @@ class assImagemapQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 		}
 		$questiontext = $this->object->getQuestion();
 		$template->setVariable("QUESTIONTEXT", $this->object->prepareTextareaOutput($questiontext, TRUE));
-		$template->setVariable("IMG_SRC", "$imagepath");
+		$template->setVariable("IMG_SRC", ilWACSignedPath::signFile($imagepath));
 		$template->setVariable("IMG_ALT", $this->lng->txt("imagemap"));
 		$template->setVariable("IMG_TITLE", $this->lng->txt("imagemap"));
 		$questionoutput = $template->get();
@@ -711,7 +707,7 @@ class assImagemapQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 			{
 				if (is_null($pass)) $pass = ilObjTest::_getPass($active_id);
 			}
-			$solutions =& $this->object->getSolutionValues($active_id, $pass);
+			$solutions = $this->object->getUserSolutionPreferingIntermediate($active_id, $pass);
 			foreach ($solutions as $idx => $solution_value)
 			{
 				if($this->object->getIsMultipleChoice())
@@ -734,7 +730,7 @@ class assImagemapQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 			{
 				if (is_null($pass)) $pass = ilObjTest::_getPass($active_id);
 			}
-			$solutions =& $this->object->getSolutionValues($active_id, $pass);
+			$solutions = $this->object->getUserSolutionPreferingIntermediate($active_id, $pass);
 			include_once "./Modules/TestQuestionPool/classes/class.ilImagemapPreview.php";
 			$preview = new ilImagemapPreview($this->object->getImagePath().$this->object->getImageFilename());
 			foreach ($solutions as $idx => $solution_value)
@@ -785,7 +781,7 @@ class assImagemapQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 		}
 		$questiontext = $this->object->getQuestion();
 		$template->setVariable("QUESTIONTEXT", $this->object->prepareTextareaOutput($questiontext, TRUE));
-		$template->setVariable("IMG_SRC", "$imagepath");
+		$template->setVariable("IMG_SRC", ilWACSignedPath::signFile($imagepath));
 		$template->setVariable("IMG_ALT", $this->lng->txt("imagemap"));
 		$template->setVariable("IMG_TITLE", $this->lng->txt("imagemap"));
 		$questionoutput = $template->get();

@@ -508,7 +508,7 @@ class ilUserImportParser extends ilSaxParser
 				$this->style = "";
 				$this->personalPicture = null;
 				$this->userCount++;
-				$this->userObj = new ilObjUser();
+				$this->userObj = new ilObjUser(ilObjUser::_lookupId($a_attribs["Id"]));
 
 				// user defined fields
 				$this->udf_data = array();
@@ -549,7 +549,9 @@ class ilUserImportParser extends ilSaxParser
 			case "AuthMode":
 				if (array_key_exists("type", $a_attribs))
 				{
-					switch ($a_attribs["type"])
+					// begin-patch ldap_multiple
+					// cast to int
+					switch ((int) $a_attribs["type"])
 					{
 						case "default":
 						case "local":
@@ -640,7 +642,7 @@ class ilUserImportParser extends ilSaxParser
 
 			case "User":
 				$this->userCount++;
-				$this->userObj = new ilObjUser();
+				$this->userObj = new ilObjUser(ilObjUser::_lookupId($a_attribs["Id"]));
 				$this->userObj->setLanguage($a_attribs["Language"]);
 				$this->userObj->setImportId($a_attribs["Id"]);
 				$this->currentPrefKey = null;
@@ -940,11 +942,7 @@ class ilUserImportParser extends ilSaxParser
 						$this->personalPicture["content"] = base64_decode($this->cdata);
 						break;
 					case "UUEncode":
-						// this only works with PHP >= 5
-						if (version_compare(PHP_VERSION,'5','>='))
-						{
-							$this->personalPicture["content"] = convert_uudecode($this->cdata);
-						}
+    					$this->personalPicture["content"] = convert_uudecode($this->cdata);
 						break;
 				}
 				break;
@@ -1164,7 +1162,7 @@ class ilUserImportParser extends ilSaxParser
 							
 							// Set default prefs						
 							$this->userObj->setPref('hits_per_page',$ilSetting->get('hits_per_page',30));
-							$this->userObj->setPref('show_users_online',$ilSetting->get('show_users_online','y'));
+							//$this->userObj->setPref('show_users_online',$ilSetting->get('show_users_online','y'));
 
 							if (count ($this->prefs)) 
 							{
@@ -1278,6 +1276,7 @@ class ilUserImportParser extends ilSaxParser
 							if (! is_null($this->userObj->getCity())) $updateUser->setCity($this->userObj->getCity());
 							if (! is_null($this->userObj->getZipCode())) $updateUser->setZipCode($this->userObj->getZipCode());
 							if (! is_null($this->userObj->getCountry())) $updateUser->setCountry($this->userObj->getCountry());
+							if (! is_null($this->userObj->getSelectedCountry())) $updateUser->setSelectedCountry($this->userObj->getSelectedCountry());
 							if (! is_null($this->userObj->getPhoneOffice())) $updateUser->setPhoneOffice($this->userObj->getPhoneOffice());
 							if (! is_null($this->userObj->getPhoneHome())) $updateUser->setPhoneHome($this->userObj->getPhoneHome());
 							if (! is_null($this->userObj->getPhoneMobile())) $updateUser->setPhoneMobile($this->userObj->getPhoneMobile());
@@ -1498,6 +1497,10 @@ class ilUserImportParser extends ilSaxParser
 
 			case "Country":
 				$this->userObj->setCountry($this->cdata);
+				break;
+
+			case "SelCountry":
+				$this->userObj->setSelectedCountry($this->cdata);
 				break;
 
 			case "PhoneOffice":
@@ -1909,6 +1912,10 @@ class ilUserImportParser extends ilSaxParser
 
 			case "Country":
 				$this->userObj->setCountry($this->cdata);
+				break;
+
+			case "SelCountry":
+				$this->userObj->setSelectedCountry($this->cdata);
 				break;
 
 			case "PhoneOffice":
@@ -2425,6 +2432,12 @@ class ilUserImportParser extends ilSaxParser
 			case 'hide_own_online_status':
 				if (!in_array($value, array('y', 'n')))
 					$this->logFailure("---", "Wrong value '$value': Value 'y' or 'n' expected for preference $key.");				
+				break;
+			case 'bs_allow_to_contact_me':
+				if(!in_array($value, array('y', 'n')))
+				{
+					$this->logFailure("---", "Wrong value '$value': Value 'y' or 'n' expected for preference $key.");
+				}
 				break;
 			case 'public_profile':
 				if (!in_array($value, array('y', 'n', 'g')))

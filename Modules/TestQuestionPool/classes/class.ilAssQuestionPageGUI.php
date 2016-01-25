@@ -17,6 +17,10 @@ require_once('./Modules/TestQuestionPool/classes/class.ilAssQuestionPage.php');
  */
 class ilAssQuestionPageGUI extends ilPageObjectGUI
 {
+	const TEMP_PRESENTATION_TITLE_PLACEHOLDER = '___TEMP_PRESENTATION_TITLE_PLACEHOLDER___';
+	
+	private $originalPresentationTitle = '';
+	
 	/**
 	 * Constructor
 	 *
@@ -31,9 +35,39 @@ class ilAssQuestionPageGUI extends ilPageObjectGUI
 		$this->setEnabledPageFocus(false);
 	}
 
+	public function getOriginalPresentationTitle()
+	{
+		return $this->originalPresentationTitle;
+	}
+
+	public function setOriginalPresentationTitle($originalPresentationTitle)
+	{
+		$this->originalPresentationTitle = $originalPresentationTitle;
+	}
+
 	protected function isPageContainerToBeRendered()
 	{
 		return $this->getRenderPageContainer();
+	}
+	
+	public function showPage()
+	{
+		$this->setOriginalPresentationTitle($this->getPresentationTitle());
+		
+		$this->setPresentationTitle(self::TEMP_PRESENTATION_TITLE_PLACEHOLDER);
+		
+		return parent::showPage();
+	}
+
+	function postOutputProcessing($output)
+	{
+		$output = str_replace(
+			self::TEMP_PRESENTATION_TITLE_PLACEHOLDER, $this->getOriginalPresentationTitle(), $output
+		);
+
+		$output = preg_replace("/src=\"\\.\\//ims", "src=\"" . ILIAS_HTTP_PATH . "/", $output);
+		
+		return $output;
 	}
 } 
 

@@ -1,9 +1,12 @@
 /* Services/Locator */
 ol.breadcrumb {
   margin: 0;
-  font-family: 'Open Sans Semibold';
+  font-weight: 600;
   padding-left: 15px;
   font-size: 0.8em;
+}
+[dir="rtl"] ol.breadcrumb {
+  padding-right: 15px;
 }
 .breadcrumb a {
   /*	color: #A0A0A0; */

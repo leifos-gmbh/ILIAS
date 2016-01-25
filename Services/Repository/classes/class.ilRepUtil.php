@@ -118,6 +118,7 @@ throw new ilRepositoryException($lng->txt("ilRepUtil::deleteObjects: Type inform
 		{
 			// SAVE SUBTREE AND DELETE SUBTREE FROM TREE
 			$affected_ids = array();
+			$affected_parents = array();
 			foreach ($a_ids as $id)
 			{
 				if($tree->isDeleted($id))
@@ -136,6 +137,7 @@ throw new ilRepositoryException($lng->txt("ilRepUtil::deleteObjects: Type inform
 					$affected_users = ilUtil::removeItemFromDesktops($subnode["child"]);
 					
 					$affected_ids[$subnode["child"]] = $subnode["child"];
+					$affected_parents[$subnode["child"]] = $subnode["parent"];
 					
 					// TODO: inform users by mail that object $id was deleted
 					//$mail->sendMail($id,$msg,$affected_users);
@@ -170,8 +172,10 @@ throw new ilRepositoryException($lng->txt("ilRepUtil::deleteObjects: Type inform
 			foreach ($affected_ids as $aid)
 			{
 				$ilAppEventHandler->raise("Services/Object", "toTrash",
-					array("obj_id" => ilObject::_lookupObjId($aid),
-					"ref_id" => $aid));
+					array( "obj_id" => ilObject::_lookupObjId($aid),
+						   "ref_id" => $aid,
+						   "old_parent_ref_id" => $affected_parents[$aid]
+						 ));
 			}
 			// inform other objects in hierarchy about paste operation
 			//$this->object->notify("confirmedDelete", $_GET["ref_id"],$_GET["parent_non_rbac_id"],$_GET["ref_id"],$_SESSION["saved_post"]);
@@ -243,8 +247,11 @@ throw new ilRepositoryException($lng->txt("ilRepUtil::deleteObjects: Type inform
 				$log->write("ilObjectGUI::removeFromSystemObject(), delete obj_id: ".$node_obj->getId().
 					", ref_id: ".$node_obj->getRefId().", type: ".$node_obj->getType().", ".
 					"title: ".$node_obj->getTitle());
-				$affected_ids[$node["ref_id"]] = array("ref_id" => $node["ref_id"],
-					"obj_id" => $node_obj->getId(), "type" => $node_obj->getType());
+				$affected_ids[$node["ref_id"]] = array(
+													"ref_id" => $node["ref_id"],
+													"obj_id" => $node_obj->getId(), 
+													"type" => $node_obj->getType(),
+													"old_parent_ref_id" => $node["parent"]);
 					
 				// this is due to bug #1860 (even if this will not completely fix it)
 				// and the fact, that media pool folders may find their way into
@@ -278,7 +285,8 @@ throw new ilRepositoryException($lng->txt("ilRepUtil::deleteObjects: Type inform
 			$ilAppEventHandler->raise("Services/Object", "delete",
 				array("obj_id" => $aid["obj_id"],
 				"ref_id" => $aid["ref_id"],
-				"type" => $aid["type"]));
+				"type" => $aid["type"],
+				"old_parent_ref_id" => $aid["old_parent_ref_id"]));
 		}
 	}
 	
@@ -319,8 +327,11 @@ throw new ilRepositoryException($lng->txt("ilRepUtil::deleteObjects: Type inform
 						$log->write("ilObjectGUI::removeDeletedNodes(), delete obj_id: ".$node_obj->getId().
 							", ref_id: ".$node_obj->getRefId().", type: ".$node_obj->getType().", ".
 							"title: ".$node_obj->getTitle());
-						$a_affected_ids[$node["ref_id"]] = array("ref_id" => $node["ref_id"],
-							"obj_id" => $node_obj->getId(), "type" => $node_obj->getType());
+						$a_affected_ids[$node["ref_id"]] = array(
+															"ref_id" => $node["ref_id"],
+															"obj_id" => $node_obj->getId(), 
+															"type" => $node_obj->getType(),
+															"old_parent_ref_id" => $node["parent"]);
 														
 						$node_obj->delete();
 						
@@ -370,31 +381,14 @@ throw new ilRepositoryException($lng->txt("ilRepUtil::deleteObjects: Type inform
 			$affected_ids[$id] = $id;
 			
 			// INSERT AND SET PERMISSIONS
-			ilRepUtil::insertSavedNodes($id, $a_cur_ref_id, -(int) $id, $affected_ids);
-			
-			// DELETE SAVED TREE
-			$saved_tree = new ilTree(-(int)$id);
-			$saved_tree->deleteTree($saved_tree->getNodeData($id));
-			
-			include_once './Services/Object/classes/class.ilObjectFactory.php';
-			$factory = new ilObjectFactory();
-			$ref_obj = $factory->getInstanceByRefId($id,FALSE);
-			if($ref_obj instanceof ilObject)
-			{
-				$lroles = $GLOBALS['rbacreview']->getRolesOfRoleFolder($id,FALSE);
-				foreach($lroles as $role_id)
-				{
-					include_once './Services/AccessControl/classes/class.ilObjRole.php';
-					$role = new ilObjRole($role_id);
-					$role->setParent($id);
-					$role->delete();
-				}
-				$parent_ref = $GLOBALS['tree']->getParentId($id);
-				if($parent_ref)
-				{
-					$ref_obj->setPermissions($parent_ref);
-				}
+			try {
+				ilRepUtil::insertSavedNodes($id, $a_cur_ref_id, -(int) $id, $affected_ids);
+			} 
+			catch (Exception $e) {
+				include_once("./Services/Repository/exceptions/class.ilRepositoryException.php");
+				throw new ilRepositoryException('Restore from trash failed with message: ' . $e->getMessage());
 			}
+
 			
 			// BEGIN ChangeEvent: Record undelete. 
 			require_once('Services/Tracking/classes/class.ilChangeEvent.php');
@@ -430,29 +424,153 @@ throw new ilRepositoryException($lng->txt("ilRepUtil::deleteObjects: Type inform
 	{
 		global $rbacadmin, $rbacreview, $log, $tree;
 
-		$tree->insertNode($a_source_id,$a_dest_id, IL_LAST_NODE, true);
-		$a_affected_ids[$a_source_id] = $a_source_id;
+		ilLoggerFactory::getLogger('rep')->debug('Restoring from trash: source_id: '. $a_source_id.', dest_id: '. $a_dest_id.', tree_id:'. $a_tree_id);
+		ilLoggerFactory::getLogger('rep')->info('Restoring ref_id  ' . $a_source_id . ' from trash.');
 		
-		// write log entry
-		$log->write("ilRepUtil::insertSavedNodes(), restored ref_id $a_source_id from trash");
-
-		// SET PERMISSIONS
-		$parentRoles = $rbacreview->getParentRoleIds($a_dest_id);
-		$obj =& ilObjectFactory::getInstanceByRefId($a_source_id);
-
-		foreach ($parentRoles as $parRol)
-		{
-			$ops = $rbacreview->getOperationsOfRole($parRol["obj_id"], $obj->getType(), $parRol["parent"]);
-			$rbacadmin->grantPermission($parRol["obj_id"],$ops,$a_source_id);
-		}
-
+		// read child of node
 		$saved_tree = new ilTree($a_tree_id);
 		$childs = $saved_tree->getChilds($a_source_id);
-
+		
+		// then delete node and put in tree
+		try {
+			$tree->insertNodeFromTrash($a_source_id, $a_dest_id, $a_tree_id, IL_LAST_NODE, true);
+		} 
+		catch (Exception $e) {
+			ilLoggerFactory::getLogger('rep')->error('Restore from trash failed with message: ' . $e->getMessage());
+			throw $e;
+		}
+		
+		include_once './Services/Object/classes/class.ilObjectFactory.php';
+		$factory = new ilObjectFactory();
+		$ref_obj = $factory->getInstanceByRefId($a_source_id,FALSE);
+		if($ref_obj instanceof ilObject)
+		{
+			$lroles = $GLOBALS['rbacreview']->getRolesOfRoleFolder($a_source_id,FALSE);
+			foreach($lroles as $role_id)
+			{
+				include_once './Services/AccessControl/classes/class.ilObjRole.php';
+				$role = new ilObjRole($role_id);
+				$role->setParent($a_source_id);
+				$role->delete();
+			}
+			if($a_dest_id)
+			{
+				$ref_obj->setPermissions($a_dest_id);
+			}
+		}
 		foreach ($childs as $child)
 		{
 			ilRepUtil::insertSavedNodes($child["child"],$a_source_id,$a_tree_id,$a_affected_ids);
 		}
+	}
+	
+	
+	
+	//
+	// OBJECT TYPE HANDLING / REMOVAL
+	//
+	
+	protected function findTypeInTrash($a_type)
+	{
+		global $ilDB;
+		
+		$res = array();
+		
+		$set = $ilDB->query("SELECT child".
+			" FROM tree".
+			" JOIN object_reference ref ON (tree.child = ref.ref_id)".
+			" JOIN object_data od ON (od.obj_id = ref.obj_id)".
+			" WHERE tree.tree < ".$ilDB->quote(0, "integer").
+			" AND od.type = ".$ilDB->quote($a_type, "text"));
+		while($row = $ilDB->fetchAssoc($set))
+		{
+			$res[] = $row["child"];
+		}
+		
+		return $res;
+	}
+	
+	protected function getObjectTypeId($a_type)
+	{
+		global $ilDB;
+
+		$set = $ilDB->query("SELECT obj_id".
+			" FROM object_data ".
+			" WHERE type = ".$ilDB->quote("typ", "text").
+			" AND title = ".$ilDB->quote($a_type, "text"));
+		$row = $ilDB->fetchAssoc($set);
+		return $row["obj_id"];
+	}
+							
+	public function deleteObjectType($a_type)
+	{
+		global $ilDB, $tree, $ilSetting;
+		
+		// delete object instances (repository/trash)
+		
+		$ref_ids_in_tree = $tree->getSubTree($tree->getNodeData(ROOT_FOLDER_ID), false, $a_type);
+		if($ref_ids_in_tree)
+		{
+			$this->deleteObjects(null, $ref_ids_in_tree);
+		}
+		
+		if($ilSetting->get('enable_trash'))
+		{
+			$ref_ids_in_trash = $this->findTypeInTrash($a_type);
+			if($ref_ids_in_trash)
+			{
+				$this->removeObjectsFromSystem($ref_ids_in_tree);
+			}
+		}
+		
+		// delete "component"
+		$type_id = $this->getObjectTypeId($a_type);
+		if($type_id)
+		{				
+			// see ilRepositoryObjectPlugin::beforeActivation()
+			
+			$ilDB->manipulate("DELETE FROM object_data".
+				" WHERE obj_id = ".$ilDB->quote($type_id, "integer"));		
+			
+			// RBAC
+			
+			// basic operations
+			$ilDB->manipulate("DELETE FROM rbac_ta".
+				" WHERE typ_id = ".$ilDB->quote($type_id, "integer") /*.
+				" AND ".$ilDB->in("ops_id", array(1, 2, 3, 4, 6), "", "integer") */);
+			
+			// creation operation
+			$set = $ilDB->query("SELECT ops_id".
+				" FROM rbac_operations ".
+				" WHERE class = ".$ilDB->quote("create", "text").
+				" AND operation = ".$ilDB->quote("create_".$a_type, "text"));			
+			$row = $ilDB->fetchAssoc($set);		
+			$create_ops_id = $row["ops_id"];
+			if($create_ops_id)
+			{				
+				$ilDB->manipulate("DELETE FROM rbac_operations".
+					" WHERE ops_id = ".$ilDB->quote($create_ops_id, "integer"));
+				
+				$ilDB->manipulate("DELETE FROM rbac_templates".
+					" WHERE ops_id = ".$ilDB->quote($create_ops_id, "integer"));
+				
+				// container create
+				foreach(array("root", "cat", "crs", "grp", "fold") as $parent_type)
+				{
+					$parent_type_id = $this->getObjectTypeId($parent_type);
+					if($parent_type_id)
+					{
+						$ilDB->manipulate("DELETE FROM rbac_ta".
+							" WHERE typ_id = ".$ilDB->quote($parent_type_id, "integer").
+							" AND ops_id = ".$ilDB->quote($create_ops_id, "integer"));
+					}
+				}			
+			}
+		}
+		
+		// delete new item settings	
+		include_once "Services/Repository/classes/class.ilObjRepositorySettings.php";
+		ilObjRepositorySettings::deleteObjectType($a_type);	
 	}
 
 

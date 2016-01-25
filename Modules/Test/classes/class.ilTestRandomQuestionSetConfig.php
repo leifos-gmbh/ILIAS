@@ -380,7 +380,7 @@ class ilTestRandomQuestionSetConfig extends ilTestQuestionSetConfig
 	 *
 	 * @param ilObjTest $cloneTestOBJ
 	 */
-	public function cloneQuestionSetRelatedData($cloneTestOBJ)
+	public function cloneQuestionSetRelatedData(ilObjTest $cloneTestOBJ)
 	{
 		// clone general config
 		
@@ -391,8 +391,9 @@ class ilTestRandomQuestionSetConfig extends ilTestQuestionSetConfig
 
 		$sourcePoolDefinitionList = $this->buildSourcePoolDefinitionList($this->testOBJ);
 		$sourcePoolDefinitionList->loadDefinitions();
-		$sourcePoolDefinitionList->cloneDefinitionsForTestId($cloneTestOBJ->getTestId());
-
+		$definitionIdMap = $sourcePoolDefinitionList->cloneDefinitionsForTestId($cloneTestOBJ->getTestId());
+		$this->registerClonedSourcePoolDefinitionIdMapping($cloneTestOBJ, $definitionIdMap);
+		
 		// build new question stage for cloned test
 
 		$sourcePoolDefinitionList = $this->buildSourcePoolDefinitionList($cloneTestOBJ);
@@ -403,6 +404,22 @@ class ilTestRandomQuestionSetConfig extends ilTestQuestionSetConfig
 		$sourcePoolDefinitionList->saveDefinitions();
 		
 		$this->updateLastQuestionSyncTimestampForTestId($cloneTestOBJ->getTestId(), time());
+	}
+	
+	private function registerClonedSourcePoolDefinitionIdMapping(ilObjTest $cloneTestOBJ, $definitionIdMap)
+	{
+		global $ilLog;
+		
+		require_once 'Services/CopyWizard/classes/class.ilCopyWizardOptions.php';
+		$cwo = ilCopyWizardOptions::_getInstance($cloneTestOBJ->getTmpCopyWizardCopyId());
+
+		foreach($definitionIdMap as $originalDefinitionId => $cloneDefinitionId)
+		{
+			$originalKey = $this->testOBJ->getRefId().'_rndSelDef_'.$originalDefinitionId;
+			$mappedKey = $cloneTestOBJ->getRefId().'_rndSelDef_'.$cloneDefinitionId;
+			$cwo->appendMapping($originalKey, $mappedKey);
+			$ilLog->write(__METHOD__.": Added random selection definition id mapping $originalKey <-> $mappedKey");
+		}
 	}
 
 	private function buildSourcePoolDefinitionList(ilObjTest $testOBJ)
@@ -479,7 +496,7 @@ class ilTestRandomQuestionSetConfig extends ilTestQuestionSetConfig
 
 		switch( $nextClass )
 		{
-			case 'ilmdeditorgui':
+			case 'ilobjectmetadatagui':
 			case 'ilpermissiongui':
 
 				return true;
@@ -509,5 +526,28 @@ class ilTestRandomQuestionSetConfig extends ilTestQuestionSetConfig
 		return array(
 			'assQuestions', 'settings', 'manscoring', 'scoringadjust', 'statistics', 'history', 'export'
 		);
+	}
+
+	// -----------------------------------------------------------------------------------------------------------------
+	
+	public function getCommaSeparatedSourceQuestionPoolLinks()
+	{
+		$definitionList = $this->buildSourcePoolDefinitionList($this->testOBJ);
+		$definitionList->loadDefinitions();
+		
+		$poolTitles = array();
+		
+		foreach($definitionList as $definition)
+		{
+			/* @var ilTestRandomQuestionSetSourcePoolDefinition $definition */
+			
+			$refId = current(ilObject::_getAllReferences($definition->getPoolId()));
+			$href = ilLink::_getLink($refId, 'qpl');
+			$title = $definition->getPoolTitle();
+			
+			$poolTitles[$definition->getPoolId()] = "<a href=\"$href\" alt=\"$title\">$title</a>";
+		}
+		
+		return implode(', ', $poolTitles);
 	}
 }

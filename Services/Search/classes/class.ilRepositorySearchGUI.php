@@ -49,6 +49,7 @@ class ilRepositorySearchGUI
 	protected $search_title = '';
 	
 	var $search_type = 'usr';
+	protected $user_limitations = true;
 
 	/**
 	* Constructor
@@ -125,7 +126,7 @@ class ilRepositorySearchGUI
 	 *
 	 * @return ilToolbarGUI
 	 */
-	public static function fillAutoCompleteToolbar($parent_object, ilToolbarGUI $toolbar = null, $a_options = array())
+	public static function fillAutoCompleteToolbar($parent_object, ilToolbarGUI $toolbar = null, $a_options = array(), $a_sticky = false)
 	{
 		global $ilToolbar, $lng, $ilCtrl, $tree;
 
@@ -155,21 +156,42 @@ class ilRepositorySearchGUI
 		$ul = new ilTextInputGUI($a_options['auto_complete_name'], 'user_login');
 		$ul->setDataSource($ajax_url);		
 		$ul->setSize($a_options['auto_complete_size']);
-		$toolbar->addInputItem($ul, true);
+		if(!$a_sticky)
+		{
+			$toolbar->addInputItem($ul, true);
+		}
+		else
+		{
+			$toolbar->addStickyItem($ul, true);
+		}
 
 		if(count((array) $a_options['user_type']))
 		{
 			include_once './Services/Form/classes/class.ilSelectInputGUI.php';
 			$si = new ilSelectInputGUI("", "user_type");
 			$si->setOptions($a_options['user_type']);
-			$toolbar->addInputItem($si);
+			if(!$a_sticky)
+			{
+				$toolbar->addInputItem($si);
+			}
+			else
+			{
+				$toolbar->addStickyItem($si);
+			}
 		}
 		
 		include_once "Services/UIComponent/Button/classes/class.ilSubmitButton.php";
 		$button = ilSubmitButton::getInstance();
 		$button->setCaption($a_options['submit_name'], false);
 		$button->setCommand('addUserFromAutoComplete');
-		$toolbar->addButtonInstance($button);
+		if(!$a_sticky)
+		{
+			$toolbar->addButtonInstance($button);
+		}
+		else
+		{
+			$toolbar->addStickyItem($button);
+		}
 
 		if((bool)$a_options['add_search'] || 
 			is_numeric($a_options['add_from_container']))
@@ -244,7 +266,7 @@ class ilRepositorySearchGUI
 
 		include_once './Services/User/classes/class.ilUserAutoComplete.php';
 		$auto = new ilUserAutoComplete();
-		
+
 		if(($_REQUEST['fetchall']))
 		{
 			$auto->setLimit(ilUserAutoComplete::MAX_ENTRIES);
@@ -254,6 +276,8 @@ class ilRepositorySearchGUI
 		$auto->setSearchFields($a_fields);
 		$auto->setResultField($result_field);
 		$auto->enableFieldSearchableCheck(true);
+		$auto->setUserLimitations($this->getUserLimitations());
+
 		echo $auto->getList($_REQUEST['term']);
 		exit();
 	}
@@ -640,7 +664,7 @@ class ilRepositorySearchGUI
 				continue;
 			}
 		
-			if(!is_object($query_parser = $this->__parseQueryString($query_string)))
+			if(!is_object($query_parser = $this->__parseQueryString($query_string, true, ($info['type'] == FIELD_TYPE_SELECT))))
 			{
 				ilUtil::sendInfo($query_parser);
 				return false;
@@ -662,7 +686,7 @@ class ilRepositorySearchGUI
 
 				case FIELD_TYPE_SELECT:
 					// Do a phrase query for select fields
-					$query_parser = $this->__parseQueryString('"'.$query_string.'"');
+					$query_parser = $this->__parseQueryString('"'.$query_string.'"', true, true);
 
 				case FIELD_TYPE_TEXT:
 					$user_search =& ilObjectSearchFactory::_getUserSearchInstance($query_parser);
@@ -758,12 +782,18 @@ class ilRepositorySearchGUI
 	* @return object of query parser or error message if an error occured
 	* @access public
 	*/
-	function &__parseQueryString($a_string,$a_combination_or = true)
+	function &__parseQueryString($a_string,$a_combination_or = true,$a_ignore_length = false)
 	{
 		$query_parser = new ilQueryParser(ilUtil::stripSlashes($a_string));
 		$query_parser->setCombination($a_combination_or ? QP_COMBINATION_OR : QP_COMBINATION_AND);
-		$query_parser->setMinWordLength(1); 
-		$query_parser->setGlobalMinLength(3); // #14768
+		$query_parser->setMinWordLength(1);
+		
+		// #17502
+		if(!(bool)$a_ignore_length)
+		{
+			$query_parser->setGlobalMinLength(3); // #14768
+		}
+		
 		$query_parser->parse();
 
 		if(!$query_parser->validate())
@@ -928,6 +958,7 @@ class ilRepositorySearchGUI
 		{
 			$table->addMultiCommand('addUser', $this->lng->txt('btn_add'));
 		}
+		$table->setUserLimitations($this->getUserLimitations());
 		$table->parseUserIds($a_usr_ids);
 		
 		$this->tpl->setVariable('RES_TABLE',$table->getHTML());
@@ -1095,6 +1126,25 @@ class ilRepositorySearchGUI
 
 		$this->ctrl->setParameter($this->callback["class"], "obj", implode(";", $_POST["obj"]));
 		$this->ctrl->redirect($this->callback["class"], $this->callback["method"]);
+	}
+
+	/**
+	 * allow user limitations like inactive and access limitations
+	 *
+	 * @param bool $a_limitations
+	 */
+	public function setUserLimitations($a_limitations)
+	{
+		$this->user_limitations = (bool) $a_limitations;
+	}
+
+	/**
+	 * allow user limitations like inactive and access limitations
+	 * @return bool
+	 */
+	public function getUserLimitations()
+	{
+		return $this->user_limitations;
 	}
 }
 ?>

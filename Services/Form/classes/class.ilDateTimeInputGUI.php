@@ -396,8 +396,16 @@ class ilDateTimeInputGUI extends ilSubEnabledFormPropertyGUI implements ilTableF
 			$dt = false;
 		}
 
-		$date = new ilDateTime($dt, IL_CAL_FKT_GETDATE, $ilUser->getTimeZone());
-		$this->setDate($date);
+		if($this->getShowTime())
+		{
+			$date = new ilDateTime($dt, IL_CAL_FKT_GETDATE, $ilUser->getTimeZone());
+			$this->setDate($date);
+		}
+		else
+		{
+			$date = new ilDate($dt, IL_CAL_FKT_GETDATE);
+			$this->setDate($date);
+		}
 		
 		// post values used to be overwritten anyways - cannot change behaviour
 		$_POST[$this->getPostVar()]['date'] = $date->get(IL_CAL_FKT_DATE, 'Y-m-d', $ilUser->getTimeZone());
@@ -422,12 +430,33 @@ class ilDateTimeInputGUI extends ilSubEnabledFormPropertyGUI implements ilTableF
 		
 		if(strlen($this->getActivationPostVar()))
 		{
+			if(!$this->activation_checked)
+			{
+				$tpl->setCurrentBlock('sub_form_hide');
+				$tpl->setVariable('DSFID',$this->getFieldId());
+				$tpl->parseCurrentBlock();
+			}
+			
+			if($this->getInfo())
+			{
+				$tpl->setCurrentBlock('activation_description');
+				$tpl->setVariable('ACT_DESCRIPTION',$this->getInfo());
+				$tpl->parseCurrentBlock();
+				
+				// disable standard info block
+				$this->setInfo(null);
+			}
+			
 			$tpl->setCurrentBlock('prop_date_activation');
+			$tpl->setVariable('LAB_ID',$this->getFieldId());
+			$tpl->setVariable('SFID',$this->getFieldId());
 			$tpl->setVariable('CHECK_ENABLED_DATE',$this->getActivationPostVar());
 			$tpl->setVariable('TXT_DATE_ENABLED',$this->activation_title);
 			$tpl->setVariable('CHECKED_ENABLED',$this->activation_checked ? 'checked="checked"' : '');
 			$tpl->setVariable('CHECKED_DISABLED',$this->getDisabled() ? 'disabled="disabled" ' : '');
 			$tpl->parseCurrentBlock();
+			
+			$tpl->touchBlock('prop_date_activation_out');
 		}
 
 		if($this->getMode() == self::MODE_SELECT)
@@ -506,6 +535,12 @@ class ilDateTimeInputGUI extends ilSubEnabledFormPropertyGUI implements ilTableF
 					$input_hint = $lng->txt("mm_dd_yyyy");
 					break;
 			}
+			
+			// #17232
+			if($this->invalid_input)
+			{
+				$value = $this->invalid_input;
+			}
 
 			$tpl->setCurrentBlock("prop_date_input_field");
 			$tpl->setVariable("DATE_ID", $this->getPostVar());
@@ -582,7 +617,7 @@ class ilDateTimeInputGUI extends ilSubEnabledFormPropertyGUI implements ilTableF
 			
 			$tpl->parseCurrentBlock();
 		}
-
+		
 		return $tpl->get();
 	}
 
@@ -647,7 +682,7 @@ class ilDateTimeInputGUI extends ilSubEnabledFormPropertyGUI implements ilTableF
 	{
 		$html = $this->render("toolbar");
 		return $html;
-	}
+	}	
 }
 
 ?>

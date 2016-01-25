@@ -146,7 +146,8 @@ class ilLuceneAdvancedSearchFields
 
 		$a_post_name = 'query['.$a_field_name.']';
 		
-		if(!$a_query)
+		ilLoggerFactory::getLogger('sea')->debug('Query was: '. print_r($a_query,TRUE));
+		if(!is_array($a_query))
 		{
 			$a_query = array();
 		}
@@ -429,7 +430,7 @@ class ilLuceneAdvancedSearchFields
 				// #17071 - reload search values
 				if(is_array($a_query) &&
 					array_key_exists($a_field_name, $a_query))
-				{
+				{				
 					$field_form->importFromPost($a_query);
 					$field_form->validate();
 				}								
@@ -619,7 +620,7 @@ class ilLuceneAdvancedSearchFields
 					
 				// Advanced meta data
 				$field_id = substr($a_field,4);
-				include_once './Services/AdvancedMetaData/classes/class.ilAdvancedMDFieldDefinition.php';
+				include_once './Services/AdvancedMetaData/classes/class.ilAdvancedMDFieldDefinition.php';				
 				try 
 				{
 					// field might be invalid (cached query)
@@ -629,7 +630,7 @@ class ilLuceneAdvancedSearchFields
 				{
 					return '';
 				}
-				
+								
 				$adv_query = $field->getLuceneSearchString($a_query);
 				if($adv_query)
 				{

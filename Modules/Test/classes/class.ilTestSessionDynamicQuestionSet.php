@@ -195,6 +195,5 @@ class ilTestSessionDynamicQuestionSet extends ilTestSession
 	{
 		$this->setLastSequence((int)$currentQuestionId);
 	}
-
 }
 

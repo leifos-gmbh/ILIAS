@@ -724,6 +724,48 @@ class ilTree
 	}
 	
 	/**
+	 * Insert node from trash deletes trash entry.
+	 * If we have database query exceptions we could wrap insertNode in try/catch 
+	 * and rollback if the insert failed.
+	 * 
+	 * @param type $a_source_id
+	 * @param type $a_target_id
+	 * @param type $a_tree_id
+	 */
+	public function insertNodeFromTrash($a_source_id, $a_target_id, $a_tree_id, $a_pos = IL_LAST_NODE, $a_reset_deleted_date = false)
+	{
+		global $ilDB;
+		
+		if($this->__isMainTree())
+		{
+			if($a_source_id <= 1 or $a_target_id <= 0)
+			{
+				ilLoggerFactory::getLogger('tree')->logStack(ilLogLevel::INFO);
+				throw new InvalidArgumentException('Invalid parameter given for ilTree::insertNodeFromTrash');
+			}
+		}
+		if (!isset($a_source_id) or !isset($a_target_id))
+		{
+			ilLoggerFactory::getLogger('tree')->logStack(ilLogLevel::INFO);
+			throw new InvalidArgumentException('Missing parameter for ilTree::insertNodeFromTrash');
+		}
+		if($this->isInTree($a_source_id))
+		{
+			ilLoggerFactory::getLogger('tree')->error('Node already in tree');
+			ilLoggerFactory::getLogger('tree')->logStack(ilLogLevel::INFO);
+			throw new InvalidArgumentException('Node already in tree.');
+		}
+		
+		$query = 'DELETE from tree '.
+				'WHERE tree = '.$ilDB->quote($a_tree_id,'integer').' '.
+				'AND child = '.$ilDB->quote($a_source_id,'integer');
+		$ilDB->manipulate($query);
+		
+		$this->insertNode($a_source_id, $a_target_id, IL_LAST_NODE, $a_reset_deleted_date);
+	}
+	
+	
+	/**
 	* insert new node with node_id under parent node with parent_id
 	* @access	public
 	* @param	integer		node_id
@@ -771,6 +813,17 @@ class ilTree
 		if ($a_reset_deletion_date)
 		{
 			ilObject::_resetDeletedDate($a_node_id);
+		}
+		
+		if (isset($GLOBALS["ilAppEventHandler"]) && $this->__isMainTree()) {
+			$GLOBALS['ilAppEventHandler']->raise(
+					"Services/Tree", 
+					"insertNode", 
+					array(
+						'tree'		=> $this->table_tree,
+						'node_id' 	=> $a_node_id, 
+						'parent_id'	=> $a_parent_id)
+			);
 		}
 	}
 	
@@ -2359,11 +2412,13 @@ class ilTree
 			$i,
 			$node_id));
 
-		$childs = $this->getChilds($node_id);
+		// to much dependencies
+		//$childs = $this->getChilds($node_id);
+		$childs = $this->getChildIds($node_id);
 
 		foreach ($childs as $child)
 		{
-			$i = $this->__renumber($child["child"],$i+1);
+			$i = $this->__renumber($child,$i+1);
 		}
 		$i++;
 		
@@ -2635,15 +2690,20 @@ class ilTree
 	 */
 	public function moveTree($a_source_id, $a_target_id, $a_location = self::POS_LAST_NODE)
 	{
+		$old_parent_id = $this->getParentId($a_source_id);
 		$this->getTreeImplementation()->moveTree($a_source_id,$a_target_id,$a_location);
-		$GLOBALS['ilAppEventHandler']->raise(
-				"Services/Tree", 
-				"moveTree", 
-				array(
-					'tree'		=> $this->table_tree,
-					'source_id' => $a_source_id, 
-					'target_id' => $a_target_id)
-		);
+		if (isset($GLOBALS["ilAppEventHandler"]) && $this->__isMainTree()) {
+			$GLOBALS['ilAppEventHandler']->raise(
+					"Services/Tree", 
+					"moveTree", 
+					array(
+						'tree'			=> $this->table_tree,
+						'source_id' 	=> $a_source_id, 
+						'target_id' 	=> $a_target_id,
+						'old_parent_id'	=> $old_parent_id
+						)
+			);
+		}
 		return true;
 	}
 	
@@ -2730,6 +2790,30 @@ class ilTree
 				'child = '.$ilDB->quote($a_node_id,'integer').' '.
 				'AND tree = '.$ilDB->quote($a_tree_id,'integer');
 		$ilDB->manipulate($query);
+	}
+	
+	/**
+	 * Lookup object types in trash
+	 * @global type $ilDB
+	 * @return type
+	 */
+	public function lookupTrashedObjectTypes()
+	{
+		global $ilDB;
+		
+		$query = 'SELECT DISTINCT(o.type) type FROM tree t JOIN object_reference r ON child = r.ref_id '.
+				'JOIN object_data o on r.obj_id = o.obj_id '.
+				'WHERE tree < '.$ilDB->quote(0,'integer').' '.
+				'AND child = -tree '.
+				'GROUP BY o.type';
+		$res = $ilDB->query($query);
+		
+		$types_deleted = array();
+		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		{
+			$types_deleted[] = $row->type;
+		}
+		return $types_deleted;
 	}
 	
 	

@@ -186,7 +186,7 @@ class ilObjSearchSettingsGUI extends ilObjectGUI
 		$hits = new ilSelectInputGUI($this->lng->txt('seas_max_hits'),'max_hits');
 		$hits->setValue($settings->getMaxHits());
 		$hits->setRequired(true);
-		for($value = 5; $value <= 15; $value += 5)
+		for($value = 5; $value <= 50; $value += 5)
 		{
 			$values[$value] = $value;
 		}
@@ -246,6 +246,11 @@ class ilObjSearchSettingsGUI extends ilObjectGUI
 			$if->addSubItem($ch);
 		}
 		
+		$cdate = new ilCheckboxInputGUI($this->lng->txt('search_cdate_filter'), 'cdate');
+		$cdate->setInfo($this->lng->txt('search_cdate_filter_info'));
+		$cdate->setChecked($settings->isDateFilterEnabled());
+		$cdate->setValue(1);
+		$this->form->addItem($cdate);
 		
 		// hide advanced search 
 		$cb = new ilCheckboxInputGUI($lng->txt("search_hide_adv_search"), "hide_adv_search");
@@ -279,6 +284,16 @@ class ilObjSearchSettingsGUI extends ilObjectGUI
 		
 		$lucene = new ilRadioOption($this->lng->txt('search_lucene'),ilSearchSettings::LUCENE_SEARCH,$this->lng->txt('java_server_info'));
 		$type->addOption($lucene);
+
+		$inactive_user = new ilCheckboxInputGUI($this->lng->txt('search_show_inactive_user'), 'inactive_user');
+		$inactive_user->setInfo($this->lng->txt('search_show_inactive_user_info'));
+		$inactive_user->setChecked($settings->isInactiveUserVisible());
+		$this->form->addItem($inactive_user);
+
+		$limited_user = new ilCheckboxInputGUI($this->lng->txt('search_show_limited_user'), 'limited_user');
+		$limited_user->setInfo($this->lng->txt('search_show_limited_user_info'));
+		$limited_user->setChecked($settings->isLimitedUserVisible());
+		$this->form->addItem($limited_user);
 	}
 	
 	
@@ -299,7 +314,7 @@ class ilObjSearchSettingsGUI extends ilObjectGUI
 		}
 		
 		include_once './Services/Search/classes/class.ilSearchSettings.php';
-		$settings = new ilSearchSettings();
+		$settings = ilSearchSettings::getInstance();
 		$settings->setMaxHits((int) $_POST['max_hits']);
 		
 		switch((int) $_POST['search_type'])
@@ -324,13 +339,28 @@ class ilObjSearchSettingsGUI extends ilObjectGUI
 
 		$settings->setHideAdvancedSearch($_POST['hide_adv_search']);
 		$settings->setAutoCompleteLength($_POST['auto_complete_length']);
-
-		$settings->update();
-
-		unset($_SESSION['search_last_class']);
+		$settings->showInactiveUser($_POST["inactive_user"]);
+		$settings->showLimitedUser($_POST["limited_user"]);
 		
-		ilUtil::sendSuccess($this->lng->txt('settings_saved'));
-		$this->settingsObject();
+		$settings->enableDateFilter($_POST['cdate']);
+		$settings->update();
+		
+		
+		// refresh lucene server
+		try {
+			$this->refreshLuceneSettings();
+			ilUtil::sendInfo($this->lng->txt('settings_saved'));
+			$this->settingsObject();
+			return true;
+		} 
+		catch (Exception $exception) 
+		{
+			ilUtil::sendFailure($exception->getMessage());
+			$this->settingsObject();
+			return false;
+		}			
+		
+		unset($_SESSION['search_last_class']);
 	}
 	
 	/**
@@ -492,29 +522,47 @@ class ilObjSearchSettingsGUI extends ilObjectGUI
 			$settings->update();
 			
 			// refresh lucene server
-			$ilBench->start('Lucene','LuceneRefreshSettings');
-			
 			try {
-				include_once './Services/WebServices/RPC/classes/class.ilRpcClientFactory.php';
-				ilRpcClientFactory::factory('RPCAdministration')->refreshSettings(
-					CLIENT_ID.'_'.$ilSetting->get('inst_id',0));
-			
+				$this->refreshLuceneSettings();
 				ilUtil::sendInfo($this->lng->txt('settings_saved'));
 				$this->luceneSettingsObject();
 				return true;
-			}
-			catch(Exception $e)
+			} 
+			catch (Exception $exception) 
 			{
-				$ilLog->write(__METHOD__.': '.$e->getMessage());
-				ilUtil::sendFailure($e->getMessage());
+				ilUtil::sendFailure($exception->getMessage());
 				$this->luceneSettingsObject();
 				return false;
-			}
+			}			
 		}
 		
 		ilUtil::sendInfo($this->lng->txt('err_check_input'));
 		$this->luceneSettingsObject();
 		return false;
+	}
+	
+	/**
+	 * Refresh lucene server settings
+	 * @throws Exception
+	 */
+	protected function refreshLuceneSettings()
+	{
+		global $ilSetting;
+		
+		if(!ilSearchSettings::getInstance()->enabledLucene())
+		{
+			return true;
+		}
+		
+		try  
+		{
+			include_once './Services/WebServices/RPC/classes/class.ilRpcClientFactory.php';
+			ilRpcClientFactory::factory('RPCAdministration')->refreshSettings(CLIENT_ID.'_'.$ilSetting->get('inst_id',0));
+		} 
+		catch (Exception $exception) {
+			ilLoggerFactory::getLogger('src')->error('Refresh of lucene server settings failed with message: ' . $e->getMessage());
+			throw $exception;
+		}
 	}
 	
 	protected function advancedLuceneSettingsObject()

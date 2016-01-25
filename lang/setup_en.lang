@@ -1,4 +1,4 @@
-/* Copyright (c) 1998-2014 ILIAS open source e-Learning e.V., Extended GPL, see docs/LICENSE */
+/* Copyright (c) 1998-2015 ILIAS open source e-Learning e.V., Extended GPL, see docs/LICENSE */
 /**
 * ILIAS language file
 *
@@ -204,8 +204,8 @@ info_text_ini#:#Please choose a client ID. Any letter (except umlauts) or number
 info_text_lang#:#Please choose additional languages and/or remove selected languages. The default language specified the language for new user accounts or users which haven't selected a preferred language yet.
 info_text_list#:#In this overview you see all available clients and their setup and access status. On the top right you may toggle the client selection screen on/off. If client selection is on, all available clients that are online will be displayed in a list on the start page of ILIAS. If client selection is turned off and a user views the start page, the login screen of the <i>default</i> client is displayed. You may determine the default client with the button below.
 info_text_login#:#Please enter the Client ID of your Installation and your account data. Your account has to be assigned to the 'administrator'-role.
-info_text_nic#:#Optionally register and obtain an installation ID (NIC-ID) from the ILIAS open source community server. Getting a NIC-ID is advisable if you want to share content with other ILIAS installations.
-info_text_nic3#:#You registered your installation. Your nic-id is
+info_text_nic#:#Optionally register and obtain an installation ID (NIC-ID) from the ILIAS community server. <b>Notice:</b> Getting a NIC-ID is recommended if you are planning to share content with other ILIAS installations or if you want to re-use content from other ILIAS installations.
+info_text_nic3#:#You registered your installation. Your NIC-ID is
 info_text_password#:#Here you may change the master password for the setup program.
 info_text_pathes#:#ILIAS supports multiple clients with different databases. Below you enter the base data directory, log file location and the paths to third-party tools. These settings are valid for all clients you create later on.
 ini_client_id_exists#:#A client with that ID already exists! Please choose another client ID.
@@ -253,7 +253,7 @@ lang_fr#:#French
 lang_hu#:#Hungarian
 lang_id#:#Indonesian
 lang_it#:#Italian
-lang_ja#:#Japanisch
+lang_ja#:#Japanese
 lang_ka#:#Georgian
 lang_lt#:#Lithuanian
 lang_min_one_language#:#You must install at least one language!
@@ -611,3 +611,25 @@ https_settings#:#HTTPS Settings
 alert#:#Warning
 pre_opcache_comments#:#Set opcache.load_comments to 1
 pre_load_comments#:#PHP-OPCache load_comments
+memcache_servers#:#Memcached-Nodes
+memcache_status#:#Active
+memcache_host#:#Host
+memcache_port#:#Port
+memcache_weight#:#Weight
+memcache_actions#:#Actions
+memcache_edit#:#Edit node
+memcache_add#:#Add Memcached node
+memcache_delete#:#Delete node
+memcache_cancel#:#Cancel
+memcache_update#:#Save node
+memcache_status_server#:#Reachable
+cache_activate_clng#:#Language
+cache_activate_obj_def#:#Object Definition
+cache_activate_ilctrl#:#Control Flow
+cache_activate_comp#:#Components
+cache_activate_tpl#:#Template (HTML)
+cache_activate_events#:#Events
+cache_activated_components#:#Activated Components
+cache_flush#:#Flush all caches
+cache_activate_tpl_blocks#:#Template (Blocks)
+cache_activate_tpl_variables#:#Template (Variablen)

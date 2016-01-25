@@ -651,7 +651,7 @@ class assImagemapQuestion extends assQuestion implements ilObjQuestionScoringAdj
 	 * @param boolean $returndetails (deprecated !!)
 	 * @return integer/array $points/$details (array $details is deprecated !!)
 	 */
-	public function calculateReachedPoints($active_id, $pass = NULL, $returndetails = FALSE)
+	public function calculateReachedPoints($active_id, $pass = NULL, $authorizedSolution = true, $returndetails = FALSE)
 	{
 		if( $returndetails )
 		{
@@ -665,7 +665,7 @@ class assImagemapQuestion extends assQuestion implements ilObjQuestionScoringAdj
 		{
 			$pass = $this->getSolutionMaxPass($active_id);
 		}
-		$result = $this->getCurrentSolutionResultSet($active_id, $pass);
+		$result = $this->getCurrentSolutionResultSet($active_id, $pass, $authorizedSolution);
 		while ($data = $ilDB->fetchAssoc($result))
 		{
 			if (strcmp($data["value1"], "") != 0)
@@ -697,10 +697,9 @@ class assImagemapQuestion extends assQuestion implements ilObjQuestionScoringAdj
 	 * @param integer $pass Test pass
 	 * @return boolean $status
 	 */
-	public function saveWorkingData($active_id, $pass = NULL)
+	public function saveWorkingData($active_id, $pass = NULL, $authorized = true)
 	{
 		global $ilDB;
-		global $ilUser;
 
 		if (is_null($pass))
 		{
@@ -712,9 +711,9 @@ class assImagemapQuestion extends assQuestion implements ilObjQuestionScoringAdj
 
 		if($this->is_multiple_choice && strlen($_GET['remImage']))
 		{
-			$query  = "DELETE FROM tst_solutions WHERE active_fi = %s AND question_fi = %s AND pass = %s AND value1 = %s";
-			$types  = array("integer", "integer", "integer", "integer");
-			$values = array($active_id, $this->getId(), $pass, $_GET['remImage']);
+			$query  = "DELETE FROM tst_solutions WHERE active_fi = %s AND question_fi = %s AND pass = %s AND value1 = %s AND authorized = %s";
+			$types  = array("integer", "integer", "integer", "integer", 'integer');
+			$values = array($active_id, $this->getId(), $pass, $_GET['remImage'], (int)$authorized);
 			
 			if( $this->getStep() !== NULL )
 			{
@@ -726,16 +725,16 @@ class assImagemapQuestion extends assQuestion implements ilObjQuestionScoringAdj
 		}
 		elseif(!$this->is_multiple_choice)
 		{
-			$affectedRows = $this->removeCurrentSolution($active_id, $pass);
+			$affectedRows = $this->removeCurrentSolution($active_id, $pass, $authorized);
 		}
 
 		if (strlen($_GET["selImage"]))
 		{
 			$imageWasSelected = true;
 			
-			$types = array('integer', 'integer', 'integer', 'integer');
-			$values = array($active_id, $this->getId(), $pass,  (int)$_GET['selImage']);
-			$query = 'DELETE FROM tst_solutions WHERE active_fi = %s AND question_fi = %s AND pass = %s AND value1 = %s';
+			$types = array('integer', 'integer', 'integer', 'integer', 'integer');
+			$values = array($active_id, $this->getId(), $pass,  (int)$_GET['selImage'], (int)$authorized);
+			$query = 'DELETE FROM tst_solutions WHERE active_fi = %s AND question_fi = %s AND pass = %s AND value1 = %s AND authorized = %s';
 			if($this->getStep() != null)
 			{
 				$types[] = 'integer';
@@ -745,7 +744,7 @@ class assImagemapQuestion extends assQuestion implements ilObjQuestionScoringAdj
 
 			$ilDB->manipulateF($query, $types, $values);
 
-			$affectedRows = $this->saveCurrentSolution($active_id, $pass, $_GET['selImage'], null);
+			$affectedRows = $this->saveCurrentSolution($active_id, $pass, $_GET['selImage'], null, $authorized);
 		}
 		else
 		{
@@ -1024,13 +1023,22 @@ class assImagemapQuestion extends assQuestion implements ilObjQuestionScoringAdj
 		global $ilDB;
 		$result = new ilUserQuestionResult($this, $active_id, $pass);
 
-		$data = $ilDB->queryF(
-			"SELECT value1+1 as value1 FROM tst_solutions WHERE active_fi = %s AND pass = %s AND question_fi = %s AND step = (
-				SELECT MAX(step) FROM tst_solutions WHERE active_fi = %s AND pass = %s AND question_fi = %s
-			)",
-			array("integer", "integer", "integer","integer", "integer", "integer"),
-			array($active_id, $pass, $this->getId(), $active_id, $pass, $this->getId())
-		);
+		$maxStep = $this->lookupMaxStep($active_id, $pass);
+
+		if( $maxStep !== null )
+		{
+			$data = $ilDB->queryF("SELECT value1+1 as value1 FROM tst_solutions WHERE active_fi = %s AND pass = %s AND question_fi = %s AND step = %s",
+				array("integer", "integer", "integer", "integer"),
+				array($active_id, $pass, $this->getId(), $maxStep)
+			);
+		}
+		else
+		{
+			$data = $ilDB->queryF("SELECT value1+1 as value1 FROM tst_solutions WHERE active_fi = %s AND pass = %s AND question_fi = %s AND step IS NULL",
+				array("integer", "integer", "integer"),
+				array($active_id, $pass, $this->getId())
+			);
+		}
 
 		while($row = $ilDB->fetchAssoc($data))
 		{

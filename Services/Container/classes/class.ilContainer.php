@@ -49,8 +49,7 @@ class ilContainer extends ilObject
 	const VIEW_SIMPLE = 4;
 	const VIEW_BY_TYPE = 5;
 	const VIEW_INHERIT = 6;
-	const VIEW_ILINC = 7;
-	
+
 	const VIEW_DEFAULT = self::VIEW_BY_TYPE;
 
 	
@@ -413,7 +412,7 @@ class ilContainer extends ilObject
 		include_once("./Services/Container/classes/class.ilContainerPage.php");
 		if (ilContainerPage::_exists("cont",
 			$this->getId()))
-		{			
+		{
 			$orig_page = new ilContainerPage($this->getId());
 			$orig_page->copy($new_obj->getId(), "cont", $new_obj->getId());			
 		}
@@ -427,9 +426,9 @@ class ilContainer extends ilObject
 			$orig_page->copy($new_obj->getId(), "cstr", $new_obj->getId());
 		}
 		
-		// #10271
+		// #10271 
 		foreach(self::_getContainerSettings($this->getId()) as $keyword => $value)
-		{
+		{						
 			self::_writeContainerSetting($new_obj->getId(), $keyword, $value);
 			
 			// copy custom icons
@@ -493,10 +492,12 @@ class ilContainer extends ilObject
 	 * @param int $ref_id
 	 * @param int $clone_source
 	 * @param array $options
+	 * @param bool force soap
+	 * @param int submode 1 => copy all, 2 => copy content
 	 * @return new refid if clone has finished or parameter ref id if cloning is still in progress
 	 * @return array(copy_id => xyz, ref_id => new ref_id)
 	 */
-	public function cloneAllObject($session_id, $client_id, $new_type, $ref_id, $clone_source, $options, $soap_call = false)
+	public function cloneAllObject($session_id, $client_id, $new_type, $ref_id, $clone_source, $options, $soap_call = false, $a_submode = 1)
 	{
 		global $ilLog;
 		
@@ -521,15 +522,16 @@ class ilContainer extends ilObject
 		$wizard_options->read();
 		$wizard_options->storeTree($clone_source);
 		
-		// Special handling for course in existing courses
-		if($new_type == 'crs' and ilObject::_lookupType(ilObject::_lookupObjId($ref_id)) == 'crs')
+		include_once './Services/Object/classes/class.ilObjectCopyGUI.php';
+		if($a_submode == ilObjectCopyGUI::SUBMODE_CONTENT_ONLY)
 		{
-			$ilLog->write(__METHOD__.': Copy course in course...');
-			$ilLog->write(__METHOD__.': Added mapping, source ID: '.$clone_source.', target ID: '.$ref_id);
+			ilLoggerFactory::getLogger('obj')->info('Copy content only...');
+			ilLoggerFactory::getLogger('obj')->debug('Added mapping, source ID: '.$clone_source.', target ID: '.$ref_id);
 			$wizard_options->read();
 			$wizard_options->dropFirstNode();
 			$wizard_options->appendMapping($clone_source,$ref_id);
 		}
+		
 		
 		#print_r($options);
 		// Duplicate session to avoid logout problems with backgrounded SOAP calls
@@ -544,12 +546,12 @@ class ilContainer extends ilObject
 		$ilLog->write(__METHOD__.': Trying to call Soap client...');
 		if($soap_client->init())
 		{
-			$ilLog->write(__METHOD__.': Calling soap clone method...');
+			ilLoggerFactory::getLogger('obj')->info('Calling soap clone method');
 			$res = $soap_client->call('ilClone',array($new_session_id.'::'.$client_id, $copy_id));
 		}
 		else
 		{
-			$ilLog->write(__METHOD__.': SOAP call failed. Calling clone method manually. ');
+			ilLoggerFactory::getLogger('obj')->warning('SOAP clone call failed. Calling clone method manually');
 			$wizard_options->disableSOAP();
 			$wizard_options->read();			
 			include_once('./webservice/soap/include/inc.soap_functions.php');
@@ -663,7 +665,7 @@ class ilContainer extends ilObject
 			// including event items!
 			if (!self::$data_preloaded)
 			{
-				$preloader->addItem($object["obj_id"], $object["type"], $object["child"]);					
+				$preloader->addItem($object["obj_id"], $object["type"], $object["child"]);
 			}			
 			
 			// filter out items that are attached to an event

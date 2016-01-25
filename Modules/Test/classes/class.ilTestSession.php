@@ -54,6 +54,11 @@ class ilTestSession
 	var $lastsequence;
 
 	/**
+	 * @var string
+	 */
+	protected $lastPresentationMode;
+
+	/**
 	* Indicates if the test was submitted already
 	*
 	* @var boolean
@@ -93,6 +98,7 @@ class ilTestSession
 		$this->anonymous_id = 0;
 		$this->test_id = 0;
 		$this->lastsequence = 0;
+		$this->lastPresentationMode = null;
 		$this->submitted = FALSE;
 		$this->submittedTimestamp = "";
 		$this->pass = 0;
@@ -195,22 +201,22 @@ class ilTestSession
 				if (!$this->activeIDExists($this->getUserId(), $this->getTestId()))
 				{
 					$anonymous_id = ($this->getAnonymousId()) ? $this->getAnonymousId() : NULL;
+					$submittedTs = (strlen($this->getSubmittedTimestamp())) ? $this->getSubmittedTimestamp() : NULL;
 					$next_id = $ilDB->nextId('tst_active');
-					$affectedRows = $ilDB->manipulateF("INSERT INTO tst_active (active_id, user_fi, anonymous_id, test_fi, lastindex, tries, submitted, submittimestamp, tstamp, objective_container) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-						array('integer', 'integer', 'text', 'integer', 'integer', 'integer', 'integer', 'timestamp', 'integer', 'integer'),
-						array(
-							$next_id,
-							$this->getUserId(),
-							$anonymous_id,
-							$this->getTestId(),
-							$this->getLastSequence(),
-							$this->getPass(),
-							$submitted,
-							(strlen($this->getSubmittedTimestamp())) ? $this->getSubmittedTimestamp() : NULL,
-							time(),
-							(int)$this->getObjectiveOrientedContainerId()
-						)
-					);
+
+					$ilDB->insert('tst_active', array(
+						'active_id' => array('integer', $next_id),
+						'user_fi' => array('integer', $this->getUserId()),
+						'anonymous_id' => array('text', $anonymous_id),
+						'test_fi' => array('integer', $this->getTestId()),
+						'lastindex' => array('integer', $this->getLastSequence()),
+						'tries' => array('integer', $this->getPass()),
+						'submitted' => array('integer', $submitted),
+						'submittimestamp' => array('timestamp', $submittedTs),
+						'tstamp' => array('integer', time()),
+						'objective_container' => array('integer', (int)$this->getObjectiveOrientedContainerId()),
+					));
+
 					$this->active_id = $next_id;
 
 					// update learning progress
@@ -410,13 +416,13 @@ class ilTestSession
 	{
 		return $this->anonymous_id;
 	}
-	
-	function setLastSequence($lastsequence)
+
+	public function setLastSequence($lastsequence)
 	{
 		$this->lastsequence = $lastsequence;
 	}
 	
-	function getLastSequence()
+	public function getLastSequence()
 	{
 		return $this->lastsequence;
 	}

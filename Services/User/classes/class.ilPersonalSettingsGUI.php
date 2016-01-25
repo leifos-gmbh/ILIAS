@@ -891,6 +891,7 @@ class ilPersonalSettingsGUI
 		}
 
 		// Users Online
+		/*
 		if ($this->userSettingVisible("show_users_online"))
 		{
 			$si = new ilSelectInputGUI($this->lng->txt("show_users_online"), "show_users_online");
@@ -903,7 +904,7 @@ class ilPersonalSettingsGUI
 			$si->setValue($ilUser->prefs["show_users_online"]);
 			$si->setDisabled($ilSetting->get("usr_settings_disable_show_users_online"));
 			$this->form->addItem($si);
-		}
+		}*/
 
 		// Store last visited
 		$lv = new ilSelectInputGUI($this->lng->txt("user_store_last_visited"), "store_last_visited");
@@ -916,14 +917,28 @@ class ilPersonalSettingsGUI
 		$this->form->addItem($lv);
 
 		// hide_own_online_status
-		if ($this->userSettingVisible("hide_own_online_status"))
-		{ 
-			$cb = new ilCheckboxInputGUI($this->lng->txt("hide_own_online_status"), "hide_own_online_status");
+		$awrn_set = new ilSetting("awrn");
+		if ($awrn_set->get("awrn_enabled", false) && $this->userSettingVisible("hide_own_online_status"))
+		{
+			$this->lng->loadLanguageModule("awrn");
+			$cb = new ilCheckboxInputGUI($this->lng->txt("awrn_hide_from_awareness"), "hide_own_online_status");
+			$cb->setInfo($this->lng->txt("awrn_hide_from_awareness_info"));
 			$cb->setChecked($ilUser->prefs["hide_own_online_status"] == "y");
 			$cb->setDisabled($ilSetting->get("usr_settings_disable_hide_own_online_status"));
 			$this->form->addItem($cb);
 		}
-		
+
+		require_once 'Services/Contact/BuddySystem/classes/class.ilBuddySystem.php';
+		if(ilBuddySystem::getInstance()->isEnabled() && $this->userSettingVisible('bs_allow_to_contact_me'))
+		{
+			$this->lng->loadLanguageModule('buddysystem');
+			$allow_to_contact_be = new ilCheckboxInputGUI($this->lng->txt('buddy_allow_to_contact_me'), 'bs_allow_to_contact_me');
+			$allow_to_contact_be->setInfo($this->lng->txt('buddy_allow_to_contact_me_info'));
+			$allow_to_contact_be->setChecked($ilUser->prefs['bs_allow_to_contact_me'] == 'y');
+			$allow_to_contact_be->setDisabled($ilSetting->get('usr_settings_disable_bs_allow_to_contact_me'));
+			$this->form->addItem($allow_to_contact_be);
+		}
+
 		include_once 'Services/Authentication/classes/class.ilSessionReminder.php';
 		if(ilSessionReminder::isGloballyActivated())
 		{
@@ -1017,6 +1032,7 @@ class ilPersonalSettingsGUI
 			// starting point: repository object
 			$repobj = new ilRadioOption($lng->txt("adm_user_starting_point_object"), ilUserUtil::START_REPOSITORY_OBJ);
 			$repobj_id = new ilTextInputGUI($lng->txt("adm_user_starting_point_ref_id"), "usr_start_ref_id");
+			$repobj_id->setInfo($lng->txt("adm_user_starting_point_ref_id_info"));
 			$repobj_id->setRequired(true);
 			$repobj_id->setSize(5);
 			if($si->getValue() == ilUserUtil::START_REPOSITORY_OBJ)
@@ -1097,10 +1113,11 @@ class ilPersonalSettingsGUI
 			}
 
 			// set show users online
+			/*
 			if ($this->workWithUserSetting("show_users_online"))
 			{
 				$ilUser->setPref("show_users_online", $_POST["show_users_online"]);
-			}
+			}*/
 			
 			// store last visited?
 			global $ilNavigationHistory;
@@ -1124,6 +1141,19 @@ class ilPersonalSettingsGUI
 				else
 				{
 					$ilUser->setPref("hide_own_online_status","n");
+				}
+			}
+
+			require_once 'Services/Contact/BuddySystem/classes/class.ilBuddySystem.php';
+			if(ilBuddySystem::getInstance()->isEnabled() && $this->workWithUserSetting('bs_allow_to_contact_me'))
+			{
+				if(isset($_POST['bs_allow_to_contact_me']) && $_POST['bs_allow_to_contact_me'] == 1)
+				{
+					$ilUser->setPref('bs_allow_to_contact_me', 'y');
+				}
+				else
+				{
+					$ilUser->setPref('bs_allow_to_contact_me', 'n');
 				}
 			}
 

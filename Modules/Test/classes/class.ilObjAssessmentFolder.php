@@ -23,6 +23,8 @@ class ilObjAssessmentFolder extends ilObject
 	const ASS_PROC_LOCK_MODE_FILE = 'file';
 	const ASS_PROC_LOCK_MODE_DB = 'db';
 
+	const DEFAULT_SKL_TRIG_NUM_ANSWERS_BARRIER = 1;
+	
 	var $setting;
 	
 	/**
@@ -594,5 +596,43 @@ class ilObjAssessmentFolder extends ilObject
 	public static function getValidAssessmentProcessLockModes()
 	{
 		return array(self::ASS_PROC_LOCK_MODE_NONE, self::ASS_PROC_LOCK_MODE_FILE, self::ASS_PROC_LOCK_MODE_DB);
+	}
+	
+	public function getSkillTriggeringNumAnswersBarrier()
+	{
+		return $this->setting->get(
+			'ass_skl_trig_num_answ_barrier', self::DEFAULT_SKL_TRIG_NUM_ANSWERS_BARRIER
+		);
+	}
+	
+	public function setSkillTriggeringNumAnswersBarrier($skillTriggeringNumAnswersBarrier)
+	{
+		$this->setting->set('ass_skl_trig_num_answ_barrier', $skillTriggeringNumAnswersBarrier);
+	}
+
+	public function fetchScoringAdjustableTypes($allQuestionTypes)
+	{
+		require_once 'Modules/TestQuestionPool/classes/class.assQuestionGUI.php';
+		$scoringAdjustableQuestionTypes = array();
+		
+		foreach($allQuestionTypes as $type => $typeData)
+		{
+			$questionGui = assQuestionGUI::_getQuestionGUI($typeData['type_tag']);
+			
+			if( $this->questionSupportsScoringAdjustment($questionGui) )
+			{
+				$scoringAdjustableQuestionTypes[$type] = $typeData;
+			}
+		}
+		
+		return $scoringAdjustableQuestionTypes;
+	}
+	
+	private function questionSupportsScoringAdjustment(\assQuestionGUI $question_object)
+	{
+		return ($question_object instanceof ilGuiQuestionScoringAdjustable
+			|| $question_object instanceof ilGuiAnswerScoringAdjustable)
+		&& ($question_object->object instanceof ilObjQuestionScoringAdjustable
+			|| $question_object->object instanceof ilObjAnswerScoringAdjustable);
 	}
 }

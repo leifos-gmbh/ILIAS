@@ -26,11 +26,18 @@ class ilPageContentGUI
 	var $return_location;
 	var $page_config = null;
 
+	/**
+	 * @var ilLogger
+	 */
+	protected $log;
+
 	static $style_selector_reset = "margin-top:2px; margin-bottom:2px; text-indent:0px; position:static; float:none; width: auto;";
 
 	// common bb buttons (special ones are iln and wln)
 	protected static $common_bb_buttons = array(
-		"str" => "Strong", "emp" => "Emph", "imp" => "Important", "com" => "Comment",
+		"str" => "Strong", "emp" => "Emph", "imp" => "Important",
+		"sup" => "Sup", "sub" => "Sub",
+		"com" => "Comment",
 		"quot" => "Quotation", "acc" => "Accent", "code" => "Code", "tex" => "Tex",
 		"fn" => "Footnote", "xln" => "ExternalLink"
 		);
@@ -42,6 +49,9 @@ class ilPageContentGUI
 	function ilPageContentGUI($a_pg_obj, $a_content_obj, $a_hier_id = 0, $a_pc_id = "")
 	{
 		global $ilias, $tpl, $lng, $ilCtrl;
+
+		$this->log = ilLoggerFactory::getLogger('copg');
+
 		$this->ilias = $ilias;
 		$this->tpl = $tpl;
 		$this->lng = $lng;
@@ -268,7 +278,7 @@ class ilPageContentGUI
 			$btpl->parseCurrentBlock();
 
 		}
-		
+
 		if ($this->getPageConfig()->getEnableKeywords())
 		{
 			$btpl->touchBlock("bb_kw_button");

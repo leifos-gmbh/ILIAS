@@ -35,6 +35,7 @@ class ilTable2GUI extends ilTableGUI
 	protected $selected_column = array();
 	protected $show_templates = false;
 	protected $show_rows_selector = true; // JF, 2014-10-27
+	protected $rows_selector_off = false;
 
 	protected $nav_determined= false;
 	protected $limit_determined = false;
@@ -61,10 +62,6 @@ class ilTable2GUI extends ilTableGUI
 	 * @var string
 	 */
 	protected $row_selector_label;
-	
-	// patch uzk start		
-	protected $persistent_filters; // [bool]
-	// patch uzk end
 
 	const FILTER_TEXT = 1;
 	const FILTER_SELECT = 2;
@@ -74,9 +71,6 @@ class ilTable2GUI extends ilTableGUI
 	const FILTER_DATE_RANGE = 6;
 	const FILTER_DURATION_RANGE = 7;
 	const FILTER_DATETIME_RANGE = 8;
-	// patch uzk start
-	const FILTER_SELECT_MULTI = 99;
-	// patch uzk end
 
 	const EXPORT_EXCEL = 1;
 	const EXPORT_CSV = 2;
@@ -505,12 +499,6 @@ class ilTable2GUI extends ilTableGUI
 	*/
 	function getEnableNumInfo()
 	{
-		// patch uzk start
-		if((bool)$this->ajax_pages)
-		{
-			return false;
-		}
-		// patch uzk end
 		return $this->num_info;
 	}
 	
@@ -756,30 +744,12 @@ class ilTable2GUI extends ilTableGUI
 				$item->setComparisonMode(ilCombinationInputGUI::COMPARISON_ASCENDING);
 				break;
 			
-			// patch uzk start
-			case self::FILTER_SELECT_MULTI:
-				include_once("./Services/Form/classes/class.ilMultiSelectInputGUI.php");
-				$item = new ilMultiSelectInputGUI($caption, $id);								
-				break;
-			// patch uzk end
-			
 			default:
 				return false;
 		}
 
 		$this->addFilterItem($item, $a_optional);
-		
-	   // patch uzk start		
-		if(!(bool)$this->persistent_filters)
-		{
-		    $item->readFromSession();		
-		}
-		else
-		{
-			$item-> unserializeData($this->loadProperty($this->persistent_filters.$item->getPostVar()));
-		}			
-		// patch uzk 
-		
+	    $item->readFromSession();
 		return $item;
 	}
 	
@@ -929,10 +899,7 @@ class ilTable2GUI extends ilTableGUI
 				else
 				{
 					$item->setValue(NULL);
-					
-					// patch uzk start
-					$this->persistFilter($item);
-					// patch uzk end
+					$item->writeToSession();
 				}
 			}
 			else if ($stored)	// take stored values
@@ -1225,10 +1192,10 @@ class ilTable2GUI extends ilTableGUI
 	
 	/**
 	 * Add Command button instance
-	 * 
-	 * @param ilButton $a_button
+	  
+	 * @param ilButtonBase $a_button
 	 */
-	function addCommandButtonInstance(ilButton $a_button)
+	function addCommandButtonInstance(ilButtonBase $a_button)
 	{
 		$this->buttons[] = $a_button;
 	}
@@ -1339,7 +1306,7 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 	 * @param	string		Width string
 	 */
 	final public function addColumn($a_text, $a_sort_field = "", $a_width = "",
-		$a_is_checkbox_action_column = false, $a_class = "", $a_tooltip = "")
+		$a_is_checkbox_action_column = false, $a_class = "", $a_tooltip = "", $a_tooltip_with_html = false)
 	{
 		$this->column[] = array(
 			"text" => $a_text,
@@ -1347,7 +1314,8 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 			"width" => $a_width,
 			"is_checkbox_action_column" => $a_is_checkbox_action_column,
 			"class" => $a_class,
-			"tooltip" => $a_tooltip
+			"tooltip" => $a_tooltip,
+			"tooltip_html" => (bool)$a_tooltip_with_html
 			);
 		if ($a_sort_field != "")
 		{
@@ -1416,12 +1384,12 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 		foreach ((array) $this->column as $column)
 		{
 			$ccnt++;
-			
 			//tooltip
 			if ($column["tooltip"] != "")
-			{
+			{				
 				include_once("./Services/UIComponent/Tooltip/classes/class.ilTooltipGUI.php");
-				ilTooltipGUI::addTooltip("thc_".$this->getId()."_".$ccnt, $column["tooltip"]);
+				ilTooltipGUI::addTooltip("thc_".$this->getId()."_".$ccnt, $column["tooltip"], 
+					"", "bottom center", "top center", !$column["tooltip_html"]);
 			}
 			if (!$this->enabled["sort"] || $column["sort_field"] == "" || $column["is_checkbox_action_column"])
 			{
@@ -1429,6 +1397,10 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 				if ($column["width"] != "")
 				{
 					$this->tpl->setVariable("TBL_COLUMN_WIDTH_NO_LINK"," width=\"".$column["width"]."\"");
+				}
+				if ($column["class"] != "")
+				{
+					$this->tpl->setVariable("TBL_COLUMN_CLASS_NO_LINK"," class=\"".$column["class"]."\"");
 				}
 				if (!$column["is_checkbox_action_column"])
 				{
@@ -1441,7 +1413,6 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 						ilUtil::img(ilUtil::getImagePath("spacer.png"), $lng->txt("action")));
 				}
 				$this->tpl->setVariable("HEAD_CELL_NL_ID", "thc_".$this->getId()."_".$ccnt);
-				
 				if ($column["class"] != "")
 				{
 					$this->tpl->setVariable("TBL_HEADER_CLASS"," " . $column["class"]);
@@ -1473,6 +1444,10 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 			if ($column["width"] != "")
 			{
 				$this->tpl->setVariable("TBL_COLUMN_WIDTH"," width=\"".$column["width"]."\"");
+			}
+			if ($column["class"] != "")
+			{
+				$this->tpl->setVariable("TBL_COLUMN_CLASS"," class=\"".$column["class"]."\"");
 			}
 
 			$lng_sort_column = $this->lng->txt("sort_by_this_column");
@@ -1520,14 +1495,6 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 		{
 			return true;
 		}
-		
-		// patch uzk start
-		global $ilCtrl;
-		if((bool)$this->ajax_pages && !$ilCtrl->isAsynch())
-		{
-			$this->storeProperty("offset", 0);
-		}
-		// patch uzk end
 
 		if ($_POST[$this->getNavParameter()."1"] != "")
 		{
@@ -1543,16 +1510,6 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 		elseif($_GET[$this->getNavParameter()])
 		{
 			$this->nav_value = $_GET[$this->getNavParameter()];
-			
-			// patch uzk start
-			if($this->nav_value == "ajx")
-			{
-				$this->nav_value =
-					$this->loadProperty("order").":".
-					$this->loadProperty("direction").":".
-					($this->loadProperty("offset")+$this->getLimit());	
-			};
-			// patch uzk end
 		}
 		elseif($_SESSION[$this->getNavParameter()] != "")
 		{
@@ -1748,43 +1705,6 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 			$this->tpl->parseCurrentBlock();			
 		}
 
-		// patch uzk start
-		if((bool)$this->ajax_pages)
-		{
-			if($ilCtrl->isAsynch())
-			{		
-				if($this->getOffset())
-				{
-					$this->storeNavParameter();
-
-					$rows = $this->tpl->get("tbl_content");
-					if($rows)
-					{					
-						$rows .= '<tr id="tblap_'.$this->getId().'"><td><a name="'.$this->getId().'_btm"></a><td></tr>';					
-					}			
-					// final "page": buttons are to be removed
-					if($this->getOffset()+$this->getLimit() >= sizeof($this->row_data))
-					{
-						$rows .= "---";
-					}
-					echo $rows;										
-				}
-				// empty response
-				else
-				{
-					echo "---";
-				}
-				exit();
-			}	
-			else
-			{
-				$this->tpl->setCurrentBlock("tbl_ajax_pages_bl");
-				$this->tpl->setVariable("TBL_AJAX_TARGET_ID", "tblap_".$this->getId());
-				$this->tpl->setVariable("TBL_BOTTOM_ANCHOR", $this->getId()."_btm");
-				$this->tpl->parseCurrentBlock();		
-			}
-		}
-		// patch uzk end
 
 		if(!$this->getPrintMode())
 		{
@@ -2078,37 +1998,68 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 	}
 	
 	/**
+	 * Check if filter element is based on adv md
+	 * 
+	 * @param ilAdvancedMDRecordGUI $a_gui
+	 * @param type $a_element
+	 * @return boolean
+	 */
+	protected function isAdvMDFilter(ilAdvancedMDRecordGUI $a_gui, $a_element)
+	{		
+		foreach($a_gui->getFilterElements(false) as $item)
+		{
+			if($item === $a_element)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
 	* Write filter values to session
 	*/
 	public function writeFilterToSession()
-	{
-		global $lng;
-		
-		$filter = $this->getFilterItems();
-		$opt_filter = $this->getFilterItems(true);
-		
-		foreach ($filter as $item)
+	{				
+		$advmd_record_gui = null;
+		if(method_exists($this, "getAdvMDRecordGUI"))
 		{
+			$advmd_record_gui = $this->getAdvMDRecordGUI();
+		}
+	
+		foreach ($this->getFilterItems() as $item)
+		{				
+			if($advmd_record_gui &&
+				$this->isAdvMDFilter($advmd_record_gui, $item))
+			{
+				continue;
+			}					
+			
 			if ($item->checkInput())
 			{
 				$item->setValueByArray($_POST);
-				
-				// patch uzk start
-				$this->persistFilter($item);
-				// patch uzk end
+				$item->writeToSession();
 			}
 		}
-		foreach ($opt_filter as $item)
+		foreach ($this->getFilterItems(true) as $item)
 		{
+			if($advmd_record_gui &&
+				$this->isAdvMDFilter($advmd_record_gui, $item))
+			{
+				continue;
+			}	
+			
 			if ($item->checkInput())
 			{
 				$item->setValueByArray($_POST);
-				
-				// patch uzk start
-				$this->persistFilter($item);
-				// patch uzk end
+				$item->writeToSession();
 			}
 		}
+		
+		if($advmd_record_gui)
+		{	
+			$advmd_record_gui->importFilter();
+		}	
 		
 		// #13209
 		unset($_REQUEST["tbltplcrt"]);
@@ -2130,10 +2081,7 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 			if ($item->checkInput())
 			{
 				$item->setValueByArray($_POST);
-				
-				// patch uzk start
-				$this->resetFilterItem($item);
-				// patch uzk end
+				$item->clearFromSession();
 			}
 		}
 		foreach ($opt_filter as $item)
@@ -2141,10 +2089,7 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 			if ($item->checkInput())
 			{
 				$item->setValueByArray($_POST);
-				
-				// patch uzk start
-				$this->resetFilterItem($item);
-				// patch uzk end
+				$item->clearFromSession();
 			}
 		}
 		
@@ -2423,7 +2368,7 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 				if ($this->getShowRowsSelector() && 
 					is_object($ilUser) &&
 					$this->getId() &&
-					$this->getLimit() < 9999) // JF, 2014-10-27
+					!$this->rows_selector_off) // JF, 2014-10-27
 				{
 					include_once("./Services/UIComponent/AdvancedSelectionList/classes/class.ilAdvancedSelectionListGUI.php");
 					$alist = new ilAdvancedSelectionListGUI();
@@ -2485,21 +2430,6 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 	function getLinkbar($a_num)
 	{
 		global $ilCtrl, $lng, $ilUser;
-		
-		// patch uzk start
-		if((bool)$this->ajax_pages)
-		{			
-			// see below
-			$pages = ceil($this->max_count/$this->getLimit());	
-			if($pages > 1)
-			{								
-				$ajax_url = $ilCtrl->getLinkTarget($this->getParentObject(), $this->getParentCmd(), "", true, false).
-					"&".$this->getNavParameter()."=ajx";
-				return '<a id="apldr_'.$this->getId().'_'.$a_num.'" href="#'.$this->getId().'_btm" class="btn btn-default" onclick="ilTableAjaxPages(\''.$ajax_url.'\', \''.$this->getId().'\')">'.$lng->txt("tbl_more").'</a>';				
-			}
-			return;
-		}
-		// patch uzk end
 
 		$hash = "";
 		if (is_object($ilUser) && $ilUser->getPref("screen_reader_optimization"))
@@ -2521,9 +2451,7 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 			$sep = "<span>&nbsp;&nbsp;|&nbsp;&nbsp;</span>";
 
 			// calculate number of pages
-			// patch uzk start
-			$pages = ceil($this->max_count / $this->getLimit());
-			// patch uzk end
+			$pages = intval($this->max_count / $this->getLimit());
 
 			// add a page if a rest remains
 			if (($this->max_count % $this->getLimit()))
@@ -2682,7 +2610,7 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 			{
 				if(!is_array($button))
 				{
-					if($button instanceof ilButton)
+					if($button instanceof ilButtonBase)
 					{	
 						$this->tpl->setVariable('BUTTON_OBJ', $button->render());	
 						
@@ -3004,10 +2932,7 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 		{
 			$a_item->setDate(new ilDate($a_value, IL_CAL_DATE));
 		}
-		
-		// patch uzk start
-		$this->persistFilter($a_item);
-		// patch uzk end
+		$a_item->writeToSession();
 	}
 
 	/**
@@ -3496,43 +3421,17 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 		return $this->prevent_double_submission;
 	}
 	
-	// patch uzk start
-	
-	public function enablePersistentFilters($a_value)
+	function setLimit($a_limit = 0, $a_default_limit = 0)
 	{
-		$this->persistent_filters = $a_value;
-	}
-	
-	protected function persistFilter(ilFormPropertyGUI $a_item)
-	{
-		if(!(bool)$this->persistent_filters)
-		{
-			$a_item->writeToSession();
-		}
-		else
-		{			
-			$this->storeProperty($this->persistent_filters.$a_item->getPostVar(), $a_item->serializeData());
+		parent::setLimit($a_limit, $a_default_limit);
+		
+		// #17077 - if limit is set "manually" to 9999, force rows selector off
+		if($a_limit == 9999 &&
+			$this->limit_determined)
+		{		
+			$this->rows_selector_off = true;
 		}
 	}
-	
-	protected function resetFilterItem(ilFormPropertyGUI $a_item)
-	{
-		if(!(bool)$this->persistent_filters)
-		{
-			$a_item->clearFromSession();
-		}
-		else
-		{			
-			$this->storeProperty($this->persistent_filters.$a_item->getPostVar(), serialize(null));
-		}
-	}		
-	
-	public function setAjaxPages($a_value)
-	{
-		$this->ajax_pages = (bool)$a_value;
-	}
-	
-	// patch uzk end
 }
 
 ?>

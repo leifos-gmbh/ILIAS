@@ -182,6 +182,7 @@ class ilLDAPUserSynchronisation
 		
 		include_once './Services/LDAP/classes/class.ilLDAPRoleAssignmentRules.php';
 		$roles = ilLDAPRoleAssignmentRules::getAssignmentsForCreation(
+			$this->getServer()->getServerId(),
 			$this->getExternalAccount(),
 			$this->getUserData()
 		);
@@ -210,6 +211,7 @@ class ilLDAPUserSynchronisation
 
 		include_once 'Services/LDAP/classes/class.ilLDAPAttributeToUser.php';
 		$update = new ilLDAPAttributeToUser($this->getServer());
+		// begin-patch 
 		$update->setNewUserAuthMode($this->getAuthMode());
 		$update->setUserData(
 			array(

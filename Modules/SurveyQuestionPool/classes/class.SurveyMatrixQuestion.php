@@ -1168,7 +1168,7 @@ class SurveyMatrixQuestion extends SurveyQuestion
 					array($next_id, $this->getId(), $active_id, $item['value'], $item['textanswer'], $item['rowvalue'], time())
 				);						
 			}			
-		}
+		}		
 	}
 
 	/**
@@ -1203,11 +1203,11 @@ class SurveyMatrixQuestion extends SurveyQuestion
 			" FROM svy_answer".
 			" JOIN svy_finished ON (svy_finished.finished_id = svy_answer.active_fi)".
 			" WHERE svy_answer.question_fi = ".$ilDB->quote($this->getId(), "integer").
-			" AND svy_finished.survey_fi = ".$ilDB->quote($survey_id, "integer");				
+			" AND svy_finished.survey_fi = ".$ilDB->quote($survey_id, "integer");		
 		if($finished_ids)
 		{
 			$sql .= " AND ".$ilDB->in("svy_finished.finished_id", $finished_ids, "", "integer");
-		}				
+		}		
 		if($rowindex)
 		{
 			$sql .= " AND rowvalue = ".$ilDB->quote($rowindex, "integer");
@@ -1273,7 +1273,7 @@ class SurveyMatrixQuestion extends SurveyQuestion
 				end($cumulated);
 				break;
 		}
-		$numrows = $result->numRows();		
+		$numrows = $result->numRows();
 		$result_array["USERS_ANSWERED"] = $this->getNrOfUsersAnswered($survey_id, $finished_ids, $rowindex);
 		$result_array["USERS_SKIPPED"] = $nr_of_users - $result_array["USERS_ANSWERED"];
 
@@ -1575,7 +1575,7 @@ class SurveyMatrixQuestion extends SurveyQuestion
 			array_push($csvrow, $evalvalue["USERS_SKIPPED"]);
 			array_push($csvrow, $evalvalue["MODE"]);
 			array_push($csvrow, $evalvalue["MODE_NR_OF_SELECTIONS"]);
-			array_push($csvrow, $evalvalue["MEDIAN"]);
+			array_push($csvrow, str_replace("<br />", " ", $evalvalue["MEDIAN"])); // #17214
 			array_push($csvrow, $evalvalue["ARITHMETIC_MEAN"]);
 			array_push($result, $csvrow);
 		}
@@ -1641,7 +1641,7 @@ class SurveyMatrixQuestion extends SurveyQuestion
 		$worksheet->write($rowcounter, 1, ilExcelUtils::_convert_text($this->lng->txt("title")), $format_title);
 		$worksheet->write($rowcounter, 2, ilExcelUtils::_convert_text($this->lng->txt("value")), $format_title);
 		$worksheet->write($rowcounter, 3, ilExcelUtils::_convert_text($this->lng->txt("category_nr_selected")), $format_title);
-		$worksheet->write($rowcounter++, 4, ilExcelUtils::_convert_text($this->lng->txt("percentage_of_selections")), $format_title);
+		$worksheet->write($rowcounter++, 4, ilExcelUtils::_convert_text($this->lng->txt("svy_fraction_of_selections")), $format_title);
 
 		foreach ($eval_data["TOTAL"]["variables"] as $key => $value)
 		{
@@ -1676,7 +1676,7 @@ class SurveyMatrixQuestion extends SurveyQuestion
 				$worksheet->write($rowcounter, 1, ilExcelUtils::_convert_text($this->lng->txt("title")), $format_title);
 				$worksheet->write($rowcounter, 2, ilExcelUtils::_convert_text($this->lng->txt("value")), $format_title);
 				$worksheet->write($rowcounter, 3, ilExcelUtils::_convert_text($this->lng->txt("category_nr_selected")), $format_title);
-				$worksheet->write($rowcounter++, 4, ilExcelUtils::_convert_text($this->lng->txt("percentage_of_selections")), $format_title);
+				$worksheet->write($rowcounter++, 4, ilExcelUtils::_convert_text($this->lng->txt("svy_fraction_of_selections")), $format_title);
 		
 				foreach ($evalvalue["variables"] as $key => $value)
 				{

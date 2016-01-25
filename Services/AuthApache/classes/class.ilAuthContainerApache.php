@@ -141,12 +141,15 @@ class ilAuthContainerApache extends Auth_Container
 								if(!$user_data['ilInternalAccount'] && $this->server->isAccountMigrationEnabled() && !self::$force_creation)
 								{
 									$this->_auth_obj->logout();
-									$_SESSION['tmp_auth_mode']        = 'ldap';
+									$_SESSION['tmp_auth_mode']        = 'apache';
 									$_SESSION['tmp_external_account'] = $a_username;
 									$_SESSION['tmp_pass']             = $_POST['password'];
 
 									include_once('./Services/LDAP/classes/class.ilLDAPRoleAssignmentRules.php');
-									$roles                 = ilLDAPRoleAssignmentRules::getAssignmentsForCreation($a_username, $user_data);
+									$roles = ilLDAPRoleAssignmentRules::getAssignmentsForCreation(
+										$this->server->getServerId(),
+										$a_username,
+										$user_data);
 									$_SESSION['tmp_roles'] = array();
 									foreach($roles as $info)
 									{

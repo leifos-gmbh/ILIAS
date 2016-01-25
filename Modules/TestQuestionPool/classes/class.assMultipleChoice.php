@@ -7,6 +7,7 @@ require_once './Modules/TestQuestionPool/interfaces/interface.ilObjQuestionScori
 require_once './Modules/TestQuestionPool/interfaces/interface.ilObjAnswerScoringAdjustable.php';
 require_once './Modules/TestQuestionPool/interfaces/interface.iQuestionCondition.php';
 require_once './Modules/TestQuestionPool/classes/class.ilUserQuestionResult.php';
+require_once 'Modules/TestQuestionPool/interfaces/interface.ilAssSpecificFeedbackOptionLabelProvider.php';
 
 /**
  * Class for multiple choice tests.
@@ -23,7 +24,7 @@ require_once './Modules/TestQuestionPool/classes/class.ilUserQuestionResult.php'
  * 
  * @ingroup		ModulesTestQuestionPool
  */
-class assMultipleChoice extends assQuestion implements ilObjQuestionScoringAdjustable, ilObjAnswerScoringAdjustable, iQuestionCondition
+class assMultipleChoice extends assQuestion implements ilObjQuestionScoringAdjustable, ilObjAnswerScoringAdjustable, iQuestionCondition, ilAssSpecificFeedbackOptionLabelProvider
 {
 	/**
 	 * The given answers of the multiple choice question
@@ -565,7 +566,7 @@ class assMultipleChoice extends assQuestion implements ilObjQuestionScoringAdjus
 	 * @throws ilTestException
 	 * @return integer|array $points/$details (array $details is deprecated !!)
 	 */
-	public function calculateReachedPoints($active_id, $pass = NULL, $returndetails = FALSE)
+	public function calculateReachedPoints($active_id, $pass = NULL, $authorizedSolution = true, $returndetails = FALSE)
 	{
 		if( $returndetails )
 		{
@@ -579,7 +580,7 @@ class assMultipleChoice extends assQuestion implements ilObjQuestionScoringAdjus
 		{
 			$pass = $this->getSolutionMaxPass($active_id);
 		}
-		$result = $this->getCurrentSolutionResultSet($active_id, $pass);
+		$result = $this->getCurrentSolutionResultSet($active_id, $pass, $authorizedSolution);
 		while ($data = $ilDB->fetchAssoc($result))
 		{
 			if (strcmp($data["value1"], "") != 0)
@@ -601,7 +602,7 @@ class assMultipleChoice extends assQuestion implements ilObjQuestionScoringAdjus
 	 *                      
 	 * @return boolean $status
 	 */
-	public function saveWorkingData($active_id, $pass = NULL)
+	public function saveWorkingData($active_id, $pass = NULL, $authorized = true)
 	{
 		/** @var $ilDB ilDB */
 		global $ilDB;
@@ -616,7 +617,7 @@ class assMultipleChoice extends assQuestion implements ilObjQuestionScoringAdjus
 		
 		$this->getProcessLocker()->requestUserSolutionUpdateLock();
 
-		$this->removeCurrentSolution($active_id, $pass);
+		$this->removeCurrentSolution($active_id, $pass, $authorized);
 
 		$solutionSubmit = $this->getSolutionSubmit();
 		
@@ -624,7 +625,7 @@ class assMultipleChoice extends assQuestion implements ilObjQuestionScoringAdjus
 		{
 			if (strlen($value))
 			{
-				$this->saveCurrentSolution($active_id, $pass, $value, null);
+				$this->saveCurrentSolution($active_id, $pass, $value, null, $authorized);
 				$entered_values++;
 			}
 		}
@@ -1137,6 +1138,11 @@ class assMultipleChoice extends assQuestion implements ilObjQuestionScoringAdjus
 			return 1;
 		}
 	}
+
+	public function getSpecificFeedbackAllCorrectOptionLabel()
+	{
+		return 'feedback_correct_sc_mc';
+	}
 	
 	/**
 	 * returns boolean wether the question
@@ -1149,7 +1155,7 @@ class assMultipleChoice extends assQuestion implements ilObjQuestionScoringAdjus
 	 * 
 	 * @return boolean $answered
 	 */
-	public function isAnswered($active_id, $pass)
+	public function isAnswered($active_id, $pass = NULL)
 	{
 		$numExistingSolutionRecords = assQuestion::getNumExistingSolutionRecords($active_id, $pass, $this->getId());
 
@@ -1332,13 +1338,24 @@ class assMultipleChoice extends assQuestion implements ilObjQuestionScoringAdjus
 		global $ilDB;
 		$result = new ilUserQuestionResult($this, $active_id, $pass);
 
-		$data = $ilDB->queryF(
-			"SELECT value1+1 as value1 FROM tst_solutions WHERE active_fi = %s AND pass = %s AND question_fi = %s AND step = (
-				SELECT MAX(step) FROM tst_solutions WHERE active_fi = %s AND pass = %s AND question_fi = %s
-			)",
-			array("integer", "integer", "integer","integer", "integer", "integer"),
-			array($active_id, $pass, $this->getId(), $active_id, $pass, $this->getId())
-		);
+		$maxStep = $this->lookupMaxStep($active_id, $pass);
+
+		if( $maxStep !== null )
+		{
+			$data = $ilDB->queryF(
+				"SELECT value1+1 as value1 FROM tst_solutions WHERE active_fi = %s AND pass = %s AND question_fi = %s AND step = %s",
+				array("integer", "integer", "integer","integer"),
+				array($active_id, $pass, $this->getId(), $maxStep)
+			);
+		}
+		else
+		{
+			$data = $ilDB->queryF(
+				"SELECT value1+1 as value1 FROM tst_solutions WHERE active_fi = %s AND pass = %s AND question_fi = %s",
+				array("integer", "integer", "integer"),
+				array($active_id, $pass, $this->getId())
+			);
+		}
 
 		while($row = $ilDB->fetchAssoc($data))
 		{

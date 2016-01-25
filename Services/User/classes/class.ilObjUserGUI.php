@@ -449,13 +449,17 @@ class ilObjUserGUI extends ilObjectGUI
 			{
 				$userObj->setPref("hits_per_page", $_POST["hits_per_page"]);
 			}
-			if($this->isSettingChangeable('show_users_online'))
+			/*if($this->isSettingChangeable('show_users_online'))
 			{
 				$userObj->setPref("show_users_online", $_POST["show_users_online"]);
-			}
+			}*/
 			if($this->isSettingChangeable('hide_own_online_status'))
 			{
 				$userObj->setPref("hide_own_online_status", $_POST["hide_own_online_status"] ? 'y' : 'n');
+			}
+			if($this->isSettingChangeable('bs_allow_to_contact_me'))
+			{
+				$userObj->setPref('bs_allow_to_contact_me', $_POST['bs_allow_to_contact_me'] ? 'y' : 'n');
 			}
 			if((int)$ilSetting->get('session_reminder_enabled'))
 			{
@@ -880,13 +884,17 @@ class ilObjUserGUI extends ilObjectGUI
 			{
 				$this->object->setPref("hits_per_page", $_POST["hits_per_page"]);
 			}
-			if($this->isSettingChangeable('show_users_online'))
+			/*if($this->isSettingChangeable('show_users_online'))
 			{
 				$this->object->setPref("show_users_online", $_POST["show_users_online"]);
-			}
+			}*/
 			if($this->isSettingChangeable('hide_own_online_status'))
 			{
 				$this->object->setPref("hide_own_online_status", $_POST["hide_own_online_status"] ? 'y' : 'n');
+			}
+			if($this->isSettingChangeable('bs_allow_to_contact_me'))
+			{
+				$this->object->setPref('bs_allow_to_contact_me', $_POST['bs_allow_to_contact_me'] ? 'y' : 'n');
 			}
 
 			// set a timestamp for last_password_change
@@ -1075,8 +1083,9 @@ class ilObjUserGUI extends ilObjectGUI
 		$data["language"] = $this->object->getLanguage();
 		$data["skin_style"] = $this->object->skin.":".$this->object->prefs["style"];
 		$data["hits_per_page"] = $this->object->prefs["hits_per_page"];
-		$data["show_users_online"] = $this->object->prefs["show_users_online"];
+		//$data["show_users_online"] = $this->object->prefs["show_users_online"];
 		$data["hide_own_online_status"] = $this->object->prefs["hide_own_online_status"] == 'y';
+		$data['bs_allow_to_contact_me'] = $this->object->prefs['bs_allow_to_contact_me'] == 'y';
 		$data["session_reminder_enabled"] = (int)$this->object->prefs["session_reminder_enabled"];
 
 		$this->form_gui->setValuesByArray($data);
@@ -1122,7 +1131,12 @@ class ilObjUserGUI extends ilObjectGUI
 			}
 			else
 			{
-				$name = $this->lng->txt('auth_'.$auth_name);
+				// begin-patch ldap_multiple
+				#$name = $this->lng->txt('auth_'.$auth_name);
+				include_once './Services/Authentication/classes/class.ilAuthUtils.php';
+				$name = ilAuthUtils::getAuthModeTranslation($auth_key);
+				// end-patch ldap_multiple
+				
 			}
 			$option[$auth_name] = $name;
 		}
@@ -1166,7 +1180,7 @@ class ilObjUserGUI extends ilObjectGUI
 		{
 			$pw = new ilPasswordInputGUI($lng->txt("passwd"), "passwd");
 			$pw->setSize(32);
-			$pw->setMaxLength(32);
+			$pw->setMaxLength(80); // #17221
 			$pw->setValidateAuthPost("auth_mode");
 			if ($a_mode == "create")
 			{
@@ -1575,6 +1589,7 @@ class ilObjUserGUI extends ilObjectGUI
 			if($this->isSettingChangeable('instant_messengers'))
 			{
 				$im = new ilTextInputGUI($lng->txt("im_".$field), "im_".$field);
+				$im->setRequired(isset($settings["require_instant_messengers"]) && $settings["require_instant_messengers"]);
 				$im->setSize(40);
 				$im->setMaxLength(40);
 				$this->form_gui->addItem($im);
@@ -1664,7 +1679,8 @@ class ilObjUserGUI extends ilObjectGUI
 			$this->isSettingChangeable( 'language') or
 			$this->isSettingChangeable( 'skin_style') or
 			$this->isSettingChangeable( 'hits_per_page') or
-			$this->isSettingChangeable( 'hide_own_online_status')
+			$this->isSettingChangeable( 'hide_own_online_status') or
+			$this->isSettingChangeable( 'bs_allow_to_contact_me')
 		)
 		{
 			$sec_st = new ilFormSectionHeaderGUI();
@@ -1747,7 +1763,7 @@ class ilObjUserGUI extends ilObjectGUI
 			$this->form_gui->addItem($hpp);
 	
 			// users online
-			$uo = new ilSelectInputGUI($lng->txt("users_online"),
+			/*$uo = new ilSelectInputGUI($lng->txt("users_online"),
 				'show_users_online');
 			$options = array(
 				"y" => $lng->txt("users_online_show_y"),
@@ -1755,13 +1771,22 @@ class ilObjUserGUI extends ilObjectGUI
 				"n" => $lng->txt("users_online_show_n"));
 			$uo->setOptions($options);
 			$uo->setValue($ilSetting->get("show_users_online"));
-			$this->form_gui->addItem($uo);
+			$this->form_gui->addItem($uo);*/
 		}
 
 		// hide online status
 		if($this->isSettingChangeable('hide_own_online_status'))
 		{
-			$os = new ilCheckboxInputGUI($lng->txt("hide_own_online_status"), "hide_own_online_status");
+			$lng->loadLanguageModule("awrn");
+			$os = new ilCheckboxInputGUI($lng->txt("awrn_hide_from_awareness"), "hide_own_online_status");
+			$this->form_gui->addItem($os);
+		}
+
+		// allow to contact me
+		if($this->isSettingChangeable('bs_allow_to_contact_me'))
+		{
+			$lng->loadLanguageModule('buddysystem');
+			$os = new ilCheckboxInputGUI($lng->txt('buddy_allow_to_contact_me'), 'bs_allow_to_contact_me');
 			$this->form_gui->addItem($os);
 		}
 
@@ -2422,13 +2447,22 @@ class ilObjUserGUI extends ilObjectGUI
 		// set hits per pages
 		$this->object->setPref("hits_per_page", $_POST["Fobject"]["hits_per_page"]);
 		// set show users online
-		$this->object->setPref("show_users_online", $_POST["Fobject"]["show_users_online"]);
+		//$this->object->setPref("show_users_online", $_POST["Fobject"]["show_users_online"]);
 		// set hide_own_online_status
 		if ($_POST["Fobject"]["hide_own_online_status"]) {
 			$this->object->setPref("hide_own_online_status", $_POST["Fobject"]["hide_own_online_status"]);
 		}
 		else {
 			$this->object->setPref("hide_own_online_status", "n");
+		}
+		// set allow to contact me
+		if(isset($_POST['Fobject']['bs_allow_to_contact_me']) && $_POST['Fobject']['bs_allow_to_contact_me'] == 1)
+		{
+			$this->object->setPref('bs_allow_to_contact_me', 'y');
+		}
+		else
+		{
+			$this->object->setPref('bs_allow_to_contact_me', 'n');
 		}
 
 		$this->update = $this->object->update();
@@ -2941,7 +2975,19 @@ class ilObjUserGUI extends ilObjectGUI
 			$a_target = ilObjUser::_lookupId(ilUtil::stripSlashes(substr($a_target, 1)));
 		}
 
-		$_GET["cmd"] = "view";
+		if(strpos($a_target, 'contact_approved') !== false)
+		{
+			$_GET['cmd'] = 'approveContactRequest';
+		}
+		else if(strpos($a_target, 'contact_ignored') !== false)
+		{
+			$_GET['cmd'] = 'ignoreContactRequest';
+		}
+		else
+		{
+			$_GET['cmd'] = 'view';
+		}
+
 		$_GET["user_id"] = (int) $a_target;
 		$_GET["baseClass"] = "ilPublicUserProfileGUI";
 		$_GET["cmdClass"] = "ilpublicuserprofilegui";

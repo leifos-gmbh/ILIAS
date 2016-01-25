@@ -88,12 +88,12 @@ class ilTrQuery
 		}
 	}
 
-	function getObjectivesStatusForUser($a_user_id, array $a_objective_ids)
+	function getObjectivesStatusForUser($a_user_id, $a_obj_id, array $a_objective_ids)
 	{
 		global $ilDB;
 						
 		include_once "Modules/Course/classes/Objectives/class.ilLOUserResults.php";								
-		$lo_lp_status = ilLOUserResults::getObjectiveStatusForLP($a_user_id, $a_objective_ids);
+		$lo_lp_status = ilLOUserResults::getObjectiveStatusForLP($a_user_id, $a_obj_id, $a_objective_ids);
 		
 		$query =  "SELECT crs_id, crs_objectives.objective_id AS obj_id, title,".$ilDB->quote("lobj", "text")." AS type".
 			" FROM crs_objectives".			
@@ -193,7 +193,8 @@ class ilTrQuery
 		
 		switch(ilObject::_lookupType($a_parent_obj_id))
 		{
-			case "lm":				
+			case "lm":	
+			case "mcst":	
 				include_once './Services/Object/classes/class.ilObjectLP.php';
 				$olp = ilObjectLP::getInstance($a_parent_obj_id);
 				$collection = $olp->getCollectionInstance();
@@ -236,7 +237,7 @@ class ilTrQuery
 			$items[$item_id] = array(
 				"title" => $item_data[$item_id]["title"],
 				"status" => $status,
-				"type" => "st"
+				"type" => self::getSubItemType($a_parent_obj_id)		
 				);						
 		}
 		
@@ -459,7 +460,7 @@ class ilTrQuery
 		$queries = array();
 		$queries[] = array("fields"=>$fields, "query"=>$query);
 
-		// objectives data 
+		/* objectives data 
 		if($objects["objectives_parent_id"])
 		{
 			$objective_fields = array("crs_objectives.objective_id AS obj_id", "title",
@@ -477,11 +478,15 @@ class ilTrQuery
 				}
 				else
 				{
+					// #15873 - see ilLOUserResults::getObjectiveStatusForLP()
 		            include_once("Services/Tracking/classes/class.ilLPStatus.php");
 					$objective_fields[] = "CASE WHEN status = ".$ilDB->quote(ilLOUserResults::STATUS_COMPLETED, "integer").
 						" THEN ".ilLPStatus::LP_STATUS_COMPLETED_NUM.
-						" WHEN status = ".$ilDB->quote(ilLOUserResults::STATUS_FAILED, "integer").
+						" WHEN (status = ".$ilDB->quote(ilLOUserResults::STATUS_FAILED, "integer").
+						" AND is_final = ".$ilDB->quote(1, "integer").")".
 						" THEN ".ilLPStatus::LP_STATUS_FAILED_NUM.
+						" WHEN status = ".$ilDB->quote(ilLOUserResults::STATUS_FAILED, "integer").
+						" THEN ".ilLPStatus::LP_STATUS_IN_PROGRESS_NUM.
 						" ELSE NULL END AS status";
 				}
 			  }
@@ -499,6 +504,7 @@ class ilTrQuery
 			
 			$queries[] = array("fields"=>$objective_fields, "query"=>$objectives_query, "count"=>"crs_objectives.objective_id");
 		}
+		*/
 		
 		if(!in_array($a_order_field, $fields))
 		{
@@ -587,8 +593,59 @@ class ilTrQuery
 					$result["cnt"]++;
 				}
 			}
+			
+			// #15379 - objectives data 
+			if($objects["objectives_parent_id"])
+			{		
+				include_once "Modules/Course/classes/class.ilCourseObjective.php";
+				include_once "Modules/Course/classes/Objectives/class.ilLOUserResults.php";	
+				$objtv_ids = ilCourseObjective::_getObjectiveIds($objects["objectives_parent_id"], true);
+				foreach(self::getObjectivesStatusForUser($a_user_id, $objects["objectives_parent_id"], $objtv_ids) as $item)
+				{				
+					$result["set"][] = $item;
+					$result["cnt"]++;
+				}
+			}			
+			
+			// subitem data
+			if($objects["subitems"])
+			{
+				$sub_type = self::getSubItemType($a_parent_obj_id);			
+				foreach($objects["subitems"]["items"] as $item_id)
+				{				
+					$row = array("title" => $objects["subitems"]["item_titles"][$item_id],
+						"type" => $sub_type);
+					
+					$status = ilLPStatus::LP_STATUS_NOT_ATTEMPTED_NUM;
+					if(in_array($a_user_id, $objects["subitems"]["completed"][$item_id]))
+					{
+						$status = ilLPStatus::LP_STATUS_COMPLETED_NUM;
+					}					
+					$row["status"] = $status;
+										
+					$result["set"][] = $row;
+					$result["cnt"]++;
+				}				
+			}
 		}
 		return $result;
+	}
+	
+	/**
+	 * Get sub-item object type for parent
+	 * @param int $a_parent_obj_id
+	 * @return string
+	 */
+	public static function getSubItemType($a_parent_obj_id)
+	{
+		switch(ilObject::_lookupType($a_parent_obj_id))
+		{
+			case "lm":
+				return "st";
+				
+			case "mcst":
+				return "mob";
+		}
 	}
 
 	/**
@@ -917,6 +974,18 @@ class ilTrQuery
 				include_once "Services/Tracking/classes/class.ilLPStatusFactory.php";
 				$class = ilLPStatusFactory::_getClassById($obj_id, ilLPObjSettings::LP_MODE_TEST_FINISHED);
 				$a_users = $class::getParticipants($obj_id);
+				break;
+			
+			case "svy":
+				include_once "Services/Tracking/classes/class.ilLPStatusFactory.php";
+				$class = ilLPStatusFactory::_getClassById($obj_id, ilLPObjSettings::LP_MODE_SURVEY_FINISHED);
+				$a_users = $class::getParticipants($obj_id);				
+				break;
+				
+			case "prg":
+				include_once("Modules/StudyProgramme/classes/class.ilObjStudyProgramme.php");
+				$prg = new ilObjStudyProgramme($obj_id, false);
+				$a_users = $prg->getIdsOfUsersWithRelevantProgress();
 				break;
 			
 			default:
@@ -1278,15 +1347,11 @@ class ilTrQuery
 				}
 				break;
 				
-			case ilLPObjSettings::LP_MODE_COLLECTION_MANUAL:
-				include_once "Services/Tracking/classes/class.ilLPStatusFactory.php";
-				$status_coll_man = ilLPStatusFactory::_getInstance($a_parent_obj_id, ilLPObjSettings::LP_MODE_COLLECTION_MANUAL);
-				$subitems = $status_coll_man->_getStatusInfo($a_parent_obj_id);
-				break;
-				
+			case ilLPObjSettings::LP_MODE_COLLECTION_MANUAL:				
 			case ilLPObjSettings::LP_MODE_COLLECTION_TLT:
+			case ilLPObjSettings::LP_MODE_COLLECTION_MOBS:
 				include_once "Services/Tracking/classes/class.ilLPStatusFactory.php";
-				$status_coll_tlt = ilLPStatusFactory::_getInstance($a_parent_obj_id, ilLPObjSettings::LP_MODE_COLLECTION_TLT);
+				$status_coll_tlt = ilLPStatusFactory::_getInstance($a_parent_obj_id, $mode);
 				$subitems = $status_coll_tlt->_getStatusInfo($a_parent_obj_id);
 				break;
 				
@@ -1581,6 +1646,11 @@ class ilTrQuery
 			include_once "Modules/Course/classes/class.ilCourseObjective.php";
 			$objective_ids = ilCourseObjective::_getObjectiveIds($a_parent_obj_id,true);
 			
+			// #17402 - are initital test(s) qualifying?
+			include_once "Modules/Course/classes/Objectives/class.ilLOSettings.php";
+			$lo_set = ilLOSettings::getInstanceByObjId($a_parent_obj_id);
+			$initial_qualifying = $lo_set->isInitialTestQualifying();	
+			
 			// there may be missing entries for any user / objective combination
 			foreach($objective_ids as $objective_id)
 			{
@@ -1592,23 +1662,31 @@ class ilTrQuery
 			
 			$query = "SELECT * FROM loc_user_results".
 				" WHERE ".$ilDB->in("objective_id", $objective_ids, "", "integer").
-				" AND ".$ilDB->in("user_id", $a_users, "", "integer").
-				" AND type = ".$ilDB->quote(ilLOUserResults::TYPE_QUALIFIED, "integer");
+				" AND ".$ilDB->in("user_id", $a_users, "", "integer");
+			if(!(bool)$initial_qualifying)
+			{
+				$query .= " AND type = ".$ilDB->quote(ilLOUserResults::TYPE_QUALIFIED, "integer");
+			}	
+			$query .= " ORDER BY type"; // qualified must come last!
 			$set = $ilDB->query($query);
 			while($row = $ilDB->fetchAssoc($set))
 			{
 				$objective_id = $row["objective_id"];
 				$user_id = $row["user_id"];
 				
-				// see ilLOUserResults::getObjectiveStatusForLP()
+				// if both initial and qualified, qualified will overwrite initial
+				
+				// #15873 - see ilLOUserResults::getObjectiveStatusForLP()
 				if($row["status"] == ilLOUserResults::STATUS_COMPLETED)
 				{
 					$res[$user_id][$objective_id] = ilLPStatus::LP_STATUS_COMPLETED_NUM;
 				}
-				else
+				else if($row["status"] == ilLOUserResults::STATUS_FAILED)
 				{
-					$res[$user_id][$objective_id] = ilLPStatus::LP_STATUS_FAILED_NUM;
-				}
+					$res[$user_id][$objective_id] = $row["is_final"]
+						? ilLPStatus::LP_STATUS_FAILED_NUM
+						: ilLPStatus::LP_STATUS_IN_PROGRESS_NUM;					
+				}				
 			}
 			
 			return $res;						

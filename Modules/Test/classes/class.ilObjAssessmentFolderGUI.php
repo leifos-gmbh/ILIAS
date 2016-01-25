@@ -190,6 +190,17 @@ class ilObjAssessmentFolderGUI extends ilObjectGUI
 		$userCriteria->setValue($user_criteria);
 		$form->addItem($userCriteria);
 
+		$numRequiredAnswers = new ilNumberInputGUI(
+			$this->lng->txt('tst_skill_triggerings_num_req_answers'), 'num_req_answers'
+		);
+		$numRequiredAnswers->setInfo($this->lng->txt('tst_skill_triggerings_num_req_answers_desc'));
+		$numRequiredAnswers->setSize(4);
+		$numRequiredAnswers->allowDecimals(false);
+		$numRequiredAnswers->setMinValue(1);
+		$numRequiredAnswers->setMinvalueShouldBeGreater(false);
+		$numRequiredAnswers->setValue($this->object->getSkillTriggeringNumAnswersBarrier());
+		$form->addItem($numRequiredAnswers);
+
 		// question settings
 		$header = new ilFormSectionHeaderGUI();
 		$header->setTitle($this->lng->txt("assf_questiontypes"));
@@ -233,7 +244,7 @@ class ilObjAssessmentFolderGUI extends ilObjectGUI
 		$scoring = new ilCheckboxGroupInputGUI($this->lng->txt('assessment_log_scoring_adjustment_activate'), "chb_scoring_adjustment");
 		$scoring_active = $this->object->getScoringAdjustableQuestions();
 		$scoring->setValue($scoring_active);
-		foreach ($questiontypes as $type_name => $qtype)
+		foreach ($this->object->fetchScoringAdjustableTypes($questiontypes) as $type_name => $qtype)
 		{
 			$scoring->addOption(new ilCheckboxOption($type_name, $qtype["question_type_id"]));
 		}
@@ -263,6 +274,8 @@ class ilObjAssessmentFolderGUI extends ilObjectGUI
 			return $this->settingsObject($form);
 		}
 		
+		$this->object->setSkillTriggeringNumAnswersBarrier((int)$_POST['num_req_answers']);
+
 		$this->object->_setManualScoring($_POST["chb_manual_scoring"]);
 		include_once "./Modules/TestQuestionPool/classes/class.ilObjQuestionPool.php";
 		$questiontypes =& ilObjQuestionPool::_getQuestionTypes(TRUE);

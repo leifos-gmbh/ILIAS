@@ -4,6 +4,7 @@
 require_once 'Modules/TestQuestionPool/classes/class.assQuestion.php';
 require_once 'Modules/TestQuestionPool/interfaces/interface.ilObjQuestionScoringAdjustable.php';
 require_once 'Modules/TestQuestionPool/interfaces/interface.ilObjAnswerScoringAdjustable.php';
+require_once 'Modules/TestQuestionPool/interfaces/interface.ilAssSpecificFeedbackOptionLabelProvider.php';
 
 /**
  * @author		Björn Heyser <bheyser@databay.de>
@@ -11,7 +12,7 @@ require_once 'Modules/TestQuestionPool/interfaces/interface.ilObjAnswerScoringAd
  *
  * @package     Modules/TestQuestionPool
  */
-class assKprimChoice extends assQuestion implements ilObjQuestionScoringAdjustable, ilObjAnswerScoringAdjustable
+class assKprimChoice extends assQuestion implements ilObjQuestionScoringAdjustable, ilObjAnswerScoringAdjustable, ilAssSpecificFeedbackOptionLabelProvider
 {
 	const NUM_REQUIRED_ANSWERS = 4;
 	
@@ -389,7 +390,7 @@ class assKprimChoice extends assQuestion implements ilObjQuestionScoringAdjustab
 	 * @param integer $pass Test pass
 	 * @return boolean $status
 	 */
-	public function saveWorkingData($active_id, $pass = NULL)
+	public function saveWorkingData($active_id, $pass = NULL, $authorized = true)
 	{
 		/** @var $ilDB ilDB */
 		global $ilDB;
@@ -404,24 +405,13 @@ class assKprimChoice extends assQuestion implements ilObjQuestionScoringAdjustab
 
 		$this->getProcessLocker()->requestUserSolutionUpdateLock();
 
-		$ilDB->manipulateF("DELETE FROM tst_solutions WHERE active_fi = %s AND question_fi = %s AND pass = %s",
-			array('integer','integer','integer'),
-			array($active_id, $this->getId(), $pass)
-		);
+		$this->removeCurrentSolution($active_id, $pass, $authorized);
+
 		$solutionSubmit = $this->getSolutionSubmit();
 
 		foreach($solutionSubmit as $answerIndex => $answerValue)
 		{
-			$next_id = $ilDB->nextId('tst_solutions');
-			$ilDB->insert("tst_solutions", array(
-				"solution_id" => array("integer", $next_id),
-				"active_fi" => array("integer", $active_id),
-				"question_fi" => array("integer", $this->getId()),
-				"value1" => array("clob", (int)$answerIndex),
-				"value2" => array("clob", (int)$answerValue),
-				"pass" => array("integer", $pass),
-				"tstamp" => array("integer", time())
-			));
+			$this->saveCurrentSolution($active_id, $pass, (int)$answerIndex, (int)$answerValue, $authorized);
 			$entered_values++;
 		}
 
@@ -470,7 +460,7 @@ class assKprimChoice extends assQuestion implements ilObjQuestionScoringAdjustab
 	 * @param boolean $returndetails (deprecated !!)
 	 * @return integer/array $points/$details (array $details is deprecated !!)
 	 */
-	public function calculateReachedPoints($active_id, $pass = NULL, $returndetails = FALSE)
+	public function calculateReachedPoints($active_id, $pass = NULL, $authorizedSolution = true, $returndetails = FALSE)
 	{
 		if( $returndetails )
 		{
@@ -484,10 +474,9 @@ class assKprimChoice extends assQuestion implements ilObjQuestionScoringAdjustab
 		{
 			$pass = $this->getSolutionMaxPass($active_id);
 		}
-		$result = $ilDB->queryF("SELECT * FROM tst_solutions WHERE active_fi = %s AND question_fi = %s AND pass = %s",
-			array('integer','integer','integer'),
-			array($active_id, $this->getId(), $pass)
-		);
+		
+		$result = $this->getCurrentSolutionResultSet($active_id, $pass, $authorizedSolution);
+
 		while ($data = $ilDB->fetchAssoc($result))
 		{
 			$found_values[(int)$data['value1']] = (int)$data['value2'];
@@ -696,12 +685,12 @@ class assKprimChoice extends assQuestion implements ilObjQuestionScoringAdjustab
 		
 		if( file_exists($answer->getImageFsPath()) )
 		{
-			unlink($answer->getImageFsPath());
+			ilUtil::delDir($answer->getImageFsPath());
 		}
 		
 		if( file_exists($answer->getThumbFsPath()) )
 		{
-			unlink($answer->getThumbFsPath());
+			ilUtil::delDir($answer->getThumbFsPath());
 		}
 
 		$answer->setImageFile(null);
@@ -1032,6 +1021,11 @@ class assKprimChoice extends assQuestion implements ilObjQuestionScoringAdjustab
 		}
 		
 		return 0;
+	}
+	
+	public function getSpecificFeedbackAllCorrectOptionLabel()
+	{
+		return 'feedback_correct_kprim';
 	}
 	
 	public static function isObligationPossible($questionId)

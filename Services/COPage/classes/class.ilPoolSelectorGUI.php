@@ -65,7 +65,7 @@ class ilPoolSelectorGUI extends ilRepositorySelectorExplorerGUI
 	 * @return bool visible true/false
 	 */
 	function isNodeVisible($a_node)
-	{
+	{		
 		if(parent::isNodeVisible($a_node))
 		{			
 			//hide empty container
@@ -83,6 +83,5 @@ class ilPoolSelectorGUI extends ilRepositorySelectorExplorerGUI
 		}
 		
 		return false;
-		
 	}
 }

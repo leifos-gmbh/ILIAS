@@ -884,7 +884,7 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 	 * @param boolean $returndetails (deprecated !!)
 	 * @return integer/array $points/$details (array $details is deprecated !!)
 	 */
-	public function calculateReachedPoints($active_id, $pass = NULL, $returndetails = FALSE)
+	public function calculateReachedPoints($active_id, $pass = NULL, $authorizedSolution = true, $returndetails = FALSE)
 	{
 		if( $returndetails )
 		{
@@ -898,7 +898,7 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 		{
 			$pass = $this->getSolutionMaxPass($active_id);
 		}
-		$result = $this->getCurrentSolutionResultSet($active_id, $pass);
+		$result = $this->getCurrentSolutionResultSet($active_id, $pass, $authorizedSolution);
 		while ($data = $ilDB->fetchAssoc($result))
 		{
 			if (strcmp($data["value1"], "") != 0)
@@ -1148,7 +1148,7 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 	 * @param integer $pass Test pass
 	 * @return boolean $status
 	 */
-	public function saveWorkingData($active_id, $pass = NULL)
+	public function saveWorkingData($active_id, $pass = NULL, $authorized = true)
 	{
 		global $ilDB;
 
@@ -1167,13 +1167,13 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 			
 			$this->getProcessLocker()->requestUserSolutionUpdateLock();
 
-			$affectedRows = $this->removeCurrentSolution($active_id, $pass);
+			$affectedRows = $this->removeCurrentSolution($active_id, $pass, $authorized);
 
 			foreach( $submittedMatchings as $definition => $terms )
 			{
 				foreach( $terms as $i => $term )
 				{
-					$affectedRows = $this->saveCurrentSolution($active_id, $pass, $term, $definition);
+					$affectedRows = $this->saveCurrentSolution($active_id, $pass, $term, $definition, $authorized);
 
 					$matchingsExist = true;
 				}
@@ -1253,7 +1253,7 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 	* @param integer $shuffle A flag indicating whether the answers are shuffled or not
 	* @see $shuffle
 	*/
-	public function setShuffle($shuffle)
+	public function setShuffle($shuffle = true)
 	{
 		switch ($shuffle)
 		{
@@ -1634,13 +1634,24 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 			$terms[$row["term_id"]] = $index;
 		}
 
-		$data = $ilDB->queryF(
-			"SELECT value1, value2 FROM tst_solutions WHERE active_fi = %s AND pass = %s AND question_fi = %s AND step = (
-				SELECT MAX(step) FROM tst_solutions WHERE active_fi = %s AND pass = %s AND question_fi = %s
-			)",
-			array("integer", "integer", "integer","integer", "integer", "integer"),
-			array($active_id, $pass, $this->getId(), $active_id, $pass, $this->getId())
-		);
+		$maxStep = $this->lookupMaxStep($active_id, $pass);
+
+		if( $maxStep !== null )
+		{
+			$data = $ilDB->queryF(
+				"SELECT value1, value2 FROM tst_solutions WHERE active_fi = %s AND pass = %s AND question_fi = %s AND step = %s",
+				array("integer", "integer", "integer","integer"),
+				array($active_id, $pass, $this->getId(), $maxStep)
+			);
+		}
+		else
+		{
+			$data = $ilDB->queryF(
+				"SELECT value1, value2 FROM tst_solutions WHERE active_fi = %s AND pass = %s AND question_fi = %s",
+				array("integer", "integer", "integer"),
+				array($active_id, $pass, $this->getId())
+			);
+		}
 
 		while($row = $ilDB->fetchAssoc($data))
 		{

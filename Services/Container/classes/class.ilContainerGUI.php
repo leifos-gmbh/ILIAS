@@ -12,6 +12,7 @@ include_once './Services/PersonalDesktop/interfaces/interface.ilDesktopItemHandl
 * root folder, course, group, category, folder
 *
 * @author Alex Killing <alex.killing@gmx.de>
+* @author Stefan Hecken <stefan.hecken@concepts-and-training.de>
 * @version $Id$
 *
 * @extends ilObjectGUI
@@ -456,12 +457,6 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 				$container_view = new ilContainerSessionsContentGUI($this);
 				break;
 				
-			// ILinc courses
-			case ilContainer::VIEW_ILINC:
-				include_once 'Services/Container/classes/class.ilContainerILincContentGUI.php';
-				$container_view = new ilContainerILincContentGUI($this);
-				break;
-			
 			// all items in one block
 			case ilContainer::VIEW_BY_TYPE:
 			default:
@@ -584,7 +579,7 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 						);
 					}
 				}
-				if($this->object->getType() == 'crs')
+				if($this->object->getType() == 'crs' or $this->object->getType() == 'grp')
 				{
 					if($this->object->gotItems())
 					{
@@ -595,7 +590,7 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 						$this->lng->txt('cntr_adopt_content'),
 						$this->ctrl->getLinkTargetByClass(
 							'ilObjectCopyGUI',
-							'initSourceSelection')
+							'adoptContent')
 					);
 				}
 			}
@@ -925,7 +920,7 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 			"Services/Container");
 		
 		$type_ordering = array(
-			"cat", "fold", "crs", "icrs", "icla", "grp", "chat", "frm", "lres",
+			"cat", "fold", "crs", "grp", "chat", "frm", "lres",
 			"glo", "webr", "file", "exc",
 			"tst", "svy", "mep", "qpl", "spl");
 			
@@ -1855,7 +1850,7 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 				}
 	
 				// CHECK IF OBJECT IS ALLOWED TO CONTAIN PASTED OBJECT AS SUBOBJECT	
-				if(!in_array($obj_data->getType(), array_keys($this->objDefinition->getSubObjects($folder_objects_cache[$folder_ref_id]->getType()))))
+				if(!in_array($obj_data->getType(), array_keys($folder_objects_cache[$folder_ref_id]->getPossibleSubObjects())))
 				{
 					$not_allowed_subobject[] = sprintf($this->lng->txt('msg_obj_may_not_contain_objects_of_type'), $folder_objects_cache[$folder_ref_id]->getTitle().' ['.$folder_objects_cache[$folder_ref_id]->getRefId().']', 
 							$GLOBALS['lng']->txt('obj_'.$obj_data->getType()));
@@ -2099,8 +2094,16 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 		// toolbars
 		$t = new ilToolbarGUI();
 		$t->setFormAction($this->ctrl->getFormAction($this, "performPasteIntoMultipleObjects"));
-		$t->addFormButton($this->lng->txt($txt_var), "performPasteIntoMultipleObjects");
-		$t->addSeparator();
+
+		include_once("./Services/UIComponent/Button/classes/class.ilSubmitButton.php");
+		$b = ilSubmitButton::getInstance();
+		$b->setCaption($txt_var);
+		$b->setCommand("performPasteIntoMultipleObjects");
+
+		//$t->addFormButton($this->lng->txt($txt_var), "performPasteIntoMultipleObjects");
+		$t->addStickyItem($b);
+
+			$t->addSeparator();
 		$t->addFormButton($this->lng->txt("obj_insert_into_clipboard"), "keepObjectsInClipboard");
 		$t->addFormButton($this->lng->txt("cancel"), "cancelMoveLink");
 		$t->setCloseFormTag(false);
@@ -2379,7 +2382,7 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 			// CHECK IF OBJECT IS ALLOWED TO CONTAIN PASTED OBJECT AS SUBOBJECT
 			$obj_type = $obj_data->getType();
 
-			if (!in_array($obj_type, array_keys($this->objDefinition->getSubObjects($this->object->getType()))))
+			if (!in_array($obj_type, array_keys($this->object->getPossibleSubObjects())))
 			{
 				$not_allowed_subobject[] = $obj_data->getType();
 			}
@@ -3611,11 +3614,8 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 		
 	/**
 	 * Show tree
-	 *
-	 * @param boolean $a_initial_call should be true if not called through standard
-	 *        $ilCtrl->getCmd() procedure 
 	 */
-	function showRepTree($a_initial_call = false)
+	function showRepTree()
 	{
 		global $tpl, $ilUser, $ilSetting, $ilCtrl;
 		
@@ -3734,7 +3734,16 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 	 */
 	protected function initSortingDirectionForm(ilContainerSortingSettings $sorting_settings, $element, $a_prefix)
 	{
-		$direction = new ilRadioGroupInputGUI($this->lng->txt('sorting_direction'),$a_prefix.'_sorting_direction');
+		if($a_prefix == 'manual')
+		{
+			$txt = $this->lng->txt('sorting_new_items_direction');
+		}
+		else
+		{
+			$txt = $this->lng->txt('sorting_direction');
+		}
+		
+		$direction = new ilRadioGroupInputGUI($txt,$a_prefix.'_sorting_direction');
 		$direction->setValue($sorting_settings->getSortDirection());
 		$direction->setRequired(TRUE);
 		
@@ -3928,6 +3937,10 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 	{
 		include_once("./Services/Repository/classes/class.ilRepositorySelectorExplorerGUI.php");
 		$exp = new ilRepositorySelectorExplorerGUI($this, "showPasteTree");
+		// TODO: The study programme 'prg' is not included here, as the
+		// ilRepositorySelectorExplorerGUI only handles static rules for
+		// parent-child-relations and not the dynamic relationsships
+		// required for the SP (see #16909).
 		$exp->setTypeWhiteList(array("root", "cat", "grp", "crs", "fold"));
 		if ($cmd == "link") {
 			$exp->setSelectMode("nodes", true);

@@ -37,6 +37,11 @@ class ilObjQuestionPool extends ilObject
 	private $navTaxonomyId = null;
 
 	/**
+	 * @var bool
+	 */
+	private $skillServiceEnabled;
+
+	/**
 	 * Import for container (courses containing tests) import 
 	 * @var string
 	 */
@@ -53,6 +58,8 @@ class ilObjQuestionPool extends ilObject
 		$this->type = "qpl";
 		$this->ilObject($a_id,$a_call_by_reference);
 		$this->setOnline(0);
+		
+		$this->skillServiceEnabled = false;
 	}
 
 	/**
@@ -292,6 +299,7 @@ class ilObjQuestionPool extends ilObject
 			$this->setOnline($row['isonline']);
 			$this->setShowTaxonomies($row['show_taxonomies']);
 			$this->setNavTaxonomyId($row['nav_taxonomy']);
+			$this->setSkillServiceEnabled($row['skill_service']);
 		}
 	}
 	
@@ -316,6 +324,7 @@ class ilObjQuestionPool extends ilObject
 					'isonline'			=> array('text', $this->getOnline()),
 					'show_taxonomies'	=> array('integer', (int)$this->getShowTaxonomies()),
 					'nav_taxonomy'		=> array('integer', (int)$this->getNavTaxonomyId()),
+					'skill_service'		=> array('integer', (int)$this->isSkillServiceEnabled()),
 					'tstamp'			=> array('integer', time())
 				),
 				array(
@@ -332,6 +341,7 @@ class ilObjQuestionPool extends ilObject
 				'isonline'			=> array('text', $this->getOnline()),
 				'show_taxonomies'	=> array('integer', (int)$this->getShowTaxonomies()),
 				'nav_taxonomy'		=> array('integer', (int)$this->getNavTaxonomyId()),
+				'skill_service'		=> array('integer', (int)$this->isSkillServiceEnabled()),
 				'tstamp'			=> array('integer', time()),
 				'obj_fi'			=> array('integer', $this->getId())
 			));
@@ -528,6 +538,20 @@ class ilObjQuestionPool extends ilObject
 	}
 
 	/**
+	 * @param ilXmlWriter $xmlWriter
+	 */
+	private function exportXMLSettings($xmlWriter)
+	{
+		$xmlWriter->xmlStartTag('Settings');
+
+		$xmlWriter->xmlElement('ShowTaxonomies', null, (int)$this->getShowTaxonomies());
+		$xmlWriter->xmlElement('NavTaxonomy', null, (int)$this->getNavTaxonomyId());
+		$xmlWriter->xmlElement('SkillService', null, (int)$this->isSkillServiceEnabled());
+		
+		$xmlWriter->xmlEndTag('Settings');
+	}
+
+	/**
 	* export pages of test to xml (see ilias_co.dtd)
 	*
 	* @param	object		$a_xml_writer	ilXmlWriter object that receives the
@@ -546,6 +570,9 @@ class ilObjQuestionPool extends ilObject
 
 		// MetaData
 		$this->exportXMLMetaData($a_xml_writer);
+
+		// Settings
+		$this->exportXMLSettings($a_xml_writer);
 
 		// PageObjects
 		$expLog->write(date("[y-m-d H:i:s] ")."Start Export Page Objects");
@@ -747,6 +774,10 @@ class ilObjQuestionPool extends ilObject
 		include_once "./Services/Utilities/classes/class.ilUtil.php";
 		switch ($type)
 		{
+			case 'xml':
+				include_once("./Services/Export/classes/class.ilExport.php");
+				$export_dir = ilExport::_getExportDirectory($this->getId(), $type, $this->getType());
+				break;
 			case 'xls':
 			case 'zip':
 				$export_dir = ilUtil::getDataDir()."/qpl_data"."/qpl_".$this->getId()."/export_$type";
@@ -1437,6 +1468,7 @@ class ilObjQuestionPool extends ilObject
 			$newObj->setOnline($this->getOnline());
 		}
 
+		$newObj->setSkillServiceEnabled($this->isSkillServiceEnabled());
 		$newObj->setShowTaxonomies($this->getShowTaxonomies());
 		$newObj->saveToDb();
 		
@@ -1595,7 +1627,8 @@ class ilObjQuestionPool extends ilObject
 			"assOrderingHorizontal" => 7,
 			"assImagemapQuestion" => 8,
 			"assTextSubset" => 9,
-			"assErrorText" => 10
+			"assErrorText" => 10,
+			"assLongMenu" => 11
 			);
 		$satypes = array();
 		$qtypes = ilObjQuestionPool::_getQuestionTypes($all_tags);
@@ -1685,6 +1718,43 @@ class ilObjQuestionPool extends ilObject
 		require_once 'Services/Taxonomy/classes/class.ilObjTaxonomy.php';
 		return ilObjTaxonomy::getUsageOfObject( $this->getId() );
 	}
+
+	/**
+	 * @return boolean
+	 */
+	public function isSkillServiceEnabled()
+	{
+		return $this->skillServiceEnabled;
+	}
+
+	/**
+	 * @param boolean $skillServiceEnabled
+	 */
+	public function setSkillServiceEnabled($skillServiceEnabled)
+	{
+		$this->skillServiceEnabled = $skillServiceEnabled;
+	}
 	
+	private static $isSkillManagementGloballyActivated = null;
+
+	public static function isSkillManagementGloballyActivated()
+	{
+		if( self::$isSkillManagementGloballyActivated === null )
+		{
+			include_once 'Services/Skill/classes/class.ilSkillManagementSettings.php';
+			$skmgSet = new ilSkillManagementSettings();
+
+			self::$isSkillManagementGloballyActivated = $skmgSet->isActivated();
+		}
+
+		return self::$isSkillManagementGloballyActivated;
+	}
+	
+	public function fromXML($xmlFile)
+	{
+		require_once 'Modules/TestQuestionPool/classes/class.ilObjQuestionPoolXMLParser.php';
+		$parser = new ilObjQuestionPoolXMLParser($this, $xmlFile);
+		$parser->startParsing();
+	}
 } // END class.ilObjQuestionPool
 ?>

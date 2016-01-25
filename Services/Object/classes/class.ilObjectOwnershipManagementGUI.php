@@ -48,18 +48,23 @@ class ilObjectOwnershipManagementGUI
 	
 	function listObjects()
 	{
-		global $tpl, $ilToolbar, $lng, $ilCtrl, $objDefinition;
-		
-		
+		global $tpl, $ilToolbar, $lng, $ilCtrl, $objDefinition;		
+				
 		$objects = ilObject::getAllOwnedRepositoryObjects($this->user_id);
 		
 		if(sizeof($objects))
 		{
+			$ilToolbar->setFormAction($ilCtrl->getFormAction($this, "listObjects"));
+			
 			include_once "Services/Form/classes/class.ilSelectInputGUI.php";
 			$sel = new ilSelectInputGUI($lng->txt("type"), "type");
-			$ilToolbar->addInputItem($sel, true);
-			$ilToolbar->setFormAction($ilCtrl->getFormAction($this, "listObjects"));
-			$ilToolbar->addFormButton($lng->txt("ok"), "listObjects");
+			$ilToolbar->addStickyItem($sel, true);
+			
+			include_once "Services/UIComponent/Button/classes/class.ilSubmitButton.php";
+			$button = ilSubmitButton::getInstance();
+			$button->setCaption("ok");
+			$button->setCommand("listObjects");
+			$ilToolbar->addStickyItem($button);
 
 			$options = array();
 			foreach(array_keys($objects) as $type)
@@ -89,6 +94,12 @@ class ilObjectOwnershipManagementGUI
 				$sel_type = array_shift($sel_type);
 			}			
 			$ilCtrl->setParameter($this, "type", $sel_type);
+		}
+		
+		// #17751
+		if(sizeof($objects[$sel_type]))
+		{
+			ilObject::fixMissingTitles($sel_type, $objects[$sel_type]);
 		}
 		
 		include_once "Services/Object/classes/class.ilObjectOwnershipManagementTableGUI.php";

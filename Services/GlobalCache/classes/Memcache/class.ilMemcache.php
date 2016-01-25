@@ -1,6 +1,7 @@
 <?php
 
 require_once('./Services/GlobalCache/classes/class.ilGlobalCacheService.php');
+require_once('class.ilMemcacheServer.php');
 
 /**
  * Class ilMemcache
@@ -10,14 +11,6 @@ require_once('./Services/GlobalCache/classes/class.ilGlobalCacheService.php');
  */
 class ilMemcache extends ilGlobalCacheService {
 
-	const STD_SERVER = '127.0.0.1';
-	const STD_PORT = 11211;
-	/**
-	 * @var array
-	 */
-	protected static $servers = array(
-		self::STD_SERVER => self::STD_PORT,
-	);
 	/**
 	 * @var Memcached
 	 */
@@ -30,10 +23,21 @@ class ilMemcache extends ilGlobalCacheService {
 	 */
 	public function __construct($service_id, $component) {
 		if (! (self::$memcache_object instanceof Memcached) AND $this->getInstallable()) {
+			/**
+			 * @var $ilMemcacheServer ilMemcacheServer
+			 */
 			$memcached = new Memcached();
-			foreach (self::$servers as $host => $port) {
-				$memcached->addServer($host, $port);
+
+			if (ilMemcacheServer::count() > 0) {
+
+				$memcached->resetServerList();
+				$servers = array();
+				foreach (ilMemcacheServer::where(array( 'status' => ilMemcacheServer::STATUS_ACTIVE ))->get() as $ilMemcacheServer) {
+					$servers[] = array( $ilMemcacheServer->getHost(), $ilMemcacheServer->getPort(), $ilMemcacheServer->getWeight() );
+				}
+				$memcached->addServers($servers);
 			}
+
 			self::$memcache_object = $memcached;
 		}
 		parent::__construct($service_id, $component);
@@ -105,8 +109,20 @@ class ilMemcache extends ilGlobalCacheService {
 		if ($this->getInstallable()) {
 			$stats = $this->getMemcacheObject()->getStats();
 
-			return $stats[self::STD_SERVER . ':' . self::STD_PORT]['pid'] > 0;
+			if (!is_array($stats)) {
+				return false;
+			}
+
+			foreach ($stats as $server) {
+				if ($server['pid'] > 0) {
+					return true;
+				}
+			}
+
+			return false;
 		}
+
+		return false;
 	}
 
 

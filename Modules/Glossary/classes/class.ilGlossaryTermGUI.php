@@ -11,6 +11,7 @@ require_once("./Modules/Glossary/classes/class.ilGlossaryTerm.php");
 * @version $Id$
 *
 * @ilCtrl_Calls ilGlossaryTermGUI: ilTermDefinitionEditorGUI, ilGlossaryDefPageGUI, ilPropertyFormGUI
+* @ilCtrl_Calls ilGlossaryTermGUI: ilObjectMetaDataGUI
 *
 * @ingroup ModulesGlossary
 */
@@ -48,12 +49,13 @@ class ilGlossaryTermGUI
 	*/
 	function executeCommand()
 	{
+		global $ilTabs;
+		
 		$next_class = $this->ctrl->getNextClass($this);
 		$cmd = $this->ctrl->getCmd();
 
 		switch ($next_class)
 		{
-
 			case "iltermdefinitioneditorgui":
 				//$this->ctrl->setReturn($this, "listDefinitions");
 				$def_edit =& new ilTermDefinitionEditorGUI();
@@ -65,6 +67,16 @@ class ilGlossaryTermGUI
 			case "ilpropertyformgui";
 				$form = $this->getEditTermForm();
 				$this->ctrl->forwardCommand($form);
+				break;
+			
+			case "ilobjectmetadatagui";		
+				$this->setTabs();
+				$ilTabs->activateTab('meta_data');
+				include_once 'Services/Object/classes/class.ilObjectMetaDataGUI.php';
+				$md_gui = new ilObjectMetaDataGUI(new ilObjGlossary($this->term->getGlossaryId(), false), 
+					'term', $this->term->getId());	
+				$this->ctrl->forwardCommand($md_gui);
+				$this->quickList();
 				break;
 				
 			default:
@@ -127,7 +139,7 @@ class ilGlossaryTermGUI
 	/**
 	 * Edit term
 	 */
-	function editTerm()
+	function editTerm(ilPropertyFormGUI $a_form = null)
 	{
 		global $ilTabs, $ilCtrl;
 
@@ -139,9 +151,12 @@ class ilGlossaryTermGUI
 		$this->tpl->setTitle($this->lng->txt("cont_term").": ".$this->term->getTerm());
 		$this->tpl->setTitleIcon(ilUtil::getImagePath("icon_glo.svg"));
 
-		$form = $this->getEditTermForm();
+		if(!$a_form)
+		{
+			$a_form = $this->getEditTermForm();
+		}
 		
-		$this->tpl->setContent($ilCtrl->getHTML($form));
+		$this->tpl->setContent($ilCtrl->getHTML($a_form));
 
 		$this->quickList();
 	}
@@ -196,8 +211,7 @@ class ilGlossaryTermGUI
 		include_once('Services/AdvancedMetaData/classes/class.ilAdvancedMDRecordGUI.php');
 		$this->record_gui = new ilAdvancedMDRecordGUI(ilAdvancedMDRecordGUI::MODE_EDITOR,'glo',$this->glossary->getId(),'term',
 			$this->term->getId());
-		$this->record_gui->setPropertyForm($form);
-		$this->record_gui->setSelectedOnly(true);
+		$this->record_gui->setPropertyForm($form);		
 		$this->record_gui->parse();
 		
 		$form->addCommandButton("updateTerm", $this->lng->txt("save"));
@@ -212,43 +226,38 @@ class ilGlossaryTermGUI
 	*/
 	function updateTerm()
 	{
-		// update term
-		$this->term->setTerm(ilUtil::stripSlashes($_POST["term"]));
-		$this->term->setLanguage($_POST["term_language"]);
-		$this->term->update();
-		
-		// update taxonomy assignment
-		if ($this->glossary->getTaxonomyId() > 0)
-		{
-			include_once("./Services/Taxonomy/classes/class.ilTaxNodeAssignment.php");
-			$ta = new ilTaxNodeAssignment("glo", $this->glossary->getId(), "term", $this->glossary->getTaxonomyId());
-			$ta->deleteAssignmentsOfItem($this->term->getId());
-			if (is_array($_POST["tax_node"]))
-			{
-				foreach ($_POST["tax_node"] as $node_id)
-				{
-					$ta->addAssignment($node_id, $this->term->getId());
-				}
-			}		
-
-		}
-		
-		// advanced metadata
-		include_once('Services/AdvancedMetaData/classes/class.ilAdvancedMDRecordGUI.php');
-		$record_gui = new ilAdvancedMDRecordGUI(ilAdvancedMDRecordGUI::MODE_EDITOR,
-			'glo',$this->glossary->getId(),'term', $this->term->getId());
-		
-		// :TODO: proper validation
 		$form = $this->getEditTermForm();
-		$form->checkInput();
-		
-		if($this->record_gui->importEditFormPostValues())
+		if($form->checkInput() &&
+			$this->record_gui->importEditFormPostValues())
 		{		
-			$this->record_gui->writeEditForm();
+			// update term
+			$this->term->setTerm(ilUtil::stripSlashes($_POST["term"]));
+			$this->term->setLanguage($_POST["term_language"]);
+			$this->term->update();
+
+			// update taxonomy assignment
+			if ($this->glossary->getTaxonomyId() > 0)
+			{
+				include_once("./Services/Taxonomy/classes/class.ilTaxNodeAssignment.php");
+				$ta = new ilTaxNodeAssignment("glo", $this->glossary->getId(), "term", $this->glossary->getTaxonomyId());
+				$ta->deleteAssignmentsOfItem($this->term->getId());
+				if (is_array($_POST["tax_node"]))
+				{
+					foreach ($_POST["tax_node"] as $node_id)
+					{
+						$ta->addAssignment($node_id, $this->term->getId());
+					}
+				}		
+
+			}
+
+			$this->record_gui->writeEditForm();			
+			ilUtil::sendSuccess($this->lng->txt("msg_obj_modified"),true);
+			$this->ctrl->redirect($this, "editTerm");
 		}
-	
-		ilUtil::sendSuccess($this->lng->txt("msg_obj_modified"),true);
-		$this->ctrl->redirect($this, "editTerm");
+			
+		$form->setValuesByPost();
+		$this->editTerm($form);
 	}
 
 	/**
@@ -688,7 +697,7 @@ class ilGlossaryTermGUI
 			$tabs_gui->addTab("properties",
 				$lng->txt("term"),
 				$this->ctrl->getLinkTarget($this, "editTerm"));
-
+			
 			$tabs_gui->addTab("definitions",
 				$lng->txt("cont_definitions"),
 				$this->ctrl->getLinkTarget($this, "listDefinitions"));
@@ -697,6 +706,17 @@ class ilGlossaryTermGUI
 				$lng->txt("cont_usage")." (".ilGlossaryTerm::getNumberOfUsages($_GET["term_id"]).")",
 				$this->ctrl->getLinkTarget($this, "listUsages"));
 			
+			include_once "Services/Object/classes/class.ilObjectMetaDataGUI.php";
+			$mdgui = new ilObjectMetaDataGUI(new ilObjGlossary($this->term->getGlossaryId(), false), 
+				"term", $this->term->getId());					
+			$mdtab = $mdgui->getTab();
+			if($mdtab)
+			{
+				$tabs_gui->addTab("meta_data",
+					$lng->txt("meta_data"),
+					$mdtab);
+			}
+
 			$tabs_gui->addNonTabbedLink("presentation_view",
 				$this->lng->txt("glo_presentation_view"),
 				ILIAS_HTTP_PATH.

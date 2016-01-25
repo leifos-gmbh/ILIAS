@@ -291,16 +291,16 @@ class ilDataCollectionField {
 	}
 
 
-	/*
-	 * isUnique
+	/**
+	 * @return bool
 	 */
 	public function isUnique() {
 		return $this->unique;
 	}
 
 
-	/*
-	 * setUnique
+	/**
+	 * @param bool $unique
 	 */
 	public function setUnique($unique) {
 		$this->unique = $unique ? 1 : 0;
@@ -425,7 +425,7 @@ class ilDataCollectionField {
 	 * @return bool
 	 */
 	public function isVisible() {
-		if (!isset($this->visible)) {
+		if (! isset($this->visible)) {
 			$this->loadVisibility();
 		}
 
@@ -444,7 +444,7 @@ class ilDataCollectionField {
 	 * @return bool
 	 */
 	public function isFilterable() {
-		if (!isset($this->filterable)) {
+		if (! isset($this->filterable)) {
 			$this->loadFilterability();
 		}
 
@@ -488,7 +488,7 @@ class ilDataCollectionField {
 				break;
 		}
 
-		if (!$this->order) {
+		if (! $this->order) {
 			$this->order = $rec['field_order'];
 		}
 	}
@@ -500,7 +500,7 @@ class ilDataCollectionField {
 	 * @return int
 	 */
 	public function isEditable() {
-		if (!isset($this->editable)) {
+		if (! isset($this->editable)) {
 			$this->loadEditability();
 		}
 
@@ -517,7 +517,7 @@ class ilDataCollectionField {
 
 
 	public function getExportable() {
-		if (!isset($this->exportable)) {
+		if (! isset($this->exportable)) {
 			$this->loadExportability();
 		}
 
@@ -605,7 +605,7 @@ class ilDataCollectionField {
 		global $ilDB;
 		$this->getLocked() == NULL ? $this->setLocked(false) : true;
 
-		if (!ilDataCollectionTable::_tableExists($this->getTableId())) {
+		if (! ilDataCollectionTable::_tableExists($this->getTableId())) {
 			throw new ilException("The field does not have a related table!");
 		}
 
@@ -632,15 +632,39 @@ class ilDataCollectionField {
 		global $ilDB;
 
 		$ilDB->update("il_dcl_field", array(
-			"table_id" => array( "integer", $this->getTableId() ),
-			"datatype_id" => array( "text", $this->getDatatypeId() ),
-			"title" => array( "text", $this->getTitle() ),
-			"description" => array( "text", $this->getDescription() ),
-			"required" => array( "integer", $this->getRequired() ),
-			"is_unique" => array( "integer", $this->isUnique() ),
-			"is_locked" => array( "integer", $this->getLocked() ? 1 : 0 ),
+			"table_id" => array(
+				"integer",
+				$this->getTableId()
+			),
+			"datatype_id" => array(
+				"text",
+				$this->getDatatypeId()
+			),
+			"title" => array(
+				"text",
+				$this->getTitle()
+			),
+			"description" => array(
+				"text",
+				$this->getDescription()
+			),
+			"required" => array(
+				"integer",
+				$this->getRequired()
+			),
+			"is_unique" => array(
+				"integer",
+				$this->isUnique()
+			),
+			"is_locked" => array(
+				"integer",
+				$this->getLocked() ? 1 : 0
+			),
 		), array(
-			"id" => array( "integer", $this->getId() )
+			"id" => array(
+				"integer",
+				$this->getId()
+			)
 		));
 		$this->updateVisibility();
 		$this->updateFilterability();
@@ -657,10 +681,19 @@ class ilDataCollectionField {
 		global $ilDB;
 		foreach ($this->property as $key => $value) {
 			$ilDB->update('il_dcl_field_prop', array(
-				'value' => array( 'integer', $value ),
+				'value' => array(
+					'integer',
+					$value
+				),
 			), array(
-				'field_id' => array( 'integer', $this->getId() ),
-				'datatype_prop_id' => array( 'integer', $key ),
+				'field_id' => array(
+					'integer',
+					$this->getId()
+				),
+				'datatype_prop_id' => array(
+					'integer',
+					$key
+				),
 			));
 		}
 	}
@@ -732,13 +765,13 @@ class ilDataCollectionField {
 				break;
 		}
 
-		if (!$set) {
+		if (! $set) {
 			$set = 0;
 		} else {
 			$set = 1;
 		}
 
-		if (!isset($this->order)) {
+		if (! isset($this->order)) {
 			$this->order = 0;
 		}
 
@@ -794,11 +827,11 @@ class ilDataCollectionField {
 	 * getOrder
 	 */
 	public function getOrder() {
-		if (!isset($this->order)) {
+		if (! isset($this->order)) {
 			$this->loadVisibility();
 		}
 
-		return !$this->order ? 0 : $this->order;
+		return ! $this->order ? 0 : $this->order;
 	}
 
 
@@ -906,11 +939,12 @@ class ilDataCollectionField {
 	 */
 	public function checkValidity($value, $record_id = NULL) {
 		//Don't check empty values
+
 		if ($value == NULL) {
 			return true;
 		}
 
-		if (!ilDataCollectionDatatype::checkValidity($this->getDatatypeId(), $value)) {
+		if (! ilDataCollectionDatatype::checkValidity($this->getDatatypeId(), $value)) {
 			throw new ilDataCollectionInputException(ilDataCollectionInputException::TYPE_EXCEPTION);
 		}
 
@@ -931,29 +965,35 @@ class ilDataCollectionField {
 			if ($properties[$length] < mb_strlen($value, 'UTF-8') AND is_numeric($properties[$length])) {
 				throw new ilDataCollectionInputException(ilDataCollectionInputException::LENGTH_EXCEPTION);
 			}
-			if (!($properties[$regex_id] == NULL OR @preg_match($regex, $value))) {
+			if (! ($properties[$regex_id] == NULL OR preg_match($regex, $value) === false)) {
 				throw new ilDataCollectionInputException(ilDataCollectionInputException::REGEX_EXCEPTION);
 			}
 			//email or url
-			if ($properties[$url]
-				&& !(preg_match('~(^(news|(ht|f)tp(s?)\://){1}\S+)~i', $value)
-					|| preg_match("/^[a-z0-9!#$%&'*+=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i", $value))
-			) {
-				throw new ilDataCollectionInputException(ilDataCollectionInputException::NOT_URL);
+			if ($properties[$url]) {
+				if ($json = json_decode($value)) {
+					$value = $json->link;
+				}
+				if (substr($value, 0, 3) === 'www') {
+					$value = 'http://' . $value;
+				}
+				if (! filter_var($value, FILTER_VALIDATE_URL) && ! filter_var($value, FILTER_VALIDATE_EMAIL)) {
+					throw new ilDataCollectionInputException(ilDataCollectionInputException::NOT_URL);
+				}
 			}
 		}
 
-		if ($this->isUnique() && $record_id === NULL) {
+		if ($this->isUnique()) {
 			$table = ilDataCollectionCache::getTableCache($this->getTableId());
-
 			foreach ($table->getRecords() as $record) {
-				if ($record->getRecordFieldValue($this->getId()) == $value && ($record->getId() != $record_id || $record_id == 0)) {
+				if ($this->normalizeValue($record->getRecordFieldValue($this->getId())) == $this->normalizeValue($value)
+					&& ($record->getId() != $record_id || $record_id == 0)
+				) {
 					throw new ilDataCollectionInputException(ilDataCollectionInputException::UNIQUE_EXCEPTION);
 				}
 
 				//for text it has to be case insensitive.
 				if ($this->getDatatypeId() == ilDataCollectionDatatype::INPUTFORMAT_TEXT) {
-					if (strtolower($record->getRecordFieldValue($this->getId())) == strtolower($value)
+					if (strtolower($this->normalizeValue($record->getRecordFieldValue($this->getId()))) == strtolower($this->normalizeValue($value))
 						&& ($record->getId() != $record_id
 							|| $record_id == 0)
 					) {
@@ -972,6 +1012,20 @@ class ilDataCollectionField {
 		}
 
 		return true;
+	}
+
+
+	/**
+	 * @param $value
+	 *
+	 * @return string
+	 */
+	protected function normalizeValue($value) {
+		if (is_string($value)) {
+			$value = trim(preg_replace("/\\s+/uism", " ", $value));
+		}
+
+		return $value;
 	}
 
 

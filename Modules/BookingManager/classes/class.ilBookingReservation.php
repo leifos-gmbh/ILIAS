@@ -317,6 +317,32 @@ class ilBookingReservation
 				$counter[$row['object_id']] = (int)$nr_map[$row['object_id']]-(int)$row['cnt'];
 			}
 		}		
+		
+		// #17868 - validate against schedule availability
+		foreach($a_ids as $obj_id)
+		{			
+			$bobj = new ilBookingObject($obj_id);
+			if($bobj->getScheduleId())
+			{
+				include_once "Modules/BookingManager/classes/class.ilBookingSchedule.php";
+				$schedule = new ilBookingSchedule($bobj->getScheduleId());
+
+				$av_from = ($schedule->getAvailabilityFrom() && !$schedule->getAvailabilityFrom()->isNull())
+					? $schedule->getAvailabilityFrom()->get(IL_CAL_UNIX)
+					: null;
+				$av_to = ($schedule->getAvailabilityTo() && !$schedule->getAvailabilityTo()->isNull())
+					? strtotime($schedule->getAvailabilityTo()->get(IL_CAL_DATE)." 23:59:59")
+					: null;
+				
+				if(($av_from && $a_from < $av_from) ||
+					($av_to && $a_to > $av_to))
+				{
+					$blocked[] = $obj_id;
+					unset($counter[$obj_id]);
+				}
+			}
+		}
+		
 		$available = array_diff($a_ids, $blocked);
 		if(sizeof($available))
 		{
@@ -340,6 +366,74 @@ class ilBookingReservation
 				return $available;
 			}
 		}
+	}
+	
+	static function isObjectAvailableInPeriod($a_obj_id, ilBookingSchedule $a_schedule, $a_from, $a_to)
+	{
+		global $ilDB;
+			
+		if(!$a_from)
+		{
+			$a_from = time();
+		}
+		if(!$a_to)
+		{
+			$a_to = strtotime("+1year", $a_from);
+		}
+		
+		if($a_from > $a_to)
+		{
+			return;
+		}
+		
+		$from = $ilDB->quote($a_from, 'integer');
+		$to = $ilDB->quote($a_to, 'integer');				
+		
+		// all bookings in period
+		$set = $ilDB->query('SELECT count(*) cnt'.
+			' FROM booking_reservation'.
+			' WHERE object_id = '.$ilDB->quote($a_obj_id, 'integer').
+			' AND (status IS NULL OR status <> '.$ilDB->quote(self::STATUS_CANCELLED, 'integer').')'.
+			' AND ((date_from <= '.$from.' AND date_to >= '.$from.')'.
+			' OR (date_from <= '.$to.' AND date_to >= '.$to.')'.
+			' OR (date_from >= '.$from.' AND date_to <= '.$to.'))');			
+		$row = $ilDB->fetchAssoc($set);
+		$booked_in_period = $row["cnt"];
+		
+		$per_slot = ilBookingObject::getNrOfItemsForObjects(array($a_obj_id));		
+		$per_slot = $per_slot[$a_obj_id];
+				
+		// max available nr of items per (week)day
+		$schedule_slots = array();
+		$definition = $a_schedule->getDefinition();						
+		$map = array_flip(array("su", "mo", "tu", "we", "th", "fr", "sa"));
+		foreach($definition as $day => $day_slots)
+		{			
+			$schedule_slots[$map[$day]] += sizeof($day_slots)*$per_slot;			
+		}		
+		
+		// sum up max available items in period per (week)day
+		$available_in_period = 0;
+		$loop = 0;
+		while($a_from < $a_to &&
+			++$loop < 1000)
+		{
+			// we are only interested in available booking slots
+			if($a_from < time())
+			{
+				continue;
+			}
+			
+			$day_slots = $schedule_slots[date("w", $a_from)];						
+			if($day_slots)
+			{
+				$available_in_period += $day_slots;
+			}
+			
+			$a_from += (60*60*24);						
+		}
+		
+		return (bool)($available_in_period-$booked_in_period);
 	}
 	
 	static function isObjectAvailableNoSchedule($a_obj_id)
@@ -483,7 +577,7 @@ class ilBookingReservation
 	 * @param	array	$filter
 	 * @return	array
 	 */
-	static function getListByDate($a_has_schedule, array $a_object_ids, $a_order_field, $a_order_direction, $a_offset, $a_limit, array $filter = null)
+	static function getListByDate($a_has_schedule, array $a_object_ids, array $filter = null)
 	{		
 		global $ilDB;
 		
@@ -506,6 +600,11 @@ class ilBookingReservation
 					' OR status IS NULL)';
 			}
 		}
+		if($filter['title'])
+		{
+			$where[] = '('.$ilDB->like('title', 'text', '%'.$filter['title'].'%').
+				' OR '.$ilDB->like('description', 'text', '%'.$filter['title'].'%').')';
+		}
 		if($a_has_schedule)
 		{
 			if($filter['from'])
@@ -515,12 +614,12 @@ class ilBookingReservation
 			if($filter['to'])
 			{
 				$where[] = 'date_to <= '.$ilDB->quote($filter['to'], 'integer');
-			}					
+			}							
 		}
 		if($filter['user_id']) // #16584
 		{
 			$where[] = 'user_id = '.$ilDB->quote($filter['user_id'], 'integer');
-		}			
+		}	
 		/*
 		if($a_group_id)
 		{
@@ -569,7 +668,7 @@ class ilBookingReservation
 			}
 			
 			if(!isset($res[$idx]))
-			{				
+			{					
 				$uname = ilObjUser::_lookupName($user_id);
 				
 				$res[$idx] = array(					
@@ -577,7 +676,7 @@ class ilBookingReservation
 					,"title" => $row["title"]
 					,"user_id" => $user_id
 					,"counter" => 1						
-					,"user_name" => $uname["lastname"].", ".$uname["firstname"] // #17862		
+					,"user_name" => $uname["lastname"].", ".$uname["firstname"] // #17862			
 				);
 				
 				if($a_has_schedule)
@@ -605,24 +704,7 @@ class ilBookingReservation
 			}
 		}				
 		
-		$size = sizeof($res);
-		
-		// order		
-		$numeric = in_array($a_order_field, array("counter", "date", "week", "weekday"));			
-		
-		// #16560 - this will enable matchting slot sorting to date/week
-		if($a_has_schedule &&
-			in_array($a_order_field, array("date", "week")))
-		{
-			$a_order_field = "_sortdate";
-		}
-		
-		$res = ilUtil::sortArray($res, $a_order_field, $a_order_direction, $numeric);
-				
-		// offset/limit		
-		$res = array_splice($res, $a_offset, $a_limit);
-		
-		return array("data"=>$res, "counter"=>$size);
+		return $res;
 	}
 	
 	/**

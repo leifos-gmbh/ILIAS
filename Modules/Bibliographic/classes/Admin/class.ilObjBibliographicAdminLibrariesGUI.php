@@ -138,8 +138,8 @@ class ilObjBibliographicAdminLibrariesGUI {
 	 * delete library
 	 */
 	public function delete() {
-		global $ilDB;
-		$ilDB->manipulate("DELETE FROM il_bibl_settings WHERE id = " . $ilDB->quote($_REQUEST["lib_id"], "integer"));
+		$ilBibliographicSetting = new ilBibliographicSetting($_REQUEST["lib_id"]);
+		$ilBibliographicSetting->delete();
 		$this->ctrl->redirect($this, 'view');
 	}
 

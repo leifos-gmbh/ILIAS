@@ -34,10 +34,6 @@ class ilDataCollectionRecordField {
 	 */
 	protected $value;
 	/**
-	 * @var ilLanguage
-	 */
-	protected $lng;
-	/**
 	 * @var ilObjUser
 	 */
 	protected $user;
@@ -50,19 +46,23 @@ class ilDataCollectionRecordField {
 	 */
 	protected $db;
 
+	/**
+	 * @var ilLanguage
+	 */
+	protected $lng;
 
 	/**
 	 * @param ilDataCollectionRecord $record
 	 * @param ilDataCollectionField  $field
 	 */
 	public function __construct(ilDataCollectionRecord $record, ilDataCollectionField $field) {
-		global $lng, $ilCtrl, $ilUser, $ilDB;
+		global $ilCtrl, $ilUser, $ilDB, $lng;
 		$this->record = $record;
 		$this->field = $field;
-		$this->lng = $lng;
 		$this->ctrl = $ilCtrl;
 		$this->user = $ilUser;
 		$this->db = $ilDB;
+		$this->lng = $lng;
 		$this->doRead();
 	}
 
@@ -71,21 +71,25 @@ class ilDataCollectionRecordField {
 	 * Read object data from database
 	 */
 	protected function doRead() {
+		if(!$this->record->getId())
+			return;
+
 		$query = "SELECT * FROM il_dcl_record_field WHERE field_id = " . $this->db->quote($this->field->getId(), "integer") . " AND record_id = "
 			. $this->db->quote($this->record->getId(), "integer");
 		$set = $this->db->query($query);
 		$rec = $this->db->fetchAssoc($set);
 		$this->id = $rec['id'];
 
-		if ($this->id == NULL) {
+		if ($this->id == null) {
 			$this->doCreate();
 		}
+
 		$this->loadValue();
 	}
 
 
 	/**
-	 * Create object in database
+	 * Creates an Id and a database entry.
 	 */
 	protected function doCreate() {
 		$id = $this->db->nextId("il_dcl_record_field");
@@ -101,6 +105,9 @@ class ilDataCollectionRecordField {
 	 */
 	public function doUpdate() {
 		//$this->loadValue(); //Removed Mantis #0011799
+		if (!$this->id) {
+			$this->doCreate();
+		}
 		$datatype = $this->field->getDatatype();
 		$query = "DELETE FROM il_dcl_stloc" . $datatype->getStorageLocation() . "_value WHERE record_field_id = "
 			. $this->db->quote($this->id, "integer");
@@ -160,7 +167,7 @@ class ilDataCollectionRecordField {
 				$this->value = $tmp;
 				//delete old file from filesystem
 				// TODO Does not belong here, create separate class ilDataCollectionFileField and overwrite setValue method
-				if ($old && $this->field->getDatatypeId() == ilDataCollectionDatatype::INPUTFORMAT_FILE) {
+				if ($old && $old != $this->value && $this->field->getDatatypeId() == ilDataCollectionDatatype::INPUTFORMAT_FILE) {
 					$this->record->deleteFile($old);
 				}
 			}
@@ -169,11 +176,50 @@ class ilDataCollectionRecordField {
 		}
 	}
 
+	/**
+	 * @param $form ilPropertyFormGUI
+	 */
+	public function setValueFromForm(&$form) {
+		if ($this->field->getDatatypeId() == ilDataCollectionDatatype::INPUTFORMAT_MOB
+			&& $form->getItemByPostVar("field_" . $this->field->getId())->getDeletionFlag()
+		) {
+			$value = - 1;
+		} else {
+			$value = $form->getInput("field_" . $this->field->getId());
+		}
+		$this->setValue($value);
+	}
+
+	/**
+	 * @param $excel
+	 * @param $row
+	 * @param $col
+	 * @return array|string
+	 */
+	public function getValueFromExcel($excel, $row, $col) {
+		$value = $excel->val($row, $col);
+		if ($this->field->getDatatypeId() == ilDataCollectionDatatype::INPUTFORMAT_DATETIME) {
+			$value = array(
+				'date' => date('Y-m-d', strtotime($value)),
+				'time' => '00:00:00',
+			);
+		}
+		return $value;
+	}
+
+	/**
+	 * @param $form ilPropertyFormGUI
+	 */
+	public function fillFormInput(&$form) {
+		$value = $this->getFormInput();
+		$form->getItemByPostVar('field_'.$this->field->getId())->setValueByArray(array("field_".$this->field->getId() => $value));
+	}
+
 
 	/**
 	 * @return mixed
 	 */
-	public function getFormInput() {
+	protected function getFormInput() {
 		$datatype = $this->field->getDatatype();
 
 		return $datatype->parseFormInput($this->getValue(), $this);
@@ -187,6 +233,16 @@ class ilDataCollectionRecordField {
 		$datatype = $this->field->getDatatype();
 
 		return $datatype->parseExportValue($this->getValue());
+	}
+
+	/**
+	 * @param $worksheet
+	 * @param $row
+	 * @param $col
+	 */
+	public function fillExcelExport($worksheet, &$row, &$col) {
+		$worksheet->writeString($row, $col, $this->getExportValue());
+		$col ++;
 	}
 
 
@@ -215,7 +271,6 @@ class ilDataCollectionRecordField {
 
 		return $datatype->parseSortingValue($this->getValue(), $this, $link);
 	}
-
 
 	/**
 	 * @return string

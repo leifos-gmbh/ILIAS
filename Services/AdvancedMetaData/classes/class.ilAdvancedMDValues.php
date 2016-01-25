@@ -51,29 +51,22 @@ class ilAdvancedMDValues
 	 * @param string $a_obj_type
 	 * @return array
 	 */
-	public static function getInstancesForObjectId($a_obj_id, $a_obj_type = null)
-	{
-		global $ilDB;
-		
+	public static function getInstancesForObjectId($a_obj_id, $a_obj_type = null, $a_sub_type = "-", $a_sub_id = 0)
+	{		
 		$res = array();
 		
 		if(!$a_obj_type)
 		{
 			$a_obj_type = ilObject::_lookupType($a_obj_id);
 		}
-	
-		// get active records for object type
-		$query = "SELECT amro.record_id".
-			" FROM adv_md_record_objs amro".
-			" JOIN adv_md_record amr ON (amr.record_id = amro.record_id)".
-			" WHERE active = ".$ilDB->quote(1, "integer").
-			" AND obj_type = ".$ilDB->quote($a_obj_type, "text");
-		$set = $ilDB->query($query);
-		while($row = $ilDB->fetchAssoc($set))
-		{
-			$res[$row["record_id"]] = new self($row["record_id"], $a_obj_id);
-		}						
 		
+		include_once "Services/AdvancedMetaData/classes/class.ilAdvancedMDRecord.php";
+		foreach(ilAdvancedMDRecord::_getSelectedRecordsByObject($a_obj_type, $a_obj_id, $a_sub_type) as $record)
+		{
+			$id = $record->getRecordId();
+			$res[$id] = new self($id, $a_obj_id, $a_sub_type, $a_sub_id);
+		}
+	
 		return $res;
 	}
 	
@@ -275,7 +268,7 @@ class ilAdvancedMDValues
 		$set = $ilDB->query($query);
 		while($row = $ilDB->fetchAssoc($set))
 		{
-			self::$preload_obj_records[$row["obj_type"]][] = $row["record_id"];
+			self::$preload_obj_records[$row["obj_type"]][] = array($row["record_id"], $row["optional"]);
 		}						
 	}
 	
@@ -285,8 +278,28 @@ class ilAdvancedMDValues
 		
 		if(isset(self::$preload_obj_records[$a_type]))
 		{		
-			foreach(self::$preload_obj_records[$a_type] as $record_id)
+			foreach(self::$preload_obj_records[$a_type] as $item)
 			{
+				$record_id = $item[0];
+				
+				// record is optional, check activation for object
+				if($item[1])
+				{
+					$found = false;
+					include_once "Services/AdvancedMetaData/classes/class.ilAdvancedMDRecord.php";
+					foreach(ilAdvancedMDRecord::_getSelectedRecordsByObject($a_type, $a_obj_id) as $record)
+					{
+						if($record->getRecordId() == $item[0])
+						{
+							$found = true;
+						}
+					}
+					if(!$found)
+					{
+						continue;
+					}
+				}
+				
 				$res[$record_id] = new self($record_id, $a_obj_id);
 				$res[$record_id]->read();
 			}
@@ -401,7 +414,7 @@ class ilAdvancedMDValues
 	 */
 	static public function queryForRecords($a_obj_id, $a_subtype, $a_records, $a_obj_id_key, $a_obj_subid_key, array $a_amet_filter = null)
 	{	
-		$result = array();
+		$results = array();
 		
 		if (!is_array($a_obj_id))
 		{

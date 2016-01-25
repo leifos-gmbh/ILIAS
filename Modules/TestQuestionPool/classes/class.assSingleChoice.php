@@ -7,6 +7,7 @@ require_once './Modules/TestQuestionPool/interfaces/interface.ilObjQuestionScori
 require_once './Modules/TestQuestionPool/interfaces/interface.ilObjAnswerScoringAdjustable.php';
 require_once './Modules/TestQuestionPool/interfaces/interface.iQuestionCondition.php';
 require_once './Modules/TestQuestionPool/classes/class.ilUserQuestionResult.php';
+require_once 'Modules/TestQuestionPool/interfaces/interface.ilAssSpecificFeedbackOptionLabelProvider.php';
 
 /**
  * Class for single choice questions
@@ -21,7 +22,7 @@ require_once './Modules/TestQuestionPool/classes/class.ilUserQuestionResult.php'
  * 
  * @ingroup		ModulesTestQuestionPool
  */
-class assSingleChoice extends assQuestion implements  ilObjQuestionScoringAdjustable, ilObjAnswerScoringAdjustable, iQuestionCondition
+class assSingleChoice extends assQuestion implements  ilObjQuestionScoringAdjustable, ilObjAnswerScoringAdjustable, iQuestionCondition, ilAssSpecificFeedbackOptionLabelProvider
 {
 	/**
 	* The given answers of the single choice question
@@ -565,7 +566,7 @@ class assSingleChoice extends assQuestion implements  ilObjQuestionScoringAdjust
 	 * @param boolean $returndetails (deprecated !!)
 	 * @return integer/array $points/$details (array $details is deprecated !!)
 	 */
-	public function calculateReachedPoints($active_id, $pass = NULL, $returndetails = FALSE)
+	public function calculateReachedPoints($active_id, $pass = NULL, $authorizedSolution = true, $returndetails = FALSE)
 	{
 		if( $returndetails )
 		{
@@ -579,7 +580,7 @@ class assSingleChoice extends assQuestion implements  ilObjQuestionScoringAdjust
 		{
 			$pass = $this->getSolutionMaxPass($active_id);
 		}
-		$result = $this->getCurrentSolutionResultSet($active_id, $pass);
+		$result = $this->getCurrentSolutionResultSet($active_id, $pass, $authorizedSolution);
 		while ($data = $ilDB->fetchAssoc($result))
 		{
 			if (strcmp($data["value1"], "") != 0)
@@ -623,7 +624,7 @@ class assSingleChoice extends assQuestion implements  ilObjQuestionScoringAdjust
 	 * @param integer $pass Test pass
 	 * @return boolean $status
 	 */
-	public function saveWorkingData($active_id, $pass = NULL)
+	public function saveWorkingData($active_id, $pass = NULL, $authorized = true)
 	{
 		global $ilDB;
 		global $ilUser;
@@ -637,7 +638,7 @@ class assSingleChoice extends assQuestion implements  ilObjQuestionScoringAdjust
 
 		$this->getProcessLocker()->requestUserSolutionUpdateLock();
 
-		$result = $this->getCurrentSolutionResultSet($active_id, $pass);
+		$result = $this->getCurrentSolutionResultSet($active_id, $pass, $authorized);
 		$row = $ilDB->fetchAssoc($result);
 		$update = $row["solution_id"];
 		
@@ -645,27 +646,19 @@ class assSingleChoice extends assQuestion implements  ilObjQuestionScoringAdjust
 		{
 			if (strlen($_POST["multiple_choice_result"]))
 			{
-				$affectedRows = $ilDB->update("tst_solutions", array(
-					"value1" => array("clob", $_POST["multiple_choice_result"]),
-					"tstamp" => array("integer", time())
-				), array(
-				"solution_id" => array("integer", $update)
-				));
+				$this->updateCurrentSolution($update, $_POST["multiple_choice_result"], null, $authorized);
 				$entered_values++;
 			}
 			else
 			{
-				$affectedRows = $ilDB->manipulateF("DELETE FROM tst_solutions WHERE solution_id = %s",
-					array('integer'),
-					array($update)
-				);
+				$this->removeSolutionRecordById($update);
 			}
 		}
 		else
 		{
 			if (strlen($_POST["multiple_choice_result"]))
 			{
-				$affectedRows = $this->saveCurrentSolution($active_id, $pass, $_POST['multiple_choice_result'], null);
+				$this->saveCurrentSolution($active_id, $pass, $_POST['multiple_choice_result'], null, $authorized);
 				$entered_values++;
 			}
 		}
@@ -1122,6 +1115,7 @@ class assSingleChoice extends assQuestion implements  ilObjQuestionScoringAdjust
 		$value = rand(0, count($this->answers)-1);
 		$_POST["multiple_choice_result"] = (strlen($value)) ? (string)$value : '0';
 		$this->saveWorkingData($active_id, $pass);
+		$this->calculateResultsFromSolution($active_id, $pass);
 	}
 
 	function getMultilineAnswerSetting()
@@ -1177,6 +1171,11 @@ class assSingleChoice extends assQuestion implements  ilObjQuestionScoringAdjust
 		}
 	}
 
+	public function getSpecificFeedbackAllCorrectOptionLabel()
+	{
+		return 'feedback_correct_sc_mc';
+	}
+
 	/**
 	 * returns boolean wether the question
 	 * is answered during test pass or not
@@ -1187,7 +1186,7 @@ class assSingleChoice extends assQuestion implements  ilObjQuestionScoringAdjust
 	 * @param integer $pass
 	 * @return boolean $answered
 	 */
-	public function isAnswered($active_id, $pass)
+	public function isAnswered($active_id, $pass  = NULL)
 	{
 		$numExistingSolutionRecords = assQuestion::getNumExistingSolutionRecords($active_id, $pass, $this->getId());
 
@@ -1250,13 +1249,24 @@ class assSingleChoice extends assQuestion implements  ilObjQuestionScoringAdjust
 		global $ilDB;
 		$result = new ilUserQuestionResult($this, $active_id, $pass);
 
-		$data = $ilDB->queryF(
-			"SELECT * FROM tst_solutions WHERE active_fi = %s AND pass = %s AND question_fi = %s AND step = (
-				SELECT MAX(step) FROM tst_solutions WHERE active_fi = %s AND pass = %s AND question_fi = %s
-			)",
-			array("integer", "integer", "integer","integer", "integer", "integer"),
-			array($active_id, $pass, $this->getId(), $active_id, $pass, $this->getId())
-		);
+		$maxStep = $this->lookupMaxStep($active_id, $pass);
+
+		if( $maxStep !== null )
+		{
+			$data = $ilDB->queryF(
+				"SELECT * FROM tst_solutions WHERE active_fi = %s AND pass = %s AND question_fi = %s AND step = %s",
+				array("integer", "integer", "integer","integer"),
+				array($active_id, $pass, $this->getId(), $maxStep)
+			);
+		}
+		else
+		{
+			$data = $ilDB->queryF(
+				"SELECT * FROM tst_solutions WHERE active_fi = %s AND pass = %s AND question_fi = %s",
+				array("integer", "integer", "integer"),
+				array($active_id, $pass, $this->getId())
+			);
+		}
 
 		$row = $ilDB->fetchAssoc($data);
 

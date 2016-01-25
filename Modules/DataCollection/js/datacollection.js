@@ -39,7 +39,7 @@ $(document).ready(function () {
 	};
 
 	/**
-	 * Formula-Fields can't be unique or required
+	 * Returns true if a selected field does not support to be unique or required
 	 */
 	dcl.checkForUnsupportedRequiredOrUniqueFields = function () {
 		var fields = ['#datatype_11', '#datatype_7'];

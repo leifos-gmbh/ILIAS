@@ -16,6 +16,8 @@ class ilExport
 	
 	// this should be part of module.xml and be parsed in the future
 	static $export_implementer = array("tst", "lm", "glo");
+
+	protected $configs = array();
 	
 	/**
 	 * Default constructor
@@ -23,9 +25,39 @@ class ilExport
 	 */
 	public function __construct()
 	{
-		
 	}
-	
+
+	/**
+	 * Get configuration (note that configurations are optional, null may be returned!)
+	 *
+	 * @param string $a_comp component (e.g. "Modules/Glossary")
+	 * @return ilExportConfig $a_comp configuration object or null
+	 * @throws ilExportException
+	 */
+	function getConfig($a_comp)
+	{
+		// if created, return existing config object
+		if (isset($this->configs[$a_comp]))
+		{
+			return $this->configs[$a_comp];
+		}
+
+		// create instance of export config object
+		$comp_arr = explode("/", $a_comp);
+		$a_class = "il".$comp_arr[1]."ExportConfig";
+		$export_config_file = "./".$a_comp."/classes/class.".$a_class.".php";
+		if (!is_file($export_config_file))
+		{
+			include_once("./Services/Export/exceptions/class.ilExportException.php");
+			throw new ilExportException('Component "'.$a_comp.'" does not provide ExportConfig class.');
+		}
+		include_once($export_config_file);
+		$exp_config = new $a_class();
+		$this->configs[$a_comp] = $exp_config;
+
+		return $exp_config;
+	}
+
 
 	/**
 	* Get a list of subitems of a repository resource, that implement
@@ -276,9 +308,16 @@ class ilExport
 	 *
 	 * @return array success and info array
 	 */
-	function exportObject($a_type, $a_id, $a_target_release)
+	function exportObject($a_type, $a_id, $a_target_release = "")
 	{
 		global $objDefinition, $tpl;
+
+		// if no target release specified, use latest major release number
+		if ($a_target_release == "")
+		{
+			$v = explode(".", ILIAS_VERSION_NUMERIC);
+			$a_target_release = $v[0].".".$v[1].".0";
+		}
 				
 		$comp = $objDefinition->getComponentForType($a_type);
 		$c = explode("/", $comp);
@@ -430,11 +469,12 @@ class ilExport
 //echo "1-".$export_class_file."-"; exit;
 		if (!is_file($export_class_file))
 		{
-echo "1-not found:".$export_class_file."-"; exit;
-			return false;
+			include_once("./Services/Export/exceptions/class.ilExportException.php");
+			throw new ilExportException('Export class file "'.$export_class_file.'" not found.');
 		}
 		include_once($export_class_file);
 		$exp = new $a_class();
+		$exp->setExport($this);
 		if (!isset($this->cnt[$a_comp]))
 		{
 			$this->cnt[$a_comp] = 1;

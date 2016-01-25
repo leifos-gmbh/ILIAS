@@ -45,7 +45,7 @@ class ilSurveyQuestionsTableGUI extends ilTable2GUI
 	 */
 	public function __construct($a_parent_obj, $a_parent_cmd, $a_write_access = false)
 	{
-		$this->setId("spl");
+		$this->setId("spl");		
 		$this->setPrefix('q_id'); // #16982
 		
 		parent::__construct($a_parent_obj, $a_parent_cmd);
@@ -57,10 +57,10 @@ class ilSurveyQuestionsTableGUI extends ilTable2GUI
 	
 		$this->setWriteAccess($a_write_access);
 
-		$qplSetting = new ilSetting("spl");
+		//$qplSetting = new ilSetting("spl");
 			
-		$this->setFormName('questionbrowser');
-		$this->setStyle('table', 'fullwidth');
+		//$this->setFormName('questionbrowser');
+		//$this->setStyle('table', 'fullwidth');
 		
 		if ($this->getWriteAccess())
 		{
@@ -107,9 +107,9 @@ class ilSurveyQuestionsTableGUI extends ilTable2GUI
 		
 		$this->setShowRowsSelector(true);
 		
-		$this->enable('sort');
-		$this->enable('header');
-		$this->enable('select_all');
+		//$this->enable('sort');
+		//$this->enable('header');
+		//$this->enable('select_all');
 		$this->setFilterCommand('filterQuestionBrowser');
 		$this->setResetCommand('resetfilterQuestionBrowser');
 		

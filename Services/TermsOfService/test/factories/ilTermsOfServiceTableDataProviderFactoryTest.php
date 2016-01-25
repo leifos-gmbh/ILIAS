@@ -19,6 +19,16 @@ class ilTermsOfServiceTableDataProviderFactoryTest extends PHPUnit_Framework_Tes
 	 */
 	public function setUp()
 	{
+		if(!defined('MDB2_AUTOQUERY_INSERT'))
+		{
+			define('MDB2_AUTOQUERY_INSERT', 1);
+		}
+		if(!defined('CLIENT_ID'))
+		{
+			define('CLIENT_ID', 'phpunit');
+		}
+
+		parent::setUp();
 	}
 
 	/**
@@ -47,7 +57,7 @@ class ilTermsOfServiceTableDataProviderFactoryTest extends PHPUnit_Framework_Tes
 	 */
 	public function testFactoryShouldReturnLanguageAdapterWhenLanguageAdapterIsSet(ilTermsOfServiceTableDataProviderFactory $factory)
 	{
-		$lng = $this->getMockBuilder('ilLanguage')->disableOriginalConstructor()->getMock();
+		$lng = $this->getMockBuilder('ilLanguage')->setMethods(array('toJSON'))->disableOriginalConstructor()->getMock();
 		$factory->setLanguageAdapter($lng);
 		$this->assertEquals($lng, $factory->getLanguageAdapter());
 	}
@@ -91,7 +101,7 @@ class ilTermsOfServiceTableDataProviderFactoryTest extends PHPUnit_Framework_Tes
 	 */
 	public function testFactoryShouldReturnAgreementByLanguageProviderWhenRequested(ilTermsOfServiceTableDataProviderFactory $factory)
 	{
-		$factory->setLanguageAdapter($this->getMockBuilder('ilLanguage')->disableOriginalConstructor()->getMock());
+		$factory->setLanguageAdapter($this->getMockBuilder('ilLanguage')->setMethods(array('toJSON'))->disableOriginalConstructor()->getMock());
 		$this->assertInstanceOf('ilTermsOfServiceAgreementByLanguageProvider', $factory->getByContext(ilTermsOfServiceTableDataProviderFactory::CONTEXT_AGRREMENT_BY_LANGUAGE));
 	}
 

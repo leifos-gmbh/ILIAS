@@ -106,7 +106,17 @@ class ilPublicUserProfileGUI
 		$this->backurl = $a_backurl;
 		$ilCtrl->setParameter($this, "back_url", rawurlencode($a_backurl));
 	}
-	
+
+	/**
+	* Get Back Link URL.
+	*
+	* @return	string	Back Link URL
+	*/
+	function getBackUrl()
+	{
+		return $this->backurl;
+	}
+		
 	protected function handleBackUrl()
 	{
 		global $ilMainMenu;
@@ -123,17 +133,7 @@ class ilPublicUserProfileGUI
 
 		$ilMainMenu->setTopBarBack($back);
 	}
-
-	/**
-	* Get Back Link URL.
-	*
-	* @return	string	Back Link URL
-	*/
-	function getBackUrl()
-	{
-		return $this->backurl;
-	}
-
+	
 	/**
 	 * Set custom preferences for public profile fields
 	 *
@@ -203,7 +203,18 @@ class ilPublicUserProfileGUI
 					$ilCtrl->forwardCommand($gui);	
 					break;
 				}							
-			
+			case 'ilbuddysystemgui':
+				if(isset($_REQUEST['osd_id']))
+				{
+					require_once 'Services/Notifications/classes/class.ilNotificationOSDHandler.php';
+					ilNotificationOSDHandler::removeNotification($_REQUEST['osd_id']);
+				}
+
+				require_once 'Services/Contact/BuddySystem/classes/class.ilBuddySystemGUI.php';
+				$gui = new ilBuddySystemGUI();
+				$ilCtrl->setReturn($this, 'view');
+				$ilCtrl->forwardCommand($gui);
+				break;
 			default:
 				$ret = $this->$cmd();
 				$tpl->setContent($ret);			
@@ -252,19 +263,28 @@ class ilPublicUserProfileGUI
 		}
 		else
 		{
+
 			if(!$is_active)
 			{
-				return;
+				ilUtil::redirect('ilias.php?baseClass=ilPersonalDesktopGUI');
 			}
-
+			
 			// Check from Database if value
 			// of public_profile = "y" show user infomation
 			$user = new ilObjUser($this->getUserId());
-			if ($user->getPref("public_profile") != "y" &&
-				($user->getPref("public_profile") != "g" || !$ilSetting->get('enable_global_profiles')) &&
+			$current = $user->getPref("public_profile");
+							
+			// #17462 - see ilPersonalProfileGUI::initPublicProfileForm()
+			if($user->getPref("public_profile") == "g" && !$ilSetting->get('enable_global_profiles'))
+			{
+				$current = "y";
+			}
+			
+			if ($current != "y" &&
+				($current != "g" || !$ilSetting->get('enable_global_profiles')) &&
 				!$this->custom_prefs)
 			{
-				return;
+				ilUtil::redirect('ilias.php?baseClass=ilPersonalDesktopGUI');
 			}
 
 			$this->renderTitle();
@@ -321,6 +341,16 @@ class ilPublicUserProfileGUI
 		$tpl->setVariable("FIRSTNAME", $first_name);
 		$tpl->setVariable("LASTNAME", $user->getLastName());
 		
+		if($user->getBirthday() &&
+			$this->getPublicPref($user, "public_birthday") == "y")
+		{
+			// #17574
+			$tpl->setCurrentBlock("bday_bl");
+			$tpl->setVariable("TXT_BIRTHDAY", $lng->txt("birthday"));
+			$tpl->setVariable("VAL_BIRTHDAY", ilDatePresentation::formatDate(new ilDate($user->getBirthday(), IL_CAL_DATE)));
+			$tpl->parseCurrentBlock();
+		}
+		
 		if(!$this->offline)
 		{
 			// vcard
@@ -347,7 +377,8 @@ class ilPublicUserProfileGUI
 			$imagefile = basename($imagefile);			
 		}
 
-		if ($this->getPublicPref($user, "public_upload")=="y" && $imagefile != "")
+		if ($this->getPublicPref($user, "public_upload")=="y" && $imagefile != "" &&
+			($ilUser->getId() != ANONYMOUS_USER_ID || $user->getPref("public_profile") == "g"))
 		{
 			//Getting the flexible path of image form ini file
 			//$webspace_dir = ilUtil::getWebspaceDir("output");
@@ -500,6 +531,40 @@ class ilPublicUserProfileGUI
 				$tpl->parseCurrentBlock();
 			}
 		}
+
+		// portfolios
+		include_once("./Services/Link/classes/class.ilLink.php");
+		include_once("./Modules/Portfolio/classes/class.ilObjPortfolio.php");
+		$back = ($this->getBackUrl() != "")
+			? $this->getBackUrl()
+			: ilLink::_getStaticLink($this->getUserId(), "usr", true);
+		$port = ilObjPortfolio::getAvailablePortfolioLinksForUserIds(array($this->getUserId()), $back);
+		$cnt=0;
+		if (count($port) > 0)
+		{
+			foreach ($port as $u)
+			{
+				$tpl->setCurrentBlock("portfolio");
+				foreach ($u as $link => $title)
+				{
+					$cnt++;
+					$tpl->setVariable("HREF_PORTFOLIO", $link);
+					$tpl->setVariable("TITLE_PORTFOLIO", $title);
+					$tpl->parseCurrentBlock();
+				}
+			}
+			$tpl->setCurrentBlock("portfolios");
+			if ($cnt > 1)
+			{
+				$lng->loadLanguageModule("prtf");
+				$tpl->setVariable("TXT_PORTFOLIO", $lng->txt("prtf_portfolios"));
+			}
+			else
+			{
+				$tpl->setVariable("TXT_PORTFOLIO", $lng->txt("portfolio"));
+			}
+			$tpl->parseCurrentBlock();
+		}
 		
 		// delicious row
 		//$d_set = new ilSetting("delicious");
@@ -565,7 +630,18 @@ class ilPublicUserProfileGUI
 				$tpl->parseCurrentBlock();
 			}
 		}
-		
+
+		if(
+			$this->getUserId() != $ilUser->getId() &&
+			!$ilUser->isAnonymous() &&
+			!ilObjUser::_isAnonymous($this->getUserId())
+		)
+		{
+			require_once 'Services/Contact/BuddySystem/classes/class.ilBuddySystemLinkButton.php';
+			$button = ilBuddySystemLinkButton::getInstanceByUserId($user->getId());
+			$tpl->setVariable('BUDDY_HTML', $button->getHtml());
+		}
+
 		$goto = "";
 		if($a_add_goto)
 		{			
@@ -701,7 +777,7 @@ class ilPublicUserProfileGUI
 	 */
 	protected static function validateUser($a_user_id)
 	{
-		global $ilUser;
+		global $ilUser, $ilCtrl;
 
 		if (ilObject::_lookupType($a_user_id) != "usr")
 		{
@@ -717,6 +793,19 @@ class ilPublicUserProfileGUI
 			}
 			return false;
 		}	
+
+		if($ilUser->isAnonymous())
+		{
+			if(strtolower($ilCtrl->getCmd()) == strtolower('approveContactRequest'))
+			{
+				ilUtil::redirect('login.php?cmd=force_login&target=usr_' . $a_user_id . '_contact_approved');
+			}
+			else if(strtolower($ilCtrl->getCmd()) == strtolower('ignoreContactRequest'))
+			{
+				ilUtil::redirect('login.php?cmd=force_login&target=usr_' . $a_user_id . '_contact_ignored');
+			}
+		}
+
 		return true;
 	}
 	
@@ -806,6 +895,43 @@ class ilPublicUserProfileGUI
 
 		exit();
 	}
-}
 
+	/**
+	 * @return string|void
+	 */
+	protected function approveContactRequest()
+	{
+		/**
+		 * @var $ilCtrl ilCtrl
+		 */
+		global $ilCtrl;
+
+		if(isset($_REQUEST['osd_id']))
+		{
+			$ilCtrl->setParameterByClass('ilBuddySystemGUI', 'osd_id', $_REQUEST['osd_id']);
+		}
+
+		$ilCtrl->setParameterByClass('ilBuddySystemGUI', 'user_id', $this->getUserId());
+		$ilCtrl->redirectByClass(array('ilPublicUserProfileGUI', 'ilBuddySystemGUI'), 'link');
+	}
+
+	/**
+	 * @return string|void
+	 */
+	protected function ignoreContactRequest()
+	{
+		/**
+		 * @var $ilCtrl ilCtrl
+		 */
+		global $ilCtrl;
+
+		if(isset($_REQUEST['osd_id']))
+		{
+			$ilCtrl->setParameterByClass('ilBuddySystemGUI', 'osd_id', $_REQUEST['osd_id']);
+		}
+
+		$ilCtrl->setParameterByClass('ilBuddySystemGUI', 'user_id', $this->getUserId());
+		$ilCtrl->redirectByClass(array('ilPublicUserProfileGUI', 'ilBuddySystemGUI'), 'ignore');
+	}
+}
 ?>

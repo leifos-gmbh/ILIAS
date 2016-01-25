@@ -8,7 +8,7 @@
 	</objectgroups>
 	<objects>
 		<object id="crs" class_name="Course" dir="classes" default_pos="20" default_pres_pos="30"
-			checkbox="1" inherit="1" translate="0" allow_copy="1" rbac="1" grp="crs" export="1" amet="1">
+			checkbox="1" inherit="1" translate="0" allow_copy="1" rbac="1" group="crs" export="1" amet="1">
 			<parent id="cat">cat</parent>
 			<parent id="recf">recf</parent>
 			<parent id="root">root</parent>
@@ -26,6 +26,7 @@
 	</objects>
 	<events>		
 		<event type="listen" id="Services/Tracking" />
+		<event type="listen" id="Services/AccessControl" />
 		<event type="raise" id="create" />
 		<event type="raise" id="update" />
 		<event type="raise" id="delete" />
@@ -37,4 +38,9 @@
 	<copage>
 		<pageobject parent_type="lobj" class_name="ilLOPage" directory="classes/Objectives"/>	
 	</copage>
+	<mailtemplates>
+		<context id="crs_context_tutor_manual" class="ilCourseMailTemplateTutorContext" />
+		<context id="crs_context_member_manual" class="ilCourseMailTemplateMemberContext" />
+	</mailtemplates>
+	<logging />
 </module>

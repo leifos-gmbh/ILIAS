@@ -231,7 +231,7 @@ class assNumericGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjust
 		$questionoutput = $template->get();
 		//$feedback = ($show_feedback) ? $this->getAnswerFeedbackOutput($active_id, $pass) : ""; // Moving new method 
 																								 // due to deprecation.
-		$feedback = ($show_feedback) ? $this->getGenericFeedbackOutput($active_id, $pass) : "";
+		$feedback = ($show_feedback && !$this->isTestPresentationContext()) ? $this->getGenericFeedbackOutput($active_id, $pass) : "";
 		if (strlen($feedback)) $solutiontemplate->setVariable("FEEDBACK", $this->object->prepareTextareaOutput( $feedback, true ));
 		$solutiontemplate->setVariable("SOLUTION_OUTPUT", $questionoutput);
 
@@ -278,7 +278,7 @@ class assNumericGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjust
 	 *
 	 * @return string
 	 */
-	public function getTestOutput($active_id, $pass = NULL, $is_postponed = FALSE, $use_post_solutions = FALSE)
+	public function getTestOutput($active_id, $pass = NULL, $is_postponed = FALSE, $use_post_solutions = FALSE, $inlineFeedback)
 	{
 		$solutions = NULL;
 		// get the solution of the user for the active pass or from the last pass if allowed
@@ -290,7 +290,7 @@ class assNumericGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjust
 			{
 				if (is_null($pass)) $pass = ilObjTest::_getPass($active_id);
 			}
-			$solutions =& $this->object->getSolutionValues($active_id, $pass);
+			$solutions = $this->object->getUserSolutionPreferingIntermediate($active_id, $pass);
 		}
 		
 		// generate the question output

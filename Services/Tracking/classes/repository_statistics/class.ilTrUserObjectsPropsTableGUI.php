@@ -298,7 +298,11 @@ class ilTrUserObjectsPropsTableGUI extends ilLPTableBaseGUI
 							$text = ilLearningProgressBaseGUI::_getStatusText($data[$c]);
 							$val = ilUtil::img($path, $text);
 
-							if($data["type"] != "lobj" && $data["type"] != "sco")	
+							if($data["ref_id"] && 
+								$data["type"] != "lobj" && 
+								$data["type"] != "sco" && 
+								$data["type"] != "st" &&
+								$data["type"] != "mob")	
 							{
 								$timing = $this->showTimingsWarning($data["ref_id"], $this->user_id);
 								if($timing)
@@ -319,9 +323,16 @@ class ilTrUserObjectsPropsTableGUI extends ilLPTableBaseGUI
 					}
 							break;
 
-						case "spent_seconds":
-							include_once("./Services/Utilities/classes/class.ilFormat.php");							
-							$val = ilFormat::_secondsToString($data[$c], ($data[$c] < 3600 ? true : false)); // #14858
+						case "spent_seconds":							
+							if(!ilObjectLP::supportsSpentSeconds($data["type"]))				
+							{
+								$val = "-";
+							}
+							else
+							{
+								include_once("./Services/Utilities/classes/class.ilFormat.php");							
+								$val = ilFormat::_secondsToString($data[$c], ($data[$c] < 3600 ? true : false)); // #14858
+							}
 							break;
 
 						case "percentage":
@@ -330,18 +341,18 @@ class ilTrUserObjectsPropsTableGUI extends ilLPTableBaseGUI
 
 					}
 				}
-				if ($c == "mark" && in_array($this->type, array("lm", "dbk")))
+				if ($c == "mark" && 
+					!ilObjectLP::supportsMark($this->type))				
 				{
 					$val = "-";
 				}
-				if ($c == "spent_seconds" && in_array($this->type, array("exc")))
+				if ($c == "spent_seconds" && 
+					!ilObjectLP::supportsSpentSeconds($this->type))
 				{
 					$val = "-";
-				}
+				}				
 				if ($c == "percentage" &&
-					(in_array(strtolower($this->status_class),
-							  array("illpstatusmanual", "illpstatusscormpackage", "illpstatustestfinished")) ||
-					$this->type == "exc"))
+					!$this->isPercentageAvailable($data["obj_id"]))
 				{
 					$val = "-";
 				}
@@ -409,11 +420,23 @@ class ilTrUserObjectsPropsTableGUI extends ilLPTableBaseGUI
 			$this->tpl->setVariable("VAL_TITLE", $data["title"]);
 			$this->tpl->parseCurrentBlock();
 		}
+		
+		// #16453 / #17163
+		if($data['ref_id'])
+		{
+			include_once './Services/Tree/classes/class.ilPathGUI.php';
+			$path = new ilPathGUI();
+			$path = $path->getPath($this->ref_id, $data['ref_id']);
+			if($path)
+			{
+				$this->tpl->setVariable('COLL_PATH', $this->lng->txt('path').': '.$path);
+			}
+		}
 
 		// #13807 / #17069
 		if($data["ref_id"] &&
 			$rbacsystem->checkAccess('edit_learning_progress', $data["ref_id"]))
-		{
+		{		
 			if(!in_array($data["type"], array("sco", "lobj")) && !$this->getPrintMode())
 			{
 				$this->tpl->setCurrentBlock("item_command");
@@ -450,7 +473,7 @@ class ilTrUserObjectsPropsTableGUI extends ilLPTableBaseGUI
 		{
 			if($c != 'status')
 			{
-				$val = $this->parseValue($c, $a_set[$c], "user");
+				$val = $this->parseValue($c, $a_set[$c], $this->type);
 			}
 			else
 			{
@@ -484,7 +507,7 @@ class ilTrUserObjectsPropsTableGUI extends ilLPTableBaseGUI
 		{
 			if($c != 'status')
 			{
-				$val = $this->parseValue($c, $a_set[$c], "user");
+				$val = $this->parseValue($c, $a_set[$c], $this->type);
 			}
 			else
 			{

@@ -70,6 +70,7 @@ class ilObjectGUI
 	var $formaction;		// special formation (array "cmd" => "formaction")
 	var $return_location;	// special return location (array "cmd" => "location")
 	var $target_frame;	// special target frame (array "cmd" => "location")
+	protected $tmp_import_dir;	// directory used during import
 
 	var $tab_target_script;
 	var $actions;
@@ -118,7 +119,7 @@ class ilObjectGUI
 
 		$this->ctrl->saveParameter($this, $params);
 
-		$this->lng =& $lng;
+		$this->lng = $lng;
 		$this->tree =& $tree;
 		$this->formaction = array();
 		$this->return_location = array();
@@ -1128,9 +1129,17 @@ class ilObjectGUI
 		{
 			$form->setValuesByArray($values);
 		}
+		
+		$this->addExternalEditFormCustom($form);
+		
 		$tpl->setContent($form->getHTML());
 	}
 
+	public function addExternalEditFormCustom(ilPropertyFormGUI $a_form)
+	{
+		// has to be done AFTER setValuesByArray() ...
+	}
+	
 	/**
 	 * Init object edit form
 	 *
@@ -1291,7 +1300,7 @@ class ilObjectGUI
 	/**
 	 * Import
 	 */
-	protected function importFileObject($parent_id = null)
+	protected function importFileObject($parent_id = null, $a_catch_errors = true)
 	{
 		global $objDefinition, $tpl, $ilErr;
 
@@ -1314,7 +1323,7 @@ class ilObjectGUI
 		if ($form->checkInput())
 		{
 			// :todo: make some check on manifest file
-			
+
 			if($objDefinition->isContainer($new_type))
 			{
 				include_once './Services/Export/classes/class.ilImportContainer.php';
@@ -1326,8 +1335,24 @@ class ilObjectGUI
 				$imp = new ilImport((int)$parent_id);
 			}
 
-			$new_id = $imp->importObject(null, $_FILES["importfile"]["tmp_name"],
-				$_FILES["importfile"]["name"], $new_type);
+			try
+			{
+				$new_id = $imp->importObject(null, $_FILES["importfile"]["tmp_name"],
+					$_FILES["importfile"]["name"], $new_type);
+			}
+			catch (ilException $e)
+			{
+				$this->tmp_import_dir = $imp->getTemporaryImportDir();
+				if (!$a_catch_errors)
+				{
+					throw $e;
+				}
+				// display message and form again
+				ilUtil::sendFailure($this->lng->txt("obj_import_file_error")." <br />".$e->getMessage());
+				$form->setValuesByPost();
+				$tpl->setContent($form->getHtml());
+				return;
+			}
 
 			if ($new_id > 0)
 			{
@@ -1587,7 +1612,7 @@ class ilObjectGUI
 	{
 		if ($this->sub_objects == "")
 		{
-			$d = $this->objDefinition->getCreatableSubObjects($this->object->getType());
+			$d = $this->objDefinition->getCreatableSubObjects($this->object->getType(), ilObjectDefinition::MODE_REPOSITORY, $this->ref_id);
 		}
 		else
 		{
@@ -2084,7 +2109,6 @@ class ilObjectGUI
 			$a_new_obj->update();
 		}		
 	}
-
 } // END class.ilObjectGUI (3.10: 2896 loc)
 
 ?>

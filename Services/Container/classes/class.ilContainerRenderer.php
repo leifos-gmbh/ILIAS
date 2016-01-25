@@ -172,7 +172,7 @@ class ilContainerRenderer
 			foreach($items as $idx => $item_id)
 			{
 				if(array_pop(explode(self::UNIQUE_SEPARATOR, $item_id)) == $a_id)
-				{		
+				{
 					unset($this->block_items[$block_id][$idx]);
 					if(!sizeof($this->block_items[$block_id]))
 					{
@@ -199,7 +199,7 @@ class ilContainerRenderer
 				return true;
 			}
 		}		
-		return in_array($a_id, $this->hidden_items);		
+		return in_array($a_id, $this->hidden_items);
 	}
 	
 	/**
@@ -220,8 +220,8 @@ class ilContainerRenderer
 			trim($a_item_html))
 		{			
 			// #16563 - item_id (== ref_id) is NOT unique, adding parent block id
-			$uniq_id = $a_block_id.self::UNIQUE_SEPARATOR.$a_item_id;					
-			
+			$uniq_id = $a_block_id.self::UNIQUE_SEPARATOR.$a_item_id;			
+		
 			$this->items[$uniq_id] = array(
 				"type" => $a_item_type
 				,"html" => $a_item_html

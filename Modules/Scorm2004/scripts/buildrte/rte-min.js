@@ -1,4 +1,4 @@
-// Build: 20151123102911 
+// Build: 20151022020047 
 
 function ADLAuxiliaryResource()
 {}
@@ -2865,8 +2865,7 @@ if(this.config.sequencing_enabled){msequencer.getCourseStatusByGlobalObjectives(
 else{result["changed_seq_utilities"]=0;}}else{result["adl_seq_utilities"]={};result["changed_seq_utilities"]=0;}
 var LP_STATUS_IN_PROGRESS_NUM=1,LP_STATUS_COMPLETED_NUM=2,LP_STATUS_FAILED_NUM=3;var percentageCompleted=0;var now_global_status=LP_STATUS_IN_PROGRESS_NUM;if(config.status.lp_mode==6){if(b_statusFailed==true)now_global_status=LP_STATUS_FAILED_NUM;else if(config.status.scos.length==i_numCompleted)now_global_status=LP_STATUS_COMPLETED_NUM;percentageCompleted=Math.round(i_numCompleted*100/config.status.scos.length);}
 else if(config.status.lp_mode==12){var measure=this.adl_seq_utilities.status[this.config.course_id][this.config.learner_id]["measure"];var satisfied=this.adl_seq_utilities.status[this.config.course_id][this.config.learner_id]["satisfied"];var completed=this.adl_seq_utilities.status[this.config.course_id][this.config.learner_id]["completed"];if(completed=="completed"||satisfied=="satisfied")now_global_status=LP_STATUS_COMPLETED_NUM;if(satisfied=="notSatisfied")now_global_status=LP_STATUS_FAILED_NUM;if(!isNaN(measure))percentageCompleted=Math.round(measure*100);}
-result["saved_global_status"]=config.status.saved_global_status;result["now_global_status"]=now_global_status;result["percentageCompleted"]=percentageCompleted;result["lp_mode"]=config.status.lp_mode;result["hash"]=config.status.hash;result["p"]=config.status.p;result["totalTimeCentisec"]=totalTimeCentisec;var to_saved_result=toJSONString(result);if(saved_result==to_saved_result){return true;}else{if(typeof SOP!="undefined"&&SOP==true)result=saveRequest(result);else{try{result=this.config.store_url?sendJSONRequest(this.config.store_url,result):{};}catch(e){return false;}}
-updateNavForSequencing();if(typeof result=="object"){saved_result=to_saved_result;var new_global_status=null;for(k in result){if(k=="new_global_status")new_global_status=result[k];}
+result["saved_global_status"]=config.status.saved_global_status;result["now_global_status"]=now_global_status;result["percentageCompleted"]=percentageCompleted;result["lp_mode"]=config.status.lp_mode;result["hash"]=config.status.hash;result["p"]=config.status.p;result["totalTimeCentisec"]=totalTimeCentisec;var to_saved_result=toJSONString(result);if(saved_result==to_saved_result){return true;}else{if(typeof SOP!="undefined"&&SOP==true)result=saveRequest(result);else result=this.config.store_url?sendJSONRequest(this.config.store_url,result):{};updateNavForSequencing();if(typeof result=="object"){saved_result=to_saved_result;var new_global_status=null;for(k in result){if(k=="new_global_status")new_global_status=result[k];}
 if(config.status.saved_global_status!=new_global_status){try{windowOpenerLoc.reload();}catch(e){}}
 config.status.saved_global_status=new_global_status;return true;}}
 return false;}
@@ -2936,13 +2935,15 @@ function onItemDeliverDo(item,wasSuspendAll)
 data.adl.data=adlcpData;var choice=validRequests['mChoice'];for(var k in choice){}
 item.accesscount++;data.cmi.learner_name=globalAct.learner_name;data.cmi.learner_id=this.config.cmi_learner_id;data.cmi.cp_node_id=item.foreignId;data.scoid=item.id;data.cmi.session_time=undefined;data.cmi.completion_threshold=item.completionThreshold;data.cmi.launch_data=item.dataFromLMS;data.cmi.time_limit_action=item.timeLimitAction;data.cmi.max_time_allowed=item.attemptAbsoluteDurationLimit;data.cmi.entry="";data.cmi.learner_preference={audio_level:(item.audio_level)?item.audio_level:1,delivery_speed:(item.delivery_speed)?item.delivery_speed:1,language:item.language,audio_captioning:item.audio_captioning};if(item.objectives)
 {for(k in item.objectives){v=item.objectives[k];if(v.primary==true){if(v.satisfiedByMeasure&&v.minNormalizedMeasure!==undefined)
-{v=v.minNormalizedMeasure;}
+{v=v.minNormalizedMeasure;if(typeof this.config.lesson_mastery_score!="undefined"&&this.config.lesson_mastery_score!=null)v=this.config.lesson_mastery_score/100;}
 else if(v.satisfiedByMeasure)
 {v=1.0;}
 else
 {v=null;}
 data.cmi.scaled_passing_score=v;break;}}}
-window.document.getElementById("noCredit").style.display='none';if(globalAct.auto_review!='n'){if((globalAct.auto_review=='r'&&((item.completion_status=='completed'&&item.success_status!='failed')||item.success_status=='passed'))||(globalAct.auto_review=='p'&&item.success_status=='passed')||(globalAct.auto_review=='q'&&(item.success_status=='passed'||item.success_status=='failed'))||(globalAct.auto_review=='c'&&item.completion_status=='completed')||(globalAct.auto_review=='d'&&(item.completion_status=='completed'&&item.success_status=='passed'))||(globalAct.auto_review=='y'&&(item.completion_status=='completed'||item.success_status=='passed'))){data.cmi.mode="review";}}
+window.document.getElementById("noCredit").style.display='none';saved_score_scaled=0;if(globalAct.auto_review=='s'){if(data.cmi.score.scaled!=""&&typeof parseFloat(data.cmi.score.scaled)=="number"){var b_in_ar=false;for(var i=0;i<ar_saved_score_scaled.length;i++){if(ar_saved_score_scaled[i][0]==item.id){saved_score_scaled=ar_saved_score_scaled[i][1];b_in_ar=true;}}
+if(b_in_ar==false){saved_score_scaled=parseFloat(data.cmi.score.scaled);ar_saved_score_scaled[ar_saved_score_scaled.length]=new Array(item.id,parseFloat(data.cmi.score.scaled));}}}
+if(globalAct.auto_review!='n'){if((globalAct.auto_review=='r'&&((item.completion_status=='completed'&&item.success_status!='failed')||item.success_status=='passed'))||(globalAct.auto_review=='p'&&item.success_status=='passed')||(globalAct.auto_review=='q'&&(item.success_status=='passed'||item.success_status=='failed'))||(globalAct.auto_review=='c'&&item.completion_status=='completed')||(globalAct.auto_review=='d'&&(item.completion_status=='completed'&&item.success_status=='passed'))||(globalAct.auto_review=='y'&&(item.completion_status=='completed'||item.success_status=='passed'))){data.cmi.mode="review";}}
 if(data.cmi.mode!="review"){if(item.exit!="suspend"){data.cmi.completion_status="unknown";data.cmi.success_status="unknown";data.cmi.entry="ab-initio";data.cmi.suspend_data=null;data.cmi.total_time="PT0H0M0S";}
 if(item.exit=="suspend"||wasSuspendAll)data.cmi.entry="resume";}
 if(config.mode=="browse")data.cmi.mode="browse";if(data.cmi.mode=="review"||data.cmi.mode=="browse"||config.credit=="no_credit"){data.cmi.credit="no-credit";window.document.getElementById("noCredit").style.display='inline';}
@@ -3080,15 +3081,15 @@ function removeByElement(arrayName,arrayElement)
 arrayName.splice(i,1);}}
 function createSummary()
 {var logEntry=new Object();logEntry['action']="SUMMARY";a_logEntries.push(toJSONString(logEntry));refreshDebugger();}
-var remoteMapping=null;var remoteInsertId=0;var globalAct=new Activity();var rootAct=new Activity();var activities=new Object();var activitiesByCAM=new Object();var activitiesByCMI=new Object();var activitiesByNo=new Array();var sharedObjectives=new Object();var sharedData=new Array();var msequencer=new ADLSequencer();var mlaunch=null;var adlnavreq=null;var logState=false;var treeState=true;var ITEM_PREFIX="itm";var RESOURCE_PARENT="tdResource";var RESOURCE_NAME="frmResource";var RESOURCE_TOP="mainTable";var guiItemId;var guiState;var gConfig;var RUNNING=1;var WAITING=0;var QUERYING=-1;var ABORTING=-2;var EXIT_ACTIONS=/^exit$/i;var POST_ACTIONS=/^exitParent|exitAll|retry|retryAll|continue|previous$/i;var SKIPPED_ACTIONS=/^skip$/i;var STOP_FORWARD_TRAVERSAL_ACTIONS=/^stopForwardTraversal$/i;var HIDDEN_FROM_CHOICE_ACTIONS=/^hiddenFromChoice$/i;var DISABLED_ACTIONS=/^disabled$/i;var state=WAITING;var SCOEntryedAct=null;var saved_adl_seq_utilities="";var saved_result;var saved={"comment":{"data":[],"checkplus":8},"correct_response":{"data":[],"checkplus":4,"node":""},"interaction":{"data":[],"checkplus":2},"objective":{"data":[],"checkplus":1}};var currentAPI;var scoStartTime=null;var wbtStartTime=currentTime();var openedResource=new Array();var treeView=true;var logActive=false;var scoDebugValues=null;var scoDebugValuesTest=null;var logEntryScoId="";var logEntryScoTitle="";var summaryOnUnload=false;var b_refreshDebugger_busy=false;var a_logEntries=[];var fixedFailure=false;var toleratedFailure=false;var statusArray=new Object();var SCOterminated=true;var onItemDeliver_item;var saved_shared_data="";var saveOnCommit=true;window.scorm_init=init;
+var remoteMapping=null;var remoteInsertId=0;var globalAct=new Activity();var rootAct=new Activity();var activities=new Object();var activitiesByCAM=new Object();var activitiesByCMI=new Object();var activitiesByNo=new Array();var sharedObjectives=new Object();var sharedData=new Array();var msequencer=new ADLSequencer();var mlaunch=null;var adlnavreq=null;var logState=false;var treeState=true;var ITEM_PREFIX="itm";var RESOURCE_PARENT="tdResource";var RESOURCE_NAME="frmResource";var RESOURCE_TOP="mainTable";var guiItemId;var guiState;var gConfig;var RUNNING=1;var WAITING=0;var QUERYING=-1;var ABORTING=-2;var EXIT_ACTIONS=/^exit$/i;var POST_ACTIONS=/^exitParent|exitAll|retry|retryAll|continue|previous$/i;var SKIPPED_ACTIONS=/^skip$/i;var STOP_FORWARD_TRAVERSAL_ACTIONS=/^stopForwardTraversal$/i;var HIDDEN_FROM_CHOICE_ACTIONS=/^hiddenFromChoice$/i;var DISABLED_ACTIONS=/^disabled$/i;var state=WAITING;var SCOEntryedAct=null;var saved_adl_seq_utilities="";var saved_result;var saved={"comment":{"data":[],"checkplus":8},"correct_response":{"data":[],"checkplus":4,"node":""},"interaction":{"data":[],"checkplus":2},"objective":{"data":[],"checkplus":1}};var saved_score_scaled=0;var ar_saved_score_scaled=[];var currentAPI;var scoStartTime=null;var wbtStartTime=currentTime();var openedResource=new Array();var treeView=true;var logActive=false;var scoDebugValues=null;var scoDebugValuesTest=null;var logEntryScoId="";var logEntryScoTitle="";var summaryOnUnload=false;var b_refreshDebugger_busy=false;var a_logEntries=[];var fixedFailure=false;var toleratedFailure=false;var statusArray=new Object();var SCOterminated=true;var onItemDeliver_item;var saved_shared_data="";var saveOnCommit=true;window.scorm_init=init;
 function Runtime(cmiItem,onCommit,onTerminate,onDebug)
 {function GetLastError()
 {if(logActive)
 sendLogEntry(getMsecSinceStart(),'GetLastError',"","",String(error),"");return String(error);}
 function GetErrorString(param)
-{if(typeof param!=='string'&&typeof param!=='number')
-{var returnValueF='GetErrorString param must contain an error code and should be a string';if(logActive)
-sendLogEntry(getMsecSinceStart(),'GetErrorString',String(param),"",returnValueF,"");return returnValueF;}
+{if(typeof param!=='string')
+{if(logActive)
+sendLogEntry(getMsecSinceStart(),'GetErrorString',String(param),"","false",201);return setReturn(201,'GetErrorString param must be empty string','');}
 var e=Runtime.errors[param];var returnValue=e&&e.message?String(e.message).substr(0,255):'';if(logActive)
 sendLogEntry(getMsecSinceStart(),'GetErrorString',String(param),"",returnValue,0);return returnValue;}
 function GetDiagnostic(param)
@@ -3127,8 +3128,10 @@ switch(state)
 {case NOT_INITIALIZED:if(logActive)
 sendLogEntry(getMsecSinceStart(),'Commit',param,"","false",142);return setReturn(142,'','false');case RUNNING:if((!cmiItem.cmi.mode||cmiItem.cmi.mode==="normal")&&(typeof cmiItem.cmi.session_time!="undefined"||config.time_from_lms==true)){if(config.time_from_lms==true){var interval=(currentTime()-msec)/1000;var dur=new ADLDuration({iFormat:FORMAT_SECONDS,iValue:interval});cmiItem.cmi.session_time=dur.format(FORMAT_SCHEMA);}
 var total_time=addTimes(total_time_at_initialize,cmiItem.cmi.session_time);cmiItem.cmi.total_time=total_time.toString();}
-if(config.auto_suspend==true)cmiItem.cmi.exit="suspend";var returnValue=false;if(cmiItem.cmi.credit=="no-credit"){returnValue=true;}
-else{var statusValues=syncCMIADLTree();returnValue=onCommit(cmiItem);if(returnValue&&saveOnCommit==true){if(config.fourth_edition){var sgo=saveSharedData(cmiItem);}
+if(config.auto_suspend==true)cmiItem.cmi.exit="suspend";var saveRespScore=true;if(saveOnCommit==true&&config.auto_review=='s'){if(cmiItem.cmi.score.scaled==""&&saved_score_scaled>0){saveRespScore=false;}
+else if(cmiItem.cmi.score.scaled!=""&&typeof parseFloat(cmiItem.cmi.score.scaled)=="number"&&parseFloat(cmiItem.cmi.score.scaled)<=saved_score_scaled){saveRespScore=false;window.document.getElementById("noCredit").style.display="inline";}else{window.document.getElementById("noCredit").style.display="none";}}
+var returnValue=false;if(cmiItem.cmi.credit=="no-credit"){returnValue=true;}
+else{var statusValues=syncCMIADLTree();returnValue=onCommit(cmiItem);if(returnValue&&saveOnCommit==true&&saveRespScore==true){if(config.fourth_edition){var sgo=saveSharedData(cmiItem);}
 returnValue=save();}}
 if(returnValue)
 {dirty=false;if(logActive&&commitByTerminate==false)

@@ -232,7 +232,7 @@ class ilSearchResultPresentation
 	 */
 	protected function renderItemList()
 	{
-		global $tree,$ilBench,$lng;
+		global $tree,$ilBench, $lng;
 
 		$this->html = '';
 		

@@ -5,12 +5,12 @@
 require_once './Services/User/classes/class.ilObjUser.php';
 require_once 'Services/Mail/classes/class.ilMailbox.php';
 require_once 'Services/Mail/classes/class.ilFormatMail.php';
-require_once 'Services/Contact/classes/class.ilAddressbook.php';
+require_once 'Services/Contact/BuddySystem/classes/class.ilBuddySystem.php';
 
 /**
 * @author Jens Conze
 * @version $Id$
-*
+* @ilCtrl_Calls ilMailSearchGroupsGUI: ilBuddySystemGUI
 * @ingroup ServicesMail
 */
 class ilMailSearchGroupsGUI
@@ -45,14 +45,30 @@ class ilMailSearchGroupsGUI
 		$this->mailing_allowed = $rbacsystem->checkAccess('internal_mail',$mail->getMailObjectReferenceId());
 
 		$this->umail = new ilFormatMail($ilUser->getId());
-		$this->abook = new ilAddressbook($ilUser->getId());
 	}
 
 	public function executeCommand()
 	{
+		/**
+		 * @var $ilErr ilErrorHandling
+		 */
+		global $ilErr;
+
 		$forward_class = $this->ctrl->getNextClass($this);
 		switch($forward_class)
 		{
+			case 'ilbuddysystemgui':
+				if(!ilBuddySystem::getInstance()->isEnabled())
+				{
+					$ilErr->raiseError($this->lng->txt('msg_no_perm_read'), $ilErr->MESSAGE);
+				}
+
+				require_once 'Services/Contact/BuddySystem/classes/class.ilBuddySystemGUI.php';
+				$this->ctrl->saveParameter($this, 'search_grp');
+				$this->ctrl->setReturn($this, 'showMembers');
+				$this->ctrl->forwardCommand(new ilBuddySystemGUI());
+				break;
+
 			default:
 				if (!($cmd = $this->ctrl->getCmd()))
 				{
@@ -169,7 +185,9 @@ class ilMailSearchGroupsGUI
 			$mail_data["m_email"],
 			$mail_data["m_subject"],
 			$mail_data["m_message"],
-			$mail_data["use_placeholders"]
+			$mail_data["use_placeholders"],
+			$mail_data['tpl_ctx_id'],
+			$mail_data['tpl_ctx_params']
 		);
 		
 		ilUtil::redirect("ilias.php?baseClass=ilMailGUI&type=search_res");
@@ -216,7 +234,9 @@ class ilMailSearchGroupsGUI
 			$mail_data["m_email"],
 			$mail_data["m_subject"],
 			$mail_data["m_message"],
-			$mail_data["use_placeholders"]
+			$mail_data["use_placeholders"],
+			$mail_data['tpl_ctx_id'],
+			$mail_data['tpl_ctx_params']
 		);
 	
 		ilUtil::redirect("ilias.php?baseClass=ilMailGUI&type=search_res");
@@ -396,7 +416,11 @@ class ilMailSearchGroupsGUI
 	 */
 	public function showMembers()
 	{
-		global $lng;
+		/**
+		 * @var $lng    ilLanguage
+		 * @var $ilUser ilObjUser
+		 */
+		global $lng, $ilUser;
 
 		if ($_GET["search_grp"] != "")
 		{
@@ -415,7 +439,6 @@ class ilMailSearchGroupsGUI
 			include_once 'Services/Contact/classes/class.ilMailSearchCoursesMembersTableGUI.php';
 			$context = $_GET["ref"] ? $_GET["ref"] : "mail"; 	
 			$table = new ilMailSearchCoursesMembersTableGUI($this, 'grp', $context);
-			$table->setId('show_grps_mmbrs_tbl');
 			$lng->loadLanguageModule('crs');
 	
 			$tableData = array();
@@ -445,13 +468,31 @@ class ilMailSearchGroupsGUI
 							$fullname = $member['lastname'].', '.$member['firstname'];
 
 						$rowData = array(
-							'members_id' => $member["id"],
-							'members_login' => $member["login"],
-							'members_name' => $fullname,
+							'members_id'      => $member["id"],
+							'members_login'   => $member["login"],
+							'members_name'    => $fullname,
 							'members_crs_grp' => $group_obj->getTitle(),
-							'members_in_addressbook' => $this->abook->checkEntryByLogin($member["login"]) ? $lng->txt("yes") : $lng->txt("no"),
-							'search_grp' => $grp_id
+							'search_grp'      => $grp_id,
 						);
+
+						if('mail' == $context && ilBuddySystem::getInstance()->isEnabled())
+						{
+							$relation = ilBuddyList::getInstanceByGlobalUser()->getRelationByUserId($member['id']);
+							$state_name = ilStr::convertUpperCamelCaseToUnderscoreCase($relation->getState()->getName());
+							$rowData['status'] = '';
+							if($member['id'] != $ilUser->getId())
+							{
+								if($relation->isOwnedByRequest())
+								{
+									$rowData['status'] = $this->lng->txt('buddy_bs_state_' . $state_name . '_a');
+								}
+								else
+								{
+									$rowData['status'] = $this->lng->txt('buddy_bs_state_' . $state_name . '_p');
+								}
+							}
+						}
+
 						$tableData[] = $rowData;
 					}
 				}

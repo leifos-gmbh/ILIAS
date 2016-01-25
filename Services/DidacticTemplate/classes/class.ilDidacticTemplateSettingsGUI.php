@@ -59,12 +59,16 @@ class ilDidacticTemplateSettingsGUI
 	 */
 	protected function overview()
 	{
-		global $ilToolbar,$lng, $ilCtrl;
+		global $ilToolbar,$lng, $ilCtrl, $ilAccess;
 
-		$ilToolbar->addButton(
-			$lng->txt('didactic_import_btn'),
-			$ilCtrl->getLinkTarget($this,'showImportForm')
-		);
+		if($ilAccess->checkAccess('write','',$_REQUEST["ref_id"]))
+		{
+			$ilToolbar->addButton(
+				$lng->txt('didactic_import_btn'),
+				$ilCtrl->getLinkTarget($this,'showImportForm')
+			);
+		}
+
 
 		include_once './Services/DidacticTemplate/classes/class.ilDidacticTemplateSettingsTableGUI.php';
 		$table = new ilDidacticTemplateSettingsTableGUI($this,'overview');
@@ -127,7 +131,12 @@ class ilDidacticTemplateSettingsGUI
 	 */
 	protected function importTemplate()
 	{
-		global $ilCtrl;
+		global $ilCtrl, $ilAccess;
+
+		if(!$ilAccess->checkAccess('write','',$_REQUEST["ref_id"]))
+		{
+			$this->ctrl->redirect($this, "overview");
+		}
 
 		$form = $this->createImportForm();
 		if(!$form->checkInput())
@@ -153,14 +162,12 @@ class ilDidacticTemplateSettingsGUI
 		);
 		$import->setInputFile($tmp);
 
-		$GLOBALS['ilLog']->write(__METHOD__.': Using '.$tmp);
-
 		try {
 			$import->import();
 		}
 		catch(ilDidacticTemplateImportException $e)
 		{
-			$GLOBALS['ilLog']->write(__METHOD__.': Import failed with message: '. $e->getMessage());
+			ilLoggerFactory::getLogger('otpl')->error('Import failed with message: ' . $e->getMessage());
 			ilUtil::sendFailure($this->lng->txt('didactic_import_failed').': '.$e->getMessage());
 		}
 
@@ -204,7 +211,12 @@ class ilDidacticTemplateSettingsGUI
 	 */
 	protected function updateTemplate()
 	{
-		global $ilCtrl;
+		global $ilCtrl, $ilAccess;
+
+		if(!$ilAccess->checkAccess('write','',$_REQUEST["ref_id"]))
+		{
+			$this->ctrl->redirect($this, "overview");
+		}
 
 		$temp = new ilDidacticTemplateSetting((int) $_REQUEST['tplid']);
 		$form = $this->initEditTemplate($temp);
@@ -286,7 +298,12 @@ class ilDidacticTemplateSettingsGUI
 	 */
 	protected function copyTemplate()
 	{
-		global $ilErr, $ilCtrl;;
+		global $ilErr, $ilCtrl, $ilAccess;
+
+		if(!$ilAccess->checkAccess('write','',$_REQUEST["ref_id"]))
+		{
+			$this->ctrl->redirect($this, "overview");
+		}
 
 		if(!$_REQUEST['tplid'])
 		{
@@ -365,7 +382,12 @@ class ilDidacticTemplateSettingsGUI
 	 */
 	protected function deleteTemplates()
 	{
-		global $ilErr, $ilCtrl;
+		global $ilErr, $ilCtrl, $ilAccess;
+
+		if(!$ilAccess->checkAccess('write','',$_REQUEST["ref_id"]))
+		{
+			$this->ctrl->redirect($this, "overview");
+		}
 
 		if(!$_REQUEST['tpls'])
 		{
@@ -391,8 +413,12 @@ class ilDidacticTemplateSettingsGUI
 	 */
 	protected function activateTemplates()
 	{
-		global $ilErr, $ilCtrl;
+		global $ilErr, $ilCtrl, $ilAccess;
 
+		if(!$ilAccess->checkAccess('write','',$_REQUEST["ref_id"]))
+		{
+			$this->ctrl->redirect($this, "overview");
+		}
 		if(!$_REQUEST['tpls'])
 		{
 			ilUtil::sendFailure($this->lng->txt('select_one'));
@@ -418,7 +444,12 @@ class ilDidacticTemplateSettingsGUI
 	 */
 	protected function deactivateTemplates()
 	{
-		global $ilErr, $ilCtrl;
+		global $ilErr, $ilCtrl, $ilAccess;
+
+		if(!$ilAccess->checkAccess('write','',$_REQUEST["ref_id"]))
+		{
+			$this->ctrl->redirect($this, "overview");
+		}
 
 		if(!$_REQUEST['tpls'])
 		{

@@ -1,5 +1,5 @@
 <?php
-
+require_once('./Modules/DataCollection/classes/Field/NReference/class.ilDataCollectionNReferenceFieldGUI.php');
 /**
  * Class ilDataCollectionNReferenceField
  *
@@ -12,6 +12,24 @@ class ilDataCollectionNReferenceField extends ilDataCollectionReferenceField {
 	 * @var int
 	 */
 	protected $max_reference_length = 20;
+
+
+	/**
+	 * @return int
+	 */
+	public function getMaxReferenceLength() {
+		return $this->max_reference_length;
+	}
+
+
+	/**
+	 * @param int $max_reference_length
+	 */
+	public function setMaxReferenceLength($max_reference_length) {
+		$this->max_reference_length = $max_reference_length;
+	}
+
+
 
 
 	public function doUpdate() {
@@ -42,6 +60,77 @@ class ilDataCollectionNReferenceField extends ilDataCollectionReferenceField {
 	}
 
 
+	/**
+	 * @return string
+	 */
+	public function getValue() {
+		$this->loadValue();
+
+		return $this->value;
+	}
+
+
+	protected function loadValueSorted() {
+		if ($this->value === NULL) {
+
+			global $ilDB;
+			$datatype = $this->field->getDatatype();
+			$refField = ilDataCollectionCache::getFieldCache($this->getField()->getFieldRef());
+
+			$supported_internal_types = array(
+				ilDataCollectionDatatype::INPUTFORMAT_ILIAS_REF,
+				ilDataCollectionDatatype::INPUTFORMAT_MOB,
+				ilDataCollectionDatatype::INPUTFORMAT_FILE,
+			);
+
+			$supported_types = array_merge(array(
+				ilDataCollectionDatatype::INPUTFORMAT_TEXT,
+				ilDataCollectionDatatype::INPUTFORMAT_NUMBER,
+				ilDataCollectionDatatype::INPUTFORMAT_BOOLEAN,
+			), $supported_internal_types);
+			$datatypeId = $refField->getDatatypeId();
+			if (in_array($datatypeId, $supported_types)) {
+				if (in_array($datatypeId, $supported_internal_types)) {
+					$query = "SELECT stlocOrig.value AS value,  ilias_object.title AS value_ref ";
+				} else {
+					$query = "SELECT stlocOrig.value AS value,  stlocRef.value AS value_ref ";
+				}
+				$query .= "FROM il_dcl_stloc" . $datatype->getStorageLocation() . "_value AS stlocOrig  ";
+
+				$query .= " INNER JOIN il_dcl_record_field AS refField ON stlocOrig.value = refField.record_id AND refField.field_id = "
+					. $ilDB->quote($refField->getId(), "integer");
+				$query .= " INNER JOIN il_dcl_stloc" . $refField->getStorageLocation()
+					. "_value AS stlocRef ON stlocRef.record_field_id = refField.id ";
+			} else {
+				$query = "SELECT stlocOrig.value AS value ";
+				$query .= "FROM il_dcl_stloc" . $datatype->getStorageLocation() . "_value AS stlocOrig  ";
+			}
+
+			switch ($datatypeId) {
+				case ilDataCollectionDatatype::INPUTFORMAT_ILIAS_REF:
+					$query .= " INNER JOIN object_reference AS ilias_ref ON ilias_ref.ref_id = stlocRef.value ";
+					$query .= " INNER JOIN object_data AS ilias_object ON ilias_object.obj_id = ilias_ref.obj_id ";
+					break;
+				case ilDataCollectionDatatype::INPUTFORMAT_MOB:
+				case ilDataCollectionDatatype::INPUTFORMAT_FILE:
+					$query .= " INNER JOIN object_data AS ilias_object ON ilias_object.obj_id =  stlocRef.value ";
+					break;
+			}
+			$query .= " WHERE stlocOrig.record_field_id = " . $ilDB->quote($this->id, "integer");
+			if (in_array($datatypeId, $supported_types)) {
+				$query .= " ORDER BY value_ref ASC";
+			}
+
+			$set = $ilDB->query($query);
+
+			$this->value = array();
+			while ($rec = $ilDB->fetchAssoc($set)) {
+				$this->value[] = $rec['value'];
+			}
+		}
+	}
+
+
 	protected function loadValue() {
 		if ($this->value === NULL) {
 			global $ilDB;
@@ -63,51 +152,10 @@ class ilDataCollectionNReferenceField extends ilDataCollectionReferenceField {
 	 * @return mixed
 	 */
 	public function getSingleHTML($options = NULL) {
-
-		// if we are in a record view and the n-ref should be displayed as a link to it's reference
-		$values = $this->getValue();
-		$record_field = $this;
-
-		if (!$values || !count($values)) {
-			return "";
-		}
-
-		$tpl = $this->buildTemplate($record_field, $values, $options);
-
-		return $tpl->get();
+		$ilDataCollectionNReferenceFieldGUI = new ilDataCollectionNReferenceFieldGUI($this);
+		return $ilDataCollectionNReferenceFieldGUI->getSingleHTML($options);
 	}
 
-
-	/**
-	 * @param $record_field
-	 * @param $values
-	 * @param $options
-	 *
-	 * @return ilTemplate
-	 */
-	public function buildTemplate($record_field, $values, $options) {
-		$tpl = new ilTemplate("tpl.reference_list.html", true, true, "Modules/DataCollection");
-		$tpl->setCurrentBlock("reference_list");
-		foreach ($values as $value) {
-			$ref_record = ilDataCollectionCache::getRecordCache($value);
-			if (!$ref_record->getTableId() || !$record_field->getField() || !$record_field->getField()->getTableId()) {
-				//the referenced record_field does not seem to exist.
-				$record_field->setValue(0);
-				$record_field->doUpdate();
-			} else {
-				$tpl->setCurrentBlock("reference");
-				if (!$options) {
-					$tpl->setVariable("CONTENT", $ref_record->getRecordFieldHTML($this->getField()->getFieldRef()));
-				} else {
-					$tpl->setVariable("CONTENT", $this->getLinkHTML($options['link']['name'], $value));
-				}
-				$tpl->parseCurrentBlock();
-			}
-		}
-		$tpl->parseCurrentBlock();
-
-		return $tpl;
-	}
 
 
 	/**
@@ -116,7 +164,7 @@ class ilDataCollectionNReferenceField extends ilDataCollectionReferenceField {
 	 *
 	 * @return string
 	 */
-	protected function getLinkHTML($link, $value) {
+	public function getLinkHTML($link, $value) {
 		if ($link == "[" . $this->getField()->getTitle() . "]") {
 			$link = NULL;
 		}
@@ -129,64 +177,23 @@ class ilDataCollectionNReferenceField extends ilDataCollectionReferenceField {
 	 * @return array|mixed|string
 	 */
 	public function getHTML() {
-		$values = $this->getValue();
-		$record_field = $this;
-
-		if (!$values OR !count($values)) {
-			return "";
-		}
-
-		$html = "";
-		$cut = false;
-		$tpl = new ilTemplate("tpl.reference_hover.html", true, true, "Modules/DataCollection");
-		$tpl->setCurrentBlock("reference_list");
-		$elements = array();
-		foreach ($values as $value) {
-			$ref_record = ilDataCollectionCache::getRecordCache($value);
-			if (!$ref_record->getTableId() OR !$record_field->getField() OR !$record_field->getField()->getTableId()) {
-				//the referenced record_field does not seem to exist.
-				$record_field->setValue(NULL);
-				$record_field->doUpdate();
-			} else {
-				$elements[] = array('value' => $ref_record->getRecordFieldHTML($this->getField()->getFieldRef()),
-									'sort' => $ref_record->getRecordFieldSortingValue($this->getField()->getFieldRef()));
-			}
-		}
-
-		//sort fetched elements
-		$is_numeric = false;
-		$ref_field = new ilDataCollectionField($record_field->getField()->getFieldRef());
-		switch ($ref_field->getDatatypeId()) {
-			case ilDataCollectionDatatype::INPUTFORMAT_DATETIME:
-			case ilDataCollectionDatatype::INPUTFORMAT_NUMBER:
-				$is_numeric = true;
-				break;
-		}
-		$elements = ilUtil::sortArray($elements, 'sort', 'asc', $is_numeric);
-
-		//concat
-		foreach($elements as $element) {
-			if ((strlen($html) < $this->max_reference_length)) {
-				$html .= $element['value'] . ", ";
-			} else {
-				$cut = true;
-			}
-			$tpl->setCurrentBlock("reference");
-			$tpl->setVariable("CONTENT", $element['value']);
-			$tpl->parseCurrentBlock();
-		}
-
-		$html = substr($html, 0, - 2);
-		if ($cut) {
-			$html .= "...";
-		}
-		$tpl->setVariable("RECORD_ID", $this->getRecord()->getId());
-		$tpl->setVariable("ALL", $html);
-		$tpl->parseCurrentBlock();
-
-		return $tpl->get();
+		$ilDataCollectionNReferenceFieldGUI = new ilDataCollectionNReferenceFieldGUI($this);
+		return $ilDataCollectionNReferenceFieldGUI->getHTML();
 	}
 
+	public function getValueFromExcel($excel, $row, $col){
+		global $lng;
+		$stringValue = $excel->val($row, $col);
+		$this->getReferencesFromString($stringValue);
+		$referenceIds = $this->getReferencesFromString($stringValue);
+		if (!count($referenceIds)) {
+			$warning = "(" . $col . ", " . ilDataCollectionImporter::getExcelCharForInteger($col) . ") " . $lng->txt("dcl_no_such_reference") . " "
+				. $stringValue;
+			return array('warning' => $warning);
+		}
+
+		return $referenceIds;
+	}
 
 	/**
 	 * @return int|string
@@ -210,6 +217,39 @@ class ilDataCollectionNReferenceField extends ilDataCollectionReferenceField {
 		$string = substr($string, 0, - 2);
 
 		return $string;
+	}
+
+	/**
+	 * This method tries to get as many valid references out of a string separated by commata. This is problematic as a string value could contain commata itself.
+	 * It is optimized to work with an exported list from this DataCollection. And works fine in most cases. Only areference list with the values "hello" and "hello, world"
+	 * Will mess with it.
+	 * @param $stringValues string
+	 * @return int[]
+	 */
+	protected function getReferencesFromString($stringValues) {
+		$slicedStrings = explode(", ", $stringValues);
+		$slicedReferences = array();
+		$resolved = 0;
+		for($i = 0; $i < count($slicedStrings); $i++) {
+			//try to find a reference since the last resolved value separated by a comma.
+			// $i = 1; $resolved = 0; $string = "hello, world, gaga" -> try to match "hello, world".
+			$searchString = implode(array_slice($slicedStrings, $resolved, $i - $resolved + 1));
+			if($ref = $this->getReferenceFromValue($searchString)){
+				$slicedReferences[] = $ref;
+				$resolved = $i;
+				continue;
+			}
+
+			//try to find a reference with the current index.
+			// $i = 1; $resolved = 0; $string = "hello, world, gaga" -> try to match "world".
+			$searchString = $slicedStrings[$i];
+			if($ref = $this->getReferenceFromValue($searchString)){
+				$slicedReferences[] = $ref;
+				$resolved = $i;
+				continue;
+			}
+		}
+		return $slicedReferences;
 	}
 }
 

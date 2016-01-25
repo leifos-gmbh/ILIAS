@@ -90,7 +90,6 @@ class ilPresentationListTableGUI extends ilTable2GUI
 		// advanced metadata
 		include_once('Services/AdvancedMetaData/classes/class.ilAdvancedMDRecordGUI.php');
 		$this->record_gui = new ilAdvancedMDRecordGUI(ilAdvancedMDRecordGUI::MODE_FILTER,'glo',$this->glossary->getId(),'term');
-		$this->record_gui->setSelectedOnly(true);
 		$this->record_gui->setTableGUI($this);
 		$this->record_gui->parse();
 		//$this->setDefaultOrderField("login");
@@ -98,6 +97,16 @@ class ilPresentationListTableGUI extends ilTable2GUI
 		$this->setData($this->glossary->getTermList($this->filter["term"], $_GET["letter"],
 				$this->filter["definition"], $this->tax_node, false, true, $this->record_gui->getFilterElements()));
 //		$this->setData(array());	
+	}
+	
+	/**
+	 * needed for advmd filter handling
+	 * 
+	 * @return ilAdvancedMDRecordGUI
+	 */
+	protected function getAdvMDRecordGUI()
+	{
+		return $this->record_gui;
 	}
 	
 	/**
@@ -131,29 +140,6 @@ class ilPresentationListTableGUI extends ilTable2GUI
 		}		
 	}
 	
-	public function writeFilterToSession()
-	{
-		// #14488
-		$term_filter = $this->getFilterItemByPostVar("term");
-		if ($term_filter &&
-			$term_filter->checkInput())
-		{
-			$term_filter->setValueByArray($_POST);
-			$term_filter->writeToSession();
-		}
-		 
-		$def_filter = $this->getFilterItemByPostVar("defintion");		
-		if ($def_filter && 
-			$def_filter->checkInput())
-		{
-			$def_filter->setValueByArray($_POST);
-			$def_filter->writeToSession();
-		}		 
-		
-		// we cannot use the tablegui filter handling for adv md
-		$this->record_gui->importFilter();		
-	}
-
 	/**
 	 * Should this field be sorted numeric?
 	 *

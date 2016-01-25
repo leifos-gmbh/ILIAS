@@ -138,6 +138,7 @@ class ilObjPortfolioAdministrationGUI extends ilObjectGUI
 			$banner = (bool)$form->getInput("banner");
 			
 			$prfa_set = new ilSetting("prfa");
+			$prfa_set->set("pd_block", (bool)$form->getInput("pd_block"));
 			$prfa_set->set("banner", $banner);
 			$prfa_set->set("banner_width", (int)$form->getInput("width"));
 			$prfa_set->set("banner_height", (int)$form->getInput("height"));			
@@ -169,14 +170,18 @@ class ilObjPortfolioAdministrationGUI extends ilObjectGUI
 	 */
 	protected function initFormSettings()
 	{
-	    global $lng, $ilSetting;
+	    global $lng, $ilSetting, $ilAccess;
 		
 		include_once('Services/Form/classes/class.ilPropertyFormGUI.php');
 		$form = new ilPropertyFormGUI();
 		$form->setFormAction($this->ctrl->getFormAction($this));
 		$form->setTitle($this->lng->txt('prtf_settings'));
-		$form->addCommandButton('saveSettings',$this->lng->txt('save'));
-		$form->addCommandButton('cancel',$this->lng->txt('cancel'));
+		
+		if ($ilAccess->checkAccess("write", "", $this->object->getRefId()))
+		{
+			$form->addCommandButton('saveSettings',$this->lng->txt('save'));
+			$form->addCommandButton('cancel',$this->lng->txt('cancel'));
+		}
 		
 		// Enable 'Portfolios'
 		$lng->loadLanguageModule('pd');
@@ -186,6 +191,13 @@ class ilObjPortfolioAdministrationGUI extends ilObjectGUI
 		$prtf_prop->setInfo($lng->txt('user_portfolios_desc'));
 		$prtf_prop->setChecked(($ilSetting->get('user_portfolios') ? '1' : '0'));
 		$form->addItem($prtf_prop);
+
+		$prfa_set = new ilSetting("prfa");
+
+		$pdblock = new ilCheckboxInputGUI($lng->txt("prtf_pd_block"), "pd_block");
+		$pdblock->setInfo($lng->txt("prtf_pd_block_info"));
+		$pdblock->setChecked($prfa_set->get("pd_block", false));
+		$form->addItem($pdblock);
 
 		$banner = new ilCheckboxInputGUI($lng->txt("prtf_preview_banner"), "banner");
 		$banner->setInfo($lng->txt("prtf_preview_banner_info"));
@@ -200,8 +212,7 @@ class ilObjPortfolioAdministrationGUI extends ilObjectGUI
 		$height->setRequired(true);
 		$height->setSize(4);
 		$banner->addSubItem($height);
-		
-		$prfa_set = new ilSetting("prfa");
+
 		$banner->setChecked($prfa_set->get("banner", false));		
 		if($prfa_set->get("banner"))
 		{

@@ -188,7 +188,7 @@ class ilObjPortfolioTemplate extends ilObjPortfolioBase
 		{
 			$has_permission = false;
 			
-			if($obj["owner"] == $ilUser->getId() && false)
+			if($obj["owner"] == $ilUser->getId())
 			{
 				$has_permission = true;
 			}

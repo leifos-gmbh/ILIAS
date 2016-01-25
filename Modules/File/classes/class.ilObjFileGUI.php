@@ -12,13 +12,29 @@ require_once "./Modules/File/classes/class.ilObjFileAccess.php";
 * @author Stefan Born <stefan.born@phzh.ch> 
 * @version $Id$
 *
-* @ilCtrl_Calls ilObjFileGUI: ilMDEditorGUI, ilInfoScreenGUI, ilPermissionGUI, ilShopPurchaseGUI, ilObjectCopyGUI
+* @ilCtrl_Calls ilObjFileGUI: ilObjectMetaDataGUI, ilInfoScreenGUI, ilPermissionGUI, ilShopPurchaseGUI, ilObjectCopyGUI
 * @ilCtrl_Calls ilObjFileGUI: ilExportGUI, ilWorkspaceAccessGUI, ilPortfolioPageGUI, ilCommonActionDispatcherGUI
+* @ilCtrl_Calls ilObjFileGUI: ilLearningProgressGUI
 *
 * @ingroup ModulesFile
 */
 class ilObjFileGUI extends ilObject2GUI
 {
+	protected $log = null;
+
+	/**
+	 * Constructor
+	 *
+	 * @param int $a_id
+	 * @param int $a_id_type
+	 * @param int $a_parent_node_id
+	 */
+	function __construct($a_id = 0, $a_id_type = self::REPOSITORY_NODE_ID, $a_parent_node_id = 0)
+	{
+		$this->log = ilLoggerFactory::getLogger('file');
+		parent::__construct($a_id, $a_id_type, $a_parent_node_id);
+	}
+
 	function getType()
 	{
 		return "file";
@@ -89,7 +105,7 @@ class ilObjFileGUI extends ilObject2GUI
 				$this->infoScreenForward();	// forwards command
 				break;
 
-			case 'ilmdeditorgui':								
+			case 'ilobjectmetadatagui':								
 				if(!$this->checkPermissionBool("write"))
 				{
 					$ilErr->raiseError($this->lng->txt('permission_denied'),$ilErr->WARNING);
@@ -97,13 +113,11 @@ class ilObjFileGUI extends ilObject2GUI
 				
 				$ilTabs->activateTab("id_meta");
 
-				include_once 'Services/MetaData/classes/class.ilMDEditorGUI.php';
-
-				$md_gui =& new ilMDEditorGUI($this->object->getId(), 0, $this->object->getType());
-				$md_gui->addObserver($this->object,'MDUpdateListener','General');
+				include_once 'Services/Object/classes/class.ilObjectMetaDataGUI.php';
+				$md_gui = new ilObjectMetaDataGUI($this->object);	
 				
 				// todo: make this work
-				$md_gui->addObserver($this->object,'MDUpdateListener','Technical');
+				// $md_gui->addMDObserver($this->object,'MDUpdateListener','Technical');
 				
 				$this->ctrl->forwardCommand($md_gui);
 				break;
@@ -143,6 +157,18 @@ class ilObjFileGUI extends ilObject2GUI
 				include_once("Services/Object/classes/class.ilCommonActionDispatcherGUI.php");
 				$gui = ilCommonActionDispatcherGUI::getInstanceFromAjaxCall();
 				$this->ctrl->forwardCommand($gui);
+				break;
+			
+			case "illearningprogressgui":
+				$ilTabs->activateTab('learning_progress');
+				require_once 'Services/Tracking/classes/class.ilLearningProgressGUI.php';
+				$new_gui =& new ilLearningProgressGUI(
+					ilLearningProgressGUI::LP_CONTEXT_REPOSITORY,
+					$this->object->getRefId(),
+					$_GET['user_id'] ? $_GET['user_id'] : $ilUser->getId()
+				);
+				$this->ctrl->forwardCommand($new_gui);
+				$this->tabs_gui->setTabActive('learning_progress');
 				break;
 			
 			default:
@@ -333,7 +359,7 @@ class ilObjFileGUI extends ilObject2GUI
 			if ($this->ctrl->getCmd() == "saveAndMeta")
 			{
 				$this->ctrl->setParameter($this, "new_type", "");
-				$target = $this->ctrl->getLinkTargetByClass(array("ilobjfilegui", "ilmdeditorgui"), "listSection", "", false, false);
+				$target = $this->ctrl->getLinkTargetByClass(array("ilobjectmetadatagui", "ilmdeditorgui"), "listSection", "", false, false);
 				ilUtil::redirect($target);
 			}
 			else
@@ -697,6 +723,9 @@ class ilObjFileGUI extends ilObject2GUI
 			ilChangeEvent::_recordReadEvent($this->object->getType(), $this->object->getRefId(),
 				$this->object->getId(), $ilUser->getId());			
 			// END ChangeEvent: Record read event.
+			
+			require_once 'Services/Tracking/classes/class.ilLPStatusWrapper.php';
+			ilLPStatusWrapper::_updateStatus($this->object->getId(), $ilUser->getId());
 
 			$this->object->sendFile($_GET["hist_id"]);
 		}
@@ -910,13 +939,29 @@ class ilObjFileGUI extends ilObject2GUI
 				$lng->txt("versions"),
 				$this->ctrl->getLinkTarget($this, "versions"));
 		}
+		
+		require_once 'Services/Tracking/classes/class.ilLearningProgressAccess.php';
+		if(ilLearningProgressAccess::checkAccess($this->object->getRefId()))
+		{
+			$ilTabs->addTab(
+				'learning_progress',
+				$lng->txt('learning_progress'),
+				$this->ctrl->getLinkTargetByClass(array(__CLASS__, 'illearningprogressgui'),'')
+			);
+		}
 
 		// meta data
 		if ($this->checkPermissionBool("write"))
 		{
-			$ilTabs->addTab("id_meta",
-				$lng->txt("meta_data"),
-				$this->ctrl->getLinkTargetByClass(array('ilobjfilegui','ilmdeditorgui'),'listSection'));
+			include_once "Services/Object/classes/class.ilObjectMetaDataGUI.php";
+			$mdgui = new ilObjectMetaDataGUI($this->object);					
+			$mdtab = $mdgui->getTab();
+			if($mdtab)
+			{
+				$ilTabs->addTab("id_meta",
+					$lng->txt("meta_data"),
+					$mdtab);
+			}			
 		}
 
 		// export
@@ -951,7 +996,8 @@ class ilObjFileGUI extends ilObject2GUI
 
 		// static method, no workspace support yet
 
-		if ($ilAccess->checkAccess("visible", "", $a_target))
+		if ($ilAccess->checkAccess("visible", "", $a_target) ||
+			$ilAccess->checkAccess("read", "", $a_target))
 		{
 			ilObjectGUI::_gotoRepositoryNode($a_target, "infoScreen");
 		}
@@ -1046,7 +1092,10 @@ class ilObjFileGUI extends ilObject2GUI
 				else
 				{
 					// handle the file
-					$fileresult = $this->handleFileUpload($dnd_form_gui->getInput("upload_files"));
+					$inp = $dnd_form_gui->getInput("upload_files");
+					$this->log->debug("ilObjFileGUI::uploadFiles ".print_r($_POST, true));
+					$this->log->debug("ilObjFileGUI::uploadFiles ".print_r($_FILES, true));
+					$fileresult = $this->handleFileUpload($inp);
 					if ($fileresult)
 						$response = (object)array_merge((array)$response, (array)$fileresult);
 				}

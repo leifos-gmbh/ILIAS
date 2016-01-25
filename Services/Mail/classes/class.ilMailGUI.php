@@ -10,7 +10,7 @@ require_once 'Services/Mail/classes/class.ilMailFormCall.php';
 *
 * @defgroup ServicesMail Services/Mail
 * @ingroup ServicesMail
-* @ilCtrl_Calls ilMailGUI: ilMailFolderGUI, ilMailFormGUI, ilMailAddressbookGUI, ilMailOptionsGUI, ilMailAttachmentGUI, ilMailSearchGUI, ilObjUserGUI
+* @ilCtrl_Calls ilMailGUI: ilMailFolderGUI, ilMailFormGUI, ilContactGUI, ilMailOptionsGUI, ilMailAttachmentGUI, ilMailSearchGUI, ilObjUserGUI
 */
 class ilMailGUI
 {
@@ -60,6 +60,8 @@ class ilMailGUI
 	{
 		if ($_GET["type"] == "search_res")
 		{
+			ilMailFormCall::storeReferer($_GET);
+
 			$this->ctrl->setParameterByClass("ilmailformgui", "cmd", "searchResults");
 			$this->ctrl->redirectByClass("ilmailformgui");
 		}
@@ -167,10 +169,10 @@ class ilMailGUI
 				$this->ctrl->forwardCommand(new ilMailFormGUI());
 				break;
 
-			case 'ilmailaddressbookgui':
-				include_once 'Services/Contact/classes/class.ilMailAddressbookGUI.php';
-
-				$this->ctrl->forwardCommand(new ilMailAddressbookGUI());
+			case 'ilcontactgui':
+				require_once 'Services/Contact/classes/class.ilContactGUI.php';
+				$this->tpl->setTitle($this->lng->txt('mail_addressbook'));
+				$this->ctrl->forwardCommand(new ilContactGUI());
 				break;
 
 			case 'ilmailoptionsgui':
@@ -247,7 +249,7 @@ class ilMailGUI
 		$this->ctrl->setParameterByClass('ilmailformgui', 'type', 'new');
 		$ilTabs->addTarget('compose', $this->ctrl->getLinkTargetByClass('ilmailformgui'));
 		$this->ctrl->clearParametersByClass('ilmailformgui');
-		$ilTabs->addTarget('mail_addressbook', $this->ctrl->getLinkTargetByClass('ilmailaddressbookgui'));
+		$ilTabs->addTarget('mail_addressbook', $this->ctrl->getLinkTargetByClass('ilcontactgui'));
 		$ilTabs->addTarget('options', $this->ctrl->getLinkTargetByClass('ilmailoptionsgui'));
 		
 		switch($this->forwardClass)
@@ -256,7 +258,7 @@ class ilMailGUI
 				$ilTabs->setTabActive('compose');
 				break;
 				
-			case 'ilmailaddressbookgui':
+			case 'ilcontactgui':
 				$ilTabs->setTabActive('mail_addressbook');
 				break;
 				

@@ -44,14 +44,6 @@ class ilForumMoveTopicsExplorer extends ilRepositorySelectorExplorerGUI
 	/**
 	 * {@inheritdoc}
 	 */
-	function isNodeVisible($a_node)
-	{
-		return parent::isNodeVisible($a_node);
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
 	function isNodeClickable($a_node)
 	{
 		/**
@@ -67,6 +59,37 @@ class ilForumMoveTopicsExplorer extends ilRepositorySelectorExplorerGUI
 			}
 
 			return $ilAccess->checkAccess('moderate_frm', '', $a_node['child']) && parent::isNodeClickable($a_node);
+		}
+
+		return false;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	function isNodeVisible($a_node)
+	{
+		return parent::isNodeVisible($a_node);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	protected function isNodeSelectable($a_node)
+	{
+		/**
+		 * @var $ilAccess ilAccessHandler
+		 */
+		global $ilAccess;
+
+		if($a_node['type'] == 'frm')
+		{
+			if($this->getCurrentFrmRefId() && $this->getCurrentFrmRefId() == $a_node['child'])
+			{
+				return false;
+			}
+
+			return $ilAccess->checkAccess('moderate_frm', '', $a_node['child']) && parent::isNodeSelectable($a_node);
 		}
 
 		return false;

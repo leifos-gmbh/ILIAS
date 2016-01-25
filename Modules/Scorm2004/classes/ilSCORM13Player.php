@@ -315,6 +315,7 @@ class ilSCORM13Player
 			'comments_storable' => $this->slm->getComments(),
 			'time_from_lms' => $this->slm->getTime_from_lms(),
 			'auto_last_visited' => $this->slm->getAuto_last_visited(),
+			'lesson_mastery_score' => $this->slm->getMasteryScore(),
 			'checkSetValues' => $this->slm->getCheck_values(),
 			'auto_suspend' => $this->slm->getAutoSuspend(),
 			'suspend_data' => $initSuspendData,
@@ -328,20 +329,23 @@ class ilSCORM13Player
 		// $status['last_visited']=null;
 		// if($this->slm->getAuto_last_visited()) 
 		// {
-
 			// $status['last_visited']=$this->get_last_visited($this->packageId, $ilUser->getID());
 		// }
-
 		// $config['status'] = $status;
+
 		return $config;
 	}
 
 	public function getPlayer()
 	{
 		global $ilUser,$lng, $ilias, $ilSetting;
+		
+		//WAC
+		require_once('./Services/WebAccessChecker/classes/class.ilWACSignedPath.php');
+		ilWACSignedPath::signFolderOfStartFile($this->getDataDirectory().'/imsmanifest.xml');
+		
 		// player basic config data
 		
-
 		$initSuspendData = null;
 		$initAdlactData = null;
 		if ($this->slm->getSequencing() == true) {
@@ -355,7 +359,8 @@ class ilSCORM13Player
 		//session
 		if ($this->slm->getSession()) {
 //			$session_timeout = (int)($ilias->ini->readVariable("session","expire"))/2;
-			$session_timeout = (int)ilSession::getIdleValue()/2;
+//			$session_timeout = (int)ilSession::getIdleValue()/2;
+			$session_timeout = (int)ilWACSignedPath::getCookieMaxLifetimeInSeconds()-1;
 		} else {
 			$session_timeout = 0;
 		}
@@ -407,6 +412,9 @@ class ilSCORM13Player
 		$langstrings['linkexpandTree']=$lng->txt('scplayer_expandtree');
 		$langstrings['linkcollapseTree']=$lng->txt('scplayer_collapsetree');
 		$langstrings['contCreditOff']=$lng->txt('cont_credit_off');
+		if ($this->slm->getAutoReviewChar() == "s") {
+			$langstrings['contCreditOff']=$lng->txt('cont_sc_score_was_higher_message');
+		}
 		$config['langstrings'] = $langstrings;
 		
 		//template variables	
@@ -574,6 +582,9 @@ class ilSCORM13Player
 	
 	public function pingSession()
 	{
+		//WAC
+		require_once('./Services/WebAccessChecker/classes/class.ilWACSignedPath.php');
+		ilWACSignedPath::signFolderOfStartFile($this->getDataDirectory().'/imsmanifest.xml');
 		//do nothing except returning header
 		header('Content-Type: text/plain; charset=UTF-8');
 		print("");
@@ -929,7 +940,7 @@ class ilSCORM13Player
 			{
 				//Check for writability
 				$res = $ilDB->queryF(
-					'SELECT write_shared_data '
+					'SELECT write_shared_data, cp_node_id '
 					  . 'FROM cp_datamap '
 					  . 'WHERE target_id = %s '
 					  . 'AND slm_id = %s '
@@ -945,9 +956,9 @@ class ilSCORM13Player
 				
 				//If it's writeable, then add the new value into the database
 				$res = $ilDB->manipulateF(
-					'INSERT INTO adl_shared_data VALUES (%s, %s, %s, %s)',
-					array('integer', 'integer', 'text', 'text'),
-					array($this->packageId, $this->userId, $key, $obj));			
+					'INSERT INTO adl_shared_data (slm_id, user_id, target_id, store, cp_node_id) VALUES (%s, %s, %s, %s, %s)',
+					array('integer', 'integer', 'text', 'text', 'integer'),
+					array($this->packageId, $this->userId, $key, $obj, $row["cp_node_id"]));			
 			}
 		}
 	    echo "1";

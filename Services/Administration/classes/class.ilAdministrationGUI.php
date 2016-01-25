@@ -16,7 +16,7 @@ include_once("./Services/Table/classes/class.ilTableGUI.php");
 * @ilCtrl_Calls ilAdministrationGUI: ilObjQuestionPoolGUI, ilObjSurveyQuestionPoolGUI, ilObjTestGUI
 * @ilCtrl_Calls ilAdministrationGUI: ilObjSurveyGUI, ilObjExerciseGUI, ilObjMediaPoolGUI, ilObjFileBasedLMGUI
 * @ilCtrl_Calls ilAdministrationGUI: ilObjCategoryGUI, ilObjUserGUI, ilObjRoleGUI, ilObjUserFolderGUI
-* @ilCtrl_Calls ilAdministrationGUI: ilObjiLincCourseGUI, ilObjiLincClassroomGUI, ilObjLinkResourceGUI
+* @ilCtrl_Calls ilAdministrationGUI: ilObjLinkResourceGUI
 * @ilCtrl_Calls ilAdministrationGUI: ilObjRoleTemplateGUI, ilObjStyleSheetGUI
 * @ilCtrl_Calls ilAdministrationGUI: ilObjRootFolderGUI, ilObjSessionGUI, ilObjPortfolioTemplateGUI
 * @ilCtrl_Calls ilAdministrationGUI: ilObjSystemFolderGUI, ilObjRoleFolderGUI, ilObjAuthSettingsGUI
@@ -34,8 +34,9 @@ include_once("./Services/Table/classes/class.ilTableGUI.php");
 * @ilCtrl_Calls ilAdministrationGUI: ilObjRemoteGlossaryGUI, ilObjRemoteFileGUI, ilObjRemoteGroupGUI, ilObjECSSettingsGUI
 * @ilCtrl_Calls ilAdministrationGUI: ilObjCloudGUI, ilObjRepositorySettingsGUI, ilObjWebResourceAdministrationGUI
 * @ilCtrl_Calls ilAdministrationGUI: ilObjCourseAdministrationGUI, ilObjGroupAdministrationGUI, ilObjExerciseAdministrationGUI
-* @ilCtrl_Calls ilAdministrationGUI: ilObjTaxonomyAdministrationGUI
+* @ilCtrl_Calls ilAdministrationGUI: ilObjTaxonomyAdministrationGUI, ilObjLoggingSettingsGUI
 * @ilCtrl_Calls ilAdministrationGUI: ilObjBibliographicAdminGUI, ilObjBibliographicGUI
+* @ilCtrl_Calls ilAdministrationGUI: ilObjStudyProgrammeAdminGUI, ilObjStudyProgrammeGUI
 * // BEGIN WebDAV
 * @ilCtrl_Calls ilAdministrationGUI: ilObjFileAccessSettingsGUI, ilPermissionGUI, ilObjRemoteTestGUI
 * // END WebDAV
@@ -441,20 +442,26 @@ class ilAdministrationGUI
 		$layout = array(
 			1 => array(
 				"basic" =>
-					array("adm", "stys", "adve", "lngf", "cmps", "accs", "hlps", "trac"),
-				"users" =>
-					array("usrf", 'tos', "rolf", "auth", "ps", "orgu")
+					array("adm", "stys", "adve", "lngf", "hlps", "accs", "cmps", "extt"),
+				"user_administration" =>
+					array("usrf", 'tos', "rolf", "auth", "ps", "orgu"),
+				"learning_outcomes" =>
+					array("skmg", "cert", "trac")
 				),
 			2 => array(
-				"services" =>
-					array("pdts", "nwss", "tags", "prfa", "skmg", "cals", "mail", 
-						"---", "seas", "mds", "taxs", "cert", 'ecss', "pays", "extt")
+				"user_services" =>
+					array("pdts", "prfa", "nwss", "awra", "cadm", "cals", "mail"),
+				"content_services" =>
+					array("seas", "mds", "tags", "taxs", 'ecss', "pays", "otpl"),
+				"maintenance" =>
+					array('sysc', "recf", 'logs', "root")
 				),
 			3 => array(
-				"objects" =>
-					array("reps", "---", "bibs", "blga", "chta", "crss", "excs", "facs", "frma",
-						"grps", "lrss", "mcts", "mobs", "svyf", "assf", "wbrs", "wiks",
-						"---", 'otpl',"root", "recf")
+				"container" =>
+					array("reps", "crss", "grps", "prgs"),
+				"content_objects" =>
+					array("bibs", "blga", "chta", "excs", "facs", "frma",
+						"lrss", "mcts", "mobs", "svyf", "assf", "wbrs", "wiks")
 				)
 			);
 		

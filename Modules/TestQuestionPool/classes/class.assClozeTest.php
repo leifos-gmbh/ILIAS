@@ -352,7 +352,7 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 	protected function saveClozeGapItemsToDb($gap, $key)
 	{
 		global $ilDB;
-		foreach ($gap->getItems() as $item)
+		foreach ($gap->getItems($this->getShuffler()) as $item)
 		{
 			$query   = "";
 			$next_id = $ilDB->nextId( 'qpl_a_cloze' );
@@ -851,7 +851,7 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 				if ($gap->getType() == CLOZE_TEXT)
 				{
 					$gap_max_points = 0;
-					foreach ($gap->getItems() as $item)
+					foreach ($gap->getItems($this->getShuffler()) as $item)
 					{
 						if ($item->getPoints() > $gap_max_points)
 						{
@@ -863,7 +863,7 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 				else if ($gap->getType() == CLOZE_SELECT)
 				{
 					$srpoints = 0;
-					foreach ($gap->getItems() as $item)
+					foreach ($gap->getItems($this->getShuffler()) as $item)
 					{
 						if ($item->getPoints() > $srpoints)
 						{
@@ -875,7 +875,7 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 				else if ($gap->getType() == CLOZE_NUMERIC)
 				{
 					$numpoints = 0;
-					foreach ($gap->getItems() as $item)
+					foreach ($gap->getItems($this->getShuffler()) as $item)
 					{
 						if ($item->getPoints() > $numpoints)
 						{
@@ -1235,7 +1235,7 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 	 * @param boolean $returndetails (deprecated !!)
 	 * @return integer/array $points/$details (array $details is deprecated !!)
 	 */
-	public function calculateReachedPoints($active_id, $pass = NULL, $returndetails = FALSE)
+	public function calculateReachedPoints($active_id, $pass = NULL, $authorized = true, $returndetails = FALSE)
 	{
 		global $ilDB;
 		
@@ -1244,7 +1244,7 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 			$pass = $this->getSolutionMaxPass($active_id);
 		}
 
-		$result = $this->getCurrentSolutionResultSet($active_id, $pass);
+		$result = $this->getCurrentSolutionResultSet($active_id, $pass, $authorized);
 		$user_result = array();
 		while ($data = $ilDB->fetchAssoc($result)) 
 		{
@@ -1307,7 +1307,7 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 	 * @param integer $pass Test pass
 	 * @return boolean $status
 	 */
-	public function saveWorkingData($active_id, $pass = NULL) 
+	public function saveWorkingData($active_id, $pass = NULL, $authorized = true) 
 	{
 		global $ilDB;
 		global $ilUser;
@@ -1319,7 +1319,7 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 		
 		$this->getProcessLocker()->requestUserSolutionUpdateLock();
 
-		$affectedRows = $this->removeCurrentSolution($active_id, $pass);
+		$affectedRows = $this->removeCurrentSolution($active_id, $pass, $authorized);
 
 		$entered_values = 0;
 		
@@ -1333,7 +1333,7 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 				{
 					if (!(($gap->getType() == CLOZE_SELECT) && ($value == -1)))
 					{
-						$affectedRows = $this->saveCurrentSolution($active_id,$pass, $val1, $value);
+						$affectedRows = $this->saveCurrentSolution($active_id,$pass, $val1, $value, $authorized);
 						$entered_values++;
 					}
 				}
@@ -1507,7 +1507,7 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 		if (array_key_exists($gap_index, $this->gaps))
 		{
 			$gap =& $this->gaps[$gap_index];
-			foreach ($gap->getItems() as $answer) 
+			foreach ($gap->getItems($this->getShuffler()) as $answer) 
 			{
 				if ($answer->getPoints() > $gap_max_points)
 				{
@@ -1600,9 +1600,8 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 		$result['id'] = (int) $this->getId();
 		$result['type'] = (string) $this->getQuestionType();
 		$result['title'] = (string) $this->getTitle();
-		$result['question'] =  $this->formatSAQuestion(
-			$this->getQuestion() . '<br/>' . $this->getClozeText()
-		);
+		$result['question'] =  $this->formatSAQuestion($this->getQuestion()).'<br/>'.
+			$this->formatSAQuestion($this->getClozeText());
 		$result['nr_of_tries'] = (int) $this->getNrOfTries();
 		$result['shuffle'] = (bool) $this->getShuffle();
 		$result['feedback'] = array(
@@ -1614,7 +1613,7 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 		foreach ($this->getGaps() as $key => $gap)
 		{
 			$items = array();
-			foreach ($gap->getItems() as $item)
+			foreach ($gap->getItems($this->getShuffler()) as $item)
 			{				
 				$jitem = array();
 				$jitem['points'] = $item->getPoints();
@@ -1692,14 +1691,37 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 		global $ilDB;
 		$result = new ilUserQuestionResult($this, $active_id, $pass);
 
-		$data = $ilDB->queryF(
-			"SELECT sol.value1+1 as val, sol.value2, cloze.cloze_type FROM tst_solutions sol INNER JOIN qpl_a_cloze cloze ON cloze.gap_id = value1 AND cloze.question_fi = sol.question_fi WHERE sol.active_fi = %s AND sol.pass = %s AND sol.question_fi = %s AND sol.step = (
-				SELECT MAX(step) FROM tst_solutions WHERE active_fi = %s AND pass = %s AND question_fi = %s
-			) GROUP BY sol.solution_id",
-			array("integer", "integer", "integer","integer", "integer", "integer"),
-			array($active_id, $pass, $this->getId(), $active_id, $pass, $this->getId())
-		);
+		$maxStep = $this->lookupMaxStep($active_id, $pass);
 
+		if( $maxStep !== null )
+		{
+			$data = $ilDB->queryF(
+				"
+				SELECT sol.value1+1 as val, sol.value2, cloze.cloze_type
+				FROM tst_solutions sol
+				INNER JOIN qpl_a_cloze cloze ON cloze.gap_id = value1 AND cloze.question_fi = sol.question_fi
+				WHERE sol.active_fi = %s AND sol.pass = %s AND sol.question_fi = %s AND sol.step = %s
+				GROUP BY sol.solution_id, sol.value1+1, sol.value2, cloze.cloze_type
+				",
+				array("integer", "integer", "integer","integer"),
+				array($active_id, $pass, $this->getId(), $maxStep)
+			);
+		}
+		else
+		{
+			$data = $ilDB->queryF(
+				"
+				SELECT sol.value1+1 as val, sol.value2, cloze.cloze_type
+				FROM tst_solutions sol
+				INNER JOIN qpl_a_cloze cloze ON cloze.gap_id = value1 AND cloze.question_fi = sol.question_fi
+				WHERE sol.active_fi = %s AND sol.pass = %s AND sol.question_fi = %s
+				GROUP BY sol.solution_id, sol.value1+1, sol.value2, cloze.cloze_type
+				",
+				array("integer", "integer", "integer"),
+				array($active_id, $pass, $this->getId())
+			);
+		}
+		
 		while($row = $ilDB->fetchAssoc($data))
 		{
 			if($row["cloze_type"] == 1)

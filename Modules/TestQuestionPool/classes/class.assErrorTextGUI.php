@@ -273,7 +273,7 @@ class assErrorTextGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
 		if ($show_question_text==true)
 			$template->setVariable("QUESTIONTEXT", $this->object->prepareTextareaOutput($this->object->getQuestion(), TRUE));
 
-		$errortext = $this->object->createErrorTextOutput($selections, $graphicalOutput, $show_correct_solution);
+		$errortext = $this->object->createErrorTextOutput($selections, $graphicalOutput, $show_correct_solution, false);
 
 		$template->setVariable("ERRORTEXT", $errortext);
 		$questionoutput = $template->get();
@@ -283,8 +283,11 @@ class assErrorTextGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
 		$feedback = '';
 		if($show_feedback)
 		{
-			$fb = $this->getGenericFeedbackOutput($active_id, $pass);
-			$feedback .=  strlen($fb) ? $fb : '';
+			if( !$this->isTestPresentationContext() )
+			{
+				$fb = $this->getGenericFeedbackOutput($active_id, $pass);
+				$feedback .= strlen($fb) ? $fb : '';
+			}
 			
 			$fb = $this->getSpecificFeedbackOutput($active_id, $pass);
 			$feedback .=  strlen($fb) ? $fb : '';
@@ -340,7 +343,7 @@ class assErrorTextGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
 			{
 				if (is_null($pass)) $pass = ilObjTest::_getPass($active_id);
 			}
-			$solutions =& $this->object->getSolutionValues($active_id, $pass);
+			$solutions = $this->object->getUserSolutionPreferingIntermediate($active_id, $pass);
 		}
 		$errortext_value = "";
 		$selections = array();

@@ -36,7 +36,7 @@ var ilMultiFormValues = {
 		});
 		
 		// handle preset values (in hidden inputs)
-		$('input:hidden[id*="ilMultiValues"]').each(function() {		
+		$('input[id*="ilMultiValues"]').each(function() {		
 			ilMultiFormValues.handlePreset(this);				
 		});				
 	},	
@@ -119,7 +119,7 @@ var ilMultiFormValues = {
 		new_id = new_id + 1;
 
 		var original_element = $('div[id="ilFormField~' + group_id + '~' + index + '"]');
-
+		
 		// clone original element
 		var new_element = $(original_element).clone();
 
@@ -167,7 +167,7 @@ var ilMultiFormValues = {
 		// #15798 - remove multi-values hidden inputs (when disabled)
 		if(preset)
 		{			
-			$(new_element).find('input:hidden[name="' + group_id + '[]"]').each(function() { 				
+			$(new_element).find('input:hidden[name="' + group_id + '[]"]').each(function() { 
 				// #15944
 				if($(this).prev().attr("disabled"))
 				{				
@@ -175,7 +175,7 @@ var ilMultiFormValues = {
 				}
 			});
 		}
-		
+
 		// add autocomplete
 		if (typeof ilMultiFormValues.auto_complete_urls[group_id] != 'undefined' &&
 			ilMultiFormValues.auto_complete_urls[group_id] != "") {
@@ -205,6 +205,7 @@ var ilMultiFormValues = {
 				},
 				minLength: 3
 			});
+			
 		}
 	},
 

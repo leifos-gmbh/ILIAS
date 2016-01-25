@@ -292,7 +292,11 @@ class ilFileXMLParser extends ilSaxParser
 					}
 				}
 				//$this->content = $content;
-				$this->file->setFileSize(filesize($this->tmpFilename)); // strlen($this->content));
+				// see #17211
+				if (is_file($this->tmpFilename))
+				{
+					$this->file->setFileSize(filesize($this->tmpFilename)); // strlen($this->content));
+				}
 				
 				// if no file type is given => lookup mime type
 				if(!$this->file->getFileType())
@@ -351,6 +355,12 @@ class ilFileXMLParser extends ilSaxParser
 		global $ilLog;
 		
 		#$ilLog->write(__METHOD__.' '.filesize($this->tmpFilename));
+
+		if(!file_exists($this->tmpFilename))
+		{
+			ilLoggerFactory::getLogger('file')->error(__METHOD__.' "'.$this->tmpFilename. '" file not found.');
+			return;
+		}
 
 		if (filesize ($this->tmpFilename) == 0) {
 			return;

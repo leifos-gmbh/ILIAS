@@ -20,6 +20,7 @@ require_once("./Services/COPage/classes/class.ilPCParagraph.php");
 * @ilCtrl_Calls ilObjGlossaryGUI: ilGlossaryTermGUI, ilMDEditorGUI, ilPermissionGUI
 * @ilCtrl_Calls ilObjGlossaryGUI: ilInfoScreenGUI, ilCommonActionDispatcherGUI, ilObjStyleSheetGUI
 * @ilCtrl_Calls ilObjGlossaryGUI: ilObjTaxonomyGUI, ilExportGUI, ilObjectCopyGUI
+* @ilCtrl_Calls ilObjGlossaryGUI: ilObjectMetaDataGUI
 * 
 * @ingroup ModulesGlossary
 */
@@ -80,7 +81,7 @@ class ilObjGlossaryGUI extends ilObjectGUI
 
 		switch ($next_class)
 		{
-			case 'ilmdeditorgui':
+			case 'ilobjectmetadatagui';
 				$this->checkPermission("write");
 				
 				$this->getTemplate();
@@ -88,14 +89,12 @@ class ilObjGlossaryGUI extends ilObjectGUI
 				$this->setLocator();
 				$this->addHeaderAction();
 
-				include_once 'Services/MetaData/classes/class.ilMDEditorGUI.php';
-
-				$md_gui =& new ilMDEditorGUI($this->object->getId(), 0, $this->object->getType());
-				$md_gui->addObserver($this->object,'MDUpdateListener','General');
-
+				$this->tabs_gui->activateTab('meta_data');
+				include_once 'Services/Object/classes/class.ilObjectMetaDataGUI.php';
+				$md_gui = new ilObjectMetaDataGUI($this->object, 'term');	
 				$this->ctrl->forwardCommand($md_gui);
 				break;
-
+			
 			case "ilglossarytermgui":
 				$this->getTemplate();
 //				$this->quickList();
@@ -367,105 +366,6 @@ class ilObjGlossaryGUI extends ilObjectGUI
 	}
 
 	/**
-	* display status information or report errors messages
-	* in case of error
-	*
-	* @access	public
-	*/
-	function importFileObject()
-	{
-		global $tpl, $ilErr;
-		
-		$new_type = $_REQUEST["new_type"];
-
-		// create permission is already checked in createObject. This check here is done to prevent hacking attempts
-		if (!$this->checkPermissionBool("create", "", $new_type))
-		{
-			$ilErr->raiseError($this->lng->txt("no_create_permission"));
-		}
-
-		$this->lng->loadLanguageModule($new_type);
-		$this->ctrl->setParameter($this, "new_type", $new_type);
-
-		$form = $this->initImportForm($new_type);
-		if ($form->checkInput())
-		{
-		    $this->ctrl->setParameter($this, "new_type", "");
-			$upload = $_FILES["importfile"];
-
-			// create and insert object in objecttree
-			include_once("./Modules/Glossary/classes/class.ilObjGlossary.php");
-			$newObj = new ilObjGlossary();
-			$newObj->setType($new_type);
-			$newObj->setTitle($upload["name"]);
-			$newObj->create(true);
-			
-			$this->putObjectInTree($newObj);
-			
-			// create import directory
-			$newObj->createImportDirectory();
-
-			// copy uploaded file to import directory
-			$file = pathinfo($upload["name"]);
-			$full_path = $newObj->getImportDirectory()."/".$upload["name"];
-
-			ilUtil::moveUploadedFile($upload["tmp_name"], $upload["name"],
-				$full_path);
-
-			// unzip file
-			ilUtil::unzip($full_path);
-
-			// determine filename of xml file
-			$subdir = basename($file["basename"],".".$file["extension"]);
-			$xml_file = $newObj->getImportDirectory()."/".$subdir."/".$subdir.".xml";
-			
-			// check whether this is a new export file.
-			// this is the case if manifest.xml exits
-//echo "1-".$newObj->getImportDirectory()."/".$subdir."/manifest.xml"."-";
-			if (is_file($newObj->getImportDirectory()."/".$subdir."/manifest.xml"))
-			{
-				include_once("./Services/Export/classes/class.ilImport.php");
-				$imp = new ilImport((int) $_GET["ref_id"]);
-				$map = $imp->getMapping();
-				$map->addMapping("Modules/Glossary", "glo", "new_id", $newObj->getId());
-				$imp->importObject($newObj, $full_path, $upload["name"], "glo",
-					"Modules/Glossary", true);
-				ilUtil::sendSuccess($this->lng->txt("glo_added"),true);
-				ilUtil::redirect("ilias.php?baseClass=ilGlossaryEditorGUI&ref_id=".$newObj->getRefId());
-			}
-
-			// check whether subdirectory exists within zip file
-			if (!is_dir($newObj->getImportDirectory()."/".$subdir))
-			{
-				$this->ilias->raiseError(sprintf($this->lng->txt("cont_no_subdir_in_zip"), $subdir),
-					$this->ilias->error_obj->MESSAGE);
-			}
-
-			// check whether xml file exists within zip file
-			if (!is_file($xml_file))
-			{
-				$this->ilias->raiseError(sprintf($this->lng->txt("cont_zip_file_invalid"), $subdir."/".$subdir.".xml"),
-					$this->ilias->error_obj->MESSAGE);
-			}
-
-			include_once ("./Modules/LearningModule/classes/class.ilContObjParser.php");
-			$contParser = new ilContObjParser($newObj, $xml_file, $subdir);
-			$contParser->startParsing();
-			ilObject::_writeImportId($newObj->getId(), $newObj->getImportId());
-
-			// delete import directory
-			ilUtil::delDir($newObj->getImportDirectory());
-
-			ilUtil::sendSuccess($this->lng->txt("glo_added"),true);
-			ilUtil::redirect("ilias.php?baseClass=ilGlossaryEditorGUI&ref_id=".$newObj->getRefId());
-		}
-
-		// display form to correct errors
-		$form->setValuesByPost();
-		$tpl->setContent($form->getHtml());
-	}
-
-	/**
 	 * Show info screen
 	 *
 	 * @param
@@ -694,13 +594,22 @@ class ilObjGlossaryGUI extends ilObjectGUI
 			}
 			
 			$down->setChecked($this->object->isActiveDownloads());
+			
+			// additional features
+			$feat = new ilFormSectionHeaderGUI();
+			$feat->setTitle($this->lng->txt('obj_features'));
+			$this->form->addItem($feat);
+
+			include_once './Services/Container/classes/class.ilContainer.php';
+			include_once './Services/Object/classes/class.ilObjectServiceSettingsGUI.php';
+			ilObjectServiceSettingsGUI::initServiceSettingsForm(
+					$this->object->getId(),
+					$this->form,
+					array(						
+						ilObjectServiceSettingsGUI::CUSTOM_METADATA
+					)
+				);		
 		}		
-		
-		// advanced metadata
-		include_once('Services/AdvancedMetaData/classes/class.ilAdvancedMDRecordGUI.php');
-		$record_gui = new ilAdvancedMDRecordGUI(ilAdvancedMDRecordGUI::MODE_REC_SELECTION,'glo',$this->object->getId(), "term");
-		$record_gui->setPropertyForm($this->form);
-		$record_gui->parseRecordSelection($this->lng->txt("glo_add_term_properties"));
 		
 		// sort columns, if adv fields are given
 		include_once("./Modules/Glossary/classes/class.ilGlossaryAdvMetaDataAdapter.php");
@@ -756,10 +665,14 @@ class ilObjGlossaryGUI extends ilObjectGUI
 			include_once("./Modules/Glossary/classes/class.ilGlossaryDefinition.php");
 			ilGlossaryDefinition::setShortTextsDirty($this->object->getId());
 
-			// update metadata record selection
-			include_once('Services/AdvancedMetaData/classes/class.ilAdvancedMDRecordGUI.php');
-			$record_gui = new ilAdvancedMDRecordGUI(ilAdvancedMDRecordGUI::MODE_REC_SELECTION,'glo',$this->object->getId(), "term");
-			$record_gui->saveSelection();
+			include_once './Services/Object/classes/class.ilObjectServiceSettingsGUI.php';
+			ilObjectServiceSettingsGUI::updateServiceSettingsForm(
+				$this->object->getId(),
+				$this->form,
+				array(
+					ilObjectServiceSettingsGUI::CUSTOM_METADATA
+				)
+			);
 			
 			// Update ecs export settings
 			include_once 'Modules/Glossary/classes/class.ilECSGlossarySettings.php';	
@@ -1392,12 +1305,17 @@ class ilObjGlossaryGUI extends ilObjectGUI
 			$tabs_gui->addTarget("settings",
 				$this->ctrl->getLinkTarget($this, "properties"), "properties",
 				get_class($this));
-
+			
 			// meta data
-			$tabs_gui->addTarget("meta_data",
-				 $this->ctrl->getLinkTargetByClass('ilmdeditorgui','listSection'),
-				 "", "ilmdeditorgui");
-
+			include_once "Services/Object/classes/class.ilObjectMetaDataGUI.php";
+			$mdgui = new ilObjectMetaDataGUI($this->object, "term");					
+			$mdtab = $mdgui->getTab();
+			if($mdtab)
+			{
+				$tabs_gui->addTarget("meta_data", $mdtab,
+					"", "ilobjectmetadatagui");
+			}
+			
 			// export
 			/*$tabs_gui->addTarget("export",
 				 $this->ctrl->getLinkTarget($this, "exportList"),

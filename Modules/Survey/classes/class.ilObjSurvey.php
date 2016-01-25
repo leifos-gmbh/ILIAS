@@ -400,6 +400,10 @@ class ilObjSurvey extends ilObject
 				array($active_fi)
 			);
 		}
+		
+		include_once "Services/Object/classes/class.ilObjectLP.php";
+		$lp_obj = ilObjectLP::getInstance($this->getId());
+		$lp_obj->resetLPDataForCompleteObject();
 	}
 	
 	/**
@@ -411,6 +415,8 @@ class ilObjSurvey extends ilObject
 	{
 		global $ilDB;
 		
+		$user_ids[] = array();
+		
 		foreach ($finished_ids as $finished_id)
 		{
 			$result = $ilDB->queryF("SELECT finished_id FROM svy_finished WHERE finished_id = %s",
@@ -418,6 +424,11 @@ class ilObjSurvey extends ilObject
 				array($finished_id)
 			);
 			$row = $ilDB->fetchAssoc($result);
+			
+			if($row["user_fi"])
+			{
+				$user_ids[] = $row["user_fi"];
+			}
 
 			$affectedRows = $ilDB->manipulateF("DELETE FROM svy_answer WHERE active_fi = %s",
 				array('integer'),
@@ -433,6 +444,13 @@ class ilObjSurvey extends ilObject
 				array('integer'),
 				array($row["finished_id"])
 			);
+		}
+		
+		if(sizeof($user_ids))
+		{
+			include_once "Services/Object/classes/class.ilObjectLP.php";
+			$lp_obj = ilObjectLP::getInstance($this->getId());
+			$lp_obj->resetLPDataForUserIds($user_ids);
 		}
 	}
 	
@@ -4503,6 +4521,13 @@ class ilObjSurvey extends ilObject
 				}
 			}
 		}
+
+		// #16210 - clone LP settings
+		include_once('./Services/Tracking/classes/class.ilLPObjSettings.php');
+		$obj_settings = new ilLPObjSettings($this->getId());
+		$obj_settings->cloneSettings($newObj->getId());
+		unset($obj_settings);
+		
 		return $newObj;
 	}
 	
@@ -4582,42 +4607,6 @@ class ilObjSurvey extends ilObject
 		return $export_dir;
 	}
 	
-	/**
-	* get export files
-	*/
-	function getExportFiles($dir)
-	{
-		// quit if import dir not available
-		if (!@is_dir($dir) or
-			!is_writeable($dir))
-		{
-			return array();
-		}
-
-		// open directory
-		$dir = dir($dir);
-
-		// initialize array
-		$file = array();
-
-		// get files and save the in the array
-		while ($entry = $dir->read())
-		{
-			if ($entry != "." && $entry != ".." && ereg("^[0-9]{10}_{2}[0-9]+_{2}(svy_)*[0-9]+\.[a-z]{1,3}\$", $entry))
-			{
-				$file[] = $entry;
-			}
-		}
-
-		// close import directory
-		$dir->close();
-		// sort files
-		sort ($file);
-		reset ($file);
-
-		return $file;
-	}
-
 	/**
 	* creates data directory for import files
 	* (data_dir/svy_data/svy_<id>/import, depending on data
@@ -5601,10 +5590,12 @@ class ilObjSurvey extends ilObject
 	{
 		global $ilDB;
 		$time = time();
+		//primary for table svy_times
+		$id =  $ilDB->nextId('svy_times');
 		$_SESSION['svy_entered_page'] = $time;
-		$affectedRows = $ilDB->manipulateF("INSERT INTO svy_times (finished_fi, entered_page, left_page, first_question) VALUES (%s, %s, %s, %s)",
-			array('integer', 'integer', 'integer', 'integer'),
-			array($finished_id, $time, NULL, $first_question)
+		$affectedRows = $ilDB->manipulateF("INSERT INTO svy_times (id, finished_fi, entered_page, left_page, first_question) VALUES (%s, %s, %s, %s,%s)",
+			array('integer','integer', 'integer', 'integer', 'integer'),
+			array($id, $finished_id, $time, NULL, $first_question)
 		);
 	}
 	
@@ -5901,6 +5892,7 @@ class ilObjSurvey extends ilObject
 		{		
 			$name = ilObjUser::_lookupName($row["user_id"]);
 			$name["email"] = ilObjUser::_lookupEmail($row["user_id"]);
+			$name["name"] = $name["lastname"].", ".$name["firstname"];
 			$res[$row["user_id"]] = $name;
 			
 			$finished = 0;
@@ -6572,13 +6564,13 @@ class ilObjSurvey extends ilObject
 		$cut->increment(IL_CAL_DAY, $this->getReminderFrequency()*-1);
 		if(!$this->getReminderLastSent() ||
 			$cut->get(IL_CAL_DATE) >= substr($this->getReminderLastSent(), 0, 10))					
-		{	
+		{				
 			$missing_ids = array();
-				
+			
 			// #16871
-			$user_ids = $this->getNotificationTargetUserIds(($this->getReminderTarget() == self::NOTIFICATION_INVITED_USERS));					
+			$user_ids = $this->getNotificationTargetUserIds(($this->getReminderTarget() == self::NOTIFICATION_INVITED_USERS));
 			if($user_ids)
-			{				
+			{
 				// gather participants who already finished
 				$finished_ids = array();
 				$set = $ilDB->query("SELECT user_fi FROM svy_finished".

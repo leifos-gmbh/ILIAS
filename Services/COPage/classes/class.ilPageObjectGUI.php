@@ -21,7 +21,7 @@ include_once("./Services/Utilities/classes/class.ilDOMUtil.php");
  *
  * @version $Id$
  *
- * @ilCtrl_Calls ilPageObjectGUI: ilPageEditorGUI, ilEditClipboardGUI, ilMDEditorGUI
+ * @ilCtrl_Calls ilPageObjectGUI: ilPageEditorGUI, ilEditClipboardGUI, ilObjectMetaDataGUI
  * @ilCtrl_Calls ilPageObjectGUI: ilPublicUserProfileGUI, ilNoteGUI, ilNewsItemGUI
  * @ilCtrl_Calls ilPageObjectGUI: ilPropertyFormGUI, ilInternalLinkGUI, ilPageMultiLangGUI
  *
@@ -61,6 +61,11 @@ class ilPageObjectGUI
 	private $abstract_only = false;
 	protected $parent_type = "";
 
+	/**
+	 * @var ilLogger
+	 */
+	protected $log;
+
 	//var $pl_start = "&#123;&#123;&#123;&#123;&#123;";
 	//var $pl_end = "&#125;&#125;&#125;&#125;&#125;";
 	var $pl_start = "{{{{{";
@@ -79,6 +84,8 @@ class ilPageObjectGUI
 		$a_prevent_get_id = false, $a_lang = "")
 	{
 		global $tpl, $lng, $ilCtrl,$ilTabs;
+
+		$this->log = ilLoggerFactory::getLogger('copg');
 
 		$this->setParentType($a_parent_type);
 		$this->setId($a_id);		
@@ -812,11 +819,11 @@ return;
 	* @param	object	$a_observer_obj		observer object
 	* @param	object	$a_observer_func	observer function
 	*/
-	function activateMetaDataEditor($a_rep_obj_id, $a_sub_obj_id, $a_type,
+	function activateMetaDataEditor($a_rep_obj, $a_type, $a_sub_obj_id,
 		$a_observer_obj = NULL, $a_observer_func = "")
-	{
+	{		
 		$this->use_meta_data = true;
-		$this->meta_data_rep_obj_id = $a_rep_obj_id;
+		$this->meta_data_rep_obj = $a_rep_obj;
 		$this->meta_data_sub_obj_id = $a_sub_obj_id;
 		$this->meta_data_type = $a_type;
 		$this->meta_data_observer_obj = $a_observer_obj;
@@ -914,6 +921,8 @@ return;
 
 		$next_class = $this->ctrl->getNextClass($this);
 
+		$this->log->debug("next_class: ".$next_class);
+
 		$cmd = $this->ctrl->getCmd();
 		//$this->ctrl->addTab("clipboard", $this->ctrl->getLinkTargetByClass("ilEditClipboardGUI", "view")
 		//	, "view", "ilEditClipboardGUI");
@@ -923,17 +932,16 @@ return;
 //echo "-".$next_class."-";
 		switch($next_class)
 		{
-			case 'ilmdeditorgui':
+			case 'ilobjectmetadatagui':
 				//$this->setTabs();
-				$ilTabs->setTabActive("meta_data");
-				include_once 'Services/MetaData/classes/class.ilMDEditorGUI.php';
-				$md_gui =& new ilMDEditorGUI($this->meta_data_rep_obj_id,
-					$this->meta_data_sub_obj_id, $this->meta_data_type);
+				$ilTabs->setTabActive("meta_data");				
+				include_once 'Services/Object/classes/class.ilObjectMetaDataGUI.php';
+				$md_gui = new ilObjectMetaDataGUI($this->meta_data_rep_obj, $this->meta_data_type, $this->meta_data_sub_obj_id);				
 				if (is_object($this->meta_data_observer_obj))
 				{
-					$md_gui->addObserver($this->meta_data_observer_obj,
+					$md_gui->addMDObserver($this->meta_data_observer_obj,
 						$this->meta_data_observer_func, "General");
-				}
+				}							
 				$this->ctrl->forwardCommand($md_gui);
 				break;
 			
@@ -1156,6 +1164,8 @@ return;
 		//{
 			if($this->getOutputMode() == "edit")
 			{
+				$this->log->debug("ilPageObjectGUI, showPage() in edit mode.");
+
 //echo ":".$this->getTemplateTargetVar().":";
 				$tpl = new ilTemplate("tpl.page_edit_wysiwyg.html", true, true, "Services/COPage");
 				//$this->tpl->addBlockFile($this->getTemplateTargetVar(), "adm_content", "tpl.page_edit_wysiwyg.html", "Services/COPage");
@@ -1214,9 +1224,14 @@ return;
 					$GLOBALS["tpl"]->addJavaScript("./Services/COPage/js/ilcopagecallback.js");
 					$GLOBALS["tpl"]->addJavascript("Services/COPage/js/page_editing.js");
 
+					include_once("./Services/UIComponent/Modal/classes/class.ilModalGUI.php");
+					ilModalGUI::initJS();
+					$lng->toJS("cont_error");
+
 					include_once './Services/Style/classes/class.ilObjStyleSheet.php';
 					$GLOBALS["tpl"]->addOnloadCode("var preloader = new Image();
 						preloader.src = './templates/default/images/loader.svg';
+						ilCOPage.setUser('".$ilUser->getLogin()."');
 						ilCOPage.setContentCss('".
 						ilObjStyleSheet::getContentStylePath((int) $this->getStyleId()).
 						", ".ilUtil::getStyleSheetLocation().
@@ -1224,7 +1239,7 @@ return;
 						"')");
 
 					//$GLOBALS["tpl"]->addJavascript("Services/RTE/tiny_mce_3_3_9_2/il_tiny_mce_src.js");
-					$GLOBALS["tpl"]->addJavascript("Services/COPage/tiny/4_1_5/tinymce.js");
+					$GLOBALS["tpl"]->addJavascript("Services/COPage/tiny/4_2_4/tinymce.js");
 					$tpl->touchBlock("init_dragging");
 
 					$cfg = $this->getPageConfig();
@@ -1235,7 +1250,8 @@ return;
 						$cfg->getEnableWikiLinks(),
 						$cfg->getEnableKeywords(),
 						$this->getStyleId(), true, true,
-						$cfg->getEnableAnchors()
+						$cfg->getEnableAnchors(), true,
+						$cfg->getEnableUserLinks()
 						));
 					
 					// add int link parts
@@ -1663,7 +1679,9 @@ return;
 			: ilPlayerUtil::getFlashVideoPlayerFilename(true);
 			
 		$cfg = $this->getPageConfig();
-		
+
+		$current_ts = time();
+
 		// added UTF-8 encoding otherwise umlaute are converted too
 		include_once("./Services/Maps/classes/class.ilMapUtil.php");
 		$params = array ('mode' => $this->getOutputMode(), 'pg_title' => htmlentities($pg_title,ENT_QUOTES,"UTF-8"),
@@ -1712,7 +1730,8 @@ return;
 						 'enable_consultation_hours' =>  $cfg->getEnablePCType("ConsultationHours") ? "y" : "n",
 						 'enable_my_courses' =>  $cfg->getEnablePCType("MyCourses") ? "y" : "n",
 						 'enable_amd_page_list' =>  $cfg->getEnablePCType("AMDPageList") ? "y" : "n",
-						 'flv_video_player' => $flv_video_player
+						 'flv_video_player' => $flv_video_player,
+						 'current_ts' => $current_ts
 						);
 		if($this->link_frame != "")		// todo other link types
 			$params["pg_frame"] = $this->link_frame;
@@ -1724,8 +1743,13 @@ return;
 		// ensure no cache hit, if included files/media objects have been changed
 		$params["incl_elements_date"] = $this->obj->getLastUpdateOfIncludedElements();
 
+
+		// should be modularized
+		include_once("./Services/COPage/classes/class.ilPCSection.php");
+		$md5_adds = ilPCSection::getCacheTriggerString($this->getPageObject());
+
 		// run xslt
-		$md5 = md5(serialize($params).$link_xml.$template_xml);
+		$md5 = md5(serialize($params).$link_xml.$template_xml.$md5_adds);
 		
 //$a = microtime();
 		
@@ -2155,7 +2179,7 @@ return;
 	static function getTinyMenu($a_par_type,
 		$a_int_links = false, $a_wiki_links = false, $a_keywords = false,
 		$a_style_id = 0, $a_paragraph_styles = true, $a_save_return = true,
-		$a_anchors = false, $a_save_new = true)
+		$a_anchors = false, $a_save_new = true, $a_user_links = false)
 	{
 		global $lng, $ilCtrl;
 
@@ -2205,6 +2229,11 @@ return;
 		}
 		ilTooltipGUI::addTooltip("il_edm_xlink", $lng->txt("cont_link_to_external"),
 			"iltinymenu_bd");
+
+		if ($a_user_links)
+		{
+			$btpl->touchBlock("bb_ulink_button");
+		}
 
 		// remove format
 		$btpl->touchBlock("rformat_button");
@@ -2397,6 +2426,7 @@ return;
 				}
 
 				$href = "";
+				$lcontent = "";
 				switch($type)
 				{
 					case "PageObject":
@@ -2438,11 +2468,30 @@ return;
 						$href = "./goto.php?target=".$obj_type."_".$target_id;
 						break;
 
+					case "User":
+						$obj_type = ilObject::_lookupType($target_id);
+						if ($obj_type == "usr")
+						{
+							include_once("./Services/User/classes/class.ilUserUtil.php");
+							$back = $ilCtrl->getLinkTargetByClass(strtolower(get_class($this)), "preview");
+							$ilCtrl->setParameterByClass("ilpublicuserprofilegui", "user_id", $target_id);
+							$ilCtrl->setParameterByClass("ilpublicuserprofilegui", "back_url",
+								rawurlencode($back));
+							$href = "";
+							include_once("./Services/User/classes/class.ilUserUtil.php");
+							if (ilUserUtil::hasPublicProfile($target_id))
+							{
+								$href = $ilCtrl->getLinkTargetByClass("ilpublicuserprofilegui", "getHTML");
+							}
+							$ilCtrl->setParameterByClass("ilpublicuserprofilegui", "user_id", "");
+							$lcontent = ilUserUtil::getNamePresentation($target_id, false, false);
+						}
+						break;
 
 				}
 				$anc_par = 'Anchor="'.$anc.'"';
 				$link_info.="<IntLinkInfo Target=\"$target\" Type=\"$type\" ".$anc_par." ".
-					"TargetFrame=\"$targetframe\" LinkHref=\"$href\" LinkTarget=\"$ltarget\" />";
+					"TargetFrame=\"$targetframe\" LinkHref=\"$href\" LinkTarget=\"$ltarget\" LinkContent=\"$lcontent\" />";
 			}
 		}
 		$link_info.= "</IntLinkInfos>";
@@ -2586,13 +2635,13 @@ return;
 			$param = substr($a_html, $start + 20, $end - $start - 20);
 			$param = explode(";", $param);
 
-			if ($param[0] == "mep" && is_numeric($param[1]) && $param[2] <= 0)
+			if ($param[0] == "mep" && is_numeric($param[1]))
 			{
 				include_once("./Modules/MediaPool/classes/class.ilMediaPoolPageGUI.php");
 
-				if (ilMediaPoolPage::_exists($param[1]))
+				if (($param[2] <= 0 || $param[2] == IL_INST_ID) && ilMediaPoolPage::_exists($param[1]))
 				{
-					$page_gui = new ilMediaPoolPageGUI($param[1], 0, true, "-");
+					$page_gui = new ilMediaPoolPageGUI($param[1], 0, true, $this->getLanguage());
 					if ($this->getOutputMode() != "offline")
 					{
 						$page_gui->setFileDownloadLink($this->determineFileDownloadLink());
@@ -2610,7 +2659,14 @@ return;
 				{
 					if ($this->getOutputMode() == "edit")
 					{
-						$html = "// ".$lng->txt("cont_missing_snippet")." //";
+						if ($param[2] <= 0)
+						{
+							$html = "// ".$lng->txt("cont_missing_snippet")." //";
+						}
+						else
+						{
+							$html = "// ".$lng->txt("cont_snippet_from_another_installation")." //";
+						}
 					}
 				}
 				$h2 = substr($a_html, 0, $start).
@@ -2619,6 +2675,7 @@ return;
 				$a_html = $h2;
 				$i++;
 			}
+
 			$start = strpos($a_html, "{{{{{ContentInclude;", $start + 5);
 			$end = 0;
 			if (is_int($start))
@@ -3225,10 +3282,16 @@ return;
 		//	, "properties", get_class($this));
 
 		if ($this->use_meta_data)
-		{
-			$ilTabs->addTarget("meta_data",
-				 $this->ctrl->getLinkTargetByClass('ilmdeditorgui',''),
-				 "", "ilmdeditorgui");
+		{			
+			include_once "Services/Object/classes/class.ilObjectMetaDataGUI.php";
+			$mdgui = new ilObjectMetaDataGUI($this->meta_data_rep_obj, 
+				$this->meta_data_type, $this->meta_data_sub_obj_id);					
+			$mdtab = $mdgui->getTab();
+			if($mdtab)
+			{
+				$ilTabs->addTarget("meta_data",			
+					$mdtab, "", "ilobjectmetadatagui");
+			}
 		}
 
 		$lm_set = new ilSetting("lm");
@@ -3690,7 +3753,11 @@ return;
 		global $ilCtrl;
 		
 		$l = ilUtil::stripSlashes($_GET["totransl"]);
-		$this->getPageObject()->copyPageToTranslation($l);
+
+		include_once("./Services/COPage/classes/class.ilPageObjectFactory.php");
+		$p = ilPageObjectFactory::getInstance($this->getPageObject()->getParentType(),
+			$this->getPageObject()->getId(), 0, "-");
+		$p->copyPageToTranslation($l);
 		$ilCtrl->setParameter($this, "transl", $l);
 		$ilCtrl->redirect($this, "edit");
 	}

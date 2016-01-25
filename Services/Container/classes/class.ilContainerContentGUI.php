@@ -719,8 +719,8 @@ abstract class ilContainerContentGUI
 		
 		// #16493
 		$perm_ok = ($ilAccess->checkAccess("visible", "", $a_itgr['ref_id']) &&
-			 $ilAccess->checkAccess("read", "", $a_itgr['ref_id']));
-			
+			 $ilAccess->checkAccess("read", "", $a_itgr['ref_id']));			
+
 		include_once('./Services/Container/classes/class.ilContainerSorting.php');			
 		include_once('./Services/Object/classes/class.ilObjectActivation.php');
 		$items = ilObjectActivation::getItemsByItemGroup($a_itgr['ref_id']);
@@ -744,8 +744,17 @@ abstract class ilContainerContentGUI
 		$item_list_gui->getListItemHTML($a_itgr["ref_id"], $a_itgr["obj_id"],
 			$a_itgr["title"], $a_itgr["description"]);
 		$commands_html = $item_list_gui->getCommandsHTML(); 
-		
-		$this->renderer->addCustomBlock($a_itgr["ref_id"], $a_itgr["title"], $commands_html);
+
+		include_once("./Modules/ItemGroup/classes/class.ilObjItemGroup.php");
+		if (ilObjItemGroup::lookupHideTitle($a_itgr["obj_id"]) &&
+			!$this->getContainerGUI()->isActiveAdministrationPanel())
+		{
+			$this->renderer->addCustomBlock($a_itgr["ref_id"], "", $commands_html);
+		}
+		else
+		{
+			$this->renderer->addCustomBlock($a_itgr["ref_id"], $a_itgr["title"], $commands_html);
+		}
 	
 		
 		// render item group sub items
@@ -756,6 +765,7 @@ abstract class ilContainerContentGUI
 		$position = 1;
 		foreach($items as $item)
 		{
+			// we are NOT using hasItem() here, because item might be in multiple item groups			
 			$html2 = $this->renderItem($item, $position++, false, "[itgr][".$a_itgr['obj_id']."]");
 			if ($html2 != "")
 			{

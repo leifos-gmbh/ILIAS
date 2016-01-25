@@ -11,7 +11,7 @@ require_once "./Services/Object/classes/class.ilObjectGUI.php";
 * 
 * @ilCtrl_Calls ilObjBookingPoolGUI: ilPermissionGUI, ilBookingObjectGUI
 * @ilCtrl_Calls ilObjBookingPoolGUI: ilBookingScheduleGUI, ilInfoScreenGUI, ilPublicUserProfileGUI
-* @ilCtrl_Calls ilObjBookingPoolGUI: ilCommonActionDispatcherGUI, ilObjectCopyGUI
+* @ilCtrl_Calls ilObjBookingPoolGUI: ilCommonActionDispatcherGUI, ilObjectCopyGUI, ilObjectMetaDataGUI
 * @ilCtrl_IsCalledBy ilObjBookingPoolGUI: ilRepositoryGUI, ilAdministrationGUI
 */
 class ilObjBookingPoolGUI extends ilObjectGUI
@@ -109,6 +109,14 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 				$this->ctrl->forwardCommand($cp);
 				break;
 			
+			case 'ilobjectmetadatagui';
+				$this->checkPermissionBool('write');				
+				$this->tabs_gui->setTabActive('meta_data');
+				include_once 'Services/Object/classes/class.ilObjectMetaDataGUI.php';
+				$md_gui = new ilObjectMetaDataGUI($this->object, 'bobj');	
+				$this->ctrl->forwardCommand($md_gui);
+				break;
+			
 			default:
 				$cmd = $this->ctrl->getCmd();
 				$cmd .= 'Object';
@@ -185,6 +193,12 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 		$public = new ilCheckboxInputGUI($this->lng->txt("book_public_log"), "public");
 		$public->setInfo($this->lng->txt("book_public_log_info"));
 		$a_form->addItem($public);		
+		
+		// additional features
+		$feat = new ilFormSectionHeaderGUI();
+		$feat->setTitle($this->lng->txt('obj_features'));
+		$a_form->addItem($feat);
+
 	}
 
 	protected function getEditFormCustomValues(array &$a_values)
@@ -192,7 +206,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 		$a_values["online"] = !$this->object->isOffline();
 		$a_values["public"] = $this->object->hasPublicLog();
 		$a_values["stype"] = $this->object->getScheduleType();
-		$a_values["limit"] = $this->object->getOverallLimit();
+		$a_values["limit"] = $this->object->getOverallLimit();		
 	}
 
 	protected function updateCustom(ilPropertyFormGUI $a_form)
@@ -201,8 +215,27 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 		$this->object->setPublicLog($a_form->getInput('public'));
 		$this->object->setScheduleType($a_form->getInput('stype'));
 		$this->object->setOverallLimit($a_form->getInput('limit') ? $a_form->getInput('limit') : null);
+		
+		include_once './Services/Container/classes/class.ilContainer.php';
+		include_once './Services/Object/classes/class.ilObjectServiceSettingsGUI.php';
+		ilObjectServiceSettingsGUI::updateServiceSettingsForm(
+			$this->object->getId(),
+			$a_form,
+			array(ilObjectServiceSettingsGUI::CUSTOM_METADATA)
+		);
 	}
-
+	
+	public function addExternalEditFormCustom(ilPropertyFormGUI $a_form)
+	{				
+		include_once './Services/Container/classes/class.ilContainer.php';
+		include_once './Services/Object/classes/class.ilObjectServiceSettingsGUI.php';
+		ilObjectServiceSettingsGUI::initServiceSettingsForm(
+				$this->object->getId(),
+				$a_form,
+				array(ilObjectServiceSettingsGUI::CUSTOM_METADATA)
+			);
+	}
+	
 	/**
 	* get tabs
 	*/
@@ -250,6 +283,18 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 			$this->tabs_gui->addTab("settings",
 				$this->lng->txt("settings"),
 				$this->ctrl->getLinkTarget($this, "edit"));
+			
+			// meta data		
+			include_once "Services/Object/classes/class.ilObjectMetaDataGUI.php";
+			$mdgui = new ilObjectMetaDataGUI($this->object, "bobj");					
+			$mdtab = $mdgui->getTab();
+			if($mdtab)
+			{
+				$this->tabs_gui->addTarget("meta_data",
+									 $mdtab,
+									 "",
+									 "ilobjectmetadatagui");
+			}	
 		}
 
 		if($ilAccess->checkAccess('edit_permission', '', $this->object->getRefId()))
@@ -360,7 +405,9 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 			else
 			{
 				$find_first_open = true;
-				$seed = new ilDate(time(), IL_CAL_UNIX);
+				$seed = isset($_GET['sseed']) 
+					? new ilDate($_GET['sseed'], IL_CAL_DATE)
+					: new ilDate(time(), IL_CAL_UNIX);
 			}
 			
 			include_once 'Services/Calendar/classes/class.ilCalendarUtil.php';
@@ -503,10 +550,28 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 		$map = array('mo', 'tu', 'we', 'th', 'fr', 'sa', 'su');
 		$definition = $schedule->getDefinition();
 		
+		$av_from = ($schedule->getAvailabilityFrom() && !$schedule->getAvailabilityFrom()->isNull())
+			? $schedule->getAvailabilityFrom()->get(IL_CAL_DATE)
+			: null;
+		$av_to = ($schedule->getAvailabilityTo() && !$schedule->getAvailabilityTo()->isNull())
+			? $schedule->getAvailabilityTo()->get(IL_CAL_DATE)
+			: null;
+		
 		$has_open_slot = false;
 		foreach(ilCalendarUtil::_buildWeekDayList($seed,$week_start)->get() as $date)
 		{
 			$date_info = $date->get(IL_CAL_FKT_GETDATE,'','UTC');
+			
+			if($av_from || 
+				$av_to)
+			{
+				$today = $date->get(IL_CAL_DATE);				
+				if($av_from > $today ||
+					$av_to < $today)
+				{
+					continue;
+				}
+			}
 
 			$slots = array();
 			if(isset($definition[$map[$date_info['isoday']-1]]))
@@ -1029,14 +1094,17 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 			}
 		}
 		else
-		{
-			$form->setValuesByPost();
-			
+		{			
 			// ilDateTimeInputGUI does NOT add hidden values on disabled!
 			
 			$rece_year = $_POST["rece"]["date"]["y"];
 			$rece_month = str_pad($_POST["rece"]["date"]["m"], 2, "0", STR_PAD_LEFT);
 			$rece_day = str_pad($_POST["rece"]["date"]["d"], 2, "0", STR_PAD_LEFT);
+			
+			// ilDateTimeInputGUI will choke on POST array format
+			$_POST["rece"] = null;		
+			
+			$form->setValuesByPost();
 			
 			$form->getItemByPostVar("rece")->setDate(new ilDate($rece_year."-".$rece_month."-".$rece_day, IL_CAL_DATE));
 			$form->getItemByPostVar("recm")->setHideSubForm($_POST["recm"] < 1);
@@ -1435,6 +1503,12 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 			$caption = $obj->getTitle().", ".ilDatePresentation::formatPeriod(
 					new ilDateTime($rsv->getFrom(), IL_CAL_UNIX),
 					new ilDateTime($rsv->getTo()+1, IL_CAL_UNIX));
+			
+			// #17869
+			if(is_array($ids))
+			{
+				$caption .= " (".sizeof($ids).")";
+			}
 			
 			$item = new ilNumberInputGUI($caption, "rsv_id_".$idx);
 			$item->setRequired(true);

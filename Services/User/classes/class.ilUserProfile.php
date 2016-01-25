@@ -284,7 +284,7 @@ class ilUserProfile
 						"course_export_hide" => true,
 						"group_export_hide" => true,
 						"group" => "settings"),
-		"show_users_online" => array(
+		/*"show_users_online" => array(
 						"input" => "selection",
 						"default" => "y",
 						"options" => array(
@@ -295,14 +295,23 @@ class ilUserProfile
 						"visib_reg_hide" => true,
 						"course_export_hide" => true,
 						"group_export_hide" => true,
-						"group" => "settings"),
+						"group" => "settings"),*/
 		"hide_own_online_status" => array(
 						"input" => "selection",
+						"lang_var" => "awrn_hide_from_awareness",
 						"required_hide" => true,
 						"visib_reg_hide" => true,
 						"course_export_hide" => true,
 						"group_export_hide" => true,
 						"group" => "settings"),
+		"bs_allow_to_contact_me" => array(
+			"input" => "selection",
+			"lang_var" => "buddy_allow_to_contact_me",
+			"required_hide" => true,
+			"visib_reg_hide" => true,
+			"course_export_hide" => true,
+			"group_export_hide" => true,
+			"group" => "settings"),
 		"preferences" => array(
 						"visible_fix_value" => 1,
 						"changeable_fix_value" => 1,
@@ -333,8 +342,15 @@ class ilUserProfile
 	 */
 	function __construct()
 	{
+		global $lng;
+
 		$this->skip_groups = array();
 		$this->skip_fields = array();
+
+		// for hide me from awareness tool text
+		// not nicest workaround, but better than using common block
+		$lng->loadLanguageModule("awrn");
+		$lng->loadLanguageModule("buddysystem");
 	}
 	
 	/**

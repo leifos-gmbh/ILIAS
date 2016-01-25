@@ -99,12 +99,17 @@ class ilObjMediaObject extends ilObject
 	*/
 	function delete()
 	{
+		$mob_logger = ilLoggerFactory::getLogger('mob');
+		$mob_logger->debug("ilObjMediaObject: Delete called for media object ID '".$this->getId()."'.");
+
 		if (!($this->getId() > 0))
 		{
 			return;
 		}
 
 		$usages = $this->getUsages();
+
+		$mob_logger->debug("ilObjMediaObject: ... Found ".count($usages)." usages.");
 
 		if (count($usages) == 0)
 		{
@@ -126,6 +131,19 @@ class ilObjMediaObject extends ilObject
 					
 			// delete object
 			parent::delete();
+
+			$mob_logger->debug("ilObjMediaObject: ... deleted.");
+		}
+		else
+		{
+			foreach ($usages as $u)
+			{
+				$mob_logger->debug("ilObjMediaObject: ... usage type:".$u["type"].
+					", id:".$u["id"].
+					", lang:".$u["lang"].
+					", hist_nr:".$u["hist_nr"].".");
+			}
+			$mob_logger->debug("ilObjMediaObject: ... not deleted.");
 		}
 	}
 
@@ -499,15 +517,13 @@ class ilObjMediaObject extends ilObject
 		}
 		
 		self::handleQuotaUpdate($this);		
-
-        	global $ilAppEventHandler;
+		global $ilAppEventHandler;
 		$ilAppEventHandler->raise('Services/MediaObjects',
         	'update',
 		array('object' => $this,
             		'obj_type' => 'mob',
             		'obj_id' => $this->getId())
-        	);            
-
+        	);  
 	}
 	
 	protected static function handleQuotaUpdate(ilObjMediaObject $a_mob)
@@ -556,13 +572,13 @@ class ilObjMediaObject extends ilObject
 	{
 		return ilUtil::getWebspaceDir()."/mobs/mm_".$a_mob_id;
 	}
-	
-/**
-	* get directory for files of media object (static)
-	*
-	* @param	int		$a_mob_id		media object id
-	*/
-	function _getURL($a_mob_id)
+
+	/**
+	 * get directory for files of media object (static)
+	 * @param int $a_mob_id media object id
+	 * @return string
+	 */
+	public static function _getURL($a_mob_id)
 	{
 		return ilUtil::getHtmlPath(ilUtil::getWebspaceDir()."/mobs/mm_".$a_mob_id);
 	}
@@ -1282,9 +1298,9 @@ class ilObjMediaObject extends ilObject
 					case "exca":
 						// Exercise assignment
 						$returned_pk = $a_usage['id'];					
-						// we are just checking against exercise object
-						include_once 'Modules/Exercise/classes/class.ilObjExercise.php';
-						$obj_id = ilObjExercise::lookupExerciseIdForReturnedId($returned_pk);			
+						// #15995 - we are just checking against exercise object
+						include_once 'Modules/Exercise/classes/class.ilExSubmission.php';
+						$obj_id = ilExSubmission::lookupExerciseIdForReturnedId($returned_pk);			
 						break;
 					
 					case "frm":		
@@ -1474,15 +1490,15 @@ class ilObjMediaObject extends ilObject
 	/**
 	* Determine width and height
 	*/
-	static function _determineWidthHeight($a_def_width, $a_def_height, $a_format, $a_type,
+	static function _determineWidthHeight($a_format, $a_type,
 		$a_file, $a_reference, $a_constrain_proportions, $a_use_original,
 		$a_user_width, $a_user_height)
 	{
 		global $lng;
 		
 		// determine width and height of known image types
-		$width = $a_def_width;
-		$height = $a_def_height;
+		$width = 640;
+		$height = 360;
 		$info = "";
 		
 		if ($a_format == "audio/mpeg")
@@ -1592,7 +1608,7 @@ class ilObjMediaObject extends ilObject
 	/**
 	 * Create new media object and update page in db and return new media object
 	 */
-	function &_saveTempFileAsMediaObject($name, $tmp_name, $upload = TRUE)
+	public static function _saveTempFileAsMediaObject($name, $tmp_name, $upload = TRUE)
 	{
 		// create dummy object in db (we need an id)
 		$media_object = new ilObjMediaObject();
@@ -1644,7 +1660,7 @@ class ilObjMediaObject extends ilObject
 	/**
 	 * Create new media object and update page in db and return new media object
 	 */
-	function uploadAdditionalFile($a_name, $tmp_name, $a_subdir = "")
+	function uploadAdditionalFile($a_name, $tmp_name, $a_subdir = "", $a_mode = "move_uploaded")
 	{
 		$a_subdir = str_replace("..", "", $a_subdir);
 		$dir = $mob_dir = ilObjMediaObject::_getDirectory($this->getId());
@@ -1653,7 +1669,7 @@ class ilObjMediaObject extends ilObject
 			$dir.= "/".$a_subdir;
 		}
 		ilUtil::makeDirParents($dir);
-		ilUtil::moveUploadedFile($tmp_name, $a_name, $dir."/".$a_name);
+		ilUtil::moveUploadedFile($tmp_name, $a_name, $dir."/".$a_name, true, $a_mode);
 		ilUtil::renameExecutables($mob_dir);
 	}
 	
@@ -1663,11 +1679,11 @@ class ilObjMediaObject extends ilObject
 	 * @param
 	 * @return
 	 */
-	function uploadSrtFile($a_tmp_name, $a_language)
+	function uploadSrtFile($a_tmp_name, $a_language, $a_mode = "move_uploaded")
 	{
 		if (is_file($a_tmp_name) && $a_language != "")
 		{
-			$this->uploadAdditionalFile("subtitle_".$a_language.".srt", $a_tmp_name, "srt");
+			$this->uploadAdditionalFile("subtitle_".$a_language.".srt", $a_tmp_name, "srt", $a_mode);
 			return true;
 		}
 		return false;
@@ -1929,6 +1945,84 @@ class ilObjMediaObject extends ilObject
 		return $a_name;
 	}
 
-	
+
+	/**
+	 * Get directory for multi srt upload
+	 *
+	 * @param
+	 * @return
+	 */
+	function getMultiSrtUploadDir()
+	{
+		return ilObjMediaObject::_getDirectory($this->getId()."/srt/tmp");
+	}
+
+
+	/**
+	 * Upload multi srt file
+	 *
+	 * @param array $a_file file info array
+	 * @throws ilMediaObjectsException
+	 */
+	function uploadMultipleSubtitleFile($a_file)
+	{
+		global $lng, $ilUser;
+
+		include_once("./Services/MediaObjects/exceptions/class.ilMediaObjectsException.php");
+		if (!is_file($a_file["tmp_name"]))
+		{
+			throw new ilMediaObjectsException($lng->txt("mob_file_could_not_be_uploaded"));
+		}
+
+		$dir = $this->getMultiSrtUploadDir();
+		ilUtil::delDir($dir, true);
+		ilUtil::makeDirParents($dir);
+		ilUtil::moveUploadedFile($a_file["tmp_name"], "multi_srt.zip", $dir."/"."multi_srt.zip");
+		ilUtil::unzip($dir."/multi_srt.zip", true);
+	}
+
+	/**
+	 * Clear multi feedback directory
+	 */
+	function clearMultiSrtDirectory()
+	{
+		ilUtil::delDir($this->getMultiSrtUploadDir());
+	}
+
+	/**
+	 * Get all srt files of srt multi upload
+	 */
+	function getMultiSrtFiles()
+	{
+		$items = array();
+
+		include_once("./Services/MetaData/classes/class.ilMDLanguageItem.php");
+		$lang_codes = ilMDLanguageItem::_getPossibleLanguageCodes();
+
+		$dir = $this->getMultiSrtUploadDir();
+		$files = ilUtil::getDir($dir);
+		foreach ($files as $k => $i)
+		{
+			// check directory
+			if ($i["type"] == "file" && !in_array($k, array(".", "..")))
+			{
+				if (pathinfo($k, PATHINFO_EXTENSION) == "srt")
+				{
+					$lang = "";
+					if (substr($k, strlen($k) - 7, 1) == "_")
+					{
+						$lang = substr($k, strlen($k) - 6, 2);
+						if (!in_array($lang, $lang_codes))
+						{
+							$lang = "";
+						}
+					}
+					$items[] = array("filename" => $k, "lang" => $lang);
+				}
+			}
+		}
+		return $items;
+	}
+
 }
 ?>

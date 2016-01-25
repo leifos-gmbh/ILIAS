@@ -9,8 +9,6 @@ include_once("Services/Block/classes/class.ilBlockGUI.php");
 * @author Alex Killing <alex.killing@gmx.de>
 * @version $Id$
 *
-* @ilCtrl_Is+++CalledBy ilWikiSideBlockGUI: ilColumnGUI
-*
 * @ingroup ModulesWiki
 */
 class ilWikiFunctionsBlockGUI extends ilBlockGUI
@@ -210,10 +208,10 @@ class ilWikiFunctionsBlockGUI extends ilBlockGUI
 						$ilCtrl->getLinkTargetByClass("ilwikipagegui", "deactivateWikiPageRating"));
 				}
 			}
-			
-			// unhide advmd?
-			include_once("./Modules/Wiki/classes/class.ilWikiAdvMetaDataBlockGUI.php");			
-			if(ilWikiAdvMetaDataBlockGUI::isActive($this->getPageObject()->getWikiId()) &&
+		
+			// unhide advmd?		
+			include_once 'Services/AdvancedMetaData/classes/class.ilAdvancedMDRecord.php';
+			if((bool)sizeof(ilAdvancedMDRecord::_getSelectedRecordsByObject("wiki", $this->getPageObject()->getWikiId(), "wpg")) &&
 				ilWikiPage::lookupAdvancedMetadataHidden($this->getPageObject()->getId()))
 			{	
 				$list->addItem($lng->txt("wiki_unhide_meta_adv_records"), "",
@@ -229,7 +227,8 @@ class ilWikiFunctionsBlockGUI extends ilBlockGUI
 				$ilCtrl->getLinkTargetByClass("ilwikipagegui", "renameWikiPage"));
 		}
 
-		if ($ilAccess->checkAccess("write", "", $_GET["ref_id"]))
+		include_once("./Modules/Wiki/classes/class.ilWikiPerm.php");
+		if (ilWikiPerm::check("activate_wiki_protection", $_GET["ref_id"]))
 		{
 			// block/unblock
 			if ($this->getPageObject()->getBlocked())
@@ -242,7 +241,11 @@ class ilWikiFunctionsBlockGUI extends ilBlockGUI
 				$list->addItem($lng->txt("wiki_block_page"), "",
 					$ilCtrl->getLinkTargetByClass("ilwikipagegui", "blockWikiPage"));
 			}
+		}
 
+		include_once("./Modules/Wiki/classes/class.ilWikiPerm.php");
+		if (ilWikiPerm::check("delete_wiki_pages", $_GET["ref_id"]))
+		{
 			// delete page
 			$st_page = ilObjWiki::_lookupStartPage($this->getPageObject()->getParentId());
 			if ($st_page != $this->getPageObject()->getTitle())
@@ -250,7 +253,11 @@ class ilWikiFunctionsBlockGUI extends ilBlockGUI
 				$list->addItem($lng->txt("wiki_delete_page"), "",
 					$ilCtrl->getLinkTargetByClass("ilwikipagegui", "deleteWikiPageConfirmationScreen"));
 			}
-			
+		}
+		
+		if ($ilAccess->checkAccess("write", "", $_GET["ref_id"]))
+		{
+
 			include_once "Modules/Wiki/classes/class.ilWikiPageTemplate.php";
 			$wpt = new ilWikiPageTemplate($this->getPageObject()->getParentId());
 			if(!$wpt->isPageTemplate($this->getPageObject()->getId()))
@@ -288,14 +295,20 @@ class ilWikiFunctionsBlockGUI extends ilBlockGUI
 		// settings
 		if ($ilAccess->checkAccess('write', "", $_GET["ref_id"]))
 		{
-//			$actions[] = array(
-//				"txt" => $lng->txt("settings"),
-//				"href" => $ilCtrl->getLinkTargetByClass("ilobjwikigui", "editSettings")
-//				);
 			$actions[] = array(
 				"txt" => $lng->txt("wiki_contributors"),
 				"href" => $ilCtrl->getLinkTargetByClass("ilobjwikigui", "listContributors")
 				);
+		}
+
+		// manage
+		if (ilWikiPerm::check("wiki_html_export", $_GET["ref_id"]))
+		{
+			$actions[] = array(
+				"txt" => $lng->txt("wiki_html_export"),
+				"id" => "il_wiki_user_export",
+				"href" => $ilCtrl->getLinkTargetByClass("ilobjwikigui", "initUserHTMLExport")
+			);
 		}
 
 		// manage
@@ -319,6 +332,10 @@ class ilWikiFunctionsBlockGUI extends ilBlockGUI
 			$tpl->setCurrentBlock("action");
 			$tpl->setVariable("HREF", $a["href"]);
 			$tpl->setVariable("TXT", $a["txt"]);
+			if ($a["id"] != "")
+			{
+				$tpl->setVariable("ACT_ID", "id='".$a["id"]."'");
+			}
 			$tpl->parseCurrentBlock();
 
 			$tpl->touchBlock("item");

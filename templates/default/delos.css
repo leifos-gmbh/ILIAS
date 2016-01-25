@@ -1,58 +1,71 @@
 @font-face {
   font-family: 'Open Sans';
-  src: url('fonts/OpenSansWeb/opensans-regular-webfont.eot');
-  src: url('fonts/OpenSansWeb/opensans-regular-webfont.eot?#iefix') format('embedded-opentype'), url('fonts/OpenSansWeb/opensans-regular-webfont.woff') format('woff'), url('fonts/OpenSansWeb/opensans-regular-webfont.ttf') format('truetype'), url('fonts/OpenSansWeb/opensans-regular-webfont.svg') format('svg');
+  src: url('fonts/OpenSansWeb/OpenSans-Regular.eot');
+  src: url('fonts/OpenSansWeb/OpenSans-Regular.woff2') format('woff2'), url('fonts/OpenSansWeb/OpenSans-Regular.woff') format('woff'), url('fonts/OpenSansWeb/OpenSans-Regular.ttf') format('truetype'), url('fonts/OpenSansWeb/OpenSans-Regular.svg') format('svg');
+  font-weight: 400;
+  font-style: normal;
 }
 @font-face {
   font-family: 'Open Sans';
-  src: url('fonts/OpenSansWeb/opensans-bold-webfont.eot');
-  src: url('fonts/OpenSansWeb/opensans-bold-webfont.eot?#iefix') format('embedded-opentype'), url('fonts/OpenSansWeb/opensans-bold-webfont.woff') format('woff'), url('fonts/OpenSansWeb/opensans-bold-webfont.ttf') format('truetype'), url('fonts/OpenSansWeb/opensans-bold-webfont.svg') format('svg');
-  font-weight: bold;
+  src: url('fonts/OpenSansWeb/OpenSans-Bold.eot');
+  src: url('fonts/OpenSansWeb/OpenSans-Bold.woff2') format('woff2'), url('fonts/OpenSansWeb/OpenSans-Bold.woff') format('woff'), url('fonts/OpenSansWeb/OpenSans-Bold.ttf') format('truetype'), url('fonts/OpenSansWeb/OpenSans-Bold.svg') format('svg');
+  font-weight: 700;
+  font-style: normal;
 }
 @font-face {
   font-family: 'Open Sans';
-  src: url('fonts/OpenSansWeb/opensans-italic-webfont.eot');
-  src: url('fonts/OpenSansWeb/opensans-italic-webfont.eot?#iefix') format('embedded-opentype'), url('fonts/OpenSansWeb/opensans-italic-webfont.woff') format('woff'), url('fonts/OpenSansWeb/opensans-italic-webfont.ttf') format('truetype'), url('fonts/OpenSansWeb/opensans-italic-webfont.svg') format('svg');
+  src: url('fonts/OpenSansWeb/OpenSans-Italic.eot');
+  src: url('fonts/OpenSansWeb/OpenSans-Italic.woff2') format('woff2'), url('fonts/OpenSansWeb/OpenSans-Italic.woff') format('woff'), url('fonts/OpenSansWeb/OpenSans-Italic.ttf') format('truetype'), url('fonts/OpenSansWeb/OpenSans-Italic.svg') format('svg');
+  font-weight: 400;
   font-style: italic;
 }
 @font-face {
   font-family: 'Open Sans';
-  src: url('fonts/OpenSansWeb/opensans-bolditalic-webfont.eot');
-  src: url('fonts/OpenSansWeb/opensans-bolditalic-webfont.eot?#iefix') format('embedded-opentype'), url('fonts/OpenSansWeb/opensans-bolditalic-webfont.woff') format('woff'), url('fonts/OpenSansWeb/opensans-bolditalic-webfont.ttf') format('truetype'), url('fonts/OpenSansWeb/opensans-bolditalic-webfont.svg') format('svg');
-  font-weight: bold;
+  src: url('fonts/OpenSansWeb/OpenSans-BoldItalic.eot');
+  src: url('fonts/OpenSansWeb/OpenSans-BoldItalic.woff2') format('woff2'), url('fonts/OpenSansWeb/OpenSans-BoldItalic.woff') format('woff'), url('fonts/OpenSansWeb/OpenSans-BoldItalic.ttf') format('truetype'), url('fonts/OpenSansWeb/OpenSans-BoldItalic.svg') format('svg');
+  font-weight: 700;
   font-style: italic;
 }
 @font-face {
-  font-family: 'Open Sans Light';
-  src: url('fonts/OpenSansWeb/opensans-light-webfont.eot');
-  src: url('fonts/OpenSansWeb/opensans-light-webfont.eot?#iefix') format('embedded-opentype'), url('fonts/OpenSansWeb/opensans-light-webfont.woff') format('woff'), url('fonts/OpenSansWeb/opensans-light-webfont.ttf') format('truetype'), url('fonts/OpenSansWeb/opensans-light-webfont.svg') format('svg');
+  font-family: 'Open Sans';
+  src: url('fonts/OpenSansWeb/OpenSans-Light.eot');
+  src: url('fonts/OpenSansWeb/OpenSans-Light.woff2') format('woff2'), url('fonts/OpenSansWeb/OpenSans-Light.woff') format('woff'), url('fonts/OpenSansWeb/OpenSans-Light.ttf') format('truetype'), url('fonts/OpenSansWeb/OpenSans-Light.svg') format('svg');
+  font-weight: 300;
+  font-style: normal;
 }
 @font-face {
-  font-family: 'Open Sans Light';
-  src: url('fonts/OpenSansWeb/opensans-lightitalic-webfont.eot');
-  src: url('fonts/OpenSansWeb/opensans-lightitalic-webfont.eot?#iefix') format('embedded-opentype'), url('fonts/OpenSansWeb/opensans-lightitalic-webfont.woff') format('woff'), url('fonts/OpenSansWeb/opensans-lightitalic-webfont.ttf') format('truetype'), url('fonts/OpenSansWeb/opensans-lightitalic-webfont.svg') format('svg');
+  font-family: 'Open Sans';
+  src: url('fonts/OpenSansWeb/OpenSans-LightItalic.eot');
+  src: url('fonts/OpenSansWeb/OpenSans-LightItalic.woff2') format('woff2'), url('fonts/OpenSansWeb/OpenSans-LightItalic.woff') format('woff'), url('fonts/OpenSansWeb/OpenSans-LightItalic.ttf') format('truetype'), url('fonts/OpenSansWeb/OpenSans-LightItalic.svg') format('svg');
+  font-weight: 300;
   font-style: italic;
 }
 @font-face {
-  font-family: 'Open Sans Semibold';
-  src: url('fonts/OpenSansWeb/opensans-semibold-webfont.eot');
-  src: url('fonts/OpenSansWeb/opensans-semibold-webfont.eot?#iefix') format('embedded-opentype'), url('fonts/OpenSansWeb/opensans-semibold-webfont.woff') format('woff'), url('fonts/OpenSansWeb/opensans-semibold-webfont.ttf') format('truetype'), url('fonts/OpenSansWeb/opensans-semibold-webfont.svg') format('svg');
+  font-family: 'Open Sans';
+  src: url('fonts/OpenSansWeb/OpenSans-Semibold.eot');
+  src: url('fonts/OpenSansWeb/OpenSans-Semibold.woff2') format('woff2'), url('fonts/OpenSansWeb/OpenSans-Semibold.woff') format('woff'), url('fonts/OpenSansWeb/OpenSans-Semibold.ttf') format('truetype'), url('fonts/OpenSansWeb/OpenSans-Semibold.svg') format('svg');
+  font-weight: 600;
+  font-style: normal;
 }
 @font-face {
-  font-family: 'Open Sans Semibold';
-  src: url('fonts/OpenSansWeb/opensans-semibolditalic-webfont.eot');
-  src: url('fonts/OpenSansWeb/opensans-semibolditalic-webfont.eot?#iefix') format('embedded-opentype'), url('fonts/OpenSansWeb/opensans-semibolditalic-webfont.woff') format('woff'), url('fonts/OpenSansWeb/opensans-semibolditalic-webfont.ttf') format('truetype'), url('fonts/OpenSansWeb/opensans-semibolditalic-webfont.svg') format('svg');
+  font-family: 'Open Sans';
+  src: url('fonts/OpenSansWeb/OpenSans-SemiboldItalic.eot');
+  src: url('fonts/OpenSansWeb/OpenSans-SemiboldItalic.woff2') format('woff2'), url('fonts/OpenSansWeb/OpenSans-SemiboldItalic.woff') format('woff'), url('fonts/OpenSansWeb/OpenSans-SemiboldItalic.ttf') format('truetype'), url('fonts/OpenSansWeb/OpenSans-SemiboldItalic.svg') format('svg');
+  font-weight: 600;
   font-style: italic;
 }
 @font-face {
-  font-family: 'Open Sans Extrabold';
-  src: url('fonts/OpenSansWeb/opensans-extrabold-webfont.eot');
-  src: url('fonts/OpenSansWeb/opensans-extrabold-webfont.eot?#iefix') format('embedded-opentype'), url('fonts/OpenSansWeb/opensans-extrabold-webfont.woff') format('woff'), url('fonts/OpenSansWeb/opensans-extrabold-webfont.ttf') format('truetype'), url('fonts/OpenSansWeb/opensans-extrabold-webfont.svg') format('svg');
+  font-family: 'Open Sans';
+  src: url('fonts/OpenSansWeb/OpenSans-ExtraBold.eot');
+  src: url('fonts/OpenSansWeb/OpenSans-ExtraBold.woff2') format('woff2'), url('fonts/OpenSansWeb/OpenSans-ExtraBold.woff') format('woff'), url('fonts/OpenSansWeb/OpenSans-ExtraBold.ttf') format('truetype'), url('fonts/OpenSansWeb/OpenSans-ExtraBold.svg') format('svg');
+  font-weight: 800;
+  font-style: normal;
 }
 @font-face {
-  font-family: 'Open Sans Extrabold';
-  src: url('fonts/OpenSansWeb/opensans-extrabolditalic-webfont.eot');
-  src: url('fonts/OpenSansWeb/opensans-extrabolditalic-webfont.eot?#iefix') format('embedded-opentype'), url('fonts/OpenSansWeb/opensans-extrabolditalic-webfont.woff') format('woff'), url('fonts/OpenSansWeb/opensans-extrabolditalic-webfont.ttf') format('truetype'), url('fonts/OpenSansWeb/opensans-extrabolditalic-webfont.svg') format('svg');
+  font-family: 'Open Sans';
+  src: url('fonts/OpenSansWeb/OpenSans-ExtraBoldItalic.eot');
+  src: url('fonts/OpenSansWeb/OpenSans-ExtraBoldItalic.woff2') format('woff2'), url('fonts/OpenSansWeb/OpenSans-ExtraBoldItalic.woff') format('woff'), url('fonts/OpenSansWeb/OpenSans-ExtraBoldItalic.ttf') format('truetype'), url('fonts/OpenSansWeb/OpenSans-ExtraBoldItalic.svg') format('svg');
+  font-weight: 800;
   font-style: italic;
 }
 /* rtl-review is this font safe for RTL languages? */
@@ -3835,7 +3848,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 }
 .navbar {
   position: relative;
-  min-height: 50px;
+  min-height: 40px;
   margin-bottom: 20px;
   border: 1px solid transparent;
 }
@@ -3943,10 +3956,10 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 }
 .navbar-brand {
   float: left;
-  padding: 15px 15px;
+  padding: 10px 15px;
   font-size: 18px;
   line-height: 20px;
-  height: 50px;
+  height: 40px;
 }
 .navbar-brand:hover,
 .navbar-brand:focus {
@@ -3963,8 +3976,8 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   float: right;
   margin-right: 15px;
   padding: 9px 10px;
-  margin-top: 8px;
-  margin-bottom: 8px;
+  margin-top: 3px;
+  margin-bottom: 3px;
   background-color: transparent;
   background-image: none;
   border: 1px solid transparent;
@@ -3988,7 +4001,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   }
 }
 .navbar-nav {
-  margin: 7.5px -15px;
+  margin: 5px -15px;
 }
 .navbar-nav > li > a {
   padding-top: 10px;
@@ -4026,8 +4039,8 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
     float: left;
   }
   .navbar-nav > li > a {
-    padding-top: 15px;
-    padding-bottom: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
   }
   .navbar-nav.navbar-right:last-child {
     margin-right: -15px;
@@ -4049,8 +4062,8 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   border-bottom: 1px solid transparent;
   -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 0 rgba(255, 255, 255, 0.1);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 0 rgba(255, 255, 255, 0.1);
-  margin-top: 12.5px;
-  margin-bottom: 12.5px;
+  margin-top: 7.5px;
+  margin-bottom: 7.5px;
 }
 @media (min-width: 768px) {
   .navbar-form .form-group {
@@ -4129,20 +4142,20 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   border-bottom-left-radius: 0;
 }
 .navbar-btn {
-  margin-top: 12.5px;
-  margin-bottom: 12.5px;
+  margin-top: 7.5px;
+  margin-bottom: 7.5px;
 }
 .navbar-btn.btn-sm {
-  margin-top: 12px;
-  margin-bottom: 12px;
+  margin-top: 7px;
+  margin-bottom: 7px;
 }
 .navbar-btn.btn-xs {
-  margin-top: 14px;
-  margin-bottom: 14px;
+  margin-top: 9px;
+  margin-bottom: 9px;
 }
 .navbar-text {
-  margin-top: 15px;
-  margin-bottom: 15px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 @media (min-width: 768px) {
   .navbar-text {
@@ -6396,10 +6409,6 @@ span.ilAlert {
   height: 22px;
   margin: 0 3px 0 0;
 }
-#ilAdvSelListTable_socialbm_actions.dropdown-menu img {
-  width: auto;
-  height: auto;
-}
 .ilAdvNoImg {
   display: inline-block;
   width: 22px;
@@ -6418,6 +6427,10 @@ span.ilAlert {
 html,
 body {
   height: 100%;
+}
+/* see bug ILIAS bug #17589 and http://stackoverflow.com/questions/17045132/scrollbar-overlay-in-ie10-how-do-you-stop-that */
+body {
+  -ms-overflow-style: scrollbar;
 }
 #ilAll {
   position: relative;
@@ -6552,6 +6565,11 @@ sub {
 }
 sup {
   vertical-align: super;
+}
+/* see bug #15971 */
+sub,
+sup {
+  position: static;
 }
 strong,
 b {
@@ -7003,12 +7021,12 @@ div.ilHeaderDesc {
   font-size: 90%;
   padding: 0;
   color: #737373;
-  font-family: 'Open Sans Light';
+  font-weight: 300;
 }
 div.ilHeaderAlert {
   font-size: 90%;
   padding: 0;
-  font-family: 'Open Sans Light';
+  font-weight: 300;
   color: #fa8228;
 }
 div.il_HeaderInner {
@@ -7062,6 +7080,19 @@ footer.ilFooter div.ilFooterContainer > a:hover {
 }
 [dir="rtl"] footer.ilFooter {
   text-align: right;
+}
+#devmodeBlock {
+  background-color: white;
+  color: black;
+  border: 1px dashed grey;
+  padding: 10px;
+  margin-top: 25px;
+}
+@media only screen and (max-width: 767px) {
+  #devmodeBlock table {
+    table-layout: fixed;
+    width: 100%;
+  }
 }
 /* ----------------- permanent link  ------------- */
 div.ilPermaLink {
@@ -7460,6 +7491,17 @@ img.ilIcon {
   width: 32px;
   height: 32px;
 }
+/* PreventBreakOut, see https://css-tricks.com/snippets/css/prevent-long-urls-from-breaking-out-of-container/ */
+.ilPreventBreakOut {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  -ms-word-break: break-all;
+  word-break: break-word;
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
 /* Component Imports */
 /* Services/Accordion */
 .il_VAccordionHead,
@@ -7550,10 +7592,6 @@ select.form-control {
   color: #4d4d4d;
   font-size: 100%;
 }
-.form-horizontal .control-label + div > span {
-  display: inline-block;
-  padding-top: 4px;
-}
 .form-horizontal .control-label.col-sm-3.il_textarea {
   text-align: left;
   width: 100%;
@@ -7641,6 +7679,54 @@ div.ilFormExternalSetting span {
 div[id^="ilFormField"] {
   margin-bottom: 10px;
 }
+/* Hierarchy Form */
+div.ilHFormHeader,
+div.ilHFormFooter {
+  color: #4d4d4d;
+  background-color: #f0f0f0;
+  padding: 4px 0px 4px 22px;
+}
+[dir="rtl"] div.ilHFormHeader,
+[dir="rtl"] div.ilHFormFooter {
+  padding: 4px 22px 4px 0px;
+}
+div.ilHFormContent {
+  padding: 20px 0px;
+}
+div.ilHFormItem {
+  margin-bottom: 5px;
+  display: table-row;
+}
+div.ilHFormHeader .ilFormCmds,
+div.ilHFormFooter .ilFormCmds {
+  float: right;
+}
+[dir="rtl"] div.ilHFormHeader .ilFormCmds,
+[dir="rtl"] div.ilHFormFooter .ilFormCmds {
+  float: left;
+}
+.ilHFormExpIcon,
+.ilHFormCheckbox,
+.ilHFormIcon {
+  min-width: 20px;
+  padding: 0 0px;
+}
+.ilHFormItemCmd {
+  padding: 0 10px;
+}
+.ilHFormExpIcon img,
+.ilHFormIcon img {
+  width: 19px;
+  height: 19px;
+}
+.ilHFormInput,
+.ilHFormInput input.form-control {
+  width: 100%;
+}
+.ilHFormDropArea {
+  margin: 6px 0px;
+  width: auto;
+}
 /* deprecated */
 /* Services/UI/Explorer2 */
 table.ilExplorer {
@@ -7697,6 +7783,8 @@ a.il_HighlightedNode,
 }
 li.ilExplSecHighlight {
   background-color: #FFFFFF !important;
+  border-top: solid 2px #e9ea00;
+  border-bottom: solid 2px #e9ea00;
 }
 div.il_ExplorerItemDescription {
   margin-left: 40px;
@@ -8004,9 +8092,15 @@ div.ilFrmPostHeader span.small {
   margin: 0 0 3px;
 }
 .ilModeratorPosting {
-  border: 1px solid #FD7;
   background-color: #FF9;
   padding: 0 5px;
+}
+.ilPostingNeedsActivation {
+  background-color: #FFE4E4;
+  padding: 0 5px;
+}
+.ilFrmBottomToolbar {
+  margin-top: 20px;
 }
 /* Services/Mail */
 a.mailread,
@@ -8157,6 +8251,14 @@ div.ilTinyMenuSection {
   border-right: 1px solid #E0E0E0;
   padding: 0 10px 4px 0;
   margin-right: 10px;
+}
+[dir="rtl"] div.ilTinyMenuSection {
+  float: right;
+  border-right: none;
+  border-left: 1px solid #E0E0E0;
+  padding: 0 0 4px 10px;
+  margin-right: 0;
+  margin-left: 10px;
 }
 #ilTinyMenuButtons {
   padding-bottom: 15px;
@@ -8346,7 +8448,7 @@ a.nostyle:hover {
 #ilEditorPanel_c {
   z-index: 3000 !important;
 }
-.mce-ico {
+#iltinymenu .mce-ico {
   color: white !important;
 }
 #iltinymenu a.btn {
@@ -8463,7 +8565,6 @@ span.ilCalColSpan {
   width: 24px;
   height: 25px;
   float: left;
-  text-align: center;
 }
 ul.ilCalSel li img {
   margin-top: 6px;
@@ -8504,7 +8605,7 @@ table.calmini tr:nth-child(even) {
 }
 table.calmini th.calmini,
 table.calmini th.calminiweek {
-  font-family: 'Open Sans Semibold';
+  font-weight: 600;
   color: #4c6586;
   font-size: 90%;
 }
@@ -8651,7 +8752,7 @@ li.ilWikiBlockItem {
 .ilTopTitle {
   /* color: darken(@ilMainMenuColor, 20%);*/
   float: left;
-  font-family: 'Open Sans Semibold';
+  font-weight: 600;
   padding: 0 0 0 15px;
   white-space: nowrap;
   line-height: 40px;
@@ -8695,8 +8796,8 @@ input.ilOpenIDBox {
 #ilTopBarNav .badge {
   font-size: 9px;
   padding: 2px 4px;
-  margin-top: -3px;
-  margin-left: -5px;
+  margin-top: -5px;
+  margin-left: -4px;
   position: absolute;
 }
 #ilTopBarNav .ilBadgeSpacer {
@@ -8729,6 +8830,7 @@ input.ilOpenIDBox {
   padding: 10px;
   position: relative;
   min-width: 40px;
+  height: 40px;
   text-align: center;
   background-color: #767676;
   color: #f5f5f5;
@@ -8891,7 +8993,7 @@ div.ilTopMemberView h3 {
   border-radius: 0;
   padding: 3px 7px;
   font-size: 11.64px;
-  /* font-family: 'Open Sans Semibold'; */
+  /* font-weight: 600; */
 }
 #ilSubTab > li > a:hover {
   color: #3a4c65;
@@ -9111,6 +9213,9 @@ tr.tblheader {
 }
 .ilTableOuter .table {
   background-color: #F9F9F9;
+}
+td > img[src$="icon_custom.svg"] {
+  max-width: 32px;
 }
 /* Services/Notes */
 div.ilNotes {
@@ -9629,6 +9734,78 @@ h3.ilProfileSectionHead {
 table.il_user_quota_disk_usage_overview {
   background-color: white;
 }
+/* -- User Gallery Styles -- */
+.ilUsersGalleryContainer div.ilUser {
+  margin: 0 0 20px;
+  background-color: #fff;
+  padding: 20px 0;
+  font-size: 100%;
+  width: 100%;
+  height: auto;
+  text-align: center;
+}
+.ilUsersGalleryContainer div.ilUser img {
+  min-height: 80px;
+  max-height: 80px;
+}
+.ilUsersGalleryContainer div.ilUser h3 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 5px;
+  margin: 20px 0;
+  font-size: 1.6rem !important;
+}
+.ilUsersGalleryContainer div.ilUser .action {
+  width: 100%;
+  height: 40px;
+}
+.ilUsersGalleryContainer div.ilUser .action div {
+  display: inline-block;
+}
+.ilUsersGalleryContainer div.ilUser .action .btn {
+  float: left;
+}
+.ilUsersGalleryContainer div.ilUser .action .btn-default:hover {
+  color: #fff !important;
+}
+.ilUsersGalleryContainer div.ilUser .action .mailBtn {
+  height: 37px;
+  font-size: 16px;
+  padding: 0 15px;
+  line-height: 30px;
+  margin: 2px 0 0 0;
+}
+.ilUsersGalleryContainer div.ilUser .action .open .btn {
+  -webkit-box-shadow: 0 0 0 0;
+  box-shadow: 0 0 0 0;
+  -webkit-box-shadow: 0 0 0 0 3px 5px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 0 0 0 0 3px 5px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 0 0 3px 5px rgba(0, 0, 0, 0.5);
+}
+.ilUsersGalleryContainer div.ilUser .action .open .btn-success:hover,
+.ilUsersGalleryContainer div.ilUser .action .open .btn-success:focus,
+.ilUsersGalleryContainer div.ilUser .action .open .btn-success:active {
+  color: white;
+  background: #626f78;
+  -webkit-box-shadow: 0 0 0 0;
+  box-shadow: 0 0 0 0;
+  -webkit-box-shadow: 0 0 0 0 3px 5px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 0 0 0 0 3px 5px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 0 0 3px 5px rgba(0, 0, 0, 0.5);
+  border: 1px solid #5b6770;
+}
+.ilUsersGalleryContainer div.ilUser .action ul.dropdown-menu {
+  min-width: 170px;
+  padding: 0;
+  margin: 0;
+  -webkit-box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+}
+.ilUsersGalleryContainer div.ilUser .action ul.dropdown-menu li > a {
+  padding: 8px 10px;
+}
 /* Services/Style */
 .ilPositionStatic {
   position: static;
@@ -9698,6 +9875,39 @@ li.smallPad {
 .ilCrsObjAcc {
   margin-bottom: 10px;
 }
+/* LOK progress bars */
+.ilCourseObjectiveProgressBar {
+  padding-right: 5px;
+  float: right;
+}
+.ilCourseObjectiveProgressBarContainer {
+  float: right;
+  padding-left: 10px;
+}
+.ilCourseObjectiveProgressBarContainer > .progress {
+  margin: 5px 0 0;
+  border: 1px solid #BBB;
+  background-color: white;
+}
+.ilCourseObjectiveProgressBarContainer > .progress > .progress-bar {
+  box-shadow: none;
+}
+.ilCourseObjectiveProgressBarLimit {
+  float: right;
+  position: relative;
+  border-right: 2px dotted #888;
+  height: 20px;
+  margin-top: -17px;
+}
+.ilCourseObjectiveProgressBarNeutral {
+  background-color: #888;
+}
+.ilCourseObjectiveProgressBarCompleted {
+  background-color: #60B060;
+}
+.ilCourseObjectiveProgressBarFailed {
+  background-color: #B06060;
+}
 /* Modules/Chatroom */
 .ilValignBottom {
   vertical-align: bottom;
@@ -9747,8 +9957,10 @@ div.ilPreconditionItem {
 div.ilContainerListItemOuter {
   padding: 15px 10px;
   zoom: 1;
-  width: 100%;
   /* background-color: lighten(@mid-gray, 75%); */
+}
+[dir="rtl"] div.ilContainerListItemOuter {
+  display: table;
 }
 div.tblfooter.ilContainerListFooter {
   font-size: 100%;
@@ -9845,8 +10057,7 @@ div.il_ContainerListItem {
   padding-right: 8px;
 }
 .ilContainerBlockHeader {
-  /* font-family: 'Open Sans Semibold'; */
-  font-weight: normal;
+  font-weight: 400;
   padding: 2px;
   text-align: left;
   vertical-align: middle;
@@ -10001,10 +10212,9 @@ div#right_bottom_area iframe {
 /* Services/PersonalDesktop */
 h3.ilPDBlockSubHeader {
   margin: 0;
-  font-family: 'Open Sans Light';
+  font-weight: 300;
   font-size: 90%;
   font-style: italic;
-  font-weight: normal;
   text-align: left;
   vertical-align: middle;
   padding: 1px 0 0 5px;
@@ -10163,8 +10373,7 @@ td.ilBlockHeaderBig {
   font-size: 100%;
 }
 h3.ilBlockHeader {
-  font-family: 'Open Sans Semibold';
-  font-weight: normal;
+  font-weight: 600;
   margin: 0;
   padding: 0;
   font-size: 100%;
@@ -10233,47 +10442,6 @@ body.ilBodyPrint {
   background-color: #FFF;
   margin: 10px;
   padding: 0;
-}
-/* -- Members Gallery Styles -- */
-div.il_MembersGallery {
-  margin: 0 auto;
-  text-align: center;
-  width: 95%;
-  padding: 8px;
-  line-height: 1.33;
-  display: block;
-  float: left;
-}
-div.il_Member,
-div.il_Tutor,
-div.il_Admin {
-  page-break-before: auto;
-  margin: 0 5px 20px;
-  background-color: #EEE;
-  padding: 10px 5px;
-  font-size: 75%;
-  width: 12em;
-  height: 14em;
-  float: left;
-  text-align: center;
-  overflow: hidden;
-}
-div.il_Member p,
-div.il_Tutor p,
-div.il_Admin p {
-  white-space: nowrap;
-}
-div.il_Tutor {
-  background-color: #BBB;
-}
-div.il_Admin {
-  background-color: #E4F2FF;
-}
-div.il_Admin img,
-div.il_Member img,
-div.il_Tutor img {
-  padding: 2px;
-  border: 1px solid #000;
 }
 /* Modules/BookingManager */
 .ilTextinfo {
@@ -10346,44 +10514,100 @@ div#il_startup_logo img {
   overflow: auto;
   width: 100%;
 }
-#block_pdbookm_0 .il_Block img {
+#block_pdbookm_0 .il_Block #tree_div img {
   height: 20px;
   width: 20px;
 }
-/* Services/UIComponent/Toolbar */
-.ilToolbar .navbar-form {
-  padding: 5px 15px 5px 0;
-  margin: 0;
+.iosPdBmListImg {
+  height: 20px;
+  width: 20px;
 }
+.iosPdBmListImg[src$="spacer.png"] {
+  height: 0;
+  width: 0;
+}
+/* Services/UIComponent/Toolbar */
 .ilToolbar.navbar {
-  min-height: 34px;
   border: 0;
   background-color: #F9F9F9;
-  margin-bottom: 20px;
-  font-size: 90%;
-  white-space: nowrap;
-  border-radius: 0;
 }
-.ilToolbar .navbar-brand {
-  padding: 5px 10px 0 10px;
-  height: 34px;
-}
-.ilToolbar .navbar-collapse {
+.ilToolbar .ilToolbarItems {
   padding: 0;
 }
-li.ilToolbarSeparator {
-  border-left: solid 1px #d8d8d8;
-  min-height: 34px;
-  padding: 0 15px 0 0;
-}
-li.ilToolbarTextonly {
-  padding: 5px 15px 5px 0;
-}
-li.ilToolbarTextonly > span {
-  line-height: 24px;
-}
-.ilToolbar input[type=file] {
+.ilToolbar .form-control {
+  width: auto;
   display: inline-block;
+}
+.ilToolbar input[type="file"] {
+  display: inline-block;
+}
+.ilToolbar li {
+  border-bottom: 1px solid #d8d8d8;
+}
+.ilToolbar li .navbar-form,
+.ilToolbar li .navbar-text {
+  padding: 0;
+  border: 0;
+  margin-left: 0;
+  margin-right: 0;
+  display: inline-block;
+}
+.ilToolbar li.navbar-text {
+  margin-left: 0;
+}
+.ilToolbar li.ilToolbarSeparator {
+  border-left: 1px solid #d8d8d8;
+  height: 40px;
+}
+.ilToolbar li.ilToolbarGroup .navbar-form,
+.ilToolbar li.ilToolbarGroup .navbar-text {
+  margin-left: 7.5px;
+}
+.ilToolbar li.ilToolbarGroup .navbar-form:first-child,
+.ilToolbar li.ilToolbarGroup .navbar-text:first-child {
+  margin-left: 0;
+}
+.ilToolbar li.ilToolbarGroup .navbar-text {
+  margin-right: 0;
+}
+.ilToolbar .ilToolbarStickyItems {
+  float: left;
+  margin-left: 15px;
+}
+.ilToolbar .ilToolbarStickyItems.navbar-nav {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.ilToolbar .ilToolbarStickyItems.navbar-nav .open .dropdown-menu > li > a {
+  padding-left: 0;
+}
+.ilToolbar .ilToolbarStickyItems > li {
+  float: left;
+  margin-right: 15px;
+}
+.ilToolbar .ilToolbarStickyItems > li .navbar-form {
+  border: 0;
+}
+.ilToolbar .ilToolbarStickyItems > li.ilToolbarStickyItem {
+  border: 0;
+}
+.ilToolbar ul.dropdown-menu > li {
+  border: none;
+}
+@media (min-width: 768px) {
+  .ilToolbar .container-fluid {
+    padding-left: 0;
+  }
+  .ilToolbar li {
+    border: 0;
+    margin-right: 15px;
+  }
+  .ilToolbar ul.dropdown-menu > li {
+    margin-right: 0;
+  }
+  .ilToolbar .ilToolbarStickyItems.navbar-nav .open .dropdown-menu > li > a {
+    padding-left: 10px;
+  }
 }
 /* Services/UIComponent/Tooltip */
 .ui-tooltip-rounded,
@@ -10424,9 +10648,12 @@ li.ilToolbarTextonly > span {
 /* Services/Locator */
 ol.breadcrumb {
   margin: 0;
-  font-family: 'Open Sans Semibold';
+  font-weight: 600;
   padding-left: 15px;
   font-size: 0.8em;
+}
+[dir="rtl"] ol.breadcrumb {
+  padding-right: 15px;
 }
 .breadcrumb a {
   /*	color: #A0A0A0; */
@@ -10585,6 +10812,26 @@ fieldset[disabled] .btn-info.active {
   text-decoration: none;
   background-color: transparent;
 }
+.btn.disabled,
+.btn[disabled],
+fieldset[disabled] .btn,
+.btn.disabled:hover,
+.btn[disabled]:hover,
+fieldset[disabled] .btn:hover,
+.btn.disabled:focus,
+.btn[disabled]:focus,
+fieldset[disabled] .btn:focus,
+.btn.disabled:active,
+.btn[disabled]:active,
+fieldset[disabled] .btn:active,
+.btn.disabled.active,
+.btn[disabled].active,
+fieldset[disabled] .btn.active {
+  background-color: #b0b0b0;
+  border-color: #b0b0b0;
+  color: #e0e0e0;
+  cursor: default;
+}
 /* old stuff */
 input.ilSubmitInactive,
 input.ilSubmitInactive:hover,
@@ -10596,6 +10843,20 @@ a.ilSubmitInactive:active {
   background-color: #b0b0b0;
   border-color: #b0b0b0;
   cursor: default;
+}
+.split-btn ul {
+  min-width: 180px;
+}
+.split-btn-default {
+  float: left;
+}
+.btn-split.dropdown-toggle {
+  border-left: 1px solid white;
+}
+.btn-split.dropdown-toggle:hover,
+.btn-split.dropdown-toggle:focus,
+.btn-split.dropdown-toggle:active {
+  border-left: 1px solid white;
 }
 button > .glyphicon {
   pointer-events: none;
@@ -10789,6 +11050,164 @@ div.ilChecklist ul li img {
 .ilFileUploadEntryOptions label.control-label {
   padding-top: 3px;
 }
+/* Modules/Portfolio */
+ul.ilPCMyCoursesCourseList > li {
+  margin-bottom: 10px;
+}
+ul.ilPCMyCoursesObjectiveList > li {
+  margin-top: 5px;
+  margin-left: 15px;
+}
+a.ilPCMyCoursesToggle {
+  outline: 0;
+}
+div.ilPCMyCoursesPath {
+  margin-bottom: 10px;
+  font-size: 90%;
+  /* font-style: italic; */
+}
+/* Services/Awareness */
+.ilAwarenessDropDown .popover {
+  max-width: 300px;
+  color: #000000;
+  min-width: 250px;
+}
+#awareness-list {
+  overflow: auto;
+}
+.ilAwarenessDropDown .popover-content {
+  padding: 0;
+}
+.ilAwarenessDropDown .media-body,
+.ilAwarenessDropDown .media-left,
+.ilAwarenessDropDown .media-right {
+  display: table-cell;
+  vertical-align: top;
+}
+.ilAwarenessDropDown .media-left {
+  padding-right: 10px;
+}
+.ilAwarenessDropDown .media {
+  padding: 10px;
+}
+#awareness-content .media:hover {
+  background-color: #ffeeaa;
+}
+#awareness-content .dropdown-menu {
+  position: static;
+  float: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+#awareness-content .media {
+  padding: 0;
+}
+#awareness-content .media-left img {
+  width: 45px;
+  height: 45px;
+}
+.ilAwarenessItem {
+  border-bottom: 1px solid #E9E9E9;
+}
+#awareness-content .media-body {
+  white-space: nowrap;
+}
+#awareness-content .media-body {
+  padding-top: 8px;
+}
+#awareness-content .media-body h4,
+#awareness-content .media-body p {
+  color: #A0A0A0;
+  font-size: 12px;
+  padding: 5px 3px 0 3px;
+  line-height: 1em;
+  margin: 0;
+}
+#awareness-content .media-body h4 {
+  padding-top: 0px;
+  color: #606060;
+}
+#awareness-content .dropdown-menu {
+  background-color: #f0f0f0;
+  padding: 10px 0;
+  font-size: 12px;
+}
+#awareness-content .dropdown-menu a {
+  color: #606060;
+}
+#awareness-content .dropdown-menu a:hover {
+  color: #202020;
+}
+#awareness-content .arrow-down {
+  width: 0;
+  height: 0;
+  border-left: 11px solid transparent;
+  border-right: 11px solid transparent;
+  border-top: 11px solid #fff;
+  margin-top: -10px;
+  margin-left: 100px;
+}
+#awareness_trigger {
+  display: block;
+}
+#awareness_trigger > span {
+  display: table-cell;
+}
+#awareness_trigger .ilBadgeSpacer {
+  display: inline-block;
+  height: 1px;
+}
+#awareness_hbadge {
+  display: block;
+  height: 16px;
+}
+#awareness_badge {
+  display: block;
+  height: 1px;
+}
+#awareness_badge .badge {
+  background-color: #A0A0A0;
+}
+.ilAwarenessDropDown h3.popover-title {
+  display: none;
+}
+.ilAwarenessDropDown .media-body {
+  /* background-image: url('./templates/default/images/scorm/not_attempted.svg'); */
+  background-repeat: no-repeat;
+  background-size: 12px 12px;
+  width: 100%;
+  background-position: right 10px top 50%;
+}
+.ilAwarenessDropDown .media-body.ilAwarenessOnline {
+  background-image: url('images/scorm/completed.svg');
+}
+.ilAwarenessLoader {
+  display: block;
+  margin: 15px auto;
+  width: 30px;
+  height: 30px;
+}
+#il_awrn_filer_btn {
+  width: 30px;
+}
+#il_awrn_filer_btn img {
+  width: 10px;
+  height: 10px;
+}
+#awareness-content .ilHighlighted {
+  background-color: #ffff9d;
+  color: #606060;
+}
+.ilAwrnBadgeHidden {
+  visibility: hidden;
+}
+/* due to bug #17839 */
+#awareness-content .dropdown-backdrop {
+  display: none;
+  right: auto;
+  width: 0px;
+}
 /* Services/UIComponent/Modal */
 .modal-body .jstree li {
   overflow: hidden;
@@ -10896,6 +11315,15 @@ table.mceToolbar td {
 .alert > a.btn {
   text-decoration: none;
 }
+#mm_adm_tr + ul.dropdown-menu > li > div.row {
+  width: 750px;
+}
+@media only screen and (max-width: 767px) {
+  #mm_adm_tr + ul.dropdown-menu > li > div.row {
+    width: 100% !important;
+    margin: 0;
+  }
+}
 /* basic responsiveness (beta)
 
    The following section targets smartphones.
@@ -10909,7 +11337,7 @@ table.mceToolbar td {
    Google recommending 640px: https://developers.google.com/webmasters/smartphone-sites/details
    
    */
-@media only screen and (max-width: 767px) {
+@media only screen and (max-width: 768px) {
   html {
     -webkit-text-size-adjust: none;
   }
@@ -10947,6 +11375,9 @@ table.mceToolbar td {
   div.ilTableOuter {
     max-width: 100%;
     overflow: auto;
+  }
+  .table-responsive .dropdown-menu {
+    position: relative;
   }
   a#il_mhead_t_focus {
     font-size: 20px;
@@ -11172,7 +11603,4 @@ table.mceToolbar td {
   a[href]:after {
     content: "";
   }
-}
-.checkbox input[type="checkbox"]#item_filter_enabled {
-  margin-left: 0;
 }

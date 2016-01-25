@@ -157,7 +157,7 @@ class ilBlogPosting extends ilPageObject
 			$ilDB->quote($this->getBlogId(), "integer").",".
 			$ilDB->quote($created, "timestamp").",".
 			$ilDB->quote($this->getAuthor(), "integer").",".
-			$ilDB->quote(false, "integer").")";
+			$ilDB->quote($this->isApproved(), "integer").")"; // #16526 - import
 		$ilDB->manipulate($query);
 
 		if(!$a_import)
@@ -339,6 +339,14 @@ class ilBlogPosting extends ilPageObject
 				$post[$rec["id"]]["created"] = new ilDateTime($rec["created"], IL_CAL_DATETIME);
 				$post[$rec["id"]]["author"] = $rec["author"];
 				$post[$rec["id"]]["approved"] = (bool)$rec["approved"];
+								
+				foreach(self::getPageContributors("blp", $rec["id"]) as $editor)
+				{
+					if($editor["user_id"] != $rec["author"])
+					{
+						$post[$rec["id"]]["editors"][] = $editor["user_id"];
+					}
+				}
 			}
 		}
 

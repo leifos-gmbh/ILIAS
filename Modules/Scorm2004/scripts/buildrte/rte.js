@@ -1,4 +1,4 @@
-// Build: 20151123102911 
+// Build: 20151022020047 
 /*
 	+-----------------------------------------------------------------------------+
 	| ILIAS open source                                                           |
@@ -13588,13 +13588,8 @@ function save()
 		//alert("Before save "+result.node.length);
 		//if (!result.node.length) {return;} 
 		if (typeof SOP!="undefined" && SOP==true) result=saveRequest(result);
-		else {
-			try{
-				result = this.config.store_url ? sendJSONRequest(this.config.store_url, result): {};
-			}catch(e){
-				return false;
-			}
-		}
+		else result = this.config.store_url ? sendJSONRequest(this.config.store_url, result): {};
+		
 		// added to synchronize the new data. it might update the navigation
 		updateNavForSequencing();
 
@@ -13966,6 +13961,7 @@ function onItemDeliverDo(item, wasSuspendAll) // onDeliver called from sequencin
 					if (v.satisfiedByMeasure && v.minNormalizedMeasure!==undefined) 
 					{
 						v = v.minNormalizedMeasure;
+						if (typeof this.config.lesson_mastery_score != "undefined" && this.config.lesson_mastery_score!=null) v = this.config.lesson_mastery_score/100;
 					}
 					else if (v.satisfiedByMeasure) 
 					{
@@ -13982,6 +13978,22 @@ function onItemDeliverDo(item, wasSuspendAll) // onDeliver called from sequencin
 		}
 		window.document.getElementById("noCredit").style.display='none';
 		//support for auto-review
+		saved_score_scaled=0;
+		if (globalAct.auto_review == 's') {
+			if (data.cmi.score.scaled != "" && typeof parseFloat(data.cmi.score.scaled) == "number") {
+				var b_in_ar=false;
+				for (var i=0;i<ar_saved_score_scaled.length;i++) {
+					if (ar_saved_score_scaled[i][0]==item.id) {
+						saved_score_scaled=ar_saved_score_scaled[i][1];
+						b_in_ar=true;
+					}
+				}
+				if (b_in_ar==false) {
+					saved_score_scaled=parseFloat(data.cmi.score.scaled);
+					ar_saved_score_scaled[ar_saved_score_scaled.length]=new Array(item.id,parseFloat(data.cmi.score.scaled));
+				}
+			}
+		}
 		if (globalAct.auto_review != 'n') {
 			if (
 				(globalAct.auto_review == 'r' && ((item.completion_status == 'completed' && item.success_status != 'failed') || item.success_status == 'passed') ) ||
@@ -14878,6 +14890,8 @@ var saved={
 	"interaction":{"data":[],"checkplus":2},
 	"objective":{"data":[],"checkplus":1}
 	};
+var saved_score_scaled=0;
+var ar_saved_score_scaled=[];
 // SCO related Variables
 var currentAPI; // reference to API during runtime of a SCO
 var scoStartTime = null;
@@ -14957,12 +14971,11 @@ function Runtime(cmiItem, onCommit, onTerminate, onDebug)
 	 */	 
 	function GetErrorString(param) 
 	{
-		if (typeof param !== 'string' && typeof param !== 'number') 
+		if (typeof param !== 'string') 
 		{
-			var returnValueF = 'GetErrorString param must contain an error code and should be a string';
 			if (logActive)
-				sendLogEntry(getMsecSinceStart(),'GetErrorString',String(param),"",returnValueF,"");
-			return returnValueF;
+				sendLogEntry(getMsecSinceStart(),'GetErrorString',String(param),"","false",201);
+			return setReturn(201, 'GetErrorString param must be empty string', '');
 		}
 		var e = Runtime.errors[param];
 		var returnValue = e && e.message ? String(e.message).substr(0,255) : '';
@@ -15115,6 +15128,21 @@ function Runtime(cmiItem, onCommit, onTerminate, onDebug)
 				//auto suspend
 				if (config.auto_suspend==true) cmiItem.cmi.exit="suspend";
 
+				//store only if score is equal or hiher than in precious attempt
+				var saveRespScore = true;
+				if (saveOnCommit == true && config.auto_review == 's') {
+
+					if (cmiItem.cmi.score.scaled == "" && saved_score_scaled > 0) {
+						saveRespScore = false; //special for Articulate
+					}
+					else if (cmiItem.cmi.score.scaled != "" && typeof parseFloat(cmiItem.cmi.score.scaled) == "number" && parseFloat(cmiItem.cmi.score.scaled) <= saved_score_scaled) {
+						saveRespScore = false;
+						window.document.getElementById("noCredit").style.display = "inline";
+					} else {
+						window.document.getElementById("noCredit").style.display = "none";
+					}
+				}
+
 				//store correct status in DB; returnValue because of IE;
 				var returnValue=false;
 				if(cmiItem.cmi.credit=="no-credit") {returnValue=true;}
@@ -15123,7 +15151,7 @@ function Runtime(cmiItem, onCommit, onTerminate, onDebug)
 					//statusHandler(cmiItem.scoid,"completion",statusValues[0]);
 					//statusHandler(cmiItem.scoid,"success",statusValues[1]);
 					returnValue = onCommit(cmiItem);
-					if (returnValue && saveOnCommit == true) {
+					if (returnValue && saveOnCommit == true && saveRespScore == true) {
 						if (config.fourth_edition) {
 							var sgo=saveSharedData(cmiItem);
 						}

@@ -8,6 +8,7 @@
 *
 * @author Stefan Meyer <smeyer.ilias@gmx.de>
 * @author Alex Killing <alex.killing@gmx.de>
+* @author Stefan Hecken <stefan.hecken@concepts-and-training.de>
 * @version $Id$
 */
 class ilObject
@@ -98,7 +99,7 @@ class ilObject
 	*/
 	function ilObject($a_id = 0, $a_reference = true)
 	{
-		global $ilias, $lng, $ilBench;
+		global $ilias, $lng, $ilBench, $objDefinition;
 
 		$ilBench->start("Core", "ilObject_Constructor");
 
@@ -109,6 +110,7 @@ class ilObject
 
 		$this->ilias =& $ilias;
 		$this->lng =& $lng;
+		$this->objDefinition = $objDefinition;
 
 		$this->max_title = self::TITLE_LENGTH;
 		$this->max_desc = self::DESC_LENGTH;
@@ -472,7 +474,18 @@ class ilObject
 		}
 		return 0;
 	}
-	
+
+	public static function _lookupImportId($a_obj_id)
+	{
+		global $ilDB;
+
+		$query = "SELECT import_id FROM object_data ".
+			"WHERE obj_id = ".$ilDB->quote($a_obj_id, "integer");
+		$res = $ilDB->query($query);
+		$row = $ilDB->fetchObject($res);
+		return $row->import_id;
+	}
+
 	/**
 	* get object owner
 	*
@@ -1434,6 +1447,12 @@ class ilObject
 
 				include_once './Services/WebServices/ECS/classes/class.ilECSImport.php';
 				ilECSImport::_deleteByObjId($this->getId());
+				
+				include_once("Services/AdvancedMetaData/classes/class.ilAdvancedMDValues.php");
+				ilAdvancedMDValues::_deleteByObjId($this->getId());
+				
+				include_once("Services/Tracking/classes/class.ilLPObjSettings.php");
+				ilLPObjSettings::_deleteByObjId($this->getId());
 
 				$remove = true;
 			}
@@ -1824,42 +1843,9 @@ class ilObject
 	 */
 	public function cloneDependencies($a_target_id,$a_copy_id)
 	{
-		include_once './Services/AccessControl/classes/class.ilConditionHandler.php';
-		include_once './Services/CopyWizard/classes/class.ilCopyWizardOptions.php';
-
-		$cwo = ilCopyWizardOptions::_getInstance($a_copy_id);
-		$mappings = $cwo->getMappings();
-
-		$conditions = ilConditionHandler::_getConditionsOfTarget($this->getRefId(), $this->getId());
-		foreach($conditions as $con)
-		{
-			if($mappings[$con['trigger_ref_id']])
-			{
-				$newCondition = new ilConditionHandler();
-
-				$target_obj = ilObject::_lookupObjId($a_target_id);
-				$target_typ = ilObject::_lookupType($target_obj);
-
-				$newCondition->setTargetRefId($a_target_id);
-				$newCondition->setTargetObjId($target_obj);
-				$newCondition->setTargetType($target_typ);
-
-				$trigger_ref = $mappings[$con['trigger_ref_id']];
-				$trigger_obj = ilObject::_lookupObjId($trigger_ref);
-				$trigger_typ = ilObject::_lookupType($trigger_obj);
-
-				$newCondition->setTriggerRefId($trigger_ref);
-				$newCondition->setTriggerObjId($trigger_obj);
-				$newCondition->setTriggerType($trigger_typ);
-				$newCondition->setOperator($con['operator']);
-				$newCondition->setValue($con['value']);
-				$newCondition->setReferenceHandlingType($con['ref_handling']);
-				$newCondition->setObligatory($con['obligatory']);
-				$newCondition->setHiddenStatus(ilConditionHandler::lookupHiddenStatusByTarget($this->getRefId()));
-				$newCondition->storeCondition();
-			}
-		}
-
+		include_once './Services/AccessControl/classes/class.ilConditionHandler.php' ;
+		ilConditionHandler::cloneDependencies($this->getRefId(),$a_target_id,$a_copy_id);
+		
 		include_once './Services/DidacticTemplate/classes/class.ilDidacticTemplateObjSettings.php';
 		$tpl_id = ilDidacticTemplateObjSettings::lookupTemplateId($this->getRefId());
 		if($tpl_id)
@@ -1917,9 +1903,9 @@ class ilObject
 		{
 			$a_size = "big";
 		}
-		
+
 		if ($ilSetting->get("custom_icons") &&
-			in_array($a_type, array("cat","grp","crs", "root", "fold")))
+			in_array($a_type, array("cat","grp","crs", "root", "fold", "prg")))
 		{
 			require_once("./Services/Container/classes/class.ilContainer.php");
 			if (ilContainer::_lookupContainerSetting($a_obj_id, "icon_custom"))
@@ -2073,8 +2059,62 @@ class ilObject
 		{
 			$all[$row["type"]][$row["obj_id"]] = $row["title"];
 		}
-		
+				
 		return $all;
+	}
+	
+	/**
+	 * Try to fix missing object titles
+	 * 
+	 * @param type $a_type
+	 * @param array &$a_obj_title_map
+	 */
+	static function fixMissingTitles($a_type, array &$a_obj_title_map)
+	{
+		global $ilDB;
+		
+		if(!in_array($a_type, array("catr", "crsr", "sess")))
+		{
+			return;
+		}
+		
+		// any missing titles?
+		$missing_obj_ids = array();
+		foreach($a_obj_title_map as $obj_id => $title)
+		{
+			if(!trim($title))
+			{
+				$missing_obj_ids[] = $obj_id;
+			}
+		}
+		
+		if(!sizeof($missing_obj_ids))
+		{
+			return;
+		}
+		
+		switch($a_type)
+		{
+			case "catr":
+			case "crsr":				
+				$set = $ilDB->query("SELECT oref.obj_id, od.type, od.title FROM object_data od".
+					" JOIN container_reference oref ON (od.obj_id = oref.target_obj_id)".
+					" AND ".$ilDB->in("oref.obj_id", $missing_obj_ids, "", "integer"));
+				while($row = $ilDB->fetchAssoc($set))
+				{					
+					$a_obj_title_map[$row["obj_id"]] = $row["title"];									
+				}
+				break;
+				
+			case "sess":				
+				include_once "Modules/Session/classes/class.ilObjSession.php";
+				foreach($missing_obj_ids as $obj_id)
+				{
+					$sess = new ilObjSession($obj_id, false);
+					$a_obj_title_map[$obj_id] = $sess->getFirstAppointment()->appointmentToString();
+				}
+				break;				
+		}				
 	}
 	
 	/**
@@ -2129,7 +2169,19 @@ class ilObject
 			);
 		}
 		return false;
-	}	
-	
+	}
+
+	/**
+	* get all possible subobjects of this type
+	* the object can decide which types of subobjects are possible jut in time
+	* overwrite if the decision distinguish from standard model
+	*
+	* @param boolean filter disabled objects? ($a_filter = true)
+	* @access public
+	* @return array list of allowed object types
+	*/
+	function getPossibleSubObjects($a_filter = true) {
+		return $this->objDefinition->getSubObjects($this->type, $a_filter);
+	}
 } // END class.ilObject
 ?>

@@ -53,7 +53,7 @@ abstract class ilPageObject
 	var $xml;
 	var $encoding;
 	var $node;
-	var $cur_dtd = "ilias_pg_4_5.dtd";
+	var $cur_dtd = "ilias_pg_5_1.dtd";
 	var $contains_int_link;
 	var $needs_parsing;
 	var $parent_type;
@@ -68,12 +68,19 @@ abstract class ilPageObject
 	protected $import_mode = false;
 
 	/**
+	 * @var ilLogger
+	 */
+	protected $log;
+
+	/**
 	* Constructor
 	* @access	public
 	*/
 	final public function ilPageObject($a_id = 0, $a_old_nr = 0, $a_lang = "-")
 	{
 		global $ilias;
+
+		$this->log = ilLoggerFactory::getLogger('copg');
 
 		// @todo: move this elsewhere
 		require_once("./Services/COPage/syntax_highlight/php/Beautifier/Init.php");
@@ -96,6 +103,7 @@ abstract class ilPageObject
 			array("PageContent", "TableRow", "TableData", "ListItem", "FileItem",
 				"Section", "Tab", "ContentPopup");
 		$this->setActive(true);
+		$this->show_page_act_info = false;
 		
 		if($a_id != 0)
 		{
@@ -354,10 +362,10 @@ abstract class ilPageObject
 	 * @param int $a_id page id
 	 * @param string $a_lang language code, if empty language independent existence is checked
 	 */
-	static function _exists($a_parent_type, $a_id, $a_lang = "")
+	static function _exists($a_parent_type, $a_id, $a_lang = "", $a_no_cache = false)
 	{
 		global $ilDB;
-		if (isset(self::$exists[$a_parent_type.":".$a_id.":".$a_lang]))
+		if (!$a_no_cache && isset(self::$exists[$a_parent_type.":".$a_id.":".$a_lang]))
 		{
 			return self::$exists[$a_parent_type.":".$a_id.":".$a_lang];
 		}
@@ -719,6 +727,10 @@ abstract class ilPageObject
 	*/
 	function setActivationStart($a_activationstart)
 	{
+		if ($a_activationstart == "")
+		{
+			$a_activationstart = null;
+		}
 		$this->activationstart = $a_activationstart;
 	}
 
@@ -739,6 +751,10 @@ abstract class ilPageObject
 	*/
 	function setActivationEnd($a_activationend)
 	{
+		if ($a_activationend == "")
+		{
+			$a_activationend = null;
+		}
 		$this->activationend = $a_activationend;
 	}
 
@@ -1157,7 +1173,7 @@ abstract class ilPageObject
 					include_once "./Modules/TestQuestionPool/classes/class.assQuestion.php";
 					$question = assQuestion::_instantiateQuestion($q_id);
 					// check due to #16557
-					if (is_object($question))
+					if (is_object($question) && $question->isComplete())
 					{
 						// check if page for question exists
 						// due to a bug in early 4.2.x version this is possible
@@ -1912,8 +1928,10 @@ abstract class ilPageObject
 	 * (after import)
 	 */
 	// @todo: possible to improve this?
-	function resolveIntLinks()
+	function resolveIntLinks($a_link_map = null)
 	{
+		$changed = false;
+
 		// resolve normal internal links
 		$xpc = xpath_new_context($this->dom);
 		$path = "//IntLink";
@@ -1922,11 +1940,24 @@ abstract class ilPageObject
 		{
 			$target = $res->nodeset[$i]->get_attribute("Target");
 			$type = $res->nodeset[$i]->get_attribute("Type");
-			
-			$new_target = ilInternalLink::_getIdForImportId($type, $target);
+
+			if ($a_link_map == null)
+			{
+				$new_target = ilInternalLink::_getIdForImportId($type, $target);
+			}
+			else
+			{
+				$nt = explode("_", $a_link_map[$target]);
+				$new_target = false;
+				if ($nt[1] == IL_INST_ID)
+				{
+					$new_target = "il__".$nt[2]."_".$nt[3];
+				}
+			}
 			if ($new_target !== false)
 			{
 				$res->nodeset[$i]->set_attribute("Target", $new_target);
+				$changed = true;
 			}
 			else		// check wether link target is same installation
 			{
@@ -1936,7 +1967,8 @@ abstract class ilPageObject
 					$new_target = ilInternalLink::_removeInstFromTarget($target);
 					if (ilInternalLink::_exists($type, $new_target))
 					{
-						$res->nodeset[$i]->set_attribute("Target", $new_target);	
+						$res->nodeset[$i]->set_attribute("Target", $new_target);
+						$changed = true;
 					}
 				}
 			}
@@ -1957,6 +1989,7 @@ abstract class ilPageObject
 			$mob_id = $id_arr[count($id_arr) - 1];
 			ilMediaItem::_resolveMapAreaLinks($mob_id);
 		}
+		return $changed;
 	}
 
 	/**
@@ -1966,7 +1999,7 @@ abstract class ilPageObject
 	 * @param	array		mapping array
 	 */
 	 // @todo: move to media classes?
-	function resolveMediaAliases($a_mapping)
+	function resolveMediaAliases($a_mapping, $a_reuse_existing_by_import = false)
 	{
 		// resolve normal internal links
 		$xpc = xpath_new_context($this->dom);
@@ -1980,7 +2013,18 @@ abstract class ilPageObject
 			$old_id = $old_id[count($old_id) - 1];
 			if ($a_mapping[$old_id] > 0)
 			{
-				$res->nodeset[$i]->set_attribute("OriginId", "il__mob_".$a_mapping[$old_id]);
+				$new_id = $a_mapping[$old_id];
+				if ($a_reuse_existing_by_import)
+				{
+					$import_id = ilObject::_lookupImportId($new_id);
+					$imp = explode("_", $import_id);
+					if ($imp[1] == IL_INST_ID && $imp[2] == "mob" && ilObject::_lookupType($imp[3]) == "mob")
+					{
+						$new_id = $imp[3];
+					}
+				}
+
+				$res->nodeset[$i]->set_attribute("OriginId", "il__mob_".$new_id);
 				$changed = true;
 			}
 		}
@@ -2058,6 +2102,7 @@ abstract class ilPageObject
 		$xpc = xpath_new_context($this->dom);
 		$path = "//Question";
 		$res =& xpath_eval($xpc, $path);
+		$updated = false;
 		for($i = 0; $i < count($res->nodeset); $i++)
 		{
 			$qref = $res->nodeset[$i]->get_attribute("QRef");
@@ -2065,9 +2110,12 @@ abstract class ilPageObject
 			if (isset($a_mapping[$qref]))
 			{
 				$res->nodeset[$i]->set_attribute("QRef", "il__qst_".$a_mapping[$qref]["pool"]);
+				$updated = true;
 			}	
 		}
 		unset($xpc);
+
+		return $updated;
 	}
 
 
@@ -2332,7 +2380,10 @@ abstract class ilPageObject
 			"parent_type" => array("text", $this->getParentType()),
 			"create_user" => array("integer", $ilUser->getId()),
 			"last_change_user" => array("integer", $ilUser->getId()),
-			"active" => array("integer", $this->getActive()),
+			"active" => array("integer", (int) $this->getActive()),
+			"activation_start" => array("timestamp", $this->getActivationStart()),
+			"activation_end" => array("timestamp", $this->getActivationEnd()),
+			"show_activation_info" => array("integer", (int) $this->getShowActivationInfo()),
 			"inactive_elements" => array("integer", $iel),
 			"int_links" => array("integer", $inl),
 			"created" => array("timestamp", ilUtil::now()),
@@ -2357,11 +2408,16 @@ abstract class ilPageObject
 	{
 		global $lng, $ilDB, $ilUser;
 
+		$this->log->debug("ilPageObject, updateFromXML(): start, id: ".$this->getId());
+
 //echo "<br>PageObject::updateFromXML[".$this->getId()."]";
 //echo "update:".ilUtil::prepareDBString(($this->getXMLContent())).":<br>";
 //echo "update:".htmlentities($this->getXMLContent()).":<br>";
 
 		$content = $this->getXMLContent();
+
+		$this->log->debug("ilPageObject, updateFromXML(): content: ".substr($content, 0, 100));
+
 		$this->buildDom(true);
 		$dom_doc = $this->getDomDoc();
 
@@ -2386,6 +2442,8 @@ abstract class ilPageObject
 
 		// after update event
 		$this->__afterUpdate($dom_doc, $content);
+
+		$this->log->debug("ilPageObject, updateFromXML(): end");
 
 		return true;
 	}
@@ -2445,7 +2503,9 @@ abstract class ilPageObject
 	function update($a_validate = true, $a_no_history = false)
 	{
 		global $lng, $ilDB, $ilUser, $ilLog, $ilCtrl;
-		
+
+		$this->log->debug("ilPageObject, update(): start, id: ".$this->getId());
+
 		$lm_set = new ilSetting("lm");
 		
 //echo "<br>**".$this->getId()."**";
@@ -2478,6 +2538,11 @@ abstract class ilPageObject
 				$lng->txt("content_until").": ".
 				ilDatePresentation::formatDate(new ilDateTime($lock["edit_lock_until"],IL_CAL_UNIX))
 			);
+		}
+
+		if (!empty($errors))
+		{
+			$this->log->debug("ilPageObject, update(): errors: ".print_r($errors, true));
 		}
 
 //echo "-".htmlentities($this->getXMLFromDom())."-"; exit;
@@ -2583,6 +2648,8 @@ abstract class ilPageObject
 			// after update event
 			$this->__afterUpdate($dom_doc, $content);
 
+			$this->log->debug("ilPageObject, update(): updated and returning true, content: ".substr($this->getXMLContent(), 0, 100));
+
 //echo "<br>PageObject::update:".htmlentities($this->getXMLContent()).":";
 			return true;
 		}
@@ -2600,7 +2667,14 @@ abstract class ilPageObject
 	function delete()
 	{
 		global $ilDB;
-		
+
+		$copg_logger = ilLoggerFactory::getLogger('copg');
+		$copg_logger->debug("ilPageObject: Delete called for ID '".$this->getId()."',".
+			" parent type: '".$this->getParentType()."', ".
+			" hist nr: '".$this->old_nr."', ".
+			" lang: '".$this->getLanguage()."', "
+		);
+
 		$mobs = array();
 		$files = array();
 		
@@ -2618,6 +2692,8 @@ abstract class ilPageObject
 				$mobs[] = $m;
 			}
 		}
+
+		$copg_logger->debug("ilPageObject: ... found ".count($mobs)." media objects.");
 
 		$this->__beforeDelete();
 
@@ -2644,16 +2720,24 @@ abstract class ilPageObject
 		// delete media objects
 		foreach ($mobs as $mob_id)
 		{
+			$copg_logger->debug("ilPageObject: ... processing mob ".$mob_id.".");
+
 			if(ilObject::_lookupType($mob_id) != 'mob')
 			{
-				$GLOBALS['ilLog']->write(__METHOD__.': Type mismatch. Ignoring mob with id: '.$mob_id);
+				$copg_logger->debug("ilPageObject: ... type mismatch. Ignoring mob ".$mob_id.".");
 				continue;
 			}
 			
 			if (ilObject::_exists($mob_id))
 			{
+				$copg_logger->debug("ilPageObject: ... delete mob ".$mob_id.".");
+
 				$mob_obj =& new ilObjMediaObject($mob_id);
 				$mob_obj->delete();
+			}
+			else
+			{
+				$copg_logger->debug("ilPageObject: ... missing mob ".$mob_id.".");
 			}
 		}
 
@@ -2931,6 +3015,10 @@ abstract class ilPageObject
 
 				case "WikiPage":
 					$t_type = "wpage";
+					break;
+
+				case "User":
+					$t_type = "user";
 					break;
 			}
 
@@ -3663,6 +3751,20 @@ abstract class ilPageObject
 				$new_id = "il_".$a_inst."_".substr($qref, 4, strlen($qref) - 4);
 //echo "<br>setting:".$new_id;
 				$res->nodeset[$i]->set_attribute("QRef", $new_id);
+			}
+		}
+		unset($xpc);
+
+		// insert inst id into content snippets
+		$xpc = xpath_new_context($this->dom);
+		$path = "//ContentInclude";
+		$res =& xpath_eval($xpc, $path);
+		for($i = 0; $i < count($res->nodeset); $i++)
+		{
+			$ci = $res->nodeset[$i]->get_attribute("InstId");
+			if ($ci == "")
+			{
+				$res->nodeset[$i]->set_attribute("InstId", $a_inst);
 			}
 		}
 		unset($xpc);
@@ -4498,6 +4600,7 @@ abstract class ilPageObject
 		$c = array();
 		foreach ($contributors as $k => $co)
 		{
+			include_once "Services/User/classes/class.ilObjUser.php";
 			$name = ilObjUser::_lookupName($k);
 			$c[] = array("user_id" => $k, "pages" => $co,
 				"lastname" => $name["lastname"], "firstname" => $name["firstname"]);
@@ -4834,7 +4937,7 @@ abstract class ilPageObject
 	function getEditLock()
 	{
 		global $ilUser, $ilDB;
-		
+		//return false;
 		$aset = new ilSetting("adve");
 		
 		$min = (int) $aset->get("block_mode_minutes") ;
@@ -5081,5 +5184,35 @@ abstract class ilPageObject
 	{
 		return array();
 	}
+
+	/**
+	 * Get all pages for parent object
+	 *
+	 * @param string	$a_parent_type Parent Type
+	 * @param int		$a_parent_id Parent ID
+	 * @param string	$a_lang language
+	 */
+	static function getLastChangeByParent($a_parent_type, $a_parent_id, $a_lang = "")
+	{
+		global $ilDB;
+
+		$and_lang = "";
+		if ($a_lang != "")
+		{
+			$and_lang = " AND lang = ".$ilDB->quote($a_lang, "text");
+		}
+
+		$ilDB->setLimit(1);
+		$q = "SELECT last_change FROM page_object ".
+			" WHERE parent_id = ".$ilDB->quote($a_parent_id, "integer").
+			" AND parent_type = ".$ilDB->quote($a_parent_type, "text").$and_lang.
+			" ORDER BY last_change DESC";
+
+		$set = $ilDB->query($q);
+		$rec = $ilDB->fetchAssoc($set);
+
+		return $rec["last_change"];
+	}
+
 }
 ?>

@@ -29,8 +29,7 @@ class ilLearningProgressGUI extends ilLearningProgressBaseGUI
 		global $ilBench, $ilHelp, $ilAccess;
 		
 		$ilBench->start('LearningProgress','0000_Start');
-
-
+		
 		$this->ctrl->setReturn($this, "");
 
 		// E.g personal desktop mode needs locator header icon ...
@@ -73,7 +72,7 @@ class ilLearningProgressGUI extends ilLearningProgressBaseGUI
 				$this->ctrl->forwardCommand($loo_gui);
 				break;
 
-			case 'illplistofsettingsgui':
+			case 'illplistofsettingsgui':				
 				if($this->getRefId() &&
 					!$ilAccess->checkAccess('edit_learning_progress', '', $this->getRefId()))
 				{

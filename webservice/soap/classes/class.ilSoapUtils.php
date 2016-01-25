@@ -59,10 +59,12 @@ class ilSoapUtils extends ilSoapAdministration
 			return $this->__raiseError($this->__getMessage(),$this->__getMessageCode());
 		}			
 
-
-		global $ilLog;
-
 		include_once 'Services/Mail/classes/class.ilMimeMail.php';
+
+		if(strpos($sender, '#:#') !== false)
+		{
+			$sender = explode('#:#', $sender);
+		}
 
 		$mmail = new ilMimeMail();
 		$mmail->autoCheck(false);
@@ -109,7 +111,6 @@ class ilSoapUtils extends ilSoapAdministration
 		}
 
 		$mmail->Send();
-		$ilLog->write('SOAP: sendMail(): '.$to.', '.$cc.', '.$bcc);
 
 		return true;
 	}
@@ -264,7 +265,7 @@ class ilSoapUtils extends ilSoapAdministration
 		// Check owner of copy procedure
 		if(!$cp_options->checkOwner($ilUser->getId()))
 		{
-			$ilLog->write(__METHOD__.': Permission check failed for user id: '.$ilUser->getId().', copy id: '.$copy_identifier);
+			ilLoggerFactory::getLogger('obj')->error('Permission check failed for user id: '.$ilUser->getId().', copy id: '.$copy_identifier);
 			return false;
 		}
 		
@@ -272,8 +273,7 @@ class ilSoapUtils extends ilSoapAdministration
 		if(($node = $cp_options->fetchFirstDependenciesNode()) === false)
 		{
 			$cp_options->deleteAll();
-			$ilLog->write(__METHOD__.': Finished copy step 2. Copy completed');
-			
+			ilLoggerFactory::getLogger('obj')->info('Finished copy step 2. Copy completed');
 			return true;
 		}
 
@@ -283,23 +283,23 @@ class ilSoapUtils extends ilSoapAdministration
 		switch($options['type'])
 		{
 			case ilCopyWizardOptions::COPY_WIZARD_OMIT:
-				$ilLog->write(__METHOD__.': Omitting node: '.$node['obj_id'].', '.$node['title'].', '.$node['type']);
+				ilLoggerFactory::getLogger('obj')->debug(': Omitting node: '.$node['obj_id'].', '.$node['title'].', '.$node['type']);
 				$this->callNextDependency($sid,$cp_options);
 				break;
 			
 			case ilCopyWizardOptions::COPY_WIZARD_LINK:
-				$ilLog->write(__METHOD__.': Nothing to do for node: '.$node['obj_id'].', '.$node['title'].', '.$node['type']);
+				ilLoggerFactory::getLogger('obj')->debug(': Nothing to do for node: '.$node['obj_id'].', '.$node['title'].', '.$node['type']);
 				$this->callNextDependency($sid,$cp_options);
 				break;
 				
 			case ilCopyWizardOptions::COPY_WIZARD_COPY:
-				$ilLog->write(__METHOD__.': Start cloning dependencies: '.$node['obj_id'].', '.$node['title'].', '.$node['type']);
+				ilLoggerFactory::getLogger('obj')->debug(': Start cloning dependencies: '.$node['obj_id'].', '.$node['title'].', '.$node['type']);
 				$this->cloneDependencies($node,$cp_options);
 				$this->callNextDependency($sid,$cp_options);
 				break;
 				
 			default:
-				$ilLog->write(__METHOD__.': No valid action type given for node: '.$node['obj_id'].', '.$node['title'].', '.$node['type']);
+				ilLoggerFactory::getLogger('obj')->warning('No valid action type given for node: '.$node['obj_id'].', '.$node['title'].', '.$node['type']);
 				$this->callNextDependency($sid,$cp_options);
 				break;
 		}
@@ -321,7 +321,7 @@ class ilSoapUtils extends ilSoapAdministration
 
 		if(!$this->__checkSession($sid))
 		{
-			return $this->__raiseError($this->__getMessage(),$this->__getMessageCode());
+			ilLoggerFactory::getLogger('obj')->error('Object cloning failed. Invalid session given: '. $this->__getMessage());
 		}			
 
 		global $ilLog,$ilUser;
@@ -332,7 +332,7 @@ class ilSoapUtils extends ilSoapAdministration
 		// Check owner of copy procedure
 		if(!$cp_options->checkOwner($ilUser->getId()))
 		{
-			$ilLog->write(__METHOD__.': Permission check failed for user id: '.$ilUser->getId().', copy id: '.$copy_identifier);
+			ilLoggerFactory::getLogger('obj')->error('Permission check failed for user id: '.$ilUser->getId().', copy id: '.$copy_identifier);
 			return false;
 		}
 		
@@ -340,7 +340,7 @@ class ilSoapUtils extends ilSoapAdministration
 		// Fetch first node
 		if(($node = $cp_options->fetchFirstNode()) === false)
 		{
-			$ilLog->write(__METHOD__.': Finished copy step 1. Starting copying of object dependencies...');
+			ilLoggerFactory::getLogger('obj')->info('Finished copy step 1. Starting copying of object dependencies...');
 			return $this->ilCloneDependencies($sid,$copy_identifier);
 		}
 	
@@ -351,26 +351,27 @@ class ilSoapUtils extends ilSoapAdministration
 		switch($options['type'])
 		{
 			case ilCopyWizardOptions::COPY_WIZARD_OMIT:
-				$ilLog->write(__METHOD__.': Omitting node: '.$node['obj_id'].', '.$node['title'].', '.$node['type']);
+				ilLoggerFactory::getLogger('obj')->debug(': Omitting node: '.$node['obj_id'].', '.$node['title'].', '.$node['type']);
 				// set mapping to zero
 				$cp_options->appendMapping($node['child'],0);
 				$this->callNextNode($sid,$cp_options);
 				break;
 				
 			case ilCopyWizardOptions::COPY_WIZARD_COPY:
-				$ilLog->write(__METHOD__.': Start cloning node: '.$node['obj_id'].', '.$node['title'].', '.$node['type']);
+				
+				ilLoggerFactory::getLogger('obj')->debug('Start cloning node: '.$node['obj_id'].', '.$node['title'].', '.$node['type']);
 				$new_ref_id = $this->cloneNode($node,$cp_options);
 				$this->callNextNode($sid,$cp_options);
 				break;
 			
 			case ilCopyWizardOptions::COPY_WIZARD_LINK:
-				$ilLog->write(__METHOD__.': Start linking node: '.$node['obj_id'].', '.$node['title'].', '.$node['type']);
+				ilLoggerFactory::getLogger('obj')->debug('Start linking node: '.$node['obj_id'].', '.$node['title'].', '.$node['type']);
 				$new_ref_id = $this->linkNode($node,$cp_options);
 				$this->callNextNode($sid,$cp_options);
 				break;
 
 			default:
-				$ilLog->write(__METHOD__.': No valid action type given for node: '.$node['obj_id'].', '.$node['title'].', '.$node['type']);
+				ilLoggerFactory::getLogger('obj')->warning('No valid action type given for: '.$node['obj_id'].', '.$node['title'].', '.$node['type']);
 				$this->callNextNode($sid,$cp_options);
 				break;
 				
@@ -402,7 +403,7 @@ class ilSoapUtils extends ilSoapAdministration
 		}
 		else
 		{
-			$ilLog->write(__METHOD__.': Cannot call SOAP server');
+			ilLoggerFactory::getLogger('obj')->warning('SOAP clone call failed. Calling clone method manually');
 			$cp_options->read();			
 			include_once('./webservice/soap/include/inc.soap_functions.php');
 			$res = ilSoapFunctions::ilClone($sid,$cp_options->getCopyId());
@@ -428,7 +429,7 @@ class ilSoapUtils extends ilSoapAdministration
 		}
 		else
 		{
-			$ilLog->write(__METHOD__.': Cannot call SOAP server');
+			ilLoggerFactory::getLogger('obj')->warning('SOAP clone call failed. Calling clone method manually');
 			$cp_options->read();
 			include_once('./webservice/soap/include/inc.soap_functions.php');
 			$res = ilSoapFunctions::ilCloneDependencies($sid,$cp_options->getCopyId());
@@ -456,20 +457,20 @@ class ilSoapUtils extends ilSoapAdministration
 		
 		if(!$ilAccess->checkAccess('copy','',$node['child']))
 		{
-			$ilLog->write(__METHOD__.': No copy permission granted: '.$source_id.', '.$node['title'].', '.$node['type']);
+			ilLoggerFactory::getLogger('obj')->error('No copy permission granted: '.$source_id.', '.$node['title'].', '.$node['type']);
 			return false;
 			
 		}
 		if(!isset($mappings[$parent_id]))
 		{
-			$ilLog->write(__METHOD__.': Omitting node '.$source_id.', '.$node['title'].', '.$node['type']. '. No target found.');
+			ilLoggerFactory::getLogger('obj')->info('Omitting node '.$source_id.', '.$node['title'].', '.$node['type']. '. No target found.');
 			return true;
 		}
 		$target_id = $mappings[$parent_id];
 		
 		if(!$tree->isInTree($target_id))
 		{
-			$ilLog->write(__METHOD__.': Omitting node '.$source_id.', '.$node['title'].', '.$node['type']. '. Object has been deleted.');
+			ilLoggerFactory::getLogger('obj')->notice('Omitting node '.$source_id.', '.$node['title'].', '.$node['type']. '. Object has been deleted.');
 			return false;
 		}
 
@@ -478,7 +479,7 @@ class ilSoapUtils extends ilSoapAdministration
 		
 		if(!is_object($new_obj))
 		{
-			$ilLog->write(__METHOD__.': Error copying '.$source_id.', '.$node['title'].', '.$node['type'].'. No target found.');
+			ilLoggerFactory::getLogger('obj')->error('Error copying '.$source_id.', '.$node['title'].', '.$node['type'].'. No target found.');
 			return false;
 		}
 
@@ -509,7 +510,7 @@ class ilSoapUtils extends ilSoapAdministration
 		
 		if(!isset($mappings[$source_id]))
 		{
-			$ilLog->write(__METHOD__.': Omitting node '.$source_id.', '.$node['title'].', '.$node['type']. '. No mapping found.');
+			ilLoggerFactory::getLogger('obj')->debug('Omitting node '.$source_id.', '.$node['title'].', '.$node['type']. '. No mapping found.');
 			return true;
 		}
 		$target_id = $mappings[$source_id];
@@ -537,13 +538,13 @@ class ilSoapUtils extends ilSoapAdministration
 		
 		if(!$ilAccess->checkAccess('delete','',$node['child']))
 		{
-			$ilLog->write(__METHOD__.': No delete permission granted: '.$source_id.', '.$node['title'].', '.$node['type']);
+			ilLoggerFactory::getLogger('obj')->warning('No delete permission granted: '.$source_id.', '.$node['title'].', '.$node['type']);
 			return false;
 			
 		}
 		if(!isset($mappings[$parent_id]))
 		{
-			$ilLog->write(__METHOD__.': Omitting node '.$source_id.', '.$node['title'].', '.$node['type']. '. No target found.');
+			ilLoggerFactory::getLogger('obj')->warning('Omitting node '.$source_id.', '.$node['title'].', '.$node['type']. '. No target found.');
 			return true;
 		}
 		$target_id = $mappings[$parent_id];
@@ -555,7 +556,7 @@ class ilSoapUtils extends ilSoapAdministration
 		
 		if(!($new_ref_id))
 		{
-			$ilLog->write(__METHOD__.': Error linking '.$source_id.', '.$node['title'].', '.$node['type'].'. No target found.');
+			ilLoggerFactory::getLogger('obj')->error('Error linking '.$source_id.', '.$node['title'].', '.$node['type'].'. No target found.');
 			return false;
 		}
 

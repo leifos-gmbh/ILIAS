@@ -85,7 +85,7 @@ abstract class ilAuthBase
 	{
 		ilSessionControl::initSession();
 
-		$this->enableLogging = false;
+		$this->enableLogging = TRUE;
 		//$this->enableLogging = false;
 
 		if ($this->enableLogging)
@@ -275,11 +275,16 @@ abstract class ilAuthBase
 	 */
 	protected function logoutObserver($a_username,$a_auth)
 	{
-		global $ilLog;
+		global $ilLog, $ilAppEventHandler;
 		
 		$ilLog->write(__METHOD__.': Logout observer called');
 		
 		ilSessionControl::handleLogoutEvent();
+
+		$ilAppEventHandler->raise(
+			'Services/Authentication', 'afterLogout',
+			array('username' => $a_auth->getUsername())
+		);
 				
 		return $this->getContainer()->logoutObserver($a_username,$a_auth);
 	}

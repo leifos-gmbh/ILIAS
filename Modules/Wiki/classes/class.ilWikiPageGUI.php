@@ -13,6 +13,7 @@ include_once("./Modules/Wiki/classes/class.ilWikiPage.php");
 * @ilCtrl_Calls ilWikiPageGUI: ilPageEditorGUI, ilEditClipboardGUI, ilMediaPoolTargetSelector
 * @ilCtrl_Calls ilWikiPageGUI: ilPublicUserProfileGUI, ilPageObjectGUI, ilNoteGUI
 * @ilCtrl_Calls ilWikiPageGUI: ilCommonActionDispatcherGUI, ilRatingGUI, ilWikiStatGUI
+* @ilCtrl_Calls ilWikiPageGUI: ilObjectMetaDataGUI
 *
 * @ingroup ModulesWiki
 */
@@ -496,8 +497,9 @@ class ilWikiPageGUI extends ilPageObjectGUI
 	function deleteWikiPageConfirmationScreen()
 	{
 		global $ilAccess, $tpl, $ilCtrl, $lng;
-		
-		if ($ilAccess->checkAccess("write", "", $_GET["ref_id"]))
+
+		include_once("./Modules/Wiki/classes/class.ilWikiPerm.php");
+		if (ilWikiPerm::check("delete_wiki_pages", $_GET["ref_id"]))
 		{
 			include_once("./Services/Utilities/classes/class.ilConfirmationGUI.php");
 			$confirmation_gui = new ilConfirmationGUI();
@@ -573,8 +575,9 @@ class ilWikiPageGUI extends ilPageObjectGUI
 	function confirmWikiPageDeletion()
 	{
 		global $ilAccess, $tpl, $ilCtrl, $lng;
-		
-		if ($ilAccess->checkAccess("write", "", $_GET["ref_id"]))
+
+		include_once("./Modules/Wiki/classes/class.ilWikiPerm.php");
+		if (ilWikiPerm::check("delete_wiki_pages", $_GET["ref_id"]))
 		{
 			$this->getPageObject()->delete();
 			
@@ -761,7 +764,8 @@ class ilWikiPageGUI extends ilPageObjectGUI
 	{
 		global $ilAccess, $tpl, $ilCtrl, $lng;
 
-		if ($ilAccess->checkAccess("write", "", $_GET["ref_id"]))
+		include_once("./Modules/Wiki/classes/class.ilWikiPerm.php");
+		if (ilWikiPerm::check("activate_wiki_protection", $_GET["ref_id"]))
 		{
 			$this->getPageObject()->setBlocked(true);
 			$this->getPageObject()->update();
@@ -779,7 +783,8 @@ class ilWikiPageGUI extends ilPageObjectGUI
 	{
 		global $ilAccess, $tpl, $ilCtrl, $lng;
 
-		if ($ilAccess->checkAccess("write", "", $_GET["ref_id"]))
+		include_once("./Modules/Wiki/classes/class.ilWikiPerm.php");
+		if (ilWikiPerm::check("activate_wiki_protection", $_GET["ref_id"]))
 		{
 			$this->getPageObject()->setBlocked(false);
 			$this->getPageObject()->update();
@@ -941,7 +946,6 @@ class ilWikiPageGUI extends ilPageObjectGUI
 		include_once('Services/AdvancedMetaData/classes/class.ilAdvancedMDRecordGUI.php');
 		$this->record_gui = new ilAdvancedMDRecordGUI(ilAdvancedMDRecordGUI::MODE_EDITOR,'wiki',$page->getWikiId(),'wpg',$page->getId());
 		$this->record_gui->setPropertyForm($form);
-		$this->record_gui->setSelectedOnly(true); // #14912
 		$this->record_gui->parse();
 		
 		$form->addCommandButton("updateAdvancedMetaData", $lng->txt("save"));
@@ -976,7 +980,7 @@ class ilWikiPageGUI extends ilPageObjectGUI
 		$form->checkInput();			
 		if(!$this->record_gui->importEditFormPostValues())
 		{	
-			$this->editInfoObject($form);
+			$this->editAdvancedMetaData($form); // #16470
 			return false;
 		}	
 				

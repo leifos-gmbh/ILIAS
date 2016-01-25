@@ -48,6 +48,12 @@ class ilObjFolderGUI extends ilContainerGUI
 			parent::viewObject();
 			return true;
 		}
+		
+		// Trac access - see ilObjCourseGUI
+		include_once 'Services/Tracking/classes/class.ilLearningProgress.php';
+		ilLearningProgress::_tracProgress($GLOBALS["ilUser"]->getId(),$this->object->getId(),
+			$this->object->getRefId(),'fold');		
+		
 		$this->renderObject();
 		$this->tabs_gui->setTabActive('view_content');
 		return true;
@@ -75,7 +81,7 @@ class ilObjFolderGUI extends ilContainerGUI
 		$cmd = $this->ctrl->getCmd();
 		
 		// show repository tree
-		$this->showRepTree(true);
+		$this->showRepTree();
 
 		switch ($next_class)
 		{			

@@ -894,10 +894,15 @@ class ilTemplate extends ilTemplateX
 			include_once "Services/Link/classes/class.ilLink.php";
 			$link_items[ilLink::_getStaticLink(0, "impr")] = array($lng->txt("imprint"), true);
 		}
-		
-		$link_items["mailto:".ilUtil::prepareFormOutput($ilSetting->get("feedback_recipient"))] = array($lng->txt("contact_sysadmin"), false);
+
+		// system support contacts
+		include_once("./Modules/SystemFolder/classes/class.ilSystemSupportContactsGUI.php");
+		if (($l = ilSystemSupportContactsGUI::getFooterLink()) != "")
+		{
+			$link_items[$l] = array(ilSystemSupportContactsGUI::getFooterText(), false);
+		}
 				
-		if (DEVMODE && version_compare(PHP_VERSION,'5','>='))
+		if (DEVMODE)
 		{
 			$link_items[ilUtil::appendUrlParameterString($_SERVER["REQUEST_URI"], "do_dev_validate=xhtml")] = array("Validate", true);
 			$link_items[ilUtil::appendUrlParameterString($_SERVER["REQUEST_URI"], "do_dev_validate=accessibility")] = array("Accessibility", true);			

@@ -84,6 +84,8 @@ class ilForumXMLWriter extends ilXmlWriter
 		$this->xmlElement("Pseudonyms",  null, (int)$row->anonymized);
 		$this->xmlElement("Statistics",  null, (int)$row->statistics_enabled);
 		$this->xmlElement("ThreadRatings",  null, (int)$row->thread_rating);
+		$this->xmlElement("Sorting", null, (int)$row->thread_sorting);
+		$this->xmlElement("MarkModeratorPosts", null, (int)$row->mark_mod_posts);
 		$this->xmlElement("PostingActivation",  null, (int)$row->post_activation);
 		$this->xmlElement("PresetSubject",  null, (int)$row->preset_subject);
 		$this->xmlElement("PresetRe",  null, (int)$row->add_re_subject);
@@ -94,6 +96,7 @@ class ilForumXMLWriter extends ilXmlWriter
 		$this->xmlElement("Moderator",  null, (int)$row->top_mods);
 		$this->xmlElement("CreateDate",  null, $row->top_date);
 		$this->xmlElement("UpdateDate",  null, $row->top_update);
+		$this->xmlElement("FileUpload",  null, (int)$row->file_upload_allowed);
 		$this->xmlElement("UpdateUserId",  null, $row->update_user);
 		$this->xmlElement("UserId",  null, (int)$row->top_usr_id);
 		$this->xmlElement("AuthorId",  null, (int)$row->thr_author_id);

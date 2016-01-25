@@ -70,6 +70,10 @@ class ilDataCollectionTable {
 	/**
 	 * @var bool
 	 */
+	protected $delete_by_owner;
+	/**
+	 * @var bool
+	 */
 	protected $limited;
 	/**
 	 * @var string
@@ -152,6 +156,7 @@ class ilDataCollectionTable {
 		$this->setDefaultSortFieldOrder($rec['default_sort_field_order']);
 		$this->setPublicCommentsEnabled($rec['public_comments']);
 		$this->setViewOwnRecordsPerm($rec['view_own_records_perm']);
+		$this->setDeleteByOwner($rec['delete_by_owner']);
 	}
 
 
@@ -212,7 +217,7 @@ class ilDataCollectionTable {
 		$this->setId($id);
 		$query = "INSERT INTO il_dcl_table (" . "id" . ", obj_id" . ", title" . ", add_perm" . ", edit_perm" . ", delete_perm" . ", edit_by_owner"
 			. ", limited" . ", limit_start" . ", limit_end" . ", is_visible" . ", export_enabled" . ", default_sort_field_id"
-			. ", default_sort_field_order" . ", description" . ", public_comments" . ", view_own_records_perm" . " ) VALUES ("
+			. ", default_sort_field_order" . ", description" . ", public_comments" . ", view_own_records_perm" . ", delete_by_owner ) VALUES ("
 			. $ilDB->quote($this->getId(), "integer") . "," . $ilDB->quote($this->getObjId(), "integer") . ","
 			. $ilDB->quote($this->getTitle(), "text") . "," . $ilDB->quote($this->getAddPerm() ? 1 : 0, "integer") . ","
 			. $ilDB->quote($this->getEditPerm() ? 1 : 0, "integer") . "," . $ilDB->quote($this->getDeletePerm() ? 1 : 0, "integer") . ","
@@ -221,7 +226,7 @@ class ilDataCollectionTable {
 			. $ilDB->quote($this->getIsVisible() ? 1 : 0, "integer") . "," . $ilDB->quote($this->getExportEnabled() ? 1 : 0, "integer") . ","
 			. $ilDB->quote($this->getDefaultSortField(), "text") . "," . $ilDB->quote($this->getDefaultSortFieldOrder(), "text") . ","
 			. $ilDB->quote($this->getDescription(), "text") . "," . $ilDB->quote($this->getPublicCommentsEnabled(), "integer") . ","
-			. $ilDB->quote($this->getViewOwnRecordsPerm(), "integer") . ")";
+			. $ilDB->quote($this->getViewOwnRecordsPerm(), "integer") . "," . $ilDB->quote($this->getDeleteByOwner() ? 1 : 0, 'integer') . ")";
 
 		$ilDB->manipulate($query);
 
@@ -268,10 +273,10 @@ class ilDataCollectionTable {
 		$ilDB->update("il_dcl_table", array(
 			"obj_id" => array( "integer", $this->getObjId() ),
 			"title" => array( "text", $this->getTitle() ),
-			"add_perm" => array( "integer", $this->getAddPerm() ),
-			"edit_perm" => array( "integer", $this->getEditPerm() ),
-			"delete_perm" => array( "integer", $this->getDeletePerm() ),
-			"edit_by_owner" => array( "integer", $this->getEditByOwner() ),
+			"add_perm" => array( "integer", (int) $this->getAddPerm() ),
+			"edit_perm" => array( "integer", (int) $this->getEditPerm() ),
+			"delete_perm" => array( "integer", (int) $this->getDeletePerm() ),
+			"edit_by_owner" => array( "integer", (int) $this->getEditByOwner() ),
 			"limited" => array( "integer", $this->getLimited() ),
 			"limit_start" => array( "timestamp", $this->getLimitStart() ),
 			"limit_end" => array( "timestamp", $this->getLimitEnd() ),
@@ -282,6 +287,7 @@ class ilDataCollectionTable {
 			"default_sort_field_order" => array( "text", $this->getDefaultSortFieldOrder() ),
 			"public_comments" => array( "integer", $this->getPublicCommentsEnabled() ? 1 : 0 ),
 			"view_own_records_perm" => array( "integer", $this->getViewOwnRecordsPerm() ),
+			'delete_by_owner' => array('integer', $this->getDeleteByOwner() ? 1 : 0),
 		), array(
 			"id" => array( "integer", $this->getId() )
 		));
@@ -475,7 +481,7 @@ class ilDataCollectionTable {
 
 
 	protected function loadFields() {
-		if ($this->fields == NULL) {
+		if ($this->fields === NULL) {
 			global $ilDB;
 
 			$query = "SELECT DISTINCT field.* FROM il_dcl_field AS field
@@ -730,8 +736,7 @@ class ilDataCollectionTable {
 			return true;
 		}
 		if ($this->getEditByOwner()) {
-			// Edit by owner is set... user is only allowed to edit her own entries
-			return $this->checkEditByOwner($record);
+			return $this->doesRecordBelongToUser($record);
 		}
 
 		return false;
@@ -754,12 +759,11 @@ class ilDataCollectionTable {
 		if (!$this->checkLimit()) {
 			return false;
 		}
-		if ($this->getDeletePerm() && !$this->getEditByOwner()) {
+		if ($this->getDeletePerm() && !$this->getDeleteByOwner()) {
 			return true;
 		}
-		if ($this->getEditByOwner()) {
-			// Edit by owner is set... user is only allowed to edit her own entries
-			return $this->checkEditByOwner($record);
+		if ($this->getDeleteByOwner()) {
+			return $this->doesRecordBelongToUser($record);
 		}
 
 		return false;
@@ -806,7 +810,7 @@ class ilDataCollectionTable {
 	 *
 	 * @return bool
 	 */
-	protected function checkEditByOwner(ilDataCollectionRecord $record) {
+	protected function doesRecordBelongToUser(ilDataCollectionRecord $record) {
 		global $ilUser;
 
 		return ($ilUser->getId() == $record->getOwner());
@@ -924,6 +928,9 @@ class ilDataCollectionTable {
 	 */
 	public function setDeletePerm($delete_perm) {
 		$this->delete_perm = $delete_perm;
+		if (!$delete_perm) {
+			$this->setDeleteByOwner(false);
+		}
 	}
 
 
@@ -941,6 +948,9 @@ class ilDataCollectionTable {
 	 */
 	public function setEditByOwner($edit_by_owner) {
 		$this->edit_by_owner = $edit_by_owner;
+		if ($edit_by_owner) {
+			$this->setEditPerm(true);
+		}
 	}
 
 
@@ -953,10 +963,34 @@ class ilDataCollectionTable {
 
 
 	/**
+	 * @return boolean
+	 */
+	public function getDeleteByOwner()
+	{
+		return (bool) $this->delete_by_owner;
+	}
+
+
+	/**
+	 * @param boolean $delete_by_owner
+	 */
+	public function setDeleteByOwner($delete_by_owner)
+	{
+		$this->delete_by_owner = $delete_by_owner;
+		if ($delete_by_owner) {
+			$this->setDeletePerm(true);
+		}
+	}
+
+
+	/**
 	 * @param boolean $edit_perm
 	 */
 	public function setEditPerm($edit_perm) {
 		$this->edit_perm = $edit_perm;
+		if (!$edit_perm) {
+			$this->setEditByOwner(false);
+		}
 	}
 
 
@@ -1338,7 +1372,7 @@ class ilDataCollectionTable {
 			if ($id == 'owner' || $id == 'last_edit_by') {
 				$join_str .= "LEFT JOIN usr_data AS sort_usr_data_{$id} ON (sort_usr_data_{$id}.usr_id = record.{$id})";
 				$select_str .= " sort_usr_data_{$id}.login AS field_{$id},";
-			} elseif ($id != 'comments') {
+			} else {
 				$select_str .= " record.{$id} AS field_{$id},";
 			}
 		} else {
@@ -1537,8 +1571,7 @@ class ilDataCollectionTable {
 		$sql = "SELECT DISTINCT record.id, record.owner";
 		if($select_str) {
 			$sql .= ', ';
-		}
-		$sql .= rtrim($select_str, ',') . " FROM il_dcl_record AS record ";
+		}		$sql .= rtrim($select_str, ',') . " FROM il_dcl_record AS record ";
 		$sql .= $join_str;
 		$sql .= " WHERE record.table_id = " . $ilDB->quote($this->getId(), 'integer') . $where_additions;
 		if ($has_nref) {

@@ -20,6 +20,7 @@ class ilNotificationOSDHandler extends ilNotificationEchoHandler {
                     'usr_id' => array('integer', $notification->user->getId()),
                     'serialized' => array('text', serialize($notification)),
                     'valid_until' => array('integer', $notification->baseNotification->getValidForSeconds() ? ($notification->baseNotification->getValidForSeconds() + time()) : 0),
+                    'visible_for' => array('integer', $notification->baseNotification->getVisibleForSeconds() ? $notification->baseNotification->getVisibleForSeconds() : 0),
                     'type' => array('text', $notification->baseNotification->getType()),
                     'time_added' => array('integer', time()),
                 )
@@ -41,7 +42,7 @@ class ilNotificationOSDHandler extends ilNotificationEchoHandler {
     public static function getNotificationsForUser($user_id, $append_osd_id_to_link = true, $max_age_seconds = 0) {
         global $ilDB;
 
-        $query = 'SELECT notification_osd_id, serialized, valid_until, type FROM ' . ilNotificationSetupHelper::$tbl_notification_osd_handler
+        $query = 'SELECT notification_osd_id, serialized, valid_until, visible_for, type FROM ' . ilNotificationSetupHelper::$tbl_notification_osd_handler
             . ' WHERE usr_id = %s AND (valid_until = 0 OR valid_until > ' . $ilDB->quote( time() ,'integer') . ') AND time_added > %s';
 
         $types = array('integer', 'integer');
@@ -112,14 +113,14 @@ class ilNotificationOSDHandler extends ilNotificationEchoHandler {
 
 			// sends a "delete the given notification" notification using the
 			// osd_maint channel
-            $deletedNotification = new ilNotificationConfig('osd_maint');
+            /*$deletedNotification = new ilNotificationConfig('osd_maint');
             $deletedNotification->setValidForSeconds(120);
             $deletedNotification->setTitleVar('deleted');
             $deletedNotification->setShortDescriptionVar($notification_osd_id);
             $deletedNotification->setLongDescriptionVar('dummy');
 
             require_once 'Services/Notifications/classes/class.ilNotificationSystem.php';
-            ilNotificationSystem::sendNotificationToUsers($deletedNotification, array($row['usr_id']));
+            ilNotificationSystem::sendNotificationToUsers($deletedNotification, array($row['usr_id']));*/
         }
     }
 

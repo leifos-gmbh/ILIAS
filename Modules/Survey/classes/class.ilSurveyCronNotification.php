@@ -71,7 +71,7 @@ class ilSurveyCronNotification extends ilCronJob
 			{	
 				$message[] = $svy_ref_id."(".$num.")";
 				$status = ilCronJobResult::STATUS_OK;				
-			}
+			}			
 		}
 		
 		$result = new ilCronJobResult();

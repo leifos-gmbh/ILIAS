@@ -33,6 +33,9 @@ class ilMapUtil
 {
 	static $_settings = null;
 
+	const DEFAULT_TILE = "a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org";
+	const DEFAULT_GEOLOCATION = null;
+
 	// Settings
 
 	static function settings() 
@@ -101,7 +104,40 @@ class ilMapUtil
 	{
 		return self::settings()->get("std_zoom");
 	}
+
+	static function setStdTileServers($a_tile)
+	{
+		self::settings()->set("std_tile", $a_tile);
+	}
 	
+	/**
+	 * Returns the tile server to be used in the installation.
+	 *
+	 * @return	string		tile server url
+	 */
+	static function getStdTileServers() 
+	{
+		$std_tile = self::settings()->get("std_tile");	
+		return $std_tile ? $std_tile : self::DEFAULT_TILE;
+	}
+	
+
+	static function setStdGeolocationServer($a_geolocation) 
+	{
+		self::settings()->set("std_geolocation", $a_geolocation);
+	}
+
+	/**
+	 * Returns the reverse geolocation server to be used in the installation.
+	 *
+	 * @return	string		tile server url
+	 */
+	static function getStdGeolocationServer()
+	{
+		$std_geoloc = self::settings()->get("std_geolocation");
+		return $std_geoloc ? $std_geoloc : self::DEFAULT_GEOLOCATION;
+	}
+
 	/**
 	* Get default longitude, latitude and zoom.
 	*
@@ -127,7 +163,10 @@ class ilMapUtil
 				return new ilGoogleMapGUI();
 			case "openlayers":
 				require_once("Services/Maps/classes/class.ilOpenLayersMapGUI.php");
-				return new ilOpenLayersMapGUI();
+				 $map = new ilOpenLayersMapGUI();
+				 $map->setTileServers(self::getStdTileServers());
+				 $map->setGeolocationServer(self::getStdGeolocationServer());
+				 return $map;
 			default:
 				require_once("Services/Maps/classes/class.ilGoogleMapGUI.php");
 				return new ilGoogleMapGUI();

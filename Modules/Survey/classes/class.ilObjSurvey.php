@@ -168,6 +168,7 @@ class ilObjSurvey extends ilObject
 	
 	protected $view_own_results; // [bool]
 	protected $mail_own_results; // [bool]
+	protected $mail_confirmation; // [bool]
 	
 	const NOTIFICATION_PARENT_COURSE = 1;
 	const NOTIFICATION_INVITED_USERS = 2;
@@ -858,6 +859,7 @@ class ilObjSurvey extends ilObject
 				"tutor_ntf_reci" => array("text", implode(";", (array)$this->getTutorNotificationRecipients())),
 				"tutor_ntf_target" => array("integer", (int)$this->getTutorNotificationTarget()),
 				"own_results_view" => array("integer", $this->hasViewOwnResults()),
+				"confirmation_mail" => array("integer", $this->hasMailConfirmation()),
 				"own_results_mail" => array("integer", $this->hasMailOwnResults())
  			));
 			$this->setSurveyId($next_id);
@@ -901,6 +903,7 @@ class ilObjSurvey extends ilObject
 				"tutor_ntf_reci" => array("text", implode(";", (array)$this->getTutorNotificationRecipients())),
 				"tutor_ntf_target" => array("integer", $this->getTutorNotificationTarget()),
 				"own_results_view" => array("integer", $this->hasViewOwnResults()),
+				"confirmation_mail" => array("integer", $this->hasMailConfirmation()),
 				"own_results_mail" => array("integer", $this->hasMailOwnResults())
 			), array(
 			"survey_id" => array("integer", $this->getSurveyId())
@@ -1161,6 +1164,7 @@ class ilObjSurvey extends ilObject
 			
 			$this->setViewOwnResults($data["own_results_view"]);
 			$this->setMailOwnResults($data["own_results_mail"]);
+			$this->setMailConfirmation($data["confirmation_mail"]);
 		}
 		
 		// moved activation to ilObjectActivation
@@ -4044,6 +4048,7 @@ class ilObjSurvey extends ilObject
 		
 		$custom_properties["own_results_view"] = (int)$this->hasViewOwnResults();
 		$custom_properties["own_results_mail"] = (int)$this->hasMailOwnResults();
+		$custom_properties["confirmation_mail"] = (int)$this->hasMailConfirmation();
 		
 		$custom_properties["mode_360"] = (int)$this->get360Mode();
 		$custom_properties["mode_360_self_eval"] = (int)$this->get360SelfEvaluation();
@@ -4376,6 +4381,7 @@ class ilObjSurvey extends ilObject
 		$newObj->setPoolUsage($this->getPoolUsage());
 		$newObj->setViewOwnResults($this->hasViewOwnResults());
 		$newObj->setMailOwnResults($this->hasMailOwnResults());
+		$newObj->setMailConfirmation($this->hasMailConfirmation());
 		
 		// #12661
 		if($this->get360Mode())
@@ -6677,6 +6683,16 @@ class ilObjSurvey extends ilObject
 	function hasMailOwnResults()
 	{
 		return $this->mail_own_results;
+	}
+	
+	function setMailConfirmation($a_value)
+	{
+		$this->mail_confirmation = (bool)$a_value;
+	}
+	
+	function hasMailConfirmation()
+	{
+		return $this->mail_confirmation;
 	}
 	
 	public static function getSurveySkippedValue()

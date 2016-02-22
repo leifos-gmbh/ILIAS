@@ -1,0 +1,7 @@
+/* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
+<!-- language file start -->
+survey#:#svy_results_mail_confirm#:#User can send participation confirmation
+survey#:#svy_results_mail_confirm_info#:#A participation confirmation can be send at the end of the survey.
+survey#:#svy_results_mail_own#:#Include given answers
+survey#:#svy_mail_send_confirmation#:#Send Participation Confirmation
+survey#:#svy_mail_confirmation_subject#:#Survey "%s" - Your participation confirmation

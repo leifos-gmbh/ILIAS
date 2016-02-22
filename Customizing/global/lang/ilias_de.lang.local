@@ -1,0 +1,7 @@
+/* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
+<!-- language file start -->
+survey#:#svy_results_mail_confirm#:#Teilnehmer kann sich Teilnahmebestätigung senden
+survey#:#svy_results_mail_confirm_info#:#Am Ende der Umfrage kann eine Teilnahmebestätigung per Email ausgelöst werden.
+survey#:#svy_results_mail_own#:#Eigene Antworten mitsenden
+survey#:#svy_mail_send_confirmation#:#Teilnahmebestätigung senden
+survey#:#svy_mail_confirmation_subject#:#Umfrage "%s" - Ihre Teilnahmebestätigung

@@ -5,3 +5,11 @@ survey#:#svy_results_mail_confirm_info#:#A participation confirmation can be sen
 survey#:#svy_results_mail_own#:#Include given answers
 survey#:#svy_mail_send_confirmation#:#Send Participation Confirmation
 survey#:#svy_mail_confirmation_subject#:#Survey "%s" - Your participation confirmation
+survey#:#svy_anonymous_participants#:#List of Participants
+survey#:#svy_anonymous_participants_info#:#If activated a list of participants can be enabled in anonymous surveys.
+survey#:#svy_anonymous_participants_min#:#Minimum Number of Participants
+survey#:#svy_anonymous_participants_min_info#:#The list will only be available if there are at least the minimum number of participants.
+survey#:#svy_anonymous_participants_svy#:#List of Participants
+survey#:#svy_anonymous_participants_svy_info#:#If activated a list of participants is available after the end date.
+survey#:#survey_results_started#:#Survey started
+survey#:#survey_results_not_started#:#Survey not started

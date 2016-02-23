@@ -585,7 +585,7 @@ class ilObjSurveyGUI extends ilObjectGUI
 				$this->object->setViewOwnResults($_POST["view_own"]);
 				$this->object->setMailConfirmation($_POST["mail_confirm"]);
 				$this->object->setMailOwnResults($_POST["mail_own"]);
-
+				
 				// both are saved in object, too
 				$this->object->setTitle(ilUtil::stripSlashes($_POST['title']));
 				$this->object->setDescription(ilUtil::stripSlashes($_POST['description']));
@@ -721,6 +721,8 @@ class ilObjSurveyGUI extends ilObjectGUI
 								{
 									$this->object->setAnonymize(ilObjSurvey::ANONYMIZE_FREEACCESS);
 								}
+																
+								$this->object->setAnonymousUserList($_POST["anon_list"]);				
 							}	
 
 							// if settings were changed get rid of existing code
@@ -1203,11 +1205,31 @@ class ilObjSurveyGUI extends ilObjectGUI
 				? "statanon"
 				: "statpers");				
 			$form->addItem($anonymization_options);
+									
+			$surveySetting = new ilSetting("survey");
+			if($surveySetting->get("anonymous_participants", false))
+			{		
+				$min = "";
+				if($surveySetting->get("anonymous_participants_min", 0))
+				{
+					$min = " (".$this->lng->txt("svy_anonymous_participants_min").": ".
+						$surveySetting->get("anonymous_participants_min").")";
+				}						
+				
+				$anon_list = new ilCheckboxInputGUI($this->lng->txt("svy_anonymous_participants_svy"), "anon_list");
+				$anon_list->setInfo($this->lng->txt("svy_anonymous_participants_svy_info").$min);
+				$anon_list->setChecked($this->object->hasAnonymousUserList());
+				$option->addSubItem($anon_list);				
+			}			
 			
 			if ($this->object->_hasDatasets($this->object->getSurveyId()))
 			{
 				$anonymization_options->setDisabled(true);
-			}						
+				if($anon_list)
+				{
+					$anon_list->setDisabled(true);
+				}
+			}										
 		}
 		// 360°
 		else
@@ -1245,7 +1267,6 @@ class ilObjSurveyGUI extends ilObjectGUI
 			$skill_service->setChecked($this->object->get360SkillService());
 			$form->addItem($skill_service);
 		}
-				
 		
 		$form->addCommandButton("saveProperties", $this->lng->txt("save"));
 

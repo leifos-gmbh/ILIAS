@@ -24,3 +24,20 @@ $ilDB->manipulate("UPDATE svy_svy".
 	" AND confirmation_mail IS NULL");
 
 ?>
+<#3>
+<?php
+
+if(!$ilDB->tableColumnExists('svy_svy','anon_user_list')) 
+{
+    $ilDB->addTableColumn(
+        'svy_svy',
+        'anon_user_list',
+        array(
+            'type' => 'integer',
+			'length' => 1,
+            'notnull' => false,
+            'default' => 0
+        ));
+}
+
+?>

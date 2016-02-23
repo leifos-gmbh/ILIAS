@@ -150,6 +150,28 @@ class ilSurveyParticipantsGUI
 		$this->tpl->setVariable('ADM_CONTENT', $table_gui->getHTML());	
 	}
 	
+	protected function isAnonymousListActive()
+	{	
+		$surveySetting = new ilSetting("survey");
+		if($surveySetting->get("anonymous_participants", false))
+		{		
+			if($this->object->hasAnonymizedResults())
+			{
+				$end = $this->object->getEndDate();
+				if($end && $end < date("YmdHis"))
+				{
+					$min = $surveySetting->get("anonymous_participants_min", 0);
+					$total = $this->object->getSurveyParticipants();
+					if(!$min || sizeof($total) >= $min)
+					{					
+						return true;
+					}
+				}
+			}			
+		}
+		return false;
+	}
+	
 	/**
 	* Set the tabs for the access codes section
 	*
@@ -166,6 +188,14 @@ class ilSurveyParticipantsGUI
 			 $this->ctrl->getLinkTarget($this,'maintenance'),
 			 array("maintenance", "deleteAllUserData"),					 
 			 "");
+		
+		if($this->isAnonymousListActive())
+		{
+			$ilTabs->addSubTabTarget("svy_anonymous_participants_svy",
+			 $this->ctrl->getLinkTarget($this,'listParticipants'),
+			 array("listParticipants"),					 
+			 "");
+		}
 
 		if(!$this->object->isAccessibleWithoutCode())
 		{
@@ -1780,6 +1810,29 @@ class ilSurveyParticipantsGUI
 		$this->ctrl->redirect($this, "listAppraisees");
    }
  
+   protected function listParticipantsObject()
+   {
+		global $ilToolbar;
+		
+	    if(!$this->isAnonymousListActive())
+	    {
+		   $this->ctrl->redirect($this, "maintenance");
+	    }
+	   
+	    $this->parent_gui->handleWriteAccess();		
+		$this->setCodesSubtabs();
+		
+		include_once "Services/UIComponent/Button/classes/class.ilLinkButton.php";
+		$button = ilLinkButton::getInstance();
+		$button->setCaption("print");								
+		$button->setOnClick("window.print(); return false;");				
+		$button->setOmitPreventDoubleSubmission(true);
+		$ilToolbar->addButtonInstance($button);		
+		
+		include_once "Modules/Survey/classes/tables/class.ilSurveyParticipantsTableGUI.php";
+		$tbl = new ilSurveyParticipantsTableGUI($this, "listParticipants", $this->object);
+		$this->tpl->setContent($tbl->getHTML());
+   }
 }
 
 ?>

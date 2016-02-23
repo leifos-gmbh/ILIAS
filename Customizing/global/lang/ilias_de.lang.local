@@ -5,3 +5,11 @@ survey#:#svy_results_mail_confirm_info#:#Am Ende der Umfrage kann eine Teilnahme
 survey#:#svy_results_mail_own#:#Eigene Antworten mitsenden
 survey#:#svy_mail_send_confirmation#:#Teilnahmebestätigung senden
 survey#:#svy_mail_confirmation_subject#:#Umfrage "%s" - Ihre Teilnahmebestätigung
+survey#:#svy_anonymous_participants#:#Teilnehmerliste
+survey#:#svy_anonymous_participants_info#:#Wenn aktiviert kann eine Teilnehmerliste bei anonymen Umfragen erzeugt werden.
+survey#:#svy_anonymous_participants_min#:#Mindestteilnehmeranzahl
+survey#:#svy_anonymous_participants_min_info#:#Die Anzeige der Liste erfolgt erst ab dieser Anzahl Teilnehmer.
+survey#:#svy_anonymous_participants_svy#:#Teilnehmerliste
+survey#:#svy_anonymous_participants_svy_info#:#Wenn aktiviert ist eine Teilnehmerliste nach dem Enddatum verfügbar.
+survey#:#survey_results_started#:#Umfrage begonnen
+survey#:#survey_results_not_started#:#Umfrage nicht begonnen

@@ -8113,6 +8113,10 @@ a.mailunread:visited {
 }
 .iosMailFilter .checkbox {
   display: inline-block !important;
+  margin: 0 10px !important;
+}
+.iosMailFilter .checkbox:first-child {
+  margin: 0 15px !important;
 }
 .iosMailFilter .checkbox input[type="checkbox"] {
   margin-left: -15px !important;
@@ -10306,6 +10310,18 @@ div.ilCreationFormSection .form-horizontal {
   background-color: #FFFFFF;
 }
 .ilObjListRow:hover {
+  background-color: #ffffea;
+}
+.table-striped {
+  border-collapse: separate;
+}
+.table-striped > tbody > tr.ilObjListRow > td {
+  background-color: #FFFFFF;
+}
+.table-striped > tbody > tr.ilObjListRow:hover > td {
+  background-color: #ffffea;
+}
+.table-striped > tbody > tr.ilObjListRow:hover:nth-child(2n+1) > td {
   background-color: #ffffea;
 }
 /* Services/Navigation */

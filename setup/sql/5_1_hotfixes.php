@@ -87,4 +87,16 @@ if($ilDB->tableColumnExists('svy_times', 'first_question'))
 			}
 		}
 	}
-	?>
+?>
+<#5>
+<?php
+if(!$ilDB->indexExistsByFields('il_qpl_qst_fq_unit',array('question_fi')))
+{
+	$ilDB->addIndex('il_qpl_qst_fq_unit',array('question_fi'), 'i2');
+}
+?>
+<#6>
+<?php
+$setting = new ilSetting();
+$setting->set('mail_send_html', 1);
+?>

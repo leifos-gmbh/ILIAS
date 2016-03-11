@@ -21,7 +21,7 @@ class ilWebAccessChecker {
 	/**
 	 * @var ilWACPath
 	 */
-	protected $path_object = NULL;
+	protected $path_object = null;
 	/**
 	 * @var bool
 	 */
@@ -106,7 +106,7 @@ class ilWebAccessChecker {
 	 */
 	protected function check() {
 		ilWACLog::getInstance()->write('Checking File: ' . $this->getPathObject()->getPathWithoutQuery());
-		if (! $this->getPathObject()) {
+		if (!$this->getPathObject()) {
 			throw new ilWACException(ilWACException::CODE_NO_PATH);
 		}
 
@@ -181,26 +181,34 @@ class ilWebAccessChecker {
 			ilWACLog::getInstance()->write('init ILIAS');
 			ilInitialisation::initILIAS();
 			global $ilUser, $ilSetting;
-			// No User seems to be logged in, we have to re-init ILIAS for anonymous
-			if ($ilUser->getId() == 0) {
-				if (! $ilSetting->get('pub_section')) {
-					// ILIAS does not support public access, abort. Access isn't possible
-					throw new ilWACException(ilWACException::ACCESS_DENIED);
-				}
-				$_POST['username'] = 'anonymous';
-				$_POST['password'] = 'anonymous';
-				ilWACLog::getInstance()->write('have to re-init ILIAS since theres no User to get checked');
-				ilInitialisation::reinitILIAS();
+			switch ($ilUser->getId()) {
+				case 0:
+					break;
+				case 13:
+					if (!$ilSetting->get('pub_section')) {
+						ilWACLog::getInstance()->write('public section not activated');
+						throw new ilWACException(ilWACException::ACCESS_DENIED);
+					}
+					break;
 			}
 		} catch (Exception $e) {
-			throw new ilWACException(ilWACException::INITIALISATION_FAILED);
+			if ($e instanceof ilWACException) {
+				throw  $e;
+			}
+			if ($e instanceof Exception && $e->getMessage() == 'Authentication failed.') {
+				$_REQUEST["baseClass"] = "ilStartUpGUI";
+				$_REQUEST["cmd"] = "showLogin";
+
+				ilWACLog::getInstance()->write('reinit ILIAS');
+				ilInitialisation::reinitILIAS();
+			}
 		}
 		$this->setInitialized(true);
 	}
 
 
 	protected function deliver() {
-		if (! $this->isChecked()) {
+		if (!$this->isChecked()) {
 			throw new ilWACException(ilWACException::ACCESS_WITHOUT_CHECK);
 		}
 
@@ -218,7 +226,7 @@ class ilWebAccessChecker {
 
 
 	protected function deny() {
-		if (! $this->isChecked()) {
+		if (!$this->isChecked()) {
 			throw new ilWACException(ilWACException::ACCESS_WITHOUT_CHECK);
 		}
 		throw new ilWACException(ilWACException::ACCESS_DENIED);

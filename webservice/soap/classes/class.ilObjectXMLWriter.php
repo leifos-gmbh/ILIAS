@@ -45,6 +45,9 @@ class ilObjectXMLWriter extends ilXmlWriter
 	var $user_id = 0;
 	
 	protected $check_permission = false;
+	// begin-patch fm
+	private $required_permission = 'visible';
+	// end-patch fm
 
 	/**
 	* constructor
@@ -85,6 +88,19 @@ class ilObjectXMLWriter extends ilXmlWriter
 	{
 		return $this->check_permission;
 	}
+
+	// begin-patch fm
+	public function setRequiredPermission($a_perm)
+	{
+		$this->required_permission = $a_perm;
+	}
+
+	public function getRequiredPermission()
+	{
+		return $this->required_permission;
+	}
+	// end-patch fm
+
 
 	function setUserId($a_id)
 	{
@@ -140,7 +156,9 @@ class ilObjectXMLWriter extends ilXmlWriter
 		{
 			if(method_exists($object, 'getType') and $objDefinition->isRBACObject($object->getType()))
 			{
-				if($this->isPermissionCheckEnabled() and !$ilAccess->checkAccessOfUser($this->getUserId(),'read','',$object->getRefId()))
+				// begin-patch fm
+				if($this->isPermissionCheckEnabled() and !$ilAccess->checkAccessOfUser($this->getUserId(),$this->getRequiredPermission(),'',$object->getRefId()))
+				// end-patch fm
 				{
 					continue;
 				}
@@ -323,6 +341,30 @@ class ilObjectXMLWriter extends ilXmlWriter
 				$this->xmlElement("Property",array('name' => 'fileExtension'),(string) $extension);
 				// begin-patch fm
 				$this->xmlElement('Property',array('name' => 'fileVersion'), (string) ilObjFileAccess::_lookupVersion($obj->getId()));
+
+				// skyguide file lock begin
+				include_once './Modules/File/classes/class.ilObjFileAccess.php';
+				$fileData = ilObjFileAccess::_lookupFileData($obj->getId());
+				if($fileData["locked_until"] && 
+					$fileData["locked_until"] > time())
+				{
+					include_once "Modules/File/classes/class.ilObjFile.php";
+					$info = ilObjFile::_getListLockInfo($fileData["locked_until"], $fileData["locked_by"]);
+					if($info)
+					{
+						$this->xmlElement('Property',array("name" => "info"), $info);
+					}
+				}
+				// append file access
+				$access = $GLOBALS['ilAccess']->checkAccessOfUser(
+						$this->getUserId(),
+						'read',
+						'sendfile',
+						$obj->getRefId()
+				);
+				$this->xmlElement('Property', array('name' => 'fileAccess'), (int) $access);
+
+				// skyguide file lock end
 				// end-patch fm
 				$this->xmlEndTag('Properties');
 				break;

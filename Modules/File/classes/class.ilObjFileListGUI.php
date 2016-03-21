@@ -182,6 +182,29 @@ class ilObjFileListGUI extends ilObjectListGUI
 			}			
 		}
 		// END WebDAV: Only display relevant information.
+		
+		
+		// skyguide file lock begin
+		
+		if($fileData["locked_until"] && 
+			$fileData["locked_until"] > time())
+		{			
+			include_once "Modules/File/classes/class.ilObjFile.php";
+			$info = ilObjFile::_getListLockInfo($fileData["locked_until"], $fileData["locked_by"]);
+			if($info)
+			{				
+				$props[] = array(
+					"alert" => true,
+					"property" => $lng->txt("file_locked"),
+					"value" => $info,
+					'propertyNameVisible' => true,
+					'newline' => true
+				);
+			}				
+		}
+		
+		// skyguide file lock end
+		
 
 		return $props;
 	}
@@ -233,6 +256,34 @@ class ilObjFileListGUI extends ilObjectListGUI
 		
 		return parent::getCommandLink($a_cmd);
 	}
+	
+	// skyguide file lock begin
+	
+	public function getCommands($a_ref_id, $a_obj_id)
+	{
+		$old_commands = $this->commands;
+		
+		// if file is locked by some other user, disable download
+		include_once "Modules/File/classes/class.ilObjFile.php";		
+		if(!ilObjFile::downloadForUserEnabled($a_obj_id)) 
+		{
+			foreach($this->commands as $idx => $command)
+			{
+				if($command["cmd"] == "sendfile")
+				{
+					unset($this->commands[$idx]);
+				}
+			}
+		}
+		
+		$comm = parent::getCommands($a_ref_id, $a_obj_id);
+		
+		$this->commands = $old_commands;
+		
+		return $comm;
+	}
+	
+	// skyguide file lock end
 
 } // END class.ilObjFileListGUI
 ?>

@@ -236,7 +236,7 @@ class ilLDAPUserSynchronisation
 
 		if(substr($this->getAuthMode(),0,4) == 'ldap')
 		{
-			return true;
+			#return true;
 		}
 		include_once './Services/LDAP/classes/class.ilLDAPQuery.php';
 		$query = new ilLDAPQuery($this->getServer());

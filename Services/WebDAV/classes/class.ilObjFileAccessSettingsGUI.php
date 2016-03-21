@@ -213,6 +213,17 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI
 		$tai_prop->setCols(80);
 		$tai_prop->setRows(5);
 		$form->addItem($tai_prop);
+		
+		
+		// skyguide file lock begin
+		
+		$lng->loadLanguageModule('file');
+		$settings = new ilSetting('file_access');
+		$lock = new ilCheckboxInputGUI($lng->txt('file_enable_lock'), 'lock');
+		$lock->setChecked($settings->get('lock'));
+		$form->addItem($lock);
+		
+		// skyguide file lock end
 
 
 		// command buttons
@@ -233,6 +244,13 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI
 		{
 			$ilErr->raiseError($lng->txt("no_permission"),$ilErr->WARNING);
 		}
+		
+		// skyguide file lock begin
+		
+		$settings = new ilSetting('file_access');
+		$settings->set('lock', (bool)$_POST['lock']);
+		
+		// skyguide file lock end
 
 		$this->object->setDownloadWithUploadedFilename(ilUtil::stripSlashes($_POST['download_with_uploaded_filename']));
 		$this->object->setInlineFileExtensions(ilUtil::stripSlashes($_POST['inline_file_extensions']));

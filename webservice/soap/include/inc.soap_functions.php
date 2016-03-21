@@ -1038,7 +1038,22 @@ class ilSoapFunctions {
 		return $s->getLearningProgressChanges($sid, $timestamp, $include_ref_ids, $type_filter);
 	}
 	// mcs-patch end
-	
+
+	public static function  getProgress($sid, $a_ref_id, $a_usr_names, $a_progress_status)
+	{
+		include_once './webservice/soap/classes/class.ilSoapLearningProgressAdministration.php';
+		$lpa = & new ilSoapLearningProgressAdministration();
+		return $lpa->getProgress($sid, $a_ref_id, $a_usr_names, $a_progress_status);
+
+	}
+
+	public static function  updateProgress($sid, $a_ref_id, $a_usr_names, $progress_xml)
+	{
+		include_once './webservice/soap/classes/class.ilSoapLearningProgressAdministration.php';
+		$lpa = & new ilSoapLearningProgressAdministration();
+		return $lpa->updateProgress($sid, $a_ref_id, $a_usr_names, $progress_xml);
+
+	}
 
 	/**
 	 * Get learning progress info

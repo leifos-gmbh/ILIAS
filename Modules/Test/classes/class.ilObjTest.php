@@ -10194,13 +10194,19 @@ function getAnswerFeedbackPoints()
 				$row = array();
 				$reached_points = 0;
 				$max_points = 0;
+
+				// begin-patch lftestexport
+				$this->loadQuestions($active_id,$this->_getResultPass($active_id));
+				// begin-patch lftestexport
 				foreach ($this->questions as $value)
 				{
 					$question =& ilObjTest::_instanciateQuestion($value);
 					if (is_object($question))
 					{
-						$max_points += $question->getMaximumPoints();
-						$reached_points += $question->getReachedPoints($active_id);
+						// begin-patch skyguide
+						$max_points = $question->getMaximumPoints();
+						$reached_points = $question->getReachedPoints($active_id,$this->_getResultPass($active_id));
+						// end-patch skyguide
 						if ($max_points > 0)
 						{
 							$percentvalue = $reached_points / $max_points;

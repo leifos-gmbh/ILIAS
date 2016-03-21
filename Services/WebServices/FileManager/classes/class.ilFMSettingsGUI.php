@@ -80,6 +80,7 @@ class ilFMSettingsGUI
 			$settings->enable($form->getInput('active'));
 			$settings->enableLocalFS($form->getInput('local'));
 			$settings->setMaxFileSize($form->getInput('filesize'));
+			$settings->setMode($form->getInput('mode'));
 			$settings->update();
 
 			ilUtil::sendSuccess($GLOBALS['lng']->txt('settings_saved'), true);
@@ -107,7 +108,7 @@ class ilFMSettingsGUI
 		$active->setValue(1);
 		$active->setChecked(ilFMSettings::getInstance()->isEnabled());
 		$form->addItem($active);
-
+		
 		// one frame
 		$local = new ilCheckboxInputGUI($GLOBALS['lng']->txt('fm_settings_local'), 'local');
 		$local->setInfo($GLOBALS['lng']->txt('fm_settings_local_info'));
@@ -124,6 +125,14 @@ class ilFMSettingsGUI
 		$fs->setInfo($GLOBALS['lng']->txt('fm_settings_filesize_info'));
 		$fs->setValue(ilFMSettings::getInstance()->getMaxFileSize());
 		$form->addItem($fs);
+		
+		
+		// mode
+		$mode = new ilCheckboxInputGUI($GLOBALS['lng']->txt('fm_settings_mode'), 'mode');
+		$mode->setInfo($GLOBALS['lng']->txt('fm_settings_mode_info'));
+		$mode->setValue(1);
+		$mode->setChecked(ilFMSettings::getInstance()->getMode() == ilFMSettings::MODE_EXPLORER);
+		$form->addItem($mode);
 		
 		return $form;
 	}

@@ -114,10 +114,6 @@ il.Overlay = {
 		// display the overlay at the anchor position
 		el = document.getElementById(id);
 		el.style.display = 'block';
-		
-		// #15431: TBD - should be above main main as default (panels) [#15377 (reverted)]
-		el.style.zIndex = "1200"; 
-		
 		if (anchor_id != null && anchor_id != '') {
 			this.overlays[id].cfg.setProperty("context", [anchor_id, ov_corner, anch_corner]);
 			this.overlays[id].cfg.setProperty("fixedcenter", false);
@@ -243,9 +239,6 @@ il.Overlay = {
 	// hide all overlays
 	hideAllOverlays: function (e, force, omit) {
 		var k, isIn, tgt, el, el_reg;
-		
-		// hide all dropdowns, too!
-		$('[data-toggle="dropdown"]').parent().removeClass('open');
 
 		for (k in il.Overlay.overlays) {
 			isIn = false;
@@ -291,7 +284,7 @@ il.Overlay = {
 				}
 			}
 			*/
-		   
+
 			if (!isIn) {
 				if (k != 'ilHelpPanel') {
 					il.Overlay.hide(null, k);

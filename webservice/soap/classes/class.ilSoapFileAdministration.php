@@ -151,6 +151,8 @@ class ilSoapFileAdministration extends ilSoapAdministration
 			return $this->__raiseError('No File found for id: '.$ref_id,
 									   'Client');
 		}
+		
+		$GLOBALS['ilLog']->write(__METHOD__.': '.$file_xml);
 
    		// Check access
 		$permission_ok = false;
@@ -267,10 +269,12 @@ class ilSoapFileAdministration extends ilSoapAdministration
 		include_once './Modules/File/classes/class.ilFileXMLWriter.php';
 
 		// create writer
-		$xmlWriter = new ilFileXMLWriter();
+		$xmlWriter = new ilFileXMLWriter(true);
 		$xmlWriter->setFile($file);
 		$xmlWriter->setAttachFileContents($attachFileContentsMode);
 		$xmlWriter->start();
+		
+		$GLOBALS['ilLog']->write(__METHOD__.': '.$xmlWriter->xmlDumpMem(true));
 
 		return $xmlWriter->getXML();
 	}

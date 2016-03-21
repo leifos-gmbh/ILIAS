@@ -2348,6 +2348,14 @@ class ilObjCourseGUI extends ilContainerGUI
 		$this->tpl->setVariable('BTN_FOOTER_MAIL',$this->lng->txt('crs_mem_send_mail'));
 		$this->tpl->setVariable('ARROW_DOWN',ilUtil::getImagePath('arrow_downright.svg'));
 		
+		// begin-patch delete_progress
+		include_once './Services/Tracking/classes/class.ilObjUserTracking.php';
+		if(ilObjUserTracking::lookupResetProgressEnabledByType('crs'))
+		{
+			$this->lng->loadLanguageModule('trac');
+			$this->tpl->setVariable('BTN_FOOTER_RESET_MEMBERS',$this->lng->txt('trac_btn_reset_progress'));
+		}
+		// end-patch delete_progress
 	}
 	
 
@@ -3552,8 +3560,9 @@ class ilObjCourseGUI extends ilContainerGUI
 				'ilexportgui'
 			);
 		}
-
-		if ($ilAccess->checkAccess('edit_permission','',$this->ref_id))
+		// begin-patch permissions
+		if ($ilAccess->checkAccess('edit_permission','',$this->ref_id) && $GLOBALS['rbacreview']->isAssigned($GLOBALS['ilUser']->getId(),SYSTEM_ROLE_ID))
+		// end-patch permissions
 		{
 			$tabs_gui->addTarget("perm_settings",
 								 $this->ctrl->getLinkTargetByClass(array(get_class($this),'ilpermissiongui'), "perm"),

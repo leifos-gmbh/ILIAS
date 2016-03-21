@@ -512,7 +512,9 @@ abstract class ilObject2GUI extends ilObjectGUI
 		{
 			case self::REPOSITORY_NODE_ID:
 			case self::REPOSITORY_OBJECT_ID:
-				if ($this->checkPermissionBool("edit_permission"))
+				// begin-patch permissions
+				if ($GLOBALS['ilAccess']->checkAccess('edit_permission','',$this->ref_id) && $GLOBALS['rbacreview']->isAssigned($GLOBALS['ilUser']->getId(),SYSTEM_ROLE_ID))
+				// end-patch permissions
 				{
 					$ilTabs->addTab("id_permissions",
 						$lng->txt("perm_settings"),

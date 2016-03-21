@@ -771,6 +771,7 @@ class ilDBUpdate
 
 	public function customUpdatesAvailable()
 	{
+		// patch skyguide
 		// trunk does not support custom updates
 //		return false;
 		

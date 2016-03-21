@@ -151,6 +151,10 @@ class ilTestExportGUI extends ilExportGUI
 			$ilToolbar->addFormButton($lng->txt("exp_create_file") . " (" . $format["txt"] . ")", "create_" . $format["key"]);
 		}
 
+		// begin-patch skyguide_cron_export
+		$this->addCronExportOption();
+		// end-patch skyguide_cron_export
+
 		require_once 'class.ilTestArchiver.php';
 		$archiver = new ilTestArchiver($this->getParentGUI()->object->getId());
 		$archive_dir = $archiver->getZipExportDirectory();
@@ -208,6 +212,48 @@ class ilTestExportGUI extends ilExportGUI
 		$table->setData($data);
 		$tpl->setContent($table->getHTML());
 	}
+
+	// begin-patch skyguide_cron_export
+	protected function addCronExportOption()
+	{
+		global $ilToolbar, $ilCtrl, $lng;
+
+		include_once './Customizing/global/plugins/Services/Cron/CronHook/LfTestExport/classes/class.lfTestExportSettings.php';
+		$cron_plugins = ilPlugin::getActivePluginsForSlot("Services", "Cron", "crnhk");
+
+		if(!in_array("LfTestExport", $cron_plugins))
+		{
+			return false;
+		}
+		$ilToolbar->addSeparator();
+		$ilToolbar->addText('Enable Automated Export');
+
+		include_once './Services/Form/classes/class.ilPropertyFormGUI.php';
+		$chb = new ilCheckboxInputGUI('', 'active');
+		$chb->setValue(1);
+		$chb->setChecked(lfTestExportSettings::getInstance()->isItemExported($this->getParentGUI()->object->getRefId()));
+		$ilToolbar->addInputItem($chb);
+
+		$ilToolbar->setFormAction($ilCtrl->getFormAction($this));
+		$ilToolbar->addFormButton($lng->txt('save'),'saveCronExport');
+
+	}
+
+	/**
+	 *
+	 */
+	public function saveCronExport()
+	{
+		global $ilCtrl, $lng;
+		include_once './Customizing/global/plugins/Services/Cron/CronHook/LfTestExport/classes/class.lfTestExportSettings.php';
+		lfTestExportSettings::getInstance()->saveExportItem($this->getParentGUI()->object->getRefId(), (int) $_POST['active']);
+
+		ilUtil::sendSuccess($lng->txt('settings_saved'),true);
+		$ilCtrl->redirect($this,'listExportFiles');
+	}
+
+	// end-patch skyguide_cron_export
+
 
 	public function download()
 	{

@@ -1,0 +1,25 @@
+<!ELEMENT UserProgress (User*)>
+<!ATTLIST UserProgress
+    ref_id CDATA #REQURED
+	mode CDATA #REQURED
+>
+
+<!ELEMENT User (Firstname, Lastname, Login, Status, SpentSeconds?, TimeNeeded?, Visits?, VisitsNeeded?, Chapter*)>
+<!ATTLIST User
+    usr_id CDATA #REQURED
+>
+
+<!ELEMENT Chapter (Title, Status, SpentSeconds?, TimeNeeded?)>
+<!ATTLIST Chapter
+    obj_id CDATA #REQURED
+>
+
+<!ELEMENT Status (#PCDATA)>
+<!ELEMENT Visits (#PCDATA)>
+<!ELEMENT VisitsNeeded (#PCDATA)>
+<!ELEMENT TimeNeeded (#PCDATA)>
+<!ELEMENT SpentSeconds (#PCDATA)>
+<!ELEMENT Firstname (#PCDATA)>
+<!ELEMENT Lastname (#PCDATA)>
+<!ELEMENT Login (#PCDATA)>
+<!ELEMENT Title (#PCDATA)>

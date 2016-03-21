@@ -26,6 +26,27 @@ class ilObjFileAccess extends ilObjectAccess
 	// END WebDAV cache inline file extensions
 	
 	protected static $preload_list_gui_data; // [array]
+	
+	
+	// skyguide file lock begin
+	function _checkAccess($a_cmd, $a_permission, $a_ref_id, $a_obj_id, $a_user_id = "")
+	{
+		// skyguide file lock begin
+		
+		if($a_permission == "read")
+		{
+			// if file is locked by some other user, disable download
+			include_once "Modules/File/classes/class.ilObjFile.php";		
+			if(!ilObjFile::downloadForUserEnabled($a_obj_id, $a_user_id)) 			
+			{
+				return false;
+			}
+		}
+		
+		return parent::_checkAccess($a_cmd, $a_permission, $a_ref_id, $a_obj_id, $a_user_id);
+	}
+	
+	// skyguide file lock end
 
 
 	/**
@@ -373,13 +394,20 @@ class ilObjFileAccess extends ilObjectAccess
 			self::$preload_list_gui_data[$row["obj_id"]]["date"] = $row["latest"];	
 		}
 		
-		$set = $ilDB->query("SELECT file_size,version,file_id".
+		// begin-patch revision-state
+		$set = $ilDB->query("SELECT file_size,version,file_id, locked_by, locked_until, locked_download ".
 			" FROM file_data".
 			" WHERE ".$ilDB->in("file_id", $a_obj_ids, "", "integer"));
+		// end-patch revision-state
 		while($row = $ilDB->fetchAssoc($set))
 		{
 			self::$preload_list_gui_data[$row["file_id"]]["size"] = $row["file_size"];	
-			self::$preload_list_gui_data[$row["file_id"]]["version"] = $row["version"];	
+			self::$preload_list_gui_data[$row["file_id"]]["version"] = $row["version"];
+			// begin-patch revision-state
+			self::$preload_list_gui_data[$row["file_id"]]["locked_by"] = $row["locked_by"];
+			self::$preload_list_gui_data[$row["file_id"]]["locked_until"] = $row["locked_until"];
+			self::$preload_list_gui_data[$row["file_id"]]["locked_download"] = $row["locked_download"];
+			// end-patch revision-state
 		}
 	}
 	

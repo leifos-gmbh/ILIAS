@@ -28,6 +28,20 @@ abstract class ilLPCollection
 		}
 	}
 	
+	
+	 // begin-patch delete_progress
+	public static function resetProgressOfUsers($a_obj_id, $a_user_ids)
+	{
+		global $ilDB;
+		$query = 'DELETE FROM ut_lp_coll_manual ' .
+				'WHERE obj_id = ' . $ilDB->quote($a_obj_id, 'integer') . ' ' .
+				'AND ' . $ilDB->in('usr_id', (array) $a_user_ids, false, 'integer');
+		$ilDB->manipulate($query);
+		return true;
+	}
+
+	// end-patch delete_progress
+
 	public static function getInstanceByMode($a_obj_id, $a_mode)
 	{
 		$path = "Services/Tracking/classes/collection/";

@@ -197,6 +197,7 @@ class ilSoapObjectAdministration extends ilSoapAdministration
 
 		$xml_writer = new ilObjectXMLWriter();
 		$xml_writer->enablePermissionCheck(true);
+		$xml_writer->setRequiredPermission('visible');
 		if($user_id)
 		{
 			$xml_writer->setUserId($user_id);

@@ -261,6 +261,25 @@ class ilObjUserTrackingGUI extends ilObjectGUI
 		$user->setInfo($this->lng->txt('trac_anonymized_info'));
 		$user->setChecked(!$this->object->enabledUserRelatedData());
 		$form->addItem($user);
+		
+		// begin-patch delete_tracking
+		$delete = new ilCheckboxInputGUI($this->lng->txt('trac_reset_progress'),'reset_progress');
+		$delete->setInfo($this->lng->txt('trac_reset_progress_info'));
+		$delete->setValue(1);
+		$delete->setChecked($this->object->isResetProgressEnabled());
+		$form->addItem($delete);
+		
+		// for courses
+		$crs_delete = new ilCheckboxInputGUI($this->lng->txt('trac_reset_progress_crs'),'reset_progress_crs');
+		$crs_delete->setValue(1);
+		$crs_delete->setChecked($this->object->isResetProgressEnabledByType('crs'));
+		$delete->addSubItem($crs_delete);
+
+		// for groups
+		$grp_delete = new ilCheckboxInputGUI($this->lng->txt('trac_reset_progress_grp'),'reset_progress_grp');
+		$grp_delete->setValue(1);
+		$grp_delete->setChecked($this->object->isResetProgressEnabledByType('grp'));
+		$delete->addSubItem($grp_delete);
 
 		// Max time gap
 		$valid = new ilNumberInputGUI($this->lng->txt('trac_valid_request'), 'valid_request');
@@ -296,10 +315,9 @@ class ilObjUserTrackingGUI extends ilObjectGUI
 			$user->setDisabled(true);
 			$valid->setDisabled(true);
 		}
-				
 		return $form;
 	}
-
+	
 	/**
 	* save user tracking settings
 	*/
@@ -345,7 +363,15 @@ class ilObjUserTrackingGUI extends ilObjectGUI
 			// $this->object->setLearningProgressDesktop($form->getInput('lp_desktop'));
 			$this->object->setLearningProgressLearner($form->getInput('lp_learner'));
 			$this->object->enableSessionStatistics($form->getInput('session_statistics'));
-			$this->object->setLearningProgressListGUI($form->getInput('lp_list'));							
+			$this->object->setLearningProgressListGUI($form->getInput('lp_list'));
+			
+			// begin-patch delete_progress
+			$this->object->enableResetProgress((bool) $_POST['reset_progress']);
+			$this->object->enableResetProgressByType((bool) $_POST['reset_progress_crs'],'crs');
+			$this->object->enableResetProgressByType((bool) $_POST['reset_progress_grp'],'grp');
+			// end-patch delete_progress
+			
+			
 			$this->object->updateSettings();
 			
 			ilUtil::sendSuccess($this->lng->txt("msg_obj_modified"), true);

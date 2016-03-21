@@ -380,6 +380,7 @@ class ilLDAPQuery
 			$res = $this->queryByScope($this->settings->getUserScope(),strtolower($dn),$filter,$fields);
 		}
 		
+		$GLOBALS['ilLog']->write(__METHOD__.':!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! '.print_r($res,TRUE));
 		
 		$tmp_result = new ilLDAPResult($this->lh,$res);
 		if(!$tmp_result->numRows())

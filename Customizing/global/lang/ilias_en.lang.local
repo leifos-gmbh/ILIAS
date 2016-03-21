@@ -1,0 +1,27 @@
+<!-- language file start -->
+file#:#file_locked#:#Revision State
+file#:#file_lock_duration#:#Duration
+file#:#file_lock_duration_infinite#:#Infinite
+file#:#file_lock_duration_timed#:#Limited
+file#:#file_lock_download#:#Enable Download
+file#:#file_lock_info#:#Current Status
+file#:#file_lock_info_details_limited#:#In revision until %s by %s
+file#:#file_lock_info_details_infinite#:#In unlimited revision by %s
+file#:#file_unlock#:#Unlock
+file#:#file_lock_extend#:#Extend
+file#:#file_keep_lock#:#Keep
+file#:#file_enable_lock#:#Enable Revision State
+common#:#event#:#Status
+fm#:#fm_settings_mode#:#Explorer Mode
+fm#:#fm_settings_mode_info#:#Explorer mode.
+trac#:#trac_reset_progress#:#Delete Progress
+trac#:#trac_reset_progress_crs#:#in Courses
+trac#:#trac_reset_progress_grp#:#in Groups
+trac#:#trac_reset_progress_info#:#If enabled, course or group administrators are allowed to delete the progress of members.
+trac#:#trac_reset_progress#:#Delete Progress
+trac#:#trac_reset_progress_crs#:#in Courses
+trac#:#trac_reset_progress_grp#:#in Groups
+trac#:#trac_reset_progress_info#:#If enabled, course or group administrators are allowed to delete the progress of members.
+trac#:#trac_btn_reset_progress#:#Delete Progress
+trac#:#trac_reset_progress_select_resources#:#Select Resources
+trac#:#trac_resetted_progress#:#Delete progress of selected users.

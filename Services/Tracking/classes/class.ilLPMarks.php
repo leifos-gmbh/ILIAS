@@ -63,6 +63,19 @@ class ilLPMarks
 		$this->__read();
 	}
 	
+	// begin-patch delete_progress
+	public static function resetProgress($a_obj_id, $a_user_ids)
+	{
+		global $ilDB;
+		
+		$query = 'DELETE FROM ut_lp_marks '.
+				'WHERE obj_id = '.$ilDB->quote($a_obj_id,'integer').' '.
+				'AND '.$ilDB->in('usr_id',$a_user_ids,false,'integer');
+		$ilDB->manipulate($query);
+		return true;
+	}
+	// begin-patch delete_progress
+	
 	/**
 	 * Delete object
 	 *

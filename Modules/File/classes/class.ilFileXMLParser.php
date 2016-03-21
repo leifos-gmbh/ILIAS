@@ -142,6 +142,25 @@ class ilFileXMLParser extends ilSaxParser
 		
 		switch($a_name)
 		{
+			// skyguide file lock begin
+			case 'Lock':
+				
+				if(!$a_attribs['user_id'])
+				{
+					$this->file->removeLock();
+				}
+				else
+				{
+					$until = (int) $a_attribs["until"];
+					if(!$until)
+					{
+						$until = -1;
+					}
+					$this->file->setLock((int)$a_attribs["user_id"], $until, (bool)$a_attribs["enable_download"]);
+				}
+				break;			
+			// skyguide file lock end
+			
 			case 'File':
 			    if (isset($a_attribs["obj_id"]))
 			    {
@@ -155,9 +174,17 @@ class ilFileXMLParser extends ilSaxParser
                 {
 					$this->file->setFileType($a_attribs["type"]);
                 }
-                   $this->file->setVersion($this->file->getVersion() + 1);
+				// skyguide file lock begin
+				#$this->file->setVersion($this->file->getVersion() + 1);
+				// skyguide file lock end
 				break;
+				
 			case 'Content':
+				
+				// skyguide file lock begin
+				$this->file->setVersion($this->file->getVersion() + 1);
+				// skyguide file lock end
+				
 				$this->tmpFilename = ilUtil::ilTempnam();
 			    $this->mode = ilFileXMLParser::$CONTENT_NOT_COMPRESSED;
 			    $this->isReadingFile = true;

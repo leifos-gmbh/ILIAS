@@ -1,0 +1,27 @@
+<!-- language file start -->
+file#:#file_locked#:#Bearbeitungsstatus
+file#:#file_lock_duration#:#Dauer
+file#:#file_lock_duration_infinite#:#Unbegrenzt
+file#:#file_lock_duration_timed#:#Limitiert
+file#:#file_lock_download#:#Dateidownload zulassen
+file#:#file_lock_info#:#Aktueller Status
+file#:#file_lock_info_details_limited#:#In Bearbeitung bis zum %s durch %s
+file#:#file_lock_info_details_infinite#:#In unbegrenzter Bearbeitung durch %s
+file#:#file_unlock#:#Freigeben
+file#:#file_lock_extend#:#Verlängern
+file#:#file_keep_lock#:#Beibehalten
+file#:#file_enable_lock#:#Bearbeitungsstatus aktivieren
+common#:#event#:#Status
+fm#:#fm_settings_mode#:#Explorer Mode
+fm#:#fm_settings_mode_info#:#Explorer mode.
+trac#:#trac_reset_progress#:#Fortschrittsdaten löschen
+trac#:#trac_reset_progress_crs#:#in Kursen
+trac#:#trac_reset_progress_grp#:#in Gruppen
+trac#:#trac_reset_progress_info#:#Wenn aktiviert, haben Kurs- bzw. Gruppenadministratoren die Möglichkeit, Fortschrittsdaten der Mitgliedern zu löschen.
+trac#:#trac_reset_progress#:#Fortschrittsdaten löschen
+trac#:#trac_reset_progress_crs#:#in Kursen
+trac#:#trac_reset_progress_grp#:#in Gruppen
+trac#:#trac_reset_progress_info#:#Wenn aktiviert, haben Kurs- bzw. Gruppenadministratoren die Möglichkeit, Fortschrittsdaten der Mitgliedern zu löschen.
+trac#:#trac_btn_reset_progress#:#Fortschrittsdaten löschen
+trac#:#trac_reset_progress_select_ressources#:#Objekte auswählen
+trac#:#trac_resetted_progress#:#Die Fortschrittsdaten der ausgewählten Benutzer wurden gelöscht.

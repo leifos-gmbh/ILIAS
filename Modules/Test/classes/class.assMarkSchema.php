@@ -236,23 +236,25 @@ class ASS_MarkSchema
 	 */
 	public function sort() 
 	{
-		function level_sort($a, $b) 
-		{
-			if ($a->getMinimumLevel() == $b->getMinimumLevel()) 
+		usort(
+			$this->mark_steps,
+			function($a, $b) 
 			{
-				$res = strcmp($a->getShortName(), $b->getShortName());
-				if ($res == 0) 
+				if ($a->getMinimumLevel() == $b->getMinimumLevel()) 
 				{
-					return strcmp($a->getOfficialName(), $b->getOfficialName());
+					$res = strcmp($a->getShortName(), $b->getShortName());
+					if ($res == 0) 
+					{
+						return strcmp($a->getOfficialName(), $b->getOfficialName());
+					}
+					else 
+					{
+						return $res;
+					}
 				}
-				else 
-				{
-					return $res;
-				}
+				return ($a->getMinimumLevel() < $b->getMinimumLevel()) ? -1 : 1;
 			}
-			return ($a->getMinimumLevel() < $b->getMinimumLevel()) ? -1 : 1;
-		}
-		usort($this->mark_steps, 'level_sort');
+		);
 	}
   
 	/**

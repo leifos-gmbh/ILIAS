@@ -1310,13 +1310,44 @@ class ilNusoapUserAdministrationAdapter
 					'type_filter' => 'tns:stringArray',
 					'progress_filter' => 'tns:intArray'
 				),
-				array('status' => 'xsd:boolean'),
+				array('status' => 'xsd:string'),
 				SERVICE_NAMESPACE,
 				SERVICE_NAMESPACE.'#deleteProgress',
 				SERVICE_STYLE,
 				SERVICE_USE,
 				'Delete user progress data of objects. '
 			);
+
+		$this->server->register('getProgress',
+			array(
+				'sid' => 'xsd:string',
+				'ref_id' => 'xsd:int',
+				'usr_names' => 'tns:stringArray',
+				'progress_status' => 'tns:intArray',
+			),
+			array('lp_data' => 'xsd:string'),
+			SERVICE_NAMESPACE,
+			SERVICE_NAMESPACE.'#getProgress',
+			SERVICE_STYLE,
+			SERVICE_USE,
+			'Bietet die Möglichkeit den Lernfortschritt eines oder mehrerer Benutzer zu ermitteln. '
+		);
+
+
+		$this->server->register('updateProgress',
+			array(
+				'sid' => 'xsd:string',
+				'ref_id' => 'xsd:int',
+				'usr_names' => 'tns:stringArray',
+				'progress_xml' => 'xsd:string',
+			),
+			array('status' => 'xsd:string'),
+			SERVICE_NAMESPACE,
+			SERVICE_NAMESPACE.'#updateProgress',
+			SERVICE_STYLE,
+			SERVICE_USE,
+			'Bietet die Möglichkeit den Lernfortschritt eines oder mehrerer Benutzer zu Manipulieren. '
+		);
 		
 		
 		$this->server->register(

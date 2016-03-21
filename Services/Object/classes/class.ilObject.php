@@ -140,6 +140,19 @@ class ilObject
 
 		$ilBench->stop("Core", "ilObject_Constructor");
 	}
+	
+	 // begin-patch delete_progress
+	public function resetProgress($a_user_ids)
+	{
+		include_once './Services/Tracking/classes/class.ilChangeEvent.php';
+		ilChangeEvent::resetReadEvents($this->getId(), $a_user_ids);
+		include_once './Services/Tracking/classes/collection/class.ilLPCollection.php';
+		ilLPCollection::resetProgressOfUsers($this->getId(), $a_user_ids);
+		include_once './Services/Tracking/classes/class.ilLPMarks.php';
+		ilLPMarks::resetProgress($this->getId(), $a_user_ids);
+	}
+
+// end-patch delete_progress
 
 	/**
 	* determines wehter objects are referenced or not (got ref ids or not)

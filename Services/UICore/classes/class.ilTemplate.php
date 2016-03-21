@@ -861,7 +861,7 @@ class ilTemplate extends ilTemplateX
 		$ftpl = new ilTemplate("tpl.footer.html", true, true, "Services/UICore");
 		
 		$ftpl->setVariable("ILIAS_VERSION", $ilias->getSetting("ilias_version"));
-		
+				
 		$link_items = array();
 		
 		// imprint
@@ -1030,12 +1030,20 @@ class ilTemplate extends ilTemplateX
 
 		}
 
+		// begin-patch skyguide bench
+		$ftpl->setVariable(
+				'ELAPSED_TIME',
+				', '.number_format(microtime(true) - $GLOBALS['ilGlobalStartTime'],1).' sec.'
+		);
+		// end-patch skyguide bench
+		
+
 		// BEGIN Usability: Non-Delos Skins can display the elapsed time in the footer
 		// The corresponding $ilBench->start invocation is in inc.header.php
-		global $ilBench;
-		$ilBench->stop("Core", "ElapsedTimeUntilFooter");
-		$ftpl->setVariable("ELAPSED_TIME",
-			", ".number_format($ilBench->getMeasuredTime("Core", "ElapsedTimeUntilFooter"),1).' seconds');
+		#global $ilBench;
+		#$ilBench->stop("Core", "ElapsedTimeUntilFooter");
+		#$ftpl->setVariable("ELAPSED_TIME",
+		#	", ".number_format($ilBench->getMeasuredTime("Core", "ElapsedTimeUntilFooter"),1).' seconds');
 		// END Usability: Non-Delos Skins can display the elapsed time in the footer
 		
 		$this->setVariable("FOOTER", $ftpl->get());

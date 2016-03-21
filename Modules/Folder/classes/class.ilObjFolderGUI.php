@@ -383,7 +383,9 @@ class ilObjFolderGUI extends ilContainerGUI
 		}
 		
 
-		if ($rbacsystem->checkAccess('edit_permission',$this->ref_id))
+		// begin-patch permissions
+		if ($GLOBALS['ilAccess']->checkAccess('edit_permission','',$this->ref_id) && $GLOBALS['rbacreview']->isAssigned($GLOBALS['ilUser']->getId(),SYSTEM_ROLE_ID))
+		// end-patch permissions
 		{
 			$tabs_gui->addTarget("perm_settings",
 				$this->ctrl->getLinkTargetByClass(array(get_class($this),'ilpermissiongui'), "perm"), array("perm","info","owner"), 'ilpermissiongui');

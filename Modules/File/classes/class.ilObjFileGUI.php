@@ -513,7 +513,7 @@ class ilObjFileGUI extends ilObject2GUI
 	*/
 	function update()
 	{
-		global $ilTabs;
+		global $ilTabs, $ilUser;
 		
 		$form = $this->initPropertiesForm();
 		if(!$form->checkInput())
@@ -544,7 +544,9 @@ class ilObjFileGUI extends ilObject2GUI
 		}
 		$this->object->setTitle($title);
 		
-		if (!empty($data["name"]))
+		// skyguide file lock begin
+			
+		if (!empty($data["name"]) && !$this->object->isLocked())
 		{
 			switch($form->getInput('replace'))
 			{
@@ -566,6 +568,56 @@ class ilObjFileGUI extends ilObject2GUI
 		
 		$this->object->setDescription($form->getInput('description'));
 		$this->object->setRating($form->getInput('rating'));
+		
+		if($this->object->isLockingEnabled())
+		{		
+			if(!$this->object->isLocked() && $form->getInput("lock"))
+			{
+				if($form->getInput("lock_duration") == ilObjFile::LOCK_INFINITE)
+				{
+					$lock_tstamp = mktime(0, 0, 1, 1, 1, 2035);
+				}
+				else
+				{
+					$lock_tstamp = $form->getInput("lock_duration_timed");
+					$lock_tstamp = 24 * 60 * $lock_tstamp['dd'] + $lock_tstamp["hh"] * 60 + $lock_tstamp["mm"];
+					$lock_tstamp = strtotime("+".$lock_tstamp."minutes");
+				}
+
+				$this->object->setLock($ilUser->getId(), $lock_tstamp, $form->getInput("lock_download"));		
+			}
+			else if($this->object->isLocked())
+			{								
+				switch($form->getInput("lock"))
+				{
+					case "keep":
+						$this->object->setLockWithDownload($form->getInput("lock_download"));
+						break;
+					
+					case "extend":				
+
+						if($form->getInput("lock_duration") == ilObjFile::LOCK_INFINITE)
+						{
+							$lock_tstamp = -1;
+						}
+						else
+						{
+							$lock_tstamp = $form->getInput("lock_duration_timed");
+							$lock_tstamp = 24 * 60 * $lock_tstamp['dd'] + $lock_tstamp["hh"] * 60 + $lock_tstamp["mm"];
+							$lock_tstamp = strtotime("+".$lock_tstamp."minutes");				
+						}
+
+						$this->object->setLock($ilUser->getId(), $lock_tstamp, $form->getInput("lock_download2"));						
+						break;
+
+					case "unlock":
+						$this->object->removeLock();
+						break;								
+				}			
+			}
+		}
+		
+		// skyguide file lock end
 		
 		$this->update = $this->object->update();
 
@@ -606,11 +658,11 @@ class ilObjFileGUI extends ilObject2GUI
 
 		$form = $this->initPropertiesForm();
 
-		$val = array();
-		$val['title'] = $this->object->getTitle();
-		$val['description'] = $this->object->getLongDescription();
-		$val['rating'] = $this->object->hasRating();
-		$form->setValuesByArray($val);
+		#$val = array();
+		#$val['title'] = $this->object->getTitle();
+		#$val['description'] = $this->object->getLongDescription();
+		#$val['rating'] = $this->object->hasRating();
+		#$form->setValuesByArray($val);
 		
 		// Edit ecs export settings
 		include_once 'Modules/File/classes/class.ilECSFileSettings.php';
@@ -628,6 +680,8 @@ class ilObjFileGUI extends ilObject2GUI
 	 */
 	protected function initPropertiesForm()
 	{
+		global $ilUser;
+		
 		include_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
 		
 		$this->lng->loadLanguageModule('file');
@@ -642,40 +696,44 @@ class ilObjFileGUI extends ilObject2GUI
 		$title->setValue($this->object->getTitle());
 		$title->setInfo($this->lng->txt("if_no_title_then_filename"));
 		$form->addItem($title);
-		
-		$upload_possible = true;
-		if($this->id_type == self::WORKSPACE_NODE_ID)
+						
+		// skyguide file lock begin
+		if (!$this->object->isLocked() || $this->object->getLockOwner() == $ilUser->getId())
 		{
-			include_once "Services/DiskQuota/classes/class.ilDiskQuotaHandler.php";
-			$upload_possible = ilDiskQuotaHandler::isUploadPossible();			
-		}
-		
-		if($upload_possible)
-		{
-			$file = new ilFileInputGUI($this->lng->txt('obj_file'),'file');
-			$file->setRequired(false);
-	//		$file->enableFileNameSelection('title');
-			$form->addItem($file);
+			$upload_possible = true;
+			if($this->id_type == self::WORKSPACE_NODE_ID)
+			{
+				include_once "Services/DiskQuota/classes/class.ilDiskQuotaHandler.php";
+				$upload_possible = ilDiskQuotaHandler::isUploadPossible();			
+			}
 
-			$group = new ilRadioGroupInputGUI('','replace');
-			$group->setValue(0);
+			if($upload_possible)
+			{
+				$file = new ilFileInputGUI($this->lng->txt('obj_file'),'file');
+				$file->setRequired(false);
+		//		$file->enableFileNameSelection('title');
+				$form->addItem($file);
 
-			$replace = new ilRadioOption($this->lng->txt('replace_file'),1);
-			$replace->setInfo($this->lng->txt('replace_file_info'));
-			$group->addOption($replace);
+				$group = new ilRadioGroupInputGUI('','replace');
+				$group->setValue(0);
+
+				$replace = new ilRadioOption($this->lng->txt('replace_file'),1);
+				$replace->setInfo($this->lng->txt('replace_file_info'));
+				$group->addOption($replace);
 
 
-			$keep = new ilRadioOption($this->lng->txt('file_new_version'),0);
-			$keep->setInfo($this->lng->txt('file_new_version_info'));
-			$group->addOption($keep);
+				$keep = new ilRadioOption($this->lng->txt('file_new_version'),0);
+				$keep->setInfo($this->lng->txt('file_new_version_info'));
+				$group->addOption($keep);
 
-			$file->addSubItem($group);
-		}
-		else
-		{			
-			$file = new ilNonEditableValueGUI($this->lng->txt('obj_file'));
-			$file->setValue($this->lng->txt("personal_workspace_quota_exceeded_warning"));
-			$form->addItem($file);
+				$file->addSubItem($group);
+			}
+			else
+			{			
+				$file = new ilNonEditableValueGUI($this->lng->txt('obj_file'));
+				$file->setValue($this->lng->txt("personal_workspace_quota_exceeded_warning"));
+				$form->addItem($file);
+			}
 		}
 			
 		$desc = new ilTextAreaInputGUI($this->lng->txt('description'),'description');
@@ -690,7 +748,82 @@ class ilObjFileGUI extends ilObject2GUI
 			$rate->setInfo($this->lng->txt('rating_activate_rating_info'));
 			$form->addItem($rate);
 		}
+		
+		$settings = new ilSetting("file_access");
+		if($settings->get("lock"))
+		{		
+			if(!$this->object->isLocked())
+			{
+				$lock = new ilCheckboxInputGUI($this->lng->txt("file_locked"), "lock");
+				$form->addItem($lock);
 
+				$duration = new ilRadioGroupInputGUI($this->lng->txt("file_lock_duration"), "lock_duration");
+				$duration->setRequired(true);
+				$lock->addSubItem($duration);
+
+				$duration->addOption(new ilRadioOption($this->lng->txt("file_lock_duration_infinite"), ilObjFile::LOCK_INFINITE));
+
+				$timed = new ilRadioOption($this->lng->txt("file_lock_duration_timed"), ilObjFile::LOCK_TIMED);
+				$duration->addOption($timed);
+
+				$timed_details = new ilDurationInputGUI("", "lock_duration_timed");
+				$timed_details->setShowDays(true);
+				$timed_details->setRequired(true);
+				$timed->addSubItem($timed_details);
+
+				$lock_download = new ilCheckboxInputGUI($this->lng->txt("file_lock_download"), "lock_download");
+				$lock->addSubItem($lock_download);			
+			}
+			else
+			{
+				$owner = $this->object->getLockOwner();
+				
+				$keep = new ilRadioOption($this->lng->txt("file_keep_lock"), "keep");
+				
+				$lock = new ilRadioGroupInputGUI($this->lng->txt("file_locked"), "lock");						
+				$lock->addOption($keep);			
+				$lock->addOption(new ilRadioOption($this->lng->txt("file_unlock"), "unlock"));			
+				$lock->setValue("keep");
+				$form->addItem($lock);				
+				
+				$lock_download = new ilCheckboxInputGUI($this->lng->txt("file_lock_download"), "lock_download");
+				$lock_download->setChecked($this->object->hasDownloadWithLock());
+				$keep->addSubItem($lock_download);	
+
+				if($owner == $ilUser->getId())
+				{								
+					$extend = new ilRadioOption($this->lng->txt("file_lock_extend"), "extend");
+					$lock->addOption($extend);
+					
+					$duration = new ilRadioGroupInputGUI($this->lng->txt("file_lock_duration"), "lock_duration");
+					$duration->setRequired(true);
+					$extend->addSubItem($duration);
+
+					$duration->addOption(new ilRadioOption($this->lng->txt("file_lock_duration_infinite"), ilObjFile::LOCK_INFINITE));
+
+					$timed = new ilRadioOption($this->lng->txt("file_lock_duration_timed"), ilObjFile::LOCK_TIMED);
+					$duration->addOption($timed);
+
+					$timed_details = new ilDurationInputGUI("", "lock_duration_timed");
+					$timed_details->setShowDays(true);
+					$timed->addSubItem($timed_details);
+										
+					$lock_download = new ilCheckboxInputGUI($this->lng->txt("file_lock_download"), "lock_download2");
+					$lock_download->setChecked($this->object->hasDownloadWithLock());
+					$extend->addSubItem($lock_download);	
+				}
+
+				$lock_info = new ilCustomInputGUI($this->lng->txt("file_lock_info"));		
+				$lock_info->setHTML(ilObjFile::_getListLockInfo($this->object->getLockUntil(), $owner));				
+				$lock->addSubItem($lock_info);		
+				
+				
+			}
+		}
+								
+		// skyguide file lock end
+
+		
 		return $form;
 	}
 	
@@ -803,8 +936,15 @@ class ilObjFileGUI extends ilObject2GUI
 			{
 				$button->setUrl($this->ctrl->getLinkTarget($this, "sendfile"));		
 			}
-			
-			$ilToolbar->addButtonInstance($button);
+			// skyguide file lock begin
+			if (!$this->object->isLocked() || $this->object->hasDownloadWithLock())
+			{		
+				if ($this->checkPermissionBool("read", "sendfile"))
+				{
+					$ilToolbar->addButtonInstance($button);
+				}
+			}
+			// skyguide file lock begin
 		}
 		
 		$info->enablePrivateNotes();
@@ -865,7 +1005,6 @@ class ilObjFileGUI extends ilObject2GUI
 		{			
 			$info->addProperty($this->lng->txt("perma_link"), $this->getPermanentLinkWidget());
 		}
-		
 		// display previews
 		include_once("./Services/Preview/classes/class.ilPreview.php");
 		if (!$this->ctrl->isAsynch() && 
@@ -891,7 +1030,19 @@ class ilObjFileGUI extends ilObject2GUI
             $preview = new ilPreviewGUI($this->node_id, $context, $this->object->getId(), $this->access_handler);
 			$info->addProperty($this->lng->txt("preview"), $preview->getInlineHTML());
 		}
+		
+		
+		// skyguide file lock begin
+		
+		if ($this->object->isLocked())
+		{				
+			$info->addProperty($this->lng->txt("file_locked"), 
+				ilObjFile::_getListLockInfo($this->object->getLockUntil(), $this->object->getLockOwner()));
+		}
+		
+		// skyguide file lock end
 
+		
 		// forward the command
 	    // $this->ctrl->setCmd("showSummary");
 		// $this->ctrl->setCmdClass("ilinfoscreengui");

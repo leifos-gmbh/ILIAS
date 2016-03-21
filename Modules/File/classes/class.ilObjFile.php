@@ -26,6 +26,18 @@ class ilObjFile extends ilObject2
 	
 	private $file_storage = null;
 	protected $log = null;
+	
+	// skyguide file lock begin
+	
+	const LOCK_INFINITE = 1;
+	const LOCK_TIMED = 2;
+	
+	var $locked_by;
+	var $locked_until;
+	var $locked_download;
+	var $locking_enabled;
+	
+	// skyguide file lock end
 
 
 	/**
@@ -35,7 +47,16 @@ class ilObjFile extends ilObject2
 	* @param	boolean	treat the id as reference_id (true) or object_id (false)
 	*/
 	function __construct($a_id = 0,$a_call_by_reference = true)
-	{
+	{			
+		// skyguide file lock begin
+		
+		include_once "Services/Administration/classes/class.ilSetting.php";
+		$settings = new ilSetting("file_access");		
+		$this->locking_enabled = (bool)$settings->get("lock");
+	
+		// skyguide file lock end
+		
+		
 		$this->version = 0;
 		$this->raise_upload_error = true;
 
@@ -46,7 +67,7 @@ class ilObjFile extends ilObject2
 		if($this->getId())
 		{
 			$this->initFileStorage();
-		}
+		}				
 	}
 
 	/**
@@ -404,6 +425,13 @@ class ilObjFile extends ilObject2
 		$this->setMode($row->f_mode);
 		$this->setRating($row->rating);
 		
+		// skyguide file lock begin
+		if($this->isLockingEnabled() && $row->locked_until && $row->locked_until > time())
+		{
+			$this->setLock($row->locked_by, $row->locked_until, $row->locked_download);		
+		}
+		// skyguide file lock end
+		
 		$this->initFileStorage();
 	}
 
@@ -433,6 +461,11 @@ class ilObjFile extends ilObject2
 			", version = ".$ilDB->quote($this->getVersion() ,'integer')." ".
 			", f_mode = ".$ilDB->quote($this->getMode() ,'text')." ".
 			", rating = ".$ilDB->quote($this->hasRating() ,'integer')." ".
+			// skyguide file lock begin
+			", locked_by = ".$ilDB->quote($this->getLockOwner() ,'integer')." ".
+			", locked_until = ".$ilDB->quote($this->getLockUntil() ,'integer')." ".
+			", locked_download = ".$ilDB->quote($this->hasDownloadWithLock(),'integer')." ".
+			// skyguide file lock end
 			"WHERE file_id = ".$ilDB->quote($this->getId() ,'integer');
 		$res = $ilDB->manipulate($q);
 		
@@ -1233,7 +1266,6 @@ class ilObjFile extends ilObject2
 		$dest_dir = $this->getDirectory($new_version_nr);
 		if (@!is_dir($dest_dir))
 			ilUtil::makeDir($dest_dir);
-
 		copy($source_path, $dest_dir . "/" . $source["filename"]);
 		
 		// create new history entry based on the old one
@@ -1257,6 +1289,183 @@ class ilObjFile extends ilObject2
 		return $new_version;
 	}
 	
+	
+	
+	// skyguide file lock begin
+	
+	/**
+	 * Is locking feature active?
+	 * 
+	 * @return bool 
+	 */
+	public function isLockingEnabled()
+	{
+		return $this->locking_enabled;
+	}
+	
+	/**
+	 * Is file currently locked?
+	 * 
+	 * @return bool 
+	 */
+	public function isLocked()
+	{
+		if($this->locked_until && $this->locked_until > time())
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Get locked by user id
+	 *
+	 * @return int 
+	 */
+	public function getLockOwner()
+	{
+		return $this->locked_by;
+	}
+	
+	/**
+	 * Get lock limit
+	 * 
+	 * @return timestamp
+	 */
+	public function getLockUntil()
+	{
+		return $this->locked_until;
+	}
+	
+	/**
+	 * Download available if locked?
+	 * 
+	 * @return bool
+	 */
+	public function hasDownloadWithLock()
+	{
+		return (bool)$this->locked_download;
+	}
+	
+	/**
+	 * Toggle download status while locked
+	 *
+	 * @param bool $a_value 
+	 */
+	public function setLockWithDownload($a_value)
+	{
+		$this->locked_download = (bool)$a_value;
+	}
+	
+	/**
+	 * Is the current lock limited?
+	 * 
+	 * @return bool
+	 */
+	public function hasInfiniteLock()
+	{
+		if($this->isLocked())
+		{
+			return ($this->locked_until == mktime(0, 0, 1, 1, 1, 2035));
+		}
+	}
+	
+	/**
+	 * Add lock
+	 * 
+	 * @param int $a_user_id
+	 * @param int $a_until
+	 * @param bool $a_download 
+	 */
+	public function setLock($a_user_id, $a_until, $a_download = null)
+	{
+		if(!$this->isLockingEnabled())
+		{
+			return;
+		}
+		
+		$this->locked_by = (int)$a_user_id;
+		
+		if($a_until == -1)
+		{
+			$a_until = mktime(0, 0, 1, 1, 1, 2035);
+		}
+		$this->locked_until = (int)$a_until;
+		
+		if($a_download !== null)
+		{
+			$this->setLockWithDownload($a_download);
+		}
+	}
+	
+	/**
+	 * Remove lock 
+	 */
+	public function removeLock()
+	{
+		$this->locked_by = null;
+		$this->locked_until = null;
+		$this->locked_download = null;
+	}
+	
+	/** 
+	 * Parse lock info for list gui
+	 * 
+	 * @param int $a_locked_until
+	 * @param int $a_locked_by
+	 * @return string
+	 */
+	public static function _getListLockInfo($a_locked_until, $a_locked_by)
+	{
+		global $lng;
+		
+		$lng->loadLanguageModule("file");
+	
+		if($a_locked_until)
+		{			
+			include_once "Services/User/classes/class.ilUserUtil.php";
+			if($a_locked_until != mktime(0, 0, 1, 1, 1, 2035))
+			{			
+				$lock_until = ilDatePresentation::formatDate(new ilDateTime($a_locked_until, IL_CAL_UNIX));
+				return sprintf($lng->txt("file_lock_info_details_limited"), 
+					$lock_until, ilUserUtil::getNamePresentation($a_locked_by));
+			}
+			else
+			{
+				return sprintf($lng->txt("file_lock_info_details_infinite"), 
+					ilUserUtil::getNamePresentation($a_locked_by));
+			}			
+		}
+	}
+	
+	/**
+	 * Check if file download is enabled for given user
+	 * 
+	 * @param int $a_obj_id
+	 * @param int $a_user_id 
+	 * @return bool
+	 */
+	public static function downloadForUserEnabled($a_obj_id, $a_user_id = null)
+	{
+		global $ilDB, $ilUser;
+	
+		$user_id = $a_user_id ? $a_user_id : $ilUser->getId();		
+		
+		$sql = "SELECT locked_by, locked_until, locked_download".
+			" FROM file_data".
+			" WHERE file_id = ".$ilDB->quote($a_obj_id, "integer");
+		$set = $ilDB->query($sql);
+		$row = $ilDB->fetchAssoc($set);
+		
+		// valid lock by other user which does not enable download
+		if($row["locked_by"] && $row["locked_by"] != $user_id && 
+			$row["locked_until"] > time() &&
+			!$row["locked_download"])
+		{			
+			return false;			
+		}
+		return true;
+	}
 	/**
 	 * Updates the file object with the specified file version.
 	 * 
@@ -1276,7 +1485,6 @@ class ilObjFile extends ilObject2
 		
 		// set filesize
 		$this->determineFileSize();
-
 		$this->update();	
 		
 		// refresh preview

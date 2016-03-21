@@ -119,7 +119,7 @@ class ilLDAPResult
  			$data = array();
 		 	foreach($this->entries[$row_counter] as $key => $value)
 	 		{
-		 		$key = strtolower($key);
+				$key = strtolower($key);
 				
 		 		if(is_int($key))
 		 		{

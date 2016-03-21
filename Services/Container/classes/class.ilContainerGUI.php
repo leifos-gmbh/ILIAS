@@ -1231,7 +1231,9 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 		global $rbacsystem, $ilCtrl;
 
 		// edit permissions
-		if ($rbacsystem->checkAccess('edit_permission',$this->ref_id))
+		// begin-patch permissions
+		if ($GLOBALS['ilAccess']->checkAccess('edit_permission','',$this->ref_id) && $GLOBALS['rbacreview']->isAssigned($GLOBALS['ilUser']->getId(),SYSTEM_ROLE_ID))
+		// end-patch permissions
 		{
 			$tabs_gui->addTarget("perm_settings",
 				$this->ctrl->getLinkTargetByClass(array(get_class($this),'ilpermissiongui'), "perm"),
@@ -3606,6 +3608,73 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 		return $lg;
 	}
 
+	protected function fileManagerLaunchErrorObject()
+	{
+		global $tpl;
+
+
+
+		ilUtil::sendFailure("The application could not be started. Please contact the help desk!");
+		$tpl->addBlockFile(
+			"ADM_CONTENT",
+			"adm_content",
+			'tpl.fm_launch_failure.html',
+			"Services/WebServices/FileManager"
+		);
+		$tpl->setVariable('IMG_SRC',ilUtil::getImagePath('sc.png','Services/WebServices/FileManager'));
+	}
+	
+	// begin-patch delete_progress
+	/**
+	 * Selection of object types for member data reset
+	 */
+	protected function resetMembersSelectionObject()
+	{
+		$GLOBALS['ilTabs']->clearTargets();
+		$GLOBALS['ilTabs']->setBackTarget($this->lng->txt('back'),$GLOBALS['ilCtrl']->getLinkTarget($this,'members'));
+		
+		$selected = array_unique(array_merge(
+			(array) ($_POST['todelete'] ? unserialize($_POST['todelete']) : array()),
+			(array) $_POST['members'],
+			(array) $_POST['tutors'],
+			(array) $_POST['admins']
+		));
+		
+		if(!count($selected))
+		{
+			ilUtil::sendFailure($this->lng->txt('select_one'),true);
+			$GLOBALS['ilCtrl']->redirect($this,'members');
+		}
+		include_once './Services/Tracking/classes/class.ilResetProgressSelectionTableGUI.php';
+		$selection = new ilResetProgressSelectionTableGUI($this, 'resetMembersSelection');
+		$selection->storeSelectedUsers($selected);
+		$selection->parseContainer($this->object->getRefId());
+		$GLOBALS['tpl']->setContent($selection->getHTML());
+	}
+
+	/**
+	 * do reset members progress
+	 */
+	protected function resetMembersProgressObject()
+	{
+		$selected = unserialize($_POST['todelete']);
+		foreach((array) $_POST['items'] as $ref_id)
+		{
+			include_once './Services/Object/classes/class.ilObjectFactory.php';
+			$obj = ilObjectFactory::getInstanceByRefId($ref_id,false);
+			if(!$obj instanceof ilObject)
+			{
+				continue;
+			}
+			$obj->resetProgress($selected);
+		}
+		
+		$this->lng->loadLanguageModule('trac');
+		ilUtil::sendSuccess($this->lng->txt('trac_resetted_progress'),true);
+		$GLOBALS['ilCtrl']->redirect($this,'members');
+	}
+	// end-patch delete_progress
+	
 	/**
 	 * Launch jnlp
 	 */
@@ -3623,6 +3692,17 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 		$tpl->setVariable('REST_URI',ILIAS_HTTP_PATH.'/Services/WebServices/Rest/server.php');
 		$tpl->setVariable('FILE_LOCKS',0);
 		$tpl->setVariable('UPLOAD_FILESIZE',  ilFMSettings::getInstance()->getMaxFileSize());
+
+		$set = new ilSetting('file_access');
+		if($set->get('lock'))
+		{
+			$tpl->setVariable('FILE_LOCKS',1);
+		}
+		else
+		{
+			$tpl->setVariable('FILE_LOCKS',0);
+		}
+		$tpl->setVariable('EXPLORER_MODE',  (ilFMSettings::getInstance()->getMode() == ilFMSettings::MODE_EXPLORER) ? 1 : 0);
 
 		include_once("./Modules/SystemFolder/classes/class.ilObjSystemFolder.php");
 		$header_top_title = ilObjSystemFolder::_getHeaderTitle();

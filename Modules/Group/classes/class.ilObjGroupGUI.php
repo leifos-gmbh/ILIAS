@@ -1161,7 +1161,15 @@ class ilObjGroupGUI extends ilContainerGUI
 		$this->tpl->setVariable('BTN_FOOTER_VAL',$this->lng->txt('remove'));
 		$this->tpl->setVariable('BTN_FOOTER_MAIL',$this->lng->txt('grp_mem_send_mail'));
 		$this->tpl->setVariable('ARROW_DOWN',ilUtil::getImagePath('arrow_downright.svg'));
-		
+
+		// begin-patch delete_progress
+		include_once './Services/Tracking/classes/class.ilObjUserTracking.php';
+		if(ilObjUserTracking::lookupResetProgressEnabledByType('crs'))
+		{
+			$this->lng->loadLanguageModule('trac');
+			$this->tpl->setVariable('BTN_FOOTER_RESET_MEMBERS',$this->lng->txt('trac_btn_reset_progress'));
+		}
+		// end-patch delete_progress
 	}
 	
 	/**

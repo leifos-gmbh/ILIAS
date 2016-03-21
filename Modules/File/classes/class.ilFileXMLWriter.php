@@ -45,6 +45,10 @@ class ilFileXMLWriter extends ilXmlWriter
 	var $file;
 
 	var $omit_header = false;
+	
+	// skyguide file lock begin
+	var $export_lock = false;
+	// skyguide file lock end
 
 	/**
 	* constructor
@@ -53,10 +57,14 @@ class ilFileXMLWriter extends ilXmlWriter
 	* @param	string	input encoding
 	* @access	public
 	*/
-	function ilFileXMLWriter()
+	function ilFileXMLWriter($a_export_lock = false)
 	{
 		parent::ilXmlWriter();
 		$this->attachFileContents = ilFileXMLWriter::$CONTENT_ATTACH_NO;
+		
+		// skyguide file lock begin
+		$this->export_lock = (bool)$a_export_lock;
+		// skyguide file lock end
 	}
 
 
@@ -129,7 +137,7 @@ class ilFileXMLWriter extends ilXmlWriter
 		  "size" => $this->file->getFileSize(),
 		  "type" => $this->file->getFileType()
 		);
-
+		
         $this->xmlStartTag("File", $attribs);
         $this->xmlElement("Filename",null,$this->file->getFileName());
 
@@ -137,6 +145,29 @@ class ilFileXMLWriter extends ilXmlWriter
         $this->xmlElement("Description",  null,$this->file->getDescription());
         $this->xmlElement("Rating",  null,(int)$this->file->hasRating());
 
+		// skyguide file lock begin
+		
+		if($this->export_lock && $this->file->isLockingEnabled() && $this->file->isLocked())
+		{
+			if($this->file->hasInfiniteLock())
+			{
+				$until = -1;
+			}
+			else
+			{
+				$until = $this->file->getLockUntil();
+			}		
+			$lattribs = array(
+				"until" => $until,
+				"user_id" => $this->file->getLockOwner(),
+				"enable_download" => $this->file->hasDownloadWithLock()			
+			);		
+			$this->xmlElement("Lock", $lattribs);
+		}
+		
+		// skyguide file lock end
+		
+		 
         if ($this->attachFileContents)
         {
             $filename = $this->file->getDirectory($this->file->getVersion())."/".$this->file->getFileName();

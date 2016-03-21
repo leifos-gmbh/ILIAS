@@ -3589,6 +3589,35 @@ class ilObjContentObject extends ilObject
 	}
 	
 	
+	
+	// begin-patch delete_progress
+	public function resetProgress($a_user_ids)
+	{
+		global $ilDB;
+		// reset progress of lm_read_event
+		// @todo no responsible application class for this table
+		
+		// fetch lm ids
+		$query = 'SELECT obj_id from lm_data '.
+				'WHERE lm_id = '.$ilDB->quote($this->getId(),'integer');
+		$res = $ilDB->query($query);
+		$lm_ids = array();
+		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		{
+			$lm_ids[] = $row->obj_id;
+		}
+		foreach((array) $a_user_ids as $usr_id)
+		{
+			$query = 'DELETE from lm_read_event '.
+					'WHERE '.$ilDB->in('obj_id',(array) $lm_ids,false,'integer').' '.
+					'AND usr_id = '.$ilDB->quote($usr_id,'integer');
+			$ilDB->manipulate($query);
+		}
+		
+		parent::resetProgress($a_user_ids);
+	}
+	// end-patch delete_progress
+	
 	public function MDUpdateListener($a_element)
 	{
 		parent::MDUpdateListener($a_element);

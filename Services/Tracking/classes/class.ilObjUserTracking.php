@@ -39,6 +39,13 @@ class ilObjUserTracking extends ilObject
 	
 	const DEFAULT_TIME_SPAN = 300;
 
+	
+	// begin-patch delete_tracking
+	private $reset_progress = false;
+	private $reset_progress_crs = false;
+	private $reset_progress_grp = false;
+	// end-patch delete_tracking
+	
 	/**
 	* Constructor
 	* @access	public
@@ -218,6 +225,12 @@ class ilObjUserTracking extends ilObject
 		$ilSetting->set("lp_learner", (int)$this->hasLearningProgressLearner());
 		$ilSetting->set("session_statistics", (int)$this->enabledSessionStatistics());
 		$ilSetting->set("lp_list_gui", (int)$this->hasLearningProgressListGUI());
+		
+		// begin-patch delete_tracking
+		$ilSetting->set('reset_progress',$this->reset_progress);
+		$ilSetting->set('reset_progress_crs',$this->reset_progress_crs);
+		$ilSetting->set('reset_progress_grp',$this->reset_progress_grp);
+		// end-patch delete_tracking
 
 		/* => REPOSITORY
 		// BEGIN ChangeEvent
@@ -259,8 +272,16 @@ class ilObjUserTracking extends ilObject
 		
 		$this->setExtendedData($ilSetting->get("lp_extended_data"),0);
 
+		// begin-patch delete_tracking
+		$this->reset_progress = $ilSetting->get('reset_progress',$this->reset_progress);
+		$this->reset_progress_crs = $ilSetting->get('reset_progress_crs',$this->reset_progress_crs);
+		$this->reset_progress_grp = $ilSetting->get('reset_progress_grp',$this->reset_progress_grp);
+		// end-patch delete_tracking
+		
 		return true;
 	}
+	
+	
 
 	static function _deleteUser($a_usr_id)
 	{
@@ -283,8 +304,79 @@ class ilObjUserTracking extends ilObject
 		return true;
 	}
 	
+	// begin-patch delete_tracking
+	/**
+	 * is progress reset enabled
+	 * @return type
+	 */
+	public function isResetProgressEnabled()
+	{
+		return $this->reset_progress;
+	}
+	
+	/**
+	 * enable progress reset
+	 * @param type $a_stat
+	 */
+	public function enableResetProgress($a_stat)
+	{
+		$this->reset_progress = $a_stat;
+	}
+	
+	/**
+	 * Check if reset progress is enabled for crs or grp
+	 * @param type $a_obj_type
+	 * @return type
+	 */
+	public function isResetProgressEnabledByType($a_obj_type)
+	{
+		switch($a_obj_type)
+		{
+			case 'crs':
+				return $this->reset_progress_crs;
+				
+			case 'grp':
+				return $this->reset_progress_grp;
+		}
+	}
+	
+	/**
+	 * enable reset progress by type
+	 * @param type $a_stat
+	 * @param type $a_obj_type
+	 */
+	public function enableResetProgressByType($a_stat,$a_obj_type)
+	{
+		switch($a_obj_type)
+		{
+			case 'crs':
+				$this->reset_progress_crs = $a_stat;
+				
+			case 'grp':
+				$this->reset_progress_grp = $a_stat;
+		}
+	}
+	
+	/**
+	 * Check if reset progress is enabled for a specific object type
+	 * @param type $a_obj_type
+	 */
+	public static function lookupResetProgressEnabledByType($a_obj_type)
+	{
+		global $ilSetting;
+		
+		return $ilSetting->get('reset_progress',false) && $ilSetting->get('reset_progress_'.$a_obj_type,false);
+	}
+	
+
+	// end-patch delete_tracking
+	
+	
 	/*
 	function setLearningProgressDesktop($a_value)
+	
+
+	function setExtendedData($a_value)
 	{
 		$this->lp_desktop = (bool)$a_value;
 	}

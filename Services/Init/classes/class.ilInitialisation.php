@@ -850,6 +850,10 @@ class ilInitialisation
 	 */
 	public static function initILIAS()
 	{
+		// begin-patch skyguide bench
+		$GLOBALS['ilGlobalStartTime'] = microtime(true);
+		// end-patch skyguide bench
+		
 		if (self::$already_initialized) 
 		{
 			// workaround for bug #17990

@@ -3,17 +3,13 @@
   <information>
     <title>FileManager</title>
     <vendor>Stefan Meyer</vendor>
-    <description>Sample JavaFX 2.0 application.</description>
-    <offline-allowed/>
+    <description>null</description>
   </information>
   <resources>
-    <jfx:javafx-runtime version="2.2+" href="http://javadl.sun.com/webapps/download/GetFile/javafx-latest/windows-i586/javafx2.jnlp"/>
-  </resources>
-  <resources>
-    <j2se version="1.6+" java-vm-args="-Xms100m -Xmx1000m "  href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="FileManager.jar" size="545237" download="eager" />
-    <jar href="lib/jersey-client-1.12.jar" size="140949" download="eager" />
-    <jar href="lib/jersey-core-1.12.jar" size="496436" download="eager" />
+    <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
+    <jar href="FileManager.jar" size="529518" download="eager" />
+    <jar href="lib/jersey-client-1.12.jar" size="141118" download="eager" />
+    <jar href="lib/jersey-core-1.12.jar" size="496569" download="eager" />
   </resources>
 <security>
   <all-permissions/>

@@ -58,11 +58,13 @@ class ilAuthContainerApache extends Auth_Container
 		{
 			return false;
 		}
-		if(!ilUtil::isLogin($a_username))
-		{
-			return false;
-		}
-
+		// patch skyguide_apache
+		#if(!ilUtil::isLogin($a_username))
+		#{
+		#	return false;
+		#}
+		// patch skyguide_apache
+		/*
 		if($a_username == 'anonymous' && $password == 'anonymous')
 		{
 			$query   = 'SELECT * FROM usr_data WHERE login = %s';
@@ -89,15 +91,28 @@ class ilAuthContainerApache extends Auth_Container
 			}
 			return false;
 		}
+		*/
+		//$_SESSION['login_invalid'] = FALSE;
 
+		$GLOBALS['ilLog']->write(__METHOD__.': Start debug');
+		$GLOBALS['ilLog']->write(__METHOD__.': '.$settings->get('apache_auth_indicator_name'));
+		$GLOBALS['ilLog']->write(__METHOD__.': '.$settings->get('apache_auth_indicator_value'));
+		$GLOBALS['ilLog']->write(__METHOD__.': '.$_SERVER[$settings->get('apache_auth_indicator_name')]);
+		$GLOBALS['ilLog']->write(__METHOD__.': '.print_r($_SESSION['login_invalid'],TRUE));
+		$GLOBALS['ilLog']->write(__METHOD__.': End debug');
+
+		// patch skyguide_apache
 		if(
-			!$_SESSION['login_invalid'] &&
 			in_array(
 				$_SERVER[$settings->get('apache_auth_indicator_name')],
 				array_filter(array_map('trim', str_getcsv($settings->get('apache_auth_indicator_value'))))
 			)
 		)
+		// patch skyguide_apache
 		{
+			return TRUE;
+			
+			
 			// we have a valid apache auth
 			$list = array(
 				$ilSetting->get('auth_mode')
@@ -274,6 +289,25 @@ class ilAuthContainerApache extends Auth_Container
 		}
 		return false;
 	}
+	
+	
+	/** 
+	 * Called from base class after successful login
+	 *
+	 * @param string username
+	 */
+	public function loginObserver($a_username,$a_auth)
+	{
+		
+		// patch skyguide_apache
+		if(strpos($a_username, '@') !== FALSE)
+		{
+			$a_username = substr($a_username,0,strpos($a_username,'@'));
+		}
+		$GLOBALS['ilLog']->write(__METHOD__.': login observer called for '.$a_username);
+
+		return $this->handleLDAPDataSource($a_auth,$a_username);
+	}	
 
 	/**
 	 * Init LDAP attribute mapping
@@ -284,4 +318,55 @@ class ilAuthContainerApache extends Auth_Container
 		include_once('Services/LDAP/classes/class.ilLDAPAttributeToUser.php');
 		$this->ldap_attr_to_user = new ilLDAPAttributeToUser($this->server);
 	}
+	
+		/**
+	 * Handle ldap as data source
+	 * @param Auth $auth
+	 * @param string $ext_account
+	 */
+	protected function handleLDAPDataSource($a_auth,$ext_account)
+	{
+		include_once './Services/LDAP/classes/class.ilLDAPServer.php';
+		$server = ilLDAPServer::getInstanceByServerId(
+			ilLDAPServer::_getFirstActiveServer()
+		);
+
+		$GLOBALS['ilLog']->write(__METHOD__.'Using ldap data source');
+
+		include_once './Services/LDAP/classes/class.ilLDAPUserSynchronisation.php';
+		$sync = new ilLDAPUserSynchronisation('ldap', $server->getServerId());
+		$sync->setExternalAccount($ext_account);
+		$sync->setUserData(array());
+		//$sync->forceCreation($this->force_creation);
+		$sync->forceCreation(TRUE);
+
+		try {
+			$internal_account = $sync->sync();
+		}
+		catch(UnexpectedValueException $e) {
+			$GLOBALS['ilLog']->write(__METHOD__.': Login failed with message: '. $e->getMessage());
+			$a_auth->status = AUTH_WRONG_LOGIN;
+			$a_auth->logout();
+			return false;
+		}
+		catch(ilLDAPSynchronisationForbiddenException $e) {
+			// No syncronisation allowed => create Error
+			$GLOBALS['ilLog']->write(__METHOD__.': Login failed with message: '. $e->getMessage());
+			$a_auth->status = AUTH_RADIUS_NO_ILIAS_USER;
+			$a_auth->logout();
+			return false;
+		}
+		catch(ilLDAPAccountMigrationRequiredException $e) {
+			$GLOBALS['ilLog']->write(__METHOD__.': Starting account migration.');
+			$a_auth->logout();
+			ilUtil::redirect('ilias.php?baseClass=ilStartUpGUI&cmdClass=ilstartupgui&cmd=showAccountMigration');
+		}
+
+		
+		$a_auth->setAuth($internal_account);
+		return true;
+	}
+
+	
 }
+?>

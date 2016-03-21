@@ -393,7 +393,7 @@ class ilTestScoringGUI extends ilTestServiceGUI
 		foreach($questionGuiList as $questionId => $questionGUI)
 		{
 			$questionHeader = sprintf($lng->txt('tst_manscoring_question_section_header'), $questionGUI->object->getTitle());
-			$questionSolution = $questionGUI->getSolutionOutput($activeId, $pass, false, false, true, false, false, true);
+			$questionSolution = $questionGUI->getSolutionOutput($activeId, $pass, TRUE, FALSE, true, TRUE, false, true);
 			$bestSolution = $questionGUI->object->getSuggestedSolutionOutput();
 		
 				$sect = new ilFormSectionHeaderGUI();

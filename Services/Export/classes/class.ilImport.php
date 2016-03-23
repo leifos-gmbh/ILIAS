@@ -238,6 +238,16 @@ class ilImport
 	{
 		return $this->tmp_import_dir;
 	}
+
+	// ibi-patch start
+	public function importFromZip($a_zip_path, $a_type)
+	{
+		ilUtil::unzip($a_zip_path,true);
+		$dir = dirname($a_zip_path).'/'.basename($a_zip_path, '.zip');
+		$GLOBALS['ilLog']->write(__METHOD__.': '.$dir.' '.$a_zip_path);
+		return $this->doImportObject($dir, $a_type);
+	}
+	// ibi-patch end
 	
 	/**
 	 * Import repository object export file

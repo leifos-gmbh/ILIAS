@@ -52,7 +52,9 @@ class ilNusoapUserAdministrationAdapter
 		define('SERVICE_NAMESPACE','urn:ilUserAdministration');
 		define('SERVICE_STYLE','rpc');
 		define('SERVICE_USE','encoded');
-		#global $debug; $debug = true;
+		// ibi-patch start
+		global $debug; $debug = false;
+		// ibi-patch end
 		$this->server = new soap_server();
 		$this->server->decode_utf8 = false;
 		$this->server->class = "ilSoapFunctions";
@@ -370,6 +372,41 @@ class ilNusoapUserAdministrationAdapter
 								SERVICE_USE,
 								'ILIAS getRefIdsByImportId(). Get all reference ids by a given import id.');
 
+		// ibi-patch start
+		// get ref id parents by import id
+		$this->server->register('getRefIdParentsByImportId',
+								array('sid' => 'xsd:string',
+									'import_id' => 'xsd:string'),
+								array('ref_ids' => 'tns:intArray'),
+								SERVICE_NAMESPACE,
+								SERVICE_NAMESPACE.'#getRefIdsByImportId',
+								SERVICE_STYLE,
+								SERVICE_USE,
+								'ILIAS getRefIdParentsByImportId(). Get all reference id parents by a given import id.');
+
+		$this->server->register('updateInstallation',
+								array('sid' => 'xsd:string'),
+								array('success' => 'xsd:boolean'),
+								SERVICE_NAMESPACE,
+								SERVICE_NAMESPACE.'#updateInstallation',
+								SERVICE_STYLE,
+								SERVICE_USE,
+								'Update ILIAS Database, languages and control structure'
+		);
+
+		$this->server->register('updateRoleTemplatePermissions',
+								array('sid' => 'xsd:string',
+									'role_id' => 'xsd:string',
+									'ref_id' => 'xsd:string',
+									'rxml' => 'xsd:string'),
+								array('success' => 'xsd:boolean'),
+								SERVICE_NAMESPACE,
+								SERVICE_NAMESPACE.'#updateRoleTemplatePermissions',
+								SERVICE_STYLE,
+								SERVICE_USE,
+								'Update Role Template Permissions'
+		);
+		// ibi-patch end
 		// get obj_id by import id
 		$this->server->register('getRefIdsByObjId',
 								array('sid' => 'xsd:string',
@@ -1041,6 +1078,34 @@ class ilNusoapUserAdministrationAdapter
 								SERVICE_USE,
 								'ILIAS updateFile():update existing file, update file properties from xml (see ilias_file_3_8.dtd for details). obj_id in xml must match according obj id of refid.!');
 
+		// ibi-patch start
+		$this->server->register('updateHtmlLearningModule',
+								array('sid' => 'xsd:string', 'ref_id' => 'xsd:int', 'zip' => 'xsd:string', 'online' => 'xsd:int', 'old_id' => 'xsd:int', 'title' => 'xsd:string', 'desc' => 'xsd:string', 'start' => 'xsd:string'),
+								array('success' => 'xsd:boolean'),
+								SERVICE_NAMESPACE,
+								SERVICE_NAMESPACE.'#updateHtmlLearningModule',
+								SERVICE_STYLE,
+								SERVICE_USE,
+								'ILIAS updateHtmlLearningModule():update existing htlm learning module');
+
+		$this->server->register('deleteLocalPolicy',
+								array('sid' => 'xsd:string', 'ref_id' => 'xsd:int', 'role_id' => 'xsd:int'),
+								array('success' => 'xsd:boolean'),
+								SERVICE_NAMESPACE,
+								SERVICE_NAMESPACE.'#deleteLocalPolicy',
+								SERVICE_STYLE,
+								SERVICE_USE,
+								'ILIAS deleteLocalPolicy(): delete local policy of a given role');
+
+		$this->server->register('updateLomMetaData',
+								array('sid' => 'xsd:string', 'rbac_id' => 'xsd:int', 'obj_id' => 'xsd:int', 'xml' => 'xsd:string'),
+								array('success' => 'xsd:boolean'),
+								SERVICE_NAMESPACE,
+								SERVICE_NAMESPACE.'#updateLomMetaData',
+								SERVICE_STYLE,
+								SERVICE_USE,
+								'ILIAS updateLomMetaData():update lom meta data');
+		// ibi-patch end
 
       	$this->server->register('getUserXML',
 								array('sid' => 'xsd:string', 'user_ids' => 'tns:intArray', 'attach_roles' => 'xsd:int'),
@@ -1237,6 +1302,26 @@ class ilNusoapUserAdministrationAdapter
 								SERVICE_STYLE,
 								SERVICE_USE,
 								'ILIAS getUserIdBySid(): returns an ILIAS usr_id for the given sid');
+
+		// ibi-patch start
+		$this->server->register ('trackObjectAccessEvent',
+								 array('sid' => 'xsd:string', 'serialized_object_access_event_data_array' => 'xsd:string'),
+								 array('success' => 'xsd:int'),
+								 SERVICE_NAMESPACE,
+								 SERVICE_NAMESPACE.'#trackObjectAccessEvent',
+								 SERVICE_STYLE,
+								 SERVICE_USE,
+								 'ILIAS trackObjectAccessEvent(): tracks an object access event for multiple ilias clients to db of master client');
+
+		$this->server->register ('trackCommunicationAccessEvent',
+								 array('sid' => 'xsd:string', 'serialized_communication_event_data_array' => 'xsd:string'),
+								 array('success' => 'xsd:int'),
+								 SERVICE_NAMESPACE,
+								 SERVICE_NAMESPACE.'#trackCommunicationAccessEvent',
+								 SERVICE_STYLE,
+								 SERVICE_USE,
+								 'ILIAS trackCommunicationAccessEvent(): tracks communication for multiple ilias clients to db of master client');
+		// ibi-patch end
 								
 		$this->server->register('deleteExpiredDualOptInUserObjects',
 								array('sid' => 'xsd:string',

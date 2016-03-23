@@ -115,6 +115,13 @@ class ilObjectXMLParser extends ilSaxParser
 			case 'Title':
 				break;
 
+			// begin-patch ibi
+			case 'TranslationTitle':
+				$this->translation_lang = $a_attribs['key'];
+				$this->translation_default = $a_attribs['default'];
+				break;
+			// begin-patch ibi
+
 			case 'Description':
 				break;
 
@@ -181,6 +188,29 @@ class ilObjectXMLParser extends ilSaxParser
 				if($a_attribs['ending_time'] < $a_attribs['starting_time'])
 					throw new ilObjectXMLException('Starting time must be earlier than ending time.');
 				break;
+			// ibi-patch start
+			case 'Sorting':
+				include_once './Services/Container/classes/class.ilContainer.php';
+				switch($a_attribs['type'])
+				{
+					case 'Manual':
+						$this->__addProperty('sorting', ilContainer::SORT_MANUAL);
+						break;
+
+					case 'Title':
+						$this->__addProperty('sorting', ilContainer::SORT_TITLE);
+						break;
+
+					case 'Activation':
+						$this->__addProperty('sorting', ilContainer::SORT_ACTIVATION);
+						break;
+				}
+				break;
+
+			case 'Item':
+				$this->__addItem($a_attribs['id'], $a_attribs['import_id']);
+				break;
+			// ibi-patch end
 				
 		}
 	}
@@ -204,6 +234,19 @@ class ilObjectXMLParser extends ilSaxParser
 			case 'Title':
 				$this->__addProperty('title',trim($this->cdata));
 				break;
+
+			// begin-patch ibi
+			case 'TranslationTitle':
+				$this->object_data[$this->curr_obj]['translations'][$this->translation_lang]['title'] = $this->cdata;
+				$this->object_data[$this->curr_obj]['translations'][$this->translation_lang]['default'] = $this->translation_default;
+				break;
+			// begin-patch ibi
+
+			// begin-patch ibi
+			case 'TranslationDescription':
+				$this->object_data[$this->curr_obj]['translations'][$this->translation_lang]['description'] = $this->cdata;
+				break;
+			// begin-patch ibi
 
 			case 'Description':
 				$this->__addProperty('description',trim($this->cdata));
@@ -293,6 +336,16 @@ class ilObjectXMLParser extends ilSaxParser
 		
 		$this->object_data[$this->curr_obj]['references'][] = $reference;
 	}
+
+	// ibi-patch start
+	protected function __addItem($a_id, $a_import_id)
+	{
+		$this->object_data[$this->curr_obj]['items'][] = array(
+			'id' => $a_id,
+			'import_id' => $a_import_id
+		);
+	}
+	// ibi-patch end
 
 }
 ?>

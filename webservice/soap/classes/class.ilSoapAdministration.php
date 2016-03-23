@@ -108,6 +108,10 @@ class ilSoapAdministration
 			return false;
 		}
 
+		// begin-patch ibi
+		return true;
+		// end-patch ibi
+
 		if($ilUser->hasToAcceptTermsOfService())
 		{
 			$this->__setMessage('User agreement no accepted.');
@@ -407,6 +411,40 @@ class ilSoapAdministration
 		
 		return $writer->getXML();
 	}
+
+	// ibi-patch start
+	public function updateInstallation($sid)
+	{
+		$this->initAuth($sid);
+		$this->initIlias();
+
+		if(!$this->__checkSession($sid))
+		{
+			return $this->__raiseError($this->__getMessage(),$this->__getMessageCode());
+		}
+
+		global $ilDB, $ilCtrlStructureReader, $ilErr, $ilClientIniFile,$rbacreview, $ilUser;
+
+		if(!$rbacreview->isAssigned($ilUser->getId(),SYSTEM_ROLE_ID))
+		{
+			$this->raiseError(
+				'Permission denied. Soap user must be assigned to administrator role',
+				'Client'
+			);
+		}
+
+		include_once './setup/classes/class.ilCtrlStructureReader.php';
+		$ilCtrlStructureReader = new ilCtrlStructureReader();
+		$ilCtrlStructureReader->setIniFile($ilClientIniFile);
+		$ilCtrlStructureReader->setErrorObject($ilErr);
+
+		include_once './Services/Database/classes/class.ilDBUpdate.php';
+		$update = new ilDBUpdate($ilDB);
+		$update->applyUpdate();
+		$update->applyHotfix();
+		return true;
+	}
+	// ibi-patch end
 	
 	public function getClientInfoXML($clientid) 
 	{		
@@ -482,7 +520,158 @@ class ilSoapAdministration
 		}
 		return null;
 	}
-	
-	
+
+	// ibi-patch start
+	public function trackObjectAccessEvent($sid, $serialized_object_access_event_data_array)
+	{
+		/*ob_start();register_shutdown_function(create_function('','
+			$ob = ob_get_contents();
+			mail("akordosz@databay.de","(".sprintf("%0.3f", microtime(true)).") SOAP_RESPONSE",$ob);
+			ob_end_flush();
+		'));*/
+
+		$this->initAuth($sid);
+		$this->initIlias();
+
+		if(!$this->__checkSession($sid))
+		{
+			return $this->__raiseError($this->__getMessage(),$this->__getMessageCode());
+		}
+
+		$object_access_event = unserialize($serialized_object_access_event_data_array);
+
+		global $ilDB;
+
+		if (!$ilDB->tableExists("track_obj_data"))
+		{
+			$ilDB->createTable("track_obj_data",
+							   array(
+								   "track_id" => array(
+									   "type" => "integer", "length" => 4, "notnull" => true
+								   ),
+								   "ref_id" => array(
+									   "type" => "integer", "length" => 4, "notnull" => true
+								   ),
+								   "obj_id" => array(
+									   "type" => "integer", "length" => 4, "notnull" => true
+								   ),
+								   "obj_type" => array(
+									   "type" => "text", "length" => 50, "notnull" => true
+								   ),
+								   "obj_title" => array(
+									   "type" => "text", "length" => 100, "notnull" => true
+								   ),
+								   "usr_id" => array(
+									   "type" => "integer", "length" => 4, "notnull" => true
+								   ),
+								   "usr_login" => array(
+									   "type" => "text", "length" => 100, "notnull" => true
+								   ),
+								   "usr_ip" => array(
+									   "type" => "text", "length" => 100, "notnull" => true
+								   ),
+								   "client_id" => array(
+									   "type" => "text", "length" => 100, "notnull" => true
+								   ),
+								   "time" => array(
+									   "type" => "integer", "length" => 4, "notnull" => true
+								   )
+							   )
+			);
+
+			$ilDB->addPrimaryKey("track_obj_data", array("track_id"));
+			$ilDB->addIndex('track_obj_data',array('obj_type'),'i1');
+			$ilDB->addIndex('track_obj_data',array('time'),'i2');
+			$ilDB->addIndex('track_obj_data',array('obj_type','time'),'i3');
+			$ilDB->createSequence("track_obj_data");
+		}
+
+		$track_id = $ilDB->nextId('track_obj_data');
+
+		$ilDB->insert('track_obj_data', array(
+										  "track_id"	=> array('integer', $track_id),
+										  "ref_id"	=> array('integer', $object_access_event['ref_id']),
+										  "obj_id"	=> array('integer', $object_access_event['obj_id']),
+										  "obj_type"  => array('text', $object_access_event['obj_type']),
+										  "obj_title" => array('text', $object_access_event['obj_title']),
+										  "usr_id"	=> array('integer', $object_access_event['usr_id']),
+										  "usr_login" => array('text', $object_access_event['usr_login']),
+										  "usr_ip"	=> array('text', $object_access_event['remote_addr']),
+										  "client_id"	=> array('text', $object_access_event['client_id']),
+										  "time"		=> array('integer', time())
+									  )
+		);
+
+		return 1;
+	}
+
+	public function trackCommunicationAccessEvent($sid, $serialized_object_access_event_data_array)
+	{
+		/*ob_start();register_shutdown_function(create_function('','
+			$ob = ob_get_contents();
+			mail("akordosz@databay.de","(".sprintf("%0.3f", microtime(true)).") SOAP_RESPONSE",$ob);
+			ob_end_flush();
+		'));*/
+
+		$this->initAuth($sid);
+		$this->initIlias();
+
+		if(!$this->__checkSession($sid))
+		{
+			return $this->__raiseError($this->__getMessage(),$this->__getMessageCode());
+		}
+
+		$object_access_event = unserialize($serialized_object_access_event_data_array);
+
+		global $ilDB;
+
+		if (!$ilDB->tableExists("track_com_data"))
+		{
+			$ilDB->createTable("track_com_data",
+							   array(
+								   "track_id" => array(
+									   "type" => "integer", "length" => 4, "notnull" => true
+								   ),
+								   "usr_id" => array(
+									   "type" => "integer", "length" => 4, "notnull" => true
+								   ),
+								   "usr_login" => array(
+									   "type" => "text", "length" => 100, "notnull" => true
+								   ),
+								   "client_id" => array(
+									   "type" => "text", "length" => 100, "notnull" => true
+								   ),
+								   "com_content" => array(
+									   "type" => "clob", "notnull" => false
+								   ),
+								   "com_type" => array(
+									   "type" => "text", "length" => 20, "notnull" => true
+								   ),
+								   "time" => array(
+									   "type" => "integer", "length" => 4, "notnull" => true
+								   )
+							   )
+			);
+
+			$ilDB->addPrimaryKey("track_com_data", array("track_id"));
+			$ilDB->createSequence("track_com_data");
+		}
+
+		$track_id = $ilDB->nextId('track_com_data');
+
+		$ilDB->insert('track_com_data', array(
+										  "track_id"		=> array('integer', $track_id),
+										  "usr_id"		=> array('integer', $object_access_event['usr_id']),
+										  "usr_login"		=> array('text', $object_access_event['usr_login']),
+										  "client_id"		=> array('text', $object_access_event['client_id']),
+										  "com_content"	=> array('text', $object_access_event['com_content']),
+										  "com_type"		=> array('text', $object_access_event['com_type']),
+										  "time"			=> array('integer', time())
+									  )
+		);
+
+		return 1;
+	}
+	// ibi-patch end
 }
 ?>

@@ -1776,6 +1776,28 @@ class ilTree
 		return $this->getRelation($a_startnode_id, $a_querynode_id) == self::RELATION_PARENT;
 	}
 
+	// ibi-patch start
+	/**
+	 * @param int $a_node_id
+	 * @param int $a_target_id
+	 */
+	public function isChild($a_node_id,$a_target_id)
+	{
+		global $ilDB;
+
+		return $this->getRelation($a_node_id, $a_target_id) == self::RELATION_CHILD;
+
+		//TODO: Prüfen Funtioniert das?
+		/*
+		$query = 'SELECT child FROM '.$this->table_tree.' '.
+			'WHERE child = '.$ilDB->quote($a_node_id,'integer').' '.
+			'AND parent = '.$ilDB->quote($a_target_id,'integer').' '.
+			'AND '.$this->tree_pk.' = '.$ilDB->quote($this->tree_id,'integer');
+		$res = $ilDB->query($query);
+		return $res->numRows() ? true : false;*/
+	}
+	// ibi-patch end
+
 	/**
 	* create a new tree
 	* to do: ???

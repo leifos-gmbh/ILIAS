@@ -28,6 +28,7 @@ class ilFileXMLParser extends ilSaxParser
 	// begin-patch fm
 	static $CONTENT_REST = 5;
 	// end-patch fm
+	static $CONTENT_ABSOLUTE_PATH = 6;
 
 	/**
 	 * Exercise object which has been parsed
@@ -150,7 +151,7 @@ class ilFileXMLParser extends ilSaxParser
                    $read_obj_id = ilUtil::__extractId($a_attribs["obj_id"], IL_INST_ID);
 			       if ($this->obj_id != -1 && (int) $read_obj_id != -1 && (int) $this->obj_id != (int) $read_obj_id)
 			       {
-            	       throw new ilFileException ("Object IDs (xml $read_obj_id and argument ".$this->obj_id.") do not match!", ilFileException::$ID_MISMATCH);
+            	       #throw new ilFileException ("Object IDs (xml $read_obj_id and argument ".$this->obj_id.") do not match!", ilFileException::$ID_MISMATCH);
                    }
 			    }
                 if (isset($a_attribs["type"]))
@@ -190,6 +191,10 @@ class ilFileXMLParser extends ilSaxParser
 						$this->mode = ilFileXMLParser::$CONTENT_REST;
 					}
 					// end-patch fm
+					elseif($a_attribs['mode'] == 'ABSOLUTE_PATH')
+					{
+						$this->mode = ilFileXMLParser::$CONTENT_ABSOLUTE_PATH;
+					}
 			    }
 		}
 	}
@@ -234,7 +239,13 @@ class ilFileXMLParser extends ilSaxParser
 				$GLOBALS['DIC']['ilLog']->write($this->mode);
 				$this->isReadingFile = false;
 				$baseDecodedFilename = ilUtil::ilTempnam();
-				if ($this->mode == ilFileXMLParser::$CONTENT_COPY)
+				// ibi-patch start
+				if($this->mode == ilFileXMLParser::$CONTENT_ABSOLUTE_PATH)
+				{
+					$this->tmpFilename = $this->cdata;
+				}
+				elseif ($this->mode == ilFileXMLParser::$CONTENT_COPY)
+				// ibi-patch end
 				{
 					$this->tmpFilename = $this->getImportDirectory()."/".self::normalizeRelativePath($this->cdata);
 				}
@@ -278,6 +289,10 @@ class ilFileXMLParser extends ilSaxParser
 						$this->tmpFilename = $baseDecodedFilename;
 					}
 				}
+
+				$GLOBALS['ilLog']->write(__METHOD__.': Mode '.$this->mode);
+				$GLOBALS['ilLog']->write(__METHOD__.': Path '.$this->tmpFilename);
+
 				//$this->content = $content;
 				// see #17211
 				if (is_file($this->tmpFilename))
@@ -315,7 +330,12 @@ class ilFileXMLParser extends ilSaxParser
 		if($a_data != "\n")
 		{
 			// begin-patch fm
-			if ($this->isReadingFile && $this->mode != ilFileXMLParser::$CONTENT_COPY && $this->mode != ilFileXMLParser::$CONTENT_REST)
+			// ibi-patch start
+			if ($this->isReadingFile && $this->mode != ilFileXMLParser::$CONTENT_COPY
+				&& $this->mode != ilFileXMLParser::$CONTENT_REST
+				&& ($this->mode != ilFileXMLParser::$CONTENT_COPY and $this->mode != ilFileXMLParser::$CONTENT_ABSOLUTE_PATH)
+			)
+			// ibi-patch end
 			// begin-patch fm
 			{
   			$handle = fopen($this->tmpFilename, "a");

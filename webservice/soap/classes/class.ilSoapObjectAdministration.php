@@ -35,6 +35,34 @@ include_once './webservice/soap/classes/class.ilSoapAdministration.php';
 
 class ilSoapObjectAdministration extends ilSoapAdministration
 {
+	function ilSoapObjectAdministration()
+	{
+		parent::ilSoapAdministration();
+	}
+
+	public function updateLomMetaData($sid, $a_rbac_id, $a_obj_id, $xml)
+	{
+		$this->initAuth($sid);
+		$this->initIlias();
+
+		#$GLOBALS['ilLog']->write('Received xml: '. print_r($xml,true).' '.$a_rbac_id.' '.$a_obj_id.' '.ilObject::_lookupType($a_rbac_id));
+
+		if(!$this->__checkSession($sid))
+		{
+			return $this->__raiseError($this->__getMessage(),$this->__getMessageCode());
+		}
+		include_once './Services/MetaData/classes/class.ilMDXMLCopier.php';
+		include_once './Services/MetaData/classes/class.ilMD.php';
+		$md = new ilMD($a_rbac_id,$a_obj_id,ilObject::_lookupType($a_rbac_id));
+		$md->deleteAll();
+		$md = new ilMD($a_rbac_id,$a_obj_id,ilObject::_lookupType($a_rbac_id));
+		$copier = new ilMDXMLCopier($xml,$a_rbac_id,$a_obj_id,ilObject::_lookupType($a_rbac_id));
+		$copier->setMDObject($md);
+		$copier->startParsing();
+
+		return true;
+	}
+
 	function getObjIdByImportId($sid,$import_id)
 	{
 		$this->initAuth($sid);
@@ -90,6 +118,48 @@ class ilSoapObjectAdministration extends ilSoapAdministration
 		}
 		return $new_refs ? $new_refs : array();
 	}
+
+
+	// ibi-patch start
+	function getRefIdParentsByImportId($sid, $import_id)
+	{
+		$this->initAuth($sid);
+		$this->initIlias();
+
+		if(!$this->__checkSession($sid))
+		{
+			return $this->__raiseError($this->__getMessage(),$this->__getMessageCode());
+		}
+		if(!$import_id)
+		{
+			return $this->__raiseError('No import id given.',
+									   'Client');
+		}
+
+		global $tree;
+
+		$obj_id = ilObject::_lookupObjIdByImportId($import_id);
+		$ref_ids = ilObject::_getAllReferences($obj_id);
+
+		$parents = array();
+		foreach($ref_ids as $ref_id)
+		{
+			if(!$tree->isInTree($ref_id))
+			{
+				continue;
+			}
+			$parent = $tree->getParentId($ref_id);
+			$type = ilObject::_lookupType(ilObject::_lookupObjId($parent));
+			if($type != 'root' and $type != 'cat')
+			{
+				continue;
+			}
+			$parents[] = $parent;
+		}
+		$GLOBALS['ilLog']->write(__METHOD__.': '.print_r($parents,true));
+		return $parents;
+	}
+	// ibi-patch end
 
 	function getRefIdsByObjId($sid,$obj_id)
 	{
@@ -443,8 +513,11 @@ class ilSoapObjectAdministration extends ilSoapAdministration
 
 		if(!$target_obj =& ilObjectFactory::getInstanceByRefId($ref_id,false))
 		{
-			return $this->__raiseError('No valid reference id given.',
-									   'Client');
+			// ibi-patch start
+			include_once './webservice/soap/classes/class.ilObjectXMLWriter.php';
+			$xml_writer = new ilObjectXMLWriter();
+			return $xml_writer->getXML();
+			// ibi-patch end
 		}
 		if (intval($ref_id) == SYSTEM_FOLDER_ID) {
 		    return $this->__raiseError('No valid reference id given.',
@@ -692,6 +765,18 @@ class ilSoapObjectAdministration extends ilSoapAdministration
 			$newObj->createReference();
 			$newObj->putInTree($a_target_id);
 			$newObj->setPermissions($a_target_id);
+
+			// ibi-patch start
+			global $objDefinition;
+
+			if($objDefinition->isContainer($newObj->getType()) and $object_data['sorting'])
+			{
+				include_once './Services/Container/classes/class.ilContainerSortingSettings.php';
+				$sort = new ilContainerSortingSettings($newObj->getId());
+				$sort->setSortMode($object_data['sorting']);
+				$sort->update();
+			}
+			// ibi-patch end
 			
 			switch($object_data['type'])
 			{
@@ -957,6 +1042,80 @@ class ilSoapObjectAdministration extends ilSoapAdministration
 		return true;
 	}
 
+	// ibi-patch start
+	function removeReferenceByImportId($sid,$import_id,$parent)
+	{
+		$this->initAuth($sid);
+		$this->initIlias();
+
+		if(!$this->__checkSession($sid))
+		{
+			return $this->__raiseError($this->__getMessage(),$this->__getMessageCode());
+		}
+		if(!strlen($import_id))
+		{
+			return $this->__raiseError('No import id given. Aborting!',
+									   'Client');
+		}
+		global $ilAccess, $tree, $ilLog;
+
+		// get obj_id
+		if(!$obj_id = ilObject::_lookupObjIdByImportId($import_id))
+		{
+			return $this->__raiseError('No object found with import id: '.$import_id,
+									   'Client');
+		}
+
+		// Check access
+		$permission_ok = false;
+		$to_delete = 0;
+		foreach($ref_ids = ilObject::_getAllReferences($obj_id) as $ref_id)
+		{
+			if($tree->isDeleted($ref_id))
+			{
+				continue;
+			}
+			$parent_id = $tree->getParentId($ref_id);
+			if($parent_id == $parent)
+			{
+				if($ilAccess->checkAccess('delete','',$ref_id))
+				{
+					$permission_ok = true;
+					$to_delete = $ref_id;
+				}
+			}
+		}
+		if(!$to_delete)
+		{
+			return true;
+		}
+
+		if(!$permission_ok)
+		{
+			return $this->__raiseError('No permission to delete the object with import id: '.$import_id,
+									   'Server');
+		}
+
+
+		// All subnodes
+		$node_data = $tree->getNodeData($to_delete);
+		$subtree_nodes = $tree->getSubtree($node_data);
+
+		foreach($subtree_nodes as $node)
+		{
+			$ilLog->write('Soap: removeFromSystemByImportId(). Deleting object with title id: '.$node['title']);
+			$tmp_obj = ilObjectFactory::getInstanceByRefId($node['ref_id']);
+			if(!is_object($tmp_obj))
+			{
+				return $this->__raiseError('Cannot create instance of reference id: '.$node['ref_id'],
+										   'Server');
+			}
+			$tmp_obj->delete();
+		}
+		$tree->deleteTree($node_data);
+		return true;
+	}
+	// ibi-patch end
 
 	function updateObjects($sid,$a_xml)
 	{
@@ -1083,10 +1242,63 @@ class ilSoapObjectAdministration extends ilSoapAdministration
 				switch ($object_data['type']) 
 				{
 					case 'cat':
-						$tmp_obj->updateTranslation($object_data["title"],$object_data["description"], $lng->getLangKey(), $lng->getLangKey());
+						// begin-patch ibi
+						$tmp_obj->removeTranslations();
+						foreach($object_data['translations'] as $lang_key => $trans)
+						{
+							$tmp_obj->addTranslation($trans['title'],$trans['description'],$lang_key,$trans['default']);
+						}
+						#$tmp_obj->updateTranslation($object_data["title"],$object_data["description"], $lng->getLangKey(), $lng->getLangKey());
+						// end-patch ibi
 						break;
 				}
 				$tmp_obj->update();
+
+				// ibi-patch start
+				global $objDefinition, $tree;
+
+				if($objDefinition->isContainer($tmp_obj->getType()) and $object_data['sorting'])
+				{
+					include_once './Services/Container/classes/class.ilContainerSortingSettings.php';
+					$sort = new ilContainerSortingSettings($tmp_obj->getId());
+					$sort->setSortMode($object_data['sorting']);
+					$sort->update();
+
+
+					$refs = ilObject::_getAllReferences($tmp_obj->getId());
+					$ref_id = end($refs);
+					$poss = array();
+					$cpos = 1;
+					foreach((array) $object_data['items'] as $item)
+					{
+						if($item['id'])
+						{
+							if($tree->isChild($item['id'],$ref_id))
+							{
+								$poss[$item['id']] = $cpos;
+							}
+						}
+						elseif($item['import_id'])
+						{
+							$import_id = ilObject::_lookupObjIdByImportId($item['import_id']);
+							foreach(ilObject::_getAllReferences($import_id) as $ref)
+							{
+								if($tree->isChild($ref,$ref_id))
+								{
+									$poss[$ref] = $cpos;
+								}
+							}
+						}
+						$cpos++;
+					}
+					include_once './Services/Container/classes/class.ilContainerSorting.php';
+					$sort = ilContainerSorting::_getInstance($tmp_obj->getId());
+					$sort->saveItems($poss);
+
+
+				}
+				// ibi-patch end
+
 				if(strlen($object_data['owner']) && is_numeric($object_data['owner']))
 				{
 				    $tmp_obj->setOwner($object_data['owner']);

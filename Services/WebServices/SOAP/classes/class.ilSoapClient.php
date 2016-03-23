@@ -1,6 +1,9 @@
 <?php
 /* Copyright (c) 1998-2009 ILIAS open source, Extended GPL, see docs/LICENSE */
 
+// begin-patch ibi
+include_once './Services/WebServices/SOAP/exceptions/class.ilSoapClientException.php';
+// end-patch ibi
 
 /**
  * Wrapper class for soap_client
@@ -15,6 +18,10 @@ class ilSoapClient
 {
 	const DEFAULT_CONNECT_TIMEOUT = 10;
 	const DEFAULT_RESPONSE_TIMEOUT = 5;
+
+	// begin-patch ibi
+	private $throwExection = false;
+	// end-patch ibi
 
 	/**
 	 * @var ilLogger
@@ -55,6 +62,13 @@ class ilSoapClient
 		
 		$this->response_timeout = self::DEFAULT_RESPONSE_TIMEOUT;
 	}
+
+	// begin-patch ibi
+	public function setThrowException($a_stat)
+	{
+		$this->throwExection = $a_stat;
+	}
+	// end-patch ibi
 	
 	/**
 	 * Get server uri
@@ -204,13 +218,16 @@ class ilSoapClient
 	 */
 	public function call($a_operation, $a_params)
 	{
-		$this->log->debug('Calling webservice: ' . $a_operation);
+		$error_message = '';
+		
+		$this->log->debug('Calling webseervice: ' . $a_operations);
 
 		$this->setSocketTimeout(false);
 		try {
 			return $this->client->__call($a_operation, $a_params);
 		} 
 		catch(SoapFault $exception) {
+			$error_message = $exception->getMessage();
 			$this->log->error('Calling webservice failed with message: ' . $exception->getMessage());
 			$this->log->debug($this->client->__getLastResponseHeaders());
 			$this->log->debug($this->client->__getLastResponse());
@@ -218,12 +235,18 @@ class ilSoapClient
 		}
 		catch(Exception $exception)
 		{
+			$error_message = $exception->getMessage();
 			$this->log->error('Caught unknown exception with message: '. $exception->getMessage());
 			$this->log->debug($this->client->__getLastResponseHeaders());
 			$this->log->debug($this->client->__getLastResponse());
 		}
 		finally {
 			$this->resetSocketTimeout();
+			
+			if(stristr($error_message,'socket read of headers') === false)
+			{
+				throw new ilSoapClientException($error_message);
+			}
 		}
 	}
 }

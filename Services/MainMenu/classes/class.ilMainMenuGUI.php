@@ -261,6 +261,28 @@ class ilMainMenuGUI
 		// get user interface plugins
 		$pl_names = $ilPluginAdmin->getActivePluginsForSlot(IL_COMP_SERVICE, "UIComponent", "uihk");
 
+		// ibi-patch start
+		// tracking
+		$configfile = 'custom.ini.php';
+
+		$ini = new ilIniFile($configfile);
+		$ini->read();
+
+		if( !file_exists($configfile) )
+		{
+			throw new Exception('Custom Config Error: Config File does not exist!');
+		}
+
+		if( CLIENT_ID == $ini->readVariable('soap', 'client') )
+		{
+			include_once('Plugins/ElisCustomTrackingTool/classes/class.ElisCustomTrackingToolGUI.php');
+			$this->renderEntry($a_tpl, "tracking",
+							   $lng->txt("tracking"),
+							   'ectt.php',
+							   $this->target);
+		}
+		// ibi-patch end
+
 		if($this->getMode() != self::MODE_TOPBAR_REDUCED &&
 			$this->getMode() != self::MODE_TOPBAR_MEMBERVIEW)
 		{
@@ -462,6 +484,30 @@ class ilMainMenuGUI
 		$lng = $this->lng;
 		$tree = $this->tree;
 		$ilAccess = $this->access;
+
+
+		// ibi-patch start
+		// tracking
+		$configfile = 'custom.ini.php';
+
+		$ini = new ilIniFile($configfile);
+		$ini->read();
+
+		if( !file_exists($configfile) )
+		{
+			throw new Exception('Custom Config Error: Config File does not exist!');
+		}
+
+		if( CLIENT_ID == $ini->readVariable('soap', 'client') )
+		{
+			include_once('Plugins/ElisCustomTrackingTool/classes/class.ElisCustomTrackingToolGUI.php');
+			$this->renderEntry($a_tpl, "tracking",
+							   $lng->txt("tracking"),
+							   'ectt.php',
+							   $this->target);
+		}
+		// ibi-patch end
+
 
 		// personal desktop
 		if ($GLOBALS['DIC']['ilUser']->getId() != ANONYMOUS_USER_ID)

@@ -129,6 +129,21 @@ class ilObjFileBasedLM extends ilObject
 		}
 	}
 
+	// begin-patch ibi
+	public static function lookupStartFile($a_id)
+	{
+		global $ilDB;
+
+		$query = 'SELECT startfile FROM file_based_lm '.
+			'WHERE id = '.$ilDB->quote($a_id,'integer');
+		$res = $ilDB->query($query);
+		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		{
+			return $row->startfile;
+		}
+		return '';
+	}
+
 	function setOnline($a_online)
 	{
 		$this->online = $a_online;

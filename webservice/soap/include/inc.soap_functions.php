@@ -196,6 +196,16 @@ class ilSoapFunctions {
 
 		return $soa->getRefIdsByImportId($sid,$import_id);
 	}
+	// ibi-patch start
+	public static function  getRefIdParentsByImportId($sid,$import_id)
+	{
+		include_once './webservice/soap/classes/class.ilSoapObjectAdministration.php';
+
+		$soa = new ilSoapObjectAdministration();
+
+		return $soa->getRefIdParentsByImportId($sid,$import_id);
+	}
+	// ibi-patch end
 	public static function  getRefIdsByObjId($sid,$object_id)
 	{
 		include_once './webservice/soap/classes/class.ilSoapObjectAdministration.php';
@@ -259,6 +269,29 @@ class ilSoapFunctions {
 
 		return $soa->removeFromSystemByImportId($sid,$import_id);
 	}
+
+	// ibi-patch start
+	public static function  removeReferenceByImportId($sid,$import_id,$parent)
+	{
+		include_once './webservice/soap/classes/class.ilSoapObjectAdministration.php';
+		$soa = new ilSoapObjectAdministration();
+		return $soa->removeReferenceByImportId($sid,$import_id,$parent);
+	}
+
+	public static function updateInstallation($sid)
+	{
+		include_once './webservice/soap/classes/class.ilSoapAdministration.php';
+		$soa = new ilSoapAdministration();
+		return $soa->updateInstallation($sid);
+	}
+
+	public function updateRoleTemplatePermissions($sid,$role_id,$a_ref_id,$role_xml)
+	{
+		include_once './webservice/soap/classes/class.ilSoapRBACAdministration.php';
+		$sra = new ilSoapRBACAdministration();
+		return $sra->updateRoleTemplatePermissions($sid, $role_id, $a_ref_id, $role_xml);
+	}
+	// ibi-patch end
 
 	public static function  updateObjects($sid,$obj_xml)
 	{
@@ -325,7 +358,16 @@ class ilSoapFunctions {
 
 		return $soa->deleteUserRoleEntry($sid,$user_id,$role_id);
 	}
+	// begin-patch ibi
+	public static function  deleteLocalPolicy($sid,$ref_id,$role_id)
+	{
+		include_once './webservice/soap/classes/class.ilSoapRBACAdministration.php';
 
+		$soa = new ilSoapRBACAdministration();
+
+		return $soa->deleteLocalPolicy($sid,$ref_id,$role_id);
+	}
+	// end-patch ibi
 	public static function  revokePermissions($sid,$ref_id,$role_id)
 	{
 		include_once './webservice/soap/classes/class.ilSoapRBACAdministration.php';
@@ -702,6 +744,22 @@ class ilSoapFunctions {
 
 	}
 
+	// ibi-patch start
+	public static function updateHtmlLearningModule($sid,$ref_id,$xml_path,$a_online,$a_old_id,$a_title,$a_desc,$a_start)
+	{
+		include_once './webservice/soap/classes/class.ilSoapFileAdministration.php';
+		$sta = & new ilSoapFileAdministration();
+		return $sta->updateHtmlLearningModule($sid, $ref_id, $xml_path,$a_online,$a_old_id,$a_title,$a_desc,$a_start);
+	}
+
+	public static function updateLomMetaData($sid,$ref_id,$obj_id,$xml)
+	{
+		include_once './webservice/soap/classes/class.ilSoapObjectAdministration.php';
+		$obj = new ilSoapObjectAdministration();
+		return $obj->updateLomMetaData($sid,$ref_id,$obj_id,$xml);
+	}
+	// ibi-patch end
+
 	public static function  addFile ($sid, $ref_id, $xml)
 	{
 		include_once './webservice/soap/classes/class.ilSoapFileAdministration.php';
@@ -956,6 +1014,26 @@ class ilSoapFunctions {
 		$swa = new ilSoapWebLinkAdministration();
 		return $swa->updateWebLink($sid, $ref_id,$xml);
 	}
+
+	// ibi-patch start
+	public static function trackObjectAccessEvent($sid,$serialized_object_access_event_data_array)
+	{
+		include_once './webservice/soap/classes/class.ilSoapAdministration.php';
+
+		$sa = new ilSoapAdministration();
+
+		return $sa->trackObjectAccessEvent($sid, $serialized_object_access_event_data_array);
+	}
+
+	public static function trackCommunicationAccessEvent($sid,$serialized_object_access_event_data_array)
+	{
+		include_once './webservice/soap/classes/class.ilSoapAdministration.php';
+
+		$sa = new ilSoapAdministration();
+
+		return $sa->trackCommunicationAccessEvent($sid, $serialized_object_access_event_data_array);
+	}
+	// ibi-patch end
 	
 	/**
 	 * 

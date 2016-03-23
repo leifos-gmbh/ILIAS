@@ -109,7 +109,28 @@ class ilObjCategory extends ilContainer
 
 		return $data ? $data : array();	
 	}
-	
+
+	// begin-patch ibi
+	public static function lookupTranslations($a_obj_id)
+	{
+		global $ilDB;
+
+		$q = "SELECT * FROM object_translation WHERE obj_id = ".
+			$ilDB->quote($a_obj_id,'integer')." ORDER BY lang_default DESC";
+		$r = $ilDB->query($q);
+		$data = array();
+		while ($row = $r->fetchRow(DB_FETCHMODE_OBJECT))
+		{
+			$data[]= array("title"	=> $row->title,
+				"desc"	=> $row->description,
+				"lang"	=> $row->lang_code,
+				'default' => $row->lang_default
+			);
+		}
+		return $data;
+	}
+	// begin-patch ibi
+
 	// remove all Translations of current category
 	function removeTranslations()
 	{

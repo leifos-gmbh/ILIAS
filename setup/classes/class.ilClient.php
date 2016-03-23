@@ -65,6 +65,17 @@ class ilClient
 		return ilDbSetup::getInstanceForClient($this);
 	}
 
+	// ibi-patch begin
+	/**
+	 * sets an external ilIniFile instance to objects ini property
+	 * @param ilIniFile $ini
+	 */
+	public function setExternalClientIni(ilIniFile $ini)
+	{
+		$this->ini = $ini;
+	}
+	// ibi-patch end
+	
 	/**
 	* init client
 	* load client.ini and set some constants

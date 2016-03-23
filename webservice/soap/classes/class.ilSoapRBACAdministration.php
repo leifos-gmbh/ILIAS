@@ -115,6 +115,35 @@ class ilSoapRBACAdministration extends ilSoapAdministration
 		}
 		return true;
 	}
+
+	// begin-patch ibi
+	public function deleteLocalPolicy($sid, $ref_id, $role_id)
+	{
+		$this->initAuth($sid);
+		$this->initIlias();
+
+		if(!$this->__checkSession($sid))
+		{
+			return $this->__raiseError($this->__getMessage(),$this->__getMessageCode());
+		}
+
+		global $rbacadmin,$ilAccess,$rbacreview;
+
+		$rolf = $GLOBALS['rbacreview']->getRoleFolderIdOfObject($ref_id);
+		if($rolf)
+		{
+			if($GLOBALS['rbacreview']->isAssignable($role_id,$rolf))
+			{
+				return $this->deleteRole($sid, $role_id);
+			}
+			$GLOBALS['rbacadmin']->deleteLocalRole($role_id,$rolf);
+		}
+
+		return true;
+	}
+	// end-patch ibi
+
+
 	function deleteUserRoleEntry($sid,$user_id,$role_id)
 	{
 		$this->initAuth($sid);
@@ -281,8 +310,9 @@ class ilSoapRBACAdministration extends ilSoapAdministration
 			return $this->__raiseError('Check access failed. No permission to access role information','Server');
 		}
 
-
-		foreach($rbacreview->getRolesOfRoleFolder($ref_id,false) as $role_id)
+		// begin-patch ibi
+		foreach($rbacreview->getRolesOfRoleFolder($ref_id,true) as $role_id)
+		// end-patch ibi
 		{
 			if($tmp_obj = ilObjectFactory::getInstanceByObjId($role_id,false))
 			{
@@ -341,6 +371,57 @@ class ilSoapRBACAdministration extends ilSoapAdministration
 		}
 		return '';
 	}
+
+// begin-patch ibi
+	/**
+	 * Update role ttemplate permissions
+	 * @param type $sid
+	 * @param type $role_id
+	 * @param type $a_ref_id
+	 * @param type $role_xml
+	 */
+	function updateRoleTemplatePermissions($sid,$role_id,$a_ref_id,$role_xml)
+	{
+		$this->initAuth($sid);
+		$this->initIlias();
+
+		if(!$this->__checkSession($sid))
+		{
+			return $this->__raiseError($this->__getMessage(),$this->__getMessageCode());
+		}
+
+		// init role
+		include_once './classes/class.ilObjectFactory.php';
+		$role = ilObjectFactory::getInstanceByObjId($role_id,false);
+		if(!$role instanceof ilObjRole)
+		{
+			return $this->__raiseError('Invalid role id given','Client');
+		}
+		if(!$GLOBALS['ilAccess']->checkAccess('edit_permission','',$a_ref_id))
+		{
+			return $this->__raiseError('Access denied','Client');
+		}
+
+		$rolf = $GLOBALS['rbacreview']->getRoleFolderIdOfObject($a_ref_id);
+		if(!$rolf)
+		{
+			return $this->__raiseError('No role existin','Client');
+		}
+
+
+		include_once './Services/AccessControl/classes/class.ilRoleXmlImporter.php';
+		$rimport = new ilRoleXmlImporter($rolf);
+		$rimport->setRole($role);
+
+		$root = simplexml_load_string($role_xml);
+		foreach($root->role as $role_ele)
+		{
+			$rimport->importSimpleXml($role_ele);
+			break;
+		}
+		return true;
+	}
+	// begin-patch ibi
 
 	function addRole($sid,$target_id,$role_xml)
 	{

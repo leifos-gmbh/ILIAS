@@ -21,7 +21,8 @@ db_template_writer.php
 
 
 # /Customizing/
-/Customizing/global
+#/Customizing/global
+/Customizing/global/plugins
 
 # /Modules/BookingManager/js/
 
@@ -381,3 +382,5 @@ db_template_writer.php
 !/dicto/results/README.md
 override.php
 virtual-data
+/ClientReplication
+/Plugins

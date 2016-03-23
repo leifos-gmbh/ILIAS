@@ -49,6 +49,17 @@ class ilClient
 		// set path default.ini
 		$this->client_defaults = ILIAS_ABSOLUTE_PATH."/setup/client.master.ini.php";
 	}
+
+	// ibi-patch begin
+	/**
+	 * sets an external ilIniFile instance to objects ini property
+	 * @param ilIniFile $ini
+	 */
+	public function setExternalClientIni(ilIniFile $ini)
+	{
+		$this->ini = $ini;
+	}
+	// ibi-patch end
 	
 	/**
 	* init client

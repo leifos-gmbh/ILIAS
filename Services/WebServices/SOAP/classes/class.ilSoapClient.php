@@ -28,6 +28,9 @@ define('DEFAULT_RESPONSE_TIMEOUT',30);
 
 include_once './webservice/soap/lib/nusoap.php';
 
+// begin-patch ibi
+include_once './Services/WebServices/SOAP/exceptions/class.ilSoapClientException.php';
+// end-patch ibi
 
 /**
 * Wrapper class for NuSOAP soap_client
@@ -46,6 +49,10 @@ class ilSoapClient
 	var $timeout = null;
 	var $response_timeout = null;
 	var $use_wsdl = true;
+
+	// begin-patch ibi
+	private $throwExection = false;
+	// end-patch ibi
 
 	function ilSoapClient($a_server = '')
 	{
@@ -73,6 +80,13 @@ class ilSoapClient
 		
 		$this->server = ilUtil::_getHttpPath().'/webservice/soap/server.php?wsdl';
 	}
+
+	// begin-patch ibi
+	public function setThrowException($a_stat)
+	{
+		$this->throwExection = $a_stat;
+	}
+	// end-patch ibi
 
 	function getServer()
 	{
@@ -121,7 +135,7 @@ class ilSoapClient
 		{
 			if(stristr($error, 'socket read of headers') === FALSE)
 			{
-				$this->log->write('Error calling soap server: '.$this->getServer().' Error: '.$error);
+				#$this->log->write('Error calling soap server: '.$this->getServer().' Error: '.$error);
 			}
 			return false;
 		}
@@ -139,7 +153,19 @@ class ilSoapClient
 		{
 			if(stristr($error, 'socket read of headers') === FALSE)
 			{
+				$this->log->write(__METHOD__.': '.$this->client->response);
 				$this->log->write('Error calling soap server: '.$this->getServer().' Error: '.$error);
+
+				// begin-patch ibi
+				if($this->throwExection and !stristr($error, 'socket read of headers'))
+				{
+					$GLOBALS['ilLog']->logStack();
+					$GLOBALS['ilLog']->write($this->client->request);
+					$GLOBALS['ilLog']->write($this->client->response);
+					throw new ilSoapClientException($error);
+				}
+				// end-patch ibi
+
 			}
 		}
 

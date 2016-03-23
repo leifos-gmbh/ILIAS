@@ -207,7 +207,7 @@ class ilRoleXmlImporter
 		$rbacadmin->assignRoleToFolder(
 			$this->getRole()->getId(),
 			$this->getRoleFolderId(),
-			$this->getRole() instanceof ilObjRole ? 'y' : 'n'
+			$GLOBALS['rbacreview']->isAssignable($this->getRole()->getId(),$this->getRoleFolderId()) ? 'y' : 'n'
 		);
 	}
 

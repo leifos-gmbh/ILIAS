@@ -29,6 +29,9 @@ class ilFileXMLWriter extends ilXmlWriter
 	// begin-patch fm
 	static $CONTENT_ATTACH_REST = 5;
 	// end-patch fm
+	// ibi-patch start
+	static $CONTENT_ATTACH_ABSOLUTE_PATH = 6;
+	// ibi-patch end
 
     /**
 	 * if true, file contents will be attached as base64
@@ -142,7 +145,16 @@ class ilFileXMLWriter extends ilXmlWriter
             $filename = $this->file->getDirectory($this->file->getVersion())."/".$this->file->getFileName();
             if (@is_file($filename))
             {
-				if ($this->attachFileContents == ilFileXMLWriter::$CONTENT_ATTACH_COPY)
+				// ibi-patch start
+				if($this->attachFileContents == ilFileXMLWriter::$CONTENT_ATTACH_ABSOLUTE_PATH)
+				{
+					$attribs = array('mode' => 'ABSOLUTE_PATH');
+					copy($filename,$this->target_dir_absolute);
+					$content = $this->target_dir_absolute;
+					$this->xmlElement('Content',$attribs,$content);
+				}
+				elseif ($this->attachFileContents == ilFileXMLWriter::$CONTENT_ATTACH_COPY)
+				// ibi-patch end
 				{
 					$attribs = array("mode" =>"COPY");
 					copy($filename, $this->target_dir_absolute."/".$this->file->getFileName());

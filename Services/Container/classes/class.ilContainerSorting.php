@@ -93,9 +93,12 @@ class ilContainerSorting
 	public static function lookupPositions($a_obj_id)
 	{
 		global $ilDB;
-		
+
+		// ibi-patch start
 		$query = "SELECT * FROM container_sorting WHERE ".
-			"obj_id = ".$ilDB->quote($a_obj_id,'integer');
+			"obj_id = ".$ilDB->quote($a_obj_id,'integer').' '.
+			'ORDER BY position';
+		// ibi-patch end
 		$res = $ilDB->query($query);
 		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
@@ -394,7 +397,9 @@ class ilContainerSorting
 	 * @param array array of items
 	 * @return
 	 */
-	protected function saveItems($a_items)
+	// ibi-patch start
+	public function saveItems($a_items)
+	// ibi-patch end
 	{
 		global $ilDB;
 		

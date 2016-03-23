@@ -1,0 +1,194 @@
+<!-- BEGIN toolbar -->
+
+<style>
+
+	div.ilToolbar
+	{
+	}
+
+	div.leftCol, div.rightCol
+	{
+		margin: 5px;
+	}
+
+	div.leftCol
+	{
+		margin-left: 8px;
+	}
+
+	div.rightCol
+	{
+		margin-left: 0;
+		float: right;
+		width: 395px !important;
+		width/**/: 385px;
+		border-left: solid #cccccc 1px;
+	}
+
+	div.clearFloat
+	{
+		clear: both;
+	}
+
+	div.ecttToolbarSelectInputRow
+	{
+		clear: left;
+	}
+
+	div.ecttToolbarSelectInputField
+	{
+		margin-top: 4px;
+		margin-bottom: 8px;
+		margin-right: 13px;
+	}
+
+	div.ecttToolbarSelectInputField select
+	{
+		width: 170px;
+	}
+
+	div.ecttToolbarCommands
+	{
+		text-align: right;
+	}
+
+	div.ecttToolbarSelectInput
+	{
+		float: left;
+	}
+
+	input.submitBerichtswesen
+	{
+		font-size: 95%;
+		font-weight:normal;
+		line-height:17px; /* Safari */
+		background-color: #FFFFFF;
+		background-image: url(./Customizing/global/skin/rewe_sortiment/images/submit_140x32.gif);
+		background-position: top center;
+		background-repeat:no-repeat;
+		color:#ffffff;
+		text-align:center;
+		padding: 6px 16px 8px 16px ;
+		/*padding: 6px 0px 7px 0px ;
+		/*height:34px;*/
+		width:141px;
+		margin: 0px;
+		text-decoration:none;
+		cursor:pointer;
+		display: inline-block;
+		border:0 solid #FFFFFF;
+	}
+
+	div.submitBerichtswesenLong
+	{
+		float: right;
+		font-size: 95%;
+		font-weight:normal;
+		line-height:17px; /* Safari */
+		background-color: #FFFFFF;
+		background-image: url(./Customizing/global/skin/rewe_sortiment/images/submit_190x32.gif);
+		background-position: top center;
+		background-repeat:no-repeat;
+		color:#ffffff;
+		text-align:center;
+		padding: 6px 16px 8px 16px ;
+		/*padding: 6px 0px 7px 0px ;
+		/*height:34px;*/
+		width:191px;
+		margin: 0px;
+		text-decoration:none;
+		cursor:pointer;
+		display: inline-block;
+		border:0 solid #FFFFFF;
+	}
+
+	div.ecttCommands
+	{
+		margin-top: 10px;
+	}
+
+	div.submitBerichtswesenLong
+	{
+		padding-left: 0;
+		padding-right: 0;
+	}
+
+	div.submitBerichtswesenLong a,
+	div.submitBerichtswesenLong a:link,
+	div.submitBerichtswesenLong a:active,
+	div.submitBerichtswesenLong a:visited,
+	div.submitBerichtswesenLong a:hover
+	{
+		color:#ffffff;
+		font-size: 95%;
+		font-weight:normal;
+
+		text-decoration:none;
+	}
+
+	/* ************************************************************** */
+
+	div#ectt_column_container div.ilTableOuter
+	{
+		{DATA_TABLE_CSS}
+	}
+	div#ectt_column_container table.fullwidth
+	{
+		{DATA_TABLE_CSS}
+	}
+
+	div#ectt_column_container td.ecttNumber
+	{
+		text-align:right;
+	}
+
+</style>
+
+
+<form action="{FORM_ACTION}" method="{FORM_METHOD}">
+
+	<div class="ilToolbar">
+
+		<!-- BEGIN duration_input_field -->
+		<div class="rightCol">
+
+				<div class="ecttToolbarDurationInput">{DURATION_INPUT}</div>
+
+		</div>
+		<!-- END duration_input_field -->
+
+		<div class="leftCol"<!-- BEGIN blubb --> style="margin-right: 395px;"<!-- END blubb -->>
+
+			<!-- BEGIN select_input_fields_row -->
+
+				<div class="ecttToolbarSelectInputRow">
+
+					<!-- BEGIN select_input_field -->
+						<div class="ecttToolbarSelectInput">
+							<div class="ecttToolbarSelectInputLabel">{SELECT_INPUT_LABEL}</div>
+							<div class="ecttToolbarSelectInputField">{SELECT_INPUT_FIELD}</div>
+						</div>
+					<!-- END select_input_field -->
+
+				</div>
+
+			<!-- END select_input_fields_row -->
+
+		</div>
+
+		<div class="clearFloat"></div>
+
+	</div>
+
+	<div class="ecttToolbarCommands">
+		<!-- BEGIN toolbar_commands -->
+		<input class="
+			   <!-- BEGIN btn_css_class_rewe -->submitBerichtswesen<!-- END btn_css_class_rewe -->
+			   <!-- BEGIN btn_css_class_default -->submit<!-- END btn_css_class_default -->
+		" type="submit" name="cmd[{SUBMIT_CMD}]" value="{SUBMIT_LABEL}" />
+		<!-- END toolbar_commands -->
+	</div>
+
+</form>
+
+<!-- END toolbar -->

@@ -28,3 +28,42 @@ $ilDB->manipulate("UPDATE svy_svy svy".
 	" SET svy.anonymize = ".$ilDB->quote(2, "integer"));
 
 ?>
+<#3>
+<?php
+
+if (!$ilDB->tableColumnExists("file_data", "locked_by"))
+{
+	$ilDB->addTableColumn("file_data", "locked_by", array(
+		"type" => "integer",
+		"notnull" => false,
+		"length" => 4,
+		"default" => 0));
+}
+
+?>
+<#4>
+<?php
+
+if (!$ilDB->tableColumnExists("file_data", "locked_until"))
+{
+	$ilDB->addTableColumn("file_data", "locked_until", array(
+		"type" => "integer",
+		"notnull" => false,
+		"length" => 4,
+		"default" => 0));
+}
+
+?>
+<#5>
+<?php
+
+if (!$ilDB->tableColumnExists("file_data", "locked_download"))
+{
+	$ilDB->addTableColumn("file_data", "locked_download", array(
+		"type" => "integer",
+		"notnull" => false,
+		"length" => 1,
+		"default" => 0));
+}
+
+?>

@@ -615,15 +615,15 @@ class ilBookingReservation
 			{
 				$where[] = 'date_to <= '.$ilDB->quote($filter['to'], 'integer');
 			}							
+			if(!$filter['past'])
+			{
+				$where[] = 'date_to > '.$ilDB->quote(time(), 'integer');
+			}
 		}
 		if($filter['user_id']) // #16584
 		{
 			$where[] = 'user_id = '.$ilDB->quote($filter['user_id'], 'integer');
-		}	
-		if(!$filter['past'])
-		{
-			$where[] = 'date_to > '.$ilDB->quote(time(), 'integer');
-		}
+		}			
 		/*
 		if($a_group_id)
 		{

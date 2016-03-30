@@ -390,7 +390,12 @@ class ilMainMenuGUI
 			$this->tpl->setVariable("HEADER_ICON", ilUtil::getImagePath("HeaderIcon.svg"));
 		}
 		*/
-		
+
+		// patch-rol start
+		include_once("./Services/ROL/MainMenu/classes/class.rolMainMenuGUI.php");
+		rolMainMenuGUI::modify();
+		// patch-rol end
+
 		$this->tpl->setVariable("TXT_MAIN_MENU", $lng->txt("main_menu"));
 		
 		$this->tpl->parseCurrentBlock();

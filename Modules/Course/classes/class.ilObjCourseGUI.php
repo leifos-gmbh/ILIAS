@@ -759,7 +759,14 @@ class ilObjCourseGUI extends ilContainerGUI
 		$form->setTitle($this->lng->txt('crs_general_info'));
 		$form->addCommandButton('updateInfo',$this->lng->txt('save'));
 		$form->addCommandButton('cancel',$this->lng->txt('cancel'));
-		
+
+		// patch-rol start
+		include_once("./Services/ROL/Course/classes/class.rolCourseGUI.php");
+		$rol_course = new rolCourseGUI($this->object->getId());
+		$rol_course->modifyInfoForm($form);
+		// patch-rol end
+
+
 		$area = new ilTextAreaInputGUI($this->lng->txt('crs_important_info'),'important');
 		$area->setValue($this->object->getImportantInformation());
 		$area->setRows(6);
@@ -888,6 +895,12 @@ class ilObjCourseGUI extends ilContainerGUI
 		include_once 'Modules/Course/classes/class.ilECSCourseSettings.php';
 		$ecs = new ilECSCourseSettings($this->object);
 		$ecs->handleContentUpdate();
+
+		// patch-rol start
+		include_once("./Services/ROL/Course/classes/class.rolCourseGUI.php");
+		$rol_course = new rolCourseGUI($this->object->getId());
+		$rol_course->updateInfo();
+		// patch-rol end
 	
 		ilUtil::sendSuccess($this->lng->txt("crs_settings_saved"));
 		$this->editInfoObject();

@@ -276,10 +276,10 @@ class ilMainMenuGUI
 		if( CLIENT_ID == $ini->readVariable('soap', 'client') )
 		{
 			include_once('Plugins/ElisCustomTrackingTool/classes/class.ElisCustomTrackingToolGUI.php');
-			$this->renderEntry($a_tpl, "tracking",
-							   $lng->txt("tracking"),
-							   'ectt.php',
-							   $this->target);
+			//$this->renderEntry($this->tpl, "tracking",
+			//				   $lng->txt("tracking"),
+			//				   'ectt.php',
+			//				   $this->target);
 		}
 		// ibi-patch end
 
@@ -501,10 +501,10 @@ class ilMainMenuGUI
 		if( CLIENT_ID == $ini->readVariable('soap', 'client') )
 		{
 			include_once('Plugins/ElisCustomTrackingTool/classes/class.ElisCustomTrackingToolGUI.php');
-			$this->renderEntry($a_tpl, "tracking",
-							   $lng->txt("tracking"),
-							   'ectt.php',
-							   $this->target);
+			//$this->renderEntry($a_tpl, "tracking",
+			//				   $lng->txt("tracking"),
+			//				   'ectt.php',
+			//				   $this->target);
 		}
 		// ibi-patch end
 

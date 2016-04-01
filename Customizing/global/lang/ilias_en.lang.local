@@ -1,3 +1,4 @@
 <!-- language file start -->
 exc#:#exc_individual_deadline#:#Individual Deadline
 exc#:#exc_individual_deadline_action#:#Set Individual Deadline
+exc#:#exc_individual_deadline_before_global#:#The date has to be after the (last) deadline: %s.

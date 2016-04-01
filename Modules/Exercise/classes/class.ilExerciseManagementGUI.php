@@ -309,139 +309,6 @@ class ilExerciseManagementGUI
 		return;		
 	}
 	
-	protected function initIndividualDeadlineModal()
-	{
-		global $lng, $tpl;
-		
-		if($this->assignment->getDeadline())
-		{
-			// prepare modal+
-			include_once "./Services/UIComponent/Modal/classes/class.ilModalGUI.php";
-			$modal = ilModalGUI::getInstance();
-			$modal->setHeading($lng->txt("exc_individual_deadline"));
-			$modal->setId("ilExcIDl");
-			$modal->setBody('<div id="ilExcIDlBody"></div>');
-			$modal = $modal->getHTML();
-
-			$ajax_url = $this->ctrl->getLinkTarget($this, "handleIndividualDeadlineCalls", "", true, false);
-
-			$tpl->addJavaScript("./Modules/Exercise/js/ilExcIDl.js", true, 3);							
-			$tpl->addOnloadCode('il.ExcIDl.init("'.$ajax_url.'");');
-			
-			// :TODO:
-			include_once "./Services/Calendar/classes/class.ilCalendarUtil.php";
-			ilCalendarUtil::initJSCalendar();
-			
-			return $modal;
-		}
-	}
-	
-	protected function handleIndividualDeadlineCallsObject()
-	{
-		global $tpl;
-						
-		if(!$this->ctrl->isAsynch())
-		{			
-			$this->ctrl->redirect($this, "members");			
-		}
-		
-		if((bool)$_GET["dn"])
-		{
-			ilUtil::sendSuccess($this->lng->txt("settings_saved"), true);
-			$this->ctrl->redirect($this, $_REQUEST["part_id"]
-				? "showParticipant"
-				: "members");	
-		}
-				
-		if($_GET["idlid"])
-		{
-			$ids = explode(",", $_GET["idlid"]);
-		
-			if($ids)
-			{
-				$form = $this->initIndividualDeadlineForm($ids);						
-				echo $form->getHTML().
-					$tpl->getOnLoadCodeForAsynch();
-			}
-		}
-		else
-		{
-			$ids = array();
-			foreach($_POST as $id => $val)
-			{						
-				if(substr($id, 0, 3) == "dl_")
-				{
-					$ids[] = (int)substr($id, 3);
-				}
-			}			
-			if($ids)
-			{
-				$form = $this->initIndividualDeadlineForm($ids);
-				if($valid = $form->checkInput())
-				{										
-					$dl = new ilDate(max($this->assignment->getDeadline(), $this->assignment->getExtendedDeadline()), IL_CAL_UNIX);
-					$valid = true;
-					foreach($ids as $id)
-					{
-						$date_field = $form->getItemByPostVar("dl_".$id);
-						if(ilDate::_before($date_field->getDate(), $dl, IL_CAL_DAY))
-						{
-							$date_field->setAlert("xxx");
-							$valid = false;
-						}
-					}					
-				}
-				
-				if(!$valid)
-				{
-					$form->setValuesByPost();
-					echo $form->getHTML().
-						$tpl->getOnLoadCodeForAsynch();
-				}
-				else
-				{
-					echo "ok";
-				}
-			}
-		}
-		
-		exit();
-	}
-	
-	protected function initIndividualDeadlineForm(array $ids)
-	{
-		include_once "Services/Form/classes/class.ilPropertyFormGUI.php";
-		$form = new ilPropertyFormGUI();
-		$form->setFormAction($this->ctrl->getFormAction($this));
-		$form->setName("ilExcIDlForm");
-		
-		include_once "Services/User/classes/class.ilUserUtil.php";
-		foreach($ids as $id)
-		{
-			$name = ilUserUtil::getNamePresentation($id);
-			$dl = new ilDateTimeInputGUI($name, "dl_".$id);
-			$form->addItem($dl);
-		}
-		
-		$form->addCommandButton("", $this->lng->txt("save"));
-		
-		return $form;
-	}
-	
-	protected function setIndividualDeadlineObject()
-	{		
-		// this will only get called if no selection
-		ilUtil::sendFailure($this->lng->txt("select_one"));		
-		if(!$_REQUEST["part_id"])
-		{
-			$this->membersObject();
-		}
-		else
-		{
-			$this->showParticipantObject();
-		}
-	}
-	
 	/**
 	 * Save grades
 	 */
@@ -1481,6 +1348,185 @@ class ilExerciseManagementGUI
 		
 		ilUtil::sendSuccess($this->lng->txt("msg_obj_modified"), true);
 		$this->ctrl->redirect($this, "members");
+	}
+	
+	
+	//
+	// individual deadlines
+	// 
+	
+	protected function initIndividualDeadlineModal()
+	{
+		global $lng, $tpl;
+		
+		if($this->assignment->getDeadline())
+		{
+			// prepare modal+
+			include_once "./Services/UIComponent/Modal/classes/class.ilModalGUI.php";
+			$modal = ilModalGUI::getInstance();
+			$modal->setHeading($lng->txt("exc_individual_deadline"));
+			$modal->setId("ilExcIDl");
+			$modal->setBody('<div id="ilExcIDlBody"></div>');
+			$modal = $modal->getHTML();
+
+			$ajax_url = $this->ctrl->getLinkTarget($this, "handleIndividualDeadlineCalls", "", true, false);
+
+			$tpl->addJavaScript("./Modules/Exercise/js/ilExcIDl.js", true, 3);							
+			$tpl->addOnloadCode('il.ExcIDl.init("'.$ajax_url.'");');
+			
+			// :TODO: 5.2
+			include_once "./Services/Calendar/classes/class.ilCalendarUtil.php";
+			ilCalendarUtil::initJSCalendar();
+			
+			return $modal;
+		}
+	}
+	
+	protected function handleIndividualDeadlineCallsObject()
+	{
+		global $tpl;
+						
+		if(!$this->ctrl->isAsynch())
+		{			
+			$this->ctrl->redirect($this, "members");			
+		}
+		
+		// we are done
+		if((bool)$_GET["dn"])
+		{
+			ilUtil::sendSuccess($this->lng->txt("settings_saved"), true);
+			$this->ctrl->redirect($this, "members");	
+		}
+				
+		// initial form call
+		if($_GET["idlid"])
+		{
+			$ids = explode(",", $_GET["idlid"]);		
+			if($ids)
+			{				
+				if($this->assignment->getType() == ilExAssignment::TYPE_UPLOAD_TEAM)
+				{
+					include_once("./Modules/Exercise/classes/class.ilExAssignmentTeam.php");					
+					$tmp = $ids;
+					$ids = array();
+					foreach($tmp as $user_id)
+					{
+						// multi-checkbox is user-id-based, convert to team-ids
+						if(is_numeric($user_id))
+						{
+							$ids[] = "t".ilExAssignmentTeam::getTeamId($this->assignment->getId(), $user_id);
+						}
+						// row action is already team id
+						else 
+						{
+							$ids[] = $user_id;
+						}
+					}
+				}
+				
+				$form = $this->initIndividualDeadlineForm($ids);						
+				echo $form->getHTML().
+					$tpl->getOnLoadCodeForAsynch();
+			}
+		}
+		// form "submit"
+		else
+		{
+			$ids = array();
+			foreach($_POST as $id => $val)
+			{						
+				if(substr($id, 0, 3) == "dl_")
+				{
+					$ids[] = substr($id, 3);
+				}
+			}			
+			if($ids)
+			{
+				$form = $this->initIndividualDeadlineForm($ids);
+				if($valid = $form->checkInput())
+				{										
+					$dl = new ilDateTime(max($this->assignment->getDeadline(), $this->assignment->getExtendedDeadline()), IL_CAL_UNIX);
+					$valid = true;
+					foreach($ids as $id)
+					{
+						$date_field = $form->getItemByPostVar("dl_".$id);
+						if(ilDate::_before($date_field->getDate(), $dl))
+						{
+							$date_field->setAlert(sprintf($this->lng->txt("exc_individual_deadline_before_global"), ilDatePresentation::formatDate($dl)));
+							$valid = false;
+						}
+					}					
+				}
+				
+				if(!$valid)
+				{
+					$form->setValuesByPost();
+					echo $form->getHTML().
+						$tpl->getOnLoadCodeForAsynch();
+				}
+				else
+				{
+					echo "ok";
+				}
+			}
+		}
+		
+		exit();
+	}
+	
+	protected function initIndividualDeadlineForm(array $ids)
+	{
+		include_once "Services/Form/classes/class.ilPropertyFormGUI.php";
+		$form = new ilPropertyFormGUI();
+		$form->setFormAction($this->ctrl->getFormAction($this));
+		$form->setName("ilExcIDlForm");
+		
+		include_once("./Modules/Exercise/classes/class.ilExAssignmentTeam.php");
+		$teams = ilExAssignmentTeam::getInstancesFromMap($this->assignment->getId());				
+		
+		include_once "Services/User/classes/class.ilUserUtil.php";
+		foreach($ids as $id)
+		{
+			// single user
+			if(is_numeric($id))
+			{
+				$name = ilObjUser::_lookupName($id);
+				$name = $name["lastname"].", ".$name["firstname"];
+			}
+			// team
+			else
+			{
+				$name = "";
+				$team_id = (int)substr($id, 1);
+				if(array_key_exists($team_id, $teams))
+				{
+					$name = array();
+					foreach($teams[$team_id]->getMembers() as $member_id)
+					{
+						$uname = ilObjUser::_lookupName($member_id);
+						$name[] = $uname["lastname"].", ".$uname["firstname"];
+					}
+					asort($name);
+					$name = implode("<br />", $name);
+				}
+			}
+			
+			$dl = new ilDateTimeInputGUI($name, "dl_".$id);			
+			$dl->setShowTime(true);
+			$dl->setRequired(true);
+			$form->addItem($dl);
+		}
+		
+		$form->addCommandButton("", $this->lng->txt("save"));
+		
+		return $form;
+	}
+	
+	protected function setIndividualDeadlineObject()
+	{		
+		// this will only get called if no selection
+		ilUtil::sendFailure($this->lng->txt("select_one"));				
+		$this->membersObject();		
 	}
 }
 

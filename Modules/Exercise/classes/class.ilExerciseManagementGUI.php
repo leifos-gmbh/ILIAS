@@ -1446,7 +1446,8 @@ class ilExerciseManagementGUI
 				$res = array();
 				if($valid = $form->checkInput())
 				{										
-					$dl = new ilDateTime(max($this->assignment->getDeadline(), $this->assignment->getExtendedDeadline()), IL_CAL_UNIX);					
+					// :TODO: should individual deadlines BEFORE extended be possible?			
+					$dl = new ilDateTime($this->assignment->getDeadline(), IL_CAL_UNIX);	
 					foreach($ids as $id)
 					{
 						$date_field = $form->getItemByPostVar("dl_".$id);

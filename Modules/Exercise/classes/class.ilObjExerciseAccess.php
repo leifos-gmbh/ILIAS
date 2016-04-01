@@ -127,6 +127,8 @@ class ilObjExerciseAccess extends ilObjectAccess implements ilConditionHandling
 			$cnt[$row["id"]] = true;			
 		}
 		
+		// :TODO: mind personal deadline?
+		
 		if($dl)
 		{
 			$time_diff = ilUtil::int2array($dl - time(), null);

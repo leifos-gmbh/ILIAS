@@ -178,6 +178,38 @@ class ilExAssignment
 	}
 	
 	/**
+	 * Get individual deadline
+	 * @param int $a_user_id
+	 * @return int
+	 */
+	function getPersonalDeadline($a_user_id)
+	{
+		global $ilDB;
+		
+		$is_team = false;
+		if($this->getType() == self::TYPE_UPLOAD_TEAM)
+		{
+			include_once("./Modules/Exercise/classes/class.ilExAssignmentTeam.php");
+			$team_id = ilExAssignmentTeam::getTeamId($this->getId(), $a_user_id);
+			if(!$team_id)
+			{
+				return;
+			}
+			$a_user_id = $team_id;
+			$is_team = true;
+		}
+		
+		$set = $ilDB->query("SELECT tstamp FROM exc_idl".
+			" WHERE ass_id = ".$ilDB->quote($this->getId(), "integer").
+			" AND member_id = ".$ilDB->quote($a_user_id, "integer").
+			" AND is_team = ".$ilDB->quote($is_team, "integer"));
+		$row = $ilDB->fetchAssoc($set);
+		return $row["tstamp"]
+			? $row["tstamp"]
+			: $this->getDeadline();
+	}
+	
+	/**
 	 * Set extended deadline (timestamp)
 	 *
 	 * @param int	
@@ -1627,13 +1659,18 @@ class ilExAssignment
 	
 	public function afterDeadline()
 	{
+		global $ilUser;
+				
+		// :TODO: always current user?
+		$idl = $this->getPersonalDeadline($ilUser->getId());
+		
 		// no deadline === true
-		$deadline = max($this->deadline, $this->deadline2);
+		$deadline = max($this->deadline, $this->deadline2, $idl);
 		return ($deadline - time() <= 0);
 	}
 	
 	public function afterDeadlineStrict()
-	{
+	{				
 		// no deadline === false
 		$deadline = max($this->deadline, $this->deadline2);		
 		return ($deadline > 0 && 

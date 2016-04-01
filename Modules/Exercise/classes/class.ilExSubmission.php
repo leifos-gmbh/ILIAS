@@ -237,8 +237,10 @@ class ilExSubmission
 	
 	protected function isLate()
 	{
-		return ($this->assignment->getDeadline() &&
-			$this->assignment->getDeadline() < time());		
+		$dl = max($this->assignment->getDeadline(),
+			$this->assignment->getPersonalDeadline($this->getUserId()));
+		
+		return ($dl && $dl < time());		
 	}
 	
 	protected function initStorage()

@@ -26,16 +26,20 @@ class ilExAssignmentGUI
 	 */
 	function getOverviewHeader(ilExAssignment $a_ass)
 	{
-		global $lng;
+		global $lng, $ilUser;
 		
 		$lng->loadLanguageModule("exc");
 		
 		$tpl = new ilTemplate("tpl.assignment_head.html", true, true, "Modules/Exercise");
 		
 		// we are completely ignoring the extended deadline here
-
-		if ($a_ass->getDeadline() &&
-			$a_ass->getDeadline() < time())
+		
+		$idl = $a_ass->getPersonalDeadline($ilUser->getId());
+		
+		// :TODO: meaning of "ended on"
+		$dl = max($a_ass->getDeadline(), $idl);		
+		if ($dl &&
+			$dl < time())
 		{
 			$tpl->setCurrentBlock("prop");
 			$tpl->setVariable("PROP", $lng->txt("exc_ended_on"));
@@ -64,7 +68,7 @@ class ilExAssignmentGUI
 		}
 		else
 		{					
-			$time_str = $this->getTimeString($a_ass->getDeadline());
+			$time_str = $this->getTimeString($idl);
 			$tpl->setCurrentBlock("prop");
 			$tpl->setVariable("PROP", $lng->txt("exc_time_to_send"));
 			$tpl->setVariable("PROP_VAL", $time_str);
@@ -79,6 +83,14 @@ class ilExAssignmentGUI
 				$tpl->parseCurrentBlock();
 			}
 			
+			if ($idl)
+			{
+				$tpl->setCurrentBlock("prop");
+				$tpl->setVariable("PROP", $lng->txt("exc_individual_deadline"));
+				$tpl->setVariable("PROP_VAL",
+					ilDatePresentation::formatDate(new ilDateTime($idl,IL_CAL_UNIX)));
+				$tpl->parseCurrentBlock();
+			}			
 		}
 
 		$mand = "";
@@ -160,7 +172,9 @@ class ilExAssignmentGUI
 	
 	protected function addSchedule(ilInfoScreenGUI $a_info, ilExAssignment $a_ass)
 	{		
-		global $lng;
+		global $lng, $ilUser;
+		
+		$idl = $a_ass->getPersonalDeadline($ilUser->getId());
 		
 		$a_info->addSection($lng->txt("exc_schedule"));
 		if ($a_ass->getStartTime() > 0)
@@ -183,9 +197,17 @@ class ilExAssignmentGUI
 				$dl = '<span class="warning">'.$dl.'</span>';						
 				$until .= $dl;
 			}
+			
 			$a_info->addProperty($lng->txt("exc_edit_until"), $until);			
 		}
-		$time_str = $this->getTimeString($a_ass->getDeadline());
+		
+		if($idl)
+		{
+			$a_info->addProperty($lng->txt("exc_individual_deadline"), 
+				ilDatePresentation::formatDate(new ilDateTime($idl,IL_CAL_UNIX)));	
+		}
+		
+		$time_str = $this->getTimeString($idl);
 		if (!$a_ass->notStartedYet())
 		{
 			$a_info->addProperty($lng->txt("exc_time_to_send"),

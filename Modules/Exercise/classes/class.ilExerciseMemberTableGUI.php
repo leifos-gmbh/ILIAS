@@ -129,13 +129,21 @@ class ilExerciseMemberTableGUI extends ilTable2GUI
 		$this->setDefaultOrderDirection("asc");
 		
 		$this->setEnableHeader(true);
-		$this->setFormAction($ilCtrl->getFormAction($a_parent_obj));
+		$this->setFormAction($ilCtrl->getFormAction($a_parent_obj));	
 		$this->setRowTemplate("tpl.exc_members_row.html", "Modules/Exercise");
 		//$this->disable("footer");
 		$this->setEnableTitle(true);
 		$this->setSelectAllCheckbox("member");
 
 		$this->addMultiCommand("saveStatusSelected", $lng->txt("exc_save_selected"));
+		
+		// individual deadlines
+		if($this->ass->getDeadline())
+		{
+			$this->setFormName("ilExcIDlForm");
+			$this->addMultiCommand("setIndividualDeadline", $lng->txt("exc_individual_deadline_action"));
+		}
+		
 		$this->addMultiCommand("redirectFeedbackMail", $lng->txt("exc_send_mail"));
 		$this->addMultiCommand("sendMembers", $lng->txt("exc_send_assignment"));
 		
@@ -151,7 +159,7 @@ class ilExerciseMemberTableGUI extends ilTable2GUI
 		
 		include_once "Services/Form/classes/class.ilPropertyFormGUI.php";
 		include_once "Services/UIComponent/Overlay/classes/class.ilOverlayGUI.php";
-		$this->overlay_tpl = new ilTemplate("tpl.exc_learner_comment_overlay.html", true, true, "Modules/Exercise");
+		$this->overlay_tpl = new ilTemplate("tpl.exc_learner_comment_overlay.html", true, true, "Modules/Exercise");		
 	}
 	
 	function getSelectableColumns()
@@ -345,6 +353,15 @@ class ilExerciseMemberTableGUI extends ilTable2GUI
 				$this->tpl->setVariable("LINK_NEW_DOWNLOAD", $file_info["files"]["download_new_url"]);
 				$this->tpl->setVariable("TXT_NEW_DOWNLOAD", $file_info["files"]["download_new_txt"]);		
 				$this->tpl->parseCurrentBlock();
+			}
+			
+			// individual deadline
+			if($this->ass->getDeadline())
+			{				
+				$this->tpl->setVariable("TXT_IDL", $lng->txt("exc_individual_deadline"));
+				$this->tpl->setVariable("ID_IDL", $member["team_id"]
+					? "t".$member["team_id"]
+					: $member_id);
 			}
 
 			// note

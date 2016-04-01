@@ -1754,6 +1754,53 @@ class ilExAssignment
 			}
 		}	
 	}
+	
+	
+	//
+	// individual deadlines
+	//
+	
+	public function setIndividualDeadline($id, ilDateTime $date)
+	{
+		global $ilDB;
+		
+		$is_team = false;
+		if(!is_numeric($id))
+		{
+			$id = substr($id, 1);
+			$is_team = true;
+		}
+		
+		$ilDB->replace("exc_idl",
+			array(
+				"ass_id" => array("integer", $this->getId()),
+				"member_id" => array("integer", $id),
+				"is_team" => array("integer", $is_team)
+			),
+			array(
+				"tstamp" => array("integer", $date->get(IL_CAL_UNIX))
+			)
+		);
+	}
+	
+	public function getIndividualDeadlines()
+	{
+		global $ilDB;
+		
+		$set = $ilDB->query("SELECT * FROM exc_idl".
+			" WHERE ass_id = ".$ilDB->quote($this->getId(), "integer"));
+		while($row = $ilDB->fetchAssoc($set))
+		{
+			if($row["is_team"])
+			{
+				$row["member_id"] = "t".$row["member_id"];
+			}
+			
+			$res[$row["member_id"]] = new ilDateTime($row["tstamp"], IL_CAL_UNIX);
+		}
+		
+		return $res;
+	}
 }
 
 ?>

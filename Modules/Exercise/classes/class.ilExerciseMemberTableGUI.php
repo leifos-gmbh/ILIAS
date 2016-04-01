@@ -51,6 +51,8 @@ class ilExerciseMemberTableGUI extends ilTable2GUI
 		
 		$data = $this->ass->getMemberListData();
 		
+		$idl = $this->ass->getIndividualDeadlines();
+		
 		// team upload?  (1 row == 1 team)
 		if($this->ass->hasTeam())
 		{	
@@ -78,7 +80,16 @@ class ilExerciseMemberTableGUI extends ilTable2GUI
 				}
 				
 				$tmp[$team_id]["team"][$item["usr_id"]] = $item["name"];
-				$tmp[$team_id]["team_id"] = $team_id;
+				$tmp[$team_id]["team_id"] = $team_id;			
+				
+				if(is_numeric($team_id))
+				{
+					$idl_team_id = "t".$team_id;
+					if(array_key_exists($idl_team_id, $idl))
+					{
+						$tmp[$team_id]["team_idl"] = $idl[$idl_team_id];	
+					}
+				}
 			}
 			
 			$data = $tmp;
@@ -91,7 +102,15 @@ class ilExerciseMemberTableGUI extends ilTable2GUI
 			if($ass_obj->getPeerReview())
 			{
 				include_once './Services/Rating/classes/class.ilRatingGUI.php';
-			}														
+			}				
+			
+			foreach($data as $idx => $item)
+			{
+				if(array_key_exists($item["usr_id"], $idl))
+				{
+					$data[$idx]["idl"] = $idl[$item["usr_id"]];	
+				}
+			}
 		}
 		
 		$this->setData($data);
@@ -358,10 +377,31 @@ class ilExerciseMemberTableGUI extends ilTable2GUI
 			// individual deadline
 			if($this->ass->getDeadline())
 			{				
+				$idl = null;
+				if(!isset($member["team"]))
+				{
+					if(isset($member["idl"]))
+					{
+						$idl = $member["idl"];
+					}
+				}
+				else
+				{
+					if(isset($member["team_idl"]))
+					{
+						$idl = $member["team_idl"];
+					}
+				}
+				
 				$this->tpl->setVariable("TXT_IDL", $lng->txt("exc_individual_deadline"));
+				$this->tpl->setVariable("VAL_IDL", $idl
+					? ilDatePresentation::formatDate($idl)
+					: "---");
 				$this->tpl->setVariable("ID_IDL", $member["team_id"]
 					? "t".$member["team_id"]
 					: $member_id);
+				
+				
 			}
 
 			// note

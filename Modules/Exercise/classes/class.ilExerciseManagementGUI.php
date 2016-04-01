@@ -1443,10 +1443,10 @@ class ilExerciseManagementGUI
 			if($ids)
 			{
 				$form = $this->initIndividualDeadlineForm($ids);
+				$res = array();
 				if($valid = $form->checkInput())
 				{										
-					$dl = new ilDateTime(max($this->assignment->getDeadline(), $this->assignment->getExtendedDeadline()), IL_CAL_UNIX);
-					$valid = true;
+					$dl = new ilDateTime(max($this->assignment->getDeadline(), $this->assignment->getExtendedDeadline()), IL_CAL_UNIX);					
 					foreach($ids as $id)
 					{
 						$date_field = $form->getItemByPostVar("dl_".$id);
@@ -1454,6 +1454,10 @@ class ilExerciseManagementGUI
 						{
 							$date_field->setAlert(sprintf($this->lng->txt("exc_individual_deadline_before_global"), ilDatePresentation::formatDate($dl)));
 							$valid = false;
+						}
+						else						
+						{
+							$res[$id] = $date_field->getDate();
 						}
 					}					
 				}
@@ -1466,6 +1470,11 @@ class ilExerciseManagementGUI
 				}
 				else
 				{
+					foreach($res as $id => $date)
+					{						
+						$this->assignment->setIndividualDeadline($id, $date);
+					}
+					
 					echo "ok";
 				}
 			}
@@ -1482,7 +1491,9 @@ class ilExerciseManagementGUI
 		$form->setName("ilExcIDlForm");
 		
 		include_once("./Modules/Exercise/classes/class.ilExAssignmentTeam.php");
-		$teams = ilExAssignmentTeam::getInstancesFromMap($this->assignment->getId());				
+		$teams = ilExAssignmentTeam::getInstancesFromMap($this->assignment->getId());	
+		
+		$values = $this->assignment->getIndividualDeadlines();
 		
 		include_once "Services/User/classes/class.ilUserUtil.php";
 		foreach($ids as $id)
@@ -1515,6 +1526,11 @@ class ilExerciseManagementGUI
 			$dl->setShowTime(true);
 			$dl->setRequired(true);
 			$form->addItem($dl);
+			
+			if(array_key_exists($id, $values))
+			{
+				$dl->setDate($values[$id]);
+			}
 		}
 		
 		$form->addCommandButton("", $this->lng->txt("save"));

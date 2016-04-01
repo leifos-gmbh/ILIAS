@@ -7195,7 +7195,13 @@ function getAnswerFeedbackPoints()
 		include_once('./Services/Tracking/classes/class.ilLPObjSettings.php');
 		$obj_settings = new ilLPObjSettings($this->getId());
 		$obj_settings->cloneSettings($newObj->getId());
-		
+
+		// patch-rol start
+		include_once("./Services/ROL/Test/classes/class.rolTest.php");
+		$t = new rolTest($this->getTestId());
+		$t->cloneTest($newObj->getTestId());
+		// patch-rol end
+
 		return $newObj;
 	}
 

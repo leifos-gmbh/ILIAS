@@ -10,3 +10,15 @@ if(!$ilDB->tableColumnExists('crs_settings', 'min_onlinetime'))
 	);
 }
 ?>
+<#2>
+<?php
+if(!$ilDB->tableColumnExists('tst_tests', 'is_certificate_test'))
+{
+	$ilDB->addTableColumn('tst_tests', 'is_certificate_test', array(
+					'type'    => 'integer',
+					'length'  => 1,
+					'notnull' => true,
+					'default' => 0)
+	);
+}
+?>

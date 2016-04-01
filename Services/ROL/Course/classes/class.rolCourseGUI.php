@@ -10,6 +10,16 @@
 class rolCourseGUI
 {
 	/**
+	 * @var array
+	 */
+	protected $post = array();
+
+	/**
+	 * @var int
+	 */
+	protected $id = 0;
+
+	/**
 	 * Constructor
 	 *
 	 * @param int $a_id Course ID

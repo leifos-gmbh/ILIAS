@@ -323,6 +323,12 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
 			ilUtil::sendInfo(implode('<br />', $infoMsg), true);
 		}
 
+		// patch-rol start
+		include_once("./Services/ROL/Test/classes/class.rolTestGUI.php");
+		$rol_test_gui = new rolTestGUI($this->testOBJ->getId());
+		$rol_test_gui->updateTest();
+		// patch-rol end
+
 		ilUtil::sendSuccess($this->lng->txt("msg_obj_modified"), true);
 		$this->ctrl->redirect($this, self::CMD_SHOW_FORM);
 	}
@@ -485,6 +491,13 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
 			$desc->setValue($desc_obj->getDescription());
 			$form->addItem($desc);
 		}
+
+
+		// patch-rol start
+		include_once("./Services/ROL/Test/classes/class.rolTestGUI.php");
+		$rol_test_gui = new rolTestGUI($this->testOBJ->getId());
+		$rol_test_gui->modifyPropertiesForm($form);
+		// patch-rol end
 
 		// pool usage
 		$pool_usage = new ilRadioGroupInputGUI($this->lng->txt('test_question_pool_usage'), 'use_pool');

@@ -210,6 +210,21 @@ class ilExAssignment
 	}
 	
 	/**
+	 * Get last/final personal deadline (of assignment)
+	 * 
+	 * @return int
+	 */
+	protected function getLastPersonalDeadline()
+	{
+		global $ilDB;
+		
+		$set = $ilDB->query("SELECT MAX(tstamp) FROM exc_idl".
+			" WHERE ass_id = ".$ilDB->quote($this->getId(), "integer"));
+		$row = $ilDB->fetchAssoc($set);
+		return $row["tstamp"];
+	}
+	
+	/**
 	 * Set extended deadline (timestamp)
 	 *
 	 * @param int	
@@ -1671,8 +1686,12 @@ class ilExAssignment
 	
 	public function afterDeadlineStrict()
 	{				
+		// :TODO: this means that peer feedback, global feedback is available 
+		// after LAST personal deadline
+		$idl = $this->getLastPersonalDeadline();
+		
 		// no deadline === false
-		$deadline = max($this->deadline, $this->deadline2);		
+		$deadline = max($this->deadline, $this->deadline2, $idl);		
 		return ($deadline > 0 && 
 			$this->afterDeadline());	
 	}

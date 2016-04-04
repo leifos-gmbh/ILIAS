@@ -63,16 +63,25 @@ class ilExSubmission
 	}
 	
 	
+	/**
+	 * @return \ilExAssignment
+	 */
 	public function getAssignment()
 	{
 		return $this->assignment;
 	}
 	
+	/**	 
+	 * @return \ilExAssignmentTeam
+	 */
 	public function getTeam()
 	{
 		return $this->team;
 	}
 	
+	/**	 
+	 * @return \ilExPeerReview
+	 */
 	public function getPeerReview()
 	{
 		return $this->peer_review;

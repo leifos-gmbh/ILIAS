@@ -1684,11 +1684,14 @@ class ilExAssignment
 		return ($deadline - time() <= 0);
 	}
 	
-	public function afterDeadlineStrict()
-	{				
+	public function afterDeadlineStrict($a_include_personal = true)
+	{						
 		// :TODO: this means that peer feedback, global feedback is available 
 		// after LAST personal deadline
-		$idl = $this->getLastPersonalDeadline();
+		// team management is currently ignoring personal deadlines
+		$idl = (bool)$a_include_personal
+			? $this->getLastPersonalDeadline()
+			: null;
 		
 		// no deadline === false
 		$deadline = max($this->deadline, $this->deadline2, $idl);		

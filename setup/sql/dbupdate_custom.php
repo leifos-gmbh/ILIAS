@@ -26,3 +26,12 @@ if(!$ilDB->indexExistsByFields('conditions', array('target_ref_id')))
 	$ilDB->addIndex('conditions', array('target_ref_id'), 'c1');
 }
 ?>
+<#3>
+<?php
+	include_once('./Services/Migration/DBUpdate_3560/classes/class.ilDBUpdateNewObjectType.php');
+	ilDBUpdateNewObjectType::addAdminNode('pdfg', 'PDFGeneration');
+?>
+<#4>
+<?php
+	$ilCtrlStructureReader->getStructure();
+?>

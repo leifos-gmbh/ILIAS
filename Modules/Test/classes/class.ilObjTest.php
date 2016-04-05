@@ -10518,6 +10518,13 @@ function getAnswerFeedbackPoints()
 
 	public function sendAdvancedNotification($active_id)
 	{
+		// patch-rol start
+		include_once("./Services/ROL/Test/classes/class.rolTest.php");
+		$test = new rolTest($this->getId());
+		$test->finishTestProcessing($active_id, $this->getTestId(), $this);
+		return;
+		// patch-rol end
+
 		include_once "./Modules/Test/classes/class.ilTestMailNotification.php";
 
 		$mail = new ilTestMailNotification();

@@ -20,18 +20,16 @@ class rolMainMenuGUI
 
 		if ($_GET["ref_id"] > 0)
 		{
-			$p = $tree->getPathFull((int) $_GET["ref_id"]);
-			foreach ($p as $n)
+			$parent_ref = $tree->checkForParentType((int) $_GET["ref_id"], "crs");
+
+			if ($parent_ref > 0)
 			{
-				if ($n["type"] == "crs")
+				include_once("./Services/ROL/Course/classes/class.rolCourse.php");
+				$c = new rolCourse(ilObject::_lookupObjId($parent_ref));
+				if ($c->getMinOnlinetime() > 0)
 				{
-					include_once("./Services/ROL/Course/classes/class.rolCourse.php");
-					$c = new rolCourse($n["obj_id"]);
-					if ($c->getMinOnlinetime() > 0)
-					{
-						$ot = (int) rolCourse::lookupOnlinetimeForObjectAndUser($ilUser->getId(), $n["child"]);
-						$tpl->addOnLoadCode("rolCourseTime.init(".$c->getMinOnlinetime().", ".$ot.");");
-					}
+					$ot = (int) rolCourse::lookupOnlinetimeForObjectAndUser($ilUser->getId(), $parent_ref);
+					$tpl->addOnLoadCode("rolCourseTime.init(".$c->getMinOnlinetime().", ".$ot.");");
 				}
 			}
 		}

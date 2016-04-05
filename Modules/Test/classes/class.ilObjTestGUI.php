@@ -3635,6 +3635,12 @@ class ilObjTestGUI extends ilObjectGUI
 						$btn->setPrimary(true);
 						$big_button[] = $btn;
 					}
+
+					// patch-rol start
+					include_once("./Services/ROL/Test/classes/class.rolTestGUI.php");
+					$rol_test_gui = new rolTestGUI($this->object->getId());
+					$rol_test_gui->modifyStartButtons($big_button);
+					// patch-rol end
 				}
 				else
 				{

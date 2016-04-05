@@ -22,3 +22,8 @@ if(!$ilDB->tableColumnExists('tst_tests', 'is_certificate_test'))
 	);
 }
 ?>
+<#3>
+<?php
+	$ilCtrlStructureReader->getStructure();
+?>
+

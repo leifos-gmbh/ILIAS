@@ -103,6 +103,37 @@ class rolCourse
 		return (int) $data[0]['spent_seconds'];
 	}
 
+	/**
+	 * Get all courses with minimal online time
+	 *
+	 * @return array of missing notifications obj_id, ref_id, users
+	 */
+	static function getMissingUserNotifications()
+	{
+		global $ilDB;
+
+		$log = ilLoggerFactory::getLogger('raiffrol');
+
+		$set = $ilDB->query("SELECT DISTINCT r.ref_id, r.obj_id, e.usr_id FROM object_data o JOIN crs_settings c ON (o.obj_id = c.obj_id) ".
+				" JOIN object_reference r ON (o.obj_id = r.obj_id) ".
+				" JOIN read_event e ON (r.obj_id = e.obj_id) ".
+				" LEFT JOIN user_course_email m ON (r.obj_id = m.course_id AND e.usr_id = m.user_id) ".
+				" WHERE c.min_onlinetime > ".$ilDB->quote(0, "integer").
+				" AND m.course_id IS NULL AND m.user_id IS NULL"
+			);
+		$missing = array();
+		while ($rec = $ilDB->fetchAssoc($set))
+		{
+			$missing[$rec["obj_id"]]["obj_id"] = $rec["obj_id"];
+			$missing[$rec["obj_id"]]["ref_id"] = $rec["ref_id"];
+			$missing[$rec["obj_id"]]["users"][] = $rec["usr_id"];
+		}
+
+		//$log->debug("");
+
+		return $missing;
+	}
+
 
 }
 

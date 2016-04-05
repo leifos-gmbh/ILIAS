@@ -1,4 +1,7 @@
 <?xml version = "1.0" encoding = "UTF-8"?>
 <service xmlns="http://www.w3.org" version="$Id$" id="raiffrol">
+	<crons>
+		<cron id="rol_test_notifications" class="rolTestNotifications" />
+	</crons>
 	<logging />
 </service>

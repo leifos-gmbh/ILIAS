@@ -180,7 +180,7 @@ Im Anhang dieser E-Mail finden Sie Ihre persönliche Teilnahmebestätigung.
 Mit freundlichen Grüßen,
 Ihr Trainingsleiter';
 		$to = "rvs.arbeitssicherheit@raiffeisen.it";
-		$to = "alex.killing@gmx.de";
+		$to = "killing@leifos.com";
 		$this->log->debug("Sending Mail to: ".$to);
 		$mail->sendMail(	/* Email to Client */
 			$to, // to
@@ -231,7 +231,7 @@ Ihr Trainingsleiter';
 		include_once "Modules/Test/classes/class.ilTestCertificateAdapter.php";
 		$certificate = new ilCertificate(new ilTestCertificateAdapter($a_test));
 		$certificate = $certificate->outCertificate(array("active_id" => $active_id, "pass" => $pass), false);
-		$this->log->debug("Got certificate: ".$certificate);
+		$this->log->debug("Got certificate: ".strlen($certificate));
 
 		// save pdf file
 		if($certificate)
@@ -256,6 +256,26 @@ Ihr Trainingsleiter';
 		}
 		$this->log->debug("Nothing to return - no certificate.");
 		return "";
+	}
+
+	/**
+	 * Get all certificate tests
+	 *
+	 * @return array all certificate tests "ref_id", "obj_id"
+	 */
+	static function getAllCertificateTests()
+	{
+		global $ilDB;
+
+		$set = $ilDB->query("SELECT r.obj_id, r.ref_id FROM tst_tests t JOIN object_reference r ON (t.obj_fi = r.obj_id)".
+			" WHERE t.is_certificate_test = ".$ilDB->quote(1, "integer")
+			);
+		$tests = array();
+		while ($rec = $ilDB->fetchAssoc($set))
+		{
+			$tests[] = $rec;
+		}
+		return $tests;
 	}
 
 }

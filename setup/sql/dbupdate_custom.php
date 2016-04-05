@@ -26,4 +26,24 @@ if(!$ilDB->tableColumnExists('tst_tests', 'is_certificate_test'))
 <?php
 	$ilCtrlStructureReader->getStructure();
 ?>
-
+<#4>
+<?php
+if (!$ilDB->tableExists('user_course_email'))
+{
+	$ilDB->createTable('user_course_email', array(
+			'user_id' => array(
+					'type' => 'integer',
+					'length' => 4,
+					'notnull' => true,
+					'default' => 0
+			),
+			'course_id' => array(
+					'type' => 'integer',
+					'length' => 4,
+					'notnull' => true,
+					'default' => 0
+			)
+	));
+	$ilDB->addPrimaryKey("user_course_email", array("user_id", "course_id"));
+}
+?>

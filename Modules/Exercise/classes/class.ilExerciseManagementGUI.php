@@ -1359,7 +1359,8 @@ class ilExerciseManagementGUI
 	{
 		global $lng, $tpl;
 		
-		if($this->assignment->getDeadline())
+		if($this->assignment->hasActiveIDl() &&
+			!$this->assignment->hasReadOnlyIDl())
 		{
 			// prepare modal+
 			include_once "./Services/UIComponent/Modal/classes/class.ilModalGUI.php";
@@ -1386,7 +1387,9 @@ class ilExerciseManagementGUI
 	{
 		global $tpl;
 						
-		if(!$this->ctrl->isAsynch())
+		if(!$this->ctrl->isAsynch() ||
+			!$this->assignment->hasActiveIDl() ||
+			$this->assignment->hasReadOnlyIDl())
 		{			
 			$this->ctrl->redirect($this, "members");			
 		}

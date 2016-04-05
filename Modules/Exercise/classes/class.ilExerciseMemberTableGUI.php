@@ -28,7 +28,7 @@ class ilExerciseMemberTableGUI extends ilTable2GUI
 	/**
 	* Constructor
 	*/
-	function __construct($a_parent_obj, $a_parent_cmd, $a_exc, $a_ass)
+	function __construct($a_parent_obj, $a_parent_cmd, ilObjExercise $a_exc, ilExAssignment $a_ass)
 	{
 		global $ilCtrl, $lng;
 		
@@ -37,7 +37,6 @@ class ilExerciseMemberTableGUI extends ilTable2GUI
 		$this->ass = $a_ass;
 		$this->ass_id = $this->ass->getId();
 		$this->setId("exc_mem_".$this->ass_id);
-		
 		
 		include_once("./Modules/Exercise/classes/class.ilFSStorageExercise.php");
 		$this->storage = new ilFSStorageExercise($this->exc_id, $this->ass_id);
@@ -156,8 +155,7 @@ class ilExerciseMemberTableGUI extends ilTable2GUI
 
 		$this->addMultiCommand("saveStatusSelected", $lng->txt("exc_save_selected"));
 		
-		// individual deadlines
-		if($this->ass->getDeadline())
+		if($this->ass->hasActiveIDl())
 		{
 			$this->setFormName("ilExcIDlForm");
 			$this->addMultiCommand("setIndividualDeadline", $lng->txt("exc_individual_deadline_action"));
@@ -375,7 +373,7 @@ class ilExerciseMemberTableGUI extends ilTable2GUI
 			}
 			
 			// individual deadline
-			if($this->ass->getDeadline())
+			if($this->ass->hasActiveIDl())
 			{				
 				$idl = null;
 				if(!isset($member["team"]))
@@ -393,15 +391,23 @@ class ilExerciseMemberTableGUI extends ilTable2GUI
 					}
 				}
 				
-				$this->tpl->setVariable("TXT_IDL", $lng->txt("exc_individual_deadline"));
-				$this->tpl->setVariable("VAL_IDL", $idl
-					? ilDatePresentation::formatDate($idl)
-					: "---");
-				$this->tpl->setVariable("ID_IDL", $member["team_id"]
-					? "t".$member["team_id"]
-					: $member_id);
-				
-				
+				if(!$this->ass->hasReadOnlyIDl())
+				{
+					$this->tpl->setVariable("TXT_IDL", $lng->txt("exc_individual_deadline"));
+					$this->tpl->setVariable("VAL_IDL", $idl
+						? ilDatePresentation::formatDate($idl)
+						: "---");
+					$this->tpl->setVariable("ID_IDL", $member["team_id"]
+						? "t".$member["team_id"]
+						: $member_id);
+				}
+				else
+				{
+					$this->tpl->setVariable("TXT_IDL_RO", $lng->txt("exc_individual_deadline"));
+					$this->tpl->setVariable("VAL_IDL_RO", $idl
+						? ilDatePresentation::formatDate($idl)
+						: "---");
+				}								
 			}
 
 			// note

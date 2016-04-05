@@ -1860,6 +1860,28 @@ class ilExAssignment
 		
 		return $res;
 	}
+	
+	public function hasActiveIDl()
+	{		
+		return (bool)$this->getDeadline();
+	}
+	
+	public function hasReadOnlyIDl()
+	{
+		if($this->getType() != ilExAssignment::TYPE_UPLOAD_TEAM &&
+			$this->getPeerReview())
+		{		
+			// all deadlines are read-only if we have peer feedback
+			include_once "Modules/Exercise/classes/class.ilExPeerReview.php";
+			$peer_review = new ilExPeerReview($this);	
+			if($peer_review->hasPeerReviewGroups())
+			{
+				return true;
+			}
+		}
+		
+		return false;		
+	}
 }
 
 ?>

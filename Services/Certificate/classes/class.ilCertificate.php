@@ -67,6 +67,7 @@ class ilCertificate
 	{
 		global $lng, $tpl, $ilCtrl, $ilias, $tree;
 
+		$this->log = ilLoggerFactory::getLogger('cert');
 		$this->lng =& $lng;
 		$this->tpl =& $tpl;
 		$this->ctrl =& $ilCtrl;
@@ -445,6 +446,9 @@ class ilCertificate
 	public function outCertificate($params, $deliver = TRUE)
 	{
 		global $ilLog;
+
+		$this->log->debug("start");
+
 		ilDatePresentation::setUseRelativeDates(false);
 		$insert_tags = $this->getAdapter()->getCertificateVariablesForPresentation($params);
 		
@@ -456,11 +460,13 @@ class ilCertificate
 			$insert_tags[$f["ph"]] = $cust_data["f_".$k];
 		}
 
+		$this->log->debug("get xslfo");
 		$xslfo = file_get_contents($this->getXSLPath());
 
 		include_once './Services/WebServices/RPC/classes/class.ilRpcClientFactory.php';
 		try
 		{
+			$this->log->debug("call fo2pdf");
 			$pdf_base64 = ilRpcClientFactory::factory('RPCTransformationHandler')->ilFO2PDF(
 				$this->exchangeCertificateVariables($xslfo, $insert_tags));
 			if ($deliver)
@@ -475,12 +481,14 @@ class ilCertificate
 		}
 		catch(XML_RPC2_FaultException $e)
 		{
-			$ilLog->write(__METHOD__.': '.$e->getMessage());
+			//$ilLog->write(__METHOD__.': '.$e->getMessage());
+			$this->log->error("RPC Fault Exception: ".$e->getMessage());
 			return false;
 		}
 		catch(Exception $e)
 		{
-			$ilLog->write(__METHOD__.': '.$e->getMessage());
+			//$ilLog->write(__METHOD__.': '.$e->getMessage());
+			$this->log->error("Exception: ".$e->getMessage());
 			return false;
 		}
 

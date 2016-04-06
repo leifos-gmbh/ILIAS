@@ -36,8 +36,8 @@ class ilClientReplicator
 
 		require_once('setup/classes/class.ilClient.php');
 
-		require_once('classes/class.ilErrorHandling.php');
-		require_once('classes/class.ilIniFile.php');
+		require_once('Services/Init/classes/class.ilErrorHandling.php');
+		require_once('Services/Init/classes/class.ilIniFile.php');
 		
 		require_once('Services/Exceptions/classes/class.ilException.php');
 		
@@ -282,7 +282,7 @@ class ilClientReplicator
 	private static function createNewDatabase($dbAdminUser, $dbAdminPass, $dbHost, $dbName)
 	{
 		$dbCreateQuery = self::buildDbCreateQuery($dbName);
-		
+		//TODO: need some changes here to make it compatible with windows
 		$command = sprintf(
 				'echo "%s;" | mysql -h %s -u%s -p%s',
 				$dbCreateQuery, $dbHost, $dbAdminUser, $dbAdminPass

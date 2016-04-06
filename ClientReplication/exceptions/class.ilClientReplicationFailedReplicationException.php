@@ -1,5 +1,5 @@
 <?php
 
-class ilClientReplicationFailedReplicationException
+class ilClientReplicationFailedReplicationException extends ilClientReplicationException
 {
 }

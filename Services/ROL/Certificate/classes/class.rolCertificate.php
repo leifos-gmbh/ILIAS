@@ -264,8 +264,31 @@ class rolCertificate
 			$rol_certificate->handoverToExternalDirectory($full_path, $a_test);
 		}
 
+		$rol_certificate->verify($a_test);
+
 		return $full_path;
 	}
+
+	/**
+	 * Get xml filename
+	 *
+	 * @return string filename
+	 */
+	function getXmlFilename()
+	{
+		return $this->getId().".xml";
+	}
+
+	/**
+	 * Get pdf filename
+	 *
+	 * @return string filename
+	 */
+	function getPdfFilename()
+	{
+		return $this->getId().".xml";
+	}
+
 
 	/**
 	 * Handover certificate to external directory
@@ -295,11 +318,11 @@ class rolCertificate
 		$cert_dir = $this->settings->get("cert_dir");
 		if ($this->settings->get("cert_dir") != "")
 		{
-			$ext_file = $this->getId().".pdf";
+			$ext_file = $this->getPdfFilename();
 			copy ($path, $cert_dir."/".$ext_file);
 
 			// write xml
-			$xml_file = $this->getId().".xml";
+			$xml_file = $this->getXmlFilename();
 			include_once "./Services/Xml/classes/class.ilXmlWriter.php";
 			$writer = new ilXmlWriter();
 			$writer->xmlHeader();
@@ -333,6 +356,57 @@ class rolCertificate
 		}
 	}
 
+	/**
+	 * Verify xml and pdf creation
+	 */
+	function verify($a_test)
+	{
+		$cert_dir = $this->settings->get("cert_dir");
+		if (is_file($cert_dir."/".$this->getXmlFilename()) && is_file($cert_dir."/".$this->getPdfFilename()))
+		{
+			$this->setVerified(ilUtil::now());
+			$this->update();
+		}
+		else
+		{
+			// user
+			$user = new ilObjUser($this->getUserId());
+
+			// course
+			$course_ref_id = $this->tree->checkForParentType((int) $a_test->getRefId(), "crs");
+			$course_obj_id = ilObject::_lookupObjId($course_ref_id);
+			$course_title = ilObject::_lookupTitle($course_obj_id);
+
+			// send mail
+			include_once "./Services/Mail/classes/class.ilMail.php";
+			$mail = new ilMail(ANONYMOUS_USER_ID);
+
+			/* Mail an Admin */
+			$m = 'Fehler in der ROL Zertifikatsgenerierung:
+
+die Dateien '.$cert_dir."/".$this->getXmlFilename().' und '.$cert_dir."/".$this->getPdfFilename().' konnten nicht geschrieben werden.
+Kurs: '.$course_title.'
+Benutzer: '.$user->getFirstname()." ".$user->getLastname()." [".$user->getLogin()."]";
+			//$to = "rvs.arbeitssicherheit@raiffeisen.it";
+			$to = $this->settings->get("cert_email");
+			if ($to != "")
+			{
+				$this->log->debug("Sending Mail to: " . $to);
+				$mail->sendMail(    /* Email to Client */
+						$to, // to
+						"", // cc
+						"", // bcc
+						"Fehler in der ROL Zertifikatsgenerierung", // subject
+						$m, // message
+						array(),
+						array('normal') // type
+				);
+				$this->log->debug("Mail sent.");
+			}
+
+		}
+	}
+	
 
 }
 

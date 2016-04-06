@@ -52,6 +52,26 @@ class rolCourse
 	}
 
 	/**
+	 * Set asix key
+	 *
+	 * @param string $a_val asix key
+	 */
+	function setAsixKey($a_val)
+	{
+		$this->asix_key = $a_val;
+	}
+
+	/**
+	 * Get asix key
+	 *
+	 * @return string asix key
+	 */
+	function getAsixKey()
+	{
+		return $this->asix_key;
+	}
+
+	/**
 	 * Read
 	 */
 	function read()
@@ -61,6 +81,7 @@ class rolCourse
 		);
 		$rec = $this->db->fetchAssoc($set);
 		$this->setMinOnlinetime($rec["min_onlinetime"]);
+		$this->setAsixKey($rec["rol_asix_key"]);
 	}
 
 
@@ -69,10 +90,24 @@ class rolCourse
 	 */
 	function update()
 	{
-		$this->db->manipulate("UPDATE crs_settings SET ".
-			" min_onlinetime = ".$this->db->quote($this->getMinOnlinetime(), "integer").
-			" WHERE obj_id = ".$this->db->quote($this->id, "integer")
-			);
+		$this->db->manipulate($q = "UPDATE crs_settings SET ".
+				" min_onlinetime = ".$this->db->quote($this->getMinOnlinetime(), "integer").
+				", rol_asix_key = ".$this->db->quote($this->getAsixKey(), "text").
+				" WHERE obj_id = ".$this->db->quote($this->id, "integer")
+				);
+	}
+
+	/**
+	 * Clone course
+	 *
+	 * @param int $a_new_course_id new course id
+	 */
+	function cloneCourse($a_new_course_id)
+	{
+		$new_c = new rolCourse($a_new_course_id);
+		$new_c->setMinOnlinetime($this->getMinOnlinetime());
+		$new_c->setAsixKey($this->getAsixKey());
+		$new_c->update();
 	}
 
 	/**

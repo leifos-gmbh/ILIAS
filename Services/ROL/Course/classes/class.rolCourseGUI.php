@@ -39,6 +39,7 @@ class rolCourseGUI
 	 */
 	function modifyInfoForm($a_form)
 	{
+		// min online time
 		$text = new ilNumberInputGUI('Onlinezeit','min_onlinetime');
 		if ($this->rol_course->getMinOnlinetime() > 0)
 		{
@@ -48,6 +49,13 @@ class rolCourseGUI
 		$text->setSize(6);
 		$text->setMaxLength(6);
 		$a_form->addItem($text);
+
+		// asix key
+		$ti = new ilTextInputGUI("AsiX Kurzschlüssel", "rol_asix_key");
+		$ti->setValue($this->rol_course->getAsixKey());
+		$ti->setMaxLength(200);
+		$a_form->addItem($ti);
+
 	}
 
 
@@ -57,6 +65,7 @@ class rolCourseGUI
 	function updateInfo()
 	{
 		$this->rol_course->setMinOnlinetime((int) $this->post["min_onlinetime"]);
+		$this->rol_course->setAsixKey($this->post["rol_asix_key"]);
 		$this->rol_course->update();
 	}
 

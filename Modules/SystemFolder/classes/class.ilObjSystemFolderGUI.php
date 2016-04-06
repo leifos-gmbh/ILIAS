@@ -1101,7 +1101,13 @@ class ilObjSystemFolderGUI extends ilObjectGUI
 		include_once("Services/Form/classes/class.ilPropertyFormGUI.php");
 		$this->form = new ilPropertyFormGUI();
 		$lng->loadLanguageModule("pd");
-		
+
+		// patch-rol start
+		include_once("./Services/ROL/Settings/classes/class.rolGeneralSettingsGUI.php");
+		$rol_gen_settings = new rolGeneralSettingsGUI();
+		$rol_gen_settings->modifyGeneralSettingsForm($this->form);
+		// patch-rol end
+
 		// installation short title
 		$ti = new ilTextInputGUI($this->lng->txt("short_inst_name"), "short_inst_name");
 		$ti->setMaxLength(200);
@@ -1240,6 +1246,12 @@ class ilObjSystemFolderGUI extends ilObjectGUI
 			include_once "Services/User/classes/class.ilUserUtil.php";
 			ilUserUtil::setStartingPoint($this->form->getInput('usr_start'), $this->form->getInput('usr_start_ref_id'));
 			ilUserUtil::togglePersonalStartingPoint($this->form->getInput('usr_start_pers'));
+
+			// patch-rol start
+			include_once("./Services/ROL/Settings/classes/class.rolGeneralSettingsGUI.php");
+			$rol_gen_settings = new rolGeneralSettingsGUI();
+			$rol_gen_settings->updateGeneralSettings();
+			// patch-rol end
 
 			ilUtil::sendSuccess($lng->txt("msg_obj_modified"), true);
 			$ilCtrl->redirect($this, "showBasicSettings");

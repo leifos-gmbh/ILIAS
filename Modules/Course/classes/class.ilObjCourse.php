@@ -972,7 +972,13 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 		$cert = new ilCertificate(new ilCourseCertificateAdapter($this));
 		$newcert = new ilCertificate(new ilCourseCertificateAdapter($new_obj));
 		$cert->cloneCertificate($newcert);
-				
+
+		// patch-rol start
+		include_once("./Services/ROL/Course/classes/class.rolCourse.php");
+		$c = new rolCourse($this->getId());
+		$c->cloneCourse($new_obj->getId());
+		// patch-rol end
+
 		return $new_obj;
 	}
 	

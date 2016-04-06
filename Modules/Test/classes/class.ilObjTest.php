@@ -7198,8 +7198,8 @@ function getAnswerFeedbackPoints()
 
 		// patch-rol start
 		include_once("./Services/ROL/Test/classes/class.rolTest.php");
-		$t = new rolTest($this->getTestId());
-		$t->cloneTest($newObj->getTestId());
+		$t = new rolTest($this->getId());
+		$t->cloneTest($newObj->getId());
 		// patch-rol end
 
 		return $newObj;

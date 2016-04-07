@@ -1846,6 +1846,8 @@ class ilExAssignment
 	{
 		global $ilDB;
 		
+		$res = array();
+		
 		$set = $ilDB->query("SELECT * FROM exc_idl".
 			" WHERE ass_id = ".$ilDB->quote($this->getId(), "integer"));
 		while($row = $ilDB->fetchAssoc($set))

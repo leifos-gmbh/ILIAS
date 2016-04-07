@@ -175,9 +175,9 @@ class rolCertificate
 	{
 		$this->db->manipulate($q = "UPDATE rol_certificate SET ".
 			" user_id = ".$this->db->quote($this->getUserId(), "integer").
-			" test_obj_id = ".$this->db->quote($this->getUserId(), "integer").
-			" created = ".$this->db->quote($this->getUserId(), "timestamp").
-			" verified = ".$this->db->quote($this->getUserId(), "timestamp").
+			", test_obj_id = ".$this->db->quote($this->getUserId(), "integer").
+			", created = ".$this->db->quote($this->getUserId(), "timestamp").
+			", verified = ".$this->db->quote($this->getUserId(), "timestamp").
 			" WHERE id = ".$this->db->quote($this->id, "integer")
 		);
 	}
@@ -286,7 +286,7 @@ class rolCertificate
 	 */
 	function getPdfFilename()
 	{
-		return $this->getId().".xml";
+		return $this->getId().".pdf";
 	}
 
 
@@ -297,6 +297,8 @@ class rolCertificate
 	 */
 	function handoverToExternalDirectory($path, $a_test)
 	{
+		$this->log->debug("Start Handover");
+
 		// user
 		$user = new ilObjUser($this->getUserId());
 		$udf_id = $this->settings->get("abi_udf");
@@ -315,10 +317,17 @@ class rolCertificate
 		include_once("./Services/ROL/Course/classes/class.rolCourse.php");
 		$rol_course = new rolCourse($course_obj_id);
 
+		// time
+		$hours = floor($rol_course->getMinOnlinetime()/60);
+		$minutes = $rol_course->getMinOnlinetime() % 60;
+		$time = $hours.":".str_pad($minutes, 2, "0", STR_PAD_LEFT);
+
 		$cert_dir = $this->settings->get("cert_dir");
+		$this->log->debug("Cert Directory: ".$cert_dir);
 		if ($this->settings->get("cert_dir") != "")
 		{
 			$ext_file = $this->getPdfFilename();
+			$this->log->debug("Copy ".$path." to ".$cert_dir."/".$ext_file.".");
 			copy ($path, $cert_dir."/".$ext_file);
 
 			// write xml
@@ -334,7 +343,7 @@ class rolCertificate
 			$writer->xmlElement("course_name_it", array(), "");
 			$writer->xmlElement("course_content_de", array(), "");
 			$writer->xmlElement("course_content_it", array(), "");
-			$writer->xmlElement("course_hours", array(), "");			// fix ?
+			$writer->xmlElement("course_hours", array(), $time);
 			$writer->xmlElement("asix_qualification", array(), $rol_course->getAsixKey());
 			$writer->xmlElement("firstname", array(), $user->getFirstname());
 			$writer->xmlElement("lastname", array(), $user->getLastname());
@@ -352,6 +361,7 @@ class rolCertificate
 			$writer->xmlElement("comment", array(), "");
 
 			$writer->xmlEndTag("certificate");
+			$this->log->debug("Create XMl File at ".$cert_dir."/".$xml_file.".");
 			$writer->xmlDumpFile($cert_dir."/".$xml_file, false);
 		}
 	}
@@ -364,6 +374,7 @@ class rolCertificate
 		$cert_dir = $this->settings->get("cert_dir");
 		if (is_file($cert_dir."/".$this->getXmlFilename()) && is_file($cert_dir."/".$this->getPdfFilename()))
 		{
+			$this->log->debug("Set verified.");
 			$this->setVerified(ilUtil::now());
 			$this->update();
 		}
@@ -380,6 +391,9 @@ class rolCertificate
 			// send mail
 			include_once "./Services/Mail/classes/class.ilMail.php";
 			$mail = new ilMail(ANONYMOUS_USER_ID);
+
+			$this->log->error("Certificate XML Interface Error. Files not written '".$cert_dir."/".$this->getXmlFilename().
+					"', '".$cert_dir."/".$this->getPdfFilename()."'. Course: ".$course_title.". User: ".$user->getFirstname()." ".$user->getLastname()." [".$user->getLogin()."]".".");
 
 			/* Mail an Admin */
 			$m = 'Fehler in der ROL Zertifikatsgenerierung:

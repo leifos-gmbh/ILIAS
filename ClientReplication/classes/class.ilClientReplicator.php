@@ -311,7 +311,7 @@ class ilClientReplicator
 	private static function copyDatabaseContent($srcDbUser, $srcDbPass, $srcDbHost, $srcDbName, $destDbUser, $destDbPass, $destDbHost, $destDbName)
 	{
 		$command = sprintf(
-				'mysqldump -h %s -u%s -p%s %s | mysql -h %s -u%s -p%s %s',
+				'mysqldump --lock-tables=false -h %s -u%s -p%s %s | mysql -h %s -u%s -p%s %s',
 				$srcDbHost, $srcDbUser, $srcDbPass, $srcDbName,
 				$destDbHost, $destDbUser, $destDbPass, $destDbName
 		);

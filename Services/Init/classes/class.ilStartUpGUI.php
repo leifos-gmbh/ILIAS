@@ -35,7 +35,6 @@ class ilStartUpGUI
 		global $ilLog;
 		
 		$cmd = $this->ctrl->getCmd("processIndexPHP",array('processIndexPHP','showLogin'));
-		$ilLog->write(__METHOD__.' cmd = '.$cmd);
 		$next_class = $this->ctrl->getNextClass($this);
 
 		switch($next_class)
@@ -339,8 +338,7 @@ class ilStartUpGUI
 		
 
 		// not controlled by login page editor
-
-		$tpl->setVariable("PAGETITLE", $lng->txt("startpage"));
+		$tpl->setVariable("PAGETITLE",  "- ".$lng->txt("startpage"));
 		$tpl->setVariable("ILIAS_RELEASE", $ilSetting->get("ilias_version"));
 		
 		$this->ctrl->setTargetScript("ilias.php");
@@ -356,7 +354,8 @@ class ilStartUpGUI
 		{
 			$tpl->setVariable('LPE',$page_editor_html);
 		}
-		
+
+		$tpl->fillWindowTitle();
 		$tpl->fillCssFiles();
 		$tpl->fillJavaScriptFiles();
 

@@ -321,32 +321,21 @@ class ilMimeMail
 	function BuildMail()
 	{
 		/**
-		 * @var $ilUser ilObjUser
+		 * @var $ilUser          ilObjUser
+		 * @var $ilSetting       ilSetting
+		 * @var $ilClientIniFile ilIniFile
 		 */
-		global $ilUser;
+		global $ilUser, $ilSetting, $ilClientIniFile;
 
 		require_once './Services/Mail/phpmailer/class.phpmailer.php';
 		$mail = new PHPMailer();
 
-		/** @var ilIniFile $ilClientIniFile */
-		global $ilClientIniFile;
-		$style = $ilClientIniFile->readVariable('layout', 'style');
-
-		$bracket_path = './Services/Mail/templates/default/tpl.html_mail_template.html';
-
-		if($style != 'delos')
+		if($ilSetting->get('mail_system_return_path', ''))
 		{
-			$tplpath = './Customizing/global/skin/'.$style.'/Services/Mail/tpl.html_mail_template.html';
-
-			if(@file_exists($tplpath))
-			{
-				$bracket_path = './Customizing/global/skin/'.$style.'/Services/Mail/tpl.html_mail_template.html';
-			}
+			$mail->Sender = $ilSetting->get('mail_system_return_path', '');
 		}
-		$bracket = file_get_contents($bracket_path);
 
 		$mail->SetFrom($this->xheaders['From'], $this->xheaders['FromName']);
-
 		foreach($this->sendto as $recipients)
 		{
 			$recipient_pieces = array_filter(array_map('trim', explode(',', $recipients)));
@@ -377,36 +366,64 @@ class ilMimeMail
 		$mail->CharSet = 'utf-8';
 		$mail->Subject = $this->xheaders['Subject'];
 
-		$directory = './Services/Mail/templates/default/img/';
-
-		if($style != 'delos')
+		if($ilSetting->get('mail_send_html', 0))
 		{
-			$directory = './Customizing/global/skin/'.$style.'/Services/Mail/img/';
-		}
+			$mail->IsHTML(true);
 
-		if(!$this->body)
-		{
-			$this->body  = ' ';
-		}
+			$style = $ilClientIniFile->readVariable('layout', 'style');
 
-		$mail->Body    = str_replace( '{PLACEHOLDER}', nl2br( ilUtil::makeClickable( $this->body ) ), $bracket );
-		$mail->AltBody = $this->body;
-
-		$directory_handle  = @opendir($directory);
-		$files = array();
-		if($directory_handle)
-		{
-			while ($filename = @readdir($directory_handle))
+			$bracket_path = './Services/Mail/templates/default/tpl.html_mail_template.html';
+			if($style != 'delos')
 			{
-				$files[] = $filename;
+				$tplpath = './Customizing/global/skin/' . $style . '/Services/Mail/tpl.html_mail_template.html';
+
+				if(@file_exists($tplpath))
+				{
+					$bracket_path = './Customizing/global/skin/' . $style . '/Services/Mail/tpl.html_mail_template.html';
+				}
+			}
+			$bracket = file_get_contents($bracket_path);
+
+			if(!$this->body)
+			{
+				$this->body  = ' ';
 			}
 
-			$images = preg_grep ('/\.jpg$/i', $files);
+			$mail->AltBody = $this->body;
 
-			foreach($images as $image)
+			if(strip_tags($this->body, '<b><u><i><a>') == $this->body)
 			{
-				$mail->AddEmbeddedImage($directory.$image, 'img/'.$image, $image);
+				// Let's assume that there is no HTML, so convert "\n" to "<br>" 
+				$this->body = nl2br($this->body);
 			}
+			$mail->Body    = str_replace( '{PLACEHOLDER}', ilUtil::makeClickable( $this->body ), $bracket );
+
+			$directory = './Services/Mail/templates/default/img/';
+			if($style != 'delos')
+			{
+				$directory = './Customizing/global/skin/' . $style . '/Services/Mail/img/';
+			}
+			$directory_handle  = @opendir($directory);
+			$files = array();
+			if($directory_handle)
+			{
+				while ($filename = @readdir($directory_handle))
+				{
+					$files[] = $filename;
+				}
+
+				$images = preg_grep ('/\.jpg$/i', $files);
+
+				foreach($images as $image)
+				{
+					$mail->AddEmbeddedImage($directory.$image, 'img/'.$image, $image);
+				}
+			}
+		}
+		else
+		{
+			$mail->IsHTML(false);
+			$mail->Body = $this->body;
 		}
 
 		$i = 0;

@@ -87,7 +87,7 @@ class ilForumMailNotification extends ilMailNotification
 
 					$this->setBody(ilMail::getSalutation($rcp, $this->getLanguage()));
 					$this->appendBody("\n\n");
-					$this->appendBody(sprintf($this->getLanguageText('thread_deleted_by'), $ilUser->getLogin(),  $this->provider->getThreadTitle()));
+					$this->appendBody(sprintf($this->getLanguageText('thread_deleted_by'), $ilUser->getLogin(),  $this->provider->getForumTitle()));
 					$this->appendBody("\n\n");
 					$this->appendBody($this->getLanguageText('forum') . ": " . $this->provider->getForumTitle());
 					$this->appendBody("\n\n");
@@ -568,12 +568,15 @@ class ilForumMailNotification extends ilMailNotification
 	}
 
 	/**
-	 * @param int $type
+	 * @param string $type
 	 * @return string
 	 */
 	private function getPermanentLink($type = self::PERMANENT_LINK_POST)
 	{
-		global $ilIliasIniFile, $ilClientIniFile;
+		/**
+		 * @var $ilClientIniFile ilIniFile
+		 */
+		global $ilClientIniFile;
 
 		if($type == self::PERMANENT_LINK_FORUM)
 		{
@@ -589,20 +592,20 @@ class ilForumMailNotification extends ilMailNotification
 		if($this->isCronjob())
 		{
 			$posting_link = sprintf($language_text,
-					$ilIliasIniFile->readVariable("server", "http_path") . "/goto.php?target=frm_" .$forum_parameters. '&client_id=' . CLIENT_ID) . "\n\n";
+					ilUtil::_getHttpPath() . "/goto.php?target=frm_" .$forum_parameters. '&client_id=' . CLIENT_ID) . "\n\n";
 
 			$posting_link .= sprintf($this->getLanguageText("forums_notification_intro"),
 					$ilClientIniFile->readVariable("client", "name"),
-					$ilIliasIniFile->readVariable("server", "http_path") . '/?client_id=' . CLIENT_ID) . "\n\n";
+					ilUtil::_getHttpPath() . '/?client_id=' . CLIENT_ID) . "\n\n";
 		}
 		else
 		{
 			$posting_link = sprintf($language_text,
-					ILIAS_HTTP_PATH . "/goto.php?target=frm_" .$forum_parameters. '&client_id=' . CLIENT_ID) . "\n\n";
+					ilUtil::_getHttpPath() . "/goto.php?target=frm_" .$forum_parameters. '&client_id=' . CLIENT_ID) . "\n\n";
 
 			$posting_link .= sprintf($this->getLanguageText("forums_notification_intro"),
 					$ilClientIniFile->readVariable("client", "name"),
-					ILIAS_HTTP_PATH . '/?client_id=' . CLIENT_ID) . "\n\n";
+					ilUtil::_getHttpPath() . '/?client_id=' . CLIENT_ID) . "\n\n";
 		}
 
 		return $posting_link;

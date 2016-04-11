@@ -377,7 +377,8 @@ class SurveyMultipleChoiceQuestion extends SurveyQuestion
 			$cat = $this->categories->getCategory($i);
 			if ($cat->other)
 			{
-				if (!in_array($i, $entered_value))
+				// #18212
+				if (!is_array($entered_value) || !in_array($i, $entered_value))
 				{
 					if (strlen($post_data[$this->getId() . "_" . $i . "_other"]))
 					{
@@ -953,7 +954,8 @@ class SurveyMultipleChoiceQuestion extends SurveyQuestion
 	*/
 	function getPreconditionValueOutput($value)
 	{
-		$category = $this->categories->getCategory($value);
+		// #18136
+		$category = $this->categories->getCategoryForScale($value+1);
 		
 		// #17895 - see getPreconditionOptions()
 		return $category->scale . 

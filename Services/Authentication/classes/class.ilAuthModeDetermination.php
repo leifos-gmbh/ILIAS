@@ -127,6 +127,9 @@ class ilAuthModeDetermination
 			return $this->position ? $this->position : array();	 	
 		}
 		$sorted = array();
+		
+		ilLoggerFactory::getLogger('auth')->dump($this->position, ilLogLevel::DEBUG);
+		
 		foreach($this->position as $auth_key)
 		{
 			include_once './Services/LDAP/classes/class.ilLDAPServer.php';
@@ -134,20 +137,26 @@ class ilAuthModeDetermination
 			if($sid)
 			{
 				$server = ilLDAPServer::getInstanceByServerId($sid);
-				$GLOBALS['ilLog']->write(__METHOD__.': Validating username filter for '.$server->getName());
+				ilLoggerFactory::getLogger('auth')->debug('Validating username filter for ' . $server->getName());
 				if(strlen($server->getUsernameFilter()))
 				{
-					if(preg_match('/'.$server->getUsernameFilter().'/', $a_username))
+					//#17731
+					$pattern = str_replace('*','.*?', $server->getUsernameFilter());
+
+					if(preg_match('/^'.$pattern.'$/', $a_username))
 					{
-						$GLOBALS['ilLog']->write(__METHOD__.': Filter matches for '. $a_username);
+						ilLoggerFactory::getLogger('auth')->debug('Filter matches for ' . $a_username);
 						array_unshift($sorted, $auth_key);
 						continue;
 					}
-					$GLOBALS['ilLog']->write(__METHOD__.': Filter matches not '. $a_username.' '.$server->getUsernameFilter());
+					ilLoggerFactory::getLogger('auth')->debug('Filter matches not for ' . $a_username. ' <-> ' . $server->getUsernameFilter());
 				}
 			}
 			$sorted[] = $auth_key;
 		}
+		
+		ilLoggerFactory::getLogger('auth')->dump($this->position, ilLogLevel::DEBUG);
+		
 		return (array) $sorted;
 	}
 	

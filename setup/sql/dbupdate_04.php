@@ -5827,7 +5827,11 @@ if(!$ilDB->uniqueConstraintExists('usr_data', array('login')))
 				Field: login
 
 				You can determine these accounts by executing the following SQL statement:
-				SELECT * FROM usr_data WHERE login IN(SELECT login FROM usr_data GROUP BY login HAVING COUNT(*) > 1)
+
+				SELECT ud.*  FROM usr_data ud
+				INNER JOIN (
+					SELECT login FROM usr_data GROUP BY login HAVING COUNT(*) > 1
+				) tmp ON tmp.login = ud.login
 
 				Please manipulate the affected records by choosing different login names.
 				If you try to rerun the update process, this warning will apear again if the issue is still not solved.
@@ -10062,18 +10066,17 @@ if ($ilDB->tableExists('rbac_templates'))
 	{
 		$ilDB->manipulateF(
 			"DELETE FROM rbac_templates WHERE rol_id = %s AND type = %s AND ops_id = %s AND parent = %s",
-			array('integer', 'integer', 'integer', 'integer'),
+			array('integer', 'text', 'integer', 'integer'),
 			array($row['rol_id'], $row['type'], $row['ops_id'], $row['parent'])
 		);
 
 		$ilDB->manipulate("INSERT INTO rbac_templates (rol_id, type, ops_id, parent)".
 			" VALUES (".
 			$ilDB->quote($row['rol_id'], "integer").
-			",".$ilDB->quote($row['type'], "integer").
+			",".$ilDB->quote($row['type'], "text").
 			",".$ilDB->quote($row['ops_id'], "integer").
 			",".$ilDB->quote($row['parent'], "integer").
-			")"
-		);
+			")");
 	}
 }
 ?>

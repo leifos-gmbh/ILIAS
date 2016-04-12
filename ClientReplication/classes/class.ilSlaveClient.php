@@ -23,7 +23,10 @@ class ilSlaveClient extends ilClientBase
 	public function modifyClientIniFile()
 	{
 		$this->getIni()->read();
-		
+
+		$this->getIni()->setVariable('client', 'name', $this->getName());
+		$this->getIni()->setVariable('client', 'description', $this->getDescription());
+
 		$this->getIni()->setVariable('db', 'user', $this->getDbUser());
 		$this->getIni()->setVariable('db', 'pass', $this->getDbPass());
 		$this->getIni()->setVariable('db', 'host', $this->getDbHost());

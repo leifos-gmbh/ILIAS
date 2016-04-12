@@ -1695,6 +1695,13 @@ class ilExAssignment
 		
 		// no deadline === false
 		$deadline = max($this->deadline, $this->deadline2, $idl);		
+		
+		// #18271 - afterDeadline() does not handle last personal deadline
+		if($idl && $deadline == $idl)
+		{
+			return ($deadline - time() <= 0);
+		}
+		
 		return ($deadline > 0 && 
 			$this->afterDeadline());	
 	}

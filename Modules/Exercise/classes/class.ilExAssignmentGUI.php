@@ -83,7 +83,7 @@ class ilExAssignmentGUI
 				$tpl->parseCurrentBlock();
 			}
 			
-			if ($idl)
+			if ($idl && $idl != $a_ass->getDeadline())
 			{
 				$tpl->setCurrentBlock("prop");
 				$tpl->setVariable("PROP", $lng->txt("exc_individual_deadline"));

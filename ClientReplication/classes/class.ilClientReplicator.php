@@ -93,6 +93,11 @@ class ilClientReplicator
 			);
 			
 			$slaveClient = new ilSlaveClient($clientId, $clientIni);
+
+			if( $ini->variableExists($section, 'CLIENT_NAME') )
+			{
+				$slaveClient->setName( $ini->readVariable($section, 'CLIENT_NAME') );
+			}
 			
 			if( $ini->variableExists($section, 'CLIENT_DESCRIPTION') )
 			{
@@ -121,7 +126,7 @@ class ilClientReplicator
 		}
 		
 		if( $i == 1 ) throw new ilClientReplicationConfigException(
-				'No slave clients were configured in the congig file "config.ini.php"'
+				'No slave clients were configured in the config file "config.ini.php"'
 		);
 		
 		return $this;

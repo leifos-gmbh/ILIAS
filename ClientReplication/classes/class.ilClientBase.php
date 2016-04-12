@@ -7,6 +7,7 @@ class ilClientBase
 	private $nic = null;
 	
 	private $id = null;
+	private $name = null;
 	private $description = null;
 	
 	private $dbHost = null;
@@ -23,6 +24,17 @@ class ilClientBase
 	public function getId()
 	{
 		return $this->clientId;
+	}
+
+	public function setName($clientName)
+	{
+		$this->clientName = $clientName;
+		return $this;
+	}
+
+	public function getName()
+	{
+		return $this->clientName;
 	}
 	
 	public function setDescription($clientDescription)

@@ -67,6 +67,23 @@ class ilSAHSPresentationGUI
 		
 		$type = ilObjSAHSLearningModule::_lookupSubType($obj_id);
 
+		// ibi-patch start
+		if( !strlen($cmd) )
+		{
+			global $ilAppEventHandler, $ilUser;
+
+			$ilAppEventHandler->raise('Modules/ScormAicc', 'trackAccess', array(
+				'ref_id'	=> (int)$_GET['ref_id'],
+				'obj_id'	=> $obj_id,
+				'obj_type'	=> 'sahs',
+				'obj_title' => $ilObjDataCache->lookupTitle($obj_id),
+				'usr_id'	=> $ilUser->getId(),
+				'usr_login'	=> $ilUser->getLogin(),
+				'client_id'	=> CLIENT_ID
+			));
+		}
+		// ibi-patch end
+
 		if ($cmd == "downloadCertificate")
 		{
 			require_once "./Modules/ScormAicc/classes/SCORM/class.ilSCORMPresentationGUI.php";

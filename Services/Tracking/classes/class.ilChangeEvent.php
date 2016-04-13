@@ -315,6 +315,23 @@ class ilChangeEvent
 			}
 		}
 
+		// ibi-patch start
+		if( in_array($a_type, array('crs', 'exc')) )
+		{
+			global $ilAppEventHandler, $ilObjDataCache, $ilUser;
+
+			$ilAppEventHandler->raise('Services/Tracking', 'trackAccess', array(
+				'ref_id'	=> $a_ref_id,
+				'obj_id'	=> $obj_id,
+				'obj_type'	=> $a_type,
+				'obj_title' => $ilObjDataCache->lookupTitle($obj_id),
+				'usr_id'	=> $ilUser->getId(),
+				'usr_login'	=> $ilUser->getLogin(),
+				'client_id'	=> CLIENT_ID
+			));
+		}
+		// ibi-patch end
+
 		// @todo:
 		// - calculate diff of spent_seconds and read_count
 		// - use ref id to get parents of types grp, crs, fold

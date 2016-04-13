@@ -162,6 +162,21 @@ class ilTestPlayerDynamicQuestionSetGUI extends ilTestPlayerAbstractGUI
 	 */
 	protected function resumePlayerCmd()
 	{
+		// ibi-patch start
+		global $ilAppEventHandler, $ilUser;
+
+		$ilAppEventHandler->raise('Modules/Test', 'trackAccess', array(
+			'ref_id'	=>	$this->object->getRefId(),
+			'obj_id'	=> $this->object->getId(),
+			'obj_type'	=> $this->object->getType(),
+			'obj_title' => $this->object->getTitle(),
+			'usr_id'	=> $ilUser->getId(),
+			'usr_login'	=> $ilUser->getLogin(),
+			'client_id'	=> CLIENT_ID
+		));
+		// ibi-patch end
+
+
 		if ($this->object->checkMaximumAllowedUsers() == FALSE)
 		{
 			return $this->showMaximumAllowedUsersReachedMessage();
@@ -179,6 +194,20 @@ class ilTestPlayerDynamicQuestionSetGUI extends ilTestPlayerAbstractGUI
 	
 	protected function startTestCmd()
 	{
+		// ibi-patch start
+		global $ilAppEventHandler, $ilUser;
+
+		$ilAppEventHandler->raise('Modules/Test', 'trackAccess', array(
+			'ref_id'	=>	$this->object->getRefId(),
+			'obj_id'	=> $this->object->getId(),
+			'obj_type'	=> $this->object->getType(),
+			'obj_title' => $this->object->getTitle(),
+			'usr_id'	=> $ilUser->getId(),
+			'usr_login'	=> $ilUser->getLogin(),
+			'client_id'	=> CLIENT_ID
+		));
+		// ibi-patch end
+		
 		$this->testSession->setCurrentQuestionId(null); // no question "came up" yet
 		
 		$this->testSession->saveToDb();

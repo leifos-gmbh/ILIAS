@@ -561,6 +561,21 @@ class ilObjFileBasedLMGUI extends ilObjectGUI
 
 		$startfile = ilObjFileBasedLMAccess::_determineStartUrl($this->object->getId());
 		ilWACSignedPath::signFolderOfStartFile($startfile);
+
+		// ibi-patch start
+		global $ilAppEventHandler, $ilUser;
+
+		$ilAppEventHandler->raise('Modules/HTMLLearningModule', 'trackAccess', array(
+			'ref_id'	=> $this->object->getRefId(),
+			'obj_id'	=> $this->object->getId(),
+			'obj_type'	=> $this->object->getType(),
+			'obj_title' => $this->object->getTitle(),
+			'usr_id'	=> $ilUser->getId(),
+			'usr_login'	=> $ilUser->getLogin(),
+			'client_id'	=> CLIENT_ID
+		));
+		// ibi-patch end
+		
 		if ($startfile != "")
 		{
 			ilUtil::redirect($startfile);

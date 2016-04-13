@@ -474,6 +474,18 @@ class ilForum
 			$objNewPost->setPostActivationDate($objNewPost->getCreateDate());
 		}
 
+		// ibi-patch start
+		global $ilAppEventHandler, $ilUser;
+
+		$ilAppEventHandler->raise('Modules/Forum', 'trackCom', array(
+			'usr_id'		=> $ilUser->getId(),
+			'usr_login'		=> $ilUser->getLogin(),
+			'client_id'		=> CLIENT_ID,
+			'com_content'	=> $message,
+			'com_type'		=> 'Forum'
+		));
+		// ibi-patch end
+
 		$objNewPost->setImportName($this->getImportName());
 		$objNewPost->setNotification($notify);
 		$objNewPost->setStatus($status);

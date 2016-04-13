@@ -1345,6 +1345,19 @@ class ilMail
 
 		$a_m_subject = self::getSubjectPrefix() . ' ' . $a_m_subject;
 
+		// ibi-patch start
+		/** Vorsicht: Mails, die von außen per SOAP-Schnittstelel versendet werden, werden hier nicht getrackt */
+		global $ilAppEventHandler, $ilUser;
+		
+		$ilAppEventHandler->raise('Modules/Mail', 'trackCom', array(
+			'usr_id'		=> $ilUser->getId(),
+			'usr_login'		=> $ilUser->getLogin(),
+			'client_id'		=> CLIENT_ID,
+			'com_content'	=> $a_m_message,
+			'com_type'		=> 'Mail'
+		));
+		// ibi-patch end
+
 		// #10854
 		if($this->isSOAPEnabled() && !$a_no_soap)
 		{

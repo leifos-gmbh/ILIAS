@@ -150,6 +150,20 @@ abstract class ilTestOutputGUI extends ilTestPlayerAbstractGUI
 	{
 		global $ilUser;
 
+		// ibi-patch start
+		global $ilAppEventHandler;
+
+		$ilAppEventHandler->raise('Modules/Test', 'trackAccess', array(
+			'ref_id'	=>	$this->object->getRefId(),
+			'obj_id'	=> $this->object->getId(),
+			'obj_type'	=> $this->object->getType(),
+			'obj_title' => $this->object->getTitle(),
+			'usr_id'	=> $ilUser->getId(),
+			'usr_login'	=> $ilUser->getLogin(),
+			'client_id'	=> CLIENT_ID
+		));
+		// ibi-patch end
+
 		$_SESSION['tst_pass_finish'] = 0;
 
 		// ensure existing test session
@@ -797,6 +811,21 @@ abstract class ilTestOutputGUI extends ilTestPlayerAbstractGUI
 	protected function resumePlayerCmd()
 	{
 		$this->handleUserSettings();
+
+		// ibi-patch start
+		global $ilAppEventHandler, $ilUser;
+
+		$ilAppEventHandler->raise('Modules/Test', 'trackAccess', array(
+			'ref_id'	=>	$this->object->getRefId(),
+			'obj_id'	=> $this->object->getId(),
+			'obj_type'	=> $this->object->getType(),
+			'obj_title' => $this->object->getTitle(),
+			'usr_id'	=> $ilUser->getId(),
+			'usr_login'	=> $ilUser->getLogin(),
+			'client_id'	=> CLIENT_ID
+		));
+		// ibi-patch end
+
 
 		$active_id = $this->testSession->getActiveId();
 		$this->ctrl->setParameter($this, "active_id", $active_id);

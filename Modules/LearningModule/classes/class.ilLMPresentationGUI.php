@@ -1775,6 +1775,21 @@ class ilLMPresentationGUI
 		}
 		
 		$this->tpl->setVariable("PAGE_CONTENT", $rating.$head.$focus_mess.$ret.$foot);
+
+		// ibi-patch start
+		global $ilAppEventHandler;
+
+		$ilAppEventHandler->raise('Modules/LearningModule', 'trackAccess', array(
+			'ref_id'	=>	$this->lm->getRefId(),
+			'obj_id'	=> $this->lm->getId(),
+			'obj_type'	=> $this->lm->getType(),
+			'obj_title' => $this->lm->getTitle(),
+			'usr_id'	=> $ilUser->getId(),
+			'usr_login'	=> $ilUser->getLogin(),
+			'client_id'	=> CLIENT_ID
+		));
+		// ibi-patch end
+
 //echo htmlentities("-".$ret."-");
 		return $head.$focus_mess.$ret.$foot;
 	}

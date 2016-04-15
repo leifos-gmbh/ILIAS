@@ -204,9 +204,9 @@ class ilExAssignment
 			" AND member_id = ".$ilDB->quote($a_user_id, "integer").
 			" AND is_team = ".$ilDB->quote($is_team, "integer"));
 		$row = $ilDB->fetchAssoc($set);
-		return $row["tstamp"]
-			? $row["tstamp"]
-			: $this->getDeadline();
+		
+		// use assignment deadline if no direct personal
+		return max($row["tstamp"], $this->getDeadline());
 	}
 	
 	/**

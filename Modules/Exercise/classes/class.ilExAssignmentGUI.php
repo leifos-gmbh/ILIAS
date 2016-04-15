@@ -182,29 +182,45 @@ class ilExAssignmentGUI
 			$a_info->addProperty($lng->txt("exc_start_time"),
 				ilDatePresentation::formatDate(new ilDateTime($a_ass->getStartTime(),IL_CAL_UNIX)));
 		}
+		
+		// extended deadline info/warning						
+		$late_dl = "";
+		if ($idl &&
+			$idl < time() &&				
+			$a_ass->beforeDeadline()) // ext dl is last deadline
+		{				
+			// extended deadline date should not be presented anywhere
+			$late_dl = ilDatePresentation::formatDate(new ilDateTime($idl, IL_CAL_UNIX));
+			$late_dl = "<br />".sprintf($lng->txt("exc_late_submission_warning"), $late_dl);								
+			$late_dl = '<span class="warning">'.$late_dl.'</span>';									
+		}			
+		
 		if ($a_ass->getDeadline())
 		{
 			$until = ilDatePresentation::formatDate(new ilDateTime($a_ass->getDeadline(),IL_CAL_UNIX));
 			
-			// extended deadline date should not be presented anywhere
-			
-			// extended deadline info/warning
-			if($a_ass->getDeadline() < time() &&				
-				$a_ass->beforeDeadline())
-			{				
-				$dl = ilDatePresentation::formatDate(new ilDateTime($a_ass->getDeadline(),IL_CAL_UNIX));
-				$dl = "<br />".sprintf($lng->txt("exc_late_submission_warning"), $dl);								
-				$dl = '<span class="warning">'.$dl.'</span>';						
-				$until .= $dl;
+			// add late info if no idl
+			if ($late_dl &&
+				$idl == $a_ass->getDeadline())
+			{
+				$until .= $late_dl;
 			}
 			
 			$a_info->addProperty($lng->txt("exc_edit_until"), $until);			
 		}
 		
-		if($idl)
+		if ($idl && 
+			$idl != $a_ass->getDeadline())
 		{
-			$a_info->addProperty($lng->txt("exc_individual_deadline"), 
-				ilDatePresentation::formatDate(new ilDateTime($idl,IL_CAL_UNIX)));	
+			$until = ilDatePresentation::formatDate(new ilDateTime($idl,IL_CAL_UNIX));
+			
+			// add late info?
+			if ($late_dl)
+			{
+				$until .= $late_dl;
+			}
+			
+			$a_info->addProperty($lng->txt("exc_individual_deadline"), $until);	
 		}
 		
 		$time_str = $this->getTimeString($idl);

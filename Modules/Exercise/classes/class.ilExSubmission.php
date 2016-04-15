@@ -246,9 +246,7 @@ class ilExSubmission
 	
 	protected function isLate()
 	{
-		$dl = max($this->assignment->getDeadline(),
-			$this->assignment->getPersonalDeadline($this->getUserId()));
-		
+		$dl = $this->assignment->getPersonalDeadline($this->getUserId());		
 		return ($dl && $dl < time());		
 	}
 	

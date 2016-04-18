@@ -316,7 +316,7 @@ class ilChangeEvent
 		}
 
 		// ibi-patch start
-		if( in_array($a_type, array('crs', 'exc')) )
+		if( in_array($a_type, array('crs', 'exc', 'grp', 'file'))  && !isset($_REQUEST['prev_dub_sub'][$a_ref_id]))
 		{
 			global $ilAppEventHandler, $ilObjDataCache, $ilUser;
 
@@ -329,6 +329,8 @@ class ilChangeEvent
 				'usr_login'	=> $ilUser->getLogin(),
 				'client_id'	=> CLIENT_ID
 			));
+			//prevents send tracking data per request twice
+			$_REQUEST['prev_dub_sub'][$a_ref_id] = true;
 		}
 		// ibi-patch end
 

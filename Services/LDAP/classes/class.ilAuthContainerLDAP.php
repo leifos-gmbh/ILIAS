@@ -51,17 +51,27 @@ class ilAuthContainerLDAP extends Auth_Container_LDAP
 	 * @param array array of pear parameters
 	 * 
 	 */
-	public function __construct()
+	public function __construct($server_id = 0)
 	{
 		global $ilLog;
-		
+
 		include_once 'Services/LDAP/classes/class.ilLDAPServer.php';
-		$this->server = new ilLDAPServer(ilLDAPServer::_getFirstActiveServer());
-	 	$this->log = $ilLog;
-		
+		// begin-patch ldap_multiple
+		if($server_id)
+		{
+			$this->server = new ilLDAPServer($server_id);
+		}
+		else
+		{
+			$GLOBALS['ilLog']->write(__METHOD__ . ': Missing server id.');
+			$GLOBALS['ilLog']->logStack();
+			$this->server = new ilLDAPServer(ilLDAPServer::_getFirstActiveServer());
+		}
+		// end-patch ldap_multiple
+		$this->log = $ilLog;
 		parent::__construct($this->server->toPearAuthArray());
 	}
-	
+
 	public function forceCreation($a_status)
 	{
 		self::$force_creation = $a_status;
@@ -189,7 +199,7 @@ class ilAuthContainerLDAP extends Auth_Container_LDAP
 		$a_username = $this->extractUserName($user_data);
 
 		include_once './Services/LDAP/classes/class.ilLDAPUserSynchronisation.php';
-		$sync = new ilLDAPUserSynchronisation('ldap', $this->server->getServerId());
+		$sync = new ilLDAPUserSynchronisation('ldap_'.$this->server->getServerId(), $this->server->getServerId());
 		$sync->setExternalAccount($a_username);
 		$sync->setUserData($user_data);
 		$sync->forceCreation(self::$force_creation);

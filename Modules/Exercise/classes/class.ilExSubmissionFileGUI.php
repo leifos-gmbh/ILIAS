@@ -83,7 +83,7 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
 	*/
 	function submissionScreenObject()
 	{
-		global $ilToolbar, $ilHelp;
+		global $ilToolbar, $ilHelp, $ilUser;
 
 
 		$this->handleTabs();
@@ -112,10 +112,11 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
 				}
 				
 				// #15883 - extended deadline warning
-				if($this->assignment->getDeadline() &&
-					time() >  $this->assignment->getDeadline())
+				$deadline = $this->assignment->getPersonalDeadline($ilUser->getId());
+				if($deadline &&
+					time() > $deadline)
 				{							
-					$dl = ilDatePresentation::formatDate(new ilDateTime($this->assignment->getDeadline(),IL_CAL_UNIX));
+					$dl = ilDatePresentation::formatDate(new ilDateTime($deadline, IL_CAL_UNIX));
 					$dl = sprintf($this->lng->txt("exc_late_submission_warning"), $dl);									
 					$dl = '<span class="warning">'.$dl.'</span>';							
 					$ilToolbar->addText($dl);

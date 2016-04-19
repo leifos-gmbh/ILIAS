@@ -1479,6 +1479,8 @@ class ilExerciseManagementGUI
 						$this->assignment->setIndividualDeadline($id, $date);
 					}
 					
+					$this->assignment->recalculateLateSubmissions();
+					
 					echo "ok";
 				}
 			}

@@ -1778,9 +1778,7 @@ class ilExAssignment
 		
 		// see JF, 2015-05-11 
 		
-		$deadline = $this->getDeadline();
-		$ext_deadline = $this->getExtendedDeadline();
-		$last_deadline = max($this->getDeadline(), $this->getExtendedDeadline());
+		$ext_deadline = $this->getExtendedDeadline();		
 	
 		include_once "Modules/Exercise/classes/class.ilExSubmission.php";
 		foreach(ilExSubmission::getAllAssignmentFiles($this->exc_id, $this->getId()) as $file)
@@ -1788,6 +1786,9 @@ class ilExAssignment
 			$id = $file["returned_id"];
 			$uploaded = new ilDateTime($file["ts"], IL_CAL_DATETIME);
 			$uploaded = $uploaded->get(IL_CAL_UNIX);
+			
+			$deadline = $this->getPersonalDeadline($file["user_id"]);
+			$last_deadline = max($deadline, $this->getExtendedDeadline());
 			
 			$late = null;			
 			

@@ -15326,3 +15326,8 @@ style#:#sty_ha_ihcap_class#:#Hor. Akkordeonelement Überschrift
 style#:#sty_va_iheada_class#:#Vert. Akkordeonelement Kopf (aktiv)
 style#:#sty_va_ihcap_class#:#Vert. Akkordeonelement Überschrift
 exc#:#exc_delete_team#:#Team löschen
+ldap#:#ldap_edit_role_assignment#:#Zuordnung bearbeiten
+ldap#:#ldap_servers#:#LDAP Server
+ldap#:#add_ldap_server#:#Server Hinzufügen
+ldap#:#ldap_username_filter#:#Benutzernamen Filter
+ldap#:#ldap_username_filter_info#:#Benutzen Sie * als Wildcard.

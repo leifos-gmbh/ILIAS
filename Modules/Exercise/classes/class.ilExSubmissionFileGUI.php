@@ -100,17 +100,7 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
 			$max_files = $this->submission->getAssignment()->getMaxFile();
 			
 			if($this->submission->canAddFile())
-			{			
-				$ilToolbar->addButton($this->lng->txt("file_add"), 
-					$this->ctrl->getLinkTarget($this, "uploadForm"));
-
-				if(!$max_files ||
-					$max_files > 1)
-				{
-					$ilToolbar->addButton($this->lng->txt("header_zip"), 
-						$this->ctrl->getLinkTarget($this, "uploadZipForm"));
-				}
-				
+			{							
 				// #15883 - extended deadline warning
 				$deadline = $this->assignment->getPersonalDeadline($ilUser->getId());
 				if($deadline &&
@@ -121,6 +111,16 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
 					$dl = '<span class="warning">'.$dl.'</span>';							
 					$ilToolbar->addText($dl);
 				}
+				
+				$ilToolbar->addButton($this->lng->txt("file_add"), 
+					$this->ctrl->getLinkTarget($this, "uploadForm"));
+
+				if(!$max_files ||
+					$max_files > 1)
+				{
+					$ilToolbar->addButton($this->lng->txt("header_zip"), 
+						$this->ctrl->getLinkTarget($this, "uploadZipForm"));
+				}				
 			}
 			
 			if($max_files)

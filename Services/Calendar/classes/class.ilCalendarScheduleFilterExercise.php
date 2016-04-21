@@ -54,7 +54,7 @@ class ilCalendarScheduleFilterExercise implements ilCalendarScheduleFilter
 				{
 					$idl = $ass->getPersonalDeadline($this->user_id);
 					if($idl &&
-						$idl != $a_event->getStart()->get(IL_CAL_UNIX))
+						$idl != $ass->getDeadline())
 					{
 						// we have individal deadline (see addCustomEvents());
 						return false;				
@@ -85,7 +85,8 @@ class ilCalendarScheduleFilterExercise implements ilCalendarScheduleFilter
 			foreach(ilExAssignment::getInstancesByExercise($exc_obj_id) as $ass)
 			{
 				$idl = $ass->getPersonalDeadline($this->user_id);
-				if($idl)
+				if($idl &&
+					$idl != $ass->getDeadline())
 				{
 					$idl = new ilDateTime($idl, IL_CAL_UNIX);					
 					if(ilDateTime::_within($idl, $start, $end))

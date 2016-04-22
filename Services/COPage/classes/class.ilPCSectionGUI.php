@@ -266,6 +266,7 @@ class ilPCSectionGUI extends ilPageContentGUI
 	{
 		$form = $this->initForm(false);
 		$form->checkInput();
+		$this->setValuesFromForm($form);
 		$this->updated = $this->pg_obj->update();
 		if ($this->updated === true)
 		{

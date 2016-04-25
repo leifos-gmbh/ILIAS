@@ -2349,6 +2349,39 @@ abstract class ilPageObject
 	}
 
 	/**
+	 * Handle repository links on copy process
+	 *
+	 * @param
+	 * @return
+	 */
+	function handleRepositoryLinksOnCopy($a_mapping)
+	{
+		$this->buildDom();
+		$this->log->debug("Handle repository links...");
+
+		// resolve normal internal links
+		$xpc = xpath_new_context($this->dom);
+		$path = "//IntLink";
+		$res = xpath_eval($xpc, $path);
+		for($i = 0; $i < count($res->nodeset); $i++)
+		{
+			$target = $res->nodeset[$i]->get_attribute("Target");
+			$type = $res->nodeset[$i]->get_attribute("Type");
+			$this->log->debug("Target: ".$target);
+			$t = explode("_", $target);
+			if ((int) $t[1] == 0 && isset($a_mapping[$t[3]]) && $type == "RepositoryItem")
+			{
+				//echo "POP";
+				$this->log->debug("... replace ".$t[3]." with ".$a_mapping[$t[3]].".");
+				$res->nodeset[$i]->set_attribute("Target",
+						"il__obj_".$a_mapping[$t[3]]);
+			}
+		}
+		unset($xpc);
+	}
+
+
+	/**
 	 * Create new page object with current xml content
 	 */
 	function createFromXML()

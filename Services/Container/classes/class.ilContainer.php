@@ -888,12 +888,12 @@ class ilContainer extends ilObject
 	protected static function fixInternalLinksAfterCopy($a_target_id, $a_copy_id)
 	{
 		$obj_id = ilObject::_lookupObjId($a_target_id);
+		include_once("./Services/Container/classes/class.ilContainerPage.php");
 		if (ilContainerPage::_exists("cont", $obj_id))
 		{
 			include_once("./Services/CopyWizard/classes/class.ilCopyWizardOptions.php");
 			$cwo = ilCopyWizardOptions::_getInstance($a_copy_id);
 			$mapping = $cwo->getMappings();
-			include_once("./Services/Container/classes/class.ilContainerPage.php");
 			$pg = new ilContainerPage($obj_id);
 			$pg->handleRepositoryLinksOnCopy($mapping);
 			$pg->update(true, true);

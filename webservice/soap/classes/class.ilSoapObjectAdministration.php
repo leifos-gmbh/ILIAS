@@ -1259,10 +1259,38 @@ class ilSoapObjectAdministration extends ilSoapAdministration
 
 				if($objDefinition->isContainer($tmp_obj->getType()) and $object_data['sorting'])
 				{
-					include_once './Services/Container/classes/class.ilContainerSortingSettings.php';
-					$sort = new ilContainerSortingSettings($tmp_obj->getId());
-					$sort->setSortMode($object_data['sorting']);
-					$sort->update();
+					include_once './Services/Container/classes/class.ilContainerSorting.php';
+					$sort = ilContainerSorting::_getInstance($tmp_obj->getId());
+
+					switch($object_data['sorting']['type'])
+					{
+						case "Creation":
+							$sort->getSortingSettings()->setSortMode(ilContainer::SORT_CREATION);
+							break;
+						case "Manual":
+							$sort->getSortingSettings()->setSortMode(ilContainer::SORT_MANUAL);
+
+							$sort->getSortingSettings()->setSortNewItemsOrder(
+								$object_data['sorting']['ni_order'] == "Creation" ?
+									ilContainer::SORT_NEW_ITEMS_ORDER_CREATION :
+									ilContainer::SORT_NEW_ITEMS_ORDER_TITLE);
+
+							$sort->getSortingSettings()->setSortNewItemsPosition(
+								$object_data['sorting']['ni_position'] == "Top" ?
+									ilContainer::SORT_NEW_ITEMS_POSITION_TOP :
+									ilContainer::SORT_NEW_ITEMS_POSITION_BOTTOM);
+							break;
+						default:
+							$sort->getSortingSettings()->setSortMode(ilContainer::SORT_TITLE);
+							break;
+					}
+
+					$sort->getSortingSettings()->setSortDirection(
+						$object_data['sorting']['direction'] == "Desc" ?
+							ilContainer::SORT_DIRECTION_DESC :
+							ilContainer::SORT_DIRECTION_ASC);
+
+					$sort->getSortingSettings()->update();
 
 
 					$refs = ilObject::_getAllReferences($tmp_obj->getId());

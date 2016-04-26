@@ -86,8 +86,8 @@ class ilContainerSorting
 	 * get instance by obj_id
 	 *
 	 * @access public
-	 * @param int obj_id
-	 * @return object ilContainerSorting
+	 * @param int $a_obj_id
+	 * @return ilContainerSorting
 	 * @static
 	 */
 	public static function _getInstance($a_obj_id)

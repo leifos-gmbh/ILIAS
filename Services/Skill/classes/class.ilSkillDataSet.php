@@ -22,6 +22,7 @@ class ilSkillDataSet extends ilDataSet
 	 * @var ilSkillTree
 	 */
 	protected $skill_tree;
+	protected $init_order_nr;
 
 	/**
 	 * Constructor
@@ -30,6 +31,9 @@ class ilSkillDataSet extends ilDataSet
 	{
 		include_once("./Services/Skill/classes/class.ilSkillTree.php");
 		$this->skill_tree = new ilSkillTree();
+
+		// todo
+		$this->init_order_nr = 0;
 	}
 
 	/**
@@ -253,16 +257,17 @@ class ilSkillDataSet extends ilDataSet
 				// determine top nodes of main tree to be exported and all referenced template nodes
 				$childs = $this->skill_tree->getChildsByTypeFilter($this->skill_tree->readRootId(), array("skll", "scat", "sctr", "sktr"));
 				$deps = array();
+				$skl_subtree_deps = array();
 				foreach ($childs as $c)
 				{
-					$deps["skl_subtree"]["ids"][] = $c["child"];
+					$skl_subtree_deps[] = $c["child"];
 				}
 
 				// determine template subtrees
 				$ref_nodes = array();
-				if (is_array($deps["skl_subtree"]["ids"]))
+				if (is_array($skl_subtree_deps))
 				{
-					foreach ($deps["skl_subtree"]["ids"] as $id)
+					foreach ($skl_subtree_deps as $id)
 					{
 						if (ilSkillTreeNode::_lookupType($id) == "sktr")
 						{
@@ -285,6 +290,10 @@ class ilSkillDataSet extends ilDataSet
 				{
 					$deps["skl_templ_subtree"]["ids"][] = $rec["templ_id"];
 				}
+
+				// export subtree after templates
+				$deps["skl_subtree"]["ids"] = $skl_subtree_deps;
+
 				return $deps;
 
 			case "skl_subtree":
@@ -310,49 +319,102 @@ class ilSkillDataSet extends ilDataSet
 	 */
 	function importRecord($a_entity, $a_types, $a_rec, $a_mapping, $a_schema_version)
 	{
+		$source_inst_id = $a_mapping->getInstallId();
 		switch ($a_entity)
 		{
-			case "skll":
-
-				return;
-				include_once("./Modules/Wiki/classes/class.ilObjWiki.php");
-				if($new_id = $a_mapping->getMapping('Services/Container','objs',$a_rec['Id']))
+			case "skl_subtree":
+				if ($a_rec["Parent"] == 1)
 				{
-					$newObj = ilObjectFactory::getInstanceByObjId($new_id,false);
+					$parent = 1;
 				}
 				else
 				{
-					$newObj = new ilObjWiki();
-					$newObj->setType("wiki");
-					$newObj->create(true);
+					$parent = (int)$a_mapping->getMapping("Services/Skill", "skl_tree", $a_rec["Parent"]);
 				}
-					
-				$newObj->setTitle($a_rec["Title"]);
-				$newObj->setDescription($a_rec["Description"]);
-				$newObj->setShortTitle($a_rec["Short"]);
-				$newObj->setStartPage($a_rec["StartPage"]);
-				$newObj->setRatingOverall($a_rec["RatingOverall"]);
-				$newObj->setRating($a_rec["Rating"]);
-				$newObj->setIntroduction($a_rec["Introduction"]);
-				$newObj->setPublicNotes($a_rec["PublicNotes"]);
-				
-				// >= 4.3
-				if(isset($a_rec["PageToc"]))
+				switch ($a_rec["Type"])
 				{
-					// $newObj->setImportantPages($a_rec["ImpPages"]);
-					$newObj->setPageToc($a_rec["PageToc"]);
-					$newObj->setRatingAsBlock($a_rec["RatingSide"]);
-					$newObj->setRatingForNewPages($a_rec["RatingNew"]);
-					$newObj->setRatingCategories($a_rec["RatingExt"]);			
+					case "scat":
+						include_once("./Services/Skill/classes/class.ilSkillCategory.php");
+						$scat = new ilSkillCategory();
+						$scat->setTitle($a_rec["Title"]);
+						$scat->setImportId("il_".$source_inst_id."_scat_".$a_rec["Child"]);
+						$scat->setSelfEvaluation($a_rec["SelfEval"]);
+						$scat->setOrderNr($a_rec["OrderNr"] + $this->init_order_nr);
+						// todo: deactivate top
+						$scat->setStatus($a_rec["Status"]);
+						$scat->create();
+						ilSkillTreeNode::putInTree($scat, $parent);
+						$a_mapping->addMapping("Services/Skill", "skl_tree", $a_rec["Child"], $scat->getId());
+						break;
+
+					case "skll":
+						include_once("./Services/Skill/classes/class.ilBasicSkill.php");
+						$skll = new ilBasicSkill();
+						$skll->setTitle($a_rec["Title"]);
+						$skll->setImportId("il_".$source_inst_id."_skll_".$a_rec["Child"]);
+						$skll->setOrderNr($a_rec["OrderNr"] + $this->init_order_nr);
+						// todo: deactivate top
+						$skll->create();
+						ilSkillTreeNode::putInTree($skll, $parent);
+						$a_mapping->addMapping("Services/Skill", "skl_tree", $a_rec["Child"], $skll->getId());
+						break;
+
 				}
-				
-				$newObj->update(true);
-				$this->current_obj = $newObj;
-				$a_mapping->addMapping("Modules/Wiki", "wiki", $a_rec["Id"], $newObj->getId());
-				$a_mapping->addMapping("Services/Rating", "rating_category_parent_id", $a_rec["Id"], $newObj->getId());
-				$a_mapping->addMapping("Services/AdvancedMetaData", "parent", $a_rec["Id"], $newObj->getId());
 				break;
 
+			case "skl_templ_subtree":
+				if ($a_rec["Parent"] == 1)
+				{
+					$parent = 1;
+				}
+				else
+				{
+					$parent = (int)$a_mapping->getMapping("Services/Skill", "skl_tree", $a_rec["Parent"]);
+				}
+				switch ($a_rec["Type"])
+				{
+					case "sctp":
+						include_once("./Services/Skill/classes/class.ilSkillTemplateCategory.php");
+						$sctp = new ilSkillTemplateCategory();
+						$sctp->setTitle($a_rec["Title"]);
+						$sctp->setImportId("il_".$source_inst_id."_sctp_".$a_rec["Child"]);
+						$sctp->setOrderNr($a_rec["OrderNr"] + $this->init_order_nr);
+						$sctp->create();
+						ilSkillTreeNode::putInTree($sctp, $parent);
+						$a_mapping->addMapping("Services/Skill", "skl_tree", $a_rec["Child"], $sctp->getId());
+						break;
+
+					case "sktp":
+						include_once("./Services/Skill/classes/class.ilBasicSkillTemplate.php");
+						$sktp = new ilBasicSkillTemplate();
+						$sktp->setTitle($a_rec["Title"]);
+						$sktp->setImportId("il_".$source_inst_id."_sktp_".$a_rec["Child"]);
+						$sktp->setOrderNr($a_rec["OrderNr"] + $this->init_order_nr);
+						$sktp->create();
+						ilSkillTreeNode::putInTree($sktp, $parent);
+						$a_mapping->addMapping("Services/Skill", "skl_tree", $a_rec["Child"], $sktp->getId());
+						break;
+				}
+				break;
+
+			case "skl_level":
+				$skill_id = (int)$a_mapping->getMapping("Services/Skill", "skl_tree", $a_rec["SkillId"]);
+				$type = ilSkillTreeNode::_lookupType($skill_id);
+				if (in_array($type, array("skll", "sktp")))
+				{
+					if ($type == "skll")
+					{
+						$skill = new ilBasicSkill($skill_id);
+					}
+					else
+					{
+						$skill = new ilBasicSkillTemplate($skill_id);
+					}
+					// todo: import id
+					$skill->addLevel($a_rec["Title"], $a_rec["Description"]);
+					$skill->update();
+				}
+				break;
 		}
 	}
 }

@@ -324,6 +324,10 @@ class ilSkillCategoryGUI extends ilSkillTreeNodeGUI
 				$ilCtrl->getLinkTargetByClass("ilskillcategorygui", "insertTemplateReferenceClip"));
 		}
 
+		// skill template reference
+		$ilToolbar->addButton($lng->txt("skmg_import_skills"),
+				$ilCtrl->getLinkTargetByClass("ilskillrootgui", "showImportForm"));
+
 	}
 
 	/**
@@ -361,6 +365,7 @@ class ilSkillCategoryGUI extends ilSkillTreeNodeGUI
 		
 		parent::redirectToParent();
 	}
+
 
 }
 

@@ -137,6 +137,46 @@ class ilSkillTreeNode
 	}
 
 	/**
+	 * Set import id
+	 *
+	 * @param string $a_val import id
+	 */
+	public function setImportId($a_val)
+	{
+		$this->import_id = $a_val;
+	}
+
+	/**
+	 * Get import id
+	 *
+	 * @return string import id
+	 */
+	public function getImportId()
+	{
+		return $this->import_id;
+	}
+
+	/**
+	 * Set creation date
+	 *
+	 * @param string $a_val creation date
+	 */
+	protected function setCreationDate($a_val)
+	{
+		$this->creation_date = $a_val;
+	}
+
+	/**
+	 * Get creation date
+	 *
+	 * @return string creation date
+	 */
+	public function getCreationDate()
+	{
+		return $this->creation_date;
+	}
+
+	/**
 	 * Get all status
 	 *
 	 * @return array array of status, key is value, value is lang text
@@ -190,6 +230,8 @@ class ilSkillTreeNode
 		$this->setOrderNr($this->data_record["order_nr"]);
 		$this->setSelfEvaluation($this->data_record["self_eval"]);
 		$this->setStatus($this->data_record["status"]);
+		$this->setImportId($this->data_record["import_id"]);
+		$this->setCreationDate($this->data_record["creation_date"]);
 	}
 
 	/**
@@ -344,7 +386,7 @@ class ilSkillTreeNode
 
 		// insert object data
 		$id = $ilDB->nextId("skl_tree_node");
-		$query = "INSERT INTO skl_tree_node (obj_id, title, type, create_date, self_eval, order_nr, status) ".
+		$query = "INSERT INTO skl_tree_node (obj_id, title, type, create_date, self_eval, order_nr, status, creation_date, import_id) ".
 			"VALUES (".
 			$ilDB->quote($id, "integer").",".
 			$ilDB->quote($this->getTitle(), "text").",".
@@ -352,7 +394,9 @@ class ilSkillTreeNode
 			$ilDB->now().", ".
 			$ilDB->quote((int) $this->getSelfEvaluation(), "integer").", ".
 			$ilDB->quote((int) $this->getOrderNr(), "integer").", ".
-			$ilDB->quote((int) $this->getStatus(), "integer").
+			$ilDB->quote((int) $this->getStatus(), "integer").", ".
+			$ilDB->now().", ".
+			$ilDB->quote((int) $this->getImportId(), "text").
 			")";
 		$ilDB->manipulate($query);
 		$this->setId($id);
@@ -370,6 +414,7 @@ class ilSkillTreeNode
 			" ,self_eval = ".$ilDB->quote((int) $this->getSelfEvaluation(), "integer").
 			" ,order_nr = ".$ilDB->quote((int) $this->getOrderNr(), "integer").
 			" ,status = ".$ilDB->quote((int) $this->getStatus(), "integer").
+			" ,import_id = ".$ilDB->quote((int) $this->getImportId(), "text").
 			" WHERE obj_id = ".$ilDB->quote($this->getId(), "integer");
 
 		$ilDB->manipulate($query);

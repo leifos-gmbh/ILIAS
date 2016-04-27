@@ -1261,34 +1261,16 @@ class ilSoapObjectAdministration extends ilSoapAdministration
 				{
 					include_once './Services/Container/classes/class.ilContainerSorting.php';
 					$sort = ilContainerSorting::_getInstance($tmp_obj->getId());
+					$sort->getSortingSettings()->setSortMode($object_data['sorting']['type']);
+					$sort->getSortingSettings()->setSortDirection($object_data['sorting']['direction']);
 
-					switch($object_data['sorting']['type'])
+					if($object_data['sorting']['type'] == ilContainer::SORT_MANUAL)
 					{
-						case "Creation":
-							$sort->getSortingSettings()->setSortMode(ilContainer::SORT_CREATION);
-							break;
-						case "Manual":
-							$sort->getSortingSettings()->setSortMode(ilContainer::SORT_MANUAL);
-
-							$sort->getSortingSettings()->setSortNewItemsOrder(
-								$object_data['sorting']['ni_order'] == "Creation" ?
-									ilContainer::SORT_NEW_ITEMS_ORDER_CREATION :
-									ilContainer::SORT_NEW_ITEMS_ORDER_TITLE);
-
-							$sort->getSortingSettings()->setSortNewItemsPosition(
-								$object_data['sorting']['ni_position'] == "Top" ?
-									ilContainer::SORT_NEW_ITEMS_POSITION_TOP :
-									ilContainer::SORT_NEW_ITEMS_POSITION_BOTTOM);
-							break;
-						default:
-							$sort->getSortingSettings()->setSortMode(ilContainer::SORT_TITLE);
-							break;
+						$sort->getSortingSettings()->setSortNewItemsOrder(
+							$object_data['sorting']['ni_order']);
+						$sort->getSortingSettings()->setSortNewItemsPosition(
+							$object_data['sorting']['ni_position']);
 					}
-
-					$sort->getSortingSettings()->setSortDirection(
-						$object_data['sorting']['direction'] == "Desc" ?
-							ilContainer::SORT_DIRECTION_DESC :
-							ilContainer::SORT_DIRECTION_ASC);
 
 					$sort->getSortingSettings()->update();
 
@@ -1319,10 +1301,8 @@ class ilSoapObjectAdministration extends ilSoapAdministration
 						}
 						$cpos++;
 					}
-					include_once './Services/Container/classes/class.ilContainerSorting.php';
-					$sort = ilContainerSorting::_getInstance($tmp_obj->getId());
-					$sort->saveItems($poss);
 
+					$sort->saveItems($poss);
 
 				}
 				// ibi-patch end

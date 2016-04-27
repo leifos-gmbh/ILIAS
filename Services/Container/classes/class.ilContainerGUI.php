@@ -1994,6 +1994,13 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 						$ilObjDataCache->lookupObjId($folder_ref_id));
 					ilChangeEvent::_catchupWriteEvents($node_data['obj_id'], $ilUser->getId());					
 					// END PATCH ChangeEvent: Record cut event.
+
+					// ibi-patch start
+					$GLOBALS['ilAppEventHandler']->raise('Services/Container', 'cut', array(
+						'obj_id' => ilObject::_lookupObjId($ref_id), 'obj_type' => ilObject::_lookupType(ilObject::_lookupObjId($ref_id))
+					));
+					// ibi-patch end
+
 				}
 				
 				// prevent multiple iterations for cut cmommand
@@ -2047,6 +2054,13 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 						$ilObjDataCache->lookupObjId($folder_ref_id));
 					ilChangeEvent::_catchupWriteEvents($node_data['obj_id'], $ilUser->getId());					
 					// END PATCH ChangeEvent: Record link event.
+
+					// ibi-patch start
+					$GLOBALS['ilAppEventHandler']->raise('Services/Container', 'link', array(
+						'obj_id' => ilObject::_lookupObjId($new_ref_id), 'obj_type' => ilObject::_lookupType(ilObject::_lookupObjId($new_ref_id))
+					));
+					// ibi-patch end
+
 				}
 	
 				$log->write(__METHOD__.', link finished');
@@ -2539,6 +2553,12 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 					$this->object->getId());
 				ilChangeEvent::_catchupWriteEvents($node_data['obj_id'], $ilUser->getId());				
 				// END PATCH ChangeEvent: Record cut event.
+
+				// ibi-patch start
+				$GLOBALS['ilAppEventHandler']->raise('Services/Container', 'cut', array(
+					'obj_id' => ilObject::_lookupObjId($ref_id), 'obj_type' => ilObject::_lookupType(ilObject::_lookupObjId($ref_id))
+				));
+				// ibi-patch end
 			}
 		} // END CUT
 
@@ -3072,6 +3092,13 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 		$positions = str_replace(',','.',$_POST['position']);
 
 		$sorting->savePost($positions);
+
+		// ibi-patch start
+		$GLOBALS['ilAppEventHandler']->raise('Services/Container', 'saveSorting', array(
+			'obj_id' => $this->object->getId(), 'obj_type' => $this->object->getType()
+		));
+		// ibi-patch end
+
 		ilUtil::sendSuccess($this->lng->txt('cntr_saved_sorting'), true);
 		$this->ctrl->redirect($this, "editOrder");
 	}

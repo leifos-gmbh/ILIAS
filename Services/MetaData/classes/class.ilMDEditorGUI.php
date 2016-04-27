@@ -786,6 +786,12 @@ class ilMDEditorGUI
 			}
 		}
 		$this->callListeners('Lifecycle');
+
+		// ibi-patch start
+		$GLOBALS['ilAppEventHandler']->raise('Services/MetaData', 'updateQuickEdit', array(
+			'obj_id' => $this->md_obj->getObjId(), 'obj_type' => $this->md_obj->getObjType()
+		));
+		// ibi-patch end
 		
 		// #18563
 		if(!$_REQUEST["wsp_id"])
@@ -1564,6 +1570,12 @@ class ilMDEditorGUI
 		}
 		$this->callListeners('General');
 
+		// ibi-patch start
+		$GLOBALS['ilAppEventHandler']->raise('Services/MetaData', 'updateGeneral', array(
+			'obj_id' => $this->md_obj->getObjId(), 'obj_type' => $this->md_obj->getObjType()
+		));
+		// ibi-patch end
+
 		// Redirect here to read new title and description
 		// Otherwise ('Lifecycle' 'technical' ...) simply call listSection()
 		$this->ctrl->setParameter($this, "section", "meta_general");
@@ -1622,6 +1634,12 @@ class ilMDEditorGUI
 			}
 		}
 		$this->callListeners('Technical');
+
+		// ibi-patch start
+		$GLOBALS['ilAppEventHandler']->raise('Services/MetaData', 'updateTechnical', array(
+			'obj_id' => $this->md_obj->getObjId(), 'obj_type' => $this->md_obj->getObjType()
+		));
+		// ibi-patch end
 
 		ilUtil::sendSuccess($this->lng->txt("saved_successfully"));
 		$this->listSection();
@@ -1993,6 +2011,13 @@ class ilMDEditorGUI
 			}
 		}
 		$this->callListeners('Lifecycle');
+
+		// ibi-patch start
+		$GLOBALS['ilAppEventHandler']->raise('Services/MetaData', 'updateLifecycle', array(
+			'obj_id' => $this->md_obj->getObjId(), 'obj_type' => $this->md_obj->getObjType()
+		));
+		// ibi-patch end
+
 		ilUtil::sendSuccess($this->lng->txt("saved_successfully"));
 		$this->listSection();
 		return true;
@@ -2174,6 +2199,13 @@ class ilMDEditorGUI
 			}
 		}
 		$this->callListeners('MetaMetaData');
+
+		// ibi-patch start
+		$GLOBALS['ilAppEventHandler']->raise('Services/MetaData', 'updateMetaMetaData', array(
+			'obj_id' => $this->md_obj->getObjId(), 'obj_type' => $this->md_obj->getObjType()
+		));
+		// ibi-patch end
+
 		ilUtil::sendSuccess($this->lng->txt("saved_successfully"));
 		$this->listSection();
 		return true;
@@ -2253,6 +2285,13 @@ class ilMDEditorGUI
 		$this->md_section->update();
 		
 		$this->callListeners('Rights');
+
+		// ibi-patch start
+		$GLOBALS['ilAppEventHandler']->raise('Services/MetaData', 'updateRights', array(
+			'obj_id' => $this->md_obj->getObjId(), 'obj_type' => $this->md_obj->getObjType()
+		));
+		// ibi-patch end
+
 		ilUtil::sendSuccess($this->lng->txt("saved_successfully"));
 		$this->listSection();
 	}
@@ -2574,6 +2613,13 @@ class ilMDEditorGUI
 		$this->md_section->update();
 		
 		$this->callListeners('Educational');
+
+		// ibi-patch start
+		$GLOBALS['ilAppEventHandler']->raise('Services/MetaData', 'updateEducational', array(
+			'obj_id' => $this->md_obj->getObjId(), 'obj_type' => $this->md_obj->getObjType()
+		));
+		// ibi-patch end
+
 		ilUtil::sendSuccess($this->lng->txt("saved_successfully"));
 		$this->listSection();
 	}
@@ -2751,6 +2797,13 @@ class ilMDEditorGUI
 		}
 		
 		$this->callListeners('Relation');
+
+		// ibi-patch start
+		$GLOBALS['ilAppEventHandler']->raise('Services/MetaData', 'updateRelation', array(
+			'obj_id' => $this->md_obj->getObjId(), 'obj_type' => $this->md_obj->getObjType()
+		));
+		// ibi-patch end
+
 		ilUtil::sendSuccess($this->lng->txt("saved_successfully"));
 		$this->listSection();
 	}
@@ -2839,6 +2892,13 @@ class ilMDEditorGUI
 		}
 		
 		$this->callListeners('Annotation');
+
+		// ibi-patch start
+		$GLOBALS['ilAppEventHandler']->raise('Services/MetaData', 'updateAnnotation', array(
+			'obj_id' => $this->md_obj->getObjId(), 'obj_type' => $this->md_obj->getObjType()
+		));
+		// ibi-patch end
+
 		ilUtil::sendSuccess($this->lng->txt("saved_successfully"));
 		$this->listSection();
 	}
@@ -3080,6 +3140,13 @@ class ilMDEditorGUI
 		}
 		
 		$this->callListeners('Classification');
+
+		// ibi-patch start
+		$GLOBALS['ilAppEventHandler']->raise('Services/MetaData', 'updateClassification', array(
+			'obj_id' => $this->md_obj->getObjId(), 'obj_type' => $this->md_obj->getObjType()
+		));
+		// ibi-patch end
+
 		ilUtil::sendSuccess($this->lng->txt("saved_successfully"));
 		$this->listSection();
 	}
@@ -3090,7 +3157,13 @@ class ilMDEditorGUI
 
 		$md_element = ilMDFactory::_getInstance($_GET['meta_path'],$_GET['meta_index'],$_GET['meta_technical']);
 		$md_element->delete();
-		
+
+		// ibi-patch start
+		$GLOBALS['ilAppEventHandler']->raise('Services/MetaData', 'deleteElement', array(
+			'obj_id' => $this->md_obj->getObjId(), 'obj_type' => $this->md_obj->getObjType()
+		));
+		// ibi-patch end
+
 		$this->listSection();
 
 		return true;
@@ -3102,6 +3175,12 @@ class ilMDEditorGUI
 
 		$md_element = ilMDFactory::_getInstance($_GET['section'],$_GET['meta_index']);
 		$md_element->delete();
+
+		// ibi-patch start
+		$GLOBALS['ilAppEventHandler']->raise('Services/MetaData', 'deleteSection', array(
+			'obj_id' => $this->md_obj->getObjId(), 'obj_type' => $this->md_obj->getObjType()
+		));
+		// ibi-patch end
 		
 		$this->listSection();
 
@@ -3182,7 +3261,13 @@ class ilMDEditorGUI
 				break;
 
 		}
-		
+
+		// ibi-patch start
+		$GLOBALS['ilAppEventHandler']->raise('Services/MetaData', 'addSection', array(
+			'obj_id' => $this->md_obj->getObjId(), 'obj_type' => $this->md_obj->getObjType()
+		));
+		// ibi-patch end
+
 		$this->listSection();
 		return true;
 	}
@@ -3301,6 +3386,12 @@ class ilMDEditorGUI
 		}
 
 		$md_new->save();
+
+		// ibi-patch start
+		$GLOBALS['ilAppEventHandler']->raise('Services/MetaData', 'addSectionElement', array(
+			'obj_id' => $this->md_obj->getObjId(), 'obj_type' => $this->md_obj->getObjType()
+		));
+		// ibi-patch end
 
 		$this->listSection();
 

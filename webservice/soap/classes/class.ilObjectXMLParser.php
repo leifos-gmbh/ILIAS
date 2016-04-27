@@ -191,18 +191,43 @@ class ilObjectXMLParser extends ilSaxParser
 			// ibi-patch start
 			case 'Sorting':
 				include_once './Services/Container/classes/class.ilContainer.php';
+
+				$direction = $a_attribs['direction'] == "Desc" ?
+					ilContainer::SORT_DIRECTION_DESC :
+					ilContainer::SORT_DIRECTION_ASC;
+
 				switch($a_attribs['type'])
 				{
 					case 'Manual':
-						$this->__addProperty('sorting', ilContainer::SORT_MANUAL);
+						$this->__addProperty('sorting', array(
+							'type' => ilContainer::SORT_MANUAL,
+							'direction' => $direction,
+							'ni_order' => $a_attribs['ni_order'] == "Creation" ?
+								ilContainer::SORT_NEW_ITEMS_ORDER_CREATION :
+								ilContainer::SORT_NEW_ITEMS_ORDER_TITLE,
+							'ni_position' => $a_attribs['ni_position'] == "Top" ?
+								ilContainer::SORT_NEW_ITEMS_POSITION_TOP :
+								ilContainer::SORT_NEW_ITEMS_POSITION_BOTTOM
+						));
 						break;
-
 					case 'Title':
-						$this->__addProperty('sorting', ilContainer::SORT_TITLE);
+						$this->__addProperty('sorting', array(
+							'type' => ilContainer::SORT_TITLE,
+							'direction' => $direction
+						));
 						break;
 
 					case 'Activation':
-						$this->__addProperty('sorting', ilContainer::SORT_ACTIVATION);
+						$this->__addProperty('sorting', array(
+							'type' => ilContainer::SORT_ACTIVATION,
+							'direction' => $direction
+						));
+						break;
+					case 'Creation':
+						$this->__addProperty('sorting', array(
+							'type' => ilContainer::SORT_CREATION,
+							'direction' => $direction
+						));
 						break;
 				}
 				break;

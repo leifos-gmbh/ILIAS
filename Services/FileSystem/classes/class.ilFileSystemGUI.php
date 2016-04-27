@@ -584,6 +584,13 @@ class ilFileSystemGUI
 
 		rename($dir.ilUtil::stripSlashes($_GET["old_name"]), $dir.$new_name);
 
+		// ibi-patch start
+		$GLOBALS['ilAppEventHandler']->raise('Services/FileSystemStorage', 'renameFile', array(
+			'obj_id' => ilObject::_lookupObjId($_GET['ref_id']),
+			'obj_type' => ilObject::_lookupType($_GET['ref_id'], true)
+		));
+		// ibi-patch end
+
 		ilUtil::renameExecutables($this->main_dir);
 		if (@is_dir($dir.$new_name))
 		{
@@ -631,6 +638,13 @@ class ilFileSystemGUI
 			{
 				ilUtil::sendSuccess($lng->txt("cont_dir_created"), true);
 				$this->setPerformedCommand("create_dir", array("name" => $new_dir));
+
+				// ibi-patch start
+				$GLOBALS['ilAppEventHandler']->raise('Services/FileSystemStorage', 'createDirectory', array(
+					'obj_id' => ilObject::_lookupObjId($_GET['ref_id']),
+					'obj_type' => ilObject::_lookupType($_GET['ref_id'], true)
+				));
+				// ibi-patch end
 			}
 		}
 		else
@@ -661,7 +675,13 @@ class ilFileSystemGUI
 			$tgt_file = $cur_dir."/".ilUtil::stripSlashes($_FILES["new_file"]["name"]);
 			
 			move_uploaded_file($_FILES["new_file"]["tmp_name"], $tgt_file);
-			
+
+			// ibi-patch start
+			$GLOBALS['ilAppEventHandler']->raise('Services/FileSystemStorage', 'uploadFile', array(
+				'obj_id' => ilObject::_lookupObjId($_GET['ref_id']),
+				'obj_type' => ilObject::_lookupType($_GET['ref_id'], true)
+			));
+			// ibi-patch end
 		}
 		elseif ($_POST["uploaded_file"])
 		{					
@@ -674,7 +694,14 @@ class ilFileSystemGUI
 				
 				// copy uploaded file to data directory
 				ilUploadFiles::_copyUploadFile($_POST["uploaded_file"], $tgt_file);
-			}			
+			}
+
+			// ibi-patch start
+			$GLOBALS['ilAppEventHandler']->raise('Services/FileSystemStorage', 'uploadFile', array(
+				'obj_id' => ilObject::_lookupObjId($_GET['ref_id']),
+				'obj_type' => ilObject::_lookupType($_GET['ref_id'], true)
+			));
+			// ibi-patch end
 		}
 		else if (trim($_FILES["new_file"]["name"]) == "")
 		{
@@ -771,6 +798,14 @@ class ilFileSystemGUI
 				$is_dir = true;
 				ilUtil::delDir($file);
 			}
+
+
+			// ibi-patch start
+			$GLOBALS['ilAppEventHandler']->raise('Services/FileSystemStorage', 'deleteFile', array(
+				'obj_id' => ilObject::_lookupObjId($_GET['ref_id']),
+				'obj_type' => ilObject::_lookupType($_GET['ref_id'], true)
+			));
+			// ibi-patch end
 		}
 
 		$this->ctrl->saveParameter($this, "cdir");
@@ -854,6 +889,13 @@ class ilFileSystemGUI
 					array("name" => substr($file, strlen($this->main_dir)+1), 						
 						"added" => $diff));
 			}
+
+			// ibi-patch start
+			$GLOBALS['ilAppEventHandler']->raise('Services/FileSystemStorage', 'unzipFile', array(
+				'obj_id' => ilObject::_lookupObjId($_GET['ref_id']),
+				'obj_type' => ilObject::_lookupType($_GET['ref_id'], true)
+			));
+			// ibi-patch end
 		}
 
 		ilUtil::renameExecutables($this->main_dir);

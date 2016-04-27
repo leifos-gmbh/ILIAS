@@ -858,6 +858,12 @@ class ilObjCategoryGUI extends ilContainerGUI
 				ilChangeEvent::_catchupWriteEvents($this->object->getId(), $ilUser->getId());				
 				// END ChangeEvent: Record update
 				
+				// ibi-patch start
+				$GLOBALS['ilAppEventHandler']->raise('Modules/Category', 'update', array(
+					'obj_id' => $this->object->getId(), 'obj_type' => $this->object->getType()
+				));
+				// ibi-patch end
+				
 				// services
 				include_once './Services/Object/classes/class.ilObjectServiceSettingsGUI.php';
 				ilObjectServiceSettingsGUI::updateServiceSettingsForm(

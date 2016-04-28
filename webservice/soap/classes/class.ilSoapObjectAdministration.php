@@ -773,8 +773,16 @@ class ilSoapObjectAdministration extends ilSoapAdministration
 			{
 				include_once './Services/Container/classes/class.ilContainerSortingSettings.php';
 				$sort = new ilContainerSortingSettings($newObj->getId());
-				$sort->setSortMode($object_data['sorting']);
-				$sort->update();
+				$sort->setSortMode($object_data['sorting']['type']);
+				$sort->setSortDirection($object_data['sorting']['direction']);
+
+				if($object_data['sorting']['type'] == ilContainer::SORT_MANUAL)
+				{
+					$sort->setSortNewItemsOrder(
+						$object_data['sorting']['ni_order']);
+					$sort->setSortNewItemsPosition(
+						$object_data['sorting']['ni_position']);
+				}
 			}
 			// ibi-patch end
 			

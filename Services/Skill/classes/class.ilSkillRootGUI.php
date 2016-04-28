@@ -149,7 +149,7 @@ class ilSkillRootGUI extends ilSkillTreeNodeGUI
 
 		include_once("./Services/Form/classes/class.ilFileInputGUI.php");
 		$fi = new ilFileInputGUI($lng->txt("skmg_input_file"), "import_file");
-		$fi->setSize(array("zip"));
+		$fi->setSuffixes(array("zip"));
 		$fi->setRequired(true);
 		$form->addItem($fi);
 

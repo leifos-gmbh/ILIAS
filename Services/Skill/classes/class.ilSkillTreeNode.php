@@ -396,7 +396,7 @@ class ilSkillTreeNode
 			$ilDB->quote((int) $this->getOrderNr(), "integer").", ".
 			$ilDB->quote((int) $this->getStatus(), "integer").", ".
 			$ilDB->now().", ".
-			$ilDB->quote((int) $this->getImportId(), "text").
+			$ilDB->quote($this->getImportId(), "text").
 			")";
 		$ilDB->manipulate($query);
 		$this->setId($id);
@@ -414,7 +414,7 @@ class ilSkillTreeNode
 			" ,self_eval = ".$ilDB->quote((int) $this->getSelfEvaluation(), "integer").
 			" ,order_nr = ".$ilDB->quote((int) $this->getOrderNr(), "integer").
 			" ,status = ".$ilDB->quote((int) $this->getStatus(), "integer").
-			" ,import_id = ".$ilDB->quote((int) $this->getImportId(), "text").
+			" ,import_id = ".$ilDB->quote($this->getImportId(), "text").
 			" WHERE obj_id = ".$ilDB->quote($this->getId(), "integer");
 
 		$ilDB->manipulate($query);
@@ -863,7 +863,7 @@ class ilSkillTreeNode
 			$cnt += 10;
 		}
 	}
-	
+
 	/**
 	 * Get icon path
 	 *

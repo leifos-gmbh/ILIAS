@@ -11,6 +11,7 @@ include_once("./Services/DataSet/classes/class.ilDataSet.php");
  * - skl_subtree: Skill subtree (includes data of skl_tree, skl_tree_node and skl_templ_ref)
  * - skl_templ_subtree: Skill template subtree (includes data of skl_tree and skl_tree_node)
  * - skl_level: Skill levels
+ * - skl_prof: skill profiles (different mode)
  *
  * @author Alex Killing <alex.killing@gmx.de>
  * @version $Id$
@@ -18,11 +19,17 @@ include_once("./Services/DataSet/classes/class.ilDataSet.php");
  */
 class ilSkillDataSet extends ilDataSet
 {
+	const MODE_SKILLS = "";
+	const MODE_PROFILES = "prof";
+
 	/**
 	 * @var ilSkillTree
 	 */
 	protected $skill_tree;
 	protected $init_order_nr;
+	protected $selected_nodes = false;
+	protected $selected_profiles = false;
+	protected $mode = "";
 
 	/**
 	 * Constructor
@@ -35,6 +42,66 @@ class ilSkillDataSet extends ilDataSet
 
 		$this->init_top_order_nr = $this->skill_tree->getMaxOrderNr($this->skill_tree_root_id);
 		$this->init_templ_top_order_nr = $this->skill_tree->getMaxOrderNr($this->skill_tree_root_id, true);
+	}
+
+	/**
+	 * Set mode
+	 *
+	 * @param string $a_val mode
+	 */
+	function setMode($a_val)
+	{
+		$this->mode = $a_val;
+	}
+
+	/**
+	 * Get mode
+	 *
+	 * @return string mode
+	 */
+	function getMode()
+	{
+		return $this->mode;
+	}
+
+	/**
+	 * Set export selected nodes
+	 *
+	 * @param array $a_val array of int
+	 */
+	function setSelectedNodes($a_val)
+	{
+		$this->selected_nodes = $a_val;
+	}
+
+	/**
+	 * Get export selected nodes
+	 *
+	 * @return array array of int
+	 */
+	function getSelectedNodes()
+	{
+		return $this->selected_nodes;
+	}
+
+	/**
+	 * Set selected profiles
+	 *
+	 * @param array $a_val array of int (profile ids)
+	 */
+	function setSelectedProfiles($a_val)
+	{
+		$this->selected_profiles = $a_val;
+	}
+
+	/**
+	 * Get selected profiles
+	 *
+	 * @return array array of int (profile ids)
+	 */
+	function getSelectedProfiles()
+	{
+		return $this->selected_profiles;
 	}
 
 	/**
@@ -129,6 +196,31 @@ class ilSkillDataSet extends ilDataSet
 					);
 			}
 		}
+		if ($a_entity == "skl_prof")
+		{
+			switch ($a_version)
+			{
+				case "5.1.0":
+					return array(
+							"Id" => "integer",
+							"Title" => "text",
+							"Description" => "text"
+					);
+			}
+		}
+		if ($a_entity == "skl_prof_level")
+		{
+			switch ($a_version)
+			{
+				case "5.1.0":
+					return array(
+							"ProfileId" => "integer",
+							"BaseSkillId" => "integer",
+							"TrefId" => "integer",
+							"LevelId" => "integer"
+					);
+			}
+		}
 		return array();
 	}
 
@@ -153,7 +245,14 @@ class ilSkillDataSet extends ilDataSet
 			switch ($a_version)
 			{
 				case "5.1.0":
-					$this->data[] = array("Mode" => "Default");
+					if ($this->getMode() == self::MODE_SKILLS)
+					{
+						$this->data[] = array("Mode" => "Skills");
+					}
+					else if ($this->getMode() == self::MODE_PROFILES)
+					{
+						$this->data[] = array("Mode" => "Profiles");
+					}
 					break;
 
 			}
@@ -241,6 +340,32 @@ class ilSkillDataSet extends ilDataSet
 			}
 		}
 
+		if ($a_entity == "skl_prof")
+		{
+			switch ($a_version)
+			{
+				case "5.1.0":
+					$this->getDirectDataFromQuery("SELECT id, title, description".
+							" FROM skl_profile WHERE ".
+							$ilDB->in("id", $a_ids, false, "integer"));
+					break;
+
+			}
+		}
+
+		if ($a_entity == "skl_prof_level")
+		{
+			switch ($a_version)
+			{
+				case "5.1.0":
+					$this->getDirectDataFromQuery("SELECT profile_id, base_skill_id, tref_id, level_id".
+							" FROM skl_profile_level WHERE ".
+							$ilDB->in("profile_id", $a_ids, false, "integer"));
+					break;
+
+			}
+		}
+
 	}
 	
 	/**
@@ -255,45 +380,69 @@ class ilSkillDataSet extends ilDataSet
 		switch ($a_entity)
 		{
 			case "skmg":
-				// determine top nodes of main tree to be exported and all referenced template nodes
-				$childs = $this->skill_tree->getChildsByTypeFilter($this->skill_tree->readRootId(), array("skll", "scat", "sctr", "sktr"));
-				$deps = array();
-				$skl_subtree_deps = array();
-				foreach ($childs as $c)
-				{
-					$skl_subtree_deps[] = $c["child"];
-				}
 
-				// determine template subtrees
-				$ref_nodes = array();
-				if (is_array($skl_subtree_deps))
+				if ($this->getMode() == self::MODE_SKILLS)
 				{
-					foreach ($skl_subtree_deps as $id)
+					// determine top nodes of main tree to be exported and all referenced template nodes
+					$sel_nodes = $this->getSelectedNodes();
+					$exp_types = array("skll", "scat", "sctr", "sktr");
+					if (!is_array($sel_nodes))
 					{
-						if (ilSkillTreeNode::_lookupType($id) == "sktr")
+						$childs = $this->skill_tree->getChildsByTypeFilter($this->skill_tree->readRootId(), $exp_types);
+						$deps = array();
+						$skl_subtree_deps = array();
+						foreach ($childs as $c)
 						{
-							$ref_nodes[$id] = $id;
+							$skl_subtree_deps[] = $c["child"];
 						}
-						else
+					} else
+					{
+						foreach ($sel_nodes as $n)
 						{
-							$sub = $this->skill_tree->getSubTree($this->skill_tree->getNodeData($id), true, "sktr");
-							foreach ($sub as $s)
+							if (in_array(ilSkillTreeNode::_lookupType((int)$n), $exp_types))
 							{
-								$ref_nodes[$s["child"]] = $s["child"];
+								$skl_subtree_deps[] = $n;
 							}
 						}
 					}
-				}
 
-				$set = $ilDB->query("SELECT DISTINCT(templ_id) FROM skl_templ_ref ".
-					" WHERE ".$ilDB->in("skl_node_id", $ref_nodes, false, "integer"));
-				while ($rec = $ilDB->fetchAssoc($set))
+					// determine template subtrees
+					$ref_nodes = array();
+					if (is_array($skl_subtree_deps))
+					{
+						foreach ($skl_subtree_deps as $id)
+						{
+							if (ilSkillTreeNode::_lookupType($id) == "sktr")
+							{
+								$ref_nodes[$id] = $id;
+							} else
+							{
+								$sub = $this->skill_tree->getSubTree($this->skill_tree->getNodeData($id), true, "sktr");
+								foreach ($sub as $s)
+								{
+									$ref_nodes[$s["child"]] = $s["child"];
+								}
+							}
+						}
+					}
+
+					$set = $ilDB->query("SELECT DISTINCT(templ_id) FROM skl_templ_ref " .
+							" WHERE " . $ilDB->in("skl_node_id", $ref_nodes, false, "integer"));
+					while ($rec = $ilDB->fetchAssoc($set))
+					{
+						$deps["skl_templ_subtree"]["ids"][] = $rec["templ_id"];
+					}
+
+					// export subtree after templates
+					$deps["skl_subtree"]["ids"] = $skl_subtree_deps;
+				}
+				else if ($this->getMode() == self::MODE_PROFILES)
 				{
-					$deps["skl_templ_subtree"]["ids"][] = $rec["templ_id"];
+					foreach ($this->getSelectedProfiles() as $p_id)
+					{
+						$deps["skl_prof"]["ids"][] = $p_id;
+					}
 				}
-
-				// export subtree after templates
-				$deps["skl_subtree"]["ids"] = $skl_subtree_deps;
 
 				return $deps;
 
@@ -306,6 +455,9 @@ class ilSkillDataSet extends ilDataSet
 				}
 				return $deps;
 
+			case "skl_prof":
+				$deps["skl_prof_level"]["ids"][] = $a_rec["Id"];
+				return $deps;
 		}
 
 		return false;
@@ -329,8 +481,7 @@ class ilSkillDataSet extends ilDataSet
 					$parent = $this->skill_tree_root_id;
 					$status = ilSkillTreeNode::STATUS_DRAFT;
 					$order = $a_rec["OrderNr"] + $this->init_top_order_nr;
-				}
-				else
+				} else
 				{
 					$parent = (int)$a_mapping->getMapping("Services/Skill", "skl_tree", $a_rec["Parent"]);
 					$status = $a_rec["Status"];
@@ -342,7 +493,7 @@ class ilSkillDataSet extends ilDataSet
 						include_once("./Services/Skill/classes/class.ilSkillCategory.php");
 						$scat = new ilSkillCategory();
 						$scat->setTitle($a_rec["Title"]);
-						$scat->setImportId("il_".$source_inst_id."_scat_".$a_rec["Child"]);
+						$scat->setImportId("il_" . $source_inst_id . "_scat_" . $a_rec["Child"]);
 						$scat->setSelfEvaluation($a_rec["SelfEval"]);
 						$scat->setOrderNr($order);
 						$scat->setStatus($status);
@@ -355,7 +506,7 @@ class ilSkillDataSet extends ilDataSet
 						include_once("./Services/Skill/classes/class.ilBasicSkill.php");
 						$skll = new ilBasicSkill();
 						$skll->setTitle($a_rec["Title"]);
-						$skll->setImportId("il_".$source_inst_id."_skll_".$a_rec["Child"]);
+						$skll->setImportId("il_" . $source_inst_id . "_skll_" . $a_rec["Child"]);
 						$skll->setSelfEvaluation($a_rec["SelfEval"]);
 						$skll->setOrderNr($order);
 						$skll->setStatus($status);
@@ -391,8 +542,7 @@ class ilSkillDataSet extends ilDataSet
 				{
 					$parent = $this->skill_tree_root_id;
 					$order = $a_rec["OrderNr"] + $this->init_templ_top_order_nr;
-				}
-				else
+				} else
 				{
 					$parent = (int)$a_mapping->getMapping("Services/Skill", "skl_tree", $a_rec["Parent"]);
 					$order = $a_rec["OrderNr"];
@@ -403,7 +553,7 @@ class ilSkillDataSet extends ilDataSet
 						include_once("./Services/Skill/classes/class.ilSkillTemplateCategory.php");
 						$sctp = new ilSkillTemplateCategory();
 						$sctp->setTitle($a_rec["Title"]);
-						$sctp->setImportId("il_".$source_inst_id."_sctp_".$a_rec["Child"]);
+						$sctp->setImportId("il_" . $source_inst_id . "_sctp_" . $a_rec["Child"]);
 						$sctp->setOrderNr($order);
 						$sctp->create();
 						ilSkillTreeNode::putInTree($sctp, $parent);
@@ -414,7 +564,7 @@ class ilSkillDataSet extends ilDataSet
 						include_once("./Services/Skill/classes/class.ilBasicSkillTemplate.php");
 						$sktp = new ilBasicSkillTemplate();
 						$sktp->setTitle($a_rec["Title"]);
-						$sktp->setImportId("il_".$source_inst_id."_sktp_".$a_rec["Child"]);
+						$sktp->setImportId("il_" . $source_inst_id . "_sktp_" . $a_rec["Child"]);
 						$sktp->setOrderNr($order);
 						$sktp->create();
 						ilSkillTreeNode::putInTree($sktp, $parent);
@@ -431,13 +581,56 @@ class ilSkillDataSet extends ilDataSet
 					if ($type == "skll")
 					{
 						$skill = new ilBasicSkill($skill_id);
-					}
-					else
+					} else
 					{
 						$skill = new ilBasicSkillTemplate($skill_id);
 					}
 					$skill->addLevel($a_rec["Title"], $a_rec["Description"], "il_" . $source_inst_id . "_sklv_" . $a_rec["LevelId"]);
 					$skill->update();
+				}
+				break;
+
+			case "skl_prof":
+				include_once("./Services/Skill/classes/class.ilSkillProfile.php");
+				$prof = new ilSkillProfile();
+				$prof->setTitle($a_rec["Title"]);
+				$prof->setDescription($a_rec["Description"]);
+				$prof->create();
+				$a_mapping->addMapping("Services/Skill", "skl_prof", $a_rec["Id"], $prof->getId());
+				break;
+
+			case "skl_prof_level":
+				$profile_id = (int)$a_mapping->getMapping("Services/Skill", "skl_prof", $a_rec["ProfileId"]);
+				if ($profile_id > 0)
+				{
+					include_once("./Services/Skill/classes/class.ilSkillProfile.php");
+					include_once("./Services/Skill/classes/class.ilBasicSkill.php");
+					$prof = new ilSkillProfile($profile_id);
+					$level_id_data = ilBasicSkill::getLevelIdForImportId($this->getCurrentInstallationId(), $a_rec["LevelId"]);
+					$skill_data = ilBasicSkill::getCommonSkillIdForImportId($this->getCurrentInstallationId(), $a_rec["BaseSkillId"], $a_rec["TrefId"]);
+					//var_dump($level_id_data);
+					//var_dump($skill_data);
+					$level_id = $tref_id = $base_skill = 0;
+					foreach($level_id_data as $l)
+					{
+						reset($skill_data);
+						foreach ($skill_data as $s)
+						{
+							//		echo "<br>=".ilBasicSkill::lookupLevelSkillId($l["level_id"])."=".$s["skill_id"]."=";
+
+							if ($level_id == 0 && ilBasicSkill::lookupLevelSkillId($l["level_id"]) == $s["skill_id"])
+							{
+								$level_id = $l["level_id"];
+								$base_skill = $s["skill_id"];
+								$tref_id = $s["tref_id"];
+							}
+						}
+					}
+					if ($level_id > 0)
+					{
+						$prof->addSkillLevel($base_skill, $tref_id, $level_id);
+					}
+					$prof->update();
 				}
 				break;
 		}

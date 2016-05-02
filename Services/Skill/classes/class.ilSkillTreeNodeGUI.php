@@ -624,6 +624,28 @@ class ilSkillTreeNodeGUI
 
 		$tpl->setContent($html);
 	}
+	
+	/**
+	 * Export seleced nodes
+	 */
+	function exportSelectedNodes()
+	{
+		global $ilCtrl;
+
+		if (!is_array($_POST["id"]) || count($_POST["id"]) == 0)
+		{
+			$this->redirectToParent();
+		}
+
+		include_once("./Services/Export/classes/class.ilExport.php");
+		$exp = new ilExport();
+		$conf = $exp->getConfig("Services/Skill");
+		$conf->setSelectedNodes($_POST["id"]);
+		$exp->exportObject("skmg", ilObject::_lookupObjId((int) $_GET["ref_id"]));
+
+		$ilCtrl->redirectByClass(array("iladministrationgui", "ilobjskillmanagementgui", "ilexportgui"), "");
+	}
+	
 
 }
 ?>

@@ -23,6 +23,10 @@ class ilSkillExporter extends ilXmlExporter
 		$this->ds = new ilSkillDataSet();
 		$this->ds->setExportDirectories($this->dir_relative, $this->dir_absolute);
 		$this->ds->setDSPrefix("ds");
+		$this->config = $this->getExport()->getConfig("Services/Skill");
+		$this->ds->setSelectedNodes($this->config->getSelectedNodes());
+		$this->ds->setSelectedProfiles($this->config->getSelectedProfiles());
+		$this->ds->setMode($this->config->getMode());
 	}
 
 

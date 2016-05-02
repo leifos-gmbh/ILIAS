@@ -1147,6 +1147,7 @@ die("ilBasicSkill::getTriggerTitleForCertificate is deprecated.");
 		global $ilDB;
 
 		include_once("./Services/Skill/classes/class.ilSkillTree.php");
+		include_once("./Services/Skill/classes/class.ilSkillTemplateReference.php");
 		$tree = new ilSkillTree();
 
 		if ($a_source_inst_id == 0)

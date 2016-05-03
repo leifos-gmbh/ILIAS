@@ -14,8 +14,8 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
-common#:#footer_active_users#:#Aktive Benutzer
 common#:#footer_active_anonymous#:#Benutzer im öffentl. Bereich
+common#:#footer_active_users#:#Aktive Benutzer
 trac#:#exception#:#Ausnahme
 common#:#mfs_please_wait#:#Bitte warten...
 common#:#mfs_please_wait_info#:#Die Seite wird aktualisiert.

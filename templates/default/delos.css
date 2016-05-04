@@ -6904,6 +6904,7 @@ h4.il_ContainerItemTitle {
 }
 div.il_ContainerItemTitle {
   float: left;
+  max-width: calc(100% - 40px);
   padding-bottom: 5px;
 }
 [dir="rtl"] div.il_ContainerItemTitle {
@@ -9989,6 +9990,7 @@ input[name^="position[blocks]"] {
 }
 div.ilListItemSection {
   clear: both;
+  max-width: calc(100% - 40px);
 }
 div.ilContainerListItemOuterHighlight {
   padding: 15px;
@@ -10062,7 +10064,7 @@ div.il_ContainerListItem {
 }
 .ilContainerBlockHeader {
   font-weight: 400;
-  padding: 2px;
+  padding: 5px 10px;
   text-align: left;
   vertical-align: middle;
 }
@@ -10128,7 +10130,7 @@ div#right_area {
   bottom: 0;
   width: 50%;
   right: 0px;
-  top: 85px;
+  top: 117px;
   position: fixed;
   padding: 5px;
   background-color: #F5F5F5;
@@ -11013,6 +11015,9 @@ a.ilTag:active {
 .ilTag.ilHighlighted {
   background-color: #ea6705;
 }
+#il_tags_modal textarea {
+  resize: vertical;
+}
 /* Services/UIComponent/Checklist */
 div.ilChecklist ul {
   list-style-type: none;
@@ -11256,14 +11261,26 @@ img[src$="icon_checked.svg"] {
   text-align: center;
 }
 div.ilNewObjectSelector {
+  display: inline-block;
+  float: right;
   margin-bottom: 8px;
-  text-align: right;
-  padding-right: 10px;
+  padding: 0 10px;
+}
+div.ilNewObjectSelector > .btn-group {
+  display: block;
+  width: 100%;
+}
+div.ilNewObjectSelector > .btn-group #ilAdvSelListAnchorText_asl {
+  float: right;
+}
+div.ilNewObjectSelector > .btn-group .dropdown-menu.pull-right {
+  top: 30px;
 }
 [dir="rtl"] div.ilNewObjectSelector {
-  text-align: left;
-  padding-right: 0;
-  padding-left: 10px;
+  float: left;
+}
+[dir="rtl"] div.ilNewObjectSelector > .btn-group #ilAdvSelListAnchorText_asl {
+  float: left;
 }
 .pdMailRow .imageSpace {
   margin-left: 40px;
@@ -11332,12 +11349,14 @@ table.mceToolbar td {
   text-decoration: none;
 }
 #ilAdvSelListAnchorText_asl + ul.dropdown-menu > li > div.row,
+#ilAdvSelListAnchorText_asl + .dropdown-backdrop + ul.dropdown-menu > li > div.row,
 #mm_adm_tr + span + ul.dropdown-menu > li > div.row,
 #mm_adm_tr + ul.dropdown-menu > li > div.row {
   width: 750px;
 }
 @media only screen and (max-width: 767px) {
   #ilAdvSelListAnchorText_asl + ul.dropdown-menu > li > div.row,
+  #ilAdvSelListAnchorText_asl + .dropdown-backdrop + ul.dropdown-menu > li > div.row,
   #mm_adm_tr + span + ul.dropdown-menu > li > div.row,
   #mm_adm_tr + ul.dropdown-menu > li > div.row {
     width: 100% !important;

@@ -93,7 +93,7 @@ class ilAuthUtils
 			if (isset($_POST['username']) and $_POST['username'] != '' and $_POST['password'] != '' or isset($_GET['ecs_hash']) or isset($_GET['ecs_hash_url']) or isset($_POST['oid_username']) or isset($_GET['oid_check_status']))
 			{
 				$user_auth_mode = ilAuthUtils::_getAuthModeOfUser($_POST['username'], $_POST['password'], $ilDB);
-				$GLOBALS['ilLog']->write(__METHOD__.' authmode is: '.$user_auth_mode);
+				ilLoggerFactory::getLogger('auth')->debug('Authmode is '. $user_auth_mode);
 
 				if ($user_auth_mode == AUTH_CAS && $ilSetting->get("cas_allow_local"))
 				{
@@ -272,7 +272,7 @@ class ilAuthUtils
 						$container = $pl->getContainer($authmode);
 						if($container instanceof Auth_Container)
 						{
-							$GLOBALS['ilLog']->write(__METHOD__.' Using plugin authentication with auth_mode '.$authmode);
+							ilLoggerFactory::getLogger('auth')->info('Using plugin authentication with auth mode ' . $authmode);
 							$ilAuth = ilAuthFactory::factory($container);
 							break 2;
 						}
@@ -321,7 +321,6 @@ class ilAuthUtils
 		}
 		if(isset($_POST['oid_username']) or $_GET['oid_check_status'])
 		{
-			$GLOBALS['ilLog']->write(__METHOD__.' set context to open id');
 			ilAuthFactory::setContext(ilAuthFactory::CONTEXT_OPENID);
 			return AUTH_OPENID;
 		}
@@ -331,6 +330,7 @@ class ilAuthUtils
 		
 		if(!$det->isManualSelection() and $det->getCountActiveAuthModes() > 1)
 		{
+			ilLoggerFactory::getLogger('auth')->debug('Using AUTH_MULTIPLE');
 			return AUTH_MULTIPLE;
 		}
 
@@ -530,17 +530,33 @@ class ilAuthUtils
 	
 	function _getAllAuthModes()
 	{
-		return array(
-			AUTH_LOCAL => ilAuthUtils::_getAuthModeName(AUTH_LOCAL),
-			AUTH_LDAP => ilAuthUtils::_getAuthModeName(AUTH_LDAP),
-			AUTH_SHIBBOLETH => ilAuthUtils::_getAuthModeName(AUTH_SHIBBOLETH),
-			AUTH_CAS => ilAuthUtils::_getAuthModeName(AUTH_CAS),
-			AUTH_SOAP => ilAuthUtils::_getAuthModeName(AUTH_SOAP),
-			AUTH_RADIUS => ilAuthUtils::_getAuthModeName(AUTH_RADIUS),
-			AUTH_ECS => ilAuthUtils::_getAuthModeName(AUTH_ECS),
-			AUTH_OPENID => ilAuthUtils::_getAuthModeName(AUTH_OPENID),
-			AUTH_APACHE => ilAuthUtils::_getAuthModeName(AUTH_APACHE)
+		$modes = array(
+			AUTH_LOCAL,
+			AUTH_LDAP,
+			AUTH_SHIBBOLETH,
+			AUTH_CAS,
+			AUTH_SOAP,
+			AUTH_RADIUS,
+			AUTH_ECS,
+			AUTH_OPENID,
+			AUTH_APACHE
 		);
+		$ret = array();
+		foreach($modes as $mode)
+		{
+			// multi ldap implementation
+			if($mode == AUTH_LDAP)
+			{
+				foreach(ilLDAPServer::_getServerList() as $ldap_id)
+				{
+					$id = AUTH_LDAP . '_' . $ldap_id;
+					$ret[$id] = ilAuthUtils::_getAuthModeName($id);
+				}
+				continue;
+			}
+			$ret[$mode] =  ilAuthUtils::_getAuthModeName($mode);
+		}
+		return $ret;
 	}
 	
 	/**

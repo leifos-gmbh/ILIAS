@@ -178,6 +178,17 @@ class ilMainMenuGUI
 		{		
 			$this->tpl->setVariable("HEADER_URL", $this->getHeaderURL());
 			$this->tpl->setVariable("HEADER_ICON", ilUtil::getImagePath("HeaderIcon.svg"));
+			
+			// #15759
+			include_once("./Modules/SystemFolder/classes/class.ilObjSystemFolder.php");
+			$header_top_title = ilObjSystemFolder::_getHeaderTitle();
+			if (trim($header_top_title) != "" && $this->tpl->blockExists("header_top_title"))
+			{
+				$this->tpl->setCurrentBlock("header_top_title");
+				$this->tpl->setVariable("TXT_HEADER_TITLE", $header_top_title);
+				$this->tpl->parseCurrentBlock();
+			}
+			
 			return;
 		}
 
@@ -1012,7 +1023,7 @@ class ilMainMenuGUI
 		global $ilHelp, $lng, $ilCtrl, $tpl, $ilSetting, $ilUser;
 
 		// screen id
-		if (defined("OH_REF_ID") && OH_REF_ID > 0)
+		if ((defined("OH_REF_ID") && OH_REF_ID > 0) || DEVMODE == 1)
 		{
 			if ($ilHelp->getScreenId() != "")
 			{

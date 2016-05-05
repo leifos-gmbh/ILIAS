@@ -15,6 +15,8 @@ include_once("./Services/Skill/classes/class.ilSkillTreeNode.php");
 class ilSkillTreeNodeGUI
 {
 	var $node_object;
+	var $in_use = false;
+	var $use_checked = false;
 
 	/**
 	* constructor
@@ -31,6 +33,38 @@ class ilSkillTreeNodeGUI
 			$this->readNodeObject((int) $a_node_id);
 		}
 	}
+
+	/**
+	 * Is in use?
+	 *
+	 * @param
+	 * @return
+	 */
+	function isInUse()
+	{
+		if (!is_object($this->node_object))
+		{
+			return false;
+		}
+		if ($this->use_checked)
+		{
+			return $this->in_use;
+		}
+		$cskill_ids = ilSkillTreeNode::getAllCSkillIdsForNodeIds(array($this->node_object->getId()));
+		include_once("./Services/Skill/classes/class.ilSkillUsage.php");
+		$u = new ilSkillUsage();
+		$usages = $u->getAllUsagesInfoOfSubtrees($cskill_ids);
+		if (count($usages) > 0)
+		{
+			$this->in_use = true;
+		}
+		else
+		{
+			$this->in_use = false;
+		}
+		return $this->in_use;
+	}
+
 
 	/**
 	* Set Parent GUI class
@@ -302,8 +336,13 @@ class ilSkillTreeNodeGUI
 	 */
 	function editProperties()
 	{
-		global $tpl;
-		
+		global $tpl, $lng;
+
+		if ($this->isInUse())
+		{
+			ilUtil::sendInfo($lng->txt("skmg_skill_in_use"));
+		}
+
 		$this->initForm("edit");
 		$this->getPropertyValues();
 		$tpl->setContent($this->form->getHTML());

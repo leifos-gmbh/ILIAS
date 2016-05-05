@@ -1231,5 +1231,35 @@ die("ilBasicSkill::getTriggerTitleForCertificate is deprecated.");
 		return $results;
 	}
 
+	/**
+	 * Get level ids for import Ids matching common skills
+	 *
+	 * @param
+	 * @return
+	 */
+	static function getLevelIdForImportIdMatchSkill($a_source_inst_id, $a_level_import_id, $a_skill_import_id, $a_tref_import_id = 0)
+	{
+		$level_id_data = self::getLevelIdForImportId($a_source_inst_id, $a_level_import_id);
+		$skill_data = self::getCommonSkillIdForImportId($a_source_inst_id, $a_skill_import_id, $a_tref_import_id);
+		$matches = array();
+		foreach($level_id_data as $l)
+		{
+			reset($skill_data);
+			foreach ($skill_data as $s)
+			{
+				if (ilBasicSkill::lookupLevelSkillId($l["level_id"]) == $s["skill_id"])
+				{
+					$matches[] = array(
+							"level_id" => $l["level_id"],
+							"creation_date" => $l["creation_date"],
+							"skill_id" => $s["skill_id"],
+							"tref_id" => $s["tref_id"]
+					);
+				}
+			}
+		}
+		return $matches;
+	}
+
 }
 ?>

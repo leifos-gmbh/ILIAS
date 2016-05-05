@@ -985,6 +985,42 @@ class ilSkillTreeNode
 		return $res;
 	}
 
+	/**
+	 * Get all possible common skill IDs for node IDs
+	 *
+	 * @param array $a_node_ids array of node ids
+	 * @return array array of skill ids
+	 */
+	static function getAllCSkillIdsForNodeIds(array $a_node_ids)
+	{
+		include_once("./Services/Skill/classes/class.ilSkillTemplateReference.php");
+		$cskill_ids = array();
+		foreach($a_node_ids as $id)
+		{
+			if (in_array(self::_lookupType($id), array("skll", "scat", "sktr")))
+			{
+				$skill_id = $id;
+				$tref_id = 0;
+				if (ilSkillTreeNode::_lookupType($id) == "sktr")
+				{
+					$skill_id = ilSkillTemplateReference::_lookupTemplateId($id);
+					$tref_id = $id;
+				}
+				$cskill_ids[] = array("skill_id" => $skill_id, "tref_id" => $tref_id);
+			}
+			if (in_array(ilSkillTreeNode::_lookupType($id), array("sktp", "sctp")))
+			{
+				foreach (ilSkillTemplateReference::_lookupTrefIdsForTemplateId($id) as $tref_id)
+				{
+					$cskill_ids[] = array("skill_id" => $id, "tref_id" => $tref_id);
+				}
+			}
+			// for cats, skills and template references, get "real" usages
+			// for skill and category templates check usage in references
+		}
+		return $cskill_ids;
+	}
+
 
 
 }

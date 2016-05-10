@@ -2384,16 +2384,24 @@ abstract class ilPageObject
 				{
 					// we have no mapping, but the linked object is child of the original node -> remove link
 					$this->log->debug("... remove links.");
-					$source_node = $res->nodeset[$i];
-					$new_node = $source_node->clone_node(true);
-					$new_node->unlink_node($new_node);
-					$childs = $new_node->child_nodes();
-					for ($j=0; $j < count($childs); $j++)
+					if ($res->nodeset[$i]->parent_node()->node_name() == "MapArea")	// simply remove map areas
 					{
-						$this->log->debug("... move node $j ".$childs[$j]->node_name(). " before ".$source_node->node_name());
-						$source_node->insert_before($childs[$j], $source_node);
+						$parent = $res->nodeset[$i]->parent_node();
+						$parent->unlink_node($parent);
 					}
-					$source_node->unlink_node($source_node);
+					else	// replace link by content of the link for other internal links
+					{
+						$source_node = $res->nodeset[$i];
+						$new_node = $source_node->clone_node(true);
+						$new_node->unlink_node($new_node);
+						$childs = $new_node->child_nodes();
+						for ($j = 0; $j < count($childs); $j++)
+						{
+							$this->log->debug("... move node $j " . $childs[$j]->node_name() . " before " . $source_node->node_name());
+							$source_node->insert_before($childs[$j], $source_node);
+						}
+						$source_node->unlink_node($source_node);
+					}
 				}
 			}
 		}

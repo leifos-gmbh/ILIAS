@@ -137,7 +137,10 @@ class ilObjectDeletionTableGUI extends ilTable2GUI
 		$this->tpl->setVariable('TYPE_IMG',ilUtil::getTypeIconPath($set['type'], $set['obj_id']));
 		$this->tpl->setVariable('TYPE_STR',$this->lng->txt('obj_'.$set['type']));
 		
-		$this->tpl->setVariable('VAL_SUBOBJECTS',(int) $set['subobjects']);
+		
+		$nodes_without_rolf = $GLOBALS['tree']->getFilteredSubTree($set['ref_id'], array('rolf'));
+		$this->tpl->setVariable('VAL_SUBOBJECTS',(int) $set['subobjects'] - (int) count($nodes_without_rolf));
+		
 	}
 	
 	/**

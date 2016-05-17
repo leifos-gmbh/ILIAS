@@ -141,8 +141,8 @@ class ilObjectDeletionTableGUI extends ilTable2GUI
 		$nodes_without_rolf = $GLOBALS['tree']->getFilteredSubTree($set['ref_id'], array('rolf'));
 		$this->tpl->setVariable('VAL_SUBOBJECTS',
 			((int) $set['subobjects'] - (int) count($nodes_without_rolf)) < 0  ? 
-			((int) $set['subobjects'] - (int) count($nodes_without_rolf)) : 
-			0
+			0 :
+			((int) $set['subobjects'] - (int) count($nodes_without_rolf))
 		);
 		
 		

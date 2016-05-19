@@ -120,7 +120,7 @@ class ilObjectDeletionTableGUI extends ilTable2GUI
 		for($d = 1; $d < $set['depth']; $d++)
 		{
 			$this->tpl->touchBlock('padding');
-			$this->tpl->touchBlock('padding_end');
+			$this->tpl->touchBlock('end_padding');
 		}
 		
 		

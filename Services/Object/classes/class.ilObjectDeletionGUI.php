@@ -204,15 +204,35 @@ class ilObjectDeletionGUI
 			ilUtil::sendFailure($this->lng->txt('select_one'));
 			return $this->showContainerConfirmation();
 		}
+		
+		$candidates = (array) $_REQUEST['objects'];
+		$only_parents = array();
+		foreach($candidates as $node_a)
+		{
+			$node_a_is_valid = true;
+			foreach($candidates as $node_b)
+			{
+				if($GLOBALS['tree']->getRelation($node_a, $node_b) == ilTree::RELATION_CHILD)
+				{
+					ilLoggerFactory::getLogger('obj')->debug('Ignoring node: ' . $node_a.' since it is child of ' . $node_b);
+					$node_a_is_valid = false;
+				}
+			}
+			if($node_a_is_valid)
+			{
+				ilLoggerFactory::getLogger('obj')->debug('Node is valid: ' . $node_a);
+				$only_parents[] = $node_a;
+			}
+		}
 
 		// try to delete 
-		if($this->doDelete((array) $_REQUEST['objects']))
+		if($this->doDelete($only_parents))
 		{
 			$GLOBALS['ilCtrl']->returnToParent($this);
 		}
 		else
 		{
-			$this->showDeletionProgress((array) $_REQUEST['objects']);
+			$this->showDeletionProgress($only_parents);
 		}
 	}
 	
@@ -221,15 +241,43 @@ class ilObjectDeletionGUI
 	 */
 	protected function deleteAllItems()
 	{
+		$filtered = $this->getSelectedFilteredObjects();
+		
+		ilLoggerFactory::getLogger('obj')->dump($filtered, ilLogLevel::DEBUG);
+		
+		$only_parents = array();
+		foreach($filtered as $node_a)
+		{
+			$node_a_is_valid = true;
+			foreach($filtered as $node_b)
+			{
+				if($GLOBALS['tree']->getRelation($node_a, $node_b) == ilTree::RELATION_CHILD)
+				{
+					ilLoggerFactory::getLogger('obj')->debug('Ignoring node: ' . $node_a.' since it is child of ' . $node_b);
+					$node_a_is_valid = false;
+				}
+				else
+				{
+					$valid_node = $node_a;
+				}
+			}
+			if($node_a_is_valid)
+			{
+				ilLoggerFactory::getLogger('obj')->debug('Node is valid: ' . $node_a);
+				$only_parents[] = $node_a;
+			}
+		}
+		
+		
 		// try to delete
-		if($this->doDelete((array) $this->getSelectedFilteredObjects()))
+		if($this->doDelete((array) $only_parents))
 		{
 			$GLOBALS['ilCtrl']->returnToParent($this);
 		}
 		else
 		{
 			// deletion in progress
-			$this->showDeletionProgress((array) $this->getSelectedFilteredObjects());
+			$this->showDeletionProgress((array) $only_parents);
 		}
 	}
 	

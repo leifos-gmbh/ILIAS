@@ -1,8 +1,9 @@
 /* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
 <!-- language file start -->
-survey#:#svy_results_mail_confirm#:#User can send participation confirmation
-survey#:#svy_results_mail_confirm_info#:#A participation confirmation can be send at the end of the survey.
+survey#:#svy_results_mail_confirm#:#Participants can request participation confirmation
+survey#:#svy_results_mail_confirm_info#:#Participants can request a mail with a confirmation of participation at the end of the survey.
 survey#:#svy_results_mail_own#:#Include given answers
+survey#:#svy_results_mail_own_info#:#The given answers will be included in the confirmation of participation.
 survey#:#svy_mail_send_confirmation#:#Send Participation Confirmation
 survey#:#svy_mail_confirmation_subject#:#Survey "%s" - Your participation confirmation
 survey#:#svy_anonymous_participants#:#List of Participants
@@ -13,3 +14,4 @@ survey#:#svy_anonymous_participants_svy#:#List of Participants
 survey#:#svy_anonymous_participants_svy_info#:#If activated a list of participants is available after the end date.
 survey#:#survey_results_started#:#Survey started
 survey#:#survey_results_not_started#:#Survey not started
+survey#:#svy_mail_own_results_body#:#you participated in the following survey:

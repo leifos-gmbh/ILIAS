@@ -1529,65 +1529,47 @@ class ilObjSurveyGUI extends ilObjectGUI
 		$info = new ilInfoScreenGUI($this);
 		$info->enablePrivateNotes();
 			
-		// "active" survey?
-		$canStart = $this->object->canStartSurvey(null, $this->external_rater_360);
 		
-		$showButtons = $canStart["result"];
-		if (!$showButtons)
-		{
-			if($canStart["edit_settings"] &&
-				$ilAccess->checkAccess("write", "", $this->ref_id))
-			{
-				$canStart["messages"][] = "<a href=\"".$this->ctrl->getLinkTarget($this, "properties")."\">&raquo; ".
-					$this->lng->txt("survey_edit_settings")."</a>";
-			}
-			ilUtil::sendInfo(implode("<br />", $canStart["messages"]));
-		}				
-				
-		$big_button = false;
 		$is_appraisee = false; 
 		
-		// 360° - closing survey?
-		if ($showButtons)
-		{									
-			if($this->object->get360Mode() && 
-				$this->object->isAppraisee($ilUser->getId()))
+		// 360° - appraisee infos									
+		if($this->object->get360Mode() && 
+			$this->object->isAppraisee($ilUser->getId()))
+		{
+			$is_appraisee = true;
+
+			$info->addSection($this->lng->txt("survey_360_appraisee_info"));
+
+			$appr_data = $this->object->getAppraiseesData();
+			$appr_data = $appr_data[$ilUser->getId()];
+			$info->addProperty($this->lng->txt("survey_360_raters_status_info"), $appr_data["finished"]);		
+
+			if(!$appr_data["closed"])
 			{
-				$is_appraisee = true;
-				
-				$info->addSection($this->lng->txt("survey_360_appraisee_info"));
+				include_once "Services/UIComponent/Button/classes/class.ilLinkButton.php";
+				$button = ilLinkButton::getInstance();
+				$button->setCaption("survey_360_appraisee_close_action");
+				$button->setUrl($this->ctrl->getLinkTargetByClass("ilsurveyparticipantsgui", "confirmappraiseeclose"));
+				$close_button_360 = '<div>'.$button->render().'</div>';
 
-				$appr_data = $this->object->getAppraiseesData();
-				$appr_data = $appr_data[$ilUser->getId()];
-				$info->addProperty($this->lng->txt("survey_360_raters_status_info"), $appr_data["finished"]);		
-
-				if(!$appr_data["closed"])
+				$txt = "survey_360_appraisee_close_action_info";
+				if($this->object->get360SkillService())
 				{
-					include_once "Services/UIComponent/Button/classes/class.ilLinkButton.php";
-					$button = ilLinkButton::getInstance();
-					$button->setCaption("survey_360_appraisee_close_action");
-					$button->setUrl($this->ctrl->getLinkTargetByClass("ilsurveyparticipantsgui", "confirmappraiseeclose"));
-					$close_button_360 = '<div>'.$button->render().'</div>';
-
-					$txt = "survey_360_appraisee_close_action_info";
-					if($this->object->get360SkillService())
-					{
-						$txt .= "_skill";
-					}								
-					$info->addProperty($this->lng->txt("status"), 
-						$close_button_360.$this->lng->txt($txt));									
-				}
-				else								
-				{									
-					ilDatePresentation::setUseRelativeDates(false);
-
-					$dt = new ilDateTime($appr_data["closed"], IL_CAL_UNIX);								
-					$info->addProperty($this->lng->txt("status"), 
-						sprintf($this->lng->txt("survey_360_appraisee_close_action_status"),
-							ilDatePresentation::formatDate($dt)));										
+					$txt .= "_skill";
 				}								
+				$info->addProperty($this->lng->txt("status"), 
+					$close_button_360.$this->lng->txt($txt));									
 			}
-		}
+			else								
+			{									
+				ilDatePresentation::setUseRelativeDates(false);
+
+				$dt = new ilDateTime($appr_data["closed"], IL_CAL_UNIX);								
+				$info->addProperty($this->lng->txt("status"), 
+					sprintf($this->lng->txt("survey_360_appraisee_close_action_status"),
+						ilDatePresentation::formatDate($dt)));										
+			}								
+		}		
 			
 		
 		// handle (anonymous) code
@@ -1650,7 +1632,9 @@ class ilObjSurveyGUI extends ilObjectGUI
 		$_SESSION["anonymous_id"][$this->object->getId()] = $anonymous_code;
 			
 		$survey_started = $this->object->isSurveyStarted($ilUser->getId(), $anonymous_code);	
-		
+								
+		$showButtons = $big_button = false;
+						
 		// already finished?
 		if(!$this->object->get360Mode() &&
 			$survey_started === 1)
@@ -1696,7 +1680,24 @@ class ilObjSurveyGUI extends ilObjectGUI
 				}						
 			}		
 		}
-				
+		else
+		{
+			// "active" survey?
+			$canStart = $this->object->canStartSurvey(null, $this->external_rater_360);
+
+			$showButtons = $canStart["result"];
+			if (!$showButtons)
+			{
+				if($canStart["edit_settings"] &&
+					$ilAccess->checkAccess("write", "", $this->ref_id))
+				{
+					$canStart["messages"][] = "<a href=\"".$this->ctrl->getLinkTarget($this, "properties")."\">&raquo; ".
+						$this->lng->txt("survey_edit_settings")."</a>";
+				}
+				ilUtil::sendInfo(implode("<br />", $canStart["messages"]));
+			}				
+		}
+		
 		if ($showButtons)
 		{	
 			// code is mandatory and not given yet

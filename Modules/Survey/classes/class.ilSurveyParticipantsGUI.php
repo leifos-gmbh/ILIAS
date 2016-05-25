@@ -155,7 +155,8 @@ class ilSurveyParticipantsGUI
 		$surveySetting = new ilSetting("survey");
 		if($surveySetting->get("anonymous_participants", false))
 		{		
-			if($this->object->hasAnonymizedResults())
+			if($this->object->hasAnonymizedResults() &&
+				$this->object->hasAnonymousUserList())
 			{
 				$end = $this->object->getEndDate();
 				if($end && $end < date("YmdHis"))

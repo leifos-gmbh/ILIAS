@@ -259,6 +259,7 @@ assessment#:#tst_virtual_pass_header_lo_initial#:#Initial Test Results for the L
 assessment#:#tst_pass_details_header_lo_qualifying#:#Qualifying Test Results for the Learning Objectives<br />%s - %s
 assessment#:#tst_virtual_pass_header_lo_qualifying#:#Qualifying Test Results for the Learning Objective<br />%s
 assessment#:#ass_create_export_file#:#Create Test Export File
+assessment#:#ass_create_export_file_with_results#:#Create Test Export File (incl. Participant Results)
 assessment#:#ass_create_export_test_results#:#Create Test Results Export File
 assessment#:#ass_create_export_test_archive#:#Create Test Archive File
 assessment#:#ass_export_files#:#Export Files
@@ -387,7 +388,7 @@ assessment#:#ects_grade_c#:#generally sound work with a number of notable errors
 assessment#:#ects_grade_d_short#:#SATISFACTORY
 assessment#:#ects_grade_d#:#fair but with significant shortcomings
 assessment#:#ects_grade_e_short#:#SUFFICIENT
-assessment#:#ects_grade_e#:#performance meets the minimum criterion
+assessment#:#ects_grade_e#:#performance meets the minimum criteria
 assessment#:#ects_grade_f_short#:#FAIL
 assessment#:#ects_grade_f#:#considerable further work is required
 assessment#:#ects_grade_fx_short#:#FAIL
@@ -411,6 +412,9 @@ assessment#:#empty_term_message#:#There is a least one empty term field.
 assessment#:#empty_terms_exist#:#There are already empty term fields. Please fill out these fields before you add more terms.
 assessment#:#enable_javascript#:#Click to enable JavaScript support
 assessment#:#end_tag#:#End Tag
+assessment#:#tst_conflict_fbh_oblig_quest#:#The combination of using compulsory questions and locked answers is not allowed.
+assessment#:#tst_conflict_reset_non_fbh#:#The setting "Lock Answers" was adjusted to "Do Not Lock Answers".
+assessment#:#tst_conflict_reset_fbh_force#:#The setting "Lock Answers" was adjusted to "Do Not Lock Answers but Force Feedback".
 assessment#:#ending_time_reached#:#You have reached the finish time
 assessment#:#enlarge#:#Enlarge
 assessment#:#enter_anonymous_code#:#Enter Anonymous Access Code
@@ -1516,9 +1520,9 @@ assessment#:#feedback_all#:#Show answer specific feedback for all answers.
 assessment#:#feedback_checked#:#Show answer specific feedback for all chosen/selected answers.
 assessment#:#feedback_correct_sc_mc#:#Show answer specific feedback for all correct answers (Correct answers are those, that lead to a positive score when chosen/selected).
 assessment#:#feedback_correct_kprim#:#Show answer specific feedback for all correct answers (Correct answers are those, for that the positive option is to be chosen/selected).
-assessment#:#tst_add_quest_cont_edit_mode#:#Editing Mode for additional Question Content
-assessment#:#tst_add_quest_cont_edit_mode_default#:#Default Editing Mode for Additional Question Content
-assessment#:#tst_add_quest_cont_edit_mode_page_object#:#Additional Content Editing with Page Editor
+assessment#:#tst_add_quest_cont_edit_mode#:#Editor for Feedack and Hints
+assessment#:#tst_add_quest_cont_edit_mode_default#:#Use rich-text editor for editing feedback and hints
+assessment#:#tst_add_quest_cont_edit_mode_page_object#:#Use ILIAS page editor for editing feedback and hints
 assessment#:#tst_question_feedback_edit_page#:#Edit Content
 assessment#:#tst_question_feedback_back_to_feedback_form#:#Back To Calling Question
 assessment#:#enable_examview#:#Overview of Answers Given
@@ -1940,13 +1944,13 @@ common#:#administrator#:#Administrator
 rbac#:#adopt_perm_from_template#:#Copy Permission Settings
 common#:#adopt#:#Adopt
 common#:#advanced_editing_allow_html_tags#:#Allow the selected HTML tags for text editing
-common#:#advanced_editing_allow_javascript_editor#:#Enable a Rich Text Editor
+common#:#advanced_editing_allow_javascript_editor#:#Enable a rich-text editor
 common#:#advanced_editing_assessment_settings#:#Allowed HTML Tags for the ILIAS Test and Assessment tool
 common#:#advanced_editing_frm_post_settings#:#Forum Post Settings
 common#:#advanced_editing_lm_js_editing_desc#:#Enables HTMLArea and JavaScript support for page editing in learning modules and glossaries.
 common#:#advanced_editing_lm_js_editing#:#Enable HTMLArea for Content Editing
 common#:#advanced_editing_lm_settings#:#Learning Module and Glossary Settings
-common#:#advanced_editing_no_rte#:#Do not use rich text editing
+common#:#advanced_editing_no_rte#:#Do not use rich-text editing
 common#:#advanced_editing_rep_page_editing_desc#:#This feature allows adding text/media to pages of a category, course, group or folder. If deactivated, existing content will be hidden.
 common#:#advanced_editing_rep_page_editing#:#Enable Content Editing in Repository
 common#:#advanced_editing_required_tags#:#The following HTML tags are required: %s
@@ -4209,8 +4213,8 @@ rbac#:#root_visible#:#<i>Repository - Home</i> is visible
 rbac#:#root_write#:#User can edit settings of <i>Repository - Home</i> and manage content
 common#:#row#:#Row
 common#:#rows#:#Rows
-common#:#rte_editor_disabled#:#Rich Text Editor disabled
-common#:#rte_editor_enabled#:#Rich Text Editor enabled
+common#:#rte_editor_disabled#:#Rich-text editor disabled
+common#:#rte_editor_enabled#:#Rich-text editor enabled
 common#:#sahs_added#:#SCORM Learning Module added
 rbac#:#sahs_copy#:#User can copy SCORM learning module
 common#:#sahs_create#:#Create SCORM Learning Module
@@ -4604,7 +4608,7 @@ common#:#udf_no_name_given#:#Please enter a field name.
 common#:#udf_required_requires_visib_reg#:#When field is set to ‘required’, it must be set to ‘visible in registration’
 common#:#udf_type_date#:#Date
 common#:#udf_type_datetime#:#Date and Time
-common#:#udf_type_select#:#Selection List (Drop-Down)
+common#:#udf_type_select#:#Selection List (Single Choice)
 common#:#udf_type_text#:#Text Field (One Line)
 common#:#udf_type_wysiwyg#:#Text Area (WYSIWYG)
 common#:#udf_update_select_field#:#Edit Select Box
@@ -4713,7 +4717,7 @@ common#:#usr_agreement_empty#:#The agreement contains no text
 common#:#usr_agreement#:#User Agreement
 common#:#usr_edit#:#Edit User
 common#:#usr_filter_coursemember#:#Member of course
-common#:#usr_filter_empty_result#:#No users found that match the selected filter criterion
+common#:#usr_filter_empty_result#:#No users found that match the selected filter criteria
 common#:#usr_filter_groupmember#:#Member of group
 common#:#usr_filter_lastlogin#:#Last login of user
 common#:#usr_filter_role#:#Assigned role
@@ -10988,9 +10992,9 @@ blog#:#blog_add_posting#:#Add Posting
 blog#:#blog_permanent_link#:#Permalink
 blog#:#blog_comments#:#Comments
 blog#:#blog_list_more#:#more
-blog#:#blog_posting_deletion_confirmation#:#Are you sure you want to delete the following entry?
-blog#:#blog_number_users_notes_or_comments#:#Number of users that attached notes or comments to this entry
-blog#:#blog_posting_deleted#:#The entry has been deleted.
+blog#:#blog_posting_deletion_confirmation#:#Are you sure you want to delete the following posting?
+blog#:#blog_number_users_notes_or_comments#:#Number of users that attached notes or comments to this posting
+blog#:#blog_posting_deleted#:#Posting has been deleted.
 blog#:#blog_enable_notes#:#Public Comments
 sahs#:#sahs_insert_ass_inside_chap#:#Insert Asset (inside chapter)
 sahs#:#sahs_insert_sco_inside_chap#:#Insert SCO (inside chapter)
@@ -11376,8 +11380,8 @@ survey#:#survey_question_pool_title#:#Pool Title
 common#:#allow_user_toggle_noti#:#Member is allowed to deactivate notification
 cntr#:#container_import_zip_file_invalid#:#The uploaded file is not a valid ILIAS export file. To upload a directory structure please use a file object.
 cntr#:#cntr_adopt_content#:#Adopt Content
-auth#:#login_page_switch_rte#:#Use Rich-Text-Editor
-auth#:#login_page_switch_ipe#:#Use ILIAS Page Editor
+auth#:#login_page_switch_rte#:#Use rich-text editor
+auth#:#login_page_switch_ipe#:#Use ILIAS page editor
 auth#:#login_page_editor_switched#:#The active page editor has been changed
 auth#:#login_page_activate#:#Activate Editor for Selected Languages
 content#:#cont_update_login_page#:#Edit Login Page Element
@@ -11400,8 +11404,8 @@ ecs#:#ecs_server_addr#:#Server Address
 ecs#:#ecs_activate#:#Activate
 ecs#:#ecs_deactivate#:#Deactivate
 ecs#:#ecs_not_configured#:#Not configured
-administration#:#user_criteria#:#Unique user criterion
-administration#:#user_criteria_desc#:#Unique user criterion that is used for test results import/export. This is needed to identify identical users on different ILIAS systems.
+administration#:#user_criteria#:#Unique user criteria
+administration#:#user_criteria_desc#:#Unique user criteria that is used for test results import/export. This is needed to identify identical users on different ILIAS systems.
 assessment#:#imported#:#imported
 ecs#:#ecs_tbl_import#:#Import
 ecs#:#ecs_tbl_export#:#Export
@@ -12424,9 +12428,9 @@ tax#:#tax_nodes#:#Nodes
 tax#:#tax_create_node#:#Create Node
 tax#:#tax_new_tax_node#:#New Node
 tax#:#tax_order#:#Order
-administration#:#adm_rep_shorten_description#:#Shorten Descriptions
-administration#:#adm_rep_shorten_description_info#:#If activated all descriptions in object lists will be shortened.
-administration#:#adm_rep_shorten_description_length#:#Max. number of characters
+administration#:#adm_rep_shorten_description#:#Limited Length of Descriptions
+administration#:#adm_rep_shorten_description_info#:#If activated all descriptions in object lists are presented with a maximum number of characters.
+administration#:#adm_rep_shorten_description_length#:#Maximum number of characters
 file#:#file_uploaded_by#:#Uploaded by
 trac#:#trac_session_statistics_mode_year#:#Year
 assessment#:#tst_question#:#Question
@@ -12496,8 +12500,10 @@ pdesk#:#bookmark_moved_ok#:#Bookmark has been moved.
 wsp#:#wsp_tab_ownership#:#My Repository Objects
 user#:#user_ownership#:#Repository Objects
 registration#:#registration_code_role_info#:#If you use a registration code, the role selection may be superseded by the code.
-mail#:#mail_system_sender_name#:#Sender Name
-mail#:#mail_system_sender_name_info#:#Please enter a name. This name will be used for automatically generated messages (internal and external). If you leave the field blank, ILIAS uses the short title of this installation. If the title is not well defined, ‘ILIAS’ is used as the sender.
+mail#:#mail_system_from_name#:#Sender Name
+mail#:#mail_system_from_name_info#:#Please enter a name. This name (e.g. 'John Doe') will be used for automatically generated messages (internal and external). If you leave the field blank, ILIAS uses the short title of this installation. If the title is not well defined, ‘ILIAS’ is used as the sender.
+mail#:#mail_system_return_path#:#Global Return-Path
+mail#:#mail_system_return_path_info#:#Please enter an email address which should be used for the return path (e.g. webmaster@ilias.de). If you leave the field blank, the 'Return-Path' will be the 'From' email address.
 content#:#cont_current_term#:#Current Term
 assessment#:#tst_setting_offer_hints_label#:#Hints
 assessment#:#tst_setting_offer_hints_info#:#Participants request hints to answer a question. With every hint presented the maximum number of points to be earned decreases.
@@ -12773,7 +12779,7 @@ dcl#:#dcl_unknown_exception#:#The value you entered is not valid.
 dcl#:#dcl_checked#:#Checked.
 dcl#:#dcl_not_checked#:#Not checked.
 dcl#:#dcl_any#:#Any
-dcl#:#dcl_noturl_exception#:#You have to enter a Link (beginning with http://) or an email address.
+dcl#:#dcl_noturl_exception#:#You have to enter a Link (beginning with http:// or www.) or an email address.
 dcl#:#dcl_no_search_results_found_for#:#No modules have been found for
 dcl#:#dcl_export_enabled#:#Allow export function for all users
 dcl#:#dcl_no_fields_yet#:#There are no fields defined for this table thus you cannot create any entries yet.
@@ -13066,7 +13072,7 @@ webr#:#webr_copy#:#Copy Weblink
 exc#:#exc_copy#:#Copy Exercise
 assessment#:#tst_copy#:#Copy Test
 survey#:#svy_copy#:#Copy Survey
-poll#:#poll_population#:#%s Votes
+poll#:#poll_population#:#%s Participants
 poll#:#poll_participants#:#Participants
 poll#:#poll_delete_votes#:#Delete All Votes
 poll#:#poll_delete_votes_sure#:#Are you sure you want to delete all votes?
@@ -13111,7 +13117,8 @@ exc#:#exc_team_notification_body_rmv#:#you have been removed from  a team upload
 exc#:#exc_team_notification_changed_by#:#Status changed by
 exc#:#exc_team_notification_link#:#Link to exercise
 poll#:#poll_absolute#:#Current Votes
-dcl#:#dcl_reference_link#:#Show as link in table view
+dcl#:#dcl_reference_link#:#Show as link to referenced entry
+dcl#:#dcl_reference_link_info#:#Detailed View must be active in referenced table
 dcl#:#dcl_ILIAS_reference_link#:#Show as link in table view
 dcl#:#dcl_text_area#:#Textarea
 dcl#:#dcl_delete_table#:#Delete Table
@@ -13698,7 +13705,7 @@ dateplaner#:#cal_ch_user_assignment_failed_info#:#The following users could not 
 dateplaner#:#cal_booking_failed_info#:#This appointment is booked out. Please choose another appointment.
 registration#:#registration_codes_override_info#:#This setting overrides any values defined in ‘Registration Settings’.
 registration#:#registration_codes_override_global_info#:#These settings may be overridden by registration codes.
-crs#:#event_list_registered_only#:#Only Registered Members
+crs#:#event_list_registered_only#:#Only Registered
 didactic#:#didactic_default_type#:#Default
 pd#:#pd_info_delete_sure_remove#:#Are you sure you want to remove the following objects from your Personal Desktop?
 pd#:#pd_info_delete_sure_unsubscribe#:#Are you sure you want to unsubscribe from the following objects?
@@ -15374,7 +15381,7 @@ prtf#:#prtf_blog_page_created#:#Blog has been added.
 wiki#:#wiki_adv_md_hidden#:#This block is currently hidden.
 wiki#:#wiki_page_list_form_info#:#Adds a list of pages of this wiki that are all assigned to the selected metadata below.
 content#:#cont_pc_amdpl#:#Page List
-meta#:#udf_type_selectmulti#:#Selection List (Checkboxes)
+meta#:#udf_type_selectmulti#:#Selection List (Multiple Choice)
 wiki#:#wiki_no_page_found#:#No wiki page has been found for search term '$1'.
 wiki#:#wiki_pages_found#:#The following pages match your search term '$1'.
 wiki#:#wiki_no_search_term#:#No search term has been entered. All pages of the wiki are listed below.
@@ -15799,34 +15806,34 @@ rbac#:#wiki_edit_wiki_navigation#:#Edit Wiki Navigation
 rbac#:#wiki_delete_wiki_pages#:#Delete Wiki Pages
 rbac#:#wiki_activate_wiki_protection#:#Set Wiki Pages to Read-Only
 rbac#:#wiki_wiki_html_export#:#Export Wiki as HTML
-crs#:#crs_loc_settings_it_type#:#Einstiegstest
-crs#:#crs_loc_settings_type_it_placement_all#:#Diagnostischer Einstiegstest über alle Lernziele
-crs#:#crs_loc_settings_it_start_object#:#Einstiegstest ist Startobjekt
-crs#:#crs_loc_settings_type_it_placement_sel#:#Diagnostischer Einstiegstest pro Lernziel
-crs#:#crs_loc_settings_type_it_qualifying_all#:#Qualifizierender Einstiegstest über alle Lernziele
-crs#:#crs_loc_settings_type_it_qualifying_sel#:#Qualifizierender Einstiegstest pro Lernziel
-crs#:#crs_loc_settings_type_it_none#:#Kein Einstiegstest
-crs#:#crs_loc_settings_qt_all#:#Abschlusstest
-crs#:#crs_loc_settings_type_q_all#:#Abschlusstest über alle Lernziele
-crs#:#crs_loc_settings_qt_start_object#:#Abschlusstest ist Startobjekt
-crs#:#crs_loc_settings_type_q_selected#:#Abschlusstest pro Lernziel
-crs#:#crs_loc_settings_err_qstart#:#Die Option "Abschlusstest als Startobjekt" wurde deaktiviert, da sie nur für Kurse ohne Einstiegstest verwendet werden kann.		
-crs#:#crs_loc_tab_qtests#:#Abschlusstests
-crs#:#crs_loc_tab_itests#:#Einstiegstests
-crs#:#crs_loc_btn_new_assignment#:#Neue Testzuordnung
-crs#:#crs_objective_tbl_col_final_tsts#:#Abschlusstests
-crs#:#crs_objective_action_qtest_sep#:#Abschlusstest zuordnen
-crs#:#crs_loc_settings_tbl_its_q_all#:#Qualifizierender Einstiegstest über alle Lernziele
-crs#:#crs_loc_settings_tbl_its_nq_all#:#Diagnostischer Einstiegstest über alle Lernziele
-crs#:#crs_loc_settings_tbl_it_q#:#Qualifizierende Einstiegstests pro Lernziel
-crs#:#crs_loc_settings_tbl_it_nq#:#Diagnostische Einstiegstests pro Lernziel
-crs#:#crs_loc_settings_tbl_qts_all#:#Abschlusstest über alle Lernziele
-crs#:#crs_loc_settings_tbl_qt#:#Abschlusstests pro Lernziel
-crs#:#crs_loc_objective_passed_confirmation#:#Sie haben das Lernziel bereits bestanden. Ein erneutes Starten des Tests setzt die Ergebnisse zurück. Wollen Sie den Test erneut starten?
-crs#:#crs_loc_objectives_passed_confirmation#:#Sie haben bereits alle Lernziel bestanden. Ein erneutes Starten des Tests setzt die Ergebnisse zurück. Wollen Sie den Test erneut starten?
-crs#:#crs_loc_tst_start#:#Test starten
-crs#:#crs_loc_mem_show_res#:#Testergebnisse anzeigen
-crs#:#crs_loc_test_results_of#:#Testergebnisse von:
+crs#:#crs_loc_settings_it_type#:#Initial Test
+crs#:#crs_loc_settings_type_it_placement_all#:#Initial Diagnostic Test for all Objectives
+crs#:#crs_loc_settings_it_start_object#:#Initial Test is Start Objects
+crs#:#crs_loc_settings_type_it_placement_sel#:#Initial Diagnostic Test per Objective
+crs#:#crs_loc_settings_type_it_qualifying_all#:#Initial Qualifying Test for all Objectives
+crs#:#crs_loc_settings_type_it_qualifying_sel#:#Initial Qualifying Test per Objective
+crs#:#crs_loc_settings_type_it_none#:#No Initial Test
+crs#:#crs_loc_settings_qt_all#:#Final Test
+crs#:#crs_loc_settings_type_q_all#:#Final Test all Objectives
+crs#:#crs_loc_settings_qt_start_object#:#Final Test is Start Object
+crs#:#crs_loc_settings_type_q_selected#:#Final Test per Objective
+crs#:#crs_loc_settings_err_qstart#:#The option "Final Test as Start Object" has been deactivated, since it can only be chosen for courses without initial test.		
+crs#:#crs_loc_tab_qtests#:#Final Tests
+crs#:#crs_loc_tab_itests#:#Initial Tests
+crs#:#crs_loc_btn_new_assignment#:#New Test Assignment
+crs#:#crs_objective_tbl_col_final_tsts#:#Final Tests
+crs#:#crs_objective_action_qtest_sep#:#Assign Final Test
+crs#:#crs_loc_settings_tbl_its_q_all#:#Initial Qualifying Test (all Objecives)
+crs#:#crs_loc_settings_tbl_its_nq_all#:#Initial Diagnostic Test (all Objectives)
+crs#:#crs_loc_settings_tbl_it_q#:#Initial Qualifying Test (per Objective)
+crs#:#crs_loc_settings_tbl_it_nq#:#Initial Diagnostic Test (per Objective)
+crs#:#crs_loc_settings_tbl_qts_all#:#Finaly Test (all Objectives)
+crs#:#crs_loc_settings_tbl_qt#:#Final Test (per Objective)
+crs#:#crs_loc_objective_passed_confirmation#:#You have already passed this learning objective. Starting a new test run will reset the result. Do you really want to start a new test run?
+crs#:#crs_loc_objectives_passed_confirmation#:#You have already passed all learning objectives. Starting a new test run will reset all results. Do you really want to start a new test run?
+crs#:#crs_loc_tst_start#:#Start Test
+crs#:#crs_loc_mem_show_res#:#Show Test Results
+crs#:#crs_loc_test_results_of#:#Test results of:
 buddysystem#:#buddy_bs_btn_txt_unlinked_a#:#Request Contact
 buddysystem#:#buddy_bs_btn_txt_unlinked_p#:#Request Contact
 buddysystem#:#buddy_bs_btn_txt_linked_a#:#Linked
@@ -15842,6 +15849,10 @@ buddysystem#:#buddy_bs_act_btn_txt_requested_to_linked#:#Confirm
 buddysystem#:#buddy_bs_act_btn_txt_ignored_request_to_unlinked#:#Cancel Request
 buddysystem#:#buddy_bs_act_btn_txt_ignored_request_to_linked#:#Confirm Request
 buddysystem#:#buddy_bs_action_not_possible#:#Action not possible
+buddysystem#:#buddy_bs_action_already_linked#:#Already accepted the contact request from user '%s'.
+buddysystem#:#buddy_bs_action_already_requested#:#Already requested user '%s'.
+buddysystem#:#buddy_bs_action_already_ignored#:#Already ignored user '%s'.
+buddysystem#:#buddy_bs_action_already_unlinked#:#The contact state for user '%s' is already unlinked.
 buddysystem#:#buddy_bs_state_linked#:#Linked
 buddysystem#:#buddy_bs_state_linked_a#:#Linked
 buddysystem#:#buddy_bs_state_linked_p#:#Linked
@@ -16183,3 +16194,14 @@ exc#:#exc_delete_team#:#Delete Team
 sysc#:#sysc_tree_structure_failures#:#Number of failures in the tree structure (parent-Relation):
 sysc#:#sysc_message_tree_structure_confirm#:#Do you really want to repair the tree structure? Please create a database backup before you proceed.
 sysc#:#sysc_btn_tree_structure#:#Recreate Tree Structure
+crs#:#event_tbl_admins#:#Administrators
+crs#:#event_tbl_members#:#Members
+crs#:#event_tbl_tutors#:#Tutors
+trac#:#trac_cron_info#:#Please activate the "Object Statistics" cron job to gather data.
+sess#:#sess_list_reg_limit_places#:#Free places
+sess#:#sess_accept_request#:#Accept Participation
+sess#:#sess_new_registrations#:#Join Request
+rbac#:#mep_copy#:#User can copy media pool
+crs#:#crs_cannot_find_role#:#Can't find this role.
+grp#:#grp_admission_link_failure_invalid_code#:#Can't register: Link is invalid.
+crs#:#crs_admission_link_failure_invalid_code#:#Can't register: Link is invalid.

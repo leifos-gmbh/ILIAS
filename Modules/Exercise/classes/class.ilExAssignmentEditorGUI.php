@@ -381,12 +381,14 @@ class ilExAssignmentEditorGUI
 				}				 
 			}
 			else
-			{			
+			{	
 				// #18269
 				if($a_form->getInput("peer"))
 				{
 					$time_deadline_max = max($time_deadline, $time_deadline_ext);					
-					$peer_dl = $this->assignment->getPeerReviewDeadline();					
+					$peer_dl = $this->assignment // #18380
+						? $this->assignment->getPeerReviewDeadline()
+						: null;
 					if($peer_dl && $peer_dl < $time_deadline_max)
 					{
 						$a_form->getItemByPostVar($peer_dl < $time_deadline_ext

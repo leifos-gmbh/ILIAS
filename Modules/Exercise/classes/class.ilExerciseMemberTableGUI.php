@@ -28,7 +28,7 @@ class ilExerciseMemberTableGUI extends ilTable2GUI
 	/**
 	* Constructor
 	*/
-	function __construct($a_parent_obj, $a_parent_cmd, $a_exc, $a_ass)
+	function __construct($a_parent_obj, $a_parent_cmd, ilObjExercise $a_exc, ilExAssignment $a_ass)
 	{
 		global $ilCtrl, $lng;
 		
@@ -37,7 +37,6 @@ class ilExerciseMemberTableGUI extends ilTable2GUI
 		$this->ass = $a_ass;
 		$this->ass_id = $this->ass->getId();
 		$this->setId("exc_mem_".$this->ass_id);
-		
 		
 		include_once("./Modules/Exercise/classes/class.ilFSStorageExercise.php");
 		$this->storage = new ilFSStorageExercise($this->exc_id, $this->ass_id);
@@ -50,6 +49,8 @@ class ilExerciseMemberTableGUI extends ilTable2GUI
 		//$this->setLimit(9999);
 		
 		$data = $this->ass->getMemberListData();
+		
+		$idl = $this->ass->getIndividualDeadlines();
 		
 		// team upload?  (1 row == 1 team)
 		if($this->ass->hasTeam())
@@ -78,7 +79,16 @@ class ilExerciseMemberTableGUI extends ilTable2GUI
 				}
 				
 				$tmp[$team_id]["team"][$item["usr_id"]] = $item["name"];
-				$tmp[$team_id]["team_id"] = $team_id;
+				$tmp[$team_id]["team_id"] = $team_id;			
+				
+				if(is_numeric($team_id))
+				{
+					$idl_team_id = "t".$team_id;
+					if(array_key_exists($idl_team_id, $idl))
+					{
+						$tmp[$team_id]["team_idl"] = $idl[$idl_team_id];	
+					}
+				}
 			}
 			
 			$data = $tmp;
@@ -91,7 +101,15 @@ class ilExerciseMemberTableGUI extends ilTable2GUI
 			if($ass_obj->getPeerReview())
 			{
 				include_once './Services/Rating/classes/class.ilRatingGUI.php';
-			}														
+			}				
+			
+			foreach($data as $idx => $item)
+			{
+				if(array_key_exists($item["usr_id"], $idl))
+				{
+					$data[$idx]["idl"] = $idl[$item["usr_id"]];	
+				}
+			}
 		}
 		
 		$this->setData($data);
@@ -129,13 +147,20 @@ class ilExerciseMemberTableGUI extends ilTable2GUI
 		$this->setDefaultOrderDirection("asc");
 		
 		$this->setEnableHeader(true);
-		$this->setFormAction($ilCtrl->getFormAction($a_parent_obj));
+		$this->setFormAction($ilCtrl->getFormAction($a_parent_obj));	
 		$this->setRowTemplate("tpl.exc_members_row.html", "Modules/Exercise");
 		//$this->disable("footer");
 		$this->setEnableTitle(true);
 		$this->setSelectAllCheckbox("member");
 
 		$this->addMultiCommand("saveStatusSelected", $lng->txt("exc_save_selected"));
+		
+		if($this->ass->hasActiveIDl())
+		{
+			$this->setFormName("ilExcIDlForm");
+			$this->addMultiCommand("setIndividualDeadline", $lng->txt("exc_individual_deadline_action"));
+		}
+		
 		$this->addMultiCommand("redirectFeedbackMail", $lng->txt("exc_send_mail"));
 		$this->addMultiCommand("sendMembers", $lng->txt("exc_send_assignment"));
 		
@@ -151,7 +176,7 @@ class ilExerciseMemberTableGUI extends ilTable2GUI
 		
 		include_once "Services/Form/classes/class.ilPropertyFormGUI.php";
 		include_once "Services/UIComponent/Overlay/classes/class.ilOverlayGUI.php";
-		$this->overlay_tpl = new ilTemplate("tpl.exc_learner_comment_overlay.html", true, true, "Modules/Exercise");
+		$this->overlay_tpl = new ilTemplate("tpl.exc_learner_comment_overlay.html", true, true, "Modules/Exercise");		
 	}
 	
 	function getSelectableColumns()
@@ -176,7 +201,7 @@ class ilExerciseMemberTableGUI extends ilTable2GUI
 	*/
 	protected function fillRow($member)
 	{
-		global $lng, $ilCtrl;
+		global $lng, $ilCtrl, $ilAccess;
 		
 		$ilCtrl->setParameter($this->parent_obj, "ass_id", $this->ass_id);
 		$ilCtrl->setParameter($this->parent_obj, "member_id", $member["usr_id"]);
@@ -266,6 +291,15 @@ class ilExerciseMemberTableGUI extends ilTable2GUI
 					$mem_obj->getPersonalPicturePath("xxsmall"));
 				$this->tpl->setVariable("USR_ALT", $lng->txt("personal_picture"));
 			}
+			
+			// #18327
+			if(!$ilAccess->checkAccessOfUser($member_id, "read","", $this->exc->getRefId()) &&
+				is_array($info = $ilAccess->getInfo()))
+			{
+				$this->tpl->setCurrentBlock('access_warning');
+				$this->tpl->setVariable('PARENT_ACCESS', $info[0]["text"]);
+				$this->tpl->parseCurrentBlock();
+			}			
 		}
 		// team upload
 		else
@@ -287,10 +321,19 @@ class ilExerciseMemberTableGUI extends ilTable2GUI
 						ilGlyphGUI::get(ilGlyphGUI::CLOSE, $lng->txt("remove")));
 					$this->tpl->parseCurrentBlock();
 				}
+								
+				// #18327
+				if(!$ilAccess->checkAccessOfUser($team_member_id, "read","", $this->exc->getRefId()) &&
+					is_array($info = $ilAccess->getInfo()))
+				{
+					$this->tpl->setCurrentBlock('team_access_warning');
+					$this->tpl->setVariable('TEAM_PARENT_ACCESS', $info[0]["text"]);
+					$this->tpl->parseCurrentBlock();
+				}		
 				
 				$this->tpl->setCurrentBlock("team_member");
 				$this->tpl->setVariable("TXT_MEMBER_NAME", $team_member_name);
-				$this->tpl->parseCurrentBlock();
+				$this->tpl->parseCurrentBlock();				
 			}
 						
 			if(!$has_no_team_yet)
@@ -345,6 +388,44 @@ class ilExerciseMemberTableGUI extends ilTable2GUI
 				$this->tpl->setVariable("LINK_NEW_DOWNLOAD", $file_info["files"]["download_new_url"]);
 				$this->tpl->setVariable("TXT_NEW_DOWNLOAD", $file_info["files"]["download_new_txt"]);		
 				$this->tpl->parseCurrentBlock();
+			}
+			
+			// individual deadline
+			if($this->ass->hasActiveIDl())
+			{				
+				$idl = null;
+				if(!isset($member["team"]))
+				{
+					if(isset($member["idl"]))
+					{
+						$idl = $member["idl"];
+					}
+				}
+				else
+				{
+					if(isset($member["team_idl"]))
+					{
+						$idl = $member["team_idl"];
+					}
+				}
+				
+				if(!$this->ass->hasReadOnlyIDl())
+				{
+					$this->tpl->setVariable("TXT_IDL", $lng->txt("exc_individual_deadline"));
+					$this->tpl->setVariable("VAL_IDL", $idl
+						? ilDatePresentation::formatDate($idl)
+						: "---");
+					$this->tpl->setVariable("ID_IDL", $member["team_id"]
+						? "t".$member["team_id"]
+						: $member_id);
+				}
+				else
+				{
+					$this->tpl->setVariable("TXT_IDL_RO", $lng->txt("exc_individual_deadline"));
+					$this->tpl->setVariable("VAL_IDL_RO", $idl
+						? ilDatePresentation::formatDate($idl)
+						: "---");
+				}								
 			}
 
 			// note

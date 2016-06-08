@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
 /**
 * ILIAS language file
@@ -94,3 +95,6 @@ pdfgen#:#footer_text#:#Text
 pdfgen#:#footer_height#:#Höhe Fußzeile
 pdfgen#:#footer_show_pages#:#Zeige Seitenzahlen
 prtf#:#pdf_export#:#PDF Export
+exc#:#exc_individual_deadline#:#Individuelle Fristenverlängerung
+exc#:#exc_individual_deadline_action#:#Individuelle Fristenverlängerung setzen
+exc#:#exc_individual_deadline_before_global#:#Das Datum muss hinter der (letzten) Deadline liegen: %s.

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
 /**
 * ILIAS language file
@@ -94,3 +95,6 @@ pdfgen#:#footer_text#:#Text
 pdfgen#:#footer_height#:#Height Footer
 pdfgen#:#footer_show_pages#:#Show Pagenumbers
 prtf#:#pdf_export#:#PDF Export
+exc#:#exc_individual_deadline#:#Individual Deadline
+exc#:#exc_individual_deadline_action#:#Set Individual Deadline
+exc#:#exc_individual_deadline_before_global#:#The date has to be after the (last) deadline: %s.

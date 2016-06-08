@@ -40,7 +40,7 @@
 								// uzk-patch: begin
 								/*
 								$("#main_menu_search").autocomplete({
-									source: "{AC_DATASOURCE}",
+									source: "{AC_DATASOURCE}" + "&search_type=4",
 									appendTo: "#mm_search_menu_ac",
 									open: function(event, ui) {
 										$(".ui-autocomplete").position({
@@ -77,6 +77,22 @@
 
 								$("#ilMMSearchMenu input[type='radio']").change(function(){
 									$("#main_menu_search").focus();
+                                                                        
+                                                                        /* close current search */
+                                                                        $("#main_menu_search").autocomplete("close");
+                                                                        
+                                                                        /* append search type */
+                                                                        
+                                                                        var orig_datasource = "{AC_DATASOURCE}";
+                                                                        var type_val = $('input[name=root_id]:checked','#mm_search_form').val();
+                                                                        
+                                                                        $("#main_menu_search").autocomplete("option",
+                                                                        {
+                                                                            source: orig_datasource + "&search_type=" + type_val
+                                                                        });
+                                                                        
+                                                                        /* start new search */
+                                                                        $("#main_menu_search").autocomplete("search");
 								});
 							}
 						}

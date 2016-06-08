@@ -184,7 +184,7 @@ class ilExSubmissionTeamGUI
 		// #13414
 		$read_only = !$this->canEditTeam();
 				
-		if ($this->submission->getAssignment()->afterDeadlineStrict())
+		if ($this->submission->getAssignment()->afterDeadlineStrict(false))
 		{
 			ilUtil::sendInfo($this->lng->txt("exercise_time_over"));
 		}
@@ -209,8 +209,14 @@ class ilExSubmissionTeamGUI
 		}
 		
 		include_once "Modules/Exercise/classes/class.ilExAssignmentTeamTableGUI.php";
-		$tbl = new ilExAssignmentTeamTableGUI($this, "submissionScreenTeam",
-			ilExAssignmentTeamTableGUI::MODE_EDIT, $this->team, $read_only);
+		$tbl = new ilExAssignmentTeamTableGUI(
+			$this, 
+			"submissionScreenTeam",
+			ilExAssignmentTeamTableGUI::MODE_EDIT, 
+			$this->exercise->getRefId(),
+			$this->team, 
+			$read_only			
+		);
 		
 		$this->tpl->setContent($tbl->getHTML());				
 	}

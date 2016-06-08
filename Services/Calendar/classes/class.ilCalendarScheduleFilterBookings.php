@@ -32,12 +32,18 @@ class ilCalendarScheduleFilterBookings implements ilCalendarScheduleFilter
 		return $a_cats;
 	}
 	
-	public function isValidEvent(ilCalendarEntry $a_event)
+	public function modifyEvent(ilCalendarEntry $a_event)
 	{
 		global $ilUser;
 		
 		$booking = new ilBookingEntry($a_event->getContextId());
 		
+		// do not show bookings of foreign users
+		if($booking->getObjId() != $this->user_id)
+		{
+			return false;
+		}
+
 		// portfolio embedded: filter by consultation hour groups?
 		if(!is_array($this->group_ids) ||
 			in_array($booking->getBookingGroup(), $this->group_ids)) 
@@ -51,12 +57,17 @@ class ilCalendarScheduleFilterBookings implements ilCalendarScheduleFilter
 			if(($this->user_id == $ilUser->getId() ||
 				!$booking->isBookedOut($a_event->getEntryId(), true)) &&
 				$booking->isTargetObjectVisible($this->cats->getTargetRefId()))
-			{				
-				return true;
+			{
+				return $a_event;
 			}
 		}
 		
 		return false;		
+	}
+	
+	public function addCustomEvents(ilDate $start, ilDate $end, array $a_categories)
+	{
+		
 	}
 }
 

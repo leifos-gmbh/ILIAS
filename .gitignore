@@ -22,7 +22,7 @@ db_template_writer.php
 
 # /Customizing/
 #uzk-patch: begin
-/Customizing/global/plugins
+/Customizing/global
 #uzk-patch: end
 
 # /Modules/BookingManager/js/

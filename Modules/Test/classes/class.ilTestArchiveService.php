@@ -13,22 +13,60 @@ require_once './Modules/Test/classes/class.ilTestArchiver.php';
  */
 class ilTestArchiveService
 {
+	/**
+	 * @var ilObjTest
+	 */
 	protected $testOBJ;
 	
+	/**
+	 * @var ilTestParticipantData
+	 */
+	protected $participantData;
+	
+	/**
+	 * @var bool
+	 */
 	protected $considerHiddenQuestionsEnabled;
+	
+	/**
+	 * @var ilTestResultHeaderLabelBuilder
+	 */
+	protected $testResultHeaderLabelBuilder;
 	
 	public function __construct(ilObjTest $testOBJ)
 	{
+		global $ilObjDataCache, $lng;
+		
 		$this->testOBJ = $testOBJ;
-
+		$this->participantData = null;
+		
 		$this->considerHiddenQuestionsEnabled = true;
+		
+		require_once 'Modules/Test/classes/class.ilTestResultHeaderLabelBuilder.php';
+		$this->testResultHeaderLabelBuilder = new ilTestResultHeaderLabelBuilder($lng, $ilObjDataCache);
 	}
-
+	
+	/**
+	 * @return ilTestParticipantData
+	 */
+	public function getParticipantData()
+	{
+		return $this->participantData;
+	}
+	
+	/**
+	 * @param ilTestParticipantData $participantData
+	 */
+	public function setParticipantData(ilTestParticipantData $participantData)
+	{
+		$this->participantData = $participantData;
+	}
+	
 	public function isConsiderHiddenQuestionsEnabled()
 	{
 		return $this->considerHiddenQuestionsEnabled;
 	}
-
+	
 	public function setConsiderHiddenQuestionsEnabled($considerHiddenQuestionsEnabled)
 	{
 		$this->considerHiddenQuestionsEnabled = $considerHiddenQuestionsEnabled;
@@ -53,6 +91,7 @@ class ilTestArchiveService
 		ilTestPDFGenerator::generatePDF($content, ilTestPDFGenerator::PDF_OUTPUT_FILE, $filename);
 
 		$archiver = new ilTestArchiver($this->testOBJ->getId());
+		$archiver->setParticipantData($this->getParticipantData());
 		$archiver->handInTestResult($activeId, $pass, $filename);
 
 		unlink($filename);
@@ -69,9 +108,11 @@ class ilTestArchiveService
 			$activeId, $pass, false, $this->isConsiderHiddenQuestionsEnabled()
 		);
 		
-		$gui = new ilTestServiceGUI($this);
+		$gui = new ilTestServiceGUI($this->testOBJ);
 		
-		return $gui->getPassListOfAnswers($results, $activeId, $pass, true, false, false, true);
+		return $gui->getPassListOfAnswers(
+			$results, $activeId, $pass, true, false, false, true, false, null, $this->testResultHeaderLabelBuilder
+		);
 	}
 
 	/**
@@ -81,6 +122,7 @@ class ilTestArchiveService
 	 */
 	private function buildOverviewFilename($activeId, $pass)
 	{
-		return ilUtil::getWebspaceDir().'/assessment/scores-'.$this->testOBJ->getId().'-'.$activeId.'-'.$pass.'.pdf';
+		$tmpFileName = ilUtil::ilTempnam();
+		return dirname($tmpFileName).'/scores-'.$this->testOBJ->getId().'-'.$activeId.'-'.$pass.'.pdf';
 	}
 }

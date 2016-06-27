@@ -336,9 +336,16 @@ class ilSCTreeTasks
 	{
 		$failures = $this->readMissing();
 		$recf_ref_id = $this->createRecoveryContainer();
+		
+		$num = 0;
 		foreach($failures as $ref_id)
 		{
+			if($num > 10)
+			{
+				continue;
+			}
 			$this->repairMissingObject($recf_ref_id,$ref_id);
+			$num++;
 		}
 		
 	}
@@ -372,7 +379,7 @@ class ilSCTreeTasks
 				$factory = new ilObjectFactory();
 				$ref_obj = $factory->getInstanceByRefId($a_ref_id,FALSE);
 				
-				if($ref_obj instanceof ilObjRoleFolder) 
+				if(1 or $ref_obj instanceof ilObjRoleFolder) 
 				{
 					$ref_obj->delete();
 				}

@@ -18,7 +18,7 @@ include_once('./Modules/Group/classes/class.ilObjGroup.php');
 * @ilCtrl_Calls ilObjGroupGUI: ilCourseContentGUI, ilColumnGUI, ilContainerPageGUI, ilObjectCopyGUI
 * @ilCtrl_Calls ilObjGroupGUI: ilObjectCustomUserFieldsGUI, ilMemberAgreementGUI, ilExportGUI, ilMemberExportGUI
 * @ilCtrl_Calls ilObjGroupGUI: ilCommonActionDispatcherGUI, ilObjectServiceSettingsGUI, ilSessionOverviewGUI
-* @ilCtrl_Calls ilObjGroupGUI: ilMailMemberSearchGUI
+* @ilCtrl_Calls ilObjGroupGUI: ilMailMemberSearchGUI, ilNewsTimelineGUI
 * 
 *
 * @extends ilObjectGUI
@@ -31,10 +31,13 @@ class ilObjGroupGUI extends ilContainerGUI
 	*/
 	public function __construct($a_data,$a_id,$a_call_by_reference,$a_prepare_output = false)
 	{
+		global $ilSetting;
+
 		$this->type = "grp";
 		parent::__construct($a_data,$a_id,$a_call_by_reference,$a_prepare_output);
 
 		$this->lng->loadLanguageModule('grp');
+		$this->setting = $ilSetting;
 	}
 
 	function executeCommand()
@@ -280,6 +283,13 @@ class ilObjGroupGUI extends ilContainerGUI
 				$mail_search->setObjParticipants(ilCourseParticipants::_getInstanceByObjId($this->object->getId()));
 				$this->ctrl->forwardCommand($mail_search);
 				break;
+
+			case "ilnewstimelinegui":
+				include_once("./Services/News/classes/class.ilNewsTimelineGUI.php");
+				$t = ilNewsTimelineGUI::getInstance($this->object->getRefId());
+				$this->ctrl->forwardCommand($t);
+				break;
+
 			default:
 			
 				// check visible permission
@@ -1853,6 +1863,9 @@ class ilObjGroupGUI extends ilContainerGUI
 		{
 			$this->tabs_gui->addTab("view_content", $lng->txt("content"),
 				$this->ctrl->getLinkTarget($this, ""));
+
+			$this->tabs_gui->addTab("news_timeline", $lng->txt("news_timeline"),
+				$this->ctrl->getLinkTargetByClass("ilnewstimelinegui", "show"));
 		}
 		if ($rbacsystem->checkAccess('visible',$this->ref_id))
 		{
@@ -2290,13 +2303,13 @@ class ilObjGroupGUI extends ilContainerGUI
 			$dur->setShowTime(true);
 			$dur->setStart($this->object->getRegistrationStart());
 			$dur->setEnd($this->object->getRegistrationEnd());
-			$this->form->addItem($dur);
+			$form->addItem($dur);
 			
 			// cancellation limit		
 			$cancel = new ilDateTimeInputGUI($this->lng->txt('grp_cancellation_end'), 'cancel_end');
 			$cancel->setInfo($this->lng->txt('grp_cancellation_end_info'));
 			$cancel->setDate($this->object->getCancellationEnd());			
-			$this->form->addItem($cancel);
+			$form->addItem($cancel);
 
 			// max member
 			$lim = new ilCheckboxInputGUI($this->lng->txt('reg_grp_max_members_short'),'registration_membership_limited');
@@ -2427,6 +2440,17 @@ class ilObjGroupGUI extends ilContainerGUI
 			$sorting_settings[] = ilContainer::SORT_CREATION;
 			$sorting_settings[] = ilContainer::SORT_MANUAL;
 			$this->initSortingForm($form, $sorting_settings);
+
+			// timeline
+			include_once './Services/Object/classes/class.ilObjectServiceSettingsGUI.php';
+			if (ilContainer::_lookupContainerSetting(
+				$this->object->getId(),
+				ilObjectServiceSettingsGUI::NEWS_VISIBILITY,
+				$this->setting->get('block_activated_news',true)))
+			{
+				$cb = new ilCheckboxInputGUI($this->lng->txt("news_timeline"), "timeline");
+				$form->addItem($cb);
+			}
 
 			// additional features
 			$feat = new ilFormSectionHeaderGUI();

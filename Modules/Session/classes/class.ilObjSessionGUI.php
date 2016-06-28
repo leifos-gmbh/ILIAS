@@ -441,7 +441,7 @@ class ilObjSessionGUI extends ilObjectGUI implements ilDesktopItemHandling
 	 */
 	public function infoScreen()
 	{
-		global $ilAccess, $ilUser,$ilCtrl,$tree,$ilToolbar;
+		global $ilAccess, $ilUser,$ilCtrl,$tree,$ilToolbar,$lng;
 
 		$this->checkPermission('visible');
 		$this->tabs_gui->setTabActive('info_short');
@@ -505,6 +505,8 @@ class ilObjSessionGUI extends ilObjectGUI implements ilDesktopItemHandling
 			$this->object->getId(),
 			$eventItems
 		);			
+		
+		$lng->loadLanguageModule("cntr");// #14158		
 		
 		foreach($eventItems as $item)
 		{						
@@ -1046,7 +1048,7 @@ class ilObjSessionGUI extends ilObjectGUI implements ilDesktopItemHandling
 		
 		include_once './Services/UIComponent/Toolbar/classes/class.ilToolbarGUI.php';
 		$toolbar = new ilToolbarGUI();		
-		$toolbar->addButton($this->lng->txt('sess_gen_attendance_list'), 
+		$toolbar->addButton($this->lng->txt('crs_print_list'),
 			$this->ctrl->getLinkTarget($this,'attendanceList'));		
 		
 		$this->tpl->setVariable('ACTION_BUTTONS',$toolbar->getHTML());
@@ -1109,7 +1111,7 @@ class ilObjSessionGUI extends ilObjectGUI implements ilDesktopItemHandling
 				$this->ctrl->clearParameters($this);
 			}
 			$table_gui->readSubscriberData();
-			$table_gui->setTitle($this->lng->txt('group_new_registrations'),'icon_usr.svg',$this->lng->txt('group_new_registrations'));
+			$table_gui->setTitle($this->lng->txt('sess_new_registrations'),'icon_usr.svg',$this->lng->txt('sess_new_registrations'));
 			$this->tpl->setVariable('TABLE_SUB',$table_gui->getHTML());
 		}
 		
@@ -1164,7 +1166,7 @@ class ilObjSessionGUI extends ilObjectGUI implements ilDesktopItemHandling
 				$this->ctrl->clearParameters($this);
 			}
 			$table->addCommandButton('updateMembers',$this->lng->txt('save'));
-			$table->setTitle($this->lng->txt('event_tbl_tutors'),'icon_usr.svg',$this->lng->txt('event_tbl_admins'));
+			$table->setTitle($this->lng->txt('event_tbl_tutors'),'icon_usr.svg',$this->lng->txt('event_tbl_tutors'));
 			$table->enableRegistration($this->object->enabledRegistration());
 			$table->setParticipants($tutors);
 			$table->parse();
@@ -1192,7 +1194,7 @@ class ilObjSessionGUI extends ilObjectGUI implements ilDesktopItemHandling
 				$this->ctrl->clearParameters($this);
 			}
 			$table->addCommandButton('updateMembers',$this->lng->txt('save'));
-			$table->setTitle($this->lng->txt('event_tbl_members'),'icon_usr.svg',$this->lng->txt('event_tbl_admins'));
+			$table->setTitle($this->lng->txt('event_tbl_members'),'icon_usr.svg',$this->lng->txt('event_tbl_members'));
 			$table->enableRegistration($this->object->enabledRegistration());
 			$table->setParticipants($members);
 			$table->parse();
@@ -1678,7 +1680,7 @@ class ilObjSessionGUI extends ilObjectGUI implements ilDesktopItemHandling
 
 				$this->form->addCommandButton('save',$this->lng->txt('event_btn_add'));
 				$this->form->addCommandButton('saveAndAssignMaterials',$this->lng->txt('event_btn_add_edit'));
-				$this->form->addCommandButton('cancel',$this->lng->txt('cancel'));
+				$this->form->addCommandButton('cancelEdit',$this->lng->txt('cancel'));
 		
 				return true;
 			
@@ -1686,7 +1688,7 @@ class ilObjSessionGUI extends ilObjectGUI implements ilDesktopItemHandling
 				$this->form->setTitle($this->lng->txt('event_table_update'));
 
 				$this->form->addCommandButton('update',$this->lng->txt('save'));
-				$this->form->addCommandButton('cancel',$this->lng->txt('cancel'));
+				$this->form->addCommandButton('cancelEdit',$this->lng->txt('cancel'));
 				
 				return true;
 		}
@@ -2346,5 +2348,12 @@ class ilObjSessionGUI extends ilObjectGUI implements ilDesktopItemHandling
 		return true;
 	}
 
+	 function cancelEditObject()
+	 {
+		 global $ilCtrl, $tree;
+		 $parent_id = $tree->getParentId($this->object->getRefId());
+		 $ilCtrl->setParameterByClass("ilrepositorygui", "ref_id", $parent_id);
+		 $ilCtrl->redirectByClass("ilrepositorygui", "");
+	 }
 }
 ?>

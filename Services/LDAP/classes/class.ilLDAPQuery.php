@@ -404,8 +404,7 @@ class ilLDAPQuery
 			$user_ext = $user_data[strtolower($this->settings->getUserAttribute())];
 
 			// auth mode depends on ldap server settings
-			$auth_mode = $this->parseAuthMode();
-
+			$auth_mode = $this->settings->getAuthenticationMappingKey();
 			$user_data['ilInternalAccount'] = ilObjUser::_checkExternalAuthAccount($auth_mode,$user_ext);
 			$this->users[$user_ext] = $user_data;
 		}
@@ -418,11 +417,7 @@ class ilLDAPQuery
 	 */
 	private function parseAuthMode()
 	{
-		if($this->settings->isAuthenticationEnabled() or !$this->settings->getAuthenticationMapping())
-		{
-			return 'ldap';
-		}
-		return ilAuthUtils::_getAuthModeName($this->settings->getAuthenticationMapping());
+		return $this->settings->getAuthenticationMappingKey();
 	}
 	
 	/**

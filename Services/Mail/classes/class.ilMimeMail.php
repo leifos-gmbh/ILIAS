@@ -330,7 +330,22 @@ class ilMimeMail
 		require_once './Services/Mail/phpmailer/class.phpmailer.php';
 		$mail = new PHPMailer();
 
-		$mail->SetFrom($this->xheaders['From'], $this->xheaders['FromName']);
+		if($ilSetting->get('mail_system_return_path', ''))
+		{
+			$mail->Sender = $ilSetting->get('mail_system_return_path', '');
+		}
+
+		require_once 'Services/Mail/classes/class.ilMail.php';
+		$addr = ilMail::getIliasMailerAddress();
+		if($this->xheaders['From'] == $addr[0])
+		{
+			$mail->setFrom($this->xheaders['From'], $this->xheaders['FromName']);
+		}
+		else
+		{
+			$mail->addReplyTo($this->xheaders['From'], $this->xheaders['FromName']);
+			$mail->setFrom($addr[0], $addr[1]);
+		}
 		foreach($this->sendto as $recipients)
 		{
 			$recipient_pieces = array_filter(array_map('trim', explode(',', $recipients)));
@@ -385,7 +400,13 @@ class ilMimeMail
 			}
 
 			$mail->AltBody = $this->body;
-			$mail->Body    = str_replace( '{PLACEHOLDER}', nl2br( ilUtil::makeClickable( $this->body ) ), $bracket );
+
+			if(strip_tags($this->body, '<b><u><i><a>') == $this->body)
+			{
+				// Let's assume that there is no HTML, so convert "\n" to "<br>" 
+				$this->body = nl2br($this->body);
+			}
+			$mail->Body    = str_replace( '{PLACEHOLDER}', ilUtil::makeClickable( $this->body ), $bracket );
 
 			$directory = './Services/Mail/templates/default/img/';
 			if($style != 'delos')
@@ -438,18 +459,27 @@ class ilMimeMail
 			" | Subject: " .$mail->Subject
 		));
 
-		$result = $mail->Send();
-
-		if($result)
+		if(!(int)$ilSetting->get('prevent_smtp_globally'))
 		{
-			ilLoggerFactory::getLogger('mail')->debug(sprintf(
-				'Successfully delegated external mail delivery'
-			));
+			$result = $mail->Send();
+
+			if($result)
+			{
+				ilLoggerFactory::getLogger('mail')->debug(sprintf(
+					'Successfully delegated external mail delivery'
+				));
+			}
+			else
+			{
+				ilLoggerFactory::getLogger('mail')->debug(sprintf(
+					'Could not deliver external email: %s', $mail->ErrorInfo
+				));
+			}
 		}
 		else
 		{
 			ilLoggerFactory::getLogger('mail')->debug(sprintf(
-				'Could not deliver external email: %s', $mail->ErrorInfo
+				'Suppressed delegation of email delivery according to global setting ( prevent_smtp_globally ).'
 			));
 		}
 	}

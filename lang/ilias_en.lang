@@ -15733,3 +15733,7 @@ grp#:#grp_admission_link_failure_invalid_code#:#Can't register: Link is invalid.
 crs#:#crs_admission_link_failure_invalid_code#:#Can't register: Link is invalid.
 form#:#form_date_duration_start#:#Start
 form#:#form_date_duration_end#:#End
+cont#:#cont_news_timeline#:#News Timeline
+cont#:#cont_news_timeline_info#:#Activates News Timeline Tab
+cont#:#cont_news_timeline_auto_entries#:#Include Automatic Entries
+cont#:#cont_news_timeline_auto_entries_info#:#Include all news that are created automatically, e.g. forum posts, new files, etc.

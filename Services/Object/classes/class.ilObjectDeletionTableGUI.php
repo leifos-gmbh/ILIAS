@@ -139,14 +139,11 @@ class ilObjectDeletionTableGUI extends ilTable2GUI
 		
 		
 		$nodes_without_rolf = $GLOBALS['tree']->getFilteredSubTree($set['ref_id'], array('rolf'));
-		$this->tpl->setVariable('VAL_SUBOBJECTS',
-			((int) $set['subobjects'] - (int) count($nodes_without_rolf)) < 0  ? 
-			0 :
-			((int) $set['subobjects'] - (int) count($nodes_without_rolf))
+		ilLoggerFactory::getLogger('obj')->debug('nodes without rolf:' . (int) count($nodes_without_rolf));
+		$this->tpl->setVariable(
+			'VAL_SUBOBJECTS',
+			(int) count($nodes_without_rolf) - 1
 		);
-		
-		
-		
 	}
 	
 	/**
@@ -205,7 +202,6 @@ class ilObjectDeletionTableGUI extends ilTable2GUI
 				$set[$counter]['type'] = ilObject::_lookupType(ilObject::_lookupObjId($a_ref_id));
 				$set[$counter]['title'] = ilObject::_lookupTitle(ilObject::_lookupObjId($a_ref_id));
 				$set[$counter]['description'] = ilObject::_lookupDescription(ilObject::_lookupObjId($a_ref_id));
-				$set[$counter]['subobjects'] = count((array) $GLOBALS['tree']->getSubTreeIds($a_ref_id));
 				$set[$counter]['depth'] = $a_level;
 			}
 		}

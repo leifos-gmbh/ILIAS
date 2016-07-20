@@ -96,6 +96,8 @@ class ilSession
 			// This would result in new session records for each request.
 			return true;
 		}
+		
+		$GLOBALS['ilLog']->write(__METHOD__.': account id '. $_SESSION['AccountId']);
 
 		$now = time();
 

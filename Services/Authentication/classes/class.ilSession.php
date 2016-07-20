@@ -310,7 +310,7 @@ class ilSession
 
 		while ($row = $ilDB->fetchObject($res))
 		{
-			$GLOBALS['ilLog']->write(__METHOD__.': duplicate write called');
+			$GLOBALS['ilLog']->write(__METHOD__.': duplicate write called: ' . $new_session);
 			ilSession::_writeData($new_session,$row->data);
 			return $new_session;
 		}

@@ -561,6 +561,9 @@ class ilInitialisation
 			$ilUser->hasToAcceptTermsOfServiceInSession(true);
 		}
 		
+		ilLoggerFactory::getRootLogger()->debug('Using account id: '. ilSession::get('AccountId'));
+		
+		
 		$uid = ilSession::get("AccountId");		
 		if($uid)
 		{

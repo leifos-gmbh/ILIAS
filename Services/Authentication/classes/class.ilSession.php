@@ -90,6 +90,7 @@ class ilSession
 		
 		if (self::isWebAccessWithoutSessionEnabled())
 		{
+			$GLOBALS['ilLog']->write(__METHOD__': prevented session writing');
 			// Prevent session data written for web access checker
 			// when no cookie was sent (e.g. for pdf files linking others).
 			// This would result in new session records for each request.
@@ -271,6 +272,7 @@ class ilSession
 
 		while ($row = $ilDB->fetchObject($res))
 		{
+			$GLOBALS['ilLog']->write(__METHOD__.': duplicate write called');
 			ilSession::_writeData($new_session,$row->data);
 			return $new_session;
 		}

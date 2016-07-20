@@ -756,8 +756,6 @@ class ilContainer extends ilObject
 		// Duplicate session to avoid logout problems with backgrounded SOAP calls
 		$new_session_id = ilSession::_duplicate($session_id);
 		
-		ilLoggerFactory::getLogger('root')->debug($new_session_id.' <-> '. $session_id);
-		
 		// Start cloning process using soap call
 		include_once 'Services/WebServices/SOAP/classes/class.ilSoapClient.php';
 

@@ -22,7 +22,7 @@ if($type_id && $tgt_ops_id)
 	ilDBUpdateNewObjectType::addRBACOperation($type_id, $tgt_ops_id);
 }
 ?>
-<#2>
+<#3>
 <?php
 
 include_once('./Services/Migration/DBUpdate_3560/classes/class.ilDBUpdateNewObjectType.php');

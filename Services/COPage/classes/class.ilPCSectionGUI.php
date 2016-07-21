@@ -95,7 +95,7 @@ class ilPCSectionGUI extends ilPageContentGUI
 		{
 			case "ilpropertyformgui":
 				include_once './Services/Form/classes/class.ilPropertyFormGUI.php';
-				$form = $this->getForm(true);
+				$form = $this->initForm(true);
 				$this->ctrl->forwardCommand($form);
 				break;
 
@@ -181,6 +181,30 @@ class ilPCSectionGUI extends ilPageContentGUI
 
 		$char_prop->setValue($selected); 
 		$form->addItem($char_prop);
+
+		// link input
+		include_once 'Services/Form/classes/class.ilLinkInputGUI.php';
+		$ac = new ilLinkInputGUI($this->lng->txt('cont_link'), 'link');
+		$ac->setAllowedLinkTypes(ilLinkInputGUI::BOTH);
+		$ac->setRequired(false);
+		$ac->setInfo($this->lng->txt("copg_sec_link_info"));
+		$ac->setInternalLinkDefault("RepositoryItem", 0);
+		$ac->setInternalLinkFilterTypes(array("RepositoryItem", "PageObject", "StructureObject", "GlossaryItem", "WikiPage", "MediaObject"));
+		if (!$a_insert)
+		{
+			$l = $this->content_obj->getLink();
+			if ($l["LinkType"] == "IntLink")
+			{
+				$ac->setValueByIntLinkAttributes($l["Type"], $l["Target"], $l["TargetFrame"]);
+			}
+			if ($l["LinkType"] == "ExtLink")
+			{
+				$ac->setValue($l["Href"]);
+			}
+		}
+		$form->addItem($ac);
+
+		// activation
 
 		// active from
 		$dt_prop = new ilDateTimeInputGUI($lng->txt("cont_active_from"), "active_from");
@@ -318,7 +342,26 @@ class ilPCSectionGUI extends ilPageContentGUI
 			$this->content_obj->setPermission($_POST["permission"]);
 		}
 
-
+		if ($_POST["link_mode"] == "ext" && $_POST["link"] != "")
+		{
+			$this->content_obj->setExtLink($_POST["link"]);
+		}
+		else if ($_POST["link_mode"] == "int" && $_POST["link"] != "")
+		{
+			// $_POST["link"] is "crs|96", "chap|2", "term|1", "wpage|1"
+//			var_dump($_POST);
+			$la = $form->getItemByPostVar("link")->getIntLinkAttributes();
+//			echo "<br>";
+//			var_dump($la); exit;
+			if ($la["Type"] != "")
+			{
+				$this->content_obj->setIntLink($la["Type"], $la["Target"], $la["TargetFrame"]);
+			}
+		}
+		else
+		{
+			$this->content_obj->setNoLink();
+		}
 	}
 
 }

@@ -1548,7 +1548,7 @@ return;
 		}
 
 //echo "<br>-".htmlentities($this->obj->getXMLContent())."-<br><br>"; exit;
-//echo "<br>-".htmlentities($this->getLinkXML())."-";
+//echo "<br>-".htmlentities($this->getLinkXML())."-"; exit;
 
 		// set default link xml, if nothing was set yet
 		if (!$this->link_xml_set)

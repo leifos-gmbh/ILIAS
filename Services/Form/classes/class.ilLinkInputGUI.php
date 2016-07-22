@@ -21,6 +21,7 @@ class ilLinkInputGUI extends ilFormPropertyGUI
 	protected $int_link_default_type = "RepositoryItem";
 	protected $int_link_default_obj = 0;
 	protected $int_link_filter_types = array("RepositoryItem");
+	protected $filter_white_list = true;
 
 	static protected $iltypemap = array(
 		"page" => "PageObject",
@@ -111,6 +112,25 @@ class ilLinkInputGUI extends ilFormPropertyGUI
 		return array_flip(self::$iltypemap);
 	}
 
+	/**
+	 * Set filter white list
+	 *
+	 * @param bool $a_val filter list is white list	
+	 */
+	function setFilterWhiteList($a_val)
+	{
+		$this->filter_white_list = $a_val;
+	}
+	
+	/**
+	 * Get filter white list
+	 *
+	 * @return bool filter list is white list
+	 */
+	function getFilterWhiteList()
+	{
+		return $this->filter_white_list;
+	}
 
 	/**
 	* Execute current command
@@ -133,7 +153,7 @@ class ilLinkInputGUI extends ilFormPropertyGUI
 				{
 					$link_gui->filterLinkType($t);
 				}
-				$link_gui->setFilterWhiteList(true);
+				$link_gui->setFilterWhiteList($this->getFilterWhiteList());
 				$link_gui->setMode("asynch");
 			
 				$ret = $ilCtrl->forwardCommand($link_gui);
@@ -386,7 +406,11 @@ class ilLinkInputGUI extends ilFormPropertyGUI
 				$hidden_target->setValue($value[2]);
 				
 				$itpl->setVariable("VAL_OBJECT_TYPE", $value_trans["type"]);						
-				$itpl->setVariable("VAL_OBJECT_NAME", $value_trans["name"]);						
+				$itpl->setVariable("VAL_OBJECT_NAME", $value_trans["name"]);
+				if ($value[2] != "")
+				{
+					$itpl->setVariable("VAL_TARGET_FRAME", "(" . $value[2].")");
+				}
 			}
 			else if($has_ext)
 			{
@@ -539,7 +563,7 @@ class ilLinkInputGUI extends ilFormPropertyGUI
 		$target = "";
 		if (self::isInternalLink($_POST[$this->getPostVar()]))
 		{
-			$target_frame = "";
+			$target_frame = $val[2];
 			$map = self::getTypeToAttrType();
 			if (isset($map[$val[0]]))
 			{
@@ -598,7 +622,12 @@ class ilLinkInputGUI extends ilFormPropertyGUI
 		}
 		if ($type != "" && $target_id != "")
 		{
-			$this->setValue($type."|".$target_id);
+			$val = $type."|".$target_id;
+			if ($a_target_frame != "")
+			{
+				$val.= 	"|".$a_target_frame;
+			}
+			$this->setValue($val);
 		}
 	}
 	

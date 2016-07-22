@@ -3241,13 +3241,23 @@
 						<xsl:call-template name="SetExtLinkAttributes" />
 					</xsl:for-each>
 					<xsl:for-each select="./IntLink">
-						<xsl:call-template name="SetIntLinkAttributes"><xsl:with-param name="targetframe">None</xsl:with-param></xsl:call-template>
+						<xsl:variable name="targetframe">
+							<xsl:choose>
+								<xsl:when test="@TargetFrame">
+									<xsl:value-of select="@TargetFrame"/>
+								</xsl:when>
+								<xsl:otherwise>None</xsl:otherwise>
+							</xsl:choose>
+						</xsl:variable>
+						<xsl:call-template name="SetIntLinkAttributes"><xsl:with-param name="targetframe"><xsl:value-of select="$targetframe"/></xsl:with-param></xsl:call-template>
 					</xsl:for-each>
-					<xsl:call-template name="SectionDiv" />
+					<xsl:call-template name="SectionContent" />
 				</a>
 			</xsl:if>
 			<xsl:if test="(not(./ExtLink) and not(./IntLink)) or $mode = 'edit'">
-				<xsl:call-template name="SectionDiv" />
+				<div>
+					<xsl:call-template name="SectionContent" />
+				</div>
 			</xsl:if>
 			<xsl:if test="@PermissionRefId">
 				{{{{{Section;Access}}}}}
@@ -3257,18 +3267,17 @@
 
 
 <!-- Section Div -->
-<xsl:template name="SectionDiv">
-	<div>
+<xsl:template name="SectionContent">
 		<xsl:if test="@Characteristic">
 			<xsl:if test="substring(@Characteristic, 1, 4) = 'ilc_'">
-				<xsl:attribute name="class">ilc_section_<xsl:value-of select="substring-after(@Characteristic, 'ilc_')"/></xsl:attribute>
+				<xsl:attribute name="class">ilc_section_<xsl:value-of select="substring-after(@Characteristic, 'ilc_')"/> ilCOPageSection</xsl:attribute>
 			</xsl:if>
 			<xsl:if test="substring(@Characteristic, 1, 4) != 'ilc_'">
-				<xsl:attribute name="class">ilc_section_<xsl:value-of select="@Characteristic"/></xsl:attribute>
+				<xsl:attribute name="class">ilc_section_<xsl:value-of select="@Characteristic"/> ilCOPageSection</xsl:attribute>
 			</xsl:if>
 		</xsl:if>
 		<xsl:if test="$mode = 'edit'">
-			<xsl:attribute name="style">min-height: 60px; height: auto !important; height: 60px; position:static;</xsl:attribute>
+			<xsl:attribute name="style">min-height: 60px; height: auto !important; height: 60px; position:static; display: block;</xsl:attribute>
 		</xsl:if>
 		<xsl:call-template name="EditReturnAnchors"/>
 		<!-- command selectbox -->
@@ -3303,7 +3312,6 @@
 			<br />
 		</xsl:if>
 		<xsl:comment>Break</xsl:comment>
-	</div>
 </xsl:template>
 
 	<!-- Resources -->

@@ -334,7 +334,7 @@ class ilPCSection extends ilPageContent
 				return array("LinkType" => "IntLink",
 					"Target" => $child->get_attribute("Target"),
 					"Type" => $child->get_attribute("Type"),
-					"TargetFrame" => $child->get_attribute("TargetFame"));
+					"TargetFrame" => $child->get_attribute("TargetFrame"));
 			}
 		}
 		return array("LinkType" => "NoLink");

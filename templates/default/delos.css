@@ -8562,6 +8562,10 @@ ul#ilAdvSelListTable_style_selection {
   overflow: auto;
   max-height: 400px;
 }
+a.ilCOPageSection {
+  color: inherit;
+  text-decoration: inherit;
+}
 /* Services/Calendar */
 td.even {
   color: #222;

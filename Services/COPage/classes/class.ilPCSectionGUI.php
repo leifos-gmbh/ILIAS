@@ -188,8 +188,17 @@ class ilPCSectionGUI extends ilPageContentGUI
 		$ac->setAllowedLinkTypes(ilLinkInputGUI::BOTH);
 		$ac->setRequired(false);
 		$ac->setInfo($this->lng->txt("copg_sec_link_info"));
-		$ac->setInternalLinkDefault("RepositoryItem", 0);
-		$ac->setInternalLinkFilterTypes(array("RepositoryItem", "PageObject", "StructureObject", "GlossaryItem", "WikiPage", "MediaObject"));
+		$ac->setInternalLinkDefault($this->getPageConfig()->getIntLinkHelpDefaultType(),
+			$this->getPageConfig()->getIntLinkHelpDefaultId());
+		$link_types = array();
+		foreach ($this->getPageConfig()->getIntLinkFilters() as $f)
+		{
+			$link_types[] = $f;
+		}
+		$ac->setInternalLinkFilterTypes($link_types);
+		$ac->setFilterWhiteList(
+			$this->getPageConfig()->getIntLinkFilterWhiteList());
+
 		if (!$a_insert)
 		{
 			$l = $this->content_obj->getLink();

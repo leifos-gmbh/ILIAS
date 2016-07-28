@@ -29,3 +29,32 @@ if($type_id)
 	}
 }
 ?>
+<#6>
+<?php
+//
+?>
+<#7>
+<?php
+//
+?>
+<#8>
+<?php
+//
+?>
+<#9>
+<?php
+//
+?>
+<#10>
+<?php
+if(!$ilDB->tableColumnExists('il_news_item', 'content_html')) {
+	$ilDB->addTableColumn('il_news_item', 'content_html',
+		array(
+			"type"    => "integer",
+			"notnull" => true,
+			"length"  => 1,
+			"default" => 0
+		)
+	);
+}
+?>

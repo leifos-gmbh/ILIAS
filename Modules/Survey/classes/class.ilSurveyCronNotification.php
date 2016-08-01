@@ -61,6 +61,8 @@ class ilSurveyCronNotification extends ilCronJob
 		
 		$status = ilCronJobResult::STATUS_NO_ACTION;
 		$message = array();
+				
+		$tutor_res = ilObjSurvey::getSurveysWithTutorResults();
 		
 		$root = $tree->getNodeData(ROOT_FOLDER_ID);
 		foreach($tree->getSubTree($root, false, "svy") as $svy_ref_id)
@@ -71,7 +73,17 @@ class ilSurveyCronNotification extends ilCronJob
 			{	
 				$message[] = $svy_ref_id."(".$num.")";
 				$status = ilCronJobResult::STATUS_OK;				
-			}			
+			}									
+			
+			// separate cron-job?
+			if(in_array($svy->getId(), $tutor_res))
+			{
+				if($svy->sendTutorResults())
+				{
+					$message[] = $svy_ref_id;
+					$status = ilCronJobResult::STATUS_OK;		
+				}
+			}
 		}
 		
 		$result = new ilCronJobResult();

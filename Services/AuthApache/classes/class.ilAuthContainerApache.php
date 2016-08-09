@@ -343,33 +343,12 @@ class ilAuthContainerApache extends Auth_Container
 		$this->ldap_attr_to_user = new ilLDAPAttributeToUser($this->server);
 	}
 	
-<<<<<<< HEAD
-		/**
-=======
 	
 	/**
->>>>>>> ilias/release_5-1
 	 * Handle ldap as data source
 	 * @param Auth $auth
 	 * @param string $ext_account
 	 */
-<<<<<<< HEAD
-	protected function handleLDAPDataSource($a_auth,$ext_account)
-	{
-		include_once './Services/LDAP/classes/class.ilLDAPServer.php';
-		$server = ilLDAPServer::getInstanceByServerId(
-			ilLDAPServer::_getFirstActiveServer()
-		);
-
-		$GLOBALS['ilLog']->write(__METHOD__.'Using ldap data source');
-
-		include_once './Services/LDAP/classes/class.ilLDAPUserSynchronisation.php';
-		$sync = new ilLDAPUserSynchronisation('ldap', $server->getServerId());
-		$sync->setExternalAccount($ext_account);
-		$sync->setUserData(array());
-		//$sync->forceCreation($this->force_creation);
-		$sync->forceCreation(TRUE);
-=======
 	protected function handleLDAPDataSource($a_auth,$ext_account, $settings)
 	{
 		include_once './Services/LDAP/classes/class.ilLDAPServer.php';
@@ -385,55 +364,32 @@ class ilAuthContainerApache extends Auth_Container
 		$sync->setUserData(array());
 		$sync->forceCreation($this->force_creation);
 		$sync->forceReadLdapData(true);
->>>>>>> ilias/release_5-1
 
 		try {
 			$internal_account = $sync->sync();
 		}
 		catch(UnexpectedValueException $e) {
-<<<<<<< HEAD
-			$GLOBALS['ilLog']->write(__METHOD__.': Login failed with message: '. $e->getMessage());
-=======
 			ilLoggerFactory::getLogger('auth')->info('Login failed with message: ' . $e->getMessage());
->>>>>>> ilias/release_5-1
 			$a_auth->status = AUTH_WRONG_LOGIN;
 			$a_auth->logout();
 			return false;
 		}
 		catch(ilLDAPSynchronisationForbiddenException $e) {
 			// No syncronisation allowed => create Error
-<<<<<<< HEAD
-			$GLOBALS['ilLog']->write(__METHOD__.': Login failed with message: '. $e->getMessage());
-=======
 			ilLoggerFactory::getLogger('auth')->info('Login failed with message: ' . $e->getMessage());
->>>>>>> ilias/release_5-1
 			$a_auth->status = AUTH_RADIUS_NO_ILIAS_USER;
 			$a_auth->logout();
 			return false;
 		}
 		catch(ilLDAPAccountMigrationRequiredException $e) {
-<<<<<<< HEAD
-			$GLOBALS['ilLog']->write(__METHOD__.': Starting account migration.');
-=======
 			ilLoggerFactory::getLogger('auth')->debug('Starting account migration');
->>>>>>> ilias/release_5-1
 			$a_auth->logout();
 			ilUtil::redirect('ilias.php?baseClass=ilStartUpGUI&cmdClass=ilstartupgui&cmd=showAccountMigration');
 		}
 
-<<<<<<< HEAD
-		
 		$a_auth->setAuth($internal_account);
 		return true;
 	}
-
 	
 }
 ?>
-=======
-		$a_auth->setAuth($internal_account);
-		return true;
-	}
-	
-}
->>>>>>> ilias/release_5-1

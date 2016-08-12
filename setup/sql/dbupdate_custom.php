@@ -58,3 +58,16 @@ if(!$ilDB->tableColumnExists('il_news_item', 'content_html')) {
 	);
 }
 ?>
+<#11>
+<?php
+if(!$ilDB->tableColumnExists('il_news_item', 'update_user_id')) {
+	$ilDB->addTableColumn('il_news_item', 'update_user_id',
+		array(
+			"type"    => "integer",
+			"notnull" => true,
+			"length"  => 4,
+			"default" => 0
+		)
+	);
+}
+?>

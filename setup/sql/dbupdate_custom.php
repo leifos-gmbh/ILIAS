@@ -71,3 +71,17 @@ if(!$ilDB->tableColumnExists('il_news_item', 'update_user_id')) {
 	);
 }
 ?>
+<#12>
+<?php
+include_once('./Services/Migration/DBUpdate_3560/classes/class.ilDBUpdateNewObjectType.php');
+
+$type_id = ilDBUpdateNewObjectType::getObjectTypeId('crs');
+if($type_id)
+{
+	$ops_id = ilDBUpdateNewObjectType::getCustomRBACOperationId("news_add_news");
+	if($ops_id)
+	{
+		ilDBUpdateNewObjectType::addRBACOperation($type_id, $ops_id);
+	}
+}
+?>

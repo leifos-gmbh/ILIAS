@@ -15,7 +15,8 @@
 		"geshi/geshi": "dev-master",
 		"tecnickcom/tcpdf": "^6.2.12",
 		"pimple/pimple" : "^3.0",
-		"symfony/yaml": "^3.1"
+		"symfony/yaml": "^3.1",
+		"jasig/phpcas": "^1.3"
 	},
 	"require-dev": {
 		"mikey179/vfsStream": "^1.6"
@@ -127,6 +128,13 @@
 			"wrapped_by": "",
 			"last_update": "2016-07-07",
 			"last_update_by": "Michael Jansen <mjansen@databay.de>"
+		},
+		"jasig/phpcas" : {
+			"source": "https://github.com/Jasig/phpCAS",
+			"used_version": "v1.3.3",
+			"added_by": "Stefan Meyer <smeyer.ilias@gmx.de",
+			"last_update": "2016-08-15",
+			"last_update_by": "Stefan Meyer <smeyer.ilias@gmx.de"
 		},
 		"patches": {
 			"tecnickcom/tcpdf": {

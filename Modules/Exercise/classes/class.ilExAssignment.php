@@ -1239,8 +1239,11 @@ class ilExAssignment
 				$mem[$rec["usr_id"]]["feedback_time"] = $rec["feedback_time"];
 				$mem[$rec["usr_id"]]["notice"] = $rec["notice"];
 				$mem[$rec["usr_id"]]["status"] = $rec["status"];
+				$mem[$rec["usr_id"]]["mark"] = $rec["mark"];
+				$mem[$rec["usr_id"]]["comment"] = $rec["u_comment"];
 			}
 		}
+		
 		return $mem;
 	}
 	
@@ -1759,6 +1762,9 @@ class ilExAssignment
 		}
 	}
 		
+	/**
+	 * @return \ilExAssignmentMemberStatus
+	 */
 	public function getMemberStatus($a_user_id = null)
 	{
 		global $ilUser;
@@ -1868,7 +1874,7 @@ class ilExAssignment
 				$row["member_id"] = "t".$row["member_id"];
 			}
 			
-			$res[$row["member_id"]] = new ilDateTime($row["tstamp"], IL_CAL_UNIX);
+			$res[$row["member_id"]] = $row["tstamp"];
 		}
 		
 		return $res;

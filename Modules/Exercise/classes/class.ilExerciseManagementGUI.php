@@ -293,7 +293,7 @@ class ilExerciseManagementGUI
 			$this->ctrl->setParameter($this, "vw", self::VIEW_ASSIGNMENT);
 			
 			include_once("./Modules/Exercise/classes/class.ilExerciseMemberTableGUI.php");
-			$exc_tab = new ilExerciseMemberTableGUI($this, "members", $this->exercise, $this->assignment);
+			$exc_tab = new ilExerciseMemberTableGUI($this, "members", $this->exercise, $this->assignment->getId());
 			$tpl->setContent(
 				$exc_tab->getHTML().
 				$this->initIndividualDeadlineModal()
@@ -919,7 +919,7 @@ class ilExerciseManagementGUI
 						$ass_id, true);
 				}
 				
-				$res = array("result"=>true, "snippet"=>ilUtil::shortenText($comment, 25, true));
+				$res = array("result"=>true, "snippet"=>$comment);
 			}						
 		}				
 		
@@ -1537,7 +1537,7 @@ class ilExerciseManagementGUI
 			
 			if(array_key_exists($id, $values))
 			{
-				$dl->setDate($values[$id]);
+				$dl->setDate(new ilDateTime($values[$id], IL_CAL_UNIX));
 			}
 		}
 		

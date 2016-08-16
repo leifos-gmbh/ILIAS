@@ -156,3 +156,40 @@ if($tgt_ops_id)
 <?php
 	$ilCtrlStructureReader->getStructure();
 ?>
+<#12>
+<?php
+require_once 'Services/Password/classes/class.ilPasswordUtils.php';
+$salt_location = CLIENT_DATA_DIR . '/pwsalt.txt';
+if(!is_file($salt_location) || !is_readable($salt_location))
+{
+	$result = @file_put_contents(
+		$salt_location,
+		substr(str_replace('+', '.', base64_encode(ilPasswordUtils::getBytes(16))), 0, 22)
+	);
+	if(!$result)
+	{
+		die("Could not create the client salt for bcrypt password hashing.");
+	}
+}
+if(!is_file($salt_location) || !is_readable($salt_location))
+{
+	die("Could not determine the client salt for bcrypt password hashing.");
+}
+?>
+<#13>
+<?php
+if(!$ilDB->tableColumnExists('qpl_qst_lome', 'min_auto_complete'))
+{
+	$ilDB->addTableColumn('qpl_qst_lome', 'min_auto_complete', array(
+			'type'	=> 'integer',
+			'length'=> 1,
+			'default' => 1)
+	);
+}
+if($ilDB->tableColumnExists('qpl_qst_lome', 'min_auto_complete'))
+{
+	$ilDB->modifyTableColumn('qpl_qst_lome', 'min_auto_complete', array(
+			'default' => 3)
+	);
+}
+?>

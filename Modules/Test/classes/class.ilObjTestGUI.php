@@ -1265,14 +1265,13 @@ class ilObjTestGUI extends ilObjectGUI
 		include_once "./Services/QTI/classes/class.ilQTIParser.php";
 
 		// Handle selection of "no questionpool" as qpl_id = -1 -> use test object id instead.
-		// TODO: chek if empty strings in $_POST["qpl_id"] relates to a bug or not
-		if ($_POST["qpl_id"] == "-1")
+		if (!isset($_POST["qpl"]) || "-1" !== (string)$_POST["qpl"])
 		{
-			$qpl_id = $newObj->id;
+			$qpl_id = $newObj->getId();
 		} 
 		else 
 		{
-			$qpl_id = $_POST["qpl_id"];
+			$qpl_id = $_POST["qpl"];
 		}
 
 		$qtiParser = new ilQTIParser($_SESSION["tst_import_qti_file"], IL_MO_PARSE_QTI, $qpl_id, $_POST["ident"]);
@@ -3144,6 +3143,12 @@ class ilObjTestGUI extends ilObjectGUI
 		$questionHeaderBlockBuilder = new ilTestQuestionHeaderBlockBuilder($this->lng);
 		$questionHeaderBlockBuilder->setHeaderMode($this->object->getTitleOutput());
 
+		if($isPdfDeliveryRequest)
+		{
+			require_once 'Services/WebAccessChecker/classes/class.ilWACSignedPath.php';
+			ilWACSignedPath::setTokenMaxLifetimeInSeconds(60);
+		}
+
 		foreach ($this->object->questions as $question) 
 		{		
 			$template->setCurrentBlock("question");
@@ -3178,7 +3183,6 @@ class ilObjTestGUI extends ilObjectGUI
 		
 		if( $isPdfDeliveryRequest )
 		{
-			//$this->object->deliverPDFfromHTML($template->get(), $this->object->getTitle());
 			require_once 'class.ilTestPDFGenerator.php';
 			ilTestPDFGenerator::generatePDF($template->get(), ilTestPDFGenerator::PDF_OUTPUT_DOWNLOAD, $this->object->getTitle());
 		}
@@ -3209,6 +3213,8 @@ class ilObjTestGUI extends ilObjectGUI
 
 		$this->tpl->addCss(ilUtil::getStyleSheetLocation("output", "test_print.css", "Modules/Test"), "print");
 
+		$isPdfDeliveryRequest = isset($_GET['pdf']) && $_GET['pdf'];
+
 		global $ilUser;
 		$print_date = mktime(date("H"), date("i"), date("s"), date("m")  , date("d"), date("Y"));
 		$max_points= 0;
@@ -3217,6 +3223,12 @@ class ilObjTestGUI extends ilObjectGUI
 		require_once 'Modules/Test/classes/class.ilTestQuestionHeaderBlockBuilder.php';
 		$questionHeaderBlockBuilder = new ilTestQuestionHeaderBlockBuilder($this->lng);
 		$questionHeaderBlockBuilder->setHeaderMode($this->object->getTitleOutput());
+
+		if($isPdfDeliveryRequest)
+		{
+			require_once 'Services/WebAccessChecker/classes/class.ilWACSignedPath.php';
+			ilWACSignedPath::setTokenMaxLifetimeInSeconds(60);
+		}
 		
 		foreach ($this->object->questions as $question)
 		{
@@ -3248,11 +3260,9 @@ class ilObjTestGUI extends ilObjectGUI
 		$template->setVariable("TXT_MAXIMUM_POINTS", ilUtil::prepareFormOutput($this->lng->txt("tst_maximum_points")));
 		$template->setVariable("VALUE_MAXIMUM_POINTS", ilUtil::prepareFormOutput($max_points));
 
-		if (array_key_exists("pdf", $_GET) && ($_GET["pdf"] == 1))
+		if($isPdfDeliveryRequest)
 		{
-			//$this->object->deliverPDFfromHTML($template->get(), $this->object->getTitle());
 			require_once 'class.ilTestPDFGenerator.php';
-			$content = $template->get();
 			ilTestPDFGenerator::generatePDF($template->get(), ilTestPDFGenerator::PDF_OUTPUT_DOWNLOAD, $this->object->getTitle());
 		}
 		else
@@ -3532,7 +3542,7 @@ class ilObjTestGUI extends ilObjectGUI
 		$testSequence = $this->testSequenceFactory->getSequenceByTestSession($testSession);
 		$testSequence->loadFromDb();
 		$testSequence->loadQuestions($testQuestionSetConfig, new ilTestDynamicQuestionSetFilterSelection());
-		
+		$big_button = array();
 		$testPlayerGUI = $this->testPlayerFactory->getPlayerGUI();
 		
 		if ($_GET['createRandomSolutions'])
@@ -5196,7 +5206,8 @@ class ilObjTestGUI extends ilObjectGUI
 			$orders, $obligations
 		);
 
-	    $ilCtrl->redirect($this, 'questions');
+		ilUtil::sendSuccess($this->lng->txt('saved_successfully'), true);
+		$ilCtrl->redirect($this, 'questions');
 	}
 
 	/**

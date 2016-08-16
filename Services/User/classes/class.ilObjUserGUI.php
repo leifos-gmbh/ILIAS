@@ -1444,7 +1444,11 @@ class ilObjUserGUI extends ilObjectGUI
 		{
 			if($this->isSettingChangeable($field))
 			{
-				$inp = new ilTextInputGUI($lng->txt($field), $field);
+				// #18795
+				$caption = ($field == "title")
+					? "person_title"
+					: $field;
+				$inp = new ilTextInputGUI($lng->txt($caption), $field);
 				$inp->setSize(32);
 				$inp->setMaxLength(32);
 				$inp->setRequired($req);
@@ -2935,7 +2939,7 @@ class ilObjUserGUI extends ilObjectGUI
 		}
 
 		// Append login info only if password has been chacnged
-		if($_POST['passwd'] != '********')
+		if($_POST['passwd'] != '')
 		{
 			$body .= $usr_lang->txt("reg_mail_body_text2")."\n".
 				ILIAS_HTTP_PATH."/login.php?client_id=".$ilias->client_id."\n".

@@ -134,6 +134,7 @@ class ilCourseXMLParser extends ilMDSaxParser implements ilSaxSubsetParser
 				{
 					if(@include_once './Customizing/global/plugins/Services/EventHandling/EventHook/FhoevEvent/classes/class.ilFhoevEventPlugin.php')
 					{
+						include_once './Customizing/global/plugins/Services/EventHandling/EventHook/FhoevEvent/classes/class.ilFhoevEventSettings.php';
 						$settings = ilFhoevEventSettings::getInstance();
 						if($settings->isActive() && $settings->getTemplateId())
 						{

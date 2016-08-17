@@ -1,21 +1,21 @@
 <tr class="{CSS_ROW}">
+	
   <td class="std">
 	<!-- BEGIN multi_bl -->
 	<input type="checkbox" name="member[{VAL_ID}]" value="1" />
 	<input type="hidden" name="id[{VAL_ID}]" value = "1" />
 	<!-- END multi_bl -->
   </td>
+  
+  
   <!-- BEGIN member_specific -->
+  
   <!-- BEGIN img_bl -->
   <td class="std">
 	<img src="{VAL_IMAGE}" title="{TXT_IMAGE}" alt="{TXT_IMAGE}" />
   </td>
   <!-- END img_bl -->
-   <!-- BEGIN type_bl -->
-  <td class="std">
-	 {VAL_TYPE}
-  </td>
-  <!-- END type_bl -->
+  
   <td class="std">
 	 {VAL_NAME}
 	<!-- BEGIN access_warning -->
@@ -24,6 +24,7 @@
 	</div>
 	<!-- END access_warning -->
   </td>
+  
    <!-- BEGIN team_bl -->
   <td class="std small">
 	 <!-- BEGIN team_member_bl --> 
@@ -31,13 +32,18 @@
 	 <!-- END team_member_bl -->
   </td>
   <!-- END team_bl -->
+  
   <!-- BEGIN login_bl -->
   <td class="std">
 	 {VAL_LOGIN}
   </td>
   <!-- END login_bl -->
+  
   <!-- END member_specific -->
+  
+  
   <!-- BEGIN team_specific -->
+  
   <td class="std">	  
 	  <!-- BEGIN team_member -->
 	  {TXT_MEMBER_NAME} 		
@@ -63,12 +69,9 @@
 	  </div>
 	  <!-- END team_info -->
   </td>
+  
   <!-- END team_specific -->
-  <!-- BEGIN member_has_no_team_bl -->
-  <td colspan="3">
-	  &nbsp;
-  </td>
-  <!-- END member_has_no_team_bl -->
+  
   <!-- BEGIN member_has_team_bl -->
   
   <!-- BEGIN submission -->
@@ -98,6 +101,12 @@
 	<input class="form-control" type="text" name="mark[{VAL_ID}]" value="{VAL_MARK}" size="5" maxlength="32" />
   </td>
   <!-- END mark -->
+  
+  <!-- BEGIN no_team_yet_bl -->
+  <td class="std small" colspan="2">
+	&nbsp;
+  </td>
+  <!-- END no_team_yet_bl -->
   
   <!-- BEGIN status_time -->
   <td class="std small">

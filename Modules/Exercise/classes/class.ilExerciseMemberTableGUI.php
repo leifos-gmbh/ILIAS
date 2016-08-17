@@ -125,9 +125,8 @@ class ilExerciseMemberTableGUI extends ilExerciseSubmissionTableGUI
 			}
 		}
 		else
-		{
-			
-			$cols[] = array($this->lng->txt("exc_team"));	
+		{			
+			$cols["name"] = array($this->lng->txt("exc_team"));	
 		}				
 		
 		return $cols;
@@ -145,32 +144,15 @@ class ilExerciseMemberTableGUI extends ilExerciseSubmissionTableGUI
 		}
 		else
 		{			
-			$cols["name"] = array($this->lng->txt("exc_team"));	
+			$cols["name"] = array($this->lng->txt("exc_tbl_team"));	
 		}	
 				
 		if($this->ass->hasActiveIDl())
 		{
-			$cols["idl"] = array($this->lng->txt("exc_individual_deadline"), "idl");	
+			$cols["idl"] = array($this->lng->txt("exc_tbl_individual_deadline"), "idl");	
 		}
 		
 		return $cols;
-	}
-	
-	function getSelectableModeColumns()
-	{
-		$columns = array();
-		
-		$columns["image"] = array(
-				"txt" => $this->lng->txt("image"),
-				"default" => true
-			);
-		
-		$columns["login"] = array(
-				"txt" => $this->lng->txt("login"),
-				"default" => true
-			);
-		
-		return $columns;
 	}
 	
 	protected function fillRow($member)

@@ -56,16 +56,7 @@ class ilExParticipantTableGUI extends ilExerciseSubmissionTableGUI
 		{
 			$this->setDescription('<span class="warning">'.$info[0]['text'].'</span>');
 		}		
-		
-		// see ilExAssignmentEditorGUI
-		$types_map = array(
-			ilExAssignment::TYPE_UPLOAD => $this->lng->txt("exc_type_upload"),
-			ilExAssignment::TYPE_UPLOAD_TEAM => $this->lng->txt("exc_type_upload_team"),
-			ilExAssignment::TYPE_BLOG => $this->lng->txt("exc_type_blog"),
-			ilExAssignment::TYPE_PORTFOLIO => $this->lng->txt("exc_type_portfolio"),
-			ilExAssignment::TYPE_TEXT => $this->lng->txt("exc_type_text"),
-			);
-		
+	
 		$data = array();		
 		foreach(ilExAssignment::getInstancesByExercise($this->exc->getId()) as $ass)
 		{				
@@ -75,8 +66,7 @@ class ilExParticipantTableGUI extends ilExerciseSubmissionTableGUI
 			$submission = new ilExSubmission($ass, $this->user->getId());
 			
 			$row = array(
-				"ass" => $ass,
-				"type" => $types_map[$ass->getType()],
+				"ass" => $ass,			
 				"submission_obj" => $submission,
 				"name" => $ass->getTitle(),
 				"status" => $member_status->getStatus(),
@@ -110,8 +100,7 @@ class ilExParticipantTableGUI extends ilExerciseSubmissionTableGUI
 		$cols = array();
 				
 		$cols["name"] = array($this->lng->txt("exc_assignment"), "name");	
-		$cols["type"] = array($this->lng->txt("type"), "type");	
-		$cols["team_members"] = array($this->lng->txt("exc_team"));			
+		$cols["team_members"] = array($this->lng->txt("exc_tbl_team"));			
 		
 		return $cols;
 	}	

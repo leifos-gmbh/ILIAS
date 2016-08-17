@@ -1240,11 +1240,11 @@ class ilExSubmission
 									
 					if (count($new) <= 0)
 					{
-						$result["files"]["download_txt"] = $lng->txt("exc_download_files");
+						$result["files"]["download_txt"] = $lng->txt("exc_tbl_action_download_files");
 					}
 					else
 					{
-						$result["files"]["download_txt"] = $lng->txt("exc_download_all");
+						$result["files"]["download_txt"] = $lng->txt("exc_tbl_action_download_all_files");
 					}
 					
 					// download new files only
@@ -1253,7 +1253,7 @@ class ilExSubmission
 						$result["files"]["download_new_url"] = 
 							$ilCtrl->getLinkTargetByClass("ilexsubmissionfilegui", "downloadNewReturned");
 						
-						$result["files"]["download_new_txt"] = $lng->txt("exc_download_new");						
+						$result["files"]["download_new_txt"] = $lng->txt("exc_tbl_action_download_new_files");						
 					}
 				}
 				break;
@@ -1276,7 +1276,7 @@ class ilExSubmission
 						$result["files"]["download_url"] = 
 							$ilCtrl->getLinkTargetByClass("ilexsubmissionfilegui", "downloadReturned");
 						
-						$result["files"]["download_txt"] = $lng->txt("exc_download_files");						
+						$result["files"]["download_txt"] = $lng->txt("exc_tbl_action_download_files");						
 					}
 				}
 				break;
@@ -1299,7 +1299,7 @@ class ilExSubmission
 						$result["files"]["download_url"] = 
 							$ilCtrl->getLinkTargetByClass("ilexsubmissionfilegui", "downloadReturned");		
 						
-						$result["files"]["download_txt"] = $lng->txt("exc_download_files");						
+						$result["files"]["download_txt"] = $lng->txt("exc_tbl_action_download_files");						
 					}
 				}
 				break;
@@ -1322,7 +1322,7 @@ class ilExSubmission
 						$result["files"]["download_url"] =
 							$ilCtrl->getLinkTargetByClass("ilexsubmissiontextgui", "showAssignmentText");												
 						
-						$result["files"]["download_txt"] = $lng->txt("exc_text_assignment_show");						
+						$result["files"]["download_txt"] = $lng->txt("exc_tbl_action_text_assignment_show");						
 					}
 				}
 				break;

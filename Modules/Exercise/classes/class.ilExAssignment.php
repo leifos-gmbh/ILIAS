@@ -1526,7 +1526,14 @@ class ilExAssignment
 					rename($file_path, $target);
 										
 					if ($noti_rec_ids)
-					{
+					{						
+						foreach($noti_rec_ids as $user_id)
+						{
+							$member_status = $this->getMemberStatus($user_id);
+							$member_status->setFeedback(true);
+							$member_status->update();
+						}				
+						
 						$a_exc->sendFeedbackFileNotification($file_name, $noti_rec_ids,
 							(int) $this->getId());
 					}

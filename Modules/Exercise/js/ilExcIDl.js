@@ -8,16 +8,17 @@ il.ExcIDl = {
 		il.ExcIDl.initModal();
 	},
 	
-	initModal: function() {			
-		// add row action
-		$("[data-exc-idl]").click(function() {			
-			il.Util.sendAjaxGetRequestToUrl(
-				il.ExcIDl.ajax_url,
-				{idlid: $(this).data("exc-idl")},
-				{},
-				il.ExcIDl.showModal
-			);
-		});			
+	trigger: function(id) {
+		il.Util.sendAjaxGetRequestToUrl(
+			il.ExcIDl.ajax_url,
+			{idlid: id},
+			{},
+			il.ExcIDl.showModal
+		);
+		return false;
+	},
+	
+	initModal: function() {						
 		// add form action
 		$('form[name="ilExcIDlForm"]').submit(function() {			
 			var submit_btn = $(document.activeElement).attr("name");

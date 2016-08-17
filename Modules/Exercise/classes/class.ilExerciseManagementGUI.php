@@ -88,6 +88,13 @@ class ilExerciseManagementGUI
 				$pcommand = $fs_gui->getLastPerformedCommand();					
 				if (is_array($pcommand) && $pcommand["cmd"] == "create_file")
 				{
+					foreach($noti_rec_ids as $user_id)
+					{
+						$member_status = $this->assignment->getMemberStatus($user_id);
+						$member_status->setFeedback(true);
+						$member_status->update();
+					}	
+					
 					$this->exercise->sendFeedbackFileNotification($pcommand["name"], 
 						$noti_rec_ids, $this->assignment->getId());
 				}					 
@@ -919,7 +926,7 @@ class ilExerciseManagementGUI
 						$ass_id, true);
 				}
 				
-				$res = array("result"=>true, "snippet"=>$comment);
+				$res = array("result"=>true, "snippet"=>nl2br($comment));
 			}						
 		}				
 		

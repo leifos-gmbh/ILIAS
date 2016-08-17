@@ -328,6 +328,26 @@ class ilExerciseManagementGUI
 		return;		
 	}
 	
+	function membersApplyObject()
+	{
+		include_once("./Modules/Exercise/classes/class.ilExerciseMemberTableGUI.php");
+		$exc_tab = new ilExerciseMemberTableGUI($this, "members", $this->exercise, $this->assignment->getId());		
+		$exc_tab->resetOffset();
+		$exc_tab->writeFilterToSession();
+		
+		$this->membersObject();
+	}
+	
+	function membersResetObject()
+	{
+		include_once("./Modules/Exercise/classes/class.ilExerciseMemberTableGUI.php");
+		$exc_tab = new ilExerciseMemberTableGUI($this, "members", $this->exercise, $this->assignment->getId());		
+		$exc_tab->resetOffset();
+		$exc_tab->resetFilter();
+		
+		$this->membersObject();
+	}
+	
 	/**
 	 * Save grades
 	 */
@@ -556,6 +576,26 @@ class ilExerciseManagementGUI
 		{
 			ilUtil::sendInfo($this->lng->txt("exc_no_assignments_available"));
 		}
+	}
+	
+	function showParticipantApplyObject()
+	{
+		include_once("./Modules/Exercise/classes/class.ilExParticipantTableGUI.php");
+		$exc_tab = new ilExParticipantTableGUI($this, "showParticipant", $this->exercise, $_GET["part_id"]);		
+		$exc_tab->resetOffset();
+		$exc_tab->writeFilterToSession();
+		
+		$this->showParticipantObject();
+	}
+	
+	function showParticipantResetObject()
+	{
+		include_once("./Modules/Exercise/classes/class.ilExParticipantTableGUI.php");
+		$exc_tab = new ilExParticipantTableGUI($this, "showParticipant", $this->exercise, $_GET["part_id"]);		
+		$exc_tab->resetOffset();
+		$exc_tab->resetFilter();
+		
+		$this->showParticipantObject();
 	}
 	
 	/**
@@ -1070,6 +1110,7 @@ class ilExerciseManagementGUI
 		}
 
 		ilUtil::sendSuccess($this->lng->txt("msg_obj_modified"), true);					
+		$ilCtrl->redirect($this, "members");
 	}
 	
 	function dissolveTeamsObject()
@@ -1104,6 +1145,7 @@ class ilExerciseManagementGUI
 		}
 
 		ilUtil::sendSuccess($this->lng->txt("msg_obj_modified"), true);		
+		$ilCtrl->redirect($this, "members");
 	}
 	
 	function adoptTeamsFromGroupObject(ilPropertyFormGUI $a_form = null)

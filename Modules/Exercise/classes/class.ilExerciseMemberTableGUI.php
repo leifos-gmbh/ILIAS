@@ -31,7 +31,7 @@ class ilExerciseMemberTableGUI extends ilExerciseSubmissionTableGUI
 		
 		$this->setTitle($lng->txt("exc_assignment").": ".$this->ass->getTitle());			
 		$this->setSelectAllCheckbox("member");		
-	}		
+	}
 	
 	protected function parseData()
 	{
@@ -51,6 +51,13 @@ class ilExerciseMemberTableGUI extends ilExerciseSubmissionTableGUI
 			
 			foreach($data as $item)
 			{
+				// filter
+				if($this->filter["status"] &&
+					$item["status"] != $this->filter["status"])
+				{
+					continue;
+				}
+				
 				$team_id = $team_map[$item["usr_id"]];
 								
 				if(!$team_id)
@@ -86,13 +93,40 @@ class ilExerciseMemberTableGUI extends ilExerciseSubmissionTableGUI
 				}				
 			}
 			
+			// filter (team-wide)
+			if($this->filter["name"])
+			{
+				foreach($tmp as $idx => $item)
+				{
+					if(!stristr(implode("", $item["team"]), $this->filter["name"]))
+					{
+						unset($tmp[$idx]);
+					}
+				}
+			}
+			
 			$data = $tmp;
 			unset($tmp);
 		}
 		else
 		{			
 			foreach($data as $idx => $item)
-			{			
+			{	
+				// filter
+				if($this->filter["status"] &&
+					$item["status"] != $this->filter["status"])
+				{
+					unset($data[$idx]);
+					continue;
+				}
+				if($this->filter["name"] &&
+					!stristr($item["name"], $this->filter["name"]) &&
+					!stristr($item["login"], $this->filter["name"]))
+				{
+					unset($data[$idx]);
+					continue;
+				}
+				
 				$data[$idx]["submission_obj"] = new ilExSubmission($this->ass, $item["usr_id"]);
 				
 				if(array_key_exists($item["usr_id"], $idl))

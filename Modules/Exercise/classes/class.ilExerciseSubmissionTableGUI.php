@@ -18,7 +18,8 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 {	
 	protected $exc; // [ilObjExercise]
 	protected $mode; // [int]
-	protected $comment_modals; // [array]
+	protected $filter; // [array]
+	protected $comment_modals = array(); // [array]
 	
 	const MODE_BY_ASSIGNMENT = 1;
 	const MODE_BY_USER = 2;	
@@ -105,10 +106,35 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 			$this->addMultiCommand("confirmDeassignMembers", $this->lng->txt("exc_deassign_members"));	
 		}
 		
+		$this->setFilterCommand($this->getParentCmd()."Apply");
+		$this->setResetCommand($this->getParentCmd()."Reset");
+		
+		$this->initFilter();
 		$this->setData($this->parseData());		
 		
 		include_once "Services/Form/classes/class.ilPropertyFormGUI.php";		
 	}
+					
+	function initFilter()
+	{
+		if($this->mode == self::MODE_BY_ASSIGNMENT)
+		{
+			$item = $this->addFilterItemByMetaType("flt_name", self::FILTER_TEXT, false, $this->lng->txt("name")." / ".$this->lng->txt("login"));
+			$this->filter["name"] = $item->getValue();				
+		}
+		
+		$this->lng->loadLanguageModule("search");
+		$options = array(
+			"" => $this->lng->txt("search_any"),
+			"notgraded" => $this->lng->txt("exc_notgraded"),
+			"passed" => $this->lng->txt("exc_passed"),
+			"failed" => $this->lng->txt("exc_failed")		
+		);
+		
+		$item = $this->addFilterItemByMetaType("flt_status", self::FILTER_SELECT, false, $this->lng->txt("exc_tbl_status"));
+		$item->setOptions($options);
+		$this->filter["status"] = $item->getValue();			
+	}	
 	
 	abstract protected function initMode($a_item_id);
 	
@@ -174,10 +200,11 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 	protected function parseRow($a_user_id, ilExAssignment $a_ass, array $a_row)
 	{
 		global $ilCtrl, $ilAccess;
-				
-		$has_no_team_yet = ($a_ass->hasTeam() &&
-			sizeof($a_row["team"]) < 2);		
 		
+		$has_no_team_yet = ($a_ass->hasTeam() &&
+			!ilExAssignmentTeam::getTeamId($a_ass->getId(), $a_user_id));
+		
+	
 		// static columns
 
 		if($this->mode == self::MODE_BY_ASSIGNMENT)

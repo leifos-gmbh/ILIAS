@@ -35,7 +35,7 @@ class ilExParticipantTableGUI extends ilExerciseSubmissionTableGUI
 					$name["lastname"].", ".$name["firstname"]." [".$name["login"]."]");		
 			}			
 		}				
-		
+
 		$this->setSelectAllCheckbox("ass");				
 	}		
 	
@@ -65,10 +65,17 @@ class ilExParticipantTableGUI extends ilExerciseSubmissionTableGUI
 			// ilExAssignment::getMemberListData()
 			
 			$member_status = $ass->getMemberStatus($this->user->getId());
-			$submission = new ilExSubmission($ass, $this->user->getId());
-			$team_map = ilExAssignmentTeam::getAssignmentTeamMap($ass->getId());
-			$idl = $ass->getIndividualDeadlines();				
+							
+			// filter
+			if($this->filter["status"] &&
+				$member_status->getStatus() != $this->filter["status"])
+			{
+				continue;
+			}			
 			
+			$submission = new ilExSubmission($ass, $this->user->getId());			
+			$idl = $ass->getIndividualDeadlines();		
+		
 			$row = array(
 				"ass" => $ass,			
 				"submission_obj" => $submission,
@@ -85,6 +92,8 @@ class ilExParticipantTableGUI extends ilExerciseSubmissionTableGUI
 			
 			if($ass->hasTeam())
 			{
+				$team_map = ilExAssignmentTeam::getAssignmentTeamMap($ass->getId());
+				
 				$row["team"] = array();
 				foreach($submission->getTeam()->getMembers() as $user_id)
 				{

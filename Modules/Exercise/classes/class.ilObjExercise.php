@@ -361,8 +361,6 @@ class ilObjExercise extends ilObject
 	{
 		global $lng, $ilUser;
 		
-		$a_members = array_keys($a_members);
-		
 		$lng->loadLanguageModule("exc");
 		
 		// subject

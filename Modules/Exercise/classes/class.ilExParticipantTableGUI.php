@@ -17,7 +17,7 @@ class ilExParticipantTableGUI extends ilExerciseSubmissionTableGUI
 	
 	protected function initMode($a_item_id)
 	{				
-		global $lng, $ilCtrl;
+		global $lng;
 		
 		$this->mode = self::MODE_BY_USER;
 		
@@ -36,12 +36,14 @@ class ilExParticipantTableGUI extends ilExerciseSubmissionTableGUI
 			}			
 		}				
 		
-		$this->setSelectAllCheckbox("ass");			
+		$this->setSelectAllCheckbox("ass");				
 	}		
 	
 	protected function parseData()
 	{
 		global $ilAccess, $ilCtrl;
+		
+		$this->addCommandButton("saveStatusParticipant", $this->lng->txt("save"));		
 		
 		// #14650 - invalid user
 		if(!$this->user)
@@ -64,6 +66,8 @@ class ilExParticipantTableGUI extends ilExerciseSubmissionTableGUI
 			
 			$member_status = $ass->getMemberStatus($this->user->getId());
 			$submission = new ilExSubmission($ass, $this->user->getId());
+			$team_map = ilExAssignmentTeam::getAssignmentTeamMap($ass->getId());
+			$idl = $ass->getIndividualDeadlines();				
 			
 			$row = array(
 				"ass" => $ass,			
@@ -87,6 +91,23 @@ class ilExParticipantTableGUI extends ilExerciseSubmissionTableGUI
 					$row["team"][$user_id] = ilObjUser::_lookupFullname($user_id);
 				}
 				asort($row["team"]);
+			
+				$team_id = $team_map[$this->user->getId()];
+				if(is_numeric($team_id))
+				{					
+					$idl_team_id = "t".$team_id;
+					if(array_key_exists($idl_team_id, $idl))
+					{
+						$row["idl"] = $idl[$idl_team_id];	
+					}
+				}
+			}
+			else
+			{
+				if(array_key_exists($this->user->getId(), $idl))
+				{
+					$row["idl"] = $idl[$this->user->getId()];	
+				}
 			}
 			
 			$data[] = $row;
@@ -101,6 +122,7 @@ class ilExParticipantTableGUI extends ilExerciseSubmissionTableGUI
 				
 		$cols["name"] = array($this->lng->txt("exc_assignment"), "name");	
 		$cols["team_members"] = array($this->lng->txt("exc_tbl_team"));			
+		$cols["idl"] = array($this->lng->txt("exc_tbl_individual_deadline"), "idl");	
 		
 		return $cols;
 	}	
@@ -113,6 +135,7 @@ class ilExParticipantTableGUI extends ilExerciseSubmissionTableGUI
 		$ilCtrl->setParameter($this->parent_obj, "ass_id", $a_item["ass"]->getId());
 				
 		// multi-select id
+		$this->tpl->setVariable("NAME_ID", "ass");			
 		$this->tpl->setVariable("VAL_ID", $a_item["ass"]->getId());			
 		
 		$this->parseRow($this->user->getId(), $a_item["ass"], $a_item);									

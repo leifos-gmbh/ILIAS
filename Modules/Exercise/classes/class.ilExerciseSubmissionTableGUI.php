@@ -104,8 +104,6 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 			$this->addMultiCommand("confirmDeassignMembers", $this->lng->txt("exc_deassign_members"));	
 		}
 		
-		$this->addCommandButton("saveStatusAll", $this->lng->txt("exc_save_all"));									
-		
 		$this->setData($this->parseData());		
 		
 		include_once "Services/Form/classes/class.ilPropertyFormGUI.php";		
@@ -402,8 +400,16 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 			}
 		}
 		
-		if($a_ass->hasActiveIDl())
-		{
+		if(!$has_no_team_yet &&
+			$a_ass->hasActiveIDl() &&
+			!$a_ass->hasReadOnlyIDl())
+		{			
+			$idl_id = $a_ass->hasTeam()
+				? "t".ilExAssignmentTeam::getTeamId($a_ass->getId(), $a_user_id)
+				: $a_user_id;		
+			
+			$this->tpl->setVariable("VAL_IDL_ID", $a_ass->getId()."_".$idl_id);
+			
 			$actions->addItem(
 				$this->lng->txt("exc_individual_deadline_action"),
 				"",
@@ -413,7 +419,7 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 				"",
 				"",
 				false,
-				"il.ExcIDl.trigger('".$a_user_id."')"
+				"il.ExcIDl.trigger('".$idl_id."',".$a_ass->getId().")"
 			);		
 		}
 		

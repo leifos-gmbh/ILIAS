@@ -8,10 +8,10 @@ il.ExcIDl = {
 		il.ExcIDl.initModal();
 	},
 	
-	trigger: function(id) {
+	trigger: function(user_id, ass_id) {
 		il.Util.sendAjaxGetRequestToUrl(
 			il.ExcIDl.ajax_url,
-			{idlid: id},
+			{idlid: ass_id+"_"+user_id},
 			{},
 			il.ExcIDl.showModal
 		);
@@ -26,6 +26,7 @@ il.ExcIDl = {
 			{
 				var values = {};
 				var cmd = null;
+				var sel = [];
 				var ids = [];
 				$.each($(this).serializeArray(), function(i, field) {
 					if(submit_btn == "select_cmd2" && field.name == "selected_cmd2")
@@ -39,7 +40,19 @@ il.ExcIDl = {
 					// extract user/team ids
 					if(field.name.substr(0, 6) == "member")
 					{
-						ids.push(field.name.substr(7, field.name.length-8));
+						sel.push(field.name.substr(7, field.name.length-8));
+					}
+					else if(field.name.substr(0, 3) == "ass")
+					{
+						sel.push(field.name.substr(4, field.name.length-5));
+					}
+					else if(field.name.substr(0, 5) == "idlid" && field.value != "")
+					{						
+						var sel_value = field.name.substr(6, field.name.length-7);
+						if(sel.indexOf(sel_value) > -1)
+						{
+							ids.push(field.value);
+						}
 					}
 				});	
 				if(cmd == "setIndividualDeadline" && ids.length)

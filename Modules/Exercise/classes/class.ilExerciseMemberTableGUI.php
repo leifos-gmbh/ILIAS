@@ -30,11 +30,13 @@ class ilExerciseMemberTableGUI extends ilExerciseSubmissionTableGUI
 		$this->ass = new ilExAssignment($a_item_id);
 		
 		$this->setTitle($lng->txt("exc_assignment").": ".$this->ass->getTitle());			
-		$this->setSelectAllCheckbox("member");			
+		$this->setSelectAllCheckbox("member");		
 	}		
 	
 	protected function parseData()
 	{
+		$this->addCommandButton("saveStatusAll", $this->lng->txt("exc_save_all"));													
+		
 		$data = $this->ass->getMemberListData();
 		
 		$idl = $this->ass->getIndividualDeadlines();			
@@ -79,10 +81,9 @@ class ilExerciseMemberTableGUI extends ilExerciseSubmissionTableGUI
 					$idl_team_id = "t".$team_id;
 					if(array_key_exists($idl_team_id, $idl))
 					{
-						$tmp[$team_id]["team_idl"] = $idl[$idl_team_id];	
+						$tmp[$team_id]["idl"] = $idl[$idl_team_id];	
 					}
-				}
-				
+				}				
 			}
 			
 			$data = $tmp;
@@ -165,6 +166,7 @@ class ilExerciseMemberTableGUI extends ilExerciseSubmissionTableGUI
 		$ilCtrl->setParameter($this->parent_obj, "member_id", $member_id);
 						
 		// multi-select id
+		$this->tpl->setVariable("NAME_ID", "member");		
 		$this->tpl->setVariable("VAL_ID", $member_id);			
 
 		$this->parseRow($member_id, $this->ass, $member);

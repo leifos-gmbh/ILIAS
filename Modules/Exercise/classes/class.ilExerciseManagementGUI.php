@@ -285,18 +285,21 @@ class ilExerciseManagementGUI
 					// multi-feedback
 					$ilToolbar->addButton($this->lng->txt("exc_adopt_group_teams"),
 						$this->ctrl->getLinkTarget($this, "adoptTeamsFromGroup"));
+					
+					$ilToolbar->addSeparator();		
 				}
 			}		
-			else
+			else if($this->exercise->hasTutorFeedbackFile())
 			{	
 				// multi-feedback
 				$ilToolbar->addButton($this->lng->txt("exc_multi_feedback"),
 					$this->ctrl->getLinkTarget($this, "showMultiFeedback"));
+				
+				$ilToolbar->addSeparator();		
 			}
 								
 			if(ilExSubmission::hasAnySubmissions($this->assignment->getId()))
-			{
-				$ilToolbar->addSeparator();			
+			{					
 				if($this->assignment->getType() == ilExAssignment::TYPE_TEXT)
 				{
 					$ilToolbar->addFormButton($lng->txt("exc_list_text_assignment"), "listTextAssignment");					

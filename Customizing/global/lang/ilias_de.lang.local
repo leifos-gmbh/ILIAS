@@ -22,3 +22,8 @@ exc#:#exc_tbl_action_feedback_file#:#Feedback per Datei geben
 exc#:#exc_tbl_action_team_log#:#Team-Log anzeigen
 exc#:#exc_tbl_action_peer_review_given#:#Gegebenes Peer-Feedback anzeigen
 exc#:#exc_tbl_action_peer_review_received#:#Erhaltenes Peer-Feedback anzeigen
+exc#:#exc_feedback#:#Feedback
+exc#:#exc_settings_feedback#:#Tutorenfeedback
+exc#:#exc_settings_feedback_text#:#Texteingabe
+exc#:#exc_settings_feedback_mail#:#per Mail
+exc#:#exc_settings_feedback_file#:#Datei

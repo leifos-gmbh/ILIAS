@@ -31,6 +31,13 @@ class ilObjExercise extends ilObject
 	var $instruction;
 	var $certificate_visibility;
 	
+	var $tutor_feedback; // [int]
+	
+	const TUTOR_FEEDBACK_MAIL = 1;
+	const TUTOR_FEEDBACK_TEXT = 2;
+	const TUTOR_FEEDBACK_FILE = 4;
+	
+	
 	/**
 	 * 
 	 * Indicates whether completion by submission is enabled or not
@@ -157,7 +164,31 @@ class ilObjExercise extends ilObject
 			$this->year == (int) date("Y",$this->timestamp);
 
 	}
-
+	
+	function hasTutorFeedbackText()
+	{
+		return $this->tutor_feedback & self::TUTOR_FEEDBACK_TEXT;
+	}
+	
+	function hasTutorFeedbackMail()
+	{
+		return $this->tutor_feedback & self::TUTOR_FEEDBACK_MAIL;
+	}
+	
+	function hasTutorFeedbackFile()
+	{
+		return $this->tutor_feedback & self::TUTOR_FEEDBACK_FILE;
+	}
+	
+	protected function getTutorFeedback()
+	{
+		return $this->tutor_feedback;
+	}
+	
+	public function setTutorFeedback($a_value)
+	{
+		$this->tutor_feedback = $a_value;
+	}
 	
 	function saveData()
 	{
@@ -169,7 +200,7 @@ class ilObjExercise extends ilObject
 			"instruction = ".$ilDB->quote($this->getInstruction()).", ".
 			"time_stamp = ".$ilDB->quote($this->getTimestamp());
 		$this->ilias->db->query($query);*/
-
+		
 		$ilDB->insert("exc_data", array(
 			"obj_id" => array("integer", $this->getId()),
 			"instruction" => array("clob", $this->getInstruction()),
@@ -178,7 +209,8 @@ class ilObjExercise extends ilObject
 			"pass_nr" => array("text", $this->getPassNr()),
 			"show_submissions" => array("integer", (int) $this->getShowSubmissions()),
 			'compl_by_submission' => array('integer', (int)$this->isCompletionBySubmissionEnabled()),
-			"certificate_visibility" => array("integer", (int)$this->getCertificateVisibility())
+			"certificate_visibility" => array("integer", (int)$this->getCertificateVisibility()),
+			"tfeedback" => array("integer", $this->getTutorFeedback())
 			));
 		return true;
 	}
@@ -202,7 +234,8 @@ class ilObjExercise extends ilObject
 	 	$new_obj->saveData();
 	 	$new_obj->setPassNr($this->getPassNr());
 	 	$new_obj->setShowSubmissions($this->getShowSubmissions());
-	 	$new_obj->setCompletionBySubmission($this->isCompletionBySubmissionEnabled());	 
+	 	$new_obj->setCompletionBySubmission($this->isCompletionBySubmissionEnabled());	
+		$new_obj->setTutorFeedback($this->getTutorFeedback());
 	 	$new_obj->update();
 	 	
 		// Copy criteria catalogues
@@ -307,6 +340,7 @@ class ilObjExercise extends ilObject
 			}
 			$this->setCompletionBySubmission($row->compl_by_submission == 1 ? true : false);
 			$this->setCertificateVisibility($row->certificate_visibility);
+			$this->setTutorFeedback($row->tfeedback);
 		}
 		
 		$this->members_obj = new ilExerciseMembers($this);
@@ -341,7 +375,8 @@ class ilObjExercise extends ilObject
 			"pass_mode" => array("text", $this->getPassMode()),
 			"pass_nr" => array("integer", $this->getPassNr()),
 			"show_submissions" => array("integer", (int) $this->getShowSubmissions()),
-			'compl_by_submission' => array('integer', (int)$this->isCompletionBySubmissionEnabled())
+			'compl_by_submission' => array('integer', (int)$this->isCompletionBySubmissionEnabled()),
+			'tfeedback' => array('integer', (int)$this->getTutorFeedback()),
 			), array(
 			"obj_id" => array("integer", $this->getId())
 			));

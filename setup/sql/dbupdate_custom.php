@@ -34,3 +34,15 @@ if(!$ilDB->tableExists('exc_idl'))
 }
 
 ?>
+<#2>
+<?php
+	if (!$ilDB->tableColumnExists('exc_data', 'tfeedback'))
+	{
+		$ilDB->addTableColumn('exc_data', 'tfeedback', array(
+			"type" => "integer",
+			"notnull" => true,
+			"length" => 1,
+			"default" => 7
+		));
+	}
+?>

@@ -84,7 +84,8 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 		$this->setFormName("ilExcIDlForm");
 		$this->addMultiCommand("setIndividualDeadline", $this->lng->txt("exc_individual_deadline_action"));
 	
-		if($this->mode == self::MODE_BY_ASSIGNMENT)
+		if($this->exc->hasTutorFeedbackMail() &&
+			$this->mode == self::MODE_BY_ASSIGNMENT)
 		{
 			$this->addMultiCommand("redirectFeedbackMail", $this->lng->txt("exc_tbl_action_feedback_mail"));
 		}
@@ -152,9 +153,18 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 		$cols["status_time"] = array($this->lng->txt("exc_tbl_status_time"), "status_time");	
 		
 		$cols["sent_time"] = array($this->lng->txt("exc_tbl_sent_time"), "sent_time");	 
-		
-		$cols["feedback_time"] = array($this->lng->txt("exc_tbl_feedback_time"), "feedback_time");	 
-		$cols["comment"] = array($this->lng->txt("exc_tbl_comment"), "comment");		
+			
+		if($this->exc->hasTutorFeedbackText() ||
+			$this->exc->hasTutorFeedbackMail() ||
+			$this->exc->hasTutorFeedbackFile())
+		{
+			$cols["feedback_time"] = array($this->lng->txt("exc_tbl_feedback_time"), "feedback_time");	 
+		}
+				
+		if($this->exc->hasTutorFeedbackText())
+		{
+			$cols["comment"] = array($this->lng->txt("exc_tbl_comment"), "comment");		
+		}
 		
 		$cols["notice"] = array($this->lng->txt("exc_tbl_notice"), "note");	
 		
@@ -254,30 +264,33 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 		
 		// comment modal
 		
-		$comment_id = "excasscomm_".$a_ass->getId()."_".$a_user_id;		
-		
-		$modal = ilModalGUI::getInstance();
-		$modal->setId($comment_id);
-		$modal->setHeading($this->lng->txt("exc_tbl_action_feedback_text"));
-				
-		$lcomment_form = new ilPropertyFormGUI();	
-		$lcomment_form->setId($comment_id);
-		$lcomment_form->setPreventDoubleSubmission(false);
+		if($this->exc->hasTutorFeedbackText())
+		{
+			$comment_id = "excasscomm_".$a_ass->getId()."_".$a_user_id;		
 
-		$lcomment = new ilTextAreaInputGUI($this->lng->txt("exc_comment_for_learner"), "lcomment_".$a_ass->getId()."_".$a_user_id);
-		$lcomment->setInfo($this->lng->txt("exc_comment_for_learner_info"));
-		$lcomment->setValue($a_row["comment"]);
-		$lcomment->setCols(45);
-		$lcomment->setRows(10);			
-		$lcomment_form->addItem($lcomment);
+			$modal = ilModalGUI::getInstance();
+			$modal->setId($comment_id);
+			$modal->setHeading($this->lng->txt("exc_tbl_action_feedback_text"));
 
-		$lcomment_form->addCommandButton("save", $this->lng->txt("save"));
-		// $lcomment_form->addCommandButton("cancel", $lng->txt("cancel"));
-		
-		$modal->setBody($lcomment_form->getHTML());
-				
-		$this->comment_modals[] = $modal->getHTML();
-		unset($modal);
+			$lcomment_form = new ilPropertyFormGUI();	
+			$lcomment_form->setId($comment_id);
+			$lcomment_form->setPreventDoubleSubmission(false);
+
+			$lcomment = new ilTextAreaInputGUI($this->lng->txt("exc_comment_for_learner"), "lcomment_".$a_ass->getId()."_".$a_user_id);
+			$lcomment->setInfo($this->lng->txt("exc_comment_for_learner_info"));
+			$lcomment->setValue($a_row["comment"]);
+			$lcomment->setCols(45);
+			$lcomment->setRows(10);			
+			$lcomment_form->addItem($lcomment);
+
+			$lcomment_form->addCommandButton("save", $this->lng->txt("save"));
+			// $lcomment_form->addCommandButton("cancel", $lng->txt("cancel"));
+
+			$modal->setBody($lcomment_form->getHTML());
+
+			$this->comment_modals[] = $modal->getHTML();
+			unset($modal);
+		}
 						
 		
 		// selectable columns
@@ -424,39 +437,48 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 		}
 		
 		// feedback mail
-		$actions->addItem(
-			$this->lng->txt("exc_tbl_action_feedback_mail"),
-			"",
-			$ilCtrl->getLinkTarget($this->parent_obj, "redirectFeedbackMail")
-		);		
+		if($this->exc->hasTutorFeedbackMail())
+		{
+			$actions->addItem(
+				$this->lng->txt("exc_tbl_action_feedback_mail"),
+				"",
+				$ilCtrl->getLinkTarget($this->parent_obj, "redirectFeedbackMail")
+			);	
+		}
 		
-		// feedback files		
-		include_once("./Modules/Exercise/classes/class.ilFSStorageExercise.php");
-		$storage = new ilFSStorageExercise($this->exc->getId(), $a_ass->getId());
-		$counter = $storage->countFeedbackFiles($a_row["submission_obj"]->getFeedbackId());				
-		$counter = $counter
-			? " (".$counter.")"
-			: "";		
-		$actions->addItem(
-			$this->lng->txt("exc_tbl_action_feedback_file").$counter,
-			"",
-			$ilCtrl->getLinkTargetByClass("ilfilesystemgui", "listFiles")
-		);		
+		// feedback files	
+		if($this->exc->hasTutorFeedbackFile())
+		{
+			include_once("./Modules/Exercise/classes/class.ilFSStorageExercise.php");
+			$storage = new ilFSStorageExercise($this->exc->getId(), $a_ass->getId());
+			$counter = $storage->countFeedbackFiles($a_row["submission_obj"]->getFeedbackId());				
+			$counter = $counter
+				? " (".$counter.")"
+				: "";		
+			$actions->addItem(
+				$this->lng->txt("exc_tbl_action_feedback_file").$counter,
+				"",
+				$ilCtrl->getLinkTargetByClass("ilfilesystemgui", "listFiles")
+			);		
+		}
+
+		// comment (modal - see above)
+		if($this->exc->hasTutorFeedbackText())
+		{
+			$actions->addItem(
+				$this->lng->txt("exc_tbl_action_feedback_text"),
+				"",
+				"#",
+				"",
+				"",
+				"",
+				"",
+				false,
+				"il.ExcManagement.showComment('".$comment_id."')"	
+			);		
+		}
 		
-		// comment (overlay - see above)
-		$actions->addItem(
-			$this->lng->txt("exc_tbl_action_feedback_text"),
-			"",
-			"#",
-			"",
-			"",
-			"",
-			"",
-			false,
-			"il.ExcManagement.showComment('".$comment_id."')"	
-		);		
-		
-		// peer review / rating
+		// peer review 
 		if($peer_review = $a_row["submission_obj"]->getPeerReview())
 		{									
 			$counter = $peer_review->countGivenFeedback(true, $a_user_id);

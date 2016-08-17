@@ -22,3 +22,8 @@ exc#:#exc_tbl_action_feedback_file#:#Give Feedback As File
 exc#:#exc_tbl_action_team_log#:#Show Team Log
 exc#:#exc_tbl_action_peer_review_given#:#Show Given Peer Feedback
 exc#:#exc_tbl_action_peer_review_received#:#Show Received Peer Feedback
+exc#:#exc_feedback#:#Feedback
+exc#:#exc_settings_feedback#:#Tutor Feedback
+exc#:#exc_settings_feedback_text#:#Textinput
+exc#:#exc_settings_feedback_mail#:#By Mail
+exc#:#exc_settings_feedback_file#:#By File

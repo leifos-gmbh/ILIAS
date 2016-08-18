@@ -391,7 +391,7 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 					{
 						foreach($a_row["submission_obj"]->getFiles() as $file)
 						{
-							if(!$file["late"])
+							if($file["late"])
 							{
 								$late = '<div class="warning">'.$this->lng->txt("exc_late_submission").'</div>';
 								break;

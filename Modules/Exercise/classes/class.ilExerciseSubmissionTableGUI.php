@@ -48,6 +48,8 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 		$this->initMode($a_item_id);		
 		
 		parent::__construct($a_parent_obj, $a_parent_cmd);		
+		
+		$this->setShowTemplates(true);
 				
 		$this->setFormAction($ilCtrl->getFormAction($a_parent_obj));	
 		$this->setRowTemplate("tpl.exc_members_row.html", "Modules/Exercise");		
@@ -321,9 +323,10 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 						
 		
 		// selectable columns
-		
+			
 		foreach($this->getSelectedColumns() as $col)
 		{								
+			$late = "";
 			switch($col)
 			{				
 				case "image":
@@ -383,14 +386,27 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 						: "&nbsp;");
 					break;
 								
-				case "submission":									
+				case "submission":			
+					if($a_row["submission_obj"])
+					{
+						foreach($a_row["submission_obj"]->getFiles() as $file)
+						{
+							if(!$file["late"])
+							{
+								$late = '<div class="warning">'.$this->lng->txt("exc_late_submission").'</div>';
+								break;
+							}
+						}						
+					}
+					// fallthrough
+					
 				case "feedback_time":
 				case "status_time":
 				case "sent_time":
 					$this->tpl->setVariable("VAL_".strtoupper($col), 
-						$a_row[$col]
+						($a_row[$col]
 							? ilDatePresentation::formatDate(new ilDateTime($a_row[$col], IL_CAL_DATETIME))
-							: "&nbsp;");
+							: "&nbsp;").$late);
 					break;
 					
 				case "login":

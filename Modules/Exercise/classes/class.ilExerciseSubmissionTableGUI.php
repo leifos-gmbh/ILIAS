@@ -326,7 +326,6 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 			
 		foreach($this->getSelectedColumns() as $col)
 		{								
-			$late = "";
 			switch($col)
 			{				
 				case "image":
@@ -393,7 +392,7 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 						{
 							if($file["late"])
 							{
-								$late = '<div class="warning">'.$this->lng->txt("exc_late_submission").'</div>';
+								$this->tpl->setVariable("TXT_LATE", $this->lng->txt("exc_late_submission"));
 								break;
 							}
 						}						
@@ -404,9 +403,9 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 				case "status_time":
 				case "sent_time":
 					$this->tpl->setVariable("VAL_".strtoupper($col), 
-						($a_row[$col]
+						$a_row[$col]
 							? ilDatePresentation::formatDate(new ilDateTime($a_row[$col], IL_CAL_DATETIME))
-							: "&nbsp;").$late);
+							: "&nbsp;");
 					break;
 					
 				case "login":

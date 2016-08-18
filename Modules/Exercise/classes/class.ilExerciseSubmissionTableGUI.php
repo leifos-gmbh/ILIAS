@@ -24,9 +24,10 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 	const MODE_BY_ASSIGNMENT = 1;
 	const MODE_BY_USER = 2;	
 	
-	const COLS_MANDATORY = array("name", "status", "mark");
-	const COLS_DEFAULT = array("image", "login", "submission_date", "idl");
- 	const COLS_ORDER = array("image", "name", "login", "team_members", 
+	// needs PH P5.6 for array support
+	protected $cols_mandatory = array("name", "status", "mark");
+	protected $cols_default = array("image", "login", "submission_date", "idl");
+ 	protected $cols_order = array("image", "name", "login", "team_members", 
 			"submission", "idl", "status", "mark", "status_time", 
 			"sent_time", "feedback_time", "comment", "notice");
 	
@@ -64,9 +65,9 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 		
 		$selected = $this->getSelectedColumns();
 		$columns = $this->parseColumns();
-		foreach(self::COLS_ORDER as $id)
+		foreach($this->cols_order as $id)
 		{
-			if(in_array($id, self::COLS_MANDATORY) ||
+			if(in_array($id, $this->cols_mandatory) ||
 				in_array($id, $selected))
 			{
 				if(array_key_exists($id, $columns))
@@ -149,9 +150,9 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 		$cols = array();
 		
 		$columns = $this->parseColumns();
-		foreach(self::COLS_ORDER as $id)
+		foreach($this->cols_order as $id)
 		{
-			if(in_array($id, self::COLS_MANDATORY))
+			if(in_array($id, $this->cols_mandatory))
 			{
 				continue;
 			}
@@ -162,7 +163,7 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 			
 				$cols[$id] = array(
 					"txt" => $col[0],
-					"default" => in_array($id, self::COLS_DEFAULT)
+					"default" => in_array($id, $this->cols_default)
 				);
 			}
 		}

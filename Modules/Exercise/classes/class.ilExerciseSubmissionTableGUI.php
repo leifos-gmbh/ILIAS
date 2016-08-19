@@ -25,7 +25,7 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 	const MODE_BY_USER = 2;	
 	
 	// needs PH P5.6 for array support
-	protected $cols_mandatory = array("name", "status", "mark");
+	protected $cols_mandatory = array("name", "status");
 	protected $cols_default = array("image", "login", "submission_date", "idl");
  	protected $cols_order = array("image", "name", "login", "team_members", 
 			"submission", "idl", "status", "mark", "status_time", 
@@ -279,12 +279,7 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 			$this->tpl->setVariable("SEL_".strtoupper($a_row["status"]), ' selected="selected" ');			
 			$this->tpl->setVariable("TXT_NOTGRADED", $this->lng->txt("exc_notgraded"));
 			$this->tpl->setVariable("TXT_PASSED", $this->lng->txt("exc_passed"));
-			$this->tpl->setVariable("TXT_FAILED", $this->lng->txt("exc_failed"));
-
-			// mark
-			$this->tpl->setVariable("VAL_MARK", $a_row["mark"]
-				? ilUtil::prepareFormOutput(trim($a_row["mark"]))
-				: "&nbsp;");		
+			$this->tpl->setVariable("TXT_FAILED", $this->lng->txt("exc_failed"));	
 		}		
 		else
 		{
@@ -372,9 +367,10 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 					break;
 				
 				case "notice":					
+				case "mark":					
 					$this->tpl->setVariable("VAL_".strtoupper($col), $a_row[$col]
 						? ilUtil::prepareFormOutput(trim($a_row[$col]))
-						: "&nbsp;");
+						: "");
 					break;
 					
 				case "comment":							

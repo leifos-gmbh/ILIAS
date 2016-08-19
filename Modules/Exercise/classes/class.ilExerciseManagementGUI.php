@@ -892,9 +892,12 @@ class ilExerciseManagementGUI
 			
 			$data[$ass_id][$member_id] = array(
 				"status" => ilUtil::stripSlashes($_POST["status"][$ass_id])		
-				,"mark" => ilUtil::stripSlashes($_POST["mark"][$ass_id])
 			);
 			
+			if(array_key_exists("mark", $_POST))
+			{
+				$data[$ass_id][$member_id]["mark"] = ilUtil::stripSlashes($_POST["mark"][$ass_id]);
+			}
 			if(array_key_exists("notice", $_POST))
 			{
 				$data[$ass_id][$member_id]["notice"] = ilUtil::stripSlashes($_POST["notice"][$ass_id]);
@@ -918,9 +921,12 @@ class ilExerciseManagementGUI
 			
 			$data[-1][$user_id] = array(
 				"status" => ilUtil::stripSlashes($_POST["status"][$user_id])						
-				,"mark" => ilUtil::stripSlashes($_POST["mark"][$user_id])
 			);
 			
+			if(array_key_exists("mark", $_POST))
+			{
+				$data[-1][$user_id]["mark"] = ilUtil::stripSlashes($_POST["mark"][$user_id]);
+			}			
 			if(array_key_exists("notice", $_POST))
 			{
 				$data[-1][$user_id]["notice"] = ilUtil::stripSlashes($_POST["notice"][$user_id]);
@@ -970,8 +976,11 @@ class ilExerciseManagementGUI
 					$saved_for[$sub_user_id] = $uname["lastname"].", ".$uname["firstname"];					
 
 					$member_status = $ass->getMemberStatus($sub_user_id);
-					$member_status->setStatus($values["status"]);					
-					$member_status->setMark($values["mark"]);					
+					$member_status->setStatus($values["status"]);	
+					if(array_key_exists("mark", $values))
+					{
+						$member_status->setMark($values["mark"]);					
+					}
 					if(array_key_exists("notice", $values))
 					{
 						$member_status->setNotice($values["notice"]);			

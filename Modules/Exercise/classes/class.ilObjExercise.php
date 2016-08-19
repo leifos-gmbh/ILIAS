@@ -31,7 +31,7 @@ class ilObjExercise extends ilObject
 	var $instruction;
 	var $certificate_visibility;
 	
-	var $tutor_feedback; // [int]
+	var $tutor_feedback = 7; // [int]
 	
 	const TUTOR_FEEDBACK_MAIL = 1;
 	const TUTOR_FEEDBACK_TEXT = 2;

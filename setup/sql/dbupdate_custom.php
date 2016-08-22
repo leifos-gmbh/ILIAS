@@ -85,3 +85,12 @@ if($type_id)
 	}
 }
 ?>
+<#13>
+<?php
+include_once('./Services/Migration/DBUpdate_3560/classes/class.ilDBUpdateNewObjectType.php');
+$src_ops_id = ilDBUpdateNewObjectType::getCustomRBACOperationId('write');
+$target_ops_id = ilDBUpdateNewObjectType::getCustomRBACOperationId('news_add_news');
+ilDBUpdateNewObjectType::cloneOperation("crs", $src_ops_id, $target_ops_id);
+ilDBUpdateNewObjectType::cloneOperation("grp", $src_ops_id, $target_ops_id);
+?>
+

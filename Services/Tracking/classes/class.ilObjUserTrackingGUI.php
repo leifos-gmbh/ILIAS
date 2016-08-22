@@ -462,7 +462,10 @@ class ilObjUserTrackingGUI extends ilObjectGUI
 			{
 				if(ilObjectLP::isSupportedObjectType($type))
 				{					
-					$res[$type] = $form->getInput("def_".$type);
+					$mode =  $form->getInput("def_".$type);
+					$res[$type] = $mode
+						? $mode
+						: ilLPObjSettings::LP_MODE_DEACTIVATED;
 				}			
 			}
 			

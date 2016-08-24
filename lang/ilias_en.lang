@@ -16210,3 +16210,5 @@ ccmt#:#ccmt_print_table_column_cmplcert_expiration_date#:#Certificate valid unti
 ccmt#:#ccmt_search_no_user_found#:#Unfortunately no hits found for your search.
 ccmt#:#ccmt_export_writer_Excel5#:#Excel 2003
 ccmt#:#ccmt_export_writer_Excel2007#:#Excel 2007
+awrn#:#awrn_use_osd#:#Popup Online Users
+awrn#:#awrn_use_osd_info#:#Display a popup to indicate new online users in the ‘Who is online?’ list.

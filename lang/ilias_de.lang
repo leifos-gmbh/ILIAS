@@ -16266,3 +16266,5 @@ bot#:#bot_toolbar_export#:#Export erzeugen
 bot#:#bot_toolbar_submit_create_report_screen#:#Bericht erzeugen
 bot#:#bot_month#:#%s Monat
 bot#:#bot_months#:#%s Monate
+awrn#:#awrn_use_osd#:#Popup Online-Benutzer
+awrn#:#awrn_use_osd_info#:#Zeigt ein Popup an, wenn neue Benutzer in der „Wer ist online?“-Anzeige mit dem Online-Status erscheinen.

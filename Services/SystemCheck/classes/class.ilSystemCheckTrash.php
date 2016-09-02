@@ -11,7 +11,8 @@ class ilSystemCheckTrash
 	private $limit_number = 0;
 	private $limit_age = null;
 	private $limit_types = array();
-	
+
+	private $mode = self::MODE_TRASH_REMOVE;
 	
 	public function __construct()
 	{

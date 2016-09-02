@@ -239,20 +239,23 @@ class ilRTE
 		switch ($a_direction)
 		{
 			case 0:
-				$a_text = preg_replace("/src\=\"(.*?\/mobs\/mm_([0-9]+)\/.*?)\"/", "src=\"il_" . $nic . "_mob_" . "\\2" . "\"", $a_text);
+				$a_text = preg_replace('/src="([^"]*?\/mobs\/mm_([0-9]+)\/.*?)\"/', 'src="il_' . IL_INST_ID . '_mob_\\2"', $a_text);
 				break;
 			default:
 				include_once("./Services/MediaObjects/classes/class.ilObjMediaObject.php");
 				$resulttext = $a_text;
-				if (preg_match_all("/src\=\"il_([0-9]+)_mob_([0-9]+)\"/", $a_text, $matches))
+				if(preg_match_all('/src="il_([0-9]+)_mob_([0-9]+)"/', $a_text, $matches))
 				{
 					foreach ($matches[2] as $idx => $mob)
 					{
 						if (ilObjMediaObject::_exists($mob))
 						{
-							$mob_obj =& new ilObjMediaObject($mob);
+							$mob_obj = new ilObjMediaObject($mob);
 							$replace = "il_" . $matches[1][$idx] . "_mob_" . $mob;
-							$resulttext = str_replace("src=\"$replace\"", "src=\"" . ILIAS_HTTP_PATH . "/data/" . CLIENT_ID . "/mobs/mm_" . $mob . "/" . $mob_obj->getTitle() . "\"", $resulttext);
+
+							require_once('./Services/WebAccessChecker/classes/class.ilWACSignedPath.php');
+							$path_to_file = ilWACSignedPath::signFile(ILIAS_HTTP_PATH . "/data/" . CLIENT_ID . "/mobs/mm_" . $mob . "/" . $mob_obj->getTitle());
+							$resulttext = str_replace("src=\"$replace\"", "src=\"" . $path_to_file . "\"", $resulttext);
 						}
 					}
 				}
@@ -278,7 +281,7 @@ class ilRTE
 		switch ($a_direction)
 		{
 			case 0:
-				if(preg_match_all("/src\=\"(.*?\/mobs\/mm_([0-9]+)\/.*?)\"/", $a_text, $matches))
+				if(preg_match_all('/src="([^"]*?\/mobs\/mm_([0-9]+)\/.*?)\"/', $a_text, $matches))
 				{
 					foreach ($matches[2] as $idx => $mob)
 					{
@@ -290,8 +293,7 @@ class ilRTE
 				}
 				break;
 			default:
-				
-				if(preg_match_all("/src\=\"il_([0-9]+)_mob_([0-9]+)\"/", $a_text, $matches))
+				if(preg_match_all('/src="il_([0-9]+)_mob_([0-9]+)"/', $a_text, $matches))
 				{
 					foreach ($matches[2] as $idx => $mob)
 					{

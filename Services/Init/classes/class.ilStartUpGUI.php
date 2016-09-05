@@ -810,7 +810,8 @@ class ilStartUpGUI
 			$rtpl->parseCurrentBlock();
 		}
 
-		if ($ilSetting->get("pub_section") &&
+		include_once './Services/Init/classes/class.ilPublicSectionSettings.php';		
+		if (ilPublicSectionSettings::getInstance()->isEnabledForDomain($_SERVER['SERVER_NAME']) &&
 			$ilAccess->checkAccessOfUser(ANONYMOUS_USER_ID, "read", "", ROOT_FOLDER_ID))
 		{
 			$rtpl->setCurrentBlock("homelink");
@@ -1112,7 +1113,8 @@ class ilStartUpGUI
 		//instantiate logout template
 		self::initStartUpTemplate("tpl.logout.html");
 		
-		if ($ilSetting->get("pub_section"))
+		include_once './Services/Init/classes/class.ilPublicSectionSettings.php';		
+		if (ilPublicSectionSettings::getInstance()->isEnabledForDomain($_SERVER['SERVER_NAME']))
 		{
 			$tpl->setCurrentBlock("homelink");
 			$tpl->setVariable("CLIENT_ID","?client_id=".$client_id."&lang=".$lng->getLangKey());
@@ -1438,7 +1440,10 @@ class ilStartUpGUI
 		// && $ilAuth->status == -101 is important for soap auth (public section on + user mapping, alex)
 		// $ilAuth->status -1 is given, if session ends (if public section -> jump to public section)
 
-		if ($ilSetting->get("pub_section") && $_POST["sendLogin"] != "1"
+		include_once './Services/Init/classes/class.ilPublicSectionSettings.php';		
+		if (ilPublicSectionSettings::getInstance()->isEnabledForDomain($_SERVER['SERVER_NAME']))
+		
+		if (ilPublicSectionSettings::getInstance()->isEnabledForDomain($_SERVER['SERVER_NAME']) && $_POST["sendLogin"] != "1"
 			&& ($ilAuth->getStatus() != -101 && $_GET["soap_pw"] == ""))
 		{
 			ilInitialisation::goToPublicSection();
@@ -1896,7 +1901,8 @@ class ilStartUpGUI
 			$tpl->setVariable('LINK_URL', 'login.php?cmd=force_login&'.$param);
 			$tpl->parseCurrentBlock();
 
-			if($ilSetting->get('pub_section') &&
+			include_once './Services/Init/classes/class.ilPublicSectionSettings.php';
+			if(ilPublicSectionSettings::getInstance()->isEnabledForDomain($_SERVER['SERVER_NAME']) &&
 				$ilAccess->checkAccessOfUser(ANONYMOUS_USER_ID, 'read', '', ROOT_FOLDER_ID))
 			{
 				$tpl->setVariable('LINK_URL', 'index.php?'.$param);

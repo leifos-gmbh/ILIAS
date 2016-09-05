@@ -1207,7 +1207,8 @@ class ilInitialisation
 
 		$status = $ilAuth->getStatus();
 
-		if($ilSetting->get('pub_section') &&
+		include_once './Services/Init/classes/class.ilPublicSectionSettings.php';
+		if(ilPublicSectionSettings::getInstance()->isEnabledForDomain($_SERVER['SERVER_NAME']) &&
 			($status == '' || $status == AUTH_EXPIRED || $status == AUTH_IDLED) &&
 			$_GET['reloadpublic'] != '1'
 		)

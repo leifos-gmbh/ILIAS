@@ -1243,9 +1243,17 @@ class ilObjSystemFolderGUI extends ilObjectGUI
 			
 			$public_section = ilPublicSectionSettings::getInstance();
 			$public_section->setEnabled($this->form->getInput('pub_section'));
-			$public_section->setDomains((array) $this->form->getInput('public_section_domains'));
 			
-			ilLoggerFactory::getLogger('root')->dump($this->form->getInput('public_section_domains'),  ilLogLevel::DEBUG);
+			$domains = array();
+			foreach((array) $this->form->getInput('public_section_domains') as $domain)
+			{
+				if(strlen(trim($domain)))
+				{
+					$domains[] = $domain;
+				}
+			}
+			$public_section->setDomains($domains);
+			ilLoggerFactory::getLogger('root')->dump($domains, ilLogLevel::DEBUG);
 			
 			$public_section->save();
 			

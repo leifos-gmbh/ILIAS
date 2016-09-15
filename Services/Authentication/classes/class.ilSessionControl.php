@@ -97,7 +97,13 @@ class ilSessionControl
 		// authenticated user or a anonymous user
 		// when the session dataset has allready been deleted
 
-		if(!$ilSetting->get("pub_section"))
+		include_once './Services/Init/classes/class.ilPublicSectionSettings.php';
+		$pub_settings = ilPublicSectionSettings::getInstance();
+		$pub_enabled = $pub_settings->isEnabledForDomain($_SERVER['SERVER_NAME']);
+		
+		ilLoggerFactory::getLogger('auth')->debug('Public section enabled: ' . $pub_enabled);
+		
+		if(!$pub_enabled)
 		{
 			global $lng;
 

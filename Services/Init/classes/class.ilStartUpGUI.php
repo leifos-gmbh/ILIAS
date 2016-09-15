@@ -36,6 +36,8 @@ class ilStartUpGUI
 		
 		$cmd = $this->ctrl->getCmd("processIndexPHP",array('processIndexPHP','showLogin'));
 		$next_class = $this->ctrl->getNextClass($this);
+		
+		ilLoggerFactory::getLogger('auth')->debug($next_class.' ' . $cmd);
 
 		switch($next_class)
 		{
@@ -1439,10 +1441,7 @@ class ilStartUpGUI
 		//
 		// && $ilAuth->status == -101 is important for soap auth (public section on + user mapping, alex)
 		// $ilAuth->status -1 is given, if session ends (if public section -> jump to public section)
-
 		include_once './Services/Init/classes/class.ilPublicSectionSettings.php';		
-		if (ilPublicSectionSettings::getInstance()->isEnabledForDomain($_SERVER['SERVER_NAME']))
-		
 		if (ilPublicSectionSettings::getInstance()->isEnabledForDomain($_SERVER['SERVER_NAME']) && $_POST["sendLogin"] != "1"
 			&& ($ilAuth->getStatus() != -101 && $_GET["soap_pw"] == ""))
 		{

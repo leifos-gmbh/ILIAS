@@ -178,6 +178,17 @@ class ilMainMenuGUI
 		{		
 			$this->tpl->setVariable("HEADER_URL", $this->getHeaderURL());
 			$this->tpl->setVariable("HEADER_ICON", ilUtil::getImagePath("HeaderIcon.svg"));
+			
+			// #15759
+			include_once("./Modules/SystemFolder/classes/class.ilObjSystemFolder.php");
+			$header_top_title = ilObjSystemFolder::_getHeaderTitle();
+			if (trim($header_top_title) != "" && $this->tpl->blockExists("header_top_title"))
+			{
+				$this->tpl->setCurrentBlock("header_top_title");
+				$this->tpl->setVariable("TXT_HEADER_TITLE", $header_top_title);
+				$this->tpl->parseCurrentBlock();
+			}
+			
 			return;
 		}
 
@@ -830,18 +841,30 @@ class ilMainMenuGUI
 		return $this->tpl->get();
 	}
 	
+	/**
+	 * Init member view
+	 * @global type $lng
+	 */
 	protected function initMemberView()
 	{
 		global $lng;
-		
+
+		include_once './Services/Container/classes/class.ilMemberViewSettings.php';
+		$ref_id = ilMemberViewSettings::getInstance()->getCurrentRefId();
+
+		if(!$ref_id)
+		{
+			return FALSE;
+		}	
+			
 		include_once './Services/Link/classes/class.ilLink.php';
 		$url = ilLink::_getLink(
-			(int) $_GET['ref_id'],
-			ilObject::_lookupType(ilObject::_lookupObjId((int) $_GET['ref_id'])),
+			$ref_id,
+			ilObject::_lookupType(ilObject::_lookupObjId($ref_id)),
 			array('mv' => 0));
-		
+
 		$this->setMode(self::MODE_TOPBAR_MEMBERVIEW);
-		$this->setTopBarBack($url, $lng->txt('mem_view_close'));				
+		$this->setTopBarBack($url, $lng->txt('mem_view_close'));
 	}
 
 	/**

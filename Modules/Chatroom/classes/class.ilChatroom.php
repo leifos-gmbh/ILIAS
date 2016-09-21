@@ -1065,7 +1065,10 @@ class ilChatroom
 	public function listUsersInPrivateRoom($private_room_id) {
 		global $ilDB;
 
-		$query	= 'SELECT user_id FROM ' . self::$privateSessionsTable . ' WHERE proom_id = %s AND disconnected = 0 OR disconnected IS NULL';
+		$query	= '
+			SELECT chatroom_users.user_id FROM ' . self::$privateSessionsTable . '
+			INNER JOIN chatroom_users ON chatroom_users.user_id = ' . self::$privateSessionsTable . '.user_id WHERE proom_id = %s AND disconnected = 0
+		';
 		$types	= array('integer');
 		$values = array($private_room_id);
 		$rset	= $ilDB->queryF( $query, $types, $values );
@@ -1073,10 +1076,10 @@ class ilChatroom
 		$users = array();
 
 		while ($row = $ilDB->fetchAssoc($rset)) {
-			$users[] = $row['user_id'];
+			$users[$row['user_id']] = $row['user_id'];
 		}
 
-		return $users;
+		return array_values($users);
 	}
 
 	public function userIsInPrivateRoom($room_id, $user_id)
@@ -1178,7 +1181,14 @@ class ilChatroom
 	public static function findDeletablePrivateRooms() {
 		global $ilDB;
 
-		$query = 'SELECT private_rooms.proom_id id, MIN(disconnected) min_disconnected, MAX(disconnected) max_disconnected FROM ' . self::$privateSessionsTable . ' private_sessions INNER JOIN '.self::$privateRoomsTable.' private_rooms ON private_sessions.proom_id = private_rooms.proom_id WHERE closed = 0 GROUP BY private_rooms.proom_id HAVING min_disconnected > 0 AND max_disconnected < %s';
+		$query = '
+			SELECT private_rooms.proom_id id, MIN(disconnected) min_disconnected, MAX(disconnected) max_disconnected
+			FROM ' . self::$privateSessionsTable . ' private_sessions
+			INNER JOIN '.self::$privateRoomsTable.' private_rooms
+				ON private_sessions.proom_id = private_rooms.proom_id
+			WHERE closed = 0
+			GROUP BY private_rooms.proom_id
+			HAVING MIN(disconnected) > 0 AND MAX(disconnected) < %s';
 		$rset = $ilDB->queryF(
 		$query,
 		array('integer'),
@@ -1188,7 +1198,7 @@ class ilChatroom
 		$rooms = array();
 
 		while ($row = $ilDB->fetchAssoc($rset)) {
-			$rooms[] = $row['id'];
+			$rooms[$row['id']] = $row['id'];
 		}
 
 		$query = 'SELECT DISTINCT proom_id, room_id, object_id FROM ' . self::$privateRoomsTable
@@ -1388,7 +1398,7 @@ public function getLastMessages($number, $chatuser = null) {
 	
 	if ($sub_room) {
 	    $ilDB->queryF(
-		    'DELETE FROM ' . self::$sessionTable . ' WHERE proom_id = %s AND disconnected < %s',
+		    'DELETE FROM ' . self::$privateSessionsTable . ' WHERE proom_id = %s AND disconnected < %s',
 		    array('integer', 'integer'),
 		    array($sub_room, time())
 	    );

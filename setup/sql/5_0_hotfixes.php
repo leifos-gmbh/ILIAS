@@ -65,3 +65,180 @@ $ilDB->manipulate("UPDATE tst_active SET last_finished_pass = (tries - 1) WHERE 
 <?php
 	$ilCtrlStructureReader->getStructure();
 ?>
+<#8>
+<?php
+
+if($ilDB->tableExists('sysc_groups'))
+{
+	$ilDB->dropTable('sysc_groups');
+}
+
+if(!$ilDB->tableExists('sysc_groups'))
+{
+	$fields = array (
+    'id'    => array(
+    		'type' => 'integer',
+    		'length'  => 4,
+    		'notnull' => true),
+	'component' => array(
+			"type" => "text",
+			"notnull" => false,
+		 	"length" => 16,
+		 	"fixed" => true),
+
+	'last_update' => array(
+			"type" => "timestamp",
+			"notnull" => false),
+		
+	'status' => array(
+			"type" => "integer",
+			"notnull" => true,
+			'length' => 1,
+			'default' => 0)
+	  );
+  $ilDB->createTable('sysc_groups', $fields);
+  $ilDB->addPrimaryKey('sysc_groups', array('id'));
+  $ilDB->createSequence("sysc_groups");
+}
+?>
+<#9>
+<?php
+
+if(!$ilDB->tableExists('sysc_tasks'))
+{
+	$fields = array (
+    'id'    => array(
+    		'type' => 'integer',
+    		'length'  => 4,
+    		'notnull' => true),
+	'grp_id' => array(
+			"type" => "integer",
+			"notnull" => TRUE,
+		 	"length" => 4),
+
+	'last_update' => array(
+			"type" => "timestamp",
+			"notnull" => false),
+		
+	'status' => array(
+			"type" => "integer",
+			"notnull" => true,
+			'length' => 1,
+			'default' => 0),
+	'identifier' => array(
+			"type" => "text",
+			"notnull" => FALSE,
+			'length' => 64)
+	  );
+	$ilDB->createTable('sysc_tasks', $fields);
+	$ilDB->addPrimaryKey('sysc_tasks', array('id'));
+	$ilDB->createSequence("sysc_tasks");
+}
+?>
+<#10>
+<?php
+	$ilDB->modifyTableColumn('il_dcl_field', 'description', array("type" => "clob"));
+?>
+<#11>
+<?php
+	$ilCtrlStructureReader->getStructure();
+?>
+<#12>
+<?php
+	if(!$ilDB->indexExistsByFields('page_question',array('question_id')))
+	{
+		$ilDB->addIndex('page_question',array('question_id'),'i2');
+	}
+?>
+<#13>
+<?php
+	if(!$ilDB->indexExistsByFields('help_tooltip', array('tt_id', 'module_id')))
+	{
+		$ilDB->addIndex('help_tooltip', array('tt_id', 'module_id'), 'i1');
+	}
+?>
+<#14>
+<?php
+$delQuery = "
+	DELETE FROM tax_node_assignment
+	WHERE node_id = %s
+	AND component = %s
+	AND obj_id = %s
+	AND item_type = %s
+	AND item_id = %s
+";
+
+$types = array('integer', 'text', 'integer', 'text', 'integer');
+
+$selQuery = "
+	SELECT tax_node_assignment.* FROM tax_node_assignment
+	LEFT JOIN qpl_questions ON question_id = item_id
+	WHERE component = %s
+	AND item_type = %s
+	AND question_id IS NULL
+";
+
+$res = $ilDB->queryF($selQuery, array('text', 'text'), array('qpl', 'quest'));
+
+while($row = $ilDB->fetchAssoc($res))
+{
+	$ilDB->manipulateF($delQuery, $types, array(
+		$row['node_id'], $row['component'], $row['obj_id'], $row['item_type'], $row['item_id']
+	));
+}
+?>
+<#15>
+<?php
+if(!$ilDB->indexExistsByFields('il_qpl_qst_fq_unit',array('question_fi')))
+{
+	$ilDB->addIndex('il_qpl_qst_fq_unit',array('question_fi'), 'i2');
+}
+?>
+<#16>
+<?php
+if(!$ilDB->indexExistsByFields('usr_data_multi',array('usr_id')))
+{
+	$ilDB->addIndex('usr_data_multi',array('usr_id'), 'i1');
+}
+?>
+<#17>
+<?php
+include_once('./Services/Migration/DBUpdate_3560/classes/class.ilDBUpdateNewObjectType.php');
+$tgt_ops_id = ilDBUpdateNewObjectType::getCustomRBACOperationId('copy');
+if($tgt_ops_id)
+{
+	$mep_type_id = ilDBUpdateNewObjectType::getObjectTypeId('mep');
+	if($mep_type_id)
+	{
+		if (!ilDBUpdateNewObjectType::isRBACOperation($mep_type_id, $tgt_ops_id))
+		{
+			// add "copy" to (external) feed
+			ilDBUpdateNewObjectType::addRBACOperation($mep_type_id, $tgt_ops_id);
+
+			// clone settings from "write" to "copy"
+			$src_ops_id = ilDBUpdateNewObjectType::getCustomRBACOperationId('write');
+			ilDBUpdateNewObjectType::cloneOperation('mep', $src_ops_id, $tgt_ops_id);
+		}
+	}
+}
+?>
+<#18>
+<?php
+require_once 'Services/Password/classes/class.ilPasswordUtils.php';
+$salt_location = CLIENT_DATA_DIR . '/pwsalt.txt';
+if(!is_file($salt_location) || !is_readable($salt_location))
+{
+	$result = @file_put_contents(
+		$salt_location,
+		substr(str_replace('+', '.', base64_encode(ilPasswordUtils::getBytes(16))), 0, 22)
+	);
+	if(!$result)
+	{
+		die("Could not create the client salt for bcrypt password hashing.");
+	}
+}
+if(!is_file($salt_location) || !is_readable($salt_location))
+{
+	die("Could not determine the client salt for bcrypt password hashing.");
+}
+?>

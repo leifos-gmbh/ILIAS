@@ -370,7 +370,7 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 		// copy XHTML media objects
 		$clone->copyXHTMLMediaObjectsOfQuestion($this_id);
 		// duplicate the image
-		$clone->duplicateImages($this_id, $thisObjId);
+		$clone->duplicateImages($this_id, $thisObjId, $clone->getId(), $testObjId);
 
 		$clone->onDuplicate($thisObjId, $this_id, $clone->getObjId(), $clone->getId());
 		
@@ -1461,8 +1461,8 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 		$result['matching_mode'] = $this->getMatchingMode();
 		$result['shuffle'] = true;
 		$result['feedback'] = array(
-			"onenotcorrect" => $this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), false),
-			"allcorrect" => $this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), true)
+			'onenotcorrect' => $this->formatSAQuestion($this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), false)),
+			'allcorrect' => $this->formatSAQuestion($this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), true))
 		);
 				
 		$terms = array();
@@ -1522,6 +1522,16 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 		$result['reset_button_label'] = $lng->txt("reset_terms");
 
 		return json_encode($result);
+	}
+	
+	public function supportsJavascriptOutput()
+	{
+		return true;
+	}
+
+	public function supportsNonJsOutput()
+	{
+		return false;
 	}
 
 	public function setMatchingMode($matchingMode)
@@ -1665,6 +1675,24 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 		else
 		{
 			return $this->getMatchingPairs();
+		}
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	protected function afterSyncWithOriginal($origQuestionId, $dupQuestionId, $origParentObjId, $dupParentObjId)
+	{
+		parent::afterSyncWithOriginal($origQuestionId, $dupQuestionId, $origParentObjId, $dupParentObjId);
+
+		$origImagePath = $this->buildImagePath($origQuestionId, $origParentObjId);
+		$dupImagePath  = $this->buildImagePath($dupQuestionId, $dupParentObjId);
+
+		ilUtil::delDir($origImagePath);
+		if(is_dir($dupImagePath))
+		{
+			ilUtil::makeDirParents($origImagePath);
+			ilUtil::rCopy($dupImagePath, $origImagePath);
 		}
 	}
 }

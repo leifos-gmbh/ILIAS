@@ -74,7 +74,9 @@ class ilTestParticipantData
 						ta.user_fi user_id,
 						ta.anonymous_id,
 						ud.firstname,
-						ud.lastname
+						ud.lastname,
+						ud.login,
+						ud.matriculation
 			FROM		tst_active ta
 			LEFT JOIN	usr_data ud
 			ON 			ud.usr_id = ta.user_fi
@@ -164,6 +166,11 @@ class ilTestParticipantData
 	{
 		return $this->byActiveId[$activeId]['user_id'];
 	}
+
+	public function getActiveIdByUserId($userId)
+	{
+		return $this->byUserId[$userId]['active_id'];
+	}
 	
 	public function getConcatedFullnameByActiveId($activeId)
 	{
@@ -209,5 +216,15 @@ class ilTestParticipantData
 		}
 		
 		return $anonymousActiveIds;
+	}
+	
+	public function getUserDataByActiveId($activeId)
+	{
+		if( isset($this->byActiveId[$activeId]) )
+		{
+			return $this->byActiveId[$activeId];
+		}
+		
+		return null;
 	}
 }

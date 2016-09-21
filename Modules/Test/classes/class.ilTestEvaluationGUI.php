@@ -973,7 +973,7 @@ class ilTestEvaluationGUI extends ilTestServiceGUI
 		$toolbar->build();
 		$template->setVariable('RESULTS_TOOLBAR', $this->ctrl->getHTML($toolbar));
 
-		$overview = $this->getPassOverview($active_id, "iltestevaluationgui", "outParticipantsPassDetails");
+		$overview = $this->getPassOverview($active_id, "iltestevaluationgui", "outParticipantsPassDetails", false, false, true);
 		$template->setVariable("PASS_OVERVIEW", $overview);
 
 		$user_id = $this->object->_getUserIdFromActiveId($active_id);
@@ -1054,12 +1054,12 @@ class ilTestEvaluationGUI extends ilTestServiceGUI
 
 		if( !$this->object->getShowPassDetails() )
 		{
-			$executable = $this->object->isExecutable($testSession, $ilUser->getId());
+			#$executable = $this->object->isExecutable($testSession, $ilUser->getId());
 
-			if($executable["executable"])
-			{
+			#if($executable["executable"])
+			#{
 				$this->ctrl->redirectByClass("ilobjtestgui", "infoScreen");
-			}
+			#}
 		}
 
 		$active_id = $testSession->getActiveId();
@@ -1211,11 +1211,11 @@ class ilTestEvaluationGUI extends ilTestServiceGUI
 		$templatehead->setVariable('RESULTS_TOOLBAR', $this->ctrl->getHTML($toolbar));
 
 		$hide_details = !$this->object->getShowPassDetails();
-		if ($hide_details)
-		{
-			$executable = $this->object->isExecutable($testSession, $ilUser->getId());
-			if (!$executable["executable"]) $hide_details = FALSE;
-		}
+		#if ($hide_details)
+		#{
+		#	$executable = $this->object->isExecutable($testSession, $ilUser->getId());
+		#	if (!$executable["executable"]) $hide_details = FALSE;
+		#}
 
 		$template->setCurrentBlock("pass_overview");
 		$overview = $this->getPassOverview($active_id, "iltestevaluationgui", "outUserPassDetails", FALSE, $hide_details);
@@ -1859,14 +1859,25 @@ class ilTestEvaluationGUI extends ilTestServiceGUI
 	{
 		global $ilDB, $ilPluginAdmin;
 
+		$testResults = $this->object->getTestResult($active_id, $pass);
+		$questionIds = array();
+		foreach($testResults as $resultItemKey => $resultItemValue)
+		{
+			if($resultItemKey === 'test' || $resultItemKey === 'pass')
+			{
+				continue;
+			}
+
+			$questionIds[] = $resultItemValue['qid'];
+		}
+
 		$table_gui = $this->buildPassDetailsOverviewTableGUI($this, 'outUserPassDetails');
 		$table_gui->initFilter();
 
 		require_once 'Modules/TestQuestionPool/classes/class.ilAssQuestionList.php';
-		$questionList = new ilAssQuestionList($ilDB, $this->lng, $ilPluginAdmin, $this->object->getId());
-
-		$questionList->setParentObjectType('tst');
-		$questionList->setQuestionInstanceTypeFilter(ilAssQuestionList::QUESTION_INSTANCE_TYPE_DUPLICATES);
+		$questionList = new ilAssQuestionList($ilDB, $this->lng, $ilPluginAdmin, null);
+		$questionList->setQuestionIdsFilter($questionIds);
+		$questionList->setQuestionInstanceTypeFilter(null);
 
 		foreach ($table_gui->getFilterItems() as $item)
 		{
@@ -1892,7 +1903,7 @@ class ilTestEvaluationGUI extends ilTestServiceGUI
 
 		$filteredTestResult = array();
 
-		foreach($this->object->getTestResult($active_id, $pass) as $resultItemKey => $resultItemValue)
+		foreach($testResults as $resultItemKey => $resultItemValue)
 		{
 			if($resultItemKey === 'test' || $resultItemKey === 'pass')
 			{

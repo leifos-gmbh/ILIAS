@@ -2056,7 +2056,7 @@ class ilUtil
 	* @static
 	* 
 	*/
-	public static function img($a_src, $a_alt = "", $a_width = "", $a_height = "", $a_border = 0, $a_id = "")
+	public static function img($a_src, $a_alt = "", $a_width = "", $a_height = "", $a_border = 0, $a_id = "", $a_class = "")
 	{
 		$img = '<img src="'.$a_src.'"';
 		if ($a_alt != "")
@@ -2070,6 +2070,10 @@ class ilUtil
 		if ($a_height != "")
 		{
 			$img.= ' height="'.$a_height.'"';
+		}
+		if ($a_class != "")
+		{
+			$img.= ' class="'.$a_class.'"';
 		}
 		if ($a_id != "")
 		{
@@ -3506,6 +3510,7 @@ class ilUtil
 		switch($a_desired_type)
 		{
 			case "jpg":
+			case "jpeg":
 			if ($im_types & IMG_JPG) return "jpg";
 			if ($im_types & IMG_GIF) return "gif";
 			if ($im_types & IMG_PNG) return "png";
@@ -4631,98 +4636,60 @@ class ilUtil
 	}
 
 	/**
-	* Return an array of date segments.
+	* Return a string of time period
 	*
-	* @param	  int $seconds Number of seconds to be parsed
-	* @return	 mixed An array containing named segments
-	* @static
-	* 
-	*/
-	public static function int2array ($seconds, $periods = null)
-	{
-		// Define time periods
-		if (!is_array($periods))
-		{
-			$periods = array (
-			'years'	=> 31536000,
-			'months' => 2592000,
-			'days'	=> 86400,
-			'hours'	=> 3600,
-			'minutes' => 60,
-			'seconds' => 1
-			);
-		}
-
-		// Loop
-		$seconds = (float) $seconds;
-		foreach ($periods as $period => $value)
-		{
-			$count = floor($seconds / $value);
-
-			if ($count == 0)
-			{
-				continue;
-			}
-
-			$values[$period] = $count;
-			$seconds = $seconds % $value;
-		}
-		// Return
-		if (empty($values))
-		{
-			$values = null;
-		}
-
-		return $values;
-	}
-
-	/**
-	* Return a string of time periods.
-	*
-	* @param	  mixed $duration An array of named segments
+	* @param	  ilDateTime $a_from
+	* @param	  ilDateTime $a_to 
 	* @return	 string
 	* @static
 	* 
 	*/
-	public static function timearray2string ($duration)
+	public static function period2String(ilDateTime $a_from, $a_to = null)
 	{
 		global $lng;
-
-		if (!is_array($duration))
+		
+		if (!$a_to)
 		{
-			return false;
+			$a_to = new ilDateTime(time(), IL_CAL_UNIX);
+		}
+		
+		$from = new DateTime($a_from->get(IL_CAL_DATETIME));
+		$to = new DateTime($a_to->get(IL_CAL_DATETIME));
+		$diff = $to->diff($from);
+		
+		$periods = array();
+		$periods["years"] = $diff->format("%y");
+		$periods["months"] = $diff->format("%m");
+		$periods["days"] = $diff->format("%d");
+		$periods["hours"] = $diff->format("%h");
+		$periods["minutes"] = $diff->format("%i");
+		$periods["seconds"] = $diff->format("%s");
+
+		if (!array_sum($periods))
+		{
+			return;
 	 	}
 
-		foreach ($duration as $key => $value) {
-
-			// Plural
-			if ($value > 1)
-			{
-				$segment_name = $key;
-				$segment_name = $lng->txt($segment_name);
-				$segment = $value . ' ' . $segment_name;
-			}
-			else
-			{
-				$segment_name = substr($key, 0, -1);
-				$segment_name = $lng->txt($segment_name);
-				$segment = $value . ' ' . $segment_name;
-			}
-
-			$array[] = $segment;
-	 	}
-	 	$len = count($array);
-
-		if ($len>3)
+		foreach ($periods as $key => $value) 
 		{
-			$array=array_slice($array,0,(3-$len));
+			if($value)
+			{
+				$segment_name = ($value > 1)
+					? $key
+					: substr($key, 0, -1);								
+				$array[] = $value . ' ' . $lng->txt($segment_name);
+			}
+	 	}
+		
+	 	$len = sizeof($array);
+		if ($len > 3)
+		{
+			$array = array_slice($array, 0, (3-$len));
     	}
 
-	 	$str = implode(', ', $array);
-
-	 	return $str;
+	 	return implode(', ', $array);
 	}
-
+	
 	public static function getFileSizeInfo()
 	{
 		global $lng;

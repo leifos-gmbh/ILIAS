@@ -127,11 +127,11 @@ class ilObjCourseGUI extends ilContainerGUI
 			$rcps[] = ilObjUser::_lookupLogin($usr_id);
 		}
         require_once 'Services/Mail/classes/class.ilMailFormCall.php';
+		ilMailFormCall::setRecipients($rcps);
 		ilUtil::redirect(ilMailFormCall::getRedirectTarget($this, 'members',
 			array(), 
 			array(
 				'type' => 'new', 
-				'rcp_to' => implode(',',$rcps),
 				'sig'	=> $this->createMailSignature()
 		)));
 	}
@@ -2587,6 +2587,12 @@ class ilObjCourseGUI extends ilContainerGUI
 						$this->object->getMembersObject()->add($user_id,IL_CRS_MEMBER);
 						$this->object->getMembersObject()->updateRoleAssignments($user_id,(array)$a_type);
 					}
+					else
+					{
+						$GLOBALS['ilLog']->write(__METHOD__.': Can\'t find role with role id "' . $a_type . '" to assign users to.');
+						ilUtil::sendFailure($this->lng->txt("crs_cannot_find_role"),true);
+						return false;
+					}
 					break;
 			}
 			$this->object->getMembersObject()->sendNotification($this->object->getMembersObject()->NOTIFY_ACCEPT_USER,$user_id);
@@ -2951,10 +2957,6 @@ class ilObjCourseGUI extends ilContainerGUI
 		
 		$this->checkPermission('write');
 		
-		$this->setSubTabs('members');
-		$this->tabs_gui->setTabActive('members');
-		$this->tabs_gui->setSubTabActive('crs_member_administration');
-		
 		$participants = array_merge((array) $_POST['admins'],(array) $_POST['tutors'], (array) $_POST['members'], (array) $_POST['roles']);
 		
 		if(!$participants)
@@ -2990,7 +2992,10 @@ class ilObjCourseGUI extends ilContainerGUI
 				}
 			}
 		}
-		
+
+		$this->setSubTabs('members');
+		$this->tabs_gui->setTabActive('members');
+		$this->tabs_gui->setSubTabActive('crs_member_administration');
 		
 		include_once('./Services/Utilities/classes/class.ilConfirmationGUI.php');
 		$confirm = new ilConfirmationGUI();
@@ -4135,10 +4140,9 @@ class ilObjCourseGUI extends ilContainerGUI
 		if(!$this->getCreationMode() &&
 			$ilAccess->checkAccess('read', '', $_GET['ref_id']))
 		{
-			$link = $ilCtrl->getLinkTargetByClass("ilrepositorygui", "frameset");				
-
-			$ilNavigationHistory->addItem($_GET['ref_id'],
-				$link, 'crs');
+			include_once("./Services/Link/classes/class.ilLink.php");
+			$ilNavigationHistory->addItem($_GET["ref_id"],
+				ilLink::_getLink($_GET["ref_id"], "crs"), "crs");
 		}
 	
 		if(!$this->getCreationMode())
@@ -4266,9 +4270,13 @@ class ilObjCourseGUI extends ilContainerGUI
 				break;
 
 			case 'ilrepositorysearchgui':
-				include_once('./Services/Search/classes/class.ilRepositorySearchGUI.php');
-				$rep_search =& new ilRepositorySearchGUI();
 				
+				if(!$this->checkPermissionBool('write'))
+				{
+					$GLOBALS['ilErr']->raiseError($GLOBALS['lng']->txt('permission_denied'), $GLOBALS['ilErr']->WARNING);
+				}
+				include_once('./Services/Search/classes/class.ilRepositorySearchGUI.php');
+				$rep_search = new ilRepositorySearchGUI();
 				if(ilCourseParticipant::_getInstanceByObjId($this->object->getId(), $GLOBALS['ilUser']->getId())->isAdmin() or $this->checkPermissionBool('edit_permission'))
 				{
 					$rep_search->setCallback($this,
@@ -4278,12 +4286,10 @@ class ilObjCourseGUI extends ilContainerGUI
 				}
 				else
 				{
+					//#18445 excludes admin role
 					$rep_search->setCallback($this,
 						'assignMembersObject',
-						array(
-							ilCourseConstants::CRS_MEMBER => $this->lng->txt('crs_member'),
-							ilCourseConstants::CRS_TUTOR	=> $this->lng->txt('crs_tutor'),
-							)
+					    $this->getLocalRoles(array($this->object->getDefaultAdminRole()))
 						);
 					
 				}
@@ -5474,10 +5480,12 @@ class ilObjCourseGUI extends ilContainerGUI
 	// end-patch lok
 
 	/**
+	 *
+	 * @var int[] $a_exclude a list of role ids which will not added to the results (optional)
 	 * returns all local roles [role_id] => title
 	 * @return array localroles
 	 */
-	protected function getLocalRoles()
+	protected function getLocalRoles($a_exclude = array())
 	{
 		$crs_admin = $this->object->getDefaultAdminRole();
 		$crs_member = $this->object->getDefaultMemberRole();
@@ -5499,6 +5507,17 @@ class ilObjCourseGUI extends ilContainerGUI
 			}
 
 			$crs_roles[$role_id] = ilObjRole::_getTranslation($title);
+		}
+
+		if(count($a_exclude) > 0)
+		{
+			foreach($a_exclude as $excluded_role)
+			{
+				if(isset($crs_roles[$excluded_role]))
+				{
+					unset($crs_roles[$excluded_role]);
+				}
+			}
 		}
 		return $crs_roles;
 	}
@@ -5557,6 +5576,162 @@ class ilObjCourseGUI extends ilContainerGUI
 				$this->ctrl->getLinkTarget($this,'mailMembers'));
 		}
 	}
-	
+
+	public function confirmRefuseSubscribersObject()
+	{
+		if(!is_array($_POST["subscribers"]))
+		{
+			ilUtil::sendFailure($this->lng->txt("crs_no_subscribers_selected"));
+			$this->membersObject();
+
+			return false;
+		}
+
+		$this->lng->loadLanguageModule('mmbr');
+
+		$this->checkPermission('write');
+		$this->setSubTabs('members');
+		$this->tabs_gui->setTabActive('members');
+		$this->tabs_gui->setSubTabActive('crs_member_administration');
+
+		include_once("Services/Utilities/classes/class.ilConfirmationGUI.php");
+		$c_gui = new ilConfirmationGUI();
+
+		// set confirm/cancel commands
+		$c_gui->setFormAction($this->ctrl->getFormAction($this, "refuseSubscribers"));
+		$c_gui->setHeaderText($this->lng->txt("info_refuse_sure"));
+		$c_gui->setCancel($this->lng->txt("cancel"), "members");
+		$c_gui->setConfirm($this->lng->txt("confirm"), "refuseSubscribers");
+
+		foreach($_POST["subscribers"] as $subscribers)
+		{
+			$name = ilObjUser::_lookupName($subscribers);
+
+			$c_gui->addItem('subscribers[]',
+							$name['user_id'],
+							$name['lastname'].', '.$name['firstname'].' ['.$name['login'].']',
+							ilUtil::getImagePath('icon_usr.svg'));
+		}
+
+		$this->tpl->setContent($c_gui->getHTML());
+		return true;
+	}
+
+	public function confirmAssignSubscribersObject()
+	{
+		if(!is_array($_POST["subscribers"]))
+		{
+			ilUtil::sendFailure($this->lng->txt("crs_no_subscribers_selected"));
+			$this->membersObject();
+
+			return false;
+		}
+		$this->checkPermission('write');
+		$this->setSubTabs('members');
+		$this->tabs_gui->setTabActive('members');
+		$this->tabs_gui->setSubTabActive('crs_member_administration');
+
+		include_once("Services/Utilities/classes/class.ilConfirmationGUI.php");
+		$c_gui = new ilConfirmationGUI();
+
+		// set confirm/cancel commands
+		$c_gui->setFormAction($this->ctrl->getFormAction($this, "assignSubscribers"));
+		$c_gui->setHeaderText($this->lng->txt("info_assign_sure"));
+		$c_gui->setCancel($this->lng->txt("cancel"), "members");
+		$c_gui->setConfirm($this->lng->txt("confirm"), "assignSubscribers");
+
+		foreach($_POST["subscribers"] as $subscribers)
+		{
+			$name = ilObjUser::_lookupName($subscribers);
+
+			$c_gui->addItem('subscribers[]',
+							$name['user_id'],
+							$name['lastname'].', '.$name['firstname'].' ['.$name['login'].']',
+							ilUtil::getImagePath('icon_usr.svg'));
+		}
+
+		$this->tpl->setContent($c_gui->getHTML());
+		return true;
+	}
+
+	public function confirmRefuseFromListObject()
+	{
+		if(!is_array($_POST["waiting"]))
+		{
+			ilUtil::sendFailure($this->lng->txt("no_checkbox"));
+			$this->membersObject();
+
+			return false;
+		}
+
+		$this->lng->loadLanguageModule('mmbr');
+
+		$this->checkPermission('write');
+		$this->setSubTabs('members');
+		$this->tabs_gui->setTabActive('members');
+		$this->tabs_gui->setSubTabActive('crs_member_administration');
+
+		include_once("Services/Utilities/classes/class.ilConfirmationGUI.php");
+		$c_gui = new ilConfirmationGUI();
+
+		// set confirm/cancel commands
+		$c_gui->setFormAction($this->ctrl->getFormAction($this, "refuseFromList"));
+		$c_gui->setHeaderText($this->lng->txt("info_refuse_sure"));
+		$c_gui->setCancel($this->lng->txt("cancel"), "members");
+		$c_gui->setConfirm($this->lng->txt("confirm"), "refuseFromList");
+
+		foreach($_POST["waiting"] as $waiting)
+		{
+			$name = ilObjUser::_lookupName($waiting);
+
+			$c_gui->addItem('waiting[]',
+							$name['user_id'],
+							$name['lastname'].', '.$name['firstname'].' ['.$name['login'].']',
+							ilUtil::getImagePath('icon_usr.svg'));
+		}
+
+		$this->tpl->setContent($c_gui->getHTML());
+		return true;
+	}
+
+	public function confirmAssignFromWaitingListObject()
+	{
+		if(!is_array($_POST["waiting"]))
+		{
+			ilUtil::sendFailure($this->lng->txt("crs_no_users_selected"));
+			$this->membersObject();
+
+			return false;
+		}
+		$this->checkPermission('write');
+		$this->setSubTabs('members');
+		$this->tabs_gui->setTabActive('members');
+		$this->tabs_gui->setSubTabActive('crs_member_administration');
+
+		include_once("Services/Utilities/classes/class.ilConfirmationGUI.php");
+		$c_gui = new ilConfirmationGUI();
+
+		// set confirm/cancel commands
+		$c_gui->setFormAction($this->ctrl->getFormAction($this, "assignFromWaitingList"));
+		$c_gui->setHeaderText($this->lng->txt("info_assign_sure"));
+		$c_gui->setCancel($this->lng->txt("cancel"), "members");
+		$c_gui->setConfirm($this->lng->txt("confirm"), "assignFromWaitingList");
+
+		foreach($_POST["waiting"] as $waiting)
+		{
+			$name = ilObjUser::_lookupName($waiting);
+
+			$c_gui->addItem('waiting[]',
+							$name['user_id'],
+							$name['lastname'].', '.$name['firstname'].' ['.$name['login'].']',
+							ilUtil::getImagePath('icon_usr.svg'));
+		}
+
+		$this->tpl->setContent($c_gui->getHTML());
+		return true;
+	}
+
+
+
 } // END class.ilObjCourseGUI
 ?>

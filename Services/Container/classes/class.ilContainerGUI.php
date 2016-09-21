@@ -172,7 +172,7 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 
 		$cmd = $ilCtrl->getCmd();
 
-		if (in_array($cmd, array("displayMediaFullscreen", "downloadFile")))
+		if (in_array($cmd, array("displayMediaFullscreen", "downloadFile", "displayMedia")))
 		{
 			$this->checkPermission("read");
 		}
@@ -1738,14 +1738,8 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 
 		if (count($no_link))
 		{
-			$no_link = array_unique($no_link);
-
-			foreach ($no_link as $type)
-			{
-				$txt_objs[] = $this->lng->txt("objs_".$type);
-			}
-
-			$this->ilias->raiseError(implode(', ',$txt_objs)." ".$this->lng->txt("msg_obj_no_link"),$this->ilias->error_obj->MESSAGE);
+			//#12203
+			$this->ilias->raiseError($this->lng->txt("msg_obj_no_link"),$this->ilias->error_obj->MESSAGE);
 
 			//$this->ilias->raiseError($this->lng->txt("msg_not_possible_link")." ".
 			//						 implode(',',$no_link),$this->ilias->error_obj->MESSAGE);
@@ -1762,7 +1756,12 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 
 		$_SESSION["clipboard"] = $clipboard;
 
-		ilUtil::sendInfo($this->lng->txt("msg_link_clipboard"),true);
+		$suffix = 'p';
+		if(count($clipboard["ref_ids"]) == 1)
+		{
+			$suffix = 's';
+		}
+		ilUtil::sendInfo($this->lng->txt("msg_link_clipboard_" . $suffix),true);
 
 		return $this->initAndDisplayLinkIntoMultipleObjectsObject();
 
@@ -2005,7 +2004,7 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 			
 			foreach($_POST['nodes'] as $folder_ref_id)
 			{		
-				$linked_to_folders[] = $ilObjDataCache->lookupTitle($ilObjDataCache->lookupObjId($folder_ref_id));
+				$linked_to_folders[$folder_ref_id] = $ilObjDataCache->lookupTitle($ilObjDataCache->lookupObjId($folder_ref_id));
 						
 				foreach($ref_ids as $ref_id)
 				{
@@ -2043,8 +2042,23 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 	
 				$log->write(__METHOD__.', link finished');
 			}
-			
-			ilUtil::sendSuccess(sprintf($this->lng->txt('mgs_objects_linked_to_the_following_folders'), implode(', ', $linked_to_folders)), true);
+
+			$linked_targets = array();
+			if(count($linked_to_folders))
+			{
+				require_once 'Services/Link/classes/class.ilLink.php';
+				foreach($linked_to_folders as $ref_id => $title)
+				{
+					$linked_targets[] = '<a href="' . ilLink::_getLink($ref_id) . '">' . $title . '</a>';
+				}
+			}
+
+			$suffix = 'p';
+			if(count($ref_ids) == 1)
+			{
+				$suffix = 's';
+			}
+			ilUtil::sendSuccess(sprintf($this->lng->txt('mgs_objects_linked_to_the_following_folders_' . $suffix), implode(', ', $linked_targets)), true);
 		} // END LINK
 
 		// clear clipboard
@@ -2107,7 +2121,10 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 		$t->setFormAction($this->ctrl->getFormAction($this, "performPasteIntoMultipleObjects"));
 		$t->addFormButton($this->lng->txt($txt_var), "performPasteIntoMultipleObjects");
 		$t->addSeparator();
+
+		$GLOBALS['lng']->loadLanguageModule('obj');
 		$t->addFormButton($this->lng->txt("obj_insert_into_clipboard"), "keepObjectsInClipboard");
+
 		$t->addFormButton($this->lng->txt("cancel"), "cancelMoveLink");
 		$t->setCloseFormTag(false);
 		$t->setLeadingImage(ilUtil::getImagePath("arrow_upright.svg"), " ");
@@ -3653,8 +3670,9 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 		$mode = ($_SESSION["il_rep_mode"] != "")
 			? $_SESSION["il_rep_mode"]
 			: "flat";
-			
-		if ($mode == "tree")
+
+		// check for administration context, see #0016312
+		if ($mode == "tree" && (strtolower($_GET["baseClass"]) != "iladministrationgui"))
 		{
 			include_once("./Services/Repository/classes/class.ilRepositoryExplorerGUI.php");
 			$exp = new ilRepositoryExplorerGUI($this, "showRepTree");

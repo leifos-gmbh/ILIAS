@@ -453,7 +453,15 @@ class ilObjMediaObject extends ilObject
 			}
 		}
 
-		self::handleQuotaUpdate($this);		
+		self::handleQuotaUpdate($this);	
+
+		global $ilAppEventHandler;
+		$ilAppEventHandler->raise('Services/MediaObjects',
+		'create',
+		array('object' => $this,
+			'obj_type' => 'mob',
+			'obj_id' => $this->getId())
+		);	
 	}
 
 
@@ -491,6 +499,15 @@ class ilObjMediaObject extends ilObject
 		}
 		
 		self::handleQuotaUpdate($this);		
+
+        	global $ilAppEventHandler;
+		$ilAppEventHandler->raise('Services/MediaObjects',
+        	'update',
+		array('object' => $this,
+            		'obj_type' => 'mob',
+            		'obj_id' => $this->getId())
+        	);            
+
 	}
 	
 	protected static function handleQuotaUpdate(ilObjMediaObject $a_mob)
@@ -1022,11 +1039,21 @@ class ilObjMediaObject extends ilObject
 	{
 		global $ilDB;
 
+		$lstr = "";
+		if ($a_lang != "")
+		{
+			$lstr = " AND usage_lang = ".$ilDB->quote($a_lang, "text");
+		}
+		$hist_str = "";
+		if ($a_usage_hist_nr !== false)
+		{
+			$hist_str = " AND usage_hist_nr = ".$ilDB->quote($a_usage_hist_nr, "integer");
+		}
+
 		$q = "SELECT * FROM mob_usage WHERE ".
 			"usage_type = ".$ilDB->quote($a_type, "text")." AND ".
-			"usage_id = ".$ilDB->quote($a_id, "integer")." AND ".
-			"usage_lang = ".$ilDB->quote($a_lang, "text")." AND ".
-			"usage_hist_nr = ".$ilDB->quote($a_usage_hist_nr, "integer");
+			"usage_id = ".$ilDB->quote($a_id, "integer").
+			$lstr.$hist_str;
 		$mobs = array();
 		$mob_set = $ilDB->query($q);
 		while($mob_rec = $ilDB->fetchAssoc($mob_set))
@@ -1466,13 +1493,14 @@ class ilObjMediaObject extends ilObject
 		
 		if (ilUtil::deducibleSize($a_format))
 		{
+			include_once("./Services/MediaObjects/classes/class.ilMediaImageUtil.php");
 			if ($a_type == "File")
 			{
-				$size = @getimagesize($a_file);
+				$size = ilMediaImageUtil::getImageSize($a_file);
 			}
 			else
 			{
-				$size = @getimagesize($a_reference);
+				$size = ilMediaImageUtil::getImageSize($a_reference);
 			}
 		}
 
@@ -1602,7 +1630,8 @@ class ilObjMediaObject extends ilObject
 
 		if (ilUtil::deducibleSize($format))
 		{
-			$size = getimagesize($file);
+			include_once("./Services/MediaObjects/classes/class.ilMediaImageUtil.php");
+			$size = ilMediaImageUtil::getImageSize($file);
 			$media_item->setWidth($size[0]);
 			$media_item->setHeight($size[1]);
 		}

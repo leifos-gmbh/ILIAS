@@ -374,7 +374,7 @@ abstract class assQuestion
 			array('integer','text'),
 			array($questionpool_id, $title)
 		);
-		return ($result->numRows() == 1) ? TRUE : FALSE;
+		return ($result->numRows() > 0) ? TRUE : FALSE;
 	}
 
 	/**
@@ -615,9 +615,19 @@ abstract class assQuestion
 	* @return boolean TRUE if the question type supports JavaScript output, FALSE otherwise
 	* @access public
 	*/
-	function supportsJavascriptOutput()
+	public function supportsJavascriptOutput()
 	{
 		return FALSE;
+	}
+
+	public function supportsNonJsOutput()
+	{
+		return true;
+	}
+	
+	public function requiresJsSwitch()
+	{
+		return $this->supportsJavascriptOutput() && $this->supportsNonJsOutput();
 	}
 
 	/**
@@ -810,7 +820,7 @@ abstract class assQuestion
 					array_push($output, '<a href="' . $this->getSuggestedSolutionPathWeb() . $solution["value"]["name"] . '">' . $possible_texts[0] . '</a>');
 					break;
 				case "text":
-					array_push($output, $this->prepareTextareaOutput($solution["value"]));
+					array_push($output, $this->prepareTextareaOutput($solution["value"], true));
 					break;
 			}
 		}
@@ -1875,7 +1885,9 @@ abstract class assQuestion
 		
 		require_once 'Modules/TestQuestionPool/classes/class.ilAssQuestionHintList.php';
 		ilAssQuestionHintList::deleteHintsByQuestionIds(array($question_id));
-
+		
+		$this->deleteTaxonomyAssignments();
+		
 		try
 		{
 			// update question count of question pool
@@ -1891,6 +1903,19 @@ abstract class assQuestion
 		$this->notifyQuestionDeleted($this);
 		
 		return true;
+	}
+	
+	private function deleteTaxonomyAssignments()
+	{
+		require_once 'Services/Taxonomy/classes/class.ilObjTaxonomy.php';
+		require_once 'Services/Taxonomy/classes/class.ilTaxNodeAssignment.php';
+		$taxIds = ilObjTaxonomy::getUsageOfObject($this->getObjId());
+		
+		foreach($taxIds as $taxId)
+		{
+			$taxNodeAssignment = new ilTaxNodeAssignment('qpl', $this->getObjId(), 'quest', $taxId);
+			$taxNodeAssignment->deleteAssignmentsOfItem($this->getId());
+		}
 	}
 
 	/**
@@ -3513,6 +3538,15 @@ abstract class assQuestion
 		{
 			$collected .= $solution_array["value"];
 		}
+
+		require_once 'Modules/TestQuestionPool/classes/class.ilAssQuestionHintList.php';
+		$questionHintList = ilAssQuestionHintList::getListByQuestionId($this->getId());
+		foreach($questionHintList as $questionHint)
+		{
+			/* @var $questionHint ilAssQuestionHint */
+			$collected .= $questionHint->getText();
+		}
+
 		return $collected;
 	}
 

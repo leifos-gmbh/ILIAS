@@ -592,8 +592,9 @@ class ilMediaItem
 			{
 				$loc = $this->getLocation();
 			}
-			$size = @getimagesize($loc);
-			
+
+			include_once("./Services/MediaObjects/classes/class.ilMediaImageUtil.php");
+			$size = ilMediaImageUtil::getImageSize($loc);
 			if ($size[0] > 0 && $size[1] > 0)
 			{
 				return array("width" => $size[0], "height" => $size[1]);
@@ -997,6 +998,7 @@ class ilMediaItem
 				break;
 
 			case "jpg":
+			case "jpeg":
 				$this->map_image = ImageCreateFromJPEG($this->getMapWorkCopyName());
 				break;
 
@@ -1033,6 +1035,7 @@ class ilMediaItem
 				break;
 
 			case "jpg":
+			case "jpeg":
 				ImageJPEG($this->map_image, $this->getMapWorkCopyName());
 				break;
 
@@ -1092,7 +1095,8 @@ class ilMediaItem
 				
 				$xml .= "<IntLink Target=\"".$area->getTarget($a_insert_inst, $a_inst)."\" Type=\"".
 					$area->getType()."\" $tf_str>";
-				$xml .= $area->getTitle();
+				// see bug 17893 and http://stackoverflow.com/questions/4026502/xml-error-at-ampersand
+				$xml .= htmlspecialchars($area->getTitle(), ENT_QUOTES);
 				$xml .="</IntLink>";
 			}
 			else

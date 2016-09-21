@@ -1681,9 +1681,12 @@ class ilObjectListGUI
 				return true;
 			}
 		}
-		
+
+		// see bug #16519
+		$d = $this->getDescription();
+		$d = strip_tags($d, "<b>");
 		$this->tpl->setCurrentBlock("item_description");
-		$this->tpl->setVariable("TXT_DESC", $this->getDescription());
+		$this->tpl->setVariable("TXT_DESC", $d);
 		$this->tpl->parseCurrentBlock();
 	}
 	
@@ -3630,12 +3633,14 @@ class ilObjectListGUI
 		if (!$this->checkCommandAccess("visible", "", $a_ref_id, "", $a_obj_id))
 		{			
 			$ilBench->stop("ilObjectListGUI", "2000_getListHTML_check_visible");
+			$this->resetCustomData();
 			return "";
 		}
 		
 		// BEGIN WEBDAV
 		if($type=='file' AND ilObjFileAccess::_isFileHidden($a_title))
 		{
+			$this->resetCustomData();
 			return "";
 		}
 		// END WEBDAV
@@ -3728,13 +3733,9 @@ class ilObjectListGUI
 		{
 			$this->insertFileUpload();	
 		}
-
-		// reset properties and commands
-		$this->cust_prop = array();
-		$this->cust_commands = array();
-		$this->sub_item_html = array();
-		$this->position_enabled = false;
-
+		
+		$this->resetCustomData();
+		
 		$this->tpl->setVariable("DIV_CLASS",'ilContainerListItemOuter');
 		$this->tpl->setVariable("DIV_ID", 'id = "'.$this->getUniqueItemId(true).'"');
 		$this->tpl->setVariable("ADDITIONAL", $this->getAdditionalInformation());
@@ -3743,6 +3744,18 @@ class ilObjectListGUI
 		$this->ctrl->setParameter($this->getContainerObject(), "item_ref_id", "");
 		
 		return $this->tpl->get();
+	}
+	
+	/**
+	 * reset properties and commands
+	 */
+	protected function resetCustomData()
+	{
+		// #15747
+		$this->cust_prop = array();
+		$this->cust_commands = array();
+		$this->sub_item_html = array();
+		$this->position_enabled = false;
 	}
 	
 	/**

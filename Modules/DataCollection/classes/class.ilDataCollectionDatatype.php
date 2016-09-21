@@ -15,6 +15,7 @@ require_once("./Services/Preview/classes/class.ilPreview.php");
 require_once('./Services/Preview/classes/class.ilPreviewGUI.php');
 require_once('class.ilDataCollectionRecordViewViewdefinition.php');
 require_once("./Services/MediaObjects/classes/class.ilMediaPlayerGUI.php");
+require_once('class.ilDclCheckboxInputGUI.php');
 
 /**
  * Class ilDataCollectionDatatype
@@ -44,7 +45,7 @@ class ilDataCollectionDatatype {
 	const INPUTFORMAT_FORMULA = 11;
 	const INPUTFORMAT_NON_EDITABLE_VALUE = 12;
 	const LINK_MAX_LENGTH = 40;
-	public static $mob_suffixes = array( 'jpg', 'jpeg', 'gif', 'png', 'mp3', 'flx', 'mp4', 'm4v', 'mov', 'wmv' );
+	public static $mob_suffixes = array('jpg', 'jpeg', 'gif', 'png', 'mp3', 'flx', 'mp4', 'm4v', 'mov', 'wmv');
 	/**
 	 * @var int
 	 */
@@ -247,10 +248,10 @@ class ilDataCollectionDatatype {
 				}
 				break;
 			case ilDataCollectionDatatype::INPUTFORMAT_NUMBER:
-				$input = new ilTextInputGUI($title, 'field_' . $field->getId());
+				$input = new ilNumberInputGUI($title, 'field_' . $field->getId());
 				break;
 			case ilDataCollectionDatatype::INPUTFORMAT_BOOLEAN:
-				$input = new ilCheckboxInputGUI($title, 'field_' . $field->getId());
+				$input = new ilDclCheckboxInputGUI($title, 'field_' . $field->getId());
 				break;
 			case ilDataCollectionDatatype::INPUTFORMAT_DATETIME:
 				$input = new ilDateTimeInputGUI($title, 'field_' . $field->getId());
@@ -264,6 +265,8 @@ class ilDataCollectionDatatype {
 					$input = new ilSelectInputGUI($title, 'field_' . $field->getId());
 				} else {
 					$input = new ilMultiSelectInputGUI($title, 'field_' . $field->getId());
+					$input->setWidth(100);
+					$input->setWidthUnit('%');
 				}
 				break;
 			case ilDataCollectionDatatype::INPUTFORMAT_RATING:
@@ -343,12 +346,12 @@ class ilDataCollectionDatatype {
 				}
 				// Sort by values ASC
 				asort($options);
-				$options = array( '' => $lng->txt('dcl_any') ) + $options;
+				$options = array('' => $lng->txt('dcl_any')) + $options;
 				$input->setOptions($options);
 				break;
 			case ilDataCollectionDatatype::INPUTFORMAT_RATING:
 				$input = $table->addFilterItemByMetaType("filter_" . $field->getId(), ilTable2GUI::FILTER_SELECT, false, $field->getId());
-				$options = array( "" => $lng->txt("dcl_any"), 1 => ">1", 2 => ">2", 3 => ">3", 4 => ">4", 5 => "5" );
+				$options = array("" => $lng->txt("dcl_any"), 1 => ">1", 2 => ">2", 3 => ">3", 4 => ">4", 5 => "5");
 				$input->setOptions($options);
 				break;
 			case ilDataCollectionDatatype::INPUTFORMAT_MOB:
@@ -371,7 +374,7 @@ class ilDataCollectionDatatype {
 				}
 				// Sort by values ASC
 				asort($options);
-				$options = array( '' => $lng->txt('dcl_any') ) + $options;
+				$options = array('' => $lng->txt('dcl_any')) + $options;
 				$input->setOptions($options);
 				break;
 		}
@@ -386,7 +389,7 @@ class ilDataCollectionDatatype {
 
 	/**
 	 * @param ilDataCollectionRecord $record
-	 * @param ilDataCollectionField  $field
+	 * @param ilDataCollectionField $field
 	 * @param                        $filter
 	 *
 	 * @return bool
@@ -503,7 +506,7 @@ class ilDataCollectionDatatype {
 				$return = $record_field->getValue();
 			}
 		} elseif ($this->id == ilDataCollectionDatatype::INPUTFORMAT_MOB) {
-			if ($value == - 1) //marked for deletion.
+			if ($value == -1) //marked for deletion.
 			{
 				return 0;
 			}
@@ -558,11 +561,15 @@ class ilDataCollectionDatatype {
 
 				// FSX MediaPreview
 				include_once("./Services/MediaObjects/classes/class.ilFFmpeg.php");
-				if (ilFFmpeg::supportsImageExtraction($format)) {
+				if (ilFFmpeg::enabled() && ilFFmpeg::supportsImageExtraction($format)) {
 					$med = $mob->getMediaItem("Standard");
 					$mob_file = ilObjMediaObject::_getDirectory($mob->getId()) . "/" . $med->getLocation();
 					$a_target_dir = ilObjMediaObject::_getDirectory($mob->getId());
-					$new_file = ilFFmpeg::extractImage($mob_file, "mob_vpreview.png", $a_target_dir, 1);
+					try {
+						$new_file = ilFFmpeg::extractImage($mob_file, "mob_vpreview.png", $a_target_dir, 1);
+					} catch (ilFFmpegException $e) {
+						ilUtil::sendFailure($e->getMessage(), true);
+					}
 				}
 
 				$mob->update();
@@ -638,6 +645,41 @@ class ilDataCollectionDatatype {
 		return $return;
 	}
 
+	/**
+	 * @param $value
+	 * @param ilDataCollectionRecordField $record_field
+	 * @param bool|true $link
+	 * @return int|string
+	 */
+	public function parseSortingValue($value, ilDataCollectionRecordField $record_field, $link = true) {
+		switch ($this->id) {
+			case self::INPUTFORMAT_DATETIME:
+				return strtotime($value);
+			case self::INPUTFORMAT_FILE:
+				if (!ilObject2::_exists($value) || ilObject2::_lookupType($value, false) != "file") {
+					return '';
+				}
+				$file_obj = new ilObjFile($value, false);
+				return $file_obj->getTitle();
+			case self::INPUTFORMAT_MOB:
+				$mob = new ilObjMediaObject($value, false);
+				return $mob->getTitle();
+			case ilDataCollectionDatatype::INPUTFORMAT_TEXT:
+				$arr_properties = $record_field->getField()->getProperties();
+				if ($arr_properties[ilDataCollectionField::PROPERTYID_URL]) {
+					if ($json = json_decode($value)) {
+						return $json->title ? $json->title : $json->link;
+					} else {
+						return $value;
+					}
+				} else {
+					return $value;
+				}
+			default:
+				return $value;
+		}
+	}
+
 
 	/**
 	 * function parses stored value in database to a html output for eg. the record list gui.
@@ -652,7 +694,10 @@ class ilDataCollectionDatatype {
 
 		switch ($this->id) {
 			case self::INPUTFORMAT_DATETIME:
+				$format = ilDatePresentation::useRelativeDates();
+				ilDatePresentation::setUseRelativeDates(false);
 				$html = ilDatePresentation::formatDate(new ilDate($value, IL_CAL_DATETIME));
+				ilDatePresentation::setUseRelativeDates($format);
 				break;
 
 			case self::INPUTFORMAT_FILE:
@@ -700,7 +745,7 @@ class ilDataCollectionDatatype {
 				$arr_properties = $record_field->getField()->getProperties();
 				$is_linked_field = $arr_properties[ilDataCollectionField::PROPERTYID_LINK_DETAIL_PAGE_MOB];
 				$has_view = ilDataCollectionRecordViewViewdefinition::getIdByTableId($record_field->getRecord()->getTableId());
-				if (in_array($med->getSuffix(), array( 'jpg', 'jpeg', 'png', 'gif' ))) {
+				if (in_array($med->getSuffix(), array('jpg', 'jpeg', 'png', 'gif'))) {
 					// Image
 					$dir = ilObjMediaObject::_getDirectory($mob->getId());
 					$width = (int)$arr_properties[ilDataCollectionField::PROPERTYID_WIDTH];
@@ -798,7 +843,7 @@ class ilDataCollectionDatatype {
 		if (strlen($value) > self::LINK_MAX_LENGTH) {
 			$link = substr($value, 0, (self::LINK_MAX_LENGTH - 3) / 2);
 			$link .= "...";
-			$link .= substr($value, - (self::LINK_MAX_LENGTH - 3) / 2);
+			$link .= substr($value, -(self::LINK_MAX_LENGTH - 3) / 2);
 		}
 
 		return $link;
@@ -820,7 +865,7 @@ class ilDataCollectionDatatype {
 				}
 				//$datetime = new DateTime();
 				$input = array(
-					"date" => substr($value, 0, - 9),
+					"date" => substr($value, 0, -9),
 					"time" => "00:00:00"
 				);
 				break;

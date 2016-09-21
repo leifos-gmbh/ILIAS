@@ -291,6 +291,9 @@ class ilDataCollectionFieldEditGUI {
                     //All other Types: List properties saved in propertie definition table
                     if ($property['inputformat'] == ilDataCollectionDatatype::INPUTFORMAT_BOOLEAN) {
 						$subitem = new ilCheckboxInputGUI($lng->txt('dcl_' . $property['title']), 'prop_' . $property['id']);
+						if($lng->txt('dcl_'.$property['title'].'_info') != '-dcl_'.$property['title'].'_info-') {
+							$subitem->setInfo($lng->txt('dcl_'.$property['title'].'_info'));
+						}
 						$opt->addSubItem($subitem);
 					} elseif ($property['inputformat'] == ilDataCollectionDatatype::INPUTFORMAT_NUMBER) {
 							$subitem = new ilNumberInputGUI($lng->txt('dcl_' . $property['title']), 'prop_' . $property['id']);
@@ -306,7 +309,7 @@ class ilDataCollectionFieldEditGUI {
 							}
 							$opt->addSubItem($subitem);
                     } elseif ($property['inputformat'] == ilDataCollectionDatatype::INPUTFORMAT_NON_EDITABLE_VALUE) {
-                        $subitem = new ilNonEditableValueGUI($property['title']);
+                        $subitem = new ilNonEditableValueGUI($lng->txt('dcl_'.$property['title']));
                         $subitem->setValue(implode(', ', ilDataCollectionDatatype::$mob_suffixes));
                         $opt->addSubItem($subitem);
 					} else {

@@ -180,6 +180,13 @@ class ilContainerSorting
 				case ilContainer::SORT_TITLE:
 					foreach((array) $a_items as $type => $data)
 					{
+						// #16311 - sorting will remove keys (prev/next)
+						if($type == 'sess_link')
+						{
+							$sorted[$type] = $data;
+							continue;
+						}
+					
 						// this line used until #4389 has been fixed (3.10.6)
 						// reanimated with 4.4.0
 						$sorted[$type] = ilUtil::sortArray(
@@ -201,6 +208,13 @@ class ilContainerSorting
 				case ilContainer::SORT_ACTIVATION:
 					foreach((array) $a_items as $type => $data)
 					{
+						// #16311 - sorting will remove keys (prev/next)
+						if($type == 'sess_link')
+						{
+							$sorted[$type] = $data;
+							continue;
+						}
+					
 						$sorted[$type] = ilUtil::sortArray(
 								(array) $data,
 								'start',
@@ -215,6 +229,13 @@ class ilContainerSorting
 				case ilContainer::SORT_CREATION:
 					foreach((array) $a_items as $type => $data)
 					{
+						// #16311 - sorting will remove keys (prev/next)
+						if($type == 'sess_link')
+						{
+							$sorted[$type] = $data;
+							continue;
+						}
+					
 						$sorted[$type] = ilUtil::sortArray(
 								(array) $data,
 								'create_date',
@@ -230,8 +251,15 @@ class ilContainerSorting
 		{
 			return $a_items;
 		}
+		$sorted = array();
 		foreach((array) $a_items as $type => $data)
 		{
+			if($type == 'sess_link')
+			{
+				$sorted[$type] = $data;
+				continue;
+			}
+			
 			// Add position
 			$items = array();
 			foreach((array) $data as $key => $item)

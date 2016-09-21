@@ -554,13 +554,14 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 	 */
 	protected function startPlayerCmd()
 	{
+		$testStartLock = $this->getLockParameter();
 		$isFirstTestStartRequest = false;
-		
+
 		$this->processLocker->requestTestStartLockCheckLock();
 		
-		if( $this->testSession->lookupTestStartLock() != $this->getLockParameter() )
+		if( $this->testSession->lookupTestStartLock() != $testStartLock )
 		{
-			$this->testSession->persistTestStartLock($this->getLockParameter());
+			$this->testSession->persistTestStartLock($testStartLock);
 			$isFirstTestStartRequest = true;
 		}
 
@@ -572,6 +573,7 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 			$this->ctrl->redirect($this, "initTest");
 		}
 		
+		$this->ctrl->setParameterByClass('ilObjTestGUI', 'lock', $testStartLock);
 		$this->ctrl->redirectByClass("ilobjtestgui", "redirectToInfoScreen");
 	}
 
@@ -716,20 +718,29 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 		$this->tpl->setVariable("CONTENT_BLOCK", "<meta http-equiv=\"refresh\" content=\"5; url=" . $this->ctrl->getLinkTarget($this, "afterTestPassFinished") . "\">");
 		$this->tpl->parseCurrentBlock();
 	}
+	
+	abstract protected function getCurrentQuestionId();
 
 	function autosaveCmd()
 	{
 		$result = "";
 		if (is_array($_POST) && count($_POST) > 0)
 		{
-			$res = $this->saveQuestionSolution(TRUE);
-			if ($res)
+			if( $this->isParticipantsAnswerFixed($this->getCurrentQuestionId()) )
 			{
-				$result = $this->lng->txt("autosave_success");
+				$result = '-IGNORE-';
 			}
 			else
 			{
-				$result = $this->lng->txt("autosave_failed");
+				$res = $this->saveQuestionSolution(TRUE);
+				if ($res)
+				{
+					$result = $this->lng->txt("autosave_success");
+				}
+				else
+				{
+					$result = $this->lng->txt("autosave_failed");
+				}
 			}
 		}
 		if (!$this->canSaveResult())
@@ -939,11 +950,6 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 			$this->testSession->setSubmitted(1);
 			$this->testSession->setSubmittedTimestamp(date('Y-m-d H:i:s'));
 			$this->testSession->saveToDb();
-		}
-
-		if( $this->object->getEnableArchiving() )
-		{
-			$this->archiveParticipantSubmission($this->testSession->getActiveId(), $finishedPass);
 		}
 	}
 
@@ -1420,7 +1426,7 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 		$template->setVariable("HOUR", $date["hours"]);
 		$template->setVariable("MINUTE", $date["minutes"]);
 		$template->setVariable("SECOND", $date["seconds"]);
-		if (preg_match("/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/", $this->object->getEndingTime(), $matches))
+		if ($this->object->isEndingTimeEnabled() && preg_match("/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/", $this->object->getEndingTime(), $matches))
 		{
 			$template->setVariable("ENDYEAR", $matches[1]);
 			$template->setVariable("ENDMONTH", $matches[2]-1);

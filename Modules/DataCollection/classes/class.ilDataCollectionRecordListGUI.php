@@ -80,8 +80,9 @@ class ilDataCollectionRecordListGUI {
 	 * execute command
 	 */
 	public function executeCommand() {
+		global $ilCtrl;
+		$ilCtrl->saveParameter($this, 'mode');
 		$cmd = $this->ctrl->getCmd();
-
 		switch ($cmd) {
 			case 'listRecords':
 				$this->setSubTabs();
@@ -325,7 +326,6 @@ class ilDataCollectionRecordListGUI {
 			}
 			foreach ($fields as $col => $field) {
 				$value = $excel->val($i, $col);
-				$value = utf8_encode($value);
 				try {
 					if ($field->getDatatypeId() == ilDataCollectionDatatype::INPUTFORMAT_REFERENCE) {
 						$old = $value;
@@ -344,7 +344,7 @@ class ilDataCollectionRecordListGUI {
 					}
 					$field->checkValidity($value, $record->getId());
 					if (!$simulate) {
-						$record->setRecordFieldValue($field->getId(), $value);
+						$record->setRecordFieldValue($field->getId(), utf8_encode($value));
 					}
 				} catch (ilDataCollectionInputException $e) {
 					$warnings[] = "(" . $i . ", " . $this->getExcelCharForInteger($col) . ") " . $e;
@@ -603,6 +603,7 @@ class ilDataCollectionRecordListGUI {
 
 		/** @var ilCtrl $ilCtrl */
 		/** @var ilTabsGUI $ilTabs */
+		$ilCtrl->setParameter($this, 'mode', self::MODE_VIEW);
 		$ilTabs->addSubTab('mode_1', $lng->txt('view'), $ilCtrl->getLinkTarget($this, 'listRecords'));
 		if ($this->table_obj->hasPermissionToDeleteRecords((int)$_GET['ref_id'])) {
 			$ilCtrl->setParameter($this, 'mode', self::MODE_MANAGE);

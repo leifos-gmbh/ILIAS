@@ -247,6 +247,7 @@ assessment#:#applet_parameter#:#Parameter
 assessment#:#applet_parameters#:#Applet Parameters
 assessment#:#apply#:#Apply
 assessment#:#ass_create_export_file#:#Create Test Export File
+assessment#:#ass_create_export_file_with_results#:#Create Test Export File (incl. Participant Results)
 assessment#:#ass_create_export_test_results#:#Create Test Results Export File
 assessment#:#ass_create_export_test_archive#:#Create Test Archive File
 assessment#:#ass_export_files#:#Export Files
@@ -388,6 +389,8 @@ assessment#:#empty_term_message#:#There is a least one empty term field.
 assessment#:#empty_terms_exist#:#There are already empty term fields. Please fill out these fields before you add more terms.
 assessment#:#enable_javascript#:#Click to enable JavaScript support
 assessment#:#end_tag#:#End Tag
+assessment#:#tst_conflict_fbh_oblig_quest#:#The combination of using compulsory questions and freezing answers given is not allowed.
+assessment#:#tst_conflict_reset_non_fbh#:#The setting "Freeze Answers Given" has been disabled.
 assessment#:#ending_time_reached#:#You have reached the finish time
 assessment#:#enlarge#:#Enlarge
 assessment#:#enter_anonymous_code#:#Enter Anonymous Access Code
@@ -876,9 +879,9 @@ assessment#:#tst_confirm_delete_results#:#You are about to remove all your previ
 assessment#:#tst_confirm_print#:#Press button to print all questions with points and solution. The question always appears at the end of a page.
 assessment#:#tst_confirm_submit_answers#:#Please confirm your submission of your solution. You won't be able to revert your answers after pressing the submit button.
 assessment#:#tst_count_correct_solutions#:#Only Correct and Complete Answers Score Points
-assessment#:#tst_count_correct_solutions_desc#:#Participants score either the maximum number of points for a fully correct and complete answer or 0 points in every other case.
+assessment#:#tst_count_correct_solutions_desc#:#Participants score either the maximum number of points for a fully correct and complete answer or 0 points in every other case. This is also valid for questions that define points for partial answers.
 assessment#:#tst_count_partial_solutions#:#Incomplete or Partly Wrong Answers Score Points
-assessment#:#tst_count_partial_solutions_desc#:#Points for correctly provided partial answers are added up: Participants can score points for incomplete or partly wrong answers.
+assessment#:#tst_count_partial_solutions_desc#:#When a question defines points for partial answers, points for correctly provided partial answers are added up: Participants can score points for incomplete or partly wrong answers on these questions.
 assessment#:#tst_defaults_applied#:#The selected test defaults have been applied.
 assessment#:#tst_defaults_apply_not_possible#:#ILIAS could not apply the selected test defaults to this test! Maybe this test already contains participant datasets.
 assessment#:#tst_defaults_apply_select_one#:#Please select exact one test defaults entry to apply the defaults to this test!
@@ -1006,6 +1009,7 @@ assessment#:#tst_password_form#:#Enter Test Password
 assessment#:#tst_password#:#Test Password
 assessment#:#tst_percent_solved#:#Percent Solved
 assessment#:#tst_position#:#Question %s of %s
+assessment#:#tst_position_without_total#:#Question %s
 assessment#:#tst_postpone_description#:#The participants may postpone questions to the end of the test.
 assessment#:#tst_postpone#:#Postpone Questions
 assessment#:#tst_print_date#:#Date of Print
@@ -1060,6 +1064,7 @@ assessment#:#tst_reset_processing_time_desc#:#The duration will be reset to the 
 assessment#:#tst_reset_processing_time#:#Reset duration for every test pass
 assessment#:#tst_result_user_name_pass#:#Results of Test Pass %s for %s
 assessment#:#tst_result_user_name#:#Test Results for %s
+assessment#:#tst_result_pass#:#Results of Test Pass
 assessment#:#tst_results_access_always#:#Immediately
 assessment#:#tst_results_access_always_desc#:#Participants can access their results on the ‘Info’-tab immediately after starting the test pass and while still taking the test. Additionally ILIAS will present them with their test results immediately after finishing  the test.
 assessment#:#tst_results_access_date#:#Date
@@ -1196,7 +1201,7 @@ assessment#:#tst_user_finished_test#:#User finished test (%s)
 assessment#:#tst_your_answer_was#:#Your answer was
 assessment#:#tst_your_answers#:#These are your answers given to the following questions.
 assessment#:#test_enable_archiving#:#Enable Archiving
-assessment#:#test_enable_archiving_desc#:#In the ‘Export’-tab the whole test comprising all answers of all participants can be exported and downloaded.
+assessment#:#test_enable_archiving_desc#:#In the ‘Export’-tab, the whole test comprising all answers of all participants can be exported and downloaded. The archive file is generated for every user when a test pass has been finished or when the results have been modified by manual scoring. This increases server load and reduces performance of the system.
 assessment#:#ass_create_archive_export#:#Create Archive-Export
 assessment#:#cannot_export_archive#:#Archive-Export cannot be created.
 assessment#:#tt_assessment#:#Assessment Test
@@ -3255,7 +3260,8 @@ common#:#message_no_delivered_files#:#You have not submitted any files.
 common#:#message_to#:#Message to:
 common#:#message#:#Message
 common#:#meta_data#:#Metadata
-common#:#mgs_objects_linked_to_the_following_folders#:#The object(s) was/were linked to the following folder(s): %s
+common#:#mgs_objects_linked_to_the_following_folders_p#:#The objects were linked to the following folder(s): %s
+common#:#mgs_objects_linked_to_the_following_folders_s#:#The object was linked to the following folder(s): %s
 common#:#migrate#:#Migrate
 common#:#min_time#:#Minimum time
 common#:#minute#:#Minute
@@ -3315,7 +3321,7 @@ common#:#msg_cancel#:#Action cancelled
 common#:#msg_changes_ok#:#The changes were OK
 common#:#msg_clear_clipboard#:#Clipboard cleared
 common#:#msg_cloned#:#Selected object(s) copied
-common#:#msg_copy_clipboard_source#:#Now, please select the desired course, whose content should be copied and click the button ‘Next’.
+common#:#msg_copy_clipboard_source#:#Now, please select the desired course, whose content should be copied and click the button ‘Continue’.
 common#:#msg_copy_clipboard#:#Now, please select the desired location, where the selected objects should be pasted into and click the button ‘Paste’.
 common#:#msg_copy_clipboard_container#:#Now, please select the desired location, where the selected objects should be pasted into and click the button ‘Continue’.
 common#:#msg_cut_clipboard#:#Now, please select the desired location, where the selected objects should be pasted into and click the button ‘Paste’.
@@ -3335,7 +3341,8 @@ common#:#msg_input_is_required#:#This input is required. Please enter a value.
 common#:#msg_invalid_filetype#:#Invalid file type
 common#:#msg_is_last_role#:#You removed the last global role from the following users
 common#:#msg_last_role_for_registration#:#At least one role must be available in the registration form for new users. This role is currently the only one available.
-common#:#msg_link_clipboard#:#Now, please select the desired location, where the selected objects should be linked to and click the button Paste.
+common#:#msg_link_clipboard_p#:#Now, please select the desired location, where the selected objects should be linked to and click the button Paste.
+common#:#msg_link_clipboard_s#:#Now, please select the desired location, where the selected object should be linked to and click the button Paste.
 common#:#msg_linked#:#Selected object(s) linked.
 common#:#msg_may_not_contain#:#This object may not contain objects of type:
 common#:#msg_min_one_active_role#:#Each user must have at least one active global role!
@@ -3389,7 +3396,7 @@ common#:#msg_obj_exists_in_folder#:#The object %s already exists in the folder %
 common#:#msg_obj_exists#:#This object already exists in this folder
 common#:#msg_obj_may_not_contain_objects_of_type#:#The object %s may not contain objects of type: %s.
 common#:#msg_obj_modified#:#Modifications saved.
-common#:#msg_obj_no_link#:#are not allowed to be linked
+common#:#msg_obj_no_link#:#It is not possible to link container objects like categories, courses, groups or folder due to technical reasons. Instead you may link several single objects within such a container to other areas or use a reference object for categories and courses.
 common#:#msg_obj_not_deletable_sold#:#Payment is activated for the following objects. They can no be deleted.
 common#:#msg_paste_object_not_in_itself#:#It’s not possible to paste the object %s in itself.
 common#:#msg_perm_adopted_from_itself#:#You cannot adopt permission settings from the current role/role template itself.
@@ -3448,6 +3455,7 @@ common#:#no_date#:#No date
 common#:#no_description#:#No description
 common#:#no_frm_in_personal_list#:#No forums in personal list.
 common#:#no_global_role_left#:#Every user has to be assigned to one role.
+common#:#user_not_found_to_delete#:#A user could not be found to delete.
 common#:#no_grp_in_personal_list#:#No groups in personal list.
 common#:#no_import_available#:#Import not available for type
 common#:#no_import_file_found#:#No import file found
@@ -5888,7 +5896,7 @@ crs#:#crs_unblocked_member_body#:#your membership in course "%s" has been restor
 crs#:#crs_unblocked_member#:#Access granted in course "%s"
 crs#:#crs_unblocked#:#Free entrance
 crs#:#crs_unlimited#:#Unlimited
-crs#:#crs_unsubscribe_member_body#:#we confirm your cancellation of membership in course "%s". We hope that you find an opportunity to participate in another course.
+crs#:#crs_unsubscribe_member_body#:#We confirm your cancellation of membership in course "%s".
 crs#:#crs_unsubscribe_member#:#Your cancellation of membership in course "%s"
 crs#:#crs_unsubscribe_sure#:#Are you sure you want to unsubscribe from this course?
 crs#:#crs_unsubscribed_from_crs#:#You have been unsubscribed from this course.
@@ -6643,12 +6651,10 @@ form#:#form_retype_password#:#Retype Password
 form#:#form_seconds#:#Seconds
 forum#:#activate_current_and_childs#:#Activate All Postings
 forum#:#activate_new_posts#:#Activate Postings
-forum#:#activate_only_current#:#Activate Current
-forum#:#activate_post_txt#:#Would you really like to activate the current posting and if applicable all its child postings? Please note that all parent postings will be activated, too.
+forum#:#activate_only_current#:#Activate Posting
+forum#:#activate_post_txt#:#Would you really like to activate the current posting?
 forum#:#activate_post#:#Activate
 forum#:#close_topics#:#Close
-forum#:#deactivate_current_and_childs#:#Deactivate All Postings
-forum#:#deactivate_post_txt#:#Would you really like to deactivate the current posting and all its child postings?
 forum#:#fmr_copy_threads_info#:#You have the possibility to copy single threads. Only the beginning of the chosen threads will be duplicated.
 forum#:#forum_add_quote#:#Add Quotation
 forum#:#forums_all_threads_marked_read#:#All threads have been marked as read
@@ -9250,7 +9256,7 @@ survey#:#apply#:#Apply
 survey#:#arithmetic_mean#:#Arithmetic Mean
 survey#:#ask_insert_questionblocks#:#Are you sure you want to insert the following question block(s) to the survey?
 survey#:#ask_insert_questions#:#Are you sure you want to insert the following question(s) to the survey?
-survey#:#back#:#<< Back
+survey#:#back#:#Back
 survey#:#before#:#before
 survey#:#browse_for_questions#:#Add from Pool
 survey#:#cancel_survey#:#Suspend the Survey
@@ -10169,7 +10175,7 @@ content#:#cont_edit_shape_whole_picture#:#Edit Shape (Whole Picture)
 common#:#settings_for_all_members#:#Notification activated for all course/group members
 common#:#settings_per_users#:#Settings per Course/Group Member
 user#:#enable_local_user_administration#:#Enable Local User Administration
-user#:#enable_local_user_administration_info#:#If enabled, local user accounts can be administrated in categories.
+user#:#enable_local_user_administration_info#:#If enabled, local user accounts can be administrated in categories and organisational units.
 user#:#restrict_user_access#:#Restricted Access to User Accounts
 user#:#restrict_user_access_info#:#Enabled this option only if you want to restrict the access to user accounts. If enabled access to local and global user accounts is only granted when a role has the permission ‘Read Access to User Account’.
 common#:#backto_lua#:#Back to Local User Administration
@@ -10775,8 +10781,8 @@ style#:#sty_to#:#To
 style#:#sty_add_content_style#:#Add Content Style
 style#:#sty_remove_global_default_state#:#Remove Global Default State
 style#:#sty_remove_global_fixed_state#:#Remove Global Fixed State
-style#:#sty_make_global_default#:#Set as Global Default Style for New Objects
-style#:#sty_make_global_fixed#:#Force this Style on New Objects
+style#:#sty_make_global_default#:#Set as default style
+style#:#sty_make_global_fixed#:#Force this style on all objects
 content#:#cont_save_types#:#Save Types
 content#:#cont_layout_template#:#Layout Template
 content#:#cont_special_page#:#Special Content Page
@@ -12539,6 +12545,7 @@ dcl#:#dcl_edit_type#:#Edit Type
 dcl#:#dcl_activate_rating#:#Activate Entry Rating
 dcl#:#dcl_activate_approval#:#Activate Entry Approval
 dcl#:#dcl_activate_notification#:#Activate Notification
+dcl#:#dcl_allowed_file_types#:#Allowed File Types
 dcl#:#dcl_table_id#:#Table ID
 dcl#:#dcl_add_new_record#:#Add New Entry
 dcl#:#dcl_list_fields#:#Fields
@@ -12588,7 +12595,7 @@ dcl#:#dcl_unknown_exception#:#The value you entered is not valid.
 dcl#:#dcl_checked#:#Checked.
 dcl#:#dcl_not_checked#:#Not checked.
 dcl#:#dcl_any#:#Any
-dcl#:#dcl_noturl_exception#:#You have to enter a Link (beginning with http://) or an email address.
+dcl#:#dcl_noturl_exception#:#You have to enter a Link (beginning with http:// or www.) or an email address.
 dcl#:#dcl_no_search_results_found_for#:#No modules have been found for
 dcl#:#dcl_export_enabled#:#Allow export function for all users
 dcl#:#dcl_no_fields_yet#:#There are no fields defined for this table thus you cannot create any entries yet.
@@ -12832,6 +12839,7 @@ dcl#:#dcl_notification_deactivate_dcl#:#Deactivate Notification for Data Collect
 dcl#:#dcl_notification_activated#:#Notification Activated
 dcl#:#dcl_notification_deactivated#:#Notification Deactivated
 dcl#:#dcl_locked#:#Locked
+dcl#:#dcl_locked_tooltip#:#Disable this field for users to edit. Does not include roles with the permission 'Edit Settings'
 dcl#:#dcl_table_settings#:#Table Settings
 dcl#:#dcl_add_perm#:#User can add entries
 dcl#:#dcl_edit_perm#:#User can edit entries
@@ -12922,7 +12930,8 @@ exc#:#exc_team_notification_body_rmv#:#you have been removed from  a team upload
 exc#:#exc_team_notification_changed_by#:#Status changed by
 exc#:#exc_team_notification_link#:#Link to exercise
 poll#:#poll_absolute#:#Current Votes
-dcl#:#dcl_reference_link#:#Show as link in table view
+dcl#:#dcl_reference_link#:#Show as link to referenced entry
+dcl#:#dcl_reference_link_info#:#Detailed View must be active in referenced table
 dcl#:#dcl_ILIAS_reference_link#:#Show as link in table view
 dcl#:#dcl_text_area#:#Textarea
 dcl#:#dcl_delete_table#:#Delete Table
@@ -12982,7 +12991,7 @@ content#:#cont_credit_mode_info#:#This setting is only affective if the lesson m
 content#:#cont_sc_auto_review_info_12#:#Set the lesson mode to ‘review’ when a learner has completed or passed a SCO.
 content#:#cont_sc_usession_info#:#This setting activates periodical requests to the server to keep the session alive.
 content#:#cont_sequencing_info#:#Enable the sequencing and navigation behaviour as defined by the learning module.
-content#:#cont_time_from_lms_info#:#Strict (according to the SCORM standard) check of values sent by the learning module to ILIAS.
+content#:#cont_time_from_lms_info#:#Processing time is set by ILIAS, not by SCOs.
 survey#:#survey_question_pool_usage_active#:#Questions can be added optionally to a question pool
 survey#:#survey_question_pool_usage_active_info#:#Each time a question is created it has to be decided if a question pool is to be used. 
 survey#:#survey_question_pool_usage_inactive#:#Questions are created directly in the survey.
@@ -13151,7 +13160,7 @@ blog#:#blog_toggle_draft_admin#:#Deactivate Blog Posting
 blog#:#blog_keywords_info#:#Use +/- icons to add and remove keywords.
 forum#:#merge#:#Merge
 forum#:#please_choose_target#:#Please choose a thread as merge target.
-forum#:#frm_sure_merge_threads#:#Are you sure you want to merge these threads? Warning: This action can not be undone! Eventually ILIAS swaps source and target thread if the first posting of the source thread is created earlier than the first posting of the target thread.
+forum#:#frm_sure_merge_threads#:#Are you sure you want to merge these threads? Warning: This action can not be undone.
 forum#:#not_allowed_to_merge_into_another_forum#:#It is not possible to merge threads of different forums.
 forum#:#frm_selected_merge_src#:#Selected Thread to Merge: %s
 forum#:#error_same_thread_ids#:#Source and target thread have to be different.
@@ -13282,6 +13291,10 @@ bibl#:#attr_order_bibtex#:#Attribute Order (Bibtex)
 bibl#:#attr_order_bibtex_info#:#default: isbn,issn,title
 bibl#:#attr_order_ris#:#Attribute Order (ris)
 bibl#:#attr_order_ris_info#:#default: sn,ti, t1
+bibl#:#news_title_created#:#New bibliography list added
+bibl#:#news_content_created#:#A new bibliography list has been added. You can view the entries by clicking the link to the item.
+bibl#:#news_title_updated#:#Bibliography list updated
+bibl#:#news_content_updated#:#The bibliography list has been modified. You can view the new entries by clicking the link to the item.
 rbac#:#bibl_visible#:#Bibliography is visible
 rbac#:#bibl_read#:#User can read bibliography content
 rbac#:#bibl_copy#:#Copy Bibliography
@@ -13442,8 +13455,8 @@ survey#:#survey_reminder_frequency_days#:#Days
 survey#:#survey_notification_target_group#:#Target Group
 survey#:#survey_notification_target_group_parent_course#:#All members of parent course/group
 survey#:#survey_notification_target_group_parent_course_inactive#:#No parent course/group given - no reminders will be sent!
-survey#:#survey_notification_target_group_invited#:#All invited users
-survey#:#survey_notification_target_group_invited_info#:#Currently invited users: %s
+survey#:#survey_notification_target_group_invited#:#All users who got the survey put on their Personal Desktop
+survey#:#survey_notification_target_group_invited_info#:#Number of current recipients: %s
 survey#:#survey_notification_tutor_setting#:#One E-Mail after all Participants Finished
 survey#:#survey_notification_tutor_recipients#:#Tutors (Login[s])
 survey#:#survey_notification_tutor_recipients_invalid#:#Please state users with write permission.
@@ -13506,7 +13519,7 @@ dateplaner#:#cal_ch_user_assignment_failed_info#:#The following users could not 
 dateplaner#:#cal_booking_failed_info#:#This appointment is booked out. Please choose another appointment.
 registration#:#registration_codes_override_info#:#This setting overrides any values defined in ‘Registration Settings’.
 registration#:#registration_codes_override_global_info#:#These settings may be overridden by registration codes.
-crs#:#event_list_registered_only#:#Only Registered Members
+crs#:#event_list_registered_only#:#Only Registered
 didactic#:#didactic_default_type#:#Default
 pd#:#pd_info_delete_sure_remove#:#Are you sure you want to remove the following objects from your Personal Desktop?
 pd#:#pd_info_delete_sure_unsubscribe#:#Are you sure you want to unsubscribe from the following objects?
@@ -13817,8 +13830,13 @@ content#:#cont_ed_plachverification#:#Placeholder Certificate
 cld#:#cld_auth_failed_no_object_created#:#Authentication failed, no Cloud Object has been created.
 dcl#:#fieldtitle_allow_chars#:#Allowed chars: %s
 dcl#:#add_value#:#Add New Entry
-common#:#objs_orgu#:#Organisational Unit
+common#:#objs_orgu#:#Organisational Units
 common#:#obj_orgu#:#Organisational Unit
+common#:#obj_orgu_description#:#Creating and editing organisational structure
+common#:#il_orgu_superior#:#Superior
+common#:#il_orgu_employee#:#Employee
+common#:#view_learning_progress#:#View Learning Progress
+common#:#view_learning_progress_rec#:#View Learning Progress of Unit incl. Subunits
 orgu#:#view_learning_progress#:#View Learning Progress
 orgu#:#il_orgu_employee#:#Employee
 orgu#:#orgu_staff_deassign#:#Are you sure you want to deassign these users from this role?
@@ -13887,6 +13905,7 @@ orgu#:#orgu_adv_settings#:#Advanced Settings
 orgu#:#orgu_type_msg_error_custom_icon#:#Could not save the custom icon
 orgu#:#orgu_type_available_amd_sets#:#Available Advanced Metadata sets
 orgu#:#orgu_type_assign_amd_sets#:#Assign Advanced Metadata sets
+orgu#:#not_movable_to_subtree#:#An organisational unit cannot be moved into its own subtree. This would create a loop.
 cld#:#cld_object_added#:#A new Cloud object has been added
 exc#:#exc_peer_review_deadline#:#Feedback Deadline 
 exc#:#exc_peer_review_deadline_info#:#Feedback can be given up to this date and received feedback is only accessible from then on.
@@ -14070,7 +14089,7 @@ search#:#search_user_search_info_form#:#Data in personal profiles of users is in
 adve#:#adve_blocking_mode#:#Edit Lock
 adve#:#adve_minutes#:#Minutes
 adve#:#adve_minutes_info#:#Minutes of inactivity before an edit lock expires and a page can be edited by another user.
-content#:#content_until#:#At least locked until: 
+content#:#content_until#:#At least locked until
 content#:#content_no_edit_lock#:#The page is currently locked by another user.
 exc#:#exc_fb_tutor_info#:#When a feedback file is uploaded, a notification is sent to the user and the feedback file will be listed in the user's assignment view.
 obj#:#svy_results#:#Results
@@ -14431,7 +14450,7 @@ content#:#cont_language#:#Language
 content#:#cont_add_lang#:#Add Language
 content#:#cont_conf_delete_lang#:#Do you really want to drop support for the following languages?
 content#:#cont_back_to_page#:#Back to Page
-content#:#cont_got_lock#:#This page has been locked for your editing. Please release the page after you have done all your changes.
+content#:#cont_got_lock_until#:#This page has been locked for your editing until %1. Please release the page after you have done all your changes by hitting %2
 content#:#cont_finish_editing#:#Finish Editing
 content#:#cont_page_lock_released#:#Editing finished. Page lock has been released.
 notes#:#note_content_removed#:#The content has been removed.
@@ -14502,6 +14521,8 @@ rbac#:#orgu_read_users#:#User can read local user accounts created in this Organ
 rbac#:#orgu_cat_administrate_users#:#User can create and administrate local user accounts in this Organisational Unit
 rbac#:#orgu_delete#:#User can move or delete Organisational Unit
 rbac#:#orgu_edit_permission#:#User can change permission settings
+rbac#:#orgu_copy#:#Copy Organisational Unit
+rbac#:#orgu_view_learning_progress_rec#:#View Learning Progress of Unit incl. Subunits
 rbac#:#rbac_create_orgu#:#Create Organisational Units
 book#:#book_post_booking_text_info#:#Use [PERIOD] and [OBJECT] to add booking details to the text.
 blog#:#blog_abstract_shorten#:#Shorten Abstract
@@ -14778,12 +14799,12 @@ content#:#cont_reset_nr_of_tries#:#Reset Number of Tries
 content#:#cont_unlock_allow_continue#:#Unlock / Allow to Continue
 crs#:#crs_subscription_failed_limit#:#The maximum number of participants has been exceeded.
 user#:#send_mail_to_inactive_users#:#Warning Mail
-user#:#send_mail_to_inactive_users_desc#:#If set, a warning mail will be sent to the user before his/her account is deleted due to inactivity.
+user#:#send_mail_to_inactive_users_desc#:#If set, a warning mail will be sent to the user before his/her account is deleted due to inactivity. Please make sure that sending external mails is possible. On activation with reminder mail, it may happen, that the time frame between reminder mail and deletion is smaller than the configured time frame. 
 user#:#send_mail_to_inactive_users_suffix#:#Days before Deletion.
 user#:#send_mail_to_inactive_users_numbers_only#:#Only positive non decimal numbers are accepted.
 user#:#send_mail_to_inactive_users_must_be_smaller_than#:#This value must be smaller than the value ‘Days passed since last login’.
 user#:#del_mail_subject#:#(ILIAS) – Your account will be deleted
-user#:#del_mail_body#:#Hello %1$s, %2$s you haven't logged in for a long period of time, on %3$s. So your account will be deleted in %4$s days. You have to login again to prevent the deletion of your account.
+user#:#del_mail_body#:#Hello %1$s, %2$s you haven't logged in for a long period of time, on %3$s. So your account will be probably deleted on %4$s. You have to login again to prevent the deletion of your account.
 user#:#delete_inactive_user_accounts_frequency#:#Frequency
 user#:#delete_inactive_user_accounts_frequency_desc#:#Frequency, in which the deletion and email distribution will be tested.
 user#:#send_mail_reminder_window_too_small#:#Your Frequency setting is too large for this reminder value.
@@ -15127,7 +15148,7 @@ survey#:#survey_access_codes_info#:#Users get access to the survey by entering a
 survey#:#survey_results_anonymization#:#Privacy
 survey#:#survey_results_personalized#:#With Names
 survey#:#survey_results_personalized_info#:#In the tab ‘Results’ the names of the participants and their respective answers are listed. Users having access to this tab can inspect who has provided which answer.
-survey#:#survey_results_anonymized#:#Without Names
+survey#:#survey_results_anonymized#:#Without Names / Anonymous Survey
 survey#:#survey_results_anonymized_info#:#In the tab ‘Results’ participants' names are replaced by codes. Users having access to this tab cannot attribute answers to named participants but only to user ‘iTXaF’ (example).
 survey#:#material_added_empty#:#The object does not have any suitable material.
 ecs#:#ecs_refresh_participants#:#Refresh ECS-Participants
@@ -15202,8 +15223,6 @@ mob#:#mob_object#:#Object
 content#:#cont_qtries_info#:#Default value for number of tries for newly created questions.
 lm#:#lm_copy#:#Copy Learning Module
 content#:#cont_settings#:#Settings for learning modules
-rbac#:#orgu_view_learning_progress_rec#:#View Learning Progress of Unit incl. Subunits
-rbac#:#orgu_copy#:#Copy Organisational Unit
 exc#:#exc_no_team_yet_notice#:#You are not assigned to a team yet!
 prtf#:#prtf_edit_embedded_blog#:#Edit Blog "%s"
 exc#:#exc_manage_team#:#Manage Team
@@ -15243,3 +15262,83 @@ cron#:#cron_result_status_fail#:#Failed
 wiki#:#wiki_unhide_meta_adv_records#:#Show additional properties
 content#:#cont_wiki_link_dialog#:#Link to Wiki Page (Dialog)
 link#:#link_link#:#Link
+prtt#:#prtt_portfolio_created#:#Portfolio Template added
+forum#:#frm_censorship#:#Censor
+forum#:#frm_revoke_censorship#:#Revoke Censorship
+forum#:#frm_censorship_applied#:#The censorship has been successfully applied.
+forum#:#frm_censorship_revoked#:#The censorship has been successfully revoked.
+forum#:#frm_mark_as_read#:#Mark as read
+forum#:#frm_mark_as_unread#:#Mark as unread
+sysc#:#sysc_overview#:#Overview
+sysc#:#sysc_groups#:#System Check Groups
+sysc#:#sysc_grp_tree#:#Repository Tree
+sysc#:#sysc_grp_tree_desc#:#Performs an analysis of the tree and prints all tree nodes along with analysis data.
+sysc#:#sysc_completed_num#:#Fullfilled Tasks
+sysc#:#sysc_failed_num#:#Not Fullfilled Tasks
+sysc#:#sysc_task_overview#:#Tasks
+sysc#:#sysc_action_validate#:#Validate
+sysc#:#sysc_action_repair#:#Repair
+sysc#:#sysc_task_tree_duplicates#:#Duplicate Entries in Repository Tree
+sysc#:#sysc_task_tree_duplicates_desc#:#Search for duplicate entries in the repository tree structure.
+sysc#:#sysc_task_tree_dump#:#List Tree
+sysc#:#sysc_task_tree_dump_desc#:#Analyses and prints the repository tree structure
+sysc#:#sysc_action_list_tree#:#Create Repository Tree Dump
+sysc#:#sysc_action_show_tree#:#Show Repository Tree Dump
+sysc#:#sysc_tree_duplicate_failures#:#Found duplicate entries in tree structure. Number of duoplicate entries
+sysc#:#sysc_message_success#:#No errors found
+sysc#:#sysc_tree_list_failures#:#A dump of the the repository tree has been created. Number of errors in tree structure:
+sysc#:#sysc_status_na#:#Not Executed
+sysc#:#sysc_status_running#:#Running
+sysc#:#sysc_status_failed#:#Failed
+sysc#:#sysc_status_completed#:#Completed
+sysc#:#sysc_task_tree_missing#:#Missing Entries in Repository Tree
+sysc#:#sysc_task_tree_missing_desc#:#Searches and repairs missing entries in the repository tree.
+sysc#:#sysc_message_tree_missing_confirm#:#Do you really want to restore missing entries in the repository tree structure?
+sysc#:#sysc_btn_tree_missing#:#Restore Missing
+sysc#:#sysc_tree_missing_failures#:#Found missing entries in the tree structure. Number of missing entries:
+sysc#:#sysc_cron_empty_trash#:#Delete Trash Bin
+sysc#:#sysc_cron_empty_trash_desc#:#If enabled, the repository trash bin will be purged by given criteria (age, object type or maximum number of objects).
+sysc#:#sysc_task_tree_missing_tree#:#Missing Entries in Repository Tree
+sysc#:#sysc_task_tree_missing_tree_desc#:#Searches and repairs missing entries in the repository tree.
+sysc#:#sysc_task_tree_missing_reference#:#Missing Object References
+sysc#:#sysc_task_tree_missing_reference_desc#:#Searches and repairs missing object references in the repository tree.
+sysc#:#sysc_task_structure#:#Tree structure
+sysc#:#sysc_task_structure_desc#:#Analyzes and corrects the repository tree structure.
+blog#:#blog_keywords_other#:#Other Keywords
+blog#:#blog_keywords_other_info#:#These keywords were set for other blog postings.
+forum#:#forums_thread_deleted#:#The selected thread including all postings have been deleted.
+forum#:#forums_threads_deleted#:#The selected threads including all postings have been deleted.
+user#:#feedhash#:#Newsfeedhash
+wsp#:#wsp_shared_filter_reset_button#:#Reset Search
+wsp#:#wsp_shared_filter_button#:#Search
+exc#:#exc_direct_submit#:#Submit
+export#:#no_file#:#No file
+content#:#lm_no_download_files#:#There are currently no files for download available.
+rbac#:#feed_copy#:#User can copy webfeed
+crs#:#crs_unsubscribe_member_explanation#:#You receive this message because you unsubscribed from the course mentioned above.
+content#:#cont_sqst#:#Survey Question (Assigned Material)
+mmbr#:#info_refuse_sure#:#Are you sure you want to refuse the following user(s)?
+administration#:#adm_user_starting_point_inherit#:#Use Standard-Settings
+administration#:#adm_user_starting_point_inherit_info#:#The settings that were made by the administrator of the platform as a whole will be used.
+content#:#cont_not_saved_edit_lock_expired#:#Sorry, but another user obtained the edit lock for this page in the meantime. You may close this message and copy the content to your clipboard.
+style#:#sty_type_ha_iheada#:#Hor. Accordion Header (active)
+style#:#sty_type_ha_ihcap#:#Hor. Accordion Caption
+style#:#sty_type_va_iheada#:#Vert. Accordion Header (active)
+style#:#sty_type_va_ihcap#:#Vert. Accordion Caption
+style#:#sty_ha_iheada_class#:#Hor. Accordion Header (active)
+style#:#sty_ha_ihcap_class#:#Hor. Accordion Caption
+style#:#sty_va_iheada_class#:#Vert. Accordion Header (active)
+style#:#sty_va_ihcap_class#:#Vert. Accordion Caption
+exc#:#exc_delete_team#:#Delete Team
+trac#:#trac_cron_info#:#Please activate the "Object Statistics" cron job to gather data.
+rbac#:#mep_copy#:#User can copy media pool
+crs#:#crs_cannot_find_role#:#Can't find this role.
+grp#:#grp_admission_link_failure_invalid_code#:#Can't register: Link is invalid.
+crs#:#crs_admission_link_failure_invalid_code#:#Can't register: Link is invalid.
+auth#:#auth_ldap_server_ds#:#LDAP-Server
+assessment#:#ass_location#:#Location
+assessment#:#ass_imap_hint#:#Hint to be shown as Tooltip
+blog#:#blog_show_latest#:#Show latest postings/drafts
+assessment#:#ass_competence_respect_level_ordering#:#Please note that the competence thresholds have to be defined in an ascending order according to the available levels.
+registration#:#reg_mail_body_activation#:#to activate your account and confirm ownership of this email address, click the link below:
+form#:#err_invalid_input#:#An invalid value has been submited. Please check your input.

@@ -51,8 +51,9 @@ class ilObjGroupGUI extends ilContainerGUI
 		if (!$this->getCreationMode() &&
 			$ilAccess->checkAccess("read", "", $_GET["ref_id"]))
 		{
+			include_once("./Services/Link/classes/class.ilLink.php");
 			$ilNavigationHistory->addItem($_GET["ref_id"],
-				$ilCtrl->getLinkTargetByClass("ilrepositorygui", "frameset"), "grp");
+				ilLink::_getLink($_GET["ref_id"], "grp"), "grp");
 		}
 
 		switch($next_class)
@@ -73,6 +74,11 @@ class ilObjGroupGUI extends ilContainerGUI
 				break;
 
 			case 'ilrepositorysearchgui':
+
+				if(!$this->checkPermissionBool('write'))
+				{
+					$GLOBALS['ilErr']->raiseError($GLOBALS['lng']->txt('permission_denied'), $GLOBALS['ilErr']->WARNING);
+				}
 				include_once('./Services/Search/classes/class.ilRepositorySearchGUI.php');
 				$rep_search =& new ilRepositorySearchGUI();
 				$rep_search->setCallback($this,
@@ -237,7 +243,9 @@ class ilObjGroupGUI extends ilContainerGUI
 			default:
 			
 				// check visible permission
-				if (!$this->getCreationMode() and !$ilAccess->checkAccess('visible','',$this->object->getRefId(),'grp'))
+				if (!$this->getCreationMode() and
+						!$ilAccess->checkAccess('visible','',$this->object->getRefId(),'grp') and
+						!$ilAccess->checkAccess('read','',$this->object->getRefId(),'grp') )
 				{
 					$ilErr->raiseError($this->lng->txt("msg_no_perm_read"),$ilErr->MESSAGE);
 				}
@@ -1360,8 +1368,8 @@ class ilObjGroupGUI extends ilContainerGUI
 		}
 		if($added_users)
 		{
-			ilUtil::sendSuccess($this->lng->txt("grp_users_added"));
-			$this->membersObject();
+			ilUtil::sendSuccess($this->lng->txt("grp_users_added"), true);
+			$this->ctrl->redirect($this, "members");
 
 			return true;
 		}
@@ -1404,8 +1412,8 @@ class ilObjGroupGUI extends ilContainerGUI
 			);
 		}
 		
-		ilUtil::sendSuccess($this->lng->txt('grp_users_removed_from_list'));
-		$this->membersObject();
+		ilUtil::sendSuccess($this->lng->txt('grp_users_removed_from_list'), true);
+		$this->ctrl->redirect($this, "members");
 		return true;
 	}
 	
@@ -1417,10 +1425,6 @@ class ilObjGroupGUI extends ilContainerGUI
 	public function confirmDeleteMembersObject()
 	{
 		$this->checkPermission('write');
-		
-		$this->setSubTabs('members');
-		$this->tabs_gui->setTabActive('members');
-		$this->tabs_gui->setSubTabActive('grp_edit_members');
 		
 		$participants_to_delete = (array) array_unique(array_merge((array) $_POST['admins'],(array) $_POST['members'], (array) $_POST['roles']));
 		
@@ -1441,6 +1445,10 @@ class ilObjGroupGUI extends ilContainerGUI
 			$this->membersObject();
 			return false;
 		}
+
+		$this->setSubTabs('members');
+		$this->tabs_gui->setTabActive('members');
+		$this->tabs_gui->setSubTabActive('grp_edit_members');
 		
 		include_once('./Services/Utilities/classes/class.ilConfirmationGUI.php');
 		$confirm = new ilConfirmationGUI();
@@ -1528,12 +1536,13 @@ class ilObjGroupGUI extends ilContainerGUI
 			$rcps[] = ilObjUser::_lookupLogin($usr_id);
 		}
 
-        require_once 'Services/Mail/classes/class.ilMailFormCall.php';
+		require_once 'Services/Mail/classes/class.ilMailFormCall.php';
+		ilMailFormCall::setRecipients($rcps);
 		ilUtil::redirect(ilMailFormCall::getRedirectTarget(
 			$this, 
 			'members',
 			array(), 
-			array('type' => 'new', 'rcp_to' => implode(',',$rcps),'sig' => $this->createMailSignature())));
+			array('type' => 'new', 'sig' => $this->createMailSignature())));
 		return true;
 	}
 	
@@ -1836,30 +1845,46 @@ class ilObjGroupGUI extends ilContainerGUI
 			return false;
 		}
 
-		foreach ($user_ids as $new_member)
+		$part = ilGroupParticipants::_getInstanceByObjId($this->object->getId());
+		$assigned = FALSE;
+		foreach((array) $user_ids as $new_member)
 		{
-			if(in_array($a_type,$this->object->getLocalGroupRoles(false)))
+			if($part->isAssigned($new_member))
 			{
-				if (!$this->object->addMember($new_member,$a_type))
-				{
-					$this->ilErr->raiseError("An Error occured while assigning user to group !",$this->ilErr->MESSAGE);
-				}
+				continue;
 			}
-
-			ilObjUser::_addDesktopItem($new_member, $this->object->getRefId(), 'grp');
-			
-			include_once './Modules/Group/classes/class.ilGroupMembershipMailNotification.php';
-			$this->object->members_obj->sendNotification(
-				ilGroupMembershipMailNotification::TYPE_ADMISSION_MEMBER,
-				$new_member
-			);
-
+			switch($a_type)
+			{
+				case $this->object->getDefaultAdminRole():
+					$part->add($new_member, IL_GRP_ADMIN);
+					include_once './Modules/Group/classes/class.ilGroupMembershipMailNotification.php';
+					$part->sendNotification(
+						ilGroupMembershipMailNotification::TYPE_ADMISSION_MEMBER, 
+						$new_member
+					);
+					$assigned = TRUE;
+					break;
+				
+				default:
+					$part->add($new_member, IL_GRP_MEMBER);
+					include_once './Modules/Group/classes/class.ilGroupMembershipMailNotification.php';
+					$part->sendNotification(
+						ilGroupMembershipMailNotification::TYPE_ADMISSION_MEMBER, 
+						$new_member
+					);
+					$assigned = TRUE;
+					break;
+			}
 		}
 		
-		unset($_SESSION["saved_post"]);
-		unset($_SESSION['grp_usr_search_result']);
-
-		ilUtil::sendSuccess($this->lng->txt("grp_msg_member_assigned"),true);
+		if($assigned)
+		{
+			ilUtil::sendSuccess($this->lng->txt("grp_msg_member_assigned"),true);
+		}
+		else
+		{
+			ilUtil::sendSuccess($this->lng->txt('grp_users_already_assigned'),TRUE);
+		}
 		$this->ctrl->redirect($this,'members');
 	}
 
@@ -3195,6 +3220,159 @@ class ilObjGroupGUI extends ilContainerGUI
 			$ilToolbar->addButton($this->lng->txt("mail_members"),
 				$this->ctrl->getLinkTarget($this,'mailMembers'));
 		}
+	}
+
+	public function confirmRefuseSubscribersObject()
+	{
+		if(!is_array($_POST["subscribers"]))
+		{
+			ilUtil::sendFailure($this->lng->txt("no_checkbox"));
+			$this->membersObject();
+
+			return false;
+		}
+
+		$this->lng->loadLanguageModule('mmbr');
+
+		$this->checkPermission('write');
+		$this->setSubTabs('members');
+		$this->tabs_gui->setTabActive('members');
+		$this->tabs_gui->setSubTabActive('grp_edit_members');
+
+		include_once("Services/Utilities/classes/class.ilConfirmationGUI.php");
+		$c_gui = new ilConfirmationGUI();
+
+		// set confirm/cancel commands
+		$c_gui->setFormAction($this->ctrl->getFormAction($this, "refuseSubscribers"));
+		$c_gui->setHeaderText($this->lng->txt("info_refuse_sure"));
+		$c_gui->setCancel($this->lng->txt("cancel"), "members");
+		$c_gui->setConfirm($this->lng->txt("confirm"), "refuseSubscribers");
+
+		foreach($_POST["subscribers"] as $subscribers)
+		{
+			$name = ilObjUser::_lookupName($subscribers);
+
+			$c_gui->addItem('subscribers[]',
+							$name['user_id'],
+							$name['lastname'].', '.$name['firstname'].' ['.$name['login'].']',
+							ilUtil::getImagePath('icon_usr.svg'));
+		}
+
+		$this->tpl->setContent($c_gui->getHTML());
+	}
+
+	public function confirmAssignSubscribersObject()
+	{
+		if(!is_array($_POST["subscribers"]))
+		{
+			ilUtil::sendFailure($this->lng->txt("no_checkbox"));
+			$this->membersObject();
+
+			return false;
+		}
+		$this->checkPermission('write');
+		$this->setSubTabs('members');
+		$this->tabs_gui->setTabActive('members');
+		$this->tabs_gui->setSubTabActive('grp_edit_members');
+
+		include_once("Services/Utilities/classes/class.ilConfirmationGUI.php");
+		$c_gui = new ilConfirmationGUI();
+
+		// set confirm/cancel commands
+		$c_gui->setFormAction($this->ctrl->getFormAction($this, "assignSubscribers"));
+		$c_gui->setHeaderText($this->lng->txt("info_assign_sure"));
+		$c_gui->setCancel($this->lng->txt("cancel"), "members");
+		$c_gui->setConfirm($this->lng->txt("confirm"), "assignSubscribers");
+
+		foreach($_POST["subscribers"] as $subscribers)
+		{
+			$name = ilObjUser::_lookupName($subscribers);
+
+			$c_gui->addItem('subscribers[]',
+							$name['user_id'],
+							$name['lastname'].', '.$name['firstname'].' ['.$name['login'].']',
+							ilUtil::getImagePath('icon_usr.svg'));
+		}
+
+		$this->tpl->setContent($c_gui->getHTML());
+		return true;
+	}
+
+	public function confirmRefuseFromListObject()
+	{
+		if(!is_array($_POST["waiting"]))
+		{
+			ilUtil::sendFailure($this->lng->txt("no_checkbox"));
+			$this->membersObject();
+
+			return false;
+		}
+
+		$this->lng->loadLanguageModule('mmbr');
+
+		$this->checkPermission('write');
+		$this->setSubTabs('members');
+		$this->tabs_gui->setTabActive('members');
+		$this->tabs_gui->setSubTabActive('grp_edit_members');
+
+		include_once("Services/Utilities/classes/class.ilConfirmationGUI.php");
+		$c_gui = new ilConfirmationGUI();
+
+		// set confirm/cancel commands
+		$c_gui->setFormAction($this->ctrl->getFormAction($this, "refuseFromList"));
+		$c_gui->setHeaderText($this->lng->txt("info_refuse_sure"));
+		$c_gui->setCancel($this->lng->txt("cancel"), "members");
+		$c_gui->setConfirm($this->lng->txt("confirm"), "refuseFromList");
+
+		foreach($_POST["waiting"] as $waiting)
+		{
+			$name = ilObjUser::_lookupName($waiting);
+
+			$c_gui->addItem('waiting[]',
+							$name['user_id'],
+							$name['lastname'].', '.$name['firstname'].' ['.$name['login'].']',
+							ilUtil::getImagePath('icon_usr.svg'));
+		}
+
+		$this->tpl->setContent($c_gui->getHTML());
+		return true;
+	}
+
+	public function confirmAssignFromWaitingListObject()
+	{
+		if(!is_array($_POST["waiting"]))
+		{
+			ilUtil::sendFailure($this->lng->txt("no_checkbox"));
+			$this->membersObject();
+
+			return false;
+		}
+		$this->checkPermission('write');
+		$this->setSubTabs('members');
+		$this->tabs_gui->setTabActive('members');
+		$this->tabs_gui->setSubTabActive('grp_edit_members');
+
+		include_once("Services/Utilities/classes/class.ilConfirmationGUI.php");
+		$c_gui = new ilConfirmationGUI();
+
+		// set confirm/cancel commands
+		$c_gui->setFormAction($this->ctrl->getFormAction($this, "assignFromWaitingList"));
+		$c_gui->setHeaderText($this->lng->txt("info_assign_sure"));
+		$c_gui->setCancel($this->lng->txt("cancel"), "members");
+		$c_gui->setConfirm($this->lng->txt("confirm"), "assignFromWaitingList");
+
+		foreach($_POST["waiting"] as $waiting)
+		{
+			$name = ilObjUser::_lookupName($waiting);
+
+			$c_gui->addItem('waiting[]',
+							$name['user_id'],
+							$name['lastname'].', '.$name['firstname'].' ['.$name['login'].']',
+							ilUtil::getImagePath('icon_usr.svg'));
+		}
+
+		$this->tpl->setContent($c_gui->getHTML());
+		return true;
 	}
 
 } // END class.ilObjGroupGUI

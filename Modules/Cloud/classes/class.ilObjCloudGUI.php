@@ -99,6 +99,10 @@ class ilObjCloudGUI extends ilObject2GUI {
 				$this->$cmd();
 
 				return;
+			case "infoScreen":
+				$this->prepareOutput();
+				$this->infoScreenObject();
+				return;
 			case "render" :
 				$this->addHeaderAction();
 				break;
@@ -107,7 +111,7 @@ class ilObjCloudGUI extends ilObject2GUI {
 		switch ($next_class) {
 			case "ilinfoscreengui":
 				$this->prepareOutput();
-				$this->infoScreenForward();
+				$this->infoScreen();
 				break;
 			case "ilcommonactiondispatchergui":
 				include_once("Services/Object/classes/class.ilCommonActionDispatcherGUI.php");
@@ -199,10 +203,18 @@ class ilObjCloudGUI extends ilObject2GUI {
 		include("ilias.php");
 	}
 
-
-	public function infoScreen() {
-		return false;
+	/**
+	 * this one is called from the info button in the repository
+	 * not very nice to set cmdClass/Cmd manually, if everything
+	 * works through ilCtrl in the future this may be changed
+	 */
+	function infoScreenObject()
+	{
+		$this->ctrl->setCmd("showSummary");
+		$this->ctrl->setCmdClass("ilinfoscreengui");
+		$this->infoScreen();
 	}
+
 
 
 	public function setTabs() {
@@ -211,7 +223,7 @@ class ilObjCloudGUI extends ilObject2GUI {
 		// tab for the "show content" command
 		if ($ilAccess->checkAccess("read", "", $this->object->getRefId())) {
 			$ilTabs->addTab("content", $lng->txt("content"), $ilCtrl->getLinkTarget($this, "render"));
-			$ilTabs->addTab("id_info", $lng->txt("info"), $this->ctrl->getLinkTargetByClass("ilinfoscreengui", "showSummary"));
+			$ilTabs->addTab("id_info", $lng->txt("info_short"), $this->ctrl->getLinkTargetByClass("ilinfoscreengui", "showSummary"));
 		}
 
 		// a "properties" tab
@@ -229,7 +241,7 @@ class ilObjCloudGUI extends ilObject2GUI {
 	/**
 	 * show information screen
 	 */
-	public function infoScreenForward() {
+	public function infoScreen() {
 		global $ilTabs, $ilErr;
 
 		$ilTabs->activateTab("id_info");
@@ -305,6 +317,9 @@ class ilObjCloudGUI extends ilObject2GUI {
 			}
 			$services_group->addOption($option);
 		}
+
+		//Select first radio-button by default
+		$services_group->setValue(array_shift($services_group->getOptions())->getValue());
 
 		$form->addItem($services_group);
 

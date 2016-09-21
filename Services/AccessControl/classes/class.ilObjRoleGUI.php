@@ -53,7 +53,13 @@ class ilObjRoleGUI extends ilObjectGUI
 		define("USER_FOLDER_ID",7);
 		
 		// Add ref_id of object that contains this role folder
-		$this->obj_ref_id = (int) $_GET['ref_id'];
+		
+		$this->obj_ref_id = 
+				((int) $_REQUEST['rolf_ref_id'] ?
+				(int) $_REQUEST['rolf_ref_id'] :
+				(int) $_REQUEST['ref_id']
+		);
+		
 		$this->obj_obj_id = ilObject::_lookupObjId($this->getParentRefId());
 		$this->obj_obj_type = ilObject::_lookupType($this->getParentObjId());
 		
@@ -61,7 +67,7 @@ class ilObjRoleGUI extends ilObjectGUI
 
 		$this->type = "role";
 		$this->ilObjectGUI($a_data,$a_id,$a_call_by_reference,false);
-		$this->ctrl->saveParameter($this, array("obj_id"));
+		$this->ctrl->saveParameter($this, array('obj_id', 'rolf_ref_id'));
 	}
 
 
@@ -77,6 +83,11 @@ class ilObjRoleGUI extends ilObjectGUI
 		switch($next_class)
 		{
 			case 'ilrepositorysearchgui':
+				
+				if(!$GLOBALS['ilAccess']->checkAccess('edit_permission','', $this->obj_ref_id))
+				{
+					$GLOBALS['ilErr']->raiseError($GLOBALS['lng']->txt('permission_denied'), $GLOBALS['ilErr']->WARNING);
+				}
 				include_once('./Services/Search/classes/class.ilRepositorySearchGUI.php');
 				$rep_search =& new ilRepositorySearchGUI();
 				$rep_search->setTitle($this->lng->txt('role_add_user'));
@@ -453,8 +464,13 @@ class ilObjRoleGUI extends ilObjectGUI
 		{
 			$title->setDisabled(true);
 		}
-		$title->setValidationRegexp('/^(?!il_).*$/');
-		$title->setValidationFailureMessage($this->lng->txt('msg_role_reserved_prefix'));
+		else
+		{
+			//#17111 No validation for disabled fields
+			$title->setValidationRegexp('/^(?!il_).*$/');
+			$title->setValidationFailureMessage($this->lng->txt('msg_role_reserved_prefix'));
+		}
+
 		$title->setSize(40);
 		$title->setMaxLength(70);
 		$title->setRequired(true);
@@ -522,8 +538,16 @@ class ilObjRoleGUI extends ilObjectGUI
 	 */
 	protected function loadRoleProperties(ilObjRole $role)
 	{
-		$role->setTitle($this->form->getInput('title'));
-		$role->setDescription($this->form->getInput('desc'));
+		//Don't set if fields are disabled to prevent html manipulation.
+		if(!$this->form->getItemByPostVar('title')->getDisabled())
+		{
+			$role->setTitle($this->form->getInput('title'));
+
+		}
+		if(!$this->form->getItemByPostVar('desc')->getDisabled())
+		{
+			$role->setDescription($this->form->getInput('desc'));
+		}
 		$role->setAllowRegister($this->form->getInput('reg'));
 		$role->toggleAssignUsersStatus($this->form->getInput('la'));
 		$role->setDiskQuota($this->form->getInput('disk_quota') * pow(ilFormat::_getSizeMagnitude(),2));
@@ -587,12 +611,26 @@ class ilObjRoleGUI extends ilObjectGUI
 	 */
 	public function editObject()
 	{
-		global $rbacsystem, $rbacreview, $ilSetting,$ilErr;
+		global $rbacsystem, $rbacreview, $ilSetting,$ilErr,$ilToolbar;
 
 		if(!$this->checkAccess('write','edit_permission'))
 		{
 			$ilErr->raiseError($this->lng->txt("msg_no_perm_write"),$ilErr->MESSAGE);
 		}
+		
+		// Show copy role button
+		if($this->object->getId() != SYSTEM_ROLE_ID)
+		{
+			$ilToolbar->setFormAction($this->ctrl->getFormAction($this));
+			if($rbacreview->isDeleteable($this->object->getId(), $this->obj_ref_id))
+			{
+				$ilToolbar->addButton(
+					$this->lng->txt('rbac_delete_role'),
+					$this->ctrl->getLinkTarget($this,'confirmDeleteRole')
+				);
+			}
+		}
+		
 		$this->initFormRoleProperties(self::MODE_GLOBAL_UPDATE);
 		$this->readRoleProperties($this->object);
 		$this->tpl->setContent($this->form->getHTML());

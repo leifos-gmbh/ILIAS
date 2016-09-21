@@ -225,8 +225,9 @@ class ilObjCategoryGUI extends ilContainerGUI
 				if (!$this->getCreationMode() &&
 					$ilAccess->checkAccess("read", "", $_GET["ref_id"]))
 				{
+					include_once("./Services/Link/classes/class.ilLink.php");
 					$ilNavigationHistory->addItem($_GET["ref_id"],
-						$ilCtrl->getLinkTargetByClass("ilrepositorygui", "frameset"), "cat");
+						ilLink::_getLink($_GET["ref_id"], "cat"), "cat");
 				}
 
 				$this->prepareOutput();
@@ -1136,6 +1137,13 @@ class ilObjCategoryGUI extends ilContainerGUI
 		$auto = new ilUserAutoComplete();
 		$auto->setSearchFields(array('login','firstname','lastname','email'));
 		$auto->enableFieldSearchableCheck(true);
+		$auto->isMoreLinkAvailable(true);
+
+		if(($_REQUEST['fetchall']))
+		{
+			$auto->setLimit(ilUserAutoComplete::MAX_ENTRIES);
+		}
+
 		echo $auto->getList($_REQUEST['term']);
 		exit();
 	}
@@ -1671,7 +1679,10 @@ class ilObjCategoryGUI extends ilContainerGUI
 				}
 				$this->object->saveIcons($_FILES["cont_icon"]['tmp_name']);
 			}
-			ilUtil::sendSuccess($this->lng->txt("msg_obj_modified"),true);
+			if ($_FILES["cont_icon"]['tmp_name'] || $_POST["cont_icon_delete"])
+			{
+				ilUtil::sendSuccess($this->lng->txt("msg_obj_modified"),true);
+			}
 			$this->ctrl->redirect($this,"editIcons");
 		}
 

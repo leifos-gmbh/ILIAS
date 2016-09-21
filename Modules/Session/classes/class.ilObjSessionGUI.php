@@ -441,7 +441,7 @@ class ilObjSessionGUI extends ilObjectGUI implements ilDesktopItemHandling
 	 */
 	public function infoScreen()
 	{
-		global $ilAccess, $ilUser,$ilCtrl,$tree,$ilToolbar;
+		global $ilAccess, $ilUser,$ilCtrl,$tree,$ilToolbar,$lng;
 
 		$this->checkPermission('visible');
 		$this->tabs_gui->setTabActive('info_short');
@@ -505,6 +505,8 @@ class ilObjSessionGUI extends ilObjectGUI implements ilDesktopItemHandling
 			$this->object->getId(),
 			$eventItems
 		);			
+		
+		$lng->loadLanguageModule("cntr");// #14158		
 		
 		foreach($eventItems as $item)
 		{						
@@ -982,7 +984,6 @@ class ilObjSessionGUI extends ilObjectGUI implements ilDesktopItemHandling
 		$tbl = new ilSessionMaterialsTableGUI($this, "materials");
 		$tbl->setTitle($this->lng->txt("event_assign_materials_table"));
 		$tbl->setDescription($this->lng->txt('event_assign_materials_info'));
-		$tbl->setId("sess_materials_". $this->object->getId());
 
 		$tbl->setMaterialItems($this->event_items->getItems());
 		$tbl->setContainerRefId($this->getContainerRefId());
@@ -1003,11 +1004,24 @@ class ilObjSessionGUI extends ilObjectGUI implements ilDesktopItemHandling
 		include_once './Modules/Session/classes/class.ilEventItems.php';
 		
 		$this->event_items = new ilEventItems($this->object->getId());
-		$this->event_items->setItems(is_array($_POST['items']) ? $_POST['items'] : array());
+
+		$list_items = is_array($_POST['all_items']) ? $_POST['all_items'] : array();
+		$list_items_checked = is_array($_POST['items']) ? $_POST['items'] : array();
+
+		$checked = $this->event_items->getItems();
+		$checked = array_diff($checked, $list_items);//remove all visible items in list
+		$checked = array_merge($checked, $list_items_checked);//add checked items in list
+
+		$this->event_items->setItems($checked);
 		$this->event_items->update();
 
-		ilUtil::sendSuccess($this->lng->txt('settings_saved'));
-		$this->materialsObject();
+		include_once 'Modules/Session/classes/class.ilSessionMaterialsTableGUI.php';
+		$tbl = new ilSessionMaterialsTableGUI($this, "materials");
+		$tbl->setOffset(0);
+		$tbl->storeNavParameter();//remove offset and go to page 1
+
+		ilUtil::sendSuccess($this->lng->txt('settings_saved'), true);
+		$this->ctrl->redirect($this,'materials');
 	}
 	
 	/**
@@ -1657,7 +1671,7 @@ class ilObjSessionGUI extends ilObjectGUI implements ilDesktopItemHandling
 
 				$this->form->addCommandButton('save',$this->lng->txt('event_btn_add'));
 				$this->form->addCommandButton('saveAndAssignMaterials',$this->lng->txt('event_btn_add_edit'));
-				$this->form->addCommandButton('cancel',$this->lng->txt('cancel'));
+				$this->form->addCommandButton('cancelEdit',$this->lng->txt('cancel'));
 		
 				return true;
 			
@@ -1665,7 +1679,7 @@ class ilObjSessionGUI extends ilObjectGUI implements ilDesktopItemHandling
 				$this->form->setTitle($this->lng->txt('event_table_update'));
 
 				$this->form->addCommandButton('update',$this->lng->txt('save'));
-				$this->form->addCommandButton('cancel',$this->lng->txt('cancel'));
+				$this->form->addCommandButton('cancelEdit',$this->lng->txt('cancel'));
 				
 				return true;
 		}
@@ -2159,5 +2173,160 @@ class ilObjSessionGUI extends ilObjectGUI implements ilDesktopItemHandling
 			$this->initContainer();
 		}
 		return $this->container_ref_id;
-	}}
+	}
+
+	public function confirmRefuseSubscribersObject()
+	{
+		if(!is_array($_POST["subscribers"]))
+		{
+			ilUtil::sendFailure($this->lng->txt("no_checkbox"));
+			$this->membersObject();
+
+			return false;
+		}
+
+		$this->lng->loadLanguageModule('mmbr');
+
+		$this->checkPermission('write');
+		$this->tabs_gui->setTabActive('event_edit_members');
+
+		include_once("Services/Utilities/classes/class.ilConfirmationGUI.php");
+		$c_gui = new ilConfirmationGUI();
+
+		// set confirm/cancel commands
+		$c_gui->setFormAction($this->ctrl->getFormAction($this, "refuseSubscribers"));
+		$c_gui->setHeaderText($this->lng->txt("info_refuse_sure"));
+		$c_gui->setCancel($this->lng->txt("cancel"), "members");
+		$c_gui->setConfirm($this->lng->txt("confirm"), "refuseSubscribers");
+
+		foreach($_POST["subscribers"] as $subscribers)
+		{
+			$name = ilObjUser::_lookupName($subscribers);
+
+			$c_gui->addItem('subscribers[]',
+							$name['user_id'],
+							$name['lastname'].', '.$name['firstname'].' ['.$name['login'].']',
+							ilUtil::getImagePath('icon_usr.svg'));
+		}
+
+		$this->tpl->setContent($c_gui->getHTML());
+		return true;
+	}
+
+	public function confirmAssignSubscribersObject()
+	{
+		if(!is_array($_POST["subscribers"]))
+		{
+			ilUtil::sendFailure($this->lng->txt("no_checkbox"));
+			$this->membersObject();
+
+			return false;
+		}
+		$this->checkPermission('write');
+		$this->tabs_gui->setTabActive('event_edit_members');
+
+		include_once("Services/Utilities/classes/class.ilConfirmationGUI.php");
+		$c_gui = new ilConfirmationGUI();
+
+		// set confirm/cancel commands
+		$c_gui->setFormAction($this->ctrl->getFormAction($this, "assignSubscribers"));
+		$c_gui->setHeaderText($this->lng->txt("info_assign_sure"));
+		$c_gui->setCancel($this->lng->txt("cancel"), "members");
+		$c_gui->setConfirm($this->lng->txt("confirm"), "assignSubscribers");
+
+		foreach($_POST["subscribers"] as $subscribers)
+		{
+			$name = ilObjUser::_lookupName($subscribers);
+
+			$c_gui->addItem('subscribers[]',
+							$name['user_id'],
+							$name['lastname'].', '.$name['firstname'].' ['.$name['login'].']',
+							ilUtil::getImagePath('icon_usr.svg'));
+		}
+
+		$this->tpl->setContent($c_gui->getHTML());
+		return true;
+	}
+
+	public function confirmRefuseFromListObject()
+	{
+		if(!is_array($_POST["waiting"]))
+		{
+			ilUtil::sendFailure($this->lng->txt("no_checkbox"));
+			$this->membersObject();
+
+			return false;
+		}
+
+		$this->lng->loadLanguageModule('mmbr');
+
+		$this->checkPermission('write');
+		$this->tabs_gui->setTabActive('event_edit_members');
+
+		include_once("Services/Utilities/classes/class.ilConfirmationGUI.php");
+		$c_gui = new ilConfirmationGUI();
+
+		// set confirm/cancel commands
+		$c_gui->setFormAction($this->ctrl->getFormAction($this, "refuseFromList"));
+		$c_gui->setHeaderText($this->lng->txt("info_refuse_sure"));
+		$c_gui->setCancel($this->lng->txt("cancel"), "members");
+		$c_gui->setConfirm($this->lng->txt("confirm"), "refuseFromList");
+
+		foreach($_POST["waiting"] as $waiting)
+		{
+			$name = ilObjUser::_lookupName($waiting);
+
+			$c_gui->addItem('waiting[]',
+							$name['user_id'],
+							$name['lastname'].', '.$name['firstname'].' ['.$name['login'].']',
+							ilUtil::getImagePath('icon_usr.svg'));
+		}
+
+		$this->tpl->setContent($c_gui->getHTML());
+		return true;
+	}
+
+	public function confirmAssignFromWaitingListObject()
+	{
+		if(!is_array($_POST["waiting"]))
+		{
+			ilUtil::sendFailure($this->lng->txt("no_checkbox"));
+			$this->membersObject();
+
+			return false;
+		}
+		$this->checkPermission('write');
+		$this->tabs_gui->setTabActive('event_edit_members');
+
+		include_once("Services/Utilities/classes/class.ilConfirmationGUI.php");
+		$c_gui = new ilConfirmationGUI();
+
+		// set confirm/cancel commands
+		$c_gui->setFormAction($this->ctrl->getFormAction($this, "assignFromWaitingList"));
+		$c_gui->setHeaderText($this->lng->txt("info_assign_sure"));
+		$c_gui->setCancel($this->lng->txt("cancel"), "members");
+		$c_gui->setConfirm($this->lng->txt("confirm"), "assignFromWaitingList");
+
+		foreach($_POST["waiting"] as $waiting)
+		{
+			$name = ilObjUser::_lookupName($waiting);
+
+			$c_gui->addItem('waiting[]',
+							$name['user_id'],
+							$name['lastname'].', '.$name['firstname'].' ['.$name['login'].']',
+							ilUtil::getImagePath('icon_usr.svg'));
+		}
+
+		$this->tpl->setContent($c_gui->getHTML());
+		return true;
+	}
+
+	 function cancelEditObject()
+	 {
+		 global $ilCtrl, $tree;
+		 $parent_id = $tree->getParentId($this->object->getRefId());
+		 $ilCtrl->setParameterByClass("ilrepositorygui", "ref_id", $parent_id);
+		 $ilCtrl->redirectByClass("ilrepositorygui", "");
+	 }
+}
 ?>

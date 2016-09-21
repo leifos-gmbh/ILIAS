@@ -870,7 +870,10 @@ class ilObjMediaObjectGUI extends ilObjectGUI
 		if ($std_item->getLocationType() == "LocalFile")
 		{
 			$file = $mob_dir."/".$std_item->getLocation();
-			$size = getimagesize($file);
+
+			include_once("./Services/MediaObjects/classes/class.ilMediaImageUtil.php");
+			$size = ilMediaImageUtil::getImageSize($file);
+
 			$std_item->setWidth($size[0]);
 			$std_item->setHeight($size[1]);
 			$this->object->update();
@@ -890,7 +893,8 @@ class ilObjMediaObjectGUI extends ilObjectGUI
 		if ($full_item->getLocationType() == "LocalFile")
 		{
 			$file = $mob_dir."/".$full_item->getLocation();
-			$size = getimagesize($file);
+			include_once("./Services/MediaObjects/classes/class.ilMediaImageUtil.php");
+			$size = ilMediaImageUtil::getImageSize($file);
 			$full_item->setWidth($size[0]);
 			$full_item->setHeight($size[1]);
 			$this->object->update();
@@ -1797,7 +1801,7 @@ class ilObjMediaObjectGUI extends ilObjectGUI
 			if (is_object($st_item) && $this->getEnabledMapAreas())
 			{
 				$format = $st_item->getFormat();
-				if (substr($format, 0, 5) == "image")
+				if (substr($format, 0, 5) == "image" && !is_int(strpos($format, "svg")))
 				{
 					$ilTabs->addTarget("cont_def_map_areas",
 						$this->ctrl->getLinkTargetByClass(

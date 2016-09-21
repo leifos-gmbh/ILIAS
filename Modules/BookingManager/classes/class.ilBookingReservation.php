@@ -515,12 +515,12 @@ class ilBookingReservation
 			if($filter['to'])
 			{
 				$where[] = 'date_to <= '.$ilDB->quote($filter['to'], 'integer');
-			}
-			if($filter['user_id'])
-			{
-				$where[] = 'user_id = '.$ilDB->quote($filter['user_id'], 'integer');
 			}					
 		}
+		if($filter['user_id']) // #16584
+		{
+			$where[] = 'user_id = '.$ilDB->quote($filter['user_id'], 'integer');
+		}			
 		/*
 		if($a_group_id)
 		{
@@ -535,6 +535,11 @@ class ilBookingReservation
 		if($a_has_schedule)
 		{			
 			$sql .= ' ORDER BY date_from DESC';			
+		}
+		else
+		{
+			// #16155 - could be cancelled and re-booked
+			$sql .= ' ORDER BY status';
 		}
 				
 		$set = $ilDB->query($sql);			
@@ -564,13 +569,15 @@ class ilBookingReservation
 			}
 			
 			if(!isset($res[$idx]))
-			{								
+			{				
+				$uname = ilObjUser::_lookupName($user_id);
+				
 				$res[$idx] = array(					
 					"object_id" => $obj_id
 					,"title" => $row["title"]
 					,"user_id" => $user_id
 					,"counter" => 1						
-					,"user_name" => ilObjUser::_lookupFullName($user_id)					
+					,"user_name" => $uname["lastname"].", ".$uname["firstname"] // #17862		
 				);
 				
 				if($a_has_schedule)
@@ -582,7 +589,8 @@ class ilBookingReservation
 					$res[$idx]["week"] = date("W",  $row["date_from"]);				
 					$res[$idx]["weekday"] = date("w",  $row["date_from"]);				
 					$res[$idx]["can_be_cancelled"] = ($row["status"] != self::STATUS_CANCELLED &&
-						$row["date_from"] > time());					
+						$row["date_from"] > time());	
+					$res[$idx]["_sortdate"] = $row["date_from"]; 
 				}
 				else
 				{
@@ -600,7 +608,15 @@ class ilBookingReservation
 		$size = sizeof($res);
 		
 		// order		
-		$numeric = in_array($a_order_field, array("counter", "date", "week", "weekday"));		
+		$numeric = in_array($a_order_field, array("counter", "date", "week", "weekday"));			
+		
+		// #16560 - this will enable matchting slot sorting to date/week
+		if($a_has_schedule &&
+			in_array($a_order_field, array("date", "week")))
+		{
+			$a_order_field = "_sortdate";
+		}
+		
 		$res = ilUtil::sortArray($res, $a_order_field, $a_order_direction, $numeric);
 				
 		// offset/limit		

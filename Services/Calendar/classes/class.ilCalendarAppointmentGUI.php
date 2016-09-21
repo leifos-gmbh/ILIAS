@@ -1316,6 +1316,11 @@ class ilCalendarAppointmentGUI
 		$cat->setType(ilCalendarCategory::TYPE_USR);
 		$cat->setTitle($this->lng->txt('cal_default_calendar'));
 		$cat->setObjId($ilUser->getId());
+		
+		// delete calendar cache
+		include_once './Services/Calendar/classes/class.ilCalendarCache.php';
+		ilCalendarCache::getInstance()->deleteUserEntries($ilUser->getId());
+
 		return $cat->add();
 	}
 	
@@ -1642,6 +1647,13 @@ class ilCalendarAppointmentGUI
 		$auto = new ilUserAutoComplete();
 		$auto->setSearchFields($a_fields);
 		$auto->enableFieldSearchableCheck(true);
+		$auto->setMoreLinkAvailable(true);
+
+		if(($_REQUEST['fetchall']))
+		{
+			$auto->setLimit(ilUserAutoComplete::MAX_ENTRIES);
+		}
+
 		echo $auto->getList($_REQUEST['query']);
 		exit();
 	}

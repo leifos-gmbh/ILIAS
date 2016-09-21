@@ -602,11 +602,11 @@ class assTextSubset extends assQuestion implements ilObjQuestionScoringAdjustabl
 		}
 		$entered_values = 0;
 
+		$solutionSubmit = $this->getSolutionSubmit();
+
 		$this->getProcessLocker()->requestUserSolutionUpdateLock();
 
 		$affectedRows = $this->removeCurrentSolution($active_id, $pass);
-
-		$solutionSubmit = $this->getSolutionSubmit();
 		
 		foreach($solutionSubmit as $value)
 		{
@@ -826,8 +826,8 @@ class assTextSubset extends assQuestion implements ilObjQuestionScoringAdjustabl
 		$result['nr_of_tries'] = (int) $this->getNrOfTries();
 		$result['matching_method'] = (string) $this->getTextRating();
 		$result['feedback'] = array(
-			"onenotcorrect" => $this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), false),
-			"allcorrect" => $this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), true)
+			'onenotcorrect' => $this->formatSAQuestion($this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), false)),
+			'allcorrect' => $this->formatSAQuestion($this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), true))
 		);
 
 		$answers = array();
@@ -862,6 +862,7 @@ class assTextSubset extends assQuestion implements ilObjQuestionScoringAdjustabl
 	protected function getSolutionSubmit()
 	{
 		$solutionSubmit = array();
+		$purifier = $this->getHtmlUserSolutionPurifier();
 		foreach($_POST as $key => $val)
 		{
 			if(preg_match("/^TEXTSUBSET_(\d+)/", $key, $matches))
@@ -869,6 +870,7 @@ class assTextSubset extends assQuestion implements ilObjQuestionScoringAdjustabl
 				$val = trim($val);
 				if(strlen($val))
 				{
+					$val = $purifier->purify($val);
 					$solutionSubmit[] = $val;
 				}
 			}

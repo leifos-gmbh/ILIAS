@@ -154,6 +154,13 @@ class ilLocalUserGUI {
 		$auto = new ilUserAutoComplete();
 		$auto->setSearchFields(array( 'login', 'firstname', 'lastname', 'email' ));
 		$auto->enableFieldSearchableCheck(true);
+		$auto->setMoreLinkAvailable(true);
+
+		if(($_REQUEST['fetchall']))
+		{
+			$auto->setLimit(ilUserAutoComplete::MAX_ENTRIES);
+		}
+
 		echo $auto->getList($_REQUEST['query']);
 		exit();
 	}
@@ -162,26 +169,28 @@ class ilLocalUserGUI {
 	/**
 	 * Delete User
 	 */
-	function performDeleteUsersObject() {
+	function performDeleteUsers() {
+		global $ilLog;
 		include_once './Services/User/classes/class.ilLocalUser.php';
 		$this->checkPermission("cat_administrate_users");
 		foreach ($_POST['user_ids'] as $user_id) {
-			if (! in_array($user_id, ilLocalUser::_getAllUserIds($this->obj->getRefId()))) {
-				die('user id not valid');
+			if (! in_array($user_id, ilLocalUser::_getAllUserIds($_GET['ref_id']))) {
+				$ilLog->write(__FILE__.":".__LINE__." User with id $user_id could not be found.");
+				ilUtil::sendFailure($this->lng->txt('user_not_found_to_delete'));
 			}
 			if (! $tmp_obj =& ilObjectFactory::getInstanceByObjId($user_id, false)) {
 				continue;
 			}
 			$tmp_obj->delete();
 		}
-		ilUtil::sendSuccess($this->lng->txt('deleted_users'));
-		$this->listUser();
+		ilUtil::sendSuccess($this->lng->txt('deleted_users'), true);
+		$this->ctrl->redirect($this, 'index');
 
 		return true;
 	}
 
 
-	function deleteUsersObject() {
+	function deleteUsers() {
 		$this->checkPermission("cat_administrate_users");
 		if (! count($_POST['id'])) {
 			ilUtil::sendFailure($this->lng->txt('no_users_selected'));
@@ -394,6 +403,16 @@ class ilLocalUserGUI {
 		$this->tpl->setVariable("ROLES_TABLE", $tbl->tpl->get());
 
 		return true;
+	}
+
+	/**
+	 * @param $permission
+	 */
+	protected function checkPermission($permission) {
+		if (! $this->ilAccess->checkAccess($permission, "", $_GET["ref_id"])) {
+			ilUtil::sendFailure($this->lng->txt("permission_denied"), true);
+			$this->ctrl->redirect($this, "");
+		}
 	}
 }
 

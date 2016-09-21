@@ -584,10 +584,7 @@ class Mail_RFC822 {
         }
 
         // Check for any char from ASCII 0 - ASCII 127
-        if (!preg_match('/^[\\x00-\\x7E]+$/i', $atom, $matches)) {
-            return false;
-        }
-
+        // mjansen patch 16 Sep 2015 start
         // Check for specials:
         if (preg_match('/[][()<>@,;\\:". ]/', $atom)) {
             return false;
@@ -597,6 +594,12 @@ class Mail_RFC822 {
         if (preg_match('/[\\x00-\\x1F]+/', $atom)) {
             return false;
         }
+        #16291
+        #17618
+        if (!(bool)preg_match('//u', $atom)) {
+            return false;
+        }
+        // mjansen patch 16 Sep 2015 end
 
         return true;
     }

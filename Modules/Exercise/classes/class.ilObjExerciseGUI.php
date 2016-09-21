@@ -609,7 +609,9 @@ class ilObjExerciseGUI extends ilObjectGUI
 		}
 
 		if($success)
-		{
+		{			
+			ilUtil::sendSuccess($this->lng->txt("file_added"), true);		
+			
 			$this->sendNotifications((int)$_GET["ass_id"]);
 			$this->object->handleSubmission((int)$_GET['ass_id']);
 		}
@@ -1097,6 +1099,7 @@ class ilObjExerciseGUI extends ilObjectGUI
 		}
 		else
 		{
+			/* #16921
 			// #9946 - create team for new user(s) for each team upload assignment
 			foreach(ilExAssignment::getAssignmentDataOfExercise($this->object->getId()) as $ass)
 			{
@@ -1109,10 +1112,11 @@ class ilObjExerciseGUI extends ilObjectGUI
 					}
 				}
 			}						
+			*/
 			
 			ilUtil::sendSuccess($this->lng->txt("exc_members_assigned"),true);
 		}
-//exit;
+
 		$this->ctrl->redirect($this, "members");
 		return true;
 	}
@@ -2098,7 +2102,8 @@ class ilObjExerciseGUI extends ilObjectGUI
 		
 		if (is_object($this->object))
 		{
-			$ilLocator->addItem($this->object->getTitle(), $this->ctrl->getLinkTarget($this, "infoScreen"), "", $_GET["ref_id"]);
+			// #17955
+			$ilLocator->addItem($this->object->getTitle(), $this->ctrl->getLinkTarget($this, "showOverview"), "", $_GET["ref_id"]);
 		}
 	}
 	
@@ -2374,8 +2379,9 @@ class ilObjExerciseGUI extends ilObjectGUI
 					$this->form->getItemByPostVar("peer")
 						->setAlert($lng->txt("exc_needs_deadline"));
 					$valid = false;
-				}					
-				if($_POST["fb"])
+				}		
+				// #18508
+				if($_POST["fb"] && $_POST["fb_date"] == ilExAssignment::FEEDBACK_DATE_DEADLINE)
 				{
 					$this->form->getItemByPostVar("fb")
 						->setAlert($lng->txt("exc_needs_deadline"));
@@ -3252,7 +3258,7 @@ class ilObjExerciseGUI extends ilObjectGUI
 		$conf->setFormAction($this->ctrl->getFormAction($this, "directSubmit"));
 		
 		$conf->setHeaderText($txt);
-		$conf->setConfirm($this->lng->txt("submit"), "directSubmit");
+		$conf->setConfirm($this->lng->txt("exc_direct_submit"), "directSubmit");
 		$conf->setCancel($this->lng->txt("cancel"), "showOverview");
 		
 		$tpl->setContent($conf->getHTML());
@@ -3742,21 +3748,28 @@ class ilObjExerciseGUI extends ilObjectGUI
 		ilUtil::sendSuccess($this->lng->txt("settings_saved"), true);
 		$this->ctrl->redirect($this, "submissionScreenTeam");
 	}
+		
+	public function confirmDeleteTeamObject()
+	{
+		$this->confirmRemoveTeamMemberObject(true);
+	}
 	
-	public function confirmRemoveTeamMemberObject()
+	public function confirmRemoveTeamMemberObject($a_full_delete = false)
 	{
 		global $ilUser, $tpl;
 		
-		$ids = $_POST["id"];
+		$team_id = $this->ass->getTeamId($ilUser->getId());
+		$members = $this->ass->getTeamMembers($team_id);
 		
+		$ids = (bool)$a_full_delete
+			? $members
+			: $_POST["id"];
+
 		if(!sizeof($ids))
 		{
 			ilUtil::sendFailure($this->lng->txt("select_one"), true);
 			$this->ctrl->redirect($this, "submissionScreenTeam");
 		}
-		
-		$team_id = $this->ass->getTeamId($ilUser->getId());
-		$members = $this->ass->getTeamMembers($team_id);
 		
 		$team_deleted = false;
 		if(sizeof($members) <= sizeof($ids))
@@ -3764,7 +3777,7 @@ class ilObjExerciseGUI extends ilObjectGUI
 			if(sizeof($members) == 1 && $members[0] == $ilUser->getId())
 			{
 				// direct team deletion - no confirmation
-				return $this->removeTeamMemberObject();
+				return $this->removeTeamMemberObject($a_full_delete);
 			}						
 			else
 			{
@@ -3773,8 +3786,7 @@ class ilObjExerciseGUI extends ilObjectGUI
 			}
 		}
 		
-		// #11957
-		
+		// #11957		
 		$team_id = $this->initTeamSubmission("showOverview");
 		
 		include_once("./Services/Utilities/classes/class.ilConfirmationGUI.php");
@@ -3809,33 +3821,37 @@ class ilObjExerciseGUI extends ilObjectGUI
 
 		$tpl->setContent($cgui->getHTML());		
 	}
-	
-	public function removeTeamMemberObject()
+	public function removeTeamMemberObject($a_full_delete = false)
 	{
 		global $ilUser;
+				
+		$team_id = $this->ass->getTeamId($ilUser->getId());
+		$members = $this->ass->getTeamMembers($team_id);
 		
-		$ids = $_POST["id"];
-		
+		$ids = (bool)$a_full_delete
+			? $members
+			: $_POST["id"];
+
 		if(!sizeof($ids))
 		{
 			ilUtil::sendFailure($this->lng->txt("select_one"), true);
 			$this->ctrl->redirect($this, "submissionScreenTeam");
-		}
+		}		
 		
-		$team_id = $this->ass->getTeamId($ilUser->getId());
-		$members = $this->ass->getTeamMembers($team_id);
-		
-		$team_deleted = false;
-		if(sizeof($members) <= sizeof($ids))
+		$team_deleted = (bool)$a_full_delete;		
+		if(!$team_deleted)
 		{
-			if(sizeof($members) == 1 && $members[0] == $ilUser->getId())
+			if(sizeof($members) <= sizeof($ids))
 			{
-				$team_deleted = true;
-			}						
-			else
-			{
-				ilUtil::sendFailure($this->lng->txt("exc_team_at_least_one"), true);
-				$this->ctrl->redirect($this, "submissionScreenTeam");
+				if(sizeof($members) == 1 && $members[0] == $ilUser->getId())
+				{
+					$team_deleted = true;
+				}						
+				else
+				{
+					ilUtil::sendFailure($this->lng->txt("exc_team_at_least_one"), true);
+					$this->ctrl->redirect($this, "submissionScreenTeam");
+				}
 			}
 		}
 		
@@ -4783,7 +4799,7 @@ class ilObjExerciseGUI extends ilObjectGUI
 	{
 		$this->checkPermission("write");
 		$ass = new ilExAssignment((int) $_GET["ass_id"]);
-		$ass->saveMultiFeedbackFiles($_POST["file"]);
+		$ass->saveMultiFeedbackFiles($_POST["file"], $this->object);
 		
 		ilUtil::sendSuccess($this->lng->txt("msg_obj_modified"), true);
 		$this->ctrl->redirect($this, "members");
@@ -4805,7 +4821,9 @@ class ilObjExerciseGUI extends ilObjectGUI
 			$comment = trim($_POST["comm"]);
 			
 			if($ass_id && $user_id)
-			{				
+			{								
+				include_once "Modules/Exercise/classes/class.ilExAssignment.php";
+				
 				// team upload?
 				if(is_object($this->ass) && $this->ass->getType() == ilExAssignment::TYPE_UPLOAD_TEAM)
 				{
@@ -4917,6 +4935,13 @@ class ilObjExerciseGUI extends ilObjectGUI
 			}			
 			
 			$this->ass->getTeamId($ilUser->getId(), true);		
+			
+			// #18046
+			if (!$this->object->members_obj->isAssigned($ilUser->getId()))
+			{
+				$this->object->members_obj->assignMember($ilUser->getId());
+			}
+			
 			ilUtil::sendSuccess($this->lng->txt("settings_saved"), true);	
 		}
 		

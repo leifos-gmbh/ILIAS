@@ -5,7 +5,7 @@
 * @module			language file German
 * @modulegroup		language
 * @author			Matthias Kunkel <mkunkel@me.com>
-* @version			$Id$
+* @version			$Id: ilias_de.lang 60971 2015-10-05 10:40:13Z gitmgr $
 */
 // The language file starts beyond the HTML-comment below. DO NOT modify this line!
 // To edit your language file with a spreadsheet (i.e. Excel or StarCalc) remove all lines
@@ -287,7 +287,7 @@ assessment#:#tst_objective_oriented_test_pass_without_questions#:#Der gestartete
 assessment#:#tst_dyn_quest_set_pool_deleted#:#Der aktuell konfigurierte Fragenpool "%s" ist gelöscht worden.
 assessment#:#tst_old_style_rnd_quest_set_broken#:#Dieser Random Test befindet sich in einem irreparablen Zustand, da angeschlossene Fragepools gelöscht wurden. Aus diesem Grund können Teilnehmer diesen Test nicht länger absolvieren.
 assessment#:#solution_contain_keywords#:#Punkte werden auf Basis des Vorkommens der folgenden Begriffe vergeben:
-assessment#:#essay_scoring_mode#:#Bewertungs Modus
+assessment#:#essay_scoring_mode#:#Bewertungsmodus
 assessment#:#essay_scoring_mode_without_keywords#:#Keine automatische Bewertung
 assessment#:#essay_scoring_mode_without_keywords_desc#:#Es werden keine Punkte automatisiert vergeben. Die Punktevergabe ist nur mit manueller Bewertung möglich.
 assessment#:#essay_scoring_mode_keyword_relation_any#:#Automatische Bewertung bei Nennung einzelner Begriffe
@@ -347,6 +347,7 @@ assessment#:#apply#:#Übernehmen
 assessment#:#ass_completion_by_submission#:#Bestehen durch Abgabe
 assessment#:#ass_completion_by_submission_info#:#Falls aktiviert, führt die Abgabe einer Lösungsdatei zur Vergabe der Maximalpunktzahl für diese Frage. Die Bewertung kann jederzeit manuell angepasst werden. Das Ändern dieser Einstellung hat keine nachträglichen Auswirkungen auf bereits eingereichte Lösungen.
 assessment#:#ass_create_export_file#:#Erstelle Exportdatei
+assessment#:#ass_create_export_file_with_results#:#Erstelle Exportdatei (inkl. Teilnehmerergebnisse)
 assessment#:#ass_create_export_test_results#:#Erstelle Ergebnisdatei
 assessment#:#ass_create_export_test_archive#:#Erstelle Archivdatei für Test
 assessment#:#ass_export_files#:#Exportdateien
@@ -401,10 +402,10 @@ assessment#:#circle#:#Kreis
 assessment#:#circle_click_center#:#Bitte klicken Sie auf den Mittelpunkt der gewünschten Region
 assessment#:#circle_click_circle#:#Bitte klicken Sie auf einen Punkt auf dem Umkreis der gewünschten Region
 assessment#:#clientip#:#Client IP
-assessment#:#close_text_hint#:#Um eine Lücke in den Text einzufügen, setzen Sie den Cursor an die entsprechende Position und betätigen den Button "Lücke erzeugen". Anschließend stehen weiter unten entsprechende Bearbeitungsbereiche zur Verfügung. Ebenso können Sie die Lücken zur Berarbeitung im Lückentext direkt anclicken.
+assessment#:#close_text_hint#:#Um eine Lücke in den Text einzufügen, setzen Sie den Cursor an die entsprechende Position und klicken Sie auf die Schaltfläche "Lücke einfügen". Anschließend stehen weiter unten entsprechende Bearbeitungsbereiche zur Verfügung. Ebenso können Sie die Lücken zur Bearbeitung im Lückentext direkt anklicken.
 assessment#:#insert_gap#:#Lücke einfügen
 assessment#:#cloze_fixed_textlength#:#Länge des Textfeldes
-assessment#:#cloze_fixed_textlength_description#:#Wenn Sie hier einen Wert eintragen, werden Textlücken, welche keinen eigenen Wert für eine maximale Länge definieren, sowie numerische Lücken mit dieser Länge erzeugt, so dass es nicht möglich ist eine größere Anzahl an Zeichen einzugeben. Für numerische Lücken ist darüberhinaus zu beachten, dass das Dezimaltrennzeichen dabei mit gezählt wird.
+assessment#:#cloze_fixed_textlength_description#:#Wenn Sie hier einen Wert eintragen, werden Textlücken, welche keinen eigenen Wert für eine maximale Länge definieren, sowie numerische Lücken mit dieser Länge erzeugt, so dass es nicht möglich ist eine größere Anzahl an Zeichen einzugeben. Für numerische Lücken ist darüber hinaus zu beachten, dass das Dezimaltrennzeichen dabei mit gezählt wird.
 assessment#:#qpl_maxchars_info_numeric_question#:#Wenn Sie hier einen Wert eintragen, wird das Feld für die numerische Antwort mit der angegebenen Länge erzeugt, so dass es nicht möglich ist eine größere Anzahl an Zeichen einzugeben. Zu beachten ist dabei, dass das Dezimaltrennzeichen dabei mit gezählt wird.
 assessment#:#cloze_text#:#Lückentextfrage
 assessment#:#cloze_textgap_case_insensitive#:#Zwischen Groß- und Kleinschreibung wird nicht unterschieden
@@ -497,6 +498,8 @@ assessment#:#empty_term_message#:#Mindestens ein Textfeld für Terme ist leer.
 assessment#:#empty_terms_exist#:#Sie haben noch nicht alle Terme ausgefüllt. Bitte füllen Sie erst diese Felder aus, bevor Sie neue Terme anlegen.
 assessment#:#enable_javascript#:#Klicken Sie hier, um die JavaScript-Unterstützung zu aktivieren
 assessment#:#end_tag#:#Endmarkierung
+assessment#:#tst_conflict_fbh_oblig_quest#:#Die Kombination der Verwendung von verpflichtenden Fragen und dem Festschreiben von Antworten ist nicht erlaubt.
+assessment#:#tst_conflict_reset_non_fbh#:#Die Einstellung "Gegebene Antworten festschreiben" wurde deaktiviert. 
 assessment#:#ending_time_reached#:#Sie haben das Ende der möglichen Bearbeitungsdauer des Tests überschritten.
 assessment#:#enlarge#:#vergrößern
 assessment#:#enter_anonymous_code#:#Zugangsschlüssel für anonymen Zugang
@@ -1024,9 +1027,9 @@ assessment#:#tst_confirm_delete_results_info#:#Ihre bisherigen Frageergebnisse w
 assessment#:#tst_confirm_print#:#Hier können sie den Test ausdrucken. Die Übersicht enthält alle Fragen, deren Lösung sowie die vergebenen Punkte. Die Frage-Elemente erscheinen stets am Ende der Frage.
 assessment#:#tst_confirm_submit_answers#:#Bitte bestätigen Sie, dass Sie den Test beenden und die gegebenen Antworten abschicken möchten. Nach dem Abschicken gibt es keine Möglichkeit mehr, Anworten einzugeben oder zu korrigieren.
 assessment#:#tst_count_correct_solutions#:#Nur richtige und vollständige Antworten erzielen Punkte
-assessment#:#tst_count_correct_solutions_desc#:#Teilnehmer erhalten entweder die maximale Punktzahl für vollständige und richtige Antworten oder 0 Punkte in allen anderen Fällen.
+assessment#:#tst_count_correct_solutions_desc#:#Teilnehmer erhalten entweder die maximale Punktzahl für vollständige und richtige Antworten oder 0 Punkte in allen anderen Fällen. Dies gilt auch für Fragen, welche Punkte für Teilantworten definieren.
 assessment#:#tst_count_partial_solutions#:#Auch teilweise falsche Antworten erzielen Punkte
-assessment#:#tst_count_partial_solutions_desc#:#Punkte für die korrekt gegebenen Teilantworten einer Frage werden aufsummiert. Es werden also  für auch insgesamt unvollständige oder teilweise falsche Antworten Punkte vergeben.
+assessment#:#tst_count_partial_solutions_desc#:#Sofern eine Frage Punkte für Teilantworten definiert, werden Punkte für die korrekt gegebenen Teilantworten der Frage aufsummiert. Es werden also für auch insgesamt unvollständige oder teilweise falsche Antworten je nach Frage Punkte vergeben.
 assessment#:#tst_default_settings#:#Persönliche Standardeinstellungen
 assessment#:#tst_defaults_applied#:#Die ausgewählten Standardeinstellungen wurden angewendet.
 assessment#:#tst_defaults_apply_not_possible#:#ILIAS konnte die ausgewählten Standardeinstellungen nicht auf diesen Test anwenden! Eventuell enthält dieser Test bereits Teilnehmerdatensätze, die verhindern, dass bestimmte Standardeinstellungen übernommen werden können.
@@ -1169,6 +1172,7 @@ assessment#:#tst_password_entered_wrong_password#:#Sie können den Test nicht st
 assessment#:#tst_password_introduction#:#Dieser Test kann nur mit einem Testpasswort gestartet werden. Bitte tragen Sie das Passwort hier ein.
 assessment#:#tst_percent_solved#:#Prozent gelöst
 assessment#:#tst_position#:#Frage %s von %s
+assessment#:#tst_position_without_total#:#Frage %s
 assessment#:#tst_postpone#:#Fragen zurückstellen
 assessment#:#tst_postpone_description#:#Erlaubt Teilnehmern, einzelne Fragen zur späteren Bearbeitung an das Ende des Tests zu stellen.
 assessment#:#tst_presentation_properties#:#Durchführung: Verhalten der Frage
@@ -1229,6 +1233,7 @@ assessment#:#tst_result#:#Testergebnis
 assessment#:#tst_result_user_name#:#Testergebnisse für %s
 assessment#:#tst_result_user_name_pass#:#Ergebnisse von Testdurchlauf %s für %s
 assessment#:#tst_results#:#Testergebnisse
+assessment#:#tst_result_pass#:#Ergebnisse des Testdurchlaufs
 assessment#:#tst_results_access_enabled#:#Teilnehmer sehen Testergebnisse
 assessment#:#tst_results_access_enabled_desc#:#Teilnehmer erhalten Zugriff auf ihre Testergebnisse. Um diese einzusehen, klicken sie im 'Info'-Reiter den Button 'Testergebnisse anzeigen'.
 assessment#:#tst_results_access_setting#:#Zeitpunkt
@@ -1290,7 +1295,7 @@ assessment#:#tst_sequence#:#Reihenfolge
 assessment#:#tst_sequence_fixed#:#Die Reihenfolge der Fragen muss eingehalten werden
 assessment#:#tst_sequence_postpone#:#Fragen können an das Ende eines Testdurchlaufs zurückgestellt werden
 assessment#:#tst_sequence_properties#:#Durchführung: Funktionen für Teilnehmer
-assessment#:#tst_final_information#:#Test abschliessen
+assessment#:#tst_final_information#:#Test abschließen
 assessment#:#tst_session_settings#:#Durchführung
 assessment#:#tst_set_offline_due_to_switched_question_set_type_setting#:#Der Test wurde auf Offline gesetzt, da der Testmodus gewechselt wurde. Sie müssen eine neue Testmodus-bezogene Fragenkonfiguration erstellen, bevor Sie den Test wieder online setzen können.
 assessment#:#tst_cannot_online_due_to_switched_quest_set_type_setting#:#Der Test konnte nicht auf online gesetzt werden, da der Testmodus gewechselt wurde. Sie müssen eine neue Testmodus-bezogene Fragenkonfiguration erstellen, bevor Sie den Test wieder online setzen können.
@@ -1527,7 +1532,7 @@ assessment#:#tst_question_feedback_back_to_feedback_form#:#Zurück zur aufrufend
 assessment#:#enable_examview#:#Übersicht gegebener Antworten
 assessment#:#enable_examview_desc#:#Teilnehmern werden alle Fragen und die von ihnen gegebenen Antworten vor Abgabe des Tests präsentiert.
 assessment#:#test_enable_archiving#:#Archivierung aktivieren
-assessment#:#test_enable_archiving_desc#:#Im Reiter 'Export' kann der gesamte Test mit allen zugehörigen Teilnehmerantworten exportiert und herunterladen werden.
+assessment#:#test_enable_archiving_desc#:#Im Reiter 'Export' kann der gesamte Test mit allen zugehörigen Teilnehmerantworten exportiert und herunterladen werden. Die Archivdateien werden bei der Testabgabe generiert und bei jeder Änderung der Auswertung vollständig aktualisiert. Das kann zu Verzögerungen und hoher Serverlast führen.
 assessment#:#ass_create_archive_export#:#Archivexport erzeugen.
 assessment#:#cannot_export_archive#:#Archivexport kann nicht erzeugt werden.
 assessment#:#show_examview_html#:#Am Bildschirm
@@ -1738,7 +1743,7 @@ blog#:#blog_edit#:#Blog editieren
 blog#:#blog_enable_notes#:#Öffentliche Kommentare
 blog#:#blog_exercise_info#:#Dieses Blog ist der Übungseinheit "%s" in der Übung "%s" zugeordnet.
 blog#:#blog_exercise_submitted_info#:#Ihre letzte Einreichung war am %s. Bitte prüfen Sie die Export-Datei: %s.
-blog#:#blog_finalize_blog#:#Blog abschliessen und abgeben
+blog#:#blog_finalize_blog#:#Blog abschließen und abgeben
 blog#:#blog_finalized#:#Das Blog wurde abgegeben.
 blog#:#blog_font_color#:#Schriftfarbe
 blog#:#blog_list_more#:#mehr
@@ -2852,7 +2857,7 @@ common#:#delete_inactivated_user_accounts_include_roles#:#Berücksichtigte Rolle
 common#:#delete_inactivated_user_accounts_include_roles_desc#:#Definiert, welche Rollen beim Löschen berücksichtigt werden sollen.
 common#:#delete_inactivated_user_accounts_interval#:#Häufigkeit
 common#:#delete_inactivated_user_accounts_interval_desc#:#Häufigkeit in der die Löschbedingungen überprüft werden.
-common#:#delete_inactivated_user_accounts_period#:#Vergangene Tage seit letzter Anmeldung
+common#:#delete_inactivated_user_accounts_period#:#Vergangene Tage seit Inaktivierung
 common#:#delete_inactivated_user_accounts_period_desc#:#Accounts werden gelöscht, wenn seit der Inaktivierung diese Zeitspanne verstrichen ist.
 common#:#delete_object#:#Lösche Objekte
 common#:#delete_parameter#:#Parameter löschen
@@ -2905,7 +2910,7 @@ common#:#down#:#Runter
 common#:#download#:#Download
 common#:#download_all_returned_files#:#Alle abgegebenen Dateien herunterladen
 common#:#download_with_uploaded_filename#:#Hochgeladenen Dateinamen verwenden
-common#:#download_with_uploaded_filename_info#:#Wählen Sie diese Option ausschliesslich für die Rückwärtskompatibilität mit ILIAS 3.9 und älteren Versionen aus: Wenn diese Option aktiviert ist, erhalten heruntergeladene Dateien den Namen, der beim Hochladen in ILIAS verwendet worden ist. Wenn diese Option nicht ausgewählt ist, erhalten heruntergeladene Dateien den Titel des Dateiobjekts als Namen. Diese Option hat keine Auswirkung auf WebDAV. Bei WebDAV erhalten heruntergeladene Dateien IMMER den Titel des Dateiobjekts als Namen.
+common#:#download_with_uploaded_filename_info#:#Wählen Sie diese Option ausschließlich für die Rückwärtskompatibilität mit ILIAS 3.9 und älteren Versionen aus: Wenn diese Option aktiviert ist, erhalten heruntergeladene Dateien den Namen, der beim Hochladen in ILIAS verwendet worden ist. Wenn diese Option nicht ausgewählt ist, erhalten heruntergeladene Dateien den Titel des Dateiobjekts als Namen. Diese Option hat keine Auswirkung auf WebDAV. Bei WebDAV erhalten heruntergeladene Dateien IMMER den Titel des Dateiobjekts als Namen.
 common#:#downloading_settings#:#Einstellungen
 common#:#drafts#:#Entwürfe
 common#:#drop#:#Entfernen
@@ -3519,7 +3524,7 @@ common#:#info_access_and_status_info#:#Zugriffs- und Statusinformationen
 common#:#info_access_permissions#:#Zugriffsrechte
 common#:#info_accessFree_sure#:#Sind Sie sicher, dass für die folgenden Benutzer die Begrenzung des zeitlichen Zugriffs aufheben wollen?
 common#:#info_activate_sure#:#Sind Sie sicher, dass Sie die folgenden Benutzer als aktive Benutzer bestätigen wollen?
-common#:#info_assign_sure#:# Sind Sie sicher, dass Sie den/die folgenden Benutzer aufnehmen möchten?
+common#:#info_assign_sure#:#Sind Sie sicher, dass Sie den/die folgenden Benutzer aufnehmen möchten?
 common#:#info_assigned#:#zugewiesen
 common#:#info_available_roles#:#Verfügbare Rollen
 common#:#info_change_user_view#:#Rechte dieses Benutzers anzeigen
@@ -3851,7 +3856,8 @@ common#:#message_content#:#Inhalt
 common#:#message_no_delivered_files#:#Sie haben noch keine Datei abgegeben.
 common#:#message_to#:#Mail an:
 common#:#meta_data#:#Metadaten
-common#:#mgs_objects_linked_to_the_following_folders#:#Objekte wurden in folgende Bereiche verknüpft: %s
+common#:#mgs_objects_linked_to_the_following_folders_p#:#Die Objekte wurden in folgende Bereiche verknüpft: %s
+common#:#mgs_objects_linked_to_the_following_folders_s#:#Das Objekt wurde in folgende Bereiche verknüpft: %s
 common#:#migrate#:#Migrieren
 common#:#min_time#:#Mindestzeit
 common#:#minute#:#Minute
@@ -3912,8 +3918,8 @@ common#:#msg_cancel#:#Aktion abgebrochen
 common#:#msg_changes_ok#:#Die Änderungen wurden übernommen
 common#:#msg_clear_clipboard#:#Zwischenablage gelöscht
 common#:#msg_cloned#:#Objekt(e) kopiert.
-common#:#msg_copy_clipboard_container#:#Wählen Sie nun den gewünschten Ort, an den die die kopierten Objekte eingefügt werden sollen. Klicken Sie abschliessend auf den Weiter-Button.
-common#:#msg_copy_clipboard#:#Wählen Sie nun den gewünschten Ort, an den die ausgewählten Objekte kopiert werden sollen. Klicken Sie abschließend auf den Kopieren-Button.
+common#:#msg_copy_clipboard_container#:#Wählen Sie nun den gewünschten Ort, an den die die kopierten Objekte eingefügt werden sollen. Klicken Sie abschließend auf den Weiter-Button.
+common#:#msg_copy_clipboard#:#Wählen Sie nun den gewünschten Ort, wohin die ausgewählten Objekte kopiert werden sollen. Klicken Sie abschließend auf den Einfügen-Button.
 common#:#msg_cut_clipboard#:#Wählen Sie nun den gewünschten Ort, an dem die ausgewählten Objekte eingefügt werden sollen. Klicken Sie abschließend auf den Einfügen-Button.
 common#:#msg_cut_copied#:#Objekt(e) verschoben.
 common#:#msg_deleted_export_files#:#Exportdatei(en) gelöscht
@@ -3931,7 +3937,8 @@ common#:#msg_input_is_required#:#Hier ist eine Angabe erforderlich. Bitte geben 
 common#:#msg_invalid_filetype#:#Ungültiger Dateityp
 common#:#msg_is_last_role#:#Sie haben den folgenden Benutzern ihre letzte Zuweisung zu einer globalen Rolle genommen
 common#:#msg_last_role_for_registration#:#Es muss mindestens eine Rolle im Registrierformular für neue Benutzer verfügbar sein. Diese Rolle ist momentan als einzige Rolle verfügbar.
-common#:#msg_link_clipboard#:#Wählen Sie nun den gewünschten Ort, in den die ausgewählten Objekte verknüpft werden sollen. Klicken Sie abschließend auf den Einfügen-Button.
+common#:#msg_link_clipboard_p#:#Wählen Sie nun den gewünschten Ort, in den die ausgewählten Objekte verknüpft werden sollen. Klicken Sie abschließend auf den Einfügen-Button.
+common#:#msg_link_clipboard_s#:#Wählen Sie nun den gewünschten Ort, in den das ausgewählte Objekt verknüpft werden sollen. Klicken Sie abschließend auf den Einfügen-Button.
 common#:#msg_linked#:#Objekt(e) verknüpft
 common#:#msg_may_not_contain#:#Dieses Objekt darf keine Objekte des folgenden Typs beinhalten:
 common#:#msg_min_one_active_role#:#Jeder Benutzer muss mindestens einer aktiven globalen Rollen zugewiesen sein!
@@ -3985,7 +3992,7 @@ common#:#msg_obj_exists#:#Dieses Objekt existiert bereits in diesem Ordner!
 common#:#msg_obj_exists_in_folder#:#Das Objekt %s existiert bereits im Ordner %s.
 common#:#msg_obj_may_not_contain_objects_of_type#:#Das Objekt %s darf keine Objekte des folgenden Typs beinhalten: %s.
 common#:#msg_obj_modified#:#Änderungen gespeichert
-common#:#msg_obj_no_link#:#können nicht verknüpft werden
+common#:#msg_obj_no_link#:#Das Verknüpfen von Containerobjekten wie Kategorien, Kursen, Gruppen und Ordnern ist aus technischen Gründen leider nicht möglich. Verknüpfen Sie stattdessen die einzelnen Objekte der Container zum gewünschten Ort oder verwenden das Referenz-Objekt für Kurse und Kategorien.
 common#:#msg_obj_not_deletable_sold#:#Die folgenden Objekte können nicht gelöscht werden, da das Payment für sie aktiviert ist:
 common#:#msg_paste_object_not_in_itself#:#Es ist nicht möglich das Objekte %s in sich selbst einzufügen.
 common#:#msg_perm_adopted_from_itself#:#Es ist nicht möglich, die Rechteeinstellungen von der aktuellen Rolle bzw. Rollenvorlage selbst zu übernehmen.
@@ -4048,6 +4055,7 @@ common#:#no_date#:#Kein Datum
 common#:#no_description#:#Keine Beschreibung
 common#:#no_frm_in_personal_list#:#Es sind keine Foren abonniert.
 common#:#no_global_role_left#:#Jeder Benutzer muss mindestens einer globalen Rolle zugeordnet sein.
+common#:#user_not_found_to_delete#:#Ein Benutzer, der gelöscht werden sollte, konnte nicht gefunden werden.
 common#:#no_grp_in_personal_list#:#Es sind keine Gruppen abonniert.
 common#:#no_import_available#:#Import nicht verfügbar für Typ
 common#:#no_import_file_found#:#Keine Importdatei gefunden
@@ -5156,7 +5164,7 @@ common#:#user_added#:#Benutzer angelegt
 common#:#user_assignment#:#Benutzerzuweisung
 common#:#user_cant_receive_mail#:#Der Benutzer hat nicht das Recht das Mailsystem zu benutzen.
 common#:#user_comment#:#Benutzer-Kommentar
-common#:#user_deactivated#:#Benutzer wurde abgelehnt.
+common#:#user_deactivated#:#Die ausgewählten Benutzer wurden deaktiviert.
 common#:#user_defined_fields#:#Benutzerdefinierte Felder
 common#:#user_defined_list#:#Übersicht benutzerdefinierter Felder
 common#:#user_deleted#:#Benutzer gelöscht
@@ -6311,7 +6319,7 @@ content#:#saved_media_object#:#Medienobjekt gespeichert
 content#:#scplayer_collapsetree#:#Baum einklappen
 content#:#scplayer_continue#:#Weiter
 content#:#scplayer_debugger#:#Testwerkzeug zeigen
-content#:#scplayer_exit#:#Schliessen
+content#:#scplayer_exit#:#Schließen
 content#:#scplayer_exitall#:#Bearbeitung beenden
 content#:#scplayer_expandtree#:#Baum ausklappen
 content#:#scplayer_hidetree#:#Baum verbergen
@@ -6328,7 +6336,7 @@ content#:#selectHeader#:#Als Kopfzeile auswählen
 content#:#seq_abandon#:#Die Anfrage wurde durchgeführt.
 content#:#seq_abandonall#:#Die Kurssitzung wurde abgebrochen.
 content#:#seq_blocked#:#Zugriff verweigert.
-content#:#seq_close#:#Bitte schliessen sie das Fenster des SCORM-Lernmoduls.
+content#:#seq_close#:#Bitte schließen sie das Fenster des SCORM-Lernmoduls.
 content#:#seq_coursecomplete#:#Der aktuelle Kurs wurde vollständig bearbeitet.
 content#:#seq_deadlock#:#Fehler: Der Sequencer befindet sich in einem Deadlock.
 content#:#seq_endsession#:#Die aktuelle Kurssitzung wurde beendet.
@@ -6341,7 +6349,7 @@ content#:#st#:#Kapitel
 content#:#start export#:#Export starten
 content#:#text_repr#:#Alternativtext
 content#:#text_repr_info#:#Wird verwendet, wenn die Grafik nicht angezeigt werden kann.
-crs#:#activation_times_not_valid#:#Die Zeidauer für 'Verfügbarkeit' ist nicht gültig.
+crs#:#activation_times_not_valid#:#Die Zeitdauer für 'Verfügbarkeit' ist nicht gültig.
 crs#:#add_event#:#Sitzung hinzufügen
 crs#:#assigned#:#Zugeordnet
 crs#:#contact_email_not_valid#:#Die E-Mail Adresse ist nicht gültig.
@@ -6457,7 +6465,7 @@ crs#:#crs_grouping_assign#:#Zuordnung ändern
 crs#:#crs_grouping_delete_sure#:#Sind Sie sicher, dass Sie die folgenden Mitgliedschaftsbeschränkungen entfernen möchten?
 crs#:#crs_grouping_deleted#:#Die Gruppierung wurde gelöscht.
 crs#:#crs_grouping_modified_assignment#:#Die Zuordnung wurde geändert.
-crs#:#crs_grouping_select_one#:#Bitte wählen Sie eine Kursgruppierung aus.
+crs#:#crs_grouping_select_one#:#Bitte wählen Sie eine Mitgliedschaftsbeschränkung aus.
 crs#:#crs_groupings#:#Kursgruppierungen
 crs#:#crs_groupings_ask_delete#:#Kursgruppierung löschen
 crs#:#crs_groups_nr#:#Anzahl Gruppen
@@ -6772,7 +6780,7 @@ crs#:#crs_subscription_type#:#Beitrittsverfahren
 crs#:#crs_suggest_lm#:#Empfehle Lernmaterialien bei:
 crs#:#crs_suggested_sections#:#Empfohlene Abschnitte
 crs#:#crs_suggestion_end#:#Empfohlenes Ende
-crs#:#crs_sure_delete_selected_archives#:#Sind Sie sicher, dass die ausgewählten Archive gelöscht werden sollen
+crs#:#crs_sure_delete_selected_archives#:#Sind Sie sicher, dass die ausgewählten Archive gelöscht werden sollen?
 crs#:#crs_syllabus#:#Kursprogramm
 crs#:#crs_table_start_objects#:#Startobjekte
 crs#:#crs_test_status_complete#:#Fertiggestellt
@@ -6808,7 +6816,7 @@ crs#:#crs_timings_sug_end#:#Empfohlenes Ende
 crs#:#crs_timings_suggested_info#:#Empfohlene Bearbeitungszeit
 crs#:#crs_timings_time_frame#:#Zeitrahmen
 crs#:#crs_timings_update_error#:#Die empfohlene Lernzeit folgender Kursmaterialien widerspricht dem angegebenen spätestmöglichen Lernzeitpunkt.
-crs#:#crs_timings_visibility#:#Wenn aktiviert, ist das Lernmaterial auch außerhalb der vorgesehen Verfügbarkeit sichtbar.
+crs#:#crs_timings_visibility#:#Wenn aktiviert, ist das Lernmaterial auch außerhalb der vorgesehenen Verfügbarkeit sichtbar.
 crs#:#crs_timings_visibility_short#:#Sichtbarkeit
 crs#:#crs_to#:#Bis:
 crs#:#crs_tutor#:#Tutor
@@ -7752,14 +7760,12 @@ form#:#form_retype_password#:#Passwort nochmals eingeben
 form#:#form_seconds#:#Sekunden
 forum#:#activate_current_and_childs#:#Alle Beitrage freischalten
 forum#:#activate_new_posts#:#Neue Beiträge freischalten
-forum#:#activate_only_current#:#Nur diesen Beitrag freischalten
+forum#:#activate_only_current#:#Beitrag freischalten
 forum#:#activate_post#:#Freischalten
-forum#:#activate_post_txt#:#Möchten Sie wirklich diesen Beitrag und ggf. alle seine Folgebeiträge freischalten? Bitte beachten Sie, dass auch alle Elternbeiträge aktiviert werden.
+forum#:#activate_post_txt#:#Möchten Sie diesen Beitrag freischalten?
 forum#:#add_re_to_subject#:#Beim Antworten auf einen Beitrag wird der Titel des vorhergehenden Beitrags übernommen und durch ein vorangestelltes Re: ergänzt.
 forum#:#add_re_to_subject_info#:#Wenn diese Option aktiviert ist, wird dem Beitragstitel der Zusatz 'Re:' hinzugefügt.
 forum#:#close_topics#:#Schließen
-forum#:#deactivate_current_and_childs#:#Alle Beitrage sperren
-forum#:#deactivate_post_txt#:#Möchten Sie wirklich diesen Beitrag und alle seine Folgebeiträge sperren?
 forum#:#empty_subject#:#Beim Antworten auf einen Beitrag bleibt die Titelzeile leer und muss vom Benutzer gefüllt werden.
 forum#:#enter_new_subject#:#Bitte geben Sie einen neuen Beitragstitel ein
 forum#:#fmr_copy_threads_info#:#Sie können hier Themen auswählen, die kopiert werden sollen. Es werden nur die Anfangsbeiträge, nicht deren Antworten kopiert.
@@ -8192,7 +8198,7 @@ license#:#zero_licenses_explanation#:#Tragen Sie 0 ein, um die Lizenzierung zu d
 mail#:#activate_serial_letter_placeholders#:#Platzhalter für Serienbrief aktivieren
 mail#:#advice_mail_body_secured#:#Aus Ihrer Mail wurden aus Sicherheitsgründen bestimmte Elemente entfernt. Bitte kontrollieren Sie den vom System bereinigten Inhalt und schicken Sie die Mail erneut ab.
 mail#:#also_as_email#:#Auch als E-Mail
-mail#:#bc#:#BC
+mail#:#bc#:#BCC
 chatroom#:#chat_select_room#:#Chatraum auswählen
 mail#:#back_to_folder#:#Zurück zum Ordner
 mail#:#current_folder#:#Aktueller Ordner: %s
@@ -8215,8 +8221,8 @@ mail#:#mail_addr_entries#:#Einträge
 mail#:#mail_assign_entry_to_mailing_list#:#Zuordnung eines Adressbucheintrags zum Verteiler
 mail#:#mail_attachments#:#Anhänge
 mail#:#mail_auto_generated_info#:#Diese E-Mail wurde von der ILIAS-Installation %s, %s automatisch an Sie versandt.
-mail#:#mail_bc_not_valid#:#Der BC-Empfänger ist nicht gültig
-mail#:#mail_bc_search#:#BC-Empfänger suchen
+mail#:#mail_bc_not_valid#:#Der BCC-Empfänger ist nicht gültig
+mail#:#mail_bc_search#:#BCC-Empfänger suchen
 mail#:#mail_byte#:#Byte
 mail#:#mail_cc_not_valid#:#Der CC-Empfänger ist nicht gültig
 mail#:#mail_cc_search#:#CC-Empfänger suchen
@@ -9451,7 +9457,7 @@ payment#:#paya_payed_access#:#Bezahlt/Zugriff
 payment#:#paya_perm_coupons#:#Gutscheine bearbeiten
 payment#:#paya_perm_obj#:#Objekte bearbeiten
 payment#:#paya_perm_stat#:#Statistiken bearbeiten
-payment#:#paya_price_not_valid#:#Die Angaben sind nicht gültig. Bitte geben Sie ausschliesslich Ganzzahlen ein
+payment#:#paya_price_not_valid#:#Die Angaben sind nicht gültig. Bitte geben Sie ausschließlich Ganzzahlen ein
 payment#:#paya_select_object_to_sell#:#Bitte wählen Sie das zu verkaufende Objekt aus.
 payment#:#paya_select_pay_method_first#:#Bitte legen Sie zuerst die Bezahlart fest.
 payment#:#paya_sell_object#:#Objekt verkaufen
@@ -9728,7 +9734,7 @@ prtf#:#prtf_edit_portfolio#:#Portfolio bearbeiten
 prtf#:#prtf_exercise_info#:#Dieses Portfolio ist der Übungseinheit "%s" der Übung "%s" zugeordnet.
 prtf#:#prtf_exercise_submitted_info#:#Ihre letzte Einreichung war am %s. Bitte prüfen Sie die Export-Datei: %s.
 prtf#:#prtf_existing_portfolio#:#Vorhandenes Portfolio
-prtf#:#prtf_finalize_portfolio#:#Portfolio abschliessen und abgeben
+prtf#:#prtf_finalize_portfolio#:#Portfolio abschließen und abgeben
 prtf#:#prtf_finalized#:#Das Portfolio wurde abgegeben.
 prtf#:#prtf_first_page_title#:#Typ der 1. Seite
 prtf#:#prtf_font_color#:#Schriftfarbe
@@ -9882,7 +9888,7 @@ rating#:#rat_one_rating#:#Eine Bewertung
 rating#:#rating_average_rating#:#Durchschnittliche Bewertung
 rating#:#rating_nr_users#:#%s Benutzer
 rating#:#rating_your_rating#:#Ihre Bewertung
-rbac#:#active_preconditions#:#Vorbedingungen
+rbac#:#active_preconditions#:#Definierte Vorbedingungen
 rbac#:#add_consultation_hours#:#Sprechstundentermine anlegen
 rbac#:#add_reply#:#Antwort anlegen
 rbac#:#add_thread#:#Thema anlegen
@@ -10027,9 +10033,9 @@ rbac#:#rbac_not_change_existing_objects#:#Vorhandene Objekte NICHT anpassen
 rbac#:#rbac_precondition_minimum_optional#:#Es müssen mindestens zwei Vorbedingungen optional verbleiben.
 rbac#:#rbac_precondition_mode#:#Modus
 rbac#:#rbac_precondition_mode_all#:#Alle Vorbedingungen
-rbac#:#rbac_precondition_mode_all_info#:#Alle Vorbedingungen müssen für einen Zugriff erfüllt werden.
+rbac#:#rbac_precondition_mode_all_info#:#Alle definierten Vorbedingungen müssen für einen Zugriff erfüllt werden.
 rbac#:#rbac_precondition_mode_subset#:#Untermenge der Vorbedingungen
-rbac#:#rbac_precondition_mode_subset_info#:#Eine Untermenge der Vorbedingungen müssen für einen Zugriff erfüllt werden. Einige Vorbedingungen können trotzdem verpflichtend sein.
+rbac#:#rbac_precondition_mode_subset_info#:#Eine Untermenge der definierten Vorbedingungen müssen für einen Zugriff erfüllt werden. Einige Vorbedingungen können trotzdem verpflichtend sein.
 rbac#:#rbac_precondition_save_obligatory#:#Verpflichtend speichern
 rbac#:#rbac_precondition_source#:#Vorbedingung durch
 rbac#:#rbac_precondition_target#:#Vorbedingung für Zugriff auf
@@ -10680,7 +10686,7 @@ skmg#:#skmg_remove_skills#:#Kompetenz entfernen
 skmg#:#skmg_remove_trigger#:#Auslöser entfernen
 skmg#:#skmg_save_all_titles#:#Alle Titel speichern
 skmg#:#skmg_save_order#:#Reihenfolge speichern
-skmg#:#skmg_save_self_evaluation#:#Selbsteinschätzung abschliessen
+skmg#:#skmg_save_self_evaluation#:#Selbsteinschätzung abschließen
 skmg#:#skmg_sctp#:#Vorlagenkategorie
 skmg#:#skmg_select_skill#:#Klicken Sie auf eine Kompetenz, um diese Ihren persönlichen Kompetenzen hinzuzufügen.
 skmg#:#skmg_select_trigger#:#Auslöser auswählen
@@ -10811,8 +10817,8 @@ style#:#sty_list_char#:#Liste
 style#:#sty_list_style_image#:#Bild
 style#:#sty_list_style_position#:#Position
 style#:#sty_list_style_type#:#Listenstyle
-style#:#sty_make_global_default#:#Voreingestellter Style für neue Objekte
-style#:#sty_make_global_fixed#:#Erzwungener Style für neue Objekte
+style#:#sty_make_global_default#:#Standard-Style
+style#:#sty_make_global_fixed#:#Erzwungener Style für alle Objekte
 style#:#sty_margin#:#Außenrand
 style#:#sty_margin_and_padding#:#Außenrand und Innenabstand
 style#:#sty_media_char#:#Medien
@@ -10968,12 +10974,12 @@ style#:#sty_type_text_inline#:#Zeichen
 style#:#sty_type_va_cntr#:#Vert. Akkordeon Container
 style#:#sty_type_va_icntr#:#Vert. Akkordeonelement Container
 style#:#sty_type_va_icont#:#Vert. Akkordeonelement Inhalt
-style#:#sty_type_va_ihead#:#Vert. Akkordeonelement Überschrift
+style#:#sty_type_va_ihead#:#Vert. Akkordeonelement Kopf
 style#:#sty_ul#:#Bullet-Liste
 style#:#sty_va_cntr_class#:#Vert. Akkordeon Container
 style#:#sty_va_icntr_class#:#Vert. Akkordeonelement Container
 style#:#sty_va_icont_class#:#Vert. Akkordeonelement Inhalt
-style#:#sty_va_ihead_class#:#Vert. Akkordeonelement Überschrift
+style#:#sty_va_ihead_class#:#Vert. Akkordeonelement Kopf
 style#:#sty_vaccordion_templates#:#Vert. Akkordeon Templates
 style#:#sty_vertical#:#Vertikal
 style#:#sty_vertical_align#:#Vertikale Ausrichtung
@@ -11012,7 +11018,7 @@ survey#:#apply#:#Übernehmen
 survey#:#arithmetic_mean#:#Arithmetisches Mittel
 survey#:#ask_insert_questionblocks#:#Sind Sie sicher, dass Sie die folgenden Frageblöcke der Umfrage hinzufügen wollen?
 survey#:#ask_insert_questions#:#Sind Sie sicher, dass Sie die folgende(n) Frage(n) der Umfrage hinzufügen wollen?
-survey#:#back#:#<< Zurück
+survey#:#back#:#Zurück
 survey#:#before#:#vor
 survey#:#browse_for_questions#:#Aus Pool hinzufügen
 survey#:#cancel_survey#:#Umfrage unterbrechen
@@ -11987,7 +11993,7 @@ trac#:#vm_times_of_day#:#Tageszeiten innerhalb des Zeitraums
 tstv#:#tstv_create#:#Testzertifikat erstellen
 tstv#:#tstv_create_info#:#Wählen Sie einen Test, für den Sie ein Zertifikat benötigen
 user#:#enable_local_user_administration#:#Lokale Benutzerverwaltung aktivieren
-user#:#enable_local_user_administration_info#:#Wenn aktiviert, können Benutzerzugänge in Kategorien angelegt und verwaltet werden.
+user#:#enable_local_user_administration_info#:#Wenn aktiviert, können Benutzerzugänge in Kategorien und Organisationseinheiten angelegt und verwaltet werden.
 user#:#restrict_user_access#:#Eingeschränkter Zugriff auf Benutzerkonten
 user#:#restrict_user_access_info#:#Aktivieren Sie diese Option nur, wenn Sie den Zugriff auf Benutzerkonten beschränken möchten. Wenn aktiviert, benötigen Benutzer das Recht "Lesezugriff auf Benutzerkonten", um auf lokale Benutzerkonten in Kategorien und auf die globalen Benutzerkonten zugreifen zu können.
 user#:#user_access_limited#:#Zeitlich begrenzt
@@ -12367,6 +12373,7 @@ dcl#:#dcl_edit_type#:#Typ bearbeiten
 dcl#:#dcl_activate_rating#:#Bewertung von Einträgen
 dcl#:#dcl_activate_approval#:#Aktivierung von Einträgen
 dcl#:#dcl_activate_notification#:#Benachrichtigung
+dcl#:#dcl_allowed_file_types#:#Erlaubte Dateitypen
 dcl#:#dcl_table_id#:#Tabellen ID
 dcl#:#dcl_add_new_record#:#Eintrag hinzufügen
 dcl#:#dcl_list_fields#:#Felder
@@ -12694,6 +12701,7 @@ dcl#:#dcl_notification_deactivate_dcl#:#Benachrichtigung deaktivieren
 dcl#:#dcl_notification_activated#:#Benachrichtigung aktiv
 dcl#:#dcl_notification_deactivated#:#Benachrichtigung inaktiv
 dcl#:#dcl_locked#:#Gesperrt
+dcl#:#dcl_locked_tooltip#:#Ein gesperrtes Feld lässt sich von Benutzern nicht mehr bearbeiten. Gilt nicht für Rollen mit dem Recht 'Einstellungen bearbeiten'
 dcl#:#dcl_table_settings#:#Tabelleneinstellungen
 dcl#:#dcl_add_perm#:#Neuen Eintrag hinzufügen
 dcl#:#dcl_edit_perm#:#Datensätze bearbeiten
@@ -12825,7 +12833,7 @@ dcl#:#dcl_record_edit_viewdefinition#:#Bearbeite Seitenvorlage
 dcl#:#dcl_record_list_viewdefinition#:#Liste der Seitenvorlagen
 dcl#:#dcl_checked#:#Ausgewählt
 dcl#:#dcl_not_checked#:#Nicht ausgewählt
-dcl#:#dcl_noturl_exception#:#Bitte geben Sie einen Link (beginnend mit http://) oder eine E-Mail Adresse ein.
+dcl#:#dcl_noturl_exception#:#Bitte geben Sie einen Link (beginnend mit http:// oder www.) oder eine E-Mail Adresse ein.
 dcl#:#dcl_field_title_change_warning#:#Sie haben den Titel des Feldes geändert, dadurch funktionieren unter Umständen die Platzhalter in der Seitenvorlage nicht mehr, diese müssen gegebenenfalls manuell angepasst werden.
 dcl#:#dcl_field_title_unique#:#Es existiert bereits ein Feld mit diesem Titel. Titel muss eindeutig sein.
 dcl#:#dcl_table_title_unique#:#Es existiert bereits eine Tabelle mit diesem Titel. Titel muss eindeutig sein.
@@ -12918,7 +12926,8 @@ exc#:#exc_team_notification_body_rmv#:#Sie wurden aus einer Team-Upload-Übungse
 exc#:#exc_team_notification_changed_by#:#Status geändert durch
 exc#:#exc_team_notification_link#:#Link zur Übung
 poll#:#poll_absolute#:#Aktuelle Stimmen
-dcl#:#dcl_reference_link#:#In der Tabellensicht als Link darstellen
+dcl#:#dcl_reference_link#:#Als Link zum referenzierten Eintrag darstellen
+dcl#:#dcl_reference_link_info#:#Die Seitenvorlage zur Einzelansicht muss in der referenzierten Tabelle aktiv sein
 dcl#:#dcl_ILIAS_reference_link#:#In der Tabellensicht als Link darstellen
 dcl#:#dcl_text_area#:#Mehrzeiliges Texteingabefeld
 forum#:#frm_notification_activated#:#Benachrichtigung aktiviert
@@ -13005,7 +13014,7 @@ content#:#cont_credit_mode_info#:#Diese Einstellung ist nur wirksam im Modus 'no
 content#:#cont_sc_auto_review_info_12#:#Setzt den Modus auf 'review', wenn der Lerner das SCO vollständig bearbeitet oder bestanden hat.
 content#:#cont_sc_usession_info#:#Wenn aktiviert werden periodisch Anfragen an den Server gesendet, um die Session des Benutzers aufrecht zu erhalten.
 content#:#cont_sequencing_info#:#Aktiviert das Verhalten für Sequencing & Navigation gemäß den Vorgaben des Lernmoduls
-content#:#cont_time_from_lms_info#:#Die Bearbeitungszeiten des SCOs werden von ILIAS und nach den strikten Vorgagen des SCORM-Standards ermittelt.
+content#:#cont_time_from_lms_info#:#Die Bearbeitungszeiten werden nicht von SCOs sondern von ILIAS bestimmt.
 mcst#:#mcst_viewmode#:#Ansicht
 mcst#:#mcst_list#:#Liste
 mcst#:#mcst_gallery#:#Kacheln
@@ -13154,14 +13163,14 @@ blog#:#blog_toggle_draft_admin#:#Blog-Eintrag deaktivieren
 blog#:#blog_keywords_info#:#Benutzen Sie die +/- Icons um Schlagwörter hinzuzufügen und zu entfernen.
 forum#:#merge#:#Zusammenführen
 forum#:#please_choose_target#:#Bitte wählen Sie ein Thema als Ziel der Zusammenführung.
-forum#:#frm_sure_merge_threads#:#Sind Sie sicher, dass Sie diese beiden Themen zu einem Thema zusammenführen wollen? Achtung: Diese Aktion kann nicht rückgängig gemacht werden! Das ältere der gewählten Themen wird immer als Zusammenführungs-Ziel behandelt. 
+forum#:#frm_sure_merge_threads#:#Sind Sie sicher, dass Sie diese beiden Themen zu einem Thema zusammenführen wollen? Achtung: Diese Aktion kann nicht rückgängig gemacht werden. 
 forum#:#not_allowed_to_merge_into_another_forum#:#Es ist nicht möglich Themen verschiedener Foren zusammenzuführen.
 forum#:#frm_selected_merge_src#:#Gewähltes Thema für die Zusammenführung: %s
 forum#:#error_same_thread_ids#:#Es müssen zwei verschiedene Themen ausgewählt werden.
 forum#:#frm_merge_src#:#Ausgewähltes Thema: %s
 forum#:#frm_merge_target#:#Ziel: %s
 forum#:#merged_threads_successfully#:#Die selektierten Themen wurden erfolgreich zusammengeführt
-forum#:#switch_threads_for_merge#:#Das augewählte Thema ist älter als das Zielthema. Um eine sinnvolle Zusammenführung zu schaffen, werden Quell- und Zielthema getauscht.
+forum#:#switch_threads_for_merge#:#Das ausgewählte Thema ist älter als das Zielthema. Um eine sinnvolle Zusammenführung zu schaffen, werden Quell- und Zielthema getauscht.
 assessment#:#oq_btn_nest_terms#:#Zur Ansicht: Terme gliedern
 assessment#:#oq_btn_nest_pictures#:#Zur Ansicht: Bilder gliedern
 assessment#:#oq_btn_define_terms#:#Zur Ansicht: Terme anlegen
@@ -13224,14 +13233,14 @@ dcl#:#dcl_simulate_info#:#Hierbei werden keine Datensätze angelegt, sondern nur
 dcl#:#dcl_multiple_selection#:#Mehrfachauswahl
 dcl#:#dcl_id#:#ID
 dcl#:#dcl_id_description#:#Die interne ID.
-dcl#:#dcl_creation_date#:#Erstellungs Datum
-dcl#:#dcl_creation_date_description#:#Das Datum an dem dieser Eintrag erstellt wurde.
+dcl#:#dcl_creation_date#:#Erstellungsdatum
+dcl#:#dcl_creation_date_description#:#Das Datum, an dem dieser Eintrag erstellt wurde.
 dcl#:#dcl_last_update#:#Letzte Änderung
-dcl#:#dcl_last_update_description#:#Das Datum an dem dieser Eintrag zuletzt geändert wurde.
+dcl#:#dcl_last_update_description#:#Das Datum, an dem dieser Eintrag zuletzt geändert wurde.
 dcl#:#dcl_owner#:#Besitzer
 dcl#:#dcl_owner_description#:#Der Besitzer dieses Eintrages.
 dcl#:#dcl_last_edited_by#:#Zuletzt geändert von
-dcl#:#dcl_last_edited_by_description#:#Der Benutzer der diesen Eintrag zuletzt geändert hat.
+dcl#:#dcl_last_edited_by_description#:#Der Benutzer, der diesen Eintrag zuletzt geändert hat.
 dcl#:#dcl_public_comments#:#Öffentliche Kommentare für Datensätze aktivieren
 dcl#:#dcl_default_sort_field#:#Standardmässige Sortierung
 dcl#:#dcl_default_sort_field_order#:#Standardmässige Sortierungs-Richtung
@@ -13269,6 +13278,10 @@ bibl#:#attr_order_bibtex#:#Attribut-Reihenfolge (Bibtex)
 bibl#:#attr_order_bibtex_info#:#default: isbn,issn,title
 bibl#:#attr_order_ris#:#Attribut-Reihenfolge (ris)
 bibl#:#attr_order_ris_info#:#default: sn,ti, t1
+bibl#:#news_title_created#:#Neue Literaturliste hinzugefügt
+bibl#:#news_content_created#:#Eine neue Literaturliste wurde hinzugefügt. Die Einträge können eingesehen werden.
+bibl#:#news_title_updated#:#Literaturliste aktualisiert
+bibl#:#news_content_updated#:#Die Literaturliste wurde aktualisiert. Die neuen Einträge können eingesehen werden.
 rbac#:#bibl_visible#:#Literaturliste ist sichtbar
 rbac#:#bibl_read#:#Literaturliste lesen
 rbac#:#bibl_copy#:#Literaturliste kopieren
@@ -13405,12 +13418,12 @@ survey#:#survey_360_no_closed_appraisees#:#Es sind noch keine Umfragen geschloss
 survey#:#survey_360_rate_other_appraisees#:#Feedback geben
 survey#:#survey_360_appraisee_info#:#Info über Feedback-Nehmer
 survey#:#survey_360_raters_status_info#:#Umfrage abgeschlossen
-survey#:#survey_360_appraisee_close_action#:#Umfrage für Feedback-Geber schliessen
+survey#:#survey_360_appraisee_close_action#:#Umfrage für Feedback-Geber schließen
 survey#:#survey_360_appraisee_close_action_info#:#Damit erhalten Sie Zugriff zu den Statistiken.
 survey#:#survey_360_appraisee_close_action_info_skill#:#Damit erhalten Sie Zugriff zu den Statistiken und Ihre Kompetenzausprägungen werden aktualisiert.
 survey#:#survey_360_appraisee_close_action_success#:#Sie haben Ihre 360°-Umfrage für die Feedback-Geber geschlossen.
 survey#:#survey_360_appraisee_close_action_status#:#Umfrage wurde am %s geschlossen.
-survey#:#survey_360_sure_appraisee_close#:#Wollen Sie wirklich die Umfrage für alle Feedback-Geber schliessen?
+survey#:#survey_360_sure_appraisee_close#:#Wollen Sie wirklich die Umfrage für alle Feedback-Geber schließen?
 survey#:#survey_360_appraisee_close_table#:#Geschlossen am
 survey#:#svy_eval_competences#:#Kompetenz-Ergebnisse
 survey#:#svy_gap_analysis#:#Gap-Analyse
@@ -13428,8 +13441,8 @@ survey#:#survey_reminder_frequency_days#:#Tage
 survey#:#survey_notification_target_group#:#Zielgruppe
 survey#:#survey_notification_target_group_parent_course#:#Alle Teilnehmer des übergeordneten Kurses/Gruppe
 survey#:#survey_notification_target_group_parent_course_inactive#:#Kein übergeordneter Kurs/Gruppe - keine Erinnerung möglich!
-survey#:#survey_notification_target_group_invited#:#Alle eingeladenen Teilnehmer
-survey#:#survey_notification_target_group_invited_info#:#Momentan eingeladene Benutzer: %s
+survey#:#survey_notification_target_group_invited#:#Teilnehmer, denen die Umfrage auf den persönlichen Schreibtisch gelegt wurde
+survey#:#survey_notification_target_group_invited_info#:#Aktuelle Anzahl der Empfänger: %s
 survey#:#survey_notification_tutor_setting#:#Eine E-Mail nachdem alle Teilnehmer beendet haben
 survey#:#survey_notification_tutor_recipients#:#Tutoren (Benutzername[n])
 survey#:#survey_notification_tutor_recipients_invalid#:#Bitte geben Sie Benutzer mit Schreibrecht an.
@@ -13491,7 +13504,7 @@ dateplaner#:#cal_ch_user_assignment_success#:#Die Benutzer wurden den ausgewähl
 dateplaner#:#cal_booking_failed_info#:#Die Buchung konnte nicht vorgenommen werden, da der Termin ausgebucht ist.
 registration#:#registration_codes_override_info#:#Diese Einstellung hat Vorrang vor allen anderen entsprechenden Registrierungs-Einstellungen.
 registration#:#registration_codes_override_global_info#:#Diese Einstellungen werden evtl. durch Registrierungscodes aufgehoben.
-crs#:#event_list_registered_only#:#Nur angemeldete Mitglieder
+crs#:#event_list_registered_only#:#Nur Angemeldete
 didactic#:#didactic_default_type#:#Standard
 pd#:#pd_info_delete_sure_remove#:#Wollen Sie wirklich die folgenden Objekte vom Persönlichen Schreibtisch entfernen?
 pd#:#pd_info_delete_sure_unsubscribe#:#Wollen Sie sich wirklich aus den folgenden Objekten abmelden?
@@ -13539,7 +13552,7 @@ assessment#:#tst_no_scorable_qst_available#:#Keine manuell bewertbare Frage verf
 assessment#:#part_received_a_of_b_points#:#Der Teilnehmer hat %s von %s möglichen Punkten erreicht.
 assessment#:#answers_of#:#Antworten von:
 survey#:#survey_360_appraisee_close_action_success_admin#:#Die 360°-Umfragen der Feedback-Nehmer wurden geschlossen.
-survey#:#survey_360_sure_appraisee_close_admin#:#Wollen Sie wirklich die Umfrage für die folgenden Feedback-Nehmer schliessen?
+survey#:#survey_360_sure_appraisee_close_admin#:#Wollen Sie wirklich die Umfrage für die folgenden Feedback-Nehmer schließen?
 assessment#:#question_id#:#Fragen-ID
 assessment#:#question_id_short#:#ID
 mcst#:#mcst_download_videoalternative#:#Alternatives Format herunterladen
@@ -13790,6 +13803,11 @@ content#:#cont_ed_plachverification#:#Platzhalter Zertifikat
 cld#:#cld_auth_failed_no_object_created#:#Authentifzierung fehlgeschlagen. Es wurde kein Cloud-Objekt angelegt.
 common#:#objs_orgu#:#Organisationseinheiten
 common#:#obj_orgu#:#Organisationseinheit
+common#:#obj_orgu_description#:#Anlage und Verwaltung der Organisationsstruktur
+common#:#il_orgu_employee#:#Mitarbeiter
+common#:#il_orgu_superior#:#Vorgesetzte
+common#:#view_learning_progress#:#Zeige Lernfortschritt
+common#:#view_learning_progress_rec#:#Lernfortschritt rekursiv einsehen
 orgu#:#view_learning_progress#:#Lernfortschritt einsehen
 orgu#:#orgu_staff_deassign#:#Diese Benutzer aus der Rolle wirklich entfernen?
 orgu#:#orgu_msg_info_paste#:#Wählen Sie nun den gewünschten Ort, an dem die ausgewählten Objekte eingefügt werden sollen.
@@ -13834,6 +13852,7 @@ orgu#:#ext_id#:#Externe ID
 orgu#:#ext_id_updated#:#Die externe ID wurde erfolgreich bearbeitet.n, da die Daten anonymisiert gespeichert werden.
 orgu#:#no_roles#:#Es gibt keine weiteren lokalen Rollen an dieser Stelle.
 orgu#:#local_other_roles#:#Weitere lokale Rollen %s
+orgu#:#not_movable_to_subtree#:#Eine Organisationseinheit kann nicht in ihre eigenen Untereinheiten eingeteilt werden, dies würde eine Schlaufe bilden.
 cld#:#cld_object_added#:#Ein neues Cloud Objekt wurde hinzugefügt
 exc#:#exc_peer_review_deadline#:#Ende des Bewertungszeitraums
 exc#:#exc_peer_review_deadline_info#:#Bis zu diesem Termin können Bewertungen abgegeben werden. Anschließend ist das erhaltene Feedback einsehbar.
@@ -14032,13 +14051,13 @@ bibl#:#bib_default_author#:#Autor
 bibl#:#bib_default_booktitle#:#Titel
 bibl#:#bib_default_chapter#:#Kapitel
 bibl#:#bib_default_edition#:#Auflage
-bibl#:#bib_default_editor#:#Verlag
+bibl#:#bib_default_editor#:#Herausgeber
 bibl#:#bib_default_institution#:#Institution
 bibl#:#bib_default_journal#:#Journal/Zeitschrift
 bibl#:#bib_default_number#:#Nummer
 bibl#:#bib_default_organization#:#Organisation
 bibl#:#bib_default_pages#:#Seiten
-bibl#:#bib_default_publisher#:#Herausgeber
+bibl#:#bib_default_publisher#:#Verlag
 bibl#:#bib_default_title#:#Titel
 bibl#:#bib_default_type#:#Typ
 bibl#:#bib_default_volume#:#Auflage
@@ -14345,7 +14364,7 @@ crs#:#crs_registration_confirmation_info#:#Der Beitritt erfolgt nur, wenn er dur
 crs#:#crs_reg_no_selfreg#:#Kein selbständiger Beitritt
 crs#:#crs_reg_password_info#:#Benutzer müssen dieses Passwort eingeben, um dem Kurs beitreten zu können.
 cat#:#cat_more_translations#:#Weitere Übersetzungen
-content#:#cont_got_lock#:#Diese Seite wurde für Ihre Bearbeitung gesperrt. Bitte geben Sie die Seite nach Ihren Änderungen wieder frei.
+content#:#cont_got_lock_until#:#Diese Seite wurde für Ihre Bearbeitung bis %1 gesperrt. Bitte geben Sie die Seite nach Ihren Änderungen durch klicken auf %2 wieder frei.
 content#:#cont_finish_editing#:#Bearbeitung beenden
 content#:#cont_page_lock_released#:#Die Bearbeitung wurde beendet. Die Seite wurde wieder freigegeben.
 orgu#:#backto_staff#:#Zurück zu Personen
@@ -14456,6 +14475,8 @@ rbac#:#orgu_cat_administrate_users#:#Lokale Benutzerkonten können angelegt und 
 rbac#:#orgu_delete#:#Organisationseinheit löschen oder verschieben
 rbac#:#orgu_edit_permission#:#Rechteeinstellungen ändern
 rbac#:#rbac_create_orgu#:#Organisationseinheiten anlegen
+rbac#:#orgu_copy#:#Organisationseinheit kopieren
+rbac#:#orgu_view_learning_progress_rec#:#Lernfortschritt rekursiv einsehen
 book#:#book_post_booking_text_info#:#Verwenden Sie [PERIOD] und [OBJECT], um Buchungsdetails zum Infotext hinzuzufügen.
 blog#:#blog_abstract_shorten#:#Auszug kürzen
 blog#:#blog_abstract_shorten_length#:#Maximale Länge
@@ -14565,7 +14586,7 @@ survey#:#svy_mail_own_results#:#Eigene Antworten per E-Mail versenden
 survey#:#svy_mail_own_results_subject#:#Umfrage "%s" - Ihre Antworten
 survey#:#svy_mail_own_results_body#:#nachfolgend ist Ihre Teilnahme gelistet.
 survey#:#svy_results_view_own#:#Teilnehmer kann eigene Antworten einsehen
-survey#:#svy_results_mail_own#:#Teilnehmer kann sich E-Mail eigenen Antworten senden
+survey#:#svy_results_mail_own#:#Teilnehmer kann sich E-Mail mit den eigenen Antworten senden
 exercise#:#exc_to_desktop_info#:#Nach Abgabe die Übung auf den Schreibtisch legen
 wiki#:#wiki_wpg#:#Wiki-Seite
 wiki#:#wiki_add_page_properties#:#Zusätzliche Eigenschaften von Wikiseiten
@@ -14716,9 +14737,9 @@ user#:#delete_inactive_user_accounts_frequency#:#Intervall
 user#:#delete_inactive_user_accounts_frequency_desc#:#Intervall, mit welchem auf Löschung sowie auf E-Mail-Versand getestet wird.
 user#:#send_mail_to_inactive_users#:#Benachrichtigungsmail
 user#:#send_mail_to_inactive_users_suffix#:#Tage bis zur Löschung.
-user#:#send_mail_to_inactive_users_desc#:#Bevor ein Benutzeraccount gelöscht werden, sendet ILIAS eine E-Mail an den Benutzer. Durch ein erneutes Anmelden des Benutzers in ILIAS wird die Löschung um die eingestellte Zeitspanne aufgeschoben. Bitte stellen Sie sicher, dass ein externer Mail-Empfang möglich ist.
+user#:#send_mail_to_inactive_users_desc#:#Bevor ein Benutzeraccount gelöscht werden, sendet ILIAS eine E-Mail an den Benutzer. Durch ein erneutes Anmelden des Benutzers in ILIAS wird die Löschung um die eingestellte Zeitspanne aufgeschoben. Bitte stellen Sie sicher, dass ein externer Mail-Empfang möglich ist. Bei Aktivierung des Cronjobs mit Benachrichtigungsmail, kann es vorkommen, dass zu Beginn die Zeitspanne zwischen Benachrichtigung und Löschung geringer als die eingestellte Zeitspanne ist.  
 user#:#del_mail_subject#:#(ILIAS) – Ihr Benutzerkonto wird bald gelöscht
-user#:#del_mail_body#:#Hallo %1$s, %2$sSie haben sich seit längerer Zeit nicht mehr auf der Lernplattform %3$s angemeldet. Ihr Benutzerkonto wird daher in %4$s Tagen gelöscht. Bitte melden Sie sich erneut an, damit Ihr Benutzerkonto erhalten bleibt.
+user#:#del_mail_body#:#Hallo %1$s, %2$sSie haben sich seit längerer Zeit nicht mehr auf der Lernplattform %3$s angemeldet. Ihr Benutzerkonto wird daher vorraussichtlich am %4$s gelöscht. Bitte melden Sie sich erneut an, damit Ihr Benutzerkonto erhalten bleibt.
 user#:#send_mail_to_inactive_users_numbers_only#:#Bitte nur ganzzahlige, positive Werte eingeben. Ihre Eingabe wurde gerundet.
 user#:#send_mail_to_inactive_users_must_be_smaller_than#:#Dieser Wert muss kleiner sein, als der Wert "Vergangene Tage seit letzter Anmeldung".
 user#:#send_mail_reminder_window_too_small#:#Das Intervall ist zu groß um den Versand einer E-Mail vor der Löschung des Accounts zu gewährleisten.
@@ -14818,7 +14839,7 @@ sess#:#sess_reg_added_to_wl#:#Sie sind in die Warteliste aufgenommen worden.
 rbac#:#condition_failed#:#Nicht bestanden
 rbac#:#condition_learning_progress#:#Status aus Lernfortschritt ableiten
 rbac#:#rbac_precondition_hide#:#Objekt verbergen
-rbac#:#rbac_precondition_hide_info#:#Das Objekt ist für Benutzer, die die Vorbedingungen nicht erfüllt haben, nicht sichtbar.
+rbac#:#rbac_precondition_hide_info#:#Dieses Objekt wird Benutzern solange nicht angezeigt, bis die definierten Vorbedingungen erfüllt sind.
 wsp#:#wsp_shared_table_title#:#Freigaben
 crs#:#crs_objective_status_configure#:#Checkliste Kurs
 crs#:#crs_objective_status_settings#:#Kurseinstellungen vornehmen
@@ -15126,7 +15147,7 @@ survey#:#survey_access_codes_info#:#Benutzer erhalten Zugang zur Umfrage, indem 
 survey#:#survey_results_anonymization#:#Datenschutz
 survey#:#survey_results_personalized#:#Mit Namen
 survey#:#survey_results_personalized_info#:#Im Reiter 'Ergebnisse' werden Teilnehmer namentlich gelistet und ihre Antworten angezeigt. Alle Benutzer mit Zugang zu diesem Reiter können einsehen, wer welche Antworten gegeben hat.
-survey#:#survey_results_anonymized#:#Ohne Namen
+survey#:#survey_results_anonymized#:#Ohne Namen / Anonyme Umfrage
 survey#:#survey_results_anonymized_info#:#Im Reiter 'Ergebnisse' werden die Namen der Teilnehmer durch Codes ersetzt. Benutzer mit Zugang zu diesem Reiter können die Antworten keinem Namen zuordnen, sondern nur einem Benutzer "iTXaF" (Beispiel).
 survey#:#material_added_empty#:#Das Objekt enthält kein geeignetes Material.
 ecs#:#ecs_refresh_participants#:#ECS-Teilnehmer aktualisieren
@@ -15201,8 +15222,6 @@ mob#:#mob_object#:#Objekt
 content#:#cont_qtries_info#:#Standardwert "Anzahl der Versuche" für neu angelegte Fragen.
 lm#:#lm_copy#:#ILIAS-Lernmodul kopieren
 content#:#cont_settings#:#Lernmoduleinstellungen
-rbac#:#orgu_view_learning_progress_rec#:#Lernfortschritt rekursiv einsehen
-rbac#:#orgu_copy#:#Organisationseinheit kopieren
 exc#:#exc_no_team_yet_notice#:#Sie gehören noch keinem Team an!
 prtf#:#prtf_edit_embedded_blog#:#Blog "%s" bearbeiten
 exc#:#exc_manage_team#:#Team verwalten
@@ -15242,4 +15261,84 @@ cron#:#cron_result_status_fail#:#Fehler
 wiki#:#wiki_unhide_meta_adv_records#:#Zusätzliche Eigenschaften anzeigen
 content#:#cont_wiki_link_dialog#:#Link zu einer Wikiseite (Dialog)
 link#:#link_link#:#Link
-common#:#msg_copy_clipboard_source#:#Now, please select the desired course, whose content should be copied and click the button ‘Next’.###25 06 2015 new variable
+common#:#msg_copy_clipboard_source#:#Wählen Sie nun den Kurs aus, dessen Inhalte kopiert werden sollen. Klicken Sie abschließende auf den Weiter-Button.
+prtt#:#prtt_portfolio_created#:#Portfoliovorlage wurde hinzugefügt
+forum#:#frm_censorship#:#Zensieren
+forum#:#frm_revoke_censorship#:#Zensur aufheben
+forum#:#frm_censorship_applied#:#Der Beitrag wurde erfolgreich zensiert.
+forum#:#frm_censorship_revoked#:#Die Zensur für den Beitrag wurde aufgehoben.
+forum#:#frm_mark_as_read#:#Als gelesen markieren
+forum#:#frm_mark_as_unread#:#Als ungelesen markieren
+sysc#:#sysc_overview#:#Übersicht
+sysc#:#sysc_groups#:#Systemcheck-Gruppen
+sysc#:#sysc_grp_tree#:#Magazinbaum
+sysc#:#sysc_grp_tree_desc#:#Analysiert und repariert die Datenintegrität des Magazinbaums
+sysc#:#sysc_completed_num#:#Erfüllte Aufgaben
+sysc#:#sysc_failed_num#:#Nicht erfüllte Aufgaben
+sysc#:#sysc_task_overview#:#Aufgaben
+sysc#:#sysc_action_validate#:#Überprüfen
+sysc#:#sysc_action_repair#:#Reparieren
+sysc#:#sysc_task_tree_duplicates#:#Doppelte Einträge in der Baumstruktur
+sysc#:#sysc_task_tree_duplicates_desc#:#Durchsucht das System nach doppelten Einträgen in Magazinbaum.
+sysc#:#sysc_task_tree_dump#:#Baum auflisten
+sysc#:#sysc_task_tree_dump_desc#:#Analysiert die Baumstruktur und listet alle Baumknoten zusammen mit den Analysedaten auf.
+sysc#:#sysc_action_list_tree#:#Dump der Baumstruktur erzeugen
+sysc#:#sysc_action_show_tree#:#Baumstruktur anzeigen
+sysc#:#sysc_tree_duplicate_failures#:#Es wurden doppelte Einträge in der Baumstruktur gefunden. Anzahl doppelter Einträge:
+sysc#:#sysc_message_success#:#Es wurden keine Fehler festgestellt.
+sysc#:#sysc_tree_list_failures#:#Ein Dump des Magazinbaums wurde erstellt. Anzahl gefundener Fehler:
+sysc#:#sysc_status_na#:#Noch nicht ausgeführt
+sysc#:#sysc_status_running#:#Wird durchgeführt
+sysc#:#sysc_status_failed#:#Fehlgschlagen
+sysc#:#sysc_status_completed#:#Erfüllt
+sysc#:#sysc_task_tree_missing#:#Fehlende Einträge in der Baumstruktur
+sysc#:#sysc_task_tree_missing_desc#:#Durchsucht das System nach fehlenden Einträgen in der Baumstruktur
+sysc#:#sysc_message_tree_missing_confirm#:#Möchten sie die fehlenden Einträge in der Baumstruktur wieder herstellen?
+sysc#:#sysc_btn_tree_missing#:#Wiederherstellung starten
+sysc#:#sysc_tree_missing_failures#:#Es gibt fehlende Einträge in der Baumstruktur. Anzahl fehlender Einträge:
+sysc#:#sysc_cron_empty_trash#:#Papierkorb löschen
+sysc#:#sysc_cron_empty_trash_desc#:#Wenn aktiviert, werden Objekte des Papierkorbs automatisch anhand bestimmter Kriterien (Alter, Objekttyp, Anzahl) aus dem System entfernt.
+sysc#:#sysc_task_tree_missing_tree#:#Fehlende Einträge im Magazinbaum
+sysc#:#sysc_task_tree_missing_tree_desc#:#Sucht und repariert fehlende Einträge referenzierter Objekte im Magazinbaum.
+sysc#:#sysc_task_tree_missing_reference#:#Fehlende Referenzen
+sysc#:#sysc_task_tree_missing_reference_desc#:#Sucht und repariert fehlende Objekt-Referenzen für Einträge im Magazinbaum.
+sysc#:#sysc_task_structure#:#Baumstruktur
+sysc#:#sysc_task_structure_desc#:#Analyiert und korrigiert die Struktur des Magazinbaums
+blog#:#blog_keywords_other#:#Sonstige Schlagwörter
+blog#:#blog_keywords_other_info#:#Diese Schlagwörter sind für andere Blog-Einträge vergeben worden.
+forum#:#forums_thread_deleted#:#Das gewählte Thema einschließlich aller dazugehörigen Beiträge wurde gelöscht.
+forum#:#forums_threads_deleted#:#Die gewählten Themen einschließlich aller dazugehörigen Beiträge wurden gelöscht.
+user#:#feedhash#:#Newsfeedhash
+wsp#:#wsp_shared_filter_reset_button#:#Suche zurücksetzen
+wsp#:#wsp_shared_filter_button#:#Suche
+exc#:#exc_direct_submit#:#Abgeben
+export#:#no_file#:#Keine Datei
+content#:#lm_no_download_files#:#Zurzeit stehen keine Download-Dateien zur Verfügung.
+rbac#:#feed_copy#:#Webfeed kopieren
+crs#:#crs_unsubscribe_member_explanation#:#Sie erhalten diese Mail, da Sie die Kursmitgliedschaft des oben genannten Kurses beendet haben.
+content#:#cont_sqst#:#Frage in Umfrage (Material)
+mmbr#:#info_refuse_sure#:#Sind Sie sicher, dass Sie den/die folgenden Benutzer ablehnen möchten?
+administration#:#adm_user_starting_point_inherit#:#Standard-Einstellungen übernehmen
+administration#:#adm_user_starting_point_inherit_info#:#Es werden die Einstellungen übernommen, wie sie vom Administrator für die ganze Plattform  global aktiviert wurden.
+content#:#cont_not_saved_edit_lock_expired#:#Entschuldigung, Ihre Änderungen konnten nicht gespeichert werden. Die Seite wurde zwischenzeitlich von einem anderen Benutzer zur Bearbeitung gesperrt. Sie können diesen Dialog schließen und dann den Inhalt in Ihre Zwischenablage kopieren.
+style#:#sty_type_ha_iheada#:#Hor. Akkordeonelement Kopf (aktiv)
+style#:#sty_type_ha_ihcap#:#Hor. Akkordeonelement Überschrift
+style#:#sty_type_va_iheada#:#Vert. Akkordeonelement Kopf (aktiv)
+style#:#sty_type_va_ihcap#:#Vert. Akkordeonelement Überschrift
+style#:#sty_ha_iheada_class#:#Hor. Akkordeonelement Kopf (aktiv)
+style#:#sty_ha_ihcap_class#:#Hor. Akkordeonelement Überschrift
+style#:#sty_va_iheada_class#:#Vert. Akkordeonelement Kopf (aktiv)
+style#:#sty_va_ihcap_class#:#Vert. Akkordeonelement Überschrift
+exc#:#exc_delete_team#:#Team löschen
+trac#:#trac_cron_info#:#Aktivieren Sie den "Objekt-Statistik"-Cron-Job, um Daten für diese Auswertung zu sammeln.
+rbac#:#mep_copy#:#Medienpool kopieren
+crs#:#crs_cannot_find_role#:#Rolle konnte nicht gefunden werden.
+grp#:#grp_admission_link_failure_invalid_code#:#Kein Beitritt möglich. Der Link ist nicht gültig.
+crs#:#crs_admission_link_failure_invalid_code#:#Kein Beitritt möglich. Der Link ist nicht gültig.
+auth#:#auth_ldap_server_ds#:#LDAP-Server
+assessment#:#ass_location#:#Ort
+assessment#:#ass_imap_hint#:#Hinweis (angezeigt als Tooltip)
+blog#:#blog_show_latest#:#Neueste Beiträge/Entwürfe anzeigen
+assessment#:#ass_competence_respect_level_ordering#:#Bitte beachten Sie, dass die Kompetenz-Schwellenwerte gemäß der Reihenfolge der Kompetenz-Ausprägungen in aufsteigender Reihenfolge definiert werden müssen.
+registration#:#reg_mail_body_activation#:#um Ihr Benutzerprofil freizuschalten und gleichzeitig diese E-Mail-Adresse zu bestätigen, klicken Sie bitte den folgenden Link an:
+form#:#err_invalid_input#:#Es wurde ein ungültiger Wert übertragen. Bitte überprüfen sie ihre Eingabe.

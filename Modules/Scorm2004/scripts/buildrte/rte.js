@@ -1,4 +1,4 @@
-// Build: 2015711221954 
+// Build: 20151123102911 
 /*
 	+-----------------------------------------------------------------------------+
 	| ILIAS open source                                                           |
@@ -13588,8 +13588,13 @@ function save()
 		//alert("Before save "+result.node.length);
 		//if (!result.node.length) {return;} 
 		if (typeof SOP!="undefined" && SOP==true) result=saveRequest(result);
-		else result = this.config.store_url ? sendJSONRequest(this.config.store_url, result): {};
-		
+		else {
+			try{
+				result = this.config.store_url ? sendJSONRequest(this.config.store_url, result): {};
+			}catch(e){
+				return false;
+			}
+		}
 		// added to synchronize the new data. it might update the navigation
 		updateNavForSequencing();
 
@@ -13863,6 +13868,8 @@ function onWindowUnload ()
 	result["p"]=config.status.p;
 	result["last"]="";
 	if (config.auto_last_visited==true) result["last"]=activities[mlaunch.mActivityID].id;
+	result["total_time_sec"]="";
+	if (config.mode!="browse") result["total_time_sec"]=((currentTime() - wbtStartTime)/1000) + config.status.total_time_sec;
 	if (typeof SOP!="undefined" && SOP==true) result=scormPlayerUnload(result);
 	else result=this.config.scorm_player_unload_url ? sendJSONRequest(this.config.scorm_player_unload_url, result): {};
 	removeResource();
@@ -14874,6 +14881,7 @@ var saved={
 // SCO related Variables
 var currentAPI; // reference to API during runtime of a SCO
 var scoStartTime = null;
+var wbtStartTime = currentTime();
 
 var openedResource = new Array();
 
@@ -14949,11 +14957,12 @@ function Runtime(cmiItem, onCommit, onTerminate, onDebug)
 	 */	 
 	function GetErrorString(param) 
 	{
-		if (typeof param !== 'string') 
+		if (typeof param !== 'string' && typeof param !== 'number') 
 		{
+			var returnValueF = 'GetErrorString param must contain an error code and should be a string';
 			if (logActive)
-				sendLogEntry(getMsecSinceStart(),'GetErrorString',String(param),"","false",201);
-			return setReturn(201, 'GetErrorString param must be empty string', '');
+				sendLogEntry(getMsecSinceStart(),'GetErrorString',String(param),"",returnValueF,"");
+			return returnValueF;
 		}
 		var e = Runtime.errors[param];
 		var returnValue = e && e.message ? String(e.message).substr(0,255) : '';

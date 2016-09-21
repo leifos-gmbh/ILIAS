@@ -3521,7 +3521,6 @@ common#:#message_content#:#Treść wiadomości
 common#:#message_no_delivered_files#:#Nie dostarczyłeś plików!
 common#:#message_to#:#Wiadomość do:
 common#:#meta_data#:#Meta dane
-common#:#mgs_objects_linked_to_the_following_folders#:#Obiekty zostały połączone z: %s
 common#:#migrate#:#Migracja
 common#:#min_time#:#Minimalny czas
 common#:#minute#:#Minuta
@@ -3597,7 +3596,6 @@ common#:#msg_input_is_required#:#To pole jest wymagane. Wprowadź wartość.
 common#:#msg_invalid_filetype#:#Błędny typ pliku
 common#:#msg_is_last_role#:#Pozbawiłeś następujących użytkowników ich ról.
 common#:#msg_last_role_for_registration#:#Conajmniej jedna rola musi być dostępna na formularzu rejestracyjnym dla nowych użytkowników. Ta rola jest teraz jedyną dostępną.
-common#:#msg_link_clipboard#:#Wybrane obiekty zostały zapamiętane w schowku (Akcja: łączenie).
 common#:#msg_linked#:#Wybrane obiekty zostały połączone.
 common#:#msg_may_not_contain#:#Ten obiekt nie może zawierać obiektów typu:
 common#:#msg_min_one_active_role#:#Każdy użytkownik musi posiadać conajmniej jedną aktywną rolę!
@@ -7722,8 +7720,6 @@ forum#:#add_re_to_subject_info#:#If activated, 'Re: ' is added to the subject on
 forum#:#ascending_order#:#Latest postings at the bottom
 forum#:#close_topics#:#Zamknij
 forum#:#cont_captcha_code#:#Code
-forum#:#deactivate_current_and_childs#:#Deactivate All Posts
-forum#:#deactivate_post_txt#:#Would you really like to deactivate the current post and all its child posts?
 forum#:#descending_order#:#Latest postings at the top
 forum#:#empty_subject#:#On reply the user has to enter a new title.
 forum#:#enter_new_subject#:#Please enter a new subject
@@ -14061,7 +14057,6 @@ content#:#cont_language#:#Language###30 12 2013 new variable
 content#:#cont_add_lang#:#Add Language###30 12 2013 new variable
 content#:#cont_conf_delete_lang#:#Do you really want to drop support for the following languages?###30 12 2013 new variable
 content#:#cont_back_to_page#:#Back to Page###30 12 2013 new variable
-content#:#cont_got_lock#:#This page has been locked for your editing. Please release the page after you have done all your changes.###30 12 2013 new variable
 content#:#cont_finish_editing#:#Finish Editing###30 12 2013 new variable
 content#:#cont_page_lock_released#:#Editing finished. Page lock has been released.###30 12 2013 new variable
 assessment#:#preserve_manscoring#:#Preserve manual scorings###04 01 2014 new variable
@@ -15243,3 +15238,101 @@ cron#:#cron_result_status_fail#:#Failed###25 06 2015 new variable
 wiki#:#wiki_unhide_meta_adv_records#:#Show additional properties###25 06 2015 new variable
 content#:#cont_wiki_link_dialog#:#Link to Wiki Page (Dialog)###25 06 2015 new variable
 link#:#link_link#:#Link###25 06 2015 new variable
+assessment#:#tst_result_pass#:#Results of Test Pass###28 07 2015 new variable
+prtt#:#prtt_portfolio_created#:#Portfolio Template added###28 07 2015 new variable
+forum#:#frm_censorship#:#Censor###28 07 2015 new variable
+forum#:#frm_revoke_censorship#:#Revoke Censorship###28 07 2015 new variable
+forum#:#frm_censorship_applied#:#The censorship has been successfully applied.###28 07 2015 new variable
+forum#:#frm_censorship_revoked#:#The censorship has been successfully revoked.###28 07 2015 new variable
+forum#:#frm_mark_as_read#:#Mark as read###28 07 2015 new variable
+forum#:#frm_mark_as_unread#:#Mark as unread###28 07 2015 new variable
+dcl#:#dcl_allowed_file_types#:#Allowed File Types###12 09 2015 new variable
+dcl#:#dcl_locked_tooltip#:#Disable this field for users to edit. Does not include roles with the permission 'Edit Settings'###12 09 2015 new variable
+bibl#:#news_title_created#:#New bibliography list added###12 09 2015 new variable
+bibl#:#news_content_created#:#A new bibliography list has been added. You can view the entries by clicking the link to the item.###12 09 2015 new variable
+bibl#:#news_title_updated#:#Bibliography list updated###12 09 2015 new variable
+bibl#:#news_content_updated#:#The bibliography list has been modified. You can view the new entries by clicking the link to the item.###12 09 2015 new variable
+common#:#obj_orgu_description#:#Creating and editing organisational structure###12 09 2015 new variable
+common#:#il_orgu_superior#:#Superior###12 09 2015 new variable
+common#:#il_orgu_employee#:#Employee###12 09 2015 new variable
+common#:#view_learning_progress#:#View Learning Progress###12 09 2015 new variable
+common#:#view_learning_progress_rec#:#View Learning Progress of Unit incl. Subunits###12 09 2015 new variable
+sysc#:#sysc_overview#:#Overview###12 09 2015 new variable
+sysc#:#sysc_groups#:#System Check Groups###12 09 2015 new variable
+sysc#:#sysc_grp_tree#:#Repository Tree###12 09 2015 new variable
+sysc#:#sysc_grp_tree_desc#:#Performs an analysis of the tree and prints all tree nodes along with analysis data.###12 09 2015 new variable
+sysc#:#sysc_completed_num#:#Fullfilled Tasks###12 09 2015 new variable
+sysc#:#sysc_failed_num#:#Not Fullfilled Tasks###12 09 2015 new variable
+sysc#:#sysc_task_overview#:#Tasks###12 09 2015 new variable
+sysc#:#sysc_action_validate#:#Validate###12 09 2015 new variable
+sysc#:#sysc_action_repair#:#Repair###12 09 2015 new variable
+sysc#:#sysc_task_tree_duplicates#:#Duplicate Entries in Repository Tree###12 09 2015 new variable
+sysc#:#sysc_task_tree_duplicates_desc#:#Search for duplicate entries in the repository tree structure.###12 09 2015 new variable
+sysc#:#sysc_task_tree_dump#:#List Tree###12 09 2015 new variable
+sysc#:#sysc_task_tree_dump_desc#:#Analyses and prints the repository tree structure###12 09 2015 new variable
+sysc#:#sysc_action_list_tree#:#Create Repository Tree Dump###12 09 2015 new variable
+sysc#:#sysc_action_show_tree#:#Show Repository Tree Dump###12 09 2015 new variable
+sysc#:#sysc_tree_duplicate_failures#:#Found duplicate entries in tree structure. Number of duoplicate entries###12 09 2015 new variable
+sysc#:#sysc_message_success#:#No errors found###12 09 2015 new variable
+sysc#:#sysc_tree_list_failures#:#A dump of the the repository tree has been created. Number of errors in tree structure:###12 09 2015 new variable
+sysc#:#sysc_status_na#:#Not Executed###12 09 2015 new variable
+sysc#:#sysc_status_running#:#Running###12 09 2015 new variable
+sysc#:#sysc_status_failed#:#Failed###12 09 2015 new variable
+sysc#:#sysc_status_completed#:#Completed###12 09 2015 new variable
+sysc#:#sysc_task_tree_missing#:#Missing Entries in Repository Tree###12 09 2015 new variable
+sysc#:#sysc_task_tree_missing_desc#:#Searches and repairs missing entries in the repository tree.###12 09 2015 new variable
+sysc#:#sysc_message_tree_missing_confirm#:#Do you really want to restore missing entries in the repository tree structure?###12 09 2015 new variable
+sysc#:#sysc_btn_tree_missing#:#Restore Missing###12 09 2015 new variable
+sysc#:#sysc_tree_missing_failures#:#Found missing entries in the tree structure. Number of missing entries:###12 09 2015 new variable
+sysc#:#sysc_cron_empty_trash#:#Delete Trash Bin###12 09 2015 new variable
+sysc#:#sysc_cron_empty_trash_desc#:#If enabled, the repository trash bin will be purged by given criteria (age, object type or maximum number of objects).###12 09 2015 new variable
+sysc#:#sysc_task_tree_missing_tree#:#Missing Entries in Repository Tree###12 09 2015 new variable
+sysc#:#sysc_task_tree_missing_tree_desc#:#Searches and repairs missing entries in the repository tree.###12 09 2015 new variable
+sysc#:#sysc_task_tree_missing_reference#:#Missing Object References###12 09 2015 new variable
+sysc#:#sysc_task_tree_missing_reference_desc#:#Searches and repairs missing object references in the repository tree.###12 09 2015 new variable
+sysc#:#sysc_task_structure#:#Tree structure###12 09 2015 new variable
+sysc#:#sysc_task_structure_desc#:#Analyzes and corrects the repository tree structure.###12 09 2015 new variable
+blog#:#blog_keywords_other#:#Other Keywords###12 09 2015 new variable
+blog#:#blog_keywords_other_info#:#These keywords were set for other blog postings.###12 09 2015 new variable
+forum#:#forums_thread_deleted#:#The selected thread including all postings have been deleted.###12 09 2015 new variable
+forum#:#forums_threads_deleted#:#The selected threads including all postings have been deleted.###12 09 2015 new variable
+user#:#feedhash#:#Newsfeedhash###08 10 2015 new variable
+wsp#:#wsp_shared_filter_reset_button#:#Reset Search###08 10 2015 new variable
+wsp#:#wsp_shared_filter_button#:#Search###08 10 2015 new variable
+exc#:#exc_direct_submit#:#Submit###08 10 2015 new variable
+export#:#no_file#:#No file###08 10 2015 new variable
+content#:#lm_no_download_files#:#There are currently no files for download available.###08 10 2015 new variable
+rbac#:#feed_copy#:#User can copy webfeed###08 10 2015 new variable
+assessment#:#tst_position_without_total#:#Question %s###16 11 2015 new variable
+crs#:#crs_unsubscribe_member_explanation#:#You receive this message because you unsubscribed from the course mentioned above.###16 11 2015 new variable
+content#:#cont_sqst#:#Survey Question (Assigned Material)###16 11 2015 new variable
+mmbr#:#info_refuse_sure#:#Are you sure you want to refuse the following user(s)?###16 11 2015 new variable
+administration#:#adm_user_starting_point_inherit#:#Use Standard-Settings###16 11 2015 new variable
+administration#:#adm_user_starting_point_inherit_info#:#The settings that were made by the administrator of the platform as a whole will be used.###16 11 2015 new variable
+common#:#user_not_found_to_delete#:#A user could not be found to delete.###21 01 2016 new variable
+orgu#:#not_movable_to_subtree#:#An organisational unit cannot be moved into its own subtree. This would create a loop.###21 01 2016 new variable
+content#:#cont_got_lock_until#:#This page has been locked for your editing until %1. Please release the page after you have done all your changes by hitting %2###21 01 2016 new variable
+content#:#cont_not_saved_edit_lock_expired#:#Sorry, but another user obtained the edit lock for this page in the meantime. You may close this message and copy the content to your clipboard.###21 01 2016 new variable
+common#:#mgs_objects_linked_to_the_following_folders_p#:#The objects were linked to the following folder(s): %s###26 01 2016 new variable
+common#:#mgs_objects_linked_to_the_following_folders_s#:#The object was linked to the following folder(s): %s###26 01 2016 new variable
+common#:#msg_link_clipboard_p#:#Now, please select the desired location, where the selected objects should be linked to and click the button Paste.###26 01 2016 new variable
+common#:#msg_link_clipboard_s#:#Now, please select the desired location, where the selected object should be linked to and click the button Paste.###26 01 2016 new variable
+style#:#sty_type_ha_iheada#:#Hor. Accordion Header (active)###01 03 2016 new variable
+style#:#sty_type_ha_ihcap#:#Hor. Accordion Caption###01 03 2016 new variable
+style#:#sty_type_va_iheada#:#Vert. Accordion Header (active)###01 03 2016 new variable
+style#:#sty_type_va_ihcap#:#Vert. Accordion Caption###01 03 2016 new variable
+style#:#sty_ha_iheada_class#:#Hor. Accordion Header (active)###01 03 2016 new variable
+style#:#sty_ha_ihcap_class#:#Hor. Accordion Caption###01 03 2016 new variable
+style#:#sty_va_iheada_class#:#Vert. Accordion Header (active)###01 03 2016 new variable
+style#:#sty_va_ihcap_class#:#Vert. Accordion Caption###01 03 2016 new variable
+assessment#:#ass_create_export_file_with_results#:#Create Test Export File (incl. Participant Results)###06 05 2016 new variable
+assessment#:#tst_conflict_fbh_oblig_quest#:#The combination of using compulsory questions and locked answers is not allowed.###06 05 2016 new variable
+assessment#:#tst_conflict_reset_non_fbh#:#The setting "Lock Answers" was adjusted to "Do Not Lock Answers".###06 05 2016 new variable
+assessment#:#tst_conflict_reset_fbh_force#:#The setting "Lock Answers" was adjusted to "Do Not Lock Answers but Force Feedback".###06 05 2016 new variable
+exc#:#exc_delete_team#:#Delete Team###06 05 2016 new variable
+trac#:#trac_cron_info#:#Please activate the "Object Statistics" cron job to gather data.###06 05 2016 new variable
+dcl#:#dcl_reference_link_info#:#Detailed View must be active in referenced table###29 06 2016 new variable
+rbac#:#mep_copy#:#User can copy media pool###29 06 2016 new variable
+crs#:#crs_cannot_find_role#:#Can't find this role.###29 06 2016 new variable
+grp#:#grp_admission_link_failure_invalid_code#:#Can't register: Link is invalid.###29 06 2016 new variable
+crs#:#crs_admission_link_failure_invalid_code#:#Can't register: Link is invalid.###29 06 2016 new variable

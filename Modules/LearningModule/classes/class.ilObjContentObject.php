@@ -1874,6 +1874,31 @@ class ilObjContentObject extends ilObject
 			$a_xml_writer->xmlElement("Property", $attrs);
 		}
 
+		// layout per page
+		$attrs = array("Name" => "LayoutPerPage", "Value" =>
+			$this->getLayoutPerPage());
+		$a_xml_writer->xmlElement("Property", $attrs);
+
+		// progress icons
+		$attrs = array("Name" => "ProgressIcons", "Value" =>
+			$this->getProgressIcons());
+		$a_xml_writer->xmlElement("Property", $attrs);
+
+		// store tries
+		$attrs = array("Name" => "StoreTries", "Value" =>
+			$this->getStoreTries());
+		$a_xml_writer->xmlElement("Property", $attrs);
+
+		// restrict forward navigation
+		$attrs = array("Name" => "RestrictForwardNavigation", "Value" =>
+			$this->getRestrictForwardNavigation());
+		$a_xml_writer->xmlElement("Property", $attrs);
+
+		// disable default feedback
+		$attrs = array("Name" => "DisableDefaultFeedback", "Value" =>
+			$this->getDisableDefaultFeedback());
+		$a_xml_writer->xmlElement("Property", $attrs);
+
 		$a_xml_writer->xmlEndTag("Properties");
 	}
 
@@ -2076,10 +2101,14 @@ class ilObjContentObject extends ilObject
 		preg_match_all("/url\(([^\)]*)\)/",$css,$files);
 		foreach (array_unique($files[1]) as $fileref)
 		{
-			$fileref = dirname($location_stylesheet)."/".$fileref;
+			$css_fileref = str_replace(array("'", '"'), "", $fileref);
+			$fileref = dirname($location_stylesheet)."/".$css_fileref;
 			if (is_file($fileref))
 			{
-				copy($fileref, $style_img_dir."/".basename($fileref));
+//echo "<br>make dir: ".dirname($style_dir."/".$css_fileref);
+				ilUtil::makeDirParents(dirname($style_dir."/".$css_fileref));
+//echo "<br>copy: ".$fileref." TO ".$style_dir."/".$css_fileref;
+				copy($fileref, $style_dir."/".$css_fileref);
 			}
 		}
 		fclose($fh);
@@ -2175,6 +2204,17 @@ class ilObjContentObject extends ilObject
 			$this->exportHTMLFile($a_target_dir, $file);
 		}
 		$ilBench->stop("ExportHTML", "exportHTMLFileObjects");
+
+		// export questions (images)
+		if (count($this->q_ids) > 0)
+		{
+			foreach ($this->q_ids as $q_id)
+			{
+				ilUtil::makeDirParents($a_target_dir."/assessment/0/".$q_id."/images");
+				ilUtil::rCopy(ilUtil::getWebspaceDir()."/assessment/0/".$q_id."/images",
+					$a_target_dir."/assessment/0/".$q_id."/images");
+			}
+		}
 
 		// export table of contents
 		$ilBench->start("ExportHTML", "exportHTMLTOC");
@@ -2339,8 +2379,14 @@ class ilObjContentObject extends ilObject
 			array("source" => './Modules/Scorm2004/scripts/questions/question_handling.js',
 				"target" => $a_target_dir.'/js/question_handling.js',
 				"type" => "js"),
+			array("source" => './Modules/TestQuestionPool/js/ilMatchingQuestion.js',
+				"target" => $a_target_dir.'/js/ilMatchingQuestion.js',
+				"type" => "js"),
 			array("source" => './Modules/Scorm2004/templates/default/question_handling.css',
 				"target" => $a_target_dir.'/css/question_handling.css',
+				"type" => "css"),
+			array("source" => './Modules/TestQuestionPool/templates/default/test_javascript.css',
+				"target" => $a_target_dir.'/css/test_javascript.css',
 				"type" => "css"),
 			array("source" => ilPlayerUtil::getLocalMediaElementJsPath(),
 				"target" => $a_target_dir."/".ilPlayerUtil::getLocalMediaElementJsPath(),
@@ -2589,14 +2635,20 @@ class ilObjContentObject extends ilObject
 				include_once("./Modules/File/classes/class.ilObjFile.php");
 				$pg_files = ilObjFile::_getFilesOfObject($this->getType().":pg", $page["obj_id"], 0, $a_lang);
 				$this->offline_files = array_merge($this->offline_files, $pg_files);
-				
+
+				// collect all questions
+				include_once("./Services/COPage/classes/class.ilPCQuestion.php");
+				$q_ids = ilPCQuestion::_getQuestionIdsForPage($this->getType(), $page["obj_id"], $a_lang);
+				foreach($q_ids as $q_id)
+				{
+					$this->q_ids[$q_id] = $q_id;
+				}
+
 				$ilBench->stop("ExportHTML", "exportHTMLPage");
 			}
 		}
 		$this->offline_mobs = $mobs;
 		$this->offline_int_links = $int_links;
-		
-		
 	}
 
 
@@ -3202,6 +3254,14 @@ class ilObjContentObject extends ilObject
 		$new_obj = parent::cloneObject($a_target_id,$a_copy_id);
 		$this->cloneMetaData($new_obj);
 		//$new_obj->createProperties();
+
+		//copy online status if object is not the root copy object
+		$cp_options = ilCopyWizardOptions::_getInstance($a_copy_id);
+
+		if(!$cp_options->isRootNode($this->getRefId()))
+		{
+			$new_obj->setOnline($this->getOnline());
+		}
 	 	
 		$new_obj->setTitle($this->getTitle());
 		$new_obj->setDescription($this->getDescription());

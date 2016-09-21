@@ -108,7 +108,6 @@ class ilObjFolderGUI extends ilContainerGUI
 			// container page editing
 			case "ilcontainerpagegui":
 				$this->prepareOutput(false);
-				$this->checkPermission("write");
 				$ret = $this->forwardToPageObject();
 				if ($ret != "")
 				{
@@ -578,7 +577,10 @@ class ilObjFolderGUI extends ilContainerGUI
 				}
 				$this->object->saveIcons($_FILES["cont_icon"]['tmp_name']);
 			}
-			ilUtil::sendSuccess($this->lng->txt("msg_obj_modified"),true);
+			if ($_FILES["cont_icon"]['tmp_name'] || $_POST["cont_icon_delete"])
+			{
+				ilUtil::sendSuccess($this->lng->txt("msg_obj_modified"),true);
+			}
 			$this->ctrl->redirect($this,"editIcons");
 		}
 

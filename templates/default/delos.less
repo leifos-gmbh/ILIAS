@@ -1,6 +1,6 @@
 @import "less/font.less"; 
  /* rtl-review is this font safe for RTL languages? */
- 
+
  /* rtl-review */
 [dir="ltr"] * { direction: ltr; unicode-bidi: embed; } //bidi-override
 [dir="rtl"] * { text-align: right; direction: rtl; unicode-bidi: embed; } //bidi-override
@@ -839,6 +839,7 @@ h4.il_ContainerItemTitle {
 
 div.il_ContainerItemTitle {
 	float: left;
+    max-width: calc(~"100% - 40px");
 	padding-bottom: 5px;
 }
 
@@ -1545,6 +1546,12 @@ div.ilSideBarContent{
 	background-color: #FF9;
 }
 
+/* Icon Default */
+img.ilIcon {
+	width: 32px;
+	height: 32px;
+}
+
 
 /* Component Imports */
 
@@ -1604,6 +1611,7 @@ div.ilSideBarContent{
 @import "less/Services/UIComponent/Checklist/delos.less";
 @import "less/Modules/WorkspaceFolder/delos.less";
 @import "less/Services/FileUpload/delos.less";
+@import "less/Services/UIComponent/Modal/delos.less";
 
 .noMargin {
 	margin: 0;
@@ -1722,6 +1730,22 @@ table.mceToolbar {
 	> a {
 		text-decoration: underline;
 	}
+}
+.alert {
+	> a.btn {
+		text-decoration: none;
+	}
+}
+
+//mantis #0017884
+#ilAdvSelListAnchorText_asl + ul.dropdown-menu > li > div.row,
+#mm_adm_tr + span + ul.dropdown-menu > li > div.row,
+#mm_adm_tr + ul.dropdown-menu > li > div.row {
+    width: 750px;
+    @media only screen and (max-width: @grid-float-breakpoint-max) {
+        width: 100% !important;
+        margin: 0;
+    }
 }
 /* basic responsiveness (beta)
 
@@ -1892,3 +1916,8 @@ table.mceToolbar {
 	}
 }
 
+.checkbox input[type="checkbox"] {
+    &#item_filter_enabled {
+        margin-left: 0;
+    }
+}

@@ -66,6 +66,24 @@ class ilTestServiceGUI
 	 */
 	protected $participantData;
 	
+	private $contextWithinTestPass = false;
+
+	/**
+	 * @return boolean
+	 */
+	public function isContextWithinTestPass()
+	{
+		return $this->contextWithinTestPass;
+	}
+
+	/**
+	 * @param boolean $contextWithinTestPass
+	 */
+	public function setContextWithinTestPass($contextWithinTestPass)
+	{
+		$this->contextWithinTestPass = $contextWithinTestPass;
+	}
+	
 	/**
 	 * The constructor takes the test object reference as parameter 
 	 *
@@ -164,7 +182,7 @@ class ilTestServiceGUI
 	 * 
 	 * @deprecated
 	 */
-	public function getPassOverview($active_id, $targetclass = "", $targetcommand = "", $short = FALSE, $hide_details = FALSE)
+	public function getPassOverview($active_id, $targetclass = "", $targetcommand = "", $short = FALSE, $hide_details = FALSE, $adminMode = false)
 	{
 		require_once 'Services/UIComponent/AdvancedSelectionList/classes/class.ilAdvancedSelectionListGUI.php';
 		require_once 'Modules/Test/classes/tables/class.ilTestPassOverviewTableGUI.php';
@@ -182,6 +200,7 @@ class ilTestServiceGUI
 		
 		require_once 'Modules/Test/classes/class.ilTestPassesSelector.php';
 		$testPassesSelector = new ilTestPassesSelector($GLOBALS['ilDB'], $this->object);
+		$testPassesSelector->setAdminModeEnabled($adminMode);
 		$testPassesSelector->setActiveId($active_id);
 		$lastFinishedPass = $this->testSessionFactory->getSession($active_id)->getLastFinishedPass();
 		$testPassesSelector->setLastFinishedPass($lastFinishedPass);
@@ -326,12 +345,15 @@ class ilTestServiceGUI
 
 						$show_question_only = ($this->object->getShowSolutionAnswersOnly()) ? TRUE : FALSE;
 
+						$showFeedback = !$this->isContextWithinTestPass() && $this->object->getShowSolutionFeedback();
+						$show_solutions = !$this->isContextWithinTestPass() && $show_solutions;
+						
 						if($show_solutions)
 						{
 							$compare_template = new ilTemplate('tpl.il_as_tst_answers_compare.html', TRUE, TRUE, 'Modules/Test');
 							$compare_template->setVariable("HEADER_PARTICIPANT", $this->lng->txt('tst_header_participant'));
 							$compare_template->setVariable("HEADER_SOLUTION", $this->lng->txt('tst_header_solution'));
-							$result_output = $question_gui->getSolutionOutput($active_id, $pass, $show_solutions, FALSE, $show_question_only, $this->object->getShowSolutionFeedback());
+							$result_output = $question_gui->getSolutionOutput($active_id, $pass, $show_solutions, FALSE, $show_question_only, $showFeedback);
 							$best_output   = $question_gui->getSolutionOutput($active_id, $pass, FALSE, FALSE, $show_question_only, FALSE, TRUE);
 
 							$compare_template->setVariable('PARTICIPANT', $result_output);
@@ -340,7 +362,7 @@ class ilTestServiceGUI
 						}
 						else
 						{
-							$result_output = $question_gui->getSolutionOutput($active_id, $pass, $show_solutions, FALSE, $show_question_only, $this->object->getShowSolutionFeedback());
+							$result_output = $question_gui->getSolutionOutput($active_id, $pass, $show_solutions, FALSE, $show_question_only, $showFeedback);
 							$template->setVariable('SOLUTION_OUTPUT', $result_output);
 						}
 

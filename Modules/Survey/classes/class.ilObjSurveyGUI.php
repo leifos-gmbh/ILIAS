@@ -89,8 +89,20 @@ class ilObjSurveyGUI extends ilObjectGUI
 		switch($next_class)
 		{
 			case "ilinfoscreengui":
-				$this->addHeaderAction();
-				$this->infoScreen();	// forwards command
+				if(!in_array($this->ctrl->getCmdClass(),
+					array('ilpublicuserprofilegui', 'ilobjportfoliogui')))
+				{		
+					$this->addHeaderAction();
+					$this->infoScreen(); // forwards command
+				}
+				else 
+				{
+					// #16891
+					$ilTabs->clearTargets();
+					include_once("./Services/InfoScreen/classes/class.ilInfoScreenGUI.php");
+					$info = new ilInfoScreenGUI($this);
+					$this->ctrl->forwardCommand($info);
+				}
 				break;
 			
 			case 'ilmdeditorgui':
@@ -238,6 +250,9 @@ class ilObjSurveyGUI extends ilObjectGUI
 	*/
 	function afterSave(ilObject $a_new_object)
 	{		
+		// #16446
+		$a_new_object->loadFromDb();
+		
 		$tpl = $this->getDidacticTemplateVar("svytpl");
 		if($tpl)
 		{
@@ -1229,6 +1244,13 @@ class ilObjSurveyGUI extends ilObjectGUI
 		$auto->setSearchFields($fields);
 		$auto->setResultField('login');
 		$auto->enableFieldSearchableCheck(true);
+		$auto->setMoreLinkAvailable(true);
+
+		if(($_REQUEST['fetchall']))
+		{
+			$auto->setLimit(ilUserAutoComplete::MAX_ENTRIES);
+		}
+
 		echo $auto->getList(ilUtil::stripSlashes($_REQUEST['term']));
 		exit();
 	}			

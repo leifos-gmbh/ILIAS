@@ -759,12 +759,17 @@ class ilSetup extends PEAR
 			$this->client->db->quote('system_role_id','text'));
 		$r1 = $this->client->db->fetchAssoc($s1);
 		$system_role_id = $r1["value"];
-		$q = "SELECT usr_data.usr_id, usr_data.passwd, usr_data.passwd_enc_type, usr_data.passwd_salt " .
-			 "FROM usr_data ".
-			 "LEFT JOIN rbac_ua ON rbac_ua.usr_id=usr_data.usr_id ".
-			 "WHERE rbac_ua.rol_id = ".$this->client->db->quote((int) $system_role_id,'integer')." ".
-			 "AND usr_data.login=".$this->client->db->quote($a_auth_data["username"],'text');
 
+		$add_usrfields = '';
+		if($this->client->db->tableColumnExists('usr_data', 'passwd_enc_type'))
+		{
+			$add_usrfields .= ' , usr_data.passwd_enc_type, usr_data.passwd_salt ';
+		}
+		$q = "SELECT usr_data.usr_id, usr_data.passwd $add_usrfields " .
+			"FROM usr_data " .
+			"LEFT JOIN rbac_ua ON rbac_ua.usr_id=usr_data.usr_id " .
+			"WHERE rbac_ua.rol_id = " . $this->client->db->quote((int)$system_role_id, 'integer') . " " .
+			"AND usr_data.login=" . $this->client->db->quote($a_auth_data["username"], 'text');
 		$r = $this->client->db->query($q);
 		if(!$this->client->db->numRows($r))
 		{
@@ -780,7 +785,7 @@ class ilSetup extends PEAR
 
 		require_once 'Services/User/classes/class.ilUserPasswordManager.php';
 		$crypt_type = ilUserPasswordManager::getInstance()->getEncoderName();
-		if(ilUserPasswordManager::getInstance()->isEncodingTypeSupported($crypt_type))
+		if(strlen($add_usrfields) && ilUserPasswordManager::getInstance()->isEncodingTypeSupported($crypt_type))
 		{
 			require_once 'setup/classes/class.ilObjSetupUser.php';
 			$user = new ilObjSetupUser();
@@ -788,7 +793,7 @@ class ilSetup extends PEAR
 			$user->setPasswordEncodingType($data['passwd_enc_type']);
 			$user->setPasswordSalt($data['passwd_salt']);
 
-			$password_valid = ilUserPasswordManager::getInstance()->verifyPassword($user, $a_auth_data['password']);
+			$password_valid = ilUserPasswordManager::getInstance()->verifyPassword($user, $a_auth_data['password'], false);
 		}
 		else
 		{
@@ -892,9 +897,6 @@ class ilSetup extends PEAR
 			$status["proxy"]["status"] = false;
 			$status["proxy"]["comment"] = $status["db"]["comment"];
 
-			$status["passwd"]["status"] = false;
-			$status["passwd"]["comment"] = $status["db"]["comment"];
-
 			$status["nic"]["status"] = false;
 			$status["nic"]["comment"] = $status["db"]["comment"];
 		}
@@ -904,7 +906,6 @@ class ilSetup extends PEAR
 			$status["lang"] = $this->checkClientLanguages($client);
 			$status["contact"] = $this->checkClientContact($client);
 			$status["proxy"] = $this->checkClientProxySettings($client);
-			$status["passwd"] = $this->checkClientPasswordSettings($client);
 			$status["nic"] = $this->checkClientNIC($client);
 			$status["finish"] = $this->checkFinish($client);
 			$status["access"] = $this->checkAccess($client);
@@ -2220,6 +2221,9 @@ class ilSetup extends PEAR
             }
             $insert = $target->db->query("INSERT INTO " . $cTable[0] . " SELECT * FROM ".$source->getDbName().".".$cTable[0]);
         }
+
+		$target->db->query("UPDATE settings SET VALUE = ".$target->db->quote(0, "integer")." WHERE keyword = ".$target->db->quote("inst_id", "text"));
+		$target->db->query("UPDATE settings SET VALUE = ".$target->db->quote(0, "integer")." WHERE keyword = ".$target->db->quote("nic_enabled", "text"));
 		return true;
 	}
 	/**
@@ -2308,48 +2312,6 @@ class ilSetup extends PEAR
 			}
 		}
 	}
-
-	/**
-	 * @param array $passwd_settings
-	 */
-	public function savePasswordSettings(array $passwd_settings)
-	{
-		$this->getClient()->ini->setVariable('auth', 'password_encoder', $passwd_settings['default_encoder']);
-		$this->getClient()->ini->write();
-	}
-
-	/**
-	 * Reads password settings from persitance layer
-	 * @return array
-	 */
-	public function getPasswordSettings()
-	{
-		return array(
-			'default_encoder' =>
-				$this->getClient()->ini->readVariable('auth', 'password_encoder') ?
-				$this->getClient()->ini->readVariable('auth', 'password_encoder') :
-				'md5'
-		);
-	}
-
-	/**
-	 * @param $client ilClient
-	 * @return array
-	 */
-	public function checkClientPasswordSettings(ilClient $client)
-	{
-		$arr['status'] = strlen($client->ini->readVariable('auth', 'password_encoder'));
-		if($arr['status'])
-		{
-			$arr['comment'] = $this->lng->txt('passwd_encoding_configured');
-		}
-		else
-		{
-			$arr['comment'] = $this->lng->txt('session_management_not_configured');
-		}
-		return $arr;
-	}
-
 
 	/**
 	 * @return bool

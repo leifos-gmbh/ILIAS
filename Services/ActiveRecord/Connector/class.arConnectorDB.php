@@ -54,7 +54,7 @@ class arConnectorDB extends arConnector {
 		if ($arFieldList->getPrimaryField()->getName()) {
 			$ilDB->addPrimaryKey($ar->getConnectorContainerName(), array( $arFieldList->getPrimaryField()->getName() ));
 		}
-		if ($arFieldList->getPrimaryField()->getFieldType() === 'integer' AND $arFieldList->getPrimaryField()->getSequence() === 'true') {
+		if ($ar->getArFieldList()->getPrimaryField()->getSequence() AND ! $ilDB->sequenceExists($ar->getConnectorContainerName())) {
 			$ilDB->createSequence($ar->getConnectorContainerName());
 		}
 		$this->updateIndices($ar);
@@ -75,7 +75,7 @@ class arConnectorDB extends arConnector {
 			$existing_indices[] = $rec->column_name;
 		}
 		foreach ($arFieldList->getFields() as $i => $arField) {
-			if ($arField->getIndex() === 'true') {
+			if ($arField->getIndex() === true) {
 				if (!in_array($arField->getName(), $existing_indices)) {
 					$ilDB->addIndex($ar->getConnectorContainerName(), array( $arField->getName() ), 'i' . $i);
 				}
@@ -96,6 +96,7 @@ class arConnectorDB extends arConnector {
 				$ilDB->addTableColumn($ar->getConnectorContainerName(), $field->getName(), $field->getAttributesForConnector());
 			}
 		}
+		$this->updateIndices($ar);
 
 		return true;
 	}

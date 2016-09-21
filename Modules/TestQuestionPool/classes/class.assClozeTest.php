@@ -190,6 +190,7 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 			// replacement of old syntax with new syntax
 			include_once("./Services/RTE/classes/class.ilRTE.php");
 			$this->question = ilRTE::_replaceMediaObjectImageSrc($this->question, 1);
+			$this->cloze_text = ilRTE::_replaceMediaObjectImageSrc($this->cloze_text, 1);
 			$this->setTextgapRating($data["textgap_rating"]);
 			$this->setEstimatedWorkingTime(substr($data["working_time"], 0, 2), substr($data["working_time"], 3, 2), substr($data["working_time"], 6, 2));
 			
@@ -337,7 +338,7 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 								$this->getTextgapRating(),
 								$this->getIdenticalScoring(),
 								$this->getFixedTextLength() ? $this->getFixedTextLength() : NULL,
-								$this->getClozeText()
+								ilRTE::_replaceMediaObjectImageSrc($this->getClozeText(), 0)
 							)
 		);
 	}
@@ -1181,16 +1182,23 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 	*/
 	function getNumericgapPoints($a_original, $a_entered, $max_points, $lowerBound, $upperBound)
 	{
-		if( ! $this->checkForValidFormula($a_entered) )
-		{
-			return 0;
-		}
-		
+// fau: fixGapFormula - check entered value by evalMath
+//		if( ! $this->checkForValidFormula($a_entered) )
+//		{
+//			return 0;
+//		}
+
 		include_once "./Services/Math/classes/class.EvalMath.php";
 		$eval = new EvalMath();
 		$eval->suppress_errors = TRUE;
 		$result = 0;
-		if (($eval->e($lowerBound) !== FALSE) && ($eval->e($upperBound) !== FALSE))
+
+		if ($eval->e($a_entered) === FALSE)
+		{
+			return 0;
+		}
+		elseif (($eval->e($lowerBound) !== FALSE) && ($eval->e($upperBound) !== FALSE))
+// fau.
 		{
 			if (($eval->e($a_entered) >= $eval->e($lowerBound)) && ($eval->e($a_entered) <= $eval->e($upperBound))) $result = $max_points;
 		}
@@ -1248,6 +1256,8 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 				);
 			}
 		}
+		
+		ksort($user_result); // this is required when identical scoring for same solutions is disabled
 
 		if ($returndetails)
 		{
@@ -1315,7 +1325,7 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 		
 		foreach($this->getSolutionSubmit() as $val1 => $val2)
 		{
-			$value = ilUtil::stripSlashes($val2, FALSE);
+			$value = trim(ilUtil::stripSlashes($val2, FALSE));
 			if (strlen($value))
 			{
 				$gap = $this->getGap(trim(ilUtil::stripSlashes($val1)));
@@ -1515,7 +1525,7 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 	*/
 	function getRTETextWithMediaObjects()
 	{
-		return parent::getRTETextWithMediaObjects();
+		return parent::getRTETextWithMediaObjects() . $this->getClozeText();
 	}
 	function getGapCombinationsExists()
 	{
@@ -1596,8 +1606,8 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 		$result['nr_of_tries'] = (int) $this->getNrOfTries();
 		$result['shuffle'] = (bool) $this->getShuffle();
 		$result['feedback'] = array(
-			"onenotcorrect" => $this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), false),
-			"allcorrect" => $this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), true)
+			'onenotcorrect' => $this->formatSAQuestion($this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), false)),
+			'allcorrect' => $this->formatSAQuestion($this->feedbackOBJ->getGenericFeedbackTestPresentation($this->getId(), true))
 		);
 		
 		$gaps = array();
@@ -1608,7 +1618,7 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 			{				
 				$jitem = array();
 				$jitem['points'] = $item->getPoints();
-				$jitem['value'] = $item->getAnswertext();
+				$jitem['value'] = $this->formatSAQuestion($item->getAnswertext());
 				$jitem['order'] = $item->getOrder();
 				if ($gap->getType() == CLOZE_NUMERIC)
 				{
@@ -1622,7 +1632,7 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 				array_push($items, $jitem);
 			}
 
-			if( $gap->getType() == CLOZE_TEXT || $gap->getType() == CLOZE_NUMERIC )
+			if( $gap->getGapSize() && ($gap->getType() == CLOZE_TEXT || $gap->getType() == CLOZE_NUMERIC) )
 			{
 				$jgap['size'] = $gap->getGapSize();
 			}

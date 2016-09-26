@@ -71,7 +71,7 @@ class ilBadgeProfileGUI
 	
 	protected function listBadges()
 	{
-		global $tpl, $ilUser;
+		global $tpl, $ilUser, $DIC;
 			
 		$this->getSubTabs("list");
 		
@@ -102,8 +102,20 @@ class ilBadgeProfileGUI
 
 		ilDatePresentation::setUseRelativeDates(false);
 
+
+		$f = $DIC->ui()->factory();
+		$renderer = $DIC->ui()->renderer();
+
+
+		$cards = array();
+
 		foreach($data as $badge)
-		{																	
+		{
+			$cards[] = $f->card(
+				$badge["title"],
+				$f->image()->standard($badge["image"], "")
+			)->withSections(array($f->legacy(ilDatePresentation::formatDate(new ilDateTime($badge["issued_on"], IL_CAL_UNIX)))));
+
 			$tmpl->setCurrentBlock("badge_bl");
 			$tmpl->setVariable("BADGE_TITLE", $badge["title"]);
 			// $tmpl->setVariable("BADGE_DESC", $badge["description"]); :TODO:
@@ -113,7 +125,15 @@ class ilBadgeProfileGUI
 			$tmpl->parseCurrentBlock();															
 		}
 
-		$tpl->setContent($tmpl->get());		
+		if (true)
+		{
+			$deck = $f->deck($cards)
+				->withCardsSize(ILIAS\UI\Component\Deck\Deck::SIZE_M);
+			$tpl->setContent($renderer->render($deck));
+			return;
+		}
+
+		$tpl->setContent($tmpl->get());
 	}
 	
 	protected function manageBadges()

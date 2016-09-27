@@ -2,7 +2,7 @@ var PhantomJsHelper =  (function () {
 	'use strict';
 
 	var pub = {
-			version 			: '0.0.1'
+		version 			: '0.0.1'
 	}, pro = {
 		json							: {},
 		phantom_page					: {},
@@ -16,11 +16,11 @@ var PhantomJsHelper =  (function () {
 	pro.appendHeaderCallback = function() {
 		if (pro.json.header !== null) {
 			return {
-					height:   pro.json.header.height,
-					contents: pro.addHeaderCallbackFunction()
-				};
-			}
-		};
+				height:   pro.json.header.height,
+				contents: pro.addHeaderCallbackFunction()
+			};
+		}
+	};
 
 	pro.addHeaderCallbackFunction = function () {
 		return	phantom.callback(function (pageNum, numPages) {

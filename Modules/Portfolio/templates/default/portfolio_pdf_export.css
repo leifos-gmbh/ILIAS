@@ -1,0 +1,40 @@
+#ilFooter{
+	display:none;
+	page-break-after:always;
+}
+
+div#minheight{
+	height:0px !important;
+}
+
+.ilAccHideContent{ 
+	width: inherit; 
+	height: inherit; 
+	display: block;
+}
+
+img, .ilc_media_cont_MediaContainer, .mejs-container, .ilProfile{
+	page-break-inside: avoid !important;
+}
+
+.ilFakePlayer{
+	position: relative;
+	background-color: black;
+	page-break-inside: avoid;
+}
+
+.ilFakePlayer .ilFakePlayerPlay{
+	background: url('images/play_one.svg') center center no-repeat;
+	width: 100%;
+	height: 100%;
+}
+
+.ilFakePlayerText{
+	color:white;
+	background-color: darkslategrey;
+	width: 100%;
+	height: 40px;
+	text-align: center;
+	position: absolute;
+	bottom: 20px;
+}

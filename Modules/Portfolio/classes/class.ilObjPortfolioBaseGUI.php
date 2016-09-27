@@ -301,6 +301,13 @@ abstract class ilObjPortfolioBaseGUI extends ilObject2GUI
 			$button->setUrl($this->ctrl->getLinkTarget($this, "export"));
 			$ilToolbar->addButtonInstance($button);
 		}
+
+		// uzk-patch: begin
+		$button = ilLinkButton::getInstance();
+		$button->setCaption("pdf_export");
+		$button->setUrl($this->ctrl->getLinkTarget($this, "export_pdf"));
+		$ilToolbar->addButtonInstance($button);
+		// uzk-patch: end
 		
 		include_once "Modules/Portfolio/classes/class.ilPortfolioPageTableGUI.php";
 		$table = new ilPortfolioPageTableGUI($this, "view");
@@ -315,7 +322,26 @@ abstract class ilObjPortfolioBaseGUI extends ilObject2GUI
 		
 		$this->tpl->setContent($table->getHTML());
 	}
-	
+
+	// uzk-patch: begin
+	function export_pdf()
+	{
+		require_once 'Modules/Portfolio/classes/class.ilPortfolioHTMLExport.php';
+		require_once 'Modules/Portfolio/classes/class.ilPortfolioPDFExport.php';
+		require_once 'Services/PDFGeneration/classes/class.ilHtmlToPdfTransformerFactory.php';
+		
+		$export = new ilPortfolioHTMLExport($this, $this->object);
+		$export->setPdfExport(true);
+		$path_to_export = $export->buildExportFile();
+		$path_to_export = $path_to_export . '/' . $this->object->getType()."_".$this->object->getId();
+		$pdf_export = new ilPortfolioPDFExport($path_to_export);
+		//$path_to_file = $pdf_export->generateHtmlFileListFromFolder();
+		$path_to_file = $pdf_export->generateSingleHtmlPageFromFolder();
+		$pdf_factory = new ilHtmlToPdfTransformerFactory();
+		$pdf_factory->deliverPDFFromHTMLFile($path_to_file, $this->object->getTitle() . '.pdf', 'I');
+	}
+	// uzk-patch: end
+
 	/**
 	 * Show portfolio page creation form
 	 */

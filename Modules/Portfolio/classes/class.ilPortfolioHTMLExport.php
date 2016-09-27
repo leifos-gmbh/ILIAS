@@ -12,7 +12,11 @@
 class ilPortfolioHTMLExport
 {
 	protected $portfolio_gui;
-	protected $export_material; 
+	protected $export_material;
+
+	// uzk-patch: begin
+	protected $is_export_for_pdf;
+	// uzk-patch: end
 
 	/**
 	 * Constructor
@@ -25,8 +29,17 @@ class ilPortfolioHTMLExport
 		$this->portfolio_gui = $a_portfolio_gui;
 		$this->object = $a_object;
 		$this->export_material = array(); // #16571
+		// uzk-patch: begin
+		$this->is_export_for_pdf = false;
+		// uzk-patch: end
 	}
 
+	// uzk-patch: begin
+	public function setPdfExport($is_export_for_pdf)
+	{
+		$this->is_export_for_pdf = $is_export_for_pdf;
+	}
+	// uzk-patch: end
 		/**
 	 * Build export file
 	 *
@@ -120,9 +133,10 @@ class ilPortfolioHTMLExport
 				copy($file, $this->export_dir."/files/".basename($file));
 			}
 		}
-		
+
 		// zip everything
-		if (true)
+		// uzk-patch: begin
+		if( ! $this->is_export_for_pdf)
 		{
 			// zip it all
 			$date = time();
@@ -131,9 +145,13 @@ class ilPortfolioHTMLExport
 				$this->object->getType()."_".$this->object->getId().".zip";
 			ilUtil::zip($this->export_dir, $zip_file);
 			ilUtil::delDir($this->export_dir);
+			return $zip_file;
 		}
-		
-		return $zip_file;
+		else
+		{
+			return ilExport::_getExportDirectory($this->object->getId(), "html", "prtf");
+		}
+		// uzk-patch: end
 	}
 
 	/**
@@ -219,7 +237,16 @@ class ilPortfolioHTMLExport
 		}
 		
 		// workaround
-		$this->tpl->setVariable("MAINMENU", "<div style='min-height:40px;'></div>");
+		// uzk-patch: begin
+		if($this->is_export_for_pdf)
+		{
+			$this->tpl->setVariable("MAINMENU", '');
+		}
+		else
+		{
+			$this->tpl->setVariable("MAINMENU", "<div style='min-height:40px;'></div>");
+		}
+		// uzk-patch: end
 		$this->tpl->setTitle($this->object->getTitle());
 		
 		$ilTabs->clearTargets();

@@ -386,6 +386,14 @@ class ilObjUserGUI extends ilObjectGUI
 		if ($this->form_gui->checkInput())
 		{
 // @todo: external account; time limit check and savings
+			$role_select = $this->form_gui->getItemByPostVar('default_role');
+			if(!array_key_exists($role_select->getValue(), (array) $role_select->getOptions()))
+			{
+				$role_select->setAlert($this->lng->txt('err_invalid_form_input'));
+				ilUtil::sendFailure($this->lng->txt('err_check_input'));
+				$this->form_gui->setValuesByPost();
+				return $tpl->setContent($this->form_gui->getHtml());
+			}
 
 			// checks passed. save user
 			$userObj = $this->loadValuesFromForm();
@@ -1444,7 +1452,11 @@ class ilObjUserGUI extends ilObjectGUI
 		{
 			if($this->isSettingChangeable($field))
 			{
-				$inp = new ilTextInputGUI($lng->txt($field), $field);
+				// #18795
+				$caption = ($field == "title")
+					? "person_title"
+					: $field;
+				$inp = new ilTextInputGUI($lng->txt($caption), $field);
 				$inp->setSize(32);
 				$inp->setMaxLength(32);
 				$inp->setRequired($req);

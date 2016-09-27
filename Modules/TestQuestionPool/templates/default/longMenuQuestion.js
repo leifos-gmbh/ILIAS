@@ -78,7 +78,7 @@ var longMenuQuestion = (function () {
 	};
 	
 	pro.appendFormParts = function()  {
-		var footer_class 	= $('.ilFormFooter');
+		var footer_class 	= $('.ilFormFooter').last();
 		var new_title 		= $('.gap_title').find('.ilFormHeader').clone().addClass('longmenu_head longmenu');
 		var title 			= 0;
 		var t0 = pro.benchmarkCallsDummyNotForUsage('appendFormParts');
@@ -578,7 +578,7 @@ var longMenuQuestion = (function () {
 	pro.sliceInNewQuestionPart = function (gap_id)
 	{
 		pub.questionParts.list.splice(gap_id, 0,  [[], '0', '1']);
-		pub.answers.splice(gap_id,0,[[]]);
+		pub.answers.splice(gap_id,0,[]);
 		pro.redrawFormParts();
 		pro.syncWithHiddenTextField();
 	};

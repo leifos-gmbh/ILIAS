@@ -6295,9 +6295,17 @@ button.close {
 }
 .il-card {
   padding: 0px;
+  background-color: #ffffff;
 }
 .il-card img {
-  width: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+.il-card > div.caption {
+  background-color: #f9f9f9;
 }
 .il-card .caption {
   border-top: 1px solid #dddddd;
@@ -6308,6 +6316,40 @@ button.close {
 .il-card .caption:first-child {
   border-top: none;
 }
+.il-card-img {
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.col-md-1 > div.il-card > .il-card-img {
+  height: 100px;
+}
+.col-md-2 > div.il-card > .il-card-img {
+  height: 200px;
+}
+.col-md-3 > div.il-card > .il-card-img {
+  height: 250px;
+}
+.col-md-4 > div.il-card > .il-card-img {
+  height: 350px;
+}
+.col-md-6 > div.il-card > .il-card-img {
+  height: 400px;
+}
+.col-md-12 > div.il-card > .il-card-img {
+  height: 600px;
+}
+@media only screen and (max-width: 768px) {
+  .col-md-1 > div.il-card > .il-card-img,
+  .col-md-2 > div.il-card > .il-card-img,
+  .col-md-3 > div.il-card > .il-card-img,
+  .col-md-4 > div.il-card > .il-card-img,
+  .col-md-6 > div.il-card > .il-card-img,
+  .col-md-12 > div.il-card > .il-card-img {
+    height: 250px;
+  }
+}
 .il-deck .row {
   margin-left: 0;
   margin-right: 0;
@@ -6315,6 +6357,9 @@ button.close {
 .il-deck .row > div {
   padding-left: 5px;
   padding-right: 5px;
+}
+.il-deck .row .thumbnail {
+  border: 0;
 }
 /*		Color scheme
 		Dark BLue: #0f2152;

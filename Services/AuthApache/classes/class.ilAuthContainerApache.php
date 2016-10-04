@@ -106,13 +106,6 @@ class ilAuthContainerApache extends Auth_Container
 		*/
 		//$_SESSION['login_invalid'] = FALSE;
 
-		$GLOBALS['ilLog']->write(__METHOD__.': Start debug');
-		$GLOBALS['ilLog']->write(__METHOD__.': '.$settings->get('apache_auth_indicator_name'));
-		$GLOBALS['ilLog']->write(__METHOD__.': '.$settings->get('apache_auth_indicator_value'));
-		$GLOBALS['ilLog']->write(__METHOD__.': '.$_SERVER[$settings->get('apache_auth_indicator_name')]);
-		$GLOBALS['ilLog']->write(__METHOD__.': '.print_r($_SESSION['login_invalid'],TRUE));
-		$GLOBALS['ilLog']->write(__METHOD__.': End debug');
-
 		// patch skyguide_apache
 		if(
 			in_array(
@@ -122,9 +115,6 @@ class ilAuthContainerApache extends Auth_Container
 		)
 		// patch skyguide_apache
 		{
-			return TRUE;
-			
-			
 			// we have a valid apache auth
 			$list = array(
 				$ilSetting->get('auth_mode')
@@ -146,6 +136,12 @@ class ilAuthContainerApache extends Auth_Container
 			include_once './Services/LDAP/classes/class.ilLDAPServer.php';
 			if($settings->get('apache_enable_ldap'))
 			{
+				// patch skyguide_apache
+				if(strpos($a_username, '@') !== FALSE)
+				{
+					$a_username = substr($a_username,0,strpos($a_username,'@'));
+				}
+				ilLoggerFactory::getLogger('auth')->debug('Handle ldap data source for username: ' . $a_username);
 				return $this->handleLDAPDataSource($this->_auth_obj,$a_username, $settings);
 			}
 
@@ -315,24 +311,6 @@ class ilAuthContainerApache extends Auth_Container
 	}
 	
 	
-	/** 
-	 * Called from base class after successful login
-	 *
-	 * @param string username
-	 */
-	public function loginObserver($a_username,$a_auth)
-	{
-		
-		// patch skyguide_apache
-		if(strpos($a_username, '@') !== FALSE)
-		{
-			$a_username = substr($a_username,0,strpos($a_username,'@'));
-		}
-		$GLOBALS['ilLog']->write(__METHOD__.': login observer called for '.$a_username);
-
-		return $this->handleLDAPDataSource($a_auth,$a_username);
-	}	
-
 	/**
 	 * Init LDAP attribute mapping
 	 * @access private

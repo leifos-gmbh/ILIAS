@@ -41,7 +41,7 @@ class ilAuthContainerApache extends Auth_Container
 	 */
 	function fetchData($a_username, $password, $isChallengeResponse = false)
 	{
-		ilLoggerFactory::getLogger('auth')->debug('Starting apache auth');
+		ilLoggerFactory::getLogger('auth')->debug('Starting apache auth for user: ' . $a_username);
 		
 		/**
 		 * @var $ilDB      ilDB

@@ -841,6 +841,8 @@ abstract class assQuestion
 					array_push($output, '<a href="' . $this->getSuggestedSolutionPathWeb() . $solution["value"]["name"] . '">' . $possible_texts[0] . '</a>');
 					break;
 				case "text":
+					$output = $this->fixSvgToPng($output);
+					$output = $this->fixUnavailableSkinImageSources($output);
 					array_push($output, $this->prepareTextareaOutput($solution["value"], true));
 					break;
 			}
@@ -2232,6 +2234,65 @@ abstract class assQuestion
 	function getOriginalId()
 	{
 		return $this->original_id;
+	}
+	
+	protected static $imageSourceFixReplaceMap = array(
+		'ok.svg' => 'ok.png', 'not_ok.svg' => 'not_ok.png',
+		'checkbox_checked.svg' => 'checkbox_checked.png',
+		'checkbox_unchecked.svg' => 'checkbox_unchecked.png',
+		'radiobutton_checked.svg' => 'radiobutton_checked.png',
+		'radiobutton_unchecked.svg' => 'radiobutton_unchecked.png'
+	);
+	
+	public function fixSvgToPng($imageFilenameContainingString)
+	{
+		$needles = array_keys(self::$imageSourceFixReplaceMap);
+		$replacements = array_values(self::$imageSourceFixReplaceMap);
+		return str_replace($needles, $replacements, $imageFilenameContainingString);
+	}
+	
+	
+	public function fixUnavailableSkinImageSources($html)
+	{
+		$matches = null;
+		if( preg_match_all('/src="(.*?)"/m', $html, $matches) )
+		{
+			$sources = $matches[1];
+			
+			$needleReplacementMap = array();
+			
+			foreach($sources as $src)
+			{
+				$file = ilUtil::removeTrailingPathSeparators( ILIAS_ABSOLUTE_PATH ) . DIRECTORY_SEPARATOR . $src;
+				
+				if( file_exists($file) )
+				{
+					continue;
+				}
+				
+				$levels = explode(DIRECTORY_SEPARATOR, $src);
+				if( count($levels) < 5 || $levels[0] != 'Customizing' || $levels[2] != 'skin' )
+				{
+					continue;
+				}
+				
+				$component = '';
+				
+				if( $levels[4] == 'Modules' || $levels[4] == 'Services' )
+				{
+					$component = $levels[4] . DIRECTORY_SEPARATOR . $levels[5];
+				}
+				
+				$needleReplacementMap[$src] = ilUtil::getImagePath(basename($src), $component);
+			}
+			
+			if( count($needleReplacementMap) )
+			{
+				$html = str_replace(array_keys($needleReplacementMap), array_values($needleReplacementMap), $html);
+			}
+		}
+		
+		return $html;
 	}
 
 /**

@@ -125,7 +125,7 @@ class ilBadgeProfileGUI
 			$tmpl->parseCurrentBlock();															
 		}
 
-		if (!true)
+		if (true)
 		{
 			$deck = $f->deck($cards)
 				->withCardsSize(ILIAS\UI\Component\Deck\Deck::SIZE_S);

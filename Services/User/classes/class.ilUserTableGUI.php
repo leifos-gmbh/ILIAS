@@ -448,14 +448,14 @@ class ilUserTableGUI extends ilTable2GUI
 		$this->filter["limited_access"] = $cb->getChecked();
 		
 		// last login
-		include_once("./Services/Form/classes/class.ilDateTimeInputGUI.php");
-		$di = new ilDateTimeInputGUI($this->lng->txt("user_last_login_before"), "last_login");
-		$default_date = new ilDateTime(time(),IL_CAL_UNIX);
-		$default_date->increment(IL_CAL_DAY, 1);
-		$di->setDate($default_date);
+		include_once("./Services/Form/classes/class.ilDateDurationInputGUI.php");
+		$di = new ilDateDurationInputGUI("Last Login (from...to)", "last_login");
+		//$default_date = new ilDateTime(time(),IL_CAL_UNIX);
+		//$default_date->increment(IL_CAL_DAY, 1);
+		//$di->setDate($default_date);
 		$this->addFilterItem($di);
 		$di->readFromSession();
-		$this->filter["last_login"] = $di->getDate();
+		//$this->filter["last_login"] = $di->getDate();
 
 		if($this->getMode() == self::MODE_USER_FOLDER)
 		{

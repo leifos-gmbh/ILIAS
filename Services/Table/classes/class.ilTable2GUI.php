@@ -22,7 +22,7 @@ class ilTable2GUI extends ilTableGUI
 	protected $optional_filters = array();
 	protected $filter_cmd = 'applyFilter';
 	protected $reset_cmd = 'resetFilter';
-	protected $filter_cols = 5;
+	protected $filter_cols = 3;
 	protected $ext_sort = false;
 	protected $ext_seg = false;
 	protected $context = "";
@@ -1870,12 +1870,18 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 		{
 			foreach ($filter as $item)
 			{
+				if (!in_array($item->getType(), array("text", "select", "dateduration")))
+				{
+					continue;
+				}
+
 				if ($ccnt >= $this->getFilterCols())
 				{
 					$this->tpl->setCurrentBlock("filter_row");
 					$this->tpl->parseCurrentBlock();
 					$ccnt = 0;
 				}
+
 				$this->tpl->setCurrentBlock("filter_item");
 				$this->tpl->setVariable("OPTION_NAME",
 					$item->getTitle());

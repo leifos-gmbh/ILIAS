@@ -38,3 +38,11 @@ img, .ilc_media_cont_MediaContainer, .mejs-container, .ilProfile{
 	position: absolute;
 	bottom: 20px;
 }
+
+.il_HeaderInner, .media-heading.ilHeader{
+	padding-top: 0px !important;
+}
+
+#mainspacekeeper > .row {
+	margin-top: 0px !important;
+}

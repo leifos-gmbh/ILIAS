@@ -439,16 +439,6 @@ class ilAssQuestionList implements ilTaxAssignedItemInfo
 		return null;
 	}
 	
-	private function getParentObjectIdFilterExpression()
-	{
-		if( $this->parentObjId )
-		{
-			return "qpl_questions.obj_fi = {$this->db->quote($this->parentObjId, 'integer')}";
-		}
-		
-		return null;
-	}
-	
 	private function getAnswerStatusFilterExpressions()
 	{
 		$expressions = array();

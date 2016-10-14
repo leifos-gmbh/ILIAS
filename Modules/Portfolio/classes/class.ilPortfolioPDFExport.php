@@ -29,6 +29,7 @@ class ilPortfolioPDFExport
 	{
 		$html_files		= array();
 		$html_content	= '';
+		require_once 'Modules/Portfolio/classes/class.ilPortfolioPage.php';
 		foreach (glob($this->html_folder_path . '/*.html') as $filename)
 		{
 			if($filename != $this->html_folder_path .'/index.html')
@@ -47,10 +48,29 @@ class ilPortfolioPDFExport
 			}
 		}
 
-		foreach($html_files as $filename)
+		preg_match('#\/prtf_(\d+)\/#', $filename, $matches);
+		$portfolio_id = $matches[1];
+		$ordering = ilPortfolioPage::getAllPages($portfolio_id);
+		if($ordering !== null)
 		{
-			$html_content .= $this->getAndCleanHtml($filename);
+			$path = dirname($filename);
+			foreach($ordering as $value)
+			{
+				$filename = $path . '/prtf_' . $value['id'] . '.html';
+				if(file_exists($filename))
+				{
+					$html_content .= $this->getAndCleanHtml($filename);
+				}
+			}
 		}
+		else
+		{
+			foreach($html_files as $filename)
+			{
+				$html_content .= $this->getAndCleanHtml($filename);
+			}
+		}
+
 
 		file_put_contents($this->html_folder_path . '/pdf_export.html', $html_content . $this->appendCustomCSS() . $this->injectJs());
 		$this->removeJs();

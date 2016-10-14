@@ -34,7 +34,7 @@ class ilPersonalSkillsGUI
 	 */
 	public function __construct()
 	{
-		global $ilCtrl, $lng, $ilHelp, $ilSetting;
+		global $ilCtrl, $lng, $ilHelp, $ilSetting, $ilUser;
 
 		$lng->loadLanguageModule('skmg');
 		
@@ -44,10 +44,16 @@ class ilPersonalSkillsGUI
 		$ilCtrl->saveParameter($this, "tref_id");
 		$ilCtrl->saveParameter($this, "profile_id");
 
+		$this->user_profiles = ilSkillProfile::getProfilesOfUser($ilUser->getId());
+
 		include_once("./Services/Skill/classes/class.ilSkillTree.php");
 		$this->skill_tree = new ilSkillTree();
 		
 		$this->use_materials = !$ilSetting->get("disable_personal_workspace");
+
+		include_once("./Services/Skill/classes/class.ilSkillManagementSettings.php");
+		$this->skmg_settings = new ilSkillManagementSettings();
+
 	}
 	
 	/**
@@ -154,15 +160,10 @@ class ilPersonalSkillsGUI
 
 		$next_class = $ilCtrl->getNextClass($this);
 		
-		$profiles = ilSkillProfile::getProfilesOfUser($ilUser->getId());
-		
+
 		// determin standard command
 		$std_cmd = "listSkills";
-		if (count($profiles) > 0)
-		{
-//			$std_cmd = "listProfiles";
-		}
-		
+
 		$cmd = $ilCtrl->getCmd($std_cmd);
 		
 		$tpl->setTitle($lng->txt("skills"));
@@ -189,10 +190,14 @@ class ilPersonalSkillsGUI
 			$lng->txt("skmg_list_skills"),
 			$ilCtrl->getLinkTarget($this, "listSkills"));
 
+		if (count($this->user_profiles) > 0)
+		{
+			$ilTabs->addTab("profile",
+				$lng->txt("skmg_assigned_profiles"),
+				$ilCtrl->getLinkTarget($this, "listProfile"));
+		}
+
 		// assign materials
-/*		$ilTabs->addTab("assign_materials",
-			$lng->txt("skmg_assign_materials"),
-			$ilCtrl->getLinkTarget($this, "assignMaterials"));*/
 
 		$ilTabs->activateTab($a_activate);
 	}
@@ -343,7 +348,10 @@ $bs["tref"] = $bs["tref_id"];
 
 			if ($this->getProfileId() > 0)
 			{
-				$this->renderProfileTargetRow($tpl, $level_data, $a_top_skill_id, $bs["id"], $bs["tref"], $user->getId());
+				if (!$this->skmg_settings->getHideProfileBeforeSelfEval())
+				{
+					$this->renderProfileTargetRow($tpl, $level_data, $a_top_skill_id, $bs["id"], $bs["tref"], $user->getId());
+				}
 			}
 			if ($this->mode != "gap")
 			{
@@ -1762,6 +1770,71 @@ $bs["tref"] = $bs["tref_id"];
 			}
 		}
 	}
+
+	/**
+	 * List profile
+	 *
+	 * @param
+	 * @return
+	 */
+	function listProfile()
+	{
+		global $ilCtrl, $tpl;
+
+		$this->setTabs("profile");
+
+		if (count($this->user_profiles) == 0)
+		{
+			return;
+		}
+		$current_prof_id = 0;
+		if ((int) $_GET["smkg_prof_id"] > 0)
+		{
+			foreach ($this->user_profiles as $p)
+			{
+				if ($p["id"] == (int) $_GET["smkg_prof_id"])
+				{
+					$current_prof_id = (int) $_GET["smkg_prof_id"];
+				}
+			}
+		}
+		if ($current_prof_id == 0)
+		{
+			$current_prof_id = $this->user_profiles[0]["id"];
+		}
+		$ilCtrl->setParameter($this, "smkg_prof_id", $current_prof_id);
+		$this->setProfileId($current_prof_id);
+
+		$skills = array();
+		if ($this->getProfileId() > 0)
+		{
+			$profile = new ilSkillProfile($this->getProfileId());
+			$this->profile_levels = $profile->getSkillLevels();
+
+			foreach ($this->profile_levels as $l)
+			{
+				$skills[] = array(
+					"base_skill_id" => $l["base_skill_id"],
+					"tref_id" => $l["tref_id"],
+					"level_id" => $l["level_id"]
+				);
+			}
+		}
+
+		include_once("./Services/Skill/classes/class.ilSkillTree.php");
+		$stree = new ilSkillTree();
+
+		// render
+		$html = "";
+		foreach ($skills as $s)
+		{
+			// todo draft check
+			$html.= $this->getSkillHTML($s["base_skill_id"], 0, true, $s["tref_id"]);
+		}
+
+		$tpl->setContent($html);
+	}
+
 	
 }
 ?>

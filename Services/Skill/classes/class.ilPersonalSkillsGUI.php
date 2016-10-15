@@ -348,7 +348,8 @@ $bs["tref"] = $bs["tref_id"];
 
 			if ($this->getProfileId() > 0)
 			{
-				if (!$this->skmg_settings->getHideProfileBeforeSelfEval())
+				if (!$this->skmg_settings->getHideProfileBeforeSelfEval() ||
+					ilBasicSkill::hasSelfEvaluated($user->getId(), $bs["id"], $bs["tref"]))
 				{
 					$this->renderProfileTargetRow($tpl, $level_data, $a_top_skill_id, $bs["id"], $bs["tref"], $user->getId());
 				}

@@ -147,7 +147,39 @@ class ilPersonalSkillsGUI
 		$this->hidden_skills[] = $a_skill_id.":".$a_tref_id;
 	}
 
-	
+	/**
+	 * Determine current profile id
+	 *
+	 * @param
+	 * @return
+	 */
+	function determineCurrentProfile()
+	{
+		global $ilCtrl;
+
+		if (count($this->user_profiles) == 0)
+		{
+			return;
+		}
+		$current_prof_id = 0;
+		if ((int) $_GET["profile_id"] > 0)
+		{
+			foreach ($this->user_profiles as $p)
+			{
+				if ($p["id"] == (int) $_GET["profile_id"])
+				{
+					$current_prof_id = (int) $_GET["profile_id"];
+				}
+			}
+		}
+		if ($current_prof_id == 0)
+		{
+			$current_prof_id = $this->user_profiles[0]["id"];
+		}
+		$ilCtrl->setParameter($this, "profile_id", $current_prof_id);
+		$this->setProfileId($current_prof_id);
+	}
+
 	/**
 	 * Execute command
 	 *
@@ -194,7 +226,7 @@ class ilPersonalSkillsGUI
 		{
 			$ilTabs->addTab("profile",
 				$lng->txt("skmg_assigned_profiles"),
-				$ilCtrl->getLinkTarget($this, "listProfile"));
+				$ilCtrl->getLinkTarget($this, "listAssignedProfile"));
 		}
 
 		// assign materials
@@ -454,7 +486,7 @@ $bs["tref"] = $bs["tref_id"];
 		
 		$tpl->setVariable("SKILL_TITLE", ilSkillTreeNode::_lookupTitle($skill_id, $tref_id));
 		
-		if ($a_edit)
+		if ($a_edit && $this->getProfileId() == 0)
 		{
 			$act_list->flush();
 			$act_list->setId("act_".$a_top_skill_id);
@@ -933,44 +965,45 @@ $bs["tref"] = $bs["tref_id"];
 	 * @param
 	 * @return
 	 */
-	function listProfiles()
+	function listProfilesForGap()
 	{
-		global $ilCtrl, $ilToolbar, $ilUser, $lng, $tpl;
+		global $ilUser, $tpl;
 		
-		$profiles = ilSkillProfile::getProfilesOfUser($ilUser->getId());
-		
-		if (count($profiles) == 0)
+		if (count($this->user_profiles) == 0)
 		{
 			return;
 		}
 		
-		// select profiles
-		include_once("./Services/Form/classes/class.ilSelectInputGUI.php");
+		$this->determineCurrentProfile();
+		$this->showProfileSelectorToolbar();
+		
+		$tpl->setContent($this->getGapAnalysisHTML());
+	}
+
+	/**
+	 * Show profile selector toolbar
+	 */
+	function showProfileSelectorToolbar()
+	{
+		global $ilToolbar, $lng, $ilCtrl;
+
 		$options = array();
-		foreach ($profiles as $p)
+		foreach ($this->user_profiles as $p)
 		{
 			$options[$p["id"]] = $p["title"];
 		}
-		
-		if (!isset($options[$_GET["profile_id"]]))
-		{
-			$_GET["profile_id"] = (int) key($options);
-			$ilCtrl->setParameter($this, "profile_id", $_GET["profile_id"]);
-		}
-		$current_profile_id = $_GET["profile_id"];
-		
-		$si = new ilSelectInputGUI($lng->txt("skmg_profile"), "");
+
+		include_once("./Services/Form/classes/class.ilSelectInputGUI.php");
+		$si = new ilSelectInputGUI($lng->txt("skmg_profile"), "profile_id");
 		$si->setOptions($options);
-		$si->setValue($current_profile_id);
+		$si->setValue($this->getProfileId());
 		$ilToolbar->addInputItem($si, true);
 		$ilToolbar->addFormButton($lng->txt("select"),
 			"selectProfile");
 		$ilToolbar->setFormAction($ilCtrl->getFormAction($this));
-		
-		$this->setProfileId($current_profile_id);
-		
-		$tpl->setContent($this->getGapAnalysisHTML());
+
 	}
+
 
 	/**
 	 * Set gap analysis actual status mode "per type"
@@ -1266,9 +1299,16 @@ $bs["tref"] = $bs["tref_id"];
 	function selectProfile()
 	{
 		global $ilCtrl;
-		
-		$ilCtrl->setParameter($this, "profile_id", $_GET["profile_id"]);
-		$ilCtrl->redirect($this, "listProfiles");
+
+		$ilCtrl->setParameter($this, "profile_id", $_POST["profile_id"]);
+		if ($this->mode == "gap")
+		{
+			$ilCtrl->redirect($this, "listProfilesForGap");
+		}
+		else
+		{
+			$ilCtrl->redirect($this, "listAssignedProfile");
+		}
 	}
 	
 	/**
@@ -1778,33 +1818,14 @@ $bs["tref"] = $bs["tref_id"];
 	 * @param
 	 * @return
 	 */
-	function listProfile()
+	function listAssignedProfile()
 	{
-		global $ilCtrl, $tpl;
+		global $tpl;
 
 		$this->setTabs("profile");
 
-		if (count($this->user_profiles) == 0)
-		{
-			return;
-		}
-		$current_prof_id = 0;
-		if ((int) $_GET["smkg_prof_id"] > 0)
-		{
-			foreach ($this->user_profiles as $p)
-			{
-				if ($p["id"] == (int) $_GET["smkg_prof_id"])
-				{
-					$current_prof_id = (int) $_GET["smkg_prof_id"];
-				}
-			}
-		}
-		if ($current_prof_id == 0)
-		{
-			$current_prof_id = $this->user_profiles[0]["id"];
-		}
-		$ilCtrl->setParameter($this, "smkg_prof_id", $current_prof_id);
-		$this->setProfileId($current_prof_id);
+		$this->determineCurrentProfile();
+		$this->showProfileSelectorToolbar();
 
 		$skills = array();
 		if ($this->getProfileId() > 0)

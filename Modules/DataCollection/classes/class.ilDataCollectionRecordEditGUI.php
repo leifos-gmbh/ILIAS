@@ -267,7 +267,7 @@ class ilDataCollectionRecordEditGUI {
 							break;
 						case ilDataCollectionDatatype::INPUTFORMAT_TEXT:
 							$value = $record->getRecordFieldValue($fieldref);
-							if ($json = json_decode($value) && json_decode($value) instanceof stdClass) {
+							if (($json = json_decode($value)) && (json_decode($value) instanceof stdClass)) {
 								$value = $json->title ? $json->title : $json->link;
 							}
 							$options[$record->getId()] = $value;
@@ -286,7 +286,7 @@ class ilDataCollectionRecordEditGUI {
 					}
 					// the option 'please select' messes with the order, therefore we reset it
 					unset($options[""]);
-					array_unshift($options, $this->lng->txt('dcl_please_select'));
+					$options = array("" => $this->lng->txt('dcl_please_select')) + $options;
  				}
 
 				$item->setOptions($options);

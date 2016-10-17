@@ -187,7 +187,7 @@ class ilPersonalSkillsGUI
 		
 		// list skills
 		$ilTabs->addTab("list_skills",
-			$lng->txt("skmg_list_skills"),
+			$lng->txt("skmg_selected_skills"),
 			$ilCtrl->getLinkTarget($this, "listSkills"));
 
 		if (count($this->user_profiles) > 0)

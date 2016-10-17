@@ -16355,3 +16355,10 @@ copg#:#copg_confirm_el_deletion#:#Do you really want to delete the selected elem
 survey#:#msg_input_only_positive_numbers#:#Please enter positive numbers in scale values.
 crs#:#crs_loc_err_stat_tst_offline#:#Not all tests are online.
 itgr#:#itgr_desc_info#:#The description will not be a part of the item group's presentation in its container.
+skmg#:#skmg_assigned_profiles#:#Assigned Profiles
+skmg#:#skmg_selected_skills#:#Selected Skills
+skmg#:#skmg_hide_profile_self_eval#:#Hide Profile without Self Evaluation
+skmg#:#skmg_hide_profile_self_eval_info#:#Profile target values will not be shown to a user, if no self evaluation has been done for a specific skill.
+skmg#:#skmg_suggested#:#Suggested Resource
+skmg#:#skmg_lp_triggers_level#:#Triggered by Completion
+skmg#:#skmg_save_settings#:#Save Settings

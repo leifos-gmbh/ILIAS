@@ -47,6 +47,8 @@ $res = $ilDB->query($query);
 $last_handled_row   = null;
 $rows_to_delete     = null;
 
+$num_users_deleted = 0;
+
 while((($row = $ilDB->fetchAssoc($res)) && is_array($row)) || is_array($rows_to_delete))
 {
 	if($last_handled_row !== null && ($last_handled_row['ext_account'] != $row['ext_account'] || !$row && count($rows_to_delete) > 0))
@@ -67,6 +69,7 @@ while((($row = $ilDB->fetchAssoc($res)) && is_array($row)) || is_array($rows_to_
 					$ilLog->write(sprintf("Would delete duplicate user with login '%s' (ext_account: %s|id: %s)", $row_to_delete['login'], $row_to_delete['ext_account'], $row_to_delete['usr_id']));
 					echo sprintf("Would delete duplicate user with login '%s' (ext_account: %s|id: %s)", $row_to_delete['login'], $row_to_delete['ext_account'], $row_to_delete['usr_id']);
 				}
+				++$num_users_deleted;
 			}
 		}
 
@@ -96,4 +99,4 @@ while((($row = $ilDB->fetchAssoc($res)) && is_array($row)) || is_array($rows_to_
 	}
 }
 
-echo "Finished script!";
+echo "Finished script, deleted {$num_users_deleted} user(s)!";

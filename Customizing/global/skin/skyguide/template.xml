@@ -1,9 +1,6 @@
 <?xml version = "1.0" encoding = "UTF-8"?>
-<template xmlns = "http://www.w3.org" version = "$Id: template.xml 17158 2011-11-10 15:00:00Z agachnang $" name = "Skyguide">
+<template xmlns = "http://www.w3.org" version = "$Id$" name = "ILIAS 5.1.x">
 	<style 	name = "Standard"
 			id = "standard"
-			image_directory = "images"/>
-	<!--  <style 	name = "Delos (Lean)"
-			id = "deloslean"
-			image_directory = "images"/> -->
+			image_directory = "images" />
 </template>

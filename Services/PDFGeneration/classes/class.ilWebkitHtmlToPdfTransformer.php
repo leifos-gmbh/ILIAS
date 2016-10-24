@@ -39,6 +39,10 @@ class ilWebkitHtmlToPdfTransformer extends ilAbstractHtmlToPdfTransformer
 	/**
 	 * @var bool
 	 */
+	protected $keep_relative_links;
+	/**
+	 * @var bool
+	 */
 	protected $enabled_forms;
 	/**
 	 * @var string
@@ -196,6 +200,7 @@ class ilWebkitHtmlToPdfTransformer extends ilAbstractHtmlToPdfTransformer
 			$this->setOrientation($this->pdf_webkit_settings->get('orientation'));
 			$this->setZoom($this->pdf_webkit_settings->get('zoom'));
 			$this->setExternalLinks((bool)$this->pdf_webkit_settings->get('external_links'));
+			$this->setKeepRelativeLinks((bool)$this->pdf_webkit_settings->get('relative_links'));
 			$this->setEnabledForms((bool)$this->pdf_webkit_settings->get('enable_forms'));
 			$this->setUserStylesheet($this->pdf_webkit_settings->get('user_stylesheet'));
 			$this->setCheckboxSvg($this->pdf_webkit_settings->get('checkbox_svg'));
@@ -342,6 +347,7 @@ class ilWebkitHtmlToPdfTransformer extends ilAbstractHtmlToPdfTransformer
 	{
 		$this->getZoomArgument();
 		$this->getExternalLinksArgument();
+		$this->getRelativeLinksArgument();
 		$this->getEnabledFormsArgument();
 		$this->getUserStylesheetArgument();
 		$this->getGreyscaleArgument();
@@ -382,6 +388,17 @@ class ilWebkitHtmlToPdfTransformer extends ilAbstractHtmlToPdfTransformer
 	public function setZoom($zoom)
 	{
 		$this->zoom = $zoom;
+	}
+
+	/**
+	 * @return string
+	 */
+	protected function getRelativeLinksArgument()
+	{
+		if($this->isKeepRelativeLinks())
+		{
+			$this->config[] = 'keep-relative-links';
+		}
 	}
 
 	/**
@@ -1101,6 +1118,22 @@ class ilWebkitHtmlToPdfTransformer extends ilAbstractHtmlToPdfTransformer
 		{
 			$this->config[] = 'radiobutton-checked-svg "' . $radio_button_svg.'"';
 		}
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function isKeepRelativeLinks()
+	{
+		return $this->keep_relative_links;
+	}
+
+	/**
+	 * @param boolean $keep_relative_links
+	 */
+	public function setKeepRelativeLinks($keep_relative_links)
+	{
+		$this->keep_relative_links = $keep_relative_links;
 	}
 
 	/**

@@ -28,6 +28,11 @@ class ilWebkitHtmlToPdfTransformerGUI extends ilAbstractHtmlToPdfTransformerGUI
 	/**
 	 * @var int
 	 */
+	protected $relative_links;
+
+	/**
+	 * @var int
+	 */
 	protected $enable_forms;
 
 	/**
@@ -226,6 +231,7 @@ class ilWebkitHtmlToPdfTransformerGUI extends ilAbstractHtmlToPdfTransformerGUI
 		$form->addItem($section_header);
 
 		$form->addItem($this->buildExternalLinksForm());
+		$form->addItem($this->buildRelativeLinksForm());
 		$form->addItem($this->buildEnableFormsForm());
 		$form->addItem($this->buildUserStylesheetForm());
 		$form->addItem($this->buildLowQualityForm());
@@ -546,6 +552,20 @@ class ilWebkitHtmlToPdfTransformerGUI extends ilAbstractHtmlToPdfTransformerGUI
 	}
 
 	/**
+	 * @return ilCheckboxInputGUI
+	 */
+	protected function buildRelativeLinksForm()
+	{
+		$relative_links = new ilCheckboxInputGUI($this->lng->txt('relative_links'), 'relative_links');
+		if($this->relative_links == 1)
+		{
+			$relative_links->setChecked(true);
+			return $relative_links;
+		}
+		return $relative_links;
+	}
+
+	/**
 	 * @return ilRadioGroupInputGUI
 	 */
 	protected function buildFooterForm()
@@ -623,6 +643,7 @@ class ilWebkitHtmlToPdfTransformerGUI extends ilAbstractHtmlToPdfTransformerGUI
 		$this->path						= $pdf_webkit_set->get('path',						'/usr/local/bin/wkhtmltopdf');
 		$this->zoom						= $pdf_webkit_set->get('zoom',						1);
 		$this->external_links			= $pdf_webkit_set->get('external_links');
+		$this->relative_links			= $pdf_webkit_set->get('relative_links');
 		$this->enable_forms				= $pdf_webkit_set->get('enable_forms');
 		$this->user_stylesheet			= $pdf_webkit_set->get('user_stylesheet');
 		$this->low_quality				= $pdf_webkit_set->get('low_quality');
@@ -666,6 +687,7 @@ class ilWebkitHtmlToPdfTransformerGUI extends ilAbstractHtmlToPdfTransformerGUI
 		$pdf_webkit_set->set('path', 					$this->path);
 		$pdf_webkit_set->set('zoom',					$this->zoom);
 		$pdf_webkit_set->set('external_links',			$this->external_links);
+		$pdf_webkit_set->set('relative_links',			$this->relative_links);
 		$pdf_webkit_set->set('enable_forms',			$this->enable_forms);
 		$pdf_webkit_set->set('user_stylesheet',			$this->user_stylesheet);
 		$pdf_webkit_set->set('low_quality',				$this->low_quality);
@@ -720,6 +742,7 @@ class ilWebkitHtmlToPdfTransformerGUI extends ilAbstractHtmlToPdfTransformerGUI
 		{
 			$this->zoom						= (float) $_POST['zoom'];
 			$this->external_links			= (int) $_POST['external_links'];
+			$this->relative_links			= (int) $_POST['relative_links'];
 			$this->enable_forms				= (int) $_POST['enable_forms'];
 			$this->user_stylesheet			= ilUtil::stripSlashes($_POST['user_stylesheet']);
 			$this->low_quality				= (int) $_POST['low_quality'];

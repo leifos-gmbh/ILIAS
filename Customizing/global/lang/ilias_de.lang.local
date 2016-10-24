@@ -150,6 +150,7 @@ pdfgen#:#header_show_pages#:#Zeige Seitenzahlen
 pdfgen#:#footer_text#:#Text
 pdfgen#:#footer_height#:#Höhe Fußzeile
 pdfgen#:#footer_show_pages#:#Zeige Seitenzahlen
+pdfgen#:#relative_links#:#Behalte relative Links bei
 prtf#:#pdf_export#:#PDF Export
 exc#:#exc_individual_deadline#:#Individuelle Fristenverlängerung
 exc#:#exc_individual_deadline_action#:#Individuelle Fristenverlängerung setzen

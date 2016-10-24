@@ -150,6 +150,7 @@ pdfgen#:#header_show_pages#:#Show Pagenumbers
 pdfgen#:#footer_text#:#Text
 pdfgen#:#footer_height#:#Height Footer
 pdfgen#:#footer_show_pages#:#Show Pagenumbers
+pdfgen#:#relative_links#:#Enable Relative Links
 prtf#:#pdf_export#:#PDF Export
 exc#:#exc_individual_deadline#:#Individual Deadline
 exc#:#exc_individual_deadline_action#:#Set Individual Deadline

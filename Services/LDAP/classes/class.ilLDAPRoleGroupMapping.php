@@ -134,6 +134,7 @@ class ilLDAPRoleGroupMapping
 	 		return false;
 	 	}
 	 	$this->log->info('LDAP assign: User ID: '.$a_usr_id.' Role Id: '.$a_role_id);
+		$this->log->debug('LDAP User auth mode is: '. ilObjUser::_lookupAuthMode($a_usr_id));
  		$this->assignToGroup($a_role_id,$a_usr_id);
 
 		return true;

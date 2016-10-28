@@ -256,8 +256,14 @@ class ilLDAPRoleGroupMapping
 				}
 			}
 		}
-		$this->users = ilObjUser::_getExternalAccountsByAuthMode('ldap',true);
 		
+		foreach($this->servers as $server_id => $server)
+		{
+			$this->users[$server_id] = ilObjUser::_getExternalAccountsByAuthMode(
+				'ldap_'.$server_id,
+				true
+			);
+		}
 		return true;
 	}
 	
@@ -281,7 +287,14 @@ class ilLDAPRoleGroupMapping
 	 */
 	private function isHandledUser($a_usr_id)
 	{
-		return array_key_exists($a_usr_id,$this->users);
+		foreach($this->users as $server_id => $users)
+		{
+			if(array_key_exists($a_usr_id, $users))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	
@@ -304,7 +317,13 @@ class ilLDAPRoleGroupMapping
 	 			}
 	 			else
 	 			{
-		 			$external_account = $this->users[$a_usr_id];
+					foreach($this->users as $server_id => $users)
+					{
+						if(array_key_exists($a_usr_id, $users))
+						{
+							$external_account = $users[$a_usr_id];
+						}
+					}
 	 			}
 	 			
 	 			// Forcing modAdd since Active directory is too slow and i cannot check if a user is member or not.
@@ -349,7 +368,13 @@ class ilLDAPRoleGroupMapping
 	 			}
 	 			else
 	 			{
-		 			$external_account = $this->users[$a_usr_id];
+					foreach($this->users as $server_id => $users)
+					{
+						if(array_key_exists($a_usr_id, $users))
+						{
+							$external_account = $users[$a_usr_id];
+						}
+					}
 	 			}
 		 		
 				// Check for other role membership
@@ -510,9 +535,9 @@ class ilLDAPRoleGroupMapping
 		{
 			return $this->user_dns[$a_usr_id];
 		}
+					
+		$external_account = $this->users[$a_server_id][$a_usr_id];
 		
-	 	$external_account = $this->users[$a_usr_id];
-	 	
 	 	try
 	 	{
 		 	$server = $this->servers[$a_server_id];

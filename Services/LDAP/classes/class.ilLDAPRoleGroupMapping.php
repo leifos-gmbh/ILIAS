@@ -33,7 +33,11 @@ include_once('Services/LDAP/classes/class.ilLDAPServer.php');
 */
 class ilLDAPRoleGroupMapping
 {
+	/**
+	 * @var ilLogger
+	 */
 	private $log = null;
+	
 	private static $instance = null;
 	private $servers = null;
 	private $mappings = array();
@@ -49,9 +53,7 @@ class ilLDAPRoleGroupMapping
 	 */
 	private function __construct()
 	{
-		global $ilLog;
-		
-		$this->log = $ilLog;
+		$this->log = ilLoggerFactory::getLogger('auth');
 		$this->initServers();
 	}
 	
@@ -127,10 +129,11 @@ class ilLDAPRoleGroupMapping
 	 	}
 	 	if(!$this->isHandledUser($a_usr_id))
 	 	{
-		 	$this->log->write('LDAP assign: User ID: '.$a_usr_id.' has no LDAP account');
+		 	$this->log->info('LDAP assign: User ID: '.$a_usr_id.' has no LDAP account');
+			$this->log->debug('LDAP User auth mode is: '. ilObjUser::_lookupAuthMode($a_usr_id));
 	 		return false;
 	 	}
-	 	$this->log->write('LDAP assign: User ID: '.$a_usr_id.' Role Id: '.$a_role_id);
+	 	$this->log->info('LDAP assign: User ID: '.$a_usr_id.' Role Id: '.$a_role_id);
  		$this->assignToGroup($a_role_id,$a_usr_id);
 
 		return true;
@@ -192,7 +195,7 @@ class ilLDAPRoleGroupMapping
 	 	{
 	 		return false;
 	 	}
-	 	$this->log->write('LDAP deassign: User ID: '.$a_usr_id.' Role Id: '.$a_role_id);
+	 	$this->log->info('LDAP deassign: User ID: '.$a_usr_id.' Role Id: '.$a_role_id);
  		$this->deassignFromGroup($a_role_id,$a_usr_id);
 	 	
 	 	return true;
@@ -336,12 +339,12 @@ class ilLDAPRoleGroupMapping
 					// Add user
 			 		$query_obj = $this->getLDAPQueryInstance($data['server_id'],$data['url']);
 					$query_obj->modAdd($data['dn'],array($data['member'] => $external_account));
-					$this->log->write('LDAP assign: Assigned '.$external_account.' to group '.$data['dn']);		
+					$this->log->info('LDAP assign: Assigned '.$external_account.' to group '.$data['dn']);		
 				}	 			
 	 		}
 			catch(ilLDAPQueryException $exc)
 			{
-				$this->log->write($exc->getMessage());
+				$this->log->warning($exc->getMessage());
 				// try next mapping
 				continue;
 			}	 		
@@ -380,7 +383,7 @@ class ilLDAPRoleGroupMapping
 				// Check for other role membership
 				if($role_id = $this->checkOtherMembership($a_usr_id,$a_role_id,$data))
 				{
-					$this->log->write('LDAP deassign: User is still assigned to role "'.$role_id.'".');
+					$this->log->info('LDAP deassign: User is still assigned to role "'.$role_id.'".');
 					continue;
 				}
 				/*
@@ -393,7 +396,7 @@ class ilLDAPRoleGroupMapping
 				// Deassign user
 		 		$query_obj = $this->getLDAPQueryInstance($data['server_id'],$data['url']);
 				$query_obj->modDelete($data['dn'],array($data['member'] => $external_account));
-				$this->log->write('LDAP deassign: Deassigned '.$external_account.' from group '.$data['dn']);
+				$this->log->info('LDAP deassign: Deassigned '.$external_account.' from group '.$data['dn']);
 				
 				// Delete from cache
 				if(is_array($this->mapping_members[$data['mapping_id']]))
@@ -408,7 +411,7 @@ class ilLDAPRoleGroupMapping
 	 		}
 	 		catch(ilLDAPQueryException $exc)
 			{
-				$this->log->write($exc->getMessage());
+				$this->log->warning($exc->getMessage());
 				// try next mapping
 				continue;
 			}	 		

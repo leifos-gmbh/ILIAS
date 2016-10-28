@@ -10,4 +10,5 @@
 * 22.08.2016 - 13.09.2016: Prototyp/Umsetzung
 * 19.09.2016: 1. Korrekturrunde
 * 29.09.2016: Korrektur Aktion Menü IE + scorm img Größe
-* 29.09.2016: Korrektur Aktion Menü IE + scorm img Größe
+* 11.10.2016: Korrektur nach Designcheck (Florian)
+* 27.10.2016: Korrektur Fehler Awareness

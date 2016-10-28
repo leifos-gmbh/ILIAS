@@ -11647,27 +11647,28 @@ table.mceToolbar td {
 }
 /* print css */
 @media print {
+  #ilTopBar,
+  .osdNotificationContainer,
+  .ilMainHeader,
+  .ilMainMenu,
+  .ilTreeView,
+  #left_nav,
+  ol.breadcrumb,
+  .btn,
+  #ilTab,
+  #ilSubTab,
+  #minheight,
+  #ilFooter {
+    display: none;
+  }
+  #mainspacekeeper {
+    padding: 0;
+  }
+  .ilLeftNavSpace {
+    margin-left: 0 !important;
+  }
   div.ilTabContentOuter {
     border: none;
-    box-shadow: none;
-  }
-  div.ilTabsTable {
-    display: block;
-    width: auto;
-  }
-  div.ilTabsTableRow {
-    display: block;
-  }
-  div.ilTabsTableCell {
-    display: block;
-  }
-  div.ilContentFixed {
-    left: 0;
-    position: static;
-  }
-  [dir="rtl"] div.ilContentFixed {
-    left: auto;
-    right: 0;
   }
   div.ilFileDropTargetOverlay {
     display: none;
@@ -12552,4 +12553,23 @@ ul.noStyle {
 }
 div.ilTopMemberView h3 {
   float: left;
+}
+#awareness-list {
+  overflow: auto;
+}
+.listIndent {
+  padding: 0;
+}
+div[id^="template_create_overlay_"][style*="hidden"] {
+  display: inline !important;
+}
+@media only screen and (max-width: 899px) {
+  div[id^="template_create_overlay_"] {
+    display: block !important;
+    position: absolute;
+    right: 0;
+  }
+}
+.ui-autocomplete {
+  z-index: 100;
 }

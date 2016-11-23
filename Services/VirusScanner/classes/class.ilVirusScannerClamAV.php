@@ -47,12 +47,15 @@ class ilVirusScannerClamAV extends ilVirusScanner
                 // - return an empty string, if file is not infected
 
                 $this->scanFilePath = $a_filepath;
+				chmod($this->scanFilePath, 0666);
                 $this->scanFileOrigName = $a_origname;
-
+				
                 // Call of antivir command
                 $cmd = $this->scanCommand . " --no-summary -i " . $a_filepath. " 2>&1";
                 exec($cmd, $out, $ret);
                 $this->scanResult = implode("\n", $out);
+				ilLoggerFactory::getLogger('root')->debug(print_r(stat($a_filepath),true));
+				ilLoggerFactory::getLogger('root')->debug('Scan result: ' . print_r($this->scanResult,true));
 
                 // sophie could be called
                 if (ereg("FOUND", $this->scanResult))
@@ -66,7 +69,7 @@ class ilVirusScannerClamAV extends ilVirusScanner
                         $this->scanFileIsInfected = false;
                         return "";
                 }
-
+				
                 // antivir has failed (todo)
                 $this->log->write("ERROR (Virus Scanner failed): "
                                                 . $this->scanResult

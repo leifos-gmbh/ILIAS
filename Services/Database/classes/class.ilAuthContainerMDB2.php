@@ -135,6 +135,13 @@ class ilAuthContainerMDB2 extends Auth_Container_MDB2
 	{
 		$this->log(__METHOD__ . ' called.', AUTH_LOG_DEBUG);
 
+		// begin-patch fhoev
+		if($this->_auth_obj->username == 'anonymous')
+		{
+			return true;
+		}
+
+
 		if(in_array($crypt_type, array('none', '')))
 		{
 			return parent::verifyPassword($raw, $encoded, $crypt_type);

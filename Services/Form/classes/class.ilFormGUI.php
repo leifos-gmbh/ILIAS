@@ -307,7 +307,9 @@ class ilFormGUI
 		if(
 			$this->waitbox_status &&
 			$ilClientIniFile instanceof ilIniFile &&
-			$ilClientIniFile->readVariable('system', 'PREVENT_MULTIPLE_FORM_SUBMITS') == 1
+			$ilClientIniFile->readVariable('system', 'PREVENT_MULTIPLE_FORM_SUBMITS') == 1 &&
+			(!isset($_GET['cmdMode']) || $_GET['cmdMode'] != 'asynch') &&
+			(!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || $_SERVER['HTTP_X_REQUESTED_WITH'] != 'XMLHttpRequest')
 		)
 		{
 			require_once 'Services/jQuery/classes/class.iljQueryUtil.php';

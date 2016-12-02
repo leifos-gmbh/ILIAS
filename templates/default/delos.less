@@ -381,6 +381,7 @@ ul, ol, p {
 
 ol, ul { 
 	padding-left: 40px;
+    list-style-image: none;//mantis #19613: stop the inheritance for nested list until specifically setted
 }
 [dir="rtl"] ol, [dir="rtl"] ul {
 	padding-right: 40px;
@@ -1684,6 +1685,9 @@ div.ilNewObjectSelector {
     float: right;
     margin-bottom: 8px;
     padding: 0 10px;
+    ~ div {
+        clear: right;
+    }
     > .btn-group {
         display: block;
         width: 100%;
@@ -1933,41 +1937,33 @@ table.mceToolbar {
 
 /* print css */
 @media print {
-
+    //i also duplicate the selectors  untill the class hidden-print is used (downgrade to 5.1, 5.0)
+    #ilTopBar,
+    .osdNotificationContainer,
+    .ilMainHeader,
+    .ilMainMenu,
+    .ilTreeView,
+    #left_nav,
+    ol.breadcrumb,
+    .btn,
+    #ilTab,
+    #ilSubTab,
+    #minheight,
+    #ilFooter {
+        display: none;
+    }
+    #mainspacekeeper {
+        padding: 0;
+    }
+    .ilLeftNavSpace {
+        margin-left: 0 !important;
+    }
 	div.ilTabContentOuter {
 		border: none;
-		box-shadow: none;
-	}
-
-	div.ilTabsTable {
-		display: block; 
-		width: auto;
 	}
 	
-	div.ilTabsTableRow {
-		display: block;
-	}
-	
-	div.ilTabsTableCell {
-		display: block;
-	}
-	
-	div.ilContentFixed {
-		left: 0;
-		position: static;
-	}
-	
-	[dir="rtl"] div.ilContentFixed {
-		left: auto;
-		right: 0;
-	}
-
 	div.ilFileDropTargetOverlay {
 		display: none;
-	}
-
-	.ilTreeView {
-		//display: none;
 	}
 
 	// overwrite bootstrap href printing
@@ -1975,4 +1971,3 @@ table.mceToolbar {
 		content: "";
 	}
 }
-

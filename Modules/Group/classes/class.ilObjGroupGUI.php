@@ -461,8 +461,8 @@ class ilObjGroupGUI extends ilContainerGUI
 		// check for parent group or course => SORT_INHERIT
 		$sort_mode = ilContainer::SORT_TITLE;
 		if(
-				$GLOBALS['tree']->checkForParentType($this->object->getRefId(),'crs') ||
-				$GLOBALS['tree']->checkForParentType($this->object->getRefId(),'grp')
+				$GLOBALS['tree']->checkForParentType($this->object->getRefId(),'crs',true) ||
+				$GLOBALS['tree']->checkForParentType($this->object->getRefId(),'grp',true)
 		)
 		{
 			$sort_mode = ilContainer::SORT_INHERIT;
@@ -2266,8 +2266,13 @@ class ilObjGroupGUI extends ilContainerGUI
 				}
 				if($this->object->getMaxMembers())
 				{
-					$info->addProperty($this->lng->txt("mem_free_places"),
-									   max(0,$this->object->getMaxMembers() - $this->object->members_obj->getCountMembers()));
+					include_once './Modules/Group/classes/class.ilObjGroupAccess.php';
+					 $reg_info = ilObjGroupAccess::lookupRegistrationInfo($this->object->getId());
+
+					 $info->addProperty(
+						 $this->lng->txt('mem_free_places'),
+						 $reg_info['reg_info_free_places']
+					 );
 				}				
 			}
 			
@@ -2596,8 +2601,8 @@ class ilObjGroupGUI extends ilContainerGUI
 			// Group presentation
 			$hasParentMembership = 
 				(
-					$tree->checkForParentType($this->object->getRefId(),'crs') ||
-					$tree->checkForParentType($this->object->getRefId(),'grp')
+					$tree->checkForParentType($this->object->getRefId(),'crs',true) ||
+					$tree->checkForParentType($this->object->getRefId(),'grp',true)
 				);
 			
 			$pres = new ilFormSectionHeaderGUI();

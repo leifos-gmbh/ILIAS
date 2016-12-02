@@ -134,16 +134,19 @@ class ilAuthContainerMDB2 extends Auth_Container_MDB2
 	public function verifyPassword($raw, $encoded, $crypt_type = 'md5')
 	{
 		$this->log(__METHOD__ . ' called.', AUTH_LOG_DEBUG);
+		
+		ilLoggerFactory::getLogger('auth')->debug('Login request from: ' . $this->_auth_obj->username);
 
 		// begin-patch fhoev
-		if($this->_auth_obj->username == 'anonymous')
+		if($this->_auth_obj->username == 'anonymous' and $raw == 'anonymous')
 		{
-			return true;
+			#return true;
 		}
 
 
 		if(in_array($crypt_type, array('none', '')))
 		{
+			ilLoggerFactory::getLogger('auth')->debug('crypt type none');
 			return parent::verifyPassword($raw, $encoded, $crypt_type);
 		}
 
@@ -152,6 +155,7 @@ class ilAuthContainerMDB2 extends Auth_Container_MDB2
 
 		if(ilUserPasswordManager::getInstance()->isEncodingTypeSupported($crypt_type))
 		{
+			ilLoggerFactory::getLogger('auth')->debug('encoding type is supported');
 			/**
 			 * @var $user ilObjUser
 			 */
@@ -159,6 +163,11 @@ class ilAuthContainerMDB2 extends Auth_Container_MDB2
 			$user->setPasswd($encoded, IL_PASSWD_CRYPTED);
 
 			return ilUserPasswordManager::getInstance()->verifyPassword($user, $raw);
+		}
+		else
+		{
+			ilLoggerFactory::getLogger('auth')->debug('encoding type is NOT supported -> pear validation');
+			
 		}
 
 		// Fall through: Let pear verify the password

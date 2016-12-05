@@ -841,9 +841,10 @@ abstract class assQuestion
 					array_push($output, '<a href="' . $this->getSuggestedSolutionPathWeb() . $solution["value"]["name"] . '">' . $possible_texts[0] . '</a>');
 					break;
 				case "text":
-					$output = $this->fixSvgToPng($output);
-					$output = $this->fixUnavailableSkinImageSources($output);
-					array_push($output, $this->prepareTextareaOutput($solution["value"], true));
+					$solutionValue = $solution["value"];
+					$solutionValue = $this->fixSvgToPng($solutionValue);
+					$solutionValue = $this->fixUnavailableSkinImageSources($solutionValue);
+					$output[] = $this->prepareTextareaOutput($solutionValue, true);
 					break;
 			}
 		}
@@ -2793,7 +2794,7 @@ abstract class assQuestion
 		);
 		if ($affectedRows == 1)
 		{
-			$this->suggested_solutions["subquestion_index"] = array(
+			$this->suggested_solutions[$subquestion_index] = array(
 				"type" => $type,
 				"value" => $value,
 				"internal_link" => $solution_id,

@@ -321,12 +321,13 @@ class ilUserUtil
 	 */
 	public static function getStartingPointAsUrl()
 	{	
-		global $tree, $ilUser;
+		global $tree, $ilUser, $rbacreview;
 		
 		$ref_id = 1;
+		//configuration by user preference
 		if(self::hasPersonalStartingPoint())
 		{
-			$current = self::getPersonalStartingPoint();	
+			$current = self::getPersonalStartingPoint();
 			if($current == self::START_REPOSITORY_OBJ)
 			{
 				$ref_id = self::getPersonalStartingObject();
@@ -334,14 +335,46 @@ class ilUserUtil
 		}
 		else
 		{
-			$current = self::getStartingPoint();
-			if($current == self::START_REPOSITORY_OBJ)
+			include_once './Services/AccessControl/classes/class.ilObjRole.php';
+			$gr = array();
+			foreach($rbacreview->getGlobalRoles() as $role_id)
 			{
-				$ref_id = self::getStartingObject();
+				if($rbacreview->isAssigned($ilUser->getId(),$role_id))
+				{
+					$role = new ilObjRole($role_id);
+					$gr[$role->getStartingPosition()]= array(
+							'point' => $role->getStartingPoint(),
+							'object' => $role->getStartingObject()
+					);
+				}
 			}
+			if(!empty($gr))
+			{
+				$current = -1;
+				krsort($gr);
+				while ($current < 0) {
+					foreach ($gr as $arole) {
+						if ($arole['point'] > 0) {
+							$current = $arole['point'];
+							$ref_id = $arole['object'];
+						}
+					}
+				}
+			}
+			// configuration by default
+			else
+			{
+				$current = self::getStartingPoint();
+
+				if($current == self::START_REPOSITORY_OBJ)
+				{
+					$ref_id = self::getStartingObject();
+				}
+			}
+
 		}
 		switch($current)
-		{			
+		{
 			case self::START_REPOSITORY:
 			case self::START_REPOSITORY_OBJ:
 				if($ref_id &&

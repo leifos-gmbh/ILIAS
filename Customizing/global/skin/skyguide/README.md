@@ -12,3 +12,4 @@
 * 29.09.2016: Korrektur Aktion Menü IE + scorm img Größe
 * 11.10.2016: Korrektur nach Designcheck (Florian)
 * 27.10.2016: Korrektur Fehler Awareness
+* 13.12.2016: Korrektur Button Seiten Editor

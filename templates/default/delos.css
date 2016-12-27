@@ -7809,11 +7809,6 @@ a.ilTreeView {
   box-shadow: 1px 1px 2px #b9b9b9;
   width: 6px;
 }
-@media only screen and (max-width: 768px) {
-  a.ilTreeView {
-    top: 140px;
-  }
-}
 a.ilTreeView > img {
   display: inline-block;
   margin-left: -2px;
@@ -11398,7 +11393,7 @@ table.mceToolbar td {
    Google recommending 640px: https://developers.google.com/webmasters/smartphone-sites/details
    
    */
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 767px) {
   html {
     -webkit-text-size-adjust: none;
   }

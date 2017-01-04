@@ -360,8 +360,6 @@ class ilMembershipCronNotifications extends ilCronJob
 		$lng = $ntf->getUserLanguage($a_user_id);
 		
 		include_once './Services/Locator/classes/class.ilLocatorGUI.php';			
-		require_once "HTML/Template/ITX.php";
-		require_once "./Services/UICore/classes/class.ilTemplateHTMLITX.php";
 		require_once "./Services/UICore/classes/class.ilTemplate.php";
 		require_once "./Services/Link/classes/class.ilLink.php";
 			
@@ -448,7 +446,7 @@ class ilMembershipCronNotifications extends ilCronJob
 		$subject = sprintf($lng->txt("crs_subject_course_group_notification"), $client);
 			
 		// #10044
-		$mail = new ilMail($ilUser->getId());
+		$mail = new ilMail(ANONYMOUS_USER_ID);
 		$mail->enableSOAP(false); // #10410
 		$mail->sendMail(ilObjUser::_lookupLogin($a_user_id), 
 			null, 

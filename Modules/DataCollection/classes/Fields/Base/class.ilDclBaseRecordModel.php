@@ -95,7 +95,7 @@ class ilDclBaseRecordModel {
 	/**
 	 * doUpdate
 	 */
-	public function doUpdate() {
+	public function doUpdate($omit_notification = false) {
 		global $DIC;
 		$ilDB = $DIC['ilDB'];
 
@@ -129,7 +129,9 @@ class ilDclBaseRecordModel {
 		}
 
 		//TODO: add event raise
-		ilObjDataCollection::sendNotification("update_record", $this->getTableId(), $this->id);
+		if (!$omit_notification) {
+			ilObjDataCollection::sendNotification("update_record", $this->getTableId(), $this->id);
+		}
 	}
 
 
@@ -702,11 +704,13 @@ class ilDclBaseRecordModel {
 		$this->doCreate();
 		foreach($new_fields as $old => $new){
 			$old_rec_field = $original->getRecordField($old);
-			$new_rec_field = new ilDclBaseRecordFieldModel($this, $new);
-			$new_rec_field->setValue($old_rec_field->getValue());
-			$new_rec_field->doUpdate();
+			$new_rec_field = ilDclCache::getRecordFieldCache($this, $new);
+			$new_rec_field->cloneStructure($old_rec_field);
 			$this->recordfields[] = $new_rec_field;
 		}
+
+		// mandatory for all cloning functions
+		ilDclCache::setCloneOf($original_id, $this->getId(), ilDclCache::TYPE_RECORD);
 	}
 
 	/**

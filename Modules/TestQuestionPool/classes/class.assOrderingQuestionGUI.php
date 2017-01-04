@@ -18,6 +18,7 @@ require_once './Modules/Test/classes/inc.AssessmentConstants.php';
  * @version	$Id$
  *          
  * @ingroup ModulesTestQuestionPool
+ * @ilCtrl_Calls assOrderingQuestionGUI: ilFormPropertyDispatchGUI
  */
 class assOrderingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjustable, ilGuiAnswerScoringAdjustable
 {
@@ -452,6 +453,8 @@ class assOrderingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 
 		require_once "./Services/Form/classes/class.ilPropertyFormGUI.php";
 		$form = new ilPropertyFormGUI();
+		$this->editForm = $form;
+
 		$form->setFormAction($this->ctrl->getFormAction($this));
 		$form->setTitle($this->outQuestionType());
 		$form->setMultipart(($orderingtype == OQ_PICTURES) ? TRUE : FALSE);
@@ -1376,7 +1379,7 @@ class assOrderingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 	{
 		global $ilDB;
 
-		$res = $ilDB->queryF('SELECT depth FROM qpl_a_ordering WHERE question_fi = %s ORDER BY solution_order ASC',
+		$res = $ilDB->queryF('SELECT depth FROM qpl_a_ordering WHERE question_fi = %s ORDER BY solution_key ASC',
 			array('integer'), array($this->object->getId()));
 		while($row = $ilDB->fetchAssoc($res))
 		{

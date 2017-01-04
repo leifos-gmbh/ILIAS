@@ -2094,7 +2094,7 @@ if($wiki_type_id)
 		array(
 			"type" => "text",
 			"length" => 100,
-			"notnull" => false,
+			"notnull" => true,
 			'fixed' => false
 		)
 	);
@@ -2107,7 +2107,7 @@ if($wiki_type_id)
 		array(
 			"type" => "text",
 			"length" => 100,
-			"notnull" => false,
+			"notnull" => true,
 			'fixed' => false
 		)
 	);
@@ -6013,7 +6013,19 @@ if(!$ilDB->uniqueConstraintExists('usr_data', array('login')))
 					SELECT login FROM usr_data GROUP BY login HAVING COUNT(*) > 1
 				) tmp ON tmp.login = ud.login
 
-				Please manipulate the affected records by choosing different login names.
+				Please manipulate the affected records by choosing different login names or use the following statement
+				to change the duplicate login name to unique name like [usr_id]_[login]_duplicate. The further changes on
+				user data (e.g. deletion of duplicates) could then be easily done in ILIAS administration.
+
+				UPDATE usr_data ud
+				INNER JOIN (
+					SELECT udinner.login, udinner.usr_id
+					FROM usr_data udinner
+					GROUP BY udinner.login
+					HAVING COUNT(udinner.login) > 1
+				) dup ON ud.login = dup.login
+				SET ud.login = CONCAT(CONCAT(CONCAT(ud.usr_id, '_'), CONCAT(ud.login, '_')), 'duplicate')
+
 				If you try to rerun the update process, this warning will apear again if the issue is still not solved.
 
 				Best regards,
@@ -13877,6 +13889,8 @@ if ($ilDB->tableExists('page_style_usage') && $ilDB->tableExists('page_style_usa
 		FROM page_style_usage_old
 	");
 
+	$ilDB->manipulate("DELETE FROM page_style_usage");
+
 	while($row = $ilDB->fetchAssoc($res))
 	{
 		$id = $ilDB->nextId('page_style_usage');
@@ -13892,12 +13906,6 @@ if ($ilDB->tableExists('page_style_usage') && $ilDB->tableExists('page_style_usa
 						  $ilDB->quote($row['stype'], "text").",".
 						  $ilDB->quote($row['sname'], "text").
 						  ")");
-
-		$ilDB->manipulateF(
-			"DELETE FROM page_style_usage_old WHERE page_id = %s AND page_type = %s AND page_lang = %s AND page_nr = %s AND template = %s AND stype = %s AND sname = %s",
-			array('integer', 'text', 'text', 'integer', 'integer', 'text', 'text'),
-			array($row['page_id'], $row['page_type'], $row['page_lang'], $row['page_nr'], $row['template'], $row['stype'], $row['sname'])
-		);
 	}
 }
 ?>
@@ -15473,8 +15481,8 @@ $table_query = $ilDB->query('SELECT id, ref_id FROM il_dcl_table
 
 $mapping = array();
 while ($rec = $ilDB->fetchAssoc($table_query)) {
-	$sql = $ilDB->query('SELECT * FROM il_dcl_tableview WHERE table_id = ' . $ilDB->quote($rec['id']));
-	if ($ilDB->numRows($sql)) {
+	$temp_sql = $ilDB->query('SELECT * FROM il_dcl_tableview WHERE table_id = ' . $ilDB->quote($rec['id']));
+	if ($ilDB->numRows($temp_sql)) {
 		continue;
 	}
 	$query = $ilDB->query('SELECT rol_id FROM rbac_fa WHERE parent = ' . $ilDB->quote($rec['ref_id'], 'integer') . " AND assign='y'");
@@ -15536,11 +15544,11 @@ if ($ilDB->tableExists('il_dcl_view') && $ilDB->tableExists('il_dcl_viewdefiniti
 
 	//set editability/exportability
 	while ($rec = $ilDB->fetchAssoc($view_query)) {
-		$sql = $ilDB->query('SELECT * FROM il_dcl_tfield_set 
+		$temp_sql = $ilDB->query('SELECT * FROM il_dcl_tfield_set 
 								WHERE table_id = ' . $ilDB->quote($rec['table_id'], 'integer') . '
 								AND field = ' . $ilDB->quote($rec['field'], 'text'));
 
-		if (!$ilDB->numRows($sql)) {
+		if (!$ilDB->numRows($temp_sql)) {
 			$next_id = $ilDB->nextId('il_dcl_tfield_set');
 			$ilDB->query('INSERT INTO il_dcl_tfield_set (id, table_id, field, field_order, exportable) VALUES ('
 				. $ilDB->quote($next_id, 'integer') . ', '
@@ -15564,11 +15572,11 @@ if ($ilDB->tableExists('il_dcl_view') && $ilDB->tableExists('il_dcl_viewdefiniti
 			continue;
 		}
 
-		$sql = $ilDB->query('SELECT * FROM page_object 
+		$temp_sql = $ilDB->query('SELECT * FROM page_object 
 						WHERE page_id = ' . $ilDB->quote($mapping[$rec['table_id']], 'integer') . ' 
 						AND parent_type = ' . $ilDB->quote('dclf', 'text'));
 
-		if ($ilDB->numRows($sql)) {
+		if ($ilDB->numRows($temp_sql)) {
 			$ilDB->query('DELETE FROM page_object 
 						WHERE page_id = ' . $ilDB->quote($rec['id'], 'integer') . ' 
 						AND parent_type = ' . $ilDB->quote('dclf', 'text'));
@@ -17846,4 +17854,174 @@ else
 <#5049>
 <?php
 	$ilCtrlStructureReader->getStructure();
+?>
+<#5050>
+<?php
+	require_once 'Services/Migration/DBUpdate_3560/classes/class.ilDBUpdateNewObjectType.php';
+
+	ilDBUpdateNewObjectType::updateOperationOrder("edit_members", 2400);
+?>
+<#5051>
+<?php
+	$ilCtrlStructureReader->getStructure();
+?>
+<#5052>
+<?php
+	$ilCtrlStructureReader->getStructure();
+?>
+<#5053>
+<?php
+	$ilCtrlStructureReader->getStructure();
+?>
+<#5054>
+<?php
+	$ilCtrlStructureReader->getStructure();
+?>
+<#5055>
+<?php
+// 1. Select all the questions of surveys
+$q = "SELECT svy_question.question_id, svy_svy_qst.survey_fi FROM svy_question, svy_svy_qst WHERE svy_question.question_id = svy_svy_qst.question_fi";
+$res = $ilDB->query($q);
+
+while ($svy_data = $res->fetchAssoc())
+{
+	$question_id = $svy_data['question_id'];
+	$svy_id = $svy_data['survey_fi'];
+
+	$q = "SELECT obj_fi FROM svy_svy WHERE survey_id = ".$ilDB->quote($svy_id, "integer");
+	$res2 = $ilDB->query($q);
+	$row = $res2->fetchAssoc();
+	$obj_id  = $row['obj_fi'];
+
+	$u = "UPDATE svy_question SET obj_fi = ".$ilDB->quote($obj_id, "integer")." WHERE question_id = ".$ilDB->quote($question_id, "integer");
+	$ilDB->query($u);
+}
+?>
+<#5056>
+<?php
+$ilDB->update(
+	'il_dcl_datatype',
+	array(
+		"ildb_type" => array("text", "text"),
+		"storage_location" => array("integer", 1)
+	),
+	array(
+		"title" => array("text", "reference")
+	)
+);
+?>
+<#5057>
+<?php
+if(!$ilDB->tableColumnExists('qpl_qst_type', 'plugin_name'))
+{
+	$ilDB->addTableColumn('qpl_qst_type', 'plugin_name', array(
+		'type'    => 'text',
+		'length'  => 40,
+		'notnull' => false,
+		'default' => null
+	));
+}
+?>
+<#5058>
+<?php
+if( !$ilDB->tableColumnExists('qpl_a_ordering', 'order_position') )
+{
+	$ilDB->addTableColumn('qpl_a_ordering', 'order_position', array(
+		'type'    => 'integer',
+		'length'  => 3,
+		'notnull' => false,
+		'default' => null
+	));
+	
+	$ilDB->manipulate("UPDATE qpl_a_ordering SET order_position = solution_order");
+	$ilDB->renameTableColumn('qpl_a_ordering', 'solution_order', 'solution_keyvalue');
+}
+?>
+<#5059>
+<?php
+if( $ilDB->tableColumnExists('qpl_a_ordering', 'solution_keyvalue') )
+{
+	$ilDB->renameTableColumn('qpl_a_ordering', 'solution_keyvalue', 'solution_key');
+}
+?>
+<#5060>
+<?php
+if( $ilDB->tableColumnExists('qpl_a_ordering', 'order_position') )
+{
+	$ilDB->renameTableColumn('qpl_a_ordering', 'order_position', 'position');
+}
+?>
+<#5061>
+<?php
+	$ilCtrlStructureReader->getStructure();
+?>
+
+<#5062>
+<?php
+	//rename tables
+	if($ilDB->tableExists('mass_info_settings') && !$ilDB->tableExists('iass_info_settings')) {
+		$ilDB->renameTable('mass_info_settings', 'iass_info_settings');
+	}
+
+	if($ilDB->tableExists('mass_settings') && !$ilDB->tableExists('iass_settings')) {
+		$ilDB->renameTable('mass_settings', 'iass_settings');
+	}
+
+	if($ilDB->tableExists('mass_members') && !$ilDB->tableExists('iass_members')) {
+		$ilDB->renameTable('mass_members', 'iass_members');
+	}
+
+	//change obj type
+	$ilDB->manipulate('UPDATE object_data SET type = '.$ilDB->quote('iass','text')
+						.'	WHERE type = '.$ilDB->quote('mass','text'));
+
+	//change name of role template for iass member
+	$ilDB->manipulate('UPDATE object_data SET title = '.$ilDB->quote('il_iass_member','text')
+						.'	WHERE type = '.$ilDB->quote('rolt','text')
+						.'		AND title ='.$ilDB->quote('il_mass_member','text'));
+
+	//change names of existing iass member roles
+	$ilDB->manipulate('UPDATE object_data SET title = REPLACE(title,'.$ilDB->quote('_mass_','text').','.$ilDB->quote('_iass_','text').')'
+						.'	WHERE type = '.$ilDB->quote('role','text')
+						.'		AND title LIKE '.$ilDB->quote('il_mass_member_%','text'));
+
+	//change typ name
+	$ilDB->manipulate('UPDATE object_data SET title = '.$ilDB->quote('iass','text')
+						.'		,description = '.$ilDB->quote('Individual Assessment','text')
+						.'	WHERE type = '.$ilDB->quote('typ','text')
+						.'		AND title = '.$ilDB->quote('mass','text'));
+
+	//adapt object declaration in rbac
+	$ilDB->manipulate('UPDATE rbac_templates SET type = '.$ilDB->quote('iass','text')
+						.'	WHERE type = '.$ilDB->quote('mass','text'));
+
+	//change op names
+	$ilDB->manipulate('UPDATE rbac_operations SET operation = '.$ilDB->quote('create_iass','text')
+						.'		,description = '.$ilDB->quote('Create Individual Assessment','text')
+						.'	WHERE operation = '.$ilDB->quote('create_mass','text'));
+
+	$ilCtrlStructureReader->getStructure();
+?>
+<#5063>
+<?php
+if($ilDB->tableExists('svy_qst_oblig'))
+{
+	$ilDB->manipulate("UPDATE svy_question".
+		" INNER JOIN svy_qst_oblig".
+		" ON svy_question.question_id = svy_qst_oblig.question_fi".
+		" SET svy_question.obligatory = svy_qst_oblig.obligatory");
+}
+?>
+<#5064>
+<?php
+$ilDB->modifyTableColumn(
+	'mail_attachment',
+	'path',
+	array(
+		"type" => "text",
+		"length" => 500,
+		"notnull" => false,
+		'default' => null
+	)
+);
 ?>

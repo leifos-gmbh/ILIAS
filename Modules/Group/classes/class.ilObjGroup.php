@@ -45,6 +45,7 @@ class ilObjGroup extends ilContainer implements ilMembershipRegistrationCodes
 	const ERR_WRONG_REG_TIME_LIMIT = 'grp_wrong_reg_time_limit';
 	const ERR_MISSING_MIN_MAX_MEMBERS = 'grp_wrong_min_max_members';
 	const ERR_WRONG_MIN_MAX_MEMBERS = 'grp_max_and_min_members_invalid';
+	const ERR_WRONG_REGISTRATION_LIMITED = 'grp_err_registration_limited';
 	
 	const MAIL_ALLOWED_ALL = 1;
 	const MAIL_ALLOWED_TUTORS = 2;
@@ -612,6 +613,15 @@ class ilObjGroup extends ilContainer implements ilMembershipRegistrationCodes
 				$ilErr->appendMessage($this->lng->txt(self::ERR_WRONG_MIN_MAX_MEMBERS));
 			}
 		}
+		if(
+			($this->getRegistrationStart() && !$this->getRegistrationEnd()) ||
+			(!$this->getRegistrationStart() && $this->getRegistrationEnd()) ||
+			$this->getRegistrationEnd() <= $this->getRegistrationStart()
+		)
+		{
+			$ilErr->appendMessage($this->lng->txt((self::ERR_WRONG_REGISTRATION_LIMITED)));
+		}
+		
 		return strlen($ilErr->getMessage()) == 0;
 	}
 	
@@ -807,11 +817,11 @@ class ilObjGroup extends ilContainer implements ilMembershipRegistrationCodes
 	 * @param int copy id
 	 *
 	 */
-	public function cloneObject($a_target_id,$a_copy_id = 0)
+	public function cloneObject($a_target_id,$a_copy_id = 0, $a_omit_tree = false)
 	{
 		global $ilDB,$ilUser, $ilSetting;
 
-	 	$new_obj = parent::cloneObject($a_target_id,$a_copy_id);
+	 	$new_obj = parent::cloneObject($a_target_id,$a_copy_id, $a_omit_tree);
 	 	$new_obj->setGroupType($this->getGroupType());
 	 	$new_obj->initGroupStatus($this->getGroupType() ? $this->getGroupType() : $this->readGroupStatus());
 

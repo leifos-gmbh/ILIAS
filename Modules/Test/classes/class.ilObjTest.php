@@ -5,6 +5,7 @@ require_once 'Services/Object/classes/class.ilObject.php';
 require_once 'Modules/Test/classes/inc.AssessmentConstants.php';
 require_once 'Modules/Test/interfaces/interface.ilMarkSchemaAware.php';
 require_once 'Modules/Test/interfaces/interface.ilEctsGradesEnabled.php';
+require_once 'Modules/TestQuestionPool/classes/questions/class.ilAssQuestionType.php';
 
 /**
  * Class ilObjTest
@@ -749,7 +750,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
 		}
 
 		// put here object specific stuff
-
+		$this->updateMetaData();
 		return true;
 	}
 
@@ -5526,6 +5527,8 @@ function getAnswerFeedbackPoints()
 */
 	function getAvailableQuestions($arrFilter, $completeonly = 0)
 	{
+		$pluginAdmin = $GLOBALS['DIC'] ? $GLOBALS['DIC']['ilPluginAdmin'] : $GLOBALS['ilPluginAdmin']; 
+		$lng = $GLOBALS['DIC'] ? $GLOBALS['DIC']['lng'] : $GLOBALS['lng']; 
 		global $ilUser;
 		global $ilDB;
 
@@ -5577,65 +5580,45 @@ function getAnswerFeedbackPoints()
 			$original_clause = " qpl_questions.original_id IS NULL AND " . $ilDB->in('qpl_questions.question_id',  $original_ids, true, 'integer');
 		}
 
-		$query_result = $ilDB->query(
-			"SELECT qpl_questions.*, qpl_questions.tstamp, qpl_qst_type.type_tag, qpl_qst_type.plugin, object_data.title qpl " .
-			"FROM qpl_questions, qpl_qst_type, object_data WHERE $original_clause $available AND " .
-			"object_data.obj_id = qpl_questions.obj_fi AND qpl_questions.tstamp > 0 AND " .
-			"qpl_questions.question_type_fi = qpl_qst_type.question_type_id$where");
+		$query_result = $ilDB->query("
+			SELECT		qpl_questions.*, qpl_questions.tstamp,
+						qpl_qst_type.type_tag, qpl_qst_type.plugin, qpl_qst_type.plugin_name,
+						object_data.title parent_title
+			FROM		qpl_questions, qpl_qst_type, object_data
+			WHERE $original_clause $available
+			AND object_data.obj_id = qpl_questions.obj_fi
+			AND qpl_questions.tstamp > 0
+			AND qpl_questions.question_type_fi = qpl_qst_type.question_type_id
+			$where
+		");
 		$rows = array();
 		$types = $this->getQuestionTypeTranslations();
 		if ($query_result->numRows())
 		{
 			while ($row = $ilDB->fetchAssoc($query_result))
 			{
-				$row['ttype'] = $types[$row['type_tag']];
-				if ($row["plugin"])
+				$row = ilAssQuestionType::conmpleteMissingPluginName($row);
+				
+				if( !$row['plugin'] )
 				{
-					if ($this->isPluginActive($row["type_tag"]))
-					{
-						array_push($rows, $row);
-					}
+					$row[ 'ttype' ] = $lng->txt($row[ "type_tag" ]);
+					
+					$rows[] = $row;
+					continue;
 				}
-				else
+				
+				if( !$pluginAdmin->isActive(IL_COMP_MODULE, 'TestQuestionPool', 'qst', $row['plugin_name']) )
 				{
-					array_push($rows, $row);
+					continue;
 				}
+				
+				$pl = ilPlugin::getPluginObject(IL_COMP_MODULE, 'TestQuestionPool', 'qst', $row['plugin_name']);
+				$row[ 'ttype' ] = $pl->getQuestionTypeTranslation();
+				
+				$rows[] = $row;
 			}
 		}
 		return $rows;
-	}
-
-	public function &getQuestionTypeTranslations()
-	{
-		global $ilDB;
-		global $lng;
-		global $ilLog;
-		global $ilPluginAdmin;
-		
-		$lng->loadLanguageModule("assessment");
-		$result = $ilDB->query("SELECT * FROM qpl_qst_type");
-		$types = array();
-		while ($row = $ilDB->fetchAssoc($result))
-		{
-			if ($row["plugin"] == 0)
-			{
-				$types[$row['type_tag']] = $lng->txt($row["type_tag"]);
-			}
-			else
-			{
-				$pl_names = $ilPluginAdmin->getActivePluginsForSlot(IL_COMP_MODULE, "TestQuestionPool", "qst");
-				foreach ($pl_names as $pl_name)
-				{
-					$pl = ilPlugin::getPluginObject(IL_COMP_MODULE, "TestQuestionPool", "qst", $pl_name);
-					if (strcmp($pl->getQuestionType(), $row["type_tag"]) == 0)
-					{
-						$types[$row['type_tag']] = $pl->getQuestionTypeTranslation();
-					}
-				}
-			}
-		}
-		ksort($types);
-		return $types;
 	}
 
 	/**
@@ -7101,7 +7084,7 @@ function getAnswerFeedbackPoints()
 	* @param int copy id
 	* @return object new test object
 	*/
-	public function cloneObject($a_target_id,$a_copy_id = 0)
+	public function cloneObject($a_target_id,$a_copy_id = 0, $a_omit_tree = false)
 	{
 		global $ilLog, $tree, $ilDB, $ilPluginAdmin;
 
@@ -7109,7 +7092,7 @@ function getAnswerFeedbackPoints()
 
 		// Copy settings
 		/** @var $newObj ilObjTest */
-		$newObj = parent::cloneObject($a_target_id,$a_copy_id);
+		$newObj = parent::cloneObject($a_target_id,$a_copy_id, $a_omit_tree);
 		$newObj->setTmpCopyWizardCopyId($a_copy_id);
 		$this->cloneMetaData($newObj);
 
@@ -8075,17 +8058,12 @@ function getAnswerFeedbackPoints()
 			return $max;
 		}
 
-/**
-* Retrieves the best pass of a given user for a given test
-*
- * @global ilLog $ilLog
- * @global ILIAS $ilias
-* @param integer $user_id The user id
-* @param integer $test_id The test id
-* @return integer The best pass of the user for the given test
-* @access public
-*/
-	function _getBestPass($active_id)
+	/**
+	 * Retrieves the best pass of a given user for a given test
+	 * @param int $active_id
+	 * @return int|mixed
+	 */
+	public static function _getBestPass($active_id)
 	{
 		global $ilDB;
 		

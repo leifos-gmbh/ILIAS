@@ -201,7 +201,13 @@ class ilSubscriberTableGUI extends ilTable2GUI
 				case 'odf_last_update':
 					$this->tpl->setVariable('VAL_CUST',(string) $a_set['odf_info_txt']);
 					break;
-				
+
+				case 'org_units':
+					$this->tpl->setCurrentBlock('custom_fields');
+					include_once './Modules/OrgUnit/classes/PathStorage/class.ilOrgUnitPathStorage.php';
+					$this->tpl->setVariable('VAL_CUST', (string) ilOrgUnitPathStorage::getTextRepresentationOfUsersOrgUnits($a_set['usr_id']));
+					$this->tpl->parseCurrentBlock();
+					break;
 
 				default:
 					$this->tpl->setCurrentBlock('custom_fields');
@@ -260,7 +266,7 @@ class ilSubscriberTableGUI extends ilTable2GUI
 
 		$this->ctrl->setParameterByClass(get_class($this->getParentObject()),'member_id',$a_set['usr_id']);
 		$this->ctrl->setParameter($this->parent_obj, 'member_id', $a_set['usr_id']);
-		$trans = $this->lng->txt($this->getParentObject()->object->getType().'_mem_send_mail');
+		$trans = $this->lng->txt($this->getRepositoryObject()->getType().'_mem_send_mail');
 		$link = $this->ctrl->getLinkTargetByClass(get_class($this->getParentObject()),'sendMailToSelectedUsers');
 		$list->addItem($trans, '', $link,'sendMailToSelectedUsers');
 		
@@ -301,6 +307,7 @@ class ilSubscriberTableGUI extends ilTable2GUI
 		unset($additional_fields["lastname"]);
 		unset($additional_fields["last_login"]);
 		unset($additional_fields["access_until"]);
+		unset($additional_fields['org_units']);
 
 		$udf_ids = $usr_data_fields = $odf_ids = array();
 		foreach($additional_fields as $field)

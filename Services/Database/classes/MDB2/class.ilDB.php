@@ -855,10 +855,11 @@ abstract class ilDB extends PEAR implements ilDBInterface
 		$manager = $this->db->loadModule('Manager');
 		$r = $manager->alterTable($a_name, array("name" => $a_new_name), false);
 		
-		$query = "UPDATE abstraction_progress ".
-			"SET table_name = ".$this->db->quote($a_new_name,'text')." ".
-			"WHERE table_name = ".$this->db->quote($a_name,'text');
-		$this->db->query($query);
+        // The abstraction_progress is no longer used in ILIAS, see http://www.ilias.de/mantis/view.php?id=19513
+        //		$query = "UPDATE abstraction_progress ".
+        //			"SET table_name = ".$this->db->quote($a_new_name,'text')." ".
+        //			"WHERE table_name = ".$this->db->quote($a_name,'text');
+        //		$this->db->query($query);
 
 		return $this->handleError($r, "renameTable(".$a_name.",".$a_new_name.")");
 	}
@@ -1412,7 +1413,7 @@ abstract class ilDB extends PEAR implements ilDBInterface
 	* For multiple similar queries/manipulations you may use prepare() and execute().
 	*
 	* @param string
-	* @return object DB
+	* @return ilPDOStatement DB
 	*/
 	function query($sql, $a_handle_error = true)
 	{
@@ -1837,7 +1838,7 @@ abstract class ilDB extends PEAR implements ilDBInterface
 	/**
 	* Fetch row as associative array from result set
 	*
-	* @param	object	result set
+	* @param	mixed	result set
 	*/
 	function fetchAssoc($a_set)
 	{

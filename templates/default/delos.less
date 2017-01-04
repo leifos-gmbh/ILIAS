@@ -17,6 +17,7 @@ In theory, you should also invert shadow... but i think we could postpone this t
 All parts that aren't checked yet are actually marked with "rtl-review"
 */
 
+
 @bsbase: "../../Services/UICore/lib/bootstrap-3.2.0/less/";
 
 // This part should be a copy of the less/bootstrap.less file
@@ -30,7 +31,7 @@ All parts that aren't checked yet are actually marked with "rtl-review"
 
 // Reset and dependencies
 @import "@{bsbase}normalize.less";
-@import "@{bsbase}print.less";
+//@import "@{bsbase}print.less";
 @import "@{bsbase}glyphicons.less";
 
 // Core CSS
@@ -83,6 +84,10 @@ All parts that aren't checked yet are actually marked with "rtl-review"
 @import "@{uibase}Deck/deck.less";
 
 @import "less/variables.less";             // customized
+
+.bg-primary {
+  color: white;
+}
 
 /* RTL review overwrite some specifics [bootstrap] styles
  *
@@ -226,7 +231,7 @@ span.ilAlert {
 }
 
 .btn-group.open .dropdown-toggle {
-	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05) inset;
+    .box-shadow(inset 0 1px 1px rgba(0, 0, 0, 0.05));
 }
 
 .dropdown-header {
@@ -238,6 +243,7 @@ span.ilAlert {
 	width: 22px;
 	height: 22px;
 	margin: 0 3px 0 0;
+	display: @il-nav-icons;
 }
 
 // must be like dropdown-menu img
@@ -281,16 +287,16 @@ body{
 }
 
 div#minheight {
-	height:180px;
-	clear:both;
+	height: 180px;
+	clear: both;
 	}
 
 div.ilFrame {
-	margin-top:-40px;
-	margin-left:auto;
-	margin-right:auto;
-	max-width:1200px;
-	box-shadow: 0 0 40px #808080;
+	margin-top: -40px;
+	margin-left: auto;
+	margin-right: auto;
+	max-width: 1200px;
+    .box-shadow(0 0 40px #808080);
 	padding-top: 129px;
 	background-color: #f9f9f9;
 	min-height: 100%;
@@ -335,7 +341,7 @@ div.ilFrame {
 	border-right: 3px solid lighten(@mid-gray, 33%);
 	z-index: 100;
 	position: fixed;
-	top: @il-fixed-menu-height;
+	top: @il-header-height;
 
 	@media only screen and (max-width: 640px) {width: 100%;}
 }
@@ -388,6 +394,7 @@ ul, ol, p {
 
 ol, ul { 
 	padding-left: 40px;
+    list-style-image: none;//mantis #19613: stop the inheritance for nested list until specifically setted
 }
 [dir="rtl"] ol, [dir="rtl"] ul {
 	padding-right: 40px;
@@ -441,7 +448,7 @@ a {
 }
 
 a:hover {
-	color: #000;
+	color: @link-hover-color;
 	text-decoration: underline;
 }
 
@@ -481,15 +488,15 @@ code {
 
 
 @media print {
-  h1, h2, h3, h4, h5, h6 { 
+   h1, h2, h3, h4, h5, h6 { 
 	page-break-after: avoid;
   }
   
   ul, ol, dl { 
 	page-break-before: avoid;
-  }
+  } 
 }
-
+  
 /* --------------------------------------------------------------
    SPECIAL STYLES
 -------------------------------------------------------------- */
@@ -499,7 +506,7 @@ body#tinymce, body.mceContentBody {
 }
 
 body#tinymce {
-	background-color: #ffffff;
+	background-color: white;
 }
 
 .ilHidden {
@@ -580,11 +587,11 @@ div.ilFrame {
 }
 
 .ilFixedTopSpacer {
-	padding-top: @il-fixed-menu-height;
+	padding-top: @il-header-height;
 }
 
 .ilFixedTopSpacerBarOnly {
-	padding-top: @il-fixed-menu-height-bar-only;
+	padding-top: @il-top-bar-height;
 }
 
 div#mainspacekeeper {
@@ -624,15 +631,15 @@ input.fullwidth, textarea.fullwidth {
 }
 
 div.input {
-	border: 1px solid #E0E0E0;
+	border: 1px solid #e0e0e0;
 	padding: 3px;
 	text-decoration: none;
 	font-size: 90%;
-	background-color: #FFF;
+	background-color: white;
 	overflow: auto;
 }
 div.input:focus {
-	border-color: #A0B0FF;
+	border-color: #a0b0ff;
 }
 input[type=text].numeric {
 	text-align: right;
@@ -669,22 +676,22 @@ div.ilAdminRow {
 
 table.std {
 	color: #222;
-	background-color: #BBB;
+	background-color: #bbb;
 	border-spacing: 0;
 	border-collapse: collapse;
-	border: 1px solid #9EADBA;
+	border: 1px solid #9eadba;
 }
 
 
 .fullwidth_invisible {
 	color: #222;
-	background-color: #FFF;
+	background-color: white;
 	width: 100%;
 	border-spacing: 0;
 }
 
 table.nobackground {
-	color: #000;
+	color: black;
 	background-color: inherit;
 	border-spacing: 0;
 	padding: 3px;
@@ -695,7 +702,7 @@ table.nobackground {
   clear: both;
   margin: 0 -10px 0 0;
   padding-top: 5px;
-  /* border-top: 1px dotted #C0C0C0; */
+  /* border-top: 1px dotted #c0c0c0; */
 }
 
 [dir="rtl"] .subitem {
@@ -704,7 +711,7 @@ table.nobackground {
 }
   
 td.nobackground {
-	color: #000;
+	color: black;
 	background-color: inherit;
 	border-spacing: 0;
 	border: none;
@@ -717,11 +724,11 @@ td.nobackground {
 }
 
 tr.tbltitle {
-	border-bottom: 1px solid #9EADBA;
+	border-bottom: 1px solid #9eadba;
 }
 
 tr.std {
-	background-color: #FFF;
+	background-color: white;
 	color: #222;
 	padding: 3px;
 }
@@ -743,13 +750,13 @@ td.std, th.std {
 }
 
 th.option, td.option {
-	background-color: #F5F5F5;
+	background-color: #f5f5f5;
 	color: #222;
 	padding: 3px;
 	font-weight : bold;
 	vertical-align: top;
 	text-align: right;
-	border-top: 1px solid #9EADBA;
+	border-top: 1px solid #9eadba;
 }
 
 [dir="rtl"] th.option, [dir="rtl"] td.option {
@@ -757,21 +764,21 @@ th.option, td.option {
 }
 
 td.sub_option {
-	background-color: #FFF;
+	background-color: white;
 	color: #222;
 	padding: 3px;
 	font-weight : bold;
 	vertical-align: top;
-	border-top: 1px solid #9EADBA;
+	border-top: 1px solid #9eadba;
 }
 
 td.option_value {
-	background: none #FFF;
+	background: none white;
 	color: #222;
 	padding: 3px;
 	vertical-align: top;
 	text-align: left;
-	border-top: 1px solid #9EADBA;
+	border-top: 1px solid #9eadba;
 }
 
 [dir="rtl"] td.option_value {
@@ -779,16 +786,16 @@ td.option_value {
 }
 
 td.option_value_center {
-	background: none #FFF;
+	background: none white;
 	color: #222;
 	padding: 3px;
 	vertical-align: top;
 	text-align: center;
-	border-top: 1px solid #9EADBA;
+	border-top: 1px solid #9eadba;
 }
 
 td.option_desc, p.option_desc {
-	background: none #FFF;
+	background: none white;
 	color: #222;
 	padding: 3px;
 	font-style: italic;
@@ -802,7 +809,7 @@ td.option_desc, p.option_desc {
 }
 
 td.boxed {
-	border: 1px solid #000;
+	border: 1px solid black;
 }
 
 /*Link, Visited, Hover, Focus, Activ*/
@@ -887,7 +894,7 @@ a.il_ItemProperty:link, a.il_ItemProperty:visited {
 }
 
 a.il_ItemProperty:hover {
-	color: #000;
+	color: black;
 }
 
 span.il_ItemAlertProperty {
@@ -1220,11 +1227,11 @@ div.Access {
 /* ----------------- normal links ------------- */
 a.light:link, a.light:visited {
 	text-decoration: none;
-	color: #35B;
+	color: #35b;
 }
 
 a.light:hover {
-	color: #000;
+	color: black;
 }
 
 /* Messages */
@@ -1268,7 +1275,7 @@ div#bot_center_area {
 	position: fixed;
 	padding: 5px;
 	background-color: @body-bg;
-	border-top: 3px solid #E9E9E9;
+	border-top: 3px solid #e9e9e9;
 	-webkit-overflow-scrolling: touch; /* Bug 11209 */ 
 	overflow: auto; /* Bug 11209 */
 }
@@ -1299,7 +1306,7 @@ div#bot_center_area_drag {
 }
 
 div#bot_center_area_drag:hover {
-	background: none #FA9;
+	background: none #fa9;
 }
 
 
@@ -1349,11 +1356,11 @@ div.ilRightPanel {
 
 /* Overlays, Blocks */
 .ilOverlay {
-	background-color: #FFF;
-	border: 1px solid #D6D6D6;
+	background-color: white;
+	border: 1px solid #d6d6d6;
 	text-align: left;
 	position: absolute;
-	box-shadow: 2px 2px 4px #C0C0C0;
+    .box-shadow(2px 2px 4px #c0c0c0);
 }
 
 [dir="rtl"] .ilOverlay {
@@ -1423,7 +1430,7 @@ div.ilHeaderBanner img.ilHeaderImg {
 
 div.ilBox {
 	background: url("@{background-images-path}FramedBack.png") repeat-x;
-	border: 1px solid #E0E0E0;
+	border: 1px solid #e0e0e0;
 	padding: 10px;
 	margin-bottom: 20px;
 }
@@ -1470,7 +1477,7 @@ div.ilTopBarRight td.il_adv_sel {
 }
 
 div.ilSideBarHead{
-	background-color: #F0F0F0;
+	background-color: #f0f0f0;
 	margin-bottom: 5px;
 	padding: 5px;
 }
@@ -1493,9 +1500,9 @@ div.ilSideBarContent{
 	display: block;
 	float: left;
 	background-color: white;
-	border: 1px solid #E0E0E0;
+	border: 1px solid #e0e0e0;
 	font-size: 90%;
-	box-shadow: 2px 2px 4px #C0C0C0; 
+    .box-shadow(2px 2px 4px #c0c0c0);
 }
 
 [dir="rtl"] .ui-menu {
@@ -1534,7 +1541,7 @@ div.ilSideBarContent{
 .ui-menu .ui-menu-more {
 	display: block;
 	zoom: 1;
-	color: #03A;
+	color: #03a;
 	cursor: pointer;
 	float: left;
 	clear: left;
@@ -1568,11 +1575,11 @@ div.ilSideBarContent{
 	padding: 2px 4px;
 	line-height: 1.5;
 	zoom: 1;
-	color: #03A;
+	color: #03a;
 }
 .ui-menu .ui-menu-item a.ui-state-hover,
 .ui-menu .ui-menu-item a.ui-state-active {
-	background-color: #FF9;
+	background-color: #ff9;
 }
 
 /* Icon Default */
@@ -1688,15 +1695,11 @@ img[src$="icon_checked.svg"] {
 	text-align: center;
 }
 
-//mantis #0017943
 div.ilNewObjectSelector {
 	display: inline-block;
-    float: right;
     margin-bottom: 8px;
     padding: 0 10px;
-    ~ div {
-        clear: right;
-    }
+    width: 100%;
     > .btn-group {
         display: block;
         width: 100%;
@@ -1710,7 +1713,6 @@ div.ilNewObjectSelector {
 }
 
 [dir="rtl"] div.ilNewObjectSelector {
-	float: left;
     > .btn-group {
         #ilAdvSelListAnchorText_asl {
             float: left;
@@ -1825,8 +1827,9 @@ table.mceToolbar {
    Google recommending 640px: https://developers.google.com/webmasters/smartphone-sites/details
    
    */
+
 @media
-	only screen and (max-width: @screen-sm-min)
+	only screen and (max-width: @grid-float-breakpoint-max)
 {
 	html {
 		-webkit-text-size-adjust: none;
@@ -1947,41 +1950,125 @@ table.mceToolbar {
 
 /* print css */
 @media print {
+    //bootstrap print.less
+    * {
+        text-shadow: none !important;
+        color: black !important; // Black prints faster: h5bp.com/s
+        background: transparent !important;
+        box-shadow: none !important;
+    }
 
+    a,
+    a:visited {
+        text-decoration: underline;
+    }
+
+    a[href]:after {
+        content: " (" attr(href) ")";
+    }
+
+    abbr[title]:after {
+        content: " (" attr(title) ")";
+    }
+
+    // Don't show links for images, or javascript/internal links
+    a[href^="javascript:"]:after,
+    a[href^="#"]:after {
+        content: "";
+    }
+
+    pre,
+    blockquote {
+        border: 1px solid #999;
+        page-break-inside: avoid;
+    }
+
+    thead {
+        display: table-header-group; // h5bp.com/t
+    }
+
+    tr,
+    img {
+        page-break-inside: avoid;
+    }
+
+    img {
+        max-width: 100% !important;
+    }
+
+    p,
+    h2,
+    h3 {
+        orphans: 3;
+        widows: 3;
+    }
+
+    h2,
+    h3 {
+        page-break-after: avoid;
+    }
+
+    // Chrome (OSX) fix for https://github.com/twbs/bootstrap/issues/11245
+    // Once fixed, we can just straight up remove this.
+    select {
+        background: white !important;
+    }
+
+    // Bootstrap components
+    .navbar {
+        display: none;
+    }
+    .table {
+        td,
+        th {
+            background-color: white !important;
+        }
+    }
+    .btn,
+    .dropup > .btn {
+        > .caret {
+            border-top-color: black !important;
+        }
+    }
+    .label {
+        border: 1px solid black;
+    }
+
+    .table {
+        border-collapse: collapse !important;
+    }
+    .table-bordered {
+        th,
+        td {
+            border: 1px solid #ddd !important;
+        }
+    }
+
+    //i also duplicate the selectors  untill the class hidden-print is used
+    #ilTopBar,
+    .osdNotificationContainer,
+    .ilMainHeader,
+    .ilMainMenu,
+    .ilTreeView,
+    .btn,
+    #ilTab,
+    #ilSubTab,
+    #minheight,
+    #ilFooter {
+        display: none;
+    }
+    #mainspacekeeper {
+        padding: 0;
+    }
+    .ilLeftNavSpace {
+        margin-left: 0 !important;
+    }
 	div.ilTabContentOuter {
 		border: none;
-		box-shadow: none;
-	}
-
-	div.ilTabsTable {
-		display: block; 
-		width: auto;
 	}
 	
-	div.ilTabsTableRow {
-		display: block;
-	}
-	
-	div.ilTabsTableCell {
-		display: block;
-	}
-	
-	div.ilContentFixed {
-		left: 0;
-		position: static;
-	}
-	
-	[dir="rtl"] div.ilContentFixed {
-		left: auto;
-		right: 0;
-	}
-
 	div.ilFileDropTargetOverlay {
 		display: none;
-	}
-
-	.ilTreeView {
-		//display: none;
 	}
 
 	// overwrite bootstrap href printing
@@ -1989,4 +2076,4 @@ table.mceToolbar {
 		content: "";
 	}
 }
-
+ 

@@ -365,7 +365,9 @@ class ilDclRecordEditGUI {
 		$confirmation = new ilConfirmationGUI();
 		$confirmation->setFormAction($this->ctrl->getFormAction($this));
 		$header_text = $this->lng->txt('dcl_confirm_storing_records');
-		if(!$permission && !ilObjDataCollectionAccess::hasEditAccess($this->parent_obj->ref_id)) {
+		if(!$permission && !ilObjDataCollectionAccess::hasEditAccess($this->parent_obj->ref_id)
+			&& !$this->table->getEditByOwner() && !$this->table->getEditPerm())
+		{
 			$header_text .= " ".$this->lng->txt('dcl_confirm_storing_records_no_permission');
 		}
 		$confirmation->setHeaderText($header_text);
@@ -449,15 +451,7 @@ class ilDclRecordEditGUI {
 		//Check if we can create this record.
 		foreach ($all_fields as $field) {
 			try {
-				if ($field->hasProperty(ilDclBaseFieldModel::PROP_URL)) {
-					$value = array(
-						'link' => $this->form->getInput("field_" . $field->getId()),
-						'title' => $this->form->getInput("field_" . $field->getId() . "_title")
-					);
-				} else {
-					$value = $this->form->getInput("field_" . $field->getId());
-				}
-				$field->checkValidity($value, $this->record_id);
+				$field->checkValidityFromForm($this->form, $this->record_id);
 			} catch (ilDclInputException $e) {
 				$valid = false;
 				$item = $this->form->getItemByPostVar('field_'.$field->getId());
@@ -571,7 +565,7 @@ class ilDclRecordEditGUI {
 				$dispatchEventData['prev_record'] = $unchanged_obj;
 			}
 
-			$record_obj->doUpdate();
+			$record_obj->doUpdate($create_mode);
 
 			$ilAppEventHandler->raise('Modules/DataCollection',
 				$dispatchEvent.'Record',

@@ -43,11 +43,29 @@ class ilDclTextFieldModel extends ilDclBaseFieldModel {
 
 
 	/**
+	 * @param ilPropertyFormGUI $form
+	 * @param null              $record_id
+	 */
+	public function checkValidityFromForm(ilPropertyFormGUI &$form, $record_id = NULL) {
+		$has_url_property = $this->getProperty(ilDclBaseFieldModel::PROP_URL);
+		if ($has_url_property) {
+			$values = array(
+				'link' => $form->getInput("field_" . $this->getId()),
+				'title' => $form->getInput("field_" . $this->getId() . "_title")
+			);
+			$this->checkValidityOfURLField($values, $record_id);
+		} else {
+			parent::checkValidityFromForm($form, $record_id);
+		}
+	}
+
+
+	/**
 	 * @inheritdoc
 	 */
 	public function checkValidity($value, $record_id = NULL) {
-		$has_url_properties = $this->getProperty(ilDclBaseFieldModel::PROP_URL);
-		if ($has_url_properties) {
+		$has_url_property = $this->getProperty(ilDclBaseFieldModel::PROP_URL);
+		if ($has_url_property) {
 			return $this->checkValidityOfURLField($value, $record_id);
 		}
 
@@ -191,5 +209,29 @@ class ilDclTextFieldModel extends ilDclBaseFieldModel {
 			default:
 				return strlen($value);
 		}
+	}
+
+	public function fillHeaderExcel(ilExcel $worksheet, &$row, &$col) {
+		parent::fillHeaderExcel($worksheet, $row, $col);
+		if ($this->getProperty(ilDclBaseFieldModel::PROP_URL)) {
+			$worksheet->setCell($row, $col, $this->getTitle() . '_title');
+			$col++;
+		}
+	}
+
+	/**
+	 * @param array $titles
+	 * @param array $import_fields
+	 */
+	public function checkTitlesForImport(array &$titles, array &$import_fields) {
+		foreach ($titles as $k => $title) {
+			if ($title == $this->getTitle()) {
+				$import_fields[$k] = $this;
+				if ($this->hasProperty(ilDclBaseFieldModel::PROP_URL) && $titles[$k+1] == $this->getTitle().'_title') {
+					unset($titles[$k+1]);
+				}
+			}
+		}
+
 	}
 }

@@ -202,7 +202,7 @@ class ilObjExercise extends ilObject
 			"show_submissions" => array("integer", (int) $this->getShowSubmissions()),
 			'compl_by_submission' => array('integer', (int)$this->isCompletionBySubmissionEnabled()),
 			"certificate_visibility" => array("integer", (int)$this->getCertificateVisibility()),
-			"tfeedback" => array("integer", $this->getTutorFeedback())
+			"tfeedback" => array("integer", (int)$this->getTutorFeedback())
 			));
 		return true;
 	}
@@ -214,12 +214,12 @@ class ilObjExercise extends ilObject
 	 * @param int target ref_id
 	 * @param int copy id
 	 */
-	public function cloneObject($a_target_id,$a_copy_id = 0)
+	public function cloneObject($a_target_id,$a_copy_id = 0, $a_omit_tree = false)
 	{
 		global $ilDB;
 		
 		// Copy settings
-	 	$new_obj = parent::cloneObject($a_target_id,$a_copy_id);
+	 	$new_obj = parent::cloneObject($a_target_id,$a_copy_id, $a_omit_tree);
 	 	$new_obj->setInstruction($this->getInstruction());
 	 	$new_obj->setTimestamp($this->getTimestamp());
 	 	$new_obj->setPassMode($this->getPassMode());

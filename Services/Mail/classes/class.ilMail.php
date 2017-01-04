@@ -696,9 +696,10 @@ class ilMail
 	/**
 	 * @param string $a_message
 	 * @param int $a_user_id
+	 * @param boolean $replace_empty
 	 * @return string
 	 */
-	protected function replacePlaceholders($a_message, $a_user_id = 0)
+	protected function replacePlaceholders($a_message, $a_user_id = 0, $replace_empty = true)
 	{
 		try
 		{
@@ -716,11 +717,10 @@ class ilMail
 			}
 
 			$user = $a_user_id > 0 ? self::getCachedUserInstance($a_user_id) : null;
-			foreach($context->getPlaceholders() as $key => $ph_definition)
-			{
-				$result    = $context->resolvePlaceholder($key, ilMailFormCall::getContextParameters(), $user);
-				$a_message = str_replace('[' . $ph_definition['placeholder'] . ']', $result, $a_message);
-			}
+
+			require_once 'Services/Mail/classes/class.ilMailTemplatePlaceholderResolver.php';
+			$processor = new ilMailTemplatePlaceholderResolver($context, $a_message);
+			$a_message = $processor->resolve($user, ilMailFormCall::getContextParameters(), $replace_empty);
 		}
 		catch(Exception $e)
 		{
@@ -753,6 +753,10 @@ class ilMail
 		if(!$a_use_placeholders)
 		{
 			$rcp_ids = $this->getUserIds(trim($a_rcp_to) . ',' . trim($a_rcp_cc) . ',' . trim($a_rcp_bcc));
+
+			ilLoggerFactory::getLogger('mail')->debug(sprintf(
+				"Parsed TO/CC/BCC user ids from given recipients: " . implode(', ', $rcp_ids)
+			));
 
 			$as_email = array();
 
@@ -822,6 +826,13 @@ class ilMail
 			$rcp_ids_replace    = $this->getUserIds(trim($a_rcp_to));
 			$rcp_ids_no_replace = $this->getUserIds(trim($a_rcp_cc).','.trim($a_rcp_bcc));
 
+			ilLoggerFactory::getLogger('mail')->debug(sprintf(
+				"Parsed TO user ids from given recipients for serial letter notification: " . implode(', ', $rcp_ids_replace)
+			));
+			ilLoggerFactory::getLogger('mail')->debug(sprintf(
+				"Parsed CC/BCC user ids from given recipients for serial letter notification: " . implode(', ', $rcp_ids_no_replace)
+			));
+
 			$as_email = array();
 
 			foreach($rcp_ids_replace as $id)
@@ -856,7 +867,7 @@ class ilMail
 
 				$mail_id = $this->sendInternalMail(
 					$inbox_id, $this->user_id, $a_attachments, $a_rcp_to, $a_rcp_cc, '',
-					'unread', $a_type, 0, $a_subject, $a_message, $id, 1
+					'unread', $a_type, 0, $a_subject, $a_message, $id, 0
 				);
 
 				if($a_attachments)
@@ -874,6 +885,8 @@ class ilMail
 			}
 
 			$as_email = array();
+
+			$cc_and_bcc_message = $this->replacePlaceholders($a_message, 0, false);
 
 			foreach($rcp_ids_no_replace as $id)
 			{
@@ -907,7 +920,7 @@ class ilMail
 
 				$mail_id = $this->sendInternalMail(
 					$inbox_id, $this->user_id, $a_attachments, $a_rcp_to, $a_rcp_cc, '',
-					'unread', $a_type, 0, $a_subject, $a_message, $id, 0
+					'unread', $a_type, 0, $a_subject, $cc_and_bcc_message, $id, 0
 				);
 
 				if($a_attachments)
@@ -918,7 +931,7 @@ class ilMail
 
 			if(count($as_email))
 			{
-				$this->sendMimeMail('', '', implode(',', $as_email), $a_subject, $a_message, $a_attachments);
+				$this->sendMimeMail('', '', implode(',', $as_email), $a_subject, $cc_and_bcc_message, $a_attachments);
 			}
 		}
 
@@ -1095,6 +1108,14 @@ class ilMail
 		 */
 		global $rbacsystem;
 
+		ilLoggerFactory::getLogger('mail')->debug(sprintf(
+			"New mail system task:" .
+			" To: " . $a_rcp_to .
+			" | CC: " . $a_rcp_cc .
+			" | BCC: " . $a_rcp_bc .
+			" | Subject: " . $a_m_subject
+		));
+
 		$this->mail_to_global_roles = true;
 		if($this->user_id != ANONYMOUS_USER_ID)
 		{
@@ -1163,15 +1184,33 @@ class ilMail
 
 		if($c_emails)
 		{
+			$externalMailRecipientsTo = $this->getEmailRecipients($rcp_to);
+			$externalMailRecipientsCc = $this->getEmailRecipients($rcp_cc);
+			$externalMailRecipientsBcc = $this->getEmailRecipients($rcp_bc);
+
+			ilLoggerFactory::getLogger('mail')->debug(sprintf(
+				"Parsed external mail addresses from given recipients:" .
+				" To: " . $externalMailRecipientsTo .
+				" | CC: " . $externalMailRecipientsCc .
+				" | BCC: " . $externalMailRecipientsBcc .
+				" | Subject: " . $a_m_subject
+			));
+
 			$this->sendMimeMail(
-				$this->getEmailRecipients($rcp_to),
-				$this->getEmailRecipients($rcp_cc),
-				$this->getEmailRecipients($rcp_bc),
+				$externalMailRecipientsTo,
+				$externalMailRecipientsCc,
+				$externalMailRecipientsBcc,
 				$a_m_subject,
 				$a_use_placeholders ? $this->replacePlaceholders($a_m_message) : $a_m_message,
 				$a_attachment,
 				0
 			);
+		}
+		else
+		{
+			ilLoggerFactory::getLogger('mail')->debug(sprintf(
+				"No external mail addresses given in recipient string"
+			));
 		}
 
 		if(in_array('system', $a_type) && !$this->distributeMail($rcp_to, $rcp_cc, $rcp_bc, $a_m_subject, $a_m_message, $a_attachment, $sent_id, $a_type, 'system', $a_use_placeholders))
@@ -1304,7 +1343,7 @@ class ilMail
 		{
 			require_once 'Services/WebServices/SOAP/classes/class.ilSoapClient.php';
 			$soap_client = new ilSoapClient();
-			$soap_client->setResponseTimeout(1);
+			$soap_client->setResponseTimeout(5);
 			$soap_client->enableWSDL(true);
 			$soap_client->init();
 
@@ -1389,16 +1428,34 @@ class ilMail
 	}
 
 	/**
-	 * Explode recipient string, allowed seperators are ',' ';' ' '
+	 * Explode recipient string, allowed separators are ',' ';' ' '
 	 * Returns an array with recipient ilMailAddress instances
-	 * @param string $a_addresses
+	 * @param string $addresses
 	 * @return ilMailAddress[] An array with objects of type ilMailAddress
 	 */
-	protected function parseAddresses($a_addresses)
+	protected function parseAddresses($addresses)
 	{
+		if(strlen($addresses) > 0)
+		{
+			ilLoggerFactory::getLogger('mail')->debug(sprintf(
+				"Started parsing of recipient string: %s", $addresses
+			));
+		}
+
 		require_once 'Services/Mail/classes/Address/Parser/class.ilMailRfc822AddressParserFactory.php';
-		$parser = ilMailRfc822AddressParserFactory::getParser($a_addresses);
-		return $parser->parse();
+		$parser = ilMailRfc822AddressParserFactory::getParser($addresses);
+		$parsedAddresses = $parser->parse();
+
+		if(strlen($addresses) > 0)
+		{
+			ilLoggerFactory::getLogger('mail')->debug(sprintf(
+				"Parsed addresses: %s", implode(',', array_map(function(ilMailAddress $address) {
+					return $address->getMailbox() . '@' . $address->getHost();
+				}, $parsedAddresses))
+			));
+		}
+
+		return $parsedAddresses;
 	}
 
 	/**

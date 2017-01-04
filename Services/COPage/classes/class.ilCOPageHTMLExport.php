@@ -17,10 +17,18 @@ class ilCOPageHTMLExport
 	private $content_style_id = 0;
 
 	/**
+	 * @var ilLogger
+	 */
+	protected $log;
+
+	/**
 	 * Initialisation
 	 */
 	function __construct($a_exp_dir)
 	{
+
+		$this->log = ilLoggerFactory::getLogger('copg');
+
 		$this->exp_dir = $a_exp_dir;
 		$this->mobs_dir = $a_exp_dir."/mobs";
 		$this->files_dir = $a_exp_dir."/files";
@@ -92,6 +100,9 @@ class ilCOPageHTMLExport
 	 */
 	function exportStyles()
 	{
+
+		$this->log->debug("export styles");
+
 		include_once "Services/Style/Content/classes/class.ilObjStyleSheet.php";
 		
 		// export content style sheet
@@ -126,12 +137,15 @@ class ilCOPageHTMLExport
 	/**
 	 * Export support scripts
 	 *
+	 * @todo: use ilPageContent js/css functions here (problem: currently they need a page object for init)
+	 *
 	 * @param
 	 * @return
 	 */
 	function exportSupportScripts()
 	{
-		
+		$this->log->debug("export scripts");
+
 		// basic js
 		copy('./Services/JavaScript/js/Basic.js', $this->js_dir.'/Basic.js');
 		
@@ -157,6 +171,20 @@ class ilCOPageHTMLExport
 			$this->css_dir.'/container.css');
 		
 		// accordion
+		include_once("./Services/Accordion/classes/class.ilAccordionGUI.php");
+		foreach (ilAccordionGUI::getLocalJavascriptFiles() as $f)
+		{
+			$tfile = $this->exp_dir."/".$f;
+			ilUtil::makeDirParents(dirname($tfile));
+			copy($f, $tfile);
+		}
+		foreach (ilAccordionGUI::getLocalCssFiles() as $f)
+		{
+			$tfile = $this->exp_dir."/".$f;
+			ilUtil::makeDirParents(dirname($tfile));
+			copy($f, $tfile);
+		}
+
 		copy('./Services/Accordion/js/accordion.js',
 			$this->js_dir.'/accordion.js');
 		copy('./Services/Accordion/css/accordion.css',
@@ -210,6 +238,8 @@ class ilCOPageHTMLExport
 	function getPreparedMainTemplate($a_tpl = "")
 	{
 		global $ilUser;
+
+		$this->log->debug("get main template");
 		
 		include_once("./Services/MediaObjects/classes/class.ilPlayerUtil.php");
 		
@@ -225,9 +255,9 @@ class ilCOPageHTMLExport
 		
 		// scripts needed
 		$scripts = array("./js/yahoo/yahoo-min.js", "./js/yahoo/yahoo-dom-event.js",
-			"./js/yahoo/animation-min.js", "./js/yahoo/container-min.js",
-			"./js/Basic.js", "./js/jquery.js", "./js/jquery-ui-min.js",
-			"./js/ilOverlay.js", "./js/accordion.js", "./js/ilCOPagePres.js",
+			"./js/yahoo/animation-min.js", "./js/yahoo/container-min.js", "./js/jquery.js",
+			"./js/Basic.js", "./js/jquery-ui-min.js",
+			"./js/ilOverlay.js", "./js/ilCOPagePres.js",
 			"./js/ilTooltip.js", "./js/maphilight.js", "./js/ilMatchingQuestion.js",
 			"./js/ilExtLink.js", "./js/linkify.js");
 		$scripts = array_merge($scripts, ilPlayerUtil::getJsFilePaths());
@@ -239,6 +269,13 @@ class ilCOPageHTMLExport
 			$scripts[] = $mathJaxSetting->get("path_to_mathjax");
 		}
 
+		// accordion
+		include_once("./Services/Accordion/classes/class.ilAccordionGUI.php");
+		foreach (ilAccordionGUI::getLocalJavascriptFiles() as $f)
+		{
+			$scripts[] = $f;
+		}
+
 		foreach ($scripts as $script)
 		{
 			$tpl->setCurrentBlock("js_file");
@@ -248,9 +285,17 @@ class ilCOPageHTMLExport
 
 		// css files needed
 		$style_name = $ilUser->prefs["style"].".css";
-		$css_files = array("./css/accordion.css", "./css/container.css",
+		$css_files = array("./css/container.css",
 			"./content_style/content.css", "./style/".$style_name, "./css/test_javascript.css");
 		$css_files = array_merge($css_files, ilPlayerUtil::getCssFilePaths());
+
+		// accordion
+		include_once("./Services/Accordion/classes/class.ilAccordionGUI.php");
+		foreach (ilAccordionGUI::getLocalCssFiles() as $f)
+		{
+			$css_files[] = $f;
+		}
+
 
 		foreach ($css_files as $css)
 		{
@@ -270,6 +315,8 @@ class ilCOPageHTMLExport
 	 */
 	function collectPageElements($a_type, $a_id)
 	{
+		$this->log->debug("collect page elements");
+
 		// collect media objects
 		$pg_mobs = ilObjMediaObject::_getMobsOfObject($a_type, $a_id);
 		foreach($pg_mobs as $pg_mob)
@@ -407,6 +454,8 @@ class ilCOPageHTMLExport
 	 */
 	function exportPageElements($a_update_callback = null)
 	{
+		$this->log->debug("export page elements");
+
 		$total = count($this->mobs) + count($this->files) + count($this->files_direct);
 		$cnt = 0;
 
@@ -462,6 +511,8 @@ class ilCOPageHTMLExport
 	function exportHTMLMOB($a_mob_id, &$a_linked_mobs)
 	{
 		global $tpl;
+
+		$this->log->debug("export html mobs");
 
 		$source_dir = ilUtil::getWebspaceDir()."/mobs/mm_".$a_mob_id;
 		if (@is_dir($source_dir))

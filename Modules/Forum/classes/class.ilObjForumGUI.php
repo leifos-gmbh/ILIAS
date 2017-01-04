@@ -215,7 +215,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling
 	{
 		return in_array(
 			strtolower($this->ctrl->getCmd()),
-			array_map('strtolower', array('createToLevelPost', 'quoteTopLevelPost', 'saveTopLevelPost'))
+			array_map('strtolower', array('createTopLevelPost', 'quoteTopLevelPost', 'saveTopLevelPost'))
 		);
 	}
 
@@ -239,7 +239,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling
 			'performPostActivation', 
 			'askForPostActivation', 'askForPostDeactivation',
 			'toggleThreadNotification', 'toggleThreadNotificationTab',
-			'toggleStickiness', 'cancelPost', 'savePost', 'saveTopLevelPost', 'createToLevelPost', 'quoteTopLevelPost', 'quotePost', 'getQuotationHTMLAsynch',
+			'toggleStickiness', 'cancelPost', 'savePost', 'saveTopLevelPost', 'createTopLevelPost', 'quoteTopLevelPost', 'quotePost', 'getQuotationHTMLAsynch',
 			'autosaveDraftAsync', 'autosaveThreadDraftAsync',
 			'saveAsDraft', 'editDraft', 'updateDraft', 'deliverDraftZipFile', 'deliverZipFile', 'cancelDraft',
 			'publishThreadDraft', 'deleteThreadDrafts'
@@ -2129,11 +2129,11 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling
 
 		if($_GET['action'] == 'showreply' || $_GET['action'] == 'ready_showreply' || $_GET['action'] == 'showdraft' || $_GET['action'] == 'editdraft')
 		{
-			$oPostGUI->setRTESupport($ilUser->getId(), 'frm~', 'frm_post', 'tpl.tinymce_frm_post.html', false, '3.4.7');
+			$oPostGUI->setRTESupport($ilUser->getId(), 'frm~', 'frm_post', 'tpl.tinymce_frm_post.html', false, '3.5.11');
 		}
 		else
 		{
-			$oPostGUI->setRTESupport($this->objCurrentPost->getId(), 'frm', 'frm_post', 'tpl.tinymce_frm_post.html', false, '3.4.7');
+			$oPostGUI->setRTESupport($this->objCurrentPost->getId(), 'frm', 'frm_post', 'tpl.tinymce_frm_post.html', false, '3.5.11');
 		}
 		// purifier
 		require_once 'Services/Html/classes/class.ilHtmlPurifierFactory.php';
@@ -2263,9 +2263,8 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling
 				}
 			}
 			
-			if(!$this->isTopLevelReplyCommand() 
-				&& !$ilUser->isAnonymous() 
-				&& $_GET['action'] == 'editdraft' || $_GET['action'] == 'showreply' || $_GET['action'] == 'ready_showreply'
+			if(!$ilUser->isAnonymous() 
+				&& ($_GET['action'] == 'editdraft' || $_GET['action'] == 'showreply' || $_GET['action'] == 'ready_showreply')
 				&& ilForumPostDraft::isSavePostDraftAllowed()
 			)
 			{
@@ -2277,7 +2276,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling
 				if($_GET['action'] == 'editdraft')
 				{
 					$this->replyEditForm->addCommandButton('updateDraft', $this->lng->txt('save_message'));
-		}
+				}
 				else
 				{
 					$this->replyEditForm->addCommandButton('saveAsDraft', $this->lng->txt('save_message'));	
@@ -2306,7 +2305,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling
 	/**
 	 * 
 	 */
-	public function createToLevelPostObject()
+	public function createTopLevelPostObject()
 	{
 		global $ilUser;
 		
@@ -2461,6 +2460,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling
 				$oFDForumDrafts = new ilFileDataForumDrafts($this->object->getId(), $draft_obj->getDraftId());
 				
 				$oFDForumDrafts->moveFilesOfDraft($oFDForum->getForumPath(), $newPost);
+				$oFDForumDrafts->delete();
 			}
 			
 			if(ilForumPostDraft::isSavePostDraftAllowed())
@@ -2629,7 +2629,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling
 				$this->object->markPostRead($ilUser->getId(), (int) $this->objCurrentTopic->getId(), (int) $this->objCurrentPost->getId());
 
 				// copy temporary media objects (frm~)
-				ilForumUtil::moveMediaObjects($oReplyEditForm->getInput('message'), 'frm~:html', $ilUser->getId(), 'frm~:html', $ilUser->getId());
+				ilForumUtil::moveMediaObjects($oReplyEditForm->getInput('message'), 'frm~:html', $ilUser->getId(), 'frm:html', $ilUser->getId());
 
 				if($this->objProperties->isFileUploadAllowed())
 				{
@@ -3034,7 +3034,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling
 		}
 		else
 		{
-			$orderField = 'frm_posts_tree.fpt_date';
+			$orderField = 'frm_posts.pos_date';
 			$this->objCurrentTopic->setOrderDirection(
 				in_array($this->objProperties->getDefaultView(), array(ilForumProperties::VIEW_DATE_ASC, ilForumProperties::VIEW_TREE))
 				? 'ASC' : 'DESC'
@@ -3189,7 +3189,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling
 				$this->ctrl->setParameter($this, 'offset', (int)$_GET['offset']);
 				$this->ctrl->setParameter($this, 'orderby', $_GET['orderby']);
 
-				$reply_button->setUrl($this->ctrl->getLinkTarget($this, 'createToLevelPost', 'frm_page_bottom'));
+				$reply_button->setUrl($this->ctrl->getLinkTarget($this, 'createTopLevelPost', 'frm_page_bottom'));
 
 				$this->ctrl->clearParameters($this);
 				array_unshift($bottom_toolbar_split_button_items, $reply_button);
@@ -3469,7 +3469,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling
 			$first_node = $this->objCurrentTopic->getFirstPostNode();
 			if(
 				$first_node instanceof ilForumPost &&
-				in_array($this->ctrl->getCmd(), array('createToLevelPost', 'saveTopLevelPost', 'quoteTopLevelPost')) &&
+				in_array($this->ctrl->getCmd(), array('createTopLevelPost', 'saveTopLevelPost', 'quoteTopLevelPost')) &&
 				!$this->objCurrentTopic->isClosed() &&
 				$ilAccess->checkAccess('add_reply', '', (int)$_GET['ref_id']))
 			{
@@ -4031,7 +4031,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling
 		$post_gui->removePlugin('advlink');
 		$post_gui->usePurifier(true);
 		$post_gui->setRTERootBlockElement('');
-		$post_gui->setRTESupport($ilUser->getId(), 'frm~', 'frm_post', 'tpl.tinymce_frm_post.html', false, '3.4.7');
+		$post_gui->setRTESupport($ilUser->getId(), 'frm~', 'frm_post', 'tpl.tinymce_frm_post.html', false, '3.5.11');
 		$post_gui->disableButtons(array(
 			'charmap',
 			'undo',
@@ -5544,7 +5544,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling
 				$tbl = new ilForumTopicTableGUI($this, 'mergeThreads', '', (int)$_GET['ref_id'], $topicData, $this->is_moderator, $this->forum_overview_setting);
 				$tbl->setSelectedThread($selected_thread_obj);
 				$tbl->setMapper($frm)->fetchData();
-				$tbl->populate();
+				$tbl->init();
 				$this->tpl->setVariable('THREADS_TABLE', $tbl->getHTML());
 			}
 			else

@@ -573,9 +573,9 @@ class ilTestInfoScreenToolbarGUI extends ilToolbarGUI
 						if ($this->getTestOBJ()->getHighscoreEnabled())
 						{
 							// Can also compare results then
-							$btn = ilSubmitButton::getInstance();
+							$btn = ilLinkButton::getInstance();
 							$btn->setCaption('tst_show_toplist');
-							$btn->setCommand('outResultsToplist');
+							$btn->setUrl($this->buildLinkTarget('ilTestToplistGUI', 'outResultsToplist'));
 							$btn->setPrimary(false);
 							$this->addButtonInstance($btn);
 						}
@@ -598,9 +598,9 @@ class ilTestInfoScreenToolbarGUI extends ilToolbarGUI
 			{
 				if ($this->getTestOBJ()->canShowSolutionPrintview($this->getTestSession()->getUserId()))
 				{
-					$btn = ilSubmitButton::getInstance();
+					$btn = ilLinkButton::getInstance();
 					$btn->setCaption('tst_list_of_answers_show');
-					$btn->setCommand('outUserListOfAnswerPasses');
+					$btn->setUrl($this->buildLinkTarget('ilTestEvaluationGUI',  'outUserListOfAnswerPasses'));
 					$btn->setPrimary(false);
 					$this->addButtonInstance($btn);
 				}

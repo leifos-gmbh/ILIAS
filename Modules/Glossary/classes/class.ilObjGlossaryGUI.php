@@ -81,6 +81,11 @@ class ilObjGlossaryGUI extends ilObjectGUI
 	protected $term_perm;
 
 	/**
+	 * @var ilLogger
+	 */
+	protected $log;
+
+	/**
 	* Constructor
 	* @access	public
 	*/
@@ -97,6 +102,9 @@ class ilObjGlossaryGUI extends ilObjectGUI
 		$this->access = $DIC->access();
 		$this->rbacsystem = $DIC->rbac()->system();
 		$this->help = $DIC["ilHelp"];
+
+		$this->log = ilLoggerFactory::getLogger('glo');
+
 		include_once("./Modules/Glossary/classes/class.ilGlossaryTermPermission.php");
 		$this->term_perm = ilGlossaryTermPermission::getInstance();
 
@@ -141,6 +149,8 @@ class ilObjGlossaryGUI extends ilObjectGUI
 		$cmd = $this->ctrl->getCmd();
 		$next_class = $this->ctrl->getNextClass($this);
 
+		$this->log->debug("glossary term, next class ".$next_class.", cmd: ".$cmd);
+
 		switch ($next_class)
 		{
 			case 'ilobjectmetadatagui';
@@ -160,7 +170,8 @@ class ilObjGlossaryGUI extends ilObjectGUI
 			case "ilglossarytermgui":
 				if (!$this->term_perm->checkPermission("write", $this->term_id))
 				{
-					return;
+					include_once("./Modules/Glossary/exceptions/class.ilGlossaryException.php");
+					throw new ilGlossaryException("No permission.");
 				}
 				$this->getTemplate();
 //				$this->quickList();
@@ -480,9 +491,11 @@ class ilObjGlossaryGUI extends ilObjectGUI
 	 * @param
 	 * @return
 	 */
-	function addUsagesToInfo($info, $glo_id)
+	static function addUsagesToInfo($info, $glo_id)
 	{
-		$info->addSection($this->lng->txt("glo_usages"));
+		global $lng, $ilAccess;
+
+		$info->addSection($lng->txt("glo_usages"));
 		include_once("./Modules/ScormAicc/classes/class.ilObjSAHSLearningModule.php");
 		$sms = ilObjSAHSLearningModule::getScormModulesForGlossary($glo_id);
 		foreach ($sms as $sm)
@@ -493,7 +506,7 @@ class ilObjGlossaryGUI extends ilObjectGUI
 			{
 				if ($link === false)
 				{
-					if ($this->access->checkAccess("write", "", $ref))
+					if ($ilAccess->checkAccess("write", "", $ref))
 					{
 						include_once("./Services/Link/classes/class.ilLink.php");
 						$link = ilLink::_getLink($ref,'sahs');
@@ -507,7 +520,7 @@ class ilObjGlossaryGUI extends ilObjectGUI
 				$entry = "<a href='".$link."' target='_top'>".$entry."</a>";
 			}
 			
-			$info->addProperty($this->lng->txt("obj_sahs"), $entry);
+			$info->addProperty($lng->txt("obj_sahs"), $entry);
 		}
 	}
 	

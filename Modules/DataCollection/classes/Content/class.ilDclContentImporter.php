@@ -190,19 +190,16 @@ class ilDclContentImporter
 		$import_fields = array();
 		foreach ($fields as $field) {
 			if ($this->checkImportType($field)) {
-				foreach ($titles as $key => $value) {
-					if ($value == $field->getTitle()) {
-						$import_fields[$key] = $field;
-						if ($field->hasProperty(ilDclBaseFieldModel::PROP_URL) && $titles[$key+1] == $field->getTitle().'_title') {
-							unset($titles[$key+1]);
-						}
-					}
-				}
+				// the fields will add themselves to $import_fields if their title is in $titles
+				$field->checkTitlesForImport($titles, $import_fields);
 			}
 		}
 
 		foreach ($titles as $key => $value) {
-			if (!isset($import_fields[$key])) {
+			$std_field_titles = ilDclStandardField::_getAllStandardFieldTitles();
+			if (in_array($value, $std_field_titles)) {
+				$this->warnings[] = "(1, " . ilDataCollectionImporter::getExcelCharForInteger($key) . ") \"" . $value . "\" " . $this->lng->txt("dcl_std_field_not_importable");
+			} else if (!isset($import_fields[$key])) {
 				$this->warnings[] = "(1, " . ilDataCollectionImporter::getExcelCharForInteger($key+1) . ") \"" . $value . "\" " . $this->lng->txt("dcl_row_not_found");
 			}
 		}

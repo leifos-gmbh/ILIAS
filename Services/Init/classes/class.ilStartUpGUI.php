@@ -450,6 +450,13 @@ class ilStartUpGUI
 		return $form;
 	}
 	
+	/**
+	 * @todo has to be refactored.
+	 * @global ilLanguage $lng
+	 * @global type $ilAuth
+	 * @global type $ilCtrl
+	 * @return boolean
+	 */
 	protected function processCode()
 	{
 		global $lng, $ilAuth, $ilCtrl;
@@ -516,8 +523,10 @@ class ilStartUpGUI
 					ilAccountCode::applyAccessLimits($user, $code);
 
 					$user->update();
-
+					
 					$ilCtrl->setParameter($this, "cu", 1);
+					$GLOBALS['DIC']->language()->loadLanguageModule('auth');
+					ilUtil::sendSuccess($GLOBALS['DIC']->language()->txt('auth_activation_code_success'),true);
 					$ilCtrl->redirect($this, "showLoginPage");		
 				}
 			}
@@ -607,6 +616,59 @@ class ilStartUpGUI
 
 		return $form;
 	}
+	
+	/**
+	 * Trying shibboleth authentication
+	 */
+	protected function doShibbolethAuthentication()
+	{
+		$this->getLogger()->debug('Trying shibboleth authentication');
+		
+		include_once './Services/AuthShibboleth/classes/class.ilAuthFrontendCredentialsShibboleth.php';
+		$credentials = new ilAuthFrontendCredentialsShibboleth();
+		$credentials->initFromRequest();
+		
+		include_once './Services/Authentication/classes/Provider/class.ilAuthProviderFactory.php';
+		$provider_factory = new ilAuthProviderFactory();
+		$provider = $provider_factory->getProviderByAuthMode($credentials, AUTH_SHIBBOLETH);
+		
+		include_once './Services/Authentication/classes/class.ilAuthStatus.php';
+		$status = ilAuthStatus::getInstance();
+		
+		include_once './Services/Authentication/classes/Frontend/class.ilAuthFrontendFactory.php';
+		$frontend_factory = new ilAuthFrontendFactory();
+		$frontend_factory->setContext(ilAuthFrontendFactory::CONTEXT_STANDARD_FORM);
+		$frontend = $frontend_factory->getFrontend(
+			$GLOBALS['DIC']['ilAuthSession'],
+			$status,
+			$credentials,
+			array($provider)
+		);
+			
+		$frontend->authenticate();
+		
+		switch($status->getStatus())
+		{
+			case ilAuthStatus::STATUS_AUTHENTICATED:
+				ilLoggerFactory::getLogger('auth')->debug('Authentication successful; Redirecting to starting page.');
+				include_once './Services/Init/classes/class.ilInitialisation.php';
+				ilInitialisation::redirectToStartingPage();
+				return;
+					
+			case ilAuthStatus::STATUS_ACCOUNT_MIGRATION_REQUIRED:
+				return $GLOBALS['ilCtrl']->redirect($this, 'showAccountMigration');
+
+			case ilAuthStatus::STATUS_AUTHENTICATION_FAILED:
+				ilUtil::sendFailure($GLOBALS['lng']->txt($status->getReason()),true);
+				$GLOBALS['ilCtrl']->redirect($this, 'showLoginPage');
+				return false;
+		}
+		
+		ilUtil::sendFailure($this->lng->txt('err_wrong_login'));
+		$this->showLoginPage();
+		return false;
+	}
+	
 	
 	/**
 	 * Try apache auth
@@ -715,6 +777,9 @@ class ilStartUpGUI
 					ilInitialisation::redirectToStartingPage();
 					return;
 					
+				case ilAuthStatus::STATUS_CODE_ACTIVATION_REQUIRED:
+					return $this->showCodeForm(ilObjUser::_lookupLogin($status->getAuthenticatedUserId()));
+
 				case ilAuthStatus::STATUS_ACCOUNT_MIGRATION_REQUIRED:
 					return $GLOBALS['ilCtrl']->redirect($this, 'showAccountMigration');
 
@@ -1550,9 +1615,8 @@ class ilStartUpGUI
 		$tpl = new ilTemplate("tpl.main.html", true, true);
 		$tpl->setAddFooter(false); // no client yet
 
-		// to do: get standard style
 		$tpl->setVariable("PAGETITLE", $lng->txt("clientlist_clientlist"));
-		$tpl->setVariable("LOCATION_STYLESHEET","./templates/default/delos.css");
+        $tpl->setVariable("LOCATION_STYLESHEET", ilUtil::getStyleSheetLocation());
 
 		// load client list template
 		self::initStartUpTemplate("tpl.client_list.html");	
@@ -2011,7 +2075,13 @@ class ilStartUpGUI
 			{
 				$lng = new ilLanguage($usr_lang);
 			}
-			
+
+			$target = $oUser->getPref('reg_target');
+			if(strlen($target) > 0)
+			{
+				$_GET['target'] = $target;
+			}
+
 			// send email
 			// try individual account mail in user administration
 			include_once("Services/Mail/classes/class.ilAccountMail.php");

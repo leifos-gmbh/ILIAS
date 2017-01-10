@@ -283,23 +283,27 @@ class ilObjSurvey extends ilObject
 	*/
 	function delete()
 	{
+		if ($this->countReferences() == 1)
+		{
+			$this->deleteMetaData();
+
+			// Delete all survey questions, constraints and materials
+			foreach ($this->questions as $question_id)
+			{
+				$this->removeQuestion($question_id);
+			}
+			$this->deleteSurveyRecord();
+
+			ilUtil::delDir($this->getImportDirectory());
+		}
+
 		$remove = parent::delete();
+
 		// always call parent delete function first!!
 		if (!$remove)
 		{
 			return false;
 		}
-
-		$this->deleteMetaData();
-
-		// Delete all survey questions, constraints and materials
-		foreach ($this->questions as $question_id)
-		{
-			$this->removeQuestion($question_id);
-		}
-		$this->deleteSurveyRecord();
-		
-		ilUtil::delDir($this->getImportDirectory());
 		return true;
 	}
 	
@@ -6455,8 +6459,8 @@ class ilObjSurvey extends ilObject
 			}			
 		}
 	}
-	
-	protected function getNotificationTargetUserIds($a_use_invited)
+
+	public function getNotificationTargetUserIds($a_use_invited)
 	{
 		global $tree;
 		

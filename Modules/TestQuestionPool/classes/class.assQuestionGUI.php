@@ -31,7 +31,7 @@ abstract class assQuestionGUI
 	*
 	* A reference to the matching question object
 	*
-	* @var object
+	* @var assQuestion
 	*/
 	var $object;
 
@@ -1145,6 +1145,24 @@ abstract class assQuestionGUI
 		return $tags;
 	}
 	
+	/**
+	 * fetches solutions from database and prefers intermediate solutions,
+	 * but falls back to authorized solutions. without any solution null is returned.
+	 * 
+	 * @return bool|null
+	 */
+	private function isLastSolutionSubmitAuthorized($active_id, $pass)
+	{
+		$userSolution = $this->object->getUserSolutionPreferingIntermediate($active_id, $pass);
+		
+		if( count($userSolution) )
+		{
+			$solutionRow = current($userSolution);
+			return (bool)$solutionRow['authorized'];
+		}
+		 
+		return null;
+	}
 	
 	/**
 	* Returns the answer generic feedback depending on the results of the question
@@ -1182,7 +1200,8 @@ abstract class assQuestionGUI
 		$incorrect_feedback = $this->object->feedbackOBJ->getGenericFeedbackTestPresentation($this->object->getId(), false);
 		if (strlen($correct_feedback.$incorrect_feedback))
 		{
-			$reached_points = $this->object->calculateReachedPoints($active_id, $pass);
+			$useAuthorizedSolution = $this->isLastSolutionSubmitAuthorized($active_id, $pass);
+			$reached_points = $this->object->calculateReachedPoints($active_id, $pass, (bool)$useAuthorizedSolution);
 			$max_points = $this->object->getMaximumPoints();
 			if ($reached_points == $max_points)
 			{
@@ -1389,8 +1408,11 @@ abstract class assQuestionGUI
 			}
 			else if (strcmp($solution_array["type"], "text") == 0)
 			{
+				$solutionContent = $solution_array['value'];
+				$solutionContent = $this->object->fixSvgToPng($solutionContent);
+				$solutionContent = $this->object->fixUnavailableSkinImageSources($solutionContent);
 				$question = new ilTextAreaInputGUI($this->lng->txt("solutionText"), "solutiontext");
-				$question->setValue($this->object->prepareTextareaOutput($solution_array["value"]));
+				$question->setValue($this->object->prepareTextareaOutput($solutionContent));
 				$question->setRequired(TRUE);
 				$question->setRows(10);
 				$question->setCols(80);

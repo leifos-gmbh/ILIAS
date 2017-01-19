@@ -3267,7 +3267,7 @@ common#:#lang_path#:#ruta del idioma
 common#:#lang_refresh_confirm_info#:#El mantenimiento extendido de idiomas está actualmente activado. Actualizar los idiomas carga todos los datos de idioma desde los Archivo de idioma de ILIAS en la base de datos. Los cambios locales (en la base de datos) serán sobreescritos, si no se exportan antes. Esto no afecta a los Archivos "*.lang.local" en el directorio de personalización.
 common#:#lang_refresh_confirm#:#¿Realmente quiere actualizar todos los idiomas?
 common#:#lang_refresh_confirm_selected#:#¿Está seguro que desea actualizar los idiomas seleccionados?
-common#:#lang_sep_decimal#:#0
+common#:#lang_sep_decimal#:#.
 common#:#lang_sep_thousand#:#.
 common#:#lang_size_bytes#:#bytes
 common#:#lang_size_gb#:#GB
@@ -16223,3 +16223,5 @@ survey#:#msg_input_only_positive_numbers#:#Por favor, introduzca sólo valores p
 crs#:#crs_loc_err_stat_tst_offline#:#Algunos tests no están on-line###12 10 2016 new variable
 itgr#:#itgr_desc_info#:#La descripción no formará parte de la presentación del grupo de objetos en este contenedor###12 10 2016 new variable
 dcl#:#dcl_std_field_not_importable#:# - Los campos estándar no se pueden importar###25 10 2016 new variable
+rbac#:#edit_members#:#Manage members###22 12 2016 new variable
+rbac#:#prg_manage_members#:#Manage members of Study Programme###22 12 2016 new variable

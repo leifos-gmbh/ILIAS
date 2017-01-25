@@ -508,7 +508,7 @@ class ilUserImportParser extends ilSaxParser
 				$this->style = "";
 				$this->personalPicture = null;
 				$this->userCount++;
-				$this->userObj = new ilObjUser(ilObjUser::_lookupId($a_attribs["Id"]));
+				$this->userObj = new ilObjUser();
 
 				// user defined fields
 				$this->udf_data = array();
@@ -549,13 +549,26 @@ class ilUserImportParser extends ilSaxParser
 			case "AuthMode":
 				if (array_key_exists("type", $a_attribs))
 				{
-					// begin-patch ldap_multiple
-					// cast to int
-					switch ((int) $a_attribs["type"])
+					switch ($a_attribs["type"])
 					{
 						case "default":
 						case "local":
 						case "ldap":
+							
+							if(strcmp('ldap', $a_attribs['type']) === 0)
+							{
+								// no server id provided => use default server
+								include_once './Services/LDAP/classes/class.ilLDAPServer.php';
+								$list = ilLDAPServer::_getActiveServerList();
+								if(count($list) == 1)
+								{
+									$this->auth_mode_set = true;
+									$ldap_id = current($list);
+									$this->userObj->setAuthMode('ldap_'.$ldap_id);
+								}
+							}
+							break;
+							
 						case "radius":
 						case "shibboleth":
 						case "script":
@@ -642,7 +655,7 @@ class ilUserImportParser extends ilSaxParser
 
 			case "User":
 				$this->userCount++;
-				$this->userObj = new ilObjUser(ilObjUser::_lookupId($a_attribs["Id"]));
+				$this->userObj = new ilObjUser();
 				$this->userObj->setLanguage($a_attribs["Language"]);
 				$this->userObj->setImportId($a_attribs["Id"]);
 				$this->currentPrefKey = null;
@@ -680,11 +693,26 @@ class ilUserImportParser extends ilSaxParser
 			case "AuthMode":
 				if (array_key_exists("type", $a_attribs))
 				{
-					switch ($a_attribs["type"])
+					switch($a_attribs["type"])
 					{
 						case "default":
 						case "local":
 						case "ldap":
+							
+							if(strcmp('ldap', $a_attribs['type']) === 0)
+							{
+								// no server id provided
+								include_once './Services/LDAP/classes/class.ilLDAPServer.php';
+								$list = ilLDAPServer::_getActiveServerList();
+								if(count($list) != 1)
+								{
+									$this->logFailure(
+										$this->userObj->getImportId(), 
+										sprintf($lng->txt("usrimport_xml_attribute_value_illegal"),"AuthMode","type",$a_attribs['type']));
+								}
+							}
+							break;
+							
 						case "radius":
 						case "shibboleth":
 						case "script":
@@ -1098,13 +1126,6 @@ class ilUserImportParser extends ilSaxParser
 										$this->userObj->setPasswordSalt($this->currPasswordSalt);
 										break;
 
-									case "MD5":
-									case "ILIAS3":
-										$this->userObj->setPasswd($this->currPassword, IL_PASSWD_CRYPTED);
-										$this->userObj->setPasswordEncodingType('md5');
-										$this->userObj->setPasswordSalt('');
-										break;
-
 									case "PLAIN":
 										$this->userObj->setPasswd($this->currPassword, IL_PASSWD_PLAIN);
 										$this->acc_mail->setUserPassword($this->currPassword);
@@ -1250,13 +1271,6 @@ class ilUserImportParser extends ilSaxParser
 										$updateUser->setPasswd($this->currPassword, IL_PASSWD_CRYPTED);
 										$updateUser->setPasswordEncodingType('bcrypt');
 										$updateUser->setPasswordSalt($this->currPasswordSalt);
-										break;
-
-									case "MD5":
-									case "ILIAS3":
-										$updateUser->setPasswd($this->currPassword, IL_PASSWD_CRYPTED);
-										$updateUser->setPasswordEncodingType('md5');
-										$updateUser->setPasswordSalt('');
 										break;
 
 									case "PLAIN":
@@ -1846,13 +1860,6 @@ class ilUserImportParser extends ilSaxParser
 						$this->userObj->setPasswd($this->cdata, IL_PASSWD_CRYPTED);
 						$this->userObj->setPasswordEncodingType('bcrypt');
 						$this->userObj->setPasswordSalt($this->currPasswordSalt);
-						break;
-
-					case "MD5":
-					case "ILIAS3":
-						$this->userObj->setPasswd($this->cdata, IL_PASSWD_CRYPTED);
-						$this->userObj->setPasswordEncodingType('md5');
-						$this->userObj->setPasswordSalt('');
 						break;
 
 					case "PLAIN":

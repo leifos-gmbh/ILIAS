@@ -124,7 +124,7 @@ class ilBuddyListTest extends PHPUnit_Framework_TestCase
 
 		$repo = $this->getMockBuilder('ilBuddySystemRelationRepository')->disableOriginalConstructor()->getMock();
 		$repo->expects($this->once())->method('getAll')->willReturn($relations);
-		$repo->expects($this->exactly(5))->method('save')->with($expected_relation);
+		$repo->expects($this->exactly(3))->method('save')->with($expected_relation);
 
 		$buddylist = ilBuddyList::getInstanceByUserId(self::BUDDY_LIST_OWNER_ID);
 		$buddylist->reset();
@@ -134,8 +134,75 @@ class ilBuddyListTest extends PHPUnit_Framework_TestCase
 		$buddylist->request($relation);
 		$buddylist->unlink($relation);
 		$buddylist->request($relation);
+	}
+
+	/**
+	 * @expectedException ilBuddySystemException
+	 */
+	public function testRelationRequestCannotBeApprovedByTheRelationOwner()
+	{
+		$this->assertException(ilBuddySystemException::class);
+		$expected_relation = new ilBuddySystemRelation(new ilBuddySystemUnlinkedRelationState());
+		$expected_relation->setUserId(self::BUDDY_LIST_OWNER_ID);
+		$expected_relation->setBuddyUserId(self::BUDDY_LIST_BUDDY_ID);
+
+		$relations = array(
+			$expected_relation->getBuddyUserId() => $expected_relation
+		);
+
+		$db = $this->getMockBuilder('ilDBInterface')->getMock();
+		$db->expects($this->once())->method('queryF');
+		$db->expects($this->once())->method('fetchAssoc')->will($this->returnValue(array(
+			'login' => 'phpunit'
+		)));
+		$this->setGlobalVariable('ilDB', $db);
+
+		$repo = $this->getMockBuilder('ilBuddySystemRelationRepository')->disableOriginalConstructor()->getMock();
+		$repo->expects($this->once())->method('getAll')->willReturn($relations);
+		$repo->expects($this->exactly(1))->method('save')->with($expected_relation);
+
+		$buddylist = ilBuddyList::getInstanceByUserId(self::BUDDY_LIST_OWNER_ID);
+		$buddylist->reset();
+		$buddylist->setRepository($repo);
+
+		$relation = $buddylist->getRelationByUserId($expected_relation->getBuddyUserId());
+		$buddylist->request($relation);
 		$buddylist->link($relation);
-		$buddylist->unlink($relation);
+	}
+
+	/**
+	 *
+	 */
+	public function testRelationRequestCanBeApprovedByTheRelationTarget()
+	{
+		$expected_relation = new ilBuddySystemRelation(new ilBuddySystemUnlinkedRelationState());
+		$expected_relation->setUserId(self::BUDDY_LIST_OWNER_ID);
+		$expected_relation->setBuddyUserId(self::BUDDY_LIST_BUDDY_ID);
+
+		$relations = array(
+			$expected_relation->getBuddyUserId() => $expected_relation
+		);
+
+		$db = $this->getMockBuilder('ilDBInterface')->getMock();
+		$db->expects($this->any())->method('queryF');
+		$db->expects($this->any())->method('fetchAssoc')->will($this->returnValue(array(
+			'login' => 'phpunit'
+		)));
+		$this->setGlobalVariable('ilDB', $db);
+
+		$repo = $this->getMockBuilder('ilBuddySystemRelationRepository')->disableOriginalConstructor()->getMock();
+		$repo->expects($this->any())->method('getAll')->willReturn($relations);
+		$repo->expects($this->any())->method('save')->with($expected_relation);
+
+		$buddylist = ilBuddyList::getInstanceByUserId(self::BUDDY_LIST_OWNER_ID);
+		$buddylist->reset();
+		$buddylist->setRepository($repo);
+		$buddylist->request($expected_relation);
+
+		$other_buddylist = ilBuddyList::getInstanceByUserId(self::BUDDY_LIST_BUDDY_ID);
+		$other_buddylist->reset();
+		$other_buddylist->setRepository($repo);
+		$other_buddylist->link($expected_relation);
 	}
 
 	/**
@@ -379,5 +446,116 @@ class ilBuddyListTest extends PHPUnit_Framework_TestCase
 		$buddylist = ilBuddyList::getInstanceByUserId(self::BUDDY_LIST_OWNER_ID);
 		$buddylist->reset();
 		$buddylist->getRelationByUserId("phpunit");
+	}
+
+	final private function setPriorRelationState(ilBuddySystemRelation $relation, ilBuddySystemRelationState $state)
+	{
+		$object = new ReflectionObject($relation);
+		$property = $object->getProperty('prior_state');
+		$property->setAccessible(true);
+
+		$property->setValue($relation, $state);
+	}
+	
+	/**
+	 * @expectedException ilBuddySystemRelationStateAlreadyGivenException
+	 */
+	public function testAlreadyGivenStateExceptionIsThrownWhenALinkedRelationShouldBeMarkedAsLinked()
+	{
+		$buddylist = ilBuddyList::getInstanceByUserId(self::BUDDY_LIST_OWNER_ID);
+		$buddylist->reset();
+
+		$state = new ilBuddySystemLinkedRelationState();
+
+		$relation = new ilBuddySystemRelation($state);
+		$relation->setUserId(self::BUDDY_LIST_OWNER_ID);
+		$relation->setBuddyUserId(self::BUDDY_LIST_BUDDY_ID);
+
+		$this->setPriorRelationState($relation, $state);
+
+		$buddylist->link($relation);
+	}
+
+	/**
+	 * @expectedException ilBuddySystemRelationStateAlreadyGivenException
+	 */
+	public function testAlreadyGivenStateExceptionIsThrownWhenAnIgnoredRelationShouldBeMarkedAsIgnored()
+	{
+		$buddylist = ilBuddyList::getInstanceByUserId(self::BUDDY_LIST_OWNER_ID);
+		$buddylist->reset();
+
+		$state = new ilBuddySystemIgnoredRequestRelationState();
+
+		$relation = new ilBuddySystemRelation($state);
+		$relation->setUserId(self::BUDDY_LIST_BUDDY_ID);
+		$relation->setBuddyUserId(self::BUDDY_LIST_OWNER_ID);
+
+		$this->setPriorRelationState($relation, $state);
+
+		$buddylist->ignore($relation);
+	}
+
+	/**
+	 * @expectedException ilBuddySystemRelationStateAlreadyGivenException
+	 */
+	public function testAlreadyGivenStateExceptionIsThrownWhenAnUnlinkedRelationShouldBeMarkedAsUnlinked()
+	{
+		$buddylist = ilBuddyList::getInstanceByUserId(self::BUDDY_LIST_OWNER_ID);
+		$buddylist->reset();
+
+		$state = new ilBuddySystemUnlinkedRelationState();
+
+		$relation = new ilBuddySystemRelation($state);
+		$relation->setUserId(self::BUDDY_LIST_OWNER_ID);
+		$relation->setBuddyUserId(self::BUDDY_LIST_BUDDY_ID);
+
+		$this->setPriorRelationState($relation, $state);
+
+		$buddylist->unlink($relation);
+	}
+
+	/**
+	 * @expectedException ilBuddySystemRelationStateAlreadyGivenException
+	 */
+	public function testAlreadyGivenStateExceptionIsThrownWhenARequestedRelationShouldBeMarkedAsRequested()
+	{
+		$buddylist = ilBuddyList::getInstanceByUserId(self::BUDDY_LIST_OWNER_ID);
+		$buddylist->reset();
+
+		$state = new ilBuddySystemRequestedRelationState();
+
+		$relation = new ilBuddySystemRelation($state);
+		$relation->setUserId(self::BUDDY_LIST_BUDDY_ID);
+		$relation->setBuddyUserId(self::BUDDY_LIST_OWNER_ID);
+
+		$this->setPriorRelationState($relation, $state);
+
+		$db = $this->getMockBuilder('ilDBInterface')->getMock();
+		$db->expects($this->any())->method('fetchAssoc')->will($this->returnValue(array(
+			'login' => 'phpunit'
+		)));
+		$GLOBALS['ilDB'] = $db;
+
+		$buddylist->request($relation);
+	}
+
+	/**
+	 * @expectedException ilBuddySystemRelationStateTransitionException
+	 */
+	public function testStateTransitionExceptionIsThrownWhenALinkedRelationShouldBeMarkedAsIgnored()
+	{
+		$this->assertException(ilBuddySystemRelationStateTransitionException::class);
+		$buddylist = ilBuddyList::getInstanceByUserId(self::BUDDY_LIST_OWNER_ID);
+		$buddylist->reset();
+
+		$state = new ilBuddySystemLinkedRelationState();
+
+		$relation = new ilBuddySystemRelation($state);
+		$relation->setUserId(self::BUDDY_LIST_OWNER_ID);
+		$relation->setBuddyUserId(self::BUDDY_LIST_BUDDY_ID);
+
+		$this->setPriorRelationState($relation, $state);
+
+		$buddylist->ignore($relation);
 	}
 }

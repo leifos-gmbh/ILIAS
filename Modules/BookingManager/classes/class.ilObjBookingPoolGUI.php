@@ -313,6 +313,19 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 				$this->ctrl->getLinkTargetByClass("ilpermissiongui", "perm"));
 		}
 	}
+	
+	protected function setHelpId($a_id)
+	{
+		global $ilHelp; 
+		
+		$object_subtype = ($this->object->getScheduleType() == ilObjBookingPool::TYPE_FIX_SCHEDULE)
+			? '-schedule'
+			: '-nonschedule';
+		
+		$ilHelp->setScreenIdComponent('book');
+		$ilHelp->setScreenId('object'.$object_subtype);
+		$ilHelp->setSubScreenId($a_id);
+	}
 
 	/**
 	 * First step in booking process
@@ -323,6 +336,8 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 		
 		$this->tabs_gui->clearTargets();
 		$this->tabs_gui->setBackTarget($this->lng->txt('book_back_to_list'), $this->ctrl->getLinkTarget($this, 'render'));
+		
+		$this->setHelpId("book");
 
 		include_once 'Modules/BookingManager/classes/class.ilBookingObject.php';
 		$obj = new ilBookingObject((int)$_GET['object_id']);
@@ -731,6 +746,8 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 	 */
 	function confirmedBookingObject()
 	{				
+		global $ilUser;
+		
 		include_once 'Modules/BookingManager/classes/class.ilBookingObject.php';
 		include_once 'Modules/BookingManager/classes/class.ilBookingReservation.php';		
 		
@@ -744,7 +761,8 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 				$object_id = $_POST['object_id'];
 				if($object_id)
 				{
-					if(ilBookingReservation::isObjectAvailableNoSchedule($object_id))				
+					if(ilBookingReservation::isObjectAvailableNoSchedule($object_id) &&
+						!ilBookingReservation::getObjectReservationForUser($object_id, $ilUser->getId())) // #18304				
 					{
 						$rsv_ids[] = $this->processBooking($object_id);						
 						$success = $object_id;	
@@ -1473,6 +1491,8 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 		$this->tabs_gui->clearTargets();
 		$this->tabs_gui->setBackTarget($lng->txt("back"),
 			$ilCtrl->getLinkTarget($this, "log"));
+		
+		$this->setHelpId("cancel_booking");	
 			
 		include_once 'Services/Utilities/classes/class.ilConfirmationGUI.php';
 		$conf = new ilConfirmationGUI();

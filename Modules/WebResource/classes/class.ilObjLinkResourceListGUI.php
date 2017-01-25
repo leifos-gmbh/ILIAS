@@ -93,27 +93,20 @@ class ilObjLinkResourceListGUI extends ilObjectListGUI
 	* @return	string		command target frame
 	*/
 	function getCommandFrame($a_cmd)
-	{
-		// #16820
-		return;
-		
-		switch($a_cmd)
-		{
-			case "":
-				if(ilObjLinkResourceAccess::_checkDirectLink($this->obj_id))
-				{
-					$frame = '_blank';
-				}
-				else
-				{
-					$frame = ilFrameTargetInfo::_getFrame("RepositoryContent");
-				}
-				break;
-
-			default:
-		}
-
-		return $frame;
+	{		
+		// #16820 / #18419 / #18622
+		if($a_cmd == "" &&
+			ilObjLinkResourceAccess::_checkDirectLink($this->obj_id))
+		{			
+			$link = ilObjLinkResourceAccess::_getFirstLink($this->obj_id);
+			
+			include_once "Services/Form/classes/class.ilFormPropertyGUI.php";
+			include_once "Services/Form/classes/class.ilLinkInputGUI.php";								
+			if(!ilLinkInputGUI::isInternalLink($link["target"]))			
+			{		
+				return '_blank';
+			}						
+		}			
 	}
 			
 

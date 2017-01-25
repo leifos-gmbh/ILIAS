@@ -718,7 +718,6 @@ assessment#:#tst_answer_sheet#:#答题卡
 assessment#:#tst_answered_questions#:#已经回答题目
 assessment#:#tst_answered_questions_test#:#这个测试中已回答的题目
 assessment#:#tst_best_solution_is#:#最佳方案是
-assessment#:#tst_browse_for_questions#:#浏览题目
 assessment#:#tst_change_points_for_question#:#Change the Points for the Answer改变此回答所对应的分数
 assessment#:#tst_confirm_delete_results#:#您即将删除所有您之前输入的这次测试的答案。这将重置所有题目为缺省值。请注意，您不能重置重试的次数，为这次测试您已经重置一次了。您确信要重置所有您之前输入的答案？
 assessment#:#tst_confirm_delete_results_info#:#您之前输入的答案已被删除。您成功重置了此次测试！
@@ -3442,7 +3441,6 @@ common#:#refuse#:#拒绝
 common#:#reg_account_confirmation_successful#:#您的账号已经激活。
 common#:#reg_mail_body_2_confirmation#:#The link will only be good for %s, after that you will have to try again from the beginning.
 common#:#reg_mail_body_3_confirmation#:#如果这封邮件对您毫无意义，它有可能是其他人有意或无意的输入了您的电子邮件地址，因此请忽略此邮件。
-common#:#reg_mail_body_confirmation#:#要激活您的账号并确认这个邮件地址的所有权，请点击下面的链接：
 common#:#reg_mail_body_forgot_password_info#:#取得您的密码，请使用登录屏幕上的“忘记了密码？”功能为这个账号请求一个新密码。
 common#:#reg_mail_body_salutation#:#Hello
 common#:#reg_mail_body_text1#:#欢迎来到ILIAS学习！
@@ -4547,7 +4545,6 @@ content#:#cont_lk_term_new#:#术语表中的术语（新框架）
 content#:#cont_lm_default_layout#:#学习模块的默认布局
 content#:#cont_lm_menu#:#菜单
 content#:#cont_lm_properties#:#学习模块属性
-content#:#cont_LocalFile#:#本地文件
 content#:#cont_location#:#位置
 content#:#cont_lrs_settings#:#设置 
 content#:#cont_lvalue#:#数据元素 
@@ -11907,8 +11904,6 @@ pdesk#:#bookmark_moved_ok#:#书签已被移动
 wsp#:#wsp_tab_ownership#:#我的知识库对象
 user#:#user_ownership#:#知识库对象
 registration#:#registration_code_role_info#:#如果您使用一个注册码，角色选择可能被这个注册码取代。
-mail#:#mail_system_sender_name#:#发件人姓名
-mail#:#mail_system_sender_name_info#:#请输入一个名字。这个名字将用于自动生成消息(内部和外部)。如果您将这个字段留空，ILIAS使用这个安装的短标题。如果标题没有很好的定义，“ILIAS”被作为发送者。
 content#:#cont_current_term#:#当前学期(Current Term)
 assessment#:#tst_setting_offer_hints_label#:#题目指定提示
 assessment#:#tst_setting_offer_hints_info#:#如果启用，已有题目指定提示将被提供。
@@ -14099,7 +14094,6 @@ content#:#cont_edit_definitions#:#Edit Definitions###10 02 2014 new variable
 content#:#cont_edit_definition#:#Edit Definition###10 02 2014 new variable
 payment#:#pay_unpayed_bill#:#Please wire the open balance to the given bank account.###14 02 2014 new variable
 meta#:#meta_c_XK#:#Kosovo###11 03 2014 new variable
-certificate#:#certificate_var_matriculation#:#12345###11 03 2014 new variable
 certificate#:#certificate_ph_matriculation#:#Matriculation number of the user###11 03 2014 new variable
 survey#:#mailparticipantdata_placeholder#:#The following placeholders will be replaced with real user data in personalized surveys:###11 03 2014 new variable
 exc#:#exc_create_portfolio_no_template#:#Do not use template###11 03 2014 new variable
@@ -16177,3 +16171,54 @@ style#:#sty_ha_ihcap_class#:#Hor. Accordion Caption###01 03 2016 new variable
 style#:#sty_va_iheada_class#:#Vert. Accordion Header (active)###01 03 2016 new variable
 style#:#sty_va_ihcap_class#:#Vert. Accordion Caption###01 03 2016 new variable
 exc#:#exc_delete_team#:#Delete Team###10 03 2016 new variable
+mail#:#mail_send_html#:#HTML Frame for External Emails###14 04 2016 new variable
+mail#:#mail_send_html_info#:#If enabled, the body of external emails will be embedded in a HTML frame. The corresponding template can be customized by creating a copy of './Services/Mail/templates/default/tpl.html_mail_template.html' at './Customizing/global/skin/[SKIN]/Services/Mail/tpl.html_mail_template.html' .###14 04 2016 new variable
+mail#:#mail_system_from_name#:#Sender Name###14 04 2016 new variable
+mail#:#mail_system_from_name_info#:#Please enter a name. This name (e.g. 'John Doe') will be used for automatically generated messages (internal and external). If you leave the field blank, ILIAS uses the short title of this installation. If the title is not well defined, ‘ILIAS’ is used as the sender.###14 04 2016 new variable
+mail#:#mail_system_return_path#:#Global Return-Path###14 04 2016 new variable
+mail#:#mail_system_return_path_info#:#Please enter an email address which should be used for the return path (e.g. webmaster@ilias.de). If you leave the field blank, the 'Return-Path' will be the 'From' email address.###14 04 2016 new variable
+sysc#:#sysc_tree_structure_failures#:#Number of failures in the tree structure (parent-Relation):###14 04 2016 new variable
+sysc#:#sysc_message_tree_structure_confirm#:#Do you really want to repair the tree structure? Please create a database backup before you proceed.###14 04 2016 new variable
+sysc#:#sysc_btn_tree_structure#:#Recreate Tree Structure###14 04 2016 new variable
+crs#:#event_tbl_admins#:#Administrators###14 04 2016 new variable
+crs#:#event_tbl_members#:#Members###14 04 2016 new variable
+crs#:#event_tbl_tutors#:#Tutors###14 04 2016 new variable
+trac#:#trac_cron_info#:#Please activate the "Object Statistics" cron job to gather data.###20 04 2016 new variable
+assessment#:#ass_create_export_file_with_results#:#Create Test Export File (incl. Participant Results)###19 05 2016 new variable
+assessment#:#tst_conflict_fbh_oblig_quest#:#The combination of using compulsory questions and locked answers is not allowed.###19 05 2016 new variable
+assessment#:#tst_conflict_reset_non_fbh#:#The setting "Lock Answers" was adjusted to "Do Not Lock Answers".###19 05 2016 new variable
+assessment#:#tst_conflict_reset_fbh_force#:#The setting "Lock Answers" was adjusted to "Do Not Lock Answers but Force Feedback".###19 05 2016 new variable
+dcl#:#dcl_reference_link_info#:#Detailed View must be active in referenced table###19 05 2016 new variable
+buddysystem#:#buddy_bs_action_already_linked#:#Already accepted the contact request from user '%s'.###19 05 2016 new variable
+buddysystem#:#buddy_bs_action_already_requested#:#Already requested user '%s'.###19 05 2016 new variable
+buddysystem#:#buddy_bs_action_already_ignored#:#Already ignored user '%s'.###19 05 2016 new variable
+buddysystem#:#buddy_bs_action_already_unlinked#:#The contact state for user '%s' is already unlinked.###19 05 2016 new variable
+sess#:#sess_list_reg_limit_places#:#Free places###19 05 2016 new variable
+sess#:#sess_accept_request#:#Accept Participation###19 05 2016 new variable
+sess#:#sess_new_registrations#:#Join Request###19 05 2016 new variable
+mail#:#mail_serial_letter_placeholders#:#Serial-Letter Placeholders###06 07 2016 new variable
+rbac#:#mep_copy#:#User can copy media pool###06 07 2016 new variable
+crs#:#crs_cannot_find_role#:#Can't find this role.###06 07 2016 new variable
+grp#:#grp_admission_link_failure_invalid_code#:#Can't register: Link is invalid.###06 07 2016 new variable
+crs#:#crs_admission_link_failure_invalid_code#:#Can't register: Link is invalid.###06 07 2016 new variable
+auth#:#auth_ldap_server_ds#:#LDAP-Server###03 08 2016 new variable
+assessment#:#ass_location#:#Location###03 08 2016 new variable
+assessment#:#ass_imap_hint#:#Hint to be shown as Tooltip###03 08 2016 new variable
+blog#:#blog_show_latest#:#Show latest postings/drafts###03 08 2016 new variable
+assessment#:#min_auto_complete#:#Autocomplete###12 10 2016 new variable
+assessment#:#autocomplete_error#:#Your autocomplete number is to large, you have answers which have less characters, so they would never be displayed.###12 10 2016 new variable
+assessment#:#tst_browse_for_qpl_questions#:#Add from Pool###12 10 2016 new variable
+assessment#:#tst_browse_for_tst_questions#:#Add from Other Test###12 10 2016 new variable
+assessment#:#ass_competence_respect_level_ordering#:#Please note that the competence thresholds have to be defined in an ascending order according to the available levels.###12 10 2016 new variable
+registration#:#reg_mail_body_activation#:#to activate your account and confirm ownership of this email address, click the link below:###12 10 2016 new variable
+form#:#err_invalid_input#:#An invalid value has been submited. Please check your input.###12 10 2016 new variable
+prg#:#prg_points_reachable#:#Points Obtainable###12 10 2016 new variable
+mail#:#mail_members_search_continue#:#Continue###12 10 2016 new variable
+copg#:#copg_confirm_el_deletion#:#Do you really want to delete the selected elements?###12 10 2016 new variable
+survey#:#msg_input_only_positive_numbers#:#Please enter positive numbers in scale values.###12 10 2016 new variable
+crs#:#crs_loc_err_stat_tst_offline#:#Not all tests are online.###12 10 2016 new variable
+itgr#:#itgr_desc_info#:#The description will not be a part of the item group's presentation in its container.###12 10 2016 new variable
+dcl#:#dcl_std_field_not_importable#:# - Standard fields are not importable.###25 10 2016 new variable
+certificate#:#certificate_var_user_matriculation#:#12345###25 10 2016 new variable
+rbac#:#edit_members#:#Manage members###22 12 2016 new variable
+rbac#:#prg_manage_members#:#Manage members of Study Programme###22 12 2016 new variable

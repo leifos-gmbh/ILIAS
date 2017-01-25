@@ -167,8 +167,8 @@ class ilDataCollectionRecordField {
 				$this->value = $tmp;
 				//delete old file from filesystem
 				// TODO Does not belong here, create separate class ilDataCollectionFileField and overwrite setValue method
-				if ($old && $old != $this->value && $this->field->getDatatypeId() == ilDataCollectionDatatype::INPUTFORMAT_FILE) {
-					$this->record->deleteFile($old);
+				if ($old && $this->field->getDatatypeId() == ilDataCollectionDatatype::INPUTFORMAT_FILE) {
+//					$this->record->deleteFile($old); // Removed due to #0018064
 				}
 			}
 		} else {
@@ -180,7 +180,7 @@ class ilDataCollectionRecordField {
 	 * @param $form ilPropertyFormGUI
 	 */
 	public function setValueFromForm(&$form) {
-		if ($this->field->getDatatypeId() == ilDataCollectionDatatype::INPUTFORMAT_MOB
+		if (in_array($this->field->getDatatypeId(), array(ilDataCollectionDatatype::INPUTFORMAT_MOB, ilDataCollectionDatatype::INPUTFORMAT_FILE))
 			&& $form->getItemByPostVar("field_" . $this->field->getId())->getDeletionFlag()
 		) {
 			$value = - 1;

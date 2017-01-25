@@ -193,7 +193,7 @@ class ilObjStudyProgramme extends ilContainer {
 		parent::update();
 
 		// Update selection for advanced meta data of the type
-		if ($this->getSubtypeId()) {
+		if ($this->getSubType()) {
 			ilAdvancedMDRecord::saveObjRecSelection($this->getId(), 'prg_type', $this->getSubType()->getAssignedAdvancedMDRecordIds());
 		} else {
 			// If no type is assigned, delete relations by passing an empty array
@@ -351,7 +351,7 @@ class ilObjStudyProgramme extends ilContainer {
 	* @return ilStudyProgrammeType
 	*/
 	public function getSubType() {
-		if($this->getSubtypeId() != "-") {
+		if(!in_array($this->getSubtypeId(), array("-", "0"))) {
 			$subtype_id = $this->getSubtypeId();
 			return new ilStudyProgrammeType($subtype_id);
 		}
@@ -519,7 +519,7 @@ class ilObjStudyProgramme extends ilContainer {
 			$this->lp_children = array();
 
 			// TODO: find a better way to get all elements except StudyProgramme-children
-			$ref_ids = $this->tree->getChilds($this->getRefId());
+			$ref_ids = $this->tree->getChildsByType($this->getRefId(), "crsr");
 
 			// apply container sorting to tree
 			$sorting = ilContainerSorting::_getInstance($this->getId());

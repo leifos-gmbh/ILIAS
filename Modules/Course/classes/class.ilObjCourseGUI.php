@@ -118,8 +118,8 @@ class ilObjCourseGUI extends ilContainerGUI
 		
 		if (!count($_POST["member"]))
 		{
-			ilUtil::sendFailure($this->lng->txt("no_checkbox"));
-			$this->membersObject();
+			ilUtil::sendFailure($this->lng->txt("no_checkbox"), true);
+			$this->cancelMemberObject();
 			return false;
 		}
 		
@@ -127,10 +127,11 @@ class ilObjCourseGUI extends ilContainerGUI
 		{
 			$rcps[] = ilObjUser::_lookupLogin($usr_id);
 		}
-		
-        require_once 'Services/Mail/classes/class.ilMailFormCall.php';
-		include_once './Modules/Course/classes/class.ilCourseMailTemplateTutorContext.php';
-		
+
+		require_once 'Services/Mail/classes/class.ilMailFormCall.php';
+		require_once 'Modules/Course/classes/class.ilCourseMailTemplateTutorContext.php';
+
+		ilMailFormCall::setRecipients($rcps);
 		ilUtil::redirect(
 			ilMailFormCall::getRedirectTarget(
 				$this, 
@@ -138,7 +139,6 @@ class ilObjCourseGUI extends ilContainerGUI
 				array(),
 				array(
 					'type'   => 'new',
-					'rcp_to' => implode(',',$rcps),
 					'sig' => $this->createMailSignature()
 				),
 				array(
@@ -530,12 +530,12 @@ class ilObjCourseGUI extends ilContainerGUI
 				}		
 				if($this->object->getSubscriptionMaxMembers())
 				{
-					include_once './Services/Membership/classes/class.ilParticipants.php';
+					include_once './Modules/Course/classes/class.ilObjCourseAccess.php';
+					$reg_info = ilObjCourseAccess::lookupRegistrationInfo($this->object->getId());
+
 					$info->addProperty(
-						$this->lng->txt("mem_free_places"),
-						max(
-							0,
-							$this->object->getSubscriptionMaxMembers() - ilParticipants::lookupNumberOfMembers($this->object->getRefId()))
+						$this->lng->txt('mem_free_places'),
+						$reg_info['reg_info_free_places']
 					);
 				}
 			}
@@ -2857,6 +2857,12 @@ class ilObjCourseGUI extends ilContainerGUI
 						$this->object->getMembersObject()->add($user_id,IL_CRS_MEMBER);
 						$this->object->getMembersObject()->updateRoleAssignments($user_id,(array)$a_type);
 					}
+					else
+					{
+						$GLOBALS['ilLog']->write(__METHOD__.': Can\'t find role with role id "' . $a_type . '" to assign users to.');
+						ilUtil::sendFailure($this->lng->txt("crs_cannot_find_role"),true);
+						return false;
+					}
 					break;
 			}
 			$this->object->getMembersObject()->sendNotification($this->object->getMembersObject()->NOTIFY_ACCEPT_USER,$user_id);
@@ -4318,9 +4324,13 @@ class ilObjCourseGUI extends ilContainerGUI
 				break;
 
 			case 'ilrepositorysearchgui':
-				include_once('./Services/Search/classes/class.ilRepositorySearchGUI.php');
-				$rep_search =& new ilRepositorySearchGUI();
 				
+				if(!$this->checkPermissionBool('write'))
+				{
+					$GLOBALS['ilErr']->raiseError($GLOBALS['lng']->txt('permission_denied'), $GLOBALS['ilErr']->WARNING);
+				}
+				include_once('./Services/Search/classes/class.ilRepositorySearchGUI.php');
+				$rep_search = new ilRepositorySearchGUI();
 				if(ilCourseParticipant::_getInstanceByObjId($this->object->getId(), $GLOBALS['ilUser']->getId())->isAdmin() or $this->checkPermissionBool('edit_permission'))
 				{
 					$rep_search->setCallback($this,
@@ -4330,12 +4340,10 @@ class ilObjCourseGUI extends ilContainerGUI
 				}
 				else
 				{
+					//#18445 excludes admin role
 					$rep_search->setCallback($this,
 						'assignMembersObject',
-						array(
-							ilCourseConstants::CRS_MEMBER => $this->lng->txt('crs_member'),
-							ilCourseConstants::CRS_TUTOR	=> $this->lng->txt('crs_tutor'),
-							)
+					    $this->getLocalRoles(array($this->object->getDefaultAdminRole()))
 						);
 					
 				}
@@ -5421,10 +5429,12 @@ class ilObjCourseGUI extends ilContainerGUI
 	// end-patch lok
 
 	/**
+	 *
+	 * @var int[] $a_exclude a list of role ids which will not added to the results (optional)
 	 * returns all local roles [role_id] => title
 	 * @return array localroles
 	 */
-	protected function getLocalRoles()
+	protected function getLocalRoles($a_exclude = array())
 	{
 		$crs_admin = $this->object->getDefaultAdminRole();
 		$crs_member = $this->object->getDefaultMemberRole();
@@ -5446,6 +5456,17 @@ class ilObjCourseGUI extends ilContainerGUI
 			}
 
 			$crs_roles[$role_id] = ilObjRole::_getTranslation($title);
+		}
+
+		if(count($a_exclude) > 0)
+		{
+			foreach($a_exclude as $excluded_role)
+			{
+				if(isset($crs_roles[$excluded_role]))
+				{
+					unset($crs_roles[$excluded_role]);
+				}
+			}
 		}
 		return $crs_roles;
 	}

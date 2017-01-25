@@ -397,9 +397,25 @@ class ilRbacSystem
 	{
 		include_once './Services/Container/classes/class.ilMemberViewSettings.php';
 		$settings = ilMemberViewSettings::getInstance();
-		if($settings->isEnabled() and isset($_GET['mv']))
+		
+		// disable member view
+		if(
+			isset($_GET['mv']) && 
+			$_GET['mv'] == 0
+		)
 		{
-			$settings->toggleActivation((int) $_GET['ref_id'], (int) $_GET['mv']);
+			// force deactivation
+			$settings->toggleActivation((int) $_GET['ref_id'], false);
+		}
+		if(
+			isset($_GET['mv']) &&
+			$_GET['mv'] == 1
+		)
+		{
+			if($this->checkAccess('write', (int) $_GET['ref_id']))
+			{
+				$settings->toggleActivation((int) $_GET['ref_id'], true);
+			}
 		}
 		
 		if(!$settings->isActive())
@@ -415,6 +431,7 @@ class ilRbacSystem
 			$this->mem_view['active'] = true;
 			$this->mem_view['items'] = $tree->getSubTreeIds($settings->getContainer());
 			$this->mem_view['items'] = array_merge($this->mem_view['items'],array($settings->getContainer()));
+			
 			include_once './Services/Membership/classes/class.ilParticipants.php';
 			$this->mem_view['role'] = ilParticipants::getDefaultMemberRole($settings->getContainer());
 			

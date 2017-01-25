@@ -335,7 +335,17 @@ class ilMimeMail
 			$mail->Sender = $ilSetting->get('mail_system_return_path', '');
 		}
 
-		$mail->SetFrom($this->xheaders['From'], $this->xheaders['FromName']);
+		require_once 'Services/Mail/classes/class.ilMail.php';
+		$addr = ilMail::getIliasMailerAddress();
+		if($this->xheaders['From'] == $addr[0])
+		{
+			$mail->setFrom($this->xheaders['From'], $this->xheaders['FromName']);
+		}
+		else
+		{
+			$mail->addReplyTo($this->xheaders['From'], $this->xheaders['FromName']);
+			$mail->setFrom($addr[0], $addr[1]);
+		}
 		foreach($this->sendto as $recipients)
 		{
 			$recipient_pieces = array_filter(array_map('trim', explode(',', $recipients)));
@@ -439,28 +449,37 @@ class ilMimeMail
 			++$i;
 		}
 
-		ilLoggerFactory::getLogger('mail')->debug(sprintf(
+		ilLoggerFactory::getLogger('mail')->debug(
 			"Trying to delegate external email delivery:" .
 			" Initiated by: " . $ilUser->getLogin() . " (" . $ilUser->getId() . ")" .
 			" | From: " . $this->xheaders['From'] .
 			" | To: " . implode(', ', $this->sendto) .
-			" | CC: " . implode(', ', $this->abcc) .
-			" | BCC: " . implode(', ', $this->acc) .
+			" | CC: " . implode(', ', $this->acc) .
+			" | BCC: " . implode(', ', $this->abcc) .
 			" | Subject: " .$mail->Subject
-		));
+		);
 
-		$result = $mail->Send();
-
-		if($result)
+		if(!(int)$ilSetting->get('prevent_smtp_globally'))
 		{
-			ilLoggerFactory::getLogger('mail')->debug(sprintf(
-				'Successfully delegated external mail delivery'
-			));
+			$result = $mail->Send();
+
+			if($result)
+			{
+				ilLoggerFactory::getLogger('mail')->debug(sprintf(
+					'Successfully delegated external mail delivery'
+				));
+			}
+			else
+			{
+				ilLoggerFactory::getLogger('mail')->debug(sprintf(
+					'Could not deliver external email: %s', $mail->ErrorInfo
+				));
+			}
 		}
 		else
 		{
 			ilLoggerFactory::getLogger('mail')->debug(sprintf(
-				'Could not deliver external email: %s', $mail->ErrorInfo
+				'Suppressed delegation of email delivery according to global setting ( prevent_smtp_globally ).'
 			));
 		}
 	}

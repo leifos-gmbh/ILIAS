@@ -223,7 +223,7 @@ assessment#:#add_matching_pair#:#Add Matching Pair
 assessment#:#add_poly#:#Add polygon area
 assessment#:#add_questionpool#:#Add Question Pool
 assessment#:#add_rect#:#Add rectangle area
-assessment#:#add_solution#:#Add Suggested Solution
+assessment#:#add_solution#:#Add Content for Recapitulation
 assessment#:#addSuggestedSolution#:#Add Content for Recapitulation
 assessment#:#all_available_question_pools#:#All available question pools
 assessment#:#allow_images#:#Image Support for Answers
@@ -259,6 +259,7 @@ assessment#:#tst_virtual_pass_header_lo_initial#:#Initial Test Results for the L
 assessment#:#tst_pass_details_header_lo_qualifying#:#Qualifying Test Results for the Learning Objectives<br />%s - %s
 assessment#:#tst_virtual_pass_header_lo_qualifying#:#Qualifying Test Results for the Learning Objective<br />%s
 assessment#:#ass_create_export_file#:#Create Test Export File
+assessment#:#ass_create_export_file_with_results#:#Create Test Export File (incl. Participant Results)
 assessment#:#ass_create_export_test_results#:#Create Test Results Export File
 assessment#:#ass_create_export_test_archive#:#Create Test Archive File
 assessment#:#ass_export_files#:#Export Files
@@ -292,6 +293,8 @@ assessment#:#average_reached_points#:#Average Points
 assessment#:#backtocallingtest#:#Back to the calling test
 assessment#:#assLongMenu#:#Long Menu
 assessment#:#answers_text_box#:#Text
+assessment#:#min_auto_complete#:#Autocomplete
+assessment#:#autocomplete_error#:#Your autocomplete number is to large, you have answers which have less characters, so they would never be displayed.
 assessment#:#answers_select#:#Select
 assessment#:#info_text_upload#:#Choose an answer text (UTF-8) file to upload.
 assessment#:#manual_editing#:#Manual Editing
@@ -309,10 +312,10 @@ assessment#:#cannot_export_test#:#You do not possess sufficient permissions to e
 assessment#:#cannot_maintain_test#:#You do not possess sufficient permissions to maintain the test!
 assessment#:#cannot_read_questionpool#:#You do not possess sufficient permissions to read the question pool data!
 assessment#:#cannot_save_metaobject#:#You do not possess sufficient permissions to save the meta data!
-assessment#:#change_solution#:#Change Suggested Solution
+assessment#:#change_solution#:#Change Content for Recapitulation
 assessment#:#changelog_description#:#The following table contains all changes of authors which have been made to this test.
 assessment#:#changelog_heading#:#Changelog
-assessment#:#changeSuggestedSolution#:#Select type of suggested solution
+assessment#:#changeSuggestedSolution#:#Select type of content for recapitulation
 assessment#:#checkbox_checked#:#Checked
 assessment#:#checkbox_unchecked#:#Unchecked
 assessment#:#circle_click_center#:#Please click on center of the desired area.
@@ -359,7 +362,7 @@ assessment#:#delete_image_header#:#Remove image
 assessment#:#delete_image_question#:#Do you really want to remove the image?
 assessment#:#delete_image#:#Remove Image
 assessment#:#delete_user_data#:#Remove Test Data of Selected Users
-assessment#:#deleteSuggestedSolution#:#Remove this suggested solution
+assessment#:#deleteSuggestedSolution#:#Remove this content for recapitulation
 assessment#:#description_maxchars#:#If nothing entered the maximum number of characters for this text answer is unlimited.
 assessment#:#detail_ending_time_reached#:#The time allotted for this test is now over. The test had not been available since %s
 assessment#:#detail_max_processing_time_reached#:#You have reached the maximum allowed processing time of the test!
@@ -387,7 +390,7 @@ assessment#:#ects_grade_c#:#generally sound work with a number of notable errors
 assessment#:#ects_grade_d_short#:#SATISFACTORY
 assessment#:#ects_grade_d#:#fair but with significant shortcomings
 assessment#:#ects_grade_e_short#:#SUFFICIENT
-assessment#:#ects_grade_e#:#performance meets the minimum criterion
+assessment#:#ects_grade_e#:#performance meets the minimum criteria
 assessment#:#ects_grade_f_short#:#FAIL
 assessment#:#ects_grade_f#:#considerable further work is required
 assessment#:#ects_grade_fx_short#:#FAIL
@@ -411,6 +414,9 @@ assessment#:#empty_term_message#:#There is a least one empty term field.
 assessment#:#empty_terms_exist#:#There are already empty term fields. Please fill out these fields before you add more terms.
 assessment#:#enable_javascript#:#Click to enable JavaScript support
 assessment#:#end_tag#:#End Tag
+assessment#:#tst_conflict_fbh_oblig_quest#:#The combination of using compulsory questions and locked answers is not allowed.
+assessment#:#tst_conflict_reset_non_fbh#:#The setting "Lock Answers" was adjusted to "Do Not Lock Answers".
+assessment#:#tst_conflict_reset_fbh_force#:#The setting "Lock Answers" was adjusted to "Do Not Lock Answers but Force Feedback".
 assessment#:#ending_time_reached#:#You have reached the finish time
 assessment#:#enlarge#:#Enlarge
 assessment#:#enter_anonymous_code#:#Enter Anonymous Access Code
@@ -647,7 +653,7 @@ assessment#:#qpl_qst_skl_selection_for_question_header#:#Compence Assignments fo
 assessment#:#tst_save_comp_points#:#Save Competence Points
 assessment#:#tst_msg_skl_qst_assign_points_saved#:#The competence points has been saved.
 assessment#:#tst_skl_level_thresholds_missing#:#There are missing thresholds for the relevant competences!
-assessment#:#tst_skl_level_thresholds_link#:#Configure Competence-Thresholds
+assessment#:#tst_skl_level_thresholds_link#:#Configure Competence Thresholds
 assessment#:#tst_skl_res_interpretation_hint_msg#:#Please consider that competence results from a single test has a limited significance. The more information is collected per competence, the merrier valid the significance will be. Should there are single competences without any entry, there is to less information collected.
 assessment#:#locked#:#locked
 assessment#:#log_answer_changed_points#:#Manual change of points of test person %s from %d to %d points by %s
@@ -659,7 +665,7 @@ assessment#:#log_mark_added#:#Mark added
 assessment#:#log_mark_changed#:#Mark changed
 assessment#:#log_mark_removed#:#Mark removed
 assessment#:#log_modified_test#:#The test was modified
-assessment#:#tst_results_presentation_description#:#If "Show Pass Details for running tests" is selected, the question titles and the reached points for every question in the test pass are available if the test is not finished. If "Show Solutions in Test Results" is selected, the detailed question solution is available to participants in the test results presentation. This includes the exact scoring of every answer, otherwise only an overview with the question titles and the reached points is shown. If the list of answers is selected, an overview of all questions with the answers of the participant is generated. This list will be offered on the Info Page and at the end of a test prior to the final submission. If "Show Answer-Specific Feedback in Test Results" is selected, the answer specific feedback will be shown in the test results next to the questions. If "Results print view (answers only)" is selected, the ILIAS content you place around a question using the "Edit content" tab page will not be visible in a print-out. If you want to save some paper space, select this option. If "Show Signature Placeholder" is selected, a signature placeholder will be shown for printout. If "Show Suggested Solution" is selected, the suggested solutions of questions (if existent) will be shown in the test results overview.
+assessment#:#tst_results_presentation_description#:#If "Show Pass Details for running tests" is selected, the question titles and the reached points for every question in the test pass are available if the test is not finished. If "Show Solutions in Test Results" is selected, the detailed question solution is available to participants in the test results presentation. This includes the exact scoring of every answer, otherwise only an overview with the question titles and the reached points is shown. If the list of answers is selected, an overview of all questions with the answers of the participant is generated. This list will be offered on the Info Page and at the end of a test prior to the final submission. If "Show Answer-Specific Feedback in Test Results" is selected, the answer specific feedback will be shown in the test results next to the questions. If "Results print view (answers only)" is selected, the ILIAS content you place around a question using the "Edit content" tab page will not be visible in a print-out. If you want to save some paper space, select this option. If "Show Signature Placeholder" is selected, a signature placeholder will be shown for printout. If "Show Content for Recapitulation" is selected, the content for recapitulation (if existent) will be shown in the test results overview.
 assessment#:#log_question_added#:#Question added at position
 assessment#:#log_question_position_changed#:#Question position changed
 assessment#:#log_question_removed#:#Question removed
@@ -907,7 +913,7 @@ assessment#:#redirectAfterSave#:#The maximum working time has been reached and y
 assessment#:#region#:#Region
 assessment#:#remove_as_participant#:#Remove as Fixed Participant
 assessment#:#remove_question#:#Remove
-assessment#:#remove_solution#:#Remove Suggested Solution
+assessment#:#remove_solution#:#Remove Content for Recapitulation
 assessment#:#report_date_not_reached#:#You have not reached the reporting date. You will be able to view the test results at %s
 assessment#:#reset_definitions#:#Reset Ordering
 assessment#:#reset_filter#:#Reset Filter
@@ -954,7 +960,7 @@ assessment#:#tst_instant_feedback_handling_force_and_freeze#:#Lock Answers and F
 assessment#:#tst_instant_feedback_handling_force_and_freeze_desc#:#After participants click 'Answer', they can no longer change their answer. Participants will be automatically presented with feedback as configured in the option 'Instant feedback'.
 assessment#:#tst_instant_feedback_handling_force#:#Do Not Lock Answers but Force Feedback
 assessment#:#tst_instant_feedback_handling_force_desc#:#After participants click 'Answer', they will be automatically presented with feedback as configured in the option 'Instant feedback'. They may however change their answers afterwards.
-assessment#:#see_details_for_further_information#:#See details for suggested solutions
+assessment#:#see_details_for_further_information#:#See details for content of recapitulation
 assessment#:#select_an_answer#:#--- Please select an answer ---
 assessment#:#select_gap#:#Select Gap
 assessment#:#select_max_one_item#:#Please select one item only
@@ -986,7 +992,7 @@ assessment#:#start_tag#:#Start Tag
 assessment#:#starting_time_not_reached#:#You have not reached the start time
 assessment#:#statistical_data#:#Statistical Data
 assessment#:#statistics#:#Statistics
-assessment#:#suggested_solution_added_successfully#:#You successfully set a suggested solution!
+assessment#:#suggested_solution_added_successfully#:#You successfully set a content for recapitulation!
 assessment#:#suggestedSolutionType#:#refer to
 assessment#:#symbol#:#Symbol
 assessment#:#term_image#:#Term Image
@@ -1025,7 +1031,8 @@ assessment#:#tst_answer_sheet#:#Test Answer Sheet
 assessment#:#tst_answered_questions_test#:#Questions answered in this test
 assessment#:#tst_answered_questions#:#Answered Questions
 assessment#:#tst_best_solution_is#:#The best solution is
-assessment#:#tst_browse_for_questions#:#Add from Pool
+assessment#:#tst_browse_for_qpl_questions#:#Add from Pool
+assessment#:#tst_browse_for_tst_questions#:#Add from Other Test
 assessment#:#tst_change_points_for_question#:#Points for the Answer
 assessment#:#tst_confirm_delete_results_info#:#Your previous entered question results were removed. You have successfully reset the test!
 assessment#:#tst_confirm_delete_results#:#You are about to remove all your previous entered question results of this test. This will reset all questions to its default values. Please note, that you cannot reset the number of passes, you already needed for this test. Do you really want to reset all your previous entered results?
@@ -1516,9 +1523,9 @@ assessment#:#feedback_all#:#Show answer specific feedback for all answers.
 assessment#:#feedback_checked#:#Show answer specific feedback for all chosen/selected answers.
 assessment#:#feedback_correct_sc_mc#:#Show answer specific feedback for all correct answers (Correct answers are those, that lead to a positive score when chosen/selected).
 assessment#:#feedback_correct_kprim#:#Show answer specific feedback for all correct answers (Correct answers are those, for that the positive option is to be chosen/selected).
-assessment#:#tst_add_quest_cont_edit_mode#:#Editing Mode for additional Question Content
-assessment#:#tst_add_quest_cont_edit_mode_default#:#Default Editing Mode for Additional Question Content
-assessment#:#tst_add_quest_cont_edit_mode_page_object#:#Additional Content Editing with Page Editor
+assessment#:#tst_add_quest_cont_edit_mode#:#Editor for Feedack and Hints
+assessment#:#tst_add_quest_cont_edit_mode_default#:#Use rich-text editor for editing feedback and hints
+assessment#:#tst_add_quest_cont_edit_mode_page_object#:#Use ILIAS page editor for editing feedback and hints
 assessment#:#tst_question_feedback_edit_page#:#Edit Content
 assessment#:#tst_question_feedback_back_to_feedback_form#:#Back To Calling Question
 assessment#:#enable_examview#:#Overview of Answers Given
@@ -1940,13 +1947,13 @@ common#:#administrator#:#Administrator
 rbac#:#adopt_perm_from_template#:#Copy Permission Settings
 common#:#adopt#:#Adopt
 common#:#advanced_editing_allow_html_tags#:#Allow the selected HTML tags for text editing
-common#:#advanced_editing_allow_javascript_editor#:#Enable a Rich Text Editor
+common#:#advanced_editing_allow_javascript_editor#:#Enable a rich-text editor
 common#:#advanced_editing_assessment_settings#:#Allowed HTML Tags for the ILIAS Test and Assessment tool
 common#:#advanced_editing_frm_post_settings#:#Forum Post Settings
 common#:#advanced_editing_lm_js_editing_desc#:#Enables HTMLArea and JavaScript support for page editing in learning modules and glossaries.
 common#:#advanced_editing_lm_js_editing#:#Enable HTMLArea for Content Editing
 common#:#advanced_editing_lm_settings#:#Learning Module and Glossary Settings
-common#:#advanced_editing_no_rte#:#Do not use rich text editing
+common#:#advanced_editing_no_rte#:#Do not use rich-text editing
 common#:#advanced_editing_rep_page_editing_desc#:#This feature allows adding text/media to pages of a category, course, group or folder. If deactivated, existing content will be hidden.
 common#:#advanced_editing_rep_page_editing#:#Enable Content Editing in Repository
 common#:#advanced_editing_required_tags#:#The following HTML tags are required: %s
@@ -2370,7 +2377,7 @@ common#:#create#:#Create
 common#:#created#:#Creation Date
 common#:#cron_forum_notification_cron#:#regularly per cron job
 common#:#cron_forum_notification_desc#:#If enabled, all users, who want to be informed about new posts in specified forum threads, will get notifications by mail.
-common#:#cron_forum_notification_crob_desc#:#If enabled, all users who have enabled forum notifications will get a daily mail about all new posts but no immediate notification for each submitted posting.
+common#:#cron_forum_notification_crob_desc#:#If enabled, all users who have enabled notifications for certain forums or forum threads will daily receive a notification mail about all new  or changed posts but no immediate notification for each submitted posting.
 common#:#cron_forum_notification_directly#:#directly on new entries
 common#:#cron_forum_notification_never#:#never
 common#:#cron_forum_notification#:#Send Forum Notifications
@@ -4082,7 +4089,6 @@ common#:#refuse#:#Refuse
 common#:#reg_account_confirmation_successful#:#Your user account has been activated.
 common#:#reg_mail_body_2_confirmation#:#The link will only be good for %s, after that you will have to try again from the beginning.
 common#:#reg_mail_body_3_confirmation#:#If this email means nothing to you, then it is possible that somebody else has entered your email address either deliberately or accidentally, so please ignore this email.
-common#:#reg_mail_body_confirmation#:#to activate your account and confirm ownership of this email address, click the link below:
 common#:#reg_mail_body_forgot_password_info#:#To get your password, please use the function « Forgot password? » at the login screen to request a new password for this account.
 common#:#reg_mail_body_salutation#:#Hello
 common#:#reg_mail_body_text1#:#Welcome to ILIAS eLearning!
@@ -4209,8 +4215,8 @@ rbac#:#root_visible#:#<i>Repository - Home</i> is visible
 rbac#:#root_write#:#User can edit settings of <i>Repository - Home</i> and manage content
 common#:#row#:#Row
 common#:#rows#:#Rows
-common#:#rte_editor_disabled#:#Rich Text Editor disabled
-common#:#rte_editor_enabled#:#Rich Text Editor enabled
+common#:#rte_editor_disabled#:#Rich-text editor disabled
+common#:#rte_editor_enabled#:#Rich-text editor enabled
 common#:#sahs_added#:#SCORM Learning Module added
 rbac#:#sahs_copy#:#User can copy SCORM learning module
 common#:#sahs_create#:#Create SCORM Learning Module
@@ -4604,7 +4610,7 @@ common#:#udf_no_name_given#:#Please enter a field name.
 common#:#udf_required_requires_visib_reg#:#When field is set to ‘required’, it must be set to ‘visible in registration’
 common#:#udf_type_date#:#Date
 common#:#udf_type_datetime#:#Date and Time
-common#:#udf_type_select#:#Selection List (Drop-Down)
+common#:#udf_type_select#:#Selection List (Single Choice)
 common#:#udf_type_text#:#Text Field (One Line)
 common#:#udf_type_wysiwyg#:#Text Area (WYSIWYG)
 common#:#udf_update_select_field#:#Edit Select Box
@@ -4713,7 +4719,7 @@ common#:#usr_agreement_empty#:#The agreement contains no text
 common#:#usr_agreement#:#User Agreement
 common#:#usr_edit#:#Edit User
 common#:#usr_filter_coursemember#:#Member of course
-common#:#usr_filter_empty_result#:#No users found that match the selected filter criterion
+common#:#usr_filter_empty_result#:#No users found that match the selected filter criteria
 common#:#usr_filter_groupmember#:#Member of group
 common#:#usr_filter_lastlogin#:#Last login of user
 common#:#usr_filter_role#:#Assigned role
@@ -5225,7 +5231,6 @@ content#:#cont_lm_default_layout#:#Default Layout of Learning Module
 content#:#cont_lm_menu#:#Menu
 content#:#cont_lm_properties#:#Learning Module Settings
 content#:#cont_localfile#:#Local File
-content#:#cont_LocalFile#:#Local File
 content#:#cont_location#:#Location
 content#:#cont_lrs_settings#:#Settings
 content#:#cont_lvalue#:#Data element
@@ -5868,7 +5873,7 @@ crs#:#crs_objective_assigned_qst#:#Assigned Questions
 crs#:#crs_objective_deassign_question#:#Delete assignment
 crs#:#crs_objective_delete_lm_assignment#:#Delete assignment
 crs#:#crs_objective_err_limit#:#Please enter a percentage number between 1 and 100.
-crs#:#crs_objective_final_test#:#Questions Achievement Test
+crs#:#crs_objective_final_test#:#Questions Final Test
 crs#:#crs_objective_insert_percent#:#Please enter only percentages between 1 and 100.
 crs#:#crs_objective_limit_err#:#The required points should not be higher than the total points.
 crs#:#crs_objective_modified#:#Updated learning objective.
@@ -5883,7 +5888,7 @@ crs#:#crs_objective_question_assignment#:#Question assignment
 crs#:#crs_objective_random_warn#:#You can not use random tests in combination with learning objectives.
 crs#:#crs_objective_result#:#After final test
 crs#:#crs_objective_saved_sorting#:#Saved sorting.
-crs#:#crs_objective_self_assessment#:#Questions Placement Test
+crs#:#crs_objective_self_assessment#:#Questions Initial Test
 crs#:#crs_objective_status#:#Objective Status
 crs#:#crs_objective_step#:#Step
 crs#:#crs_objective_updated_test#:#Updated modifications.
@@ -6084,7 +6089,7 @@ crs#:#crs_users_added#:#Added user to the course
 crs#:#crs_users_already_assigned#:#The user is already assigned to this course
 crs#:#crs_users_removed_from_list#:#The selected users have been removed from the waiting list
 crs#:#crs_view_archive#:#Archive View
-crs#:#crs_view_info_objective#:#Course for individualised studying: Performance on learning objectives organises the course work. Content might be recommended based on individual performance in a placement test. A final test can be used to prove learning objective mastery. 
+crs#:#crs_view_info_objective#:#Course for individualised studying: Performance on learning objectives organises the course work. Content might be recommended based on individual performance in an initial test. A final test can be used to prove learning objective mastery. 
 crs#:#crs_view_info_timing#:#Presentation mode for timings settings.
 crs#:#crs_view_mode#:#Course Presentation
 crs#:#crs_view_objective#:#Learning Objectives-Driven Course
@@ -7221,6 +7226,7 @@ license#:#remaining_licenses#:#Available licenses
 license#:#used_licenses_explanation#:#Every first access of a user consumes a license.
 license#:#used_licenses#:#Consumed licenses
 license#:#zero_licenses_explanation#:#Enter a 0 to deactivate the licensing.
+mail#:#mail_serial_letter_placeholders#:#Serial-Letter Placeholders
 mail#:#activate_serial_letter_placeholders#:#Activate Serial-Letter Placeholders
 mail#:#advice_mail_body_secured#:#Because of security reasons ILIAS removed some elements of your message. Please check the secured message and send the mail again.
 mail#:#also_as_email#:#Also as E-Mail
@@ -10988,9 +10994,9 @@ blog#:#blog_add_posting#:#Add Posting
 blog#:#blog_permanent_link#:#Permalink
 blog#:#blog_comments#:#Comments
 blog#:#blog_list_more#:#more
-blog#:#blog_posting_deletion_confirmation#:#Are you sure you want to delete the following entry?
-blog#:#blog_number_users_notes_or_comments#:#Number of users that attached notes or comments to this entry
-blog#:#blog_posting_deleted#:#The entry has been deleted.
+blog#:#blog_posting_deletion_confirmation#:#Are you sure you want to delete the following posting?
+blog#:#blog_number_users_notes_or_comments#:#Number of users that attached notes or comments to this posting
+blog#:#blog_posting_deleted#:#Posting has been deleted.
 blog#:#blog_enable_notes#:#Public Comments
 sahs#:#sahs_insert_ass_inside_chap#:#Insert Asset (inside chapter)
 sahs#:#sahs_insert_sco_inside_chap#:#Insert SCO (inside chapter)
@@ -11376,8 +11382,8 @@ survey#:#survey_question_pool_title#:#Pool Title
 common#:#allow_user_toggle_noti#:#Member is allowed to deactivate notification
 cntr#:#container_import_zip_file_invalid#:#The uploaded file is not a valid ILIAS export file. To upload a directory structure please use a file object.
 cntr#:#cntr_adopt_content#:#Adopt Content
-auth#:#login_page_switch_rte#:#Use Rich-Text-Editor
-auth#:#login_page_switch_ipe#:#Use ILIAS Page Editor
+auth#:#login_page_switch_rte#:#Use rich-text editor
+auth#:#login_page_switch_ipe#:#Use ILIAS page editor
 auth#:#login_page_editor_switched#:#The active page editor has been changed
 auth#:#login_page_activate#:#Activate Editor for Selected Languages
 content#:#cont_update_login_page#:#Edit Login Page Element
@@ -11400,8 +11406,8 @@ ecs#:#ecs_server_addr#:#Server Address
 ecs#:#ecs_activate#:#Activate
 ecs#:#ecs_deactivate#:#Deactivate
 ecs#:#ecs_not_configured#:#Not configured
-administration#:#user_criteria#:#Unique user criterion
-administration#:#user_criteria_desc#:#Unique user criterion that is used for test results import/export. This is needed to identify identical users on different ILIAS systems.
+administration#:#user_criteria#:#Unique user criteria
+administration#:#user_criteria_desc#:#Unique user criteria that is used for test results import/export. This is needed to identify identical users on different ILIAS systems.
 assessment#:#imported#:#imported
 ecs#:#ecs_tbl_import#:#Import
 ecs#:#ecs_tbl_export#:#Export
@@ -12424,9 +12430,9 @@ tax#:#tax_nodes#:#Nodes
 tax#:#tax_create_node#:#Create Node
 tax#:#tax_new_tax_node#:#New Node
 tax#:#tax_order#:#Order
-administration#:#adm_rep_shorten_description#:#Shorten Descriptions
-administration#:#adm_rep_shorten_description_info#:#If activated all descriptions in object lists will be shortened.
-administration#:#adm_rep_shorten_description_length#:#Max. number of characters
+administration#:#adm_rep_shorten_description#:#Limited Length of Descriptions
+administration#:#adm_rep_shorten_description_info#:#If activated all descriptions in object lists are presented with a maximum number of characters.
+administration#:#adm_rep_shorten_description_length#:#Maximum number of characters
 file#:#file_uploaded_by#:#Uploaded by
 trac#:#trac_session_statistics_mode_year#:#Year
 assessment#:#tst_question#:#Question
@@ -12775,7 +12781,7 @@ dcl#:#dcl_unknown_exception#:#The value you entered is not valid.
 dcl#:#dcl_checked#:#Checked.
 dcl#:#dcl_not_checked#:#Not checked.
 dcl#:#dcl_any#:#Any
-dcl#:#dcl_noturl_exception#:#You have to enter a Link (beginning with http://) or an email address.
+dcl#:#dcl_noturl_exception#:#You have to enter a Link (beginning with http:// or www.) or an email address.
 dcl#:#dcl_no_search_results_found_for#:#No modules have been found for
 dcl#:#dcl_export_enabled#:#Allow export function for all users
 dcl#:#dcl_no_fields_yet#:#There are no fields defined for this table thus you cannot create any entries yet.
@@ -13068,7 +13074,7 @@ webr#:#webr_copy#:#Copy Weblink
 exc#:#exc_copy#:#Copy Exercise
 assessment#:#tst_copy#:#Copy Test
 survey#:#svy_copy#:#Copy Survey
-poll#:#poll_population#:#%s Votes
+poll#:#poll_population#:#%s Participants
 poll#:#poll_participants#:#Participants
 poll#:#poll_delete_votes#:#Delete All Votes
 poll#:#poll_delete_votes_sure#:#Are you sure you want to delete all votes?
@@ -13113,7 +13119,8 @@ exc#:#exc_team_notification_body_rmv#:#you have been removed from  a team upload
 exc#:#exc_team_notification_changed_by#:#Status changed by
 exc#:#exc_team_notification_link#:#Link to exercise
 poll#:#poll_absolute#:#Current Votes
-dcl#:#dcl_reference_link#:#Show as link in table view
+dcl#:#dcl_reference_link#:#Show as link to referenced entry
+dcl#:#dcl_reference_link_info#:#Detailed View must be active in referenced table
 dcl#:#dcl_ILIAS_reference_link#:#Show as link in table view
 dcl#:#dcl_text_area#:#Textarea
 dcl#:#dcl_delete_table#:#Delete Table
@@ -13404,6 +13411,7 @@ dcl#:#dcl_file_not_readable#:#The file could not be read. Please make sure to up
 dcl#:#dcl_import_terminated#:#The import terminated. Entries added
 dcl#:#dcl_max_import#:#The maximum amount of imported entries is reached.
 dcl#:#dcl_row_not_found#:# - This field couldn't be found in the table.
+dcl#:#dcl_std_field_not_importable#:# - Standard fields are not importable.
 dcl#:#dcl_import_records .xls#:#Import .xls
 dcl#:#dcl_file_format_description#:#The file needs to be an excel .XLS file with the data you want to import on the first sheet. In the first row there have to be exactly the names of the fields (case sensitive) you want to import and in the following rows you can add the values. It is strongly recommended to simulate your import first.
 dcl#:#dcl_simulate_import#:#Simulate Import
@@ -13700,7 +13708,7 @@ dateplaner#:#cal_ch_user_assignment_failed_info#:#The following users could not 
 dateplaner#:#cal_booking_failed_info#:#This appointment is booked out. Please choose another appointment.
 registration#:#registration_codes_override_info#:#This setting overrides any values defined in ‘Registration Settings’.
 registration#:#registration_codes_override_global_info#:#These settings may be overridden by registration codes.
-crs#:#event_list_registered_only#:#Only Registered Members
+crs#:#event_list_registered_only#:#Only Registered
 didactic#:#didactic_default_type#:#Default
 pd#:#pd_info_delete_sure_remove#:#Are you sure you want to remove the following objects from your Personal Desktop?
 pd#:#pd_info_delete_sure_unsubscribe#:#Are you sure you want to unsubscribe from the following objects?
@@ -14683,7 +14691,7 @@ poll#:#poll_result_answers#:#Votes
 poll#:#poll_result_users#:#Participants
 user#:#usr_id#:#User ID
 meta#:#meta_c_XK#:#Kosovo
-certificate#:#certificate_var_matriculation#:#12345
+certificate#:#certificate_var_user_matriculation#:#12345
 certificate#:#certificate_ph_matriculation#:#Matriculation number of the user
 survey#:#mailparticipantdata_placeholder#:#These placeholders are replaced by actual user data if ‘Privacy’ is ‘With Names’:
 poll#:#poll_notification_subscribe#:#Activate Notification
@@ -15072,23 +15080,23 @@ crs#:#crs_loc_tt_info#:#You have reached %1$d%%. The test is passed with %2$d%%.
 crs#:#crs_objective_status_configure#:#Checklist for Course
 crs#:#crs_objective_status_settings#:#Course Settings
 crs#:#crs_objective_status_materials#:#Create Course Content
-crs#:#crs_objective_status_itest#:#Assign Placement Test
-crs#:#crs_objective_status_qtest#:#Assign Achievement Test
+crs#:#crs_objective_status_itest#:#Assign Initial Test
+crs#:#crs_objective_status_qtest#:#Assign Final Test
 crs#:#crs_objective_status_objectives#:#Configure Learning Objectives
 crs#:#crs_objective_status_start#:#Define Start Objects
 crs#:#crs_objective_status_fullfilled#:#OK
 crs#:#crs_objective_action_materials#:#Assign Material
-crs#:#crs_objective_action_qtest#:#Assign Questions of Achievement Test
-crs#:#crs_objective_action_itest#:#Assign Questions of Placement Test
-crs#:#crs_loc_qt_visibility#:#Visibility of Achievement Test 
-crs#:#crs_loc_qt_visibility_all#:#Show Achievement Test Covering all Objectives
-crs#:#crs_loc_qt_visibility_lo#:#Show Achievement Test for Each Individual Objective
+crs#:#crs_objective_action_qtest#:#Assign Questions of Final Test
+crs#:#crs_objective_action_itest#:#Assign Questions of Initial Test
+crs#:#crs_loc_qt_visibility#:#Visibility of Final Test 
+crs#:#crs_loc_qt_visibility_all#:#Show Final Test Covering all Objectives
+crs#:#crs_loc_qt_visibility_lo#:#Show Final Test for Each Individual Objective
 crs#:#crs_loc_limited_passes#:#Limited Test Passes
 crs#:#crs_loc_passes#:#Number of Passes
 crs#:#crs_loc_passes_info#:#Maximum Number of test passes
 crs#:#crs_loc_err_stat_no_materials#:#No Course Materials available
-crs#:#crs_loc_err_stat_no_qt#:#No Achievement Test available
-crs#:#crs_loc_err_stat_no_it#:#No Placement Test available
+crs#:#crs_loc_err_stat_no_qt#:#No final test available
+crs#:#crs_loc_err_stat_no_it#:#No Initial test available
 crs#:#crs_objective_status_objective_creation#:#Create Learning Objective
 crs#:#crs_loc_form_create_objectives#:#Create Learning Objectives
 crs#:#crs_loc_err_no_active_mat#:#Learning objectives without assigned content
@@ -15097,14 +15105,14 @@ crs#:#crs_loc_err_no_active_qt#:#Learning Objectives without Qualifying Test
 crs#:#crs_loc_err_no_active_lo#:#No active Learning Objective
 crs#:#crs_loc_settings_tbl#:#Settings for the Learning Objectives-Driven Course
 crs#:#crs_loc_settings_type#:#Course Design
-crs#:#crs_loc_type_initial_all#:#Course Starts with Placement Test
-crs#:#crs_loc_type_initial_sel#:#Course starts with Placement Test for Selected Learning Objective
+crs#:#crs_loc_type_initial_all#:#Course Starts with Initial Test
+crs#:#crs_loc_type_initial_sel#:#Course starts with Initial Test for Selected Learning Objective
 crs#:#crs_loc_type_qualified#:#Credit-by-examination design 
 crs#:#crs_loc_type_practise#:#Course Starts with Learning and Practise
 crs#:#crs_loc_tab_materials#:#Material
-crs#:#crs_loc_tab_itest#:#Placement Test 
-crs#:#crs_loc_tab_qtest#:#Achievement Test
-crs#:#crs_loc_settings_itest_tbl#:#Settings for the Placement Test 
+crs#:#crs_loc_tab_itest#:#Initial Test 
+crs#:#crs_loc_tab_qtest#:#Final Test
+crs#:#crs_loc_settings_itest_tbl#:#Settings for the Initial Test 
 crs#:#crs_loc_tab_objectives#:#Learning Objectives
 crs#:#crs_loc_settings_qtest_tbl#:#Settings for the Qualifying Test
 crs#:#crs_loc_tab_start#:#Start Objects
@@ -15285,7 +15293,7 @@ administration#:#language_clear_local_changes_info#:#Reset the database entries 
 administration#:#language_delete_local_additions_info#:#Delete all entries that were locally added to the database.
 administration#:#language_merge_local_changes_info#:#Merge all local changes and additions alphabetically into the standard language file lang/ilias_%s.lang. The web server must have write permission on this file.
 administration#:#language_remove_local_file_info#:#Remove the file Customizing/global/lang/ilias_%s.lang.local and change the language status from ‘Installed With Local’ to ‘Installed’. The changes in the database are not touched.
-crs#:#crs_loc_type_initial_all_info#:#Based on individual results of the placement test, ILIAS recommends learning content for the not-yet-sufficient learning objectives. The final achievement test assesses whether a test participant already mastered the learning objectives or if additional learning and training is needed.
+crs#:#crs_loc_type_initial_all_info#:#Based on individual results of the initial test, ILIAS recommends learning content for the not-yet-sufficient learning objectives. The final achievement test assesses whether a test participant already mastered the learning objectives or if additional learning and training is needed.
 crs#:#crs_loc_type_qualified_info#:#The course starts with a test to assess if a course member already mastered the learning objectives. For all passed learning objectives, users do not have to work through any of the learning content or take more tests. For all not-yet-sufficient learning objectives, ILIAS recommends learning content. The mastery of the remaining learning objectives is tested in an additional test run. 
 crs#:#crs_loc_type_practise_info#:#Course members can use the full range of learning objectives and assigned learning content immediately. They can take the achievement testto assess whether they mastered the learning objectives already of if additional learning and training is needed.
 prtf#:#prtf_page_element_my_courses_info#:#This is a list of all my courses which are currently online and where I have a membership.
@@ -15309,9 +15317,9 @@ exc#:#exc_peer_review_reset#:#Delete and Reset Peer-Feedback
 exc#:#exc_peer_review_reset_sure#:#Are you sure you want to delete the complete peer-feedback for the assignment "%s"?
 exc#:#exc_peer_review_reset_done#:#All Peer-Feedback-related data has been deleted for the assignment.
 adve#:#char_selector_msg_blocks_or_custom_needed#:#When you activate the selector, please choose a character block or enter a special selection!
-crs#:#crs_loc_form_tst_new_initial_info#:#Create a new test to serve as Placement Test
+crs#:#crs_loc_form_tst_new_initial_info#:#Create a new test to serve as initial test
 crs#:#crs_loc_form_tst_new_qualified_info#:#--
-crs#:#crs_loc_form_assign_initial_info#:#Select a test from this course to serve as Placement Test
+crs#:#crs_loc_form_assign_initial_info#:#Select a test from this course to serve as Initial Test
 crs#:#crs_loc_form_assign_qualified_info#:#--
 poll#:#poll_view_results_after_period_impossible#:#The voting period is not limited.
 content#:#cont_download#:#Download
@@ -15376,7 +15384,7 @@ prtf#:#prtf_blog_page_created#:#Blog has been added.
 wiki#:#wiki_adv_md_hidden#:#This block is currently hidden.
 wiki#:#wiki_page_list_form_info#:#Adds a list of pages of this wiki that are all assigned to the selected metadata below.
 content#:#cont_pc_amdpl#:#Page List
-meta#:#udf_type_selectmulti#:#Selection List (Checkboxes)
+meta#:#udf_type_selectmulti#:#Selection List (Multiple Choice)
 wiki#:#wiki_no_page_found#:#No wiki page has been found for search term '$1'.
 wiki#:#wiki_pages_found#:#The following pages match your search term '$1'.
 wiki#:#wiki_no_search_term#:#No search term has been entered. All pages of the wiki are listed below.
@@ -15626,7 +15634,7 @@ exc#:#exc_team_management_tutor#:#Team Management by Tutors
 exc#:#exc_team_management_tutor_info#:#If activated participants cannot organize teams themselves.
 exc#:#exc_no_team_yet_info_tutor#:#Teams are managed by the exercise tutors.
 exc#:#exc_max_file#:#Max Number of Files
-exc#:#exc_max_file_info#:#Participants will not be able to upload more files once the limit is reached.
+exc#:#exc_max_file_info#:#Participants will not be able to upload more files once the limit is reached. In team assignments the limit is also enforced per participant not team-wide.
 exc#:#exc_max_file_tgl#:#Limit Uploads
 exc#:#exc_max_file_reached#:#You cannot upload more than %s files.
 exc#:#exc_deadline_extended#:#Grace Period
@@ -15751,8 +15759,8 @@ obj#:#obj_target_location#:#Target Location
 obj#:#obj_copy_progress#:#Copy Progress
 cntr#:#cntr_copy_repo_tree#:#Repository Tree
 cntr#:#cntr_copy_crs_grp#:#My Courses and Groups
-crs#:#crs_mail_context_tutor_title#:#Course Tutor 
-crs#:#crs_mail_context_member_title#:#Course Member
+crs#:#crs_mail_context_tutor_title#:#Mail to Course Member
+crs#:#crs_mail_context_member_title#:#Info Page Course
 sahs#:#sahs_mail_context_lp#:#SCORM Learning Progress
 mail#:#mail_templates#:#Text Templates
 mail#:#mail_new_template#:#New Text Template
@@ -15801,34 +15809,34 @@ rbac#:#wiki_edit_wiki_navigation#:#Edit Wiki Navigation
 rbac#:#wiki_delete_wiki_pages#:#Delete Wiki Pages
 rbac#:#wiki_activate_wiki_protection#:#Set Wiki Pages to Read-Only
 rbac#:#wiki_wiki_html_export#:#Export Wiki as HTML
-crs#:#crs_loc_settings_it_type#:#Einstiegstest
-crs#:#crs_loc_settings_type_it_placement_all#:#Diagnostischer Einstiegstest über alle Lernziele
-crs#:#crs_loc_settings_it_start_object#:#Einstiegstest ist Startobjekt
-crs#:#crs_loc_settings_type_it_placement_sel#:#Diagnostischer Einstiegstest pro Lernziel
-crs#:#crs_loc_settings_type_it_qualifying_all#:#Qualifizierender Einstiegstest über alle Lernziele
-crs#:#crs_loc_settings_type_it_qualifying_sel#:#Qualifizierender Einstiegstest pro Lernziel
-crs#:#crs_loc_settings_type_it_none#:#Kein Einstiegstest
-crs#:#crs_loc_settings_qt_all#:#Abschlusstest
-crs#:#crs_loc_settings_type_q_all#:#Abschlusstest über alle Lernziele
-crs#:#crs_loc_settings_qt_start_object#:#Abschlusstest ist Startobjekt
-crs#:#crs_loc_settings_type_q_selected#:#Abschlusstest pro Lernziel
-crs#:#crs_loc_settings_err_qstart#:#Die Option "Abschlusstest als Startobjekt" wurde deaktiviert, da sie nur für Kurse ohne Einstiegstest verwendet werden kann.		
-crs#:#crs_loc_tab_qtests#:#Abschlusstests
-crs#:#crs_loc_tab_itests#:#Einstiegstests
-crs#:#crs_loc_btn_new_assignment#:#Neue Testzuordnung
-crs#:#crs_objective_tbl_col_final_tsts#:#Abschlusstests
-crs#:#crs_objective_action_qtest_sep#:#Abschlusstest zuordnen
-crs#:#crs_loc_settings_tbl_its_q_all#:#Qualifizierender Einstiegstest über alle Lernziele
-crs#:#crs_loc_settings_tbl_its_nq_all#:#Diagnostischer Einstiegstest über alle Lernziele
-crs#:#crs_loc_settings_tbl_it_q#:#Qualifizierende Einstiegstests pro Lernziel
-crs#:#crs_loc_settings_tbl_it_nq#:#Diagnostische Einstiegstests pro Lernziel
-crs#:#crs_loc_settings_tbl_qts_all#:#Abschlusstest über alle Lernziele
-crs#:#crs_loc_settings_tbl_qt#:#Abschlusstests pro Lernziel
-crs#:#crs_loc_objective_passed_confirmation#:#Sie haben das Lernziel bereits bestanden. Ein erneutes Starten des Tests setzt die Ergebnisse zurück. Wollen Sie den Test erneut starten?
-crs#:#crs_loc_objectives_passed_confirmation#:#Sie haben bereits alle Lernziel bestanden. Ein erneutes Starten des Tests setzt die Ergebnisse zurück. Wollen Sie den Test erneut starten?
-crs#:#crs_loc_tst_start#:#Test starten
-crs#:#crs_loc_mem_show_res#:#Testergebnisse anzeigen
-crs#:#crs_loc_test_results_of#:#Testergebnisse von:
+crs#:#crs_loc_settings_it_type#:#Initial Test
+crs#:#crs_loc_settings_type_it_placement_all#:#Initial Diagnostic Test for all Objectives
+crs#:#crs_loc_settings_it_start_object#:#Initial Test is Start Objects
+crs#:#crs_loc_settings_type_it_placement_sel#:#Initial Diagnostic Test per Objective
+crs#:#crs_loc_settings_type_it_qualifying_all#:#Initial Qualifying Test for all Objectives
+crs#:#crs_loc_settings_type_it_qualifying_sel#:#Initial Qualifying Test per Objective
+crs#:#crs_loc_settings_type_it_none#:#No Initial Test
+crs#:#crs_loc_settings_qt_all#:#Final Test
+crs#:#crs_loc_settings_type_q_all#:#Final Test all Objectives
+crs#:#crs_loc_settings_qt_start_object#:#Final Test is Start Object
+crs#:#crs_loc_settings_type_q_selected#:#Final Test per Objective
+crs#:#crs_loc_settings_err_qstart#:#The option "Final Test as Start Object" has been deactivated, since it can only be chosen for courses without initial test.		
+crs#:#crs_loc_tab_qtests#:#Final Tests
+crs#:#crs_loc_tab_itests#:#Initial Tests
+crs#:#crs_loc_btn_new_assignment#:#New Test Assignment
+crs#:#crs_objective_tbl_col_final_tsts#:#Final Tests
+crs#:#crs_objective_action_qtest_sep#:#Assign Final Test
+crs#:#crs_loc_settings_tbl_its_q_all#:#Initial Qualifying Test (all Objecives)
+crs#:#crs_loc_settings_tbl_its_nq_all#:#Initial Diagnostic Test (all Objectives)
+crs#:#crs_loc_settings_tbl_it_q#:#Initial Qualifying Test (per Objective)
+crs#:#crs_loc_settings_tbl_it_nq#:#Initial Diagnostic Test (per Objective)
+crs#:#crs_loc_settings_tbl_qts_all#:#Finaly Test (all Objectives)
+crs#:#crs_loc_settings_tbl_qt#:#Final Test (per Objective)
+crs#:#crs_loc_objective_passed_confirmation#:#You have already passed this learning objective. Starting a new test run will reset the result. Do you really want to start a new test run?
+crs#:#crs_loc_objectives_passed_confirmation#:#You have already passed all learning objectives. Starting a new test run will reset all results. Do you really want to start a new test run?
+crs#:#crs_loc_tst_start#:#Start Test
+crs#:#crs_loc_mem_show_res#:#Show Test Results
+crs#:#crs_loc_test_results_of#:#Test results of:
 buddysystem#:#buddy_bs_btn_txt_unlinked_a#:#Request Contact
 buddysystem#:#buddy_bs_btn_txt_unlinked_p#:#Request Contact
 buddysystem#:#buddy_bs_btn_txt_linked_a#:#Linked
@@ -15844,6 +15852,10 @@ buddysystem#:#buddy_bs_act_btn_txt_requested_to_linked#:#Confirm
 buddysystem#:#buddy_bs_act_btn_txt_ignored_request_to_unlinked#:#Cancel Request
 buddysystem#:#buddy_bs_act_btn_txt_ignored_request_to_linked#:#Confirm Request
 buddysystem#:#buddy_bs_action_not_possible#:#Action not possible
+buddysystem#:#buddy_bs_action_already_linked#:#Action not possible. Already accepted the contact request from user '%s'.
+buddysystem#:#buddy_bs_action_already_requested#:#Action not possible. Already requested user '%s'.
+buddysystem#:#buddy_bs_action_already_ignored#:#Action not possible. Already ignored user '%s'.
+buddysystem#:#buddy_bs_action_already_unlinked#:#Action not possible. The contact state for user '%s' is already unlinked.
 buddysystem#:#buddy_bs_state_linked#:#Linked
 buddysystem#:#buddy_bs_state_linked_a#:#Linked
 buddysystem#:#buddy_bs_state_linked_p#:#Linked
@@ -16109,13 +16121,13 @@ crs#:#crs_loc_settings_passed_mode_mark#:#Test questions for mastered learning o
 crs#:#crs_checklist_objective#:#Checklist Objective
 prtf#:#prtf_set_default_publish_global#:#Share with unregistered users also
 prtf#:#prtf_set_default_publish_registered#:#Share with registered users only
-crs#:#crs_loc_settings_type_it_placement_all_info#:#Placement test on all learning objectives
-crs#:#crs_loc_settings_type_it_placement_sel_info#:#Placement test per single learning objective
-crs#:#crs_loc_settings_type_it_qualifying_all_info#:#Achievement test on all learning objectives
-crs#:#crs_loc_settings_type_it_qualifying_sel_info#:#Achievement test per sinble learning objective
-crs#:#crs_loc_settings_type_it_none_info#:#No placement test
-crs#:#crs_loc_settings_type_q_all_info#:#Achievement test on all learning objectives
-crs#:#crs_loc_settings_type_q_selected_info#:#Achievement test per sinble learning objective
+crs#:#crs_loc_settings_type_it_placement_all_info#:#Initial test on all learning objectives
+crs#:#crs_loc_settings_type_it_placement_sel_info#:#Initial test per single learning objective
+crs#:#crs_loc_settings_type_it_qualifying_all_info#:#Final test on all learning objectives
+crs#:#crs_loc_settings_type_it_qualifying_sel_info#:#Final test per single learning objective
+crs#:#crs_loc_settings_type_it_none_info#:#No initial test
+crs#:#crs_loc_settings_type_q_all_info#:#Final test on all learning objectives
+crs#:#crs_loc_settings_type_q_selected_info#:#Final test per single learning objective
 crs#:#crs_visibility_until_info#:#The course will be visible to it's members in a specific period of time.
 crs#:#crs_registration_limited_info#:#Members can only register for this course during a specific period of time.
 crs#:#crs_subscription_max_members_short_info#:#The minimal respectively maximial number of members can be set. A waiting list can be set up.
@@ -16185,3 +16197,29 @@ exc#:#exc_delete_team#:#Delete Team
 sysc#:#sysc_tree_structure_failures#:#Number of failures in the tree structure (parent-Relation):
 sysc#:#sysc_message_tree_structure_confirm#:#Do you really want to repair the tree structure? Please create a database backup before you proceed.
 sysc#:#sysc_btn_tree_structure#:#Recreate Tree Structure
+crs#:#event_tbl_admins#:#Administrators
+crs#:#event_tbl_members#:#Members
+crs#:#event_tbl_tutors#:#Tutors
+trac#:#trac_cron_info#:#Please activate the "Object Statistics" cron job to gather data.
+sess#:#sess_list_reg_limit_places#:#Free places
+sess#:#sess_accept_request#:#Accept Participation
+sess#:#sess_new_registrations#:#Join Request
+rbac#:#mep_copy#:#User can copy media pool
+crs#:#crs_cannot_find_role#:#Can't find this role.
+grp#:#grp_admission_link_failure_invalid_code#:#Can't register: Link is invalid.
+crs#:#crs_admission_link_failure_invalid_code#:#Can't register: Link is invalid.
+auth#:#auth_ldap_server_ds#:#LDAP-Server
+assessment#:#ass_location#:#Location
+assessment#:#ass_imap_hint#:#Hint to be shown as Tooltip
+blog#:#blog_show_latest#:#Show latest postings/drafts
+assessment#:#ass_competence_respect_level_ordering#:#Please note that the competence thresholds have to be defined in an ascending order according to the available levels.
+registration#:#reg_mail_body_activation#:#to activate your account and confirm ownership of this email address, click the link below:
+form#:#err_invalid_input#:#An invalid value has been submited. Please check your input.
+prg#:#prg_points_reachable#:#Points Obtainable
+mail#:#mail_members_search_continue#:#Continue
+copg#:#copg_confirm_el_deletion#:#Do you really want to delete the selected elements?
+survey#:#msg_input_only_positive_numbers#:#Please enter positive numbers in scale values.
+crs#:#crs_loc_err_stat_tst_offline#:#Not all tests are online.
+itgr#:#itgr_desc_info#:#The description will not be a part of the item group's presentation in its container.
+rbac#:#edit_members#:#Manage members
+rbac#:#prg_manage_members#:#Manage members of Study Programme

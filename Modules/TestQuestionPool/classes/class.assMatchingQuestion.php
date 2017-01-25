@@ -155,10 +155,13 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 		foreach ($this->terms as $key => $term)
 		{
 			$next_id = $ilDB->nextId( 'qpl_a_mterm' );
-			$ilDB->manipulateF( "INSERT INTO qpl_a_mterm (term_id, question_fi, picture, term) VALUES (%s, %s, %s, %s)",
-								array( 'integer', 'integer', 'text', 'text' ),
-								array( $next_id, $this->getId(), $term->picture, $term->text )
-			);
+			$ilDB->insert('qpl_a_mterm', array(
+				'term_id' => array('integer', $next_id),
+				'question_fi' => array('integer', $this->getId()),
+				'picture' => array('text', $term->picture),
+				'term' => array('text', $term->text),
+				'ident' => array('integer', $term->identifier)
+			));
 			$termids[$term->identifier] = $next_id;
 		}
 
@@ -167,11 +170,13 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 		foreach ($this->definitions as $key => $definition)
 		{
 			$next_id = $ilDB->nextId( 'qpl_a_mdef' );
-			$ilDB->manipulateF( "INSERT INTO qpl_a_mdef (def_id, question_fi, picture, definition, morder) VALUES (%s, %s, %s, %s, %s)",
-								array( 'integer', 'integer', 'text', 'text', 'integer' ),
-								array( $next_id, $this->getId(
-								), $definition->picture, $definition->text, $definition->identifier )
-			);
+			$ilDB->insert('qpl_a_mdef', array(
+				'def_id' => array('integer', $next_id),
+				'question_fi' => array('integer', $this->getId()),
+				'picture' => array('text', $definition->picture),
+				'definition' => array('text', $definition->text),
+				'ident' => array('integer', $definition->identifier)
+			));
 			$definitionids[$definition->identifier] = $next_id;
 		}
 
@@ -280,7 +285,7 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 		{
 			while ($data = $ilDB->fetchAssoc($result))
 			{
-				$term = new assAnswerMatchingTerm($data['term'], $data['picture'], $data['term_id']);
+				$term = new assAnswerMatchingTerm($data['term'], $data['picture'], $data['ident']);
 				array_push($this->terms, $term);
 				$termids[$data['term_id']] = $term;
 			}
@@ -297,7 +302,7 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 		{
 			while ($data = $ilDB->fetchAssoc($result))
 			{
-				$definition = new assAnswerMatchingDefinition($data['definition'], $data['picture'], $data['morder']);
+				$definition = new assAnswerMatchingDefinition($data['definition'], $data['picture'], $data['ident']);
 				array_push($this->definitions, $definition);
 				$definitionids[$data['def_id']] = $definition;
 			}
@@ -370,7 +375,7 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 		// copy XHTML media objects
 		$clone->copyXHTMLMediaObjectsOfQuestion($this_id);
 		// duplicate the image
-		$clone->duplicateImages($this_id, $thisObjId);
+		$clone->duplicateImages($this_id, $thisObjId, $clone->getId(), $testObjId);
 
 		$clone->onDuplicate($thisObjId, $this_id, $clone->getObjId(), $clone->getId());
 		
@@ -1686,6 +1691,24 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 		else
 		{
 			return $this->getMatchingPairs();
+		}
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	protected function afterSyncWithOriginal($origQuestionId, $dupQuestionId, $origParentObjId, $dupParentObjId)
+	{
+		parent::afterSyncWithOriginal($origQuestionId, $dupQuestionId, $origParentObjId, $dupParentObjId);
+
+		$origImagePath = $this->buildImagePath($origQuestionId, $origParentObjId);
+		$dupImagePath  = $this->buildImagePath($dupQuestionId, $dupParentObjId);
+
+		ilUtil::delDir($origImagePath);
+		if(is_dir($dupImagePath))
+		{
+			ilUtil::makeDirParents($origImagePath);
+			ilUtil::rCopy($dupImagePath, $origImagePath);
 		}
 	}
 }

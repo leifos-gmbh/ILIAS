@@ -533,6 +533,8 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 		$this->tpl->setVariable("CONTENT_BLOCK", "<meta http-equiv=\"refresh\" content=\"5; url=" . $url . "\">");
 		$this->tpl->parseCurrentBlock();
 	}
+	
+	abstract protected function getCurrentQuestionId();
 
 	function autosaveCmd()
 	{
@@ -542,14 +544,21 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 		$result = "";
 		if (is_array($_POST) && count($_POST) > 0)
 		{
-			$res = $this->saveQuestionSolution($authorizedSolution, true);
-			if ($res)
+			if( $this->isParticipantsAnswerFixed($this->getCurrentQuestionId()) )
 			{
-				$result = $this->lng->txt("autosave_success");
+				$result = '-IGNORE-';
 			}
 			else
 			{
-				$result = $this->lng->txt("autosave_failed");
+				$res = $this->saveQuestionSolution($authorizedSolution, true);
+				if ($res)
+				{
+					$result = $this->lng->txt("autosave_success");
+				}
+				else
+				{
+					$result = $this->lng->txt("autosave_failed");
+				}
 			}
 		}
 		if (!$canSaveResult)
@@ -751,11 +760,6 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 			$this->testSession->setSubmittedTimestamp(date('Y-m-d H:i:s'));
 			$this->testSession->saveToDb();
 		}
-
-		if( $this->object->getEnableArchiving() )
-		{
-			$this->archiveParticipantSubmission($this->testSession->getActiveId(), $finishedPass);
-		}
 	}
 
 	protected function afterTestPassFinishedCmd()
@@ -877,7 +881,7 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 		{
 			ilUtil::makeDirParents($path);
 		}
-		$filename = $path . '/exam_N' . $inst_id . '-' . $this->object->getId()
+		$filename = realpath($path) . '/exam_N' . $inst_id . '-' . $this->object->getId()
 					. '-' . $active . '-' . $pass . '.pdf';
 
 		require_once 'class.ilTestPDFGenerator.php';
@@ -934,7 +938,7 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 		$overview = $testevaluationgui->getPassListOfAnswers(
 			$passdata, $active, $pass, true, false, false, true, false, $objectivesList, $testResultHeaderLabelBuilder
 		);
-		$filename = ilUtil::getWebspaceDir() . '/assessment/scores-'.$this->object->getId() . '-' . $active . '-' . $pass . '.pdf';
+		$filename = realpath(ilUtil::getWebspaceDir()) . '/assessment/scores-'.$this->object->getId() . '-' . $active . '-' . $pass . '.pdf';
 		ilTestPDFGenerator::generatePDF($overview, ilTestPDFGenerator::PDF_OUTPUT_FILE, $filename);
 		$archiver->handInTestResult($active, $pass, $filename);
 		unlink($filename);

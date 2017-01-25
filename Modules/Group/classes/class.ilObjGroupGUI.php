@@ -95,6 +95,11 @@ class ilObjGroupGUI extends ilContainerGUI
 				break;
 
 			case 'ilrepositorysearchgui':
+
+				if(!$this->checkPermissionBool('write'))
+				{
+					$GLOBALS['ilErr']->raiseError($GLOBALS['lng']->txt('permission_denied'), $GLOBALS['ilErr']->WARNING);
+				}
 				include_once('./Services/Search/classes/class.ilRepositorySearchGUI.php');
 				$rep_search =& new ilRepositorySearchGUI();
 				$rep_search->setCallback($this,
@@ -216,7 +221,7 @@ class ilObjGroupGUI extends ilContainerGUI
 				
 				$this->setSubTabs('members');
 				$this->tabs_gui->setTabActive('members');
-				$this->tabs_gui->setSubTabActive('export_members');
+				$this->tabs_gui->setSubTabActive('grp_export_members');
 				$export = new ilMemberExportGUI($this->object->getRefId());
 				$this->ctrl->forwardCommand($export);
 				break;
@@ -448,8 +453,8 @@ class ilObjGroupGUI extends ilContainerGUI
 		// check for parent group or course => SORT_INHERIT
 		$sort_mode = ilContainer::SORT_TITLE;
 		if(
-				$GLOBALS['tree']->checkForParentType($this->object->getRefId(),'crs') ||
-				$GLOBALS['tree']->checkForParentType($this->object->getRefId(),'grp')
+				$GLOBALS['tree']->checkForParentType($this->object->getRefId(),'crs',true) ||
+				$GLOBALS['tree']->checkForParentType($this->object->getRefId(),'grp',true)
 		)
 		{
 			$sort_mode = ilContainer::SORT_INHERIT;
@@ -1447,12 +1452,13 @@ class ilObjGroupGUI extends ilContainerGUI
 			$rcps[] = ilObjUser::_lookupLogin($usr_id);
 		}
 
-        require_once 'Services/Mail/classes/class.ilMailFormCall.php';
+		require_once 'Services/Mail/classes/class.ilMailFormCall.php';
+		ilMailFormCall::setRecipients($rcps);
 		ilUtil::redirect(ilMailFormCall::getRedirectTarget(
 			$this, 
 			'members',
 			array(), 
-			array('type' => 'new', 'rcp_to' => implode(',',$rcps),'sig' => $this->createMailSignature())));
+			array('type' => 'new', 'sig' => $this->createMailSignature())));
 		return true;
 	}
 	
@@ -2240,8 +2246,13 @@ class ilObjGroupGUI extends ilContainerGUI
 				}
 				if($this->object->getMaxMembers())
 				{
-					$info->addProperty($this->lng->txt("mem_free_places"),
-									   max(0,$this->object->getMaxMembers() - $this->object->members_obj->getCountMembers()));
+					include_once './Modules/Group/classes/class.ilObjGroupAccess.php';
+					 $reg_info = ilObjGroupAccess::lookupRegistrationInfo($this->object->getId());
+
+					 $info->addProperty(
+						 $this->lng->txt('mem_free_places'),
+						 $reg_info['reg_info_free_places']
+					 );
 				}				
 			}
 			
@@ -2570,8 +2581,8 @@ class ilObjGroupGUI extends ilContainerGUI
 			// Group presentation
 			$hasParentMembership = 
 				(
-					$tree->checkForParentType($this->object->getRefId(),'crs') ||
-					$tree->checkForParentType($this->object->getRefId(),'grp')
+					$tree->checkForParentType($this->object->getRefId(),'crs',true) ||
+					$tree->checkForParentType($this->object->getRefId(),'grp',true)
 				);
 			
 			$pres = new ilFormSectionHeaderGUI();

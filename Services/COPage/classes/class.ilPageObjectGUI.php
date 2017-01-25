@@ -1770,6 +1770,11 @@ return;
 		{
 			$xsl = file_get_contents("./Services/COPage/xsl/page.xsl");
 
+			$this->log->debug("Calling XSLT, content: ".$content);
+			//echo $content; exit;
+			//$content = '<dummy><PageObject></PageObject><MediaObject Id="il__mob_350071"><MediaItem Purpose="Standard"><Location Type="LocalFile">01_Course_Kick_off500pix_100_0.png</Location><Format>image/png</Format><Layout Width="100" Height="71" HorizontalAlign="Left" /><MapArea Shape="WholePicture" Coords="" ><ExtLink Href="" Title="">https://lms.skyguide.corp/goto.php?target=fold_323629&client_id=skyguide</ExtLink></MapArea></MediaItem></MediaObject><MediaObject Id="il__mob_350072"><MediaItem Purpose="Standard"><Location Type="LocalFile">02_Feasibility500pix_100_0.png</Location><Format>image/png</Format><Layout Width="100" Height="71" HorizontalAlign="Left" /></MediaItem></MediaObject><MediaObject Id="il__mob_350073"><MediaItem Purpose="Standard"><Location Type="LocalFile">03_Preparation500pix_100_0.png</Location><Format>image/png</Format><Layout Width="100" Height="71" HorizontalAlign="Left" /></MediaItem></MediaObject><MediaObject Id="il__mob_350074"><MediaItem Purpose="Standard"><Location Type="LocalFile">05_Planning500pix.png</Location><Format>image/png</Format><Layout Width="100" Height="71" HorizontalAlign="Left" /></MediaItem></MediaObject><MediaObject Id="il__mob_350076"><MediaItem Purpose="Standard"><Location Type="LocalFile">06_SIM_Kick_off500pix_100_0.png</Location><Format>image/png</Format><Layout Width="100" Height="71" HorizontalAlign="Left" /></MediaItem></MediaObject><MediaObject Id="il__mob_350077"><MediaItem Purpose="Standard"><Location Type="LocalFile">07_TVAL500pix_100_0.png</Location><Format>image/png</Format><Layout Width="100" Height="70" HorizontalAlign="Left" /></MediaItem></MediaObject><MediaObject Id="il__mob_350078"><MediaItem Purpose="Standard"><Location Type="LocalFile">08_PVAL500pix_100_0.png</Location><Format>image/png</Format><Layout Width="100" Height="70" HorizontalAlign="Left" /></MediaItem></MediaObject><MediaObject Id="il__mob_350079"><MediaItem Purpose="Standard"><Location Type="LocalFile">09_OVAL500pix_100_0.png</Location><Format>image/png</Format><Layout Width="100" Height="71" HorizontalAlign="Left" /></MediaItem></MediaObject><MediaObject Id="il__mob_350080"><MediaItem Purpose="Standard"><Location Type="LocalFile">10_Course500pix_100_0.png</Location><Format>image/png</Format><Layout Width="100" Height="71" HorizontalAlign="Left" /></MediaItem></MediaObject><MediaObject Id="il__mob_350081"><MediaItem Purpose="Standard"><Location Type="LocalFile">11_Evaluation500pix_100_0.png</Location><Format>image/png</Format><Layout Width="100" Height="71" HorizontalAlign="Left" /></MediaItem></MediaObject><MediaObject Id="il__mob_350082"><MediaItem Purpose="Standard"><Location Type="LocalFile">100_Accountable500pix_100_0.png</Location><Format>image/png</Format><Layout Width="100" Height="69" HorizontalAlign="Left" /></MediaItem></MediaObject><MediaObject Id="il__mob_350241"><MediaItem Purpose="Standard"><Location Type="LocalFile">Picture30LINK_450_0.PNG</Location><Format>image/png</Format><Layout Width="450" Height="24" HorizontalAlign="Left" /><MapArea Shape="WholePicture" Coords="" ><ExtLink Href="http://lms.skyguide.corp/goto.php?target=file_323721_download&amp;client_id=skyguide" Title=""></ExtLink></MapArea></MediaItem></MediaObject></dummy>';
+
+
 			$args = array( '/_xml' => $content, '/_xsl' => $xsl );
 			$xh = xslt_create();
 			//		echo "<b>XSLT</b>:".htmlentities($xsl).":<br>";
@@ -2592,6 +2597,7 @@ return;
 		xslt_free($xh);
 
 		// unmask user html
+		require_once('./Services/Style/classes/class.ilObjStyleSheet.php');
 		$tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
 				ilObjStyleSheet::getContentStylePath(0));
 		$tpl->setVariable("LOCATION_STYLESHEET", ilUtil::getStyleSheetLocation());
@@ -2639,9 +2645,14 @@ return;
 			{
 				include_once("./Modules/MediaPool/classes/class.ilMediaPoolPageGUI.php");
 
+				$snippet_lang = $this->getLanguage();
+				if (!ilPageObject::_exists("mep", $param[1], $snippet_lang))
+				{
+					$snippet_lang = "-";
+				}
 				if (($param[2] <= 0 || $param[2] == IL_INST_ID) && ilMediaPoolPage::_exists($param[1]))
 				{
-					$page_gui = new ilMediaPoolPageGUI($param[1], 0, true, $this->getLanguage());
+					$page_gui = new ilMediaPoolPageGUI($param[1], 0, true, $snippet_lang);
 					if ($this->getOutputMode() != "offline")
 					{
 						$page_gui->setFileDownloadLink($this->determineFileDownloadLink());

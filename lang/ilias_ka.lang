@@ -916,7 +916,6 @@ assessment#:#tst_availability_limitless_info#:#Choose this mode for making the t
 assessment#:#tst_availability_until_info#:#Choose this mode for making the test available and accessible to users for a fixed period of time (depending on participants restriction settings below).
 assessment#:#tst_beginning_ending_information#:#ინფორმაცია ტესტის დასაწყისში და მის დასასრულს
 assessment#:#tst_best_solution_is#:#საუკეთესო ამოხსნაა
-assessment#:#tst_browse_for_questions#:#კითხვების ძიება/დამატება
 assessment#:#tst_change_points_for_question#:#შეცვალეთ პასუხის ქულები
 assessment#:#tst_confirm_delete_results#:#თქვენ შლით თვენს მიერ წინათ შეყვანილ ტესტის კითხვების შედეგებს. Eეს მიანიჭებს ყველა კითხვას მცდარ ღირებულებას. გთხოვთ გაითვალისწინოთ რომ არ შეგიძლიათ განაახლოთ ჩაბარებები, რომელიც თქვენ უკვე გჭირდებოდათ ამ ტესტისთვის. Nნამდვილად გსურთ წინათ შეყვანილი ყველა შედეგის განახლება?
 assessment#:#tst_confirm_delete_results_info#:#თქვენ მიერ წინათ შეყვანილი ტესტის პასუხები წაიშალა. თქვენ წარმატებულად განაახლეთ ტესტი!
@@ -3258,7 +3257,7 @@ common#:#lang_path#:#ენის მდებარეობა
 common#:#lang_refresh_confirm#:#ნამდვილად გსურთ ყველა ენის განახლება
 common#:#lang_refresh_confirm_info#:#გაგრძელებული ენის შენარჩუნება ამჟამად გააქტიურებულია. Eნების განახლება წაიკითხავს მხოლოდ გლობალური ენის ილიასის ფაილს და შესაძლოა ადგილობრივ ენის ფაილს ენის ცვლილების განყოფილებიდან. Gლობალური ენის ფაილები არ მოახდენს ზეგავლენას ხელით შეტანილ ცვლილებებზე. ადგილობრივი ფაილი გადააწერს ყველა ხელით შეტანილ ცვლილებას რომელიც  უფრო ძველია  ვიდრე ადგილობრივი ენის ფაილის შენახვის თარიღი
 common#:#lang_refresh_confirm_selected#:#ნამდვილად გსურთ მონიშნული ენის წაშლა?
-common#:#lang_sep_decimal#:#0
+common#:#lang_sep_decimal#:#.
 common#:#lang_sep_thousand#:#,
 common#:#lang_size_bytes#:#ბაიტები
 common#:#lang_size_gb#:#გეგაბაიტი
@@ -4199,7 +4198,6 @@ common#:#reg_account_confirmation_successful#:#თქვენი მომხ�
 common#:#reg_goto_parent_membership_info#:#Only members can access the target object.
 common#:#reg_mail_body_2_confirmation#:#ლინკი იმუშავებს მხოლოდ "%s"  ისთვის, შემდეგ თქვენ უნდა სცადოთ  ხელახლა
 common#:#reg_mail_body_3_confirmation#:#თუ ეს ემაილი არაფერს ნიშნავს თქვენთვის, მაშინ შესაძლებელია  ვინმე შესული იყო თქვენი ემეილის მისამართზე გამიზნულად ან შემთხვევით, ამიტომ გთხოვთ არ მიაქციოთ ყურადღება ამ ემაილს
-common#:#reg_mail_body_confirmation#:#იმისათვის რომ გააქტიუროდ თქვენი ანგარიში და დაადასტუროთ ამ ემაილის მფლობელობა, დააჭირეთ ლინკს ქვემოთ
 common#:#reg_mail_body_forgot_password_info#:#იმისათვის რომ მიიღოთ პაროლი, გთხოვთ გამოიყენოთ ფუნქცია "დაგავიწყდათ პაროლი" შესვლის მაგიდაზე რომ მოითხოვოთ ახალი პაროლი ამ ანგარიშისთვის
 common#:#reg_mail_body_salutation#:#გამარჯობა
 common#:#reg_mail_body_text1#:#მოგესალმებით ილიასის ე სწავლებაში
@@ -5432,7 +5430,6 @@ content#:#cont_lm_comments_desc#:#Allow users to share comments on every page of
 content#:#cont_lm_default_layout#:#სასწავლო მოდულის მცდარი სქემა
 content#:#cont_lm_menu#:#მენიუ
 content#:#cont_lm_properties#:#სასწავლო მოდულის პარამეტრები
-content#:#cont_LocalFile#:#ადგილობრივი ფაილი
 content#:#cont_localization#:#ლოკალიზაცია
 content#:#cont_localization_info#:#წინასწარ განსაზღვრულ ტექსტში გამოყენებული ენა, მაგალითად "წინა" და "შემდეგი"
 content#:#cont_location#:#ადგილ-მდებარეობა
@@ -8270,8 +8267,6 @@ mail#:#mail_sure_delete#:#დაწმუნებული ხართ რო�
 mail#:#mail_sure_delete_entry#:#დარწმუნებული ხართ რომ შემდეგი შენატანების წაშლა გსურთ?
 mail#:#mail_sure_delete_file#:#ფაილი ამოიშლება ავტომატურად
 mail#:#mail_sure_delete_folder#:#ფოლდერი და მისი შინაარსი წაიშლება სამუდამოდ
-mail#:#mail_system_sender_name#:#Sender Name
-mail#:#mail_system_sender_name_info#:#Please enter a name. This name will be used for automatically generated messages (internal and external). If you leave the field blank, ILIAS uses the short title of this installation. If the title is not well defined, 'ILIAS' is used as the sender.
 mail#:#mail_to#:#ვის
 mail#:#mail_user_addr_n_valid#:#შემდეგ მომხმარებლებს არ აქვთ სწორი ემაილის მისამართი
 mail#:#placeholders_advise#:#
@@ -14100,7 +14095,6 @@ content#:#cont_edit_definitions#:#Edit Definitions###10 02 2014 new variable
 content#:#cont_edit_definition#:#Edit Definition###10 02 2014 new variable
 payment#:#pay_unpayed_bill#:#Please wire the open balance to the given bank account.###14 02 2014 new variable
 meta#:#meta_c_XK#:#Kosovo###11 03 2014 new variable
-certificate#:#certificate_var_matriculation#:#12345###11 03 2014 new variable
 certificate#:#certificate_ph_matriculation#:#Matriculation number of the user###11 03 2014 new variable
 survey#:#mailparticipantdata_placeholder#:#The following placeholders will be replaced with real user data in personalized surveys:###11 03 2014 new variable
 exc#:#exc_create_portfolio_no_template#:#Do not use template###11 03 2014 new variable
@@ -16178,3 +16172,54 @@ style#:#sty_ha_ihcap_class#:#Hor. Accordion Caption###01 03 2016 new variable
 style#:#sty_va_iheada_class#:#Vert. Accordion Header (active)###01 03 2016 new variable
 style#:#sty_va_ihcap_class#:#Vert. Accordion Caption###01 03 2016 new variable
 exc#:#exc_delete_team#:#Delete Team###10 03 2016 new variable
+mail#:#mail_send_html#:#HTML Frame for External Emails###14 04 2016 new variable
+mail#:#mail_send_html_info#:#If enabled, the body of external emails will be embedded in a HTML frame. The corresponding template can be customized by creating a copy of './Services/Mail/templates/default/tpl.html_mail_template.html' at './Customizing/global/skin/[SKIN]/Services/Mail/tpl.html_mail_template.html' .###14 04 2016 new variable
+mail#:#mail_system_from_name#:#Sender Name###14 04 2016 new variable
+mail#:#mail_system_from_name_info#:#Please enter a name. This name (e.g. 'John Doe') will be used for automatically generated messages (internal and external). If you leave the field blank, ILIAS uses the short title of this installation. If the title is not well defined, ‘ILIAS’ is used as the sender.###14 04 2016 new variable
+mail#:#mail_system_return_path#:#Global Return-Path###14 04 2016 new variable
+mail#:#mail_system_return_path_info#:#Please enter an email address which should be used for the return path (e.g. webmaster@ilias.de). If you leave the field blank, the 'Return-Path' will be the 'From' email address.###14 04 2016 new variable
+sysc#:#sysc_tree_structure_failures#:#Number of failures in the tree structure (parent-Relation):###14 04 2016 new variable
+sysc#:#sysc_message_tree_structure_confirm#:#Do you really want to repair the tree structure? Please create a database backup before you proceed.###14 04 2016 new variable
+sysc#:#sysc_btn_tree_structure#:#Recreate Tree Structure###14 04 2016 new variable
+crs#:#event_tbl_admins#:#Administrators###14 04 2016 new variable
+crs#:#event_tbl_members#:#Members###14 04 2016 new variable
+crs#:#event_tbl_tutors#:#Tutors###14 04 2016 new variable
+trac#:#trac_cron_info#:#Please activate the "Object Statistics" cron job to gather data.###20 04 2016 new variable
+assessment#:#ass_create_export_file_with_results#:#Create Test Export File (incl. Participant Results)###19 05 2016 new variable
+assessment#:#tst_conflict_fbh_oblig_quest#:#The combination of using compulsory questions and locked answers is not allowed.###19 05 2016 new variable
+assessment#:#tst_conflict_reset_non_fbh#:#The setting "Lock Answers" was adjusted to "Do Not Lock Answers".###19 05 2016 new variable
+assessment#:#tst_conflict_reset_fbh_force#:#The setting "Lock Answers" was adjusted to "Do Not Lock Answers but Force Feedback".###19 05 2016 new variable
+dcl#:#dcl_reference_link_info#:#Detailed View must be active in referenced table###19 05 2016 new variable
+buddysystem#:#buddy_bs_action_already_linked#:#Already accepted the contact request from user '%s'.###19 05 2016 new variable
+buddysystem#:#buddy_bs_action_already_requested#:#Already requested user '%s'.###19 05 2016 new variable
+buddysystem#:#buddy_bs_action_already_ignored#:#Already ignored user '%s'.###19 05 2016 new variable
+buddysystem#:#buddy_bs_action_already_unlinked#:#The contact state for user '%s' is already unlinked.###19 05 2016 new variable
+sess#:#sess_list_reg_limit_places#:#Free places###19 05 2016 new variable
+sess#:#sess_accept_request#:#Accept Participation###19 05 2016 new variable
+sess#:#sess_new_registrations#:#Join Request###19 05 2016 new variable
+mail#:#mail_serial_letter_placeholders#:#Serial-Letter Placeholders###06 07 2016 new variable
+rbac#:#mep_copy#:#User can copy media pool###06 07 2016 new variable
+crs#:#crs_cannot_find_role#:#Can't find this role.###06 07 2016 new variable
+grp#:#grp_admission_link_failure_invalid_code#:#Can't register: Link is invalid.###06 07 2016 new variable
+crs#:#crs_admission_link_failure_invalid_code#:#Can't register: Link is invalid.###06 07 2016 new variable
+auth#:#auth_ldap_server_ds#:#LDAP-Server###03 08 2016 new variable
+assessment#:#ass_location#:#Location###03 08 2016 new variable
+assessment#:#ass_imap_hint#:#Hint to be shown as Tooltip###03 08 2016 new variable
+blog#:#blog_show_latest#:#Show latest postings/drafts###03 08 2016 new variable
+assessment#:#min_auto_complete#:#Autocomplete###12 10 2016 new variable
+assessment#:#autocomplete_error#:#Your autocomplete number is to large, you have answers which have less characters, so they would never be displayed.###12 10 2016 new variable
+assessment#:#tst_browse_for_qpl_questions#:#Add from Pool###12 10 2016 new variable
+assessment#:#tst_browse_for_tst_questions#:#Add from Other Test###12 10 2016 new variable
+assessment#:#ass_competence_respect_level_ordering#:#Please note that the competence thresholds have to be defined in an ascending order according to the available levels.###12 10 2016 new variable
+registration#:#reg_mail_body_activation#:#to activate your account and confirm ownership of this email address, click the link below:###12 10 2016 new variable
+form#:#err_invalid_input#:#An invalid value has been submited. Please check your input.###12 10 2016 new variable
+prg#:#prg_points_reachable#:#Points Obtainable###12 10 2016 new variable
+mail#:#mail_members_search_continue#:#Continue###12 10 2016 new variable
+copg#:#copg_confirm_el_deletion#:#Do you really want to delete the selected elements?###12 10 2016 new variable
+survey#:#msg_input_only_positive_numbers#:#Please enter positive numbers in scale values.###12 10 2016 new variable
+crs#:#crs_loc_err_stat_tst_offline#:#Not all tests are online.###12 10 2016 new variable
+itgr#:#itgr_desc_info#:#The description will not be a part of the item group's presentation in its container.###12 10 2016 new variable
+dcl#:#dcl_std_field_not_importable#:# - Standard fields are not importable.###25 10 2016 new variable
+certificate#:#certificate_var_user_matriculation#:#12345###25 10 2016 new variable
+rbac#:#edit_members#:#Manage members###22 12 2016 new variable
+rbac#:#prg_manage_members#:#Manage members of Study Programme###22 12 2016 new variable

@@ -22,7 +22,7 @@ class ilExParticipantTableGUI extends ilTable2GUI
 	*/
 	function __construct($a_parent_obj, $a_parent_cmd, $a_exc, $a_part_id)
 	{
-		global $ilCtrl, $lng, $lng;
+		global $ilCtrl, $lng, $ilAccess;
 		
 		$this->exc = $a_exc;
 		$this->exc_id = $this->exc->getId();
@@ -32,7 +32,7 @@ class ilExParticipantTableGUI extends ilTable2GUI
 		$this->part_id = $a_part_id;
 		
 		$this->setId("exc_part_".$this->exc_id."_".$this->part_id);
-		
+
 		include_once("./Services/User/classes/class.ilObjUser.php");
 		
 		if ($this->part_id > 0)
@@ -47,12 +47,12 @@ class ilExParticipantTableGUI extends ilTable2GUI
 			else
 			{
 				$ilCtrl->setParameter($a_parent_obj, "member_id", "");
+				$ilCtrl->setParameter($a_parent_obj, "part_id", "");	// #0020073
 				$ilCtrl->redirect($a_parent_obj, $a_parent_cmd);
 			}
 		}
 		
 		parent::__construct($a_parent_obj, $a_parent_cmd);
-		
 		$data = ilExAssignment::getAssignmentDataOfExercise($this->exc_id);
 		$this->setData($data);
 		
@@ -96,6 +96,13 @@ class ilExParticipantTableGUI extends ilTable2GUI
 		include_once "Services/Form/classes/class.ilPropertyFormGUI.php";
 		include_once "Services/UIComponent/Overlay/classes/class.ilOverlayGUI.php";
 		$this->overlay_tpl = new ilTemplate("tpl.exc_learner_comment_overlay.html", true, true, "Modules/Exercise");
+		
+		// #18327
+		if(!$ilAccess->checkAccessOfUser($a_part_id, "read","", $this->exc->getRefId()) &&
+			is_array($info = $ilAccess->getInfo()))
+		{
+			$this->setDescription('<span class="warning">'.$info[0]['text'].'</span>');
+		}		
 	}
 	
 	/**

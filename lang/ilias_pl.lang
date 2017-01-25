@@ -1,6 +1,6 @@
-/* Copyright (c) 1998-2016 ILIAS open source eLearning e.V., Extended GPL, see docs/LICENSE */
+/* Copyright (c) 1998-2017 ILIAS open source e-Learning e.V., Extended GPL, see docs/LICENSE */
 /**
-* ILIAS language file
+* ILIAS language file (All entries)
 *
 * @module			language file Polish
 * @modulegroup		language
@@ -10,7 +10,7 @@
 // The language file starts beyond the HTML-comment below. DO NOT modify this line!
 // To edit your language file with a spreadsheet (i.e. Excel or StarCalc) remove all lines
 // from the first line to the HTML-comment. After editing paste the lines in place again.
-// NOTICE: Character coding of all ILIAS lang files is UTF-8! Please set your editor
+// NOTICE: Character coding of all ILIAS 3 lang files is UTF-8! Please set your editor
 // to the corresponding mode! 
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
@@ -33,7 +33,7 @@ acc#:#acc_reply#:#Odpowiedź
 acc#:#acc_tree_off#:#Tree Off
 acc#:#acc_tree_on#:#Tree On
 adm#:#adm_awrn_support_contacts_info#:#All technical support contacts are listed. Users are defined as technical support contacts in the section "General Settings" > "Contact Information".
-adm#:#adm_support_contacts#:#Technical Support
+adm#:#adm_support_contacts#:#Wsparcie Techniczne
 adm#:#adm_support_contacts_info#:#Support contacts used in the footer link and (if activated) in the ‘Who is online?’-Tool. Comma separated list of account logins.
 adm#:#adm_update_skill_status#:#Aktualizacja Stanu Kompetencji
 adm#:#adm_update_skill_tables#:#Aktualizacja Tabel Kompetencji
@@ -260,7 +260,7 @@ administration#:#nothing_to_restore#:#Nic do odtworzenia...
 administration#:#obj_blga#:#Blog
 administration#:#obj_blga_desc#:#Global Blog Settings
 administration#:#obj_chta_desc#:#Chat Administration
-administration#:#obj_excs#:#Exercise
+administration#:#obj_excs#:#Ćwiczenie
 administration#:#obj_excs_desc#:#Global Exercise Settings
 administration#:#obj_mds#:#Metadane
 administration#:#obj_mds_desc#:#Konfiguracja metadanych
@@ -355,7 +355,6 @@ adve#:#adve_text_content_features#:#Text Content Menu
 adve#:#adve_use_physical#:#Use b/i/u instead of str/emp/imp
 adve#:#adve_use_physical_info#:#This setting replaces the semantic style class buttons for strong, emphatic and important with physical attribute buttons b (bold), i (italic) and u (underline). Please note, that this may result in inconsistencies, if the style editor is used and other phyiscal attributes are assigned to the strong/emphatic/important style classes.
 adve#:#adve_use_tiny_mce#:#Enable TinyMCE for WYSIWYG Editing
-adve#:#char_selector#:#Selector for Unicode Characters
 adve#:#char_selector_admin#:#Selector for Unicode Characters (TODO)
 adve#:#char_selector_blocks#:#Available Unicode Blocks
 adve#:#char_selector_blocks_info#:#All characters of the selected blocks will be listed, but not all of them may be supported by the current browser font.
@@ -371,24 +370,20 @@ adve#:#char_selector_custom_items_info5a#:#U+00C0
 adve#:#char_selector_custom_items_info5b#:#A character can also be defined in Unicode notation (case insensitive)
 adve#:#char_selector_custom_items_info6a#:#U+00C0-U+00CF
 adve#:#char_selector_custom_items_info6b#:#Ranges are also possible in Unicode notation
-adve#:#char_selector_disabled#:#Disabled
 adve#:#char_selector_disabled_admin#:#Disabled (TODO)
 adve#:#char_selector_disabled_info_admin#:#Disables the selector. Users and tests can have individual settings.
 adve#:#char_selector_disabled_info_test#:#Disables the selector during a test run.
 adve#:#char_selector_disabled_info_user#:#Disables the selector. Tests can have an individual setting.
 adve#:#char_selector_disabled_test#:#Disabled (TODO)
 adve#:#char_selector_disabled_user#:#Disabled (TODO)
-adve#:#char_selector_enabled#:#Enabled
 adve#:#char_selector_enabled_admin#:#Enabled (TODO)
 adve#:#char_selector_enabled_info_admin#:#Enables the selector, invoked through a button in the main menu. Users and tests can have individual settings.
 adve#:#char_selector_enabled_info_test#:#Enables the selector during the a test run.
 adve#:#char_selector_enabled_info_user#:#Enables the selector, invoked through a button in the main menu.
 adve#:#char_selector_enabled_test#:#Enabled (TODO)
 adve#:#char_selector_enabled_user#:#Enabled (TODO)
-adve#:#char_selector_inactive#:#Inactive
 adve#:#char_selector_inactive_admin#:#Inactive (TODO)
 adve#:#char_selector_inactive_info_admin#:#Deactivates the selector. Users and tests can't overwrite this setting.
-adve#:#char_selector_inherit#:#Inherit
 adve#:#char_selector_inherit_info_test#:#Take the platform or user specific setting.
 adve#:#char_selector_inherit_info_user#:#Take the platform setting.
 adve#:#char_selector_inherit_test#:#Inherit (TODO)
@@ -450,15 +445,18 @@ assessment#:#applet_parameter#:#Parametr
 assessment#:#applet_parameters#:#Parametry Apletu
 assessment#:#apply#:#Zastosuj
 assessment#:#apply_def_settings_to_tst#:#Apply Settings
+assessment#:#ass_competence_respect_level_ordering#:#Please note that the competence thresholds have to be defined in an ascending order according to the available levels.
 assessment#:#ass_completion_by_submission#:#Completed by Submission
 assessment#:#ass_completion_by_submission_info#:#If enabled, the submission of at least one file causes the completion of this question by granting the maximum score for this question. The score could be manually changed later. Switching this setting does not effect already submitted solutions.
 assessment#:#ass_create_archive_export#:#Create Archive-Export.
 assessment#:#ass_create_export_file#:#Twórz plik eksportowy
+assessment#:#ass_create_export_file_with_results#:#Create Test Export File (incl. Participant Results)
 assessment#:#ass_create_export_test_archive#:#Create Test Archive File
 assessment#:#ass_create_export_test_results#:#Eksport Rezultatów testu
 assessment#:#ass_create_question#:#Create Question
 assessment#:#ass_export_files#:#Eksport plików
 assessment#:#ass_file#:#Plik
+assessment#:#ass_imap_hint#:#Hint to be shown as Tooltip
 assessment#:#ass_lac_answer_index_not_exist#:#The question with index "Q%s" does not have an answer with the index "%s".
 assessment#:#ass_lac_answer_index_not_exist_cur_qst#:#The current question does not have an answer with the index "%s".
 assessment#:#ass_lac_answer_value_not_exists#:#The value "%s" does not exist in question Q%s[%s].
@@ -480,6 +478,7 @@ assessment#:#ass_lac_question_not_reachable#:#The question with index "Q%s" is n
 assessment#:#ass_lac_show_legend_btn#:#Show Legend
 assessment#:#ass_lac_unable_to_parse_condition#:#The condition "%s" can not be validated.
 assessment#:#ass_lac_validation_error#:#Errors occured while validating the conditional expression(s)!
+assessment#:#ass_location#:#Location
 assessment#:#ass_process_lock#:#Use Lockings during Test Passes
 assessment#:#ass_process_lock_desc#:#Without the use of any locking mechanism, race conditions are possible. This can lead to inconsistent test results.
 assessment#:#ass_process_lock_mode#:#Lock Mode during Test Pass
@@ -516,6 +515,7 @@ assessment#:#assQuestions#:#Pytania
 assessment#:#assSingleChoice#:#Pytanie wielokrotnego wyboru (pojedyncza odpowiedź)
 assessment#:#assTextQuestion#:#Pytanie - szkic
 assessment#:#assTextSubset#:#Pytanie z tekstem
+assessment#:#autocomplete_error#:#Your autocomplete number is to large, you have answers which have less characters, so they would never be displayed.
 assessment#:#autosave#:#Automatyczny zapis
 assessment#:#autosave_failed#:#Autosave failed!
 assessment#:#autosave_info#:#Jeśli zaznaczone, odpowiedzi są zapisywane w określonym czasie, aby uniknąć utraty danych. (Nie stosuje się jedynie do wybranych pytań.)
@@ -730,7 +730,6 @@ assessment#:#eval_search_users#:#Użytkownicy
 assessment#:#eval_search_userselection#:#Wyszukaj użytkowników, dla których chcesz dokonać oszacowań statystycznych.
 assessment#:#eval_selected_users#:#Oszacowanie dla wybranych użytkowników
 assessment#:#exam_id#:#Exam Id:
-assessment#:#examid_in_kiosk#:#Display Exam Id in Kiosk mode
 assessment#:#examid_in_test_pass#:#Display Testpass ID
 assessment#:#examid_in_test_pass_desc#:#A testpass ID is diplayed in the test. A new ID is generated for every testpass.
 assessment#:#examid_in_test_res#:#ILIAS Testpass ID
@@ -754,6 +753,7 @@ assessment#:#feedback_all#:#Show answer specific feedback for all answers.
 assessment#:#feedback_answers#:#Reakcja na każdą odpowiedź na pytanie
 assessment#:#feedback_checked#:#Show answer specific feedback for all chosen/selected answers.
 assessment#:#feedback_complete_solution#:#Poprawne rozwiązanie
+assessment#:#feedback_correct#:#Show answer specific feedback for all correct answers (Correct answers are those, that lead to a positive score when chosen/selected).
 assessment#:#feedback_correct_kprim#:#Show answer specific feedback for all correct answers (Correct answers are those, for that the positive option is to be chosen/selected).
 assessment#:#feedback_correct_sc_mc#:#Show answer specific feedback for all correct answers (Correct answers are those, that lead to a positive score when chosen/selected).
 assessment#:#feedback_generic#:#Common Solution Feedback
@@ -936,6 +936,7 @@ assessment#:#maximum_points#:#Maksymalna liczba dostępnych punktów
 assessment#:#maxsize#:#Maximum file upload size
 assessment#:#maxsize_info#:#Enter the maximum size in bytes that should be allowed for file uploads. If you leave this field empty, the maximum size of this installation will be chosen instead.
 assessment#:#meaning#:#Znaczenie
+assessment#:#min_auto_complete#:#Autocomplete
 assessment#:#min_percentage_ne_0#:#Musisz określić minimum na 0 procent! Schemat zaznaczeń nie został zapisany.
 assessment#:#misc#:#Misc Options
 assessment#:#msg_circle_added#:#Circle added
@@ -1054,8 +1055,6 @@ assessment#:#qpl_assessment_no_assessment_of_questions#:#Brak oceny wybranego py
 assessment#:#qpl_assessment_of_questions#:#Ocena pytań
 assessment#:#qpl_assessment_total_of_answers#:#Ogółem odpowiedzi
 assessment#:#qpl_assessment_total_of_right_answers#:#Ogółem procent prawidłowych  odpowiedzi (procent maksymalnej punktacji)
-assessment#:#qpl_browsercolumns#:#Spersonalizowane listy pytań
-assessment#:#qpl_browsercolumns_description#:#Select the question data columns that are shown in the question list of a question pool. This setting will be applied for each available question pool.
 assessment#:#qpl_cancel_skill_assigns_update#:#Cancel
 assessment#:#qpl_confirm_delete_questions#:#Czy jesteś pewien, że chcesz usunąć następujące pytania? Jeśli usuniesz zaznaczone pytania to rezultaty wszystkich testów zawierających zaznaczone pytania będą również usunięte.
 assessment#:#qpl_copy_insert_clipboard#:#Wybrane pytania zostały skopiowane do schowka
@@ -1258,11 +1257,8 @@ assessment#:#set_manual_feedback#:#Ustaw ręczną reakcję
 assessment#:#shape#:#Kształt
 assessment#:#show_answer_overview#:#Show Answer Overview
 assessment#:#show_detailed_results#:#Show User's Detailed Results (Marked Pass)
-assessment#:#show_exam_id#:#Display Exam Id
 assessment#:#show_examview_html#:#Show exam view on the test submission page.
-assessment#:#show_examview_html_desc#:#Shows the tests questions and answers in ILIAS in a step prior to submission.
 assessment#:#show_examview_pdf#:#Shows exam view in an automatically downloaded PDF.
-assessment#:#show_examview_pdf_desc#:#Shows the tests questions and answers in a PDF file in a step prior to submission. (Download button available as well.)
 assessment#:#show_pass_overview#:#Pokaż podgląd zaznaczonych wykonań
 assessment#:#show_user_answers#:#Pokaż zaznaczone przez użytkownika odpowiedzi
 assessment#:#showinfo#:#Pokaż pełną stronę informacyjną.
@@ -1294,7 +1290,6 @@ assessment#:#term#:#Temin
 assessment#:#term_image#:#Zobrazowanie Terminu
 assessment#:#term_text#:#Opisu Terminu
 assessment#:#terms#:#Terminy
-assessment#:#test_add_new_question#:#Add Question
 assessment#:#test_cancelled#:#Test został anulowany
 assessment#:#test_confirm_template_reset#:#Are you sure that you do not want to use the template anymore?
 assessment#:#test_delete_page#:#Delete Question
@@ -1311,7 +1306,6 @@ assessment#:#test_is_offline#:#Nie możesz uruchomić testu! test jest w trybie 
 assessment#:#test_jump_to#:#Przejdź do Pytania
 assessment#:#test_move_page#:#Move Question
 assessment#:#test_next_question#:#Następne Pytanie
-assessment#:#test_presentation#:#Presentation Options
 assessment#:#test_prev_question#:#Poprzednie Pytanie
 assessment#:#test_question_pool_usage#:#Wybierz Pulę Pytań
 assessment#:#test_question_pool_usage_optional#:#Questions can be added optionally to a question pool
@@ -1366,7 +1360,6 @@ assessment#:#tst_add_quest_cont_edit_mode_default#:#Default Editing Mode for Add
 assessment#:#tst_add_quest_cont_edit_mode_page_object#:#Additional Content Editing with Page Object Editor
 assessment#:#tst_all_test_competences#:#All Test Competence
 assessment#:#tst_all_user_data_deleted#:#Wszystkie dane uczestnika testu zostały skasowane!
-assessment#:#tst_allow_fixed_participants#:#Udostępnij test wybranym uczestnikom
 assessment#:#tst_allow_instant_verification#:#Zezwól na weryfikację bieżących odpowiedzi
 assessment#:#tst_allowed_users#:#Maksymalna liczba użytkowników mogąca rozwiązywać test jednocześnie
 assessment#:#tst_allowed_users_desc#:#ILIAS will monitor the number of participants taking the test at the same time. If more users than maximally allowed try to access ILIAS will prevent them from starting the test.
@@ -1394,7 +1387,9 @@ assessment#:#tst_back_to_top#:#Back to Top
 assessment#:#tst_back_to_virtual_pass#:#Back to Questionoverview
 assessment#:#tst_beginning_ending_information#:#Informacja na Początku i na Końcu Testu
 assessment#:#tst_best_solution_is#:#Najlepsze rozwiązanie to
+assessment#:#tst_browse_for_qpl_questions#:#Add from Pool
 assessment#:#tst_browse_for_questions#:#Przegląd pytań
+assessment#:#tst_browse_for_tst_questions#:#Add from Other Test
 assessment#:#tst_btn_hide_best_solutions#:#Hide Best Solutions
 assessment#:#tst_btn_rebuild_random_question_stage#:#Synchronize Quesitons from Pool
 assessment#:#tst_btn_show_best_solutions#:#Show Best Solutions
@@ -1410,6 +1405,9 @@ assessment#:#tst_confirm_delete_results#:#Usuniesz wszystkie swoje poprzednie od
 assessment#:#tst_confirm_delete_results_info#:#Twoje poprzednie odpowiedzi zostały usunięte. Przywróciłeś stan początkowy testu!
 assessment#:#tst_confirm_print#:#Naciśnij przycisk aby wydrukować wszystkie pytania z punktami i rozwiązaniami. Pytanie jest zawsze na końcu strony.
 assessment#:#tst_confirm_submit_answers#:#Potwierdź przekazanie do oceny twoich odpowiedzi. Nie będziesz mógł powrócić do zmiany swoich odpowiedzi po naciśnięciu przycisku zatwierdzającego. Użyj mechanizmu wydruku swojej przeglądarki do wydruku arkusza odpowiedzi.
+assessment#:#tst_conflict_fbh_oblig_quest#:#The combination of using compulsory questions and locked answers is not allowed.
+assessment#:#tst_conflict_reset_fbh_force#:#The setting "Lock Answers" was adjusted to "Do Not Lock Answers but Force Feedback".
+assessment#:#tst_conflict_reset_non_fbh#:#The setting "Lock Answers" was adjusted to "Do Not Lock Answers".
 assessment#:#tst_copy#:#Duplikuj Test
 assessment#:#tst_count_correct_solutions#:#Zliczaj tylko kompletne rozwiązania
 assessment#:#tst_count_correct_solutions_desc#:#Participants score either the maximum number of points for a fully correct and complete answer or 0 points in every other case.
@@ -1471,7 +1469,6 @@ assessment#:#tst_extratime_notavailable#:#Extra time can be added only for tests
 assessment#:#tst_feedback#:#Feedback
 assessment#:#tst_filter_tax_node#:#Taxonomy Node
 assessment#:#tst_filter_taxonomy#:#Filter Taxonomy
-assessment#:#tst_filtered_question_list#:#Test Question Selection
 assessment#:#tst_final_information#:#Finishing the Test: Information Before Submission
 assessment#:#tst_finish_confirm_button#:#Tak, chcę skończyć test
 assessment#:#tst_finish_confirm_cancel_button#:#Nie, powrót do poprzedniej odpowiedzi
@@ -2101,6 +2098,7 @@ auth#:#auth_account_migration_new#:#Create New User Account
 auth#:#auth_auth_settings#:#Settings
 auth#:#auth_info_add#:#Choose this option if you have never registered to ILIAS. A new account will be created
 auth#:#auth_info_migrate#:#If you have already an ILIAS account enter username and password to migrate your personal data (Mail, Test results...).
+auth#:#auth_ldap_server_ds#:#LDAP-Server
 auth#:#auth_login_editor#:#Loginscreen Editor
 auth#:#auth_openid#:#OpenId
 auth#:#auth_openid_configure#:#Configure OpenId-Authentication
@@ -2316,7 +2314,6 @@ bibl#:#bibl_settings_libraries#:#Libraries
 bibl#:#bibl_settings_new#:#Add Library
 bibl#:#bibliography file#:#Bibliography File
 bibl#:#detail_view#:#Detail View
-bibl#:#Download Original File#:#Download Original File
 bibl#:#download_original_file#:#Download Original File
 bibl#:#libraries#:#Libraries
 bibl#:#news_content_created#:#A new bibliography list has been added. You can view the entries by clicking the link to the item.
@@ -2324,7 +2321,6 @@ bibl#:#news_content_updated#:#The bibliography list has been modified. You can v
 bibl#:#news_title_created#:#New bibliography list added
 bibl#:#news_title_updated#:#Bibliography list updated
 bibl#:#obj_bibl_duplicate#:#Duplicate Bibliography
-bibl#:#Override Entries#:#Override Entries
 bibl#:#override_entries#:#Override Entries
 bibl#:#ris_default_a1#:#Primary author
 bibl#:#ris_default_a2#:#Secondary author
@@ -2492,6 +2488,7 @@ blog#:#blog_rename_posting#:#Rename Posting
 blog#:#blog_search_users#:#Search Users
 blog#:#blog_settings#:#Blog Administration
 blog#:#blog_settings_navigation#:#Navigation Column
+blog#:#blog_show_latest#:#Show latest postings/drafts
 blog#:#blog_style#:#Blog Style
 blog#:#blog_toggle_draft#:#Save As Draft
 blog#:#blog_toggle_draft_admin#:#Deactivate Blog Posting
@@ -2602,27 +2599,31 @@ book#:#book_type_updated#:#The booking type has been updated.
 book#:#book_type_warning#:#Currently, there are no booking objects available. To use the booking pool you need to create booking objects.
 book#:#booking_nr_of_items#:#Nr of Items
 book#:#obj_book_duplicate#:#Copy Booking Pool
-buddysystem#:#buddy_allow_to_contact_me#:#Allow to contact me
+buddysystem#:#buddy_allow_to_contact_me#:#Pozwól na kontakt ze mną
 buddysystem#:#buddy_allow_to_contact_me_info#:#If enabled, other users are able to send me request for getting into contact.
-buddysystem#:#buddy_bs_act_btn_txt_ignored_request_to_linked#:#Confirm Request
+buddysystem#:#buddy_bs_act_btn_txt_ignored_request_to_linked#:#Zatwierdź Prośbę
 buddysystem#:#buddy_bs_act_btn_txt_ignored_request_to_unlinked#:#Cancel Request
 buddysystem#:#buddy_bs_act_btn_txt_linked_to_unlinked#:#Unlink
 buddysystem#:#buddy_bs_act_btn_txt_requested_to_ignored_request#:#Ignore
 buddysystem#:#buddy_bs_act_btn_txt_requested_to_linked#:#Confirm
 buddysystem#:#buddy_bs_act_btn_txt_requested_to_unlinked#:#Cancel Request
+buddysystem#:#buddy_bs_action_already_ignored#:#Already ignored user '%s'.
+buddysystem#:#buddy_bs_action_already_linked#:#Already accepted the contact request from user '%s'.
+buddysystem#:#buddy_bs_action_already_requested#:#Already requested user '%s'.
+buddysystem#:#buddy_bs_action_already_unlinked#:#The contact state for user '%s' is already unlinked.
 buddysystem#:#buddy_bs_action_not_possible#:#Action not possible
 buddysystem#:#buddy_bs_btn_txt_ignored_request_a#:#Requested Contact
-buddysystem#:#buddy_bs_btn_txt_ignored_request_p#:#Request Ignored
+buddysystem#:#buddy_bs_btn_txt_ignored_request_p#:#Odrzucone Prośby
 buddysystem#:#buddy_bs_btn_txt_linked_a#:#Linked
 buddysystem#:#buddy_bs_btn_txt_linked_p#:#Linked
 buddysystem#:#buddy_bs_btn_txt_requested_a#:#Requested Contact
 buddysystem#:#buddy_bs_btn_txt_requested_p#:#Request
-buddysystem#:#buddy_bs_btn_txt_unlinked_a#:#Request Contact
+buddysystem#:#buddy_bs_btn_txt_unlinked_a#:#Prośba o Kontakt
 buddysystem#:#buddy_bs_btn_txt_unlinked_p#:#Request Contact
 buddysystem#:#buddy_bs_no_new_requests#:#No new requests
 buddysystem#:#buddy_bs_state_ignored_request_a#:#Requested
 buddysystem#:#buddy_bs_state_ignored_request_p#:#Ignored
-buddysystem#:#buddy_bs_state_ignoredrequest#:#Ignored
+buddysystem#:#buddy_bs_state_ignoredrequest#:#Odrzucone
 buddysystem#:#buddy_bs_state_linked#:#Linked
 buddysystem#:#buddy_bs_state_linked_a#:#Linked
 buddysystem#:#buddy_bs_state_linked_p#:#Linked
@@ -2632,8 +2633,8 @@ buddysystem#:#buddy_bs_state_requested_p#:#Requested
 buddysystem#:#buddy_bs_state_unlinked#:#Unlinked
 buddysystem#:#buddy_bs_state_unlinked_a#:#Unlinked
 buddysystem#:#buddy_bs_state_unlinked_p#:#Unlinked
-buddysystem#:#buddy_enable#:#Activate ‘Contacts’
-buddysystem#:#buddy_enable_info#:#If enabled, users are allowed to contact each other by initiating contact requests. Additionally, there is a personal user setting to allow or prevent being contacted.
+buddysystem#:#buddy_enable#:#Aktywuj ‘Kontakty’
+buddysystem#:#buddy_enable_info#:#Jeżeli funkcja jest aktywna, użytkownicy mogą kontaktować się wzajemnie. Dodatkowo, dostępne są ustawienia użytkownika pozwalające lub uniemożliwiające kontaktowanie się z użytkownikiem.
 buddysystem#:#buddy_notification_contact_request#:#Contact Request
 buddysystem#:#buddy_notification_contact_request_ignore#:#Ignore Request:
 buddysystem#:#buddy_notification_contact_request_ignore_osd#:#Ignore Request
@@ -2645,7 +2646,7 @@ buddysystem#:#buddy_relation_requested#:#A request has been sent to the user.
 buddysystem#:#buddy_request_approved#:#You successfully approved the contact.
 buddysystem#:#buddy_request_ignored#:#You ignored the user.
 buddysystem#:#buddy_tbl_filter_state#:#Status
-buddysystem#:#buddy_tbl_title_relations#:#Relations to Other Users
+buddysystem#:#buddy_tbl_title_relations#:#Relacje z Innymi Użytkownikami
 buddysystem#:#buddy_view_gallery#:#Gallery
 buddysystem#:#buddy_view_table#:#List
 cat#:#cat_copy#:#Copy Category
@@ -2749,6 +2750,7 @@ certificate#:#certificate_var_user_fullname#:#Dr. Jan Kowalski
 certificate#:#certificate_var_user_institution#:#ILIAS Open Source
 certificate#:#certificate_var_user_lastname#:#Kowalski
 certificate#:#certificate_var_user_login#:#jdoe
+certificate#:#certificate_var_user_matriculation#:#12345
 certificate#:#certificate_var_user_salutation#:#Mrs.
 certificate#:#certificate_var_user_street#:#100 Main Street
 certificate#:#certificate_var_user_title#:#Dr.
@@ -3069,7 +3071,7 @@ cntr#:#cntr_old_editor_open_standard_editor#:#Open Standard Editor
 cntr#:#cntr_old_editor_warning#:#The maintenance of this editor will be discontinued in a future major releases of ILIAS. You may still use it to edit the content of this page now. But we recommend to switch to the standard page editor of ILIAS when possible.
 cntr#:#cntr_ordering#:#Sortowanie
 cntr#:#cntr_page_actions#:#Page Actions
-cntr#:#cntr_saved_sorting#:#Zapisz Sortowanie.
+cntr#:#cntr_saved_sorting#:#Sortowanie Zapisane
 cntr#:#cntr_switch_to_new_editor_cmd#:#Switch to this page for presentation
 cntr#:#cntr_switch_to_new_editor_message#:#This is the supported standard editor. Please use it to setup the content page. If you click the following link, the content presentation in the repository will switch from the old editor's content to this page.
 cntr#:#cntr_switched_editor#:#Switched to new content.
@@ -3120,7 +3122,7 @@ common#:#account_expires_subject#:#[ILIAS 3] Twoje konto straciło ważność
 common#:#action#:#Akcja
 common#:#action_aborted#:#Akcja anulowana
 common#:#actions#:#Akcje
-common#:#activate#:#Set Active
+common#:#activate#:#Aktywuj
 common#:#activate_assessment_logging#:#Aktywuj śledzenie Testów i Oceniania
 common#:#activate_block#:#Aktywuj
 common#:#activate_https#:#Aktywacja HTTPS (Płatność, Logowanie)
@@ -3408,7 +3410,7 @@ common#:#cal_from#:#From:
 common#:#cal_until#:#Do:
 common#:#calendar#:#Terminarz
 common#:#cancel#:#Anuluj
-common#:#cancel_file_upload#:#Do you really want to cancel all pending uploads?
+common#:#cancel_file_upload#:#Czy naprawdę chcesz anulować oczekiwany przesył plików?
 common#:#cannot_find_xml#:#Nie można znaleźć żadnego pliku XML.
 common#:#cannot_uninstall_language_in_use#:#Nie możesz odinstalować używanego języka!
 common#:#cannot_uninstall_systemlanguage#:#Nie możesz odinstalować języka systemu!
@@ -3528,7 +3530,6 @@ common#:#cond_ref_unique#:#Unique Preconditions for Links
 common#:#condition#:#Warunek
 common#:#condition_already_assigned#:#Obiekt jest już przydzielony
 common#:#condition_circle_created#:#To powiązanie nie jest możliwe, dopóki wchodzą w interakcje.
-common#:#condition_delete_sure#:#Czy na pewno chcesz usunąć następujący warunek?
 common#:#condition_deleted#:#Warunek  usunięty.
 common#:#condition_finished#:#Zakończony
 common#:#condition_not_finished#:#Nie ukończony
@@ -3565,7 +3566,7 @@ common#:#copy_all#:#Kopiuj wszystko
 common#:#copy_n_of_suffix#:#- Copy (%1$s)
 common#:#copy_of#:#Kopia
 common#:#copy_of_suffix#:#- Copy
-common#:#copy_selected_items#:#Copy
+common#:#copy_selected_items#:#Kopiuj
 common#:#copy_to#:#do
 common#:#copyChapter#:#Kopiuj
 common#:#copyPage#:#Kopiuj
@@ -3669,7 +3670,7 @@ common#:#db_type#:#Typ bazy danych
 common#:#db_user#:#Użytkownik bazy danych
 common#:#db_version#:#Wersja bazy danych
 common#:#dd_mm_yyyy#:#DD.MM.YYYY
-common#:#deactivate#:#Set Inactive
+common#:#deactivate#:#Deaktywuj
 common#:#decrease_attempts#:#Ilość prób - 1
 common#:#def_repository_view#:#Domyślny widok dostępnych zasobów
 common#:#default#:#Domyślne
@@ -3714,7 +3715,7 @@ common#:#deleted_user_account#:#Usuń Konto Użytkownika
 common#:#deleted_users#:#Usunięci użytkownicy
 common#:#delicious#:#Konto del.icio.us
 common#:#deliver#:#Dostarcz ćwiczenie
-common#:#department#:#Dział/Sekcja/Wydział
+common#:#department#:#Departament
 common#:#desc#:#Opis
 common#:#description#:#Opis
 common#:#desired_password#:#Nowe hasło
@@ -3752,16 +3753,16 @@ common#:#domain#:#Domena
 common#:#down#:#W dół
 common#:#download#:#Pobierz
 common#:#download_all_returned_files#:#Pobierz wszystkie nadesłane pliki
-common#:#download_link#:#Download Link
+common#:#download_link#:#Link do Pobrania
 common#:#download_multiple_objects#:#Download Multiple Objects
-common#:#download_selected_items#:#Download
+common#:#download_selected_items#:#Pobierz
 common#:#download_with_uploaded_filename#:#Download with uploaded filename
 common#:#download_with_uploaded_filename_info#:#Select this option exclusively for backwards compatibility with ILIAS 3.9 and older versions: When this option is selected, the filename of a downloaded file is equal to the filename that was used for uploading the file into ILIAS. If this option is not selected, the filename of a downloaded file is equal to the title of the file object in ILIAS. This option does not affect WebDAV. For WebDAV the filename of a downloaded file is always equal to the title of the file object.
 common#:#downloading_settings#:#Ustawienia Pobierania
 common#:#drafts#:#Szkice
-common#:#drag_files_here#:#Drag-and-drop your files here
+common#:#drag_files_here#:#Przeciągnij i upuść pliki tutaj
 common#:#drop#:#Upuść
-common#:#drop_files_on_repo_obj_info#:#Drop the files here to upload them into this object.
+common#:#drop_files_on_repo_obj_info#:#Upuść pliki tutaj, aby przesłać je do tego obiektu.
 common#:#edit#:#Edytuj
 common#:#edit_assignments#:#Edit Assignments
 common#:#edit_cat_settings#:#Advanced Category Settings
@@ -3778,7 +3779,7 @@ common#:#edit_stylesheet#:#Edytuj styl
 common#:#edited_at#:#Edytowany
 common#:#edited_on#:#Edited on
 common#:#editor#:#Edytor
-common#:#email#:#E-mail (preferowany służbowy)
+common#:#email#:#E-mail
 common#:#email_feedback#:#E-mail zwrotny
 common#:#email_footer#:#<br />powered by ILIAS
 common#:#email_not_valid#:#Wprowadzony adres e-mail jest nieprawidłowy!
@@ -3824,7 +3825,6 @@ common#:#enable_trash_info#:#Jeżeli włączone, to usunięte obiekty są przesu
 common#:#enable_webdav#:#Enable WebDAV access
 common#:#enable_webdav_info#:#Allows WebDAV clients to access the repository as a webfolder. Users can open webfolders using the "open as webfolder" action in the repository, or by entering the following address in a WebDAV client: <a href="%1$s" folder="%1$s">%1$s</a>
 common#:#enabled#:#Wybrany
-common#:#enter_filename_deliver#:#Podaj ćwiczenie do dostarczenia
 common#:#enter_in_mb_desc#:#Enter a value in MB.
 common#:#enter_new_name#:#Please enter a name
 common#:#enumerate#:#Wylicz
@@ -3858,11 +3858,11 @@ common#:#err_wrong_header#:#Powód: Zły nagłówek.
 common#:#err_wrong_login#:#Niewłaściwy login lub hasło
 common#:#err_wrong_password#:#Złe hasło
 common#:#error#:#Błąd
-common#:#error_empty_file_or_folder#:#The file size is 0 bytes or it is a folder.
-common#:#error_extraction_failed#:#The extraction of the archive and its directories failed. Probably because you don't have the rights to create folders or categories within this object.
+common#:#error_empty_file_or_folder#:#Rozmiar pliku 0 bajtów lub jest to folder.
+common#:#error_extraction_failed#:#Rozpakowanie archiwum nie powiodło się. Prawdopodobnie dlatego, że nie masz prawa do tworzenia folderów w tym obiekcie.
 common#:#error_parser#:#Błąd startu parsera.
 common#:#error_recipient#:#Odbiorca błędu
-common#:#error_upload_was_zero_bytes#:#The upload failed as this is a folder, the file size is 0 bytes or the file was renamed meanwhile.
+common#:#error_upload_was_zero_bytes#:#Przesyłanie nie powiodło się, ponieważ jest to folder, plik ma rozmiar 0 bajtów lub przekroczona max. rozmiar pliku lub w trakcie została zmieniona nazwa pliku.
 common#:#event_ass_materials_prop#:#Materiały Sesji
 common#:#event_assign_files#:#File Assignment
 common#:#exc#:#Ćwiczenie
@@ -3934,14 +3934,14 @@ common#:#export_xml#:#Eksportuj jako plik xml
 common#:#ext_acccount_required#:#Podaj nazwą konta zewnętrznego.
 common#:#ext_cat_settings#:#Edit Advanced Category Settings
 common#:#ext_link#:#Link
-common#:#extracting#:#Extracting...
+common#:#extracting#:#Rozpakowywanie...
 common#:#extt_configure#:#konfiguruje...
 common#:#extt_name#:#Oprogramowanie/Serwis
 common#:#extt_remark#:#Całe oprogramowanie i serwisy pokazane powyżej nie są częścią systemu ILIAS i nie są objęte otwartą licencją ILIAS.
 common#:#extt_title_configure#:#Konfiguruj zewnętrzne oprogramowanie
 common#:#failure_message#:#Komunikat Błedu
 common#:#faq_exercise#:#Ćwiczenie (FAQ)
-common#:#fax#:#Kierunek Studiów
+common#:#fax#:#Fax
 common#:#feed#:#Zasilenie Wiadomości
 common#:#feedback#:#Informacja systemowa
 common#:#feedback_recipient#:#Odbiorca
@@ -3997,7 +3997,7 @@ common#:#files_location#:#Miejsce plików
 common#:#filesize#:#Rozmiar pliku
 common#:#filetype#:#Typ pliku
 common#:#fill_out_all_required_fields#:#Wypełnij wszystkie konieczne pola
-common#:#filter#:#Filtr:
+common#:#filter#:#Filtr
 common#:#filter_users_with_access#:#Only users with access
 common#:#filter_users_with_disk_usage#:#Only users with disk space used
 common#:#filter_users_with_exceeded_disk_quota#:#Only users with disk quota exceeded
@@ -4213,7 +4213,7 @@ common#:#HH#:#HH:MM
 common#:#hh_mm#:#HH:MM
 common#:#hh_mm_ss#:#HH:MM:SS
 common#:#hide#:#Ukryj
-common#:#hide_all_details#:#Hide all details
+common#:#hide_all_details#:#Ukryj wszystkie detale
 common#:#hide_details#:#Ukryj szczegóły
 common#:#hide_filter#:#Ukryj filtr
 common#:#hide_own_online_status#:#Ukryj mój status Online
@@ -4247,7 +4247,7 @@ common#:#hist_webr_delete#:#Usunięto zasób web. Tytuł: "%1"
 common#:#hist_webr_update#:#Uaktualniono zasób web. Tytuł: "%1"
 common#:#history#:#Historia
 common#:#hits_per_page#:#Trafień/Stronę
-common#:#hobby#:#Typ studiów
+common#:#hobby#:#Zainteresowania/Hobbi
 common#:#home#:#Strona domowa
 common#:#host#:#Serwer
 common#:#hour#:#Godzina
@@ -4288,7 +4288,7 @@ common#:#il_chat_moderator_read#:#Read access to Chat Room
 common#:#il_chat_moderator_visible#:#Chat Room is visible
 common#:#il_chat_moderator_write#:#Edit Chat Room settings
 common#:#il_crs_admin#:#Administrator
-common#:#il_crs_member#:#Członek
+common#:#il_crs_member#:#Uczestnik Kursu
 common#:#il_crs_non_member#:#Course non-member
 common#:#il_crs_tutor#:#Opiekun
 common#:#il_frm_moderator#:#Moderator
@@ -4393,7 +4393,7 @@ common#:#install_local#:#Instaluj z plikiem lokalnym
 common#:#installed#:#Zainstalowane
 common#:#installed_local#:#Zainstalowane z plikiem lokalnym
 common#:#instant_messengers#:#Kuriery Natychmiastowych Wiadomości
-common#:#institution#:#Nazwa instytucji/jednostki wojskowej
+common#:#institution#:#Instytucja
 common#:#internal_local_roles_only#:#Lokalne role (tylko wygenerowane automatycznie)
 common#:#internal_system#:#System wewnętrzny
 common#:#invalid_visible_required_options_selected#:#All fields set to required has to be set to visible in registration, too.
@@ -4593,7 +4593,7 @@ common#:#mail_maxsize_mail#:#Maks. rozmiar wiadomości
 common#:#mail_maxtime_attach#:#Maks. okres trzymania załączników (dni)
 common#:#mail_maxtime_mail#:#Maks. okres trzymania wiadomości (dni)
 common#:#mail_member#:#Mail to Member
-common#:#mail_members#:#E-Mail do członków
+common#:#mail_members#:#E-Mail do Uczestników Kursu
 common#:#mail_multiple_recipients_found#:#Enter a more specific mail address. ILIAS found multiple possible recipients for this address: %s
 common#:#mail_no_recipient_found#:#Enter a different mail address. ILIAS couldn't find a recipient with this mail address.
 common#:#mail_no_valid_group_role#:#No valid group role
@@ -4614,14 +4614,14 @@ common#:#mail_z_local#:#Foldery użytkownika
 common#:#mails#:#Wiadomości
 common#:#mails_at_the_ilias_installation#:#You received %1$s new mails at the ILIAS-Installation %2$s
 common#:#mails_pl#:#Maile
-common#:#main_menu#:#Main Menu
+common#:#main_menu#:#Moje Menu
 common#:#main_menu_frame#:#Menu najwyższego poziomu
 common#:#manage_members#:#Manage Members
 common#:#manage_tracking_data#:#Zarządzanie danymi śledzenia
 common#:#mark_all_read#:#Zaznacz wszystkie jako przeczytane
 common#:#mark_all_unread#:#Zaznacz wszystkie jako nieodczytane
 common#:#marked_entries#:#Pozycje zaznaczone
-common#:#matriculation#:#Forma studiów
+common#:#matriculation#:#Numer świadectwa dojrzałości
 common#:#max_number_rec#:#Maksymalna liczba rekordów
 common#:#max_previews_per_object#:#Number of preview images per file
 common#:#max_previews_per_object_info#:#Defines the maximum number of preview images that are created per file.
@@ -4652,7 +4652,7 @@ common#:#mem_waiting_list#:#Users on Waiting List:
 common#:#mem_waiting_list_position#:#Your Position on the Waiting List:
 common#:#member#:#Członek
 common#:#member_status#:#Status członka:
-common#:#members#:#Członkowie
+common#:#members#:#Uczestnicy
 common#:#membership_annulled#:#Twoje członkostwo zostało anulowane.
 common#:#membership_leave#:#Leave
 common#:#mep#:#Pula mediów
@@ -4666,6 +4666,7 @@ common#:#message_content#:#Treść wiadomości
 common#:#message_no_delivered_files#:#Nie dostarczyłeś plików!
 common#:#message_to#:#Wiadomość do:
 common#:#meta_data#:#Meta dane
+common#:#mgs_objects_linked_to_the_following_folders#:#Obiekty zostały połączone z: %s
 common#:#mgs_objects_linked_to_the_following_folders_p#:#The objects were linked to the following folder(s): %s
 common#:#mgs_objects_linked_to_the_following_folders_s#:#The object was linked to the following folder(s): %s
 common#:#migrate#:#Migracja
@@ -4744,6 +4745,7 @@ common#:#msg_input_is_required#:#To pole jest wymagane. Wprowadź wartość.
 common#:#msg_invalid_filetype#:#Błędny typ pliku
 common#:#msg_is_last_role#:#Pozbawiłeś następujących użytkowników ich ról.
 common#:#msg_last_role_for_registration#:#Conajmniej jedna rola musi być dostępna na formularzu rejestracyjnym dla nowych użytkowników. Ta rola jest teraz jedyną dostępną.
+common#:#msg_link_clipboard#:#Wybrane obiekty zostały zapamiętane w schowku (Akcja: łączenie).
 common#:#msg_link_clipboard_p#:#Now, please select the desired location, where the selected objects should be linked to and click the button Paste.
 common#:#msg_link_clipboard_s#:#Now, please select the desired location, where the selected object should be linked to and click the button Paste.
 common#:#msg_linked#:#Wybrane obiekty zostały połączone.
@@ -4827,7 +4829,7 @@ common#:#msg_wrong_filetype#:#File is no zip-archive
 common#:#msg_wrong_format#:#The value you entered is not a valid format.
 common#:#multimedia#:#Multimedia
 common#:#my_bms#:#Moje Zakładki
-common#:#my_contacts#:#My Contact
+common#:#my_contacts#:#Moje Kontakty
 common#:#my_courses#:#Moje Kursy
 common#:#my_courses_groups#:#Moje Kursy i Grupy
 common#:#my_frms#:#Moje Fora
@@ -4910,7 +4912,7 @@ common#:#notes_and_comments#:#Notatki i Komentarze
 common#:#notice#:#Notice
 common#:#notifications#:#Powiadomienia
 common#:#nr_following_sessions#:#%1d following session(s)...
-common#:#num_of_selected_files#:#%s file(s) selected
+common#:#num_of_selected_files#:#%s plik został wybrany
 common#:#num_users#:#Liczba użytkowników
 common#:#number_of_accesses#:#Liczba logowań
 common#:#number_of_records#:#Liczba rekordów
@@ -4935,8 +4937,8 @@ common#:#obj_bibs_desc#:#Bibliography Administration
 common#:#obj_blog#:#Blog
 common#:#obj_blog_duplicate#:#Copy Blog
 common#:#obj_book#:#Booking Pool
-common#:#obj_cadm#:#Contacts
-common#:#obj_cadm_desc#:#Contacts Administration
+common#:#obj_cadm#:#Kontakty
+common#:#obj_cadm_desc#:#Kontakt z Administratorem
 common#:#obj_calendar#:#Kalendarz
 common#:#obj_cals#:#Kalendarz
 common#:#obj_cals_desc#:#Ogólne Ustawienia Kalendarza
@@ -4961,7 +4963,7 @@ common#:#obj_crs#:#Kurs
 common#:#obj_crs_duplicate#:#Kopiuj Kurs
 common#:#obj_crs_select#:#-- Wybierz jeden Kurs --
 common#:#obj_crsr#:#Odwołanie do Kursu
-common#:#obj_crss#:#Course
+common#:#obj_crss#:#Kurs
 common#:#obj_crss_desc#:#General settings for Courses
 common#:#obj_crsv#:#Course Certificate
 common#:#obj_dbk#:#Książka Cyfrowa
@@ -5119,8 +5121,8 @@ common#:#obj_tool_setting_news#:#Pokaż Wewnętrzne Wiadomości
 common#:#obj_tool_setting_news_info#:#Blok "Wiadomości Wewnętrzne" będzie wyświetlany wewnątrz zakładki "Treść".
 common#:#obj_tool_settings#:#Tools
 common#:#obj_tool_settings_title#:#Tool Settings
-common#:#obj_tos#:#Terms of Service
-common#:#obj_tos_desc#:#Terms of Service Settings
+common#:#obj_tos#:#Zasady Użytkowania
+common#:#obj_tos_desc#:#Ustawienia Zasad Użytkowania
 common#:#obj_trac#:#Statystyki i Postępy Nauczania
 common#:#obj_trac_desc#:#Dostęp użytkownika do danych z śledzenia
 common#:#obj_tst#:#Test
@@ -5270,18 +5272,18 @@ common#:#password#:#Hasło
 common#:#password_allow_chars#:#Dozwolone znaki: %s
 common#:#password_assistance_disabled#:#Pomoc do haseł jest dostępna tylko, gdy autoryzacja jest dokonywana za pomocą lokalnej bazy danych ILIAS.
 common#:#password_assistance_info#:#Jeśli pomoc do haseł jest włączona, to na stronie logowania do ILIAS pojawia się odnośnik z tekstem "Zapomniałeś hasła?". Użytkownicy mogą posłużyć się tym odnośnikiem dla przydziału nowego hasła, bez pomocy administratora systemu.
-common#:#password_change_on_first_login_demand#:#Your initial password have to be changed before you can start using ILIAS services
+common#:#password_change_on_first_login_demand#:#Twoje hasło startowe musi być zmienioe przed rozpoczęciem używania ILIAS
 common#:#password_contains_invalid_chars#:#The password contains invalid characters
 common#:#password_contains_parts_of_login_err#:#The chosen password contains your username. Please insert a new password.
 common#:#password_empty#:#The password must not be empty.
 common#:#password_expired#:#Twoje hasło wygasło i musi być zmienione, ponieważ ostatnia zmiana odbyła się % dni temu.
 common#:#password_multiple_errors#:#Multiple criterias are not satisfied:
-common#:#password_must_chars_and_numbers#:#The password must contain characters and numbers.
-common#:#password_must_contain_lcase_chars#:#The password must contain at least %s lower case letters.
-common#:#password_must_contain_ucase_chars#:#The password must contain at least %s capital letters.
-common#:#password_must_special_chars#:#The password must contain special characters.
+common#:#password_must_chars_and_numbers#:#Hasło musi zawierać litery i cyfry.
+common#:#password_must_contain_lcase_chars#:#Hasło musi zawierać przynajmniej %s małe litery.
+common#:#password_must_contain_ucase_chars#:#Hasło musi zawierać przynajmniej %s wielkich liter.
+common#:#password_must_special_chars#:#Hasło musi zawierać znaki specjalne.
 common#:#password_to_long#:#The password must have at most a size of %s characters.
-common#:#password_to_short#:#The password must have at least a size of %s characters.
+common#:#password_to_short#:#Hasło musi mieć przynajmniej %s znaków.
 common#:#paste#:#Wklej
 common#:#paste_clipboard_items#:#Wklej pozycje ze schowka
 common#:#paste_clipboard_items_into_multiple_objects#:#Paste Into Multiple Objects
@@ -5328,7 +5330,7 @@ common#:#permission_denied#:#Dostęp zabroniony
 common#:#permission_denied_filed_locked_by#:#Access denied. The file was locked by '%s'.
 common#:#permission_settings#:#Ustawienia uprawnień dostępu
 common#:#permission_settings_info#:#Ten formularz określa która rola co może wykonywać z bieżącym obiektem '%s'.
-common#:#person_title#:#Stopień wojskowy/tytuł
+common#:#person_title#:#Tytuł
 common#:#personal_data#:#Dane osobowe
 common#:#personal_desktop#:#Pulpit Osobisty
 common#:#personal_picture#:#Zdjęcie
@@ -5371,8 +5373,8 @@ common#:#predefined_template#:#Predefiniowany szablon roli
 common#:#preferences#:#Preferencje
 common#:#presentation_options#:#Opcje prezentacji
 common#:#preview#:#Podgląd
-common#:#preview_create#:#Create Preview
-common#:#preview_delete#:#Delete Preview
+common#:#preview_create#:#Stwórz Podgląd
+common#:#preview_delete#:#Usuń Podgląd
 common#:#preview_learner#:#Widok Użytkownika
 common#:#preview_learner_info#:#Jeśli opcja jest włączona to administratorzy Kursów i Grup mają możliwość obejrzenia określonej zawartości z perspektywy uczącego się.
 common#:#preview_loading#:#Ładowanie Podglądu...
@@ -5655,7 +5657,7 @@ common#:#select#:#Wybierz
 common#:#select_all#:#Wybierz wszystkie
 common#:#select_at_least_one_object#:#Proszę wybierz przynajmniej jeden obiekt.
 common#:#select_file#:#Wybierz plik
-common#:#select_files_from_computer#:#Select the files from your computer
+common#:#select_files_from_computer#:#Wybierz pliki ze swojego komputera
 common#:#select_max_one_item#:#Wybierz tylko jedną pozycję.
 common#:#select_mode#:#Wybierz tryb
 common#:#select_object_to_copy#:#Wybierz obiekt do skopiowania
@@ -5666,7 +5668,7 @@ common#:#select_password#:#Wybierz nowe hasło
 common#:#select_questionpool#:#Pula pytań dla testu
 common#:#select_questionpool_option#:#Wybierz pulę pytań
 common#:#selected#:#Wybrany
-common#:#selected_files#:#Selected files
+common#:#selected_files#:#Wybrane pliki
 common#:#selected_items#:#Pozycje osobowe
 common#:#selected_items_back#:#Powrót do pozycji osobistych
 common#:#selected_languages_updated#:#The selected languages have been updated (if installed):
@@ -5711,7 +5713,6 @@ common#:#setSystemLanguage#:#Ustaw język systemowy
 common#:#settings#:#Ustawienia
 common#:#settings_for_all_members#:#Global Setting for all Course/Group Members
 common#:#settings_for_new_members#:#Settings for new Members
-common#:#settings_per_members#:#Ustawienia dla każdego użytkownika osobno
 common#:#settings_per_users#:#Settings per Course/Group Members
 common#:#settings_saved#:#Ustawienia zapisane
 common#:#setUserLanguage#:#Ustaw język użytkownika
@@ -5763,7 +5764,7 @@ common#:#shoppingcart#:#Shoppingcart
 common#:#short_inst_name#:#Krótki tytuł
 common#:#short_inst_name_info#:#Ten tytuł będzie widniał w pasku tytułu przeglądarki. Jeśli nie wprowadzisz wartości, to będzie użyte 'ILIAS'.
 common#:#show#:#Pokaż
-common#:#show_all_details#:#Show all details
+common#:#show_all_details#:#Pokarz wszystkie detale
 common#:#show_details#:#Pokaż szczegóły
 common#:#show_filter#:#Zastosuj filtr
 common#:#show_hidden_block#:#Pokaż Ukryte Bloki
@@ -6028,12 +6029,12 @@ common#:#update_language#:#Uaktualnij język
 common#:#update_on_conflict#:#Uaktualnij przy konflikcie
 common#:#upload#:#Wyślij
 common#:#upload_error_file_not_found#:#Błąd załadowania: Nie znaleziono pliku.
-common#:#upload_files#:#Upload files
-common#:#upload_files_title#:#Upload files
-common#:#upload_pending#:#Pending
+common#:#upload_files#:#Przesył plików
+common#:#upload_files_title#:#Przesył plików
+common#:#upload_pending#:#Oczekiwanie
 common#:#upload_settings#:#Uploading Settings
 common#:#uploaded_and_checked#:#Plik został załadowany i sprawdzony, teraz możesz rozpocząć jego import.
-common#:#uploading#:#Uploading...
+common#:#uploading#:#Przesył...
 common#:#uri#:#URI
 common#:#url#:#URL
 common#:#url_a#:#URL
@@ -6234,9 +6235,9 @@ common#:#zip#:#Kod pocztowy
 common#:#zip_structure_error#:#Archive contains same filenames. Upload aborted.
 common#:#zip_test_failed#:#Zip-Test failed. Please contact you ILIAS administrator.
 common#:#zipcode#:#Kod pocztowy
-contact#:#contact_awrn_ap_contacts#:#Approved Contacts
+contact#:#contact_awrn_ap_contacts#:#Zatwierdzone Kontakty
 contact#:#contact_awrn_ap_contacts_info#:#All contacts approved by the user are listed.
-contact#:#contact_awrn_req_contacts#:#Contact Requests
+contact#:#contact_awrn_req_contacts#:#Prośba o Kontakt
 contact#:#contact_awrn_req_contacts_info#:#All contact requests are listed.
 content#:#add_menu_entry#:#Dodaj pozycję menu >>
 content#:#all#:#Wszystko
@@ -6799,7 +6800,7 @@ content#:#cont_lm_default_layout#:#Default Layout of Learning Module
 content#:#cont_lm_mail_permanent_link#:#Click on the following link to access the learning module:
 content#:#cont_lm_menu#:#Menu
 content#:#cont_lm_properties#:#Właściwości modułu nauczania
-content#:#cont_LocalFile#:#Local File
+content#:#cont_localfile#:#Local File
 content#:#cont_localization#:#Localization
 content#:#cont_localization_info#:#Language used for predifined texts, e.g. "Previous" and "Next".
 content#:#cont_location#:#Location
@@ -7385,7 +7386,6 @@ content#:#glo_used_in_scorm#:#The glossary is used by the SCORM module. If delet
 content#:#help_assign_help_ids#:#Chapter/Screen-IDs Assignment
 content#:#htlm_import#:#Import HTML Learning Module
 content#:#HTML export#:#Eksport HTML
-content#:#HTML_export#:#Eksport HTML
 content#:#import_sco_object#:#Import SCO
 content#:#info_stop_offline_mode_sure#:#Note: The learning progress achieved in offline mode are lost. Are you sure?
 content#:#lm_activate_rating#:#Activate Rating For Pages
@@ -7413,7 +7413,6 @@ content#:#Pages#:#Strony
 content#:#pages from#:#Strony od
 content#:#par#:#Paragraf
 content#:#PDF export#:#Eksport PDF
-content#:#PDF_export#:#Eksport PDF
 content#:#pg#:#Strona
 content#:#public_section#:#Sekcja publiczna
 content#:#read offline#:#Czytaj Offline
@@ -7458,6 +7457,7 @@ content#:#stop_user_offline_mode#:#Stop offline mode
 content#:#stop_user_offline_mode_for_user#:#Stop offline mode for
 content#:#text_repr#:#Text Representation
 content#:#text_repr_info#:#Used for image "alt" attribute.
+copg#:#copg_confirm_el_deletion#:#Do you really want to delete the selected elements?
 cptch#:#captcha_alt_txt#:#This is a visual captcha. Click the tab to get to an audio captcha
 cptch#:#captcha_audio_title#:#Audio Captcha. Click to hear the letters and characters of the captcha.
 cptch#:#captcha_code_info#:#Please type in the letters and characters of the image.
@@ -7545,6 +7545,7 @@ crs#:#crs_admin#:#Administrator
 crs#:#crs_admin_no_notify#:#Administrator (brak zgłoszenia)
 crs#:#crs_admin_notify#:#Administrator (zgłoszenie)
 crs#:#crs_administrators#:#Administratorzy
+crs#:#crs_admission_link_failure_invalid_code#:#Can't register: Link is invalid.
 crs#:#crs_admission_link_failure_membership_limited#:#Can't registrate: Course membership is limited.
 crs#:#crs_admission_link_failure_registration_period#:#Can't registrate: Course is out of registration period.
 crs#:#crs_admission_link_success_registration#:#Successfully registrated to course "%s".
@@ -7571,7 +7572,7 @@ crs#:#crs_availability_limitless_info#:#Wybierz ten tryb aby udostępnić kurs u
 crs#:#crs_availability_until_info#:#Wybierz ten tryb aby udostępnić kurs użytkownikom w określonym przedziale czasu.
 crs#:#crs_awrn_current_course#:#Current Course
 crs#:#crs_awrn_current_course_info#:#If the user navigates to a course in the repository, all members of the course are listed.
-crs#:#crs_awrn_support_contacts#:#Tutorial Support
+crs#:#crs_awrn_support_contacts#:#Wsparcie Techniczne
 crs#:#crs_awrn_support_contacts_info#:#All tutorial support contacts of courses with membership of the current user are listed. Users are defined as tutorial support contacts in the Members tab of the respective course.
 crs#:#crs_blocked#:#Dostęp odrzucony
 crs#:#crs_blocked_member#:#Uczestnicy kursu (zablokowani)
@@ -7583,6 +7584,7 @@ crs#:#crs_cancel_subscription_body2#:#Być może są inni użytkownicy oczekują
 crs#:#crs_cancellation_end#:#Cancellation Limit
 crs#:#crs_cancellation_end_info#:#From this date on particiants cannot unsubscribe anymore.
 crs#:#crs_cancellation_end_rbac_info#:#The cancellation deadline was met on %s, a cancellation is not possible anymore.
+crs#:#crs_cannot_find_role#:#Can't find this role.
 crs#:#crs_cdf_edit_member#:#Edit Course Relevant User Data
 crs#:#crs_cdf_tbl_last_edit#:#Last Update (Course-specific Data)
 crs#:#crs_change_status#:#Zmiany statusu celu:
@@ -7717,6 +7719,7 @@ crs#:#crs_loc_err_nr_tries_exceeded#:#The number of passes per objective exceeds
 crs#:#crs_loc_err_stat_no_it#:#No Initial Test available
 crs#:#crs_loc_err_stat_no_materials#:#No Course Materials available
 crs#:#crs_loc_err_stat_no_qt#:#No Qualifying Test available
+crs#:#crs_loc_err_stat_tst_offline#:#Not all tests are online.
 crs#:#crs_loc_form_assign#:#Use Existing Test
 crs#:#crs_loc_form_assign_initial_info#:#Select a test from this course to serve as Placement Test
 crs#:#crs_loc_form_assign_it#:#Test Assignment
@@ -7836,7 +7839,7 @@ crs#:#crs_max_and_min_members_needed#:#Set a minimum or maximum number of member
 crs#:#crs_max_members_needed#:#A maximum number of members is needed for the waiting list feature.
 crs#:#crs_max_members_reached#:#Została osiągnięta maksymalna liczba uczestników
 crs#:#crs_mem_change_status#:#Status zmian
-crs#:#crs_mem_contact#:#Support Contact
+crs#:#crs_mem_contact#:#Wsparcie Techniczne
 crs#:#crs_mem_contacts#:#Support Contacts
 crs#:#crs_mem_send_mail#:#Wyślij pocztę
 crs#:#crs_member#:#Członek
@@ -7941,7 +7944,7 @@ crs#:#crs_objective_qst_summary#:#Overview Question Assignment
 crs#:#crs_objective_question_assignment#:#Przydział pytań
 crs#:#crs_objective_random_warn#:#You can not use random tests in combination with learning objectives.
 crs#:#crs_objective_result#:#Po teście
-crs#:#crs_objective_saved_sorting#:#Zapisz Sortowanie.
+crs#:#crs_objective_saved_sorting#:#Sortowanie zapisane
 crs#:#crs_objective_self_assessment#:#Initial Test
 crs#:#crs_objective_status#:#Objective Status
 crs#:#crs_objective_status_configure#:#Configure Learning Objective Oriented Course
@@ -7956,7 +7959,6 @@ crs#:#crs_objective_status_start#:#Define Start Objects
 crs#:#crs_objective_step#:#Step
 crs#:#crs_objective_tbl_col_final_tsts#:#Abschlusstests
 crs#:#crs_objective_updated_test#:#Modyfikacje zapamiętane.
-crs#:#crs_objective_view#:#Widok zorientowany na cele
 crs#:#crs_objective_wiz_final#:#Final Test Questions
 crs#:#crs_objective_wiz_final_info#:#Assignment of final test questions.
 crs#:#crs_objective_wiz_final_limit#:#Limits for Final Test
@@ -8243,6 +8245,7 @@ crs#:#event_location#:#Miejsce
 crs#:#event_materials#:#Materiały Sesji
 crs#:#event_not_participated#:#Nie uczestniczący
 crs#:#event_overview#:#Uczestnicy sesji
+crs#:#event_participant_selection#:#Participant Selection
 crs#:#event_participated#:#Uczestniczący
 crs#:#event_participation#:#Uczestnictwo
 crs#:#event_register#:#Rejestruj
@@ -8257,11 +8260,14 @@ crs#:#event_start_date#:#Data
 crs#:#event_table_create#:#Nowe zdarzenie
 crs#:#event_table_update#:#Edycja zdarzenia
 crs#:#event_tbl_admin#:#Administrator
+crs#:#event_tbl_admins#:#Administrators
 crs#:#event_tbl_member#:#Member
+crs#:#event_tbl_members#:#Members
 crs#:#event_tbl_participants#:#Lista uczestników
 crs#:#event_tbl_participated#:#Uczestnictwo zatwierdzone
 crs#:#event_tbl_registered#:#Zarejestrowany
 crs#:#event_tbl_tutor#:#Tutor
+crs#:#event_tbl_tutors#:#Tutors
 crs#:#event_time#:#Czas
 crs#:#event_title#:#Tytuł
 crs#:#event_tutor_data#:#Informacje o wykładowcy
@@ -8918,7 +8924,7 @@ dcl#:#dcl_edit_type_lim#:#Limited
 dcl#:#dcl_edit_type_lim_info#:#Acces for users with add/edit permission is limited to the following daterange
 dcl#:#dcl_edit_type_non#:#Not editable
 dcl#:#dcl_edit_type_non_info#:#Creating New Records needs edit settings permission
-dcl#:#dcl_edit_type_unlim#:#Unlimited
+dcl#:#dcl_edit_type_unlim#:#Bez limitu
 dcl#:#dcl_edit_type_unlim_info#:#Users with add/edit permission can add/edit entries
 dcl#:#dcl_editable_in_table_gui#:#Please vote in the table view.
 dcl#:#dcl_empty_view#:#Delete this View
@@ -9030,6 +9036,7 @@ dcl#:#dcl_record_view_viewdefinition#:#Edytuj Widok Szczegółowy
 dcl#:#dcl_reference#:#Reference
 dcl#:#dcl_reference_desc#:#Bereitstellen von Auswahloptionen, die in einem anderen Feld einer Tabelle gepflegt werden
 dcl#:#dcl_reference_link#:#Show as link in table view
+dcl#:#dcl_reference_link_info#:#Detailed View must be active in referenced table
 dcl#:#dcl_reference_title#:#Referenz zu Tabelle und Feld
 dcl#:#dcl_regex#:#Regular Expression
 dcl#:#dcl_regex_info#:#(without delimiter)
@@ -9040,6 +9047,7 @@ dcl#:#dcl_simulate_import#:#Simulate Import
 dcl#:#dcl_simulate_info#:#Simulating the import will not add any fields into the Data Collection but may give you feedback on problems with the import file, thus helping you to prevent corrupted entries.
 dcl#:#dcl_skipped_delete_records#:#%s records were not deleted due to permission settings
 dcl#:#dcl_status#:#Your status
+dcl#:#dcl_std_field_not_importable#:# - Standard fields are not importable.
 dcl#:#dcl_table#:#Table
 dcl#:#dcl_table_create#:#Create Table
 dcl#:#dcl_table_edit#:#Update Table
@@ -9088,7 +9096,7 @@ didactic#:#didactic_confirm_delete_msg#:#Czy chcesz usunąć następujące dydak
 didactic#:#didactic_copy_suc_message#:#Copied didactic template
 didactic#:#didactic_deactivated_msg#:#Deactivated didactic templates
 didactic#:#didactic_default_type#:#Default
-didactic#:#didactic_default_type_info#:#Domyślne uprawnienia %s
+didactic#:#didactic_default_type_info#:#	<br />Default set of permissions will be applied.
 didactic#:#didactic_delete_msg#:#Deleted didactical templates.
 didactic#:#didactic_do_export#:#Export
 didactic#:#didactic_edit_tpl#:#Edit Didactic Template
@@ -9392,6 +9400,7 @@ exc#:#exc_deadline#:#Czas Wykonania
 exc#:#exc_deadline_ext_mismatch#:#The grace period has to end after the deadline.
 exc#:#exc_deadline_extended#:#Grace Period
 exc#:#exc_deadline_extended_info#:#Late submission are possible between the deadline and the end of the grace period.
+exc#:#exc_delete_team#:#Delete Team
 exc#:#exc_direct_submit#:#Submit
 exc#:#exc_direct_submit_blog#:#Would you like to submit the current version of the blog right now? You can do it anytime from the blog editor later on.
 exc#:#exc_direct_submit_portfolio#:#Chcesz teraz zgłosić aktualną wersję Portfolio? Możesz to zrobić później w każdej chwili z edytorze Portfolio.
@@ -9665,12 +9674,12 @@ feed#:#feed_proxy_port_info#:#Proxy port for socket connection
 feed#:#feed_settings#:#Ustawienia zewnętrznych Feed
 file#:#enable_personal_workspace_disk_quota#:#Activate Hard Quota for Personal Workspace
 file#:#enable_personal_workspace_disk_quota_info#:#Allows definition of a hard disk quota for each user account and each global role. This quota only affects files in the personal workspace and in portfolios. As soon as a user exceeds the defined quota, ILIAS will prohibit the user to upload more files until the used disk space is again under quota.
-file#:#file_copy#:#Copy File
-file#:#file_download#:#Download File
-file#:#file_import#:#Import File
+file#:#file_copy#:#Kopiuj Pliki
+file#:#file_download#:#Pobierz Plik
+file#:#file_import#:#Import Plików
 file#:#file_new_version#:#Utwórz nową wersję
 file#:#file_new_version_info#:#Utwórz nową wersję pliku. Stara wersja zostanie zmodyfikowana.
-file#:#file_uploaded_by#:#Uploaded by
+file#:#file_uploaded_by#:#Umieszczony przez
 file#:#personal_workspace_disk_quota#:#Hard Disk Quota for Personal Workspace
 file#:#personal_workspace_quota_exceeded_warning#:#You have exceeded the disk quota for your personal workspace.
 file#:#personal_workspace_quota_status_legend#:#You are using %1$s of your available disk quota of %2$s (%3$d%%).
@@ -9689,6 +9698,7 @@ fold#:#fold_import#:#Import Folder
 fold#:#fold_settings#:#Folder Settings
 form#:#captcha_code#:#User Verification
 form#:#email_not_match#:#Your entries for the email address don't match! Please re-enter your email address.
+form#:#err_invalid_input#:#An invalid value has been submited. Please check your input.
 form#:#form_alphabet_all#:#All
 form#:#form_days#:#Dni
 form#:#form_file_input#:#Plik wejściowy
@@ -9916,7 +9926,6 @@ grp#:#crs_grouping_select_one#:#Wybierz dokładnie jeden limit uczestnictwa.
 grp#:#crs_grp_added_grouping#:#Limit na ilość uczestników został dodany.
 grp#:#crs_grp_assign_crs#:#Przydział grup
 grp#:#crs_grp_enter_title#:#Wypełnij wymagane pola.
-grp#:#crs_grp_info_reg#:#Możesz się zarejestrować tylko do jednej z tych grup:
 grp#:#crs_grp_no_courses_assigned#:#Nie przydzielono żadnej grupy
 grp#:#crs_grp_table_assigned_courses#:#Przydzielone grupy
 grp#:#events#:#Sessions
@@ -9926,6 +9935,7 @@ grp#:#grp_accept_subscriber_body#:#You have been admitted to group "%1$s".\n\n%2
 grp#:#grp_activate_notification#:#Aktywowanie Powiadamiania
 grp#:#grp_added_to_list#:#You have been assigned to the waiting list. You are assigned to position %s on the waiting list.
 grp#:#grp_admins#:#Administratorzy
+grp#:#grp_admission_link_failure_invalid_code#:#Can't register: Link is invalid.
 grp#:#grp_admission_link_failure_membership_limited#:#Can't registrate: Group membership is limited.
 grp#:#grp_admission_link_failure_registration_period#:#Can't registrate: Group is out of registration period.
 grp#:#grp_admission_link_success_registration#:#Successfully registrated to group "%s".
@@ -10106,6 +10116,7 @@ init#:#init_error_redirect_click#:#Please click to continue.
 init#:#init_error_redirect_info#:#Redirect not supported by context.
 itgr#:#itgr_assigned_materials#:#Przypisane Materiały
 itgr#:#itgr_assignment#:#Przypisanie
+itgr#:#itgr_desc_info#:#The description will not be a part of the item group's presentation in its container.
 itgr#:#itgr_edit#:#Edycja Grupowania Obiektów
 itgr#:#itgr_hide_title#:#Hide Title
 itgr#:#itgr_hide_title_info#:#Hides title of item group in presentation for learner.
@@ -10346,18 +10357,18 @@ mail#:#activate_serial_letter_placeholders#:#Activate Serial-Letter Placeholders
 mail#:#advice_mail_body_secured#:#Because of security reasons ILIAS removed some elements of your message. Please check the secured message and send the mail again.
 mail#:#also_as_email#:#rownież pocztą
 mail#:#auto_update#:#Update
-mail#:#back_to_folder#:#Back to Folder
+mail#:#back_to_folder#:#Powrót do Folderu
 mail#:#bc#:#BC
 mail#:#chat_users_have_been_invited#:#Użytkownicy zostali zaroszeni.
 mail#:#chat_users_without_login#:#Następujący użytkownicy nie mają konta w ILIAS, w związku z czym nie mogą być zaproszeni do Pokoi Czat.
 mail#:#chat_users_without_permission#:#Następujący użytkownicy nie mają dostępu do Pokoi Czat.
 mail#:#cron_update_addressbook#:#Synchronize address book entries automatically
 mail#:#cron_update_addressbook_desc#:#If this option is enabled, users can specify whether address book entries which are related to user accounts, should be synchronized by the cronjob. Only data that was released by the User, will be updated.
-mail#:#current_folder#:#Current Folder: %s
+mail#:#current_folder#:#Aktualny Folder: %s
 mail#:#forward#:#Prześlij dalej
 mail#:#goto_invitation_chat#:#Open Chat Room
 mail#:#info_mail_external_sender_noreply#:#Please enter the e-mail that shall be used as sender's address for external system messages and notifications.
-mail#:#invite_to_chat#:#Invite to Chat
+mail#:#invite_to_chat#:#Zaproś do Czatu
 mail#:#linebreak#:#Linia rozdzielająca
 mail#:#link_check_affected_links#:#Affected Links
 mail#:#link_check_introduction#:#the following weblinks are invalid:
@@ -10457,6 +10468,7 @@ mail#:#mail_maxsize_attachment_error#:#Limit wysyłania to:
 mail#:#mail_member_notification#:#Participant Notification
 mail#:#mail_members_added_addressbook#:#Członkowie zostali dodani do książki adresowej
 mail#:#mail_members_of_mailing_list#:#Members of Mailing List
+mail#:#mail_members_search_continue#:#Continue
 mail#:#mail_message_send#:#Wiadomość została wysłana.
 mail#:#mail_move_error#:#Błąd podczas przesuwania wiadomości
 mail#:#mail_move_to#:#Przesuń do:
@@ -10519,7 +10531,10 @@ mail#:#mail_select_one_entry#:#Musisz wybrać jedną pozycję
 mail#:#mail_select_one_file#:#Musisz wybrać jeden plik
 mail#:#mail_select_only_one_entry#:#Wybierz tylko jedną pozycję.
 mail#:#mail_select_recipients#:#Please select mail recipients:
+mail#:#mail_send_html#:#HTML Frame for External Emails
+mail#:#mail_send_html_info#:#If enabled, the body of external emails will be embedded in a HTML frame. The corresponding template can be customized by creating a copy of './Services/Mail/templates/default/tpl.html_mail_template.html' at './Customizing/global/skin/[SKIN]/Services/Mail/tpl.html_mail_template.html' .
 mail#:#mail_send_with_system_address#:#Wyślij z adresem systemu
+mail#:#mail_serial_letter_placeholders#:#Serial-Letter Placeholders
 mail#:#mail_settings_incoming_type_see_also#:#You can find a further possibility to modify the incoming type of e-mails for users <a href="%s">here</a>
 mail#:#mail_subject_prefix#:#Temat e-maila
 mail#:#mail_subject_prefix_info#:#Enter a text, which will be prepended to the subject line of outgoing auto generated e-mails
@@ -10527,6 +10542,10 @@ mail#:#mail_sure_delete#:#Jesteś pewien, że chcesz usunąć zaznaczone wiadomo
 mail#:#mail_sure_delete_entry#:#Jesteś pewien, że chcesz usunąć nasępujące pozycje?
 mail#:#mail_sure_delete_file#:#Plik został ostatecznie usunięty.
 mail#:#mail_sure_delete_folder#:#Folder wraz z całą zawartością został ostatecznie usunięty.
+mail#:#mail_system_from_name#:#Sender Name
+mail#:#mail_system_from_name_info#:#Please enter a name. This name (e.g. 'John Doe') will be used for automatically generated messages (internal and external). If you leave the field blank, ILIAS uses the short title of this installation. If the title is not well defined, ‘ILIAS’ is used as the sender.
+mail#:#mail_system_return_path#:#Global Return-Path
+mail#:#mail_system_return_path_info#:#Please enter an email address which should be used for the return path (e.g. webmaster@ilias.de). If you leave the field blank, the 'Return-Path' will be the 'From' email address.
 mail#:#mail_system_sender_name#:#Sender Name
 mail#:#mail_system_sender_name_info#:#Please enter a name. This name will be used for automatically generated messages (internal and external). If you leave the field blank, ILIAS uses the short title of this installation. If the title is not well defined, 'ILIAS' is used as the sender.
 mail#:#mail_template_client#:#Text Template
@@ -10555,12 +10574,13 @@ mail#:#search_content#:#Search Result
 mail#:#search_recipients#:#Szukaj Odbiorcy
 mail#:#send_mail_admins#:#All Administrators
 mail#:#send_mail_members#:#All Members
-mail#:#send_mail_to#:#Mail to
+mail#:#send_mail_to#:#Wyślij pocztę do
 mail#:#send_mail_tutors#:#All Tutors
 mail#:#system_notification_installation_changed_by#:#Changed By
 mail#:#system_notification_installation_signature#:#This email has been sent automatically by the ILIAS installation
 maps#:#configure_geolocation#:#Please finish the geolocation configuration in the "Third Party Software" administration menu to enable address search.
 maps#:#maps_custom_geolocation_server_info#:#Server URL to provide geolocation-data using Nominatim. Your entry should contain the placeholder [QUERY] to define a position for request information. Example: nominatim.example.com/search/[QUERY]?format=json.
+maps#:#maps_custom_server_info#:#Activate custom servers to provide tile- and geolocation-data. Multiple inputs should be separated by spaces. Defaults are "%s" for tiles and "%s" for geolocation.
 maps#:#maps_custom_tile_server_info#:#Server URL to provide tile-data. Multiple inputs should be separated by spaces. Defaults is "%s".
 maps#:#maps_enable_maps#:#Enable Maps
 maps#:#maps_enable_maps_info#:#Activates Maps in user profiles, groups and courses.
@@ -10603,7 +10623,7 @@ mcst#:#mcst_default_visibility#:#Default Access
 mcst#:#mcst_det_playtime#:#Określ czas odtwarzania
 mcst#:#mcst_download_audioportable#:#Download Audio Portable
 mcst#:#mcst_download_cnt#:#Downloaded
-mcst#:#mcst_download_standard#:#Download
+mcst#:#mcst_download_standard#:#Pobierz
 mcst#:#mcst_download_videoalternative#:#Download Alternative File
 mcst#:#mcst_download_videoportable#:#Download Video Portable
 mcst#:#mcst_downloadable#:#Pobierz
@@ -10624,7 +10644,7 @@ mcst#:#mcst_incl_files_in_rss_info#:#Jeśli wybrane, to RSS Feed zawiera załąc
 mcst#:#mcst_input_either_file_or_url#:#Please specify a file or an URL. If you provide a file, please note the maximum allowed upload file size.
 mcst#:#mcst_last_submission#:#Ostatnie podporządkowanie
 mcst#:#mcst_list#:#List
-mcst#:#mcst_manage#:#Manage
+mcst#:#mcst_manage#:#Zarządzaj
 mcst#:#mcst_media_cast#:#Media Cast
 mcst#:#mcst_media_cast_not_online#:#Mediacast is not online
 mcst#:#mcst_media_cast_not_online_text#:#Mediacast is not online or has been disabled
@@ -10635,20 +10655,20 @@ mcst#:#mcst_mimetypes_info#:#Comma separated list of mime types
 mcst#:#mcst_news_item_visibility_info#:#Public news can be accessed without authentication outside of ILIAS via RSS. Please do not include any confidential information.
 mcst#:#mcst_no_extraction_possible#:#Sorry, it was not able to extract an image from the file.
 mcst#:#mcst_nr_items#:#Ilość pozycji
-mcst#:#mcst_ordering#:#Sorting
+mcst#:#mcst_ordering#:#Sortowanie
 mcst#:#mcst_ordering_creation_date_asc#:#By Creation Date (Ascending)
 mcst#:#mcst_ordering_creation_date_desc#:#By Creation Date (Descending)
 mcst#:#mcst_ordering_manual#:#Manual
 mcst#:#mcst_ordering_title#:#By Title
 mcst#:#mcst_play#:#Play
-mcst#:#mcst_play_cnt#:#Played
+mcst#:#mcst_play_cnt#:#Ilość odtworzeń
 mcst#:#mcst_play_time#:#Czas odtwarzania
 mcst#:#mcst_preview_picture#:#Preview Picture
 mcst#:#mcst_preview_picture_info#:#Only supported by the following main media types:
 mcst#:#mcst_purpose_standard#:#Standard File
 mcst#:#mcst_purpose_videoalternative#:#Alternative Video File
 mcst#:#mcst_reference_info#:#Provide URL pointing to resource
-mcst#:#mcst_save_order#:#Save Order
+mcst#:#mcst_save_order#:#Zapisz Porządek
 mcst#:#mcst_second#:#Second
 mcst#:#mcst_set_playtime#:#Playtime has been set.
 mcst#:#mcst_settings#:#Ustawienia MediaCast
@@ -10787,7 +10807,7 @@ meta#:#md_months#:#Miesiąc:
 meta#:#md_obj_types#:#Assigned Objekts
 meta#:#md_record_export_table#:#Export Files
 meta#:#md_record_list_table#:#Advanced Metadata Sets
-meta#:#md_separated_by#:#Separated by %s
+meta#:#md_separated_by#:#Oddzielone przez %s
 meta#:#md_time#:#Godzina:
 meta#:#md_used#:#Usage
 meta#:#meta_accessibility_restrictions#:#Restrykcje dostępu
@@ -11364,7 +11384,7 @@ meta#:#udf_type_integer#:#Integer
 meta#:#udf_type_location#:#Location
 meta#:#udf_type_selectmulti#:#Selection List (Checkboxes)
 mmbr#:#info_refuse_sure#:#Are you sure you want to refuse the following user(s)?
-mmbr#:#mmbr_awrn_my_groups_courses#:#My Groups and Courses
+mmbr#:#mmbr_awrn_my_groups_courses#:#Moje Grupy i Kursy
 mmbr#:#mmbr_awrn_my_groups_courses_info#:#All members of groups or courses of the current user are listed.
 mmbr#:#mmbr_btn_mail_selected_users#:#Send Mail
 mmbr#:#mmbr_selected_users#:#Selected Participants
@@ -11385,8 +11405,6 @@ news#:#finish_publishing_date#:#Finish Publishing:
 news#:#news_1_file_created#:#1 plik został dodany.
 news#:#news_1_file_updated#:#1 plik został zaktualizowany.
 news#:#news_1_postings#:#1 Post został dodany.
-news#:#news_acc_cache#:#Sprawdzenie uprawnień (Minuty)
-news#:#news_acc_cache_info#:#Sprawdź uprawnienia do czytania wiadomości przez x minut (tylko pulpit osobisty). '0' oznacza zawsze. Większe wartości zwiększają wydajność, lecz linki mogą wskazywać niedostępne pozycje.
 news#:#news_add_news#:#Add News
 news#:#news_all_items#:#Wszystkie pozycje
 news#:#news_allow_longer_periods#:#Allow Longer Periods
@@ -12219,7 +12237,7 @@ pdesk#:#bookmark_moved_ok#:#Bookmark has been moved.
 pdesk#:#bookmark_select_target#:#Please select target.
 pdesk#:#pdesk_feedback_request#:#Żądanie reakcji
 pdesk#:#pdesk_feedbacks#:#Żądania reakcji
-pdesk#:#pdesk_intro#:#Witamy na twoim Pulpicie Osobistym!
+pdesk#:#pdesk_intro#:#Witaj na Pulpicie Osobistym!
 pdesk#:#pdesk_intro2#:#To jest twój osobisty obszar dla zorganizowania pracy i uczenia się. Możesz tu umieścić zasoby z innych obszarów. Wykonanie tego wymaga dwu etapów:
 pdesk#:#pdesk_intro3#:#Kliknij na '%s' i przeglądnij istniejące zasoby nauczania.
 pdesk#:#pdesk_intro4#:#Jeśli znajdzesz coś interesującego, to dodaj to do swojego pulpitu klikając na przycisk <i>Dodaj do pulpitu</i>.
@@ -12229,7 +12247,7 @@ poll#:#poll_activation_online_info#:#Jeżeli offline, tylko administratorzy mog�
 poll#:#poll_active_no_edit#:#This poll is currently active and cannot be edited.
 poll#:#poll_add#:#Dodaj Głosowanie
 poll#:#poll_add_answer#:#Add Answer
-poll#:#poll_anonymous_warning#:#Your name is not visible in the poll results.
+poll#:#poll_anonymous_warning#:#Twoje imię i nazwisko nie będzie widoczne w wynikach ankiety.
 poll#:#poll_answer#:#Answer
 poll#:#poll_answers#:#Possible Answers
 poll#:#poll_availability_limitless_info#:#Choose this mode for making the poll available and accessible to users.
@@ -12294,7 +12312,7 @@ poll#:#poll_voting_period_end#:#Koniec
 poll#:#poll_voting_period_info#:#Deadline for Voting: %s
 poll#:#poll_voting_period_limited#:#Ograniczenia
 poll#:#poll_voting_period_start#:#Rozpoczęcie
-poll#:#poll_voting_period_unlimited#:#Unlimited
+poll#:#poll_voting_period_unlimited#:#Bez limitu
 prg#:#prg_acknowledge_completed_courses#:#Acknowledge Completed Courses
 prg#:#prg_add#:#Add Study Programme
 prg#:#prg_added_course_ref_successful#:#New course-reference was added successfully
@@ -12327,6 +12345,7 @@ prg#:#prg_open_node#:#Switch to this node
 prg#:#prg_please_select_a_course_for_creating_a_leaf#:#Please select a course for creating a course-reference leaf
 prg#:#prg_points#:#Points
 prg#:#prg_points_current#:#Points Current
+prg#:#prg_points_reachable#:#Points Obtainable
 prg#:#prg_points_required#:#Points Required
 prg#:#prg_possible#:#Possible
 prg#:#prg_prg_type#:#Study Programme Type
@@ -12474,7 +12493,6 @@ ps#:#ps_account_security_mode#:#Account Security
 ps#:#ps_account_security_mode_customized#:#Customized Account Security
 ps#:#ps_account_security_mode_default#:#Standard Ilias Account Security
 ps#:#ps_agreement_accepted#:#Warunki użytkowania zostały zaakceptowane
-ps#:#ps_agreement_req_info#:#Zaakceptuj warunki użytkowania aby mieć dostęp do zawartości kursu.
 ps#:#ps_auto_https#:#Autodetekcja HTTPS
 ps#:#ps_auto_https_description#:#jeśli włączony, ILIAS próbuje wykryć status HTTPs przez analizę wartości nagłówka podanej poniżej.
 ps#:#ps_auto_https_header_name#:#Nazwa nagłówka
@@ -12487,7 +12505,6 @@ ps#:#ps_cdf_delete_sure#:#Czy chcesz usunąć to pole użytkownika?
 ps#:#ps_cdf_deleted#:#Usunięto pole użytkownika.
 ps#:#ps_cdf_deleted_field#:#Usunięto wartość.
 ps#:#ps_cdf_edit_field#:#Edit Data Field
-ps#:#ps_cdf_info#:#Dalsze specyficzne dla kursu dane:
 ps#:#ps_cdf_name#:#Nazwa
 ps#:#ps_cdf_no_fields#:#Nie zdefiniowano pól użytkownika
 ps#:#ps_cdf_no_name_given#:#Podaj nazwę
@@ -12550,7 +12567,6 @@ ps#:#ps_prevent_simultaneous_logins#:#Prevent Simultaneous Logins
 ps#:#ps_prevent_simultaneous_logins_info#:#If enabled, simultaneous logins with the same account from different computers are not possible.
 ps#:#ps_privacy_protection#:#Ustawienia prywatności
 ps#:#ps_profile_export#:#Zabezpieczenie danych profilu użytkownika
-ps#:#ps_required_info#:#Dalsze pola specyficzne dla kursu są wymagane dla dostępu do zawartości kursu.
 ps#:#ps_security_protection#:#Ustawienia bezpieczeństwa
 ps#:#ps_select_one#:#Wybierz jeden plik eksportowy
 ps#:#ps_show_crs_access#:#Pokaż ostatni czas dostępu uczestników kursu
@@ -12588,8 +12604,8 @@ pwassist#:#pwassist_username_mail_body#:#Znaleziono aktywną nazwę użytkownika
 rating#:#rat_not_rated_yet#:#Jeszcze Nie Dokonano Oceny
 rating#:#rat_nr_ratings#:#%s Oceny
 rating#:#rat_one_rating#:#Jedna Ocena
-rating#:#rating_activate_rating#:#Enable Rating
-rating#:#rating_activate_rating_info#:#if enabled, users can rate this object.
+rating#:#rating_activate_rating#:#Włącz Ocene
+rating#:#rating_activate_rating_info#:#Jeśli jest włączone, użytkownicy mogą ocenić ten obiekt.
 rating#:#rating_add_category#:#Add Category
 rating#:#rating_average_rating#:#Average Rating
 rating#:#rating_categories#:#Rating Categories
@@ -12929,6 +12945,7 @@ rbac#:#mds_edit_permission#:#Zmień ustawienia uprawnień
 rbac#:#mds_read#:#Read access to Metadata settings
 rbac#:#mds_visible#:#Metadata settings are visible
 rbac#:#mds_write#:#Edit Metadata setting
+rbac#:#mep_copy#:#User can copy media pool
 rbac#:#mep_delete#:#Usuń pulę mediów
 rbac#:#mep_edit_permission#:#Zmiana ustawień uprawnień
 rbac#:#mep_read#:#Czytanie zawartości puli mediów
@@ -13376,6 +13393,7 @@ registration#:#reg_email_role_assignment#:#Przydział ról wg domeny
 registration#:#reg_enable_access_limitations#:#Włącz Ograniczenia dostępu
 registration#:#reg_fixed#:#Wybór z podanej listy
 registration#:#reg_info_pwd#:#Jeśli aktywne to hasła będą automatycznie wysłane pocztą elektroniczną do nowych użytkowników.
+registration#:#reg_mail_body_activation#:#to activate your account and confirm ownership of this email address, click the link below:
 registration#:#reg_mail_body_approve#:#Jesteś już zarejestrowany w ILIAS i otrzymaliśmy e-mail z danymi twojego konta. Teraz twoje konto zostało aktywowane przez administratora.
 registration#:#reg_mail_body_confirmation#:#Aby potwierdzić rejestrację konto uruchom poniższy link:
 registration#:#reg_mail_body_profile#:#Dane profilu:
@@ -13480,155 +13498,57 @@ rep#:#rep_object_to_delete#:#To Delete
 rep#:#rep_time_period#:#Okres
 rep#:#rep_visibility_limitless#:#Nieograniczony
 rep#:#rep_visibility_until#:#Dostępny Tymczasowo
-rep_robj_xgdo#:#rep_robj_xgdo_already_member#:#You are already a member of this object.
-rep_robj_xgdo#:#rep_robj_xgdo_assigned_users_p#:#The users were successfully assigned.
-rep_robj_xgdo#:#rep_robj_xgdo_assigned_users_s#:#The user was successfully assigned.
-rep_robj_xgdo#:#rep_robj_xgdo_cancel#:#Cancel
-rep_robj_xgdo#:#rep_robj_xgdo_cat_create_xgdo#:#Create Google Docs Document
-rep_robj_xgdo#:#rep_robj_xgdo_check_connection#:#Check Connection
-rep_robj_xgdo#:#rep_robj_xgdo_connection_check_failed#:#Connection failed: Please checker whether you entered a valid google account and the corresponding password.
-rep_robj_xgdo#:#rep_robj_xgdo_connection_check_successful#:#Connection established successfully.
-rep_robj_xgdo#:#rep_robj_xgdo_content#:#Content
-rep_robj_xgdo#:#rep_robj_xgdo_creation_type#:#Action
-rep_robj_xgdo#:#rep_robj_xgdo_creation_type_new#:#Create New Document
-rep_robj_xgdo#:#rep_robj_xgdo_creation_type_upload#:#Upload Existing Document
-rep_robj_xgdo#:#rep_robj_xgdo_crs_create_xgdo#:#Create Google Docs Document
-rep_robj_xgdo#:#rep_robj_xgdo_description#:#Description
-rep_robj_xgdo#:#rep_robj_xgdo_doctype#:#Document Type
-rep_robj_xgdo#:#rep_robj_xgdo_doctype_doc#:#Document
-rep_robj_xgdo#:#rep_robj_xgdo_doctype_not_valid#:#The chosen document type is currently not supported.
-rep_robj_xgdo#:#rep_robj_xgdo_doctype_ppt#:#Presentation
-rep_robj_xgdo#:#rep_robj_xgdo_doctype_xls#:#Spreadsheet
-rep_robj_xgdo#:#rep_robj_xgdo_edit#:#Edit
-rep_robj_xgdo#:#rep_robj_xgdo_edit_properties#:#Edit Settings
-rep_robj_xgdo#:#rep_robj_xgdo_err_cr_incomplete#:#An error occured during the creation process.
-rep_robj_xgdo#:#rep_robj_xgdo_err_cr_type_mismatch#:#The chosen document type is currently not supported.
-rep_robj_xgdo#:#rep_robj_xgdo_err_cr_upload#:#ILIAS could not create a google document with the uploaded file.
-rep_robj_xgdo#:#rep_robj_xgdo_exp_csv#:#CSV
-rep_robj_xgdo#:#rep_robj_xgdo_exp_doc#:#DOC
-rep_robj_xgdo#:#rep_robj_xgdo_exp_docx#:#DOCX
-rep_robj_xgdo#:#rep_robj_xgdo_exp_html#:#HTML
-rep_robj_xgdo#:#rep_robj_xgdo_exp_jpeg#:#JPEG
-rep_robj_xgdo#:#rep_robj_xgdo_exp_ods#:#ODS
-rep_robj_xgdo#:#rep_robj_xgdo_exp_odt#:#ODT
-rep_robj_xgdo#:#rep_robj_xgdo_exp_pdf#:#PDF
-rep_robj_xgdo#:#rep_robj_xgdo_exp_png#:#PNG
-rep_robj_xgdo#:#rep_robj_xgdo_exp_pptx#:#PPTX
-rep_robj_xgdo#:#rep_robj_xgdo_exp_rtf#:#RTF
-rep_robj_xgdo#:#rep_robj_xgdo_exp_svg#:#SVG
-rep_robj_xgdo#:#rep_robj_xgdo_exp_tsv#:#TSV
-rep_robj_xgdo#:#rep_robj_xgdo_exp_txt#:#TXT
-rep_robj_xgdo#:#rep_robj_xgdo_exp_xls#:#XLS
-rep_robj_xgdo#:#rep_robj_xgdo_exp_xlsx#:#XLSX
-rep_robj_xgdo#:#rep_robj_xgdo_exp_zip#:#ZIP
-rep_robj_xgdo#:#rep_robj_xgdo_fold_create_xgdo#:#Create Google Docs Document
-rep_robj_xgdo#:#rep_robj_xgdo_form_retype_google_account#:#Retype Google Account
-rep_robj_xgdo#:#rep_robj_xgdo_gdocs_file#:#File
-rep_robj_xgdo#:#rep_robj_xgdo_google_account#:#Your Google Account
-rep_robj_xgdo#:#rep_robj_xgdo_google_account_not_match#:#Your entries for Google account don't match! Please re-enter your Google account.
-rep_robj_xgdo#:#rep_robj_xgdo_google_account_not_valid#:#The Google account you entered is not valid!
-rep_robj_xgdo#:#rep_robj_xgdo_google_account_owner_info#:#Please enter your valid Google account. <span style="font-weight:bold;color:red">Important: The entered account has to be valid. Otherwise you will not have any permissions for the created document.</span>
-rep_robj_xgdo#:#rep_robj_xgdo_google_account_participant_desc#:#This object does not know your Google account, yet. We need your Google account to automatically grant the required permissions for you to view/edit the document.
-rep_robj_xgdo#:#rep_robj_xgdo_google_account_participant_info#:#Please enter your valid Google account. <span style="font-weight:bold;color:red">Important: The entered account has to be valid. Otherwise you will not have any permissions for the created document.</span>
-rep_robj_xgdo#:#rep_robj_xgdo_google_master_login#:#Google Login
-rep_robj_xgdo#:#rep_robj_xgdo_google_master_login_info#:#<span style="font-weight:bold;color:red">If configured once, please do not change the Google account anymore. Otherwise, ILIAS can no longer manange the previously created documents.</span>
-rep_robj_xgdo#:#rep_robj_xgdo_grp_create_xgdo#:#Create Google Docs Document
-rep_robj_xgdo#:#rep_robj_xgdo_il_xgdo#:#Google Docs
-rep_robj_xgdo#:#rep_robj_xgdo_il_xgdo_reader#:#Reader
-rep_robj_xgdo#:#rep_robj_xgdo_il_xgdo_writer#:#Writer
-rep_robj_xgdo#:#rep_robj_xgdo_join#:#Join
-rep_robj_xgdo#:#rep_robj_xgdo_joined_successfully#:#You joined successfully.
-rep_robj_xgdo#:#rep_robj_xgdo_members#:#Members
-rep_robj_xgdo#:#rep_robj_xgdo_membership_required_for_content#:#To use the content of this object you have to be either member of the local reader or member of the local writer role.
-rep_robj_xgdo#:#rep_robj_xgdo_no_users_assigned_p#:#Nobody of the selected users could be assigned.
-rep_robj_xgdo#:#rep_robj_xgdo_no_users_assigned_s#:#Could not assign the selected user.
-rep_robj_xgdo#:#rep_robj_xgdo_obj_xgdo#:#Google Docs Document
-rep_robj_xgdo#:#rep_robj_xgdo_obj_xgdo_duplicate#:#Copy
-rep_robj_xgdo#:#rep_robj_xgdo_objs_xgdo#:#Google Docs Documents
-rep_robj_xgdo#:#rep_robj_xgdo_objs_xgdo_duplicate#:#Copy Google Docs Document
-rep_robj_xgdo#:#rep_robj_xgdo_participant_administration#:#Edit Participants
-rep_robj_xgdo#:#rep_robj_xgdo_participant_gallery#:#Google Docs Members Gallery
-rep_robj_xgdo#:#rep_robj_xgdo_participants#:#Participants
-rep_robj_xgdo#:#rep_robj_xgdo_participants_removed_p#:#The members were successfully deleted.
-rep_robj_xgdo#:#rep_robj_xgdo_participants_removed_s#:#The member was successfully deleted.
-rep_robj_xgdo#:#rep_robj_xgdo_personal_settings#:#Personal Settings
-rep_robj_xgdo#:#rep_robj_xgdo_properties#:#Settings
-rep_robj_xgdo#:#rep_robj_xgdo_reader#:#Reader (May read)
-rep_robj_xgdo#:#rep_robj_xgdo_reader_short_add#:#Reader
-rep_robj_xgdo#:#rep_robj_xgdo_readers#:#Readers (May read)
-rep_robj_xgdo#:#rep_robj_xgdo_remove_participants_info_p#:#Do you really want to delete the selected members?
-rep_robj_xgdo#:#rep_robj_xgdo_remove_participants_info_s#:#Do you really want to delete the selected member?
-rep_robj_xgdo#:#rep_robj_xgdo_root_create_xgdo#:#Create Google Docs Document
-rep_robj_xgdo#:#rep_robj_xgdo_save#:#Save
-rep_robj_xgdo#:#rep_robj_xgdo_search_users#:#Search Users
-rep_robj_xgdo#:#rep_robj_xgdo_send_mail#:#Send Email to Participants
-rep_robj_xgdo#:#rep_robj_xgdo_title#:#Title
-rep_robj_xgdo#:#rep_robj_xgdo_writer#:#Writer (May write)
-rep_robj_xgdo#:#rep_robj_xgdo_writer_short_add#:#Writer
-rep_robj_xgdo#:#rep_robj_xgdo_writers#:#Writers (May write)
-rep_robj_xgdo#:#rep_robj_xgdo_xgdo_add#:#Add Google Docs Document
-rep_robj_xgdo#:#rep_robj_xgdo_xgdo_delete#:#User can move or delete google docs document
-rep_robj_xgdo#:#rep_robj_xgdo_xgdo_edit_permission#:#User can change permission settings
-rep_robj_xgdo#:#rep_robj_xgdo_xgdo_new#:#Add new Google Docs Document
-rep_robj_xgdo#:#rep_robj_xgdo_xgdo_read#:#User can read google docs document
-rep_robj_xgdo#:#rep_robj_xgdo_xgdo_visible#:#Google docs document is visible
-rep_robj_xgdo#:#rep_robj_xgdo_xgdo_write#:#User can edit google docs document
-rep_robj_xtov#:#rep_robj_xtov_add_to_overview#:#Add to Overview
-rep_robj_xtov#:#rep_robj_xtov_add_to_overview_as_filter#:#Add to Overview as Filter
-rep_robj_xtov#:#rep_robj_xtov_add_tsts_to_overview#:#Add Tests to Overview
-rep_robj_xtov#:#rep_robj_xtov_cancel#:#Cancel
-rep_robj_xtov#:#rep_robj_xtov_cat_create_xtov#:#Create Test Overview
-rep_robj_xtov#:#rep_robj_xtov_config_test_overview#:#Configure Test Overview
-rep_robj_xtov#:#rep_robj_xtov_content#:#Content
-rep_robj_xtov#:#rep_robj_xtov_copy#:#Copy
-rep_robj_xtov#:#rep_robj_xtov_crs_create_xtov#:#Create Test Overview
-rep_robj_xtov#:#rep_robj_xtov_description#:#Description
-rep_robj_xtov#:#rep_robj_xtov_edit#:#Edit
-rep_robj_xtov#:#rep_robj_xtov_edit_properties#:#Edit Settings
-rep_robj_xtov#:#rep_robj_xtov_fold_create_xtov#:#Create Test Overview
-rep_robj_xtov#:#rep_robj_xtov_grp_create_xtov#:#Create Test Overview
-rep_robj_xtov#:#rep_robj_xtov_item_chosen#:#Chosen
-rep_robj_xtov#:#rep_robj_xtov_membership_count_members#:#Members
-rep_robj_xtov#:#rep_robj_xtov_membership_list_description#:#Please select certain groups or courses the test participants have to be member of. If no object is selected, all test participants of the tests selected above are listed.
-rep_robj_xtov#:#rep_robj_xtov_membership_list_flt_grp_name#:#Name
-rep_robj_xtov#:#rep_robj_xtov_membership_list_hdr_membership_info#:#Additional Information
-rep_robj_xtov#:#rep_robj_xtov_membership_list_hdr_membership_title#:#Title
-rep_robj_xtov#:#rep_robj_xtov_membership_list_table_title#:#Group/Courses Filter
-rep_robj_xtov#:#rep_robj_xtov_memberships_updated_success#:#Updated successfully.
-rep_robj_xtov#:#rep_robj_xtov_min_one_check_membership#:#Please select at least one group or course.
-rep_robj_xtov#:#rep_robj_xtov_min_one_check_test#:#Please select at least one test.
-rep_robj_xtov#:#rep_robj_xtov_obj_xtov#:#Test Overview
-rep_robj_xtov#:#rep_robj_xtov_obj_xtov_duplicate#:#Copy
-rep_robj_xtov#:#rep_robj_xtov_objs_xtov#:#Test Overview
-rep_robj_xtov#:#rep_robj_xtov_objs_xtov_duplicate#:#Copy Test Overviews
-rep_robj_xtov#:#rep_robj_xtov_overview_avg_not_available#:#Not available
-rep_robj_xtov#:#rep_robj_xtov_overview_flt_group_name#:#Membership
-rep_robj_xtov#:#rep_robj_xtov_overview_flt_participant_name#:#Participant
-rep_robj_xtov#:#rep_robj_xtov_overview_result_not_authorized#:#Not authorized
-rep_robj_xtov#:#rep_robj_xtov_overview_test_no_permission#:#(No Permission)
-rep_robj_xtov#:#rep_robj_xtov_overview_test_not_passed#:#Not passed
-rep_robj_xtov#:#rep_robj_xtov_properties#:#Settings
-rep_robj_xtov#:#rep_robj_xtov_remove_from_overview#:#Remove
-rep_robj_xtov#:#rep_robj_xtov_root_create_xtov#:#Create Test Overview
-rep_robj_xtov#:#rep_robj_xtov_save#:#Save
-rep_robj_xtov#:#rep_robj_xtov_test_list_description#:#Please select the tests you want to add to this overview.
-rep_robj_xtov#:#rep_robj_xtov_test_list_flt_tst_name#:#Name
-rep_robj_xtov#:#rep_robj_xtov_test_list_hdr_test_info#:#Path to Test
-rep_robj_xtov#:#rep_robj_xtov_test_list_hdr_test_title#:#Title
-rep_robj_xtov#:#rep_robj_xtov_test_list_table_title#:#Tests to accumulate in overview '%s'
-rep_robj_xtov#:#rep_robj_xtov_test_overview_description#:#This table shows test results of participants, filtered by certain group or course memberships.
-rep_robj_xtov#:#rep_robj_xtov_test_overview_hdr_avg#:#Average
-rep_robj_xtov#:#rep_robj_xtov_test_overview_hdr_user#:#Participant
-rep_robj_xtov#:#rep_robj_xtov_test_overview_table_title#:#Test Overview '%s'
-rep_robj_xtov#:#rep_robj_xtov_tests_updated_success#:#Updated successfully.
-rep_robj_xtov#:#rep_robj_xtov_title#:#Title
-rep_robj_xtov#:#rep_robj_xtov_xtov_add#:#Add Test Overview
-rep_robj_xtov#:#rep_robj_xtov_xtov_delete#:#Delete: Delete Test Overview
-rep_robj_xtov#:#rep_robj_xtov_xtov_edit_permission#:#Change Permissions: Change permission settings
-rep_robj_xtov#:#rep_robj_xtov_xtov_new#:#Add Test Overview
-rep_robj_xtov#:#rep_robj_xtov_xtov_read#:#Read: Read access to Test Overview
-rep_robj_xtov#:#rep_robj_xtov_xtov_visible#:#Visible: Test Overview is visible
-rep_robj_xtov#:#rep_robj_xtov_xtov_write#:#Edit Settings: Edit Test Overview
+rep_robj_xbbb#:#rep_robj_xbbb_BigBlueButton_plugin_configuration#:#Big Blue Button Connection Properties
+rep_robj_xbbb#:#rep_robj_xbbb_cat_create_xbbb#:#Create Big Blue Button Virtual Classroom
+rep_robj_xbbb#:#rep_robj_xbbb_checkbox_record_meeting#:#record next session
+rep_robj_xbbb#:#rep_robj_xbbb_class_ended#:#The class has been ended.
+rep_robj_xbbb#:#rep_robj_xbbb_class_not_started_yet#:#This class has not started yet. Please try again later when the class is running.
+rep_robj_xbbb#:#rep_robj_xbbb_class_running#:#There is a class running,
+rep_robj_xbbb#:#rep_robj_xbbb_click_to_open_class#:#Click here to open your Virtual Classroom in a new window.
+rep_robj_xbbb#:#rep_robj_xbbb_content#:#Content
+rep_robj_xbbb#:#rep_robj_xbbb_crs_create_xbbb#:#Create Big Blue Button Virtual Classroom
+rep_robj_xbbb#:#rep_robj_xbbb_Date_Title#:#date
+rep_robj_xbbb#:#rep_robj_xbbb_DeleteLink_Title#:#delete recording
+rep_robj_xbbb#:#rep_robj_xbbb_description#:#description
+rep_robj_xbbb#:#rep_robj_xbbb_edit#:#Edit
+rep_robj_xbbb#:#rep_robj_xbbb_edit_properties#:#edit properties
+rep_robj_xbbb#:#rep_robj_xbbb_end_class#:#click here to end the class.
+rep_robj_xbbb#:#rep_robj_xbbb_end_class_comment#:#(Note that all participants will be kicked if they are still connected to the class).
+rep_robj_xbbb#:#rep_robj_xbbb_fold_create_xbbb#:#Create Big Blue Button Virtual Classroom
+rep_robj_xbbb#:#rep_robj_xbbb_grp_create_xbbb#:#Create Big Blue Button Virtual Classroom
+rep_robj_xbbb#:#rep_robj_xbbb_Headline_Recordings#:#recordings
+rep_robj_xbbb#:#rep_robj_xbbb_Length_Title#:#length
+rep_robj_xbbb#:#rep_robj_xbbb_Link_Title#:#link
+rep_robj_xbbb#:#rep_robj_xbbb_meetingRecordedMessage#:#The current session will be recorded!
+rep_robj_xbbb#:#rep_robj_xbbb_new_class_created#:#A new Virtual Clasroom has been created and it will be opened automatically in a new window.
+rep_robj_xbbb#:#rep_robj_xbbb_new_class_created_join_manual#:#Click here to join your Virtual Classroom if it did not open automatically.
+rep_robj_xbbb#:#rep_robj_xbbb_new_class_created_warning#:#You MUST join the class before the attendees. No one will be able to join until a moderator does.
+rep_robj_xbbb#:#rep_robj_xbbb_no_class_running#:#There is no class running,
+rep_robj_xbbb#:#rep_robj_xbbb_obj_xbbb#:#Big Blue Button Virtual Classroom
+rep_robj_xbbb#:#rep_robj_xbbb_obj_xbbb_duplicate#:#Copy
+rep_robj_xbbb#:#rep_robj_xbbb_obj_xbbb_select#:#Select Big Blue Button Virtual Classroom
+rep_robj_xbbb#:#rep_robj_xbbb_objs_xbbb#:#Big Blue Button Virtual Classrooms
+rep_robj_xbbb#:#rep_robj_xbbb_objs_xbbb_duplicate#:#Copy Big Blue Button Virtual Classroom
+rep_robj_xbbb#:#rep_robj_xbbb_privateport#:#Private Port (e.g. 8080)
+rep_robj_xbbb#:#rep_robj_xbbb_privateurl#:#Private URL (e.g. http://192.168.1.100)
+rep_robj_xbbb#:#rep_robj_xbbb_properties#:#Properties
+rep_robj_xbbb#:#rep_robj_xbbb_publicport#:#Public Port (e.g. 80)
+rep_robj_xbbb#:#rep_robj_xbbb_publicurl#:#Public URL (e.g. http://mybbbserver.com)
+rep_robj_xbbb#:#rep_robj_xbbb_root_create_xbbb#:#Create Big Blue Button Virtual Classroom
+rep_robj_xbbb#:#rep_robj_xbbb_salt#:#Security Salt
+rep_robj_xbbb#:#rep_robj_xbbb_save#:#Save
+rep_robj_xbbb#:#rep_robj_xbbb_saving_invoked#:#saved
+rep_robj_xbbb#:#rep_robj_xbbb_start_class#:#click here to start the class.
+rep_robj_xbbb#:#rep_robj_xbbb_status#:#status
+rep_robj_xbbb#:#rep_robj_xbbb_title#:#title
+rep_robj_xbbb#:#rep_robj_xbbb_welcometext#:#welcome text
+rep_robj_xbbb#:#rep_robj_xbbb_xbbb_add#:#Add Big Blue Button Virtual Classroom
+rep_robj_xbbb#:#rep_robj_xbbb_xbbb_delete#:#Delete Big Blue Button Virtual Classroom
+rep_robj_xbbb#:#rep_robj_xbbb_xbbb_edit_permission#:#Change permission settings
+rep_robj_xbbb#:#rep_robj_xbbb_xbbb_new#:#Add New Big Blue Button Virtual Classroom
+rep_robj_xbbb#:#rep_robj_xbbb_xbbb_read#:#Read access to Big Blue Button Virtual Classroom
+rep_robj_xbbb#:#rep_robj_xbbb_xbbb_visible#:#Big Blue Button Virtual Classroom is visible
+rep_robj_xbbb#:#rep_robj_xbbb_xbbb_write#:#Edit Big Blue Button Virtual Classroom
 rfil#:#rfil_call#:#Call ECS File
 rfil#:#rfil_version_tstamp#:#Upload Date
 rglo#:#rglo_call#:#Call ECS Glossary
@@ -13688,7 +13608,6 @@ sahs#:#sahs_std_sequencing#:#Standard Sequencing
 sahs#:#sahs_std_sequencing_info#:#Use ILIAS standard sequencing behaviour.
 sahs#:#sahs_unit#:#SCO
 sahs#:#scorm_create_export_file_html_one#:#Create Export File (HTML, One Page, Review Mode)
-scormdebug#:#adl_nav_request_valid_choice#:#Used by a SCO to determine if a Choice navigation request for a particular activity will succeed.
 scormdebug#:#adl.nav.request#:#Navigation request to be processed immediately following Terminate()
 scormdebug#:#adl.nav.request_valid.choice#:#Used by a SCO to determine if a Choice navigation request for a particular activity will succeed.
 scormdebug#:#adl.nav.request_valid.continue#:#Used by a SCO to determine if a Continue navigation request will succeed.
@@ -13955,7 +13874,7 @@ search#:#lucene_cpu#:#Maximum Number of Threads
 search#:#lucene_create_ini#:#Create Configuration File
 search#:#lucene_default_operator#:#Default Operator
 search#:#lucene_default_operator_info#:#Please choose the default operator for boolean queries. In default mode ("AND") terms are considered to be in conjunction. In "OR" mode terms without any modifiers are considered optional.
-search#:#lucene_download_ini#:#Download Configuration File
+search#:#lucene_download_ini#:#Pobierz Plik Konfiguracyjny
 search#:#lucene_err_ampersand#:#Queries containing the special characters && must be in the form: term1 && term2.
 search#:#lucene_err_and_or_not#:#Queries containing AND/OR/NOT must be in the form: term1 AND|OR|NOT|AND NOT term2.
 search#:#lucene_err_asterisk#:#The wildcard (*) character must be preceded by at least one alphabet or number.
@@ -14002,7 +13921,7 @@ search#:#lucene_show_relevance_info#:#Search results are sorted by their relevan
 search#:#lucene_show_sub_relevance#:#Show Subitem Relevance
 search#:#lucene_size_frag_info#:#Please choose the maximum size of highlighted test fragments.
 search#:#lucene_size_fragments#:#Size of Text Fragments
-search#:#lucene_tbl_create_ini#:#Create Java-Server Ini-File
+search#:#lucene_tbl_create_ini#:#Utwórz Plik Java-Server Ini
 search#:#search_active#:#Włącznie z aktywnymi użytkownikami
 search#:#search_add_members_from_container_crs#:#Add Users of Current Course
 search#:#search_add_members_from_container_grp#:#Add Users of Current Group
@@ -14130,8 +14049,10 @@ search#:#search_user_search_info_form#:#If enabled, users data will be indexed a
 search#:#search_user_simple#:#Proste wyszukanie użytkownika
 search#:#search_users#:#Szukaj użytkownika
 search#:#until#:#aż do
+sess#:#sess_accept_request#:#Accept Participation
 sess#:#sess_copy#:#Copy Session
 sess#:#sess_import#:#Import Session
+sess#:#sess_list_reg_limit_places#:#Free places
 sess#:#sess_lp_preset#:#Activate Learning Progress
 sess#:#sess_lp_preset_info#:#(De-)Actives the learning progress for all session events.
 sess#:#sess_mail_permanent_link#:#Click on the following link to find all of the information you need regarding the session:
@@ -14142,6 +14063,7 @@ sess#:#sess_mail_sub_dec_sub#:#Registration refused for session "%s"
 sess#:#sess_max_members_needed#:#A maximum number of members is needed for the waiting list feature.
 sess#:#sess_msg_applicants_assigned#:#Applicant(s) registered for session.
 sess#:#sess_msg_applicants_removed#:#Applicant(s) removed from list.
+sess#:#sess_new_registrations#:#Join Request
 sess#:#sess_reg_added_to_wl#:#You have been added to the waiting list.
 sess#:#sess_reg_direct#:#Direct Registration
 sess#:#sess_reg_direct_info#:#User has to click ‘Join’ to participate in session
@@ -14462,7 +14384,9 @@ style#:#sty_glo_char#:#Glossary
 style#:#sty_ha_cntr_class#:#Hor. Accordion Container
 style#:#sty_ha_icntr_class#:#Hor. Accordion Item Container
 style#:#sty_ha_icont_class#:#Hor. Accordion Item Content
+style#:#sty_ha_ihcap_class#:#Hor. Accordion Caption
 style#:#sty_ha_ihead_class#:#Hor. Accordion Item Header
+style#:#sty_ha_iheada_class#:#Hor. Accordion Header (active)
 style#:#sty_haccordion_templates#:#Hor. Accordion Templates
 style#:#sty_height#:#Height
 style#:#sty_hide#:#Ukryj
@@ -14594,7 +14518,9 @@ style#:#sty_type_glo_ovuglistlink#:#Unit Glossary List Link
 style#:#sty_type_ha_cntr#:#Hor. Accordion Container
 style#:#sty_type_ha_icntr#:#Hor. Accordion Item Container
 style#:#sty_type_ha_icont#:#Hor. Accordion Item Content
+style#:#sty_type_ha_ihcap#:#Hor. Accordion Caption
 style#:#sty_type_ha_ihead#:#Hor. Accordion Item Header
+style#:#sty_type_ha_iheada#:#Hor. Accordion Header (active)
 style#:#sty_type_heading1#:#Heading 1
 style#:#sty_type_heading2#:#Heading 2
 style#:#sty_type_heading3#:#Heading 3
@@ -14666,12 +14592,16 @@ style#:#sty_type_text_inline#:#Character
 style#:#sty_type_va_cntr#:#Vert. Accordion Container
 style#:#sty_type_va_icntr#:#Vert. Accordion Item Container
 style#:#sty_type_va_icont#:#Vert. Accordion Item Content
+style#:#sty_type_va_ihcap#:#Vert. Accordion Caption
 style#:#sty_type_va_ihead#:#Vert. Accordion Item Header
+style#:#sty_type_va_iheada#:#Vert. Accordion Header (active)
 style#:#sty_ul#:#Lista Wypunktowana
 style#:#sty_va_cntr_class#:#Vert. Accordion Container
 style#:#sty_va_icntr_class#:#Vert. Accordion Item Container
 style#:#sty_va_icont_class#:#Vert. Accordion Item Content
+style#:#sty_va_ihcap_class#:#Vert. Accordion Caption
 style#:#sty_va_ihead_class#:#Vert. Accordion Item Header
+style#:#sty_va_iheada_class#:#Vert. Accordion Header (active)
 style#:#sty_vaccordion_templates#:#Vert. Accordion Templates
 style#:#sty_vertical#:#Vertical
 style#:#sty_vertical_align#:#Wyrównanie pionowe
@@ -15001,6 +14931,7 @@ survey#:#mode_text#:#Najczęściej wybierana wartość (Tekst)
 survey#:#msg_deleted_export_files#:#Export file(s) deleted
 survey#:#msg_duplicate_scale#:#Please enter unique scale values
 survey#:#msg_enter_value_for_valid_constraint#:#Please enter a value to create a valid precondition!
+survey#:#msg_input_only_positive_numbers#:#Please enter positive numbers in scale values.
 survey#:#msg_max_nr_answers#:#Please select at most %s answers
 survey#:#msg_message_deleted#:#Messagetext deleted
 survey#:#msg_message_inserted#:#Messagetext inserted
@@ -15145,8 +15076,6 @@ survey#:#show_questiontext#:#Wyświetl tekst pytania
 survey#:#show_questiontext_description#:#Jeśli to pole wyboru jest wybrane, to dla każdego pytania bloku pytań będzie widoczna treść pytania. Jeśli nie jest wybrane, to treść pytania każdego pytania w bloku pytań będzie ukryta.
 survey#:#skipped#:#pominięty
 survey#:#specialusers#:#Special Users
-survey#:#spl_browsercolumns#:#Spersonalizowane listy pytań
-survey#:#spl_browsercolumns_description#:#Select the question data columns that are shown in the question list of a question pool. This setting will be applied for each available question pool.
 survey#:#spl_copy_insert_clipboard#:#The selected question(s) are copied to the clipboard
 survey#:#spl_copy_select_none#:#Please check at least one question to copy it to the clipboard
 survey#:#spl_general_properties#:#Właściwości ogólne
@@ -15490,6 +15419,7 @@ sysc#:#sysc_action_show_tree#:#Show Repository Tree Dump
 sysc#:#sysc_action_validate#:#Validate
 sysc#:#sysc_administrate_deleted#:#Administrate Deleted Objects
 sysc#:#sysc_btn_tree_missing#:#Restore Missing
+sysc#:#sysc_btn_tree_structure#:#Recreate Tree Structure
 sysc#:#sysc_completed_num#:#Fullfilled Tasks
 sysc#:#sysc_cron_empty_trash#:#Delete Trash Bin
 sysc#:#sysc_cron_empty_trash_desc#:#If enabled, the repository trash bin will be purged by given criteria (age, object type or maximum number of objects).
@@ -15499,6 +15429,7 @@ sysc#:#sysc_grp_tree#:#Repository Tree
 sysc#:#sysc_grp_tree_desc#:#Performs an analysis of the tree and prints all tree nodes along with analysis data.
 sysc#:#sysc_message_success#:#No errors found
 sysc#:#sysc_message_tree_missing_confirm#:#Do you really want to restore missing entries in the repository tree structure?
+sysc#:#sysc_message_tree_structure_confirm#:#Do you really want to repair the tree structure? Please create a database backup before you proceed.
 sysc#:#sysc_overview#:#Overview
 sysc#:#sysc_status_completed#:#Completed
 sysc#:#sysc_status_failed#:#Failed
@@ -15529,6 +15460,7 @@ sysc#:#sysc_trash_restore_info#:#Restore deleted objects from trash bin and move
 sysc#:#sysc_tree_duplicate_failures#:#Found duplicate entries in tree structure. Number of duoplicate entries
 sysc#:#sysc_tree_list_failures#:#A dump of the the repository tree has been created. Number of errors in tree structure:
 sysc#:#sysc_tree_missing_failures#:#Found missing entries in the tree structure. Number of missing entries:
+sysc#:#sysc_tree_structure_failures#:#Number of failures in the tree structure (parent-Relation):
 tagging#:#tag_remove_tags_of_obj_without_access#:#Remove Tag
 tagging#:#tag_some_obj_tagged_without_access#:#You do not have the permissions to access some of the tagged objects anymore. Should the tag be removed for these objects?
 tagging#:#tag_tags_deleted#:#Tag has been removed from inaccessible objects.
@@ -15580,7 +15512,7 @@ tbl#:#tbl_templates#:#Podgląd
 tos#:#tos_acceptance_datetime#:#Date
 tos#:#tos_acceptance_history#:#Acceptance History
 tos#:#tos_agreement#:#Terms of Service
-tos#:#tos_agreement_by_lng#:#Terms of Service
+tos#:#tos_agreement_by_lng#:#Zasady Użytkowania
 tos#:#tos_agreement_document#:#Document
 tos#:#tos_agreement_document_missing#:#Missing
 tos#:#tos_agreement_exists#:#Existent
@@ -15598,8 +15530,8 @@ tos#:#tos_status_desc#:#If activated, users are forced to accept the terms of se
 tos#:#tos_status_enable#:#Enable
 tos#:#tos_sure_reset_tos#:#Are you sure you want to reset the terms of service for all users in system? This also applies to those accounts that are used for the SOAP webservices, the chat server, or the cron job.
 tos#:#tos_tos_settings#:#Settings
-trac#:#create_date_max#:#Latest Registration
-trac#:#create_date_min#:#Earliest Registration
+trac#:#create_date_max#:#Ostatnia Rejestracja
+trac#:#create_date_min#:#Pierwsza Rejestracja
 trac#:#found_objects#:#Znalezione obiekty
 trac#:#found_too_much_objects#:#zostało znalezionych więcej niż %s obiektów. Zmień swoje zapytanie.
 trac#:#info_all_objects#:#Następujące odnośniki śledzenia odpowiadają obiektom typu '%s'.
@@ -15738,6 +15670,7 @@ trac#:#trac_collection_tlt_learner_subitem#:#You have spent %s of the %s needed 
 trac#:#trac_comment#:#Komentarz
 trac#:#trac_comments#:#Komentarze
 trac#:#trac_completed#:#Skompletowane
+trac#:#trac_cron_info#:#Please activate the "Object Statistics" cron job to gather data.
 trac#:#trac_crs_assignments#:#Przydział pozycji kursu
 trac#:#trac_crs_items#:#Pozycje kursu możliwe do przydzielenia
 trac#:#trac_crs_members#:#Uczestnicy kursu:
@@ -15806,9 +15739,9 @@ trac#:#trac_lp_list_gui#:#Personal Desktop, Repository, Search
 trac#:#trac_lp_list_gui_info#:#If activated, the learning progress status is included in objects lists.
 trac#:#trac_lp_on_personal_desktop#:#Learning Progress on Personal Desktop
 trac#:#trac_lp_on_personal_desktop_info#:#If active, learning progress is available in the main menu.
-trac#:#trac_lp_settings_info_parent_container#:#Learning Progress of Parent Objects
+trac#:#trac_lp_settings_info_parent_container#:#POSTĘP NAUCZANIA OBIEKTU RODZICA
 trac#:#trac_lp_settings_info_parent_group#:#Other objects in grouping
-trac#:#trac_lp_settings_info_parent_legend#:#The learning progress status of this object is influenced by "%s".
+trac#:#trac_lp_settings_info_parent_legend#:#Status postępu nauczania tego obiektu jest zależny od "%s".
 trac#:#trac_lp_settings_info_parent_usage#:#Determines Learning Progress
 trac#:#trac_manual_display#:#Display in Learning Progress
 trac#:#trac_manual_is_displayed#:#Is Displayed
@@ -15833,8 +15766,8 @@ trac#:#trac_mode_collection_tlt_info#:#Users who reached the Typical Learning Ti
 trac#:#trac_mode_deactivated#:#Deaktywowany
 trac#:#trac_mode_deactivated_info#:#Żaden proces nie będzie wyliczany.
 trac#:#trac_mode_deactivated_info_new#:#Status postępów nauczania nie będzie wyświetlany.
-trac#:#trac_mode_downloaded#:#Downloaded
-trac#:#trac_mode_downloaded_info#:#The learning progress is determined by the download status of the file.
+trac#:#trac_mode_downloaded#:#Pobranie
+trac#:#trac_mode_downloaded_info#:#Postęp nauki określony jest przez stan pobierania pliku.
 trac#:#trac_mode_event#:#Participation in Sessions
 trac#:#trac_mode_event_info#:#The learning progress status will be determined by the participation status.
 trac#:#trac_mode_exercise_returned#:#Ćwiczenie zwrócone
@@ -15987,9 +15920,9 @@ user#:#enable_local_user_administration_info#:#If enabled, local user accounts c
 user#:#feedhash#:#Newsfeedhash
 user#:#inform_user_mail_info#:#If activated, an email will be sent to the user. Its content can be defined in Administration > User Management > Settings > New Account Mail.
 user#:#interests#:#Interests
-user#:#interests_general#:#General Interests
-user#:#interests_help_looking#:#Looking For Help
-user#:#interests_help_offered#:#Offering Help
+user#:#interests_general#:#Głównie zainteresowany
+user#:#interests_help_looking#:#Szukam Pomocy w
+user#:#interests_help_offered#:#Oferuję Pomoc w
 user#:#passwd_generation_pre#:#Pre-defined Passwords
 user#:#restrict_user_access#:#Restriced Access to User Accounts
 user#:#restrict_user_access_info#:#If enabled, the access to user account is restricted. The access depends on the permission "Read Access to Local User Account" in "User Accounts" and "Categories".
@@ -16003,7 +15936,7 @@ user#:#tos_accepted_content#:#Accepted Content
 user#:#tos_not_accepted_yet#:#Not accepted yet
 user#:#tos_show_signed_text#:#Show Details
 user#:#user_access_limited#:#Limited
-user#:#user_access_unlimited#:#Unlimited
+user#:#user_access_unlimited#:#Bez limitu
 user#:#user_account_code#:#Code
 user#:#user_account_code_generated#:#Date Of Generation
 user#:#user_account_code_generated_all#:#All Dates
@@ -16014,7 +15947,7 @@ user#:#user_account_code_used#:#Date Of Use
 user#:#user_account_code_valid_until#:#Valid Until
 user#:#user_account_code_valid_until_dynamic#:#Number of Days
 user#:#user_account_code_valid_until_static#:#End Date
-user#:#user_account_code_valid_until_unlimited#:#Unlimited
+user#:#user_account_code_valid_until_unlimited#:#Bez limitu
 user#:#user_account_codes#:#Account Codes
 user#:#user_account_codes_add#:#Add Codes
 user#:#user_account_codes_edit_header#:#Add Codes
@@ -16031,7 +15964,7 @@ user#:#user_adm_enable_alpha_nav#:#Alphabetical Navigation in User Administratio
 user#:#user_all#:#Wszyscy
 user#:#user_allow_delete_own_account#:#Allow users to delete own account
 user#:#user_any#:#Any
-user#:#user_awrn_all_users#:#All Users
+user#:#user_awrn_all_users#:#Wszyscy Użytkownicy
 user#:#user_awrn_all_users_info#:#All users of the platform are listed.
 user#:#user_delete_own_account#:#Delete Account
 user#:#user_delete_own_account_aborted#:#Aborted deletion, account was not changed.
@@ -16068,7 +16001,7 @@ user#:#user_profile_preview#:#Podgląd
 user#:#user_public_profile_info#:#Proszę określ, które informacje osobiste mogą być widoczne dla innych użytkowników.
 user#:#user_save_ordering_and_titles#:#Zapisz kolejność i nazwy
 user#:#user_screen_reader_optimization#:#Optymalizacja odczytu z ekranu
-user#:#user_screen_reader_optimization_info#:#Automatyczna ostrość i optymalizacja Ajax  w celu zwiększenia wydajności odczytu z ekranu.
+user#:#user_screen_reader_optimization_info#:#Zwiększ wydajności odczytu z ekranu.
 user#:#user_select_course_group#:#Select Course/Group
 user#:#user_selected_pages_deleted#:#The selected pages have been deleted.
 user#:#user_store_last_visited#:#Last Visited
@@ -16102,9 +16035,9 @@ webr#:#webr_new_link#:#Dodaj Nowy Link
 webr#:#webr_sort_manual#:#Manualne sortowanie
 webr#:#webr_sort_title#:#Sortuj wedłu tytułu
 webr#:#webr_sorting#:#Sortowanie linków
-wfld#:#wfld_add#:#Create Folder
+wfld#:#wfld_add#:#Utwórz Folder
 wfld#:#wfld_edit#:#Edit Folder
-wfld#:#wfld_new#:#Create New Folder
+wfld#:#wfld_new#:#Utwórz Nowy Folder
 wiki#:#wiki_activate_extended_rating#:#Activate Rating Categories
 wiki#:#wiki_activate_new_page_rating#:#Activate Rating For New Pages
 wiki#:#wiki_activate_page_rating#:#Activate Rating
@@ -16332,7 +16265,7 @@ wsp#:#wsp_shared_filter_reset_button#:#Reset Search
 wsp#:#wsp_shared_mandatory_filter_info#:#Please set at least one filter attribute. Text filters have to be at least 4 characters long.
 wsp#:#wsp_shared_member_filter#:#Members of Course / Group
 wsp#:#wsp_shared_object_type#:#Type of Resource
-wsp#:#wsp_shared_resources#:#Shared Resources
+wsp#:#wsp_shared_resources#:#Współdzielone Zasoby
 wsp#:#wsp_shared_table_title#:#Shares
 wsp#:#wsp_shared_title#:#Title of Resource
 wsp#:#wsp_shared_type#:#Shared With
@@ -16350,12 +16283,3 @@ wsp#:#wsp_type_scov#:#Certificate: SCORM
 wsp#:#wsp_type_tstv#:#Verification: Test
 wsp#:#wsp_type_webr#:#Zasób web
 wsp#:#wsp_type_wfld#:#Folder
-style#:#sty_type_ha_iheada#:#Hor. Accordion Header (active)###01 03 2016 new variable
-style#:#sty_type_ha_ihcap#:#Hor. Accordion Caption###01 03 2016 new variable
-style#:#sty_type_va_iheada#:#Vert. Accordion Header (active)###01 03 2016 new variable
-style#:#sty_type_va_ihcap#:#Vert. Accordion Caption###01 03 2016 new variable
-style#:#sty_ha_iheada_class#:#Hor. Accordion Header (active)###01 03 2016 new variable
-style#:#sty_ha_ihcap_class#:#Hor. Accordion Caption###01 03 2016 new variable
-style#:#sty_va_iheada_class#:#Vert. Accordion Header (active)###01 03 2016 new variable
-style#:#sty_va_ihcap_class#:#Vert. Accordion Caption###01 03 2016 new variable
-exc#:#exc_delete_team#:#Delete Team###10 03 2016 new variable

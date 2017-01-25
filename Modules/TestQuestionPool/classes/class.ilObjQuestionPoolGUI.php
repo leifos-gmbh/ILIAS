@@ -192,6 +192,10 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
 				$this->ctrl->setReturnByClass("ilAssQuestionPageGUI", "view");
 				$this->ctrl->setReturn($this, "questions");
 				$page_gui = new ilAssQuestionPageGUI($_GET["q_id"]);
+				$page_gui->obj->addUpdateListener(
+					$question,
+					'updateTimestamp'
+				);
 				$page_gui->setEditPreview(true);
 				$page_gui->setEnabledTabs(false);
 				if (strlen($this->ctrl->getCmd()) == 0 && !isset($_POST["editImagemapForward_x"])) // workaround for page edit imagemaps, keep in mind
@@ -1649,7 +1653,10 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
 				}
 				
 				$taxId = substr($item->getPostVar(), strlen('tax_'));
-				$questionList->addTaxonomyFilter($taxId, $item->getValue());
+				
+				$questionList->addTaxonomyFilter(
+					$taxId, $item->getValue(), $this->object->getId(), $this->object->getType()
+				);
 			}
 			elseif( $item->getValue() !== false )
 			{
@@ -1659,7 +1666,10 @@ class ilObjQuestionPoolGUI extends ilObjectGUI
 		
 		if( $this->object->isNavTaxonomyActive() && (int)$_GET['tax_node'] )
 		{
-			$questionList->addTaxonomyFilter( $this->object->getNavTaxonomyId(), array((int)$_GET['tax_node']) );
+			$questionList->addTaxonomyFilter(
+				$this->object->getNavTaxonomyId(), array((int)$_GET['tax_node']),
+				$this->object->getId(), $this->object->getType()
+			);
 		}
 
 		$questionList->load();

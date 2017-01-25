@@ -1779,10 +1779,8 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 		if (isset($_POST["cmd"]["clear"]))
 		{
 			ilUtil::sendSuccess($this->lng->txt("msg_clear_clipboard"),true);
-
-			//$this->ctrl->returnToParent($this);
-			//ilUtil::redirect($this->getReturnLocation("clear",$this->ctrl->getLinkTarget($this)),get_class($this));
-			$this->disableAdministrationPanelObject();
+			// fixed mantis 0018474: Clear Clipboard redirects to Subtab View, instead of Subtab "Edit Multiple"
+			$this->ctrl->redirect($this, 'render');
 		}
 	}
 	
@@ -2123,8 +2121,10 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 		//$t->addFormButton($this->lng->txt($txt_var), "performPasteIntoMultipleObjects");
 		$t->addStickyItem($b);
 
-			$t->addSeparator();
+		$t->addSeparator();
+		$this->lng->loadLanguageModule('obj');
 		$t->addFormButton($this->lng->txt("obj_insert_into_clipboard"), "keepObjectsInClipboard");
+
 		$t->addFormButton($this->lng->txt("cancel"), "cancelMoveLink");
 		$t->setCloseFormTag(false);
 		$t->setLeadingImage(ilUtil::getImagePath("arrow_upright.svg"), " ");
@@ -3742,7 +3742,15 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 			$sort->addOption($sort_manual);
 		}
 
-		$sort->setValue($settings->getSortMode());
+		// Handle moved containers and there possibly invalid values
+		if(in_array($settings->getSortMode(), $a_sorting_settings))
+		{
+			$sort->setValue($settings->getSortMode());
+		}
+		else
+		{
+			$sort->setValue(ilContainer::SORT_TITLE);
+		}
 		$form->addItem($sort);
 		
 		return $form;

@@ -2,14 +2,13 @@
 /* Copyright (c) 1998-2014 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 require_once 'Services/Password/classes/class.ilBasePasswordEncoder.php';
-require_once 'Services/Password/interfaces/interface.ilPasswordEncoderConfigurationFormAware.php';
 
 /**
  * Class ilBcryptPasswordEncoder
  * @author  Michael Jansen <mjansen@databay.de>
  * @package ServicesPassword
  */
-class ilBcryptPasswordEncoder extends ilBasePasswordEncoder implements ilPasswordEncoderConfigurationFormAware
+class ilBcryptPasswordEncoder extends ilBasePasswordEncoder
 {
 	/**
 	 * @var int
@@ -211,14 +210,15 @@ class ilBcryptPasswordEncoder extends ilBasePasswordEncoder implements ilPasswor
 
 	/**
 	 * Generates a bcrypt encoded string
-	 * @param    string $raw
-	 * @param    string $salt
+	 * @param    string $raw         The raw password
+	 * @param    string $user_secret A randomly generated string (should be 16 ASCII chars)
 	 * @return   string
 	 * @throws   ilPasswordException
 	 */
-	protected function encode($raw, $salt)
+	protected function encode($raw, $user_secret)
 	{
-		$hashed_password = hash_hmac('whirlpool', str_pad($raw, strlen($raw) * 4, sha1($salt), STR_PAD_BOTH), $this->getClientSalt(), true);
+		$client_secret   = $this->getClientSalt();
+		$hashed_password = hash_hmac('whirlpool', str_pad($raw, strlen($raw) * 4, sha1($user_secret), STR_PAD_BOTH), $client_secret, true);
 		$salt            = substr(str_shuffle(str_repeat('./0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', 22)), 0, 22);
 
 		/**
@@ -244,13 +244,14 @@ class ilBcryptPasswordEncoder extends ilBasePasswordEncoder implements ilPasswor
 			}
 		}
 
-		$encrypted_password = crypt($hashed_password, $prefix . $this->getCosts() . '$' . $salt);
-		if(strlen($encrypted_password) <= 13)
+		$salted_password = crypt($hashed_password, $prefix . $this->getCosts() . '$' . $salt);
+		if(strlen($salted_password) <= 13)
 		{
 			require_once 'Services/Password/exceptions/class.ilPasswordException.php';
 			throw new ilPasswordException('Error during the bcrypt generation');
 		}
-		return $encrypted_password;
+
+		return $salted_password;
 	}
 
 	/**
@@ -277,17 +278,6 @@ class ilBcryptPasswordEncoder extends ilBasePasswordEncoder implements ilPasswor
 	/**
 	 * 
 	 */
-	private function generateClientSalt()
-	{
-		require_once 'Services/Password/classes/class.ilPasswordUtils.php';
-		$this->setClientSalt(
-			substr(str_replace('+', '.', base64_encode(ilPasswordUtils::getBytes(self::MIN_SALT_SIZE))), 0, 22)
-		);
-	}
-
-	/**
-	 * 
-	 */
 	private function readClientSalt()
 	{
 		if(is_file($this->getClientSaltLocation()) && is_readable($this->getClientSaltLocation()))
@@ -298,6 +288,22 @@ class ilBcryptPasswordEncoder extends ilBasePasswordEncoder implements ilPasswor
 				$this->setClientSalt($contents);
 			}
 		}
+		else
+		{
+			$this->generateClientSalt();
+			$this->storeClientSalt();
+		}
+	}
+
+	/**
+	 *
+	 */
+	private function generateClientSalt()
+	{
+		require_once 'Services/Password/classes/class.ilPasswordUtils.php';
+		$this->setClientSalt(
+			substr(str_replace('+', '.', base64_encode(ilPasswordUtils::getBytes(self::MIN_SALT_SIZE))), 0, 22)
+		);
 	}
 
 	/**
@@ -308,89 +314,8 @@ class ilBcryptPasswordEncoder extends ilBasePasswordEncoder implements ilPasswor
 		$result = @file_put_contents($this->getClientSaltLocation(), $this->getClientSalt());
 		if(!$result)
 		{
-			throw new ilPasswordException("Could not store the client salt. Please contact an administrator.");
+			require_once 'Services/Password/exceptions/class.ilPasswordException.php';
+			throw new ilPasswordException(sprintf("Could not store the client salt in: %s. Please contact an administrator.", $this->getClientSaltLocation()));
 		}
-	}
-
-	/**
-	 * {@inheritdoc}
-	 * @throws ilPasswordException
-	 */
-	public function onSelection()
-	{
-		if(!$this->getClientSalt())
-		{
-			try
-			{
-				$this->generateClientSalt();
-				$this->storeClientSalt();
-			}
-			catch(ilPasswordException $e)
-			{
-				$this->setClientSalt(null);
-				throw $e;
-			}
-		}
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function validateForm(ilPropertyFormGUI $form)
-	{
-		/**
-		 * @var $lng ilLanguage
-		 */
-		global $lng;
-
-		if(!strlen(trim($this->getClientSalt())) || !preg_match('/^.{' . self::MIN_SALT_SIZE . ',}$/', $this->getClientSalt()))
-		{
-			$form->getItemByPostVar('bcrypt_salt')->setAlert($lng->txt('passwd_encoder_bcrypt_client_salt_invalid'));
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function saveForm(ilPropertyFormGUI $form)
-	{
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function buildForm(ilPropertyFormGUI $form)
-	{
-		/**
-		 * @var $lng ilLanguage
-		 */
-		global $lng;
-
-		$header = new ilFormSectionHeaderGUI();
-		$header->setTitle($lng->txt('passwd_encoder_' . $this->getName()));
-		$form->addItem($header);
-
-		$salt = new ilCustomInputGUI($lng->txt('passwd_encoder_bcrypt_client_salt'), 'bcrypt_salt');
-
-		$info = array($lng->txt('passwd_encoder_client_bcrypt_salt_info'));
-		if(!$this->isBcryptSupported())
-		{
-			$info[] = sprintf($lng->txt('passwd_encoder_client_bcrypt_salt_info_php537'), PHP_VERSION);
-		}
-		if(1 == count($info))
-		{
-			$salt->setInfo(current($info));
-		}
-		else
-		{
-			$salt->setInfo('<ul><li>' . implode('</li><li>', $info) . '</li></ul>');
-		}
-
-		$salt->setHtml($this->getClientSaltLocation());
-
-		$form->addItem($salt);
 	}
 }

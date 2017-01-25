@@ -494,8 +494,7 @@ class ilObjUserFolderGUI extends ilObjectGUI
 		foreach ($_POST["id"] as $id)
 		{
 			// instatiate correct object class (usr)
-			$obj =& $this->ilias->obj_factory->getInstanceByObjId($id);
-			$obj->setTimeLimitOwner($ilUser->getId());
+			$obj = $this->ilias->obj_factory->getInstanceByObjId($id);
 			$obj->setTimeLimitUnlimited(1);
 			$obj->setTimeLimitFrom("");
 			$obj->setTimeLimitUntil("");
@@ -601,8 +600,7 @@ class ilObjUserFolderGUI extends ilObjectGUI
 		foreach ($_POST["id"] as $id)
 		{
 			// instatiate correct object class (usr)
-			$obj =& $this->ilias->obj_factory->getInstanceByObjId($id);
-			$obj->setTimeLimitOwner($ilUser->getId());
+			$obj = $this->ilias->obj_factory->getInstanceByObjId($id);
 			$obj->setTimeLimitUnlimited(0);
 			$obj->setTimeLimitFrom($timefrom);
 			$obj->setTimeLimitUntil($timeuntil);
@@ -1177,30 +1175,31 @@ class ilObjUserFolderGUI extends ilObjectGUI
 						// with false, and only set to true if we find the object id of the
 						// locally administrated category in the tree path to the local role.
 						$isInSubtree = $this->object->getRefId() == USER_FOLDER_ID;
-						
-						$path = "";
+
+						$path_array = array();
 						if ($this->tree->isInTree($rolf[0]))
 						{
 							// Create path. Paths which have more than 4 segments
 							// are truncated in the middle.
 							$tmpPath = $this->tree->getPathFull($rolf[0]);
+							$tmpPath[] = $rolf[0];//adds target item to list
+
 							for ($i = 1, $n = count($tmpPath) - 1; $i < $n; $i++)
 							{
-								if ($i > 1)
-								{
-									$path = $path.' > ';
-								}
 								if ($i < 3 || $i > $n - 3)
 								{
-									$path = $path.$tmpPath[$i]['title'];
+									$path_array[] = $tmpPath[$i]['title'];
 								} 
 								else if ($i == 3 || $i == $n - 3)
 								{
-									$path = $path.'...';
+									$path_array[] = '...';
 								}
 								
 								$isInSubtree |= $tmpPath[$i]['obj_id'] == $this->object->getId();
 							}
+							//revert this path for a better readability in dropdowns #18306
+							$path = implode(" < ", array_reverse($path_array));
+
 						}
 						else
 						{

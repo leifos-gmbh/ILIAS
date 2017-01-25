@@ -1931,6 +1931,8 @@ abstract class ilPageObject
 	function resolveIntLinks($a_link_map = null)
 	{
 		$changed = false;
+		
+		$this->log->debug("start");
 
 		// resolve normal internal links
 		$xpc = xpath_new_context($this->dom);
@@ -1944,6 +1946,8 @@ abstract class ilPageObject
 			if ($a_link_map == null)
 			{
 				$new_target = ilInternalLink::_getIdForImportId($type, $target);
+				$this->log->debug("no map, type: ".$type.", target: ".$target.", new target: ".$new_target);
+//				echo "-".$new_target."-".$type."-".$target."-"; exit;
 			}
 			else
 			{
@@ -1953,6 +1957,7 @@ abstract class ilPageObject
 				{
 					$new_target = "il__".$nt[2]."_".$nt[3];
 				}
+				$this->log->debug("map, type: ".$type.", target: ".$target.", new target: ".$new_target);
 			}
 			if ($new_target !== false)
 			{
@@ -2008,19 +2013,36 @@ abstract class ilPageObject
 		$changed = false;
 		for($i = 0; $i < count($res->nodeset); $i++)
 		{
+			// get the ID of the import file from the xml
 			$old_id = $res->nodeset[$i]->get_attribute("OriginId");
 			$old_id = explode("_", $old_id);
 			$old_id = $old_id[count($old_id) - 1];
+			// get the new id from the current mapping
 			if ($a_mapping[$old_id] > 0)
 			{
 				$new_id = $a_mapping[$old_id];
 				if ($a_reuse_existing_by_import)
 				{
+					// this should work, if the lm has been imported in a translation installation and re-exported
 					$import_id = ilObject::_lookupImportId($new_id);
 					$imp = explode("_", $import_id);
 					if ($imp[1] == IL_INST_ID && $imp[2] == "mob" && ilObject::_lookupType($imp[3]) == "mob")
 					{
 						$new_id = $imp[3];
+					}
+
+					// now check, if the translation has been done just by changing text in the exported
+					// translation file
+					if ($import_id == "")
+					{
+						// if the old_id is also referred by the page content of the default language
+						// we assume that this media object is unchanged
+						include_once("./Services/MediaObjects/classes/class.ilObjMediaObject.php");
+						$med_of_def_lang = ilObjMediaObject::_getMobsOfObject("lm:pg", $this->getId(), 0, "-");
+						if (in_array($old_id, $med_of_def_lang))
+						{
+							$new_id = $old_id;
+						}
 					}
 				}
 

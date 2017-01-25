@@ -32,6 +32,10 @@ class ilObjContentObject extends ilObject
 	var $auto_glossaries = array();
 	
 	private $import_dir = '';
+	/**
+	 * @var ilLogger
+	 */
+	protected $log;
 
 	/**
 	* Constructor
@@ -43,6 +47,8 @@ class ilObjContentObject extends ilObject
 	{
 		// this also calls read() method! (if $a_id is set)
 		$this->ilObject($a_id,$a_call_by_reference);
+
+		$this->log = ilLoggerFactory::getLogger('lm');
 
 		$this->mob_ids = array();
 		$this->file_ids = array();
@@ -2219,6 +2225,11 @@ class ilObjContentObject extends ilObject
 			}
 		}
 
+		// init collector arrays
+		$this->offline_mobs = array();
+		$this->offline_int_links = array();
+		$this->offline_files = array();
+
 		// iterate all languages
 		foreach ($langs as $lang)
 		{
@@ -2497,7 +2508,25 @@ class ilObjContentObject extends ilObject
 				"target" => $mathJaxSetting->get("path_to_mathjax"),
 				"type" => "js");
 		}
-		
+
+		// auto linking js
+		include_once("./Services/Link/classes/class.ilLinkifyUtil.php");
+		foreach (ilLinkifyUtil::getLocalJsPaths() as $p)
+		{
+			if (is_int(strpos($p, "ExtLink")))
+			{
+				$scripts[] = array("source" => $p,
+					"target" => $a_target_dir.'/js/ilExtLink.js',
+					"type" => "js");
+			}
+			if (is_int(strpos($p, "linkify")))
+			{
+				$scripts[] = array("source" => $p,
+					"target" => $a_target_dir.'/js/linkify.js',
+					"type" => "js");
+			}
+		}
+
 		return $scripts;
 
 	}
@@ -2731,8 +2760,14 @@ class ilObjContentObject extends ilObject
 				$ilBench->stop("ExportHTML", "exportHTMLPage");
 			}
 		}
-		$this->offline_mobs = $mobs;
-		$this->offline_int_links = $int_links;
+		foreach ($mobs as $m)
+		{
+			$this->offline_mobs[$m] = $m;
+		}
+		foreach ($int_links as $k => $v)
+		{
+			$this->offline_int_links[$k] = $v;
+		}
 	}
 
 
@@ -3205,33 +3240,6 @@ class ilObjContentObject extends ilObject
 		$mess =  $this->importFromDirectory(
 			$this->getImportDirectory()."/".$subdir, $a_validate);
 
-		// this should only be true for help modules
-		if ($a_import_into_help_module > 0)
-		{
-			// search the zip file
-			$dir = $this->getImportDirectory()."/".$subdir;
-			$files = ilUtil::getDir($dir);
-			foreach ($files as $file)
-			{
-				if (is_int(strpos($file["entry"], "__help_")) && 
-					is_int(strpos($file["entry"], ".zip")))
-				{
-					include_once("./Services/Export/classes/class.ilImport.php");
-					$imp = new ilImport();
-					$imp->getMapping()->addMapping('Services/Help', 'help_module', 0, $a_import_into_help_module);
-					include_once("./Modules/LearningModule/classes/class.ilLMObject.php");
-					$chaps = ilLMObject::getObjectList($this->getId(), "st");
-					foreach ($chaps as $chap)
-					{
-						$chap_arr = explode("_", $chap["import_id"]);
-						$imp->getMapping()->addMapping('Services/Help', 'help_chap',
-							$chap_arr[count($chap_arr) - 1], $chap["obj_id"]);
-					}
-					$imp->importEntity($dir."/".$file["entry"], $file["entry"],
-						"help", "Services/Help", true);
-				}
-			}
-		}
 		
 		// delete import directory
 		ilUtil::delDir($this->getImportDirectory());
@@ -3246,9 +3254,13 @@ class ilObjContentObject extends ilObject
 	 * @param
 	 * @return
 	 */
-	function importFromDirectory($a_directory, $a_validate = true)
+	// begin-patch optes_lok_export
+	function importFromDirectory($a_directory, $a_validate = true, $a_mapping = null)
+	// end-patch optes_lok_export
 	{
 		global $lng;
+
+		$this->log->debug("import from directory ".$a_directory);
 		
 		// determine filename of xml file
 		$subdir = basename($a_directory);
@@ -3257,16 +3269,19 @@ class ilObjContentObject extends ilObject
 		// check directory exists within zip file
 		if (!is_dir($a_directory))
 		{
+			$this->log->error(sprintf($lng->txt("cont_no_subdir_in_zip"), $subdir));
 			return sprintf($lng->txt("cont_no_subdir_in_zip"), $subdir);
 		}
 
 		// check whether xml file exists within zip file
 		if (!is_file($xml_file))
 		{
+			$this->log->error(sprintf($lng->txt("cont_zip_file_invalid"), $subdir."/".$subdir.".xml"));
 			return sprintf($lng->txt("cont_zip_file_invalid"), $subdir."/".$subdir.".xml");
 		}
 
 		// import questions
+		$this->log->debug("import qti");
 		$qti_file = $a_directory."/qti.xml";
 		$qtis = array();
 		if (is_file($qti_file))
@@ -3287,9 +3302,12 @@ class ilObjContentObject extends ilObject
 			}
 		}
 
+		$this->log->debug("get ilContObjParser");
 		include_once ("./Modules/LearningModule/classes/class.ilContObjParser.php");
 		$subdir = ".";
 		$contParser = new ilContObjParser($this, $xml_file, $subdir, $a_directory);
+		// smeyer: added \ilImportMapping lok im/export
+		$contParser->setImportMapping($a_mapping);
 		$contParser->setQuestionMapping($qtis);
 		$contParser->startParsing();
 		ilObject::_writeImportId($this->getId(), $this->getImportId());

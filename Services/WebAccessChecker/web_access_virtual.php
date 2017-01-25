@@ -6,5 +6,5 @@
  */
 
 chdir('../../');
-require_once('./Services/WebAccessChecker/classes/class.ilWebAccessChecker.php');
-ilWebAccessChecker::run(urldecode($_SERVER['REQUEST_URI']));
+require_once('./Services/WebAccessChecker/classes/class.ilWebAccessCheckerDelivery.php');
+ilWebAccessCheckerDelivery::run($_SERVER['REQUEST_URI']);

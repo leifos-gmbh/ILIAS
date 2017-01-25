@@ -683,7 +683,7 @@ class ilObjMediaObjectGUI extends ilObjectGUI
 		}
 		else	// standard type: reference
 		{
-			$format = ilObjMediaObject::getMimeType(ilUtil::stripSlashes($_POST["standard_reference"]));
+			$format = ilObjMediaObject::getMimeType(ilUtil::stripSlashes($_POST["standard_reference"]), true);
 			$media_item->setFormat($format);
 			$media_item->setLocation(ilUtil::secureLink(ilUtil::stripSlashes($_POST["standard_reference"])));
 			$media_item->setLocationType("Reference");
@@ -759,7 +759,7 @@ class ilObjMediaObjectGUI extends ilObjectGUI
 				$format = $location = "";
 				if ($_POST["full_reference"] != "")
 				{
-					$format = ilObjMediaObject::getMimeType($_POST["full_reference"]);
+					$format = ilObjMediaObject::getMimeType($_POST["full_reference"], true);
 					$location = ilUtil::stripSlashes($_POST["full_reference"]);
 				}
 			}
@@ -869,7 +869,10 @@ class ilObjMediaObjectGUI extends ilObjectGUI
 		if ($std_item->getLocationType() == "LocalFile")
 		{
 			$file = $mob_dir."/".$std_item->getLocation();
-			$size = getimagesize($file);
+
+			include_once("./Services/MediaObjects/classes/class.ilMediaImageUtil.php");
+			$size = ilMediaImageUtil::getImageSize($file);
+
 			$std_item->setWidth($size[0]);
 			$std_item->setHeight($size[1]);
 			$this->object->update();
@@ -889,7 +892,8 @@ class ilObjMediaObjectGUI extends ilObjectGUI
 		if ($full_item->getLocationType() == "LocalFile")
 		{
 			$file = $mob_dir."/".$full_item->getLocation();
-			$size = getimagesize($file);
+			include_once("./Services/MediaObjects/classes/class.ilMediaImageUtil.php");
+			$size = ilMediaImageUtil::getImageSize($file);
 			$full_item->setWidth($size[0]);
 			$full_item->setHeight($size[1]);
 			$this->object->update();
@@ -915,7 +919,7 @@ class ilObjMediaObjectGUI extends ilObjectGUI
 			$format = $std_item->getFormat();
 			if ($_POST["standard_type"] == "Reference")
 			{
-				$format = ilObjMediaObject::getMimeType(ilUtil::stripSlashes($_POST["standard_reference"]));
+				$format = ilObjMediaObject::getMimeType(ilUtil::stripSlashes($_POST["standard_reference"]), true);
 				$std_item->setFormat($format);
 				$std_item->setLocation(ilUtil::secureLink(ilUtil::stripSlashes($_POST["standard_reference"])));
 				$std_item->setLocationType("Reference");
@@ -1024,7 +1028,7 @@ class ilObjMediaObjectGUI extends ilObjectGUI
 				$format = $full_item->getFormat();
 				if ($_POST["full_type"] == "Reference")
 				{
-					$format = ilObjMediaObject::getMimeType(ilUtil::stripSlashes($_POST["full_reference"]));
+					$format = ilObjMediaObject::getMimeType(ilUtil::stripSlashes($_POST["full_reference"]), true);
 					$full_item->setFormat($format);
 					$full_item->setLocationType("Reference");					
 					$location = ilUtil::stripSlashes($_POST["full_reference"]);
@@ -1772,7 +1776,7 @@ class ilObjMediaObjectGUI extends ilObjectGUI
 			if (is_object($st_item) && $this->getEnabledMapAreas())
 			{
 				$format = $st_item->getFormat();
-				if (substr($format, 0, 5) == "image")
+				if (substr($format, 0, 5) == "image" && !is_int(strpos($format, "svg")))
 				{
 					$ilTabs->addTarget("cont_def_map_areas",
 						$this->ctrl->getLinkTargetByClass(

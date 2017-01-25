@@ -325,7 +325,9 @@ class ilInitialisation
 		define ("ROLE_FOLDER_ID",$ilClientIniFile->readVariable('system','ROLE_FOLDER_ID'));
 		define ("MAIL_SETTINGS_ID",$ilClientIniFile->readVariable('system','MAIL_SETTINGS_ID'));
 		$error_handler = $ilClientIniFile->readVariable('system', 'ERROR_HANDLER');
-		define ("ERROR_HANDLER",$error_handler ? $error_handler : "PRETTY_PAGE");
+		define ("ERROR_HANDLER", $error_handler ? $error_handler : "PRETTY_PAGE");
+		$log_error_trace = $ilClientIniFile->readVariable('system', 'LOG_ERROR_TRACE');
+		define ("LOG_ERROR_TRACE", $log_error_trace ? $log_error_trace : false);
 		
 		// this is for the online help installation, which sets OH_REF_ID to the
 		// ref id of the online module
@@ -1129,6 +1131,18 @@ class ilInitialisation
 		{
 			return;
 		}
+		
+		if(self::showingLoginForm($current_script))
+		{
+			// login form is shown or user tries to authenticate => destroy old user session
+			$ilAuth->logout();
+			ilSession::_destroy(session_id(), ilSession::SESSION_CLOSE_LOGIN);
+			ilSession::set('AccountId', null);
+			
+			ilLoggerFactory::getLogger('auth')->debug('Logout called for old session on login request');
+		}
+		
+		
 						
 		$oldSid = session_id();		
 		
@@ -1145,7 +1159,7 @@ class ilInitialisation
 				ilPaymentShoppingCart::_migrateShoppingCart($oldSid, $newSid);
 			}
 		}					
-		
+
 		if($ilAuth->getAuth() && $ilAuth->getStatus() == '')
 		{
 			self::initUserAccount();
@@ -1221,7 +1235,7 @@ class ilInitialisation
 	/**
 	 * init HTML output (level 3)
 	 */
-	protected static function initHTML()
+	static function initHTML()
 	{
 		global $ilUser;
 		
@@ -1329,7 +1343,7 @@ class ilInitialisation
 	 * @return boolean 
 	 */
 	protected static function blockedAuthentication($a_current_script)
-	{		
+	{
 		if($a_current_script == "register.php" || 
 			$a_current_script == "pwassist.php" ||
 			$a_current_script == "confirmReg.php" ||

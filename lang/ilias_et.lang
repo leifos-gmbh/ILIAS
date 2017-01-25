@@ -1233,7 +1233,6 @@ assessment#:#tst_back_to_question_list#:#Back to Question List
 assessment#:#tst_back_to_top#:#Back to Top
 assessment#:#tst_beginning_ending_information#:#Info testi alguse ja lõpu kohta
 assessment#:#tst_best_solution_is#:#Parim lahendus on
-assessment#:#tst_browse_for_questions#:#Otsi küsimusi
 assessment#:#tst_btn_hide_best_solutions#:#Hide Best Solutions
 assessment#:#tst_btn_rebuild_random_question_stage#:#Synchronize Quesitons from Pool
 assessment#:#tst_btn_show_best_solutions#:#Show Best Solutions
@@ -2427,7 +2426,6 @@ certificate#:#certificate_text#:#Tunnistuse tekst
 certificate#:#certificate_top#:#Päis
 certificate#:#certificate_unit_description#:#Sisesta mõõduühikud kui VÄÄRTUS[cm|mm|in|pt|pc|px|em], NT. 10mm või 3in
 certificate#:#certificate_usage#:#Pane tähele, et sertifikaatide kasutamine on võimalik ainult siis, kui ILIASe Java-server töötab. Java-serveri konfigureerimine on võimalik ILIASe administreerimise pealehel veebiteenuste sektsioonis.
-certificate#:#certificate_var_matriculation#:#12345
 certificate#:#certificate_var_max_points#:#46
 certificate#:#certificate_var_result_mark_long#:#Hea
 certificate#:#certificate_var_result_mark_short#:#B
@@ -5102,7 +5100,6 @@ common#:#reg_account_confirmation_successful#:#Sinu kasutajakonto on aktiveeritu
 common#:#reg_goto_parent_membership_info#:#Only members can access the target object.
 common#:#reg_mail_body_2_confirmation#:#The link will only be good for %s, after that you will have to try again from the beginning.
 common#:#reg_mail_body_3_confirmation#:#If this email means nothing to you, then it is possible that somebody else has entered your email address either deliberately or accidentally, so please ignore this email.
-common#:#reg_mail_body_confirmation#:#to activate your account and confirm ownership of this email address, click the link below:
 common#:#reg_mail_body_forgot_password_info#:#Parooli saamiseks antud kasutajanimele kasutage keskkonna logimislehel funktsiooni « Parooli abi ».
 common#:#reg_mail_body_salutation#:#Austatud
 common#:#reg_mail_body_text1#:#teretulemast e-õppe keskkonda ILIAS!
@@ -6418,7 +6415,6 @@ content#:#cont_lm_default_layout#:#Vaikimisi paigutus õppemoodulile
 content#:#cont_lm_mail_permanent_link#:#Click on the following link to access the learning module:
 content#:#cont_lm_menu#:#Menüü
 content#:#cont_lm_properties#:#Õpimooduli omadused
-content#:#cont_LocalFile#:#Local File
 content#:#cont_localization#:#Lokaliseerimine
 content#:#cont_localization_info#:#Kasutajaliidese keel, nagu näiteks. "Eelmine" and "Järgmine".
 content#:#cont_location#:#Asukoht
@@ -9827,8 +9823,6 @@ mail#:#mail_sure_delete#:#Are you sure you want to delete the marked mail(s)?
 mail#:#mail_sure_delete_entry#:#Kas oled kindel, et soovid järgmised kontaktid kustutada
 mail#:#mail_sure_delete_file#:#The file will be removed permanently
 mail#:#mail_sure_delete_folder#:#The folder and its contents will be removed permanently
-mail#:#mail_system_sender_name#:#Sender Name
-mail#:#mail_system_sender_name_info#:#Please enter a name. This name will be used for automatically generated messages (internal and external). If you leave the field blank, ILIAS uses the short title of this installation. If the title is not well defined, 'ILIAS' is used as the sender.
 mail#:#mail_to#:#To
 mail#:#mail_user_addr_n_valid#:#Following users have no valid e-mail address
 mail#:#placeholders_advise#:#Kohahoidjad on lahendatud ainult saajatele `Kellele` väljal.%sSaajad väljadel `Koopia` ja `Pimekoopia`saavad lahendamata kohahoidjad.
@@ -16178,3 +16172,54 @@ style#:#sty_ha_ihcap_class#:#Hor. Accordion Caption###01 03 2016 new variable
 style#:#sty_va_iheada_class#:#Vert. Accordion Header (active)###01 03 2016 new variable
 style#:#sty_va_ihcap_class#:#Vert. Accordion Caption###01 03 2016 new variable
 exc#:#exc_delete_team#:#Delete Team###10 03 2016 new variable
+mail#:#mail_send_html#:#HTML Frame for External Emails###14 04 2016 new variable
+mail#:#mail_send_html_info#:#If enabled, the body of external emails will be embedded in a HTML frame. The corresponding template can be customized by creating a copy of './Services/Mail/templates/default/tpl.html_mail_template.html' at './Customizing/global/skin/[SKIN]/Services/Mail/tpl.html_mail_template.html' .###14 04 2016 new variable
+mail#:#mail_system_from_name#:#Sender Name###14 04 2016 new variable
+mail#:#mail_system_from_name_info#:#Please enter a name. This name (e.g. 'John Doe') will be used for automatically generated messages (internal and external). If you leave the field blank, ILIAS uses the short title of this installation. If the title is not well defined, ‘ILIAS’ is used as the sender.###14 04 2016 new variable
+mail#:#mail_system_return_path#:#Global Return-Path###14 04 2016 new variable
+mail#:#mail_system_return_path_info#:#Please enter an email address which should be used for the return path (e.g. webmaster@ilias.de). If you leave the field blank, the 'Return-Path' will be the 'From' email address.###14 04 2016 new variable
+sysc#:#sysc_tree_structure_failures#:#Number of failures in the tree structure (parent-Relation):###14 04 2016 new variable
+sysc#:#sysc_message_tree_structure_confirm#:#Do you really want to repair the tree structure? Please create a database backup before you proceed.###14 04 2016 new variable
+sysc#:#sysc_btn_tree_structure#:#Recreate Tree Structure###14 04 2016 new variable
+crs#:#event_tbl_admins#:#Administrators###14 04 2016 new variable
+crs#:#event_tbl_members#:#Members###14 04 2016 new variable
+crs#:#event_tbl_tutors#:#Tutors###14 04 2016 new variable
+trac#:#trac_cron_info#:#Please activate the "Object Statistics" cron job to gather data.###20 04 2016 new variable
+assessment#:#ass_create_export_file_with_results#:#Create Test Export File (incl. Participant Results)###19 05 2016 new variable
+assessment#:#tst_conflict_fbh_oblig_quest#:#The combination of using compulsory questions and locked answers is not allowed.###19 05 2016 new variable
+assessment#:#tst_conflict_reset_non_fbh#:#The setting "Lock Answers" was adjusted to "Do Not Lock Answers".###19 05 2016 new variable
+assessment#:#tst_conflict_reset_fbh_force#:#The setting "Lock Answers" was adjusted to "Do Not Lock Answers but Force Feedback".###19 05 2016 new variable
+dcl#:#dcl_reference_link_info#:#Detailed View must be active in referenced table###19 05 2016 new variable
+buddysystem#:#buddy_bs_action_already_linked#:#Already accepted the contact request from user '%s'.###19 05 2016 new variable
+buddysystem#:#buddy_bs_action_already_requested#:#Already requested user '%s'.###19 05 2016 new variable
+buddysystem#:#buddy_bs_action_already_ignored#:#Already ignored user '%s'.###19 05 2016 new variable
+buddysystem#:#buddy_bs_action_already_unlinked#:#The contact state for user '%s' is already unlinked.###19 05 2016 new variable
+sess#:#sess_list_reg_limit_places#:#Free places###19 05 2016 new variable
+sess#:#sess_accept_request#:#Accept Participation###19 05 2016 new variable
+sess#:#sess_new_registrations#:#Join Request###19 05 2016 new variable
+mail#:#mail_serial_letter_placeholders#:#Serial-Letter Placeholders###06 07 2016 new variable
+rbac#:#mep_copy#:#User can copy media pool###06 07 2016 new variable
+crs#:#crs_cannot_find_role#:#Can't find this role.###06 07 2016 new variable
+grp#:#grp_admission_link_failure_invalid_code#:#Can't register: Link is invalid.###06 07 2016 new variable
+crs#:#crs_admission_link_failure_invalid_code#:#Can't register: Link is invalid.###06 07 2016 new variable
+auth#:#auth_ldap_server_ds#:#LDAP-Server###03 08 2016 new variable
+assessment#:#ass_location#:#Location###03 08 2016 new variable
+assessment#:#ass_imap_hint#:#Hint to be shown as Tooltip###03 08 2016 new variable
+blog#:#blog_show_latest#:#Show latest postings/drafts###03 08 2016 new variable
+assessment#:#min_auto_complete#:#Autocomplete###12 10 2016 new variable
+assessment#:#autocomplete_error#:#Your autocomplete number is to large, you have answers which have less characters, so they would never be displayed.###12 10 2016 new variable
+assessment#:#tst_browse_for_qpl_questions#:#Add from Pool###12 10 2016 new variable
+assessment#:#tst_browse_for_tst_questions#:#Add from Other Test###12 10 2016 new variable
+assessment#:#ass_competence_respect_level_ordering#:#Please note that the competence thresholds have to be defined in an ascending order according to the available levels.###12 10 2016 new variable
+registration#:#reg_mail_body_activation#:#to activate your account and confirm ownership of this email address, click the link below:###12 10 2016 new variable
+form#:#err_invalid_input#:#An invalid value has been submited. Please check your input.###12 10 2016 new variable
+prg#:#prg_points_reachable#:#Points Obtainable###12 10 2016 new variable
+mail#:#mail_members_search_continue#:#Continue###12 10 2016 new variable
+copg#:#copg_confirm_el_deletion#:#Do you really want to delete the selected elements?###12 10 2016 new variable
+survey#:#msg_input_only_positive_numbers#:#Please enter positive numbers in scale values.###12 10 2016 new variable
+crs#:#crs_loc_err_stat_tst_offline#:#Not all tests are online.###12 10 2016 new variable
+itgr#:#itgr_desc_info#:#The description will not be a part of the item group's presentation in its container.###12 10 2016 new variable
+dcl#:#dcl_std_field_not_importable#:# - Standard fields are not importable.###25 10 2016 new variable
+certificate#:#certificate_var_user_matriculation#:#12345###25 10 2016 new variable
+rbac#:#edit_members#:#Manage members###22 12 2016 new variable
+rbac#:#prg_manage_members#:#Manage members of Study Programme###22 12 2016 new variable

@@ -592,8 +592,9 @@ class ilMediaItem
 			{
 				$loc = $this->getLocation();
 			}
-			$size = @getimagesize($loc);
-			
+
+			include_once("./Services/MediaObjects/classes/class.ilMediaImageUtil.php");
+			$size = ilMediaImageUtil::getImageSize($loc);
 			if ($size[0] > 0 && $size[1] > 0)
 			{
 				return array("width" => $size[0], "height" => $size[1]);
@@ -1105,13 +1106,12 @@ class ilMediaItem
 			else
 			{
 				$xml .= "<ExtLink Href=\"".str_replace("&", "&amp;",$area->getHref())."\" Title=\"".
-					$area->getExtTitle()."\">";
-				$xml .= $area->getTitle();
+					str_replace("&", "&amp;",$area->getExtTitle())."\">";
+				$xml .= str_replace("&", "&amp;", $area->getTitle());
 				$xml .="</ExtLink>";
 			}
 			$xml .= "</MapArea>";
 		}
-
 		return $xml;
 	}
 

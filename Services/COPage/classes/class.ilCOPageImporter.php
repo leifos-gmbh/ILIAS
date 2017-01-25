@@ -13,6 +13,16 @@ include_once("./Services/Export/classes/class.ilXmlImporter.php");
 class ilCOPageImporter extends ilXmlImporter
 {
 	/**
+	 * @var ilLogger
+	 */
+	protected $log;
+
+	/**
+	 * @var ilCOPageDataSet
+	 */
+	protected $ds;
+
+	/**
 	 * Initialisation
 	 */
 	function init()
@@ -21,6 +31,8 @@ class ilCOPageImporter extends ilXmlImporter
 		$this->ds = new ilCOPageDataSet();
 		$this->ds->setDSPrefix("ds");
 		$this->config = $this->getImport()->getConfig("Services/COPage");
+
+		$this->log = ilLoggerFactory::getLogger('copg');
 	}
 	
 	
@@ -69,6 +81,8 @@ class ilCOPageImporter extends ilXmlImporter
 						{
 							$lstr = "-";
 						}
+						// see bug #0019049
+						$next_xml = str_replace("&amp;", "&", $next_xml);
 						if ($this->config->getUpdateIfExists() && ilPageObject::_exists($id[0], $id[1], $lstr))
 						{
 							$page = ilPageObjectFactory::getInstance($id[0], $id[1], 0, $lstr);
@@ -117,6 +131,7 @@ class ilCOPageImporter extends ilXmlImporter
 	 */
 	function finalProcessing($a_mapping)
 	{
+		$this->log->debug("start");
 		$pages = $a_mapping->getMappingsOfEntity("Services/COPage", "pgl");
 		$media_objects = $a_mapping->getMappingsOfEntity("Services/MediaObjects", "mob");
 		$file_objects = $a_mapping->getMappingsOfEntity("Modules/File", "file");
@@ -139,6 +154,7 @@ class ilCOPageImporter extends ilXmlImporter
 						if (!$this->config->getSkipInternalLinkResolve())
 						{
 							$il = $new_page->resolveIntLinks();
+							$this->log->debug("resolve internal link for page ".$id[0]."-".$id[1]."-".$id[2]);
 						}
 						if ($med || $fil || $il)
 						{
@@ -148,6 +164,7 @@ class ilCOPageImporter extends ilXmlImporter
 				}
 			}
 		//}
+		$this->log->debug("end");
 	}
 }
 

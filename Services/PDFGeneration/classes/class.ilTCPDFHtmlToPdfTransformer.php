@@ -1,6 +1,8 @@
 <?php
+
 require_once 'Services/PDFGeneration/classes/class.ilPDFGeneration.php';
 require_once 'Services/PDFGeneration/classes/class.ilPDFGenerationJob.php';
+require_once 'Services/PDFGeneration/classes/class.ilAbstractHtmlToPdfTransformer.php';
 
 class ilTCPDFHtmlToPdfTransformer extends ilAbstractHtmlToPdfTransformer
 {

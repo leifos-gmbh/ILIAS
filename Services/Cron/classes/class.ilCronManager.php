@@ -122,7 +122,7 @@ class ilCronManager
 		{
 			$ilLog->write("CRON - job ".$a_job_data["job_id"]." still running");
 
-			$cut = 60*60*3; // 3h				
+			$cut = 60*60*12; // 3h				
 
 			// is running (and has not pinged) for 3 hours straight, we assume it crashed
 			if(time()-$a_job_data["alive_ts"] > $cut)

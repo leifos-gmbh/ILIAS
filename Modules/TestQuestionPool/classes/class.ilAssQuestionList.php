@@ -504,11 +504,6 @@ class ilAssQuestionList implements ilTaxAssignedItemInfo
 		{
 			$CONDITIONS[] = $this->getParentObjFilterExpression();
 		}
-		
-		if( $this->getParentObjectIdFilterExpression() !== null )
-		{
-			$CONDITIONS[] = $this->getParentObjectIdFilterExpression();
-		}
 
 		if( $this->getParentObjectIdFilterExpression() !== null )
 		{

@@ -162,14 +162,12 @@ class ilStudyProgrammeExpandableProgressListGUI extends ilStudyProgrammeProgress
 		}
 		$preloader->preload();
 
-		//TODO: remove when PHP5.3 support is canceld
-		$self = $this;
-		return implode("\n", array_map(function(ilObjCourse $course) use ($self) {
+		return implode("\n", array_map(function(ilObjCourse $course) {
 			require_once("Modules/StudyProgramme/classes/class.ilStudyProgrammeCourseListGUI.php");
 			require_once("Modules/StudyProgramme/classes/class.ilStudyProgrammeContainerObjectMock.php");
 
 			$item_gui = new ilStudyProgrammeCourseListGUI();
-			$self->configureItemGUI($item_gui);
+			$this->configureItemGUI($item_gui);
 			$item_gui->setContainerObject(new ilStudyProgrammeContainerObjectMock($course));
 			return $item_gui->getListItemHTML
 				( $course->getRefId()
@@ -180,8 +178,7 @@ class ilStudyProgrammeExpandableProgressListGUI extends ilStudyProgrammeProgress
 		}, $crs));
 	}
 	
-	//TODO: public -> protected when PHP5.3 support is cancelled
-	public function configureItemGUI(ilStudyProgrammeCourseListGUI $a_item_gui) {
+	protected function configureItemGUI(ilStudyProgrammeCourseListGUI $a_item_gui) {
 		$a_item_gui->enableComments(false);
 		$a_item_gui->enableTags(false);
 		$a_item_gui->enableIcon(true);

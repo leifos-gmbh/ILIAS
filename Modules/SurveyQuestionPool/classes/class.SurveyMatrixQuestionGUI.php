@@ -680,7 +680,7 @@ class SurveyMatrixQuestionGUI extends SurveyQuestionGUI
 		{
 			$tplheaders->setCurrentBlock("bipolar_start");
 			$style = array();
-			array_push($style, sprintf("width: %.2F%s!important", $layout["percent_bipolar_adjective1"], "%"));
+			array_push($style, sprintf("width: %.2f%s!important", $layout["percent_bipolar_adjective1"], "%"));
 			if (count($style) > 0)
 			{
 				$tplheaders->setVariable("STYLE", " style=\"" . implode(";", $style) . "\"");
@@ -698,7 +698,7 @@ class SurveyMatrixQuestionGUI extends SurveyQuestionGUI
 				$tplheaders->setVariable("TEXT", ilUtil::prepareFormOutput($col->title));
 				$tplheaders->setVariable("CLASS", "rsep");
 				$style = array();
-				array_push($style, sprintf("width: %.2F%s!important", $layout["percent_neutral"], "%"));
+				array_push($style, sprintf("width: %.2f%s!important", $layout["percent_neutral"], "%"));
 				if ($this->object->getNeutralColumnSeparator())
 				{
 					array_push($style, "border-left: $neutralstyle!important;");
@@ -718,7 +718,7 @@ class SurveyMatrixQuestionGUI extends SurveyQuestionGUI
 						array_push($style, "border-right: 1px solid $bordercolor!important");
 					}
 				}
-				array_push($style, sprintf("width: %.2F%s!important", $layout["percent_columns"] / $this->object->getColumnCount(), "%"));
+				array_push($style, sprintf("width: %.2f%s!important", $layout["percent_columns"] / $this->object->getColumnCount(), "%"));
 				$tplheaders->setCurrentBlock("column_header");
 				$tplheaders->setVariable("TEXT", ilUtil::prepareFormOutput($col->title));
 				$tplheaders->setVariable("CLASS", "center");
@@ -733,7 +733,7 @@ class SurveyMatrixQuestionGUI extends SurveyQuestionGUI
 		{
 			$tplheaders->setCurrentBlock("bipolar_end");
 			$style = array();
-			array_push($style, sprintf("width: %.2F%s!important", $layout["percent_bipolar_adjective2"], "%"));
+			array_push($style, sprintf("width: %.2f%s!important", $layout["percent_bipolar_adjective2"], "%"));
 			if (count($style) > 0)
 			{
 				$tplheaders->setVariable("STYLE", " style=\"" . implode(";", $style) . "\"");
@@ -742,7 +742,7 @@ class SurveyMatrixQuestionGUI extends SurveyQuestionGUI
 		}
 
 		$style = array();
-		array_push($style, sprintf("width: %.2F%s!important", $layout["percent_row"], "%"));
+		array_push($style, sprintf("width: %.2f%s!important", $layout["percent_row"], "%"));
 		if (count($style) > 0)
 		{
 			$tplheaders->setVariable("STYLE", " style=\"" . implode(";", $style) . "\"");

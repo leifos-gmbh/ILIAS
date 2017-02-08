@@ -248,7 +248,6 @@ class ilPCMapGUI extends ilPageContentGUI
 		}
 		$this->displayValidationError();
 		$this->form->setValuesByPost();
-		
 		$tpl->setContent($this->form->getHTML());
 	}
 }

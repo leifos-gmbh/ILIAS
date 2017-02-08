@@ -986,9 +986,9 @@ class ilPersonalSettingsGUI
 			// starting point	
 			include_once "Services/User/classes/class.ilUserUtil.php";
 			if(ilUserUtil::hasPersonalStartingPoint())
-			{				
+			{
 				ilUserUtil::setPersonalStartingPoint($this->form->getInput('usr_start'), 
-					$this->form->getInput('usr_start_ref_id'));				
+					$this->form->getInput('usr_start_ref_id'));
 			}
 
 			// selector for unicode characters

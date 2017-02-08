@@ -672,7 +672,7 @@ class ilSetup
 			$user->setPasswordEncodingType($data['passwd_enc_type']);
 			$user->setPasswordSalt($data['passwd_salt']);
 
-			$password_valid = ilUserPasswordManager::getInstance()->verifyPassword($user, $a_auth_data['password'], false);
+			$password_valid = ilUserPasswordManager::getInstance()->verifyPassword($user, $a_auth_data['password']);
 		}
 		else
 		{

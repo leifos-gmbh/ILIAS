@@ -749,7 +749,6 @@ Calendar.prototype.create = function (_par) {
 	if (this.isPopup) {
 		div.style.position = "absolute";
 		div.style.display = "none";
-		div.style.zIndex = 9999; // vs. bootstrap modal
 	}
 	div.appendChild(table);
 

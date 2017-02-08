@@ -220,7 +220,7 @@ class ilCertificate
 	*
 	* @param $newObject The new certificate object
 	*/
-	public function cloneCertificate(ilCertificate $newObject)
+	public function cloneCertificate($newObject)
 	{
 		$xsl = $this->getXSLPath();
 		$bgimage = $this->getBackgroundImagePath();

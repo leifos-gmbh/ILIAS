@@ -350,18 +350,6 @@ class ilTinyMCE extends ilRTE
 		return implode(',', $btns);
 	}
 	
-	protected function getButtonsForUserTextEditor($buttontags)
-	{
-		$btns = $this->_buildButtonsFromHTMLTags($buttontags);
-
-		$btns = explode(',', $btns);
-		
-		$btns[] = 'undo';
-		$btns[] = 'redo';
-		
-		return implode(',', $btns);
-	}
-	
 	/**
 	* Set Enable Style Selecttion.
 	*

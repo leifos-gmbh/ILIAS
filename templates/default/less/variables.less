@@ -1,5 +1,6 @@
 //== Colors
-
+//
+//##
 /*		Color scheme
 		Dark BLue: #0f2152;
 		Mid Blue: #4c6586;
@@ -31,10 +32,10 @@
 @web-font-path: "fonts/";
 
 @mid-gray: #434343;
-@il-primary-container-bg: #FFFFFF;
-@il-secondary-container-bg: #F9F9F9;
+@il-primary-container-bg: white;
+@il-secondary-container-bg: #f9f9f9;
 
-@il-highlight-bg: #FFFFD0;
+@il-highlight-bg: #ffffd0;
 /* @il-highlight-bg: saturate(lighten(@brand-warning, 34%), 80%); */
 /* @il-highlight-bg: lighten(@brand-secondary, 44%); */
 /* @il-highlight-bg: lighten(#21c5d8, 40%); */
@@ -42,13 +43,64 @@
 
 
 //== Scaffolding
+//
+//##
 @body-bg:               #f0f0f0;
 @text-color:            @gray-dark;
 @link-color:            lighten(@brand-primary, 5%);
 @link-hover-color:      darken(@link-color, 15%);
 
+@component-active-color: white;
+@btn-primary-color: white;
+@btn-success-color: white;
+@btn-info-color: white;
+@btn-warning-color: white;
+@btn-danger-color: white;
+@input-bg: white;
+
+@dropdown-bg: white;
+
+@navbar-inverse-link-hover-color: white;
+@navbar-inverse-brand-hover-color: white;
+@navbar-inverse-toggle-icon-bar-bg: white;
+
+@nav-open-link-hover-color: white;
+
+@pagination-bg: white;
+@pagination-active-color: white;
+@pagination-disabled-bg: white;
+
+@tooltip-color: white;
+@tooltip-bg: black;
+
+@popover-bg: white;
+@popover-arrow-color: white;
+
+@label-color: white;
+@label-link-hover-color: white;
+
+@modal-content-bg: white;
+@modal-backdrop-bg: black;
+
+@progress-bar-color: white;
+
+@list-group-bg: white;
+
+@panel-bg: white;
+@panel-primary-text: white;
+
+@carousel-control-color: white;
+@carousel-indicator-active-bg: white;
+@carousel-indicator-border-color: white;
+@carousel-caption-color: white;
+
+@close-text-shadow: 0 1px 0 white;
+@kbd-color: white;
+
 
 //== Typography
+//
+//##
 @font-family-sans-serif:  'Open Sans', Verdana, Arial, Helvetica, sans-serif;
 
 @font-size-base:          14px;
@@ -62,11 +114,15 @@
 @font-size-h5:            ceil((@font-size-base * 1.1));
 @font-size-h6:            @font-size-base;
 
+//** Controls font sizes in drop down menu.
+@il-font-size-dropdown:		ceil((@font-size-base * 1.0));
+
 
 //== Iconography
+//
+//##
 @icon-font-path:            "../../Services/UICore/lib/bootstrap-3.2.0/fonts/";
 
-//== Components
 //== Components
 //
 //## Define common padding and border radius sizes and more. Values based on 14px text and 1.428 line-height (~20px to start).
@@ -90,15 +146,29 @@
 @border-radius-large:       0px;
 @border-radius-small:       0px;
 
+
+//== Header
+
+//** controls height of the "topbar" (that gray thingy on top of the page in the standard).
+@il-top-bar-height:			40px;
+//** controls the height of the "main header" (that white thingy with the logo and the main menu in it).
+@il-main-header-height:		80px;
+//** controls the height of the border underneath the main header.
+@il-header-border-bottom-height: 3px;
+//** that is the height of the complete header, that is that thingy upon the real content of the page.
+@il-header-height:			ceil((@il-main-header-height + @il-top-bar-height - @il-header-border-bottom-height));
+//** controls the height of the "logo" (that [ILIAS] thingy on top the page in the standard).
+@il-logo-height:			50px;
+//** controls the width of the "logo" (that [ILIAS] thingy on top the page in the standard).
+@il-logo-width:				50px;
+
 //== Navs
+//
+//##
 @nav-link-padding:          5px 10px;
 @nav-tabs-border-color:     #e0e0e0;
 /* @nav-tabs-link-hover-border-color: @brand-primary; */
 @nav-tabs-active-link-hover-border-color: #e0e0e0;
-
-// this is related to the main menu
-@il-fixed-menu-height: 117px;
-@il-fixed-menu-height-bar-only: 40px;
 
 //== Breadcrumbs
 //
@@ -130,13 +200,13 @@
 //
 //##
 
-@badge-color:                 #fff;
+@badge-color:                 white;
 //** Linked badge text color on hover
-@badge-link-hover-color:      #fff;
+@badge-link-hover-color:      white;
 @badge-bg:                    darken(@brand-warning, 10%);
 
 //** Badge text color in active nav link
-@badge-active-color:          #fff;
+@badge-active-color:          white;
 //** Badge background color in active nav link
 @badge-active-bg:             darken(@brand-warning, 10%);
 
@@ -160,6 +230,7 @@
 @ilMainMenuColor:			lighten(@brand-primary, 10%);
 @ilButtonFontSize: 	@font-size-small;
 
+@input-color-placeholder: lighten(@gray-light, 30%);
 
 //== Panels
 //
@@ -189,6 +260,9 @@
 @dropdown-link-hover-bg: #f2f2f2;
 @dropdown-link-hover-bg: lighten(@brand-primary, 53%);;
 
+//** determines display of icons in dropdowns, 'none' for no display and 'inline' for display
+@il-nav-icons:             inline;
+
 //== Tables
 //
 //## Customizes the `.table` component with basic values, each used across all table variations.
@@ -201,7 +275,7 @@
 //** Default background color used for all tables.
 @table-bg:                      transparent;
 //** Background color used for `.table-striped`.
-@table-bg-accent:               #ffffff;
+@table-bg-accent:               white;
 
 //** Border color for table and cell borders.
 @table-border-color:            #ddd;
@@ -211,6 +285,8 @@
 @il-table-cmd-bg:				@il-secondary-container-bg;
 
 //== Toolbar
+//
+//##
 @navbar-height: 40px;
 @il-toolbar-margin: 15px; // Margin between toolbar items
 @il-toolbar-bg: @il-secondary-container-bg;
@@ -218,5 +294,49 @@
 @il-toolbar-border: 1px solid #d8d8d8;
 
 //== Postings
-@il-posting-by-moderator-bg: #FF9;
-@il-posting-needs-moderation-bg: #FFE4E4;
+//
+//##
+@il-posting-by-moderator-bg: #ff9;
+@il-posting-needs-moderation-bg: #ffe4e4;
+
+//== bootstrap date time picker (/Services/Calendar/)
+//
+//##
+@bs-datetimepicker-timepicker-font-size: 1.2em;
+@bs-datetimepicker-active-bg: @btn-primary-bg;
+@bs-datetimepicker-active-color: @btn-primary-color;
+@bs-datetimepicker-border-radius: @border-radius-base;
+@bs-datetimepicker-btn-hover-bg: @gray-lighter;
+@bs-datetimepicker-disabled-color: @gray-light;
+@bs-datetimepicker-alternate-color: @gray-light;
+@bs-datetimepicker-secondary-border-color: #ccc;
+@bs-datetimepicker-secondary-border-color-rgba: rgba(0, 0, 0, 0.2);
+@bs-datetimepicker-primary-border-color: white;
+@bs-datetimepicker-text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+
+//== Glyph
+//
+//##
+@il-glyph-color: @link-color;
+@il-glyph-hover-color: @link-hover-color;
+@il-glyph-highlighted-color: @brand-warning;
+@il-glyph-highlighted-hover-color:  darken(@brand-warning, 15%);
+
+//== Counter
+//
+//##
+@il-counter-padding: 2px 4px;
+@il-counter-font-size: 9px;
+@il-counter-margin-left: -4px;
+
+//== Status Counter
+//
+//##
+@il-counter-status-bg: lighten(@mid-gray, 40%);
+@il-counter-status-margin-top: 10px;
+
+//== Novelty Counter
+//
+//##
+@il-counter-novelty-bg: @brand-warning;
+@il-counter-novelty-margin-top: -5px;

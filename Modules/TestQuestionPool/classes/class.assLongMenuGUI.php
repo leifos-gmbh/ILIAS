@@ -10,7 +10,7 @@ include_once './Modules/Test/classes/inc.AssessmentConstants.php';
  *
  * @package     Modules/TestQuestionPool
  *
- * @ilCtrl_Calls assLongMenuGUI: ilPropertyFormGUI
+ * @ilCtrl_Calls assLongMenuGUI: ilPropertyFormGUI, ilFormPropertyDispatchGUI
  */
 class assLongMenuGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjustable
 {
@@ -64,14 +64,9 @@ class assLongMenuGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjus
 	}
 
 	/**
-	 * Evaluates a posted edit form and writes the form data in the question object
-	 *
-	 * @param bool $always
-	 *
-	 * @return integer A positive value, if one of the required fields wasn't set, else 0
-	 *
+	 * {@inheritdoc}
 	 */
-	public function writePostData($always = false)
+	protected function writePostData($always = false)
 	{
 		$form = $this->buildEditForm();
 		$form->setValuesByPost();
@@ -118,7 +113,7 @@ class assLongMenuGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjus
 	/**
 	 * @return ilPropertyFormGUI
 	 */
-	private function buildEditForm()
+	protected function buildEditForm()
 	{
 		$form = $this->buildBasicEditFormObject();
 
@@ -166,7 +161,7 @@ class assLongMenuGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjus
 		$long_menu_text->setValue($this->object->prepareTextareaOutput($this->object->getLongMenuTextValue()));
 		$form->addItem($long_menu_text);
 		
-		$tpl = new ilTemplate("tpl.il_as_qpl_cloze_gap_button_code.html", TRUE, TRUE, "Modules/TestQuestionPool");
+		$tpl = new ilTemplate("tpl.il_as_qpl_long_menu_gap_button_code.html", TRUE, TRUE, "Modules/TestQuestionPool");
 		$tpl->setVariable('INSERT_GAP', $this->lng->txt('insert_gap'));
 		$tpl->parseCurrentBlock();
 		$button = new ilCustomInputGUI('&nbsp;','');
@@ -217,6 +212,7 @@ class assLongMenuGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjus
 		$tpl->setVariable("TEXT", 				$this->lng->txt('answers_text_box'));
 		$tpl->setVariable("POINTS", 			$this->lng->txt('points'));
 		$tpl->setVariable("INFO_TEXT_UPLOAD",	$this->lng->txt('info_text_upload'));
+		$tpl->setVariable("TXT_BROWSE",			$this->lng->txt('select_file'));
 		$tpl->setVariable("MANUAL_EDITING", 	$this->lng->txt('manual_editing'));
 		$tpl->setVariable("CORRECT_ANSWER_TXT", $this->lng->txt('correct_answers'));
 		$tpl->setVariable("ANSWER_OPTIONS_TXT", $this->lng->txt('answer_options'));
@@ -371,6 +367,7 @@ class assLongMenuGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjus
 				$user_solution[$solution_value["value1"]] = $solution_value["value2"];
 			}
 		}
+
 		// generate the question output
 		include_once "./Services/UICore/classes/class.ilTemplate.php";
 		$template = new ilTemplate("tpl.il_as_qpl_longmenu_output.html", TRUE, TRUE, "Modules/TestQuestionPool");

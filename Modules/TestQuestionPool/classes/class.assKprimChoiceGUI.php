@@ -11,7 +11,7 @@ require_once 'Modules/TestQuestionPool/interfaces/interface.ilGuiAnswerScoringAd
  *
  * @package     Modules/TestQuestionPool
  *
- * @ilCtrl_Calls assKprimChoiceGUI: ilPropertyFormGUI
+ * @ilCtrl_Calls assKprimChoiceGUI: ilPropertyFormGUI, ilFormPropertyDispatchGUI
  */
 class assKprimChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjustable, ilGuiAnswerScoringAdjustable
 {
@@ -96,6 +96,9 @@ class assKprimChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringAd
 		$this->editQuestion();
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	protected function writePostData($upload = false)
 	{
 		$form = $this->buildEditForm();
@@ -134,7 +137,7 @@ class assKprimChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringAd
 	/**
 	 * @return ilPropertyFormGUI
 	 */
-	private function buildEditForm()
+	protected function buildEditForm()
 	{
 		$form = $this->buildBasicEditFormObject();
 		

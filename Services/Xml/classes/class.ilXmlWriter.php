@@ -72,7 +72,7 @@ class ilXmlWriter
 	* @param	string	input encoding
 	* @access	public
 	*/
-	function ilXmlWriter ($version = "1.0", $outEnc = "utf-8", $inEnc = "utf-8")
+	function __construct($version = "1.0", $outEnc = "utf-8", $inEnc = "utf-8")
 	{
 		// initialize xml string
 		$this->xmlStr = "";
@@ -129,7 +129,7 @@ class ilXmlWriter
 	* @return	string	escaped text
 	* @access	static
 	*/
-	function _xmlEscapeData($data)
+	static function _xmlEscapeData($data)
 	{
 		$position = 0;
 		$length = strlen($data);

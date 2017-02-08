@@ -3,6 +3,7 @@
 /* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 require_once "./Services/Object/classes/class.ilObjectGUI.php";
+require_once('./Services/Repository/classes/class.ilObjectPlugin.php');
 
 /**
 * Class ilObjRoleTemplateGUI
@@ -38,14 +39,14 @@ class ilObjRoleTemplateGUI extends ilObjectGUI
 	*
 	* @access	public
 	*/
-	function ilObjRoleTemplateGUI($a_data,$a_id,$a_call_by_reference)
+	function __construct($a_data,$a_id,$a_call_by_reference)
 	{
 		global $lng;
 		
 		$lng->loadLanguageModule('rbac');
 		
 		$this->type = "rolt";
-		$this->ilObjectGUI($a_data,$a_id,$a_call_by_reference,false);
+		parent::__construct($a_data,$a_id,$a_call_by_reference,false);
 		$this->rolf_ref_id =& $this->ref_id;
 		$this->ctrl->saveParameter($this, "obj_id");
 	}
@@ -313,12 +314,12 @@ class ilObjRoleTemplateGUI extends ilObjectGUI
 											    "type"		=> $info['type']);
 			
 			$txt = $objDefinition->isPlugin($info['type'])
-				? ilPlugin::lookupTxt("rep_robj", $info['type'], $info['type']."_".$info['operation'])
+				? ilObjectPlugin::lookupTxtById($info['type'], $info['type']."_".$info['operation'])
 				: $this->lng->txt($info['type']."_".$info['operation']);
 			if (substr($info['operation'], 0, 7) == "create_" &&
 				$objDefinition->isPlugin(substr($info['operation'], 7)))
 			{
-				$txt = ilPlugin::lookupTxt("rep_robj", substr($info['operation'], 7), $info['type']."_".$info['operation']);
+				$txt = ilObjectPlugin::lookupTxtById(substr($info['operation'], 7), $info['type']."_".$info['operation']);
 			}
 			elseif(substr($info['operation'],0,6) == 'create')
 			{
@@ -342,7 +343,7 @@ class ilObjRoleTemplateGUI extends ilObjectGUI
 		{
 			if ($objDefinition->isPlugin($obj_data["type"]))
 			{
-				$rbac_objects[$key]["name"] = ilPlugin::lookupTxt("rep_robj", $obj_data["type"],
+				$rbac_objects[$key]["name"] = ilObjectPlugin::lookupTxtById($obj_data["type"],
 						"obj_".$obj_data["type"]);
 			}
 			else
@@ -608,22 +609,22 @@ class ilObjRoleTemplateGUI extends ilObjectGUI
 	/**
 	* admin and normal tabs are equal for roles
 	*/
-	function getAdminTabs(&$tabs_gui)
+	function getAdminTabs()
 	{
-		$this->getTabs($tabs_gui);
+		$this->getTabs();
 	}
 	
-	function getTabs(&$tabs_gui)
+	function getTabs()
 	{
-		global $rbacsystem,$rbacreview;
+		global $rbacsystem;
 
 		if ($rbacsystem->checkAccess('write',$this->rolf_ref_id))
 		{
-			$tabs_gui->addTarget("settings",
+			$this->tabs_gui->addTarget("settings",
 				$this->ctrl->getLinkTarget($this, "edit"),
 				array("edit","update"), get_class($this));
 				
-			$tabs_gui->addTarget("default_perm_settings",
+			$this->tabs_gui->addTarget("default_perm_settings",
 				$this->ctrl->getLinkTarget($this, "perm"),
 				array("perm"), get_class($this));
 		}
@@ -646,7 +647,7 @@ class ilObjRoleTemplateGUI extends ilObjectGUI
 	* should be overwritten to add object specific items
 	* (repository items are preloaded)
 	*/
-	function addAdminLocatorItems()
+	function addAdminLocatorItems($a_do_not_add_object = false)
 	{
 		global $ilLocator;
 		

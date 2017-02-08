@@ -279,17 +279,17 @@ class ilExSubmissionTeamGUI
 		global $ilUser, $tpl;
 		
 		if(!$this->submission->isTutor())
-		{			
+		{
 			$ids = (bool)$a_full_delete
 				? $this->team->getMembers()
 				: $_POST["id"];
-			
+
 			if(!sizeof($ids) &&
 				!$this->canEditTeam())
 			{
 				ilUtil::sendFailure($this->lng->txt("select_one"), true);
 				$this->ctrl->redirect($this, "submissionScreenTeam");
-			}					
+			}
 		}
 		else
 		{
@@ -373,7 +373,7 @@ class ilExSubmissionTeamGUI
 		{
 			$members = $this->team->getMembers();
 			if(sizeof($members) <= sizeof($ids))
-			{				
+			{
 				if(sizeof($members) == 1 && $members[0] == $ilUser->getId())
 				{
 					$team_deleted = true;

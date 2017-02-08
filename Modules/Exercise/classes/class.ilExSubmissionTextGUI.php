@@ -122,10 +122,10 @@ class ilExSubmissionTextGUI extends ilExSubmissionBaseGUI
 			ilUtil::sendFailure($this->lng->txt("exercise_time_over"), true);
 			$ilCtrl->redirect($this, "returnToParent");
 		}
-				
+		
 		$deadline = max($this->assignment->getDeadline(), $this->assignment->getExtendedDeadline());
 		if($deadline)
-		{									
+		{			
 			$deadline = $this->assignment->getPersonalDeadline($ilUser->getId());
 			
 			// extended deadline date should not be presented anywhere

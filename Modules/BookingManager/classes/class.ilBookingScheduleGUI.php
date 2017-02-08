@@ -128,61 +128,32 @@ class ilBookingScheduleGUI
 		$title->setMaxLength(120);
 		$form_gui->addItem($title);
 
-		/*
-		$type = new ilRadioGroupInputGUI($lng->txt("book_schedule_type"), "type");
-		$type->setRequired(true);
-		$form_gui->addItem($type);
-		$fix = new ilRadioOption($lng->txt("book_schedule_type_fix"), "fix");
-		$fix->setInfo($lng->txt("book_schedule_type_fix_info"));
-		$type->addOption($fix);
-		$flex = new ilRadioOption($lng->txt("book_schedule_type_flexible"), "flexible");
-		$flex->setInfo($lng->txt("book_schedule_type_flexible_info"));
-		$type->addOption($flex);
-
-		$raster = new ilNumberInputGUI($lng->txt("book_schedule_raster"), "raster");
-		$raster->setRequired(true);
-		$raster->setInfo($lng->txt("book_schedule_raster_info"));
-		$raster->setMinValue(1);
-		$raster->setSize(3);
-		$raster->setMaxLength(3);
-		$raster->setSuffix($lng->txt("book_minutes"));
-		$flex->addSubItem($raster);
-
-		$rent_min = new ilNumberInputGUI($lng->txt("book_schedule_rent_min"), "rent_min");
-		$rent_min->setInfo($lng->txt("book_schedule_rent_info"));
-		$rent_min->setMinValue(1);
-		$rent_min->setSize(3);
-		$rent_min->setMaxLength(3);
-		$flex->addSubItem($rent_min);
-
-		$rent_max = new ilNumberInputGUI($lng->txt("book_schedule_rent_max"), "rent_max");
-		$rent_max->setInfo($lng->txt("book_schedule_rent_info"));
-		$rent_max->setMinValue(1);
-		$rent_max->setSize(3);
-		$rent_max->setMaxLength(3);
-		$flex->addSubItem($rent_max);
-
-		$break = new ilNumberInputGUI($lng->txt("book_schedule_break"), "break");
-		$break->setInfo($lng->txt("book_schedule_break_info"));
-		$break->setMinValue(1);
-		$break->setSize(3);
-		$break->setMaxLength(3);
-		$flex->addSubItem($break);
-		*/
-		
 		include_once "Modules/BookingManager/classes/class.ilScheduleInputGUI.php";
 		$definition = new ilScheduleInputGUI($lng->txt("book_schedule_days"), "days");
 		$definition->setInfo($lng->txt("book_schedule_days_info"));
 		$definition->setRequired(true);
 		$form_gui->addItem($definition);
 
+		$deadline_opts = new ilRadioGroupInputGUI($lng->txt("book_deadline_options"), "deadline_opts");
+		$deadline_opts->setRequired(true);
+		$form_gui->addItem($deadline_opts);
+
+		$deadline_time = new ilRadioOption($lng->txt("book_deadline_hours"), "hours");
+		$deadline_opts->addOption($deadline_time);
+
 		$deadline = new ilNumberInputGUI($lng->txt("book_deadline"), "deadline");
 		$deadline->setInfo($lng->txt("book_deadline_info"));
 		$deadline->setSuffix($lng->txt("book_hours"));
-		$deadline->setMinValue(0);
+		$deadline->setMinValue(1);
 		$deadline->setSize(3);
 		$deadline->setMaxLength(3);
-		$form_gui->addItem($deadline);
+		$deadline_time->addSubItem($deadline);
+
+		$deadline_start = new ilRadioOption($lng->txt("book_deadline_slot_start"), "slot_start");
+		$deadline_opts->addOption($deadline_start);
+
+		$deadline_slot = new ilRadioOption($lng->txt("book_deadline_slot_end"), "slot_end");
+		$deadline_opts->addOption($deadline_slot);
 		
 		if ($a_mode == "edit")
 		{			
@@ -193,17 +164,15 @@ class ilBookingScheduleGUI
 		$av = new ilFormSectionHeaderGUI();
 		$av->setTitle($lng->txt("obj_activation_list_gui"));
 		$form_gui->addItem($av);
-		
+				
 		// #18221
-		$lng->loadLanguageModule('rep');
+		$lng->loadLanguageModule('rep');		
 		
-		$from = new ilDateTimeInputGUI($lng->txt("rep_activation_limited_start"), "from");
-		$from->enableDateActivation("", "from_tgl", $schedule ? is_object($schedule->getAvailabilityFrom()) : false);
+		$from = new ilDateTimeInputGUI($lng->txt("rep_activation_limited_start"), "from");		
 		$from->setShowTime(true);
 		$form_gui->addItem($from);
 		
-		$to = new ilDateTimeInputGUI($lng->txt("rep_activation_limited_end"), "to");
-		$to->enableDateActivation("", "to_tgl", $schedule ? is_object($schedule->getAvailabilityTo()) : false);
+		$to = new ilDateTimeInputGUI($lng->txt("rep_activation_limited_end"), "to");		
 		$to->setShowTime(true);
 		$form_gui->addItem($to);
 	
@@ -218,9 +187,23 @@ class ilBookingScheduleGUI
 			include_once 'Modules/BookingManager/classes/class.ilBookingSchedule.php';
 			$schedule = new ilBookingSchedule($id);
 			$title->setValue($schedule->getTitle());
-			$deadline->setValue($schedule->getDeadline());
 			$from->setDate($schedule->getAvailabilityFrom());
 			$to->setDate($schedule->getAvailabilityTo());
+			
+			if($schedule->getDeadline() == 0)
+			{				
+				$deadline_opts->setValue("slot_start");
+			}
+			else if($schedule->getDeadline() > 0)
+			{
+				$deadline->setValue($schedule->getDeadline());
+				$deadline_opts->setValue("hours");
+			}
+			else
+			{
+				$deadline->setValue(0);
+				$deadline_opts->setValue("slot_end");
+			}
 
 			/*
 			if($schedule->getRaster())
@@ -347,15 +330,27 @@ class ilBookingScheduleGUI
 		
 		$schedule->setTitle($form->getInput("title"));
 		$schedule->setPoolId($ilObjDataCache->lookupObjId($this->ref_id));
-		$schedule->setDeadline($form->getInput("deadline"));
 		
-		$from = $form->getItemByPostVar("from");
-		$from_tgl = $from->getActivationPostVar();		
-		$schedule->setAvailabilityFrom($_POST[$from_tgl] ? $from->getDate(): null);
+		$from = $form->getItemByPostVar("from");		
+		$schedule->setAvailabilityFrom($from->getDate());
 		
 		$to = $form->getItemByPostVar("to");
-		$to_tgl = $to->getActivationPostVar();		
-		$schedule->setAvailabilityTo($_POST[$to_tgl] ? $to->getDate(): null);
+		$schedule->setAvailabilityTo($to->getDate());
+		
+		switch($form->getInput("deadline_opts"))
+		{
+			case "slot_start":
+				$schedule->setDeadline(0);
+				break;
+			
+			case "hours":			
+				$schedule->setDeadline($form->getInput("deadline"));
+				break;
+			
+			case "slot_end":
+				$schedule->setDeadline(-1);
+				break;
+		}
 
 		/*
 		if($form->getInput("type") == "flexible")

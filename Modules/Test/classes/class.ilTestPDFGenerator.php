@@ -68,13 +68,6 @@ class ilTestPDFGenerator
 			$node->parentNode->removeChild($node);
 		}
 
-		// remove noprint elems as tcpdf will make empty pdf when hidden by css rules
-		$domX = new DomXPath($dom);
-		foreach($domX->query("//*[contains(@class, 'ilNoDisplay')]") as $node)
-		{
-			$node->parentNode->removeChild($node);
-		}
-
 		$dom->encoding = 'UTF-8';
 
 		$img_src_map = array();
@@ -101,7 +94,7 @@ class ilTestPDFGenerator
 			return $html;
 		}
 
-		return '<?xml encoding="UTF-8">'.$cleaned_html;
+		return $cleaned_html;
 	}
 
 	public static function generatePDF($pdf_output, $output_mode, $filename=null)
@@ -142,7 +135,7 @@ class ilTestPDFGenerator
 			$module_path = "Modules/Test/";
 
 			// use ilStyleDefinition instead of account to get the current skin
-			include_once "Services/Style/classes/class.ilStyleDefinition.php";
+			include_once "Services/Style/System/classes/class.ilStyleDefinition.php";
 			if (ilStyleDefinition::getCurrentSkin() != "default")
 			{
 				$fname = "./Customizing/global/skin/".

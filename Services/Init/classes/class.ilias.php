@@ -106,7 +106,7 @@ class ILIAS
 	* setup ILIAS global object
 	* @access	public
 	*/
-	function ILIAS($a_client_id = 0)
+	function __construct($a_client_id = 0)
 	{
 		global $ilErr, $ilDB, $ilIliasIniFile, $ilClientIniFile, $ilAuth;
 
@@ -119,23 +119,9 @@ class ILIAS
 
 		// create instance of object factory
 		include_once("./Services/Object/classes/class.ilObjectFactory.php");
-		$this->obj_factory =& new ilObjectFactory();
+		$this->obj_factory = new ilObjectFactory();
 	}
 
-	/**
-	* Destructor
-	* @access	private
-	* @return	boolean
-	*/
-	function _ILIAS()
-	{
-		if ($this->ini->readVariable("db", "type") != "")
-		{
-			$this->db->disconnect();
-		}
-		
-		return true;
-	}
 	
 	
 	/**

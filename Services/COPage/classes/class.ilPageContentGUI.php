@@ -17,6 +17,10 @@ class ilPageContentGUI
 	var $ilias;
 	var $tpl;
 	var $lng;
+
+	/**
+	 * @var ilCtrl
+	 */
 	var $ctrl;
 	var $pg_obj;
 	var $hier_id;
@@ -46,7 +50,7 @@ class ilPageContentGUI
 	* Constructor
 	* @access	public
 	*/
-	function ilPageContentGUI($a_pg_obj, $a_content_obj, $a_hier_id = 0, $a_pc_id = "")
+	function __construct($a_pg_obj, $a_content_obj, $a_hier_id = 0, $a_pc_id = "")
 	{
 		global $ilias, $tpl, $lng, $ilCtrl;
 
@@ -166,7 +170,7 @@ class ilPageContentGUI
 		{
 			if (ilObject::_lookupType($this->getStyleId()) == "sty")
 			{
-				include_once("./Services/Style/classes/class.ilObjStyleSheet.php");
+				include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
 				$this->style = new ilObjStyleSheet($this->getStyleId());
 			}
 		}
@@ -182,7 +186,7 @@ class ilPageContentGUI
 		if ($this->getStyleId() > 0 &&
 			ilObject::_lookupType($this->getStyleId()) == "sty")
 		{
-			include_once("./Services/Style/classes/class.ilObjStyleSheet.php");
+			include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
 			$style = new ilObjStyleSheet($this->getStyleId());
 			$chars = array();
 			if (!is_array($a_type))
@@ -259,9 +263,6 @@ class ilPageContentGUI
 		$btpl = new ilTemplate("tpl.bb_menu.html", true, true, "Services/COPage");
 
 		// not nice, should be set by context per method
-		//if ($this->pg_obj->getParentType() == "gdf" ||
-		//	$this->pg_obj->getParentType() == "lm" ||
-		//	$this->pg_obj->getParentType() == "dbk")
 		if ($this->getPageConfig()->getEnableInternalLinks())
 		{
 			$btpl->setCurrentBlock("bb_ilink_button");
@@ -304,8 +305,12 @@ class ilPageContentGUI
 			{
 				if ($c != "tex" || $mathJaxSetting->get("enable") || defined("URL_TO_LATEX"))
 				{
-					$btpl->touchBlock("bb_".$c."_button");
-					$btpl->setVariable("TXT_".strtoupper($c), $this->lng->txt("cont_text_".$c));
+					if (!in_array($c, array("acc", "com", "quot", "code")))
+					{
+						$btpl->touchBlock("bb_" . $c . "_button");
+						$btpl->setVariable("TXT_" . strtoupper($c), $this->lng->txt("cont_text_" . $c));
+						$lng->toJS("cont_text_" . $c);
+					}
 				}
 			}
 		}
@@ -314,17 +319,22 @@ class ilPageContentGUI
 		{
 			$btpl->touchBlock("bb_anc_button");
 			$btpl->setVariable("TXT_ANC", $lng->txt("cont_anchor").":");
+			$lng->toJS("cont_anchor");
 		}
+
+		$btpl->setVariable("CHAR_STYLE_SELECT", ilPCParagraphGUI::getCharStyleSelector($this->pg_obj->getParentType(), true, $this->getStyleId()));
 		
 		// footnote
 //		$btpl->setVariable("TXT_FN", $this->lng->txt("cont_text_fn"));
 		
 //		$btpl->setVariable("TXT_CODE", $this->lng->txt("cont_text_code"));
 		$btpl->setVariable("TXT_ILN", $this->lng->txt("cont_text_iln"));
+		$lng->toJS("cont_text_iln");
 //		$btpl->setVariable("TXT_XLN", $this->lng->txt("cont_text_xln"));
 //		$btpl->setVariable("TXT_TEX", $this->lng->txt("cont_text_tex"));
 		$btpl->setVariable("TXT_BB_TIP", $this->lng->txt("cont_bb_tip"));
 		$btpl->setVariable("TXT_WLN", $lng->txt("wiki_wiki_page"));
+		$lng->toJS("wiki_wiki_page");
 		
 		$btpl->setVariable("PAR_TA_NAME", $a_ta_name);
 		
@@ -375,7 +385,7 @@ class ilPageContentGUI
 		}
 
 		// check whether target is allowed
-		$curr_node =& $this->pg_obj->getContentNode($a_hid[0], $a_hid[1]);
+		$curr_node = $this->pg_obj->getContentNode($a_hid[0], $a_hid[1]);
 		if (is_object($curr_node) && $curr_node->node_name() == "FileItem")
 		{
 			$this->ilias->raiseError($this->lng->txt("cont_operation_not_allowed"),$this->ilias->error_obj->MESSAGE);
@@ -431,7 +441,7 @@ class ilPageContentGUI
 		}
 
 		// check whether target is allowed
-		$curr_node =& $this->pg_obj->getContentNode($a_hid[0], $a_hid[1]);
+		$curr_node = $this->pg_obj->getContentNode($a_hid[0], $a_hid[1]);
 		if (is_object($curr_node) && $curr_node->node_name() == "FileItem")
 		{
 			$this->ilias->raiseError($this->lng->txt("cont_operation_not_allowed"),$this->ilias->error_obj->MESSAGE);
@@ -468,15 +478,14 @@ class ilPageContentGUI
 	{
 		global $ilErr;
 		
-		if ($this->pg_obj->getParentType() != "lm" &&
-			$this->pg_obj->getParentType() != "dbk")
+		if ($this->pg_obj->getParentType() != "lm")
 		{
 			$ilErr->raiseError("Split method called for wrong parent type (".
 			$this->pg_obj->getParentType().")", $ilErr->FATAL);
 		}
 		else
 		{
-			$lm_page =& ilLMPageObject::_splitPage($this->pg_obj->getId(),
+			$lm_page = ilLMPageObject::_splitPage($this->pg_obj->getId(),
 				$this->pg_obj->getParentType(), $this->hier_id);
 				
 			// jump to new page
@@ -494,8 +503,7 @@ class ilPageContentGUI
 	{
 		global $ilErr;
 		
-		if ($this->pg_obj->getParentType() != "lm" &&
-			$this->pg_obj->getParentType() != "dbk")
+		if ($this->pg_obj->getParentType() != "lm")
 		{
 			$ilErr->raiseError("Split method called for wrong parent type (".
 			$this->pg_obj->getParentType().")", $ilErr->FATAL);

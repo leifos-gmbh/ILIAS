@@ -25,9 +25,9 @@ class ilCopyWizardSettingsXMLParser extends ilSaxParser
   * @param	string	input encoding
   * @access	public
   */
-  function ilCopyWizardSettingsXMLParser($xml)
+  function __construct($xml)
   {
-    parent::ilSaxParser('', true);
+    parent::__construct('', true);
     $this->setXMLContent($xml);    
   }
 

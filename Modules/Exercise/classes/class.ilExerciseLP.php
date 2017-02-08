@@ -13,6 +13,14 @@ include_once "Services/Object/classes/class.ilObjectLP.php";
  */
 class ilExerciseLP extends ilObjectLP
 {
+	public static function getDefaultModes($a_lp_active)
+	{
+		return array(
+			ilLPObjSettings::LP_MODE_DEACTIVATED,
+			ilLPObjSettings::LP_MODE_EXERCISE_RETURNED
+		);		
+	}
+	
 	public function getDefaultMode()
 	{		
 		return ilLPObjSettings::LP_MODE_EXERCISE_RETURNED;
@@ -26,7 +34,7 @@ class ilExerciseLP extends ilObjectLP
 		);
 	}	
 	
-	protected static function isLPMember(array &$a_res, $a_usr_id, array $a_obj_ids)
+	protected static function isLPMember(array &$a_res, $a_usr_id, $a_obj_ids)
 	{
 		global $ilDB;
 		

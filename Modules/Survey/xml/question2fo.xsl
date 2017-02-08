@@ -70,7 +70,7 @@
 	</xsl:template>
 	
 	<xsl:template match="//div">
-		<xsl:choose>
+		<xsl:choose>			
 			<xsl:when test="@class='surveySheet'">
 				<fo:block>
 					<!-- <xsl:attribute name="page-break-inside">avoid</xsl:attribute> -->
@@ -93,7 +93,7 @@
 					<xsl:attribute name="margin-bottom">0.5em</xsl:attribute>
 					<xsl:apply-templates select="node()"></xsl:apply-templates>
 				</fo:block>
-			</xsl:when>
+			</xsl:when>			
 			<xsl:when test="@class='questionblockTitle'">
 				<fo:block>
 					<xsl:attribute name="text-align">center</xsl:attribute>

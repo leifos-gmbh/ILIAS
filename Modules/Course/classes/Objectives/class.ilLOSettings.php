@@ -43,6 +43,11 @@ class ilLOSettings
 	
 	private static $instances = array();
 	
+	/**
+	 * @var ilLogger
+	 */
+	private $logger = null;
+	
 	
 	// settings 5.1
 	private $it_type = self::TYPE_INITIAL_PLACEMENT_ALL;
@@ -70,6 +75,8 @@ class ilLOSettings
 	 */
 	protected function __construct($a_cont_id)
 	{
+		$this->logger = $GLOBALS['DIC']->logger()->crs();
+		
 		$this->container_id = $a_cont_id;
 		$this->read();
 	}
@@ -197,7 +204,7 @@ class ilLOSettings
 				'WHERE itest = '.$ilDB->quote($a_trst_ref_id,'integer').' '.
 				'OR qtest = '.$ilDB->quote($a_trst_ref_id,'integer');
 		$res = $ilDB->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			return $row->obj_id;
 		}
@@ -536,8 +543,10 @@ class ilLOSettings
 				
 			default:
 
+				$this->logger->debug('Type initial default');
 				if($start->exists($this->getInitialTest()))
 				{
+					$this->logger->debug('Old start object exists. Trying to delete');
 					$start->deleteItem($this->getInitialTest());
 				}
 				break;
@@ -577,7 +586,7 @@ class ilLOSettings
 		$query = 'SELECT * FROM loc_settings '.
 				'WHERE obj_id = '.$ilDB->quote($this->getObjId(),'integer');
 		$res = $ilDB->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$this->entry_exists = true;
 			

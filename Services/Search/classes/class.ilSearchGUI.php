@@ -218,7 +218,6 @@ class ilSearchGUI extends ilSearchBaseGUI
 			$auto->setResultField($result_field);
 			$auto->enableFieldSearchableCheck(true);
 			$auto->setUserLimitations(true);
-			$auto->setPrivacyMode(ilUserAutoComplete::PRIVACY_MODE_RESPECT_USER_SETTING);
 
 			$res = $auto->getList($_REQUEST['term']);
 			

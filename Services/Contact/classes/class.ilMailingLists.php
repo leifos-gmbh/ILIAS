@@ -24,24 +24,38 @@
 require_once "Services/Contact/classes/class.ilMailingList.php";
 
 /**
-* @author Michael Jansen <mjansen@databay.de>
-* @version $Id$
-*
-* @ingroup ServicesMail
-*/
+ * @author Michael Jansen <mjansen@databay.de>
+ * @version $Id$
+ * @ingroup ServicesMail
+ */
 class ilMailingLists
 {
-	private $db = null;	
-	private $user = null;
+	/**
+	 * @var ilDBInterface
+	 */
+	private $db;
+
+	/**
+	 * @var ilObjUser
+	 */
+	private $user;
+
+	/**
+	 * @var null|ilMailingList
+	 */
 	private $ml = null;
-	
+
+	/**
+	 * ilMailingLists constructor.
+	 * @param ilObjUser $a_user
+	 */
 	public function __construct(ilObjUser $a_user)
 	{
-		global $ilDB;
+		global $DIC;
 
-		$this->db = $ilDB;
+		$this->db   = $DIC['ilDB'];
 		$this->user = $a_user;
-	}	
+	}
 
 	public function get($id = 0)
 	{
@@ -76,7 +90,7 @@ class ilMailingLists
 		$entries = array();
 		
 		$counter = 0;
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{			
 			$tmpObj = new ilMailingList($this->user, 0);
 			$tmpObj->setId($row->ml_id);
@@ -108,7 +122,6 @@ class ilMailingLists
 		else
 		{
 			$this->setCurrentMailingList($ml_id);
-			if ($this->getCurrentMailingList()->getCreateDate() == '0000-00-00 00:00:00') return false;
 		}
 		
 		return true;

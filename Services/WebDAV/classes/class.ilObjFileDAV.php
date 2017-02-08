@@ -47,9 +47,9 @@ class ilObjFileDAV extends ilObjectDAV
 	*
 	* @param refid A refid to the object.
 	*/
-	function ilObjFileDAV($refid, $obj = null) 
+	function __construct($refid, $obj = null) 
 	{
-               $this->ilObjectDAV($refid, $obj);
+               parent::__construct($refid, $obj);
               
                // Set debug to true, if you want to get debug output for this
                // object
@@ -193,7 +193,7 @@ class ilObjFileDAV extends ilObjectDAV
 	{
 		if (is_null($this->obj))
 		{
-			$this->obj = &new ilObjFile($this->getRefId(),true);
+			$this->obj = new ilObjFile($this->getRefId(),true);
 			$this->obj->read();
 		}
 	}

@@ -32,13 +32,6 @@ include_once 'class.ilMDBase.php';
 
 class ilMDRequirement extends ilMDBase
 {
-	function ilMDRequirement($a_rbac_id = 0,$a_obj_id = 0,$a_obj_type = '')
-	{
-		parent::ilMDBase($a_rbac_id,
-						 $a_obj_id,
-						 $a_obj_type);
-	}
-
 	// SET/GET
 	function setOrCompositeId($a_or_composite_id)
 	{
@@ -129,7 +122,7 @@ class ilMDRequirement extends ilMDBase
 	{
 		if($this->db->autoExecute('il_meta_requirement',
 								  $this->__getFields(),
-								  DB_AUTOQUERY_INSERT))
+								  ilDBConstants::MDB2_AUTOQUERY_INSERT))
 		{
 			$this->setMetaId($this->db->getLastInsertId());
 
@@ -146,7 +139,7 @@ class ilMDRequirement extends ilMDBase
 		{
 			if($this->db->autoExecute('il_meta_requirement',
 									  $this->__getFields(),
-									  DB_AUTOQUERY_UPDATE,
+									  ilDBConstants::MDB2_AUTOQUERY_UPDATE,
 									  "meta_requirement_id = ".$ilDB->quote($this->getMetaId())))
 			{
 				return true;
@@ -200,7 +193,7 @@ class ilMDRequirement extends ilMDBase
 				"WHERE meta_requirement_id = ".$ilDB->quote($this->getMetaId());
 
 			$res = $this->db->query($query);
-			while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+			while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 			{
 				$this->setRBACId($row->rbac_id);
 				$this->setObjId($row->obj_id);
@@ -260,7 +253,7 @@ class ilMDRequirement extends ilMDBase
 			"AND or_composite_id = ".$ilDB->quote($a_or_composite_id);
 
 		$res = $ilDB->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$ids[] = $row->meta_requirement_id;
 		}

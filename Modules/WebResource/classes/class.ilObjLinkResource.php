@@ -42,9 +42,8 @@ class ilObjLinkResource extends ilObject
 	* @param	integer	reference_id or object_id
 	* @param	boolean	treat the id as reference_id (true) or object_id (false)
 	*/
-	function ilObjLinkResource($a_id = 0,$a_call_by_reference = true)
+	public function __construct($a_id = 0,$a_call_by_reference = true)
 	{
-		//$this->type = "lnkr";
 		$this->type = "webr";
 		parent::__construct($a_id,$a_call_by_reference);
 	}
@@ -154,7 +153,7 @@ class ilObjLinkResource extends ilObject
 	{
 		include_once './Modules/WebResource/classes/class.ilLinkResourceItems.php';
 
-		$this->items_obj =& new ilLinkResourceItems($this->getId());
+		$this->items_obj = new ilLinkResourceItems($this->getId());
 
 		return true;
 	}
@@ -167,9 +166,9 @@ class ilObjLinkResource extends ilObject
 	 * @param int copy id
 	 * 
 	 */
-	public function cloneObject($a_target_id,$a_copy_id = 0)
+	public function cloneObject($a_target_id,$a_copy_id = 0, $a_omit_tree = false)
 	{
-	 	$new_obj = parent::cloneObject($a_target_id,$a_copy_id);
+	 	$new_obj = parent::cloneObject($a_target_id,$a_copy_id, $a_omit_tree);
 	 	$this->cloneMetaData($new_obj);
 	 	
 	 	// object created now copy other settings

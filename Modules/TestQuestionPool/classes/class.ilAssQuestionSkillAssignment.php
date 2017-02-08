@@ -18,7 +18,7 @@ class ilAssQuestionSkillAssignment
 
 
 	/**
-	 * @var ilDB
+	 * @var ilDBInterface
 	 */
 	private $db;
 
@@ -67,7 +67,7 @@ class ilAssQuestionSkillAssignment
 	 */
 	private $solutionComparisonExpressionList;
 	
-	public function __construct(ilDB $db)
+	public function __construct(ilDBInterface $db)
 	{
 		$this->db = $db;
 		
@@ -115,7 +115,7 @@ class ilAssQuestionSkillAssignment
 		if( $this->dbRecordExists() )
 		{
 			$this->db->update('qpl_qst_skl_assigns', array(
-					'skill_points' => array('integer', $this->getSkillPoints()),
+					'skill_points' => array('integer', (int)$this->getSkillPoints()),
 					'eval_mode' => array('text', $this->getEvalMode())
 				),
 				array(
@@ -133,7 +133,7 @@ class ilAssQuestionSkillAssignment
 				'question_fi' => array('integer', $this->getQuestionId()),
 				'skill_base_fi' => array('integer', $this->getSkillBaseId()),
 				'skill_tref_fi' => array('integer', $this->getSkillTrefId()),
-				'skill_points' => array('integer', $this->getSkillPoints()),
+				'skill_points' => array('integer', (int)$this->getSkillPoints()),
 				'eval_mode' => array('text', $this->getEvalMode())
 			));
 		}

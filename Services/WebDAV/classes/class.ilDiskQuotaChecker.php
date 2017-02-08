@@ -32,7 +32,7 @@
 */
 class ilDiskQuotaChecker
 {
-	function ilDiskQuotaChecker()
+	function __construct()
 	{
 	}
 
@@ -71,7 +71,8 @@ class ilDiskQuotaChecker
 	{
 		$info = array();
 
-		global $ilDB;
+		global $DIC;
+		$ilDB = $DIC['ilDB'];
 
 		$res = $ilDB->queryf("SELECT keyword, value ".
 			"FROM usr_pref ".
@@ -80,7 +81,7 @@ class ilDiskQuotaChecker
 	        array('integer'),
 	        array($a_user_id));
 
-		while ($row = $res->fetchRow(DB_FETCHMODE_OBJECT)) {
+		while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
 			switch ($row->keyword)
 			{
 				case 'disk_quota' :
@@ -108,7 +109,7 @@ class ilDiskQuotaChecker
 	        array('integer','integer'),
 	        array(ROLE_FOLDER_ID, $a_user_id));
 
-		$row = $res->fetchRow(DB_FETCHMODE_OBJECT);
+		$row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT);
 		$info['role_id'] = $row->role_id;
 		$info['role_title'] = $row->title;
 
@@ -142,7 +143,8 @@ class ilDiskQuotaChecker
 		$info = array();
 		$details = array();
 
-		global $ilDB;
+		global $DIC;
+		$ilDB = $DIC['ilDB'];
 
 		$res = $ilDB->query("SELECT keyword, value ".
 			"FROM usr_pref ".
@@ -150,7 +152,7 @@ class ilDiskQuotaChecker
 			"AND ".$ilDB->like("keyword", "text", 'disk\\_usage%')
 			);
 
-		while ($row = $res->fetchRow(DB_FETCHMODE_OBJECT)) {
+		while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
 			switch ($row->keyword)
 			{
 				case 'disk_usage.last_update' :
@@ -219,7 +221,8 @@ class ilDiskQuotaChecker
 	public static function _fetchDiskQuotaReport($a_usage_filter = 3, $a_access_filter = 1,  $a_order_column='disk_usage',$a_order_by='desc')
 	{
 		$data = array();
-		global $ilDB;
+		global $DIC;
+		$ilDB = $DIC['ilDB'];
 
 		if (! $a_order_column) {
 			$a_order_column = 'disk_usage';
@@ -309,7 +312,7 @@ class ilDiskQuotaChecker
 	        array(ROLE_FOLDER_ID, SYSTEM_ROLE_ID)
 		);
 		$previous_usr_id = null;
-		while ($row = $res->fetchRow(DB_FETCHMODE_ASSOC)) {
+		while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_ASSOC)) {
 			if ($previous_usr_id != $row['usr_id'])
 			{
 				$data[] = $row;
@@ -331,7 +334,8 @@ class ilDiskQuotaChecker
 	 */
 	public static function _updateDiskUsageReport()
 	{
-		global $ilDB;
+		global $DIC;
+		$ilDB = $DIC['ilDB'];
 
 		// delete old values
 		$ilDB->manipulate("DELETE FROM usr_pref ".
@@ -418,7 +422,8 @@ class ilDiskQuotaChecker
 	 */
 	private static function __saveUserData($a_user_id, $a_type, $a_size, $a_count)
 	{
-		global $ilDB;
+		global $DIC;
+		$ilDB = $DIC['ilDB'];
 		
 		if ($a_user_id && $a_size != null && $a_count != null)
 		{
@@ -452,7 +457,7 @@ class ilDiskQuotaChecker
 		$count = null;
 		$size = null;
 		$owner = null;
-		while ($row = $a_objects->fetchRow(DB_FETCHMODE_OBJECT)) {
+		while ($row = $a_objects->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
 			if ($row->owner != $owner) {
 				if ($owner != null) {					
 					$a_result[$owner]["size"] += $size;
@@ -482,7 +487,8 @@ class ilDiskQuotaChecker
 	 */
 	private static function __getRepositoryObjectsByType($a_type)
 	{		
-		global $ilDB;
+		global $DIC;
+		$ilDB = $DIC['ilDB'];
 		
 		return $ilDB->query("SELECT DISTINCT d.obj_id, d.owner ".
 			"FROM object_data d ".
@@ -503,7 +509,8 @@ class ilDiskQuotaChecker
 	 */
 	private static function __getWorkspaceObjectsByType($a_type)
 	{		
-		global $ilDB;
+		global $DIC;
+		$ilDB = $DIC['ilDB'];
 		
 		return $ilDB->query("SELECT DISTINCT d.obj_id, d.owner ".
 			"FROM object_data d ".
@@ -530,13 +537,14 @@ class ilDiskQuotaChecker
 	 */
 	private static function __updateDiskUsageReportOfUsers($a_access_obj, $a_type)
 	{
-		global $ilDB;
+		global $DIC;
+		$ilDB = $DIC['ilDB'];
 
 		// get all users
 		$res = $ilDB->query("SELECT usr_id FROM usr_data");
 
 		// for each user count the number of objects and sum up the size
-		while ($row = $res->fetchRow(DB_FETCHMODE_OBJECT)) {
+		while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
 			$data = $a_access_obj->_lookupDiskUsageOfUser($row->usr_id);
 			self::__saveUserData($row->usr_id, $a_type, $data["size"], $data["count"]);
 		}
@@ -544,7 +552,8 @@ class ilDiskQuotaChecker
 	
 	public static function _sendSummaryMails()
 	{
-		global $ilSetting;
+		global $DIC;
+		$ilSetting = $DIC['ilSetting'];
 		
 		$lastStart = $ilSetting->get('last_cronjob_disk_quota_sum_start_ts', 0);
 		if( !$lastStart || date('dmY', $lastStart) != date('dmY') )
@@ -564,7 +573,8 @@ class ilDiskQuotaChecker
 	 */
 	public static function _sendReminderMails()
 	{
-		global $ilDB;
+		global $DIC;
+		$ilDB = $DIC['ilDB'];
 
 		require_once 'Services/Mail/classes/class.ilDiskQuotaReminderMail.php';
 		$mail = new ilDiskQuotaReminderMail();
@@ -630,7 +640,7 @@ class ilDiskQuotaChecker
 	        array(ROLE_FOLDER_ID, SYSTEM_ROLE_ID)
 		);
 
-		while ($row = $res->fetchRow(DB_FETCHMODE_ASSOC)) {
+		while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_ASSOC)) {
 			$details = self::_lookupDiskUsage($row['usr_id']);
 			$row['disk_usage_details'] = $details['details'];
 
@@ -666,20 +676,22 @@ class ilDiskQuotaChecker
 	*/
 	public static function _lookupDiskUsageReportLastUpdate()
 	{
-		global $ilDB;
+		global $DIC;
+		$ilDB = $DIC['ilDB'];
 
 		require_once 'Services/Mail/classes/class.ilDiskQuotaReminderMail.php';
 		$mail = new ilDiskQuotaReminderMail();
 
 		$res = $ilDB->query("SELECT MAX(value) last_update ".
 			"FROM usr_pref WHERE keyword='disk_usage.last_update'");
-		$row = $res->fetchRow(DB_FETCHMODE_ASSOC);
+		$row = $res->fetchRow(ilDBConstants::FETCHMODE_ASSOC);
 		return ($row != null) ? $row['last_update'] : null;
 	}
 	
 	public static function _lookupPersonalWorkspaceDiskQuota($a_user_id)
 	{
-		global $ilDB;
+		global $DIC;
+		$ilDB = $DIC['ilDB'];
 		
 		$info = array();
 
@@ -690,7 +702,7 @@ class ilDiskQuotaChecker
 	        array('integer', 'text'),
 	        array($a_user_id, "wsp_disk_quota"));
 
-		$row = $res->fetchRow(DB_FETCHMODE_OBJECT);
+		$row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT);
 		$info['user_wsp_disk_quota'] = $row->value;
 				
 
@@ -709,7 +721,7 @@ class ilDiskQuotaChecker
 	        array('integer','integer'),
 	        array(ROLE_FOLDER_ID, $a_user_id));
 
-		$row = $res->fetchRow(DB_FETCHMODE_OBJECT);
+		$row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT);
 		$info['role_id'] = $row->role_id;
 		$info['role_title'] = $row->title;
 

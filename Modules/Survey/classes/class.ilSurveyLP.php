@@ -12,6 +12,14 @@ include_once "Services/Object/classes/class.ilObjectLP.php";
  */
 class ilSurveyLP extends ilObjectLP
 {
+	public static function getDefaultModes($a_lp_active)
+	{
+		return array(
+			ilLPObjSettings::LP_MODE_DEACTIVATED,
+			ilLPObjSettings::LP_MODE_SURVEY_FINISHED
+		);
+	}
+	
 	public function getDefaultMode()
 	{		
 		return ilLPObjSettings::LP_MODE_DEACTIVATED; // :TODO:
@@ -31,7 +39,7 @@ class ilSurveyLP extends ilObjectLP
 		return (bool)ilObjSurveyAccess::_lookupAnonymize($this->obj_id);
 	}
 
-	protected static function isLPMember(array &$a_res, $a_usr_id, array $a_obj_ids)
+	protected static function isLPMember(array &$a_res, $a_usr_id, $a_obj_ids)
 	{		
 		global $ilDB;
 		

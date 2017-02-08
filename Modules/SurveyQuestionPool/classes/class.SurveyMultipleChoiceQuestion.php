@@ -52,16 +52,10 @@ class SurveyMultipleChoiceQuestion extends SurveyQuestion
 * @param integer $owner A numerical ID to identify the owner/creator
 * @access public
 */
-	function SurveyMultipleChoiceQuestion(
-		$title = "",
-		$description = "",
-		$author = "",
-		$questiontext = "",
-		$owner = -1,
-		$orientation = 0 
-	)
+	function __construct($title = "", $description = "", $author = "", $questiontext = "", $owner = -1, $orientation = 0)
 	{
-		$this->SurveyQuestion($title, $description, $author, $questiontext, $owner);
+		parent::__construct($title, $description, $author, $questiontext, $owner);
+		
 		$this->orientation = $orientation;
 		include_once "./Modules/SurveyQuestionPool/classes/class.SurveyCategories.php";
 		$this->categories = new SurveyCategories();
@@ -74,7 +68,7 @@ class SurveyMultipleChoiceQuestion extends SurveyQuestion
 	* @return array Array containing the question fields and data from the database
 	* @access public
 	*/
-	function _getQuestionDataArray($id)
+	function getQuestionDataArray($id)
 	{
 		global $ilDB;
 		
@@ -246,10 +240,9 @@ class SurveyMultipleChoiceQuestion extends SurveyQuestion
 	*
 	* @param object $a_xml_writer The XMLWriter object
 	* @param boolean $a_include_header Determines wheather or not the XML should be used
-	* @param string $obligatory_state The value of the obligatory state
 	* @access public
 	*/
-	function insertXML(&$a_xml_writer, $a_include_header = TRUE, $obligatory_state = "")
+	function insertXML(&$a_xml_writer, $a_include_header = TRUE)
 	{
 		$attrs = array(
 			"id" => $this->getId(),
@@ -444,29 +437,6 @@ class SurveyMultipleChoiceQuestion extends SurveyQuestion
 		return "";
 	}
 	
-	/**
-	* Saves random answers for a given active user in the database
-	*
-	* @param integer $active_id The database ID of the active user
-	*/
-	public function saveRandomData($active_id)
-	{
-		global $ilDB;
-		// multiple responses
-		for ($i = 0; $i < $this->categories->getCategoryCount(); $i++)
-		{
-			if (rand(0,1)) 
-			{
-				$cat = $this->categories->getCategory($i);
-				$next_id = $ilDB->nextId('svy_answer');
-				$affectedRows = $ilDB->manipulateF("INSERT INTO svy_answer (answer_id, question_fi, active_fi, value, textanswer, tstamp) VALUES (%s, %s, %s, %s, %s, %s)",
-					array('integer','integer','integer','float','text','integer'),
-					array($next_id, $this->getId(), $active_id, $i, ($cat->other) ? "Random Data" : null, time())
-				);
-			}
-		}
-	}
-	
 	function saveUserInput($post_data, $active_id, $a_return = false)
 	{
 		global $ilDB;
@@ -501,337 +471,6 @@ class SurveyMultipleChoiceQuestion extends SurveyQuestion
 		{
 			return $return_data;
 		}
-	}
-
-	function &getCumulatedResults($survey_id, $nr_of_users, $finished_ids)
-	{
-		global $ilDB;
-		
-		$question_id = $this->getId();
-		
-		$result_array = array();
-		$cumulated = array();
-
-		$sql = "SELECT svy_answer.* FROM svy_answer".
-			" JOIN svy_finished ON (svy_finished.finished_id = svy_answer.active_fi)".
-			" WHERE svy_answer.question_fi = ".$ilDB->quote($question_id, "integer").
-			" AND svy_finished.survey_fi = ".$ilDB->quote($survey_id, "integer");		
-		if($finished_ids)
-		{
-			$sql .= " AND ".$ilDB->in("svy_finished.finished_id", $finished_ids, "", "integer");
-		}
-
-		$result = $ilDB->query($sql);		
-		$numrows = $result->numRows();
-		
-		// count the answers for every answer value
-		$textanswers = array();
-		while ($row = $ilDB->fetchAssoc($result))
-		{
-			$cumulated[$row["value"]]++;
-			
-			// add text value to result array
-			if ($row["textanswer"])
-			{
-				$textanswers[$row["value"]][] = $row["textanswer"];
-			}
-		}
-		// sort textanswers by value
-		if (is_array($textanswers))
-		{
-			ksort($textanswers, SORT_NUMERIC);
-		}
-		asort($cumulated, SORT_NUMERIC);
-		end($cumulated);
-		
-		$sql = "SELECT svy_answer.answer_id, svy_answer.question_fi, svy_answer.active_fi".
-			" FROM svy_answer".
-			" JOIN svy_finished ON (svy_finished.finished_id = svy_answer.active_fi)".
-			" WHERE svy_answer.question_fi = ".$ilDB->quote($question_id, "integer").
-			" AND svy_finished.survey_fi = ".$ilDB->quote($survey_id, "integer");		
-		if($finished_ids)
-		{
-			$sql .= " AND ".$ilDB->in("svy_finished.finished_id", $finished_ids, "", "integer");
-		}
-		
-		$mcmr_result = $ilDB->query($sql);	
-		$found = array();
-		while ($row = $ilDB->fetchAssoc($mcmr_result))
-		{
-			$found[$row["question_fi"] . "_" . $row["active_fi"]] = 1;
-		}
-		$result_array["USERS_ANSWERED"] = count($found);
-		$result_array["USERS_SKIPPED"] = $nr_of_users - count($found);
-		$numrows = count($found);
-
-		$result_array["MEDIAN"] = "";
-		$result_array["ARITHMETIC_MEAN"] = "";
-		if(sizeof($cumulated))
-		{
-			$prefix = "";
-			if (strcmp(key($cumulated), "") != 0)
-			{
-				$prefix = (key($cumulated)+1) . " - ";
-			}
-			$category = $this->categories->getCategoryForScale(key($cumulated)+1);
-			$result_array["MODE"] =  $prefix . $category->title;
-			$result_array["MODE_VALUE"] =  key($cumulated)+1;
-			$result_array["MODE_NR_OF_SELECTIONS"] = $cumulated[key($cumulated)];
-		}
-		$result_array["QUESTION_TYPE"] = "SurveyMultipleChoiceQuestion";
-		$maxvalues = 0;
-		for ($key = 0; $key < $this->categories->getCategoryCount(); $key++)
-		{
-			$cat = $this->categories->getCategory($key);
-			$maxvalues += $cumulated[$cat->scale-1];
-		}
-		for ($key = 0; $key < $this->categories->getCategoryCount(); $key++)
-		{
-			$cat = $this->categories->getCategory($key);
-			$percentage = 0;
-			if ($numrows > 0)
-			{
-				if ($maxvalues > 0)
-				{
-					$percentage = ($maxvalues > 0) ? (float)((int)$cumulated[$cat->scale-1]/$maxvalues) : 0;
-				}
-			}
-			if(isset($textanswers[$cat->scale-1]))
-			{
-				// #12138
-				$result_array["textanswers"][$key] = $textanswers[$cat->scale-1];
-			}
-			$result_array["variables"][$key] = array("title" => $cat->title, "selected" => (int)$cumulated[$cat->scale-1], "percentage" => $percentage);
-		}
-		return $result_array;
-	}
-
-	/**
-	* Creates an Excel worksheet for the detailed cumulated results of this question
-	*
-	* @param object $workbook Reference to the parent excel workbook
-	* @param object $format_title Excel title format
-	* @param object $format_bold Excel bold format
-	* @param array $eval_data Cumulated evaluation data
-	* @access public
-	*/
-	function setExportDetailsXLS(&$workbook, &$format_title, &$format_bold, &$eval_data, $export_label)
-	{
-		include_once ("./Services/Excel/classes/class.ilExcelUtils.php");
-		$worksheet =& $workbook->addWorksheet();
-		$rowcounter = 0;
-		switch ($export_label)
-		{
-			case 'label_only':
-				$worksheet->writeString(0, 0, ilExcelUtils::_convert_text($this->lng->txt("label")), $format_bold);
-				$worksheet->writeString(0, 1, ilExcelUtils::_convert_text($this->label));
-				break;
-			case 'title_only':
-				$worksheet->writeString(0, 0, ilExcelUtils::_convert_text($this->lng->txt("title")), $format_bold);
-				$worksheet->writeString(0, 1, ilExcelUtils::_convert_text($this->getTitle()));
-				break;
-			default:
-				$worksheet->writeString(0, 0, ilExcelUtils::_convert_text($this->lng->txt("title")), $format_bold);
-				$worksheet->writeString(0, 1, ilExcelUtils::_convert_text($this->getTitle()));
-				$rowcounter++;
-				$worksheet->writeString($rowcounter, 0, ilExcelUtils::_convert_text($this->lng->txt("label")), $format_bold);
-				$worksheet->writeString($rowcounter, 1, ilExcelUtils::_convert_text($this->label));
-				break;
-		}
-		$rowcounter++;
-		$worksheet->writeString($rowcounter, 0, ilExcelUtils::_convert_text($this->lng->txt("question")), $format_bold);
-		$worksheet->writeString($rowcounter, 1, ilExcelUtils::_convert_text($this->getQuestiontext()));
-		$rowcounter++;
-		$worksheet->writeString($rowcounter, 0, ilExcelUtils::_convert_text($this->lng->txt("question_type")), $format_bold);
-		$worksheet->writeString($rowcounter, 1, ilExcelUtils::_convert_text($this->lng->txt($this->getQuestionType())));
-		$rowcounter++;
-		$worksheet->writeString($rowcounter, 0, ilExcelUtils::_convert_text($this->lng->txt("users_answered")), $format_bold);
-		$worksheet->write($rowcounter, 1, $eval_data["USERS_ANSWERED"]);
-		$rowcounter++;
-		$worksheet->writeString($rowcounter, 0, ilExcelUtils::_convert_text($this->lng->txt("users_skipped")), $format_bold);
-		$worksheet->write($rowcounter, 1, $eval_data["USERS_SKIPPED"]);
-		$rowcounter++;
-
-		$worksheet->write($rowcounter, 0, ilExcelUtils::_convert_text($this->lng->txt("mode")), $format_bold);
-		$worksheet->write($rowcounter++, 1, ilExcelUtils::_convert_text($eval_data["MODE_VALUE"]));
-		$worksheet->write($rowcounter, 0, ilExcelUtils::_convert_text($this->lng->txt("mode_text")), $format_bold);
-		$worksheet->write($rowcounter++, 1, ilExcelUtils::_convert_text($eval_data["MODE"]));
-		$worksheet->write($rowcounter, 0, ilExcelUtils::_convert_text($this->lng->txt("mode_nr_of_selections")), $format_bold);
-		$worksheet->write($rowcounter++, 1, ilExcelUtils::_convert_text($eval_data["MODE_NR_OF_SELECTIONS"]));
-		$worksheet->write($rowcounter, 0, ilExcelUtils::_convert_text($this->lng->txt("categories")), $format_bold);
-		$worksheet->write($rowcounter, 1, ilExcelUtils::_convert_text($this->lng->txt("title")), $format_title);
-		$worksheet->write($rowcounter, 2, ilExcelUtils::_convert_text($this->lng->txt("value")), $format_title);
-		$worksheet->write($rowcounter, 3, ilExcelUtils::_convert_text($this->lng->txt("category_nr_selected")), $format_title);
-		$worksheet->write($rowcounter++, 4, ilExcelUtils::_convert_text($this->lng->txt("svy_fraction_of_selections")), $format_title);
-		foreach ($eval_data["variables"] as $key => $value)
-		{
-			$worksheet->write($rowcounter, 1, ilExcelUtils::_convert_text($value["title"]));
-			$category = $this->categories->getCategory($key);
-			$worksheet->write($rowcounter, 2, $category->scale);
-			$worksheet->write($rowcounter, 3, ilExcelUtils::_convert_text($value["selected"]));
-			$worksheet->write($rowcounter++, 4, ilExcelUtils::_convert_text($value["percentage"]), $format_percent);
-		}
-		
-		// add text answers to detailed results
-		if (is_array($eval_data["textanswers"]))
-		{
-			$worksheet->write($rowcounter, 0, ilExcelUtils::_convert_text($this->lng->txt("freetext_answers")), $format_bold);
-			$worksheet->write($rowcounter, 1, ilExcelUtils::_convert_text($this->lng->txt("title")), $format_title);
-			$worksheet->write($rowcounter++, 2, ilExcelUtils::_convert_text($this->lng->txt("answer")), $format_title);
-			
-			foreach ($eval_data["textanswers"] as $key => $answers)
-			{
-				$title = $eval_data["variables"][$key]["title"];
-				foreach ($answers as $answer)
-				{
-					$worksheet->write($rowcounter, 1, ilExcelUtils::_convert_text($title));
-					$worksheet->write($rowcounter++, 2, ilExcelUtils::_convert_text($answer));
-				}
-			}
-		}			
-	}
-
-	/**
-	* Adds the entries for the title row of the user specific results
-	*
-	* @param array $a_array An array which is used to append the title row entries
-	* @access public
-	*/
-	function addUserSpecificResultsExportTitles(&$a_array, $a_use_label = false, $a_substitute = true)
-	{
-		parent::addUserSpecificResultsExportTitles($a_array, $a_use_label, $a_substitute);
-		
-		for ($index = 0; $index < $this->categories->getCategoryCount(); $index++)
-		{
-			$category = $this->categories->getCategory($index);
-			$title = $category->title;
-			
-			if(!$a_use_label || $a_substitute)
-			{
-				array_push($a_array, $title);
-			}
-			else
-			{
-				array_push($a_array, "");
-			}
-			
-			// optionally add headers for text answers
-			if ($category->other)
-			{
-				if(!$a_use_label || $a_substitute)
-				{
-					array_push($a_array, $title . " - ". $this->lng->txt("other"));
-				}
-				else
-				{
-					array_push($a_array, "");
-				}
-			}
-		}
-	}
-	
-	/**
-	* Adds the values for the user specific results export for a given user
-	*
-	* @param array $a_array An array which is used to append the values
-	* @param array $resultset The evaluation data for a given user
-	* @access public
-	*/
-	function addUserSpecificResultsData(&$a_array, &$resultset)
-	{
-		if (count($resultset["answers"][$this->getId()]))
-		{
-			array_push($a_array, "");
-			for ($index = 0; $index < $this->categories->getCategoryCount(); $index++)
-			{
-				$category = $this->categories->getCategory($index);		
-				$incoming_value = $category->scale ? $category->scale-1 : $index;		
-				
-				$found = 0;
-				$textanswer = "";				
-				foreach ($resultset["answers"][$this->getId()] as $answerdata)
-				{
-					if (strcmp($incoming_value, $answerdata["value"]) == 0)
-					{
-						$found = $answerdata["value"]+1;
-						$textanswer = $answerdata["textanswer"];
-					}
-				}
-				if ($found)
-				{
-					array_push($a_array, $found);
-				}
-				else
-				{
-					array_push($a_array, "0");
-				}				
-				if ($category->other)
-				{
-					array_push($a_array, $textanswer);
-				}
-			}
-		}
-		else
-		{
-			array_push($a_array, $this->getSkippedValue());
-			for ($index = 0; $index < $this->categories->getCategoryCount(); $index++)
-			{
-				array_push($a_array, "");
-				
-				// add empty text answers for skipped question
-				$category = $this->categories->getCategory($index);
-				if ($category->other)
-				{
-					array_push($a_array, "");
-				}
-			}
-		}
-	}
-
-	/**
-	* Returns an array containing all answers to this question in a given survey
-	*
-	* @param integer $survey_id The database ID of the survey
-	* @return array An array containing the answers to the question. The keys are either the user id or the anonymous id
-	* @access public
-	*/
-	function &getUserAnswers($survey_id, $finished_ids)
-	{
-		global $ilDB;
-		
-		$answers = array();
-		
-		$sql = "SELECT svy_answer.* FROM svy_answer".
-			" JOIN svy_finished ON (svy_finished.finished_id = svy_answer.active_fi)".
-			" WHERE svy_answer.question_fi = ".$ilDB->quote($this->getId(), "integer").
-			" AND svy_finished.survey_fi = ".$ilDB->quote($survey_id, "integer");		
-		if($finished_ids)
-		{
-			$sql .= " AND ".$ilDB->in("svy_finished.finished_id", $finished_ids, "", "integer");
-		}
-		
-		$result = $ilDB->query($sql);		
-		while ($row = $ilDB->fetchAssoc($result))
-		{
-			$category = $this->categories->getCategoryForScale($row["value"]+1);
-			if (!is_array($answers[$row["active_fi"]]))
-			{
-				$answers[$row["active_fi"]] = array();
-			}
-			$title = $row["value"] + 1 . " - " . $category->title;
-			if ($category->other) $title .= ": " . $row["textanswer"];
-			$catindex = $this->categories->getIndex($category);
-			if ($catindex !== null)
-			{
-				$answers[$row["active_fi"]][$catindex] = $title;
-			}
-			else
-			{
-				array_push($answers[$row["active_fi"]], $title);
-			}
-			ksort($answers[$row["active_fi"]], SORT_NUMERIC);
-		}
-		return $answers;
 	}
 
 	/**

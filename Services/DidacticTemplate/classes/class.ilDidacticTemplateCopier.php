@@ -33,7 +33,7 @@ class ilDidacticTemplateCopier
 				'WHERE title = '.$ilDB->quote($a_orig_title,'text');
 		$res = $ilDB->query($query);
 		$num = 0;
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			++$num;
 		}
@@ -87,7 +87,10 @@ class ilDidacticTemplateCopier
 			$new->save();
 		}
 
-
+		$trans = $orig->getTranslationObject();
+		$copy_trans = $trans->copy($this->new_tpl_id);
+		$copy_trans->addLanguage($trans->getDefaultLanguage(),$copy->getTitle(), $copy->getDescription(), true, true);
+		$copy_trans->save();
 	}
 }
 ?>

@@ -41,7 +41,7 @@ class ilSearchBaseGUI implements ilDesktopItemHandling, ilAdministrationCommandH
 	* Constructor
 	* @access public
 	*/
-	function ilSearchBaseGUI()
+	function __construct()
 	{
 		global $ilCtrl,$ilias,$lng,$tpl,$ilMainMenu;
 
@@ -52,7 +52,7 @@ class ilSearchBaseGUI implements ilDesktopItemHandling, ilAdministrationCommandH
 		$this->lng->loadLanguageModule('search');
 
 		$ilMainMenu->setActive('search');
-		$this->settings =& new ilSearchSettings();
+		$this->settings = new ilSearchSettings();
 	}
 
 	function prepareOutput()
@@ -498,7 +498,7 @@ $this->next_link = $this->ctrl->getLinkTarget($this,'performSearch');
 			$now = new ilDate(time(),IL_CAL_UNIX);
 		}
 		$ds = new ilDateTimeInputGUI('','screation_date');
-		#$ds->setMode(ilDateTimeInputGUI::MODE_INPUT);
+		$ds->setRequired(true);
 		$ds->setDate($now);
 		$enabled->addSubItem($ds);
 		

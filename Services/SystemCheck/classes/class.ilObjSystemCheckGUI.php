@@ -117,7 +117,7 @@ class ilObjSystemCheckGUI extends ilObjectGUI
 	 * Get administration tabs
 	 * @param ilTabsGUI $tabs_gui
 	 */
-	public function getAdminTabs(ilTabsGUI $tabs_gui)
+	public function getAdminTabs()
 	{
 		/**
 		 * @var $rbacsystem ilRbacSystem
@@ -126,11 +126,11 @@ class ilObjSystemCheckGUI extends ilObjectGUI
 
 		if($rbacsystem->checkAccess('read', $this->object->getRefId()))
 		{
-			$tabs_gui->addTarget('overview', $this->ctrl->getLinkTarget($this, 'overview'));
+			$this->tabs_gui->addTarget('overview', $this->ctrl->getLinkTarget($this, 'overview'));
 		}
 		if($rbacsystem->checkAccess('edit_permission', $this->object->getRefId()))
 		{
-			$tabs_gui->addTarget('perm_settings', $this->ctrl->getLinkTargetByClass(array(get_class($this), 'ilpermissiongui'), 'perm'), array('perm', 'info', 'owner'), 'ilpermissiongui');
+			$this->tabs_gui->addTarget('perm_settings', $this->ctrl->getLinkTargetByClass(array(get_class($this), 'ilpermissiongui'), 'perm'), array('perm', 'info', 'owner'), 'ilpermissiongui');
 		}
 	}
 	
@@ -225,8 +225,7 @@ class ilObjSystemCheckGUI extends ilObjectGUI
 		
 		$age = new ilDateTimeInputGUI($this->lng->txt('sysc_trash_limit_age'), 'age');
 		$age->setInfo($this->lng->txt('purge_age_limit_desc'));
-		$age->setMinuteStepSize(15);
-		$age->setMode(ilDateTimeInputGUI::MODE_INPUT);
+		$age->setMinuteStepSize(15);		
 		#$earlier = new ilDateTime(time(),IL_CAL_UNIX);
 		#$earlier->increment(IL_CAL_MONTH,-6);
 		#$age->setDate($earlier);
@@ -274,15 +273,10 @@ class ilObjSystemCheckGUI extends ilObjectGUI
 		{
 			$trash = new ilSystemCheckTrash();
 			$trash->setMode(ilSystemCheckTrash::MODE_TRASH_REMOVE);
-			
-			$dt_arr = $form->getInput('age');
-			
-			$GLOBALS['ilLog']->write(__METHOD__.': '.print_r($dt_arr,TRUE));
-			
-			
-			if($dt_arr['date'])
+			$dt = $form->getItemByPostVar('age')->getDate();			
+			if($dt)
 			{
-				$trash->setAgeLimit(new ilDate($dt_arr['date'],IL_CAL_DATE));
+				$trash->setAgeLimit($dt);
 			}
 			$trash->setNumberLimit($form->getInput('number'));
 			

@@ -233,28 +233,22 @@ class ilAccountRegistrationGUI
 			}
 		}
 
-		if(ilTermsOfServiceHelper::isEnabled())
+		require_once 'Services/TermsOfService/classes/class.ilTermsOfServiceSignableDocumentFactory.php';
+		$document = ilTermsOfServiceSignableDocumentFactory::getByLanguageObject($lng);
+		if(ilTermsOfServiceHelper::isEnabled() && $document->exists())
 		{
-			try
-			{
-				require_once 'Services/TermsOfService/classes/class.ilTermsOfServiceSignableDocumentFactory.php';
-				$document = ilTermsOfServiceSignableDocumentFactory::getByLanguageObject($lng);
-				$field    = new ilFormSectionHeaderGUI();
-				$field->setTitle($lng->txt('usr_agreement'));
-				$this->form->addItem($field);
+			$field = new ilFormSectionHeaderGUI();
+			$field->setTitle($lng->txt('usr_agreement'));
+			$this->form->addItem($field);
 
-				$field = new ilCustomInputGUI();
-				$field->setHTML('<div id="agreement">' . $document->getContent() . '</div>');
-				$this->form->addItem($field);
+			$field = new ilCustomInputGUI();
+			$field->setHTML('<div id="agreement">' . $document->getContent() . '</div>');
+			$this->form->addItem($field);
 
-				$field = new ilCheckboxInputGUI($lng->txt('accept_usr_agreement'), 'accept_terms_of_service');
-				$field->setRequired(true);
-				$field->setValue(1);
-				$this->form->addItem($field);
-			}
-			catch(ilTermsOfServiceNoSignableDocumentFoundException $e)
-			{
-			}
+			$field = new ilCheckboxInputGUI($lng->txt('accept_usr_agreement'), 'accept_terms_of_service');
+			$field->setRequired(true);
+			$field->setValue(1);
+			$this->form->addItem($field);
 		}
 
 		require_once 'Services/Captcha/classes/class.ilCaptchaUtil.php';
@@ -473,7 +467,6 @@ class ilAccountRegistrationGUI
 		$map = array();
 		$up->skipGroup("preferences");
 		$up->skipGroup("settings");
-		$up->skipGroup("instant_messengers");
 		$up->skipField("password");
 		$up->skipField("birthday");
 		$up->skipField("upload");
@@ -513,18 +506,6 @@ class ilAccountRegistrationGUI
 			}
 		}
 
-		// messenger
-		$map = array("icq", "yahoo", "msn", "aim", "skype", "jabber", "voip");
-		foreach($map as $client)
-		{
-			$field = "usr_im_".$client;
-			$field_obj = $this->form->getItemByPostVar($field);
-			if($field_obj)
-			{
-				$this->userObj->setInstantMessengerId($client, $this->form->getInput($field));
-			}
-		}
-		
 		$this->userObj->setTitle($this->userObj->getFullname());
 		$this->userObj->setDescription($this->userObj->getEmail());
 
@@ -670,14 +651,8 @@ class ilAccountRegistrationGUI
 		//insert user data in table user_data
 		$this->userObj->saveAsNew();
 
-		try
-		{
-			require_once 'Services/TermsOfService/classes/class.ilTermsOfServiceSignableDocumentFactory.php';
-			ilTermsOfServiceHelper::trackAcceptance($this->userObj, ilTermsOfServiceSignableDocumentFactory::getByLanguageObject($lng));
-		}
-		catch(ilTermsOfServiceNoSignableDocumentFoundException $e)
-		{
-		}
+		require_once 'Services/TermsOfService/classes/class.ilTermsOfServiceSignableDocumentFactory.php';
+		ilTermsOfServiceHelper::trackAcceptance($this->userObj, ilTermsOfServiceSignableDocumentFactory::getByLanguageObject($lng));
 
 		// setup user preferences
 		$this->userObj->setLanguage($this->form->getInput('usr_language'));
@@ -687,13 +662,18 @@ class ilAccountRegistrationGUI
 			$hits_per_page = 10;
 		}
 		$this->userObj->setPref("hits_per_page", $hits_per_page);
+		if(strlen($_GET['target']) > 0)
+		{
+			$this->userObj->setPref('reg_target', ilUtil::stripSlashes($_GET['target']));
+		}
 		/*$show_online = $ilSetting->get("show_users_online");
 		if ($show_online == "")
 		{
 			$show_online = "y";
 		}
 		$this->userObj->setPref("show_users_online", $show_online);*/
-		$this->userObj->setPref('bs_allow_to_contact_me', 'y');
+		$this->userObj->setPref('bs_allow_to_contact_me',  $ilSetting->get('bs_allow_to_contact_me', 'n'));
+		$this->userObj->setPref('chat_osc_accept_msg', $ilSetting->get('chat_osc_accept_msg', 'n'));
 		$this->userObj->writePrefs();
 
 		
@@ -870,10 +850,6 @@ class ilAccountRegistrationGUI
 			$this->tpl->setCurrentBlock('activation');
 			$this->tpl->setVariable('TXT_REGISTERED', $lng->txt('txt_registered'));
 			$this->tpl->setVariable('FORMACTION', 'login.php?cmd=post&target=' . ilUtil::stripSlashes($_GET['target']));
-			if(ilSession::get('forceShoppingCartRedirect'))
-			{
-				$this->tpl->setVariable('FORMACTION', './login.php?forceShoppingCartRedirect=1');
-			}
 			$this->tpl->setVariable('TARGET', 'target="_parent"');
 			$this->tpl->setVariable('TXT_LOGIN', $lng->txt('login_to_ilias'));
 			$this->tpl->setVariable('USERNAME', $this->userObj->getLogin());
@@ -883,23 +859,6 @@ class ilAccountRegistrationGUI
 		else if($this->registration_settings->getRegistrationType() == IL_REG_APPROVE)
 		{
 			$this->tpl->setVariable('TXT_REGISTERED', $lng->txt('txt_submitted'));
-
-			if(IS_PAYMENT_ENABLED == true)
-			{
-				if(ilSession::get('forceShoppingCartRedirect'))
-				{
-					$this->tpl->setCurrentBlock('activation');
-					include_once 'Services/Payment/classes/class.ilShopLinkBuilder.php';
-					$shop_link = new ilShopLinkBuilder();
-					$this->tpl->setVariable('FORMACTION', $shop_link->buildLink('ilshopshoppingcartgui', '_forceShoppingCartRedirect_user=' . $this->userObj->getId()));
-					$this->tpl->setVariable('TARGET', 'target=\'_parent\'');
-
-					$this->lng->loadLanguageModule('payment');
-					$this->tpl->setVariable('TXT_LOGIN', $lng->txt('pay_goto_shopping_cart'));
-					$this->tpl->parseCurrentBlock();
-					$this->lng->loadLanguageModule('registration');
-				}
-			}
 		}
 		else if($this->registration_settings->getRegistrationType() == IL_REG_ACTIVATION)
 		{

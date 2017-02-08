@@ -26,13 +26,14 @@ class ilObjBlogAccess extends ilObjectAccess implements ilWACCheckingClass
 	 *		array("permission" => "write", "cmd" => "edit", "lang_var" => "edit"),
 	 *	);
 	 */
-	function _getCommands()
+	static function _getCommands()
 	{
 		$commands = array
 		(
 			array("permission" => "read", "cmd" => "preview", "lang_var" => "show", "default" => true),
 			array("permission" => "write", "cmd" => "render", "lang_var" => "edit"),
 			array("permission" => "contribute", "cmd" => "render", "lang_var" => "edit"),
+			array("permission" => "write", "cmd" => "edit", "lang_var" => "settings"),
 			array("permission" => "write", "cmd" => "export", "lang_var" => "export_html")
 		);
 		
@@ -42,7 +43,7 @@ class ilObjBlogAccess extends ilObjectAccess implements ilWACCheckingClass
 	/**
 	* check whether goto script will succeed
 	*/
-	function _checkGoto($a_target)
+	static function _checkGoto($a_target)
 	{		
 		global $ilAccess;
 		

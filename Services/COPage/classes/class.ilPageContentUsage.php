@@ -50,7 +50,7 @@ class ilPageContentUsage
 	/**
 	* Get usages
 	*/
-	function getUsages($a_pc_type, $a_pc_id, $a_incl_hist = true)
+	static function getUsages($a_pc_type, $a_pc_id, $a_incl_hist = true)
 	{
 		global $ilDB;
 		
@@ -78,7 +78,7 @@ class ilPageContentUsage
 	 * @param
 	 * @return
 	 */
-	function getUsagesOfPage($a_usage_id, $a_usage_type, $a_hist_nr = 0, $a_all_hist_nrs = false, $a_lang = "-")
+	static function getUsagesOfPage($a_usage_id, $a_usage_type, $a_hist_nr = 0, $a_all_hist_nrs = false, $a_lang = "-")
 	{
 		global $ilDB;
 

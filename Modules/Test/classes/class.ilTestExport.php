@@ -2,24 +2,24 @@
 /* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 require_once './Modules/Test/classes/inc.AssessmentConstants.php';
-require_once './Services/Utilities/classes/class.ilFormat.php';
 
 /**
  * Export class for tests
  *
  * @author Helmut Schottmüller <helmut.schottmueller@mac.com>
  * @author Maximilian Becker <mbecker@databay.de>
+ * @author Björn Heyser <bheyser@databay.de>
  * 
  * @version $Id$
  *
  * @ingroup ModulesTest
  */
-class ilTestExport
+abstract class ilTestExport
 {
 	/** @var  ilErrorHandling $err */
 	var $err;			// error object
 	
-	/** @var  ilDB $db */
+	/** @var  ilDBInterface $db */
 	var $db;			// database object
 	
 	/** @var  ILIAS $ilias */
@@ -158,7 +158,7 @@ class ilTestExport
 		fclose($file);
 
 		$excelfile = $this->exportToExcel($deliver = FALSE);
-		@copy($excelfile, $this->export_dir . "/" . str_replace($this->getExtension(), "xls", $this->filename));
+		@copy($excelfile, $this->export_dir . "/" . str_replace($this->getExtension(), "xlsx", $this->filename));
 		@unlink($excelfile);
 		// end
 		$expLog->write(date("[y-m-d H:i:s] ")."Finished Export of Results");
@@ -167,70 +167,70 @@ class ilTestExport
 	}
 
 	/**
-	* Exports the aggregated results to the Microsoft Excel file format
-	*
-	* @param boolean $deliver TRUE to directly deliver the file, FALSE to return the binary data
-	*/
+	 * Exports the aggregated results to the Microsoft Excel file format
+	 * @param boolean $deliver TRUE to directly deliver the file, FALSE to return the binary data
+	 * @return string
+	 */
 	protected function aggregatedResultsToExcel($deliver = TRUE)
 	{
 		$data = $this->test_obj->getAggregatedResultsData();
-		include_once "./Services/Excel/classes/class.ilExcelWriterAdapter.php";
-		$excelfile = ilUtil::ilTempnam();
-		$adapter = new ilExcelWriterAdapter($excelfile, FALSE);
-		$testname = ilUtil::getASCIIFilename(preg_replace("/\s/", "_", $this->test_obj->getTitle() . '_aggregated')) . ".xls";
-		$workbook = $adapter->getWorkbook();
-		$workbook->setVersion(8); // Use Excel97/2000 Format
-		// Creating a worksheet
-		$format_percent =& $workbook->addFormat();
-		$format_percent->setNumFormat("0.00%");
-		$format_title =& $workbook->addFormat();
-		$format_title->setBold();
-		$format_title->setColor('black');
-		$format_title->setPattern(1);
-		$format_title->setFgColor('silver');
-		include_once "./Services/Excel/classes/class.ilExcelUtils.php";
-		$worksheet =& $workbook->addWorksheet(ilExcelUtils::_convert_text($this->lng->txt("tst_results_aggregated")));
-		$row = 0;
+
+		require_once 'Modules/TestQuestionPool/classes/class.ilAssExcelFormatHelper.php';
+		$worksheet = new ilAssExcelFormatHelper();
+		$worksheet->addSheet($this->lng->txt('tst_results_aggregated'));
+
+		$row = 1;
 		$col = 0;
-		$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("result")), $format_title);
-		$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("value")), $format_title);
+		$worksheet->setCell($row, $col++, $this->lng->txt('result'));
+		$worksheet->setCell($row, $col++, $this->lng->txt('value'));
+
+		$worksheet->setBold('A' . $row . ':' . $worksheet->getColumnCoord($col - 1) . $row);
+
 		$row++;
-		foreach ($data["overview"] as $key => $value)
+		foreach($data['overview'] as $key => $value)
 		{
 			$col = 0;
-			$worksheet->write($row, $col++, ilExcelUtils::_convert_text($key));
-			$worksheet->write($row, $col++, ilExcelUtils::_convert_text($value));
+			$worksheet->setCell($row, $col++, $key);
+			$worksheet->setCell($row, $col++, $value);
 			$row++;
 		}
+
 		$row++;
 		$col = 0;
-		$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("question_id")), $format_title);
-		$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("question_title")), $format_title);
-		$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("average_reached_points")), $format_title);
-		$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("points")), $format_title);
-		$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("percentage")), $format_title);
-		$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("number_of_answers")), $format_title);
+
+		$worksheet->setCell($row, $col++, $this->lng->txt('question_id'));
+		$worksheet->setCell($row, $col++, $this->lng->txt('question_title'));
+		$worksheet->setCell($row, $col++, $this->lng->txt('average_reached_points'));
+		$worksheet->setCell($row, $col++, $this->lng->txt('points'));
+		$worksheet->setCell($row, $col++, $this->lng->txt('percentage'));
+		$worksheet->setCell($row, $col++, $this->lng->txt('number_of_answers'));
+
+		$worksheet->setBold('A' . $row . ':' . $worksheet->getColumnCoord($col - 1) . $row);
+
 		$row++;
-		foreach ($data["questions"] as $key => $value)
+		foreach($data['questions'] as $key => $value)
 		{
 			$col = 0;
-			$worksheet->write($row, $col++, ilExcelUtils::_convert_text($key));
-			$worksheet->write($row, $col++, ilExcelUtils::_convert_text($value[0]));
-			$worksheet->write($row, $col++, ilExcelUtils::_convert_text($value[4]));
-			$worksheet->write($row, $col++, ilExcelUtils::_convert_text($value[5]));
-			$worksheet->write($row, $col++, ilExcelUtils::_convert_text($value[6]), $format_percent);
-			$worksheet->write($row, $col++, ilExcelUtils::_convert_text($value[3]));
+			$worksheet->setCell($row, $col++, $key);
+			$worksheet->setCell($row, $col++, $value[0]);
+			$worksheet->setCell($row, $col++, $value[4]);
+			$worksheet->setCell($row, $col++, $value[5]);
+			$worksheet->setCell($row, $col++, $value[6]);
+			$worksheet->setCell($row, $col++, $value[3]);
 			$row++;
 		}
-		$workbook->close();
-		if ($deliver)
+
+		if($deliver)
 		{
-			ilUtil::deliverFile($excelfile, $testname, "application/vnd.ms-excel", false, true);
-			exit;
+			$worksheet->sendToClient(
+				ilUtil::getASCIIFilename(preg_replace("/\s/", '_', $this->test_obj->getTitle() . '_aggregated')) . '.xlsx'
+			);
 		}
 		else
 		{
-			return $excelfile;
+			$excelfile = ilUtil::ilTempnam();
+			$worksheet->writeToFile($excelfile);
+			return $excelfile . '.xlsx';
 		}
 	}
 
@@ -303,194 +303,170 @@ class ilTestExport
 	{
 		if (strcmp($this->mode, "aggregated") == 0) return $this->aggregatedResultsToExcel($deliver);
 
-		require_once './Services/Excel/classes/class.ilExcelWriterAdapter.php';
-		$excelfile = ilUtil::ilTempnam();
-		$adapter = new ilExcelWriterAdapter($excelfile, FALSE);
-		$testname = $this->test_obj->getTitle();
-		switch($this->mode)
-		{
-				case 'results':
-				$testname .= '_results';
-				break;
-		}
-		$testname = ilUtil::getASCIIFilename(preg_replace("/\s/", "_", $testname)) . ".xls";
-		$workbook = $adapter->getWorkbook();
-		$workbook->setVersion(8); // Use Excel97/2000 Format
-		// Creating a worksheet
-		$format_bold =& $workbook->addFormat();
-		$format_bold->setBold();
-		$format_percent =& $workbook->addFormat();
-		$format_percent->setNumFormat("0.00%");
-		$format_datetime =& $workbook->addFormat();
-		$format_datetime->setNumFormat("DD/MM/YYYY hh:mm:ss");
-		$format_title =& $workbook->addFormat();
-		$format_title->setBold();
-		$format_title->setColor('black');
-		$format_title->setPattern(1);
-		$format_title->setFgColor('silver');
-		require_once './Services/Excel/classes/class.ilExcelUtils.php';
-		$worksheet =& $workbook->addWorksheet(ilExcelUtils::_convert_text($this->lng->txt("tst_results")));
+		require_once 'Modules/TestQuestionPool/classes/class.ilAssExcelFormatHelper.php';
+
+		$worksheet = new ilAssExcelFormatHelper();
+		$worksheet->addSheet($this->lng->txt('tst_results'));
+
 		$additionalFields = $this->test_obj->getEvaluationAdditionalFields();
-		$row = 0;
+
+		$row = 1;
 		$col = 0;
 
-		if ($this->test_obj->getAnonymity())
+		if($this->test_obj->getAnonymity())
 		{
-			$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("counter")), $format_title);
+			$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row, $this->lng->txt('counter'));
 		}
 		else
 		{
-			$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("name")), $format_title);
-			$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("login")), $format_title);
+			$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row, $this->lng->txt('name'));
+			$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row, $this->lng->txt('login'));
 		}
-		if (count($additionalFields))
+
+		if(count($additionalFields))
 		{
-			foreach ($additionalFields as $fieldname)
+			foreach($additionalFields as $fieldname)
 			{
-				$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt($fieldname)), $format_title);
+				$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row, $this->lng->txt($fieldname));
 			}
 		}
-		$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("tst_stat_result_resultspoints")), $format_title);
-		$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("maximum_points")), $format_title);
-		$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("tst_stat_result_resultsmarks")), $format_title);
-		if ($this->test_obj->getECTSOutput())
+
+		$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row, $this->lng->txt('tst_stat_result_resultspoints'));
+		$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row, $this->lng->txt('maximum_points'));
+		$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row, $this->lng->txt('tst_stat_result_resultsmarks'));
+
+		if($this->test_obj->getECTSOutput())
 		{
-			$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("ects_grade")), $format_title);
+			$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row, $this->lng->txt('ects_grade'));
 		}
-		$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("tst_stat_result_qworkedthrough")), $format_title);
-		$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("tst_stat_result_qmax")), $format_title);
-		$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("tst_stat_result_pworkedthrough")), $format_title);
-		$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("tst_stat_result_timeofwork")), $format_title);
-		$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("tst_stat_result_atimeofwork")), $format_title);
-		$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("tst_stat_result_firstvisit")), $format_title);
-		$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("tst_stat_result_lastvisit")), $format_title);
 
-		$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("tst_stat_result_mark_median")), $format_title);
-		$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("tst_stat_result_rank_participant")), $format_title);
-		$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("tst_stat_result_rank_median")), $format_title);
-		$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("tst_stat_result_total_participants")), $format_title);
-		$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("tst_stat_result_median")), $format_title);
-		$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("scored_pass")), $format_title);
+		$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row, $this->lng->txt('tst_stat_result_qworkedthrough'));
+		$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row, $this->lng->txt('tst_stat_result_qmax'));
+		$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row, $this->lng->txt('tst_stat_result_pworkedthrough'));
+		$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row, $this->lng->txt('tst_stat_result_timeofwork'));
+		$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row, $this->lng->txt('tst_stat_result_atimeofwork'));
+		$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row, $this->lng->txt('tst_stat_result_firstvisit'));
+		$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row, $this->lng->txt('tst_stat_result_lastvisit'));
+		$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row, $this->lng->txt('tst_stat_result_mark_median'));
+		$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row, $this->lng->txt('tst_stat_result_rank_participant'));
+		$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row, $this->lng->txt('tst_stat_result_rank_median'));
+		$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row, $this->lng->txt('tst_stat_result_total_participants'));
+		$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row, $this->lng->txt('tst_stat_result_median'));
+		$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row, $this->lng->txt('scored_pass'));
+		$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row, $this->lng->txt('pass'));
 
-		$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("pass")), $format_title);
+		$worksheet->setBold('A' . $row . ':' . $worksheet->getColumnCoord($col - 1) . $row);
 
 		$counter = 1;
-		$data =& $this->test_obj->getCompleteEvaluationData(TRUE, $filterby, $filtertext);
+		$data = $this->test_obj->getCompleteEvaluationData(TRUE, $filterby, $filtertext);
 		$firstrowwritten = false;
-		foreach ($data->getParticipants() as $active_id => $userdata) 
+		foreach($data->getParticipants() as $active_id => $userdata) 
 		{
 			$remove = FALSE;
-			if ($passedonly)
+			if($passedonly)
 			{
-				if ($data->getParticipant($active_id)->getPassed() == FALSE)
+				if($data->getParticipant($active_id)->getPassed() == FALSE)
 				{
 					$remove = TRUE;
 				}
 			}
-			if (!$remove)
+			if(!$remove)
 			{
 				$row++;
-				if ($this->test_obj->isRandomTest() || $this->test_obj->getShuffleQuestions())
+				$col = 0;
+				if($this->test_obj->isRandomTest() || $this->test_obj->getShuffleQuestions())
 				{
 					$row++;
 				}
-				$col = 0;
-				if ($this->test_obj->getAnonymity())
+
+				if($this->test_obj->getAnonymity())
 				{
-					$worksheet->write($row, $col++, ilExcelUtils::_convert_text($counter));
+					$worksheet->setCell($row, $col++, $counter);
 				}
 				else
 				{
-					$worksheet->write($row, $col++, ilExcelUtils::_convert_text($data->getParticipant($active_id)->getName()));
-					$worksheet->write($row, $col++, ilExcelUtils::_convert_text($data->getParticipant($active_id)->getLogin()));
+					$worksheet->setCell($row, $col++, $data->getParticipant($active_id)->getName());
+					$worksheet->setCell($row, $col++, $data->getParticipant($active_id)->getLogin());
 				}
-				if (count($additionalFields))
+
+				if(count($additionalFields))
 				{
-					$userfields = ilObjUser::_lookupFields($userdata->getUserID());
+					$userfields = ilObjUser::_lookupFields($userdata->getUserId());
 					foreach ($additionalFields as $fieldname)
 					{
-						if (strcmp($fieldname, "gender") == 0)
+						if(strcmp($fieldname, 'gender') == 0)
 						{
-							$worksheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt("gender_" . $userfields[$fieldname])));
+							$worksheet->setCell($row, $col++, $this->lng->txt('gender_' . $userfields[$fieldname]));
 						}
 						else
 						{
-							$worksheet->write($row, $col++, ilExcelUtils::_convert_text($userfields[$fieldname]));
+							$worksheet->setCell($row, $col++, $userfields[$fieldname]);
 						}
 					}
 				}
-				$worksheet->write($row, $col++, ilExcelUtils::_convert_text($data->getParticipant($active_id)->getReached()));
-				$worksheet->write($row, $col++, ilExcelUtils::_convert_text($data->getParticipant($active_id)->getMaxpoints()));
-				$worksheet->write($row, $col++, ilExcelUtils::_convert_text($data->getParticipant($active_id)->getMark()));
-				if ($this->test_obj->getECTSOutput())
+
+				$worksheet->setCell($row, $col++, $data->getParticipant($active_id)->getReached());
+				$worksheet->setCell($row, $col++, $data->getParticipant($active_id)->getMaxpoints());
+				$worksheet->setCell($row, $col++, $data->getParticipant($active_id)->getMark());
+
+				if($this->test_obj->getECTSOutput())
 				{
-					$worksheet->write($row, $col++, ilExcelUtils::_convert_text($data->getParticipant($active_id)->getECTSMark()));
+					$worksheet->setCell($row, $col++, $data->getParticipant($active_id)->getECTSMark());
 				}
-				$worksheet->write($row, $col++, ilExcelUtils::_convert_text($data->getParticipant($active_id)->getQuestionsWorkedThrough()));
-				$worksheet->write($row, $col++, ilExcelUtils::_convert_text($data->getParticipant($active_id)->getNumberOfQuestions()));
-				$worksheet->write($row, $col++, $data->getParticipant($active_id)->getQuestionsWorkedThroughInPercent() / 100.0, $format_percent);
+
+				$worksheet->setCell($row, $col++, $data->getParticipant($active_id)->getQuestionsWorkedThrough());
+				$worksheet->setCell($row, $col++, $data->getParticipant($active_id)->getNumberOfQuestions());
+				$worksheet->setCell($row, $col++, ($data->getParticipant($active_id)->getQuestionsWorkedThroughInPercent() / 100.0) . '%');
+
 				$time = $data->getParticipant($active_id)->getTimeOfWork();
 				$time_seconds = $time;
 				$time_hours    = floor($time_seconds/3600);
 				$time_seconds -= $time_hours   * 3600;
 				$time_minutes  = floor($time_seconds/60);
 				$time_seconds -= $time_minutes * 60;
-				$worksheet->write($row, $col++, ilExcelUtils::_convert_text(sprintf("%02d:%02d:%02d", $time_hours, $time_minutes, $time_seconds)));
+				$worksheet->setCell($row, $col++, sprintf("%02d:%02d:%02d", $time_hours, $time_minutes, $time_seconds));
 				$time = $data->getParticipant($active_id)->getQuestionsWorkedThrough() ? $data->getParticipant($active_id)->getTimeOfWork() / $data->getParticipant($active_id)->getQuestionsWorkedThrough() : 0;
 				$time_seconds = $time;
 				$time_hours    = floor($time_seconds/3600);
 				$time_seconds -= $time_hours   * 3600;
 				$time_minutes  = floor($time_seconds/60);
 				$time_seconds -= $time_minutes * 60;
-				$worksheet->write($row, $col++, ilExcelUtils::_convert_text(sprintf("%02d:%02d:%02d", $time_hours, $time_minutes, $time_seconds)));
-				$fv = getdate($data->getParticipant($active_id)->getFirstVisit());
-				$firstvisit = ilUtil::excelTime(
-					$fv["year"],
-					$fv["mon"],
-					$fv["mday"],
-					$fv["hours"],
-					$fv["minutes"],
-					$fv["seconds"]
-				);
-				$worksheet->write($row, $col++, $firstvisit, $format_datetime);
-				$lv = getdate($data->getParticipant($active_id)->getLastVisit());
-				$lastvisit = ilUtil::excelTime(
-					$lv["year"],
-					$lv["mon"],
-					$lv["mday"],
-					$lv["hours"],
-					$lv["minutes"],
-					$lv["seconds"]
-				);
-				$worksheet->write($row, $col++, $lastvisit, $format_datetime);
+				$worksheet->setCell($row, $col++, sprintf("%02d:%02d:%02d", $time_hours, $time_minutes, $time_seconds));
+				$worksheet->setCell($row, $col++, new ilDateTime($data->getParticipant($active_id)->getFirstVisit(), IL_CAL_UNIX));
+				$worksheet->setCell($row, $col++, new ilDateTime($data->getParticipant($active_id)->getLastVisit(), IL_CAL_UNIX));
 
 				$median = $data->getStatistics()->getStatistics()->median();
 				$pct = $data->getParticipant($active_id)->getMaxpoints() ? $median / $data->getParticipant($active_id)->getMaxpoints() * 100.0 : 0;
 				$mark = $this->test_obj->mark_schema->getMatchingMark($pct);
 				$mark_short_name = "";
-				if (is_object($mark))
+
+				if(is_object($mark))
 				{
 					$mark_short_name = $mark->getShortName();
 				}
-				$worksheet->write($row, $col++, ilExcelUtils::_convert_text($mark_short_name));
-				$worksheet->write($row, $col++, ilExcelUtils::_convert_text($data->getStatistics()->getStatistics()->rank($data->getParticipant($active_id)->getReached())));
-				$worksheet->write($row, $col++, ilExcelUtils::_convert_text($data->getStatistics()->getStatistics()->rank_median()));
-				$worksheet->write($row, $col++, ilExcelUtils::_convert_text($data->getStatistics()->getStatistics()->count()));
-				$worksheet->write($row, $col++, ilExcelUtils::_convert_text($median));
-				if ($this->test_obj->getPassScoring() == SCORE_BEST_PASS)
+
+				$worksheet->setCell($row, $col++, $mark_short_name);
+				$worksheet->setCell($row, $col++, $data->getStatistics()->getStatistics()->rank($data->getParticipant($active_id)->getReached()));
+				$worksheet->setCell($row, $col++, $data->getStatistics()->getStatistics()->rank_median());
+				$worksheet->setCell($row, $col++, $data->getStatistics()->getStatistics()->count());
+				$worksheet->setCell($row, $col++, $median);
+
+				if($this->test_obj->getPassScoring() == SCORE_BEST_PASS)
 				{
-					$worksheet->write($row, $col++, $data->getParticipant($active_id)->getBestPass() + 1);
+					$worksheet->setCell($row, $col++, $data->getParticipant($active_id)->getBestPass() + 1);
 				}
 				else
 				{
-					$worksheet->write($row, $col++, $data->getParticipant($active_id)->getLastPass() + 1);
+					$worksheet->setCell($row, $col++, $data->getParticipant($active_id)->getLastPass() + 1);
 				}
+
 				$startcol = $col;
-				for ($pass = 0; $pass <= $data->getParticipant($active_id)->getLastPass(); $pass++)
+
+				for($pass = 0; $pass <= $data->getParticipant($active_id)->getLastPass(); $pass++)
 				{
 					$col = $startcol;
 					$finishdate = $this->test_obj->getPassFinishDate($active_id, $pass);
-					if ($finishdate > 0)
+					if($finishdate > 0)
 					{
 						if ($pass > 0)
 						{
@@ -500,22 +476,22 @@ class ilTestExport
 								$row++;
 							}
 						}
-						$worksheet->write($row, $col++, ilExcelUtils::_convert_text($pass+1));
-						if (is_object($data->getParticipant($active_id)) && is_array($data->getParticipant($active_id)->getQuestions($pass)))
+						$worksheet->setCell($row, $col++, $pass + 1);
+						if(is_object($data->getParticipant($active_id)) && is_array($data->getParticipant($active_id)->getQuestions($pass)))
 						{
-							foreach ($data->getParticipant($active_id)->getQuestions($pass) as $question)
+							foreach($data->getParticipant($active_id)->getQuestions($pass) as $question)
 							{
 								$question_data = $data->getParticipant($active_id)->getPass($pass)->getAnsweredQuestionByQuestionId($question["id"]);
-								$worksheet->write($row, $col, ilExcelUtils::_convert_text($question_data["reached"]));
-								if ($this->test_obj->isRandomTest() || $this->test_obj->getShuffleQuestions())
+								$worksheet->setCell($row, $col, $question_data["reached"]);
+								if($this->test_obj->isRandomTest() || $this->test_obj->getShuffleQuestions())
 								{
-									$worksheet->write($row-1, $col, ilExcelUtils::_convert_text(preg_replace("/<.*?>/", "", $data->getQuestionTitle($question["id"]))), $format_title);
+									$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col) . ($row - 1),  preg_replace("/<.*?>/", "", $data->getQuestionTitle($question["id"])));
 								}
 								else
 								{
-									if ($pass == 0 && !$firstrowwritten)
+									if($pass == 0 && !$firstrowwritten)
 									{
-										$worksheet->write(0, $col, ilExcelUtils::_convert_text(preg_replace("/<.*?>/", "", $data->getQuestionTitle($question["id"]))), $format_title);
+										$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col) . 1, $data->getQuestionTitle($question["id"]));
 									}
 								}
 								$col++;
@@ -527,59 +503,63 @@ class ilTestExport
 				$counter++;
 			}
 		}
-		if ($this->test_obj->getExportSettingsSingleChoiceShort() && !$this->test_obj->isRandomTest() && $this->test_obj->hasSingleChoiceQuestions())
+
+		if($this->test_obj->getExportSettingsSingleChoiceShort() && !$this->test_obj->isRandomTest() && $this->test_obj->hasSingleChoiceQuestions())
 		{
 			// special tab for single choice tests
-			$titles =& $this->test_obj->getQuestionTitlesAndIndexes();
+			$titles = $this->test_obj->getQuestionTitlesAndIndexes();
 			$positions = array();
 			$pos = 0;
-			$row = 0;
-			foreach ($titles as $id => $title)
+			$row = 1;
+			foreach($titles as $id => $title)
 			{
 				$positions[$id] = $pos;
 				$pos++;
 			}
+
 			$usernames = array();
 			$participantcount = count($data->getParticipants());
 			$allusersheet = false;
 			$pages = 0;
-			$resultsheet =& $workbook->addWorksheet($this->lng->txt("eval_all_users"));
+
+			$worksheet->addSheet($this->lng->txt('eval_all_users'));
 
 			$col = 0;
-			$resultsheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt('name')), $format_title);
-			$resultsheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt('login')), $format_title);
-			if (count($additionalFields))
+			$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row, $this->lng->txt('name'));
+			$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row,  $this->lng->txt('login'));
+			if(count($additionalFields))
 			{
-				foreach ($additionalFields as $fieldname)
+				foreach($additionalFields as $fieldname)
 				{
-					if (strcmp($fieldname, "matriculation") == 0)
+					if(strcmp($fieldname, "matriculation") == 0)
 					{
-						$resultsheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt('matriculation')), $format_title);
+						$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row,  $this->lng->txt('matriculation'));
 					}
 				}
 			}
-			$resultsheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt('test')), $format_title);
-			foreach ($titles as $title)
+			$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row,  $this->lng->txt('test'));
+			foreach($titles as $title)
 			{
-				$resultsheet->write($row, $col++, ilExcelUtils::_convert_text($title), $format_title);
+				$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row, $title);
 			}
-			$row++;
+			$worksheet->setBold('A' . $row . ':' . $worksheet->getColumnCoord($col - 1) . $row);
 
-			foreach ($data->getParticipants() as $active_id => $userdata) 
+			$row++;
+			foreach($data->getParticipants() as $active_id => $userdata) 
 			{
-				$username = (!is_null($userdata) && ilExcelUtils::_convert_text($userdata->getName())) ? ilExcelUtils::_convert_text($userdata->getName()) : "ID $active_id";
+				$username = (!is_null($userdata) && $userdata->getName()) ? $userdata->getName() : "ID $active_id";
 				if (array_key_exists($username, $usernames))
 				{
 					$usernames[$username]++;
-					$username .= " ($i)";
+					$username .= " ($usernames[$username])";
 				}
 				else
 				{
 					$usernames[$username] = 1;
 				}
 				$col = 0;
-				$resultsheet->write($row, $col++, $username);
-				$resultsheet->write($row, $col++, $userdata->getLogin());
+				$worksheet->setCell($row, $col++, $username);
+				$worksheet->setCell($row, $col++, $userdata->getLogin());
 				if (count($additionalFields))
 				{
 					$userfields = ilObjUser::_lookupFields($userdata->getUserID());
@@ -589,7 +569,7 @@ class ilTestExport
 						{
 							if (strlen($userfields[$fieldname]))
 							{
-								$resultsheet->write($row, $col++, ilExcelUtils::_convert_text($userfields[$fieldname]));
+								$worksheet->setCell($row, $col++, $userfields[$fieldname]);
 							}
 							else
 							{
@@ -598,14 +578,14 @@ class ilTestExport
 						}
 					}
 				}
-				$resultsheet->write($row, $col++, ilExcelUtils::_convert_text($this->test_obj->getTitle()));
+				$worksheet->setCell($row, $col++, $this->test_obj->getTitle());
 				$pass = $userdata->getScoredPass();
-				if (is_object($userdata) && is_array($userdata->getQuestions($pass)))
+				if(is_object($userdata) && is_array($userdata->getQuestions($pass)))
 				{
-					foreach ($userdata->getQuestions($pass) as $question)
+					foreach($userdata->getQuestions($pass) as $question)
 					{
-						$objQuestion =& $this->test_obj->_instanciateQuestion($question["aid"]);
-						if (is_object($objQuestion) && strcmp($objQuestion->getQuestionType(), 'assSingleChoice') == 0)
+						$objQuestion = ilObjTest::_instanciateQuestion($question["aid"]);
+						if(is_object($objQuestion) && strcmp($objQuestion->getQuestionType(), 'assSingleChoice') == 0)
 						{
 							$solution = $objQuestion->getSolutionValues($active_id, $pass);
 							$pos = $positions[$question["aid"]];
@@ -617,67 +597,70 @@ class ilTestExport
 									$selectedanswer = $answer->getAnswertext();
 								}
 							}
-							$resultsheet->write($row, $col+$pos, ilExcelUtils::_convert_text($selectedanswer));
+							$worksheet->setCell($row, $col+$pos, $selectedanswer);
 						}
 					}
 				}
 				$row++;
 			}
-			if ($this->test_obj->isSingleChoiceTestWithoutShuffle())
+
+			if($this->test_obj->isSingleChoiceTestWithoutShuffle())
 			{
 				// special tab for single choice tests without shuffle option
 				$pos = 0;
-				$row = 0;
+				$row = 1;
 				$usernames = array();
 				$allusersheet = false;
 				$pages = 0;
-				$resultsheet =& $workbook->addWorksheet($this->lng->txt("eval_all_users") . " (2)");
+
+				$worksheet->addSheet($this->lng->txt('eval_all_users'). ' (2)');
 
 				$col = 0;
-				$resultsheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt('name')), $format_title);
-				$resultsheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt('login')), $format_title);
+				$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row,  $this->lng->txt('name'));
+				$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row,  $this->lng->txt('login'));
 				if (count($additionalFields))
 				{
 					foreach ($additionalFields as $fieldname)
 					{
 						if (strcmp($fieldname, "matriculation") == 0)
 						{
-							$resultsheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt('matriculation')), $format_title);
+							$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row,  $this->lng->txt('matriculation'));
 						}
 					}
 				}
-				$resultsheet->write($row, $col++, ilExcelUtils::_convert_text($this->lng->txt('test')), $format_title);
-				foreach ($titles as $title)
+				$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row,  $this->lng->txt('test'));
+				foreach($titles as $title)
 				{
-					$resultsheet->write($row, $col++, ilExcelUtils::_convert_text($title), $format_title);
+					$worksheet->setFormattedExcelTitle($worksheet->getColumnCoord($col++) . $row,  $title);
 				}
-				$row++;
+				$worksheet->setBold('A' . $row . ':' . $worksheet->getColumnCoord($col - 1) . $row);
 
+				$row++;
 				foreach ($data->getParticipants() as $active_id => $userdata) 
 				{
-					$username = (!is_null($userdata) && ilExcelUtils::_convert_text($userdata->getName())) ? ilExcelUtils::_convert_text($userdata->getName()) : "ID $active_id";
+					$username = (!is_null($userdata) && $userdata->getName()) ? $userdata->getName() : "ID $active_id";
 					if (array_key_exists($username, $usernames))
 					{
 						$usernames[$username]++;
-						$username .= " ($i)";
+						$username .= " ($usernames[$username])";
 					}
 					else
 					{
 						$usernames[$username] = 1;
 					}
 					$col = 0;
-					$resultsheet->write($row, $col++, $username);
-					$resultsheet->write($row, $col++, $userdata->getLogin());
+					$worksheet->setCell($row, $col++, $username);
+					$worksheet->setCell($row, $col++, $userdata->getLogin());
 					if (count($additionalFields))
 					{
-						$userfields = ilObjUser::_lookupFields($userdata->getUserID());
+						$userfields = ilObjUser::_lookupFields($userdata->getUserId());
 						foreach ($additionalFields as $fieldname)
 						{
 							if (strcmp($fieldname, "matriculation") == 0)
 							{
 								if (strlen($userfields[$fieldname]))
 								{
-									$resultsheet->write($row, $col++, ilExcelUtils::_convert_text($userfields[$fieldname]));
+									$worksheet->setCell($row, $col++, $userfields[$fieldname]);
 								}
 								else
 								{
@@ -686,19 +669,19 @@ class ilTestExport
 							}
 						}
 					}
-					$resultsheet->write($row, $col++, ilExcelUtils::_convert_text($this->test_obj->getTitle()));
+					$worksheet->setCell($row, $col++, $this->test_obj->getTitle());
 					$pass = $userdata->getScoredPass();
-					if (is_object($userdata) && is_array($userdata->getQuestions($pass)))
+					if(is_object($userdata) && is_array($userdata->getQuestions($pass)))
 					{
-						foreach ($userdata->getQuestions($pass) as $question)
+						foreach($userdata->getQuestions($pass) as $question)
 						{
-							$objQuestion =& $this->test_obj->_instanciateQuestion($question["aid"]);
-							if (is_object($objQuestion) && strcmp($objQuestion->getQuestionType(), 'assSingleChoice') == 0)
+							$objQuestion = ilObjTest::_instanciateQuestion($question["aid"]);
+							if(is_object($objQuestion) && strcmp($objQuestion->getQuestionType(), 'assSingleChoice') == 0)
 							{
 								$solution = $objQuestion->getSolutionValues($active_id, $pass);
 								$pos = $positions[$question["aid"]];
 								$selectedanswer = chr(65+$solution[0]["value1"]);
-								$resultsheet->write($row, $col+$pos, ilExcelUtils::_convert_text($selectedanswer));
+								$worksheet->setCell($row, $col+$pos, $selectedanswer);
 							}
 						}
 					}
@@ -714,12 +697,12 @@ class ilTestExport
 			$allusersheet = false;
 			$pages = 0;
 			$i = 0;
-			foreach ($data->getParticipants() as $active_id => $userdata) 
+			foreach($data->getParticipants() as $active_id => $userdata) 
 			{
 				$i++;
 				
-				$username = (!is_null($userdata) && ilExcelUtils::_convert_text($userdata->getName())) ? ilExcelUtils::_convert_text($userdata->getName()) : "ID $active_id";
-				if (array_key_exists($username, $usernames))
+				$username = (!is_null($userdata) && $userdata->getName()) ? $userdata->getName() : "ID $active_id";
+				if(array_key_exists($username, $usernames))
 				{
 					$usernames[$username]++;
 					$username .= " ($i)";
@@ -728,48 +711,63 @@ class ilTestExport
 				{
 					$usernames[$username] = 1;
 				}
-				if ($participantcount > 250) {
-					if (!$allusersheet || ($pages-1) < floor($row / 64000)) {
-						$resultsheet =& $workbook->addWorksheet($this->lng->txt("eval_all_users") . (($pages > 0) ? " (".($pages+1).")" : ""));
+
+				if($participantcount > 250)
+				{
+					if(!$allusersheet || ($pages-1) < floor($row / 64000))
+					{
+						$worksheet->addSheet($this->lng->txt("eval_all_users") . (($pages > 0) ? " (".($pages+1).")" : ""));
 						$allusersheet = true;
-						$row = 0;
+						$row = 1;
 						$pages++;
 					}
-				} else {
-					$resultsheet =& $workbook->addWorksheet(utf8_decode($username));
 				}
-				if (method_exists($resultsheet, "writeString"))
+				else
 				{
-					$pass = $userdata->getScoredPass();
-					$row = ($allusersheet) ? $row : 0;
-					$resultsheet->writeString($row, 0, ilExcelUtils::_convert_text(sprintf($this->lng->txt("tst_result_user_name_pass"), $pass+1, $userdata->getName())), $format_bold);
-					$row += 2;
-					if (is_object($userdata) && is_array($userdata->getQuestions($pass)))
+					$resultsheet = $worksheet->addSheet($username);
+				}
+
+				$pass = $userdata->getScoredPass();
+				$row = ($allusersheet) ? $row : 1;
+				$worksheet->setCell($row, 0, sprintf($this->lng->txt("tst_result_user_name_pass"), $pass+1, $userdata->getName()));
+				$worksheet->setBold($worksheet->getColumnCoord(0) . $row);
+				$row += 2;
+				if(is_object($userdata) && is_array($userdata->getQuestions($pass)))
+				{
+					foreach($userdata->getQuestions($pass) as $question)
 					{
-						foreach ($userdata->getQuestions($pass) as $question)
+						require_once "./Modules/TestQuestionPool/classes/class.assQuestion.php";
+						$question = assQuestion::_instanciateQuestion($question["id"]);
+						if(is_object($question))
 						{
-							require_once "./Modules/TestQuestionPool/classes/class.assQuestion.php";
-							$question = assQuestion::_instanciateQuestion($question["id"]);
-							if (is_object($question))
-							{
-								$row = $question->setExportDetailsXLS($resultsheet, $row, $active_id, $pass, $format_title, $format_bold);
-							}
+							$row = $question->setExportDetailsXLS($worksheet, $row, $active_id, $pass);
 						}
 					}
 				}
 			}
 		}
-		$workbook->close();
-		if ($deliver)
+
+		if($deliver)
 		{
-			ilUtil::deliverFile($excelfile, $testname, "application/vnd.ms-excel", false, true);
-			exit;
+			$testname = $this->test_obj->getTitle();
+			switch($this->mode)
+			{
+				case 'results':
+					$testname .= '_results';
+					break;
+			}
+			$testname = ilUtil::getASCIIFilename(preg_replace("/\s/", "_", $testname)) . '.xlsx';
+			$worksheet->sendToClient($testname);
 		}
 		else
 		{
-			return $excelfile;
+			$excelfile = ilUtil::ilTempnam();
+			$worksheet->writeToFile($excelfile);
+			return $excelfile . '.xlsx';
 		}
 	}
+
+
 
 	/**
 	* Exports the evaluation data to the CSV file format
@@ -924,7 +922,7 @@ class ilTestExport
 				{
 					if($ts)
 					{
-						$visit = ilFormat::formatDate(date('Y-m-d H:i:s', $ts), "datetime", false, false);
+						$visit = ilDatePresentation::formatDate(new ilDateTime($ts, IL_CAL_UNIX));
 						array_push($datarow2, $visit);
 					}
 					else
@@ -1008,6 +1006,10 @@ class ilTestExport
 		}
 	}
 
+	abstract protected function initXmlExport();
+	
+	abstract protected function getQuestionIds();
+
 	/**
 	* build xml export file
 	*/
@@ -1016,6 +1018,8 @@ class ilTestExport
 		global $ilBench;
 
 		$ilBench->start("TestExport", "buildExportFile");
+
+		$this->initXmlExport();
 
 		include_once("./Services/Xml/classes/class.ilXmlWriter.php");
 		$this->xml = new ilXmlWriter;
@@ -1029,6 +1033,8 @@ class ilTestExport
 
 		// set xml header
 		$this->xml->xmlHeader();
+
+		$this->xml->xmlStartTag("ContentObject", array('Type' => 'Test'));
 
 		// create directories
 		$this->test_obj->createExportDirectory();
@@ -1046,7 +1052,7 @@ class ilTestExport
 
 		// write qti file
 		$qti_file = fopen($this->export_dir."/".$this->subdir."/".$this->qti_filename, "w");
-		fwrite($qti_file, $this->test_obj->toXML());
+		fwrite($qti_file, $this->getQtiXml());
 		fclose($qti_file);
 
 		// get xml content
@@ -1054,6 +1060,14 @@ class ilTestExport
 		$this->test_obj->exportPagesXML($this->xml, $this->inst_id,
 			$this->export_dir."/".$this->subdir, $expLog);
 		$ilBench->stop("TestExport", "buildExportFile_getXML");
+		
+		$this->populateQuestionSetConfigXml($this->xml);
+		
+		$assignmentList = $this->buildQuestionSkillAssignmentList();
+		$this->populateQuestionSkillAssignmentsXml($this->xml, $assignmentList, $this->getQuestionIds());
+		$this->populateSkillLevelThresholdsXml($this->xml, $assignmentList);
+
+		$this->xml->xmlEndTag("ContentObject");
 
 		// dump xml document to screen (only for debugging reasons)
 		/*
@@ -1073,6 +1087,7 @@ class ilTestExport
 			// dump results xml document to file
 			include_once "./Modules/Test/classes/class.ilTestResultsToXML.php";
 			$resultwriter = new ilTestResultsToXML($this->test_obj->getTestId(), $this->test_obj->getAnonymity());
+			$resultwriter->setIncludeRandomTestQuestionsEnabled($this->test_obj->isRandomTest());
 			$ilBench->start("TestExport", "buildExportFile_results");
 			$resultwriter->xmlDumpFile($this->export_dir."/".$this->subdir."/".$this->resultsfile, false);
 			$ilBench->stop("TestExport", "buildExportFile_results");
@@ -1097,6 +1112,40 @@ class ilTestExport
 
 		return $this->export_dir."/".$this->subdir.".zip";
 	}
+	
+	abstract protected function populateQuestionSetConfigXml(ilXmlWriter $xmlWriter);
+	
+	protected function getQtiXml()
+	{
+		$tstQtiXml = $this->test_obj->toXML();
+		$qstQtiXml = $this->getQuestionsQtiXml();
+		
+		if (strpos($tstQtiXml, "</section>") !== false)
+		{
+			$qtiXml = str_replace("</section>", "$qstQtiXml</section>", $tstQtiXml);
+		}
+		else
+		{
+			$qtiXml = str_replace("<section ident=\"1\"/>", "<section ident=\"1\">\n$qstQtiXml</section>", $tstQtiXml);
+		}
+		
+		return $qtiXml;
+	}
+	
+	abstract protected function getQuestionsQtiXml();
+	
+	protected function getQuestionQtiXml($questionId)
+	{
+		include_once "./Modules/TestQuestionPool/classes/class.assQuestion.php";
+		$questionOBJ = assQuestion::_instantiateQuestion($questionId);
+		$xml = $questionOBJ->toXML(false);
+
+		// still neccessary? there is an include header flag!?
+		$xml = preg_replace("/<questestinterop>/", "", $xml);
+		$xml = preg_replace("/<\/questestinterop>/", "", $xml);
+		
+		return $xml;
+	}
 
 	function exportXHTMLMediaObjects($a_export_dir)
 	{
@@ -1107,7 +1156,7 @@ class ilTestExport
 		{
 			if (ilObjMediaObject::_exists($mob))
 			{
-				$mob_obj =& new ilObjMediaObject($mob);
+				$mob_obj = new ilObjMediaObject($mob);
 				$mob_obj->exportFiles($a_export_dir);
 				unset($mob_obj);
 			}
@@ -1119,14 +1168,60 @@ class ilTestExport
 			{
 				if (ilObjMediaObject::_exists($mob))
 				{
-					$mob_obj =& new ilObjMediaObject($mob);
+					$mob_obj = new ilObjMediaObject($mob);
 					$mob_obj->exportFiles($a_export_dir);
 					unset($mob_obj);
 				}
 			}
 		}
 	}
-
+	
+	/**
+	 * @param ilXmlWriter $a_xml_writer
+	 * @param $questions
+	 */
+	protected function populateQuestionSkillAssignmentsXml(ilXmlWriter $a_xml_writer, ilAssQuestionSkillAssignmentList $assignmentList, $questions)
+	{
+		require_once 'Modules/TestQuestionPool/classes/questions/class.ilAssQuestionSkillAssignmentExporter.php';
+		$skillQuestionAssignmentExporter = new ilAssQuestionSkillAssignmentExporter();
+		$skillQuestionAssignmentExporter->setXmlWriter($a_xml_writer);
+		$skillQuestionAssignmentExporter->setQuestionIds($questions);
+		$skillQuestionAssignmentExporter->setAssignmentList($assignmentList);
+		$skillQuestionAssignmentExporter->export();
+	}
+	
+	protected function populateSkillLevelThresholdsXml(ilXmlWriter $a_xml_writer, ilAssQuestionSkillAssignmentList $assignmentList)
+	{
+		global $ilDB;
+		
+		require_once 'Modules/Test/classes/class.ilTestSkillLevelThresholdList.php';
+		$thresholdList = new ilTestSkillLevelThresholdList($ilDB);
+		$thresholdList->setTestId($this->test_obj->getTestId());
+		$thresholdList->loadFromDb();
+		
+		require_once 'Modules/Test/classes/class.ilTestSkillLevelThresholdExporter.php';
+		$skillLevelThresholdExporter = new ilTestSkillLevelThresholdExporter();
+		$skillLevelThresholdExporter->setXmlWriter($a_xml_writer);
+		$skillLevelThresholdExporter->setAssignmentList($assignmentList);
+		$skillLevelThresholdExporter->setThresholdList($thresholdList);
+		$skillLevelThresholdExporter->export();
+	}
+	
+	/**
+	 * @return ilAssQuestionSkillAssignmentList
+	 */
+	protected function buildQuestionSkillAssignmentList()
+	{
+		global $ilDB;
+		
+		require_once 'Modules/TestQuestionPool/classes/class.ilAssQuestionSkillAssignmentList.php';
+		$assignmentList = new ilAssQuestionSkillAssignmentList($ilDB);
+		$assignmentList->setParentObjId($this->test_obj->getId());
+		$assignmentList->loadFromDb();
+		$assignmentList->loadAdditionalSkillData();
+		
+		return $assignmentList;
+	}
 }
 
 ?>

@@ -41,7 +41,7 @@ class ilAssQuestionUserSolutionAdopter
 	protected static $preparedInsertResultRecordStatement = null;
 
 	/**
-	 * @var ilDB
+	 * @var ilDBInterface
 	 */
 	protected $db;
 
@@ -71,11 +71,11 @@ class ilAssQuestionUserSolutionAdopter
 	protected $questionIds;
 
 	/**
-	 * @param ilDB $db
+	 * @param ilDBInterface $db
 	 * @param ilSetting $assSettings
 	 * @param bool $isAssessmentLogEnabled
 	 */
-	public function __construct(ilDB $db, ilSetting $assSettings, $isAssessmentLogEnabled)
+	public function __construct(ilDBInterface $db, ilSetting $assSettings, $isAssessmentLogEnabled)
 	{
 		$this->db = $db;
 		
@@ -162,9 +162,11 @@ class ilAssQuestionUserSolutionAdopter
 			$this->processLockerFactory->setQuestionId($questionId);
 			$processLocker = $this->processLockerFactory->getLocker();
 
-			$processLocker->requestUserSolutionAdoptLock();
-			$this->adoptQuestionAnswer($questionId);
-			$processLocker->releaseUserSolutionAdoptLock();
+			$processLocker->executeUserTestResultUpdateLockOperation(function() use ($questionId) {
+
+				$this->adoptQuestionAnswer($questionId);
+
+			});
 		}
 	}
 

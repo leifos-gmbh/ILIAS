@@ -1319,38 +1319,38 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 			include_once "./Modules/Test/classes/class.ilObjTest.php";
 			$pass = ilObjTest::_getPass($active_id);
 		}
-		
-		$this->getProcessLocker()->requestUserSolutionUpdateLock();
-
-		$affectedRows = $this->removeCurrentSolution($active_id, $pass, $authorized);
 
 		$entered_values = 0;
-		
-		foreach($this->getSolutionSubmit() as $val1 => $val2)
-		{
-			$value = trim(ilUtil::stripSlashes($val2, FALSE));
-			if (strlen($value))
+
+		$this->getProcessLocker()->executeUserSolutionUpdateLockOperation(function() use (&$entered_values, $active_id, $pass, $authorized) {
+
+			$this->removeCurrentSolution($active_id, $pass, $authorized);
+
+			foreach($this->getSolutionSubmit() as $val1 => $val2)
 			{
-				$gap = $this->getGap(trim(ilUtil::stripSlashes($val1)));
-				if (is_object($gap))
+				$value = trim(ilUtil::stripSlashes($val2, FALSE));
+				if (strlen($value))
 				{
-					if (!(($gap->getType() == CLOZE_SELECT) && ($value == -1)))
+					$gap = $this->getGap(trim(ilUtil::stripSlashes($val1)));
+					if (is_object($gap))
 					{
-						$affectedRows = $this->saveCurrentSolution($active_id,$pass, $val1, $value, $authorized);
-						$entered_values++;
+						if (!(($gap->getType() == CLOZE_SELECT) && ($value == -1)))
+						{
+							$this->saveCurrentSolution($active_id,$pass, $val1, $value, $authorized);
+							$entered_values++;
+						}
 					}
 				}
 			}
-		}
 
-		$this->getProcessLocker()->releaseUserSolutionUpdateLock();
+		});
 
 		if ($entered_values)
 		{
 			include_once ("./Modules/Test/classes/class.ilObjAssessmentFolder.php");
 			if (ilObjAssessmentFolder::_enabledAssessmentLogging())
 			{
-				$this->logAction($this->lng->txtlng("assessment", "log_user_entered_values", ilObjAssessmentFolder::_getLogLanguage()), $active_id, $this->getId());
+				assQuestion::logAction($this->lng->txtlng("assessment", "log_user_entered_values", ilObjAssessmentFolder::_getLogLanguage()), $active_id, $this->getId());
 			}
 		}
 		else
@@ -1358,22 +1358,17 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 			include_once ("./Modules/Test/classes/class.ilObjAssessmentFolder.php");
 			if (ilObjAssessmentFolder::_enabledAssessmentLogging())
 			{
-				$this->logAction($this->lng->txtlng("assessment", "log_user_not_entered_values", ilObjAssessmentFolder::_getLogLanguage()), $active_id, $this->getId());
+				assQuestion::logAction($this->lng->txtlng("assessment", "log_user_not_entered_values", ilObjAssessmentFolder::_getLogLanguage()), $active_id, $this->getId());
 			}
 		}
 		
 		return TRUE;
 	}
-	
+
 	/**
-	 * Reworks the allready saved working data if neccessary
-	 *
-	 * @access protected
-	 * @param integer $active_id
-	 * @param integer $pass
-	 * @param boolean $obligationsAnswered
+	 * {@inheritdoc}
 	 */
-	protected function reworkWorkingData($active_id, $pass, $obligationsAnswered)
+	protected function reworkWorkingData($active_id, $pass, $obligationsAnswered, $authorized)
 	{
 		// nothing to rework!
 	}
@@ -1549,28 +1544,20 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 	{
 		$this->gap_combinations = $value;
 	}
+
 	/**
-	* Creates an Excel worksheet for the detailed cumulated results of this question
-	*
-	* @param object $worksheet Reference to the parent excel worksheet
-	* @param object $startrow Startrow of the output in the excel worksheet
-	* @param object $active_id Active id of the participant
-	* @param object $pass Test pass
-	* @param object $format_title Excel title format
-	* @param object $format_bold Excel bold format
-	* @param array $eval_data Cumulated evaluation data
-	* @access public
-	*/
-	public function setExportDetailsXLS(&$worksheet, $startrow, $active_id, $pass, &$format_title, &$format_bold)
+	 * {@inheritdoc}
+	 */
+	public function setExportDetailsXLS($worksheet, $startrow, $active_id, $pass)
 	{
-		include_once ("./Services/Excel/classes/class.ilExcelUtils.php");
+		parent::setExportDetailsXLS($worksheet, $startrow, $active_id, $pass);
+
 		$solution = $this->getSolutionValues($active_id, $pass);
-		$worksheet->writeString($startrow, 0, ilExcelUtils::_convert_text($this->lng->txt($this->getQuestionType())), $format_title);
-		$worksheet->writeString($startrow, 1, ilExcelUtils::_convert_text($this->getTitle()), $format_title);
 		$i = 1;
 		foreach ($this->getGaps() as $gap_index => $gap)
 		{
-			$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($this->lng->txt("gap") . " $i"), $format_bold);
+			$worksheet->setCell($startrow + $i, 0,$this->lng->txt("gap") . " $i");
+			$worksheet->setBold($worksheet->getColumnCoord(0) . ($startrow + $i));
 			$checked = FALSE;
 			foreach ($solution as $solutionvalue)
 			{
@@ -1579,17 +1566,18 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 					switch ($gap->getType())
 					{
 						case CLOZE_SELECT:
-							$worksheet->writeString($startrow + $i, 1, $gap->getItem($solutionvalue["value2"])->getAnswertext());
+							$worksheet->setCell($startrow + $i, 1, $gap->getItem($solutionvalue["value2"])->getAnswertext());
 							break;
 						case CLOZE_NUMERIC:
 						case CLOZE_TEXT:
-							$worksheet->writeString($startrow + $i, 1, $solutionvalue["value2"]);
+							$worksheet->setCell($startrow + $i, 1, $solutionvalue["value2"]);
 							break;
 					}
 				}
 			}
 			$i++;
 		}
+
 		return $startrow + $i + 1;
 	}
 	
@@ -1690,7 +1678,7 @@ class assClozeTest extends assQuestion implements ilObjQuestionScoringAdjustable
 	*/
 	public function getUserQuestionResult($active_id, $pass)
 	{
-		/** @var ilDB $ilDB */
+		/** @var ilDBInterface $ilDB */
 		global $ilDB;
 		$result = new ilUserQuestionResult($this, $active_id, $pass);
 

@@ -83,9 +83,7 @@ class ilFileSystemTableGUI extends ilTable2GUI
 		$this->setFormAction($ilCtrl->getFormAction($a_parent_obj));
 		$this->setRowTemplate("tpl.directory_row.html",
 			"Services/FileSystem");
-		$this->setEnableTitle(true);
-				
-		include_once "Services/Utilities/classes/class.ilFormat.php";
+		$this->setEnableTitle(true);		
 	}
 	
 	function numericOrdering($a_field)
@@ -202,7 +200,7 @@ class ilFileSystemTableGUI extends ilTable2GUI
 		
 		if($a_set["type"] != "dir")
 		{					
-			$this->tpl->setVariable("TXT_SIZE", ilFormat::formatSize($a_set["size"]));
+			$this->tpl->setVariable("TXT_SIZE", ilUtil::formatSize($a_set["size"]));
 		}
 
 		// single item commands
@@ -210,7 +208,7 @@ class ilFileSystemTableGUI extends ilTable2GUI
 			!($a_set["type"] == "dir" && $a_set["entry"] == ".."))
 		{
 			$advsel = new ilAdvancedSelectionListGUI();
-			$advsel->setListTitle($this->lng->txt("actions"));
+			//$advsel->setListTitle($this->lng->txt("actions"));
 			foreach($this->row_commands as $rcom)
 			{								
 				if($rcom["allow_dir"] || $a_set["type"] != "dir")

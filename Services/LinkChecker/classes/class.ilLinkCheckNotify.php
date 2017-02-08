@@ -13,9 +13,9 @@ class ilLinkCheckNotify
 	var $db = null;
 
 
-	function ilLinkCheckNotify(&$db)
+	public function __construct($db)
 	{
-		$this->db =& $db;
+		$this->db = $db;
 	}
 	
 	function setUserId($a_usr_id)
@@ -64,7 +64,7 @@ class ilLinkCheckNotify
 	}
 
 	/* Static */
-	function _getNotifyStatus($a_usr_id,$a_obj_id)
+	static function _getNotifyStatus($a_usr_id,$a_obj_id)
 	{
 		global $ilDB;
 
@@ -76,7 +76,7 @@ class ilLinkCheckNotify
 		return $res->numRows() ? true : false;
 	}
 
-	function _deleteUser($a_usr_id)
+	static function _deleteUser($a_usr_id)
 	{
 		global $ilDB;
 
@@ -86,7 +86,7 @@ class ilLinkCheckNotify
 		return true;
 	}
 
-	function _deleteObject($a_obj_id)
+	static function _deleteObject($a_obj_id)
 	{
 		global $ilDB;
 
@@ -97,7 +97,7 @@ class ilLinkCheckNotify
 		return true;
 	}
 
-	function _getNotifiers($a_obj_id)
+	static function _getNotifiers($a_obj_id)
 	{
 		global $ilDB;
 
@@ -105,7 +105,7 @@ class ilLinkCheckNotify
 			"WHERE obj_id = ".$ilDB->quote($a_obj_id,'integer')." ";
 
 		$res = $ilDB->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$usr_ids[] = $row->usr_id;
 		}
@@ -113,14 +113,14 @@ class ilLinkCheckNotify
 		return $usr_ids ? $usr_ids : array();
 	}
 
-	function _getAllNotifiers(&$db)
+	static function _getAllNotifiers(&$db)
 	{
 		global $ilDB;
 
 		$query = "SELECT * FROM link_check_report ";
 
 		$res = $db->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$usr_ids[$row->usr_id][] = $row->obj_id;
 		}

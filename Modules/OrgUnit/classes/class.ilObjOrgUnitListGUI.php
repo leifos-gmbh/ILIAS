@@ -19,8 +19,9 @@ class ilObjOrgUnitListGUI extends ilObjectListGUI {
 
 
 	function __construct() {
-		global $tpl;
-		$this->ilObjectListGUI();
+		global $DIC;
+		$tpl = $DIC['tpl'];
+		parent::__construct();
 		$this->tpl = $tpl;
 		//$this->enableComments(false, false);
 	}
@@ -37,7 +38,6 @@ class ilObjOrgUnitListGUI extends ilObjectListGUI {
 		$this->copy_enabled = false;
 		$this->subscribe_enabled = false;
 		$this->link_enabled = false;
-		$this->payment_enabled = false;
 
 		$this->type = "orgu";
 		$this->gui_class_name = "ilobjorgunitgui";
@@ -59,7 +59,7 @@ class ilObjOrgUnitListGUI extends ilObjectListGUI {
 	/**
 	 * no social commands needed in orgunits.
 	 */
-	public function insertCommonSocialCommands() {
+	public function insertCommonSocialCommands($a_header_actions = false) {
 		return;
 	}
 
@@ -92,7 +92,9 @@ class ilObjOrgUnitListGUI extends ilObjectListGUI {
 
 
 	public function insertIconsAndCheckboxes() {
-		global $lng, $ilias;
+		global $DIC;
+		$lng = $DIC['lng'];
+		$ilias = $DIC['ilias'];
 		// FSX removed $this->getCheckboxStatus() in if-Statement: 0014726
 		if (!$ilias->getSetting('custom_icons')) {
 			parent::insertIconsAndCheckboxes();

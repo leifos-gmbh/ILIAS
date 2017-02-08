@@ -20,6 +20,11 @@ include_once("./Modules/Wiki/classes/class.ilWikiPage.php");
 class ilWikiPageGUI extends ilPageObjectGUI
 {
 	/**
+	 * @var ilObjWiki
+	 */
+	protected $wiki;
+
+	/**
 	* Constructor
 	*/
 	function __construct($a_id = 0, $a_old_nr = 0, $a_wiki_ref_id = 0)
@@ -33,7 +38,7 @@ class ilWikiPageGUI extends ilPageObjectGUI
 		$this->getPageObject()->setWikiRefId($this->getWikiRefId());
 		
 		// content style
-		include_once("./Services/Style/classes/class.ilObjStyleSheet.php");
+		include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
 		
 		$tpl->setCurrentBlock("SyntaxStyle");
 		$tpl->setVariable("LOCATION_SYNTAX_STYLESHEET",
@@ -65,14 +70,47 @@ class ilWikiPageGUI extends ilPageObjectGUI
 	}
 
 	/**
+	 * Set wiki
+	 *
+	 * @param ilObjWiki $a_val wiki	
+	 */
+	function setWiki($a_val)
+	{
+		$this->wiki = $a_val;
+	}
+	
+	/**
+	 * Get wiki
+	 *
+	 * @return ilObjWiki wiki
+	 */
+	function getWiki()
+	{
+		return $this->wiki;
+	}	
+	
+	/**
 	* execute command
 	*/
-	function &executeCommand()
+	function executeCommand()
 	{
-		global $ilCtrl, $ilTabs, $ilUser, $ilAccess, $lng;
+		global $ilCtrl, $ilTabs, $ilUser, $ilAccess, $lng, $tpl;
 		
 		$next_class = $this->ctrl->getNextClass($this);
 		$cmd = $this->ctrl->getCmd();
+
+		$head_title = ilObject::_lookupTitle(ilObject::_lookupObjId((int) $_GET["ref_id"])).": ".$this->getWikiPage()->getTitle();
+		$tpl->setHeaderPageTitle($head_title);
+		// see #13804
+		if ($_GET["page"] != "")
+		{
+			$tpl->setPermanentLink("wiki", "", "wpage_".$this->getPageObject()->getId()."_".$_GET["ref_id"], "", $head_title);
+		}
+		else
+		{
+			$tpl->setPermanentLink("wiki", $_GET["ref_id"]);
+		}
+
 
 		switch($next_class)
 		{
@@ -327,22 +365,6 @@ class ilWikiPageGUI extends ilPageObjectGUI
 				true, ilObjWiki::_lookupPublicNotes($this->getPageObject()->getParentId()),
 				$may_delete, $callback));
 		}
-		
-		// permanent link
-		$append = ($_GET["page"] != "")
-			? "_".ilWikiUtil::makeUrlTitle($_GET["page"])
-			: "";
-
-		// see #13804
-		if ($_GET["page"] != "")
-		{
-			$tpl->setPermanentLink("wiki", "", "wpage_".$this->getPageObject()->getId()."_".$_GET["ref_id"]);
-		}
-		else
-		{
-			$tpl->setPermanentLink("wiki", $_GET["ref_id"]);
-		}
-
 
 
 		// page content
@@ -401,7 +423,7 @@ class ilWikiPageGUI extends ilPageObjectGUI
 		global $tpl, $ilCtrl;
 		
 		// content style
-/*		include_once("./Services/Style/classes/class.ilObjStyleSheet.php");
+/*		include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
 		$tpl->setCurrentBlock("ContentStyle");
 		$tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
 			ilObjStyleSheet::getContentStylePath(0));
@@ -450,6 +472,20 @@ class ilWikiPageGUI extends ilPageObjectGUI
 			$this->getWikiPage()->getWikiId(),
 			($this->getOutputMode() == "offline"));
 		$ilCtrl->setParameterByClass("ilobjwikigui", "from_page", $_GET["from_page"]);
+
+
+		// metadata in print view
+		if ($this->getOutputMode() == "print"  && $this->wiki instanceof ilObjWiki)
+		{
+			include_once("./Services/Object/classes/class.ilObjectMetaDataGUI.php");
+			$mdgui = new ilObjectMetaDataGUI($this->wiki, "wpg", $this->getId());
+			$md = $mdgui->getKeyValueList();
+			if ($md != "")
+			{
+				$output = str_replace("<!--COPage-PageTop-->", "<p>" . $md . "</p>", $output);
+			}
+		}
+
 
 		return $output;
 	}
@@ -544,7 +580,7 @@ class ilWikiPageGUI extends ilPageObjectGUI
 			
 			// contributors
 			$dtpl->setVariable("TXT_CONTRIBUTORS", $lng->txt("wiki_contributors"));
-			$contributors = ilWikiPage::getPageContributors($this->getWikiPage()->getId());
+			$contributors = ilWikiPage::getWikiPageContributors($this->getWikiPage()->getId());
 			foreach($contributors as $contributor)
 			{
 				$dtpl->setCurrentBlock("contributor");
@@ -627,7 +663,7 @@ class ilWikiPageGUI extends ilPageObjectGUI
 	{
 		global $lng, $ilCtrl;
 
-		$pages = ilWikiPage::getAllPages(ilObject::_lookupObjId($this->getWikiRefId()));
+		$pages = ilWikiPage::getAllWikiPages(ilObject::_lookupObjId($this->getWikiRefId()));
 
 		include_once("Services/Form/classes/class.ilPropertyFormGUI.php");
 		$this->form = new ilPropertyFormGUI();
@@ -691,7 +727,7 @@ class ilWikiPageGUI extends ilPageObjectGUI
 			{
 				case "wiki":
 					include_once("./Modules/Wiki/classes/class.ilWikiPage.php");
-					$all_pages = ilWikiPage::getAllPages($this->getPageObject()->getWikiId());
+					$all_pages = ilWikiPage::getAllWikiPages($this->getPageObject()->getWikiId());
 					foreach ($all_pages as $p)
 					{
 						$pg_ids[] = $p["id"];
@@ -753,7 +789,7 @@ class ilWikiPageGUI extends ilPageObjectGUI
 		if(!sizeof($all_pages))
 		{
 			include_once("./Modules/Wiki/classes/class.ilWikiPage.php");
-			$all_pages = ilWikiPage::getAllPages($this->getPageObject()->getWikiId());
+			$all_pages = ilWikiPage::getAllWikiPages($this->getPageObject()->getWikiId());
 		}
 		
 		include_once "Modules/Wiki/classes/class.ilWikiExportOrderTableGUI.php";

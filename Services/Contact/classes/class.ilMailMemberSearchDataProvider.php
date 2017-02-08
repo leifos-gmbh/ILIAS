@@ -21,14 +21,23 @@ class ilMailMemberSearchDataProvider
 	 * @var null
 	 */
 	protected $objParticipants = null;
-	
+
+	/**
+	 * @var ilLanguage
+	 */
+	protected $lng;
+
 	/**
 	 * @param $objParticipants
 	 */
 	public function __construct($objParticipants)
 	{
+		global $DIC;
+
 		$this->objParticipants = $objParticipants;
-		$this->type = $this->objParticipants->getType();
+		$this->type            = $this->objParticipants->getType();
+		$this->lng             = $DIC['lng'];
+
 		$this->collectTableData();
 	}
 
@@ -37,8 +46,6 @@ class ilMailMemberSearchDataProvider
 	 */
 	private function collectTableData()
 	{
-		global $lng;
-		
 		$members = $this->objParticipants->getMembers();
 		$admins = $this->objParticipants->getAdmins();
 		
@@ -58,10 +65,10 @@ class ilMailMemberSearchDataProvider
 				$login = ilObjUser::_lookupLogin($user_id);
 				$fullname = $name['lastname'] . ', ' . $name['firstname'];
 
-				$this->data[$fullname]['user_id'] = $user_id;
-				$this->data[$fullname]['login']   = $login;
-				$this->data[$fullname]['name']    = $fullname;
-				$this->data[$fullname]['role']    = $lng->txt($role);
+				$this->data[$user_id]['user_id'] = $user_id;
+				$this->data[$user_id]['login']   = $login;
+				$this->data[$user_id]['name']    = $fullname;
+				$this->data[$user_id]['role']    = $this->lng->txt($role);
 			}
 		}
 	}

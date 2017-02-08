@@ -25,7 +25,7 @@ class ilObjBibliographicAccess extends ilObjectAccess {
 	 *        array("permission" => "write", "cmd" => "edit", "lang_var" => "edit"),
 	 *    );
 	 */
-	public function _getCommands() {
+	public static function _getCommands() {
 		$commands = array
 		(
 			array( "permission" => "read", "cmd" => "render", "lang_var" => "show", "default" => true ),
@@ -42,8 +42,10 @@ class ilObjBibliographicAccess extends ilObjectAccess {
 	 *
 	 * @return bool
 	 */
-	public function _checkGoto($a_target) {
-		global $ilAccess, $lng;
+	public static function _checkGoto($a_target) {
+		global $DIC;
+		$ilAccess = $DIC['ilAccess'];
+		$lng = $DIC['lng'];
 		$t_arr = explode('_', $a_target);
 		if ($t_arr[0] != 'bibl' || ((int)$t_arr[1]) <= 0) {
 			return false;
@@ -69,7 +71,11 @@ class ilObjBibliographicAccess extends ilObjectAccess {
 	 * @return    boolean        true, if everything is ok
 	 */
 	public function _checkAccess($a_cmd, $a_permission, $a_ref_id, $a_obj_id, $a_user_id = "") {
-		global $ilUser, $lng, $rbacsystem, $ilAccess;
+		global $DIC;
+		$ilUser = $DIC['ilUser'];
+		$lng = $DIC['lng'];
+		$rbacsystem = $DIC['rbacsystem'];
+		$ilAccess = $DIC['ilAccess'];
 		if ($a_user_id == "") {
 			$a_user_id = $ilUser->getId();
 		}
@@ -115,7 +121,8 @@ class ilObjBibliographicAccess extends ilObjectAccess {
 	 * @param    int $a_id bibl id
 	 */
 	public static function _lookupOnline($a_id) {
-		global $ilDB;
+		global $DIC;
+		$ilDB = $DIC['ilDB'];
 		$q = "SELECT is_online FROM il_bibl_data WHERE id = " .
 			$ilDB->quote($a_id, "integer");
 		$bibl_set = $ilDB->query($q);

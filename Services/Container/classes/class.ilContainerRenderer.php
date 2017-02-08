@@ -1,5 +1,6 @@
 <?php
 /* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
+require_once('./Services/Repository/classes/class.ilObjectPlugin.php');
 
 /**
 * Class ilContainerRenderer
@@ -172,10 +173,10 @@ class ilContainerRenderer
 		{
 			if(array_pop(explode(self::UNIQUE_SEPARATOR, $item_id)) == $a_id)
 			{
-				unset($this->items[$item_id]);
+				unset($this->items[$item_id]);				
 			}
 		}
-		
+
 		foreach($this->block_items as $block_id => $items)
 		{
 			foreach($items as $idx => $item_id)
@@ -200,7 +201,7 @@ class ilContainerRenderer
 	 * @return bool
 	 */
 	public function hasItem($a_id)
-	{				
+	{		
 		return (array_key_exists($a_id, $this->item_ids) ||
 			array_key_exists($a_id, $this->hidden_items));
 	}
@@ -234,7 +235,6 @@ class ilContainerRenderer
 			$this->item_ids[$a_item_id] = true;
 			
 			$this->block_items[$a_block_id][] = $uniq_id;
-			
 			return true;
 		}
 		return false;
@@ -580,7 +580,8 @@ class ilContainerRenderer
 			else
 			{
 				include_once("./Services/Component/classes/class.ilPlugin.php");
-				$title = ilPlugin::lookupTxt("rep_robj", $a_type, "objs_".$a_type);
+				$pl = ilObjectPlugin::getRepoPluginObjectByType($a_type);
+				$title= $pl->txt("objs_".$a_type);
 			}
 		}
 		else

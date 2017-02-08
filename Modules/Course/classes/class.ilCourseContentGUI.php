@@ -9,7 +9,6 @@
 *
 * @extends ilObjectGUI
 *
-* @ilCtrl_Calls ilCourseContentGUI: ilCourseArchivesGUI
 * @ilCtrl_Calls ilCourseContentGUI: ilColumnGUI, ilObjectCopyGUI
 *
 */
@@ -25,18 +24,19 @@ class ilCourseContentGUI
 	var $tabs_gui;
 
 	/**
-	* Constructor
-	* @access public
-	*/
-	function ilCourseContentGUI(&$container_gui_obj)
+	 * Constructor
+	 * @access public
+	 * @param ilObjectGUI
+	 */
+	public function __construct($container_gui_obj)
 	{
 		global $tpl,$ilCtrl,$lng,$ilObjDataCache,$ilTabs;
 
-		$this->tpl =& $tpl;
-		$this->ctrl =& $ilCtrl;
-		$this->lng =& $lng;
+		$this->tpl = $tpl;
+		$this->ctrl = $ilCtrl;
+		$this->lng = $lng;
 		$this->lng->loadLanguageModule('crs');
-		$this->tabs_gui =& $ilTabs;
+		$this->tabs_gui = $ilTabs;
 
 		$this->container_gui =& $container_gui_obj;
 		$this->container_obj =& $this->container_gui->object;
@@ -44,7 +44,7 @@ class ilCourseContentGUI
 		$this->__initCourseObject();
 	}
 
-	function &executeCommand()
+	function executeCommand()
 	{
 		global $ilAccess, $ilErr, $ilTabs, $ilCtrl;
 
@@ -76,14 +76,6 @@ class ilCourseContentGUI
 				if(!$this->__checkStartObjects())
 				{
 					$this->showStartObjects();
-					break;
-				}
-
-				// forward if archives enabled and not tutor
-				if(!$this->is_tutor = $ilAccess->checkAccess('write','',$this->course_obj->getRefId()) and
-				   $this->course_obj->isArchived())
-				{
-					$this->__forwardToArchivesGUI();
 					break;
 				}
 
@@ -130,20 +122,6 @@ class ilCourseContentGUI
 		return 'view';
 	}
 
-	function __forwardToArchivesGUI()
-	{
-		include_once 'Modules/Course/classes/class.ilCourseArchivesGUI.php';
-
-		$this->ctrl->setReturn($this,'');
-		$archives_gui = new ilCourseArchivesGUI($this->container_gui);
-		$this->ctrl->forwardCommand($archives_gui);
-
-		$this->tabs_gui->setTabActive('view_content');
-		$this->tabs_gui->setSubTabActive('crs_archives');
-
-		return true;
-	}
-
 	function __checkStartObjects()
 	{
 		include_once './Modules/Course/classes/class.ilCourseStart.php';
@@ -180,7 +158,7 @@ class ilCourseContentGUI
 		$this->tpl->setVariable("HEADER_EDITED",$this->lng->txt('crs_objective_accomplished'));
 
 
-		$lm_continue =& new ilCourseLMHistory($this->course_obj->getRefId(),$ilUser->getId());
+		$lm_continue = new ilCourseLMHistory($this->course_obj->getRefId(),$ilUser->getId());
 		$continue_data = $lm_continue->getLMHistory();
 
 		$counter = 0;
@@ -519,7 +497,7 @@ class ilCourseContentGUI
 			{
 				$this->tpl->setCurrentBlock("tlt");
 				$this->tpl->setVariable("TXT_TLT",$this->lng->txt('meta_typical_learning_time'));
-				$this->tpl->setVariable("TLT_VAL",ilFormat::_secondsToString($tlt));
+				$this->tpl->setVariable("TLT_VAL",ilDatePresentation::secondsToString($tlt));
 				$this->tpl->parseCurrentBlock();
 			}
 
@@ -773,7 +751,7 @@ class ilCourseContentGUI
 		{
 			$this->tpl->setCurrentBlock("tlt");
 			$this->tpl->setVariable("TXT_TLT",$this->lng->txt('meta_typical_learning_time'));
-			$this->tpl->setVariable("TLT_VAL",ilFormat::_secondsToString($tlt));
+			$this->tpl->setVariable("TLT_VAL",ilDatePresentation::secondsToString($tlt));
 			$this->tpl->parseCurrentBlock();
 		}
 		
@@ -987,7 +965,7 @@ class ilCourseContentGUI
 		{
 			$this->tpl->setCurrentBlock("tlt");
 			$this->tpl->setVariable("TXT_TLT",$this->lng->txt('meta_typical_learning_time'));
-			$this->tpl->setVariable("TLT_VAL",ilFormat::_secondsToString($tlt));
+			$this->tpl->setVariable("TLT_VAL",ilDatePresentation::secondsToString($tlt));
 			$this->tpl->parseCurrentBlock();
 		}
 		

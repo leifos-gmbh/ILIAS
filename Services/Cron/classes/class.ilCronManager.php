@@ -98,114 +98,111 @@ class ilCronManager
 	{
 		global $ilLog, $ilDB;
 		
-		$did_run = false;
+		$did_run = false;				
+				
+		include_once "Services/Cron/classes/class.ilCronJobResult.php";		
 		
 		if($a_job_data === null)
 		{
 			// aquire "fresh" job (status) data
 			$a_job_data = array_pop(self::getCronJobData($a_job->getId()));
 		}
-	
-		if($a_job)
-		{			
-			include_once "Services/Cron/classes/class.ilCronJobResult.php";		
-			
-			// already running?
-			if($a_job_data["alive_ts"])
+
+		// already running?
+		if($a_job_data["alive_ts"])
+		{
+			$ilLog->write("CRON - job ".$a_job_data["job_id"]." still running");
+
+			$cut = 60*60*3; // 3h				
+
+			// is running (and has not pinged) for 3 hours straight, we assume it crashed
+			if(time()-$a_job_data["alive_ts"] > $cut)
 			{
-				$ilLog->write("CRON - job ".$a_job_data["job_id"]." still running");
-				
-				$cut = 60*60*3; // 3h				
-				
-				// is running (and has not pinged) for 3 hours straight, we assume it crashed
-				if(time()-$a_job_data["alive_ts"] > $cut)
-				{
-					$ilDB->manipulate("UPDATE cron_job SET".
-						" running_ts = ".$ilDB->quote(0, "integer").
-						" , alive_ts = ".$ilDB->quote(0, "integer").							
-						" WHERE job_id = ".$ilDB->quote($a_job_data["job_id"], "text"));
-
-					self::deactivateJob($a_job); // #13082
-
-					$result = new ilCronJobResult();
-					$result->setStatus(ilCronJobResult::STATUS_CRASHED);
-					$result->setCode("job_auto_deactivation_time_limit");
-					$result->setMessage("Cron job deactivated because it has been inactive for 3 hours");
-
-					if(!$a_manual)
-					{
-						self::sendNotification($a_job, $result);
-					}
-
-					self::updateJobResult($a_job, $result, $a_manual);							
-
-					$ilLog->write("CRON - job ".$a_job_data["job_id"]." deactivated (assumed crash)");
-				}		
-			}
-			// initiate run?
-			else if($a_job->isActive($a_job_data["job_result_ts"], 
-				$a_job_data["schedule_type"], $a_job_data["schedule_value"], $a_manual))
-			{
-				$ilLog->write("CRON - job ".$a_job_data["job_id"]." started");
-
-				$ilDB->manipulate("UPDATE cron_job SET".
-					" running_ts = ".$ilDB->quote(time(), "integer").
-					" , alive_ts = ".$ilDB->quote(time(), "integer").
-					" WHERE job_id = ".$ilDB->quote($a_job_data["job_id"], "text"));
-
-				$ts_in = self::getMicrotime();					
-				$result = $a_job->run();
-				$ts_dur = self::getMicrotime()-$ts_in;
-
-				// no proper result 
-				if(!$result instanceof ilCronJobResult)
-				{
-					$result = new ilCronJobResult();
-					$result->setStatus(ilCronJobResult::STATUS_CRASHED);
-					$result->setCode("job_no_result");
-					$result->setMessage("Cron job did not return a proper result");
-
-					if(!$a_manual)
-					{
-						self::sendNotification($a_job, $result);
-					}
-
-					$ilLog->write("CRON - job ".$a_job_data["job_id"]." no result");
-				}
-				// no valid configuration, job won't work
-				else if($result->getStatus() == ilCronJobResult::STATUS_INVALID_CONFIGURATION)
-				{
-					self::deactivateJob($a_job);
-
-					if(!$a_manual)
-					{
-						self::sendNotification($a_job, $result);	
-					}
-
-					$ilLog->write("CRON - job ".$a_job_data["job_id"]." invalid configuration");
-				}
-				// success!
-				else
-				{
-					$did_run = true;
-				}
-
-				$result->setDuration($ts_dur);
-
-				self::updateJobResult($a_job, $result, $a_manual);
-
 				$ilDB->manipulate("UPDATE cron_job SET".
 					" running_ts = ".$ilDB->quote(0, "integer").
-					" , alive_ts = ".$ilDB->quote(0, "integer").
-					" WHERE job_id = ".$ilDB->quote($a_job_data["job_id"], "text"));		
+					" , alive_ts = ".$ilDB->quote(0, "integer").							
+					" WHERE job_id = ".$ilDB->quote($a_job_data["job_id"], "text"));
 
-				$ilLog->write("CRON - job ".$a_job_data["job_id"]." finished");
+				self::deactivateJob($a_job); // #13082
+
+				$result = new ilCronJobResult();
+				$result->setStatus(ilCronJobResult::STATUS_CRASHED);
+				$result->setCode(ilCronJobResult::CODE_SUPPOSED_CRASH);
+				$result->setMessage("Cron job deactivated because it has been inactive for 3 hours");
+
+				if(!$a_manual)
+				{
+					self::sendNotification($a_job, $result);
+				}
+
+				self::updateJobResult($a_job, $result, $a_manual);							
+
+				$ilLog->write("CRON - job ".$a_job_data["job_id"]." deactivated (assumed crash)");
+			}		
+		}
+		// initiate run?
+		else if($a_job->isActive($a_job_data["job_result_ts"], 
+			$a_job_data["schedule_type"], $a_job_data["schedule_value"], $a_manual))
+		{
+			$ilLog->write("CRON - job ".$a_job_data["job_id"]." started");
+
+			$ilDB->manipulate("UPDATE cron_job SET".
+				" running_ts = ".$ilDB->quote(time(), "integer").
+				" , alive_ts = ".$ilDB->quote(time(), "integer").
+				" WHERE job_id = ".$ilDB->quote($a_job_data["job_id"], "text"));
+
+			$ts_in = self::getMicrotime();					
+			$result = $a_job->run();
+			$ts_dur = self::getMicrotime()-$ts_in;
+
+			// no proper result 
+			if(!$result instanceof ilCronJobResult)
+			{
+				$result = new ilCronJobResult();
+				$result->setStatus(ilCronJobResult::STATUS_CRASHED);
+				$result->setCode(ilCronJobResult::CODE_NO_RESULT);
+				$result->setMessage("Cron job did not return a proper result");
+
+				if(!$a_manual)
+				{
+					self::sendNotification($a_job, $result);
+				}
+
+				$ilLog->write("CRON - job ".$a_job_data["job_id"]." no result");
 			}
+			// no valid configuration, job won't work
+			else if($result->getStatus() == ilCronJobResult::STATUS_INVALID_CONFIGURATION)
+			{
+				self::deactivateJob($a_job);
+
+				if(!$a_manual)
+				{
+					self::sendNotification($a_job, $result);	
+				}
+
+				$ilLog->write("CRON - job ".$a_job_data["job_id"]." invalid configuration");
+			}
+			// success!
 			else
 			{
-				$ilLog->write("CRON - job ".$a_job_data["job_id"]." returned status inactive");
+				$did_run = true;
 			}
-		}		
+
+			$result->setDuration($ts_dur);
+
+			self::updateJobResult($a_job, $result, $a_manual);
+
+			$ilDB->manipulate("UPDATE cron_job SET".
+				" running_ts = ".$ilDB->quote(0, "integer").
+				" , alive_ts = ".$ilDB->quote(0, "integer").
+				" WHERE job_id = ".$ilDB->quote($a_job_data["job_id"], "text"));		
+
+			$ilLog->write("CRON - job ".$a_job_data["job_id"]." finished");
+		}
+		else
+		{
+			$ilLog->write("CRON - job ".$a_job_data["job_id"]." returned status inactive");
+		}				
 		
 		return $did_run;
 	}
@@ -558,7 +555,7 @@ class ilCronManager
 		include_once "Services/Cron/classes/class.ilCronJobResult.php";
 		$result = new ilCronJobResult();
 		$result->setStatus(ilCronJobResult::STATUS_RESET);
-		$result->setCode("job_manual_reset");
+		$result->setCode(ilCronJobResult::CODE_MANUAL_RESET);
 		$result->setMessage("Cron job re-activated by admin");		
 		self::updateJobResult($a_job, $result, true);
 				

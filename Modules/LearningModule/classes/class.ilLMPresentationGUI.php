@@ -3,7 +3,7 @@
 
 require_once("./Modules/LearningModule/classes/class.ilObjLearningModule.php");
 require_once("./Services/MainMenu/classes/class.ilMainMenuGUI.php");
-require_once("./Services/Style/classes/class.ilObjStyleSheet.php");
+require_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
 
 /**
 * Class ilLMPresentationGUI
@@ -13,7 +13,7 @@ require_once("./Services/Style/classes/class.ilObjStyleSheet.php");
 * @author Alex Killing <alex.killing@gmx.de>
 * @version $Id$
 *
-* @ilCtrl_Calls ilLMPresentationGUI: ilNoteGUI, ilInfoScreenGUI, ilShopPurchaseGUI
+* @ilCtrl_Calls ilLMPresentationGUI: ilNoteGUI, ilInfoScreenGUI
 * @ilCtrl_Calls ilLMPresentationGUI: ilLMPageGUI, ilGlossaryDefPageGUI, ilCommonActionDispatcherGUI
 * @ilCtrl_Calls ilLMPresentationGUI: ilLearningProgressGUI, ilAssGenFeedbackPageGUI
 * @ilCtrl_Calls ilLMPresentationGUI: ilRatingGUI
@@ -32,10 +32,8 @@ class ilLMPresentationGUI
 	protected $current_page_id = false;
 	protected $focus_id = 0;		// focus id is set e.g. from learning objectives course, we focus on a chapter/page
 	protected $export_all_languages = false;
-	
-	private $needs_to_be_purchased = false;
 
-	function ilLMPresentationGUI()
+	function __construct()
 	{
 		global $ilUser, $lng, $tpl, $rbacsystem, $ilCtrl, $ilAccess;
 
@@ -77,13 +75,6 @@ class ilLMPresentationGUI
 			}
 		}
 
-		if(IS_PAYMENT_ENABLED)
-		{
-			include_once 'Services/Payment/classes/class.ilPaymentObject.php';
-			$this->needs_to_be_purchased = ilPaymentObject::_requiresPurchaseToAccess((int)$this->lm->getRefId());
-		}
-		else $this->needs_to_be_purchased = false;
-
 		// check, if learning module is online
 		if (!$rbacsystem->checkAccess("write", $_GET["ref_id"]))
 		{
@@ -114,31 +105,7 @@ class ilLMPresentationGUI
 	{
 		global $ilNavigationHistory, $ilAccess, $ilias, $lng, $ilCtrl, $ilUser;
 
-		if(IS_PAYMENT_ENABLED)
-		{
-			include_once 'Services/Payment/classes/class.ilPaymentObject.php';
-			if($ilAccess->checkAccess('visible', '', $_GET['ref_id']) &&
-			   $this->needs_to_be_purchased)
-			{
-				if(!((int)$_GET['obj_id'] &&
-				   ($this->lm->getPublicAccessMode() == 'selected' && ilLMObject::_isPagePublic($_GET['obj_id'])) &&
-				   ($this->ctrl->getCmd() == 'layout' || $this->ctrl->getCmd() == '')))
-
-				{
-					unset($_GET['obj_id']);
-
-					$this->tpl->getStandardTemplate();
-					$this->ilLocator();
-
-					include_once 'Services/Payment/classes/class.ilShopPurchaseGUI.php';
-					$pp = new ilShopPurchaseGUI((int)$_GET['ref_id']);
-					$ret = $this->ctrl->forwardCommand($pp);
-					$this->tpl->show();
-					return true;
-				}
-			}
-		}
-		// check read permission, payment and parent conditions
+		// check read permission and parent conditions
 		// todo: replace all this by ilAccess call
 		if (!$ilAccess->checkAccess("read", "", $_GET["ref_id"]) &&
 			(!(($this->ctrl->getCmd() == "infoScreen" || $this->ctrl->getNextClass() == "ilinfoscreengui")
@@ -266,12 +233,6 @@ class ilLMPresentationGUI
     */
 	function export()
 	{
-		switch($this->lm->getType())
-		{
-			case "dbk":
-				$this->lm_gui->export();
-				break;
-		}
 	}
 
 	/**
@@ -908,8 +869,7 @@ class ilLMPresentationGUI
 	{
 		global $rbacsystem;
 		
-		// no sub menu for abstract of digilib book
-		if ($this->lm->getType() == "dbk" && $this->abstract)
+		if ($this->abstract)
 		{
 			return;
 		}
@@ -1034,12 +994,6 @@ class ilLMPresentationGUI
 		global $ilAccess, $ilSetting;
 		
 		
-		// no notes for abstract of digilib book
-		if ($this->lm->getType() == "dbk" && $this->abstract)
-		{
-			return;
-		}
-
 		// no notes in offline (export) mode
 		if ($this->offlineMode())
 		{
@@ -1106,7 +1060,7 @@ class ilLMPresentationGUI
 	/**
 	* locator
 	*/
-	function ilLocator()
+	function ilLocator($a_std_templ_loaded = false)
 	{
 		global $ilLocator, $tree, $ilCtrl;
 
@@ -1121,7 +1075,10 @@ class ilLMPresentationGUI
 			$a_id = $_GET["obj_id"];
 		}
 
-		$this->tpl->addBlockFile("STATUSLINE", "statusline", "tpl.statusline.html");
+		if (!$a_std_templ_loaded)
+		{
+			$this->tpl->addBlockFile("STATUSLINE", "statusline", "tpl.statusline.html");
+		}
 		
 		if (!$this->lm->cleanFrames())
 		{
@@ -1168,9 +1125,9 @@ class ilLMPresentationGUI
 					{
 						$ilLocator->addItem(
 							ilUtil::shortenText(
-								ilStructureObject::_getPresentationTitle($row["child"],
+								ilStructureObject::_getPresentationTitle($row["child"], IL_CHAPTER_TITLE,
 									$this->lm->isActiveNumbering(),
-									$this->lm_set->get("time_scheduled_page_activation"), 0, $this->lang),
+									$this->lm_set->get("time_scheduled_page_activation"), false, 0, $this->lang),
 								50,true),
 							$this->getLink($_GET["ref_id"], "layout", $row["child"], $frame_param, "StructureObject"),
 							$frame_target);
@@ -1285,7 +1242,7 @@ class ilLMPresentationGUI
 			}
 
 			// if public access get first public page in chapter
-			if(($ilUser->getId() == ANONYMOUS_USER_ID || $this->needs_to_be_purchased) &&
+			if($ilUser->getId() == ANONYMOUS_USER_ID &&
 			   $this->lm_gui->object->getPublicAccessMode() == 'selected')
 			{
 				$public = ilLMObject::_isPagePublic($page_id);
@@ -1352,11 +1309,12 @@ class ilLMPresentationGUI
 	}
 
 	/**
-	* process <ilPage> content tag
-	*
-	* @param	object		page node
-	* @param	integer		footer/header page id
-	*/
+	 * process <ilPage> content tag
+	 *
+	 * @param $a_page_node page node
+	 * @param int $a_page_id header / footer page id
+	 * @return string
+	 */
 	function ilPage(&$a_page_node, $a_page_id = 0)
 	{
 		global $ilUser, $ilHelp;
@@ -1370,7 +1328,7 @@ class ilLMPresentationGUI
 		$this->fill_on_load_code = true;
 
 		// check if page is (not) visible in public area
-		if(($ilUser->getId() == ANONYMOUS_USER_ID || $this->needs_to_be_purchased) && 
+		if($ilUser->getId() == ANONYMOUS_USER_ID && 
 		   $this->lm_gui->object->getPublicAccessMode() == 'selected')
 		{
 			$public = ilLMObject::_isPagePublic($this->getCurrentPageId());
@@ -1599,7 +1557,7 @@ class ilLMPresentationGUI
 		// read link targets
 		$link_xml = $this->getLinkXML($int_links, $this->getLayoutLinkTargets());
 		$link_xml.= $this->getLinkTargetsXML();
-//echo htmlentities($link_xml);
+
 		// get lm page object
 		$lm_pg_obj = new ilLMPageObject($this->lm, $page_id);
 		$lm_pg_obj->setLMId($this->lm->getId());
@@ -1747,7 +1705,7 @@ class ilLMPresentationGUI
 	 */
 	function basicPageGuiInit($a_page_gui)
 	{
-		include_once("./Services/Style/classes/class.ilObjStyleSheet.php");
+		include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
 		$a_page_gui->setStyleId(ilObjStyleSheet::getEffectiveContentStyleId(
 			$this->lm->getStyleSheetId(), "lm"));
 		if (!$this->offlineMode())
@@ -1921,6 +1879,10 @@ class ilLMPresentationGUI
 							$href =
 								$this->getLink($_GET["ref_id"], "layout", $target_id, $nframe, $type,
 									"append", $anc);
+							if ($lm_id == "")
+							{
+								$href = "";
+							}
 						}
 						else
 						{
@@ -2010,8 +1972,11 @@ class ilLMPresentationGUI
 				
 				$anc_par = 'Anchor="'.$anc.'"';
 
-				$link_info.="<IntLinkInfo Target=\"$target\" Type=\"$type\" ".
-					"TargetFrame=\"$targetframe\" LinkHref=\"$href\" LinkTarget=\"$ltarget\" $anc_par/>";
+				if ($href != "")
+				{
+					$link_info .= "<IntLinkInfo Target=\"$target\" Type=\"$type\" " .
+						"TargetFrame=\"$targetframe\" LinkHref=\"$href\" LinkTarget=\"$ltarget\" $anc_par/>";
+				}
 
 				// set equal link info for glossary links of target "None" and "Glossary"
 				/*
@@ -2265,7 +2230,7 @@ class ilLMPresentationGUI
 				$this->lm->getType(), $this->lm_set->get("time_scheduled_page_activation"));
 
 			if ($succ_node["obj_id"] > 0 &&
-				($ilUser->getId() == ANONYMOUS_USER_ID || $this->needs_to_be_purchased) &&
+				$ilUser->getId() == ANONYMOUS_USER_ID &&
 				( $this->lm->getPublicAccessMode() == "selected" &&
 					!ilLMObject::_isPagePublic($succ_node["obj_id"])))
 			{
@@ -2404,7 +2369,7 @@ class ilLMPresentationGUI
 				$this->lm->getType(), $this->lm_set->get("time_scheduled_page_activation"));
 
 			if ($succ_node["obj_id"] > 0 &&
-				($ilUser->getId() == ANONYMOUS_USER_ID || $this->needs_to_be_purchased) &&
+				$ilUser->getId() == ANONYMOUS_USER_ID &&
 				( $this->lm->getPublicAccessMode() == "selected" &&
 				!ilLMObject::_isPagePublic($succ_node["obj_id"])))
 			{
@@ -2451,7 +2416,7 @@ class ilLMPresentationGUI
 			$active = ilLMPage::_lookupActive($c_id,
 				$this->lm->getType(), $this->lm_set->get("time_scheduled_page_activation"));
 			if ($pre_node["obj_id"] > 0 &&
-				($ilUser->getId() == ANONYMOUS_USER_ID || $this->needs_to_be_purchased) &&
+				$ilUser->getId() == ANONYMOUS_USER_ID &&
 				($this->lm->getPublicAccessMode() == "selected" &&
 				!ilLMObject::_isPagePublic($pre_node["obj_id"])))
 			{
@@ -2520,7 +2485,7 @@ class ilLMPresentationGUI
 				$prev_target = 'target="_top" ';
 			}
 			
-			if(($ilUser->getId() == ANONYMOUS_USER_ID || $this->needs_to_be_purchased) &&
+			if($ilUser->getId() == ANONYMOUS_USER_ID &&
 			   ($this->lm->getPublicAccessMode() == 'selected' && !ilLMObject::_isPagePublic($pre_node["obj_id"])))
 			{
 				$output = $this->lng->txt("msg_page_not_public");
@@ -2577,7 +2542,7 @@ class ilLMPresentationGUI
 				$succ_target = ' target="_top" ';
 			}
 			
-			if(($ilUser->getId() == ANONYMOUS_USER_ID || $this->needs_to_be_purchased) &&
+			if($ilUser->getId() == ANONYMOUS_USER_ID &&
 			   ($this->lm->getPublicAccessMode() == 'selected' && !ilLMObject::_isPagePublic($pre_node["obj_id"])))
 			{
 				$output = $this->lng->txt("msg_page_not_public");
@@ -2750,8 +2715,10 @@ class ilLMPresentationGUI
 		}
 
 		//$this->tpl->addBlockFile("CONTENT", "content", "tpl.lm_toc.html", true);
+		//var_dump($GLOBALS["tpl"]); echo "<br><br>";
+		//exit;
 		$this->tpl->getStandardTemplate();
-		$this->ilLocator();
+		$this->ilLocator(true);
 		
 		$this->tpl->setVariable("TABS", $this->lm_gui->setilLMMenu($this->offlineMode()
 			,$this->getExportFormat(), "toc", true));
@@ -2861,7 +2828,7 @@ class ilLMPresentationGUI
 		// Full locator, if read permission is given
 		if ($ilAccess->checkAccess("read", "", $_GET["ref_id"]))
 		{
-			$this->ilLocator();
+			$this->ilLocator(true);
 		}
 		else
 		{
@@ -2970,7 +2937,7 @@ class ilLMPresentationGUI
 		$this->tpl->setVariable("TABS", $this->lm_gui->setilLMMenu($this->offlineMode()
 			,$this->getExportFormat(), "print", true));
 			
-		$this->ilLocator();
+		$this->ilLocator(true);
 		$this->tpl->addBlockFile("ADM_CONTENT", "adm_content",
 			"tpl.lm_print_selection.html", "Modules/LearningModule");
 
@@ -3028,7 +2995,7 @@ class ilLMPresentationGUI
 						$this->lm->getPageHeader(), $this->lm->isActiveNumbering(),
 						$this->lm_set->get("time_scheduled_page_activation"), false, 0, $this->lang);
 					
-					if(($ilUser->getId() == ANONYMOUS_USER_ID || $this->needs_to_be_purchased)&&
+					if($ilUser->getId() == ANONYMOUS_USER_ID &&
 					   $this->lm_gui->object->getPublicAccessMode() == "selected")
 					{
 						if (!ilLMObject::_isPagePublic($node["obj_id"]))
@@ -3051,10 +3018,10 @@ class ilLMPresentationGUI
 				// chapter
 				case "st":
 					$text =
-						ilStructureObject::_getPresentationTitle($node["obj_id"],
+						ilStructureObject::_getPresentationTitle($node["obj_id"], IL_CHAPTER_TITLE,
 							$this->lm->isActiveNumbering(),
-							$this->lm_set->get("time_scheduled_page_activation"), 0, $this->lang);
-					if(($ilUser->getId() == ANONYMOUS_USER_ID || $this->needs_to_be_purchased) && 
+							$this->lm_set->get("time_scheduled_page_activation"), false, 0, $this->lang);
+					if($ilUser->getId() == ANONYMOUS_USER_ID && 
 					   $this->lm_gui->object->getPublicAccessMode() == "selected")
 					{
 						if (!ilLMObject::_isPagePublic($node["obj_id"]))
@@ -3086,7 +3053,7 @@ class ilLMPresentationGUI
 				$this->lm->getPageHeader(), $this->lm->isActiveNumbering(),
 				$this->lm_set->get("time_scheduled_page_activation"), false, 0, $this->lang);
 			
-			if(($ilUser->getId() == ANONYMOUS_USER_ID || $this->needs_to_be_purchased) &&
+			if($ilUser->getId() == ANONYMOUS_USER_ID &&
 			   $this->lm_gui->object->getPublicAccessMode() == "selected")
 			{
 				if (!ilLMObject::_isPagePublic($_GET["obj_id"]))
@@ -3245,7 +3212,7 @@ class ilLMPresentationGUI
 			if (ilLMObject::_exists($this->lm->getFooterPage()))
 			{
 				$page_object_gui = $this->getLMPageGUI($this->lm->getFooterPage());
-				include_once("./Services/Style/classes/class.ilObjStyleSheet.php");
+				include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
 				$page_object_gui->setStyleId(ilObjStyleSheet::getEffectiveContentStyleId(
 					$this->lm->getStyleSheetId(), "lm"));
 
@@ -3265,7 +3232,7 @@ class ilLMPresentationGUI
 			if (ilLMObject::_exists($this->lm->getHeaderPage()))
 			{
 				$page_object_gui = $this->getLMPageGUI($this->lm->getHeaderPage());
-				include_once("./Services/Style/classes/class.ilObjStyleSheet.php");
+				include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
 				$page_object_gui->setStyleId(ilObjStyleSheet::getEffectiveContentStyleId(
 					$this->lm->getStyleSheetId(), "lm"));
 
@@ -3339,7 +3306,7 @@ class ilLMPresentationGUI
 				// output chapter title
 				if ($node["type"] == "st")
 				{
-					if(($ilUser->getId() == ANONYMOUS_USER_ID || $this->needs_to_be_purchased) && 
+					if($ilUser->getId() == ANONYMOUS_USER_ID && 
 					   $this->lm_gui->object->getPublicAccessMode() == "selected")
 					{
 						if (!ilLMObject::_isPagePublic($node["obj_id"]))
@@ -3375,7 +3342,7 @@ class ilLMPresentationGUI
 				// output page
 				if ($node["type"] == "pg")
 				{
-					if(($ilUser->getId() == ANONYMOUS_USER_ID || $this->needs_to_be_purchased) &&
+					if($ilUser->getId() == ANONYMOUS_USER_ID &&
 					   $this->lm_gui->object->getPublicAccessMode() == "selected")
 					{
 						if (!ilLMObject::_isPagePublic($node["obj_id"]))
@@ -3390,7 +3357,7 @@ class ilLMPresentationGUI
 					$page_id = $node["obj_id"];
 					$page_object_gui = $this->getLMPageGUI($page_id);
 					$page_object = $page_object_gui->getPageObject();
-					include_once("./Services/Style/classes/class.ilObjStyleSheet.php");
+					include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
 					$page_object_gui->setStyleId(ilObjStyleSheet::getEffectiveContentStyleId(
 						$this->lm->getStyleSheetId(), "lm"));
 
@@ -3669,9 +3636,9 @@ class ilLMPresentationGUI
 					}
 					$this->tpl->setCurrentBlock("toc_entry");
 					$this->tpl->setVariable("TXT_TOC_TITLE",
-						ilStructureObject::_getPresentationTitle($node2["obj_id"],
+						ilStructureObject::_getPresentationTitle($node2["obj_id"], IL_CHAPTER_TITLE,
 							$this->lm->isActiveNumbering(),
-							$this->lm_set->get("time_scheduled_page_activation"), 0, $this->lang));
+							$this->lm_set->get("time_scheduled_page_activation"), false, 0, $this->lang));
 					$this->tpl->parseCurrentBlock();
 				}
 			}
@@ -3798,7 +3765,7 @@ class ilLMPresentationGUI
 		$this->tpl->setVariable("TABS", $this->lm_gui->setilLMMenu($this->offlineMode()
 			,$this->getExportFormat(), "download", true));
 
-		$this->ilLocator();
+		$this->ilLocator(true);
 		//$this->tpl->stopTitleFloating();
 		$this->tpl->addBlockFile("ADM_CONTENT", "adm_content", "tpl.lm_download_list.html", "Modules/LearningModule");
 
@@ -3832,107 +3799,10 @@ class ilLMPresentationGUI
 			}
 		}
 
-		// create table
-		require_once("./Services/Table/classes/class.ilTableGUI.php");
-		$tbl = new ilTableGUI();
 
-		// load files templates
-		$this->tpl->addBlockfile("DOWNLOAD_TABLE", "download_table", "tpl.table.html");
-
-		// load template for table content data
-		$this->tpl->addBlockfile("TBL_CONTENT", "tbl_content", "tpl.download_file_row.html", "Modules/LearningModule");
-
-		$export_files = array();
-		$types = array("xml", "html", "scorm");
-		foreach($types as $type)
-		{
-			if ($this->lm->getPublicExportFile($type) != "")
-			{
-				if (is_file($this->lm->getExportDirectory($type)."/".
-					$this->lm->getPublicExportFile($type)))
-				{
-					$dir = $this->lm->getExportDirectory($type);
-					$size = filesize($this->lm->getExportDirectory($type)."/".
-						$this->lm->getPublicExportFile($type));
-					$export_files[] = array("type" => $type,
-						"file" => $this->lm->getPublicExportFile($type),
-						"size" => $size);
-				}
-			}
-		}
-		
-		$num = 0;
-		
-		$tbl->setTitle($this->lng->txt("download"));
-
-		$tbl->setHeaderNames(array($this->lng->txt("cont_format"),
-			$this->lng->txt("cont_file"),
-			$this->lng->txt("size"), $this->lng->txt("date"),
-			""));
-
-		$cols = array("format", "file", "size", "date", "download");
-		$header_params = array("ref_id" => $_GET["ref_id"], "obj_id" => $_GET["obj_id"],
-			"cmd" => "showDownloadList", "cmdClass" => strtolower(get_class($this)));
-		$tbl->setHeaderVars($cols, $header_params);
-		$tbl->setColumnWidth(array("10%", "30%", "20%", "20%","20%"));
-		$tbl->disable("sort");
-
-		// control
-		$tbl->setOrderColumn($_GET["sort_by"]);
-		$tbl->setOrderDirection($_GET["sort_order"]);
-		$tbl->setLimit($_GET["limit"]);
-		$tbl->setOffset($_GET["offset"]);
-		$tbl->setMaxCount($this->maxcount);		// ???
-
-		//$this->tpl->setVariable("COLUMN_COUNTS", 5);
-
-		// footer
-		//$tbl->setFooter("tblfooter",$this->lng->txt("previous"),$this->lng->txt("next"));
-		$tbl->disable("footer");
-
-		$tbl->setMaxCount(count($export_files));
-		$export_files = array_slice($export_files, $_GET["offset"], $_GET["limit"]);
-
-		if(count($export_files) > 0)
-		{
-			$tbl->render();
-			$i=0;
-			foreach($export_files as $exp_file)
-			{
-				if (!$exp_file["size"] > 0)
-				{
-					continue;
-				}
-				
-				$this->tpl->setCurrentBlock("tbl_content");
-				$this->tpl->setVariable("TXT_FILENAME", $exp_file["file"]);
-
-				$css_row = ilUtil::switchColor($i++, "tblrow1", "tblrow2");
-				$this->tpl->setVariable("CSS_ROW", $css_row);
-
-				include_once("./Services/Utilities/classes/class.ilFormat.php");
-				$this->tpl->setVariable("TXT_SIZE", ilFormat::formatSize($exp_file["size"]));
-				$this->tpl->setVariable("TXT_FORMAT", strtoupper($exp_file["type"]));
-				$this->tpl->setVariable("CHECKBOX_ID", $exp_file["type"].":".$exp_file["file"]);
-
-				$file_arr = explode("__", $exp_file["file"]);
-				include_once("./Services/Calendar/classes/class.ilDatePresentation.php");
-				ilDatePresentation::setUseRelativeDates(false);
-				$this->tpl->setVariable("TXT_DATE", ilDatePresentation::formatDate(new ilDateTime($file_arr[0], IL_CAL_UNIX)));
-
-				$this->tpl->setVariable("TXT_DOWNLOAD", $this->lng->txt("download"));
-				$this->ctrl->setParameter($this, "type", $exp_file["type"]);
-				$this->tpl->setVariable("LINK_DOWNLOAD",
-					$this->ctrl->getLinkTarget($this, "downloadExportFile"));
-
-				$this->tpl->parseCurrentBlock();
-			}
-		} //if is_array
-		else
-		{
-			ilUtil::sendInfo($this->lng->txt("lm_no_download_files"));
-		}
-
+		include_once("./Modules/LearningModule/classes/class.ilLMDownloadTableGUI.php");
+		$download_table = new ilLMDownloadTableGUI($this, "showDownloadList", $this->lm);
+		$this->tpl->setVariable("DOWNLOAD_TABLE", $download_table->getHTML());
 		$this->tpl->show();
 	}
 
@@ -3947,8 +3817,10 @@ class ilLMPresentationGUI
 			return;
 		}
 
-		$file = $this->lm->getPublicExportFile($_GET["type"]);
-		if ($this->lm->getPublicExportFile($_GET["type"]) != "")
+		$base_type = explode("_", $_GET["type"]);
+		$base_type = $base_type[0];
+		$file = $this->lm->getPublicExportFile($base_type);
+		if ($this->lm->getPublicExportFile($base_type) != "")
 		{
 			$dir = $this->lm->getExportDirectory($_GET["type"]);
 			if (is_file($dir."/".$file))

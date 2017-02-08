@@ -31,11 +31,9 @@ if (
 	// Load all the IILIAS stuff
 	require_once "include/inc.header.php";
 	
-	global $ilAuth;
-	
 	// Logout out user from application
 	// Destroy application session/cookie etc
-	$ilAuth->logout();
+	$GLOBALS['DIC']['ilAuthSession']->logout();
 	
 	// Finally, send user to the return URL
 	ilUtil::redirect($_GET['return']);
@@ -150,7 +148,7 @@ function LogoutNotification($SessionID){
 	$q = "SELECT session_id, data FROM usr_session WHERE expires > 'NOW()'";
 	$r = $ilDB->query($q);
 	
-	while($session_entry = $r->fetchRow(DB_FETCHMODE_ASSOC)){
+	while($session_entry = $r->fetchRow(ilDBConstants::FETCHMODE_ASSOC)){
 		
 		$user_session = unserializesession($session_entry['data']);
 		

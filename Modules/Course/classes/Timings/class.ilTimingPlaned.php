@@ -37,7 +37,12 @@ class ilTimingPlaned
 	var $ilDB;
 	var $lng;
 
-	function ilTimingPlaned($item_id,$a_usr_id)
+	/**
+	 * Constructor
+	 * @param int $item_id
+	 * @param int $a_usr_id
+	 */
+	public function __construct($item_id,$a_usr_id)
 	{
 		global $ilErr,$ilDB,$lng,$tree;
 
@@ -115,7 +120,7 @@ class ilTimingPlaned
 		return ilTimingPlaned::_delete($this->getItemId(),$this->getUserId());
 	}
 
-	function _delete($a_item_id,$a_usr_id)
+	public static function _delete($a_item_id,$a_usr_id)
 	{
 		global $ilDB;
 
@@ -126,7 +131,7 @@ class ilTimingPlaned
 	}
 
 	// Static
-	function _getPlanedTimings($a_usr_id,$a_item_id)
+	public static function _getPlanedTimings($a_usr_id,$a_item_id)
 	{
 		global $ilDB;
 
@@ -134,7 +139,7 @@ class ilTimingPlaned
 			"WHERE item_id = ".$ilDB->quote($a_item_id ,'integer')." ".
 			"AND usr_id = ".$ilDB->quote($a_usr_id ,'integer')." ";
 		$res = $ilDB->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$data['planed_start'] = $row->planed_start;
 			$data['planed_end'] = $row->planed_end;
@@ -143,14 +148,14 @@ class ilTimingPlaned
 	}
 
 
-	function _getPlanedTimingsByItem($a_item_id)
+	static function _getPlanedTimingsByItem($a_item_id)
 	{
 		global $ilDB;
 
 		$query = "SELECT * FROM crs_timings_planed ".
 			"WHERE item_id = ".$ilDB->quote($a_item_id ,'integer')." ";
 		$res = $ilDB->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$data[$row->usr_id]['start'] = $row->planed_start;
 			$data[$row->usr_id]['end']   = $row->planed_end;
@@ -158,7 +163,7 @@ class ilTimingPlaned
 		return $data ? $data : array();
 	}
 
-	function _deleteByItem($a_item_id)
+	public static function _deleteByItem($a_item_id)
 	{
 		global $ilDB;
 
@@ -167,7 +172,7 @@ class ilTimingPlaned
 		$res = $ilDB->manipulate($query);
 	}
 
-	function _deleteByUser($a_usr_id)
+	public static function _deleteByUser($a_usr_id)
 	{
 		global $ilDB;
 
@@ -184,7 +189,7 @@ class ilTimingPlaned
 			"WHERE item_id = ".$ilDB->quote($this->getItemId() ,'integer')." ".
 			"AND usr_id = ".$ilDB->quote($this->getUserId() ,'integer')." ";
 		$res = $this->db->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$this->setPlanedStartingTime($row->planed_start);
 			$this->setPlanedEndingTime($row->planed_end);

@@ -15,11 +15,7 @@ include_once("./Services/Object/classes/class.ilObjectAccess.php");
 class ilObjFolderAccess extends ilObjectAccess
 {
     private static $folderSettings; 
-    
-    function _construct () {
-        parent::__construct();
-    }
-    
+
     private static function getFolderSettings() {
         if (is_null (ilObjFolderAccess::$folderSettings))
         {
@@ -41,7 +37,7 @@ class ilObjFolderAccess extends ilObjectAccess
 	 *		array("permission" => "write", "cmd" => "edit", "lang_var" => "edit"),
 	 *	);
 	 */
-	function _getCommands()
+	static function _getCommands()
 	{
 		$commands = array();
 		$commands[] = array("permission" => "read", "cmd" => "view", "lang_var" => "show", "default" => true);
@@ -62,7 +58,7 @@ class ilObjFolderAccess extends ilObjectAccess
 		//$commands[] = array("permission" => "read", "cmd" => "showSummary", "lang_var" => "info_short", "enable_anonymous" => "false");
 		if (ilObjFolderAccess::hasDownloadAction($_GET["ref_id"]))
 		{
-		    $commands[] = array("permission" => "read", "cmd" => "downloadFolder", "lang_var" => "download", "enable_anonymous" => "false");
+		    $commands[] = array("permission" => "read", "cmd" => "downloadFolder", "lang_var" => "download"); // #18805
 		}
 		// BEGIN WebDAV: Mount Webfolder.
 		include_once ('Services/WebDAV/classes/class.ilDAVActivationChecker.php');
@@ -85,7 +81,7 @@ class ilObjFolderAccess extends ilObjectAccess
 	}
 
 	
-	private function hasDownloadAction ($ref_id)
+	private static function hasDownloadAction ($ref_id)
 	{
 	    global $tree, $ilUser;
 	    $settings = ilObjFolderAccess::getFolderSettings();
@@ -96,6 +92,7 @@ class ilObjFolderAccess extends ilObjectAccess
 	    /*
 	     * deactivated check for now, because wrong ref_id here!
 	     
+		 * 
 	    $children = $tree->getChildsByTypeFilter($ref_id, array("file","fold"));
 
 	    // no children at all, so no download button

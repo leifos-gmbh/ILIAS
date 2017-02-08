@@ -25,19 +25,15 @@
 * Class ilLearningProgress
 *
 * @author Stefan Meyer <meyer@leifos.com>
-*
 * @version $Id$
-*
-* @extends ilObjectGUI
 * @package ilias-core
-*
 */
 
 class ilLearningProgress
 {
 	var $db = null;
 
-	function ilLearningProgress()
+	function __construct()
 	{
 		global $ilDB;
 		
@@ -46,9 +42,7 @@ class ilLearningProgress
 
 	// Static
 	static function _tracProgress($a_user_id, $a_obj_id, $a_ref_id, $a_obj_type = '')
-	{
-		global $ilDB;
-
+	{		
 		require_once('Services/Tracking/classes/class.ilChangeEvent.php');
 		ilChangeEvent::_recordReadEvent($a_obj_type, $a_ref_id, $a_obj_id, $a_user_id);
 		
@@ -58,7 +52,7 @@ class ilLearningProgress
 		return true;
 	}
 
-	function _getProgress($a_user_id,$a_obj_id)
+	static function _getProgress($a_user_id,$a_obj_id)
 	{
 		require_once 'Services/Tracking/classes/class.ilChangeEvent.php';
 		$events = ilChangeEvent::_lookupReadEvents($a_obj_id, $a_user_id);

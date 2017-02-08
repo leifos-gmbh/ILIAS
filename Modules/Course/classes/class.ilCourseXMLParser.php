@@ -50,21 +50,21 @@ class ilCourseXMLParser extends ilMDSaxParser implements ilSaxSubsetParser
 	/**
 	* Constructor
 	*
-	* @param	object		$a_content_object	must be of type ilObjContentObject
+	* @param	ilObject		$a_content_object	must be of type ilObjContentObject
 	*											ilObjTest or ilObjQuestionPool
 	* @param	string		$a_xml_file			xml file
 	* @param	string		$a_subdir			subdirectory in import directory
 	* @access	public
 	*/
-	function ilCourseXMLParser($a_course_obj, $a_xml_file = '')
+	public function __construct($a_course_obj, $a_xml_file = '')
 	{
 		global $lng,$ilLog;
 
-		parent::ilMDSaxParser($a_xml_file);
+		parent::__construct($a_xml_file);
 
 		$this->sax_controller = new ilSaxController();
 
-		$this->log =& $ilLog;
+		$this->log = $ilLog;
 
 		$this->course_obj = $a_course_obj;
 		$this->course_members = ilCourseParticipants::_getInstanceByObjId($this->course_obj->getId());
@@ -75,7 +75,7 @@ class ilCourseXMLParser extends ilMDSaxParser implements ilSaxSubsetParser
 		$this->md_obj = new ilMD($this->course_obj->getId(),0,'crs');
 		$this->setMDObject($this->md_obj);
 
-		$this->lng =& $lng;
+		$this->lng = $lng;
 	}
 
 	/**
@@ -288,27 +288,6 @@ class ilCourseXMLParser extends ilMDSaxParser implements ilSaxSubsetParser
 				$this->course_obj->setOrderType(
 					ilContainerSortingSettings::getInstanceByObjId($this->course_obj->getId())->getSortMode()
 				);
-				break;
-
-
-			case 'Archive':
-				$this->in_archive = true;
-				switch($a_attribs['Access'])
-				{
-					case 'Disabled':
-						$this->course_obj->setArchiveType(IL_CRS_ARCHIVE_NONE);
-						break;
-
-					case 'Read':
-						$this->course_obj->setArchiveType(IL_CRS_ARCHIVE_NONE);
-						#$this->course_obj->setViewMode(IL_CRS_VIEW_ARCHIVE);
-						break;
-
-					case 'Download':
-						#$this->course_obj->setViewMode(IL_CRS_VIEW_ARCHIVE);
-						$this->course_obj->setArchiveType(IL_CRS_ARCHIVE_DOWNLOAD);
-						break;
-				}
 				break;
 
 			case 'Disabled':
@@ -573,9 +552,6 @@ class ilCourseXMLParser extends ilMDSaxParser implements ilSaxSubsetParser
 				$this->in_registration = false;
 				break;
 
-			case 'Archive':
-				$this->in_archive = false;
-				break;
 
 			case 'Start':
 				if($this->in_availability)
@@ -585,10 +561,6 @@ class ilCourseXMLParser extends ilMDSaxParser implements ilSaxSubsetParser
 				if($this->in_registration)
 				{
 					$this->course_obj->setSubscriptionStart(trim($this->cdata));
-				}
-				if($this->in_archive)
-				{
-					$this->course_obj->setArchiveStart(trim($this->cdata));
 				}
 				if($this->in_period)
 				{
@@ -608,10 +580,6 @@ class ilCourseXMLParser extends ilMDSaxParser implements ilSaxSubsetParser
 				{
 					$this->course_obj->setSubscriptionEnd(trim($this->cdata));
 				}
-				if($this->in_archive)
-				{
-					$this->course_obj->setArchiveEnd(trim($this->cdata));
-				}
 				if($this->in_period)
 				{
 					if((int)$this->cdata)
@@ -628,6 +596,10 @@ class ilCourseXMLParser extends ilMDSaxParser implements ilSaxSubsetParser
 
 			case 'ImportantInformation':
 				$this->course_obj->setImportantInformation(trim($this->cdata));
+				break;
+			
+			case 'ViewMode':
+				$this->course_obj->setViewMode(trim($this->cdata));
 				break;
 
 			case 'Name':

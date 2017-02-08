@@ -43,6 +43,11 @@ class ilBuddyList
 	protected $relations_read = false;
 
 	/**
+	 * @var ilAppEventHandler
+	 */
+	protected $event_handler;
+
+	/**
 	 * @param int $usr_id
 	 * @return self
 	 * @throws ilBuddySystemException
@@ -68,12 +73,9 @@ class ilBuddyList
 	 */
 	public static function getInstanceByGlobalUser()
 	{
-		/**
-		 * @var $ilUser ilObjUser
-		 */
-		global $ilUser;
+		global $DIC;
 
-		return self::getInstanceByUserId($ilUser->getId());
+		return self::getInstanceByUserId($DIC->user()->getId());
 	}
 
 	/**
@@ -81,8 +83,12 @@ class ilBuddyList
 	 */
 	protected function __construct($owner_id)
 	{
+		global $DIC;
+
 		$this->setOwnerId($owner_id);
 		$this->setRepository(new ilBuddySystemRelationRepository($this->getOwnerId()));
+
+		$this->event_handler = $DIC['ilAppEventHandler'];
 	}
 
 	/**
@@ -312,18 +318,24 @@ class ilBuddyList
 	{
 		try
 		{
-			$relation->link();
-			$this->getRepository()->save($relation);
-			$this->getRelations()->set($this->getRelationTargetUserId($relation), $relation);
-		}
-		catch(ilBuddySystemException $e)
-		{
 			if($relation->isLinked())
 			{
 				require_once 'Services/Contact/BuddySystem/exceptions/class.ilBuddySystemRelationStateAlreadyGivenException.php';
 				throw new ilBuddySystemRelationStateAlreadyGivenException('buddy_bs_action_already_linked');
 			}
 
+			if($this->getOwnerId() == $relation->getUserId())
+			{
+				throw new ilBuddySystemException("You can only accept a request when you are not the initiator");
+			}
+
+			$relation->link();
+
+			$this->getRepository()->save($relation);
+			$this->getRelations()->set($this->getRelationTargetUserId($relation), $relation);
+		}
+		catch(ilBuddySystemRelationStateException $e)
+		{
 			throw $e;
 		}
 
@@ -391,7 +403,7 @@ class ilBuddyList
 			throw $e;
 		}
 
-		$GLOBALS['ilAppEventHandler']->raise(
+		$this->event_handler->raise(
 			'Services/Contact',
 			'contactRequested',
 			array(
@@ -409,14 +421,21 @@ class ilBuddyList
 	 */
 	public function ignore(ilBuddySystemRelation $relation)
 	{
-		if($this->getOwnerId() == $relation->getUserId())
-		{
-			throw new ilBuddySystemException("You can only ignore a request when you are not the initiator %s");
-		}
-
 		try
 		{
+			if($relation->isLinked())
+			{
+				require_once 'Services/Contact/BuddySystem/exceptions/class.ilBuddySystemRelationStateTransitionException.php';
+				throw new ilBuddySystemRelationStateTransitionException('buddy_bs_action_already_linked');
+			}
+
+			if($this->getOwnerId() == $relation->getUserId())
+			{
+				throw new ilBuddySystemException("You can only ignore a request when you are not the initiator");
+			}
+
 			$relation->ignore();
+
 			$this->getRepository()->save($relation);
 			$this->getRelations()->set($this->getRelationTargetUserId($relation), $relation);
 		}

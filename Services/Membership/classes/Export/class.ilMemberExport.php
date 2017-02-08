@@ -49,6 +49,9 @@ class ilMemberExport
 	private $obj_id;
 	private $type;
 	private $members;
+	private $groups = array();
+	private $groups_participants = array();
+	private $groups_rights = array();
 	
 	private $lng;
 	
@@ -82,6 +85,7 @@ class ilMemberExport
 		$this->type = ilObject::_lookupType($this->obj_id);
 		
 		$this->initMembers();
+		$this->initGroups();
 		 	
 		$this->agreement = ilMemberAgreement::_readByObjId($this->obj_id);
 	 	$this->settings = new ilUserFormSettings('memexp');
@@ -185,13 +189,13 @@ class ilMemberExport
 	 */
 	public function createExcel()
 	{
-		include_once "./Services/Excel/classes/class.ilExcelUtils.php";
-		include_once "./Services/Excel/classes/class.ilExcelWriterAdapter.php";
-		$adapter = new ilExcelWriterAdapter($this->getFilename(), false);
-		$workbook = $adapter->getWorkbook();
-		$this->worksheet = $workbook->addWorksheet();
+		include_once "./Services/Excel/classes/class.ilExcel.php";
+		$this->worksheet = new ilExcel();
+		$this->worksheet->addSheet($this->lng->txt("members"));
+		
 		$this->write();
-		$workbook->close();
+		
+		$this->worksheet->writeToFile($this->getFilename());	
 	}
 	
 	/**
@@ -226,7 +230,7 @@ class ilMemberExport
 				break;
 				
 			case self::EXPORT_EXCEL:
-				$this->worksheet->write($a_row,$a_col,$a_value);
+				$this->worksheet->setCell($a_row+1,$a_col,$a_value);
 				break;
 		}
 	}
@@ -296,7 +300,12 @@ class ilMemberExport
 			{
 				$fields[] = 'cdf_'.$field_obj->getId();
 			}
-		}	 	
+		}
+		if($this->settings->enabled('group_memberships'))
+		{
+			$fields[] = 'crs_members_groups';
+		}
+
 	 	return $fields ? $fields : array();
 	}
 	
@@ -324,6 +333,10 @@ class ilMemberExport
 				case 'consultation_hour':
 					$this->lng->loadLanguageModule('dateplaner');
 					$this->addCol($this->lng->txt('cal_ch_field_ch'), $row, $col++);
+					break;
+				
+				case 'org_units':
+					$this->addCol($this->lng->txt('org_units'), $row, $col++);
 					break;
 				
 				default:
@@ -425,8 +438,9 @@ class ilMemberExport
 						{
 							if($this->agreement[$usr_id]['accepted'])
 							{
-								#$this->csv->addColumn(ilFormat::formatUnixTime($this->agreement[$usr_id]['acceptance_time'],true));
-								$this->addCol(ilFormat::formatUnixTime($this->agreement[$usr_id]['acceptance_time'],true),$row,$col++);
+								#$this->csv->addColumn(il-Format::format-Unix-Time($this->agreement[$usr_id]['acceptance_time'],true));
+								$dt = new ilDateTime($this->agreement[$usr_id]['acceptance_time'], IL_CAL_UNIX);
+								$this->addCol($dt->get(IL_CAL_DATETIME),$row,$col++);
 							}
 							else
 							{
@@ -474,7 +488,24 @@ class ilMemberExport
 						$uts_str = implode(',',$uts);
 						$this->addCol($uts_str, $row, $col++);
 						break;
-											
+					case 'crs_members_groups':
+						$groups = array();
+
+						foreach(array_keys($this->groups) as $grp_ref)
+						{
+							if(in_array($usr_id, $this->groups_participants[$grp_ref])
+								&& $this->groups_rights[$grp_ref])
+							{
+								$groups[] = $this->groups[$grp_ref];
+							}
+						}
+						$this->addCol(implode(", ", $groups), $row, $col++);
+						break;
+						
+					case 'org_units':
+						$this->addCol(ilObjUser::lookupOrgUnitsRepresentation($usr_id), $row, $col++);
+						break;
+						
 					default:
 						// Check aggreement
 						if(!$this->privacy->courseConfirmationRequired() or $this->agreement[$usr_id]['accepted'])
@@ -658,6 +689,35 @@ class ilMemberExport
 			$this->members = ilGroupParticipants::_getInstanceByObjId($this->getObjId());
 		}
 		return true;
+	}
+
+	protected function initGroups()
+	{
+		global $tree, $ilAccess;
+		$parent_node = $tree->getNodeData($this->ref_id);
+		$groups = $tree->getSubTree($parent_node, true, "grp");
+		if(is_array($groups) && sizeof($groups))
+		{
+			include_once('./Modules/Group/classes/class.ilGroupParticipants.php');
+			$this->groups_rights = array();
+			foreach($groups as $idx => $group_data)
+			{
+				// check for group in group
+				if($group_data["parent"] != $this->ref_id  && $tree->checkForParentType($group_data["ref_id"], "grp",true))
+				{
+					unset($groups[$idx]);
+				}
+				else
+				{
+					$this->groups[$group_data["ref_id"]] = $group_data["title"];
+					//TODO: change permissions from write to manage_members plus "|| ilObjGroup->getShowMembers()"----- uncomment below; testing required
+					//$obj = new ilObjGroup($group_data["ref_id"], true);
+					$this->groups_rights[$group_data["ref_id"]] = (bool)$ilAccess->checkAccess("write", "", $group_data["ref_id"])/* || $obj->getShowMembers()*/;
+					$gobj = ilGroupParticipants::_getInstanceByObjId($group_data["obj_id"]);
+					$this->groups_participants[$group_data["ref_id"]] = $gobj->getParticipants();
+				}
+			}
+		}
 	}
 }
 

@@ -20,11 +20,11 @@ form.form-inline {
 }
 
 .form-horizontal .form-group {
-	margin: 10px 0px;
+	margin: 10px 0;
 }
 
 .form-control, .form-control:focus {
-	box-shadow: 0 0 0;
+	.box-shadow(none);
 }
 
 .form-horizontal input.form-control, .form-horizontal textarea.form-control,
@@ -111,7 +111,7 @@ input[type="file"].form-control {
 }
 
 .ilFormFooter {
-	padding: 3px 0px;
+	padding: 3px 0;
 }
 
 .ilFormFooter .ilFormCmds {
@@ -125,7 +125,7 @@ input[type="file"].form-control {
 
 /* jQuery ui autocomplete menu */
 input.ilHFormHighlighted, .ui-state-focus {
-	background-color: #FF9;
+	background-color: #ff9;
 }
 
 div.ilFormExternalSetting {
@@ -143,7 +143,7 @@ div.ilFormExternalSetting ul {
 }
 
 div.ilFormExternalSetting span {
-	color: #C08030;
+	color: #c08030;
 	/* font-style: italic; */
 }
 
@@ -155,15 +155,15 @@ div[id^="ilFormField"] {
 div.ilHFormHeader, div.ilHFormFooter {
 	color: darken(@ilFormColor, 20%);
 	background-color: @body-bg;
-	padding: 4px 0px 4px 22px;
+	padding: 4px 0 4px 22px;
 }
 
 [dir="rtl"] div.ilHFormHeader, [dir="rtl"] div.ilHFormFooter {
-	padding: 4px 22px 4px 0px;
+	padding: 4px 22px 4px 0;
 }
 
 div.ilHFormContent {
-	padding: 20px 0px;
+	padding: 20px 0;
 }
 
 div.ilHFormItem {
@@ -184,7 +184,7 @@ div.ilHFormHeader .ilFormCmds, div.ilHFormFooter .ilFormCmds {
 
 .ilHFormExpIcon, .ilHFormCheckbox, .ilHFormIcon {
 	min-width: 20px;
-	padding: 0 0px;
+	padding: 0;
 }
 
 .ilHFormItemCmd {
@@ -205,7 +205,7 @@ div.ilHFormHeader .ilFormCmds, div.ilHFormFooter .ilFormCmds {
 }
 
 .ilHFormDropArea {
-	margin: 6px 0px;
+	margin: 6px 0;
 	width: auto;
 }
 
@@ -213,3 +213,45 @@ div.ilHFormHeader .ilFormCmds, div.ilHFormFooter .ilFormCmds {
 div.ilFormInfo {
 }
 
+
+/* experimental: bootstrap'ed file upload */
+.btn-file {
+	position: relative;
+	overflow: hidden;
+}
+.btn-file input[type=file] {
+	position: absolute;
+	top: 0;
+	right: 0;
+	min-width: 100%;
+	min-height: 100%;
+	font-size: 100px;
+	text-align: right;
+	filter: alpha(opacity=0);
+	opacity: 0;
+	outline: none;
+	background: white;
+	cursor: inherit;
+	display: block;
+}
+
+.ilFormInnerCol {
+	padding: 0;
+}
+
+.ilFormInnerCol .form-group {
+	margin: 0;
+}
+
+input:invalid {
+	background-color: #ffebeb;
+	border-color: #d08080;
+}
+
+.il_non_editable_value {
+	padding-top: 4px;
+}
+
+.bootstrap-datetimepicker-widget {
+	z-index: 2000;
+}

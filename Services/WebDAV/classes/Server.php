@@ -105,7 +105,7 @@ class HTTP_WebDAV_Server
      *
      * @param void
      */
-    function HTTP_WebDAV_Server() 
+    private function __construct() 
     {
         // PHP messages destroy XML output -> switch them off
         //ini_set("display_errors", 0);
@@ -183,7 +183,7 @@ class HTTP_WebDAV_Server
         // detect requested method names
         $method = strtolower($_SERVER["REQUEST_METHOD"]);
         $wrapper = "http_".$method;
-		
+	
 		$this->writelog(__METHOD__.': Using request method: '.$method);
         
         // activate HEAD emulation by GET if no HEAD method found
@@ -1160,10 +1160,6 @@ class HTTP_WebDAV_Server
                     echo "The service does not support content MD5 checksum verification"; 
                     return;
 
-                case 'HTTP_CONTENT_LENGTH':
-                    // defined on IIS and has the same value as CONTENT_LENGTH
-                    break;
-
                 default: 
                     // any other unknown Content-* headers
                     $this->http_status("501 not implemented"); 
@@ -2015,29 +2011,15 @@ class HTTP_WebDAV_Server
          */
 	private function writelog($message) 
 	{
-		global $log, $ilUser;
+		global $DIC;
+		$log = $DIC['log'];
+		$ilUser = $DIC['ilUser'];
 		
 		$log->write(
 			$ilUser->getLogin()
 			.' DAV Server.'.str_replace("\n",";",$message)
 		);
-		/*
-		if ($this->logFile) 
-		{
-			$fh = fopen($this->logFile, 'a');
-			fwrite($fh, date('Y-m-d h:i:s '));
-			fwrite($fh, str_replace("\n",";",$message));
-			fwrite($fh, "\n\n");
-			fclose($fh);		
-		}*/
 	}
 // END PATCH WebDAV
-} 
-
-  /*
-   * Local variables:
-   * tab-width: 4
-   * c-basic-offset: 4
-   * End:
-   */
+}
 ?>

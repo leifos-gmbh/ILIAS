@@ -30,9 +30,13 @@ class ilFeedWriter
 	var $ch_link = "";
 	var $ch_description = "";
 	var $items = array();
-	
-	function ilFeedWriter()
+
+	/**
+	 * ilFeedWriter constructor.
+	 */
+	function __construct()
 	{
+
 	}
 	
 	/**

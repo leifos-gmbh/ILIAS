@@ -32,13 +32,6 @@ include_once 'class.ilMDBase.php';
 
 class ilMDTaxonPath extends ilMDBase
 {
-	function ilMDTaxonPath($a_rbac_id = 0,$a_obj_id = 0,$a_obj_type = '')
-	{
-		parent::ilMDBase($a_rbac_id,
-						 $a_obj_id,
-						 $a_obj_type);
-	}
-
 	// METHODS OF CHILD OBJECTS (Taxon)
 	function &getTaxonIds()
 	{
@@ -54,7 +47,7 @@ class ilMDTaxonPath extends ilMDBase
 		{
 			return false;
 		}
-		$tax =& new ilMDTaxon();
+		$tax = new ilMDTaxon();
 		$tax->setMetaId($a_taxon_id);
 
 		return $tax;
@@ -63,7 +56,7 @@ class ilMDTaxonPath extends ilMDBase
 	{
 		include_once 'Services/Migration/DBUpdate_426/classes/class.ilMDTaxon.php';
 
-		$tax =& new ilMDTaxon($this->getRBACId(),$this->getObjId(),$this->getObjType());
+		$tax = new ilMDTaxon($this->getRBACId(),$this->getObjId(),$this->getObjType());
 		$tax->setParentId($this->getMetaId());
 		$tax->setParentType('meta_taxon_path');
 
@@ -100,7 +93,7 @@ class ilMDTaxonPath extends ilMDBase
 	{
 		if($this->db->autoExecute('il_meta_taxon_path',
 								  $this->__getFields(),
-								  DB_AUTOQUERY_INSERT))
+								  ilDBConstants::MDB2_AUTOQUERY_INSERT))
 		{
 			$this->setMetaId($this->db->getLastInsertId());
 
@@ -117,7 +110,7 @@ class ilMDTaxonPath extends ilMDBase
 		{
 			if($this->db->autoExecute('il_meta_taxon_path',
 									  $this->__getFields(),
-									  DB_AUTOQUERY_UPDATE,
+									  ilDBConstants::MDB2_AUTOQUERY_UPDATE,
 									  "meta_taxon_path_id = ".$ilDB->quote($this->getMetaId())))
 			{
 				return true;
@@ -172,7 +165,7 @@ class ilMDTaxonPath extends ilMDBase
 				"WHERE meta_taxon_path_id = ".$ilDB->quote($this->getMetaId());
 
 			$res = $this->db->query($query);
-			while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+			while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 			{
 				$this->setRBACId($row->rbac_id);
 				$this->setObjId($row->obj_id);
@@ -221,7 +214,7 @@ class ilMDTaxonPath extends ilMDBase
 			"AND parent_type = ".$ilDB->quote($a_parent_type);
 
 		$res = $ilDB->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$ids[] = $row->meta_taxon_path_id;
 		}

@@ -128,7 +128,6 @@ class ilSCORM13Package
 		header('content-type: text/xml');
 		header('content-disposition: attachment; filename="manifest.xml"');
 
-		//$row = ilSCORM13DB::getRecord("cp_package", "obj_id",$this->packageId);
 		$res = $ilDB->queryF(
 			'SELECT xmldata FROM cp_package WHERE obj_id = %s', 
 			array('integer'),
@@ -208,7 +207,7 @@ class ilSCORM13Package
 			if($l[0])
 			{
 				include_once 'Services/MetaData/classes/class.ilMDXMLCopier.php';
-				$mdxml =& new ilMDXMLCopier($l[0]->asXML(),$packageId,$packageId,ilObject::_lookupType($packageId));
+				$mdxml = new ilMDXMLCopier($l[0]->asXML(),$packageId,$packageId,ilObject::_lookupType($packageId));
 				$mdxml->startParsing();
 				$mdxml->getMDObject()->update();
 			}
@@ -477,8 +476,7 @@ class ilSCORM13Package
 		$newObj->createReference();
 		$newObj->putInTree($_GET["ref_id"]);
 		$newObj->setPermissions($_GET["ref_id"]);
-		$newObj->notify("new",$_GET["ref_id"],$_GET["parent_non_rbac_id"],$_GET["ref_id"],$newObj->getRefId());
-
+		
 		$xml_file = $packageFolder."/glossary.xml";
 
 		// check whether xml file exists within zip file
@@ -502,7 +500,7 @@ class ilSCORM13Package
 		switch($node->getName())
 		{
 			case "manifest":
-				$this->slm_tree =& new ilTree($this->slm->getId());
+				$this->slm_tree = new ilTree($this->slm->getId());
 				$this->slm_tree->setTreeTablePK("slm_id");
 				$this->slm_tree->setTableNames('sahs_sc13_tree', 'sahs_sc13_tree_node');
 				$this->slm_tree->addTree($this->slm->getId(), 1);
@@ -531,7 +529,7 @@ class ilSCORM13Package
 					if($l[0])
 					{
 						include_once 'Services/MetaData/classes/class.ilMDXMLCopier.php';
-						$mdxml =& new ilMDXMLCopier($l[0]->asXML(),$this->slm->getId(),$this->slm->getId(),$this->slm->getType());
+						$mdxml = new ilMDXMLCopier($l[0]->asXML(),$this->slm->getId(),$this->slm->getId(),$this->slm->getType());
 						$mdxml->startParsing();
 						$mdxml->getMDObject()->update();
 					}
@@ -544,7 +542,7 @@ class ilSCORM13Package
 				$a = $node->attributes();
 				if(preg_match("/il_\d+_chap_\d+/",$a['identifier']))
 				{
-					$chap=& new ilSCORM2004Chapter($this->slm);
+					$chap= new ilSCORM2004Chapter($this->slm);
 					$chap->setTitle($node->title);
 					$chap->setSLMId($this->slm->getId());
 					$chap->create(true);
@@ -566,7 +564,7 @@ class ilSCORM13Package
 					if($l[0])
 				  	{
 				  		include_once 'Services/MetaData/classes/class.ilMDXMLCopier.php';
-				  		$mdxml =& new ilMDXMLCopier($l[0]->asXML(),$this->slm->getId(),$chap->getId(),$chap->getType());
+				  		$mdxml = new ilMDXMLCopier($l[0]->asXML(),$this->slm->getId(),$chap->getId(),$chap->getType());
 						$mdxml->startParsing();
 						$mdxml->getMDObject()->update();
 				  	}
@@ -729,7 +727,7 @@ class ilSCORM13Package
 		if($l[0])
 	  	{
 	  		include_once 'Services/MetaData/classes/class.ilMDXMLCopier.php';
-	  		$mdxml =& new ilMDXMLCopier($l[0]->asXML(),$slm->getId(),$sco->getId(),$sco->getType());
+	  		$mdxml = new ilMDXMLCopier($l[0]->asXML(),$slm->getId(),$sco->getId(),$sco->getType());
 			$mdxml->startParsing();
 			$mdxml->getMDObject()->update();
 	  	}
@@ -746,7 +744,7 @@ class ilSCORM13Package
 			if($pmd[0])
 		  	{
 		  		include_once 'Services/MetaData/classes/class.ilMDXMLCopier.php';
-		  		$mdxml =& new ilMDXMLCopier($pmd[0]->asXML(),$slm->getId(),$page->getId(),$page->getType());
+		  		$mdxml = new ilMDXMLCopier($pmd[0]->asXML(),$slm->getId(),$page->getId(),$page->getType());
 				$mdxml->startParsing();
 				$mdxml->getMDObject()->update();
 		  	}
@@ -767,7 +765,7 @@ class ilSCORM13Package
 					if($mmd[0])
 				  	{
 				  		include_once 'Services/MetaData/classes/class.ilMDXMLCopier.php';
-				  		$mdxml =& new ilMDXMLCopier($mmd[0]->asXML(),0,$media_object->getId(),$media_object->getType());
+				  		$mdxml = new ilMDXMLCopier($mmd[0]->asXML(),0,$media_object->getId(),$media_object->getType());
 						$mdxml->startParsing();
 						$mdxml->getMDObject()->update();
 				  	}
@@ -776,7 +774,7 @@ class ilSCORM13Package
 					$mob_dir = ilObjMediaObject::_getDirectory ( $media_object->getId () );
 					foreach ( $medianode->MediaItem as $xMediaItem ) 
 					{	
-						$media_item = & new ilMediaItem ( );
+						$media_item = new ilMediaItem ( );
 						$media_object->addMediaItem ( $media_item );
 						$media_item->setPurpose($xMediaItem[Purpose]);
 						$media_item->setFormat($xMediaItem->Format );
@@ -921,12 +919,6 @@ class ilSCORM13Package
 			case XML_DOCUMENT_NODE:
 
 				// insert into cp_package
-				/*ilSCORM13DB::setRecord('cp_package', array(
-				'obj_id' => $this->packageId,
-				'identifier' => $this->packageName,
-				'persistPreviousAttempts' => 0,
-				'settings' => '',
-				));*/				
 
 				$res = $ilDB->queryF(
 					'SELECT * FROM cp_package WHERE obj_id = %s AND c_identifier = %s',
@@ -1128,17 +1120,6 @@ class ilSCORM13Package
 	{
 		global $ilDB;
 		
-		//$this->packageId = 100;
-		//return true;
-		//ilSCORM13DB::getRecord('sahs_lm', array());
-		//	$this->packageId = ilSCORM13DB::getRecord('sahs_lm', array());
-/*		ilSCORM13DB::setRecord('cp_package', array(
-		'obj_id' => $this->packageId,
-		'xmldata' => $x->asXML(),
-		'jsdata' => json_encode($j),
-		), 'obj_id');
-*/
-
 		$ilDB->insert('cp_package', array(
 			'obj_id'		=> array('integer', $this->packageId),
 			'xmldata'		=> array('clob', $x->asXML()),

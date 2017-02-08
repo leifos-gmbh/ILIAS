@@ -29,13 +29,13 @@ class ilGlossaryDefinition
 	* Constructor
 	* @access	public
 	*/
-	function ilGlossaryDefinition($a_id = 0)
+	function __construct($a_id = 0)
 	{
 		global $lng, $ilias, $tpl;
 
-		$this->lng =& $lng;
-		$this->ilias =& $ilias;
-		$this->tpl =& $tpl;
+		$this->lng = $lng;
+		$this->ilias = $ilias;
+		$this->tpl = $tpl;
 
 		$this->id = $a_id;
 		if ($a_id != 0)
@@ -111,7 +111,7 @@ class ilGlossaryDefinition
 
 	function assignPageObject(&$a_page_object)
 	{
-		$this->page_object =& $a_page_object;
+		$this->page_object = $a_page_object;
 	}
 
 	function &getPageObject()
@@ -185,34 +185,35 @@ class ilGlossaryDefinition
 	{
 		global $ilDB;
 		
-		$term =& new ilGlossaryTerm($this->getTermId());
+		$term = new ilGlossaryTerm($this->getTermId());
 
 		$this->setId($ilDB->nextId("glossary_definition"));
-		
-		// lock glossary_definition table
-		$ilDB->lockTables(
-			array(
-				0 => array('name' => 'glossary_definition', 'type' => ilDB::LOCK_WRITE)));
 
-		// get maximum definition number
-		$q = "SELECT max(nr) AS max_nr FROM glossary_definition WHERE term_id = ".
-			$ilDB->quote($this->getTermId(), "integer");
-		$max_set = $ilDB->query($q);
-		$max_rec = $ilDB->fetchAssoc($max_set);
-		$max = (int) $max_rec["max_nr"];
+		$ilAtomQuery = $ilDB->buildAtomQuery();
+		$ilAtomQuery->addTableLock('glossary_definition');
 
-		// insert new definition record
-		$ilDB->manipulate("INSERT INTO glossary_definition (id, term_id, short_text, nr, short_text_dirty)".
-			" VALUES (".
-			$ilDB->quote($this->getId(), "integer").",".
-			$ilDB->quote($this->getTermId(), "integer").",".
-			$ilDB->quote($this->getShortText(), "text").", ".
-			$ilDB->quote(($max + 1), "integer").", ".
-			$ilDB->quote($this->getShortTextDirty(), "integer").
-			")");
+		$ilAtomQuery->addQueryCallable(function (ilDBInterface $ilDB) {
 
-		// unlock glossary definition table
-		$ilDB->unlockTables();
+			// get maximum definition number
+			$q = "SELECT max(nr) AS max_nr FROM glossary_definition WHERE term_id = " .
+				$ilDB->quote($this->getTermId(), "integer");
+			$max_set = $ilDB->query($q);
+			$max_rec = $ilDB->fetchAssoc($max_set);
+			$max = (int)$max_rec["max_nr"];
+
+			// insert new definition record
+			$ilDB->manipulate("INSERT INTO glossary_definition (id, term_id, short_text, nr, short_text_dirty)" .
+				" VALUES (" .
+				$ilDB->quote($this->getId(), "integer") . "," .
+				$ilDB->quote($this->getTermId(), "integer") . "," .
+				$ilDB->quote($this->getShortText(), "text") . ", " .
+				$ilDB->quote(($max + 1), "integer") . ", " .
+				$ilDB->quote($this->getShortTextDirty(), "integer") .
+				")");
+
+		});
+
+		$ilAtomQuery->run();
 
 		// get number
 		$q = "SELECT nr FROM glossary_definition WHERE id = ".
@@ -240,132 +241,118 @@ class ilGlossaryDefinition
 	function delete()
 	{
 		global $ilDB;
-		
-		// lock glossary_definition table
-		#ilDB::_lockTables(array('glossary_definition' => 'WRITE'));
-		$ilDB->lockTables(
-			array(
-				0 => array('name' => 'glossary_definition', 'type' => ilDB::LOCK_WRITE)));
-		
 
-		// be sure to get the right number
-		$q = "SELECT * FROM glossary_definition WHERE id = ".
-			$ilDB->quote($this->id, "integer");
-		$def_set = $ilDB->query($q);
-		$def_rec = $ilDB->fetchAssoc($def_set);
-		$this->setNr($def_rec["nr"]);
+		$ilAtomQuery = $ilDB->buildAtomQuery();
+		$ilAtomQuery->addTableLock("glossary_definition");
 
-		// update numbers of other definitions
-		$ilDB->manipulate("UPDATE glossary_definition SET ".
-			" nr = nr - 1 ".
-			" WHERE term_id = ".$ilDB->quote($this->getTermId(), "integer")." ".
-			" AND nr > ".$ilDB->quote($this->getNr(), "integer"));
+		$ilAtomQuery->addQueryCallable(function (ilDBInterface $ilDB){
 
-		// delete current definition
-		$ilDB->manipulate("DELETE FROM glossary_definition ".
-			" WHERE id = ".$ilDB->quote($this->getId(), "integer"));
+			// be sure to get the right number
+			$q = "SELECT * FROM glossary_definition WHERE id = ".
+				$ilDB->quote($this->id, "integer");
+			$def_set = $ilDB->query($q);
+			$def_rec = $ilDB->fetchAssoc($def_set);
+			$this->setNr($def_rec["nr"]);
 
-		// unlock glossary_definition table
-		$ilDB->unlockTables();
+			// update numbers of other definitions
+			$ilDB->manipulate("UPDATE glossary_definition SET ".
+				" nr = nr - 1 ".
+				" WHERE term_id = ".$ilDB->quote($this->getTermId(), "integer")." ".
+				" AND nr > ".$ilDB->quote($this->getNr(), "integer"));
+
+			// delete current definition
+			$ilDB->manipulate("DELETE FROM glossary_definition ".
+				" WHERE id = ".$ilDB->quote($this->getId(), "integer"));
+
+		});
+		$ilAtomQuery->run();
 
 		// delete page and meta data
 		$this->page_object->delete();
 
 		// delete meta data
 		$this->deleteMetaData();
-/*
-		$nested = new ilNestedSetXML();
-		$nested->init($this->getId(), $this->getType());
-		$nested->deleteAllDBData();
-*/
 	}
 
 
 	function moveUp()
 	{
 		global $ilDB;
-		
-		// lock glossary_definition table
-		#ilDB::_lockTables(array('glossary_definition' => 'WRITE'));
-		$ilDB->lockTables(
-			array(
-				0 => array('name' => 'glossary_definition', 'type' => ilDB::LOCK_WRITE)));
 
+		$ilAtomQuery = $ilDB->buildAtomQuery();
+		$ilAtomQuery->addTableLock('glossary_definition');
 
-		// be sure to get the right number
-		$q = "SELECT * FROM glossary_definition WHERE id = ".
-			$ilDB->quote($this->id, "integer");
-		$def_set = $ilDB->query($q);
-		$def_rec = $ilDB->fetchAssoc($def_set);
-		$this->setNr($def_rec["nr"]);
+		$ilAtomQuery->addQueryCallable(function (ilDBInterface $ilDB) {
 
-		if ($this->getNr() < 2)
-		{
-			$ilDB->unlockTables();
-			return;
-		}
+			// be sure to get the right number
+			$q = "SELECT * FROM glossary_definition WHERE id = " .
+				$ilDB->quote($this->id, "integer");
+			$def_set = $ilDB->query($q);
+			$def_rec = $ilDB->fetchAssoc($def_set);
+			$this->setNr($def_rec["nr"]);
 
-		// update numbers of other definitions
-		$ilDB->manipulate("UPDATE glossary_definition SET ".
-			" nr = nr + 1 ".
-			" WHERE term_id = ".$ilDB->quote($this->getTermId(), "integer")." ".
-			" AND nr = ".$ilDB->quote(($this->getNr() - 1), "integer"));
+			if ($this->getNr() < 2) {
+				return;
+			}
 
-		// delete current definition
-		$ilDB->manipulate("UPDATE glossary_definition SET ".
-			" nr = nr - 1 ".
-			" WHERE term_id = ".$ilDB->quote($this->getTermId(), "integer")." ".
-			" AND id = ".$ilDB->quote($this->getId(), "integer"));
+			// update numbers of other definitions
+			$ilDB->manipulate("UPDATE glossary_definition SET " .
+				" nr = nr + 1 " .
+				" WHERE term_id = " . $ilDB->quote($this->getTermId(), "integer") . " " .
+				" AND nr = " . $ilDB->quote(($this->getNr() - 1), "integer"));
 
-		// unlock glossary_definition table
-		$ilDB->unlockTables();
+			// delete current definition
+			$ilDB->manipulate("UPDATE glossary_definition SET " .
+				" nr = nr - 1 " .
+				" WHERE term_id = " . $ilDB->quote($this->getTermId(), "integer") . " " .
+				" AND id = " . $ilDB->quote($this->getId(), "integer"));
+
+		});
+		$ilAtomQuery->run();
 	}
-
 
 	function moveDown()
 	{
 		global $ilDB;
-		
-		// lock glossary_definition table
-		#ilDB::_lockTables(array('glossary_definition' => 'WRITE'));
-		$ilDB->lockTables(
-			array(
-				0 => array('name' => 'glossary_definition', 'type' => ilDB::LOCK_WRITE)));
 
-		// be sure to get the right number
-		$q = "SELECT * FROM glossary_definition WHERE id = ".
-			$ilDB->quote($this->id, "integer");
-		$def_set = $ilDB->query($q);
-		$def_rec = $ilDB->fetchAssoc($def_set);
-		$this->setNr($def_rec["nr"]);
+		$ilAtomQuery = $ilDB->buildAtomQuery();
+		$ilAtomQuery->addTableLock('glossary_definition');
 
-		// get max number
-		$q = "SELECT max(nr) as max_nr FROM glossary_definition WHERE term_id = ".
-			$ilDB->quote($this->getTermId(), "integer");
-		$max_set = $ilDB->query($q);
-		$max_rec = $ilDB->fetchAssoc($max_set);
+		$ilAtomQuery->addQueryCallable(function(ilDBInterface $ilDB){
 
-		if ($this->getNr() >= $max_rec["max_nr"])
-		{
-			$ilDB->unlockTables();
-			return;
-		}
+			// be sure to get the right number
+			$q = "SELECT * FROM glossary_definition WHERE id = ".
+				$ilDB->quote($this->id, "integer");
+			$def_set = $ilDB->query($q);
+			$def_rec = $ilDB->fetchAssoc($def_set);
+			$this->setNr($def_rec["nr"]);
 
-		// update numbers of other definitions
-		$ilDB->manipulate("UPDATE glossary_definition SET ".
-			" nr = nr - 1 ".
-			" WHERE term_id = ".$ilDB->quote($this->getTermId(), "integer")." ".
-			" AND nr = ".$ilDB->quote(($this->getNr() + 1), "integer"));
+			// get max number
+			$q = "SELECT max(nr) as max_nr FROM glossary_definition WHERE term_id = ".
+				$ilDB->quote($this->getTermId(), "integer");
+			$max_set = $ilDB->query($q);
+			$max_rec = $ilDB->fetchAssoc($max_set);
 
-		// delete current definition
-		$ilDB->manipulate("UPDATE glossary_definition SET ".
-			" nr = nr + 1 ".
-			" WHERE term_id = ".$ilDB->quote($this->getTermId(), "integer")." ".
-			" AND id = ".$ilDB->quote($this->getId(), "integer"));
+			if ($this->getNr() >= $max_rec["max_nr"])
+			{
+				return;
+			}
 
-		// unlock glossary_definition table
-		$ilDB->unlockTables();
+			// update numbers of other definitions
+			$ilDB->manipulate("UPDATE glossary_definition SET ".
+				" nr = nr - 1 ".
+				" WHERE term_id = ".$ilDB->quote($this->getTermId(), "integer")." ".
+				" AND nr = ".$ilDB->quote(($this->getNr() + 1), "integer"));
 
+			// delete current definition
+			$ilDB->manipulate("UPDATE glossary_definition SET ".
+				" nr = nr + 1 ".
+				" WHERE term_id = ".$ilDB->quote($this->getTermId(), "integer")." ".
+				" AND id = ".$ilDB->quote($this->getId(), "integer"));
+
+		});
+
+		$ilAtomQuery->run();
 	}
 
 
@@ -445,7 +432,7 @@ class ilGlossaryDefinition
 	/**
 	* static
 	*/
-	function getDefinitionList($a_term_id)
+	static function getDefinitionList($a_term_id)
 	{
 		global $ilDB;
 		
@@ -565,15 +552,15 @@ class ilGlossaryDefinition
 		include_once("Services/MetaData/classes/class.ilMDDescription.php");
 
 		$glo_id = ilGlossaryTerm::_lookGlossaryID($this->getTermId());
-		$md =& new ilMD($glo_id, $this->getId(), $this->getType());
-		$md_gen =& $md->getGeneral();
+		$md = new ilMD($glo_id, $this->getId(), $this->getType());
+		$md_gen = $md->getGeneral();
 		$md_gen->setTitle($this->getTitle());
 
 		// sets first description (maybe not appropriate)
-		$md_des_ids =& $md_gen->getDescriptionIds();
+		$md_des_ids = $md_gen->getDescriptionIds();
 		if (count($md_des_ids) > 0)
 		{
-			$md_des =& $md_gen->getDescription($md_des_ids[0]);
+			$md_des = $md_gen->getDescription($md_des_ids[0]);
 			$md_des->setDescription($this->getDescription());
 			$md_des->update();
 		}
@@ -616,7 +603,7 @@ class ilGlossaryDefinition
 
 				// Update Title and description
 				$glo_id = ilGlossaryTerm::_lookGlossaryID($this->getTermId());
-				$md =& new ilMD($glo_id, $this->getId(), $this->getType());
+				$md = new ilMD($glo_id, $this->getId(), $this->getType());
 				$md_gen = $md->getGeneral();
 
 				//ilObject::_writeTitle($this->getId(),$md_gen->getTitle());
@@ -642,7 +629,7 @@ class ilGlossaryDefinition
 	*
 	* @param	int		$a_def_id		definition id
 	*/
-	function _lookupTermId($a_def_id)
+	static function _lookupTermId($a_def_id)
 	{
 		global $ilDB;
 		

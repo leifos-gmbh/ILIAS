@@ -43,7 +43,6 @@ class ilObjForumListGUI extends ilObjectListGUI
 		$this->copy_enabled        = true;
 		$this->subscribe_enabled   = true;
 		$this->link_enabled        = true;
-		$this->payment_enabled     = false;
 		$this->info_screen_enabled = true;
 		$this->type                = 'frm';
 		$this->gui_class_name      = 'ilobjforumgui';
@@ -54,18 +53,7 @@ class ilObjForumListGUI extends ilObjectListGUI
 	}
 
 	/**
-	 * @param int    $a_ref_id
-	 * @param int    $a_obj_id
-	 * @param string $a_title
-	 * @param string $a_description
-	 */
-	public function initItem($a_ref_id, $a_obj_id, $a_title = "", $a_description = "")
-	{
-		parent::initItem($a_ref_id, $a_obj_id, $a_title, $a_description);
-	}
-
-	/**
-	 * @return array
+	 * {@inheritdoc}
 	 */
 	public function getProperties()
 	{
@@ -90,6 +78,14 @@ class ilObjForumListGUI extends ilObjectListGUI
 		$properties       = ilObjForumAccess::getStatisticsByRefId($this->ref_id);
 		$num_posts_total  = $properties['num_posts'];
 		$num_unread_total = $properties['num_unread_posts'];
+
+		include_once 'Modules/Forum/classes/class.ilForumPostDraft.php';
+		$num_drafts_total = 0;
+		if(ilForumPostDraft::isSavePostDraftAllowed())
+		{
+			$drafts_statistics = ilForumPostDraft::getDraftsStatisticsByRefId($this->ref_id);
+			$num_drafts_total = $drafts_statistics['total'];
+		}	
 
 		$frm_overview_setting = (int)$ilSetting::_lookupValue('frma','forum_overview');
 		$num_new_total = 0;
@@ -121,6 +117,15 @@ class ilObjForumListGUI extends ilObjectListGUI
 						);
 					}
 				}
+			}
+			
+			if(ilForumPostDraft::isSavePostDraftAllowed() && $num_drafts_total > 0)
+			{
+				$props[] = array(
+					'alert'    => ($num_drafts_total > 0) ? true : false,
+					'property' => $lng->txt('drafts'),
+					'value'    => $num_drafts_total
+				);
 			}
 		}
 		else
@@ -183,8 +188,7 @@ class ilObjForumListGUI extends ilObjectListGUI
 	}
 
 	/**
-	 * @param string $a_cmd
-	 * @return string
+	 * {@inheritdoc}
 	 */
 	public function getCommandFrame($a_cmd)
 	{
@@ -192,8 +196,7 @@ class ilObjForumListGUI extends ilObjectListGUI
 	}
 
 	/**
-	 * @param string $a_cmd
-	 * @return string
+	 * {@inheritdoc}
 	 */
 	public function getCommandLink($a_cmd)
 	{

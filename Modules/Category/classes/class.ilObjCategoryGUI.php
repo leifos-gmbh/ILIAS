@@ -28,7 +28,7 @@ class ilObjCategoryGUI extends ilContainerGUI
 	* Constructor
 	* @access public
 	*/
-	function ilObjCategoryGUI($a_data, $a_id, $a_call_by_reference = true, $a_prepare_output = true)
+	function __construct($a_data, $a_id, $a_call_by_reference = true, $a_prepare_output = true)
 	{
 		//global $ilCtrl;
 
@@ -38,7 +38,7 @@ class ilObjCategoryGUI extends ilContainerGUI
 		$GLOBALS['lng']->loadLanguageModule('cat');
 
 		$this->type = "cat";
-		$this->ilContainerGUI($a_data,(int) $a_id,$a_call_by_reference,false);
+		parent::__construct($a_data,(int) $a_id,$a_call_by_reference,false);
 		
 		if (is_object($this->object))
 		{
@@ -51,7 +51,7 @@ class ilObjCategoryGUI extends ilContainerGUI
 		}
 	}
 
-	function &executeCommand()
+	function executeCommand()
 	{
 		global $rbacsystem, $ilNavigationHistory, $ilAccess, $ilCtrl,$ilTabs;
 
@@ -107,7 +107,7 @@ class ilObjCategoryGUI extends ilContainerGUI
 			case "ilcolumngui":
 				$this->checkPermission("read");
 				$this->prepareOutput();
-				include_once("./Services/Style/classes/class.ilObjStyleSheet.php");
+				include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
 				$this->tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
 					ilObjStyleSheet::getContentStylePath($this->object->getStyleSheetId()));
 				$this->renderObject();
@@ -117,7 +117,7 @@ class ilObjCategoryGUI extends ilContainerGUI
 				$this->prepareOutput();
 				$this->tabs_gui->setTabActive('perm_settings');
 				include_once("Services/AccessControl/classes/class.ilPermissionGUI.php");
-				$perm_gui =& new ilPermissionGUI($this);
+				$perm_gui = new ilPermissionGUI($this);
 				$ret =& $this->ctrl->forwardCommand($perm_gui);
 				break;
 				
@@ -131,7 +131,7 @@ class ilObjCategoryGUI extends ilContainerGUI
 				
 			case 'ilcontainerlinklistgui':
 				include_once("Services/Container/classes/class.ilContainerLinkListGUI.php");
-				$link_list_gui =& new ilContainerLinkListGUI();
+				$link_list_gui = new ilContainerLinkListGUI();
 				$ret =& $this->ctrl->forwardCommand($link_list_gui);
 				break;
 
@@ -240,7 +240,7 @@ class ilObjCategoryGUI extends ilContainerGUI
 				}
 
 				$this->prepareOutput();
-				include_once("./Services/Style/classes/class.ilObjStyleSheet.php");
+				include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
 				if (is_object($this->object))
 				{
 					$this->tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
@@ -265,7 +265,7 @@ class ilObjCategoryGUI extends ilContainerGUI
 	/**
 	* Get tabs
 	*/
-	function getTabs(&$tabs_gui)
+	function getTabs()
 	{
 		global $rbacsystem, $lng, $ilHelp, $ilAccess;
 
@@ -282,7 +282,7 @@ class ilObjCategoryGUI extends ilContainerGUI
 			$force_active = ($_GET["cmd"] == "" || $_GET["cmd"] == "render")
 				? true
 				: false;
-			$tabs_gui->addTab("view_content", $lng->txt("content"),
+			$this->tabs_gui->addTab("view_content", $lng->txt("content"),
 				$this->ctrl->getLinkTarget($this, ""));
 
 			//BEGIN ChangeEvent add info tab to category object
@@ -292,7 +292,7 @@ class ilObjCategoryGUI extends ilContainerGUI
 					|| strtolower($_GET["cmdClass"]) == "ilnotegui")
 					? true
 					: false;
-				$tabs_gui->addTarget("info_short",
+				$this->tabs_gui->addTarget("info_short",
 					 $this->ctrl->getLinkTargetByClass(
 					 array("ilobjcategorygui", "ilinfoscreengui"), "showSummary"),
 					 array("showSummary","", "infoScreen"),
@@ -306,7 +306,7 @@ class ilObjCategoryGUI extends ilContainerGUI
 			$force_active = ($_GET["cmd"] == "edit")
 				? true
 				: false;
-			$tabs_gui->addTarget("settings",
+			$this->tabs_gui->addTarget("settings",
 				$this->ctrl->getLinkTarget($this, "edit"), "edit", get_class($this)
 				, "", $force_active);
 			
@@ -315,8 +315,8 @@ class ilObjCategoryGUI extends ilContainerGUI
 			$mdgui = new ilObjectMetaDataGUI($this->object);					
 			$mdtab = $mdgui->getTab();
 			if($mdtab)
-			{			
-				$tabs_gui->addTab("meta_data",
+			{
+				$this->tabs_gui->addTab("meta_data",
 					$this->lng->txt("meta_data"),
 					$mdtab);
 			}	
@@ -328,7 +328,7 @@ class ilObjCategoryGUI extends ilContainerGUI
 						false
 				))
 			{
-				$tabs_gui->addTarget("obj_tool_setting_taxonomies",
+				$this->tabs_gui->addTarget("obj_tool_setting_taxonomies",
 					$this->ctrl->getLinkTarget($this, "editTaxonomySettings"), "editTaxonomySettings", get_class($this));
 			}
 		}				
@@ -338,13 +338,13 @@ class ilObjCategoryGUI extends ilContainerGUI
 			ilUserAccountSettings::getInstance()->isLocalUserAdministrationEnabled() and 
 			$rbacsystem->checkAccess('cat_administrate_users',$this->ref_id))
 		{
-			$tabs_gui->addTarget("administrate_users",
+			$this->tabs_gui->addTarget("administrate_users",
 				$this->ctrl->getLinkTarget($this, "listUsers"), "listUsers", get_class($this));
 		}
 
 		if($ilAccess->checkAccess('write','',$this->object->getRefId()))
 		{
-			$tabs_gui->addTarget(
+			$this->tabs_gui->addTarget(
 				'export',
 				$this->ctrl->getLinkTargetByClass('ilexportgui',''),
 				'export',
@@ -353,7 +353,7 @@ class ilObjCategoryGUI extends ilContainerGUI
 		}
 		
 		// parent tabs (all container: edit_permission, clipboard, trash
-		parent::getTabs($tabs_gui);
+		parent::getTabs();
 
 	}
 
@@ -368,6 +368,16 @@ class ilObjCategoryGUI extends ilContainerGUI
 		$ret =  parent::renderObject();
 		return $ret;
 
+	}
+
+	function viewObject()
+	{
+		if (strtolower($_GET["baseClass"]) == "iladministrationgui")
+		{
+			parent::viewObject();
+			return true;
+		}
+		return $this->renderObject();
 	}
 
 	protected function initCreationForms($a_new_type)
@@ -394,7 +404,7 @@ class ilObjCategoryGUI extends ilContainerGUI
 		// inherit parents content style, if not individual
 		$parent_ref_id = $tree->getParentId($a_new_object->getRefId());
 		$parent_id = ilObject::_lookupObjId($parent_ref_id);
-		include_once("./Services/Style/classes/class.ilObjStyleSheet.php");
+		include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
 		$style_id = ilObjStyleSheet::lookupObjectStyle($parent_id);
 		if ($style_id > 0)
 		{
@@ -917,14 +927,14 @@ class ilObjCategoryGUI extends ilContainerGUI
 	/**
 	* display form for category import (static, also called by RootFolderGUI)
 	*/
-	function _importCategoriesForm ($a_ref_id, &$a_tpl)
+	public static function _importCategoriesForm ($a_ref_id, &$a_tpl)
 	{
-		global $lng, $rbacreview;
+		global $lng, $rbacreview, $ilCtrl;
 
 		$a_tpl->addBlockfile("ADM_CONTENT", "adm_content", "tpl.cat_import_form.html",
 			"Modules/Category");
 
-		$a_tpl->setVariable("FORMACTION", $this->ctrl->getFormAction($this));
+		$a_tpl->setVariable("FORMACTION", $ilCtrl->getFormActionByClass('ilObjCategoryGUI'));
 
 		$a_tpl->setVariable("TXT_IMPORT_CATEGORIES", $lng->txt("import_categories"));
 		$a_tpl->setVariable("TXT_HIERARCHY_OPTION", $lng->txt("import_cat_localrol"));
@@ -982,7 +992,7 @@ class ilObjCategoryGUI extends ilContainerGUI
 	/**
 	* get user import directory name
 	*/
-	function _getImportDir()
+	static function _getImportDir()
 	{
 		return ilUtil::getDataDir()."/cat_import";
 	}
@@ -1012,9 +1022,9 @@ class ilObjCategoryGUI extends ilContainerGUI
 	* import categories (static, also called by RootFolderGUI)
 	*/
 	
-	function _importCategories($a_ref_id, $withrol_tmp)	
+	public static function _importCategories($a_ref_id, $withrol_tmp)	
 	{
-		global $lng;
+		global $lng, $ilCtrl;
 
 		require_once("./Modules/Category/classes/class.ilCategoryImportParser.php");
 
@@ -1033,7 +1043,7 @@ class ilObjCategoryGUI extends ilContainerGUI
 		// added to prevent empty file names
 		if (!strcmp($file_name,"")) {
 		  ilUtil::sendFailure($lng->txt("no_import_file_found"), true);
-		  $this->ctrl->redirect($this);
+		  $ilCtrl->redirectByClass('ilObjCategoryGUI');
 		}
 
 		$parts = pathinfo($file_name);
@@ -1052,7 +1062,7 @@ class ilObjCategoryGUI extends ilContainerGUI
 		$importParser->startParsing();
 
 		ilUtil::sendSuccess($lng->txt("categories_imported"), true);
-		$this->ctrl->redirect($this);
+		$ilCtrl->redirectByClass('ilObjCategoryGUI');
 	}
 	
 	/**
@@ -1251,31 +1261,37 @@ class ilObjCategoryGUI extends ilContainerGUI
 			#return true;
 		}
 		
-		$this->tpl->addBlockfile('ADM_CONTENT','adm_content','tpl.cat_role_assignment.html',
-			"Modules/Category");
-
 		$ass_roles = $rbacreview->assignedRoles($_GET['obj_id']);
 
 		$counter = 0;
+		$f_result = array();
+		
 		foreach($roles as $role)
 		{
 			$role_obj =& ilObjectFactory::getInstanceByObjId($role['obj_id']);
 			
 			$disabled = false;
-			$f_result[$counter][] = ilUtil::formCheckbox(in_array($role['obj_id'],$ass_roles) ? 1 : 0,
+			$f_result[$counter]['checkbox'] = ilUtil::formCheckbox(in_array($role['obj_id'],$ass_roles) ? 1 : 0,
 														 'role_ids[]',
 														 $role['obj_id'],
 														 $disabled);
-			$f_result[$counter][] = $role_obj->getTitle() ? $role_obj->getTitle() : "";
-			$f_result[$counter][] = $role_obj->getDescription() ? $role_obj->getDescription() : "";
-			$f_result[$counter][] = $role['role_type'] == 'global' ? 
+			$f_result[$counter]['title'] = $role_obj->getTitle() ? $role_obj->getTitle() : "";
+			$f_result[$counter]['desc'] = $role_obj->getDescription() ? $role_obj->getDescription() : "";
+			$f_result[$counter]['type'] = $role['role_type'] == 'global' ?
 				$this->lng->txt('global') :
 				$this->lng->txt('local');
 			
 			unset($role_obj);
 			++$counter;
 		}
-		$this->__showRolesTable($f_result,"assignRolesObject");
+
+		include_once ('./Modules/Category/classes/class.ilCategoryAssignRoleTableGUI.php');
+		$table = new ilCategoryAssignRoleTableGUI($this, "assignRoles");
+		$tmp_obj =& ilObjectFactory::getInstanceByObjId($_GET['obj_id']);
+		$title = $this->lng->txt('role_assignment').' ('.$tmp_obj->getFullname().')';
+		$table->setTitle($title,"icon_role.svg",$this->lng->txt("role_assignment"));
+		$table->setData($f_result);
+		$this->tpl->setContent($table->getHTML());
 	}
 
 	function assignSaveObject()
@@ -1388,231 +1404,6 @@ class ilObjCategoryGUI extends ilContainerGUI
 			return false;
 		}
 		return true;
-	}
-
-
-	function __showRolesTable($a_result_set,$a_from = "")
-	{
-		$this->checkPermission("cat_administrate_users");
-
-		$tbl =& $this->__initTableGUI();
-		$tpl =& $tbl->getTemplateObject();
-
-		// SET FORMAACTION
-		$tpl->setCurrentBlock("tbl_form_header");
-
-		$this->ctrl->setParameter($this,'obj_id',$_GET['obj_id']);
-		$tpl->setVariable("FORMACTION",$this->ctrl->getFormAction($this));
-		$tpl->parseCurrentBlock();
-
-		// SET FOOTER BUTTONS
-		$tpl->setVariable("COLUMN_COUNTS",4);
-		$tpl->setVariable("IMG_ARROW", ilUtil::getImagePath("arrow_downright.svg"));
-		
-//		$tpl->setCurrentBlock("tbl_action_button");
-		$tpl->setVariable("BTN_NAME","assignSave");
-		$tpl->setVariable("BTN_VALUE",$this->lng->txt("change_assignment"));
-		$tpl->parseCurrentBlock();
-		
-		$tpl->setCurrentBlock("tbl_action_row");
-		$tpl->setVariable("TPLPATH",$this->tpl->tplPath);
-		$tpl->parseCurrentBlock();
-
-		$tmp_obj =& ilObjectFactory::getInstanceByObjId($_GET['obj_id']);
-		$title = $this->lng->txt('role_assignment').' ('.$tmp_obj->getFullname().')';
-
-		$tbl->setTitle($title,"icon_role.svg",$this->lng->txt("role_assignment"));
-		$tbl->setHeaderNames(array('',
-								   $this->lng->txt("title"),
-								   $this->lng->txt('description'),
-								   $this->lng->txt("type")));
-		$tbl->setHeaderVars(array("",
-								  "title",
-								  "description",
-								  "type"),
-							array("ref_id" => $this->object->getRefId(),
-								  "cmd" => "assignRoles",
-								  "obj_id" => $_GET['obj_id'],
-								  "cmdClass" => "ilobjcategorygui",
-								  "cmdNode" => $_GET["cmdNode"],
-								  "baseClass" => "ilRepositoryGUI")
-		);
-		$tbl->setColumnWidth(array("4%","35%","45%","16%"));
-
-		$this->set_unlimited = true;
-		$this->__setTableGUIBasicData($tbl,$a_result_set,$a_from,true);
-		$tbl->render();
-
-		$this->tpl->setVariable("ROLES_TABLE",$tbl->tpl->get());
-
-		return true;
-	}		
-
-	function __showUsersTable($a_result_set,$a_from = "",$a_footer = true)
-	{
-		$this->checkPermission("cat_administrate_users");
-		
-		$tbl =& $this->__initTableGUI();
-		$tpl =& $tbl->getTemplateObject();
-
-		// SET FORMAACTION
-		$tpl->setCurrentBlock("tbl_form_header");
-
-		$this->ctrl->setParameter($this,'sort_by',$_GET['sort_by']);
-		$this->ctrl->setParameter($this,'sort_order',$_GET['sort_order']);
-		$this->ctrl->setParameter($this,'offset',$_GET['offset']);
-		$tpl->setVariable("FORMACTION",$this->ctrl->getFormAction($this));
-		$tpl->parseCurrentBlock();
-
-
-		if($a_footer)
-		{
-			// SET FOOTER BUTTONS
-			$tpl->setVariable("COLUMN_COUNTS",6);
-			$tpl->setVariable("IMG_ARROW", ilUtil::getImagePath("arrow_downright.svg"));
-
-			$tpl->setCurrentBlock("tbl_action_button");
-			$tpl->setVariable("BTN_NAME","deleteUser");
-			$tpl->setVariable("BTN_VALUE",$this->lng->txt("delete"));
-			$tpl->parseCurrentBlock();
-			
-			$tpl->setCurrentBlock("tbl_action_row");
-			$tpl->setVariable("TPLPATH",$this->tpl->tplPath);
-			$tpl->parseCurrentBlock();
-			
-			$tbl->setFormName('cmd');
-			$tbl->enable('select_all');
-		}
-
-		$tbl->setTitle($this->lng->txt("users"),"icon_usr.svg",$this->lng->txt("users"));
-		$tbl->setHeaderNames(array('',
-								   $this->lng->txt("username"),
-								   $this->lng->txt("firstname"),
-								   $this->lng->txt("lastname"),
-								   $this->lng->txt('context'),
-								   $this->lng->txt('role_assignment')));
-		$tbl->setHeaderVars(array("",
-								  "login",
-								  "firstname",
-								  "lastname",
-								  "context",
-								  "role_assignment"),
-							array("ref_id" => $this->object->getRefId(),
-								  "cmd" => "listUsers",
-								  "cmdClass" => "ilobjcategorygui",
-								  "cmdNode" => $_GET["cmdNode"]));
-		$tbl->setColumnWidth(array("1px","20%","20%","20%","20%","20%"));
-		$tbl->setSelectAllCheckbox('user_ids');
-
-		$this->__setTableGUIBasicData($tbl,$a_result_set,$a_from,true);
-		$tbl->render();
-
-		$this->tpl->setVariable("USERS_TABLE",$tbl->tpl->get());
-
-		return true;
-	}		
-
-	function __setTableGUIBasicData(&$tbl,&$result_set,$a_from = "",$a_footer = true)
-	{
-		global $ilUser;
-
-		switch ($a_from)
-		{
-			case "listUsersObject":
-				$tbl->setOrderColumn($_GET["sort_by"]);
-				$tbl->setOrderDirection($_GET["sort_order"]);
-				$tbl->setOffset($_GET["offset"]);
-				$tbl->setMaxCount($this->all_users_count);
-				$tbl->setLimit($ilUser->getPref('hits_per_page'));
-				$tbl->setFooter("tblfooter",$this->lng->txt("previous"),$this->lng->txt("next"));
-				$tbl->setData($result_set);
-				$tbl->disable('auto_sort');
-
-				return true;
-
-
-			case "assignRolesObject":
-				$offset = $_GET["offset"];
-				// init sort_by (unfortunatly sort_by is preset with 'title'
-				if ($_GET["sort_by"] == "title" or empty($_GET["sort_by"]))
-				{
-					$_GET["sort_by"] = "login";
-				}
-				$order = $_GET["sort_by"];
-				$direction = $_GET["sort_order"];
-				break;
-			
-			case "clipboardObject":
-				$offset = $_GET["offset"];
-				$order = $_GET["sort_by"];
-				$direction = $_GET["sort_order"];
-				$tbl->disable("footer");
-				break;
-				
-			default:
-				$offset = $_GET["offset"];
-				$order = $_GET["sort_by"];
-				$direction = $_GET["sort_order"];
-				break;
-		}
-
-		$tbl->setOrderColumn($order);
-		$tbl->setOrderDirection($direction);
-		$tbl->setOffset($offset);
-		if($this->set_unlimited)
-		{
-			$tbl->setLimit($_GET["limit"]*100);
-		}
-		else
-		{
-			$tbl->setLimit($_GET['limit']);
-		}
-		$tbl->setMaxCount(count($result_set));
-
-		if($a_footer)
-		{
-			$tbl->setFooter("tblfooter",$this->lng->txt("previous"),$this->lng->txt("next"));
-		}
-		else
-		{
-			$tbl->disable('footer');
-		}
-		$tbl->setData($result_set);
-	}
-
-	function &__initTableGUI()
-	{
-		include_once "./Services/Table/classes/class.ilTableGUI.php";
-
-		return new ilTableGUI(0,false);
-	}
-
-	function __buildFilterSelect($a_parent_ids)
-	{
-		$action[0] = $this->lng->txt('all_users');
-		$action[$this->object->getRefId()] = $this->lng->txt('users').
-			' ('.ilObject::_lookupTitle(ilObject::_lookupObjId($this->object->getRefId())).')';
-
-		foreach($a_parent_ids as $parent)
-		{
-			if($parent == $this->object->getRefId())
-			{
-				continue;
-			}
-			switch($parent)
-			{
-				case ilLocalUser::_getUserFolderId():
-					$action[ilLocalUser::_getUserFolderId()] = $this->lng->txt('global_user'); 
-					
-					break;
-
-				default:
-					$action[$parent] = $this->lng->txt('users').' ('.ilObject::_lookupTitle(ilObject::_lookupObjId($parent)).')';
-
-					break;
-			}
-		}
-		return ilUtil::formSelect($_SESSION['filtered_users'][$this->object->getRefId()],"filter",$action,false,true);
 	}
 	
 	public static function _goto($a_target)

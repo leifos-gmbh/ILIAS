@@ -45,10 +45,6 @@ class ilUserSearchOptions
 {
 	var $db = null;
 
-	public function ilUserSearchOptions()
-	{
-	}
-
 	/**
 	 * Get info of searchable fields for selectable columns in table gui
 	 * @param bool $a_admin
@@ -138,6 +134,28 @@ class ilUserSearchOptions
 					asort($fields[$counter]['values']);					
 					break;
 					
+				case 'org_units':
+					$fields[$counter]['type'] = FIELD_TYPE_SELECT;
+
+					include_once './Modules/OrgUnit/classes/class.ilObjOrgUnit.php';
+					$root = ilObjOrgUnit::getRootOrgRefId();
+					include_once './Modules/OrgUnit/classes/class.ilObjOrgUnitTree.php';
+					$tree = ilObjOrgUnitTree::_getInstance();
+					$nodes = $tree->getAllChildren($root);
+
+					include_once './Modules/OrgUnit/classes/PathStorage/class.ilOrgUnitPathStorage.php';
+					$paths = ilOrgUnitPathStorage::getTextRepresentationOfOrgUnits();
+
+					$options[0] = $lng->txt('select_one');
+					foreach($paths as $org_ref_id => $path)
+					{
+						$options[$org_ref_id] = $path;
+					}
+					
+					$fields[$counter]['values'] = $options;
+					break;
+						
+					
 				// begin-patch lok
 				case 'interests_general':
 				case 'interests_help_offered':
@@ -183,6 +201,7 @@ class ilUserSearchOptions
 					 'sel_country',
 					 'email',
 					 'hobby',
+					 'org_units',
 					 // begin-patch lok
 					 'matriculation',
 					 'interests_general',

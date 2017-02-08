@@ -19,7 +19,7 @@ require_once './Modules/Test/classes/inc.AssessmentConstants.php';
  * @ingroup 	ModulesTestQuestionPool
  * 
  * @ilctrl_iscalledby assErrorTextGUI: ilObjQuestionPoolGUI
- * 
+ * @ilCtrl_Calls assErrorTextGUI: ilFormPropertyDispatchGUI
  */
 class assErrorTextGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjustable, ilGuiAnswerScoringAdjustable
 {
@@ -44,14 +44,9 @@ class assErrorTextGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
 	}
 
 	/**
-	 * Evaluates a posted edit form and writes the form data in the question object
-	 *
-	 * @param bool $always
-	 *
-	 * @return integer A positive value, if one of the required fields wasn't set, else 0
-	 * @access private
+	 * {@inheritdoc}
 	 */
-	function writePostData($always = false)
+	protected function writePostData($always = false)
 	{
 		$hasErrors = (!$always) ? $this->editQuestion(true) : false;
 		if (!$hasErrors)
@@ -111,6 +106,8 @@ class assErrorTextGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
 
 		include_once("./Services/Form/classes/class.ilPropertyFormGUI.php");
 		$form = new ilPropertyFormGUI();
+		$this->editForm = $form;
+
 		$form->setFormAction($this->ctrl->getFormAction($this));
 		$form->setTitle($this->outQuestionType());
 		$form->setMultipart(FALSE);

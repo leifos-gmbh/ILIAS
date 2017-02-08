@@ -89,9 +89,19 @@ class ilObjStudyProgrammeGUI extends ilContainerGUI {
 
 
 	public function __construct() {
-		global $tpl, $ilCtrl, $ilAccess, $ilToolbar, $ilLocator, $tree, $lng, $ilLog, $ilias, $ilHelp;
+		global $DIC;
+		$tpl = $DIC['tpl'];
+		$ilCtrl = $DIC['ilCtrl'];
+		$ilAccess = $DIC['ilAccess'];
+		$ilToolbar = $DIC['ilToolbar'];
+		$ilLocator = $DIC['ilLocator'];
+		$tree = $DIC['tree'];
+		$lng = $DIC['lng'];
+		$ilLog = $DIC['ilLog'];
+		$ilias = $DIC['ilias'];
+		$ilHelp = $DIC['ilHelp'];
 
-		parent::ilContainerGUI(array(), (int) $_GET['ref_id'], true, false);
+		parent::__construct(array(), (int) $_GET['ref_id'], true, false);
 
 		$this->tpl = $tpl;
 		$this->ctrl = $ilCtrl;
@@ -172,7 +182,7 @@ class ilObjStudyProgrammeGUI extends ilContainerGUI {
 				$this->ctrl->forwardCommand($ilTranslationGui);
 				break;*/
 			case "ilobjstudyprogrammemembersgui":
-				$this->denyAccessIfNot("write");
+				$this->denyAccessIfNot("manage_members");
 				$this->tabs_gui->setTabActive(self::TAB_MEMBERS);
 				require_once("Modules/StudyProgramme/classes/class.ilObjStudyProgrammeMembersGUI.php");
 				$gui = new ilObjStudyProgrammeMembersGUI($this, $this->ref_id);
@@ -534,14 +544,15 @@ class ilObjStudyProgrammeGUI extends ilContainerGUI {
 								   , $this->lng->txt("settings")
 								   , $this->getLinkTarget("settings")
 								   );
-			//Maybe some time this will be: if ($this->checkAccess("manage_members")) {
-			$this->tabs_gui->addTab( self::TAB_MEMBERS
-								   , $this->lng->txt("members")
-								   , $this->getLinkTarget("members")
-								   );
 		}
 
-		parent::getTabs($this->tabs_gui);
+		if ($this->checkAccess("manage_members") ) {
+			$this->tabs_gui->addTab( self::TAB_MEMBERS
+					   , $this->lng->txt("members")
+					   , $this->getLinkTarget("members")
+					   );
+		}
+		parent::getTabs();
 	}
 
 	/**
@@ -655,7 +666,10 @@ class ilObjStudyProgrammeGUI extends ilContainerGUI {
 	 * @param string $a_target
 	 */
 	public static function _goto($a_target) {
-		global $ilAccess, $ilErr, $ilCtrl;
+		global $DIC;
+		$ilAccess = $DIC['ilAccess'];
+		$ilErr = $DIC['ilErr'];
+		$ilCtrl = $DIC['ilCtrl'];
 		$id = explode("_", $a_target);
 		$ilCtrl->setTargetScript("ilias.php");
 		$ilCtrl->initBaseClass("ilRepositoryGUI");
@@ -665,7 +679,8 @@ class ilObjStudyProgrammeGUI extends ilContainerGUI {
 	}
 
 	public function addToNavigationHistory(){
-		global $ilNavigationHistory;
+		global $DIC;
+		$ilNavigationHistory = $DIC['ilNavigationHistory'];
 		
 		if(!$this->getCreationMode() &&
 			$this->ilAccess->checkAccess('read', '', $_GET['ref_id']))

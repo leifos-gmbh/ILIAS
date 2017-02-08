@@ -98,7 +98,7 @@ class ilFileDataForum extends ilFileData
 					'md5'   => md5($this->obj_id . '_' . $this->pos_id . '_' . $rest),
 					'name'  => $rest,
 					'size'  => $file->getSize(),
-					'ctime' => ilFormat::formatDate(date('Y-m-d H:i:s', $file->getCTime()))
+					'ctime' => date('Y-m-d H:i:s', $file->getCTime())
 				);
 			}
 		}
@@ -130,12 +130,12 @@ class ilFileDataForum extends ilFileData
 				list($pos_id, $rest) = explode('_', $rest, 2);
 				if($pos_id == $this->getPosId())
 				{
-					$files[] = array(
+					$files[$rest] = array(
 						'path'  => $file->getPathname(),
 						'md5'   => md5($this->obj_id . '_' . $this->pos_id . '_' . $rest),
 						'name'  => $rest,
 						'size'  => $file->getSize(),
-						'ctime' => ilFormat::formatDate(date('Y-m-d H:i:s', $file->getCTime()))
+						'ctime' => date('Y-m-d H:i:s', $file->getCTime())
 					);
 				}
 			}
@@ -217,10 +217,8 @@ class ilFileDataForum extends ilFileData
 			foreach($files['name'] as $index => $name)
 			{
 				// remove trailing '/'
-				while(substr($name, -1) == '/')
-				{
-					$name = substr($name, 0, -1);
-				}	
+				$name = rtrim($name, '/');
+
 				$filename = ilUtil::_sanitizeFilemame($name);				
 				$temp_name = $files['tmp_name'][$index];
 				$error = $files['error'][$index];
@@ -239,10 +237,8 @@ class ilFileDataForum extends ilFileData
 		else if(isset($files['name']) && is_string($files['name']))
 		{
 			// remove trailing '/'
-			while(substr($files['name'], -1) == '/')
-			{
-				$files['name'] = substr($files['name'], 0, -1);
-			}			
+			$files['name'] = rtrim($files['name'], '/');
+				
 			$filename = ilUtil::_sanitizeFilemame($files['name']);
 			$temp_name = $files['tmp_name'];
 			
@@ -447,4 +443,68 @@ class ilFileDataForum extends ilFileData
 		return true;
 	}
 
+	/**
+	 * @param $file
+	 * @return bool|void
+	 */
+	public function deliverFile($file)
+	{
+		if(!$path = $this->getFileDataByMD5Filename($file))
+		{
+			return ilUtil::sendFailure($this->lng->txt('error_reading_file'), true);
+		}
+		else
+		{
+			return ilUtil::deliverFile($path['path'], $path['clean_filename']);
+		}
+	}
+
+	/**
+	 *
+	 */
+	public function deliverZipFile()
+	{
+		/**
+		 * @var $lng ilLanguage
+		 */
+		global $lng;
+
+		$zip_file = $this->createZipFile();
+		if(!$zip_file)
+		{
+			ilUtil::sendFailure($lng->txt('error_reading_file'), true);
+			return false;
+		}
+		else
+		{
+			$post = new ilForumPost($this->getPosId());
+			ilUtil::deliverFile($zip_file,  $post->getSubject() . '.zip', '', false, true, false);
+			ilUtil::delDir($this->getForumPath() . '/zip/' . $this->getObjId() . '_' . $this->getPosId());
+			exit();
+		}
+	}
+
+	/**
+	 * @return null|string
+	 */
+	protected function createZipFile()
+	{
+		$filesOfPost = $this->getFilesOfPost();
+		ksort($filesOfPost);
+
+		ilUtil::makeDirParents($this->getForumPath() . '/zip/' . $this->getObjId() . '_' . $this->getPosId());
+		$tmp_dir = $this->getForumPath() . '/zip/' . $this->getObjId() . '_' . $this->getPosId();
+		foreach($filesOfPost as $file)
+		{
+			@copy($file['path'], $tmp_dir . '/' . $file['name']);
+		}
+
+		$zip_file = null;
+		if(ilUtil::zip($tmp_dir, $this->getForumPath() . '/zip/' . $this->getObjId() . '_' . $this->getPosId() . '.zip'))
+		{
+			$zip_file = $this->getForumPath() . '/zip/' . $this->getObjId() . '_' . $this->getPosId() . '.zip';
+		}
+
+		return $zip_file;
+	}
 }

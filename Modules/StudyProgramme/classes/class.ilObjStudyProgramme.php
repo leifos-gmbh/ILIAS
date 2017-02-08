@@ -40,13 +40,15 @@ class ilObjStudyProgramme extends ilContainer {
 	public function __construct($a_id = 0, $a_call_by_reference = true) {
 		$this->type = "prg";
 		$this->settings = null;
-		$this->ilContainer($a_id, $a_call_by_reference);
+		parent::__construct($a_id, $a_call_by_reference);
 		
 		$this->clearParentCache();
 		$this->clearChildrenCache();
 		$this->clearLPChildrenCache();
 
-		global $tree, $ilUser;
+		global $DIC;
+		$tree = $DIC['tree'];
+		$ilUser = $DIC['ilUser'];
 		$this->tree = $tree;
 		$this->ilUser = $ilUser;
 
@@ -526,13 +528,11 @@ class ilObjStudyProgramme extends ilContainer {
 			$ref_ids = $sorting->sortItems(array('crs_ref'=>$ref_ids));
 			$ref_ids = $ref_ids['crs_ref'];
 
-			// TODO: $this could be removed as soon as support for PHP 5.3 is dropped:
-			$self = $this;
-			$lp_children = array_map(function($node_data) use ($self) {
-				$lp_obj = $self->object_factory->getInstanceByRefId($node_data["child"]);
+			$lp_children = array_map(function($node_data) {
+				$lp_obj = $this->object_factory->getInstanceByRefId($node_data["child"]);
 
 				// filter out all StudyProgramme instances
-				return ($lp_obj instanceof $self)? null : $lp_obj;
+				return ($lp_obj instanceof $this)? null : $lp_obj;
 			}, $ref_ids);
 
 			$this->lp_children = array_filter($lp_children);
@@ -808,7 +808,8 @@ class ilObjStudyProgramme extends ilContainer {
 	 * @return $this
 	 */
 	public function moveTo(ilObjStudyProgramme $a_new_parent) {
-		global $rbacadmin;
+		global $DIC;
+		$rbacadmin = $DIC['rbacadmin'];
 
 		if ($parent = $this->getParent()) {
 
@@ -1178,7 +1179,8 @@ class ilObjStudyProgramme extends ilContainer {
 	}
 	
 	static protected function setProgressesCompletedIfParentIsProgrammeInLPCompletedMode($a_ref_id, $a_obj_id, $a_user_id) {
-		global $tree; // TODO: replace this by a settable static for testing purpose?
+		global $DIC; // TODO: replace this by a settable static for testing purpose?
+		$tree = $DIC['tree'];
 		$node_data = $tree->getParentNodeData($a_ref_id);
 		if ($node_data["type"] !== "prg") {
 			return;
@@ -1200,7 +1202,8 @@ class ilObjStudyProgramme extends ilContainer {
 	 * @return int | null
 	 */
 	static protected function getParentId(ilObject $a_object) {
-		global $tree;
+		global $DIC;
+		$tree = $DIC['tree'];
 		if (!$tree->isInTree($a_object->getRefId())) {
 			return null;
 		}
@@ -1288,7 +1291,8 @@ class ilObjStudyProgramme extends ilContainer {
 	*/
 	function saveIcons($a_custom_icon)
 	{
-		global $ilDB;
+		global $DIC;
+		$ilDB = $DIC['ilDB'];
 
 		$this->createContainerDirectory();
 		$cont_dir = $this->getContainerDirectory();

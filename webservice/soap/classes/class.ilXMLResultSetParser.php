@@ -46,9 +46,9 @@ class ilXMLResultSetParser extends ilSaxParser
 	* @param	string		$a_xml_data			xml data
 	* @access	public
 	*/
-	function ilXMLResultSetParser($a_xml_data = '')
+	function __construct($a_xml_data = '')
 	{
-		parent::ilSaxParser();
+		parent::__construct();
 		$this->setXMLContent($a_xml_data);
 	}
 

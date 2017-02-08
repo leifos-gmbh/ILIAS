@@ -36,12 +36,12 @@ class ilObjFolder extends ilContainer
 	var $folder_tree;
 	
 	/**
-	* Constructor
-	* @access	public
-	* @param	integer	reference_id or object_id
-	* @param	boolean	treat the id as reference_id (true) or object_id (false)
-	*/
-	function ilObjFolder($a_id = 0,$a_call_by_reference = true)
+	 * Constructor
+	 * @access	public
+	 * @param	integer	reference_id or object_id
+	 * @param	boolean	treat the id as reference_id (true) or object_id (false)
+	 */
+	public function __construct($a_id = 0,$a_call_by_reference = true)
 	{
 		$this->type = "fold";
 		parent::__construct($a_id,$a_call_by_reference);
@@ -61,9 +61,9 @@ class ilObjFolder extends ilContainer
 	 * @param int copy id
 	 * 
 	 */
-	public function cloneObject($a_target_id,$a_copy_id = 0)
+	public function cloneObject($a_target_id,$a_copy_id = 0, $a_omit_tree = false)
 	{
-	 	$new_obj = parent::cloneObject($a_target_id,$a_copy_id);
+	 	$new_obj = parent::cloneObject($a_target_id,$a_copy_id, $a_omit_tree);
 		
 		// Copy learning progress settings
 		include_once('Services/Tracking/classes/class.ilLPObjSettings.php');
@@ -162,7 +162,6 @@ class ilObjFolder extends ilContainer
 	
 	public function downloadFolder() {
 		global $lng, $rbacsystem, $ilAccess;
-		include_once "./Services/Utilities/classes/class.ilUtil.php";
 		include_once 'Modules/File/classes/class.ilObjFile.php';
 		include_once 'Modules/File/classes/class.ilFileException.php';
 		if (!$ilAccess->checkAccess("read", "", $this->getRefId()))

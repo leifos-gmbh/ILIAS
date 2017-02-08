@@ -3,6 +3,7 @@
 /* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 require_once "./Services/Object/classes/class.ilObject.php";
+require_once('./Services/Repository/classes/class.ilObjectPlugin.php');
 
 /**
 * Class ilObjRole
@@ -41,12 +42,12 @@ class ilObjRole extends ilObject
 	* @param	integer	reference_id or object_id
 	* @param	boolean	treat the id as reference_id (true) or object_id (false)
 	*/
-	function ilObjRole($a_id = 0,$a_call_by_reference = false)
+	function __construct($a_id = 0,$a_call_by_reference = false)
 	{
 		$this->type = "role";
 		$this->disk_quota = 0;
 		$this->wsp_disk_quota = 0;
-		$this->ilObject($a_id,$a_call_by_reference);
+		parent::__construct($a_id,$a_call_by_reference);
 	}
 	
 	/**
@@ -65,7 +66,7 @@ class ilObjRole extends ilObject
 		$res = $ilDB->query("SELECT obj_id FROM object_data ".
 			" WHERE type=".$ilDB->quote("rolt", "text").
 			" AND title=".$ilDB->quote($a_tpl_name, "text"));
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$tpl_id = $row->obj_id;
 		}
@@ -138,7 +139,7 @@ class ilObjRole extends ilObject
 		return $this->assign_users ? $this->assign_users : 0;
 	}
 	// Same method (static)
-	function _getAssignUsersStatus($a_role_id)
+	public static function _getAssignUsersStatus($a_role_id)
 	{
 		global $ilDB;
 
@@ -330,7 +331,7 @@ class ilObjRole extends ilObject
 	* @access	public
 	* @return	array		array of int: role ids
 	*/
-	function _lookupRegisterAllowed()
+	static function _lookupRegisterAllowed()
 	{
 		global $ilDB;
 		
@@ -356,7 +357,7 @@ class ilObjRole extends ilObject
 	* @param	int			$a_role_id		role id
 	* @return	boolean		true if role is allowed in user registration
 	*/
-	function _lookupAllowRegister($a_role_id)
+	static function _lookupAllowRegister($a_role_id)
 	{
 		global $ilDB;
 		
@@ -451,12 +452,11 @@ class ilObjRole extends ilObject
 			// users with last role found?
 			if (count($last_role_user_ids) > 0)
 			{
+				$user_names = array();
 				foreach ($last_role_user_ids as $user_id)
 				{
 					// GET OBJECT TITLE
-					$tmp_obj = $this->ilias->obj_factory->getInstanceByObjId($user_id);
-					$user_names[] = $tmp_obj->getFullname();
-					unset($tmp_obj);
+					$user_names[] = ilObjUser::_lookupLogin($user_id);
 				}
 				
 				// TODO: This check must be done in rolefolder object because if multiple
@@ -505,7 +505,7 @@ class ilObjRole extends ilObject
 		return count($rbacreview->assignedUsers($this->getId()));
 	}
 
-	function _getTranslation($a_role_title)
+	static function _getTranslation($a_role_title)
 	{
 		global $lng;
 		
@@ -527,7 +527,7 @@ class ilObjRole extends ilObject
 	
 	
 	
-	function _updateAuthMode($a_roles)
+	static function _updateAuthMode($a_roles)
 	{
 		global $ilDB;
 
@@ -540,7 +540,7 @@ class ilObjRole extends ilObject
 		}
 	}
 
-	function _getAuthMode($a_role_id)
+	static function _getAuthMode($a_role_id)
 	{
 		global $ilDB;
 
@@ -608,12 +608,12 @@ class ilObjRole extends ilObject
 			
 			// handle plugin permission texts
 			$txt = $objDefinition->isPlugin($info['type'])
-				? ilPlugin::lookupTxt("rep_robj", $info['type'], $info['type']."_".$info['operation'])
+				? ilObjectPlugin::lookupTxtById($info['type'], $info['type']."_".$info['operation'])
 				: $lng->txt($info['type']."_".$info['operation']);
 			if (substr($info['operation'], 0, 7) == "create_" &&
 				$objDefinition->isPlugin(substr($info['operation'], 7)))
 			{
-				$txt = ilPlugin::lookupTxt("rep_robj", substr($info['operation'], 7), $info['type']."_".$info['operation']);
+				$txt = ilObjectPlugin::lookupTxtById(substr($info['operation'], 7), $info['type']."_".$info['operation']);
 			}
 			$rbac_operations[$info['typ_id']][$info['ops_id']] = array(
 									   							"ops_id"	=> $info['ops_id'],
@@ -986,7 +986,7 @@ class ilObjRole extends ilObject
 							{
 								$query = "SELECT obj_id FROM object_data WHERE type='rolt' AND title='il_grp_status_closed'";
 								$res = $ilDB->query($query);
-								while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+								while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 								{
 									$group_closed_id = $row->obj_id;
 								}
@@ -1001,7 +1001,7 @@ class ilObjRole extends ilObject
 							{
 								$query = "SELECT obj_id FROM object_data WHERE type='rolt' AND title='il_grp_status_open'";
 								$res = $ilDB->query($query);
-								while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+								while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 								{
 									$group_open_id = $row->obj_id;
 								}
@@ -1017,7 +1017,7 @@ class ilObjRole extends ilObject
 					{
 						$query = "SELECT obj_id FROM object_data WHERE type='rolt' AND title='il_crs_non_member'";
 						$res = $ilDB->query($query);
-						while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+						while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 						{
 							$course_non_member_id = $row->obj_id;
 						}

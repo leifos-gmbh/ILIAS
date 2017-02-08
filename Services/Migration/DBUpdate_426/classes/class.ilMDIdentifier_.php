@@ -32,13 +32,6 @@ include_once 'class.ilMDBase.php';
 
 class ilMDIdentifier_ extends ilMDBase
 {
-	function ilMDIdentifier_($a_rbac_id = 0,$a_obj_id = 0,$a_obj_type = '')
-	{
-		parent::ilMDBase($a_rbac_id,
-						 $a_obj_id,
-						 $a_obj_type);
-	}
-
 	// SET/GET
 	function setCatalog($a_catalog)
 	{
@@ -62,7 +55,7 @@ class ilMDIdentifier_ extends ilMDBase
 	{
 		if($this->db->autoExecute('il_meta_identifier_',
 								  $this->__getFields(),
-								  DB_AUTOQUERY_INSERT))
+								  ilDBConstants::MDB2_AUTOQUERY_INSERT))
 		{
 			$this->setMetaId($this->db->getLastInsertId());
 
@@ -79,7 +72,7 @@ class ilMDIdentifier_ extends ilMDBase
 		{
 			if($this->db->autoExecute('il_meta_identifier_',
 									  $this->__getFields(),
-									  DB_AUTOQUERY_UPDATE,
+									  ilDBConstants::MDB2_AUTOQUERY_UPDATE,
 									  "meta_identifier__id = ".$ilDB->quote($this->getMetaId())))
 			{
 				return true;
@@ -127,7 +120,7 @@ class ilMDIdentifier_ extends ilMDBase
 				"WHERE meta_identifier__id = ".$ilDB->quote($this->getMetaId());
 
 			$res = $this->db->query($query);
-			while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+			while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 			{
 				$this->setRBACId($row->rbac_id);
 				$this->setObjId($row->obj_id);
@@ -166,7 +159,7 @@ class ilMDIdentifier_ extends ilMDBase
 
 
 		$res = $ilDB->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$ids[] = $row->meta_identifier__id;
 		}

@@ -100,9 +100,9 @@ class ilObjNullDAV extends ilObjectDAV
 	*
 	* @param refid A refid to the object.
 	*/
-	function ilObjNullDAV($refid, $obj = null) 
+	function __construct($refid, $obj = null) 
 	{
-		$this->ilObjectDAV($refid, $obj);
+		parent::__construct($refid, $obj);
 	}
 	
 	/**
@@ -131,7 +131,7 @@ class ilObjNullDAV extends ilObjectDAV
 	{
 		if (is_null($this->obj))
 		{
-			$this->obj = &new ilObjNull($this->getRefId(),true);
+			$this->obj = new ilObjNull($this->getRefId(),true);
 			$this->obj->read();
 		}
 	}
@@ -148,7 +148,7 @@ class ilObjNullDAV extends ilObjectDAV
 		$this->write();
 		$this->obj->setPermissions($refId);
 		$this->writelog('convertToILIASType '.$type.' obj='.$this->getObjectId());
-		$converted =& $this->createObject($this->getRefId(), $type);
+		$converted =& ilObjectDAV::createObject($this->getRefId(), $type);
 		$converted->obj->createProperties();
 		return $converted;
 	}

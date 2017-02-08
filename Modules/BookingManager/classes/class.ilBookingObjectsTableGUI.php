@@ -165,7 +165,7 @@ class ilBookingObjectsTableGUI extends ilTable2GUI
 				if($av_from > $now)
 				{
 					$data[$idx]["not_yet"] = ilDatePresentation::formatDate(new ilDate($av_from, IL_CAL_UNIX));
-				}
+				}								
 				if($av_to)
 				{				
 					// #18658
@@ -174,7 +174,7 @@ class ilBookingObjectsTableGUI extends ilTable2GUI
 						$this->lng->loadLanguageModule("dateplaner");
 						$data[$idx]["full_up"] = $this->lng->txt("cal_booked_out");
 					}
-				}					
+				}	
 			}
 		}
 		

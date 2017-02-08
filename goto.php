@@ -18,27 +18,6 @@
 
 // this should bring us all session data of the desired
 // client
-if (isset($_GET["client_id"]))
-{
-	$cookie_domain = $_SERVER['SERVER_NAME'];
-	$cookie_path = dirname( $_SERVER['PHP_SELF'] );
-
-	/* if ilias is called directly within the docroot $cookie_path
-	is set to '/' expecting on servers running under windows..
-	here it is set to '\'.
-	in both cases a further '/' won't be appended due to the following regex
-	*/
-	$cookie_path .= (!preg_match("/[\/|\\\\]$/", $cookie_path)) ? "/" : "";
-		
-	if($cookie_path == "\\") $cookie_path = '/';
-	
-	$cookie_domain = ''; // Temporary Fix
-	
-	setcookie("ilClientId", $_GET["client_id"], 0, $cookie_path, $cookie_domain);
-	
-	$_COOKIE["ilClientId"] = $_GET["client_id"];
-}
-
 require_once("Services/Init/classes/class.ilInitialisation.php");
 ilInitialisation::initILIAS();
 
@@ -65,61 +44,12 @@ if (is_object($ilPluginAdmin))
 	}
 }
 
-if(IS_PAYMENT_ENABLED)
-{
-	if(strpos($_GET['target'], 'purchasetypedemo') !== false)
-	{
-		$_GET['purchasetype'] = 'demo';
-		$_GET['cmd'] = 'showDemoVersion';
-		$_GET['target'] = str_replace('purchasetypedemo', '', $_GET['target']);
-	}
-	else if(strpos($_GET['target'], 'purchasetypebuy') !== false)
-	{
-		$_GET['purchasetype'] = 'buy';
-		$_GET['cmd'] = 'showDetails';
-		$_GET['target'] = str_replace('purchasetypebuy', '', $_GET['target']);
-	}
-}
-
 $r_pos = strpos($_GET["target"], "_");
 $rest = substr($_GET["target"], $r_pos+1);
 $target_arr = explode("_", $_GET["target"]);
 $target_type = $target_arr[0];
 $target_id = $target_arr[1];
 $additional = $target_arr[2];		// optional for pages
-
-if(IS_PAYMENT_ENABLED)
-{
-	include_once './Services/Payment/classes/class.ilShopLinkBuilder.php';
-	$shop_classes = array_keys(ilShopLinkBuilder::$linkArray);
-	if(in_array($target_type, $shop_classes))
-	{
-		$class = $target_type;
-		if(ilShopLinkBuilder::$linkArray[strtolower($class)]['public'] == 'true'
-		|| ($_SESSION["AccountId"] != ANONYMOUS_USER_ID && ilShopLinkBuilder::$linkArray[strtolower($class)]['public'] == 'false'))
-		{
-			if($additional != '')
-			{
-				$additional_param .= "&cmd=".$additional;
-			}
-			else
-			{
-				$additional_param = '';
-			}
-			
-			$link = 'ilias.php?baseClass='.ilShopLinkBuilder::$linkArray[strtolower($class)]['baseClass']
-				.'&cmdClass='.strtolower(ilShopLinkBuilder::$linkArray[strtolower($class)]['cmdClass']).$additional_param;
-
-			//additional parameters needed for shop
-			if(isset($target_arr[3]))
-			{
-				$link .='&'.$target_arr[3]; 
-			}
-			
-			ilUtil::redirect($link);
-		}
-	}
-}
 
 // imprint has no ref id...
 if($target_type == "impr")
@@ -187,7 +117,6 @@ switch($target_type)
 				
 	// please migrate to default branch implementation
 	case "lm":
-	case "dbk":
 		require_once("./Modules/LearningModule/classes/class.ilObjContentObjectGUI.php");
 		ilObjContentObjectGUI::_goto($target_id);
 		break;

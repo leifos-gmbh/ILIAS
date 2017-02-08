@@ -151,7 +151,7 @@ class ilContainerSortingSettings
 			"WHERE obj_id = ".$ilDB->quote($a_obj_id ,'integer')." ";
 		$res = $ilDB->query($query);
 		
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			return $row->sort_mode;
 		}
@@ -176,7 +176,7 @@ class ilContainerSortingSettings
 			"WHERE obj_id = ".$ilDB->quote($a_obj_id ,'integer')." ";
 		$res = $ilDB->query($query);
 		
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			if($row->sort_mode != ilContainer::SORT_INHERIT)
 			{
@@ -381,7 +381,7 @@ class ilContainerSortingSettings
 	 		"WHERE obj_id = ".$this->db->quote($this->obj_id ,'integer')." ";
 	 		
 	 	$res = $this->db->query($query);
-	 	while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+	 	while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 	 	{
 	 		$this->sort_mode = $row->sort_mode;
 			$this->sort_direction = $row->sort_direction;

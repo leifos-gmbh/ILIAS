@@ -34,13 +34,13 @@ class ilSolutionExplorer extends ilExplorer
 * @access	public
 * @param	string	target
 */
-	function ilSolutionExplorer($a_target, $a_target_class)
+	public function __construct($a_target, $a_target_class)
 	{
 		global $tree,$ilCtrl;
 
 		$this->ctrl = $ilCtrl;
 		$this->target_class = $a_target_class;
-		parent::ilExplorer($a_target);
+		parent::__construct($a_target);
 		$this->tree = $tree;
 		$this->root_id = $this->tree->readRootId();
 		$this->order_column = "title";
@@ -113,7 +113,7 @@ class ilSolutionExplorer extends ilExplorer
 		return '';
 	}
 
-	function isClickable($a_type, $a_ref_id)
+	function isClickable($a_type, $a_ref_id = 0)
 	{
 		return $a_type == $this->selectable_type and $a_ref_id != $this->ref_id;
 	}

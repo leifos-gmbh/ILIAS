@@ -61,6 +61,9 @@ class ilWikiHTMLExport
 	function buildExportFile()
 	{
 		$this->log->debug("buildExportFile...");
+        //init the mathjax rendering for HTML export
+		include_once './Services/MathJax/classes/class.ilMathJax.php';
+		ilMathJax::getInstance()->init(ilMathJax::PURPOSE_EXPORT);
 
 		if ($this->getMode() == self::MODE_USER)
 		{
@@ -99,7 +102,7 @@ class ilWikiHTMLExport
 		$this->log->debug("export directory: ".$this->export_dir);
 
 		// system style html exporter
-		include_once("./Services/Style/classes/class.ilSystemStyleHTMLExport.php");
+		include_once("./Services/Style/System/classes/class.ilSystemStyleHTMLExport.php");
 		$this->sys_style_html_export = new ilSystemStyleHTMLExport($this->export_dir);
 		$this->sys_style_html_export->addImage("icon_wiki.svg");
 		$this->sys_style_html_export->export();
@@ -141,7 +144,7 @@ class ilWikiHTMLExport
 	{
 		global $tpl, $ilBench, $ilLocator;
 
-		$pages = ilWikiPage::getAllPages($this->wiki->getId());
+		$pages = ilWikiPage::getAllWikiPages($this->wiki->getId());
 
 		include_once("./Services/COPage/classes/class.ilPageContentUsage.php");
 		include_once("./Services/MediaObjects/classes/class.ilObjMediaObject.php");

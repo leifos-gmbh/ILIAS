@@ -24,10 +24,10 @@ class ilObjCategory extends ilContainer
 	* @param	integer	reference_id or object_id
 	* @param	boolean	treat the id as reference_id (true) or object_id (false)
 	*/
-	function ilObjCategory($a_id = 0,$a_call_by_reference = true)
+	function __construct($a_id = 0,$a_call_by_reference = true)
 	{
 		$this->type = "cat";
-		$this->ilContainer($a_id,$a_call_by_reference);
+		parent::__construct($a_id,$a_call_by_reference);
 	}
 
 	/**
@@ -88,7 +88,7 @@ class ilObjCategory extends ilContainer
 		
 		$num = 0;
 
-		while ($row = $r->fetchRow(DB_FETCHMODE_OBJECT))
+		while ($row = $r->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$data["Fobject"][$num]= array("title"	=> $row->title,
 										  "desc"	=> $row->description,
@@ -175,11 +175,11 @@ class ilObjCategory extends ilContainer
 	 * @param int copy id
 	 * 
 	 */
-	public function cloneObject($a_target_id,$a_copy_id = 0)
+	public function cloneObject($a_target_id,$a_copy_id = 0, $a_omit_tree = false)
 	{
 		global $ilDB,$ilUser;
 		
-	 	$new_obj = parent::cloneObject($a_target_id,$a_copy_id);
+	 	$new_obj = parent::cloneObject($a_target_id,$a_copy_id,$a_omit_tree);
 
 		/*	 done in class.ilContainer	
 	 	include_once('./Services/Container/classes/class.ilContainerSortingSettings.php');

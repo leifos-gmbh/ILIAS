@@ -22,14 +22,15 @@ class ilPDNewsBlockGUI extends ilNewsForContextBlockGUI
 	/**
 	 * Constructor
 	 */
-	function ilPDNewsBlockGUI()
+	function __construct()
 	{
 		global $ilCtrl, $lng, $ilUser, $ilBench, $ilAccess, $ilCtrl;
 
 		$ilBench->start("News", "ilPDNewsBlockGUI_Constructor");
 		$news_set = new ilSetting("news");
 		
-		parent::ilBlockGUI();
+		// NOT ilNewsForContextBlockGUI::__construct() !
+		ilBlockGUI::__construct();
 		
 		$lng->loadLanguageModule("news");
 		include_once("./Services/News/classes/class.ilNewsItem.php");
@@ -167,7 +168,7 @@ class ilPDNewsBlockGUI extends ilNewsForContextBlockGUI
 	/**
 	* execute command
 	*/
-	function &executeCommand()
+	function executeCommand()
 	{
 		global $ilCtrl;
 
@@ -301,7 +302,7 @@ class ilPDNewsBlockGUI extends ilNewsForContextBlockGUI
 			$tpl->setVariable("TXT_PRIV_TITLE", $lng->txt("news_get_priv_feed_title"));
 			
 			// #14365
-			if($ilUser->_getFeedPass($_SESSION["AccountId"]))
+			if($ilUser->_getFeedPass($GLOBALS['DIC']['ilUser']->getId()))
 			{
 				$tpl->setVariable("TXT_PRIV_INFO", $lng->txt("news_get_priv_feed_info"));
 				$tpl->setVariable("TXT_PRIV_FEED_URL", $lng->txt("news_feed_url"));			

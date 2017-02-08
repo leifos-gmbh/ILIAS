@@ -38,9 +38,13 @@ class ilSurveyExecutionGUI
 	var $lng;
 	var $tpl;
 	var $ctrl;
-	var $ilias;
 	var $tree;
 	var $preview;
+
+	/**
+	* @var ilLogger
+	*/
+	protected $log;
 	
 /**
 * ilSurveyExecutionGUI constructor
@@ -50,22 +54,21 @@ class ilSurveyExecutionGUI
 * @param object $a_object Associated ilObjSurvey class
 * @access public
 */
-  function ilSurveyExecutionGUI($a_object)
-  {
-		global $lng, $tpl, $ilCtrl, $ilias, $tree;
+	function __construct($a_object)
+  	{
+		global $lng, $tpl, $ilCtrl, $tree;
 
-		$this->lng =& $lng;
-		$this->tpl =& $tpl;
-		$this->ctrl =& $ilCtrl;
-		$this->ilias =& $ilias;
-		$this->object =& $a_object;
-		$this->tree =& $tree;
+		$this->lng = $lng;
+		$this->tpl = $tpl;
+		$this->ctrl = $ilCtrl;
+		$this->object = $a_object;
+		$this->tree = $tree;
 				
 		$this->external_rater_360 = false;
 		if($this->object->get360Mode() &&
 			$_SESSION["anonymous_id"][$this->object->getId()] && 
 			ilObjSurvey::validateExternalRaterCode($this->object->getRefId(), 
-					$_SESSION["anonymous_id"][$this->object->getId()]))
+				$_SESSION["anonymous_id"][$this->object->getId()]))
 		{
 			$this->external_rater_360 = true;
 		}
@@ -74,17 +77,22 @@ class ilSurveyExecutionGUI
 		$this->preview = (bool)$_REQUEST["prvw"];
 		$this->ctrl->saveParameter($this, "prvw");
 		$this->ctrl->saveParameter($this, "pgov");
+
+		$this->log = ilLoggerFactory::getLogger("svy");
 	}
 	
 	/**
 	* execute command
 	*/
-	function &executeCommand()
+	function executeCommand()
 	{
 		$cmd = $this->ctrl->getCmd();
 		$next_class = $this->ctrl->getNextClass($this);
 
 		$cmd = $this->getCommand($cmd);
+
+		$this->log->debug("- cmd= ".$cmd);
+
 		if (strlen($cmd) == 0)
 		{
 			$this->ctrl->setParameter($this, "qid", $_GET["qid"]);
@@ -106,9 +114,10 @@ class ilSurveyExecutionGUI
 		if($this->preview)
 		{
 			if(!$rbacsystem->checkAccess("write", $this->object->ref_id))
-			{
+			{				
 				// only with write access it is possible to preview the survey
-				$this->ilias->raiseError($this->lng->txt("survey_cannot_preview_survey"),$this->ilias->error_obj->MESSAGE);	
+				include_once "Modules/Survey/exceptions/class.ilSurveyException.php";
+				throw new ilSurveyException($this->lng->txt("survey_cannot_preview_survey"));
 			}
 			
 			return true;
@@ -118,7 +127,8 @@ class ilSurveyExecutionGUI
 			!$rbacsystem->checkAccess("read", $this->object->ref_id)) 
 		{
 			// only with read access it is possible to run the test
-			$this->ilias->raiseError($this->lng->txt("cannot_read_survey"),$this->ilias->error_obj->MESSAGE);
+			include_once "Modules/Survey/exceptions/class.ilSurveyException.php";
+			throw new ilSurveyException($this->lng->txt("cannot_read_survey"));
 		}
 		
 		$user_id = $ilUser->getId();
@@ -371,6 +381,8 @@ class ilSurveyExecutionGUI
 		// check for constraints
 		if (count($page[0]["constraints"]))
 		{
+			$this->log->debug("Page constraints= ", $page[0]["constraints"]);
+
 			while (is_array($page) and ($constraint_true == 0) and (count($page[0]["constraints"])))
 			{
 				$constraint_true = ($page[0]['constraints'][0]['conjunction'] == 0) ? true : false;
@@ -726,27 +738,27 @@ class ilSurveyExecutionGUI
 				$has_button = true;
 			}
 				
-			if($this->object->hasMailOwnResults())
+			if($this->object->hasMailConfirmation())
 			{
 				if($has_button)
 				{
 					$ilToolbar->addSeparator();
 				}
 
-				require_once "Services/Form/classes/class.ilTextInputGUI.php";								
-				$mail = new ilTextInputGUI($this->lng->txt("email"), "mail");
-				$mail->setSize(25);				
-				if($ilUser->getId() != ANONYMOUS_USER_ID)
+				if($ilUser->getId() == ANONYMOUS_USER_ID ||
+					!$ilUser->getEmail())
 				{
-					$mail->setValue($ilUser->getEmail());				
+					require_once "Services/Form/classes/class.ilTextInputGUI.php";								
+					$mail = new ilTextInputGUI($this->lng->txt("email"), "mail");
+					$mail->setSize(25);									
+					$ilToolbar->addInputItem($mail, true);	
 				}
-				$ilToolbar->addInputItem($mail, true);	
 								
 				$ilToolbar->setFormAction($this->ctrl->getFormAction($this, "mailUserResults"));
 								
 				include_once "Services/UIComponent/Button/classes/class.ilSubmitButton.php";
 				$button = ilSubmitButton::getInstance();
-				$button->setCaption("svy_mail_own_results");
+				$button->setCaption("svy_mail_send_confirmation");
 				$button->setCommand("mailUserResults");
 				$ilToolbar->addButtonInstance($button);		
 				
@@ -908,15 +920,21 @@ class ilSurveyExecutionGUI
 	}
 	
 	function mailUserResults()
-	{		
-		if(!$this->object->hasMailOwnResults())
+	{
+		global $ilUser;
+
+		if(!$this->object->hasMailConfirmation())
 		{
 			$this->backToRepository();
 		}
 		
 		$this->checkAuth(false, true);		
 		
-		$recipient = $_POST["mail"];	
+		$recipient = $_POST["mail"];
+		if(!$recipient)
+		{
+			$recipient = $ilUser->getEmail();
+		}
 		if(!ilUtil::is_email($recipient))
 		{
 			$this->ctrl->redirect($this, "runShowFinishedPage");

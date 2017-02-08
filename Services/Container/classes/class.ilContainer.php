@@ -40,7 +40,9 @@ class ilContainer extends ilObject
 {
 	protected $order_type = 0;
 	protected $hiddenfilesfound = false;
-	
+	protected $news_timeline = false;
+	protected $news_timeline_auto_entries = false;
+
 	// container view constants
 	const VIEW_SESSIONS = 0;
 	const VIEW_OBJECTIVE = 1;
@@ -71,26 +73,29 @@ class ilContainer extends ilObject
 
 
 	static $data_preloaded = false;
-	
+
 	/**
-	* Constructor
-	* @access	public
-	* @param	integer	reference_id or object_id
-	* @param	boolean	treat the id as reference_id (true) or object_id (false)
-	*/
-	function ilContainer($a_id = 0, $a_call_by_reference = true)
+	 * @var ilSetting
+	 */
+	protected $setting;
+
+	function __construct($a_id = 0, $a_reference = true)
 	{
-		parent::__construct($a_id, $a_call_by_reference);
+		global $DIC;
+
+		$this->setting = $DIC["ilSetting"];
+		parent::__construct($a_id, $a_reference);
+
 	}
-	
-	
-	
+
 	/**
 	* Create directory for the container.
 	* It is <webspace_dir>/container_data.
 	*/
 	function createContainerDirectory()
 	{
+		global $DIC;
+
 		$webspace_dir = ilUtil::getWebspaceDir();
 		$cont_dir = $webspace_dir."/container_data";
 		if (!is_dir($cont_dir))
@@ -119,7 +124,7 @@ class ilContainer extends ilObject
 	*
 	* @return	string	container directory
 	*/
-	function _getContainerDirectory($a_id)
+	static function _getContainerDirectory($a_id)
 	{
 		return ilUtil::getWebspaceDir()."/container_data/obj_".$a_id;
 	}
@@ -205,6 +210,106 @@ class ilContainer extends ilObject
 	}
 
 	/**
+	 * Set news timeline
+	 *
+	 * @param bool $a_val activate news timeline
+	 */
+	function setNewsTimeline($a_val)
+	{
+		$this->news_timeline = $a_val;
+	}
+
+	/**
+	 * Get news timeline
+	 *
+	 * @return bool activate news timeline
+	 */
+	function getNewsTimeline()
+	{
+		return $this->news_timeline;
+	}
+	
+	/**
+	 * Set news timeline auto entries
+	 *
+	 * @param bool $a_val include automatically created entries	
+	 */
+	function setNewsTimelineAutoEntries($a_val)
+	{
+		$this->news_timeline_auto_entries = $a_val;
+	}
+	
+	/**
+	 * Get news timeline auto entries
+	 *
+	 * @return bool include automatically created entries
+	 */
+	function getNewsTimelineAutoEntries()
+	{
+		return $this->news_timeline_auto_entries;
+	}
+
+	/**
+	 * Set news timline is landing page
+	 *
+	 * @param bool $a_val is news timline landing page?
+	 */
+	function setNewsTimelineLandingPage($a_val)
+	{
+		$this->news_timeline_landing_page = $a_val;
+	}
+
+	/**
+	 * Get news timline is landing page
+	 *
+	 * @return bool is news timline landing page?
+	 */
+	function getNewsTimelineLandingPage()
+	{
+		return $this->news_timeline_landing_page;
+	}
+
+	/**
+	 * Set news block activated
+	 *
+	 * @param bool $a_val news block activated	
+	 */
+	function setNewsBlockActivated($a_val)
+	{
+		$this->news_block_activated = $a_val;
+	}
+	
+	/**
+	 * Get news block activated
+	 *
+	 * @return bool news block activated
+	 */
+	function getNewsBlockActivated()
+	{
+		return $this->news_block_activated;
+	}
+	
+	/**
+	 * Set use news
+	 *
+	 * @param bool $a_val use news system?	
+	 */
+	function setUseNews($a_val)
+	{
+		$this->use_news = $a_val;
+	}
+	
+	/**
+	 * Get use news
+	 *
+	 * @return bool use news system?
+	 */
+	function getUseNews()
+	{
+		return $this->use_news;
+	}
+	
+	/**
 	* Lookup a container setting.
 	*
 	* @param	int			container id
@@ -212,7 +317,7 @@ class ilContainer extends ilObject
 	*
 	* @return	string		setting value
 	*/
-	function _lookupContainerSetting($a_id, $a_keyword, $a_default_value = NULL)
+	static function _lookupContainerSetting($a_id, $a_keyword, $a_default_value = NULL)
 	{
 		global $ilDB;
 		
@@ -220,7 +325,7 @@ class ilContainer extends ilObject
 				" id = ".$ilDB->quote($a_id ,'integer')." AND ".
 				" keyword = ".$ilDB->quote($a_keyword ,'text');
 		$set = $ilDB->query($q);
-		$rec = $set->fetchRow(DB_FETCHMODE_ASSOC);
+		$rec = $set->fetchRow(ilDBConstants::FETCHMODE_ASSOC);
 		
 		if(isset($rec['value']))
 		{
@@ -233,7 +338,12 @@ class ilContainer extends ilObject
 		return $a_default_value;
 	}
 
-	function _writeContainerSetting($a_id, $a_keyword, $a_value)
+	/**
+	 * @param $a_id
+	 * @param $a_keyword
+	 * @param $a_value
+	 */
+	public static function _writeContainerSetting($a_id, $a_keyword, $a_value)
 	{
 		global $ilDB;
 		
@@ -241,12 +351,16 @@ class ilContainer extends ilObject
 			"id = ".$ilDB->quote($a_id,'integer')." ".
 			"AND keyword = ".$ilDB->quote($a_keyword,'text');
 		$res = $ilDB->manipulate($query);
-		
+
+		$log = ilLoggerFactory::getLogger("cont");
+		$log->debug("Write container setting, id: ".$a_id.", keyword: ".$a_keyword.", value: ".$a_value);
+
 		$query = "INSERT INTO container_settings (id, keyword, value) VALUES (".
 			$ilDB->quote($a_id ,'integer').", ".
 			$ilDB->quote($a_keyword ,'text').", ".
 			$ilDB->quote($a_value ,'text').
 			")";
+
 		$res = $ilDB->manipulate($query);
 	}
 	
@@ -329,7 +443,7 @@ class ilContainer extends ilObject
 	* @param	int		$a_id		container object id
 	* @param	string	$a_size		"big" | "small"
 	*/
-	function _lookupIconPath($a_id, $a_size = "big")
+	static function _lookupIconPath($a_id, $a_size = "big")
 	{
 		if ($a_size == "")
 		{
@@ -397,11 +511,11 @@ class ilContainer extends ilObject
 	 * @param int copy id
 	 * @return object new object 
 	 */
-	public function cloneObject($a_target_id,$a_copy_id = 0)
+	public function cloneObject($a_target_id,$a_copy_id = 0, $a_omit_tree = false)
 	{
 		global $ilLog;
 
-		$new_obj = parent::cloneObject($a_target_id,$a_copy_id);
+		$new_obj = parent::cloneObject($a_target_id,$a_copy_id, $a_omit_tree);
 	
 		include_once('./Services/Container/classes/class.ilContainerSortingSettings.php');
 		#18624 - copy all sorting settings
@@ -466,6 +580,9 @@ class ilContainer extends ilObject
 
 		include_once('./Services/Container/classes/class.ilContainerSorting.php');
 		ilContainerSorting::_getInstance($this->getId())->cloneSorting($a_target_id,$a_copy_id);
+
+		// fix internal links to other objects
+		ilContainer::fixInternalLinksAfterCopy($a_target_id,$a_copy_id, $this->getRefId());
 		
 		// fix item group references in page content
 		include_once("./Modules/ItemGroup/classes/class.ilObjItemGroup.php");
@@ -591,8 +708,7 @@ class ilContainer extends ilObject
 	*
 	* @return	array
 	*/
-	function getSubItems($a_admin_panel_enabled = false, $a_include_side_block = false,
-		$a_get_single = 0)
+	public function getSubItems($a_admin_panel_enabled = false, $a_include_side_block = false, $a_get_single = 0)
 	{
 		global $objDefinition, $ilBench, $tree, $ilObjDataCache, $ilUser, $rbacsystem,
 			$ilSetting;
@@ -783,9 +899,19 @@ class ilContainer extends ilObject
 		
 		if (((int) $this->getStyleSheetId()) > 0)
 		{
-			include_once("./Services/Style/classes/class.ilObjStyleSheet.php");
+			include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
 			ilObjStyleSheet::writeStyleUsage($this->getId(), $this->getStyleSheetId());
 		}
+
+		$log = ilLoggerFactory::getLogger("cont");
+		$log->debug("Create Container, id: ".$this->getId());
+
+		self::_writeContainerSetting($this->getId(), "news_timeline", (int) $this->getNewsTimeline());
+		self::_writeContainerSetting($this->getId(), "news_timeline_incl_auto", (int) $this->getNewsTimelineAutoEntries());
+		self::_writeContainerSetting($this->getId(), "news_timeline_landing_page", (int) $this->getNewsTimelineLandingPage());
+		include_once("./Services/Object/classes/class.ilObjectServiceSettingsGUI.php");
+		self::_writeContainerSetting($this->getId() ,ilObjectServiceSettingsGUI::NEWS_VISIBILITY,(int) $this->getNewsBlockActivated());
+		self::_writeContainerSetting($this->getId() ,ilObjectServiceSettingsGUI::USE_NEWS,(int) $this->getUseNews());
 
 		return $ret;
 	}
@@ -797,8 +923,18 @@ class ilContainer extends ilObject
 	{
 		$ret = parent::update();
 		
-		include_once("./Services/Style/classes/class.ilObjStyleSheet.php");
+		include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
 		ilObjStyleSheet::writeStyleUsage($this->getId(), $this->getStyleSheetId());
+
+		$log = ilLoggerFactory::getLogger("cont");
+		$log->debug("Update Container, id: ".$this->getId());
+
+		self::_writeContainerSetting($this->getId(), "news_timeline", (int) $this->getNewsTimeline());
+		self::_writeContainerSetting($this->getId(), "news_timeline_incl_auto", (int) $this->getNewsTimelineAutoEntries());
+		self::_writeContainerSetting($this->getId(), "news_timeline_landing_page", (int) $this->getNewsTimelineLandingPage());
+		include_once("./Services/Object/classes/class.ilObjectServiceSettingsGUI.php");
+		self::_writeContainerSetting($this->getId() ,ilObjectServiceSettingsGUI::NEWS_VISIBILITY,(int) $this->getNewsBlockActivated());
+		self::_writeContainerSetting($this->getId() ,ilObjectServiceSettingsGUI::USE_NEWS,(int) $this->getUseNews());
 
 		return $ret;
 	}
@@ -818,9 +954,29 @@ class ilContainer extends ilObject
 		include_once("./Services/Container/classes/class.ilContainerSortingSettings.php");
 		$this->setOrderType(ilContainerSortingSettings::_lookupSortMode($this->getId()));
 		
-		include_once("./Services/Style/classes/class.ilObjStyleSheet.php");
+		include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
 		$this->setStyleSheetId((int) ilObjStyleSheet::lookupObjectStyle($this->getId()));
+
+		$this->readContainerSettings();
 	}
+
+	/**
+	 * Read container settings
+	 *
+	 * @param
+	 * @return
+	 */
+	function readContainerSettings()
+	{
+		$this->setNewsTimeline(self::_lookupContainerSetting($this->getId(), "news_timeline"));
+		$this->setNewsTimelineAutoEntries(self::_lookupContainerSetting($this->getId(), "news_timeline_incl_auto"));
+		$this->setNewsTimelineLandingPage(self::_lookupContainerSetting($this->getId(), "news_timeline_landing_page"));
+		include_once("./Services/Object/classes/class.ilObjectServiceSettingsGUI.php");
+		$this->setNewsBlockActivated(self::_lookupContainerSetting($this->getId(), ilObjectServiceSettingsGUI::NEWS_VISIBILITY,
+			$this->setting->get('block_activated_news',true)));
+		$this->setUseNews(self::_lookupContainerSetting($this->getId(), ilObjectServiceSettingsGUI::USE_NEWS, true));
+	}
+
 
 	/**
 	 * overwrites description fields to long or short description in an assoc array
@@ -873,6 +1029,27 @@ class ilContainer extends ilObject
 			}
 		}
 		return $objects;
+	}
+
+	/**
+	 * Fix internal links after copy process
+	 *
+	 * @param int $a_target_id ref if of new container
+	 * @param int $a_copy_id copy process id
+	 */
+	protected static function fixInternalLinksAfterCopy($a_target_id, $a_copy_id, $a_source_ref_id)
+	{
+		$obj_id = ilObject::_lookupObjId($a_target_id);
+		include_once("./Services/Container/classes/class.ilContainerPage.php");
+		if (ilContainerPage::_exists("cont", $obj_id))
+		{
+			include_once("./Services/CopyWizard/classes/class.ilCopyWizardOptions.php");
+			$cwo = ilCopyWizardOptions::_getInstance($a_copy_id);
+			$mapping = $cwo->getMappings();
+			$pg = new ilContainerPage($obj_id);
+			$pg->handleRepositoryLinksOnCopy($mapping, $a_source_ref_id);
+			$pg->update(true, true);
+		}
 	}
 	
 } // END class ilContainer

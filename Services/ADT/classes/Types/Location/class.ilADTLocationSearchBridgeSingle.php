@@ -80,7 +80,7 @@ class ilADTLocationSearchBridgeSingle extends ilADTSearchBridgeSingle
 		$post = $this->extractPostValues($a_post);
 				
 		if($post && $this->shouldBeImportedFromPost($post))
-		{		
+		{						
 			$tgl = $this->getForm()->getItemByPostVar($this->addToElementId("tgl"));
 			$tgl->setChecked(true);
 			
@@ -182,7 +182,7 @@ class ilADTLocationSearchBridgeSingle extends ilADTSearchBridgeSingle
 		if(is_array($a_value))
 		{
 			$this->getADT()->setLatitude($a_value["lat"]);			
-			$this->getADT()->setLongitude($a_value["long"]);			
+			$this->getADT()->setLongitude($a_value["long"]);	
 			$this->getADT()->setZoom($a_value["zoom"]);			
 			$this->radius = (int)$a_value["radius"];			
 		}		

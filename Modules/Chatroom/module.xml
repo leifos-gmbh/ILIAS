@@ -1,4 +1,4 @@
-<?php xml version = "1.0" encoding = "UTF-8"?>
+<?xml version = "1.0" encoding = "UTF-8"?>
 <module xmlns="http://www.w3.org" version="$Id$" id="chtr">
 	<baseclasses>
 	    <baseclass name="ilObjChatroomGUI" dir="classes" />
@@ -20,4 +20,7 @@
 		</object>
 	</objects>
 	<logging />
+	<web_access_checker>
+		<secure_path path="chatroom" checking-class="ilObjChatroomAccess" />
+	</web_access_checker>
 </module>

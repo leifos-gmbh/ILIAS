@@ -53,10 +53,10 @@ class ilObjQuestionPool extends ilObject
 	* @param	integer	reference_id or object_id
 	* @param	boolean	treat the id as reference_id (true) or object_id (false)
 	*/
-	function ilObjQuestionPool($a_id = 0,$a_call_by_reference = true)
+	public function __construct($a_id = 0,$a_call_by_reference = true)
 	{
 		$this->type = "qpl";
-		$this->ilObject($a_id,$a_call_by_reference);
+		parent::__construct($a_id,$a_call_by_reference);
 		$this->setOnline(0);
 		
 		$this->skillServiceEnabled = false;
@@ -113,7 +113,7 @@ class ilObjQuestionPool extends ilObject
 	{
 		global $ilUser;
 		include_once "./Services/MetaData/classes/class.ilMD.php";
-		$md =& new ilMD($this->getId(), 0, $this->getType());
+		$md = new ilMD($this->getId(), 0, $this->getType());
 		$md_gen =& $md->getGeneral();
 		if ($md_gen == false)
 		{
@@ -157,7 +157,11 @@ class ilObjQuestionPool extends ilObject
 
 		//put here your module specific stuff
 		$this->deleteQuestionpool();
-
+		
+		require_once 'Modules/TestQuestionPool/classes/questions/class.ilAssQuestionSkillAssignmentImportFails.php';
+		$qsaImportFails = new ilAssQuestionSkillAssignmentImportFails($this->getId());
+		$qsaImportFails->deleteRegisteredImportFails();
+		
 		return true;
 	}
 
@@ -182,73 +186,6 @@ class ilObjQuestionPool extends ilObject
 			include_once "./Services/Utilities/classes/class.ilUtil.php";
 			ilUtil::delDir($directory);
 		}
-	}
-
-
-	/**
-	* notifys an object about an event occured
-	* Based on the event happend, each object may decide how it reacts.
-	*
-	* If you are not required to handle any events related to your module, just delete this method.
-	* (For an example how this method is used, look at ilObjGroup)
-	*
-	* @access	public
-	* @param	string	event
-	* @param	integer	reference id of object where the event occured
-	* @param	array	passes optional parameters if required
-	* @return	boolean
-	*/
-	function notify($a_event,$a_ref_id,$a_parent_non_rbac_id,$a_node_id,$a_params = 0)
-	{
-		global $tree;
-
-		switch ($a_event)
-		{
-			case "link":
-
-				//var_dump("<pre>",$a_params,"</pre>");
-				//echo "Module name ".$this->getRefId()." triggered by link event. Objects linked into target object ref_id: ".$a_ref_id;
-				//exit;
-				break;
-
-			case "cut":
-
-				//echo "Module name ".$this->getRefId()." triggered by cut event. Objects are removed from target object ref_id: ".$a_ref_id;
-				//exit;
-				break;
-
-			case "copy":
-
-				//var_dump("<pre>",$a_params,"</pre>");
-				//echo "Module name ".$this->getRefId()." triggered by copy event. Objects are copied into target object ref_id: ".$a_ref_id;
-				//exit;
-				break;
-
-			case "paste":
-
-				//echo "Module name ".$this->getRefId()." triggered by paste (cut) event. Objects are pasted into target object ref_id: ".$a_ref_id;
-				//exit;
-				break;
-
-			case "new":
-
-				//echo "Module name ".$this->getRefId()." triggered by paste (new) event. Objects are applied to target object ref_id: ".$a_ref_id;
-				//exit;
-				break;
-		}
-
-		// At the beginning of the recursive process it avoids second call of the notify function with the same parameter
-		if ($a_node_id==$_GET["ref_id"])
-		{
-			$parent_obj =& $this->ilias->obj_factory->getInstanceByRefId($a_node_id);
-			$parent_type = $parent_obj->getType();
-			if($parent_type == $this->getType())
-			{
-				$a_node_id = (int) $tree->getParentId($a_node_id);
-			}
-		}
-
-		parent::notify($a_event,$a_ref_id,$a_parent_non_rbac_id,$a_node_id,$a_params);
 	}
 
 	/**
@@ -440,7 +377,7 @@ class ilObjQuestionPool extends ilObject
 		if ($question_id > 0) return assQuestion::_instanciateQuestionGUI($question_id);
 		assQuestion::_includeClass($question_type, 1);
 		$question_type_gui = $question_type . "GUI";
-		$question_gui =& new $question_type_gui();
+		$question_gui = new $question_type_gui();
 		return $question_gui;
 	}
 	
@@ -557,7 +494,7 @@ class ilObjQuestionPool extends ilObject
 	* @param	object		$a_xml_writer	ilXmlWriter object that receives the
 	*										xml data
 	*/
-	function exportPagesXML(&$a_xml_writer, $a_inst, $a_target_dir, &$expLog, $questions)
+	function objectToXmlWriter(ilXmlWriter &$a_xml_writer, $a_inst, $a_target_dir, &$expLog, $questions)
 	{
 		global $ilBench;
 		
@@ -595,7 +532,32 @@ class ilObjQuestionPool extends ilObject
 		$ilBench->stop("ContentObjectExport", "exportFileItems");
 		$expLog->write(date("[y-m-d H:i:s] ")."Finished Export File Items");
 
+		// skill assignments
+		$this->populateQuestionSkillAssignmentsXml($a_xml_writer, $questions);
+
 		$a_xml_writer->xmlEndTag("ContentObject");
+	}
+	
+	/**
+	 * @param ilXmlWriter $a_xml_writer
+	 * @param $questions
+	 */
+	protected function populateQuestionSkillAssignmentsXml(ilXmlWriter &$a_xml_writer, $questions)
+	{
+		global $ilDB;
+		
+		require_once 'Modules/TestQuestionPool/classes/class.ilAssQuestionSkillAssignmentList.php';
+		$assignmentList = new ilAssQuestionSkillAssignmentList($ilDB);
+		$assignmentList->setParentObjId($this->getId());
+		$assignmentList->loadFromDb();
+		$assignmentList->loadAdditionalSkillData();
+		
+		require_once 'Modules/TestQuestionPool/classes/questions/class.ilAssQuestionSkillAssignmentExporter.php';
+		$skillQuestionAssignmentExporter = new ilAssQuestionSkillAssignmentExporter();
+		$skillQuestionAssignmentExporter->setXmlWriter($a_xml_writer);
+		$skillQuestionAssignmentExporter->setQuestionIds($questions);
+		$skillQuestionAssignmentExporter->setAssignmentList($assignmentList);
+		$skillQuestionAssignmentExporter->export();
 	}
 
 	/**
@@ -821,7 +783,7 @@ class ilObjQuestionPool extends ilObject
 	/**
 	* set import directory
 	*/
-	function _setImportDirectory($a_import_dir = null)
+	public static function _setImportDirectory($a_import_dir = null)
 	{
 		if (strlen($a_import_dir))
 		{
@@ -836,7 +798,7 @@ class ilObjQuestionPool extends ilObject
 	/**
 	* get import directory of lm
 	*/
-	function _getImportDirectory()
+	public static function _getImportDirectory()
 	{
 		if (strlen($_SESSION["qpl_import_dir"]))
 		{
@@ -923,7 +885,7 @@ class ilObjQuestionPool extends ilObject
 	* @return string The QTI xml representation of the questions
 	* @access public
 	*/
-	function toXML($questions)
+	function questionsToXML($questions)
 	{
 		$xml = "";
 		// export button was pressed
@@ -951,7 +913,7 @@ class ilObjQuestionPool extends ilObject
 	* @return integer The number of questions in the questionpool object
 	* @access public
 	*/
-	function _getQuestionCount($questionpool_id, $complete_questions_only = FALSE)
+	public static function _getQuestionCount($questionpool_id, $complete_questions_only = FALSE)
 	{
 		global $ilDB;
 		if ($complete_questions_only)
@@ -1024,7 +986,7 @@ class ilObjQuestionPool extends ilObject
 		return $this->getShowTaxonomies() && (int)$this->getNavTaxonomyId();
 	}
 	
-	function _lookupOnline($a_obj_id, $is_reference = FALSE)
+	public static function _lookupOnline($a_obj_id, $is_reference = FALSE)
 	{
 		global $ilDB;
 		
@@ -1056,7 +1018,7 @@ class ilObjQuestionPool extends ilObject
 	* @param integer $a_obj_id Object id of the question pool
 	* @access private
 	*/
-	function _hasEqualPoints($a_obj_id, $is_reference = FALSE)
+	public static function _hasEqualPoints($a_obj_id, $is_reference = FALSE)
 	{
 		global $ilDB;
 		
@@ -1214,7 +1176,7 @@ class ilObjQuestionPool extends ilObject
 * @param integer $user_id The database id of the user
 * @access public
 */
-	function _isWriteable($object_id, $user_id)
+	public static function _isWriteable($object_id, $user_id)
 	{
 		global $rbacsystem;
 
@@ -1359,7 +1321,7 @@ class ilObjQuestionPool extends ilObject
 * @return array The available question pools
 * @access public
 */
-	function &_getAvailableQuestionpools($use_object_id = FALSE, $equal_points = FALSE, $could_be_offline = FALSE, $showPath = FALSE, $with_questioncount = FALSE, $permission = "read", $usr_id = "")
+	public static function _getAvailableQuestionpools($use_object_id = FALSE, $equal_points = FALSE, $could_be_offline = FALSE, $showPath = FALSE, $with_questioncount = FALSE, $permission = "read", $usr_id = "")
 	{
 		global $ilUser, $ilDB, $lng;
 
@@ -1454,11 +1416,11 @@ class ilObjQuestionPool extends ilObject
 *
 * @access public
 */
-	function cloneObject($a_target_id,$a_copy_id = 0)
+	function cloneObject($a_target_id,$a_copy_id = 0, $a_omit_tree = false)
 	{
 		global $ilLog;
 
-		$newObj = parent::cloneObject($a_target_id,$a_copy_id);
+		$newObj = parent::cloneObject($a_target_id,$a_copy_id, $a_omit_tree);
 
 		//copy online status if object is not the root copy object
 		$cp_options = ilCopyWizardOptions::_getInstance($a_copy_id);
@@ -1505,12 +1467,12 @@ class ilObjQuestionPool extends ilObject
 		return $newObj;
 	}
 
-	function &getQuestionTypes($all_tags = FALSE, $fixOrder = false)
+	function getQuestionTypes($all_tags = FALSE, $fixOrder = false)
 	{
-		return $this->_getQuestionTypes($all_tags, $fixOrder);
+		return self::_getQuestionTypes($all_tags, $fixOrder);
 	}
 
-	function &_getQuestionTypes($all_tags = FALSE, $fixOrder = false)
+	public static function _getQuestionTypes($all_tags = FALSE, $fixOrder = false)
 	{
 		global $ilDB;
 		global $lng;
@@ -1554,16 +1516,20 @@ class ilObjQuestionPool extends ilObject
 		return $types;
 	}
 
-        public static function getQuestionTypeByTypeId($type_id) {
-            global $ilDB;
-            $query = "SELECT type_tag FROM qpl_qst_type WHERE question_type_id = %s";
-            $types = array('integer');
-            $values = array($type_id);
-            $result = $ilDB->queryF($query, $types, $values);
-            if ($row = $ilDB->fetchAssoc($result)) {
-                return $row['type_tag'];
-            }
-        }
+	public static function getQuestionTypeByTypeId($type_id)
+	{
+		global $ilDB;
+
+		$query = "SELECT type_tag FROM qpl_qst_type WHERE question_type_id = %s";
+		$types = array('integer');
+		$values = array($type_id);
+		$result = $ilDB->queryF($query, $types, $values);
+
+		if($row = $ilDB->fetchAssoc($result))
+		{
+			return $row['type_tag'];
+		}
+	}
 
 	public static function getQuestionTypeTranslations()
 	{
@@ -1682,17 +1648,29 @@ class ilObjQuestionPool extends ilObject
 	* @param string $a_pname The plugin name
 	* @access public
 	*/
-	function isPluginActive($a_pname)
+	function isPluginActive($questionType)
 	{
+		/* @var ilPluginAdmin $ilPluginAdmin */
 		global $ilPluginAdmin;
-		if ($ilPluginAdmin->isActive(IL_COMP_MODULE, "TestQuestionPool", "qst", $a_pname))
+		
+		$plugins = $ilPluginAdmin->getActivePluginsForSlot(IL_COMP_MODULE, "TestQuestionPool", "qst");
+		foreach($plugins as $pluginName)
 		{
-			return TRUE;
+			if( $pluginName == $questionType ) // plugins having pname == qtype
+			{
+				return true;
+			}
+			
+			/* @var ilQuestionsPlugin $plugin */
+			$plugin = ilPlugin::getPluginObject(IL_COMP_MODULE, "TestQuestionPool", "qst", $pluginName);
+			
+			if($plugin->getQuestionType() == $questionType) // plugins havin an independent name
+			{
+				return true;
+			}
 		}
-		else
-		{
-			return FALSE;
-		}
+		
+		return false;
 	}
 	
 	/*

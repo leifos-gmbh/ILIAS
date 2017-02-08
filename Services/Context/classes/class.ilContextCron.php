@@ -2,7 +2,7 @@
 
 /* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
 
-include_once "Services/Context/classes/class.ilContextBase.php";
+include_once "Services/Context/interfaces/interface.ilContextTemplate.php";
 
 /** 
  * Service context for cron
@@ -12,7 +12,7 @@ include_once "Services/Context/classes/class.ilContextBase.php";
  * 
  * @ingroup ServicesContext
  */
-class ilContextCron extends ilContextBase
+class ilContextCron implements ilContextTemplate
 {			
 	/**
 	 * Are redirects supported?
@@ -82,6 +82,15 @@ class ilContextCron extends ilContextBase
 	public static function doAuthentication()
 	{
 		return true;
+	}
+	
+	/**
+	 * Check if persistent session handling is supported
+	 * @return boolean
+	 */
+	public static function supportsPersistentSessions()
+	{
+		return false;
 	}
 }
 

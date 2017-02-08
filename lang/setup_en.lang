@@ -36,8 +36,6 @@ change_sort_direction#:#Change Sort Direction
 change#:#Change
 check_db_versions#:#Please ensure that the database mode determined by ILIAS matches to your version of MySQL. This should be the case usually. If not, your database version is not supported.<br> Example 1: If the mode is 'MySQL 4.1.x or higher' and your database version is '4.0.12' then this MySQL version is not supported. Please contact the ILIAS team.<br />Example 2: If the mode is 'MySQL 4.1.x or higher' and your database version is '4.1.14' then everything is ok.
 check_failed_convert#:#Convert command not found.
-check_failed_htmldoc#:#HTMLdoc command not found.
-check_failed_htmldoc#:#Testing FOP failed.
 check_failed_java#:#Java command not found.
 check_failed_latex#:#Testing LaTeX CGI script failed.
 check_failed_unzip#:#Unzip command not found.
@@ -176,9 +174,6 @@ hide_clientlist#:#Client Selection is hidden for users.
 host#:#Host
 hotfix_applied#:#Hotfix Applied
 hotfix_available#:#Hotfix Available
-htmldoc_path_comment_win#:#Optional to generate PDF documents, e.g. 'C:/tools/htmldoc/htmldoc.exe'.
-htmldoc_path_comment#:#Optional to generate PDF documents, e.g. '/your_path/htmldoc'.
-htmldoc_path#:#Path to HTMLdoc
 http_path#:#HTTP Path
 id#:#ID
 ilias_db_mode#:#ILIAS Database Mode
@@ -236,9 +231,6 @@ installed#:#Installed
 institution#:#Institution
 intro_install#:#This is the main page of ILIAS Setup. From here you can step through the installation.
 ip_address#:#IP Address
-java_path_comment_win#:#Optional for validating SCORM Learning Modules, e.g. 'C:/Program Files/Java/bin/java.exe'.
-java_path_comment#:#Optional for validating SCORM Learning Modules, e.g. '/your_path/java'.
-java_path#:#Path to Java
 lang_ar#:#Arabic
 lang_bg#:#Bulgarian
 lang_cs#:#Czech
@@ -336,7 +328,6 @@ no_path_convert#:#No convert path given.
 no_path_datadir#:#No data directory given.
 no_path_fop#:#No FOP path given.
 no_path_given#:#No path given.
-no_path_htmldoc#:#No HTMLdoc path given.
 no_path_java#:#No Java path given.
 no_path_log#:#No log path given.
 no_path_mkisofs#:#No mkisofs path given.
@@ -369,7 +360,6 @@ password#:#Password
 path_not_set#:#Path not set.
 path_to_convert#:#Path to Convert
 path_to_fop#:#Path to FOP
-path_to_htmldoc#:#Path to HTMLdoc
 path_to_java#:#Path to Java
 path_to_mkisofs#:#Path to mkisofs
 path_to_unzip#:#Path to Unzip
@@ -618,4 +608,15 @@ cache_activate_events#:#Events
 cache_activated_components#:#Activated Components
 cache_flush#:#Flush all caches
 cache_activate_tpl_blocks#:#Template (Blocks)
-cache_activate_tpl_variables#:#Template (Variablen)
+cache_activate_tpl_variables#:#Template (Variables)
+cache_activate_all#:#All
+error_log_path#:#Path to error log files
+error_log_path_comment#:#Please enter only the path. Files will be automaticly saved on error.
+enable_system_styles_management#:#Manage System Styles
+enable_system_styles_management_info#:#Manage (add, edit, delete) System Styles (Skins) in the Layout and Styles section of the Administration.
+lessc_path#:#Path to lessc
+lessc_path_comment#:#Lessc is needed to compile less files to CSS. This is a requirement for generating new css files for systems styles through manipulating less variables in the Administration.
+lessc#:#Path to lessc
+db_switch_legacy#:#You are using a Database-Type which has been replaced with a newer implementation. The newer implementation also supports PHP7. Do you want to switch to:
+db_switch_legacy_button#:#Switch
+error_log_path_comment_win#:#Please enter only the path(E.g. 'C:/iliasdata'). Files will be automaticly saved on error.

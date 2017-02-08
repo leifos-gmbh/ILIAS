@@ -1,5 +1,6 @@
 <?php
 /* Copyright (c) 1998-2009 ILIAS open source, Extended GPL, see docs/LICENSE */
+require_once('./Services/Repository/classes/class.ilObjectPlugin.php');
 
 /**
 * This class displays the permission status of a user concerning a specific object.
@@ -60,7 +61,7 @@ class ilObjectPermissionStatusGUI
 	/**
 	* execute command
 	*/
-	public function &executeCommand()
+	public function executeCommand()
 	{
 		global $ilCtrl;
 
@@ -71,7 +72,7 @@ class ilObjectPermissionStatusGUI
 		{
 			case 'ilrepositorysearchgui':
 				include_once('./Services/Search/classes/class.ilRepositorySearchGUI.php');
-				$rep_search =& new ilRepositorySearchGUI();
+				$rep_search = new ilRepositorySearchGUI();
 				$this->ilCtrl->setReturn($this,'perminfo');
 				$this->ilCtrl->forwardCommand($rep_search);
 				break;
@@ -384,13 +385,12 @@ class ilObjectPermissionStatusGUI
 			if (substr($ops['operation'], 0, 7) == "create_" &&
 				$objDefinition->isPlugin(substr($ops['operation'], 7)))
 			{
-				$result_set[$counter]["operation"] = ilPlugin::lookupTxt("rep_robj", substr($ops['operation'],7),
-					#$this->object->getType()."_".$ops['operation']);
+				$result_set[$counter]["operation"] = ilObjectPlugin::lookupTxtById(substr($ops['operation'],7),
 					'rbac_'.$ops['operation']);
 			}
 			else if ($objDefinition->isPlugin($this->object->getType()))
 			{
-				$result_set[$counter]["operation"] = ilPlugin::lookupTxt("rep_robj", $this->object->getType(),
+				$result_set[$counter]["operation"] = ilObjectPlugin::lookupTxtById($this->object->getType(),
 					$this->object->getType()."_".$ops['operation']);
 			}
 			elseif(substr($ops['operation'],0,7) == 'create_')

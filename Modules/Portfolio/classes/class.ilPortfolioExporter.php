@@ -29,18 +29,30 @@ class ilPortfolioExporter extends ilXmlExporter
 		$pg_ids = array();		
 		foreach ($a_ids as $id)
 		{			
-			foreach(ilPortfolioTemplatePage::getAllPages($id) as $p)
+			foreach(ilPortfolioTemplatePage::getAllPortfolioPages($id) as $p)
 			{
 				$pg_ids[] = "prtt:".$p["id"];
 			}
 		}
 		
-		return array (
+		$deps[] =
 			array(
 				"component" => "Services/COPage",
 				"entity" => "pg",
-				"ids" => $pg_ids)
-			);
+				"ids" => $pg_ids);
+
+		// style
+		$obj_ids = (is_array($a_ids))
+			? $a_ids
+			: array($a_ids);
+		$deps[] = array(
+			"component" => "Services/Style",
+			"entity" => "object_style",
+			"ids" => $obj_ids
+		);
+
+		return $deps;
+
 	}
 	
 	public function getXmlRepresentation($a_entity, $a_schema_version, $a_id)

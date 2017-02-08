@@ -25,6 +25,7 @@ require_once(dirname(__FILE__) . '/Types/class.ilOrgUnitTypeGUI.php');
 require_once(dirname(__FILE__) . '/Settings/class.ilObjOrgUnitSettingsFormGUI.php');
 require_once('./Services/AdvancedMetaData/classes/class.ilAdvancedMDRecordGUI.php');
 require_once('./Services/Container/classes/class.ilContainerByTypeContentGUI.php');
+require_once("./Modules/OrgUnit/classes/Extension/class.ilOrgUnitExtension.php");
 
 /**
  * Class ilObjOrgUnit GUI class
@@ -88,8 +89,17 @@ class ilObjOrgUnitGUI extends ilContainerGUI {
 
 
 	public function __construct() {
-		global $tpl, $ilCtrl, $ilAccess, $ilToolbar, $ilLocator, $tree, $lng, $ilLog, $ilias;
-		parent::ilContainerGUI(array(), $_GET["ref_id"], true, false);
+		global $DIC;
+		$tpl = $DIC['tpl'];
+		$ilCtrl = $DIC['ilCtrl'];
+		$ilAccess = $DIC['ilAccess'];
+		$ilToolbar = $DIC['ilToolbar'];
+		$ilLocator = $DIC['ilLocator'];
+		$tree = $DIC['tree'];
+		$lng = $DIC['lng'];
+		$ilLog = $DIC['ilLog'];
+		$ilias = $DIC['ilias'];
+		parent::__construct(array(), $_GET["ref_id"], true, false);
 
 		$this->tpl = $tpl;
 		$this->ctrl = $ilCtrl;
@@ -217,7 +227,7 @@ class ilObjOrgUnitGUI extends ilContainerGUI {
 				$this->ctrl->saveParameterByClass("illearningprogressgui", "obj_id");
 				$this->ctrl->saveParameterByClass("illearningprogressgui", "recursive");
 				include_once './Services/Tracking/classes/class.ilLearningProgressGUI.php';
-				$new_gui =& new ilLearningProgressGUI(ilLearningProgressGUI::LP_CONTEXT_ORG_UNIT, $_GET["ref_id"], $_GET['obj_id']);
+				$new_gui = new ilLearningProgressGUI(ilLearningProgressGUI::LP_CONTEXT_ORG_UNIT, $_GET["ref_id"], $_GET['obj_id']);
 				$this->ctrl->forwardCommand($new_gui);
 				break;
 			case 'ilorgunitexportgui':
@@ -360,11 +370,19 @@ class ilObjOrgUnitGUI extends ilContainerGUI {
 
 	public function showTree() {
 		$tree = new ilOrgUnitExplorerGUI("orgu_explorer", "ilObjOrgUnitGUI", "showTree", new ilTree(1));
-		$tree->setTypeWhiteList(array( "orgu" ));
+		$tree->setTypeWhiteList(
+			$this->getTreeWhiteList()
+		);
 		if (!$tree->handleCommand()) {
 			$this->tpl->setLeftNavContent($tree->getHTML());
 		}
 		$this->ctrl->setParameterByClass("ilObjOrgUnitGUI", "ref_id", $_GET["ref_id"]);
+	}
+
+	protected function getTreeWhiteList() {
+		$whiteList = array("orgu");
+		$pls = ilOrgUnitExtension::getActivePluginIdsForTree();
+		return array_merge($whiteList, $pls);
 	}
 
 
@@ -373,7 +391,6 @@ class ilObjOrgUnitGUI extends ilContainerGUI {
 	 */
 	public function setTitleAndDescription() {
 		# all possible create permissions
-		//$possible_ops_ids = $rbacreview->getOperationsByTypeAndClass('orgu', 'create');
 		parent::setTitleAndDescription();
 		if ($this->object->getTitle() == "__OrgUnitAdministration") {
 			$this->tpl->setTitle($this->lng->txt("objs_orgu"));
@@ -391,7 +408,10 @@ class ilObjOrgUnitGUI extends ilContainerGUI {
 	}
 
 
-	protected function addAdminLocatorItems() {
+	/**
+	 * @param bool $a_do_not_add_object
+	 */
+	protected function addAdminLocatorItems($a_do_not_add_object = false) {
 		$path = $this->tree->getPathFull($_GET["ref_id"], ilObjOrgUnit::getRootOrgRefId());
 		// add item for each node on path
 		foreach ((array)$path as $key => $row) {
@@ -423,7 +443,7 @@ class ilObjOrgUnitGUI extends ilContainerGUI {
 	/**
 	 * @param ilTabsGUI $tabs_gui
 	 */
-	public function getTabs(ilTabsGUI $tabs_gui = NULL) {
+	public function getTabs() {
 		if ($this->ilAccess->checkAccess('read', '', $this->object->getRefId())) {
 			$this->tabs_gui->addTab("view_content", $this->lng->txt("content"), $this->ctrl->getLinkTarget($this, ""));
 			$this->tabs_gui->addTab("info_short", "Info", $this->ctrl->getLinkTargetByClass("ilinfoscreengui", "showSummary"));
@@ -450,7 +470,7 @@ class ilObjOrgUnitGUI extends ilContainerGUI {
 				$this->tabs_gui->addTab('orgu_types', $this->lng->txt('orgu_types'), $this->ctrl->getLinkTargetByClass('ilOrgUnitTypeGUI'));
 			}
 		}
-		parent::getTabs($this->tabs_gui);
+		parent::getTabs();
 	}
 
 
@@ -582,7 +602,10 @@ class ilObjOrgUnitGUI extends ilContainerGUI {
 	}
 
 
-	public function showAdministrationPanel($tpl) {
+	/**
+	 * @param $tpl
+	 */
+	public function showAdministrationPanel(&$tpl) {
 		parent::showAdministrationPanel($tpl);
 		//an ugly encapsulation violation in order to remove the "verknüpfen"/"link" and copy button.
 		/** @var $toolbar ilToolbarGUI */
@@ -600,17 +623,20 @@ class ilObjOrgUnitGUI extends ilContainerGUI {
 
 
 	public static function _goto($ref_id) {
-		global $ilCtrl;
+		global $DIC;
+		$ilCtrl = $DIC['ilCtrl'];
 		$ilCtrl->initBaseClass("ilAdministrationGUI");
 		$ilCtrl->setTargetScript("ilias.php");
 		$ilCtrl->setParameterByClass("ilObjOrgUnitGUI", "ref_id", $ref_id);
 		$ilCtrl->setParameterByClass("ilObjOrgUnitGUI", "admin_mode", "settings");
+		$ilCtrl->setParameterByClass("IlObjPluginDispatchGUI", "admin_mode", "settings");
 		$ilCtrl->redirectByClass(array( "ilAdministrationGUI", "ilObjOrgUnitGUI" ), "view");
 	}
 
 
 	protected function getTreeSelectorGUI($cmd) {
-		global $tree;
+		global $DIC;
+		$tree = $DIC['tree'];
 		$explorer = new ilOrgUnitExplorerGUI("rep_exp_sel", $this, "showPasteTree", $tree);
 		$explorer->setAjax(false);
 		$explorer->setSelectMode('nodes[]', false);
@@ -622,8 +648,8 @@ class ilObjOrgUnitGUI extends ilContainerGUI {
 	/**
 	 * @param ilTabsGUI $tabs_gui
 	 */
-	public function getAdminTabs(ilTabsGUI $tabs_gui) {
-		$this->getTabs($tabs_gui);
+	public function getAdminTabs() {
+		$this->getTabs();
 	}
 
 
@@ -659,7 +685,7 @@ class ilObjOrgUnitGUI extends ilContainerGUI {
 	 * @return ilTableGUI
 	 * @description Make protected function avaiable for ilLocalUserGUI...
 	 */
-	public function __initTableGUI() {
+	public function &__initTableGUI() {
 		return parent::__initTableGUI();
 	}
 
@@ -668,8 +694,8 @@ class ilObjOrgUnitGUI extends ilContainerGUI {
 	 * @return ilTableGUI
 	 * @description Make protected function avaiable for ilLocalUserGUI...
 	 */
-	public function __setTableGUIBasicData(&$tbl, &$a_result_set, $a_from, $a_form) {
-		return parent::__setTableGUIBasicData($tbl, $a_result_set, $a_from, $a_form);
+	public function __setTableGUIBasicData(&$tbl, &$result_set, $a_from = "") {
+		return parent::__setTableGUIBasicData($tbl, $result_set, $a_from);
 	}
 }
 

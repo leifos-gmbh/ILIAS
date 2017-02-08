@@ -204,7 +204,7 @@ class ilForumTopic
 				WHERE thr_pk = %s',
 				array('integer'), array($this->id));
 
-			$row = $res->fetchRow(DB_FETCHMODE_OBJECT);
+			$row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT);
 
 			if (is_object($row))
 			{
@@ -259,7 +259,7 @@ class ilForumTopic
 			AND parent_pos = %s',
 			array('integer', 'integer'), array($this->id, '1'));
 		
-		$row = $res->fetchRow(DB_FETCHMODE_OBJECT);
+		$row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT);
 		
 		return $row->pos_fk ? $row->pos_fk : 0;
 	}
@@ -302,7 +302,7 @@ class ilForumTopic
 			WHERE pos_thr_fk = %s',
 			array('integer'), array($this->id));
 		
-		$rec = $res->fetchRow(DB_FETCHMODE_ASSOC);
+		$rec = $res->fetchRow(ilDBConstants::FETCHMODE_ASSOC);
 			
 		return $rec['cnt'];
 	}
@@ -326,7 +326,7 @@ class ilForumTopic
 			AND pos_thr_fk = %s',
 			array('integer', 'integer', 'integer', 'integer'), array('1', '0', $ilUser->getId(), $this->id));
 			
-		$rec = $res->fetchRow(DB_FETCHMODE_ASSOC);
+		$rec = $res->fetchRow(ilDBConstants::FETCHMODE_ASSOC);
 			
 		return $rec['cnt'];
 	}
@@ -348,7 +348,7 @@ class ilForumTopic
 			array('integer', 'integer'),
 			array('0', $this->id));
 			
-		$row = $res->fetchRow(DB_FETCHMODE_OBJECT);
+		$row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT);
 		
 		return new ilForumPost($row->pos_pk);
 	}
@@ -371,7 +371,7 @@ class ilForumTopic
 				ORDER BY pos_date DESC',
 				array('integer'), array($this->id));
 			
-			$row = $res->fetchRow(DB_FETCHMODE_OBJECT);
+			$row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT);
 
 			return new ilForumPost($row->pos_pk);
 		}
@@ -402,7 +402,7 @@ class ilForumTopic
 				array('integer', 'integer', 'integer', 'integer'),
 				array($this->id, '1', '0', $ilUser->getId()));
 			
-			$row = $res->fetchRow(DB_FETCHMODE_OBJECT);
+			$row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT);
 			
 			return new ilForumPost($row->pos_pk);
 		}
@@ -423,7 +423,7 @@ class ilForumTopic
 				array('integer'),
 				array($this->id));
 			
-			while ($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+			while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 			{
 				$posts[$row->pos_pk] = $row;
 			}
@@ -565,40 +565,41 @@ class ilForumTopic
 				}
 			}
 
-			$this->db->lockTables(
-				array(
-					0 => array('name' => 'frm_user_read',     'type' => ilDB::LOCK_WRITE),
-					1 => array('name' => 'frm_thread_access', 'type' => ilDB::LOCK_WRITE)
-				)
-			);
+			$current_id = $this->id;
 
-			$this->db->manipulateF('
+			$ilAtomQuery = $ilDB->buildAtomQuery();
+			$ilAtomQuery->addTableLock('frm_user_read');
+			$ilAtomQuery->addTableLock('frm_thread_access');
+
+			$ilAtomQuery->addQueryCallable(function (ilDBInterface $ilDB) use ($new_obj_id, $current_id) {
+				$ilDB->manipulateF('
 				DELETE FROM frm_user_read
 				WHERE obj_id = %s AND thread_id =%s',
-				array('integer', 'integer'),
-				array($new_obj_id, $this->id));
-			
-			$this->db->manipulateF('
+					array('integer', 'integer'),
+					array($new_obj_id, $current_id));
+
+				$ilDB->manipulateF('
 				UPDATE frm_user_read
 				SET obj_id = %s
 				WHERE thread_id = %s',
-				array('integer', 'integer'),
-				array($new_obj_id, $this->id));
+					array('integer', 'integer'),
+					array($new_obj_id, $current_id));
 
-			$this->db->manipulateF('
+				$ilDB->manipulateF('
 				DELETE FROM frm_thread_access
 				WHERE obj_id = %s AND thread_id =%s',
-				array('integer', 'integer'),
-				array($new_obj_id, $this->id));
-			
-			$this->db->manipulateF('
+					array('integer', 'integer'),
+					array($new_obj_id, $current_id));
+
+				$ilDB->manipulateF('
 				UPDATE frm_thread_access
 				SET obj_id = %s
 				WHERE thread_id =%s',
-				array('integer', 'integer'),  
-				array($new_obj_id, $this->id));
+					array('integer', 'integer'),
+					array($new_obj_id, $current_id));
+			});
 
-			$this->db->unlockTables();
+			$ilAtomQuery->run();
 
 			$this->db->manipulateF('
 				UPDATE frm_posts
@@ -616,7 +617,7 @@ class ilForumTopic
 
 			$new_obj_id = ilForum::_lookupObjIdForForumId($new_pk);
 
-			while($post = $posts->fetchRow(DB_FETCHMODE_ASSOC))
+			while($post = $posts->fetchRow(ilDBConstants::FETCHMODE_ASSOC))
 			{ 
 				include_once("./Services/News/classes/class.ilNewsItem.php");
 				$news_id = ilNewsItem::getFirstNewsIdForContext($old_obj_id,
@@ -633,7 +634,7 @@ class ilForumTopic
 		return 0;
 	}
 	
-	public function getNestedSetPostChildren($pos_id = null, $expandedNodes = array())
+	public function getNestedSetPostChildren($pos_id = null, $levels = null)
 	{
 		global $ilUser;
 
@@ -644,7 +645,7 @@ class ilForumTopic
 		if( $pos_id !== null )
 		{
 			$res = $this->db->queryF("
-				SELECT		lft, rgt
+				SELECT		lft, rgt, depth
 				FROM		frm_posts_tree
 				WHERE		pos_fk = %s
 				AND			thr_fk = %s",
@@ -677,7 +678,7 @@ class ilForumTopic
 							THEN 0
 							ELSE 1
 							END) post_read,
-							COUNT(fpt2.pos_fk) children	
+							COUNT(fpt2.pos_fk) children
 
 			FROM			frm_posts_tree fpt
 
@@ -710,12 +711,12 @@ class ilForumTopic
 		{
 			$query .= ' AND (fp.pos_status = 1 OR fp.pos_status = 0 AND fp.pos_display_user_id = ' . $this->db->quote($ilUser->getId(), 'integer') . ') ';
 		}
-		
-		if( $expandedNodes )			
+
+		if( $data && is_numeric($levels) )
 		{
-			$query .= ' AND '.$this->db->in('fpt.parent_pos', $expandedNodes, false, 'integer').' ';	
+			$query .= ' AND fpt.depth <= '.$this->db->quote($data['depth'] + $levels, 'integer').' ';
 		}
-			
+
 		$query .= ' GROUP BY fpt.depth,
 							fpt.rgt,
 							fpt.parent_pos,

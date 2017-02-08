@@ -20,6 +20,27 @@ abstract class ilPageContent
 	var $hier_id; 		// hierarchical editing id
 	var $node;			// node in page xml
 	var $dom;			// dom object
+	var $page_lang;
+
+	/**
+	 * @var string needed for post processing (e.g. content includes)
+	 */
+	protected $file_download_link;
+
+	/**
+	 * @var string needed for post processing (e.g. content includes)
+	 */
+	protected $fullscreen_link;
+
+	/**
+	 * @var string needed for post processing (e.g. content includes)
+	 */
+	protected $sourcecode_download_script;
+
+	/**
+	 * @var ilLogger
+	 */
+	protected $log;
 
 	/**
 	* Constructor.
@@ -29,6 +50,7 @@ abstract class ilPageContent
 	*/
 	final function __construct($a_pg_obj)
 	{
+		$this->log = ilLoggerFactory::getLogger('copg');
 		$this->setPage($a_pg_obj);
 		$this->dom = $a_pg_obj->getDom();
 		$this->init();
@@ -89,9 +111,9 @@ abstract class ilPageContent
 	*
 	* @param	object	$a_node		node object
 	*/
-	function setNode(&$a_node)
+	function setNode($a_node)
 	{
-		$this->node =& $a_node;
+		$this->node = $a_node;
 	}
 	
 
@@ -108,7 +130,7 @@ abstract class ilPageContent
 	/**
 	 * Get Javascript files
 	 */
-	function getJavascriptFiles()
+	function getJavascriptFiles($a_mode)
 	{
 		return array();
 	}
@@ -116,7 +138,7 @@ abstract class ilPageContent
 	/**
 	 * Get css files
 	 */
-	function getCssFiles()
+	function getCssFiles($a_mode)
 	{
 		return array();
 	}
@@ -124,7 +146,7 @@ abstract class ilPageContent
 	/**
 	 * Get on load code
 	 */
-	function getOnloadCode()
+	function getOnloadCode($a_mode)
 	{
 		return array();
 	}
@@ -189,7 +211,67 @@ abstract class ilPageContent
 		return $this->pcid;
 	}
 
-	
+	/**
+	 * Set file download link
+	 *
+	 * @param string $a_download_link download link
+	 */
+	function setFileDownloadLink($a_download_link)
+	{
+		$this->file_download_link = $a_download_link;
+	}
+
+	/**
+	 * Get file download link
+	 *
+	 * @return string
+	 */
+	function getFileDownloadLink()
+	{
+		return $this->file_download_link;
+	}
+
+	/**
+	 * Set fullscreen link
+	 *
+	 * @param string $a_download_link download link
+	 */
+	function setFullscreenLink($a_fullscreen_link)
+	{
+		$this->fullscreen_link = $a_fullscreen_link;
+	}
+
+	/**
+	 * Get fullscreen link
+	 *
+	 * @return string
+	 */
+	function getFullscreenLink()
+	{
+		return $this->fullscreen_link;
+	}
+
+	/**
+	 * Set sourcecode download script
+	 *
+	 * @param string $script_name
+	 */
+	function setSourcecodeDownloadScript ($script_name)
+	{
+		$this->sourcecode_download_script = $script_name;
+	}
+
+	/**
+	 * Get sourcecode download script
+	 *
+	 * @return string
+	 */
+	function getSourcecodeDownloadScript ()
+	{
+		return $this->sourcecode_download_script;
+	}
+
+
 	/**
 	* Read PC Id.
 	*
@@ -285,7 +367,7 @@ abstract class ilPageContent
 	/**
 	* Check whether Hier ID $a is greater than Hier ID $b
 	*/
-	function isGreaterHierId($a, $b)
+	static function isGreaterHierId($a, $b)
 	{
 		$a_arr = explode("_", $a);
 		$b_arr = explode("_", $b);

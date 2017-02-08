@@ -98,10 +98,10 @@ class ilMembershipCronNotifications extends ilCronJob
 							$user_id);
 						if($user_news)
 						{
-							$user_news_aggr[$user_id][$ref_id] = $user_news;		
-							
+							$user_news_aggr[$user_id][$ref_id] = $user_news;	
+
 							// #17928
-							ilCronManager::ping($this->getId());
+							ilCronManager::ping($this->getId());							
 						}
 					}
 				}				
@@ -161,7 +161,7 @@ class ilMembershipCronNotifications extends ilCronJob
 		global $lng;
 		
 		$wrong_parent = (array_key_exists($a_item["id"], $a_filter_map) &&
-				$a_parent_ref_id != $a_filter_map[$a_item["id"]]);		
+				$a_parent_ref_id != $a_filter_map[$a_item["id"]]);	
 		
 		// #18223
 		if($wrong_parent)
@@ -229,7 +229,7 @@ class ilMembershipCronNotifications extends ilCronJob
 		$res = "";
 		switch($item_obj_type)
 		{
-			case "frm":				
+			case "frm":			
 				if(!$a_is_sub)
 				{
 					$res =  $lng->txt("obj_".$item_obj_type).
@@ -241,7 +241,7 @@ class ilMembershipCronNotifications extends ilCronJob
 				}				
 				break;
 				
-			case "file":
+			case "file":				
 				if(!is_array($a_item["aggregation"]) ||
 					sizeof($a_item["aggregation"]) == 1)
 				{
@@ -270,13 +270,13 @@ class ilMembershipCronNotifications extends ilCronJob
 				if($content)
 				{
 					$res .= ' - '.$content;
-				}			
+				}				
 				break;
 		}	
 		
 		$res = $a_is_sub 
 			? "- ".$res
-			: "# ".$res;
+			: "# ".$res;		
 		
 		if(sizeof($sub))
 		{		
@@ -360,8 +360,6 @@ class ilMembershipCronNotifications extends ilCronJob
 		$lng = $ntf->getUserLanguage($a_user_id);
 		
 		include_once './Services/Locator/classes/class.ilLocatorGUI.php';			
-		require_once "HTML/Template/ITX.php";
-		require_once "./Services/UICore/classes/class.ilTemplateHTMLITX.php";
 		require_once "./Services/UICore/classes/class.ilTemplate.php";
 		require_once "./Services/Link/classes/class.ilLink.php";
 			
@@ -401,7 +399,7 @@ class ilMembershipCronNotifications extends ilCronJob
 			{
 				$parent["news"] = implode("\n", $parsed);			
 				$tmp[$path] = $parent;		
-			}
+			}											
 		}
 		
 		// any objects?

@@ -24,7 +24,7 @@ class ilObjUserFolderGUI extends ilObjectGUI
 	* Constructor
 	* @access public
 	*/
-	function ilObjUserFolderGUI($a_data,$a_id,$a_call_by_reference, $a_prepare_output = true)
+	function __construct($a_data,$a_id,$a_call_by_reference, $a_prepare_output = true)
 	{
 		global $ilCtrl;
 
@@ -32,7 +32,7 @@ class ilObjUserFolderGUI extends ilObjectGUI
 		define('USER_FOLDER_ID',7);
 		
 		$this->type = "usrf";
-		$this->ilObjectGUI($a_data,$a_id,$a_call_by_reference,false);
+		parent::__construct($a_data,$a_id,$a_call_by_reference,false);
 		
 		$this->lng->loadLanguageModule('search');
 		$this->lng->loadLanguageModule("user");
@@ -49,7 +49,7 @@ class ilObjUserFolderGUI extends ilObjectGUI
 		return $this->user_owner_id ? $this->user_owner_id : USER_FOLDER_ID;
 	}
 
-	function &executeCommand()
+	function executeCommand()
 	{
 		global $ilTabs;
 		
@@ -69,13 +69,13 @@ class ilObjUserFolderGUI extends ilObjectGUI
 
 			case 'ilpermissiongui':
 				include_once("Services/AccessControl/classes/class.ilPermissionGUI.php");
-				$perm_gui =& new ilPermissionGUI($this);
+				$perm_gui = new ilPermissionGUI($this);
 				$ret =& $this->ctrl->forwardCommand($perm_gui);
 				break;
 				
 			case 'ilrepositorysearchgui':
 				include_once('./Services/Search/classes/class.ilRepositorySearchGUI.php');
-				$user_search =& new ilRepositorySearchGUI();
+				$user_search = new ilRepositorySearchGUI();
 				$user_search->setTitle($this->lng->txt("search_user_extended")); // #17502
 				$user_search->enableSearchableCheck(false);
 				$user_search->setUserLimitations(false);
@@ -906,7 +906,7 @@ class ilObjUserFolderGUI extends ilObjectGUI
 	*/
 	function importUserRoleAssignmentObject ()
 	{
-		global $ilUser,$rbacreview, $tpl, $lng, $ilCtrl;;
+		global $ilUser, $tpl, $lng, $ilCtrl;;
 	
 		// Blind out tabs for local user import
 		if ($_GET["baseClass"] == 'ilRepositoryGUI')
@@ -1128,12 +1128,13 @@ class ilObjUserFolderGUI extends ilObjectGUI
 					// local roles and may contains thousands of roles on large ILIAS
 					// installations.
 					$loc_roles = array();
+					require_once 'Services/Mail/classes/Address/Type/class.ilMailRoleAddressType.php';
 					foreach($roles as $role_id => $role)
 					{
 						if ($role["type"] == "Local")
 						{
 							$searchName = (substr($role['name'],0,1) == '#') ? $role['name'] : '#'.$role['name'];
-							$matching_role_ids = $rbacreview->searchRolesByMailboxAddressList($searchName);
+							$matching_role_ids = ilMailRoleAddressType::searchRolesByMailboxAddressList($searchName);
 							foreach ($matching_role_ids as $mid) {
 								if (! in_array($mid, $loc_roles)) {
 									$loc_roles[] = $mid;
@@ -1151,6 +1152,7 @@ class ilObjUserFolderGUI extends ilObjectGUI
 				
 				// create a search array with  .
 				$l_roles_mailbox_searcharray = array();
+				require_once 'Services/Mail/classes/Address/Type/class.ilMailRoleAddressType.php';
 				foreach ($loc_roles as $key => $loc_role)
 				{
 					// fetch context path of role
@@ -1205,14 +1207,15 @@ class ilObjUserFolderGUI extends ilObjectGUI
 						{
 							$path = "<b>Rolefolder ".$rolf[0]." not found in tree! (Role ".$loc_role.")</b>";
 						}
-						$roleMailboxAddress = $rbacreview->getRoleMailboxAddress($loc_role);
+						$roleMailboxAddress = ilMailRoleAddressType::getRoleMailboxAddress($loc_role);
 						$l_roles[$loc_role] = $roleMailboxAddress.', '.$path;
 					}
 				} //foreach role
 	
 				$l_roles[""] = ""; 
 				natcasesort($l_roles);
-				$l_roles[""] = $this->lng->txt("usrimport_ignore_role"); 
+				$l_roles[""] = $this->lng->txt("usrimport_ignore_role");
+				require_once 'Services/Mail/classes/Address/Type/class.ilMailRoleAddressType.php';
 				foreach($roles as $role_id => $role)
 				{
 					if ($role["type"] == "Local")
@@ -1220,7 +1223,7 @@ class ilObjUserFolderGUI extends ilObjectGUI
 						$this->tpl->setCurrentBlock("local_role");
 						$this->tpl->setVariable("TXT_IMPORT_LOCAL_ROLE", $role["name"]);
 						$searchName = (substr($role['name'],0,1) == '#') ? $role['name'] : '#'.$role['name'];
-						$matching_role_ids = $rbacreview->searchRolesByMailboxAddressList($searchName);
+						$matching_role_ids = ilMailRoleAddressType::searchRolesByMailboxAddressList($searchName);
 						$pre_select = count($matching_role_ids) == 1 ? $matching_role_ids[0] : "";
 						if ($this->object->getRefId() == USER_FOLDER_ID) {
 							// There are too many roles in a large ILIAS installation
@@ -1383,341 +1386,7 @@ class ilObjUserFolderGUI extends ilObjectGUI
 			$this->ctrl->redirectByClass('ilobjcategorygui','listUsers');
 		}
 	}
-
-
-	function appliedUsersObject()
-	{
-		global $rbacsystem,$ilias;
-
-		unset($_SESSION['applied_users']);
-
-		if (!$rbacsystem->checkAccess("visible,read",$this->object->getRefId()))
-		{
-			$this->ilias->raiseError($this->lng->txt("permission_denied"),$this->ilias->error_obj->MESSAGE);
-		}
-		
-		if(!count($app_users =& $ilias->account->getAppliedUsers()))
-		{
-			ilUtil::sendFailure($this->lng->txt('no_users_applied'));
-
-			return false;
-		}
-
-		$this->tpl->addBlockFile("ADM_CONTENT", "adm_content", "tpl.usr_applied_users.html", "Services/User");
-		$this->lng->loadLanguageModule('crs');
-		
-		$counter = 0;
-		foreach($app_users as $usr_id)
-		{
-			$tmp_user =& ilObjectFactory::getInstanceByObjId($usr_id);
-
-			$f_result[$counter][]	= ilUtil::formCheckbox(0,"users[]",$usr_id);
-			$f_result[$counter][]   = $tmp_user->getLogin();
-			$f_result[$counter][]	= $tmp_user->getFirstname();
-			$f_result[$counter][]	= $tmp_user->getLastname();
-			
-			if($tmp_user->getTimeLimitUnlimited())
-			{
-				$f_result[$counter][]	= "<b>".$this->lng->txt('crs_unlimited')."</b>";
-			}
-			else
-			{
-				$limit = "<b>".$this->lng->txt('crs_from').'</b> '.strftime("%Y-%m-%d %R",$tmp_user->getTimeLimitFrom()).'<br />';
-				$limit .= "<b>".$this->lng->txt('crs_to').'</b> '.strftime("%Y-%m-%d %R",$tmp_user->getTimeLimitUntil());
-
-				$f_result[$counter][]	= $limit;
-			}
-			++$counter;
-		}
-
-		$this->__showAppliedUsersTable($f_result);
-
-		return true;
-	}
-
-	function editAppliedUsersObject()
-	{
-		global $rbacsystem;
-
-		if(!$rbacsystem->checkAccess("write", $this->ref_id))
-		{
-			$this->ilias->raiseError($this->lng->txt("msg_no_perm_write"),$this->ilias->error_obj->MESSAGE);
-		}
-
-		$this->lng->loadLanguageModule('crs');
-
-		$_POST['users'] = $_SESSION['applied_users'] = ($_SESSION['applied_users'] ? $_SESSION['applied_users'] : $_POST['users']);
-
-		if(!isset($_SESSION['error_post_vars']))
-		{
-			ilUtil::sendInfo($this->lng->txt('time_limit_add_time_limit_for_selected'));
-		}
-
-		if(!count($_POST["users"]))
-		{
-			ilUtil::sendFailure($this->lng->txt("time_limit_no_users_selected"));
-			$this->appliedUsersObject();
-
-			return false;
-		}
-		
-		$counter = 0;
-		foreach($_POST['users'] as $usr_id)
-		{
-			if($counter)
-			{
-				$title .= ', ';
-			}
-			$tmp_user =& ilObjectFactory::getInstanceByObjId($usr_id);
-			$title .= $tmp_user->getLogin();
-			++$counter;
-		}
-		if(strlen($title) > 79)
-		{
-			$title = substr($title,0,80);
-			$title .= '...';
-		}
-
-
-		$this->tpl->addBlockFile("ADM_CONTENT", "adm_content", "tpl.usr_edit_applied_users.html", "Services/User");
-		$this->tpl->setVariable("FORMACTION",$this->ctrl->getFormAction($this));
-
-		// LOAD SAVED DATA IN CASE OF ERROR
-		$time_limit_unlimited = $_SESSION["error_post_vars"]["au"]["time_limit_unlimited"] ? 
-			1 : 0;
-
-		$time_limit_start = $_SESSION["error_post_vars"]["au"]["time_limit_start"] ? 
-			$this->__toUnix($_SESSION["error_post_vars"]["au"]["time_limit_start"]) :
-			time();
-		$time_limit_end = $_SESSION["error_post_vars"]["au"]["time_limit_end"] ? 
-			$this->__toUnix($_SESSION["error_post_vars"]["au"]["time_limit_end"]) :
-			time();
-
-		
-		// SET TEXT VARIABLES
-		$this->tpl->setVariable("ALT_IMG",$this->lng->txt("obj_usr"));
-		$this->tpl->setVariable("TYPE_IMG",ilObject::_getIcon("", "", "usr"));
-		$this->tpl->setVariable("TITLE",$title);
-		$this->tpl->setVariable("TXT_TIME_LIMIT",$this->lng->txt("time_limit"));
-		$this->tpl->setVariable("TXT_TIME_LIMIT_START",$this->lng->txt("crs_start"));
-		$this->tpl->setVariable("TXT_TIME_LIMIT_END",$this->lng->txt("crs_end"));
-		$this->tpl->setVariable("CMD_SUBMIT","updateAppliedUsers");
-		$this->tpl->setVariable("TXT_CANCEL",$this->lng->txt("cancel"));
-		$this->tpl->setVariable("TXT_SUBMIT",$this->lng->txt("submit"));
-		
-
-
-		$this->tpl->setVariable("SELECT_TIME_LIMIT_START_DAY",$this->__getDateSelect("day","au[time_limit_start][day]",
-																					 date("d",$time_limit_start)));
-		$this->tpl->setVariable("SELECT_TIME_LIMIT_START_MONTH",$this->__getDateSelect("month","au[time_limit_start][month]",
-																					   date("m",$time_limit_start)));
-		$this->tpl->setVariable("SELECT_TIME_LIMIT_START_YEAR",$this->__getDateSelect("year","au[time_limit_start][year]",
-																					  date("Y",$time_limit_start)));
-		$this->tpl->setVariable("SELECT_TIME_LIMIT_START_HOUR",$this->__getDateSelect("hour","au[time_limit_start][hour]",
-																					  date("G",$time_limit_start)));
-		$this->tpl->setVariable("SELECT_TIME_LIMIT_START_MINUTE",$this->__getDateSelect("minute","au[time_limit_start][minute]",
-																					  date("i",$time_limit_start)));
-		$this->tpl->setVariable("SELECT_TIME_LIMIT_END_DAY",$this->__getDateSelect("day","au[time_limit_end][day]",
-																				   date("d",$time_limit_end)));
-		$this->tpl->setVariable("SELECT_TIME_LIMIT_END_MONTH",$this->__getDateSelect("month","au[time_limit_end][month]",
-																					 date("m",$time_limit_end)));
-		$this->tpl->setVariable("SELECT_TIME_LIMIT_END_YEAR",$this->__getDateSelect("year","au[time_limit_end][year]",
-																					date("Y",$time_limit_end)));
-		$this->tpl->setVariable("SELECT_TIME_LIMIT_END_HOUR",$this->__getDateSelect("hour","au[time_limit_end][hour]",
-																					  date("G",$time_limit_end)));
-		$this->tpl->setVariable("SELECT_TIME_LIMIT_END_MINUTE",$this->__getDateSelect("minute","au[time_limit_end][minute]",
-																					  date("i",$time_limit_end)));
-		if($this->ilias->account->getTimeLimitUnlimited())
-		{
-			$this->tpl->setVariable("ROWSPAN",3);
-			$this->tpl->setCurrentBlock("unlimited");
-			$this->tpl->setVariable("TXT_TIME_LIMIT_UNLIMITED",$this->lng->txt("crs_unlimited"));
-			$this->tpl->setVariable("TIME_LIMIT_UNLIMITED",ilUtil::formCheckbox($time_limit_unlimited,"au[time_limit_unlimited]",1));
-			$this->tpl->parseCurrentBlock();
-		}
-		else
-		{
-			$this->tpl->setVariable("ROWSPAN",2);
-		}
-	}
-
-	function updateAppliedUsersObject()
-	{
-		global $rbacsystem;
-
-		if(!$rbacsystem->checkAccess("write", $this->ref_id))
-		{
-			$this->ilias->raiseError($this->lng->txt("msg_no_perm_write"),$this->ilias->error_obj->MESSAGE);
-		}
-
-		$start	= $this->__toUnix($_POST['au']['time_limit_start']);
-		$end	= $this->__toUnix($_POST['au']['time_limit_end']);
-
-		if(!$_POST['au']['time_limit_unlimited'])
-		{
-			if($start > $end)
-			{
-				$_SESSION['error_post_vars'] = $_POST;
-				ilUtil::sendFailure($this->lng->txt('time_limit_not_valid'));
-				$this->editAppliedUsersObject();
-
-				return false;
-			}
-		}
-		#if(!$this->ilias->account->getTimeLimitUnlimited())
-		#{
-		#	if($start < $this->ilias->account->getTimeLimitFrom() or
-		#	   $end > $this->ilias->account->getTimeLimitUntil())
-		#	{
-		#		$_SESSION['error_post_vars'] = $_POST;
-		#		ilUtil::sendInfo($this->lng->txt('time_limit_not_within_owners'));
-		#		$this->editAppliedUsersObject();
-
-		#		return false;
-		#	}
-		#}
-
-		foreach($_SESSION['applied_users'] as $usr_id)
-		{
-			$tmp_user =& ilObjectFactory::getInstanceByObjId($usr_id);
-
-			$tmp_user->setTimeLimitUnlimited((int) $_POST['au']['time_limit_unlimited']);
-			$tmp_user->setTimeLimitFrom($start);
-			$tmp_user->setTimeLimitUntil($end);
-			$tmp_user->setTimeLimitMessage(0);
-			$tmp_user->update();
-
-			unset($tmp_user);
-		}
-
-		unset($_SESSION['applied_users']);
-		ilUtil::sendSuccess($this->lng->txt('time_limit_users_updated'));
-		$this->appliedUsersObject();
-		
-		return true;
-	}
-
-	function __showAppliedUsersTable($a_result_set)
-	{
-		$tbl =& $this->__initTableGUI();
-		$tpl =& $tbl->getTemplateObject();
-
-		// SET FORMAACTION
-		$tpl->setCurrentBlock("tbl_form_header");
-
-		$tpl->setVariable("FORMACTION",$this->ctrl->getFormAction($this));
-		$tpl->parseCurrentBlock();
-
-		$tpl->setCurrentBlock("tbl_action_btn");
-		$tpl->setVariable("BTN_NAME",'editAppliedUsers');
-		$tpl->setVariable("BTN_VALUE",$this->lng->txt('edit'));
-		$tpl->parseCurrentBlock();
-
-		$tpl->setCurrentBlock("tbl_action_row");
-		$tpl->setVariable("COLUMN_COUNTS",5);
-		$tpl->setVariable("IMG_ARROW", ilUtil::getImagePath("arrow_downright.svg"));
-		$tpl->setVariable("ALT_ARROW", $this->lng->txt("actions"));
-		$tpl->parseCurrentBlock();
-
-
-
-		$tbl->setTitle($this->lng->txt("time_limit_applied_users"),"",$this->lng->txt("users"));
-		$tbl->setHeaderNames(array('',
-								   $this->lng->txt("login"),
-								   $this->lng->txt("firstname"),
-								   $this->lng->txt("lastname"),
-								   $this->lng->txt("time_limits")));
-		$header_params = $this->ctrl->getParameterArray($this, "appliedUsers");
-		$tbl->setHeaderVars(array("",
-								  "login",
-								  "firstname",
-								  "lastname",
-								  "time_limit"),
-							array($header_params));
-		$tbl->setColumnWidth(array("3%","19%","19%","19%","40%"));
-
-
-		$this->__setTableGUIBasicData($tbl,$a_result_set);
-		$tbl->render();
-
-		$this->tpl->setVariable("APPLIED_USERS",$tbl->tpl->get());
-
-		return true;
-	}
-
-	function &__initTableGUI()
-	{
-		include_once "./Services/Table/classes/class.ilTableGUI.php";
-
-		return new ilTableGUI(0,false);
-	}
-
-	function __setTableGUIBasicData(&$tbl,&$result_set,$from = "")
-	{
-		$offset = $_GET["offset"];
-		$order = $_GET["sort_by"];
-		$direction = $_GET["sort_order"];
-
-        //$tbl->enable("hits");
-		$tbl->setOrderColumn($order);
-		$tbl->setOrderDirection($direction);
-		$tbl->setOffset($offset);
-		$tbl->setLimit($_GET["limit"]);
-		$tbl->setMaxCount(count($result_set));
-		$tbl->setFooter("tblfooter",$this->lng->txt("previous"),$this->lng->txt("next"));
-		$tbl->setData($result_set);
-	}
-
-	function __getDateSelect($a_type,$a_varname,$a_selected)
-    {
-        switch($a_type)
-        {
-            case "minute":
-                for($i=0;$i<=60;$i++)
-                {
-                    $days[$i] = $i < 10 ? "0".$i : $i;
-                }
-                return ilUtil::formSelect($a_selected,$a_varname,$days,false,true);
-
-            case "hour":
-                for($i=0;$i<24;$i++)
-                {
-                    $days[$i] = $i < 10 ? "0".$i : $i;
-                }
-                return ilUtil::formSelect($a_selected,$a_varname,$days,false,true);
-
-            case "day":
-                for($i=1;$i<32;$i++)
-                {
-                    $days[$i] = $i < 10 ? "0".$i : $i;
-                }
-                return ilUtil::formSelect($a_selected,$a_varname,$days,false,true);
-
-            case "month":
-                for($i=1;$i<13;$i++)
-                {
-                    $month[$i] = $i < 10 ? "0".$i : $i;
-                }
-                return ilUtil::formSelect($a_selected,$a_varname,$month,false,true);
-
-            case "year":
-                for($i = date("Y",time());$i < date("Y",time()) + 3;++$i)
-                {
-                    $year[$i] = $i;
-                }
-                return ilUtil::formSelect($a_selected,$a_varname,$year,false,true);
-        }
-    }
-	function __toUnix($a_time_arr)
-    {
-        return mktime($a_time_arr["hour"],
-                      $a_time_arr["minute"],
-                      $a_time_arr["second"],
-                      $a_time_arr["month"],
-                      $a_time_arr["day"],
-                      $a_time_arr["year"]);
-    }
-
+	
 	function hitsperpageObject()
 	{
         parent::hitsperpageObject();
@@ -1764,8 +1433,7 @@ class ilObjUserFolderGUI extends ilObjectGUI
 				'session_max_idle' => $ilSetting->get('session_max_idle', ilSessionControl::DEFAULT_MAX_IDLE),
 				'session_max_idle_after_first_request' => $ilSetting->get('session_max_idle_after_first_request', ilSessionControl::DEFAULT_MAX_IDLE_AFTER_FIRST_REQUEST),
 
-				'passwd_auto_generate' => (bool)$ilSetting->get("passwd_auto_generate"),			
-				'password_change_on_first_login_enabled' => $security->isPasswordChangeOnFirstLoginEnabled() ? 1 : 0, 													
+				'password_change_on_first_login_enabled' => $security->isPasswordChangeOnFirstLoginEnabled() ? 1 : 0,
 				'password_must_not_contain_loginame' => $security->getPasswordMustNotContainLoginnameStatus() ? 1 : 0, 													
 				'password_chars_and_numbers_enabled' => $security->isPasswordCharsAndNumbersEnabled() ? 1 : 0,
 				'password_special_chars_enabled' => $security->isPasswordSpecialCharsEnabled() ? 1 : 0 ,
@@ -1846,8 +1514,7 @@ class ilObjUserFolderGUI extends ilObjectGUI
 				$ilSetting->set('user_delete_own_account', (int)$this->form->getInput('user_own_account'));
 				$ilSetting->set('user_delete_own_account_email', $this->form->getInput('user_own_account_email'));
 				
-				$ilSetting->set("passwd_auto_generate", $this->form->getInput("passwd_auto_generate"));	
-				$ilSetting->set("password_assistance", $this->form->getInput("password_assistance"));	
+				$ilSetting->set("password_assistance", $this->form->getInput("password_assistance"));
 				
 				// BEGIN SESSION SETTINGS
 				$ilSetting->set('session_handling_type',
@@ -1955,7 +1622,7 @@ class ilObjUserFolderGUI extends ilObjectGUI
 		// create session reminder subform
 		$cb = new ilCheckboxInputGUI($this->lng->txt("session_reminder"), "session_reminder_enabled");
 		$expires = ilSession::getSessionExpireValue();
-		$time = ilFormat::_secondsToString($expires, true);
+		$time = ilDatePresentation::secondsToString($expires, true);
 		$cb->setInfo($this->lng->txt("session_reminder_info")."<br />".
 			sprintf($this->lng->txt('session_reminder_session_duration'), $time));		
 		$fixed->addSubItem($cb);
@@ -2044,12 +1711,6 @@ class ilObjUserFolderGUI extends ilObjectGUI
 		$pass->setTitle($this->lng->txt('ps_password_settings'));
 		$this->form->addItem($pass);
 		 
-		// password generation
-		$cb = new ilCheckboxInputGUI($this->lng->txt("passwd_generation_pre"), "passwd_auto_generate");
-		$cb->setChecked($ilSetting->get("passwd_auto_generate"));		
-		$cb->setInfo($this->lng->txt("passwd_generation_info"));
-		$this->form->addItem($cb);
-		
 		$check = new ilCheckboxInputGUI($this->lng->txt('ps_password_change_on_first_login_enabled'),'password_change_on_first_login_enabled');
 		$check->setInfo($this->lng->txt('ps_password_change_on_first_login_enabled_info'));
 		$this->form->addItem($check);
@@ -2174,6 +1835,7 @@ class ilObjUserFolderGUI extends ilObjectGUI
 		include_once 'Services/Search/classes/class.ilUserSearchOptions.php';
 		$lng->loadLanguageModule("administration");
 		$lng->loadLanguageModule("mail");
+		$lng->loadLanguageModule("chatroom");
 		$this->setSubTabs('settings');
 		$ilTabs->activateTab('settings');
 		$ilTabs->activateSubTab('standard_fields');
@@ -2374,6 +2036,8 @@ class ilObjUserFolderGUI extends ilObjectGUI
 		}
 		
 		$ilias->setSetting('mail_incoming_mail', (int)$_POST['select']['default_mail_incoming_mail']);
+		$ilias->setSetting('chat_osc_accept_msg', ilUtil::stripSlashes($_POST['select']['default_chat_osc_accept_msg']));
+		$ilias->setSetting('bs_allow_to_contact_me', ilUtil::stripSlashes($_POST['select']['default_bs_allow_to_contact_me']));
 
 		ilUtil::sendSuccess($this->lng->txt("usr_settings_saved"));
 		$this->settingsObject();
@@ -2761,9 +2425,9 @@ class ilObjUserFolderGUI extends ilObjectGUI
 		$this->ctrl->redirect($this, "newAccountMail");
 	}
 
-	function getAdminTabs(&$tabs_gui)
+	function getAdminTabs()
 	{
-		$this->getTabs($tabs_gui);
+		$this->getTabs();
 	}
 
 	/**
@@ -2771,7 +2435,7 @@ class ilObjUserFolderGUI extends ilObjectGUI
 	* @access	public
 	* @param	object	tabs gui object
 	*/
-	function getTabs(&$tabs_gui)
+	function getTabs()
 	{
 		include_once 'Services/Tracking/classes/class.ilObjUserTracking.php';
 
@@ -2779,10 +2443,10 @@ class ilObjUserFolderGUI extends ilObjectGUI
 		
 		if ($rbacsystem->checkAccess("visible,read",$this->object->getRefId()))
 		{
-			$tabs_gui->addTarget("usrf",
+			$this->tabs_gui->addTarget("usrf",
 				$this->ctrl->getLinkTarget($this, "view"), array("view","delete","resetFilter", "userAction", ""), "", "");
 
-			$tabs_gui->addTarget(
+			$this->tabs_gui->addTarget(
 				"search_user_extended",
 				$this->ctrl->getLinkTargetByClass('ilRepositorySearchGUI',''),
 				array(),
@@ -2793,10 +2457,10 @@ class ilObjUserFolderGUI extends ilObjectGUI
 		
 		if ($rbacsystem->checkAccess("write",$this->object->getRefId()))
 		{
-			$tabs_gui->addTarget("settings",
+			$this->tabs_gui->addTarget("settings",
 				$this->ctrl->getLinkTarget($this, "generalSettings"),array('settings','generalSettings','listUserDefinedField','newAccountMail'));
 				
-			$tabs_gui->addTarget("export",
+			$this->tabs_gui->addTarget("export",
 				$this->ctrl->getLinkTarget($this, "export"), "export", "", "");
 
 			/* deprecated, JF 27 May 2013
@@ -2811,7 +2475,7 @@ class ilObjUserFolderGUI extends ilObjectGUI
 
 		if ($rbacsystem->checkAccess('edit_permission',$this->object->getRefId()))
 		{
-			$tabs_gui->addTarget("perm_settings",
+			$this->tabs_gui->addTarget("perm_settings",
 								 $this->ctrl->getLinkTargetByClass(array(get_class($this),'ilpermissiongui'), "perm"), 
 								 array("perm","info","owner"), 'ilpermissiongui');
 		}
@@ -3053,6 +2717,8 @@ class ilObjUserFolderGUI extends ilObjectGUI
 		{			
 			$cmds["mail"] = $this->lng->txt("send_mail");
 		}
+		
+		$cmds['addToClipboard'] = $this->lng->txt('clipboard_add_btn');
 						
 		return $cmds;
 	}
@@ -3199,5 +2865,22 @@ class ilObjUserFolderGUI extends ilObjectGUI
 		}		
 	}
 	
+	protected function addToClipboardObject()
+	{
+		$users = (array) $_POST['id'];
+		if(!count($users))
+		{
+			ilUtil::sendFailure($this->lng->txt('select_one'),true);
+			$this->ctrl->redirect($this, 'view');
+		}
+		include_once './Services/User/classes/class.ilUserClipboard.php';
+		$clip = ilUserClipboard::getInstance($GLOBALS['ilUser']->getId());
+		$clip->add($users);
+		$clip->save();
+		
+		ilUtil::sendSuccess($this->lng->txt('clipboard_user_added'),true);
+		$this->ctrl->redirect($this, 'view');
+		
+	}
 } // END class.ilObjUserFolderGUI
 ?>

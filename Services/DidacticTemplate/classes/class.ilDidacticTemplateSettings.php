@@ -30,7 +30,7 @@ class ilDidacticTemplateSettings
 
 	/**
 	 * Get singelton instance
-	 * @return ilDidacticTemplateSetting
+	 * @return ilDidacticTemplateSettings
 	 */
 	public static function getInstance()
 	{
@@ -57,7 +57,7 @@ class ilDidacticTemplateSettings
 
 	/**
 	 * Get templates
-	 * @return array ilDidacticTemplateSetting
+	 * @return ilDidacticTemplateSetting[]
 	 */
 	public function getTemplates()
 	{
@@ -95,7 +95,7 @@ class ilDidacticTemplateSettings
 		}
 
 		$res = $ilDB->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$this->templates[$row->id] = new ilDidacticTemplateSetting($row->id);
 		}
@@ -125,7 +125,7 @@ class ilDidacticTemplateSettings
 		}
 
 		$res = $ilDB->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$this->templates[$row->id] = new ilDidacticTemplateSetting($row->id);
 		}

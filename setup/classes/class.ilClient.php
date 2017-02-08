@@ -4,8 +4,8 @@
 /**
 * Client Management
 *
-* @author Sascha Hofmann <shofmann@databay.de> 
-* @author Alex Killing <alex.killing@gmx.de> 
+* @author Sascha Hofmann <shofmann@databay.de>
+* @author Alex Killing <alex.killing@gmx.de>
 * @version $Id$
 *
 */
@@ -21,22 +21,27 @@ class ilClient
 	var $status;				// contains status infos about setup process (todo: move function to this class)
 	var $setup_ok = false;		// if client setup was finished at least once, this is set to true
 	var $nic_status;			// contains received data of ILIAS-NIC server when registering
-
+	/**
+	 * @var string
+	 */
+	public $error = '';
 	/**
 	 * @var ilDB
 	 */
 	public $db;
-
 	/**
 	 * @var ilIniFile
 	 */
 	public $ini;
-	
+
+
 	/**
-	* Constructor
-	* @param	string	client id
-	*/
-	function ilClient($a_client_id, $a_db_connections)
+	 * ilClient constructor.
+	 *
+	 * @param $a_client_id
+	 * @param $a_db_connections
+	 */
+	public function __construct($a_client_id, $a_db_connections)
 	{
 		if ($a_client_id)
 		{
@@ -45,11 +50,21 @@ class ilClient
 		}
 
 		$this->db_connections = $a_db_connections;
-		
+
 		// set path default.ini
 		$this->client_defaults = ILIAS_ABSOLUTE_PATH."/setup/client.master.ini.php";
 	}
-	
+
+
+	/**
+	 * @return \ilDbSetup
+	 */
+	public function getDBSetup() {
+		require_once('./setup/classes/class.ilDbSetup.php');
+
+		return ilDbSetup::getInstanceForClient($this);
+	}
+
 	/**
 	* init client
 	* load client.ini and set some constants
@@ -60,41 +75,51 @@ class ilClient
 		$this->ini = new ilIniFile($this->ini_file_path);
 
 		// load defaults only if no client.ini was found
-		if (!@file_exists($this->ini_file_path))
-		{
-//echo "<br>A-".$this->ini_file_path."-";
-			$this->ini->GROUPS = parse_ini_file($this->client_defaults,true);
+		if (!@file_exists($this->ini_file_path)) {
+			//echo "<br>A-".$this->ini_file_path."-";
+			$this->ini->GROUPS = parse_ini_file($this->client_defaults, true);
+
 			return false;
 		}
 
 		// read client.ini
-		if (!$this->ini->read())
-		{
-			$this->error = get_class($this).": ".$this->ini->getError();
-			return false;		
+		if (!$this->ini->read()) {
+			$this->error = get_class($this) . ": " . $this->ini->getError();
+
+			return false;
 		}
 
 		// only for ilias main
-		define("CLIENT_WEB_DIR",ILIAS_ABSOLUTE_PATH."/".ILIAS_WEB_DIR."/".$this->getId());
-		define("CLIENT_DATA_DIR",ILIAS_DATA_DIR."/".$this->getId());
-		define ("DEVMODE",$this->ini->readVariable('system','DEVMODE'));
-		define ("ROOT_FOLDER_ID",$this->ini->readVariable('system','ROOT_FOLDER_ID'));
-		define ("SYSTEM_FOLDER_ID",$this->ini->readVariable('system','SYSTEM_FOLDER_ID'));
-		define ("ROLE_FOLDER_ID",$this->ini->readVariable('system','ROLE_FOLDER_ID'));
-		define ("ANONYMOUS_USER_ID",13);
-		define ("ANONYMOUS_ROLE_ID",14);
-		define ("SYSTEM_USER_ID",6);
-		define ("SYSTEM_ROLE_ID",2);
-		
-		$this->db_exists = $this->connect();
-		if ($this->db_exists)
-		{
-			$this->db_installed = $this->isInstalledDB($this->db);
+		define("CLIENT_WEB_DIR", ILIAS_ABSOLUTE_PATH . "/" . ILIAS_WEB_DIR . "/" . $this->getId());
+		define("CLIENT_DATA_DIR", ILIAS_DATA_DIR . "/" . $this->getId());
+		define("DEVMODE", $this->ini->readVariable('system', 'DEVMODE'));
+		define("ROOT_FOLDER_ID", $this->ini->readVariable('system', 'ROOT_FOLDER_ID'));
+		define("SYSTEM_FOLDER_ID", $this->ini->readVariable('system', 'SYSTEM_FOLDER_ID'));
+		define("ROLE_FOLDER_ID", $this->ini->readVariable('system', 'ROLE_FOLDER_ID'));
+		define("ANONYMOUS_USER_ID", 13);
+		define("ANONYMOUS_ROLE_ID", 14);
+		define("SYSTEM_USER_ID", 6);
+		define("SYSTEM_ROLE_ID", 2);
+
+		$this->db_exists = $this->getDBSetup()->isConnectable();
+				$this->getDBSetup()->provideGlobalDB();
+		if ($this->db_exists) {
+			$this->db_installed = $this->getDBSetup()->isDatabaseInstalled();
 		}
-		
-		return true;	
+
+		return true;
 	}
-	
+
+
+	public function provideGlobalDB() {
+		$this->getDBSetup()->provideGlobalDB();
+	}
+
+
+	public function revokeGlobalDB() {
+		$this->getDBSetup()->provideGlobalDB();
+	}
+
 	/**
 	* get client id
 	* @return	string	client id
@@ -103,7 +128,7 @@ class ilClient
 	{
 		return $this->id;
 	}
-	
+
 	/**
 	* set client id
 	* @param	string	client id
@@ -113,7 +138,7 @@ class ilClient
 		$this->id = $a_client_id;
 		$this->webspace_dir = ILIAS_ABSOLUTE_PATH."/".ILIAS_WEB_DIR."/".$this->id;
 	}
-	
+
 	/**
 	* get client name
 	* @return	string	client name
@@ -122,7 +147,7 @@ class ilClient
 	{
 		return $this->ini->readVariable("client","name");
 	}
-	
+
 	/**
 	* set client name
 	* @param	string	client name
@@ -131,7 +156,7 @@ class ilClient
 	{
 		$this->ini->setVariable("client","name",$a_str);
 	}
-	
+
 	/**
 	* get client description
 	* @return	string	client description
@@ -140,7 +165,7 @@ class ilClient
 	{
 		return $this->ini->readVariable("client","description");
 	}
-	
+
 	/**
 	* set client description
 	* @param	string	client description
@@ -165,7 +190,7 @@ class ilClient
 	{
 		return $this->db;
 	}
-	
+
 	/**
 	* connect to client database
 	* @return	boolean	true on success
@@ -174,21 +199,14 @@ class ilClient
 	{
 		// check parameters
 		// To support oracle tnsnames.ora dbname is not required
-		if (!$this->getdbHost() || !$this->getdbUser())
-		{
+		if (!$this->getdbHost() || !$this->getdbUser()) {
 			$this->error = "empty_fields";
+
 			return false;
 		}
-		/*
-		if (!$this->getdbHost() || !$this->getdbName() || !$this->getdbUser())
-		{
-			$this->error = "empty_fields";
-			return false;
-		}
-		*/
-		
+
 		include_once("./Services/Database/classes/class.ilDBWrapperFactory.php");
-		$this->db = ilDBWrapperFactory::getWrapper($this->getdbType(), 
+		$this->db = ilDBWrapperFactory::getWrapper($this->getdbType(),
 			$this->ini->readVariable("db","inactive_mysqli"));
 		$this->db->setDBUser($this->getdbUser());
 		$this->db->setDBPort($this->getdbPort());
@@ -196,14 +214,17 @@ class ilClient
 		$this->db->setDBHost($this->getdbHost());
 		$this->db->setDBName($this->getdbName());
 		$con = $this->db->connect(true);
-		
+
 		if (!$con)
 		{
 			$this->error = "Database connection failed.";
 			return false;
 		}
 		$GLOBALS["ilDB"] = $this->db;
-		
+		$GLOBALS["DIC"]["ilDB"] = function($c) {
+			return $GLOBALS["ilDB"];
+		};
+
 		$this->db_exists = true;
 		return true;
 	}
@@ -223,7 +244,7 @@ class ilClient
 		{
 			return false;
 		}
-		
+
 		// check existence of some basic tables from ilias3 to determine if ilias3 is already installed in given database
 		if (in_array("object_data",$tables) and in_array("object_reference",$tables) and in_array("usr_data",$tables) and in_array("rbac_ua",$tables))
 		{
@@ -270,7 +291,7 @@ class ilClient
 				$this->dsn_host = "pgsql://".$this->getdbUser().":".$this->getdbPass()."@".$this->getdbHost().$db_port_str;
 				$this->dsn = "pgsql://".$this->getdbUser().":".$this->getdbPass()."@".$this->getdbHost().$db_port_str."/".$this->getdbName();
 				break;
-				
+
 			case "mysql":
 			case "innodb":
 			default:
@@ -282,7 +303,7 @@ class ilClient
 				$this->dsn_host = "mysql://".$this->getdbUser().":".$this->getdbPass()."@".$this->getdbHost().$db_port_str;
 				$this->dsn = "mysql://".$this->getdbUser().":".$this->getdbPass()."@".$this->getdbHost().$db_port_str."/".$this->getdbName();
 				break;
-		}				
+		}
 	}
 
 	/**
@@ -293,11 +314,11 @@ class ilClient
 	{
 		$this->ini->setVariable("db","host",$a_str);
 	}
-	
+
 	/**
 	* get db host
 	* @return	string	db host
-	* 
+	*
 	*/
 	function getDbHost()
 	{
@@ -330,7 +351,7 @@ class ilClient
 	{
 		$this->ini->setVariable("db","user",$a_str);
 	}
-	
+
 	/**
 	* get db user
 	* @return	string	db user
@@ -366,7 +387,7 @@ class ilClient
 	{
 		$this->ini->setVariable("db","pass",$a_str);
 	}
-	
+
 	/**
 	* get db password
 	* @return	string	db password
@@ -384,11 +405,11 @@ class ilClient
 	{
 		$this->ini->setVariable("db","slave_active", (int) $a_act);
 	}
-	
+
 	/**
 	* get slave active
 	* @return int active
-	* 
+	*
 	*/
 	function getDbSlaveActive()
 	{
@@ -403,11 +424,11 @@ class ilClient
 	{
 		$this->ini->setVariable("db","slave_host",$a_str);
 	}
-	
+
 	/**
 	* get db slave host
 	* @return	string	db host
-	* 
+	*
 	*/
 	function getDbSlaveHost()
 	{
@@ -440,7 +461,7 @@ class ilClient
 	{
 		$this->ini->setVariable("db","slave_user",$a_str);
 	}
-	
+
 	/**
 	* get slave db user
 	* @return	string	db user
@@ -476,7 +497,7 @@ class ilClient
 	{
 		$this->ini->setVariable("db","slave_pass",$a_str);
 	}
-	
+
 	/**
 	* get slave db password
 	* @return	string	db password
@@ -530,30 +551,6 @@ class ilClient
 		return ILIAS_ABSOLUTE_PATH."/".ILIAS_WEB_DIR."/".$this->getId();
 	}
 
-	/**
-	* check database connection
-	* @return	boolean
-	*/
-	function checkDatabaseHost()
-	{
-		global $lng;
-
-		if ($this->getDbType() == "oracle")
-		{
-			return true;
-		}
-		
-		//connect to databasehost
-		$db = $this->db_connections->connectHost($this->dsn_host);
-		if (MDB2::isError($db))
-		{
-			//$this->error = $db->getMessage()."! Please check database hostname, username & password.";
-			$this->error = $db->getMessage()." - ".$db->getUserInfo()." - ".$lng->txt("db_error_please_check");
-			return false;
-		}
-		
-		return true;
-	}
 
 	/**
 	* check database connection with database name
@@ -561,22 +558,27 @@ class ilClient
 	*/
 	function checkDatabaseExists($a_keep_connection = false)
 	{
+		return $this->getDBSetup()->isConnectable();
+		
 		//try to connect to database
 		$db = $this->db_connections->connectDB($this->dsn);
 		if (MDB2::isError($db))
 		{
 			return false;
 		}
-		
+
 		if (!$this->isInstalledDB($db))
 		{
 			return false;
 		}
-		
+
 		// #10633
 		if($a_keep_connection)
 		{
 			$GLOBALS["ilDB"] = $this->db;
+			$GLOBALS["DIC"]["ilDB"] = function($c) {
+				return $GLOBALS["ilDB"];
+			};
 		}
 
 		return true;
@@ -586,17 +588,23 @@ class ilClient
 	{
 		$this->connect();
 	}
-	
+
+
 	/**
-	* read one value from settings table
-	* @access	public
-	* @param	string	keyword
-	* @return	string	value
-	*/
-	function getSetting($a_keyword)
-	{
+	 * read one value from settings table
+	 *
+	 * @access    public
+	 * @param    string    keyword
+	 * @return    string    value
+	 */
+	public function getSetting($a_keyword) {
+		global $ilDB;
+		if (!$this->getDBSetup()->isDatabaseInstalled() || !$ilDB) {
+			return false;
+		}
 		include_once './Services/Administration/classes/class.ilSetting.php';
 		$set = new ilSetting("common", true);
+
 		return $set->get($a_keyword);
 	}
 
@@ -625,7 +633,7 @@ class ilClient
 		$set = new ilSetting("common", true);
 		$set->set($a_key, $a_val);
 	}
-	
+
 	/**
 	* @param	string	url to ilias nic server
 	* @return	string	url with required parameters
@@ -650,52 +658,70 @@ class ilClient
 				"&contact_lastname=".rawurlencode($settings["admin_lastname"]).
 				"&contact_email=".rawurlencode($settings["admin_email"]).
 				"&nic_key=".rawurlencode($this->getNICkey());
-				
+
 		return $url;
 	}
-	
+
 	/**
 	* Connect to ILIAS-NIC
 	*
 	* This function establishes a HTTP connection to the ILIAS Network
 	* Information Center (NIC) in order to update the ILIAS-NIC host
 	* database and - in case of a newly installed system - obtain an
-	* installation id at first connection. 
+	* installation id at first connection.
 	* This function my be put into a dedicated include file as soon
 	* as there are more functions concerning the interconnection of
 	* ILIAS hosts
 	*
-	* @param	void 
+	* @param	void
 	* @return	string/array	$ret	error message or data array
 	*/
 	function updateNIC($a_nic_url)
 	{
+		$max_redirects = 5;
+		$socket_timeout = 5;
+
+		require_once(__DIR__."/../../Services/WebServices/Curl/classes/class.ilCurlConnection.php");
+		if (!ilCurlConnection::_isCurlExtensionLoaded()) {
+			$this->setError("CURL-extension not loaded.");
+			return false;
+		}
+
+		$url = $this->getURLStringForNIC($a_nic_url);
+		$req = new ilCurlConnection($url);
+		$req->init();
+
 		$settings = $this->getAllSettings();
 		if((bool)$settings['proxy_status'] && strlen($settings['proxy_host']) && strlen($settings['proxy_port']))
 		{
-			$proxy_options = array(
-				'proxy_host' => $settings['proxy_host'],
-				'proxy_port' => $settings['proxy_port']
-			);
-		}
-		else
-		{
-			$proxy_options = array();
+			$req->setOpt(CURLOPT_HTTPPROXYTUNNEL, true);
+			$req->setOpt(CURLOPT_PROXY, $settings["proxy_host"]);
+			$req->setOpt(CURLOPT_PROXYPORT, $settings["proxy_port"]);
 		}
 
-		include_once('HTTP/Request.php');
-		$url = $this->getURLStringForNIC($a_nic_url);
-		$req = new HTTP_Request($url, $proxy_options);
-
-		$req->sendRequest();
-		$response = $req->getResponseBody();
-		$response = explode("\n", $response);
-
-		$this->nic_status = $response;
+		$req->setOpt(CURLOPT_HEADER, 1);
+		$req->setOpt(CURLOPT_RETURNTRANSFER, 1);
+		$req->setOpt(CURLOPT_CONNECTTIMEOUT, $socket_timeout);
+		$req->setOpt(CURLOPT_FOLLOWLOCATION, 1);
+		$req->setOpt(CURLOPT_MAXREDIRS, $max_redirects);
+		$response = $req->exec();
 		
+		$req->parseResponse($response);
+		$response_body = $req->getResponseBody();
+
+		$info = $req->getInfo();
+		if ($info["http_code"] != "200") {
+			$this->setError("Could not connect to NIC-Server at '".$url."'");
+			return false;
+		}
+
+		$this->nic_status = explode("\n", $response_body);
+		
+		ilLoggerFactory::getLogger('setup')->dump($nic_status);
+
 		return true;
 	}
-	
+
 	/**
 	* set nic_key
 	* generate nic_key if nic_key field in cust table is empty.
@@ -709,14 +735,14 @@ class ilClient
 		mt_srand((double)microtime()*1000000);
 		$nic_key =	md5(str_replace(".","",$_SERVER["SERVER_ADDR"]) +
 					mt_rand(100000,999999));
-		
+
 		$this->setSetting("nic_key",$nic_key);
-		
+
 		$this->nic_key = $nic_key;
-		
+
 		return true;
 	}
-	
+
 	/**
 	* get nic_key
 	* @access	public
@@ -725,48 +751,57 @@ class ilClient
 	function getNICkey()
 	{
 		$this->nic_key = $this->getSetting("nic_key");
-		
+
 		if (empty($this->nic_key))
 		{
 			$this->setNICkey();
 		}
-		
+
 		return $this->nic_key;
 	}
-	
+
 	function getDefaultLanguage()
 	{
 		return $this->getSetting("language");
 	}
-	
+
 	function setDefaultLanguage($a_lang_key)
 	{
 		$this->setSetting("language",$a_lang_key);
 		$this->ini->setVariable("language","default",$a_lang_key);
 		$this->ini->write();
-		
+
 		return true;
 	}
 
+
 	/**
-	* get error message and clear error var
-	* @return	string	error message
-	*/
-	function getError()
-	{
+	 * get error message and clear error var
+	 *
+	 * @return    string    error message
+	 */
+	function getError() {
 		$error = $this->error;
 		$this->error = "";
 
 		return $error;
 	}
-	
+
+
+	/**
+	 * @param $error_message
+	 */
+	public function setError($error_message) {
+		$this->error = $error_message;
+	}
+
 	/**
 	* delete client
 	* @param	boolean	remove ini if true
 	* @param	boolean	remove db if true
 	* @param	boolean remove files if true
 	* @return	array	confirmation messages
-	* 
+	*
 	*/
 	function delete ($a_ini = true, $a_db = false, $a_files = false)
 	{
@@ -873,7 +908,7 @@ class ilClient
 
 		return true;
 	}
-	
+
 	/**
 	 * write init
 	 *
@@ -884,6 +919,6 @@ class ilClient
 	{
 		$this->ini->write();
 	}
-	
+
 } // END class.ilClient
 ?>

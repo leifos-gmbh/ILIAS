@@ -25,7 +25,7 @@ class ilSkillCategoryGUI extends ilSkillTreeNodeGUI
 		
 		$ilCtrl->saveParameter($this, "obj_id");
 		
-		parent::ilSkillTreeNodeGUI($a_node_id);
+		parent::__construct($a_node_id);
 	}
 
 	/**
@@ -39,11 +39,11 @@ class ilSkillCategoryGUI extends ilSkillTreeNodeGUI
 	/**
 	 * Execute command
 	 */
-	function &executeCommand()
+	function executeCommand()
 	{
 		global $ilCtrl, $tpl, $ilTabs;
 		
-		$tpl->getStandardTemplate();
+		//$tpl->getStandardTemplate();
 		
 		$next_class = $ilCtrl->getNextClass($this);
 		$cmd = $ilCtrl->getCmd();
@@ -250,7 +250,12 @@ class ilSkillCategoryGUI extends ilSkillTreeNodeGUI
 	 */
 	function listItems()
 	{
-		global $tpl;
+		global $tpl, $lng;
+
+		if ($this->isInUse())
+		{
+			ilUtil::sendInfo($lng->txt("skmg_skill_in_use"));
+		}
 
 		self::addCreationButtons();
 		$this->setTabs("content");
@@ -324,6 +329,10 @@ class ilSkillCategoryGUI extends ilSkillTreeNodeGUI
 				$ilCtrl->getLinkTargetByClass("ilskillcategorygui", "insertTemplateReferenceClip"));
 		}
 
+		// skill template reference
+		$ilToolbar->addButton($lng->txt("skmg_import_skills"),
+				$ilCtrl->getLinkTargetByClass("ilskillrootgui", "showImportForm"));
+
 	}
 
 	/**
@@ -345,7 +354,7 @@ class ilSkillCategoryGUI extends ilSkillTreeNodeGUI
 	 * @param
 	 * @return
 	 */
-	function redirectToParent()
+	function redirectToParent($a_tmp_mode = false)
 	{
 		global $ilCtrl;
 		
@@ -361,6 +370,7 @@ class ilSkillCategoryGUI extends ilSkillTreeNodeGUI
 		
 		parent::redirectToParent();
 	}
+
 
 }
 

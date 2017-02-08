@@ -86,9 +86,9 @@ class ilFileXMLParser extends ilSaxParser
 	* @param   int $obj_id obj id of exercise which is to be updated
 	* @access	public
 	*/
-	function ilFileXMLParser(& $file, $a_xml_data, $obj_id = -1, $mode = 0)
+	function __construct(& $file, $a_xml_data, $obj_id = -1, $mode = 0)
 	{
-		parent::ilSaxParser();
+		parent::__construct();
 		$this->file = $file;
 		$this->setXMLContent($a_xml_data);
 		$this->obj_id = $obj_id;
@@ -355,7 +355,6 @@ class ilFileXMLParser extends ilSaxParser
 		global $ilLog;
 		
 		#$ilLog->write(__METHOD__.' '.filesize($this->tmpFilename));
-
 		if(!file_exists($this->tmpFilename))
 		{
 			ilLoggerFactory::getLogger('file')->error(__METHOD__.' "'.$this->tmpFilename. '" file not found.');

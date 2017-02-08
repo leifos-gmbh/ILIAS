@@ -1,6 +1,7 @@
 <?php
 /* Copyright (c) 1998-2009 ILIAS open source, Extended GPL, see docs/LICENSE */
 /* Copyright (c) 2015 Richard Klees, Extended GPL, see docs/LICENSE */
+/* Copyright (c) 2016 Stefan Hecken, Extended GPL, see docs/LICENSE */
 
 require_once 'Services/Environment/classes/class.ilRuntime.php';
 
@@ -11,32 +12,20 @@ require_once 'Services/Environment/classes/class.ilRuntime.php';
 * @author	Stefan Meyer <meyer@leifos.com>
 * @author	Sascha Hofmann <shofmann@databay.de>
 * @author	Richard Klees <richard.klees@concepts-and-training.de>
+* @author	Stefan Hecken <stefan.hecken@concepts-and-training.de>
 * @version	$Id$
 * @extends PEAR
 * @todo		when an error occured and clicking the back button to return to previous page the referer-var in session is deleted -> server error
 * @todo		This class is a candidate for a singleton. initHandlers could only be called once per process anyways, as it checks for static $handlers_registered.
 */
-include_once 'PEAR.php';
-
-// TODO: This would clearly benefit from Autoloading...
-require_once("./Services/Exceptions/lib/Whoops/Run.php");
-require_once("./Services/Exceptions/lib/Whoops/Handler/HandlerInterface.php");
-require_once("./Services/Exceptions/lib/Whoops/Handler/Handler.php");
-require_once("./Services/Exceptions/lib/Whoops/Handler/CallbackHandler.php");
-require_once("./Services/Exceptions/lib/Whoops/Handler/PrettyPageHandler.php");
-require_once("./Services/Exceptions/lib/Whoops/Exception/Inspector.php");
-require_once("./Services/Exceptions/lib/Whoops/Exception/ErrorException.php");
-require_once("./Services/Exceptions/lib/Whoops/Exception/FrameCollection.php");
-require_once("./Services/Exceptions/lib/Whoops/Exception/Frame.php");
-require_once("./Services/Exceptions/lib/Whoops/Exception/Inspector.php");
-require_once("./Services/Exceptions/lib/Whoops/Exception/Formatter.php");
-require_once("./Services/Exceptions/lib/Whoops/Util/TemplateHelper.php");
-require_once("./Services/Exceptions/lib/Whoops/Util/Misc.php");
 
 require_once("Services/Exceptions/classes/class.ilDelegatingHandler.php");
 require_once("Services/Exceptions/classes/class.ilPlainTextHandler.php");
 require_once("Services/Exceptions/classes/class.ilTestingHandler.php");
-
+set_include_path("./Services/Database/lib/PEAR" . PATH_SEPARATOR . ini_get('include_path'));
+if (!class_exists('PEAR')) {
+	require_once 'PEAR.php';
+}
 use Whoops\Run;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Handler\CallbackHandler;
@@ -73,18 +62,18 @@ class ilErrorHandling extends PEAR
 	var $MESSAGE;
 
 	/**
-	 * Are the error handlers already registered?
+	 * Are the whoops error handlers already registered?
 	 * @var bool
 	 */
-	protected static $handlers_registered = false;
+	protected static $whoops_handlers_registered = false;
 
 	/**
 	* Constructor
 	* @access	public
 	*/
-	function ilErrorHandling()
+	public function __construct()
 	{
-		$this->PEAR();
+		parent::__construct();
 
 		// init vars
 		$this->DEBUG_ENV = true;
@@ -94,7 +83,11 @@ class ilErrorHandling extends PEAR
 
 		$this->error_obj = false;
 		
-		$this->initHandlers();
+		$this->initWhoopsHandlers();
+		
+		// somehow we need to get rid of the whoops error handler
+		restore_error_handler();
+		set_error_handler(array($this, "handlePreWhoops"));
 	}
 	
 	/**
@@ -105,24 +98,24 @@ class ilErrorHandling extends PEAR
 	 *
 	 * @return void
 	 */
-	protected function initHandlers() {
-		if (self::$handlers_registered) {
+	protected function initWhoopsHandlers() {
+		if (self::$whoops_handlers_registered) {
 			// Only register whoops error handlers once.
 			return;
 		}
 		
 		$ilRuntime = $this->getIlRuntime();
-		$whoops = $this->getWhoops();
+		$this->whoops = $this->getWhoops();
 		
-		$whoops->pushHandler(new ilDelegatingHandler($this));
+		$this->whoops->pushHandler(new ilDelegatingHandler($this));
 		
 		if ($ilRuntime->shouldLogErrors()) {
-			$whoops->pushHandler($this->loggingHandler());
+			$this->whoops->pushHandler($this->loggingHandler());
 		}
 		
-		$whoops->register();
+		$this->whoops->register();
 		
-		self::$handlers_registered = true;
+		self::$whoops_handlers_registered = true;
 	}
 
 	/**
@@ -365,34 +358,42 @@ class ilErrorHandling extends PEAR
 	 * @return Whoops\Handler
 	 */
 	protected function defaultHandler() {
-		return new CallbackHandler(function(Exception $exception, Inspector $inspector, Run $run) {
-			if ($exception instanceof \Whoops\Exception\ErrorException
-			and $exception->getCode() == E_ERROR) {
-				global $tpl, $lng, $tree;
-				$_SESSION["failure"] = $exception->getMessage();
-				include("error.php");
-				exit();
+		// php7-todo : alex, 1.3.2016: Exception -> Throwable, please check
+		return new CallbackHandler(function($exception, Inspector $inspector, Run $run) {
+			global $lng;
+
+			require_once("Services/Logging/classes/error/class.ilLoggingErrorSettings.php");
+			require_once("Services/Logging/classes/error/class.ilLoggingErrorFileStorage.php");
+			require_once("Services/Utilities/classes/class.ilUtil.php");
+
+			$session_id = substr(session_id(),0,5);
+			$err_num = rand(1, 9999);
+			$file_name = $session_id."_".$err_num;
+
+			$logger = ilLoggingErrorSettings::getInstance();
+			if(!empty($logger->folder())) {
+				$lwriter = new ilLoggingErrorFileStorage($inspector, $logger->folder(), $file_name);
+				$lwriter->write();
 			}
 
-			require_once("Services/Utilities/classes/class.ilUtil.php");
-			ilUtil::sendFailure($exception->getMessage(), true);
-			// many test installation have display_errors on, we do not need additional information in this case
-			// however in cases of warnings, whoops seems to get rid of these messages, but not in the case of fatals
-			// so we do not check for ini_get("display_errors"), but for headers_sent()
-			if (!headers_sent())
-			{
-				// #0019268, when not in setup
-				if (class_exists("ilInitialisation"))
-				{
-					ilInitialisation::initHTML();
-					global $tpl, $lng, $tree;
-					include("error.php");                // redirect will not display fatal error messages, since writing to session (sendFailure) will not work at this point
+			//Use $lng if defined or fallback to english
+			if($lng !== null) {
+				$lng->loadLanguageModule('logging');
+				$message = sprintf($lng->txt("log_error_message"), $file_name);
+
+				if($logger->mail()) {
+					$message .= " ".sprintf($lng->txt("log_error_message_send_mail"), $logger->mail(), $file_name, $logger->mail());
 				}
-				else	// when in setup...
-				{
-					ilUtil::redirect("error.php");
+			} else {
+				$message = "Error ".$file_name." occurred.";
+
+				if($logger->mail()) {
+					$message .= ' '.'Please send a mail to <a href="mailto:'.$logger->mail().'?subject=code: '.$file_name.'">'.$logger->mail().'%s</a>';
 				}
 			}
+
+			ilUtil::sendFailure($message, true);
+			ilUtil::redirect("error.php");
 		});
 	}
 
@@ -424,55 +425,63 @@ class ilErrorHandling extends PEAR
 	 * @return Whoops\Handler
 	 */
 	protected function loggingHandler() {
-		// TODO: remove this, when PHP 5.3 support is dropped. Make logMessageFor protected then as well.
-		$self = $this;
-		return new CallbackHandler(function(Exception $exception, Inspector $inspector, Run $run) use ($self) {
+		// php7-todo : alex, 1.3.2016: Exception -> Throwable, please check
+		return new CallbackHandler(function($exception, Inspector $inspector, Run $run) {
 			/**
 			 * Don't move this out of this callable
 			 * @var ilLog $ilLog;
 			 */
 			global $ilLog;
 
-			$log_message = $self->logMessageFor($exception, (bool)LOG_ERROR_TRACE);
 			if(is_object($ilLog)) {
 				// ak: default log level of write() is INFO, which is not appropriate -> set this to warning
 				include_once './Services/Logging/classes/public/class.ilLogLevel.php';
-				$ilLog->write($log_message, ilLogLevel::WARNING);
+				$ilLog->write('ERROR (' . $exception->getCode() .') ' . $exception->getMessage(), ilLogLevel::WARNING);
 			}
-
+			
 			// Send to system logger
-			error_log($log_message);
+			error_log($exception->getMessage());
 		});
 	}
+	
+	public function handlePreWhoops($level, $message, $file, $line)
+	{
+		global $ilLog;
+		
+		if ($level & error_reporting()) {
+			
+			// correct-with-php5-removal JL start
+			// ignore all E_STRICT that are E_NOTICE (or nothing at all) in PHP7
+			if (version_compare(PHP_VERSION, '7.0.0', '<')) {
+				if ($level == E_STRICT) {
+					if (!stristr($message, "should be compatible") &&
+						!stristr($message, "should not be called statically")) {
+						return true;
+					};
+				}
+			}
+			// correct-with-php5-removal end
 
-	/**
-	 * Get the error message to be logged.
-	 *
-	 * TODO: Can be made protected when support for PHP 5.3. is dropped.
-	 *
-	 * @param	$exception	Exception
-	 * @param	$log_trace	bool
-	 * @return	string
-	 */
-	public function logMessageFor(Exception $exception, $log_trace) {
-		assert('is_bool($log_trace)');
-		$prefix = "PHP Error: ";
-		if ($exception instanceof \Whoops\Exception\ErrorException) {
-			switch ($exception->getCode()) {
-				case E_ERROR:
-				case E_USER_ERROR:
-					$prefix = "PHP Fatal error: ";
+			if (!$this->isDevmodeActive()) {
+				// log E_USER_NOTICE, E_STRICT, E_DEPRECATED, E_USER_DEPRECATED only
+				if ($level >= E_USER_NOTICE) {	
+					
+					if ($ilLog) {				
+						$severity = Whoops\Util\Misc::TranslateErrorCode($level);
+						$ilLog->write("\n\n".$severity." - ".$message."\n".$file." - line ".$line."\n");
+					}
+					return true;
+				}
+			}
+			
+			// trigger whoops error handling
+			if($this->whoops)
+			{
+				return $this->whoops->handleError($level, $message, $file, $line);
 			}
 		}
-
-		$msg = $prefix.$exception->getMessage()." in ".$exception->getFile()." on line ".$exception->getLine();
-
-		if ($log_trace) {
-			$msg .= "\n".$exception->getTraceAsString();
-		}
-
-		return $msg;
+		
+		return false;
 	}
-
+	
 } // END class.ilErrorHandling
-?>

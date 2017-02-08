@@ -28,7 +28,7 @@ class ilRepositoryExplorer extends ilExplorer
 	* @param	string	scriptname
 	* @param    int user_id
 	*/
-	function ilRepositoryExplorer($a_target, $a_top_node = 0)
+	function __construct($a_target, $a_top_node = 0)
 	{
 		global $tree, $ilCtrl, $lng, $ilSetting, $objDefinition;
 
@@ -38,7 +38,7 @@ class ilRepositoryExplorer extends ilExplorer
 		$this->force_open_path = array();
 
 
-		parent::ilExplorer($a_target);
+		parent::__construct($a_target);
 		$this->tree = $tree;
 		$this->root_id = $this->tree->readRootId();
 		$this->order_column = "title";
@@ -103,6 +103,11 @@ class ilRepositoryExplorer extends ilExplorer
 				$link = $ilCtrl->getLinkTargetByClass(array("ilrepositorygui", "ilobjgroupgui"), "");
 				$ilCtrl->setParameterByClass("ilobjgroupgui", "ref_id", $_GET["ref_id"]);
 				return $link;
+			case "grpr":
+				$ilCtrl->setParameterByClass("ilrepositorygui", "ref_id", $a_node_id);
+				$link = $ilCtrl->getLinkTargetByClass("ilrepositorygui", "redirect");
+				$ilCtrl->setParameterByClass("ilrepositorygui", "ref_id", $_GET["ref_id"]);
+				return $link;
 
 			case "crs":
 				$ilCtrl->setParameterByClass("ilobjcoursegui", "ref_id", $a_node_id);
@@ -159,6 +164,10 @@ class ilRepositoryExplorer extends ilExplorer
 				$t_frame = ilFrameTargetInfo::_getFrame("RepositoryContent", "grp");
 				return $t_frame;
 
+			case "grpr":
+				$t_frame = ilFrameTargetInfo::_getFrame("RepositoryContent", "grpr");
+				return $t_frame;
+
 			case "crs":
 				$t_frame = ilFrameTargetInfo::_getFrame("RepositoryContent", "crs");
 				return $t_frame;
@@ -193,7 +202,7 @@ class ilRepositoryExplorer extends ilExplorer
 		return parent::getImage($a_name);
 	}
 
-	function isClickable($a_type, $a_ref_id,$a_obj_id = 0)
+	function isClickable($a_type, $a_ref_id = 0,$a_obj_id = 0)
 	{
 		global $rbacsystem,$tree,$ilDB,$ilUser,$ilAccess;
 
@@ -220,7 +229,7 @@ class ilRepositoryExplorer extends ilExplorer
 
 				$query = sprintf("SELECT * FROM tst_tests WHERE obj_fi=%s",$a_obj_id);
 				$res = $ilDB->query($query);
-				while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+				while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 				{
 					return (bool) $row->complete;
 				}
@@ -234,7 +243,7 @@ class ilRepositoryExplorer extends ilExplorer
 
 				$query = sprintf("SELECT * FROM svy_svy WHERE obj_fi=%s",$a_obj_id);
 				$res = $ilDB->query($query);
-				while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+				while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 				{
 					return (bool) $row->complete;
 				}
@@ -251,7 +260,7 @@ class ilRepositoryExplorer extends ilExplorer
 					return false;
 				}
 				break;
-				
+			case 'grpr':
 			case 'crsr':
 			case 'catr':
 				include_once('./Services/ContainerReference/classes/class.ilContainerReferenceAccess.php');
@@ -269,7 +278,7 @@ class ilRepositoryExplorer extends ilExplorer
 					if ($a_type == "lm")
 					{
 						include_once("./Modules/LearningModule/classes/class.ilObjLearningModule.php");
-						$lm_obj =& new ilObjLearningModule($a_ref_id);
+						$lm_obj = new ilObjLearningModule($a_ref_id);
 						if((!$lm_obj->getOnline()) && (!$rbacsystem->checkAccess('write',$a_ref_id)))
 						{
 							return false;
@@ -279,7 +288,7 @@ class ilRepositoryExplorer extends ilExplorer
 					if ($a_type == "htlm")
 					{
 						include_once("./Modules/HTMLLearningModule/classes/class.ilObjFileBasedLM.php");
-						$lm_obj =& new ilObjFileBasedLM($a_ref_id);
+						$lm_obj = new ilObjFileBasedLM($a_ref_id);
 						if((!$lm_obj->getOnline()) && (!$rbacsystem->checkAccess('write',$a_ref_id)))
 						{
 							return false;
@@ -289,7 +298,7 @@ class ilRepositoryExplorer extends ilExplorer
 					if ($a_type == "sahs")
 					{
 						include_once("./Modules/ScormAicc/classes/class.ilObjSAHSLearningModule.php");
-						$lm_obj =& new ilObjSAHSLearningModule($a_ref_id);
+						$lm_obj = new ilObjSAHSLearningModule($a_ref_id);
 						if((!$lm_obj->getOnline()) && (!$rbacsystem->checkAccess('write',$a_ref_id)))
 						{
 							return false;
@@ -396,7 +405,7 @@ class ilRepositoryExplorer extends ilExplorer
 	* @param	integer array options
 	* @return	string
 	*/
-	function formatHeader(&$tpl, $a_obj_id,$a_option)
+	function formatHeader($tpl, $a_obj_id,$a_option)
 	{
 		global $lng, $ilias, $tree, $ilCtrl;
 

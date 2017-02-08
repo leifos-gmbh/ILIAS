@@ -6,6 +6,7 @@ require_once('./Services/WebAccessChecker/classes/class.ilWACLog.php');
 require_once('./Services/Init/classes/class.ilInitialisation.php');
 require_once('./Services/FileDelivery/classes/class.ilFileDelivery.php');
 require_once('./Services/WebAccessChecker/classes/class.ilWACCookie.php');
+require_once('./Services/WebAccessChecker/classes/class.ilWACHeader.php');
 
 /**
  * Class ilWebAccessChecker
@@ -63,6 +64,10 @@ class ilWebAccessChecker {
 	 */
 	protected $cookie = null;
 	/**
+	 * @var ilWACHeaderInterface
+	 */
+	protected $header = null;
+	/**
 	 * @var array
 	 */
 	protected $applied_checking_methods = array();
@@ -74,9 +79,10 @@ class ilWebAccessChecker {
 	 * @param $path
 	 * @param \ilWACCookieInterface|null $ilWACCookieInterface
 	 */
-	public function __construct($path, ilWACCookieInterface $ilWACCookieInterface = null) {
+	public function __construct($path, ilWACCookieInterface $ilWACCookieInterface = null, ilWACHeaderInterface $ilWACHeaderInterface = null) {
 		$this->setPathObject(new ilWACPath($path));
 		$this->setCookie($ilWACCookieInterface ? $ilWACCookieInterface : new ilWACCookie());
+		$this->setHeader($ilWACHeaderInterface ? $ilWACHeaderInterface : new ilWACHeader());
 	}
 
 
@@ -130,7 +136,7 @@ class ilWebAccessChecker {
 			if ($canBeDelivered) {
 				ilWACLog::getInstance()->write('checked using fallback');
 				$this->sendHeader('checked using fallback');
-				if ($ilWACSignedPath->isFolderSigned()&& $this->isRevalidateFolderTokens()) {
+				if ($ilWACSignedPath->isFolderSigned() && $this->isRevalidateFolderTokens()) {
 					$ilWACSignedPath->revalidatingFolderToken();
 				}
 
@@ -163,6 +169,14 @@ class ilWebAccessChecker {
 
 
 	/**
+	 * @param $message
+	 */
+	protected function sendHeader($message) {
+		$this->getHeader()->sendHeader('X-ILIAS-WebAccessChecker: ' . $message);
+	}
+
+
+	/**
 	 * @return bool
 	 * @throws \ilWACException
 	 */
@@ -179,20 +193,17 @@ class ilWebAccessChecker {
 			$this->checkPublicSection();
 			$this->checkUser();
 		} catch (Exception $e) {
-			if (($e instanceof ilWACException && $e->getCode() == ilWACException::ACCESS_DENIED_NO_LOGIN)
-				|| ($e instanceof Exception && $e->getMessage() == 'Authentication failed.')) {
-				$_REQUEST["baseClass"] = "ilStartUpGUI";
-				// @todo authentication: fix request show login
-				$_REQUEST["cmd"] = "showLogin";
-
-				$_POST['username'] = 'anonymous';
-				$_POST['password'] = 'anonymous';
-				ilWACLog::getInstance()->write('reinit ILIAS');
+			if ($e instanceof ilWACException) {
+				throw  $e;
+			}
+			if ($e instanceof Exception && $e->getMessage() == 'Authentication failed.') {
+				include_once './Services/Context/classes/class.ilContext.php';
+				ilContext::init(ilContext::CONTEXT_WEB_ACCESS_CHECK);
+				require_once("Services/Init/classes/class.ilInitialisation.php");
+				$GLOBALS['DIC']['ilAuthSession']->setAuthenticated(true, ANONYMOUS_USER_ID);
 				ilInitialisation::reinitILIAS();
 				$this->checkPublicSection();
 				$this->checkUser();
-			} elseif ($e instanceof ilWACException) {
-				throw  $e;
 			}
 		}
 		$this->setInitialized(true);
@@ -401,9 +412,17 @@ class ilWebAccessChecker {
 
 
 	/**
-	 * @param $message
+	 * @return \ilWACHeaderInterface
 	 */
-	protected function sendHeader($message) {
-		header('X-ILIAS-WebAccessChecker: ' . $message);
+	public function getHeader() {
+		return $this->header;
+	}
+
+
+	/**
+	 * @param \ilWACHeaderInterface $header
+	 */
+	public function setHeader($header) {
+		$this->header = $header;
 	}
 }

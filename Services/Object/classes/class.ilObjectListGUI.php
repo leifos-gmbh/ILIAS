@@ -3,7 +3,7 @@
 
 define ("IL_LIST_AS_TRIGGER", "trigger");
 define ("IL_LIST_FULL", "full");
-
+require_once('./Services/Repository/classes/class.ilObjectPlugin.php');
 
 /**
 * Class ilObjectListGUI
@@ -28,7 +28,6 @@ class ilObjectListGUI
 
 	const CONTEXT_REPOSITORY = 1;
 	const CONTEXT_WORKSPACE = 2;
-	const CONTEXT_SHOP = 3;
 	const CONTEXT_WORKSPACE_SHARING = 4;
 	const CONTEXT_PERSONAL_DESKTOP = 5;
 	const CONTEXT_SEARCH = 6;
@@ -108,6 +107,7 @@ class ilObjectListGUI
 	protected $force_visible_only = false;	
 	protected $prevent_duplicate_commands = array();
 	protected $parent_ref_id;
+	protected $context;
 
 	static protected $cnt_notes = array();
 	static protected $cnt_tags = array();
@@ -123,21 +123,28 @@ class ilObjectListGUI
 	
 	static protected $tpl_file_name = "tpl.container_list_item.html";
 	static protected $tpl_component = "Services/Container";
+
+	/**
+	 * @var \ILIAS\DI\UIServices
+	 */
+	protected $ui;
 	
 	/**
 	* constructor
 	*
 	*/
-	function ilObjectListGUI()
+	function __construct($a_context = self::CONTEXT_REPOSITORY)
 	{
-		global $rbacsystem, $ilCtrl, $lng, $ilias;
+		global $ilias, $DIC;
 
-		$this->rbacsystem = $rbacsystem;
+		$this->ui = $DIC->ui();
+		$this->rbacsystem = $DIC->rbac()->system();
 		$this->ilias = $ilias;
-		$this->ctrl = $ilCtrl;
-		$this->lng = $lng;
+		$this->ctrl = $DIC->ctrl();
+		$this->lng = $DIC->language();
 		$this->mode = IL_LIST_FULL;
 		$this->path_enabled = false;
+		$this->context = $a_context;
 		
 		$this->enableComments(false);
 		$this->enableNotes(false);
@@ -151,8 +158,8 @@ class ilObjectListGUI
 		
 		include_once('Services/LDAP/classes/class.ilLDAPRoleGroupMapping.php');
 		$this->ldap_mapping = ilLDAPRoleGroupMapping::_getInstance();
-		
-		$lng->loadLanguageModule("obj");
+
+		$this->lng->loadLanguageModule("obj");
 	}
 
 
@@ -194,7 +201,6 @@ class ilObjectListGUI
 		$this->subscribe_enabled = true;
 		$this->link_enabled = false;
 		$this->copy_enabled = false;
-		$this->payment_enabled = false;
 		$this->progress_enabled = false;
 		$this->notice_properties_enabled = true;
 		$this->info_screen_enabled = false;
@@ -534,27 +540,7 @@ class ilObjectListGUI
 	{
 		return $this->subscribe_enabled;
 	}
-	/**
-	* En/disable payment
-	*
-	* @param bool
-	* @return void
-	*/
-	function enablePayment($a_status)
-	{
-		$this->payment_enabled = $a_status;
 
-		return;
-	}
-	/**
-	*
-	* @param bool
-	* @return bool
-	*/
-	function getPaymentStatus()
-	{
-		return $this->payment_enabled;
-	}
 	/**
 	* En/disable link
 	*
@@ -953,7 +939,7 @@ class ilObjectListGUI
 			return $this->access_cache[$a_permission]["-".$a_cmd][$cache_prefix.$a_ref_id];
 		}
 
-		if($this->context == self::CONTEXT_REPOSITORY || $this->context == self::CONTEXT_SHOP)
+		if($this->context == self::CONTEXT_REPOSITORY)
 		{
 			$access = $ilAccess->checkAccess($a_permission,$a_cmd,$a_ref_id,$a_type,$a_obj_id);
 			if ($ilAccess->getPreventCachingLastResult())
@@ -979,17 +965,16 @@ class ilObjectListGUI
 	* @param	string		$a_description	description
 	* @param	int			$a_context		tree/workspace
 	*/
-	function initItem($a_ref_id, $a_obj_id, $a_title = "", $a_description = "", $a_context = self::CONTEXT_REPOSITORY)
+	function initItem($a_ref_id, $a_obj_id, $a_title = "", $a_description = "")
 	{
-		$this->offline_mode = false;
-		include_once('Modules/ScormAicc/classes/class.ilObjSAHSLearningModuleAccess.php');
+		$this->offline_mode = false;		
 		if ($this->type == "sahs") {
+			include_once('Modules/ScormAicc/classes/class.ilObjSAHSLearningModuleAccess.php');
 			$this->offline_mode = ilObjSAHSLearningModuleAccess::_lookupUserIsOfflineMode($a_obj_id);  	
 		}
 		$this->access_cache = array();
 		$this->ref_id = $a_ref_id;
 		$this->obj_id = $a_obj_id;
-		$this->context = $a_context;
 		$this->setTitle($a_title);
 		$this->setDescription($a_description);
 		#$this->description = $a_description;
@@ -1082,7 +1067,7 @@ class ilObjectListGUI
 	*/
 	function getCommandLink($a_cmd)
 	{
-		if($this->context == self::CONTEXT_REPOSITORY || $this->context == self::CONTEXT_SHOP)
+		if($this->context == self::CONTEXT_REPOSITORY)
 		{
 			// BEGIN WebDAV Get mount webfolder link.
 			require_once ('Services/WebDAV/classes/class.ilDAVActivationChecker.php');
@@ -1171,7 +1156,7 @@ class ilObjectListGUI
 	*						"property" (string) => property name
 	*						"value" (string) => property value
 	*/
-	public function getProperties($a_item = '')
+	public function getProperties()
 	{
 		global $objDefinition;
 
@@ -1268,68 +1253,6 @@ class ilObjectListGUI
 				}
 			}
 			// END WebDAV Display warning for invisible files and files with special characters
-		
-			// BEGIN ChangeEvent: display changes.
-			require_once('Services/Tracking/classes/class.ilChangeEvent.php');
-			if (ilChangeEvent::_isActive())
-			{
-				global $ilias, $lng, $ilUser;
-				if ($ilias->account->getId() != ANONYMOUS_USER_ID)
-				{
-					// Performance improvement: for container objects
-					// we only display 'changed inside' events, for
-					// leaf objects we only display 'object new/changed'
-					// events
-					$isContainer = in_array($this->type, array('cat', 'fold', 'crs', 'grp'));
-					// uzk-patch: begin
-					global $ilSetting;
-					$hide_events_obj_type = unserialize($ilSetting->get('hide_event_message'));
-					$hide_events = array();
-					if(!is_array($hide_events_obj_type)) $hide_events_obj_type = array();
-					foreach($hide_events_obj_type as $key => $value)
-					{
-						# $options[$key]= $this->lng->txt($key);
-						if($value)
-						{
-							$hide_events[] = $key;
-						}
-					}
-					$hideEventMessage = in_array($this->type, $hide_events) ? true : false;
-					// uzk-patch: end
-					if($isContainer)
-					{
-						$state = ilChangeEvent::_lookupInsideChangeState($this->obj_id, $ilUser->getId());
-						// uzk-patch: begin
-						if($state > 0 && !$hideEventMessage)
-						// uzk-patch: end
-						{
-							$props[] = array(
-								"alert" => true,
-								"value" => $lng->txt('state_changed_inside'),
-								'propertyNameVisible' => false);
-						}
-					}
-					/*
-					 * elseif(!$objDefinition->isAdministrationObject(ilObject::_lookupType($this->obj_id)))
-					 * 
-					 * only files support write events properly
-					 */
-					elseif($this->type == "file")
-					{
-						$state = ilChangeEvent::_lookupChangeState($this->obj_id, $ilUser->getId());
-						// uzk-patch: begin
-						if($state > 0 && !$hideEventMessage)
-						// uzk-patch: end
-						{
-							$props[] = array(
-								"alert" => true,
-								"value" => $lng->txt(($state == 1) ? 'state_unread' : 'state_changed'),
-								'propertyNameVisible' => false);
-						}
-					}
-				}
-			}
-			// END ChangeEvent: display changes.
 		}
 
 		return $props;
@@ -1802,11 +1725,11 @@ class ilObjectListGUI
 	*
 	* @access	private
 	*/
-	function insertProperties($a_item = '')
+	function insertProperties()
 	{
 		global $ilAccess, $lng, $ilUser;
 		
-		$props = $this->getProperties($a_item);
+		$props = $this->getProperties();
 		$props = $this->getCustomProperties($props);
 		
 		if($this->context != self::CONTEXT_WORKSPACE && $this->context != self::CONTEXT_WORKSPACE_SHARING)
@@ -1988,127 +1911,6 @@ class ilObjectListGUI
 		}
 		$this->tpl->setCurrentBlock('notice_property');
 		$this->tpl->parseCurrentBlock();
-	}
-
-
-	/**
-	* insert payment information
-	*
-	* @access	private
-	*/
-	function insertPayment()
-	{
-		global $ilAccess,$ilObjDataCache,$ilUser;
-
-		if(IS_PAYMENT_ENABLED && $this->payment_enabled)
-		{
-			include_once './Services/Payment/classes/class.ilPaymentObject.php';
-			include_once './Services/Payment/classes/class.ilPaymentBookings.php';
-
-			if(ilPaymentobject::_requiresPurchaseToAccess($this->ref_id))
-			{
-				if(ilPaymentBookings::_hasAccess(ilPaymentObject::_lookupPobjectId($a_ref_id), $ilUser->getId()))
-				{
-					// get additional information about order_date and duration
-
-					$order_infos = array();
-					$order_infos = ilPaymentBookings::_lookupOrder(ilPaymentObject::_lookupPobjectId($this->ref_id));
-
-					if(count($order_infos) > 0)
-					{
-						global $lng;
-						$pay_lang = $lng;
-						$pay_lang->loadLanguageModule('payment');
-						$alert = true;
-						$a_newline = true;
-						$a_property = $pay_lang->txt('object_purchased_date');
-						$a_value = ilDatePresentation::formatDate(new ilDateTime($order_infos["order_date"],IL_CAL_UNIX));
-
-						$this->addCustomProperty($a_property, $a_value, $alert, $a_newline);
-
-						$alert = true;
-						$a_newline = true;
-						$a_property = $this->lng->txt('object_duration');
-						if($order_infos['duration'] == 0)
-							$a_value = $pay_lang->txt('unlimited_duration');
-						else
-							$a_value = $order_infos['duration'] .' '.$this->lng->txt('months');
-						$this->addCustomProperty($a_property, $a_value, $alert, $a_newline);
-					}
-
-					// check for extension prices
-					if(ilPaymentObject::_hasExtensions($this->ref_id))
-					{
-						$has_extension_prices = true;
-						$this->insertPaymentCommand($has_extension_prices);
-					}
-
-				}
-				else
-				{
-					// only relevant and needed for the shop content page
-
-					$this->ctpl = new ilTemplate("tpl.container_list_item_commands.html", true, true,
-						"Services/Container", "DEFAULT", false, true);
-					$this->ctpl->setCurrentBlock('payment');
-					$this->ctpl->setVariable('PAYMENT_TYPE_IMG', ilUtil::getImagePath('icon_pays.svg'));
-					$this->ctpl->setVariable('PAYMENT_ALT_IMG', $this->lng->txt('payment_system') . ': ' . $this->lng->txt('payment_buyable'));
-					$this->ctpl->parseCurrentBlock();
-
-					$this->insertPaymentCommand();
-				}
-			}
-		}
-	}
-	
-	protected function insertPaymentCommand($has_extension_prices = false)
-	{
-		$commands = $this->getCommands($this->ref_id, $this->obj_id);
-		foreach($commands as $command)
-		{ 
-			if($command['default'] === true)
-			{
-				$command = $this->createDefaultCommand($command);
-//				if(is_null($command['link']) )
-//				{
-					switch($this->type)
-					{
-						case 'sahs':
-							$command['link'] = 'ilias.php?baseClass=ilSAHSPresentationGUI&ref_id='.$this->ref_id;
-							break;
-						
-						case 'lm':
-							$command['link'] = 'ilias.php?baseClass=ilLMPresentationGUI&ref_id='.$this->ref_id;
-							break;
-						case 'exc':
-						default:
-							$command['link'] = 'ilias.php?baseClass=ilShopController&cmdClass=ilshoppurchasegui&ref_id='.$this->ref_id;
-							break;	
-					}					
-//				}
-
-				$type = $this->type;
-				if(strpos($command['link'], '_'.$type.'_') !== false)
-				{
-					$demo_link = str_replace('_'.$type.'_', '_'.$type.'purchasetypedemo_', $command['link']);
-					$buy_link = str_replace('_'.$type.'_', '_'.$type.'purchasetypebuy_', $command['link']);
-				}
-				else
-				{
-					$demo_link = $command['link'].(strpos($command['link'], '?') === false ? '?' : '&').'purchasetype=demo';
-					$buy_link = $command['link'].(strpos($command['link'], '?') === false ? '?' : '&').'purchasetype=buy';
-				}
-
-				$this->current_selection_list->addItem($this->lng->txt('payment_demo'), "", $demo_link, $a_img, $this->lng->txt('payment_demo'), $command['frame']);
-				if($has_extension_prices == true)
-				{
-					$this->current_selection_list->addItem($this->lng->txt('buy_extension'), "", $buy_link, $a_img, $this->lng->txt('buy_extension'), $command['frame']);
-				}
-				else
-					$this->current_selection_list->addItem($this->lng->txt('buy'), "", $buy_link, $a_img, $this->lng->txt('buy'), $command['frame']);
-
-			}
-		}
 	}
 
 	protected function parseConditions($toggle_id,$conditions,$obligatory = true)
@@ -2308,10 +2110,21 @@ class ilObjectListGUI
 			}
 			
 			$prevent_background_click = false;
-			if ($a_cmd =='mount_webfolder')
+			if ($a_cmd == 'mount_webfolder')
 			{
 				$prevent_background_click = true;
 			}
+			
+			if ($a_cmd == "downloadFolder")
+			{
+				include_once "Services/BackgroundTask/classes/class.ilFolderDownloadBackgroundTaskHandler.php";
+				if(ilFolderDownloadBackgroundTaskHandler::isActive())
+				{
+					$a_onclick = ilFolderDownloadBackgroundTaskHandler::getObjectListAction($this->ref_id);
+					$a_href = "#";
+				}				
+			}			
+			
 			$this->current_selection_list->addItem($a_text, "", $a_href, $a_img, $a_text, $a_frame,
 				"", $prevent_background_click, $a_onclick);
 		}				
@@ -2562,34 +2375,7 @@ class ilObjectListGUI
 		$type = ilObject::_lookupType(ilObject::_lookupObjId($this->getCommandId()));
 
 		if ($ilUser->getId() != ANONYMOUS_USER_ID)
-		{
-			// BEGIN WebDAV: Lock/Unlock objects
-			/* This code section is temporarily commented out. 
-			   I will reactivate it at a later point, when I get the
-               the backend working properly. - Werner Randelshofer 2008-04-17
-			if (is_object($this->container_obj) && $this->rbacsystem->checkAccess("write", $this->ref_id))
-			{
-				require_once 'Services/WebDAV/classes/class.ilDAVServer.php';
-				if (ilDAVServer::_isActive() && ilDAVServer::_isActionsVisible())
-				{
-					$this->ctrl->setParameter($this->container_obj, "ref_id",
-						$this->container_obj->object->getRefId());
-					$this->ctrl->setParameter($this->container_obj, "type", $this->type);
-					$this->ctrl->setParameter($this->container_obj, "item_ref_id", $this->ref_id);
-					$cmd_link = $this->ctrl->getLinkTarget($this->container_obj, "lock");
-					$this->insertCommand($cmd_link, $this->lng->txt("lock"));
-
-					$this->ctrl->setParameter($this->container_obj, "ref_id",
-						$this->container_obj->object->getRefId());
-					$this->ctrl->setParameter($this->container_obj, "type", $this->type);
-					$this->ctrl->setParameter($this->container_obj, "item_ref_id", $this->ref_id);
-					$cmd_link = $this->ctrl->getLinkTarget($this->container_obj, "unlock");
-					$this->insertCommand($cmd_link, $this->lng->txt("unlock"));
-				}
-			}
-			*/
-			// END WebDAV: Lock/Unlock objects
-			
+		{	
 			// #17467 - add ref_id to link (in repository only!)
 			if(is_object($this->container_obj) &&
 				!($this->container_obj instanceof ilAdministrationCommandHandling) &&
@@ -2713,6 +2499,12 @@ class ilObjectListGUI
 		$parent_ref_id = $this->container_obj->object->getRefId();
 		$parent_type = $this->container_obj->object->getType();
 		
+		// #18737
+		if($this->reference_ref_id)
+		{
+			$this->ctrl->setParameterByClass('ilobjectactivationgui', 'ref_id', $this->reference_ref_id);
+		}
+		
 		if($this->checkCommandAccess('write','',$parent_ref_id,$parent_type) ||
 			$this->checkCommandAccess('write','',$this->ref_id,$this->type))
 		{												
@@ -2724,6 +2516,11 @@ class ilObjectListGUI
 				'edit');
 			
 			$this->insertCommand($cmd_lnk, $this->lng->txt('obj_activation_list_gui'));			
+		}
+		
+		if($this->reference_ref_id)
+		{
+			$this->ctrl->setParameterByClass('ilobjectactivationgui', 'ref_id', $this->ref_id);
 		}
 	}
 
@@ -2764,8 +2561,6 @@ class ilObjectListGUI
 		$this->current_selection_list->setUseImages(false);
 		$this->current_selection_list->setAdditionalToggleElement($this->getUniqueItemId(true), "ilContainerListItemOuterHighlight");
 
-		include_once 'Services/Payment/classes/class.ilPaymentObject.php';
-		
 		$this->ctrl->setParameterByClass($this->gui_class_name, "ref_id", $this->ref_id);
 
 		// only standard command?
@@ -2903,11 +2698,6 @@ class ilObjectListGUI
 					$this->insertPasteCommand();
 				}
 				// END PATCH Lucene Search
-
-				if(IS_PAYMENT_ENABLED)
-				{
-					$this->insertPayment();
-				}
 			}
 		}
 		
@@ -3160,7 +2950,17 @@ class ilObjectListGUI
 	{
 		$this->header_icons[$a_id] = $a_html;
 	}
-	
+
+	/**
+	 *
+	 * @param string $a_id
+	 * @param string $a_html
+	 */
+	function addHeaderGlyph($a_id, $a_glyph, $a_onclick = null)
+	{
+		$this->header_icons[$a_id] = array("glyph" => $a_glyph, "onclick" => $a_onclick);
+	}
+
 	function setAjaxHash($a_hash)
 	{
 		$this->ajax_hash = $a_hash;
@@ -3189,11 +2989,17 @@ class ilObjectListGUI
 			{
 				include_once("./Services/Tagging/classes/class.ilTaggingGUI.php");
 				$lng->loadLanguageModule("tagging");
-				$this->addHeaderIcon("tags", 					
+				/*$this->addHeaderIcon("tags",
 					ilUtil::getImagePath("icon_tag.svg"),
 					$lng->txt("tagging_tags").": ".count($tags),
 					ilTaggingGUI::getListTagsJSCall($this->ajax_hash, $redraw_js),
-					count($tags));				
+					count($tags));*/
+
+				$f = $this->ui->factory();
+				$this->addHeaderGlyph("tags", $f->glyph()->tag("#")
+					->withCounter($f->counter()->status((int) count($tags))),
+					ilTaggingGUI::getListTagsJSCall($this->ajax_hash, $redraw_js));
+
 			}
 		}
 				
@@ -3207,23 +3013,35 @@ class ilObjectListGUI
 
 			if($this->notes_enabled && $cnt[$this->obj_id][IL_NOTE_PRIVATE] > 0)
 			{
-				$this->addHeaderIcon("notes",
+				/*$this->addHeaderIcon("notes",
 					ilUtil::getImagePath("note_unlabeled.svg"),
 					$lng->txt("private_notes").": ".$cnt[$this->obj_id][IL_NOTE_PRIVATE],
 					ilNoteGUI::getListNotesJSCall($this->ajax_hash, $redraw_js),
 					$cnt[$this->obj_id][IL_NOTE_PRIVATE]
-					);
+					);*/
+
+				$f = $this->ui->factory();
+				$this->addHeaderGlyph("notes", $f->glyph()->note("#")
+					->withCounter($f->counter()->status((int) $cnt[$this->obj_id][IL_NOTE_PRIVATE])),
+					ilNoteGUI::getListNotesJSCall($this->ajax_hash, $redraw_js));
+
 			}
 
 			if($comments_enabled && $cnt[$this->obj_id][IL_NOTE_PUBLIC] > 0)
 			{
 				$lng->loadLanguageModule("notes");
 				
-				$this->addHeaderIcon("comments",
+				/*$this->addHeaderIcon("comments",
 					ilUtil::getImagePath("comment_unlabeled.svg"),
 					$lng->txt("notes_public_comments").": ".$cnt[$this->obj_id][IL_NOTE_PUBLIC],
 					ilNoteGUI::getListCommentsJSCall($this->ajax_hash, $redraw_js),
-					$cnt[$this->obj_id][IL_NOTE_PUBLIC]);
+					$cnt[$this->obj_id][IL_NOTE_PUBLIC]);*/
+
+				$f = $this->ui->factory();
+				$this->addHeaderGlyph("comments", $f->glyph()->comment("#")
+					->withCounter($f->counter()->status((int) $cnt[$this->obj_id][IL_NOTE_PUBLIC])),
+					ilNoteGUI::getListCommentsJSCall($this->ajax_hash, $redraw_js));
+
 			}			
 		}
 		
@@ -3270,35 +3088,52 @@ class ilObjectListGUI
 				$id = "headp_".$id;
 				
 				if(is_array($attr))
-				{				
-					if($attr["onclick"])
-					{				
-						$htpl->setCurrentBlock("onclick");
-						$htpl->setVariable("PROP_ONCLICK", $attr["onclick"]);
+				{
+					if($attr["glyph"])
+					{
+						if ($attr["onclick"])
+						{
+							$htpl->setCurrentBlock("prop_glyph_oc");
+							$htpl->setVariable("GLYPH_ONCLICK", $attr["onclick"]);
+							$htpl->parseCurrentBlock();
+						}
+						$renderer = $this->ui->renderer();
+						$html = $renderer->render($attr["glyph"]);
+						$htpl->setCurrentBlock("prop_glyph");
+						$htpl->setVariable("GLYPH", $html);
 						$htpl->parseCurrentBlock();
 					}
-
-					if($attr["status_text"])
+					else
 					{
-						$htpl->setCurrentBlock("status");
-						$htpl->setVariable("PROP_TXT", $attr["status_text"]);
+						if ($attr["onclick"])
+						{
+							$htpl->setCurrentBlock("onclick");
+							$htpl->setVariable("PROP_ONCLICK", $attr["onclick"]);
+							$htpl->parseCurrentBlock();
+						}
+
+						if ($attr["status_text"])
+						{
+							$htpl->setCurrentBlock("status");
+							$htpl->setVariable("PROP_TXT", $attr["status_text"]);
+							$htpl->parseCurrentBlock();
+						}
+
+						if (!$attr["href"])
+						{
+							$attr["href"] = "#";
+						}
+
+						$htpl->setCurrentBlock("prop");
+						$htpl->setVariable("PROP_ID", $id);
+						$htpl->setVariable("IMG", ilUtil::img($attr["img"]));
+						$htpl->setVariable("PROP_HREF", $attr["href"]);
 						$htpl->parseCurrentBlock();
-					}
-					
-					if(!$attr["href"])
-					{
-						$attr["href"] = "#";
-					}
 
-					$htpl->setCurrentBlock("prop");
-					$htpl->setVariable("PROP_ID", $id);
-					$htpl->setVariable("IMG", ilUtil::img($attr["img"]));										
-					$htpl->setVariable("PROP_HREF", $attr["href"]);													
-					$htpl->parseCurrentBlock();
-					
-					if($attr["tooltip"])
-					{					
-						ilTooltipGUI::addTooltip($id, $attr["tooltip"]);
+						if ($attr["tooltip"])
+						{
+							ilTooltipGUI::addTooltip($id, $attr["tooltip"]);
+						}
 					}
 				}
 				else
@@ -3516,7 +3351,7 @@ class ilObjectListGUI
 			{
 				include_once("Services/Component/classes/class.ilPlugin.php");
 				$this->tpl->setVariable("ALT_ICON", $lng->txt("icon")." ".
-					ilPlugin::lookupTxt("rep_robj", $this->getIconImageType(), "obj_".$this->getIconImageType()));
+					ilObjectPlugin::lookupTxtById($this->getIconImageType(), "obj_".$this->getIconImageType()));
 			}
 
 			$this->tpl->setVariable("SRC_ICON",
@@ -3593,9 +3428,9 @@ class ilObjectListGUI
 	* @return	string		html code
 	*/
 	function getListItemHTML($a_ref_id, $a_obj_id, $a_title, $a_description,
-		$a_use_asynch = false, $a_get_asynch_commands = false, $a_asynch_url = "", $a_context = self::CONTEXT_REPOSITORY)
+		$a_use_asynch = false, $a_get_asynch_commands = false, $a_asynch_url = "")
 	{
-		global $ilAccess, $ilBench, $ilUser, $ilCtrl;
+		global $ilBench, $ilUser;
 
 		// this variable stores wheter any admin commands
 		// are included in the output
@@ -3606,12 +3441,12 @@ class ilObjectListGUI
 
 		// initialization
 		$ilBench->start("ilObjectListGUI", "1000_getListHTML_init$type");
-		$this->initItem($a_ref_id, $a_obj_id, $a_title, $a_description, $a_context);
+		$this->initItem($a_ref_id, $a_obj_id, $a_title, $a_description);
 		$ilBench->stop("ilObjectListGUI", "1000_getListHTML_init$type");
 		
 		// prepare ajax calls
 		include_once "Services/Object/classes/class.ilCommonActionDispatcherGUI.php";
-		if($a_context == self::CONTEXT_REPOSITORY)
+		if($this->context == self::CONTEXT_REPOSITORY)
 		{
 			$node_type = ilCommonActionDispatcherGUI::TYPE_REPOSITORY;
 		}
@@ -3683,8 +3518,7 @@ class ilObjectListGUI
 		$this->tpl = new ilTemplate(static::$tpl_file_name, true, true,
 			static::$tpl_component, "DEFAULT", false, true);
 
-		if ($this->getCommandsStatus() || 
-			($this->payment_enabled && IS_PAYMENT_ENABLED))
+		if($this->getCommandsStatus())
 		{
 			if (!$this->getSeparateCommands())
 			{

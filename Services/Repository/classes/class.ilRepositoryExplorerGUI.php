@@ -212,6 +212,12 @@ class ilRepositoryExplorerGUI extends ilTreeExplorerGUI
 				$ilCtrl->setParameterByClass("ilobjgroupgui", "ref_id", $_GET["ref_id"]);
 				return $link;
 
+			case "grpr":
+				$ilCtrl->setParameterByClass("ilrepositorygui", "ref_id", $a_node["child"]);
+				$link = $ilCtrl->getLinkTargetByClass("ilrepositorygui", "redirect");
+				$ilCtrl->setParameterByClass("ilrepositorygui", "ref_id", $_GET["ref_id"]);
+				return $link;
+
 			case "crs":
 				$ilCtrl->setParameterByClass("ilobjcoursegui", "ref_id", $a_node["child"]);
 				$link = $ilCtrl->getLinkTargetByClass(array("ilrepositorygui", "ilobjcoursegui"), "view");
@@ -538,7 +544,7 @@ class ilRepositoryExplorerGUI extends ilTreeExplorerGUI
 
 				$query = sprintf("SELECT * FROM tst_tests WHERE obj_fi=%s", $obj_id);
 				$res = $ilDB->query($query);
-				while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+				while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 				{
 					return (bool) $row->complete;
 				}
@@ -552,7 +558,7 @@ class ilRepositoryExplorerGUI extends ilTreeExplorerGUI
 
 				$query = sprintf("SELECT * FROM svy_svy WHERE obj_fi=%s", $obj_id);
 				$res = $ilDB->query($query);
-				while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+				while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 				{
 					return (bool) $row->complete;
 				}
@@ -569,7 +575,7 @@ class ilRepositoryExplorerGUI extends ilTreeExplorerGUI
 					return false;
 				}
 				break;
-				
+			case 'grpr':
 			case 'crsr':
 			case 'catr':
 				include_once('./Services/ContainerReference/classes/class.ilContainerReferenceAccess.php');
@@ -586,7 +592,7 @@ class ilRepositoryExplorerGUI extends ilTreeExplorerGUI
 					if ($a_node["type"] == "lm")
 					{
 						include_once("./Modules/LearningModule/classes/class.ilObjLearningModule.php");
-						$lm_obj =& new ilObjLearningModule($a_node["child"]);
+						$lm_obj = new ilObjLearningModule($a_node["child"]);
 						if((!$lm_obj->getOnline()) && (!$rbacsystem->checkAccess('write', $a_node["child"])))
 						{
 							return false;
@@ -596,7 +602,7 @@ class ilRepositoryExplorerGUI extends ilTreeExplorerGUI
 					if ($a_node["type"] == "htlm")
 					{
 						include_once("./Modules/HTMLLearningModule/classes/class.ilObjFileBasedLM.php");
-						$lm_obj =& new ilObjFileBasedLM($a_node["child"]);
+						$lm_obj = new ilObjFileBasedLM($a_node["child"]);
 						if((!$lm_obj->getOnline()) && (!$rbacsystem->checkAccess('write', $a_node["child"])))
 						{
 							return false;
@@ -606,7 +612,7 @@ class ilRepositoryExplorerGUI extends ilTreeExplorerGUI
 					if ($a_node["type"] == "sahs")
 					{
 						include_once("./Modules/ScormAicc/classes/class.ilObjSAHSLearningModule.php");
-						$lm_obj =& new ilObjSAHSLearningModule($a_node["child"]);
+						$lm_obj = new ilObjSAHSLearningModule($a_node["child"]);
 						if((!$lm_obj->getOnline()) && (!$rbacsystem->checkAccess('write', $a_node["child"])))
 						{
 							return false;

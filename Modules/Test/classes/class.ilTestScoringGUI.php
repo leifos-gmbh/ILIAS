@@ -31,22 +31,23 @@ class ilTestScoringGUI extends ilTestServiceGUI
 	* @param object $a_object Associated ilObjTest class
 	* @access public
 	*/
-	function ilTestScoringGUI(ilObjTest $a_object)
+	public function __construct(ilObjTest $a_object)
 	{
-		parent::ilTestServiceGUI($a_object);
+		parent::__construct($a_object);
 	}
 
 	/**
 	 * @param string $active_sub_tab
 	 */
-	protected function buildSubTabs($active_sub_tab = 'man_scoring')
+	protected function buildSubTabs($active_sub_tab = 'man_scoring_by_qst')
 	{
 		/**
 		 * @var $ilTabs ilTabsGUI
 		 */
 		global $ilTabs;
-		$ilTabs->addSubTab('man_scoring', $this->lng->txt('tst_man_scoring_by_part'), $this->ctrl->getLinkTargetByClass('ilTestScoringGUI', 'showManScoringParticipantsTable'));
+
 		$ilTabs->addSubTab('man_scoring_by_qst', $this->lng->txt('tst_man_scoring_by_qst'), $this->ctrl->getLinkTargetByClass('ilTestScoringByQuestionsGUI', 'showManScoringByQuestionParticipantsTable'));
+		$ilTabs->addSubTab('man_scoring', $this->lng->txt('tst_man_scoring_by_part'), $this->ctrl->getLinkTargetByClass('ilTestScoringGUI', 'showManScoringParticipantsTable'));
 		$ilTabs->setSubTabActive($active_sub_tab);
 	}
 	
@@ -94,7 +95,7 @@ class ilTestScoringGUI extends ilTestServiceGUI
 	/**
 	* execute command
 	*/
-	function &executeCommand()
+	function executeCommand()
 	{
 		global $ilAccess;
 		
@@ -122,7 +123,7 @@ class ilTestScoringGUI extends ilTestServiceGUI
 		}
 		
 		$cmd = $this->getCommand($cmd);
-		$this->buildSubTabs();
+		$this->buildSubTabs('man_scoring');
 		switch($next_class)
 		{
 			default:

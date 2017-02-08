@@ -2,14 +2,13 @@
 /* Copyright (c) 1998-2012 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 require_once 'Services/Table/classes/class.ilTable2GUI.php';
-require_once 'Services/Calendar/classes/class.ilDatePresentation.php';
 require_once 'Modules/Forum/classes/class.ilForumAuthorInformation.php';
 require_once 'Modules/Forum/classes/class.ilForumAuthorInformationCache.php';
 require_once 'Services/Rating/classes/class.ilRatingGUI.php';
 
 /**
  * Class ilForumTopicTableGUI
- * @author  Nadia Ahmad <nahmad@databay.de>
+ * @author  Nadia Matuschek <nmatuschek@databay.de>
  * @author  Michael Jansen <mjansen@databay.de>
  * @version $Id$
  * @ingroup ModulesForum
@@ -55,6 +54,11 @@ class ilForumTopicTableGUI extends ilTable2GUI
 	 * @var int for displaying thread_sorting position 
 	 */
 	public $position = 1;
+	
+	/**
+	 * @var bool
+	 */
+	public $is_post_draft_allowed = FALSE;
 
 	/**
 	 * @param        $a_parent_obj
@@ -82,7 +86,8 @@ class ilForumTopicTableGUI extends ilTable2GUI
 		$this->setTopicData($topicData);
 
 		// Call this immediately in constructor
-		$this->setId('frm_tt_' . substr(md5($this->parent_cmd), 0, 3) . '_'. $this->getRefId());
+		$id = 'frm_tt_' . substr(md5($this->parent_cmd), 0, 3) . '_'. $this->getRefId();
+		$this->setId($id);
 
 		// Let the database do the work
 		$this->setDefaultOrderDirection('DESC');
@@ -94,9 +99,11 @@ class ilForumTopicTableGUI extends ilTable2GUI
 
 		// Add global css for table styles
 		$tpl->addCss('./Modules/Forum/css/forum_table.css');
+		
+		$this->is_post_draft_allowed = ilForumPostDraft::isSavePostDraftAllowed();
 	}
 	
-	public function populate()
+	public function init()
 	{
 		if($this->parent_cmd == 'mergeThreads')
 		{
@@ -128,10 +135,16 @@ class ilForumTopicTableGUI extends ilTable2GUI
 			$this->addColumn('', 'check', '10px', true);
 		}
 
-		$this->addColumn($this->lng->txt('forums_thread'), '');
+		$this->addColumn($this->lng->txt('forums_thread'), 'thr_subject');
 		$this->addColumn($this->lng->txt('forums_created_by'), '');
-		$this->addColumn($this->lng->txt('forums_articles'), '');
-		$this->addColumn($this->lng->txt('visits'), '');
+		$this->addColumn($this->lng->txt('forums_articles'), 'num_posts');
+		$this->addColumn($this->lng->txt('visits'), 'num_visit');
+		
+		if($this->is_post_draft_allowed)
+		{
+			$this->addColumn($this->lng->txt('drafts',''));
+		}
+		
 		$this->addColumn($this->lng->txt('forums_last_post'), 'post_date');
 		if('showThreads' == $this->parent_cmd && $this->parent_obj->objProperties->isIsThreadRatingEnabled())
 		{
@@ -185,6 +198,10 @@ class ilForumTopicTableGUI extends ilTable2GUI
 		$this->addColumn($this->lng->txt('forums_created_by'), 'author');
 		$this->addColumn($this->lng->txt('forums_articles'), 'num_posts');
 		$this->addColumn($this->lng->txt('visits'), 'num_visit');
+		if($this->is_post_draft_allowed)
+		{
+			$this->addColumn($this->lng->txt('drafts',''));
+		}
 		$this->addColumn($this->lng->txt('forums_last_post'), 'lp_date');
 	
 		// Disable sorting
@@ -209,7 +226,7 @@ class ilForumTopicTableGUI extends ilTable2GUI
 	/**
 	 * @param ilForumTopic $thread
 	 */
-	public function fillRow(ilForumTopic $thread)
+	public function fillRow($thread)
 	{
 		/**
 		 * @var $ilUser ilObjUser
@@ -315,7 +332,11 @@ class ilForumTopicTableGUI extends ilTable2GUI
 
 		$this->tpl->setVariable('VAL_ARTICLE_STATS', $topicStats);
 		$this->tpl->setVariable('VAL_NUM_VISIT', $thread->getVisits());
-
+		if($this->is_post_draft_allowed)
+		{
+			$draft_statistics = ilForumPostDraft::getDraftsStatisticsByRefId($this->getRefId());
+			$this->tpl->setVariable('VAL_DRAFTS', (int)$draft_statistics[$thread->getId()]);
+		}
 		// Last posting
 		if($num_posts > 0)
 		{
@@ -386,14 +407,14 @@ class ilForumTopicTableGUI extends ilTable2GUI
 	public function fetchData()
 	{
 		$this->determineOffsetAndOrder();
-		
+
 		$excluded_ids = array();
 		if($this->parent_cmd == 'mergeThreads' &&
 		   $this->getSelectedThread() instanceof ilForumTopic)
 		{
 			$excluded_ids[] = $this->getSelectedThread()->getId();
 		}
-
+		
 		$params = array(
 			'is_moderator'    => $this->getIsModerator(),
 			'excluded_ids'    => $excluded_ids,

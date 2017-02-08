@@ -112,11 +112,11 @@ class ilPrivacySettings
 		
 		if(ilObject::_lookupType($a_ref_id, true) == 'crs')
 		{
-			return $this->enabledCourseExport() and $ilAccess->checkAccessOfUser($user_id,'write','',$a_ref_id) and $rbacsystem->checkAccessOfUser($user_id,'export_member_data',$this->getPrivacySettingsRefId());
+			return $this->enabledCourseExport() and $ilAccess->checkAccessOfUser($user_id,'manage_members','',$a_ref_id) and $rbacsystem->checkAccessOfUser($user_id,'export_member_data',$this->getPrivacySettingsRefId());
 		}
 		else
 		{
-			return $this->enabledGroupExport() and $ilAccess->checkAccessOfUser($user_id,'write','',$a_ref_id) and $rbacsystem->checkAccessOfUser($user_id,'export_member_data',$this->getPrivacySettingsRefId());
+			return $this->enabledGroupExport() and $ilAccess->checkAccessOfUser($user_id,'manage_members','',$a_ref_id) and $rbacsystem->checkAccessOfUser($user_id,'export_member_data',$this->getPrivacySettingsRefId());
 		}		
 	}
 
@@ -336,7 +336,7 @@ class ilPrivacySettings
 				"AND object_reference.ref_id = tree.child ".
 				"AND object_reference.obj_id = object_data.obj_id";
 		$res = $this->db->query($query);
-		$row = $res->fetchRow(DB_FETCHMODE_ASSOC);
+		$row = $res->fetchRow(ilDBConstants::FETCHMODE_ASSOC);
 		$this->ref_id = $row["ref_id"];
 
 		$this->export_course = (bool) $this->settings->get('ps_export_course',false);

@@ -18,6 +18,7 @@ require_once './Modules/Test/classes/inc.AssessmentConstants.php';
  * @version	$Id$
  *          
  * @ingroup ModulesTestQuestionPool
+ * @ilCtrl_Calls assSingleChoiceGUI: ilFormPropertyDispatchGUI
  */
 class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjustable, ilGuiAnswerScoringAdjustable
 {
@@ -40,13 +41,9 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	}
 
 	/**
-	 * Evaluates a posted edit form and writes the form data in the question object
-	 *
-	 * @param bool $always
-	 *
-	 * @return integer A positive value, if one of the required fields wasn't set, else 0
+	 * {@inheritdoc}
 	 */
-	public function writePostData($always = false)
+	protected function writePostData($always = false)
 	{
 		$hasErrors = (!$always) ? $this->editQuestion(true) : false;
 		if (!$hasErrors)
@@ -72,6 +69,8 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 		include_once("./Services/Form/classes/class.ilPropertyFormGUI.php");
 		$form = new ilPropertyFormGUI();
+		$this->editForm = $form;
+
 		$form->setFormAction($this->ctrl->getFormAction($this));
 		$form->setTitle($this->outQuestionType());
 		$isSingleline = ($this->object->lastChange == 0 && !array_key_exists('types', $_POST)) ? (($this->object->getMultilineAnswerSetting()) ? false : true) : $this->object->isSingleline;
@@ -729,7 +728,7 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 					if (in_array( $suffix, array( "jpg", "jpeg", "png", "gif" ) ))
 					{
 						// upload image
-						$filename = $this->object->createNewImageFileName( $file_org_name );
+						$filename = $this->object->buildHashedImageFilename( $file_org_name );
 						if ($this->object->setImageFile( $filename, $file_temp_name ) == 0)
 						{
 							$picturefile = $filename;

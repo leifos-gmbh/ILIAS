@@ -176,7 +176,7 @@ Calendar.setup = function (params) {
 				document.getElementById(params.inputFieldsDate + "_m").value + "/" +
 				document.getElementById(params.inputFieldsDate + "_d").value + "/" +
 				document.getElementById(params.inputFieldsDate + "_y").value;
-				
+		
 			// #18494 - birthday has "empty" default
 			if(params.date === "0/0/0")	{
 				params.date = null;

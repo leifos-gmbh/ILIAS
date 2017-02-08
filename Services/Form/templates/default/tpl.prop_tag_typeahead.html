@@ -16,7 +16,7 @@
 	var ilBootstrapTaggingOnLoad  = (function () 
 	{
 		'use strict';
-		var pub 				= {},
+		var pub 				= {}, 
 			pri 				= {};
 		pub.id	 				= '';
 		pub.terms 				= {TERMS};
@@ -41,7 +41,7 @@
 			});
 
 			pri.preventFormSubmissionOnEnterInTypeahead();
-
+			
 			$(pub.id).on('itemAdded', function(elem) {
 				if (typeof pub.callbackItemAdded === 'function') {
 					pub.callbackItemAdded();
@@ -82,7 +82,7 @@
 				callback(matches);
 			};
 		};
-
+		
 		pri.preventFormSubmissionOnEnterInTypeahead = function()
 		{
 			$(document).ready(function() {
@@ -94,7 +94,7 @@
 				});
 			});
 		};
-
+		
 		return pub;
 	}());
 </script>

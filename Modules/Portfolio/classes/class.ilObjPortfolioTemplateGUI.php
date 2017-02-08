@@ -26,8 +26,6 @@ class ilObjPortfolioTemplateGUI extends ilObjPortfolioBaseGUI
 	{
 		global $ilNavigationHistory;
 				
-		$this->tpl->getStandardTemplate();
-
 		// add entry to navigation history
 		if(!$this->getCreationMode() &&
 			$this->getAccessHandler()->checkAccess("read", "", $this->node_id))
@@ -72,6 +70,7 @@ class ilObjPortfolioTemplateGUI extends ilObjPortfolioBaseGUI
 				break;
 			
 			case "ilobjectcopygui":
+				$this->prepareOutput();
 				include_once "./Services/Object/classes/class.ilObjectCopyGUI.php";
 				$cp = new ilObjectCopyGUI($this);
 				$cp->setType("prtt");
@@ -88,7 +87,7 @@ class ilObjPortfolioTemplateGUI extends ilObjPortfolioBaseGUI
 				break;
 			
 			case "ilobjstylesheetgui":
-				include_once ("./Services/Style/classes/class.ilObjStyleSheetGUI.php");
+				include_once ("./Services/Style/Content/classes/class.ilObjStyleSheetGUI.php");
 				$this->ctrl->setReturn($this, "editStyleProperties");
 				$style_gui = new ilObjStyleSheetGUI("", $this->object->getStyleSheetId(), false, false);
 				$style_gui->omitLocator();
@@ -179,15 +178,12 @@ class ilObjPortfolioTemplateGUI extends ilObjPortfolioBaseGUI
 	*/
 	function infoScreenForward()
 	{
-		global $ilTabs, $ilErr, $ilToolbar;
+		global $ilTabs, $ilToolbar;
 		
 		$ilTabs->activateTab("id_info");
 
-		if (!$this->checkPermissionBool("visible"))
-		{
-			$ilErr->raiseError($this->lng->txt("msg_no_perm_read"));
-		}
-		
+		$this->checkPermission("visible");
+	
 		if ($this->checkPermissionBool("read"))
 		{
 			$this->lng->loadLanguageModule("cntr");
@@ -295,27 +291,16 @@ class ilObjPortfolioTemplateGUI extends ilObjPortfolioBaseGUI
 		$online = new ilCheckboxInputGUI($this->lng->txt('rep_activation_online'),'online');		
 		$online->setInfo($this->lng->txt('prtt_activation_online_info').$act_obj_info);		
 		$a_form->addItem($online);				
-		
-		$act_type = new ilCheckboxInputGUI($this->lng->txt('rep_visibility_until'),'access_type');
-		// $act_type->setInfo($this->lng->txt('prtt_availability_until_info'));	
-		
-			$this->tpl->addJavaScript('./Services/Form/js/date_duration.js');
-			include_once "Services/Form/classes/class.ilDateDurationInputGUI.php";
-			$dur = new ilDateDurationInputGUI($this->lng->txt("rep_time_period"), "access_period");
-			$dur->setShowTime(true);						
-			$date = $this->object->getActivationStartDate();				
-			$dur->setStart(new ilDateTime($date ? $date : time(), IL_CAL_UNIX));
-			$dur->setStartText($this->lng->txt('rep_activation_limited_start'));				
-			$date = $this->object->getActivationEndDate();
-			$dur->setEnd(new ilDateTime($date ? $date : time(), IL_CAL_UNIX));
-			$dur->setEndText($this->lng->txt('rep_activation_limited_end'));				
-			$act_type->addSubItem($dur);
+				
+		include_once "Services/Form/classes/class.ilDateDurationInputGUI.php";
+		$dur = new ilDateDurationInputGUI($this->lng->txt("rep_visibility_until"), "access_period");
+		$dur->setShowTime(true);									
+		$dur->setEndText($this->lng->txt('rep_activation_limited_end'));				
+		$a_form->addItem($dur);	
 
 			$visible = new ilCheckboxInputGUI($this->lng->txt('rep_activation_limited_visibility'), 'access_visiblity');
 			$visible->setInfo($this->lng->txt('prtt_activation_limited_visibility_info'));
-			$act_type->addSubItem($visible);
-			
-		$a_form->addItem($act_type);						
+			$dur->addSubItem($visible);										
 		
 		$section = new ilFormSectionHeaderGUI();
 		$section->setTitle($this->lng->txt('properties'));
@@ -326,8 +311,13 @@ class ilObjPortfolioTemplateGUI extends ilObjPortfolioBaseGUI
 	
 	protected function getEditFormCustomValues(array &$a_values)
 	{				
-		$a_values["online"] = $this->object->isOnline();		
-		$a_values["access_type"] = $this->object->isActivationLimited();		
+		$a_values["online"] = $this->object->isOnline();				
+		$a_values["access_period"]["start"] = $this->object->getActivationStartDate() 
+			? new ilDateTime($this->object->getActivationStartDate(), IL_CAL_UNIX)
+			: null;
+		$a_values["access_period"]["end"] = $this->object->getActivationEndDate() 
+			? new ilDateTime($this->object->getActivationEndDate(), IL_CAL_UNIX)
+			: null;			
 		$a_values["access_visiblity"] = $this->object->getActivationVisibility();
 		
 		parent::getEditFormCustomValues($a_values);
@@ -338,12 +328,11 @@ class ilObjPortfolioTemplateGUI extends ilObjPortfolioBaseGUI
 		$this->object->setOnline($a_form->getInput("online"));
 		
 		// activation
-		if($a_form->getInput("access_type"))
+		$period = $a_form->getItemByPostVar("access_period");	
+		if($period->getStart() && $period->getEnd())
 		{	
 			$this->object->setActivationLimited(true);								    			
-			$this->object->setActivationVisibility($a_form->getInput("access_visiblity"));
-			
-			$period = $a_form->getItemByPostVar("access_period");										
+			$this->object->setActivationVisibility($a_form->getInput("access_visiblity"));															
 			$this->object->setActivationStartDate($period->getStart()->get(IL_CAL_UNIX));
 			$this->object->setActivationEndDate($period->getEnd()->get(IL_CAL_UNIX));										
 		}
@@ -403,10 +392,12 @@ class ilObjPortfolioTemplateGUI extends ilObjPortfolioBaseGUI
 		return "ilportfoliotemplatepagegui";
 	}
 	
-	protected function initCopyPageFormOptions(ilFormPropertyGUI $a_tgt)
-	{						
-		$old = new ilRadioOption($this->lng->txt("prtf_existing_portfolio"), "old");
-		$a_tgt->addOption($old);
+	protected function initCopyPageFormOptions(ilPropertyFormGUI $a_form)
+	{
+		// always existing prtft
+		$hi = new ilHiddenInputGUI("target");
+		$hi->setValue("old");
+		$a_form->addItem($hi);
 
 		$options = array();
 		$all = ilObjPortfolioTemplate::getAvailablePortfolioTemplates("write");
@@ -417,10 +408,8 @@ class ilObjPortfolioTemplateGUI extends ilObjPortfolioBaseGUI
 		$prtf = new ilSelectInputGUI($this->lng->txt("obj_prtt"), "prtf");
 		$prtf->setRequired(true);
 		$prtf->setOptions($options);
-		$old->addSubItem($prtf);		
+		$a_form->addItem($prtf);
 		
-		// no option to create new template here
-		$a_tgt->setValue("old");
 	}
 	
 	

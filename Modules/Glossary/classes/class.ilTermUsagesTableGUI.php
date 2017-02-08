@@ -111,7 +111,7 @@ class ilTermUsagesTableGUI extends ilTable2GUI
 						require_once("./Modules/LearningModule/classes/class.ilObjContentObject.php");
 						require_once("./Modules/LearningModule/classes/class.ilObjLearningModule.php");
 						require_once("./Modules/LearningModule/classes/class.ilLMObject.php");
-						$lm_obj =& new ilObjLearningModule($page_obj->getParentId(), false);
+						$lm_obj = new ilObjLearningModule($page_obj->getParentId(), false);
 						$item["obj_type_txt"] = $this->lng->txt("obj_".$cont_type);
 						$item["obj_title"] = $lm_obj->getTitle();
 						$item["sub_txt"] = $this->lng->txt("pg");
@@ -205,6 +205,17 @@ class ilTermUsagesTableGUI extends ilTable2GUI
 					$item["obj_link"] = ilLink::_getStaticLink($ref_id);
 				}
 
+				break;
+
+			case "termref":
+				$item["obj_type_txt"] = $this->lng->txt("obj_glo");
+				$item["obj_title"] = ilObject::_lookupTitle($usage["id"]);
+				$item["sub_txt"] = $this->lng->txt("glo_referenced_term");
+				$ref_id = $this->getFirstWritableRefId($usage["id"]);
+				if ($ref_id > 0)
+				{
+					$item["obj_link"] = ilLink::_getStaticLink($ref_id);
+				}
 				break;
 
 			default:

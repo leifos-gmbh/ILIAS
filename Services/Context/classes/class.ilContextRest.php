@@ -2,7 +2,7 @@
 
 /* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
 
-include_once "Services/Context/classes/class.ilContextBase.php";
+include_once "Services/Context/interfaces/interface.ilContextTemplate.php";
 
 /** 
  * Service context for soap
@@ -12,7 +12,7 @@ include_once "Services/Context/classes/class.ilContextBase.php";
  * 
  * @ingroup ServicesContext
  */
-class ilContextRest extends ilContextBase
+class ilContextRest implements ilContextTemplate
 {			
 	/**
 	 * Are redirects supported?
@@ -83,6 +83,16 @@ class ilContextRest extends ilContextBase
 	{
 		return false;
 	}
+	
+	/**
+	 * Check if persistent session handling is supported
+	 * @return boolean
+	 */
+	public static function supportsPersistentSessions()
+	{
+		return false;
+	}
+	
 }
 
 ?>

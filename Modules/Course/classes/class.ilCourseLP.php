@@ -13,6 +13,25 @@ include_once "Services/Object/classes/class.ilObjectLP.php";
  */
 class ilCourseLP extends ilObjectLP
 {
+	public static function getDefaultModes($a_lp_active)
+	{
+		// objectives cannot be supported
+		
+		if(!$a_lp_active)
+		{
+			return array(
+				ilLPObjSettings::LP_MODE_DEACTIVATED
+			);
+		}
+		else
+		{
+			return array(
+				ilLPObjSettings::LP_MODE_DEACTIVATED,
+				ilLPObjSettings::LP_MODE_MANUAL_BY_TUTOR
+			);
+		}
+	}
+	
 	public function getDefaultMode()
 	{
 		if($this->checkObjectives())
@@ -33,7 +52,7 @@ class ilCourseLP extends ilObjectLP
 			ilLPObjSettings::LP_MODE_MANUAL_BY_TUTOR, 
 			ilLPObjSettings::LP_MODE_COLLECTION
 		);
-	}	
+	}		
 	
 	public function getCurrentMode()
 	{
@@ -74,7 +93,7 @@ class ilCourseLP extends ilObjectLP
 		return $member_obj->getMembers();		
 	}	
 	
-	protected static function isLPMember(array &$a_res, $a_usr_id, array $a_obj_ids)
+	protected static function isLPMember(array &$a_res, $a_usr_id, $a_obj_ids)
 	{
 		global $ilDB;
 			

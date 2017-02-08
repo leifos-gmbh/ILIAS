@@ -470,7 +470,7 @@ class ilECSEventQueueReader
 		$res = $ilDB->query($query);
 
 		$event_id = 0;
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$event_id = $row->event_id;
 		}
@@ -622,7 +622,7 @@ class ilECSEventQueueReader
 		
 	 	$res = $this->db->query($query);
 	 	$counter = 0;
-	 	while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+	 	while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 	 	{
 	 		$this->events[$counter]['event_id'] = $row->event_id;
 	 		$this->events[$counter]['type'] = $row->type;

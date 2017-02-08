@@ -17,12 +17,14 @@ class ilHTTPS
 	
 	private static $instance = null;
 
-	var $enabled = false;
-	var $protected_scripts = array();
+	protected $enabled = false;
 
-	var $automaticHTTPSDetectionEnabled = false;
-	var $headerName = false;
-	var $headerValue = false;
+	protected $protected_classes = array();
+	protected $protected_scripts = array();
+
+	protected $automaticHTTPSDetectionEnabled = false;
+	protected $headerName = false;
+	protected $headerValue = false;
 
 	/**
 	 * @deprected use <code>ilHTTPS::getInstance()</code>
@@ -116,7 +118,6 @@ class ilHTTPS
 	{
 		$this->protected_scripts[] = 'login.php';
 		$this->protected_scripts[] = 'index.php';
-		$this->protected_scripts[] = 'payment.php';
 		$this->protected_scripts[] = 'register.php';
 		// BEGIN WebDAV Use SSL for WebDAV.
 		$this->protected_scripts[] = 'webdav.php';
@@ -162,10 +163,6 @@ class ilHTTPS
 	{
 		$this->protected_classes[] = 'ilstartupgui';
 		$this->protected_classes[] = 'ilaccountregistrationgui';
-		$this->protected_classes[] = 'ilpurchasebmfgui';
-		$this->protected_classes[] = 'ilpurchasepaypal';
-		$this->protected_classes[] = 'ilshopshoppingcartgui';
-		$this->protected_classes[] = 'ilpurchasebillgui';
 		$this->protected_classes[] = 'ilpersonalsettingsgui';
 	}
 
@@ -174,7 +171,7 @@ class ilHTTPS
 	* @access	public
 	* @return	boolean
 	*/
-	function _checkHTTPS()
+	public static function _checkHTTPS()
 	{
 		// only check standard port in the moment
 		$port = 443;

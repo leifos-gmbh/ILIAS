@@ -113,7 +113,7 @@ class ilExAssignmentTeamTableGUI extends ilTable2GUI
 		{
 			$this->tpl->setVariable("VAL_ID", $a_set["id"]);
 		}
-		$this->tpl->setVariable("TXT_NAME", $a_set["name"]);	
+		$this->tpl->setVariable("TXT_NAME", $a_set["name"]);		
 		
 		// #18327
 		if(!$ilAccess->checkAccessOfUser($a_set["id"], "read","", $this->parent_ref_id) &&

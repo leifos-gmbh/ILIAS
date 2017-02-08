@@ -43,7 +43,7 @@ class ilObjSessionAccess extends ilObjectAccess
 	 * @return array
 	 * @static
 	 */
-	public function _getCommands()
+	public static function _getCommands()
 	{
 		$commands = array
 		(
@@ -74,15 +74,44 @@ class ilObjSessionAccess extends ilObjectAccess
 	{
 		global $ilUser, $lng, $rbacsystem, $ilAccess;
 		
-		$a_user_id = $a_user_id ? $a_user_id : $ilUser->getId();
+		if(!$a_user_id)
+		{
+			$a_user_id = $ilUser->getId();
+		}
+		include_once './Modules/Session/classes/class.ilSessionParticipants.php';
+		$part = ilSessionParticipants::getInstanceByObjId($a_obj_id);
+		
 		switch($a_cmd)
 		{
 			case 'register':
-				if(self::_lookupRegistration($a_obj_id)&& $a_user_id != ANONYMOUS_USER_ID)
+				
+				if(!self::_lookupRegistration($a_obj_id))
 				{
-					return !self::_lookupRegistered($a_user_id,$a_obj_id);
+					//ilLoggerFactory::getLogger('sess')->debug('Lookup registration failed: register access denied.');
+					return false;
 				}
-				return false;
+				if($ilUser->isAnonymous())
+				{
+					//ilLoggerFactory::getLogger('sess')->debug('User is anoynmous: register access denied.');
+					return false;
+				}
+				if($part->isAssigned($a_user_id))
+				{
+					//ilLoggerFactory::getLogger('sess')->debug('User is assigned: register access denied.');
+					return false;
+				}
+				if($part->isSubscriber($a_user_id))
+				{
+					//ilLoggerFactory::getLogger('sess')->debug('User is subscriber: register access denied.');
+					return false;
+				}
+				include_once './Modules/Session/classes/class.ilSessionWaitingList.php';
+				if(ilSessionWaitingList::_isOnList($a_user_id, $a_obj_id))
+				{
+					//ilLoggerFactory::getLogger('sess')->debug('User is on waiting list: register access denied.');
+					return false;
+				}
+				break;
 				
 			case 'unregister':
 				if(self::_lookupRegistration($a_obj_id) && $a_user_id != ANONYMOUS_USER_ID)
@@ -98,7 +127,7 @@ class ilObjSessionAccess extends ilObjectAccess
 	/**
 	* check whether goto script will succeed
 	*/
-	public function _checkGoto($a_target)
+	public static function _checkGoto($a_target)
 	{
 		global $ilAccess;
 		
@@ -135,7 +164,7 @@ class ilObjSessionAccess extends ilObjectAccess
 		
 		$query = "SELECT registration,obj_id FROM event ";
 		$res = $ilDB->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			self::$registrations[$row->obj_id] = (bool) $row->registration;
 		}
@@ -163,7 +192,7 @@ class ilObjSessionAccess extends ilObjectAccess
 		$query = "SELECT event_id, registered FROM event_participants WHERE usr_id = ".$ilDB->quote($ilUser->getId(),'integer');
 		$res = $ilDB->query($query);
 		self::$registered[$a_usr_id] = array();
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			self::$registered[$a_usr_id][$row->event_id] = (bool) $row->registered;
 		}

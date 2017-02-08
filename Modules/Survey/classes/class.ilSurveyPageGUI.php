@@ -1379,7 +1379,7 @@ class ilSurveyPageGUI
 		$pages = $this->object->getSurveyPages();
 		$this->has_next_page = ($this->current_page < sizeof($pages));
 		$this->has_previous_page = ($this->current_page > 1);
-		$this->has_datasets = $this->object->_hasDatasets($this->object->getSurveyId());
+		$this->has_datasets = ilObjSurvey::_hasDatasets($this->object->getSurveyId());
 		
 		if($this->has_datasets)
 		{
@@ -1451,9 +1451,9 @@ class ilSurveyPageGUI
 							$tiny->_buildAdvancedTableButtonsFromHTMLTags($tags).
 							($tiny->getStyleSelect() ? ',styleselect' : '');
 				$buttons_3 = $tiny->_buildAdvancedButtonsFromHTMLTags(3, $tags);
-				$ttpl->setVariable('WYSIWYG_BUTTONS_1', $tiny->_removeRedundantSeparators($buttons_1));
-				$ttpl->setVariable('WYSIWYG_BUTTONS_2', $tiny->_removeRedundantSeparators($buttons_2));
-				$ttpl->setVariable('WYSIWYG_BUTTONS_3', $tiny->_removeRedundantSeparators($buttons_3));
+				$ttpl->setVariable('WYSIWYG_BUTTONS_1', ilTinyMCE::removeRedundantSeparators($buttons_1));
+				$ttpl->setVariable('WYSIWYG_BUTTONS_2', ilTinyMCE::removeRedundantSeparators($buttons_2));
+				$ttpl->setVariable('WYSIWYG_BUTTONS_3', ilTinyMCE::removeRedundantSeparators($buttons_3));
 			}
 
 			// commands

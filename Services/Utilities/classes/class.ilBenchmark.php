@@ -12,14 +12,6 @@
 class ilBenchmark
 {
 	var $bench = array();
-	
-	/**
-	* constructor
-	*/
-	function ilBenchmark()
-	{
-	}
-
 
 	/**
 	*
@@ -97,7 +89,9 @@ return;
 				$ilDB->manipulate("DELETE FROM benchmark");
 				foreach ($this->db_bench as $b)
 				{
+					$id = $ilDB->nextId('benchmark');
 					$ilDB->insert("benchmark", array(
+						"id" => array("integer", $id),
 						"duration" => array("float", $this->microtimeDiff($b["start"], $b["stop"])),
 						"sql_stmt" => array("clob", $b["sql"])
 					));

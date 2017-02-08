@@ -423,7 +423,7 @@ class ilWikiUtil
 	/**
 	* See class.ilInitialisation.php
 	*/
-	function removeUnsafeCharacters($a_str)
+	static function removeUnsafeCharacters($a_str)
 	{
 		return str_replace(array("\x00", "\n", "\r", "\\", "'", '"', "\x1a"), "", $a_str);
 	}
@@ -692,6 +692,7 @@ class ilWikiUtil
 		}
 		else
 		{
+			
 			$link = ilLink::_getLink($a_wiki_ref_id);
 		}
 

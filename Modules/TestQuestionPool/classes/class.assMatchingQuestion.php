@@ -155,10 +155,13 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 		foreach ($this->terms as $key => $term)
 		{
 			$next_id = $ilDB->nextId( 'qpl_a_mterm' );
-			$ilDB->manipulateF( "INSERT INTO qpl_a_mterm (term_id, question_fi, picture, term) VALUES (%s, %s, %s, %s)",
-								array( 'integer', 'integer', 'text', 'text' ),
-								array( $next_id, $this->getId(), $term->picture, $term->text )
-			);
+			$ilDB->insert('qpl_a_mterm', array(
+				'term_id' => array('integer', $next_id),
+				'question_fi' => array('integer', $this->getId()),
+				'picture' => array('text', $term->picture),
+				'term' => array('text', $term->text),
+				'ident' => array('integer', $term->identifier)
+			));
 			$termids[$term->identifier] = $next_id;
 		}
 
@@ -167,11 +170,13 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 		foreach ($this->definitions as $key => $definition)
 		{
 			$next_id = $ilDB->nextId( 'qpl_a_mdef' );
-			$ilDB->manipulateF( "INSERT INTO qpl_a_mdef (def_id, question_fi, picture, definition, morder) VALUES (%s, %s, %s, %s, %s)",
-								array( 'integer', 'integer', 'text', 'text', 'integer' ),
-								array( $next_id, $this->getId(
-								), $definition->picture, $definition->text, $definition->identifier )
-			);
+			$ilDB->insert('qpl_a_mdef', array(
+				'def_id' => array('integer', $next_id),
+				'question_fi' => array('integer', $this->getId()),
+				'picture' => array('text', $definition->picture),
+				'definition' => array('text', $definition->text),
+				'ident' => array('integer', $definition->identifier)
+			));
 			$definitionids[$definition->identifier] = $next_id;
 		}
 
@@ -280,7 +285,7 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 		{
 			while ($data = $ilDB->fetchAssoc($result))
 			{
-				$term = new assAnswerMatchingTerm($data['term'], $data['picture'], $data['term_id']);
+				$term = new assAnswerMatchingTerm($data['term'], $data['picture'], $data['ident']);
 				array_push($this->terms, $term);
 				$termids[$data['term_id']] = $term;
 			}
@@ -297,7 +302,7 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 		{
 			while ($data = $ilDB->fetchAssoc($result))
 			{
-				$definition = new assAnswerMatchingDefinition($data['definition'], $data['picture'], $data['morder']);
+				$definition = new assAnswerMatchingDefinition($data['definition'], $data['picture'], $data['ident']);
 				array_push($this->definitions, $definition);
 				$definitionids[$data['def_id']] = $definition;
 			}
@@ -1164,23 +1169,22 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 				include_once "./Modules/Test/classes/class.ilObjTest.php";
 				$pass = ilObjTest::_getPass($active_id);
 			}
-			
-			$this->getProcessLocker()->requestUserSolutionUpdateLock();
 
-			$affectedRows = $this->removeCurrentSolution($active_id, $pass, $authorized);
+			$this->getProcessLocker()->executeUserSolutionUpdateLockOperation(function() use (&$matchingsExist, $submittedMatchings, $active_id, $pass, $authorized) {
 
-			foreach( $submittedMatchings as $definition => $terms )
-			{
-				foreach( $terms as $i => $term )
+				$this->removeCurrentSolution($active_id, $pass, $authorized);
+
+				foreach($submittedMatchings as $definition => $terms)
 				{
-					$affectedRows = $this->saveCurrentSolution($active_id, $pass, $term, $definition, $authorized);
-
-					$matchingsExist = true;
+					foreach($terms as $i => $term)
+					{
+						$this->saveCurrentSolution($active_id, $pass, $term, $definition, $authorized);
+						$matchingsExist = true;
+					}
 				}
-			}
 
-			$this->getProcessLocker()->releaseUserSolutionUpdateLock();
-			
+			});
+
 			$saveWorkingDataResult = true;
 		}
 		else
@@ -1193,11 +1197,11 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 		{
 			if( $matchingsExist )
 			{
-				$this->logAction($this->lng->txtlng("assessment", "log_user_entered_values", ilObjAssessmentFolder::_getLogLanguage()), $active_id, $this->getId());
+				assQuestion::logAction($this->lng->txtlng("assessment", "log_user_entered_values", ilObjAssessmentFolder::_getLogLanguage()), $active_id, $this->getId());
 			}
 			else
 			{
-				$this->logAction($this->lng->txtlng("assessment", "log_user_not_entered_values", ilObjAssessmentFolder::_getLogLanguage()), $active_id, $this->getId());
+				assQuestion::logAction($this->lng->txtlng("assessment", "log_user_not_entered_values", ilObjAssessmentFolder::_getLogLanguage()), $active_id, $this->getId());
 			}
 		}
 
@@ -1215,14 +1219,9 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 	}
 
 	/**
-	 * Reworks the allready saved working data if neccessary
-	 *
-	 * @access protected
-	 * @param integer $active_id
-	 * @param integer $pass
-	 * @param boolean $obligationsAnswered
+	 * {@inheritdoc}
 	 */
-	protected function reworkWorkingData($active_id, $pass, $obligationsAnswered)
+	protected function reworkWorkingData($active_id, $pass, $obligationsAnswered, $authorized)
 	{
 		// nothing to rework!
 	}
@@ -1317,23 +1316,14 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 	}
 
 	/**
-	* Creates an Excel worksheet for the detailed cumulated results of this question
-	*
-	* @param object $worksheet Reference to the parent excel worksheet
-	* @param object $startrow Startrow of the output in the excel worksheet
-	* @param object $active_id Active id of the participant
-	* @param object $pass Test pass
-	* @param object $format_title Excel title format
-	* @param object $format_bold Excel bold format
-	* @param array $eval_data Cumulated evaluation data
-	* @access public
-	*/
-	public function setExportDetailsXLS(&$worksheet, $startrow, $active_id, $pass, &$format_title, &$format_bold)
+	 * {@inheritdoc}
+	 */
+	public function setExportDetailsXLS($worksheet, $startrow, $active_id, $pass)
 	{
-		include_once ("./Services/Excel/classes/class.ilExcelUtils.php");
+		parent::setExportDetailsXLS($worksheet, $startrow, $active_id, $pass);
+
 		$solutions = $this->getSolutionValues($active_id, $pass);
-		$worksheet->writeString($startrow, 0, ilExcelUtils::_convert_text($this->lng->txt($this->getQuestionType())), $format_title);
-		$worksheet->writeString($startrow, 1, ilExcelUtils::_convert_text($this->getTitle()), $format_title);
+
 		$imagepath = $this->getImagePath();
 		$i = 1;
 		foreach ($solutions as $solution)
@@ -1341,33 +1331,34 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 			$matches_written = FALSE;
 			foreach ($this->getMatchingPairs() as $idx => $pair)
 			{
-				if (!$matches_written) $worksheet->writeString($startrow + $i, 1, ilExcelUtils::_convert_text($this->lng->txt("matches")));
+				if (!$matches_written) $worksheet->setCell($startrow + $i, 1, $this->lng->txt("matches"));
 				$matches_written = TRUE;
 				if ($pair->definition->identifier == $solution["value2"])
 				{
 					if (strlen($pair->definition->text))
 					{
-						$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($pair->definition->text));
+						$worksheet->setCell($startrow + $i, 0, $pair->definition->text);
 					}
 					else
 					{
-						$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($pair->definition->picture));
+						$worksheet->setCell($startrow + $i, 0, $pair->definition->picture);
 					}
 				}
 				if ($pair->term->identifier == $solution["value1"])
 				{
 					if (strlen($pair->term->text))
 					{
-						$worksheet->writeString($startrow + $i, 2, ilExcelUtils::_convert_text($pair->term->text));
+						$worksheet->setCell($startrow + $i, 2, $pair->term->text);
 					}
 					else
 					{
-						$worksheet->writeString($startrow + $i, 2, ilExcelUtils::_convert_text($pair->term->picture));
+						$worksheet->setCell($startrow + $i, 2, $pair->term->picture);
 					}
 				}
 			}
 			$i++;
 		}
+
 		return $startrow + $i + 1;
 	}
 	
@@ -1604,7 +1595,7 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 	*/
 	public function getUserQuestionResult($active_id, $pass)
 	{
-		/** @var ilDB $ilDB */
+		/** @var ilDBInterface $ilDB */
 		global $ilDB;
 		$result = new ilUserQuestionResult($this, $active_id, $pass);
 

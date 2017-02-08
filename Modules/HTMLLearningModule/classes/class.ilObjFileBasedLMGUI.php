@@ -11,7 +11,7 @@
 * $Id$
 *
 * @ilCtrl_Calls ilObjFileBasedLMGUI: ilFileSystemGUI, ilObjectMetaDataGUI, ilPermissionGUI, ilLearningProgressGUI, ilInfoScreenGUI
-* @ilCtrl_Calls ilObjFileBasedLMGUI: ilShopPurchaseGUI, ilCommonActionDispatcherGUI
+* @ilCtrl_Calls ilObjFileBasedLMGUI: ilCommonActionDispatcherGUI
 * @ilCtrl_Calls ilObjFileBasedLMGUI: ilLicenseGUI, ilExportGUI
 * @ingroup ModulesHTMLLearningModule
 */
@@ -30,7 +30,7 @@ class ilObjFileBasedLMGUI extends ilObjectGUI
 	*
 	* @access	public
 	*/
-	function ilObjFileBasedLMGUI($a_data,$a_id = 0,$a_call_by_reference = true, $a_prepare_output = true)
+	function __construct($a_data,$a_id = 0,$a_call_by_reference = true, $a_prepare_output = true)
 	{
 		global $lng, $ilCtrl;
 
@@ -40,7 +40,7 @@ class ilObjFileBasedLMGUI extends ilObjectGUI
 		$this->type = "htlm";
 		$lng->loadLanguageModule("content");
 
-		parent::ilObjectGUI($a_data, $a_id, $a_call_by_reference, false);
+		parent::__construct($a_data, $a_id, $a_call_by_reference, false);
 		//$this->actions = $this->objDefinition->getActions("mep");
 		$this->output_prepared = $a_prepare_output;
 
@@ -68,24 +68,6 @@ class ilObjFileBasedLMGUI extends ilObjectGUI
 				$this->getTemplate();
 				$this->setLocator();
 				$this->setTabs();				
-			}
-		}
-
-			
-		if(!$this->getCreationMode())
-		{
-			if(IS_PAYMENT_ENABLED)
-			{
-				include_once 'Services/Payment/classes/class.ilPaymentObject.php';
-				if(ilPaymentObject::_requiresPurchaseToAccess($_GET['ref_id'], $type = (isset($_GET['purchasetype']) ? $_GET['purchasetype'] : NULL) ))
-				{
-					$this->tpl->getStandardTemplate();
-
-					include_once 'Services/Payment/classes/class.ilShopPurchaseGUI.php';
-					$pp = new ilShopPurchaseGUI((int)$_GET['ref_id']);
-					$ret = $this->ctrl->forwardCommand($pp);
-					return true;
-				}
 			}
 		}
 
@@ -176,13 +158,13 @@ class ilObjFileBasedLMGUI extends ilObjectGUI
 				break;
 
 			case "ilinfoscreengui":
-				$ret =& $this->outputInfoScreen();
+				$ret = $this->outputInfoScreen();
 				break;
 
 			case "illearningprogressgui":
 				$ilTabs->activateTab('id_learning_progress');
 				include_once './Services/Tracking/classes/class.ilLearningProgressGUI.php';
-				$new_gui =& new ilLearningProgressGUI(ilLearningProgressGUI::LP_CONTEXT_REPOSITORY,
+				$new_gui = new ilLearningProgressGUI(ilLearningProgressGUI::LP_CONTEXT_REPOSITORY,
 													  $this->object->getRefId(),
 													  $_GET['user_id'] ? $_GET['user_id'] : $ilUser->getId());
 				$this->ctrl->forwardCommand($new_gui);
@@ -191,15 +173,8 @@ class ilObjFileBasedLMGUI extends ilObjectGUI
 			case 'ilpermissiongui':
 				$ilTabs->activateTab('id_permissions');
 				include_once("Services/AccessControl/classes/class.ilPermissionGUI.php");
-				$perm_gui =& new ilPermissionGUI($this);
-				$ret =& $this->ctrl->forwardCommand($perm_gui);
-				break;
-
-			case 'illicensegui':
-				$ilTabs->activateTab('id_license');
-				include_once("./Services/License/classes/class.ilLicenseGUI.php");
-				$license_gui =& new ilLicenseGUI($this);
-				$ret =& $this->ctrl->forwardCommand($license_gui);
+				$perm_gui = new ilPermissionGUI($this);
+				$ret = $this->ctrl->forwardCommand($perm_gui);
 				break;
 
 			case "ilexportgui":
@@ -225,7 +200,7 @@ class ilObjFileBasedLMGUI extends ilObjectGUI
 				{
 					$cmd.= "Object";
 				}
-				$ret =& $this->$cmd();
+				$ret = $this->$cmd();
 				break;
 		}
 		
@@ -311,23 +286,6 @@ class ilObjFileBasedLMGUI extends ilObjectGUI
 			$ne->setValue(basename($this->lng->txt("no_start_file")));
 		}
 		$this->form->addItem($ne);
-		
-		include_once("Services/License/classes/class.ilLicenseAccess.php");
-		if (ilLicenseAccess::_isEnabled())
-		{
-			$lic = new ilCheckboxInputGUI($lng->txt("cont_license"), "lic");
-			$lic->setInfo($lng->txt("cont_license_info"));
-			$this->form->addItem($lic);
-			
-			if(!$ilAccess->checkAccess('edit_permission', '', $this->ref_id))
-			{
-				$lic->setDisabled(true);
-			}
-		}		
-		
-		$bib = new ilCheckboxInputGUI($lng->txt("cont_biblio"), "bib");
-		$bib->setInfo($lng->txt("cont_biblio_info"));
-		$this->form->addItem($bib);
 
 		$this->form->addCommandButton("saveProperties", $lng->txt("save"));
 		$this->form->addCommandButton("toFilesystem", $lng->txt("cont_set_start_file"));
@@ -359,8 +317,7 @@ class ilObjFileBasedLMGUI extends ilObjectGUI
 		$values["startfile"] = $startfile;
 		$values["title"] = $this->object->getTitle();
 		$values["desc"] = $this->object->getDescription();
-		$values["lic"] = $this->object->getShowLicense();
-		$values["bib"] = $this->object->getShowBibliographicalData();
+		//$values["lic"] = $this->object->getShowLicense();
 
 		$this->form->setValuesByArray($values);
 	}
@@ -391,14 +348,7 @@ class ilObjFileBasedLMGUI extends ilObjectGUI
 			$this->object->setTitle($this->form->getInput("title"));
 			$this->object->setDescription($this->form->getInput("desc"));
 			$this->object->setOnline(ilUtil::yn2tf($_POST["cobj_online"]));
-			$this->object->setShowBibliographicalData($this->form->getInput("bib"));		
-			
-			$lic = $this->form->getItemByPostVar("lic");
-			if($lic && !$lic->getDisabled())
-			{
-				$this->object->setShowLicense($this->form->getInput("lic"));
-			}						
-			
+
 			$this->object->update();
 			ilUtil::sendSuccess($this->lng->txt("msg_obj_modified"), true);
 			$this->ctrl->redirect($this, "properties");
@@ -447,7 +397,7 @@ class ilObjFileBasedLMGUI extends ilObjectGUI
 	* save object
 	* @access	public
 	*/
-	function afterSave($newObj)
+	function afterSave(ilObject $newObj)
 	{
 		if(!$newObj->getStartFile())
 		{
@@ -527,179 +477,6 @@ class ilObjFileBasedLMGUI extends ilObjectGUI
 		$this->permObject();
 	}
 	
-	/**
-	* save bib item (admin call)
-	*/
-	function saveBibItemObject($a_target = "")
-	{
-		global $ilTabs;
-
-		$ilTabs->activateTab("id_bib_data");
-
-		include_once "./Modules/LearningModule/classes/class.ilBibItemGUI.php";
-		$bib_gui =& new ilBibItemGUI();
-		$bib_gui->setObject($this->object);
-		$bibItemIndex = $_POST["bibItemIndex"] ? $_POST["bibItemIndex"] : $_GET["bibItemIndex"];
-		$bibItemIndex *= 1;
-		if ($bibItemIndex < 0)
-		{
-			$bibItemIndex = 0;
-		}
-		$bibItemIndex = $bib_gui->save($bibItemIndex);
-
-		if ($a_target == "")
-		{
-			$a_target = "adm_object.php?ref_id=" . $this->object->getRefId();
-		}
-
-		$bib_gui->edit("ADM_CONTENT", "adm_content", $a_target, $bibItemIndex);
-	}
-
-	/**
-	* save bib item (module call)
-	*/
-	function saveBibItem()
-	{
-		// questionable workaround to make this old stuff work
-		$this->ctrl->setParameter($this, ilCtrl::IL_RTOKEN_NAME, $this->ctrl->getRequestToken());
-
-		//$this->setTabs();
-		$this->saveBibItemObject($this->ctrl->getLinkTarget($this));
-	}
-
-	/**
-	* edit bib items (admin call)
-	*/
-	function editBibItemObject($a_target = "")
-	{
-		global $ilTabs;
-
-		$ilTabs->activateTab("id_bib_data");
-		
-		include_once "./Modules/LearningModule/classes/class.ilBibItemGUI.php";
-		$bib_gui =& new ilBibItemGUI();
-		$bib_gui->setObject($this->object);
-		$bibItemIndex = $_POST["bibItemIndex"] ? $_POST["bibItemIndex"] : $_GET["bibItemIndex"];
-		$bibItemIndex *= 1;
-		if ($bibItemIndex < 0)
-		{
-			$bibItemIndex = 0;
-		}
-		if ($a_target == "")
-		{
-			$a_target = "adm_object.php?ref_id=" . $this->object->getRefId();
-		}
-
-		$bib_gui->edit("ADM_CONTENT", "adm_content", $a_target, $bibItemIndex);
-	}
-
-	/**
-	* edit bib items (module call)
-	*/
-	function editBibItem()
-	{
-		// questionable workaround to make this old stuff work
-		$this->ctrl->setParameter($this, ilCtrl::IL_RTOKEN_NAME, $this->ctrl->getRequestToken());
-
-		//$this->setTabs();
-		$this->editBibItemObject($this->ctrl->getLinkTarget($this));
-	}
-
-	/**
-	* delete bib item (admin call)
-	*/
-	function deleteBibItemObject($a_target = "")
-	{
-		global $ilTabs;
-
-		$ilTabs->activateTab("id_bib_data");
-		
-		include_once "./Modules/LearningModule/classes/class.ilBibItemGUI.php";
-		$bib_gui =& new ilBibItemGUI();
-		$bib_gui->setObject($this->object);
-		$bibItemIndex = $_POST["bibItemIndex"] ? $_POST["bibItemIndex"] : $_GET["bibItemIndex"];
-		$bib_gui->bib_obj->delete($_GET["bibItemName"], $_GET["bibItemPath"], $bibItemIndex);
-		if (strpos($bibItemIndex, ",") > 0)
-		{
-			$bibItemIndex = substr($bibItemIndex, 0, strpos($bibItemIndex, ","));
-		}
-		if ($a_target == "")
-		{
-			$a_target = "adm_object.php?ref_id=" . $this->object->getRefId();
-		}
-
-		$bib_gui->edit("ADM_CONTENT", "adm_content", $a_target, max(0, $bibItemIndex - 1));
-	}
-
-	/**
-	* delete bib item (module call)
-	*/
-	function deleteBibItem()
-	{
-		// questionable workaround to make this old stuff work
-		$this->ctrl->setParameter($this, ilCtrl::IL_RTOKEN_NAME, $this->ctrl->getRequestToken());
-
-		//$this->setTabs();
-		$this->deleteBibItemObject($this->ctrl->getLinkTarget($this));
-	}
-
-	/**
-	* add bib item (admin call)
-	*/
-	function addBibItemObject($a_target = "")
-	{
-		global $ilTabs;
-	
-		$ilTabs->activateTab("id_bib_data");
-	
-		$bibItemName = $_POST["bibItemName"] ? $_POST["bibItemName"] : $_GET["bibItemName"];
-		$bibItemIndex = $_POST["bibItemIndex"] ? $_POST["bibItemIndex"] : $_GET["bibItemIndex"];
-		if ($bibItemName == "BibItem")
-		{
-			include_once "./Modules/LearningModule/classes/class.ilBibItem.php";
-			$bib_item =& new ilBibItem();
-			$bib_item->setId($this->object->getId());
-			$bib_item->setType($this->object->getType());
-			$bib_item->read();
-		}
-
-		include_once "./Modules/LearningModule/classes/class.ilBibItemGUI.php";
-		$bib_gui =& new ilBibItemGUI();
-		$bib_gui->setObject($this->object);
-		if ($bibItemIndex == "")
-			$bibItemIndex = 0;
-		$bibItemPath = $_POST["bibItemPath"] ? $_POST["bibItemPath"] : $_GET["bibItemPath"];
-
-		//if ($bibItemName != "" && $bibItemName != "BibItem")
-		if ($bibItemName != "")
-		{
-			$bib_gui->bib_obj->add($bibItemName, $bibItemPath, $bibItemIndex);
-			$data = $bib_gui->bib_obj->getElement("BibItem");
-			$bibItemIndex = (count($data) - 1);
-		}
-		else
-		{
-			ilUtil::sendInfo($this->lng->txt("bibitem_choose_element"), true);
-		}
-		if ($a_target == "")
-		{
-			$a_target = "adm_object.php?ref_id=" . $this->object->getRefId();
-		}
-
-		$bib_gui->edit("ADM_CONTENT", "adm_content", $a_target, $bibItemIndex);
-	}
-
-	/**
-	* add bib item (module call)
-	*/
-	function addBibItem()
-	{
-		// questionable workaround to make this old stuff work
-		$this->ctrl->setParameter($this, ilCtrl::IL_RTOKEN_NAME, $this->ctrl->getRequestToken());
-
-		//$this->setTabs();
-		$this->addBibItemObject($this->ctrl->getLinkTarget($this));
-	}
 
 	/**
 	* Frameset -> Output list of files
@@ -727,11 +504,6 @@ class ilObjFileBasedLMGUI extends ilObjectGUI
 	{
 		global $ilUser;
 
-		// Note license usage
-		include_once "Services/License/classes/class.ilLicense.php";
-		ilLicense::_noteAccess($this->object->getId(), $this->object->getType(),
-			$this->object->getRefId());
-		
 		// #9483
 		if ($ilUser->getId() != ANONYMOUS_USER_ID)
 		{	
@@ -872,16 +644,6 @@ class ilObjFileBasedLMGUI extends ilObjectGUI
 				$this->ctrl->getLinkTargetByClass(array('ilobjfilebasedlmgui','illearningprogressgui'), ''));
 		}
 
-		include_once("Services/License/classes/class.ilLicenseAccess.php");
-		if ($ilAccess->checkAccess('edit_permission', '', $this->ref_id) &&
-			ilLicenseAccess::_isEnabled() &&
-			$this->object->getShowLicense())
-		{
-			$ilTabs->addTab("id_license",
-				$lng->txt("license"),
-				$this->ctrl->getLinkTargetByClass('illicensegui', ''));
-		}
-		
 		if($ilAccess->checkAccess('write', '', $this->ref_id))
 		{
 			include_once "Services/Object/classes/class.ilObjectMetaDataGUI.php";
@@ -894,12 +656,6 @@ class ilObjFileBasedLMGUI extends ilObjectGUI
 					$mdtab);
 			}
 			
-			if($this->object->getShowBibliographicalData())
-			{
-				$ilTabs->addTab("id_bib_data",
-					$lng->txt("bib_data"),
-					$this->ctrl->getLinkTarget($this, "editBibItem"));
-			}
 		}
 
 
@@ -974,7 +730,7 @@ class ilObjFileBasedLMGUI extends ilObjectGUI
 	 * @param
 	 * @return
 	 */
-	function importFileObject($parent_id = null)
+	function importFileObject($parent_id = null, $a_catch_errors = true)
 	{
 		try
 		{

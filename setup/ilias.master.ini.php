@@ -20,7 +20,6 @@ convert =
 zip = 
 unzip = 
 java = 
-htmldoc = 
 ffmpeg = 
 
 [log]
@@ -28,6 +27,7 @@ path =
 file = 
 enabled = 1
 level = WARNING
+error_path = 
 
 [debian]
 data_dir = /var/opt/ilias
@@ -36,7 +36,6 @@ convert = /usr/bin/convert
 zip = /usr/bin/zip
 unzip = /usr/bin/unzip
 java = 
-htmldoc = /usr/bin/htmldoc
 ffmpeg = /usr/bin/ffmpeg
 
 [redhat]
@@ -46,7 +45,6 @@ convert =
 zip = 
 unzip = 
 java = 
-htmldoc = 
 
 [suse]
 data_dir = 
@@ -55,7 +53,6 @@ convert =
 zip = 
 unzip = 
 java = 
-htmldoc = 
 
 [https]
 auto_https_detect_enabled = 0

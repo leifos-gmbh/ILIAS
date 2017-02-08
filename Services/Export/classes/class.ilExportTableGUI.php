@@ -133,7 +133,8 @@ class ilExportTableGUI extends ilTable2GUI
 		foreach($this->getCustomColumns() as $c)
 		{
 			$this->tpl->setCurrentBlock('custom');
-			$this->tpl->setVariable('VAL_CUSTOM', $c['obj']->$c['func']($a_set['type'], $a_set['file']).' ');
+			$f = $c['func'];
+			$this->tpl->setVariable('VAL_CUSTOM', $c['obj']->$f($a_set['type'], $a_set['file']).' ');
 			$this->tpl->parseCurrentBlock();
 		}
 		
@@ -145,8 +146,7 @@ class ilExportTableGUI extends ilTable2GUI
 			: $a_set['type'];
 		$this->tpl->setVariable('VAL_TYPE', $type);
 		$this->tpl->setVariable('VAL_FILE', $a_set['file']);
-		include_once("./Services/Utilities/classes/class.ilFormat.php");
-		$this->tpl->setVariable('VAL_SIZE', ilFormat::formatSize($a_set['size']));
+		$this->tpl->setVariable('VAL_SIZE', ilUtil::formatSize($a_set['size']));
 		$this->tpl->setVariable('VAL_DATE', ilDatePresentation::formatDate(new ilDateTime($a_set['timestamp'], IL_CAL_UNIX)));
 		
 		$this->tpl->setVariable('TXT_DOWNLOAD', $this->lng->txt('download'));

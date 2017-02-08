@@ -14,15 +14,15 @@ include_once 'Services/Tracking/classes/class.ilLPStatus.php';
 class ilLPStatusManual extends ilLPStatus
 {
 
-	function ilLPStatusManual($a_obj_id)
+	function __construct($a_obj_id)
 	{
 		global $ilDB;
 
-		parent::ilLPStatus($a_obj_id);
-		$this->db =& $ilDB;
+		parent::__construct($a_obj_id);
+		$this->db = $ilDB;
 	}
 
-	function _getInProgress($a_obj_id)
+	static function _getInProgress($a_obj_id)
 	{
 		include_once './Services/Tracking/classes/class.ilChangeEvent.php';
 		$users = ilChangeEvent::lookupUsersInProgress($a_obj_id);
@@ -33,7 +33,7 @@ class ilLPStatusManual extends ilLPStatus
 		return $users;						
 	}
 
-	function _getCompleted($a_obj_id)
+	static function _getCompleted($a_obj_id)
 	{
 		global $ilDB;
 		
@@ -44,7 +44,7 @@ class ilLPStatusManual extends ilLPStatus
 			"AND completed = '1' ";
 
 		$res = $ilDB->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$usr_ids[] = $row->user_id;
 		}
@@ -67,7 +67,6 @@ class ilLPStatusManual extends ilLPStatus
 		$status = self::LP_STATUS_NOT_ATTEMPTED_NUM;
 		switch ($ilObjDataCache->lookupType($a_obj_id))
 		{
-			case 'dbk':
 			case 'lm':
 			case 'htlm':
 				include_once("./Services/Tracking/classes/class.ilChangeEvent.php");

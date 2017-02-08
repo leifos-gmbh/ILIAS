@@ -175,7 +175,7 @@ class ilSurveyEditorGUI
 		
 		$this->questionsSubtabs("questions");
 
-		$hasDatasets = $this->object->_hasDatasets($this->object->getSurveyId());
+		$hasDatasets = ilObjSurvey::_hasDatasets($this->object->getSurveyId());
 		$read_only = $hasDatasets;
 		
 
@@ -1038,7 +1038,7 @@ class ilSurveyEditorGUI
 		
 		if($a_block_id)
 		{
-			$questionblock = $this->object->getQuestionblock($a_block_id);
+			$questionblock = ilObjSurvey::_getQuestionblock($a_block_id);
 			$title->setValue($questionblock["title"]);
 			$toggle_blocktitle->setChecked($questionblock["show_blocktitle"]);
 			$toggle_questiontitle->setChecked($questionblock["show_questiontext"]);
@@ -1317,7 +1317,13 @@ class ilSurveyEditorGUI
 			$ilToolbar->addButtonInstance($button);	
 		}
 		
-		
+        // defer rendering of tex to fo processing
+		if (array_key_exists("pdf", $_GET) && ($_GET["pdf"] == 1))
+		{
+			require_once('Services/MathJax/classes/class.ilMathJax.php');
+			ilMathJax::getInstance()->init(ilMathJax::PURPOSE_DEFERRED_PDF);
+		}
+
 		$template = new ilTemplate("tpl.il_svy_svy_printview.html", TRUE, TRUE, "Modules/Survey");
 	
 		$pages =& $this->object->getSurveyPages();
@@ -1367,7 +1373,7 @@ class ilSurveyEditorGUI
 			$template->setVariable("TEXT_REQUIRED", $this->lng->txt("required_field"));
 		}			
 		
-		$this->tpl->addCss("./Modules/Survey/templates/default/survey_print.css", "print");
+		// $this->tpl->addCss("./Modules/Survey/templates/default/survey_print.css", "print");
 		if (array_key_exists("pdf", $_GET) && ($_GET["pdf"] == 1))
 		{
 			$printbody = new ilTemplate("tpl.il_as_tst_print_body.html", TRUE, TRUE, "Modules/Test");
@@ -1376,6 +1382,14 @@ class ilSurveyEditorGUI
 			$printoutput = $printbody->get();
 			$printoutput = preg_replace("/href=\".*?\"/", "", $printoutput);		
 			$fo = $this->object->processPrintoutput2FO($printoutput);
+
+            // render tex as fo graphics
+			require_once('Services/MathJax/classes/class.ilMathJax.php');
+			$fo = ilMathJax::getInstance()
+				->init(ilMathJax::PURPOSE_PDF)
+				->setRendering(ilMathJax::RENDER_PNG_AS_FO_FILE)
+				->insertLatexImages($fo);
+
 			// #11436
 			if(!$fo || !$this->object->deliverPDFfromFO($fo))
 			{

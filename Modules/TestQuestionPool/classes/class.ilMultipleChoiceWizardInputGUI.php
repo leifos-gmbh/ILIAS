@@ -210,11 +210,10 @@ class ilMultipleChoiceWizardInputGUI extends ilSingleChoiceWizardInputGUI
 	}
 
 	/**
-	* Insert property html
-	*
-	* @return	int	Size
-	*/
-	function insert(&$a_tpl)
+	 * Insert property html
+	 * @param $a_tpl ilTemplate
+	 */
+	function insert($a_tpl)
 	{
 		global $lng;
 		
@@ -246,6 +245,7 @@ class ilMultipleChoiceWizardInputGUI extends ilSingleChoiceWizardInputGUI
 						$tpl->parseCurrentBlock();
 					}
 					$tpl->setCurrentBlock('addimage');
+					$tpl->setVariable("IMAGE_BROWSE", $lng->txt('select_file'));
 					$tpl->setVariable("IMAGE_ID", $this->getPostVar() . "[image][$i]");
 					$tpl->setVariable("IMAGE_SUBMIT", $lng->txt("upload"));
 					$tpl->setVariable("IMAGE_ROW_NUMBER", $i);

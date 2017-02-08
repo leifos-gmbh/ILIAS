@@ -3,6 +3,7 @@
 
 include_once "./Services/Object/classes/class.ilObjectGUI.php";
 include_once './Services/AccessControl/classes/class.ilObjRole.php';
+require_once('./Services/Repository/classes/class.ilObjectPlugin.php');
 
 /**
 * Class ilObjRoleGUI
@@ -66,12 +67,12 @@ class ilObjRoleGUI extends ilObjectGUI
 		$this->container_type = ilObject::_lookupType(ilObject::_lookupObjId($this->obj_ref_id));
 
 		$this->type = "role";
-		$this->ilObjectGUI($a_data,$a_id,$a_call_by_reference,false);
+		parent::__construct($a_data,$a_id,$a_call_by_reference,false);
 		$this->ctrl->saveParameter($this, array('obj_id', 'rolf_ref_id'));
 	}
 
 
-	function &executeCommand()
+	function executeCommand()
 	{
 		global $rbacsystem;
 
@@ -89,7 +90,7 @@ class ilObjRoleGUI extends ilObjectGUI
 					$GLOBALS['ilErr']->raiseError($GLOBALS['lng']->txt('permission_denied'), $GLOBALS['ilErr']->WARNING);
 				}
 				include_once('./Services/Search/classes/class.ilRepositorySearchGUI.php');
-				$rep_search =& new ilRepositorySearchGUI();
+				$rep_search = new ilRepositorySearchGUI();
 				$rep_search->setTitle($this->lng->txt('role_add_user'));
 				$rep_search->setCallback($this,'addUserObject');
 
@@ -178,9 +179,9 @@ class ilObjRoleGUI extends ilObjectGUI
 	/**
 	* admin and normal tabs are equal for roles
 	*/
-	function getAdminTabs(&$tabs_gui)
+	function getAdminTabs()
 	{
-		$this->getTabs($tabs_gui);
+		$this->getTabs();
 	}
 	
 	/**
@@ -304,7 +305,7 @@ class ilObjRoleGUI extends ilObjectGUI
 
 		include_once 'Services/AccessControl/classes/class.ilRoleDesktopItem.php';
 
-		$role_desk_item_obj =& new ilRoleDesktopItem($this->object->getId());
+		$role_desk_item_obj = new ilRoleDesktopItem($this->object->getId());
 
 		foreach ($_POST['del_desk_item'] as $role_item_id)
 		{
@@ -373,7 +374,7 @@ class ilObjRoleGUI extends ilObjectGUI
 
 		include_once 'Services/AccessControl/classes/class.ilRoleDesktopItem.php';
 
-		$role_desk_item_obj =& new ilRoleDesktopItem($this->object->getId());
+		$role_desk_item_obj = new ilRoleDesktopItem($this->object->getId());
 		$role_desk_item_obj->add((int) $_GET['item_id'],ilObject::_lookupType((int) $_GET['item_id'],true));
 
 		ilUtil::sendSuccess($this->lng->txt('role_assigned_desktop_item'));
@@ -507,8 +508,8 @@ class ilObjRoleGUI extends ilObjectGUI
 		}
 		$role->setAllowRegister($this->form->getInput('reg'));
 		$role->toggleAssignUsersStatus($this->form->getInput('la'));
-		$role->setDiskQuota($this->form->getInput('disk_quota') * pow(ilFormat::_getSizeMagnitude(),2));
-		$role->setPersonalWorkspaceDiskQuota($this->form->getInput('wsp_disk_quota') * pow(ilFormat::_getSizeMagnitude(),2));
+		$role->setDiskQuota(ilUtil::MB2Bytes($this->form->getInput('disk_quota')));
+		$role->setPersonalWorkspaceDiskQuota(ilUtil::MB2Bytes($this->form->getInput('wsp_disk_quota')));
 		return true;
 	}
 	
@@ -530,11 +531,11 @@ class ilObjRoleGUI extends ilObjectGUI
 		$data['la'] = $role->getAssignUsersStatus();
 		if(ilDiskQuotaActivationChecker::_isActive())
 		{
-			$data['disk_quota'] = $role->getDiskQuota() / (pow(ilFormat::_getSizeMagnitude(),2));
+			$data['disk_quota'] = ilUtil::Bytes2MB($role->getDiskQuota());
 		}
 		if(ilDiskQuotaActivationChecker::_isPersonalWorkspaceActive())
 		{
-			$data['wsp_disk_quota'] = $role->getPersonalWorkspaceDiskQuota() / (pow(ilFormat::_getSizeMagnitude(),2));		
+			$data['wsp_disk_quota'] = ilUtil::Bytes2MB($role->getPersonalWorkspaceDiskQuota());		
 		}
 		$data['pro'] = $rbacreview->isProtected($this->obj_ref_id, $role->getId());
 		
@@ -743,7 +744,7 @@ class ilObjRoleGUI extends ilObjectGUI
 		{
 			if($objDefinition->isPlugin($subtype))
 			{
-				$translation = ilPlugin::lookupTxt("rep_robj", $subtype,"obj_".$subtype);
+				$translation = ilObjectPlugin::lookupTxtById($subtype,"obj_".$subtype);
 			}
 			elseif($objDefinition->isSystemObject($subtype))
 			{
@@ -764,7 +765,7 @@ class ilObjRoleGUI extends ilObjectGUI
 		{
 			if($objDefinition->isPlugin($subtype))
 			{
-				$translation = ilPlugin::lookupTxt("rep_robj", $subtype,"obj_".$subtype);
+				$translation = ilObjectPlugin::lookupTxtById($subtype,"obj_".$subtype);
 			}
 			elseif($objDefinition->isSystemObject($subtype))
 			{
@@ -1490,7 +1491,7 @@ class ilObjRoleGUI extends ilObjectGUI
 	* should be overwritten to add object specific items
 	* (repository items are preloaded)
 	*/
-	function addAdminLocatorItems()
+	function addAdminLocatorItems($a_do_not_add_object = false)
 	{
 		global $ilLocator;
 
@@ -1518,9 +1519,9 @@ class ilObjRoleGUI extends ilObjectGUI
 
 
 
-	function getTabs(&$tabs_gui)
+	function getTabs()
 	{
-		global $rbacsystem,$rbacreview, $ilHelp;
+		global $rbacreview, $ilHelp;
 
 		$base_role_container = $rbacreview->getFoldersAssignedToRole($this->object->getId(),true);
 		
@@ -1537,19 +1538,19 @@ class ilObjRoleGUI extends ilObjectGUI
 		}
 
 		// not so nice (workaround for using tabs in repository)
-		$tabs_gui->clearTargets();
+		$this->tabs_gui->clearTargets();
 
 		$ilHelp->setScreenIdComponent("role");
 
 		if ($this->back_target != "")
 		{
-			$tabs_gui->setBackTarget(
+			$this->tabs_gui->setBackTarget(
 				$this->back_target["text"],$this->back_target["link"]);
 		}
 
 		if($this->checkAccess('write','edit_permission') && $activate_role_edit)
 		{
-			$tabs_gui->addTarget("edit_properties",
+			$this->tabs_gui->addTarget("edit_properties",
 				$this->ctrl->getLinkTarget($this, "edit"), array("edit","update"), get_class($this));
 		}
 /*
@@ -1558,7 +1559,7 @@ class ilObjRoleGUI extends ilObjectGUI
 			$force_active = ($_GET["cmd"] == "perm" || $_GET["cmd"] == "")
 				? true
 				: false;
-			$tabs_gui->addTarget("default_perm_settings",
+			$this->tabs_gui->addTarget("default_perm_settings",
 				$this->ctrl->getLinkTarget($this, "perm"), array("perm", "adoptPermSave", "permSave"),
 				get_class($this),
 				"", $force_active);
@@ -1566,7 +1567,7 @@ class ilObjRoleGUI extends ilObjectGUI
 */
 		if($this->checkAccess('write','edit_permission') and $this->showDefaultPermissionSettings())
 		{
-			$tabs_gui->addTarget(
+			$this->tabs_gui->addTarget(
 				"default_perm_settings",
 				$this->ctrl->getLinkTarget($this, "perm"), array(),get_class($this)
 			);
@@ -1574,7 +1575,7 @@ class ilObjRoleGUI extends ilObjectGUI
 
 		if($this->checkAccess('write','edit_permission') && $activate_role_edit && $this->object->getId() != ANONYMOUS_ROLE_ID)
 		{
-			$tabs_gui->addTarget("user_assignment",
+			$this->tabs_gui->addTarget("user_assignment",
 				$this->ctrl->getLinkTarget($this, "userassignment"),
 				array("deassignUser", "userassignment", "assignUser", "searchUserForm", "search"),
 				get_class($this));
@@ -1582,14 +1583,14 @@ class ilObjRoleGUI extends ilObjectGUI
 
 		if($this->checkAccess('write','edit_permission') && $activate_role_edit  && $this->object->getId() != ANONYMOUS_ROLE_ID)
 		{
-			$tabs_gui->addTarget("desktop_items",
+			$this->tabs_gui->addTarget("desktop_items",
 				$this->ctrl->getLinkTarget($this, "listDesktopItems"),
 				array("listDesktopItems", "deleteDesktopItems", "selectDesktopItem", "askDeleteDesktopItem"),
 				get_class($this));
 		}
 		if($this->checkAccess('write','edit_permission'))
 		{
-			$tabs_gui->addTarget(
+			$this->tabs_gui->addTarget(
 					'export',
 					$this->ctrl->getLinkTargetByClass('ilExportGUI'),
 					array()
@@ -1600,16 +1601,15 @@ class ilObjRoleGUI extends ilObjectGUI
 
 	function mailToRoleObject()
 	{
-		global $rbacreview;
-		
 		$obj_ids = ilObject::_getIdsForTitle($this->object->getTitle(), $this->object->getType());		
 		if(count($obj_ids) > 1)
 		{
 			$_SESSION['mail_roles'][] = '#il_role_'.$this->object->getId();
 		}
 		else
-		{		
-			$_SESSION['mail_roles'][] = $rbacreview->getRoleMailboxAddress($this->object->getId());
+		{
+			require_once 'Services/Mail/classes/Address/Type/class.ilMailRoleAddressType.php';
+			$_SESSION['mail_roles'][] = ilMailRoleAddressType::getRoleMailboxAddress($this->object->getId());
 		}
 
         require_once 'Services/Mail/classes/class.ilMailFormCall.php';
@@ -1774,6 +1774,30 @@ class ilObjRoleGUI extends ilObjectGUI
 		}
 		return true;
 	}
+	
+	/**
+	 * Add selected users to user clipboard
+	 */
+	protected function addToClipboardObject()
+	{
+		global $lng, $ilCtrl;
+		
+		$users = (array) $_POST['user_id'];
+		if(!count($users))
+		{
+			ilUtil::sendFailure($this->lng->txt('select_one'),true);
+			$ilCtrl->redirect($this, 'userassignment');
+		}
+		include_once './Services/User/classes/class.ilUserClipboard.php';
+		$clip = ilUserClipboard::getInstance($GLOBALS['ilUser']->getId());
+		$clip->add($users);
+		$clip->save();
+
+		$lng->loadLanguageModule('user');
+		ilUtil::sendSuccess($this->lng->txt('clipboard_user_added'),true);
+		$ilCtrl->redirect($this, 'userassignment');
+	}
+	
 	
 	
 } // END class.ilObjRoleGUI

@@ -63,7 +63,19 @@ class ilSoapFunctions {
 		return $sua->loginLDAP($client, $username, $password);
 	}
 
+	/**
+	 * @deprecated
+	 */
+	public static function  loginStudipUser($sid,$user_id)
+	{
+		include_once './webservice/soap/classes/class.ilSoapUserAdministration.php';
 
+		$sua = new ilSoapUserAdministration();
+
+		return $sua->loginStudipUser($sid,$user_id);
+	}
+
+	
 	public static function  logout($sid)
 	{
 		include_once './webservice/soap/classes/class.ilSoapUserAdministration.php';
@@ -90,44 +102,9 @@ class ilSoapFunctions {
 		return $sua->getUser($sid,$user_id);
 	}
 
-	/**
-	 * @deprecated
-	 */
-	public static function  updateUser($sid,$user_data)
-	{
-		include_once './webservice/soap/classes/class.ilSoapUserAdministration.php';
 
-		$sua = new ilSoapUserAdministration();
-
-		return $sua->updateUser($sid,$user_data);
-	}
 
 	/**
-	 * @deprecated
-	 */
-	public static function  updatePassword($sid,$user_id,$new_password)
-	{
-		include_once './webservice/soap/classes/class.ilSoapUserAdministration.php';
-
-		$sua = new ilSoapUserAdministration();
-
-		return $sua->updatePassword($sid,$user_id,$new_password);
-	}
-
-	/**
-	 * @deprecated
-	 */
-	public static function  addUser($sid,$user_data,$global_role_id)
-	{
-		include_once './webservice/soap/classes/class.ilSoapUserAdministration.php';
-
-		$sua = new ilSoapUserAdministration();
-
-		return $sua->addUser($sid,$user_data,$global_role_id);
-	}
-
-	/**
-	 * @deprecated
 	 */
 	public static function  deleteUser($sid,$user_id)
 	{
@@ -484,7 +461,7 @@ class ilSoapFunctions {
 	{
 		include_once './webservice/soap/classes/class.ilSoapUtils.php';
 
-		$sou =& new ilSoapUtils();
+		$sou = new ilSoapUtils();
 		return $sou->distributeMails($sid,$mail_xml);
 		
 	}
@@ -616,7 +593,7 @@ class ilSoapFunctions {
 	public static function  getStructureObjects ($sid, $ref_id) {
 		include_once './webservice/soap/classes/class.ilSoapStructureObjectAdministration.php';
 
-		$sca = & new ilSOAPStructureObjectAdministration();
+		$sca = new ilSOAPStructureObjectAdministration();
 
 		return $sca->getStructureObjects ($sid, $ref_id);
 	}
@@ -678,13 +655,13 @@ class ilSoapFunctions {
 
 	public static function  getNIC($sid) {
 		include_once './webservice/soap/classes/class.ilSoapAdministration.php';
-		$soa = & new ilSoapAdministration();
+		$soa = new ilSoapAdministration();
 		return $soa->getNIC($sid);
 	}
 
 	public static function  getExerciseXML ($sid, $ref_id, $attachFileContentsMode) {
 		include_once './webservice/soap/classes/class.ilSoapExerciseAdministration.php';
-		$sta = & new ilSoapExerciseAdministration();
+		$sta = new ilSoapExerciseAdministration();
 		return $sta->getExerciseXML($sid, $ref_id, $attachFileContentsMode);
 
 	}
@@ -692,14 +669,14 @@ class ilSoapFunctions {
 
 	public static function  updateExercise ($sid, $ref_id, $xml) {
 		include_once './webservice/soap/classes/class.ilSoapExerciseAdministration.php';
-		$sta = & new ilSoapExerciseAdministration();
+		$sta = new ilSoapExerciseAdministration();
 		return $sta->updateExercise($sid, $ref_id, $xml);
 
 	}
 
 	public static function  addExercise ($sid, $ref_id, $xml) {
 		include_once './webservice/soap/classes/class.ilSoapExerciseAdministration.php';
-		$sta = & new ilSoapExerciseAdministration();
+		$sta = new ilSoapExerciseAdministration();
 		return $sta->addExercise($sid, $ref_id, $xml);
 
 	}
@@ -707,7 +684,7 @@ class ilSoapFunctions {
 	public static function  getFileXML ($sid, $ref_id, $attachFileContentsMode)
 	{
 		include_once './webservice/soap/classes/class.ilSoapFileAdministration.php';
-		$sta = & new ilSoapFileAdministration();
+		$sta = new ilSoapFileAdministration();
 		return $sta->getFileXML($sid, $ref_id, $attachFileContentsMode);
 
 	}
@@ -716,7 +693,7 @@ class ilSoapFunctions {
 	public static function  updateFile ($sid, $ref_id, $xml)
 	{
 		include_once './webservice/soap/classes/class.ilSoapFileAdministration.php';
-		$sta = & new ilSoapFileAdministration();
+		$sta = new ilSoapFileAdministration();
 		return $sta->updateFile($sid, $ref_id, $xml);
 
 	}
@@ -724,7 +701,7 @@ class ilSoapFunctions {
 	public static function  addFile ($sid, $ref_id, $xml)
 	{
 		include_once './webservice/soap/classes/class.ilSoapFileAdministration.php';
-		$sta = & new ilSoapFileAdministration();
+		$sta = new ilSoapFileAdministration();
 		return $sta->addFile($sid, $ref_id, $xml);
 
 	}
@@ -1055,7 +1032,37 @@ class ilSoapFunctions {
 
 	}
 
+	/**
+	 * Exports a given table of a datacollection into xls
+	 *
+	 * @param string $sid
+	 * @param int $data_collection_id
+	 * @param int $table_id
+	 * @param string $format
+	 * @param string $filepath
+	 *
+	 * @return string
+	 */
+	public static function exportDataCollectionContent($sid, $data_collection_id, $table_id = null, $format = "xls", $filepath = null) {
+		include_once './webservice/soap/classes/class.ilSoapDataCollectionAdministration.php';
+		$dcl = new ilSoapDataCollectionAdministration();
+		return $dcl->exportDataCollectionContent($sid, $data_collection_id, $table_id, $format, $filepath);
+	}
 	
+	/**
+	 * Process background task
+	 *
+	 * @param string $sid
+	 * @param int $task_id	 
+	 *
+	 * @return string
+	 */
+	public static function processBackgroundTask($sid, $task_id) {
+		include_once './webservice/soap/classes/class.ilSoapBackgroundTaskAdministration.php';
+		$bg = new ilSoapBackgroundTaskAdministration();
+		return $bg->processBackgroundTask($sid, $task_id);
+	}
+
 }
 
 ?>

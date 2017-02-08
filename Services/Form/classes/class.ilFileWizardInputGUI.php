@@ -130,10 +130,7 @@ class ilFileWizardInputGUI extends ilFileInputGUI
 			foreach ($pictures['name'] as $index => $name)
 			{
 				// remove trailing '/'
-				while (substr($name, -1) == '/')
-				{
-					$name = substr($name, 0, -1);
-				}
+				$name = rtrim($name, '/');
 
 				$filename = $name;
 				$filename_arr = pathinfo($name);
@@ -228,7 +225,7 @@ class ilFileWizardInputGUI extends ilFileInputGUI
 	*
 	* @return	int	Size
 	*/
-	function insert(&$a_tpl)
+	function insert($a_tpl)
 	{
 		global $lng;
 		

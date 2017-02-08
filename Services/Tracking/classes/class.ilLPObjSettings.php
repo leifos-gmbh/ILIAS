@@ -45,6 +45,7 @@ class ilLPObjSettings
 	const LP_MODE_DOWNLOADED = 20;
 	const LP_MODE_COLLECTION_MOBS = 21;
 	const LP_MODE_STUDY_PROGRAMME = 22;
+	const LP_MODE_INDIVIDUAL_ASSESSMENT = 23;
 
 	const LP_DEFAULT_VISITS = 30; // ???
 	
@@ -117,9 +118,12 @@ class ilLPObjSettings
 		
 		,self::LP_MODE_STUDY_PROGRAMME => array('ilLPStatusStudyProgramme',
 			'trac_mode_study_programme', '')
+
+		,self::LP_MODE_INDIVIDUAL_ASSESSMENT => array('ilLPStatusIndividualAssessment',
+			'trac_mode_individual_assessment', 'trac_mode_individual_assessment_info')
 	);
 
-	function ilLPObjSettings($a_obj_id)
+	function __construct($a_obj_id)
 	{
 		global $ilObjDataCache, $ilDB;
 
@@ -192,7 +196,7 @@ class ilLPObjSettings
 	{
 		$res = $this->db->query("SELECT * FROM ut_lp_settings WHERE obj_id = ".
 			$this->db->quote($this->obj_id ,'integer'));
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$this->is_stored = true;
 			$this->obj_type = $row->obj_type;
@@ -255,7 +259,7 @@ class ilLPObjSettings
 		ilLPStatusWrapper::_refreshStatus($this->getObjId());
 	}
 
-	function _delete($a_obj_id)
+	static function _delete($a_obj_id)
 	{
 		global $ilDB;
 
@@ -268,7 +272,7 @@ class ilLPObjSettings
 
 	// Static
 	
-	function _lookupVisits($a_obj_id)
+	static function _lookupVisits($a_obj_id)
 	{
 		global $ilDB;
 
@@ -276,7 +280,7 @@ class ilLPObjSettings
 			"WHERE obj_id = ".$ilDB->quote($a_obj_id ,'integer');
 
 		$res = $ilDB->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			return $row->visits;
 		}
@@ -294,7 +298,7 @@ class ilLPObjSettings
 		$query = "SELECT obj_id, u_mode FROM ut_lp_settings".
 			" WHERE ".$ilDB->in("obj_id", $a_obj_ids, "", "integer");
 		$set = $ilDB->query($query);
-		while($row = $set->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $set->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$res[$row->obj_id] = $row->u_mode;
 		}

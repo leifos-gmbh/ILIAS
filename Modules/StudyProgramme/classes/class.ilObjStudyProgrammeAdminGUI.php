@@ -21,12 +21,15 @@ class ilObjStudyProgrammeAdminGUI extends ilObjectGUI {
 	 * @param bool $a_prepare_output
 	 */
 	public function __construct($a_data, $a_id, $a_call_by_reference = true, $a_prepare_output = true) {
-		global $ilCtrl, $ilAccess, $ilSetting;
+		global $DIC;
+		$ilCtrl = $DIC['ilCtrl'];
+		$ilAccess = $DIC['ilAccess'];
+		$ilSetting = $DIC['ilSetting'];
 		$this->ctrl = $ilCtrl;
 		$this->ilAccess = $ilAccess;
 		$this->ilSetting = $ilSetting;
 		$this->type = 'prgs';
-		parent::ilObjectGUI($a_data, $a_id, $a_call_by_reference, $a_prepare_output);
+		parent::__construct($a_data, $a_id, $a_call_by_reference, $a_prepare_output);
 		$this->lng->loadLanguageModule('prg');
 		//Check Permissions globally for all SubGUIs. We only check write permissions
 		$this->checkPermission('write');
@@ -120,7 +123,8 @@ class ilObjStudyProgrammeAdminGUI extends ilObjectGUI {
 	}
 
 	public function getAdminTabs() {
-		global $rbacsystem;
+		global $DIC;
+		$rbacsystem = $DIC['rbacsystem'];
 		/**
 		 * @var $rbacsystem ilRbacSystem
 		 */

@@ -80,46 +80,7 @@ class ilObjTestAccess extends ilObjectAccess implements ilConditionHandling
 
 		return true;
 	}
-	
-	/**
-	* Returns the maximum number of points available for a test pass
-	*
-	* @param boolean $random TRUE if the test is a random test, otherwise FALSE
-	* @param int $test_id The test id
-	* @param int $pass The test pass
-	* @return int The available points for the test pass
-	*/
-	function _getMaxPointsForTestPass($random, $user_id, $test_id, $pass)
-	{
-		global $ilDB;
-		$max = 0;
-		if ($random)
-		{
-			$result = $ilDB->queryF("SELECT SUM(qpl_questions.points) maxpoints FROM tst_test_rnd_qst, qpl_questions, tst_active WHERE tst_active.active_id = tst_test_rnd_qst.active_fi AND tst_test_rnd_qst.question_fi = qpl_questions.question_id AND tst_active.test_fi = %s AND tst_test_rnd_qst.pass = %s AND tst_active.user_fi = %s",
-				array('integer','integer','integer'),
-				array($test_id, $pass, $user_id)
-			);
-			if ($result->numRows())
-			{
-				$row = $ilDB->fetchAssoc($result);
-				$max = $row["maxpoints"];
-			}
-		}
-		else
-		{
-			$result = $ilDB->queryF("SELECT SUM(qpl_questions.points) maxpoints FROM tst_test_question, qpl_questions WHERE tst_test_question.question_fi = qpl_questions.question_id AND tst_test_question.test_fi = %s",
-				array('integer'),
-				array($test_id)
-			);
-			if ($result->numRows())
-			{
-				$row = $ilDB->fetchAssoc($result);
-				$max = $row["maxpoints"];
-			}
-		}
-		return $max;
-	}
-	
+
 	/**
 	* Returns TRUE if the user with the user id $user_id passed the test with the object id $a_obj_id
 	*
@@ -313,7 +274,7 @@ class ilObjTestAccess extends ilObjectAccess implements ilConditionHandling
 	 * @param type $a_user_id
 	 * @param type $a_obj_id
 	 */
-	protected function updateTestResultCache($a_user_id, $a_obj_id)
+	protected static function updateTestResultCache($a_user_id, $a_obj_id)
 	{
 		global $ilDB;
 		
@@ -407,7 +368,7 @@ class ilObjTestAccess extends ilObjectAccess implements ilConditionHandling
 	 *		array("permission" => "write", "cmd" => "edit", "lang_var" => "edit"),
 	 *	);
 	 */
-	function _getCommands()
+	static function _getCommands()
 	{
 		$commands = array
 		(
@@ -430,7 +391,7 @@ class ilObjTestAccess extends ilObjectAccess implements ilConditionHandling
 	/**
 	* checks wether all necessary parts of the test are given
 	*/
-	function _lookupCreationComplete($a_obj_id)
+	public static function _lookupCreationComplete($a_obj_id)
 	{
 		global $ilDB;
 
@@ -456,7 +417,7 @@ class ilObjTestAccess extends ilObjectAccess implements ilConditionHandling
 	/**
 	 * Returns (request cached) information if a specific user has finished at least one test pass
 	 *
-	 * @param integer $user_id obj_id of the user
+	 * @param integer $a_user_id obj_id of the user
 	 * @param integer $a_obj_id obj_id of the test
 	 * @return bool
 	 */
@@ -488,7 +449,7 @@ class ilObjTestAccess extends ilObjectAccess implements ilConditionHandling
 			self::$hasFinishedCache["{$a_user_id}:{$a_obj_id}"] = count($testPassesSelector->getClosedPasses());
 		}
 		
-		return self::$hasFinishedCache["{$a_user_id}:{$a_obj_id}"];
+		return (bool) self::$hasFinishedCache["{$a_user_id}:{$a_obj_id}"];
 	}
 
 /**
@@ -498,7 +459,7 @@ class ilObjTestAccess extends ilObjectAccess implements ilConditionHandling
 * @return mixed The ILIAS test id or FALSE if the query was not successful
 * @access public
 */
-	function _getTestIDFromObjectID($object_id)
+	public static function _getTestIDFromObjectID($object_id)
 	{
 		global $ilDB;
 		$test_id = FALSE;
@@ -513,116 +474,14 @@ class ilObjTestAccess extends ilObjectAccess implements ilConditionHandling
 		}
 		return $test_id;
 	}
-	
-	function &_getTestQuestions($active_id, $pass = NULL)
-	{
-		if (is_null($pass))
-		{
-			$pass = 0;
-		}
-		$questions = array();
-		
-		global $ilDB;
-		$result = $ilDB->queryF("SELECT test_fi FROM tst_active WHERE active_id = %s",
-			array('integer'),
-			array($active_id)
-		);
-		$test_id = "";
-		if ($result->numRows())
-		{
-			$row = $ilDB->fetchAssoc($result);
-			$test_id = $row["test_fi"];
-		}
-		else
-		{
-			return $questions;
-		}
-		$result = $ilDB->queryF("SELECT qpl_questions.question_id, qpl_questions.points FROM qpl_questions, tst_test_question WHERE tst_test_question.question_fi = qpl_questions.question_id AND tst_test_question.test_fi = %s ORDER BY tst_test_question.sequence",
-			array('integer'),
-			array($test_id)
-		);
-		if ($result->numRows())
-		{
-			// standard test
-			while ($row = $ilDB->fetchAssoc($result))
-			{
-				array_push($questions, $row);
-			}
-		}
-		else
-		{
-			// random test
-			$result = $ilDB->queryF("SELECT qpl_questions.question_id, qpl_questions.points FROM qpl_questions, tst_test_rnd_qst WHERE tst_test_rnd_qst.question_fi = qpl_questions.question_id AND tst_test_rnd_qst.active_fi = %s AND tst_test_rnd_qst.pass = %s ORDER BY tst_test_rnd_qst.sequence",
-				array('integer','integer'),
-				array($active_id, $pass)
-			);
-			if ($result->numRows())
-			{
-				while ($row = $ilDB->fetchAssoc($result))
-				{
-					array_push($questions, $row);
-				}
-			}
-		}
-		return $questions;
-	}
-	
-/**
-* Returns true, if a test is complete for use
-*
-* @return boolean True, if the test is complete for use, otherwise false
-* @access public
-*/
-	function _isComplete($a_obj_id)
-	{
-		global $ilDB;
-		
-		$query = "
-			SELECT tst_tests.complete
-			FROM object_data
-			INNER JOIN tst_tests
-			ON tst_tests.obj_fi = object_data.obj_id
-			WHERE object_data.obj_id = %s
-		";
 
-		$res = $ilDB->queryF($query, array('integer'), array($a_obj_id));
-
-		while( $row = $ilDB->fetchAssoc($res) )
-		{
-			return (bool)$row['complete'];
-		}
-
-		return false;
-	}
-	
-	/**
-	* Returns the database content of a test with a given id
-	*
-	* @param int $test_id Database id of the test
-	* @return array An associative array with the contents of the tst_tests database row
-	* @access public
-	*/
-	function &_getTestData($test_id)
-	{
-		global $ilDB;
-		$result = $ilDB->queryF("SELECT * FROM tst_tests WHERE test_id = %s",
-			array('integer'),
-			array($test_id)
-		);
-		if (!$result->numRows())
-		{
-			return 0;
-		}
-		return $ilDB->fetchAssoc($result);
-	}
-	
 	/**
 	 * Lookup object id for test id
 	 *
 	 * @param		int		test id
 	 * @return		int		object id
 	 */
-	function _lookupObjIdForTestId($a_test_id)
+	public static function _lookupObjIdForTestId($a_test_id)
 	{
 		global $ilDB;
 
@@ -642,7 +501,7 @@ class ilObjTestAccess extends ilObjectAccess implements ilConditionHandling
 	* @return 	array 	list if test obj ids
 	* @access	public
 	*/
-	function _getRandomTestsForQuestionPool($qpl_id)
+	public static function _getRandomTestsForQuestionPool($qpl_id)
 	{
 		global $ilDB;
 	
@@ -672,7 +531,7 @@ class ilObjTestAccess extends ilObjectAccess implements ilConditionHandling
 * @return mixed true if the user is allowed to run the online exam or if the test isn't an online exam, an alert message if the test is an online exam and the user is not allowed to run it
 * @access public
 */
-	function _lookupOnlineTestAccess($a_test_id, $a_user_id)
+	public static function _lookupOnlineTestAccess($a_test_id, $a_user_id)
 	{
 		global $ilDB, $lng;
 		
@@ -734,7 +593,7 @@ class ilObjTestAccess extends ilObjectAccess implements ilConditionHandling
 	* @return string The output name of the user
 	* @access public
 	*/
-	function _getParticipantData($active_id)
+	public static function _getParticipantData($active_id)
 	{
 		global $lng, $ilDB;
 
@@ -793,7 +652,7 @@ class ilObjTestAccess extends ilObjectAccess implements ilConditionHandling
 	 * @param	int		active ID of the participant
 	 * @return	int		user id
 	 */
-	function _getParticipantId($active_id)
+	public static function _getParticipantId($active_id)
 	{
 		global $lng, $ilDB;
 
@@ -820,14 +679,19 @@ class ilObjTestAccess extends ilObjectAccess implements ilConditionHandling
 *           )
 * @access public
 */
-	function &_getPassedUsers($a_obj_id)
+	public static function _getPassedUsers($a_obj_id)
 	{
 		global $ilDB;
 
 		$passed_users = array();
 		// Maybe SELECT DISTINCT(tst_active.user_fi)... ?
 		$userresult = $ilDB->queryF("
-			SELECT tst_active.active_id, COUNT(tst_sequence.active_fi) sequences
+			SELECT tst_active.active_id, COUNT(tst_sequence.active_fi) sequences, tst_active.last_finished_pass,
+				CASE WHEN
+					(tst_tests.nr_of_tries - 1) = tst_active.last_finished_pass
+				THEN '1'
+				ELSE '0'
+				END is_last_pass
 			FROM tst_tests
 			INNER JOIN tst_active
 			ON tst_active.test_fi = tst_tests.test_id
@@ -840,11 +704,16 @@ class ilObjTestAccess extends ilObjectAccess implements ilConditionHandling
 		);
 		$all_participants = array();
 		$notAttempted = array();
+		$lastPassUsers = array();
 		while ($row = $ilDB->fetchAssoc($userresult))
 		{
 			if($row['sequences'] == 0)
 			{
 				$notAttempted[$row['active_id']] = $row['active_id'];
+			}
+			if($row['is_last_pass'])
+			{
+				$lastPassUsers[$row['active_id']] = $row['active_id'];
 			}
 
 			$all_participants[$row['active_id']] = $row['active_id'];
@@ -876,6 +745,14 @@ class ilObjTestAccess extends ilObjectAccess implements ilConditionHandling
 			{
 				$data['failed'] = 0;
 				$data['passed'] = 0;
+				$data['not_attempted'] = 1;
+			}
+			
+			if( $data['failed'] && !isset($lastPassUsers[$data['active_fi']]) )
+			{
+				$data['passed'] = 0;
+				$data['failed'] = 0;
+				$data['in_progress'] = 1;
 			}
 
 			$data['user_id'] = $data['user_fi'];
@@ -887,7 +764,7 @@ class ilObjTestAccess extends ilObjectAccess implements ilConditionHandling
 	/**
 	* check whether goto script will succeed
 	*/
-	function _checkGoto($a_target)
+	static function _checkGoto($a_target)
 	{
 		global $ilAccess;
 		
@@ -957,5 +834,33 @@ class ilObjTestAccess extends ilObjectAccess implements ilConditionHandling
 		$testSession = $testSessionFactory->getSessionByUserId($userId);
 
 		return $testOBJ->canShowTestResults($testSession);
+	}
+	
+	/**
+	 * @ideaof Andre Michels <amichels@databay.de>
+	 * 
+	 * @param $testObjId
+	 * @param $userId
+	 * @return bool
+	 */
+	public static function hasVisibleCertificate($testObjId, $userId)
+	{
+		$testOBJ = ilObjectFactory::getInstanceByObjId($testObjId, false);
+		
+		if( !($testOBJ instanceof ilObjTest) || !$userId )
+		{
+			return false;
+		}
+		
+		require_once 'Modules/Test/classes/class.ilTestSessionFactory.php';
+		$testSessionFactory = new ilTestSessionFactory($testOBJ);
+		$testSession = $testSessionFactory->getSessionByUserId($userId);
+		
+		if( !$testSession->getActiveId() )
+		{
+			return false;
+		}
+		
+		return $testOBJ->canShowCertificate($testSession, $testSession->getUserId(), $testSession->getActiveId());
 	}
 }

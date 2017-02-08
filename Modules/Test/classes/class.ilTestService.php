@@ -40,7 +40,7 @@ class ilTestService
 		global $ilUser;
 
 		$scoredPass = $this->object->_getResultPass($active_id);
-		$lastPass = $this->object->_getPass($active_id);
+		$lastPass = ilObjTest::_getPass($active_id);
 
 		$testPercentage = 0;
 		$testReachedPoints = 0;
@@ -296,7 +296,9 @@ class ilTestService
 				}
 			}
 
-			$data[] = array('order' => $value["nr"], 'title' => $this->object->getQuestionTitle($value["title"]), 'description' => $description, 'worked_through' => $value["worked_through"], 'postponed' => $value["postponed"], 'points' => $points, 'marked' => $marked, 'sequence' => $value["sequence"], 'obligatory' => $value['obligatory'], 'isAnswered' => $value['isAnswered']);
+// fau: testNav - add number parameter for getQuestionTitle()
+			$data[] = array('order' => $value["nr"], 'title' => $this->object->getQuestionTitle($value["title"], $value["nr"]), 'description' => $description, 'worked_through' => $value["worked_through"], 'postponed' => $value["postponed"], 'points' => $points, 'marked' => $marked, 'sequence' => $value["sequence"], 'obligatory' => $value['obligatory'], 'isAnswered' => $value['isAnswered']);
+// fau.
 		}
 
 		return $data;

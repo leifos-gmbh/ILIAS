@@ -80,7 +80,7 @@ class ilAdvancedMDRecord
 			"WHERE searchable = 1 AND active = 1 ";
 			
 		$res = $ilDB->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$records[] = self::_getInstanceByRecordId($row->record_id);
 		}
@@ -109,7 +109,7 @@ class ilAdvancedMDRecord
 		$query = "SELECT title FROM adv_md_record ".
 			"WHERE record_id = ".$ilDB->quote($a_record_id ,'integer')." ";
 		$res = $ilDB->query($query);
-		$row = $res->fetchRow(DB_FETCHMODE_OBJECT);
+		$row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT);
 		
 		return $title_cache[$a_record_id] = $row->title;
 	}
@@ -129,7 +129,7 @@ class ilAdvancedMDRecord
 		$query = "SELECT record_id FROM adv_md_record ".
 			"WHERE import_id = ".$ilDB->quote($a_ilias_id ,'text')." ";
 		$res = $ilDB->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			return $row->record_id;
 		}
@@ -189,7 +189,7 @@ class ilAdvancedMDRecord
 			"JOIN adv_md_record amr ON amo.record_id = amr.record_id ".
 			"WHERE active = 1 ";
 		$res = $ilDB->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$obj_types[] = $row->obj_type; 
 		}
@@ -210,7 +210,7 @@ class ilAdvancedMDRecord
 		
 		$query = "SELECT record_id FROM adv_md_record ";
 		$res = $ilDB->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$records[] = ilAdvancedMDRecord::_getInstanceByRecordId($row->record_id);
 		}
@@ -233,7 +233,7 @@ class ilAdvancedMDRecord
 		
 		$query = "SELECT * FROM adv_md_record_objs WHERE sub_type=".$ilDB->quote("-", "text");
 		$res = $ilDB->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$records[$row->obj_type][] = self::_getInstanceByRecordId($row->record_id);
 		}
@@ -274,7 +274,7 @@ class ilAdvancedMDRecord
 		$query .= "ORDER by parent_obj DESC, record_id";
 
 		$res = $ilDB->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$records[] = self::_getInstanceByRecordId($row->record_id);
 		}
@@ -367,7 +367,7 @@ class ilAdvancedMDRecord
 			;
 
 		$res = $ilDB->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$records[] = self::_getInstanceByRecordId($row->record_id);
 		}
@@ -503,18 +503,14 @@ class ilAdvancedMDRecord
 	
 	/**
 	 * Validate settings
-	 * Write error message to ilErr 
 	 *
 	 * @access public
 	 * 
 	 */
 	public function validate()
-	{
-	 	global $ilErr,$lng;
-	 	
+	{	 	
 	 	if(!strlen($this->getTitle()))
-	 	{
-	 		$ilErr->setMessage('fill_out_all_required_fields');
+	 	{	 		
 	 		return false;
 	 	}
 	 	return true;
@@ -742,7 +738,7 @@ class ilAdvancedMDRecord
 	 	$query = "SELECT * FROM adv_md_record ".
 	 		"WHERE record_id = ".$this->db->quote($this->getRecordId() ,'integer')." ";
 	 	$res = $this->db->query($query);
-	 	while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+	 	while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$this->setImportId($row->import_id);
 			$this->setActive($row->active);
@@ -753,7 +749,7 @@ class ilAdvancedMDRecord
 		$query = "SELECT * FROM adv_md_record_objs ".
 	 		"WHERE record_id = ".$this->db->quote($this->getRecordId() ,'integer')." ";
 	 	$res = $this->db->query($query);
-	 	while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+	 	while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 	 	{
 	 		$this->obj_types[] = array(
 				"obj_type" => $row->obj_type,
@@ -850,6 +846,90 @@ class ilAdvancedMDRecord
 		}
 		return $recs;
 	}
+	
+	/**
+	 * Clone record
+	 * 
+	 * @param array &$a_fields_map
+	 * @param type $a_parent_obj_id
+	 * @return self
+	 */
+	public function _clone(array &$a_fields_map, $a_parent_obj_id = null)
+	{		
+		$new_obj = new self();
+		$new_obj->setActive($this->isActive());
+		$new_obj->setTitle($this->getTitle());
+		$new_obj->setDescription($this->getDescription());				
+		$new_obj->setParentObject($a_parent_obj_id
+			? $a_parent_obj_id
+			: $this->getParentObject());
+		$new_obj->setAssignedObjectTypes($this->getAssignedObjectTypes());
+		$new_obj->save();
+		
+		include_once('Services/AdvancedMetaData/classes/class.ilAdvancedMDFieldDefinition.php');
+		foreach(ilAdvancedMDFieldDefinition::getInstancesByRecordId($this->getRecordId()) as $definition)
+		{
+			$new_def = $definition->_clone($new_obj->getRecordId());			
+			$a_fields_map[$definition->getFieldId()] = $new_def->getFieldId();
+		}		
 
+		return $new_obj;
+	}
+		
+	/**
+	 * Get shared records
+	 * 
+	 * @param int $a_obj1_id
+	 * @param int $a_obj2_id
+	 * @param string $a_sub_type
+	 * @return array
+	 */
+	public static function getSharedRecords($a_obj1_id, $a_obj2_id, $a_sub_type = "-")
+	{
+		$obj_type = ilObject::_lookupType($a_obj1_id);
+		$sel = array_intersect(
+			ilAdvancedMDRecord::getObjRecSelection($a_obj1_id, $a_sub_type),
+			ilAdvancedMDRecord::getObjRecSelection($a_obj2_id, $a_sub_type)
+		);
+		
+		$res = array();
+		
+		foreach(self::_getRecords() as $record)
+		{	
+			// local records cannot be shared
+			if($record->getParentObject())
+			{
+				continue;
+			}
+			
+			// :TODO: inactive records can be ignored?
+			if(!$record->isActive())
+			{
+				continue;
+			}
+			
+			// parse assigned types
+			foreach($record->getAssignedObjectTypes() as $item)
+			{
+				if($item["obj_type"] == $obj_type &&
+					$item["sub_type"] == $a_sub_type)
+				{				
+					// mandatory
+					if(!$item["optional"])
+					{
+						$res[] = $record->getRecordId();
+					}
+					// optional
+					else if(in_array($record->getRecordId(), $sel))
+					{
+						$res[] = $record->getRecordId();
+					}
+				}
+			}					
+		}
+		
+		return $res;
+	}
 }
+
 ?>

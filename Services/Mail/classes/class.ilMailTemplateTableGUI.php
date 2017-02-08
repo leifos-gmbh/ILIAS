@@ -37,6 +37,7 @@ class ilMailTemplateTableGUI extends ilTable2GUI
 		$this->setId('mail_man_tpl');
 		parent::__construct($a_parent_obj, $a_parent_cmd);
 
+		$this->setTitle($this->lng->txt('mail_templates'));
 		$this->setDefaultOrderDirection('ASC');
 		$this->setDefaultOrderField('title');
 
@@ -88,7 +89,7 @@ class ilMailTemplateTableGUI extends ilTable2GUI
 	/**
 	 * @param array $row
 	 */
-	protected function fillRow(array $row)
+	protected function fillRow($row)
 	{
 		foreach($row as $column => $value)
 		{

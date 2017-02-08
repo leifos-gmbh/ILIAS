@@ -1,15 +1,13 @@
 (function($) {
 
 	$(document).click(function() {
-	    $('.dropdown-menu.menu').hide();
-	    $('.menu_attached').removeClass('menu_attached');
+		$('.dropdown-menu.menu').hide();
 	});
 	
 	var iconsByType = {
 		user: 'templates/default/images/icon_usr.svg',
 		room: 'templates/default/images/icon_chtr.svg'
-	}
-
+	};
 
 	var inArray = function(ar, value) {
 		if (ar && (typeof ar == 'object' || typeof ar == 'array')) {
@@ -20,41 +18,37 @@
 			}
 		}
 		return false;
-	}
+	};
 
 	$.fn.ilChatDialog = function (method) {
-		var applyStyle = function (dialog) {
-			dialog.css('position', 'absolute');
-		}
-
 		var methods = {
 			init: function (params) {
 				var $content = $(this);
 
 				var defaultButtons = (params.defaultButtons === false) ? [] : [
 					{
-						id:      'ok',
-						label:   translate('ok'),
+						id:      "ok",
+						label:   translate("ok"),
 						callback:function (e) {
 							var close = true;
-							if (typeof params.positiveAction == 'function') {
+							if (typeof params.positiveAction === "function") {
 								close = params.positiveAction.call($content, e);
 							}
-							if (typeof close == 'undefined' || close) {
-								$content.ilChatDialog('close');
+							if (typeof close === "undefined" || close) {
+								$content.ilChatDialog("close");
 							}
 						}
 					},
 					{
-						id:      'cancel',
-						label:   translate('cancel'),
+						id:      "cancel",
+						label:   translate("cancel"),
 						callback:function (e) {
 							var close = true;
-							if (typeof params.negativeAction == 'function') {
+							if (typeof params.negativeAction == "function") {
 								close = params.negativeAction.call($content, e);
 							}
-							if (typeof close == 'undefined' || close) {
-								$content.ilChatDialog('close');
+							if (typeof close === "undefined" || close) {
+								$content.ilChatDialog("close");
 							}
 						}
 					}
@@ -62,76 +56,62 @@
 
 				var properties = $.extend(true, {}, {
 					title:           '',
-					parent:          $('body'),
-					position:        null,
 					buttons:         defaultButtons,
 					disabled_buttons:[]
 				}, params);
 
-				var dialog = $('<div class="ilChatDialog">');
-
-				applyStyle(dialog);
-
-				$(this).data('ilChatDialog', $.extend(properties, {
-					_dialog:dialog,
-					_parent:$(this).parent()
-				}));
-
-				if (properties.title) {
-					var title = $('<h3>').text(properties.title).addClass('chat_block_title');
-					dialog.append(title);
-				}
-
-				$('#modal_alpha').remove();
-
-				$('<div id="modal_alpha" class="chat_modal_overlay">').appendTo($('body'));
-
-				var dialogBody = $('<div class="ilChatDialogBody">').appendTo(dialog);
-				$(this).appendTo(dialogBody).show();
-
-				dialog.appendTo(properties.parent);
+				var dialogBody = $('<div class="ilChatDialogBody">'),
+					buttons = {};
 
 				if (properties.buttons) {
-					var dialogButtons = $('<div class="ilChatDialogButtons">').appendTo(dialog);
 					$.each(properties.buttons, function () {
+						var btn = this;
+
 						// IE: properties.disabled_buttons is of type object instead of array
-						//if (this.id && properties.disabled_buttons.indexOf(this.id) >= 0) {
-						if (this.id && inArray(properties.disabled_buttons, this.id)) {
+
+						if (btn.id && inArray(properties.disabled_buttons, btn.id)) {
 							return;
 						}
-						$('<input type="button" class="btn btn-default btn-sm">')
-							.click(this.callback)
-							.val(this.label)
-							.appendTo(dialogButtons);
+
+						buttons[btn.id] = {
+							type:      "button",
+							label:     this.label,
+							className: "btn btn-default",
+							callback:  function (e, $modal) {
+								if (typeof btn.callback === "function") {
+									btn.callback();
+								}
+							}
+						};
 					});
 				}
 
-				if (!properties.position) {
-					properties.position = {
-						x:($(window).width() - dialog.width()) / 2,
-						y:($(window).height() - dialog.height()) / 2
-					}
-				}
+				$(this).appendTo(dialogBody).show();
 
-				dialog.css('left', properties.position.x)
-					.css('top', properties.position.y);
+				var $modal = il.Modal.dialogue({
+					show: true,
+					header: properties.title || null,
+					body: $(this),
+					buttons: buttons || []
+				});
+
+				$(this).data("ilChatDialog", $.extend(properties, {
+					_modal: $modal,
+					_parent: $(this).parent()
+				}));
 
 				return $(this);
 			},
-			close:function () {
-				var data = $(this).data('ilChatDialog');
+			close: function () {
+				var data = $(this).data("ilChatDialog");
 
-				if (typeof data.close == 'function') {
+				if (typeof data.close === "function") {
 					data.close();
 				}
 
-				if (data._parent) {
-					$(this).appendTo($(data._parent)).hide();
-				}
-				$('#modal_alpha').remove();
-				$(data._dialog).remove();
+				data._modal.hide();
 			}
-		}
+		};
 
 		if (methods[method]) {
 			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
@@ -140,16 +120,15 @@
 		} else {
 			$.error('Method ' + method + ' does not exist on jQuery.ilChatDialog');
 		}
-	}
+	};
 
 	function getMenuLine(label, callback, icon) {
 		var line = $('<li></li>');
 		var content = $('<a class="" href="#">'+(icon ? ('<img style="margin-right: 8px" src="'+icon+'"/>'): '')+'<span class="xsmall">'+label+'</span></a>');
 		line.append(content);
 		if (callback) {
-			line.bind('click', function(ev) {
+			line.on('click', function(ev) {
 				$(this).parents('.menu').hide();
-				menuContainer.data('ilChatMenu')._attatched.removeClass('menu_attached');
 				callback.call($(this).parents('.menu'));
 				ev.preventDefault();
 				ev.stopPropagation();
@@ -170,22 +149,17 @@
 			show: function(menuitems, alignToRight) {
 
 				if (!menuContainer) {
-					menuContainer = $('<ul class="dropdown-menu menu pull-right" role="menu"></ul>')
+					menuContainer = $('<ul class="dropdown-menu menu" role="menu"></ul>')
 						.appendTo($(this));
 				}
-
-				if ($(this).hasClass('menu_attached')) {
-					$(this).removeClass('menu_attached');
-					menuContainer.hide();
-					return;
-				}
-				else if (menuContainer.is(':visible')) {
-					menuContainer.hide();
+				
+				if (alignToRight != undefined && alignToRight) {
+					menuContainer.addClass("pull-right");
+				} else {
+					menuContainer.removeClass("pull-right");
 				}
 
 				menuContainer.find('li').remove();
-
-				$(this).addClass('menu_attached');
 
 				var table = menuContainer;
 
@@ -198,11 +172,11 @@
 
 				menuContainer.data('ilChatMenu', {
 					_attatched: this
-				})
+				});
 
 				menuContainer.show();
 			}
-		}
+		};
 
 		if ( methods[method] ) {
 			return methods[method].apply( this, Array.prototype.slice.call( arguments, 1 ));
@@ -211,7 +185,7 @@
 		} else {
 			$.error( 'Method ' +  method + ' does not exist on jQuery.ilChatList' );
 		}
-	}
+	};
 
 	$.fn.ilChatList = function( method ) {
 
@@ -230,7 +204,7 @@
 			return line;
 		}
 
-		var menuContainer = $('<ul class="dropdown-menu menu pull-right" role="menu"></ul>')
+		var menuContainer = $('<ul class="dropdown-menu menu" role="menu"></ul>')
 			.appendTo($('body'));
 
 		var methods = {
@@ -242,47 +216,45 @@
 			},
 			add: function(options) {
 				if ($(this).data('ilChatList')._index['id_' + options.id]) {
+					if(options.label != undefined)
+					{
+						$(this).data('ilChatList')._index['id_' + options.id].find('.label').html(options.label);
+					}
 					return $(this);
 				}
-                    
-				var line = $(
-					'<p class="listentry '+options.type+'_'+options.id+' online_user"><img src="'+iconsByType[options.type]+'" />&nbsp;' +
-					'<button onclick="this.blur(); return false;" class="btn btn-default dropdown-toggle btn-sm" data-toggle="dropdown" data-container="body">' +
-					'<span class="label">' + options.label + '</span> ' +
-					'<span class="caret" alt=""></span>' +
-					'</button>' +
-					'</p>');
+
+				var line = $(   
+					'<div class="listentry '+options.type+'_'+options.id+' online_user"><img src="'+iconsByType[options.type]+'" />&nbsp;' +
+						'<div class="btn-group">' +
+							'<button class="btn btn-default dropdown-toggle" data-toggle="dropdown" data-container="body">' +
+							'<span class="label">' + options.label + '</span> ' +
+							'<span class="caret"></span>' +
+							'</button>' +
+						'</div>' +
+					'</div>');
 
 				if (typeof options.hide != 'undefined' && options.hide == true) {
 					line.addClass('hidden_entry');
 				} 
-		    
+
 				line.data('ilChatList', options);
-				
+
 				var $this = $(this);
 				$this.data('ilChatList')._index['id_' + options.id] = line;
 
-				line.bind('click', function(e) {
-				    
+				line.find("button").on("click", function(e) {
+
 					e.preventDefault();
 					e.stopPropagation();
-				    
-					if ($(this).hasClass('menu_attached')) {
-						$(this).removeClass('menu_attached');
-						menuContainer.hide();
-						return;
-					}
-					else if (menuContainer.is(':visible')) {
-						menuContainer.hide();
-					}
+
+					$("#chat_users .menu").hide();
 
 					menuContainer.find('li').remove();
-					var data = $(this).data('ilChatList');
+
+					var data = line.data('ilChatList');
 					if (data.type == 'user' && data.id == personalUserInfo.userid) {
 						return;
 					}
-
-					$(this).addClass('menu_attached');
 
 					$.each($this.data('ilChatList')._menuitems, function() {
 
@@ -298,13 +270,13 @@
 							menuContainer.append(getMenuLine(this.label, this.callback));
 						}
 					});
-					
-					menuContainer.appendTo(line);
+
+					menuContainer.appendTo(line.find(".btn-group"));
 
 					menuContainer.data('ilChat', {
-						context: $(this).data('ilChatList')
+						context: line.data('ilChatList')
 					});
-                        
+
 					menuContainer.show();
 				});
 
@@ -353,7 +325,7 @@
 				var line = $(this).data('ilChatList')._index['id_' + id];
 				if (line) {
 					var data = line.data('ilChatList');
-					line.remove();
+					//line.remove();
 					if (data.type == 'user' || data.type == '') {
 						$(data.type + '_' + id).remove();
 						if (data.type == 'user') {
@@ -372,6 +344,14 @@
 			getDataById: function(id) {
 				return $(this).data('ilChatList')._index['id_' + id] ? $(this).data('ilChatList')._index['id_' + id].data('ilChatList') : undefined;
 			},
+			setNewEvents: function(id, newEvents) {
+
+				var data = $(this).data('ilChatList')._index['id_' + id].data('ilChatList');
+				if(data)
+				{
+					data.new_events = newEvents;
+				}
+			},
 			getAll: function() {
 				var result = [];
 				$.each($(this).data('ilChatList')._index, function() {
@@ -383,8 +363,16 @@
 				});
 
 				return result;
+			},
+			clear: function() {
+				$('#chat_users').find('div').not('.no_users').remove();
+				menuContainer.html('');
+				$(this).data('ilChatList', {
+					_index: {},
+					_menuitems: $(this).data('ilChatList')._menuitems
+				});
 			}
-		}
+		};
 	
 		if ( methods[method] ) {
 			return methods[method].apply( this, Array.prototype.slice.call( arguments, 1 ));
@@ -408,6 +396,7 @@
 			addScope: function(scope_id, scope) {
 				var tmp = $('<div class="messageContainer">');
 				$(this).data('ilChatMessageArea')._scopes['id_' + scope_id] = tmp;
+				//console.log($(this).data('ilChatMessageArea')._scopes);
 				$(this).append(tmp);
 				tmp.data('ilChatMessageArea', scope);
 				tmp.hide();
@@ -428,24 +417,24 @@
 						return;
 					}
 
-					var data = container.data('ilChatMessageArea');
-                        
-					var line = $('<div class="messageLine chat"></div>')
-					.addClass((message['public'] || message['public'] == undefined) ? 'public' : 'private');
-					if (message.message && message.message.message) {
-					    message = message.message;
-					}
+                    var line = $('<div class="messageLine chat"></div>')
+							.addClass((message.target != undefined && !message.target.public) ? 'private' : 'public');
+
 					switch(message.type) {
 						case 'message':
-							var content;
-							try {
-							    content = JSON.parse(message.message);
+							var content = message.content;
+
+							if(message.from == undefined) {
+								var legacyMessage = JSON.parse(message.message);
+								content = legacyMessage.content;
+								message.format = legacyMessage.format;
+								message.from = message.user;
+
+								if(message.timestamp.toString().length > 13) { // Max 32-Bit Integer.
+									message.timestamp = parseInt(message.timestamp.toString().substring(0,13));
+								}
 							}
-							catch (ex) {
-							    //console.log(ex);
-							    return true;
-							}
-							
+
 							var messageDate =  new Date(message.timestamp);
 
 							if (typeof lastHandledDate.scope == "undefined" ||
@@ -458,12 +447,20 @@
 							lastHandledDate.scope = messageDate;
 							
 							line.append($('<span class="chat content date"></span>').append('' + formatISOTime(message.timestamp) + ', '))
-								.append($('<span class="chat content username"></span>').append(message.user.username));
+								.append($('<span class="chat content username"></span>').append(message.from.username));
 
-							if (message.recipients) {
+							if (message.target) {
+								if (message.target.username != "") {
+									line.append($('<span class="chat recipient">@</span>').append(message.target.username))
+								}
+								else {
+									line.append($('<span class="chat recipient">@</span>').append('unkown'))
+								}
+							}
+							/*if (message.recipients) {
 								var parts = message.recipients.split(',');
 								for (var i in parts) {
-									if (parts[i] != message.user.id) {
+									if (parts[i] != message.username.id) {
 										var data = $('#chat_users').ilChatList('getDataById', parts[i]);
 										if (data) {
 											line.append($('<span class="chat recipient">@</span>').append(data.label))
@@ -473,69 +470,68 @@
 										}
 									}
 								}
-							}
+							}*/
 
 							var messageSpan = $('<span class="chat content message"></span>');
-								messageSpan.text(messageSpan.text(content.content).text())
-									.html(replaceSmileys(messageSpan.text()));
+								messageSpan.text(messageSpan.text(content).text())
+									.html(smileys.replace(messageSpan.text()));
 							line.append($('<span class="chat content messageseparator">:</span>'))
 								.append(messageSpan);
-								
 
-							for(var i in content.format) {
+							for(var i in message.format) {
 								if (i != 'color')
-									messageSpan.addClass( i + '_' + content.format[i]);
+									messageSpan.addClass( i + '_' + message.format[i]);
 							}
 
-							messageSpan.css('color', content.format.color);
+							messageSpan.css('color', message.format.color);
 
-							if (data && data.id != subRoomId) {
-								$('#room_' + data.id).addClass('new_events');
+							if (message.subRoomId != subRoomId) {
+								$('.room_' + message.subRoomId).addClass('new_events');
 							}
 
 							break;
 						case 'connected':
-							if (message.login || (message.message.users[0] && message.message.users[0].login)) {
+							if (message.login || (message.users[0] && message.users[0].login)) {
 							    /*line
 							    .append($('<span class="chat content date"></span>').append('(' + formatISOTime(message.timestamp || message.message.timestamp) + ') '))
 							    .append($('<span class="chat content username"></span>').append(message.login || message.message.users[0].login))
 							    .append($('<span class="chat content messageseparator">:</span>'))
 							    .append($('<span class="chat content message"></span>').append(translate('connect')));*/
 								line
-								    .append($('<span class="chat"></span>').append(translate('connect', {username: message.login})));
+								    .append($('<span class="chat"></span>').append(translate('connect', {username: message.users[0].login})));
 								line.addClass('notice');
 							}
 							break;
 						case 'disconnected':
-							if (message.login || (message.message.users[0] && message.message.users[0].login)) {
+							if (message.login || (message.users[0] && message.users[0].login)) {
 							    /*line
 							    .append($('<span class="chat content date"></span>').append('(' + formatISOTime(message.timestamp || message.message.timestamp) + ') '))
 							    .append($('<span class="chat content username"></span>').append(message.login || message.message.users[0].login))
 							    .append($('<span class="chat content messageseparator">:</span>'))
 							    .append($('<span class="chat content message"></span>').append(translate('disconnected')));*/
 								line
-								    .append($('<span class="chat"></span>').append(translate('disconnected', {username: message.login})));
+								    .append($('<span class="chat"></span>').append(translate('disconnected', {username: message.users[0].login})));
 								line.addClass('notice');
 							}
 							break;
 						case 'private_room_entered':
-							if (message.login || (message.message.users[0] && message.message.users[0].login)) {
+							if (message.login || (message.users[0] && message.users[0].login)) {
 							    line
-							    .append($('<span class="chat content date"></span>').append('' + formatISOTime(message.timestamp || message.message.timestamp) + ', '))
-							    .append($('<span class="chat content username"></span>').append(message.login || message.message.users[0].login))
+							    .append($('<span class="chat content date"></span>').append('' + formatISOTime(message.timestamp) + ', '))
+							    .append($('<span class="chat content username"></span>').append(message.login || message.users[0].login))
 							    .append($('<span class="chat content messageseparator">:</span>'))
-							    .append($('<span class="chat content message"></span>').append(translate('connect')));
+							    .append($('<span class="chat content message"></span>').append(translate('connect', {username: message.users[0].login})));
 							}
 							break;
 						case 'private_room_left':
 						case 'notice':
 							line
-							    .append($('<span class="chat"></span>').append(message.message));
+							    .append($('<span class="chat"></span>').append(message.content));
 							line.addClass('notice');
 							break;
 						case 'error':
 							line
-							.append($('<span class="chat"></span>').append(message.message));
+							.append($('<span class="chat"></span>').append(message.content));
 							line.addClass('error');
 							break;
 						case 'userjustkicked':
@@ -543,7 +539,12 @@
 					}
 
 					container.append(line);
-				})
+
+					if(message.subRoomId == subRoomId)
+					{
+						scrollChatArea(container);
+					}
+				});
 
                     
 				return $(this);
@@ -554,7 +555,7 @@
 			clearMessages: function(id) {
 				$(this).data('ilChatMessageArea')._scopes['id_' + id].find('div').html('');
 			},
-			show: function(id, posturl) {
+			show: function(id, posturl, leaveCallback) {
 				var scopes = $(this).data('ilChatMessageArea')._scopes;
                     
 				$.each(scopes, function() {
@@ -562,6 +563,7 @@
 				});
                     
 				scopes['id_' + id].show();
+				scrollChatArea(scopes['id_' + id]);
 				if (id == 0) {
 				    $('.current_room_title').text(scopes['id_' + id].data('ilChatMessageArea').title);
 				}
@@ -570,9 +572,10 @@
 					$('<a href="#"></a>')
 					    .text(translate('main'))
 					    .click(function(e) {
-						e.preventDefault();
-						e.stopPropagation();
-						$('#chat_messages').ilChatMessageArea('show', 0);
+							e.preventDefault();
+							e.stopPropagation();
+							iliasConnector.leavePrivateRoom(currentRoom);
+							currentRoom = 0;
 					    })
 				    )
 				    .append('&nbsp;&rarr;&nbsp;' + scopes['id_' + id].data('ilChatMessageArea').title);
@@ -588,7 +591,7 @@
 				else {
 					$('#chat_users').find('.online_user').hide();
 
-					$.get(
+					/*$.get(
 						posturl.replace(/postMessage/, 'privateRoom-listUsers') + '&sub=' + id,
 						function(response)
 						{
@@ -614,7 +617,7 @@
 							$('#chat_users').css('visibility', 'visible');
 						},
 						'json'
-					);
+					);*/
 				}
 
 				if ($('.online_user:visible').length == 0) {
@@ -639,4 +642,15 @@
 		}
   
 	};
+
+
+	function scrollChatArea(container) {
+		if($('#chat_auto_scroll').attr('checked')) {
+			$(container).parent().animate({
+				scrollTop: $(container).height()
+			}, 5);
+		}
+	}
+
+
 })(jQuery)

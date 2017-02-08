@@ -13,7 +13,7 @@ class ilTCPDFGenerator
 {
 	public static function generatePDF(ilPDFGenerationJob $job)
 	{
-		require_once 'tcpdf/tcpdf.php';
+		require_once 'libs/composer/vendor/autoload.php';
 
 		// create new PDF document
 		$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
@@ -36,6 +36,8 @@ class ilTCPDFGenerator
 		$pdf->setImageScale($job->getImageScale());
 		$pdf->SetFont('dejavusans', '', 10); // TODO
 
+		$pdf->setSpacesRE('/[^\S\xa0]/'); // Fixing unicode/PCRE-mess #17547
+
 		/* // TODO
 		// set some language-dependent strings (optional)
 		if (file_exists(dirname(__FILE__).'/lang/eng.php')) {
@@ -47,10 +49,15 @@ class ilTCPDFGenerator
 
 		foreach ($job->getPages() as $page)
 		{
+			$page = ' '.$page;
 			$pdf->AddPage();
 			$pdf->writeHTML($page, true, false, true, false, '');
 		}
-
 		$result = $pdf->Output($job->getFilename(), $job->getOutputMode() ); // (I - Inline, D - Download, F - File)
+
+		if(in_array($job->getOutputMode(), array('I', 'D')))
+		{
+			exit();
+		}
 	}
 }

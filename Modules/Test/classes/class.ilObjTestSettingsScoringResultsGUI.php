@@ -38,7 +38,7 @@ class ilObjTestSettingsScoringResultsGUI extends ilTestSettingsGUI
 	/** @var ilTree $tree */
 	protected $tree = null;
 	
-	/** @var ilDB $db */
+	/** @var ilDBInterface $db */
 	protected $db = null;
 
 	/** @var ilPluginAdmin $pluginAdmin */
@@ -67,7 +67,7 @@ class ilObjTestSettingsScoringResultsGUI extends ilTestSettingsGUI
 	 * @param ilAccessHandler $access
 	 * @param ilLanguage      $lng
 	 * @param ilTemplate      $tpl
-	 * @param ilDB            $db
+	 * @param ilDBInterface   $db
 	 * @param ilObjTestGUI    $testGUI
 	 * 
 	 * @return \ilObjTestSettingsGeneralGUI
@@ -78,7 +78,7 @@ class ilObjTestSettingsScoringResultsGUI extends ilTestSettingsGUI
 		ilLanguage $lng, 
 		ilTemplate $tpl, 
 		ilTree $tree,
-		ilDB $db,
+		ilDBInterface $db,
 		ilPluginAdmin $pluginAdmin,
 		ilObjTestGUI $testGUI
 	)
@@ -220,30 +220,23 @@ class ilObjTestSettingsScoringResultsGUI extends ilTestSettingsGUI
 					continue;
 					
 				case 'datetime':
-					
-					list($date, $time) = explode(' ', $item->getDate()->get(IL_CAL_DATETIME));
 
-					if( $item->getMode() == ilDateTimeInputGUI::MODE_SELECT )
+					$datetime = $item->getDate();
+					if($datetime instanceof ilDateTime)
 					{
-						list($y, $m, $d) = explode('-', $date);
-
-						$confirmation->addHiddenItem("{$item->getPostVar()}[date][y]", $y);
-						$confirmation->addHiddenItem("{$item->getPostVar()}[date][m]", $m);
-						$confirmation->addHiddenItem("{$item->getPostVar()}[date][d]", $d);
-
-						if( $item->getShowTime() )
+						list($date, $time) = explode(' ', $datetime->get(IL_CAL_DATETIME));
+						if(!($date instanceof ilDate))
 						{
-							list($h, $m, $s) = explode(':', $time);
-
-							$confirmation->addHiddenItem("{$item->getPostVar()}[time][h]", $h);
-							$confirmation->addHiddenItem("{$item->getPostVar()}[time][m]", $m);
-							$confirmation->addHiddenItem("{$item->getPostVar()}[time][s]", $s);
+							$confirmation->addHiddenItem($item->getPostVar(), $date . ' ' . $time);
+						}
+						else
+						{
+							$confirmation->addHiddenItem($item->getPostVar(), $date);
 						}
 					}
 					else
 					{
-						$confirmation->addHiddenItem("{$item->getPostVar()}[date]", $date);
-						$confirmation->addHiddenItem("{$item->getPostVar()}[time]", $time);
+						$confirmation->addHiddenItem($item->getPostVar(), '');
 					}
 
 					break;
@@ -348,6 +341,9 @@ class ilObjTestSettingsScoringResultsGUI extends ilTestSettingsGUI
 		$mc_scoring->addOption($opt = new ilRadioOption($this->lng->txt('tst_score_mcmr_use_scoring_system'), 1, ''));
 		$opt->setInfo($this->lng->txt('tst_score_mcmr_use_scoring_system_desc'));
 		$mc_scoring->setValue($this->testOBJ->getMCScoring());
+// fau: testNav - set the deprecated mc scoring option to disabled
+		$mc_scoring->setDisabled(true);
+// fau.
 		$form->addItem($mc_scoring);
 
 		// score cutting
@@ -442,6 +438,7 @@ class ilObjTestSettingsScoringResultsGUI extends ilTestSettingsGUI
 			$optionDate->setInfo($this->lng->txt('tst_results_access_date_desc'));
 				// access date
 				$reportingDate = new ilDateTimeInputGUI($this->lng->txt('tst_reporting_date'), 'reporting_date');
+				$reportingDate->setRequired(true);
 				$reportingDate->setShowTime(true);
 				if (strlen($this->testOBJ->getReportingDate()))
 				{
@@ -492,9 +489,15 @@ class ilObjTestSettingsScoringResultsGUI extends ilTestSettingsGUI
 
 				if( $this->testOBJ->getScoreReporting() == REPORT_AFTER_DATE )
 				{
-					$this->testOBJ->setReportingDate(
-						$form->getItemByPostVar('reporting_date')->getDate()->get(IL_CAL_FKT_DATE, 'YmdHis')
-					);
+					$reporting_date = $form->getItemByPostVar('reporting_date')->getDate();
+					if($reporting_date instanceof ilDateTime)
+					{
+						$this->testOBJ->setReportingDate($reporting_date->get(IL_CAL_FKT_DATE, 'YmdHis'));
+					}
+					else
+					{
+						$this->testOBJ->setReportingDate('');
+					}
 				}
 				else
 				{

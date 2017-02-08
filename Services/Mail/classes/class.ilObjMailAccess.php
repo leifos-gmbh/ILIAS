@@ -30,12 +30,12 @@ class ilObjMailAccess extends ilObjectAccess
 	/**
 	 * check whether goto script will succeed
 	 */
-	function _checkGoto($a_target)
+	static function _checkGoto($a_target)
 	{
 		global $rbacsystem;
 
 		require_once 'Services/Mail/classes/class.ilMail.php';
-		$mail = new ilMail($_SESSION["AccountId"]);
+		$mail = new ilMail($GLOBALS['DIC']['ilUser']->getId());
 		if($rbacsystem->checkAccess('internal_mail', $mail->getMailObjectReferenceId()))
 		{
 			return true;

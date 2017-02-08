@@ -33,10 +33,10 @@ class ilPCQuestion extends ilPageContent
 	/**
 	* Set node
 	*/
-	function setNode(&$a_node)
+	function setNode($a_node)
 	{
 		parent::setNode($a_node);		// this is the PageContent node
-		$this->q_node =& $a_node->first_child();		//... and this the Question
+		$this->q_node = $a_node->first_child();		//... and this the Question
 	}
 
 	/**
@@ -234,7 +234,7 @@ class ilPCQuestion extends ilPageContent
 	 * @param
 	 * @return array
 	 */
-	function _getPageForQuestionId($a_q_id, $a_parent_type = "")
+	static function _getPageForQuestionId($a_q_id, $a_parent_type = "")
 	{
 		global $ilDB;
 
@@ -260,6 +260,8 @@ class ilPCQuestion extends ilPageContent
 	function modifyPageContentPostXsl($a_output, $a_mode)
 	{
 		global $lng;
+
+		$qhtml = "";
 
 		if ($this->getPage()->getPageConfig()->getEnableSelfAssessment())
 		{
@@ -296,6 +298,20 @@ class ilPCQuestion extends ilPageContent
 		{
 			// set by T&A components
 			$qhtml = $this->getPage()->getPageConfig()->getQuestionHTML();
+
+			// address #19788
+			if (!is_array($qhtml) || count($qhtml) == 0)
+			{
+				// #14154
+				$q_ids = $this->getPage()->getQuestionIds();
+				if(sizeof($q_ids))
+				{
+					foreach ($q_ids as $k)
+					{
+						$a_output = str_replace("{{{{{Question;il__qst_$k"."}}}}}", " ".$lng->txt("copg_questions_not_supported_here"), $a_output);
+					}
+				}
+			}
 		}
 
 		if (is_array($qhtml))

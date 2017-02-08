@@ -60,7 +60,7 @@ class ilRegistrationSettings
 	private $reg_allow_codes = false;
 	private $allowed_domains;	
 	
-	function ilRegistrationSettings()
+	function __construct()
 	{
 		$this->__read();
 	}
@@ -74,11 +74,11 @@ class ilRegistrationSettings
 		$this->registration_type = $a_type;
 	}
 
-	function _lookupRegistrationType()
+	static function _lookupRegistrationType()
 	{
-		global $ilias;
+		global $ilSetting;
 
-		$ret  = (int)$ilias->getSetting('new_registration_type',IL_REG_DISABLED);
+		$ret = (int)$ilSetting->get('new_registration_type',IL_REG_DISABLED);
 
 		if($ret < 1 or $ret > 5)
 		{

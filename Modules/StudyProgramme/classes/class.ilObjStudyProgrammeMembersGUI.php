@@ -62,7 +62,17 @@ class ilObjStudyProgrammeMembersGUI {
 	protected $parent_gui;
 
 	public function __construct($a_parent_gui, $a_ref_id) {
-		global $tpl, $ilCtrl, $ilAccess, $ilToolbar, $ilLocator, $tree, $lng, $ilLog, $ilias, $ilUser;
+		global $DIC;
+		$tpl = $DIC['tpl'];
+		$ilCtrl = $DIC['ilCtrl'];
+		$ilAccess = $DIC['ilAccess'];
+		$ilToolbar = $DIC['ilToolbar'];
+		$ilLocator = $DIC['ilLocator'];
+		$tree = $DIC['tree'];
+		$lng = $DIC['lng'];
+		$ilLog = $DIC['ilLog'];
+		$ilias = $DIC['ilias'];
+		$ilUser = $DIC['ilUser'];
 
 		$this->ref_id = $a_ref_id;
 		$this->parent_gui = $a_parent_gui;
@@ -141,7 +151,7 @@ class ilObjStudyProgrammeMembersGUI {
 		}
 		
 		$prg_id = ilObject::_lookupObjId($this->ref_id);
-		$table = new ilStudyProgrammeMembersTableGUI($prg_id, $this->ref_id, $this);
+		$table = new ilStudyProgrammeMembersTableGUI($prg_id, $this->ref_id, $this, "view");
 		return $table->getHTML();
 	}
 
@@ -205,7 +215,7 @@ class ilObjStudyProgrammeMembersGUI {
 		foreach ($completed_programmes as $user_id => $prg_ref_ids) {
 			$ass_id = $assignments[$user_id]->getId();
 			foreach ($prg_ref_ids as $ids) {
-				list($prg_ref_id, $crs_id, $crsr_id) = split(";", $ids);
+				list($prg_ref_id, $crs_id, $crsr_id) = explode(";", $ids);
 				$prg = $this->getStudyProgramme($prg_ref_id);
 				$progress = $prg->getProgressForAssignment($ass_id);
 				$progress->setLPCompleted($crsr_id, $user_id);

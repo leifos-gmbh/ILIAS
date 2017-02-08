@@ -25,25 +25,25 @@ class ilChatroomObjectDefinition
 	private $relativeClassPath;
 
 	/**
-	 * TaskScope
+	 * GUIScope
 	 * set to '' for single instance or 'admin' for general administration
 	 * @var string
 	 */
-	private $taskScope;
+	private $guiScope;
 
 	/**
 	 * Sets class parameters using given parameters.
 	 * @param string $moduleName
 	 * @param string $moduleBasePath
 	 * @param string $relativeClassPath Optional.
-	 * @param string $taskScope Optional.
+	 * @param string $guiScope          Optional.
 	 */
-	public function __construct($moduleName, $moduleBasePath, $relativeClassPath = 'classes', $taskScope = '')
+	public function __construct($moduleName, $moduleBasePath, $relativeClassPath = 'classes', $guiScope = '')
 	{
 		$this->moduleName        = $moduleName;
 		$this->moduleBasePath    = rtrim($moduleBasePath, '/\\');
 		$this->relativeClassPath = rtrim($relativeClassPath);
-		$this->taskScope         = rtrim($taskScope);
+		$this->guiScope          = rtrim($guiScope);
 	}
 
 	/**
@@ -61,15 +61,15 @@ class ilChatroomObjectDefinition
 
 	/**
 	 * Returns an Instance of ilChatroomObjectDefinition, using given $moduleName
-	 * and $taskScope as parameters.
+	 * and $guiScope as parameters.
 	 * @param string $moduleName
-	 * @param string $taskScope Optional. 'admin' or ''. Default ''
+	 * @param string $guiScope Optional. 'admin' or ''. Default ''
 	 * @return ilChatroomObjectDefinition
 	 */
-	public static function getDefaultDefinitionWithCustomTaskPath($moduleName, $taskScope = '')
+	public static function getDefaultDefinitionWithCustomGUIPath($moduleName, $guiScope = '')
 	{
 		$object = new self(
-			$moduleName, 'Modules/' . $moduleName . '/', 'classes', $taskScope
+			$moduleName, 'Modules/' . $moduleName . '/', 'classes', $guiScope
 		);
 
 		return $object;
@@ -77,57 +77,56 @@ class ilChatroomObjectDefinition
 
 	/**
 	 * Returns true if file exists.
-	 * @param string $task
+	 * @param string $gui
 	 * @return boolean
 	 */
-	public function hasTask($task)
+	public function hasGUI($gui)
 	{
-		return file_exists($this->getTaskPath($task));
+		return file_exists($this->getGUIPath($gui));
 	}
 
 	/**
-	 * Requires file, whereby given $task is used as parameter in getTaskPath
-	 * method to build the filename of the file to required.
-	 * @param string $task
-	 */
-	public function loadTask($task)
-	{
-		require_once $this->getTaskPath($task);
-	}
-
-
-	/**
-	 * Builds and returns new task using given $task and $gui
-	 * @param string              $task
-	 * @param ilChatroomObjectGUI $gui
-	 * @return ilChatroomTaskHandler
-	 */
-	public function buildTask($task, ilChatroomObjectGUI $gui)
-	{
-		$className = $this->getTaskClassName($task);
-		$task      = new $className($gui);
-
-		return $task;
-	}
-
-	/**
-	 * Builds task classname using given $task and returns it.
-	 * @param string $task
+	 * Builds gui path using given $gui and returns it.
+	 * @param string $gui
 	 * @return string
 	 */
-	public function getTaskClassName($task)
-	{
-		return 'il' . $this->moduleName . ucfirst($this->taskScope) . ucfirst($task) . 'Task';
-	}
-
-	/**
-	 * Builds task path using given $task and returns it.
-	 * @param string $task
-	 * @return string
-	 */
-	public function getTaskPath($task)
+	public function getGUIPath($gui)
 	{
 		return $this->moduleBasePath . '/' . $this->relativeClassPath . '/' .
-			$this->taskScope . 'tasks/class.' . $this->getTaskClassName($task) . '.php';
+		$this->guiScope . 'gui/class.' . $this->getGUIClassName($gui) . '.php';
+	}
+
+	/**
+	 * Builds gui classname using given $gui and returns it.
+	 * @param string $gui
+	 * @return string
+	 */
+	public function getGUIClassName($gui)
+	{
+		return 'il' . $this->moduleName . ucfirst($this->guiScope) . ucfirst($gui) . 'GUI';
+	}
+
+	/**
+	 * Requires file, whereby given $gui is used as parameter in getGUIPath
+	 * method to build the filename of the file to required.
+	 * @param string $gui
+	 */
+	public function loadGUI($gui)
+	{
+		require_once $this->getGUIPath($gui);
+	}
+
+	/**
+	 * Builds and returns new gui using given $gui and $gui
+	 * @param string              $gui
+	 * @param ilChatroomObjectGUI $chatroomObjectGUI
+	 * @return ilChatroomGUIHandler
+	 */
+	public function buildGUI($gui, ilChatroomObjectGUI $chatroomObjectGUI)
+	{
+		$className   = $this->getGUIClassName($gui);
+		$guiInstance = new $className($chatroomObjectGUI);
+
+		return $guiInstance;
 	}
 }

@@ -12,6 +12,15 @@ include_once "Services/Object/classes/class.ilObjectLP.php";
  */
 class ilTestLP extends ilObjectLP
 {
+	public static function getDefaultModes($a_lp_active)
+	{
+		return array(
+			ilLPObjSettings::LP_MODE_DEACTIVATED,
+			ilLPObjSettings::LP_MODE_TEST_FINISHED, 
+			ilLPObjSettings::LP_MODE_TEST_PASSED
+		);
+	}
+	
 	public function getDefaultMode()
 	{		
 		return ilLPObjSettings::LP_MODE_TEST_PASSED;
@@ -46,15 +55,19 @@ class ilTestLP extends ilObjectLP
 			require_once "Modules/Course/classes/Objectives/class.ilLOSettings.php";
 			$course_obj_id = ilLOSettings::isObjectiveTest($test_ref_id);
 			if($course_obj_id)
-			{
-				// is test initial and/or qualified?
-				$lo_settings = ilLOSettings::getInstanceByObjId($course_obj_id);				
-				$is_i = ($lo_settings->getInitialTest() == $test_ref_id);
-				$is_q = ($lo_settings->getQualifiedTest() == $test_ref_id);		
-				
+			{													
 				// remove objective results data
+				$lo_settings = ilLOSettings::getInstanceByObjId($course_obj_id);		
+				
 				require_once "Modules/Course/classes/Objectives/class.ilLOUserResults.php";
-				ilLOUserResults::deleteResultsFromLP($course_obj_id, $a_user_ids, $is_i, $is_q);
+				include_once './Modules/Course/classes/Objectives/class.ilLOTestAssignments.php';
+				ilLOUserResults::deleteResultsFromLP(
+					$course_obj_id, 
+					$a_user_ids, 
+					($lo_settings->getInitialTest() == $test_ref_id), 
+					($lo_settings->getQualifiedTest() == $test_ref_id), 
+					ilLOTestAssignments::lookupObjectivesForTest($test_ref_id)
+				);					
 				
 				// refresh LP - see ilLPStatusWrapper::_updateStatus()
 				require_once "Services/Tracking/classes/class.ilLPStatusFactory.php";
@@ -70,7 +83,7 @@ class ilTestLP extends ilObjectLP
 		}
 	}
 	
-	protected static function isLPMember(array &$a_res, $a_usr_id, array $a_obj_ids)
+	protected static function isLPMember(array &$a_res, $a_usr_id, $a_obj_ids)
 	{
 		global $ilDB;
 		
@@ -78,7 +91,7 @@ class ilTestLP extends ilObjectLP
 		$set = $ilDB->query("SELECT tt.obj_fi".
 			" FROM tst_active ta".
 			" JOIN tst_tests tt ON (ta.test_fi = tt.test_id)".
-			" WHERE ".$ilDB->in("tt.obj_fi", $a_obj_ids, "", "integer").
+			" WHERE ".$ilDB->in("tt.obj_fi", (array)$a_obj_ids, "", "integer").
 			" AND ta.user_fi = ".$ilDB->quote($a_usr_id, "integer"));		
 		while($row = $ilDB->fetchAssoc($set))
 		{

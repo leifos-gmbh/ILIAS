@@ -51,11 +51,11 @@ class ilCalendarBlockGUI extends ilBlockGUI
 	*
 	* @param	boolean		skip initialisation (is called by derived PDCalendarBlockGUI class)
 	*/
-	function ilCalendarBlockGUI($a_skip_init = false)
+	function __construct($a_skip_init = false)
 	{
 		global $ilCtrl, $lng, $ilUser, $tpl, $ilHelp;
 		
-		parent::ilBlockGUI();
+		parent::__construct();
 		
 		$this->ctrl = $ilCtrl;
 
@@ -185,7 +185,7 @@ class ilCalendarBlockGUI extends ilBlockGUI
 	/**
 	* execute command
 	*/
-	function &executeCommand()
+	function executeCommand()
 	{
 		global $ilCtrl,$ilTabs,$ilUser;
 
@@ -268,9 +268,9 @@ class ilCalendarBlockGUI extends ilBlockGUI
 		// alex: changed from > 1 to > 0 - original detail level 1 did not work anymore
 		if ($this->getCurrentDetailLevel() > 0 && $this->display_mode != "mmon")
 		{
-			$this->setColSpan(1);					
-			$this->tpl->addBlockFile("BLOCK_ROW", "block_row","tpl.pd_event_list.html", "Services/Calendar");		
-			
+			$this->setColSpan(1);
+			$this->setRowTemplate("tpl.pd_event_list.html", "Services/Calendar");
+
 			ilBlockGUI::fillDataSection();
 		}
 		else

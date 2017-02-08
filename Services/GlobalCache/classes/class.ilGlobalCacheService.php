@@ -81,7 +81,7 @@ abstract class ilGlobalCacheService {
 	 * @description set self::$valid_keys from GlobalCache
 	 */
 	protected function readValid() {
-		if ($this->isActive()) {
+		if ($this->isActive() && $this->isInstallable()) {
 			$this->valid_keys = $this->unserialize($this->get('valid_keys'));
 			$this->valid_key_hash = md5(serialize($this->valid_keys));
 		}
@@ -123,7 +123,7 @@ abstract class ilGlobalCacheService {
 	 *
 	 * @return bool
 	 */
-	abstract public function set($key, $serialized_value, $ttl = NULL);
+	abstract public function set($key, $serialized_value, $ttl = null);
 
 
 	/**
@@ -180,7 +180,7 @@ abstract class ilGlobalCacheService {
 	/**
 	 * @param null $key
 	 */
-	public function setInvalid($key = NULL) {
+	public function setInvalid($key = null) {
 		if ($key) {
 			unset($this->valid_keys[$key]);
 		} else {
@@ -239,10 +239,10 @@ abstract class ilGlobalCacheService {
 	 * @return string
 	 */
 	public function getInstallationFailureReason() {
-		if (! $this->getInstallable()) {
+		if (!$this->getInstallable()) {
 			return 'Not installed';
 		}
-		if (! $this->checkMemory()) {
+		if (!$this->checkMemory()) {
 			return 'Not enough Cache-Memory, set to at least ' . $this->getMinMemory() . 'M';
 		}
 

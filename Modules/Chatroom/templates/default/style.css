@@ -67,7 +67,14 @@
 }
 
 .listentry {
-	position: relative;
+}
+
+.listentry {
+	display: block;
+} 
+
+.listentry div {
+	display: inline-block;
 }
 
 .listentry.self {
@@ -140,25 +147,6 @@
 h2.current_room_title {
 	display: inline;
 	width: auto;
-}
-
-.ilChatDialog {
-	background-color: white;
-	border: 1px solid #BCCAE5;
-	padding-top: 0;
-}
-
-.ilChatDialog .ilChatDialogBody {
-	padding: 3px;
-}
-
-.ilChatDialog .ilChatDialogButtons {
-	padding: 3px;
-	text-align: right;
-}
-
-.ilChatDialog .ilChatDialogButtons .submit {
-	margin: 2px;
 }
 
 .chat_block_title {
@@ -275,4 +263,12 @@ h2.current_room_title {
 #iosChatEmoticonsPanel img, .messageLine img {
 	max-width: 24px;
 	max-height: 24px;
+}
+
+#message_recipient_info {
+	word-wrap: normal;
+}
+
+#chat_users button .label {
+	vertical-align: middle !important;
 }

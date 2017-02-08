@@ -100,7 +100,7 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
 			$max_files = $this->submission->getAssignment()->getMaxFile();
 			
 			if($this->submission->canAddFile())
-			{							
+			{											
 				// #15883 - extended deadline warning
 				$deadline = $this->assignment->getPersonalDeadline($ilUser->getId());
 				if($deadline &&
@@ -120,7 +120,7 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
 				{
 					$ilToolbar->addButton($this->lng->txt("header_zip"), 
 						$this->ctrl->getLinkTarget($this, "uploadZipForm"));
-				}				
+				}
 			}
 			
 			if($max_files)
@@ -202,6 +202,7 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
 	                
 		$form->setTitle($lng->txt("file_add"));
 		$form->setFormAction($ilCtrl->getFormAction($this, "uploadFile"));
+		
 		return $form;
 	}
 
@@ -217,8 +218,8 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
 	
 		include_once("./Services/Form/classes/class.ilFileInputGUI.php");
 		$fi = new ilFileInputGUI($lng->txt("file"), "deliver");
-		$fi->setRequired(true);
 		$fi->setSuffixes(array("zip"));
+		$fi->setRequired(true);
 		$form->addItem($fi);
 	
 		$form->addCommandButton("uploadZip", $lng->txt("upload"));

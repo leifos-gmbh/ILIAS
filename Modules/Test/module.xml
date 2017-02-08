@@ -1,4 +1,4 @@
-<?php xml version = "1.0" encoding = "UTF-8"?>
+<?xml version = "1.0" encoding = "UTF-8"?>
 <module xmlns="http://www.w3.org" version="$Id: modules.xml 15671 2008-01-04 13:08:30Z akill $"
 	id="tst">
 	<baseclasses>
@@ -28,6 +28,9 @@
 			<parent id="wfld">wfld</parent>
 		</object>
 	</objects>
+	<crons>
+		<cron id="finish_unfinished_passes" class="ilCronFinishUnfinishedTestPasses" />
+	</crons>
 	<pluginslots>
 		<pluginslot id="texp" name="Export" />
 		<pluginslot id="tsig" name="Signature" />

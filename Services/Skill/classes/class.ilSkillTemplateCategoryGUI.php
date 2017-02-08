@@ -27,7 +27,7 @@ class ilSkillTemplateCategoryGUI extends ilSkillTreeNodeGUI
 		$ilCtrl->saveParameter($this, "obj_id");
 		$this->tref_id = $a_tref_id;
 		
-		parent::ilSkillTreeNodeGUI($a_node_id);
+		parent::__construct($a_node_id);
 	}
 
 	/**
@@ -41,11 +41,11 @@ class ilSkillTemplateCategoryGUI extends ilSkillTreeNodeGUI
 	/**
 	 * Execute command
 	 */
-	function &executeCommand()
+	function executeCommand()
 	{
 		global $ilCtrl, $tpl, $ilTabs;
 		
-		$tpl->getStandardTemplate();
+		//$tpl->getStandardTemplate();
 		
 		$next_class = $ilCtrl->getNextClass($this);
 		$cmd = $ilCtrl->getCmd();
@@ -111,8 +111,13 @@ class ilSkillTemplateCategoryGUI extends ilSkillTreeNodeGUI
 	 */
 	function listItems()
 	{
-		global $tpl;
-		
+		global $tpl, $lng;
+
+		if ($this->isInUse())
+		{
+			ilUtil::sendInfo($lng->txt("skmg_skill_in_use"));
+		}
+
 		if ($this->tref_id == 0)
 		{
 			self::addCreationButtons();

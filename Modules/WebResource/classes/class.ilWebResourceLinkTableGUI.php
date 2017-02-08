@@ -113,7 +113,7 @@ class ilWebResourceLinkTableGUI extends ilTable2GUI
 		$items = $this->getWebResourceItems()->sortItems($items);
 		
 		include_once "Services/Form/classes/class.ilFormPropertyGUI.php";
-		include_once "Services/Form/classes/class.ilLinkInputGUI.php";								
+		include_once "Services/Form/classes/class.ilLinkInputGUI.php";										
 		
 		$counter = 1;
 		foreach($items as $link)

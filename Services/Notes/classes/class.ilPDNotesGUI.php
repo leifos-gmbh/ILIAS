@@ -34,17 +34,19 @@ class ilPDNotesGUI
 	*
 	* @access	public
 	*/
-	function ilPDNotesGUI()
+	function __construct()
 	{
 		global $ilias, $tpl, $lng, $ilCtrl, $ilUser, $ilTabs, $ilHelp;
 
 		$ilHelp->setScreenIdComponent("note");
+
+		$lng->loadLanguageModule("notes");
 		
 		// initiate variables
-		$this->ilias =& $ilias;
-		$this->tpl =& $tpl;
-		$this->lng =& $lng;
-		$this->ctrl =& $ilCtrl;
+		$this->ilias = $ilias;
+		$this->tpl = $tpl;
+		$this->lng = $lng;
+		$this->ctrl = $ilCtrl;
 		
 		// link from ilPDNotesBlockGUI
 		if($_GET["rel_obj"])
@@ -67,10 +69,9 @@ class ilPDNotesGUI
 	/**
 	* execute command
 	*/
-	function &executeCommand()
+	function executeCommand()
 	{
 		$next_class = $this->ctrl->getNextClass();
-
 		switch($next_class)
 		{
 			case "ilnotegui":
@@ -99,8 +100,20 @@ class ilPDNotesGUI
 	*/
 	function displayHeader()
 	{
-		$this->tpl->setTitle($this->lng->txt("notes"));
-				
+		global $ilSetting;
+
+		$t = $this->lng->txt("notes");
+		if (!$this->ilias->getSetting("disable_notes") && !$ilSetting->get("disable_comments"))
+		{
+			$t = $this->lng->txt("notes_and_comments");
+		}
+		if ($this->ilias->getSetting("disable_notes"))
+		{
+			$t = $this->lng->txt("notes_comments");
+		}
+
+		$this->tpl->setTitle($t);
+
 		// catch feedback message
 		// display infopanel if something happened
 		ilUtil::infoPanel();
@@ -220,7 +233,7 @@ class ilPDNotesGUI
 				if ($obj["rep_obj_id"] > 0)
 				{
 					$type = ilObject::_lookupType($obj["rep_obj_id"]);
-					$type_str = (in_array($type, array("lm", "htlm", "sahs", "dbk")))
+					$type_str = (in_array($type, array("lm", "htlm", "sahs")))
 						? $lng->txt("learning_resource")
 						: $lng->txt("obj_".$type);
 					$caption = $type_str.": ".ilObject::_lookupTitle($obj["rep_obj_id"]);
@@ -263,10 +276,14 @@ class ilPDNotesGUI
 	function setTabs()
 	{
 		global $ilTabs, $ilSetting, $ilCtrl;
-				
-		$ilTabs->addTarget("private_notes",
-			$ilCtrl->getLinkTarget($this, "showPrivateNotes"), "", "", "",
-			($this->getMode() == ilPDNotesGUI::PRIVATE_NOTES));		
+
+		if(!$ilSetting->get("disable_notes"))
+		{
+			$ilTabs->addTarget("private_notes",
+				$ilCtrl->getLinkTarget($this, "showPrivateNotes"), "", "", "",
+				($this->getMode() == ilPDNotesGUI::PRIVATE_NOTES));
+		}
+
 		if(!$ilSetting->get("disable_comments"))
 		{
 			$ilTabs->addTarget("notes_public_comments",

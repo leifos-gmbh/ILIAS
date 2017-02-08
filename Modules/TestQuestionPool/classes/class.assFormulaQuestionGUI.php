@@ -17,6 +17,7 @@ require_once './Modules/TestQuestionPool/interfaces/interface.ilGuiAnswerScoring
  * @author            Helmut Schottmüller <helmut.schottmueller@mac.com>
  * @version           $Id: class.assFormulaQuestionGUI.php 1235 2010-02-15 15:21:18Z hschottm $
  * @ingroup           ModulesTestQuestionPool
+ * @ilCtrl_Calls assFormulaQuestionGUI: ilFormPropertyDispatchGUI
  */
 class assFormulaQuestionGUI extends assQuestionGUI
 {
@@ -155,10 +156,9 @@ class assFormulaQuestionGUI extends assQuestionGUI
 	}
 
 	/**
-	 * Evaluates a posted edit form and writes the form data in the question object
-	 * @return integer A positive value, if one of the required fields wasn't set, else 0
+	 * {@inheritdoc}
 	 */
-	public function writePostData($always = false)
+	protected function writePostData($always = false)
 	{
 		$hasErrors = (!$always) ? $this->editQuestion(true) : false;
 		$checked = true;
@@ -318,7 +318,7 @@ class assFormulaQuestionGUI extends assQuestionGUI
 	 * @param bool $checkonly
 	 * @return bool
 	 */
-	function editQuestion($checkonly = FALSE)
+	public function editQuestion($checkonly = FALSE)
 	{
 		$save = $this->isSaveCommand();
 		
@@ -326,6 +326,8 @@ class assFormulaQuestionGUI extends assQuestionGUI
 
 		include_once("./Services/Form/classes/class.ilPropertyFormGUI.php");
 		$form = new ilPropertyFormGUI();
+		$this->editForm = $form;
+
 		$form->setFormAction($this->ctrl->getFormAction($this));
 		$form->setTitle($this->outQuestionType());
 		$form->setMultipart(FALSE);
@@ -1172,6 +1174,17 @@ class assFormulaQuestionGUI extends assQuestionGUI
 				}
 			}
 		}
+
+// fau: testNav - take question variables always from authorized solution because they are saved with this flag, even if an authorized solution is not saved
+		$solutions = $this->object->getSolutionValues($active_id, $pass, true);
+		foreach($solutions as $idx => $solution_value)
+		{
+			if (preg_match("/^(\\\$v\\d+)$/", $solution_value["value1"], $matches))
+			{
+				$user_solution[$matches[1]] = $solution_value["value2"];
+			}
+		}
+// fau.
 
 		// generate the question output
 		$template = new ilTemplate("tpl.il_as_qpl_formulaquestion_output.html", true, true, 'Modules/TestQuestionPool');

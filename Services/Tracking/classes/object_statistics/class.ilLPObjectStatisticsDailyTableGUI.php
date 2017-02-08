@@ -37,9 +37,9 @@ class ilLPObjectStatisticsDailyTableGUI extends ilLPTableBaseGUI
 		for($loop = 0; $loop<24; $loop+=2)
 		{
 			$this->addColumn(str_pad($loop, 2, "0", STR_PAD_LEFT).":00-<br />".
-				str_pad($loop+2, 2, "0", STR_PAD_LEFT).":00 ", "hour".$loop, "", false, "ilRight");
+				str_pad($loop+2, 2, "0", STR_PAD_LEFT).":00 ", "hour".$loop);
 		}
-		$this->addColumn($lng->txt("total"), "sum", "", false, "ilRight");
+		$this->addColumn($lng->txt("total"), "sum");
 
 		$this->setTitle($this->lng->txt("trac_object_stat_daily"));
 
@@ -131,7 +131,28 @@ class ilLPObjectStatisticsDailyTableGUI extends ilLPTableBaseGUI
 	{
 		$data = array();
 		
-		$objects = $this->searchObjects($this->getCurrentFilter(true), "read");
+		if($this->filter["type"] != "prtf")
+		{
+			// JF, 2016-06-06
+			$objects = $this->searchObjects($this->getCurrentFilter(true), "");
+			
+			if($this->filter["type"] == "blog")
+			{				
+				foreach(ilTrQuery::getWorkspaceBlogs($this->filter["query"]) as $obj_id)
+				{
+					$objects[$obj_id] = array($obj_id);
+				}
+			}
+		}
+		else
+		{
+			// portfolios are not part of repository
+			foreach(ilTrQuery::getPortfolios($this->filter["query"]) as $obj_id)
+			{
+				$objects[$obj_id] = array($obj_id);
+			}
+		}
+		
 		if($objects)
 		{						
 			include_once "Services/Tracking/classes/class.ilTrQuery.php";
@@ -269,15 +290,15 @@ class ilLPObjectStatisticsDailyTableGUI extends ilLPTableBaseGUI
 		return $chart->getHTML();
 	}
 	
-	protected function fillMetaExcel()
+	protected function fillMetaExcel(ilExcel $a_excel, &$a_row)
 	{
 		
 	}
 	
-	protected function fillRowExcel($a_worksheet, &$a_row, $a_set)
+	protected function fillRowExcel(ilExcel $a_excel, &$a_row, $a_set)
 	{
-		$a_worksheet->write($a_row, 0, ilObject::_lookupTitle($a_set["obj_id"]));
-		$a_worksheet->write($a_row, 0, $a_set["obj_id"]);
+		$a_excel->setCell($a_row, 0, ilObject::_lookupTitle($a_set["obj_id"]));
+		$a_excel->setCell($a_row, 1, $a_set["obj_id"]);
 			
 		$col = 1;
 		for($loop = 0; $loop<24; $loop+=2)
@@ -288,8 +309,7 @@ class ilLPObjectStatisticsDailyTableGUI extends ilLPTableBaseGUI
 				$value = $this->anonymizeValue($value);
 			}	
 		
-			$col++;
-			$a_worksheet->write($a_row, $col, $value);
+			$a_excel->setCell($a_row, ++$col, $value);
 		}
 		
 		if($this->filter["measure"] == "spent_seconds")
@@ -302,11 +322,10 @@ class ilLPObjectStatisticsDailyTableGUI extends ilLPTableBaseGUI
 		{
 			$sum = $this->anonymizeValue((int)$a_set["sum"]);
 		}			
-		$col++;
-		$a_worksheet->write($a_row, $col, $sum);
+		$a_excel->setCell($a_row, ++$col, $sum);
 	}
 	
-	protected function fillMetaCSV()
+	protected function fillMetaCSV($a_csv)
 	{
 		
 	}

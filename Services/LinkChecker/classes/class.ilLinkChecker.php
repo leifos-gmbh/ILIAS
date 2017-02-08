@@ -20,17 +20,18 @@ class ilLinkChecker
 	var $page_id = 0;
 
 
-	function ilLinkChecker(&$db,$a_validate_all = true)
+	public function __construct($db,$a_validate_all = true)
 	{
 		global $ilDB;
 
 		define('DEBUG',1);
 		define('SOCKET_TIMEOUT',5);
+		define('MAX_REDIRECTS',5);
 
-		$this->db =& $db;
+		$this->db = $db;
 
 		// SET GLOBAL DB HANDLER FOR STATIC METHODS OTHER CLASSES
-		$ilDB =& $db;
+		$ilDB = $db;
 
 		$this->validate_all = $a_validate_all;
 	}
@@ -94,7 +95,7 @@ class ilLinkChecker
 			"WHERE obj_id = ".$ilDB->quote($this->getObjId(),'integer')." ";
 
 		$res = $this->db->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$invalid[] = array('page_id' => $row->page_id,
 							   'url'	 => $row->url);
@@ -172,7 +173,7 @@ class ilLinkChecker
 				"AND parent_type = 'lm'";
 
 			$res = $this->db->query($query);
-			while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+			while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 			{
 				$pages[] = array('page_id' => $row->page_id,
 								 'content' => $row->content,
@@ -185,7 +186,7 @@ class ilLinkChecker
 				"WHERE parent_type = 'lm'";
 
 			$res = $this->db->query($query);
-			while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+			while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 			{
 				$pages[] = array('page_id' => $row->page_id,
 								 'content' => $row->content,
@@ -214,16 +215,6 @@ class ilLinkChecker
 		return $this->getInvalidLinks();
 	}
 
-	function checkPear()
-	{
-		if(!@include_once('HTTP/Request.php'))
-		{
-			return false;
-		}
-		return true;
-	}
-		
-
 	// PRIVATE
 	function __txt($language,$key,$module = 'common')
 	{
@@ -236,10 +227,10 @@ class ilLinkChecker
 	function __fetchUserData($a_usr_id)
 	{
 		global $ilDB;
-		
-		$query = "SELECT email FROM usr_data WHERE usr_id = ".$ilDB->quote($a_usr_id)."";
 
-		$row = $this->db->getRow($query,DB_FETCHMODE_OBJECT);
+		$r = $this->db->query("SELECT email FROM usr_data WHERE usr_id = ".$ilDB->quote($a_usr_id));
+
+		$row = $r->fetchRow(ilDBConstants::FETCHMODE_OBJECT);
 
 		$data['email'] = $row->email;
 
@@ -257,11 +248,11 @@ class ilLinkChecker
 	function __getTitle($a_lm_obj_id)
 	{
 		global $ilDB;
-		
-		$query = "SELECT title FROM object_data ".
-			"WHERE obj_id = ".$ilDB->quote($a_lm_obj_id ,'integer')." ";
 
-		$row = $this->db->getRow($query,DB_FETCHMODE_OBJECT);
+		$r = $this->db->query("SELECT title FROM object_data ".
+			"WHERE obj_id = ".$ilDB->quote($a_lm_obj_id ,'integer')." ");
+
+		$row = $r->fetchRow(ilDBConstants::FETCHMODE_OBJECT);
 
 		return $row->title;
 	}
@@ -477,20 +468,37 @@ class ilLinkChecker
 						'host'	   => isset($url_data['host']) ? $url_data['host'] : $url_data['path']);										
 		}
 		return $link ? $link : array();
-	}			
+	}
 
-		
 
+	/**
+	 *
+	 * $a_links Format:
+	 * Array (
+	 * 	[1] => Array (
+	 * 		['scheme'] => intern/http/https,
+	 * 		['ref_id'] => ILIAS ref ID,
+	 * 		['obj_type'] => ILIAS object type,
+	 * 		['complete'] => link to check,
+	 * 	),
+	 * 	[2]=> ...
+	 * )
+	 *
+	 * @param array $a_links Format:
+	 * @return array Returns all invalid links! Format like $a_links with additional error information ['http_status_code'] and ['curl_errno']
+	 */
 	function __validateLinks($a_links)
 	{
 		global $tree;
-		
-		if(!@include_once('HTTP/Request.php'))
+		include_once('./Services/Logging/classes/public/class.ilLoggerFactory.php');
+		include_once('./Services/WebServices/Curl/classes/class.ilCurlConnection.php');
+		if(!ilCurlConnection::_isCurlExtensionLoaded())
 		{
 			$this->__appendLogMessage('LinkChecker: Pear HTTP_Request is not installed. Aborting');
-
+			ilLoggerFactory::getLogger('lchk')->error('LinkChecker: Curl extension is not loeaded. Aborting');
 			return array();
 		}
+		$invalid = array();
 
 		foreach($a_links as $link)
 		{
@@ -508,33 +516,43 @@ class ilLinkChecker
 			// external
 			else
 			{
-				if(gethostbyname($link['host']) == $link['host'])
-				{
-					$invalid[] = $link;
-					continue;
-				}
-
 				if($link['scheme'] !== 'http' and $link['scheme'] !== 'https')
 				{
+					ilLoggerFactory::getLogger('lchk')->error('LinkChecker: Unkown link sheme "' . $link['scheme'] . '". Continue check');
 					continue;
 				}
 
 				require_once './Services/Http/classes/class.ilProxySettings.php';
-
-				if(ilProxySettings::_getInstance()->isActive())
+				$http_code = 0;
+				$c_error_no = 0;
+				try
 				{
-					$options = array('proxy_host' => ilProxySettings::_getInstance()->getHost(), 
-									 'proxy_port' => ilProxySettings::_getInstance()->getPort());
+					$curl = new ilCurlConnection($link['complete']);
+					$curl->init();
+
+					if(ilProxySettings::_getInstance()->isActive())
+					{
+						$curl->setOpt(CURLOPT_HTTPPROXYTUNNEL,true );
+						$curl->setOpt(CURLOPT_PROXY, ilProxySettings::_getInstance()->getHost());
+						$curl->setOpt(CURLOPT_PROXYPORT, ilProxySettings::_getInstance()->getPort());
+					}
+
+					$curl->setOpt( CURLOPT_HEADER, 1);
+					$curl->setOpt(CURLOPT_RETURNTRANSFER, 1);
+					$curl->setOpt(CURLOPT_CONNECTTIMEOUT ,SOCKET_TIMEOUT);
+					$curl->setOpt(CURLOPT_FOLLOWLOCATION, 1);
+					$curl->setOpt(CURLOPT_MAXREDIRS ,MAX_REDIRECTS);
+					$curl->exec();
+					$headers = $curl->getInfo();
+					$http_code  = $headers['http_code'];
 				}
-				else
+				catch(ilCurlConnectionException $e)
 				{
-					$options = array();
+					$c_error_no = $e->getCode();
+					ilLoggerFactory::getLogger('lchk')->error('LinkChecker: No valid http code received. Curl error ('.$e->getCode().'): ' . $e->getMessage());
 				}
 
-				$req = new HTTP_Request($link['complete'], $options);
-				$req->sendRequest();
-
-				switch($req->getResponseCode())
+				switch($http_code)
 				{
 					// EVERYTHING OK
 					case '200':
@@ -542,23 +560,26 @@ class ilLinkChecker
 					case '301':
 					case '302':
 						break;
-
 					default:
-						$link['http_status_code'] = $req->getResponseCode();
+						$link['http_status_code'] = $http_code;
+						if($http_code == 0 && $c_error_no != 0)
+						{
+							$link['curl_errno'] = $c_error_no;
+						}
 						$invalid[] = $link;
 						break;
 				}
 			}
 		}
-		return $invalid ? $invalid : array();
+		return $invalid;
 	}
 
 	function __getObjIdByPageId($a_page_id)
 	{
-		$query = "SELECT lm_id FROM lm_data ".
-			"WHERE obj_id = '".$a_page_id."'";
+		$res = $this->db->query( "SELECT lm_id FROM lm_data ".
+			"WHERE obj_id = '".$a_page_id."'");
 
-		$row = $this->db->getRow($query,DB_FETCHMODE_OBJECT);
+		$row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT);
 
 		return $row->lm_id ? $row->lm_id : 0;
 	}
@@ -589,8 +610,11 @@ class ilLinkChecker
 
 		foreach($this->getInvalidLinks() as $link)
 		{
-			$query = "INSERT INTO link_check (obj_id,page_id,url,parent_type,http_status_code,last_check) ".
+			$id = $ilDB->nextId('link_check');
+
+			$query = "INSERT INTO link_check (id, obj_id,page_id,url,parent_type,http_status_code,last_check) ".
 				"VALUES ( ".
+				$ilDB->quote($id, "integer").",".
 				$ilDB->quote($link['obj_id'],'integer').", ".
 				$ilDB->quote($link['page_id'],'integer').", ".
 				$ilDB->quote(substr($link['complete'],0,255),'text').", ".

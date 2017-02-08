@@ -153,7 +153,7 @@ class ilExportFieldsInfo
 					$caption = ($field == "title")
 						? "person_title"
 						: $field;
-					$fields[$field]['txt'] = $lng->txt($caption);
+					$fields[$field]['txt'] = $lng->txt($caption);				
 					$fields[$field]['default'] = 0;
 					break;
 			}

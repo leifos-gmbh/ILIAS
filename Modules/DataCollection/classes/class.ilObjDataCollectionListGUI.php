@@ -24,7 +24,6 @@ class ilObjDataCollectionListGUI extends ilObjectListGUI {
 		$this->cut_enabled = true;
 		$this->subscribe_enabled = true;
 		$this->link_enabled = true;
-		$this->payment_enabled = false;
 		$this->info_screen_enabled = true;
 		$this->type = "dcl";
 		$this->gui_class_name = "ilobjdatacollectiongui";
@@ -44,7 +43,9 @@ class ilObjDataCollectionListGUI extends ilObjectListGUI {
 	 *                    "value" (string) => property value
 	 */
 	public function getProperties() {
-		global $lng, $ilUser;
+		global $DIC;
+		$lng = $DIC['lng'];
+		$ilUser = $DIC['ilUser'];
 
 		$props = array();
 		include_once("./Modules/DataCollection/classes/class.ilObjDataCollectionAccess.php");

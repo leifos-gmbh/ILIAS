@@ -30,7 +30,7 @@ class ilBasicSkillGUI extends ilSkillTreeNodeGUI
 		$ilCtrl->saveParameter($this, array("obj_id", "level_id"));
 		$this->base_skill_id = $a_node_id;
 		
-		parent::ilSkillTreeNodeGUI($a_node_id);
+		parent::__construct($a_node_id);
 	}
 	
 	/**
@@ -48,7 +48,7 @@ class ilBasicSkillGUI extends ilSkillTreeNodeGUI
 	{
 		global $ilCtrl, $tpl, $ilTabs, $ilHelp;
 		
-		$tpl->getStandardTemplate();
+		//$tpl->getStandardTemplate();
 		
 		$next_class = $ilCtrl->getNextClass($this);
 		$cmd = $ilCtrl->getCmd();
@@ -143,12 +143,19 @@ class ilBasicSkillGUI extends ilSkillTreeNodeGUI
 		global $tpl, $ilToolbar, $lng, $ilCtrl;
 
 		$this->setTabs("levels");
-		
-		$ilToolbar->addButton($lng->txt("skmg_add_level"),
-			$ilCtrl->getLinkTarget($this, "addLevel"));
+
+		if ($this->isInUse())
+		{
+			ilUtil::sendInfo($lng->txt("skmg_skill_in_use"));
+		}
+		else
+		{
+			$ilToolbar->addButton($lng->txt("skmg_add_level"),
+					$ilCtrl->getLinkTarget($this, "addLevel"));
+		}
 		
 		include_once("./Services/Skill/classes/class.ilSkillLevelTableGUI.php");
-		$table = new ilSkillLevelTableGUI($this->base_skill_id, $this, "edit");
+		$table = new ilSkillLevelTableGUI($this->base_skill_id, $this, "edit", 0, $this->isInUse());
 		$tpl->setContent($table->getHTML());
 	}
 
@@ -235,7 +242,12 @@ class ilBasicSkillGUI extends ilSkillTreeNodeGUI
 	 */
 	function editLevel()
 	{
-		global $tpl;
+		global $tpl, $lng;
+
+		if ($this->isInUse())
+		{
+			ilUtil::sendInfo($lng->txt("skmg_skill_in_use"));
+		}
 
 		$this->initLevelForm();
 		$this->getLevelValues();
@@ -616,7 +628,7 @@ class ilBasicSkillGUI extends ilSkillTreeNodeGUI
 	/**
 	 * Redirect to parent (identified by current obj_id)
 	 */
-	function redirectToParent()
+	function redirectToParent($a_tmp_mode = false)
 	{
 		global $ilCtrl;
 		

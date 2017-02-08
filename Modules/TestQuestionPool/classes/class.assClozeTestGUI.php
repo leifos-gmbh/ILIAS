@@ -18,6 +18,7 @@ require_once './Modules/TestQuestionPool/interfaces/interface.ilGuiAnswerScoring
  * @version		$Id$
  * 
  * @ingroup 	ModulesTestQuestionPool
+ * @ilCtrl_Calls assClozeTestGUI: ilFormPropertyDispatchGUI          
  */
 class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjustable, ilGuiAnswerScoringAdjustable
 {
@@ -55,14 +56,9 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
 	}
 
 	/**
-	 * Evaluates a posted edit form and writes the form data in the question object
-	 *
-	 * @param bool $always
-	 *
-	 * @return integer A positive value, if one of the required fields wasn't set, else 0
-	 * @access private
+	 * {@inheritdoc}
 	 */
-	function writePostData($always = false)
+	protected function writePostData($always = false)
 	{
 		$hasErrors = (!$always) ? $this->editQuestion(true) : false;
 		if (!$hasErrors)
@@ -249,6 +245,8 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
 
         include_once("./Services/Form/classes/class.ilPropertyFormGUI.php");
 		$form = new ilPropertyFormGUI();
+		$this->editForm = $form;
+
 		$form->setFormAction($this->ctrl->getFormAction($this));
 		$form->setTitle($this->outQuestionType());
 		$form->setMultipart(FALSE);
@@ -425,10 +423,33 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
 		$form->addItem($cloze_text);
 
 		$tpl = new ilTemplate("tpl.il_as_qpl_cloze_gap_button_code.html", TRUE, TRUE, "Modules/TestQuestionPool");
-		$tpl->setVariable('INSERT_GAP', $this->lng->txt('insert_gap'));
-		$tpl->setVariable('CREATE_GAPS', $this->lng->txt('create_gaps'));
-		$tpl->parseCurrentBlock();
+
 		$button = new ilCustomInputGUI('&nbsp;','');
+		require_once 'Services/UIComponent/SplitButton/classes/class.ilSplitButtonGUI.php';
+		require_once 'Services/UIComponent/Button/classes/class.ilJsLinkButton.php';
+		$action_button = ilSplitButtonGUI::getInstance();
+
+		$sb_text_gap = ilJsLinkButton::getInstance();
+		$sb_text_gap->setCaption('text_gap');
+		$sb_text_gap->setName('gapbutton');
+		$sb_text_gap->setId('gaptrigger_text');
+		$action_button->setDefaultButton($sb_text_gap);
+
+		$sb_sel_gap = ilJsLinkButton::getInstance();
+		$sb_sel_gap->setCaption('select_gap');
+		$sb_sel_gap->setName('gapbutton_select');
+		$sb_sel_gap->setId('gaptrigger_select');
+		$action_button->addMenuItem(new ilButtonToSplitButtonMenuItemAdapter($sb_sel_gap));
+
+		$sb_num_gap = ilJsLinkButton::getInstance();
+		$sb_num_gap->setCaption('numeric_gap');
+		$sb_num_gap->setName('gapbutton_numeric');
+		$sb_num_gap->setId('gaptrigger_numeric');
+		$action_button->addMenuItem(new ilButtonToSplitButtonMenuItemAdapter($sb_num_gap));
+
+		$tpl->setVariable('BUTTON', $action_button->render());
+		$tpl->parseCurrentBlock();
+
 		$button->setHtml($tpl->get());
 		$form->addItem($button);
 

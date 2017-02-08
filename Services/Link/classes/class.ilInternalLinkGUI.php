@@ -27,7 +27,7 @@ class ilInternalLinkGUI
 	var $tree;
 	var $ltypes = array();
 	
-	function ilInternalLinkGUI($a_default_type, $a_default_obj)
+	function __construct($a_default_type, $a_default_obj)
 	{
 		global $lng, $ilias, $ilCtrl, $tree;
 
@@ -142,7 +142,7 @@ class ilInternalLinkGUI
 	}
 
 
-	function &executeCommand()
+	function executeCommand()
 	{
 		$next_class = $this->ctrl->getNextClass($this);
 
@@ -299,7 +299,7 @@ class ilInternalLinkGUI
 		if(($this->link_type == "PageObject" || $this->link_type == "StructureObject") &&
 			(empty($_SESSION["il_link_cont_obj"]) ||
 			!in_array(ilObject::_lookupType($_SESSION["il_link_cont_obj"], true),
-				array("lm", "dbk"))))
+				array("lm"))))
 		{
 			$this->changeTargetObject("cont_obj");
 		}
@@ -309,7 +309,7 @@ class ilInternalLinkGUI
 		}
 		else
 		{
-			$tpl =& new ilTemplate("tpl.link_help.html", true, true, "Services/Link");
+			$tpl = new ilTemplate("tpl.link_help.html", true, true, "Services/Link");
 			$tpl->setVariable("LOCATION_STYLESHEET", ilUtil::getStyleSheetLocation());
 		}
 
@@ -457,7 +457,7 @@ class ilInternalLinkGUI
 			
 				// check whether current object matchs to type
 				if (!in_array(ilObject::_lookupType($_SESSION["il_link_cont_obj"], true),
-					array("lm", "dbk")))
+					array("lm")))
 				{
 					$this->changeTargetObject("lm");
 				}
@@ -466,11 +466,6 @@ class ilInternalLinkGUI
 				{
 					require_once("./Modules/LearningModule/classes/class.ilObjLearningModule.php");
 					$cont_obj = new ilObjLearningModule($_SESSION["il_link_cont_obj"], true);
-				}
-				else if ($type == "dbk")
-				{
-					require_once("./Modules/LearningModule/classes/class.ilObjDlBook.php");
-					$cont_obj = new ilObjDlBook($_SESSION["il_link_cont_obj"], true);
 				}
 
 				// get all chapters
@@ -500,7 +495,7 @@ class ilInternalLinkGUI
 			// glossary item link
 			case "GlossaryItem":
 				require_once("./Modules/Glossary/classes/class.ilObjGlossary.php");
-				$glossary =& new ilObjGlossary($_SESSION["il_link_glossary"], true);
+				$glossary = new ilObjGlossary($_SESSION["il_link_glossary"], true);
 
 				// get all glossary items
 				$terms = $glossary->getTermList();
@@ -559,7 +554,7 @@ class ilInternalLinkGUI
 				else
 				{
 					require_once("./Modules/MediaPool/classes/class.ilObjMediaPool.php");
-					$med_pool =& new ilObjMediaPool($_SESSION["il_link_mep"], true);
+					$med_pool = new ilObjMediaPool($_SESSION["il_link_mep"], true);
 					// get current folders
 					$fobjs = $med_pool->getChilds($_SESSION["il_link_mep_obj"], "fold");
 					$f2objs = array();
@@ -664,7 +659,7 @@ class ilInternalLinkGUI
 			case "WikiPage":
 				$wiki_id = ilObject::_lookupObjId($_SESSION["il_link_wiki"]);
 				require_once("./Modules/Wiki/classes/class.ilWikiPage.php");
-				$wpages = ilWikiPage::getAllPages($wiki_id);
+				$wpages = ilWikiPage::getAllWikiPages($wiki_id);
 
 				// get all glossary items
 				$tpl->setCurrentBlock("chapter_list");
@@ -762,9 +757,6 @@ class ilInternalLinkGUI
 	 */
 	function saveFileLink()
 	{
-		$mtpl =& new ilTemplate("tpl.link_help.html", true, true, "Services/Link");
-		$mtpl->setVariable("LOCATION_STYLESHEET", ilUtil::getStyleSheetLocation());
-
 		if ($_FILES["link_file"]["name"] != "")
 		{
 			include_once("./Modules/File/classes/class.ilObjFile.php");
@@ -794,7 +786,7 @@ class ilInternalLinkGUI
 	function outputThumbnail(&$tpl, $a_id, $a_mode = "")
 	{
 		// output thumbnail
-		$mob =& new ilObjMediaObject($a_id);
+		$mob = new ilObjMediaObject($a_id);
 		$med =& $mob->getMediaItem("Standard");
 		$target = $med->getThumbnailTarget("small");
 		$suff = "";
@@ -967,7 +959,7 @@ class ilInternalLinkGUI
 			}
 		}
 
-		$tpl =& new ilTemplate("tpl.link_help_explorer.html", true, true, "Services/Link");
+		$tpl = new ilTemplate("tpl.link_help_explorer.html", true, true, "Services/Link");
 
 		$output = $this->getTargetExplorer($a_type);
 
@@ -1082,7 +1074,7 @@ class ilInternalLinkGUI
 	/**
 	 * Get initialisation HTML to use interna link editing
 	 */
-	function getInitHTML($a_url, $a_move_to_body = false)
+	static function getInitHTML($a_url)
 	{
 		global $tpl, $lng;
 
@@ -1096,6 +1088,9 @@ class ilInternalLinkGUI
 		ilYuiUtil::initConnection();
 
 		$tpl->addJavascript("./Services/Link/js/ilIntLink.js");
+		
+		// #18721
+		$tpl->addJavaScript("Services/Form/js/Form.js");
 
 		include_once("./Services/UIComponent/Modal/classes/class.ilModalGUI.php");
 		$modal = ilModalGUI::getInstance();

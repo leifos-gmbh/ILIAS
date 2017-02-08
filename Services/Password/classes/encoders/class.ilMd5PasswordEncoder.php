@@ -50,12 +50,4 @@ class ilMd5PasswordEncoder extends ilBasePasswordEncoder
 	{
 		return 'md5';
 	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function requiresSalt()
-	{
-		return false;
-	}
 }

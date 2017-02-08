@@ -45,7 +45,7 @@ class ilCustomUserFieldsGUI
 		return $this->permissions;
 	}
 	
-	function &executeCommand()
+	function executeCommand()
 	{
 		global $ilCtrl;
 		
@@ -529,7 +529,7 @@ class ilCustomUserFieldsGUI
 				ilMemberAgreement::_reset();			
 			}
 
-			ilUtil::sendSuccess($lng->txt('udf_added_field'), true);
+			ilUtil::sendSuccess($lng->txt('settings_saved'), true);
 			$ilCtrl->redirect($this);
 		}
 		

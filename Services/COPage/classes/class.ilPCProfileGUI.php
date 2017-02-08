@@ -41,15 +41,15 @@ class ilPCProfileGUI extends ilPageContentGUI
 	* Constructor
 	* @access	public
 	*/
-	function ilPCProfileGUI(&$a_pg_obj, &$a_content_obj, $a_hier_id, $a_pc_id = "")
+	function __construct(&$a_pg_obj, &$a_content_obj, $a_hier_id, $a_pc_id = "")
 	{
-		parent::ilPageContentGUI($a_pg_obj, $a_content_obj, $a_hier_id, $a_pc_id);
+		parent::__construct($a_pg_obj, $a_content_obj, $a_hier_id, $a_pc_id);
 	}
 
 	/**
 	* execute command
 	*/
-	function &executeCommand()
+	function executeCommand()
 	{
 		// get next class that processes or forwards current command
 		$next_class = $this->ctrl->getNextClass($this);
@@ -60,7 +60,7 @@ class ilPCProfileGUI extends ilPageContentGUI
 		switch($next_class)
 		{
 			default:
-				$ret =& $this->$cmd();
+				$ret = $this->$cmd();
 				break;
 		}
 
@@ -171,16 +171,6 @@ class ilPCProfileGUI extends ilPageContentGUI
 			}
 		}
 
-		// always has to be set
-		$im_arr = array("icq","yahoo","msn","aim","skype","jabber","voip");
-		foreach ($im_arr as $im)
-		{
-			if(!isset($prefs["public_im_".$im]))
-			{
-				$prefs["public_im_".$im] = "n";
-			}
-		}
-			
 		include_once "Services/User/classes/class.ilPersonalProfileGUI.php";
 		$profile = new ilPersonalProfileGUI();
 		$profile->showPublicProfileFields($form, $prefs, $mode_manual, $is_template);

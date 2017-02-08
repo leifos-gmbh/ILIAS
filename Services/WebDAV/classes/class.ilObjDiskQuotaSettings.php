@@ -65,11 +65,11 @@ class ilObjDiskQuotaSettings extends ilObject
 	* @param	integer	reference_id or object_id
 	* @param	boolean	treat the id as reference_id (true) or object_id (false)
 	*/
-	public function ilObjDiskQuotaSettings($a_id = 0,$a_call_by_reference = true)
+	public function __construct($a_id = 0,$a_call_by_reference = true)
 	{
 		// NOTE: We share the facs object with ilObjFileAccessSettings!
 		$this->type = "facs";
-		$this->ilObject($a_id,$a_call_by_reference);
+		parent::__construct($a_id,$a_call_by_reference);
 	}
 	
 	/**
@@ -79,7 +79,8 @@ class ilObjDiskQuotaSettings extends ilObject
 	 */
 	public static function getInstance()
 	{
-		global $ilDB;
+		global $DIC;
+		$ilDB = $DIC['ilDB'];
 		
 		$query = "SELECT object_reference.ref_id FROM object_reference,tree,object_data ".
 			"WHERE tree.parent = ".$ilDB->quote(SYSTEM_FOLDER_ID,'integer')." ".
@@ -87,7 +88,7 @@ class ilObjDiskQuotaSettings extends ilObject
 			"AND object_reference.ref_id = tree.child ".
 			"AND object_reference.obj_id = object_data.obj_id";
 		$res = $ilDB->query($query);
-		$row = $res->fetchRow(DB_FETCHMODE_ASSOC);
+		$row = $res->fetchRow(ilDBConstants::FETCHMODE_ASSOC);
 		$ref_id = $row["ref_id"];		
 		if($ref_id)
 		{
@@ -171,12 +172,11 @@ class ilObjDiskQuotaSettings extends ilObject
 		$settings->set('wsp_enabled', $this->personalWorkspaceDiskQuotaEnabled);
 	}
 	/**
-	* read object data from db into object
-	* @param	boolean
-	*/
-	public function read($a_force_db = false)
+	 * read object data from db into object
+	 */
+	public function read()
 	{
-		parent::read($a_force_db);
+		parent::read();
 
 		$settings = new ilSetting('disk_quota');
 		$this->diskQuotaEnabled = $settings->get('enabled') == true;
@@ -196,14 +196,15 @@ class ilObjDiskQuotaSettings extends ilObject
 	 * @param string $a_lang language code
 	 * @return array{} Associative array with mail templates.
 	 */
-	function _lookupReminderMailTemplate($a_lang)
+	public static function _lookupReminderMailTemplate($a_lang)
 	{
-		global $ilDB;
+		global $DIC;
+		$ilDB = $DIC['ilDB'];
 
 		$set = $ilDB->query("SELECT * FROM mail_template ".
 			" WHERE type='dqta' AND lang = ".$ilDB->quote($a_lang,'text'));
 
-		if ($rec = $set->fetchRow(DB_FETCHMODE_ASSOC))
+		if ($rec = $set->fetchRow(ilDBConstants::FETCHMODE_ASSOC))
 		{
 			return $rec;
 		}
@@ -212,7 +213,8 @@ class ilObjDiskQuotaSettings extends ilObject
 
 	function _writeReminderMailTemplate($a_lang, $a_subject, $a_sal_g, $a_sal_f, $a_sal_m, $a_body)
 	{
-		global $ilDB;
+		global $DIC;
+		$ilDB = $DIC['ilDB'];
 
 		if(self::_lookupReminderMailTemplate($a_lang))
 		{

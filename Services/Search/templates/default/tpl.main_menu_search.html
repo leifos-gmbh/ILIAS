@@ -33,7 +33,7 @@
 							{
 								// we must bind the blur event before the autocomplete
 								// item is added
-								$("#main_menu_search").bind("blur", function(e) {
+								$("#main_menu_search").on("blur", function(e) {
 									// prevent that the autocomplete list disappears when blur occurs
 									e.stopImmediatePropagation();
 								});
@@ -59,21 +59,6 @@
 								});
 								*/
 								// uzk-patch: end
-								/*$("#main_menu_search").bind("focusin click", function(e) {
-									il.Overlay.show(e, "mm_search_menu", "main_menu_search",
-											false, 'tl', 'bl');
-								});*/
-
-								/*$(".ilMainMenuSearch img").bind("click", function(e) {
-									if ($("#main_menu_search").val().length < 1 && e.type != "focusout")
-									{
-										location.href = $("#mm_search_menu a").first().attr('href');
-									}
-									else
-									{
-										$("#mm_search_form").submit();
-									}
-								});*/
 
 								$("#ilMMSearchMenu input[type='radio']").change(function(){
 									$("#main_menu_search").focus();

@@ -27,12 +27,10 @@ class ilStructureObjectGUI extends ilLMObjectGUI
 	* Constructor
 	* @access	public
 	*/
-	function ilStructureObjectGUI(&$a_content_obj, &$a_tree)
+	function __construct(&$a_content_obj, &$a_tree)
 	{
-		global $ilias, $tpl, $lng;
-
-		parent::ilLMObjectGUI($a_content_obj);
-		$this->tree =& $a_tree;
+		parent::__construct($a_content_obj);
+		$this->tree = $a_tree;
 	}
 
 	/**
@@ -42,7 +40,7 @@ class ilStructureObjectGUI extends ilLMObjectGUI
 	*/
 	function setStructureObject(&$a_st_object)
 	{
-		$this->obj =& $a_st_object;
+		$this->obj = $a_st_object;
 	}
 	
 	
@@ -57,7 +55,7 @@ class ilStructureObjectGUI extends ilLMObjectGUI
 	/**
 	* execute command
 	*/
-	function &executeCommand()
+	function executeCommand()
 	{		
 //echo "<br>:cmd:".$this->ctrl->getCmd().":cmdClass:".$this->ctrl->getCmdClass().":";
 		$next_class = $this->ctrl->getNextClass($this);
@@ -91,17 +89,17 @@ class ilStructureObjectGUI extends ilLMObjectGUI
 				{
 					$this->setTabs();
 					$this->initConditionHandlerInterface();
-					$ret =& $this->condHI->executeCommand();
+					$this->condHI->executeCommand();
 				}
 				elseif(($cmd == "create") && ($_POST["new_type"] == "pg"))
 				{
 					$this->setTabs();
-					$pg_gui =& new ilLMPageObjectGUI($this->content_object);
-					$ret =& $pg_gui->executeCommand();
+					$pg_gui = new ilLMPageObjectGUI($this->content_object);
+					$pg_gui->executeCommand();
 				}
 				else
 				{
-					$ret =& $this->$cmd();
+					$this->$cmd();
 				}
 				break;
 		}
@@ -165,9 +163,7 @@ class ilStructureObjectGUI extends ilLMObjectGUI
 		$form_gui->setDragIcon(ilUtil::getImagePath("icon_pg.svg"));
 		$form_gui->addCommand($lng->txt("cont_save_all_titles"), "saveAllTitles");
 		$form_gui->addHelpItem($lng->txt("cont_chapters_after_pages"));
-		$up_gui = ($this->content_object->getType() == "dbk")
-			? "ilobjdlbookgui"
-			: "ilobjlearningmodulegui";
+		$up_gui = "ilobjlearningmodulegui";
 		$ilCtrl->setParameterByClass($up_gui, "active_node", $this->obj->getId());
 		$ilCtrl->setParameterByClass($up_gui, "active_node", "");
 
@@ -316,7 +312,7 @@ class ilStructureObjectGUI extends ilLMObjectGUI
 
 			// title
 			$this->tpl->setVariable("TEXT_CONTENT",
-				ilStructureObject::_getPresentationTitle($child["obj_id"],
+				ilStructureObject::_getPresentationTitle($child["obj_id"], IL_CHAPTER_TITLE,
 					$this->content_object->isActiveNumbering()));
 
 			$this->tpl->parseCurrentBlock();
@@ -391,7 +387,7 @@ class ilStructureObjectGUI extends ilLMObjectGUI
 	function save()
 	{
 
-		$this->obj =& new ilStructureObject($this->content_object);
+		$this->obj = new ilStructureObject($this->content_object);
 
 		$this->obj->setType("st");
 		$this->obj->setTitle(ilUtil::stripSlashes($_POST["Fobject"]["title"]));
@@ -431,7 +427,7 @@ class ilStructureObjectGUI extends ilLMObjectGUI
 				? $_GET["obj_id"]
 				: $tree->getRootId();
 			// determine last child of type pg
-			$childs =& $tree->getChildsByType($parent_id, "pg");
+			$childs = $tree->getChildsByType($parent_id, "pg");
 			if (count($childs) != 0)
 			{
 				$_GET["target"] = $childs[count($childs) - 1]["obj_id"];
@@ -571,7 +567,7 @@ class ilStructureObjectGUI extends ilLMObjectGUI
 	{
 		include_once("./Services/AccessControl/classes/class.ilConditionHandlerGUI.php");
 
-		$this->condHI =& new ilConditionHandlerGUI($this);
+		$this->condHI = new ilConditionHandlerGUI($this);
 		$this->condHI->setBackButtons(array());
 		$this->condHI->setAutomaticValidation(false);
 		$this->condHI->setTargetType("st");

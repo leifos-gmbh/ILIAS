@@ -74,16 +74,10 @@ class SurveyMetricQuestion extends SurveyQuestion
 * @param integer $owner A numerical ID to identify the owner/creator
 * @access public
 */
-	function SurveyMetricQuestion(
-		$title = "",
-		$description = "",
-		$author = "",
-		$questiontext = "",
-		$owner = -1,
-		$subtype = self::SUBTYPE_NON_RATIO
-	)
+	function __construct($title = "", $description = "", $author = "", $questiontext = "",	$owner = -1, $subtype = self::SUBTYPE_NON_RATIO)
 	{
-		$this->SurveyQuestion($title, $description, $author, $questiontext, $owner);
+		parent::__construct($title, $description, $author, $questiontext, $owner);
+		
 		$this->subtype = $subtype;
 		$this->minimum = "";
 		$this->maximum = "";
@@ -188,7 +182,7 @@ class SurveyMetricQuestion extends SurveyQuestion
 	* @return array Array containing the question fields and data from the database
 	* @access public
 	*/
-	function _getQuestionDataArray($id)
+	function getQuestionDataArray($id)
 	{
 		global $ilDB;
 		
@@ -354,10 +348,9 @@ class SurveyMetricQuestion extends SurveyQuestion
 	*
 	* @param object $a_xml_writer The XMLWriter object
 	* @param boolean $a_include_header Determines wheather or not the XML should be used
-	* @param string $obligatory_state The value of the obligatory state
 	* @access public
 	*/
-	function insertXML(&$a_xml_writer, $a_include_header = TRUE, $obligatory_state = "")
+	function insertXML(&$a_xml_writer, $a_include_header = TRUE)
 	{
 		$attrs = array(
 			"id" => $this->getId(),
@@ -556,23 +549,6 @@ class SurveyMetricQuestion extends SurveyQuestion
 		return "";
 	}
 	
-	/**
-	* Saves random answers for a given active user in the database
-	*
-	* @param integer $active_id The database ID of the active user
-	*/
-	public function saveRandomData($active_id)
-	{
-		global $ilDB;
-		// single response
-		$number = rand($this->getMinimum(), (strlen($this->getMaximum())) ? $this->getMaximum() : 100);
-		$next_id = $ilDB->nextId('svy_answer');
-		$affectedRows = $ilDB->manipulateF("INSERT INTO svy_answer (answer_id, question_fi, active_fi, value, textanswer, tstamp) VALUES (%s, %s, %s, %s, %s, %s)",
-			array('integer','integer','integer','float','text','integer'),
-			array($next_id, $this->getId(), $active_id, $number, NULL, time())
-		);
-	}
-
 	function saveUserInput($post_data, $active_id, $a_return = false)
 	{
 		global $ilDB;
@@ -593,244 +569,6 @@ class SurveyMetricQuestion extends SurveyQuestion
 			array('integer','integer','integer','float','text','integer'),
 			array($next_id, $this->getId(), $active_id, (strlen($entered_value)) ? $entered_value : NULL, NULL, time())
 		);
-	}
-	
-	function &getCumulatedResults($survey_id, $nr_of_users, $finished_ids)
-	{
-		global $ilDB;
-		
-		$question_id = $this->getId();
-		
-		$result_array = array();
-		$cumulated = array();
-
-		$sql = "SELECT svy_answer.* FROM svy_answer".
-			" JOIN svy_finished ON (svy_finished.finished_id = svy_answer.active_fi)".
-			" WHERE svy_answer.question_fi = ".$ilDB->quote($question_id, "integer").
-			" AND svy_finished.survey_fi = ".$ilDB->quote($survey_id, "integer");		
-		if($finished_ids)
-		{
-			$sql .= " AND ".$ilDB->in("svy_finished.finished_id", $finished_ids, "", "integer");
-		}
-
-		$result = $ilDB->query($sql);		
-		while ($row = $ilDB->fetchAssoc($result))
-		{
-			$cumulated[$row["value"]]++;
-		}
-		asort($cumulated, SORT_NUMERIC);
-		end($cumulated);
-		$numrows = $result->numRows();
-		$result_array["USERS_ANSWERED"] = $result->numRows();
-		$result_array["USERS_SKIPPED"] = $nr_of_users - $result->numRows();
-		if(sizeof($cumulated))
-		{
-			$result_array["MODE"] = key($cumulated);
-			$result_array["MODE_VALUE"] = key($cumulated);
-			$result_array["MODE_NR_OF_SELECTIONS"] = $cumulated[key($cumulated)];
-			ksort($cumulated, SORT_NUMERIC);
-		}
-		$counter = 0;
-		foreach ($cumulated as $value => $nr_of_users)
-		{
-			$percentage = 0;
-			if ($numrows > 0)
-			{
-				$percentage = (float)($nr_of_users/$numrows);
-			}
-			$result_array["values"][$counter++] = array("value" => $value, "selected" => (int)$nr_of_users, "percentage" => $percentage);
-		}
-		$median = array();
-		$total = 0;
-		$x_i = 0;
-		$p_i = 1;
-		$x_i_inv = 0;
-		$sum_part_zero = false;
-		foreach ($cumulated as $value => $key)
-		{
-			$total += $key;
-			for ($i = 0; $i < $key; $i++)
-			{
-				array_push($median, $value);
-				$x_i += $value;
-				$p_i *= $value;
-				if ($value != 0)
-				{
-					$sum_part_zero = true;
-					$x_i_inv += 1/$value;
-				}
-			}
-		}
-		if ($total > 0)
-		{
-			if (($total % 2) == 0)
-			{
-				$median_value = 0.5 * ($median[($total/2)-1] + $median[($total/2)]);
-			}
-			else
-			{
-				$median_value = $median[(($total+1)/2)-1];
-			}
-		}
-		else
-		{
-			$median_value = "";
-		}
-		if ($total > 0)
-		{
-			if (($x_i/$total) == (int)($x_i/$total))
-			{
-				$result_array["ARITHMETIC_MEAN"] = $x_i/$total;
-			}
-			else
-			{
-				$result_array["ARITHMETIC_MEAN"] = sprintf("%.2f", $x_i/$total);
-			}
-		}
-		else
-		{
-			$result_array["ARITHMETIC_MEAN"] = "";
-		}
-		$result_array["MEDIAN"] = $median_value;
-		$result_array["QUESTION_TYPE"] = "SurveyMetricQuestion";
-		return $result_array;
-	}
-	
-	/**
-	* Creates an Excel worksheet for the detailed cumulated results of this question
-	*
-	* @param object $workbook Reference to the parent excel workbook
-	* @param object $format_title Excel title format
-	* @param object $format_bold Excel bold format
-	* @param array $eval_data Cumulated evaluation data
-	* @access public
-	*/
-	function setExportDetailsXLS(&$workbook, &$format_title, &$format_bold, &$eval_data, $export_label)
-	{
-		include_once ("./Services/Excel/classes/class.ilExcelUtils.php");
-		$worksheet =& $workbook->addWorksheet();
-		$rowcounter = 0;
-		switch ($export_label)
-		{
-			case 'label_only':
-				$worksheet->writeString(0, 0, ilExcelUtils::_convert_text($this->lng->txt("label")), $format_bold);
-				$worksheet->writeString(0, 1, ilExcelUtils::_convert_text($this->label));
-				break;
-			case 'title_only':
-				$worksheet->writeString(0, 0, ilExcelUtils::_convert_text($this->lng->txt("title")), $format_bold);
-				$worksheet->writeString(0, 1, ilExcelUtils::_convert_text($this->getTitle()));
-				break;
-			default:
-				$worksheet->writeString(0, 0, ilExcelUtils::_convert_text($this->lng->txt("title")), $format_bold);
-				$worksheet->writeString(0, 1, ilExcelUtils::_convert_text($this->getTitle()));
-				$rowcounter++;
-				$worksheet->writeString($rowcounter, 0, ilExcelUtils::_convert_text($this->lng->txt("label")), $format_bold);
-				$worksheet->writeString($rowcounter, 1, ilExcelUtils::_convert_text($this->label));
-				break;
-		}
-		$rowcounter++;
-		$worksheet->writeString($rowcounter, 0, ilExcelUtils::_convert_text($this->lng->txt("question")), $format_bold);
-		$worksheet->writeString($rowcounter, 1, ilExcelUtils::_convert_text($this->getQuestiontext()));
-		$rowcounter++;
-		$worksheet->writeString($rowcounter, 0, ilExcelUtils::_convert_text($this->lng->txt("question_type")), $format_bold);
-		$worksheet->writeString($rowcounter, 1, ilExcelUtils::_convert_text($this->lng->txt($this->getQuestionType())));
-		$rowcounter++;
-		$worksheet->writeString($rowcounter, 0, ilExcelUtils::_convert_text($this->lng->txt("users_answered")), $format_bold);
-		$worksheet->write($rowcounter, 1, $eval_data["USERS_ANSWERED"]);
-		$rowcounter++;
-		$worksheet->writeString($rowcounter, 0, ilExcelUtils::_convert_text($this->lng->txt("users_skipped")), $format_bold);
-		$worksheet->write($rowcounter, 1, $eval_data["USERS_SKIPPED"]);
-		$rowcounter++;
-
-		$worksheet->write($rowcounter, 0, $this->lng->txt("subtype"), $format_bold);
-		switch ($this->getSubtype())
-		{
-			case self::SUBTYPE_NON_RATIO:
-				$worksheet->write($rowcounter++, 1, ilExcelUtils::_convert_text($this->lng->txt("non_ratio")), $format_bold);
-				break;
-			case self::SUBTYPE_RATIO_NON_ABSOLUTE:
-				$worksheet->write($rowcounter++, 1, ilExcelUtils::_convert_text($this->lng->txt("ratio_non_absolute")), $format_bold);
-				break;
-			case self::SUBTYPE_RATIO_ABSOLUTE:
-				$worksheet->write($rowcounter++, 1, ilExcelUtils::_convert_text($this->lng->txt("ratio_absolute")), $format_bold);
-				break;
-		}
-		$worksheet->write($rowcounter, 0, ilExcelUtils::_convert_text($this->lng->txt("mode")), $format_bold);
-		$worksheet->write($rowcounter++, 1, ilExcelUtils::_convert_text($eval_data["MODE"]));
-		$worksheet->write($rowcounter, 0, ilExcelUtils::_convert_text($this->lng->txt("mode_text")), $format_bold);
-		$worksheet->write($rowcounter++, 1, ilExcelUtils::_convert_text($eval_data["MODE"]));
-		$worksheet->write($rowcounter, 0, ilExcelUtils::_convert_text($this->lng->txt("mode_nr_of_selections")), $format_bold);
-		$worksheet->write($rowcounter++, 1, ilExcelUtils::_convert_text($eval_data["MODE_NR_OF_SELECTIONS"]));
-		$worksheet->write($rowcounter, 0, ilExcelUtils::_convert_text($this->lng->txt("median")), $format_bold);
-		$worksheet->write($rowcounter++, 1, ilExcelUtils::_convert_text($eval_data["MEDIAN"]));
-		$worksheet->write($rowcounter, 0, ilExcelUtils::_convert_text($this->lng->txt("arithmetic_mean")), $format_bold);
-		$worksheet->write($rowcounter++, 1, ilExcelUtils::_convert_text($eval_data["ARITHMETIC_MEAN"]));
-		$worksheet->write($rowcounter, 0, ilExcelUtils::_convert_text($this->lng->txt("values")), $format_bold);
-		$worksheet->write($rowcounter, 1, ilExcelUtils::_convert_text($this->lng->txt("value")), $format_title);
-		$worksheet->write($rowcounter, 2, ilExcelUtils::_convert_text($this->lng->txt("category_nr_selected")), $format_title);
-		$worksheet->write($rowcounter++, 3, ilExcelUtils::_convert_text($this->lng->txt("svy_fraction_of_selections")), $format_title);
-		$values = "";
-		if (is_array($eval_data["values"]))
-		{
-			foreach ($eval_data["values"] as $key => $value)
-			{
-				$worksheet->write($rowcounter, 1, ilExcelUtils::_convert_text($value["value"]));
-				$worksheet->write($rowcounter, 2, ilExcelUtils::_convert_text($value["selected"]));
-				$worksheet->write($rowcounter++, 3, ilExcelUtils::_convert_text($value["percentage"]), $format_percent);
-			}
-		}
-	}
-
-	/**
-	* Adds the values for the user specific results export for a given user
-	*
-	* @param array $a_array An array which is used to append the values
-	* @param array $resultset The evaluation data for a given user
-	* @access public
-	*/
-	function addUserSpecificResultsData(&$a_array, &$resultset)
-	{
-		if (count($resultset["answers"][$this->getId()]))
-		{
-			foreach ($resultset["answers"][$this->getId()] as $key => $answer)
-			{
-				array_push($a_array, $answer["value"]);
-			}
-		}
-		else
-		{
-			array_push($a_array, $this->getSkippedValue());
-		}
-	}
-	
-	/**
-	* Returns an array containing all answers to this question in a given survey
-	*
-	* @param integer $survey_id The database ID of the survey
-	* @return array An array containing the answers to the question. The keys are either the user id or the anonymous id
-	* @access public
-	*/
-	function &getUserAnswers($survey_id, $finished_ids)
-	{
-		global $ilDB;
-		
-		$answers = array();
-		
-		$sql = "SELECT svy_answer.* FROM svy_answer".
-			" JOIN svy_finished ON (svy_finished.finished_id = svy_answer.active_fi)".
-			" WHERE svy_answer.question_fi = ".$ilDB->quote($this->getId(), "integer").
-			" AND svy_finished.survey_fi = ".$ilDB->quote($survey_id, "integer");		
-		if($finished_ids)
-		{
-			$sql .= " AND ".$ilDB->in("svy_finished.finished_id", $finished_ids, "", "integer");
-		}
-		
-		$result = $ilDB->query($sql);		
-		while ($row = $ilDB->fetchAssoc($result))
-		{
-			$answers[$row["active_fi"]] = $row["value"];
-		}
-		return $answers;
 	}
 
 	/**

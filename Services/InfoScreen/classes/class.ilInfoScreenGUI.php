@@ -39,15 +39,15 @@ class ilInfoScreenGUI
 	* @param	object	$a_gui_object	GUI instance of related object
 	* 									(ilCouseGUI, ilTestGUI, ...)
 	*/
-	function ilInfoScreenGUI($a_gui_object)
+	function __construct($a_gui_object)
 	{
 		global $ilias, $ilCtrl, $lng,$ilTabs;
 
-		$this->ilias =& $ilias;
-		$this->ctrl =& $ilCtrl;
-		$this->lng =& $lng;
-		$this->tabs_gui =& $ilTabs;
-		$this->gui_object =& $a_gui_object;
+		$this->ilias = $ilias;
+		$this->ctrl = $ilCtrl;
+		$this->lng = $lng;
+		$this->tabs_gui = $ilTabs;
+		$this->gui_object = $a_gui_object;
 		$this->sec_nr = 0;
 		$this->private_notes_enabled = false;
 		$this->news_enabled = false;
@@ -61,13 +61,10 @@ class ilInfoScreenGUI
 	/**
 	* execute command
 	*/
-	function &executeCommand()
+	function executeCommand()
 	{
 		global $rbacsystem, $tpl, $ilAccess;
-
-		// load additional language modules
-		$this->lng->loadLanguageModule("barometer");
-
+		
 		$next_class = $this->ctrl->getNextClass($this);
 
 		$cmd = $this->ctrl->getCmd("showSummary");
@@ -386,7 +383,7 @@ class ilInfoScreenGUI
 		{
 			if($seconds = $educational->getTypicalLearningTimeSeconds())
 			{
-				$learning_time = ilFormat::_secondsToString($seconds);
+				$learning_time = ilDatePresentation::secondsToString($seconds);
 			}
 		}
 
@@ -448,9 +445,6 @@ class ilInfoScreenGUI
 			
 			if($ref_id)
 			{
-				include_once('./Services/Link/classes/class.ilLink.php');
-				$href = ilLink::_getStaticLink($ref_id,$type,true);
-
 				include_once 'Services/WebServices/ECS/classes/class.ilECSServerSettings.php';
 				if(ilECSServerSettings::getInstance()->activeServerExists())
 				{
@@ -469,10 +463,6 @@ class ilInfoScreenGUI
 					);
 			
 				// bookmarks
-
-				$title = $ilObjDataCache->lookupTitle($a_obj->getId());
-
-				$bms = ilPermanentLinkGUI::_getBookmarksSelectionList($title, $href);
 
 				// links to resource
 				if ($ilAccess->checkAccess("write", "", $ref_id) ||
@@ -550,7 +540,7 @@ class ilInfoScreenGUI
 		{
 				$size = $a_obj->getDiskUsage();
 				if ($size !== null) {
-					$this->addProperty($lng->txt("disk_usage"),ilFormat::formatSize($size,'long'));
+					$this->addProperty($lng->txt("disk_usage"),ilUtil::formatSize($size,'long'));
 				}
 		}
 		// change event
@@ -597,12 +587,13 @@ class ilInfoScreenGUI
 		// END ChangeEvent: Display change event info
 
 		// BEGIN WebDAV: Display locking information
-		require_once('Services/WebDAV/classes/class.ilDAVServer.php');
-		if (ilDAVServer::_isActive())
+		require_once ('Services/WebDAV/classes/class.ilDAVActivationChecker.php');
+		if (ilDAVActivationChecker::_isActive())
 		{
 			global $ilias, $ilUser;
 			if ($ilUser->getId() != ANONYMOUS_USER_ID)
 			{
+				require_once 'Services/WebDAV/classes/class.ilDAVServer.php';
 				$davLocks = new ilDAVLocks();
 
 				// Show lock info
@@ -1007,7 +998,7 @@ class ilInfoScreenGUI
 				// tags of all users
 				$a_tpl->setCurrentBlock("pv");
 				$a_tpl->setVariable("TXT_PROPERTY_VALUE",
-					ilFormat::_secondsToString($progress['spent_seconds']));
+					ilDatePresentation::secondsToString($progress['spent_seconds']));
 				$a_tpl->parseCurrentBlock();
 				$a_tpl->setCurrentBlock("property_row");
 				$a_tpl->setVariable("TXT_PROPERTY", $this->lng->txt('trac_spent_time'));

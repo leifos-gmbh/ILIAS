@@ -49,16 +49,11 @@ class ilBuddySystemGUI
 	 */
 	public function __construct()
 	{
-		/**
-		 * @var $ilCtrl ilCtrl
-		 * @var $ilUser ilObjUser
-		 * @var $lng    ilLanguage
-		 */
-		global $ilCtrl, $ilUser, $lng;
+		global $DIC;
 
-		$this->ctrl = $ilCtrl;
-		$this->user = $ilUser;
-		$this->lng  = $lng;
+		$this->ctrl = $DIC['ilCtrl'];
+		$this->user = $DIC['ilUser'];
+		$this->lng  = $DIC['lng'];
 
 		require_once 'Services/Contact/BuddySystem/classes/class.ilBuddyList.php';
 		require_once 'Services/Contact/BuddySystem/classes/states/class.ilBuddySystemRelationStateFactory.php';
@@ -73,31 +68,26 @@ class ilBuddySystemGUI
 	 */
 	public static function initializeFrontend()
 	{
-		/**
-		 * @var $tpl    ilTemplate
-		 * @var $ilCtrl ilCtrl
-		 * @var $lng    ilLanguage
-		 */
-		global $tpl, $ilCtrl, $lng;
+		global $DIC;
 
 		if(!self::$frontend_initialized)
 		{
-			$lng->loadLanguageModule('buddysystem');
+			$DIC->language()->loadLanguageModule('buddysystem');
 
 			require_once 'Services/JSON/classes/class.ilJsonUtil.php';
 
-			$tpl->addJavascript('./Services/Contact/BuddySystem/js/buddy_system.js');
+			$DIC['tpl']->addJavascript('./Services/Contact/BuddySystem/js/buddy_system.js');
 
 			$config = new stdClass();
-			$config->http_post_url        = $ilCtrl->getFormActionByClass(array('ilUIPluginRouterGUI', 'ilBuddySystemGUI'), '', '', true, false);
-			$config->transition_state_cmd = 'transition';
-			$tpl->addOnLoadCode("il.BuddySystem.setConfig(".ilJsonUtil::encode($config).");");
+			$config->http_post_url        = $DIC->ctrl()->getFormActionByClass(array('ilUIPluginRouterGUI', 'ilBuddySystemGUI'), '', '', true, false);
+			$config->transition_state_cmd = 'transitionAsync';
+			$DIC['tpl']->addOnLoadCode("il.BuddySystem.setConfig(".ilJsonUtil::encode($config).");");
 
 			$btn_config = new stdClass();
 			$btn_config->bnt_class = 'ilBuddySystemLinkWidget';
 
-			$tpl->addOnLoadCode("il.BuddySystemButton.setConfig(".ilJsonUtil::encode($btn_config).");");
-			$tpl->addOnLoadCode("il.BuddySystemButton.init();");
+			$DIC['tpl']->addOnLoadCode("il.BuddySystemButton.setConfig(".ilJsonUtil::encode($btn_config).");");
+			$DIC['tpl']->addOnLoadCode("il.BuddySystemButton.init();");
 
 			self::$frontend_initialized = true;
 		}
@@ -150,6 +140,37 @@ class ilBuddySystemGUI
 	 */
 	private function requestCommand()
 	{
+		$this->transitionCommand('request', 'buddy_relation_requested', function(ilBuddySystemRelation $relation) {
+			if($relation->isUnlinked() && !ilUtil::yn2tf(ilObjUser::_lookupPref($relation->getBuddyUserId(), 'bs_allow_to_contact_me')))
+			{
+				throw new ilException("The requested user does not want to get contact requests");
+			}
+		});
+	}
+
+	/**
+	 * 
+	 */
+	private function ignoreCommand()
+	{
+		$this->transitionCommand('ignore', 'buddy_request_ignored');
+	}
+
+	/**
+	 * 
+	 */
+	private function linkCommand()
+	{
+		$this->transitionCommand('link', 'buddy_request_approved');
+	}
+
+	/**
+	 * @param string $cmd
+	 * @param string $positive_feedback_lng_id
+	 * @param callable|null $onBeforeExecute
+	 */
+	private function transitionCommand($cmd, $positive_feedback_lng_id, callable $onBeforeExecute = null)
+	{
 		if(!$this->isRequestParameterGiven('user_id', self::BS_REQUEST_HTTP_GET))
 		{
 			ilUtil::sendInfo($this->lng->txt('buddy_bs_action_not_possible'), true);
@@ -161,78 +182,20 @@ class ilBuddySystemGUI
 			require_once 'Services/Contact/BuddySystem/classes/class.ilBuddyList.php';
 			$relation = ilBuddyList::getInstanceByGlobalUser()->getRelationByUserId((int)$_GET['user_id']);
 
-			// The ILIAS JF decided to add a new personal setting
-			if($relation->isUnlinked() && !ilUtil::yn2tf(ilObjUser::_lookupPref($relation->getBuddyUserId(), 'bs_allow_to_contact_me')))
+			if(null !== $onBeforeExecute)
 			{
-				throw new ilException("The requested user does not want to get contact requests");
+				$onBeforeExecute();
 			}
 
-			ilBuddyList::getInstanceByGlobalUser()->request($relation);
-			ilUtil::sendSuccess($this->lng->txt('buddy_relation_requested'), true);
+			ilBuddyList::getInstanceByGlobalUser()->$cmd($relation);
+			ilUtil::sendSuccess($this->lng->txt($positive_feedback_lng_id), true);
+
 		}
 		catch(ilBuddySystemRelationStateAlreadyGivenException $e)
 		{
 			ilUtil::sendInfo(sprintf($this->lng->txt($e->getMessage()), ilObjUser::_lookupLogin((int)$_GET['user_id'])), true);
 		}
-		catch(ilException $e)
-		{
-			ilUtil::sendInfo($this->lng->txt('buddy_bs_action_not_possible'), true);
-		}
-
-		$this->ctrl->returnToParent($this);
-	}
-
-	/**
-	 * 
-	 */
-	private function ignoreCommand()
-	{
-		if(!$this->isRequestParameterGiven('user_id', self::BS_REQUEST_HTTP_GET))
-		{
-			ilUtil::sendInfo($this->lng->txt('buddy_bs_action_not_possible'), true);
-			$this->ctrl->returnToParent($this);
-		}
-
-		try
-		{
-			require_once 'Services/Contact/BuddySystem/classes/class.ilBuddyList.php';
-			ilBuddyList::getInstanceByGlobalUser()->ignore(
-				ilBuddyList::getInstanceByGlobalUser()->getRelationByUserId((int)$_GET['user_id'])
-			);
-			ilUtil::sendSuccess($this->lng->txt('buddy_request_ignored'), true);
-		}
-		catch(ilBuddySystemRelationStateAlreadyGivenException $e)
-		{
-			ilUtil::sendInfo(sprintf($this->lng->txt($e->getMessage()), ilObjUser::_lookupLogin((int)$_GET['user_id'])), true);
-		}
-		catch(ilException $e)
-		{
-			ilUtil::sendInfo($this->lng->txt('buddy_bs_action_not_possible'), true);
-		}
-
-		$this->ctrl->returnToParent($this);
-	}
-
-	/**
-	 * 
-	 */
-	private function linkCommand()
-	{
-		if(!$this->isRequestParameterGiven('user_id', self::BS_REQUEST_HTTP_GET))
-		{
-			ilUtil::sendInfo($this->lng->txt('buddy_bs_action_not_possible'), true);
-			$this->ctrl->returnToParent($this);
-		}
-
-		try
-		{
-			require_once 'Services/Contact/BuddySystem/classes/class.ilBuddyList.php';
-			ilBuddyList::getInstanceByGlobalUser()->link(
-				ilBuddyList::getInstanceByGlobalUser()->getRelationByUserId((int)$_GET['user_id'])
-			);
-			ilUtil::sendSuccess($this->lng->txt('buddy_request_approved'), true);
-		}
-		catch(ilBuddySystemRelationStateAlreadyGivenException $e)
+		catch(ilBuddySystemRelationStateTransitionException $e)
 		{
 			ilUtil::sendInfo(sprintf($this->lng->txt($e->getMessage()), ilObjUser::_lookupLogin((int)$_GET['user_id'])), true);
 		}
@@ -247,13 +210,8 @@ class ilBuddySystemGUI
 	/**
 	 * Performs a state transition based on the request action
 	 */
-	private function transitionCommand()
+	private function transitionAsyncCommand()
 	{
-		/**
-		 * @var $lng ilLanguage
-		 */
-		global $lng;
-
 		if(!$this->ctrl->isAsynch())
 		{
 			throw new RuntimeException('This action only supports AJAX http requests');
@@ -275,7 +233,7 @@ class ilBuddySystemGUI
 		try
 		{
 			$usr_id = (int)$_POST['usr_id'];
-			$action = $_POST['action'];
+			$action = ilUtil::stripSlashes($_POST['action']);
 
 			if(ilObjUser::_isAnonymous($usr_id))
 			{
@@ -304,9 +262,13 @@ class ilBuddySystemGUI
 			{
 				$response->message = sprintf($this->lng->txt($e->getMessage()), ilObjUser::_lookupLogin((int)$usr_id));
 			}
+			catch(ilBuddySystemRelationStateTransitionException $e)
+			{
+				$response->message = sprintf($this->lng->txt($e->getMessage()), ilObjUser::_lookupLogin((int)$usr_id));
+			}
 			catch(Exception $e)
 			{
-				$response->message = $lng->txt('buddy_bs_action_not_possible');
+				$response->message = $this->lng->txt('buddy_bs_action_not_possible');
 			}
 
 			$response->state      = get_class($relation->getState());
@@ -314,10 +276,10 @@ class ilBuddySystemGUI
 		}
 		catch(Exception $e)
 		{
-			$response->message = $lng->txt('buddy_bs_action_not_possible');
+			$response->message = $this->lng->txt('buddy_bs_action_not_possible');
 		}
 
-		echo ilJsonUtil::encode($response);
+		echo json_encode($response);
 		exit();
 	}
 }

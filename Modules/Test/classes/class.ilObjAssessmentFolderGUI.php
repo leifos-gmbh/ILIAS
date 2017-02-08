@@ -23,12 +23,12 @@ class ilObjAssessmentFolderGUI extends ilObjectGUI
 	/**
 	 * Constructor
 	 */
-	public function ilObjAssessmentFolderGUI($a_data,$a_id,$a_call_by_reference)
+	public function __construct($a_data, $a_id = 0, $a_call_by_reference = true, $a_prepare_output = true)
 	{
 		global $rbacsystem;
 
 		$this->type = "assf";
-		$this->ilObjectGUI($a_data,$a_id,$a_call_by_reference,false);
+		parent::__construct($a_data,$a_id,$a_call_by_reference,false);
 
 		if (!$rbacsystem->checkAccess('read',$this->object->getRefId()))
 		{
@@ -38,7 +38,7 @@ class ilObjAssessmentFolderGUI extends ilObjectGUI
 		$this->lng->loadLanguageModule('assessment');
 	}
 	
-	public function &executeCommand()
+	public function executeCommand()
 	{
 		/**
 		 * @var $rbacsystem ilRbacSystem
@@ -55,7 +55,7 @@ class ilObjAssessmentFolderGUI extends ilObjectGUI
 			case 'ilpermissiongui':
                 $ilTabs->activateTab('perm_settings');
 				include_once("Services/AccessControl/classes/class.ilPermissionGUI.php");
-				$perm_gui =& new ilPermissionGUI($this);
+				$perm_gui = new ilPermissionGUI($this);
 				$ret =& $this->ctrl->forwardCommand($perm_gui);
 				break;
 
@@ -201,6 +201,11 @@ class ilObjAssessmentFolderGUI extends ilObjectGUI
 		$numRequiredAnswers->setValue($this->object->getSkillTriggeringNumAnswersBarrier());
 		$form->addItem($numRequiredAnswers);
 
+		$ceeqwh = new ilCheckboxInputGUI($this->lng->txt('export_essay_qst_with_html'), 'export_essay_qst_with_html');
+		$ceeqwh->setChecked($this->object->getExportEssayQuestionsWithHtml());
+		$ceeqwh->setInfo($this->lng->txt('export_essay_qst_with_html_desc'));
+		$form->addItem($ceeqwh);
+		
 		// question settings
 		$header = new ilFormSectionHeaderGUI();
 		$header->setTitle($this->lng->txt("assf_questiontypes"));
@@ -209,7 +214,7 @@ class ilObjAssessmentFolderGUI extends ilObjectGUI
 		// available question types
 		$allowed = new ilCheckboxGroupInputGUI($this->lng->txt('assf_allowed_questiontypes'), "chb_allowed_questiontypes");
 		$questiontypes =& ilObjQuestionPool::_getQuestionTypes(TRUE);
-		$forbidden_types = $this->object->_getForbiddenQuestionTypes();
+		$forbidden_types = ilObjAssessmentFolder::_getForbiddenQuestionTypes();
 		$allowedtypes = array();
 		foreach ($questiontypes as $qt)
 		{
@@ -225,7 +230,7 @@ class ilObjAssessmentFolderGUI extends ilObjectGUI
 
 		// manual scoring
 		$manual = new ilCheckboxGroupInputGUI($this->lng->txt('assessment_log_manual_scoring_activate'), "chb_manual_scoring");
-		$manscoring = $this->object->_getManualScoring();
+		$manscoring = ilObjAssessmentFolder::_getManualScoring();
 		$manual->setValue($manscoring);
 		foreach ($questiontypes as $type_name => $qtype)
 		{
@@ -275,7 +280,7 @@ class ilObjAssessmentFolderGUI extends ilObjectGUI
 		}
 		
 		$this->object->setSkillTriggeringNumAnswersBarrier((int)$_POST['num_req_answers']);
-
+		$this->object->setExportEssayQuestionsWithHtml((int) $_POST["export_essay_qst_with_html"] == 1);
 		$this->object->_setManualScoring($_POST["chb_manual_scoring"]);
 		include_once "./Modules/TestQuestionPool/classes/class.ilObjQuestionPool.php";
 		$questiontypes =& ilObjQuestionPool::_getQuestionTypes(TRUE);
@@ -327,10 +332,11 @@ class ilObjAssessmentFolderGUI extends ilObjectGUI
 	*/
 	public function showLogObject()
 	{
-		$from = mktime($_POST['log_from']['time']['h'], $_POST['log_from']['time']['m'], 0, $_POST['log_from']['date']['m'], $_POST['log_from']['date']['d'], $_POST['log_from']['date']['y']);
-		$until = mktime($_POST['log_until']['time']['h'], $_POST['log_until']['time']['m'], 0, $_POST['log_until']['date']['m'], $_POST['log_until']['date']['d'], $_POST['log_until']['date']['y']);
-		$test = $_POST['sel_test'];
-		$this->logsObject($from, $until, $test);
+		$form = $this->getLogDataOutputForm();
+		$form->checkInput();
+
+		$form->setValuesByPost();
+		$this->logsObject($form);
 	}
 	
 	/**
@@ -338,9 +344,17 @@ class ilObjAssessmentFolderGUI extends ilObjectGUI
 	*/
 	public function exportLogObject()
 	{
-		$from = mktime($_POST['log_from']['time']['h'], $_POST['log_from']['time']['m'], 0, $_POST['log_from']['date']['m'], $_POST['log_from']['date']['d'], $_POST['log_from']['date']['y']);
-		$until = mktime($_POST['log_until']['time']['h'], $_POST['log_until']['time']['m'], 0, $_POST['log_until']['date']['m'], $_POST['log_until']['date']['d'], $_POST['log_until']['date']['y']);
-		$test = $_POST['sel_test'];
+		$form = $this->getLogDataOutputForm();
+		if(!$form->checkInput())
+		{
+			$form->setValuesByPost();
+			$this->logsObject($form);
+			return;
+		}
+
+		$test  = $form->getInput('sel_test');
+		$from  = $form->getItemByPostVar('log_from')->getDate()->get(IL_CAL_UNIX);
+		$until = $form->getItemByPostVar('log_until')->getDate()->get(IL_CAL_UNIX);
 
 		$csv = array();
 		$separator = ";";
@@ -354,7 +368,7 @@ class ilObjAssessmentFolderGUI extends ilObjectGUI
 		include_once "./Modules/TestQuestionPool/classes/class.assQuestion.php";
 		$available_tests =& ilObjTest::_getAvailableTests(1);
 		array_push($csv, ilUtil::processCSVRow($row, TRUE, $separator));
-		$log_output =& $this->object->getLog($from, $until, $test);
+		$log_output = ilObjAssessmentFolder::getLog($from, $until, $test);
 		$users = array();
 		foreach ($log_output as $key => $log)
 		{
@@ -389,28 +403,13 @@ class ilObjAssessmentFolderGUI extends ilObjectGUI
 	}
 
 	/**
-	* display assessment folder logs form
-	*/
-	public function logsObject($p_from = null, $p_until = null, $p_test = null)
+	 * @return ilPropertyFormGUI
+	 */
+	protected function getLogDataOutputForm()
 	{
-                global $ilTabs;
-                $ilTabs->activateTab('logs');
-
-		$template = new ilTemplate("tpl.assessment_logs.html", TRUE, TRUE, "Modules/Test");
-
-		require_once "./Services/Link/classes/class.ilLink.php";
-		include_once "./Modules/Test/classes/class.ilObjTest.php";
-		include_once "./Modules/TestQuestionPool/classes/class.assQuestion.php";
-		
-		$available_tests =& ilObjTest::_getAvailableTests(1);
-		if (count($available_tests) == 0)
-		{
-			ilUtil::sendInfo($this->lng->txt('assessment_log_no_data'));
-			return;
-		}
-
-		include_once("./Services/Form/classes/class.ilPropertyFormGUI.php");
+		require_once 'Services/Form/classes/class.ilPropertyFormGUI.php';
 		$form = new ilPropertyFormGUI();
+		$form->setPreventDoubleSubmission(false);
 		$form->setFormAction($this->ctrl->getFormAction($this));
 		$form->setTableWidth("100%");
 		$form->setId("logs");
@@ -418,24 +417,26 @@ class ilObjAssessmentFolderGUI extends ilObjectGUI
 		$header = new ilFormSectionHeaderGUI();
 		$header->setTitle($this->lng->txt("assessment_log"));
 		$form->addItem($header);
-		
+
 		// from
-		$from = new ilDateTimeInputGUI($this->lng->txt('cal_from'), "log_from");		
+		$from = new ilDateTimeInputGUI($this->lng->txt('cal_from'), "log_from");
 		$from->setShowTime(true);
-		$now = getdate();
-		$fromdate = ($p_from) ? $p_from : (($_GET['log_from']) ? $_GET['log_from'] : mktime(0, 0, 0, 1, 1, $now['year']));
-		$from->setDate(new ilDateTime($fromdate, IL_CAL_UNIX));
+		$from->setRequired(true);
 		$form->addItem($from);
 
 		// until
-		$until = new ilDateTimeInputGUI($this->lng->txt('cal_until'), "log_until");		
+		$until = new ilDateTimeInputGUI($this->lng->txt('cal_until'), "log_until");
 		$until->setShowTime(true);
-		$untildate = ($p_until) ? $p_until : (($_GET['log_until']) ? $_GET['log_until'] : time());
-		$until->setDate(new ilDateTime($untildate, IL_CAL_UNIX));
+		$until->setRequired(true);
 		$form->addItem($until);
+
+		require_once 'Modules/Test/classes/class.ilObjTest.php';
+		require_once 'Modules/TestQuestionPool/classes/class.assQuestion.php';
+		$available_tests = ilObjTest::_getAvailableTests(1);
 
 		// tests
 		$fortest = new ilSelectInputGUI($this->lng->txt('assessment_log_for_test'), "sel_test");
+		$fortest->setRequired(true);
 		$sorted_options = array();
 		foreach($available_tests as $key => $value)
 		{
@@ -445,27 +446,96 @@ class ilObjAssessmentFolderGUI extends ilObjectGUI
 			);
 		}
 		$sorted_options = ilUtil::sortArray($sorted_options, 'title','asc');
-		$options = array();
+		$options = array('' => $this->lng->txt('please_choose'));
 		foreach($sorted_options as $option)
 		{
 			$options[$option['key']] = $option['title'];
 		}
 		$fortest->setOptions($options);
-		$p_test = ($p_test) ? $p_test : $_GET['sel_test'];
-		if ($p_test) $fortest->setValue($p_test);
 		$form->addItem($fortest);
-		$this->ctrl->setParameter($this, 'sel_test', $p_test);
-		$this->ctrl->setParameter($this, 'log_until', $untildate);
-		$this->ctrl->setParameter($this, 'log_from', $fromdate);
-		$form->addCommandButton("showLog", $this->lng->txt("show"));
-		$form->addCommandButton("exportLog", $this->lng->txt("export"));
+
+		$form->addCommandButton('showLog', $this->lng->txt('show'));
+		$form->addCommandButton('exportLog', $this->lng->txt('export'));
+		
+		return $form;
+	}
+
+	/**
+	 * @param $form ilPropertyFormGUI|null
+	 */
+	public function logsObject(ilPropertyFormGUI $form = null)
+	{
+		/**
+		 * @var $ilTabs ilTabsGUI
+		 */
+		global $ilTabs;
+
+		$ilTabs->activateTab('logs');
+
+		$template = new ilTemplate("tpl.assessment_logs.html", TRUE, TRUE, "Modules/Test");
+
+		$p_test    = 0;
+		$fromdate  = 0;
+		$untildate = 0;
+
+		if(!($form instanceof ilPropertyFormGUI))
+		{
+			$form = $this->getLogDataOutputForm();
+			
+			$values = array();
+			if(isset($_GET['sel_test']))
+			{
+				$p_test = $values['sel_test'] = (int)$_GET['sel_test'];
+			}
+
+			if(isset($_GET['log_from']))
+			{
+				$fromdate = (int)$_GET['log_from'];
+			}
+			else
+			{
+				$fromdate = mktime(0, 0, 0, 1, 1, date('Y'));
+			}
+
+			if(isset($_GET['log_until']))
+			{
+				$untildate = (int)$_GET['log_until'];
+			}
+			else
+			{
+				$untildate = time();
+			}
+
+			$values['log_from'] = new ilDateTime($fromdate, IL_CAL_UNIX);
+			$values['log_until'] = new ilDateTime($untildate, IL_CAL_UNIX);
+
+			$form->setValuesByArray($values);
+		}
+		else
+		{
+			$fromdate_input  = $form->getItemByPostVar('log_from')->getDate();
+			$untildate_input = $form->getItemByPostVar('log_until')->getDate();
+			if($fromdate_input instanceof ilDateTime && $untildate_input instanceof ilDateTime)
+			{
+				$p_test  = $form->getInput('sel_test');
+
+				$fromdate  = $fromdate_input->get(IL_CAL_UNIX);
+				$untildate = $untildate_input->get(IL_CAL_UNIX);
+			}
+		}
+
+		$this->ctrl->setParameter($this, 'sel_test', (int)$p_test);
+		$this->ctrl->setParameter($this, 'log_until', (int)$untildate);
+		$this->ctrl->setParameter($this, 'log_from', (int)$fromdate);
+
 		$template->setVariable("FORM", $form->getHTML());
 
-		if ($p_test)
+		if($p_test)
 		{
+			require_once "Services/Link/classes/class.ilLink.php";
 			include_once "./Modules/Test/classes/tables/class.ilAssessmentFolderLogTableGUI.php";
 			$table_gui = new ilAssessmentFolderLogTableGUI($this, 'logs');
-			$log_output =& $this->object->getLog($fromdate, $untildate, $p_test);
+			$log_output = ilObjAssessmentFolder::getLog($fromdate, $untildate, $p_test);
 
 			$self = $this;
 			array_walk($log_output, function(&$row) use ($self) {
@@ -475,8 +545,9 @@ class ilObjAssessmentFolderGUI extends ilObjectGUI
 					$row['location_txt']  = $self->lng->txt("perma_link");
 				}
 			});
+
 			$table_gui->setData($log_output);
-			$template->setVariable('LOG', $table_gui->getHTML());	
+			$template->setVariable('LOG', $table_gui->getHTML());
 		}
 		$this->tpl->setVariable("ADM_CONTENT", $template->get());
 	}
@@ -513,7 +584,7 @@ class ilObjAssessmentFolderGUI extends ilObjectGUI
 		$table_gui = new ilAssessmentFolderLogAdministrationTableGUI($this, 'logAdmin', $a_write_access);
 		include_once "./Modules/Test/classes/class.ilObjTest.php";
 		require_once "./Services/Link/classes/class.ilLink.php";
-		$available_tests =& ilObjTest::_getAvailableTests(false);
+		$available_tests = ilObjTest::_getAvailableTests(false);
 		$data = array();
 		foreach ($available_tests as $ref_id => $title)
 		{
@@ -530,9 +601,9 @@ class ilObjAssessmentFolderGUI extends ilObjectGUI
 		$this->tpl->setVariable('ADM_CONTENT', $table_gui->getHTML());	
 	}
 
-	public function getAdminTabs(&$tabs_gui)
+	public function getAdminTabs()
 	{
-		$this->getTabs($tabs_gui);
+		$this->getTabs();
 	}
 
 	public function getLogdataSubtabs()
@@ -564,7 +635,7 @@ class ilObjAssessmentFolderGUI extends ilObjectGUI
 	*
 	* @param	object	tabs gui object
 	*/
-	public function getTabs(&$tabs_gui)
+	public function getTabs()
 	{
 		global $rbacsystem, $lng;
 
@@ -583,27 +654,27 @@ class ilObjAssessmentFolderGUI extends ilObjectGUI
 		
 		if ($rbacsystem->checkAccess("visible,read",$this->object->getRefId()))
 		{
-			$tabs_gui->addTarget("settings",
+			$this->tabs_gui->addTarget("settings",
 				$this->ctrl->getLinkTarget($this, "settings"), array("settings","","view"), "", "");
 
-			$tabs_gui->addTarget("logs",
+			$this->tabs_gui->addTarget("logs",
 				$this->ctrl->getLinkTarget($this, "showLogSettings"), 
 					array('saveLogSettings', 'showLogSettings', "logs","showLog", "exportLog", "logAdmin", "deleteLog"), 
 					"", "");
 
-			$tabs_gui->addTab("templates",
+			$this->tabs_gui->addTab("templates",
 				$lng->txt("adm_settings_templates"),
 				$this->ctrl->getLinkTargetByClass("ilsettingstemplategui", ""));
 		}
 
 		if ($rbacsystem->checkAccess("write",$this->object->getRefId()))
 		{
-			$tabs_gui->addTarget('units', $this->ctrl->getLinkTargetByClass('ilGlobalUnitConfigurationGUI', ''), '', 'ilglobalunitconfigurationgui');
+			$this->tabs_gui->addTarget('units', $this->ctrl->getLinkTargetByClass('ilGlobalUnitConfigurationGUI', ''), '', 'ilglobalunitconfigurationgui');
 		}
 
 		if ($rbacsystem->checkAccess('edit_permission',$this->object->getRefId()))
 		{
-			$tabs_gui->addTarget("perm_settings",
+			$this->tabs_gui->addTarget("perm_settings",
 				$this->ctrl->getLinkTargetByClass(array(get_class($this),'ilpermissiongui'), "perm"), array("perm","info","owner"), 'ilpermissiongui');
 		}
 	}
@@ -619,8 +690,8 @@ class ilObjAssessmentFolderGUI extends ilObjectGUI
 		{
 			$form = $this->getLogSettingsForm();
 			$form->setValuesByArray(array(
-				'chb_assessment_logging' => $this->object->_enabledAssessmentLogging(),
-				'reporting_language'     => $this->object->_getLogLanguage()
+				'chb_assessment_logging' => ilObjAssessmentFolder::_enabledAssessmentLogging(),
+				'reporting_language'     => ilObjAssessmentFolder::_getLogLanguage()
 			));
 		}
 

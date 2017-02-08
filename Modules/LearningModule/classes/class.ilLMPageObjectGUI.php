@@ -28,11 +28,9 @@ class ilLMPageObjectGUI extends ilLMObjectGUI
 	* @param	object		$a_content_obj		content object (lm | dbk)
 	* @access	public
 	*/
-	function ilLMPageObjectGUI(&$a_content_obj)
+	function __construct(&$a_content_obj)
 	{
-		global $ilias, $tpl, $lng;
-
-		parent::ilLMObjectGUI($a_content_obj);
+		parent::__construct($a_content_obj);
 
 	}
 
@@ -49,7 +47,7 @@ class ilLMPageObjectGUI extends ilLMObjectGUI
 	/**
 	* execute command
 	*/
-	function &executeCommand()
+	function executeCommand()
 	{
 		global $tpl, $ilCtrl, $ilTabs, $ilSetting;
 		
@@ -108,7 +106,7 @@ class ilLMPageObjectGUI extends ilLMObjectGUI
 					"_".$_GET["ref_id"],
 					$view_frame);
 
-				include_once("./Services/Style/classes/class.ilObjStyleSheet.php");
+				include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
 				$page_gui->setStyleId(ilObjStyleSheet::getEffectiveContentStyleId(
 					$this->content_object->getStyleSheetId(), "lm"));
 				$page_gui->setTemplateTargetVar("ADM_CONTENT");
@@ -129,9 +127,7 @@ class ilLMPageObjectGUI extends ilLMObjectGUI
 				$page_gui->setHeader($this->lng->txt("page").": ".$this->obj->getTitle());
 				$page_gui->setActivationListener($this, "activatePage");
 				
-				$up_gui = ($this->content_object->getType() == "dbk")
-					? "ilobjdlbookgui"
-					: "ilobjlearningmodulegui";
+				$up_gui = "ilobjlearningmodulegui";
 				$ilCtrl->setParameterByClass($up_gui, "active_node", $this->obj->getId());
 
 				$tpl->setTitleIcon(ilUtil::getImagePath("icon_pg.svg"));
@@ -145,7 +141,7 @@ class ilLMPageObjectGUI extends ilLMObjectGUI
 				break;
 
 			default:
-				$ret =& $this->$cmd();
+				$ret = $this->$cmd();
 				break;
 		}
 	}
@@ -179,7 +175,7 @@ class ilLMPageObjectGUI extends ilLMObjectGUI
 	*/
 	function save()
 	{
-		$this->obj =& new ilLMPageObject($this->content_object);
+		$this->obj = new ilLMPageObject($this->content_object);
 		$this->obj->setType("pg");
 		$this->obj->setTitle(ilUtil::stripSlashes($_POST["Fobject"]["title"]));
 		$this->obj->setDescription(ilUtil::stripSlashes($_POST["Fobject"]["desc"]));
@@ -199,9 +195,7 @@ class ilLMPageObjectGUI extends ilLMObjectGUI
 			ilUtil::redirect($this->ctrl->getLinkTargetByClass("ilStructureObjectGUI",
 				"edit", "", true));
 		}
-		$up_gui = ($this->content_object->getType() == "dbk")
-			? "ilobjdlbookgui"
-			: "ilobjlearningmodulegui";
+		$up_gui = "ilobjlearningmodulegui";
 		$this->ctrl->redirectByClass($up_gui, "pages");
 	}
 
@@ -215,9 +209,7 @@ class ilLMPageObjectGUI extends ilLMObjectGUI
 			ilUtil::redirect($this->ctrl->getLinkTargetByClass("ilStructureObjectGUI",
 				"view", "", true));
 		}
-		$up_gui = ($this->content_object->getType() == "dbk")
-			? "ilobjdlbookgui"
-			: "ilobjlearningmodulegui";
+		$up_gui = "ilobjlearningmodulegui";
 		$this->ctrl->redirectByClass($up_gui, "pages");
 	}
 
@@ -256,7 +248,7 @@ class ilLMPageObjectGUI extends ilLMObjectGUI
 					case "PageObject":
 					case "StructureObject":
 						$lm_id = ilLMObject::_lookupContObjID($target_id);
-						$cont_obj =& $this->content_object;
+						$cont_obj = $this->content_object;
 						if ($lm_id == $cont_obj->getId())
 						{
 							$ltarget = "";
@@ -285,6 +277,10 @@ class ilLMPageObjectGUI extends ilLMObjectGUI
 							}
 							$ltarget = "ilContObj".$lm_id;
 						}
+						if ($lm_id == "")
+						{
+							$href = "";
+						}
 						break;
 
 					case "GlossaryItem":
@@ -308,11 +304,13 @@ class ilLMPageObjectGUI extends ilLMObjectGUI
 						$ltarget = $t_frame;
 						break;
 				}
-				
-				$anc_par = 'Anchor="'.$anc.'"';
-				
-				$link_info.="<IntLinkInfo Target=\"$target\" Type=\"$type\" ".
-					"TargetFrame=\"$targetframe\" LinkHref=\"$href\" LinkTarget=\"$ltarget\" $anc_par/>";
+
+				if ($href != "")
+				{
+					$anc_par = 'Anchor="' . $anc . '"';
+					$link_info .= "<IntLinkInfo Target=\"$target\" Type=\"$type\" " .
+						"TargetFrame=\"$targetframe\" LinkHref=\"$href\" LinkTarget=\"$ltarget\" $anc_par/>";
+				}
 			}
 		}
 		$link_info.= "</IntLinkInfos>";

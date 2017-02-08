@@ -11,7 +11,7 @@
  */
 class ilTrQuery
 {
-	function getObjectsStatusForUser($a_user_id, array $obj_refs)
+	static function getObjectsStatusForUser($a_user_id, array $obj_refs)
 	{
 		global $ilDB;
 
@@ -88,7 +88,7 @@ class ilTrQuery
 		}
 	}
 
-	function getObjectivesStatusForUser($a_user_id, $a_obj_id, array $a_objective_ids)
+	public static function getObjectivesStatusForUser($a_user_id, $a_obj_id, array $a_objective_ids)
 	{
 		global $ilDB;
 						
@@ -118,7 +118,7 @@ class ilTrQuery
 		return $result;
 	}
 	
-	function getSCOsStatusForUser($a_user_id, $a_parent_obj_id, array $a_sco_ids)
+	static function getSCOsStatusForUser($a_user_id, $a_parent_obj_id, array $a_sco_ids)
 	{
 		self::refreshObjectsStatus(array($a_parent_obj_id), array($a_user_id));	
 		
@@ -187,7 +187,14 @@ class ilTrQuery
 		return $items;
 	}
 	
-	function getSubItemsStatusForUser($a_user_id, $a_parent_obj_id, array $a_item_ids)
+	/**
+	 * Get subitems status
+	 * @param type $a_user_id
+	 * @param type $a_parent_obj_id
+	 * @param array $a_item_ids
+	 * @return type
+	 */
+	public static function getSubItemsStatusForUser($a_user_id, $a_parent_obj_id, array $a_item_ids)
 	{
 		self::refreshObjectsStatus(array($a_parent_obj_id), array($a_user_id));	
 		
@@ -460,52 +467,6 @@ class ilTrQuery
 		$queries = array();
 		$queries[] = array("fields"=>$fields, "query"=>$query);
 
-		/* objectives data 
-		if($objects["objectives_parent_id"])
-		{
-			$objective_fields = array("crs_objectives.objective_id AS obj_id", "title",
-				$ilDB->quote("lobj", "text")." as type");
-			
-			include_once "Modules/Course/classes/Objectives/class.ilLOUserResults.php";	
-				
-			if (is_array($a_additional_fields))
-			{
-              foreach($a_additional_fields as $field)
-			  {
-				if($field != "status")
-				{
-					$objective_fields[] = "NULL AS ".$field;
-				}
-				else
-				{
-					// #15873 - see ilLOUserResults::getObjectiveStatusForLP()
-		            include_once("Services/Tracking/classes/class.ilLPStatus.php");
-					$objective_fields[] = "CASE WHEN status = ".$ilDB->quote(ilLOUserResults::STATUS_COMPLETED, "integer").
-						" THEN ".ilLPStatus::LP_STATUS_COMPLETED_NUM.
-						" WHEN (status = ".$ilDB->quote(ilLOUserResults::STATUS_FAILED, "integer").
-						" AND is_final = ".$ilDB->quote(1, "integer").")".
-						" THEN ".ilLPStatus::LP_STATUS_FAILED_NUM.
-						" WHEN status = ".$ilDB->quote(ilLOUserResults::STATUS_FAILED, "integer").
-						" THEN ".ilLPStatus::LP_STATUS_IN_PROGRESS_NUM.
-						" ELSE NULL END AS status";
-				}
-			  }
-			}
-
-			$where = array();
-			$where[] = "crs_objectives.crs_id = ".$ilDB->quote($objects["objectives_parent_id"], "integer");
-			$where[] = "crs_objectives.active = ".$ilDB->quote(1, "integer");
-		
-			$objectives_query = " FROM crs_objectives".
-				" LEFT JOIN loc_user_results ON (crs_objectives.objective_id = loc_user_results.objective_id".
-				" AND loc_user_results.user_id = ".$ilDB->quote($a_user_id, "integer").
-				" AND loc_user_results.type = ".$ilDB->quote(ilLOUserResults::TYPE_QUALIFIED, "integer").")".			
-				self::buildFilters($where, $a_filters);
-			
-			$queries[] = array("fields"=>$objective_fields, "query"=>$objectives_query, "count"=>"crs_objectives.objective_id");
-		}
-		*/
-		
 		if(!in_array($a_order_field, $fields))
 		{
 			$a_order_field = "title";
@@ -916,7 +877,16 @@ class ilTrQuery
 				include_once "Modules/Group/classes/class.ilGroupParticipants.php";
 				$member_obj = ilGroupParticipants::_getInstanceByObjId($obj_id);
 				return $member_obj->getMembers();
-			
+
+			/* Mantis 19296: Individual Assessment can be subtype of crs.
+		 	 * But for LP view only his own members should be displayed.
+		 	 * We need to return the members without checking the parent path. */
+			case "iass":
+				include_once("Modules/IndividualAssessment/classes/class.ilObjIndividualAssessment.php");
+				$iass = new ilObjIndividualAssessment($obj_id, false);
+				return $iass->loadMembers()->membersIds();
+				break;
+
 			default:				
 				// walk path to find course or group object and use members of that object
 				$path = $tree->getPathId($a_ref_id);
@@ -987,7 +957,6 @@ class ilTrQuery
 				$prg = new ilObjStudyProgramme($obj_id, false);
 				$a_users = $prg->getIdsOfUsersWithRelevantProgress();
 				break;
-			
 			default:
 				// no sensible data: return null
 				break;
@@ -1238,6 +1207,9 @@ class ilTrQuery
 
 					switch($field)
 					{
+						case 'org_units':
+							break;
+						
 						case "language":
 							if($function)
 							{
@@ -1336,8 +1308,8 @@ class ilTrQuery
 			// what about LP_MODE_SCORM_PACKAGE ?
 			case ilLPObjSettings::LP_MODE_SCORM:
 				include_once "Services/Tracking/classes/class.ilLPStatusFactory.php";
-				$status_scorm = ilLPStatusFactory::_getInstance($a_parent_obj_id, ilLPObjSettings::LP_MODE_SCORM);
-				$scorm = $status_scorm->_getStatusInfo($a_parent_obj_id);
+				$status_scorm = get_class(ilLPStatusFactory::_getInstance($a_parent_obj_id, ilLPObjSettings::LP_MODE_SCORM));				
+				$scorm = $status_scorm::_getStatusInfo($a_parent_obj_id);
 				break;
 			
 			case ilLPObjSettings::LP_MODE_OBJECTIVES:				
@@ -1351,8 +1323,8 @@ class ilTrQuery
 			case ilLPObjSettings::LP_MODE_COLLECTION_TLT:
 			case ilLPObjSettings::LP_MODE_COLLECTION_MOBS:
 				include_once "Services/Tracking/classes/class.ilLPStatusFactory.php";
-				$status_coll_tlt = ilLPStatusFactory::_getInstance($a_parent_obj_id, $mode);
-				$subitems = $status_coll_tlt->_getStatusInfo($a_parent_obj_id);
+				$status_coll_tlt = get_class(ilLPStatusFactory::_getInstance($a_parent_obj_id, $mode));
+				$subitems = $status_coll_tlt::_getStatusInfo($a_parent_obj_id);
 				break;
 				
 			default:
@@ -1570,10 +1542,10 @@ class ilTrQuery
 			$udf = self::buildColumns($fields, $a_additional_fields);
 				
 			include_once("./Services/Tracking/classes/class.ilLPStatus.php");
-			
+					
 			// #18673 - if parent supports percentage does not matter for "sub-items"
 			$fields[] = "percentage";
-																							
+																		
 			$raw = array();
 			foreach($a_obj_ids as $obj_id)
 			{				
@@ -1584,7 +1556,7 @@ class ilTrQuery
 					" AND ut_lp_marks.obj_id = ".$ilDB->quote($obj_id, "integer").")".
 					" LEFT JOIN usr_pref ON (usr_pref.usr_id = usr_data.usr_id AND keyword = ".$ilDB->quote("language", "text").")".
 					self::buildFilters($where);
-
+				
 				$raw = self::executeQueries(array(array("fields"=>$fields, "query"=>$query)), "login");
 				if($raw["cnt"])
 				{
@@ -1653,7 +1625,7 @@ class ilTrQuery
 			include_once "Modules/Course/classes/Objectives/class.ilLOSettings.php";
 			$lo_set = ilLOSettings::getInstanceByObjId($a_parent_obj_id);
 			$initial_qualifying = $lo_set->isInitialTestQualifying();	
-			
+		
 			// there may be missing entries for any user / objective combination
 			foreach($objective_ids as $objective_id)
 			{
@@ -1752,13 +1724,14 @@ class ilTrQuery
 		return $res;
 	}
 
-	function getObjectTypeStatistics()
+	static function getObjectTypeStatistics()
 	{
 		global $ilDB, $objDefinition;
 		
 		// re-use add new item selection (folder is not that important)
 		$types = array_keys($objDefinition->getCreatableSubObjects("root", ilObjectDefinition::MODE_REPOSITORY));
 		
+		// repository
 		include_once "Services/Tree/classes/class.ilTree.php";
 		$tree = new ilTree(1);
 		$sql = "SELECT ".$tree->table_obj_data.".obj_id,".$tree->table_obj_data.".type,".
@@ -1782,8 +1755,74 @@ class ilTrQuery
 		foreach($res as $type => $values)
 		{
 			$res[$type]["objects"] = sizeof(array_unique($values["objects"]));
+		}		
+		
+		// portfolios (not part of repository)
+		foreach(self::getPortfolios() as $obj_id)
+		{
+			$res["prtf"]["type"] = "prtf";
+			$res["prtf"]["references"]++;
+			$res["prtf"]["objects"]++;
 		}
 		
+		foreach(self::getWorkspaceBlogs() as $obj_id)
+		{
+			$res["blog"]["type"] = "blog";
+			$res["blog"]["references"]++;
+			$res["blog"]["objects"]++;
+		}
+		
+		return $res;
+	}
+	
+	static public function getWorkspaceBlogs($a_title = null)
+	{
+		global $ilDB;
+		
+		$res = array();
+		
+		// blogs in workspace?
+		$sql = "SELECT od.obj_id,oref.wsp_id,od.type".		
+			" FROM tree_workspace wst".
+			" JOIN object_reference_ws oref ON (oref.wsp_id = wst.child)".
+			" JOIN object_data od ON (oref.obj_id = od.obj_id)".
+			" WHERE od.type = ".$ilDB->quote("blog", "text");
+		
+		if($a_title)
+		{
+			$sql .= " AND ".$ilDB->like("od.title", "text", "%".$a_title."%");
+		}
+		
+		$set = $ilDB->query($sql);		
+		while($row = $ilDB->fetchAssoc($set))
+		{
+			$res[] = $row["obj_id"];
+		}
+				
+		return $res;
+	}
+	
+	static public function getPortfolios($a_title = null)
+	{
+		global $ilDB;
+		
+		$res = array();
+		
+		$sql = "SELECT od.obj_id".
+			" FROM usr_portfolio prtf".
+			" JOIN object_data od ON (od.obj_id = prtf.id)";
+		
+		if($a_title)
+		{
+			$sql .= " WHERE ".$ilDB->like("od.title", "text", "%".$a_title."%");
+		}
+		
+		$set = $ilDB->query($sql);
+		while($row = $ilDB->fetchAssoc($set))
+		{
+			$res[] = $row["obj_id"];
+		}
+				
 		return $res;
 	}
 
@@ -1869,7 +1908,7 @@ class ilTrQuery
 		
 		if($a_type == "lres")
 		{
-			$a_type = array('lm','sahs','htlm','dbk');
+			$a_type = array('lm','sahs','htlm');
 		}
 		
 		$sql = "SELECT r.ref_id,r.obj_id".
@@ -1992,7 +2031,7 @@ class ilTrQuery
 		return $res;
 	}
 	
-	function getObjectTypeStatisticsPerMonth($a_aggregation, $a_year = null)
+	static function getObjectTypeStatisticsPerMonth($a_aggregation, $a_year = null)
 	{
 		global $ilDB;
 		

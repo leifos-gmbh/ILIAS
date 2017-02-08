@@ -22,13 +22,13 @@ class ilObjNotificationAdminGUI extends ilObjectGUI
 	* Constructor
 	* @access	public
 	*/
-	function __construct($a_data,$a_id,$a_call_by_reference = true, $a_prepare_output = true) {
+	public function __construct($a_data, $a_id = 0, $a_call_by_reference = true, $a_prepare_output = true) {
 		$this->type = "nota";
-		$this->ilObjectGUI($a_data,$a_id,$a_call_by_reference, false);
-                $this->lng->loadLanguageModule('notification');
+		parent::__construct($a_data,$a_id,$a_call_by_reference, false);
+		$this->lng->loadLanguageModule('notification');
 	}
 	
-	function _forwards()
+	static function _forwards()
 	{
 		return array();
 	}
@@ -47,7 +47,7 @@ class ilObjNotificationAdminGUI extends ilObjectGUI
 			case 'ilpermissiongui':
 				//$ilTabs->activateTab("id_permissions");
 				include_once("Services/AccessControl/classes/class.ilPermissionGUI.php");
-				$perm_gui =& new ilPermissionGUI($this);
+				$perm_gui = new ilPermissionGUI($this);
 				$ret =& $this->ctrl->forwardCommand($perm_gui);
 				break;
 

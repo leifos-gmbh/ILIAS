@@ -42,9 +42,9 @@ class ilObjGroupDAV extends ilObjectDAV
 	*
 	* @param refid A refid to the object.
 	*/
-	function ilObjGroupDAV($refid) 
+	function __construct($refid) 
 	{
-		$this->ilObjectDAV($refid);
+		parent::__construct($refid);
 	}
 	
 	/**
@@ -81,7 +81,7 @@ class ilObjGroupDAV extends ilObjectDAV
 	{
 		if (is_null($this->obj))
 		{
-			$this->obj = &new ilObjGroup($this->getRefId(),true);
+			$this->obj = new ilObjGroup($this->getRefId(),true);
 			$this->obj->read();
 		}
 	}

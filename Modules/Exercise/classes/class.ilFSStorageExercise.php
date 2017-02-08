@@ -148,7 +148,8 @@ class ilFSStorageExercise extends ilFileSystemStorage
 	 */
 	function getPeerReviewUploadPath($a_peer_id, $a_giver_id, $a_crit_id)
 	{
-		$path = $this->peer_review_upload_path."/".$a_peer_id."/".$a_giver_id;
+		$path = $this->peer_review_upload_path."/".$a_peer_id."/".$a_giver_id."/";
+
 		if((int)$a_crit_id)
 		{
 			$path .= (int)$a_crit_id."/";
@@ -203,7 +204,7 @@ class ilFSStorageExercise extends ilFileSystemStorage
 				$files[] = array(
 					'name'     => $file,
 					'size'     => filesize($this->path.'/'.$file),
-					'ctime'    => ilFormat::formatDate(date('Y-m-d H:i:s',filectime($this->path.'/'.$file))),
+					'ctime'    => filectime($this->path.'/'.$file),
 					'fullpath' => $this->path.'/'.$file);
 			}
 		}
@@ -253,8 +254,6 @@ class ilFSStorageExercise extends ilFileSystemStorage
 			// CHECK IF FILE PATH EXISTS
 			if (!is_dir($savepath))
 			{
-				require_once "./Services/Utilities/classes/class.ilUtil.php";
-				#ilUtil::makeDirParents($savepath);
 				ilUtil::makeDir($savepath);
 			}
 			$now = getdate();

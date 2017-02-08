@@ -37,7 +37,7 @@ class ilSCORM2004OrganizationHFormGUI extends ilHierarchyFormGUI
 		// @todo: move this to a service since it can be used here, too
 		include_once("./Modules/LearningModule/classes/class.ilEditClipboard.php");
 
-		include_once("./Services/Style/classes/class.ilPageLayout.php");
+		include_once("./Services/COPage/Layout/classes/class.ilPageLayout.php");
 		$page_layouts = (count(ilPageLayout::activeLayouts()) > 0);
 		$special_pages = (count(ilPageLayout::activeLayouts(true)) > 0);
 		
@@ -458,6 +458,19 @@ class ilSCORM2004OrganizationHFormGUI extends ilHierarchyFormGUI
 		}
 		
 		return $commands;
+	}
+
+	/**
+	 * Get icon alt text for an item.
+	 *
+	 * @param	array		item array
+	 * @return	string		icon alt text
+	 */
+	function getChildIconAlt($a_item)
+	{
+		global $lng;
+
+		return $lng->txt("icon")." ".$lng->txt("obj_".$a_item["type"]);
 	}
 
 }

@@ -85,15 +85,13 @@ class ilUtil
 		$default_img = ".".$module_path."/templates/default/images/".$img;
 
 		// use ilStyleDefinition instead of account to get the current skin and style
-		require_once("./Services/Style/classes/class.ilStyleDefinition.php");
+		require_once("./Services/Style/System/classes/class.ilStyleDefinition.php");
 		$current_skin = ilStyleDefinition::getCurrentSkin();
 		$current_style = ilStyleDefinition::getCurrentStyle();
 		
 		if (is_object($styleDefinition))
 		{
-			$image_dir = $styleDefinition->getImageDirectory(
-				ilStyleDefinition::getCurrentMasterStyle(),
-				$current_style);
+			$image_dir = $styleDefinition->getImageDirectory($current_style);
 		}
 		if ($current_skin == "default")
 		{
@@ -179,7 +177,7 @@ class ilUtil
 		
 		// add version as parameter to force reload for new releases
 		// use ilStyleDefinition instead of account to get the current style
-		require_once("./Services/Style/classes/class.ilStyleDefinition.php");
+		require_once("./Services/Style/System/classes/class.ilStyleDefinition.php");
 		$stylesheet_name = (strlen($a_css_name))
 			? $a_css_name
 			: ilStyleDefinition::getCurrentStyle().".css";
@@ -190,7 +188,7 @@ class ilUtil
 
 		$filename = "";
 		// use ilStyleDefinition instead of account to get the current skin
-		require_once("./Services/Style/classes/class.ilStyleDefinition.php");
+		require_once("./Services/Style/System/classes/class.ilStyleDefinition.php");
 		if (ilStyleDefinition::getCurrentSkin() != "default")
 		{
 			$filename = "./Customizing/global/skin/".ilStyleDefinition::getCurrentSkin()."/".$a_css_location.$stylesheet_name;
@@ -228,7 +226,7 @@ class ilUtil
 
 		$filename = "";
 		// use ilStyleDefinition instead of account to get the current skin
-		require_once("./Services/Style/classes/class.ilStyleDefinition.php");
+		require_once("./Services/Style/System/classes/class.ilStyleDefinition.php");
 		if (ilStyleDefinition::getCurrentSkin() != "default")
 		{
 			$filename = "./Customizing/global/skin/".ilStyleDefinition::getCurrentSkin()."/".$a_js_location.$js_name;
@@ -299,7 +297,7 @@ class ilUtil
 		}
 
 		// use ilStyleDefinition instead of account to get the current skin and style
-		require_once("./Services/Style/classes/class.ilStyleDefinition.php");
+		require_once("./Services/Style/System/classes/class.ilStyleDefinition.php");
 		if (ilStyleDefinition::getCurrentSkin() == "default")
 		{
 			$in_style = "./templates/".ilStyleDefinition::getCurrentSkin()."/"
@@ -479,8 +477,8 @@ class ilUtil
 		}
 
 		// dirty removal of other "[]" in string
-		$varname_id = ereg_replace("\[","_",$varname_id);
-		$varname_id = ereg_replace("\]","",$varname_id);
+		$varname_id = str_replace("[","_",$varname_id);
+		$varname_id = str_replace("]","",$varname_id);
 
 		$str .= " value=\"".$value."\" id=\"".$varname_id."\" />\n";
 
@@ -801,16 +799,16 @@ class ilUtil
 		$ret = $a_text;
 
 		// www-URL ohne ://-Angabe
-		$ret = eregi_replace("(^|[[:space:]]+)(www\.)([[:alnum:]#?/&=\.-]+)",
-			"\\1http://\\2\\3", $ret);
+		$ret = preg_replace("/(^|[\s]+)(www\.)([A-Za-z0-9#&=?.\/\-]+)/i",
+			"$1http://$2$3", $ret);
 
 		// ftp-URL ohne ://-Angabe
-		$ret = eregi_replace("(^|[[:space:]]+)(ftp\.)([[:alnum:]#?/&=\.-]+)",
-			"\\1ftp://\\2\\3", $ret);
+		$ret = preg_replace("/(^|[\s]+)(ftp\.)([A-Za-z0-9#&=?.\/\-]+)/i",
+			"$1ftp://$2$3", $ret);
 
 		// E-Mail (this does not work as expected, users must add mailto: manually)
-		//$ret = eregi_replace("(([a-z0-9_]|\\-|\\.)+@([^[:space:]]*)([[:alnum:]-]))",
-		//	"mailto:\\1", $ret);
+		//$ret = preg_replace("/(([a-z0-9_]|\-|\.)+@([^[\s]*)([A-Za-z0-9\-]))/i",
+		//	"mailto:$1", $ret);
 
 		// mask existing image tags
 		$ret = str_replace('src="http://', '"***masked_im_start***', $ret);
@@ -1127,27 +1125,21 @@ class ilUtil
 	*/
 	public static function is_email($a_email)
 	{
-		// BEGIN Mail: If possible, use PearMail to validate e-mail address
 		global $ilErr;
 
 		// additional check for ilias object is needed,
 		// otherwise setup will fail with this if branch
 		if(is_object($ilErr)) // seems to work in Setup now
 		{
-			require_once './Services/PEAR/lib/Mail/RFC822.php';
-			$parser = new Mail_RFC822();
-			PEAR::setErrorHandling(PEAR_ERROR_RETURN);		
-			$addresses = $parser->parseAddressList($a_email, 'ilias', false, true);
-			if(!is_a($addresses, 'PEAR_Error') &&
-				count($addresses) == 1 && $addresses[0]->host != 'ilias'
-			)
+			try
 			{
-				PEAR::setErrorHandling(PEAR_ERROR_CALLBACK, array($ilErr, "errorHandler"));
-				return true;
+				require_once 'Services/Mail/classes/Address/Parser/class.ilMailRfc822AddressParserFactory.php';
+				$parser    = ilMailRfc822AddressParserFactory::getParser($a_email);
+				$addresses = $parser->parse();
+				return count($addresses) == 1 && $addresses[0]->getHost() != ilMail::ILIAS_HOST;
 			}
-			else			
+			catch(ilException $e)
 			{
-				PEAR::setErrorHandling(PEAR_ERROR_CALLBACK, array($ilErr, "errorHandler"));
 				return false;
 			}
 		}
@@ -1166,7 +1158,6 @@ class ilUtil
 			
 			return(preg_match("/^[-_.[:alnum:]]+@((([[:alnum:]]|[[:alnum:]][[:alnum:]-]*[[:alnum:]])\.)+(".$tlds.")|(([0-9][0-9]?|[0-1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.){3}([0-9][0-9]?|[0-1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5]))$/i",$a_email));
 		}
-		// END Mail: If possible, use PearMail to validate e-mail address
 	}
 
 	/**
@@ -1411,7 +1402,7 @@ class ilUtil
 	* @param	string	login
 	* @return	boolean	true if valid
 	*/
-	function isLogin($a_login)
+	static function isLogin($a_login)
 	{
 		if (empty($a_login))
 		{
@@ -1426,7 +1417,7 @@ class ilUtil
 		// FIXME - If ILIAS is configured to use RFC 822
 		//         compliant mail addresses we should not
 		//         allow the @ character.
-		if (!ereg("^[A-Za-z0-9_\.\+\*\@!\$\%\~\-]+$", $a_login))
+		if (!preg_match("/^[A-Za-z0-9_\.\+\*\@!\$\%\~\-]+$/", $a_login))
 		{
 			return false;
 		}
@@ -2090,52 +2081,6 @@ class ilUtil
 		$img.= ' border="'.(int) $a_border.'"/>';
 
 		return $img;
-	}
-
-	/**
-	*	produce pdf out of html with htmldoc
-	*   @param  html    String  HTML-Data given to create pdf-file
-	*   @param  pdf_file    String  Filename to save pdf in
-	*   @static
-	*   
-	*/
-	public static function html2pdf($html, $pdf_file)
-	{
-		$html_file = str_replace(".pdf",".html",$pdf_file);
-
-		$fp = fopen( $html_file ,"wb");
-		fwrite($fp, $html);
-		fclose($fp);
-
-		ilUtil::htmlfile2pdf($html_file,$pdf_file);
-	}
-
-	/**
-	*	produce pdf out of html with htmldoc
-	*   @param  html    String  HTML-Data given to create pdf-file
-	*   @param  pdf_file    String  Filename to save pdf in
-	* @static
-	*/
-	public static function htmlfile2pdf($html_file, $pdf_file)
-	{
-		$htmldoc_path = PATH_TO_HTMLDOC;
-
-		$htmldoc = "--no-toc ";
-		$htmldoc .= "--no-jpeg ";
-		$htmldoc .= "--webpage ";
-		$htmldoc .= "--outfile " . ilUtil::escapeShellArg($pdf_file) . " ";
-		$htmldoc .= "--bodyfont Arial ";
-		$htmldoc .= "--charset iso-8859-15 ";
-		$htmldoc .= "--color ";
-		$htmldoc .= "--size A4  ";      // --landscape
-		$htmldoc .= "--format pdf ";
-		$htmldoc .= "--footer ... ";
-		$htmldoc .= "--header ... ";
-		$htmldoc .= "--left 60 ";
-		// $htmldoc .= "--right 200 ";
-		$htmldoc .= $html_file;
-		ilUtil::execQuoted($htmldoc_path, $htmldoc);
-
 	}
 
 	/**
@@ -2924,23 +2869,15 @@ class ilUtil
 	{
 		global $ilLog;
 
-		$ws = "[ \t\r\f\v\n]*";
+		$ws = "[\s]*";
 		$att = $ws."[^>]*".$ws;
 
-		while (eregi("\<($tag$att($tag_att$ws=$ws\"(([\$@!*()~;,_0-9A-z/:=%\\.&#?+\\-])*)\")$att)\>",
+		while (preg_match('/<('.$tag.$att.'('.$tag_att.$ws.'="'.$ws.'(([$@!*()~;,_0-9A-z\/:=%.&#?+\-])*)")'.$att.')>/i',
 			$a_str, $found))
-		{
-			$un = array(".", "-", "+", "?", '$', "*", "(", ")");
-			$esc = array();
-			foreach($un as $v)
-			{
-				$esc[] = "\\".$v;
-			}
-			$ff = str_replace($un, $esc, $found[1]);
-
+		{			
 			$old_str = $a_str;
-			$a_str = eregi_replace("\<".$ff."\>",
-				"&lt;$tag $tag_att$tag_att=\"".$found[3]."\"&gt;", $a_str);
+			$a_str = preg_replace("/<".preg_quote($found[1], "/").">/i",
+				'&lt;'.$tag.' '.$tag_att.$tag_att.'="'.$found[3].'"&gt;', $a_str);
 			if ($old_str == $a_str)
 			{
 				$ilLog->write("ilUtil::maskA-".htmlentities($old_str)." == ".
@@ -2957,20 +2894,12 @@ class ilUtil
 	{
 		global $ilLog;
 
-		while (eregi("&lt;($tag $tag_att$tag_att=\"(([\$@!*()~;,_0-9A-z/:=%\\.&#?+\\-])*)\")&gt;",
+		while (preg_match('/&lt;('.$tag.' '.$tag_att.$tag_att.'="(([$@!*()~;,_0-9A-z\/:=%.&#?+\-])*)")&gt;/i',
 			$a_str, $found))
-		{
-			$un = array(".", "-", "+", "?", '$', "*", "(", ")");
-			$esc = array();
-			foreach($un as $v)
-			{
-				$esc[] = "\\".$v;
-			}
-			$ff = str_replace($un, $esc, $found[1]);
-
+		{			
 			$old_str = $a_str;
-			$a_str = eregi_replace("&lt;".$ff."&gt;",
-				"<$tag $tag_att=\"".ilUtil::secureLink($found[2])."\">", $a_str);
+			$a_str = preg_replace("/&lt;".preg_quote($found[1], "/")."&gt;/i",
+				'<'.$tag.' '.$tag_att.'="'.ilUtil::secureLink($found[2]).'">', $a_str);
 			if ($old_str == $a_str)
 			{
 				$ilLog->write("ilUtil::unmaskA-".htmlentities($old_str)." == ".
@@ -2978,7 +2907,7 @@ class ilUtil
 				return $a_str;
 			}
 		}
-		$a_str = str_replace("&lt;/$tag&gt;", "</$tag>", $a_str);
+		$a_str = str_replace('&lt;/'.$tag.'&gt;', '</'.$tag.'>', $a_str);
 		return $a_str;
 	}
 
@@ -3182,7 +3111,7 @@ class ilUtil
 			while($cpar != $cpar_old)
 			{
 				$cpar_old = $cpar;
-				$cpar = eregi_replace("[^a-zA-Z0-9_]", "", $cpar);
+				$cpar = preg_replace("/[^a-zA-Z0-9_]/i", "", $cpar);
 			}
 
 			// extract value
@@ -3620,7 +3549,13 @@ class ilUtil
 				}
 			}
 		}
-		  		
+
+        // Manually trigger to write and close the session. This has the advantage that if an exception is thrown
+        // during the writing of the session (ILIAS writes the session into the database by default) we get an exception
+        // if the session_write_close() is triggered by exit() then the exception will be dismissed but the session
+        // is never written, which is a nightmare to develop with.
+        session_write_close();
+
 		header("Location: ".$a_script);
 		exit();
 	}
@@ -4384,7 +4319,7 @@ class ilUtil
 
 		$res = $ilDB->query($query);
 		$counter = 0;
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			if($counter >= $limit)
 			{
@@ -4407,181 +4342,35 @@ class ilUtil
 		return $ref_ids ? $ref_ids : array();
 	}
 
-
 	/**
 	 * Include Mathjax
-	 *
-	 * @param
-	 * @return
+	 * @deprecated
 	 */
 	function includeMathjax($a_tpl = null)
 	{
-		global $tpl;
-
-		if ($a_tpl == null)
-		{
-			$a_tpl = $tpl;
+		include_once './Services/MathJax/classes/class.ilMathJax.php';
+		ilMathJax::getInstance()->includeMathJax($a_tpl);
 		}
-
-		// - take care of html exports (-> see buildLatexImages)
-		include_once "./Services/Administration/classes/class.ilSetting.php";
-		$mathJaxSetting = new ilSetting("MathJax");
-		$use_mathjax = $mathJaxSetting->get("enable");
-		if ($use_mathjax)
-		{
-			$a_tpl->addJavaScript($mathJaxSetting->get("path_to_mathjax"));
-		}
-	}
-
 
 	/**
-	* replace [text]...[/tex] tags with formula image code
-	*
-	* added additional parameters to make this method usable
-	* for other start and end tags as well
-	* 
-	* @static
-	* 
+	 * replace [tex]...[/tex] tags with formula image code
+	 * @deprecated
 	*/
-	public static function insertLatexImages($a_text, $a_start = "\[tex\]", $a_end = "\[\/tex\]")
+	public static function insertLatexImages($a_text, $a_start = '[tex]', $a_end = '[/tex]')
 	{
-		global $tpl, $lng, $ilUser;
-
-		$cgi = URL_TO_LATEX;
-
-		// - take care of html exports (-> see buildLatexImages)
-		include_once "./Services/Administration/classes/class.ilSetting.php";
-		$mathJaxSetting = new ilSetting("MathJax");
-		$use_mathjax = $mathJaxSetting->get("enable");
-		if ($use_mathjax)
-		{
-			$a_text = preg_replace("/\\\\([RZN])([^a-zA-Z]|<\/span>)/", "\\mathbb{"."$1"."}"."$2", $a_text);
-			$tpl->addJavaScript($mathJaxSetting->get("path_to_mathjax"));
-		}
-		
-		// this is a fix for bug5362
-		$cpos = 0;
-		$o_start = $a_start;
-		$o_end = $a_end;
-		$a_start = str_replace("\\", "", $a_start);
-		$a_end = str_replace("\\", "", $a_end);
-
-		while (is_int($spos = stripos($a_text, $a_start, $cpos)))	// find next start
-		{
-			if (is_int ($epos = stripos($a_text, $a_end, $spos + 1)))
-			{
-				$tex = substr($a_text, $spos + strlen($a_start), $epos - $spos - strlen($a_start));
-
-				// replace, if tags do not go across div borders
-				if (!is_int(strpos($tex, "</div>")))
-				{
-					if (!$use_mathjax)
-					{
-						$a_text = substr($a_text, 0, $spos).
-							"<img alt=\"".htmlentities($tex)."\" src=\"".$cgi."?".
-							rawurlencode(str_replace('&amp;', '&', str_replace('&gt;', '>', str_replace('&lt;', '<', $tex))))."\" ".
-							" />".
-							substr($a_text, $epos + strlen($a_end));
-					}
-					else
-					{
-						$tex = $a_start.$tex.$a_end;
-						
-						switch ((int) $mathJaxSetting->get("limiter"))
-						{
-							case 1:
-								$mj_start = "[tex]";
-								$mj_end = "[/tex]";
-								break;
-
-							case 2:
-								$mj_start = '<span class="math">';
-								$mj_end = '</span>';
-								break;
-								
-							default:
-								$mj_start = "\(";
-								$mj_end = "\)";
-								break;
-						}
-						
-						$replacement = 
-							preg_replace('/' . $o_start . '(.*?)' . $o_end . '/ie',
-							"'".$mj_start."' . preg_replace('/[\\\\\\\\\\]{2}/', '\\cr', str_replace('<', '&lt;', str_replace('<br/>', '', str_replace('<br />', '', str_replace('<br>', '', '$1'))))) . '".$mj_end."'", $tex);
-						// added special handling for \\ -> \cr, < -> $lt; and removal of <br/> tags in jsMath expressions, H. Schottmüller, 2007-09-09
-						$a_text = substr($a_text, 0, $spos).
-							$replacement.
-							substr($a_text, $epos + strlen($a_end));
-					}
-				}
-			}
-			$cpos = $spos + 1;
-		}
-		
-		$result_text = $a_text;
-
-		return $result_text;
+		include_once './Services/MathJax/classes/class.ilMathJax.php';
+		return ilMathJax::getInstance()->insertLatexImages($a_text, $a_start, $a_end);
 	}
 
 	/**
-	* replace [text]...[/tex] tags with formula image code
-	* ////////
-	* added additional parameters to make this method usable
-	* for other start and end tags as well
-	* 
-	* @static
-	* 
+	 * replace [tex]...[/tex] tags with formula image code for offline use
+	 * @deprecated
 	*/
 	public static function buildLatexImages($a_text, $a_dir)
 	{
-		$result_text = $a_text;
-		
-		$start = "\[tex\]";
-		$end = "\[\/tex\]";
-
-		$cgi = URL_TO_LATEX;
-		
-		if ($cgi != "")
-		{
-			while (preg_match('/' . $start . '(.*?)' . $end . '/ie', $result_text, $found))
-			{
-				$cnt = (int) $GLOBALS["teximgcnt"]++;
-				// get image from cgi and write it to file
-				$fpr = @fopen($cgi."?".rawurlencode($found[1]), "r");
-				$lcnt = 0;
-				if ($fpr)
-				{
-					while(!feof($fpr))
-					{
-						$buf = fread($fpr, 1024);
-						if ($lcnt == 0)
-						{
-							if (is_int(strpos(strtoupper(substr($buf, 0, 5)), "GIF")))
-							{
-								$suffix = "gif";
-							}
-							else
-							{
-								$suffix = "png";
-							}
-							$fpw = fopen($a_dir."/teximg/img".$cnt.".".$suffix, "w");
-						}
-						$lcnt++;
-						fwrite($fpw, $buf);
-					}
-					fclose($fpw);
-					fclose($fpr);
-				}
-
-				// replace tex-tag
-				$img_str = "./teximg/img".$cnt.".".$suffix;
-				$result_text = str_replace($found[0],
-					'<img alt="'.$found[1].'" src="'.$img_str.'" />', $result_text);
-			}
-		}
-
-		return $result_text;
-	}
+		include_once './Services/MathJax/classes/class.ilMathJax.php';
+		return ilMathJax::getInstance()->insertLatexImages($a_text, '[tex]','[/tex]', $a_dir.'/teximg', './teximg');
+    }
 
 	/**
 	* Prepares a string for a text area output where latex code may be in it
@@ -4598,8 +4387,9 @@ class ilUtil
 
 		if ($prepare_for_latex_output)
 		{
-			$result = ilUtil::insertLatexImages($result, "\<span class\=\"latex\">", "\<\/span>");
-			$result = ilUtil::insertLatexImages($result, "\[tex\]", "\[\/tex\]");
+			include_once './Services/MathJax/classes/class.ilMathJax.php';
+			$result = ilMathJax::getInstance()->insertLatexImages($result, "\<span class\=\"latex\">", "\<\/span>");
+			$result = ilMathJax::getInstance()->insertLatexImages($result, "\[tex\]", "\[\/tex\]");
 		}
 
 		// removed: did not work with magic_quotes_gpc = On
@@ -4860,7 +4650,7 @@ class ilUtil
 			"ORDER BY ".$a_field;
 
 		$res = $ilDB->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$ids[] = $row->$a_id_name;
 		}
@@ -5062,6 +4852,11 @@ class ilUtil
 		// Temporary fix for feed.php 
 		if(!(bool)$a_set_cookie_invalid) $expire = 0;
 		else $expire = time() - (365*24*60*60);
+		
+		if(!defined('IL_COOKIE_SECURE'))
+		{
+			define('IL_COOKIE_SECURE', false);
+		}
 
 		setcookie( $a_cookie_name, $a_cookie_value, $expire,
 			IL_COOKIE_PATH, IL_COOKIE_DOMAIN, IL_COOKIE_SECURE, IL_COOKIE_HTTPONLY
@@ -5279,7 +5074,145 @@ class ilUtil
 		}
 
 		fclose($fp);
+	}
+	
+	
+	//
+	//  used to be in ilFormat
+	//
+	
+	/**
+	 * Returns the magnitude used for size units.
+	 *
+	 * This function always returns the value 1024. Thus the value returned
+	 * by this function is the same value that Windows and Mac OS X return for a
+	 * file. The value is a GibiBit, MebiBit, KibiBit or byte unit.
+	 *
+	 * For more information about these units see:
+	 * http://en.wikipedia.org/wiki/Megabyte
+	 *
+	 * @return <type>
+	 */
+	protected static function _getSizeMagnitude()
+	{
+		return 1024;
+	}
+	
+	/**
+	* format a float
+	* 
+	* this functions takes php's number_format function and 
+	* formats the given value with appropriate thousand and decimal
+	* separator.
+	* @access	public
+	* @param	float		the float to format
+	* @param	integer		count of decimals
+	* @param	integer		display thousands separator
+	* @param	boolean		whether .0 should be suppressed
+	* @return	string		formatted number
+	*/
+	protected static function fmtFloat($a_float, $a_decimals=0, $a_dec_point = null, $a_thousands_sep = null, $a_suppress_dot_zero=false)
+	{
+		global $lng;
 
+		if ($a_dec_point == null) {
+			{
+				$a_dec_point = ".";
+			}
+		}
+		if ($a_dec_point == '-lang_sep_decimal-') {
+			$a_dec_point = ".";
+		}
+
+		if ($a_thousands_sep == null) {
+			$a_thousands_sep = $lng->txt('lang_sep_thousand');
+		}
+		if ($a_thousands_sep == '-lang_sep_thousand-') {
+			$a_thousands_sep = ",";
+		}
+
+		$txt = number_format($a_float, $a_decimals, $a_dec_point, $a_thousands_sep);
+
+		// remove trailing ".0" 
+		if (($a_suppress_dot_zero == 0 || $a_decimals == 0)
+		    && substr($txt, - 2) == $a_dec_point . '0'
+		) {
+			$txt = substr($txt, 0, strlen($txt) - 2);
+		}
+		if ($a_float == 0 and $txt == "") {
+			$txt = "0";
+		}
+
+		return $txt;
+	}
+	
+	/**
+	 * Returns the specified file size value in a human friendly form.
+	 * <p>
+	 * By default, the oder of magnitude 1024 is used. Thus the value returned
+	 * by this function is the same value that Windows and Mac OS X return for a
+	 * file. The value is a GibiBig, MebiBit, KibiBit or byte unit.
+	 * <p>
+	 * For more information about these units see:
+	 * http://en.wikipedia.org/wiki/Megabyte
+	 *
+	 * @param	integer	size in bytes
+	 * @param	string	mode:
+	 *                  "short" is useful for display in the repository
+	 *                  "long" is useful for display on the info page of an object
+	 * @param	ilLanguage  The language object, or null if you want to use the system language.
+	 */
+	public static function formatSize($size, $a_mode = 'short', $a_lng = null)
+	{
+		global $lng;
+		if ($a_lng == null) {
+			$a_lng = $lng;
+		}
+
+		$mag = self::_getSizeMagnitude();
+
+		if ($size >= $mag * $mag * $mag) {
+			$scaled_size = $size / $mag / $mag / $mag;
+			$scaled_unit = 'lang_size_gb';
+		} else {
+			if ($size >= $mag * $mag) {
+				$scaled_size = $size / $mag / $mag;
+				$scaled_unit = 'lang_size_mb';
+			} else {
+				if ($size >= $mag) {
+					$scaled_size = $size / $mag;
+					$scaled_unit = 'lang_size_kb';
+				} else {
+					$scaled_size = $size;
+					$scaled_unit = 'lang_size_bytes';
+				}
+			}
+		}
+
+		$result = self::fmtFloat($scaled_size, ($scaled_unit
+		                                        == 'lang_size_bytes') ? 0 : 1, $a_lng->txt('lang_sep_decimal'), $a_lng->txt('lang_sep_thousand'), true)
+		          . ' ' . $a_lng->txt($scaled_unit);
+		if ($a_mode == 'long' && $size > $mag) {
+			$result .= ' (' . self::fmtFloat($size, 0, $a_lng->txt('lang_sep_decimal'), $a_lng->txt('lang_sep_thousand')) . ' '
+			           . $a_lng->txt('lang_size_bytes') . ')';
+		}
+
+		return $result;
+	}
+	
+	
+	// 
+	// used for disk quotas
+	// 
+	
+	public static function MB2Bytes($a_value)
+	{
+		return  $a_value * pow(self::_getSizeMagnitude(), 2);
+	}
+	
+	public static function Bytes2MB($a_value)
+	{
+		return  $a_value / (pow(self::_getSizeMagnitude(), 2));
 	}
 
 

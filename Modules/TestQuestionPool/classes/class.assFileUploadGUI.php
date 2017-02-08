@@ -17,7 +17,7 @@ require_once './Modules/TestQuestionPool/interfaces/interface.ilGuiQuestionScori
  * @ingroup ModulesTestQuestionPool
  *
  * @ilctrl_iscalledby assFileUploadGUI: ilObjQuestionPoolGUI
- * 
+ * @ilCtrl_Calls assFileUploadGUI: ilFormPropertyDispatchGUI
  */
 class assFileUploadGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjustable
 {
@@ -42,13 +42,9 @@ class assFileUploadGUI extends assQuestionGUI implements ilGuiQuestionScoringAdj
 	}
 
 	/**
-	 * Evaluates a posted edit form and writes the form data in the question object
-	 *
-	 * @param bool $always
-	 *
-	 * @return integer A positive value, if one of the required fields wasn't set, else 0
+	 * {@inheritdoc}
 	 */
-	public function writePostData($always = false)
+	protected function writePostData($always = false)
 	{
 		$hasErrors = (!$always) ? $this->editQuestion(true) : false;
 		if (!$hasErrors)
@@ -82,6 +78,8 @@ class assFileUploadGUI extends assQuestionGUI implements ilGuiQuestionScoringAdj
 
 		include_once("./Services/Form/classes/class.ilPropertyFormGUI.php");
 		$form = new ilPropertyFormGUI();
+		$this->editForm = $form;
+
 		$form->setFormAction($this->ctrl->getFormAction($this));
 		$form->setTitle($this->outQuestionType());
 		$form->setMultipart(false);

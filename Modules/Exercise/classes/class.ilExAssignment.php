@@ -956,7 +956,7 @@ class ilExAssignment
 	 * @param
 	 * @return
 	 */
-	function cloneAssignmentsOfExercise($a_old_exc_id, $a_new_exc_id, array $a_crit_cat_map)
+	static function cloneAssignmentsOfExercise($a_old_exc_id, $a_new_exc_id, array $a_crit_cat_map)
 	{
 		$ass_data = self::getInstancesByExercise($a_old_exc_id);
 		foreach ($ass_data as $d)
@@ -1144,7 +1144,7 @@ class ilExAssignment
 	/**
 	 * Order assignments by deadline date
 	 */
-	function countMandatory($a_ex_id)
+	static function countMandatory($a_ex_id)
 	{
 		global $ilDB;
 		
@@ -1239,6 +1239,8 @@ class ilExAssignment
 				$mem[$rec["usr_id"]]["feedback_time"] = $rec["feedback_time"];
 				$mem[$rec["usr_id"]]["notice"] = $rec["notice"];
 				$mem[$rec["usr_id"]]["status"] = $rec["status"];
+				$mem[$rec["usr_id"]]["mark"] = $rec["mark"];
+				$mem[$rec["usr_id"]]["comment"] = $rec["u_comment"];
 			}
 		}
 		return $mem;
@@ -1523,7 +1525,14 @@ class ilExAssignment
 					rename($file_path, $target);
 										
 					if ($noti_rec_ids)
-					{
+					{						
+						foreach($noti_rec_ids as $user_id)
+						{
+							$member_status = $this->getMemberStatus($user_id);
+							$member_status->setFeedback(true);
+							$member_status->update();
+						}	
+						
 						$a_exc->sendFeedbackFileNotification($file_name, $noti_rec_ids,
 							(int) $this->getId());
 					}
@@ -1688,7 +1697,7 @@ class ilExAssignment
 	}
 	
 	public function afterDeadlineStrict($a_include_personal = true)
-	{						
+	{
 		// :TODO: this means that peer feedback, global feedback is available 
 		// after LAST personal deadline
 		// team management is currently ignoring personal deadlines
@@ -1758,7 +1767,11 @@ class ilExAssignment
 			return $path."/".$file;
 		}
 	}
-		
+
+	/**
+	 * @param int|null $a_user_id
+	 * @return \ilExAssignmentMemberStatus
+	 */
 	public function getMemberStatus($a_user_id = null)
 	{
 		global $ilUser;
@@ -1780,9 +1793,9 @@ class ilExAssignment
 		global $ilDB;
 		
 		// see JF, 2015-05-11 
+				
+		$ext_deadline = $this->getExtendedDeadline();
 		
-		$ext_deadline = $this->getExtendedDeadline();		
-	
 		include_once "Modules/Exercise/classes/class.ilExSubmission.php";
 		foreach(ilExSubmission::getAllAssignmentFiles($this->exc_id, $this->getId()) as $file)
 		{
@@ -1868,7 +1881,7 @@ class ilExAssignment
 				$row["member_id"] = "t".$row["member_id"];
 			}
 			
-			$res[$row["member_id"]] = new ilDateTime($row["tstamp"], IL_CAL_UNIX);
+			$res[$row["member_id"]] = $row["tstamp"];
 		}
 		
 		return $res;

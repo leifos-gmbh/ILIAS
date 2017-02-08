@@ -45,7 +45,7 @@ class ilConditionHandlerGUI
 
 		include_once "./Services/AccessControl/classes/class.ilConditionHandler.php";
 
-		$this->ch_obj =& new ilConditionHandler();
+		$this->ch_obj = new ilConditionHandler();
 
 		$this->ctrl =& $ilCtrl;
 		$this->gui_obj =& $gui_obj;
@@ -225,7 +225,7 @@ class ilConditionHandlerGUI
 		
 		include_once "./Services/AccessControl/classes/class.ilConditionHandler.php";
 
-		$this->ch_obj =& new ilConditionHandler();
+		$this->ch_obj = new ilConditionHandler();
 
 		if($a_ref_id)
 		{
@@ -289,8 +289,9 @@ class ilConditionHandlerGUI
 			)
 		);
 
-		$this->tpl->setVariable('TABLE_CONDITIONS',$table->getHTML());
-		$this->tpl->setContent($table->getHTML());
+		$h = $table->getHTML();
+		$this->tpl->setVariable('TABLE_CONDITIONS',$h);
+		//$this->tpl->setContent($h);
 	}
 
 	/**
@@ -334,7 +335,6 @@ class ilConditionHandlerGUI
 						{
 							ilConditionHandler::updateObligatory($item["condition_id"], false);
 						}
-						$num_req = 1;
 					}
 					ilConditionHandler::saveNumberOfRequiredTriggers(
 									$this->getTargetRefId(),
@@ -410,7 +410,7 @@ class ilConditionHandlerGUI
 				$this->getTargetType()
 			);
 		}
-
+		
 		$all = ilConditionHandler::_getConditionsOfTarget($this->getTargetRefId(),$this->getTargetId());
 		
 		include_once './Services/Form/classes/class.ilPropertyFormGUI.php';
@@ -433,32 +433,27 @@ class ilConditionHandlerGUI
 		$mall->setInfo($this->lng->txt("rbac_precondition_mode_all_info"));
 		$mode->addOption($mall);
 		
-		$msubset = new ilRadioOption($this->lng->txt("rbac_precondition_mode_subset"), "subset");
-		$msubset->setInfo($this->lng->txt("rbac_precondition_mode_subset_info"));
-		$mode->addOption($msubset);
-
-		$obl = new ilNumberInputGUI($this->lng->txt('precondition_num_obligatory'), 'required');
-		$obl->setInfo($this->lng->txt('precondition_num_optional_info'));
-		if(count($opt))
+		
+		if(count($all) > 1)
 		{
-			$obligatory = ilConditionHandler::calculateRequiredTriggers(
-				$this->getTargetRefId(),
-				$this->getTargetId(),
-				$this->getTargetType()
-			);
-			$min = count($all) - count($opt) + 1;
+			$min = 1;
 			$max = count($all) - 1;
+
+			$msubset = new ilRadioOption($this->lng->txt("rbac_precondition_mode_subset"), "subset");
+			$msubset->setInfo($this->lng->txt("rbac_precondition_mode_subset_info"));
+			$mode->addOption($msubset);
+
+			$obl = new ilNumberInputGUI($this->lng->txt('precondition_num_obligatory'), 'required');
+			$obl->setInfo($this->lng->txt('precondition_num_optional_info'));
+			
+			$num_required = ilConditionHandler::lookupObligatoryConditionsOfTarget($this->getTargetRefId(), $this->getTargetId());
+			$obl->setValue($num_required > 0 ? $num_required : null);
+			$obl->setRequired(true);
+			$obl->setSize(1);
+			$obl->setMinValue($min);
+			$obl->setMaxValue($max);
+			$msubset->addSubItem($obl);
 		}
-		else
-		{
-			$obligatory = $min = $max = 1;
-		}
-		$obl->setValue($obligatory);
-		$obl->setRequired(true);
-		$obl->setSize(1);
-		$obl->setMinValue($min);
-		$obl->setMaxValue($max);
-		$msubset->addSubItem($obl);
 		
 		$old_mode = new ilHiddenInputGUI("old_list_mode");
 		$old_mode->setValue($_REQUEST["list_mode"]);

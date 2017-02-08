@@ -24,7 +24,12 @@ class ilRepositorySelectorExplorerGUI extends ilTreeExplorerGUI
 	protected $session_materials = array();
 	protected $highlighted_node = null;
 	protected $clickable_types = array();
-	
+
+	/**
+	 * @var callable
+	 */
+	protected $nc_modifier = null;
+
 	/**
 	 * Constructor
 	 *
@@ -35,7 +40,7 @@ class ilRepositorySelectorExplorerGUI extends ilTreeExplorerGUI
 	 * @param string $a_selection_par selection parameter
 	 */
 	public function __construct($a_parent_obj, $a_parent_cmd, $a_selection_gui = null, $a_selection_cmd = "selectObject",
-		$a_selection_par = "sel_ref_id")
+								$a_selection_par = "sel_ref_id", $a_id = "rep_exp_sel")
 	{
 		global $tree, $objDefinition;
 
@@ -49,8 +54,7 @@ class ilRepositorySelectorExplorerGUI extends ilTreeExplorerGUI
 			: strtolower($a_selection_gui);
 		$this->selection_cmd = $a_selection_cmd;
 		$this->selection_par = $a_selection_par;
-
-		parent::__construct("rep_exp_sel", $a_parent_obj, $a_parent_cmd, $tree);
+		parent::__construct($a_id, $a_parent_obj, $a_parent_cmd, $tree);
 
 		$this->setSkipRootNode(false);
 		$this->setAjax(true);
@@ -75,6 +79,26 @@ class ilRepositorySelectorExplorerGUI extends ilTreeExplorerGUI
 	}
 
 	/**
+	 * Set node content modifier
+	 *
+	 * @param callable $a_val
+	 */
+	function setNodeContentModifier(callable $a_val)
+	{
+		$this->nc_modifier = $a_val;
+	}
+
+	/**
+	 * Get node content modifier
+	 *
+	 * @return callable
+	 */
+	function getNodeContentModifier()
+	{
+		return $this->nc_modifier;
+	}
+
+	/**
 	 * Get node content
 	 *
 	 * @param array $a_node node data
@@ -83,7 +107,13 @@ class ilRepositorySelectorExplorerGUI extends ilTreeExplorerGUI
 	function getNodeContent($a_node)
 	{
 		global $lng;
-		
+
+		$c = $this->getNodeContentModifier();
+		if (is_callable($c))
+		{
+			return $c($a_node);
+		}
+
 		$title = $a_node["title"];
 		if ($a_node["child"] == $this->getNodeId($this->getRootNode()))
 		{
@@ -95,7 +125,7 @@ class ilRepositorySelectorExplorerGUI extends ilTreeExplorerGUI
 
 		return $title;
 	}
-	
+
 	/**
 	 * Get node icon
 	 *
@@ -128,10 +158,10 @@ class ilRepositorySelectorExplorerGUI extends ilTreeExplorerGUI
 			return $lng->txt("icon")." ".$title;
 		}
 
-		
+
 		return parent::getNodeIconAlt($a_node);
 	}
-	
+
 	/**
 	 * Is node highlighted?
 	 *
@@ -155,8 +185,8 @@ class ilRepositorySelectorExplorerGUI extends ilTreeExplorerGUI
 			return true;
 		}
 		return false;
-	}	
-	
+	}
+
 	/**
 	 * Get href for node
 	 *
@@ -167,9 +197,16 @@ class ilRepositorySelectorExplorerGUI extends ilTreeExplorerGUI
 	{
 		global $ilCtrl;
 
-		$ilCtrl->setParameterByClass($this->selection_gui, $this->selection_par, $a_node["child"]);
-		$link = $ilCtrl->getLinkTargetByClass($this->selection_gui, $this->selection_cmd);
-		$ilCtrl->setParameterByClass($this->selection_gui, $this->selection_par, "");
+		if ($this->select_postvar == "")
+		{
+			$ilCtrl->setParameterByClass($this->selection_gui, $this->selection_par, $a_node["child"]);
+			$link = $ilCtrl->getLinkTargetByClass($this->selection_gui, $this->selection_cmd);
+			$ilCtrl->setParameterByClass($this->selection_gui, $this->selection_par, "");
+		}
+		else
+		{
+			return "#";
+		}
 
 		return $link;
 	}
@@ -188,10 +225,10 @@ class ilRepositorySelectorExplorerGUI extends ilTreeExplorerGUI
 		{
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Sort childs
 	 *
@@ -204,7 +241,7 @@ class ilRepositorySelectorExplorerGUI extends ilTreeExplorerGUI
 		global $objDefinition;
 
 		$parent_obj_id = ilObject::_lookupObjId($a_parent_node_id);
-		
+
 		if ($parent_obj_id > 0)
 		{
 			$parent_type = ilObject::_lookupType($parent_obj_id);
@@ -221,7 +258,7 @@ class ilRepositorySelectorExplorerGUI extends ilTreeExplorerGUI
 				$objDefinition->getGroupedRepositoryObjectTypes($parent_type);
 		}
 		$group = array();
-		
+
 		foreach ($a_childs as $child)
 		{
 			$g = $objDefinition->getGroupOfObj($child["type"]);
@@ -231,14 +268,14 @@ class ilRepositorySelectorExplorerGUI extends ilTreeExplorerGUI
 			}
 			$group[$g][] = $child;
 		}
-	
+
 		// #14587 - $objDefinition->getGroupedRepositoryObjectTypes does NOT include side blocks!
 		$wl = $this->getTypeWhiteList();
 		if(is_array($wl) && in_array("poll", $wl))
 		{
 			$this->type_grps[$parent_type]["poll"] = array();
 		}
-		
+
 		$childs = array();
 		foreach ($this->type_grps[$parent_type] as $t => $g)
 		{
@@ -249,20 +286,20 @@ class ilRepositorySelectorExplorerGUI extends ilTreeExplorerGUI
 				include_once("./Services/Container/classes/class.ilContainerSorting.php");
 				$sort = ilContainerSorting::_getInstance($parent_obj_id);
 				$group = $sort->sortItems($group);
-				
+
 				// need extra session sorting here
 				if ($t == "sess")
 				{
 
 				}
-				
+
 				foreach ($group[$t] as $k => $item)
 				{
 					$childs[] = $item;
 				}
 			}
 		}
-		
+
 		return $childs;
 	}
 
@@ -275,7 +312,7 @@ class ilRepositorySelectorExplorerGUI extends ilTreeExplorerGUI
 	function getChildsOfNode($a_parent_node_id)
 	{
 		global $ilAccess;
-		
+
 		if (!$ilAccess->checkAccess("read", "", $a_parent_node_id))
 		{
 			return array();
@@ -283,7 +320,7 @@ class ilRepositorySelectorExplorerGUI extends ilTreeExplorerGUI
 
 		return parent::getChildsOfNode($a_parent_node_id);
 	}
-	
+
 	/**
 	 * Is node clickable?
 	 *
@@ -357,6 +394,68 @@ class ilRepositorySelectorExplorerGUI extends ilTreeExplorerGUI
 		return (array)$this->clickable_types;
 	}
 
+	/**
+	 * Get HTML
+	 *
+	 * @param
+	 * @return
+	 */
+	/*	function getHTML()
+		{
+			global $ilCtrl, $tpl;
+
+			$add = "";
+			if ($ilCtrl->isAsynch())
+			{
+				$add = $this->getOnLoadCode();
+			}
+			else
+			{
+				$tpl->addOnloadCode($this->getOnLoadCode());
+			}
+
+			return parent::getHTML().$add;
+		}
+	*/
+
+	/**
+	 * set Whitelist for clickable items
+	 *
+	 * @param array/string $a_types array type
+	 */
+	function setSelectableTypes($a_types)
+	{
+		if(!is_array($a_types))
+		{
+			$a_types = array($a_types);
+		}
+		$this->selectable_types = $a_types;
+	}
+
+	/**
+	 * get whitelist for clickable items
+	 *
+	 * @return array types
+	 */
+	function getSelectableTypes()
+	{
+		return (array)$this->selectable_types;
+	}
+
+	/**
+	 * Is node selectable?
+	 *
+	 * @param mixed $a_node node object/array
+	 * @return boolean node selectable true/false
+	 */
+	protected function isNodeSelectable($a_node)
+	{
+		if(count($this->getSelectableTypes()))
+		{
+			return in_array($a_node['type'],$this->getSelectableTypes() );
+		}
+		return true;
+	}
 }
 
 ?>

@@ -23,9 +23,9 @@ class ilGlossarySelectorGUI extends ilExplorer
 	{
 		global $tree,$ilCtrl;
 
-		$this->ctrl =& $ilCtrl;
+		$this->ctrl = $ilCtrl;
 		$this->parent_class = $a_par_class;
-		parent::ilExplorer($a_target);
+		parent::__construct($a_target);
 	}
 
 	function setSelectableTypes($a_types)
@@ -53,7 +53,7 @@ class ilGlossarySelectorGUI extends ilExplorer
 	/**
 	* Item clickable?
 	*/
-	function isClickable($a_type, $a_ref_id)
+	function isClickable($a_type, $a_ref_id = 0)
 	{
 		global $ilUser, $ilAccess;
 		
@@ -95,7 +95,7 @@ class ilGlossarySelectorGUI extends ilExplorer
 	* @param	integer array options
 	* @return	string
 	*/
-	function formatHeader(&$tpl, $a_obj_id,$a_option)
+	function formatHeader($tpl, $a_obj_id,$a_option)
 	{
 		global $lng, $ilias;
 		

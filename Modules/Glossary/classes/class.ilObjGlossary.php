@@ -21,13 +21,18 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
 {
 
 	/**
+	 * @var array
+	 */
+	var $auto_glossaries = array();
+
+	/**
 	* Constructor
 	* @access	public
 	*/
-	function ilObjGlossary($a_id = 0,$a_call_by_reference = true)
+	function __construct($a_id = 0,$a_call_by_reference = true)
 	{
 		$this->type = "glo";
-		$this->ilObject($a_id,$a_call_by_reference);
+		parent::__construct($a_id,$a_call_by_reference);
 	}
 
 	/**
@@ -46,7 +51,7 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
 			$this->createMetaData();
 		}
 		
-		$ilDB->manipulate("INSERT INTO glossary (id, is_online, virtual, pres_mode, snippet_length) VALUES (".
+		$ilDB->manipulate("INSERT INTO glossary (id, is_online, glossary.virtual, pres_mode, snippet_length) VALUES (".
 			$ilDB->quote($this->getId(), "integer").",".
 			$ilDB->quote("n", "text").",".
 			$ilDB->quote($this->getVirtualMode(), "text").",".
@@ -56,9 +61,11 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
 		$this->setPresentationMode("table");
 		$this->setSnippetLength(200);
 
+		$this->updateAutoGlossaries();
+
 		if (((int) $this->getStyleSheetId()) > 0)
 		{
-			include_once("./Services/Style/classes/class.ilObjStyleSheet.php");
+			include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
 			ilObjStyleSheet::writeStyleUsage($this->getId(), $this->getStyleSheetId());
 		}
 
@@ -88,8 +95,20 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
 		$this->setSnippetLength($gl_rec["snippet_length"]);
 		$this->setShowTaxonomy($gl_rec["show_tax"]);
 		
-		include_once("./Services/Style/classes/class.ilObjStyleSheet.php");
+		include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
 		$this->setStyleSheetId((int) ilObjStyleSheet::lookupObjectStyle($this->getId()));
+
+		// read auto glossaries
+		$set = $ilDB->query("SELECT * FROM glo_glossaries ".
+			" WHERE id = ".$ilDB->quote($this->getId(), "integer")
+		);
+		$glos = array();
+		while ($rec = $ilDB->fetchAssoc($set))
+		{
+			$glos[] = $rec["glo_id"];
+		}
+		$this->setAutoGlossaries($glos);
+
 
 	}
 
@@ -223,7 +242,7 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
 	/**
 	 * check wether content object is online
 	 */
-	function _lookupOnline($a_id)
+	static function _lookupOnline($a_id)
 	{
 		global $ilDB;
 
@@ -320,7 +339,58 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
 	{
 		return $this->show_tax;
 	}
-	
+
+	/**
+	 * Set auto glossaries
+	 *
+	 * @param array $a_val int
+	 */
+	function setAutoGlossaries($a_val)
+	{
+		$this->auto_glossaries = array();
+		if (is_array($a_val))
+		{
+			foreach ($a_val as $v)
+			{
+				$v = (int) $v;
+				if ($v > 0 && ilObject::_lookupType($v) == "glo" &&
+					!in_array($v, $this->auto_glossaries))
+				{
+					$this->auto_glossaries[] = $v;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Get auto glossaries
+	 *
+	 * @return array int
+	 */
+	function getAutoGlossaries()
+	{
+		return $this->auto_glossaries;
+	}
+
+	/**
+	 * Remove auto glossary
+	 *
+	 * @param
+	 * @return
+	 */
+	function removeAutoGlossary($a_glo_id)
+	{
+		$glo_ids = array();
+		foreach($this->getAutoGlossaries() as $g)
+		{
+			if ($g != $a_glo_id)
+			{
+				$glo_ids[] = $g;
+			}
+		}
+		$this->setAutoGlossaries($glo_ids);
+	}
+
 	/**
 	 * Update object
 	 */
@@ -332,7 +402,7 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
 
 		$ilDB->manipulate("UPDATE glossary SET ".
 			" is_online = ".$ilDB->quote(ilUtil::tf2yn($this->getOnline()), "text").",".
-			" virtual = ".$ilDB->quote($this->getVirtualMode(), "text").",".
+			" glossary.virtual = ".$ilDB->quote($this->getVirtualMode(), "text").",".
 			" public_xml_file = ".$ilDB->quote($this->getPublicExportFile("xml"), "text").",".
 			" public_html_file = ".$ilDB->quote($this->getPublicExportFile("html"), "text").",".
 			" glo_menu_active = ".$ilDB->quote(ilUtil::tf2yn($this->isActiveGlossaryMenu()), "text").",".
@@ -342,18 +412,65 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
 			" snippet_length = ".$ilDB->quote((int)$this->getSnippetLength(), "integer")." ".
 			" WHERE id = ".$ilDB->quote($this->getId(), "integer"));
 		
-		include_once("./Services/Style/classes/class.ilObjStyleSheet.php");
+		include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
 		ilObjStyleSheet::writeStyleUsage($this->getId(), $this->getStyleSheetId());
 
+		$this->updateAutoGlossaries();
 		parent::update();
 	}
 
 
 	/**
+	 * Update auto glossaries
+	 *
+	 * @param
+	 * @return
+	 */
+	function updateAutoGlossaries()
+	{
+		global $ilDB;
+
+		// update auto glossaries
+		$ilDB->manipulate("DELETE FROM glo_glossaries WHERE ".
+			" id = ".$ilDB->quote($this->getId(), "integer")
+		);
+		foreach ($this->getAutoGlossaries() as $glo_id)
+		{
+			$ilDB->manipulate("INSERT INTO glo_glossaries ".
+				"(id, glo_id) VALUES (".
+				$ilDB->quote($this->getId(), "integer").",".
+				$ilDB->quote($glo_id, "integer").
+				")");
+		}
+	}
+
+	/**
+	 * Lookup auto glossaries
+	 *
+	 * @param
+	 * @return
+	 */
+	static function lookupAutoGlossaries($a_id)
+	{
+		global $ilDB;
+
+		// read auto glossaries
+		$set = $ilDB->query("SELECT * FROM glo_glossaries ".
+			" WHERE id = ".$ilDB->quote($a_id, "integer")
+		);
+		$glos = array();
+		while ($rec = $ilDB->fetchAssoc($set))
+		{
+			$glos[] = $rec["glo_id"];
+		}
+		return $glos;
+	}
+
+	/**
 	* Get term list
 	*/
 	function getTermList($searchterm = "", $a_letter = "", $a_def = "", $a_tax_node = 0, $a_include_offline_childs = false,
-		$a_add_amet_fields = false, array $a_amet_filter = null, $a_omit_virtual = false)
+		$a_add_amet_fields = false, array $a_amet_filter = null, $a_omit_virtual = false, $a_include_references = false)
 	{
 		if ($a_omit_virtual)
 		{
@@ -364,7 +481,7 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
 			$glo_ids = $this->getAllGlossaryIds($a_include_offline_childs);
 		}
 		$list = ilGlossaryTerm::getTermList($glo_ids, $searchterm, $a_letter, $a_def, $a_tax_node,
-			$a_add_amet_fields, $a_amet_filter);
+			$a_add_amet_fields, $a_amet_filter, $a_include_references);
 		return $list;
 	}
 
@@ -554,6 +671,10 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
 		ilUtil::delDir($a_target_dir);
 		ilUtil::makeDir($a_target_dir);
 		
+        // init mathjax rendering for export
+		include_once './Services/MathJax/classes/class.ilMathJax.php';
+		ilMathJax::getInstance()->init(ilMathJax::PURPOSE_EXPORT);
+
 		include_once("./Services/COPage/classes/class.ilCOPageHTMLExport.php");
 		$this->co_page_html_export = new ilCOPageHTMLExport($a_target_dir);
 		$this->co_page_html_export->createDirectories();
@@ -585,7 +706,7 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
 		// get glossary presentation gui class
 		include_once("./Modules/Glossary/classes/class.ilGlossaryPresentationGUI.php");
 		$_GET["cmd"] = "nop";
-		$glo_gui =& new ilGlossaryPresentationGUI();
+		$glo_gui = new ilGlossaryPresentationGUI();
 		$glo_gui->setOfflineMode(true);
 		$glo_gui->setOfflineDirectory($a_target_dir);
 		
@@ -699,7 +820,7 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
 
 			$_GET["term_id"] = $term["id"];
 			$_GET["frame"] = "_blank";
-			$content =& $a_glo_gui->listDefinitions($_GET["ref_id"],$term["id"],false);
+			$content = $a_glo_gui->listDefinitions($_GET["ref_id"],$term["id"],false);
 			$file = $a_target_dir."/term_".$term["id"].".html";
 							
 			// open file
@@ -753,7 +874,7 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
 		$_GET["obj_type"]  = "MediaObject";
 		$_GET["mob_id"]  = $a_mob_id;
 		$_GET["cmd"] = "";
-		$content =& $a_glo_gui->media();
+		$content = $a_glo_gui->media();
 		$file = $a_target_dir."/media_".$a_mob_id.".html";
 
 		// open file
@@ -1016,89 +1137,25 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
 			$terms = $this->getTermList();
 			foreach ($terms as $term)
 			{
-				$term_obj =& new ilGlossaryTerm($term["id"]);
+				$term_obj = new ilGlossaryTerm($term["id"]);
 				$term_obj->delete();
 			}
 		}
-		
+
+		// delete term references
+		include_once("./Modules/Glossary/classes/class.ilGlossaryTermReferences.php");
+		$refs = new ilGlossaryTermReferences($this->getId());
+		$refs->delete();
+
 		// delete glossary data entry
 		$q = "DELETE FROM glossary WHERE id = ".$ilDB->quote($this->getId());
 		$ilDB->query($q);
 
 		// delete meta data
 		$this->deleteMetaData();
-/*
-		$nested = new ilNestedSetXML();
-		$nested->init($this->getId(), $this->getType());
-		$nested->deleteAllDBData();
-*/
 
 		return true;
 	}
-
-	/**
-	* notifys an object about an event occured
-	* Based on the event happend, each object may decide how it reacts.
-	*
-	* @access	public
-	* @param	string	event
-	* @param	integer	reference id of object where the event occured
-	* @param	array	passes optional paramters if required
-	* @return	boolean
-	*/
-	function notify($a_event,$a_ref_id,$a_parent_non_rbac_id,$a_node_id,$a_params = 0)
-	{
-		global $tree;
-		
-		switch ($a_event)
-		{
-			case "link":
-				
-				//var_dump("<pre>",$a_params,"</pre>");
-				//echo "Glossary ".$this->getRefId()." triggered by link event. Objects linked into target object ref_id: ".$a_ref_id;
-				//exit;
-				break;
-			
-			case "cut":
-				
-				//echo "Glossary ".$this->getRefId()." triggered by cut event. Objects are removed from target object ref_id: ".$a_ref_id;
-				//exit;
-				break;
-				
-			case "copy":
-			
-				//var_dump("<pre>",$a_params,"</pre>");
-				//echo "Glossary ".$this->getRefId()." triggered by copy event. Objects are copied into target object ref_id: ".$a_ref_id;
-				//exit;
-				break;
-
-			case "paste":
-				
-				//echo "Glossary ".$this->getRefId()." triggered by paste (cut) event. Objects are pasted into target object ref_id: ".$a_ref_id;
-				//exit;
-				break;
-
-			case "new":
-
-				//echo "Glossary ".$this->getRefId()." triggered by paste (new) event. Objects are applied to target object ref_id: ".$a_ref_id;
-				//exit;
-				break;
-		}
-		
-		// At the beginning of the recursive process it avoids second call of the notify function with the same parameter
-		if ($a_node_id==$_GET["ref_id"])
-		{	
-			$parent_obj =& $this->ilias->obj_factory->getInstanceByRefId($a_node_id);
-			$parent_type = $parent_obj->getType();
-			if($parent_type == $this->getType())
-			{
-				$a_node_id = (int) $tree->getParentId($a_node_id);
-			}
-		}
-		
-		parent::notify($a_event,$a_ref_id,$a_parent_non_rbac_id,$a_node_id,$a_params);
-	}
-
 
 	/**
 	* Get zipped xml file for glossary.
@@ -1155,11 +1212,11 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
 	 * @param int target ref_id
 	 * @param int copy id
 	 */
-	public function cloneObject($a_target_id,$a_copy_id = 0)
+	public function cloneObject($a_target_id,$a_copy_id = 0, $a_omit_tree = false)
 	{
 		global $ilDB, $ilUser, $ilias;
 
-		$new_obj = parent::cloneObject($a_target_id,$a_copy_id);
+		$new_obj = parent::cloneObject($a_target_id,$a_copy_id, $a_omit_tree);
 		$this->cloneMetaData($new_obj);
 
 		//copy online status if object is not the root copy object
@@ -1175,10 +1232,11 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
 		$new_obj->setVirtualMode($this->getVirtualMode());
 		$new_obj->setPresentationMode($this->getPresentationMode());
 		$new_obj->setSnippetLength($this->getSnippetLength());
+		$new_obj->setAutoGlossaries($this->getAutoGlossaries());
 		$new_obj->update();
 
 		// set/copy stylesheet
-		include_once("./Services/Style/classes/class.ilObjStyleSheet.php");
+		include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
 		$style_id = $this->getStyleSheetId();
 		if ($style_id > 0 && !ilObjStyleSheet::_lookupStandard($style_id))
 		{
@@ -1268,6 +1326,57 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
 			return $lng->txt("glo_term").' "'. ilGlossaryTerm::_lookGlossaryTerm($a_sub_id).'"';
 		}
 	}
+
+	/**
+	 * Auto link glossary terms
+	 *
+	 * @param
+	 * @return
+	 */
+	function autoLinkGlossaryTerms($a_glo_id)
+	{
+		// get terms of target glossary
+		include_once("./Modules/Glossary/classes/class.ilGlossaryTerm.php");
+		$terms = ilGlossaryTerm::getTermList($a_glo_id);
+
+		// for each get page: get content
+		$source_terms = ilGlossaryTerm::getTermList($this->getId());
+		$found_pages = array();
+		foreach($source_terms as $source_term)
+		{
+			$source_defs = ilGlossaryDefinition::getDefinitionList($source_term["id"]);
+
+			for ($j = 0; $j < count($source_defs); $j++)
+			{
+				$def = $source_defs[$j];
+				$pg = new ilGlossaryDefPage($def["id"]);
+
+				$c = $pg->getXMLContent();
+				foreach ($terms as $t)
+				{
+					if (is_int(stripos($c, $t["term"])))
+					{
+						$found_pages[$def["id"]]["terms"][] = $t;
+						if (!is_object($found_pages[$def["id"]]["page"]))
+						{
+							$found_pages[$def["id"]]["page"] = $pg;
+						}
+					}
+				}
+				reset($terms);
+			}
+		}
+
+		// ilPCParagraph autoLinkGlossariesPage with page and terms
+		include_once("./Services/COPage/classes/class.ilPCParagraph.php");
+		foreach ($found_pages as $id => $fp)
+		{
+			ilPCParagraph::autoLinkGlossariesPage($fp["page"], $fp["terms"]);
+		}
+
+
+	}
+
 }
 
 ?>

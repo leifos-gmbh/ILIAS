@@ -3,7 +3,7 @@
 /* Copyright (c) 1998-2012 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 
-require_once("./Services/Style/classes/class.ilObjStyleSheet.php");
+require_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
 require_once ("./Modules/Glossary/classes/class.ilGlossaryDefPageGUI.php");
 
 /**
@@ -29,24 +29,26 @@ class ilTermDefinitionEditorGUI
 	* Constructor
 	* @access	public
 	*/
-	function ilTermDefinitionEditorGUI()
+	function __construct()
 	{
-		global $ilias, $tpl, $lng, $objDefinition, $ilCtrl;
+		global $ilias, $tpl, $lng, $objDefinition, $ilCtrl, $ilTabs;
 
 		// initiate variables
-		$this->ilias =& $ilias;
-		$this->tpl =& $tpl;
-		$this->lng =& $lng;
-		$this->ctrl =& $ilCtrl;
-		$this->glossary =& new ilObjGlossary($_GET["ref_id"], true);
-		$this->definition =& new ilGlossaryDefinition($_GET["def"]);
-		$this->term =& new ilGlossaryTerm($this->definition->getTermId());
+		$this->ilias = $ilias;
+		$this->tpl = $tpl;
+		$this->lng = $lng;
+		$this->ctrl = $ilCtrl;
+		$this->glossary = new ilObjGlossary($_GET["ref_id"], true);
+		$this->definition = new ilGlossaryDefinition($_GET["def"]);
+		$this->term = new ilGlossaryTerm($this->definition->getTermId());
+		$this->term_glossary = new ilObjGlossary(ilGlossaryTerm::_lookGlossaryID($this->definition->getTermId()), false);
+		$this->tabs_gui = $ilTabs;
 
 		$this->ctrl->saveParameter($this, array("def"));
 	}
 
 
-	function &executeCommand()
+	function executeCommand()
 	{
 		global $tpl, $ilCtrl, $lng;
 		
@@ -56,7 +58,7 @@ class ilTermDefinitionEditorGUI
 		// content style
 		$this->tpl->setCurrentBlock("ContentStyle");
 		$this->tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
-			ilObjStyleSheet::getContentStylePath($this->glossary->getStyleSheetId()));
+			ilObjStyleSheet::getContentStylePath($this->term_glossary->getStyleSheetId()));
 		$this->tpl->parseCurrentBlock();
 
 		// syntax style
@@ -66,12 +68,12 @@ class ilTermDefinitionEditorGUI
 		$this->tpl->parseCurrentBlock();
 
 		require_once ("./Modules/Glossary/classes/class.ilGlossaryLocatorGUI.php");
-		$gloss_loc =& new ilGlossaryLocatorGUI();
+		$gloss_loc = new ilGlossaryLocatorGUI();
 		$gloss_loc->setTerm($this->term);
 		$gloss_loc->setGlossary($this->glossary);
 		$gloss_loc->setDefinition($this->definition);
 
-		$this->tpl->getStandardTemplate();
+//		$this->tpl->getStandardTemplate();
 		$this->tpl->setTitle($this->term->getTerm()." - ".
 			$this->lng->txt("cont_definition")." ".
 			$this->definition->getNr());
@@ -118,7 +120,7 @@ class ilTermDefinitionEditorGUI
 				// metadata
 				// ... set title to term, if no title is given
 				include_once("./Services/MetaData/classes/class.ilMD.php");
-				$md = new ilMD($this->glossary->getId(), $this->definition->getId(), "gdf");
+				$md = new ilMD($this->term_glossary->getId(), $this->definition->getId(), "gdf");
 				$md_gen = $md->getGeneral();
 				if ($md_gen->getTitle() == "")
 				{
@@ -126,13 +128,13 @@ class ilTermDefinitionEditorGUI
 					$md_gen->update();
 				}
 
-				$page_gui->activateMetaDataEditor($this->glossary, "gdf", $this->definition->getId());
+				$page_gui->activateMetaDataEditor($this->term_glossary, "gdf", $this->definition->getId());
 				
 				$page_gui->setSourcecodeDownloadScript("ilias.php?baseClass=ilGlossaryPresentationGUI&amp;ref_id=".$_GET["ref_id"]);
 				$page_gui->setFullscreenLink("ilias.php?baseClass=ilGlossaryPresentationGUI&amp;cmd=fullscreen&amp;ref_id=".$_GET["ref_id"]);
 				$page_gui->setTemplateTargetVar("ADM_CONTENT");
 				$page_gui->setOutputMode("edit");
-				$page_gui->setStyleId($this->glossary->getStyleSheetId());
+				$page_gui->setStyleId($this->term_glossary->getStyleSheetId());
 				$page_gui->setLocator($gloss_loc);
 				$page_gui->setIntLinkReturn($this->ctrl->getLinkTargetByClass("ilobjglossarygui", "quickList",
 					"", false, false));
@@ -141,14 +143,14 @@ class ilTermDefinitionEditorGUI
 				$page_gui->setHeader($this->term->getTerm());
 				$page_gui->setFileDownloadLink("ilias.php?baseClass=ilGlossaryPresentationGUI&amp;cmd=downloadFile&amp;ref_id=".$_GET["ref_id"]);
 				$page_gui->setPresentationTitle($this->term->getTerm());
-				$ret =& $this->ctrl->forwardCommand($page_gui);
+				$ret = $this->ctrl->forwardCommand($page_gui);
 				$tpl->setContent($ret);
 				break;
 
 			default:
 				$this->setTabs();
 				$gloss_loc->display();
-				$ret =& $this->$cmd();
+				$ret = $this->$cmd();
 				break;
 
 		}
@@ -173,23 +175,21 @@ class ilTermDefinitionEditorGUI
 	*/
 	function setTabs()
 	{
-		global $ilTabs;
-
 		// catch feedback message
-		$this->getTabs($ilTabs);
+		$this->getTabs();
 	}
 
 	/**
 	* get tabs
 	*/
-	function getTabs(&$tabs_gui)
+	function getTabs()
 	{
 		// back to glossary
-		$tabs_gui->setBack2Target($this->lng->txt("glossary"),
+		$this->tabs_gui->setBack2Target($this->lng->txt("glossary"),
 			$this->ctrl->getParentReturn($this));
 
 		// back to upper context
-		$tabs_gui->setBackTarget($this->lng->txt("term"),
+		$this->tabs_gui->setBackTarget($this->lng->txt("term"),
 			$this->ctrl->getLinkTargetByClass("ilglossarytermgui", "editTerm"));
 
 	}

@@ -84,35 +84,6 @@ class ilObjectSearchFactory
 				return self::_getObjectSearchInstance($a_query_parser);
 		}
 	}
-	
-	
-	
-	/**
-	 * get reference of LikeShopObjectSearch.
-	 * 
-	 * @param object query parser object
-	 * @return object reference of LikeShopObjectSearch
-	 * @static
-     * @access public
-	 * 
-	 */
-	public static function _getShopObjectSearchInstance($query_parser)
-	{
-		include_once 'Services/Search/classes/Like/class.ilLikeShopObjectSearch.php';
-		return new ilLikeShopObjectSearch($query_parser);
-	}
-	
-	/**
-	 * get reference of LikeShopMetaDataSearch.
-	 * 
-	 * @param object query parser object
-	 * @return object reference of LikeShopMetaDataSearch
-	 */
-	public static function _getShopMetaDataSearchInstance($query_parser)
-	{
-		include_once 'Services/Search/classes/Like/class.ilLikeShopMetaDataSearch.php';
-		return new ilLikeShopMetaDataSearch($query_parser);
-	}
 
 	/**
 	 * get reference of ilFulltext/LikeMetaDataSearch.
@@ -304,7 +275,7 @@ class ilObjectSearchFactory
 	 * @param object query parser object
 	 * @return object reference of ilWebresourceAdvancedSearch
 	 */
-	public function _getWebresourceSearchInstance($query_parser)
+	public static function _getWebresourceSearchInstance($query_parser)
 	{
 		if(ilSearchSettings::getInstance()->enabledIndex())
 		{
@@ -380,6 +351,16 @@ class ilObjectSearchFactory
 	{
 		include_once('Services/AdvancedMetaData/classes/class.ilAdvancedMDLikeSearch.php');
 		return new ilAdvancedMDLikeSearch($query_parser);
+	}
+	
+	/**
+	 * get orgunit search instance
+	 * @param type $query_parser
+	 */
+	public static function getUserOrgUnitAssignmentInstance($query_parser)
+	{
+		include_once './Services/Search/classes/Like/class.ilLikeUserOrgUnitSearch.php';
+		return new ilLikeUserOrgUnitSearch($query_parser);
 	}
 }
 ?>

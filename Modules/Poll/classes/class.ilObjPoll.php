@@ -245,9 +245,13 @@ class ilObjPoll extends ilObject2
 		{
 			$activation = ilObjectActivation::getItem($this->ref_id);			
 			$this->setAccessType($activation["timing_type"]);
-			$this->setAccessBegin($activation["timing_start"]);
-			$this->setAccessEnd($activation["timing_end"]);							
-			$this->setAccessVisibility($activation["visible"]);							
+			if($this->getAccessType() == ilObjectActivation::TIMINGS_ACTIVATION)
+			{
+				// default entry values should not be loaded if not activated
+				$this->setAccessBegin($activation["timing_start"]);
+				$this->setAccessEnd($activation["timing_end"]);							
+				$this->setAccessVisibility($activation["visible"]);							
+			}
 		}
 	}
 	
@@ -350,8 +354,10 @@ class ilObjPoll extends ilObject2
 	 * @param int copy id
 	 * @return ilObjPoll
 	 */
-	public function doCloneObject(ilObjPoll $new_obj, $a_target_id, $a_copy_id = 0)
+	public function doCloneObject($new_obj, $a_target_id, $a_copy_id = 0)
 	{		
+		assert($new_obj instanceof ilObjPoll);
+		
 		// question/image
 		$new_obj->setQuestion($this->getQuestion());		
 		$image = $this->getImageFullPath();

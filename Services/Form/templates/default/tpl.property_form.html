@@ -17,7 +17,7 @@
 				<!-- END char_selector -->
 				<!-- BEGIN commands2 -->
 				<!-- BEGIN cmd2 -->
-				<input class="btn btn-default btn-sm" type="SUBMIT" name="cmd[{CMD}]" value="{CMD_TXT}" />
+				<input class="btn btn-default btn-sm" type="SUBMIT" name="cmd[{CMD}]" value="{CMD_TXT}" {CMD2_ID}/>
 				<!-- END cmd2 -->
 				<!-- END commands2 -->
 		</div>
@@ -49,10 +49,10 @@
 		<input type="{PROP_INPUT_TYPE}" size="{SIZE}" id="{ID}" maxlength="{MAXLENGTH}" name="{POST_VAR}" <!-- BEGIN prop_text_propval -->value="{PROPERTY_VALUE}" <!-- END prop_text_propval -->{DISABLED}/>
 <!-- END prop_text -->
 <!-- BEGIN prop_login -->
-		<input type="text" size="{SIZE}" id="{ID}" maxlength="{MAXLENGTH}" name="{POST_VAR}" value="{PROPERTY_VALUE}" {DISABLED} {AUTOCOMPLETE}/>
+		<input type="text" class="form-control" size="{SIZE}" id="{ID}" maxlength="{MAXLENGTH}" name="{POST_VAR}" value="{PROPERTY_VALUE}" {DISABLED} {AUTOCOMPLETE} {REQUIRED} />
 <!-- END prop_login -->
 <!-- BEGIN prop_email -->
-		<input type="text" size="{SIZE}" id="{ID}" maxlength="{MAXLENGTH}" name="{POST_VAR}" value="{PROPERTY_VALUE}" {DISABLED}/>
+		<input type="text" size="{SIZE}" id="{ID}" maxlength="{MAXLENGTH}" name="{POST_VAR}" value="{PROPERTY_VALUE}" {DISABLED} />
 		{HIDDEN_INPUT}
 <!-- END prop_email -->
 <!-- BEGIN prop_custom -->
@@ -111,7 +111,7 @@
 		&nbsp;</div>
 		<div class="col-sm-6 ilFormCmds">
 <!-- BEGIN cmd -->
-		<input class="btn btn-default btn-sm" type="submit" name="cmd[{CMD}]" value="{CMD_TXT}" />
+		<input class="btn btn-default btn-sm" type="submit" name="cmd[{CMD}]" value="{CMD_TXT}" {CMD_ID} />
 <!-- END cmd -->
 		</div>
 	</div><!-- end of ilFormRow -->

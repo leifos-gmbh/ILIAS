@@ -23,7 +23,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 	function __construct($a_data, $a_id, $a_call_by_reference, $a_prepare_output = true)
 	{
 		$this->type = "book";
-		$this->ilObjectGUI($a_data,$a_id,$a_call_by_reference,$a_prepare_output);
+		parent::__construct($a_data,$a_id,$a_call_by_reference,$a_prepare_output);
 		$this->lng->loadLanguageModule("book");
 	}
 
@@ -65,21 +65,21 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 			case 'ilpermissiongui':
 				$this->tabs_gui->setTabActive('perm_settings');
 				include_once("Services/AccessControl/classes/class.ilPermissionGUI.php");
-				$perm_gui =& new ilPermissionGUI($this);
+				$perm_gui = new ilPermissionGUI($this);
 				$ret =& $this->ctrl->forwardCommand($perm_gui);
 				break;
 
 			case 'ilbookingobjectgui':
 				$this->tabs_gui->setTabActive('render');
 				include_once("Modules/BookingManager/classes/class.ilBookingObjectGUI.php");
-				$object_gui =& new ilBookingObjectGUI($this);
+				$object_gui = new ilBookingObjectGUI($this);
 				$ret =& $this->ctrl->forwardCommand($object_gui);
 				break;
 
 			case 'ilbookingschedulegui':
 				$this->tabs_gui->setTabActive('schedules');
 				include_once("Modules/BookingManager/classes/class.ilBookingScheduleGUI.php");
-				$schedule_gui =& new ilBookingScheduleGUI($this);
+				$schedule_gui = new ilBookingScheduleGUI($this);
 				$ret =& $this->ctrl->forwardCommand($schedule_gui);
 				break;
 
@@ -194,6 +194,13 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 		$public->setInfo($this->lng->txt("book_public_log_info"));
 		$a_form->addItem($public);		
 		
+		$period = new ilNumberInputGUI($this->lng->txt("book_reservation_filter_period"), "period");
+		$period->setInfo($this->lng->txt("book_reservation_filter_period_info"));
+		$period->setSuffix($this->lng->txt("days"));
+		$period->setSize(3);
+		$period->setMinValue(0);
+		$a_form->addItem($period);
+		
 		// additional features
 		$feat = new ilFormSectionHeaderGUI();
 		$feat->setTitle($this->lng->txt('obj_features'));
@@ -207,6 +214,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 		$a_values["public"] = $this->object->hasPublicLog();
 		$a_values["stype"] = $this->object->getScheduleType();
 		$a_values["limit"] = $this->object->getOverallLimit();		
+		$a_values["period"] = $this->object->getReservationFilterPeriod();
 	}
 
 	protected function updateCustom(ilPropertyFormGUI $a_form)
@@ -215,6 +223,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 		$this->object->setPublicLog($a_form->getInput('public'));
 		$this->object->setScheduleType($a_form->getInput('stype'));
 		$this->object->setOverallLimit($a_form->getInput('limit') ? $a_form->getInput('limit') : null);
+		$this->object->setReservationFilterPeriod(strlen($a_form->getInput('period')) ? (int)$a_form->getInput('period') : null);
 		
 		include_once './Services/Container/classes/class.ilContainer.php';
 		include_once './Services/Object/classes/class.ilObjectServiceSettingsGUI.php';
@@ -241,7 +250,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 	*/
 	function setTabs()
 	{
-		global $ilAccess, $ilHelp, $ilUser;
+		global $ilHelp, $ilUser;
 		
 		if (in_array($this->ctrl->getCmd(), array("create", "save")) && !$this->ctrl->getNextClass())
 		{
@@ -250,7 +259,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 		
 		$ilHelp->setScreenIdComponent("book");
 		
-		if ($ilAccess->checkAccess('read', '', $this->object->getRefId()))
+		if ($this->checkPermissionBool('read'))
 		{
 			if($ilUser->getId() != ANONYMOUS_USER_ID)
 			{
@@ -271,7 +280,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 			}
 		}
 		
-		if ($ilAccess->checkAccess('write', '', $this->object->getRefId()))
+		if ($this->checkPermissionBool('write'))
 		{
 			if($this->object->getScheduleType() != ilObjBookingPool::TYPE_NO_SCHEDULE)
 			{
@@ -297,7 +306,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 			}	
 		}
 
-		if($ilAccess->checkAccess('edit_permission', '', $this->object->getRefId()))
+		if($this->checkPermissionBool('edit_permission'))
 		{
 			$this->tabs_gui->addTab("perm_settings",
 				$this->lng->txt("perm_settings"),
@@ -551,7 +560,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 		{
 			// :TODO: inactive for now
 		}
-
+		
 		return $mytpl->get();
 	}
 	
@@ -580,12 +589,12 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 			if($av_from || 
 				$av_to)
 			{
-				$today = $date->get(IL_CAL_DATE);				
+				$today = $date->get(IL_CAL_DATE);						
 				if($av_from > $today ||
 					$av_to < $today)
 				{
 					continue;
-				}
+				}			
 			}
 
 			$slots = array();
@@ -611,33 +620,11 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 				// #13738
 				if($user_settings->getTimeFormat() == ilCalendarSettings::TIME_FORMAT_12)
 				{					
-					if(stristr($period[0], "pm"))
-					{
-						$period[0] = (int)$period[0]+12;
-					}
-					else
-					{
-						$period[0] = (int)$period[0];
-						if($period[0] == 12)
-						{
-							$period[0] = 0;
-						}
-					}					
+					$period[0] = date("H", strtotime($period[0]));						
 					if(sizeof($period) == 2)
 					{
-						if(stristr($period[1], "pm"))
-						{
-							$period[1] = (int)$period[1]+12;
-						}
-						else
-						{
-							$period[1] = (int)$period[1];
-							if($period[1] == 12)
-							{
-								$period[1] = 0;
-							}
-						}
-					}					
+						$period[1] = date("H", strtotime($period[1]));		
+					}							
 				}
 				
 				if(sizeof($period) == 1)
@@ -675,15 +662,33 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 						// always single object, we can sum up
 						$nr_available = (array)ilBookingReservation::getAvailableObject($object_ids, $slot_from, $slot_to-1, false, true);						
 						
-						// check deadline
-						if($slot_from < (time()+$schedule->getDeadline()*60*60) || !array_sum($nr_available))
+						// any objects available?
+						if(!array_sum($nr_available))
 						{
 							continue;
+						}					
+						
+						// check deadline
+						if($schedule->getDeadline() >= 0)
+						{
+							// 0-n hours before slots begins
+							if($slot_from < (time()+$schedule->getDeadline()*60*60))
+							{
+								continue;
+							}
 						}
-
+						else
+						{
+							// running slots can be booked, only ended slots are invalid
+							if($slot_to < time())
+							{
+								continue;
+							}							
+						}
+						
 						// is slot active in current hour?
 						if((int)$slot['from'] < $period_to && (int)$slot['to'] > $period_from)
-						{
+						{																					
 							$from = ilDatePresentation::formatDate(new ilDateTime($slot_from, IL_CAL_UNIX));
 							$from = array_pop(explode(' ', $from));
 							$to = ilDatePresentation::formatDate(new ilDateTime($slot_to, IL_CAL_UNIX));
@@ -946,6 +951,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 		$form->addItem($rec_mode);
 
 		$rec_end = new ilDateTimeInputGUI($this->lng->txt("cal_repeat_until"), "rece");		
+		$rec_end->setRequired(true);
 		$rec_mode->addSubItem($rec_end);	
 					
 		if(!$a_reload)
@@ -1029,11 +1035,15 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 		}
 		
 		// recurrence
-		if((int)$_POST["recm"] > 0 && $current_first)
+		
+		// checkInput() has not been called yet, so we have to improvise
+		include_once 'Services/Calendar/classes/class.ilCalendarUtil.php';
+		$end = ilCalendarUtil::parseIncomingDate($_POST["rece"], null);		
+		
+		if((int)$_POST["recm"] > 0 && $end && $current_first)
 		{
 			ksort($counter);			
-			$end = $_POST["rece"]["date"];
-			$end = date("Y-m-d", mktime(23, 59, 59, $end["m"], $end["d"], $end["y"]));					
+			$end = $end->get(IL_CAL_DATE);	
 			$cycle = (int)$_POST["recm"]*7;			
 			$cut = 0;		
 			$org = $counter;
@@ -1152,13 +1162,10 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 	 */
 	function processBooking($a_object_id, $a_from = null, $a_to = null, $a_group_id = null)
 	{
-		global $ilUser, $ilAccess;
+		global $ilUser;
 		
 		// #11995
-		if(!$ilAccess->checkAccess('read', '', $this->object->getRefId()))
-		{
-			$this->ilias->raiseError($this->lng->txt("msg_no_perm_read"),$this->ilias->error_obj->MESSAGE);
-		};
+		$this->checkPermission('read');		
 		
 		include_once 'Modules/BookingManager/classes/class.ilBookingReservation.php';
 		$reservation = new ilBookingReservation();
@@ -1200,12 +1207,11 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 	 */
 	function logObject()
 	{
-		global $tpl, $ilAccess;
+		global $tpl;
 
 		$this->tabs_gui->setTabActive('log');
 				
-		$show_all = ($ilAccess->checkAccess('write', '', $this->object->getRefId()) ||
-			$this->object->hasPublicLog());
+		$show_all = ($this->checkPermissionBool('write') || $this->object->hasPublicLog());
 		
 		$filter = null;
 		if($_GET["object_id"])
@@ -1223,14 +1229,13 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 	
 	function logDetailsObject()
 	{
-		global $tpl, $ilAccess;
+		global $tpl;
 
 		$this->tabs_gui->clearTargets();
 		$this->tabs_gui->setBackTarget($this->lng->txt("back"),
 			$this->ctrl->getLinkTarget($this, "log"));
 				
-		$show_all = ($ilAccess->checkAccess('write', '', $this->object->getRefId()) ||
-			$this->object->hasPublicLog());
+		$show_all = ($this->checkPermissionBool('write') ||	$this->object->hasPublicLog());
 		
 		$filter = null;
 		if($_GET["object_id"])
@@ -1250,9 +1255,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 	 * Change status of given reservations
 	 */
 	function changeStatusObject()
-	{
-		global $ilAccess;
-		
+	{		
 		$this->tabs_gui->setTabActive('log');
 		
 		if(!$_POST['reservation_id'])
@@ -1261,7 +1264,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 			return $this->logObject();
 		}
 
-		if ($ilAccess->checkAccess('write', '', $this->object->getRefId()))
+		if ($this->checkPermissionBool('write'))
 		{
 			include_once 'Modules/BookingManager/classes/class.ilBookingReservation.php';
 			ilBookingReservation::changeStatus($_POST['reservation_id'], (int)$_POST['tstatus']);
@@ -1275,11 +1278,8 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 	 * Apply filter from reservations table gui
 	 */
 	function applyLogFilterObject()
-	{
-		global $ilAccess;
-				
-		$show_all = ($ilAccess->checkAccess('write', '', $this->object->getRefId()) ||
-			$this->object->hasPublicLog());
+	{				
+		$show_all = ($this->checkPermissionBool('write') ||	$this->object->hasPublicLog());
 		
 		include_once 'Modules/BookingManager/classes/class.ilBookingReservationsTableGUI.php';
 		$table = new ilBookingReservationsTableGUI($this, 'log', $this->ref_id,
@@ -1294,11 +1294,8 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 	 * Reset filter in reservations table gui
 	 */
 	function resetLogFilterObject()
-	{
-		global $ilAccess;
-				
-		$show_all = ($ilAccess->checkAccess('write', '', $this->object->getRefId()) ||
-			$this->object->hasPublicLog());
+	{				
+		$show_all = ($this->checkPermissionBool('write') ||	$this->object->hasPublicLog());
 		
 		include_once 'Modules/BookingManager/classes/class.ilBookingReservationsTableGUI.php';
 		$table = new ilBookingReservationsTableGUI($this, 'log', $this->ref_id,
@@ -1311,7 +1308,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 
 	public static function _goto($a_target)
 	{
-		global $ilAccess, $ilErr, $lng;
+		global $ilAccess, $lng;
 
 		if ($ilAccess->checkAccess("read", "", $a_target))
 		{
@@ -1322,9 +1319,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 			ilUtil::sendFailure(sprintf($lng->txt("msg_no_perm_read_item"),
 				ilObject::_lookupTitle(ilObject::_lookupObjId($a_target))), true);
 			ilObjectGUI::_gotoRepositoryRoot();
-		}
-
-		$ilErr->raiseError($lng->txt("msg_no_perm_read"), $ilErr->FATAL);
+		}	
 	}
 
 	/**
@@ -1341,28 +1336,25 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 
 	function infoScreen()
 	{
-		global $ilAccess, $ilCtrl;
+		global $ilCtrl;
 
 		$this->tabs_gui->setTabActive('info');
-
-		if (!$ilAccess->checkAccess("visible", "", $this->ref_id))
-		{
-			$this->ilias->raiseError($this->lng->txt("msg_no_perm_read"),$this->ilias->error_obj->MESSAGE);
-		}
+		
+		$this->checkPermission("visible");
 
 		include_once("./Services/InfoScreen/classes/class.ilInfoScreenGUI.php");
 		$info = new ilInfoScreenGUI($this);
 
 		$info->enablePrivateNotes();
 
-		if ($ilAccess->checkAccess("read", "", $_GET["ref_id"]))
+		if ($this->checkPermissionBool("read"))
 		{
 			$info->enableNews();
 		}
 
 		// no news editing for files, just notifications
 		$info->enableNewsEditing(false);
-		if ($ilAccess->checkAccess("write", "", $_GET["ref_id"]))
+		if ($this->checkPermissionBool("write"))
 		{
 			$news_set = new ilSetting("news");
 			$enable_internal_rss = $news_set->get("enable_rss_for_internal");
@@ -1399,7 +1391,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 	
 	function rsvConfirmCancelObject()
 	{
-		global $ilCtrl, $lng, $tpl, $ilAccess, $ilUser;
+		global $ilCtrl, $lng, $tpl, $ilUser;
 	
 		$ids = $this->getLogReservationIds();
 		if(!sizeof($ids))
@@ -1423,7 +1415,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 					$valid_ids[$item["booking_object_id"]] = $item["title"];
 				}		
 						
-				if(($ilAccess->checkAccess("write", "", $this->ref_id) || $user_id == $ilUser->getId()) &&
+				if(($this->checkPermissionBool("write") || $user_id == $ilUser->getId()) &&
 					$from > time() &&
 					in_array($obj_id, array_keys($valid_ids)))
 				{				
@@ -1464,9 +1456,9 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 		$this->tabs_gui->clearTargets();
 		$this->tabs_gui->setBackTarget($lng->txt("back"),
 			$ilCtrl->getLinkTarget($this, "log"));
-		
-		$this->setHelpId("cancel_booking");	
 			
+		$this->setHelpId("cancel_booking");		
+		
 		include_once 'Services/Utilities/classes/class.ilConfirmationGUI.php';
 		$conf = new ilConfirmationGUI();
 		$conf->setFormAction($ilCtrl->getFormAction($this, 'rsvCancel'));
@@ -1576,6 +1568,8 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 		$this->tabs_gui->setBackTarget($lng->txt("back"),
 			$ilCtrl->getLinkTarget($this, "log"));
 		
+		$this->setHelpId("cancel_booking");		
+		
 		// #13511
 		ilUtil::sendQuestion($lng->txt("book_confirm_cancel"));		
 		
@@ -1586,7 +1580,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 
 	function rsvCancelObject()
 	{
-		global $ilAccess, $ilUser, $tpl, $lng, $ilCtrl;
+		global $ilUser, $tpl, $lng, $ilCtrl;
 				
 		$ids = $_POST["rsv_id"];
 		
@@ -1628,8 +1622,8 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 			foreach($ids as $id)
 			{				
 				$obj = new ilBookingReservation($id);
-
-				if (!$ilAccess->checkAccess("write", "", $this->ref_id) && $obj->getUserId() != $ilUser->getId())
+			
+				if (!$this->checkPermissionBool("write") && $obj->getUserId() != $ilUser->getId())
 				{
 					ilUtil::sendFailure($this->lng->txt('permission_denied'), true);
 					$this->ctrl->redirect($this, 'log');
@@ -1656,43 +1650,9 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 		$this->logObject();
 	}
 
-	/*
-	function rsvUncancelObject()
-	{
-		global $ilAccess;
-		
-		if(!$ilAccess->checkAccess("write", "", $this->ref_id))
-		{
-			ilUtil::sendFailure($this->lng->txt('permission_denied'), true);
-			$this->ctrl->redirect($this, 'log');
-		}
-
-		$ids = $this->getLogReservationIds();
-		if($ids)
-		{
-			include_once 'Modules/BookingManager/classes/class.ilBookingReservation.php';		
-			foreach($ids as $id)
-			{	
-				$obj = new ilBookingReservation($id);
-				$obj->setStatus(NULL);
-				$obj->update();
-			}
-		}
-
-		ilUtil::sendSuccess($this->lng->txt('settings_saved'));
-		$this->logObject();
-	}
-	*/
-	
 	function rsvInUseObject()
-	{
-		global $ilAccess;
-
-		if(!$ilAccess->checkAccess("write", "", $this->ref_id))
-		{
-			ilUtil::sendFailure($this->lng->txt('permission_denied'), true);
-			$this->ctrl->redirect($this, 'log');
-		}
+	{		
+		$this->checkPermission("write");
 
 		$ids = $this->getLogReservationIds();
 		if($ids)
@@ -1712,13 +1672,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 
 	function rsvNotInUseObject()
 	{
-		global $ilAccess;
-				
-		if(!$ilAccess->checkAccess("write", "", $this->ref_id))
-		{
-			ilUtil::sendFailure($this->lng->txt('permission_denied'), true);
-			$this->ctrl->redirect($this, 'log');
-		}
+		$this->checkPermission("write");
 		
 		$ids = $this->getLogReservationIds();
 		if($ids)

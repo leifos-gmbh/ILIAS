@@ -12,23 +12,23 @@ include_once("./Services/Table/classes/class.ilTableGUI.php");
 *
 * @ilCtrl_Calls ilAdministrationGUI: ilObjGroupGUI, ilObjFolderGUI, ilObjFileGUI, ilObjCourseGUI, ilCourseObjectivesGUI
 * @ilCtrl_Calls ilAdministrationGUI: ilObjSAHSLearningModuleGUI, ilObjChatroomGUI, ilObjForumGUI
-* @ilCtrl_Calls ilAdministrationGUI: ilObjLearningModuleGUI, ilObjDlBookGUI, ilObjGlossaryGUI
+* @ilCtrl_Calls ilAdministrationGUI: ilObjLearningModuleGUI, ilObjGlossaryGUI
 * @ilCtrl_Calls ilAdministrationGUI: ilObjQuestionPoolGUI, ilObjSurveyQuestionPoolGUI, ilObjTestGUI
 * @ilCtrl_Calls ilAdministrationGUI: ilObjSurveyGUI, ilObjExerciseGUI, ilObjMediaPoolGUI, ilObjFileBasedLMGUI
 * @ilCtrl_Calls ilAdministrationGUI: ilObjCategoryGUI, ilObjUserGUI, ilObjRoleGUI, ilObjUserFolderGUI
 * @ilCtrl_Calls ilAdministrationGUI: ilObjLinkResourceGUI
-* @ilCtrl_Calls ilAdministrationGUI: ilObjRoleTemplateGUI, ilObjStyleSheetGUI
+* @ilCtrl_Calls ilAdministrationGUI: ilObjRoleTemplateGUI
 * @ilCtrl_Calls ilAdministrationGUI: ilObjRootFolderGUI, ilObjSessionGUI, ilObjPortfolioTemplateGUI
 * @ilCtrl_Calls ilAdministrationGUI: ilObjSystemFolderGUI, ilObjRoleFolderGUI, ilObjAuthSettingsGUI
 * @ilCtrl_Calls ilAdministrationGUI: ilObjChatServerGUI, ilObjLanguageFolderGUI, ilObjMailGUI
-* @ilCtrl_Calls ilAdministrationGUI: ilObjObjectFolderGUI, ilObjPaymentSettingsGUI, ilObjRecoveryFolderGUI
+* @ilCtrl_Calls ilAdministrationGUI: ilObjObjectFolderGUI, ilObjRecoveryFolderGUI
 * @ilCtrl_Calls ilAdministrationGUI: ilObjSearchSettingsGUI, ilObjStyleSettingsGUI
 * @ilCtrl_Calls ilAdministrationGUI: ilObjAssessmentFolderGUI, ilObjExternalToolsSettingsGUI, ilObjUserTrackingGUI
 * @ilCtrl_Calls ilAdministrationGUI: ilObjAdvancedEditingGUI, ilObjPrivacySecurityGUI, ilObjNewsSettingsGUI
 * @ilCtrl_Calls ilAdministrationGUI: ilObjPersonalDesktopSettingsGUI, ilObjMediaCastGUI
 * @ilCtrl_Calls ilAdministrationGUI: ilObjLanguageExtGUI, ilObjMDSettingsGUI, ilObjComponentSettingsGUI
 * @ilCtrl_Calls ilAdministrationGUI: ilObjCalendarSettingsGUI, ilObjSurveyAdministrationGUI
-* @ilCtrl_Calls ilAdministrationGUI: ilObjCategoryReferenceGUI, ilObjCourseReferenceGUI, ilObjRemoteCourseGUI
+* @ilCtrl_Calls ilAdministrationGUI: ilObjCategoryReferenceGUI, ilObjCourseReferenceGUI, ilObjRemoteCourseGUI, ilObjGroupReferenceGUI
 * @ilCtrl_Calls ilAdministrationGUI: ilObjForumAdministrationGUI, ilObjBlogGUI, ilObjPollGUI, ilObjDataCollectionGUI
 * @ilCtrl_Calls ilAdministrationGUI: ilObjRemoteCategoryGUI, ilObjRemoteWikiGUI, ilObjRemoteLearningModuleGUI
 * @ilCtrl_Calls ilAdministrationGUI: ilObjRemoteGlossaryGUI, ilObjRemoteFileGUI, ilObjRemoteGroupGUI, ilObjECSSettingsGUI
@@ -37,6 +37,7 @@ include_once("./Services/Table/classes/class.ilTableGUI.php");
 * @ilCtrl_Calls ilAdministrationGUI: ilObjTaxonomyAdministrationGUI, ilObjLoggingSettingsGUI
 * @ilCtrl_Calls ilAdministrationGUI: ilObjBibliographicAdminGUI, ilObjBibliographicGUI
 * @ilCtrl_Calls ilAdministrationGUI: ilObjStudyProgrammeAdminGUI, ilObjStudyProgrammeGUI
+* @ilCtrl_Calls ilAdministrationGUI: ilObjBadgeAdministrationGUI, ilMemberExportSettingsGUI
 * // BEGIN WebDAV
 * @ilCtrl_Calls ilAdministrationGUI: ilObjFileAccessSettingsGUI, ilPermissionGUI, ilObjRemoteTestGUI
 * // END WebDAV
@@ -57,7 +58,7 @@ class ilAdministrationGUI
 	* Constructor
 	* @access	public
 	*/
-	function ilAdministrationGUI()
+	function __construct()
 	{
 		global $lng, $ilias, $tpl, $tree, $rbacsystem, $objDefinition,
 			$_GET, $ilCtrl, $ilLog, $ilMainMenu;
@@ -105,7 +106,7 @@ class ilAdministrationGUI
 	/**
 	* execute command
 	*/
-	function &executeCommand()
+	function executeCommand()
 	{
 		global $tree, $rbacsystem, $ilias, $lng, $objDefinition, $ilHelp;
 		
@@ -121,7 +122,7 @@ class ilAdministrationGUI
 		$new_type = $_POST["new_type"]
 			? $_POST["new_type"]
 			: $_GET["new_type"];
-		if ($new_type != "" && $this->ctrl->getCmd() == "create")
+		if ($new_type != "")
 		{
 			$this->creation_mode = true;
 		}
@@ -184,8 +185,7 @@ class ilAdministrationGUI
 					include_once($class_path);
 					$class_name = $this->ctrl->getClassForClasspath($class_path);
 					if (($next_class == "ilobjrolegui" || $next_class == "ilobjusergui"
-						|| $next_class == "ilobjroletemplategui"
-						|| $next_class == "ilobjstylesheetgui"))
+						|| $next_class == "ilobjroletemplategui"))
 					{
 						if ($_GET["obj_id"] != "")
 						{
@@ -206,14 +206,28 @@ class ilAdministrationGUI
 						}
 						else
 						{
-							if(is_subclass_of($class_name, "ilObject2GUI"))
+							if (!$this->creation_mode)
 							{
-								$this->gui_obj = new $class_name($this->cur_ref_id, ilObject2GUI::REPOSITORY_NODE_ID);
+								if(is_subclass_of($class_name, "ilObject2GUI"))
+								{
+									$this->gui_obj = new $class_name($this->cur_ref_id, ilObject2GUI::REPOSITORY_NODE_ID);
+								}
+								else
+								{
+									$this->gui_obj = new $class_name("", $this->cur_ref_id, true, false);
+								}
 							}
 							else
 							{
-								$this->gui_obj = new $class_name("", $this->cur_ref_id, true, false);
-							}						
+								if(is_subclass_of($class_name, "ilObject2GUI"))
+								{
+									$this->gui_obj = new $class_name(null, ilObject2GUI::REPOSITORY_NODE_ID, $this->cur_ref_id);
+								}
+								else
+								{
+									$this->gui_obj = new $class_name("", 0, true, false);
+								}
+							}
 						}
 						$this->gui_obj->setCreationMode($this->creation_mode);
 					}
@@ -446,18 +460,18 @@ class ilAdministrationGUI
 				"user_administration" =>
 					array("usrf", 'tos', "rolf", "auth", "ps", "orgu"),
 				"learning_outcomes" =>
-					array("skmg", "cert", "trac")
+					array("skmg", "bdga", "cert", "trac")
 				),
 			2 => array(
 				"user_services" =>
 					array("pdts", "prfa", "nwss", "awra", "cadm", "cals", "mail"),
 				"content_services" =>
-					array("seas", "mds", "tags", "taxs", 'ecss', "pays", "otpl"
+					array("seas", "mds", "tags", "taxs", 'ecss', "otpl"
 					// uzk-patch: begin
 						,"pdfg"),
 					// uzk-patch: end
 				"maintenance" =>
-					array('sysc', "recf", 'logs', "root")
+					array('sysc', "recf", 'logs', "root", "wfe")
 				),
 			3 => array(
 				"container" =>

@@ -30,12 +30,13 @@ class ilObjLinkResourceAccess extends ilObjectAccess
 	 *		array("permission" => "write", "cmd" => "edit", "lang_var" => "edit"),
 	 *	);
 	 */
-	function _getCommands()
+	static function _getCommands()
 	{
 		$commands = array
 		(
 			array("permission" => "read", "cmd" => "", "lang_var" => "show",
 				"default" => true),
+			array("permission" => "read", "cmd" => "exportHTML", "lang_var" => "export_html"),
 			array("permission" => "write", "cmd" => "editLinks", "lang_var" => "edit_content"),
 			array("permission" => "write", "cmd" => "settings", "lang_var" => "settings")
 		);
@@ -46,7 +47,7 @@ class ilObjLinkResourceAccess extends ilObjectAccess
 	/**
 	* check whether goto script will succeed
 	*/
-	function _checkGoto($a_target)
+	static function _checkGoto($a_target)
 	{
 		global $ilAccess;
 		
@@ -121,7 +122,7 @@ class ilObjLinkResourceAccess extends ilObjectAccess
 			"AND active = ".$ilDB->quote(1,'integer').' ';
 		$res = $ilDB->query($query);
 		
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$item['title']				= $row->title;
 			$item['description']		= $row->description;
@@ -143,7 +144,7 @@ class ilObjLinkResourceAccess extends ilObjectAccess
 	 *
 	 * @param array $a_obj_ids array of object ids
 	 */
-	function _preloadData($a_obj_ids, $a_ref_ids)
+	static function _preloadData($a_obj_ids, $a_ref_ids)
 	{
 		global $ilDB, $ilUser;
 		
@@ -155,7 +156,7 @@ class ilObjLinkResourceAccess extends ilObjectAccess
 		{
 			self::$item[$id] = array();
 		}
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$item['title']				= $row->title;
 			$item['description']		= $row->description;

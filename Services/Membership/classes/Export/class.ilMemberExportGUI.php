@@ -49,6 +49,10 @@ class ilMemberExportGUI
 	
 	private $fields_info;
 	private $fss_export = null;
+	/**
+	 * @var ilUserFormSettings
+	 */
+	private $exportSettings;
 
 	/**
 	 * Constructor
@@ -215,9 +219,13 @@ class ilMemberExportGUI
 			$chours = new ilCheckboxInputGUI($this->lng->txt('cal_ch_field_ch'), 'export_members[]');
 			$chours->setValue('consultation_hour');
 			$chours->setChecked($this->exportSettings->enabled('consultation_hour'));
-			$form->addItem($chours);		
-		}		 
-		
+			$form->addItem($chours);
+		}
+
+		$grp_membr = new ilCheckboxInputGUI($this->lng->txt('crs_members_groups'), 'export_members[]');
+		$grp_membr->setValue('group_memberships');
+		$grp_membr->setChecked($this->exportSettings->enabled('group_memberships'));
+		$form->addItem($grp_membr);
 		return $form;		
 	}
 	
@@ -298,7 +306,7 @@ class ilMemberExportGUI
 	{
 	 	$this->handleIncoming();
 		
-		$filename = time().'_participant_export_xls_'.$this->obj_id.'.xls';
+		$filename = time().'_participant_export_xls_'.$this->obj_id;
 		$this->fss_export->initMemberExportDirectory();
 		$filepath = $this->fss_export->getMemberExportDirectory().DIRECTORY_SEPARATOR.$filename;
 		
@@ -362,18 +370,33 @@ class ilMemberExportGUI
 		foreach($this->fss_export->getMemberExportFiles() as $file)
 		{
 			if(md5($file['name']) == $hash)
-			{				
+			{							
 				$contents = $this->fss_export->getMemberExportFile($file['timest'].'_participant_export_'.
 					$file['type'].'_'.$this->obj_id.'.'.$file['type']);
+				
+				// newer export files could be .xlsx
+				if($file['type'] == 'xls' && !$contents)
+				{
+					$contents = $this->fss_export->getMemberExportFile($file['timest'].'_participant_export_'.
+						$file['type'].'_'.$this->obj_id.'.xlsx');
+					$file['type'] = 'xlsx';
+				}
 
 				switch($file['type'])
 				{
+					case 'xlsx':
+						ilUtil::deliverData(
+							$contents,
+							date('Y_m_d_H-i'.$file['timest']).'_member_export_'.$this->obj_id.'.xlsx',
+							'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+						);		
+					
 					case 'xls':
 						ilUtil::deliverData(
 							$contents,
 							date('Y_m_d_H-i'.$file['timest']).'_member_export_'.$this->obj_id.'.xls',
 							'application/vnd.ms-excel'
-						);
+						);						
 
 					default:
 					case 'csv':
@@ -447,8 +470,16 @@ class ilMemberExportGUI
 			{
 				continue;
 			}
-			
-			$this->fss_export->deleteMemberExportFile($file['timest'].'_participant_export_'.$file['type'].'_'.$this->obj_id.'.'.$file['type']);
+
+			$ret = $this->fss_export->deleteMemberExportFile($file['timest'].'_participant_export_'.
+				$file['type'].'_'.$this->obj_id.'.'.$file['type']);
+
+			//try xlsx if return is false and type is xls
+			if($file['type'] == "xls" && !$ret)
+			{
+				$this->fss_export->deleteMemberExportFile($file['timest'].'_participant_export_'.
+					$file['type'].'_'.$this->obj_id.'.'."xlsx");
+			}
 		}
 		
 		ilUtil::sendSuccess($this->lng->txt('ps_files_deleted'), true);

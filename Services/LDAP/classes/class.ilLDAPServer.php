@@ -226,7 +226,7 @@ class ilLDAPServer
 		$res = $ilDB->query($query);
 
 		$server = array();
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$server[] = $row->server_id;
 		}
@@ -283,7 +283,7 @@ class ilLDAPServer
 		$res = $ilDB->query($query);
 
 		$server_ids = array();
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$server_ids[] = $row->server_id;
 		}
@@ -304,7 +304,7 @@ class ilLDAPServer
 			"WHERE authentication_type = ".$ilDB->quote($a_auth_mode,'integer')." ".
 			"AND authentication = ".$ilDB->quote(0,'integer');
 		$res = $ilDB->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			return true;
 		}
@@ -318,7 +318,7 @@ class ilLDAPServer
 		$query = "SELECT server_id FROM ldap_server_settings ".
 			"WHERE authentication_type = ".$ilDB->quote($a_auth_mode,'integer')." ";
 		$res = $ilDB->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			return $row->server_id;
 		}
@@ -1134,7 +1134,7 @@ class ilLDAPServer
 		$query = "SELECT * FROM ldap_server_settings WHERE server_id = ".$this->db->quote($this->server_id)."";
 		
 		$res = $this->db->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$this->toggleActive($row->active);
 			$this->setName($row->name);

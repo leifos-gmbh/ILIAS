@@ -70,11 +70,13 @@ public class DBFactory {
 
 				// MySQL
 				if(
-                                    client.getDbType().equalsIgnoreCase("mysql") || 
-                                    client.getDbType().equalsIgnoreCase("mysqli") ||
-                                    client.getDbType().equalsIgnoreCase("innodb")
-                                ) 
-                                {
+					client.getDbType().equalsIgnoreCase("mysql") ||
+					client.getDbType().equalsIgnoreCase("innodb") ||
+					client.getDbType().equalsIgnoreCase("mysqli") || 
+					client.getDbType().equalsIgnoreCase("pdo-mysql-myisam") ||
+					client.getDbType().equalsIgnoreCase("pdo-mysql-innodb") ||
+					client.getDbType().equalsIgnoreCase("pdo-mysql-galera")
+				) {
 
 					logger.info("Loading Mysql driver...");
 					Class.forName( "com.mysql.jdbc.Driver");

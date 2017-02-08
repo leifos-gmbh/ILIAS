@@ -29,10 +29,10 @@ class ilPCPlugged extends ilPageContent
 	/**
 	* Set node
 	*/
-	function setNode(&$a_node)
+	function setNode($a_node)
 	{
 		parent::setNode($a_node);		// this is the PageContent node
-		$this->plug_node =& $a_node->first_child();		// this is the Plugged node
+		$this->plug_node = $a_node->first_child();		// this is the Plugged node
 	}
 
 	/**
@@ -46,8 +46,8 @@ class ilPCPlugged extends ilPageContent
 	{
 		$this->node = $this->createPageContentNode();
 		$a_pg_obj->insertContent($this, $a_hier_id, IL_INSERT_AFTER, $a_pc_id);
-		$this->plug_node =& $this->dom->create_element("Plugged");
-		$this->plug_node =& $this->node->append_child($this->plug_node);
+		$this->plug_node = $this->dom->create_element("Plugged");
+		$this->plug_node = $this->node->append_child($this->plug_node);
 		$this->plug_node->set_attribute("PluginName", $a_plugin_name);
 		$this->plug_node->set_attribute("PluginVersion", $a_plugin_version);
 	}
@@ -247,7 +247,7 @@ class ilPCPlugged extends ilPageContent
 	/**
 	 * Get javascript files
 	 */
-	function getJavascriptFiles()
+	function getJavascriptFiles($a_mode)
 	{
 		global $ilPluginAdmin;
 		
@@ -261,7 +261,7 @@ class ilPCPlugged extends ilPageContent
 				"COPage", "pgcp", $pl_name);
 			$pl_dir = $plugin->getDirectory();
 			
-			$pl_js_files = $plugin->getJavascriptFiles();
+			$pl_js_files = $plugin->getJavascriptFiles($a_mode);
 			foreach ($pl_js_files as $pl_js_file)
 			{
 				if (!is_int(strpos($pl_js_file, "//")))
@@ -281,7 +281,7 @@ class ilPCPlugged extends ilPageContent
 	/**
 	 * Get css files
 	 */
-	function getCssFiles()
+	function getCssFiles($a_mode)
 	{
 		global $ilPluginAdmin;
 		
@@ -295,7 +295,7 @@ class ilPCPlugged extends ilPageContent
 				"COPage", "pgcp", $pl_name);
 			$pl_dir = $plugin->getDirectory();
 			
-			$pl_css_files = $plugin->getCssFiles();
+			$pl_css_files = $plugin->getCssFiles($a_mode);
 			foreach ($pl_css_files as $pl_css_file)
 			{
 				if (!is_int(strpos($pl_css_file, "//")))

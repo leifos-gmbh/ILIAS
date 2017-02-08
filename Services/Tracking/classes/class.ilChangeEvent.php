@@ -52,7 +52,7 @@ class ilChangeEvent
 	 *      of the object. If this is not null, then the event is only 
 	 *      recorded for the specified parent.
 	 */
-	function _recordWriteEvent($obj_id, $usr_id, $action, $parent_obj_id = null)
+	public static function _recordWriteEvent($obj_id, $usr_id, $action, $parent_obj_id = null)
 	{
 		global $ilDB;
 		
@@ -99,7 +99,6 @@ class ilChangeEvent
 			$aff = $ilDB->manipulate($query);
 			
 		}
-		//error_log ('ilChangeEvent::_recordWriteEvent '.$q);
 	}
 	
 	/**
@@ -110,7 +109,7 @@ class ilChangeEvent
 	 * @param $catchupWriteEvents boolean If true, this function catches up with
 	 * 	write events.
 	 */
-	function _recordReadEvent($a_type, $a_ref_id, $obj_id, $usr_id,
+	static function _recordReadEvent($a_type, $a_ref_id, $obj_id, $usr_id,
 		$isCatchupWriteEvents = true, $a_ext_rc = false, $a_ext_time = false)
 	{
 		global $ilDB, $tree;
@@ -322,7 +321,7 @@ class ilChangeEvent
 		// - add diffs to childs_spent_seconds and childs_read_count
 	}
 
-	function _recordObjStats($a_obj_id, $a_spent_seconds, $a_read_count, $a_childs_spent_seconds = null, $a_child_read_count = null)
+	static function _recordObjStats($a_obj_id, $a_spent_seconds, $a_read_count, $a_childs_spent_seconds = null, $a_child_read_count = null)
 	{
 		global $ilDB;
 		
@@ -335,6 +334,7 @@ class ilChangeEvent
 		$now = time();
 
 		$fields = array();
+		$fields['log_id'] = array("integer", $ilDB->nextId('obj_stat_log'));
 		$fields["obj_id"] = array("integer", $a_obj_id);
 		$fields["obj_type"] = array("text", ilObject::_lookupType($a_obj_id));
 		$fields["tstamp"] = array("timestamp", $now);
@@ -373,7 +373,7 @@ class ilChangeEvent
 	 * @param integer $a_now
 	 * @param integer $a_minimum
 	 */
-	function _syncObjectStats($a_now = null, $a_minimum = 20000)
+	static function _syncObjectStats($a_now = null, $a_minimum = 20000)
 	{
 		global $ilDB;
 		
@@ -389,92 +389,107 @@ class ilChangeEvent
 		$row = $ilDB->fetchAssoc($set);
 		if($row["counter"] >= $a_minimum)
 		{
-			// lock source and transfer table
-			$ilDB->lockTables(array(array("name"=>"obj_stat_log", "type"=>ilDB::LOCK_WRITE),
-				array("name"=>"obj_stat_tmp", "type"=>ilDB::LOCK_WRITE)));
+			$ilAtomQuery = $ilDB->buildAtomQuery();
+			$ilAtomQuery->addTableLock('obj_stat_log');
+			$ilAtomQuery->addTableLock('obj_stat_tmp');
 
-			// if other process was transferring, we had to wait for the lock and
-			// the source table should now have less than minimum/needed entries
-			$set = $ilDB->query("SELECT COUNT(*) AS counter FROM obj_stat_log");
-			$row = $ilDB->fetchAssoc($set);
-			if($row["counter"] >= $a_minimum)
-			{
-				// use only "full" seconds to have a clear cut
-				$ilDB->query("INSERT INTO obj_stat_tmp".
-					" SELECT * FROM obj_stat_log".
-					" WHERE tstamp < ".$ilDB->quote($a_now, "timestamp"));
+			$ilAtomQuery->addQueryCallable(function(ilDBInterface $ilDB) use($a_now, $a_minimum, &$ret){
 
-				// remove transferred entries from source table
-				$ilDB->query("DELETE FROM obj_stat_log".
-					" WHERE tstamp < ".$ilDB->quote($a_now, "timestamp"));
-
-				// remove lock from source table
-				$ilDB->unlockTables();
-
-				// lock transfer and target table (is this needed?)
-				$ilDB->lockTables(array(array("name"=>"obj_stat_tmp", "type"=>ilDB::LOCK_WRITE),
-				array("name"=>"obj_stat", "type"=>ilDB::LOCK_WRITE)));
-
-				// process log data (timestamp is not needed anymore)
-				$sql = "SELECT obj_id, obj_type, yyyy, mm, dd, hh, SUM(read_count) AS read_count,".
-					" SUM(childs_read_count) AS childs_read_count, SUM(spent_seconds) AS spent_seconds,".
-					" SUM(childs_spent_seconds) AS childs_spent_seconds".
-					" FROM obj_stat_tmp".
-					" GROUP BY obj_id, obj_type, yyyy, mm, dd, hh";
-				$set = $ilDB->query($sql);
-				while($row = $ilDB->fetchAssoc($set))
+				// if other process was transferring, we had to wait for the lock and
+				// the source table should now have less than minimum/needed entries
+				$set = $ilDB->query("SELECT COUNT(*) AS counter FROM obj_stat_log");
+				$row = $ilDB->fetchAssoc($set);
+				if($row["counter"] >= $a_minimum)
 				{
-					// "primary key"
-					$where = array("obj_id" => array("integer", $row["obj_id"]),
-						"obj_type" => array("text", $row["obj_type"]),
-						"yyyy" => array("integer", $row["yyyy"]),
-						"mm" => array("integer", $row["mm"]),
-						"dd" => array("integer", $row["dd"]),
-						"hh" => array("integer", $row["hh"]));
+					// use only "full" seconds to have a clear cut
+					$ilDB->query("INSERT INTO obj_stat_tmp".
+						" SELECT * FROM obj_stat_log".
+						" WHERE tstamp < ".$ilDB->quote($a_now, "timestamp"));
 
-					$where_sql = array();
-					foreach($where as $field => $def)
-					{
-						$where_sql[] = $field." = ".$ilDB->quote($def[1], $def[0]);
-					}
-					$where_sql = implode(" AND ", $where_sql);
+					// remove transferred entries from source table
+					$ilDB->query("DELETE FROM obj_stat_log".
+						" WHERE tstamp < ".$ilDB->quote($a_now, "timestamp"));
 
-					// existing entry?
-					$check = $ilDB->query("SELECT read_count, childs_read_count, spent_seconds,".
-						"childs_spent_seconds".
-						" FROM obj_stat".
-						" WHERE ".$where_sql);
-					if($ilDB->numRows($check))
-					{
-						$old = $ilDB->fetchAssoc($check);
-
-						// add existing values
-						$fields = array("read_count" => array("integer", $old["read_count"]+$row["read_count"]),
-							"childs_read_count" => array("integer", $old["childs_read_count"]+$row["childs_read_count"]),
-							"spent_seconds" => array("integer", $old["spent_seconds"]+$row["spent_seconds"]),
-							"childs_spent_seconds" => array("integer", $old["childs_spent_seconds"]+$row["childs_spent_seconds"]));
-
-						$ilDB->update("obj_stat", $fields, $where);
-					}
-					else
-					{
-						// new entry
-						$fields = $where;
-						$fields["read_count"] = array("integer", $row["read_count"]);
-						$fields["childs_read_count"] = array("integer", $row["childs_read_count"]);
-						$fields["spent_seconds"] = array("integer", $row["spent_seconds"]);
-						$fields["childs_spent_seconds"] = array("integer", $row["childs_spent_seconds"]);
-
-						$ilDB->insert("obj_stat", $fields);
-					}
+					$ret = true;
 				}
+				else
+				{
+					$ret = false;
+				}
+			});
 
-				// clean up transfer table
-				$ilDB->query("DELETE FROM obj_stat_tmp");
+			$ilAtomQuery->run();
+
+			//continue only if obj_stat_log counter >= $a_minimum
+			if($ret)
+			{
+				$ilAtomQuery = $ilDB->buildAtomQuery();
+				$ilAtomQuery->addTableLock('obj_stat_tmp');
+				$ilAtomQuery->addTableLock('obj_stat');
+
+				$ilAtomQuery->addQueryCallable(function(ilDBInterface $ilDB) use($a_now, $a_minimum){
+
+					// process log data (timestamp is not needed anymore)
+					$sql = "SELECT obj_id, obj_type, yyyy, mm, dd, hh, SUM(read_count) AS read_count,".
+						" SUM(childs_read_count) AS childs_read_count, SUM(spent_seconds) AS spent_seconds,".
+						" SUM(childs_spent_seconds) AS childs_spent_seconds".
+						" FROM obj_stat_tmp".
+						" GROUP BY obj_id, obj_type, yyyy, mm, dd, hh";
+					$set = $ilDB->query($sql);
+					while($row = $ilDB->fetchAssoc($set))
+					{
+						// "primary key"
+						$where = array("obj_id" => array("integer", $row["obj_id"]),
+							"obj_type" => array("text", $row["obj_type"]),
+							"yyyy" => array("integer", $row["yyyy"]),
+							"mm" => array("integer", $row["mm"]),
+							"dd" => array("integer", $row["dd"]),
+							"hh" => array("integer", $row["hh"]));
+
+						$where_sql = array();
+						foreach($where as $field => $def)
+						{
+							$where_sql[] = $field." = ".$ilDB->quote($def[1], $def[0]);
+						}
+						$where_sql = implode(" AND ", $where_sql);
+
+						// existing entry?
+						$check = $ilDB->query("SELECT read_count, childs_read_count, spent_seconds,".
+							"childs_spent_seconds".
+							" FROM obj_stat".
+							" WHERE ".$where_sql);
+						if($ilDB->numRows($check))
+						{
+							$old = $ilDB->fetchAssoc($check);
+
+							// add existing values
+							$fields = array("read_count" => array("integer", $old["read_count"]+$row["read_count"]),
+								"childs_read_count" => array("integer", $old["childs_read_count"]+$row["childs_read_count"]),
+								"spent_seconds" => array("integer", $old["spent_seconds"]+$row["spent_seconds"]),
+								"childs_spent_seconds" => array("integer", $old["childs_spent_seconds"]+$row["childs_spent_seconds"]));
+
+							$ilDB->update("obj_stat", $fields, $where);
+						}
+						else
+						{
+							// new entry
+							$fields = $where;
+							$fields["read_count"] = array("integer", $row["read_count"]);
+							$fields["childs_read_count"] = array("integer", $row["childs_read_count"]);
+							$fields["spent_seconds"] = array("integer", $row["spent_seconds"]);
+							$fields["childs_spent_seconds"] = array("integer", $row["childs_spent_seconds"]);
+
+							$ilDB->insert("obj_stat", $fields);
+						}
+					}
+
+					// clean up transfer table
+					$ilDB->query("DELETE FROM obj_stat_tmp");
+
+				});
+
+				$ilAtomQuery->run();
 			}
-
-			// remove all locks (does not matter if transfer was actually performed)
-			$ilDB->unlockTables();
 		}
 	}
 
@@ -486,7 +501,7 @@ class ilChangeEvent
 	 * @param $usr_id int The user.
 	 * @param $timestamp SQL timestamp.
 	 */
-	function _catchupWriteEvents($obj_id, $usr_id, $timestamp = null)
+	static function _catchupWriteEvents($obj_id, $usr_id, $timestamp = null)
 	{
 		global $ilDB;
 		
@@ -585,7 +600,7 @@ class ilChangeEvent
 			"AND usr_id=".$ilDB->quote($usr_id ,'integer');
 		$r = $ilDB->query($q);
 		$catchup = null;
-		while ($row = $r->fetchRow(DB_FETCHMODE_ASSOC)) {
+		while ($row = $r->fetchRow(ilDBConstants::FETCHMODE_ASSOC)) {
 			$catchup = $row['ts'];
 		}
 		
@@ -638,7 +653,7 @@ class ilChangeEvent
 			"AND usr_id=".$ilDB->quote($usr_id ,'integer');
 		$r = $ilDB->query($q);
 		$catchup = null;
-		while ($row = $r->fetchRow(DB_FETCHMODE_ASSOC)) {
+		while ($row = $r->fetchRow(ilDBConstants::FETCHMODE_ASSOC)) {
 			$catchup = $row['ts'];
 		}
 
@@ -678,70 +693,7 @@ class ilChangeEvent
 			return 0; // user catched all write events, report as unchanged (0)
 		}
 	}
-	/**
-	 * Returns the changed state of objects which are children of the specified
-	 * parent object.
-	 *
-	 * Note this gives a different result than calling _lookupChangeState of
-	 * each child object. This is because, this function treats a catch on the
-	 * write events on the parent as a catch up for all child objects.
-	 * This difference was made, because it greatly improves performance
-	 * of this function. 
-	 *
-	 * @param $parent_obj_id int The object id of the parent object.
-	 * @param $usr_id int The user who is interested into these events.
-	 * @return 0 = object has not been changed inside
-	 *         1 = object has been changed inside
-	 */
-	public static function _lookupInsideChangeState($parent_obj_id, $usr_id)
-	{
-		global $ilDB;
-		
-		$q = "SELECT ts ".
-			"FROM catch_write_events ".
-			"WHERE obj_id=".$ilDB->quote($parent_obj_id)." ".
-			"AND usr_id=".$ilDB->quote($usr_id);
-		$r = $ilDB->query($q);
-		$catchup = null;
-		while ($row = $r->fetchRow(DB_FETCHMODE_ASSOC)) {
-			$catchup = $row['ts'];
-		}
-
-		if($catchup == null)
-		{
-			$ilDB->setLimit(1);
-			$query = sprintf('SELECT * FROM write_event '.
-				'WHERE parent_obj_id = %s '.
-				'AND usr_id <> %s ',
-				$ilDB->quote($parent_obj_id,'integer'),
-				$ilDB->quote($usr_id,'integer'));
-			$res = $ilDB->query($query);
-		}
-		else
-		{
-			$ilDB->setLimit(1);
-			$query = sprintf('SELECT * FROM write_event '.
-				'WHERE parent_obj_id = %s '.
-				'AND usr_id <> %s '.
-				'AND ts > %s ',
-				$ilDB->quote($parent_obj_id,'integer'),
-				$ilDB->quote($usr_id,'integer'),
-				$ilDB->quote($catchup,'timestamp'));
-			$res = $ilDB->query($query);
-		}
-		$numRows = $res->numRows();
-		if ($numRows > 0)
-		{
-			$row = $ilDB->fetchAssoc($res);
-			// if we have write events, and user never catched one, report as new (1)
-			// if we have write events, and user catched an old write event, report as changed (2)
-			return ($catchup == null) ? 1 : 2;
-		}
-		else 
-		{
-			return 0; // user catched all write events, report as unchanged (0)
-		}
-	}
+	
 	/**
 	 * Reads all read events which occured on the object 
 	 * which happened after the last time the user caught up with them.
@@ -762,7 +714,7 @@ class ilChangeEvent
 			"AND usr_id=".$ilDB->quote($usr_id);
 		$r = $ilDB->query($q);
 		$catchup = null;
-		while ($row = $r->fetchRow(DB_FETCHMODE_ASSOC)) {
+		while ($row = $r->fetchRow(ilDBConstants::FETCHMODE_ASSOC)) {
 			$catchup = $row['ts'];
 		}
 		
@@ -774,7 +726,7 @@ class ilChangeEvent
 			"ORDER BY last_access DESC";
 		$r = $ilDB->query($q);
 		$events = array();
-		while ($row = $r->fetchRow(DB_FETCHMODE_ASSOC))
+		while ($row = $r->fetchRow(ilDBConstants::FETCHMODE_ASSOC))
 		{
 			$events[] = $row;
 		}
@@ -912,15 +864,8 @@ class ilChangeEvent
 				$res = $ilDB->query($query);
 			}
 			
-			if ($ilDB->isError($res) || $ilDB->isError($res->result))
-			{
-				return 'couldn\'t insert initial data into table "write_event": '.
-				(($ilDB->isError($r->result)) ? $r->result->getMessage() : $r->getMessage());
-			}
-
-
-			global $ilias;
-			$ilias->setSetting('enable_change_event_tracking', '1');
+			global $ilSetting;
+			$ilSetting->set('enable_change_event_tracking', '1');
 
 			return $res;
 		}
@@ -932,9 +877,8 @@ class ilChangeEvent
 	 * @return mixed true on success, a string with an error message on failure.
 	 */
 	public static function _deactivate() {
-		global $ilias;
-		$ilias->setSetting('enable_change_event_tracking', '0');
-		
+		global $ilSetting;
+		$ilSetting->set('enable_change_event_tracking', '0');		
 	}
 
 	/**
@@ -943,9 +887,8 @@ class ilChangeEvent
 	 * @return mixed true on success, a string with an error message on failure.
 	 */
 	public static function _isActive() {
-		global $ilias;
-		return $ilias->getSetting('enable_change_event_tracking', '0') == '1';
-		
+		global $ilSetting;
+		return $ilSetting->get('enable_change_event_tracking', '0') == '1';		
 	}
 	
 	/**
@@ -1007,7 +950,7 @@ class ilChangeEvent
 	 * called in ./Modules/ScormAicc/classes/class.ilSCORMOfflineMode.php
 	 * @return true
 	 */
-	function _updateAccessForScormOfflinePlayer($obj_id, $usr_id, $i_last_access, $t_first_access) {
+	static function _updateAccessForScormOfflinePlayer($obj_id, $usr_id, $i_last_access, $t_first_access) {
 		global $ilDB;
 		$res = $ilDB->queryF('UPDATE read_event SET first_access=%s, last_access = %s WHERE obj_id=%s AND usr_id=%s',
 			array('timestamp','integer','integer','integer'),

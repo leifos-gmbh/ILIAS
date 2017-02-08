@@ -174,32 +174,33 @@ class shibConfig {
 	/**
 	 * @var bool
 	 */
-	protected static $cache = NULL;
+	protected static $cache = null;
 
 
 	protected function __construct() {
-		global $ilSetting;
+		global $DIC;
+		$ilSetting = $DIC['ilSetting'];
 		/**
 		 * @var $ilSetting ilSetting
 		 */
 		foreach (get_class_vars('shibConfig') as $field => $val) {
 			$str = $ilSetting->get('shib_' . $field);
-			if ($str !== NULL) {
+			if ($str !== null) {
 				$this->{$field} = $str;
 			}
 		}
 
 		if ($this->getGender() != 'm' OR $this->getGender() != 'w') {
-			$this->setGender(NULL);
+			$this->setGender(null);
 		}
 	}
 
 
 	/**
-	 * @return shibConfig
+	 * @return bool|\shibConfig
 	 */
 	public static function getInstance() {
-		if (! isset(self::$cache)) {
+		if (!isset(self::$cache)) {
 			self::$cache = new self();
 		}
 
@@ -873,5 +874,3 @@ class shibConfig {
 		return $this->update_lastname;
 	}
 }
-
-?>

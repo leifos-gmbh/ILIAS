@@ -19,11 +19,11 @@ include_once("./Services/Feeds/classes/class.ilFeedWriter.php");
 class ilUserFeedWriter extends ilFeedWriter
 {
 	
-	function ilUserFeedWriter($a_user_id, $a_hash, $privFeed = false)
+	function __construct($a_user_id, $a_hash, $privFeed = false)
 	{
 		global $ilSetting, $lng;
 
-		parent::ilFeedWriter();
+		parent::__construct();
 		
 		//$lng->loadLanguageModule("news");
 		
@@ -113,7 +113,7 @@ class ilUserFeedWriter extends ilFeedWriter
 				$feed_item->setDescription($content);
 
 				// lm page hack, not nice
-				if (in_array($item["context_obj_type"], array("dbk", "lm")) && $item["context_sub_obj_type"] == "pg"
+				if (in_array($item["context_obj_type"], array("lm")) && $item["context_sub_obj_type"] == "pg"
 					&& $item["context_sub_obj_id"] > 0)
 				{
 					$feed_item->setLink(ILIAS_HTTP_PATH."/goto.php?client_id=".CLIENT_ID.

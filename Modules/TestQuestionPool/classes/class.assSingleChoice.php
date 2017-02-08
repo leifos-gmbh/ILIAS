@@ -119,7 +119,7 @@ class assSingleChoice extends assQuestion implements  ilObjQuestionScoringAdjust
 	 */
 	public function saveToDb($original_id = "")
 	{
-		/** @var ilDB $ilDB */
+		/** @var ilDBInterface $ilDB */
 		global $ilDB;
 
 		$this->saveQuestionDataToDb($original_id);
@@ -634,43 +634,44 @@ class assSingleChoice extends assQuestion implements  ilObjQuestionScoringAdjust
 			include_once "./Modules/Test/classes/class.ilObjTest.php";
 			$pass = ilObjTest::_getPass($active_id);
 		}
+
 		$entered_values = 0;
 
-		$this->getProcessLocker()->requestUserSolutionUpdateLock();
+		$this->getProcessLocker()->executeUserSolutionUpdateLockOperation(function() use (&$entered_values, $ilDB, $active_id, $pass, $authorized) {
 
-		$result = $this->getCurrentSolutionResultSet($active_id, $pass, $authorized);
-		$row = $ilDB->fetchAssoc($result);
-		$update = $row["solution_id"];
-		
-		if ($update)
-		{
-			if (strlen($_POST["multiple_choice_result"]))
+			$result = $this->getCurrentSolutionResultSet($active_id, $pass, $authorized);
+			$row    = $ilDB->fetchAssoc($result);
+			$update = $row["solution_id"];
+
+			if($update)
 			{
-				$this->updateCurrentSolution($update, $_POST["multiple_choice_result"], null, $authorized);
-				$entered_values++;
+				if(strlen($_POST["multiple_choice_result"]))
+				{
+					$this->updateCurrentSolution($update, $_POST["multiple_choice_result"], null, $authorized);
+					$entered_values++;
+				}
+				else
+				{
+					$this->removeSolutionRecordById($update);
+				}
 			}
 			else
 			{
-				$this->removeSolutionRecordById($update);
+				if(strlen($_POST["multiple_choice_result"]))
+				{
+					$this->saveCurrentSolution($active_id, $pass, $_POST['multiple_choice_result'], null, $authorized);
+					$entered_values++;
+				}
 			}
-		}
-		else
-		{
-			if (strlen($_POST["multiple_choice_result"]))
-			{
-				$this->saveCurrentSolution($active_id, $pass, $_POST['multiple_choice_result'], null, $authorized);
-				$entered_values++;
-			}
-		}
 
-		$this->getProcessLocker()->releaseUserSolutionUpdateLock();
-		
+		});
+
 		if ($entered_values)
 		{
 			include_once ("./Modules/Test/classes/class.ilObjAssessmentFolder.php");
 			if (ilObjAssessmentFolder::_enabledAssessmentLogging())
 			{
-				$this->logAction($this->lng->txtlng("assessment", "log_user_entered_values", ilObjAssessmentFolder::_getLogLanguage()), $active_id, $this->getId());
+				assQuestion::logAction($this->lng->txtlng("assessment", "log_user_entered_values", ilObjAssessmentFolder::_getLogLanguage()), $active_id, $this->getId());
 			}
 		}
 		else
@@ -678,7 +679,7 @@ class assSingleChoice extends assQuestion implements  ilObjQuestionScoringAdjust
 			include_once ("./Modules/Test/classes/class.ilObjAssessmentFolder.php");
 			if (ilObjAssessmentFolder::_enabledAssessmentLogging())
 			{
-				$this->logAction($this->lng->txtlng("assessment", "log_user_not_entered_values", ilObjAssessmentFolder::_getLogLanguage()), $active_id, $this->getId());
+				assQuestion::logAction($this->lng->txtlng("assessment", "log_user_not_entered_values", ilObjAssessmentFolder::_getLogLanguage()), $active_id, $this->getId());
 			}
 		}
 		
@@ -699,7 +700,7 @@ class assSingleChoice extends assQuestion implements  ilObjQuestionScoringAdjust
 	
 	public function saveAdditionalQuestionDataToDb()
 	{
-		/** @var ilDB $ilDB */
+		/** @var ilDBInterface $ilDB */
 		global $ilDB;
 		
 		// save additional data
@@ -722,7 +723,7 @@ class assSingleChoice extends assQuestion implements  ilObjQuestionScoringAdjust
 
 	public function saveAnswerSpecificDataToDb()
 	{
-		/** @var ilDB $ilDB */
+		/** @var ilDBInterface $ilDB */
 		global $ilDB;
 		if (!$this->isSingleline)
 		{
@@ -755,14 +756,9 @@ class assSingleChoice extends assQuestion implements  ilObjQuestionScoringAdjust
 	}
 
 	/**
-	 * Reworks the allready saved working data if neccessary
-	 *
-	 * @access protected
-	 * @param integer $active_id
-	 * @param integer $pass
-	 * @param boolean $obligationsAnswered
+	 * {@inheritdoc}
 	 */
-	protected function reworkWorkingData($active_id, $pass, $obligationsAnswered)
+	protected function reworkWorkingData($active_id, $pass, $obligationsAnswered, $authorized)
 	{
 		// nothing to rework!
 	}
@@ -899,7 +895,9 @@ class assSingleChoice extends assQuestion implements  ilObjQuestionScoringAdjust
 
 	function copyImages($question_id, $source_questionpool)
 	{
+		/** @var $ilLog ilLogger */
 		global $ilLog;
+
 		$imagepath = $this->getImagePath();
 		$imagepath_original = str_replace("/$this->id/images", "/$question_id/images", $imagepath);
 		$imagepath_original = str_replace("/$this->obj_id/", "/$source_questionpool/", $imagepath_original);
@@ -908,21 +906,32 @@ class assSingleChoice extends assQuestion implements  ilObjQuestionScoringAdjust
 			$filename = $answer->getImage();
 			if (strlen($filename))
 			{
-				if (!file_exists($imagepath))
+				if(!file_exists($imagepath))
 				{
 					ilUtil::makeDirParents($imagepath);
 				}
-				if (!@copy($imagepath_original . $filename, $imagepath . $filename))
+
+				if(file_exists($imagepath_original . $filename))
 				{
-					$ilLog->write("image could not be duplicated!!!!", $ilLog->ERROR);
-					$ilLog->write("object: " . print_r($this, TRUE), $ilLog->ERROR);
-				}
-				if (@file_exists($imagepath_original. $this->getThumbPrefix(). $filename))
-				{
-					if (!@copy($imagepath_original . $this->getThumbPrefix() . $filename, $imagepath . $this->getThumbPrefix() . $filename))
+					if(!copy($imagepath_original . $filename, $imagepath . $filename))
 					{
-						$ilLog->write("image thumbnail could not be duplicated!!!!", $ilLog->ERROR);
-						$ilLog->write("object: " . print_r($this, TRUE), $ilLog->ERROR);
+						$ilLog->warning(sprintf(
+							"Could not clone source image '%s' to '%s' (srcQuestionId: %s|tgtQuestionId: %s|srcParentObjId: %s|tgtParentObjId: %s)",
+							$imagepath_original . $filename, $imagepath . $filename,
+							$question_id, $this->id, $source_questionpool, $this->obj_id
+						));
+					}
+				}
+
+				if(file_exists($imagepath_original. $this->getThumbPrefix(). $filename))
+				{
+					if(!copy($imagepath_original . $this->getThumbPrefix() . $filename, $imagepath . $this->getThumbPrefix() . $filename))
+					{
+						$ilLog->warning(sprintf(
+							"Could not clone thumbnail source image '%s' to '%s' (srcQuestionId: %s|tgtQuestionId: %s|srcParentObjId: %s|tgtParentObjId: %s)",
+							$imagepath_original . $this->getThumbPrefix() . $filename, $imagepath . $this->getThumbPrefix() . $filename,
+							$question_id, $this->id, $source_questionpool, $this->obj_id
+						));
 					}
 				}
 			}
@@ -997,41 +1006,34 @@ class assSingleChoice extends assQuestion implements  ilObjQuestionScoringAdjust
 	}
 
 	/**
-	* Creates an Excel worksheet for the detailed cumulated results of this question
-	*
-	* @param object $worksheet Reference to the parent excel worksheet
-	* @param object $startrow Startrow of the output in the excel worksheet
-	* @param object $active_id Active id of the participant
-	* @param object $pass Test pass
-	* @param object $format_title Excel title format
-	* @param object $format_bold Excel bold format
-	* @param array $eval_data Cumulated evaluation data
-	* @access public
-	*/
-	public function setExportDetailsXLS(&$worksheet, $startrow, $active_id, $pass, &$format_title, &$format_bold)
+	 * {@inheritdoc}
+	 */
+	public function setExportDetailsXLS($worksheet, $startrow, $active_id, $pass)
 	{
-		include_once ("./Services/Excel/classes/class.ilExcelUtils.php");
+		parent::setExportDetailsXLS($worksheet, $startrow, $active_id, $pass);
+
 		$solution = $this->getSolutionValues($active_id, $pass);
-		$worksheet->writeString($startrow, 0, ilExcelUtils::_convert_text($this->lng->txt($this->getQuestionType())), $format_title);
-		$worksheet->writeString($startrow, 1, ilExcelUtils::_convert_text($this->getTitle()), $format_title);
 		$i = 1;
 		foreach ($this->getAnswers() as $id => $answer)
 		{
-			$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($answer->getAnswertext()), $format_bold);
+			$worksheet->setCell($startrow + $i, 0,$answer->getAnswertext());
+			$worksheet->setBold($worksheet->getColumnCoord(0) . ($startrow + $i));
 			if(
 				count($solution) > 0 &&
 				isset($solution[0]) &&
 				is_array($solution[0]) &&
-				strlen($solution[0]['value1']) > 0 && $id == $solution[0]['value1'])
+				strlen($solution[0]['value1']) > 0 && $id == $solution[0]['value1']
+			)
 			{
-				$worksheet->write($startrow + $i, 1, 1);
+				$worksheet->setCell($startrow + $i, 1, 1);
 			}
 			else
 			{
-				$worksheet->write($startrow + $i, 1, 0);
+				$worksheet->setCell($startrow + $i, 1, 0);
 			}
 			$i++;
 		}
+
 		return $startrow + $i + 1;
 	}
 
@@ -1240,7 +1242,7 @@ class assSingleChoice extends assQuestion implements  ilObjQuestionScoringAdjust
 	*/
 	public function getUserQuestionResult($active_id, $pass)
 	{
-		/** @var ilDB $ilDB */
+		/** @var ilDBInterface $ilDB */
 		global $ilDB;
 		$result = new ilUserQuestionResult($this, $active_id, $pass);
 

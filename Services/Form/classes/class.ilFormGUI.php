@@ -42,15 +42,6 @@ class ilFormGUI
 	}
 	// uzk-patch: end
 	/**
-	* Constructor
-	*
-	* @param
-	*/
-	function ilFormGUI()
-	{
-	}
-
-	/**
 	* Set FormAction.
 	*
 	* @param	string	$a_formaction	FormAction

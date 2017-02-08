@@ -353,7 +353,7 @@ class ilNumberInputGUI extends ilSubEnabledFormPropertyGUI
 	*
 	* @return	int	Size
 	*/
-	function insert(&$a_tpl)
+	function insert($a_tpl)
 	{
 		$html = $this->render();
 
@@ -413,6 +413,11 @@ class ilNumberInputGUI extends ilSubEnabledFormPropertyGUI
 		if ($constraints != "")
 		{
 			$tpl->setVariable("TXT_NUMBER_CONSTRAINTS", $constraints);
+		}
+		
+		if($this->getRequired())
+		{
+			$tpl->setVariable("REQUIRED", "required=\"required\"");
 		}
 		
 		$tpl->parseCurrentBlock();

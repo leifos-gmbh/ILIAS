@@ -1,4 +1,4 @@
-<?php xml version = "1.0" encoding = "UTF-8"?>
+<?xml version = "1.0" encoding = "UTF-8"?>
 <module xmlns="http://www.w3.org" version="$Id: modules.xml 15671 2013-04-06 13:08:30Z otruffer $" id="orgu">
 	<baseclasses></baseclasses>
 	<objectgroups>
@@ -13,9 +13,15 @@
 	</objects>
 	<events>
 		<event type="raise" id="delete" />
+		<event type="listen" id="Services/Tree" />
 	</events>
 	<pluginslots>
 		<pluginslot id="orgutypehk" name="OrgUnitTypeHook" />
 	</pluginslots>
-
+	<pluginslots>
+		<pluginslot id="orguext" name="OrgUnitExtension" />
+	</pluginslots>
+	<crons>
+		<cron id="orgunit_paths" class="ilCronUpdateOrgUnitPaths" />
+	</crons>
 </module>

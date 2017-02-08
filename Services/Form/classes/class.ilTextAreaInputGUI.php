@@ -416,7 +416,7 @@ class ilTextAreaInputGUI extends ilSubEnabledFormPropertyGUI
 	*
 	* @return	int	Size
 	*/
-	function insert(&$a_tpl)
+	function insert($a_tpl)
 	{
 		$ttpl = new ilTemplate("tpl.prop_textarea.html", true, true, "Services/Form");
 		
@@ -524,7 +524,13 @@ class ilTextAreaInputGUI extends ilSubEnabledFormPropertyGUI
 			{
 				$ttpl->setVariable('DISABLED','disabled="disabled" ');
 			}
-			$ttpl->setVariable("PROPERTY_VALUE", ilUtil::prepareFormOutput($this->getValue()));
+			$ttpl->setVariable("PROPERTY_VALUE", ilUtil::prepareFormOutput($this->getValue()));						
+		
+			if($this->getRequired())
+			{
+				$ttpl->setVariable("REQUIRED", "required=\"required\"");
+			}
+		
 			$ttpl->parseCurrentBlock();
 		}
 		
@@ -533,8 +539,6 @@ class ilTextAreaInputGUI extends ilSubEnabledFormPropertyGUI
 			$ttpl->setVariable("HIDDEN_INPUT",
 				$this->getHiddenTag($this->getPostVar(), $this->getValue()));
 		}
-
-		
 		$a_tpl->setCurrentBlock("prop_generic");
 		$a_tpl->setVariable("PROP_GENERIC", $ttpl->get());
 		$a_tpl->parseCurrentBlock();

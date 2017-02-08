@@ -21,8 +21,10 @@ class ilObjStudyProgrammeListGUI extends ilObjectListGUI {
 
 
 	function __construct() {
-		global $tpl, $lng;
-		$this->ilObjectListGUI();
+		global $DIC;
+		$tpl = $DIC['tpl'];
+		$lng = $DIC['lng'];
+		parent::__construct();
 		$this->tpl = $tpl;
 		$this->lng = $lng;
 		$this->lng->loadLanguageModule("prg");
@@ -36,12 +38,11 @@ class ilObjStudyProgrammeListGUI extends ilObjectListGUI {
 	function init() {
 		$this->static_link_enabled = true;
 		$this->delete_enabled = true;
-		$this->cut_enabled = true;
+		$this->cut_enabled = false;
 		$this->info_screen_enabled = true;
 		$this->copy_enabled = true;
 		$this->subscribe_enabled = false;
 		$this->link_enabled = false;
-		$this->payment_enabled = false;
 
 		$this->type = "prg";
 		$this->gui_class_name = "ilobjstudyprogrammegui";
@@ -63,7 +64,7 @@ class ilObjStudyProgrammeListGUI extends ilObjectListGUI {
 	/**
 	 * no social commands needed in program.
 	 */
-	public function insertCommonSocialCommands() {
+	public function insertCommonSocialCommands($a_header_actions = false) {
 		return;
 	}
 

@@ -345,7 +345,7 @@ class ilBookingReservation
 		
 		$available = array_diff($a_ids, $blocked);
 		if(sizeof($available))
-		{
+		{									
 			if($a_return_counter)
 			{
 				foreach($a_ids as $id)
@@ -417,14 +417,14 @@ class ilBookingReservation
 			: null;
 		$av_to = ($a_schedule->getAvailabilityTo() && !$a_schedule->getAvailabilityTo()->isNull())
 			? strtotime($a_schedule->getAvailabilityTo()->get(IL_CAL_DATE)." 23:59:59")
-			: null;	
+			: null;
 		
 		// sum up max available items in period per (week)day
 		$available_in_period = 0;
 		$loop = 0;
 		while($a_from < $a_to &&
 			++$loop < 1000)
-		{
+		{			
 			// any slots for current weekday?
 			$day_slots = $schedule_slots[date("w", $a_from)];
 			if($day_slots)
@@ -448,7 +448,7 @@ class ilBookingReservation
 			
 			$a_from += (60*60*24);						
 		}
-		
+				
 		return (bool)($available_in_period-$booked_in_period);
 	}
 	
@@ -630,7 +630,11 @@ class ilBookingReservation
 			if($filter['to'])
 			{
 				$where[] = 'date_to <= '.$ilDB->quote($filter['to'], 'integer');
-			}							
+			}		
+			if(!$filter['past'])
+			{
+				$where[] = 'date_to > '.$ilDB->quote(time(), 'integer');
+			}
 		}
 		if($filter['user_id']) // #16584
 		{
@@ -692,7 +696,7 @@ class ilBookingReservation
 					,"title" => $row["title"]
 					,"user_id" => $user_id
 					,"counter" => 1						
-					,"user_name" => $uname["lastname"].", ".$uname["firstname"] // #17862			
+					,"user_name" => $uname["lastname"].", ".$uname["firstname"] // #17862
 				);
 				
 				if($a_has_schedule)

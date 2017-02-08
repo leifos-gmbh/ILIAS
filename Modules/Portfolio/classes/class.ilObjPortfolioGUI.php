@@ -44,6 +44,8 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
 	
 	function executeCommand()
 	{					
+		global $lng;
+		
 		// goto link to portfolio page
 		if($_GET["gtp"])
 		{		
@@ -70,11 +72,17 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
 				{
 					$this->setTabs();
 					$this->tabs_gui->activateTab("share");
+					
+					if($this->access_handler->getPermissions($this->object->getId()) &&
+						!$this->object->isOnline())
+					{
+						ilUtil::sendInfo($lng->txt("prtf_shared_offline_info"));
+					}
 										
 					$this->tpl->setPermanentLink("prtf", $this->object->getId());
 
 					include_once('./Services/PersonalWorkspace/classes/class.ilWorkspaceAccessGUI.php');
-					$wspacc = new ilWorkspaceAccessGUI($this->object->getId(), $this->access_handler, true, $plink);
+					$wspacc = new ilWorkspaceAccessGUI($this->object->getId(), $this->access_handler, true);
 					$this->ctrl->forwardCommand($wspacc);
 				}
 				break;
@@ -96,7 +104,7 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
 				break;
 			
 			case "ilobjstylesheetgui":
-				include_once ("./Services/Style/classes/class.ilObjStyleSheetGUI.php");
+				include_once ("./Services/Style/Content/classes/class.ilObjStyleSheetGUI.php");
 				$this->ctrl->setReturn($this, "editStyleProperties");
 				$style_gui = new ilObjStyleSheetGUI("", $this->object->getStyleSheetId(), false, false);
 				$style_gui->omitLocator();
@@ -264,7 +272,7 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
 		$type_page->addSubItem($tf);	
 
 		// page templates
-		include_once "Services/Style/classes/class.ilPageLayout.php";
+		include_once "Services/COPage/Layout/classes/class.ilPageLayout.php";
 		$templates = ilPageLayout::activeLayouts(false, ilPageLayout::MODULE_PORTFOLIO);
 		if($templates)
 		{			
@@ -387,7 +395,7 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
 			$layout_id = $_POST["tmpl"];
 			if($layout_id)
 			{
-				include_once("./Services/Style/classes/class.ilPageLayout.php");
+				include_once("./Services/COPage/Layout/classes/class.ilPageLayout.php");
 				$layout_obj = new ilPageLayout($layout_id);
 				$page->setXMLContent($layout_obj->getXMLContent());
 			}
@@ -525,8 +533,13 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
 		return "ilportfoliopagegui";
 	}
 	
-	protected function initCopyPageFormOptions(ilFormPropertyGUI $a_tgt)
+	protected function initCopyPageFormOptions(ilPropertyFormGUI $a_form)
 	{
+
+		$a_tgt = new ilRadioGroupInputGUI($this->lng->txt("target"), "target");
+		$a_tgt->setRequired(true);
+		$a_form->addItem($a_tgt);
+
 		$old = new ilRadioOption($this->lng->txt("prtf_existing_portfolio"), "old");
 		$a_tgt->addOption($old);
 
@@ -718,7 +731,7 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
 		$skill_ids = array();
 		
 		include_once "Modules/Portfolio/classes/class.ilPortfolioTemplatePage.php";
-		foreach(ilPortfolioTemplatePage::getAllPages($a_prtt_id) as $page)
+		foreach(ilPortfolioTemplatePage::getAllPortfolioPages($a_prtt_id) as $page)
 		{
 			switch($page["type"])
 			{
@@ -853,7 +866,7 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
 			if($form->checkInput())
 			{
 				include_once "Modules/Portfolio/classes/class.ilPortfolioTemplatePage.php";
-				foreach(ilPortfolioTemplatePage::getAllPages($prtt_id) as $page)
+				foreach(ilPortfolioTemplatePage::getAllPortfolioPages($prtt_id) as $page)
 				{
 					switch($page["type"])
 					{												

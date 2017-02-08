@@ -31,6 +31,8 @@
 */
 class ilQTIMatimage
 {
+	const EMBEDDED_BASE64 = 'base64';
+	
 	var $imagetype;
 	var $label;
 	var $height;
@@ -42,7 +44,7 @@ class ilQTIMatimage
 	var $entityref;
 	var $content;
 	
-	function ilQTIMatimage()
+	function __construct()
 	{
 	}
 
@@ -144,6 +146,18 @@ class ilQTIMatimage
 	function getContent()
 	{
 		return $this->content;
+	}
+
+	public function getRawContent()
+	{
+		switch( $this->getEmbedded() )
+		{
+			case self::EMBEDDED_BASE64:
+				
+				return base64_decode($this->getContent());
+		}
+		
+		return $this->getContent();
 	}
 }
 ?>

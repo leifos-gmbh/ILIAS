@@ -398,22 +398,6 @@ class ilCalendarSchedule
 		return $new_events;
 	}
 
-	protected function isValidEventByFilters(ilCalendarEntry $a_event)
-	{
-		$valid = true;
-		
-		foreach($this->filters as $filter)
-		{							
-			if(!$filter->isValidEvent($a_event))
-			{
-				$valid = false;
-				break;
-			}			
-		}
-		
-		return $valid;
-	}						
-
 	/**
 	 * get new/changed events
 	 *
@@ -445,9 +429,9 @@ class ilCalendarSchedule
 			"ORDER BY last_update";
 		$res = $this->db->query($query);
 		
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{						
-			$event = new ilCalendarEntry($row->cal_id);						
+			$event = new ilCalendarEntry($row->cal_id);			
 			$valid_event = $this->modifyEventByFilters($event);
 			if($valid_event)
 			{
@@ -507,7 +491,7 @@ class ilCalendarSchedule
 		$res = $this->db->query($query);
 				
 		$events = array();
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$event = new ilCalendarEntry($row->cal_id);			
 			$valid_event = $this->modifyEventByFilters($event);
@@ -521,7 +505,7 @@ class ilCalendarSchedule
 		{
 			$events[] = $event;
 		}
-		
+			
 		return $events;
 	}
 	

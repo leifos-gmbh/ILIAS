@@ -27,7 +27,7 @@ class ilImageWizardInputGUI extends ilTextInputGUI
 	function __construct($a_title = "", $a_postvar = "")
 	{
 		parent::__construct($a_title, $a_postvar);
-		$this->setSuffixes(array("jpg", "jpeg", "png", "gif"));
+		$this->setSuffixes(assQuestion::getAllowedImageMaterialFileExtensions());
 		$this->setSize('25');
 		$this->validationRegexp = "";
 	}
@@ -255,7 +255,7 @@ class ilImageWizardInputGUI extends ilTextInputGUI
 	*
 	* @return	int	Size
 	*/
-	function insert(&$a_tpl)
+	function insert($a_tpl)
 	{
 		global $lng;
 		
@@ -283,6 +283,7 @@ class ilImageWizardInputGUI extends ilTextInputGUI
 				$tpl->parseCurrentBlock();
 			}
 			$tpl->setCurrentBlock('addimage');
+			$tpl->setVariable("IMAGE_BROWSE", $lng->txt('select_file'));
 			$tpl->setVariable("IMAGE_ID", $this->getPostVar() . "[image][$i]");
 			$tpl->setVariable("IMAGE_SUBMIT", $lng->txt("upload"));
 			$tpl->setVariable("IMAGE_ROW_NUMBER", $i);

@@ -8,16 +8,17 @@ il.ExcIDl = {
 		il.ExcIDl.initModal();
 	},
 	
-	initModal: function() {			
-		// add row action
-		$("[data-exc-idl]").click(function() {			
-			il.Util.sendAjaxGetRequestToUrl(
-				il.ExcIDl.ajax_url,
-				{idlid: $(this).data("exc-idl")},
-				{},
-				il.ExcIDl.showModal
-			);
-		});			
+	trigger: function(user_id, ass_id) {
+		il.Util.sendAjaxGetRequestToUrl(
+			il.ExcIDl.ajax_url,
+			{idlid: ass_id+"_"+user_id},
+			{},
+			il.ExcIDl.showModal
+		);
+		return false;
+	},
+	
+	initModal: function() {						
 		// add form action
 		$('form[name="ilExcIDlForm"]').submit(function() {			
 			var submit_btn = $(document.activeElement).attr("name");
@@ -25,6 +26,7 @@ il.ExcIDl = {
 			{
 				var values = {};
 				var cmd = null;
+				var sel = [];
 				var ids = [];
 				$.each($(this).serializeArray(), function(i, field) {
 					if(submit_btn == "select_cmd2" && field.name == "selected_cmd2")
@@ -38,7 +40,19 @@ il.ExcIDl = {
 					// extract user/team ids
 					if(field.name.substr(0, 6) == "member")
 					{
-						ids.push(field.name.substr(7, field.name.length-8));
+						sel.push(field.name.substr(7, field.name.length-8));
+					}
+					else if(field.name.substr(0, 3) == "ass")
+					{
+						sel.push(field.name.substr(4, field.name.length-5));
+					}
+					else if(field.name.substr(0, 5) == "idlid" && field.value != "")
+					{						
+						var sel_value = field.name.substr(6, field.name.length-7);
+						if(sel.indexOf(sel_value) > -1)
+						{
+							ids.push(field.value);
+						}
 					}
 				});	
 				if(cmd == "setIndividualDeadline" && ids.length)

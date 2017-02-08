@@ -13,6 +13,7 @@ class ilDidacticTemplateBlockRoleAction extends ilDidacticTemplateAction
 {
 	const FILTER_SOURCE_TITLE = 1;
 	const FILTER_SOURCE_OBJ_ID = 2;
+	const FILTER_PARENT_ROLES = 3;
 
 	const PATTERN_PARENT_TYPE = 'action';
 
@@ -288,7 +289,7 @@ class ilDidacticTemplateBlockRoleAction extends ilDidacticTemplateAction
 		$query = 'SELECT * FROM didactic_tpl_abr '.
 			'WHERE action_id = '.$ilDB->quote($this->getActionId());
 		$res = $ilDB->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$this->setFilterType($row->filter_type);
 		}

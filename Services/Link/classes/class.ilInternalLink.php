@@ -20,7 +20,7 @@ class ilInternalLink
 	 * @param int $a_source_if source id
 	 * @param int $a_lang source language
 	 */
-	function _deleteAllLinksOfSource($a_source_type, $a_source_id, $a_lang = "-")
+	static function _deleteAllLinksOfSource($a_source_type, $a_source_id, $a_lang = "-")
 	{
 		global $ilias, $ilDB;
 
@@ -44,7 +44,7 @@ class ilInternalLink
 	 * @param	int			$a_target_id		target id
 	 * @param	int			$a_target_inst		target installation id
 	 */
-	function _deleteAllLinksToTarget($a_target_type, $a_target_id, $a_target_inst = 0)
+	static function _deleteAllLinksToTarget($a_target_type, $a_target_id, $a_target_inst = 0)
 	{
 		global $ilias, $ilDB;
 
@@ -63,7 +63,7 @@ class ilInternalLink
 	 * @param	int			$a_target_id		target id
 	 * @param	int			$a_target_inst		target installation id
 	 */
-	function _saveLink($a_source_type, $a_source_id, $a_target_type, $a_target_id, $a_target_inst = 0,
+	static function _saveLink($a_source_type, $a_source_id, $a_target_type, $a_target_id, $a_target_inst = 0,
 		$a_source_lang = "-")
 	{
 		global $ilDB;
@@ -90,7 +90,7 @@ class ilInternalLink
 	 *
 	 * @return	array		sources (array of array("type", "id"))
 	 */
-	function _getSourcesOfTarget($a_target_type, $a_target_id, $a_target_inst)
+	static function _getSourcesOfTarget($a_target_type, $a_target_id, $a_target_inst)
 	{
 		global $ilias, $ilDB;
 
@@ -118,7 +118,7 @@ class ilInternalLink
 	 *
 	 * @return	array		targets (array of array("type", "id", "inst"))
 	 */
-	function _getTargetsOfSource($a_source_type, $a_source_id, $a_source_lang = "-")
+	static function _getTargetsOfSource($a_source_type, $a_source_id, $a_source_lang = "-")
 	{
 		global $ilDB;
 
@@ -154,8 +154,9 @@ class ilInternalLink
 	 *
 	 * @return	string		current target id (e.g. "il__pg_244")
 	 */
-	function _getIdForImportId($a_type, $a_target)
+	static function _getIdForImportId($a_type, $a_target)
 	{
+		include_once("./Modules/LearningModule/classes/class.ilLMObject.php");
 		switch($a_type)
 		{
 			case "PageObject":
@@ -251,7 +252,7 @@ class ilInternalLink
 	 *
 	 * @return	boolean		true/false
 	 */
-	function _exists($a_type, $a_target)
+	static function _exists($a_type, $a_target)
 	{
 		global $tree;
 		
@@ -259,14 +260,17 @@ class ilInternalLink
 		{
 			case "PageObject":
 			case "StructureObject":
+				include_once("./Modules/LearningModule/classes/class.ilLMObject.php");
 				return ilLMObject::_exists($a_target);
 				break;
 
 			case "GlossaryItem":
+				include_once("./Modules/Glossary/classes/class.ilGlossaryTerm.php");
 				return ilGlossaryTerm::_exists($a_target);
 				break;
 
 			case "MediaObject":
+				include_once("./Services/MediaObjects/classes/class.ilObjMediaObject.php");
 				return ilObjMediaObject::_exists($a_target);
 				break;
 				
@@ -292,7 +296,7 @@ class ilInternalLink
 	 *
 	 * @param	string		$a_target		import target id (e.g. "il_2_pg_22")
 	 */
-	function _extractInstOfTarget($a_target)
+	static function _extractInstOfTarget($a_target)
 	{
 		if (!is_int(strpos($a_target, "__")))
 		{
@@ -310,7 +314,7 @@ class ilInternalLink
 	 *
 	 * @param	string		$a_target		import target id (e.g. "il_2_pg_22")
 	 */
-	function _removeInstFromTarget($a_target)
+	static function _removeInstFromTarget($a_target)
 	{
 		if (!is_int(strpos($a_target, "__")))
 		{
@@ -328,7 +332,7 @@ class ilInternalLink
 	 *
 	 * @param	string		$a_target		import target id (e.g. "il_2_pg_22")
 	 */
-	function _extractObjIdOfTarget($a_target)
+	static function _extractObjIdOfTarget($a_target)
 	{
 		$target = explode("_", $a_target);
 		return $target[count($target) - 1];
@@ -339,7 +343,7 @@ class ilInternalLink
 	 *
 	 * @param	string		$a_target		import target id (e.g. "il_2_pg_22")
 	 */
-	function _extractTypeOfTarget($a_target)
+	static function _extractTypeOfTarget($a_target)
 	{
 		$target = explode("_", $a_target);
 		return $target[count($target) - 2];

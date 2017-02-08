@@ -21,7 +21,6 @@ class ilPCLoginPageElement extends ilPageContent
 		'login-form' => 'login_form',
 		'cas-login-form' => 'cas_login_form',
 		'shibboleth-login-form' => 'shib_login_form',
-		'openid-login-form' => 'openid_login_form',
 		'registration-link' => 'registration_link',
 		'language-selection' => 'language_selection',
 		'user-agreement' => 'user_agreement_link'
@@ -47,7 +46,7 @@ class ilPCLoginPageElement extends ilPageContent
 	/**
 	* Set node
 	*/
-	function setNode(&$a_node)
+	function setNode($a_node)
 	{
 		parent::setNode($a_node);						// this is the PageContent node
 		$this->res_node = $a_node->first_child();		// this is the login page element

@@ -12,7 +12,11 @@ ilInitialisation::initILIAS();
  * @var $ilUser ilObjUser
  * @var $https ilHttps
  */
-global $ilIliasIniFile, $lng, $ilUser, $https;
+global $DIC;
+$ilIliasIniFile = $DIC['ilIliasIniFile'];
+$lng = $DIC['lng'];
+$ilUser = $DIC['ilUser'];
+$https = $DIC['https'];
 
 $lng->loadLanguageModule("form");
 
@@ -157,9 +161,17 @@ $tpl->setVariable(
 	implode(', ', array_map(create_function('$value', 'return ".".$value;'), $tinyMCE_valid_imgs))
 );
 
+include_once "Services/jQuery/classes/class.iljQueryUtil.php";
+$jquery_path = array_pop(explode("Services/", iljQueryUtil::getLocaljQueryPath()));
+$tpl->setVariable("JQUERY", $jquery_path);
+
 if($ilUser->getLanguage() == 'de')
 {
 	$tpl->touchBlock('validation_engine_lang_de');
+}
+else if($ilUser->getLanguage() == 'hu')
+{
+	$tpl->touchBlock('validation_engine_lang_hu');
 }
 else
 {

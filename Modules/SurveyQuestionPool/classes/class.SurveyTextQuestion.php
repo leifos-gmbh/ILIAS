@@ -49,15 +49,10 @@ class SurveyTextQuestion extends SurveyQuestion
 * @param integer $owner A numerical ID to identify the owner/creator
 * @access public
 */
-	function SurveyTextQuestion(
-		$title = "",
-		$description = "",
-		$author = "",
-		$questiontext = "",
-		$owner = -1
-	)
+	function __construct($title = "", $description = "", $author = "", $questiontext = "",	$owner = -1)
 	{
-		$this->SurveyQuestion($title, $description, $author, $questiontext, $owner);
+		parent::__construct($title, $description, $author, $questiontext, $owner);
+		
 		$this->maxchars = 0;
 		$this->textwidth = 50;
 		$this->textheight = 5;
@@ -70,7 +65,7 @@ class SurveyTextQuestion extends SurveyQuestion
 	* @return array Array containing the question fields and data from the database
 	* @access public
 	*/
-	function _getQuestionDataArray($id)
+	function getQuestionDataArray($id)
 	{
 		global $ilDB;
 		$result = $ilDB->queryF("SELECT svy_question.*, " . $this->getAdditionalTableName() . ".* FROM svy_question, " . $this->getAdditionalTableName() . " WHERE svy_question.question_id = %s AND svy_question.question_id = " . $this->getAdditionalTableName() . ".question_fi",
@@ -218,10 +213,9 @@ class SurveyTextQuestion extends SurveyQuestion
 	*
 	* @param object $a_xml_writer The XMLWriter object
 	* @param boolean $a_include_header Determines wheather or not the XML should be used
-	* @param string $obligatory_state The value of the obligatory state
 	* @access public
 	*/
-	function insertXML(&$a_xml_writer, $a_include_header = TRUE, $obligatory_state = "")
+	function insertXML(&$a_xml_writer, $a_include_header = TRUE)
 	{
 		$attrs = array(
 			"id" => $this->getId(),
@@ -279,27 +273,6 @@ class SurveyTextQuestion extends SurveyQuestion
 		}
 		
 		$a_xml_writer->xmlEndTag("question");
-	}
-
-	/**
-	* Returns the maxium number of allowed characters for the text answer
-	*
-	* @return integer The maximum number of characters
-	* @access public
-	*/
-	function _getMaxChars($question_id)
-	{
-		global $ilDB;
-		$result = $ilDB->queryF("SELECT maxchars FROM svy_question WHERE question_id = %s",
-			array('integer'),
-			array($question_id)
-		);
-		if ($result->numRows())
-		{
-			$row = $ilDB->fetchAssoc($result);
-			return $row["maxchars"];
-		}
-		return 0;
 	}
 
 	/**
@@ -361,42 +334,10 @@ class SurveyTextQuestion extends SurveyQuestion
 		return "";
 	}
 	
-	function randomText($length)
-	{
-		$random= "";
-		$char_list = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-		$char_list .= "abcdefghijklmnopqrstuvwxyz";
-		$char_list .= "1234567890";
-		for($i = 0; $i < $length; $i++)
-		{ 
-			$random .= substr($char_list,(rand()%(strlen($char_list))), 1);
-			if (!rand(0,5)) $random .= ' ';
-		}
-		return $random;
-	}
-	
-	/**
-	* Saves random answers for a given active user in the database
-	*
-	* @param integer $active_id The database ID of the active user
-	*/
-	public function saveRandomData($active_id)
-	{
-		global $ilDB;
-		// single response
-		$randomtext = $this->randomText(rand(25,100));
-		$next_id = $ilDB->nextId('svy_answer');
-		$affectedRows = $ilDB->manipulateF("INSERT INTO svy_answer (answer_id, question_fi, active_fi, value, textanswer, tstamp) VALUES (%s, %s, %s, %s, %s, %s)",
-			array('integer', 'integer', 'integer', 'float', 'text', 'integer'),
-			array($next_id, $this->getId(), $active_id, NULL, $randomtext, time())
-		);
-	}
-
 	function saveUserInput($post_data, $active_id, $a_return = false)
 	{
 		global $ilDB;
 
-		include_once "./Services/Utilities/classes/class.ilUtil.php";
 		$entered_value = ilUtil::stripSlashes($post_data[$this->getId() . "_text_question"]);
 		$maxchars = $this->getMaxChars();
 		if ($maxchars > 0)
@@ -417,149 +358,6 @@ class SurveyTextQuestion extends SurveyQuestion
 		);
 	}
 	
-	function &getCumulatedResults($survey_id, $nr_of_users, $finished_ids)
-	{
-		global $ilDB;
-		
-		$question_id = $this->getId();
-		
-		$result_array = array();
-		$cumulated = array();
-		$textvalues = array();
-		
-		$sql = "SELECT svy_answer.* FROM svy_answer".
-			" JOIN svy_finished ON (svy_finished.finished_id = svy_answer.active_fi)".
-			" WHERE svy_answer.question_fi = ".$ilDB->quote($question_id, "integer").
-			" AND svy_finished.survey_fi = ".$ilDB->quote($survey_id, "integer");		
-		if($finished_ids)
-		{
-			$sql .= " AND ".$ilDB->in("svy_finished.finished_id", $finished_ids, "", "integer");
-		}
-
-		$result = $ilDB->query($sql);		
-		while ($row = $ilDB->fetchAssoc($result))
-		{
-			$cumulated[$row["value"]]++;
-			array_push($textvalues, $row["textanswer"]);
-		}
-		asort($cumulated, SORT_NUMERIC);
-		end($cumulated);
-		$numrows = $result->numRows();
-		$result_array["USERS_ANSWERED"] = $result->numRows();
-		$result_array["USERS_SKIPPED"] = $nr_of_users - $result->numRows();
-		$result_array["QUESTION_TYPE"] = "SurveyTextQuestion";
-		$result_array["textvalues"] = $textvalues;
-		return $result_array;
-	}
-	
-	/**
-	* Creates an Excel worksheet for the detailed cumulated results of this question
-	*
-	* @param object $workbook Reference to the parent excel workbook
-	* @param object $format_title Excel title format
-	* @param object $format_bold Excel bold format
-	* @param array $eval_data Cumulated evaluation data
-	* @access public
-	*/
-	function setExportDetailsXLS(&$workbook, &$format_title, &$format_bold, &$eval_data, $export_label)
-	{
-		include_once ("./Services/Excel/classes/class.ilExcelUtils.php");
-		$worksheet =& $workbook->addWorksheet();
-		$rowcounter = 0;
-		switch ($export_label)
-		{
-			case 'label_only':
-				$worksheet->writeString(0, 0, ilExcelUtils::_convert_text($this->lng->txt("label")), $format_bold);
-				$worksheet->writeString(0, 1, ilExcelUtils::_convert_text($this->label));
-				break;
-			case 'title_only':
-				$worksheet->writeString(0, 0, ilExcelUtils::_convert_text($this->lng->txt("title")), $format_bold);
-				$worksheet->writeString(0, 1, ilExcelUtils::_convert_text($this->getTitle()));
-				break;
-			default:
-				$worksheet->writeString(0, 0, ilExcelUtils::_convert_text($this->lng->txt("title")), $format_bold);
-				$worksheet->writeString(0, 1, ilExcelUtils::_convert_text($this->getTitle()));
-				$rowcounter++;
-				$worksheet->writeString($rowcounter, 0, ilExcelUtils::_convert_text($this->lng->txt("label")), $format_bold);
-				$worksheet->writeString($rowcounter, 1, ilExcelUtils::_convert_text($this->label));
-				break;
-		}
-		$rowcounter++;
-		$worksheet->writeString($rowcounter, 0, ilExcelUtils::_convert_text($this->lng->txt("question")), $format_bold);
-		$worksheet->writeString($rowcounter, 1, ilExcelUtils::_convert_text($this->getQuestiontext()));
-		$rowcounter++;
-		$worksheet->writeString($rowcounter, 0, ilExcelUtils::_convert_text($this->lng->txt("question_type")), $format_bold);
-		$worksheet->writeString($rowcounter, 1, ilExcelUtils::_convert_text($this->lng->txt($this->getQuestionType())));
-		$rowcounter++;
-		$worksheet->writeString($rowcounter, 0, ilExcelUtils::_convert_text($this->lng->txt("users_answered")), $format_bold);
-		$worksheet->write($rowcounter, 1, $eval_data["USERS_ANSWERED"]);
-		$rowcounter++;
-		$worksheet->writeString($rowcounter, 0, ilExcelUtils::_convert_text($this->lng->txt("users_skipped")), $format_bold);
-		$worksheet->write($rowcounter, 1, $eval_data["USERS_SKIPPED"]);
-		$rowcounter++;
-
-		$worksheet->write($rowcounter, 0, ilExcelUtils::_convert_text($this->lng->txt("given_answers")), $format_bold);
-		$textvalues = "";
-		if (is_array($eval_data["textvalues"]))
-		{
-			foreach ($eval_data["textvalues"] as $textvalue)
-			{
-				$worksheet->write($rowcounter++, 1, ilExcelUtils::_convert_text($textvalue));
-			}
-		}
-	}
-
-	/**
-	* Adds the values for the user specific results export for a given user
-	*
-	* @param array $a_array An array which is used to append the values
-	* @param array $resultset The evaluation data for a given user
-	* @access public
-	*/
-	function addUserSpecificResultsData(&$a_array, &$resultset)
-	{
-		if (count($resultset["answers"][$this->getId()]))
-		{
-			foreach ($resultset["answers"][$this->getId()] as $key => $answer)
-			{
-				array_push($a_array, $answer["textanswer"]);
-			}
-		}
-		else
-		{
-			array_push($a_array, $this->getSkippedValue());
-		}
-	}
-
-	/**
-	* Returns an array containing all answers to this question in a given survey
-	*
-	* @param integer $survey_id The database ID of the survey
-	* @return array An array containing the answers to the question. The keys are either the user id or the anonymous id
-	* @access public
-	*/
-	function &getUserAnswers($survey_id, $finished_ids)
-	{
-		global $ilDB;
-		
-		$answers = array();
-		
-		$sql = "SELECT svy_answer.* FROM svy_answer, svy_finished".
-			" WHERE svy_finished.survey_fi = ".$ilDB->quote($survey_id, "integer").
-			" AND svy_answer.question_fi = ".$ilDB->quote($this->getId(), "integer").
-			" AND svy_finished.finished_id = svy_answer.active_fi";	
-		if($finished_ids)
-		{
-			$sql .= " AND ".$ilDB->in("svy_finished.finished_id", $finished_ids, "", "integer");
-		}
-		$result = $ilDB->query($sql);
-		while ($row = $ilDB->fetchAssoc($result))
-		{
-			$answers[$row["active_fi"]] = $row["textanswer"];
-		}
-		return $answers;
-	}
-
 	/**
 	* Import response data from the question import file
 	*

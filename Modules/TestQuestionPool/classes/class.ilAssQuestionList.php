@@ -2,6 +2,7 @@
 /* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 require_once 'Services/Taxonomy/interfaces/interface.ilTaxAssignedItemInfo.php';
+require_once 'Modules/TestQuestionPool/classes/questions/class.ilAssQuestionType.php';
 
 /**
  * Handles a list of questions
@@ -15,9 +16,9 @@ require_once 'Services/Taxonomy/interfaces/interface.ilTaxAssignedItemInfo.php';
 class ilAssQuestionList implements ilTaxAssignedItemInfo
 {
 	/**
-	 * global ilDB object instance
+	 * global ilDBInterface object instance
 	 *
-	 * @var ilDB
+	 * @var ilDBInterface
 	 */
 	protected $db = null;
 	
@@ -146,12 +147,11 @@ class ilAssQuestionList implements ilTaxAssignedItemInfo
 	/**
 	 * Constructor
 	 * 
-	 * @param ilDB $db
+	 * @param ilDBInterface $db
 	 * @param ilLanguage $lng
 	 * @param ilPluginAdmin $pluginAdmin
-	 *
 	 */
-	public function __construct(ilDB $db, ilLanguage $lng, ilPluginAdmin $pluginAdmin)
+	public function __construct(ilDBInterface $db, ilLanguage $lng, ilPluginAdmin $pluginAdmin)
 	{
 		$this->db = $db;
 		$this->lng = $lng;
@@ -533,6 +533,7 @@ class ilAssQuestionList implements ilTaxAssignedItemInfo
 			'qpl_questions.*',
 			'qpl_qst_type.type_tag',
 			'qpl_qst_type.plugin',
+			'qpl_qst_type.plugin_name',
 			'qpl_questions.points max_points',
 			'object_data.title parent_title'
 		);
@@ -601,6 +602,8 @@ class ilAssQuestionList implements ilTaxAssignedItemInfo
 		
 		while( $row = $this->db->fetchAssoc($res) )
 		{
+			$row = ilAssQuestionType::conmpleteMissingPluginName($row);
+			
 			if( !$this->isActiveQuestionType($row) )
 			{
 				continue;
@@ -659,7 +662,7 @@ class ilAssQuestionList implements ilTaxAssignedItemInfo
 			return true;
 		}
 		
-		return $this->pluginAdmin->isActive(IL_COMP_MODULE, 'TestQuestionPool', 'qst', $questionData['type_tag']);
+		return $this->pluginAdmin->isActive(IL_COMP_MODULE, 'TestQuestionPool', 'qst', $questionData['plugin_name']);
 	}
 
 	public function getDataArrayForQuestionId($questionId)

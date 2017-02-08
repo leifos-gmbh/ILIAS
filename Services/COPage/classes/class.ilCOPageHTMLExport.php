@@ -100,9 +100,11 @@ class ilCOPageHTMLExport
 	 */
 	function exportStyles()
 	{
-		include_once "Services/Style/classes/class.ilObjStyleSheet.php";
+
 		$this->log->debug("export styles");
 
+		include_once "Services/Style/Content/classes/class.ilObjStyleSheet.php";
+		
 		// export content style sheet
 		if ($this->getContentStyleId() < 1)
 		{

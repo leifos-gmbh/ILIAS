@@ -32,14 +32,6 @@ include_once 'class.ilMDBase.php';
 
 class ilMDMetaMetadata extends ilMDBase
 {
-
-	function ilMDMetaMetadata($a_rbac_id = 0,$a_obj_id = 0,$a_obj_type = '')
-	{
-		parent::ilMDBase($a_rbac_id,
-						 $a_obj_id,
-						 $a_obj_type);
-	}
-
 	// SUBELEMENTS
 	function &getIdentifierIds()
 	{
@@ -55,7 +47,7 @@ class ilMDMetaMetadata extends ilMDBase
 		{
 			return false;
 		}
-		$ide =& new ilMDIdentifier();
+		$ide = new ilMDIdentifier();
 		$ide->setMetaId($a_identifier_id);
 
 		return $ide;
@@ -64,7 +56,7 @@ class ilMDMetaMetadata extends ilMDBase
 	{
 		include_once 'Services/Migration/DBUpdate_426/classes/class.ilMDIdentifier.php';
 
-		$ide =& new ilMDIdentifier($this->getRBACId(),$this->getObjId(),$this->getObjType());
+		$ide = new ilMDIdentifier($this->getRBACId(),$this->getObjId(),$this->getObjType());
 		$ide->setParentId($this->getMetaId());
 		$ide->setParentType('meta_meta_data');
 
@@ -85,7 +77,7 @@ class ilMDMetaMetadata extends ilMDBase
 		{
 			return false;
 		}
-		$con =& new ilMDContribute();
+		$con = new ilMDContribute();
 		$con->setMetaId($a_contribute_id);
 
 		return $con;
@@ -94,7 +86,7 @@ class ilMDMetaMetadata extends ilMDBase
 	{
 		include_once 'Services/Migration/DBUpdate_426/classes/class.ilMDContribute.php';
 
-		$con =& new ilMDContribute($this->getRBACId(),$this->getObjId(),$this->getObjType());
+		$con = new ilMDContribute($this->getRBACId(),$this->getObjId(),$this->getObjType());
 		$con->setParentId($this->getMetaId());
 		$con->setParentType('meta_meta_data');
 
@@ -134,7 +126,7 @@ class ilMDMetaMetadata extends ilMDBase
 	{
 		if($this->db->autoExecute('il_meta_meta_data',
 								  $this->__getFields(),
-								  DB_AUTOQUERY_INSERT))
+								  ilDBConstants::MDB2_AUTOQUERY_INSERT))
 		{
 			$this->setMetaId($this->db->getLastInsertId());
 
@@ -151,7 +143,7 @@ class ilMDMetaMetadata extends ilMDBase
 		{
 			if($this->db->autoExecute('il_meta_meta_data',
 									  $this->__getFields(),
-									  DB_AUTOQUERY_UPDATE,
+									  ilDBConstants::MDB2_AUTOQUERY_UPDATE,
 									  "meta_meta_data_id = ".$ilDB->quote($this->getMetaId())))
 			{
 				return true;
@@ -214,7 +206,7 @@ class ilMDMetaMetadata extends ilMDBase
 
 		
 			$res = $this->db->query($query);
-			while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+			while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 			{
 				$this->setRBACId($row->rbac_id);
 				$this->setObjId($row->obj_id);
@@ -271,7 +263,7 @@ class ilMDMetaMetadata extends ilMDBase
 			"AND obj_id = ".$ilDB->quote($a_obj_id);
 
 		$res = $ilDB->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			return $row->meta_meta_data_id;
 		}

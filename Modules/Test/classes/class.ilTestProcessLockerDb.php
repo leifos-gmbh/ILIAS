@@ -12,56 +12,60 @@ require_once 'Modules/Test/classes/class.ilTestProcessLocker.php';
 class ilTestProcessLockerDb extends ilTestProcessLocker
 {
 	/**
-	 * @var ilDB
+	 * @var ilDBInterface
 	 */
 	protected $db;
 
 	/**
-	 * @param ilDB $db
+	 * @var ilAtomQuery
 	 */
-	public function __construct(ilDB $db)
+	protected $atom_query;
+
+	/**
+	 * @param ilDBInterface $db
+	 */
+	public function __construct(ilDBInterface $db)
 	{
-		$this->db = $db;
+		$this->db         = $db;
+		$this->atom_query = $this->db->buildAtomQuery(); 
 	}
 
-	public function requestTestStartLockCheckLock()
+	/**
+	 * {@inheritdoc}
+	 */
+	protected function onBeforeExecutingTestStartOperation()
 	{
-		$tables = array(
-			array('name' => 'tst_active', 'type' => ilDB::LOCK_WRITE)
-		);
-
-		$this->db->lockTables($tables);
+		$this->atom_query->addTableLock('tst_active');
 	}
 
-	public function releaseTestStartLockCheckLock()
+	/**
+	 * {@inheritdoc}
+	 */
+	protected function onBeforeExecutingRandomPassBuildOperation($withTaxonomyTables = false)
 	{
-		$this->db->unlockTables();
-	}
+		$this->atom_query->addTableLock('tst_rnd_cpy');
+		$this->atom_query->addTableLock('qpl_questions');
+		$this->atom_query->addTableLock('qpl_qst_type');
+		$this->atom_query->addTableLock('tst_test_rnd_qst')->lockSequence(true);
+		$this->atom_query->addTableLock('il_plugin');
+		$this->atom_query->addTableLock('tst_active');
 
-	public function requestRandomPassBuildLock($withTaxonomyTables = false)
-	{
-		$tables = array();
-		
-		$tables[] = array('name' => 'tst_rnd_cpy', 'type' => ilDB::LOCK_WRITE);
-		$tables[] = array('name' => 'qpl_questions', 'type' => ilDB::LOCK_WRITE);
-		$tables[] = array('name' => 'qpl_qst_type', 'type' => ilDB::LOCK_WRITE);
-		$tables[] = array('name' => 'tst_test_rnd_qst', 'type' => ilDB::LOCK_WRITE);
-		$tables[] = array('name' => 'tst_test_rnd_qst', 'type' => ilDB::LOCK_WRITE, 'sequence' => true);
-		$tables[] = array('name' => 'il_pluginslot', 'type' => ilDB::LOCK_WRITE);
-		$tables[] = array('name' => 'il_plugin', 'type' => ilDB::LOCK_WRITE);
-
-		if( $withTaxonomyTables )
+		if($withTaxonomyTables)
 		{
-			$tables[] = array('name' => 'tax_tree s', 'type' => ilDB::LOCK_WRITE);
-			$tables[] = array('name' => 'tax_tree t', 'type' => ilDB::LOCK_WRITE);
-			$tables[] = array('name' => 'tax_node_assignment', 'type' => ilDB::LOCK_WRITE);
+			$this->atom_query->addTableLock('tax_tree')->aliasName('s');
+			$this->atom_query->addTableLock('tax_tree')->aliasName('t');
+			$this->atom_query->addTableLock('tax_node_assignment');
 		}
-
-		$this->db->lockTables($tables);
 	}
 
-	public function releaseRandomPassBuildLock()
+	/**
+	 * {@inheritdoc}
+	 */
+	protected function executeOperation(callable $operation)
 	{
-		$this->db->unlockTables();
+		$this->atom_query ->addQueryCallable(function(ilDBInterface $ilDB) use ($operation) {
+			$operation();
+		});
+		$this->atom_query->run();
 	}
 } 

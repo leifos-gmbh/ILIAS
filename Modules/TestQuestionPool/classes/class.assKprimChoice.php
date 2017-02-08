@@ -392,8 +392,8 @@ class assKprimChoice extends assQuestion implements ilObjQuestionScoringAdjustab
 	 */
 	public function saveWorkingData($active_id, $pass = NULL, $authorized = true)
 	{
-		/** @var $ilDB ilDB */
-		global $ilDB;
+		/** @var ilDBInterface $ilDB */
+		$ilDB = $GLOBALS['DIC']['ilDB'];
 
 		if (is_null($pass))
 		{
@@ -403,26 +403,26 @@ class assKprimChoice extends assQuestion implements ilObjQuestionScoringAdjustab
 
 		$entered_values = 0;
 
-		$this->getProcessLocker()->requestUserSolutionUpdateLock();
+		$this->getProcessLocker()->executeUserSolutionUpdateLockOperation(function() use (&$entered_values, $active_id, $pass, $authorized) {
 
-		$this->removeCurrentSolution($active_id, $pass, $authorized);
+			$this->removeCurrentSolution($active_id, $pass, $authorized);
 
-		$solutionSubmit = $this->getSolutionSubmit();
+			$solutionSubmit = $this->getSolutionSubmit();
 
-		foreach($solutionSubmit as $answerIndex => $answerValue)
-		{
-			$this->saveCurrentSolution($active_id, $pass, (int)$answerIndex, (int)$answerValue, $authorized);
-			$entered_values++;
-		}
+			foreach($solutionSubmit as $answerIndex => $answerValue)
+			{
+				$this->saveCurrentSolution($active_id, $pass, (int)$answerIndex, (int)$answerValue, $authorized);
+				$entered_values++;
+			}
 
-		$this->getProcessLocker()->releaseUserSolutionUpdateLock();
+		});
 
 		if ($entered_values)
 		{
 			include_once ("./Modules/Test/classes/class.ilObjAssessmentFolder.php");
 			if (ilObjAssessmentFolder::_enabledAssessmentLogging())
 			{
-				$this->logAction($this->lng->txtlng("assessment", "log_user_entered_values", ilObjAssessmentFolder::_getLogLanguage()), $active_id, $this->getId());
+				assQuestion::logAction($this->lng->txtlng("assessment", "log_user_entered_values", ilObjAssessmentFolder::_getLogLanguage()), $active_id, $this->getId());
 			}
 		}
 		else
@@ -430,7 +430,7 @@ class assKprimChoice extends assQuestion implements ilObjQuestionScoringAdjustab
 			include_once ("./Modules/Test/classes/class.ilObjAssessmentFolder.php");
 			if (ilObjAssessmentFolder::_enabledAssessmentLogging())
 			{
-				$this->logAction($this->lng->txtlng("assessment", "log_user_not_entered_values", ilObjAssessmentFolder::_getLogLanguage()), $active_id, $this->getId());
+				assQuestion::logAction($this->lng->txtlng("assessment", "log_user_not_entered_values", ilObjAssessmentFolder::_getLogLanguage()), $active_id, $this->getId());
 			}
 		}
 
@@ -438,16 +438,11 @@ class assKprimChoice extends assQuestion implements ilObjQuestionScoringAdjustab
 	}
 
 	/**
-	 * Reworks the allready saved working data if neccessary
-	 *
-	 * @access protected
-	 * @param integer $active_id
-	 * @param integer $pass
-	 * @param boolean $obligationsAnswered
+	 * {@inheritdoc}
 	 */
-	protected function reworkWorkingData($active_id, $pass, $obligationsAnswered)
+	protected function reworkWorkingData($active_id, $pass, $obligationsAnswered, $authorized)
 	{
-		// nothing to do
+		// nothing to rework!
 	}
 
 	/**
@@ -666,7 +661,7 @@ class assKprimChoice extends assQuestion implements ilObjQuestionScoringAdjustab
 			ilUtil::makeDirParents($imagePath);
 		}
 		
-		$filename = $this->createNewImageFileName($fileData['name'], true);
+		$filename = $this->buildHashedImageFilename($fileData['name'], true);
 
 		$answer->setImageFsDir($imagePath);
 		$answer->setImageFile($filename);
@@ -904,8 +899,9 @@ class assKprimChoice extends assQuestion implements ilObjQuestionScoringAdjustab
 
 	protected function cloneAnswerImages($sourceQuestionId, $sourceParentId, $targetQuestionId, $targetParentId)
 	{
+		/** @var $ilLog ilLogger */
 		global $ilLog;
-		
+
 		$sourcePath = $this->buildImagePath($sourceQuestionId, $sourceParentId);
 		$targetPath = $this->buildImagePath($targetQuestionId, $targetParentId);
 
@@ -915,23 +911,32 @@ class assKprimChoice extends assQuestion implements ilObjQuestionScoringAdjustab
 			
 			if (strlen($filename))
 			{
-				if (!file_exists($targetPath))
+				if(!file_exists($targetPath))
 				{
 					ilUtil::makeDirParents($targetPath);
 				}
-				
-				if (!@copy($sourcePath.$filename, $targetPath.$filename))
+
+				if(file_exists($sourcePath . $filename))
 				{
-					$ilLog->write("image could not be duplicated!!!!", $ilLog->ERROR);
-					$ilLog->write("object: " . print_r($this, TRUE), $ilLog->ERROR);
-				}
-				
-				if (@file_exists($sourcePath.$this->getThumbPrefix().$filename))
-				{
-					if (!@copy($sourcePath.$this->getThumbPrefix().$filename, $targetPath.$this->getThumbPrefix().$filename))
+					if(!copy($sourcePath . $filename, $targetPath . $filename))
 					{
-						$ilLog->write("image thumbnail could not be duplicated!!!!", $ilLog->ERROR);
-						$ilLog->write("object: " . print_r($this, TRUE), $ilLog->ERROR);
+						$ilLog->warning(sprintf(
+							"Could not clone source image '%s' to '%s' (srcQuestionId: %s|tgtQuestionId: %s|srcParentObjId: %s|tgtParentObjId: %s)",
+							$sourcePath . $filename, $targetPath . $filename,
+							$sourceQuestionId, $targetQuestionId, $sourceParentId, $targetParentId
+						));
+					}
+				}
+
+				if(file_exists($sourcePath . $this->getThumbPrefix() . $filename))
+				{
+					if(!copy($sourcePath . $this->getThumbPrefix() . $filename, $targetPath . $this->getThumbPrefix() . $filename))
+					{
+						$ilLog->warning(sprintf(
+							"Could not clone thumbnail source image '%s' to '%s' (srcQuestionId: %s|tgtQuestionId: %s|srcParentObjId: %s|tgtParentObjId: %s)",
+							$sourcePath . $this->getThumbPrefix() . $filename, $targetPath . $this->getThumbPrefix() . $filename,
+							$sourceQuestionId, $targetQuestionId, $sourceParentId, $targetParentId
+						));
 					}
 				}
 			}
@@ -1043,18 +1048,17 @@ class assKprimChoice extends assQuestion implements ilObjQuestionScoringAdjustab
 	/**
 	 * {@inheritdoc}
 	 */
-	public function setExportDetailsXLS(&$worksheet, $startrow, $active_id, $pass, &$format_title, &$format_bold)
+	public function setExportDetailsXLS($worksheet, $startrow, $active_id, $pass)
 	{
-		require_once 'Services/Excel/classes/class.ilExcelUtils.php';
+		parent::setExportDetailsXLS($worksheet, $startrow, $active_id, $pass);
 
 		$solution = $this->getSolutionValues($active_id, $pass);
-
-		$worksheet->writeString($startrow, 0, ilExcelUtils::_convert_text($this->lng->txt($this->getQuestionType())), $format_title);
-		$worksheet->writeString($startrow, 1, ilExcelUtils::_convert_text($this->getTitle()), $format_title);
+		
 		$i = 1;
 		foreach($this->getAnswers() as $id => $answer)
 		{
-			$worksheet->writeString($startrow + $i, 0, ilExcelUtils::_convert_text($answer->getAnswertext()), $format_bold);
+			$worksheet->setCell($startrow + $i, 0, $answer->getAnswertext());
+			$worksheet->setBold($worksheet->getColumnCoord(0) . ($startrow + $i));
 			$correctness = FALSE;
 			foreach($solution as $solutionvalue)
 			{
@@ -1064,9 +1068,10 @@ class assKprimChoice extends assQuestion implements ilObjQuestionScoringAdjustab
 					break;
 				}
 			}
-			$worksheet->write($startrow + $i, 1, $correctness);
+			$worksheet->setCell($startrow + $i, 1, $correctness);
 			$i++;
 		}
+
 		return $startrow + $i + 1;
 	}
 	

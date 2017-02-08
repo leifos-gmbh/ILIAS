@@ -17,62 +17,84 @@ class ilCertificate
 	/**
 	* The reference to the ILIAS control class
 	*
-	* @var ctrl
+	* @var ilCtrl
 	*/
 	protected $ctrl;
 
 	/**
 	* The reference to the ILIAS tree class
 	*
-	* @var ctrl
+	* @var ilTree
 	*/
 	protected $tree;
 
 	/**
 	* The reference to the ILIAS class
 	*
-	* @var object
+	* @var ILIAS
 	*/
 	protected $ilias;
 
 	/**
-	* The reference to the Template class
-	*
-	* @var object
-	*/
-	protected $tpl;
-
-	/**
 	* The reference to the Language class
 	*
-	* @var object
+	* @var ilLanguage
 	*/
 	protected $lng;
 
 	/**
 	* The certificate adapter
 	*
-	* @var object
+	* @var ilCertificateAdapter
 	*/
 	protected $adapter;
-	
+
+	/**
+	 * @var ilSetting
+	 */
+	protected $settings;
+
+	/**
+	 * @var ilLog
+	 */
+	protected $log;
+
+	/**
+	 * @var ilDBInterface
+	 */
+	protected $db;
+
+	/**
+	 * @var bool
+	 */
 	protected static $is_active;
 	
 	/**
-	* ilCertificate constructor
-	*
-	* @param object $adapter The certificate adapter needed to construct the certificate
-	*/
-	function __construct($adapter)
+	 * ilCertificate constructor
+	 * @param ilCertificateAdapter $adapter The certificate adapter needed to construct the certificate
+	 */
+	public function __construct(ilCertificateAdapter $adapter)
 	{
-		global $lng, $tpl, $ilCtrl, $ilias, $tree;
+		global $DIC;
 
-		$this->lng =& $lng;
-		$this->tpl =& $tpl;
-		$this->ctrl =& $ilCtrl;
-		$this->ilias =& $ilias;
-		$this->tree =& $tree;
-		$this->adapter =& $adapter;
+		$this->lng      = $DIC['lng'];
+		$this->ctrl     = $DIC['ilCtrl'];
+		$this->ilias    = $DIC['ilias'];
+		$this->tree     = $DIC['tree'];
+		$this->settings = $DIC['ilSetting'];
+		$this->log      = $DIC['ilLog'];
+		$this->db       = $DIC['ilDB'];
+
+		$this->adapter = $adapter;
+	}
+
+	/**
+	 * @param string $a_number
+	 * @return float
+	 */
+	public function formatNumberString($a_number)
+	{
+		return str_replace(',', '.', $a_number);
 	}
 	
 	/**
@@ -381,7 +403,7 @@ class ilCertificate
 		// additional font support
 		$xsl = str_replace(
 				'font-family="Helvetica, unifont"',
-				'font-family="'.$GLOBALS['ilSetting']->get('rpc_pdf_font','Helvetica, unifont').'"',
+				'font-family="'.$this->settings->get('rpc_pdf_font','Helvetica, unifont').'"',
 				$xsl
 		);
 		
@@ -438,13 +460,13 @@ class ilCertificate
 	}
 	
 	/**
-	* Creates a PDF certificate
-	*
-	* @param array $params An array of parameters which is needed to create the certificate
-	*/
+	 * Creates a PDF certificate
+	 * @param array $params An array of parameters which is needed to create the certificate
+	 * @param bool $deliver
+	 * @return void|string
+	 */
 	public function outCertificate($params, $deliver = TRUE)
 	{
-		global $ilLog;
 		ilDatePresentation::setUseRelativeDates(false);
 		$insert_tags = $this->getAdapter()->getCertificateVariablesForPresentation($params);
 		
@@ -457,6 +479,13 @@ class ilCertificate
 		}
 
 		$xslfo = file_get_contents($this->getXSLPath());
+
+        // render tex as fo graphics
+		require_once('Services/MathJax/classes/class.ilMathJax.php');
+		$xslfo = ilMathJax::getInstance()
+			->init(ilMathJax::PURPOSE_PDF)
+			->setRendering(ilMathJax::RENDER_PNG_AS_FO_FILE)
+			->insertLatexImages($xslfo);
 
 		include_once './Services/WebServices/RPC/classes/class.ilRpcClientFactory.php';
 		try
@@ -473,34 +502,14 @@ class ilCertificate
 				return $pdf_base64->scalar;
 			}
 		}
-		catch(XML_RPC2_FaultException $e)
-		{
-			$ilLog->write(__METHOD__.': '.$e->getMessage());
-			return false;
-		}
 		catch(Exception $e)
 		{
-			$ilLog->write(__METHOD__.': '.$e->getMessage());
+			$this->log->write(__METHOD__.': '.$e->getMessage());
 			return false;
 		}
 
 		ilDatePresentation::setUseRelativeDates(true);
-
-		/*
-		include_once "./Services/Transformation/classes/class.ilFO2PDF.php";
-		$fo2pdf = new ilFO2PDF();
-		$fo2pdf->setFOString($this->exchangeCertificateVariables($xslfo, $insert_tags));
-		$result = $fo2pdf->send();
-		if ($deliver)
-		{
-			include_once "./Services/Utilities/classes/class.ilUtil.php";
-			ilUtil::deliverData($result, $this->getAdapter()->getCertificateFilename($params), "application/pdf");
-		}
-		else
-		{
-			return $result;
-		}
-		*/
+		
 	}
 
 	/**
@@ -508,11 +517,16 @@ class ilCertificate
 	*/
 	public function createPreview()
 	{
-		global $ilLog;
-
 		ilDatePresentation::setUseRelativeDates(false);
 
 		$xslfo = file_get_contents($this->getXSLPath());
+
+        // render tex as fo graphics
+		require_once('Services/MathJax/classes/class.ilMathJax.php');
+		$xslfo = ilMathJax::getInstance()
+			->init(ilMathJax::PURPOSE_PDF)
+			->setRendering(ilMathJax::RENDER_PNG_AS_FO_FILE)
+			->insertLatexImages($xslfo);
 
 		include_once './Services/WebServices/RPC/classes/class.ilRpcClientFactory.php';
 		try
@@ -522,27 +536,14 @@ class ilCertificate
 			ilUtil::deliverData($pdf_base64->scalar, $this->getAdapter()->getCertificateFilename(), "application/pdf");
 
 		}
-		catch(XML_RPC2_FaultException $e)
-		{
-			$ilLog->write(__METHOD__.': '.$e->getMessage());
-			return false;
-		}
 		catch(Exception $e)
 		{
-			$ilLog->write(__METHOD__.': '.$e->getMessage());
+			$this->log->write(__METHOD__.': '.$e->getMessage());
 			return false;
 		}
 
 		ilDatePresentation::setUseRelativeDates(true);
 		
-		/*
-		include_once "./Services/Transformation/classes/class.ilFO2PDF.php";
-		$fo2pdf = new ilFO2PDF();
-		$fo2pdf->setFOString($this->exchangeCertificateVariables($xslfo));
-		$result = $fo2pdf->send();
-		include_once "./Services/Utilities/classes/class.ilUtil.php";
-		ilUtil::deliverData($result, $this->getAdapter()->getCertificateFilename(), "application/pdf");
-		*/
 	}
 	
 	/**
@@ -656,7 +657,7 @@ class ilCertificate
 	* @param object $adapter The certificate adapter
 	* @return boolean Returns TRUE if the certificate is complete, FALSE otherwise
 	*/
-	function _isComplete($adapter)
+	public static function _isComplete($adapter)
 	{
 		if (is_object($adapter) && method_exists($adapter, "getCertificatePath"))
 		{
@@ -940,59 +941,71 @@ class ilCertificate
 		}
 		return self::$is_active;
 	}
-	
+
+	/**
+	 * @param int $a_obj_id
+	 * @return bool
+	 */
 	public static function isObjectActive($a_obj_id)
 	{
 		$chk = self::areObjectsActive(array($a_obj_id));
-		return $chk[$a_obj_id];		
+		return $chk[$a_obj_id];
 	}
+
+	/**
+	 * @param array $a_obj_ids
+	 * @return array
+	 */
 	public static function areObjectsActive(array $a_obj_ids)
 	{
-		global $ilDB;
-		
+		/**
+		 * @var $ilDB ilDBInterface
+		 */
+		global $DIC;
+
+		$ilDB = $DIC['ilDB'];
+
 		$all = array();
 		foreach($a_obj_ids as $id)
 		{
 			$all[$id] = false;
 		}
-		
-		$set = $ilDB->query("SELECT obj_id FROM il_certificate".
-			" WHERE ".$ilDB->in("obj_id", $a_obj_ids, "", "integer"));
+
+		$set = $ilDB->query("SELECT obj_id FROM il_certificate WHERE ".$ilDB->in("obj_id", $a_obj_ids, "", "integer"));
 		while($row = $ilDB->fetchAssoc($set))
 		{
 			$all[$row["obj_id"]] = true;
 		}
+
 		return $all;
 	}
-	
+
+	/**
+	 * @return int
+	 */
 	public function readActive()
 	{
-		global $ilDB;
-		
 		$obj_id = $this->adapter->getCertificateID();
-		$set = $ilDB->query("SELECT obj_id FROM il_certificate".
-			" WHERE obj_id = ".$ilDB->quote($obj_id, "integer"));
-	    return $ilDB->numRows($set);
-	}	
-	
+		$set    = $this->db->query("SELECT obj_id FROM il_certificate WHERE obj_id = " . $this->db->quote($obj_id, "integer"));
+		return $this->db->numRows($set);
+	}
+
+	/**
+	 * @param $a_value bool
+	 */
 	public function writeActive($a_value)
 	{
-		global $ilDB;
-		
 		$obj_id = $this->adapter->getCertificateID();
-		
+
 		if((bool)$a_value)
 		{
-			$ilDB->replace("il_certificate",
-				array("obj_id"=>array("integer", $obj_id)),
-				array());		
+			$this->db->replace("il_certificate", array("obj_id" => array("integer", $obj_id)), array());
 		}
 		else
 		{
-			$ilDB->manipulate("DELETE FROM il_certificate".
-				" WHERE obj_id = ".$ilDB->quote($obj_id, "integer"));
+			$this->db->manipulate("DELETE FROM il_certificate WHERE obj_id = " . $this->db->quote($obj_id, "integer"));
 		}
-	}	
+	}
 	
 	/**
 	* Creates a redirect to a certificate download
@@ -1001,7 +1014,13 @@ class ilCertificate
 	*/
 	public static function _goto($ref_id)
 	{
-		global $ilCtrl;
+		/**
+		 * @var $ilCtrl ilCtrl
+		 */
+		global $DIC;
+
+		$ilCtrl = $DIC['ilCtrl'];
+
 		include_once "./Services/Object/classes/class.ilObject.php";
 		$type = ilObject::_lookupType($ref_id, true);
 		switch ($type)
@@ -1071,10 +1090,14 @@ class ilCertificate
 		return $output;
 	}
 
-	public function outCertificateWithGivenContentAndVariables($content, $insert_tags)
+	/**
+	 * @param string $content
+	 * @param array $insert_tags
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function outCertificateWithGivenContentAndVariables($content, array $insert_tags)
 	{
-		global $ilLog;
-
 		ilDatePresentation::setUseRelativeDates(false);
 
 		$form_fields = $this->getFormFieldsFromFO();
@@ -1091,19 +1114,12 @@ class ilCertificate
 			include_once "./Services/Utilities/classes/class.ilUtil.php";
 			ilUtil::deliverData($pdf_base64->scalar, $this->getAdapter()->getCertificateFilename(array()), "application/pdf");
 		}
-		catch(XML_RPC2_FaultException $e)
-		{
-			$ilLog->write(__METHOD__.': '.$e->getMessage());
-			return false;
-		}
 		catch(Exception $e)
 		{
-			$ilLog->write(__METHOD__.': '.$e->getMessage());
+			$this->log->write(__METHOD__.': '.$e->getMessage());
 			return false;
 		}
 
 		ilDatePresentation::setUseRelativeDates(true);
 	}
 }
-
-?>

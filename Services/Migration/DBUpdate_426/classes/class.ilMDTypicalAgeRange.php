@@ -32,13 +32,6 @@ include_once 'class.ilMDBase.php';
 
 class ilMDTypicalAgeRange extends ilMDBase
 {
-	function ilMDTypicalAgeRange($a_rbac_id = 0,$a_obj_id = 0,$a_obj_type = '')
-	{
-		parent::ilMDBase($a_rbac_id,
-						 $a_obj_id,
-						 $a_obj_type);
-	}
-
 	// SET/GET
 	function setTypicalAgeRange($a_typical_age_range)
 	{
@@ -68,7 +61,7 @@ class ilMDTypicalAgeRange extends ilMDBase
 	{
 		if($this->db->autoExecute('il_meta_typical_age_range',
 								  $this->__getFields(),
-								  DB_AUTOQUERY_INSERT))
+								  ilDBConstants::MDB2_AUTOQUERY_INSERT))
 		{
 			$this->setMetaId($this->db->getLastInsertId());
 
@@ -85,7 +78,7 @@ class ilMDTypicalAgeRange extends ilMDBase
 		{
 			if($this->db->autoExecute('il_meta_typical_age_range',
 									  $this->__getFields(),
-									  DB_AUTOQUERY_UPDATE,
+									  ilDBConstants::MDB2_AUTOQUERY_UPDATE,
 									  "meta_typical_age_range_id = ".$ilDB->quote($this->getMetaId())))
 			{
 				return true;
@@ -134,7 +127,7 @@ class ilMDTypicalAgeRange extends ilMDBase
 				"WHERE meta_typical_age_range_id = ".$ilDB->quote($this->getMetaId());
 
 			$res = $this->db->query($query);
-			while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+			while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 			{
 				$this->setRBACId($row->rbac_id);
 				$this->setObjId($row->obj_id);
@@ -171,7 +164,7 @@ class ilMDTypicalAgeRange extends ilMDBase
 			"AND parent_type = ".$ilDB->quote($a_parent_type)."";
 
 		$res = $ilDB->query($query);
-		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$ids[] = $row->meta_typical_age_range_id;
 		}

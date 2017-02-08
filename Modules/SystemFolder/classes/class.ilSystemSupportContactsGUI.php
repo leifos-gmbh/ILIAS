@@ -76,12 +76,12 @@ class ilSystemSupportContactsGUI
 	static function getFooterLink()
 	{
 		global $ilCtrl, $ilUser;
-
+		
 		include_once("./Modules/SystemFolder/classes/class.ilSystemSupportContacts.php");
 
 		$users = ilSystemSupportContacts::getValidSupportContactIds();
 		if (count($users) > 0)
-		{
+		{					
 			// #17847 - we cannot use a proper GUI on the login screen 
 			if(!$ilUser->getId())
 			{

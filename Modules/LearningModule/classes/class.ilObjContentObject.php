@@ -49,8 +49,6 @@ class ilObjContentObject extends ilObject
 
 		$this->log = ilLoggerFactory::getLogger('lm');
 
-		$this->log = ilLoggerFactory::getLogger('lm');
-
 		$this->mob_ids = array();
 		$this->file_ids = array();
 		$this->q_ids = array();

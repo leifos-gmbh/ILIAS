@@ -109,6 +109,8 @@ il.Util.addOnLoad(function() {
 			return (
 			$(this).attr("href").toLowerCase().indexOf("cmd=members&") !== -1 &&
 			(
+			$(this).attr("href").toLowerCase().indexOf("cmdclass=ilcoursemembershipgui") !== -1 ||
+			$(this).attr("href").toLowerCase().indexOf("cmdclass=ilgroupmembershipgui") !== -1 ||
 			$(this).attr("href").toLowerCase().indexOf("cmdclass=ilobjcoursegui") !== -1 ||
 			$(this).attr("href").toLowerCase().indexOf("cmdclass=ilobjgroupgui") !== -1
 			)

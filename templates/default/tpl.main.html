@@ -94,9 +94,7 @@ il.Util.addOnLoad(function() {
 				draggable:     false,
 				open: function() {
 					$('button.ui-dialog-titlebar-close').attr("style", "display: block !important; color: black !important;");
-					if ($.browser.webkit) {
-						$('button.ui-dialog-titlebar-close').css("padding", 0);
-					}
+					$('button.ui-dialog-titlebar-close').css("padding", 0);
 				},
 				beforeClose: function() {
 					$('button.ui-dialog-titlebar-close').attr("style", "display: none !important;");

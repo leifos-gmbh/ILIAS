@@ -22,7 +22,7 @@
 <!-- PageObjects are comparable to LOM LearningObjects of aggregation level 2 -->
 <!ELEMENT PageObject (PageContent*, Layout?, InitOpenedContent?)>
 
-<!ELEMENT PageContent ((Paragraph | MediaObject | Table | List | FileList | Question | PlaceHolder | Section | Resources | LoginPageElement | Map | Plugged | Tabs | ContentInclude | InteractiveImage | Profile | Verification | Blog | QuestionOverview | Skills | ConsultationHours | MyCourses | AMDPageList), BibItemIdentifier*)>
+<!ELEMENT PageContent ((Paragraph | MediaObject | Table | List | FileList | Question | PlaceHolder | Section | Resources | LoginPageElement | Map | Plugged | Tabs | ContentInclude | InteractiveImage | Profile | Verification | Blog | QuestionOverview | Skills | ConsultationHours | MyCourses | AMDPageList | Grid), BibItemIdentifier*)>
 
 <!-- enable/disable paragraph elements -->
 <!ATTLIST PageContent
@@ -372,6 +372,16 @@ col or row span. -->
 	PCID CDATA #IMPLIED
 >
 <!ELEMENT TabCaption (%titletext;)*>
+
+<!-- Grid -->
+<!ELEMENT Grid (GridCell*)>
+<!ELEMENT GridCell (PageContent*)>
+<!ATTLIST GridCell
+		WIDTH_XS CDATA #REQUIRED
+		WIDTH_S CDATA #REQUIRED
+		WIDTH_M CDATA #REQUIRED
+		WIDTH_L CDATA #REQUIRED
+		PCID CDATA #IMPLIED>
 
 <!-- ContentInclude: Example: ContentId 13, ContentType: mep, InstId: ''-->
 <!ELEMENT ContentInclude EMPTY>

@@ -101,7 +101,7 @@ abstract class ilPageObject
 		$this->encoding = "UTF-8";		
 		$this->id_elements =
 			array("PageContent", "TableRow", "TableData", "ListItem", "FileItem",
-				"Section", "Tab", "ContentPopup");
+				"Section", "Tab", "ContentPopup", "GridCell");
 		$this->setActive(true);
 		$this->show_page_act_info = false;
 		

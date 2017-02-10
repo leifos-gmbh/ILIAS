@@ -782,6 +782,12 @@
 		<xsl:with-param name="langvar">ed_insert_list</xsl:with-param>
 	</xsl:call-template>
 
+	<!-- insert grid -->
+	<xsl:call-template name="EditMenuItem">
+		<xsl:with-param name="command">insert_grid</xsl:with-param>
+		<xsl:with-param name="langvar">ed_insert_grid</xsl:with-param>
+	</xsl:call-template>
+
 	<!-- insert section -->
 	<xsl:call-template name="EditMenuItem">
 		<xsl:with-param name="command">insert_sec</xsl:with-param>
@@ -3783,6 +3789,46 @@
 		<div style="clear:both;"><xsl:comment>Break</xsl:comment></div>
 	</div>
 	<div style="clear:both;"><xsl:comment>Break</xsl:comment></div>
+	</div>
+</xsl:template>
+
+
+<!-- Grid -->
+<xsl:template match="Grid">
+	<div>
+		<xsl:apply-templates select="GridCell"/>
+	</div>
+</xsl:template>
+
+<!-- GridCell -->
+<xsl:template match="GridCell">
+	<div>
+		<xsl:call-template name="EditReturnAnchors"/>
+		<!-- insert commands -->
+		<!-- <xsl:value-of select="@HierId"/> -->
+		<xsl:if test="$mode = 'edit'">
+			<!-- drop area (js) -->
+			<xsl:if test="$javascript = 'enable'">
+				<xsl:call-template name="DropArea">
+					<xsl:with-param name="hier_id"><xsl:value-of select="@HierId"/></xsl:with-param>
+					<xsl:with-param name="pc_id"><xsl:value-of select="@PCID"/></xsl:with-param>
+				</xsl:call-template>
+			</xsl:if>
+			<!-- insert dropdown (no js) -->
+			<xsl:if test= "$javascript = 'disable'">
+				<select size="1" class="ilEditSelect">
+					<xsl:attribute name="name">command<xsl:value-of select="@HierId"/>
+					</xsl:attribute>
+					<xsl:call-template name="EditMenuInsertItems"/>
+				</select>
+				<input class="ilEditSubmit" type="submit">
+					<xsl:attribute name="value"><xsl:value-of select="//LVs/LV[@name='ed_go']/@value"/></xsl:attribute>
+					<xsl:attribute name="name">cmd[exec_<xsl:value-of select="@HierId"/>:<xsl:value-of select="@PCID"/>]</xsl:attribute>
+				</input>
+				<br/>
+			</xsl:if>
+		</xsl:if>
+		<xsl:apply-templates select="PageContent"/>
 	</div>
 </xsl:template>
 

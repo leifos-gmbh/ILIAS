@@ -84,7 +84,7 @@ il.Util.addOnLoad(function() {
 		var btn = $.fn.button.noConflict(); // reverts $.fn.button to jqueryui btn
 		$.fn.btn = btn; // assigns bootstrap button functionality to $.fn.btn
 		// Folder download
-		$(".dropdown-menu a[href*='downloadFolder'], input.submit[name*='downloadExportFile']").live("click", function() {
+		$("#ilContentContainer").on("click", ".dropdown-menu a[href*='downloadFolder'], input.submit[name*='downloadExportFile']", function() {
 			$("#dialog_modal-general").dialog({
 				height:        140,
 				width:         340,

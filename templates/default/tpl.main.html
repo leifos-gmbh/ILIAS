@@ -107,16 +107,15 @@ il.Util.addOnLoad(function() {
 		// Member views in groups and courses
 		var $context = $("ul#ilTab a, ul#ilSubTab a").filter(function () {
 			return (
-			$(this).attr("href").toLowerCase().indexOf("cmd=members&") !== -1 &&
-			(
-			$(this).attr("href").toLowerCase().indexOf("cmdclass=ilcoursemembershipgui") !== -1 ||
-			$(this).attr("href").toLowerCase().indexOf("cmdclass=ilgroupmembershipgui") !== -1 ||
-			$(this).attr("href").toLowerCase().indexOf("cmdclass=ilobjcoursegui") !== -1 ||
-			$(this).attr("href").toLowerCase().indexOf("cmdclass=ilobjgroupgui") !== -1
-			)
+				(
+					$(this).attr("href").toLowerCase().indexOf("cmdclass=ilcoursemembershipgui") !== -1 ||
+					$(this).attr("href").toLowerCase().indexOf("cmdclass=ilgroupmembershipgui") !== -1 ||
+					$(this).attr("href").toLowerCase().indexOf("cmdclass=ilobjcoursegui") !== -1 ||
+					$(this).attr("href").toLowerCase().indexOf("cmdclass=ilobjgroupgui") !== -1
+				)
 			) || (
-			$(this).attr("href").toLowerCase().indexOf("cmd=show") !== -1 &&
-			$(this).attr("href").toLowerCase().indexOf("cmdclass=ilcourseparticipantsgroupsgui") !== -1
+				$(this).attr("href").toLowerCase().indexOf("cmd=show") !== -1 &&
+				$(this).attr("href").toLowerCase().indexOf("cmdclass=ilcourseparticipantsgroupsgui") !== -1
 			) ? true : false;
 		});
 

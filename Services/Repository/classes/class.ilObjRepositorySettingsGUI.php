@@ -183,47 +183,7 @@ class ilObjRepositorySettingsGUI extends ilObjectGUI
 		$event->setInfo($this->lng->txt("trac_show_repository_views_info"));
 		$event->setChecked(ilChangeEvent::_isActive());		
 		$form->addItem($event);
-		// uzk-patch: begin
-		/**
-		 * @var $ilSetting ilSetting
-		 */
-		global $ilSetting;
-
-		include_once 'Services/Form/classes/class.ilMultiSelectInputGUI.php';
-		$obj_types = $this->getRepositoryObjectTypes();
-		if(!$ilSetting->get('hide_event_message'))
-		{
-			$sel_obj_types = $obj_types;
-			array_walk($sel_obj_types, function(&$element) {
-				$element = 1;
-			});
-			$ilSetting->set('hide_event_message', serialize($sel_obj_types));
-		}
-		else
-		{
-			$sel_obj_types = unserialize($ilSetting->get('hide_event_message'));
-		}
-
-		$options = array();
-		foreach($obj_types as $key => $value)
-		{
-			$options[$key] = $this->lng->txt('obj_' . $key);
-			if($sel_obj_types[$key])
-			{
-				$sel_values[] = $key;
-			}
-		}
-
-		asort($options);
-
-		$o_multi = new ilMultiSelectInputGUI($this->lng->txt('exception'), 'multi_select');
-		$o_multi->setwidth(300);
-		$o_multi->setHeight(200);
-		$o_multi->setOptions($options);
-		$o_multi->setValue($sel_values);
-
-		$event->addSubItem($o_multi);
-		//uzk-patch: end
+		
 		
 		include_once "Services/Administration/classes/class.ilAdministrationSettingsFormHandler.php";
 		ilAdministrationSettingsFormHandler::addFieldsToForm(
@@ -318,22 +278,6 @@ class ilObjRepositorySettingsGUI extends ilObjectGUI
 			if ($form->getInput('change_event_tracking'))
 			{
 				ilChangeEvent::_activate();
-				// uzk-patch: begin
-				/**
-				 * @var $ilSetting ilSetting
-				 */
-				global $ilSetting;
-				if(is_array($form->getInput('multi_select')))
-				{
-					$sel_obj_types = $this->getRepositoryobjectTypes();
-					foreach((array)$form->getInput('multi_select') as $type)
-					{
-						$sel_obj_types[$type] = 1;
-					}
-					$ilSetting->set('hide_event_message', serialize($sel_obj_types));
-				}
-				else $ilSetting->delete('hide_event_message');
-				// uzk-patch: end
 			}
 			else
 			{
@@ -772,51 +716,6 @@ class ilObjRepositorySettingsGUI extends ilObjectGUI
 				return array(array("view", $fields));	
 		}
 	}
-	// uzk-patch: begin
-	public function getRepositoryObjectTypes()
-	{
-		/**
-		 * @var $objDefinition ilObjectDefinition
-		 */
-		global $objDefinition;
-
-		$types = $objDefinition->getAllObjects();
-
-		$object_types = array();
-
-		foreach($types as $type)
-		{
-			if($objDefinition->isContainer($type))
-			{
-				$subtypes = $objDefinition->getCreatableSubObjects($type);
-
-				include_once("./Services/Repository/classes/class.ilRepositoryObjectPluginSlot.php");
-
-				if ($type != "icrs")
-				{
-					$subtypes = ilRepositoryObjectPluginSlot::addCreatableSubObjects($subtypes);
-				}
-
-				if(count($subtypes) > 0)
-				{
-					foreach ($subtypes as $row)
-					{
-						$count = 0;
-						if ($row["max"] == "" || $count < $row["max"])
-						{
-							if (!in_array($row["name"], array('rolf', 'rolt', 'usr', 'mail', 'role', 'lng')))
-							{
-								$object_types[$row["name"]] = '0' ;
-							}
-						}
-					}
-				}
-			}
-		}
-
-		return $object_types;
-	}
-	// uzk-patch: end
 }
 
 ?>

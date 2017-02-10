@@ -84,7 +84,7 @@ il.Util.addOnLoad(function() {
 		var btn = $.fn.button.noConflict(); // reverts $.fn.button to jqueryui btn
 		$.fn.btn = btn; // assigns bootstrap button functionality to $.fn.btn
 		// Folder download
-		$("#ilContentContainer").on("click", ".dropdown-menu a[href*='downloadFolder'], input.submit[name*='downloadExportFile']", function() {
+		$("#ilContentContainer").on("click", ".dropdown-menu a[href*='downloadFolder'], input.submit[name*='downloadExportFile'], a[href*='download']", function() {
 			$("#dialog_modal-general").dialog({
 				height:        140,
 				width:         340,
@@ -120,7 +120,7 @@ il.Util.addOnLoad(function() {
 		if ($context.size() > 0) {
 			$([
 				$("div.ilTableHeaderTitle a, div.ilTableOuter a, div.ilTableNav a").filter(function() {
-					return $(this).hasClass("ilTableMenuItem") || $(this).hasClass("ilAccAnchor") ? false : true;
+					return $(this).hasClass("ilTableMenuItem") || $(this).hasClass("ilAccAnchor") || ($(this).attr("href")  !== undefined && $(this).attr("href").toLowerCase().indexOf("download")) !== -1 ? false : true;
 				}),
 				$context
 			]).each(function() {

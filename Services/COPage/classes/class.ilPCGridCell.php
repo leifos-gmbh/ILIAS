@@ -13,8 +13,6 @@ require_once("./Services/COPage/classes/class.ilPageContent.php");
  */
 class ilPCGridCell extends ilPageContent
 {
-	var $dom;
-
 	/**
 	* Init page content component.
 	*/
@@ -24,48 +22,18 @@ class ilPCGridCell extends ilPageContent
 	}
 
 	/**
-	* insert new cell item after current one
-	*/
-	function newItemAfter()
-	{
-		$grid_cell = $this->getNode();
-		$new_cell = $this->dom->create_element("GridCell");
-		if ($next_tab = $grid_cell->next_sibling())
-		{
-			$next_tab->insert_before($new_cell, $next_tab);
-		}
-		else
-		{
-			$parent_tabs = $grid_cell->parent_node();
-			$parent_tabs->append_child($new_cell);
-		}
-	}
-
-
-	/**
-	* insert new tab item before current one
-	*/
-	function newItemBefore()
-	{
-		$grid_cell = $this->getNode();
-		$new_cell = $this->dom->create_element("GridCell");
-		$grid_cell->insert_before($new_cell, $grid_cell);
-	}
-
-
-	/**
 	 * delete tab
 	 */
-	function deleteItem()
+	function deleteCell()
 	{
 		$grid_cell = $this->getNode();
 		$grid_cell->unlink($grid_cell);
 	}
 
 	/**
-	* move tab item down
-	*/
-	function moveItemDown()
+	 * Move cell right
+	 */
+	function moveCellRight()
 	{
 		$grid_cell = $this->getNode();
 		$next = $grid_cell->next_sibling();
@@ -75,9 +43,9 @@ class ilPCGridCell extends ilPageContent
 	}
 
 	/**
-	* move tab item up
-	*/
-	function moveItemUp()
+	 * Move cell left
+	 */
+	function moveCellLeft()
 	{
 		$grid_cell = $this->getNode();
 		$prev = $grid_cell->previous_sibling();

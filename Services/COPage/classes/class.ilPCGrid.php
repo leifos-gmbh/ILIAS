@@ -54,11 +54,15 @@ class ilPCGrid extends ilPageContent
 
 	/**
 	 * Get sizes
+	 *
+	 *  Note that these are mapped to (BS3):
+	 *  s > .col-xs, m > .col-sm, l > .col-md, xl > .col-lg
+	 *
 	 * @return array
 	 */
 	static function getSizes()
 	{
-		return array("xs" => "xs", "s" => "s", "m" => "m", "l" => "l");
+		return array("s" => "s", "m" => "m", "l" => "l", "xl" => "xl");
 	}
 
 	/**
@@ -92,6 +96,7 @@ class ilPCGrid extends ilPageContent
 	 * @param string $a_attr	attribute name
 	 * @param string $a_value attribute value
 	 */
+	/*
 	protected function setTabsAttribute($a_attr, $a_value)
 	{
 		if (!empty($a_value))
@@ -105,7 +110,7 @@ class ilPCGrid extends ilPageContent
 				$this->grid_node->remove_attribute($a_attr);
 			}
 		}
-	}
+	}*/
 
 
 	/**
@@ -140,6 +145,29 @@ class ilPCGrid extends ilPageContent
 	}
 
 	/**
+	 * Save widths of cells
+	 */
+	function saveWidths($a_width_s, $a_width_m, $a_width_l, $a_width_xl)
+	{
+		$cell_nodes = $this->grid_node->child_nodes();
+		for($i = 0; $i < count($cell_nodes); $i++)
+		{
+			if ($cell_nodes[$i]->node_name() == "GridCell")
+			{
+				$pc_id = $cell_nodes[$i]->get_attribute("PCID");
+				$hier_id = $cell_nodes[$i]->get_attribute("HierId");
+				$k = $hier_id.":".$pc_id;
+				$cell_nodes[$i]->set_attribute("WIDTH_XS", "");
+				$cell_nodes[$i]->set_attribute("WIDTH_S", $a_width_s[$k]);
+				$cell_nodes[$i]->set_attribute("WIDTH_M", $a_width_m[$k]);
+				$cell_nodes[$i]->set_attribute("WIDTH_L", $a_width_l[$k]);
+				$cell_nodes[$i]->set_attribute("WIDTH_XL", $a_width_xl[$k]);
+			}
+		}
+	}
+
+
+	/**
 	 * Delete grid cell
 	 */
 	function deleteGridCell($a_hier_id, $a_pc_id)
@@ -161,14 +189,30 @@ class ilPCGrid extends ilPageContent
 	/**
 	 * Add grid cell
 	 */
-	function addGridCell($a_xs, $a_s, $a_m, $a_l)
+	function addGridCell($a_s, $a_m, $a_l, $a_xl)
 	{
 		$new_item = $this->dom->create_element("GridCell");
 		$new_item = $this->grid_node->append_child($new_item);
-		$new_item->set_attribute("xs", $a_xs);
-		$new_item->set_attribute("s", $a_s);
-		$new_item->set_attribute("m", $a_m);
-		$new_item->set_attribute("l", $a_l);
+		//$new_item->set_attribute("xs", $a_xs);
+		$new_item->set_attribute("WIDTH_XS", "");
+		$new_item->set_attribute("WIDTH_S", $a_s);
+		$new_item->set_attribute("WIDTH_M", $a_m);
+		$new_item->set_attribute("WIDTH_L", $a_l);
+		$new_item->set_attribute("WIDTH_XL", $a_xl);
+	}
+
+	/**
+	 * Add a cell
+	 */
+	function addCell()
+	{
+		$new_item = $this->dom->create_element("GridCell");
+		$new_item->set_attribute("WIDTH_XS", "");
+		$new_item->set_attribute("WIDTH_S", "");
+		$new_item->set_attribute("WIDTH_M", "");
+		$new_item->set_attribute("WIDTH_L", "");
+		$new_item->set_attribute("WIDTH_XL", "");
+		$this->grid_node->append_child($new_item);
 	}
 
 	/**
@@ -177,7 +221,7 @@ class ilPCGrid extends ilPageContent
 	 */
 	static function getLangVars()
 	{
-		return array("pc_grid", "pc_grid_cell");
+		return array("pc_grid", "pc_grid_cell", "ed_delete_cell", "ed_cell_left", "ed_cell_right");
 	}
 
 	/**
@@ -195,6 +239,32 @@ class ilPCGrid extends ilPageContent
 	{
 		return parent::getCssFiles($a_mode);
 	}
+
+	function getCellData()
+	{
+		$cells = array();
+		$cell_nodes = $this->grid_node->child_nodes();
+		$k = 0;
+		for($i = 0; $i < count($cell_nodes); $i++)
+		{
+			if ($cell_nodes[$i]->node_name() == "GridCell")
+			{
+				$pc_id = $cell_nodes[$i]->get_attribute("PCID");
+				$hier_id = $cell_nodes[$i]->get_attribute("HierId");
+				$cells[] = array("pos" => $k,
+					"xs" => $cell_nodes[$i]->get_attribute("WIDTH_XS"),
+					"s" => $cell_nodes[$i]->get_attribute("WIDTH_S"),
+					"m" => $cell_nodes[$i]->get_attribute("WIDTH_M"),
+					"l" => $cell_nodes[$i]->get_attribute("WIDTH_L"),
+					"xl" => $cell_nodes[$i]->get_attribute("WIDTH_XL"),
+					"pc_id" => $pc_id, "hier_id" => $hier_id);
+				$k++;
+			}
+		}
+
+		return $cells;
+	}
+
 
 }
 ?>

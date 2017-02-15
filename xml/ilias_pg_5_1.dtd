@@ -381,6 +381,7 @@ col or row span. -->
 		WIDTH_S CDATA #REQUIRED
 		WIDTH_M CDATA #REQUIRED
 		WIDTH_L CDATA #REQUIRED
+		WIDTH_XL CDATA #REQUIRED
 		PCID CDATA #IMPLIED>
 
 <!-- ContentInclude: Example: ContentId 13, ContentType: mep, InstId: ''-->

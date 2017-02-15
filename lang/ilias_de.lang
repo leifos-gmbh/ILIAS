@@ -14,6 +14,17 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+content#:#cont_pc_grid#:#Grid
+content#:#cont_grid_nr_cells#:#Number of Cells
+content#:#cont_ed_insert_grid#:#Insert Grid
+content#:#cont_grid_width_s#:#Small
+content#:#cont_grid_width_m#:#Medium
+content#:#cont_grid_width_l#:#Large
+content#:#cont_grid_width_xl#:#Extra Large
+content#:#cont_add_cell#:#Add Cell
+content#:#cont_ed_delete_cell#:#Delete Cell
+content#:#cont_ed_cell_left#:#Move Left
+content#:#cont_ed_cell_right#:#Move Right
 acc#:#acc_access_key#:#Access-Key
 acc#:#acc_access_keys#:#Access-Keys
 acc#:#acc_comp_frm#:#Forum

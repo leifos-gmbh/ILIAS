@@ -3435,7 +3435,8 @@ abstract class ilPageObject
 		// @todo: try to generalize this
 		if (($curr_name == "TableData") || ($curr_name == "PageObject") ||
 			($curr_name == "ListItem") || ($curr_name == "Section")
-			|| ($curr_name == "Tab") || ($curr_name == "ContentPopup"))
+			|| ($curr_name == "Tab") || ($curr_name == "ContentPopup")
+			|| ($curr_name == "GridCell"))
 		{
 			$a_mode = IL_INSERT_CHILD;
 		}
@@ -3540,7 +3541,8 @@ abstract class ilPageObject
 		// @todo: try to generalize
 		if (($curr_name == "TableData") || ($curr_name == "PageObject") ||
 			($curr_name == "ListItem") || ($curr_name == "Section")
-			|| ($curr_name == "Tab") || ($curr_name == "ContentPopup"))
+			|| ($curr_name == "Tab") || ($curr_name == "ContentPopup")
+			|| ($curr_name == "GridCell"))
 		{
 			$a_mode = IL_INSERT_CHILD;
 		}

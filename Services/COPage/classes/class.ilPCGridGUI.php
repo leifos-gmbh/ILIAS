@@ -1,7 +1,8 @@
 <?php
 /* Copyright (c) 1998-2017 ILIAS open source, Extended GPL, see docs/LICENSE */
 
-require_once("./Services/COPage/classes/class.ilPCCell.php");
+require_once("./Services/COPage/classes/class.ilPCGrid.php");
+require_once("./Services/COPage/classes/class.ilPCGridCell.php");
 require_once("./Services/COPage/classes/class.ilPageContentGUI.php");
 
 /**
@@ -25,10 +26,10 @@ class ilPCGridGUI extends ilPageContentGUI
 	 */
 	function ilPCGridGUI($a_pg_obj, $a_content_obj, $a_hier_id, $a_pc_id = "")
 	{
-		global $DIC;
+		global $ilToolbar, $ilTabs;
 
-		$this->toolbar = $DIC->toolbar();
-		$this->tabs = $DIC->tabs();
+		$this->toolbar = $ilToolbar;
+		$this->tabs = $ilTabs;
 		parent::ilPageContentGUI($a_pg_obj, $a_content_obj, $a_hier_id, $a_pc_id);
 	}
 	
@@ -60,6 +61,10 @@ class ilPCGridGUI extends ilPageContentGUI
 	{
 		$this->displayValidationError();
 		$form = $this->initCreationForm();
+		if ($this->ctrl->getCmd() == "create")
+		{
+			$form->setValuesByPost();
+		}
 		$this->tpl->setContent($form->getHTML());
 	}
 
@@ -95,12 +100,12 @@ class ilPCGridGUI extends ilPageContentGUI
 		$ni->setSize(2);
 		$form->addItem($ni);
 
-		$options = ilPCGrid::getSizes();
+		$options = array("" => "") + ilPCGrid::getWidths();
 
 		// widths
-		foreach (ilPCGrid::getWidths() as $w)
+		foreach (ilPCGrid::getSizes() as $s)
 		{
-			$si = new ilSelectInputGUI($this->lng->txt("cont_grid_".$w), $w);
+			$si = new ilSelectInputGUI($this->lng->txt("cont_grid_width_".$s), $s);
 			$si->setOptions($options);
 			$form->addItem($si);
 		}
@@ -125,7 +130,7 @@ class ilPCGridGUI extends ilPageContentGUI
 
 			for ($i = 0; $i < (int) $_POST["number_of_cells"]; $i++)
 			{
-				$this->content_obj->addGridCell($_POST["xs"], $_POST["s"], $_POST["m"], $_POST["l"]);
+				$this->content_obj->addGridCell($_POST["s"], $_POST["m"], $_POST["l"], $_POST["xl"]);
 			}
 
 			$this->updated = $this->pg_obj->update();
@@ -176,9 +181,9 @@ class ilPCGridGUI extends ilPageContentGUI
 			$this->ctrl->getLinkTarget($this, "addCell"));
 
 		$this->setTabs();
-		$this->tabs->activateTab("cont_cells");
-		include_once("./Services/COPage/classes/class.ilPCCellsTableGUI.php");
-		$table_gui = new ilPCCellsTableGUI($this, "edit", $this->content_obj);
+		$this->tabs->activateTab("settings");
+		include_once("./Services/COPage/classes/class.ilPCGridCellTableGUI.php");
+		$table_gui = new ilPCGridCellTableGUI($this, "edit", $this->content_obj);
 		$this->tpl->setContent($table_gui->getHTML());
 	}
 	
@@ -277,10 +282,33 @@ class ilPCGridGUI extends ilPageContentGUI
 		$this->tabs->setBackTarget($this->lng->txt("pg"),
 			$this->ctrl->getParentReturn($this));
 
-		$this->ilTabs->addTarget("cont_cells",
-			$this->ctrl->getLinkTarget($this, "edit"), "edit",
-			get_class($this));
+		$this->tabs->addTab("settings",
+			$this->lng->txt("settings"),
+			$this->ctrl->getLinkTarget($this, "edit")
+		);
 
 	}
+
+	/**
+	 * Save tabs properties in db and return to page edit screen
+	 */
+	function saveCellData()
+	{
+		$width_s = ilUtil::stripSlashesArray($_POST["width_s"]);
+		$width_m = ilUtil::stripSlashesArray($_POST["width_m"]);
+		$width_l = ilUtil::stripSlashesArray($_POST["width_l"]);
+		$width_xl = ilUtil::stripSlashesArray($_POST["width_xl"]);
+		$this->content_obj->saveWidths($width_s, $width_m, $width_l, $width_xl);
+
+		if (is_array($_POST["position"]))
+		{
+			$positions = ilUtil::stripSlashesArray($_POST["position"]);
+			$this->content_obj->savePositions($positions);
+		}
+		$this->updated = $this->pg_obj->update();
+		ilUtil::sendSuccess($this->lng->txt("msg_obj_modified"), true);
+		$this->ctrl->redirect($this, "edit");
+	}
+
 }
 ?>

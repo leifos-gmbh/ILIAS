@@ -114,7 +114,7 @@ class ilObjUserFolderGUI extends ilObjectGUI
 			case 'iluserstartingpointgui':
 				$this->tabs_gui->setTabActive('settings');
 				$this->setSubTabs("settings");
-				$ilTabs->activateSubTab("starting_point");
+				$ilTabs->activateSubTab("starting_points");
 				include_once("./Services/User/classes/class.ilUserStartingPointGUI.php");
 				$cf = new ilUserStartingPointGUI($this->ref_id);
 				$this->ctrl->forwardCommand($cf);

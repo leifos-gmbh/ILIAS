@@ -3869,6 +3869,7 @@
 			</xsl:if>
 		</xsl:if>
 		<xsl:apply-templates select="PageContent"/>
+		<xsl:comment>End of Grid Cell</xsl:comment>
 	</div>
 </xsl:template>
 

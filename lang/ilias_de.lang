@@ -1872,23 +1872,23 @@ blog#:#blog_toggle_draft#:#Veröffentlichung zurücknehmen
 blog#:#blog_toggle_final#:#Beitrag veröffentlichen
 book#:#book_add#:#Buchungspool anlegen
 book#:#book_add_object#:#Objekt hinzufügen
-book#:#book_add_schedule#:#Zeitraster hinzufügen
-book#:#book_add_type#:#Buchungsobjekt-Typ hinzufügen
+book#:#book_add_schedule#:#Zeitplan hinzufügen
+book#:#book_add_type#:#Buchungsobjekttyp hinzufügen
 book#:#book_all#:#Alle anzeigen
 book#:#book_back_to_list#:#Zurück zur Liste
 book#:#book_book#:#Buchen
 book#:#book_booking_types#:#Buchungsobjekte
 book#:#book_cal_entry#:#Buchung von:
 book#:#book_change_status#:#Status ändern
-book#:#book_confirm_booking#:#Buchung vornehmen
+book#:#book_confirm_booking#:#Buchungsobjekt reservieren
 book#:#book_confirm_delete#:#Wollen Sie wirklich die nachfolgende Objekte löschen?
 book#:#book_create_title#:#Buchungspool hinzufügen
 book#:#book_current_user#:#Gebucht von
 book#:#book_deadline#:#Zeitspanne
 book#:#book_deadline_info#:#Minimale Zeit zwischen Buchung und Buchungszeitraum
 book#:#book_earlier#:#Früher
-book#:#book_edit#:#Belegungsplan bearbeiten
-book#:#book_edit_object#:#Objekt ändern
+book#:#book_edit#:#Buchungspool bearbeiten
+book#:#book_edit_object#:#Buchungsobjekt ändern
 book#:#book_edit_schedule#:#Zeitplan editieren
 book#:#book_edit_type#:#Typ ändern
 book#:#book_fromto#:#Datumsbereich
@@ -1909,8 +1909,8 @@ book#:#book_object_updated#:#Das Buchungsobjekt wurde geändert.
 book#:#book_objects_list#:#Buchungsobjekte
 book#:#book_period#:#Dauer
 book#:#book_pool_added#:#Ein Buchungspool wurde angelegt.
-book#:#book_public_log#:#Benutzer sehen Belegungsplan
-book#:#book_public_log_info#:#Benutzer können auch den Reiter „Belegungsplan“ einsehen.
+book#:#book_public_log#:#Benutzer sehen Reservierungen
+book#:#book_public_log_info#:#Benutzer können auch den Reiter „Reservierungen“ einsehen.
 book#:#book_reservation_block#:#Blockieren
 book#:#book_reservation_cancel#:#Stornieren
 book#:#book_reservation_confirmed#:#Die Buchung wurde erfolgreich durchgeführt.
@@ -8275,7 +8275,7 @@ mep#:#mobs_activate_pages#:#Inhaltsbausteine nutzen
 mep#:#mobs_activate_pages_info#:#Ermöglicht es, Seiteninhalte als Bausteine in Medienpools anzulegen. Diese Inhaltsbausteine können in ILIAS Lernmodulen wiederverwendet, aber dort nicht bearbeitet werden.
 mep#:#mobs_always_show_file_manager#:#Dateistruktur immer anzeigen
 mep#:#mobs_always_show_file_manager_info#:#Wenn deaktiviert, wird die Dateistruktur für einfache Datentypen, wie z.B. Bilder, nicht angezeigt.
-mep#:#mobs_restrict_file_types#:#Dateitypen einschränken
+mep#:#mobs_restrict_file_types#:#Erlaubte Dateitypen
 mep#:#mobs_restrict_file_types_info#:#Bestimmen Sie alle Dateitypen, die in Medienobjekten hochgeladen werden dürfen. Tragen Sie dazu die jeweilige Dateiendungen mit Komma getrennt ein (z.B. jpg,gif). Wird kein Eintrag vorgenommen, sind alle Typen erlaubt.
 meta#:#md_adv_active#:#Aktiv
 meta#:#md_adv_add_value#:#Neuer Wert
@@ -11735,7 +11735,7 @@ assessment#:#tst_availability_until_info#:#Wählen Sie diese Einstellung, um den
 assessment#:#tst_activation_online_info#:#Nur wenn der Test online geschaltet ist, können Benutzer am Test teilnehmen.
 assessment#:#tst_activation_limited_visibility_info#:#Außerhalb des angegebenen Zeitraums wird der Testtitel angezeigt. Der Test kann aber nicht gestartet werden.
 book#:#booking_nr_of_items#:#Anzahl
-book#:#book_schedule_type_fixed#:#Belegungen zu Terminen
+book#:#book_schedule_type_fixed#:#Reservierungen mit Zeitplan
 book#:#book_schedule_type_fixed_info#:#Dieser Typ ist geeignet für Räume, Beamer, etc.
 book#:#book_schedule_type_none#:#Ohne Zeitplan verteilen
 book#:#book_schedule_type_none_info#:#Dieser Typ ist geeignet für Referatsthemen, Seminarplätze, etc.
@@ -12205,7 +12205,7 @@ blog#:#blog_needs_approval#:#Beitrag ist noch nicht freigeschaltet
 sess#:#sess_copy#:#Sitzung kopieren
 grp#:#events#:#Sitzungen
 book#:#book_additional_info_file#:#Zusätzliche Beschreibung
-book#:#book_post_booking_information#:#Informationen nach einer Buchung
+book#:#book_post_booking_information#:#Informationen nach einer Reservierung
 book#:#book_post_booking_text#:#Text
 book#:#book_post_booking_file#:#Datei
 book#:#book_download_info#:#Zusätzliche Beschreibung herunterladen
@@ -15348,7 +15348,7 @@ blog#:#blog_news_posting_authors#:#Beteiligte Autoren: %s
 book#:#book_reservation_filter_period#:#Filter „Zeitraum“
 book#:#book_reservation_filter_period_info#:#Der Default-Wert für den Zeitraum-Filter in Tagen ab dem aktuellem Datum.
 book#:#book_filter_past_reservations#:#Abgelaufene Reservierungen anzeigen
-book#:#book_deadline_options#:#Spätester Buchungszeitpunkt
+book#:#book_deadline_options#:#Spätester Reservierungszeitpunkt
 book#:#book_deadline_hours#:#Bis n Stunden vor Beginn des Zeitfensters
 book#:#book_deadline_slot_end#:#Bis zum Ende des Zeitfensters
 book#:#book_deadline_slot_start#:#Bis zum Beginn des Zeitfensters
@@ -15876,7 +15876,7 @@ chatroom#:#chat_user_action_invite_osd#:#On-Screen-Chat starten
 form#:#err_invalid_input#:#Es wurde ein ungültiger Wert übertragen. Bitte überprüfen Sie Ihre Eingabe.
 chatroom#:#chat_osc_no_conv#:#Keine Konversationen vorhanden.
 chatroom#:#chat_osc_no_sub_directory#:#Relativer Pfad
-chatroom#:#chat_osc_no_sub_directory_info#:#Wird der Chatserver so konfiguriert, dass die zugehörige URL einen Unterpfad der Form "http(s)://[IP/Domain]/[PFAD]" enthält, muss hier der relative [PFAD] angegeben werden.
+chatroom#:#chat_osc_no_sub_directory_info#:#Wird der Chatserver so konfiguriert, dass der zugehörige URL einen Unterpfad der Form "http(s)://[IP/Domain]/[UNTERVERZEICHNIS]" enthält, muss hier das relative [UNTERVERZEICHNIS] angegeben werden. In den meisten Szenarien kann dieses Feld leer gelassen werden.
 prg#:#prg_points_reachable#:#Erreichbare Punkte
 mail#:#mail_members_search_continue#:#Weiter
 copg#:#copg_confirm_el_deletion#:#Sollen die ausgewählten Elemente wirklich gelöscht werden?
@@ -15917,3 +15917,8 @@ prg#:#prg_in_progress_img_alt#:#in progress###deprecated
 survey#:#error_save_code#:#Value not saved properly. <b>The E- mail: '%s' is not valid</b>. First name: '%s', Last name: '%s'.<br>###07 02 2017 new variable
 survey#:#cannot_send_emails#:#You do not possess sufficient permissions to send emails.###07 02 2017 new variable
 rbac#:#book_copy#:#Buchungspool kopieren
+mep#:#mobs_black_list_file_types#:#Verbotene Dateitypen
+mep#:#mobs_black_list_file_types_info#:#Diese List schränkt die Menge der erlaubten Dateitypen ein. Tragen Sie dazu die jeweilige Dateiendungen mit Komma getrennt ein (z.B. jpg,gif). Dies ist sinnvoll, wenn die vorangegangene Option leer ist (alle Typen erlaubt).
+form#:#form_msg_file_type_is_not_allowed#:#Dieser Dateityp ist nicht erlaubt.
+common#:#file_no_valid_file_type#:#Dieser Dateityp ist nicht erlaubt.
+common#:#file_some_invalid_file_types_removed#:#Einige Dateitypen sind nicht erlaubt und wurden entfernt.

@@ -51,7 +51,9 @@ class ilExAssignment
 	protected $max_file;
 	
 	protected $member_status = array(); // [array]
-	
+
+	protected $log;
+
 	/**
 	 * Constructor
 	 */
@@ -59,6 +61,8 @@ class ilExAssignment
 	{
 		$this->setType(self::TYPE_UPLOAD);
 		$this->setFeedbackDate(self::FEEDBACK_DATE_DEADLINE);
+
+		$this->log = ilLoggerFactory::getLogger("exc");
 		
 		if ($a_id > 0)
 		{
@@ -1024,8 +1028,9 @@ class ilExAssignment
 	 */
 	public function getFiles()
 	{
-		include_once("./Modules/Exercise/classes/class.ilFSStorageExercise.php");
-		$storage = new ilFSStorageExercise($this->getExerciseId(), $this->getId());
+		$this->log->debug("getting files from class.ilExAssignment using ilFSWebStorageExercise");
+		include_once("./Modules/Exercise/classes/class.ilFSWebStorageExercise.php");
+		$storage = new ilFSWebStorageExercise($this->getExerciseId(), $this->getId());
 		return $storage->getFiles();
 	}
 	
@@ -1294,8 +1299,9 @@ class ilExAssignment
 	 */
 	function uploadAssignmentFiles($a_files)
 	{
-		include_once("./Modules/Exercise/classes/class.ilFSStorageExercise.php");
-		$storage = new ilFSStorageExercise($this->getExerciseId(), $this->getId());
+		ilLoggerFactory::getLogger("exc")->debug("upload assignment files files = ",$a_files);
+		include_once("./Modules/Exercise/classes/class.ilFSWebStorageExercise.php");
+		$storage = new ilFSWebStorageExercise($this->getExerciseId(), $this->getId());
 		$storage->create();
 		$storage->uploadAssignmentFiles($a_files);
 	}

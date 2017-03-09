@@ -14,6 +14,11 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+uzk#:#prtf_share#:#Share
+uzk#:#prtf_but_offline#:#, but offline
+uzk#:#adopt_mail#:#Share and Notify
+uzk#:#nofiy_recipients_question#:#Would you like to send a mail notification?
+uzk#:#prtf_shared_usr_body#:#%1$s has shared an object to you.
 help#:#help_tt_disable#:#Disable Help Tooltips
 help#:#help_tt_enable#:#Enable Help Tooltips
 forum#:#delete_drafts_successfully#:#The drafts were deleted successfully.

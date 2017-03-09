@@ -14,6 +14,11 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+uzk#:#prtf_share#:#Freigeben
+uzk#:#prtf_but_offline#:#, aber offline
+uzk#:#adopt_mail#:#Freigeben und Benachrichtigen
+uzk#:#nofiy_recipients_question#:#Möchten Sie eine Benachrichtigungsmail versenden?
+uzk#:#prtf_shared_usr_body#:#%1$s hat für Sie ein Objekt im Arbeitsraum freigegeben.
 help#:#help_tt_disable#:#Hilfe-Tooltips ausschalten
 help#:#help_tt_enable#:#Hilfe-Tooltips anschalten
 forum#:#delete_drafts_successfully#:#Die Entwürfe wurden erfolgreich gelöscht.

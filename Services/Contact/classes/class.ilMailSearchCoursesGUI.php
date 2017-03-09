@@ -398,6 +398,9 @@ class ilMailSearchCoursesGUI
 					else if($_GET["ref"] == "wsp")
 					{
 						$current_selection_list->addItem($this->lng->txt("wsp_share_with_members"), '', $this->ctrl->getLinkTarget($this, "share"));
+						// uzk-patch: begin
+							$current_selection_list->addItem($this->lng->txt("adopt_mail"), '', $this->ctrl->getLinkTarget($this, "shareMail"));
+						// uzk-patch: begin
 					}
 					$current_selection_list->addItem($this->lng->txt("mail_list_members"), '', $this->ctrl->getLinkTarget($this, "showMembers"));
 					
@@ -564,21 +567,14 @@ class ilMailSearchCoursesGUI
 		}
 	}
 	
-	// patch uzk start
-	
-	function shareAndNotify()
-	{
-		$this->share(true);
-	}
-	
-	function share($a_notify = false)
+	function share()
 	{
 		if ($_GET["view"] == "mycourses")
 		{
 			$ids = $_REQUEST["search_crs"];
 			if (sizeof($ids))
 			{
-				$this->addPermission($ids, $a_notify);					
+				$this->addPermission($ids);					
 			}
 			else
 			{
@@ -591,7 +587,7 @@ class ilMailSearchCoursesGUI
 			$ids = $_REQUEST["search_members"];
 			if (sizeof($ids))
 			{
-				$this->addPermission($ids, $a_notify);					
+				$this->addPermission($ids);					
 			}
 			else
 			{
@@ -605,7 +601,7 @@ class ilMailSearchCoursesGUI
 		}		
 	}
 	
-	protected function addPermission($a_obj_ids, $a_notify = false)
+	protected function addPermission($a_obj_ids)
 	{
 		if(!is_array($a_obj_ids))
 		{
@@ -619,21 +615,104 @@ class ilMailSearchCoursesGUI
 			if(!in_array($object_id, $existing))
 			{
 				$added = $this->wsp_access_handler->addPermission($this->wsp_node_id, $object_id);
+				
+				//	uzk-patch: begin
+				// dirty hack because i.e. ilPortfolioAccessHandler does not return anything
+				$added = $added == null ? true : bool($added);
+				//	uzk-patch: end
 			}
 		}
 		
 		if($added)
-		{							
-			if($a_notify)
+		{
+			//	uzk-patch: begin
+			if($_GET['ref'] == 'wsp' && $this->ctrl->getCmd() == 'share')
 			{
-				include_once "Services/Contact/classes/class.ilMailSearchGUI.php";
-				ilMailSearchGUI::sendShareNotification($this->wsp_access_handler, $this->wsp_node_id, $a_obj_ids);
+				$this->confirmNotifyRecipients($a_obj_ids);
 			}
-							
+			else if($_GET['ref'] == 'wsp' && $this->ctrl->getCmd() == 'shareMail')
+			{
+				$this->notifyRecipients($a_obj_ids);
+			}
 			ilUtil::sendSuccess($this->lng->txt("wsp_share_success"), true);
-		}	
-		$this->ctrl->redirectByClass("ilworkspaceaccessgui", "share");				
+			//	uzk-patch: end
+		}
+		$this->ctrl->redirectByClass("ilworkspaceaccessgui", "share");		
 	}
 	
-	// patch uzk end	
+	//	uzk-patch: begin
+	public function shareMail()
+	{
+		$this->share();
+	}
+	
+	/**
+	 * @param $recipients
+	 */
+	private function confirmNotifyRecipients($recipients)
+	{
+		global $lng, $tpl;
+		$tpl->getStandardTemplate();
+		include_once("./Services/Utilities/classes/class.ilConfirmationGUI.php");
+		
+		$confirm = new ilConfirmationGUI();
+		
+		$confirm->setHeaderText($lng->txt('nofiy_recipients_question'));
+		$confirm->setFormAction($this->ctrl->getFormAction($this));
+		$confirm->addHiddenItem('recipients', serialize($recipients));
+		
+		$confirm->setConfirm($lng->txt('confirm'), 'notifyRecipients');
+		$confirm->setCancel($lng->txt('cancel'), 'cancel');
+		$tpl->setContent($confirm->getHTML());
+		$tpl->show();
+		exit;
+	}
+	
+	/**
+	 * @param array $recipients
+	 */
+	public function notifyRecipients($recipients = array())
+	{
+		global $ilObjDataCache, $rbacreview;
+		
+		$validate = function($value) {return (int)$value;};
+		
+		if(isset($recipients) && count($recipients) > 0)
+		{
+			$recipients = array_map($validate, $recipients);
+		}
+		else if(isset($_POST['recipients']))
+		{
+			$tmp_rec = unserialize($_POST['recipients']);
+			if(count($tmp_rec) > 0)
+			{
+				$recipients = array_map($validate, $tmp_rec);
+			}
+			else
+			{
+				$recipients = array();
+			}
+		}
+		
+		foreach($recipients as $obj_id)
+		{
+			$user_ids = array();
+			$type = $ilObjDataCache->lookupType($obj_id);
+			if($type == 'crs')
+			{
+				$participantsObj = ilParticipants::getInstanceByObjId($obj_id);
+				$user_ids = array_unique($participantsObj->getParticipants());
+			}
+			
+			include_once './Modules/Portfolio/classes/class.ilPortfolioMailNotification.php';
+			$mailObj = new ilPortfolioMailNotification(true);
+			$mailObj->setWspAccessHandler($this->wsp_access_handler);
+			$mailObj->setWspNodeId($this->wsp_node_id);
+			$mailObj->setType(ilPortfolioMailNotification::TYPE_SHARE_CRS);
+			$mailObj->setRecipients($user_ids);
+			$mailObj->send();
+		}
+		$this->ctrl->returnToParent($this);
+	}
+//	uzk-patch: end
 }

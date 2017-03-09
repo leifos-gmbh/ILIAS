@@ -20,7 +20,9 @@
 	| Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. |
 	+-----------------------------------------------------------------------------+
 */
-
+// uzk-patch: begin
+include_once './Services/Form/classes/class.ilRadioOption.php';
+// uzk-patch: end 
 /**
 * This class represents an option in a checkbox group
 *

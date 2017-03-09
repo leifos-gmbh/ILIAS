@@ -24,6 +24,10 @@ class ilPortfolioRepositoryGUI
 
 		$lng->loadLanguageModule("prtf");
 		$lng->loadLanguageModule("user");
+		
+		// uzk-patch: begin
+		$lng->loadLanguageModule('uzk');
+		// uzk-patch: end
 
 		include_once('./Modules/Portfolio/classes/class.ilPortfolioAccessHandler.php');
 		$this->access_handler = new ilPortfolioAccessHandler();	
@@ -365,7 +369,22 @@ class ilPortfolioRepositoryGUI
 		$tbl->resetFilter();
 		
 		$this->showOther();
-	}	
+	}
+	
+//	uzk-patch: begin
+	protected function saveStatus()
+	{
+		$id = $_GET['pf_id'];
+		$status  = $_GET['is_online'];
+		if($this->checkAccess("write", $id))
+		{
+			$portfolio = new ilObjPortfolio($id, false);
+			(bool)$status == true ? $portfolio->setOnline(false) : 	$portfolio->setOnline(true); 
+			$portfolio->update();
+		}
+		$this->show();
+	}
+	//	uzk-patch: end
 }
 
 ?>

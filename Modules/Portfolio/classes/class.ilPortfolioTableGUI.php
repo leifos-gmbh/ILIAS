@@ -28,8 +28,10 @@ class ilPortfolioTableGUI extends ilTable2GUI
 
 		$this->setTitle($lng->txt("prtf_portfolios"));
 
-		$this->addColumn($this->lng->txt(""), "", "1");		
-		$this->addColumn($this->lng->txt("title"), "title", "50%");
+		$this->addColumn($this->lng->txt(""), "", "1");	
+		// uzk-patch: begin
+		$this->addColumn($this->lng->txt("title"), "title");
+		// uzk-patch: end
 		$this->addColumn($this->lng->txt("online"), "is_online");
 		// patch uzk start
 		// $this->addColumn($this->lng->txt("prtf_default_portfolio"), "is_default");		
@@ -45,6 +47,9 @@ class ilPortfolioTableGUI extends ilTable2GUI
 		$this->getItems();
 		
 		$lng->loadLanguageModule("wsp");
+		// uzk-patch: begin
+		$lng->loadLanguageModule("uzk");
+		// uzk-patch: end
 		
 		include_once('./Services/Link/classes/class.ilLink.php');
 	}
@@ -79,7 +84,13 @@ class ilPortfolioTableGUI extends ilTable2GUI
 		if(in_array($a_set["id"], $this->shared_objects))
 		{
 			$this->tpl->setCurrentBlock("shared");
-			$this->tpl->setVariable("TXT_SHARED", $lng->txt("wsp_status_shared"));
+			$but_offline = '';
+			if(!$a_set['is_online'])
+			{
+				$but_offline = ' '.$lng->txt('prtf_but_offline');
+			}
+			$this->tpl->setVariable("TXT_SHARED", $lng->txt("wsp_status_shared").$but_offline);
+			
 			$this->tpl->parseCurrentBlock();
 		}
 
@@ -89,8 +100,14 @@ class ilPortfolioTableGUI extends ilTable2GUI
 
 		$this->tpl->setCurrentBlock("edit");
 		$this->tpl->setVariable("VAL_ID", $a_set["id"]);
-		$this->tpl->setVariable("STATUS_ONLINE",
-			($a_set["is_online"]) ? " checked=\"checked\"" : "");
+		//	uzk-patch: begin	
+		$button_html = $this->getOnOffButton($a_set["id"], $a_set['is_online']);
+		
+		$this->tpl->setVariable("STATUS_ONLINE", $button_html
+//			($a_set["is_online"]) ? " checked=\"checked\"" : ""
+		);
+		//	uzk-patch: end	
+		
 		$this->tpl->setVariable("VAL_DEFAULT",
 			($a_set["is_default"]) ? $lng->txt("yes") : "");
 		$this->tpl->parseCurrentBlock();
@@ -109,6 +126,15 @@ class ilPortfolioTableGUI extends ilTable2GUI
 			$ilCtrl->getLinkTargetByClass($prtf_path, "view"));
 		$this->tpl->setVariable("TXT_ACTION", $lng->txt("prtf_edit_portfolio"));
 		$this->tpl->parseCurrentBlock();
+		
+		//	uzk-patch: begin
+		// Do not move! This is needed right here!
+		$share_path = array(get_class($this->parent_obj), "ilobjportfoliogui", 'ilworkspaceaccessgui');
+		$this->tpl->setVariable("URL_ACTION",
+			$ilCtrl->getLinkTargetByClass($share_path, "share"));
+		$this->tpl->setVariable("TXT_ACTION", $lng->txt("prtf_share"));
+		$this->tpl->parseCurrentBlock();
+		//	uzk-patch: end
 		
 		$ilCtrl->setParameterByClass("ilobjportfoliogui", "prt_id", "");		
 
@@ -138,5 +164,23 @@ class ilPortfolioTableGUI extends ilTable2GUI
 		// patch uzk end 
 		*/
 	}
-	
+	//	uzk-patch: begin	
+	protected function getOnOffButton($pf_id, $is_online)
+	{
+		global $ilCtrl;
+		
+		include_once './Services/UIComponent/Button/classes/class.ilLinkButton.php';
+		$button = ilLinkButton::getInstance();
+		$txt_status =  $is_online == true ? $this->lng->txt('online') : $this->lng->txt('offline');
+				
+		$button->setId('pfid_'.$pf_id.'_'.$is_online);
+		$ilCtrl->setParameter($this->parent_obj, "pf_id", $pf_id);
+		$ilCtrl->setParameter($this->parent_obj, "is_online", $is_online);
+		$button->setUrl($ilCtrl->getLinkTarget($this->parent_obj, "saveStatus", "", true, false));
+
+		$button->setCaption($txt_status, false);
+		
+		return  $button->render();
+	}
+	//	uzk-patch: end
 }?>

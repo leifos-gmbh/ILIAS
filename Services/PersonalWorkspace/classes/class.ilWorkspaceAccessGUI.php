@@ -293,6 +293,26 @@ class ilWorkspaceAccessGUI
 		$form->setValuesByPost();
 		$this->showPasswordForm($form);
 	}
+	
+//	uzk-patch: begin
+	public function applyFilter()
+	{
+		include_once "Services/PersonalWorkspace/classes/class.ilWorkspaceAccessTableGUI.php";
+		$table = new ilWorkspaceAccessTableGUI($this, "share", $this->node_id, $this->getAccessHandler());
+		$table->resetOffset();
+		$table->writeFilterToSession();
+		$this->share();
+	}
+
+	public function resetFilter()
+	{
+		include_once "Services/PersonalWorkspace/classes/class.ilWorkspaceAccessTableGUI.php";
+		$table = new ilWorkspaceAccessTableGUI($this, "share", $this->node_id, $this->getAccessHandler());
+		$table->resetOffset();
+		$table->resetFilter();
+		$this->share();
+	}
+	//	uzk-patch: end
 }
 
 ?>

@@ -103,8 +103,6 @@ class ilMailSearchGUI
 		return true;
 	}
 	
-	// patch uzk start
-	
 	public function adopt($a_return_recipients = false)	
 	{
 		// necessary because of select all feature of ilTable2GUI
@@ -150,96 +148,6 @@ class ilMailSearchGUI
 			return $recipients;
 		}
 	}
-	
-//	public function adoptAndNotify()
-//	{
-//		global $lng;
-//		
-//		$recipients = $this->adopt(true);
-//	
-//		self::sendShareNotification($this->wsp_access_handler, $this->wsp_node_id, $recipients);
-//		
-//		$this->ctrl->returnToParent($this);
-//	}	
-//	
-//	public static function sendShareNotification($a_wsp_access_handler, $a_wsp_node_id, array $a_obj_ids)
-//	{			
-//		$user_ids = array();
-//		foreach($a_obj_ids as $obj_id)
-//		{
-//			switch(ilObject::_lookupType($obj_id))
-//			{
-//				case "grp":
-//					include_once "Modules/Group/classes/class.ilGroupParticipants.php";
-//					$part = ilGroupParticipants::_getInstanceByObjId($obj_id);
-//					$user_ids = array_merge($user_ids, $part->getParticipants());
-//					break;
-//				
-//				case "crs":
-//					include_once "Modules/Course/classes/class.ilCourseParticipants.php";
-//					$part = ilCourseParticipants::_getInstanceByObjId($obj_id);
-//					$user_ids = array_merge($user_ids, $part->getParticipants());
-//					break;
-//				
-//				case "usr":
-//					$user_ids[] = $obj_id;
-//					break;
-//			}
-//		}
-//		
-//		if(sizeof($user_ids))
-//		{			
-//			// personal workspace
-//			if(method_exists($a_wsp_access_handler, "getTree"))
-//			{
-//				$tree = $a_wsp_access_handler->getTree();			
-//				$obj_id = $tree->lookupObjectId($a_wsp_node_id);	
-//				
-//				$link = $a_wsp_access_handler->getGotoLink($a_wsp_node_id, $obj_id);			
-//			}
-//			// portfolio
-//			else
-//			{
-//				$obj_id = $a_wsp_node_id;
-//				
-//				include_once "Services/Link/classes/class.ilLink.php";
-//				$link = ilLink::_getStaticLink($obj_id, "prtf");
-//			}
-//			$obj_type = ilObject::_lookupType($obj_id);
-//			$obj_title = ilObject::_lookupTitle($obj_id);
-//			
-//			include_once "./Services/Language/classes/class.ilLanguageFactory.php";
-//			
-//			foreach($user_ids as $user_id)
-//			{
-//				// use language of recipient to compose message
-//				$ulng = ilLanguageFactory::_getLanguageOfUser($user_id);
-//				$ulng->loadLanguageModule('wsp');
-//
-//				$subject = sprintf($ulng->txt('wsp_share_notification_subject'), $obj_title);
-//				$message = sprintf($ulng->txt('wsp_share_notification_salutation'), ilObjUser::_lookupFullname($user_id))."\n\n";		
-//				
-//				$message .= $ulng->txt('wsp_share_notification_body').":\n\n";
-//				$message .= $ulng->txt('obj_'.$obj_type).": ". $obj_title."\n";			
-//				$message .= "\n".$ulng->txt('wsp_share_notification_link').": ".$link;				
-//				
-//				// direct download
-//				if($obj_type == "file")
-//				{
-//					$dl_link = $a_wsp_access_handler->getGotoLink($a_wsp_node_id, $obj_id, "_download");
-//										
-//					$message .= "\n".$ulng->txt('wsp_share_notification_download_link').": ".$dl_link;			
-//				}
-//
-//				$mail_obj = new ilMail(ANONYMOUS_USER_ID);
-//				$mail_obj->appendInstallationSignature(true);
-//				$mail_obj->sendMail(ilObjUser::_lookupLogin($user_id),
-//					"", "", $subject, $message, array(), array("system"));				
-//			}
-//		}		
-//	}
-//	
-//	// patch uzk end
 	
 	private function saveMailData()
 	{

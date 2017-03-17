@@ -939,12 +939,16 @@ class ilTemplate extends HTML_Template_ITX
 		$link_items = array();
 		
 		// imprint
-		include_once "Services/Imprint/classes/class.ilImprint.php";
-		if($_REQUEST["baseClass"] != "ilImprintGUI" && ilImprint::isActive())
-		{
-			include_once "Services/Link/classes/class.ilLink.php";
-			$link_items[ilLink::_getStaticLink(0, "impr")] = array($lng->txt("imprint"), true);
-		}
+		#include_once "Services/Imprint/classes/class.ilImprint.php";
+		#if($_REQUEST["baseClass"] != "ilImprintGUI" && ilImprint::isActive())
+		#{
+		#	include_once "Services/Link/classes/class.ilLink.php";
+		#	$link_items[ilLink::_getStaticLink(0, "impr")] = array($lng->txt("imprint"), true);
+		#}
+		
+		$link_items['https://www.bghw.de/die-bghw-ihr-partner-fuer-arbeitssicherheit-und-gesundheit-1/die-bghw/impressum'] = array($lng->txt('imprint'),true);
+		$link_items['https://www.bghw.de/die-bghw-ihr-partner-fuer-arbeitssicherheit-und-gesundheit-1/die-bghw/datenschutz/'] = array('Datenschutz', true);
+		
 
 		// system support contacts
 		include_once("./Modules/SystemFolder/classes/class.ilSystemSupportContactsGUI.php");

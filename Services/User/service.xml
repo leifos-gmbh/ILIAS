@@ -32,4 +32,7 @@
 	</web_access_checker>
 	<logging />
 	<badges />
+	<comp>
+		<implements component="Services/User" interface="ActionContext" dir="Gallery/classes" classbase="Gallery"/>
+	</comp>
 </service>

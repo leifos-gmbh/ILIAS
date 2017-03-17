@@ -11,4 +11,7 @@
 		</object>
 	</objects>
 	<logging />
+	<comp>
+		<implements component="Services/User" interface="ActionContext" dir="classes" classbase="Awareness"/>
+	</comp>
 </service>

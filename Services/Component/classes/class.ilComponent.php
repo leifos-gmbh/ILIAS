@@ -364,7 +364,32 @@ abstract class ilComponent
 			return $row->name;
 		}
 	}
-	
+
+	/**
+	 * Lookup interface implementers
+	 *
+	 * @param string $a_provider_component
+	 * @param string $a_provider_interface
+	 * @return array
+	 */
+	static function getInterfaceImplementers($a_provider_component, $a_provider_interface)
+	{
+		global $DIC;
+
+		$db = $DIC->database();
+
+		$set = $db->query("SELECT * FROM  comp_ipml_int".
+			" WHERE provider_component = ".$db->quote($a_provider_component, "text").
+			" AND provider_interface = ".$db->quote($a_provider_interface, "text")
+			);
+		$items = array();
+		while ($rec = $db->fetchAssoc($set))
+		{
+			$items[] = $rec;
+		}
+		return $items;
+	}
+
 
 }
 ?>

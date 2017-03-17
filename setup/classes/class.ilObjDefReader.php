@@ -17,7 +17,8 @@ class ilObjDefReader extends ilSaxParser
 	protected $component_id;
 	
 	protected $readers = array(
-		"copage" => array("class" => "ilCOPageDefReader")
+		"copage" => array("class" => "ilCOPageDefReader"),
+		"comp" => array("class" => "ilComponentDefReader")
 		);
 	protected $current_reader = null;
 	

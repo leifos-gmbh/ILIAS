@@ -16,4 +16,42 @@ if(!$ilDB->tableColumnExists('grp_settings', 'grp_end'))
 			"length" => 4
 		));
 }
-?>	
+?>
+<#2>
+<?php
+if (!$ilDB->tableExists('comp_impl_int'))
+{
+	$ilDB->createTable('comp_impl_int', array(
+		'provider_component' => array(
+			'type' => 'text',
+			'length' => 150,
+			'notnull' => true
+		),
+		'provider_interface' => array(
+			'type' => 'text',
+			'length' => 50,
+			'notnull' => true
+		),
+		'consumer_component' => array(
+			'type' => 'text',
+			'length' => 150,
+			'notnull' => true
+		),
+		'consumer_component' => array(
+			'type' => 'text',
+			'length' => 200,
+			'notnull' => true
+		),
+		'consumer_classbase' => array(
+			'type' => 'text',
+			'length' => 50,
+			'notnull' => false
+		)
+	));
+	$ilDB->addIndex('comp_impl_int',array('provider_component','provider_interface'),'i1');
+}
+?>
+<#3>
+<?php
+	$ilCtrlStructureReader->getStructure();
+?>

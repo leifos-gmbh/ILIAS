@@ -11,13 +11,6 @@
  */
 class ilUserActionContextFactory
 {
-	protected static $contexts = array(
-		array (
-			"component" => "Services/User/Actions/Contexts",
-			"class" => "ilAwarenessUserActionContext"
-		)
-	);
-
 	/**
 	 * Get all action contexts
 	 *
@@ -25,15 +18,17 @@ class ilUserActionContextFactory
 	 */
 	static function getAllActionContexts()
 	{
+		include_once("./Services/Component/classes/class.ilComponent.php");
 		$contexts = array();
 
-		foreach (self::$contexts as $p)
+		foreach (ilComponent::getInterfaceImplementers("Services/User", "ActionContext") as $p)
 		{
-			$dir = (isset($p["dir"]))
-				? $p["dir"]
+			$dir = (isset($p["consumer_component"]))
+				? $p["consumer_component"]
 				: "classes";
-			include_once("./".$p["component"]."/".$dir."/class.".$p["class"].".php");
-			$contexts[] = new $p["class"]();
+			$class = "il".$p["consumer_classbase"]."UserActionContext";
+			include_once("./".$p["consumer_component"]."/".$dir."/class.".$class.".php");
+			$contexts[] = new $class();
 		}
 
 		return $contexts;

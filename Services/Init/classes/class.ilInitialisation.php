@@ -110,7 +110,7 @@ class ilInitialisation
 	 * the ilias.ini.php file.
 	 */
 	protected static function initIliasIniFile()
-	{		
+	{
 		require_once("./Services/Init/classes/class.ilIniFile.php");
 		$ilIliasIniFile = new ilIniFile("./ilias.ini.php");				
 		$ilIliasIniFile->read();
@@ -1012,6 +1012,10 @@ class ilInitialisation
 
 			return;
 		}
+
+		// begin-patch bench
+		$GLOBALS['ilGlobalStartTime'] = microtime(true);
+		// end-patch bench
 
 		$GLOBALS["DIC"] = new \ILIAS\DI\Container();
 		$GLOBALS["DIC"]["ilLoggerFactory"] = function($c) {

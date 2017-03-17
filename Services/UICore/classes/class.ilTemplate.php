@@ -1095,6 +1095,14 @@ class ilTemplate extends HTML_Template_ITX
 
 		}
 
+               // begin-patch bench
+		$ftpl->setVariable(
+			'ELAPSED_TIME',
+			', '.number_format(microtime(true) - $GLOBALS['ilGlobalStartTime'],1).' sec.'
+		);
+		// end-patch bench
+
+
 		// BEGIN Usability: Non-Delos Skins can display the elapsed time in the footer
 		// The corresponding $ilBench->start invocation is in inc.header.php
 		$ilBench = $DIC["ilBench"];
@@ -1102,7 +1110,6 @@ class ilTemplate extends HTML_Template_ITX
 		$ftpl->setVariable("ELAPSED_TIME",
 			", ".number_format($ilBench->getMeasuredTime("Core", "ElapsedTimeUntilFooter"),1).' seconds');
 		// END Usability: Non-Delos Skins can display the elapsed time in the footer
-		
 		$this->setVariable("FOOTER", $ftpl->get());
 	}
 

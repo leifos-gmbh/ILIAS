@@ -37,7 +37,7 @@ if (!$ilDB->tableExists('comp_impl_int'))
 			'length' => 150,
 			'notnull' => true
 		),
-		'consumer_component' => array(
+		'consumer_dir' => array(
 			'type' => 'text',
 			'length' => 200,
 			'notnull' => true
@@ -52,6 +52,21 @@ if (!$ilDB->tableExists('comp_impl_int'))
 }
 ?>
 <#3>
+<?php
+	$ilCtrlStructureReader->getStructure();
+?>
+<#4>
+<?php
+if(!$ilDB->tableColumnExists('comp_impl_int', 'consumer_dir'))
+{
+	$ilDB->addTableColumn('comp_impl_int', 'consumer_dir', array(
+		'type' => 'text',
+		'length' => 200,
+		'notnull' => true
+	));
+}
+?>
+<#5>
 <?php
 	$ilCtrlStructureReader->getStructure();
 ?>

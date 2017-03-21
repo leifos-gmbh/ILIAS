@@ -14,6 +14,10 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+content#:#cont_last_visited_page#:#Zuletzt besuchte Seite
+content#:#cont_first_page#:#Erste Seite
+content#:#cont_lm_starting_point#:#Startseite für ILIAS-Lernmodule
+content#:#cont_lm_starting_point_info#:#Seite, die beim Anklicken des Lernmodultitels geöffnet wird.
 acc#:#acc_access_key#:#Access-Key
 acc#:#acc_access_keys#:#Access-Keys
 acc#:#acc_comp_frm#:#Forum

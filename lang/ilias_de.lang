@@ -776,7 +776,7 @@ assessment#:#log_mark_added#:#Note hinzugefügt
 assessment#:#log_mark_changed#:#Note geändert
 assessment#:#log_mark_removed#:#Note entfernt
 assessment#:#log_modified_test#:#Der Test wurde verändert
-assessment#:#tst_results_presentation_description#:#Wird die Ergebnisübersicht für laufende Tests angeboten, erhalten die Teilnehmer die Möglichkeit, Fragentitel und erzielte Punkte der jeweiligen Fragen in der Ergebnisübersicht einzusehen. Wenn die Bewertungsdetails in den Testergebnissen angezeigt werden, bekommen die Teilnehmer neben ihrer eigenen Lösung auch die korrekte Lösung einer Frage angezeigt. Wenn die Liste der Antworten angezeigt wird, erhalten die Teilnehmer eine Übersicht mit ihren Antworten zu den einzelnen Testfragen. Diese Übersicht wird vor dem endgültigen Abschicken des Tests und nach Beendigung auf der Info-Seite des Tests angeboten. Wenn die antwortspezifischen Rückmeldungen ausgewählt sind, werden diese Rückmeldungen (falls vorhanden) in den Testergebnissen angezeigt. Wenn "Druckausgabe der Ergebnisse (nur Antworten)" ausgewählt ist, werden ILIAS-Inhalte, die Sie über den "Inhalt bearbeiten" Karteireiter der Fragen vor und hinter dem eigentlichen Fragentext platzieren können, in einem Ausdruck nicht angezeigt. Ist "Unterschrift-Platzhalter anzeigen" ausgewählt, wird für den Ausdruck ein Platzhalter für die Unterschrift des Testteilnehmers angezeigt. Wenn "Musterlösungen anzeigen" ausgewählt ist, werden die Musterlösungen von Fragen (falls vorhanden) in der Fragenübersicht der Testergebnisse angezeigt.
+assessment#:#tst_results_presentation_description#:#Wird die Ergebnisübersicht für laufende Tests angeboten, erhalten die Teilnehmer die Möglichkeit, Fragentitel und erzielte Punkte der jeweiligen Fragen in der Ergebnisübersicht einzusehen. Wenn die Bewertungsdetails in den Testergebnissen angezeigt werden, bekommen die Teilnehmer neben ihrer eigenen Lösung auch die korrekte Lösung einer Frage angezeigt. Wenn die Liste der Antworten angezeigt wird, erhalten die Teilnehmer eine Übersicht mit ihren Antworten zu den einzelnen Testfragen. Diese Übersicht wird vor dem endgültigen Abschicken des Tests und nach Beendigung auf der Info-Seite des Tests angeboten. Wenn die antwortspezifischen Rückmeldungen ausgewählt sind, werden diese Rückmeldungen (falls vorhanden) in den Testergebnissen angezeigt. Wenn "Druckausgabe der Ergebnisse (nur Antworten)" ausgewählt ist, werden ILIAS-Inhalte, die Sie über den "Inhalt bearbeiten" Karteireiter der Fragen vor und hinter dem eigentlichen Fragentext platzieren können, in einem Ausdruck nicht angezeigt. Ist "Unterschrift-Platzhalter anzeigen" ausgewählt, wird für den Ausdruck ein Platzhalter für die Unterschrift des Testteilnehmers angezeigt. Ist "Inhalte zur Wiederholung" ausgewählt, werden die Inhalte zur Wiederholung (falls vorhanden) in der Fragenübersicht der Testergebnisse angezeigt.
 assessment#:#log_question_added#:#Frage hinzugefügt an Position
 assessment#:#log_question_position_changed#:#Fragenposition geändert
 assessment#:#log_question_removed#:#Frage entfernt
@@ -8613,7 +8613,7 @@ mep#:#mobs_activate_pages#:#Inhaltsbausteine nutzen
 mep#:#mobs_activate_pages_info#:#Ermöglicht es, Seiteninhalte als Bausteine in Medienpools anzulegen. Diese Inhaltsbausteine können in ILIAS Lernmodulen wiederverwendet, aber dort nicht bearbeitet werden.
 mep#:#mobs_always_show_file_manager#:#Dateistruktur immer anzeigen
 mep#:#mobs_always_show_file_manager_info#:#Wenn deaktiviert, wird die Dateistruktur für einfache Datentypen, wie z.B. Bilder, nicht angezeigt.
-mep#:#mobs_restrict_file_types#:#Dateitypen einschränken
+mep#:#mobs_restrict_file_types#:#Erlaubte Dateitypen
 mep#:#mobs_restrict_file_types_info#:#Bestimmen Sie alle Dateitypen, die in Medienobjekten hochgeladen werden dürfen. Tragen Sie dazu die jeweilige Dateiendungen mit Komma getrennt ein (z.B. jpg,gif). Wird kein Eintrag vorgenommen, sind alle Typen erlaubt.
 meta#:#md_adv_active#:#Aktiv
 meta#:#md_adv_add_value#:#Neuer Wert
@@ -15437,8 +15437,8 @@ administration#:#adm_missing_entry_add_action#:#Hinzufügen
 administration#:#adm_missing_entry_add#:#Neuen Eintrag erstellen
 trac#:#trac_mode_survey_finished#:#Umfrage beendet
 trac#:#trac_mode_survey_finished_info#:#Die Umfrage muss beendet werden.
-crs#:#crs_usr_agreement#:#Benutzerveinbarung
-grp#:#grp_usr_agreement#:#Benutzerveinbarung
+crs#:#crs_usr_agreement#:#Benutzervereinbarung
+grp#:#grp_usr_agreement#:#Benutzervereinbarung
 meta#:#md_adv_confirm_definition_select_option_all#:#Alle vorhandenen Einträge gleich behandeln
 meta#:#md_adv_confirm_definition_select_option_single#:#Jeden vorhandenen Eintrag einzeln entscheiden
 meta#:#md_adv_confirm_definition_select_option_all_action#:#Neuer Wert
@@ -16223,3 +16223,8 @@ itgr#:#itgr_desc_info#:#Die Beschreibung wird bei der Anzeige des Objekteblocks 
 survey#:#msg_input_only_positive_numbers#:#Bitte geben Sie natürliche Zahlen als Skalenwerte ein.
 rbac#:#prg_manage_members#:#Teilnehmer eines Studienprogramms bearbeiten
 rbac#:#edit_members#:#Teilnehmer bearbeiten
+mep#:#mobs_black_list_file_types#:#Verbotene Dateitypen
+mep#:#mobs_black_list_file_types_info#:#Diese List schränkt die Menge der erlaubten Dateitypen ein. Tragen Sie dazu die jeweilige Dateiendungen mit Komma getrennt ein (z.B. jpg,gif). Dies ist sinnvoll, wenn die vorangegangene Option leer ist (alle Typen erlaubt).
+form#:#form_msg_file_type_is_not_allowed#:#Dieser Dateityp ist nicht erlaubt.
+common#:#file_no_valid_file_type#:#Dieser Dateityp ist nicht erlaubt.
+common#:#file_some_invalid_file_types_removed#:#Einige Dateitypen sind nicht erlaubt und wurden entfernt.

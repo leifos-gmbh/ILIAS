@@ -45,7 +45,6 @@ class ilObjFile extends ilObject2 {
 	 * @param bool $a_call_by_reference defines the $a_id a ref_id
 	 */
 	public function __construct($a_id = 0, $a_call_by_reference = true) {
-	{			
 		// skyguide file lock begin
 		
 		include_once "Services/Administration/classes/class.ilSetting.php";

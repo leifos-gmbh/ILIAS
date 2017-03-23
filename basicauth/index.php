@@ -7,7 +7,7 @@ $_POST['auth_mode'] = 13;
 $_POST['username'] = 'dummy';
 $_POST['password'] = 'dummy';
 
-$GLOBALS['COOKIE_PATH'] = '/ilias51_leifos/';
+$GLOBALS['COOKIE_PATH'] = '/';
 
 
 require_once("Services/Init/classes/class.ilInitialisation.php");

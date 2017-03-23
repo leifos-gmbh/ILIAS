@@ -19,6 +19,10 @@ define('AUTH_OPENID',10);
 
 define ("AUTH_APACHE",11);
 
+// patch skyguide_auth
+define('AUTH_APACHE_PLUGIN',13);
+// patch skyguide_auth
+
 define ("AUTH_INACTIVE",18);
 
 define('AUTH_MULTIPLE',20);

@@ -259,6 +259,39 @@ class ilObjMediaObjectGUI extends ilObjectGUI
 			$format = new ilNonEditableValueGUI($lng->txt("cont_format"), "standard_format");
 			$format->setValue($std_item->getFormat());
 			$this->form_gui->addItem($format);
+			
+			// uzk-patch: begin
+			$lng->loadLanguageModule('mcst');
+			include_once("./Services/MediaObjects/classes/class.ilFFmpeg.php");
+			if (ilFFmpeg::enabled())
+			{
+				global $ilToolbar;
+				
+				$med = $std_item;
+				if (is_object($med))
+				{
+					if (ilFFmpeg::supportsImageExtraction($med->getFormat()))
+					{
+						// second
+						include_once("./Services/Form/classes/class.ilTextInputGUI.php");
+						$ni = new ilTextInputGUI($this->lng->txt("mcst_second"), "sec");
+						$ni->setMaxLength(4);
+						$ni->setSize(4);
+						$ni->setValue(1);
+						$ilToolbar->addInputItem($ni, true);
+						
+						$ilToolbar->addFormButton($this->lng->txt("mcst_extract_preview_image"), "extractPreviewImage");
+						$ilToolbar->setFormAction($ilCtrl->getFormAction($this));
+					}
+				}
+				
+				// preview picure
+				$pp = new ilImageFileInputGUI($lng->txt("mcst_preview_picture"), "preview_pic");
+				$pp->setSuffixes(array("png", "jpeg", "jpg"));
+				$pp->setInfo($lng->txt("mcst_preview_picture_info")." mp4, mp3, png, jp(e)g, gif");
+				$this->form_gui->addItem($pp);
+			}
+			// uzk-patch: end
 		}
 		
 		// standard size
@@ -509,6 +542,20 @@ class ilObjMediaObjectGUI extends ilObjectGUI
 			$values["standard_type"] = "Reference";
 			$values["standard_reference"] = $std_item->getLocation();
 		}
+		
+		// uzk-patch: begin
+		include_once("./Services/MediaObjects/classes/class.ilObjMediaObjectGUI.php");
+		$mob = $this->object;
+		
+		// preview
+		$ppic = $mob->getVideoPreviewPic();
+		if ($ppic != "")
+		{
+			$i = $this->form_gui->getItemByPostVar("preview_pic");
+			$i->setImage($ppic);
+		}
+		// uzk-patch: end
+		
 		$values["standard_format"] = $std_item->getFormat();
 		$values["standard_width_height"]["width"] = $std_item->getWidth();
 		$values["standard_width_height"]["height"] = $std_item->getHeight();
@@ -1153,6 +1200,21 @@ class ilObjMediaObjectGUI extends ilObjectGUI
 			include_once("./Services/MediaObjects/classes/class.ilMediaSvgSanitizer.php");
 			ilMediaSvgSanitizer::sanitizeDir(ilObjMediaObject::_getDirectory($this->object->getId()));	// see #20339
 
+			// uzk-patch: begin
+			$prevpic = $this->form_gui->getInput("preview_pic");
+			if ($prevpic["size"] > 0)
+			{
+				$this->object->uploadVideoPreviewPic($prevpic);
+			}
+			else
+			{
+				$prevpici = $this->form_gui->getItemByPostVar("preview_pic");
+				if ($prevpici->getDeletionFlag())
+				{
+					$this->object->removeAdditionalFile($this->object->getVideoPreviewPic(true));
+				}
+			}
+			// uzk-patch: end
 			$this->object->update();
 			ilUtil::sendSuccess($lng->txt("msg_obj_modified"), true);
 			$this->ctrl->redirect($this, "edit");
@@ -1163,8 +1225,60 @@ class ilObjMediaObjectGUI extends ilObjectGUI
 			$tpl->setContent($this->form_gui->getHTML());
 		}
 	}
-
-
+	
+	// uzk-patch: begin
+	/**
+	 * Extract preview image
+	 *
+	 * @param
+	 * @return
+	 */
+	function extractPreviewImageObject()
+	{
+		include_once("./Services/MediaObjects/classes/class.ilObjMediaObjectGUI.php");
+		$mob = $this->object; 
+		
+		try
+		{
+			$sec = (int) $_POST["sec"];
+			if ($sec < 0)
+			{
+				$sec = 0;
+			}
+			if ($mob->getVideoPreviewPic() != "")
+			{
+				$mob->removeAdditionalFile($mob->getVideoPreviewPic(true));
+			}
+			include_once("./Services/MediaObjects/classes/class.ilFFmpeg.php");
+			$med = $mob->getMediaItem("Standard");
+			$mob_file = ilObjMediaObject::_getDirectory($mob->getId())."/".$med->getLocation();
+			$new_file = ilFFmpeg::extractImage($mob_file, "mob_vpreview.png", ilObjMediaObject::_getDirectory($mob->getId()), $sec);
+			
+			if ($new_file != "")
+			{
+				ilUtil::sendInfo($this->lng->txt("mcst_image_extracted"), true);
+			}
+			else
+			{
+				ilUtil::sendFailure($this->lng->txt("mcst_no_extraction_possible"), true);
+			}
+		}
+		catch (ilException $e)
+		{
+			if (DEVMODE == 1)
+			{
+				$ret = ilFFmpeg::getLastReturnValues();
+				$add = (is_array($ret) && count($ret) > 0)
+					? "<br />".implode($ret, "<br />")
+					: "";
+			}
+			ilUtil::sendFailure($e->getMessage().$add, true);
+		}
+		
+		$this->ctrl->redirect($this, "edit");
+	}
+	// uzk-patch: end
+	
 	/**
 	* administrate files of media object
 	*/

@@ -2382,10 +2382,21 @@
 						<xsl:otherwise></xsl:otherwise>
 					</xsl:choose>
 				</xsl:variable>
-
+				<!--uzk-patch: begin-->
+				<!-- determine poster -->
+				<xsl:variable name="poster">
+					<xsl:choose>
+						<xsl:when test="$sizemode = 'mob' or $sizemode = 'alias'"><xsl:value-of select="//MediaObject[@Id=$cmobid]/MediaItem[@Purpose=$curPurpose]/Layout[1]/@Poster"/></xsl:when>
+						<xsl:otherwise></xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				<!--uzk-patch: end-->				
 				<xsl:call-template name="MOBTag">
 					<xsl:with-param name="data" select="$data" />
 					<xsl:with-param name="type" select="$type" />
+					<!--uzk-patch: begin-->				
+					<xsl:with-param name="poster" select="$poster" />
+					<!--uzk-patch: end-->
 					<xsl:with-param name="width" select="$width" />
 					<xsl:with-param name="height" select="$height" />
 					<xsl:with-param name="curPurpose" select="$curPurpose" />
@@ -2577,6 +2588,9 @@
 <xsl:template name="MOBTag">
 	<xsl:param name="data"/>
 	<xsl:param name="type"/>
+	<!--uzk-patch: begin-->
+	<xsl:param name="poster"/>
+	<!--uzk-patch: begin-->
 	<xsl:param name="width"/>
 	<xsl:param name="height"/>
 	<xsl:param name="cmobid"/>
@@ -2691,6 +2705,11 @@
 					<xsl:if test="$height != ''">
 						<xsl:attribute name="height"><xsl:value-of select="$height"/></xsl:attribute>
 					</xsl:if>
+					<xsl:attribute name="width"><xsl:value-of select="$width"/></xsl:attribute>
+					<!--uzk-patch: begin-->
+					<xsl:attribute name="poster"><xsl:value-of select="$poster"/></xsl:attribute>
+					<!--uzk-patch: end-->
+					<xsl:attribute name="height"><xsl:value-of select="$height"/></xsl:attribute>
 					<xsl:attribute name="type">application/x-shockwave-flash</xsl:attribute>
 					<xsl:attribute name="pluginspage">http://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash</xsl:attribute>
 					<xsl:attribute name="base"><xsl:value-of select="$base"/></xsl:attribute>
@@ -2950,6 +2969,13 @@
 				<xsl:if test="$height != ''">
 					<xsl:attribute name="height"><xsl:value-of select="$height"/></xsl:attribute>
 				</xsl:if>
+				<!--uzk-patch: begin-->
+				<xsl:if test="$poster != ''">
+					<xsl:attribute name="poster"><xsl:value-of select="$poster"/></xsl:attribute>
+				</xsl:if>
+				<!--uzk-patch: end-->
+				<xsl:attribute name="width"><xsl:value-of select="$width"/></xsl:attribute>
+				<xsl:attribute name="height"><xsl:value-of select="$height"/></xsl:attribute>
 				<xsl:if test="$mode != 'edit' and
 					(../MediaAliasItem[@Purpose = $curPurpose]/Parameter[@Name = 'autostart']/@Value = 'true' or
 					( not(../MediaAliasItem[@Purpose = $curPurpose]/Parameter) and

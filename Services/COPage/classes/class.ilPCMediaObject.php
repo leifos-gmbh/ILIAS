@@ -116,8 +116,8 @@ class ilPCMediaObject extends ilPageContent
 		$item_node->set_attribute("Purpose", "Standard");
 		$media_item = $this->getMediaObject()->getMediaItem("Standard");
 
-		$layout_node = $this->dom->create_element("Layout");
-		$layout_node = $item_node->append_child($layout_node);
+		$layout_node =& $this->dom->create_element("Layout");
+		
 		if ($media_item->getWidth() > 0)
 		{
 			//$layout_node->set_attribute("Width", $media_item->getWidth());
@@ -127,6 +127,15 @@ class ilPCMediaObject extends ilPageContent
 			//$layout_node->set_attribute("Height", $media_item->getHeight());
 		}
 		$layout_node->set_attribute("HorizontalAlign", "Left");
+		//uzk-patch: begin
+		if($this->getMediaObject()->getVideoPreviewPic() != '')
+		{
+			$layout_node->set_attribute("Poster", $this->getMediaObject()->getVideoPreviewPic());
+		}
+		
+		$layout_node =& $item_node->append_child($layout_node);
+		//uzk-patch: end
+		
 
 		// caption
 		if ($media_item->getCaption() != "")
@@ -173,7 +182,14 @@ class ilPCMediaObject extends ilPageContent
 			{
 				$layout_node->set_attribute("Height", $fullscreen_item->getHeight());
 			}
-
+//uzk-patch: begin
+			if($this->getMediaObject()->getVideoPreviewPic() != '')
+			{
+				$layout_node->set_attribute("Poster", $this->getMediaObject()->getVideoPreviewPic());
+			}
+//uzk-patch: end
+			
+			
 			// caption
 			if ($fullscreen_item->getCaption() != "")
 			{

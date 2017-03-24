@@ -17,19 +17,27 @@ img, .ilc_media_cont_MediaContainer, .mejs-container, .ilProfile{
 	page-break-inside: avoid !important;
 }
 
+.ilPosterFakePlayer{
+	position: relative;
+	page-break-inside: avoid;
+	background-size: 100% auto;
+	background: center top no-repeat;
+	max-width: 860px;
+}
+
 .ilFakePlayer{
 	position: relative;
 	background-color: black;
 	page-break-inside: avoid;
 }
 
-.ilFakePlayer .ilFakePlayerPlay{
+.ilFakePlayer, .ilPosterFakePlayer .ilFakePlayerPlay{
 	background: url('images/play_one.svg') center center no-repeat;
 	width: 100%;
 	height: 100%;
 }
 
-.ilFakePlayerText{
+.ilPosterFakePlayer .ilFakePlayerText{
 	color:white;
 	background-color: darkslategrey;
 	width: 100%;

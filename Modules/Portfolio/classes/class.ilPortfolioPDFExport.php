@@ -118,8 +118,32 @@ class ilPortfolioPDFExport
 		 * 		</object>
 		 * </video>
 		 */
-		$fake_player = '<div class="ilFakePlayer" style="width:$1px;height:$2px;"><div class="ilFakePlayerPlay"></div><div class="ilFakePlayerText">"$3"</div></div>';
-		$html = preg_replace('/<video.*width=\"([^"]*)\".*height=\"([^"]*)\".*>.*<source.*src=\"([^"]*)\".*type=\"([^"]*)\".*><\/video>/', $fake_player, $html);
+		
+		preg_match('/<video.*poster=\"([^"]*)\".*>/', $html, $match);
+		
+		if(count($match))
+		{
+			$poster = $match[1];
+			if(strlen($poster))
+			{
+				$data_dir = ilUtil::getWebspaceDir();
+				
+				$tmp_poster = explode($data_dir, $poster);
+				$mob_path = $tmp_poster[1];
+				
+				$preview_pic = $this->html_folder_path.''.$mob_path;
+				$fake_player = '<div class="ilPosterFakePlayer" style="width:$1px;height:$2px;background-image:url('.$preview_pic.');">
+				<div class="ilFakePlayerPlay"></div>
+				<div class="ilFakePlayerText">"$3"</div>
+				</div>';
+				$html        = preg_replace('/<video.*width=\"([^"]*)\".*height=\"([^"]*)\".*>.*<source.*src=\"([^"]*)\".*type=\"([^"]*)\".*><\/video>/', $fake_player, $html);
+			}
+		}
+		else
+		{
+			$fake_player = '<div class="ilFakePlayer" style="width:$1px;height:$2px;"><div class="ilFakePlayerPlay"></div><div class="ilFakePlayerText">"$3"</div></div>';
+			$html        = preg_replace('/<video.*width=\"([^"]*)\".*height=\"([^"]*)\".*>.*<source.*src=\"([^"]*)\".*type=\"([^"]*)\".*><\/video>/', $fake_player, $html);
+		}
 		$fake_player = '<div class="ilFakePlayer" style="width:$3px;height:$1px;"><div class="ilFakePlayerPlay"></div><div class="ilFakePlayerText">"$2"</div></div>';
 		$html = preg_replace('/<audio.*height=\"([^"]*)\".*src=\"([^"]*)\".*width=\"([^"]*)\"\/>/', $fake_player, $html);
 

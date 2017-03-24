@@ -710,7 +710,13 @@ class ilObjMediaObject extends ilObject
 					$halign = ($item->getHAlign() != "")
 						? "HorizontalAlign=\"".$item->getHAlign()."\""
 						: "";
-					$xml .= "<Layout $width $height $halign />";
+					
+					// uzk-patch: begin
+					$poster =  ($this->getVideoPreviewPic() != "")
+						? "Poster=\"".$this->getVideoPreviewPic()."\""
+						: "";
+					
+					$xml .= "<Layout $width $height $halign $poster />";
 
 					// Caption
 					if ($item->getCaption() != "")
@@ -768,8 +774,13 @@ class ilObjMediaObject extends ilObject
 					$halign = ($item->getHAlign() != "")
 						? "HorizontalAlign=\"".$item->getHAlign()."\""
 						: "";
-					$xml .= "<Layout $width $height $halign />";
-
+					// uzk-patch: begin
+					$poster =  ($this->getVideoPreviewPic() != "")
+						? "Poster=\"".$this->getVideoPreviewPic()."\""
+						: "";
+					
+					$xml .= "<Layout $width $height $halign $poster />";
+					// uzk-patch: end
 					// Caption
 					if ($item->getCaption() != "")
 					{
@@ -851,8 +862,13 @@ class ilObjMediaObject extends ilObject
 					$halign = ($item->getHAlign() != "")
 						? "HorizontalAlign=\"".$item->getHAlign()."\""
 						: "";
-					$xml .= "<Layout $width $height $halign />";
-
+					// uzk-patch: begin
+					$poster =  ($this->getVideoPreviewPic() != "")
+						? 'Poster="".$this->getVideoPreviewPic().""'
+						: "";
+					
+					$xml .= "<Layout $poster $width $height $halign />";
+					// uzk-patch: end
 					// Caption
 					if ($item->getCaption() != "")
 					{

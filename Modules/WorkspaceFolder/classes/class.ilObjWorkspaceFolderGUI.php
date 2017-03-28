@@ -127,6 +127,9 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 		global $tpl, $ilUser, $ilTabs, $ilCtrl;
 		
 		unset($_SESSION['clipboard']['wsp2repo']);
+		// patch uzk start
+		unset($_SESSION['clipboard']['repo2wsp']);
+		// patch uzk end
 		
 		// add new item
 		include_once "Services/Object/classes/class.ilObjectAddNewItemGUI.php";
@@ -152,28 +155,47 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 			$ilTabs->activateSubTab("content");
 		}
 		
-		$left = "";
-
-		// sub-folders
+		// patch uzk start
+		
 		if($this->node_id != $exp->getRoot() || $exp->hasFolders($this->node_id))
 		{
-			$exp->setTargetGet("wsp_id");
-			$exp->setSessionExpandVariable('wspexpand');
-			$exp->setExpand($this->node_id);
-			$exp->setExpandTarget($this->ctrl->getLinkTarget($this));
-
-			if ($_GET["wspexpand"] != "")
+			// toggled
+			if(isset($_GET["viewmode"]))
 			{
-				$exp->setExpand($_GET["wspexpand"]);
+				$new_state = (trim($_GET["viewmode"]) == "tree") 
+					? "tree"
+					: "flat";
+				ilSession::set("wsp_tree_mode", $new_state);	
+			}		
+
+			$toggle_state = (ilSession::get("wsp_tree_mode") == "tree")
+					? "flat"
+					: "tree";
+			$ilCtrl->setParameter($this, "viewmode", $toggle_state);
+			$tpl->setTreeFlatIcon($ilCtrl->getLinkTarget($this), $toggle_state);
+			$ilCtrl->setParameter($this, "viewmode", ilSession::get("wsp_tree_mode"));
+
+			if(ilSession::get("wsp_tree_mode") == "tree")
+			{		 		
+				// sub-folders				
+				$exp->setTargetGet("wsp_id");
+				$exp->setSessionExpandVariable('wspexpand');
+				$exp->setExpand($this->node_id);
+				$exp->setExpandTarget($this->ctrl->getLinkTarget($this));
+
+				if ($_GET["wspexpand"] != "")
+				{
+					$exp->setExpand($_GET["wspexpand"]);
+				}
+
+				$exp->highlightNode($this->node_id);
+				$exp->setOutput(0);
+
+				$tpl->setLeftNavContent($exp->getOutput());				
 			}
-
-			$exp->highlightNode($this->node_id);
-			$exp->setOutput(0);
-		
-			$left .= $exp->getOutput();
 		}
-
-		$tpl->setLeftNavContent($left);
+		
+		// patch uzk end
 	}
 	
 	function edit()
@@ -206,27 +228,42 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 		}
 
 		$current_node = $_REQUEST["item_ref_id"];
-		$parent_node = $this->tree->getParentId($current_node);
-
+		
+		// patch uzk start				
+		if(!$_SESSION['clipboard']['repo2wsp'])
+		{
+			$parent_node = $this->tree->getParentId($current_node);
+		}
+		else
+		{
+			$parent_node = $this->tree->getRootId();
+		}
+		// patch uzk end
+		
 		// on cancel or fail we return to parent node
 		$this->ctrl->setParameter($this, "wsp_id", $parent_node);
-
-		// check permission
-		$no_cut = array();
-		foreach ($this->tree->getSubTree($this->tree->getNodeData($current_node)) as $node)
+		
+		// patch uzk start				
+		if(!$_SESSION['clipboard']['repo2wsp'])
 		{
-			if (!$this->checkPermissionBool("delete", "", "", $node["wsp_id"]))
+			// check permission
+			$no_cut = array();
+			foreach ($this->tree->getSubTree($this->tree->getNodeData($current_node)) as $node)
 			{
-				$obj = ilObjectFactory::getInstanceByObjId($node["obj_id"]);
-				$no_cut[$node["wsp_id"]] = $obj->getTitle();
-				unset($obj);
+				if (!$this->checkPermissionBool("delete", "", "", $node["wsp_id"]))
+				{
+					$obj = ilObjectFactory::getInstanceByObjId($node["obj_id"]);
+					$no_cut[$node["wsp_id"]] = $obj->getTitle();
+					unset($obj);
+				}
+			}	
+			if (count($no_cut))
+			{
+				ilUtil::sendFailure($this->lng->txt("msg_no_perm_cut")." ".implode(',', $no_cut), true);
+				$this->ctrl->redirect($this);
 			}
-		}
-		if (count($no_cut))
-		{
-			ilUtil::sendFailure($this->lng->txt("msg_no_perm_cut")." ".implode(',', $no_cut), true);
-			$this->ctrl->redirect($this);
-		}
+		}					
+		// patch uzk start
 
 		// open current position
 		// using the explorer session storage directly is basically a hack
@@ -269,12 +306,31 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 			ilUtil::sendFailure($this->lng->txt("no_checkbox"), true);
 			$this->ctrl->redirect($this);
 		}
-
+		
 		$current_node = $_REQUEST["item_ref_id"];
-		$owner = $this->tree->lookupOwner($current_node);
+		
+		// patch uzk start
+		if(!$_SESSION['clipboard']['repo2wsp'])
+		{
+			$owner = $this->tree->lookupOwner($current_node);
+		}
+		else
+		{
+			$owner = ilObject::_lookupOwner(ilObject::_lookupObjId($current_node));
+		}
+		// patch uzk end		
 		if($owner == $ilUser->getId())
 		{		
-			$parent_node = $this->tree->getParentId($current_node);
+			// patch uzk start				
+			if(!$_SESSION['clipboard']['repo2wsp'])
+			{
+				$parent_node = $this->tree->getParentId($current_node);
+			}
+			else
+			{
+				$parent_node = $this->tree->getRootId();
+			}
+			// patch uzk end
 
 			// on cancel or fail we return to parent node
 			$this->ctrl->setParameter($this, "wsp_id", $parent_node);
@@ -354,8 +410,15 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 		global $ilTabs, $tree;
 		
 		$ilTabs->clearTargets();
-
-		if(!$_SESSION['clipboard']['shared'])
+		
+		// patch uzk start				
+		if($_SESSION['clipboard']['repo2wsp'])
+		{
+			$ilTabs->setBackTarget($this->lng->txt('back'),
+				$this->ctrl->getLinkTargetByClass("ilObjectOwnershipManagementGUI"));
+		}		
+		else if(!$_SESSION['clipboard']['shared'])
+		// patch uzk end
 		{
 			$ilTabs->setBackTarget($this->lng->txt('back'),
 				$this->ctrl->getLinkTarget($this));
@@ -432,7 +495,7 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 	 */
 	function performPasteIntoMultipleObjects()
 	{
-		global $ilUser;
+		global $ilUser, $ilAccess;
 		
 		$mode = $_SESSION['clipboard']['cmd'];
 		$source_node_id = $_SESSION['clipboard']['source_id'];
@@ -450,8 +513,18 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 		}
 
 		// object instances
-		$source_obj_id = $this->tree->lookupObjectId($source_node_id);
-		$source_object = ilObjectFactory::getInstanceByObjId($source_obj_id);
+		// patch uzk start
+		if(!$_SESSION['clipboard']['repo2wsp'])
+		{	
+			$source_obj_id = $this->tree->lookupObjectId($source_node_id);
+			$source_object = ilObjectFactory::getInstanceByObjId($source_obj_id);
+		}
+		else
+		{
+			$source_obj_id = ilObject::_lookupObjId($source_node_id);
+			$source_object = ilObjectFactory::getInstanceByRefId($source_node_id);
+		}
+		// patch uzk end
 		
 		if(!$_SESSION['clipboard']['wsp2repo'])
 		{		
@@ -479,29 +552,52 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 			$fail[] = sprintf($this->lng->txt('msg_obj_may_not_contain_objects_of_type'),
 					$target_object->getTitle(), $source_object->getType());
 		}
-				
-		// if object is shared permission to copy has been checked above
-		$owner = $this->tree->lookupOwner($source_node_id);			
-		if($mode == "copy" && $ilUser->getId() == $owner && !$this->checkPermissionBool('copy', '', '', $source_node_id))
-		{
-			$fail[] = $this->lng->txt('permission_denied');
-		}
-
-		if(!$_SESSION['clipboard']['wsp2repo'])
-		{
-			if($mode == "cut" && $this->tree->isGrandChild($source_node_id, $target_node_id))
+		
+		// patch uzk start
+		if(!$_SESSION['clipboard']['repo2wsp'])
+		{	
+			// if object is shared permission to copy has been checked above
+			$owner = $this->tree->lookupOwner($source_node_id);			
+			if($mode == "copy" && $ilUser->getId() == $owner && !$this->checkPermissionBool('copy', '', '', $source_node_id))
 			{
-				$fail[] = sprintf($this->lng->txt('msg_paste_object_not_in_itself'),
-					$source_object->getTitle());
-			}			
-		}
-									
-		if(!$this->checkPermissionBool('create', '', $source_object->getType(), $target_node_id))
-		{
-			$fail[] = sprintf($this->lng->txt('msg_no_perm_paste_object_in_folder'),
-				$source_object->getTitle(), $target_object->getTitle());
-		}		
+				$fail[] = $this->lng->txt('permission_denied');
+			}
+				
+			// wsp to wsp
+			if(!$_SESSION['clipboard']['wsp2repo'])
+			{			
+				if($mode == "cut" && $this->tree->isGrandChild($source_node_id, $target_node_id))
+				{
+					$fail[] = sprintf($this->lng->txt('msg_paste_object_not_in_itself'),
+						$source_object->getTitle());
+				}
 
+				if(!$this->checkPermissionBool('create', '', $source_object->getType(), $target_node_id))
+				{
+					$fail[] = sprintf($this->lng->txt('msg_no_perm_paste_object_in_folder'),
+						$source_object->getTitle(), $target_object->getTitle());
+				}
+			}
+			// wsp to repo
+			else
+			{									
+				if(!$ilAccess->checkAccess('create', '', $target_node_id, $source_object->getType()))
+				{
+					$fail[] = sprintf($this->lng->txt('msg_no_perm_paste_object_in_folder'),
+						$source_object->getTitle(), $target_object->getTitle());
+				}
+			}
+		}
+		// repo to wsp
+		else
+		{
+			if(!$ilAccess->checkAccess('delete', '', $source_node_id, $source_object->getType()))
+			{
+				$fail[] = sprintf($this->lng->txt('permission_denied'));
+			}
+		}
+		// patch uzk end
+		
 		if(sizeof($fail))
 		{
 			ilUtil::sendFailure(implode("<br />", $fail), true);
@@ -512,10 +608,26 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 		// move the node
 		if($mode == "cut")
 		{		
-			if(!$_SESSION['clipboard']['wsp2repo'])
+			// patch uzk start			
+			// repo to wsp
+			if($_SESSION['clipboard']['repo2wsp'])
+			{
+				// remove from repository
+				global $tree;								
+				$tree->deleteTree($tree->getNodeData($source_node_id));								
+				$source_object->removeReferenceOnly();
+			
+				// insert into workspace tree				
+				$new_obj_node_id = $this->tree->insertObject($target_node_id, $source_obj_id);
+				$this->getAccessHandler()->setPermissions($target_node_id, $new_obj_node_id);				
+			}						
+			// wsp to wsp
+			else if(!$_SESSION['clipboard']['wsp2repo'])			
 			{
 				$this->tree->moveTree($source_node_id, $target_node_id);
-			}
+			}			
+			// wsp to repo
+			// patch uzk end
 			else
 			{
 				$parent_id = $this->tree->getParentId($source_node_id);
@@ -549,8 +661,29 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 			$wizard_options->saveRoot($source_node_id);						
 			$wizard_options->read();
 			
-			$new_obj = $source_object->cloneObject($target_node_id, $copy_id);	
-			
+			// patch uzk start
+			//$new_obj = $source_object->cloneObject($target_node_id, $copy_id);
+			if(!$_SESSION['clipboard']['repo2wsp'])
+			{
+				$new_obj = $source_object->cloneObject($target_node_id, $copy_id, !$_SESSION['clipboard']['wsp2repo']);	
+				
+				if($_SESSION['clipboard']['wsp2repo'] &&
+					method_exists($new_obj, "doWorkspaceToRepo"))
+				{
+					$source_object->doWorkspaceToRepo($new_obj);								
+				}		
+			}
+			else
+			{
+				$new_obj = $source_object->cloneObject($target_node_id, $copy_id, true);	
+				
+				if(method_exists($new_obj, "doRepoToWorkspace"))
+				{
+					$source_object->doRepoToWorkspace($new_obj);	
+				}
+			}
+			// patch uzk end
+
 			// insert into workspace tree
 			if($new_obj && !$_SESSION['clipboard']['wsp2repo'])
 			{
@@ -577,6 +710,10 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 		unset($_SESSION['clipboard']['wsp2repo']);
 		unset($_SESSION['clipboard']['shared']);
 		
+		// patch uzk start
+		unset($_SESSION['clipboard']['repo2wsp']);
+		// patch uzk end
+		
 		// #17746
 		if($mode == 'cut')
 		{
@@ -586,14 +723,30 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 		{
 			ilUtil::sendSuccess($this->lng->txt('msg_cloned'), true);
 		}
-		
+
 		$this->ctrl->setParameter($this, "wsp_id", $redirect_node);
 		$this->ctrl->redirect($this);		 
 	}
-	
+
+	// patch uzk start
+	function copy_from_repository()
+	{
+		$_SESSION['clipboard']['repo2wsp'] = true;
+		$this->copy();
+	}
+
+	function cut_from_repository()
+	{
+		$_SESSION['clipboard']['repo2wsp'] = true;
+		$this->cut();
+	}
+	// patch uzk end
+
 	function shareFilter()
 	{
-		$this->share(false);
+		// patch uzk start
+		$this->share(true);
+		// patch uzk end
 	}
 	
 	function share($a_load_data = true)

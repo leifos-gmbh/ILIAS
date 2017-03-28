@@ -1365,58 +1365,55 @@ class ilObject
 
 
 	/**
-	* delete object or referenced object
-	* (in the case of a referenced object, object data is only deleted
-	* if last reference is deleted)
-	* This function removes an object entirely from system!!
-	*
- 	* @access	public
-	* @return	boolean	true if object was removed completely; false if only a references was removed
-	*/
-	// patch uzk start
-	function delete($a_force_referenced = false)	
+	 * delete object or referenced object
+	 * (in the case of a referenced object, object data is only deleted
+	 * if last reference is deleted)
+	 * This function removes an object entirely from system!!
+	 *
+	 * @access	public
+	 * @return	boolean	true if object was removed completely; false if only a references was removed
+	 */
+	function delete()
 	{
 		global $rbacadmin, $log, $ilDB;
 
 		$remove = false;
-		
-		if (!(bool)$a_force_referenced)
+
+		// delete object_data entry
+		if ((!$this->referenced) || ($this->countReferences() == 1))
 		{
-			// delete object_data entry
-			if ((!$this->referenced) || ($this->countReferences() == 1))
+			// check type match
+			$db_type = ilObject::_lookupType($this->getId());
+			if ($this->type != $db_type)
 			{
-				// check type match
-				$db_type = ilObject::_lookupType($this->getId());
-				if ($this->type != $db_type)
-				{
-					$message = "ilObject::delete(): Type mismatch. Object with obj_id: ".$this->id." ".
-						"was instantiated by type '".$this->type."'. DB type is: ".$db_type;
+				$message = "ilObject::delete(): Type mismatch. Object with obj_id: ".$this->id." ".
+					"was instantiated by type '".$this->type."'. DB type is: ".$db_type;
 
-					// write log entry
-					$log->write($message);
+				// write log entry
+				$log->write($message);
 
-					// raise error
-					$this->ilias->raiseError("ilObject::delete(): Type mismatch. (".$this->type."/".$this->id.")",$this->ilias->error_obj->WARNING);
-				}
+				// raise error
+				$this->ilias->raiseError("ilObject::delete(): Type mismatch. (".$this->type."/".$this->id.")",$this->ilias->error_obj->WARNING);
+			}
 
-				// delete entry in object_data
-				$q = "DELETE FROM object_data ".
-					"WHERE obj_id = ".$ilDB->quote($this->getId(), "integer");
-				$ilDB->manipulate($q);
+			// delete entry in object_data
+			$q = "DELETE FROM object_data ".
+				"WHERE obj_id = ".$ilDB->quote($this->getId(), "integer");
+			$ilDB->manipulate($q);
 
-				// delete long description
-				$query = "DELETE FROM object_description WHERE obj_id = ".
-					$ilDB->quote($this->getId(), "integer");
-				$ilDB->manipulate($query);
+			// delete long description
+			$query = "DELETE FROM object_description WHERE obj_id = ".
+				$ilDB->quote($this->getId(), "integer");
+			$ilDB->manipulate($query);
 
 			// write log entry
 			$log->write("ilObject::delete(), deleted object, obj_id: ".$this->getId().", type: ".
 				$this->getType().", title: ".$this->getTitle());
-			
-			// keep log of core object data 
+
+			// keep log of core object data
 			include_once "Services/Object/classes/class.ilObjectDataDeletionLog.php";
 			ilObjectDataDeletionLog::add($this);
-			
+
 			// remove news
 			include_once("./Services/News/classes/class.ilNewsItem.php");
 			$news_item = new ilNewsItem();
@@ -1424,59 +1421,57 @@ class ilObject
 			include_once("./Services/Block/classes/class.ilBlockSetting.php");
 			ilBlockSetting::_deleteSettingsOfBlock($this->getId(), "news");
 
-				include_once './Services/DidacticTemplate/classes/class.ilDidacticTemplateObjSettings.php';
-				ilDidacticTemplateObjSettings::deleteByObjId($this->getId());
+			include_once './Services/DidacticTemplate/classes/class.ilDidacticTemplateObjSettings.php';
+			ilDidacticTemplateObjSettings::deleteByObjId($this->getId());
 
-				/* remove notes (see infoscreen gui)
-				   as they can be seen as personal data we are keeping them for now
-				include_once("Services/Notes/classes/class.ilNote.php");
-				foreach(array(IL_NOTE_PRIVATE, IL_NOTE_PUBLIC) as $note_type)
-				{
-					foreach(ilNote::_getNotesOfObject($this->id, 0, $this->type, $note_type) as $note)
-					{
-						$note->delete();
-					}
-				}
-				*/
-
-				// BEGIN WebDAV: Delete WebDAV properties
-				$query = "DELETE FROM dav_property ".
-					"WHERE obj_id = ".$ilDB->quote($this->getId(),'integer');
-				$res = $ilDB->manipulate($query);
-				// END WebDAV: Delete WebDAV properties
-
-				include_once './Services/WebServices/ECS/classes/class.ilECSImport.php';
-				ilECSImport::_deleteByObjId($this->getId());
-				
-				include_once("Services/AdvancedMetaData/classes/class.ilAdvancedMDValues.php");
-				ilAdvancedMDValues::_deleteByObjId($this->getId());
-				
-				include_once("Services/Tracking/classes/class.ilLPObjSettings.php");
-				ilLPObjSettings::_deleteByObjId($this->getId());
-
-				$remove = true;
-			}
-			else
+			/* remove notes (see infoscreen gui)
+			   as they can be seen as personal data we are keeping them for now
+			include_once("Services/Notes/classes/class.ilNote.php");
+			foreach(array(IL_NOTE_PRIVATE, IL_NOTE_PUBLIC) as $note_type)
 			{
-				// write log entry
-				$log->write("ilObject::delete(), object not deleted, number of references: ".
-					$this->countReferences().", obj_id: ".$this->getId().", type: ".
-					$this->getType().", title: ".$this->getTitle());
+				foreach(ilNote::_getNotesOfObject($this->id, 0, $this->type, $note_type) as $note)
+				{
+					$note->delete();
+				}
 			}
+		    */
+
+			// BEGIN WebDAV: Delete WebDAV properties
+			$query = "DELETE FROM dav_property ".
+				"WHERE obj_id = ".$ilDB->quote($this->getId(),'integer');
+			$res = $ilDB->manipulate($query);
+			// END WebDAV: Delete WebDAV properties
+
+			include_once './Services/WebServices/ECS/classes/class.ilECSImport.php';
+			ilECSImport::_deleteByObjId($this->getId());
+
+			include_once("Services/AdvancedMetaData/classes/class.ilAdvancedMDValues.php");
+			ilAdvancedMDValues::_deleteByObjId($this->getId());
+
+			include_once("Services/Tracking/classes/class.ilLPObjSettings.php");
+			ilLPObjSettings::_deleteByObjId($this->getId());
+
+			$remove = true;
+		}
+		else
+		{
+			// write log entry
+			$log->write("ilObject::delete(), object not deleted, number of references: ".
+				$this->countReferences().", obj_id: ".$this->getId().", type: ".
+				$this->getType().", title: ".$this->getTitle());
 		}
 
 		// delete object_reference entry
-		if ($this->referenced || 
-			(bool)$a_force_referenced)
-		{			
+		if ($this->referenced)
+		{
 			include_once "Services/Object/classes/class.ilObjectActivation.php";
 			ilObjectActivation::deleteAllEntries($this->getRefId());
-			
+
 			// delete entry in object_reference
 			$query = "DELETE FROM object_reference ".
 				"WHERE ref_id = ".$ilDB->quote($this->getRefId(),'integer');
 			$res = $ilDB->manipulate($query);
-			
+
 			// write log entry
 			$log->write("ilObject::delete(), reference deleted, ref_id: ".$this->getRefId().
 				", obj_id: ".$this->getId().", type: ".
@@ -1508,6 +1503,59 @@ class ilObject
 		}
 
 		return $remove;
+	}
+
+	// patch uzk start
+	/**
+	 * Remove reference
+	 *
+	 * @param
+	 * @return
+	 */
+	function removeReferenceOnly()
+	{
+		global $ilDB, $log, $rbacadmin;
+
+		// delete object_reference entry
+		if ($this->referenced)
+		{
+			include_once "Services/Object/classes/class.ilObjectActivation.php";
+			ilObjectActivation::deleteAllEntries($this->getRefId());
+
+			// delete entry in object_reference
+			$query = "DELETE FROM object_reference ".
+				"WHERE ref_id = ".$ilDB->quote($this->getRefId(),'integer');
+			$res = $ilDB->manipulate($query);
+
+			// write log entry
+			$log->write("ilObject::delete(), reference deleted, ref_id: ".$this->getRefId().
+				", obj_id: ".$this->getId().", type: ".
+				$this->getType().", title: ".$this->getTitle());
+
+			// DELETE PERMISSION ENTRIES IN RBAC_PA
+			// DONE: method overwritten in ilObjRole & ilObjUser.
+			// this call only applies for objects in rbac (not usr,role,rolt)
+			// TODO: Do this for role templates too
+			$rbacadmin->revokePermission($this->getRefId(),0,false);
+
+			include_once "Services/AccessControl/classes/class.ilRbacLog.php";
+			ilRbacLog::delete($this->getRefId());
+
+			// Remove applied didactic template setting
+			include_once './Services/DidacticTemplate/classes/class.ilDidacticTemplateObjSettings.php';
+			ilDidacticTemplateObjSettings::deleteByRefId($this->getRefId());
+
+			// Remove desktop items
+			ilUtil::removeItemFromDesktops($this->getRefId());
+		}
+
+		// remove conditions
+		if ($this->referenced)
+		{
+			$ch = new ilConditionHandler();
+			$ch->delete($this->getRefId());
+			unset($ch);
+		}
 	}
 	// patch uzk end
 

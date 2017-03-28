@@ -1037,17 +1037,21 @@ class ilPersonalProfileGUI
 				$radg->addOption($op3);
 			}
 			$this->form->addItem($radg);
-			
+
+			// patch uzk start
+			/*
 			// #11773
 			if ($ilSetting->get('user_portfolios'))
 			{
 				// #10826
 				$prtf = "<br />".$lng->txt("user_profile_portfolio");
 				$prtf .= "<br /><a href=\"ilias.php?baseClass=ilPersonalDesktopGUI&cmd=jumpToPortfolio\">&raquo; ".
-					$lng->txt("user_portfolios")."</a>";	
+					$lng->txt("user_portfolios")."</a>";
 				$info .= $prtf;
 			}
-			
+			*/
+			// patch uzk end
+
 			$radg->setInfo($info);
 		}
 		else
@@ -1055,14 +1059,14 @@ class ilPersonalProfileGUI
 			$prtf = $lng->txt("user_profile_portfolio_selected");
 			$prtf .= "<br /><a href=\"ilias.php?baseClass=ilPersonalDesktopGUI&cmd=jumpToPortfolio&prt_id=".$portfolio_id."\">&raquo; ".
 				$lng->txt("portfolio")."</a>";
-			
+
 			$info = new ilCustomInputGUI($lng->txt("user_activate_public_profile"));
-			$info->setHTML($prtf);			
+			$info->setHTML($prtf);
 			$this->form->addItem($info);
 		}
-		
+
 		$this->showPublicProfileFields($this->form, $ilUser->prefs);
-		
+
 		$this->form->addCommandButton("savePublicProfile", $lng->txt("save"));
 	}
 

@@ -564,14 +564,21 @@ class ilMailSearchCoursesGUI
 		}
 	}
 	
-	function share()
+	// patch uzk start
+	
+	function shareAndNotify()
+	{
+		$this->share(true);
+	}
+	
+	function share($a_notify = false)
 	{
 		if ($_GET["view"] == "mycourses")
 		{
 			$ids = $_REQUEST["search_crs"];
 			if (sizeof($ids))
 			{
-				$this->addPermission($ids);
+				$this->addPermission($ids, $a_notify);					
 			}
 			else
 			{
@@ -584,7 +591,7 @@ class ilMailSearchCoursesGUI
 			$ids = $_REQUEST["search_members"];
 			if (sizeof($ids))
 			{
-				$this->addPermission($ids);
+				$this->addPermission($ids, $a_notify);					
 			}
 			else
 			{
@@ -595,10 +602,10 @@ class ilMailSearchCoursesGUI
 		else
 		{
 			$this->showMyCourses();
-		}
+		}		
 	}
 	
-	protected function addPermission($a_obj_ids)
+	protected function addPermission($a_obj_ids, $a_notify = false)
 	{
 		if(!is_array($a_obj_ids))
 		{
@@ -616,9 +623,17 @@ class ilMailSearchCoursesGUI
 		}
 		
 		if($added)
-		{
+		{							
+			if($a_notify)
+			{
+				include_once "Services/Contact/classes/class.ilMailSearchGUI.php";
+				ilMailSearchGUI::sendShareNotification($this->wsp_access_handler, $this->wsp_node_id, $a_obj_ids);
+			}
+							
 			ilUtil::sendSuccess($this->lng->txt("wsp_share_success"), true);
-		}
-		$this->ctrl->redirectByClass("ilworkspaceaccessgui", "share");		
+		}	
+		$this->ctrl->redirectByClass("ilworkspaceaccessgui", "share");				
 	}
+	
+	// patch uzk end	
 }

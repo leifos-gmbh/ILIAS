@@ -120,6 +120,10 @@ class ilMailSearchCoursesMembersTableGUI extends ilTable2GUI
 			$this->setSelectAllCheckbox('search_members[]');
 			$this->lng->loadLanguageModule("wsp");
 			$this->addMultiCommand('share', $this->lng->txt("wsp_share_with_members"));
+
+			// patch uzk start
+			$this->addMultiCommand('shareAndNotify',$this->lng->txt('wsp_share_with_members_and_notify'));
+			// patch uzk end
 		}
 		$this->lng->loadLanguageModule('buddysystem');
 

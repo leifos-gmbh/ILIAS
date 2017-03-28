@@ -62,7 +62,7 @@ class ilTable2GUI extends ilTableGUI
 	 * @var string
 	 */
 	protected $row_selector_label;
-
+	
 	// patch uzk start		
 	protected $persistent_filters; // [bool]
 	// patch uzk end
@@ -1526,7 +1526,7 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 		{
 			return true;
 		}
-
+		
 		// patch uzk start
 		global $ilCtrl;
 		if((bool)$this->ajax_pages && !$ilCtrl->isAsynch())
@@ -2410,7 +2410,7 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 				$this->tpl->setVariable("BLK_CLASS", "Block");
 			}
 			$this->tpl->parseCurrentBlock();
-			
+
 			// top navigation, if number info or linkbar given
 			if ($numinfo != "" || $linkbar != "" || $column_selector != "" ||
 				count($this->filters) > 0 || count($this->optional_filters) > 0)
@@ -2427,7 +2427,7 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 					}
 					$this->tpl->parseCurrentBlock();
 
-					
+
 					if (!$this->getDisableFilterHiding())
 					{
 						$this->tpl->setCurrentBlock("filter_deactivation");
@@ -2440,7 +2440,7 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 						}
 						$this->tpl->parseCurrentBlock();
 					}
-					
+
 				}
 				
 				if ($numinfo != "" && $this->getEnableNumInfo())
@@ -2526,7 +2526,7 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 	function getLinkbar($a_num)
 	{
 		global $ilCtrl, $lng, $ilUser;
-
+		
 		// patch uzk start
 		if((bool)$this->ajax_pages)
 		{			
@@ -2932,7 +2932,12 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 		{
 			include_once("./Services/Table/classes/class.ilTablePropertiesStorage.php");
 			$tab_prop = new ilTablePropertiesStorage();
-
+			// uzk patch start
+			if ($value == null)
+			{
+				$value = "";
+			}
+			// uzk patch end
 			$tab_prop->storeProperty($this->getId(), $ilUser->getId(), $type, $value);
 		}
 	}
@@ -3554,8 +3559,8 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 			$this->rows_selector_off = true;
 		}
 	}
-	// patch uzk start
 
+	// patch uzk start
 	public function enablePersistentFilters($a_value)
 	{
 		$this->persistent_filters = $a_value;
@@ -3589,7 +3594,6 @@ echo "ilTabl2GUI->addSelectionButton() has been deprecated with 4.2. Please try 
 	{
 		$this->ajax_pages = (bool)$a_value;
 	}
-
 	// patch uzk end
 }
 

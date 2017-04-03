@@ -14,6 +14,21 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+user#:#has_role#:#Role
+user#:#criteria#:#Criteria
+user#:#starting_point#:#Starting Point
+user#:#user_role_starting_point#:#User - Starting Point
+user#:#roles_without_starting_point#:#Roles without defined starting point:
+user#:#all_roles_has_starting_point#:#All the roles have starting points
+user#:#starting_page#:#Starting Point
+user#:#starting_points#:#Starting Points
+user#:#user_chooses_starting_page#:#User Chooses Starting Point
+user#:#save_order#:#Save Order
+user#:#editing_this_role#:#Role
+user#:#create_starting_point#:#Create Rule
+user#:#starting_point_settings#:#Starting Point Settings
+user#:#confirm_delete_starting_point#:#Are you sure you want to delete this rule?
+user#:#back_to_starting_points_list#:#Back to Starting Points
 acc#:#acc_access_key#:#Access Key
 acc#:#acc_access_keys#:#Access Keys
 acc#:#acc_comp_frm#:#Forum
@@ -16221,18 +16236,3 @@ copg#:#copg_confirm_el_deletion#:#Do you really want to delete the selected elem
 survey#:#msg_input_only_positive_numbers#:#Please enter positive numbers in scale values.
 crs#:#crs_loc_err_stat_tst_offline#:#Not all tests are online.
 itgr#:#itgr_desc_info#:#The description will not be a part of the item group's presentation in its container.
-administration#:#has_role#:#Has role
-administration#:#criteria#:#Criteria
-administration#:#starting_point#:#Start Point
-administration#:#user_role_starting_point#:#User - Role starting point
-administration#:#roles_without_starting_point#:#Roles without defined starting point:
-administration#:#all_roles_has_starting_point#:#All the roles have starting points
-administration#:#starting_page#:#Start Page
-administration#:#starting_points#:#Starting points
-administration#:#user_chooses_starting_page#:#User Chooses the starting page
-administration#:#save_order#:#Save order
-administration#:#editing_this_role#:#Editing this Role
-administration#:#create_starting_point#:#Create starting point
-administration#:#starting_point_settings#:#Starting Point Settings
-administration#:#confirm_delete_starting_point#:#Are you sure you want to delete this starting point?
-administration#:#back_to_starting_points_list#:#Back to starting points

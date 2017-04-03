@@ -29,6 +29,7 @@ class ilUserStartingPointGUI
 		$this->lng = $lng;
 		$this->tpl = $tpl;
 		$this->parent_ref_id = $a_parent_ref_id;
+		$this->lng->loadLanguageModule("administration");
 
 	}
 	function &executeCommand()

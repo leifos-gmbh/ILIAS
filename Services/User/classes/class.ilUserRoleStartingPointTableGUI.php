@@ -128,7 +128,7 @@ class ilUserRoleStartingPointTableGUI extends ilTable2GUI
 			$object_id = ilObject::_lookupObjId($reference_id);
 			$type = $dc->lookupType($object_id);
 			$title = $dc->lookupTitle($object_id);
-			$starting_point = $this->lng->txt("type").": ".$type." ".$this->lng->txt("ref_id")." ".$reference_id." ".$this->lng->txt("title")."<i>\"".$title."\"</i>";
+			$starting_point = $this->lng->txt("obj_".$type)." "."<i>\"".$title."\" ($reference_id)</i>";
 		}
 
 		$result[] = array (
@@ -177,7 +177,7 @@ class ilUserRoleStartingPointTableGUI extends ilTable2GUI
 			$this->tpl->setVariable("VAL_ID", "position[".$a_set['id']."]");
 			$this->tpl->setVariable("VAL_POS", $a_set["starting_position"]);
 
-			$this->tpl->setVariable("TXT_TITLE", $this->lng->txt("has_role").":".$a_set["criteria"]);
+			$this->tpl->setVariable("TXT_TITLE", $this->lng->txt("has_role").": ".$a_set["criteria"]);
 		}
 		else
 		{

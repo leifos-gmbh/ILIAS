@@ -3798,7 +3798,7 @@
 <xsl:template match="Grid">
 	<xsl:call-template name="EditLabel"><xsl:with-param name="text"><xsl:value-of select="//LVs/LV[@name='pc_grid']/@value"/></xsl:with-param></xsl:call-template>
 	<xsl:call-template name="EditReturnAnchors"/>
-	<div class="row">
+	<div class="row row-flex row-flex-wrap">
 		<xsl:apply-templates select="GridCell"/>
 		<xsl:if test="$mode = 'edit'">
 			<!-- <xsl:value-of select="../@HierId"/> -->
@@ -3833,43 +3833,45 @@
 			<xsl:if test="@WIDTH_XL != ''"> col-lg-<xsl:value-of select="@WIDTH_XL"/></xsl:if>
 			<xsl:if test="@WIDTH_S = '' and @WIDTH_M = '' and @WIDTH_L = '' and @WIDTH_XL = ''">col-xs-12</xsl:if>
 		</xsl:attribute>
-		<xsl:if test="$mode = 'edit'">
-			<xsl:call-template name="EditReturnAnchors"/>
-			<xsl:call-template name="Icon">
-				<xsl:with-param name="img_src"><xsl:value-of select="$img_cell"/></xsl:with-param>
-				<xsl:with-param name="img_id">CONTENTg<xsl:value-of select="@HierId"/>:<xsl:value-of select="@PCID"/></xsl:with-param>
-			</xsl:call-template>
-			<div class="ilOverlay il_editmenu ilNoDisplay">
-				<xsl:attribute name="id">contextmenu_g<xsl:value-of select="@HierId"/></xsl:attribute>
-				<xsl:call-template name="GridCellMenu"/>
-			</div>
-		</xsl:if>
-		<!-- insert commands -->
-		<!-- <xsl:value-of select="@HierId"/> -->
-		<xsl:if test="$mode = 'edit'">
-			<!-- drop area (js) -->
-			<xsl:if test="$javascript = 'enable'">
-				<xsl:call-template name="DropArea">
-					<xsl:with-param name="hier_id"><xsl:value-of select="@HierId"/></xsl:with-param>
-					<xsl:with-param name="pc_id"><xsl:value-of select="@PCID"/></xsl:with-param>
+		<div class="flex-col flex-grow">
+			<xsl:if test="$mode = 'edit'">
+				<xsl:call-template name="EditReturnAnchors"/>
+				<xsl:call-template name="Icon">
+					<xsl:with-param name="img_src"><xsl:value-of select="$img_cell"/></xsl:with-param>
+					<xsl:with-param name="img_id">CONTENTg<xsl:value-of select="@HierId"/>:<xsl:value-of select="@PCID"/></xsl:with-param>
 				</xsl:call-template>
+				<div class="ilOverlay il_editmenu ilNoDisplay">
+					<xsl:attribute name="id">contextmenu_g<xsl:value-of select="@HierId"/></xsl:attribute>
+					<xsl:call-template name="GridCellMenu"/>
+				</div>
 			</xsl:if>
-			<!-- insert dropdown (no js) -->
-			<xsl:if test= "$javascript = 'disable'">
-				<select size="1" class="ilEditSelect">
-					<xsl:attribute name="name">command<xsl:value-of select="@HierId"/>
-					</xsl:attribute>
-					<xsl:call-template name="EditMenuInsertItems"/>
-				</select>
-				<input class="ilEditSubmit" type="submit">
-					<xsl:attribute name="value"><xsl:value-of select="//LVs/LV[@name='ed_go']/@value"/></xsl:attribute>
-					<xsl:attribute name="name">cmd[exec_<xsl:value-of select="@HierId"/>:<xsl:value-of select="@PCID"/>]</xsl:attribute>
-				</input>
-				<br/>
+			<!-- insert commands -->
+			<!-- <xsl:value-of select="@HierId"/> -->
+			<xsl:if test="$mode = 'edit'">
+				<!-- drop area (js) -->
+				<xsl:if test="$javascript = 'enable'">
+					<xsl:call-template name="DropArea">
+						<xsl:with-param name="hier_id"><xsl:value-of select="@HierId"/></xsl:with-param>
+						<xsl:with-param name="pc_id"><xsl:value-of select="@PCID"/></xsl:with-param>
+					</xsl:call-template>
+				</xsl:if>
+				<!-- insert dropdown (no js) -->
+				<xsl:if test= "$javascript = 'disable'">
+					<select size="1" class="ilEditSelect">
+						<xsl:attribute name="name">command<xsl:value-of select="@HierId"/>
+						</xsl:attribute>
+						<xsl:call-template name="EditMenuInsertItems"/>
+					</select>
+					<input class="ilEditSubmit" type="submit">
+						<xsl:attribute name="value"><xsl:value-of select="//LVs/LV[@name='ed_go']/@value"/></xsl:attribute>
+						<xsl:attribute name="name">cmd[exec_<xsl:value-of select="@HierId"/>:<xsl:value-of select="@PCID"/>]</xsl:attribute>
+					</input>
+					<br/>
+				</xsl:if>
 			</xsl:if>
-		</xsl:if>
-		<xsl:apply-templates select="PageContent"/>
-		<xsl:comment>End of Grid Cell</xsl:comment>
+			<xsl:apply-templates select="PageContent"/>
+			<xsl:comment>End of Grid Cell</xsl:comment>
+		</div>
 	</div>
 </xsl:template>
 

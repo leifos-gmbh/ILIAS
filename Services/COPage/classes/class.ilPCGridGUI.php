@@ -93,6 +93,7 @@ class ilPCGridGUI extends ilPageContentGUI
 		$form = new ilPropertyFormGUI();
 		$form->setFormAction($this->ctrl->getFormAction($this));
 		$form->setTitle($this->lng->txt("cont_ed_insert_grid"));
+		$form->setDescription($this->lng->txt("cont_ed_insert_grid_info"));
 
 		// number of cells
 		$ni = new ilNumberInputGUI($this->lng->txt("cont_grid_nr_cells"), "number_of_cells");
@@ -100,12 +101,18 @@ class ilPCGridGUI extends ilPageContentGUI
 		$ni->setSize(2);
 		$form->addItem($ni);
 
+		$sh = new ilFormSectionHeaderGUI();
+		$sh->setTitle($this->lng->txt("cont_ed_grid_col_width"));
+		$sh->setInfo($this->lng->txt("cont_ed_grid_col_width_info"));
+		$form->addItem($sh);
+
 		$options = array("" => "") + ilPCGrid::getWidths();
 
 		// widths
 		foreach (ilPCGrid::getSizes() as $s)
 		{
 			$si = new ilSelectInputGUI($this->lng->txt("cont_grid_width_".$s), $s);
+			$si->setInfo($this->lng->txt("cont_grid_width_".$s."_info"));
 			$si->setOptions($options);
 			$form->addItem($si);
 		}

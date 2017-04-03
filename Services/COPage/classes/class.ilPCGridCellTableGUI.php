@@ -38,7 +38,7 @@ class ilPCGridCellTableGUI extends ilTable2GUI
 		$this->addMultiCommand("confirmTabsDeletion", $lng->txt("delete"));
 		$this->addCommandButton("saveCellData", $lng->txt("save"));
 		
-		$this->setTitle($lng->txt("cont_tabs"));
+		$this->setTitle($lng->txt("cont_ed_grid_col_widths"));
 	}
 	
 	/**

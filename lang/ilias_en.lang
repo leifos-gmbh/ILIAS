@@ -14,17 +14,25 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
-content#:#cont_pc_grid#:#Grid
-content#:#cont_grid_nr_cells#:#Number of Cells
-content#:#cont_ed_insert_grid#:#Insert Grid
+content#:#cont_pc_grid#:#Column Layout
+content#:#cont_grid_nr_cells#:#Number of Columns
+content#:#cont_ed_insert_grid#:#Insert Column Layout
 content#:#cont_grid_width_s#:#Small
+content#:#cont_grid_width_s_info#:#E.g. smartphone
 content#:#cont_grid_width_m#:#Medium
+content#:#cont_grid_width_m_info#:#E.g. tablet
 content#:#cont_grid_width_l#:#Large
+content#:#cont_grid_width_l_info#:#E.g. desktop
 content#:#cont_grid_width_xl#:#Extra Large
-content#:#cont_add_cell#:#Add Cell
-content#:#cont_ed_delete_cell#:#Delete Cell
+content#:#cont_grid_width_xl_info#:#E.g. wide desktop
+content#:#cont_add_cell#:#Add Column
+content#:#cont_ed_delete_cell#:#Delete Column
 content#:#cont_ed_cell_left#:#Move Left
 content#:#cont_ed_cell_right#:#Move Right
+content#:#cont_ed_insert_grid_info#:#Adds a responsive column layout based on a grid with 12 units per row.
+content#:#cont_ed_grid_col_width#:#Column Width
+content#:#cont_ed_grid_col_width_info#:#Column width can span multiple 1/12 units of the row and depend on the overall screen size. Devices are given as examples. Their screen size determines the concrete behaviour. 12/12 equals to 100% width.
+content#:#cont_ed_grid_col_widths#:#Column Widths
 acc#:#acc_access_key#:#Access Key
 acc#:#acc_access_keys#:#Access Keys
 acc#:#acc_comp_frm#:#Forum

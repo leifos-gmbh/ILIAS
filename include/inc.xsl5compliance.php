@@ -45,25 +45,11 @@ function xslt_process(&$proc, $xml_var, $xslt_var, $dummy, $args, $params,
 	 */
 	$xslt = $proc->myProc;
 
-	$log = ilLoggerFactory::getLogger('copg');
-	$log->debug("--0--");
-	$log->debug(print_r($xml_var,true));
-	$log->debug(print_r($xslt_var,true));
-	$cargs = $args;
-	$cargs["/_xsl"] = substr($cargs["/_xsl"], 0, 2000);
-	$log->debug(print_r($cargs,true));
-	//var_dump($cargs); exit;
-
-	$log->debug(print_r($params,true));
-	$log->debug("--1--");
 
 //echo htmlentities($args[substr($xslt_var, 4)]);
 	$xslt_domdoc = new DomDocument();
-	$log->debug("--2--");
 	$xslt_domdoc->loadXML($args[substr($xslt_var, 4)]);
-	$log->debug("--3--");
 	$xslt->importStyleSheet($xslt_domdoc);
-	$log->debug("--4--");
 	if (is_array($params))
 	{
 		foreach ($params as $key => $value)
@@ -71,17 +57,13 @@ function xslt_process(&$proc, $xml_var, $xslt_var, $dummy, $args, $params,
 			$xslt->setParameter("", $key, (string)$value);
 		}
 	}
-	$log->debug("--5--");
 	// supress warnings all the time. (some lib xslt bring warnings due to & in links)
 	//if ($a_no_warnings)
 	//{
 		$xml_domdoc = new DomDocument();
-	$log->debug("--6--");
 		$xml_domdoc->loadXML($args[substr($xml_var, 4)]);
-	$log->debug("--7--");
 		// show warnings again due to discussion in #12866
 		$result = $xslt->transformToXML($xml_domdoc);
-	$log->debug("--8--");
 	//}
 	//else
 	//{

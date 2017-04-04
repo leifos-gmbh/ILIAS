@@ -67,3 +67,7 @@ if (!$ilDB->tableColumnExists("file_data", "locked_download"))
 }
 
 ?>
+<#6>
+<?php
+	$ilCtrlStructureReader->getStructure();
+?>

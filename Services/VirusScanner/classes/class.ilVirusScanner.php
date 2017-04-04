@@ -134,7 +134,8 @@ class ilVirusScanner
 
 		$this->ilias = & $ilias;
 		$this->lng = & $lng;
-		$this->log = & $log;
+		$this->log = ilLoggerFactory::getLogger('vira');
+		
 		$this->scanCommand = $a_scancommand;
 		$this->cleanCommand = $a_cleancommand;
 		
@@ -297,7 +298,7 @@ class ilVirusScanner
 		}
 		$mess .= ": " . ereg_replace("(\r|\n)+", "; ", $this->scanResult);
 
-		$this->log->write($mess);
+		$this->log->info($mess);
 	}
 	
 	/**
@@ -314,7 +315,7 @@ class ilVirusScanner
 		}
 		$mess .= ": " . ereg_replace("(\r|\n)+", "; ", $this->cleanResult);
 
-		$this->log->write($mess);
+		$this->log->info($mess);
 	}
 
 	/**

@@ -176,6 +176,10 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
             array (
                 0 => __DIR__ . '/..' . '/pimple/pimple/src',
             ),
+            'PhantomInstaller\\' => 
+            array (
+                0 => __DIR__ . '/..' . '/jakoch/phantomjs-installer/src',
+            ),
             'PHPExcel' => 
             array (
                 0 => __DIR__ . '/..' . '/phpoffice/phpexcel/Classes',
@@ -1608,6 +1612,7 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
         'PHPMailerOAuthGoogle' => __DIR__ . '/..' . '/phpmailer/phpmailer/class.phpmaileroauthgoogle.php',
         'POP3' => __DIR__ . '/..' . '/phpmailer/phpmailer/class.pop3.php',
         'Parser' => __DIR__ . '/../..' . '/../../Services/Utilities/classes/Parser.php',
+        'PhantomInstaller\\Installer' => __DIR__ . '/..' . '/jakoch/phantomjs-installer/src/PhantomInstaller/Installer.php',
         'Pimple\\Container' => __DIR__ . '/..' . '/pimple/pimple/src/Pimple/Container.php',
         'Pimple\\ServiceProviderInterface' => __DIR__ . '/..' . '/pimple/pimple/src/Pimple/ServiceProviderInterface.php',
         'Pimple\\Tests\\Fixtures\\Invokable' => __DIR__ . '/..' . '/pimple/pimple/src/Pimple/Tests/Fixtures/Invokable.php',
@@ -2988,6 +2993,7 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
         'ilAuthFrontendCLI' => __DIR__ . '/../..' . '/../../Services/Authentication/classes/Frontend/class.ilAuthFrontendCLI.php',
         'ilAuthFrontendCredentials' => __DIR__ . '/../..' . '/../../Services/Authentication/classes/Frontend/class.ilAuthFrontendCredentials.php',
         'ilAuthFrontendCredentialsApache' => __DIR__ . '/../..' . '/../../Services/Authentication/classes/Frontend/class.ilAuthFrontendCredentialsApache.php',
+        'ilAuthFrontendCredentialsCAS' => __DIR__ . '/../..' . '/../../Services/CAS/classes/class.ilAuthFrontendCredentialsCAS.php',
         'ilAuthFrontendCredentialsHTTP' => __DIR__ . '/../..' . '/../../Services/Authentication/classes/Frontend/class.ilAuthFrontendCredentialsHTTP.php',
         'ilAuthFrontendCredentialsLTI' => __DIR__ . '/../..' . '/../../Services/LTI/classes/InternalProvider/class.ilAuthFrontendCredentialsLTI.php',
         'ilAuthFrontendCredentialsSaml' => __DIR__ . '/../..' . '/../../Services/Saml/classes/class.ilAuthFrontendCredentialsSaml.php',
@@ -3008,6 +3014,7 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
         'ilAuthProvider' => __DIR__ . '/../..' . '/../../Services/Authentication/classes/Provider/class.ilAuthProvider.php',
         'ilAuthProviderAccountMigrationInterface' => __DIR__ . '/../..' . '/../../Services/Authentication/interfaces/interface.ilAuthProviderAccountMigrationInterface.php',
         'ilAuthProviderApache' => __DIR__ . '/../..' . '/../../Services/AuthApache/classes/class.ilAuthProviderApache.php',
+        'ilAuthProviderCAS' => __DIR__ . '/../..' . '/../../Services/CAS/classes/class.ilAuthProviderCAS.php',
         'ilAuthProviderDatabase' => __DIR__ . '/../..' . '/../../Services/Authentication/classes/Provider/class.ilAuthProviderDatabase.php',
         'ilAuthProviderECS' => __DIR__ . '/../..' . '/../../Services/WebServices/ECS/classes/class.ilAuthProviderECS.php',
         'ilAuthProviderFactory' => __DIR__ . '/../..' . '/../../Services/Authentication/classes/Provider/class.ilAuthProviderFactory.php',
@@ -3187,6 +3194,7 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
         'ilButton' => __DIR__ . '/../..' . '/../../Services/UIComponent/Button/classes/class.ilButton.php',
         'ilButtonBase' => __DIR__ . '/../..' . '/../../Services/UIComponent/Button/classes/class.ilButtonBase.php',
         'ilButtonToSplitButtonMenuItemAdapter' => __DIR__ . '/../..' . '/../../Services/UIComponent/SplitButton/classes/class.ilButtonToSplitButtonMenuItemAdapter.php',
+        'ilCASAttributeToUser' => __DIR__ . '/../..' . '/../../Services/CAS/classes/class.ilCASAttributeToUser.php',
         'ilCASAuth' => __DIR__ . '/../..' . '/../../Services/CAS/classes/class.ilCASAuth.php',
         'ilCASSettings' => __DIR__ . '/../..' . '/../../Services/CAS/classes/class.ilCASSettings.php',
         'ilCASSettingsGUI' => __DIR__ . '/../..' . '/../../Services/CAS/classes/class.ilCASSettingsGUI.php',

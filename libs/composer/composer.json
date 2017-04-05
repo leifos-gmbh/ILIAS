@@ -4,7 +4,8 @@
 	"license": "GPL v3",
 	"authors": [],
 	"config": {
-		"optimize-autoloader": true
+		"optimize-autoloader": true,
+		"bin-dir": "bin"
 	},
 	"require": {
 		"cweagans/composer-patches": "~1.0",
@@ -27,9 +28,6 @@
 		"league/flysystem": "^1.0",
 		"james-heinrich/getid3": "^1.9",
 		"jakoch/phantomjs-installer": "2.1.1-p05"
-	},
-	"config": {
-		"bin-dir": "bin"
 	},
 	"require-dev": {
 		"mikey179/vfsStream": "^1.6",

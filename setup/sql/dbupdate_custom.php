@@ -70,3 +70,15 @@ if(!$ilDB->tableColumnExists('comp_impl_int', 'consumer_dir'))
 <?php
 	$ilCtrlStructureReader->getStructure();
 ?>
+<#6>
+<?php
+if(!$ilDB->tableColumnExists('crs_settings', 'show_members_export'))
+{
+		$ilDB->addTableColumn('crs_settings', 'show_members_export', array(
+			"type" => "integer",
+			"notnull" => false,
+			"length" => 4
+		));
+}
+?>
+

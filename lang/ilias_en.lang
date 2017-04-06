@@ -14,6 +14,8 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+crs#:#crs_show_member_export#:#Participants List
+crs#:#crs_show_member_export_info#:#Course Members may print a list of participants.
 grp#:#grp_period#:#Veranstaltungszeitraum
 grp#:#grp_period_info#:#Information zum Start und Ende der Veranstaltung, die mit der Gruppe unterstützt werden soll.
 mem#:#mmbr_gallery_user_actions#:#Benutzeraktionen in Mitgliedergalerie

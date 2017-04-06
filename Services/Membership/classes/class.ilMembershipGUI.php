@@ -1446,6 +1446,8 @@ class ilMembershipGUI
 		}
 	}
 	
+	
+	
 	/**
 	 * Print members
 	 * @todo: refactor to own class
@@ -1457,9 +1459,20 @@ class ilMembershipGUI
 		$this->checkPermission('read');
 		
 		$ilTabs->clearTargets();
-		$ilTabs->setBackTarget(
-			$this->lng->txt('back'),
-			$this->ctrl->getLinkTarget($this, 'participants'));
+		
+		if($GLOBALS['ilAccess']->checkAccess('manage_members','',$this->getParentObject()->getId()))
+		{
+			$ilTabs->setBackTarget(
+				$this->lng->txt('back'),
+				$this->ctrl->getLinkTarget($this, 'participants'));
+		}
+		else
+		{
+			$ilTabs->setBackTarget(
+				$this->lng->txt('back'),
+				$this->ctrl->getLinkTarget($this, 'jump2UsersGallery'));
+		}
+		
 		
 		$list = $this->initAttendanceList();
 		$form = $list->initForm('printMembersOutput');
@@ -1481,6 +1494,15 @@ class ilMembershipGUI
 		$list->getFullscreenHTML();
 		exit();
 	}
+	
+	/**
+	 * 
+	 */
+	protected function jump2UsersGallery()
+	{
+		$this->ctrl->redirectByClass('ilUsersGalleryGUI');
+	}
+	
 	
 	
 	

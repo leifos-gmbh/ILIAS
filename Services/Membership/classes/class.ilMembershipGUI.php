@@ -283,7 +283,8 @@ class ilMembershipGUI
 					$cmd != 'membersMap'
 				)
 				{
-					$this->checkPermission('manage_members');
+					#$this->checkPermission('manage_members');
+					$this->checkPermission('read');
 				}
 				else
 				{
@@ -1453,7 +1454,7 @@ class ilMembershipGUI
 	{
 		global $ilTabs;
 		
-		$this->checkPermission('manage_members');
+		$this->checkPermission('read');
 		
 		$ilTabs->clearTargets();
 		$ilTabs->setBackTarget(

@@ -816,7 +816,7 @@ class ilMembershipGUI
 			}
 			$toolbar->addButton(
 				$this->lng->txt($this->getParentObject()->getType().'_print_list'),
-				$this->ctrl->getLinkTarget($this, 'printMembers')
+				$this->ctrl->getLinkTarget($this, 'printForMembersOutput')
 			);
 		}
 	}
@@ -1496,6 +1496,24 @@ class ilMembershipGUI
 	}
 	
 	/**
+	 * print members output
+	 */
+	protected function printForMembersOutput()
+	{		
+		$list = $this->initAttendanceList();
+		$list->setTitle($this->lng->txt('obj_'.$this->getParentObject()->getType()).': '.$this->getParentObject()->getTitle());
+		$list->setId(0);
+		$form = $list->initForm('printForMembersOutput');
+		$list->initFromForm();
+		$list->setCallback(array($this, 'getAttendanceListUserData'));	
+		$this->member_data = $this->getPrintMemberData($this->getMembersObject()->getParticipants());
+		$list->getNonMemberUserData($this->member_data);
+		
+		$list->getFullscreenHTML();
+		exit();
+	}
+
+	/**
 	 * 
 	 */
 	protected function jump2UsersGallery()
@@ -1509,7 +1527,7 @@ class ilMembershipGUI
 	/**
 	 * Init attendance list
 	 */
-	protected function initAttendanceList()
+	protected function initAttendanceList($a_for_members = false)
 	{
 		/**
 		 * @var ilWaitingList

@@ -279,6 +279,41 @@ class ilTabsGUI
 			"frame" => $a_frame, "dir_text" => true, "id" => $a_id, "cmdClass" => array());
 	}
 
+	// cdpatch start
+
+	/**
+	 * Set component
+	 *
+	 * @param	string	component
+	 */
+	function setContextInfo($a_comp, $a_screen = "")
+	{
+		$this->component = $a_comp;
+		$this->screen = $a_screen;
+	}
+
+	/**
+	 * Get component
+	 *
+	 * @return	string	component
+	 */
+	function getComponent()
+	{
+		return $this->component;
+	}
+
+	/**
+	 * Get screen
+	 *
+	 * @return	string	screen
+	 */
+	function getScreen()
+	{
+		return $this->screen;
+	}
+
+	// cdpatch end
+
 	/**
 	 * DEPRECATED.
 	 * @deprecated since version 5.2
@@ -407,7 +442,8 @@ class ilTabsGUI
 			{
 				$ui_plugin = ilPluginAdmin::getPluginObject(IL_COMP_SERVICE, "UIComponent", "uihk", $pl);
 				$gui_class = $ui_plugin->getUIClassInstance();
-				$resp = $gui_class->modifyGUI("", $a_get_sub_tabs ? "sub_tabs" : "tabs",
+				// cdpatch: replace "" with $this->getComponent()
+				$resp = $gui_class->modifyGUI($this->getComponent(), $a_get_sub_tabs ? "sub_tabs" : "tabs",
 					array("tabs" => $this));
 			}
 		}

@@ -2,6 +2,8 @@
 
 /* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
 
+include_once("./Services/Database/classes/class.ilDBAnalyzer.php");
+
 /**
  * This class handles all DB changes necessary for Carl Duisberg
  *

@@ -28,6 +28,9 @@ class ilUserQuery
 	private $users = array();
 	private $first_letter = '';
 	private $has_access = false;
+	// cdpatch start
+	public $company_id = 0;
+	// cdpatch end
 
 	private $default_fields = array(
 		"usr_id", 
@@ -338,6 +341,16 @@ class ilUserQuery
 			$where = " AND";
 		}
 
+		// cdpatch start
+		if ($this->company_id > 0)
+		{
+			$add = $where." company_id = ".$ilDB->quote($this->company_id, "integer");
+			$query.= $add;
+			$count_query.= $add;
+			$where = " AND";
+		}
+		// cdpatch end
+
 		if($this->has_access) //user is limited but has access
 		{
 			$unlimited = "time_limit_unlimited = ". $ilDB->quote(1, 'integer');
@@ -504,11 +517,12 @@ class ilUserQuery
 	 * Get data for user administration list.
 	 * @deprecated
 	 */
+	// cdpatch: added company id
 	public static function getUserListData($a_order_field, $a_order_dir, $a_offset, $a_limit,
 		$a_string_filter = "", $a_activation_filter = "", $a_last_login_filter = null,
 		$a_limited_access_filter = false, $a_no_courses_filter = false,
 		$a_course_group_filter = 0, $a_role_filter = 0, $a_user_folder_filter = null,
-		$a_additional_fields = '', $a_user_filter = null, $a_first_letter = "")
+		$a_additional_fields = '', $a_user_filter = null, $a_first_letter = "", $a_company_id = 0)
 	{
 	
 		$query = new ilUserQuery();
@@ -527,6 +541,9 @@ class ilUserQuery
 		$query->setAdditionalFields($a_additional_fields);
 		$query->setUserFilter($a_user_filter);
 		$query->setFirstLetterLastname($a_first_letter);
+		// cdpatch start
+		$query->company_id = $a_company_id;
+		// cdpatch end
 		return $query->query();
 	}
 }

@@ -250,6 +250,11 @@ class ilPersonalSettingsGUI
 	// init sub tabs
 	function __initSubTabs($a_cmd)
 	{
+
+		// cdpatch start
+		return;
+		// cdpatch end
+
 		/**
 		 * @var $rbacsystem ilRbacSystem
 		 */
@@ -322,7 +327,9 @@ class ilPersonalSettingsGUI
 		global $ilTabs, $ilUser;
 		
 		$this->__initSubTabs("showPersonalData");
-		$ilTabs->activateTab("password");
+
+		// cdpatch: out-commented next line
+		//$ilTabs->activateTab("password");
 
 		$this->setHeader();
 		// check whether password of user have to be changed
@@ -601,7 +608,8 @@ class ilPersonalSettingsGUI
 //			$ilCtrl->getLinkTargetByClass(array("ilmailgui","ilmailformgui"), "mailUser"));
 		
 		$this->__initSubTabs("showPersonalData");
-		$ilTabs->activateTab("general_settings");
+		// cdpatch: out-commented next line
+		//$ilTabs->activateTab("general_settings");
 
 		$this->setHeader();
 

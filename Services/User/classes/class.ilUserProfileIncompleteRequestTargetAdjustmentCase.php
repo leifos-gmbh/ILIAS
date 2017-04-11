@@ -23,8 +23,16 @@ class ilUserProfileIncompleteRequestTargetAdjustmentCase extends ilUserRequestTa
 	{
 		if(!isset($_GET['baseClass']) || strtolower($_GET['baseClass']) != 'ilpersonaldesktopgui')
 		{
+			// cdpatch: out-commented
 			return false;
 		}
+
+		// cdpatch start
+		if (strtolower($_GET['baseClass']) != 'iluihookplugingui')
+		{
+			return false;
+		}
+		// cdpatch end
 
 		return (
 			strtolower($this->ctrl->getCmdClass()) == 'ilpersonalprofilegui' &&

@@ -678,7 +678,8 @@ class ilPersonalProfileGUI
 	 */
 	function setHeader()
 	{
-		$this->tpl->setTitle($this->lng->txt('personal_profile'));
+		// cdpatch: outcommented next line
+		//$this->tpl->setTitle($this->lng->txt('personal_profile'));
 	}
 
 	//
@@ -693,8 +694,9 @@ class ilPersonalProfileGUI
 	function showPersonalData($a_no_init = false)
 	{
 		global $ilUser, $styleDefinition, $rbacreview, $ilias, $lng, $ilSetting, $ilTabs;
-		
-		$ilTabs->activateTab("personal_data");
+
+		// cdpatch: out-commented next line
+		//$ilTabs->activateTab("personal_data");
 
 		$settings = $ilias->getAllSettings();
 
@@ -775,9 +777,16 @@ class ilPersonalProfileGUI
 		include_once("./Services/User/classes/class.ilUserProfile.php");
 		$up = new ilUserProfile();
 		$up->skipField("password");
+		//cdpatch start
+		$up->skipField("company_password");
+		$up->skipField("password_addon");
+		//cdpatch end
 		$up->skipGroup("settings");
 		$up->skipGroup("preferences");
-		
+		//cdpatch start
+		$up->skipField("roles");
+		//cdpatch end
+
 		$up->setAjaxCallback(
 			$this->ctrl->getLinkTargetByClass('ilPublicUserProfileGUI', 'doProfileAutoComplete', '', true)
 		);
@@ -835,7 +844,14 @@ class ilPersonalProfileGUI
 								? $value->get(IL_CAL_DATE)
 								: "");							
 							break;
-					
+
+						// cdpatch start
+						case "usr_branch":
+						case "field_of_responsibility":
+						case "usr_field_of_responsibility":
+							break;
+						// cdpatch end
+
 						default:
 							$m = ucfirst($f);
 							if(isset($map[$f]))
@@ -848,6 +864,20 @@ class ilPersonalProfileGUI
 				}
 			}		
 			$ilUser->setFullname();
+			// cdpatch start
+			if ($this->workWithUserSetting("branch"))
+			{
+				$ilUser->setBranch($_POST["usr_branch"]);
+			}
+			if ($this->workWithUserSetting("field_of_responsibility"))
+			{
+				$ilUser->setFieldOfResponsibility($_POST["usr_field_of_responsibility"]);
+			}
+			if ($this->workWithUserSetting("profession"))
+			{
+				$ilUser->setProfession($_POST["usr_profession"]);
+			}
+			// cdpatch end
 
 			// check map activation
 			include_once("./Services/Maps/classes/class.ilMapUtil.php");

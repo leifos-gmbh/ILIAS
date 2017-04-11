@@ -44,6 +44,8 @@ function xslt_process(&$proc, $xml_var, $xslt_var, $dummy, $args, $params,
 	 * @var $xslt XSLTProcessor
 	 */
 	$xslt = $proc->myProc;
+
+
 //echo htmlentities($args[substr($xslt_var, 4)]);
 	$xslt_domdoc = new DomDocument();
 	$xslt_domdoc->loadXML($args[substr($xslt_var, 4)]);
@@ -55,7 +57,6 @@ function xslt_process(&$proc, $xml_var, $xslt_var, $dummy, $args, $params,
 			$xslt->setParameter("", $key, (string)$value);
 		}
 	}
-
 	// supress warnings all the time. (some lib xslt bring warnings due to & in links)
 	//if ($a_no_warnings)
 	//{

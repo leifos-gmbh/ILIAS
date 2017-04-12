@@ -276,7 +276,9 @@ class ilFFmpeg
 		$target_file = $target_dir."/".$a_target_filename;
 		
 		$sec = (int) $a_sec;
-		$cmd = "-y -i ".ilUtil::escapeShellArg($a_file)." -r 1 -f image2 -vframes 1 -ss ".$sec." ".ilUtil::escapeShellArg($target_file);
+		//uzk-patch: begin
+		$cmd = "-y  -ss ".$sec." -i ".ilUtil::escapeShellArg($a_file)." -r 1 -f image2 -vframes 1 ".ilUtil::escapeShellArg($target_file);
+		//uzk-patch: end
 //echo "-$cmd-"; exit;
 		$ret = self::exec($cmd." 2>&1");
 		self::$last_return = $ret;

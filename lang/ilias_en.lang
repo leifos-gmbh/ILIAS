@@ -14,6 +14,12 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+uzk#:#cont_ed_increase_size_10#:#Increase by 10% 
+uzk#:#cont_ed_decrease_size_10#:#Decrease by 10% 
+uzk#:#cont_ed_increase_size_5#:#Increase by 5% 
+uzk#:#cont_ed_decrease_size_5#:#Decrease by 5% 
+uzk#:#cont_ed_increase_size_1#:#Increase by 1% 
+uzk#:#cont_ed_decrease_size_1#:#Decrease by 1% 
 uzk#:#prtf_share#:#Share
 uzk#:#prtf_but_offline#:#, but offline
 uzk#:#adopt_mail#:#Share and Notify

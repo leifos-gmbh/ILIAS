@@ -2521,7 +2521,36 @@
 		<xsl:call-template name="EditMenuItem"><xsl:with-param name="command">copyToClipboard</xsl:with-param>
 		<xsl:with-param name="langvar">ed_copy_clip</xsl:with-param></xsl:call-template>
 	</xsl:if>
+<!--uzik-patch: begin-->
+	<xsl:call-template name="EditMenuItem">
+		<xsl:with-param name="command">increaseSize10</xsl:with-param>
+		<xsl:with-param name="langvar">ed_increase_size_10</xsl:with-param>
+	</xsl:call-template>
+	<xsl:call-template name="EditMenuItem">
+		<xsl:with-param name="command">increaseSize5</xsl:with-param>
+		<xsl:with-param name="langvar">ed_increase_size_5</xsl:with-param>
+	</xsl:call-template>
+
+	<xsl:call-template name="EditMenuItem">
+		<xsl:with-param name="command">increaseSize1</xsl:with-param>
+		<xsl:with-param name="langvar">ed_increase_size_1</xsl:with-param>
+	</xsl:call-template>
 	
+	<xsl:call-template name="EditMenuItem">
+		<xsl:with-param name="command">decreaseSize10</xsl:with-param>
+		<xsl:with-param name="langvar">ed_decrease_size_10</xsl:with-param>
+	</xsl:call-template>
+
+	<xsl:call-template name="EditMenuItem">
+		<xsl:with-param name="command">decreaseSize5</xsl:with-param>
+		<xsl:with-param name="langvar">ed_decrease_size_5</xsl:with-param>
+	</xsl:call-template>
+
+	<xsl:call-template name="EditMenuItem">
+		<xsl:with-param name="command">decreaseSize1</xsl:with-param>
+		<xsl:with-param name="langvar">ed_decrease_size_1</xsl:with-param>
+	</xsl:call-template>
+	<!--uzik-patch: end-->	
 </xsl:template>
 
 <!-- MOBs: Images -->

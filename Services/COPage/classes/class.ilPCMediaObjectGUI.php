@@ -1289,6 +1289,36 @@ class ilPCMediaObjectGUI extends ilPageContentGUI
 			$ilCtrl->setParameter($this, "subCmd", "");
 		}
 	}
-
+	// uzk-patch: begin
+	public function increaseSize10(){ $this->resizeFactor(+10); }
+	public function increaseSize5(){ $this->resizeFactor(+5); }
+	public function increaseSize1(){ $this->resizeFactor(+1); }
+	public function decreaseSize10(){ $this->resizeFactor(-10); }
+	public function decreaseSize5(){ $this->resizeFactor(-5); }
+	public function decreaseSize1(){ $this->resizeFactor(-1); }
+	
+	/**
+	 * resize by factor in percent
+	 * @param signed int $factor
+	 */
+	protected function resizeFactor($factor)
+	{
+		$mob = $this->content_obj->getMediaObject();
+		$med = $mob->getMediaItem("Standard");
+		
+		$org_width = $med->getWidth();
+		$org_height = $med->getHeight();
+		
+		$new_width  = ($org_width / 100) * (100 + ($factor));
+		$new_height = ($org_height / 100) * (100 + ($factor));
+		
+		$med->setWidth($new_width);
+		$med->setHeight($new_height);
+		$med->update();
+		
+		$_SESSION["il_pg_error"] = $this->pg_obj->update();
+		$this->ctrl->returnToParent($this, "jump".$this->hier_id);
+	}
+	// uzk-patch: end
 }
 ?>

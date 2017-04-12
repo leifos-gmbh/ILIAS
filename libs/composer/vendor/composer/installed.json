@@ -22,7 +22,7 @@
             "composer/composer": "~1.0",
             "phpunit/phpunit": "~4.6"
         },
-        "time": "2016-03-28T18:54:21+00:00",
+        "time": "2016-03-28 18:54:21",
         "type": "composer-plugin",
         "extra": {
             "class": "cweagans\\Composer\\Patches"
@@ -63,7 +63,7 @@
         "require": {
             "php": ">=5.2"
         },
-        "time": "2016-07-16T12:58:58+00:00",
+        "time": "2016-07-16 12:58:58",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -139,7 +139,7 @@
             "ruflin/elastica": "Allow sending log messages to an Elastic Search server",
             "sentry/sentry": "Allow sending log messages to a Sentry server"
         },
-        "time": "2016-07-29T03:23:52+00:00",
+        "time": "2016-07-29 03:23:52",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -191,7 +191,7 @@
             "ext-xmlwriter": "*",
             "php": ">=5.2.0"
         },
-        "time": "2015-05-01T07:00:55+00:00",
+        "time": "2015-05-01 07:00:55",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -248,7 +248,7 @@
         "require": {
             "php": ">=5.3.0"
         },
-        "time": "2015-09-11T15:10:35+00:00",
+        "time": "2015-09-11 15:10:35",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -296,7 +296,7 @@
         "require": {
             "php": ">=5.3.0"
         },
-        "time": "2012-03-14T16:36:15+00:00",
+        "time": "2012-03-14 16:36:15",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -341,7 +341,7 @@
         "require": {
             "php": ">=5.3.0"
         },
-        "time": "2015-09-12T10:08:34+00:00",
+        "time": "2015-09-12 10:08:34",
         "type": "library",
         "extra": {
             "patches_applied": {
@@ -437,7 +437,7 @@
             "ptachoire/cssembed": "Assetic provides the integration with phpcssembed to embed data uris",
             "twig/twig": "Assetic provides the integration with the Twig templating engine"
         },
-        "time": "2015-11-12T13:51:40+00:00",
+        "time": "2015-11-12 13:51:40",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -496,7 +496,7 @@
             "composer/composer": "1.*@alpha",
             "phpunit/phpunit": "4.*"
         },
-        "time": "2015-08-10T12:35:38+00:00",
+        "time": "2015-08-10 12:35:38",
         "type": "composer-plugin",
         "extra": {
             "branch-alias": {
@@ -542,7 +542,7 @@
             "ext-exif": "EXIF extension is required for graphic modules.",
             "ext-rar": "RAR extension is required for RAR archive module."
         },
-        "time": "2012-12-04T17:31:30+00:00",
+        "time": "2012-12-04 17:31:30",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -596,7 +596,7 @@
             "symfony/var-dumper": "Pretty print complex values better with var-dumper available",
             "whoops/soap": "Formats errors as SOAP responses"
         },
-        "time": "2016-05-06T18:25:35+00:00",
+        "time": "2016-05-06 18:25:35",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -649,7 +649,7 @@
         "require": {
             "php": ">=5.5.9"
         },
-        "time": "2016-07-28T11:13:48+00:00",
+        "time": "2016-07-28 11:13:48",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -700,7 +700,7 @@
         "require": {
             "robloach/component-installer": "*"
         },
-        "time": "2016-07-04T06:39:29+00:00",
+        "time": "2016-07-04 06:39:29",
         "type": "component",
         "extra": {
             "component": {
@@ -753,7 +753,7 @@
             "reference": "fe0936ee26643249e916849d48e3a51d5f5e278b",
             "shasum": ""
         },
-        "time": "2012-12-21T11:40:51+00:00",
+        "time": "2012-12-21 11:40:51",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -796,7 +796,7 @@
         "require": {
             "php": ">=5.5.9"
         },
-        "time": "2016-07-17T14:02:08+00:00",
+        "time": "2016-07-17 14:02:08",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -844,7 +844,7 @@
             "reference": "ac5c9c1f26eba2e6d0a9e374dc3d8316b586cdcc",
             "shasum": ""
         },
-        "time": "2016-02-01T23:14:34+00:00",
+        "time": "2016-02-01 23:14:34",
         "type": "library",
         "installation-source": "source",
         "autoload": {
@@ -893,7 +893,7 @@
         "suggest": {
             "league/oauth2-google": "Needed for Google XOAUTH2 authentication"
         },
-        "time": "2017-01-09T09:33:47+00:00",
+        "time": "2017-01-09 09:33:47",
         "type": "library",
         "extra": {
             "patches_applied": {
@@ -934,5 +934,49 @@
             }
         ],
         "description": "PHPMailer is a full-featured email creation and transfer class for PHP"
+    },
+    {
+        "name": "jakoch/phantomjs-installer",
+        "version": "2.1.1-p05",
+        "version_normalized": "2.1.1.0-patch05",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/jakoch/phantomjs-installer.git",
+            "reference": "1aa2a29da48fee62679f7f7a3d446b0e52df494a"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/jakoch/phantomjs-installer/zipball/1aa2a29da48fee62679f7f7a3d446b0e52df494a",
+            "reference": "1aa2a29da48fee62679f7f7a3d446b0e52df494a",
+            "shasum": ""
+        },
+        "require": {
+            "ext-bz2": "*",
+            "ext-openssl": "*"
+        },
+        "time": "2016-07-11 09:07:23",
+        "type": "custom-installer",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "PhantomInstaller\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Jens-André Koch",
+                "email": "jakoch@web.de"
+            }
+        ],
+        "description": "A Composer package which installs the PhantomJS binary (Linux, Windows, Mac) into `/bin` of your project.",
+        "keywords": [
+            "binaries",
+            "headless",
+            "phantomjs"
+        ]
     }
 ]

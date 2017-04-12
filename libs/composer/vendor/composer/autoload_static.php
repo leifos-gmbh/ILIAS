@@ -73,6 +73,10 @@ class ComposerStaticInit0b7e5ccf6ad3b6544d6c5a11478f9b6b
             array (
                 0 => __DIR__ . '/..' . '/pimple/pimple/src',
             ),
+            'PhantomInstaller\\' => 
+            array (
+                0 => __DIR__ . '/..' . '/jakoch/phantomjs-installer/src',
+            ),
             'PHPExcel' => 
             array (
                 0 => __DIR__ . '/..' . '/phpoffice/phpexcel/Classes',

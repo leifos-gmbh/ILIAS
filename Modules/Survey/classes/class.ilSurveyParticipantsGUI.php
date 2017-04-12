@@ -135,7 +135,12 @@ class ilSurveyParticipantsGUI
 		include_once "./Modules/Survey/classes/tables/class.ilSurveyMaintenanceTableGUI.php";
 		$table_gui = new ilSurveyMaintenanceTableGUI($this, 'maintenance');
 		$total =& $this->object->getSurveyParticipants();
+
+		include_once ("./Services/AccessControl/classes/class.ilUserAccessHandler.php");
+		$access_handler = new ilUserAccessHandler();
+
 		$data = array();
+		//$array_svy_users_id = array(); //option B using array
 		foreach ($total as $user_data)
 		{
 			$finished = false;
@@ -145,15 +150,53 @@ class ilSurveyParticipantsGUI
 			}			
 			$wt = $this->object->getWorkingtimeForParticipant($user_data["active_id"]);
 			$last_access = $this->object->getLastAccess($user_data["active_id"]);
+
+			//option A
+			if($access_handler->checkAccess($user_data['userid']))
+			{
+				array_push($data, array(
+					'id' => $user_data["active_id"],
+					'name' => $user_data["sortname"],
+					'login' => $user_data["login"],
+					'last_access' => $last_access,
+					'workingtime' => $wt,
+					'finished' => $finished,
+					'userid' => $user_data['userid']
+				));
+			}
+
+			//option B using array
+			/*
 			array_push($data, array(
 				'id' => $user_data["active_id"],
 				'name' => $user_data["sortname"],
 				'login' => $user_data["login"],
 				'last_access' => $last_access,
 				'workingtime' => $wt,
-				'finished' => $finished
+				'finished' => $finished,
+				'userid' => $user_data['userid']
 			));
+			array_push($array_svy_users_id, $user_data['userid']);
+			*/
 		}
+
+
+		//option B using array
+		/*
+		$access_handler = new ilUserAccessHandler();
+		$filtered_users_id = $access_handler->filterUsers($array_svy_users_id);
+
+		$visible_data = array();
+		foreach($data as $user_data)
+		{
+			if(in_array($user_data['userid'],$filtered_users_id))
+			{
+				array_push($visible_data, $user_data);
+			}
+		}
+		$table_gui->setData($visible_data);
+		*/
+
 		$table_gui->setData($data);
 		$this->tpl->setVariable('ADM_CONTENT', $table_gui->getHTML());	
 	}

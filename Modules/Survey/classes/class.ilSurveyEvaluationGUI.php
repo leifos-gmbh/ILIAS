@@ -1308,47 +1308,50 @@ class ilSurveyEvaluationGUI
 		}
 				
 		$participants = $this->object->getSurveyParticipants($finished_ids);
+
+		include_once ("./Services/AccessControl/classes/class.ilUserAccessHandler.php");
+
+		$access_handler = new ilUserAccessHandler();
 		
 		include_once "./Modules/SurveyQuestionPool/classes/class.SurveyQuestion.php";	
 		foreach($participants as $user)
-		{	
-			$user_id = $user["active_id"];
-		
-			$row = array();			
-			$row[] = trim($user["lastname"]) 
-				? $user["lastname"] 
-				: $user["name"]; // anonymous
-			$row[] = $user["firstname"];
-			$row[] = $user["login"]; // #10579
-			
-			if ($this->object->canExportSurveyCode())
+		{
+			//conditional to show only the users related with the "logged" user.
+			if($access_handler->checkAccess($user['userid']))
 			{
-				$row[] = $user_id; 
+				$user_id = $user["active_id"];
+
+				$row = array();
+				$row[] = trim($user["lastname"])
+					? $user["lastname"]
+					: $user["name"]; // anonymous
+				$row[] = $user["firstname"];
+				$row[] = $user["login"]; // #10579
+
+				if ($this->object->canExportSurveyCode()) {
+					$row[] = $user_id;
+				}
+
+				$row[] = $this->object->getWorkingtimeForParticipant($user_id);
+
+				if ((bool)$user["finished"]) {
+					$dt = new ilDateTime($user["finished_tstamp"], IL_CAL_UNIX);
+					$row[] = ($_POST["export_format"] == self::TYPE_XLS)
+						? $dt
+						: ilDatePresentation::formatDate($dt);
+				} else {
+					$row[] = "-"; // :TODO:
+				}
+
+				foreach ($questions as $item) {
+					$q_eval = $item[0];
+					$q_res = $item[1];
+
+					$q_eval->addUserSpecificResults($row, $user_id, $q_res);
+				}
+
+				$rows[] = $row;
 			}
-			
-			$row[] = $this->object->getWorkingtimeForParticipant($user_id);
-			
-			if((bool)$user["finished"])
-			{
-				$dt = new ilDateTime($user["finished_tstamp"], IL_CAL_UNIX);
-				$row[] = ($_POST["export_format"] == self::TYPE_XLS)
-					? $dt
-					: ilDatePresentation::formatDate($dt);
-			}
-			else
-			{						
-				$row[] = "-"; // :TODO:
-			}
-			
-			foreach($questions as $item)
-			{	
-				$q_eval = $item[0];		
-				$q_res = $item[1];
-				
-				$q_eval->addUserSpecificResults($row, $user_id, $q_res);
-			}
-			
-			$rows[] = $row;
 		}		
 		
 		// #11179
@@ -1464,7 +1467,11 @@ class ilSurveyEvaluationGUI
 	}
 	
 	protected function parseUserSpecificResults(array $a_finished_ids = null)
-	{				
+	{
+		include_once ("./Services/AccessControl/classes/class.ilUserAccessHandler.php");
+
+		$access_handler = new ilUserAccessHandler();
+
 		$data = array();		
 		
 		$participants = $this->object->getSurveyParticipants($a_finished_ids);
@@ -1480,37 +1487,37 @@ class ilSurveyEvaluationGUI
 				: $q_res->getQuestion();
 				
 			foreach($participants as $user)
-			{	
-				$user_id = $user["active_id"];
-				
-				$parsed_results = $q_eval->parseUserSpecificResults($q_res, $user_id);				
-				
-				if(!array_key_exists($user_id, $data))
+			{
+				if($access_handler->checkAccess($user['userid']))
 				{
-					$wt = $this->object->getWorkingtimeForParticipant($user_id);
-					
-					$finished = $user["finished"]
-						? $user["finished_tstamp"]
-						: false;
-					
-					$data[$user_id] = array(
+					$user_id = $user["active_id"];
+
+					$parsed_results = $q_eval->parseUserSpecificResults($q_res, $user_id);
+
+					if (!array_key_exists($user_id, $data)) {
+						$wt = $this->object->getWorkingtimeForParticipant($user_id);
+
+						$finished = $user["finished"]
+							? $user["finished_tstamp"]
+							: false;
+
+						$data[$user_id] = array(
 							"username" => $user["sortname"],
 							"question" => $question->getTitle(),
 							"results" => $parsed_results,
 							"workingtime" => $wt,
 							"finished" => $finished,
 							"subitems" => array()
-						);					
-				}
-				else
-				{
-					$data[$user_id]["subitems"][] = array(
+						);
+					} else {
+						$data[$user_id]["subitems"][] = array(
 							"username" => " ",
 							"question" => $question->getTitle(),
 							"results" => $parsed_results,
 							"workingtime" => null,
 							"finished" => null
 						);
+					}
 				}
 			}
 		}	

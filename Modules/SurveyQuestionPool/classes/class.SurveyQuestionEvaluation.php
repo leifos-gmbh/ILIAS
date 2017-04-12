@@ -64,48 +64,84 @@ abstract class SurveyQuestionEvaluation
 	 */
 	protected function parseResults(ilSurveyEvaluationResults $a_results, array $a_answers, SurveyCategories $a_categories = null)
 	{
-		$num_users_answered = sizeof($a_answers);			
+		include_once ("./Services/AccessControl/classes/class.ilUserAccessHandler.php");
+
+		$access_handler = new ilUserAccessHandler();
+
+		$survey = new ilObjSurvey($this->question->getObjId(), false);
+
+		$participants  = $survey->getSurveyParticipants();
+
+		$participants_visible = array();
+
+		$num_users_answered = 0;
+		$num_users_skipped = 0;
+
+		foreach ($participants as $participant)
+		{
+			//conditional to show only the users related with the "logged" user.
+			if($access_handler->checkAccess($participant['userid']))
+			{
+				array_push($participants_visible, $participant);
+
+				if($participant['finished'])
+				{
+					$num_users_answered++;
+				}
+				else
+				{
+					$num_users_skipped++;
+				}
+			}
+		}
 
 		$a_results->setUsersAnswered($num_users_answered);
-		$a_results->setUsersSkipped($this->getNrOfParticipants()-$num_users_answered);
+		$a_results->setUsersSkipped($num_users_skipped);
 		
 		// parse answers
 		$has_multi = false;
 		$selections = array();
 		foreach($a_answers as $active_id => $answers)
 		{
-			// :TODO: 
-			if(sizeof($answers) > 1)
+			//conditional to check user visibility with ilUserAccessHandler
+			$user_data = $survey->getUserDataFromActiveId($active_id);
+			$user_id = $user_data['userid'];
+			if($access_handler->checkAccess($user_id))
 			{
-				$has_multi = true;
-			}							
-			foreach($answers as $answer)
-			{					
-				// map selection value to scale/category
-				if($a_categories && 
-					$answer["value"] != "")
+				// :TODO:
+				if(sizeof($answers) > 1)
 				{
-					$scale = $a_categories->getCategoryForScale($answer["value"]+1);
-					if($scale instanceof ilSurveyCategory)
+					$has_multi = true;
+				}
+				foreach($answers as $answer)
+				{
+					// map selection value to scale/category
+					if($a_categories &&
+						$answer["value"] != "")
 					{
-						$answer["value"] = $scale->scale;
+						$scale = $a_categories->getCategoryForScale($answer["value"]+1);
+						if($scale instanceof ilSurveyCategory)
+						{
+							$answer["value"] = $scale->scale;
+						}
 					}
-				}				
-				
-				$parsed = new ilSurveyEvaluationResultsAnswer(
-					$active_id, 
-					$answer["value"], 
-					$answer["text"]
-				);		
-				$a_results->addAnswer($parsed);
 
-				if($answer["value"] != "")
-				{
-					$selections[$answer["value"]]++;
-				}				
-			}			
+					$parsed = new ilSurveyEvaluationResultsAnswer(
+						$active_id,
+						$answer["value"],
+						$answer["text"]
+					);
+					$a_results->addAnswer($parsed);
+
+					if($answer["value"] != "")
+					{
+						$selections[$answer["value"]]++;
+					}
+				}
+			}
+
 		}
-		
+
 		$total = array_sum($selections);
 
 		if($total)

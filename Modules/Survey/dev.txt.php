@@ -1,5 +1,49 @@
 <?php exit; ?>
 
+April, 12 2017
+
+## (new) AccessControl service class
+
+**Services/AccessControl/classes/class.ilUserAccessHandler.php**
+
+Two methods to filter if users can be visible for the "logged" user:
+
+- checkAccess -> gets an id and returns true if visible. (DUMMY code here. Workshop needed.)
+- filterUsers -> gets an array, calls checkAccess and returns the same array filtered.
+
+## Survey
+
+#### (edit) IlObjSurvey
+
+**Modules/Survey/classes/class.ilObjSurvey.php**
+
+- (edit) getUserDataFromActiveId method -> user id added in the returned array.
+
+#### (edit) ilSurveyParticipantsGUI
+**Modules/Survey/classes/class.ilSurveyParticipantsGUI.php**
+
+-(edit) maintenanceObject method -> Filter the data before send it to the tableGUI.
+
+#### (edit) SurveyQuestionEvaluation
+**Modules/SurveyQuestionPool/classes/class.SurveyQuestionEvaluation.php**
+
+- (edit) parseResults method -> Filter the participants, to show proper counters. And then filter the answers to show proper statistics.
+
+#### (edit) ilSurveyEvaluationGUI
+**Modules/Survey/classes/class.ilSurveyEvaluationGUI.php**
+
+-(edit) parseUserSpecificResults method -> Filter the users in the loop.
+-(edit) exportEvaluationUser method -> Filter the users in the loop.
+
+
+#### COMMENTS
+
+We could edit getSurveyParticipants method adding the filter inside to avoid to many conditionals but for now we should keep it as it is.
+Because we don't know which logic we should apply into the service, the comments I made should be updated/removed.
+
+
+
+
 # Survey Question Pool (Modules/SurveyQuestionPool)
 * Main question editing/storing
 * Storing of phrases

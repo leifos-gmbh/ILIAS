@@ -265,8 +265,27 @@ class ilPersonalSkill implements ilSkillUsageInfo
 				"skl_assigned_material", "user_id");
 
 		// self evaluations
+		// cdpatch start
 		ilSkillUsage::getUsageInfoGeneric($a_cskill_ids, $a_usages, ilSkillUsage::SELF_EVAL,
 				"skl_self_eval_level", "user_id");
+
+		/* old patch, won't work anymore
+		$q = "SELECT user_id, skill_id FROM skl_self_eval s JOIN skl_self_eval_level l ON (s.id = l.self_eval_id) ";
+		$w = "WHERE";
+		foreach ($a_cskill_ids as $sk)
+		{
+			$q.= $w." skill_id = ".$ilDB->quote($sk["skill_id"], "integer");
+			$w = " OR ";
+		}
+		$q.= " GROUP BY user_id, skill_id";
+		$set = $ilDB->query($q);
+		while ($rec = $ilDB->fetchAssoc($set))
+		{
+			$a_usages[$rec["skill_id"].":0"][ilSkillUsage::SELF_EVAL][] =
+				array("key" => $rec["user_id"]);
+		}
+		*/
+		// cdpatch end
 
 		// users that use the skills as personal skills
 		$pskill_ids = array();

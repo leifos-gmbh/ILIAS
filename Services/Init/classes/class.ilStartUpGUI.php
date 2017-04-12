@@ -1745,6 +1745,23 @@ class ilStartUpGUI
 		$this->showTermsOfService();
 	}
 
+	// cdpatch start
+	/**
+	 * Deny acceptance
+	 *
+	 * @param
+	 * @return
+	 */
+	function denyAcceptance()
+	{
+		global $ilAuth;
+
+		$ilAuth->logout();
+		session_destroy();
+		ilUtil::redirect("login.php");
+	}
+	// cdpatch end
+
 	/**
 	 * Show terms of service
 	 */
@@ -1793,6 +1810,10 @@ class ilStartUpGUI
 			}
 
 			$tpl->setVariable('TERMS_OF_SERVICE_CONTENT', $document->getContent());
+
+			// cdpatch start
+			$tpl->setVariable("TXT_DENY_EXIT", $lng->txt("refuse_exit"));
+			// cdpatch end
 		}
 		else
 		{

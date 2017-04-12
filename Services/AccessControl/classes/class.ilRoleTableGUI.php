@@ -264,7 +264,12 @@ class ilRoleTableGUI extends ilTable2GUI
 			substr($set['title_orig'],0,3) != 'il_') or
 			$this->getType() == self::TYPE_SEARCH)
 		{
-			$this->tpl->setVariable('VAL_ID', $set['obj_id']);
+			// cdpatch: added if
+			include_once("./Services/CD/classes/class.ilCDPermWrapper.php");
+			if (!ilCDPermWrapper::isCDRole($set["title"]))
+			{
+				$this->tpl->setVariable('VAL_ID', $set['obj_id']);
+			}
 		}
 		$this->tpl->setVariable('VAL_TITLE_LINKED', $set['title']);
 		$this->tpl->setVariable('VAL_LINK', $link);

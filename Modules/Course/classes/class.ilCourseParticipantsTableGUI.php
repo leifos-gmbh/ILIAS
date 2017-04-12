@@ -24,14 +24,20 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
 	 * @param
 	 * @return
 	 */
+	// cdpatch: added plugin
 	public function __construct(
 		$a_parent_obj,
 		ilObject $rep_object,
 		$a_show_learning_progress = false,
 		$a_show_timings = false,
-		$a_show_lp_status_sync = false)
+		$a_show_lp_status_sync = false,
+		$a_plugin = null)
 	{
 		global $lng, $ilCtrl;
+
+		// cdpatch start
+		$this->pl = $a_plugin;
+		// cdpatch end
 
 		$this->show_learning_progress = $a_show_learning_progress;	
 		if($this->show_learning_progress)
@@ -83,9 +89,18 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
 			$this->addColumn($all_cols[$col]['txt'], $col);
 		}
 
-		if($this->show_learning_progress)
+
+		// cdpatch: evaluations instead of learning progress
+		//if($this->show_learning_progress)
+		if(true)
 		{
-			$this->addColumn($this->lng->txt('learning_progress'), 'progress');
+			if (is_object($this->pl))
+			{
+				$this->pl->includeClass("class.cdParticipantEvaluation.php");
+				$this->addColumn($this->pl->txt('evaluations'));
+			}
+
+			//$this->addColumn($this->lng->txt('learning_progress'), 'progress');
 		}
 
 		if($this->privacy->enabledCourseAccessTimes())
@@ -268,9 +283,17 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
 		{
 			$this->tpl->setVariable('VAL_ACCESS', $a_set['access_time']);
 		}
-		if($this->show_learning_progress)
+		// cdpatch:  eval instead of lp
+		//if($this->show_learning_progress)
+		if (is_object($this->pl))
 		{
-			
+			$this->tpl->setCurrentBlock('eval');
+			$this->tpl->setVariable("EVAL_NUM",
+				(int) cdParticipantEvaluation::countEvals($a_set["usr_id"],
+					$this->parent_obj->object->getId()));
+			$this->tpl->parseCurrentBlock();
+
+			/*
 			$this->tpl->setCurrentBlock('lp');
 			switch($a_set['progress'])
 			{
@@ -295,6 +318,7 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
 					break;
 			}
 			$this->tpl->parseCurrentBlock();
+			*/
 		}
 		
 		$this->tpl->setVariable('VAL_POSTNAME', 'participants');
@@ -346,7 +370,17 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
 			$this->tpl->setVariable('LINK_NAME', $this->ctrl->getLinkTarget($this->parent_obj, 'deliverCertificate'));
 			$this->tpl->setVariable('LINK_TXT', $this->lng->txt('download_certificate'));
 			$this->tpl->parseCurrentBlock();
-		}		
+		}
+		// cdpatch begin
+		if (strtolower(get_class($this->parent_obj)) == "ilobjcoursegui")
+		{
+			$this->tpl->setCurrentBlock('link');
+			$this->tpl->setVariable('LINK_NAME',$this->ctrl->getLinkTargetByClass(array('ilcduihookgui','cdparticipantevaluationgui'), ''));
+			$this->tpl->setVariable('LINK_TXT',$this->lng->txt('edit_evaluations'));
+			$this->tpl->parseCurrentBlock();
+		}
+		// cdpatch end
+
 		$this->ctrl->clearParameters($this->parent_obj);
 
 		if($this->show_timings)

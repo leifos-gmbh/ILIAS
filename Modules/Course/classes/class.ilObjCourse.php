@@ -154,7 +154,69 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 	{
 		$this->reg_access_code = $a_code;
 	}
-	
+
+	// cdpatch start
+	/**
+	 * Set course type
+	 *
+	 * @param int $a_val course type
+	 */
+	function setCourseType($a_val)
+	{
+		$this->course_type = $a_val;
+	}
+
+	/**
+	 * Get course type
+	 *
+	 * @return int course type
+	 */
+	function getCourseType()
+	{
+		return $this->course_type;
+	}
+
+	/**
+	 * Set course level
+	 *
+	 * @param int $a_val course level
+	 */
+	function setCourseLevel($a_val)
+	{
+		$this->course_level = $a_val;
+	}
+
+	/**
+	 * Get course level
+	 *
+	 * @return int course level
+	 */
+	function getCourseLevel()
+	{
+		return $this->course_level;
+	}
+
+	/**
+	 * Set course nr
+	 *
+	 * @param string $a_val course nr
+	 */
+	function setCourseNr($a_val)
+	{
+		$this->course_nr = $a_val;
+	}
+
+	/**
+	 * Get course nr
+	 *
+	 * @return string course nr
+	 */
+	function getCourseNr()
+	{
+		return $this->course_nr;
+	}
+	// cdpatch end
+
 	/**
 	 * Check if access code is enabled
 	 * @return 
@@ -1343,6 +1405,13 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 		$new_obj->setNumberOfNextSessions($this->getNumberOfNextSessions());
 		$new_obj->setAutoNotification( $this->getAutoNotification() );
 		$new_obj->enableRegistrationAccessCode($this->isRegistrationAccessCodeEnabled());
+
+		// cdpatch start
+		$new_obj->setCourseType($this->getCourseType());
+		$new_obj->setCourseLevel($this->getCourseLevel());
+		$new_obj->setCourseNr($this->getCourseNr());
+		// cdpatch end
+
 		include_once './Services/Membership/classes/class.ilMembershipRegistrationCodeUtils.php';
 		$new_obj->setRegistrationAccessCode(ilMembershipRegistrationCodeUtils::generateCode());
 		$new_obj->setStatusDetermination($this->getStatusDetermination());
@@ -1369,12 +1438,13 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 		include_once './Services/Membership/classes/class.ilMembershipRegistrationCodeUtils.php';
 		$this->setRegistrationAccessCode(ilMembershipRegistrationCodeUtils::generateCode());
 
+		// cdpatch: added course type
 		$query = "INSERT INTO crs_settings (obj_id,syllabus,contact_name,contact_responsibility,".
 			"contact_phone,contact_email,contact_consultation,activation_type,activation_start,".
 			"activation_end,sub_limitation_type,sub_start,sub_end,sub_type,sub_password,sub_mem_limit,".
 			"sub_max_members,sub_notify,view_mode,abo," .
 			"latitude,longitude,location_zoom,enable_course_map,waiting_list,show_members, ".
-			"session_limit,session_prev,session_next, reg_ac_enabled, reg_ac, auto_notification, status_dt,mail_members_type) ".
+			"session_limit,session_prev,session_next, reg_ac_enabled, reg_ac, auto_notification, status_dt,mail_members_type, course_type) ".
 			"VALUES( ".
 			$ilDB->quote($this->getId() ,'integer').", ".
 			$ilDB->quote($this->getSyllabus() ,'text').", ".
@@ -1410,7 +1480,8 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 			$ilDB->quote($this->getRegistrationAccessCode(),'text').', '.
 			$ilDB->quote((int)$this->getAutoNotification(),'integer').', '.
 			$ilDB->quote((int)$this->getStatusDetermination(),'integer').', '.
-			$ilDB->quote((int) $this->getMailToMembersType(),'integer').' '.
+			$ilDB->quote((int) $this->getMailToMembersType(),'integer').','.
+			$ilDB->quote($this->getCourseType(),'integer').' '.
 			")";
 			
 		$res = $ilDB->manipulate($query);
@@ -1461,6 +1532,11 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 			$this->setNumberOfNextSessions($row->session_next);
 			$this->enableRegistrationAccessCode($row->reg_ac_enabled);
 			$this->setRegistrationAccessCode($row->reg_ac);
+			// cdpatch start
+			$this->setCourseType($row->course_type);
+			$this->setCourseLevel($row->course_level);
+			$this->setCourseNr($row->course_nr);
+			// cdpatch end
 			$this->setAutoNotification($row->auto_notification == 1 ? true : false);
 			$this->setStatusDetermination((int) $row->status_dt);
 			$this->setMailToMembersType($row->mail_members_type);

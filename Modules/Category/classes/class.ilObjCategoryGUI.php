@@ -221,6 +221,11 @@ class ilObjCategoryGUI extends ilContainerGUI
 				break;
 
 			default:
+
+				// cdpatch start
+				$this->checkPermission("visible");
+				// cdpatch end
+
 				if ($cmd == "infoScreen")
 				{
 					$this->checkPermission("visible");

@@ -66,6 +66,18 @@ class ilMembershipGUI
 		$this->logger = ilLoggerFactory::getLogger($this->getParentObject()->getType());
 		
 		$this->access = $GLOBALS['DIC']->access();
+
+		// cdpatch start
+		global $ilPluginAdmin;
+		$pl_names = $ilPluginAdmin->getActivePluginsForSlot(IL_COMP_SERVICE, "UIComponent", "uihk");
+		foreach ($pl_names as $pl)
+		{
+			if ($pl == "CD")
+			{
+				$this->cd_plugin = ilPluginAdmin::getPluginObject(IL_COMP_SERVICE, "UIComponent", "uihk", $pl);
+			}
+		}
+		// cdpatch end
 	}
 	
 	/**
@@ -756,7 +768,14 @@ class ilMembershipGUI
 	protected function showParticipantsToolbar()
 	{
 		global $ilToolbar;
-		
+
+		// cdpatch start
+		if(!$GLOBALS['ilAccess']->checkAccess('write','', $this->getParentObject()->getRefId()))
+		{
+			return;
+		}
+		// cdpatch end
+
 		include_once './Services/Search/classes/class.ilRepositorySearchGUI.php';
 		ilRepositorySearchGUI::fillAutoCompleteToolbar(
 			$this,
@@ -787,7 +806,15 @@ class ilMembershipGUI
 		$ilToolbar->addButton(
 			$this->lng->txt($this->getParentObject()->getType(). "_print_list"),
 			$this->ctrl->getLinkTarget($this, 'printMembers'));
-		
+
+		// cdpatch start
+		if (is_object($this->cd_plugin))
+		{
+			$this->cd_plugin->modifyCourseToolbar($ilToolbar);
+		}
+		// cdpatch end
+
+
 		$this->showMailToMemberToolbarButton($ilToolbar, 'participants', false);
 	}
 

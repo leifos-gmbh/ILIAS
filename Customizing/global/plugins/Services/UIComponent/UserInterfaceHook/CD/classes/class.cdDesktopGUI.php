@@ -36,7 +36,7 @@ class cdDesktopGUI
 		global $ilCtrl, $tpl, $lng, $ilUser;
 
 		$tpl->setTitle($lng->txt("personal_desktop"));
-		$tpl->setTitleIcon(ilUtil::getImagePath("icon_pd_b.png"));
+		$tpl->setTitleIcon(ilUtil::getImagePath("icon_pd.svg"));
 
 
 		$cmd = $ilCtrl->getCmd();

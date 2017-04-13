@@ -1754,10 +1754,8 @@ class ilStartUpGUI
 	 */
 	function denyAcceptance()
 	{
-		global $ilAuth;
-
-		$ilAuth->logout();
-		session_destroy();
+		$GLOBALS['DIC']['ilAuthSession']->logout();
+		//session_destroy();
 		ilUtil::redirect("login.php");
 	}
 	// cdpatch end

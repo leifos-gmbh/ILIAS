@@ -471,12 +471,11 @@ class ilUserQuery
 		}
 		
 		$ilDB->setLimit($limit, $offset);
-		
+
 		if(sizeof($multi_fields))
 		{
 			$usr_ids = array();
 		}
-		
 		// set query
 		$set = $ilDB->query($query);
 		$result = array();
@@ -489,7 +488,7 @@ class ilUserQuery
 				$usr_ids[] = $rec["usr_id"];
 			}
 		}
-		
+
 		// add multi-field-values to user-data
 		if(sizeof($multi_fields) && sizeof($usr_ids))
 		{

@@ -127,7 +127,7 @@ class ilCompanyUserTableGUI extends ilTable2GUI
 			"login",
 			"",
 			0,
-			0,
+			999999,
 			$this->filter["lastname"],
 			$this->filter["activation"],
 			$this->filter["last_login"],
@@ -141,7 +141,7 @@ class ilCompanyUserTableGUI extends ilTable2GUI
 			"",
 			$this->company_id
 			);
-			
+
 /*
 		if (count($usr_data["set"]) == 0 && $this->getOffset() > 0)
 		{

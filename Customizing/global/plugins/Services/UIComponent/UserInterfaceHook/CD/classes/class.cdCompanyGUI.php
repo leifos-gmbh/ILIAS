@@ -50,7 +50,7 @@ class cdCompanyGUI
 		global $ilCtrl, $tpl, $ilUser;
 
 		$tpl->setTitle($this->pl->txt("companies"));
-		$tpl->setTitleIcon(ilUtil::getImagePath("icon_webr_b.png"));
+		$tpl->setTitleIcon(ilUtil::getImagePath("icon_webr.svg"));
 
 
 		$next_class = $ilCtrl->getNextClass();

@@ -143,7 +143,7 @@ class ilCDPermWrapper
 	 * @param
 	 * @return
 	 */
-	function isPerRole($a_only_master = false)
+	static function isPerRole($a_only_master = false)
 	{
 		global $ilUser, $rbacreview, $tree, $ilDB;
 
@@ -214,11 +214,9 @@ class ilCDPermWrapper
 			ilObject::_lookupType($category_ref_id, true) == "cat")
 		{
 //echo "2-$category_ref_id-";
-			$rf = $rbacreview->getRoleFolderOfObject($category_ref_id);
 //var_dump($rf); exit;
 //echo "<br>3-$rf-"; exit;
-			$role_list = $rbacreview->getRoleListByObject(
-				$rf["child"]);
+			$role_list = $rbacreview->getRoleListByObject($category_ref_id);
 //echo "4"; exit;
 			foreach ($role_list as $r)
 			{
@@ -268,9 +266,7 @@ class ilCDPermWrapper
 		if ($tree->isInTree($category_ref_id) &&
 			ilObject::_lookupType($category_ref_id, true) == "cat")
 		{
-			$rf = $rbacreview->getRoleFolderOfObject($category_ref_id);
-			$role_list = $rbacreview->getRoleListByObject(
-				$rf["child"]);
+			$role_list = $rbacreview->getRoleListByObject($category_ref_id);
 			foreach ($role_list as $r)
 			{
 				if (strtolower($r["title"]) == "cdc-ma")
@@ -315,9 +311,7 @@ class ilCDPermWrapper
 		if ($tree->isInTree($category_ref_id) &&
 			ilObject::_lookupType($category_ref_id, true) == "cat")
 		{
-			$rf = $rbacreview->getRoleFolderOfObject($category_ref_id);
-			$role_list = $rbacreview->getRoleListByObject(
-				$rf["child"]);
+			$role_list = $rbacreview->getRoleListByObject($category_ref_id);
 			foreach ($role_list as $r)
 			{
 				if (strtolower($r["title"]) == "trainer")
@@ -334,14 +328,13 @@ class ilCDPermWrapper
 	 * @param
 	 * @return
 	 */
-	function checkUserCreationPossible($a_company_id)
+	static function checkUserCreationPossible($a_company_id)
 	{
 		global $rbacadmin, $ilPluginAdmin, $rbacreview, $tree;
 		
 		$possible = false;
 		
 		$pl_names = $ilPluginAdmin->getActivePluginsForSlot(IL_COMP_SERVICE, "UIComponent", "uihk");
-		$plugin_html = false;
 		foreach ($pl_names as $pl)
 		{
 			if ($pl == "CD")
@@ -350,7 +343,6 @@ class ilCDPermWrapper
 			}
 		}
 
-		$center_id = cdCompany::lookupCenterId($a_company_id);
 		$pl->includeClass("class.cdCenter.php");
 		$center_id = cdCompany::lookupCenterId($a_company_id);
 
@@ -358,17 +350,12 @@ class ilCDPermWrapper
 		if ($tree->isInTree($category_ref_id) &&
 			ilObject::_lookupType($category_ref_id, true) == "cat")
 		{
-			$rf = $rbacreview->getRoleFolderOfObject($category_ref_id);
-			if (is_array($rf) && count($rf) > 0)
+			$role_list = $rbacreview->getRoleListByObject($category_ref_id);
+			foreach ($role_list as $r)
 			{
-				$role_list = $rbacreview->getRoleListByObject(
-					$rf["child"]);
-				foreach ($role_list as $r)
+				if (strtolower($r["title"]) == "kunde")
 				{
-					if (strtolower($r["title"]) == "kunde")
-					{
-						$possible = true;
-					}
+					$possible = true;
 				}
 			}
 		}
@@ -416,7 +403,7 @@ class ilCDPermWrapper
 	 * @param
 	 * @return
 	 */
-	function canAdminUser($a_target_user, $a_pl)
+	static function canAdminUser($a_target_user, $a_pl)
 	{
 		if (self::isAdmin())
 		{

@@ -178,10 +178,9 @@ class ilCDTrainer
 
 		// cd_trainer table
 		$fields = $this->getMainDBFields();
-		
+
 		$fields["id"] = array("integer", $id);
-//var_dump($_POST);
-//var_dump($fields); exit;
+
 		$ilDB->insert("cd_trainer", $fields);
 		
 		$this->writeOtherTables();
@@ -198,6 +197,7 @@ class ilCDTrainer
 		include_once("./Services/CD/classes/class.ilCDTrainerProfile.php");
 		$pro = new ilCDTrainerProfile($this->cd_plugin);
 		$sfields = $pro->getStandardFields();
+//		var_dump($sfields); exit;
 		foreach ($sfields as $f => $def)
 		{
 			if ($def["table"] == "cd_trainer")
@@ -247,9 +247,9 @@ class ilCDTrainer
 			? $this->cd_trainer["fee"]
 			: array();
 		$fee = ilUtil::sortArray($fee, "date", "asc");
-		$fields["fee"] = array("clob", $fee);
+		$fields["fee"] = array("clob", serialize($fee));
 
-		$fields["former"] = array("integer", $this->cd_trainer["former"]);
+		$fields["former"] = array("integer", (int) $this->cd_trainer["former"]);
 		
 		return $fields;
 	}

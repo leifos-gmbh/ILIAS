@@ -96,7 +96,7 @@ class ilLangLicenseInputGUI extends ilSubEnabledFormPropertyGUI implements ilTab
 	}
 	
 	
-	public function setMulti($a_multi)
+	public function setMulti($a_multi, $a_sortable = false, $a_addremove = true)
 	{
 		$this->multi = (bool)$a_multi;
 	}

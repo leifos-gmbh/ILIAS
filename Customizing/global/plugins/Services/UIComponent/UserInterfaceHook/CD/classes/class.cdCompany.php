@@ -613,7 +613,7 @@ class cdCompany
 	 * @param	int			company id
 	 * @return	boolean		password unique true/false
 	 */
-	function checkUniquePassword($a_pw, $a_id = 0)
+	static function checkUniquePassword($a_pw, $a_id = 0)
 	{
 		global $ilDB;
 
@@ -658,7 +658,7 @@ class cdCompany
 	 * @param
 	 * @return
 	 */
-	function lookupNrOfUsers($a_comp_id)
+	static function lookupNrOfUsers($a_comp_id)
 	{
 		global $ilDB;
 

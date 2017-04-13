@@ -298,7 +298,7 @@ class cdOralTarget
 	 * @param int $a_user_id
 	 * @return array
 	 */
-	function readUserValues($a_user_id, $a_only_latest = false)
+	static function readUserValues($a_user_id, $a_only_latest = false)
 	{
 		global $ilDB;
 		

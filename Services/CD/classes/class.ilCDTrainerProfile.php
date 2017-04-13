@@ -128,7 +128,8 @@ class ilCDTrainerProfile extends ilUserProfile
 						"required_fix_value" => 0,
 						"method" => "getSelectedCountry2",
 						"table" => "cd_trainer",
-						"group" => "personal_data"),
+						"group" => "personal_data",
+						"type" => "text"),
 		"street" => array(
 						"input" => "text",
 						"maxlength" => 40,
@@ -861,13 +862,13 @@ class ilCDTrainerProfile extends ilUserProfile
 		if ($birthday_obj)
 		{
 			$birthday = $a_form->getInput("usr_birthday");
-			$birthday = $birthday["date"];
+			//$birthday = $birthday["date"];
 
 			// when birthday was not set, array will not be substituted with string by ilBirthdayInputGui
-			if(!is_array($birthday))
-			{
+			//if(!is_array($birthday))
+			//{
 				$a_user->setBirthday($birthday);
-			}
+			//}
 		}
 
 		// todo: password
@@ -1062,7 +1063,8 @@ class ilCDTrainerProfile extends ilUserProfile
 						break;
 						
 					case "birthday":
-						$item->setValueByArray(array("usr_birthday" => array("date" => $val)));
+						//$item->setValueByArray(array("usr_birthday" => array("date" => $val)));
+						$item->setDate(new ilDate($val, IL_CAL_DATE));
 						break;
 						
 					default:

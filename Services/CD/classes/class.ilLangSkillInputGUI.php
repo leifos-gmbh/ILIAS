@@ -113,7 +113,7 @@ class ilLangSkillInputGUI extends ilSubEnabledFormPropertyGUI implements ilTable
 		return $this->level_values;
 	}
 	
-	public function setMulti($a_multi)
+	public function setMulti($a_multi, $a_sortable = false, $a_addremove = true)
 	{
 		$this->multi = (bool)$a_multi;
 	}
@@ -223,8 +223,9 @@ class ilLangSkillInputGUI extends ilSubEnabledFormPropertyGUI implements ilTable
 			$tpl->setVariable("VAL_SELECT_OPTION_L", ilUtil::prepareFormOutput($option_value));
 			if((string) $sel_lv == (string) $option_value)
 			{
-				$tpl->setVariable("CHK_SEL_OPTION_L",
-					'selected="selected"');
+				// this will be set by JS and JS fails (at least under Chrome) if we already set selected here...
+				//$tpl->setVariable("CHK_SEL_OPTION_L",
+				//	'selected="selected"');
 			}
 			$tpl->setVariable("TXT_SELECT_OPTION_L", $option_text);
 			$tpl->parseCurrentBlock();

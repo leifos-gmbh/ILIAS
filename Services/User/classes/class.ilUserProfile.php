@@ -931,6 +931,12 @@ class ilUserProfile
 						$a_form->addItem($ne);
 					}
 					break;
+
+				// cdpatch start
+				default:
+					$this->addFormField($a_form, $f, $p, $a_user);
+					break;
+				// cdpatch end
 			}
 		}
 		

@@ -3,6 +3,10 @@
 
 include_once 'Services/Table/interfaces/interface.ilTableFilterItem.php';
 
+// cdpatch start
+include_once("./Services/Calendar/classes/class.ilCalendarUtil.php");
+// cdpatch end
+
 /**
 * input GUI for a time span (start and end date)
 *

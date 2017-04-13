@@ -9,7 +9,8 @@ var ilMultiFormValues = {
 	/**
 	 * Bind click events and handle preset values
 	 */
-	init: function() {		
+	init: function() {
+
 		// add click event to +-icons
 		$('button[id*="ilMultiAdd"]').on('click', function(e) {
 			ilMultiFormValues.addEvent(e);
@@ -225,14 +226,15 @@ var ilMultiFormValues = {
 	 * @param node element
 	 */
 	handleAddPreset: function(element) {
-
 		// build id for added elements
 		var element_id = $(element).attr('id').split('~');
 		element_id = element_id[1];
-
+		// console.log(element_id);
 		// add element for each additional value
 		var values = $(element).attr('value').split('~');
 		$(values).each(function(i) {
+			// console.log(i);
+			// console.log(this);
 			$("select[name='" + element_id + "[]']").eq(i).find('option:selected').removeAttr('selected');
 			$("select[name='" + element_id + "[]']").eq(i).find('option[value="' + this + '"]').attr('selected', true);
 			$("input[name='" + element_id + "[]']").eq(i).attr('value', this);

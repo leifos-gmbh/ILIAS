@@ -94,7 +94,7 @@ class ilCDDateInputGUI extends ilTextInputGUI
 	*
 	* @return	int	Size
 	*/
-	function insert(&$a_tpl)
+	function insert($a_tpl)
 	{
 		$html = $this->render();
 

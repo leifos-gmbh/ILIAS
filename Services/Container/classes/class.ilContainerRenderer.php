@@ -578,9 +578,7 @@ class ilContainerRenderer
 				$title = $lng->txt("objs_".$a_type);
 
 				// cdpatch start (added counter for sessions)
-				if ($a_type == "sess")
-				{
-				if (count($this->block_items["sess"]) > 1)
+				if ($a_type == "sess" && count($this->block_items["sess"]) > 1)
 				{
 					$title = count($this->block_items["sess"])." ".$lng->txt("objs_sess");
 				}

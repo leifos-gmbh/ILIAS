@@ -63,7 +63,7 @@ class ilCDTrainerGUI
 		if (!$this->user_is_trainer)
 		{
 			$tpl->setTitle($lng->txt("trainers"));
-			$tpl->setTitleIcon(ilUtil::getImagePath("icon_usr_b.png"));
+			$tpl->setTitleIcon(ilUtil::getImagePath("icon_usr.svg"));
 		}
 		
 		$next_class = $ilCtrl->getNextClass();
@@ -1190,7 +1190,6 @@ class ilCDTrainerGUI
 							else
 							{
 								// should not be needed
-								var_dump($item);
 								$value = print_r($item["value"], true);
 							}
 							break;

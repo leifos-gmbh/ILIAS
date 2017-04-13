@@ -8,7 +8,17 @@
 <script>
 	$(function() {
 		$("#il_property_form_table_{TABLE_ID_JS} input[type=submit]").filter(function() {
-			return $(this).attr("id") != "ilCharSelectorToggleForm" && $(this).attr("id") != "gaptrigger" && $(this).closest("form").attr("id").indexOf("form_excasscomm") === -1;
+			var id = $(this).attr("id"),
+				formId =  $(this).closest("form").attr("id");
+
+			return (
+				id !== "ilCharSelectorToggleForm" &&
+				id !== "gaptrigger" &&
+				(
+					typeof formId !== "string" ||
+					formId.indexOf("form_excasscomm") === -1
+				)
+			);
 		}).click(function() {
 			var $clickedButton = this;
 			$("#il_property_form_table_{TABLE_ID_JS} input[type=submit]").filter(function() {

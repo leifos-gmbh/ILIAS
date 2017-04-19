@@ -79,6 +79,8 @@ All parts that aren't checked yet are actually marked with "rtl-review"
 
 /* flex grid support start, see http://www.bootply.com/126437 */
 
+/* deactivated flex grid, since grids in grids will not work correctly width:100%; and flex:1 1 auto; seem to be problems
+
 .row-flex, .row-flex > div[class*='col-'] {
 	display: -webkit-box;
 	display: -moz-box;
@@ -96,13 +98,12 @@ All parts that aren't checked yet are actually marked with "rtl-review"
 }
 
 .row-flex > div[class*='col-'], .container-flex > div[class*='col-'] {
-	margin:-.2px; /* hack adjust for wrapping */
+	margin:-.2px;
 }
 
 .container-flex > div[class*='col-'] div,.row-flex > div[class*='col-'] div {
-	width:100%;
-}
-
+	 width:100%;
+ }
 
 .flex-col {
 	display: flex;
@@ -116,6 +117,8 @@ All parts that aren't checked yet are actually marked with "rtl-review"
 	-webkit-flex: 2;
 	flex: 2;
 }
+
+*/
 
 /* flex grid support end */
 

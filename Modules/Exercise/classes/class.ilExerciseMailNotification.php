@@ -114,6 +114,30 @@ class ilExerciseMailNotification extends ilMailNotification
 					$this->appendBody("\n\n");
 					$this->appendBody(sprintf($this->getLanguageText('exc_submission_notification_link'),
 						$this->createPermanentLink()));
+
+					if (ilExAssignment::lookupType($this->getAssignmentId()) ==	ilExAssignment::TYPE_UPLOAD)
+					{
+						$this->appendBody("\n\n");
+
+						//new files uploaded
+						$assignment = new ilExAssignment($this->getAssignmentId());
+						$submission = new ilExSubmission($assignment,$ilUser->getId());
+						if($submission->lookupNewFiles())
+						{
+							$this->appendBody(sprintf($this->getLanguageText('exc_submission_downloads_notification_link'),
+								$this->createPermanentLink(array("ass_id" => $this->getAssignmentId(), "action" => "download", "member_id" => $ilUser->getId()))));
+						}
+						else
+						{
+							$this->appendBody(sprintf($this->getLanguageText('exc_submission_downloads_notification_link'),
+								$this->getLanguageText("exc_submission_no_new_files")));
+						}
+					}
+
+					$this->appendBody("\n\n");
+					$this->appendBody(sprintf($this->getLanguageText('exc_submission_and_grades_notification_link'),
+						$this->createPermanentLink(array("ass_id" => $this->getAssignmentId(), "action" => "grades"))));
+
 					$this->getMail()->appendInstallationSignature(true);
 
 					$this->sendMail(array($rcp),array('system'));

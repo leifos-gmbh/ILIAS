@@ -559,26 +559,51 @@ class ilObjExerciseGUI extends ilObjectGUI
 	*/
 	public static function _goto($a_target, $a_raw)
 	{
-		global $ilErr, $lng, $ilAccess;
+		global $ilErr, $lng, $ilAccess, $ilCtrl;
 
-		$ass_id = null;
-		$parts = explode("_", $a_raw);
-		if(sizeof($parts) == 2)
+		//we don't have baseClass here...
+		$ilCtrl->setTargetScript("ilias.php");
+		$ilCtrl->initBaseClass("ilRepositoryGUI");
+
+		//ilExerciseMailNotification has links to:
+		// "Assignments", "Submission and Grades" and Downnoad the NEW files if the assignment type is "File Upload".
+		$ass_id = $_GET['ass_id'];
+		if(!$ass_id)
 		{
-			$ass_id = (int)$parts[1];
+			$ass_id = null;
+			$parts = explode("_", $a_raw);
+			if(sizeof($parts) == 2) {
+				$ass_id = (int)$parts[1];
+			}
 		}
 		
 		if ($ilAccess->checkAccess("read", "", $a_target))
 		{
-			if($ass_id)
-			{
-				$_GET["ass_id_goto"] = $ass_id;
+			$ilCtrl->setParameterByClass("ilExerciseHandlerGUI", "ref_id", $a_target);
+			$ilCtrl->setParameterByClass("ilExerciseHandlerGUI", "target", $a_target);
+
+			if($ass_id){
+				$ilCtrl->setParameterByClass("ilExerciseManagementGUI", "ass_id", $ass_id);
 			}
-			$_GET["ref_id"] = $a_target;
-			$_GET["cmd"] = "showOverview";
-			$_GET["baseClass"] = "ilExerciseHandlerGUI";
-			include("ilias.php");
-			exit;
+
+			$action = $_GET['action'];
+			switch($action)
+			{
+				case "grades":
+					$ilCtrl->redirectByClass(array("ilRepositoryGUI", "ilExerciseHandlerGUI", "ilObjExerciseGUI", "ilExerciseManagementGUI"), "members");
+					break;
+
+				case "download":
+					$ilCtrl->setParameterByClass("ilExerciseHandlerGUI", "member_id", $_GET['member_id']);
+					$ilCtrl->redirectByClass(array("ilRepositoryGUI", "ilExerciseHandlerGUI", "ilObjExerciseGUI", "ilExerciseManagementGUI", "ilExSubmissionFileGUI"),"downloadNewReturned");
+					break;
+
+				default:
+					$ilCtrl->redirectByClass(array("ilRepositoryGUI", "ilExerciseHandlerGUI", "ilObjExerciseGUI"), "showOverview");
+					break;
+
+			}
+
 		}
 		else if ($ilAccess->checkAccess("visible", "", $a_target))
 		{

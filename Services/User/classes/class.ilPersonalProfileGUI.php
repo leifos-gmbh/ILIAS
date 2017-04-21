@@ -126,6 +126,10 @@ class ilPersonalProfileGUI
 	{
 		global $ilUser;
 
+		// cdpatch start
+		return;
+		// cdpatch end
+
 		if ($this->workWithUserSetting("upload"))
 		{
 			if (!$this->form->hasFileUpload("userfile"))
@@ -561,6 +565,10 @@ class ilPersonalProfileGUI
 		global $ilTabs, $ilUser, $ilHelp;
 
 		$ilHelp->setScreenIdComponent("user");
+
+		// cdpatch start
+		return;
+		// cdpatch end
 		
 		// personal data
 		$ilTabs->addTab("personal_data", 

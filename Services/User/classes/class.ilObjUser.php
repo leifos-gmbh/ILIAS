@@ -2365,7 +2365,7 @@ class ilObjUser extends ilObject
 	/**
 	 * Lookup company id
 	 */
-	function _lookupCompanyId($a_user_id)
+	static function _lookupCompanyId($a_user_id)
 	{
 		return ilObjUser::_lookup($a_user_id, "company_id");
 	}

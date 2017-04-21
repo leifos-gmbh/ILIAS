@@ -2148,7 +2148,13 @@ class ilObjCourseGUI extends ilContainerGUI
 		
 		include_once './Modules/Course/classes/class.ilCourseMembershipGUI.php';
 		$membership_gui = new ilCourseMembershipGUI($this, $this->object);
-		$membership_gui->addMemberTab($this->tabs_gui, $is_participant);
+		// cdpatch start
+		if ($ilAccess->checkAccess("write", "", $this->object->getRefId()) &&
+			$ilAccess->checkAccess("edit_learning_progress", "", $this->object->getRefId()))
+		{
+			$membership_gui->addMemberTab($this->tabs_gui, $is_participant);
+		}
+		// cdpatch end
 
 		// badges
 		if($ilAccess->checkAccess('write','',$this->ref_id))

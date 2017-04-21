@@ -14,8 +14,11 @@ include_once "Services/Object/classes/class.ilObjectListGUI.php";
  */
 class ilObjCourseListGUI extends ilObjectListGUI
 {
-
 	// cdpatch start
+
+	protected static $pl_loaded = false;
+	protected static $pl = null;
+
 	function __construct($a_context = self::CONTEXT_REPOSITORY)
 	{
 		parent::__construct($a_context);

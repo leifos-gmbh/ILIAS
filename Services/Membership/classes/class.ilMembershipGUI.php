@@ -924,6 +924,8 @@ class ilMembershipGUI
 			);
 
 			// show group overview
+			// cdpatch start
+			/*
 			if($this instanceof ilCourseMembershipGUI)
 			{
 				$tabs->addSubTabTarget(
@@ -933,6 +935,8 @@ class ilMembershipGUI
 					"ilCourseParticipantsGroupsGUI"
 				);
 			}
+			*/
+			// cdpatch end
 			
 			$childs = (array) $GLOBALS['tree']->getChildsByType($this->getParentObject()->getRefId(),'sess');
 			if(count($childs))
@@ -945,12 +949,16 @@ class ilMembershipGUI
 				);
 			}
 
+			// cdpatch start
+			/*
 			$tabs->addSubTabTarget(
 				$this->getParentObject()->getType().'_members_gallery',
 				$this->ctrl->getLinkTargetByClass(array(get_class($this),'ilUsersGalleryGUI')),
 				'view',
 				'ilUsersGalleryGUI'
 			);
+			*/
+			// cdpatch end
 		}
 		else if($this->getParentObject()->getShowMembers())
 		{

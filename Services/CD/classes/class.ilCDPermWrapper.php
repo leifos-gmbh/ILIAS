@@ -109,6 +109,7 @@ class ilCDPermWrapper
 							{
 								// check whether parent is a cdc category
 								$parent = $tree->getParentId($f);
+								$parent = $f;
 								if (ilObject::_lookupType($parent, true) == "cat")
 								{
 									$set = $ilDB->query("SELECT id FROM cd_center WHERE " .

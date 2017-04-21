@@ -223,10 +223,10 @@ class cdParticipationConfirmation
 	 * @param
 	 * @return
 	 */
-	function downloadConfirmationFile($a_ref_id, $a_conf, $a_placeholders, $date)
+	static function downloadConfirmationFile($a_pl, $a_ref_id, $a_conf, $a_placeholders, $date)
 	{
 		// get confirmation template
-		$this->pl->includeClass("class.cdParticipationConfirmation.php");
+		$a_pl->includeClass("class.cdParticipationConfirmation.php");
 		$conf = new cdParticipationConfirmation($a_conf);
 		
 		// create temporary directory
@@ -246,8 +246,8 @@ class cdParticipationConfirmation
 //		$parts = $parts->getParticipants();
 		
 		$parts = ilCourseParticipants::_getInstanceByObjId(ilObject::_lookupObjId($a_ref_id))->getMembers();
-		
-		$this->pl->includeClass("class.cdCourseType.php");
+
+		$a_pl->includeClass("class.cdCourseType.php");
 		
 		foreach ($parts as $user_id)
 		{

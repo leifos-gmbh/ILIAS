@@ -815,9 +815,7 @@ class ilCDTrainerGUI
 	 * @param array $a_recipe
 	 */
 	protected function exportPDF(array $a_recipe)
-	{		
-		global $tpl;			
-
+	{
 		$form = $this->initTrainerForm();	
 		$data = $this->exportPDFProcessFormData($form);
 		$html = $this->exportPDFProcessData($a_recipe, $data);

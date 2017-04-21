@@ -545,7 +545,7 @@ class cdParticipantEvaluation
 	 * @param
 	 * @return
 	 */
-	function countEvals($a_user_id, $a_course_id)
+	static function countEvals($a_user_id, $a_course_id)
 	{
 		global $ilDB;
 		
@@ -563,7 +563,7 @@ class cdParticipantEvaluation
 	 * @param
 	 * @return
 	 */
-	function getEvalNotificationsForCourses($a_course)
+	static function getEvalNotificationsForCourses($a_course)
 	{
 		global $rbacsystem, $ilDB;
 		

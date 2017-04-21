@@ -128,12 +128,12 @@ class ilCDCourseAssignmentGUI
 	 */
 	function assignUsers()
 	{
-		include_once("./Services/Membership/classes/class.ilParticipants.php");
+		include_once("./Modules/Course/classes/class.ilCourseParticipants.php");
 		
 		$obj_id = ilObject::_lookupObjId((int) $_GET["sel_ref_id"]);
 		if (ilObject::_lookupType($obj_id) == "crs")
 		{
-			$par = new ilParticipants($obj_id);
+			$par = new ilCourseParticipants($obj_id);
 			if (is_array($_POST["user_id"]))
 			{
 				foreach ($_POST["user_id"] as $user_id)

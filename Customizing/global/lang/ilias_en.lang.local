@@ -237,3 +237,5 @@ cd#:#cd_really_assign_as_member#:#Do you really want to assign the following use
 cd#:#cd_assign#:#Assign
 cd#:#cd_registration#:#Registration
 cd#:#cd_profile_changes#:#Profile Changes
+common#:#form_date_duration_start#:#Von
+common#:#form_date_duration_end#:#Bis

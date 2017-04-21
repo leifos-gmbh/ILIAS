@@ -42,7 +42,6 @@ class cdCoursesTableGUI extends ilTable2GUI
 		$item_list_gui->enableDelete(false);
 		$item_list_gui->enableCut(false);
 		$item_list_gui->enableCopy(false);
-		$item_list_gui->enablePayment(false);
 		$item_list_gui->enableLink(false);
 		$item_list_gui->enableInfoScreen(false);
 		$item_list_gui->enableSubscribe(false);

@@ -167,7 +167,7 @@ class cdCourseExtGUI
 		$this->initParticipantConfirmationForm();
 		$this->form->checkInput();
 		$date = $this->form->getItemByPostVar("date")->getDate();
-		cdParticipationConfirmation::downloadConfirmationFile($_GET["ref_id"],
+		cdParticipationConfirmation::downloadConfirmationFile($this->pl, $_GET["ref_id"],
 			$_POST["conf"], $_POST, $date);
 	}
 	

@@ -125,6 +125,10 @@ class ilInitialisation
 		define ("PATH_TO_FOP",$ilIliasIniFile->readVariable("tools","fop"));
 		define ("PATH_TO_LESSC",$ilIliasIniFile->readVariable("tools","lessc"));
 
+		// cdpatch start
+		define ("PATH_TO_HTMLDOC",$ilIliasIniFile->readVariable("tools","htmldoc"));
+		// cdpatch end
+
 		// read virus scanner settings
 		switch ($ilIliasIniFile->readVariable("tools", "vscantype"))
 		{

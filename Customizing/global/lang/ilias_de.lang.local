@@ -186,3 +186,5 @@ cd#:#cd_really_assign_as_member#:#Sollen die folgenden Benutzer dem Kurs wirklic
 cd#:#cd_assign#:#Zuordnen
 cd#:#cd_registration#:#Registrierung
 cd#:#cd_profile_changes#:#Profiländerungen
+common#:#form_date_duration_start#:#Von
+common#:#form_date_duration_end#:#Bis

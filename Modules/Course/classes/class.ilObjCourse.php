@@ -1300,7 +1300,8 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 		{
 			$this->__createDefaultSettings();
 		}
-		
+
+		// cdpatch: added course type and level
 		$query = "UPDATE crs_settings SET ".
 			"syllabus = ".$ilDB->quote($this->getSyllabus() ,'text').", ".
 			"contact_name = ".$ilDB->quote($this->getContactName() ,'text').", ".
@@ -1338,7 +1339,10 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 			'crs_end = '.$ilDB->quote(($this->getCourseEnd() && !$this->getCourseEnd()->isNull()) ? $this->getCourseEnd()->get(IL_CAL_UNIX) : null, 'integer').', '.
 			'auto_wait = '.$ilDB->quote((int) $this->hasWaitingListAutoFill(),'integer').', '.
 			'leave_end = '.$ilDB->quote(($this->getCancellationEnd() && !$this->getCancellationEnd()->isNull()) ? $this->getCancellationEnd()->get(IL_CAL_UNIX) : null, 'integer').', '.
-			'min_members = '.$ilDB->quote((int) $this->getSubscriptionMinMembers(),'integer').'  '.				
+			'min_members = '.$ilDB->quote((int) $this->getSubscriptionMinMembers(),'integer').', '.
+			'course_type = '.$ilDB->quote($this->getCourseType(),'integer').', '.
+			'course_level = '.$ilDB->quote($this->getCourseLevel(),'text').', '.
+			'course_nr = '.$ilDB->quote($this->getCourseNr(),'text').' '.
 			"WHERE obj_id = ".$ilDB->quote($this->getId() ,'integer')."";		
 				
 		$res = $ilDB->manipulate($query);

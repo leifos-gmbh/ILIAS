@@ -422,6 +422,9 @@ class ilObjUserGUI extends ilObjectGUI
 				case "std_user":
 					break;
 			}
+			$userObj->setBranch(ilUtil::stripSlashes($_POST["branch"]));
+			$userObj->setFieldOfResponsibility(ilUtil::stripSlashes($_POST["field_of_responsibility"]));
+			$userObj->setProfession(ilUtil::stripSlashes($_POST["profession"]));
 			// cdpatch end
 
 
@@ -890,6 +893,9 @@ class ilObjUserGUI extends ilObjectGUI
 					$this->object->setCompanyId(0);
 					break;
 			}
+			$this->object->setBranch(ilUtil::stripSlashes($_POST["branch"]));
+			$this->object->setFieldOfResponsibility(ilUtil::stripSlashes($_POST["field_of_responsibility"]));
+			$this->object->setProfession(ilUtil::stripSlashes($_POST["profession"]));
 			// cdpatch end
 
 

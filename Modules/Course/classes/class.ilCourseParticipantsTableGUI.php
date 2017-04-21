@@ -36,7 +36,17 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
 		global $lng, $ilCtrl;
 
 		// cdpatch start
-		$this->pl = $a_plugin;
+		global $ilPluginAdmin;
+		$this->pl = null;
+		$pl_names = $ilPluginAdmin->getActivePluginsForSlot(IL_COMP_SERVICE, "UIComponent", "uihk");
+		foreach ($pl_names as $pl)
+		{
+			if ($pl == "CD")
+			{
+				// course type information
+				$this->pl = ilPluginAdmin::getPluginObject(IL_COMP_SERVICE, "UIComponent", "uihk", $pl);
+			}
+		}
 		// cdpatch end
 
 		$this->show_learning_progress = $a_show_learning_progress;	
@@ -290,7 +300,7 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
 			$this->tpl->setCurrentBlock('eval');
 			$this->tpl->setVariable("EVAL_NUM",
 				(int) cdParticipantEvaluation::countEvals($a_set["usr_id"],
-					$this->parent_obj->object->getId()));
+					$this->rep_object->getId()));
 			$this->tpl->parseCurrentBlock();
 
 			/*
@@ -372,13 +382,11 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
 			$this->tpl->parseCurrentBlock();
 		}
 		// cdpatch begin
-		if (strtolower(get_class($this->parent_obj)) == "ilobjcoursegui")
-		{
-			$this->tpl->setCurrentBlock('link');
-			$this->tpl->setVariable('LINK_NAME',$this->ctrl->getLinkTargetByClass(array('ilcduihookgui','cdparticipantevaluationgui'), ''));
-			$this->tpl->setVariable('LINK_TXT',$this->lng->txt('edit_evaluations'));
-			$this->tpl->parseCurrentBlock();
-		}
+		$this->tpl->setCurrentBlock('link');
+		$this->ctrl->setParameterByClass("cdparticipantevaluationgui", "member_id", $a_set["usr_id"]);
+		$this->tpl->setVariable('LINK_NAME',$this->ctrl->getLinkTargetByClass(array('ilcduihookgui','cdparticipantevaluationgui'), ''));
+		$this->tpl->setVariable('LINK_TXT',$this->lng->txt('edit_evaluations'));
+		$this->tpl->parseCurrentBlock();
 		// cdpatch end
 
 		$this->ctrl->clearParameters($this->parent_obj);

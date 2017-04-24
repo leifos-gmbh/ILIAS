@@ -576,10 +576,11 @@ class ilObjExerciseGUI extends ilObjectGUI
 				$ass_id = (int)$parts[1];
 			}
 		}
-		
+
+		$ilCtrl->setParameterByClass("ilExerciseHandlerGUI", "ref_id", $a_target);
+
 		if ($ilAccess->checkAccess("read", "", $a_target))
 		{
-			$ilCtrl->setParameterByClass("ilExerciseHandlerGUI", "ref_id", $a_target);
 			$ilCtrl->setParameterByClass("ilExerciseHandlerGUI", "target", $a_target);
 
 			if($ass_id){
@@ -607,11 +608,7 @@ class ilObjExerciseGUI extends ilObjectGUI
 		}
 		else if ($ilAccess->checkAccess("visible", "", $a_target))
 		{
-			$_GET["ref_id"] = $a_target;
-			$_GET["cmd"] = "infoScreen";
-			$_GET["baseClass"] = "ilExerciseHandlerGUI";
-			include("ilias.php");
-			exit;
+			$ilCtrl->redirectByClass(array("ilRepositoryGUI", "ilExerciseHandlerGUI", "ilObjExerciseGUI"), "infoScreen");
 		}
 		else if ($ilAccess->checkAccess("read", "", ROOT_FOLDER_ID))
 		{

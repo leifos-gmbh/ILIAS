@@ -184,20 +184,15 @@ class cdCourseExtGUI
 		$ref_id = (int) $_GET["ref_id"];
 		$obj_id = (int) ilObject::_lookupObjId($ref_id);
 		$course = new ilObjCourse($ref_id);
-		
-		include_once "./Services/Excel/classes/class.ilExcelWriterAdapter.php";
-		$excelfile = ilUtil::ilTempnam();
-		$adapter = new ilExcelWriterAdapter($excelfile, FALSE);
-		$workbook = $adapter->getWorkbook();
-		$workbook->setVersion(8); // Use Excel97/2000 Format
-		include_once ("./Services/Excel/classes/class.ilExcelUtils.php");
-		
-		
+
+		include_once "./Services/Excel/classes/class.ilExcel.php";
+		$excel = new ilExcel();
+		$excel->addSheet("Beurteilungen");
+
 		//
 		// evaluations
 		//
-		$ws = $workbook->addWorksheet();
-		
+
 		include_once("./Services/Form/classes/class.ilFormPropertyGUI.php");
 		$this->pl->includeClass("class.cdEvalSkillInputGUI.php");
 		$sk_inp = new cdEvalSkillInputGUI("", "", $this->pl);
@@ -205,25 +200,25 @@ class cdCourseExtGUI
 
 		// header row
 		$col = 0;
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($this->pl->txt("creation")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($this->pl->txt("last_update")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($this->pl->txt("part_lastname")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($this->pl->txt("part_firstname")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($this->pl->txt("trainer")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($lng->txt("obj_crs")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($this->pl->txt("course_level")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($this->pl->txt("after_x_lessons")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($this->pl->txt("starting_cef")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($this->pl->txt("current_cef")));
+		$excel->setCell(1, $col++, $this->pl->txt("creation"));
+		$excel->setCell(1, $col++, $this->pl->txt("last_update"));
+		$excel->setCell(1, $col++, $this->pl->txt("part_lastname"));
+		$excel->setCell(1, $col++, $this->pl->txt("part_firstname"));
+		$excel->setCell(1, $col++, $this->pl->txt("trainer"));
+		$excel->setCell(1, $col++, $lng->txt("obj_crs"));
+		$excel->setCell(1, $col++, $this->pl->txt("course_level"));
+		$excel->setCell(1, $col++, $this->pl->txt("after_x_lessons"));
+		$excel->setCell(1, $col++, $this->pl->txt("starting_cef"));
+		$excel->setCell(1, $col++, $this->pl->txt("current_cef"));
 		foreach ($skills as $v => $txt)
 		{
-			$ws->writeString(0, $col++, ilExcelUtils::_convert_text($txt));
+			$excel->setCell(1, $col++, $txt);
 		}
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($this->pl->txt("test_level")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($this->pl->txt("test_attendance")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($this->pl->txt("result")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($this->pl->txt("stay_in_group")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($this->pl->txt("recommended_level")));
+		$excel->setCell(1, $col++, $this->pl->txt("test_level"));
+		$excel->setCell(1, $col++, $this->pl->txt("test_attendance"));
+		$excel->setCell(1, $col++, $this->pl->txt("result"));
+		$excel->setCell(1, $col++, $this->pl->txt("stay_in_group"));
+		$excel->setCell(1, $col++, $this->pl->txt("recommended_level"));
 		
 		// get trainers
 		include_once("./Modules/Course/classes/class.ilCourseParticipants.php");
@@ -240,49 +235,48 @@ class cdCourseExtGUI
 		}
 
 		
-		$cnt = 1;
+		$cnt = 2;
 		$this->pl->includeClass("class.cdParticipantEvaluation.php");
 		foreach (cdParticipantEvaluation::getPEsOfCourse($obj_id) as $eval)
 		{
 //var_dump($eval);
 			$user = ilObjUser::_lookupName($eval["participant_id"]);
 			$col = 0;
-			$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($eval["creation_date"]));
-			$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($eval["update_date"]));
-			$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($user["lastname"]));
-			$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($user["firstname"]));
-			$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($tstr));
-			$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text(ilObject::_lookupTitle($obj_id)));
-			$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($course->getCourseLevel()));
-			$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($eval["after_x_lessons"]));
-			$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($eval["starting_cef"]));
-			$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($eval["current_cef"]));
+			$excel->setCell($cnt, $col++, $eval["creation_date"]);
+			$excel->setCell($cnt, $col++, $eval["update_date"]);
+			$excel->setCell($cnt, $col++, $user["lastname"]);
+			$excel->setCell($cnt, $col++, $user["firstname"]);
+			$excel->setCell($cnt, $col++, $tstr);
+			$excel->setCell($cnt, $col++, ilObject::_lookupTitle($obj_id));
+			$excel->setCell($cnt, $col++, $course->getCourseLevel());
+			$excel->setCell($cnt, $col++, $eval["after_x_lessons"]);
+			$excel->setCell($cnt, $col++, $eval["starting_cef"]);
+			$excel->setCell($cnt, $col++, $eval["current_cef"]);
 			$sks = unserialize($eval["skills"]);
 			foreach ($skills as $v => $txt)
 			{
-				$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($sks[$v]));
+				$excel->setCell($cnt, $col++, $sks[$v]);
 			}
-			$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($eval["test_level"]));
+			$excel->setCell($cnt, $col++, $eval["test_level"]);
 			$att = $eval["test_attendance"]
 				? "x"
 				: "";
-			$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($att));
-			$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($eval["test_result"]));
+			$excel->setCell($cnt, $col++, $att);
+			$excel->setCell($cnt, $col++, $eval["test_result"]);
 			$stay = $eval["stay_in_group"]
 				? "x"
 				: "";
-			$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($stay));
+			$excel->setCell($cnt, $col++, $stay);
 			$rec_level = $eval["stay_in_group"]
 				? ""
 				: $eval["recommended_level"];
-			$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($rec_level));
+			$excel->setCell($cnt, $col++, $rec_level);
 			
 			$cnt++;
 		}
 
-		$workbook->close();
 		$exc_name = ilUtil::getASCIIFilename(preg_replace("/\s/", "_", $this->pl->txt("evaluations_course")."_".ilObject::_lookupTitle($obj_id)));
-		ilUtil::deliverFile($excelfile, $exc_name.".xls", "application/vnd.ms-excel");
+		$excel->sendToClient($exc_name);
 	}
 	
 

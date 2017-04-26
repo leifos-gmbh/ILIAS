@@ -684,7 +684,7 @@ class cdCompany
 			"lastname",
 			"asc",
 			0,
-			0,
+			999999,
 			"",
 			"",
 			null,
@@ -708,101 +708,96 @@ class cdCompany
 				$user_data[] = $u;
 			}
 		}
-		
-		include_once "./Services/Excel/classes/class.ilExcelWriterAdapter.php";
-		$excelfile = ilUtil::ilTempnam();
-		$adapter = new ilExcelWriterAdapter($excelfile, FALSE);
-		$workbook = $adapter->getWorkbook();
-		$workbook->setVersion(8); // Use Excel97/2000 Format
-		include_once ("./Services/Excel/classes/class.ilExcelUtils.php");
-		
-		
+
+		include_once "./Services/Excel/classes/class.ilExcel.php";
+		$excel = new ilExcel();
+		$excel->addSheet("Personendaten");
+
 		//
 		// user data
 		//
-		$ws = $workbook->addWorksheet();
-		
+
 		// header row
 		$col = 0;
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($lng->txt("lastname")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($lng->txt("firstname")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($lng->txt("login")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($lng->txt("gender")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($lng->txt("department")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($lng->txt("branch")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($lng->txt("profession")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($lng->txt("field_of_responsibility")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($lng->txt("zipcode")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($lng->txt("city")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($lng->txt("country")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($lng->txt("phone_office")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($lng->txt("fax")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($lng->txt("email")));
+		$excel->setCell(1, $col++, $lng->txt("lastname"));
+		$excel->setCell(1, $col++, $lng->txt("firstname"));
+		$excel->setCell(1, $col++, $lng->txt("login"));
+		$excel->setCell(1, $col++, $lng->txt("gender"));
+		$excel->setCell(1, $col++, $lng->txt("department"));
+		$excel->setCell(1, $col++, $lng->txt("branch"));
+		$excel->setCell(1, $col++, $lng->txt("profession"));
+		$excel->setCell(1, $col++, $lng->txt("field_of_responsibility"));
+		$excel->setCell(1, $col++, $lng->txt("zipcode"));
+		$excel->setCell(1, $col++, $lng->txt("city"));
+		$excel->setCell(1, $col++, $lng->txt("country"));
+		$excel->setCell(1, $col++, $lng->txt("phone_office"));
+		$excel->setCell(1, $col++, $lng->txt("fax"));
+		$excel->setCell(1, $col++, $lng->txt("email"));
 		
-		$cnt = 1;
+		$cnt = 2;
 		foreach ($user_data as $user)
 		{
 			$col = 0;
-			$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($user["lastname"]));
-			$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($user["firstname"]));
-			$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($user["login"]));
-			$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($user["gender"]));
-			$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($user["department"]));
-			$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($user["branch"]));
-			$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($user["profession"]));
-			$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($user["field_of_responsibility"]));
-			$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($user["zipcode"]));
-			$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($user["city"]));
-			$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($user["country"]));
-			$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($user["phone_office"]));
-			$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($user["fax"]));
-			$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($user["email"]));
+			$excel->setCell($cnt, $col++, $user["lastname"]);
+			$excel->setCell($cnt, $col++, $user["firstname"]);
+			$excel->setCell($cnt, $col++, $user["login"]);
+			$excel->setCell($cnt, $col++, $user["gender"]);
+			$excel->setCell($cnt, $col++, $user["department"]);
+			$excel->setCell($cnt, $col++, $user["branch"]);
+			$excel->setCell($cnt, $col++, $user["profession"]);
+			$excel->setCell($cnt, $col++, $user["field_of_responsibility"]);
+			$excel->setCell($cnt, $col++, $user["zipcode"]);
+			$excel->setCell($cnt, $col++, $user["city"]);
+			$excel->setCell($cnt, $col++, $user["country"]);
+			$excel->setCell($cnt, $col++, $user["phone_office"]);
+			$excel->setCell($cnt, $col++, $user["fax"]);
+			$excel->setCell($cnt, $col++, $user["email"]);
 			$cnt++;
 		}
 		
 		//
 		// overview
 		//
-		$ws = $workbook->addWorksheet();
+		$excel->addSheet("Übersicht");
 		
 		// header row
-		$ws->writeString(0, 0, ilExcelUtils::_convert_text($lng->txt("lastname")));
-		$ws->writeString(0, 1, ilExcelUtils::_convert_text($lng->txt("firstname")));
-		$ws->writeString(0, 2, ilExcelUtils::_convert_text($lng->txt("login")));
-		$ws->writeString(0, 3, ilExcelUtils::_convert_text($a_pl->txt("mother_tongue")));
-		
-		$ws->writeString(0, 4, ilExcelUtils::_convert_text($a_pl->txt("pointscdc")));
-		$ws->writeString(0, 5, ilExcelUtils::_convert_text($a_pl->txt("datumtest")));
+		$excel->setCell(1, 0, $lng->txt("lastname"));
+		$excel->setCell(1, 1, $lng->txt("firstname"));
+		$excel->setCell(1, 2, $lng->txt("login"));
+		$excel->setCell(1, 3, $a_pl->txt("mother_tongue"));
 
-		$ws->writeString(0, 6, ilExcelUtils::_convert_text($a_pl->txt("train_lang")));
-		$ws->writeString(0, 7, ilExcelUtils::_convert_text($a_pl->txt("avg_self")));
-		$ws->writeString(0, 8, ilExcelUtils::_convert_text($a_pl->txt("online")));
-		$ws->writeString(0, 9, ilExcelUtils::_convert_text($a_pl->txt("oral")));
-		$ws->writeString(0, 10, ilExcelUtils::_convert_text($a_pl->txt("target")));
-		$ws->writeString(0, 11, ilExcelUtils::_convert_text($a_pl->txt("tech_lang")));
-		$ws->writeString(0, 12, ilExcelUtils::_convert_text($a_pl->txt("type_of_training")));
+		$excel->setCell(1, 4, $a_pl->txt("pointscdc"));
+		$excel->setCell(1, 5, $a_pl->txt("datumtest"));
+
+		$excel->setCell(1, 6, $a_pl->txt("train_lang"));
+		$excel->setCell(1, 7, $a_pl->txt("avg_self"));
+		$excel->setCell(1, 8, $a_pl->txt("online"));
+		$excel->setCell(1, 9, $a_pl->txt("oral"));
+		$excel->setCell(1, 10, $a_pl->txt("target"));
+		$excel->setCell(1, 11, $a_pl->txt("tech_lang"));
+		$excel->setCell(1, 12, $a_pl->txt("type_of_training"));
 		
 		// data rows
-		$cnt = 1;
+		$cnt = 2;
 		foreach ($user_data as $user)
 		{
 			$data = $this->getOverviewData($a_pl, $user["usr_id"]);
 			
 			foreach ($data["langs"] as $l)
 			{
-				$ws->writeString($cnt, 0, ilExcelUtils::_convert_text($user["lastname"]));
-				$ws->writeString($cnt, 1, ilExcelUtils::_convert_text($user["firstname"]));
-				$ws->writeString($cnt, 2, ilExcelUtils::_convert_text($user["login"]));
-				
-				$ws->writeString($cnt, 4, ilExcelUtils::_convert_text($data["points"][$l]));
-				$ws->writeString($cnt, 5, ilExcelUtils::_convert_text($data["ts"][$l]));
-				
-				$ws->writeString($cnt, 6, ilExcelUtils::_convert_text($lng->txt("meta_l_".$l)));
-				$ws->writeString($cnt, 7, ilExcelUtils::_convert_text($data["self_avg"][$l]));
-				$ws->writeString($cnt, 8, ilExcelUtils::_convert_text($data["test"][$l]));
-				$ws->writeString($cnt, 9, ilExcelUtils::_convert_text($data["oral_target"][$l]["oral"]));
-				$ws->writeString($cnt, 10, ilExcelUtils::_convert_text($data["oral_target"][$l]["target"]));
-				$ws->writeString($cnt, 11, ilExcelUtils::_convert_text($data["tech_lang"][$l]));
+				$excel->setCell($cnt, 0, $user["lastname"]);
+				$excel->setCell($cnt, 1, $user["firstname"]);
+				$excel->setCell($cnt, 2, $user["login"]);
+
+				$excel->setCell($cnt, 4, $data["points"][$l]);
+				$excel->setCell($cnt, 5, $data["ts"][$l]);
+
+				$excel->setCell($cnt, 6, $lng->txt("meta_l_".$l));
+				$excel->setCell($cnt, 7, $data["self_avg"][$l]);
+				$excel->setCell($cnt, 8, $data["test"][$l]);
+				$excel->setCell($cnt, 9, $data["oral_target"][$l]["oral"]);
+				$excel->setCell($cnt, 10, $data["oral_target"][$l]["target"]);
+				$excel->setCell($cnt, 11, $data["tech_lang"][$l]);
 				
 				$cnt++;
 			}
@@ -811,29 +806,29 @@ class cdCompany
 		//
 		// needs analysis
 		//
-		$ws = $workbook->addWorksheet();
+		$excel->addSheet("Bedarfsanalyse");
 		
 		// header row
 		$col = 0;
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($lng->txt("lastname")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($lng->txt("firstname")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($lng->txt("login")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($a_pl->txt("course_lang")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($a_pl->txt("last_course")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($a_pl->txt("lang_level")));
+		$excel->setCell(1, $col++, $lng->txt("lastname"));
+		$excel->setCell(1, $col++, $lng->txt("firstname"));
+		$excel->setCell(1, $col++, $lng->txt("login"));
+		$excel->setCell(1, $col++, $a_pl->txt("course_lang"));
+		$excel->setCell(1, $col++, $a_pl->txt("last_course"));
+		$excel->setCell(1, $col++, $a_pl->txt("lang_level"));
 		foreach (cdNeedsAnalysis::$talk_understand as $k => $l)
 		{
-			$ws->writeString(0, $col++, ilExcelUtils::_convert_text($a_pl->txt($l)));
+			$excel->setCell(1, $col++, $a_pl->txt($l));
 		}
 		foreach (cdNeedsAnalysis::$write_read as $k => $l)
 		{
-			$ws->writeString(0, $col++, ilExcelUtils::_convert_text($a_pl->txt($l)));
+			$excel->setCell(1, $col++, $a_pl->txt($l));
 		}
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($a_pl->txt("technical_language")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($a_pl->txt("other_technical_language")));
+		$excel->setCell(1, $col++, $a_pl->txt("technical_language"));
+		$excel->setCell(1, $col++, $a_pl->txt("other_technical_language"));
 		
 		// data rows
-		$cnt = 1;
+		$cnt = 2;
 		reset($user_data);
 		foreach ($user_data as $user)
 		{
@@ -841,10 +836,10 @@ class cdCompany
 			foreach ($nas as $na)
 			{
 				$col = 0;
-				$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($user["lastname"]));
-				$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($user["firstname"]));
-				$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($user["login"]));
-				$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($lng->txt("meta_l_".$na["course_lang"])));
+				$excel->setCell($cnt, $col++, $user["lastname"]);
+				$excel->setCell($cnt, $col++, $user["firstname"]);
+				$excel->setCell($cnt, $col++, $user["login"]);
+				$excel->setCell($cnt, $col++, $lng->txt("meta_l_".$na["course_lang"]));
 				if(!(int)$na["last_course"])
 				{
 					$v = $a_pl->txt("option_never");
@@ -853,7 +848,7 @@ class cdCompany
 				{
 					$v = $na["last_course"];
 				}
-				$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($v));
+				$excel->setCell($cnt, $col++, $v);
 				if($na["lang_level"] == "")
 				{
 					$v = $a_pl->txt("option_none");
@@ -862,7 +857,7 @@ class cdCompany
 				{
 					$v = $na["lang_level"];
 				}
-				$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($v));
+				$excel->setCell($cnt, $col++, $v);
 				
 				$ta = unserialize($na["talk_understanding"]);
 				foreach (cdNeedsAnalysis::$talk_understand as $k => $l)
@@ -875,7 +870,7 @@ class cdCompany
 					{
 						$v = $a_pl->txt("freq_".$ta[$k]);
 					}
-					$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($v));
+					$excel->setCell($cnt, $col++, $v);
 				}
 				$wr = unserialize($na["write_read"]);
 				foreach (cdNeedsAnalysis::$write_read as $k => $l)
@@ -888,7 +883,7 @@ class cdCompany
 					{
 						$v = $a_pl->txt("freq_".$wr[$k]);
 					}
-					$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($v));
+					$excel->setCell($cnt, $col++, $v);
 				}
 
 				$tl = cdNeedsAnalysis::$technical_lang;
@@ -900,8 +895,8 @@ class cdCompany
 				{
 					$v = $a_pl->txt($tl[$na["tech_lang_sel"]]);
 				}
-				$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($v));
-				$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($na["tech_lang_free"]));
+				$excel->setCell($cnt, $col++, $v);
+				$excel->setCell($cnt, $col++, $na["tech_lang_free"]);
 				
 				$cnt++;
 			}
@@ -910,18 +905,19 @@ class cdCompany
 		//
 		// self evaluation
 		//
-		$ws = $workbook->addWorksheet();
-		
+		$excel->addSheet("Selbsteinschätzung");
+
+
 		// header row
 		include_once("./Services/Skill/classes/class.ilBasicSkill.php");
 		include_once("./Services/Skill/classes/class.ilSkillTree.php");
 		$col = 0;
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($lng->txt("lastname")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($lng->txt("firstname")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($lng->txt("login")));
+		$excel->setCell(1, $col++, $lng->txt("lastname"));
+		$excel->setCell(1, $col++, $lng->txt("firstname"));
+		$excel->setCell(1, $col++, $lng->txt("login"));
 		
 		// data rows
-		$cnt = 1;
+		$cnt = 2;
 		reset($user_data);
 		foreach ($user_data as $user)
 		{
@@ -930,9 +926,9 @@ class cdCompany
 			foreach ($ses as $se)
 			{
 				$col = 0;
-				$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($user["lastname"]));
-				$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($user["firstname"]));
-				$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($user["login"]));
+				$excel->setCell($cnt, $col++, $user["lastname"]);
+				$excel->setCell($cnt, $col++, $user["firstname"]);
+				$excel->setCell($cnt, $col++, $user["login"]);
 
 				$se = new ilSkillSelfEvaluation($se["id"]);
 				$levels = $se->getLevels();
@@ -960,13 +956,13 @@ class cdCompany
 		
 							$sk = new ilBasicSkill($child["child"]);
 							$ls = $sk->getLevelData();
-		
-							$ws->writeString($cnt, 3, ilExcelUtils::_convert_text($title));
+
+							$excel->setCell($cnt, 3, $title);
 							foreach ($ls as $ld)
 							{
 								if ($ld["id"] == $levels[$child["child"]])
 								{
-									$ws->writeString($cnt, 4, ilExcelUtils::_convert_text($ld["title"]));
+									$excel->setCell($cnt, 4, $ld["title"]);
 								}
 							}
 							$cnt++;
@@ -980,7 +976,8 @@ class cdCompany
 		//
 		// tests
 		//
-		$ws = $workbook->addWorksheet();
+		$excel->addSheet("Tests");
+
 		$a_pl->includeClass("class.cdEntryLevelTest.php");
 		
 		$fields = array(
@@ -1000,16 +997,16 @@ class cdCompany
 		
 		// header row
 		$col = 0;
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($lng->txt("lastname")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($lng->txt("firstname")));
-		$ws->writeString(0, $col++, ilExcelUtils::_convert_text($lng->txt("login")));
+		$excel->setCell(1, $col++, $lng->txt("lastname"));
+		$excel->setCell(1, $col++, $lng->txt("firstname"));
+		$excel->setCell(1, $col++, $lng->txt("login"));
 		foreach ($fields as $f => $l)
 		{
-			$ws->writeString(0, $col++, ilExcelUtils::_convert_text($a_pl->txt($l)));
+			$excel->setCell(1, $col++, $a_pl->txt($l));
 		}
 		
 		// data rows
-		$cnt = 1;
+		$cnt = 2;
 		reset($user_data);
 		foreach ($user_data as $user)
 		{
@@ -1017,9 +1014,9 @@ class cdCompany
 			foreach ($ts as $t)
 			{
 				$col = 0;
-				$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($user["lastname"]));
-				$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($user["firstname"]));
-				$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($user["login"]));
+				$excel->setCell($cnt, $col++, $user["lastname"]);
+				$excel->setCell($cnt, $col++, $user["firstname"]);
+				$excel->setCell($cnt, $col++, $user["login"]);
 				
 				foreach ($fields as $f => $l)
 				{
@@ -1055,16 +1052,14 @@ class cdCompany
 							break;
 					}
 
-					$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($v));
+					$excel->setCell($cnt, $col++, $v);
 				}
 				$cnt++;
 			}
 		}
 
-		
-		$workbook->close();
 		$exc_name = ilUtil::getASCIIFilename(preg_replace("/\s/", "_", $this->getTitle()));
-		ilUtil::deliverFile($excelfile, $exc_name.".xls", "application/vnd.ms-excel");
+		$excel->sendToClient($exc_name);
 	}
 	
 	/**

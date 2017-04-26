@@ -665,6 +665,21 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 		return false;
 	}
 
+	// cdpatch start
+	static function _lookupLevel($a_id)
+	{
+		global $ilDB;
+
+		$query = "SELECT course_level FROM crs_settings WHERE obj_id = ".$ilDB->quote($a_id ,'integer')." ";
+		$res = $ilDB->query($query);
+		while($row = $res->fetchRow(DB_FETCHMODE_OBJECT))
+		{
+			return $row->course_level;
+		}
+		return false;
+	}
+	// cdpatch end
+
 	static function _lookupAboStatus($a_id)
 	{
 		global $ilDB;

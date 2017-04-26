@@ -576,7 +576,7 @@ class ilCDTrainer
 	 * @param
 	 * @return
 	 */
-	function excelExport($a_pl, $a_offset = 0, $a_limit = 0)
+	static function excelExport($a_pl, $a_offset = 0, $a_limit = 0)
 	{
 		global $lng, $log;
 		
@@ -597,14 +597,14 @@ class ilCDTrainer
 		
 		include_once("./Services/User/classes/class.ilUserQuery.php");
 		
-		include_once "./Services/Excel/classes/class.ilExcelWriterAdapter.php";
-		$excelfile = ilUtil::ilTempnam();
-		$adapter = new ilExcelWriterAdapter($excelfile, FALSE);
-		$workbook = $adapter->getWorkbook();
-		$workbook->setVersion(8); // Use Excel97/2000 Format
-		include_once ("./Services/Excel/classes/class.ilExcelUtils.php");
+		include_once "./Services/Excel/classes/class.ilExcel.php";
+		$excel = new ilExcel();
+		$excel->addSheet("Trainer");
+
+		//$workbook->setVersion(8); // Use Excel97/2000 Format
+		//include_once ("./Services/Excel/classes/class.ilExcelUtils.php");
 		
-		$ws = $workbook->addWorksheet();
+		//$ws = $workbook->addWorksheet();
 		
 		include_once("./Services/CD/classes/class.ilCDTrainerProfile.php");
 		$tr_prof = new ilCDTrainerProfile($a_pl);
@@ -697,10 +697,11 @@ class ilCDTrainer
 					break;
 			} 
 			
-			$ws->writeString(0, $col++, ilExcelUtils::_convert_text($txt));
+			//$ws->writeString(0, $col++, ilExcelUtils::_convert_text($txt));
+			$excel->setCell(1, $col++, $txt);
 		}
 		
-		$cnt = 1;
+		$cnt = 2;
 		$all_cnt = 0;
 		foreach ($trainers as $t)
 		{
@@ -805,7 +806,7 @@ class ilCDTrainer
 								case 2: $v = $lng->txt("little"); break;
 								case 3: $v = $lng->txt("much"); break;
 							}
-							$tls[] = $this->plugin->txt($tlangs[$k])." (".$v.")";
+							$tls[] = $a_pl->txt($tlangs[$k])." (".$v.")";
 						}
 						$val = implode($tls, ";");
 						break;
@@ -864,18 +865,20 @@ class ilCDTrainer
 						break;
 				}
 				$val = str_replace(";", ", ", $val);
-				$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($val));
+				//$ws->writeString($cnt, $col++, ilExcelUtils::_convert_text($val));
+				$excel->setCell($cnt, $col++, $val);
 			}
 			$cnt++;
 		}
 		$log->write("-- trying to close the wb ");
-		$workbook->close();
+		//$workbook->close();
 		$log->write("-- successfully closed the wb ");
 		$exc_name = ilUtil::getASCIIFilename("trainer");
 
 		$log->write("-- deliver the file ");
 
-		ilUtil::deliverFile($excelfile, $exc_name.".xls", "application/vnd.ms-excel");
+		//ilUtil::deliverFile($excelfile, $exc_name.".xls", "application/vnd.ms-excel");
+		$excel->sendToClient($exc_name);
 
 	}
 

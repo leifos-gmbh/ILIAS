@@ -189,7 +189,7 @@ class cdPartEvalOverviewTableGUI extends ilTable2GUI
 	 * @param	int		$a_row			row counter
 	 * @param	array	$a_set			data array
 	 */
-	protected function fillRowExcel($a_worksheet, &$a_row, $a_set)
+	protected function fillRowExcel(ilExcel $a_excel, &$a_row, $a_set)
 	{
 		global $lng;
 
@@ -238,7 +238,7 @@ class cdPartEvalOverviewTableGUI extends ilTable2GUI
 					break;
 			}
 
-			$a_worksheet->write($a_row, $col, strip_tags($val));
+			$a_excel->setCell($a_row, $col, $val);
 			$col++;
 		}
 	}

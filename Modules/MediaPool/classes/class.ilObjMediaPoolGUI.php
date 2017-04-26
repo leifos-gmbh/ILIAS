@@ -19,6 +19,7 @@ include_once("./Services/Clipboard/classes/class.ilEditClipboardGUI.php");
 * @ilCtrl_Calls ilObjMediaPoolGUI: ilObjMediaObjectGUI, ilObjFolderGUI, ilEditClipboardGUI, ilPermissionGUI
 * @ilCtrl_Calls ilObjMediaPoolGUI: ilInfoScreenGUI, ilMediaPoolPageGUI, ilExportGUI, ilFileSystemGUI
 * @ilCtrl_Calls ilObjMediaPoolGUI: ilCommonActionDispatcherGUI, ilObjectCopyGUI, ilObjectTranslationGUI, ilMediaPoolImportGUI
+* @ilCtrl_Calls ilObjMediaPoolGUI: ilMobMultiSrtUploadGUI
 *
 * @ingroup ModulesMediaPool
 */
@@ -338,6 +339,19 @@ class ilObjMediaPoolGUI extends ilObject2GUI
 				$this->tpl->show();
 				break;
 
+			case "ilmobmultisrtuploadgui":
+				$this->prepareOutput();
+				$this->addHeaderAction();
+				$this->setTabs("content");
+				$this->setContentSubTabs("srt_files");
+				include_once("./Services/MediaObjects/classes/class.ilMobMultiSrtUploadGUI.php");
+				include_once("./Modules/MediaPool/classes/class.ilMepMultiSrt.php");
+				$gui = new ilMobMultiSrtUploadGUI(new ilMepMultiSrt($this->object));
+				$this->ctrl->forwardCommand($gui);
+				$this->tpl->show();
+				break;
+
+
 			default:
 				$this->prepareOutput();
 				$this->addHeaderAction();
@@ -441,7 +455,8 @@ class ilObjMediaPoolGUI extends ilObject2GUI
 
 		$this->checkPermission("read");
 
-		$ilTabs->setTabActive("objs_fold");
+		$ilTabs->setTabActive("content");
+		$this->setContentSubTabs("content");
 		
 		if ($ilAccess->checkAccess("write", "", $this->object->getRefId()))
 		{
@@ -493,7 +508,8 @@ class ilObjMediaPoolGUI extends ilObject2GUI
 		$ilCtrl->setParameter($this, "mep_mode", "allMedia");
 
 		$this->checkPermission("read");
-		$ilTabs->setTabActive("mep_all_mobs");
+		$ilTabs->setTabActive("content");
+		$this->setContentSubTabs("mep_all_mobs");
 		
 		
 		include_once("./Modules/MediaPool/classes/class.ilMediaPoolTableGUI.php");
@@ -1373,6 +1389,29 @@ class ilObjMediaPoolGUI extends ilObject2GUI
 	////
 
 	/**
+	 * Set sub tabs for content tab
+	 *
+	 * @param string
+	 */
+	function setContentSubTabs($a_active)
+	{
+		global $ilTabs, $ilCtrl;
+
+		$ilTabs->addSubTab("content", $this->lng->txt("objs_fold"), $this->ctrl->getLinkTarget($this, ""));
+
+		$ilCtrl->setParameter($this, "mepitem_id", "");
+		$ilTabs->addSubTab("mep_all_mobs", $this->lng->txt("mep_all_mobs"), $this->ctrl->getLinkTarget($this, "allMedia"));
+		$ilCtrl->setParameter($this, "mepitem_id", $_GET["mepitem_id"]);
+
+		$ilTabs->addSubtab("srt_files",
+			$this->lng->txt("mep_media_subtitles"),
+			$ilCtrl->getLinkTargetByClass("ilmobmultisrtuploadgui", ""));
+
+		$ilTabs->activateSubTab($a_active);
+	}
+
+
+	/**
 	* Set tabs
 	*/
 	function setTabs()
@@ -1384,13 +1423,14 @@ class ilObjMediaPoolGUI extends ilObject2GUI
 		if ($ilAccess->checkAccess('read', '', $this->ref_id) ||
 			$ilAccess->checkAccess('write', '', $this->ref_id))
 		{
-			$ilTabs->addTarget("objs_fold", $this->ctrl->getLinkTarget($this, ""),
-				"listMedia", "", "_top");
+			$ilTabs->addTab("content", $this->lng->txt("mep_content"), $this->ctrl->getLinkTarget($this, ""));
+			//$ilTabs->addTarget("objs_fold", $this->ctrl->getLinkTarget($this, ""),
+			//	"listMedia", "", "_top");
 
-			$ilCtrl->setParameter($this, "mepitem_id", "");
-			$ilTabs->addTarget("mep_all_mobs", $this->ctrl->getLinkTarget($this, "allMedia"),
-				"allMedia", "", "_top");
-			$ilCtrl->setParameter($this, "mepitem_id", $_GET["mepitem_id"]);
+			//$ilCtrl->setParameter($this, "mepitem_id", "");
+			//$ilTabs->addTarget("mep_all_mobs", $this->ctrl->getLinkTarget($this, "allMedia"),
+			//	"allMedia", "", "_top");
+			//$ilCtrl->setParameter($this, "mepitem_id", $_GET["mepitem_id"]);
 		}
 
 		// info tab

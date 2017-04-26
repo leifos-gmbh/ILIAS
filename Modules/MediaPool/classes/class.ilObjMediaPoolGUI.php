@@ -278,6 +278,7 @@ class ilObjMediaPoolGUI extends ilObject2GUI
 				if ($ot->getContentActivated())
 				{
 					$exp_gui->addFormat("xml_master", "XML (".$lng->txt("mep_master_language_only").")", $this, "export");
+					$exp_gui->addFormat("xml_masternomedia", "XML (".$lng->txt("mep_master_language_only_no_media").")", $this, "export");
 				}
 				$ret = $this->ctrl->forwardCommand($exp_gui);
 				$this->tpl->show();
@@ -1745,7 +1746,7 @@ class ilObjMediaPoolGUI extends ilObject2GUI
 			$opt = ilUtil::stripSlashes($format[1]);
 		}
 
-		$this->object->exportXML(($opt == "master"));
+		$this->object->exportXML($opt);
 	}
 
 }

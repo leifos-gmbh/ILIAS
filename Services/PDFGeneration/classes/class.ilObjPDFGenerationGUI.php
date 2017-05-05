@@ -165,9 +165,11 @@ class ilObjPDFGenerationGUI extends ilObject2GUI
 	/**
 	 * {@inheritdoc}
 	 */
-	public function getAdminTabs(ilTabsGUI $tabs_gui)
+	public function getAdminTabs()
 	{
-		if($this->checkPermissionBool('read'))
+		$tabs_gui = $GLOBALS['DIC']->tabs();
+
+				if($this->checkPermissionBool('read'))
 		{
 			$tabs_gui->addTarget('settings', $this->ctrl->getLinkTarget($this, 'view'), array(), __CLASS__);
 		}

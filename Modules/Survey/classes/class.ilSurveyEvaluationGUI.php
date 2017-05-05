@@ -1862,7 +1862,7 @@ class ilSurveyEvaluationGUI
 		}
 
 		if (!$a_return) {
-			ilUtil::deliverFile($target, $a_filename, 'application/pdf');
+			ilUtil::deliverFile($target, $a_filename, $mime_type);
 		} else {
 			return $target;
 		}

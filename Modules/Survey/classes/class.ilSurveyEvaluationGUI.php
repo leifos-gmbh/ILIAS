@@ -1852,7 +1852,7 @@ class ilSurveyEvaluationGUI
 		$log->dump($return, ilLogLevel::DEBUG);
 
 		if (!$a_return) {
-			ilUtil::deliverFile($target, $a_filename);
+			ilUtil::deliverFile($target, $a_filename, 'application/pdf');
 		} else {
 			return $target;
 		}

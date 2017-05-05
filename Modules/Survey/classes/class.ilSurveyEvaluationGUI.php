@@ -1837,7 +1837,7 @@ class ilSurveyEvaluationGUI
 		$args = array(
 			session_id(),
 			$parts["host"],
-			$parts["path"],
+			$parts["path"] ? $parts["path"] : '/',
 			CLIENT_ID,
 			"\"" . ILIAS_HTTP_PATH . "/" . $a_url . "\"",
 			$target

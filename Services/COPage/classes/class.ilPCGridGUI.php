@@ -245,7 +245,8 @@ class ilPCGridGUI extends ilPageContentGUI
 			foreach ($_POST["tid"] as $k => $i)
 			{
 				$id = explode(":", $k);
-				$cgui->addItem("tid[]", $k, $id[0]."-".$id[1]);
+				$id = explode("_", $id[0]);
+				$cgui->addItem("tid[]", $k, $this->lng->txt("cont_grid_cell")." ".$id[count($id) - 1]);
 			}
 			
 			$this->tpl->setContent($cgui->getHTML());
@@ -272,7 +273,7 @@ class ilPCGridGUI extends ilPageContentGUI
 			foreach($_POST["tid"] as $tid)
 			{
 				$ids = explode(":", $tid);
-				$this->content_obj->deleteCell($ids[0], $ids[1]);
+				$this->content_obj->deleteGridCell($ids[0], $ids[1]);
 			}
 		}
 		$this->updated = $this->pg_obj->update();

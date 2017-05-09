@@ -3752,7 +3752,7 @@
 				</xsl:if>
 			</xsl:when>
 			</xsl:choose>
-			<xsl:attribute name="style"><xsl:value-of select="$cstyle" /></xsl:attribute>
+			<xsl:attribute name="style"><xsl:value-of select="$cstyle" /><xsl:if test="$mode = 'edit'"> overflow:visible;</xsl:if></xsl:attribute>
 			<xsl:if test="$mode != 'edit'">
 				<!-- <xsl:attribute name="id">tab<xsl:number count="Tab" level="any"/></xsl:attribute> -->
 			</xsl:if>

@@ -16,6 +16,13 @@
 <!-- language file start -->
 common#:#pwsp_recalculate_disk_quota#:#Persönlicher Arbeitsraum: Neuberechnung Disk-Quota
 common#:#pwsp_recalculate_disk_quota_desc#:#Berechnet die Disk-Quota-Werte für den persönlichen Arbeitsraum neu.
+itgr#:#itgr_show_title#:#Titel anzeigen
+itgr#:#itgr_show_title_info#:#Der Titel des Objektblocks wird in der Präsentation für Lerner angezeigt.
+itgr#:#itgr_behaviour#:#Verhalten
+itgr#:#itgr_behaviour_info#:#Das System merkt sich den Zustand (geöffnet/geschlossen) je Benutzer bis zur Abmeldung (Logout).
+itgr#:#itgr_always_open#:#Immer offen
+itgr#:#itgr_expandable_closed#:#Ausklappbar (zunächst geschlossen)
+itgr#:#itgr_expandable_open#:#Ausklappbar (zunächst geöffnet)
 acc#:#acc_access_key#:#Access-Key
 acc#:#acc_access_keys#:#Access-Keys
 acc#:#acc_comp_frm#:#Forum

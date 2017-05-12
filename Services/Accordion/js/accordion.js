@@ -6,6 +6,10 @@ il.Accordion = {
 
 	data: {},
 
+	initAll: function () {
+		$
+	},
+
 	/**
 	 * Add accordion element
 	 *
@@ -414,3 +418,9 @@ il.Accordion = {
 	}
 
 };
+
+(function ($, il){
+	$(function () {
+		il.Accordion.initAll();
+	});
+}($, il));

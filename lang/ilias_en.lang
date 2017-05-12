@@ -16,6 +16,13 @@
 <!-- language file start -->
 common#:#pwsp_recalculate_disk_quota#:#Personal Workspace: Recalculation of Disk Quota
 common#:#pwsp_recalculate_disk_quota_desc#:#Recalculates all disk quota values for the personal workspace.
+itgr#:#itgr_show_title#:#Show Title
+itgr#:#itgr_show_title_info#:#Shows title of item group in presentation for learner.
+itgr#:#itgr_behaviour#:#Block Behaviour
+itgr#:#itgr_behaviour_info#:#The system will store the opened/closed state for the current user until logout.
+itgr#:#itgr_always_open#:#Always Open
+itgr#:#itgr_expandable_closed#:#Expandable (initially closed)
+itgr#:#itgr_expandable_open#:#Expandable (initially opened)
 acc#:#acc_access_key#:#Access Key
 acc#:#acc_access_keys#:#Access Keys
 acc#:#acc_comp_frm#:#Forum

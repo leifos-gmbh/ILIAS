@@ -122,8 +122,7 @@ class ilExerciseMailNotification extends ilMailNotification
 						$assignment = new ilExAssignment($this->getAssignmentId());
 						$submission = new ilExSubmission($assignment,$ilUser->getId());
 
-						##
-						if($submission->lookupNewFiles())
+						if($submission->lookupNewFiles($submission->getTutor()))
 						{
 							$this->appendBody(sprintf($this->getLanguageText('exc_submission_downloads_notification_link'),
 								$this->createPermanentLink(array(),"_".$this->getAssignmentId()."_".$ilUser->getId()."_download")));

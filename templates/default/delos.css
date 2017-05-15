@@ -10079,6 +10079,7 @@ div.il_ContainerListItem {
   padding-left: 50px;
   /* padding-top: 6px; */
   background-color: #F9F9F9;
+  cursor: pointer;
   margin-bottom: 1px;
 }
 .ilContainerBlockHeaderExpanded {

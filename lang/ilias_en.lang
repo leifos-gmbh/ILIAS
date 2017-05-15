@@ -23,6 +23,9 @@ itgr#:#itgr_behaviour_info#:#The system will store the opened/closed state for t
 itgr#:#itgr_always_open#:#Always Open
 itgr#:#itgr_expandable_closed#:#Expandable (initially closed)
 itgr#:#itgr_expandable_open#:#Expandable (initially opened)
+exc#:#exc_submission_and_grades_notification_link#:#Link to Exercise (Submissions and Grades): %s
+exc#:#exc_submission_downloads_notification_link#:#Download New Submissions: %s
+exc#:#exc_submission_no_new_files#:#No new submissions available.
 acc#:#acc_access_key#:#Access Key
 acc#:#acc_access_keys#:#Access Keys
 acc#:#acc_comp_frm#:#Forum

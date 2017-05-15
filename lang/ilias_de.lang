@@ -23,6 +23,9 @@ itgr#:#itgr_behaviour_info#:#Das System merkt sich den Zustand (geöffnet/geschl
 itgr#:#itgr_always_open#:#Immer offen
 itgr#:#itgr_expandable_closed#:#Ausklappbar (zunächst geschlossen)
 itgr#:#itgr_expandable_open#:#Ausklappbar (zunächst geöffnet)
+exc#:#exc_submission_and_grades_notification_link#:#Link zur Übung (Abgaben und Noten): %s
+exc#:#exc_submission_downloads_notification_link#:#Neue Abgaben herunterladen: %s
+exc#:#exc_submission_no_new_files#:#Keine neuen Abgaben vorhanden.
 acc#:#acc_access_key#:#Access-Key
 acc#:#acc_access_keys#:#Access-Keys
 acc#:#acc_comp_frm#:#Forum

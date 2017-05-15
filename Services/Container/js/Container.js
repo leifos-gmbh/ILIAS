@@ -20,7 +20,7 @@
 
 		// init event
 		container_header.on("click", function (e) {
-			var source_element = $(e.srcElement);
+			var source_element = $(e.target);
 			var t = $(this);
 			var item_container = t.parent().children(".ilContainerItemsContainer").first();
 			var bs_css_correction_on = {'margin-left': '-15px', 'margin-right': '-15px', 'padding-left': '15px', 'padding-right': '15px'};
@@ -34,6 +34,7 @@
 			//console.log(item_container);
 			//console.log($(this).parent().children(".ilContainerItemsContainer"));
 			//$(this).parent().children(".ilContainerItemsContainer").addClass("ilNoDisplay");
+
 			if (item_container.hasClass("ilNoDisplay")) {
 				item_container.removeClass("ilNoDisplay");
 				item_container.css(bs_css_correction_on);

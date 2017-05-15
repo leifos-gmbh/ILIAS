@@ -571,9 +571,21 @@ class ilObjExerciseGUI extends ilObjectGUI
 		if(!$ass_id)
 		{
 			$ass_id = null;
+			$action = null;
 			$parts = explode("_", $a_raw);
-			if(sizeof($parts) == 2) {
-				$ass_id = (int)$parts[1];
+
+			switch(end($parts))
+			{
+				case "download":
+					$action = $parts[3];
+					$member = $parts[2];
+					$ass_id = $parts[1];
+					break;
+
+				case "grades":
+					$action= $parts[2];
+					$ass_id = $parts[1];
+					break;
 			}
 		}
 
@@ -581,13 +593,12 @@ class ilObjExerciseGUI extends ilObjectGUI
 
 		if ($ilAccess->checkAccess("read", "", $a_target))
 		{
-			$ilCtrl->setParameterByClass("ilExerciseHandlerGUI", "target", $a_target);
+			$ilCtrl->setParameterByClass("ilExerciseHandlerGUI", "target", $a_raw);
 
 			if($ass_id){
 				$ilCtrl->setParameterByClass("ilExerciseManagementGUI", "ass_id", $ass_id);
 			}
 
-			$action = $_GET['action'];
 			switch($action)
 			{
 				case "grades":
@@ -595,7 +606,7 @@ class ilObjExerciseGUI extends ilObjectGUI
 					break;
 
 				case "download":
-					$ilCtrl->setParameterByClass("ilExerciseHandlerGUI", "member_id", $_GET['member_id']);
+					$ilCtrl->setParameterByClass("ilExerciseHandlerGUI", "member_id", $member);
 					$ilCtrl->redirectByClass(array("ilRepositoryGUI", "ilExerciseHandlerGUI", "ilObjExerciseGUI", "ilExerciseManagementGUI", "ilExSubmissionFileGUI"),"downloadNewReturned");
 					break;
 

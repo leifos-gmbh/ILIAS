@@ -50,7 +50,6 @@ class ilExerciseMailNotification extends ilMailNotification
 	public function send()
 	{
 		global $ilUser;
-		
 		// parent::send();
 		
 		include_once("./Modules/Exercise/classes/class.ilExAssignment.php");
@@ -122,10 +121,12 @@ class ilExerciseMailNotification extends ilMailNotification
 						//new files uploaded
 						$assignment = new ilExAssignment($this->getAssignmentId());
 						$submission = new ilExSubmission($assignment,$ilUser->getId());
+
+						##
 						if($submission->lookupNewFiles())
 						{
 							$this->appendBody(sprintf($this->getLanguageText('exc_submission_downloads_notification_link'),
-								$this->createPermanentLink(array("ass_id" => $this->getAssignmentId(), "action" => "download", "member_id" => $ilUser->getId()))));
+								$this->createPermanentLink(array(),"_".$this->getAssignmentId()."_".$ilUser->getId()."_download")));
 						}
 						else
 						{
@@ -136,7 +137,7 @@ class ilExerciseMailNotification extends ilMailNotification
 
 					$this->appendBody("\n\n");
 					$this->appendBody(sprintf($this->getLanguageText('exc_submission_and_grades_notification_link'),
-						$this->createPermanentLink(array("ass_id" => $this->getAssignmentId(), "action" => "grades"))));
+						$this->createPermanentLink(array(), "_".$this->getAssignmentId()."_grades")));
 
 					$this->getMail()->appendInstallationSignature(true);
 

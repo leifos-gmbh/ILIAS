@@ -16232,3 +16232,5 @@ exc#:#exc_submission_and_grades_notification_link#:#Link to Exercise (Submission
 exc#:#exc_submission_downloads_notification_link#:#Download New Submissions: %s
 exc#:#exc_submission_no_new_files#:#No new submissions available.
 exc#:#exc_wait_for_files#:#Your download should start automatically. If the download doesn't start in 5 secs, please click here
+exc#:#exc_target_not_valid#:#Target requested is not valid or incomplete.
+exc#:#exc_no_get_target#:#A valid target has not been sent.

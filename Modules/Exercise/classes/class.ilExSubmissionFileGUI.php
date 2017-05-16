@@ -75,7 +75,7 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
 
 		$a_info->addProperty($lng->txt("exc_files_returned"), $files_str);	
 	}
-	
+
 	/**
 	* Displays a form which allows members to deliver their solutions
 	*
@@ -395,7 +395,9 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
 	 * Download submitted files of user.
 	 */
 	function downloadReturnedObject($a_only_new = false)
-	{		
+	{
+		global $lng;
+
 		$peer_review_mask_filename = false;
 		
 		if($this->submission->canView())
@@ -408,7 +410,12 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
 			return;
 		}		
 		
-		$this->submission->downloadFiles(null, $a_only_new, $peer_review_mask_filename);			
+		$this->submission->downloadFiles(null, $a_only_new, $peer_review_mask_filename);
+		// we only get here, if no files have been found for download
+		if ($a_only_new)
+		{
+			ilUtil::sendInfo($lng->txt("exc_all_new_files_offered_already"), true);
+		}
 		$this->returnToParentObject();
 	}
 

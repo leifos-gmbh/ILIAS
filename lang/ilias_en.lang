@@ -26,6 +26,10 @@ itgr#:#itgr_expandable_open#:#Expandable (initially opened)
 exc#:#exc_submission_and_grades_notification_link#:#Link to Exercise (Submissions and Grades): %s
 exc#:#exc_submission_downloads_notification_link#:#Download New Submissions: %s
 exc#:#exc_submission_no_new_files#:#No new submissions available.
+exc#:#exc_wait_for_files#:#Your download should start automatically. If the download doesn't start in 5 secs, please click here
+exc#:#exc_target_not_valid#:#Target requested is not valid or incomplete.
+exc#:#exc_no_get_target#:#A valid target has not been sent.
+exc#:#exc_all_new_files_offered_already#:#All new files have already been offered for download. For another download, please click on the action links below.
 acc#:#acc_access_key#:#Access Key
 acc#:#acc_access_keys#:#Access Keys
 acc#:#acc_comp_frm#:#Forum

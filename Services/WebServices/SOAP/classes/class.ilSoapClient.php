@@ -13,6 +13,9 @@
  */
 class ilSoapClient
 {
+	const ERROR_HANDLING_FOR_CLIENT_CALLS_NONE = 1;
+	const ERROR_HANDLING_FOR_CLIENT_CALLS_EXCEPTION = 2;
+	
 	const DEFAULT_CONNECT_TIMEOUT = 10;
 	const DEFAULT_RESPONSE_TIMEOUT = 5;
 
@@ -32,6 +35,8 @@ class ilSoapClient
 	private $response_timeout = 10;
 	
 	private $stored_socket_timeout = null;
+	
+	private $error_handling = self::ERROR_HANDLING_FOR_CLIENT_CALLS_NONE;
 	
 	
 	/**
@@ -54,6 +59,11 @@ class ilSoapClient
 		$this->connect_timeout = $timeout;
 		
 		$this->response_timeout = self::DEFAULT_RESPONSE_TIMEOUT;
+	}
+	
+	public function setErrorHandlingForClientCalls($a_error)
+	{
+		$this->error_handling = $a_error;
 	}
 	
 	/**
@@ -215,6 +225,12 @@ class ilSoapClient
 			$this->log->error('Calling webservice failed with message: ' . $exception->getMessage());
 			$this->log->debug($this->client->__getLastResponseHeaders());
 			$this->log->debug($this->client->__getLastResponse());
+			
+			if($this->error_handling == self::ERROR_HANDLING_FOR_CLIENT_CALLS_EXCEPTION)
+			{
+				throw $exception;
+			}
+			
 			return false;
 		}
 		catch(Exception $exception)
@@ -222,6 +238,10 @@ class ilSoapClient
 			$this->log->error('Caught unknown exception with message: '. $exception->getMessage());
 			$this->log->debug($this->client->__getLastResponseHeaders());
 			$this->log->debug($this->client->__getLastResponse());
+			if($this->error_handling == self::ERROR_HANDLING_FOR_CLIENT_CALLS_EXCEPTION)
+			{
+				throw $exception;
+			}
 		}
 		finally {
 			$this->resetSocketTimeout();

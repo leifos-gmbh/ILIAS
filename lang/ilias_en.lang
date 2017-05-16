@@ -16231,3 +16231,4 @@ common#:#file_some_invalid_file_types_removed#:#Some file types are not allowed 
 exc#:#exc_submission_and_grades_notification_link#:#Link to Exercise (Submissions and Grades): %s
 exc#:#exc_submission_downloads_notification_link#:#Download New Submissions: %s
 exc#:#exc_submission_no_new_files#:#No new submissions available.
+exc#:#exc_wait_for_files#:#Your download should start automatically. If the download doesn't start in 5 secs, please click here

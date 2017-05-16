@@ -582,6 +582,12 @@ class ilObjExerciseGUI extends ilObjectGUI
 					$ass_id = $parts[1];
 					break;
 
+				case "setdownload":
+					$action = $parts[3];
+					$member = $parts[2];
+					$ass_id = $parts[1];
+					break;
+
 				case "grades":
 					$action= $parts[2];
 					$ass_id = $parts[1];
@@ -608,6 +614,11 @@ class ilObjExerciseGUI extends ilObjectGUI
 				case "download":
 					$ilCtrl->setParameterByClass("ilExerciseHandlerGUI", "member_id", $member);
 					$ilCtrl->redirectByClass(array("ilRepositoryGUI", "ilExerciseHandlerGUI", "ilObjExerciseGUI", "ilExerciseManagementGUI", "ilExSubmissionFileGUI"),"downloadNewReturned");
+					break;
+
+				case "setdownload":
+					$ilCtrl->setParameterByClass("ilExerciseHandlerGUI", "member_id", $member);
+					$ilCtrl->redirectByClass(array("ilRepositoryGUI", "ilExerciseHandlerGUI", "ilObjExerciseGUI", "ilExerciseManagementGUI", "ilExSubmissionFileGUI"),"waitingDownload");
 					break;
 
 				default:

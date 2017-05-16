@@ -75,6 +75,20 @@ class ilExSubmissionFileGUI extends ilExSubmissionBaseGUI
 
 		$a_info->addProperty($lng->txt("exc_files_returned"), $files_str);	
 	}
+
+	public function waitingDownloadObject()
+	{
+		global $lng;
+		$parts = explode("_", $_GET['target']);
+		$member = $parts[2];
+		$ass_id = $parts[1];
+		$exc_ref_id = $parts[0];
+		$action = "download";
+
+		$url = ILIAS_HTTP_PATH."/goto.php?target=exc_".$exc_ref_id."_".$ass_id."_".$member."_".$action."&client_id=".CLIENT_ID;
+		$this->tpl->setContent($lng->txt("exc_wait_for_files")."<a href='$url'> Download</a><script>window.location.href ='".$url."';</script>");
+
+	}
 	
 	/**
 	* Displays a form which allows members to deliver their solutions

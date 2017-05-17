@@ -138,7 +138,10 @@ class ilVirusScannerClamAV extends ilVirusScanner
 		// - return an empty string, if file is not infected
 		
 		$this->scanFilePath		 = $a_filepath;
-		chmod($this->scanFilePath, 0666);
+		if(file_exists($this->scanFilePath))
+		{
+			chmod($this->scanFilePath, 0666);
+		}
 		$this->scanFileOrigName	 = $a_origname;
 		
 		$this->log->info('Scanning file: ' . $this->scanFilePath.' original name: '.$this->scanFileOrigName);

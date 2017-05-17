@@ -87,7 +87,7 @@ class ilRPCServerSettings
 	
 	public function getServerUrl()
 	{
-		return 'http://'.$this->getHost().':'.$this->getPort().'/'.RPC_SERVER_PATH;
+		return 'http://'.$this->getHost().':'.$this->getPort().RPC_SERVER_PATH;
 	}
 	
 

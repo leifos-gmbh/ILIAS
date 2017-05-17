@@ -43,6 +43,7 @@ class ilRpcClientFactory
 	{
 		include_once './Services/WebServices/RPC/classes/class.ilRPCServerSettings.php';
 
+		ilLoggerFactory::getLogger('root')->info(ilRPCServerSettings::getInstance()->getServerUrl());
 		$client = XML_RPC2_Client::create(
 			ilRPCServerSettings::getInstance()->getServerUrl(),
 			array(

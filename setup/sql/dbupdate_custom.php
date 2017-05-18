@@ -73,10 +73,12 @@ if (!$ilDB->tableColumnExists("file_data", "locked_download"))
 ?>
 <#7>
 <?php
+/*
 $ilDB->query(
 	  'update webr_items set target = '
 	. 'replace(target,'.$ilDB->quote('lms.skyguide.corp','text').','.$ilDB->quote('lms.skyguide.ch','text')
 	. ')'
 );
+ */
 
 ?>

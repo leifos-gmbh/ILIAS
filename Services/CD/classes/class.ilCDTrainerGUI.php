@@ -750,6 +750,7 @@ class ilCDTrainerGUI
 			,"usr_street"
 			,"usr_zipcode"
 			,"usr_city"
+			,"usr_country"
 			,"usr_phone_office"
 			,"usr_phone_mobile"
 			,"usr_fax"
@@ -992,7 +993,8 @@ class ilCDTrainerGUI
 				}							
 			}
 		}			
-		
+
+		$checked = "";
 		switch($class)
 		{
 			// include levels
@@ -1023,7 +1025,11 @@ class ilCDTrainerGUI
 					: null;
 				break;
 	
-			default:			
+			default:
+				if ($class == "ilCheckboxInputGUI")
+				{
+					$checked = $a_item->getChecked();
+				}
 				$value = $a_item->getValue();						
 				if($a_item->getMultiValues())
 				{
@@ -1050,6 +1056,7 @@ class ilCDTrainerGUI
 		$a_data[$id] = array(
 				"caption" => $a_item->getTitle(),
 				"value" => $value,
+				"checked" => $checked,
 				"options" => $options
 			);
 	}
@@ -1066,7 +1073,6 @@ class ilCDTrainerGUI
 		global $lng;
 		
 		$res = array();
-		
 		$html = "";
 		foreach($a_recipe as $item)
 		{
@@ -1160,7 +1166,7 @@ class ilCDTrainerGUI
 							break;
 							
 						case "ilCheckboxInputGUI":
-							$value= $item["value"]
+							$value= $item["checked"]
 								? $lng->txt("yes")
 								: $lng->txt("no");
 							break;

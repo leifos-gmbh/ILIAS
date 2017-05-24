@@ -19,6 +19,19 @@ class ilCDLangExamLicense
 	 */
 	static function getLicenses()
 	{
+		include_once("./Services/CD/classes/class.cdUtil.php");
+		if (cdUtil::isDAF())	// a17k540
+		{
+			return  array(
+				"telc" => "telc",
+				"widaf" => "WiDaF",
+				"testdaf" => "TestDaF",
+				"pwd" => "PWD",
+				"dsh" => "DSH"
+			);
+		}
+
+
 		return  array(
 			"telc" => "telc",
 			"toeic" => "Toeic",

@@ -32,14 +32,23 @@ class ilCDTestSaver
 		//$rec = array("user_id" => 253, "session_id" => "14af7e99b461aabe43aaac572624ef40");
 		if ($rec)
 		{
+			$set2 = $ilDB->query("SELECT * FROM usr_session WHERE ".
+				" session_id = ".$ilDB->quote($sess_id, "text")
+			);
+			$rec2 = $ilDB->fetchAssoc($set2);
+
 			// we got a test session -> refresh ilias session
 			$ilDB->replace("usr_session", array(
 					"session_id" => array("text", $rec["session_id"])
 				),array(
 					"data" => array("clob", $rec["sess_data"]),
-					"expires" => array("integer", time()),
+					"expires" => array("integer", time() + 3600),
 					"ctime" => array("integer", time()),
 					"user_id" => array("integer", $rec["user_id"]),
+					"last_remind_ts" => array("integer", $rec2["last_remind_ts"]),
+					"type" => array("integer", $rec2["type"]),
+					"createtime" => array("integer", $rec2["createtime"]),
+					"remote_addr" => array("text", $rec2["remote_addr"])
 				));
 	
 			$type = explode("_",$data['test_id']);

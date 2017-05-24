@@ -568,7 +568,8 @@ class ilCDTrainerProfile extends ilUserProfile
 				$ne->setValue($lng->txt("further_education_desc"));
 				$a_form->addItem($ne);
 
-				for ($i = 2006; $i <= 2015; $i++)
+				$to = (int) date("Y");
+				for ($i = 2006; $i <= $to; $i++)
 				{					
 					$txt = $i;
 					if ($i == 2006)

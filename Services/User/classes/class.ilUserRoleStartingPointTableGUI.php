@@ -36,7 +36,7 @@ class ilUserRoleStartingPointTableGUI extends ilTable2GUI
 		$this->setLimit(9999);
 		$this->setTitle($lng->txt("user_role_starting_point"));
 
-		$this->addColumn("#");
+		$this->addColumn($lng->txt("user_order"));
 		$this->addColumn($lng->txt("criteria"));
 		$this->addColumn($lng->txt("starting_page"));
 		$this->addColumn($lng->txt("actions"));
@@ -48,17 +48,6 @@ class ilUserRoleStartingPointTableGUI extends ilTable2GUI
 
 		//require_once "./Services/AccessControl/classes/class.ilObjRole.php";
 		//$roles_without_point = ilObjRole::getGlobalRolesWithoutStartingPoint();
-		require_once "./Services/AccessControl/classes/class.ilStartingPoint.php";
-		$roles_without_point = ilStartingPoint::getGlobalRolesWithoutStartingPoint();
-
-		if(!empty($roles_without_point))
-		{
-			$this->addCommandButton("roleStartingPointform", $this->lng->txt('create_starting_point'));
-		}
-		else
-		{
-			ilUtil::sendInfo($lng->txt("all_roles_has_starting_point"));
-		}
 
 	}
 
@@ -77,7 +66,7 @@ class ilUserRoleStartingPointTableGUI extends ilTable2GUI
 
 		$valid_points = ilUserUtil::getPossibleStartingPoints();
 
-		$status = (ilUserUtil::hasPersonalStartingPoint()? "Individual" : "Default");
+		$status = (ilUserUtil::hasPersonalStartingPoint()? $lng->txt("yes") : $lng->txt("no"));
 
 		$result = array();
 		$result[] = array (

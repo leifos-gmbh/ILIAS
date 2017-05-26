@@ -360,15 +360,14 @@ class ilUserUtil
 						}
 					}
 				}
-
 				if(!empty($gr))
 				{
-					ksort($gr);
+					krsort($gr);	// ak: if we use array_pop (last element) we need to reverse sort, since we want the one with the smallest number
 					$role_point = array_pop($gr);
 					$current = $role_point['point'];
 					$ref_id = $role_point['object'];
-
 					$by_default = false;
+
 				}
 			}
 			if($by_default)
@@ -382,9 +381,12 @@ class ilUserUtil
 			}
 
 		}
+
 		switch($current)
 		{
 			case self::START_REPOSITORY:
+				$ref_id = $tree->readRootId();
+
 			case self::START_REPOSITORY_OBJ:
 				if($ref_id &&
 					ilObject::_lookupObjId($ref_id) && 

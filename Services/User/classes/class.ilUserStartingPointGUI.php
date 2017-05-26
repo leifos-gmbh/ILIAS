@@ -23,11 +23,13 @@ class ilUserStartingPointGUI
 	 */
 	function __construct($a_parent_ref_id)
 	{
-		global $lng,$tpl;
+		global $lng,$tpl,$ilToolbar, $ilCtrl;
 
 		$this->log = ilLoggerFactory::getLogger("user");
 		$this->lng = $lng;
 		$this->tpl = $tpl;
+		$this->toolbar = $ilToolbar;
+		$this->ctrl = $ilCtrl;
 		$this->parent_ref_id = $a_parent_ref_id;
 		$this->lng->loadLanguageModule("administration");
 
@@ -53,6 +55,20 @@ class ilUserStartingPointGUI
 	public function startingPoints()
 	{
 		include_once "Services/User/classes/class.ilUserRoleStartingPointTableGUI.php";
+
+		require_once "./Services/AccessControl/classes/class.ilStartingPoint.php";
+		$roles_without_point = ilStartingPoint::getGlobalRolesWithoutStartingPoint();
+
+		if(!empty($roles_without_point))
+		{
+			$this->toolbar->addButton($this->lng->txt('create_starting_point'),
+				$this->ctrl->getLinkTarget($this, "roleStartingPointform"));
+		}
+		else
+		{
+			ilUtil::sendInfo($this->lng->txt("all_roles_has_starting_point"));
+		}
+
 
 		$tbl = new ilUserRoleStartingPointTableGUI($this);
 
@@ -88,7 +104,7 @@ class ilUserStartingPointGUI
 		$form = new ilPropertyFormGUI();
 
 		// starting point: personal
-		$startp = new ilCheckboxInputGUI($this->lng->txt("adm_user_starting_point_personal"), "usr_start_pers");
+		$startp = new ilCheckboxInputGUI($this->lng->txt("user_chooses_starting_page"), "usr_start_pers");
 		$startp->setInfo($this->lng->txt("adm_user_starting_point_personal_info"));
 		$startp->setChecked(ilUserUtil::hasPersonalStartingPoint());
 
@@ -134,9 +150,15 @@ class ilUserStartingPointGUI
 				{
 					$options[$rolid] = $role->getTitle();
 					$starting_point = $st_point->getStartingPoint();
-					$si_roles = new ilSelectInputGUI($this->lng->txt("editing_this_role"), 'role');
+					$si_roles = new ilSelectInputGUI($this->lng->txt("editing_this_role"), 'role_disabled');
 					$si_roles->setOptions($options);
+					$si_roles->setDisabled(true);
 					$form->addItem($si_roles);
+
+					$hi = new ilHiddenInputGUI("role");
+					$hi->setValue($rolid);
+					$form->addItem($hi);
+
 					$hidde_sp_id = new ilHiddenInputGUI("start_point_id");
 					$hidde_sp_id->setValue($spoint_id);
 					$form->addItem($hidde_sp_id);
@@ -217,6 +239,7 @@ class ilUserStartingPointGUI
 
 		// save and cancel commands
 		$form->addCommandButton("saveStartingPoint", $this->lng->txt("save"));
+		$form->addCommandButton("startingPoints", $this->lng->txt("cancel"));
 
 		$form->setTitle($this->lng->txt("starting_point_settings"));
 		$form->setFormAction($ilCtrl->getFormAction($this));
@@ -230,7 +253,7 @@ class ilUserStartingPointGUI
 
 		if (!$rbacsystem->checkAccess("write",$this->parent_ref_id))
 		{
-			$ilErr->raiseError($lng->txt("msg_no_perm_read"), $ilErr->FATAL);
+			$ilErr->raiseError($this->lng->txt("msg_no_perm_read"), $ilErr->FATAL);
 		}
 
 		include_once "Services/User/classes/class.ilUserUtil.php";
@@ -256,7 +279,7 @@ class ilUserStartingPointGUI
 
 		if (!$rbacsystem->checkAccess("write",$this->parent_ref_id))
 		{
-			$ilErr->raiseError($lng->txt("msg_no_perm_read"), $ilErr->FATAL);
+			$ilErr->raiseError($this->lng->txt("msg_no_perm_read"), $ilErr->FATAL);
 		}
 
 		if((int)$_POST['start_point_id'] > 0)

@@ -243,8 +243,16 @@ class ilCDTrainerGUI
 		
 		include_once("./Services/CD/classes/class.ilCDTrainer.php");
 		include_once("./Services/CD/classes/class.ilCDPermWrapper.php");
-		// fki-patch: trainer mode
-		$user_admin_centers = ilCDPermWrapper::getAdminCenters("train");
+		include_once("./Services/CD/classes/class.cdUtil.php");
+		if (cdUtil::isDAF())
+		{
+			$user_admin_centers = ilCDPermWrapper::getAdminCenters();
+		}
+		else
+		{
+			// fki-patch: trainer mode
+			$user_admin_centers = ilCDPermWrapper::getAdminCenters("train");
+		}
 
 		if (is_array($_POST["tr_id"]))
 		{
@@ -1325,8 +1333,16 @@ class ilCDTrainerGUI
 
 		include_once("./Services/CD/classes/class.ilCDTrainer.php");
 		include_once("./Services/CD/classes/class.ilCDPermWrapper.php");
-		// fki-patch: trainer mode
-		$user_admin_centers = ilCDPermWrapper::getAdminCenters("train");
+		include_once("./Services/CD/classes/class.cdUtil.php");
+		if (cdUtil::isDAF())
+		{
+			$user_admin_centers = ilCDPermWrapper::getAdminCenters();
+		}
+		else
+		{
+			// fki-patch: trainer mode
+			$user_admin_centers = ilCDPermWrapper::getAdminCenters("train");
+		}
 
 		if (is_array($_POST["tr_id"]))
 		{

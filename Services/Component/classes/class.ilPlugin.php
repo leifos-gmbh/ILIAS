@@ -301,6 +301,16 @@ abstract class ilPlugin
 	 */
 	protected function getLanguageDirectory()
 	{
+		// cdpatch start
+		include_once("./Services/CD/classes/class.cdUtil.php");
+		if (cdUtil::isDAF())
+		{
+			if (is_dir($this->getDirectory()."/lang_daf"))
+			{
+				return $this->getDirectory()."/lang_daf";
+			}
+		}
+		// cdpatch end
 		return $this->getDirectory()."/lang";
 	}
 

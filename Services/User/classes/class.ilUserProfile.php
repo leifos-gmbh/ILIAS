@@ -421,9 +421,19 @@ class ilUserProfile
 		}
 
 		// cdpatch start
-		$unset = array("title", "birthday", "upload", "institution", "phone_home",
-			"phone_mobile", "hobby", "referral_comment", "instant_messengers", "matriculation",
-			"delicious", "interests_general", "interests_help_offered", "interests_help_looking", "org_units");
+		include_once("./Services/CD/classes/class.cdUtil.php");
+		if (cdUtil::isDAF())
+		{
+			$unset = array("title", "upload", "institution",
+				"hobby", "referral_comment", "instant_messengers", "matriculation",
+				"delicious", "interests_general", "interests_help_offered", "interests_help_looking", "org_units");
+		}
+		else
+		{
+			$unset = array("title", "birthday", "upload", "institution", "phone_home",
+				"phone_mobile", "hobby", "referral_comment", "instant_messengers", "matriculation",
+				"delicious", "interests_general", "interests_help_offered", "interests_help_looking", "org_units");
+		}
 		foreach ($unset as $u)
 		{
 			unset($fields[$u]);

@@ -97,6 +97,21 @@ class ilTermsOfServiceFileSystemDocument implements ilTermsOfServiceSignableDocu
 	 */
 	protected function initSourceFiles()
 	{
+		// cdpatch start
+		include_once("./Services/CD/classes/class.cdUtil.php");
+		if (cdUtil::isDAF())
+		{
+			$this->source_files = array(
+				implode('/', array('.', 'Customizing', 'clients', CLIENT_ID, 'agreement', 'agreement_' . $this->getLanguageAdapter()->getLangKey() . '.html'))         => $this->getLanguageAdapter()->getLangKey(),
+				implode('/', array('.', 'Customizing', 'clients', CLIENT_ID, 'agreement', 'agreement_' . $this->getLanguageAdapter()->getDefaultLanguage() . '.html')) => $this->getLanguageAdapter()->getDefaultLanguage(),
+				implode('/', array('.', 'Customizing', 'clients', CLIENT_ID, 'agreement', 'agreement_en.html'))                                                        => 'en',
+				implode('/', array('.', 'Customizing', 'global', 'agreement_daf', 'agreement_' . $this->getLanguageAdapter()->getLangKey() . '.html'))                     => $this->getLanguageAdapter()->getLangKey(),
+				implode('/', array('.', 'Customizing', 'global', 'agreement_daf', 'agreement_' . $this->getLanguageAdapter()->getDefaultLanguage() . '.html'))             => $this->getLanguageAdapter()->getDefaultLanguage(),
+				implode('/', array('.', 'Customizing', 'global', 'agreement_daf', 'agreement_en.html'))                                                                    => 'en'
+			);
+			return;
+		}
+		// cdpatch end
 		$this->source_files = array(
 			implode('/', array('.', 'Customizing', 'clients', CLIENT_ID, 'agreement', 'agreement_' . $this->getLanguageAdapter()->getLangKey() . '.html'))         => $this->getLanguageAdapter()->getLangKey(),
 			implode('/', array('.', 'Customizing', 'clients', CLIENT_ID, 'agreement', 'agreement_' . $this->getLanguageAdapter()->getDefaultLanguage() . '.html')) => $this->getLanguageAdapter()->getDefaultLanguage(),

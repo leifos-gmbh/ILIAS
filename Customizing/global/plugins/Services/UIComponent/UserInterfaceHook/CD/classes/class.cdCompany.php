@@ -816,23 +816,41 @@ class cdCompany
 		$excel->setCell(1, $col++, $a_pl->txt("course_lang"));
 		$excel->setCell(1, $col++, $a_pl->txt("last_course"));
 		$excel->setCell(1, $col++, $a_pl->txt("lang_level"));
-		foreach (cdNeedsAnalysis::$talk_understand as $k => $l)
+		if (cdUtil::isDAF())
 		{
-			$excel->setCell(1, $col++, $a_pl->txt($l));
+			$a_pl->includeClass("class.cdNeedsAnalysisDAF.php");
+			foreach (cdNeedsAnalysisDAF::getQuestions($a_pl) as $k => $question)
+			{
+				$excel->setCell(1, $col++, $question);
+			}
 		}
-		foreach (cdNeedsAnalysis::$write_read as $k => $l)
+		else
 		{
-			$excel->setCell(1, $col++, $a_pl->txt($l));
+			foreach (cdNeedsAnalysis::$talk_understand as $k => $l)
+			{
+				$excel->setCell(1, $col++, $a_pl->txt($l));
+			}
+			foreach (cdNeedsAnalysis::$write_read as $k => $l)
+			{
+				$excel->setCell(1, $col++, $a_pl->txt($l));
+			}
+			$excel->setCell(1, $col++, $a_pl->txt("technical_language"));
+			$excel->setCell(1, $col++, $a_pl->txt("other_technical_language"));
 		}
-		$excel->setCell(1, $col++, $a_pl->txt("technical_language"));
-		$excel->setCell(1, $col++, $a_pl->txt("other_technical_language"));
 		
 		// data rows
 		$cnt = 2;
 		reset($user_data);
 		foreach ($user_data as $user)
 		{
-			$nas = cdNeedsAnalysis::getNeedsAnalysesOfUser($user["usr_id"]);
+			if (cdUtil::isDAF())
+			{
+				$nas = cdNeedsAnalysisDAF::getNeedsAnalysesOfUser($user["usr_id"]);
+			}
+			else
+			{
+				$nas = cdNeedsAnalysis::getNeedsAnalysesOfUser($user["usr_id"]);
+			}
 			foreach ($nas as $na)
 			{
 				$col = 0;
@@ -858,46 +876,52 @@ class cdCompany
 					$v = $na["lang_level"];
 				}
 				$excel->setCell($cnt, $col++, $v);
-				
-				$ta = unserialize($na["talk_understanding"]);
-				foreach (cdNeedsAnalysis::$talk_understand as $k => $l)
-				{
-					if($ta[$k] === 0)
-					{
-						$v = $a_pl->txt("option_never");
-					}
-					else
-					{
-						$v = $a_pl->txt("freq_".$ta[$k]);
-					}
-					$excel->setCell($cnt, $col++, $v);
-				}
-				$wr = unserialize($na["write_read"]);
-				foreach (cdNeedsAnalysis::$write_read as $k => $l)
-				{
-					if($wr[$k] === 0)
-					{
-						$v = $a_pl->txt("option_never");
-					}
-					else
-					{
-						$v = $a_pl->txt("freq_".$wr[$k]);
-					}
-					$excel->setCell($cnt, $col++, $v);
-				}
 
-				$tl = cdNeedsAnalysis::$technical_lang;
-				if(!(int)$na["tech_lang_sel"])
+				if (cdUtil::isDAF())
 				{
-					$v = $a_pl->txt("option_none");
+					foreach (cdNeedsAnalysisDAF::getQuestions($a_pl) as $k => $question)
+					{
+						$excel->setCell($cnt, $col++, $na["daf"][$k]["answer"]);
+					}
 				}
 				else
 				{
-					$v = $a_pl->txt($tl[$na["tech_lang_sel"]]);
+					$ta = unserialize($na["talk_understanding"]);
+					foreach (cdNeedsAnalysis::$talk_understand as $k => $l)
+					{
+						if ($ta[$k] === 0)
+						{
+							$v = $a_pl->txt("option_never");
+						} else
+						{
+							$v = $a_pl->txt("freq_" . $ta[$k]);
+						}
+						$excel->setCell($cnt, $col++, $v);
+					}
+					$wr = unserialize($na["write_read"]);
+					foreach (cdNeedsAnalysis::$write_read as $k => $l)
+					{
+						if ($wr[$k] === 0)
+						{
+							$v = $a_pl->txt("option_never");
+						} else
+						{
+							$v = $a_pl->txt("freq_" . $wr[$k]);
+						}
+						$excel->setCell($cnt, $col++, $v);
+					}
+
+					$tl = cdNeedsAnalysis::$technical_lang;
+					if (!(int)$na["tech_lang_sel"])
+					{
+						$v = $a_pl->txt("option_none");
+					} else
+					{
+						$v = $a_pl->txt($tl[$na["tech_lang_sel"]]);
+					}
+					$excel->setCell($cnt, $col++, $v);
+					$excel->setCell($cnt, $col++, $na["tech_lang_free"]);
 				}
-				$excel->setCell($cnt, $col++, $v);
-				$excel->setCell($cnt, $col++, $na["tech_lang_free"]);
-				
 				$cnt++;
 			}
 		}

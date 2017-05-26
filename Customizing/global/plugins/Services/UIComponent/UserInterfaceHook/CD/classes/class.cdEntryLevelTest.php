@@ -212,6 +212,14 @@ class cdEntryLevelTest
 	 */
 	static function getAvailableTests()
 	{
+		include_once("./Services/CD/classes/class.cdUtil.php");
+		if (cdUtil::isDAF())
+		{
+			return array(
+				"de" => array("de", "en", "fr", "it", "es")
+			);
+		}
+
 		return array(
 			"de" => array("de", "en", "fr", "it", "es"),
 			"en" => array("de", "en"),

@@ -186,6 +186,17 @@ class ilLanguage
 		//}
 		$this->cust_lang_path = ILIAS_ABSOLUTE_PATH."/Customizing/global/lang";
 
+		// cdpatch start
+		include_once("./Services/CD/classes/class.cdUtil.php");
+		if (cdUtil::isDAF())
+		{
+			if (is_dir(ILIAS_ABSOLUTE_PATH."/Customizing/global/lang_daf"))
+			{
+				$this->cust_lang_path = ILIAS_ABSOLUTE_PATH."/Customizing/global/lang_daf";
+			}
+		}
+		// cdpatch end
+
 		$this->lang_default = $ilIliasIniFile->readVariable("language","default");
 		if (is_object($ilSetting) && $ilSetting->get("language") != "")
 		{

@@ -1,6 +1,8 @@
 <?php
 
-set_include_path("./Services/PEAR/lib".PATH_SEPARATOR.ini_get('include_path'));
+//set_include_path("./Services/PEAR/lib".PATH_SEPARATOR.ini_get('include_path'));
+require_once("libs/composer/vendor/autoload.php");
+
 define ("DEVMODE", 0);
 
 /*$_POST['action'] = "save_testdata";
@@ -14,7 +16,7 @@ $_POST['result_grammar'] = "60";
 $_POST['result_voca'] = "70";
 $_POST['result_read'] = "44";
 $_POST['result_listen'] = "11";
-$_POST['user_id'] = "14af7e99b461aabe43aaac572624ef40";*/
+$_POST['user_id'] = "0b0829e5a3ed99650e45f9916893179c";*/
 
 if ($_POST['action'] == "save_testdata")
 {

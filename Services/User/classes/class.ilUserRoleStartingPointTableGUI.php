@@ -89,7 +89,7 @@ class ilUserRoleStartingPointTableGUI extends ilTable2GUI
 				$object_id = ilObject::_lookupObjId($point['starting_object']);
 				$type = $dc->lookupType($object_id);
 				$title = $dc->lookupTitle($object_id);
-				$sp_text = $this->lng->txt("type").": ".$type." ".$this->lng->txt("ref_id")." ".$point['starting_object']." ".$this->lng->txt("title")."<i>\"".$title."\"</i>";
+				$sp_text = $this->lng->txt("obj_".$type)." <i>\"".$title."\"</i> [".$point['starting_object']."]";
 			}
 
 			if($point['rule_type'] == ilStartingPoint::ROLE_BASED)

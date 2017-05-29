@@ -16,7 +16,7 @@ $_POST['result_grammar'] = "60";
 $_POST['result_voca'] = "70";
 $_POST['result_read'] = "44";
 $_POST['result_listen'] = "11";
-$_POST['user_id'] = "0b0829e5a3ed99650e45f9916893179c";*/
+$_POST['user_id'] = "6349179172610e5e381f2e77dc038ab2";*/
 
 if ($_POST['action'] == "save_testdata")
 {

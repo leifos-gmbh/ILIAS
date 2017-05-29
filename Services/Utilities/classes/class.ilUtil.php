@@ -3731,6 +3731,7 @@ class ilUtil
 //ilUtil::printBacktrace(5);
 //echo "<br>".$cmd; exit;
 		exec($cmd, $arr);
+		die ("ilUtil::execQuoted: ".$cmd);
 //		$ilLog->write("ilUtil::execQuoted: ".$cmd.".");
 		return $arr;
 	}

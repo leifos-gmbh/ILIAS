@@ -1,0 +1,704 @@
+<!-- {DUMMY} -->
+<style>
+	.ilLeftNav {
+		overflow: visible;
+	}
+	.sb {
+		padding: 0;
+		list-style: none;
+		margin: 0;
+	}
+	.sb > li {
+		padding: 7px 10px;
+		color: #707070;
+	}
+	.sb > li > div > span.glyphicon {
+		padding-right: 10px;
+		color: #909090;
+	}
+	.sb > li:hover {
+		background-color: #FEFEFE;
+		color: #505050;
+	}
+
+	.sb > li .dropdown-menu {
+		left: 20px;
+	}
+
+	.nowrap li {
+		white-space: nowrap;
+	}
+
+	.popcontent .list-group {
+		list-style: none;
+	}
+
+	.popover-content {
+		padding: 0;
+	}
+
+	.popover {
+		max-width: none;
+	}
+
+	.list-group {
+		padding: 0;
+		margin-bottom: 0;
+	}
+	.list-group-item {
+		border: 0;
+		padding: 5px 10px;
+		color: #707070;
+	}
+
+	#il_screen_id, #ilTopBar {
+		display:none;
+	}
+	.ilMainHeader.ilTopFixed {
+		top: 0;
+	}
+
+	.ilTopFixed {
+		position: static;
+	}
+
+	#ilTopNav .navbar-nav > li > a {
+		color: white;
+	}
+
+	.ilFixedTopSpacer {
+		padding-top: 0px;
+	}
+
+	.ilLeftNav {
+		position: absolute;
+		top:0;
+		width: 215px;
+		border-right: 1px solid #A0A0A0;
+		min-height: 1000px;
+	}
+
+	#mainspacekeeper {
+		min-height: 1000px;
+	}
+
+	.ilLeftNavSpace {
+		margin-left: 240px !important;
+	}
+
+	.pop_top_nav {
+		padding: 5px 10px;
+		font-size: 80%;
+	}
+
+	#awareness-content {
+		min-width: 330px;
+	}
+
+	.ilTagCloud, #tree_div {
+		min-width: 330px;
+		padding: 10px;
+	}
+
+</style>
+<script>
+	$(document).on('click', function (e) {
+		$('[data-mt="popover"],[data-original-title]').each(function () {
+			//the 'is' for buttons that trigger popups
+			//the 'has' for icons within a button that triggers a popup
+			if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+				(($(this).popover('hide').data('bs.popover')||{}).inState||{}).click = false  // fix for BS 3.3.6
+			}
+
+		});
+	});
+	$(function() {
+		$('[data-toggle="popover1"]').popover({
+			html: true,
+			content: function() {
+				return $('#popover-content1').html();
+			},
+			viewport: { "selector": "#mainspacekeeper", "padding": 0 }
+		});
+		$('[data-toggle="popover2"]').popover({
+			html: true,
+			content: function() {
+				return $('#popover-content2').html();
+			},
+			viewport: { "selector": "#mainspacekeeper", "padding": 0 }
+		});
+		$('[data-toggle="popover3"]').popover({
+			html: true,
+			content: function() {
+				return $('#popover-content3').html();
+			},
+			viewport: { "selector": "#mainspacekeeper", "padding": 0 }
+		});
+		$('[data-toggle="popover4"]').popover({
+			html: true,
+			content: function() {
+				return $('#popover-content4').html();
+			},
+			viewport: { "selector": "#mainspacekeeper", "padding": 0 }
+		});
+		$('[data-toggle="popover5"]').popover({
+			html: true,
+			content: function() {
+				return $('#popover-content5').html();
+			},
+			viewport: { "selector": "#mainspacekeeper", "padding": 0 }
+		});
+	})
+</script>
+<ul class="sb">
+	<li>
+		<div data-mt="popover" data-toggle="popover2"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Max Mustermann</div>
+	</li>
+	<li>
+		<div data-mt="popover" data-toggle="popover1"><span class="glyphicon glyphicon-th-large" aria-hidden="true"></span> Meine Kurse</div>
+	</li>
+	<li>
+		<div data-mt="popover" data-toggle="popover3"><span class="glyphicon glyphicon-globe" aria-hidden="true"></span> Meine Portfolios</div>
+	</li>
+	<li>
+		<div data-mt="popover"><span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> Magazin</div>
+	</li>
+	<li>
+		<div data-mt="popover" data-toggle=""><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Kalender</div>
+	</li>
+	<li>
+		<div data-mt="popover" data-toggle=""><span class="glyphicon glyphicon-bell" aria-hidden="true"></span> Neuigkeiten <span class="badge badge-notify il-counter-novelty">5</span>
+		</div>
+	</li>
+	<li>
+		<div data-mt="popover" data-toggle="popover4" data-toggle=""><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Kontakte <span class="badge badge-notify il-counter-novelty">2</span></div>
+	</li>
+	<li>
+		<div data-mt="popover" data-toggle="popover5" data-toggle=""><span class="glyphicon glyphicon-tags" aria-hidden="true"></span> Bookmarks & Tags</div>
+	</li>
+	<li>
+		<div data-mt="popover" data-toggle=""><span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span> Notizen & Kommentare</div>
+	</li>
+	<li>
+		<div data-mt="popover" data-toggle=""><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Suche</div>
+	</li>
+	<li>
+		<div data-mt="popover" data-toggle=""><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Hilfe</div>
+	</li>
+	<li>
+		<div data-mt="popover" data-toggle=""><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Administration</div>
+	</li>
+</ul>
+
+<!-- loaded popover content -->
+<div id="popover-content1" style="display: none">
+	<div class="popcontent nowrap">
+		<ul class="list-group" >
+			<li class="pop_top_nav"><a href="#" ><span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span> Alle meine Kurse</a></li>
+			<li class="dropdown-header ilLVNavEnt">Zuletzt besucht</li>
+			<li><a href="#" class="list-group-item">Aristoteles: Poetik und Rhetorik </a></li>
+			<li><a href="#" class="list-group-item">Zeit und Zeitlichkeit </a></li>
+			<li><a href="#" class="list-group-item">G.W.F. Hegel, Wissenschaft der Logik</a></li>
+			<li><a href="#" class="list-group-item">Einführung in die Anthropologie </a></li>
+			<li><a href="#" class="list-group-item">Der Sinn für Gerechtigkeit</a></li>
+		</ul>
+	</div>
+</div>
+
+<div id="popover-content2" style="display: none">
+	<div class="popcontent nowrap">
+		<ul class="list-group" >
+			<li><a href="#" class="list-group-item">Profil</a></li>
+			<li><a href="#" class="list-group-item">Arbeitsraum</a></li>
+			<li><a href="#" class="list-group-item">Badges</a></li>
+			<li><a href="#" class="list-group-item">Kompetenzen</a></li>
+			<li><a href="#" class="list-group-item">Lernfortschritt</a></li>
+			<li><a href="#" class="list-group-item">Einstellungen</a></li>
+			<li><a href="logout.php" class="list-group-item">Abmelden</a></li>
+		</ul>
+	</div>
+</div>
+
+<div id="popover-content3" style="display: none">
+	<div class="popcontent nowrap">
+		<ul class="list-group" >
+			<li class="pop_top_nav"><a href="#" ><span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span> Alle meine Portfolios</a></li>
+			<li class="dropdown-header ilLVNavEnt">Zuletzt besucht</li>
+			<li><a href="#" class="list-group-item">Portfolio A, Übungseinheit "Selbstreflexion" </a></li>
+			<li><a href="#" class="list-group-item">Portfolio B, Übungseinheit "..." </a></li>
+			<li><a href="#" class="list-group-item">Mein Lebenslauf</a></li>
+		</ul>
+	</div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+<!-- awareness -->
+
+<div id="popover-content4" style="display: none">
+	<div class="popcontent nowrap ilAwarenessDropDown">
+
+<div id="awareness-content">
+	<div class="pop_top_nav"><a href="#"><b>Wer ist online?</b></a> | <a href="#">Konversationen</a> | <a href="#" ><span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span> Meine Kontakte</a></div>
+
+	<form id="il_awrn_filter_form">
+		<div class="input-group">
+			<input type="text" value="" class="form-control" name="il_awareness_filter" id="il_awareness_filter" placeholder="Filter">
+			<span class="input-group-btn">
+				<button id="il_awrn_filer_btn" class="btn btn-default" type="submit"><span class="sr-only"></span><span class="glyphicon glyphicon-filter"></span></button>
+			</span>
+		</div>
+	</form>
+
+	<div id="awareness-list">
+
+
+		<div class="dropdown-header ">
+			Approved Contacts
+		</div>
+
+
+
+
+
+		<div class="ilAwarenessItem">
+			<div class="media" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+				<div class="ilAwarenessItemRow">
+					<div class="media-left">
+						<a href="#">
+							<img class="media-object" src="http://www.ilias.de/docu/data/docu/usr_images/usr_13815_xsmall.jpg?t=78794" alt="">
+						</a>
+					</div>
+					<div class="media-body ilAwarenessOnline">
+						<h4 class="media-heading">Bogen, Christian</h4>
+						<p>[bogen]</p>
+					</div>
+				</div>
+			</div>
+			<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+
+				<li role="presentation">
+					<div class="arrow-down"></div>
+					<a role="menuitem" tabindex="-1" href="ilias.php?baseClass=ilMailGUI&amp;r=&amp;type=new&amp;rcp_to=bogen">Mail</a>
+				</li>
+
+				<li role="presentation">
+
+					<a role="menuitem" tabindex="-1" href="./goto.php?target=usr_13815">Profile</a>
+				</li>
+
+				<li role="presentation">
+
+					<a role="menuitem" tabindex="-1" href="ilias.php?user=bogen&amp;cmd=listSharedResourcesOfOtherUser&amp;cmdClass=ilobjworkspacerootfoldergui&amp;cmdNode=25:3w:d6&amp;baseClass=ilpersonaldesktopgui">Shared Resources</a>
+				</li>
+
+			</ul>
+		</div>
+
+
+
+
+		<div class="ilAwarenessItem">
+			<div class="media" id="dropdownMenu2" data-toggle="dropdown" aria-expanded="true">
+				<div class="ilAwarenessItemRow">
+					<div class="media-left">
+						<a href="#">
+							<img class="media-object" src="http://www.ilias.de/docu/data/docu/usr_images/usr_21087_xsmall.jpg?t=35462" alt="">
+						</a>
+					</div>
+					<div class="media-body ilAwarenessOnline">
+						<h4 class="media-heading">Schmid, Fabian</h4>
+						<p>[fschmid]</p>
+					</div>
+				</div>
+			</div>
+			<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu2">
+
+				<li role="presentation">
+					<div class="arrow-down"></div>
+					<a role="menuitem" tabindex="-1" href="ilias.php?baseClass=ilMailGUI&amp;r=&amp;type=new&amp;rcp_to=fschmid">Mail</a>
+				</li>
+
+				<li role="presentation">
+
+					<a role="menuitem" tabindex="-1" href="./goto.php?target=usr_21087">Profile</a>
+				</li>
+
+				<li role="presentation">
+
+					<a role="menuitem" tabindex="-1" href="ilias.php?user=fschmid&amp;cmd=listSharedResourcesOfOtherUser&amp;cmdClass=ilobjworkspacerootfoldergui&amp;cmdNode=25:3w:d6&amp;baseClass=ilpersonaldesktopgui">Shared Resources</a>
+				</li>
+
+			</ul>
+		</div>
+
+
+
+		<div class="dropdown-header ">
+			All Users
+		</div>
+
+
+
+
+
+		<div class="ilAwarenessItem">
+			<div class="media" id="dropdownMenu3" data-toggle="dropdown" aria-expanded="true">
+				<div class="ilAwarenessItemRow">
+					<div class="media-left">
+						<a href="#">
+							<img class="media-object" src="http://www.ilias.de/docu/data/docu/usr_images/usr_13815_xsmall.jpg?t=78794" alt="">
+						</a>
+					</div>
+					<div class="media-body ilAwarenessOnline">
+						<h4 class="media-heading">Bogen, Christian</h4>
+						<p>[bogen]</p>
+					</div>
+				</div>
+			</div>
+			<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu3">
+
+				<li role="presentation">
+					<div class="arrow-down"></div>
+					<a role="menuitem" tabindex="-1" href="ilias.php?baseClass=ilMailGUI&amp;r=&amp;type=new&amp;rcp_to=bogen">Mail</a>
+				</li>
+
+				<li role="presentation">
+
+					<a role="menuitem" tabindex="-1" href="./goto.php?target=usr_13815">Profile</a>
+				</li>
+
+				<li role="presentation">
+
+					<a role="menuitem" tabindex="-1" href="ilias.php?user=bogen&amp;cmd=listSharedResourcesOfOtherUser&amp;cmdClass=ilobjworkspacerootfoldergui&amp;cmdNode=25:3w:d6&amp;baseClass=ilpersonaldesktopgui">Shared Resources</a>
+				</li>
+
+			</ul>
+		</div>
+
+
+
+
+		<div class="ilAwarenessItem">
+			<div class="media" id="dropdownMenu4" data-toggle="dropdown" aria-expanded="true">
+				<div class="ilAwarenessItemRow">
+					<div class="media-left">
+						<a href="#">
+							<img class="media-object" src="./templates/default/images/no_photo_xsmall.jpg" alt="">
+						</a>
+					</div>
+					<div class="media-body ilAwarenessOnline">
+						<h4 class="media-heading">&nbsp;</h4>
+						<p>[user12345]</p>
+					</div>
+				</div>
+			</div>
+			<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu4">
+
+				<li role="presentation">
+					<div class="arrow-down"></div>
+					<a role="menuitem" tabindex="-1" href="ilias.php?baseClass=ilMailGUI&amp;r=&amp;type=new&amp;rcp_to=rafik.by%2540gmail.com">Mail</a>
+				</li>
+
+				<li role="presentation">
+
+					<a role="menuitem" tabindex="-1" href="ilias.php?user=rafik.by@gmail.com&amp;cmd=listSharedResourcesOfOtherUser&amp;cmdClass=ilobjworkspacerootfoldergui&amp;cmdNode=25:3w:d6&amp;baseClass=ilpersonaldesktopgui">Shared Resources</a>
+				</li>
+
+			</ul>
+		</div>
+
+
+
+
+		<div class="ilAwarenessItem">
+			<div class="media" id="dropdownMenu5" data-toggle="dropdown" aria-expanded="true">
+				<div class="ilAwarenessItemRow">
+					<div class="media-left">
+						<a href="#">
+							<img class="media-object" src="http://www.ilias.de/docu/data/docu/usr_images/usr_21087_xsmall.jpg?t=35462" alt="">
+						</a>
+					</div>
+					<div class="media-body ilAwarenessOnline">
+						<h4 class="media-heading">Schmid, Fabian</h4>
+						<p>[fschmid]</p>
+					</div>
+				</div>
+			</div>
+			<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu5">
+
+				<li role="presentation">
+					<div class="arrow-down"></div>
+					<a role="menuitem" tabindex="-1" href="ilias.php?baseClass=ilMailGUI&amp;r=&amp;type=new&amp;rcp_to=fschmid">Mail</a>
+				</li>
+
+				<li role="presentation">
+
+					<a role="menuitem" tabindex="-1" href="./goto.php?target=usr_21087">Profile</a>
+				</li>
+
+				<li role="presentation">
+
+					<a role="menuitem" tabindex="-1" href="ilias.php?user=fschmid&amp;cmd=listSharedResourcesOfOtherUser&amp;cmdClass=ilobjworkspacerootfoldergui&amp;cmdNode=25:3w:d6&amp;baseClass=ilpersonaldesktopgui">Shared Resources</a>
+				</li>
+
+			</ul>
+		</div>
+
+
+
+
+		<div class="ilAwarenessItem">
+			<div class="media" id="dropdownMenu6" data-toggle="dropdown" aria-expanded="true">
+				<div class="ilAwarenessItemRow">
+					<div class="media-left">
+						<a href="#">
+							<img class="media-object" src="http://www.ilias.de/docu/data/docu/usr_images/usr_17467_xsmall.jpg?t=43157" alt="">
+						</a>
+					</div>
+					<div class="media-body ilAwarenessOnline">
+						<h4 class="media-heading">Willi, Werner</h4>
+						<p>[werner.willi]</p>
+					</div>
+				</div>
+			</div>
+			<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu6">
+
+				<li role="presentation">
+					<div class="arrow-down"></div>
+					<a role="menuitem" tabindex="-1" href="ilias.php?baseClass=ilMailGUI&amp;r=&amp;type=new&amp;rcp_to=werner.willi">Mail</a>
+				</li>
+
+				<li role="presentation">
+
+					<a role="menuitem" tabindex="-1" href="./goto.php?target=usr_17467">Profile</a>
+				</li>
+
+				<li role="presentation">
+
+					<a role="menuitem" tabindex="-1" href="ilias.php?user=werner.willi&amp;cmd=listSharedResourcesOfOtherUser&amp;cmdClass=ilobjworkspacerootfoldergui&amp;cmdNode=25:3w:d6&amp;baseClass=ilpersonaldesktopgui">Shared Resources</a>
+				</li>
+
+			</ul>
+		</div>
+
+
+	</div>
+</div>
+	</div>
+</div>
+
+
+
+<!-- TAGS -->
+<script>
+	$(function () {
+		$('.sb').on('click','#taglink', function () {
+			$(".ilTagCloud").css("display", "");
+			$("#tree_div").css("display", "none");
+			$("#taglink").css("font-weight", "bold");
+			$("#bmlink").css("font-weight", "normal");
+			$("#subtitle5").html("Meine Tags");
+		});
+
+		$('.sb').on('click','#bmlink', function () {
+			$(".ilTagCloud").css("display", "none");
+			$("#tree_div").css("display", "");
+			$("#taglink").css("font-weight", "normal");
+			$("#bmlink").css("font-weight", "bold");
+			$("#subtitle5").html("Meine Bookmarks");
+		});
+
+	});
+</script>
+
+
+<div id="popover-content5" style="display: none">
+	<div class="popcontent">
+		<div class="pop_top_nav"><a id="taglink" href="#" style="font-weight:bold">Tags</a> | <a id="bmlink" href="#">Bookmarks</a> | <a href="#" >...<span class="caret"></span></a></div>
+
+		<li id="subtitle5" class="dropdown-header ilLVNavEnt">Meine Tags</li>
+
+<div class="ilTagCloud" >
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=555&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">555</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=bbb&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">bbb</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=cvb&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">cvb</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=dann%20gut&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">dann gut</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=Das&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">Das</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=das%20ist%20dorch&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">das ist dorch</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=Demo&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">Demo</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=dfg&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">dfg</a>
+
+	<a class="ilTag ilTagRelVeryHigh" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=drei&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">drei</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=ee23e&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">ee23e</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=ein&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">ein</a>
+
+	<a class="ilTag ilTagRelHigh" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=eins&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">eins</a>
+
+	<a class="ilTag ilTagRelMiddle" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=er&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">er</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=ert&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">ert</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=Exercise&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">Exercise</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=fff&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">fff</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=fo&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">fo</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=f%C3%BCnf&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">fünf</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=Gruppenarbeit&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">Gruppenarbeit</a>
+
+	<a class="ilTag ilTagRelMiddle" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=Hallo&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">Hallo</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=halt&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">halt</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=hilfe&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">hilfe</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=ist&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">ist</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=it&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">it</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=jelr&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">jelr</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=just%20amazing&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">just amazing</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=lkerlkw&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">lkerlkw</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=lkwejr&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">lkwejr</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=lost%20gehts&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">lost gehts</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=lqejwr&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">lqejwr</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=lqwk&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">lqwk</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=lwjerlkj&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">lwjerlkj</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=lwkejrlkwjerj23o3&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">lwkejrlkwjerj23o3</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=mehr&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">mehr</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=Meine&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">Meine</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=My&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">My</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=na&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">na</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=neues%20wort%3F&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">neues wort?</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=noch&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">noch</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=nochmal&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">nochmal</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=now&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">now</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=nun&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">nun</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=oiafk&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">oiafk</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=oij&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">oij</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=oijf&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">oijf</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=ois&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">ois</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=oiwm&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">oiwm</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=owier&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">owier</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=qweq&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">qweq</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=rlwe&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">rlwe</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=sd&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">sd</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=sdfg&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">sdfg</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=slf&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">slf</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=so&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">so</a>
+
+	<a class="ilTag ilTagRelMiddle" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=super&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">super</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=super%20toll&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">super toll</a>
+
+	<a class="ilTag ilTagRelMiddle" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=Tags&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">Tags</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=te&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">te</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=tes&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">tes</a>
+
+	<a class="ilTag ilTagRelVeryHigh" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=test&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">test</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=testq&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">testq</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=toll&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">toll</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=und&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">und</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=und%20das%20noch%20dazu&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">und das noch dazu</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=viel&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">viel</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=vier&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">vier</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=weee&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">weee</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=weir&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">weir</a>
+
+	<a class="ilTag ilTagRelMiddle" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=Welt&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">Welt</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=wer&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">wer</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=werwr&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">werwr</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=wewew&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">wewew</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=wichtig&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">wichtig</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=wlekj&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">wlekj</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=wlerljw&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">wlerljw</a>
+
+	<a class="ilTag ilTagRelLow" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=wlkj&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">wlkj</a>
+
+	<a class="ilTag ilTagRelHigh" href="ilias.php?col_side=right&amp;block_type=pdtag&amp;tag=zwei&amp;cmd=showResourcesForTag&amp;cmdClass=ilpdtaggingblockgui&amp;cmdNode=65:3u:5r&amp;baseClass=ilPersonalDesktopGUI">zwei</a>
+
+
+</div>
+
+		<div id="tree_div" style="display:none;"><div id="il_expl2_jstree_cont_out_bm_exp" class="">
+			<div id="il_expl2_jstree_cont_bm_exp" class="jstree jstree-0 jstree-focused"><ul class="jstree-no-dots jstree-no-icons"><li rel="disabled" id="exp_node_bm_exp_165" class="jstree-leaf"><ins class="jstree-icon">&nbsp;</ins><a href="#" onclick="$('#il_expl2_jstree_cont_bm_exp').jstree('toggle_node' , '#exp_node_bm_exp_165'); return false;"><ins class="jstree-icon">&nbsp;</ins><img src="./templates/default/images/icon_bmf.svg" alt="Symbol Bookmark-Ordner" title="Symbol Bookmark-Ordner" border="0"> <span class="loader"></span><span class="ilExp2NodeContent">A next folder</span></a></li><li rel="disabled" id="exp_node_bm_exp_174" class="jstree-leaf"><ins class="jstree-icon">&nbsp;</ins><a href="#" onclick="$('#il_expl2_jstree_cont_bm_exp').jstree('toggle_node' , '#exp_node_bm_exp_174'); return false;"><ins class="jstree-icon">&nbsp;</ins><img src="./templates/default/images/icon_bmf.svg" alt="Symbol Bookmark-Ordner" title="Symbol Bookmark-Ordner" border="0"> <span class="loader"></span><span class="ilExp2NodeContent">Das ist Ordnung!</span></a></li><li rel="disabled" id="exp_node_bm_exp_175" class="jstree-leaf"><ins class="jstree-icon">&nbsp;</ins><a href="#" onclick="$('#il_expl2_jstree_cont_bm_exp').jstree('toggle_node' , '#exp_node_bm_exp_175'); return false;"><ins class="jstree-icon">&nbsp;</ins><img src="./templates/default/images/icon_bmf.svg" alt="Symbol Bookmark-Ordner" title="Symbol Bookmark-Ordner" border="0"> <span class="loader"></span><span class="ilExp2NodeContent">fff</span></a></li><li rel="disabled" id="exp_node_bm_exp_160" class="jstree-closed"><ins class="jstree-icon">&nbsp;</ins><a href="#" onclick="$('#il_expl2_jstree_cont_bm_exp').jstree('toggle_node' , '#exp_node_bm_exp_160'); return false;"><ins class="jstree-icon">&nbsp;</ins><img src="./templates/default/images/icon_bmf.svg" alt="Symbol Bookmark-Ordner" title="Symbol Bookmark-Ordner" border="0"> <span class="loader"></span><span class="ilExp2NodeContent">Next Folder</span></a><ul>
+				<li rel="disabled" id="exp_node_bm_exp_161" class="jstree-closed"><ins class="jstree-icon">&nbsp;</ins><a href="#" onclick="$('#il_expl2_jstree_cont_bm_exp').jstree('toggle_node' , '#exp_node_bm_exp_161'); return false;"><ins class="jstree-icon">&nbsp;</ins><img src="./templates/default/images/icon_bmf.svg" alt="Symbol Bookmark-Ordner" title="Symbol Bookmark-Ordner" border="0"> <span class="loader"></span><span class="ilExp2NodeContent">Another folder</span></a><ul>
+					<li rel="disabled" id="exp_node_bm_exp_166" class="jstree-last jstree-closed"><ins class="jstree-icon">&nbsp;</ins><a href="#" onclick="$('#il_expl2_jstree_cont_bm_exp').jstree('toggle_node' , '#exp_node_bm_exp_166'); return false;"><ins class="jstree-icon">&nbsp;</ins><img src="./templates/default/images/icon_bmf.svg" alt="Symbol Bookmark-Ordner" title="Symbol Bookmark-Ordner" border="0"> <span class="loader"></span><span class="ilExp2NodeContent">Yet another folder</span></a><ul>
+						<li rel="disabled" id="exp_node_bm_exp_167" class="jstree-last jstree-leaf"><ins class="jstree-icon">&nbsp;</ins><a href="#" onclick="$('#il_expl2_jstree_cont_bm_exp').jstree('toggle_node' , '#exp_node_bm_exp_167'); return false;"><ins class="jstree-icon">&nbsp;</ins><img src="./templates/default/images/icon_bmf.svg" alt="Symbol Bookmark-Ordner" title="Symbol Bookmark-Ordner" border="0"> <span class="loader"></span><span class="ilExp2NodeContent">Yet more bookmark folders with long texts</span></a></li></ul></li></ul></li>
+				<li rel="disabled" id="exp_node_bm_exp_170" class="jstree-leaf"><ins class="jstree-icon">&nbsp;</ins><a href="#" onclick="$('#il_expl2_jstree_cont_bm_exp').jstree('toggle_node' , '#exp_node_bm_exp_170'); return false;"><ins class="jstree-icon">&nbsp;</ins><img src="./templates/default/images/icon_bmf.svg" alt="Symbol Bookmark-Ordner" title="Symbol Bookmark-Ordner" border="0"> <span class="loader"></span><span class="ilExp2NodeContent">Folder</span></a></li>
+				<li rel="disabled" id="exp_node_bm_exp_169" class="jstree-leaf"><ins class="jstree-icon">&nbsp;</ins><a href="#" onclick="$('#il_expl2_jstree_cont_bm_exp').jstree('toggle_node' , '#exp_node_bm_exp_169'); return false;"><ins class="jstree-icon">&nbsp;</ins><img src="./templates/default/images/icon_bmf.svg" alt="Symbol Bookmark-Ordner" title="Symbol Bookmark-Ordner" border="0"> <span class="loader"></span><span class="ilExp2NodeContent">Folder</span></a></li>
+				<li rel="disabled" id="exp_node_bm_exp_173" class="jstree-leaf"><ins class="jstree-icon">&nbsp;</ins><a href="#" onclick="$('#il_expl2_jstree_cont_bm_exp').jstree('toggle_node' , '#exp_node_bm_exp_173'); return false;"><ins class="jstree-icon">&nbsp;</ins><img src="./templates/default/images/icon_bmf.svg" alt="Symbol Bookmark-Ordner" title="Symbol Bookmark-Ordner" border="0"> <span class="loader"></span><span class="ilExp2NodeContent">Folder</span></a></li>
+				<li rel="disabled" id="exp_node_bm_exp_171" class="jstree-leaf"><ins class="jstree-icon">&nbsp;</ins><a href="#" onclick="$('#il_expl2_jstree_cont_bm_exp').jstree('toggle_node' , '#exp_node_bm_exp_171'); return false;"><ins class="jstree-icon">&nbsp;</ins><img src="./templates/default/images/icon_bmf.svg" alt="Symbol Bookmark-Ordner" title="Symbol Bookmark-Ordner" border="0"> <span class="loader"></span><span class="ilExp2NodeContent">Folder</span></a></li>
+				<li rel="disabled" id="exp_node_bm_exp_172" class="jstree-last jstree-leaf"><ins class="jstree-icon">&nbsp;</ins><a href="#" onclick="$('#il_expl2_jstree_cont_bm_exp').jstree('toggle_node' , '#exp_node_bm_exp_172'); return false;"><ins class="jstree-icon">&nbsp;</ins><img src="./templates/default/images/icon_bmf.svg" alt="Symbol Bookmark-Ordner" title="Symbol Bookmark-Ordner" border="0"> <span class="loader"></span><span class="ilExp2NodeContent">Folderdd</span></a></li></ul></li><li rel="disabled" id="exp_node_bm_exp_163" class="jstree-open"><ins class="jstree-icon">&nbsp;</ins><a href="#" onclick="$('#il_expl2_jstree_cont_bm_exp').jstree('toggle_node' , '#exp_node_bm_exp_163'); return false;"><ins class="jstree-icon">&nbsp;</ins><img src="./templates/default/images/icon_bmf.svg" alt="Symbol Bookmark-Ordner" title="Symbol Bookmark-Ordner" border="0"> <span class="loader"></span><span class="ilExp2NodeContent">Next Folder with some longer text</span></a><ul style="">
+				<li rel="disabled" id="exp_node_bm_exp_164" class="jstree-last jstree-leaf"><ins class="jstree-icon">&nbsp;</ins><a href="#" onclick="$('#il_expl2_jstree_cont_bm_exp').jstree('toggle_node' , '#exp_node_bm_exp_164'); return false;"><ins class="jstree-icon">&nbsp;</ins><img src="./templates/default/images/icon_bmf.svg" alt="Symbol Bookmark-Ordner" title="Symbol Bookmark-Ordner" border="0"> <span class="loader"></span><span class="ilExp2NodeContent">Another folder</span></a></li></ul></li><li rel="disabled" id="exp_node_bm_exp_159" class="jstree-leaf"><ins class="jstree-icon">&nbsp;</ins><a href="http://scott.local/ilias/goto_iliastrunk_crs_56.html" target="_blank"><ins class="jstree-icon">&nbsp;</ins><img src="./templates/default/images/icon_bm.svg" alt="Symbol Bookmark" title="Symbol Bookmark" border="0"> <span class="loader"></span><span class="ilExp2NodeContent">Course 2</span></a></li><li rel="disabled" id="exp_node_bm_exp_162" class="jstree-leaf"><ins class="jstree-icon">&nbsp;</ins><a href="http://scott.local/ilias/goto_iliastrunk_crs_56.html" target="_blank"><ins class="jstree-icon">&nbsp;</ins><img src="./templates/default/images/icon_bm.svg" alt="Symbol Bookmark" title="Symbol Bookmark" border="0"> <span class="loader"></span><span class="ilExp2NodeContent">Course 2</span></a></li><li rel="disabled" id="exp_node_bm_exp_176" class="jstree-leaf"><ins class="jstree-icon">&nbsp;</ins><a href="http://anderson.local/ilias/goto_iliastrunk_wiki_wpage_92_46.html" target="_blank"><ins class="jstree-icon">&nbsp;</ins><img src="./templates/default/images/icon_bm.svg" alt="Symbol Bookmark" title="Symbol Bookmark" border="0"> <span class="loader"></span><span class="ilExp2NodeContent">Second Wiki: Wiki</span></a></li><li rel="disabled" id="exp_node_bm_exp_168" class="jstree-last jstree-leaf"><ins class="jstree-icon">&nbsp;</ins><a href="http://www.spiegel.de" target="_blank"><ins class="jstree-icon">&nbsp;</ins><img src="./templates/default/images/icon_bm.svg" alt="Symbol Bookmark" title="Symbol Bookmark" border="0"> <span class="loader"></span><span class="ilExp2NodeContent">Spiegel</span></a></li></ul></div>
+		</div>
+		</div>
+
+	</div>
+</div>

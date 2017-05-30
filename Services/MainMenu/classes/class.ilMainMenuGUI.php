@@ -781,6 +781,12 @@ class ilMainMenuGUI
 
 		$this->setTemplateVars();
 
+		// layout-patch start
+		include_once("./Services/_LayoutPatch/classes/class.ilLayoutPatch.php");
+		ilLayoutPatch::patch();
+		// layout-patch end
+
+
 		return $this->tpl->get();
 	}
 	

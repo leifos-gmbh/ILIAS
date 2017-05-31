@@ -858,11 +858,15 @@ class ilCDTrainerGUI
 			file_put_contents($src_file, $html);
 			ilUtil::execQuoted(PATH_TO_HTMLDOC, $src_file.' '.$tgt_file);		
 			unlink($src_file);
-echo "<br>".$tgt_file;
+echo "<br>Zieldatei: ".$tgt_file;
 			if(file_exists($tgt_file))
 			{
-				echo "EXISTS";
+				echo " EXISTIERT.";
 //				ilUtil::deliverFile($tgt_file, $title.".pdf", "", false, true);
+			}
+			else
+			{
+				echo " EXISTIERT NICHT.";
 			}
 	exit;
 			ilUtil::sendFailure("PDF Export failed");

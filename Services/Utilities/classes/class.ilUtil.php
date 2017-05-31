@@ -3729,9 +3729,9 @@ class ilUtil
 			$cmd .= " ".$args;
 		}
 //ilUtil::printBacktrace(5);
-//echo "<br>".$cmd; exit;
+//echo "<br>".$cmd;
 		exec($cmd, $arr);
-		die ("ilUtil::execQuoted: ".$cmd);
+		echo ("ilUtil::execQuoted: ".$cmd);
 //		$ilLog->write("ilUtil::execQuoted: ".$cmd.".");
 		return $arr;
 	}

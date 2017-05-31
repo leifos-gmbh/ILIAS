@@ -858,11 +858,13 @@ class ilCDTrainerGUI
 			file_put_contents($src_file, $html);
 			ilUtil::execQuoted(PATH_TO_HTMLDOC, $src_file.' '.$tgt_file);		
 			unlink($src_file);
-
+echo "<br>".$tgt_file;
 			if(file_exists($tgt_file))
 			{
-				ilUtil::deliverFile($tgt_file, $title.".pdf", "", false, true);
+				echo "EXISTS";
+//				ilUtil::deliverFile($tgt_file, $title.".pdf", "", false, true);
 			}
+	exit;
 			ilUtil::sendFailure("PDF Export failed");
 			$this->listTrainers();
 		}

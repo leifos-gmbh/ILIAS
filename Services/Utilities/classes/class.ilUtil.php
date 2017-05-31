@@ -3731,10 +3731,10 @@ class ilUtil
 //ilUtil::printBacktrace(5);
 //echo "<br>".$cmd;
 		$r = exec($cmd, $arr);
-		echo ("<br>Shell Commando: <br>".$cmd);
-		echo "<br><br>Rückmeldung:";
-		var_dump($arr);
-		var_dump($r);
+//		echo ("<br>Shell Commando: <br>".$cmd);
+//		echo "<br><br>Rückmeldung:";
+//		var_dump($arr);
+//		var_dump($r);
 
 //		$ilLog->write("ilUtil::execQuoted: ".$cmd.".");
 		return $arr;

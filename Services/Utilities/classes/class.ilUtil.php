@@ -3730,7 +3730,9 @@ class ilUtil
 		}
 //ilUtil::printBacktrace(5);
 //echo "<br>".$cmd;
-		exec($cmd, $arr);
+		$r = exec($cmd, $arr);
+		var_dump($arr);
+		var_dump($r);
 		echo ("ilUtil::execQuoted: ".$cmd);
 //		$ilLog->write("ilUtil::execQuoted: ".$cmd.".");
 		return $arr;

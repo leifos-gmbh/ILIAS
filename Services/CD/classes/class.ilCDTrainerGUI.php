@@ -858,7 +858,7 @@ class ilCDTrainerGUI
 			file_put_contents($src_file, $html);
 			ilUtil::execQuoted(PATH_TO_HTMLDOC, $src_file.' '.$tgt_file);		
 			unlink($src_file);
-echo "<br>Zieldatei: ".$tgt_file;
+echo "<br><br>Zieldatei: ".$tgt_file;
 			if(file_exists($tgt_file))
 			{
 				echo " EXISTIERT.";

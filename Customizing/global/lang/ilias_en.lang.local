@@ -24,4 +24,4 @@ trac#:#trac_reset_progress_grp#:#in Groups
 trac#:#trac_reset_progress_info#:#If enabled, course or group administrators are allowed to delete the progress of members.
 trac#:#trac_btn_reset_progress#:#Delete Progress
 trac#:#trac_reset_progress_select_resources#:#Select Resources
-trac#:#trac_resetted_progress#:#Delete progress of selected users.
+trac#:#trac_resetted_progress#:#Deleted progress of selected users.

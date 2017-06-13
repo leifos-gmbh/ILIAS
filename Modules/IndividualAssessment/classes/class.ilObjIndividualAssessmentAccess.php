@@ -4,6 +4,9 @@ require_once 'Services/Object/classes/class.ilObjectAccess.php';
 require_once 'Services/AccessControl/classes/class.ilConditionHandler.php';
 require_once 'Services/AccessControl/interfaces/interface.ilConditionHandling.php';
 class ilObjIndividualAssessmentAccess extends ilObjectAccess implements ilConditionHandling{
+
+	const NOT_MEMBER = "not_member";
+
 	/**
 	 * @inheritdoc
 	 */
@@ -24,7 +27,8 @@ class ilObjIndividualAssessmentAccess extends ilObjectAccess implements ilCondit
 		include_once './Services/AccessControl/classes/class.ilConditionHandler.php';
 		return array(
 			ilConditionHandler::OPERATOR_PASSED,
-			ilConditionHandler::OPERATOR_FAILED
+			ilConditionHandler::OPERATOR_FAILED,
+			self::NOT_MEMBER
 		);
 	}
 
@@ -41,6 +45,13 @@ class ilObjIndividualAssessmentAccess extends ilObjectAccess implements ilCondit
 			case ilConditionHandler::OPERATOR_FAILED:
 				return ilIndividualAssessmentLPInterface::determineStatusOfMember($iass_id, $a_usr_id) 
 					== ilIndividualAssessmentMembers::LP_FAILED;
+				break;
+			case ilConditionHandler::OPERATOR_NOT_MEMBER:
+				if(ilIndividualAssessmentLPInterface::determineStatusOfMember($iass_id, $a_usr_id))
+					return false;
+				else
+					return true;
+				break;
 			default:
 				return false;
 		}

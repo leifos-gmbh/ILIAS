@@ -29,11 +29,18 @@ class ilLMObject
 	static protected $data_records = array();
 
 	/**
+	 * @var ilDB
+	 */
+	protected $db;
+
+	/**
 	* @param	object		$a_content_obj		content object (digi book or learning module)
 	*/
 	function __construct($a_content_obj, $a_id = 0)
 	{
-		global $ilias;
+		global $DIC;
+
+		$this->db = $DIC->database();
 
 		$this->id = $a_id;
 		$this->setContentObject($a_content_obj);
@@ -1537,6 +1544,46 @@ class ilLMObject
 		}
 	}
 
-	
+	/**
+	 * Get short titles
+	 *
+	 * @param
+	 * @return array
+	 */
+	static function getShortTitles($a_lm_id)
+	{
+		global $DIC;
+
+		$db = $DIC->database();
+
+		$title_data = array();
+		$set = $db->query("SELECT * FROM lm_data d LEFT JOIN lm_tree t ON (d.obj_id = t.child) WHERE d.lm_id = ".
+			$db->quote($a_lm_id, "integer")." ORDER BY t.lft, d.title");
+		while ($rec = $db->fetchAssoc($set))
+		{
+			$title_data[] = $rec;
+		}
+		return $title_data;
+	}
+
+	/**
+	 * Write short title
+	 *
+	 * @param integer $a_id object id
+	 * @param string $a_short_title short title
+	 */
+	static function writeShortTitle($a_id, $a_short_title)
+	{
+		global $DIC;
+
+		$db = $DIC->database();
+
+		$db->manipulate("UPDATE lm_data SET ".
+			" short_title = ".$db->quote($a_short_title, "text").
+			" WHERE obj_id = ".$db->quote($a_id, "integer")
+			);
+	}
+
+
 }
 ?>

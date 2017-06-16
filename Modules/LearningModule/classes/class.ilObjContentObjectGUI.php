@@ -313,6 +313,16 @@ class ilObjContentObjectGUI extends ilObjectGUI implements ilLinkCheckerGUIRowHa
 				$this->ctrl->forwardCommand($gui);
 				break;
 
+			case "illmeditshorttitlesgui":
+				$this->addHeaderAction();
+				$this->addLocations(true);
+				$this->setTabs("content");
+				$this->setContentSubTabs("short_titles");
+				include_once("./Modules/LearningModule/classes/class.ilLMEditShortTitlesGUI.php");
+				$gui = new ilLMEditShortTitlesGUI($this->object);
+				$this->ctrl->forwardCommand($gui);
+				break;
+
 			default:
 				$new_type = $_POST["new_type"]
 					? $_POST["new_type"]
@@ -2480,11 +2490,16 @@ class ilObjContentObjectGUI extends ilObjectGUI implements ilLinkCheckerGUIRowHa
 		$ilTabs->addSubtab("chapters",
 			$lng->txt("cont_chapters"),
 			$ilCtrl->getLinkTarget($this, "chapters"));
-		
+
 		// all pages
 		$ilTabs->addSubtab("pages",
 			$lng->txt("cont_all_pages"),
 			$ilCtrl->getLinkTarget($this, "pages"));
+
+		// all pages
+		$ilTabs->addSubtab("short_titles",
+			$lng->txt("cont_short_titles"),
+			$ilCtrl->getLinkTargetByClass("illmeditshorttitlesgui", ""));
 
 		// export ids
 		if ($lm_set->get("html_export_ids"))

@@ -483,7 +483,7 @@ class ilLMObject
 			$ilDB->quote($this->getType(), "text").", ".
 			$ilDB->quote($this->getLayout(), "text").", ".
 			$ilDB->quote($this->getLMId(), "integer").",".
-			$ilDB->quote($this->getImportId(), "text").
+			$ilDB->quote($this->getImportId(), "text").",".
 			$ilDB->quote($this->getShortTitle(), "text").
 			", ".$ilDB->now().")";
 		$ilDB->manipulate($query);

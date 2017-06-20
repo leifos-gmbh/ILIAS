@@ -14,6 +14,7 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+content#:#cont_short_title_info#:#Kurztitel werden in der Präsentationsansicht in der Baumdarstellung auf der linken Seite und für die Vor- und Zurück-Navigation genutzt.
 content#:#cont_short_titles#:#Kurztitel
 content#:#cont_short_title#:#Kurztitel
 forum#:#delete_drafts_successfully#:#Die Entwürfe wurden erfolgreich gelöscht.

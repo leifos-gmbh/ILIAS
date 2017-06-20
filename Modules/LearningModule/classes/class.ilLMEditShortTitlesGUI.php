@@ -15,6 +15,11 @@ class ilLMEditShortTitlesGUI
 	protected $lm;
 
 	/**
+	 * @var ilObjLearningModuleGUI
+	 */
+	protected $lm_gui;
+
+	/**
 	 * @var ilTemplate
 	 */
 	protected $tpl;
@@ -29,14 +34,19 @@ class ilLMEditShortTitlesGUI
 	 *
 	 * @param ilObjLearningModule $a_lm learning module
 	 */
-	function __construct(ilObjLearningModule $a_lm)
+	function __construct(ilObjLearningModuleGUI $a_lm_gui)
 	{
 		global $DIC;
 
 		$this->ctrl = $DIC->ctrl();
-		$this->lm = $a_lm;
+		$this->lm = $a_lm_gui->object;
+		$this->lm_gui = $a_lm_gui;
 		$this->tpl = $DIC["tpl"];
 		$this->lng = $DIC->language();
+
+		$this->lang = ($_GET["transl"] == "")
+			? "-"
+			: $_GET["transl"];
 
 	}
 
@@ -63,9 +73,10 @@ class ilLMEditShortTitlesGUI
 	 */
 	function listShortTitles()
 	{
+		$ml_head = ilObjContentObjectGUI::getMultiLangHeader($this->lm->getId(), $this->lm_gui, "short_titles");
 		include_once("./Modules/LearningModule/classes/class.ilLMEditShortTitlesTableGUI.php");
-		$tab = new ilLMEditShortTitlesTableGUI($this, "listShortTitles", $this->lm);
-		$this->tpl->setContent($tab->getHTML());
+		$tab = new ilLMEditShortTitlesTableGUI($this, "listShortTitles", $this->lm, $this->lang);
+		$this->tpl->setContent($ml_head.$tab->getHTML());
 	}
 
 	/**
@@ -79,7 +90,7 @@ class ilLMEditShortTitlesGUI
 			{
 				if (ilLMObject::_lookupContObjID($id) == $this->lm->getId())
 				{
-					ilLMObject::writeShortTitle($id, ilUtil::stripSlashes($title));
+					ilLMObject::writeShortTitle($id, ilUtil::stripSlashes($title), $this->lang);
 				}
 			}
 		}

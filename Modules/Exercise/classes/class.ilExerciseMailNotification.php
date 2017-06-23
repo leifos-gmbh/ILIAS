@@ -80,6 +80,9 @@ class ilExerciseMailNotification extends ilMailNotification
 						$this->getLanguageText('exc_msg_new_feedback_file_uploaded2'));
 					$this->appendBody("\n");
 					$this->appendBody(
+						$this->getLanguageText('exc_msg_new_feedback_file_uploaded3'));
+					$this->appendBody("\n");
+					$this->appendBody(
 						$this->getLanguageText('obj_exc').": ".$this->getObjectTitle(true));
 					$this->appendBody("\n");
 					$this->appendBody(

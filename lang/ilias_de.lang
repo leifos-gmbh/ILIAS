@@ -2986,7 +2986,7 @@ common#:#edited_at#:#Bearbeitet am###deprecated
 common#:#editor#:#Editor
 common#:#email#:#E-Mail
 common#:#email_feedback#:#E-Mail-Feedback###deprecated 
-common#:#email_footer#:#<br />powered by ILIAS###deprecated 
+common#:#email_footer#:#<br />###deprecated 
 common#:#email_not_valid#:#Die eingegebene E-Mail-Adresse ist nicht gültig!
 common#:#enable#:#Aktivieren
 common#:#enable_admin_force#:#Benachrichtigung aktivieren###deprecated 

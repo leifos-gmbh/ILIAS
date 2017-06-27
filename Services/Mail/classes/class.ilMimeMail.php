@@ -450,15 +450,19 @@ class ilMimeMail
 			++$i;
 		}
 
-		ilLoggerFactory::getLogger('mail')->debug(
-			"Trying to delegate external email delivery:" .
-			" Initiated by: " . $ilUser->getLogin() . " (" . $ilUser->getId() . ")" .
-			" | From: " . $this->xheaders['From'] .
-			" | To: " . implode(', ', $this->sendto) .
-			" | CC: " . implode(', ', $this->acc) .
-			" | BCC: " . implode(', ', $this->abcc) .
-			" | Subject: " .$mail->Subject
-		);
+		// cdpatch: added if
+		if (is_object($ilUser))
+		{
+			ilLoggerFactory::getLogger('mail')->debug(
+				"Trying to delegate external email delivery:" .
+				" Initiated by: " . $ilUser->getLogin() . " (" . $ilUser->getId() . ")" .
+				" | From: " . $this->xheaders['From'] .
+				" | To: " . implode(', ', $this->sendto) .
+				" | CC: " . implode(', ', $this->acc) .
+				" | BCC: " . implode(', ', $this->abcc) .
+				" | Subject: " . $mail->Subject
+			);
+		}
 
 		if(!(int)$ilSetting->get('prevent_smtp_globally'))
 		{

@@ -1482,6 +1482,7 @@ class ilObjCourseGUI extends ilContainerGUI
 	
 		$this->setSubTabs("properties");
 		$this->tabs_gui->setTabActive('settings');
+		$this->tabs_gui->activateSubTab('icon_settings');
 		
 		if(!$a_form)
 		{

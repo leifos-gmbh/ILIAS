@@ -28,6 +28,7 @@
 * @version $Id$
 *
 * @ilCtrl_Calls ilCalendarCategoryGUI: ilCalendarAppointmentGUI, ilCalendarSelectionBlockGUI
+* @ilCtrl_IsCalledBy ilCalendarCategoryGUI: ilColumnGUI
 *
 * @ingroup ServicesCalendar
 */

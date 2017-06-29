@@ -115,7 +115,8 @@ class ilCalendarAppointmentPanelGUI
 			$this->tpl->setVariable('PANEL_DETAILS',$this->lng->txt('cal_details'));
 		}
 		$this->tpl->setVariable('PANEL_TXT_DATE',$this->lng->txt('date'));
-		
+
+		//TODO get this conditional and use it to create the new modal titles.
 		if($a_app['fullday'])
 		{
 			$this->tpl->setVariable('PANEL_DATE',ilDatePresentation::formatPeriod(

@@ -863,7 +863,12 @@ class ilCalendarBlockGUI extends ilBlockGUI
 		
 	function getData()
 	{
-		global $ilCtrl, $lng;
+		global $DIC;
+
+		$ilCtrl = $DIC->ctrl();
+		$lng = $DIC->language();
+		$f = $DIC->ui()->factory();
+		$renderer = $DIC->ui()->renderer();
 							
 		$seed = new ilDate(date('Y-m-d',time()),IL_CAL_DATE);
 		
@@ -896,11 +901,14 @@ class ilCalendarBlockGUI extends ilBlockGUI
 				$ilCtrl->setParameterByClass('ilcalendardaygui','seed',$start->get(IL_CAL_DATE));
 				$link = $ilCtrl->getLinkTargetByClass('ilcalendardaygui','');
 				$ilCtrl->clearParametersByClass('ilcalendardaygui');
-			
+
+				$modal = $f->modal()->roundtrip(ilDatePresentation::formatPeriod($start, $end),$f->legacy($this->getModalContent($item)));
+
 				$data[] = array(	
 					"date" =>  ilDatePresentation::formatPeriod($start, $end),
 					"title" => $item["event"]->getPresentationTitle(),			
-					"url" => $link
+					"url" => $link,
+					"shy_button" => $renderer->render([$f->button()->shy($item["event"]->getPresentationTitle(), "")->withOnClick($modal->getShowSignal()), $modal])
 					);				
 			}			
 			
@@ -918,6 +926,13 @@ class ilCalendarBlockGUI extends ilBlockGUI
 		}
 		
 		return $data;
+	}
+
+	public function getModalContent($a_app)
+	{
+		include_once('./Services/Calendar/classes/class.ilCalendarAppointmentPresentationGUI.php');
+
+		return ilCalendarAppointmentPresentationGUI::_getInstance($this->seed)->show($a_app);
 	}
 }
 

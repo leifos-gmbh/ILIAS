@@ -59,9 +59,8 @@ class ilAppointmentPresentationCourseGUI extends ilAppointmentPresentationGUI im
 			foreach ($files as $file) {
 				$tpl->setCurrentBlock("files");
 				$ilCtrl->setParameter($this, 'file_id', $file->getFileId());
-				//TODO DOWNLOAD LINK CALL
-				//$tpl->setVariable("DOWN_LINK",$ilCtrl->getLinkTarget($this,'sendfile'));
-				$tpl->setVariable("DOWN_NAME", $file->getFileName());
+				$ilCtrl->setParameterByClass('ilobjcoursegui','file_id', $file->getFileId());
+				$tpl->setVariable("DOWN_LINK",$ilCtrl->getLinkTarget(new ilObjCourseGUI(),'sendfile'));				$tpl->setVariable("DOWN_NAME", $file->getFileName());
 				$tpl->setVariable("DOWN_INFO_TXT", $lng->txt('crs_file_size_info'));
 				$tpl->setVariable("DOWN_SIZE", $file->getFileSize());
 				$tpl->setVariable("TXT_BYTES", $lng->txt('bytes'));

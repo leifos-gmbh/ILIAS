@@ -82,6 +82,15 @@ class ilSoapGroupAdministration extends ilSoapAdministration
 		include_once 'Modules/Group/classes/class.ilGroupXMLParser.php';
 		$xml_parser = new ilGroupXMLParser($newObj, $grp_xml,$target_id);
 		$new_ref_id = $xml_parser->startParsing();
+		
+		// delete connection user
+		if($new_ref_id)
+		{
+			$new_obj_id = ilObject::_lookupObjId($new_ref_id);
+			include_once './Modules/Group/classes/class.ilGroupParticipants.php';
+			$part = ilParticipants::getInstanceByObjId($new_obj_id);
+			$part->delete($GLOBALS['ilUser']->getId());
+		}
 
 		return $new_ref_id ? $new_ref_id : "0";
 	}

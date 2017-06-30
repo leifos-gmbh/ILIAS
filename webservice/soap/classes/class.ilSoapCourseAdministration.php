@@ -94,6 +94,17 @@ class ilSoapCourseAdministration extends ilSoapAdministration
 		$xml_parser = new ilCourseXMLParser($newObj);
 		$xml_parser->setXMLContent($crs_xml);
 		$xml_parser->startParsing();
+		
+		// delete connection user
+		if($newObj->getRefId())
+		{
+			$new_obj_id = ilObject::_lookupObjId($newObj->getRefId());
+			include_once './Modules/Course/classes/class.ilCourseParticipants.php';
+			$part = ilParticipants::getInstanceByObjId($new_obj_id);
+			$part->delete($GLOBALS['ilUser']->getId());
+		}
+
+		
 		return $newObj->getRefId() ? $newObj->getRefId() : "0";
 		
 	}

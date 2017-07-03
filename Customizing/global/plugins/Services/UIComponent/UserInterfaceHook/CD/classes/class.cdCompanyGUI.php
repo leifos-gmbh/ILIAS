@@ -6,7 +6,6 @@
  *
  * @author Alex Killing <alex.killing@gmx.de>
  * @version $Id$
- * @ilCtrl_Calls cdCompanyGUI: ilCDCourseAssignmentGUI
  */
 class cdCompanyGUI
 {
@@ -18,9 +17,7 @@ class cdCompanyGUI
 	 */
 	function __construct($a_pl)
 	{
-		global $ilCtrl, $lng;
-
-		$lng->loadLanguageModule("cd");
+		global $ilCtrl;
 
 		$this->pl = $a_pl;
 		$this->pl->includeClass("class.cdCompany.php");
@@ -50,21 +47,7 @@ class cdCompanyGUI
 		global $ilCtrl, $tpl, $ilUser;
 
 		$tpl->setTitle($this->pl->txt("companies"));
-		$tpl->setTitleIcon(ilUtil::getImagePath("icon_webr.svg"));
-
-
-		$next_class = $ilCtrl->getNextClass();
-
-		switch ($next_class)
-		{
-			case "ilcdcourseassignmentgui":
-				$ilCtrl->setReturn($this, "listUsers");
-				include_once("./Services/CD/classes/class.ilCDCourseAssignmentGUI.php");
-				$cass = new ilCDCourseAssignmentGUI(false);
-				$ilCtrl->forwardCommand($cass);
-				return;
-				break;
-		}
+		$tpl->setTitleIcon(ilUtil::getImagePath("icon_webr_b.png"));
 
 		// personal development employee
 		if (ilCDPermWrapper::isPerRole())
@@ -275,7 +258,7 @@ class cdCompanyGUI
 		if (self::isAdmin())
 		{
 										*/
-		
+
 			$options = array(
 				0 => " - " 
 				);
@@ -291,10 +274,10 @@ class cdCompanyGUI
 			$si->setOptions($options);
 			$si->setValue($ilUser->getId());
 			$this->form->addItem($si);
-		
+
 		// Schleife ENDE 
 		// }
-		
+
 		/*  raus Heller 01.04.2016
 
 		else
@@ -388,14 +371,17 @@ class cdCompanyGUI
 				$company->setCompanyPassword($_POST["company_password"]);
 				$company->setInternet($_POST["internet"]);
 				$company->setParentCompany((int) $_POST["parent_company"]);
-				if (self::isAdmin())
-				{
-					$company->setCreationUser((int) $_POST["creation_user"]);
-				}
-				else
-				{
-					$company->setCreationUser($ilUser->getId());
-				}
+				
+				// Alle können speicher Heller - 06.01.2017
+				//if (self::isAdmin())
+				//{
+				$company->setCreationUser((int) $_POST["creation_user"]);
+				// }
+				// else
+				// {
+				// 	$company->setCreationUser($ilUser->getId());
+				// }
+
 				$company->setTitleAmendment($_POST["title_amendment"]);
 				$company->setAddressAmendment($_POST["address_amendment"]);
 				$company->create();
@@ -448,10 +434,13 @@ class cdCompanyGUI
 					$this->company->setCompanyPassword($_POST["company_password"]);
 					$this->company->setInternet($_POST["internet"]);
 					$this->company->setParentCompany((int) $_POST["parent_company"]);
-					if (self::isAdmin())
-					{
+					
+					// Alle können speichern Heller 06.01.2017
+					// if (self::isAdmin())
+					// {
 						$this->company->setCreationUser((int) $_POST["creation_user"]);
-					}
+					// }
+					
 					$this->company->setTitleAmendment($_POST["title_amendment"]);
 					$this->company->setAddressAmendment($_POST["address_amendment"]);
 					$this->company->update();
@@ -926,8 +915,8 @@ class cdCompanyGUI
 			$ilCtrl->getLinkTarget($this, "listUsers"));
 
 		// needs analysis
-		$this->pl->includeClass("class.cdNeedsAnalysisFactory.php");
-		$na_gui = cdNeedsAnalysisFactory::getGUIInstance($this->pl);
+		$this->pl->includeClass("class.cdNeedsAnalysisGUI.php");
+		$na_gui = new cdNeedsAnalysisGUI($this->pl);
 		$html = $na_gui->getPresentationView($this->user_id);
 
 		// self evaluation
@@ -1172,7 +1161,7 @@ class cdCompanyGUI
 		// date
 		$dt = new ilDateTimeInputGUI($lng->txt("date"), "date");
 		$dt->setShowTime(false);
-		//$dt->setMode(ilDateTimeInputGUI::MODE_SELECT);
+		$dt->setMode(ilDateTimeInputGUI::MODE_SELECT);
 		$form->addItem($dt);
 
 		// oral 
@@ -1351,27 +1340,6 @@ class cdCompanyGUI
 	////
 
 	/**
-	 * Export excel (selected)
-	 *
-	 * @param
-	 * @return
-	 */
-	function exportExcelSelected()
-	{
-		global $ilCtrl;
-
-		if (is_array($_POST["id"]) && count($_POST["id"]) > 0)
-		{
-			$this->company->exportExcel($this->pl, $_POST["id"]);
-		}
-		else
-		{
-			$ilCtrl->redirect($this, "listUsers");
-		}
-	}
-	
-	
-	/**
 	 * Export learning data as excel
 	 */
 	function exportExcel()
@@ -1398,7 +1366,7 @@ class cdCompanyGUI
 	function confirmChangeCompany()
 	{
 		global $ilCtrl, $tpl, $lng;
-			
+
 		if (!is_array($_POST["id"]) || count($_POST["id"]) == 0)
 		{
 			ilUtil::sendInfo($lng->txt("no_checkbox"), true);
@@ -1424,7 +1392,7 @@ class cdCompanyGUI
 				if (!isset($center_name[$c["center_id"]]))
 				{
 					$center_name[$c["center_id"]] =
-						cdCenter::lookupTitle($c["center_id"]);
+					cdCenter::lookupTitle($c["center_id"]);
 				}
 				$options[$c["id"]] = $c["title"]." (".$center_name[$c["center_id"]].")";
 			}
@@ -1567,23 +1535,6 @@ class cdCompanyGUI
 			ilUtil::sendSuccess($lng->txt("msg_obj_modified"), true);
 		}
 		$ilCtrl->redirect($this, "showPartEvalOverview");
-	}
-
-	/**
-	 * Assign course
-	 *
-	 * @param
-	 * @return
-	 */
-	function assignCourse()
-	{
-		global $ilCtrl;
-
-		if (is_array($_POST["id"]) && count($_POST["id"]) > 0)
-		{
-			$ilCtrl->setParameterByClass("ilCDCourseAssignmentGUI", "user_ids", implode(",", $_POST["id"]));
-			$ilCtrl->redirectByClass("ilCDCourseAssignmentGUI", "");
-		}
 	}
 
 }

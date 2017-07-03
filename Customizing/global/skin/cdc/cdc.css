@@ -15409,7 +15409,7 @@ table.mceToolbar td {
 
 .cd-name-trainer {font-weight: bold;}
 
-.cd-trainer-small,.cd-active-center {font-size: .8em;}
+/* .cd-trainer-small,.cd-active-center {font-size: .8em;} */
 
 .cd-in-lang-trainer {
 	background: transparent;

@@ -1161,7 +1161,7 @@ class cdCompanyGUI
 		// date
 		$dt = new ilDateTimeInputGUI($lng->txt("date"), "date");
 		$dt->setShowTime(false);
-		$dt->setMode(ilDateTimeInputGUI::MODE_SELECT);
+		//$dt->setMode(ilDateTimeInputGUI::MODE_SELECT);
 		$form->addItem($dt);
 
 		// oral 

@@ -8,6 +8,7 @@ include_once './Services/Calendar/classes/AppointmentPresentation/class.ilAppoin
  * @author Jesús López Reyes <lopez@leifos.com>
  * @version $Id$
  *
+ * @ilCtrl_IsCalledBy ilAppointmentPresentationUserGUI: ilCalendarAppointmentPresentationGUI
  *
  * @ingroup ServicesCalendar
  */

@@ -12,7 +12,7 @@
  */
 class ilAppointmentPresentationFactory
 {
-	public static function getPresentation($a_appointment)
+	public static function getInstance($a_appointment)
 	{
 		global $lng;
 
@@ -36,7 +36,7 @@ class ilAppointmentPresentationFactory
 				{
 					case "crs":
 						require_once "./Services/Calendar/classes/AppointmentPresentation/class.ilAppointmentPresentationCourseGUI.php";
-						return ilAppointmentPresentationCourseGUI::getInstance();
+						return ilAppointmentPresentationCourseGUI::getInstance($a_appointment);
 						break;
 					case "grp":
 						require_once "./Services/Calendar/classes/AppointmentPresentation/class.ilAppointmentPresentationGroupGUI.php";

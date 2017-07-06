@@ -7,6 +7,7 @@ include_once './Services/Calendar/classes/AppointmentPresentation/class.ilAppoin
  * @author Jesús López Reyes <lopez@leifos.com>
  * @version $Id$
  *
+ * @ilCtrl_IsCalledBy ilAppointmentPresentationCourseGUI: ilCalendarAppointmentPresentationGUI
  *
  * @ingroup ServicesCalendar
  */
@@ -24,6 +25,20 @@ class ilAppointmentPresentationCourseGUI extends ilAppointmentPresentationGUI im
 		}
 
 		return self::$instance;
+	}
+
+	function executeCommand()
+	{
+		global $ilCtrl;
+
+		$next_class = $ilCtrl->getNextClass();
+		$cmd = $ilCtrl->getCmd("getHTML");
+
+		switch ($next_class)
+		{
+			default:
+				return $this->$cmd();
+		}
 	}
 
 	public function addInfoScreen(ilInfoScreenGUI $a_infoscreen, $a_app)

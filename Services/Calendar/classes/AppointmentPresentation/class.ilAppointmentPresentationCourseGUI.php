@@ -67,7 +67,7 @@ class ilAppointmentPresentationCourseGUI extends ilAppointmentPresentationGUI im
 			$a_infoscreen->addProperty($lng->txt("files"), $tpl->get());
 		}
 
-		// support contacts
+		// tutorial support members
 		$parts = ilParticipants::getInstanceByObjId($cat_info['obj_id']);
 		//contacts is an array of user ids.
 		$contacts = $parts->getContacts();
@@ -87,6 +87,57 @@ class ilAppointmentPresentationCourseGUI extends ilAppointmentPresentationGUI im
 			$a_infoscreen->addProperty($lng->txt("crs_mem_contacts"),$str);
 		}
 
-		$a_infoscreen->addProperty($lng->txt("crs_contact"), "(Can I delete this???)Text from Contact of Setting > Course Information  (do not display if not applicable)The Contact from Course Information should be swapped for Tutorial Support.");
+		//course contact
+		$contact_fields = false;
+		$str = "";
+		if($crs->getContactName()) {
+			$str .=$crs->getContactName()."<br>";
+		}
+
+		if($crs->getContactEmail())
+		{
+			include_once './Modules/Course/classes/class.ilCourseMailTemplateMemberContext.php';
+			require_once 'Services/Mail/classes/class.ilMailFormCall.php';
+
+			$courseGUI = new ilObjCourseGUI();
+
+			$emails = explode(",",$crs->getContactEmail());
+			foreach ($emails as $email) {
+				$email = trim($email);
+				$etpl = new ilTemplate("tpl.crs_contact_email.html", true, true , 'Modules/Course');
+				$etpl->setVariable(
+					"EMAIL_LINK",
+					ilMailFormCall::getLinkTarget(
+						$a_infoscreen, 'showSummary', array(),
+						array(
+							'type'   => 'new',
+							'rcp_to' => $email,
+							'sig' => $courseGUI->createMailSignature()
+						),
+						array(
+							ilMailFormCall::CONTEXT_KEY => ilCourseMailTemplateMemberContext::ID,
+							'ref_id' => $crs->getRefId(),
+							'ts'     => time()
+						)
+					)
+				);
+				$etpl->setVariable("CONTACT_EMAIL", $email);
+				$str .= $etpl->get()."<br />";
+			}
+		}
+
+		if($crs->getContactPhone()) {
+			$str .=$crs->getContactPhone()."<br>";
+		}
+		if($crs->getContactResponsibility()) {
+			$str .=$crs->getContactResponsibility()."<br>";
+		}
+		if($crs->getContactConsultation()) {
+			$str .=$crs->getContactConsultation()."<br>";
+		}
+
+		if($str != ""){
+			$a_infoscreen->addProperty($lng->txt("crs_contact"), $str);
+		}
 	}
 }

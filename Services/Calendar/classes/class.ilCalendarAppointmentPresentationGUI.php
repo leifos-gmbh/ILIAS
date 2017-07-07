@@ -8,7 +8,6 @@ include_once './Services/Calendar/classes/class.ilCalendarSettings.php';
  * @version  $Id$
  * @ilCtrl_Calls ilCalendarAppointmentPresentationGUI: ilInfoScreenGUI, ilCalendarAppointmentGUI
 */
-
 class ilCalendarAppointmentPresentationGUI
 {
 	protected $seed = null;
@@ -89,25 +88,16 @@ class ilCalendarAppointmentPresentationGUI
 
 	public function getHTML()
 	{
-		global $tpl;
-
 		include_once "./Services/Calendar/classes/AppointmentPresentation/class.ilAppointmentPresentationFactory.php";
 
 		$tpl = new ilTemplate('tpl.appointment_presentation.html',true,true,'Services/Calendar');
 
 		// HERE PASS THE APP, TOOLBAR, INFOSCREEN
 
-		$f = ilAppointmentPresentationFactory::getInstance($this->appointment);
-
-		//pending show the HTML
+		$info_screen = $this->setInfoScreen($this->appointment);
 		$toolbar = $this->fillToolbar($this->appointment);
-		if($toolbar)
-		{
-			$f->addToolbar($toolbar);
-			$tpl->setCurrentBlock("toolbar");
-			$tpl->setVariable("TOOLBAR",$f->getToolbar()->getHTML());
-			$tpl->parseCurrentBlock();
-		}
+		$f = ilAppointmentPresentationFactory::getInstance($this->appointment, $info_screen, $toolbar);
+
 
 		$cat_info = $this->getCatInfo($this->appointment);
 
@@ -136,8 +126,19 @@ class ilCalendarAppointmentPresentationGUI
 			$tpl->parseCurrentBlock();
 		}
 
-		$info_screen = $this->setInfoScreen($this->appointment);
-		$tpl->setVariable("CONTENT",$f->addInfoScreen($info_screen, $this->appointment)->getHTML());
+		// this fills the toolbar and the infoscreen
+		$this->ctrl->getHTML($f);
+
+		// show toolbar
+		if($toolbar)
+		{
+			$tpl->setCurrentBlock("toolbar");
+			$tpl->setVariable("TOOLBAR",$toolbar->getHTML());
+			$tpl->parseCurrentBlock();
+		}
+
+		// show infoscreen
+		$tpl->setVariable("CONTENT", $info_screen->getHTML());
 
 		return $tpl->get();
 	}

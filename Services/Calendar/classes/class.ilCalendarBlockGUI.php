@@ -919,7 +919,7 @@ class ilCalendarBlockGUI extends ilBlockGUI
 					"title" => $item["event"]->getPresentationTitle(),			
 					"url" => $link,
 					"shy_button" => $renderer->render([$f->button()->shy($item["event"]->getPresentationTitle(), "")->withOnClick($modal->getShowSignal()), $modal])
-					);				
+					);
 			}			
 			
 			$this->setEnableNumInfo(true);

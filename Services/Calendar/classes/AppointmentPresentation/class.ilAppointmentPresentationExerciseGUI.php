@@ -13,25 +13,14 @@ include_once './Services/Calendar/classes/AppointmentPresentation/class.ilAppoin
  */
 class ilAppointmentPresentationExerciseGUI extends ilAppointmentPresentationGUI implements ilCalendarAppointmentPresentation
 {
-	/**
-	 * Get singleton
-	 *
-	 * @return self
-	 */
-	public static function getInstance()
+
+	public function getHTML()
 	{
-		if (self::$instance === null || !(self::$instance instanceof ilAppointmentPresentationExerciseGUI)) {
-			self::$instance = new self;
-		}
-
-		return self::$instance;
-	}
-
-	public function addInfoScreen(ilInfoScreenGUI $a_infoscreen, $a_app)
-	{
-		ilLoggerFactory::getRootLogger()->debug("////// // / ////////     infoscreen EXERCISE    //////");
-
 		global $lng, $ilCtrl;
+
+		$a_infoscreen = $this->getInfoScreen();
+		$a_app = $this->appointment;
+		ilLoggerFactory::getRootLogger()->debug("////// // / ////////     infoscreen EXERCISE    //////");
 
 		include_once "./Modules/Exercise/classes/class.ilObjExercise.php";
 
@@ -64,8 +53,6 @@ class ilAppointmentPresentationExerciseGUI extends ilAppointmentPresentationGUI 
 
 		//TODO Work instructions of the assignment...
 		$a_infoscreen->addProperty($lng->txt("exc_instruction"), "OK I NEED THE ASSIGNMENT AND THEN GET THE WORK INSTRUCTIONS");
-
-		return $a_infoscreen;
 	}
 
 }

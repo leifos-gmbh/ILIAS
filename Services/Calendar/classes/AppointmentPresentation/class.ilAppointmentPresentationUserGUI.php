@@ -15,20 +15,6 @@ include_once './Services/Calendar/classes/AppointmentPresentation/class.ilAppoin
 class ilAppointmentPresentationUserGUI extends ilAppointmentPresentationGUI implements ilCalendarAppointmentPresentation
 {
 	protected $seed;
-	/**
-	 * Get singleton
-	 *
-	 * @return self
-	 */
-	public static function getInstance()
-	{
-		if(self::$instance === null || !(self::$instance instanceof ilAppointmentPresentationUserGUI))
-		{
-			self::$instance = new self;
-		}
-
-		return self::$instance;
-	}
 
 	/**
 	 * Get seed date
@@ -38,8 +24,13 @@ class ilAppointmentPresentationUserGUI extends ilAppointmentPresentationGUI impl
 		return $this->seed;
 	}
 
-	public function addInfoScreen(ilInfoScreenGUI $a_infoscreen, $a_app)
+	public function getHTML()
 	{
+		global $lng, $ilCtrl;
+
+		$a_infoscreen = $this->getInfoScreen();
+		$a_app = $this->appointment;
+
 		global $lng, $ilCtrl, $DIC;
 
 		$f = $DIC->ui()->factory();
@@ -76,10 +67,6 @@ class ilAppointmentPresentationUserGUI extends ilAppointmentPresentationGUI impl
 		}
 
 		$a_infoscreen->addProperty($lng->txt("cal_user_notification"), "DUMMY TEXT, I DON'T KNOW WHAT IS THIS USER NOTIFICATION INFO.");
-
-		return $a_infoscreen;
-
-
 	}
 
 }

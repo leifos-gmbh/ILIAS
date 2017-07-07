@@ -5,39 +5,39 @@ include_once './Services/Calendar/interfaces/interface.ilCalendarAppointmentPres
  * @author Jesús López Reyes <lopez@leifos.com>
  * @version $Id$
  *
+ * @ilCtrl_IsCalledBy ilAppointmentPresentationGUI: ilCalendarAppointmentPresentationGUI
  *
  * @ingroup ServicesCalendar
  */
-
 class ilAppointmentPresentationGUI implements ilCalendarAppointmentPresentation
 {
 	protected static $instance; // [ilCalendarAppointmentPresentationFactory]
 	protected $toolbar;
 	//protected $infoscreen;
+	protected $appointment;
+	protected $infoscreen;
 
 	/**
-	 * Get singleton
+	 * 
+	 *
+	 * @param
+	 * @return
+	 */
+	function __construct($a_appointment, $a_info_screen, $a_toolbar)
+	{
+		$this->appointment = $a_appointment;
+		$this->infoscreen = $a_info_screen;
+		$this->toolbar = $a_toolbar;
+	}
+	
+	
+	/**
 	 *
 	 * @return self
 	 */
-	public static function getInstance()
+	public static function getInstance($a_appointment, $a_info_screen, $a_toolbar)
 	{
-		if(self::$instance === null)
-		{
-			self::$instance = new self;
-		}
-		return self::$instance;
-	}
-
-	/**
-	 * @param ilToolbarGUI $a_toolbar
-	 */
-	public function addToolbar(ilToolbarGUI $a_toolbar)
-	{
-		$this->toolbar = $a_toolbar;
-		//$clone = clone $this;
-		//$clone->toolbar = $toolbar;
-		//return $clone;
+		return new static($a_appointment, $a_info_screen, $a_toolbar);
 	}
 
 	/**
@@ -46,14 +46,6 @@ class ilAppointmentPresentationGUI implements ilCalendarAppointmentPresentation
 	public function getToolbar()
 	{
 		return $this->toolbar;
-	}
-
-	/**
-	 * @param ilInfoScreenGUI $a_infoscreen
-	 */
-	public function addInfoScreen(ilInfoScreenGUI $a_infoscreen, $a_app)
-	{
-		$this->infoscreen = $a_infoscreen;
 	}
 
 	/**
@@ -77,6 +69,32 @@ class ilAppointmentPresentationGUI implements ilCalendarAppointmentPresentation
 			$cat_info['obj_id'];
 		return $cat_info;
 	}
+
+	function executeCommand()
+	{
+		global $ilCtrl;
+
+		$next_class = $ilCtrl->getNextClass();
+		$cmd = $ilCtrl->getCmd("getHTML");
+
+		switch ($next_class)
+		{
+			default:
+				return $this->$cmd();
+		}
+	}
+
+	/**
+	 * Get HTML
+	 *
+	 * @param
+	 * @return
+	 */
+	function getHTML()
+	{
+
+	}
+
 
 	//TODO : SOME ELEMENTS CAN GET CUSTOM METADATA
 }

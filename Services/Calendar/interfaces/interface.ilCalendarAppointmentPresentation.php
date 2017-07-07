@@ -8,12 +8,8 @@
  */
 interface ilCalendarAppointmentPresentation
 {
-	/**
-	 * @param ilToolbarGUI $toolbar
-	 * @return mixed
-	 */
-	public function addToolbar(ilToolbarGUI $toolbar);
+	public function getToolbar();
 
-	public function addInfoScreen(ilInfoScreenGUI $infoscreen, $appointment);
+	public function getInfoScreen();
 
 }

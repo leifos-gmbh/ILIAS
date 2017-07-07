@@ -13,23 +13,13 @@ include_once './Services/Calendar/classes/AppointmentPresentation/class.ilAppoin
  */
 class ilAppointmentPresentationSessionGUI extends ilAppointmentPresentationGUI implements ilCalendarAppointmentPresentation
 {
-	/**
-	 * Get singleton
-	 *
-	 * @return self
-	 */
-	public static function getInstance()
-	{
-		if (self::$instance === null || !(self::$instance instanceof ilAppointmentPresentationSessionGUI)) {
-			self::$instance = new self;
-		}
 
-		return self::$instance;
-	}
-
-	public function addInfoScreen(ilInfoScreenGUI $a_infoscreen, $a_app)
+	public function getHTML()
 	{
-		global $lng;
+		global $lng, $ilCtrl;
+
+		$a_infoscreen = $this->getInfoScreen();
+		$a_app = $this->appointment;
 
 		//include_once('./Services/Calendar/classes/class.ilCalendarCategoryAssignments.php');
 		include_once "./Modules/Session/classes/class.ilObjSession.php";

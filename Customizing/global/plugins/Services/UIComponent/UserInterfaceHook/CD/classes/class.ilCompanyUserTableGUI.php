@@ -21,7 +21,9 @@ class ilCompanyUserTableGUI extends ilTable2GUI
 		$a_company)
 	{
 		global $ilCtrl, $lng, $ilAccess, $lng, $rbacsystem;
-		
+
+		$lng->loadLanguageModule("cd");
+
 		$this->user_admin_centers = $a_user_admin_centers;
 		$lng->loadLanguageModule("user");
 		$lng->loadLanguageModule("meta");

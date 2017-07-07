@@ -6,6 +6,8 @@
  *
  * @author Alex Killing <alex.killing@gmx.de>
  * @version $Id$
+ *
+ * @ilCtrl_Calls cdCompanyGUI: ilCDCourseAssignmentGUI
  */
 class cdCompanyGUI
 {
@@ -47,7 +49,20 @@ class cdCompanyGUI
 		global $ilCtrl, $tpl, $ilUser;
 
 		$tpl->setTitle($this->pl->txt("companies"));
-		$tpl->setTitleIcon(ilUtil::getImagePath("icon_webr_b.png"));
+		$tpl->setTitleIcon(ilUtil::getImagePath("icon_webr.svg"));
+
+		$next_class = $ilCtrl->getNextClass();
+
+		switch ($next_class)
+		{
+			case "ilcdcourseassignmentgui":
+				$ilCtrl->setReturn($this, "listUsers");
+				include_once("./Services/CD/classes/class.ilCDCourseAssignmentGUI.php");
+				$cass = new ilCDCourseAssignmentGUI(false);
+				$ilCtrl->forwardCommand($cass);
+				return;
+				break;
+		}
 
 		// personal development employee
 		if (ilCDPermWrapper::isPerRole())
@@ -1340,6 +1355,26 @@ class cdCompanyGUI
 	////
 
 	/**
+	 * Export excel (selected)
+	 *
+	 * @param
+	 * @return
+	 */
+	function exportExcelSelected()
+	{
+		global $ilCtrl;
+
+		if (is_array($_POST["id"]) && count($_POST["id"]) > 0)
+		{
+			$this->company->exportExcel($this->pl, $_POST["id"]);
+		}
+		else
+		{
+			$ilCtrl->redirect($this, "listUsers");
+		}
+	}
+
+	/**
 	 * Export learning data as excel
 	 */
 	function exportExcel()
@@ -1537,6 +1572,22 @@ class cdCompanyGUI
 		$ilCtrl->redirect($this, "showPartEvalOverview");
 	}
 
+	/**
+	 * Assign course
+	 *
+	 * @param
+	 * @return
+	 */
+	function assignCourse()
+	{
+		global $ilCtrl;
+
+		if (is_array($_POST["id"]) && count($_POST["id"]) > 0)
+		{
+			$ilCtrl->setParameterByClass("ilCDCourseAssignmentGUI", "user_ids", implode(",", $_POST["id"]));
+			$ilCtrl->redirectByClass("ilCDCourseAssignmentGUI", "");
+		}
+	}
 }
 
 ?>

@@ -920,8 +920,7 @@ class ilCalendarBlockGUI extends ilBlockGUI
 					"url" => $link,
 					"shy_button" => $renderer->render([$f->button()->shy($item["event"]->getPresentationTitle(), "")->withOnClick($modal->getShowSignal()), $modal])
 					);
-			}			
-			
+			}
 			$this->setEnableNumInfo(true);
 		}
 		else
@@ -943,7 +942,6 @@ class ilCalendarBlockGUI extends ilBlockGUI
 		global $DIC;
 
 		include_once('./Services/Calendar/classes/class.ilCalendarAppointmentPresentationGUI.php');
-
 		$next_gui = ilCalendarAppointmentPresentationGUI::_getInstance($this->seed, $a_app);
 		$this->appointment = $a_app;
 

@@ -52,12 +52,14 @@ class ilAppointmentPresentationUserGUI extends ilAppointmentPresentationGUI impl
 		$ilCtrl->setParameterByClass("ilcalendarcategorygui",'category_id', $cat_id);
 		$ilCtrl->setParameterByClass("ilcalendarcategorygui",'seed',$this->getSeed());
 
-		//TODO: FIX THIS LINK
-		$a_infoscreen->addProperty($lng->txt("cal_origin"),	$r->render($f->button()->shy($cat_info['title'],$ilCtrl->getLinkTargetByClass("ilcalendarcategorygui", 'details'))));
+		// link to calendar
+		$a_infoscreen->addProperty($lng->txt("cal_origin"),	$r->render($f->button()->shy($cat_info['title'],
+			$ilCtrl->getLinkTargetByClass(array("ilPersonalDesktopGUI", "ilCalendarPresentationGUI", "ilcalendarcategorygui"), 'details'))));
 
-		//TODO: FIX THIS LINK
-		$ilCtrl->setParameterByClass('ilpublicuserprofilegui', "user", $cat_info['obj_id']);
-		$a_infoscreen->addProperty($lng->txt("cal_owner"),$r->render($f->button()->shy($lng->txt("link_cal_owner"),$ilCtrl->getLinkTargetByClass("ilpublicuserprofilegui", 'getHTML'))));
+		// link to user profile: todo: check if profile is really public
+		include_once('./Services/Link/classes/class.ilLink.php');
+		$href = ilLink::_getStaticLink($cat_info['obj_id'], "usr");
+		$a_infoscreen->addProperty($lng->txt("cal_owner"),$r->render($f->button()->shy($lng->txt("link_cal_owner"), $href)));
 
 		$a_infoscreen->addSection($lng->txt((ilOBject::_lookupType($cat_info['obj_id']) == "usr" ? "app" : ilOBject::_lookupType($cat_info['obj_id']))."_info"));
 

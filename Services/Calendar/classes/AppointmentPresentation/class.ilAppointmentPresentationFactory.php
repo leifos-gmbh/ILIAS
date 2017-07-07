@@ -24,9 +24,7 @@ class ilAppointmentPresentationFactory
 		$entry_obj_id = isset($cat_info['subitem_obj_ids'][$cat_id]) ?
 			$cat_info['subitem_obj_ids'][$cat_id] :
 			$cat_info['obj_id'];
-
 		ilLoggerFactory::getRootLogger()->debug("swithc type = ".$cat_info['type']);
-
 		switch($cat_info['type'])
 		{
 			case ilCalendarCategory::TYPE_OBJ:

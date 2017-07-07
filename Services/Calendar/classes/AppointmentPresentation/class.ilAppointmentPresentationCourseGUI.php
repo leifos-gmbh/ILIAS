@@ -16,19 +16,19 @@ class ilAppointmentPresentationCourseGUI extends ilAppointmentPresentationGUI im
 
 	public function getHTML()
 	{
-		global $lng, $ilCtrl;
+		global $lng, $ilCtrl,$DIC;
 
 		$a_infoscreen = $this->getInfoScreen();
 		$a_app = $this->appointment;
 
-		//include_once('./Services/Calendar/classes/class.ilCalendarCategoryAssignments.php');
+		$f = $DIC->ui()->factory();
+		$r = $DIC->ui()->renderer();
+
 		include_once "./Modules/Course/classes/class.ilObjCourse.php";
 		include_once "./Modules/Course/classes/class.ilCourseFile.php";
 
 		$cat_id = $this->getCatId($a_app['event']->getEntryId());
 		$cat_info = $this->getCatInfo($cat_id);
-
-		//ilLoggerFactory::getRootLogger()->debug("cat_info",$cat_info);
 
 		$crs = new ilObjCourse($cat_info['obj_id'], false);
 		$files =& ilCourseFile::_readFilesByCourse($cat_info['obj_id']);
@@ -51,7 +51,8 @@ class ilAppointmentPresentationCourseGUI extends ilAppointmentPresentationGUI im
 				$tpl->setCurrentBlock("files");
 				$ilCtrl->setParameter($this, 'file_id', $file->getFileId());
 				$ilCtrl->setParameterByClass('ilobjcoursegui','file_id', $file->getFileId());
-				$tpl->setVariable("DOWN_LINK",$ilCtrl->getLinkTarget(new ilObjCourseGUI(),'sendfile'));				$tpl->setVariable("DOWN_NAME", $file->getFileName());
+				$tpl->setVariable("DOWN_LINK",$ilCtrl->getLinkTarget(new ilObjCourseGUI(),'sendfile'));
+				$tpl->setVariable("DOWN_NAME", $file->getFileName());
 				$tpl->setVariable("DOWN_INFO_TXT", $lng->txt('crs_file_size_info'));
 				$tpl->setVariable("DOWN_SIZE", $file->getFileSize());
 				$tpl->setVariable("TXT_BYTES", $lng->txt('bytes'));
@@ -62,16 +63,22 @@ class ilAppointmentPresentationCourseGUI extends ilAppointmentPresentationGUI im
 
 		// support contacts
 		$parts = ilParticipants::getInstanceByObjId($cat_info['obj_id']);
-		$conts = $parts->getContacts();
-		if (count($conts) > 0) {
-			foreach ($conts as $c) {
-				include_once("./Services/User/classes/class.ilPublicUserProfileGUI.php");
-				$pgui = new ilPublicUserProfileGUI($c);
-				//TODO DOWNLOAD LINK CALL
-				//$pgui->setBackUrl($ilCtrl->getLinkTargetByClass("ilinfoscreengui"));
-				$pgui->setEmbedded(true);
-				$a_infoscreen->addProperty($lng->txt("crs_mem_contacts"), $pgui->getHTML());
+		//contacts is an array of user ids.
+		$contacts = $parts->getContacts();
+		$num_contacts = count($contacts);
+		if($num_contacts > 0) {
+			$str = "";
+			foreach ($contacts as $contact) {
+				// link to user profile: todo: check if profile is really public
+				include_once('./Services/Link/classes/class.ilLink.php');
+				$href = ilLink::_getStaticLink($contact, "usr");
+				if($num_contacts > 1 && $contacts[0] != $contact)
+				{
+					$str .= ", ";
+				}
+				$str .= $r->render($f->button()->shy(ilObjUser::_lookupFullname($contact), $href));
 			}
+			$a_infoscreen->addProperty($lng->txt("crs_mem_contacts"),$str);
 		}
 
 		$a_infoscreen->addProperty($lng->txt("crs_contact"), "(Can I delete this???)Text from Contact of Setting > Course Information  (do not display if not applicable)The Contact from Course Information should be swapped for Tutorial Support.");

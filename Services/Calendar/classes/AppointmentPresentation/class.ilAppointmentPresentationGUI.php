@@ -13,7 +13,6 @@ class ilAppointmentPresentationGUI implements ilCalendarAppointmentPresentation
 {
 	protected static $instance; // [ilCalendarAppointmentPresentationFactory]
 	protected $toolbar;
-	//protected $infoscreen;
 	protected $appointment;
 	protected $infoscreen;
 

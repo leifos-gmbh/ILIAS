@@ -36,11 +36,8 @@ class ilAppointmentPresentationUserGUI extends ilAppointmentPresentationGUI impl
 		$f = $DIC->ui()->factory();
 		$r = $DIC->ui()->renderer();
 
-		//include_once('./Services/Calendar/classes/class.ilCalendarCategoryAssignments.php');
 		$cat_id = $this->getCatId($a_app['event']->getEntryId());
 		$cat_info = $this->getCatInfo($cat_id);
-
-		//ilLoggerFactory::getRootLogger()->debug("cat_info",$cat_info);
 
 		$a_infoscreen->addSection($a_app['event']->getTitle());
 

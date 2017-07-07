@@ -42,16 +42,19 @@ class ilCalendarAppointmentPresentationGUI
 	 * @access public
 	 * @param ilDate $seed
 	 * @param  $a_app
-	 * @return
+	 * @return ilCalendarAppointmentPresentationGUI
 	 * @static
 	 */
 	public static function _getInstance(ilDate $seed, $a_app)
 	{
+		return new static($seed, $a_app);
+		/*
 		if(isset(self::$instance) and self::$instance)
 		{
 			return self::$instance;
 		}
 		return self::$instance = new ilCalendarAppointmentPresentationGUI($seed, $a_app);
+		*/
 	}
 
 	function executeCommand()

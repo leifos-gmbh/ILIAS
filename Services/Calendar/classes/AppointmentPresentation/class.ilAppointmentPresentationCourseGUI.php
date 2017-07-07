@@ -31,8 +31,12 @@ class ilAppointmentPresentationCourseGUI extends ilAppointmentPresentationGUI im
 		//ilLoggerFactory::getRootLogger()->debug("cat_info",$cat_info);
 
 		$crs = new ilObjCourse($cat_info['obj_id'], false);
-		$files =& ilCourseFile::_readFilesByCourse($cat_info['obj_id']);
+		$files = ilCourseFile::_readFilesByCourse($cat_info['obj_id']);
 
+		// get course ref id (this is possible, since courses only have one ref id)
+		$refs = ilObject::_getAllReferences($cat_info['obj_id']);
+		include_once('./Services/Link/classes/class.ilLink.php');
+		$crs_ref_id = current($refs);
 
 		$description_text = $cat_info['title'] . ", " . ilObject::_lookupDescription($cat_info['obj_id']);
 		$a_infoscreen->addSection($cat_info['title']);
@@ -51,11 +55,14 @@ class ilAppointmentPresentationCourseGUI extends ilAppointmentPresentationGUI im
 				$tpl->setCurrentBlock("files");
 				$ilCtrl->setParameter($this, 'file_id', $file->getFileId());
 				$ilCtrl->setParameterByClass('ilobjcoursegui','file_id', $file->getFileId());
-				$tpl->setVariable("DOWN_LINK",$ilCtrl->getLinkTarget(new ilObjCourseGUI(),'sendfile'));				$tpl->setVariable("DOWN_NAME", $file->getFileName());
+				$ilCtrl->setParameterByClass('ilobjcoursegui','ref_id', $crs_ref_id);
+				$tpl->setVariable("DOWN_LINK",$ilCtrl->getLinkTargetByClass(array("ilRepositoryGUI","ilobjcoursegui"),'sendfile'));
+				$tpl->setVariable("DOWN_NAME", $file->getFileName());
 				$tpl->setVariable("DOWN_INFO_TXT", $lng->txt('crs_file_size_info'));
 				$tpl->setVariable("DOWN_SIZE", $file->getFileSize());
 				$tpl->setVariable("TXT_BYTES", $lng->txt('bytes'));
 				$tpl->parseCurrentBlock();
+				$ilCtrl->setParameterByClass('ilobjcoursegui','ref_id', $_GET["ref_id"]);
 			}
 			$a_infoscreen->addProperty($lng->txt("files"), $tpl->get());
 		}

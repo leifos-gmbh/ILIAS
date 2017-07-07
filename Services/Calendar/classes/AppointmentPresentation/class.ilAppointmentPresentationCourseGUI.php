@@ -47,8 +47,17 @@ class ilAppointmentPresentationCourseGUI extends ilAppointmentPresentationGUI im
 		$a_infoscreen->addProperty($lng->txt(ilObject::_lookupType($cat_info['obj_id'])), $description_text);
 
 		$a_infoscreen->addSection($lng->txt((ilOBject::_lookupType($cat_info['obj_id']) == "usr" ? "app" : ilOBject::_lookupType($cat_info['obj_id'])) . "_info"));
-		$a_infoscreen->addProperty($lng->txt("crs_important_info"), $crs->getImportantInformation());
-		$a_infoscreen->addProperty($lng->txt("crs_syllabus"), $crs->getSyllabus());
+
+		if($crs->getImportantInformation())
+		{
+			$a_infoscreen->addProperty($lng->txt("crs_important_info"), $crs->getImportantInformation());
+		}
+
+		if($crs->getSyllabus())
+		{
+			$a_infoscreen->addProperty($lng->txt("crs_syllabus"), $crs->getSyllabus());
+		}
+
 		if (count($files)) {
 			$tpl = new ilTemplate('tpl.event_info_file.html', true, true, 'Modules/Course');
 			foreach ($files as $file) {
@@ -127,7 +136,7 @@ class ilAppointmentPresentationCourseGUI extends ilAppointmentPresentationGUI im
 		}
 
 		if($crs->getContactPhone()) {
-			$str .=$crs->getContactPhone()."<br>";
+			$str .=$lng->txt("crs_contact_phone").": ".$crs->getContactPhone()."<br>";
 		}
 		if($crs->getContactResponsibility()) {
 			$str .=$crs->getContactResponsibility()."<br>";

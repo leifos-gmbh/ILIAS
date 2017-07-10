@@ -16,7 +16,7 @@ class ilAppointmentPresentationSessionGUI extends ilAppointmentPresentationGUI i
 
 	public function getHTML()
 	{
-		global $lng, $ilCtrl;
+		global $lng, $ilCtrl,$tree;
 
 		$a_infoscreen = $this->getInfoScreen();
 		$a_app = $this->appointment;
@@ -64,6 +64,54 @@ class ilAppointmentPresentationSessionGUI extends ilAppointmentPresentationGUI i
 			$str_lecturer .= $lng->txt("phone").": ".$session_obj->getPhone()."<br>";
 		}
 		$a_infoscreen->addProperty($lng->txt("cal_info_lecturer"), $str_lecturer);
+
+		//TODO: Ok ... Getting files from the session is completely different than courses and so :S
+		//SELECT * FROM event_file WHERE event_id = 879; // Not this table!
+		//info is in the table "event_items" so...find another way.
+		//include_once "./Modules/Session/classes/class.ilSessionFile.php";
+		//$files = ilSessionFile::_readFilesByEvent($cat_info['obj_id']);
+
+		$html = '';
+
+		include_once './Services/Object/classes/class.ilObjectActivation.php';
+		include_once './Services/Container/classes/class.ilContainerSorting.php';
+		include_once './Modules/Session/classes/class.ilSessionObjectListGUIFactory.php';
+
+		$eventItems = ilObjectActivation::getItemsByEvent($cat_info['obj_id']);
+		$refs = ilObject::_getAllReferences($cat_info['obj_id']);
+		$session_ref_id = current($refs);
+
+		$parent_id = $tree->getParentId($session_ref_id);
+		$parent_id = ilObject::_lookupObjId($parent_id);
+		$eventItems = ilContainerSorting::_getInstance($parent_id)->sortSubItems(
+			'sess',
+			$cat_info['obj_id'],
+			$eventItems
+		);
+
+		$lng->loadLanguageModule("cntr");// #14158
+		require_once "./Modules/Session/classes/class.ilObjSessionGUI.php";
+		foreach($eventItems as $item)
+		{
+			$list_gui = ilSessionObjectListGUIFactory::factory($item['type']);
+			$list_gui->setContainerObject($this);
+
+			$html .= $list_gui->getListItemHTML(
+				$item['ref_id'],
+				$item['obj_id'],
+				$item['title'],
+				$item['description']
+			);
+		}
+
+		if(strlen($html))
+		{
+			$a_infoscreen->addSection($lng->txt('event_materials'));
+			$a_infoscreen->addProperty(
+				'&nbsp;',
+				$html);
+		}
+
 
 		return $a_infoscreen;
 	}

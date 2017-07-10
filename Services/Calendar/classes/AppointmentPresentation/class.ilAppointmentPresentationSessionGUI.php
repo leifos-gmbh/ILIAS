@@ -21,34 +21,49 @@ class ilAppointmentPresentationSessionGUI extends ilAppointmentPresentationGUI i
 		$a_infoscreen = $this->getInfoScreen();
 		$a_app = $this->appointment;
 
-		//include_once('./Services/Calendar/classes/class.ilCalendarCategoryAssignments.php');
 		include_once "./Modules/Session/classes/class.ilObjSession.php";
 
 		$cat_id = $this->getCatId($a_app['event']->getEntryId());
 		$cat_info = $this->getCatInfo($cat_id);
 
-		//ilLoggerFactory::getRootLogger()->debug("cat_info",$cat_info);
-
-		$obj = new ilObjSession($cat_info['obj_id'],false);
-
-		$description_text = $cat_info['title'] . ", " . ilObject::_lookupDescription($cat_info['obj_id']);
+		//Title of the session (The title can be a date... which date? and why no the title of the session?)
 		$a_infoscreen->addSection($cat_info['title']);
 
-		if ($a_app['event']->getDescription()) {
-			$a_infoscreen->addProperty($lng->txt("description"), ilUtil::makeClickable(nl2br($a_app['event']->getDescription())));
-		}
-		$a_infoscreen->addProperty($lng->txt(ilObject::_lookupType($cat_info['obj_id'])), $description_text);
+		//description
+		$a_infoscreen->addProperty($lng->txt("description"), $a_app['event']->getDescription());
 
+		//Contained in:
+		$parent_title = ilObject::_lookupTitle(ilObject::_lookupObjectId($_GET['ref_id']));
+		$a_infoscreen->addProperty($lng->txt("cal_contained_in"),$parent_title);
+
+		//SESSION INFORMATION
 		$a_infoscreen->addSection($lng->txt((ilOBject::_lookupType($cat_info['obj_id']) == "usr" ? "app" : ilOBject::_lookupType($cat_info['obj_id'])) . "_info"));
-
-
-		//TODO FIX THIS, DOES NOT SHOW THE LOCATION
-		//$a_infoscreen->addProperty($lng->txt("cal_location"),ilUtil::makeClickable($a_app['event']->getLocation()));
-		if($a_app['event']->getLocation())
-		{
-			$a_infoscreen->addProperty($lng->txt("cal_location"),ilUtil::makeClickable($a_app['event']->getLocation()));
+		$session_obj = new ilObjSession($cat_info['obj_id'],false);
+		//location
+		if($session_obj->getLocation()){
+			$a_infoscreen->addProperty($lng->txt("cal_location"),ilUtil::makeClickable($session_obj->getLocation()));
 		}
-		//TODO get the details/workflow, information about lecturer, Files.
+		//details/workflow
+		if($session_obj->getDetails())
+		{
+			$a_infoscreen->addProperty($lng->txt("cal_details_workflow"),$session_obj->getDetails());
+		}
+		//lecturer name
+		$str_lecturer = "";
+		if($session_obj->getName())
+		{
+			$str_lecturer .= $session_obj->getName()."<br>";
+		}
+		//lecturer email
+		if($session_obj->getEmail())
+		{
+			$str_lecturer .= $session_obj->getEmail()."<br>";
+		}
+		if($session_obj->getPhone())
+		{
+			$str_lecturer .= $lng->txt("phone").": ".$session_obj->getPhone()."<br>";
+		}
+		$a_infoscreen->addProperty($lng->txt("cal_info_lecturer"), $str_lecturer);
 
 		return $a_infoscreen;
 	}

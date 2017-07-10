@@ -888,7 +888,6 @@ class ilCalendarBlockGUI extends ilBlockGUI
 		$data = array();
 		if(sizeof($events))
 		{
-			//$modal = $f->modal()->roundtrip("asdf",$f->legacy(""));
 
 			foreach($events as $item)
 			{			

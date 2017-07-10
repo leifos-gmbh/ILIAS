@@ -16,37 +16,32 @@ class ilAppointmentPresentationExerciseGUI extends ilAppointmentPresentationGUI 
 
 	public function getHTML()
 	{
-		global $lng, $ilCtrl;
+		global $lng, $ilCtrl, $DIC;
+
+		include_once "./Modules/Exercise/classes/class.ilObjExercise.php";
+
+		$f = $DIC->ui()->factory();
+		$r = $DIC->ui()->renderer();
 
 		$a_infoscreen = $this->getInfoScreen();
 		$a_app = $this->appointment;
-		ilLoggerFactory::getRootLogger()->debug("////// // / ////////     infoscreen EXERCISE    //////");
-
-		include_once "./Modules/Exercise/classes/class.ilObjExercise.php";
 
 		$cat_id = $this->getCatId($a_app['event']->getEntryId());
 		$cat_info = $this->getCatInfo($cat_id);
 
-		ilLoggerFactory::getRootLogger()->debug("cat _info ==> ",$cat_info);
-		ilLoggerFactory::getRootLogger()->debug("cat _id ==> ".$cat_id);
-
-		$context = $a_app['event']->getContextId();
-
-		ilLoggerFactory::getRootLogger()->debug("context _id ==> ".$context);
-
-
-
-		$obj = new ilObjExercise($cat_info['obj_id'], false);
-
-		$description_text = $cat_info['title'] . ", " . ilObject::_lookupDescription($cat_info['obj_id']);
+		$exc_obj = new ilObjExercise($cat_info['obj_id'], false);
 
 		//Assignment title
 		$a_infoscreen->addSection($a_app['event']->getPresentationTitle());
 
-		//exercise title
-		$a_infoscreen->addProperty($lng->txt("cal_origin"),$cat_info['title']);
+		//TODO: Fix this link
+		include_once('./Services/Link/classes/class.ilLink.php');
+		$href = ilLink::_getStaticLink($cat_info['obj_id'], "exc");
+		$a_infoscreen->addProperty($lng->txt("cal_origin"),$r->render($f->button()->shy($exc_obj->getPresentationTitle(), $href)));
 
-		//TODO Now i need the course or the group
+		//parent course or group title
+		$parent_title = ilObject::_lookupTitle(ilObject::_lookupObjectId($_GET['ref_id']));
+		$a_infoscreen->addProperty($lng->txt("cal_contained_in"),$parent_title);
 
 		//Assignment title information
 		$a_infoscreen->addSection($lng->txt((ilOBject::_lookupType($cat_info['obj_id']) == "usr" ? "app" : ilOBject::_lookupType($cat_info['obj_id'])) . "_info"));

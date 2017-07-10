@@ -16,7 +16,9 @@ class ilAppointmentPresentationSessionGUI extends ilAppointmentPresentationGUI i
 
 	public function getHTML()
 	{
-		global $lng, $ilCtrl,$tree;
+		global $lng, $ilCtrl, $DIC;
+		$f = $DIC->ui()->factory();
+		$r = $DIC->ui()->renderer();
 
 		$a_infoscreen = $this->getInfoScreen();
 		$a_app = $this->appointment;
@@ -65,12 +67,26 @@ class ilAppointmentPresentationSessionGUI extends ilAppointmentPresentationGUI i
 		}
 		$a_infoscreen->addProperty($lng->txt("cal_info_lecturer"), $str_lecturer);
 
-		//TODO: Ok ... Getting files from the session is completely different than courses and so :S
-		//SELECT * FROM event_file WHERE event_id = 879; // Not this table!
-		//info is in the table "event_items" so...find another way.
-		//include_once "./Modules/Session/classes/class.ilSessionFile.php";
-		//$files = ilSessionFile::_readFilesByEvent($cat_info['obj_id']);
+		//Ok ... Getting files from the session is completely different than courses and so :S
+		//files are not in the table "event_file". They are in "event_items"
+		//Option 1
+		$eventItems = ilObjectActivation::getItemsByEvent($cat_info['obj_id']);
+		if(count($eventItems))
+		{
+			include_once('./Services/Link/classes/class.ilLink.php');
+			$str = "";
+			foreach ($eventItems as $file)
+			{
+				$href = ilLink::_getStaticLink($file['ref_id'], "file", true,"download");
+				$str .= $r->render($f->button()->shy($file['title'], $href))."<br>";
+			}
+			$a_infoscreen->addProperty($lng->txt("files"),$str);
+		}
 
+		//OPTION 2 with all the HTML stuff
+		/*
+
+		global $tree;
 		$html = '';
 
 		include_once './Services/Object/classes/class.ilObjectActivation.php';
@@ -111,7 +127,7 @@ class ilAppointmentPresentationSessionGUI extends ilAppointmentPresentationGUI i
 				'&nbsp;',
 				$html);
 		}
-
+		*/
 
 		return $a_infoscreen;
 	}

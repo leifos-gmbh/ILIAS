@@ -148,5 +148,13 @@ class ilAppointmentPresentationCourseGUI extends ilAppointmentPresentationGUI im
 		if($str != ""){
 			$a_infoscreen->addProperty($lng->txt("crs_contact"), $str);
 		}
+
+		// fill toolbar (example)
+		$toolbar = $this->getToolbar();
+		$toolbar->addSeparator();
+		$toolbar->addButton("Download all Files", "www.ilias.de");
+		$toolbar->addButton("Open Course", "www.ilias.de");
+
+
 	}
 }

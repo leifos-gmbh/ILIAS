@@ -1764,6 +1764,31 @@ class ilObject
 	{
 		global $objDefinition,$ilUser,$rbacadmin, $ilDB;
 		
+		// patch content-only
+		include_once './Services/CopyWizard/classes/class.ilCopyWizardOptions.php';
+		$cwo = ilCopyWizardOptions::_getInstance($a_copy_id);
+		
+		ilLoggerFactory::getLogger('obj')->info('Check copy content only for ' . $this->getRefId());
+		if($cwo->shouldCopyContentOnly($this->getRefId()))
+		{
+			ilLoggerFactory::getLogger('obj')->info('Copy content only for ' . $this->getRefId());
+			
+			// new obj is existing
+			$mappings = $cwo->getMappings();
+			$new_ref_id = $mappings[$this->getRefId()];
+			include_once './Services/Object/classes/class.ilObjectFactory.php';
+			$obj_factory = new ilObjectFactory();
+			$new_obj = $obj_factory->getInstanceByRefId($new_ref_id, false);
+			if(!$new_ref_id instanceof ilObject)
+			{
+				ilLoggerFactory::getLogger('obj')->warning('Cannot create instance of target object for copy content only.');
+			}
+			include_once('./Services/AdvancedMetaData/classes/class.ilAdvancedMDValues.php');
+			ilAdvancedMDValues::_cloneValues($this->getId(),$new_obj->getId());
+			return $new_obj;
+		}
+		// patch content-only
+		
 		$location = $objDefinition->getLocation($this->getType());
 		$class_name = ('ilObj'.$objDefinition->getClassName($this->getType()));
 		

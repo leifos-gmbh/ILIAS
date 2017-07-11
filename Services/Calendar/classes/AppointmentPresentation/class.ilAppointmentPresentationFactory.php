@@ -58,7 +58,7 @@ class ilAppointmentPresentationFactory
 				return ilAppointmentPresentationUserGUI::getInstance($a_appointment, $a_info_screen, $a_toolbar);
 				break;
 			case ilCalendarCategory::TYPE_CH:
-				require_once "./Services/Calendar/classes/AppointmentPresentation/class.ilAppointmentPresentationGUI.php";
+				require_once "./Services/Calendar/classes/AppointmentPresentation/class.ilAppointmentPresentationUserGUI.php";
 				return ilAppointmentPresentationUserGUI::getInstance($a_appointment, $a_info_screen, $a_toolbar);
 				break;
 			case ilCalendarCategory::TYPE_BOOK:

@@ -330,7 +330,7 @@ class ilPasswordAssistanceGUI
 
 		$mm = new ilMimeMail();
 		$mm->Subject($this->lng->txt('pwassist_mail_subject'));
-		$mm->From($contact_address);
+		$mm->From($contact_address[0]);
 		$mm->To($userObj->getEmail());
 		$mm->Body
 		(
@@ -695,15 +695,13 @@ class ilPasswordAssistanceGUI
 		$server_url      = $protocol . $_SERVER['HTTP_HOST'] . substr($_SERVER['PHP_SELF'], 0, strrpos($_SERVER['PHP_SELF'], '/')) . '/';
 		$login_url       = $server_url . 'pwassist.php' . '?client_id=' . $this->ilias->getClientId() . '&lang=' . $this->lng->getLangKey();
 		$contact_address = ilMail::getIliasMailerAddress();
-		$contact_address = ilMail::getIliasMailerAddress();
-		include_once './Modules/SystemFolder/classes/class.ilSystemSupportContacts.php';
 		if($GLOBALS['ilSetting']->get("admin_email"))
 		{
-			$contact_address = $GLOBALS['ilSetting']->get("admin_email");
+			$contact_address[0] = $GLOBALS['ilSetting']->get("admin_email");
 		}
 		$mm = new ilMimeMail();
 		$mm->Subject($this->lng->txt('pwassist_mail_subject'));
-		$mm->From($contact_address);
+		$mm->From($contact_address[0]);
 		$mm->To($email);
 		$mm->Body
 		(

@@ -322,14 +322,9 @@ class ilPasswordAssistanceGUI
 
 		$contact_address = ilMail::getIliasMailerAddress();
 		include_once './Modules/SystemFolder/classes/class.ilSystemSupportContacts.php';
-		foreach (ilSystemSupportContacts::getValidSupportContactIds() as $id)
+		if($GLOBALS['ilSetting']->get("admin_email"))
 		{
-			include_once './Services/User/classes/class.ilObjUser.php';
-			if (($e = ilObjUser::_lookupEmail($id)) != "")
-			{
-				$contact_address[0] = $e;
-				break;
-			}
+			$contact_address[0] = $GLOBALS['ilSetting']->get("admin_email");
 		}
 		
 
@@ -700,17 +695,12 @@ class ilPasswordAssistanceGUI
 		$server_url      = $protocol . $_SERVER['HTTP_HOST'] . substr($_SERVER['PHP_SELF'], 0, strrpos($_SERVER['PHP_SELF'], '/')) . '/';
 		$login_url       = $server_url . 'pwassist.php' . '?client_id=' . $this->ilias->getClientId() . '&lang=' . $this->lng->getLangKey();
 		$contact_address = ilMail::getIliasMailerAddress();
+		$contact_address = ilMail::getIliasMailerAddress();
 		include_once './Modules/SystemFolder/classes/class.ilSystemSupportContacts.php';
-		foreach (ilSystemSupportContacts::getValidSupportContactIds() as $id)
+		if($GLOBALS['ilSetting']->get("admin_email"))
 		{
-			include_once './Services/User/classes/class.ilObjUser.php';
-			if (($e = ilObjUser::_lookupEmail($id)) != "")
-			{
-				$contact_address[0] = $e;
-				break;
-			}
+			$contact_address = $GLOBALS['ilSetting']->get("admin_email");
 		}
-
 		$mm = new ilMimeMail();
 		$mm->Subject($this->lng->txt('pwassist_mail_subject'));
 		$mm->From($contact_address);

@@ -689,6 +689,17 @@ class ilPasswordAssistanceGUI
 		$server_url      = $protocol . $_SERVER['HTTP_HOST'] . substr($_SERVER['PHP_SELF'], 0, strrpos($_SERVER['PHP_SELF'], '/')) . '/';
 		$login_url       = $server_url . 'pwassist.php' . '?client_id=' . $this->ilias->getClientId() . '&lang=' . $this->lng->getLangKey();
 		$contact_address = ilMail::getIliasMailerAddress();
+		
+		foreach (ilSystemSupportContacts::getValidSupportContactIds() as $id)
+		{
+			include_once './Modules/SystemFolder/classes/class.ilSystemSupportContacts.php';
+			include_once './Services/User/classes/class.ilObjUser.php';
+			if (($e = ilObjUser::_lookupEmail($id)) != "")
+			{
+				$contact_address[0] = $e;
+				break;
+			}
+		}
 
 		$mm = new ilMimeMail();
 		$mm->Subject($this->lng->txt('pwassist_mail_subject'));

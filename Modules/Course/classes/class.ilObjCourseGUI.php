@@ -227,6 +227,7 @@ class ilObjCourseGUI extends ilContainerGUI
 		global $ilErr,$ilAccess, $ilUser, $ilSetting;
 
 		$this->checkPermission('visible');
+		
 		// Fill meta header tags
 		include_once('Services/MetaData/classes/class.ilMDUtils.php');
 		ilMDUtils::_fillHTMLMetaTags($this->object->getId(),$this->object->getId(),'crs');
@@ -265,6 +266,27 @@ class ilObjCourseGUI extends ilContainerGUI
 			$info->addProperty($this->lng->txt('crs_syllabus'), nl2br(
 								ilUtil::makeClickable ($this->object->getSyllabus(), true)));
 		}
+		
+		global $ilPluginAdmin;
+		$pl_names = $ilPluginAdmin->getActivePluginsForSlot(IL_COMP_SERVICE, "Cron", "crnhk");
+		$info->addSection('Kursinformation');
+		foreach($pl_names as $plugin)
+		{
+			$ui_plugin = ilPluginAdmin::getPluginObject(IL_COMP_SERVICE, "Cron", "crnhk", $plugin);
+			if($ui_plugin->getId() != 'fahi')
+			{
+				continue;
+			}
+			
+			$crsinfo = ilFAHCourseInfo::getInfoByImportId($this->object->getRefId());
+			foreach($crsinfo as $key => $value)
+			{
+				ilLoggerFactory::getLogger('crs')->info('Key: ' . $key.' -> ' .$value);
+				$info->addProperty($key, nl2br($value));
+			}
+			break;
+		}
+		
 		// files
 		if(count($files))
 		{

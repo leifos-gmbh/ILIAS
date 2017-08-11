@@ -281,7 +281,7 @@ class ilObjCourseGUI extends ilContainerGUI
 			foreach($crsinfo as $key => $value)
 			{
 				ilLoggerFactory::getLogger('crs')->info('Key: ' . $key.' -> ' .$value);
-				$info->addProperty($key, nl2br($value));
+				$info->addProperty($key, ilUtil::makeClickable(nl2br($value)));
 			}
 			break;
 		}

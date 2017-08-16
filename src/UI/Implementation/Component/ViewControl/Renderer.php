@@ -100,11 +100,18 @@ class Renderer extends AbstractComponentRenderer
 		} else {
 			$tpl->touchBlock($type."_disabled");
 		}
-		$this->maybeRenderId($component, $tpl, $type."_with_id", $uptype."_PREV_ID");
+		$this->maybeRenderId($component, $tpl, $type."_with_id", $uptype."_ID");
 	}
 
 	protected function maybeRenderId(Component\Component $component, $tpl, $block, $template_var) {
 		$id = $this->bindJavaScript($component);
+
+		// Check if the component is acting as triggerer
+		if ($component instanceof Component\Triggerer && count($component->getTriggeredSignals())) {
+			$id = ($id === null) ? $this->createId() : $id;
+			$this->triggerRegisteredSignals($component, $id);
+		}
+
 		if ($id !== null) {
 			$tpl->setCurrentBlock($block);
 			$tpl->setVariable($template_var, $id);

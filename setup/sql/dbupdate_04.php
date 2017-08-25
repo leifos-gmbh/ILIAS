@@ -18802,10 +18802,6 @@ if(!$ilDB->tableColumnExists('chatroom_bans', 'actor_id'))
 ?>
 <#5094>
 <?php
-	$ilCtrlStructureReader->getStructure();
-?>
-<#5095>
-<?php
 if(!$ilDB->tableColumnExists('usr_data', 'second_email'))
 {
 	$ilDB->addTableColumn('usr_data', 'second_email', 
@@ -18815,7 +18811,7 @@ if(!$ilDB->tableColumnExists('usr_data', 'second_email'))
 		));
 }
 ?>
-<#5096>
+<#5095>
 <?php
 if(!$ilDB->tableColumnExists('mail_options', 'mail_address_option'))
 {
@@ -18826,6 +18822,70 @@ if(!$ilDB->tableColumnExists('mail_options', 'mail_address_option'))
 		      'default' => 3
 		));
 }
+?>
+<#5096>
+<?php
+$fields = array(
+	'id' => array(
+		'type' => 'integer',
+		'length' => '8',
+		
+	),
+	'title' => array(
+		'type' => 'text',
+		'length' => '512',
+		
+	),
+	'description' => array(
+		'type' => 'text',
+		'length' => '4000',
+		
+	),
+	
+);
+if (! $ilDB->tableExists('il_orgu_positions')) {
+	$ilDB->createTable('il_orgu_positions', $fields);
+	$ilDB->addPrimaryKey('il_orgu_positions', array( 'id' ));
+	
+	if (! $ilDB->sequenceExists('il_orgu_positions')) {
+		$ilDB->createSequence('il_orgu_positions');
+	}
+	
+}
+
+$fields = array(
+	'id' => array(
+		'type' => 'integer',
+		'length' => '8',
+		
+	),
+	'over' => array(
+		'type' => 'integer',
+		'length' => '1',
+		
+	),
+	'depth' => array(
+		'type' => 'integer',
+		'length' => '1',
+		
+	),
+	'position' => array(
+		'type' => 'integer',
+		'length' => '1',
+		
+	),
+	
+);
+if (! $ilDB->tableExists('il_orgu_authority')) {
+	$ilDB->createTable('il_orgu_authority', $fields);
+	$ilDB->addPrimaryKey('il_orgu_authority', array( 'id' ));
+	
+	if (! $ilDB->sequenceExists('il_orgu_authority')) {
+		$ilDB->createSequence('il_orgu_authority');
+	}
+	
+}
+
 ?>
 <#5097>
 <?php
@@ -19623,7 +19683,24 @@ $ilDB->insert('pdfgen_renderer_avail',
 ?>
 <#5139>
 <?php
-	$ilCtrlStructureReader->getStructure();
+if(!$ilDB->tableExists('orgu_obj_pos_settings'))
+{
+	$ilDB->createTable('orgu_obj_pos_settings', array(
+		'obj_id' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => false
+		),
+		'active' => array(
+			'type' => 'integer',
+			'length' => 1,
+			'notnull' => false,
+			'default' => 0
+		)
+		)
+	);
+	$ilDB->addPrimaryKey('orgu_obj_pos_settings', array('obj_id'));
+}
 ?>
 <#5140>
 <?php
@@ -19671,5 +19748,418 @@ if ($iass_type_id) {
 	if ($new_ops_id) {
 		ilDBUpdateNewObjectType::addRBACOperation($iass_type_id, $new_ops_id);
 	}
+}
+?>
+<#5144>
+<?php
+
+if (!$ilDB->tableExists('cont_skills'))
+{
+	$ilDB->createTable('cont_skills', array(
+		'id' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true,
+			'default' => 0
+		),
+		'skill_id' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true,
+			'default' => 0
+		),
+		'tref_id' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true,
+			'default' => 0
+		)
+	));
+
+	$ilDB->addPrimaryKey('cont_skills',array('id','skill_id','tref_id'));
+}
+?>
+<#5145>
+<?php
+if (!$ilDB->tableExists('cont_member_skills'))
+{
+	$ilDB->createTable('cont_member_skills', array(
+		'obj_id' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true,
+			'default' => 0
+		),
+		'user_id' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true,
+			'default' => 0
+		),
+		'tref_id' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true,
+			'default' => 0
+		),
+		'skill_id' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true,
+			'default' => 0
+		),
+		'level_id' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true,
+			'default' => 0
+		),
+		'published' => array(
+			'type' => 'integer',
+			'length' => 1,
+			'notnull' => true,
+			'default' => 0
+		)
+	));
+
+	$ilDB->addPrimaryKey('cont_member_skills',array('obj_id','user_id','skill_id', 'tref_id'));
+}
+?>
+<#5146>
+<?php
+	include_once('./Services/Migration/DBUpdate_3560/classes/class.ilDBUpdateNewObjectType.php');
+	$new_ops_id = ilDBUpdateNewObjectType::addCustomRBACOperation('grade', 'Grade', 'object', 2410);
+	$type_id = ilDBUpdateNewObjectType::getObjectTypeId('crs');
+	if($type_id && $new_ops_id)
+	{
+		ilDBUpdateNewObjectType::addRBACOperation($type_id, $new_ops_id);
+	}
+	$type_id2 = ilDBUpdateNewObjectType::getObjectTypeId('grp');
+	if($type_id2 && $new_ops_id)
+	{
+		ilDBUpdateNewObjectType::addRBACOperation($type_id2, $new_ops_id);
+	}
+?>
+<#5147>
+<?php
+include_once('./Services/Migration/DBUpdate_3560/classes/class.ilDBUpdateNewObjectType.php');
+
+	$src_ops_id = ilDBUpdateNewObjectType::getCustomRBACOperationId('manage_members');
+	$tgt_ops_id = ilDBUpdateNewObjectType::getCustomRBACOperationId('grade');
+	ilDBUpdateNewObjectType::cloneOperation('crs', $src_ops_id, $tgt_ops_id);
+	ilDBUpdateNewObjectType::cloneOperation('grp', $src_ops_id, $tgt_ops_id);
+?>
+
+<#5148>
+<?php
+include_once('./Services/Migration/DBUpdate_3560/classes/class.ilDBUpdateNewObjectType.php');
+
+	$src_ops_id = ilDBUpdateNewObjectType::getCustomRBACOperationId('manage_members');
+	$tgt_ops_id = ilDBUpdateNewObjectType::getCustomRBACOperationId('grade');
+	ilDBUpdateNewObjectType::cloneOperation('crs', $src_ops_id, $tgt_ops_id);
+	ilDBUpdateNewObjectType::cloneOperation('grp', $src_ops_id, $tgt_ops_id);
+?>
+
+<#5149>
+<?php
+if( !$ilDB->tableColumnExists('tst_rnd_quest_set_qpls', 'origin_tax_filter'))
+{
+	$ilDB->addTableColumn('tst_rnd_quest_set_qpls', 'origin_tax_filter',
+		array('type' => 'text', 'length' => 4000, 'notnull'	=> false, 'default'	=> null)
+	);
+}
+?>
+
+<#5150>
+<?php
+if( !$ilDB->tableColumnExists('tst_rnd_quest_set_qpls', 'mapped_tax_filter'))
+{
+	$ilDB->addTableColumn('tst_rnd_quest_set_qpls', 'mapped_tax_filter',
+		array('type' => 'text', 'length' => 4000, 'notnull'	=> false, 'default'	=> null)
+	);
+}
+?>
+
+<#5151>
+<?php
+$query = "SELECT * FROM tst_rnd_quest_set_qpls WHERE origin_tax_fi IS NOT NULL OR mapped_tax_fi IS NOT NULL";
+$result = $ilDB->query($query);
+while ($row = $ilDB->fetchObject($result))
+{
+	if (!empty($row->origin_tax_fi))
+	{
+		$origin_tax_filter = serialize(array((int) $row->origin_tax_fi => array((int) $row->origin_node_fi)));
+	}
+	else
+	{
+		$origin_tax_filter = null;
+	}
+
+	if (!empty($row->mapped_tax_fi))
+	{
+		$mapped_tax_filter = serialize(array((int) $row->mapped_tax_fi => array((int) $row->mapped_node_fi)));
+	}
+	else
+	{
+		$mapped_tax_filter = null;
+	}
+
+	$update = "UPDATE tst_rnd_quest_set_qpls SET "
+		. " origin_tax_fi = NULL, origin_node_fi = NULL, mapped_tax_fi = NULL, mapped_node_fi = NULL, "
+		. " origin_tax_filter = " . $ilDB->quote($origin_tax_filter, 'text'). ", "
+		. " mapped_tax_filter = " . $ilDB->quote($mapped_tax_filter, 'text')
+		. " WHERE def_id = " . $ilDB->quote($row->def_id);
+
+	$ilDB->manipulate($update);
+}
+?>
+<#5152>
+<?php
+if( !$ilDB->tableColumnExists('tst_rnd_quest_set_qpls', 'type_filter'))
+{
+	$ilDB->addTableColumn('tst_rnd_quest_set_qpls', 'type_filter',
+		array('type' => 'text', 'length' => 250, 'notnull'	=> false, 'default'	=> null)
+	);
+}
+?>
+<#5153>
+<?php
+	include_once('./Services/Migration/DBUpdate_3560/classes/class.ilDBUpdateNewObjectType.php');
+	$new_ops_id = ilDBUpdateNewObjectType::addCustomRBACOperation('edit_page_meta', 'Edit Page Metadata', 'object', 3050);
+	$type_id = ilDBUpdateNewObjectType::getObjectTypeId('wiki');
+	if($type_id && $new_ops_id)
+	{
+		ilDBUpdateNewObjectType::addRBACOperation($type_id, $new_ops_id);
+	}
+?>
+<#5154>
+<?php
+	include_once('./Services/Migration/DBUpdate_3560/classes/class.ilDBUpdateNewObjectType.php');
+
+	$src_ops_id = ilDBUpdateNewObjectType::getCustomRBACOperationId('write');
+	$tgt_ops_id = ilDBUpdateNewObjectType::getCustomRBACOperationId('edit_page_meta');
+	ilDBUpdateNewObjectType::cloneOperation('wiki', $src_ops_id, $tgt_ops_id);
+?>
+<#5155>
+<?php
+	$ilCtrlStructureReader->getStructure();
+?>
+<#5156>
+<?php
+if(!$ilDB->tableExists('saml_attribute_mapping'))
+{
+	$ilDB->createTable(
+		'saml_attribute_mapping',
+		array(
+			'idp_id'        => array(
+				'type'    => 'integer',
+				'length'  => 4,
+				'notnull' => true
+			),
+			'attribute'     => array(
+				'type'    => 'text',
+				'length'  => '75',
+				'notnull' => true
+			),
+			'idp_attribute' => array(
+				'type'    => 'text',
+				'length'  => '1000',
+				'notnull' => false,
+				'default' => null
+			),
+		)
+	);
+}
+?>
+<#5157>
+<?php
+$ilDB->addPrimaryKey('saml_attribute_mapping', array('idp_id', 'attribute'));
+?>
+<#5158>
+<?php
+if(!$ilDB->tableColumnExists('saml_attribute_mapping', 'idp_attribute'))
+{
+	$ilDB->modifyTableColumn('saml_attribute_mapping', 'idp_attribute', array(
+		'type'    => 'text',
+		'length'  => '1000',
+		'notnull' => false,
+		'default' => null
+	));
+}
+?>
+<#5159>
+<?php
+if(!$ilDB->tableColumnExists('saml_attribute_mapping', 'update_automatically'))
+{
+	$ilDB->addTableColumn('saml_attribute_mapping', 'update_automatically', array(
+		'type'    => 'integer',
+		'length'  => 1,
+		'notnull' => true,
+		'default' => 0
+	));
+}
+?>
+<#5160>
+<?php
+$ilCtrlStructureReader->getStructure();
+?>
+<#5161>
+<?php
+if(!$ilDB->tableExists('saml_idp_settings'))
+{
+	$ilDB->createTable(
+		'saml_idp_settings',
+		array(
+			'idp_id'        => array(
+				'type'    => 'integer',
+				'length'  => 4,
+				'notnull' => true
+			),
+			'is_active'     => array(
+				'type'    => 'integer',
+				'length'  => 1,
+				'notnull' => true
+			)
+		)
+	);
+}
+?>
+<#5162>
+<?php
+$ilDB->addPrimaryKey('saml_idp_settings', array('idp_id'));
+?>
+<#5163>
+<?php
+if(!$ilDB->tableColumnExists('saml_idp_settings', 'allow_local_auth'))
+{
+	$ilDB->addTableColumn('saml_idp_settings', 'allow_local_auth',
+		array(
+			'type' => 'integer',
+			'length' => 1,
+			'notnull' => true,
+			'default' => 0
+		)
+	);
+}
+if(!$ilDB->tableColumnExists('saml_idp_settings', 'default_role_id'))
+{
+	$ilDB->addTableColumn('saml_idp_settings', 'default_role_id',
+		array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true,
+			'default' => 0
+		)
+	);
+}
+if(!$ilDB->tableColumnExists('saml_idp_settings', 'uid_claim'))
+{
+	$ilDB->addTableColumn('saml_idp_settings', 'uid_claim',
+		array(
+			'type' => 'text',
+			'length' => 1000,
+			'notnull' => false,
+			'default' => null
+		)
+	);
+}
+if(!$ilDB->tableColumnExists('saml_idp_settings', 'login_claim'))
+{
+	$ilDB->addTableColumn('saml_idp_settings', 'login_claim',
+		array(
+			'type' => 'text',
+			'length' => 1000,
+			'notnull' => false,
+			'default' => null
+		)
+	);
+}
+if(!$ilDB->tableColumnExists('saml_idp_settings', 'sync_status'))
+{
+	$ilDB->addTableColumn('saml_idp_settings', 'sync_status',
+		array(
+			'type' => 'integer',
+			'length' => 1,
+			'notnull' => true,
+			'default' => 0
+		)
+	);
+}
+if(!$ilDB->tableColumnExists('saml_idp_settings', 'account_migr_status'))
+{
+	$ilDB->addTableColumn('saml_idp_settings', 'account_migr_status',
+		array(
+			'type' => 'integer',
+			'length' => 1,
+			'notnull' => true,
+			'default' => 0
+		)
+	);
+}
+?>
+<#5164>
+<?php
+if(!$ilDB->tableExists('auth_ext_attr_mapping') && $ilDB->tableExists('saml_attribute_mapping'))
+{
+	$ilDB->renameTable('saml_attribute_mapping', 'auth_ext_attr_mapping');
+}
+?>
+<#5165>
+<?php
+if(!$ilDB->tableColumnExists('auth_ext_attr_mapping', 'auth_src_id') && $ilDB->tableColumnExists('auth_ext_attr_mapping', 'idp_id'))
+{
+	$ilDB->renameTableColumn('auth_ext_attr_mapping', 'idp_id', 'auth_src_id');
+}
+?>
+<#5166>
+<?php
+if(!$ilDB->tableColumnExists('auth_ext_attr_mapping', 'auth_mode'))
+{
+	$ilDB->addTableColumn('auth_ext_attr_mapping', 'auth_mode', array(
+		'type'    => 'text',
+		'notnull' => false,
+		'length'  => 50
+	));
+}
+?>
+<#5167>
+<?php
+// This migrates existing records
+$ilDB->manipulate('UPDATE auth_ext_attr_mapping SET auth_mode = ' . $ilDB->quote('saml', 'text'));
+?>
+<#5168>
+<?php
+$ilDB->dropPrimaryKey('auth_ext_attr_mapping');
+?>
+<#5169>
+<?php
+$ilDB->addPrimaryKey('auth_ext_attr_mapping', array('auth_mode', 'auth_src_id', 'attribute'));
+?>
+<#5170>
+<?php
+if(!$ilDB->tableColumnExists('auth_ext_attr_mapping', 'ext_attribute') && $ilDB->tableColumnExists('auth_ext_attr_mapping', 'idp_attribute'))
+{
+	$ilDB->renameTableColumn('auth_ext_attr_mapping', 'idp_attribute', 'ext_attribute');
+}
+?>
+<#5171>
+<?php
+if(!$ilDB->sequenceExists('saml_idp_settings'))
+{
+	$ilDB->createSequence('saml_idp_settings');
+}
+?>
+<#5172>
+<?php
+if(!$ilDB->tableColumnExists('saml_idp_settings', 'entity_id'))
+{
+	$ilDB->addTableColumn('saml_idp_settings', 'entity_id',
+		array(
+			'type' => 'text',
+			'length' => 1000,
+			'notnull' => false,
+			'default' => null
+		)
+	);
 }
 ?>

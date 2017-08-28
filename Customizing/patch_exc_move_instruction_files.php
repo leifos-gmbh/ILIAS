@@ -34,11 +34,11 @@ while($row = $db->fetchAssoc($result))
 
 			if (!is_dir(ILIAS_ABSOLUTE_PATH."/".ILIAS_WEB_DIR.$directory_relative_path))
 			{
-				shell_exec("mkdir -p ".ILIAS_ABSOLUTE_PATH."/".ILIAS_WEB_DIR.$directory_relative_path);
+				ilUtil::makeDirParents(ILIAS_ABSOLUTE_PATH."/".ILIAS_WEB_DIR.$directory_relative_path);
 			}
 			if (!file_exists("'".ILIAS_ABSOLUTE_PATH."/".ILIAS_WEB_DIR.$file_relative_path."'"))
 			{
-				shell_exec("mv '".$file_full_path."' '".ILIAS_ABSOLUTE_PATH."/".ILIAS_WEB_DIR.$file_relative_path."'");
+				rename($file_full_path ,ILIAS_ABSOLUTE_PATH."/".ILIAS_WEB_DIR.$file_relative_path);
 			}
 		}
 	}

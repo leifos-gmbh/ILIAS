@@ -116,13 +116,9 @@ try {
 	}
 
 	$executionChain();
-
-	$cron->logout();
 }
 catch(Exception $e)
 {
-	$cron->logout();
-
 	echo $e->getMessage()."\n";
 	exit(1);
 }

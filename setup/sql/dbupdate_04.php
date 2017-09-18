@@ -4175,6 +4175,12 @@ if(!$ilDB->tableColumnExists('reg_registration_codes','ext_enabled'))
 <#4383>
 <?php
 
+if($ilDB->tableColumnExists('reg_registration_codes','generated'))
+{
+	$ilDB->renameTableColumn('reg_registration_codes', "generated", 'generated_on');
+
+}
+
 $query = 'SELECT * FROM usr_account_codes ';
 $res = $ilDB->query($query);
 while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
@@ -13777,6 +13783,7 @@ if (!$ilDB->tableExists('obj_stat_tmp'))
 	));
 	$ilDB->addPrimaryKey('obj_stat_tmp', array('log_id'));
 	$ilDB->addIndex('obj_stat_tmp',array('obj_id', 'obj_type', 'yyyy', 'mm', 'dd', 'hh'),'i1');
+	$ilDB->createSequence('obj_stat_tmp');
 }
 ?>
 <#4845>

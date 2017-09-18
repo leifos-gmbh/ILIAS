@@ -925,7 +925,7 @@ assessment#:#qpl_settings_general_form_prop_show_tax_desc#:#Existing taxonomies 
 assessment#:#qpl_settings_general_form_property_show_taxonomies#:#Show Taxonomies
 assessment#:#qpl_paste_no_objects#:#There are no questions in the clipboard. Please copy or move a question into the clipboard.
 assessment#:#qpl_paste_success#:#The question(s) have been pasted into the question pool
-assessment#:#qpl_paste_error#:#At least one question could not pe pasted into the question pool. Possible reason: You tried to move the question into the same question pool.
+assessment#:#qpl_paste_error#:#At least one question could not be pasted into the question pool. Possible reason: You tried to move the question into the same question pool.
 assessment#:#qpl_question_is_in_use#:#The question you are about to edit exists in %s test(s). If you change this question, you will NOT change the question(s) in the test(s), because the system creates a copy of a question when it is inserted in a test!
 assessment#:#qpl_questions_deleted#:#Question(s) removed.
 assessment#:#qpl_select_file_for_import#:#You must select a file for import!###deprecated 
@@ -1623,6 +1623,8 @@ assessment#:#sign_submission#:#Digitally Sign Test Submissions
 assessment#:#sign_submission_info#:#If this is activated and a signature plugin is installed and active, participants will be requested to digitally sign their submissions.
 assessment#:#preserve_manscoring#:#Preserve manual scorings
 assessment#:#preserve_manscoring_info#:#Changes in the scoring of a question may make it necessary to void manual scorings. This option allows to void ALL manual scorings in the test and should be used only in rare occasions.
+assessment#:#tst_qst_added_to_pool_s#:#Successfully added the question to the selected pool.
+assessment#:#tst_qst_added_to_pool_p#:#Successfully added the questions to the selected pool.
 auth#:#auth_account_migration_keep#:#Migrate Existing User Account
 auth#:#auth_account_migration_name#:#Migration
 auth#:#auth_account_migration_new#:#Create New User Account
@@ -9171,7 +9173,7 @@ survey#:#view_phrase#:#View Phrase###deprecated
 survey#:#warning_question_in_use#:#Warning! The question you want to edit is in use by the surveys listed below. If you decide to continue and save/apply the question, all answers of the surveys listed below will be deleted. If you want to change the question and use it in another survey, please choose duplicate in the question browser to create a new instance of this question.###deprecated 
 survey#:#warning_question_not_complete#:#The question is not complete!
 survey#:#wrong_categories_selected_for_insert#:#ILIAS could not perform the desired action. Please check exactly one answer as target position!###deprecated 
-survey#:#wrong_survey_code_used#:#You cannot enter the survey, because you tried to start it with an unauthorized survey code.
+survey#:#wrong_survey_code_used#:#No access to survey. Your survey code is invalid or has already been used.
 tagging#:#tagging_all_users#:#All Users
 tagging#:#tagging_edit_settings#:#Edit Settings
 tagging#:#tagging_enable_all_users_info#:#Adds a section ‘All Users’ to the info screens that lists all tags of all users attached to a resource.

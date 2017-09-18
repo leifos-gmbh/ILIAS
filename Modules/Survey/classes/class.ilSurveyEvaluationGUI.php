@@ -1174,6 +1174,10 @@ class ilSurveyEvaluationGUI
 			{
 				include_once "Services/Accordion/classes/class.ilAccordionGUI.php";
 				$acc = new ilAccordionGUI();
+				if ($_GET["pdf"] == 1)
+				{
+					$acc->setBehaviour(ilAccordionGUI::FORCE_ALL_OPEN);
+				}
 				$acc->setId("svyevaltxt".$question->getId());
 
 				$a_tpl->setVariable("TEXT_HEADING", $this->lng->txt("freetext_answers"));

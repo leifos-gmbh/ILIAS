@@ -62,6 +62,34 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 	}
 
 	/**
+	 * Get the single/multiline editing of answers
+	 * - The settings of an already saved question is preferred
+	 * - A new question will use the setting of the last edited question by the user
+	 * @param bool	$checkonly	get the setting for checking a POST
+	 * @return bool
+	 */
+	protected function getEditAnswersSingleLine($checkonly = false)
+	{
+		if ($checkonly)
+		{
+			// form posting is checked
+			return ($_POST['types'] == 0) ? true : false;
+		}
+
+		$lastChange = $this->object->getLastChange();
+		if (empty($lastChange) && !isset($_POST['types']))
+		{
+			// a new question is edited
+			return $this->object->getMultilineAnswerSetting() ? false : true;
+		}
+		else
+		{
+			// a saved question is edited
+			return $this->object->isSingleline;
+		}
+	}
+
+	/**
 	 * Creates an output of the edit form for the question
 	 *
 	 */
@@ -74,8 +102,7 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$form = new ilPropertyFormGUI();
 		$form->setFormAction($this->ctrl->getFormAction($this));
 		$form->setTitle($this->outQuestionType());
-		$isSingleline = ($this->object->lastChange == 0 && !array_key_exists('types', $_POST)) ? (($this->object->getMultilineAnswerSetting()) ? false : true) : $this->object->isSingleline;
-		if ($checkonly) $isSingleline = ($_POST['types'] == 0) ? true : false;
+		$isSingleline = $this->getEditAnswersSingleLine($checkonly);
 		if ($isSingleline)
 		{
 			$form->setMultipart(TRUE);
@@ -289,7 +316,7 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$template->setCurrentBlock("answer_row");
 			$template->setVariable("ANSWER_TEXT", $this->object->prepareTextareaOutput($answer->getAnswertext(), TRUE));
 			
-			if( $this->isPdfOutputMode() || $this->isUserInputOutputMode() )
+			if( $this->isPdfOutputMode() || $this->isContentEditingOutputMode() )
 			{
 				if (strcmp($user_solution, $answer_id) == 0)
 				{
@@ -417,8 +444,10 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		}
 		return $questionoutput;
 	}
-
-	function getTestOutput($active_id, $pass = NULL, $is_postponed = FALSE, $use_post_solutions = FALSE, $show_feedback = FALSE)
+	
+	// hey: prevPassSolutions - pass will be always available from now on
+	function getTestOutput($active_id, $pass, $is_postponed = FALSE, $use_post_solutions = FALSE, $show_feedback = FALSE)
+	// hey.
 	{
 		$keys = $this->getChoiceKeys();
 
@@ -426,13 +455,15 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 		$user_solution = "";
 		if ($active_id)
 		{
-			$solutions = NULL;
-			include_once "./Modules/Test/classes/class.ilObjTest.php";
-			if (!ilObjTest::_getUsePreviousAnswers($active_id, true))
-			{
-				if (is_null($pass)) $pass = ilObjTest::_getPass($active_id);
-			}
-			$solutions = $this->object->getUserSolutionPreferingIntermediate($active_id, $pass);
+			// hey: prevPassSolutions - obsolete due to central check
+			#$solutions = NULL;
+			#include_once "./Modules/Test/classes/class.ilObjTest.php";
+			#if (!ilObjTest::_getUsePreviousAnswers($active_id, true))
+			#{
+			#	if (is_null($pass)) $pass = ilObjTest::_getPass($active_id);
+			#}
+			// hey.
+			$solutions = $this->getTestOutputSolutions($active_id, $pass);
 			foreach ($solutions as $idx => $solution_value)
 			{
 				$user_solution = $solution_value["value1"];
@@ -649,7 +680,7 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 	public function populateQuestionSpecificFormPart(\ilPropertyFormGUI $form)
 	{
-		$isSingleline = ($this->object->lastChange == 0 && !array_key_exists( 'types',$_POST)) ? (($this->object->getMultilineAnswerSetting()) ? false : true) : $this->object->isSingleline;
+		$isSingleline = $this->getEditAnswersSingleLine();
 		// shuffle
 		$shuffle = new ilCheckboxInputGUI($this->lng->txt( "shuffle_answers" ), "shuffle");
 		$shuffle->setValue( 1 );
@@ -752,7 +783,7 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
 	public function populateAnswerSpecificFormPart(\ilPropertyFormGUI $form)
 	{
-		$isSingleline = ($this->object->lastChange == 0 && !array_key_exists('types', $_POST)) ? (($this->object->getMultilineAnswerSetting()) ? false : true) : $this->object->isSingleline;
+		$isSingleline = $this->getEditAnswersSingleLine();
 
 		// Choices
 		include_once "./Modules/TestQuestionPool/classes/class.ilSingleChoiceWizardInputGUI.php";

@@ -4704,13 +4704,20 @@ abstract class assQuestion
 	 * @param int $active_id
 	 * @param int $pass
 	 * @param bool|true $authorized
+	 * @param array $ignoredSolutionIds an array of solution ids which should be ignored
 	 * @global ilDB $ilDB
 	 *
 	 * @return int
 	 */
-	public function removeCurrentSolution($active_id, $pass, $authorized = true)
+	public function removeCurrentSolution($active_id, $pass, $authorized = true, $ignoredSolutionIds = array())
 	{
 		global $ilDB;
+
+		$not_in = '';
+		if(count($ignoredSolutionIds) > 0)
+		{
+			$not_in = ' AND ' . $ilDB->in('solution_id', $ignoredSolutionIds, true, 'integer') . ' ';
+		}
 
 		if($this->getStep() !== NULL)
 		{
@@ -4721,6 +4728,7 @@ abstract class assQuestion
 				AND pass = %s
 				AND step = %s
 				AND authorized = %s
+				$not_in
 			";
 
 			return $ilDB->manipulateF($query, array('integer', 'integer', 'integer', 'integer', 'integer'),
@@ -4735,6 +4743,7 @@ abstract class assQuestion
 				AND question_fi = %s
 				AND pass = %s
 				AND authorized = %s
+				$not_in
 			";
 
 			return $ilDB->manipulateF($query, array('integer', 'integer', 'integer', 'integer'),
@@ -4896,6 +4905,19 @@ abstract class assQuestion
 	
 	abstract public function duplicate($for_test = true, $title = "", $author = "", $owner = "", $testObjId = null);
 
+	// hey: prevPassSolutions - check for authorized solution
+	public function authorizedSolutionExists($active_id, $pass)
+	{
+		$solutionAvailability = $this->lookupForExistingSolutions($active_id, $pass);
+		return (bool)$solutionAvailability['authorized'];
+	}
+	public function authorizedOrIntermediateSolutionExists($active_id, $pass)
+	{
+		$solutionAvailability = $this->lookupForExistingSolutions($active_id, $pass);
+		return (bool)$solutionAvailability['authorized'] || (bool)$solutionAvailability['intermediate'];
+	}
+	// hey.
+	
 	/**
 	 * @param $active_id
 	 * @param $pass
@@ -4917,6 +4939,46 @@ abstract class assQuestion
 
 		return $maxStep;
 	}
+
+	// fau: testNav - new function lookupForExistingSolutions
+	/**
+	 * Lookup if an authorized or intermediate solution exists
+	 * @param 	int 		$activeId
+	 * @param 	int 		$pass
+	 * @return 	array		['authorized' => bool, 'intermediate' => bool]
+	 */
+	public function lookupForExistingSolutions($activeId, $pass)
+	{
+		global $ilDB;
+		
+		$return = array(
+			'authorized' => false,
+			'intermediate' => false
+		);
+		
+		$query = "
+			SELECT authorized, COUNT(*) cnt
+			FROM tst_solutions
+			WHERE active_fi = %s
+			AND question_fi = %s
+			AND pass = %s
+			GROUP BY authorized
+		";
+		$result = $ilDB->queryF($query, array('integer', 'integer', 'integer'), array($activeId, $this->getId(), $pass));
+		
+		while ($row = $ilDB->fetchAssoc($result))
+		{
+			if ($row['authorized']) {
+				$return['authorized'] = $row['cnt'] > 0;
+			}
+			else
+			{
+				$return['intermediate'] = $row['cnt'] > 0;
+			}
+		}
+		return $return;
+	}
+	// fau.
 		
 	public function removeExistingSolutions($activeId, $pass)
 	{

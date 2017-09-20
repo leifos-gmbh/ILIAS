@@ -1290,10 +1290,10 @@ class ilPCMediaObjectGUI extends ilPageContentGUI
 		}
 	}
 	// uzk-patch: begin
-	public function increaseSize10(){ $this->resizeFactor(+10); }
+	public function increaseSize10(){ $this->resizeFactor(+20); }
 	public function increaseSize5(){ $this->resizeFactor(+5); }
 	public function increaseSize1(){ $this->resizeFactor(+1); }
-	public function decreaseSize10(){ $this->resizeFactor(-10); }
+	public function decreaseSize10(){ $this->resizeFactor(-20); }
 	public function decreaseSize5(){ $this->resizeFactor(-5); }
 	public function decreaseSize1(){ $this->resizeFactor(-1); }
 	

@@ -14,8 +14,8 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
-uzk#:#cont_ed_increase_size_10#:#Um 10% vergrößern
-uzk#:#cont_ed_decrease_size_10#:#Um 10% verkleinern
+uzk#:#cont_ed_increase_size_20#:#Um 20% vergrößern
+uzk#:#cont_ed_decrease_size_20#:#Um 20% verkleinern
 uzk#:#cont_ed_increase_size_5#:#Um 5% vergrößern
 uzk#:#cont_ed_decrease_size_5#:#Um 5% verkleinern
 uzk#:#cont_ed_increase_size_1#:#Um 1% vergrößern

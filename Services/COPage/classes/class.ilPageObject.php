@@ -1319,7 +1319,7 @@ abstract class ilPageObject
 			"de_activate", "ed_paste", "ed_edit_multiple", "ed_cut", "ed_copy", "ed_insert_templ",
 			"ed_click_to_add_pg", "download"
 		//uzk-patch: begin
-		    , 'ed_increase_size_10', 'ed_decrease_size_10'
+		    , 'ed_increase_size_20', 'ed_decrease_size_20'
 		    , 'ed_increase_size_5', 'ed_decrease_size_5'
 	        , 'ed_increase_size_1', 'ed_decrease_size_1'
 		//uzk-patch: end    

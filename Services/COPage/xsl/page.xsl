@@ -2523,8 +2523,8 @@
 	</xsl:if>
 <!--uzik-patch: begin-->
 	<xsl:call-template name="EditMenuItem">
-		<xsl:with-param name="command">increaseSize10</xsl:with-param>
-		<xsl:with-param name="langvar">ed_increase_size_10</xsl:with-param>
+		<xsl:with-param name="command">increaseSize20</xsl:with-param>
+		<xsl:with-param name="langvar">ed_increase_size_20</xsl:with-param>
 	</xsl:call-template>
 	<xsl:call-template name="EditMenuItem">
 		<xsl:with-param name="command">increaseSize5</xsl:with-param>
@@ -2537,8 +2537,8 @@
 	</xsl:call-template>
 	
 	<xsl:call-template name="EditMenuItem">
-		<xsl:with-param name="command">decreaseSize10</xsl:with-param>
-		<xsl:with-param name="langvar">ed_decrease_size_10</xsl:with-param>
+		<xsl:with-param name="command">decreaseSize20</xsl:with-param>
+		<xsl:with-param name="langvar">ed_decrease_size_20</xsl:with-param>
 	</xsl:call-template>
 
 	<xsl:call-template name="EditMenuItem">

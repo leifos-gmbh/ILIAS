@@ -938,10 +938,10 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
 				$sub->addResourceObject($target_id);
 			}
 		}
-		
-		ilUtil::sendSuccess($this->lng->txt("prtf_portfolio_created"), true);
+
+		ilUtil::sendSuccess($this->lng->txt("prtf_portfolio_created_from_template"), true);
 		$this->ctrl->setParameter($this, "prt_id", $target_id);
-		$this->ctrl->redirect($this, "view");
+		$this->ctrl->redirect($this, "preview");
 	}
 
 	public static function _goto($a_target)

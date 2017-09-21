@@ -15940,3 +15940,4 @@ rbac#:#book_copy#:#User can copy booking pool
 exc#:#exc_settings_feedback_mail_info#:#Tutors enter their evaluation into a mail form. The evaluation is sent to participants.
 exc#:#exc_settings_feedback_file_info#:#Tutors upload a file. The participant receives a notification about it and can access the file at the assignment overview.
 exc#:#exc_settings_feedback_text_info#:#Tutors type their evaluation in a text field. The participant receives a notification about it and the text is displayed at the assignment overview.
+prtf#:#prtf_portfolio_created_from_template#:#This is the preview of your new portfolio. To add pages and manage the content of the portfolio click on "Edit Portfolio" on top of this page.

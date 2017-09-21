@@ -492,12 +492,15 @@ class ilPortfolioAccessHandler implements ilWACCheckingClass
 			}
 			$sql .= " AND ".$ilDB->in("obj.owner", $usr_ids, "", "integer");			
 		}		
-		
+
 		if($a_filter["acl_date"])
 		{
 			$dt = $a_filter["acl_date"]->get(IL_CAL_DATE);
-			$dt = new ilDateTime($dt." 00:00:00", IL_CAL_DATETIME);
-			$sql .= " AND acl.tstamp > ".$ilDB->quote($dt->get(IL_CAL_UNIX), "integer");
+			if (strlen($dt) == 10 && substr($dt, 4, 1) == "-")
+			{
+				$dt = new ilDateTime($dt . " 00:00:00", IL_CAL_DATETIME);
+				$sql .= " AND acl.tstamp > " . $ilDB->quote($dt->get(IL_CAL_UNIX), "integer");
+			}
 		}
 		
 		if($a_filter["crsgrp"])

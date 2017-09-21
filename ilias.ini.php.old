@@ -1,0 +1,67 @@
+; <?php exit; ?>
+[server]
+http_path = "http://anderson.local/uni_koeln/5_2"
+absolute_path = "/htdocs/uni_koeln/5_2"
+presetting = ""
+timezone = "Europe/Berlin"
+
+[clients]
+path = "data"
+inifile = "client.ini.php"
+datadir = "/opt/data/uni_koeln_5_2"
+default = "unikoeln52"
+list = "0"
+
+[setup]
+pass = "2025a5da6db32f693ed75d72cf31073b"
+
+[tools]
+convert = "/opt/ImageMagick/bin/convert"
+zip = "/usr/bin/zip"
+unzip = "/usr/bin/unzip"
+java = ""
+ffmpeg = "/usr/local/bin/ffmpeg"
+ghostscript = ""
+latex = ""
+vscantype = "none"
+scancommand = ""
+cleancommand = ""
+enable_system_styles_management = ""
+lessc = "/usr/local/bin/lessc"
+
+[log]
+path = "/opt/data/uni_koeln_5_2"
+file = "ilias.log"
+enabled = "1"
+level = "WARNING"
+error_path = ""
+
+[debian]
+data_dir = "/var/opt/ilias"
+log = "/var/log/ilias/ilias.log"
+convert = "/usr/bin/convert"
+zip = "/usr/bin/zip"
+unzip = "/usr/bin/unzip"
+java = ""
+ffmpeg = "/usr/bin/ffmpeg"
+
+[redhat]
+data_dir = ""
+log = ""
+convert = ""
+zip = ""
+unzip = ""
+java = ""
+
+[suse]
+data_dir = ""
+log = ""
+convert = ""
+zip = ""
+unzip = ""
+java = ""
+
+[https]
+auto_https_detect_enabled = "0"
+auto_https_detect_header_name = ""
+auto_https_detect_header_value = ""

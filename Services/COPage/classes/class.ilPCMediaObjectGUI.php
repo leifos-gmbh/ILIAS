@@ -1305,17 +1305,25 @@ class ilPCMediaObjectGUI extends ilPageContentGUI
 	{
 		$mob = $this->content_obj->getMediaObject();
 		$med = $mob->getMediaItem("Standard");
-		
+
 		$org_width = $med->getWidth();
-		$org_height = $med->getHeight();
-		
+		$org_height= $med->getHeight();
+
+		if(strlen($org_width) === 0 && strlen($org_height) === 0)
+		{
+			$size = $med->getOriginalSize();
+
+			$org_width  = $size['width'];
+			$org_height = $size['height'];
+		}
+
 		$new_width  = ($org_width / 100) * (100 + ($factor));
 		$new_height = ($org_height / 100) * (100 + ($factor));
-		
+
 		$med->setWidth($new_width);
 		$med->setHeight($new_height);
 		$med->update();
-		
+
 		$_SESSION["il_pg_error"] = $this->pg_obj->update();
 		$this->ctrl->returnToParent($this, "jump".$this->hier_id);
 	}

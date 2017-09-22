@@ -1307,7 +1307,9 @@ abstract class ilPageObject
 	function getLanguageVariablesXML()
 	{
 		global $lng;
-
+		// uzk-patch: begin
+		$lng->loadLanguageModule('uzk');
+		// uzk-patch: end
 		$xml = "<LVs>";
 		$lang_vars = array(
 			"ed_paste_clip", "ed_edit", "ed_edit_prop", "ed_delete", "ed_moveafter",

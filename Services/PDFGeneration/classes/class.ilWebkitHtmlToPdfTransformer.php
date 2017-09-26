@@ -1213,7 +1213,7 @@ class ilWebkitHtmlToPdfTransformer extends ilAbstractHtmlToPdfTransformer
 	 */
 	public function getPathToTestHTML()
 	{
-		return 'Services/PDFGeneration/templates/default/test_complex.html';
+		return ilPdfGeneratorUtils::generatePathToComplexTestHTML();
 	}
 
 	/**

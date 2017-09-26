@@ -98,7 +98,7 @@ class ilTCPDFHtmlToPdfTransformer extends ilAbstractHtmlToPdfTransformer
 
 	public function getPathToTestHTML()
 	{
-		return 'Services/PDFGeneration/templates/default/test_complex.html';
+		return ilPdfGeneratorUtils::generatePathToComplexTestHTML();
 	}
 
 	public static function supportMultiSourcesFiles()

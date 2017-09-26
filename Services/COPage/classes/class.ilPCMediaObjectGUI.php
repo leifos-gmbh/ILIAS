@@ -814,6 +814,7 @@ class ilPCMediaObjectGUI extends ilPageContentGUI
 			$values["st_width_height"]["width"] = $std_item->getWidth();
 			$values["st_width_height"]["height"] = $std_item->getHeight();
 		}
+		
 		$values["st_derive_caption"] = $std_alias_item->definesCaption()
 			? "n"
 			: "y";
@@ -1323,7 +1324,9 @@ class ilPCMediaObjectGUI extends ilPageContentGUI
 		$med->setWidth($new_width);
 		$med->setHeight($new_height);
 		$med->update();
-
+		
+		$this->saveAliasProperties();
+		
 		$_SESSION["il_pg_error"] = $this->pg_obj->update();
 		$this->ctrl->returnToParent($this, "jump".$this->hier_id);
 	}

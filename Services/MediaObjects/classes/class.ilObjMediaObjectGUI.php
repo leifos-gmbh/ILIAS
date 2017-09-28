@@ -1202,14 +1202,15 @@ class ilObjMediaObjectGUI extends ilObjectGUI
 
 			// uzk-patch: begin
 			$prevpic = $this->form_gui->getInput("preview_pic");
-			if ($prevpic["size"] > 0)
+			if($prevpic instanceof ilImageFileInputGUI && $prevpic["size"] > 0)
 			{
 				$this->object->uploadVideoPreviewPic($prevpic);
 			}
 			else
 			{
-				$prevpici = $this->form_gui->getItemByPostVar("preview_pic");
-				if ($prevpici->getDeletionFlag())
+				$prevpic = $this->form_gui->getItemByPostVar("preview_pic");
+				$prevpic = true;
+				if($prevpic instanceof ilImageFileInputGUI && $prevpic->getDeletionFlag())
 				{
 					$this->object->removeAdditionalFile($this->object->getVideoPreviewPic(true));
 				}

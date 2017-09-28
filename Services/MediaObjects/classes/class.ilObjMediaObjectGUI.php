@@ -1209,7 +1209,6 @@ class ilObjMediaObjectGUI extends ilObjectGUI
 			else
 			{
 				$prevpic = $this->form_gui->getItemByPostVar("preview_pic");
-				$prevpic = true;
 				if($prevpic instanceof ilImageFileInputGUI && $prevpic->getDeletionFlag())
 				{
 					$this->object->removeAdditionalFile($this->object->getVideoPreviewPic(true));

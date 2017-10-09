@@ -130,7 +130,7 @@ class ilMailSearchCoursesTableGUI extends ilTable2GUI
 			$this->addMultiCommand('share',$this->lng->txt('wsp_share_with_members'));
 			
 			// uzk-patch: begin
-			$this->addMultiCommand('shareMail',$lng->txt('wsp_share_with_members_and_notify'));
+			$this->addMultiCommand('shareMail',$this->lng->txt('wsp_share_with_members_and_notify'));
 			// uzk-patch: end
 		}
 		$this->addMultiCommand('showMembers',$this->lng->txt('mail_list_members'));

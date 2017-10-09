@@ -50,7 +50,7 @@ class ilPortfolioPDFExport
 
 		preg_match('#\/prtf_(\d+)\/#', $filename, $matches);
 		$portfolio_id = $matches[1];
-		$ordering = ilPortfolioPage::getAllPages($portfolio_id);
+		$ordering = ilPortfolioPage::getAllPortfolioPages($portfolio_id);
 		if($ordering !== null)
 		{
 			$path = dirname($filename);

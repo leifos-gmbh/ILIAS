@@ -1116,7 +1116,7 @@ class ilStartUpGUI
 		foreach((array) $_COOKIE as $name => $value)
 		{
 			ilLoggerFactory::getLogger('root')->info('Cookie is: ' . $name);
-			if(substr($name, 0, 4) == 'ilCl')
+			if(substr($name, 0, 4) == 'NSC_')
 			{
 				ilUtil::redirect('https://lms.skyguide.ch/cgi/tmlogout');
 			}

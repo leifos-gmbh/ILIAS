@@ -1115,7 +1115,8 @@ class ilStartUpGUI
 		// begin-patch skyguide slo
 		foreach((array) $_COOKIE as $name => $value)
 		{
-			if(substr($name, 0, 4) == 'NSC_')
+			ilLoggerFactory::getLogger('root')->info('Cookie is: ' . $name);
+			if(substr($name, 0, 4) == 'ilCl')
 			{
 				ilUtil::redirect('https://lms.skyguide.ch/cgi/tmlogout');
 			}

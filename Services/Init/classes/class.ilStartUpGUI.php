@@ -1112,6 +1112,14 @@ class ilStartUpGUI
 		//instantiate logout template
 		self::initStartUpTemplate("tpl.logout.html");
 		
+		// begin-patch skyguide slo
+		foreach((array) $_COOKIE as $name => $value)
+		{
+			if(substr($name, 0, 4) == 'NSC_')
+			{
+				ilUtil::redirect('https://lms.skyguide.ch/cgi/tmlogout');
+			}
+		}
 		if ($ilSetting->get("pub_section"))
 		{
 			$tpl->setCurrentBlock("homelink");

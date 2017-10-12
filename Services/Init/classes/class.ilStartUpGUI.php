@@ -1110,6 +1110,7 @@ class ilStartUpGUI
 		ilUtil::setCookie("ilClientId","");
 		ilUtil::setCookie("PHPSESSID","");
 		ilUtil::setCookie("iltest","");
+		ilUtil::setCookie("authchallenge","");
 
 		//instantiate logout template
 		self::initStartUpTemplate("tpl.logout.html");

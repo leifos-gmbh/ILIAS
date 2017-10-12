@@ -1108,6 +1108,8 @@ class ilStartUpGUI
 		// reset cookie
 		$client_id = $_COOKIE["ilClientId"];
 		ilUtil::setCookie("ilClientId","");
+		ilUtil::setCookie("PHPSESSID","");
+		ilUtil::setCookie("iltest","");
 
 		//instantiate logout template
 		self::initStartUpTemplate("tpl.logout.html");
@@ -1116,7 +1118,7 @@ class ilStartUpGUI
 		foreach((array) $_COOKIE as $name => $value)
 		{
 			ilLoggerFactory::getLogger('root')->info('Cookie is: ' . $name);
-			if(substr($name, 0, 4) == 'NSC_')
+			if(strcmp('172.27.136.10', $_SERVER['REMOTE_ADDR']) === 0)
 			{
 				ilUtil::redirect('https://lms.skyguide.ch/cgi/tmlogout');
 			}

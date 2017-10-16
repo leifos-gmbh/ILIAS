@@ -11715,7 +11715,9 @@ dcl#:#dcl_export_started#:#Asynchroner Export gestartet
 dcl#:#dcl_export_finished#:#Export Abgeschlossen
 dcl#:#dcl_supported_filetypes#:#Erlaubte Dateiendungen
 dcl#:#dcl_supported_filetypes_desc#:#Sie können hier kommagetrennt Dateiendungen angeben. Zum Beispiel: pdf, docx
-dcl#:#dcl_no_export_data_available#:#Keine Daten oder Felder für den Export verfügbar
+dcl#:#dcl_no_export_data_available#:#Keine Daten oder Felder für den Export verfügbar.
+dcl#:#dcl_no_export_content_available#:#Keine Daten für den Export verfügbar.
+dcl#:#dcl_no_export_fields_available#:#Keine Felder für den Export aktiviert. Markieren Sie mindestens ein Feld als "Exportierbar" in den <a href="%s">Tabelleneinstellungen</a>.
 common#:#obj_dcl_duplicate#:#Datensammlung kopieren
 survey#:#freetext_answers#:#Freitext-Antworten
 forum#:#frm_at_least_one_moderator#:#Es muss mindestens ein Moderator zugewiesen sein.
@@ -15955,3 +15957,4 @@ exc#:#exc_settings_feedback_file_info#:#Tutoren laden ihre Datei hoch. Der jewei
 exc#:#exc_settings_feedback_text_info#:#Tutoren geben ihre Rückmeldungen in ein Textfeld ein. Der jeweilige Teilnehmer erhält eine Benachrichtigung und der Text wird ihm in der Übungseinheiten-Übersicht angezeigt.
 chatroom#:#chat_deletion_interval_run_at#:#Time###25 08 2017 new variable
 wiki#:#wiki_pg_list_no_search_fields#:#Es befinden sich keine durchsuchbaren Metadatenfelder in den Metadatensätzen des Wikis.
+content#:#cont_transl_master_language_not_allowed#:#Um eine Übersetzung zu importieren, müssen sie zumindest eine zusätzliche Sprache unter "Einstellungen" > "Mehrsprachigkeit" aktivieren.

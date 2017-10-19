@@ -601,7 +601,8 @@ class ilSurveyPageGUI
 				$max = 0;
 				foreach($titles as $existing_title)
 				{
-					if(preg_match("/".preg_quote($title)." \(([0-9]+)\)$/", $existing_title, $match))
+					#21278 preg_quote with delimiter
+					if(preg_match("/".preg_quote($title, "/")." \(([0-9]+)\)$/", $existing_title, $match))
 					{
 						$max = max($match[1], $max);						
 					}
@@ -1249,7 +1250,7 @@ class ilSurveyPageGUI
 
 			if($this->object->isPoolActive())
 			{
-				$ilToolbar->addSeparator();
+				//$ilToolbar->addSeparator();
 
 				$last_on_page = 0;
 				if($a_pages && 
@@ -1330,7 +1331,7 @@ class ilSurveyPageGUI
 		// jump to page
 		if(sizeof($pages_drop) > 1)
 		{
-			$ilToolbar->addSeparator();
+			//$ilToolbar->addSeparator();
 
 			$ilToolbar->setFormAction($ilCtrl->getFormAction($this));
 

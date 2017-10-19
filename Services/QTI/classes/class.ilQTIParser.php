@@ -22,6 +22,7 @@
 */
 
 include_once("./Services/Xml/classes/class.ilSaxParser.php");
+include_once 'Modules/TestQuestionPool/classes/questions/LogicalAnswerCompare/class.ilAssQuestionTypeList.php';
 
 define ("IL_MO_PARSE_QTI",  1);
 define ("IL_MO_VERIFY_QTI", 2);
@@ -709,6 +710,10 @@ class ilQTIParser extends ilSaxParser
 						}
 					}
 				}
+				if (!$this->matimage->getEmbedded() && strlen($this->matimage->getUri()))
+				{
+					$this->matimage->setContent(@file_get_contents(dirname($this->xml_file) . '/'. $this->matimage->getUri()));
+				}
 				break;
 			case "material":
 				include_once("./Services/QTI/classes/class.ilQTIMaterial.php");
@@ -1323,6 +1328,11 @@ class ilQTIParser extends ilSaxParser
 				//           the complete flag must be calculated?
 				$qt = $this->item->determineQuestionType();
 				$presentation = $this->item->getPresentation(); 
+				
+				if( !ilAssQuestionTypeList::isImportable($qt) )
+				{
+					return;
+				}
 				
 				include_once "./Modules/TestQuestionPool/classes/class.assQuestion.php";
 				assQuestion::_includeClass($qt);

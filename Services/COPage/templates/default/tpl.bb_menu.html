@@ -1,5 +1,5 @@
 <script language="JavaScript" type="text/javascript">
-ilCOPage = {
+/*ilCOPage = {
 	setCharacterClass: function (v) {
 		var b = il.COPageBB;
 		console.log(v);
@@ -21,7 +21,7 @@ ilCOPage = {
 				break;
 		}
 	}
-};
+};*/
 il.COPageBB = {
 	initCommands: function () {
 		t = il.COPageBB;
@@ -140,7 +140,9 @@ il.COPageBB = {
 		var t = il.COPageBB,
 				k = $(e).attr("accesskey"),
 				com = t.findCommandForKey(k);
-		t.applyCommand(com);
+		if (com != "iln") {
+			t.applyCommand(com);
+		}
 	},
 
 	applyCommand: function (com) {

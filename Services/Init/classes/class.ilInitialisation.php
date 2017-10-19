@@ -315,7 +315,7 @@ class ilInitialisation
 			}
 			else
 			{
-				self::abortAndDie("Invalid client");
+				self::abortAndDie("Fatal Error: ilInitialisation::initClientIniFile initializing client ini file abborted with: ". $ilClientIniFile->ERROR);
 			}
 		}
 		
@@ -1072,6 +1072,11 @@ class ilInitialisation
 	 */
 	public static function resumeUserSession()
 	{
+		include_once './Services/Authentication/classes/class.ilAuthUtils.php';
+		if(ilAuthUtils::handleForcedAuthentication())
+		{
+		}
+		
 		if(
 			!$GLOBALS['DIC']['ilAuthSession']->isAuthenticated() or
 			$GLOBALS['DIC']['ilAuthSession']->isExpired()
@@ -1318,6 +1323,11 @@ class ilInitialisation
 	 */
 	protected static function blockedAuthentication($a_current_script)
 	{
+		if(ilContext::getType() == ilContext::CONTEXT_WAC)
+		{
+			ilLoggerFactory::getLogger('init')->debug('Blocked authentication for WAC request.');
+			return true;
+		}
 		if(ilContext::getType() == ilContext::CONTEXT_APACHE_SSO)
 		{
 			ilLoggerFactory::getLogger('init')->debug('Blocked authentication for sso request.');

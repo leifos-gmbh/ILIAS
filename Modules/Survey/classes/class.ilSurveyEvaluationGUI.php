@@ -791,7 +791,13 @@ class ilSurveyEvaluationGUI
 				$button->setOmitPreventDoubleSubmission(true);
 				$ilToolbar->addButtonInstance($button);	
 
-				$ilToolbar->addSeparator();				
+				$ilToolbar->addSeparator();
+
+				//templates: results, table of contents
+				$dtmpl = new ilTemplate("tpl.il_svy_svy_results_details.html", true, true, "Modules/Survey");
+				$toc_tpl = new ilTemplate("tpl.svy_results_table_contents.html", true, true, "Modules/Survey");
+				$this->lng->loadLanguageModule("content");
+				$toc_tpl->setVariable("TITLE_TOC", $this->lng->txt('cont_toc'));
 			}			
 			
 			$modal_id = "svy_ev_exp";
@@ -822,14 +828,6 @@ class ilSurveyEvaluationGUI
 				{
 					$finished_ids = array(-1);
 				}
-			}
-			
-			if($details)
-			{
-				$dtmpl = new ilTemplate("tpl.il_svy_svy_results_details.html", true, true, "Modules/Survey");
-				$toc_tpl = new ilTemplate("tpl.svy_results_table_contents.html", true, true, "Modules/Survey");
-				$this->lng->loadLanguageModule("content");
-				$toc_tpl->setVariable("TITLE_TOC", $this->lng->txt('cont_toc'));
 			}
 			
 			$details_figure = $_POST["cp"]
@@ -871,7 +869,23 @@ class ilSurveyEvaluationGUI
 					$toc_tpl->setVariable("TOC_ID", $anchor_id);
 					$toc_tpl->parseCurrentBlock();
 				}
-			}				
+			}
+			if($details)
+			{
+				//TABLE OF CONTENTS
+				$panel_toc = $ui_factory->panel()->standard("", $ui_factory->legacy($toc_tpl->get()));
+				$render_toc = $ui_renderer->render($panel_toc);
+				$dtmpl->setVariable("PANEL_TOC", $render_toc);
+
+				//REPORT
+				$report_title = "";
+				$panel_report = $ui_factory->panel()->report($report_title, $this->array_panels);
+				$render_report = $ui_renderer->render($panel_report);
+				$dtmpl->setVariable("PANEL_REPORT",$render_report);
+
+				//print the main template
+				$this->tpl->setVariable('DETAIL', $dtmpl->get());
+			}
 		}		
 		
 		$this->tpl->setVariable('MODAL', $modal);	
@@ -880,24 +894,6 @@ class ilSurveyEvaluationGUI
 			include_once "./Modules/Survey/classes/tables/class.ilSurveyResultsCumulatedTableGUI.php";
 			$table_gui = new ilSurveyResultsCumulatedTableGUI($this, $details ? 'evaluationdetails' : 'evaluation', $results);	
 			$this->tpl->setVariable('CUMULATED', $table_gui->getHTML());
-		}
-		else
-		{
-			//TABLE OF CONTENTS
-			$panel_toc = $ui_factory->panel()->standard("", $ui_factory->legacy($toc_tpl->get()));
-			$render_toc = $ui_renderer->render($panel_toc);
-			$dtmpl->setVariable("PANEL_TOC", $render_toc);
-
-			//REPORT
-			$report_title = "";
-			$panel_report = $ui_factory->panel()->report($report_title, $this->array_panels);
-			$render_report = $ui_renderer->render($panel_report);
-			$dtmpl->setVariable("PANEL_REPORT",$render_report);
-
-
-			//print the main template
-			$this->tpl->setVariable('DETAIL', $dtmpl->get());
-
 		}
 		unset($dtmpl);
 		unset($table_gui);
@@ -1002,7 +998,10 @@ class ilSurveyEvaluationGUI
 			$card_table_tpl->setVariable("QUESTION_STATISTIC_VALUE", $value);
 			$card_table_tpl->parseCurrentBlock();
 		}
-		$panel_qst_card = $ui_factory->panel()->sub($qst_title, $ui_factory->legacy($svy_text))
+		//anchor in title. Used in TOC
+		$anchor_id = "svyrdq".$question->getId();
+		$title = "<span id='$anchor_id'>$qst_title</span>";
+		$panel_qst_card = $ui_factory->panel()->sub($title, $ui_factory->legacy($svy_text))
 			->withCard($ui_factory->card($svy_type_title)->withSections(array($ui_factory->legacy($card_table_tpl->get()))));
 		array_push($this->array_panels, $panel_qst_card);
 

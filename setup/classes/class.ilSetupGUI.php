@@ -533,11 +533,6 @@ echo "<br>+".$client_id;
 			$num++;
 		}
 
-		if (count($languages) % 2)
-		{
-			$this->tpl->touchBlock("lng_empty_cell");
-		}
-
 		if ($this->cmd != "logout" and $this->setup->isInstalled() and $this->setup->isAuthenticated())
 		{
 			// add client link
@@ -596,7 +591,7 @@ echo "<br>+".$client_id;
 			}
 		}
 
-		$this->tpl->setVariable("VAL_CMD", $_GET["cmd"]);
+		$this->tpl->setVariable("VAL_CMD", htmlspecialchars($_GET["cmd"]));
 		$this->tpl->setVariable("TXT_OK",$this->lng->txt("change"));
 		$this->tpl->setVariable("TXT_CHOOSE_LANGUAGE",$this->lng->txt("choose_language"));
 		$this->tpl->setVariable("PAGETITLE","Setup");

@@ -442,7 +442,9 @@ class ilObjGroupGUI extends ilContainerGUI
 		$members_obj->add($ilUser->getId(),IL_GRP_ADMIN);
 		$members_obj->updateNotification($ilUser->getId(),$ilSetting->get('mail_grp_admin_notification', true));
 		
-		parent::afterSave($new_object);
+		ilUtil::sendSuccess($this->lng->txt("object_added"), true);
+		$this->ctrl->setParameter($this, "ref_id", $new_object->getRefId());
+		$this->ctrl->redirect($this,'edit');
 	}
 	
 	/**
@@ -897,7 +899,8 @@ class ilObjGroupGUI extends ilContainerGUI
 			$all_prtf = ilObjPortfolio::getAvailablePortfolioLinksForUserIds($ids,
 				$this->ctrl->getLinkTarget($this, "members"));
 		}
-
+		
+		$profile_data = ilObjUser::_readUsersProfileData($ids);
 		foreach($ids as $usr_id)
 		{
 			$name = ilObjUser::_lookupName($usr_id);
@@ -907,6 +910,11 @@ class ilObjGroupGUI extends ilContainerGUI
 			$tmp_data['notification'] = $this->object->members_obj->isNotificationEnabled($usr_id) ? 1 : 0;
 			$tmp_data['usr_id'] = $usr_id;
 			$tmp_data['login'] = ilObjUser::_lookupLogin($usr_id);
+			
+			foreach((array) $profile_data[$usr_id] as $field => $value)
+			{
+				$tmp_data[$field] = $value;
+			}
 
 			if($this->show_tracking)
 			{
@@ -1069,7 +1077,7 @@ class ilObjGroupGUI extends ilContainerGUI
 				"");
 		}
 
-		
+		include_once './Modules/Group/classes/class.ilGroupParticipants.php';
 		$is_participant = ilGroupParticipants::_isParticipant($this->ref_id, $ilUser->getId());
 			
 		// Members

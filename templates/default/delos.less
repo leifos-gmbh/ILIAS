@@ -17,7 +17,6 @@ In theory, you should also invert shadow... but i think we could postpone this t
 All parts that aren't checked yet are actually marked with "rtl-review"
 */
 
-
 @bsbase: "../../Services/UICore/lib/bootstrap-3.2.0/less/";
 
 // This part should be a copy of the less/bootstrap.less file
@@ -1439,13 +1438,12 @@ div.ilBox {
 
 /* Top-Bar */
 div.ilTopBar {
-  background-color: #444;
-  color: white;
+  background-color: @il-top-bar-bg;
+  color: @il-top-bar-color;
   padding: 5px 10px;
-}
-
-div.ilTopBar a {
-	color: white;
+  a {
+		color: @il-top-bar-link-color;
+	}
 }
 
 div.ilTopBarLeft {

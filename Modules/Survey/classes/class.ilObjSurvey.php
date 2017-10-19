@@ -1755,8 +1755,12 @@ class ilObjSurvey extends ilObject
 	{
 		include_once "./Modules/SurveyQuestionPool/classes/class.SurveyQuestion.php";
 		$question = self::_instanciateQuestion($question_id);
-		$question->delete($question_id);
-		$this->removeConstraintsConcerningQuestion($question_id);
+		#20610 if no question found, do nothing.
+		if($question)
+		{
+			$question->delete($question_id);
+			$this->removeConstraintsConcerningQuestion($question_id);
+		}
 	}
 	
 /**
@@ -2907,7 +2911,6 @@ class ilObjSurvey extends ilObject
 		else
 		{
 			$row = $ilDB->fetchAssoc($result);
-			
 			// yes, we are doing it this way
 			$_SESSION["finished_id"][$this->getId()] = $row["finished_id"];
 			
@@ -4440,6 +4443,7 @@ class ilObjSurvey extends ilObject
 
 	function sendCodes($not_sent, $subject, $message, $lang)
 	{
+		global $DIC;
 		/*
 		 * 0 = all
 		 * 1 = not sent
@@ -4450,7 +4454,9 @@ class ilObjSurvey extends ilObject
 		
 		include_once "./Services/Mail/classes/class.ilMail.php";
 		include_once "./Services/Link/classes/class.ilLink.php";
-		$user_id = $this->getOwner();
+
+		#19956
+		$user_id = $DIC->user()->getId();
 		$mail = new ilMail($user_id);
 		$recipients = $this->getExternalCodeRecipients($check_finished);
 		foreach ($recipients as $data)
@@ -4764,7 +4770,6 @@ class ilObjSurvey extends ilObject
 	function processPrintoutput2FO($print_output)
 	{
 		global $ilLog; 
-		
 		if (extension_loaded("tidy"))
 		{
 			$config = array(
@@ -4784,11 +4789,13 @@ class ilObjSurvey extends ilObject
 			$print_output = str_replace("&otimes;", "X", $print_output);
 			
 			// #17680 - metric questions use &#160; in print view
-			$print_output = str_replace("&gt;", ">", $print_output);
-			$print_output = str_replace("&lt;", "<", $print_output);
+			$print_output = str_replace("&gt;", "~|gt|~", $print_output);		// see #21550
+			$print_output = str_replace("&lt;", "~|lt|~", $print_output);
 			$print_output = str_replace("&#160;", "~|nbsp|~", $print_output);
 			$print_output = preg_replace('/&(?!amp)/', '&amp;', $print_output);
-			$print_output = str_replace("~|nbsp|~", "&#160;", $print_output);			
+			$print_output = str_replace("~|nbsp|~", "&#160;", $print_output);
+			$print_output = str_replace( "~|gt|~", "&gt;", $print_output);
+			$print_output = str_replace( "~|lt|~", "&lt;", $print_output);
 		}
 		$xsl = file_get_contents("./Modules/Survey/xml/question2fo.xsl");
 
@@ -4798,11 +4805,20 @@ class ilObjSurvey extends ilObject
 				'font-family="'.$GLOBALS['ilSetting']->get('rpc_pdf_font','Helvetica, unifont').'"',
 				$xsl
 		);
-		
 		$args = array( '/_xml' => $print_output, '/_xsl' => $xsl );
 		$xh = xslt_create();
 		$params = array();
-		$output = xslt_process($xh, "arg:/_xml", "arg:/_xsl", NULL, $args, $params);
+		try
+		{
+			$output = xslt_process($xh, "arg:/_xml", "arg:/_xsl", null, $args, $params);
+		}
+		catch (Exception $e)
+		{
+			$this->log->error("Print XSLT failed:");
+			$this->log->error("Content: ".$print_output);
+			$this->log->error("Xsl: ".$xsl);
+			throw ($e);
+		}
 		xslt_error($xh);
 		xslt_free($xh);
 		$ilLog->write($output);
@@ -5862,14 +5878,15 @@ class ilObjSurvey extends ilObject
 	{
 		global $ilDB, $ilAccess;
 		
-		$now = time();		
+		$now = time();
+		$now_with_format = date("YmdHis", $now);
 		$today = date("Y-m-d");
 		
 		// object settings / participation period
 		if($this->isOffline() ||
 			!$this->getReminderStatus() ||
-			($this->getStartDate() && $now < $this->getStartDate()) ||
-			($this->getEndDate() && $now > $this->getEndDate()))
+			($this->getStartDate() && $now_with_format < $this->getStartDate()) ||
+			($this->getEndDate() && $now_with_format > $this->getEndDate()))
 		{
 			return false;
 		}
@@ -6113,6 +6130,7 @@ class ilObjSurvey extends ilObject
 			$user = new ilObjUser($a_user_id);
 
 			require_once 'Services/Mail/classes/class.ilMailTemplatePlaceholderResolver.php';
+			require_once 'Services/Mail/classes/class.ilMailFormCall.php';
 			$processor = new ilMailTemplatePlaceholderResolver($context, $a_message);
 			$a_message = $processor->resolve($user, ilMailFormCall::getContextParameters());
 			

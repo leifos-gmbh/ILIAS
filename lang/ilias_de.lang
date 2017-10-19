@@ -1,10 +1,10 @@
 * Copyright (c) 1998-2017 ILIAS open source e-Learning e.V., Extended GPL, see docs/LICENSE */
 /**
-* ILIAS language file (All entries)
+* ILIAS language file
 *
 * @module			language file German
 * @modulegroup		language
-* @author			Matthias Kunkel <mkunkel@me.com>
+* @author			Matthias Kunkel <kunkel@ilias.de>
 * @version			$Id$
 */
 // The language file starts beyond the HTML-comment below. DO NOT modify this line!
@@ -23,7 +23,8 @@ forum#:#autosave_post_draft_info#:#<span class="asterisk">Dieser Beitrag wird al
 forum#:#edit_thread_draft#:#Themenentwurf bearbeiten
 common#:#pd_enable_pdfrmpostdraft#:#'Meine Beitragsentwürfe' aktivieren
 common#:#pd_enable_pdfrmpostdraft_info#:#Sofern aktiviert, wird auf dem Persönlichen Schreibtisch ein Block 'Meine Beitragsentwürfe' angezeigt, in welchem die Beitragsentwürfe des Benutzers in Foren aufgelistet werden.
-pd#:#block_show_pdfrmpostdraft#:#'Meine Beitragsentwürfe' anzeigen###deprecated 
+pd#:#block_show_pdfrmpostdraft#:#'Meine Beitragsentwürfe' anzeigen
+forum#:#forums_thread_drafts_deleted#:#Das gewählte Thema einschließlich aller dazugehörigen Beiträge und evtl. Beitragsentwürfe wurde gelöscht.
 forum#:#forums_threads_drafts_deleted#:#Die gewählten Themen einschließlich aller dazugehörigen Beiträge und evtl. Beitragsentwürfe wurden gelöscht.
 forum#:#save_draft_successfully#:#Der Entwurf wurde erfolgreich gespeichert. 
 forum#:#forums_info_delete_draft#:#Sind Sie sicher, dass Sie diesen Entwurf löschen möchten?
@@ -322,6 +323,8 @@ assessment#:#ass_mc_sel_lim_hint#:#Bitte wählen Sie %s von %s Antworten!
 assessment#:#ass_mc_sel_lim_exhausted_hint#:#Bitte wählen Sie nicht mehr als %s von %s Antworten!
 assessment#:#ass_mc_sel_lim_setting#:#Antwortbeschränkung
 assessment#:#ass_mc_sel_lim_setting_desc#:#Mit dieser Einstellung lässt sich die Anzahl durch den Teilnehmer wählbarer Antworten einschränken.
+assessment#:#ass_txt_char_lim_exhausted_hint#:#Ihre Eingabe überschreitet mit %s Zeichen die Zeichenbeschränkung von %s Zeichen!
+assessment#:#essay_scoring_mode#:#Bewertungsmodus
 assessment#:#essay_scoring_mode_without_keywords#:#Keine automatische Bewertung
 assessment#:#essay_scoring_mode_without_keywords_desc#:#Es werden keine Punkte automatisiert vergeben. Die Punktevergabe ist nur mit manueller Bewertung möglich.
 assessment#:#essay_scoring_mode_keyword_relation_any#:#Automatische Bewertung bei Nennung einzelner Begriffe
@@ -364,6 +367,9 @@ assessment#:#allowedextensions_info#:#Geben Sie eine kommagetrennte Liste der er
 assessment#:#analyze_errortext#:#Text analysieren
 assessment#:#gap_combination#:#Lückentext-Kombination
 assessment#:#answer#:#Antwort
+assessment#:#tst_failed_imp_skl_thresholds#:#Der Import der Schwellenwerte für folgende Kompetenzen wurde übersprungen, weil die zugehörige Kompetenz im lokalen System eine abweichende Liste von Ausprägungen aufweist.
+assessment#:#tst_failed_imp_qst_skl_assign#:#Die Zuweisungen der Fragen zu fogenden Kompetenzen konnte durch den Import nicht hergestellt werden. Die entsprechenden Kompetenzen konnten im hiesigen System nicht identifiziert werden.
+assessment#:#ass_skl_import_fails_remove_btn#:#Diese Meldung entfernen
 assessment#:#answer_image#:#Antwort-Grafik
 assessment#:#answer_is_not_correct_but_positive#:#Sie haben Punkte für Ihre Lösung erhalten. Allerdings handelt es sich dabei nicht um die beste Lösung.
 assessment#:#answer_is_right#:#Ihre Lösung ist korrekt.
@@ -695,7 +701,7 @@ assessment#:#internal_links_update#:#Aktualisierung###deprecated
 assessment#:#javaapplet#:#Java-Applet
 assessment#:#keywords_hint#:#Um eine automatische Punktevergabe bei einer Frage vom Typ Freitext eingeben zu erreichen, geben Sie hier bitte eine Liste von Schlagwörtern an. Die Schlagwörter müssen durch Leerzeichen oder Zeilenumbrüche voneinander getrennt sein. Ist eines der Schlagwörter im Antworttext vorhanden, vergibt ILIAS die für die Frage eingetragene maximale Punktezahl anstelle der üblichen Bewertung von 0 Punkten.###deprecated 
 assessment#:#kiosk#:#Prüfungsansicht
-assessment#:#kiosk_description#:#Die Prüfungsansicht zeigt den Test im Kiosk-Modus. Dabei werden alle Bildschirm- und Navigationselemente, die nicht zum Test gehören, ausgeblendet. Um Teilnehmer effektiv daran zu hindern, während des Tests andere Webseiten zu öffnen, setzen bitte Sie einen hierfür spezialisierten Browser, z.B. Safe Exam Browser.
+assessment#:#kiosk_description#:#Die Prüfungsansicht zeigt den Test im Kiosk-Modus. Dabei werden alle Bildschirm- und Navigationselemente, die nicht zum Test gehören, ausgeblendet. Um Teilnehmer effektiv daran zu hindern, während des Tests andere Webseiten zu öffnen, setzen Sie bitte einen hierfür spezialisierten Browser ein, z.B. den Safe Exam Browser.
 assessment#:#kiosk_options#:#Angezeigte Informationen
 assessment#:#kiosk_options_desc#:#Die ausgewählten Informationen werden im Kopfbereich der Seite angezeigt.
 assessment#:#kiosk_show_participant#:#Name des Teilnehmers
@@ -797,6 +803,7 @@ assessment#:#tst_qst_skl_cfg_in_pool_hint_dynquestset#:#Die Fragen-Kompetenz-Zuo
 assessment#:#qpl_qst_skl_selection_for_question_header#:#Kompetenzzuordnung für die Frage: %s
 assessment#:#tst_save_comp_points#:#Speichere Kompetenz-Punkte
 assessment#:#tst_msg_skl_qst_assign_points_saved#:#Die Kompetenz-Punkte wurden gespeichert.
+assessment#:#tst_msg_skl_qst_assign_points_not_saved#:#Die Kompetenz-Punkte wurden nicht gespeichert. Bitte überprüfen Sie Ihre Eingabe.
 assessment#:#tst_skl_level_thresholds_missing#:#Es sind noch nicht für alle relevanten Kompetenzen Schwellenwerte definiert worden!
 assessment#:#tst_skl_level_thresholds_link#:#Kompetenz-Schwellenwerte konfigurieren
 assessment#:#tst_skl_res_interpretation_hint_msg#:#Beachten Sie, dass die Kompetenzergebnisse eines einzelnen Tests nur bedingt aussagekräftig sind. Je mehr Informationen zu den einzelnen Kompetenzen gesammelt werden, desto valider die Aussage. Sollten einzelne Kompetenzen keinen Eintrag erhalten haben, standen für diese Kompetenz zu wenig Informationen zur Verfügung.
@@ -1295,7 +1302,7 @@ assessment#:#tst_hide_previous_results_description#:#Die vorherigen Ergebnisse v
 assessment#:#tst_hide_previous_results_hide#:#Meine Ergebnisse aus dem vorigen Testdurchlauf nicht anzeigen###deprecated 
 assessment#:#tst_hide_previous_results_introduction#:#Wenn Sie mehr als einen Durchlauf dieses Tests bearbeiten, werden Ihre vorherigen Ergebnisse nicht als voreingestellte Werte übernommen###deprecated 
 assessment#:#tst_hide_side_list#:#Fragenliste aus
-assessment#:#new_test_online#:#Der Test wurde online geschaltet.
+news#:#new_test_online#:#Der Test wurde online geschaltet.
 assessment#:#tst_import_no_items#:#Fehler: Die Importdatei beinhaltet keine Fragen!
 assessment#:#tst_import_verify_found_questions#:#ILIAS hat die folgenden Fragen in der Importdatei gefunden. Bitte wählen Sie die Fragen aus, die Sie mit diesem Test importieren wollen.
 assessment#:#tst_in_use_edit_questions_disabled#:#Der Test wurde bereits von %s Teilnehmern begonnen. Sie dürfen deshalb keine Fragen mehr bearbeiten oder verschieben!###deprecated 
@@ -1535,7 +1542,7 @@ assessment#:#tst_show_solution_printview#:#Druckbare Liste der Antworten
 assessment#:#tst_show_solution_signature#:#Platzhalter für Unterschrift
 assessment#:#tst_show_solution_suggested#:#Inhalte zur Wiederholung
 assessment#:#tst_show_summary#:#Fragenliste und Bearbeitungstand anzeigen
-assessment#:#tst_show_summary_description#:#Teilnehmer können sich links neben den Testfragen eine Fragenliste anzeigen lassen. Mit dem Button 'Bearbeitungsstand' rufen die Teilnehmer eine Übersicht auf, die zeigt, welche Fragen sie jeweils bereits bearbeitet oder markiert haben. Das Verhalten der Übersicht 'Bearbeitungsstand' können Sie noch weiter konfigurieren:
+assessment#:#tst_show_summary_description#:#Teilnehmer können sich links neben den Testfragen eine Fragenliste anzeigen lassen. Mit dem Button 'Bearbeitungsstand' rufen die Teilnehmer eine Übersicht auf, die zeigt, welche Fragen sie bereits bearbeitet oder markiert haben. Das Verhalten der Übersicht 'Bearbeitungsstand' können Sie noch weiter konfigurieren:
 assessment#:#tst_shuffle_questions#:#Fragen mischen
 assessment#:#tst_shuffle_questions_description#:#Die Reihenfolge der Fragen wird pro Teilnehmer und pro Testdurchlauf neu gemischt.
 assessment#:#tst_signature#:#Unterschrift
@@ -1600,6 +1607,8 @@ assessment#:#tst_type_comment#:#Warnung: Das Ändern des Testtyps bei einem lauf
 assessment#:#tst_types#:#Test-Typen###deprecated 
 assessment#:#tst_use_javascript#:#JavaScript für das Ziehen und Ablegen von Antworten verwenden###deprecated 
 assessment#:#tst_use_previous_answers#:#Verwendung vorheriger Lösungen
+assessment#:#use_previous_solution_advice#:#Die angezeigte Lösung wurde vormals von Ihnen abgegeben. Sie müssen die Übernahme dieser Lösung unterhalb der Frage bestätigen, falls Sie die Lösung ohne Änderungen übernehmen wollen.
+assessment#:#use_previous_solution#:#Verwende vorherige Lösung
 assessment#:#tst_use_previous_answers_description#:#Zeigt Teilnehmern die Antworten aus dem vorherigen Testdurchlauf an. Die Option muss vom Teilnehmer vor Beginn des Tests auf dem Reiter 'Info' per Checkbox aktiviert werden.
 assessment#:#tst_use_previous_answers_user#:#Meine Lösungen aus einem vorherigen Testdurchlauf als vorgegebene Werte verwenden
 assessment#:#tst_user_finished_test#:#Ein Teilnehmer hat den Test beendet (%s)
@@ -1792,6 +1801,8 @@ assessment#:#sign_submission#:#Digitale Signatur
 assessment#:#sign_submission_info#:#Das Signatur-Plugin muss installiert und aktiviert sein, damit Teilnehmer aufgefordert werden, ihre Testabgabe zu signieren.
 assessment#:#preserve_manscoring#:#Manuelle Bewertungen erhalten
 assessment#:#preserve_manscoring_info#:#Aufgrund von Veränderungen in der Fragebewertung kann es erforderlich sein, bislang erfolgte manuelle Bewertungen zu verwerfen. Dieser Schalter gestattet die Entwertung ALLER manuellen Bewertungen in einem Test und sollte nur in Ausnahmefällen genutzt werden. 
+assessment#:#tst_qst_added_to_pool_s#:#Die Frage wurde erfolgreich in den Fragenpool übernommen. 
+assessment#:#tst_qst_added_to_pool_p#:#Die Fragen wurden erfolgreich in den Fragenpool übernommen.
 auth#:#auth_account_code#:#Code
 auth#:#auth_account_code_info#:#Um Ihr Benutzerkonto zu reaktivieren, können Sie einen ILIAS-Benutzerkonten-Code benutzen.
 auth#:#auth_account_code_title#:#Benutzerkonten-Code
@@ -1810,7 +1821,7 @@ auth#:#auth_radius_charset_info#:#Wählen Sie hier die Zeichenkodierung aus, die
 auth#:#auth_radius_ldap#:#Synchronisierung über LDAP-Einstellungen
 auth#:#auth_radius_ldap_info#:#Wenn aktiviert, wird die Synchronisierung der Benutzerdaten und Rollenzuordnungen, gemäß der LDAP-Einstellungen vorgenommen.
 auth#:#auth_radius_sync_rad#:#Automatische Generierung von ILIAS-Benutzerkonten
-auth#:#auth_radius_sync_rad_info#:#Benutzer, die sich erfolgreich gegen Radius authentifiziert haben, jedoch über keinen ILIAS-Benutzerkonto verfügen, werden automatisch angelegt.
+auth#:#auth_radius_sync_rad_info#:#Benutzer, die sich erfolgreich gegen Radius authentifiziert haben, jedoch über kein ILIAS-Benutzerkonto verfügen, werden automatisch angelegt.
 auth#:#auth_sync#:#Benutzer-Synchronisierung
 auth#:#auth_sync_cas#:#Automatische Generierung von ILIAS-Benutzerkonten
 auth#:#auth_sync_cas_info#:#Benutzer, die sich erfolgreich gegen CAS authentifiziert haben, jedoch über keinen ILIAS-Benutzerkonto verfügen, werden automatisch angelegt.
@@ -2678,7 +2689,7 @@ common#:#chat_invite_public_room_tooltip#:#In den öffentlichen Chatraum einlade
 chatroom#:#chat_settings#:#Chat-Einstellungen
 common#:#chat_users_active#:#Aktive Benutzer
 common#:#check#:#Rückmeldung anfordern
-assessment#:#submit_and_check#:#Speichern und prüfen
+assessment#:#submit_and_check#:#Antwort speichern und Rückmeldung anfordern
 common#:#check_all#:#Alle auswählen
 common#:#check_langfile#:#Bitte überprüfen Sie die Sprachdatei!
 common#:#check_languages#:#Alle Sprachen überprüfen
@@ -2908,7 +2919,7 @@ common#:#delete_inactive_user_accounts_period_desc#:#Accounts werden gelöscht, 
 common#:#update_orgunits#:#Benutzerfeld 'Organisationseinheiten' aktualisieren
 common#:#update_orgunits_desc#:#Wenn eingeschaltet, werden bei allen Benutzern das Feld 'Organisationseinheiten' aktualisiert und so allfällige Fehler behoben.
 common#:#delete_inactivated_user_accounts#:#Benutzerzugänge nach Inaktivierung löschen
-common#:#delete_inactivated_user_accounts_desc#:#Wenn eingeschaltet, werden Benutzerzugänge abhängig vom Zeitpunkt der Inaktivierung gelöscht.
+common#:#delete_inactivated_user_accounts_desc#:#Wenn eingeschaltet, werden Benutzerzugänge %s Tage nach der Inaktivierung gelöscht.
 common#:#delete_inactivated_user_accounts_include_roles#:#Berücksichtigte Rollen
 common#:#delete_inactivated_user_accounts_include_roles_desc#:#Definiert, welche Rollen beim Löschen berücksichtigt werden sollen.
 common#:#delete_inactivated_user_accounts_interval#:#Häufigkeit###deprecated 
@@ -3037,6 +3048,7 @@ common#:#err_count_param#:#Grund: Falsche Parameteranzahl
 common#:#err_enter_current_passwd#:#Bitte geben Sie Ihr momentanes Passwort an!###deprecated 
 common#:#err_in_line#:#Fehler in Zeile
 common#:#err_inactive#:#Dieses Benutzerkonto ist nicht aktiv bzw. noch nicht aktiviert worden. Bitte kontaktieren Sie den Technischen Support (siehe Link unten) für weitere Unterstützung.
+common#:#err_inactive_login_attempts#:#Ihr Benutzerkonto wurde wegen falscher Loginversuche deaktiviert. Klicken Sie auf 'Technische Betreuung kontaktieren' am Fuße dieser Seite, um die Administratoren zu informieren, dass sie Ihr Benutzerkonto wieder aktivieren sollen.
 common#:#err_invalid_port#:#Ungültige Portnummer
 common#:#err_ldap_auth_failed#:#Benutzer konnte nicht authentifiziert werden! Bitte überprüfen Sie, ob ILIAS- und LDAP-Passwort übereinstimmen###deprecated 
 common#:#err_ldap_connect_failed#:#Verbindung zum LDAP-Server fehlgeschlagen! Bitte überprüfen Sie Serveradresse und Port###deprecated 
@@ -6459,7 +6471,7 @@ crs#:#crs_groupings#:#Kursgruppierungen
 crs#:#crs_groupings_ask_delete#:#Kursgruppierung löschen###deprecated 
 crs#:#crs_groups_nr#:#Anzahl Gruppen
 crs#:#crs_grp_added_grouping#:#Eine neue Mitgliedschaftsbeschränkung wurde angelegt.
-crs#:#crs_grp_already_assigned#:#Da Sie bereits Mitglied in einem der Kurse sind, können Sie nicht einem weiteren Kurs aus der Liste beitreten!
+crs#:#crs_grp_already_assigned#:#Da Sie bereits Mitglied in einem der oben genannten Objekte sind, können Sie nicht einem weiteren aus der Liste beitreten!
 crs#:#crs_grp_assign_crs#:#Kurs zuordnen
 crs#:#crs_grp_assigned_courses#:#Die ausgewählten Kurse wurden zugeordnet.###deprecated 
 crs#:#crs_grp_assigned_courses_info#:#Zugeordnete Kurse:###deprecated 
@@ -7025,7 +7037,7 @@ dateplaner#:#cal_ch_num_bookings#:#Anmeldungen pro Termin
 dateplaner#:#cal_ch_personal_book#:#Persönliche Buchungen
 dateplaner#:#cal_ch_personal_ch#:#Persönliche Sprechstundentermine
 dateplaner#:#cal_ch_target_object#:#Objekt im Magazin
-dateplaner#:#cal_ch_target_object_info#:#Die Sprechstunden werden nur in den ausgewählten Kursen und Gruppen in einem kleinen Block rechts angezeigt. Geben Sie die Ref-ID des betreffenden Objektes ein. Sie finden diese in der URL des entsprechenden Objekts. Mehrere Ref-IDs geben Sie kommagetrennt ein.
+dateplaner#:#cal_ch_target_object_info#:#Die Sprechstunden werden in Kursen und Gruppen in einem kleinen Block rechts angezeigt. Um dies auf bestimmte Kurse oder Gruppen zu beschränken, geben Sie die Ref-ID des betreffenden Objektes ein. Sie finden diese in der URL des entsprechenden Objekts. Mehrere Ref-IDs geben Sie kommagetrennt ein. Unabhängig davon können Sprechstunden auch in Ihren E-Portfolios erscheinen.
 dateplaner#:#cal_ch_unknown_repository_object#:#Die angegebene Kennung des Objekts ist nicht gültig.
 dateplaner#:#cal_ch_unknown_user#:#Der eingegebene Benutzername existiert nicht.
 dateplaner#:#cal_change_responsible_users#:#Verantwortliche Mitglieder ändern
@@ -7482,7 +7494,7 @@ exc#:#exc_deadline#:#Abgabetermin
 exc#:#exc_direct_submit_blog#:#Möchten Sie die aktuelle Version Ihres Blogs jetzt abgeben? Sie können dies auch jederzeit im Blog-Editor tun.
 exc#:#exc_direct_submit_portfolio#:#Möchten Sie die aktuelle Version Ihres Portfolios jetzt abgeben? Sie können dies auch jederzeit im Portfolio-Editor tun.
 exc#:#exc_edit_assignment#:#Einstellungen der Übungseinheit
-exc#:#exc_edit_assignments#:#Übungseinheiten bearbeitn
+exc#:#exc_edit_assignments#:#Übungseinheiten bearbeiten
 exc#:#exc_edit_submission#:#Eingereichte Lösungen ändern
 exc#:#exc_ended_on#:#Beendet am
 exc#:#exc_export_excel#:#Export (Excel)
@@ -9055,7 +9067,7 @@ prtf#:#prtf_exercise_submitted_info#:#Sie haben Ihr Portfolio am %s eingereicht.
 prtf#:#prtf_existing_portfolio#:#Vorhandenes Portfolio
 prtf#:#prtf_finalize_portfolio#:#Portfolio abschließen und abgeben
 prtf#:#prtf_finalized#:#Das Portfolio wurde abgegeben.
-prtf#:#prtf_first_page_title#:#Typ der 1. Seite
+prtf#:#prtf_first_page_title#:#Beginnt mit:
 prtf#:#prtf_font_color#:#Schriftfarbe###deprecated 
 prtf#:#prtf_new_portfolio#:#Neues Portfolio
 prtf#:#prtf_no_blogs_info#:#Wenn Sie im Bereich "%s" einen Blog anlegen, können Sie dieses auch als Teil Ihres Portfolios verwenden.
@@ -9145,7 +9157,7 @@ ps#:#ps_field_type#:#Datenfeldtyp
 ps#:#ps_files_deleted#:#Die Exportdateien wurden gelöscht.
 ps#:#ps_grp_user_fields#:#Gruppenspezifische Benutzerdaten
 ps#:#ps_login_max_attempts#:#Maximale Anzahl von Anmeldeversuchen
-ps#:#ps_login_max_attempts_info#:# Bestimmt die maximal erlaubte Anzahl fehlgeschlagener Anmeldeversuche. Wird kein Wert eingetragen, ist die Funktion deaktiviert und ILIAS zählt ILIAS nicht die fehlgeschlagenen Anmeldeversuche.
+ps#:#ps_login_max_attempts_info#:# Bestimmt wie viele Anmeldeversuche eines Benutzer höchstens fehlschlagen dürfen. Schlagen mehr Anmeldeversuche fehl, wird dieser Benutzer auf 'inaktiv' gesetzt und muss im 'Benutzer Management' wieder aktiviert werden, bevor er die Plattform benutzen kann. Wird kein Wert eingetragen, ist die Funktion deaktiviert und ILIAS zählt die fehlgeschlagenen Anmeldeversuche nicht.
 ps#:#ps_name_field#:#Name des Datenfeldes###deprecated 
 ps#:#ps_new_select_field#:#Neue Auswahlliste anlegen###deprecated 
 ps#:#ps_new_text_field#:#Neues Textfeld anlegen###deprecated 
@@ -10947,7 +10959,7 @@ survey#:#warning_question_in_use#:#Warnung! Die Frage, die Sie bearbeiten wollen
 survey#:#warning_question_not_complete#:#Die Frage ist unvollständig!
 survey#:#workingtime#:#Bearbeitungsdauer
 survey#:#wrong_categories_selected_for_insert#:#ILIAS konnte die geplante Aktion nicht durchführen. Bitte stellen Sie sicher, dass nur genau eine Antwort als Zielposition ausgewählt wurde!###deprecated 
-survey#:#wrong_survey_code_used#:#Sie können diese Umfrage nicht starten, da Sie versucht haben, einen ungültigen Zugangsschlüssel zu verwenden.
+survey#:#wrong_survey_code_used#:#Kein Zugriff auf die Umfrage. Ihr Zugangsschlüssel ist ungültig oder wurde bereits verwendet.
 tagging#:#tagging_all_users#:#Alle Benutzer
 tagging#:#tagging_edit_settings#:#Einstellungen
 tagging#:#tagging_enable_all_users#:#Zeige Tags aller Benutzer
@@ -11223,6 +11235,7 @@ trac#:#vm_times_of_day#:#Tageszeiten innerhalb des Zeitraums###deprecated
 tstv#:#tstv_create#:#Testzertifikat erstellen
 tstv#:#tstv_create_info#:#Wählen Sie einen Test, für den Sie ein Zertifikat benötigen
 user#:#clipboard_add_btn#:#Der Zwischenablage hinzufügen
+user#:#clipboard_add_from_btn#:#Aus der Zwischenablage hinzufügen
 user#:#clipboard_user_added#:#Die ausgewählten Benutzer wurden der Zwischenablage hinzugefügt.
 user#:#clipboard_table_title#:#Zwischenablage (Benutzerkonten)
 user#:#enable_local_user_administration#:#Lokale Benutzerverwaltung aktivieren
@@ -11689,7 +11702,9 @@ dcl#:#dcl_export_started#:#Asynchroner Export gestartet
 dcl#:#dcl_export_finished#:#Export Abgeschlossen
 dcl#:#dcl_supported_filetypes#:#Erlaubte Dateiendungen
 dcl#:#dcl_supported_filetypes_desc#:#Sie können hier kommagetrennt Dateiendungen angeben. Zum Beispiel: pdf, docx
-dcl#:#dcl_no_export_data_available#:#Keine Daten oder Felder für den Export verfügbar
+dcl#:#dcl_no_export_data_available#:#Keine Daten oder Felder für den Export verfügbar.
+dcl#:#dcl_no_export_content_available#:#Keine Daten für den Export verfügbar.
+dcl#:#dcl_no_export_fields_available#:#Keine Felder für den Export aktiviert. Markieren Sie mindestens ein Feld als "Exportierbar" in den <a href="%s">Tabelleneinstellungen</a>.
 common#:#obj_dcl_duplicate#:#Datensammlung kopieren
 survey#:#freetext_answers#:#Freitext-Antworten
 forum#:#frm_at_least_one_moderator#:#Es muss mindestens ein Moderator zugewiesen sein.
@@ -11699,7 +11714,7 @@ common#:#soap_connect_timeout#:#Timeout für Verbindungsaufbau
 common#:#soap_connect_timeout_info#:#Die maximale Zeit in Sekunden, die gewartet wird, bis eine Verbindung zum SOAP-Web-Service aufgebaut werden kann.
 dateplaner#:#cal_ical_infoscreen#:#Abonnieren
 trac#:#trac_lp_on_personal_desktop#:#Lernfortschritt auf Persönlichem Schreibtisch
-trac#:#trac_lp_learner_access#:#Eigenen Lernfornschritt einsehen
+trac#:#trac_lp_learner_access#:#Eigenen Lernfortschritt einsehen
 rating#:#rating_categories#:#Bewertungs-Kategorien
 rating#:#rating_add_category#:#Kategorie hinzufügen
 rating#:#rating_category_create#:#Kategorie erstellen
@@ -12024,7 +12039,7 @@ dcl#:#dcl_msg_tableviews_delete_all#:#Löschen nicht möglich: Es muss mindesten
 dcl#:#dcl_msg_tables_delete_all#:#Löschen nicht möglich: Es muss mindestens eine Tabelle existieren
 dcl#:#dcl_msg_tables_deleted#:#Tabellen gelöscht
 dcl#:#dcl_tables_confirm_delete#:#Sind Sie sicher, dass die folgenden Tabellen gelöscht werden sollen?
-dcl#:#dcl_msg_info_alternatives#:#Die gewünschte Einzelansicht konnte nicht angezeigt werden, da entweder keine Einzelansicht für diese Tabellenansicht existiert oder Sie nicht genügend Zurgriffsrechte besitzen. Wählen Sie aus der Liste eine für Sie verfügbare Einzelansicht, um den Datensatz dennoch anzuzeigen.
+dcl#:#dcl_msg_info_alternatives#:#Die gewünschte Einzelansicht konnte nicht angezeigt werden, da entweder keine Einzelansicht für diese Tabellenansicht existiert oder Sie nicht genügend Zugriffsrechte besitzen. Wählen Sie aus der Liste eine für Sie verfügbare Einzelansicht, um den Datensatz dennoch anzuzeigen.
 dcl#:#dcl_tableviews_confirm_delete#:#Sind Sie sicher, dass die folgenden Ansichten gelöscht werden sollen?
 dcl#:#dcl_tableview_confirm_delete#:#Sind Sie sicher, dass die folgende Ansicht gelöscht werden sollen?
 dcl#:#dcl_tableview_fieldsettings#:#Feldspezifische Einstellungen
@@ -12125,6 +12140,7 @@ dcl#:#dcl_noturl_exception#:#Bitte geben Sie einen Link (beginnend mit http:// o
 dcl#:#dcl_field_title_change_warning#:#Sie haben den Titel des Feldes geändert, dadurch funktionieren unter Umständen die Platzhalter in der Seitenvorlage nicht mehr, diese müssen gegebenenfalls manuell angepasst werden.
 dcl#:#dcl_field_title_unique#:#Es existiert bereits ein Feld mit diesem Titel. Titel muss eindeutig sein.
 dcl#:#dcl_table_title_unique#:#Es existiert bereits eine Tabelle mit diesem Titel. Titel muss eindeutig sein.
+dcl#:#dcl_table_title_not_matching#:#Die Titel des Excel-Arbeitsblatts und der Tabelle in der Datensammlung stimmen nicht überein. Benennen Sie das Arbeitsblatt um, um einen korrekten Import durchzuführen.
 pd#:#pd_export_profile#:#Persönliche Daten exportieren
 pd#:#pd_download_last_export_file#:#Aktuelle Exportdatei herunterladen
 pd#:#pd_import_personal_data#:#Persönliche Daten importieren
@@ -12263,7 +12279,7 @@ common#:#qpl_copy#:#Fragenpool für Tests kopieren
 mathjax#:#mathjax_enable_mathjax_info#:#Aktiviert die LaTeX-Unterstützung mit MathJax, um mathematische Formeln ausgeben zu können.
 mathjax#:#mathjax_enable_mathjax#:#MathJax aktivieren
 mathjax#:#mathjax_mathjax#:#MathJax
-mathjax#:#mathjax_path_to_mathjax_desc#:#Zum Beispiel: http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML oder eine URL zu Ihrer lokalen Installation.
+mathjax#:#mathjax_path_to_mathjax_desc#:#Zum Beispiel: https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML oder eine URL zu Ihrer lokalen Installation.
 mathjax#:#mathjax_path_to_mathjax#:#URL zu MathJax
 mathjax#:#mathjax_settings#:#MathJax-Einstellungen
 mathjax#:#mathjax_limiter#:#Trennzeichen
@@ -12297,7 +12313,7 @@ content#:#cont_selected_topic#:#Ausgewähltes Thema
 content#:#cont_all_topics#:#Alle Themen
 content#:#cont_highlight_class#:#Klasse hervorheben
 survey#:#survey_question_pool_usage_active#:#Fragen können optional in einem Fragenpool angelegt werden
-survey#:#survey_question_pool_usage_active_info#:#Beim Anlegen einer Fragen muss jeweils entschieden werden, ob ein Fragenpool verwendet werden soll.
+survey#:#survey_question_pool_usage_active_info#:#Beim Anlegen einer Frage muss jeweils entschieden werden, ob ein Fragenpool verwendet werden soll.
 survey#:#survey_question_pool_usage_inactive#:#Fragen werden direkt in der Umfrage angelegt.
 survey#:#survey_question_pool_usage_inactive_info#:#Die Frage wird zuerst nur für diese Umfrage erstellt und kann später manuell zu einem Fragenpool hinzugefügt werden.
 dateplaner#:#cal_notification_crsgrp#:#Benachrichtigung für Kurs/Gruppenteilnehmer
@@ -12412,7 +12428,6 @@ ecs#:#ecs_cmap_att_organisation#:#Organisation
 ecs#:#ecs_cmap_att_term#:#Semester
 ecs#:#ecs_cmap_att_title#:#Veranstaltungstitel
 ecs#:#ecs_cmap_att_lecturer#:#Lehrperson
-ecs#:#ecs_cmap_att_orgunit#:#Organisationseinheit
 ecs#:#ecs_cmap_atts_table#:#Konfiguration der Zuordnungs-Attribute
 ecs#:#ecs_cmap_attributes#:#Attribute
 ecs#:#ecs_cmap_overview#:#Zuordnungsübersicht
@@ -13087,10 +13102,10 @@ prtt#:#prtt_activation_limited_visibility_info#:#Falls aktiv, ist die Portfoliov
 content#:#cont_profile_mode_template_inherit_info#:#Verwendet die Daten des Profils
 prtf#:#prtf_template_editor_placeholder_info#:#Dieser Platzhalter wird im Portfolio ersetzt.
 prtf#:#prtf_creation_mode#:#Neues Portfolio
-prtf#:#prtf_creation_mode_template#:#Aus Vorlage erstellen
-prtf#:#prtf_creation_mode_scratch#:#Ohne Vorlage erstellen
-prtf#:#prtf_template_import_blog_create#:#Neuen Blog erstellen
-prtf#:#prtf_template_import_blog_reuse#:#Bestehenden Blog nutzen
+prtf#:#prtf_creation_mode_template#:#Aus einer Portfoliovorlage erstellen
+prtf#:#prtf_creation_mode_scratch#:#Ohne Portfoliovorlage erstellen
+prtf#:#prtf_template_import_blog_create#:#Neues Blog erstellen
+prtf#:#prtf_template_import_blog_reuse#:#Bestehendes Blog nutzen
 prtf#:#prtf_template_import_blog_ignore#:#Blog-Seite entfernen
 prtf#:#prtf_create_template_from_portfolio#:#Portfolio
 prtf#:#prtf_create_template_from_portfolio_info#:#Wählen Sie ein Portfolio um dessen Inhalte und Einstellungen für die Vorlage zu übernehmen.
@@ -14399,7 +14414,7 @@ survey#:#svy_evaluation_access_participants_info#:#Alle Benutzer, die an der Umf
 survey#:#svy_results_view_own_info#:#Teilnehmer können sich eine Übersicht mit den eigenen Antworten anzeigen lassen, nachdem sie die Umfrage beendet haben. Sie können die Antworten nicht mehr ändern.
 survey#:#survey_360_self_evaluation_info#:#Feedback-Nehmer können anhand der Fragen eine Selbsteinschätzung vornehmen.
 survey#:#survey_360_self_raters_info#:#Feedback-Nehmer wählen die Personen, welche ihnen eine Rückmeldung geben sollen selber aus. Sie laden diese Personen auch selbständig ein. 
-survey#:#survey_360_self_appraisee_info#:#Allen Benutzern wird ein Link auf dem Reiter "Info" angezeigt. Mit diesem Link können sie sich selbständig Umfrage als Empfänger von Feedback eintragen.  
+survey#:#survey_360_self_appraisee_info#:#Allen Benutzern wird ein Link auf dem Reiter "Info" angezeigt. Über diesen Link können diese sich selbst als Feedback-Empfänger für diese Umfrage eintragen.
 survey#:#survey_360_results_none_info#:#Feedback-Nehmer können die Antworten, welche Feedback-Geber ausgewählt haben nicht einsehen. 
 survey#:#survey_360_results_own_info#:#Feedback-Nehmer können nur die Antworten einsehen, welche Feedback-Geber zu ihnen persönlich ausgewählt haben. 
 survey#:#survey_360_results_all_info#:#Alle Feedback-Nehmer der 360°-Umfrage können alle Rückmeldungen aller Feedback-Geber zu sich und zu allen anderen Feedback-Nehmern einsehen. 
@@ -14433,7 +14448,7 @@ administration#:#language_delete_local_additions_info#:#Löscht alle Einträge i
 administration#:#language_merge_local_changes_info#:#Mischt alle lokalen Änderungen oder Ergänzungen in die Standard-Sprachdatei lang/ilias_%s.lang. Der Web-Server muss Schreibrecht auf dieser Datei besitzen.
 administration#:#language_remove_local_file_info#:#Entfernt die Datei Customizing/global/lang/ilias_%s.lang.local und setzt den Status der Sprache von "Mit lokaler Version installiert" auf "Installiert". Die Einträge in der Datenbank sind davon nicht betroffen.
 administration#:#language_save_dist#:#Backup der Standard-Sprachdatei erzeugen
-administration#:#language_save_dist_info#:#Erzeugt ein Backup der Standard-Sprachdatei im ILIAS-Datenverzeichnis. Dies hilft nach einem ILIAS-Update, Koflikte von eingenen Änderungen mit aktualisierten Sprachvariablen zu finden.
+administration#:#language_save_dist_info#:#Erzeugt ein Backup der Standard-Sprachdatei im externen ILIAS-Datenverzeichnis. Dies hilft nach einem ILIAS-Update, Konflikte von eigenen Änderungen mit aktualisierten Sprachvariablen zu finden.
 administration#:#language_saved_dist#:#Das Backup der Standard-Sprachdatei wurde erzeugt.
 administration#:#language_save_dist_failed#:#Das Backup der Standard-Sprachdatei konnte nicht geschrieben werden.
 crs#:#crs_loc_type_initial_all_info#:#Anhand der Ergebnisse des Einstiegstests empfiehlt ILIAS Lerninhalte für die  noch nicht erreichten Lernziele. Ein Qualifizierender Test prüft zum Abschluss  die Erreichung aller Lernziele.
@@ -14524,7 +14539,7 @@ scormtrac#:#student_response#:#student_response: Antwort
 scormtrac#:#ostatus#:#Status des Lernziels
 prtf#:#prtf_blog_page_created#:#Blog wurde hinzugefügt.
 wiki#:#wiki_adv_md_hidden#:#Dieser Block wird aktuell nicht präsentiert.###deprecated 
-wiki#:#wiki_page_list_form_info#:#Fügt eine Liste mit Wiki-Seiten hinzu, die nachfolgenden Metadaten zugeordnet sind.
+wiki#:#wiki_page_list_form_info#:#Fügt eine Liste mit Wiki-Seiten hinzu, die nachfolgenden Metadaten zugeordnet sind. Es werden nur durchsuchbare Metadatenfelder aus den Metadatensätzen des Wikis angeboten.
 content#:#cont_pc_amdpl#:#Seitenliste
 meta#:#udf_type_selectmulti#:#Auswahlliste (Mehrfachauswahl)
 wiki#:#wiki_no_page_found#:#Es wurden keine Seiten zum Suchbegriff '$1' gefunden.
@@ -14564,7 +14579,7 @@ dateplaner#:#cal_type_exc#:#Übungskalender
 grp#:#grp_admission_link_failure_registration_period#:#Kein Beitritt möglich. Die Gruppe ist ausserhalb des Beitrittszeitraumes.
 crs#:#crs_admission_link_failure_registration_period#:#Kein Beitritt möglich. Der Kurs ist ausserhalb des Beitrittszeitraumes.
 grp#:#grp_admission_link_failure_membership_limited#:#Kein Beitritt möglich. Die Mitgliederzahl der Gruppe ist begrenzt.
-crs#:#crs_admission_link_failure_membership_limited#:#Kein Beitritt möglich. Die Mitgliederzahl der Gruppe ist begrenzt.
+crs#:#crs_admission_link_failure_membership_limited#:#Kein Beitritt möglich. Die Mitgliederzahl des Kurses ist begrenzt.
 grp#:#grp_admission_link_success_registration#:#Erfolgreich zur Gruppe "%s" beigetreten.
 crs#:#crs_admission_link_success_registration#:#Erfolgreich zum Kurs "%s" beigetreten.
 rbac#:#ilias_id#:#ILIAS-ID
@@ -15026,14 +15041,14 @@ rbac#:#cadm_read#:#Administration für Benutzerkontakte lesen
 rbac#:#cadm_write#:#Administration für Benutzerkontakte editieren
 rbac#:#cadm_edit_permission#:#Rechteeinstellungen der Administration für Benutzerkontakte ändern
 common#:#no_gallery_users_available#:#Aktuell befinden sich keine Benutzer in der Galerie.
-crs#:#crs_mem_contact#:#Kursbetreuung
+crs#:#crs_mem_contact#:#Tutorielle Betreuung
 awrn#:#awareness_now_online#:#Jetzt online
 awrn#:#awareness_now_online_users#:#[ONLINE_USER_NAMES]
 common#:#obj_awra_desc#:#„Wer ist online?“-Anzeige administrieren
 common#:#obj_awra#:#„Wer ist online?“-Anzeige
 awrn#:#awareness_settings#:#Einstellungen
 awrn#:#awrn_enable#:#Aktiviere „Wer ist online?“-Anzeige
-crs#:#crs_mem_contacts#:#Kursbetreuung
+crs#:#crs_mem_contacts#:#Tutorielle Betreuung
 user#:#user_awrn_all_users#:#Alle Benutzer
 user#:#user_awrn_all_users_info#:#Alle Benutzer der Plattform werden aufgelistet.
 crs#:#crs_awrn_support_contacts#:#Kursbetreuung
@@ -15216,7 +15231,7 @@ wsp#:#wsp_shared_filter_reset_button#:#Suche zurücksetzen
 wsp#:#wsp_shared_filter_button#:#Suche
 wiki#:#wiki_page_title_too_long#:#Die Seite konnte nicht angelegt werden, da der Titel zu lang ist. Bitte wählen Sie einen kürzeren Seitentitel.
 exc#:#exc_direct_submit#:#Abgeben
-membership#:#mem_error_preconditions#:#Die Aufnahme konnte nicht erfolgen, da Vorbedingungen zum Beitritt nicht erfüllt sind.
+membership#:#mem_error_preconditions#:#Die Aufnahme konnte nicht erfolgen, da mindestens eine Einstellung dies verhindert.
 export#:#no_file#:#Keine Datei
 content#:#lm_no_download_files#:#Zurzeit stehen keine Download-Dateien zur Verfügung.
 rbac#:#feed_copy#:#Webfeed kopieren
@@ -15565,11 +15580,11 @@ survey#:#svy_eval_captions_abs_perc#:#Anzahl und Prozent
 survey#:#svy_eval_captions_abs#:#Anzahl
 survey#:#svy_eval_captions_perc#:#Prozent
 style#:#add_system_style#:#Neuer System Style
-style#:#add_substyle#:#Neuer Sub Style
-style#:#skin_id#:#Skin ID
+style#:#add_substyle#:#Neuer Substyle
+style#:#skin_id#:#Skin-ID
 style#:#skin_name#:#Skin Name
 style#:#skin#:#Skin
-style#:#style_id#:#Style ID
+style#:#style_id#:#Style-ID
 style#:#Style#:#Style
 style#:#style_name#:#Style Name
 style#:#image_dir#:#Icon-Ordner
@@ -15614,17 +15629,17 @@ style#:#default_style_set_to#:#Der Standard Style wurde geändert zu:
 style#:#personal_style_set_to#:#Der persönliche Style wurde geändert zu:
 style#:#refresh_entries#:#Einträge aktualisieren
 style#:#entries_reloaded#:#Alle Einträge wurden aktualisiert
-style#:#msg_sub_style_created#:#Der Sub Style wurde erstellt.
+style#:#msg_sub_style_created#:#Der Substyle wurde erstellt.
 style#:#style#:#Style
-style#:#sub_style_settings#:#Sub Style Zuweisung###deprecated 
+style#:#sub_style_settings#:#Substyle-Zuweisung###deprecated
 style#:#parent#:#Parent Style
-style#:#sty_substyle_of#:#Sub Style von
+style#:#sty_substyle_of#:#Substyle von
 style#:#assignment#:#Zuweisung
 style#:#remove_assignment#:#Zuweisung löschen
 style#:#reset_variables#:#Variablen zurücksetzen
 style#:#update_variables#:#Variablen aktualisieren
 style#:#less_file_updated#:#Die Less Variablen wurden aktualisiert.
-style#:#settings_of_substyle#:#Manage sub style
+style#:#settings_of_substyle#:#Substyle verwalten
 style#:#settings_of_style#:#Styles verwalten
 style#:#of_parent#:#vom Parent:
 style#:#from_skin#:#vom Skin:
@@ -15632,34 +15647,34 @@ style#:#dir_copied_from#:#Der Ordner wurde kopiert von:
 style#:#to#:#nach:
 style#:#dir_deleted#:#Der folgende Ordner wurde gelöscht:
 style#:#sty_create_new_system_style#:#Erstelle einen neuen System Style.
-style#:#sty_create_new_system_sub_style#:#Erstelle einen neuen System Sub Style.
+style#:#sty_create_new_system_sub_style#:#Erstelle einen neuen System Substyle.
 style#:#sty_import_system_style#:#Importiere bestehenden System Style aus ZIP.
 style#:#sty_copy_other_system_style#:#Klone einen bestehenden System Style.
-style#:#sub_style_id#:#Sub Style ID
-style#:#sub_style_name#:#Sub Style Name
+style#:#sub_style_id#:#Substyle-ID
+style#:#sub_style_name#:#Substyle-Name
 style#:#less_variables_file_not_included#:#Die Less Variablen Datei:
 style#:#in_main_less_file#:#ist nicht in der System Styles main Less Datei importiert:
 style#:#can_not_read_less_file#:#Less Datei kann nicht gelesen werden. Pfad:
 style#:#msg_sys_style_created#:#Die neue System Style Datei wurde erfolgreich erstellt.
-style#:#skin_id_description#:#Skins sind Behälter für Styles und Sub Styles. Die Skin ID setzt den Namen des Ordners, welcher alle Informationen zu Styles und Sub Styles beinhaltet. Die Skin ID darf sich nur aus Buchstaben, Nummern sowie Bindestrichen zusammensetzen.
+style#:#skin_id_description#:#Skins sind Behälter für Styles und Substyles. Die Skin-ID setzt den Namen des Ordners, welcher alle Informationen zu Styles und Substyles beinhaltet. Die Skin-ID darf sich nur aus Buchstaben, Nummern sowie Bindestrichen zusammensetzen.
 style#:#skin_name_description#:#Der Skin Name kann als Beschreibung für das Einsatzgebiet verwendet werden. Er wird in allen UI Elementen aufgelistet, in denen ein Skin ausgewählt werden kann.
-style#:#style_id_description#:#Die Style ID wird für Style-spezifische css- und less-Dateien unterhalb des Skin Ordners verwendet. Die Style ID darf sich nur aus Buchstaben, Nummern sowie Bindestrichen zusammensetzen.
+style#:#style_id_description#:#Die Style-ID wird für Style-spezifische css- und less-Dateien unterhalb des Skin Ordners verwendet. Die Style-ID darf sich nur aus Buchstaben, Nummern sowie Bindestrichen zusammensetzen.
 style#:#style_name_description#:#Der Style Name kann als Beschreibung für das Einsatzgebiet verwendet werden. Er wird in allen UI Elementen aufgelistet, in denen ein Skin ausgewählt werden kann.
-style#:#sub_style#:#Sub Style
-style#:#image_dir_description#:#Ordner für das Speichern von Bildern (hauptsächlich Icons) vom betreffenden Skin. Dieser Ordner kann mit anderen Styles und Sub Styles geteilt werden.
-style#:#font_dir_description#:#Ordner für das Speichern von Schriftarten vom betreffenden Skin. Dieser Ordner kann mit anderen Styles und Sub Styles geteilt werden.
-style#:#sound_dir_description#:#Ordner für das Speichern von Tönen vom betreffenden Skin. Dieser Ordner kann mit anderen Styles und Sub Styles geteilt werden.
-style#:#sub_style_parent_style_description#:#Sub Styles werden genau einem Parent Style zugewiesen. Sie werden nur den Usern angezeigt, welche auch Zugang zum Parent Style haben. Der Parent Style eines Sub Styles kann nur während der Erstellung des Sub Styles einmalig zugeordnet werden.
-style#:#sub_style_id_description#:#Die Sub Style ID wird für die betreffenden css und less Dateien verwendet. Diese sind innerhalb des betreffenden Skin Ordners. Die Sub Style ID darf sich nur aus Buchstaben, Nummern sowie Bindestrichen zusammensetzen.
-style#:#sub_style_name_description#:#Der Sub Style Name kann als Beschreibung für das Einsatzgebiet verwendet werden. Es wird in allen UI Elementen aufgelistet, welche eine Selektierung des Skins erlauben.
+style#:#sub_style#:#Substyle
+style#:#image_dir_description#:#Ordner für das Speichern von Bildern (hauptsächlich Icons) vom betreffenden Skin. Dieser Ordner kann mit anderen Styles und Substyles geteilt werden.
+style#:#font_dir_description#:#Ordner für das Speichern von Schriftarten vom betreffenden Skin. Dieser Ordner kann mit anderen Styles und Substyles geteilt werden.
+style#:#sound_dir_description#:#Ordner für das Speichern von Tönen vom betreffenden Skin. Dieser Ordner kann mit anderen Styles und Substyles geteilt werden.
+style#:#sub_style_parent_style_description#:#Substyles werden genau einem Parent Style zugewiesen. Sie werden nur den Usern angezeigt, welche auch Zugang zum Parent Style haben. Der Parent Style eines Substyles kann nur während der Erstellung des Substyles einmalig zugeordnet werden.
+style#:#sub_style_id_description#:#Die Substyle-ID wird für die betreffenden css und less Dateien verwendet. Diese sind innerhalb des betreffenden Skin Ordners. Die Substyle-ID darf sich nur aus Buchstaben, Nummern sowie Bindestrichen zusammensetzen.
+style#:#sub_style_name_description#:#Der Substyle-Name kann als Beschreibung für das Einsatzgebiet verwendet werden. Es wird in allen UI Elementen aufgelistet, welche eine Selektierung des Skins erlauben.
 style#:#system_style_activation_description#:#Aktive System Styles können bestimmten Benutzern zugewiesen, oder durch diese ausgewählt werden wenn die betreffende Einstellung (Benutzerverwaltung / Einstellungen / Standardfelder / Standard-Skin/ -Style) aktiviert ist.
 style#:#system_style_default_description#:#Wenn aktiviert, ist dieser Style als Standard System Style festgelegt. Der Standard System Style wird verwendet, sofern der Benutzer noch keinen eigenen Style zugewiesen hat, oder der Benutzer nicht eingeloggt ist.
 style#:#system_style_personal_description#:#Wenn aktiviert, ist dieser Style als persönlicher Style festgelegt. Das stellt eine gute Hilfe dar, wenn aktuelle Änderungen am Skin mitverfolgt werden möchten.
 style#:#less_compile_failed#:#Die Less Datei konnte nicht kompiliert werden. Lessc muss dafür installiert und der Pfad im ILIAS setup richtig gesetzt sein.
 style#:#zip_export_failed#:#Der ZIP Export ist mit folgender Error Meldung fehlgeschlagen:
-style#:#no_style_selected#:#Es wurde kein Sub Style ausgewählt.
-style#:#adapt_less#:#Anpassung der Less Datei
-style#:#adapt_less_description#:#Dies ist die Darstellung aller less Variablen aus dem aktuellen Skin. Variablennamen und Beschreibungen sind direkt aus den Dateien ausgelesen und daher nur in Originalsprache vorhanden. Der ausgewählte Style wird beim Aktualisieren/Zurücksetzen der Variablen vollständig neu kompiliert. Das Zurücksetzten der Variablen erstellt eine exakte Kopie des ursprünglichen "delos style".
+style#:#no_style_selected#:#Es wurde kein Substyle ausgewählt.
+style#:#adapt_less#:#Anpassung der Less-Datei
+style#:#adapt_less_description#:#Dies ist die Darstellung aller less-Variablen aus dem aktuellen Skin. Variablennamen und Beschreibungen sind direkt aus den Dateien ausgelesen und daher nur in Originalsprache vorhanden. Der ausgewählte Style wird beim Aktualisieren/Zurücksetzen der Variablen vollständig neu kompiliert. Das Zurücksetzten der Variablen erstellt eine exakte Kopie des ursprünglichen "delos style".
 style#:#adapt_icons_description#:#Alle svg Icons, welche im Ordner images gefunden wurden, werden hier aufgelistet. Wenn eine Farbe geändert wird, ist dies in allen hier aufgelisteten Icons sofort ersichtlich.
 style#:#adapt_icons#:#Anpassung der Iconfarben
 style#:#invalid_less_path#:#Der angegebene lessc Pfad ist ungültig oder kann vom Webserver nicht gelesen und ausgeführt werden. Die lessc Datei unter dem angegebenen Pfad (oder die verlinkte Datei, falls der Pfad auf einen symlink verweist) muss vom Webserver gelesen und ausgeführt werden können.
@@ -15679,9 +15694,9 @@ style#:#color#:#Farbe
 style#:#adapt_icon#:#Anpassung der Icons
 style#:#adapt_icon_description#:#Passe die Iconfarbe oder das Icon an.
 style#:#preview#:#Vorschau
-style#:#icons_gallery#:#Icon Galerie
-style#:#cant_delete_style_with_substyles#:#Styles mit Sub Styles können nicht gelöscht werden.
-style#:#style_assignments_deleted#:#Style Zuweisungen des folgenden Sub Style wurden gelöscht:
+style#:#icons_gallery#:#Icon-Galerie
+style#:#cant_delete_style_with_substyles#:#Styles mit Substyles können nicht gelöscht werden.
+style#:#style_assignments_deleted#:#Style Zuweisungen des folgenden Substyle wurden gelöscht:
 style#:#skin_id_exists#:#Es existiert bereits ein Skin mit dieser ID.
 style#:#usages#:#Verwendungen:
 exc#:#exc_individual_deadline#:#Individuelle Frist
@@ -15876,12 +15891,20 @@ form#:#err_invalid_input#:#Es wurde ein ungültiger Wert übertragen. Bitte übe
 chatroom#:#chat_osc_no_conv#:#Keine Konversationen vorhanden.
 chatroom#:#chat_osc_no_sub_directory#:#Relativer Pfad
 chatroom#:#chat_osc_no_sub_directory_info#:#Wird der Chatserver so konfiguriert, dass der zugehörige URL einen Unterpfad der Form "http(s)://[IP/Domain]/[UNTERVERZEICHNIS]" enthält, muss hier das relative [UNTERVERZEICHNIS] angegeben werden. In den meisten Szenarien kann dieses Feld leer gelassen werden.
+chatroom#:#chat_deletion_section_head#:#Löschen alter Nachrichten
+chatroom#:#chat_deletion_disabled#:#Deaktiviert
+chatroom#:#chat_deletion_interval#:#Intervall
+chatroom#:#chat_deletion_interval_info#:#Falls gewählt, werden Nachrichten im Magazin-Chat und im On-Screen-Chat gelöscht, sofern sie älter als der hier definierte Schwellenwert sind.
+chatroom#:#chat_deletion_interval_unit#:#Einheit
+chatroom#:#chat_deletion_interval_value#:#Wert
+chatroom#:#chat_deletion_ival_max_val#:#Der maximale Wert für die gewählte Einheit '%s' ist: %s
+chatroom#:#chat_deletion_interval_run_at_info#:#Geben Sie hier den Zeitpunkt im Format 'HH:MM' an (z.B. 23:30), wann der Server das Löschen alter Nachrichten durchführen soll.
 prg#:#prg_points_reachable#:#Erreichbare Punkte
 mail#:#mail_members_search_continue#:#Weiter
 copg#:#copg_confirm_el_deletion#:#Sollen die ausgewählten Elemente wirklich gelöscht werden?
 crs#:#crs_loc_err_stat_tst_offline#:#Nicht alle Tests sind Online
 itgr#:#itgr_desc_info#:#Die Beschreibung wird bei der Anzeige des Objekteblocks nicht mit ausgegeben.
-assessment#:#esusay_scoring_mode_keyword_relation_any_desc#:#Für jedes gefundede Keyword werden die entsprechenden Punkte automatisch vergeben.###deprecated 
+assessment#:#essay_scoring_mode_keyword_relation_any_desc#:#Für jedes gefundede Keyword werden die entsprechenden Punkte automatisch vergeben.###deprecated 
 common#:#object_purchased_date#:#Kaufdatum###deprecated 
 dcl#:#dcl_msg_tableviews_order_updated#:#Anordnung der Ansichten aktualisiert
 dcl#:#dcl_create_table#:#Tabelle erstellen###deprecated 
@@ -15914,11 +15937,11 @@ rbac#:#crs_manage_members#:#Mitglieder eines Kurses verwalten
 prg#:#prg_successful_img_alt#:#successful###deprecated 
 prg#:#prg_in_progress_img_alt#:#in progress###deprecated 
 survey#:#error_save_code#:#Value not saved properly. <b>The E- mail: '%s' is not valid</b>. First name: '%s', Last name: '%s'.<br>###07 02 2017 new variable
-survey#:#cannot_send_emails#:#You do not possess sufficient permissions to send emails.###07 02 2017 new variable
+survey#:#cannot_send_emails#:#Sie besitzen nicht die Berechtigung, Mails zu versenden.
 rbac#:#book_copy#:#Buchungspool kopieren
-mep#:#mobs_black_list_file_types#:#Verbotene Dateitypen
-mep#:#mobs_black_list_file_types_info#:#Diese List schränkt die Menge der erlaubten Dateitypen ein. Tragen Sie dazu die jeweilige Dateiendungen mit Komma getrennt ein (z.B. jpg,gif). Dies ist sinnvoll, wenn die vorangegangene Option leer ist (alle Typen erlaubt).
-form#:#form_msg_file_type_is_not_allowed#:#Dieser Dateityp ist nicht erlaubt.
-common#:#file_no_valid_file_type#:#Dieser Dateityp ist nicht erlaubt.
-common#:#file_some_invalid_file_types_removed#:#Einige Dateitypen sind nicht erlaubt und wurden entfernt.
-ecs#:#ecs_member_auth_type#:#Authentifizierungsmethode für Kursmitglieder
+exc#:#exc_settings_feedback_mail_info#:#Tutoren geben ihre Rückmeldungen zur Abgabe in ein Mail-Formular ein. Die Mail wird dem entsprechenden Teilnehmer gesendet.
+exc#:#exc_settings_feedback_file_info#:#Tutoren laden ihre Datei hoch. Der jeweilige Teilnehmer erhält eine Benachrichtigung und die Datei wird ihm in der Übungseinheiten-Übersicht angezeigt.
+exc#:#exc_settings_feedback_text_info#:#Tutoren geben ihre Rückmeldungen in ein Textfeld ein. Der jeweilige Teilnehmer erhält eine Benachrichtigung und der Text wird ihm in der Übungseinheiten-Übersicht angezeigt.
+chatroom#:#chat_deletion_interval_run_at#:#Time###25 08 2017 new variable
+wiki#:#wiki_pg_list_no_search_fields#:#Es befinden sich keine durchsuchbaren Metadatenfelder in den Metadatensätzen des Wikis.
+content#:#cont_transl_master_language_not_allowed#:#Um eine Übersetzung zu importieren, müssen sie zumindest eine zusätzliche Sprache unter "Einstellungen" > "Mehrsprachigkeit" aktivieren.

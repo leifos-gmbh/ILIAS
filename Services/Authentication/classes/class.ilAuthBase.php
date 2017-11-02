@@ -85,7 +85,7 @@ abstract class ilAuthBase
 	{
 		ilSessionControl::initSession();
 
-		$this->enableLogging = false;
+		$this->enableLogging = true;
 		//$this->enableLogging = false;
 
 		if ($this->enableLogging)

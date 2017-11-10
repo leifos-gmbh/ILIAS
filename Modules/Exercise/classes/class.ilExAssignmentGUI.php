@@ -19,7 +19,7 @@ class ilExAssignmentGUI
 	function __construct(ilObjExercise $a_exc)
 	{
 		$this->exc = $a_exc;
-	}	
+	}
 	
 	/**
 	 * Get assignment header for overview
@@ -29,7 +29,10 @@ class ilExAssignmentGUI
 		global $lng, $ilUser;
 		
 		$lng->loadLanguageModule("exc");
-		
+
+		include_once("./Modules/Exercise/classes/class.ilExcAssMemberState.php");
+		$state = ilExcAssMemberState::getInstanceByIds($a_ass->getId(), $ilUser->getId());
+
 		$tpl = new ilTemplate("tpl.assignment_head.html", true, true, "Modules/Exercise");
 		
 		// we are completely ignoring the extended deadline here
@@ -38,57 +41,51 @@ class ilExAssignmentGUI
 		
 		// :TODO: meaning of "ended on"
 		$dl = max($a_ass->getDeadline(), $idl);		
-		if ($dl &&
-			$dl < time())
+		// if ($dl &&
+		//	$dl < time())
+		if ($state->exceededOfficialDeadline())
 		{
 			$tpl->setCurrentBlock("prop");
 			$tpl->setVariable("PROP", $lng->txt("exc_ended_on"));
-			$tpl->setVariable("PROP_VAL",
-				ilDatePresentation::formatDate(new ilDateTime($a_ass->getDeadline(),IL_CAL_UNIX)));
+			$tpl->setVariable("PROP_VAL", $state->getCommonDeadlinePresentation());
 			$tpl->parseCurrentBlock();
 			
-			// #14077
-			if($a_ass->getPeerReview() &&
-				$a_ass->getPeerReviewDeadline())
+			// #14077						// this currently shows the feedback deadline during grace period
+			if($state->getPeerReviewDeadline())
 			{								
 				$tpl->setCurrentBlock("prop");
 				$tpl->setVariable("PROP", $lng->txt("exc_peer_review_deadline"));
-				$tpl->setVariable("PROP_VAL",
-					ilDatePresentation::formatDate(new ilDateTime($a_ass->getPeerReviewDeadline(),IL_CAL_UNIX)));
+				$tpl->setVariable("PROP_VAL", $state->getPeerReviewDeadlinePresentation());
 				$tpl->parseCurrentBlock();
 			}		
 		}
-		else if ($a_ass->notStartedYet())
+		else if (!$state->hasGenerallyStarted())
 		{
 			$tpl->setCurrentBlock("prop");
 			$tpl->setVariable("PROP", $lng->txt("exc_starting_on"));
-			$tpl->setVariable("PROP_VAL",
-				ilDatePresentation::formatDate(new ilDateTime($a_ass->getStartTime(),IL_CAL_UNIX)));
+			$tpl->setVariable("PROP_VAL", $state->getGeneralStartPresentation());
 			$tpl->parseCurrentBlock();
 		}
 		else
-		{					
-			$time_str = $this->getTimeString($idl);
+		{
 			$tpl->setCurrentBlock("prop");
 			$tpl->setVariable("PROP", $lng->txt("exc_time_to_send"));
-			$tpl->setVariable("PROP_VAL", $time_str);
+			$tpl->setVariable("PROP_VAL", $state->getRemainingTimePresentation());
 			$tpl->parseCurrentBlock();
 	
-			if ($a_ass->getDeadline())
+			if ($state->getCommonDeadline() > 0)
 			{
 				$tpl->setCurrentBlock("prop");
 				$tpl->setVariable("PROP", $lng->txt("exc_edit_until"));
-				$tpl->setVariable("PROP_VAL",
-					ilDatePresentation::formatDate(new ilDateTime($a_ass->getDeadline(),IL_CAL_UNIX)));
+				$tpl->setVariable("PROP_VAL", $state->getCommonDeadlinePresentation());
 				$tpl->parseCurrentBlock();
 			}
 			
-			if ($idl && $idl != $a_ass->getDeadline())
+			if ($state->getIndividualDeadline() > 0)
 			{
 				$tpl->setCurrentBlock("prop");
 				$tpl->setVariable("PROP", $lng->txt("exc_individual_deadline"));
-				$tpl->setVariable("PROP_VAL",
-					ilDatePresentation::formatDate(new ilDateTime($idl,IL_CAL_UNIX)));
+				$tpl->setVariable("PROP_VAL", $state->getIndividualDeadlinePresentation());
 				$tpl->parseCurrentBlock();
 			}		
 		}
@@ -113,10 +110,17 @@ class ilExAssignmentGUI
 	 * Get assignment body for overview
 	 */
 	function getOverviewBody(ilExAssignment $a_ass)
-	{		
+	{
+		global $DIC;
+
+		$ilUser = $DIC->user();
+
 		$this->current_ass_id = $a_ass->getId();
 		
 		$tpl = new ilTemplate("tpl.assignment_body.html", true, true, "Modules/Exercise");
+
+		include_once("./Modules/Exercise/classes/class.ilExcAssMemberState.php");
+		$state = ilExcAssMemberState::getInstanceByIds($a_ass->getId(), $ilUser->getId());
 
 		include_once("./Services/InfoScreen/classes/class.ilInfoScreenGUI.php");
 		include_once("./Services/UIComponent/Button/classes/class.ilLinkButton.php");
@@ -132,7 +136,7 @@ class ilExAssignmentGUI
 			$this->addPublicSubmissions($info, $a_ass);
 		}
 		
-		if (!$a_ass->notStartedYet())
+		if ($state->hasGenerallyStarted())
 		{
 			$this->addFiles($info, $a_ass);
 			$this->addSubmission($info, $a_ass);			
@@ -146,9 +150,12 @@ class ilExAssignmentGUI
 	
 	protected function addInstructions(ilInfoScreenGUI $a_info, ilExAssignment $a_ass)
 	{		
-		global $lng;
-		
-		if (!$a_ass->notStartedYet())
+		global $lng, $ilUser;
+
+		include_once("./Modules/Exercise/classes/class.ilExcAssMemberState.php");
+		$state = ilExcAssMemberState::getInstanceByIds($a_ass->getId(), $ilUser->getId());
+
+		if ($state->areInstructionsVisible())
 		{			
 			$inst = $a_ass->getInstruction();	
 			if(trim($inst))
@@ -169,23 +176,26 @@ class ilExAssignmentGUI
 	{		
 		global $lng, $ilUser;
 		
-		$idl = $a_ass->getPersonalDeadline($ilUser->getId());		
-		
+		$idl = $a_ass->getPersonalDeadline($ilUser->getId());
+
+		include_once("./Modules/Exercise/classes/class.ilExcAssMemberState.php");
+		$state = ilExcAssMemberState::getInstanceByIds($a_ass->getId(), $ilUser->getId());
+
 		$a_info->addSection($lng->txt("exc_schedule"));
-		if ($a_ass->getStartTime() > 0)
+		if ($state->getGeneralStart() > 0)
 		{
-			$a_info->addProperty($lng->txt("exc_start_time"),
-				ilDatePresentation::formatDate(new ilDateTime($a_ass->getStartTime(),IL_CAL_UNIX)));
+			$a_info->addProperty($lng->txt("exc_start_time"), $state->getGeneralStartPresentation());
 		}
-		
-		// extended deadline info/warning						
+
+		// extended deadline info/warning
 		$late_dl = "";
-		if ($idl &&
-			$idl < time() &&				
-			$a_ass->beforeDeadline()) // ext dl is last deadline
+		//if ($idl &&
+		//	$idl < time() &&
+		//	$a_ass->beforeDeadline()) // ext dl is last deadline
+		if ($state->inLateSubmissionPhase())
 		{				
 			// extended deadline date should not be presented anywhere
-			$late_dl = ilDatePresentation::formatDate(new ilDateTime($idl, IL_CAL_UNIX));
+			$late_dl = $state->getOfficialDeadlinePresentation();
 			$late_dl = "<br />".sprintf($lng->txt("exc_late_submission_warning"), $late_dl);								
 			$late_dl = '<span class="warning">'.$late_dl.'</span>';									
 		}			

@@ -164,6 +164,34 @@ class ilExcIndividualDeadline
 	}
 
 
+	/**
+	 * Get starting timestamp data for an assignment.
+	 *
+	 * This is mainly used by ilExAssignment to determine the calculated deadlines
+	 *
+	 * @param $a_ass_id
+	 * @return array
+	 */
+	static public function getStartingTimestamps($a_ass_id)
+	{
+		global $DIC;
+
+		$ilDB = $DIC->database();
+		$res = array();
+
+		$set = $ilDB->query("SELECT * FROM exc_idl".
+			" WHERE ass_id = ".$ilDB->quote($a_ass_id, "integer"));
+		while ($row = $ilDB->fetchAssoc($set))
+		{
+			$res[] = array("member_id" => $row["member_id"],
+				"is_team" => $row["is_team"],
+				"starting_ts" => $row["starting_ts"]);
+		}
+
+		return $res;
+	}
+
+
 }
 
 ?>

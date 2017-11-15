@@ -142,6 +142,17 @@ class ilExcAssMemberState
 	}
 
 	/**
+	 * Get individual deadline object
+	 *
+	 * @return ilExcIndividualDeadline
+	 */
+	function getIndividualDeadlineObject()
+	{
+		return $this->idl;
+	}
+	
+	
+	/**
 	 * Get general start
 	 *
 	 * @param
@@ -207,6 +218,34 @@ class ilExcAssMemberState
 			}
 		}
 		return $calculated_deadline;
+	}
+
+	/**
+	 * Get relative deadline
+	 *
+	 * @return int
+	 */
+	function getRelativeDeadline()
+	{
+		if ($this->assignment->getDeadlineMode() == ilExAssignment::DEADLINE_RELATIVE)
+		{
+			return $this->assignment->getRelativeDeadline();
+		}
+		return 0;
+	}
+
+	/**
+	 * Get relative deadline presentation
+	 *
+	 * @return string
+	 */
+	function getRelativeDeadlinePresentation()
+	{
+		if ($this->assignment->getDeadlineMode() == ilExAssignment::DEADLINE_RELATIVE)
+		{
+			return $this->getRelativeDeadline()." ".$this->lng->txt("days");
+		}
+		return "";
 	}
 
 	/**
@@ -387,6 +426,22 @@ class ilExcAssMemberState
 	}
 
 	/**
+	 * Is submission currently allowed
+	 *
+	 * @return bool
+	 */
+	function isPeerReviewAllowed()
+	{
+		if ($this->assignment->getPeerReview() && $this->hasSubmissionEndedForAllUsers()
+			&& ($this->getPeerReviewDeadline() == 0 || $this->getPeerReviewDeadline() > $this->time))
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Get common deadline presentation
 	 *
 	 * @return string
@@ -417,6 +472,7 @@ class ilExcAssMemberState
 	 * @param
 	 * @return
 	 */
+	/*
 	function getLateSubmissionWarning()
 	{
 		$lng = $this->lng;
@@ -432,7 +488,7 @@ class ilExcAssMemberState
 		}
 
 		return $late_dl;
-	}
+	}*/
 	
 	/**
 	 * In late submission phase
@@ -477,12 +533,40 @@ class ilExcAssMemberState
 	 */
 	function hasSubmissionEnded()
 	{
+		if ($this->getEffectiveDeadline() == 0)
+		{
+			return false;
+		}
+
 		if ($this->time > $this->getEffectiveDeadline())
 		{
 			return true;
 		}
 		return false;
 	}
+
+	/**
+	 * Has submission ended for all users
+	 *
+	 * @param
+	 * @return
+	 */
+	function hasSubmissionEndedForAllUsers()
+	{
+		$global_subm_end = max($this->getEffectiveDeadline(), $this->assignment->getLastPersonalDeadline());
+
+		if ($global_subm_end == 0)
+		{
+			return false;
+		}
+
+		if ($this->time > $global_subm_end)
+		{
+			return true;
+		}
+		return false;
+	}
+
 
 
 	/**

@@ -224,7 +224,7 @@ class ilExAssignment
 	}
 	
 	/**
-	 * Get individual deadline
+	 * Get individual deadline (max of common or idl (team) deadline = Official Deadline)
 	 * @param int $a_user_id
 	 * @return int
 	 */
@@ -261,7 +261,7 @@ class ilExAssignment
 	 * 
 	 * @return int
 	 */
-	protected function getLastPersonalDeadline()
+	public function getLastPersonalDeadline()
 	{
 		global $ilDB;
 		
@@ -1741,15 +1741,15 @@ class ilExAssignment
 	
 	// status
 	
-	public function afterDeadline()
+	public function afterDeadline()									// like: after effective deadline (for single user), no deadline: true
 	{
 		global $ilUser;
 				
 		// :TODO: always current user?
-		$idl = $this->getPersonalDeadline($ilUser->getId());
+		$idl = $this->getPersonalDeadline($ilUser->getId());		// official deadline
 		
 		// no deadline === true
-		$deadline = max($this->deadline, $this->deadline2, $idl);
+		$deadline = max($this->deadline, $this->deadline2, $idl);	// includes grace period
 		return ($deadline - time() <= 0);
 	}
 	
@@ -1766,16 +1766,16 @@ class ilExAssignment
 		$deadline = max($this->deadline, $this->deadline2, $idl);		
 		
 		// #18271 - afterDeadline() does not handle last personal deadline
-		if($idl && $deadline == $idl)
+		if($idl && $deadline == $idl)								// after effective deadline of all users
 		{
 			return ($deadline - time() <= 0);
 		}
 		
-		return ($deadline > 0 && 
+		return ($deadline > 0 && 									// like: after effective deadline (for single user), except: no deadline false
 			$this->afterDeadline());	
 	}
 	
-	public function beforeDeadline()
+	public function beforeDeadline()								// like: before effective deadline (for all users), no deadline: true
 	{
 		// no deadline === true
 		return !$this->afterDeadlineStrict();
@@ -1970,6 +1970,37 @@ class ilExAssignment
 		}
 		
 		return false;		
+	}
+
+	/**
+	 * Get calculated deadlines for user/team members. These arrays will contain no entries, if team or user
+	 * has not started the assignment yet.
+	 *
+	 * @return array[array] contains two arrays one with key "user", second with key "team", each one has
+	 * 						member id as keys and calculated deadline as value
+	 */
+	public function getCalculatedDeadlines()
+	{
+		$calculated_deadlines = array(
+			"user" => array(),
+			"team" => array()
+		);
+
+		if ($this->getRelativeDeadline() && $this->getDeadlineMode() == self::DEADLINE_RELATIVE)
+		{
+			include_once("./Modules/Exercise/classes/class.ilExcIndividualDeadline.php");
+			foreach (ilExcIndividualDeadline::getStartingTimestamps($this->getId()) as $ts)
+			{
+				$type = $ts["is_team"]
+					? "team"
+					: "user";
+
+				$calculated_deadlines[$type][$ts["member_id"]] = array(
+					"calculated_deadline" => $ts["starting_ts"] + ($this->getRelativeDeadline() * 24 * 60 * 60)
+				);
+			}
+		}
+		return $calculated_deadlines;
 	}
 }
 

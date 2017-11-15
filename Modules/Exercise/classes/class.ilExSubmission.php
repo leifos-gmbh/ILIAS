@@ -24,6 +24,9 @@ class ilExSubmission
 		$this->user_id = $a_user_id;	
 		$this->is_tutor = (bool)$a_is_tutor;
 		$this->public_submissions = (bool)$a_public_submissions;
+
+		include_once("./Modules/Exercise/classes/class.ilExcAssMemberState.php");
+		$this->state = ilExcAssMemberState::getInstanceByIds($a_ass->getId(), $a_user_id);
 		
 		if($a_ass->hasTeam())
 		{
@@ -151,8 +154,7 @@ class ilExSubmission
 	public function canSubmit()
 	{
 		return ($this->isOwner() &&
-			!$this->assignment->notStartedYet() &&
-			$this->assignment->beforeDeadline());
+			$this->state->isSubmissionAllowed());
 	}
 	
 	public function canView()
@@ -246,7 +248,8 @@ class ilExSubmission
 	
 	protected function isLate()
 	{
-		$dl = $this->assignment->getPersonalDeadline($this->getUserId());		
+		$dl = $this->state->getOfficialDeadline();
+		//$dl = $this->assignment->getPersonalDeadline($this->getUserId());
 		return ($dl && $dl < time());		
 	}
 	

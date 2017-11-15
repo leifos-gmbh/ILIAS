@@ -26,9 +26,9 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 	
 	// needs PH P5.6 for array support
 	protected $cols_mandatory = array("name", "status");
-	protected $cols_default = array("image", "login", "submission_date", "idl");
+	protected $cols_default = array("image", "login", "submission_date", "idl", "calc_deadline");
  	protected $cols_order = array("image", "name", "login", "team_members", 
-			"sent_time", "submission", "idl", "status", "mark", "status_time", 
+			"sent_time", "submission", "calc_deadline", "idl", "status", "mark", "status_time",
 			"feedback_time", "comment", "notice");
 	
 	/**
@@ -384,8 +384,14 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 							? ilDatePresentation::formatDate(new ilDateTime($a_row[$col], IL_CAL_UNIX))
 							: "&nbsp;");
 					break;
-				
-								
+
+				case "calc_deadline":
+					$this->tpl->setVariable("VAL_".strtoupper($col),
+						$a_row[$col]
+							? ilDatePresentation::formatDate(new ilDateTime($a_row[$col], IL_CAL_UNIX))
+							: "&nbsp;");
+					break;
+
 				case "mark":	
 					if($has_no_team_yet)
 					{

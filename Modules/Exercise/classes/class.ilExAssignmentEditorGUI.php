@@ -378,7 +378,7 @@ class ilExAssignmentEditorGUI
 					$a_form->getInput("peer"))
 				{
 					$a_form->getItemByPostVar("peer")
-						->setAlert($lng->txt("exc_needs_deadline"));
+						->setAlert($lng->txt("exc_needs_fixed_deadline"));
 					$valid = false;
 				}			
 				// global feedback

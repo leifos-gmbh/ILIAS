@@ -158,14 +158,20 @@ class ilDownloadFilesBackgroundTask
 			{
 				$this->has_files = true;
 			}
-			foreach($files as $file_with_absolut_path)
+			foreach($files as $file)
 			{
-				$basename = ilUtil::getASCIIFilename(basename($file_with_absolut_path));
+				$source_dir = $file->getDirectory();
+				$source_file = $file->getFSName();
+				$target_file = $file->getName();
+
+				$basename = ilUtil::getASCIIFilename(basename($target_file));
+
 				$def->addCopyDefinition(
-					$file_with_absolut_path,
-					$folder_date.'/'.$folder_app.'/'.$basename
+					$source_dir."/".$source_file,
+					$folder_date."/".$folder_app."/".$basename
 				);
-				$this->logger->debug('Added new copy definition: ' . $folder_date.'/'.$folder_app.'/'.$basename. ' -> '. $file_with_absolut_path);
+
+				$this->logger->debug('Added new copy definition: ' . $folder_date.'/'.$folder_app.'/'.$basename. ' -> '. $source_dir."/".$source_file);
 			}
 			
 		}

@@ -112,6 +112,7 @@ class ilFSWebStorageExercise extends ilFileSystemStorage
 					'name'     => $file,
 					'size'     => filesize($this->path.'/'.$file),
 					'ctime'    => filectime($this->path.'/'.$file),
+					'directory'=> $this->path,
 					'fullpath' => $this->path.'/'.$file,
 					'order'    => $files_order[$file]["order_nr"] ? $files_order[$file]["order_nr"] : 0
 					);

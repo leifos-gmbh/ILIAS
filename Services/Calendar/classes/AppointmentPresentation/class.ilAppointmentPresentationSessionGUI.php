@@ -79,25 +79,23 @@ class ilAppointmentPresentationSessionGUI extends ilAppointmentPresentationGUI i
 			$this->addListItemProperty($this->lng->txt("event_tutor_data"), implode(", ", $str_lecturer));
 		}
 
-		$eventItems = ilObjectActivation::getItemsByEvent($cat_info['obj_id']);
-		if(count($eventItems))
+		//$files = ilObjectActivation::getItemsByEvent($cat_info['obj_id']);
+		$file_handler = ilAppointmentFileHandlerFactory::getInstance($this->appointment);
+		$files = $file_handler->getFiles();
+		if(count($files))
 		{
 			include_once('./Services/Link/classes/class.ilLink.php');
+			$this->has_files = true;
 			$str = array();
-			foreach ($eventItems as $file)
+			foreach ($files as $file)
 			{
-				if($file['type'] == "file") {
-					$this->has_files = true;
-					$href = ilLink::_getStaticLink($file['ref_id'], "file", true,"download");
-					$str[$file['title']] = $r->render($f->button()->shy($file['title'], $href));
-				}
+				$href = ilLink::_getStaticLink($file->getRefId(), "file", true,"download");
+				$str[$file->getName()] = $r->render($f->button()->shy($file->getName(), $href));
 			}
-			if($this->has_files)
-			{
-				ksort($str, SORT_NATURAL | SORT_FLAG_CASE);
-				$this->addInfoProperty($this->lng->txt("files"), implode("<br>", $str));
-				$this->addListItemProperty($this->lng->txt("files"), implode(", ", $str));
-			}
+
+			ksort($str, SORT_NATURAL | SORT_FLAG_CASE);
+			$this->addInfoProperty($this->lng->txt("files"), implode("<br>", $str));
+			$this->addListItemProperty($this->lng->txt("files"), implode(", ", $str));
 		}
 
 		$this->addAction($this->lng->txt("sess_open"), ilLink::_getStaticLink($ref_id));

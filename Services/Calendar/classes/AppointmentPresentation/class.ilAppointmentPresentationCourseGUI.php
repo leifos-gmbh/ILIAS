@@ -21,6 +21,8 @@ class ilAppointmentPresentationCourseGUI extends ilAppointmentPresentationGUI im
 		global $DIC;
 
 		include_once('./Services/Link/classes/class.ilLink.php');
+		include_once "./Modules/Course/classes/class.ilObjCourse.php";
+		include_once "./Modules/Course/classes/class.ilCourseFile.php";
 
 		$this->lng->loadLanguageModule("crs");
 
@@ -28,13 +30,12 @@ class ilAppointmentPresentationCourseGUI extends ilAppointmentPresentationGUI im
 
 		$this->ctrl = $DIC->ctrl();
 
-		include_once "./Modules/Course/classes/class.ilObjCourse.php";
-		include_once "./Modules/Course/classes/class.ilCourseFile.php";
-
 		$cat_info = $this->getCatInfo();
 
 		$crs = new ilObjCourse($cat_info['obj_id'], false);
-		$files = ilCourseFile::_readFilesByCourse($cat_info['obj_id']);
+		$file_handler = ilAppointmentFileHandlerFactory::getInstance($this->appointment);
+		$files = $file_handler->getFiles();
+		//$files = ilCourseFile::_readFilesByCourse($cat_info['obj_id']);
 
 		// get course ref id (this is possible, since courses only have one ref id)
 		$refs = ilObject::_getAllReferences($cat_info['obj_id']);
@@ -65,11 +66,11 @@ class ilAppointmentPresentationCourseGUI extends ilAppointmentPresentationGUI im
 				$links = array();
 				foreach ($files as $file)
 				{
-					$this->ctrl->setParameter($this, 'file_id', $file->getFileId());
-					$this->ctrl->setParameterByClass('ilobjcoursegui', 'file_id', $file->getFileId());
+					$this->ctrl->setParameter($this, 'file_id', $file->getId());
+					$this->ctrl->setParameterByClass('ilobjcoursegui', 'file_id', $file->getId());
 					$this->ctrl->setParameterByClass('ilobjcoursegui', 'ref_id', $crs_ref_id);
 
-					$file_name = $file->getFileName();
+					$file_name = $file->getName();
 					$links[$file_name] = $this->ui->renderer()->render(($this->ui->factory()->button()->shy($file_name,
 						$this->ctrl->getLinkTargetByClass(array("ilRepositoryGUI", "ilobjcoursegui"), 'sendfile'))));
 

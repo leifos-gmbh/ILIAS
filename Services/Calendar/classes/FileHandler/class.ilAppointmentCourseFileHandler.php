@@ -17,7 +17,7 @@ class ilAppointmentCourseFileHandler extends ilAppointmentBaseFileHandler implem
 	 * Get files (for appointment)
 	 *
 	 * @param
-	 * @return
+	 * @return array ilAppointmentFileObject
 	 */
 	function getFiles()
 	{
@@ -36,7 +36,20 @@ class ilAppointmentCourseFileHandler extends ilAppointmentBaseFileHandler implem
 
 			foreach ($course_files as $course_file)
 			{
-				$files[] = $course_file->getInfoDirectory()."/".$course_file->getFileName();
+				/*$files[] = array(
+					'source_directory' => $course_file->getInfoDirectory(),
+					'source_file_name' => $course_file->getFileId(),
+					'source_file_id' => $course_file->getFileId(),
+					'target_file_name' => $course_file->getFileName()
+				);*/
+
+				include_once("./Services/Calendar/classes/FileHandler/class.ilAppointmentFileObject.php");
+				$files[] = new ilAppointmentFileObject(
+								$course_file->getFileId(),
+								$course_file->getInfoDirectory(),
+								$course_file->getFileId(),
+								$course_file->getFileName()
+							);
 			}
 		}
 

@@ -27,9 +27,15 @@ class ilAppointmentExerciseFileHandler extends ilAppointmentBaseFileHandler impl
 		$files = array();
 		if(count($ass_files))
 		{
+			include_once("./Services/Calendar/classes/FileHandler/class.ilAppointmentFileObject.php");
+
 			foreach($ass_files as $ass_file)
 			{
-				$files[] = $ass_file['fullpath'];
+				$files[] = new ilAppointmentFileObject(
+								"",
+								$ass_file['directory'],
+								$ass_file['name']
+							);
 			}
 		}
 		return $files;

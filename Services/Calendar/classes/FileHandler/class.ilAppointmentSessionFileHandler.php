@@ -43,9 +43,19 @@ class ilAppointmentSessionFileHandler extends ilAppointmentBaseFileHandler imple
 						$filename = $file->getDirectory($file->getVersion())."/".$file->getFileName();
 						if (@!is_file($filename))
 						{
-							$filename = $file->getDirectory()."/".$file->getFileName();
+							$file_directory = $file->getDirectory();
+						} else {
+							$file_directory = $file->getDirectory($file->getVersion());
 						}
-						$files[] = $filename;
+
+						include_once("./Services/Calendar/classes/FileHandler/class.ilAppointmentFileObject.php");
+						$files[] = new ilAppointmentFileObject(
+										$file->getId(),
+										$file_directory,
+										$file->getFileName(),
+										$file->getFileName(),
+										$file->getRefId()
+									);
 					}
 				}
 			}

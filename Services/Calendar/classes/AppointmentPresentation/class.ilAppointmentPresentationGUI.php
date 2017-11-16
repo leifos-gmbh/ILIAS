@@ -151,7 +151,8 @@ class ilAppointmentPresentationGUI  implements ilCalendarAppointmentPresentation
 
 	public function getCatInfo()
 	{
-		$cat_id = $this->getCatId($this->appointment['event']->getEntryId());
+		$cal_entry_id = $this->appointment['event']->getEntryId();
+		$cat_id = $this->getCatId($cal_entry_id);
 		//$cat_info = ilCalendarCategories::_getInstance()->getCategoryInfo($cat_id);
 
 		$cat = ilCalendarCategory::getInstanceByCategoryId($cat_id);

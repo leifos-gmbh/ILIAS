@@ -64,6 +64,14 @@ class ilAppointmentPresentationConsultationHoursGUI extends ilAppointmentPresent
 			}
 		}
 
+		//files to download
+		$file_handler = ilAppointmentFileHandlerFactory::getInstance($a_app);
+		$files = $file_handler->getFiles();
+		//count number of files
+		if (count($files)) {
+			$this->has_files = true;
+		}
+
 		// owner
 		$this->addInfoProperty($this->lng->txt('cal_ch_booking_owner'), ilObjUser::_lookupFullname($booking->getObjId()));
 

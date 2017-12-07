@@ -799,6 +799,14 @@ class ilObjSurveyGUI extends ilObjectGUI
 				}
 
 				$this->object->saveToDb();
+				
+				ilObjectServiceSettingsGUI::updateServiceSettingsForm(
+					$this->object->getId(),
+					$form,
+					array(
+						ilObjectServiceSettingsGUI::ORGU_POSITION_ACCESS
+					)
+				);
 
 				if (strcmp($_SESSION["info"], "") != 0)
 				{
@@ -1347,8 +1355,8 @@ class ilObjSurveyGUI extends ilObjectGUI
 			$ts_results->addOption($option);
 			$form->addItem($ts_results);		
 		}
-
-			
+		
+					
 		// competence service activation for 360 mode
 		
 		include_once("./Services/Skill/classes/class.ilSkillManagementSettings.php");
@@ -1364,7 +1372,26 @@ class ilObjSurveyGUI extends ilObjectGUI
 			$skill_service->setChecked($this->object->get360SkillService());
 			$form->addItem($skill_service);
 		}
-				
+		
+		$position_settings = ilOrgUnitGlobalSettings::getInstance()
+			->getObjectPositionSettingsByType($this->object->getType());
+
+		if($position_settings->isActive())
+		{
+			// add additional feature section
+			$feat = new ilFormSectionHeaderGUI();
+			$feat->setTitle($this->lng->txt('obj_features'));
+			$form->addItem($feat);
+
+			// add orgunit settings
+			ilObjectServiceSettingsGUI::initServiceSettingsForm(
+					$this->object->getId(),
+					$form,
+					array(
+						ilObjectServiceSettingsGUI::ORGU_POSITION_ACCESS
+					)
+				);
+		}
 		
 		$form->addCommandButton("saveProperties", $this->lng->txt("save"));
 

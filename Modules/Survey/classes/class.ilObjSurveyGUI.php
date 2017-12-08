@@ -450,7 +450,8 @@ class ilObjSurveyGUI extends ilObjectGUI
 		}
 			
 		include_once "./Modules/Survey/classes/class.ilObjSurveyAccess.php";
-		if ($this->checkPermissionBool("read_results") || 
+		if(
+			$this->checkRbacOrPositionPermission('read_results','access_results') ||
 			ilObjSurveyAccess::_hasEvaluationAccess($this->object->getId(), $ilUser->getId()))
 		{
 			// evaluation
@@ -2409,6 +2410,22 @@ class ilObjSurveyGUI extends ilObjectGUI
 		
 		ilUtil::sendSuccess($this->lng->txt("mail_sent"), true);
 		$this->ctrl->redirect($this, "infoScreen");
+	}
+	
+	/**
+	 * Check rbac or position permission
+	 * @param type $a_rbac_permission
+	 * @param type $a_position_permission
+	 * @return type
+	 */
+	protected function checkRbacOrPositionPermission($a_rbac_permission, $a_position_permission)
+	{
+		$access = $GLOBALS['DIC']->access();
+		return $access->checkRbacOrPositionPermissionAccess(
+			$a_rbac_permission, 
+			$a_position_permission, 
+			$this->object->getRefId()
+		);
 	}
 } 
 

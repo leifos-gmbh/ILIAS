@@ -6187,8 +6187,8 @@ class ilObjSurvey extends ilObject
 		$link = ilLink::_getStaticLink($this->getRefId(), "svy");
 		
 		// somehow needed in cron-calls
-		$ilCtrl->setTargetScript("ilias.php");
-		$ilCtrl->initBaseClass("ilobjsurveygui");
+		//$ilCtrl->setTargetScript("ilias.php");
+		//$ilCtrl->initBaseClass("ilobjsurveygui");
 		
 		// yeah, I know...
 		$_GET["ref_id"] = $this->getRefId();
@@ -6197,7 +6197,7 @@ class ilObjSurvey extends ilObject
 		include_once "./Modules/Survey/classes/class.ilSurveyEvaluationGUI.php";		
 		$gui = new ilSurveyEvaluationGUI($this);
 		$url = $ilCtrl->getLinkTargetByClass(array("ilObjSurveyGUI", "ilSurveyEvaluationGUI"), "evaluationdetails", "", false, false);
-		$pdf = $gui->callPhantom($url, "pdf", true);
+		$pdf = $gui->callPhantom($url, "pdf", true, true);
 		
 		if(!$pdf || 
 			!file_exists($pdf))

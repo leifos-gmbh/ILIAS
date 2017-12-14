@@ -20,7 +20,7 @@ class ilUsersGalleryParticipants extends ilAbstractUsersGalleryCollectionProvide
 	/**
 	 * @param ilParticipants $participants
 	 */
-	public function __construct(ilParticipants $participants)
+	public function __construct(ilUsersGalleryParticipants $participants)
 	{
 		$this->participants = $participants;
 	}
@@ -68,15 +68,48 @@ class ilUsersGalleryParticipants extends ilAbstractUsersGalleryCollectionProvide
 		/**
 		 * @var $DIC ILIAS\DI\Container
 		 */
-		global $DIC;
+		global $DIC, $ilUser;
 
 		$groups = [];
+		
+		$rbac_perm = 'manage_members';
+		$participants = $this->participants->getParticipants();
+		if(in_array($ilUser->getId(), $participants))
+		{
+			$rbac_perm = 'read';
+		}
+		
+		$contacts = $DIC->access()->filterUserIdsByRbacOrPositionOfCurrentUser(
+			$rbac_perm,
+			'manage_members',
+			(int) $_GET['ref_id'],
+			$this->participants->getContacts()
+		);
+		$admins = $DIC->access()->filterUserIdsByRbacOrPositionOfCurrentUser(
+			$rbac_perm,
+			'manage_members',
+			(int) $_GET['ref_id'],
+			$this->participants->getAdmins()
+		);
+		$tutors = $DIC->access()->filterUserIdsByRbacOrPositionOfCurrentUser(
+			$rbac_perm,
+			'manage_members',
+			(int) $_GET['ref_id'],
+			$this->participants->getTutors()
+		);
+		$members = $DIC->access()->filterUserIdsByRbacOrPositionOfCurrentUser(
+			$rbac_perm,
+			'manage_members',
+			(int) $_GET['ref_id'],
+			$this->participants->getMembers()
+		);
+			
 
 		foreach([
-			array($this->participants->getContacts(), true, $DIC->language()->txt('crs_mem_contact')),
-			array($this->participants->getAdmins()  , false, ''),
-			array($this->participants->getTutors()  , false, ''),
-			array($this->participants->getMembers() , false, '')
+			array($contacts, true, $DIC->language()->txt('crs_mem_contact')),
+			array($admins  , false, ''),
+			array($tutors  , false, ''),
+			array($members , false, '')
 		] as $users)
 		{
 			$group = $this->getPopulatedGroup($this->getUsers($users[0]));

@@ -202,6 +202,9 @@ class ilUtil
 		{
 			$vers = str_replace(" ", "-", $ilias->getSetting("ilias_version"));
 			$vers = "?vers=".str_replace(".", "-", $vers);
+			// use version from template xml to force reload on changes
+            $skin = ilStyleDefinition::getSkins()[ilStyleDefinition::getCurrentSkin()];
+            $vers .= ($skin->getVersion() != '' ? str_replace(".", "-", '-' . $skin->getVersion()) : '');
 		}
 		return $filename . $vers;
 	}
@@ -3072,6 +3075,32 @@ class ilUtil
 		return $a_str;
 	}
 
+	/**
+	 * Prepare secure href attribute
+	 *
+	 * @param
+	 * @return
+	 */
+	static function secureUrl($url)
+	{
+		// check if url is valid (absolute or relative)
+		if (filter_var($url, FILTER_VALIDATE_URL) === false &&
+			filter_var("http://".$url, FILTER_VALIDATE_URL) === false &&
+			filter_var("http:".$url, FILTER_VALIDATE_URL) === false &&
+			filter_var("http://de.de".$url, FILTER_VALIDATE_URL) === false &&
+			filter_var("http://de.de/".$url, FILTER_VALIDATE_URL) === false)
+		{
+			return "";
+		}
+		if (trim(strtolower(parse_url($url, PHP_URL_SCHEME))) == "javascript")
+		{
+			return "";
+		}
+		$url = htmlspecialchars($url, ENT_QUOTES);
+		return $url;
+	}
+
+
 
 	/**
 	* prepare a string for db writing (insert/update)
@@ -5233,6 +5262,18 @@ class ilUtil
 	public static function Bytes2MB($a_value)
 	{
 		return  $a_value / (pow(self::_getSizeMagnitude(), 2));
+	}
+
+	/**
+	 * Dump var
+	 *
+	 * @param null $mixed
+	 */
+	static function dumpVar($mixed = null)
+	{
+		echo '<pre>';
+		var_dump($mixed);
+		echo '</pre>';
 	}
 
 

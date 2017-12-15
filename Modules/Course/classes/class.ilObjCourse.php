@@ -2163,7 +2163,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 		$this->course_logger->debug('Max members: ' . $max);
 		$this->course_logger->debug('Current members: ' . $now);
 		
-		if($now < $max)
+		if($max <= $now)
 		{
 			return;
 		}
@@ -2185,7 +2185,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 				continue;
 			}
 			$this->getMembersObject()->add($user_id,IL_CRS_MEMBER);
-			$this->getMembersObject()->sendNotification($this->getMembersObject()->NOTIFY_ACCEPT_USER,$user_id);
+			$this->getMembersObject()->sendNotification($this->getMembersObject()->NOTIFY_ACCEPT_USER,$user_id,true);
 			$waiting_list->removeFromList($user_id);
 			$this->checkLPStatusSync($user_id);
 			
@@ -2224,9 +2224,15 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 		return true;
 	}
 	
+	/**
+	 * Minimum members check
+	 * @global type $ilDB
+	 * @return array
+	 */
 	public static function findCoursesWithNotEnoughMembers()
 	{
-		global $ilDB;
+		$ilDB = $GLOBALS['DIC']->database();
+		$tree = $GLOBALS['DIC']->repositoryTree();
 		
 		$res = array();
 		
@@ -2246,6 +2252,14 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 			" AND (crs_start IS NULL OR crs_start > ".$ilDB->quote($now, "integer").")");
 		while($row = $ilDB->fetchAssoc($set))
 		{
+			$refs = ilObject::_getAllReferences($row['obj_id']);
+			$ref = end($refs);
+			
+			if($tree->isDeleted($ref))
+			{
+				continue;
+			}
+			
 			$part = new ilCourseParticipants($row["obj_id"]);
 			$reci = $part->getNotificationRecipients();
 			if(sizeof($reci))

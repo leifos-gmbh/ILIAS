@@ -28,7 +28,9 @@ class ilWorkflowDbHelper
 	 */
 	public static function writeWorkflow(ilWorkflow $workflow)
 	{
-		global $ilDB;
+		global $DIC;
+		/** @var ilDB $ilDB */
+		$ilDB = $DIC['ilDB'];
 
 		$require_data_persistance = $workflow->isDataPersistenceRequired();
 		$workflow->resetDataPersistenceRequirement();
@@ -102,7 +104,10 @@ class ilWorkflowDbHelper
 	 */
 	public static function persistWorkflowIOData(ilWorkflow $workflow)
 	{
-		global $ilDB;
+		global $DIC;
+		/** @var ilDB $ilDB */
+		$ilDB = $DIC['ilDB'];
+
 		$workflow_id = $workflow->getId();
 
 		$input_data = $workflow->getInputVars();
@@ -136,7 +141,9 @@ class ilWorkflowDbHelper
 	 */
 	public static function deleteWorkflow(ilWorkflow $a_workflow)
 	{
-		global $ilDB;
+		global $DIC;
+		/** @var ilDB $ilDB */
+		$ilDB = $DIC['ilDB'];
 		
 		if ($a_workflow->hasDbId())
 		{
@@ -181,7 +188,9 @@ class ilWorkflowDbHelper
 	 */
 	public static function writeDetector(ilDetector $a_detector)
 	{
-		global $ilDB;
+		global $DIC;
+		/** @var ilDB $ilDB */
+		$ilDB = $DIC['ilDB'];
 
 		if ($a_detector->hasDbId())
 		{
@@ -209,12 +218,12 @@ class ilWorkflowDbHelper
 		$det_context = $a_detector->getEventContext();
 		$det_listen = $a_detector->getListeningTimeframe();
 
-		if($det_context['identifier'] == '{{THIS:WFID}}')
+		if($det_context['identifier'] === '{{THIS:WFID}}')
 		{
 			$det_context['identifier'] = $wf_id;
 		}
 
-		if($det_subject['identifier'] == '{{THIS:WFID}}')
+		if($det_subject['identifier'] === '{{THIS:WFID}}')
 		{
 			$det_subject['identifier'] = $wf_id;
 		}
@@ -269,7 +278,9 @@ class ilWorkflowDbHelper
 	 */
 	public static function deleteDetector(ilExternalDetector $detector)
 	{
-		global $ilDB;
+		global $DIC;
+		/** @var ilDB $ilDB */
+		$ilDB = $DIC['ilDB'];
 
 		if ($detector->hasDbId())
 		{
@@ -309,7 +320,9 @@ class ilWorkflowDbHelper
 		$context_id
 	)
 	{
-		global $ilDB;
+		global $DIC;
+		/** @var ilDB $ilDB */
+		$ilDB = $DIC['ilDB'];
 
 		require_once './Services/WorkflowEngine/classes/utils/class.ilWorkflowUtils.php';
 		$now = ilWorkflowUtils::time();
@@ -321,12 +334,12 @@ class ilWorkflowDbHelper
 			WHERE type = ' . $ilDB->quote($type, 'text') . '
 			AND content = ' . $ilDB->quote($content, 'text') . '
 			AND subject_type = ' . $ilDB->quote($subject_type, 'text') . '
-			AND subject_id = ' . $ilDB->quote($subject_id, 'integer') . '
+			AND (subject_id = ' . $ilDB->quote($subject_id, 'integer') . ' OR subject_id = ' . $ilDB->quote(0, 'integer') . ')
 			AND context_type = ' . $ilDB->quote($context_type, 'text') . '
-			AND context_id = ' . $ilDB->quote($context_id, 'integer') . '
+			AND (context_id = ' . $ilDB->quote($context_id, 'integer') . ' OR context_id = ' . $ilDB->quote(0, 'integer') . ')
 			AND (listening_start = ' . $ilDB->quote(0, 'integer') . ' 
-				 OR (listening_start < ' . $ilDB->quote($now, 'integer') . ' AND listening_end = '. $ilDB->quote(0, 'integer') . ') 
-				 OR listening_end > ' . $ilDB->quote($now, 'integer') . ')'
+				 OR listening_start <= ' . $ilDB->quote($now, 'integer') . ') AND (listening_end = '. $ilDB->quote(0, 'integer') . '
+				 OR listening_end >= ' . $ilDB->quote($now, 'integer') . ')'
 		);
 
 		while ($row = $ilDB->fetchAssoc($result))
@@ -349,7 +362,10 @@ class ilWorkflowDbHelper
 	 */
 	public static function wakeupWorkflow($id)
 	{
-		global $ilDB;
+		global $DIC;
+		/** @var ilDB $ilDB */
+		$ilDB = $DIC['ilDB'];
+
 		$result = $ilDB->query(
 			'SELECT workflow_class, workflow_location, workflow_instance
 			FROM wfe_workflows
@@ -359,7 +375,7 @@ class ilWorkflowDbHelper
 		$workflow = $ilDB->fetchAssoc($result);
 
 		require_once './Services/WorkflowEngine/classes/workflows/class.ilBaseWorkflow.php';
-		$path = $workflow['workflow_location'] . $workflow['workflow_class'];
+		$path = rtrim($workflow['workflow_location'], '/') . '/' . $workflow['workflow_class'];
 
 		require_once $path;
 
@@ -377,7 +393,9 @@ class ilWorkflowDbHelper
 	 */
 	public static function writeStartEventData($event, $process_id)
 	{
-		global $ilDB;
+		global $DIC;
+		/** @var ilDB $ilDB */
+		$ilDB = $DIC['ilDB'];
 
 		$event_id = $ilDB->nextId('wfe_startup_events');
 
@@ -404,7 +422,9 @@ class ilWorkflowDbHelper
 	 */
 	public static function writeStaticInput($key, $value, $start_event)
 	{
-		global $ilDB;
+		global $DIC;
+		/** @var ilDB $ilDB */
+		$ilDB = $DIC['ilDB'];
 
 		$ilDB->insert(
 			'wfe_static_inputs',
@@ -433,7 +453,9 @@ class ilWorkflowDbHelper
 			$query .= "AND context_id = '".$params->getContextId()."'";
 		}
 
-		global $ilDB;
+		global $DIC;
+		/** @var ilDB $ilDB */
+		$ilDB = $DIC['ilDB'];
 
 		$workflows = array();
 		$result = $ilDB->query($query);
@@ -448,7 +470,10 @@ class ilWorkflowDbHelper
 	{
 		$query = "SELECT name, value FROM wfe_static_inputs WHERE event_id = '" . $event_id . "'";
 
-		global $ilDB;
+		global $DIC;
+		/** @var ilDB $ilDB */
+		$ilDB = $DIC['ilDB'];
+
 		$result = $ilDB->query($query);
 
 		$retval = array();

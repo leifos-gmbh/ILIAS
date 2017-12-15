@@ -103,7 +103,15 @@ class ilQtiMatImageSecurity
 
 			if( $declaredMimeType != $detectedMimeType )
 			{
-				return false;
+				// since ilias exports jpeg declared pngs itself, we skip this validation ^^
+				// return false;
+				
+				/* @var ilComponentLogger $log */
+				$log = $GLOBALS['DIC'] ? $GLOBALS['DIC']['ilLog'] : $GLOBALS['ilLog'];
+				$log->log(
+					'QPL: imported image with declared mime ('.$declaredMimeType.') '
+					.'and detected mime ('.$detectedMimeType.')'
+				);
 			}
 		}
 
@@ -114,6 +122,11 @@ class ilQtiMatImageSecurity
 	{
 		if ($this->getImageMaterial()->getUri())
 		{
+			if( !$this->hasFileExtension($this->getImageMaterial()->getUri()) )
+			{
+				return true;
+			}
+
 			$extension = $this->determineFileExtension($this->getImageMaterial()->getUri());
 		}
 		else
@@ -139,10 +152,33 @@ class ilQtiMatImageSecurity
 	{
 		return ilFileUtils::lookupContentMimeType($content);
 	}
-	
+
+	/**
+	 * Returns the determine file extension. If no extension
+	 * @param string $label
+	 * @return string|null
+	 */
 	protected function determineFileExtension($label)
 	{
-		list($dirname, $basename, $extension, $filename) = array_values( pathinfo($label) );
-		return $extension;
+		$pathInfo = pathinfo($label);
+
+		if(isset($pathInfo['extension']))
+		{
+			return $pathInfo['extension'];
+		}
+
+		return null;
+	}
+	
+	/**
+	 * Returns whether or not the passed label contains a file extension 
+	 * @param string $label
+	 * @return bool
+	 */
+	protected function hasFileExtension($label)
+	{
+		$pathInfo = pathinfo($label);
+
+		return array_key_exists('extension', $pathInfo);
 	}
 }

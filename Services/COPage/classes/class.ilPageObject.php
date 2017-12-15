@@ -341,7 +341,7 @@ abstract class ilPageObject
 		{
 			include_once("./Services/COPage/exceptions/class.ilCOPageNotFoundException.php");
 			throw new ilCOPageNotFoundException("Error: Page ".$this->id." is not in database".
-				" (parent type ".$this->getParentType().").");
+				" (parent type ".$this->getParentType().", lang: ".$this->getLanguage().").");
 		}
 
 		$this->xml = $this->page_record["content"];
@@ -5306,6 +5306,30 @@ abstract class ilPageObject
 
 		return $rec["last_change"];
 	}
+
+	/**
+	 * Get all file object ids
+	 *
+	 * @return array
+	 */
+	function getAllFileObjIds()
+	{
+		$file_obj_ids = array();
+
+		// insert inst id file item identifier entries
+		$xpc = xpath_new_context($this->dom);
+		$path = "//FileItem/Identifier";
+		$res = xpath_eval($xpc, $path);
+		for($i = 0; $i < count($res->nodeset); $i++)
+		{
+			$file_obj_ids[] = $res->nodeset[$i]->get_attribute("Entry");
+		}
+		unset($xpc);
+		return $file_obj_ids;
+	}
+
+
+
 
 }
 ?>

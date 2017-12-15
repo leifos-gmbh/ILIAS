@@ -2189,6 +2189,37 @@ class ilObjContentObject extends ilObject
 			// now: forward ("all" info to export files and links)
 			$this->exportHTMLPages($lm_gui, $a_target_dir, $lm_gui->lang, ($a_lang == "all"));
 			$ilBench->stop("ExportHTML", "exportHTMLPages");
+
+			// export table of contents
+			$ilLocator->clearItems();
+			if ($this->isActiveTOC())
+			{
+				$tpl = new ilTemplate("tpl.main.html", true, true);
+
+				$GLOBALS["tpl"] = $tpl;
+
+				$lm_gui->tpl = $tpl;
+				$content = $lm_gui->showTableOfContents();
+				//var_dump($content); exit;
+				if ($a_lang == "all")
+				{
+					$file = $a_target_dir . "/table_of_contents_".$lang.".html";
+				}
+				else
+				{
+					$file = $a_target_dir . "/table_of_contents.html";
+				}
+
+				// open file
+				if (!($fp = @fopen($file,"w+")))
+				{
+					die ("<b>Error</b>: Could not open \"".$file."\" for writing".
+						" in <b>".__FILE__."</b> on line <b>".__LINE__."</b><br />");
+				}
+				chmod($file, 0770);
+				fwrite($fp, $content);
+				fclose($fp);
+			}
 		}
 
 		// export glossary terms
@@ -2237,28 +2268,6 @@ class ilObjContentObject extends ilObject
 					$a_target_dir."/assessment/0/".$q_id."/images");
 			}
 		}
-
-		// export table of contents
-		$ilBench->start("ExportHTML", "exportHTMLTOC");
-		$ilLocator->clearItems();
-		if ($this->isActiveTOC())
-		{
-			$tpl = new ilTemplate("tpl.main.html", true, true);
-			$lm_gui->tpl = $tpl;
-			$content = $lm_gui->showTableOfContents();
-			$file = $a_target_dir."/table_of_contents.html";
-				
-			// open file
-			if (!($fp = @fopen($file,"w+")))
-			{
-				die ("<b>Error</b>: Could not open \"".$file."\" for writing".
-					" in <b>".__FILE__."</b> on line <b>".__LINE__."</b><br />");
-			}
-			chmod($file, 0770);
-			fwrite($fp, $content);
-			fclose($fp);
-		}
-		$ilBench->stop("ExportHTML", "exportHTMLTOC");
 
 		// export images
 		$ilBench->start("ExportHTML", "exportHTMLImages");
@@ -2538,6 +2547,11 @@ class ilObjContentObject extends ilObject
 			fclose($fp);
 		}
 		$linked_mobs = $mob_obj->getLinkedMediaObjects();
+		foreach ($linked_mobs as $id)
+		{
+			$this->log->debug("HTML Export: Add media object $id (".ilObject::_lookupTitle($id).") ".
+				" due to media object ".$a_mob_id." (".ilObject::_lookupTitle($a_mob_id).").");
+		}
 		$a_linked_mobs = array_merge($a_linked_mobs, $linked_mobs);
 	}
 	
@@ -2580,6 +2594,9 @@ class ilObjContentObject extends ilObject
 					foreach($def_mobs as $def_mob)
 					{
 						$this->offline_mobs[$def_mob] = $def_mob;
+						include_once("./Modules/Glossary/classes/class.ilGlossaryTerm.php");
+						$this->log->debug("HTML Export: Add media object $def_mob (".ilObject::_lookupTitle($def_mob).") ".
+							" due to glossary entry ".$int_link["id"]." (".ilGlossaryTerm::_lookGlossaryTerm($int_link["id"]).").");
 					}
 					
 					// get all files of page
@@ -2656,6 +2673,9 @@ class ilObjContentObject extends ilObject
 						foreach($incl_mobs as $incl_mob)
 						{
 							$mobs[$incl_mob] = $incl_mob;
+							include_once("./Modules/LearningModule/classes/class.ilLMObject.php");
+							$this->log->debug("HTML Export: Add media object $incl_mob (".ilObject::_lookupTitle($incl_mob).") ".
+								" due to snippet ".$pc["id"]." in page ".$page["obj_id"]." (".ilLMObject::_lookupTitle($page["obj_id"]).").");
 						}
 					}
 				}
@@ -2665,6 +2685,9 @@ class ilObjContentObject extends ilObject
 				foreach($pg_mobs as $pg_mob)
 				{
 					$mobs[$pg_mob] = $pg_mob;
+					include_once("./Modules/LearningModule/classes/class.ilLMObject.php");
+					$this->log->debug("HTML Export: Add media object $pg_mob (".ilObject::_lookupTitle($pg_mob).") ".
+						" due to page ".$page["obj_id"]." (".ilLMObject::_lookupTitle($page["obj_id"]).").");
 				}
 				
 				// get all internal links of page

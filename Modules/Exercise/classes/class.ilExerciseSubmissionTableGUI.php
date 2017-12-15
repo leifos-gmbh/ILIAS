@@ -86,7 +86,14 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 		$this->addMultiCommand("saveStatusSelected", $this->lng->txt("exc_save_selected"));
 			
 		$this->setFormName("ilExcIDlForm");
-		$this->addMultiCommand("setIndividualDeadline", $this->lng->txt("exc_individual_deadline_action"));
+
+		// see 0021530 and parseRow here with similar action per user
+		if ($this->mode == self::MODE_BY_ASSIGNMENT &&
+			$this->ass->hasActiveIDl() &&
+			!$this->ass->hasReadOnlyIDl())
+		{
+			$this->addMultiCommand("setIndividualDeadline", $this->lng->txt("exc_individual_deadline_action"));
+		}
 	
 		if($this->exc->hasTutorFeedbackMail() &&
 			$this->mode == self::MODE_BY_ASSIGNMENT)
@@ -386,17 +393,17 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 					}
 					// fallthrough
 					
-				case "notice":	
-					$this->tpl->setVariable("VAL_".strtoupper($col), $a_row[$col]
-						? ilUtil::prepareFormOutput(trim($a_row[$col]))
-						: "");
+				case "notice":
+					// see #22076
+					$this->tpl->setVariable("VAL_".strtoupper($col), ilUtil::prepareFormOutput(trim($a_row[$col])));
 					break;
 					
 				case "comment":							
 					// for js-updating
-					$this->tpl->setVariable("LCOMMENT_ID", $comment_id."_snip");		
-		
-					$this->tpl->setVariable("VAL_".strtoupper($col), $a_row[$col]
+					$this->tpl->setVariable("LCOMMENT_ID", $comment_id."_snip");
+
+					// see #22076
+					$this->tpl->setVariable("VAL_".strtoupper($col), (trim($a_row[$col]) !== "")
 						? nl2br(trim($a_row[$col]))
 						: "&nbsp;");
 					break;

@@ -277,6 +277,8 @@ class ilPasswordAssistanceGUI
 	 */
 	public function sendPasswordAssistanceMail(ilObjUser $userObj)
 	{
+		global $DIC;
+
 		require_once 'Services/Mail/classes/class.ilMailbox.php';
 		require_once 'Services/Mail/classes/class.ilMail.php';
 		require_once 'Services/Mail/classes/class.ilMimeMail.php';
@@ -345,7 +347,7 @@ class ilPasswordAssistanceGUI
 					$server_url,
 					$_SERVER['REMOTE_ADDR'],
 					$userObj->getLogin(),
-					'mailto:' . $contact_address[0],
+					'mailto:' . $DIC['ilSetting']->get("admin_email"),
 					$alternative_pwassist_url
 				)
 			)
@@ -685,6 +687,8 @@ class ilPasswordAssistanceGUI
 	 */
 	public function sendUsernameAssistanceMail($email, array $logins)
 	{
+		global $DIC;
+
 		require_once 'Services/Mail/classes/class.ilMailbox.php';
 		require_once 'Services/Mail/classes/class.ilMail.php';
 		require_once 'Services/Mail/classes/class.ilMimeMail.php';
@@ -716,7 +720,7 @@ class ilPasswordAssistanceGUI
 					$server_url,
 					$_SERVER['REMOTE_ADDR'],
 					$email,
-					'mailto:' . $contact_address[0],
+					'mailto:' . $DIC['ilSetting']->get("admin_email"),
 					$login_url
 				)
 			)

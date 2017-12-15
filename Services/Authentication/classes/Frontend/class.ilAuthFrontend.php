@@ -92,11 +92,12 @@ class ilAuthFrontend
 	}
 	
 	/**
-	 * Migrate Account
+	 * Migrate Account to existing user account
 	 * @param ilAuthSession $session
 	 * @param type $a_username
 	 * @param type $a_auth_mode
 	 * @param type $a_desired_authmode
+	 * @throws \InvalidArgumentException if current auth provider does not support account migration
 	 */
 	public function migrateAccount(ilAuthSession $session)
 	{
@@ -116,12 +117,29 @@ class ilAuthFrontend
 		}
 		
 		$user->setAuthMode(ilSession::get(static::MIG_DESIRED_AUTHMODE));
+		
+		$this->getLogger()->debug('new auth mode is: ' . ilSession::get(self::MIG_DESIRED_AUTHMODE));
+		
 		$user->setExternalAccount(ilSession::get(static::MIG_EXTERNAL_ACCOUNT));
 		$user->update();
 		
-		// @todo call provider and update account data, role assignment, ...
-		
-		return true;
+		foreach($this->getProviders() as $provider)
+		{
+			if(!$provider instanceof ilAuthProviderAccountMigrationInterface)
+			{
+				$this->logger->warning('Provider: ' . get_class($provider) .' does not support account migration.');
+				throw new InvalidArgumentException('Invalid auth provider given.');
+			}
+			$this->getCredentials()->setUsername(ilSession::get(static::MIG_EXTERNAL_ACCOUNT));
+			$provider->migrateAccount($this->getStatus());
+			switch($this->getStatus()->getStatus())
+			{
+				case ilAuthStatus::STATUS_AUTHENTICATED:
+					return $this->handleAuthenticationSuccess($provider);
+					
+			}
+		}
+		return $this->handleAuthenticationFail();
 	}
 	
 	/**
@@ -131,6 +149,11 @@ class ilAuthFrontend
 	{
 		foreach($this->providers as $provider)
 		{
+			if(!$provider instanceof ilAuthProviderAccountMigrationInterface)
+			{
+				$this->logger->warning('Provider: ' . get_class($provider) .' does not support account migration.');
+				throw new InvalidArgumentException('Invalid auth provider given.');
+			}
 			$provider->createNewAccount($this->getStatus());
 
 			switch($this->getStatus()->getStatus())
@@ -221,7 +244,16 @@ class ilAuthFrontend
 			$this->getStatus()->setReason('auth_err_invalid_user_account');
 			return false;
 		}
-		// user activation
+
+		if(!$this->checkExceededLoginAttempts($user))
+		{
+			$this->getLogger()->info('Authentication failed for inactive user with id and too may login attempts: ' . $this->getStatus()->getAuthenticatedUserId());
+			$this->getStatus()->setStatus(ilAuthStatus::STATUS_AUTHENTICATION_FAILED);
+			$this->getStatus()->setAuthenticatedUserId(0);
+			$this->getStatus()->setReason('err_inactive_login_attempts');
+			return false;
+		}
+
 		if(!$this->checkActivation($user))
 		{
 			$this->getLogger()->info('Authentication failed for inactive user with id: ' . $this->getStatus()->getAuthenticatedUserId());
@@ -356,7 +388,38 @@ class ilAuthFrontend
 	{
 		return $user->getActive();
 	}
-	
+
+	/**
+	 * @param \ilObjUser $user
+	 * @return bool
+	 */
+	protected function checkExceededLoginAttempts(\ilObjUser $user)
+	{
+		if(in_array($user->getId(), array(ANONYMOUS_USER_ID, SYSTEM_USER_ID)))
+		{
+			return true;
+		}
+
+		$isInactive = !$user->getActive();
+		if(!$isInactive)
+		{
+			return true;
+		}
+
+		require_once 'Services/PrivacySecurity/classes/class.ilSecuritySettings.php';
+		$security = ilSecuritySettings::_getInstance();
+		$maxLoginAttempts = $security->getLoginMaxAttempts();
+
+		if(!(int)$maxLoginAttempts)
+		{
+			return true;
+		}
+
+		$numLoginAttempts = \ilObjUser::_getLoginAttempts($user->getId());
+
+		return $numLoginAttempts < $maxLoginAttempts;
+	}
+
 	/**
 	 * Check time limit
 	 * @param ilObjUser $user

@@ -15,7 +15,8 @@ var Database = function Database(config) {
 			port: config.database.port,
 			user: config.database.user,
 			password: config.database.pass,
-			database: config.database.name
+			database: config.database.name,
+			charset: 'UTF8_UNICODE_CI'
 			//debug: true
 		});
 
@@ -200,6 +201,68 @@ var Database = function Database(config) {
 		})
 	};
 
+	this.getMessageAcceptanceStatusForUsers = function(onResult, onEnd) {
+		_onQueryEvents(
+			_pool.query('SELECT usr_id FROM usr_pref WHERE keyword = ? AND value = ?', ["chat_osc_accept_msg", "y"]),
+			onResult,
+			onEnd
+		);
+	};
+
+	this.clearChatMessagesProcess = function (bound, namespaceName, callback) {
+		bound = parseInt(bound / 1000);
+
+		async.waterfall([
+			function(next) {
+				_pool.query('DELETE FROM chatroom_history WHERE timestamp < ?',
+					[bound],
+					function (err, result) {
+						if (err) throw err;
+						Container.getLogger().info("Clear Messages for namespace %s affected %s rows", namespaceName, result.affectedRows)
+
+						next(null, result);
+					});
+			},
+			function(result, next)
+			{
+				_pool.query('DELETE FROM osc_messages WHERE timestamp < ?',
+					[bound],
+					function (err, result) {
+						if (err) throw err;
+						Container.getLogger().info("Clear OSC-Messages for namespace %s affected %s rows", namespaceName, result.affectedRows)
+
+						next(null, result);
+					});
+			},
+			function(result, next)
+			{
+				_pool.query('DELETE c FROM osc_conversation c LEFT JOIN osc_messages m ON m.conversation_id = c.id WHERE m.id IS NULL',
+					[bound],
+					function (err, result) {
+						if (err) throw err;
+						Container.getLogger().info("Clear OSC-Conversations for namespace %s affected %s rows", namespaceName, result.affectedRows)
+
+						next(null, result);
+					});
+			},
+			function(result, next)
+			{
+				_pool.query('DELETE a FROM osc_activity a LEFT JOIN osc_conversation c ON a.conversation_id = c.id WHERE c.id IS NULL',
+					[bound],
+					function (err, result) {
+						if (err) throw err;
+						Container.getLogger().info("Clear OSC-Activity for namespace %s affected %s rows", namespaceName, result.affectedRows)
+
+						next(null, result);
+					});
+			}
+		],function(err){
+			if(err) throw err;
+
+			callback();
+		});
+	};
+
 	this.trackActivity = function(conversationId, userId, timestamp) {
 		var emptyResult = true;
 		_onQueryEvents(
@@ -234,8 +297,8 @@ var Database = function Database(config) {
 		_onQueryEvents(
 			_pool.query('SELECT * FROM osc_activity WHERE conversation_id = ? AND user_id = ?', [conversationId, userId]),
 			function(result){
-				_pool.query('UPDATE osc_activity SET is_closed = ? WHERE conversation_id = ? AND user_id = ?',
-					[1, conversationId, userId],
+				_pool.query('UPDATE osc_activity SET is_closed = ?, timestamp = ? WHERE conversation_id = ? AND user_id = ?',
+					[1, Date.getTimestamp(), conversationId, userId],
 					function(err){
 						if(err) throw err;
 					}

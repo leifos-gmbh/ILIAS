@@ -44,6 +44,16 @@ class ilMailMemberGroupRoles extends ilAbstractMailMemberRoles
 	 */
 	public function getMailRoles($ref_id)
 	{
+		// no roles for position access only
+		$part = ilParticipants::getInstance($ref_id);
+		if(!$part->isAssigned($GLOBALS['DIC']->user()->getId()))
+		{
+			if(!$GLOBALS['DIC']->access()->checkAccess('manage_members','',$ref_id))
+			{
+				return [];
+			}
+		}
+		
 		$role_ids = $this->rbacreview->getLocalRoles($ref_id);
 
 		$sorted_role_ids = array();

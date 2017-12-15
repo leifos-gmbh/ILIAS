@@ -284,6 +284,11 @@ class ilMailMemberSearchGUI
 	protected function showSearchForm()
 	{
 		$this->storeReferer();
+		
+		if(!count((array) $this->mail_roles))
+		{
+			return $this->showSelectableUsers();
+		}
 
 		$form = $this->initMailToMembersForm();
 		$this->tpl->setContent($form->getHTML());

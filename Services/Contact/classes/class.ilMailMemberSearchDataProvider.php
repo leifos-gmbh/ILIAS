@@ -56,8 +56,32 @@ class ilMailMemberSearchDataProvider
 			$tutors = $this->objParticipants->getTutors();
 			$participants['il_crs_tutor'] = $tutors;
 		}
+
+		$filtered_participants = [];
 		
-		foreach($participants as $role => $users )
+		if($this->objParticipants->isAssigned($GLOBALS['DIC']->user()->getId()))
+		{
+			$filtered_participants = $participants;
+		}
+		else
+		{
+			foreach($participants as $role => $users)
+			{
+				$user_ids = $GLOBALS['DIC']->access()->filterUserIdsByRbacOrPositionOfCurrentUser(
+					'manage_members',
+					'manage_members',
+					(int) $_REQUEST['ref_id'],
+					$users
+				);
+				if(count($user_ids))
+				{
+					$filtered_participants[$role] = $user_ids;
+				}
+
+			}
+		}
+		
+		foreach($filtered_participants as $role => $users )
 		{
 			foreach($users as $user_id)
 			{

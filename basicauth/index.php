@@ -8,6 +8,7 @@ $_POST['username'] = 'dummy';
 $_POST['password'] = 'dummy';
 
 $GLOBALS['COOKIE_PATH'] = '/';
+unset($_COOKIE['PHPSESSID']);
 
 
 require_once("Services/Init/classes/class.ilInitialisation.php");

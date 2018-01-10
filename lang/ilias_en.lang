@@ -1,4 +1,4 @@
-/* Copyright (c) 1998-2017 ILIAS open source eLearning e.V., Extended GPL, see docs/LICENSE */
+/* Copyright (c) 1998-2018 ILIAS open source eLearning e.V., Extended GPL, see docs/LICENSE */
 /**
 * ILIAS language file
 *
@@ -9807,6 +9807,7 @@ survey#:#please_enter_mail_subject#:#Please enter a mail subject###deprecated
 survey#:#please_enter_mail_message#:#Please enter a mail message###deprecated 
 survey#:#participating_users#:#Participating Users###deprecated 
 survey#:#please_enter_mail_code#:#Please enter the access code placeholder [code]
+survey#:#please_enter_mail_url#:#Please enter the access url placeholder [url]
 survey#:#mail_sent_short#:#Sent
 survey#:#finished_mail_subject#:#The survey "%s" was finished
 survey#:#msg_min_nr_answers#:#Please check at least %s answer(s).
@@ -15056,7 +15057,7 @@ awrn#:#awareness_settings#:#Settings
 awrn#:#awrn_enable#:#Enable ‘Who is online?’-Tool
 crs#:#crs_mem_contacts#:#Tutorial Support
 user#:#user_awrn_all_users#:#All Users
-user#:#user_awrn_all_users_info#:#All users of the platform are listed.
+user#:#user_awrn_all_users_info#:#All users of the platform are listed. Please not that the setting "Online and Offline" can reduce performance greatly on installations with a large number of users.
 crs#:#crs_awrn_support_contacts#:#Tutorial Support
 crs#:#crs_awrn_support_contacts_info#:#All tutorial support contacts of courses with membership of the current user are listed. Users are defined as tutorial support contacts in the Members tab of the respective course.
 awrn#:#awrn_inactive#:#Not Listed
@@ -15073,7 +15074,7 @@ awrn#:#awrn_caching_period#:#Caching Period
 awrn#:#awrn_caching_period_info#:#Time that is waited before the number of users in the top bar is updated and new online users are determined.
 awrn#:#awrn_seconds#:#sec
 awrn#:#awrn_max_nr_entries#:#Max. Number of Items
-awrn#:#awrn_max_nr_entries_info#:#Maximum number of items in the ‘Who is online?’ list.
+awrn#:#awrn_max_nr_entries_info#:#Maximum number of items in the ‘Who is online?’ list. This setting has only minimal performance influence when displaying the tool in the top bar.
 awrn#:#awrn_hide_from_awareness#:#Hide Me From ‘Who is online?’-Tool
 awrn#:#awrn_hide_from_awareness_info#:#The ‘Who is online?’-Tool is in the top bar and listing selected users (e.g. contacts or members of your courses).
 common#:#contact_sysadmin#:#Contact Technical Support
@@ -15604,6 +15605,7 @@ style#:#add_system_style#:#Add System Style
 style#:#add_substyle#:#Add Sub Style
 style#:#skin_id#:#Skin ID
 style#:#skin_name#:#Skin Name
+style#:#skin_version#:#Skin Version
 style#:#skin#:#Skin
 style#:#style_id#:#Style ID
 style#:#Style#:#Style
@@ -15679,6 +15681,7 @@ style#:#can_not_read_less_file#:#Cannot read less file. Path:
 style#:#msg_sys_style_created#:#The new system style has successfully been created.
 style#:#skin_id_description#:#Skins are container for styles and sub styles. The skin ID sets the name of the folder that holds all style and sub style information. Only letters, numbers as well as hyphens or underline characters are to be used in skin ID's.
 style#:#skin_name_description#:#The skin name can be used to describe the area of application of the skin in human readable form. It will appear in all UI elements allowing the selection of skins.
+style#:#skin_version_description#:#The skin version is used to re-cache the style after changes. It gets automatically updated.
 style#:#style_id_description#:#The style id is used as name for style specific files such as css and less placed inside the skins folder. Only letters, numbers as well as hyphens or underline characters are to be used in style ID's.
 style#:#style_name_description#:#The style name can be used to describe the area of application of the style in human readable form. It will appear in all UI elements allowing the selection of styles.
 style#:#sub_style#:#Sub Style
@@ -15903,6 +15906,9 @@ chatroom#:#chat_osc_leave_grp_conv#:#Leave Conversation
 chatroom#:#chat_osc_user_left_grp_conv#:#User '%s' has left the group conversation.
 chatroom#:#chat_osc_dont_accept_msg#:#You currently cannot be invited to conversations. If desired you can change this in your <a href="%s">'Personal Settings'</a>.
 chatroom#:#chat_osc_doesnt_accept_msg#:#Conversations not possible
+chatroom#:#chat_osc_subs_rej_msgs#:#Currently it is not possible to continue this conversation. Your chat-partner must activate chats in the chat-settings.
+chatroom#:#chat_osc_subs_rej_msgs_p#:#The following chat partners of your conversation do not want to receive messages anymore: %s
+chatroom#:#chat_osc_self_rej_msgs#:#You currently cannot take part in this conversation because you suppressed receiving messages in your settings.
 usr#:#user_actions#:#User Actions
 usr#:#user_action#:#User Action
 buddysystem#:#buddy_handle_contact_request#:#Contact Request

@@ -1460,9 +1460,9 @@ class ilObjContentObject extends ilObject
 			$tree->renumber();
 		}
 
-		// delete subtrees that have no lm_data records
-		$nodes = $tree->getSubtree($tree->getNodeData($tree->getRootId()));
-		foreach ($nodes as $node)
+		// delete subtrees that have no lm_data records (changed due to #20637)
+		$set = $ilDB->query("SELECT * FROM lm_tree WHERE lm_tree.lm_id = ".$ilDB->quote($this->getId(), "integer"));
+		while ($node = $ilDB->fetchAssoc($set))
 		{
 			$q = "SELECT * FROM lm_data WHERE obj_id = ".
 				$ilDB->quote($node["child"], "integer");
@@ -1471,6 +1471,7 @@ class ilObjContentObject extends ilObject
 			if (!$obj_rec)
 			{
 				$node_data = $tree->getNodeData($node["child"]);
+				$node_data["child"] = $node["child"];
 				$tree->deleteTree($node_data);
 			}
 		}
@@ -2189,6 +2190,37 @@ class ilObjContentObject extends ilObject
 			// now: forward ("all" info to export files and links)
 			$this->exportHTMLPages($lm_gui, $a_target_dir, $lm_gui->lang, ($a_lang == "all"));
 			$ilBench->stop("ExportHTML", "exportHTMLPages");
+
+			// export table of contents
+			$ilLocator->clearItems();
+			if ($this->isActiveTOC())
+			{
+				$tpl = new ilTemplate("tpl.main.html", true, true);
+
+				$GLOBALS["tpl"] = $tpl;
+
+				$lm_gui->tpl = $tpl;
+				$content = $lm_gui->showTableOfContents();
+				//var_dump($content); exit;
+				if ($a_lang == "all")
+				{
+					$file = $a_target_dir . "/table_of_contents_".$lang.".html";
+				}
+				else
+				{
+					$file = $a_target_dir . "/table_of_contents.html";
+				}
+
+				// open file
+				if (!($fp = @fopen($file,"w+")))
+				{
+					die ("<b>Error</b>: Could not open \"".$file."\" for writing".
+						" in <b>".__FILE__."</b> on line <b>".__LINE__."</b><br />");
+				}
+				chmod($file, 0770);
+				fwrite($fp, $content);
+				fclose($fp);
+			}
 		}
 
 		// export glossary terms
@@ -2237,28 +2269,6 @@ class ilObjContentObject extends ilObject
 					$a_target_dir."/assessment/0/".$q_id."/images");
 			}
 		}
-
-		// export table of contents
-		$ilBench->start("ExportHTML", "exportHTMLTOC");
-		$ilLocator->clearItems();
-		if ($this->isActiveTOC())
-		{
-			$tpl = new ilTemplate("tpl.main.html", true, true);
-			$lm_gui->tpl = $tpl;
-			$content = $lm_gui->showTableOfContents();
-			$file = $a_target_dir."/table_of_contents.html";
-				
-			// open file
-			if (!($fp = @fopen($file,"w+")))
-			{
-				die ("<b>Error</b>: Could not open \"".$file."\" for writing".
-					" in <b>".__FILE__."</b> on line <b>".__LINE__."</b><br />");
-			}
-			chmod($file, 0770);
-			fwrite($fp, $content);
-			fclose($fp);
-		}
-		$ilBench->stop("ExportHTML", "exportHTMLTOC");
 
 		// export images
 		$ilBench->start("ExportHTML", "exportHTMLImages");

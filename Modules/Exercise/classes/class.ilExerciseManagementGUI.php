@@ -270,7 +270,7 @@ class ilExerciseManagementGUI
 		
 		// #16168 - no assignments
 		if (count($ass) > 0)
-		{	
+		{
 			$ilToolbar->addSeparator();
 
 			// we do not want the ilRepositorySearchGUI form action		

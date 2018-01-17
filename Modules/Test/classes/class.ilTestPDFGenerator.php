@@ -1,6 +1,6 @@
 <?php
 /* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
-
+require_once 'Services/PDFGeneration/classes/class.ilHtmlToPdfTransformerFactory.php';
 /**
  * Class ilTestPDFGenerator
  * 
@@ -18,12 +18,26 @@ class ilTestPDFGenerator
 
 	private static function buildHtmlDocument($contentHtml, $styleHtml)
 	{
+		$math_jax = '';
+		$mathJaxSetting = new ilSetting('MathJax');
+		if($mathJaxSetting->get("enable"))
+		{
+			$math_jax = '	<script type="text/x-mathjax-config">
+						  MathJax.Hub.Config({tex2jax: {inlineMath: [[\'$\',\'$\'], [\'\\\(\',\'\\\)\']]}});
+						</script>
+						<script type="text/javascript" async src="'.$mathJaxSetting->get("path_to_mathjax").'"></script>
+ 				';
+		}
+
+		require_once('Services/MathJax/classes/class.ilMathJax.php');
+		ilMathJax::getInstance()->init(ilMathJax::PURPOSE_EXPORT);
 		return "
 			<html>
 				<head>
 					<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
  					$styleHtml
- 				</head>
+ 					$math_jax
+ 					</head>
 				<body>$contentHtml</body>
 			</html>
 		";
@@ -49,13 +63,13 @@ class ilTestPDFGenerator
 		}
 		
 		$invalid_elements = array();
-
-		$script_elements     = $dom->getElementsByTagName('script');
-		foreach($script_elements as $elm)
-		{
-			$invalid_elements[] = $elm;
-		}
-
+		//uzk-patch: begin
+		#$script_elements     = $dom->getElementsByTagName('script');
+		#foreach($script_elements as $elm)
+		#{
+			#$invalid_elements[] = $elm;
+		#}
+		//uzk-patch: end
 		foreach($invalid_elements as $elm)
 		{
 			$elm->parentNode->removeChild($elm);
@@ -106,20 +120,14 @@ class ilTestPDFGenerator
 			$filename .= '.pdf';
 		}
 		
-		require_once './Services/PDFGeneration/classes/class.ilPDFGeneration.php';
-		
-		$job = new ilPDFGenerationJob();
-		$job->setAutoPageBreak(true)
-			->setCreator('ILIAS Test')
-			->setFilename($filename)
-			->setMarginLeft('20')
-			->setMarginRight('20')
-			->setMarginTop('20')
-			->setMarginBottom('20')
-			->setOutputMode($output_mode)
-			->addPage($pdf_output);
-		
-		ilPDFGeneration::doJob($job);
+		//uzk-patch: begin
+		$start_time = microtime(TRUE);
+		$pdf_factory = new ilHtmlToPdfTransformerFactory();
+		$pdf_factory->deliverPDFFromHTMLString($pdf_output, $filename, $output_mode);
+		$dur = microtime(true) - $start_time;
+		global $ilLog;
+		$ilLog->write(sprintf('PDF creation for %s took %s seconds.', basename($filename), $dur));
+		//uzk-patch: end
 	}
 	
 	public static function preprocessHTML($html)

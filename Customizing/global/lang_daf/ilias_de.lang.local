@@ -76,7 +76,7 @@ cd#:#work_permit#:#Arbeitserlaubnis für Deutschland
 cd#:#driving_license#:#Gültiger Führerschein
 cd#:#car_owner#:#Eigenes Auto
 cd#:#work_experience#:#Berufserfahrung
-cd#:#work_exp_lang_train#:#Berufserfahrung als Sprachtrainer/in
+cd#:#work_exp_lang_train#:#Berufserfahrung als Dozent/in
 cd#:#work_experience_lang_train_desc#:#Machen Sie kurze Angaben zum Zeitraum der Berufserfahrung, sowie zu den wichtigsten Funktionen, Tätigkeiten und Sprachschulen/Ihren Arbeitgebern.
 cd#:#given_lessons#:#Anzahl bisher unterrichteter Stunden
 cd#:#work_experience_other#:#Berufserfahrung in anderen Berufen
@@ -87,7 +87,7 @@ cd#:#general_education#:#Allgemeine Ausbildung
 cd#:#general_education_desc#:#Machen Sie kurze Angaben zu Ihrer Ausbildung sowie zu den erworbenen beruflichen Fähigkeiten und benennen Sie bitte die Ausbildungs- oder Ausbildungseinrichtung (allgemein)
 cd#:#general_education_other#:#Sonstiges
 cd#:#language_education#:#Ausbildung Sprachtrainer
-cd#:#lang_education_other#:#Sonstiges
+cd#:#lang_education_other#:#Bitte angeben
 cd#:#competences#:#Kompetenzen
 cd#:#teaching_experience#:#Unterrichtserfahrung
 cd#:#teaching_experience_desc#:#Erfahrung mit Unterricht in Allgemeinsprache sowie Berufs-/Geschäftssprache: Branchen/Zeitraum (z.B. Werbung, 2008-2009)
@@ -104,7 +104,7 @@ cd#:#current_teaching_material#:#Ich arbeite in meinen Unterrichten mit folgende
 cd#:#teaching_media#:#Ich setze momentan folgende Medien im Unterricht ein
 cd#:#other_teaching_media#:#Sonstige Medien
 cd#:#teaching_methods#:#Ich verwende folgende Arbeitsformen und -methoden
-cd#:#trainer_role#:#Meine Rolle als Trainer/in im Fremdsprachenunterricht sehe ich so
+cd#:#trainer_role#:#Meine Rolle als Dozent/in im Fremdsprachenunterricht sehe ich so
 cd#:#my_potential#:#Mein Entwicklungspotential
 cd#:#scenario#:#Szenario: "Ich unterrichte für die Carl-Duisberg Centren einen Firmenkunden. Der Auftraggeber dieses Trainings und/oder ein pädagogischer Mitarbeiter der Carl Duisberg Centren möchte meinen Unterricht hospitieren."
 cd#:#teaching_location#:#Einsatzregion/en, Orte
@@ -145,7 +145,7 @@ common#:#err_inactive#:#Ihr Benutzeraccount ist zurzeit (noch) deaktiviert. Neue
 cd#:#no_edit_trainer_permission#:#Sie können die Daten zu diesem Trainer nicht bearbeiten und abspeichern, da er einem anderen Zentrum zugeordnet ist.
 cd#:#export_excel#:#Excel-Export
 cd#:#cd_enter_valid_date_format#:#Bitte tragen Sie gültige Daten im Format dd.mm.yyyy ein.
-cd#:#cd_reg_trainer#:#Als Trainer registrieren
+cd#:#cd_reg_trainer#:#Als Dozent/in registrieren
 cd#:#cd_notes#:#Interne Bewertung
 cd#:#cd_other#:#Weitere Notizen
 cd#:#cd_qm_evaluation#:#QM Bewertung
@@ -168,3 +168,5 @@ common#:#cd_sel_country2#:#2. Staatsangehörigkeit
 common#:#login_to_ilias#:#Login DaF Teilnehmerportal-Server
 cd#:#pdf_export_short#:#Kurz-Profil (PDF)
 cd#:#pdf_export_full#:#Profil (PDF)
+cd#:#daf_certificate#:#DAF-Zertifikat
+cd#:#tm_apps#:#Apps

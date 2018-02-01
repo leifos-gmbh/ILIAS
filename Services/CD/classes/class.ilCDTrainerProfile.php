@@ -474,6 +474,22 @@ class ilCDTrainerProfile extends ilUserProfile
 			$fields[$f] = $p;
 		}
 
+		include_once("./Services/CD/classes/class.cdUtil.php");
+		if (cdUtil::isDAF())	// a17k540
+		{
+			unset($fields["fax"]);
+			unset($fields["residence_permit"]);
+			unset($fields["work_permit"]);
+			unset($fields["permit_license"]);
+			unset($fields["driving_license"]);
+			unset($fields["car_owner"]);
+			unset($fields["instruction_language"]);
+			unset($fields["lang_education"]);
+			unset($fields["lang_education_other"]);
+			unset($fields["cefr_knowledge"]);
+			unset($fields["scenario"]);
+		}
+		//	var_dump($fields); exit;
 		return $fields;
 	}
 
@@ -556,6 +572,15 @@ class ilCDTrainerProfile extends ilUserProfile
 					2 => "50-100",
 					3 => "> 100"
 					);
+				if (cdUtil::isDAF())	// a17k540
+				{
+					$options = array(
+						"" => $lng->txt("please_select"),
+						4 => "< 500",
+						5 => "500 - 1000",
+						6 => "> 1000"
+					);
+				}
 				$si = new ilSelectInputGUI($lng->txt($lv), "usr_".$f);
 				$si->setOptions($options);
 				$si->setRequired(true);
@@ -569,10 +594,21 @@ class ilCDTrainerProfile extends ilUserProfile
 				$a_form->addItem($ne);
 
 				$to = (int) date("Y");
-				for ($i = 2006; $i <= $to; $i++)
-				{					
+
+				$start = 2006;
+
+				for ($i = $start; $i <= $to; $i++)
+				{
+					if (cdUtil::isDAF())	// a17k540
+					{
+						if ($i <= 2012 && $i > 2006)
+						{
+							continue;
+						}
+					}
+
 					$txt = $i;
-					if ($i == 2006)
+					if ($i == $start)
 					{
 						$txt = $lng->txt("cd_before");
 					}
@@ -599,6 +635,18 @@ class ilCDTrainerProfile extends ilUserProfile
 					"promotion_doktorat" => $lng->txt("promotion_or_similar"),
 					"ht_promotion" => $lng->txt("promotion_higher")
 					);
+				if (cdUtil::isDAF())	// a17k540
+				{
+					$options = array(
+						"" => $lng->txt("please_select"),
+						"daf_certificate" => $lng->txt("daf_certificate"),
+						"abitur" => $lng->txt("abitur_or_similar"),
+						"fh_bachelor" => $lng->txt("bachelor_or_similar"),
+						"uni_master" => $lng->txt("master_or_similar"),
+						"promotion_doktorat" => $lng->txt("promotion_or_similar"),
+						"ht_promotion" => $lng->txt("promotion_higher")
+					);
+				}
 				$si = new ilSelectInputGUI($lng->txt("education"), "usr_general_education");
 				$si->setOptions($options);
 				$a_form->addItem($si);
@@ -635,6 +683,14 @@ class ilCDTrainerProfile extends ilUserProfile
 					2 => $lng->txt("little"),
 					3 => $lng->txt("much")
 					);
+				if (cdUtil::isDAF())	// a17k540
+				{
+					$options = array(
+						"" => $lng->txt("please_select"),
+						3 => $lng->txt("yes"),
+						1 => $lng->txt("no"),
+					);
+				}
 				foreach ($this->tech_lang as $k => $tl)
 				{
 					$si = new ilSelectInputGUI($this->cd_plugin->txt($tl), "teach_exp_tech_lang_".$k);
@@ -731,6 +787,10 @@ class ilCDTrainerProfile extends ilUserProfile
 					"skype" => $lng->txt("tm_skype"),
 					"podcast" => $lng->txt("tm_podcasts")
 					);
+				if (cdUtil::isDAF())	// a17k540
+				{
+					$options["apps"] = 	$lng->txt("tm_apps");
+				}
 				include_once("./Services/Form/classes/class.ilMultiSelectInputGUI.php");
 				$si = new ilMultiSelectInputGUI($lng->txt("teaching_media"), "teaching_media");
 				$si->setOptions($options);

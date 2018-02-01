@@ -65,8 +65,8 @@ class ilAccountRegistrationGUI
 
 			$this->mode = "trainer";
 			$ilCtrl->saveParameter($this, "mode");
-			$lng->loadLanguageModule("cd");
 		}
+		$lng->loadLanguageModule("cd");
 		// cdpatch end
 
 	}

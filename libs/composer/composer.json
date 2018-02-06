@@ -5,7 +5,7 @@
 	"authors": [],
 	"require": {
 		"cweagans/composer-patches": "~1.0",
-		"filp/whoops": "^2.0",
+		"filp/whoops": "^2.1.13",
 		"monolog/monolog": "^1.15",
 		"phpoffice/phpexcel": "^1.8.1",
 		"technosophos/LibRIS": "^2.0.2",
@@ -17,7 +17,8 @@
 		"pimple/pimple" : "^3.0",
 		"symfony/yaml": "^3.1",
 		"moment/moment": "^2.14.1",
-		"jakoch/phantomjs-installer": "2.1.1-p05"
+		"jakoch/phantomjs-installer": "2.1.1-p05",
+		"psr/log": "^1.0.1"
 	},
 	 "config": {
         "bin-dir": "bin"
@@ -60,8 +61,8 @@
 			"used_version" : "v2.1.0",
 			"wrapped_by" : null,
 			"added_by" : "Denis Klöpfer <denis.kloepfer@concepts-and-training.de>",
-			"last_update" : "2016-03-22",
-			"last_update_by" : "Jörg Lützenkirchen <luetzenkirchen@leifos.com>"
+			"last_update" : "2018-01-11",
+			"last_update_by" : "Richard Klees <richard.klees@concepts-and-training.de>"
 		},
 		"monolog/monolog" : {
 			"source" : "https://github.com/Seldaek/monolog",

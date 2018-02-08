@@ -381,20 +381,13 @@ assessment#:#duplicate_order_values_entered#:#You have entered duplicate order v
 assessment#:#duplicate#:#Duplicate
 assessment#:#ects_allow_ects_grades#:#Show ECTS grade additional to received mark
 assessment#:#ects_fill_out_all_values#:#Please enter a value for every ECTS grade!
-assessment#:#ects_grade_a_short#:#EXCELLENT
-assessment#:#ects_grade_a#:#outstanding performance with only minor errors
-assessment#:#ects_grade_b_short#:#VERY GOOD
-assessment#:#ects_grade_b#:#above the average standard but with some errors
-assessment#:#ects_grade_c_short#:#GOOD
-assessment#:#ects_grade_c#:#generally sound work with a number of notable errors
-assessment#:#ects_grade_d_short#:#SATISFACTORY
-assessment#:#ects_grade_d#:#fair but with significant shortcomings
-assessment#:#ects_grade_e_short#:#SUFFICIENT
-assessment#:#ects_grade_e#:#performance meets the minimum criteria
-assessment#:#ects_grade_f_short#:#FAIL
-assessment#:#ects_grade_f#:#considerable further work is required
-assessment#:#ects_grade_fx_short#:#FAIL
-assessment#:#ects_grade_fx#:#some more work required before the credit can be awarded
+assessment#:#ects_grade_a_desc#:#outstanding performance with only minor errors
+assessment#:#ects_grade_b_desc#:#above the average standard but with some errors
+assessment#:#ects_grade_c_desc#:#generally sound work with a number of notable errors
+assessment#:#ects_grade_d_desc#:#fair but with significant shortcomings
+assessment#:#ects_grade_e_desc#:#performance meets the minimum criteria
+assessment#:#ects_grade_f_desc#:#considerable further work is required
+assessment#:#ects_grade_fx_desc#:#some more work required before the credit can be awarded
 assessment#:#ects_grade#:#ECTS Grade
 assessment#:#ects_output_of_ects_grades#:#Output of ECTS grades
 assessment#:#ects_range_error_a#:#Please enter a value between 0 and 100 for ECTS grade A!
@@ -10608,6 +10601,7 @@ survey#:#please_enter_mail_subject#:#Please enter a mail subject
 survey#:#please_enter_mail_message#:#Please enter a mail message
 survey#:#participating_users#:#Participating Users
 survey#:#please_enter_mail_code#:#Please enter the access code placeholder [code]
+survey#:#please_enter_mail_url#:#Please enter the access url placeholder [url]
 survey#:#mail_sent_short#:#Sent
 survey#:#finished_mail_subject#:#The survey "%s" was finished
 survey#:#msg_min_nr_answers#:#Please check at least %s answer(s).
@@ -15384,7 +15378,7 @@ scormtrac#:#student_response#:#student_response: Response
 scormtrac#:#ostatus#:#Status of the objective
 prtf#:#prtf_blog_page_created#:#Blog has been added.
 wiki#:#wiki_adv_md_hidden#:#This block is currently hidden.
-wiki#:#wiki_page_list_form_info#:#Adds a list of pages of this wiki that are all assigned to the selected metadata below.
+wiki#:#wiki_page_list_form_info#:#Adds a list of pages of this wiki that are all assigned to the selected metadata below. Only searchable meta data fields are listed.
 content#:#cont_pc_amdpl#:#Page List
 meta#:#udf_type_selectmulti#:#Selection List (Multiple Choice)
 wiki#:#wiki_no_page_found#:#No wiki page has been found for search term '$1'.
@@ -15910,7 +15904,7 @@ awrn#:#awareness_settings#:#Settings
 awrn#:#awrn_enable#:#Enable ‘Who is online?’-Tool
 crs#:#crs_mem_contacts#:#Tutorial Support
 user#:#user_awrn_all_users#:#All Users
-user#:#user_awrn_all_users_info#:#All users of the platform are listed.
+user#:#user_awrn_all_users_info#:#All users of the platform are listed. Please not that the setting "Online and Offline" can reduce performance greatly on installations with a large number of users.
 crs#:#crs_awrn_support_contacts#:#Tutorial Support
 crs#:#crs_awrn_support_contacts_info#:#All tutorial support contacts of courses with membership of the current user are listed. Users are defined as tutorial support contacts in the Members tab of the respective course.
 awrn#:#awrn_inactive#:#Not Listed
@@ -15927,7 +15921,7 @@ awrn#:#awrn_caching_period#:#Caching Period
 awrn#:#awrn_caching_period_info#:#Time that is waited before the number of users in the top bar is updated and new online users are determined.
 awrn#:#awrn_seconds#:#sec
 awrn#:#awrn_max_nr_entries#:#Max. Number of Items
-awrn#:#awrn_max_nr_entries_info#:#Maximum number of items in the ‘Who is online?’ list.
+awrn#:#awrn_max_nr_entries_info#:#Maximum number of items in the ‘Who is online?’ list. This setting has only minimal performance influence when displaying the tool in the top bar.
 awrn#:#awrn_hide_from_awareness#:#Hide Me From ‘Who is online?’-Tool
 awrn#:#awrn_hide_from_awareness_info#:#The ‘Who is online?’-Tool is in the top bar and listing selected users (e.g. contacts or members of your courses).
 common#:#contact_sysadmin#:#Contact Technical Support
@@ -16236,3 +16230,4 @@ wsp#:#element_already_shared#:#This element is already shared with this user.
 wsp#:#search_no_match#:#Your search did not match any results
 wsp#:#element_shared#:#Element shared
 wsp#:#share#:#Share
+wiki#:#wiki_pg_list_no_search_fields#:#No searchable meta data fields found in the metadata sets of the wiki.

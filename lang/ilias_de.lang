@@ -491,20 +491,13 @@ assessment#:#duplicate_order_values_entered#:#Sie haben mindestens eine doppelte
 assessment#:#ects_allow_ects_grades#:#ECTS-Note zusätzlich zur erreichten Note anzeigen
 assessment#:#ects_fill_out_all_values#:#Bitte geben Sie einen Wert für jede ECTS-Note an!
 assessment#:#ects_grade#:#ECTS-Note
-assessment#:#ects_grade_a#:#ausgezeichnete Leistungen und nur wenige unbedeutende Fehler
-assessment#:#ects_grade_a_short#:#HERVORRAGEND
-assessment#:#ects_grade_b#:#überdurchschnittliche Leistungen, aber einige Fehler
-assessment#:#ects_grade_b_short#:#SEHR GUT
-assessment#:#ects_grade_c#:#insgesamt gute und solide Arbeit, jedoch mit einigen grundlegenden Fehlern
-assessment#:#ects_grade_c_short#:#GUT
-assessment#:#ects_grade_d#:#mittelmäßig, jedoch deutliche Mängel
-assessment#:#ects_grade_d_short#:#BEFRIEDIGEND
-assessment#:#ects_grade_e#:#die gezeigten Leistungen entsprechen den Mindestanforderungen
-assessment#:#ects_grade_e_short#:#AUSREICHEND
-assessment#:#ects_grade_f#:#es sind erhebliche Verbesserungen erforderlich
-assessment#:#ects_grade_f_short#:#NICHT BESTANDEN
-assessment#:#ects_grade_fx#:#es sind Verbesserungen erforderlich, bevor die Leistung anerkannt wird
-assessment#:#ects_grade_fx_short#:#NICHT BESTANDEN
+assessment#:#ects_grade_a_desc#:#ausgezeichnete Leistungen und nur wenige unbedeutende Fehler
+assessment#:#ects_grade_b_desc#:#überdurchschnittliche Leistungen, aber einige Fehler
+assessment#:#ects_grade_c_desc#:#insgesamt gute und solide Arbeit, jedoch mit einigen grundlegenden Fehlern
+assessment#:#ects_grade_d_desc#:#mittelmäßig, jedoch deutliche Mängel
+assessment#:#ects_grade_e_desc#:#die gezeigten Leistungen entsprechen den Mindestanforderungen
+assessment#:#ects_grade_f_desc#:#es sind erhebliche Verbesserungen erforderlich
+assessment#:#ects_grade_fx_desc#:#es sind Verbesserungen erforderlich, bevor die Leistung anerkannt wird
 assessment#:#ects_output_of_ects_grades#:#Ausgabe von ECTS-Noten
 assessment#:#ects_range_error_a#:#Bitte geben Sie einen Wert zwischen 0 und 100 für die ECTS-Note A an!
 assessment#:#ects_range_error_b#:#Bitte geben Sie einen Wert zwischen 0 und 100 für die ECTS-Note B an!
@@ -6514,7 +6507,7 @@ content#:#selectHeader#:#Als Kopfzeile auswählen
 content#:#seq_abandon#:#Die Anfrage wurde durchgeführt.
 content#:#seq_abandonall#:#Die Kurssitzung wurde abgebrochen.
 content#:#seq_blocked#:#Zugriff verweigert.
-content#:#seq_close#:#Bitte schließen sie das Fenster des SCORM-Lernmoduls.
+content#:#seq_close#:#Bitte schließen Sie das Fenster des SCORM-Lernmoduls.
 content#:#seq_coursecomplete#:#Der aktuelle Kurs wurde vollständig bearbeitet.
 content#:#seq_deadlock#:#Fehler: Der Sequencer befindet sich in einem Deadlock.
 content#:#seq_endsession#:#Die aktuelle Kurssitzung wurde beendet.
@@ -6878,7 +6871,7 @@ crs#:#crs_reg_user_already_assigned#:#Sie sind bereits Mitglied dieses Kurses
 crs#:#crs_reg_user_already_subscribed#:#Sie haben bereits einen Aufnahmeantrag gestellt! Bitte warten Sie auf die Bestätigung.
 crs#:#crs_reg_user_blocked#:#Ihr Zugang wurde gesperrt
 crs#:#crs_registration#:#Zum Kurs beitreten
-crs#:#crs_registration_deactivated#:#Nur Kursdministratoren und Kurstutoren können Benutzer in den Kurs aufnehmen.
+crs#:#crs_registration_deactivated#:#Nur Kursadministratoren und Kurstutoren können Benutzer in den Kurs aufnehmen.
 crs#:#crs_registration_limited#:#Zeitlich begrenzter Beitritt
 crs#:#crs_registration_type#:#Beitrittsverfahren
 crs#:#crs_registration_unlimited#:#Zeitlich unbegrenzt
@@ -11538,6 +11531,7 @@ survey#:#phrase_added#:#Phrase hinzugefügt
 survey#:#phrase_new#:#Neue Phrase erstellen
 survey#:#phrase_saved#:#Die Phrase wurde erfolgreich gespeichert
 survey#:#please_enter_mail_code#:#Bitte verwenden Sie den Platzhalter für den Zugangscode [code].
+survey#:#please_enter_mail_url#:#Bitte verwenden Sie den Platzhalter für die URL [url].
 survey#:#please_enter_mail_message#:#Bitte geben Sie einen Nachrichteninhalt ein.
 survey#:#please_enter_mail_subject#:#Bitte geben Sie einen Betreff ein.
 survey#:#please_select#:#-- bitte auswählen --
@@ -15384,7 +15378,7 @@ scormtrac#:#student_response#:#student_response: Antwort
 scormtrac#:#ostatus#:#Status des Lernziels
 prtf#:#prtf_blog_page_created#:#Blog wurde hinzugefügt.
 wiki#:#wiki_adv_md_hidden#:#Dieser Block wird aktuell nicht präsentiert.
-wiki#:#wiki_page_list_form_info#:#Fügt eine Liste mit Wiki-Seiten hinzu, die nachfolgenden Metadaten zugeordnet sind.
+wiki#:#wiki_page_list_form_info#:#Fügt eine Liste mit Wiki-Seiten hinzu, die nachfolgenden Metadaten zugeordnet sind. Es werden nur durchsuchbare Metadatenfelder aus den Metadatensätzen des Wikis angeboten.
 content#:#cont_pc_amdpl#:#Seitenliste
 meta#:#udf_type_selectmulti#:#Auswahlliste (Mehrfachauswahl)
 wiki#:#wiki_no_page_found#:#Es wurden keine Seiten zum Suchbegriff '$1' gefunden.
@@ -15895,7 +15889,7 @@ awrn#:#awareness_settings#:#Einstellungen
 awrn#:#awrn_enable#:#Aktiviere „Wer ist online?“-Anzeige
 crs#:#crs_mem_contacts#:#Kursbetreuung
 user#:#user_awrn_all_users#:#Alle Benutzer
-user#:#user_awrn_all_users_info#:#Alle Benutzer der Plattform werden aufgelistet.
+user#:#user_awrn_all_users_info#:#Alle Benutzer der Plattform werden aufgelistet. Achtung: Wird die Option "Online und offline" gewählt, ist bei hoher Benutzerzahl mit erheblichen Performanzeinbußen zu rechnen.
 crs#:#crs_awrn_support_contacts#:#Kursbetreuung
 crs#:#crs_awrn_support_contacts_info#:#Benutzer, die den Kurs betreuen, werden aufgelistet. Die jeweiligen Benutzer werden im Reiter Mitglieder des Kurses für die Kursbetreuung eingetragen.
 awrn#:#awrn_inactive#:#Keine Anzeige
@@ -15914,7 +15908,7 @@ awrn#:#awrn_caching_period#:#Caching-Zeitraum
 awrn#:#awrn_caching_period_info#:#Dieser Zeitraum wird abgewartet, bevor die Anzahl der Benutzer in der Top-Anzeige aktualisiert und neue Online-Benutzer ermittelt werden.
 awrn#:#awrn_seconds#:#Sek.
 awrn#:#awrn_max_nr_entries#:#Anzahl max. Einträge
-awrn#:#awrn_max_nr_entries_info#:#Diese Anzahl an Einträgen wird maximal in der „Wer ist online?“-Liste angezeigt.
+awrn#:#awrn_max_nr_entries_info#:#Diese Anzahl an Einträgen wird maximal in der „Wer ist online?“-Liste angezeigt. Diese Einstellung beeinflusst die Performanz der Anzeige in der Top-Bar nicht wesentlich.
 awrn#:#awrn_hide_from_awareness#:#Mich nicht in „Wer ist online?“-Anzeige auflisten
 awrn#:#awrn_hide_from_awareness_info#:#Die „Wer ist online?“-Anzeige erscheint oben im Kopf der Anwendung und listet ausgewählte Benutzer auf (z.B. Kontakte oder Mitglieder Ihrer Kurse).
 common#:#contact_sysadmin#:#Technische Betreuung kontaktieren
@@ -16236,3 +16230,4 @@ wsp#:#element_already_shared#:#This element is already shared with this user.###
 wsp#:#search_no_match#:#Your search did not match any results###17 05 2017 new variable
 wsp#:#element_shared#:#Element shared###17 05 2017 new variable
 wsp#:#share#:#Share###17 05 2017 new variable
+wiki#:#wiki_pg_list_no_search_fields#:#Es befinden sich keine durchsuchbaren Metadatenfelder in den Metadatensätzen des Wikis.

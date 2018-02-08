@@ -262,10 +262,6 @@ abstract class assQuestion
 	 */
 	private $obligationsToBeConsidered = false;
 	
-	protected static $allowedImageMaterialFileExtensionsByMimeType = array(
-		'image/jpeg' => array('jpg', 'jpeg'), 'image/png' => array('png'), 'image/gif' => array('gif')
-	);
-	
 	/**
 	* assQuestion constructor
 	*
@@ -360,20 +356,18 @@ abstract class assQuestion
 			strtolower($fileExtension), self::getAllowedFileExtensionsForMimeType($mimeType)
 		);
 	}
-
-	/**
-	 * @return array	all allowed file extensions for image material
-	 */
-	public static function getAllowedImageMaterialFileExtensions()
+	
+	public static function getAllowedImageFileExtensions()
 	{
-		$extensions = array();
-
-		foreach (self::$allowedImageMaterialFileExtensionsByMimeType as $mimeType => $mimeExtensions)
+		$allowedExtensions = array();
+		
+		foreach(self::$allowedFileExtensionsByMimeType as $mimeType => $fileExtensions)
 		{
-			$extensions = array_merge($extensions, $mimeExtensions);
+			 $allowedExtensions = array_merge($allowedExtensions, $fileExtensions);
 		}
-		return array_unique($extensions);
-	}
+		
+		return $allowedExtensions;
+	}	
 
 	/**
 	 * @return ilArrayElementShuffler
@@ -2185,6 +2179,25 @@ abstract class assQuestion
 		}
 	}
 	
+	public static function isFileAvailable($file)
+	{
+		if( !file_exists($file) )
+		{
+			return false;
+		}
+		
+		if( !is_file($file) )
+		{
+			return false;
+		}
+		
+		if( !is_readable($file) )
+		{
+			return false;
+		}
+		
+		return true;
+	}
 	
 	function copyXHTMLMediaObjectsOfQuestion($a_q_id)
 	{
@@ -3741,10 +3754,8 @@ abstract class assQuestion
 		$collected = $this->getQuestion();
 		$collected .= $this->feedbackOBJ->getGenericFeedbackContent($this->getId(), false);
 		$collected .= $this->feedbackOBJ->getGenericFeedbackContent($this->getId(), true);
-		for( $i = 0; $i <= $this->getTotalAnswers(); $i++ )
-		{
-			$collected .= $this->feedbackOBJ->getSpecificAnswerFeedbackContent($this->getId(), $i);
-		}
+		$collected .= $this->feedbackOBJ->getAllSpecificAnswerFeedbackContents($this->getId());
+		
 		foreach ($this->suggested_solutions as $solution_array)
 		{
 			$collected .= $solution_array["value"];
@@ -4226,18 +4237,7 @@ abstract class assQuestion
 	 */
 	function formatSAQuestion($a_q)
 	{
-		include_once("./Services/RTE/classes/class.ilRTE.php");
-		$a_q = nl2br((string) ilRTE::_replaceMediaObjectImageSrc($a_q, 0));
-		$a_q = str_replace("</li><br />", "</li>", $a_q);
-		$a_q = str_replace("</li><br>", "</li>", $a_q);
-		
-		$a_q = ilUtil::insertLatexImages($a_q, "\[tex\]", "\[\/tex\]");
-		$a_q = ilUtil::insertLatexImages($a_q, "\<span class\=\"latex\">", "\<\/span>");
-
-		$a_q = str_replace('{', '&#123;', $a_q);
-		$a_q = str_replace('}', '&#125;', $a_q);
-		
-		return $a_q;
+		return $this->getSelfAssessmentFormatter()->format($a_q);
 	}
 
 	// scorm2004-start ???
@@ -4896,6 +4896,15 @@ abstract class assQuestion
 			$sec += $time_array[2];
 		}
 		return $sec;
+	}
+	
+	/**
+	 * @return \ilAssSelfAssessmentQuestionFormatter
+	 */
+	protected function getSelfAssessmentFormatter()
+	{
+		require_once 'Modules/TestQuestionPool/classes/questions/class.ilAssSelfAssessmentQuestionFormatter.php';
+		return new \ilAssSelfAssessmentQuestionFormatter();
 	}
 
 	public function toJSON()

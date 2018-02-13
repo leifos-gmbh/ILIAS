@@ -1,0 +1,160 @@
+<?php
+
+/* Copyright (c) 1998-2018 ILIAS open source, Extended GPL, see docs/LICENSE */
+
+/**
+ * User interface for like feature
+ *
+ * @author Alex Killing <alex.killing@gmx.de>
+ * @version $Id$
+ *
+ * @ingroup ServicesLike
+ */
+class ilLikeGUI
+{
+	/**
+	 * @var ilLanguage
+	 */
+	protected $lng;
+
+	/**
+	 * @var ilCtrl
+	 */
+	protected $ctrl;
+
+	/**
+	 * @var ilObjUser
+	 */
+	protected $user;
+
+	/**
+	 * @var int
+	 */
+	protected $obj_id;
+
+	/**
+	 * @var string
+	 */
+	protected $obj_type;
+
+	/**
+	 * @var int
+	 */
+	protected $sub_obj_id;
+
+	/**
+	 * @var string
+	 */
+	protected $sub_obj_type;
+
+	/**
+	 * @var int
+	 */
+	protected $news_id;
+
+	/**
+	 * ilLikeGUI constructor
+	 */
+	function __construct()
+	{
+		global $DIC;
+
+		$this->lng = $DIC->language();
+		$this->ctrl = $DIC->ctrl();
+		$this->user = $DIC->user();
+		$this->ui = $DIC->ui();
+
+		$this->lng->loadLanguageModule("like");
+	}
+
+	/**
+	 * Execute command
+	 * @return string
+	 */
+	function executeCommand()
+	{
+		$ilCtrl = $this->ctrl;
+
+		$next_class = $ilCtrl->getNextClass($this);
+		$cmd = $ilCtrl->getCmd("getHTML");
+
+		switch($next_class)
+		{
+			default:
+				if (in_array($cmd, array("getHTML", "renderEmoticons")))
+				{
+					return $this->$cmd();
+				}
+				break;
+		}
+		return "";
+	}
+
+	/**
+	 * Set Object.
+	 *
+	 * @param	int			$a_obj_id			Object ID
+	 * @param	string		$a_obj_type			Object Type
+	 * @param	int			$a_sub_obj_id		Subobject ID
+	 * @param	string		$a_sub_obj_type		Subobject Type
+	 */
+	function setObject($a_obj_id, $a_obj_type, $a_sub_obj_id = 0, $a_sub_obj_type = "", $a_news_id = 0)
+	{
+		if(!trim($a_sub_obj_type))
+		{
+			$a_sub_obj_type = "-";
+		}
+
+		$this->obj_id = $a_obj_id;
+		$this->obj_type = $a_obj_type;
+		$this->sub_obj_id = $a_sub_obj_id;
+		$this->sub_obj_type = $a_sub_obj_type;
+		$this->news_id = $a_news_id;
+		$this->id = "like_".$this->obj_id."_".$this->obj_type."_".$this->sub_obj_id."_".
+			$this->sub_obj_type."_".$this->news_id;
+	}
+
+	/**
+	 * Get HTML
+	 *
+	 * @param
+	 * @return
+	 */
+	function getHTML()
+	{
+		$f = $this->ui->factory();
+		$r = $this->ui->renderer();
+		$ctrl = $this->ctrl;
+		$lng = $this->lng;
+
+		$tpl = new ilTemplate("tpl.like.html", true, true, "Services/Like");
+
+		$popover = $f->popover()->standard($f->legacy(''))->withTitle('');
+		$ctrl->setParameter($this, "repl_sig", $popover->getReplaceContentSignal()->getId());
+		$asyn_url = $ctrl->getLinkTarget($this, "renderEmoticons", "", true, false);
+		$popover = $popover->withAsyncContentUrl($asyn_url);
+		$button = $f->button()->shy($lng->txt("like"), '#')
+			->withOnClick($popover->getShowSignal());
+
+		$tpl->setVariable("LIKE", $r->render([$popover, $button]));
+
+		return $tpl->get();
+	}
+
+	/**
+	 * Render emoticons
+	 *
+	 */
+	function renderEmoticons()
+	{
+		$tpl = new ilTemplate("tpl.emoticons.html", true, true, "Services/Like");
+		$tpl->setVariable("ID", $this->id);
+		echo $tpl->get();
+		exit;
+	}
+
+
+
+}
+
+?>

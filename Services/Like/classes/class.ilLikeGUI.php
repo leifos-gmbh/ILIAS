@@ -81,7 +81,7 @@ class ilLikeGUI
 		switch($next_class)
 		{
 			default:
-				if (in_array($cmd, array("getHTML", "renderEmoticons")))
+				if (in_array($cmd, array("getHTML", "renderEmoticons", "renderModal")))
 				{
 					return $this->$cmd();
 				}
@@ -129,12 +129,30 @@ class ilLikeGUI
 
 		$tpl = new ilTemplate("tpl.like.html", true, true, "Services/Like");
 
+		// modal
+		$modal_asyn_url = $ctrl->getLinkTarget($this, "renderModal", "", true, false);
+		$modal = $f->modal()->roundtrip('', $f->legacy(""))
+			->withAsyncRenderUrl($modal_asyn_url);
+		$button = $f->button()->shy("*****", '#')
+			->withOnClick($modal->getShowSignal());
+		$modal_button = $r->render([$button, $modal]);
+
+		$badge = '<a href="#">👍<span class="badge badge-notify il-counter-status">4</span><span class="il-counter-spacer">4</span></a><a href="#">😆<span class="badge badge-notify il-counter-status">3</span><span class="il-counter-spacer">3</span></a>';
+		$modal_button = str_replace("*****", $badge, $modal_button);
+
+		$tpl->setVariable("MODAL_TRIGGER", $modal_button);
+
+
+		// emoticon popover
 		$popover = $f->popover()->standard($f->legacy(''))->withTitle('');
 		$ctrl->setParameter($this, "repl_sig", $popover->getReplaceContentSignal()->getId());
 		$asyn_url = $ctrl->getLinkTarget($this, "renderEmoticons", "", true, false);
 		$popover = $popover->withAsyncContentUrl($asyn_url);
 		$button = $f->button()->shy($lng->txt("like"), '#')
 			->withOnClick($popover->getShowSignal());
+
+		//$tpl->setVariable("STATUS_BADGES", '<a href="#">👍<span class="badge badge-notify il-counter-status">2</span><span class="il-counter-spacer">4</span></a><a href="#">😆<span
+		//class="badge badge-notify il-counter-status">4</span><span class="il-counter-spacer">4</span></a>');
 
 		$tpl->setVariable("LIKE", $r->render([$popover, $button]));
 
@@ -143,7 +161,6 @@ class ilLikeGUI
 
 	/**
 	 * Render emoticons
-	 *
 	 */
 	function renderEmoticons()
 	{
@@ -152,6 +169,68 @@ class ilLikeGUI
 		echo $tpl->get();
 		exit;
 	}
+
+	/**
+	 * Render modal
+	 */
+	function renderModal()
+	{
+		$user = $this->user;
+
+		$f = $this->ui->factory();
+		$r = $this->ui->renderer();
+
+		$image = $f->image()->responsive(
+			ilObjUser::_getPersonalPicturePath($user->getId()),
+			"Thumbnail Example");
+
+		$list_item1 = $f->item()->standard("Max Learner")
+			->withDescription("👍&nbsp;&nbsp; 11. Feb 2017")
+			->withLeadImage($image);
+
+		$list_item2 = $f->item()->standard("Alex Killing")
+			->withDescription("👍&nbsp;&nbsp; 10. Feb 2017")
+			->withLeadImage($image);
+
+		$list_item3 = $f->item()->standard("Hans Moser")
+			->withDescription("😆&nbsp;&nbsp; 8. Feb 2017")
+			->withLeadImage($image);
+
+		$list_item4 = $f->item()->standard("Fred Schmidt")
+			->withDescription("😆&nbsp;&nbsp; 7. Feb 2017")
+			->withLeadImage($image);
+
+		$list_item5 = $f->item()->standard("Gustav Schwan")
+			->withDescription("👍&nbsp;&nbsp; 4. Feb 2017")
+			->withLeadImage($image);
+
+		$list_item6 = $f->item()->standard("Fridolin Fischer")
+			->withDescription("😆&nbsp;&nbsp; 2. Feb 2017")
+			->withLeadImage($image);
+
+		$list_item7 = $f->item()->standard("Paul Pastete")
+			->withDescription("👍&nbsp;&nbsp; 1. Feb 2017")
+			->withLeadImage($image);
+
+		$std_list = $f->panel()->listing()->standard("", array(
+			$f->item()->group("", array(
+				$list_item1,
+				$list_item2,
+				$list_item3,
+				$list_item4,
+				$list_item5,
+				$list_item6,
+				$list_item7
+			))
+		));
+
+
+
+		$modal = $f->modal()->roundtrip('', $std_list);
+		echo $r->render($modal);
+		exit;
+	}
+
 
 
 

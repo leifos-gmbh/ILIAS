@@ -14156,3 +14156,4 @@ meta#:#adt_error_max_length#:#Der eingegebene Text ist zu lang. Bitte geben Sie 
 form#:#form_chars_remaining#:#Verbleibende Zeichen:
 poll#:#poll_voting_period_full_info#:#Abstimmung von %s bis %s
 crs#:#crs_subscription_min_members_err#:#Die minimale Anzahl darf nicht größer als die maximale Anzahl sein.
+like#:#like#:#Like

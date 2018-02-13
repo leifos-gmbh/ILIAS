@@ -7,6 +7,9 @@
  *
  * @author Alex Killing <alex.killing@gmx.de>
  * @version $Id$
+ *
+ * @ilCtrl_Calls ilNewsTimelineGUI: ilLikeGUI
+ *
  * @ingroup ServicesNews
  */
 class ilNewsTimelineGUI
@@ -110,14 +113,28 @@ class ilNewsTimelineGUI
 
 	/**
 	 * Execute command
+	 *
+	 * @throws ilCtrlException
 	 */
 	function executeCommand()
 	{
+		$ctrl = $this->ctrl;
+
 		$next_class = $this->ctrl->getNextClass($this);
 		$cmd = $this->ctrl->getCmd("show");
 
 		switch ($next_class)
 		{
+			case "illikegui":
+				include_once("./Services/Like/classes/class.ilLikeGUI.php");
+				$i = new ilNewsItem($_GET["news_id"]);
+				$ctrl->saveParameter($this,"news_id");
+				$like_gui = new ilLikeGUI();
+				$like_gui->setObject($i->getContextObjId(), $i->getContextObjType(),
+					$i->getContextSubObjId(), $i->getContextSubObjType());
+				$ret = $ctrl->forwardCommand($like_gui);
+				break;
+
 			default:
 				if (in_array($cmd, array("show", "save", "update", "loadMore", "remove")))
 				{

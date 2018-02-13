@@ -13906,6 +13906,21 @@ span.ilNewsRssIcon:hover {
 .ilTimeline > li {
   margin-bottom: 20px;
   position: relative;
+  margin-right: 50%;
+}
+.ilTimeline > li:nth-child(even) {
+  margin-left: 50%;
+  margin-right: 0;
+}
+@media only screen and (max-width: 767px) {
+  .ilTimeline > li:nth-child(even) {
+    margin-left: 0;
+  }
+}
+@media only screen and (max-width: 767px) {
+  .ilTimeline > li {
+    margin-right: 0;
+  }
 }
 .ilTimeline > li:before,
 .ilTimeline > li:after {
@@ -13916,7 +13931,7 @@ span.ilNewsRssIcon:hover {
   clear: both;
 }
 .ilTimeline > li > .ilTimelinePanel {
-  width: 44%;
+  width: 88%;
   float: left;
   padding: 20px;
   position: relative;
@@ -13948,7 +13963,7 @@ span.ilNewsRssIcon:hover {
   text-align: center;
   position: absolute;
   top: 16px;
-  left: 50%;
+  left: 0;
   margin-left: -25px;
   background-color: #999;
   z-index: 100;
@@ -15194,17 +15209,17 @@ span.ilProfileBadge {
   text-align: right;
 }
 .ilLike .badge {
-  margin-left: 1px;
+  margin-left: 2px;
 }
 .ilLike .il-counter-spacer {
-  margin-left: 1px;
+  margin-left: 0px;
   font-size: 9px;
-  /* padding: 2px 4px; */
+  padding: 0;
   visibility: hidden;
 }
 .ilLike a {
   display: inline-block;
-  padding: 2px 4px;
+  /* padding: 2px 4px; */
 }
 .ilLike a:hover {
   text-decoration: none;
@@ -15220,6 +15235,9 @@ span.ilProfileBadge {
   text-decoration: none;
   /*background-color: @il-highlight-bg;*/
   background-color: #F0F0F0;
+}
+.ilLike .il-item img {
+  max-width: 50%;
 }
 .noMargin {
   margin: 0;

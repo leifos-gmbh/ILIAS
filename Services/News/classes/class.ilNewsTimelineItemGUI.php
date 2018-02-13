@@ -201,17 +201,6 @@ class ilNewsTimelineItemGUI implements ilTimelineItemInt
 			$tpl->parseCurrentBlock();
 		}
 
-		// like
-		$tpl->setCurrentBlock("like");
-		include_once("./Services/Like/classes/class.ilLikeGUI.php");
-		$like_gui = new ilLikeGUI();
-		$this->ctrl->setParameterByClass("ilnewstimelinegui", "news_id", $i->getId());
-		$like_gui->setObject($i->getContextObjId(), $i->getContextObjType(),
-			$i->getContextSubObjId(), $i->getContextSubObjType());
-		$tpl->setVariable("LIKE", $this->ctrl->getHTML($like_gui));
-		$this->ctrl->setParameterByClass("ilnewstimelinegui", "news_id", $_GET["news_id"]);
-		$tpl->parseCurrentBlock();
-
 		$tpl->setVariable("USER_IMAGE", ilObjUser::_getPersonalPicturePath($i->getUserId(), "xsmall"));
 		if (!$i->getContentIsLangVar())
 		{
@@ -257,6 +246,25 @@ class ilNewsTimelineItemGUI implements ilTimelineItemInt
 
 
 		return $tpl->get();
+	}
+
+	/**
+	 * Render footer
+	 */
+	function renderFooter()
+	{
+		$i = $this->getNewsItem();
+
+		// like
+		include_once("./Services/Like/classes/class.ilLikeGUI.php");
+		$like_gui = new ilLikeGUI();
+		$this->ctrl->setParameterByClass("ilnewstimelinegui", "news_id", $i->getId());
+		$like_gui->setObject($i->getContextObjId(), $i->getContextObjType(),
+			$i->getContextSubObjId(), $i->getContextSubObjType());
+		$html = $this->ctrl->getHTML($like_gui);
+		$this->ctrl->setParameterByClass("ilnewstimelinegui", "news_id", $_GET["news_id"]);
+
+		return $html;
 	}
 
 }

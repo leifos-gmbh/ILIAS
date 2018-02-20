@@ -7,8 +7,8 @@ define('IL_COOKIE_PATH', $_REQUEST['cookie_path']);
 if ($_REQUEST['ilias_path'])
     define('ILIAS_HTTP_PATH', $_REQUEST['ilias_path']);
 
-include_once './Services/Authentication/classes/class.ilAuthUtils.php';
 
+include_once './Services/Authentication/classes/class.ilAuthUtils.php';
 $_POST['auth_mode'] = AUTH_APACHE;
 
 ilAuthFactory::setContext(ilAuthFactory::CONTEXT_APACHE);
@@ -67,6 +67,15 @@ else
 if ((defined('APACHE_ERRORCODE') && APACHE_ERRORCODE) || (!$ilUser || $ilUser->getId() == ANONYMOUS_USER_ID || !$ilUser->getId()))
 	$redirect .= '&auth_stat='. AUTH_APACHE_FAILED;
 
-
+$redirect = ILIAS_HTTP_PATH.'/goto.php?';
+if($_GET['target'])
+{
+	$redirect .= 'target='.$_GET['target'];
+}
+else
+{
+	$redirect .= 'target=root_1';
+}
+$redirect = str_replace('/basicauth','', $redirect);
 
 header('Location: ' . $redirect);

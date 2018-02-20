@@ -58,7 +58,7 @@ if(
 		// netscaler session
 		case '1':
 		case '2':
-			ilLoggerFactory::getLogger('auth')->info('Redirect to: ./intern/' . $target);
+			ilLoggerFactory::getLogger('auth')->info('Redirect to: ./intern' . $target);
 			ilUtil::redirect('./intern'.$target);
 			break;
 			

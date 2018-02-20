@@ -56,7 +56,7 @@ foreach($validDomains as $validDomain)
 
 if( !$validRedirect )
 {
-	#die('The redirect target "'.$redirect.'" is not in the list of allowed domains.');
+	die('The redirect target "'.$redirect.'" is not in the list of allowed domains.');
 }
 
 if (strpos($redirect, '?') === false)

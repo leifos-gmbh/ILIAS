@@ -101,7 +101,9 @@ class ilStartUpGUI
 		}
 		
 		// check for session cookies enabled
-		if (!isset($_COOKIE['iltest']))
+		// begin-patch skyguide auth
+		if (!isset($_COOKIE['iltest']) && 0)
+		// end-patch skyguide auth
 		{
 			if (empty($_GET['cookies']))
 			{

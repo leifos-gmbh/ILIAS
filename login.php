@@ -57,11 +57,12 @@ if(
 	{
 		// netscaler session
 		case '1':
+		// kerberos session
 		case '2':
 			ilLoggerFactory::getLogger('auth')->info('Redirect to: ./intern' . $target);
 			ilUtil::redirect('./intern'.$target);
 			break;
-			
+
 		default:
 			ilLoggerFactory::getLogger('auth')->info('No sso request, showing login page.');
 			break;

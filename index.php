@@ -65,6 +65,34 @@ if (isset($_GET["client_id"]))
 require_once("Services/Init/classes/class.ilInitialisation.php");
 ilInitialisation::initILIAS();
 
+// begin-patch skyguide
+if(
+	!isset($_GET['cmd']) ||
+	strcmp($_GET['cmd'], 'force_login') !== 0
+)
+{
+	ilLoggerFactory::getLogger('auth')->info('Check for SSO request...');
+	
+	
+	$target = (strlen($_GET['target']) ? ('?target='.$_GET['target']) : '?');
+	switch($_SERVER['SKY_SSO'])
+	{
+		// netscaler session
+		case '1':
+		// kerberos session
+		case '2':
+			ilLoggerFactory::getLogger('auth')->info('Redirect to: ./intern' . $target);
+			ilUtil::redirect('./intern'.$target);
+			break;
+
+		default:
+			ilLoggerFactory::getLogger('auth')->info('No sso request, showing login page.');
+			break;
+	}
+	
+}
+// end-patch skyguide
+
 $ilCtrl->initBaseClass("ilStartUpGUI");
 $ilCtrl->setTargetScript("ilias.php");
 $ilCtrl->callBaseClass();

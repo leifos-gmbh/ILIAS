@@ -6393,12 +6393,10 @@ class ilObjSurvey extends ilObject
 				"", "", $subject, $message, array($att), array("system"));
 		}
 		
-		/*
 		$ilDB->manipulate("UPDATE svy_vy".
 			" SET tutor_res_cron = ".$ilDB->quote(1, "integer").
 			" WHERE survey_id = ".$ilDB->quote($this->getSurveyId(), "integer"));		 
-		*/
-		
+
 		return true;
 	}
 	

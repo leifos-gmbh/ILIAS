@@ -203,3 +203,13 @@ while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 <?php
 $ilCtrlStructureReader->getStructure();
 ?>
+<#14>
+<?php
+if (!$ilDB->tableColumnExists('exc_assignment', 'fb_date_custom')) {
+	$ilDB->addTableColumn('exc_assignment', 'fb_date_custom', [
+		"type"    => "integer",
+		"length"  => 4,
+		"default" => NULL,
+	]);
+}
+?>

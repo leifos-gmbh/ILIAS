@@ -185,6 +185,10 @@ class SurveyTextQuestionGUI extends SurveyQuestionGUI
 			{
 				$template->setVariable("VALUE_ANSWER", ilUtil::prepareFormOutput($working_data[0]["textanswer"]));
 			}
+			if ($this->object->getMaxChars())
+			{
+				$template->setVariable("MAXLENGTH", " maxlength=\"" . $this->object->getMaxChars() . "\"");
+			}
 			$template->setVariable("QUESTION_ID", $this->object->getId());
 			$template->setVariable("WIDTH", $this->object->getTextWidth());
 			$template->setVariable("HEIGHT", $this->object->getTextHeight());

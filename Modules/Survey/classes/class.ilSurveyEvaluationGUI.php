@@ -2033,6 +2033,8 @@ class ilSurveyEvaluationGUI
 			$target
 		);
 
+		ilSession::_writeData(session_id(), session_encode());
+
 		$output = $return = "";
 
 		exec($executable_string = $bin . " " . $script . " " . implode(" ", $args), $output, $return);

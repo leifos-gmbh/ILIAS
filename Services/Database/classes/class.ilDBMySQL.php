@@ -515,8 +515,8 @@ class ilDBMySQL extends ilDB
 	*/
 	function dropFulltextIndex($a_table, $a_name)
 	{
-		$i_name = $this->constraintName($a_table, $a_name)."_idx";
-		$this->query("ALTER TABLE $a_table DROP FULLTEXT $i_name");
+		$i_name = $this->constraintName($a_table, $a_name);
+		$this->query("ALTER TABLE $a_table DROP INDEX $i_name");
 	}
 
 	/**

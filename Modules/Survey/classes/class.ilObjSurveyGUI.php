@@ -282,6 +282,7 @@ class ilObjSurveyGUI extends ilObjectGUI
 			$this->getCreationMode() != true)
 		{
 			$this->tpl->show();
+			$this->log->debug("after tpl show");
 		}
 	}
 				

@@ -437,6 +437,12 @@ class ilSetupGUI
 			case 'switchTree':
 				$this->switchTree();
 				break;
+			
+			// begin-patch skyguide
+			case 'switchCollation':
+				$this->switchCollation();
+				break;
+			// end-patch skyguide
 
 			case "saveClientIni":
 			case "installDatabase":
@@ -3575,12 +3581,48 @@ class ilSetupGUI
 		$settings_type_form = $this->initSettingsTypeForm();
 		$mp_ns_form = $this->initTreeImplementationForm();
 
+		// begin-patch skyguide
+		$coll_form = $this->initCollationForm();
+		// end-patch skyguide
+		
+
 		$this->tpl->setVariable("SETUP_CONTENT",
 			$ctrl_structure_form->getHTML() . "<br />" .
 			$settings_type_form->getHTML().'<br />'.
-			$mp_ns_form->getHTML());
+			// begin-patch skyguide
+			$mp_ns_form->getHTML().'<br />'.
+			$coll_form->getHTML()
+		);
+		// end-patch skyguide
 
 	}
+	
+	// begin-patch skyguide
+	public function initCollationForm()
+	{
+		include_once './Services/Form/classes/class.ilPropertyFormGUI.php';
+		$form = new ilPropertyFormGUI();
+		$form->setId('collation');
+		$form->setTitle('Datebase Collation');
+		$form->setFormAction('setup.php?cmd=gateway');
+		
+		
+		$select = new ilSelectInputGUI('Target Collation','collation');
+		$select->setOptions(
+			array(
+				0 => '- Please select - ',
+				1 => 'utf8_unicode_ci',
+				2 => 'utf8_general_ci'
+			)
+		);
+		$form->addItem($select);
+		
+		$form->addCommandButton('switchCollation', 'Switch Collation');
+		
+		return $form;
+	}
+	// end-patch skyguide
+	
 
 	public function initTreeImplementationForm()
 	{
@@ -3651,6 +3693,53 @@ class ilSetupGUI
 		}
 
 		ilUtil::sendInfo($this->lng->txt("tree_implementation_switched"), true);
+		$this->displayTools();
+	}
+	
+	public function switchCollation()
+	{
+		ilLoggerFactory::getLogger('root')->info('Switch tables called...');
+		
+		$collation = '';
+		switch($_POST['collation'])
+		{
+			case 0:
+				break;
+			case 1: 
+				$collation = 'utf8_unicode_ci';
+				break;
+			
+			case 2:
+				$collation = 'utf8_general_ci';
+				break;
+		}
+		
+		if(!$collation)
+		{
+			return $this->displayTools();
+		}
+		
+		$db = $GLOBALS['ilDB'];
+		$tables = $db->listTables();
+		foreach($tables as $num => $table)
+		{
+			$query = 'ALTER TABLE '.$table.' COLLATE '.$collation;
+			$res = $db->manipulate($query);
+			
+			$query = 'ALTER TABLE '.$table.' ENGINE =  '. $db->quote('InnoDB');
+			$res = $db->manipulate($query);
+		}
+		
+		$sequences = $db->listSequences();
+		foreach($sequences as $num => $table)
+		{
+			$query = 'ALTER TABLE '.$table.'_seq COLLATE '.$collation;
+			$res = $db->manipulate($query);
+			
+			$query = 'ALTER TABLE '.$table.'_seq ENGINE =  '. $db->quote('InnoDB');
+			$res = $db->manipulate($query);
+		}
+		
 		$this->displayTools();
 	}
 

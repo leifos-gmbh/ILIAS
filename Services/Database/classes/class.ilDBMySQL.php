@@ -527,7 +527,7 @@ class ilDBMySQL extends ilDB
 		$set = $this->query("SHOW INDEX FROM ".$a_table);
 		while ($rec = $this->fetchAssoc($set))
 		{
-			if ($rec["Key_name"] == $a_name && $rec["Index_type"] == "FULLTEXT")
+			if ($rec["key_name"] == $a_name && $rec["index_type"] == "FULLTEXT")
 			{
 				return true;
 			}

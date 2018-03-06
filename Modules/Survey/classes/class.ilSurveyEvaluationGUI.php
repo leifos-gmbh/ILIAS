@@ -113,6 +113,9 @@ class ilSurveyEvaluationGUI
 		$next_class = $this->ctrl->getNextClass($this);
 
 		$cmd = $this->getCommand($cmd);
+
+		$this->log->debug($cmd);
+
 		switch($next_class)
 		{
 			default:
@@ -815,6 +818,8 @@ class ilSurveyEvaluationGUI
 		$ui_factory = $ui->factory();
 		$ui_renderer = $ui->renderer();
 
+		$this->log->debug("check access");
+
 		// auth
 		if(!$this->hasResultsAccess())
 		{			
@@ -840,6 +845,8 @@ class ilSurveyEvaluationGUI
 					break;
 			}
 		}
+
+		$this->log->debug("check access ok");
 		
 		$ilToolbar->setFormAction($this->ctrl->getFormAction($this));
 		include_once "Services/Form/classes/class.ilPropertyFormGUI.php";
@@ -1046,8 +1053,10 @@ class ilSurveyEvaluationGUI
 			$this->tpl->setVariable("HEADER_PROP_VALUE", $value);
 			$this->tpl->parseCurrentBlock();
 		}
-		
-		// $this->tpl->addCss("./Modules/Survey/templates/default/survey_print.css", "print");				
+
+		$this->log->debug("end");
+
+		// $this->tpl->addCss("./Modules/Survey/templates/default/survey_print.css", "print");
 	}
 	
 	/**
@@ -2004,6 +2013,11 @@ class ilSurveyEvaluationGUI
 		$bin = ilUtil::isWindows()
 			? ILIAS_ABSOLUTE_PATH . "/libs/composer/vendor/jakoch/phantomjs/bin/phantomjs.exe"
 			: ILIAS_ABSOLUTE_PATH . "/libs/composer/vendor/jakoch/phantomjs/bin/phantomjs";
+
+		if (is_file ("/opt/phantomjs-2.1.1-macosx/bin/phantomjs"))
+		{
+			$bin = "/opt/phantomjs-2.1.1-macosx/bin/phantomjs";
+		}
 
 		$parts = parse_url(ILIAS_HTTP_PATH);
 

@@ -3694,6 +3694,18 @@ else
 		$tables = $db->listTables();
 		foreach($tables as $num => $table)
 		{
+			$set = $db->query("SHOW INDEX FROM ".$table);
+			while ($rec = $db->fetchAssoc($set))
+			{
+				if($rec["index_type"] == "FULLTEXT")
+				{
+					if($db->isFulltextIndex($table, $rec['key_name']))
+					{
+						$db->dropFulltextIndex($table, $rec['key_name']);
+					}
+				}
+			}
+			
 			$query = 'ALTER TABLE '.$table.' COLLATE '.$collation;
 			$res = $db->manipulate($query);
 			

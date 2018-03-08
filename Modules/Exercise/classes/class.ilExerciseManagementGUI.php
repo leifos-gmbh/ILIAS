@@ -531,11 +531,10 @@ class ilExerciseManagementGUI
 
 	public function getReportPanel($a_data)
 	{
+		$modal = $this->getEvaluationModal($a_data);
 		//todo lang var
 		$actions = $this->ui_factory->dropdown()->standard(array(
-			$this->ui_factory->button()->shy("Grade and Evaluate", "https://www.ilias.de"),
-			$this->ui_factory->button()->shy("Grade and Evaluate", "https://www.ilias.de")
-
+			$this->ui_factory->button()->shy("Grade and Evaluate", "#")->withOnClick($modal->getShowSignal()),
 		));
 
 		if($a_data['status'] == 'notgraded') {
@@ -549,6 +548,7 @@ class ilExerciseManagementGUI
 		} else {
 			$evaluation = $this->lng->txt('exc_settings_feedback')." ".$this->lng->txt('exc_not_yet');
 		}
+
 		//todo: tpl for this sections ¿?¿¿ like in surveys
 		$card_sections_html =
 			"Submited on ".ilDatePresentation::formatDate(new ilDate($a_data["udate"], IL_CAL_DATETIME)).
@@ -598,11 +598,23 @@ class ilExerciseManagementGUI
 		$feedback_panel = $this->ui_factory->panel()->sub("",$this->ui_factory->legacy($feedback_html));
 
 		$panel_title = $this->lng->txt("exc_list_text_assignment").": ".$this->assignment->getTitle();
+
 		$report = $this->ui_factory->panel()->report($panel_title, array($main_panel, $feedback_panel));
 
-		return $this->ui_renderer->render($report);
+		return $this->ui_renderer->render([$modal,$report]);
 	}
-		
+
+	public function getEvaluationModal($a_data)
+	{
+		$html = "<h1>".$a_data['uname']."</h1>";
+		$html .= "<p>".$a_data['comment']."</p>";
+		//todo dropdown
+		$html .= "<p>".$a_data['grade']."</p>";
+		$html .= "<p>Place for Textarea.</p>";
+		//todo lang var
+
+		return  $this->ui_factory->modal()->roundtrip($this->lng->txt("grade_and_evaluate"), $this->ui_factory->legacy($html));
+	}
 	
 	/**
 	* Add user as member

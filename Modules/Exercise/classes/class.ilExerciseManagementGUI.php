@@ -48,6 +48,11 @@ class ilExerciseManagementGUI
 	protected $ui_renderer;
 
 	/**
+	 * @var array
+	 */
+	protected $filter;
+
+	/**
 	 * @var ilToolbarGUI
 	 */
 	protected $toolbar;
@@ -467,16 +472,12 @@ class ilExerciseManagementGUI
 	 */
 	function listTextAssignmentObject($a_show_peer_review = true)
 	{
+		$this->initFilter();
+
 		//tabs
 		$this->tabs_gui->clearTargets();
 		$this->tabs_gui->setBackTarget($this->lng->txt("back"),
 			$this->ctrl->getLinkTarget($this, "members"));
-
-		//toolbar
-		$this->toolbar->addText("Grade Filter (Dropdown)");
-		$this->toolbar->addText("Feedback Filter (Dropdown)");
-		$this->toolbar->addText("OK button");
-		$this->toolbar->addSeparator();
 
 		$button_print = $this->ui_factory->button()->standard("Print", "#")
 			->withOnLoadCode(function($id) {
@@ -534,11 +535,11 @@ class ilExerciseManagementGUI
 		$modal = $this->getEvaluationModal($a_data);
 		//todo lang var
 		$actions = $this->ui_factory->dropdown()->standard(array(
-			$this->ui_factory->button()->shy("Grade and Evaluate", "#")->withOnClick($modal->getShowSignal()),
+			$this->ui_factory->button()->shy($this->lng->txt("grade_evaluate"), "#")->withOnClick($modal->getShowSignal()),
 		));
 
 		if($a_data['status'] == 'notgraded') {
-			$status = $this->lng->txt('exc_tbl_status')." ".$this->lng->txt('exc_not_yet');
+			$status = $this->lng->txt('exc_tbl_status')." ".$this->lng->txt('not_yet');
 		} else {
 			$status = $this->lng->txt('exc_tbl_status_time')." ".$a_data['status_time'];
 		}
@@ -546,7 +547,7 @@ class ilExerciseManagementGUI
 		if($a_data['feedback_time']) {
 			$evaluation = $this->lng->txt('exc_tbl_feedback_time')." ".$a_data['feedback_time'];
 		} else {
-			$evaluation = $this->lng->txt('exc_settings_feedback')." ".$this->lng->txt('exc_not_yet');
+			$evaluation = $this->lng->txt('exc_settings_feedback')." ".$this->lng->txt('not_yet');
 		}
 
 		//todo: tpl for this sections ¿?¿¿ like in surveys
@@ -554,12 +555,12 @@ class ilExerciseManagementGUI
 			"Submited on ".ilDatePresentation::formatDate(new ilDate($a_data["udate"], IL_CAL_DATETIME)).
 			"<br>".$status.
 			"<br>".$evaluation.
-			"<br>".$this->lng->txt('exc_feedback_given')." ".$a_data['fb_given'].
-			"<br>".$this->lng->txt('exc_feedback_received')." ".$a_data['fb_received'];
+			"<br>".$this->lng->txt('feedback_given')." ".$a_data['fb_given'].
+			"<br>".$this->lng->txt('feedback_received')." ".$a_data['fb_received'];
 
 
 		$main_panel = $this->ui_factory->panel()->sub($a_data['uname'], $this->ui_factory->legacy($a_data['utext']))
-			->withCard($this->ui_factory->card($this->lng->txt('exc_text_assignment'))->withSections(array($this->ui_factory->legacy($card_sections_html))))->withActions($actions);
+			->withCard($this->ui_factory->card($this->lng->txt('text_assignment'))->withSections(array($this->ui_factory->legacy($card_sections_html))))->withActions($actions);
 
 		//todo remove this css
 		$feedback_html = "<div style='background-color:#F9F9F9;padding:9px;'>";
@@ -569,7 +570,7 @@ class ilExerciseManagementGUI
 			$user = new ilObjUser($peer_id);
 			$peer_name =  $user->getFirstname()." ".$user->getLastname();
 			//todo: apply only 20px in intermediate elements.
-			$feedback_html .= "<div style='margin-bottom:20px;'>".$this->lng->txt("exc_feedback_from")." ".$peer_name;
+			$feedback_html .= "<div style='margin-bottom:20px;'>".$this->lng->txt("feedback_from")." ".$peer_name;
 
 			$submission = new ilExSubmission($this->assignment, $a_data["uid"]);
 			$values = $submission->getPeerReview()->getPeerReviewValues($peer_id, $a_data["uid"]);
@@ -613,7 +614,7 @@ class ilExerciseManagementGUI
 		$html .= "<p>Place for Textarea.</p>";
 		//todo lang var
 
-		return  $this->ui_factory->modal()->roundtrip($this->lng->txt("grade_and_evaluate"), $this->ui_factory->legacy($html));
+		return  $this->ui_factory->modal()->roundtrip(strtoupper($this->lng->txt("grade_evaluate")), $this->ui_factory->legacy($html));
 	}
 	
 	/**
@@ -1958,6 +1959,44 @@ class ilExerciseManagementGUI
 		{
 			$this->showParticipantObject();
 		}
+	}
+
+	function initFilter()
+	{
+		$this->lng->loadLanguageModule("search");
+
+		$this->toolbar->setFormAction($this->ctrl->getFormAction($this));
+
+		$si_status = new ilSelectInputGUI($this->lng->txt("exc_tbl_status"), "filter_status");
+		$options = array(
+			"" => $this->lng->txt("search_any"),
+			"notgraded" => $this->lng->txt("exc_notgraded"),
+			"passed" => $this->lng->txt("exc_passed"),
+			"failed" => $this->lng->txt("exc_failed")
+		);
+		$si_status->setOptions($options);
+		$this->filter["status"] = $si_status->getValue();
+
+		$si_feedback = new ilSelectInputGUI($this->lng->txt("exc_tbl_status"), "filter_feedback");
+		$options = array(
+			"submission_feedback" => $this->lng->txt("submissions_feedback"),
+			"submission_only" => $this->lng->txt("submissions_only")
+		);
+		$si_feedback->setOptions($options);
+		$this->filter["feedback"] = $si_feedback->getValue();
+
+		//add elements to the toolbar
+		$this->toolbar->addInputItem($si_status);
+		$this->toolbar->addInputItem($si_feedback);
+
+		$submit = $this->ui_factory->button()->standard("Filter", "saveFilter");
+		$this->toolbar->addComponent($submit);
+
+	}
+
+	function saveFilter()
+	{
+		die("hi");
 	}
 }
 

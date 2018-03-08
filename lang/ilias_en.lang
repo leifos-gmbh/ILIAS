@@ -14157,3 +14157,8 @@ meta#:#adt_error_max_length#:#Please enter a shorter text.
 form#:#form_chars_remaining#:#Characters remaining:
 crs#:#crs_subscription_min_members_err#:#The minimum number is not allowed to be greater than the maximum number of participants.
 exc#:#exc_global_feedback_file_after_date#:#After set Date
+exc#:#exc_feedback_given#:#Feedback given
+exc#:#exc_feedback_received#:#Feedback received
+exc#:#exc_feedback_from#:#Feedback from
+exc#:#exc_text_assignment#:#Text Assignment
+exc#:#exc_not_yet#:#not yet

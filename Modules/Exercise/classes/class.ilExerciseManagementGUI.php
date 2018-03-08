@@ -38,6 +38,16 @@ class ilExerciseManagementGUI
 	protected $tpl;
 
 	/**
+	 * @var \ILIAS\UI\Factory
+	 */
+	protected $ui_factory;
+
+	/**
+	 * @var \ILIAS\UI\Renderer
+	 */
+	protected $ui_renderer;
+
+	/**
 	 * @var ilToolbarGUI
 	 */
 	protected $toolbar;
@@ -59,6 +69,8 @@ class ilExerciseManagementGUI
 	{		
 		global $DIC;
 
+		$this->ui_factory = $DIC->ui()->factory();
+		$this->ui_renderer = $DIC->ui()->renderer();
 		$this->toolbar = $DIC->toolbar();
 		$ilCtrl = $DIC->ctrl();
 		$ilTabs = $DIC->tabs();
@@ -460,20 +472,23 @@ class ilExerciseManagementGUI
 	 */
 	function listTextAssignmentObject($a_show_peer_review = true)
 	{
-		global $DIC;
-
 		//tabs
 		$this->tabs_gui->clearTargets();
 		$this->tabs_gui->setBackTarget($this->lng->txt("back"),
 			$this->ctrl->getLinkTarget($this, "members"));
 
 		//toolbar
-		$toolbar = $DIC->toolbar();
-		$toolbar->addText("Grade Filter (Dropdown)");
-		$toolbar->addText("Feedback Filter (Dropdown)");
-		$toolbar->addText("OK button");
-		$toolbar->addSeparator();
-		$toolbar->addText("Print button");
+		$this->toolbar->addText("Grade Filter (Dropdown)");
+		$this->toolbar->addText("Feedback Filter (Dropdown)");
+		$this->toolbar->addText("OK button");
+		$this->toolbar->addSeparator();
+
+		$button_print = $this->ui_factory->button()->standard("Print", "#")
+			->withOnLoadCode(function($id) {
+				return "$('#{$id}').click(function() { window.print(); return false; });";
+			});
+		$this->toolbar->addComponent($button_print);
+
 
 		//retrieve data
 		$peer_data = array();
@@ -521,14 +536,10 @@ class ilExerciseManagementGUI
 
 	public function getReportPanel($a_data)
 	{
-		global $DIC;
-		$ui_factory = $DIC->ui()->factory();
-		$ui_render = $DIC->ui()->renderer();
-
 		//todo lang var
-		$actions = $ui_factory->dropdown()->standard(array(
-			$ui_factory->button()->shy("Grade and Evaluate", "https://www.ilias.de"),
-			$ui_factory->button()->shy("Grade and Evaluate", "https://www.ilias.de")
+		$actions = $this->ui_factory->dropdown()->standard(array(
+			$this->ui_factory->button()->shy("Grade and Evaluate", "https://www.ilias.de"),
+			$this->ui_factory->button()->shy("Grade and Evaluate", "https://www.ilias.de")
 
 		));
 
@@ -552,8 +563,8 @@ class ilExerciseManagementGUI
 			"<br>".$this->lng->txt('exc_feedback_received')." ".$a_data['fb_received'];
 
 
-		$main_panel = $ui_factory->panel()->sub($a_data['uname'], $ui_factory->legacy($a_data['utext']))
-			->withCard($ui_factory->card($this->lng->txt('exc_text_assignment'))->withSections(array($ui_factory->legacy($card_sections_html))))->withActions($actions);
+		$main_panel = $this->ui_factory->panel()->sub($a_data['uname'], $this->ui_factory->legacy($a_data['utext']))
+			->withCard($this->ui_factory->card($this->lng->txt('exc_text_assignment'))->withSections(array($this->ui_factory->legacy($card_sections_html))))->withActions($actions);
 
 		//todo remove this css
 		$feedback_html = "<div style='background-color:#F9F9F9;padding:9px;'>";
@@ -589,12 +600,12 @@ class ilExerciseManagementGUI
 		//todo this lng var evaluation statement. See FWE
 		$feedback_html .= "<p>".$this->lng->txt('exc_comment')."<br>".$a_data['comment']."</p>";
 
-		$feedback_panel = $ui_factory->panel()->sub("",$ui_factory->legacy($feedback_html));
+		$feedback_panel = $this->ui_factory->panel()->sub("",$this->ui_factory->legacy($feedback_html));
 
 		$panel_title = $this->lng->txt("exc_list_text_assignment").": ".$this->assignment->getTitle();
-		$report = $ui_factory->panel()->report($panel_title, array($main_panel, $feedback_panel));
+		$report = $this->ui_factory->panel()->report($panel_title, array($main_panel, $feedback_panel));
 
-		return $ui_render->render($report);
+		return $this->ui_renderer->render($report);
 	}
 		
 	

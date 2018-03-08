@@ -72,21 +72,16 @@ class ilExerciseManagementGUI
 		$this->ui_factory = $DIC->ui()->factory();
 		$this->ui_renderer = $DIC->ui()->renderer();
 		$this->toolbar = $DIC->toolbar();
-		$ilCtrl = $DIC->ctrl();
-		$ilTabs = $DIC->tabs();
-		$lng = $DIC->language();
-		$tpl = $DIC["tpl"];
+		$this->ctrl = $DIC->ctrl();
+		$this->tabs_gui = $DIC->tabs();
+		$this->lng = $DIC->language();
+		$this->tpl = $DIC["tpl"];
 		
 		$this->exercise = $a_exercise;
 		$this->assignment = $a_ass;
 		
-		$ilCtrl->saveParameter($this, array("vw", "member_id"));
+		$this->ctrl->saveParameter($this, array("vw", "member_id"));
 
-		// :TODO:
-		$this->ctrl = $ilCtrl;
-		$this->tabs_gui = $ilTabs;
-		$this->lng = $lng;
-		$this->tpl = $tpl;				
 	}
 	
 	public function executeCommand()

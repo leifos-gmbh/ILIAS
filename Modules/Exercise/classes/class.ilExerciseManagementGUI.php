@@ -1963,9 +1963,12 @@ class ilExerciseManagementGUI
 
 	function initFilter()
 	{
+		$this->filter["status"] = trim(ilUtil::stripSlashes($_POST["filter_status"]));
+		$this->filter["feedback"] = trim(ilUtil::stripSlashes($_POST["filter_feedback"]));
+
 		$this->lng->loadLanguageModule("search");
 
-		$this->toolbar->setFormAction($this->ctrl->getFormAction($this));
+		$this->toolbar->setFormAction($this->ctrl->getFormAction($this, "listTextAssignmentWithPeerReview"));
 
 		$si_status = new ilSelectInputGUI($this->lng->txt("exc_tbl_status"), "filter_status");
 		$options = array(
@@ -1975,7 +1978,8 @@ class ilExerciseManagementGUI
 			"failed" => $this->lng->txt("exc_failed")
 		);
 		$si_status->setOptions($options);
-		$this->filter["status"] = $si_status->getValue();
+		$si_status->setValue($this->filter["status"]);
+
 
 		$si_feedback = new ilSelectInputGUI($this->lng->txt("exc_tbl_status"), "filter_feedback");
 		$options = array(
@@ -1983,20 +1987,17 @@ class ilExerciseManagementGUI
 			"submission_only" => $this->lng->txt("submissions_only")
 		);
 		$si_feedback->setOptions($options);
-		$this->filter["feedback"] = $si_feedback->getValue();
+		$si_feedback->setValue($this->filter["feedback"]);
 
-		//add elements to the toolbar
 		$this->toolbar->addInputItem($si_status);
 		$this->toolbar->addInputItem($si_feedback);
 
-		$submit = $this->ui_factory->button()->standard("Filter", "saveFilter");
-		$this->toolbar->addComponent($submit);
-
-	}
-
-	function saveFilter()
-	{
-		die("hi");
+		//todo: old school here.
+		include_once "Services/UIComponent/Button/classes/class.ilSubmitButton.php";
+		$submit = ilSubmitButton::getInstance();
+		$submit->setCaption("Filter");
+		$submit->setCommand("listTextAssignmentWithPeerReview");
+		$this->toolbar->addButtonInstance($submit);
 	}
 }
 

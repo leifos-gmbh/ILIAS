@@ -1411,20 +1411,26 @@ class ilExAssignment
 	 * Get submission data for an specific user,exercise and assignment.
 	 * todo we can refactor a bit the method getMemberListData to use this and remove duplicate code.
 	 * @param $a_user_id
+	 * @param $a_grade
 	 * @return array
 	 */
-	public function getExerciseMemberAssignmentData($a_user_id)
+	public function getExerciseMemberAssignmentData($a_user_id, $a_grade = "")
 	{
 		global $DIC;
 		$ilDB = $DIC->database();
 
 		include_once "Modules/Exercise/classes/class.ilExSubmission.php";
 
-		$data = array();
+		//todo: Ugly...use const or centralized method.
+		if(in_array($a_grade, array("notgraded", "passed", "failed")))
+		{
+			$and_grade = " AND status = ".$ilDB->quote($a_grade, "text");
+		}
 
 		$q = "SELECT * FROM exc_mem_ass_status ".
 			"WHERE ass_id = ".$ilDB->quote($this->getId(), "integer").
-			" AND usr_id = ".$ilDB->quote($a_user_id, "integer");
+			" AND usr_id = ".$ilDB->quote($a_user_id, "integer").
+			$and_grade;
 
 		$set = $ilDB->query($q);
 

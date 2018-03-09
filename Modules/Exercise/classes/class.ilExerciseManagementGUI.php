@@ -527,11 +527,13 @@ class ilExerciseManagementGUI
 					$data["fb_given"] = $peer_review->countGivenFeedback(true, $file["user_id"]);
 				}
 
-				$submission_data = $this->assignment->getExerciseMemberAssignmentData($file["user_id"]);
+				$submission_data = $this->assignment->getExerciseMemberAssignmentData($file["user_id"], $this->filter["status"]);
 
-				$data = array_merge($data, $submission_data);
-
-				$report_html .= $this->getReportPanel($data);
+				if(is_array($submission_data))
+				{
+					$data = array_merge($data, $submission_data);
+					$report_html .= $this->getReportPanel($data);
+				}
 			}
 		}
 
@@ -540,6 +542,7 @@ class ilExerciseManagementGUI
 
 	public function getReportPanel($a_data)
 	{
+		//TODO: remove the panel titles and use one generic title for all the reports. It has been done in previous commits.
 		$modal = $this->getEvaluationModal($a_data);
 		//todo lang var
 		$actions = $this->ui_factory->dropdown()->standard(array(

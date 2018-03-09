@@ -468,6 +468,8 @@ class ilExerciseManagementGUI
 
 	/**
 	 * //todo lang vars.
+	 * //TODO Show something when we don't have any panel displayed.
+	 * //TODO display labels in the toolbar.
 	 * always true after we mixed the 2 ui tables into panels.
 	 */
 	function listTextAssignmentObject($a_show_peer_review = true)
@@ -515,7 +517,7 @@ class ilExerciseManagementGUI
 				{
 					$data["peer"] = array_keys($peer_data[$file["user_id"]]);
 				}
-			
+
 				$data["fb_received"] = count($data["peer"]);
 				$data["fb_given"] = $peer_review->countGivenFeedback(true, $file["user_id"]);
 
@@ -555,7 +557,7 @@ class ilExerciseManagementGUI
 
 		//todo: tpl for this sections ¿?¿¿ like in surveys
 		$card_sections_html =
-			"Submited on ".ilDatePresentation::formatDate(new ilDate($a_data["udate"], IL_CAL_DATETIME)).
+			$this->lng->txt("exc_tbl_submission_date")." ".ilDatePresentation::formatDate(new ilDate($a_data["udate"], IL_CAL_DATETIME)).
 			"<br>".$status.
 			"<br>".$evaluation.
 			"<br>".$this->lng->txt('feedback_given')." ".$a_data['fb_given'].
@@ -615,11 +617,30 @@ class ilExerciseManagementGUI
 	public function getEvaluationModal($a_data)
 	{
 		$html = "<h1>".$a_data['uname']."</h1>";
-		$html .= "<p>".$a_data['comment']."</p>";
-		//todo dropdown
-		$html .= "<p>".$a_data['grade']."</p>";
-		$html .= "<p>Place for Textarea.</p>";
-		//todo lang var
+		$html .= "<p>".$a_data['utext']."</p>";
+
+		$form = new ilPropertyFormGUI();
+		$form->setId(uniqid('form'));
+
+		//Grade
+		//TODO: DRY centralize this options in const or method.
+		$options = array(
+			"" => $this->lng->txt("search_any"),
+			"notgraded" => $this->lng->txt("exc_notgraded"),
+			"passed" => $this->lng->txt("exc_passed"),
+			"failed" => $this->lng->txt("exc_failed")
+		);
+		$si = new ilSelectInputGUI($this->lng->txt("exc_tbl_status"), "grade");
+		$si->setOptions($options);
+		$si->setValue($a_data['status']);
+		$form->addItem($si);
+
+
+		$ta = new ilTextAreaInputGUI($this->lng->txt("exc_comment"), 'comment');
+		$ta->setValue($a_data['comment']);
+		$form->addItem($ta);
+
+		$html .= $form->getHTML();
 
 		return  $this->ui_factory->modal()->roundtrip(strtoupper($this->lng->txt("grade_evaluate")), $this->ui_factory->legacy($html));
 	}
@@ -1987,8 +2008,7 @@ class ilExerciseManagementGUI
 		$si_status->setOptions($options);
 		$si_status->setValue($this->filter["status"]);
 
-
-		$si_feedback = new ilSelectInputGUI($this->lng->txt("exc_tbl_status"), "filter_feedback");
+		$si_feedback = new ilSelectInputGUI($this->lng->txt("feedback"), "filter_feedback");
 		$options = array(
 			"submission_feedback" => $this->lng->txt("submissions_feedback"),
 			"submission_only" => $this->lng->txt("submissions_only")
@@ -1996,13 +2016,13 @@ class ilExerciseManagementGUI
 		$si_feedback->setOptions($options);
 		$si_feedback->setValue($this->filter["feedback"]);
 
-		$this->toolbar->addInputItem($si_status);
-		$this->toolbar->addInputItem($si_feedback);
+		$this->toolbar->addInputItem($si_status, true);
+		$this->toolbar->addInputItem($si_feedback, true);
 
 		//todo: old school here.
 		include_once "Services/UIComponent/Button/classes/class.ilSubmitButton.php";
 		$submit = ilSubmitButton::getInstance();
-		$submit->setCaption("Filter");
+		$submit->setCaption("filter");
 		$submit->setCommand("listTextAssignmentWithPeerReview");
 		$this->toolbar->addButtonInstance($submit);
 	}

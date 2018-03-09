@@ -14158,6 +14158,7 @@ form#:#form_chars_remaining#:#Characters remaining:
 crs#:#crs_subscription_min_members_err#:#The minimum number is not allowed to be greater than the maximum number of participants.
 exc#:#exc_global_feedback_file_after_date#:#After set Date
 exc#:#feedback_given#:#Feedback given
+exc#:#feedback#:#Feedback
 exc#:#feedback_received#:#Feedback received
 exc#:#feedback_from#:#Feedback from
 exc#:#text_assignment#:#Text Assignment
@@ -14165,3 +14166,4 @@ exc#:#not_yet#:#not yet
 exc#:#grade_evaluate#:#Grade and Evaluate
 exc#:#submissions_feedback#:#Submissions and Feedback
 exc#:#submissions_only#:#Submissions Only
+exc#:#filer#:#Filter

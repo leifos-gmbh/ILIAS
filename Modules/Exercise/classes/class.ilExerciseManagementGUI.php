@@ -637,6 +637,7 @@ class ilExerciseManagementGUI
 
 
 		$ta = new ilTextAreaInputGUI($this->lng->txt("exc_comment"), 'comment');
+		$ta->setInfo($this->lng->txt("exc_comment_for_learner_info"));
 		$ta->setValue($a_data['comment']);
 		$form->addItem($ta);
 

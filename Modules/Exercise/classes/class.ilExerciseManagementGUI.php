@@ -490,14 +490,9 @@ class ilExerciseManagementGUI
 		$this->toolbar->addSeparator();
 		$this->toolbar->addComponent($button_print);
 
-
 		//retrieve data
-		$peer_data = array();
-		if($a_show_peer_review)
-		{
-			$peer_review = new ilExPeerReview($this->assignment);
-			$peer_data = $peer_review->getAllPeerReviews();
-		}
+		$peer_review = new ilExPeerReview($this->assignment);
+		$peer_data = $peer_review->getAllPeerReviews();
 
 		include_once "Services/User/classes/class.ilUserUtil.php";
 		include_once "Services/RTE/classes/class.ilRTE.php";
@@ -516,16 +511,13 @@ class ilExerciseManagementGUI
 					"utext" => ilRTE::_replaceMediaObjectImageSrc($file["atext"], 1) // mob id to mob src
 				);
 
-				if($a_show_peer_review)
+				if(isset($peer_data[$file["user_id"]]))
 				{
-					if(isset($peer_data[$file["user_id"]]))
-					{
-						$data["peer"] = array_keys($peer_data[$file["user_id"]]);
-					}
-
-					$data["fb_received"] = count($data["peer"]);
-					$data["fb_given"] = $peer_review->countGivenFeedback(true, $file["user_id"]);
+					$data["peer"] = array_keys($peer_data[$file["user_id"]]);
 				}
+			
+				$data["fb_received"] = count($data["peer"]);
+				$data["fb_given"] = $peer_review->countGivenFeedback(true, $file["user_id"]);
 
 				$submission_data = $this->assignment->getExerciseMemberAssignmentData($file["user_id"], $this->filter["status"]);
 
@@ -574,7 +566,7 @@ class ilExerciseManagementGUI
 			->withCard($this->ui_factory->card($this->lng->txt('text_assignment'))->withSections(array($this->ui_factory->legacy($card_sections_html))))->withActions($actions);
 
 		$feedback_html = "";
-		if(array_key_exists("peer", $a_data))
+		if(array_key_exists("peer", $a_data) && $this->filter["feedback"] == "submission_feedback")
 		{
 			//todo remove this css
 			$feedback_html .= "<div style='background-color:#F9F9F9;padding:9px;'>";

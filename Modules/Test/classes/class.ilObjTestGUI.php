@@ -210,6 +210,7 @@ class ilObjTestGUI extends ilObjectGUI
 				break;
 
 			case "iltestplayerfixedquestionsetgui":
+				$this->trackTestObjectReadEvent();
 				require_once "./Modules/Test/classes/class.ilTestPlayerFixedQuestionSetGUI.php";
 				if(!$this->object->getKioskMode()) $this->prepareOutput();
 				$gui = new ilTestPlayerFixedQuestionSetGUI($this->object);
@@ -218,6 +219,7 @@ class ilObjTestGUI extends ilObjectGUI
 				break;
 
 			case "iltestplayerrandomquestionsetgui":
+				$this->trackTestObjectReadEvent();
 				require_once "./Modules/Test/classes/class.ilTestPlayerRandomQuestionSetGUI.php";
 				if(!$this->object->getKioskMode()) $this->prepareOutput();
 				$gui = new ilTestPlayerRandomQuestionSetGUI($this->object);
@@ -226,6 +228,7 @@ class ilObjTestGUI extends ilObjectGUI
 				break;
 
 			case "iltestplayerdynamicquestionsetgui":
+				$this->trackTestObjectReadEvent();
 				require_once "./Modules/Test/classes/class.ilTestPlayerDynamicQuestionSetGUI.php";
 				if (!$this->object->getKioskMode()) $this->prepareOutput();
 				$gui = new ilTestPlayerDynamicQuestionSetGUI($this->object);
@@ -745,6 +748,17 @@ class ilObjTestGUI extends ilObjectGUI
 			$this->tpl->show();
 		}
 	}
+	
+	protected function trackTestObjectReadEvent()
+	{
+		$ilUser = isset($GLOBALS['DIC']) ? $GLOBALS['DIC']['ilUser'] : $GLOBALS['ilUser'];
+		require_once 'Services/Tracking/classes/class.ilChangeEvent.php';
+		
+		ilChangeEvent::_recordReadEvent(
+			$this->object->getType(), $this->object->getRefId(),
+			$this->object->getId(), $ilUser->getId()
+		);
+	}
 
 	private function questionsTabGatewayObject()
 	{
@@ -914,8 +928,6 @@ class ilObjTestGUI extends ilObjectGUI
 			ilTestPDFGenerator::generatePDF(
 				$template->get(), ilTestPDFGenerator::PDF_OUTPUT_DOWNLOAD, $this->object->getTitle()
 			);
-			
-			exit;
 		}
 		else
 		{
@@ -1765,15 +1777,11 @@ class ilObjTestGUI extends ilObjectGUI
 	 */
 	public function confirmRemoveQuestionsObject()
 	{
-		$checked_questions = $_POST["q_id"];
+		$removeQuestionIds = (array)$_POST["q_id"];
 
 		$questions = $this->object->getQuestionTitlesAndIndexes();
-		$deleted   = array();
-		foreach((array)$checked_questions as $value)
-		{
-			$this->object->removeQuestion($value);
-			$deleted[] = $value;
-		}
+		
+		$this->object->removeQuestions($removeQuestionIds);
 
 		$this->object->saveCompleteStatus( $this->testQuestionSetConfigFactory->getQuestionSetConfig() );
 		
@@ -1783,11 +1791,11 @@ class ilObjTestGUI extends ilObjectGUI
 		{
 			$prev        = null;
 			$return_to   = null;
-			$deleted_tmp = $deleted;
+			$deleted_tmp = $removeQuestionIds;
 			$first       = array_shift($deleted_tmp);
 			foreach((array)$questions as $key => $value)
 			{
-				if(!in_array($key, $deleted))
+				if(!in_array($key, $removeQuestionIds))
 				{
 					$prev = $key;
 					if(!$first)
@@ -1809,7 +1817,7 @@ class ilObjTestGUI extends ilObjectGUI
 			}
 
 			if(
-				count($questions) == count($checked_questions) ||
+				count($questions) == count($removeQuestionIds) ||
 				!$return_to
 			)
 			{
@@ -2141,7 +2149,7 @@ class ilObjTestGUI extends ilObjectGUI
 			$new_pool->addSubItem($name);
 		}
 
-		$form->addCommandButton("executeCreateQuestion", $lng->txt("submit"));
+		$form->addCommandButton("executeCreateQuestion", $lng->txt("create"));
 		$form->addCommandButton("questions", $lng->txt("cancel"));
 
 		return $tpl->setContent($form->getHTML());
@@ -3548,6 +3556,8 @@ class ilObjTestGUI extends ilObjectGUI
 		{
 			$this->ilias->raiseError($this->lng->txt("msg_no_perm_read"),$this->ilias->error_obj->MESSAGE);
 		}
+		
+		$this->trackTestObjectReadEvent();
 
 		include_once("./Services/InfoScreen/classes/class.ilInfoScreenGUI.php");
 		$info = new ilInfoScreenGUI($this);

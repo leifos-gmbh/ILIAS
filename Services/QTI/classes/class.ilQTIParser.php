@@ -22,6 +22,7 @@
 */
 
 include_once("./Services/Xml/classes/class.ilSaxParser.php");
+include_once 'Modules/TestQuestionPool/classes/questions/LogicalAnswerCompare/class.ilAssQuestionTypeList.php';
 
 define ("IL_MO_PARSE_QTI",  1);
 define ("IL_MO_VERIFY_QTI", 2);
@@ -49,7 +50,12 @@ class ilQTIParser extends ilSaxParser
 	var $render_type;
 	var $response_label;
 	var $material;
+	
+	/**
+	 * @var ilQTIMatimage
+	 */
 	var $matimage;
+	
 	var $response;
 	var $resprocessing;
 	var $outcomes;
@@ -681,6 +687,10 @@ class ilQTIParser extends ilSaxParser
 						}
 					}
 				}
+				if (!$this->matimage->getEmbedded() && strlen($this->matimage->getUri()))
+				{
+					$this->matimage->setContent(@file_get_contents(dirname($this->xml_file) . '/'. $this->matimage->getUri()));
+				}
 				break;
 			case "material":
 				include_once("./Services/QTI/classes/class.ilQTIMaterial.php");
@@ -1290,6 +1300,11 @@ class ilQTIParser extends ilSaxParser
 				$qt = $this->item->determineQuestionType();
 				$presentation = $this->item->getPresentation(); 
 				
+				if( !ilAssQuestionTypeList::isImportable($qt) )
+				{
+					return;
+				}
+				
 				include_once "./Modules/TestQuestionPool/classes/class.assQuestion.php";
 				assQuestion::_includeClass($qt);
 				$question = new $qt();
@@ -1358,15 +1373,30 @@ class ilQTIParser extends ilSaxParser
 				$this->material = NULL;
 				break;
 			case "matimage";
-				if ($this->material != NULL)
+
+				if( !$this->isMatImageAvailable() )
 				{
-					if ($this->matimage != NULL)
-					{
-						$this->material->addMatimage($this->matimage);
-					}
+					break;
 				}
+				
+				if( $this->virusDetected($this->matimage->getRawContent()) )
+				{
+					break;
+				}
+				
+				require_once 'Services/QTI/classes/class.ilQtiMatImageSecurity.php';
+				$matImageSecurity = new ilQtiMatImageSecurity($this->matimage);
+				$matImageSecurity->sanitizeLabel();
+				
+				if( !$matImageSecurity->validate() )
+				{
+					break;
+				}
+				
+				$this->material->addMatimage($this->matimage);
 				$this->matimage = NULL;
 				break;
+			
 			// add support for matbreak element
 			case "matbreak":
 				$this->mattext = new ilQTIMattext();
@@ -1801,5 +1831,32 @@ class ilQTIParser extends ilSaxParser
 		
 		return $xmlContent;
 	}
+	
+	protected function isMatImageAvailable()
+	{
+		if( !$this->material )
+		{
+			return false;
+		}
+		
+		if( !$this->matimage )
+		{
+			return false;
+		}
+		
+		return true;
+	}
+	
+	protected function virusDetected($buffer)
+	{
+		require_once 'Services/VirusScanner/classes/class.ilVirusScannerFactory.php';
+		$vs = ilVirusScannerFactory::_getInstance();
+		
+		if( $vs === null )
+		{
+			return false; // no virus scan, no virus detected
+		}
+		
+		return (bool)$vs->scanBuffer($buffer);
+	}
 }
-?>

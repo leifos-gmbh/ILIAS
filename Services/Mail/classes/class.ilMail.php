@@ -904,19 +904,30 @@ class ilMail
 		);
 	}
 
-	function updateDraft($a_folder_id,
-						 $a_attachments,
-						 $a_rcp_to,
-						 $a_rcp_cc,
-						 $a_rcp_bcc,
-						 $a_m_type,
-						 $a_m_email,
-						 $a_m_subject,
-						 $a_m_message,
-						 $a_draft_id = 0,
-						 $a_use_placeholders = 0,
-						 $a_tpl_context_id = null,
-						 $a_tpl_context_params = array()
+	/**
+	 * @param int $usrId
+	 * @param int $folderId
+	 * @return int
+	 */
+	public function getNewDraftId($usrId, $folderId)
+	{
+		global $ilDB;
+
+		$next_id = $ilDB->nextId($this->table_mail);
+		$ilDB->insert($this->table_mail, array(
+			'mail_id'        => array('integer', $next_id),
+			'user_id'        => array('integer', $usrId),
+			'folder_id'      => array('integer', $folderId),
+			'sender_id'      => array('integer', $usrId)
+		));
+
+		return $next_id;
+	}
+
+	public function updateDraft(
+		$a_folder_id, $a_attachments, $a_rcp_to, $a_rcp_cc, $a_rcp_bcc,
+		$a_m_type, $a_m_email, $a_m_subject,  $a_m_message, $a_draft_id = 0,
+		$a_use_placeholders = 0, $a_tpl_context_id = null, $a_tpl_context_params = array()
 	)
 	{
 		global $ilDB;
@@ -1008,7 +1019,6 @@ class ilMail
 		/**/
 
 		$next_id = $ilDB->nextId($this->table_mail);
-
 		$ilDB->insert($this->table_mail, array(
 			'mail_id'		=> array('integer', $next_id),
 			'user_id'		=> array('integer', $a_user_id),
@@ -1309,7 +1319,7 @@ class ilMail
 	/**
 	* get user_ids
 	* @param    string recipients seperated by ','
-	* @return	string error message
+	* @return	array error message
 	*/
 	function getUserIds($a_recipients)
 	{
@@ -1399,7 +1409,7 @@ class ilMail
 						foreach ($grp_object->getGroupMemberIds() as $id)
 						{
 							$ids[] = $id;
-							$foundUserIds = $id;
+							$foundUserIds[] = $id;
 						}
 
 						ilLoggerFactory::getLogger('mail')->debug(sprintf(
@@ -1609,7 +1619,7 @@ class ilMail
 	* @return   Returns an empty string, if all recipients are okay.
 	*           Returns a string with invalid recipients, if some are not okay.
 	*/
-	function checkRecipients($a_recipients,$a_type)
+	function checkRecipients($a_recipients)
 	{
 		global $rbacsystem,$rbacreview;
 		$wrong_rcps = '';
@@ -1863,6 +1873,44 @@ class ilMail
 	}
 
 	/**
+	 * @param string $a_rcp_to
+	 * @param string $a_rcp_cc
+	 * @param string $a_rcp_bc
+	 * @return string
+	 */
+	public function validateRecipients($a_rcp_to, $a_rcp_cc, $a_rcp_bc)
+	{
+		try
+		{
+			$message = '';
+
+			if($error_message = $this->checkRecipients($a_rcp_to))
+			{
+				$message .= $error_message;
+			}
+			if($error_message = $this->checkRecipients($a_rcp_cc))
+			{
+				$message .= $error_message;
+			}
+			if($error_message = $this->checkRecipients($a_rcp_bc))
+			{
+				$message .= $error_message;
+			}
+			
+			if(strlen($message) > 0)
+			{
+				return $this->lng->txt('mail_following_rcp_not_valid') . $message;
+			}
+
+			return '';
+		}
+		catch(ilMailException $e)
+		{
+			return $this->lng->txt('mail_following_rcp_not_valid') . $this->lng->txt($e->getMessage());
+		}
+	}
+
+	/**
 	* send external mail using class.ilMimeMail.php
 	* @param string to
 	* @param string cc
@@ -1893,9 +1941,6 @@ class ilMail
 			$this->mail_to_global_roles = $rbacsystem->checkAccessOfUser($this->user_id, 'mail_to_global_roles', $this->mail_obj_ref_id);
 		}
 
-		$error_message = '';
-		$message = '';
-
 		if (in_array("system",$a_type))
 		{
 			$a_type = array('system');
@@ -1914,34 +1959,10 @@ class ilMail
 			return $error_message;
 		}
 
-		try
- 		{
-			// check recipients
-			if ($error_message = $this->checkRecipients($a_rcp_to,$a_type))
-			{
-				$message .= $error_message;
-			}
-
-			if ($error_message = $this->checkRecipients($a_rcp_cc,$a_type))
-			{
-				$message .= $error_message;
-			}
-
-			if ($error_message = $this->checkRecipients($a_rcp_bc,$a_type))
-			{
-				$message .= $error_message;
-			}
- 		}
-
-		catch(ilMailException $e)
- 		{
-			return $this->lng->txt($e->getMessage());
- 		}
-
-		// if there was an error
-		if (!empty($message))
+		$error_message = $this->validateRecipients($a_rcp_to, $a_rcp_cc, $a_rcp_bc);
+		if(strlen($error_message) > 0)
 		{
-			return $this->lng->txt("mail_following_rcp_not_valid").$message;
+			return $error_message;
 		}
 
 		// ACTIONS FOR ALL TYPES

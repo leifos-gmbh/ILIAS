@@ -179,7 +179,7 @@ class ilInitialisation
 		}
 		$host = $_SERVER['HTTP_HOST'];
 
-		$rq_uri = $_SERVER['REQUEST_URI'];
+		$rq_uri = strip_tags($_SERVER['REQUEST_URI']);
 
 		// security fix: this failed, if the URI contained "?" and following "/"
 		// -> we remove everything after "?"
@@ -308,7 +308,7 @@ class ilInitialisation
 			}
 			else
 			{
-				self::abortAndDie("Invalid client");
+				self::abortAndDie("Fatal Error: ilInitialisation::initClientIniFile initializing client ini file abborted with: ". $ilClientIniFile->ERROR);
 			}
 		}
 		

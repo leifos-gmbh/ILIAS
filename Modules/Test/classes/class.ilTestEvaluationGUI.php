@@ -455,7 +455,7 @@ class ilTestEvaluationGUI extends ilTestServiceGUI
 					$questions = $data->getParticipant($active_id)->getQuestions(0);
 				}
 				$counter = 1;
-				foreach ($questions as $question)
+				foreach ((array)$questions as $question)
 				{
 					$this->tpl->setCurrentBlock("question_row");
 					$this->tpl->setVariable("QUESTION_COUNTER", $counter);
@@ -2034,7 +2034,7 @@ class ilTestEvaluationGUI extends ilTestServiceGUI
 				}
 
 				$taxId = substr($item->getPostVar(), strlen('tax_'));
-				$questionList->addTaxonomyFilter($taxId, $item->getValue());
+				$questionList->addTaxonomyFilter($taxId, $item->getValue(), $this->object->getId(), 'tst');
 			}
 			elseif( $item->getValue() !== false )
 			{

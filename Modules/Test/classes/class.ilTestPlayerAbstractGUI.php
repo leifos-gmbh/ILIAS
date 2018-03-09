@@ -320,7 +320,7 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 		$this->tpl->setVariable( "SPECIFIC_FEEDBACK",
 								 $question_gui->getSpecificFeedbackOutput(
 									 $this->testSession->getActiveId(),
-									 NULL
+									 $this->testSequence->getPass()
 								 )
 		);
 		$this->tpl->parseCurrentBlock();
@@ -331,7 +331,7 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 		$this->tpl->setCurrentBlock( "answer_feedback" );
 		$this->tpl->setVariable( "ANSWER_FEEDBACK",
 								 $question_gui->getAnswerFeedbackOutput( $this->testSession->getActiveId(),
-																		 NULL
+																		 $this->testSequence->getPass()
 								 )
 		);
 		$this->tpl->parseCurrentBlock();
@@ -1158,12 +1158,19 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 			$userPostSolution = false;
 		}
 
+		// hey: prevPassSolutions - determine solution pass index and configure gui accordingly 
+		$solutionPassIndex = $this->determineSolutionPassIndex($questionGui);
+		$questionGui->setPreviousSolutionPrefilled($solutionPassIndex < $this->testSession->getPass());
+		// hey.
+		
 		// Answer specific feedback is rendered into the display of the test question with in the concrete question types outQuestionForTest-method.
 		// Notation of the params prior to getting rid of this crap in favor of a class
 		$questionGui->outQuestionForTest(
 			$formAction, 							#form_action
 			$this->testSession->getActiveId(),		#active_id
-			NULL, 									#pass
+			// hey: prevPassSolutions - prepared pass index having no, current or previous solution
+			$solutionPassIndex, 					#pass
+			// hey.
 			$isPostponed, 							#is_postponed
 			$userPostSolution, 						#user_post_solution
 			$answerFeedbackEnabled					#answer_feedback == inline_specific_feedback
@@ -1178,6 +1185,38 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 
 		$this->populateIntermediateSolutionSaver($questionGui);
 	}
+	
+	// hey: prevPassSolutions - determine solution pass index
+	protected function determineSolutionPassIndex(assQuestionGUI $questionGui)
+	{
+		require_once './Modules/Test/classes/class.ilObjTest.php';
+		
+		if( ilObjTest::_getUsePreviousAnswers($this->testSession->getActiveId(), true) )
+		{
+			$currentSolutionAvailable = $questionGui->object->authorizedOrIntermediateSolutionExists(
+				$this->testSession->getActiveId(), $this->testSession->getPass()
+			);
+			
+			if( !$currentSolutionAvailable )
+			{
+				$previousPass = $questionGui->object->getSolutionMaxPass(
+					$this->testSession->getActiveId()
+				);
+				
+				$previousSolutionAvailable = $questionGui->object->authorizedSolutionExists(
+					$this->testSession->getActiveId(), $previousPass
+				);
+				
+				if( $previousSolutionAvailable )
+				{
+					return $previousPass;
+				}
+			}
+		}
+		
+		return $this->testSession->getPass();
+	}
+	// hey.
 
 	abstract protected function showQuestionCmd();
 
@@ -2056,7 +2095,7 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
 
 			// Notation of the params prior to getting rid of this crap in favor of a class
 			$solutionoutput = $questionGui->getSolutionOutput($this->testSession->getActiveId(),    #active_id
-				NULL,                                                #pass
+				$this->testSession->getPass(),                                                      #pass
 				FALSE,                                                #graphical_output
 				$show_question_inline_score,                        #result_output
 				FALSE,                                                #show_question_only

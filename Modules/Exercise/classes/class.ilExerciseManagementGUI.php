@@ -473,6 +473,10 @@ class ilExerciseManagementGUI
 	function listTextAssignmentObject($a_show_peer_review = true)
 	{
 		$this->initFilter();
+		if($this->filter["feedback"] == "submission_only")
+		{
+			$a_show_peer_review = false;
+		}
 
 		//tabs
 		$this->tabs_gui->clearTargets();
@@ -483,6 +487,7 @@ class ilExerciseManagementGUI
 			->withOnLoadCode(function($id) {
 				return "$('#{$id}').click(function() { window.print(); return false; });";
 			});
+		$this->toolbar->addSeparator();
 		$this->toolbar->addComponent($button_print);
 
 
@@ -511,13 +516,16 @@ class ilExerciseManagementGUI
 					"utext" => ilRTE::_replaceMediaObjectImageSrc($file["atext"], 1) // mob id to mob src
 				);
 
-				if(isset($peer_data[$file["user_id"]]))
+				if($a_show_peer_review)
 				{
-					$data["peer"] = array_keys($peer_data[$file["user_id"]]);
-				}
+					if(isset($peer_data[$file["user_id"]]))
+					{
+						$data["peer"] = array_keys($peer_data[$file["user_id"]]);
+					}
 
-				$data["fb_received"] = count($data["peer"]);
-				$data["fb_given"] = $peer_review->countGivenFeedback(true, $file["user_id"]);
+					$data["fb_received"] = count($data["peer"]);
+					$data["fb_given"] = $peer_review->countGivenFeedback(true, $file["user_id"]);
+				}
 
 				$submission_data = $this->assignment->getExerciseMemberAssignmentData($file["user_id"]);
 
@@ -562,34 +570,38 @@ class ilExerciseManagementGUI
 		$main_panel = $this->ui_factory->panel()->sub($a_data['uname'], $this->ui_factory->legacy($a_data['utext']))
 			->withCard($this->ui_factory->card($this->lng->txt('text_assignment'))->withSections(array($this->ui_factory->legacy($card_sections_html))))->withActions($actions);
 
-		//todo remove this css
-		$feedback_html = "<div style='background-color:#F9F9F9;padding:9px;'>";
-
-		foreach($a_data["peer"] as $peer_id)
+		$feedback_html = "";
+		if(array_key_exists("peer", $a_data))
 		{
-			$user = new ilObjUser($peer_id);
-			$peer_name =  $user->getFirstname()." ".$user->getLastname();
-			//todo: apply only 20px in intermediate elements.
-			$feedback_html .= "<div style='margin-bottom:20px;'>".$this->lng->txt("feedback_from")." ".$peer_name;
+			//todo remove this css
+			$feedback_html .= "<div style='background-color:#F9F9F9;padding:9px;'>";
 
-			$submission = new ilExSubmission($this->assignment, $a_data["uid"]);
-			$values = $submission->getPeerReview()->getPeerReviewValues($peer_id, $a_data["uid"]);
-
-			//Todo: template for this could be nice.
-			foreach($this->assignment->getPeerReviewCriteriaCatalogueItems() as $crit)
+			foreach($a_data["peer"] as $peer_id)
 			{
-				$crit_id = $crit->getId()
-					? $crit->getId()
-					: $crit->getType();
-				$crit->setPeerReviewContext($this->assignment, $peer_id, $a_data["uid"]);
+				$user = new ilObjUser($peer_id);
+				$peer_name =  $user->getFirstname()." ".$user->getLastname();
+				//todo: apply only 20px in intermediate elements.
+				$feedback_html .= "<div style='margin-bottom:20px;'>".$this->lng->txt("feedback_from")." ".$peer_name;
 
-				$feedback_html .=
-					'<div class="ilBlockPropertyCaption">'.$crit->getTitle().'</div>'.
-					'<div style="margin:2px 0;">'.$crit->getHTML($values[$crit_id]).'</div>';
+				$submission = new ilExSubmission($this->assignment, $a_data["uid"]);
+				$values = $submission->getPeerReview()->getPeerReviewValues($peer_id, $a_data["uid"]);
+
+				//Todo: template for this could be nice.
+				foreach($this->assignment->getPeerReviewCriteriaCatalogueItems() as $crit)
+				{
+					$crit_id = $crit->getId()
+						? $crit->getId()
+						: $crit->getType();
+					$crit->setPeerReviewContext($this->assignment, $peer_id, $a_data["uid"]);
+
+					$feedback_html .=
+						'<div class="ilBlockPropertyCaption">'.$crit->getTitle().'</div>'.
+						'<div style="margin:2px 0;">'.$crit->getHTML($values[$crit_id]).'</div>';
+				}
+				$feedback_html .= "</div>";
 			}
 			$feedback_html .= "</div>";
 		}
-		$feedback_html .= "</div>";
 
 		$feedback_html .= "<p>".$this->lng->txt('grade').": ".$this->lng->txt('exc_'.$a_data['status'])."</p>";
 

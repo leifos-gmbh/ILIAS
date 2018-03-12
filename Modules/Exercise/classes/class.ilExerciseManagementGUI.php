@@ -470,6 +470,7 @@ class ilExerciseManagementGUI
 	 * //todo lang vars.
 	 * //TODO Show something when we don't have any panel displayed.
 	 * //TODO display labels in the toolbar.
+	 * //template for the card, and the subpanel with grade and comment.
 	 * always true after we mixed the 2 ui tables into panels.
 	 */
 	function listTextAssignmentObject($a_show_peer_review = true)
@@ -500,12 +501,15 @@ class ilExerciseManagementGUI
 		include_once "Services/RTE/classes/class.ilRTE.php";
 
 		$report_html = "";
+		//TODO create proper title.
+		$report_title = $this->lng->txt("exc_list_text_assignment").": ".$this->assignment->getTitle();
+		$report_html .= "<h1>".$report_title."</h1>";
 		foreach(ilExSubmission::getAllAssignmentFiles($this->assignment->getExerciseId(), $this->assignment->getId()) as $file)
 		{
 			if(trim($file["atext"]))
 			{
 				$user = new ilObjUser($file["user_id"]);
-				$uname = $user->getFirstname().", ".$user->getLastname();
+				$uname = $user->getFirstname()." ".$user->getLastname();
 				$data = array(
 					"uid" => $file["user_id"],
 					"uname" => $uname,
@@ -527,8 +531,13 @@ class ilExerciseManagementGUI
 				{
 					$data = array_merge($data, $submission_data);
 					$report_html .= $this->getReportPanel($data);
+					$num_panels++;
 				}
 			}
+		}
+		if($num_panels == 0)
+		{
+			//TODO show nothing to display
 		}
 
 		$this->tpl->setContent($report_html);
@@ -557,7 +566,7 @@ class ilExerciseManagementGUI
 
 		//todo: tpl for this sections ¿?¿¿ like in surveys
 		$card_sections_html =
-			$this->lng->txt("exc_tbl_submission_date")." ".ilDatePresentation::formatDate(new ilDate($a_data["udate"], IL_CAL_DATETIME)).
+			$this->lng->txt("exc_tbl_submission_date")." ".ilDatePresentation::formatDate(new ilDateTime($a_data["udate"], IL_CAL_DATETIME)).
 			"<br>".$status.
 			"<br>".$evaluation.
 			"<br>".$this->lng->txt('feedback_given')." ".$a_data['fb_given'].
@@ -607,9 +616,9 @@ class ilExerciseManagementGUI
 
 		$feedback_panel = $this->ui_factory->panel()->sub("",$this->ui_factory->legacy($feedback_html));
 
-		$panel_title = $this->lng->txt("exc_list_text_assignment").": ".$this->assignment->getTitle();
+		//$panel_title = $this->lng->txt("exc_list_text_assignment").": ".$this->assignment->getTitle();
 
-		$report = $this->ui_factory->panel()->report($panel_title, array($main_panel, $feedback_panel));
+		$report = $this->ui_factory->panel()->report("", array($main_panel, $feedback_panel));
 
 		return $this->ui_renderer->render([$modal,$report]);
 	}

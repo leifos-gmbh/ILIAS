@@ -164,7 +164,7 @@ class cdNeedsAnalysisGUI
 
 				// last course
 				$options = array(""=>$this->pl->txt("option_never"));
-				for ($i = 2013; $i >= 1950; $i--)
+				for ($i = 2018; $i >= 1950; $i--)
 				{
 					$options[$i] = $i;
 				}

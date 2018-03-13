@@ -147,6 +147,11 @@ cd#:#export_excel#:#Excel-Export
 cd#:#cd_enter_valid_date_format#:#Bitte tragen Sie gültige Daten im Format dd.mm.yyyy ein.
 cd#:#cd_reg_trainer#:#Application Form
 cd#:#cd_notes#:#Notizen
+cd#:#cd_edit#:#Editieren
+cd#:#cd_activate#:#<span style="color:green;">Aktivieren</span>
+cd#:#cd_deactivate#:#<span style="color:darkred;">Deaktivieren</span>
+cd#:#cd_trainer_yes#:#<span style="color:green;">Ja</span>
+cd#:#cd_trainer_no#:#<span style="color:red;">Nein</span>
 cd#:#cd_other#:#Andere
 cd#:#cd_qm_evaluation#:#QM Bewertung
 cd#:#cd_entry_date#:#Einstellungsdatum

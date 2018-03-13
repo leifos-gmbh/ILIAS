@@ -221,3 +221,19 @@ cd#:#pdf_export_short#:#Short Profile (PDF)
 cd#:#pdf_export_full#:#Profile (PDF)
 cd#:#daf_certificate#:#DAF Certificate
 cd#:#tm_apps#:#Apps
+cd#:#cd_current_trainer#:#Current Trainers
+cd#:#cd_former_trainer#:#Former Trainers
+cd#:#cd_make_current_trainer#:#<< Current Trainer
+cd#:#cd_make_former_trainer#:#>> Former Trainer
+cd#:#cd_sure_former_trainer#:#Should the trainer really become a former trainer?
+cd#:#cd_sure_current_trainer#:#Should the trainer really become a current trainer again?
+cd#:#cd_confirm#:#Confirm
+cd#:#cd_assign_course#:#Assign to Course
+cd#:#cd_select_course#:#Please select a course.
+cd#:#cd_really_assign_as_trainer#:#Do you really want to assign the following users as trainers to the course?
+cd#:#cd_really_assign_as_member#:#Do you really want to assign the following users as members to the course?
+cd#:#cd_assign#:#Assign
+cd#:#cd_registration#:#Registration
+cd#:#cd_profile_changes#:#Profile Changes
+common#:#form_date_duration_start#:#Von
+common#:#form_date_duration_end#:#Bis

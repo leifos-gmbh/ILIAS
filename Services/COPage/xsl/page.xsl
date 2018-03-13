@@ -2522,6 +2522,10 @@
 	<xsl:param name="data"/>
 	<xsl:param name="inline"/>
 	<img border="0" style="width:100%">
+		<!-- see 0020796 -->
+		<xsl:if test = "name(..) != 'Paragraph'">
+			<xsl:attribute name="style">width:100%</xsl:attribute>
+		</xsl:if>
 		<xsl:if test = "$map_item = '' or $cmobid != concat('il__mob_',$map_mob_id)">
 			<xsl:attribute name="src"><xsl:value-of select="$data"/></xsl:attribute>
 		</xsl:if>
@@ -2848,6 +2852,21 @@
 
 		<!-- YouTube -->
 		<xsl:when test = "substring-after($data,'youtube.com') != ''">
+			<!-- iframe instead of object tag, see bug #21657 -->
+			<iframe frameborder="0" allowfullscreen="1">
+				<xsl:if test="$width != ''">
+					<xsl:attribute name="width"><xsl:value-of select="$width"/></xsl:attribute>
+				</xsl:if>
+				<xsl:if test="$height != ''">
+					<xsl:attribute name="height"><xsl:value-of select="$height"/></xsl:attribute>
+				</xsl:if>
+				<xsl:attribute name="src">
+					<xsl:value-of select="$httpprefix"/>//www.youtube.com/embed/<xsl:value-of select="//MediaObject[@Id=$cmobid]/MediaItem[@Purpose=$curPurpose]/Parameter[@Name='v']/@Value" />
+				</xsl:attribute>
+				<xsl:comment>Comment to have separate iframe ending tag</xsl:comment>
+			</iframe>
+		</xsl:when>
+		<xsl:when test = "substring-after($data,'xxxyoutube.com') != ''">
 			<object>
 				<xsl:if test="$width != ''">
 					<xsl:attribute name="width"><xsl:value-of select="$width"/></xsl:attribute>

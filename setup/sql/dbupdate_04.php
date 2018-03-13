@@ -4175,6 +4175,12 @@ if(!$ilDB->tableColumnExists('reg_registration_codes','ext_enabled'))
 <#4383>
 <?php
 
+if($ilDB->tableColumnExists('reg_registration_codes','generated'))
+{
+	$ilDB->renameTableColumn('reg_registration_codes', "generated", 'generated_on');
+
+}
+
 $query = 'SELECT * FROM usr_account_codes ';
 $res = $ilDB->query($query);
 while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
@@ -13777,6 +13783,7 @@ if (!$ilDB->tableExists('obj_stat_tmp'))
 	));
 	$ilDB->addPrimaryKey('obj_stat_tmp', array('log_id'));
 	$ilDB->addIndex('obj_stat_tmp',array('obj_id', 'obj_type', 'yyyy', 'mm', 'dd', 'hh'),'i1');
+	$ilDB->createSequence('obj_stat_tmp');
 }
 ?>
 <#4845>
@@ -13798,17 +13805,17 @@ if ($ilDB->tableExists('obj_stat_tmp') && $ilDB->tableExists('obj_stat_tmp_old')
 						  "(log_id, obj_id, obj_type, tstamp,  yyyy, mm, dd, hh, read_count, childs_read_count, spent_seconds, childs_spent_seconds) ".
 						  "VALUES ( ".
 						  $ilDB->quote($id ,'integer').', '.
-						  $ilDB->quote($data['obj_id'] ,'integer').', '.
-						  $ilDB->quote($data['obj_type'] ,'text').', '.
-						  $ilDB->quote($data['tstamp'] ,'integer').', '.
-						  $ilDB->quote($data['yyyy'] ,'integer').', '.
-						  $ilDB->quote($data['mm'] ,'integer').', '.
-						  $ilDB->quote($data['dd'] ,'integer').', '.
-						  $ilDB->quote($data['hh'] ,'integer').', '.
-						  $ilDB->quote($data['read_count'] ,'integer').', '.
-						  $ilDB->quote($data['childs_read_count'] ,'integer').', '.
-						  $ilDB->quote($data['spent_seconds'] ,'integer').', '.
-						  $ilDB->quote($data['childs_spent_seconds'] ,'integer').
+						  $ilDB->quote($row['obj_id'] ,'integer').', '.
+						  $ilDB->quote($row['obj_type'] ,'text').', '.
+						  $ilDB->quote($row['tstamp'] ,'integer').', '.
+						  $ilDB->quote($row['yyyy'] ,'integer').', '.
+						  $ilDB->quote($row['mm'] ,'integer').', '.
+						  $ilDB->quote($row['dd'] ,'integer').', '.
+						  $ilDB->quote($row['hh'] ,'integer').', '.
+						  $ilDB->quote($row['read_count'] ,'integer').', '.
+						  $ilDB->quote($row['childs_read_count'] ,'integer').', '.
+						  $ilDB->quote($row['spent_seconds'] ,'integer').', '.
+						  $ilDB->quote($row['childs_spent_seconds'] ,'integer').
 						  ")"
 		);
 
@@ -14102,6 +14109,94 @@ if ($ilDB->tableExists('ut_lp_collections_tmp'))
 <#4857>
 <?php
 //usr_session_stats adding primary key
+$usr_session_stats_temp_num = "
+SELECT COUNT(*) cnt
+FROM (
+	SELECT slot_begin
+    FROM usr_session_stats
+    GROUP BY slot_begin
+    HAVING COUNT(*) > 1
+) duplicateSessionStats
+";
+$res  = $ilDB->query($usr_session_stats_temp_num);
+$data = $ilDB->fetchAssoc($res);
+if($data['cnt'])
+{
+	$usr_session_stats_dup_query = "
+	SELECT *
+	FROM usr_session_stats
+	GROUP BY slot_begin
+	HAVING COUNT(*) > 1
+	";
+	$res = $ilDB->query($usr_session_stats_dup_query);
+
+	$stmt_del = $ilDB->prepareManip("DELETE FROM usr_session_stats WHERE slot_begin = ? ", array('integer'));
+	$stmt_in  = $ilDB->prepareManip("INSERT INTO usr_session_stats ("
+		. "slot_begin"
+		. ",slot_end"
+		. ",active_min"
+		. ",active_max"
+		. ",active_avg"
+		. ",active_end"
+		. ",opened"
+		. ",closed_manual"
+		. ",closed_expire"
+		. ",closed_idle"
+		. ",closed_idle_first"
+		. ",closed_limit"
+		. ",closed_login"
+		. ",max_sessions"
+		. ",closed_misc"
+		. ") VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", 
+		array(
+			'integer',
+			'integer', 
+			'integer',
+			'integer', 
+			'integer',
+			'integer', 
+			'integer',
+			'integer', 
+			'integer',
+			'integer', 
+			'integer',
+			'integer', 
+			'integer',
+			'integer', 
+			'integer'
+		)
+	);
+
+	while($row = $ilDB->fetchAssoc($res))
+	{
+		$ilDB->execute($stmt_del, array($row['slot_begin']));
+		$ilDB->execute($stmt_in, array(
+				$row['slot_begin'], 
+				$row['slot_end'],
+				$row['active_min'], 
+				$row['active_max'],
+				$row['active_avg'], 
+				$row['active_end'],
+				$row['opened'], 
+				$row['closed_manual'],
+				$row['closed_expire'], 
+				$row['closed_idle'],
+				$row['closed_idle_first'], 
+				$row['closed_limit'],
+				$row['closed_login'], 
+				$row['max_sessions'],
+				$row['closed_misc']
+			)
+		);
+	}
+}
+
+$res  = $ilDB->query($usr_session_stats_temp_num);
+$data = $ilDB->fetchAssoc($res);
+if($data['cnt'] > 0)
+{
+	die("There are still duplicate entries in table 'usr_session_stats'. Please execute this database update step again.");
+}
 
 if($ilDB->tableExists('usr_session_stats'))
 {
@@ -18259,3 +18354,4 @@ $ilDB->manipulate('delete from obj_members where admin = '.
 <?php
 	$ilCtrlStructureReader->getStructure();
 ?>
+

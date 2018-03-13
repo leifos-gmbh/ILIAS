@@ -15,7 +15,8 @@ var Database = function Database(config) {
 			port: config.database.port,
 			user: config.database.user,
 			password: config.database.pass,
-			database: config.database.name
+			database: config.database.name,
+			charset: 'UTF8_UNICODE_CI'
 			//debug: true
 		});
 
@@ -200,13 +201,22 @@ var Database = function Database(config) {
 		})
 	};
 
-	this.clearChatMessagesProcess = function (bound, namespaceName, callback) {
-		bound = parseInt(bound / 1000);
+	this.getMessageAcceptanceStatusForUsers = function(onResult, onEnd) {
+		_onQueryEvents(
+			_pool.query('SELECT usr_id FROM usr_pref WHERE keyword = ? AND value = ?', ["chat_osc_accept_msg", "y"]),
+			onResult,
+			onEnd
+		);
+	};
+
+	this.clearChatMessagesProcess = function(bound, namespaceName, callback) {
+		var boundMilliseconds = parseInt(bound),
+			boundSeconds      = parseInt(bound / 1000);
 
 		async.waterfall([
 			function(next) {
 				_pool.query('DELETE FROM chatroom_history WHERE timestamp < ?',
-					[bound],
+					[boundSeconds],
 					function (err, result) {
 						if (err) throw err;
 						Container.getLogger().info("Clear Messages for namespace %s affected %s rows", namespaceName, result.affectedRows)
@@ -217,7 +227,7 @@ var Database = function Database(config) {
 			function(result, next)
 			{
 				_pool.query('DELETE FROM osc_messages WHERE timestamp < ?',
-					[bound],
+					[boundMilliseconds],
 					function (err, result) {
 						if (err) throw err;
 						Container.getLogger().info("Clear OSC-Messages for namespace %s affected %s rows", namespaceName, result.affectedRows)
@@ -228,7 +238,7 @@ var Database = function Database(config) {
 			function(result, next)
 			{
 				_pool.query('DELETE c FROM osc_conversation c LEFT JOIN osc_messages m ON m.conversation_id = c.id WHERE m.id IS NULL',
-					[bound],
+					[boundMilliseconds],
 					function (err, result) {
 						if (err) throw err;
 						Container.getLogger().info("Clear OSC-Conversations for namespace %s affected %s rows", namespaceName, result.affectedRows)
@@ -239,7 +249,7 @@ var Database = function Database(config) {
 			function(result, next)
 			{
 				_pool.query('DELETE a FROM osc_activity a LEFT JOIN osc_conversation c ON a.conversation_id = c.id WHERE c.id IS NULL',
-					[bound],
+					[boundMilliseconds],
 					function (err, result) {
 						if (err) throw err;
 						Container.getLogger().info("Clear OSC-Activity for namespace %s affected %s rows", namespaceName, result.affectedRows)
@@ -252,7 +262,7 @@ var Database = function Database(config) {
 
 			callback();
 		});
-	}
+	};
 
 	this.trackActivity = function(conversationId, userId, timestamp) {
 		var emptyResult = true;
@@ -288,8 +298,8 @@ var Database = function Database(config) {
 		_onQueryEvents(
 			_pool.query('SELECT * FROM osc_activity WHERE conversation_id = ? AND user_id = ?', [conversationId, userId]),
 			function(result){
-				_pool.query('UPDATE osc_activity SET is_closed = ? WHERE conversation_id = ? AND user_id = ?',
-					[1, conversationId, userId],
+				_pool.query('UPDATE osc_activity SET is_closed = ?, timestamp = ? WHERE conversation_id = ? AND user_id = ?',
+					[1, Date.getTimestamp(), conversationId, userId],
 					function(err){
 						if(err) throw err;
 					}
@@ -371,15 +381,7 @@ var Database = function Database(config) {
 	 * @param {Conversation} conversation
 	 */
 	this.updateConversation = function(conversation) {
-		var participantsJson = [];
-		var participants = conversation.getParticipants();
-
-		for(var index in participants) {
-			if(participants.hasOwnProperty(index)){
-				participantsJson.push(participants[index].json())
-			}
-		}
-		participantsJson = JSON.stringify(participantsJson);
+		var participantsJson = JSON.stringify(getConversationParticipantsJson(conversation));
 
 		_pool.query('UPDATE osc_conversation SET participants = ?, is_group = ? WHERE id = ?',
 			[participantsJson, conversation.isGroup(), conversation.getId()],
@@ -394,13 +396,19 @@ var Database = function Database(config) {
 	 * @param {Conversation} conversation
 	 */
 	this.persistConversation = function(conversation) {
-		_pool.query('INSERT INTO osc_conversation SET ?', {
-			id: conversation.getId(),
-			is_group: conversation.isGroup(),
-			participants: JSON.stringify(conversation.getParticipants())
-		}, function(err){
-			if(err) throw err;
-		});
+		var participantsJson = JSON.stringify(getConversationParticipantsJson(conversation));
+
+		_pool.query(
+			'INSERT INTO osc_conversation SET ?',
+			{
+				id: conversation.getId(),
+				is_group: conversation.isGroup(),
+				participants: participantsJson
+			},
+			function(err){
+				if(err) throw err;
+			}
+		);
 	};
 
 
@@ -423,6 +431,28 @@ var Database = function Database(config) {
 	this.getConnection = function(callback) {
 		_pool.getConnection(callback);
 	};
+
+	function getConversationParticipantsJson(conversation) {
+		var participantsJson = {};
+		var participants = conversation.getParticipants();
+
+		for (var index in participants) {
+			if(participants.hasOwnProperty(index)) {
+				var p = participants[index];
+				if (p.getId() !== null && p.getId() > 0 && !participantsJson.hasOwnProperty(p.getId())) {
+					participantsJson[p.getId()] = p.json();
+				}
+			}
+		}
+
+		if (typeof Object.values === "function") {
+			return Object.values(participantsJson);
+		} else {
+			return Object.keys(participantsJson).map(function(k) {
+				return participantsJson[k]
+			});
+		}
+	}
 
 	function _onQueryEvents(query, onResult, onEnd) {
 		query.on('result', onResult);

@@ -141,8 +141,8 @@ class ilObjPollGUI extends ilObject2GUI
 	
 	protected function validateCustom(ilPropertyFormGUI $a_form)
 	{
-		// #14606
-		if(!$a_form->getInput("period") &&
+		// #14606 #20594
+		if(!$a_form->getInput("voting_period") &&
 			$a_form->getInput("results") == ilObjPoll::VIEW_RESULTS_AFTER_PERIOD)
 		{		
 			ilUtil::sendFailure($this->lng->txt("form_input_not_valid"));
@@ -182,6 +182,9 @@ class ilObjPollGUI extends ilObject2GUI
 		}
 		else
 		{
+			#20594
+			$this->object->setVotingPeriodBegin(null);
+			$this->object->setVotingPeriodEnd(null);
 			$this->object->setVotingPeriod(0);
 		}				
 	}

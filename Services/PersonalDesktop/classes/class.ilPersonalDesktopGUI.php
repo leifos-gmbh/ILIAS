@@ -61,7 +61,9 @@ class ilPersonalDesktopGUI
 			$this->ilias->raiseError($this->lng->txt("msg_not_available_for_anon"),$this->ilias->error_obj->MESSAGE);
 		}
 		$this->cmdClass = $_GET['cmdClass'];
-		
+
+		$this->ctrl->saveParameter($this, array("view"));
+
 		//$tree->useCache(false);
 
 		$this->action_menu = new ilAdvancedSelectionListGUI();

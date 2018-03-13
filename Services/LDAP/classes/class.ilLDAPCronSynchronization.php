@@ -93,7 +93,7 @@ class ilLDAPCronSynchronization extends ilCronJob
 
 					$offset = 0;
 					$limit = 500;
-					while($user_sliced = array_slice($users, $offset, $limit))
+					while($user_sliced = array_slice($users, $offset, $limit, true))
 					{
 				 		$ilLog->write("LDAP: Starting update/creation of users ...");
 						$ilLog->write("LDAP: Offset: " . $offset);
@@ -104,6 +104,8 @@ class ilLDAPCronSynchronization extends ilCronJob
 						$ilLog->write("LDAP: Finished update/creation");
 						
 						$offset += $limit;
+
+						ilCronManager::ping($this->getId());
 					}					
 					$this->counter++;
 		 		}

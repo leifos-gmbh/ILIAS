@@ -49,14 +49,10 @@ class ilDclReferenceFieldRepresentation extends ilDclBaseFieldRepresentation {
 					$value = $record->getRecordFieldValue($fieldref);
 					if ($record->getRecordField($fieldref)->getField()->hasProperty(ilDclBaseFieldModel::PROP_URL)) {
 						if (!is_array($value)) {
-							throw new ilDclException('Value of URL-Field should always be an array');
+							$value = array('title' => '', 'link' => $value);
 						}
 						$value = $value['title'] ? $value['title'] : $value['link'];
 					}
-//					$json = json_decode($value);
-//					if ($json instanceof stdClass) {
-//						$value = $json->title ? $json->title : $json->link;
-//					}
 					$options[$record->getId()] = $value;
 					break;
 				default:
@@ -94,7 +90,7 @@ class ilDclReferenceFieldRepresentation extends ilDclBaseFieldRepresentation {
 		$ref_table = ilDclCache::getTableCache($ref_field->getTableId());
 		$options = array();
 		foreach ($ref_table->getRecords() as $record) {
-			$options[$record->getId()] = $record->getRecordFieldValue($ref_field_id);
+			$options[$record->getId()] = $record->getRecordFieldPlainText($ref_field_id);
 		}
 		// Sort by values ASC
 		asort($options);

@@ -207,9 +207,11 @@ class assTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			{
 				$max_no_of_chars = ucfirst($this->lng->txt('unlimited'));
 			}
-			
-			$act_no_of_chars = strlen($user_solution);
-			$template->setVariable("CHARACTER_INFO", '<b>' . $max_no_of_chars . '</b>' . 
+
+			$stripped = trim(strip_tags($user_solution));
+			$stripped = str_replace(array("\n", "\r\n", "\r"), '', $stripped);
+			$act_no_of_chars = strlen($stripped);
+			$template->setVariable("CHARACTER_INFO", '<b>' . $max_no_of_chars . '</b>' .
 				$this->lng->txt('answer_characters') . ' <b>' . $act_no_of_chars . '</b>');
 		}
 		if (($active_id > 0) && (!$show_correct_solution))
@@ -260,7 +262,15 @@ class assTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 			$fb = $this->getSpecificFeedbackOutput($active_id, $pass);
 			$feedback .=  strlen($fb) ? $fb : '';
 		}
-		if (strlen($feedback)) $solutiontemplate->setVariable("FEEDBACK", $this->object->prepareTextareaOutput( $feedback, true ));
+		if (strlen($feedback))
+		{
+			$cssClass = ( $this->hasCorrectSolution($active_id, $pass) ?
+				ilAssQuestionFeedback::CSS_CLASS_FEEDBACK_CORRECT : ilAssQuestionFeedback::CSS_CLASS_FEEDBACK_WRONG
+			);
+			
+			$solutiontemplate->setVariable("ILC_FB_CSS_CLASS", $cssClass);
+			$solutiontemplate->setVariable("FEEDBACK", $this->object->prepareTextareaOutput( $feedback, true ));
+		}
 		
 		$solutiontemplate->setVariable("SOLUTION_OUTPUT", $questionoutput);
 

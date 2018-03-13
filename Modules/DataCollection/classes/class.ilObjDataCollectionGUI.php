@@ -27,6 +27,8 @@ require_once('./Modules/DataCollection/classes/class.ilDclExportGUI.php');
  * @ilCtrl_Calls ilObjDataCollectionGUI: ilDclTableListGUI, ilObjFileGUI
  * @ilCtrl_Calls ilObjDataCollectionGUI: ilObjUserGUI
  * @ilCtrl_Calls ilObjDataCollectionGUI: ilRatingGUI
+ * @ilCtrl_Calls ilObjDataCollectionGUI: ilPropertyFormGUI
+ * @ilCtrl_Calls ilObjDataCollectionGUI: ilDclPropertyFormGUI
  *
  * @extends      ilObject2GUI
  */
@@ -253,6 +255,16 @@ class ilObjDataCollectionGUI extends ilObject2GUI {
 
 				$this->ctrl->forwardCommand($exp_gui);
 				break;
+
+			case strtolower(ilDclPropertyFormGUI::class):
+				require_once './Modules/DataCollection/classes/Content/class.ilDclRecordEditGUI.php';
+				$recordedit_gui = new ilDclRecordEditGUI($this);
+				$recordedit_gui->getRecord();
+				$recordedit_gui->initForm();
+				$form = $recordedit_gui->getForm();
+				$this->ctrl->forwardCommand($form);
+				break;
+
 			default:
 				return parent::executeCommand();
 		}
@@ -294,7 +306,7 @@ class ilObjDataCollectionGUI extends ilObject2GUI {
 
 		$ilTabs->activateTab("id_info");
 
-		if (!$this->checkPermissionBool("visible")) {
+		if (!$this->checkPermissionBool("visible") && !$this->checkPermissionBool("read")) {
 			$ilErr->raiseError($this->lng->txt("msg_no_perm_read"));
 		}
 
@@ -375,7 +387,7 @@ class ilObjDataCollectionGUI extends ilObject2GUI {
 		}
 
 		// info screen
-		if ($ilAccess->checkAccess('visible', "", $this->object->getRefId())) {
+		if ($ilAccess->checkAccess('visible', "", $this->object->getRefId()) || $ilAccess->checkAccess('read', "", $this->object->getRefId())) {
 			$ilTabs->addTab("id_info", $lng->txt("info_short"), $this->ctrl->getLinkTargetByClass("ilinfoscreengui", "showSummary"));
 		}
 

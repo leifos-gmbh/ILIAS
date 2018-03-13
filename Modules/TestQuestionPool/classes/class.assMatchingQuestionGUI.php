@@ -596,7 +596,15 @@ class assMatchingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 			$fb = $this->getSpecificFeedbackOutput($active_id, $pass);
 			$feedback .=  strlen($fb) ? $fb : '';
 		}
-		if (strlen($feedback)) $solutiontemplate->setVariable("FEEDBACK", $this->object->prepareTextareaOutput($feedback, true));
+		if (strlen($feedback))
+		{
+			$cssClass = ( $this->hasCorrectSolution($active_id, $pass) ?
+				ilAssQuestionFeedback::CSS_CLASS_FEEDBACK_CORRECT : ilAssQuestionFeedback::CSS_CLASS_FEEDBACK_WRONG
+			);
+			
+			$solutiontemplate->setVariable("ILC_FB_CSS_CLASS", $cssClass);
+			$solutiontemplate->setVariable("FEEDBACK", $this->object->prepareTextareaOutput( $feedback, true ));
+		}
 		
 		$solutiontemplate->setVariable("SOLUTION_OUTPUT", $questionoutput);
 
@@ -613,7 +621,17 @@ class assMatchingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 	{
 		$solutions = is_object($this->getPreviewSession()) ? (array)$this->getPreviewSession()->getParticipantsSolution() : array();
 
-		$this->tpl->addJavaScript('Modules/TestQuestionPool/js/jquery-ui-1-10-3-fixed.js');
+		if($GLOBALS['ilBrowser']->isMobile() || $GLOBALS['ilBrowser']->isIpad())
+		{
+			require_once 'Services/jQuery/classes/class.iljQueryUtil.php';
+			iljQueryUtil::initjQuery();
+			iljQueryUtil::initjQueryUI();
+			$this->tpl->addJavaScript('./Services/jQuery/js/jquery.ui.touch-punch.min.js');
+		}
+		else
+		{
+			$this->tpl->addJavaScript('Modules/TestQuestionPool/js/jquery-ui-1-10-3-fixed.js');
+		}
 		$this->tpl->addJavaScript('Modules/TestQuestionPool/js/ilMatchingQuestion.js');
 		$this->tpl->addCss(ilUtil::getStyleSheetLocation('output', 'test_javascript.css', 'Modules/TestQuestionPool'));
 
@@ -777,7 +795,17 @@ class assMatchingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 	function getTestOutput($active_id, $pass, $is_postponed = FALSE, $user_post_solution = FALSE, $inlineFeedback = false)
 	// hey.
 	{
-		$this->tpl->addJavaScript('Modules/TestQuestionPool/js/jquery-ui-1-10-3-fixed.js');
+		if($GLOBALS['ilBrowser']->isMobile() || $GLOBALS['ilBrowser']->isIpad())
+		{
+			require_once 'Services/jQuery/classes/class.iljQueryUtil.php';
+			iljQueryUtil::initjQuery();
+			iljQueryUtil::initjQueryUI();
+			$this->tpl->addJavaScript('./Services/jQuery/js/jquery.ui.touch-punch.min.js');
+		}
+		else
+		{
+			$this->tpl->addJavaScript('Modules/TestQuestionPool/js/jquery-ui-1-10-3-fixed.js');
+		}
 		$this->tpl->addJavaScript('Modules/TestQuestionPool/js/ilMatchingQuestion.js');
 		$this->tpl->addCss(ilUtil::getStyleSheetLocation('output', 'test_javascript.css', 'Modules/TestQuestionPool'));
 

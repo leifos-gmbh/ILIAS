@@ -65,6 +65,7 @@ class ilWorkflowEngineDefinitionsGUI
 				break;
 
 			case'stoplistening':
+				return $this->stopListening();
 				break;
 
 			case 'view':
@@ -151,18 +152,22 @@ class ilWorkflowEngineDefinitionsGUI
 		$repo_dir_name = ilObjWorkflowEngine::getRepositoryDir() . '/';
 		if(!is_dir($repo_dir_name))
 		{
-			mkdir($repo_dir_name, 0777, true);
+			\ilUtil::makeDirParents($repo_dir_name);
 		}
 
 		$temp_dir_name =  ilObjWorkflowEngine::getTempDir();
 		if(!is_dir($temp_dir_name))
 		{
-			mkdir($temp_dir_name, 0777, true);
+			\ilUtil::makeDirParents($temp_dir_name);
 		}
 
 		$file_name = $_FILES['process_file']['name'];
 		$temp_name = $_FILES['process_file']['tmp_name'];
-		move_uploaded_file($temp_name, $temp_dir_name.$file_name);
+		\ilUtil::moveUploadedFile(
+			$temp_name,
+			$file_name,
+			$temp_dir_name . $file_name
+		);
 
 		$repo_base_name = 'il'.substr($file_name,0,strpos($file_name,'.'));
 		$wf_base_name = 'wfd.'.$repo_base_name.'_v';
@@ -293,6 +298,21 @@ class ilWorkflowEngineDefinitionsGUI
 		}
 
 		ilUtil::sendSuccess($this->parent_gui->lng->txt('started_listening'), true);
+		ilUtil::redirect(
+			html_entity_decode(
+				$this->parent_gui->ilCtrl->getLinkTarget($this->parent_gui, 'definitions.view')
+			)
+		);
+	}
+
+	public function stopListening()
+	{
+		$process_id = ilUtil::stripSlashes($_GET['process_id']);
+
+		require_once './Services/WorkflowEngine/classes/utils/class.ilWorkflowDbHelper.php';
+		ilWorkflowDbHelper::deleteStartEventData($process_id);
+
+		ilUtil::sendSuccess($this->parent_gui->lng->txt('wfe_stopped_listening'), true);
 		ilUtil::redirect(
 			html_entity_decode(
 				$this->parent_gui->ilCtrl->getLinkTarget($this->parent_gui, 'definitions.view')

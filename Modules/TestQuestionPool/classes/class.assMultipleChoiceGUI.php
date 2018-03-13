@@ -388,7 +388,7 @@ class assMultipleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScorin
 			{
 				if (strcmp($mc_solution, $answer_id) == 0)
 				{
-					if( $this->renderPurposeSupportsFormHtml() )
+					if( $this->renderPurposeSupportsFormHtml() || $this->isRenderPurposePrintPdf() )
 					{
 						$template->setVariable("SOLUTION_IMAGE", ilUtil::getHtmlPath(ilUtil::getImagePath("checkbox_checked.png")));
 						$template->setVariable("SOLUTION_ALT", $this->lng->txt("checked"));
@@ -405,7 +405,7 @@ class assMultipleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScorin
 			}
 			if (!$checked)
 			{
-				if( $this->renderPurposeSupportsFormHtml() )
+				if( $this->renderPurposeSupportsFormHtml() || $this->isRenderPurposePrintPdf() )
 				{
 					$template->setVariable("SOLUTION_IMAGE", ilUtil::getHtmlPath(ilUtil::getImagePath("checkbox_unchecked.png")));
 					$template->setVariable("SOLUTION_ALT", $this->lng->txt("unchecked"));
@@ -427,7 +427,15 @@ class assMultipleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScorin
 		$questionoutput = $template->get();
 		$feedback = ($show_feedback && !$this->isTestPresentationContext()) ? $this->getAnswerFeedbackOutput($active_id, $pass) : "";
 		
-		if (strlen($feedback)) $solutiontemplate->setVariable("FEEDBACK", $this->object->prepareTextareaOutput( $feedback , true ));
+		if (strlen($feedback))
+		{
+			$cssClass = ( $this->hasCorrectSolution($active_id, $pass) ?
+				ilAssQuestionFeedback::CSS_CLASS_FEEDBACK_CORRECT : ilAssQuestionFeedback::CSS_CLASS_FEEDBACK_WRONG
+			);
+			
+			$solutiontemplate->setVariable("ILC_FB_CSS_CLASS", $cssClass);
+			$solutiontemplate->setVariable("FEEDBACK", $this->object->prepareTextareaOutput( $feedback , true ));
+		}
 		$solutiontemplate->setVariable("SOLUTION_OUTPUT", $questionoutput);
 
 		$solutionoutput = $solutiontemplate->get(); 

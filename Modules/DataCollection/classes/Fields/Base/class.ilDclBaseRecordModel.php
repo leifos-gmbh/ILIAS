@@ -417,6 +417,22 @@ class ilDclBaseRecordModel {
 	}
 
 	/**
+	 * Get Field Export Value
+	 *
+	 * @param int $field_id
+	 *
+	 * @return array
+	 */
+	public function getRecordFieldPlainText($field_id) {
+		$this->loadRecordFields();
+		if (ilDclStandardField::_isStandardField($field_id)) {
+			return $this->getStandardFieldHTML($field_id);
+		} else {
+			return $this->recordfields[$field_id]->getPlainText();
+		}
+	}
+
+	/**
 	 * @param $worksheet
 	 * @param $row
 	 * @param $col
@@ -684,16 +700,17 @@ class ilDclBaseRecordModel {
 
 		if (!$omit_notification) {
 			ilObjDataCollection::sendNotification("delete_record", $this->getTableId(), $this->getId());
+
+			$ilAppEventHandler->raise('Modules/DataCollection',
+				'deleteRecord',
+				array(
+					'dcl' => ilDclCache::getTableCache($this->getTableId())->getCollectionObject(),
+					'table_id' => $this->table_id,
+					'record_id' => $this->getId(),
+					'record' => $this,
+				));
 		}
 
-		$ilAppEventHandler->raise('Modules/DataCollection',
-			'deleteRecord',
-			array(
-				'dcl' => ilDclCache::getTableCache($this->getTableId())->getCollectionObject(),
-				'table_id' => $this->table_id,
-				'record_id' => $this->getId(),
-				'record' => $this,
-			));
 	}
 
 

@@ -2645,7 +2645,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling
 				$this->object->markPostRead($ilUser->getId(), (int) $this->objCurrentTopic->getId(), (int) $this->objCurrentPost->getId());
 
 				// copy temporary media objects (frm~)
-				ilForumUtil::moveMediaObjects($oReplyEditForm->getInput('message'), 'frm~:html', $ilUser->getId(), 'frm:html', $ilUser->getId());
+				ilForumUtil::moveMediaObjects($oReplyEditForm->getInput('message'), 'frm~:html', $ilUser->getId(), 'frm:html', $newPost);
 
 				if($this->objProperties->isFileUploadAllowed())
 				{
@@ -2718,7 +2718,10 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling
 						}
 					}
 				}
-					
+				
+				// save old activation status for send_notification decision
+				$old_status_was_active = $this->objCurrentPost->isActivated();
+				
 				// if post has been edited posting mus be activated again by moderator
 				$status = 1;
 				$send_activation_mail = 0;
@@ -2795,7 +2798,8 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling
 						array(
 							'ref_id'            => $this->object->getRefId(),
 							'post'              => $this->objCurrentPost,
-							'notify_moderators' => (bool)$send_activation_mail
+							'notify_moderators' => (bool)$send_activation_mail,
+							'old_status_was_active' => (bool)$old_status_was_active
 						)
 					);
 	
@@ -3302,7 +3306,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling
 					if(!$this->isTopLevelReplyCommand() && $this->objCurrentPost->getId() == $node->getId())
 					{
 						# actions for "active" post
-						if($this->is_moderator || $node->isActivated())
+						if($this->is_moderator || $node->isActivated() || $node->isOwner($ilUser->getId()))
 						{
 							// reply/edit
 							if(
@@ -4297,26 +4301,28 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling
 				$draft_obj = ilForumPostDraft::newInstanceByDraftId((int)$draft_id);
 				
 			}
-			// build new thread
-			$newPost = $frm->generateThread(
-				$topicData['top_pk'],
-				$draft_obj->getPostAuthorId(),
-				$draft_obj->getPostDisplayUserId(),
-				$this->handleFormInput($this->create_topic_form_gui->getInput('subject'), false),
+
+			$newThread = new ilForumTopic(0, true, true);
+			$newThread->setForumId($topicData['top_pk']);
+			$newThread->setThrAuthorId($draft_obj->getPostAuthorId());
+			$newThread->setDisplayUserId($draft_obj->getPostDisplayUserId());
+			$newThread->setSubject($this->handleFormInput($this->create_topic_form_gui->getInput('subject'), false));
+			$newThread->setUserAlias($draft_obj->getPostUserAlias());
+
+			$newPostId = $frm->generateThread(
+				$newThread,
 				ilRTE::_replaceMediaObjectImageSrc($this->create_topic_form_gui->getInput('message'), 0),
 				$draft_obj->getNotify(),
 				$draft_obj->getPostNotify(),
-				$draft_obj->getPostUserAlias(),
-				'',
 				$status
 			);
-			
+
 			if($this->objProperties->isFileUploadAllowed())
 			{
 				$file = $_FILES['userfile'];
 				if(is_array($file) && !empty($file))
 				{
-					$tmp_file_obj = new ilFileDataForum($this->object->getId(), $newPost);
+					$tmp_file_obj = new ilFileDataForum($this->object->getId(), $newPostId);
 					$tmp_file_obj->storeUploadedFile($file);
 				}
 			}
@@ -4334,7 +4340,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling
 			foreach($uploadedObjects as $mob)
 			{
 				ilObjMediaObject::_removeUsage($mob, 'frm~:html', $ilUser->getId());
-				ilObjMediaObject::_saveUsage($mob,'frm:html', $newPost);
+				ilObjMediaObject::_saveUsage($mob,'frm:html', $newPostId);
 			}
 			
 			if(ilForumPostDraft::isSavePostDraftAllowed() && $draft_obj instanceof ilForumPostDraft)
@@ -4345,10 +4351,10 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling
 				if($this->objProperties->isFileUploadAllowed())
 				{
 					//move files of draft to posts directory
-					$oFDForum = new ilFileDataForum($this->object->getId(), $newPost);
+					$oFDForum = new ilFileDataForum($this->object->getId(), $newPostId);
 					$oFDForumDrafts = new ilFileDataForumDrafts($this->object->getId(), $draft_obj->getDraftId());
 					
-					$oFDForumDrafts->moveFilesOfDraft($oFDForum->getForumPath(), $newPost);
+					$oFDForumDrafts->moveFilesOfDraft($oFDForum->getForumPath(), $newPostId);
 				}
 				$draft_obj->deleteDraft();
 			}
@@ -4358,7 +4364,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling
 				'createdPost',
 				array(
 					'ref_id'            => $this->object->getRefId(),
-					'post'              => new ilForumPost($newPost),
+					'post'              => new ilForumPost($newPostId),
 					'notify_moderators' => !$status
 				)
 			);
@@ -4371,7 +4377,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling
 			}
 			else
 			{
-				return $newPost;
+				return $newPostId;
 			}
 		}
 		else
@@ -4449,17 +4455,18 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling
 				$status = 0;
 			}
 
-			// build new thread
+			$newThread = new ilForumTopic(0, true, true);
+			$newThread->setForumId($topicData['top_pk']);
+			$newThread->setThrAuthorId($ilUser->getId());
+			$newThread->setDisplayUserId($display_user_id);
+			$newThread->setSubject($this->handleFormInput($this->create_topic_form_gui->getInput('subject'), false));
+			$newThread->setUserAlias($user_alias);
+
 			$newPost = $frm->generateThread(
-				$topicData['top_pk'],
-				$ilUser->getId(),
-				$display_user_id,
-				$this->handleFormInput($this->create_topic_form_gui->getInput('subject'), false),
+				$newThread,
 				ilRTE::_replaceMediaObjectImageSrc($this->create_topic_form_gui->getInput('message'), 0),
 				$this->create_topic_form_gui->getItemByPostVar('notify') ? (int)$this->create_topic_form_gui->getInput('notify') : 0,
 				0, // #19980
-				$user_alias,
-				'',
 				$status
 			);
 
@@ -6658,7 +6665,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling
 					!$this->displayConfirmPostActivation())
 			)
 			{
-				if($this->is_moderator || $node->isActivated())
+				if($this->is_moderator || $node->isActivated() || $node->isOwner($ilUser->getId()))
 				{
 					// button: reply
 					if(!$this->objCurrentTopic->isClosed() && $node->isActivated() &&
@@ -6681,7 +6688,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling
 					}
 					
 					// button: edit article
-					if(!$this->objCurrentTopic->isClosed() && $node->isActivated() &&
+					if(!$this->objCurrentTopic->isClosed() && 
 						($node->isOwner($ilUser->getId()) || $this->is_moderator) &&
 						!$node->isCensored() &&
 						$ilUser->getId() != ANONYMOUS_USER_ID

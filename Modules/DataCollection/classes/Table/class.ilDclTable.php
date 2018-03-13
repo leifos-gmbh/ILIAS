@@ -190,13 +190,13 @@ class ilDclTable {
 	 *
 	 * @param boolean $delete_main_table true to delete table anyway
 	 */
-	public function doDelete($delete_only_content = false) {
+	public function doDelete($delete_only_content = false, $omit_notification = false) {
 		global $DIC;
 		$ilDB = $DIC['ilDB'];
 
 		/** @var $ilDB ilDB */
 		foreach ($this->getRecords() as $record) {
-			$record->doDelete();
+			$record->doDelete($omit_notification);
 		}
 
 		foreach ($this->getRecordFields() as $field) {
@@ -463,7 +463,7 @@ class ilDclTable {
 			}
 			$this->fields = $fields;
 
-			ilDclCache::preloadFieldProperties(array_keys($fields));
+			ilDclCache::preloadFieldProperties($fields);
 		}
 	}
 
@@ -1255,7 +1255,7 @@ class ilDclTable {
 		$org_std_fields = $original->getStandardFields();
 		foreach ($this->getStandardFields() as $element_key => $std_field) {
 			$std_field->cloneStructure($org_std_fields[$element_key]);
-			if ($std_field->getId() == $original->getDefaultSortField()) {
+			if ($std_field->getId() === $original->getDefaultSortField()) {
 				$default_sort_field = $std_field->getId();
 			}
 		}
@@ -1269,7 +1269,7 @@ class ilDclTable {
 				$new_field->cloneStructure($orig_field->getId());
 				$new_fields[$orig_field->getId()] = $new_field;
 
-				if ($orig_field->getId() == $original->getDefaultSortField()) {
+				if ($orig_field->getId() === $original->getDefaultSortField()) {
 					$default_sort_field = $new_field->getId();
 				}
 			}

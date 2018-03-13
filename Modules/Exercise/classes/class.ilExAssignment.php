@@ -193,7 +193,8 @@ class ilExAssignment
 			$team_id = ilExAssignmentTeam::getTeamId($this->getId(), $a_user_id);
 			if(!$team_id)
 			{
-				return;
+				// #0021043
+				$this->getDeadline();
 			}
 			$a_user_id = $team_id;
 			$is_team = true;
@@ -1750,7 +1751,7 @@ class ilExAssignment
 	{		
 		$path = $this->getGlobalFeedbackFileStoragePath();
 		ilUtil::delDir($path, true);
-		if(@move_uploaded_file($a_file["tmp_name"], $path."/".$a_file["name"]))
+		if (ilUtil::moveUploadedFile($a_file["tmp_name"], $a_file["name"], $path.$a_file["name"]))
 		{
 			$this->setFeedbackFile($a_file["name"]);		
 			return true;

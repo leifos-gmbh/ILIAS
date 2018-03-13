@@ -244,7 +244,6 @@ class ilObjFile extends ilObject2 {
 		}
 
 		$file = $this->getDirectory($this->getVersion())."/".$a_filename;
-		//move_uploaded_file($a_upload_file, $file);
 		ilUtil::moveUploadedFile($a_upload_file, $a_filename, $file, $this->raise_upload_error);
 		
 		$this->handleQuotaUpdate($this);
@@ -694,7 +693,8 @@ class ilObjFile extends ilObject2 {
 				 * http://stackoverflow.com/questions/32115609/basename-fail-when-file-name-start-by-an-accent
 				 * Therefore we can no longer use basename();
 				 */
-				$download_file_name = end(explode(DIRECTORY_SEPARATOR, $file));
+				$parts = explode(DIRECTORY_SEPARATOR, $file);
+				$download_file_name = end($parts);
 				$ilFileDelivery->setDownloadFileName($download_file_name);
 			}
 			$ilFileDelivery->deliver();
@@ -947,6 +947,11 @@ class ilObjFile extends ilObject2 {
 	{
 		global $ilDB;
 
+		// check if file really exists
+		if (ilObject::_lookupType($a_file_id) != "file")
+		{
+			return;
+		}
 		// #15143
 		$ilDB->replace("file_usage",
 			array(
@@ -1090,7 +1095,6 @@ class ilObjFile extends ilObject2 {
 			}
 
 			$file = $this->getDirectory($this->getVersion())."/".$a_filename;
-			//move_uploaded_file($a_upload_file, $file);
 			rename($a_upload_file,  $file);
 			
 			// create preview

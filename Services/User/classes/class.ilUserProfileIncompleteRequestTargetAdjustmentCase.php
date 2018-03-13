@@ -58,6 +58,7 @@ class ilUserProfileIncompleteRequestTargetAdjustmentCase extends ilUserRequestTa
 	 */
 	public function adjust()
 	{
+		$_GET['baseClass'] = 'ilpersonaldesktopgui';
 		// sm: directly redirect to personal desktop -> personal profile
 		$this->ctrl->setTargetScript('ilias.php');
 		ilUtil::redirect($this->ctrl->getLinkTargetByClass(array('ilpersonaldesktopgui', 'ilpersonalprofilegui'), 'showPersonalData', '', false, false));

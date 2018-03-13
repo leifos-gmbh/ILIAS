@@ -183,6 +183,25 @@ while ($rec = $ilDB->fetchAssoc($set))
 	{
 		$ilDB->dropPrimaryKey('page_question');
 	}
+
+	$set = $ilDB->query("select page_parent_type, page_id, question_id, page_lang, count(*) from page_question group by page_parent_type, page_id, question_id, page_lang HAVING count(*) > 1");
+	while ($rec = $this->db->fetchAssoc($set))
+	{
+		// remove all datasets with duplicates
+		$del = "DELETE FROM page_question ".
+			" WHERE page_parent_type = ".$ilDB->quote($rec['page_parent_type'], 'text').
+			" AND page_id = ".$ilDB->quote($rec['page_id'], 'integer').
+			" AND question_id = ".$ilDB->quote($rec['question_id'], 'integer').
+			" AND page_lang = ".$ilDB->quote($rec['page_lang'], 'text');
+		$ilDB->manipulate($del);
+		$ilDB->insert('page_question', array(
+			'page_parent_type' => array('text', $rec['page_parent_type']),
+			'page_id' => array('integer', $rec['page_id']),
+			'question_id' => array('integer', $rec['question_id']),
+			'page_lang' => array('text', $rec['page_lang'])
+		));
+	}
+
 	$ilDB->addPrimaryKey('page_question', array('page_parent_type', 'page_id', 'question_id', 'page_lang'));
 ?>
 <#12>
@@ -288,4 +307,135 @@ if($ilDB->tableColumnExists('wiki_stat', 'avg_rating'))
 		'default' => 0
 	));
 }
+?>
+<#19>
+<?php
+$ilCtrlStructureReader->getStructure();
+?>
+<#20>
+<?php
+
+$query = "
+	SELECT	qpl.question_id qid,
+			qpl.points qpl_points,
+			answ.points answ_points
+	
+	FROM qpl_questions qpl
+	
+	INNER JOIN qpl_qst_essay qst
+	ON qst.question_fi = qpl.question_id
+	
+	INNER JOIN qpl_a_essay answ
+	ON answ.question_fi = qst.question_fi
+	
+	WHERE qpl.question_id IN(
+	
+		SELECT keywords.question_fi
+	
+		FROM qpl_a_essay keywords
+	
+		INNER JOIN qpl_qst_essay question
+		ON question.question_fi = keywords.question_fi
+		AND question.keyword_relation = {$ilDB->quote('', 'text')}
+	
+		WHERE keywords.answertext = {$ilDB->quote('', 'text')}
+		GROUP BY keywords.question_fi
+		HAVING COUNT(keywords.question_fi) = {$ilDB->quote(1, 'integer')}
+		
+	)
+";
+
+$res = $ilDB->query($query);
+
+while( $row = $ilDB->fetchAssoc($res) )
+{
+	if( $row['answ_points'] > $row['qpl_points'] )
+	{
+		$ilDB->update('qpl_questions',
+			array('points' => array('float', $row['answ_points'])),
+			array('question_id' => array('integer', $row['qid']))
+		);
+	}
+	
+	$ilDB->manipulateF(
+		"DELETE FROM qpl_a_essay WHERE question_fi = %s",
+		array('integer'), array($row['qid'])
+	);
+	
+	$ilDB->update('qpl_qst_essay',
+		array('keyword_relation' => array('text', 'non')),
+		array('question_fi' => array('integer', $row['qid']))
+	);
+}
+
+?>
+<#21>
+<?php
+if($ilDB->tableExists('svy_answer'))
+{
+	if($ilDB->tableColumnExists('svy_answer','textanswer'))
+	{
+		$ilDB->modifyTableColumn('svy_answer', 'textanswer', array(
+			'type'	=> 'clob',
+			'notnull' => false
+		));
+	}
+}
+?>
+<#22>
+<?php
+if( $ilDB->indexExistsByFields('cmi_objective', array('id')) )
+{
+	$ilDB->dropIndexByFields('cmi_objective',array('id'));
+}
+?>
+<#23>
+<?php
+if (!$ilDB->indexExistsByFields('page_style_usage', array('page_id', 'page_type', 'page_lang', 'page_nr')) )
+{
+	$ilDB->addIndex('page_style_usage',array('page_id', 'page_type', 'page_lang', 'page_nr'),'i1');
+}
+?>
+<#24>
+<?php
+
+include_once('./Services/Migration/DBUpdate_3560/classes/class.ilDBUpdateNewObjectType.php');
+
+$rp_ops_id = ilDBUpdateNewObjectType::getCustomRBACOperationId("read_learning_progress");
+$ep_ops_id = ilDBUpdateNewObjectType::getCustomRBACOperationId('edit_learning_progress');
+$w_ops_id = ilDBUpdateNewObjectType::getCustomRBACOperationId('write');
+if($rp_ops_id && $ep_ops_id && $w_ops_id)
+{			
+	// see ilObjectLP
+	$lp_types = array('mcst');
+
+	foreach($lp_types as $lp_type)
+	{
+		$lp_type_id = ilDBUpdateNewObjectType::getObjectTypeId($lp_type);
+		if($lp_type_id)
+		{			
+			ilDBUpdateNewObjectType::addRBACOperation($lp_type_id, $rp_ops_id);				
+			ilDBUpdateNewObjectType::addRBACOperation($lp_type_id, $ep_ops_id);				
+			ilDBUpdateNewObjectType::cloneOperation($lp_type, $w_ops_id, $rp_ops_id);
+			ilDBUpdateNewObjectType::cloneOperation($lp_type, $w_ops_id, $ep_ops_id);
+		}
+	}
+}
+?>
+<#25>
+<?php
+require_once('./Services/Migration/DBUpdate_3560/classes/class.ilDBUpdateNewObjectType.php');
+ilDBUpdateNewObjectType::addRBACTemplate('orgu', 'il_orgu_employee', "OrgUnit Employee Role Template", null);
+?>
+<#26>
+<?php
+	$ilDB->manipulate('UPDATE exc_mem_ass_status SET status='.$ilDB->quote('notgraded', 'text').' WHERE status = '.$ilDB->quote('', 'text'));
+?>
+<#27>
+<?php
+$ilCtrlStructureReader->getStructure();
+?>
+<#28>
+<?php
+$ilCtrlStructureReader->getStructure();
 ?>

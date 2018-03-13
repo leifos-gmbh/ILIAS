@@ -91,7 +91,7 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
 		$this->setFormName('participants');
 
 		$this->addColumn('', 'f', "1");
-		$this->addColumn($this->lng->txt('name'), 'lastname', '20%');
+		$this->addColumn($this->lng->txt('name'), 'name', '20%');
 		
 		$all_cols = $this->getSelectableColumns();
 		foreach($this->getSelectedColumns() as $col)
@@ -134,7 +134,7 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
 
 		$this->setRowTemplate("tpl.show_participants_row.html", "Modules/Course");
 
-		$this->setDefaultOrderField('lastname');
+		$this->setDefaultOrderField('roles');
 		$this->enable('sort');
 		$this->enable('header');
 		$this->enable('numinfo');
@@ -512,7 +512,9 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
 			{
 				$ud = array();
 			}
-			
+						
+			$a_user_data[$user_id] = array_merge($ud,$course_user_data[$user_id]);
+
 
 			$roles = array();			
 			foreach($local_roles as $role_id => $role_name)
@@ -523,11 +525,12 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
 					$roles[] = $role_name;
 				}
 			}
-			$a_user_data[$user_id] = array_merge($ud,$course_user_data[$user_id]);
+
+			$a_user_data[$user_id]['name'] = ($a_user_data[$user_id]['lastname'].', '.$a_user_data[$user_id]['firstname']);
 			$a_user_data[$user_id]['roles_label'] = implode('<br />', $roles);
-
 			$a_user_data[$user_id]['roles'] = $this->participants->setRoleOrderPosition($user_id);
-
+			
+			
 			if($this->show_lp_status_sync)
 			{								
 				// #9912 / #13208
@@ -639,7 +642,14 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
 				}
 			}
 		}
-		#$this->setMaxCount($usr_data['cnt'] ? $usr_data['cnt'] : 0);
+		
+		// always sort by name first
+		$a_user_data = ilUtil::sortArray(
+			$a_user_data,
+			'name',
+			$this->getOrderDirection()
+		);
+		
 		return $this->setData($a_user_data);
 	}
 	

@@ -1,4 +1,4 @@
-// Build: 20151022020047 
+// Build: 2018118223708 
 /*
 	+-----------------------------------------------------------------------------+
 	| ILIAS open source                                                           |
@@ -10952,13 +10952,13 @@ function sclog(mess, type)
 function sclogflush()
 {
 	return;
-	elm = all("ilLogPre");
-	if (elm) 
-	{
-		elm.innerHTML = elm.innerHTML + log_buffer;
-		sclogscroll();
-	}
-	log_buffer = "";
+	// elm = all("ilLogPre");
+	// if (elm) 
+	// {
+		// elm.innerHTML = elm.innerHTML + log_buffer;
+		// sclogscroll();
+	// }
+	// log_buffer = "";
 }
 
 /**
@@ -11789,34 +11789,36 @@ UIEvent.prototype.stop = function () {
 /* User Interface Methods (DOM, Events, CSS, crossbrowser) */
 
 
-function attachUIEvent (obj, name, func) 
-{
-	if (window.Event) 
-	{
-		obj.addEventListener(name, func, false);
-	} 
-	else if (obj.attachEvent) 
-	{
-		obj.attachEvent('on'+name, func);
-	} 
-	else 
-	{
+function attachUIEvent (obj, name, func) {
+	if (window.Event) {
+		if (obj.addEventListener) {
+			obj.addEventListener(name, func, false);
+		}
+		else if (obj.attachEvent) {
+			obj.attachEvent('on'+name, func);
+		}
+		else {
+			obj.addEventListener(name, func, false);
+		}
+	}
+	else {
 		obj[name] = func;
 	}
 }
 	
-function detachUIEvent(obj, name, func) 
-{
-	if (window.Event) 
-	{
-		obj.removeEventListener(name, func, false);
-	} 
-	else if (obj.attachEvent) 
-	{
-		obj.detachEvent('on'+name, func);
-	} 
-	else 
-	{
+function detachUIEvent(obj, name, func) {
+	if (window.Event) {
+		if (obj.removeEventListener) {
+			obj.removeEventListener(name, func, false);
+		}
+		else if (obj.attachEvent) {
+			obj.detachEvent('on'+name, func);
+		}
+		else {
+			obj.removeEventListener(name, func, false);
+		}
+	}
+	else {
 		obj[name] = '';
 	}
 }
@@ -13739,19 +13741,18 @@ function setItemValue (key, dest, source, destkey)
 	if (source && source.hasOwnProperty(key)) 
 	{
 		var d = source[key];
-		var temp=d;
-		if (d!="" && !isNaN(Number(d)) && (/^-?\d{1,32}(\.\d{1,32})?$/.test(d))) {
-			d = Number(d);
-		} else if (d==="true") {
-			d = true;
-		} else if (d==="false") {
-			d = false;
+		var dk = destkey ? destkey : key; 
+		//special handling keys without conversion
+		if (dk != "location" && dk != "suspend_data" && dk != "title") {
+			if (d!="" && !isNaN(Number(d)) && (/^-?\d{1,32}(\.\d{1,32})?$/.test(d))) {
+				d = Number(d);
+			} else if (d==="true") {
+				d = true;
+			} else if (d==="false") {
+				d = false;
+			}
 		}
-		//special handling for titles - no conversion
-		if (key == "title") {
-			d=temp;
-		}
-		dest[destkey ? destkey : key] = d;
+		dest[dk] = d;
 	}
 }
 
@@ -14549,17 +14550,19 @@ var apiIndents = // for mapping internal to api representaiton
 function updateNav(ignore) {
 
 	function signActNode() {
-		if(elm && activities[tree[i].mActivityID].href && guiItemId == elm.id) {
-			removeClass(elm.parentNode,"ilc_rte_status_RTENotAttempted",1);
-			removeClass(elm.parentNode,"ilc_rte_status_RTEIncomplete",1);
-			removeClass(elm.parentNode,"ilc_rte_status_RTECompleted",1);
-			removeClass(elm.parentNode,"ilc_rte_status_RTEFailed",1);
-			removeClass(elm.parentNode,"ilc_rte_status_RTEPassed",1);
-			toggleClass(elm, "ilc_rte_tlink_RTETreeCurrent",1);
-			toggleClass(elm.parentNode,"ilc_rte_status_RTERunning",1);
-		} else {
-			removeClass(elm, "ilc_rte_tlink_RTETreeCurrent");
-			removeClass(elm.parentNode, "ilc_rte_status_RTERunning");
+		if (elm) {
+			if(activities[tree[i].mActivityID].href && guiItemId == elm.id) {
+				removeClass(elm.parentNode,"ilc_rte_status_RTENotAttempted",1);
+				removeClass(elm.parentNode,"ilc_rte_status_RTEIncomplete",1);
+				removeClass(elm.parentNode,"ilc_rte_status_RTECompleted",1);
+				removeClass(elm.parentNode,"ilc_rte_status_RTEFailed",1);
+				removeClass(elm.parentNode,"ilc_rte_status_RTEPassed",1);
+				toggleClass(elm, "ilc_rte_tlink_RTETreeCurrent",1);
+				toggleClass(elm.parentNode,"ilc_rte_status_RTERunning",1);
+			} else {
+				removeClass(elm, "ilc_rte_tlink_RTETreeCurrent");
+				removeClass(elm.parentNode, "ilc_rte_status_RTERunning");
+			}
 		}
 	}
 
@@ -14696,7 +14699,7 @@ function updateNav(ignore) {
 		}
 		//added to sign actual node
 		// if (ignore!=true) 
-		signActNode();
+		if (elm) signActNode();
 		//toggleClass(elm.parentNode, 'hidden', item.hidden);
 		first = false;
 	}

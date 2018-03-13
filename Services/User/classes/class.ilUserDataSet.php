@@ -80,6 +80,7 @@ class ilUserDataSet extends ilDataSet
 						"Matriculation" => "text",
 						"Latitude" => "text",
 						"Longitude" => "text",
+						"LocZoom" => "text",
 						"Picture" => "directory"
 						);
 			}
@@ -147,7 +148,14 @@ class ilUserDataSet extends ilDataSet
 			$tmp_dir = ilUtil::ilTempnam();
 			ilUtil::makeDir($tmp_dir);
 			include_once("./Services/User/classes/class.ilObjUser.php");
-			ilObjUser::copyProfilePicturesToDirectory($a_set["Id"], $tmp_dir);
+
+			$im = ilObjUser::_getPersonalPicturePath($a_set["Id"], "small", true,
+				true);
+
+			if ($im != "")
+			{
+				ilObjUser::copyProfilePicturesToDirectory($a_set["Id"], $tmp_dir);
+			}
 			
 			$this->temp_picture_dirs[$a_set["Id"]] = $tmp_dir;
 			
@@ -218,7 +226,7 @@ class ilUserDataSet extends ilDataSet
 					$this->getDirectDataFromQuery("SELECT usr_id id, login username, firstname, lastname, ".
 						" title, birthday, gender, institution, department, street, city, zipcode, country, sel_country, ".
 						" phone_office, phone_home, phone_mobile, fax, email, hobby, referral_comment, matriculation, ".
-						" delicious, latitude, longitude".
+						" delicious, latitude, longitude, loc_zoom".
 						" FROM usr_data u ".
 						"WHERE ".
 						$ilDB->in("u.usr_id", $a_ids, false, "integer"));
@@ -228,7 +236,7 @@ class ilUserDataSet extends ilDataSet
 					$this->getDirectDataFromQuery("SELECT usr_id id, login username, firstname, lastname, ".
 						" title, birthday, gender, institution, department, street, city, zipcode, country, sel_country, ".
 						" phone_office, phone_home, phone_mobile, fax, email, hobby, referral_comment, matriculation, ".
-						" latitude, longitude".
+						" latitude, longitude, loc_zoom".
 						" FROM usr_data u ".
 						"WHERE ".
 						$ilDB->in("u.usr_id", $a_ids, false, "integer"));

@@ -616,8 +616,6 @@ class ilExerciseManagementGUI
 
 		$feedback_panel = $this->ui_factory->panel()->sub("",$this->ui_factory->legacy($feedback_html));
 
-		//$panel_title = $this->lng->txt("exc_list_text_assignment").": ".$this->assignment->getTitle();
-
 		$report = $this->ui_factory->panel()->report("", array($main_panel, $feedback_panel));
 
 		return $this->ui_renderer->render([$modal,$report]);
@@ -629,12 +627,14 @@ class ilExerciseManagementGUI
 		$html .= "<p>".$a_data['utext']."</p>";
 
 		$form = new ilPropertyFormGUI();
+
+		$form->setFormAction($this->ctrl->getFormAction($this, "saveEvaluationFromModal"));
+
 		$form->setId(uniqid('form'));
 
 		//Grade
 		//TODO: DRY centralize this options in const or method.
 		$options = array(
-			"" => $this->lng->txt("search_any"),
 			"notgraded" => $this->lng->txt("exc_notgraded"),
 			"passed" => $this->lng->txt("exc_passed"),
 			"failed" => $this->lng->txt("exc_failed")
@@ -644,17 +644,43 @@ class ilExerciseManagementGUI
 		$si->setValue($a_data['status']);
 		$form->addItem($si);
 
+		$item = new ilHiddenInputGUI('mem_id');
+		$item->setValue($a_data['uid']);
+		$form->addItem($item);
+
 
 		$ta = new ilTextAreaInputGUI($this->lng->txt("exc_comment"), 'comment');
 		$ta->setInfo($this->lng->txt("exc_comment_for_learner_info"));
 		$ta->setValue($a_data['comment']);
+		$ta->setRows(10);
 		$form->addItem($ta);
 
 		$html .= $form->getHTML();
+		$form_id = 'form_' . $form->getId();
+		//todo lang var
+		$submit_btn = $this->ui_factory->button()->primary($this->lng->txt("save"), '#')
+			->withOnLoadCode(function($id) use ($form_id) {
+				return "$('#{$id}').click(function() { $('#{$form_id}').submit(); return false; });";
+			});
 
-		return  $this->ui_factory->modal()->roundtrip(strtoupper($this->lng->txt("grade_evaluate")), $this->ui_factory->legacy($html));
+		return  $this->ui_factory->modal()->roundtrip(strtoupper($this->lng->txt("grade_evaluate")), $this->ui_factory->legacy($html))->withActionButtons([$submit_btn]);
 	}
-	
+
+	public function saveEvaluationFromModalObject()
+	{
+		$comment = trim($_POST['comment']);
+		$user_id = (int)$_POST['mem_id'];
+		$grade = trim($_POST["grade"]);
+
+		if($this->assignment->getId() && $user_id) {
+			$member_status = $this->assignment->getMemberStatus($user_id);
+			$member_status->setComment(ilUtil::stripSlashes($comment));
+			$member_status->setStatus($grade);
+			$member_status->update();
+		}
+		$this->ctrl->redirect($this, "listTextAssignment");
+	}
+
 	/**
 	* Add user as member
 	*/

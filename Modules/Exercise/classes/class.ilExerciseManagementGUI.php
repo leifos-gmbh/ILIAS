@@ -475,7 +475,6 @@ class ilExerciseManagementGUI
 
 	/**
 	 * //TODO Show something when we don't have any panel displayed.
-	 * //template for the card, and the subpanel with grade and comment.
 	 * always true after we mixed the 2 ui tables into panels.
 	 */
 	function listTextAssignmentObject($a_show_peer_review = true)
@@ -509,6 +508,7 @@ class ilExerciseManagementGUI
 		//TODO create proper title.
 		$report_title = $this->lng->txt("exc_list_text_assignment").": ".$this->assignment->getTitle();
 		$report_html .= "<h1>".$report_title."</h1>";
+		$total_reports = 0;
 		foreach(ilExSubmission::getAllAssignmentFiles($this->assignment->getExerciseId(), $this->assignment->getId()) as $file)
 		{
 			if(trim($file["atext"]))
@@ -536,13 +536,18 @@ class ilExerciseManagementGUI
 				{
 					$data = array_merge($data, $submission_data);
 					$report_html .= $this->getReportPanel($data);
-					$num_panels++;
+					$total_reports++;
+
 				}
 			}
 		}
-		if($num_panels == 0)
+		if($total_reports == 0)
 		{
-			//TODO show nothing to display
+			$mtpl = new ilTemplate("tpl.message.html", true, true, "Services/Utilities");
+			$mtpl->setCurrentBlock("info_message");
+			$mtpl->setVariable("TEXT", $this->lng->txt("fiter_no_results"));
+			$mtpl->parseCurrentBlock();
+			$report_html .= $mtpl->get();
 		}
 
 		$this->tpl->setContent($report_html);

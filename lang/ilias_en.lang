@@ -14166,4 +14166,5 @@ exc#:#not_yet#:#not yet
 exc#:#grade_evaluate#:#Grade and Evaluate
 exc#:#submissions_feedback#:#Submissions and Feedback
 exc#:#submissions_only#:#Submissions Only
-exc#:#filer#:#Filter
+exc#:#filter#:#Filter
+exc#:#fiter_no_results#:#The current filter did not match any submission.

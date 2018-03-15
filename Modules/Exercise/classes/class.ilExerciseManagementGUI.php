@@ -63,7 +63,14 @@ class ilExerciseManagementGUI
 	const VIEW_ASSIGNMENT = 1;
 	const VIEW_PARTICIPANT = 2;	
 	const VIEW_GRADES = 3;
-	
+
+	const FEEDBACK_ONLY_SUBMISSION = "submission_feedback";
+	const FEEDBACK_FULL_SUBMISSION = "submission_only";
+
+	const GRADE_NOT_GRADED = "notgraded";
+	const GRADE_PASSED = "passed";
+	const GRADE_FAILED = "failed";
+
 	/**
 	 * Constructor
 	 * 
@@ -549,7 +556,7 @@ class ilExerciseManagementGUI
 			$this->ui_factory->button()->shy($this->lng->txt("grade_evaluate"), "#")->withOnClick($modal->getShowSignal()),
 		));
 
-		if($a_data['status'] == 'notgraded') {
+		if($a_data['status'] == self::GRADE_NOT_GRADED) {
 			$str_status_key = $this->lng->txt('exc_tbl_status');
 			$str_status_value = $this->lng->txt('not_yet');
 		} else {
@@ -638,11 +645,10 @@ class ilExerciseManagementGUI
 		$form->setId(uniqid('form'));
 
 		//Grade
-		//TODO: DRY centralize this options in const or method.
 		$options = array(
-			"notgraded" => $this->lng->txt("exc_notgraded"),
-			"passed" => $this->lng->txt("exc_passed"),
-			"failed" => $this->lng->txt("exc_failed")
+			self::GRADE_NOT_GRADED => $this->lng->txt("exc_notgraded"),
+			self::GRADE_PASSED => $this->lng->txt("exc_passed"),
+			self::GRADE_FAILED => $this->lng->txt("exc_failed")
 		);
 		$si = new ilSelectInputGUI($this->lng->txt("exc_tbl_status"), "grade");
 		$si->setOptions($options);
@@ -1291,7 +1297,7 @@ class ilExerciseManagementGUI
 					$status = $values["status"];
 					if ($status == "")
 					{
-						$status = "notgraded";
+						$status = self::GRADE_NOT_GRADED;
 					}
 					$member_status->setStatus($status);
 					if(array_key_exists("mark", $values))
@@ -2051,9 +2057,9 @@ class ilExerciseManagementGUI
 		$si_status = new ilSelectInputGUI($this->lng->txt("exc_tbl_status"), "filter_status");
 		$options = array(
 			"" => $this->lng->txt("search_any"),
-			"notgraded" => $this->lng->txt("exc_notgraded"),
-			"passed" => $this->lng->txt("exc_passed"),
-			"failed" => $this->lng->txt("exc_failed")
+			self::GRADE_NOT_GRADED => $this->lng->txt("exc_notgraded"),
+			self::GRADE_PASSED => $this->lng->txt("exc_passed"),
+			self::GRADE_FAILED => $this->lng->txt("exc_failed")
 		);
 		$si_status->setOptions($options);
 		$si_status->setValue($this->filter["status"]);

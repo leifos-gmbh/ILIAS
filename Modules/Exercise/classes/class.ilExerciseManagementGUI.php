@@ -587,6 +587,7 @@ class ilExerciseManagementGUI
 		$feedback_tpl = new ilTemplate("tpl.exc_report_feedback.html", true, true, "Modules/Exercise");
 		if(array_key_exists("peer", $a_data) && $this->filter["feedback"] == "submission_feedback")
 		{
+			$feedback_tpl->setCurrentBlock("feedback");
 			foreach($a_data["peer"] as $peer_id)
 			{
 				$user = new ilObjUser($peer_id);
@@ -614,6 +615,7 @@ class ilExerciseManagementGUI
 				$feedback_tpl->setVariable("PEER_FEEDBACK", $review_html);
 				$feedback_tpl->parseCurrentBlock();
 			}
+			$feedback_tpl->parseCurrentBlock();
 		}
 		$feedback_tpl->setVariable("GRADE", $this->lng->txt('grade').": ".$this->lng->txt('exc_'.$a_data['status']));
 		$feedback_tpl->setVariable("COMMENT", $this->lng->txt('exc_comment')."<br>".$a_data['comment']);

@@ -2034,8 +2034,15 @@ class ilExerciseManagementGUI
 
 	function initFilter()
 	{
-		$this->filter["status"] = trim(ilUtil::stripSlashes($_POST["filter_status"]));
-		$this->filter["feedback"] = trim(ilUtil::stripSlashes($_POST["filter_feedback"]));
+		if($_POST["filter_status"]) {
+			$this->filter["status"] = trim(ilUtil::stripSlashes($_POST["filter_status"]));
+		}
+
+		if($_POST["filter_feedback"]) {
+			$this->filter["feedback"] = trim(ilUtil::stripSlashes($_POST["filter_feedback"]));
+		} else {
+			$this->filter["feedback"] = "submission_feedback";
+		}
 
 		$this->lng->loadLanguageModule("search");
 

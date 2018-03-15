@@ -467,9 +467,7 @@ class ilExerciseManagementGUI
 	}
 
 	/**
-	 * //todo lang vars.
 	 * //TODO Show something when we don't have any panel displayed.
-	 * //TODO display labels in the toolbar.
 	 * //template for the card, and the subpanel with grade and comment.
 	 * always true after we mixed the 2 ui tables into panels.
 	 */
@@ -545,54 +543,62 @@ class ilExerciseManagementGUI
 
 	public function getReportPanel($a_data)
 	{
-		//TODO: remove the panel titles and use one generic title for all the reports. It has been done in previous commits.
 		$modal = $this->getEvaluationModal($a_data);
-		//todo lang var
+
 		$actions = $this->ui_factory->dropdown()->standard(array(
 			$this->ui_factory->button()->shy($this->lng->txt("grade_evaluate"), "#")->withOnClick($modal->getShowSignal()),
 		));
 
 		if($a_data['status'] == 'notgraded') {
-			$status = $this->lng->txt('exc_tbl_status')." ".$this->lng->txt('not_yet');
+			$str_status_key = $this->lng->txt('exc_tbl_status');
+			$str_status_value = $this->lng->txt('not_yet');
 		} else {
-			$status = $this->lng->txt('exc_tbl_status_time')." ".$a_data['status_time'];
+			$str_status_key = $this->lng->txt('exc_tbl_status_time');
+			$str_status_value = $a_data['status_time'];
 		}
 
 		if($a_data['feedback_time']) {
-			$evaluation = $this->lng->txt('exc_tbl_feedback_time')." ".$a_data['feedback_time'];
+			$str_evaluation_key = $this->lng->txt('exc_tbl_feedback_time');
+			$str_evaluation_value = $a_data['feedback_time'];
 		} else {
-			$evaluation = $this->lng->txt('exc_settings_feedback')." ".$this->lng->txt('not_yet');
+			$str_evaluation_key = $this->lng->txt('exc_settings_feedback');
+			$str_evaluation_value = $this->lng->txt('not_yet');
 		}
 
-		//todo: tpl for this sections ¿?¿¿ like in surveys
-		$card_sections_html =
-			$this->lng->txt("exc_tbl_submission_date")." ".ilDatePresentation::formatDate(new ilDateTime($a_data["udate"], IL_CAL_DATETIME)).
-			"<br>".$status.
-			"<br>".$evaluation.
-			"<br>".$this->lng->txt('feedback_given')." ".$a_data['fb_given'].
-			"<br>".$this->lng->txt('feedback_received')." ".$a_data['fb_received'];
-
+		$card_content = array(
+			$this->lng->txt("exc_tbl_submission_date") => ilDatePresentation::formatDate(new ilDateTime($a_data["udate"], IL_CAL_DATETIME)),
+			$str_status_key => $str_status_value,
+			$str_evaluation_key => $str_evaluation_value,
+			$this->lng->txt('feedback_given') => $a_data['fb_given'],
+			$this->lng->txt('feedback_received') => $a_data['fb_received']
+		);
+		$card_tpl = new ilTemplate("tpl.exc_report_details_card.html", true, true, "Modules/Exercise");
+		foreach($card_content as $key => $value)
+		{
+			$card_tpl->setCurrentBlock("assingment_card");
+			$card_tpl->setVariable("ROW_KEY", $key);
+			$card_tpl->setVariable("ROW_VALUE", $value);
+			$card_tpl->parseCurrentBlock();
+		}
 
 		$main_panel = $this->ui_factory->panel()->sub($a_data['uname'], $this->ui_factory->legacy($a_data['utext']))
-			->withCard($this->ui_factory->card($this->lng->txt('text_assignment'))->withSections(array($this->ui_factory->legacy($card_sections_html))))->withActions($actions);
+			->withCard($this->ui_factory->card($this->lng->txt('text_assignment'))->withSections(array($this->ui_factory->legacy($card_tpl->get()))))->withActions($actions);
 
-		$feedback_html = "";
+		$feedback_tpl = new ilTemplate("tpl.exc_report_feedback.html", true, true, "Modules/Exercise");
 		if(array_key_exists("peer", $a_data) && $this->filter["feedback"] == "submission_feedback")
 		{
-			//todo remove this css
-			$feedback_html .= "<div style='background-color:#F9F9F9;padding:9px;'>";
-
 			foreach($a_data["peer"] as $peer_id)
 			{
 				$user = new ilObjUser($peer_id);
 				$peer_name =  $user->getFirstname()." ".$user->getLastname();
-				//todo: apply only 20px in intermediate elements.
-				$feedback_html .= "<div style='margin-bottom:20px;'>".$this->lng->txt("feedback_from")." ".$peer_name;
+
+				$feedback_tpl->setCurrentBlock("peer_feedback");
+				$feedback_tpl->setVariable("PEER_NAME", $peer_name);
 
 				$submission = new ilExSubmission($this->assignment, $a_data["uid"]);
 				$values = $submission->getPeerReview()->getPeerReviewValues($peer_id, $a_data["uid"]);
 
-				//Todo: template for this could be nice.
+				$review_html = "";
 				foreach($this->assignment->getPeerReviewCriteriaCatalogueItems() as $crit)
 				{
 					$crit_id = $crit->getId()
@@ -600,21 +606,19 @@ class ilExerciseManagementGUI
 						: $crit->getType();
 					$crit->setPeerReviewContext($this->assignment, $peer_id, $a_data["uid"]);
 
-					$feedback_html .=
+					$review_html .=
 						'<div class="ilBlockPropertyCaption">'.$crit->getTitle().'</div>'.
 						'<div style="margin:2px 0;">'.$crit->getHTML($values[$crit_id]).'</div>';
+
 				}
-				$feedback_html .= "</div>";
+				$feedback_tpl->setVariable("PEER_FEEDBACK", $review_html);
+				$feedback_tpl->parseCurrentBlock();
 			}
-			$feedback_html .= "</div>";
 		}
+		$feedback_tpl->setVariable("GRADE", $this->lng->txt('grade').": ".$this->lng->txt('exc_'.$a_data['status']));
+		$feedback_tpl->setVariable("COMMENT", $this->lng->txt('exc_comment')."<br>".$a_data['comment']);
 
-		$feedback_html .= "<p>".$this->lng->txt('grade').": ".$this->lng->txt('exc_'.$a_data['status'])."</p>";
-
-		//todo this lng var evaluation statement. See FWE
-		$feedback_html .= "<p>".$this->lng->txt('exc_comment')."<br>".$a_data['comment']."</p>";
-
-		$feedback_panel = $this->ui_factory->panel()->sub("",$this->ui_factory->legacy($feedback_html));
+		$feedback_panel = $this->ui_factory->panel()->sub("",$this->ui_factory->legacy($feedback_tpl->get()));
 
 		$report = $this->ui_factory->panel()->report("", array($main_panel, $feedback_panel));
 
@@ -623,13 +627,12 @@ class ilExerciseManagementGUI
 
 	public function getEvaluationModal($a_data)
 	{
-		$html = "<h1>".$a_data['uname']."</h1>";
-		$html .= "<p>".$a_data['utext']."</p>";
+		$modal_tpl = new ilTemplate("tpl.exc_report_evaluation_modal.html", true, true, "Modules/Exercise");
+		$modal_tpl->setVariable("USER_NAME",$a_data['uname']);
+		$modal_tpl->setVariable("USER_TEXT",$a_data['utext']);
 
 		$form = new ilPropertyFormGUI();
-
 		$form->setFormAction($this->ctrl->getFormAction($this, "saveEvaluationFromModal"));
-
 		$form->setId(uniqid('form'));
 
 		//Grade
@@ -648,24 +651,26 @@ class ilExerciseManagementGUI
 		$item->setValue($a_data['uid']);
 		$form->addItem($item);
 
-
 		$ta = new ilTextAreaInputGUI($this->lng->txt("exc_comment"), 'comment');
 		$ta->setInfo($this->lng->txt("exc_comment_for_learner_info"));
 		$ta->setValue($a_data['comment']);
 		$ta->setRows(10);
 		$form->addItem($ta);
 
-		$html .= $form->getHTML();
+		$modal_tpl->setVariable("FORM",$form->getHTML());
+
 		$form_id = 'form_' . $form->getId();
-		//todo lang var
 		$submit_btn = $this->ui_factory->button()->primary($this->lng->txt("save"), '#')
 			->withOnLoadCode(function($id) use ($form_id) {
 				return "$('#{$id}').click(function() { $('#{$form_id}').submit(); return false; });";
 			});
 
-		return  $this->ui_factory->modal()->roundtrip(strtoupper($this->lng->txt("grade_evaluate")), $this->ui_factory->legacy($html))->withActionButtons([$submit_btn]);
+		return  $this->ui_factory->modal()->roundtrip(strtoupper($this->lng->txt("grade_evaluate")), $this->ui_factory->legacy($modal_tpl->get()))->withActionButtons([$submit_btn]);
 	}
 
+	/**
+	 * Save assignment submission grade(status) and comment from the roundtrip modal.
+	 */
 	public function saveEvaluationFromModalObject()
 	{
 		$comment = trim($_POST['comment']);

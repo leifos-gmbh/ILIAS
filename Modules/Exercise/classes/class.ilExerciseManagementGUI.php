@@ -467,23 +467,14 @@ class ilExerciseManagementGUI
 	
 	
 	// TEXT ASSIGNMENT ?!
-	
-	function listTextAssignmentWithPeerReviewObject()
-	{
-		$this->listTextAssignmentObject(true);
-	}
 
 	/**
 	 * //TODO Show something when we don't have any panel displayed.
 	 * always true after we mixed the 2 ui tables into panels.
 	 */
-	function listTextAssignmentObject($a_show_peer_review = true)
+	function listTextAssignmentObject()
 	{
 		$this->initFilter();
-		if($this->filter["feedback"] == "submission_only")
-		{
-			$a_show_peer_review = false;
-		}
 
 		//tabs
 		$this->tabs_gui->clearTargets();
@@ -2057,7 +2048,7 @@ class ilExerciseManagementGUI
 
 		$this->lng->loadLanguageModule("search");
 
-		$this->toolbar->setFormAction($this->ctrl->getFormAction($this, "listTextAssignmentWithPeerReview"));
+		$this->toolbar->setFormAction($this->ctrl->getFormAction($this, "listTextAssignment"));
 
 		$si_status = new ilSelectInputGUI($this->lng->txt("exc_tbl_status"), "filter_status");
 		$options = array(
@@ -2084,7 +2075,7 @@ class ilExerciseManagementGUI
 		include_once "Services/UIComponent/Button/classes/class.ilSubmitButton.php";
 		$submit = ilSubmitButton::getInstance();
 		$submit->setCaption("filter");
-		$submit->setCommand("listTextAssignmentWithPeerReview");
+		$submit->setCommand("listTextAssignment");
 		$this->toolbar->addButtonInstance($submit);
 	}
 }

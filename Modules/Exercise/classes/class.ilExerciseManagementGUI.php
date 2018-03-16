@@ -687,6 +687,7 @@ class ilExerciseManagementGUI
 			$member_status->setStatus($grade);
 			$member_status->update();
 		}
+		ilUtil::sendSuccess($this->lng->txt("exc_status_saved"), true);
 		$this->ctrl->redirect($this, "listTextAssignment");
 	}
 

@@ -469,8 +469,7 @@ class ilExerciseManagementGUI
 	// TEXT ASSIGNMENT ?!
 
 	/**
-	 * //TODO Show something when we don't have any panel displayed.
-	 * always true after we mixed the 2 ui tables into panels.
+	 * todo: Pagination.
 	 */
 	function listTextAssignmentObject()
 	{

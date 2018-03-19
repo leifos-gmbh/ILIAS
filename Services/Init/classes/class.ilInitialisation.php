@@ -967,6 +967,10 @@ class ilInitialisation
 			return ilLoggerFactory::getInstance();
 		};
 
+		$GLOBALS["DIC"]["filter"] = function($c) {
+			return new \ILIAS\Filter\FilterFactory();
+		};
+
 		self::$already_initialized = true;
 
 		self::initCore();

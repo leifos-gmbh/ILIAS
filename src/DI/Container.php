@@ -163,4 +163,12 @@ class Container extends \Pimple\Container {
 	public function event() {
 		return $this['ilAppEventHandler'];
 	}
+
+	/**
+	 * @return \ILIAS\Filter\FilterFactory
+	 */
+	public function filter() {
+		return $this['filter'];
+	}
+
 }

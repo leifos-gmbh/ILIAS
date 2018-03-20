@@ -1,4 +1,3 @@
-
 <?php
 /* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
 
@@ -53,7 +52,7 @@ class assFileUploadFileTableGUI extends ilTable2GUI
 	{
 		if( count($this->getData()) )
 		{
-			$this->addCommandButton($this->parent_cmd, $this->lng->txt('delete'));
+			$this->addCommandButton($this->parent_cmd, $this->lng->txt('delete'), '', '', 'ilc_qsubmit_Submit');
 		}
 	}
 	
@@ -95,4 +94,3 @@ class assFileUploadFileTableGUI extends ilTable2GUI
 	}
 	
 }
-?>

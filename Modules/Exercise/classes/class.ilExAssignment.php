@@ -1239,7 +1239,15 @@ class ilExAssignment
 			$new_ass->setMinCharLimit($d->getMinCharLimit());
 			$new_ass->setMaxCharLimit($d->getMaxCharLimit());
 			$new_ass->setPortfolioTemplateId($d->getPortfolioTemplateId());
-
+			$new_ass->setReminderSubmitStatus($d->getReminderSubmitStatus());
+			$new_ass->setReminderSubmitStart($d->getReminderSubmissionStart());
+			$new_ass->setReminderSubmitFrequency($d->getReminderSubmissionFrequency());
+			$new_ass->setReminderGradeStatus($d->getReminderGradeStatus());
+			$new_ass->setReminderGradeStart($d->getReminderGradeStart());
+			$new_ass->setReminderGradeFrequency($d->getReminderGradeFrequency());
+			$new_ass->setPeerReviewReminderStatus($d->getPeerReviewReminderStatus());
+			$new_ass->setPeerReviewReminderStart($d->getPeerReviewReminderStart());
+			$new_ass->setPeerReviewReminderFrequency($d->getPeerReviewReminderFrequency());
 
 			// criteria catalogue(s)
 			if($d->getPeerReviewCriteriaCatalogue() &&

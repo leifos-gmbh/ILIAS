@@ -4,17 +4,30 @@
   text-align: right;
 }
 .ilLike .badge {
+<<<<<<< HEAD
   margin-left: 1px;
 }
 .ilLike .il-counter-spacer {
   margin-left: 1px;
   font-size: 9px;
   /* padding: 2px 4px; */
+=======
+  margin-left: 2px;
+}
+.ilLike .il-counter-spacer {
+  margin-left: 0px;
+  font-size: 9px;
+  padding: 0;
+>>>>>>> ff4a9c0ea1... add missing like file
   visibility: hidden;
 }
 .ilLike a {
   display: inline-block;
+<<<<<<< HEAD
   padding: 2px 4px;
+=======
+  /* padding: 2px 4px; */
+>>>>>>> ff4a9c0ea1... add missing like file
 }
 .ilLike a:hover {
   text-decoration: none;
@@ -31,3 +44,9 @@
   /*background-color: @il-highlight-bg;*/
   background-color: #F0F0F0;
 }
+<<<<<<< HEAD
+=======
+.ilLike .il-item img {
+  max-width: 50%;
+}
+>>>>>>> ff4a9c0ea1... add missing like file

@@ -1,0 +1,33 @@
+.ilLike {
+  /* background-color: @il-secondary-container-bg; */
+  padding: 3px;
+  text-align: right;
+}
+.ilLike .badge {
+  margin-left: 1px;
+}
+.ilLike .il-counter-spacer {
+  margin-left: 1px;
+  font-size: 9px;
+  /* padding: 2px 4px; */
+  visibility: hidden;
+}
+.ilLike a {
+  display: inline-block;
+  padding: 2px 4px;
+}
+.ilLike a:hover {
+  text-decoration: none;
+}
+.ilLikeEmoticons {
+  padding: 0;
+}
+.ilLikeEmoticons a {
+  display: inline-block;
+  padding: 8px;
+}
+.ilLikeEmoticons a:hover {
+  text-decoration: none;
+  /*background-color: @il-highlight-bg;*/
+  background-color: #F0F0F0;
+}

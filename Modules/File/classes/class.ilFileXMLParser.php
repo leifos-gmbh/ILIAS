@@ -174,9 +174,6 @@ class ilFileXMLParser extends ilSaxParser
                 {
 					$this->file->setFileType($a_attribs["type"]);
                 }
-				// skyguide file lock begin
-				#$this->file->setVersion($this->file->getVersion() + 1);
-				// skyguide file lock end
 				break;
 				
 			case 'Content':

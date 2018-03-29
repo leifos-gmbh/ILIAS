@@ -133,14 +133,21 @@ class ilLikeGUI
 		$modal_asyn_url = $ctrl->getLinkTarget($this, "renderModal", "", true, false);
 		$modal = $f->modal()->roundtrip('', $f->legacy(""))
 			->withAsyncRenderUrl($modal_asyn_url);
-		$button = $f->button()->shy("*****", '#')
-			->withOnClick($modal->getShowSignal());
-		$modal_button = $r->render([$button, $modal]);
 
-		$badge = '<a href="#">👍<span class="badge badge-notify il-counter-status">4</span><span class="il-counter-spacer">4</span></a><a href="#">😆<span class="badge badge-notify il-counter-status">3</span><span class="il-counter-spacer">3</span></a>';
-		$modal_button = str_replace("*****", $badge, $modal_button);
+		$comps = [];
+		$comps[] = $f->glyph()->like()
+			->withOnClick($modal->getShowSignal())
+			->withCounter($f->counter()->status(5));
+		$comps[] = $f->glyph()->wow()
+			->withOnClick($modal->getShowSignal())
+			->withCounter($f->counter()->status(4));
+		$comps[] = $modal;
 
-		$tpl->setVariable("MODAL_TRIGGER", $modal_button);
+		$glyphs = $r->render($comps);
+
+		$tpl->setVariable("MODAL_TRIGGER", $glyphs);
+
+		$tpl->setVariable("SEP", $r->render($f->divider()->vertical()));
 
 
 		// emoticon popover
@@ -150,9 +157,6 @@ class ilLikeGUI
 		$popover = $popover->withAsyncContentUrl($asyn_url);
 		$button = $f->button()->shy($lng->txt("like"), '#')
 			->withOnClick($popover->getShowSignal());
-
-		//$tpl->setVariable("STATUS_BADGES", '<a href="#">👍<span class="badge badge-notify il-counter-status">2</span><span class="il-counter-spacer">4</span></a><a href="#">😆<span
-		//class="badge badge-notify il-counter-status">4</span><span class="il-counter-spacer">4</span></a>');
 
 		$tpl->setVariable("LIKE", $r->render([$popover, $button]));
 
@@ -164,8 +168,22 @@ class ilLikeGUI
 	 */
 	function renderEmoticons()
 	{
+		$f = $this->ui->factory();
+		$r = $this->ui->renderer();
+
 		$tpl = new ilTemplate("tpl.emoticons.html", true, true, "Services/Like");
 		$tpl->setVariable("ID", $this->id);
+
+		$glyphs[] = $f->glyph()->like();
+		$glyphs[] = $f->glyph()->dislike();
+		$glyphs[] = $f->glyph()->love();
+		$glyphs[] = $f->glyph()->laugh();
+		$glyphs[] = $f->glyph()->wow();
+		$glyphs[] = $f->glyph()->sad();
+		$glyphs[] = $f->glyph()->angry();
+
+		$tpl->setVariable("GLYPHS", $r->render($glyphs));
+
 		echo $tpl->get();
 		exit;
 	}

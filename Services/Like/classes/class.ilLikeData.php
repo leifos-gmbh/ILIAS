@@ -21,11 +21,12 @@
 class ilLikeData
 {
 	const TYPE_LIKE = 0;
-	const TYPE_LOVE = 1;
-	const TYPE_LAUGH = 2;
-	const TYPE_WOW = 3;
-	const TYPE_SAD = 4;
-	const TYPE_ANGRY = 5;
+	const TYPE_DISLIKE = 1;
+	const TYPE_LOVE = 2;
+	const TYPE_LAUGH = 3;
+	const TYPE_WOW = 4;
+	const TYPE_SAD = 5;
+	const TYPE_ANGRY = 6;
 
 	/**
 	 *
@@ -52,7 +53,7 @@ class ilLikeData
 	}
 	
 	/**
-	 * Add like for a user and object
+	 * Add expression for a user and object
 	 *
 	 * @param int $a_user_id user id (who is liking)
 	 * @param int $a_like_type one of self::TYPE_LIKE to self::TYPE_ANGRY
@@ -62,7 +63,7 @@ class ilLikeData
 	 * @param string $a_sub_obj_type subobject type (as defined by the module being responsible for main object type)
 	 * @param int $a_news_id news is (optional news id, if like action is dedicated to a news for the object/subobject)
 	 */
-	public function like($a_user_id, $a_like_type, $a_obj_id, $a_obj_type, $a_sub_obj_id = 0, $a_sub_obj_type = "",
+	public function addExpression($a_user_id, $a_like_type, $a_obj_id, $a_obj_type, $a_sub_obj_id = 0, $a_sub_obj_type = "",
 		$a_news_id = 0)
 	{
 		$ilDB = $this->db;
@@ -92,7 +93,7 @@ class ilLikeData
 	}
 
 	/**
-	 * Remove like for a user and object
+	 * Remove expression for a user and object
 	 *
 	 * @param int $a_user_id user id (who is liking)
 	 * @param int $a_like_type one of self::TYPE_LIKE to self::TYPE_ANGRY
@@ -102,7 +103,7 @@ class ilLikeData
 	 * @param string $a_sub_obj_type subobject type (as defined by the module being responsible for main object type)
 	 * @param int $a_news_id news is (optional news id, if like action is dedicated to a news for the object/subobject)
 	 */
-	public function dislike($a_user_id, $a_like_type, $a_obj_id, $a_obj_type, $a_sub_obj_id = 0, $a_sub_obj_type = "",
+	public function removeExpression($a_user_id, $a_like_type, $a_obj_id, $a_obj_type, $a_sub_obj_id = 0, $a_sub_obj_type = "",
 						 $a_news_id = 0)
 	{
 		$ilDB = $this->db;

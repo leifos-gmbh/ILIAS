@@ -2796,6 +2796,16 @@ class ilObjCourseGUI extends ilContainerGUI
 			);
 		}
 		
+		// begin-patch montcenis
+		if(
+			$a_add == 'info' &&
+			$ilAccess->checkAccess('visible','',$a_target)
+		)
+		{
+			ilObjectGUI::_gotoRepositoryNode($a_target, "infoScreenGoto");
+		}
+		// end-patch montcenis
+		
 		if ($a_add == "mem" && $ilAccess->checkAccess("manage_members", "", $a_target))
 		{
 			ilObjectGUI::_gotoRepositoryNode($a_target, "members");

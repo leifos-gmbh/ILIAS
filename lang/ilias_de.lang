@@ -3234,7 +3234,7 @@ common#:#fold_a#:#ein Ordner###deprecated
 common#:#fold_add#:#Ordner anlegen
 common#:#fold_added#:#Ordner angelegt
 rbac#:#fold_copy#:#Ordner kopieren
-common#:#fold_copy_threads_info#:#Bitte wählen Sie aus, welche Materialien kopiert, verknüpft oder aber bei dem Kopiervorgang ausgelassen werden sollen.###deprecated
+common#:#fold_copy_threads_info#:#Bitte wählen Sie aus, welche Materialien kopiert, verknüpft oder aber bei dem Kopiervorgang ausgelassen werden sollen.
 rbac#:#fold_delete#:#Ordner löschen oder verschieben
 common#:#fold_edit#:#Ordner bearbeiten
 rbac#:#fold_edit_learning_progress#:#Benutzer kann Lernfortschrittseinstellungen bearbeiten
@@ -3243,7 +3243,7 @@ common#:#fold_new#:#Neuen Ordner anlegen
 rbac#:#fold_read#:#Lesezugriff auf Ordner
 common#:#fold_type#:#Ordnerart###deprecated
 rbac#:#fold_visible#:#Ordner ist sichtbar
-common#:#fold_wizard_page#:#Ordner kopieren (Schritt 2/2)###deprecated
+common#:#fold_wizard_page#:#Ordner kopieren (Schritt 2/2)
 rbac#:#fold_write#:#Ordner bearbeiten
 common#:#folder#:#Ordner
 common#:#folders#:#Ordner
@@ -4219,7 +4219,7 @@ common#:#obj_file_duplicate#:#Datei kopieren###deprecated
 common#:#obj_file_inline#:#Lernmodul Datei
 common#:#obj_file_select#:#-- Bitte wählen Sie eine Datei aus --###deprecated
 common#:#obj_fold#:#Ordner
-common#:#obj_fold_duplicate#:#Ordner kopieren###deprecated
+common#:#obj_fold_duplicate#:#Ordner kopieren
 common#:#obj_fold_select#:#-- Bitte wählen Sie einen Ordner aus --###deprecated
 common#:#obj_frm#:#Forum
 common#:#obj_frm_duplicate#:#Forum kopieren
@@ -5368,7 +5368,7 @@ rbac#:#wiki_visible#:#Wiki ist sichtbar
 rbac#:#wiki_write#:#Einstellungen des Wikis bearbeiten
 common#:#with#:#mit
 common#:#wizard_search_list#:#Ihre Suche ergab folgende Ergebnisse. Bitte wählen Sie eines aus.
-common#:#wizard_title_info#:#Bitte geben Sie den Titel des zu kopierenden Objektes ein.
+common#:#wizard_title_info#:#Geben Sie bitte den Titel oder Teile des Titels ein, um das Objekt zu suchen, das Sie kopieren wollen. Klicken Sie auf "Weiter", um passende Suchergebnisse angezeigt zu bekommen.
 common#:#write#:#Schreiben
 common#:#wrong_ip_detected#:#Der Zugang zum System wird aufgrund einer falschen Client IP verweigert.<br>Ihre aktuelle IP-Adresse: %s<br>Bitte kontaktieren Sie die Technische Betreuung / Systemadministration.
 common#:#year#:#Jahr
@@ -7506,7 +7506,7 @@ exc#:#exc_edit_assignments#:#Übungseinheiten bearbeiten
 exc#:#exc_edit_submission#:#Eingereichte Lösungen ändern
 exc#:#exc_ended_on#:#Beendet am
 exc#:#exc_export_excel#:#Export (Excel)
-exc#:#exc_fb_files#:#Dateien vom Tutor
+exc#:#exc_fb_files#:#Bewertungsdateien
 exc#:#exc_grades#:#Notenübersicht
 exc#:#exc_grades_overview#:#Notenübersicht
 exc#:#exc_hand_in#:#Datei abgeben
@@ -13375,7 +13375,7 @@ common#:#password_must_contain_lcase_chars#:#Das Passwort muss mindestens %s Kle
 common#:#password_must_contain_ucase_chars#:#Das Passwort muss mindestens %s Großbuchstaben enthalten.
 search#:#search_user_search_form#:#Suche in Persönlichen Profilen
 search#:#search_user_search_info_form#:#Benutzerdaten in Persönlichen Profilen werden indexiert und können genutzt werden, um Benutzer über die globale Suche zu finden.
-exc#:#exc_fb_tutor_info#:#Durch eine hochgeladene Feedback-Datei wird eine Benachrichtigung an den Benutzer gesendet, und die Datei wird in dessen Übungseinheiten-Übersicht gelistet.
+exc#:#exc_fb_tutor_info#:#Wird eine Datei zur Bewertung der Übungseinheit hochgeladen, erhält die Teilnehmerin oder der Teilnehmer eine Benachrichtigung und kann dann in der Übersicht der Übungseinheiten heruntergeladen und eingesehen werden.
 obj#:#svy_results#:#Ergebnisse
 survey#:#svy_result_mail_notification_info#:#Nach Beenden einer Umfrage werden die Antworten des Teilnehmers an die eingetragen Empfänger gesendet.
 bibl#:#bib_default_address#:#Adresse Autor###deprecated

@@ -327,6 +327,7 @@ class ilExAssignmentReminder
 		$reminders = $this->getReminders();
 		$reminders = $this->parseReminders($reminders);
 
+		$tpl = null;
 		foreach ($reminders as $reminder)
 		{
 			include_once "./Services/Mail/classes/class.ilMail.php";
@@ -339,13 +340,24 @@ class ilExAssignmentReminder
 			$rmd_type = $reminder["reminder_type"];
 			$template_id = $reminder['template_id'];
 
+			//if the template exists (can be deleted via Administration/Mail)
 			if($template_id)
 			{
 				$prov = new ilMailTemplateDataProvider();
 				$tpl = $prov->getTemplateById($template_id);
+			}
 
+			if($tpl)
+			{
 				$subject = $tpl->getSubject();
-				$message = $this->sentReminderPlaceholders($tpl->getMessage(), $member_id);
+
+				$placeholder_params = array(
+					"exc_id" => $exc->getId(),
+					"exc_ref" => $parent_ref,
+					"ass_id" => $ass->getId(),
+					"member_id" => $member_id
+				);
+				$message = $this->sentReminderPlaceholders($tpl->getMessage(), $placeholder_params);
 			}
 			else
 			{
@@ -354,14 +366,8 @@ class ilExAssignmentReminder
 				$ulng = ilLanguageFactory::_getLanguageOfUser($member_id);
 				$ulng->loadLanguageModule('exc');
 
-				$tmpl = null;
-
-				//remove this line
-				//$link2 = ILIAS_HTTP_PATH."/goto.php?ref_id=".$parent_ref."&ass_id=".$ass->getId()."&cmd=showOverview&cmdClass=ilobjexercisegui&baseClass=ilexercisehandlergui";
-
 				include_once "./Services/Link/classes/class.ilLink.php";
 				$link = ilLink::_getStaticLink($parent_ref, "exc");
-				//$link .="&ass_id=".$ass->getId();
 
 				$message = sprintf($ulng->txt('exc_reminder_salutation'), ilObjUser::_lookupFullname($member_id))."\n\n";
 
@@ -400,7 +406,7 @@ class ilExAssignmentReminder
 	}
 
 	//see ilObjSurvey.
-	protected function sentReminderPlaceholders($a_message, $a_user_id)
+	protected function sentReminderPlaceholders($a_message, $a_reminder_data)
 	{
 		// see ilMail::replacePlaceholders()
 		include_once "Modules/Exercise/classes/class.ilExerciseMailTemplateReminderContext.php";
@@ -410,12 +416,15 @@ class ilExAssignmentReminder
 			require_once 'Services/Mail/classes/class.ilMailTemplateService.php';
 			$context = ilMailTemplateService::getTemplateContextById(ilExerciseMailTemplateReminderContext::ID);
 
-			$user = new ilObjUser($a_user_id);
+			$user = new ilObjUser($a_reminder_data["member_id"]);
 
 			require_once 'Services/Mail/classes/class.ilMailTemplatePlaceholderResolver.php';
-			require_once 'Services/Mail/classes/class.ilMailFormCall.php';
+			//require_once 'Services/Mail/classes/class.ilMailFormCall.php';
 			$processor = new ilMailTemplatePlaceholderResolver($context, $a_message);
-			$a_message = $processor->resolve($user, ilMailFormCall::getContextParameters());
+
+			//$a_message = $processor->resolve($user, ilMailFormCall::getContextParameters());
+			$a_message = $processor->resolve($user, $a_reminder_data);
+
 
 		}
 		catch(Exception $e)

@@ -4,7 +4,6 @@
 include_once './Services/Mail/classes/class.ilMailTemplateContext.php';
 
 /**
- * TODO Test this links if they work with assignments or we should call exercises by ref.
  * Handles exercise reminder mail placeholders
  * 
  * @author Jesús López <lopez@leifos.com>
@@ -86,9 +85,13 @@ class ilExerciseMailTemplateReminderContext extends ilMailTemplateContext
 			'placeholder'	=> 'ASSIGNMENT_TITLE',
 			'label'			=> $lng->txt('exc_mail_context_reminder_assignment_title')
 		);
+		$placeholders['exc_title'] = array(
+			'placeholder'	=> 'EXERCISE_TITLE',
+			'label'			=> $lng->txt('exc_mail_context_reminder_exercise_title')
+		);
 								
-		$placeholders['ass_link'] = array(
-			'placeholder'	=> 'ASSIGNMENT_LINK',
+		$placeholders['exc_link'] = array(
+			'placeholder'	=> 'EXERCISE_LINK',
 			'label'			=> $lng->txt('perma_link')
 		);
 
@@ -100,19 +103,24 @@ class ilExerciseMailTemplateReminderContext extends ilMailTemplateContext
 	 */
 	public function resolveSpecificPlaceholder($placeholder_id, array $context_parameters, ilObjUser $recipient = null, $html_markup = false)
 	{
-		/**
-		 * @var $ilObjDataCache ilObjectDataCache
-		 */
 		$ilObjDataCache = $this->obj_data_cache;
 
-		if('ass_title' == $placeholder_id)
+		if($placeholder_id == 'ass_title')
 		{
-			return $ilObjDataCache->lookupTitle($ilObjDataCache->lookupObjId($context_parameters['ref_id']));
+			//return $ilObjDataCache->lookupTitle($ilObjDataCache->lookupObjId($context_parameters['ref_id']));
+			$ass = new ilExAssignment($context_parameters["ass_id"]);
+			return $ass->getTitle();
+
 		}
-		else if('ass_link' == $placeholder_id)
+		else if($placeholder_id == 'exc_title')
+		{
+			return $ilObjDataCache->lookupTitle($context_parameters["exc_id"]);
+
+		}
+		else if($placeholder_id == 'exc_link')
 		{
 			require_once './Services/Link/classes/class.ilLink.php';
-			return ilLink::_getLink($context_parameters['ref_id'], 'ass');
+			return ilLink::_getLink($context_parameters['exc_ref'], 'exc');
 		}
 
 		return '';

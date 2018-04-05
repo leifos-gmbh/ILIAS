@@ -55,13 +55,22 @@ class ilNewsTimelineItemGUI implements ilTimelineItemInt
 	protected $ctrl;
 
 	/**
+	 * @var \ilLikeGUI
+	 */
+	protected $like_gui;
+
+	/**
 	 * Constructor
 	 *
-	 * $param ilNewsItem $a_news_item
+	 * @param ilNewsItem $a_news_item
+	 * @param $a_news_ref_id
+	 * @param ilLikeGUI $a_like_gui
 	 */
-	protected function __construct(ilNewsItem $a_news_item, $a_news_ref_id)
+	protected function __construct(ilNewsItem $a_news_item, $a_news_ref_id, \ilLikeGUI $a_like_gui)
 	{
 		global $DIC;
+
+		$this->like_gui = $a_like_gui;
 
 		$this->lng = $DIC->language();
 		$this->ctrl = $DIC->ctrl();
@@ -79,9 +88,9 @@ class ilNewsTimelineItemGUI implements ilTimelineItemInt
 	 * @param ilNewsItem $a_news_item news item
 	 * @return ilNewsTimelineItemGUI
 	 */
-	static function getInstance(ilNewsItem $a_news_item, $a_news_ref_id)
+	static function getInstance(ilNewsItem $a_news_item, $a_news_ref_id, \ilLikeGUI $a_like_gui)
 	{
-		return new self($a_news_item, $a_news_ref_id);
+		return new self($a_news_item, $a_news_ref_id, $a_like_gui);
 	}
 
 
@@ -250,18 +259,17 @@ class ilNewsTimelineItemGUI implements ilTimelineItemInt
 
 	/**
 	 * Render footer
+	 * @throws ilCtrlException
 	 */
 	function renderFooter()
 	{
 		$i = $this->getNewsItem();
 
 		// like
-		include_once("./Services/Like/classes/class.ilLikeGUI.php");
-		$like_gui = new ilLikeGUI();
 		$this->ctrl->setParameterByClass("ilnewstimelinegui", "news_id", $i->getId());
-		$like_gui->setObject($i->getContextObjId(), $i->getContextObjType(),
-			$i->getContextSubObjId(), $i->getContextSubObjType());
-		$html = $this->ctrl->getHTML($like_gui);
+		$this->like_gui->setObject($i->getContextObjId(), $i->getContextObjType(),
+			$i->getContextSubObjId(), $i->getContextSubObjType(), $i->getId());
+		$html = $this->ctrl->getHTML($this->like_gui);
 		$this->ctrl->setParameterByClass("ilnewstimelinegui", "news_id", $_GET["news_id"]);
 
 		return $html;

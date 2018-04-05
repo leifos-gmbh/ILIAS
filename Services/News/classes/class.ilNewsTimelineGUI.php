@@ -77,6 +77,12 @@ class ilNewsTimelineGUI
 		$this->include_auto_entries = $a_include_auto_entries;
 		$this->access = $DIC->access();
 
+		include_once("./Services/Like/classes/class.ilLikeFactoryGUI.php");
+		$likef = new ilLikeFactoryGUI();
+		$this->like_gui = $likef->widget(array(ilObject::_lookupObjectId($this->ref_id)));
+		$this->news_id = (int) $_GET["news_id"];
+
+
 		$this->lng->loadLanguageModule("news");
 	}
 
@@ -126,13 +132,11 @@ class ilNewsTimelineGUI
 		switch ($next_class)
 		{
 			case "illikegui":
-				include_once("./Services/Like/classes/class.ilLikeGUI.php");
-				$i = new ilNewsItem($_GET["news_id"]);
+				$i = new ilNewsItem($this->news_id);
 				$ctrl->saveParameter($this,"news_id");
-				$like_gui = new ilLikeGUI();
-				$like_gui->setObject($i->getContextObjId(), $i->getContextObjType(),
-					$i->getContextSubObjId(), $i->getContextSubObjType());
-				$ret = $ctrl->forwardCommand($like_gui);
+				$this->like_gui->setObject($i->getContextObjId(), $i->getContextObjType(),
+					$i->getContextSubObjId(), $i->getContextSubObjType(), $this->news_id);
+				$ret = $ctrl->forwardCommand($this->like_gui);
 				break;
 
 			default:
@@ -177,7 +181,7 @@ class ilNewsTimelineGUI
 		foreach ($news_data as $d)
 		{
 			$news_item = new ilNewsItem($d["id"]);
-			$item = ilNewsTimelineItemGUI::getInstance($news_item, $d["ref_id"]);
+			$item = ilNewsTimelineItemGUI::getInstance($news_item, $d["ref_id"], $this->like_gui);
 			$item->setUserEditAll($this->getUserEditAll());
 			$timeline->addItem($item);
 			$js_items[$d["id"]] = array(
@@ -248,7 +252,7 @@ class ilNewsTimelineGUI
 		foreach ($news_data as $d)
 		{
 			$news_item = new ilNewsItem($d["id"]);
-			$item = ilNewsTimelineItemGUI::getInstance($news_item, $d["ref_id"]);
+			$item = ilNewsTimelineItemGUI::getInstance($news_item, $d["ref_id"], $this->like_gui);
 			$item->setUserEditAll($this->getUserEditAll());
 			$timeline->addItem($item);
 			$js_items[$d["id"]] = array(

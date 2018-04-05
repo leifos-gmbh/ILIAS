@@ -4,8 +4,6 @@
 /**
  *
  * TODO: import/export reminder data with the exercise/assignment.
- * TODO: Mail templates setup + Mail templates in Assignment.
- * TODO: Send the notifications.
  * TODO: Delete reminders from exc_ass_reminders when the assignment is deleted.
  *
  * Exercise Assignment Reminders
@@ -215,7 +213,7 @@ class ilExAssignmentReminder
 	}
 
 
-	// CRON STUFF
+	// Specific Methods to be used via Cron Job.
 	/**
 	 * Get reminders available by date/frequence.
 	 * @return mixed
@@ -322,7 +320,7 @@ class ilExAssignmentReminder
 	}
 
 	/**
-	 * send reminders
+	 * CRON send reminders
 	 */
 	public function sendReminders()
 	{
@@ -397,7 +395,8 @@ class ilExAssignmentReminder
 
 		}
 
-		return true;
+		$this->updateRemindersLastDate($reminders);
+		return sizeof($reminders);
 	}
 
 	//see ilObjSurvey.
@@ -426,5 +425,23 @@ class ilExAssignmentReminder
 		}
 
 		return $a_message;
+	}
+
+	/**
+	 * Update reminders last_send value with the current timestamp.
+	 * @param $a_reminders
+	 */
+	protected function updateRemindersLastDate($a_reminders)
+	{
+		foreach($a_reminders as $reminder)
+		{
+			$sql = "UPDATE exc_ass_reminders".
+				" SET last_send = ".$this->db->quote(time(),'integer').
+				" WHERE type = ".$this->db->quote($reminder["reminder_type"],'text').
+				" AND ass_id = ".$this->db->quote($reminder["ass_id"],'integer').
+				" AND exc_id = ".$this->db->quote($reminder["exc_id"],'integer');
+
+			$this->db->manipulate($sql);
+		}
 	}
 }

@@ -125,6 +125,13 @@ class ilSlaveClient extends ilClientBase
 	{
 		$db = $this->getDatabaseConnection();
 		
+		include_once './ClientReplication/classes/class.ilClientReplicationDependencies.php';
+		$dic = new ilClientReplicationDependencies();
+		$dic->setDB($db);
+		$GLOBALS['DIC'] = $dic;
+		$GLOBALS['ilDB'] = $dic->database();
+		
+		
 		$query = "
 			DELETE FROM		settings
 			WHERE			module = 'common'
@@ -133,12 +140,10 @@ class ilSlaveClient extends ilClientBase
 		
 		$db->manipulate($query);
 		
-		$GLOBALS['ilDB'] = $db;
 		$client = new ilClient($this->getId(), $db);
 		$client->setExternalClientIni($this->getIni());
 		$client->updateNIC($nicUrl);
 		$instId = (int)$client->nic_status[2];
-		unset($GLOBALS['ilDB']);
 		
 		$query = "
 			INSERT INTO settings (

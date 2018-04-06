@@ -31,12 +31,8 @@ class ilClientReplicator
 	
 	private function includeCommonClasses()
 	{
-		require_once('include/inc.get_pear.php');
-		require_once('include/inc.debug.php');
-
 		require_once('setup/classes/class.ilClient.php');
 
-		require_once('Services/Init/classes/class.ilErrorHandling.php');
 		require_once('Services/Init/classes/class.ilIniFile.php');
 		
 		require_once('Services/Exceptions/classes/class.ilException.php');

@@ -20,7 +20,6 @@ ini_set('display_errors', 'on');
 
 chdir(dirname(__FILE__).'/..');
 
-echo("Hallo Welt\n");
 require_once('ClientReplication/classes/class.ilClientReplicator.php');
 
 $icr = new ilClientReplicator();

@@ -605,4 +605,16 @@ class ilExAssignmentReminder
 			$this->db->manipulate($sql);
 		}
 	}
+
+	/**
+	 * remove reminders from DB when the parent assignment is deleted.
+	 * @param $a_ass_id
+	 */
+	function deleteReminders($a_ass_id)
+	{
+		$sql = "DELETE FROM exc_ass_reminders".
+			" WHERE ass_id = ".$a_ass_id;
+
+		$this->db->manipulate($sql);
+	}
 }

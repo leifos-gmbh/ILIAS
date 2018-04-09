@@ -55,7 +55,19 @@ class ilNoteGUI
 	var $public_deletion_enabled = false;
 	var $repository_mode = false;
 	var $old = false;
-	
+
+	protected $default_command = "getNotesHTML";
+
+	/**
+	 * @var \ILIAS\DI\UIServices
+	 */
+	protected $ui;
+
+	/**
+	 * @var int
+	 */
+	protected $news_id = 0;
+
 	/**
 	* constructor, specifies notes set
 	*
@@ -64,7 +76,8 @@ class ilNoteGUI
 	* @param	$a_obj_type		string	"pd" for personal desktop
 	* @param	$a_include_subobjects	string		include all subobjects of rep object (e.g. pages)
 	*/
-	function __construct($a_rep_obj_id = "", $a_obj_id = "", $a_obj_type = "", $a_include_subobjects = false)
+	function __construct($a_rep_obj_id = "", $a_obj_id = "", $a_obj_type = "", $a_include_subobjects = false,
+		$a_news_id = 0)
 	{
 		global $DIC;
 
@@ -73,6 +86,7 @@ class ilNoteGUI
 		$this->obj_definition = $DIC["objDefinition"];
 		$this->tree = $DIC->repositoryTree();
 		$this->access = $DIC->access();
+		$this->ui = $DIC->ui();
 		$ilCtrl = $DIC->ctrl();
 		$lng = $DIC->language();
 
@@ -85,6 +99,7 @@ class ilNoteGUI
 		$this->obj_id = $a_obj_id;
 		$this->obj_type = $a_obj_type;
 		$this->inc_sub = $a_include_subobjects;
+		$this->news_id = $a_news_id;
 		
 		// auto-detect object type
 		if(!$this->obj_type && $a_rep_obj_id)
@@ -101,10 +116,8 @@ class ilNoteGUI
 		$this->add_note_form = false;
 		$this->edit_note_form = false;
 		$this->private_enabled = false;
-		$notes_settings = new ilSetting("notes");
-		$id = $this->rep_obj_id."_".$this->obj_id."_".$this->obj_type;
-		//if ($notes_settings->get("activate_".$id))
-		if (ilNote::commentsActivated($this->rep_obj_id, $this->obj_id, $this->obj_type))
+
+		if (ilNote::commentsActivated($this->rep_obj_id, $this->obj_id, $this->obj_type, $this->news_id))
 		{
 			$this->public_enabled = true;
 		}
@@ -160,11 +173,31 @@ class ilNoteGUI
 	}
 	
 	/**
+	 * Set default command
+	 *
+	 * @param string $a_val default command	
+	 */
+	public function setDefaultCommand($a_val)
+	{
+		$this->default_command = $a_val;
+	}
+	
+	/**
+	 * Get default command
+	 *
+	 * @return string default command
+	 */
+	public function getDefaultCommand()
+	{
+		return $this->default_command;
+	}
+	
+	/**
 	* execute command
 	*/
 	function executeCommand()
 	{
-		$cmd = $this->ctrl->getCmd("getNotesHTML");
+		$cmd = $this->ctrl->getCmd($this->getDefaultCommand());
 		$next_class = $this->ctrl->getNextClass($this);
 
 		switch($next_class)
@@ -345,15 +378,16 @@ if ($this->private_enabled && $this->public_enabled
 		if ($this->comments_settings && !$hide_comments && !$this->delete_note
 			&& !$this->edit_note_form && !$this->add_note_form && $ilUser->getId() != ANONYMOUS_USER_ID)
 		{
-			$notes_settings = new ilSetting("notes");
-			$id = $this->rep_obj_id."_".$this->obj_id."_".$this->obj_type;
 			//$active = $notes_settings->get("activate_".$id);
 			$active = ilNote::commentsActivated($this->rep_obj_id, $this->obj_id, $this->obj_type);
 
 			if ($active)
 			{
-				$this->renderLink($ntpl, "comments_settings", $lng->txt("notes_deactivate_comments"),
-					"deactivateComments", "notes_top");
+				if ($this->news_id == 0)
+				{
+					$this->renderLink($ntpl, "comments_settings", $lng->txt("notes_deactivate_comments"),
+						"deactivateComments", "notes_top");
+				}
 				$ntpl->setCurrentBlock("comments_settings2");
 			}
 			else
@@ -404,17 +438,12 @@ if ($this->private_enabled && $this->public_enabled
 	{
 		$ilCtrl = $this->ctrl;
 		
-		$notes_settings = new ilSetting("notes");
-		
 		if ($this->comments_settings)
 		{
-			$id = $this->rep_obj_id."_".$this->obj_id."_".$this->obj_type;
-			//$notes_settings->set("activate_".$id, 1);
 			ilNote::activateComments($this->rep_obj_id, $this->obj_id, $this->obj_type, true);
 		}
 		
 		$ilCtrl->redirectByClass("ilnotegui", "showNotes", "", $this->ajax);
-//		$ilCtrl->redirectByClass("ilnotegui", "getNotesHtml", "", $this->ajax);
 	}
 
 	/**
@@ -424,17 +453,12 @@ if ($this->private_enabled && $this->public_enabled
 	{
 		$ilCtrl = $this->ctrl;
 		
-		$notes_settings = new ilSetting("notes");
-		
 		if ($this->comments_settings)
 		{
-			$id = $this->rep_obj_id."_".$this->obj_id."_".$this->obj_type;
-			//$notes_settings->set("activate_".$id, 0);
 			ilNote::activateComments($this->rep_obj_id, $this->obj_id, $this->obj_type, false);
 		}
 		
 		$ilCtrl->redirectByClass("ilnotegui", "showNotes", "", $this->ajax);
-		//$ilCtrl->redirectByClass("ilnotegui", "getNotesHtml", "", $this->ajax);
 	}
 
 	/**
@@ -452,10 +476,6 @@ if ($this->private_enabled && $this->public_enabled
 			? "private"
 			: "public";
 		
-		/* user settings are deprecated
-		$user_setting_notes_public_all = $ilUser->getPref("notes_pub_all");
-		$user_setting_notes_by_type = $ilUser->getPref("notes_".$suffix);		 
-		*/
 		$user_setting_notes_public_all = "y";
 		$user_setting_notes_by_type = "y";
 		
@@ -473,11 +493,8 @@ if ($this->private_enabled && $this->public_enabled
 
 		$notes = ilNote::_getNotesOfObject($this->rep_obj_id, $this->obj_id,
 			$this->obj_type, $a_type, $this->inc_sub, $filter,
-			$user_setting_notes_public_all, $this->repository_mode, (bool)$_SESSION["comments_sort_asc"]);
-
-		$all_notes = ilNote::_getNotesOfObject($this->rep_obj_id, $this->obj_id,
-			$this->obj_type, $a_type, $this->inc_sub, $filter,
-			"", $this->repository_mode);
+			$user_setting_notes_public_all, $this->repository_mode, (bool)$_SESSION["comments_sort_asc"],
+			$this->news_id);
 
 		$tpl = new ilTemplate("tpl.notes_list.html", true, true, "Services/Notes");
 
@@ -490,8 +507,8 @@ if ($this->private_enabled && $this->public_enabled
 		}
 		
 		// show counter if notes are hidden
-		$cnt_str = (count($all_notes) > 0)
-			? " (".count($all_notes).")"
+		$cnt_str = (count($notes) > 0)
+			? " (".count($notes).")"
 			: "";
 
 		// title
@@ -585,7 +602,7 @@ if ($this->private_enabled && $this->public_enabled
 		}
 		
 		// show show/hide button for note list
-		if (count($all_notes) > 0 && $this->enable_hiding && !$this->delete_note
+		if (count($notes) > 0 && $this->enable_hiding && !$this->delete_note
 			&& !$this->export_html && !$this->print && !$this->edit_note_form
 			&& !$this->add_note_form)
 		{
@@ -1387,7 +1404,7 @@ return;
 		if ($_POST["note"] != "")
 		{
 			$note = new ilNote();
-			$note->setObject($this->obj_type, $this->rep_obj_id, $this->obj_id);	
+			$note->setObject($this->obj_type, $this->rep_obj_id, $this->obj_id, $this->news_id);
 			$note->setInRepository($this->repository_mode);
 			$note->setType($_GET["note_type"]);
 			$note->setAuthor($ilUser->getId());
@@ -1761,7 +1778,58 @@ $ilCtrl->redirect($this, "showNotes", "notes_top", $this->ajax);
 	{
 		$_SESSION["comments_sort_asc"] = 0;
 		return $this->getNotesHtml();
-	}		
+	}
+
+	/**
+	 * Get HTML
+	 *
+	 * @param
+	 * @return string
+	 */
+	public function getHTML()
+	{
+		return $this->getCommentsWidget();
+	}
+
+
+	/**
+	 * Get widget
+	 *
+	 * @param
+	 * @return string
+	 */
+	protected function getCommentsWidget()
+	{
+		$f = $this->ui->factory();
+		$r = $this->ui->renderer();
+
+		$lng = $this->lng;
+
+		$hash = ilCommonActionDispatcherGUI::buildAjaxHash(
+			ilCommonActionDispatcherGUI::TYPE_REPOSITORY,
+			null , ilObject::_lookupType($this->rep_obj_id), $this->rep_obj_id, "", 0, $this->news_id);
+
+		$cnt = ilNote::_countNotesAndComments($this->rep_obj_id, $this->obj_id, $this->obj_type, $this->news_id);
+		$cnt = $cnt[$this->rep_obj_id][IL_NOTE_PUBLIC];
+		$comps = array();
+		$comps[] = $f->divider()->horizontal();
+		if ($cnt > 0)
+		{
+			$c = $f->counter()->status((int) $cnt);
+			$comps[] = $f->glyph()->comment()->withCounter($c)->withAdditionalOnLoadCode(function($id) use ($hash) {
+				return "$(\"#$id\").click(function() { ".self::getListCommentsJSCall($hash, null)."});";
+			});
+			$comps[] = $f->divider()->vertical();
+		}
+
+
+		$comps[] = $f->button()->shy($lng->txt("comment"), "#")->withAdditionalOnLoadCode(function($id) use ($hash) {
+			return "$(\"#$id\").click(function() { ".self::getListCommentsJSCall($hash, null)."});";
+		});
+
+		return "<div style='text-align:right;'>".$r->render($comps)."</div>";
+	}
+
 }
 
 ?>

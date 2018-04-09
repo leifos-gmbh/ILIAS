@@ -3,6 +3,12 @@
   padding: 3px;
   text-align: right;
 }
+.ilLike .modal {
+  text-align: left;
+}
+.ilLike .modal .glyphicon {
+  font-size: 160%;
+}
 .ilLike .badge {
   margin-left: -7px;
   top: 7px;
@@ -38,4 +44,5 @@
 }
 .ilLike .il-item img {
   max-width: 50%;
+  float: right;
 }

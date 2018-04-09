@@ -43,6 +43,12 @@ span.ilNewsRssIcon {
 			@media only screen and (max-width: @grid-float-breakpoint-max) {
 				margin-left: 0;
 			}
+			> .ilTimelineBadge {
+				left: 0;
+				margin-left: -25px;
+				right: auto;
+				margin-right: 0;
+			}
 		}
 		@media only screen and (max-width: @grid-float-breakpoint-max) {
 			margin-right: 0;
@@ -85,11 +91,11 @@ span.ilNewsRssIcon {
 			text-align: center;
 			position: absolute;
 			top: 16px;
-			left: 0;
-			margin-left: -25px;
 			background-color: #999;
 			z-index: 100;
 			border-radius: 50%;
+			right: 0;
+			margin-right: -25px;
 			@media only screen and (max-width: @grid-float-breakpoint-max) {
 				left: 90%;
 			}

@@ -519,8 +519,7 @@ class ilExAssignmentReminder
 				$ulng = ilLanguageFactory::_getLanguageOfUser($reminder["member_id"]);
 				$ulng->loadLanguageModule('exc');
 
-				include_once "./Services/Link/classes/class.ilLink.php";
-				$link = ilLink::_getStaticLink($reminder["exc_ref"], "exc");
+				$link = ilLink::_getLink($reminder["exc_ref"], "exc", array(), "_".$reminder["ass_id"]);
 
 				$message = sprintf($ulng->txt('exc_reminder_salutation'), ilObjUser::_lookupFullname($reminder["member_id"]))."\n\n";
 

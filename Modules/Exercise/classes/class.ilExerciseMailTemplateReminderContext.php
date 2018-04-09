@@ -90,8 +90,8 @@ class ilExerciseMailTemplateReminderContext extends ilMailTemplateContext
 			'label'			=> $lng->txt('exc_mail_context_reminder_exercise_title')
 		);
 								
-		$placeholders['exc_link'] = array(
-			'placeholder'	=> 'EXERCISE_LINK',
+		$placeholders['ass_link'] = array(
+			'placeholder'	=> 'ASSIGNMENT_LINK',
 			'label'			=> $lng->txt('perma_link')
 		);
 
@@ -114,10 +114,11 @@ class ilExerciseMailTemplateReminderContext extends ilMailTemplateContext
 			return $ilObjDataCache->lookupTitle($context_parameters["exc_id"]);
 
 		}
-		else if($placeholder_id == 'exc_link')
+		else if($placeholder_id == 'ass_link')
 		{
 			require_once './Services/Link/classes/class.ilLink.php';
-			return ilLink::_getLink($context_parameters['exc_ref'], 'exc');
+			return ilLink::_getLink($context_parameters["exc_ref"], "exc", array(), "_".$context_parameters["ass_id"]);
+
 		}
 
 		return '';

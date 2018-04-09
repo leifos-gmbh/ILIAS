@@ -165,7 +165,7 @@ class ilLikeGUI
 
 		if ($emo_counters != "")
 		{
-			$tpl->setVariable("SEP", $r->render($f->divider()->vertical()));
+			//$tpl->setVariable("SEP", $r->render($f->divider()->vertical()));
 		}
 
 
@@ -189,7 +189,7 @@ class ilLikeGUI
 	 * @return string
 	 * @throws ilLikeDataException
 	 */
-	protected function renderEmoCounters($modal_signal)
+	protected function renderEmoCounters($modal_signal = null)
 	{
 		$ilCtrl = $this->ctrl;
 
@@ -205,8 +205,11 @@ class ilLikeGUI
 			if ($cnts[$k] > 0)
 			{
 				$glyph = $this->getGlyphForConst($k);
-				$comps[] = $glyph->withOnClick($modal_signal)
-					->withCounter($f->counter()->status($cnts[$k]));
+				if ($modal_signal !== null)
+				{
+					$glyph = $glyph->withOnClick($modal_signal);
+				}
+				$comps[] = $glyph->withCounter($f->counter()->status($cnts[$k]));
 			}
 		}
 
@@ -218,9 +221,17 @@ class ilLikeGUI
 		{
 			$tpl->setVariable("MODAL_TRIGGER", $r->render($comps));
 		}
-		$tpl->setVariable("ID", $this->dom_id);
+		if ($modal_signal !== null)
+		{
+			$tpl->setVariable("ID", $this->dom_id);
+		}
 
-		return $tpl->get();
+		if (count($comps) > 0 && $modal_signal !== null)
+		{
+			$tpl->setVariable("SEP", $r->render($f->divider()->vertical()));
+		}
+
+		return $tpl->get().$d;
 	}
 
 
@@ -312,6 +323,7 @@ class ilLikeGUI
 
 	/**
 	 * Render modal
+	 * @throws ilLikeDataException
 	 */
 	function renderModal()
 	{
@@ -320,53 +332,32 @@ class ilLikeGUI
 		$f = $this->ui->factory();
 		$r = $this->ui->renderer();
 
-		$image = $f->image()->responsive(
-			ilObjUser::_getPersonalPicturePath($user->getId()),
-			"Thumbnail Example");
 
-		$list_item1 = $f->item()->standard("Max Learner")
-			->withDescription("👍&nbsp;&nbsp; 11. Feb 2017")
-			->withLeadImage($image);
+		$list_items = [];
+		foreach ($this->data->getExpressionEntries($this->obj_id, $this->obj_type,
+			$this->sub_obj_id, $this->sub_obj_type, $this->news_id) as $exp)
+		{
+			$name = ilUserUtil::getNamePresentation($exp["user_id"]);
 
-		$list_item2 = $f->item()->standard("Alex Killing")
-			->withDescription("👍&nbsp;&nbsp; 10. Feb 2017")
-			->withLeadImage($image);
+			$image = $f->image()->responsive(
+				ilObjUser::_getPersonalPicturePath($exp["user_id"]),
+				$name);
 
-		$list_item3 = $f->item()->standard("Hans Moser")
-			->withDescription("😆&nbsp;&nbsp; 8. Feb 2017")
-			->withLeadImage($image);
+			$g = $this->getGlyphForConst($exp["expression"]);
 
-		$list_item4 = $f->item()->standard("Fred Schmidt")
-			->withDescription("😆&nbsp;&nbsp; 7. Feb 2017")
-			->withLeadImage($image);
-
-		$list_item5 = $f->item()->standard("Gustav Schwan")
-			->withDescription("👍&nbsp;&nbsp; 4. Feb 2017")
-			->withLeadImage($image);
-
-		$list_item6 = $f->item()->standard("Fridolin Fischer")
-			->withDescription("😆&nbsp;&nbsp; 2. Feb 2017")
-			->withLeadImage($image);
-
-		$list_item7 = $f->item()->standard("Paul Pastete")
-			->withDescription("👍&nbsp;&nbsp; 1. Feb 2017")
-			->withLeadImage($image);
+			$list_items[] = $f->item()->standard($name)
+				->withDescription($r->render($g)." ".
+					ilDatePresentation::formatDate(new ilDateTime($exp["timestamp"], IL_CAL_DATETIME)))
+				->withLeadImage($image);
+		}
 
 		$std_list = $f->panel()->listing()->standard("", array(
-			$f->item()->group("", array(
-				$list_item1,
-				$list_item2,
-				$list_item3,
-				$list_item4,
-				$list_item5,
-				$list_item6,
-				$list_item7
-			))
+			$f->item()->group("", $list_items)
 		));
 
+		$header = $f->legacy($this->renderEmoCounters());
 
-
-		$modal = $f->modal()->roundtrip('', $std_list);
+		$modal = $f->modal()->roundtrip('', [$header, $std_list]);
 		echo $r->render($modal);
 		exit;
 	}

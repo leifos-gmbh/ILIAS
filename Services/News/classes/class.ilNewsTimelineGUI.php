@@ -8,7 +8,7 @@
  * @author Alex Killing <alex.killing@gmx.de>
  * @version $Id$
  *
- * @ilCtrl_Calls ilNewsTimelineGUI: ilLikeGUI
+ * @ilCtrl_Calls ilNewsTimelineGUI: ilLikeGUI, ilNoteGUI
  *
  * @ingroup ServicesNews
  */
@@ -77,9 +77,6 @@ class ilNewsTimelineGUI
 		$this->include_auto_entries = $a_include_auto_entries;
 		$this->access = $DIC->access();
 
-		include_once("./Services/Like/classes/class.ilLikeFactoryGUI.php");
-		$likef = new ilLikeFactoryGUI();
-		$this->like_gui = $likef->widget(array(ilObject::_lookupObjectId($this->ref_id)));
 		$this->news_id = (int) $_GET["news_id"];
 
 
@@ -133,10 +130,13 @@ class ilNewsTimelineGUI
 		{
 			case "illikegui":
 				$i = new ilNewsItem($this->news_id);
+				include_once("./Services/Like/classes/class.ilLikeFactoryGUI.php");
+				$likef = new ilLikeFactoryGUI();
+				$like_gui = $likef->widget(array($i->getContextObjId()));
 				$ctrl->saveParameter($this,"news_id");
-				$this->like_gui->setObject($i->getContextObjId(), $i->getContextObjType(),
+				$like_gui->setObject($i->getContextObjId(), $i->getContextObjType(),
 					$i->getContextSubObjId(), $i->getContextSubObjType(), $this->news_id);
-				$ret = $ctrl->forwardCommand($this->like_gui);
+				$ret = $ctrl->forwardCommand($like_gui);
 				break;
 
 			default:
@@ -177,11 +177,19 @@ class ilNewsTimelineGUI
 		include_once("./Services/News/classes/class.ilNewsTimelineItemGUI.php");
 		$timeline = ilTimelineGUI::getInstance();
 
+		// get like widget
+		$obj_ids = array_unique(array_map(function ($a) {
+			return $a["context_obj_id"];
+		}, $news_data));
+		include_once("./Services/Like/classes/class.ilLikeFactoryGUI.php");
+		$likef = new ilLikeFactoryGUI();
+		$like_gui = $likef->widget($obj_ids);
+
 		$js_items = array();
 		foreach ($news_data as $d)
 		{
 			$news_item = new ilNewsItem($d["id"]);
-			$item = ilNewsTimelineItemGUI::getInstance($news_item, $d["ref_id"], $this->like_gui);
+			$item = ilNewsTimelineItemGUI::getInstance($news_item, $d["ref_id"], $like_gui);
 			$item->setUserEditAll($this->getUserEditAll());
 			$timeline->addItem($item);
 			$js_items[$d["id"]] = array(
@@ -248,11 +256,19 @@ class ilNewsTimelineGUI
 		include_once("./Services/News/classes/class.ilNewsTimelineItemGUI.php");
 		$timeline = ilTimelineGUI::getInstance();
 
+		// get like widget
+		$obj_ids = array_unique(array_map(function ($a) {
+			return $a["context_obj_id"];
+		}, $news_data));
+		include_once("./Services/Like/classes/class.ilLikeFactoryGUI.php");
+		$likef = new ilLikeFactoryGUI();
+		$like_gui = $likef->widget($obj_ids);
+
 		$js_items = array();
 		foreach ($news_data as $d)
 		{
 			$news_item = new ilNewsItem($d["id"]);
-			$item = ilNewsTimelineItemGUI::getInstance($news_item, $d["ref_id"], $this->like_gui);
+			$item = ilNewsTimelineItemGUI::getInstance($news_item, $d["ref_id"], $like_gui);
 			$item->setUserEditAll($this->getUserEditAll());
 			$timeline->addItem($item);
 			$js_items[$d["id"]] = array(

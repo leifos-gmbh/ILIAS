@@ -3048,7 +3048,10 @@ class ilObjectListGUI
 		{
 			include_once("./Services/Notes/classes/class.ilNote.php");
 			include_once("./Services/Notes/classes/class.ilNoteGUI.php");
-			$cnt = ilNote::_countNotesAndComments($this->obj_id, $this->sub_obj_id);
+			$type = ($this->sub_obj_type == "")
+				? $this->type
+				: $this->sub_obj_type;
+			$cnt = ilNote::_countNotesAndComments($this->obj_id, $this->sub_obj_id, $type);
 
 			if($this->notes_enabled && $cnt[$this->obj_id][IL_NOTE_PRIVATE] > 0)
 			{

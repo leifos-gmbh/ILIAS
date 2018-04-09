@@ -50,3 +50,25 @@ if (!$ilDB->tableExists('like_data'))
 	$ilDB->addIndex('like_data',array('obj_id'),'i1');
 }
 ?>
+<#2>
+<?php
+if( !$ilDB->tableColumnExists('like_data', 'exp_ts') )
+{
+	$ilDB->addTableColumn('like_data', 'exp_ts', array(
+		'type' => 'timestamp',
+		'notnull' => true
+	));
+}
+?>
+<#3>
+<?php
+if( !$ilDB->tableColumnExists('note', 'news_id') )
+{
+	$ilDB->addTableColumn('note', 'news_id', array(
+		'type' => 'integer',
+		'length' => 4,
+		'notnull' => true,
+		'default' => 0
+	));
+}
+?>

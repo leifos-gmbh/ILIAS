@@ -3,39 +3,28 @@
   padding: 3px;
   text-align: right;
 }
-.ilLike .badge {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  margin-left: 1px;
+.ilLike .modal {
+  text-align: left;
 }
-.ilLike .il-counter-spacer {
-  margin-left: 1px;
-  font-size: 9px;
-  /* padding: 2px 4px; */
-=======
-  margin-left: 2px;
-=======
+.ilLike .modal .glyphicon {
+  font-size: 160%;
+}
+.ilLike .badge {
   margin-left: -7px;
   top: 7px;
 }
 .ilLike .glyphicon {
   font-size: 130%;
->>>>>>> e3a1b42afb... like service, part iii
 }
 .ilLike .il-counter-spacer {
   margin-left: 0px;
   font-size: 9px;
   padding: 0;
->>>>>>> ff4a9c0ea1... add missing like file
   visibility: hidden;
 }
 .ilLike a {
   display: inline-block;
-<<<<<<< HEAD
-  padding: 2px 4px;
-=======
   /* padding: 2px 4px; */
->>>>>>> ff4a9c0ea1... add missing like file
 }
 .ilLike a:hover {
   text-decoration: none;
@@ -53,9 +42,7 @@
   /*background-color: @il-highlight-bg;*/
   background-color: #F0F0F0;
 }
-<<<<<<< HEAD
-=======
 .ilLike .il-item img {
   max-width: 50%;
+  float: right;
 }
->>>>>>> ff4a9c0ea1... add missing like file

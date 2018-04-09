@@ -272,6 +272,17 @@ class ilNewsTimelineItemGUI implements ilTimelineItemInt
 		$html = $this->ctrl->getHTML($this->like_gui);
 		$this->ctrl->setParameterByClass("ilnewstimelinegui", "news_id", $_GET["news_id"]);
 
+		// comments
+		$notes_obj_type = ($i->getContextSubObjType() == "")
+			? $i->getContextObjType()
+			: $i->getContextSubObjType();
+		$note_gui = new ilNoteGUI($i->getContextObjId(), $i->getContextSubObjId(),
+			$notes_obj_type, false,  $i->getId());
+		$note_gui->setDefaultCommand("getWidget");
+
+		//ilNoteGUI::getListCommentsJSCall($this->ajax_hash, $redraw_js)
+		$html.= $this->ctrl->getHTML($note_gui);
+
 		return $html;
 	}
 

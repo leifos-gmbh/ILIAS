@@ -13957,6 +13957,12 @@ span.ilNewsRssIcon:hover {
     margin-left: 0;
   }
 }
+.ilTimeline > li:nth-child(even) > .ilTimelineBadge {
+  left: 0;
+  margin-left: -25px;
+  right: auto;
+  margin-right: 0;
+}
 @media only screen and (max-width: 767px) {
   .ilTimeline > li {
     margin-right: 0;
@@ -14003,11 +14009,11 @@ span.ilNewsRssIcon:hover {
   text-align: center;
   position: absolute;
   top: 16px;
-  left: 0;
-  margin-left: -25px;
   background-color: #999;
   z-index: 100;
   border-radius: 50%;
+  right: 0;
+  margin-right: -25px;
 }
 @media only screen and (max-width: 767px) {
   .ilTimeline > li > .ilTimelineBadge {
@@ -15248,6 +15254,12 @@ span.ilProfileBadge {
   padding: 3px;
   text-align: right;
 }
+.ilLike .modal {
+  text-align: left;
+}
+.ilLike .modal .glyphicon {
+  font-size: 160%;
+}
 .ilLike .badge {
   margin-left: -7px;
   top: 7px;
@@ -15283,6 +15295,7 @@ span.ilProfileBadge {
 }
 .ilLike .il-item img {
   max-width: 50%;
+  float: right;
 }
 .noMargin {
   margin: 0;

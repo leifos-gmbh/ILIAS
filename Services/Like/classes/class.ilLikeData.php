@@ -119,8 +119,9 @@ class ilLikeData
 				"news_id" => array("integer", (int) $a_news_id),
 				"like_type" => array("integer", (int) $a_like_type)
 				),
-			array()
-			);
+			array(
+				"exp_ts" => array("timestamp", ilUtil::now())
+			));
 	}
 
 	/**
@@ -180,18 +181,20 @@ class ilLikeData
 		}
 
 		$set = $ilDB->query("SELECT * FROM like_data ".
-			" WHERE ".$ilDB->in("obj_id", $a_obj_ids, false, "integer"));
+			" WHERE ".$ilDB->in("obj_id", $a_obj_ids, false, "integer").
+			" ORDER by exp_ts DESC");
 		while ($rec = $ilDB->fetchAssoc($set))
 		{
 			$subtype = $rec["sub_obj_type"] == "-"
 				? ""
 				: $rec["sub_obj_type"];
-			$this->data[$rec["obj_id"]][$rec["sub_obj_id"]][$subtype][$rec["news_id"]][$rec["like_type"]][$rec["user_id"]] = 1;
+			$this->data[$rec["obj_id"]][$rec["sub_obj_id"]][$subtype][$rec["news_id"]][$rec["like_type"]][$rec["user_id"]] =
+				$rec["exp_ts"];
 		}
 	}
 
 	/**
-	 *
+	 * Get expression counts for obj/subobj/news
 	 *
 	 * @param int $obj_id
 	 * @param string $obj_type
@@ -246,6 +249,50 @@ class ilLikeData
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * Get expression entries for obj/subobj/news
+	 *
+	 * @param int $obj_id
+	 * @param string $obj_type
+	 * @param int $sub_obj_id
+	 * @param string $sub_obj_type
+	 * @param int $news_id
+	 * @return int[] $news_id
+	 * @throws ilLikeDataException
+	 */
+	public function getExpressionEntries($obj_id, $obj_type, $sub_obj_id, $sub_obj_type, $news_id)
+	{
+		if (!is_array($this->data[$obj_id]))
+		{
+			include_once("./Services/Like/exceptions/class.ilLikeDataException.php");
+			throw new ilLikeDataException("No data loaded for object $obj_id.");
+		}
+
+		if ($sub_obj_type == "-")
+		{
+			$sub_obj_type = "";
+		}
+
+		$exp = array();
+		foreach ($this->getExpressionTypes() as $k => $txt)
+		{
+			if  (is_array($this->data[$obj_id][$sub_obj_id][$sub_obj_type][$news_id][$k]))
+			{
+				foreach ($this->data[$obj_id][$sub_obj_id][$sub_obj_type][$news_id][$k] as $user => $ts)
+				{
+					$exp[] = array(
+						"expression" => $k,
+						"user_id" => $user,
+						"timestamp" => $ts
+					);
+				}
+			}
+		}
+
+		$exp = ilUtil::sortArray($exp, "timestamp", "desc");
+		return $exp;
 	}
 
 

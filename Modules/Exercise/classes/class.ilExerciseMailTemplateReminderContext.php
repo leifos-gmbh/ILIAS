@@ -118,7 +118,6 @@ class ilExerciseMailTemplateReminderContext extends ilMailTemplateContext
 		{
 			require_once './Services/Link/classes/class.ilLink.php';
 			return ilLink::_getLink($context_parameters["exc_ref"], "exc", array(), "_".$context_parameters["ass_id"]);
-
 		}
 
 		return '';

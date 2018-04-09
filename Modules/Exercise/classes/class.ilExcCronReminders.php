@@ -78,7 +78,7 @@ class ilExcCronReminders extends ilCronJob
 		$cron_status = ilCronJobResult::STATUS_NO_ACTION;
 		$message = "";
 		$reminder = new ilExAssignmentReminder();
-		$num_reminders = $reminder->sendReminders();
+		$num_reminders = $reminder->checkReminders();
 
 		if($num_reminders)
 		{

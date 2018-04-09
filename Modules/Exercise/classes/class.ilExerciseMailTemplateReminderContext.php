@@ -107,10 +107,7 @@ class ilExerciseMailTemplateReminderContext extends ilMailTemplateContext
 
 		if($placeholder_id == 'ass_title')
 		{
-			//return $ilObjDataCache->lookupTitle($ilObjDataCache->lookupObjId($context_parameters['ref_id']));
-			$ass = new ilExAssignment($context_parameters["ass_id"]);
-			return $ass->getTitle();
-
+			return ilExAssignment::lookupTitle($context_parameters["ass_id"]);
 		}
 		else if($placeholder_id == 'exc_title')
 		{

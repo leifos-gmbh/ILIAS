@@ -14180,8 +14180,12 @@ exc#:#exc_reminders_cron_info#:#If enabled, 3 reminders will be active: Users to
 exc#:#exc_reminder_end#:#Reminder ends
 exc#:#exc_reminder_mail_template#:#Mail Template
 exc#:#exc_reminder_mail_no_tpl#:#Do not use mail template
-exc#:#exc_mail_context_reminder_title#:#Exercise Reminder
-exc#:#exc_mail_context_reminder_info#:#Specific Reminders for Exercises (Submit, Grade or Feedback)
+exc#:#exc_mail_context_submit_reminder_title#:#Exercise Submit Reminder
+exc#:#exc_mail_context_submit_reminder_info#:#Reminder Users to Submit an Assignment
+exc#:#exc_mail_context_grade_reminder_title#:#Exercise Grade Reminder
+exc#:#exc_mail_context_grade_reminder_info#:#Reminder Tutors/Teachers to Grade an Assignment
+exc#:#exc_mail_context_peer_reminder_title#:#Exercise Feedback/Peer Reminder
+exc#:#exc_mail_context_peer_reminder_info#:#Reminder Users to provide Feedback in an Assignment
 exc#:#exc_mail_context_reminder_assignment_title#:#Assignment Title
 exc#:#exc_mail_context_reminder_exercise_title#:#Exercise Title
 exc#:#exc_reminder_salutation#:#Hello %s,

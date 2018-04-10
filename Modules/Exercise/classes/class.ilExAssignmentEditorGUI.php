@@ -354,7 +354,7 @@ class ilExAssignmentEditorGUI
 		$rmd_submit_end->setRequired(true);
 		$rmd_submit->addSubItem($rmd_submit_end);
 
-		$rmd_submit->addSubItem($this->addMailTemplatesRadio("rmd_submit_template_id"));
+		$rmd_submit->addSubItem($this->addMailTemplatesRadio(ilExAssignmentReminder::SUBMIT_REMINDER));
 
 		// grade reminder
 		$rmd_grade = new ilCheckboxInputGUI($this->lng->txt("exc_reminder_grade_setting"), "rmd_grade_status");
@@ -377,7 +377,7 @@ class ilExAssignmentEditorGUI
 		$rmd_grade_end->setRequired(true);
 		$rmd_grade->addSubItem($rmd_grade_end);
 
-		$rmd_grade->addSubItem($this->addMailTemplatesRadio("rmd_grade_template_id"));
+		$rmd_grade->addSubItem($this->addMailTemplatesRadio(ilExAssignmentReminder::GRADE_REMINDER));
 
 		$form->addItem($rmd_submit);
 		$form->addItem($rmd_grade);
@@ -475,15 +475,32 @@ class ilExAssignmentEditorGUI
 		return $form;
 	}
 
-	public function addMailTemplatesRadio($a_postvar_name)
+	public function addMailTemplatesRadio($a_reminder_type)
 	{
-		include_once "Modules/Exercise/classes/class.ilExerciseMailTemplateReminderContext.php";
+		$post_var = "rmd_".$a_reminder_type."_template_id";
 
-		$r_group = new ilRadioGroupInputGUI($this->lng->txt("exc_reminder_mail_template"), $a_postvar_name);
+		$r_group = new ilRadioGroupInputGUI($this->lng->txt("exc_reminder_mail_template"), $post_var);
 		$r_group->setRequired(true);
 		$r_group->addOption(new ilRadioOption($this->lng->txt("exc_reminder_mail_no_tpl"), 0));
 
-		$context = new ilExerciseMailTemplateReminderContext();
+		switch ($a_reminder_type)
+		{
+			case ilExAssignmentReminder::SUBMIT_REMINDER:
+				include_once "Modules/Exercise/classes/class.ilExcMailTemplateSubmitReminderContext.php";
+				$context = new ilExcMailTemplateSubmitReminderContext();
+				break;
+			case ilExAssignmentReminder::GRADE_REMINDER:
+				include_once "Modules/Exercise/classes/class.ilExcMailTemplateGradeReminderContext.php";
+				$context = new ilExcMailTemplateGradeReminderContext();
+				break;
+			case ilExAssignmentReminder::FEEDBACK_REMINDER:
+				include_once "Modules/Exercise/classes/class.ilExcMailTemplatePeerReminderContext.php";
+				$context = new ilExcMailTemplatePeerReminderContext();
+				break;
+			default:
+				exit();
+		}
+
 		$template_data = new ilMailTemplateDataProvider();
 		$templates = $template_data->getTemplateByContextId($context->getId());
 
@@ -1309,7 +1326,7 @@ class ilExAssignmentEditorGUI
 		$rmd_submit_end->setRequired(true);
 		$rmd_feedback->addSubItem($rmd_submit_end);
 
-		$rmd_feedback->addSubItem($this->addMailTemplatesRadio("rmd_peer_template_id"));
+		$rmd_feedback->addSubItem($this->addMailTemplatesRadio(ilExAssignmentReminder::FEEDBACK_REMINDER));
 
 		$form->addItem($rmd_feedback);
 

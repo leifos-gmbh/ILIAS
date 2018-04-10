@@ -4,12 +4,13 @@
 include_once './Services/Mail/classes/class.ilMailTemplateContext.php';
 
 /**
- * Handles exercise reminder mail placeholders
+ * Handles exercise Submit reminder mail placeholders
+ * If all contexts are using the same placeholders,constructor etc. todo: create base class.
  * 
  * @author Jesús López <lopez@leifos.com>
  * @package ModulesExercise
  */
-class ilExerciseMailTemplateReminderContext extends ilMailTemplateContext
+class ilExcMailTemplateSubmitReminderContext extends ilMailTemplateContext
 {
 	/**
 	 * @var ilLanguage
@@ -36,7 +37,7 @@ class ilExerciseMailTemplateReminderContext extends ilMailTemplateContext
 		}
 	}
 
-	const ID = 'exc_context_rmd';
+	const ID = 'exc_context_submit_rmd';
 	
 	/**
 	 * @return string
@@ -55,7 +56,7 @@ class ilExerciseMailTemplateReminderContext extends ilMailTemplateContext
 		
 		$lng->loadLanguageModule('exc');
 		
-		return $lng->txt('exc_mail_context_reminder_title');
+		return $lng->txt('exc_mail_context_submit_reminder_title');
 	}
 
 	/**
@@ -67,7 +68,7 @@ class ilExerciseMailTemplateReminderContext extends ilMailTemplateContext
 
 		$lng->loadLanguageModule('exc');
 
-		return $lng->txt('exc_mail_context_reminder_info');
+		return $lng->txt('exc_mail_context_submit_reminder_info');
 	}
 
 	/**

@@ -505,7 +505,7 @@ class ilExAssignmentReminder
 					"ass_id" => $reminder["ass_id"],
 					"member_id" => $reminder["member_id"]
 				);
-				$message = $this->sentReminderPlaceholders($tpl->getMessage(), $placeholder_params);
+				$message = $this->sentReminderPlaceholders($tpl->getMessage(), $placeholder_params, $rmd_type);
 			}
 			else
 			{
@@ -558,26 +558,37 @@ class ilExAssignmentReminder
 	}
 
 	//see ilObjSurvey.
-	protected function sentReminderPlaceholders($a_message, $a_reminder_data)
+	protected function sentReminderPlaceholders($a_message, $a_reminder_data, $a_reminder_type)
 	{
 		// see ilMail::replacePlaceholders()
-		include_once "Modules/Exercise/classes/class.ilExerciseMailTemplateReminderContext.php";
-
 		try
 		{
 			require_once 'Services/Mail/classes/class.ilMailTemplateService.php';
-			$context = ilMailTemplateService::getTemplateContextById(ilExerciseMailTemplateReminderContext::ID);
+
+			switch($a_reminder_type)
+			{
+				case ilExAssignmentReminder::SUBMIT_REMINDER:
+					include_once "Modules/Exercise/classes/class.ilExcMailTemplateSubmitReminderContext.php";
+					$context = ilMailTemplateService::getTemplateContextById(ilExcMailTemplateSubmitReminderContext::ID);
+					break;
+				case ilExAssignmentReminder::GRADE_REMINDER:
+					include_once "Modules/Exercise/classes/class.ilExcMailTemplateGradeReminderContext.php";
+					$context = ilMailTemplateService::getTemplateContextById(ilExcMailTemplateGradeReminderContext::ID);
+					break;
+				case ilExAssignmentReminder::FEEDBACK_REMINDER:
+					include_once "Modules/Exercise/classes/class.ilExcMailTemplatePeerReminderContext.php";
+					$context = ilMailTemplateService::getTemplateContextById(ilExcMailTemplatePeerReminderContext::ID);
+					break;
+				default:
+					exit();
+			}
 
 			$user = new ilObjUser($a_reminder_data["member_id"]);
 
 			require_once 'Services/Mail/classes/class.ilMailTemplatePlaceholderResolver.php';
-			//require_once 'Services/Mail/classes/class.ilMailFormCall.php';
+
 			$processor = new ilMailTemplatePlaceholderResolver($context, $a_message);
-
-			//$a_message = $processor->resolve($user, ilMailFormCall::getContextParameters());
 			$a_message = $processor->resolve($user, $a_reminder_data);
-
-
 		}
 		catch(Exception $e)
 		{

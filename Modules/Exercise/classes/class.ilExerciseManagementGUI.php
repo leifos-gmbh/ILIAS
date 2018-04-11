@@ -556,12 +556,12 @@ class ilExerciseManagementGUI
 			$str_status_value = $this->lng->txt('not_yet');
 		} else {
 			$str_status_key = $this->lng->txt('exc_tbl_status_time');
-			$str_status_value = $a_data['status_time'];
+			$str_status_value = ilDatePresentation::formatDate(new ilDateTime($a_data["status_time"], IL_CAL_DATETIME));
 		}
 
 		if($a_data['feedback_time']) {
 			$str_evaluation_key = $this->lng->txt('exc_tbl_feedback_time');
-			$str_evaluation_value = $a_data['feedback_time'];
+			$str_evaluation_value = ilDatePresentation::formatDate(new ilDateTime($a_data["feedback_time"], IL_CAL_DATETIME));
 		} else {
 			$str_evaluation_key = $this->lng->txt('exc_settings_feedback');
 			$str_evaluation_value = $this->lng->txt('not_yet');

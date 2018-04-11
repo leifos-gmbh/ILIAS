@@ -453,11 +453,7 @@ class ilErrorHandling extends PEAR
 			// ignore all E_STRICT that are E_NOTICE (or nothing at all) in PHP7
 			if (version_compare(PHP_VERSION, '7.0.0', '<')) {
 				if ($level == E_STRICT) {
-					if (!stristr($message, "should be compatible") &&
-						!stristr($message, "should not be called statically") &&
-						!stristr($message, "should not be abstract")) {
-						return true;
-					};
+					return true;
 				}
 			}
 			// correct-with-php5-removal end

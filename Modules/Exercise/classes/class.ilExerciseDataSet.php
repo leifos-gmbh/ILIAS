@@ -757,10 +757,14 @@ class ilExerciseDataSet extends ilDataSet
 				ilLoggerFactory::getRootLogger()->debug("NEW Exercise = ".$new_exc_id);
 				ilLoggerFactory::getRootLogger()->debug("INITIAL ARRAY = ",$a_rec);
 				*/
+
+				//always UTC timestamp in db.
+				$end = new ilDateTime($a_rec["End"], IL_CAL_DATETIME, "UTC");
+
 				$rmd = new ilExAssignmentReminder($new_exc_id, $new_ass_id,$a_rec["Type"]);
 				$rmd->setReminderStatus($a_rec["Status"]);
 				$rmd->setReminderStart($a_rec["Start"]);
-				$rmd->setReminderEnd($a_rec["End"]);
+				$rmd->setReminderEnd($end->get(IL_CAL_UNIX));
 				$rmd->setReminderFrequency($a_rec["Freq"]);
 				$rmd->setReminderLastSend($a_rec["LastSend"]);
 				$rmd->setReminderMailTemplate($a_rec["TemplateId"]);

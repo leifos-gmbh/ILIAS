@@ -746,21 +746,10 @@ class ilExerciseDataSet extends ilDataSet
 			case "exc_ass_reminders":
 				// (5.3) reminders
 				include_once("./Modules/Exercise/classes/class.ilExAssignmentReminder.php");
-
 				$new_ass_id = $a_mapping->getMapping("Modules/Exercise", "exc_assignment", $a_rec["AssId"]);
 				$new_exc_id = $a_mapping->getMapping('Modules/Exercise','exc',$a_rec['ExcId']);
-
-				/*
-				ilLoggerFactory::getRootLogger()->debug("old_ assignment ".$a_rec["AssId"]);
-				ilLoggerFactory::getRootLogger()->debug("old_ Exercise ".$a_rec["ExcId"]);
-				ilLoggerFactory::getRootLogger()->debug("NEW assignment = ".$new_ass_id);
-				ilLoggerFactory::getRootLogger()->debug("NEW Exercise = ".$new_exc_id);
-				ilLoggerFactory::getRootLogger()->debug("INITIAL ARRAY = ",$a_rec);
-				*/
-
 				//always UTC timestamp in db.
 				$end = new ilDateTime($a_rec["End"], IL_CAL_DATETIME, "UTC");
-
 				$rmd = new ilExAssignmentReminder($new_exc_id, $new_ass_id,$a_rec["Type"]);
 				$rmd->setReminderStatus($a_rec["Status"]);
 				$rmd->setReminderStart($a_rec["Start"]);

@@ -24,6 +24,7 @@
 
 # Directories
 /data
+<<<<<<< HEAD
 #/Customizing/global
 /setup/sql/ilDBTemplate
 virtual-data

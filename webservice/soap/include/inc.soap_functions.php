@@ -748,7 +748,7 @@ class ilSoapFunctions {
 	public static function updateHtmlLearningModule($sid,$ref_id,$xml_path,$a_online,$a_old_id,$a_title,$a_desc,$a_start)
 	{
 		include_once './webservice/soap/classes/class.ilSoapFileAdministration.php';
-		$sta = & new ilSoapFileAdministration();
+		$sta = new ilSoapFileAdministration();
 		return $sta->updateHtmlLearningModule($sid, $ref_id, $xml_path,$a_online,$a_old_id,$a_title,$a_desc,$a_start);
 	}
 

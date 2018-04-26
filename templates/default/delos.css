@@ -14620,6 +14620,10 @@ span.ilNewsRssIcon:hover {
 .dynamic-show-more {
   display: none;
 }
+.ilTimeline .ilNotes {
+  margin: 0 -20px -20px -20px;
+  padding: 10px 20px;
+}
 div.ilSurveyPageEditDropArea {
   border-color: #88be51;
   color: #88be51;
@@ -15724,7 +15728,7 @@ span.ilProfileBadge {
 }
 .ilLike {
   /* background-color: @il-secondary-container-bg; */
-  padding: 3px;
+  padding: 5px 0px;
   text-align: right;
 }
 .ilLike .modal {

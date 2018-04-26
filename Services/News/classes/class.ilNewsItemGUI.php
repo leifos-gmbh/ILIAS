@@ -332,6 +332,13 @@ class ilNewsItemGUI
 		$radio_group->setValue("users");
 		$form->addItem($radio_group);
 
+		// media
+		/*
+		$media = new ilFileStandardDropzoneInputGUI($lng->txt('news_media'), 'media');
+		//$media->setSuffixes(array("jpeg", "jpg", "png", "gif", "mp4", "mp3"));
+		$media->setRequired(false);
+		$form->addItem($media);*/
+
 		// Property ContentLong
 		/*
 		$text_area = new ilTextAreaInputGUI($lng->txt("news_news_item_content_long"), "news_content_long");
@@ -412,6 +419,13 @@ class ilNewsItemGUI
 			$this->news_item->setTitle($form->getInput("news_title"));
 			$this->news_item->setContent($form->getInput("news_content"));
 			$this->news_item->setVisibility($form->getInput("news_visibility"));
+
+			/*
+			$data = $form->getInput('media');
+			var_dump($data);*/
+
+
+
 			$this->news_item->setContentLong("");
 			if (self::isRteActivated())
 			{

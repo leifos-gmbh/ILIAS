@@ -15,6 +15,8 @@
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
 like#:#like#:#Like
+notes#:#notes_latest_comment#:#Letzter Kommentar
+notes#:#notes_add_edit_comment#:#Kommentar hinzufügen/editieren
 common#:#obj_ltis#:#LTI
 common#:#obj_ltis_desc#:#Learning Tools Interoperability
 common#:#lti_outcome#:#Übermittlung LTI-Lernfortschritt

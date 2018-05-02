@@ -140,7 +140,7 @@ class ilNewsTimelineGUI
 				break;
 
 			default:
-				if (in_array($cmd, array("show", "save", "update", "loadMore", "remove")))
+				if (in_array($cmd, array("show", "save", "update", "loadMore", "remove", "updateNewsItem")))
 				{
 					$this->$cmd();
 				}
@@ -200,7 +200,8 @@ class ilNewsTimelineGUI
 				"content_long" => "",
 				"priority" => $d["priority"],
 				"visibility" => $d["visibility"],
-				"content_type" => $d["content_type"]
+				"content_type" => $d["content_type"],
+				"mob_id" => $d["mob_id"]
 			);
 		}
 
@@ -279,7 +280,8 @@ class ilNewsTimelineGUI
 				"content_long" => "",
 				"priority" => $d["priority"],
 				"visibility" => $d["visibility"],
-				"content_type" => $d["content_type"]
+				"content_type" => $d["content_type"],
+				"mob_id" => $d["mob_id"]
 			);
 		}
 
@@ -292,6 +294,26 @@ class ilNewsTimelineGUI
 		exit;
 	}
 
+	
+	/**
+	 *
+	 *
+	 * @param
+	 */
+	protected function updateNewsItem()
+	{
+		if ($_POST["news_action"] == "save")
+		{
+			$this->save();
+			$this->ctrl->redirect($this, "show");
+		}
+		if ($_POST["news_action"] == "update")
+		{
+			$this->update();
+			$this->ctrl->redirect($this, "show");
+		}
+	}
+	
 
 	/**
 	 * Save (ajax)
@@ -320,6 +342,13 @@ class ilNewsTimelineGUI
 			$news_item->setContextObjType($obj_type);
 			$news_item->setUserId($this->user->getId());
 
+			$media = $_FILES["media"];
+			if ($media["name"] != "")
+			{
+				$mob = ilObjMediaObject::_saveTempFileAsMediaObject($media["name"], $media["tmp_name"], true);
+				$news_item->setMobId($mob->getId());
+			}
+
 			$news_set = new ilSetting("news");
 			if (!$news_set->get("enable_rss_for_internal"))
 			{
@@ -328,8 +357,9 @@ class ilNewsTimelineGUI
 
 			$news_item->create();
 		}
-		exit;
 	}
+
+
 
 	/**
 	 * Update (ajax)
@@ -352,16 +382,40 @@ class ilNewsTimelineGUI
 			}
 			$news_item->setContentLong("");
 
+			$media = $_FILES["media"];
+			$old_mob_id = 0;
+
+			// delete old media object
+			if ($media["name"] != "" || $_POST["media_delete"] != "")
+			{
+				if ($news_item->getMobId() > 0 && ilObject::_lookupType($news_item->getMobId()) == "mob")
+				{
+					$old_mob_id = $news_item->getMobId();
+				}
+				$news_item->setMobId(0);
+			}
+
+			if ($media["name"] != "")
+			{
+				$mob = ilObjMediaObject::_saveTempFileAsMediaObject($media["name"], $media["tmp_name"], true);
+				$news_item->setMobId($mob->getId());
+			}
+
 			$obj_id = ilObject::_lookupObjectId($this->ref_id);
 
 			if ($news_item->getContextObjId() == $obj_id)
 			{
 				$news_item->setUpdateUserId($this->user->getId());
 				$news_item->update();
-			}
 
+				if ($old_mob_id > 0)
+				{
+					include_once("./Services/MediaObjects/classes/class.ilObjMediaObject.php");
+					$old_mob = new ilObjMediaObject($old_mob_id);
+					$old_mob->delete();
+				}
+			}
 		}
-		exit;
 	}
 
 	/**
@@ -394,6 +448,16 @@ class ilNewsTimelineGUI
 		include_once("./Services/News/classes/class.ilNewsItemGUI.php");
 		$form = ilNewsItemGUI::getEditForm(IL_FORM_EDIT, $this->ref_id);
 		$form->setShowTopButtons(false);
+		$form->setFormAction($this->ctrl->getFormAction($this));
+
+
+		//
+		$hi = new ilHiddenInputGUI("id");
+		$form->addItem($hi);
+		$act = new ilHiddenInputGUI("news_action");
+		$form->addItem($act);
+		$form->setId("news_edit_form");
+
 		$modal->setBody($form->getHTML());
 
 		return $modal->getHTML();

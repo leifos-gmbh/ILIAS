@@ -189,24 +189,11 @@ class ilNewsTimelineItemGUI implements ilTimelineItemInt
 		}
 
 		// media
-		if ($i->getContentType() == NEWS_AUDIO &&
-			$i->getMobId() > 0 && ilObject::_exists($i->getMobId()))
+		if ($i->getMobId() > 0 && ilObject::_exists($i->getMobId()))
 		{
-			include_once("./Services/MediaObjects/classes/class.ilObjMediaObject.php");
-			include_once("./Services/MediaObjects/classes/class.ilMediaPlayerGUI.php");
-			$mob = new ilObjMediaObject($i->getMobId());
-			$med = $mob->getMediaItem("Standard");
-			$mpl = new ilMediaPlayerGUI("news_pl_".$i->getMobId());
-			if (strcasecmp("Reference", $med->getLocationType()) == 0)
-				$mpl->setFile($med->getLocation());
-			else
-				$mpl->setFile(ilObjMediaObject::_getURL($mob->getId())."/".$med->getLocation());
-			$mpl->setDisplayHeight($med->getHeight());
-			//$mpl->setDisplayWidth("100%");
-			//$mpl->setDisplayHeight("320");
+			$media = $this->renderMedia($i);
 			$tpl->setCurrentBlock("player");
-			$tpl->setVariable("PLAYER",
-				$mpl->getMp3PlayerHtml());
+			$tpl->setVariable("PLAYER", $media);
 			$tpl->parseCurrentBlock();
 		}
 
@@ -253,9 +240,85 @@ class ilNewsTimelineItemGUI implements ilTimelineItemInt
 
 		$tpl->setVariable("ACTIONS", $list->getHTML());
 
-
 		return $tpl->get();
 	}
+
+	/**
+	 * Render media
+	 *
+	 * @param
+	 * @return
+	 */
+	protected function renderMedia(ilNewsItem $i)
+	{
+		global $DIC;
+
+		$media_path = $this->getMediaPath($i);
+		$mime = ilObjMediaObject::getMimeType($media_path);
+
+		$ui_factory = $DIC->ui()->factory();
+		$ui_renderer = $DIC->ui()->renderer();
+
+		if (in_array($mime, array("image/jpeg", "image/svg+xml", "image/gif", "image/png")))
+		{
+			$item_id = "il-news-modal-img-".$i->getId();
+			$title = basename($media_path);
+			$image = $ui_renderer->render($ui_factory->image()->responsive($media_path, $title));
+
+			$img_tpl = new ilTemplate("tpl.news_timeline_image_file.html", true, true, "Services/News");
+			$img_tpl->setVariable("ITEM_ID", $item_id);
+			$img_tpl->setVariable("IMAGE", $image);
+
+			$html = $img_tpl->get();
+		}
+		else if (in_array($mime, array("audio/mpeg", "audio/ogg", "video/mp4", "video/x-flv", "video/webm")))
+		{
+			$mp = new ilMediaPlayerGUI();
+			$mp->setFile($media_path);
+			$mp->setDisplayHeight(200);
+			$html = $mp->getMediaPlayerHtml();
+		}
+		else
+		{
+			// download?
+			$html = "";
+		}
+		return $html;
+	}
+
+	/**
+	 * Render media
+	 *
+	 * @param ilNewsItem
+	 * @return string
+	 */
+	protected function renderMediaModal(ilNewsItem $i)
+	{
+		global $DIC;
+
+		$media_path = $this->getMediaPath($i);
+		$mime = ilObjMediaObject::getMimeType($media_path);
+
+		$ui_factory = $DIC->ui()->factory();
+		$ui_renderer = $DIC->ui()->renderer();
+
+		$modal_html = "";
+
+		if (in_array($mime, array("image/jpeg", "image/svg+xml", "image/gif", "image/png")))
+		{
+			$title = basename($media_path);
+			$item_id = "il-news-modal-img-".$i->getId();
+			$image = $ui_renderer->render($ui_factory->image()->responsive($media_path, $title));
+			$modal = ilModalGUI::getInstance();
+			$modal->setId($item_id);
+			$modal->setType(ilModalGUI::TYPE_LARGE);
+			$modal->setBody($image);
+			$modal->setHeading($title);
+			$modal_html = $modal->getHTML();
+		}
+		return $modal_html;
+	}
+
 
 	/**
 	 * Render footer
@@ -283,7 +346,31 @@ class ilNewsTimelineItemGUI implements ilTimelineItemInt
 		//ilNoteGUI::getListCommentsJSCall($this->ajax_hash, $redraw_js)
 		$html.= $this->ctrl->getHTML($note_gui);
 
-		return $html;
+		return $html.$this->renderMediaModal($i);
+	}
+
+	/**
+	 * @param ilNewsItem $i
+	 * @return string
+	 */
+	protected function getMediaPath(ilNewsItem $i)
+	{
+		$media_path = "";
+		if ($i->getMobId() > 0)
+		{
+			include_once("./Services/MediaObjects/classes/class.ilObjMediaObject.php");
+			include_once("./Services/MediaObjects/classes/class.ilMediaPlayerGUI.php");
+			$mob = new ilObjMediaObject($i->getMobId());
+			$med = $mob->getMediaItem("Standard");
+			if (strcasecmp("Reference", $med->getLocationType()) == 0)
+			{
+				$media_path = $med->getLocation();
+			} else
+			{
+				$media_path = ilObjMediaObject::_getURL($mob->getId()) . "/" . $med->getLocation();
+			}
+		}
+		return $media_path;
 	}
 
 }

@@ -295,6 +295,53 @@ class ilLikeData
 		return $exp;
 	}
 
+	/**
+	 * Get expression entries for obj/subobj/news
+	 *
+	 * @param int $obj_id
+	 * @param int $since_ts timestamp (show only data since...)
+	 * @return array
+	 * @throws ilLikeDataException
+	 */
+	public function getExpressionEntriesForObject($obj_id, $since_ts = null)
+	{
+		if (!is_array($this->data[$obj_id]))
+		{
+			include_once("./Services/Like/exceptions/class.ilLikeDataException.php");
+			throw new ilLikeDataException("No data loaded for object $obj_id.");
+		}
+		$exp = array();
+		foreach ($this->data[$obj_id] as $sub_obj_id => $si)
+		{
+			foreach ($si as $sub_obj_type => $so)
+			{
+				foreach ($so as $news_id => $ni)
+				{
+					foreach ($ni as $exp_type => $entry)
+					{
+						foreach ($entry as $user => $ts)
+						{
+							if ($since_ts == null || $ts > $since_ts)
+							{
+								$exp[] = array(
+									"sub_obj_id" => $sub_obj_id,
+									"sub_obj_type" => $sub_obj_type,
+									"news_id" => $news_id,
+									"expression" => $exp_type,
+									"user_id" => $user,
+									"timestamp" => $ts
+								);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		$exp = ilUtil::sortArray($exp, "timestamp", "desc");
+		return $exp;
+	}
+
 
 }
 

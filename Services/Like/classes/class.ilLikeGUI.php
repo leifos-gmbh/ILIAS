@@ -58,6 +58,11 @@ class ilLikeGUI
 	protected $dom_id;
 
 	/**
+	 * @var ilLanguage
+	 */
+	protected $language;
+
+	/**
 	 * ilLikeGUI constructor.
 	 * @param ilLikeData $data
 	 * @param ilTemplate|null $main_tpl
@@ -74,6 +79,7 @@ class ilLikeGUI
 		$this->ctrl = $DIC->ctrl();
 		$this->user = $DIC->user();
 		$this->ui = $DIC->ui();
+		$this->lng = $DIC->language();
 
 		$this->data = $data;
 
@@ -363,7 +369,44 @@ class ilLikeGUI
 	}
 
 
+	/**
+	 * Get unicode for const
+	 *
+	 * @param int $a_const
+	 * @return string
+	 */
+	/*
+	static public function getCharacter($a_const)
+	{
+		$tpl = new ilTemplate("tpl.unicodes.html", true, true, "Services/Like");
+		$tpl->touchBlock("u".$a_const);
+		return $tpl->get();
+	}*/
 
+	/**
+	 * Get expresseion text for const
+	 *
+	 * @param int $a_const
+	 * @return string
+	 */
+	static public function getExpressionText($a_const)
+	{
+		global $DIC;
+
+		$lng = $DIC->language();
+
+		switch ($a_const)
+		{
+			case ilLikeData::TYPE_LIKE: return $lng->txt("like"); break;
+			case ilLikeData::TYPE_DISLIKE: return $lng->txt("dislike"); break;
+			case ilLikeData::TYPE_LOVE: return $lng->txt("love"); break;
+			case ilLikeData::TYPE_LAUGH: return $lng->txt("laugh"); break;
+			case ilLikeData::TYPE_ASTOUNDED: return $lng->txt("astounded"); break;
+			case ilLikeData::TYPE_SAD: return $lng->txt("sad"); break;
+			case ilLikeData::TYPE_ANGRY: return $lng->txt("angry"); break;
+		}
+		return "";
+	}
 
 }
 

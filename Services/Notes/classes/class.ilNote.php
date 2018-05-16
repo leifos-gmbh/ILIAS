@@ -273,6 +273,26 @@ class ilNote
 	}
 	
 	/**
+	 * Set news id
+	 *
+	 * @param int $a_val news id	
+	 */
+	function setNewsId($a_val)
+	{
+		$this->news_id = $a_val;
+	}
+	
+	/**
+	 * Get news id
+	 *
+	 * @return int news id
+	 */
+	function getNewsId()
+	{
+		return $this->news_id;
+	}
+	
+	/**
 	* set repository object status
 	*
 	* @param	bool		
@@ -445,12 +465,10 @@ class ilNote
 
 		$news_where =
 			" AND news_id = ".$ilDB->quote((int) $a_news_id, "integer");
-		
-		if(!$a_repository_mode)
-		{
-			$sub_where .= " AND no_repository = ".$ilDB->quote(1, "integer");
-		}
-		
+
+
+		$sub_where .= " AND no_repository = ".$ilDB->quote(!$a_repository_mode, "integer");
+
 		$q = "SELECT * FROM note WHERE ".
 			" rep_obj_id = ".$ilDB->quote((int) $a_rep_obj_id, "integer").
 			$sub_where.
@@ -481,6 +499,43 @@ class ilNote
 			$notes[$cnt]->setAllData($note_rec);
 		}
 		
+		return $notes;
+	}
+
+	/**
+	 * get all notes related to a single repository object
+	 */
+	public static function _getAllNotesOfSingleRepObject($a_rep_obj_id, $a_type = IL_NOTE_PRIVATE, $a_incl_sub = false, $a_sort_ascending = false,
+		$a_since = "")
+	{
+		global $DIC;
+
+		$ilDB = $DIC->database();
+
+		$sub_where = (!$a_incl_sub)
+			? " AND obj_id = ".$ilDB->quote((int) 0, "integer") : "";
+
+		if ($a_since != "")	{
+			$sub_where.=" AND creation_date > ".$ilDB->quote($a_since, "timestamp");
+		}
+
+		$sub_where .= " AND no_repository = ".$ilDB->quote(0, "integer");
+
+		$q = "SELECT * FROM note WHERE ".
+			" rep_obj_id = ".$ilDB->quote((int) $a_rep_obj_id, "integer").
+			$sub_where.
+			" AND type = ".$ilDB->quote((int) $a_type, "integer").
+			" ORDER BY creation_date ";
+
+		$q .= ((bool)$a_sort_ascending) ? "ASC" : "DESC";
+		$set = $ilDB->query($q);
+		$notes = array();
+		while($note_rec = $ilDB->fetchAssoc($set))
+		{
+			$cnt = count($notes);
+			$notes[$cnt] = new ilNote();
+			$notes[$cnt]->setAllData($note_rec);
+		}
 		return $notes;
 	}
 

@@ -14,6 +14,16 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+news#:#news_new_reactions#:#Neue Reaktionen
+news#:#news_new_comments#:#Neue Kommentare
+like#:#reaction#:#Reaktion
+common#:#like#:#Like
+common#:#love#:#Love
+common#:#dislike#:#Dislike
+common#:#laugh#:#Laugh
+common#:#astounded#:#Astounded
+common#:#sad#:#Sad
+common#:#angry#:#Angry
 news#:#news_media#:#Mediendatei
 like#:#like#:#Like
 notes#:#notes_latest_comment#:#Letzter Kommentar

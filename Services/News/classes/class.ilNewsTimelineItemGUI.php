@@ -333,7 +333,6 @@ class ilNewsTimelineItemGUI implements ilTimelineItemInt
 		$this->like_gui->setObject($i->getContextObjId(), $i->getContextObjType(),
 			$i->getContextSubObjId(), $i->getContextSubObjType(), $i->getId());
 		$html = $this->ctrl->getHTML($this->like_gui);
-		$this->ctrl->setParameterByClass("ilnewstimelinegui", "news_id", $_GET["news_id"]);
 
 		// comments
 		$notes_obj_type = ($i->getContextSubObjType() == "")
@@ -345,6 +344,8 @@ class ilNewsTimelineItemGUI implements ilTimelineItemInt
 
 		//ilNoteGUI::getListCommentsJSCall($this->ajax_hash, $redraw_js)
 		$html.= $this->ctrl->getHTML($note_gui);
+
+		$this->ctrl->setParameterByClass("ilnewstimelinegui", "news_id", $_GET["news_id"]);
 
 		return $html.$this->renderMediaModal($i);
 	}

@@ -139,6 +139,17 @@ class ilNewsTimelineGUI
 				$ret = $ctrl->forwardCommand($like_gui);
 				break;
 
+			case "ilnotegui":
+				$i = new ilNewsItem($this->news_id);
+				$ctrl->saveParameter($this,"news_id");
+				$notes_obj_type = ($i->getContextSubObjType() == "")
+					? $i->getContextObjType()
+					: $i->getContextSubObjType();
+				$note_gui = new ilNoteGUI($i->getContextObjId(), $i->getContextSubObjId(),
+					$notes_obj_type, false,  $i->getId());
+				$ret = $ctrl->forwardCommand($note_gui);
+				break;
+
 			default:
 				if (in_array($cmd, array("show", "save", "update", "loadMore", "remove", "updateNewsItem")))
 				{

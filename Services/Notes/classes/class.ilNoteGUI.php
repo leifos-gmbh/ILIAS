@@ -592,15 +592,18 @@ if ($this->private_enabled && $this->public_enabled
 		$anch = $this->anchor_jump
 			? "notes_top"
 			: "";
-		$tpl->setVariable("FORMACTION", $ilCtrl->getFormAction($this, "getNotesHTML", $anch));
-		if ($this->ajax)
-		{
-			$os = "onsubmit = \"ilNotes.cmdAjaxForm(event, '".
-				$ilCtrl->getFormActionByClass("ilnotegui", "", "", true).
-				"'); return false;\"";
-			$tpl->setVariable("ON_SUBMIT_FORM", $os);
-			$tpl->setVariable("FORM_ID", "Ajax");
+		if (!$this->only_latest)	{
+			$tpl->setVariable("FORMACTION", $ilCtrl->getFormAction($this, "getNotesHTML", $anch));
+			if ($this->ajax)
+			{
+				$os = "onsubmit = \"ilNotes.cmdAjaxForm(event, '".
+					$ilCtrl->getFormActionByClass("ilnotegui", "", "", true).
+					"'); return false;\"";
+				$tpl->setVariable("ON_SUBMIT_FORM", $os);
+				$tpl->setVariable("FORM_ID", "Ajax");
+			}
 		}
+
 		
 		if ($this->export_html || $this->print)
 		{
@@ -1437,7 +1440,7 @@ return;
 		$ilUser = $this->user;
 		$lng = $this->lng;
 		$ilCtrl = $this->ctrl;
-	
+		//ilLoggerFactory::getLogger("root")->notice("addNote");
 		$this->initNoteForm("create", $_GET["note_type"]);
 
 		//if ($this->form->checkInput())
@@ -1844,7 +1847,8 @@ $ilCtrl->redirect($this, "showNotes", "notes_top", $this->ajax);
 		$r = $this->ui->renderer();
 
 		$lng = $this->lng;
-
+		$ctrl = $this->ctrl;
+		$ctrl->setParameter($this, "news_id", $this->news_id);
 		$hash = ilCommonActionDispatcherGUI::buildAjaxHash(
 			ilCommonActionDispatcherGUI::TYPE_REPOSITORY,
 			null , ilObject::_lookupType($this->rep_obj_id), $this->rep_obj_id, "", 0, $this->news_id);
@@ -1853,13 +1857,15 @@ $ilCtrl->redirect($this, "showNotes", "notes_top", $this->ajax);
 		$cnt = $cnt[$this->rep_obj_id][IL_NOTE_PUBLIC];
 
 		$tpl = new ilTemplate("tpl.note_widget_header.html", true, true, "Services/Notes");
-
+		$widget_el_id = "notew_".str_replace(";","_", $hash);
+		$ctrl->setParameter($this, "hash", $hash);
+		$update_url = $ctrl->getLinkTarget($this, "updateWidget","",true,false);
 		$comps = array();
 		if ($cnt > 0)
 		{
 			$c = $f->counter()->status((int) $cnt);
-			$comps[] = $f->glyph()->comment()->withCounter($c)->withAdditionalOnLoadCode(function($id) use ($hash) {
-				return "$(\"#$id\").click(function() { ".self::getListCommentsJSCall($hash, null)."});";
+			$comps[] = $f->glyph()->comment()->withCounter($c)->withAdditionalOnLoadCode(function($id) use ($hash, $update_url, $widget_el_id) {
+				return "$(\"#$id\").click(function() { ".self::getListCommentsJSCall($hash, "ilNotes.updateWidget(\"".$widget_el_id."\",\"".$update_url."\");")."});";
 			});
 			$comps[] = $f->divider()->vertical();
 			$tpl->setVariable("GLYPH", $r->render($comps));
@@ -1867,21 +1873,34 @@ $ilCtrl->redirect($this, "showNotes", "notes_top", $this->ajax);
 		}
 
 
-		$b = $f->button()->shy($lng->txt("notes_add_edit_comment"), "#")->withAdditionalOnLoadCode(function($id) use ($hash) {
-			return "$(\"#$id\").click(function() { ".self::getListCommentsJSCall($hash, null)."});";
+		$b = $f->button()->shy($lng->txt("notes_add_edit_comment"), "#")->withAdditionalOnLoadCode(function($id) use ($hash,$update_url,$widget_el_id) {
+			return "$(\"#$id\").click(function() { ".self::getListCommentsJSCall($hash, "ilNotes.updateWidget(\"".$widget_el_id."\",\"".$update_url."\");")."});";
 		});
-		$tpl->setVariable("SHY_BUTTON", $r->render($b));
+		$tpl->setVariable("SHY_BUTTON", $r->renderAsync($b));
 
 		$this->widget_header = $tpl->get();
 
 		$this->hide_new_form = true;
 		$this->only_latest = true;
 		$this->no_actions = true;
-		$html = $this->getNoteListHTML(IL_NOTE_PUBLIC);
-
+		$html = "<div id='".$widget_el_id."'>".$this->getNoteListHTML(IL_NOTE_PUBLIC)."</div>";
+		$ctrl->setParameter($this, "news_id", $_GET["news_id"]);
 		return $html;
 
 	}
+
+	/**
+	 * Update widget
+	 *
+	 * @param
+	 * @return
+	 */
+	protected function updateWidget()
+	{
+		echo $this->getCommentsWidget();
+		exit;
+	}
+
 	
 }
 

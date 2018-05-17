@@ -1876,7 +1876,14 @@ $ilCtrl->redirect($this, "showNotes", "notes_top", $this->ajax);
 		$b = $f->button()->shy($lng->txt("notes_add_edit_comment"), "#")->withAdditionalOnLoadCode(function($id) use ($hash,$update_url,$widget_el_id) {
 			return "$(\"#$id\").click(function(event) { ".self::getListCommentsJSCall($hash, "ilNotes.updateWidget(\"".$widget_el_id."\",\"".$update_url."\");")."});";
 		});
-		$tpl->setVariable("SHY_BUTTON", $r->renderAsync($b));
+		if ($ctrl->isAsynch())
+		{
+			$tpl->setVariable("SHY_BUTTON", $r->renderAsync($b));
+		}
+		else
+		{
+			$tpl->setVariable("SHY_BUTTON", $r->render($b));
+		}
 
 		$this->widget_header = $tpl->get();
 

@@ -169,10 +169,6 @@ class ilLikeGUI
 		$emo_counters = $this->renderEmoCounters($modal->getShowSignal());
 		$tpl->setVariable("EMO_COUNTERS", $emo_counters.$r->render($modal));
 
-		if ($emo_counters != "")
-		{
-			//$tpl->setVariable("SEP", $r->render($f->divider()->vertical()));
-		}
 
 
 		// emoticon popover
@@ -237,7 +233,7 @@ class ilLikeGUI
 			$tpl->setVariable("SEP", $r->render($f->divider()->vertical()));
 		}
 
-		return $tpl->get().$d;
+		return $tpl->get();
 	}
 
 
@@ -362,6 +358,7 @@ class ilLikeGUI
 		));
 
 		$header = $f->legacy($this->renderEmoCounters());
+		//$header = $f->legacy("---");
 
 		$modal = $f->modal()->roundtrip('', [$header, $std_list]);
 		echo $r->render($modal);

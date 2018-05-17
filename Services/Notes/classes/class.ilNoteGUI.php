@@ -1865,7 +1865,7 @@ $ilCtrl->redirect($this, "showNotes", "notes_top", $this->ajax);
 		{
 			$c = $f->counter()->status((int) $cnt);
 			$comps[] = $f->glyph()->comment()->withCounter($c)->withAdditionalOnLoadCode(function($id) use ($hash, $update_url, $widget_el_id) {
-				return "$(\"#$id\").click(function() { ".self::getListCommentsJSCall($hash, "ilNotes.updateWidget(\"".$widget_el_id."\",\"".$update_url."\");")."});";
+				return "$(\"#$id\").click(function(event) { ".self::getListCommentsJSCall($hash, "ilNotes.updateWidget(\"".$widget_el_id."\",\"".$update_url."\");")."});";
 			});
 			$comps[] = $f->divider()->vertical();
 			$tpl->setVariable("GLYPH", $r->render($comps));
@@ -1874,7 +1874,7 @@ $ilCtrl->redirect($this, "showNotes", "notes_top", $this->ajax);
 
 
 		$b = $f->button()->shy($lng->txt("notes_add_edit_comment"), "#")->withAdditionalOnLoadCode(function($id) use ($hash,$update_url,$widget_el_id) {
-			return "$(\"#$id\").click(function() { ".self::getListCommentsJSCall($hash, "ilNotes.updateWidget(\"".$widget_el_id."\",\"".$update_url."\");")."});";
+			return "$(\"#$id\").click(function(event) { ".self::getListCommentsJSCall($hash, "ilNotes.updateWidget(\"".$widget_el_id."\",\"".$update_url."\");")."});";
 		});
 		$tpl->setVariable("SHY_BUTTON", $r->renderAsync($b));
 

@@ -559,7 +559,6 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
 			}
 		}
 
-
 		$this->setData($data);
 	}
 	

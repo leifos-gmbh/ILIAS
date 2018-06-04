@@ -4649,7 +4649,7 @@ class ilObjSurvey extends ilObject
 							"accesscode" => $data["code"],
 							"lang" => $lang
 						));				
-					$messagetext = str_replace('[url]', "<" . $url . ">", $messagetext);
+					$messagetext = str_replace('[url]', $url, $messagetext);
 					foreach ($data as $key => $value)
 					{
 						$messagetext = str_replace('[' . $key . ']', $value, $messagetext);

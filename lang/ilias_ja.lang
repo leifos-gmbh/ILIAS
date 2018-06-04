@@ -396,6 +396,7 @@ adve#:#char_selector_unicode_all#:#全てのUnicodeブロック
 adve#:#char_selector_user#:#テスト中の特殊文字(Unicode)選択用メニュー
 assessment#:#0_unlimited#:#(0=制限なし)
 assessment#:#action#:#アクション
+assessment#:#question_browse_area_info#:#インポートしたい質問からオブジェクトを選択してください。
 assessment#:#add_answer#:#解答を追加
 assessment#:#add_answer_tf#:#正誤解答
 assessment#:#add_answer_yn#:#はい/いいえ解答
@@ -15952,3 +15953,13 @@ acc#:#acc_access_key#:#Access Key###15 03 2018 new variable
 assessment#:#false#:#False###15 03 2018 new variable
 assessment#:#log_user_solution_willingly_deleted#:#User deleted the answer.###15 03 2018 new variable
 assessment#:#true#:#True###15 03 2018 new variable
+dateplaner#:#crs_start#:#Course starts###25 04 2018 new variable
+dateplaner#:#crs_end#:#Course ends###25 04 2018 new variable
+file#:#file_suffix_default_white#:#Default Suffix Whitelist###25 04 2018 new variable
+file#:#file_suffix_default_white_info#:#Default list of accepted file suffixes.###25 04 2018 new variable
+file#:#file_suffix_custom_black#:#Custom Suffix Blacklist###25 04 2018 new variable
+file#:#file_suffix_custom_black_info#:#These suffixes will be removed from the default whitelist.###25 04 2018 new variable
+file#:#file_suffix_custom_white#:#Custom Suffix Whitelist###25 04 2018 new variable
+file#:#file_suffix_custom_white_info#:#These suffixes will be added to the default whitelist.###25 04 2018 new variable
+file#:#file_suffix_overall_white#:#Overal Suffix Whitelist###25 04 2018 new variable
+file#:#file_suffix_overall_white_info#:#Resulting overall list of accepted file suffixes.###25 04 2018 new variable

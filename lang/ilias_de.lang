@@ -1198,7 +1198,7 @@ assessment#:#test_using_template_link#:#Vorlage nicht mehr verwenden
 assessment#:#text_answers_saved#:#Die Punkte der Textfragen wurden gespeichert!###deprecated
 assessment#:#text_correct#:#Korrekter Text
 assessment#:#text_gap#:#Textlücke
-assessment#:#text_maximum_chars_allowed#:#Bitte geben Sie nicht mehr als ein Maximum von %s Zeichen ein. Alle weiteren Zeichen werden am Ende abgeschnitten.
+assessment#:#text_maximum_chars_allowed#:#Bitte geben Sie nicht mehr als ein Maximum von %s Zeichen ein. Alle weiteren Zeichen werden am Ende abgeschnitten. Eingaben über das Limit hinaus werden nicht abgeschnitten, können aber ggf. in die Bewertung mit eingehen.
 assessment#:#text_rating#:#Methode für Textvergleiche
 assessment#:#text_wrong#:#Fehlerhafter Text
 assessment#:#textsize#:#Textgröße
@@ -1401,7 +1401,7 @@ assessment#:#tst_presentation_properties#:#Durchführung: Verhalten der Frage
 assessment#:#tst_print#:#Test und Assessment – Druckansicht
 assessment#:#tst_print_date#:#Datum des Ausdrucks###deprecated
 assessment#:#tst_processing_time#:#Bearbeitungsdauer begrenzen
-assessment#:#tst_processing_time_desc#:#Teilnehmer können den Test nur für eine begrenzte Zeit bearbeiten. Die Zeit läuft von dem Moment des ersten Startens durch den Teilnehmer. "Test unterbrechen" stoppt den Ablauf der Bearbeitungsdauer nicht.
+assessment#:#tst_processing_time_desc#:#Teilnehmer können den Test nur für eine begrenzte Zeit bearbeiten. Die Zeit läuft von dem Moment des ersten Startens durch den Teilnehmer. "Test unterbrechen" stoppt den Ablauf der Bearbeitungsdauer nicht. Wenn die Anzahl möglicher Testdurchläufe eingeschränkt wird, erscheint im Tab "Teilnehmer" eine zusätzliche Funktion um Teilnehmern zusätzliche Zeit zu gewähren.
 assessment#:#tst_properties#:#Test-Eigenschaften###deprecated
 assessment#:#tst_qst_order#:#Nr.
 assessment#:#tst_qst_resetsolved#:#markiere als ungelöst###deprecated
@@ -1836,7 +1836,7 @@ blog#:#blog_admin_toggle_info#:#Das Blog-Feature kann in der Administration des 
 blog#:#blog_back_to_ilias#:#Zurück zu ILIAS###deprecated
 blog#:#blog_background_color#:#Hintergrundfarbe###deprecated
 blog#:#blog_banner#:#Banner
-blog#:#blog_change_notification_body_comment#:#der folgende Beitrag wurde kommentiert:###deprecated
+blog#:#blog_change_notification_body_comment#:#der folgende Beitrag wurde kommentiert:
 blog#:#blog_change_notification_body_new#:#der folgende Beitrag wurde neu angelegt:
 blog#:#blog_change_notification_body_update#:#der folgende Beitrag wurde geändert:
 blog#:#blog_change_notification_link#:#Link zum Beitrag
@@ -10972,8 +10972,8 @@ tagging#:#tagging_tag#:#Tag
 tagging#:#tagging_tag_info#:#Um Inhalte mit Tags (Schlagwörtern) auszuzeichnen, öffnen Sie die Info-Seite des Objekts und geben dort die Tags ein.
 tagging#:#tagging_tags#:#Tags
 tagging#:#tagging_users_using_tag#:#Benutzer, die Tags benutzen
-tbl#:#tbl_export_csv#:#.csv exportieren
-tbl#:#tbl_export_excel#:#.xls exportieren
+tbl#:#tbl_export_csv#:#CSV-Export
+tbl#:#tbl_export_excel#:#Excel-Export
 tbl#:#tbl_template_create#:#Aktuelle Ansicht speichern
 tbl#:#tbl_template_created#:#Die aktuelle Ansicht wurde gespeichert.
 tbl#:#tbl_template_delete#:#Gespeicherte Ansicht löschen
@@ -11529,6 +11529,7 @@ content#:#cont_current_term#:#Aktueller Begriff
 assessment#:#tst_setting_offer_hints_label#:#Lösungshinweise
 assessment#:#tst_setting_offer_hints_info#:#Teilnehmer können Lösungshinweise anfordern, um eine Frage zu beantworten. Pro gegebenem Lösungshinweis verringern sich die Punkte für die richtige Antwort.
 assessment#:#tst_question_hints_tab#:#Lösungshinweise
+assessment#:#question_browse_area_info#:#Wählen sie bitte ein Objekt aus dem sie Fragen importieren wollen.
 assessment#:#tst_question_hints_table_header#:#Lösungshinweise zur Frage: %s
 assessment#:#tst_question_hints_table_no_items#:#Keine vorhandenen Lösungshinweise
 assessment#:#tst_question_hints_table_column_hint_order#:#Reihenfolge
@@ -11580,6 +11581,7 @@ assessment#:#tst_question_hints_table_link_edit_hint_page#:#Seite bearbeiten
 assessment#:#tst_question_hints_form_cmd_save_points#:#Speichere Punkte
 assessment#:#tst_question_hints_form_cmd_save_points_and_edit_page#:# Speichere Punkte und bearbeite Seite
 assessment#:#tst_question_hints_back_to_hint_list#:#Liste der Lösungshinweise
+assessment#:#conf_delete_pass_ctm#:#Wollen Sie Ihre bisherigen Antworten wirklich löschen?
 assessment#:#conf_delete_pass#:#Durchgang wirklich löschen?
 common#:#objs_blog#:#Blogs
 common#:#obj_blog_duplicate#:#Blog kopieren
@@ -11695,9 +11697,9 @@ dcl#:#dcl_save_confirmation_desc#:#Benutzer muss das Eintragen von neuen Datens�
 dcl#:#dcl_confirm_storing_records#:#Bitte überprüfen Sie die Angaben vor dem Speichern.
 dcl#:#dcl_confirm_storing_records_no_permission#:#Sie haben keine Rechte, den Datensatz später nochmals zu bearbeiten.
 dcl#:#dcl_save_record#:#Eintrag speichern
-dcl#:#dlc_xls_async_export#:#Asynchroner XLSX export
+dcl#:#dlc_xls_async_export#:#Asynchroner Excel-Export
 dcl#:#dcl_export_started#:#Asynchroner Export gestartet
-dcl#:#dcl_export_finished#:#Export Abgeschlossen
+dcl#:#dcl_export_finished#:#Export abgeschlossen
 dcl#:#dcl_supported_filetypes#:#Erlaubte Dateiendungen
 dcl#:#dcl_supported_filetypes_desc#:#Sie können hier kommagetrennt Dateiendungen angeben. Zum Beispiel: pdf, docx
 dcl#:#dcl_no_export_data_available#:#Keine Daten oder Felder für den Export verfügbar.
@@ -15676,7 +15678,7 @@ style#:#system_style_activation_description#:#Aktive System Styles können besti
 style#:#system_style_default_description#:#Wenn aktiviert, ist dieser Style als Standard System Style festgelegt. Der Standard System Style wird verwendet, sofern der Benutzer noch keinen eigenen Style zugewiesen hat, oder der Benutzer nicht eingeloggt ist.
 style#:#system_style_personal_description#:#Wenn aktiviert, ist dieser Style als persönlicher Style festgelegt. Das stellt eine gute Hilfe dar, wenn aktuelle Änderungen am Skin mitverfolgt werden möchten.
 style#:#less_compile_failed#:#Die Less Datei konnte nicht kompiliert werden. Lessc muss dafür installiert und der Pfad im ILIAS setup richtig gesetzt sein.
-style#:#zip_export_failed#:#Der ZIP Export ist mit folgender Error Meldung fehlgeschlagen:
+style#:#zip_export_failed#:#Der ZIP-Export ist mit folgender Fehlermeldung fehlgeschlagen:
 style#:#no_style_selected#:#Es wurde kein Substyle ausgewählt.
 style#:#adapt_less#:#Anpassung der Less-Datei
 style#:#adapt_less_description#:#Dies ist die Darstellung aller less-Variablen aus dem aktuellen Skin. Variablennamen und Beschreibungen sind direkt aus den Dateien ausgelesen und daher nur in Originalsprache vorhanden. Der ausgewählte Style wird beim Aktualisieren/Zurücksetzen der Variablen vollständig neu kompiliert. Das Zurücksetzten der Variablen erstellt eine exakte Kopie des ursprünglichen "delos style".

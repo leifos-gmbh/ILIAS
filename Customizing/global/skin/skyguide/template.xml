@@ -1,0 +1,6 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<template xmlns = "http://www.w3.org" version = "$Id$" name = "ILIAS 5.1.x">
+	<style 	name = "SKYGUIDE"
+			id = "skyguide"
+			image_directory = "images" />
+</template>

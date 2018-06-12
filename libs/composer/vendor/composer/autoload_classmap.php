@@ -428,6 +428,7 @@ return array(
     'ILIAS\\Data\\Result' => $baseDir . '/../../src/Data/Result.php',
     'ILIAS\\Data\\Result\\Error' => $baseDir . '/../../src/Data/Result/Error.php',
     'ILIAS\\Data\\Result\\Ok' => $baseDir . '/../../src/Data/Result/Ok.php',
+    'ILIAS\\Data\\URI' => $baseDir . '/../../src/Data/URI.php',
     'ILIAS\\FileDelivery\\Delivery' => $baseDir . '/../../Services/FileDelivery/classes/Delivery.php',
     'ILIAS\\FileDelivery\\FileDeliveryTypes\\DeliveryMethod' => $baseDir . '/../../Services/FileDelivery/classes/FileDeliveryTypes/DeliveryMethod.php',
     'ILIAS\\FileDelivery\\FileDeliveryTypes\\FileDeliveryTypeFactory' => $baseDir . '/../../Services/FileDelivery/classes/FileDeliveryTypes/FileDeliveryTypeFactory.php',

@@ -620,6 +620,7 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
         'ILIAS\\Data\\Result' => __DIR__ . '/../..' . '/../../src/Data/Result.php',
         'ILIAS\\Data\\Result\\Error' => __DIR__ . '/../..' . '/../../src/Data/Result/Error.php',
         'ILIAS\\Data\\Result\\Ok' => __DIR__ . '/../..' . '/../../src/Data/Result/Ok.php',
+        'ILIAS\\Data\\URI' => __DIR__ . '/../..' . '/../../src/Data/URI.php',
         'ILIAS\\FileDelivery\\Delivery' => __DIR__ . '/../..' . '/../../Services/FileDelivery/classes/Delivery.php',
         'ILIAS\\FileDelivery\\FileDeliveryTypes\\DeliveryMethod' => __DIR__ . '/../..' . '/../../Services/FileDelivery/classes/FileDeliveryTypes/DeliveryMethod.php',
         'ILIAS\\FileDelivery\\FileDeliveryTypes\\FileDeliveryTypeFactory' => __DIR__ . '/../..' . '/../../Services/FileDelivery/classes/FileDeliveryTypes/FileDeliveryTypeFactory.php',

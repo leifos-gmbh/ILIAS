@@ -7912,9 +7912,6 @@ hr.il-divider-with-label {
 .il-viewcontrol-sortation .dropdown-toggle .caret:before {
   content: "\21f5";
 }
-.il-viewcontrol-pagination .dropdown {
-  display: inline;
-}
 .ilBlockContent .il-viewcontrol-section .btn.btn-default {
   background-color: transparent;
   border: 0;
@@ -10040,11 +10037,6 @@ footer.ilFooter {
   background-color: #4c6586;
   color: white;
 }
-@media only screen and (max-width: 767px) {
-  footer.ilFooter {
-    height: auto;
-  }
-}
 footer.ilFooter div.ilFooterContainer {
   color: white;
   line-height: 1.75;
@@ -10578,8 +10570,10 @@ form.form-inline {
   -webkit-box-shadow: none;
   box-shadow: none;
 }
-textarea.form-control {
-  max-width: 100%;
+.form-horizontal input.form-control,
+.form-horizontal textarea.form-control,
+.form-horizontal select.form-control {
+  /* max-width: 80%; */
 }
 select.form-control {
   width: auto;

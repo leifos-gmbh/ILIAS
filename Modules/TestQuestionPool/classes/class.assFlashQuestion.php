@@ -102,12 +102,30 @@ class assFlashQuestion extends assQuestion implements ilObjQuestionScoringAdjust
 								serialize( $this->getParameters() )
 							)
 		);
-		if ($_SESSION["flash_upload_filename"])
-		{
+
+		try {
+			$this->moveAppletIfExists();
+		} catch (\ilFileUtilsException $e) {
+			\ilLoggerFactory::getRootLogger()->error($e->getMessage());
+		}
+	}
+
+	/**
+	 * Moves an applet file (maybe stored in the PHP session) to its final filesystem destination
+	 * @throws \ilFileUtilsException
+	 */
+	protected function moveAppletIfExists()
+	{
+		if (
+			isset($_SESSION['flash_upload_filename']) && is_string($_SESSION['flash_upload_filename']) &&
+			file_exists($_SESSION['flash_upload_filename']) && is_file($_SESSION['flash_upload_filename'])
+		) {
 			$path = $this->getFlashPath();
-			ilUtil::makeDirParents( $path );
-			@rename( $_SESSION["flash_upload_filename"], $path . $this->getApplet() );
-			unset($_SESSION["flash_upload_filename"]);
+			\ilUtil::makeDirParents($path);
+
+			require_once 'Services/Utilities/classes/class.ilFileUtils.php';
+			\ilFileUtils::rename($_SESSION['flash_upload_filename'], $path . $this->getApplet());
+			unset($_SESSION['flash_upload_filename']);
 		}
 	}
 
@@ -731,7 +749,7 @@ class assFlashQuestion extends assQuestion implements ilObjQuestionScoringAdjust
 	{
 		// TODO: Implement getUserQuestionResult() method.
 	}
-
+	
 	/**
 	 * If index is null, the function returns an array with all anwser options
 	 * Else it returns the specific answer option
@@ -752,11 +770,11 @@ class assFlashQuestion extends assQuestion implements ilObjQuestionScoringAdjust
 	 */
 	// hey: refactored identifiers
 	public function buildTestPresentationConfig()
-	// hey.
+		// hey.
 	{
 		// hey: refactored identifiers
 		return parent::buildTestPresentationConfig()
-		// hey.
+			// hey.
 			->setFormChangeDetectionEnabled(false)
 			->setBackgroundChangeDetectionEnabled(true);
 	}

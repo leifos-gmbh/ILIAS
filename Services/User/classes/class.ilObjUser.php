@@ -1365,6 +1365,10 @@ class ilObjUser extends ilObject
 		// badges
 		include_once "Services/Badge/classes/class.ilBadgeAssignment.php";
 		ilBadgeAssignment::deleteByUserId($this->getId());
+
+		// remove org unit assignments
+		$ilOrgUnitUserAssignmentQueries = ilOrgUnitUserAssignmentQueries::getInstance();
+		$ilOrgUnitUserAssignmentQueries->deleteAllAssignmentsOfUser($this->getId());
 		
 		// Delete user defined field entries
 		$this->deleteUserDefinedFieldEntries();
@@ -1467,28 +1471,6 @@ class ilObjUser extends ilObject
 		}
 
 		return ilUtil::stripSlashes(substr($this->lastname,0,$a_max_strlen));
-	}
-
-	/**
-	* check wether user has accepted user agreement
-	*/
-	function hasAcceptedUserAgreement()
-	{
-		/**
-		 * @var ilRbacReview
-		 */
-		global $rbacreview;
-
-		if(
-			null != $this->agree_date ||
-			'root' == $this->login ||
-			in_array($this->getId(), array(ANONYMOUS_USER_ID, SYSTEM_USER_ID)) ||
-			$rbacreview->isAssigned($this->getId(), SYSTEM_ROLE_ID)
-		)
-		{
-			return true;
-		}
-		return false;
 	}
 
 	/**
@@ -2360,6 +2342,8 @@ class ilObjUser extends ilObject
 				!ilAuthUtils::_needsExternalAccountByAuthMode($this->getAuthMode(true))
 			) {
 				return true;
+			} else {
+				return false;
 			}
 		}
 
@@ -3797,7 +3781,7 @@ class ilObjUser extends ilObject
 
 		// For compatibility, check for login (no ext_account entry given)
 		$res = $db->queryF("SELECT login FROM usr_data ".
-			"WHERE login = %s AND auth_mode = %s AND ext_account IS NULL ",
+			"WHERE login = %s AND auth_mode = %s AND (ext_account IS NULL OR ext_account = '') ",
 			array("text", "text"),
 			array($a_account, $a_auth));
 		if($usr = $db->fetchAssoc($res))
@@ -5467,19 +5451,13 @@ class ilObjUser extends ilObject
 	 */
 	public function hasToAcceptTermsOfService()
 	{
-		/**
-		 * @var ilRbacReview
-		 */
-		global $rbacreview;
-
 		require_once 'Services/TermsOfService/classes/class.ilTermsOfServiceHelper.php';
 
 		if(
 			ilTermsOfServiceHelper::isEnabled() && 
 			null == $this->agree_date &&
 			'root' != $this->login &&
-			!in_array($this->getId(), array(ANONYMOUS_USER_ID, SYSTEM_USER_ID)) &&
-			!$rbacreview->isAssigned($this->getId(), SYSTEM_ROLE_ID)
+			!in_array($this->getId(), array(ANONYMOUS_USER_ID, SYSTEM_USER_ID))
 		)
 		{
 			return true;

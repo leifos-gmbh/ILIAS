@@ -7575,7 +7575,7 @@ function getAnswerFeedbackPoints()
 			if (is_numeric($user_id))
 			{
 				$result = $ilDB->queryF("SELECT tst_active.active_id, tst_active.tries, usr_id, %s login, %s lastname, %s firstname, tst_invited_user.clientip, " .
-					"tst_active.submitted test_finished, matriculation, IFNULL(tst_active.last_finished_pass, -1) <> tst_active.last_started_pass unfinished_passes  FROM usr_data, tst_invited_user " .
+					"tst_active.submitted test_finished, matriculation, COALESCE(tst_active.last_finished_pass, -1) <> tst_active.last_started_pass unfinished_passes  FROM usr_data, tst_invited_user " .
 					"LEFT JOIN tst_active ON tst_active.user_fi = tst_invited_user.user_fi AND tst_active.test_fi = tst_invited_user.test_fi " .
 					"WHERE tst_invited_user.test_fi = %s and tst_invited_user.user_fi=usr_data.usr_id AND usr_data.usr_id=%s " .
 					"ORDER BY $order",
@@ -7586,7 +7586,7 @@ function getAnswerFeedbackPoints()
 			else
 			{
 				$result = $ilDB->queryF("SELECT tst_active.active_id, usr_id, %s login, %s lastname, %s firstname, tst_invited_user.clientip, " .
-					"tst_active.submitted test_finished, matriculation, IFNULL(tst_active.last_finished_pass, -1) <> tst_active.last_started_pass unfinished_passes  FROM usr_data, tst_invited_user " .
+					"tst_active.submitted test_finished, matriculation, COALESCE(tst_active.last_finished_pass, -1) <> tst_active.last_started_pass unfinished_passes  FROM usr_data, tst_invited_user " .
 					"LEFT JOIN tst_active ON tst_active.user_fi = tst_invited_user.user_fi AND tst_active.test_fi = tst_invited_user.test_fi " .
 					"WHERE tst_invited_user.test_fi = %s and tst_invited_user.user_fi=usr_data.usr_id " .
 					"ORDER BY $order",
@@ -7600,7 +7600,7 @@ function getAnswerFeedbackPoints()
 			if (is_numeric($user_id))
 			{
 				$result = $ilDB->queryF("SELECT tst_active.active_id, tst_active.tries, usr_id, login, lastname, firstname, tst_invited_user.clientip, " .
-					"tst_active.submitted test_finished, matriculation, IFNULL(tst_active.last_finished_pass, -1) <> tst_active.last_started_pass unfinished_passes  FROM usr_data, tst_invited_user " .
+					"tst_active.submitted test_finished, matriculation, COALESCE(tst_active.last_finished_pass, -1) <> tst_active.last_started_pass unfinished_passes  FROM usr_data, tst_invited_user " .
 					"LEFT JOIN tst_active ON tst_active.user_fi = tst_invited_user.user_fi AND tst_active.test_fi = tst_invited_user.test_fi " .
 					"WHERE tst_invited_user.test_fi = %s and tst_invited_user.user_fi=usr_data.usr_id AND usr_data.usr_id=%s " .
 					"ORDER BY $order",
@@ -7611,7 +7611,7 @@ function getAnswerFeedbackPoints()
 			else
 			{
 				$result = $ilDB->queryF("SELECT tst_active.active_id, tst_active.tries, usr_id, login, lastname, firstname, tst_invited_user.clientip, " .
-					"tst_active.submitted test_finished, matriculation, IFNULL(tst_active.last_finished_pass, -1) <> tst_active.last_started_pass unfinished_passes  FROM usr_data, tst_invited_user " .
+					"tst_active.submitted test_finished, matriculation, COALESCE(tst_active.last_finished_pass, -1) <> tst_active.last_started_pass unfinished_passes  FROM usr_data, tst_invited_user " .
 					"LEFT JOIN tst_active ON tst_active.user_fi = tst_invited_user.user_fi AND tst_active.test_fi = tst_invited_user.test_fi " .
 					"WHERE tst_invited_user.test_fi = %s and tst_invited_user.user_fi=usr_data.usr_id " .
 					"ORDER BY $order",
@@ -7651,7 +7651,7 @@ function getAnswerFeedbackPoints()
 						usr_data.matriculation,
 						usr_data.active,
 						tst_active.lastindex,
-						IFNULL(tst_active.last_finished_pass, -1) <> tst_active.last_started_pass unfinished_passes 
+						COALESCE(tst_active.last_finished_pass, -1) <> tst_active.last_started_pass unfinished_passes 
 				FROM tst_active
 				LEFT JOIN usr_data
 				ON tst_active.user_fi = usr_data.usr_id
@@ -7676,7 +7676,7 @@ function getAnswerFeedbackPoints()
 						usr_data.matriculation,
 						usr_data.active,
 						tst_active.lastindex,
-						IFNULL(tst_active.last_finished_pass, -1) <> tst_active.last_started_pass unfinished_passes 
+						COALESCE(tst_active.last_finished_pass, -1) <> tst_active.last_started_pass unfinished_passes 
 				FROM tst_active
 				LEFT JOIN usr_data
 				ON tst_active.user_fi = usr_data.usr_id
@@ -8071,6 +8071,7 @@ function getAnswerFeedbackPoints()
 			}
 			foreach ($participants as $active_id => $user_rec)
 			{
+				$mark = $ects_mark = '';
 				$row = array();
 				$reached_points = 0;
 				$max_points = 0;
@@ -8097,7 +8098,10 @@ function getAnswerFeedbackPoints()
 				if ($mark_obj)
 				{
 					$mark = $mark_obj->getOfficialName();
-					$ects_mark = $this->getECTSGrade($passed_array, $reached_points, $max_points);
+					if($this->getECTSOutput())
+					{
+						$ects_mark = $this->getECTSGrade($passed_array, $reached_points, $max_points);
+					}
 				}
 				if ($this->getAnonymity())
 				{
@@ -8202,7 +8206,7 @@ function getAnswerFeedbackPoints()
 		public static function _getMaxPass($active_id)
 		{
 			global $ilDB;
-			$result = $ilDB->queryF("SELECT MAX(pass) maxpass FROM tst_test_result WHERE active_fi = %s",
+			$result = $ilDB->queryF("SELECT MAX(pass) maxpass FROM tst_pass_result WHERE active_fi = %s",
 				array('integer'),
 				array($active_id)
 			);

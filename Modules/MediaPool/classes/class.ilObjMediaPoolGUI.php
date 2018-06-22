@@ -17,7 +17,7 @@ include_once("./Services/Clipboard/classes/class.ilEditClipboardGUI.php");
 * @ilCtrl_Calls ilObjMediaPoolGUI: ilObjMediaObjectGUI, ilObjFolderGUI, ilEditClipboardGUI, ilPermissionGUI
 * @ilCtrl_Calls ilObjMediaPoolGUI: ilInfoScreenGUI, ilMediaPoolPageGUI, ilExportGUI, ilFileSystemGUI
 * @ilCtrl_Calls ilObjMediaPoolGUI: ilCommonActionDispatcherGUI, ilObjectCopyGUI, ilObjectTranslationGUI, ilMediaPoolImportGUI
-* @ilCtrl_Calls ilObjMediaPoolGUI: ilMobMultiSrtUploadGUI
+* @ilCtrl_Calls ilObjMediaPoolGUI: ilMobMultiSrtUploadGUI, ilObjectMetaDataGUI
 *
 * @ingroup ModulesMediaPool
 */
@@ -138,6 +138,20 @@ class ilObjMediaPoolGUI extends ilObject2GUI
 
 		switch($next_class)
 		{
+			case 'ilobjectmetadatagui';
+				$this->checkPermission("write");
+
+				$this->prepareOutput();
+				$this->addHeaderAction();
+
+				$this->tabs_gui->activateTab('meta_data');
+				include_once 'Services/Object/classes/class.ilObjectMetaDataGUI.php';
+				$md_gui = new ilObjectMetaDataGUI($this->object, 'mob');
+				$this->ctrl->forwardCommand($md_gui);
+				$this->tpl->show();
+				break;
+
+
 			case 'ilmediapoolpagegui':
 				$this->checkPermission("write");
 				$this->prepareOutput();
@@ -441,18 +455,54 @@ class ilObjMediaPoolGUI extends ilObject2GUI
 		$ni->setSize(5);
 		$ni->setInfo($this->lng->txt("mep_default_width_height_info"));
 		$a_form->addItem($ni);
+
+		// additional features
+		$feat = new ilFormSectionHeaderGUI();
+		$feat->setTitle($this->lng->txt('obj_features'));
+		$a_form->addItem($feat);
+
+		include_once './Services/Container/classes/class.ilContainer.php';
+		include_once './Services/Object/classes/class.ilObjectServiceSettingsGUI.php';
+		ilObjectServiceSettingsGUI::initServiceSettingsForm(
+			$this->object->getId(),
+			$a_form,
+			array(
+				ilObjectServiceSettingsGUI::CUSTOM_METADATA
+			)
+		);
+
 	}
 
 	/**
-	 * Edit
+	 * edit object
 	 *
-	 * @param
-	 * @return
+	 * @access	public
 	 */
-	function edit()
+	public function edit()
 	{
+		$tpl = $this->tpl;
+		$ilTabs = $this->tabs_gui;
+		$ilErr = $this->ilErr;
+
 		$this->setSettingsSubTabs("settings");
-		parent::edit();
+
+		if (!$this->checkPermissionBool("write"))
+		{
+			$ilErr->raiseError($this->lng->txt("msg_no_perm_write"),$ilErr->MESSAGE);
+		}
+
+		$ilTabs->activateTab("settings");
+
+		$form = $this->initEditForm();
+		$values = $this->getEditFormValues();
+		if($values)
+		{
+			$form->setValuesByArray($values, true);
+		}
+
+		$this->addExternalEditFormCustom($form);
+
+		$tpl->setContent($form->getHTML());
 	}
 
 
@@ -472,6 +522,17 @@ class ilObjMediaPoolGUI extends ilObject2GUI
 	{
 		$this->object->setDefaultWidth($a_form->getInput("default_width"));
 		$this->object->setDefaultHeight($a_form->getInput("default_height"));
+
+		// additional features
+		include_once './Services/Object/classes/class.ilObjectServiceSettingsGUI.php';
+		ilObjectServiceSettingsGUI::updateServiceSettingsForm(
+			$this->object->getId(),
+			$a_form,
+			array(
+				ilObjectServiceSettingsGUI::CUSTOM_METADATA
+			)
+		);
+
 	}
 
 	/**
@@ -1516,7 +1577,21 @@ class ilObjMediaPoolGUI extends ilObject2GUI
 				"view", "ileditclipboardgui");
 		}
 
+		// properties
 		if ($ilAccess->checkAccess("write", "", $this->object->getRefId()))
+		{
+			// meta data
+			include_once "Services/Object/classes/class.ilObjectMetaDataGUI.php";
+			$mdgui = new ilObjectMetaDataGUI($this->object, "mob");
+			$mdtab = $mdgui->getTab();
+			if ($mdtab)
+			{
+				$ilTabs->addTarget("meta_data", $mdtab,
+					"", "ilobjectmetadatagui");
+			}
+		}
+
+			if ($ilAccess->checkAccess("write", "", $this->object->getRefId()))
 		{
 			$ilTabs->addTarget("export", $this->ctrl->getLinkTargetByClass("ilexportgui", ""),
 				"", "ilexportgui");

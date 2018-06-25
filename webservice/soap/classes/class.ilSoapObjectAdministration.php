@@ -35,10 +35,6 @@ include_once './webservice/soap/classes/class.ilSoapAdministration.php';
 
 class ilSoapObjectAdministration extends ilSoapAdministration
 {
-	function ilSoapObjectAdministration()
-	{
-		parent::ilSoapAdministration();
-	}
 
 	public function updateLomMetaData($sid, $a_rbac_id, $a_obj_id, $xml)
 	{

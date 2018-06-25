@@ -219,14 +219,19 @@ class ilSoapClient
 	public function call($a_operation, $a_params)
 	{
 		$error_message = '';
+		$is_fault = false;
 		
-		$this->log->debug('Calling webseervice: ' . $a_operations);
+		$this->log->debug('Calling webseervice: ' . $a_operation);
+		$this->log->dump($a_params, ilLogLevel::DEBUG);
 
 		$this->setSocketTimeout(false);
 		try {
-			return $this->client->__call($a_operation, $a_params);
+			$res = $this->client->__call($a_operation, $a_params);
+			$this->log->dump($res, ilLogLevel::DEBUG);
+			return $res;
 		} 
 		catch(SoapFault $exception) {
+			$is_fault = true;
 			$error_message = $exception->getMessage();
 			$this->log->error('Calling webservice failed with message: ' . $exception->getMessage());
 			$this->log->debug($this->client->__getLastResponseHeaders());
@@ -235,16 +240,22 @@ class ilSoapClient
 		}
 		catch(Exception $exception)
 		{
+			$is_fault = true;
 			$error_message = $exception->getMessage();
 			$this->log->error('Caught unknown exception with message: '. $exception->getMessage());
 			$this->log->debug($this->client->__getLastResponseHeaders());
 			$this->log->debug($this->client->__getLastResponse());
 		}
 		finally {
+
 			$this->resetSocketTimeout();
-			
-			if(stristr($error_message,'socket read of headers') === false)
+
+			if(
+				$is_fault &&
+				stristr($error_message,'socket read of headers') === false)
 			{
+				$this->log->dump($this->client->__getLastResponseHeaders());
+				$this->log->dump($this->client->__getLastResponse());
 				throw new ilSoapClientException($error_message);
 			}
 		}

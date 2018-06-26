@@ -133,7 +133,10 @@ class ilGroupXMLWriter extends ilXmlWriter
 	public function __buildGroup()
 	{
 		$attrs["exportVersion"] = $this->EXPORT_VERSION;
-		$attrs["id"] = "il_".$this->ilias->getSetting('inst_id').'_grp_'.$this->group_obj->getId();
+
+		// begin-patch ibi
+		#$attrs["id"] = "il_".$this->ilias->getSetting('inst_id').'_grp_'.$this->group_obj->getId();
+		$attrs['id'] = IL_INST_ID.'::'.$this->group_obj->getId();
 		
 		switch($this->group_obj->readGroupStatus())
 		{

@@ -222,11 +222,22 @@ class ilSoapWebLinkAdministration extends ilSoapAdministration
 									'Client');
 		}
 
+		// begin-patch ibi
+		// delete existing links
+		include_once './Modules/WebResource/classes/class.ilLinkResourceItems.php';
+		$links = new ilLinkResourceItems($webl->getId());
+		foreach($links->getAllItems() as $id => $info)
+		{
+			$links->delete($id);
+		}
+
 		try 
 		{
 			include_once './Modules/WebResource/classes/class.ilWebLinkXmlParser.php';
 			$parser = new ilWebLinkXmlParser($webl,$weblink_xml);
-			$parser->setMode(ilWebLinkXmlParser::MODE_UPDATE);
+			// begin-patch ibi
+			//$parser->setMode(ilWebLinkXmlParser::MODE_UPDATE);
+			$parser->setMode(ilWebLinkXmlParser::MODE_CREATE);
 			$parser->start();
 		}
 		catch(ilSaxParserException $e)

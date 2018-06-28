@@ -227,13 +227,17 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
 		$cols = [];
 		// additional user fields
 		if (($parent = $this->getParentGroupCourse()) !== false)	{
-			include_once './Services/PrivacySecurity/classes/class.ilExportFieldsInfo.php';
-			$ef = ilExportFieldsInfo::_getInstanceByType($parent["type"]);
-			foreach($ef->getSelectableFieldsInfo(ilObject::_lookupObjectId($parent["ref_id"])) as $k => $v)
+
+			if ($this->access->checkAccess("manage_members", "", $parent["ref_id"]))
 			{
-				if (!in_array($k, ["login"]))
+				include_once './Services/PrivacySecurity/classes/class.ilExportFieldsInfo.php';
+				$ef = ilExportFieldsInfo::_getInstanceByType($parent["type"]);
+				foreach ($ef->getSelectableFieldsInfo(ilObject::_lookupObjectId($parent["ref_id"])) as $k => $v)
 				{
-					$cols[$k] = $v;
+					if (!in_array($k, ["login"]))
+					{
+						$cols[$k] = $v;
+					}
 				}
 			}
 		}

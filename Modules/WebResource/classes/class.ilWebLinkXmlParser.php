@@ -347,7 +347,21 @@ class ilWebLinkXmlParser extends ilMDSaxParser
 			case 'Target':
 				if($this->current_link)
 				{
-					$this->current_link->setTarget(trim($this->cdata));
+					// begin-patch ibi
+					$target = trim($this->cdata);
+					if($this->current_link->getInternal())
+					{
+						$parts = explode('::',$target);
+						if(count($parts) == 2)
+						{
+							$obj_id = ilObject::_lookupObjIdByImportId($target);
+							$type = ilObject::_lookupType($obj_id);
+							$ref_ids = ilObject::_getAllReferences($obj_id);
+							$ref_id = end($ref_ids);
+							$target = $type.'|'.$ref_id;
+						}
+					}
+					$this->current_link->setTarget($target);
 				}
 				break;
 		}

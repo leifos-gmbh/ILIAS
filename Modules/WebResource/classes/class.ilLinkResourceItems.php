@@ -663,7 +663,25 @@ class ilLinkResourceItems
 		{
 			++$position;
 			$link = self::lookupItem($this->getLinkResourceId(), $item_id);
-			
+
+			// begin-patch ibi
+			// rewrite target using import id
+			$target = $link['target'];
+			if($link['internal'] == "1")
+			{
+				$parts = explode('|', (string)$link['target']);
+				if(count($parts) == 2)
+				{
+					$obj_id = ilObject::_lookupObjId($parts[1]);
+					$target = IL_INST_ID.'::'.$obj_id;
+				}
+				else
+				{
+					$item['valid'] = 0;
+					$target = 'invalid';
+				}
+			}
+
 			$writer->xmlStartTag(
 				'WebLink',
 				array(
@@ -677,11 +695,13 @@ class ilLinkResourceItems
 			);
 			$writer->xmlElement('Title',array(),$link['title']);
 			$writer->xmlElement('Description',array(),$link['description']);
-			$writer->xmlElement('Target',array(),$link['target']);
+
+
+			$writer->xmlElement('Target',array(), $target);
 			
 			// Dynamic parameters
 			include_once './Modules/WebResource/classes/class.ilParameterAppender.php';
-			foreach(ilParameterAppender::_getParams($link_id) as $param_id => $param)
+			foreach(ilParameterAppender::_getParams($item_id) as $param_id => $param)
 			{
 				$value = '';
 				switch($param['value'])

@@ -12,7 +12,8 @@
 class ilUIFramework
 {
 
-	const BOWER_BOOTSTRAP_JS = "libs/bower/bower_components/bootstrap/dist/js/bootstrap.min.js";
+	//const BOWER_BOOTSTRAP_JS = "libs/bower/bower_components/bootstrap/dist/js/bootstrap.min.js";
+	const BOWER_BOOTSTRAP_JS = "libs/composer/vendor/twbs/bootstrap/dist/js/bootstrap.bundle.js";
 
 
 	/**

@@ -86,8 +86,11 @@ class ilObjMediaPoolGUI extends ilObject2GUI
 	}
 	
 	/**
-	* execute command
-	*/
+	 * execute command
+	 *
+	 * @return bool|void
+	 * @throws ilCtrlException
+	 */
 	function executeCommand()
 	{
 		$ilTabs = $this->tabs;
@@ -206,6 +209,9 @@ class ilObjMediaPoolGUI extends ilObject2GUI
 				$this->getTemplate();
 				$ilObjMediaObjectGUI->setTabs();
 				$this->setLocator();
+
+				// set adv metadata record dobject
+				$ilObjMediaObjectGUI->setAdvMdRecordObject($this->object->getRefId(), "mep", "mob");
 
 				$ret = $this->ctrl->forwardCommand($ilObjMediaObjectGUI);
 

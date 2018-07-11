@@ -834,12 +834,15 @@ class ilAdvancedMDRecordGUI
 	 * Parse property for table head
 	 */
 	private function parseTableHead()
-	{	 	
-	 	foreach($this->getActiveRecords() as $record_obj)
-	 	{
-	 		include_once('Services/AdvancedMetaData/classes/class.ilAdvancedMDFieldDefinition.php');
-	 		foreach(ilAdvancedMDFieldDefinition::_getDefinitionsByRecordId($record_obj->getRecordId()) as $def)
-	 		{
+	{
+		include_once('Services/AdvancedMetaData/classes/class.ilAdvancedMDFieldDefinition.php');
+		foreach($this->getActiveRecords() as $record_obj)
+		{
+			$record_id = $record_obj->getRecordId();
+
+			$defs = ilAdvancedMDFieldDefinition::getInstancesByRecordId($record_id);
+			foreach($defs as $def)
+			{
 	 			if($this->handleECSDefinitions($def))
 	 			{
 	 				continue;
@@ -856,14 +859,16 @@ class ilAdvancedMDRecordGUI
 	private function parseTableCells()
 	{	 	
 	 	$data = $this->getRowData();
-	 	
 	 	$html = "";
-	 	
-	 	foreach($this->getActiveRecords() as $record_obj)
-	 	{
-	 		include_once('Services/AdvancedMetaData/classes/class.ilAdvancedMDFieldDefinition.php');
-	 		foreach(ilAdvancedMDFieldDefinition::_getDefinitionsByRecordId($record_obj->getRecordId()) as $def)
-	 		{
+
+		include_once('Services/AdvancedMetaData/classes/class.ilAdvancedMDFieldDefinition.php');
+		foreach($this->getActiveRecords() as $record_obj)
+		{
+			$record_id = $record_obj->getRecordId();
+
+			$defs = ilAdvancedMDFieldDefinition::getInstancesByRecordId($record_id);
+			foreach($defs as $def)
+			{
 	 			if($this->handleECSDefinitions($def))
 	 			{
 	 				continue;

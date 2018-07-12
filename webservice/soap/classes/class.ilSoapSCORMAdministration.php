@@ -35,6 +35,45 @@ include_once './webservice/soap/classes/class.ilSoapAdministration.php';
 class ilSoapSCORMAdministration extends ilSoapAdministration
 {
 
+
+	public function updateScormObject($sid, $ref_id, $abs_path)
+	{
+		$this->initAuth($sid);
+		$this->initIlias();
+
+		if(!$this->__checkSession($sid))
+		{
+			return $this->__raiseError($this->__getMessage(),$this->__getMessageCode());
+		}
+		if(!strlen($ref_id))
+		{
+			return $this->__raiseError('No ref id given. Aborting!',
+				'Client');
+		}
+		global $rbacsystem, $tree, $ilLog;
+
+		// get obj_id
+		if(!$obj_id = ilObject::_lookupObjectId($ref_id))
+		{
+			return $this->__raiseError('No scorm object found for id: '.$ref_id,
+				'Client');
+		}
+
+		$lm_obj = ilObjectFactory::getInstanceByObjId($obj_id, false);
+		if (!is_object($lm_obj) || $lm_obj->getType()!= "sahs")
+		{
+			return $this->__raiseError('Wrong obj id or type for scorm object with id '.$ref_id,
+				'Server');
+		}
+		// get scorm xml
+		require_once("./Modules/ScormAicc/classes/SCORM/class.ilSCORMObject.php");
+		require_once("./Modules/ScormAicc/classes/SCORM/class.ilSCORMResource.php");
+
+
+
+	}
+
+
   	/**
 	 * get ims manifest xml
 	 *

@@ -129,14 +129,13 @@ class ilSoapRBACAdministration extends ilSoapAdministration
 
 		global $rbacadmin,$ilAccess,$rbacreview;
 
-		$rolf = $GLOBALS['rbacreview']->getRoleFolderIdOfObject($ref_id);
-		if($rolf)
+		if($ref_id)
 		{
-			if($GLOBALS['rbacreview']->isAssignable($role_id,$rolf))
+			if($GLOBALS['rbacreview']->isAssignable($role_id,$ref_id))
 			{
 				return $this->deleteRole($sid, $role_id);
 			}
-			$GLOBALS['rbacadmin']->deleteLocalRole($role_id,$rolf);
+			$GLOBALS['rbacadmin']->deleteLocalRole($role_id,$ref_id);
 		}
 
 		return true;
@@ -391,7 +390,6 @@ class ilSoapRBACAdministration extends ilSoapAdministration
 		}
 
 		// init role
-		include_once './classes/class.ilObjectFactory.php';
 		$role = ilObjectFactory::getInstanceByObjId($role_id,false);
 		if(!$role instanceof ilObjRole)
 		{
@@ -402,15 +400,8 @@ class ilSoapRBACAdministration extends ilSoapAdministration
 			return $this->__raiseError('Access denied','Client');
 		}
 
-		$rolf = $GLOBALS['rbacreview']->getRoleFolderIdOfObject($a_ref_id);
-		if(!$rolf)
-		{
-			return $this->__raiseError('No role existin','Client');
-		}
-
-
 		include_once './Services/AccessControl/classes/class.ilRoleXmlImporter.php';
-		$rimport = new ilRoleXmlImporter($rolf);
+		$rimport = new ilRoleXmlImporter($a_ref_id);
 		$rimport->setRole($role);
 
 		$root = simplexml_load_string($role_xml);

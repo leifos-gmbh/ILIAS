@@ -1,5 +1,5 @@
 <?php
-/* Copyright (c) 1998-2009 ILIAS open source, Extended GPL, see docs/LICENSE */
+/* Copyright (c) 1998-2018 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 include_once("Services/Table/classes/class.ilTable2GUI.php");
 
@@ -66,10 +66,15 @@ class ilMediaPoolTableGUI extends ilTable2GUI
 		$this->parent_tpl = $a_parent_tpl;
 		if ($a_all_objects)
 		{
-			$this->setId("mepall".$a_parent_obj->object->getId());
+			$this->setId("mepall");
+			if (is_object($a_parent_obj->object))
+			{
+				$this->setId("mepall" . $a_parent_obj->object->getId());
+			}
 		}
 		else
 		{
+			$this->setId("mepfold");
 			if (is_object($a_parent_obj->object))
 			{
 				$this->setId("mepfold".$a_parent_obj->object->getId());
@@ -113,7 +118,7 @@ class ilMediaPoolTableGUI extends ilTable2GUI
 		$this->setFormAction($ilCtrl->getFormAction($a_parent_obj));
 		$this->setRowTemplate("tpl.mep_list_row.html", "Modules/MediaPool");
 
-		if ($this->all_objects)
+		if ($this->showAdvMetadata())
 		{
 			// adv metadata init (adds filter)
 			include_once('Services/AdvancedMetaData/classes/class.ilAdvancedMDRecordGUI.php');
@@ -125,6 +130,11 @@ class ilMediaPoolTableGUI extends ilTable2GUI
 			$adv_th_record_gui = new ilAdvancedMDRecordGUI(ilAdvancedMDRecordGUI::MODE_TABLE_HEAD, 'mep', $this->media_pool->getId(), 'mob');
 			$adv_th_record_gui->setTableGUI($this);
 			$adv_th_record_gui->parse();
+			if ($a_mode == self::IL_MEP_SELECT)
+			{
+				$this->setFilterCommand("insert_applyFilter");
+				$this->setResetCommand("insert_resetFilter");
+			}
 		}
 
 		// actions column
@@ -134,20 +144,22 @@ class ilMediaPoolTableGUI extends ilTable2GUI
 		$this->getItems();
 
 		// title
-		if ($this->current_folder != $this->tree->getRootId() && !$this->all_objects)
+		if ($a_mode != ilMediaPoolTableGUI::IL_MEP_EDIT)
 		{
-			$node = $this->tree->getNodeData($this->current_folder);
-			$this->setTitle(
-				$lng->txt("mep_choose_from_folder").": ".$node["title"], "icon_fold.svg",
-				$node["title"]);
-		}
-		else
-		{
-			$this->setTitle(
-				$lng->txt("mep_choose_from_mep").": ".
-				ilObject::_lookupTitle($this->media_pool->getId()),
-				"icon_mep.svg",
-				ilObject::_lookupTitle($this->media_pool->getId()));
+			if ($this->current_folder != $this->tree->getRootId() && !$this->all_objects)
+			{
+				$node = $this->tree->getNodeData($this->current_folder);
+				$this->setTitle(
+					$lng->txt("mep_choose_from_folder") . ": " . $node["title"], "icon_fold.svg",
+					$node["title"]);
+			} else
+			{
+				$this->setTitle(
+					$lng->txt("mep_choose_from_mep") . ": " .
+					ilObject::_lookupTitle($this->media_pool->getId()),
+					"icon_mep.svg",
+					ilObject::_lookupTitle($this->media_pool->getId()));
+			}
 		}
 		
 		// action commands
@@ -182,6 +194,21 @@ class ilMediaPoolTableGUI extends ilTable2GUI
 			$this->setSelectAllCheckbox("id");
 		}
 	}
+
+	/**
+	 * Show adv metadata
+	 * @return bool
+	 */
+	protected function showAdvMetadata()
+	{
+		if ($this->all_objects)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
 
 	/**
 	 * needed for advmd filter handling
@@ -344,15 +371,17 @@ class ilMediaPoolTableGUI extends ilTable2GUI
 				$this->filter['keyword'],
 				$this->filter['caption']
 			);
-
-			// add advanced metadata
-			if (is_array($this->adv_filter_record_gui->getFilterElements()))
-			{
-				include_once("./Services/AdvancedMetaData/classes/class.ilAdvancedMDValues.php");
-				$objs = ilAdvancedMDValues::queryForRecords($this->media_pool->getRefId(),
-					"mep", "mob", 0, "mob", $objs, "", "foreign_id", $this->adv_filter_record_gui->getFilterElements());
-			}
 		}
+
+		// add advanced metadata
+		if ($this->showAdvMetadata())
+		{
+			include_once("./Services/AdvancedMetaData/classes/class.ilAdvancedMDValues.php");
+			$objs = ilAdvancedMDValues::queryForRecords($this->media_pool->getRefId(),
+				"mep", "mob", 0, "mob", $objs, "", "foreign_id", $this->adv_filter_record_gui->getFilterElements());
+		}
+//echo ("<br>".$this->media_pool->getRefId());
+//var_dump($objs); exit;
 		$this->setData($objs);
 	}
 
@@ -387,7 +416,7 @@ class ilMediaPoolTableGUI extends ilTable2GUI
 		$this->tpl->setCurrentBlock("link");
 
 		// adv metadata columns
-		if ($this->all_objects)
+		if ($this->showAdvMetadata())
 		{
 			$adv_cell_record_gui = new ilAdvancedMDRecordGUI(ilAdvancedMDRecordGUI::MODE_TABLE_CELLS, 'mep', $this->media_pool->getId(), 'mob');
 			$adv_cell_record_gui->setTableGUI($this);

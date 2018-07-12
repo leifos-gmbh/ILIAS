@@ -245,13 +245,18 @@ class ilSoapFileAdministration extends ilSoapAdministration
 									   'Server');
 		}
 
-		include_once './Services/Export/classes/class.ilImport.php';
-		$imp = new ilImport((int) $ref_id);
 
-		$obj_id = ilObject::_lookupObjId($ref_id);
-		$GLOBALS['ilLog']->write(__METHOD__.': old id is '. $a_old_id);
-		$imp->getMapping()->addMapping('Services/Container','objs',$a_old_id,$obj_id);
-		$imp->importFromZip($zip_path, 'htlm');
+		try {
+			include_once './Services/Export/classes/class.ilImport.php';
+			$imp = new ilImport((int) $ref_id);
+
+			$obj_id = ilObject::_lookupObjId($ref_id);
+			$imp->getMapping()->addMapping('Services/Container','objs',$a_old_id,$obj_id);
+			$imp->importFromZip($zip_path, 'htlm');
+		}
+		catch(Exception $e) {
+			return $this->__raiseError($e->getMessage(),'Server');
+		}
 
 		$html->setOnline((bool) $a_online);
 		$html->setTitle($a_title);

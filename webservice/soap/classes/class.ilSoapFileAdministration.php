@@ -252,7 +252,16 @@ class ilSoapFileAdministration extends ilSoapAdministration
 
 			$obj_id = ilObject::_lookupObjId($ref_id);
 			$imp->getMapping()->addMapping('Services/Container','objs',$a_old_id,$obj_id);
-			$imp->importFromZip($zip_path, 'htlm');
+			$imp->importObject(
+				'unused',
+				$zip_path,
+				basename($zip_path),
+				'htlm',
+				'',
+				true
+			);
+
+			//$imp->importFromZip($zip_path, 'htlm');
 		}
 		catch(Exception $e) {
 			return $this->__raiseError($e->getMessage(),'Server');

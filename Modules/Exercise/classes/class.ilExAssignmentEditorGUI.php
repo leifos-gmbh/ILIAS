@@ -359,13 +359,6 @@ class ilExAssignmentEditorGUI
 		// grade reminder
 		$rmd_grade = new ilCheckboxInputGUI($this->lng->txt("exc_reminder_grade_setting"), "rmd_grade_status");
 
-		$rmd_grade_start = new ilNumberInputGUI($this->lng->txt("exc_reminder_start"), "rmd_grade_start");
-		$rmd_grade_start->setSize(3);
-		$rmd_grade_start->setMaxLength(3);
-		$rmd_grade_start->setRequired(true);
-		$rmd_grade_start->setMinValue(1);
-		$rmd_grade->addSubItem($rmd_grade_start);
-
 		$rmd_grade_frequency = new ilNumberInputGUI($this->lng->txt("exc_reminder_frequency"), "rmd_grade_freq");
 		$rmd_grade_frequency->setSize(3);
 		$rmd_grade_frequency->setMaxLength(3);
@@ -726,7 +719,6 @@ class ilExAssignmentEditorGUI
 				if($a_form->getInput("rmd_grade_status"))
 				{
 					$res["rmd_grade_status"] = true;
-					$res["rmd_grade_start"] = $a_form->getInput("rmd_grade_start");
 					$res["rmd_grade_freq"] = $a_form->getInput("rmd_grade_freq");
 					$res["rmd_grade_end"] = $reminder_grade_end_date;
 					$res["rmd_grade_template_id"] = $a_form->getInput("rmd_grade_template_id");
@@ -990,7 +982,6 @@ class ilExAssignmentEditorGUI
 		if($rmd_grade->getReminderStatus())
 		{
 			$values["rmd_grade_status"] = $rmd_grade->getReminderStatus();
-			$values["rmd_grade_start"] = $rmd_grade->getReminderStart();
 			$values["rmd_grade_end"] = new ilDateTime($rmd_grade->getReminderEnd(), IL_CAL_UNIX);
 			$values["rmd_grade_freq"] = $rmd_grade->getReminderFrequency();
 			$values["rmd_grade_template_id"] = $rmd_grade->getReminderMailTemplate();

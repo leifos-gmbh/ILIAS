@@ -701,6 +701,9 @@ class ilExerciseManagementGUI
 			$member_status = $this->assignment->getMemberStatus($user_id);
 			$member_status->setComment(ilUtil::stripSlashes($comment));
 			$member_status->setStatus($grade);
+			if($comment != "") {
+				$member_status->setFeedback(true);
+			}
 			$member_status->update();
 		}
 		ilUtil::sendSuccess($this->lng->txt("exc_status_saved"), true);

@@ -44,7 +44,9 @@ class ilExerciseManagementGUI
 
 	protected $exercise; // [ilObjExercise]
 	protected $assignment; // [ilExAssignment]
-	
+
+	protected $task_factory;
+
 	const VIEW_ASSIGNMENT = 1;
 	const VIEW_PARTICIPANT = 2;	
 	const VIEW_GRADES = 3;
@@ -64,9 +66,15 @@ class ilExerciseManagementGUI
 		$ilTabs = $DIC->tabs();
 		$lng = $DIC->language();
 		$tpl = $DIC["tpl"];
+
+		$this->task_factory = $DIC->backgroundTasks()->taskFactory();
 		
 		$this->exercise = $a_exercise;
-		$this->assignment = $a_ass;
+		if($a_ass)
+		{
+			$this->assignment = $a_ass;
+			$this->ass_id = $this->assignment->getId();
+		}
 		
 		$ilCtrl->saveParameter($this, array("vw", "member_id"));
 
@@ -84,7 +92,7 @@ class ilExerciseManagementGUI
 		$ilTabs = $this->tabs_gui;
 		
 		$class = $ilCtrl->getNextClass($this);
-		$cmd = $ilCtrl->getCmd("listPublicSubmissions");		
+		//$cmd = $ilCtrl->getCmd("listPublicSubmissions");
 		
 		switch($class)
 		{			
@@ -183,7 +191,17 @@ class ilExerciseManagementGUI
 				$ilCtrl->forwardCommand($gui);				
 				break;
 			
-			default:									
+			default:
+				$cmd = $ilCtrl->getCmd();
+				switch($cmd)
+				{
+					case 'downloadExcelTextSubmissions':
+						$cmd = $ilCtrl->getCmd("downloadExcelTextSubmissions");
+						break;
+					default:
+						$cmd = $ilCtrl->getCmd("listPublicSubmissions");
+						break;
+				}
 				$this->{$cmd."Object"}();				
 				break;
 		}
@@ -373,15 +391,25 @@ class ilExerciseManagementGUI
 			}
 								
 			if(ilExSubmission::hasAnySubmissions($this->assignment->getId()))
-			{				
-				if($this->assignment->getType() == ilExAssignment::TYPE_TEXT)
+			{
+				$ass_type = $this->assignment->getType();
+
+				switch($ass_type)
 				{
-					$ilToolbar->addFormButton($lng->txt("exc_list_text_assignment"), "listTextAssignment");					
-				}		
-				else 
-				{			
-					$ilToolbar->addFormButton($lng->txt("download_all_returned_files"), "downloadAll");			
-				}		
+					case ilExAssignment::TYPE_TEXT:
+						//todo change addFormButton for addButtonInstance
+						//todo lang vars and implement the methods.
+						//todo define better method names.
+						$ilToolbar->addFormButton($lng->txt("exc_list_text_assignment"), "listTextAssignment");
+						//TODO rename the method to downloadTextSubmissionsData
+						$ilToolbar->addFormButton($lng->txt("xus download_all_returned_files"), "downloadExcelTextSubmissions");
+						break;
+					default:
+						//TODO : Move to Background Tasks.
+						$ilToolbar->addFormButton($lng->txt("download_all_returned_files"), "downloadAll");
+						//$ilToolbar->addFormButton($lng->txt("download_all_returned_files"), "downloadSubmissionFiles");
+						break;
+				}
 			}
 			$this->ctrl->setParameter($this, "vw", self::VIEW_ASSIGNMENT);
 			
@@ -400,6 +428,19 @@ class ilExerciseManagementGUI
 		$ilCtrl->setParameter($this, "ass_id", "");
 
 		return;		
+	}
+
+	//TODO rename this method to something more appropriate.
+	function downloadExcelTextSubmissionsObject()
+	{
+		include_once './Modules/Exercise/classes/BackgroundTasks/class.ilDownloadSubmissionsBackgroundTask.php';
+		//TODO not always have assignment. In Participants view sub tab we don't have such object.
+		$download_task = new ilDownloadSubmissionsBackgroundTask($GLOBALS['DIC']->user()->getId(), $this->exercise->getId(), $this->ass_id);
+
+		if($download_task->run())
+		{
+			ilUtil::sendSuccess($this->lng->txt('dummy text, change me'),true);
+		}
 	}
 	
 	function membersApplyObject()

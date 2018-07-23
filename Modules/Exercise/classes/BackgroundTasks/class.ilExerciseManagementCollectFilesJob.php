@@ -27,6 +27,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 
 	protected $assignment;
 	protected $temp_dir;
+	protected $lng;
 
 	const FBK_DIRECTORY = "Feedback_files";
 
@@ -38,6 +39,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 		global $DIC;
 		//TODO instead fo root use exc
 		$this->logger = $DIC->logger()->root();
+		$this->lng = $DIC->language();
 		//$this->logger = $DIC->logger()->exc();
 	}
 
@@ -184,8 +186,11 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 					}
 					switch ($crit_type){
 						case 'bool':
-							//TODO: translate YES NO from  1 0 ????
-							$excel->setCell($row,++$col,$values[$crit_id]);
+							if($values[$crit_id] == 1){
+								$excel->setCell($row,++$col,$this->lng->txt("yes"));
+							} else {
+								$excel->setCell($row,++$col,$this->lng->txt("no"));
+							}
 							break;
 						case 'rating':
 							/*

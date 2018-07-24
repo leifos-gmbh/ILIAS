@@ -118,6 +118,9 @@ class ilBookCronNotification extends ilCronJob
 
 		$log->debug("start");
 
+
+		$notifications = [];
+		
 		/*
 		 * pool id 123 > 2 days, ...
 		 */
@@ -156,7 +159,6 @@ class ilBookCronNotification extends ilCronJob
 			$log->debug("users: ".count($user_ids));
 
 			// group by user, type, pool
-			$notifications = [];
 			foreach ($res as $r)
 			{
 

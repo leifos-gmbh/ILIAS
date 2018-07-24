@@ -173,10 +173,11 @@ class ilBookCronNotification extends ilCronJob
 				// admins
 				foreach ($user_ids as $uid)
 				{
-					$log->debug("check write for user id: ".$uid);
+					$log->debug("check write for user id: ".$uid.", pool: ".$p["booking_pool_id"]);
 
 					if ($this->checkAccess("write", $uid, $p["booking_pool_id"]))
 					{
+						$log->debug("got write");
 						$notifications[$uid]["admin"][$r["pool_id"]][] = $r;
 					}
 				}

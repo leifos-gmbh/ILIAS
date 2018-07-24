@@ -30,6 +30,8 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	protected $lng;
 
 	const FBK_DIRECTORY = "Feedback_files";
+	const LINK_COLOR = "0,0,255";
+	const BG_COLOR = "255,255,255";
 
 	/**
 	 * Constructor
@@ -151,10 +153,12 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 			if($assignment_type == ilExAssignment::TYPE_TEXT) {
 				$excel->setCell($row, ++$col, $submission_files[$submission_counter]['atext']);
 			} else {
-				// ass type upload
+				// TODO LINK THE FILE ass type upload
 				$excel->setCell($row, ++$col, 'EXTERNAL LINK');
+				$excel->addLink($row,$col,"http://www.ilias.de");
+				//$excel->addLink(1,2,"./Feedback_files/grafic.png");
+				$excel->setColors($excel->getCoordByColumnAndRow($col,$row), self::BG_COLOR,self::LINK_COLOR);
 			}
-			//$excel->getCell($row, 3)->Hyperlink->setUrl("http://ilias.de");
 
 			if($ass_has_feedback)
 			{

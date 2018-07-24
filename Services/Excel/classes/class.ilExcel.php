@@ -9,7 +9,6 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-use PHPOffice\PhpSpreadsheet\Cell\Hyperlink;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 
@@ -544,6 +543,16 @@ class ilExcel
 	{
 		$columnLetter = Coordinate::stringFromColumnIndex($pColumn);
 		return $columnLetter . $pRow;
+	}
+
+	/**
+	 * @param $a_row int
+	 * @param $a_column int
+	 * @param $a_path
+	 */
+	function addLink($a_row, $a_column, $a_path)
+	{
+		$this->workbook->getActiveSheet()->getCellByColumnAndRow($a_column,$a_row)->getHyperlink()->setUrl($a_path);
 	}
 
 }

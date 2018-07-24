@@ -131,7 +131,7 @@ class ilBookCronNotification extends ilCronJob
 			$to_ts = mktime(0, 0, 0, date('n'), date('j') + $p["reminder_day"] + 1);
 			$res = [];
 
-			$log->debug("pool id: ".$p["booking_pool_id"].$from_ts."-".$to_ts);
+			$log->debug("pool id: ".$p["booking_pool_id"].", ".$from_ts."-".$to_ts);
 
 			if ($to_ts > $from_ts)
 			{
@@ -145,7 +145,7 @@ class ilBookCronNotification extends ilCronJob
 			// get subscriber of pool id
 			$user_ids = ilNotification::getNotificationsForObject(ilNotification::TYPE_BOOK, $p["booking_pool_id"]);
 
-			$log->debug("users: ".$p["booking_pool_id"].count($user_ids));
+			$log->debug("users: ".count($user_ids));
 
 			// group by user, type, pool
 			$notifications = [];

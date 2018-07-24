@@ -120,7 +120,7 @@ class ilBookCronNotification extends ilCronJob
 
 
 		$notifications = [];
-		
+
 		/*
 		 * pool id 123 > 2 days, ...
 		 */
@@ -132,7 +132,7 @@ class ilBookCronNotification extends ilCronJob
 			$log->debug("next day ts: ".$next_day_ts);
 			$last_reminder_to_ts = $p["last_remind_ts"];
 			// for debug purposes
-			$last_reminder_to_ts-= 24*60*60;
+			// $last_reminder_to_ts-= 24*60*60;
 			$log->debug("last_reminder ts: ".$last_reminder_to_ts);
 			$from_ts = max($next_day_ts, $last_reminder_to_ts);
 			$log->debug("from ts: ".$from_ts);

@@ -161,6 +161,7 @@ class ilBookCronNotification extends ilCronJob
 			{
 
 				// users
+				$log->debug("check notification of user id: ".$r["user_id"]);
 				if (in_array($r["user_id"], $user_ids))
 				{
 					if ($this->checkAccess("read", $r["user_id"], $p["booking_pool_id"]))
@@ -172,6 +173,8 @@ class ilBookCronNotification extends ilCronJob
 				// admins
 				foreach ($user_ids as $uid)
 				{
+					$log->debug("check write for user id: ".$uid);
+
 					if ($this->checkAccess("write", $uid, $p["booking_pool_id"]))
 					{
 						$notifications[$uid]["admin"][$r["pool_id"]][] = $r;

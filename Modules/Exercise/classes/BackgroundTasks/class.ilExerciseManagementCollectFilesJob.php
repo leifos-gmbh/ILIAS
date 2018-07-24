@@ -31,6 +31,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	protected $excel_title; //sanitized file name/sheet title
 
 	const FBK_DIRECTORY = "Feedback_files";
+	const SUB_DIRECTORY = "Submissions";
 	const LINK_COLOR = "0,0,255";
 	const BG_COLOR = "255,255,255";
 
@@ -151,13 +152,11 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 			//Get the submission Text
 			if($assignment_type == ilExAssignment::TYPE_TEXT) {
 				$excel->setCell($row, ++$col, $submission_files[$submission_counter]['atext']);
-			} else {
+			} elseif($assignment_type == ilExAssignment::TYPE_UPLOAD) {
 				$this->collectSubmissionFiles($exercise_id);
 				// TODO LINK THE FILE ass type upload
 				//Problem I can only add link to the cell not to the text.
-				$excel->setCell($row, ++$col, 'EXTERNAL LINK TO DIRECTORY WITH THE NAME OF THE USER');
-				$excel->addLink($row,$col,"http://www.ilias.de");
-				//$excel->addLink(1,2,"./Feedback_files/grafic.png");
+				$excel->addLink($row,$col,$this->target_directory."/".self::SUB_DIRECTORY."/submissions.zip");
 				$excel->setColors($excel->getCoordByColumnAndRow($col,$row), self::BG_COLOR,self::LINK_COLOR);
 			}
 
@@ -224,6 +223,8 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 							$excel->setCell($row,++$col, $values[$crit_id]);
 							break;
 						case 'file':
+
+							//TODO probably we should move the files first somehow.
 							if($crit_id) {
 								$crit_file_obj = ilExcCriteriaFile::getInstanceById($crit_id);
 							} else {
@@ -232,12 +233,17 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 							$crit_file_obj->setPeerReviewContext($this->assignment, $participant_id, $feedback_giver);
 							$files = $crit_file_obj->getFiles();
 							$str_files = "";
+							//problem here how to link multiple files in one cell.
 							foreach($files as $file)
 							{
-								$this->copyFileToTempDirectory($file);
+								$this->copyFileToSubDirectory(self::FBK_DIRECTORY,$file);
 								$str_files .= $file."\n";
 							}
+
+							//TODO: following code is just for test... THIS STUFF IS NOT FROM HERE!!!!
+							$str_files .= "\n FINAL SUBMISSION DIRECTORY => ".$this->target_directory."/".self::SUB_DIRECTORY;
 							$excel->setCell($row,++$col, $str_files);
+							$excel->addLink($row,$col,$this->target_directory."/".self::SUB_DIRECTORY);
 							break;
 					}
 				}
@@ -258,16 +264,19 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 
 	/**
 	 * TODO use the new filesystem.
+	 * @param $a_directory string
 	 * @param $a_file string
 	 */
-	public function copyFileToTempDirectory($a_file)
+	public function copyFileToSubDirectory($a_directory, $a_file)
 	{
-		if(!is_dir($this->target_directory."/".self::FBK_DIRECTORY))
+		$dir = $this->target_directory."/".$a_directory;
+
+		if(!is_dir($dir))
 		{
-			ilUtil::createDirectory($this->target_directory."/".self::FBK_DIRECTORY);
+			ilUtil::createDirectory($dir);
 		}
 
-		copy($a_file, $this->target_directory."/".self::FBK_DIRECTORY."/".basename($a_file));
+		copy($a_file, $dir."/".basename($a_file));
 
 		/*global $DIC;
 		$fs = $DIC->filesystem();
@@ -339,7 +348,9 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 
 		// REFACTOR THE DOWNLOAD METHOD TO ACCEPT DELIVER THE FILES DIRECTLY OR GET THE FILE NAME TO
 		// BE DOWNLOADED IN A BACKGROUND TASK
-		$zip_file = ilExSubmission::downloadAllAssignmentFiles($this->assignment, $members);
+
+		$zip_file = ilExSubmission::downloadAllAssignmentFiles($this->assignment, $members,$this->target_directory);
+		//copy($zip_file,$this->target_directory."/".self::SUB_DIRECTORY."/submissions.zip");
 		copy($zip_file,$this->target_directory."/submissions.zip");
 	}
 }

@@ -922,10 +922,15 @@ class ilExSubmission
 	/**
 	 * Download all submitted files of an assignment (all user)
 	 *
+	 * // TODO Refactor this
+	 * // TODO Remove all the zips created in the temp directory.
+	 * @param $a_ass ilExAssignment
 	 * @param	$members		array of user names, key is user id
+	 * @param $to_path string
 	 * @throws ilExerciseException
+	 * @return mixed
 	 */
-	public static function downloadAllAssignmentFiles(ilExAssignment $a_ass, array $members)
+	public static function downloadAllAssignmentFiles(ilExAssignment $a_ass, array $members, $to_path = "")
 	{
 		global $DIC;
 
@@ -956,8 +961,15 @@ class ilExSubmission
 		$zip = PATH_TO_ZIP;
 
 		// check first, if we have enough free disk space to copy all files to temporary directory
-		$tmpdir = ilUtil::ilTempnam();
+
+		if($to_path) {
+			//TODO remove this ugly submissions here... pass it in the param.
+			$tmpdir = $to_path."/submissions";
+		} else {
+			$tmpdir = ilUtil::ilTempnam();
+		}
 		ilUtil::makeDir($tmpdir);
+
 		chdir($tmpdir);
 
 		// check free diskspace
@@ -1097,13 +1109,14 @@ class ilExSubmission
 		$assTitle = $a_ass->getTitle()."_".$a_ass->getId();
 		chdir($cdir);
 
-		//TODO REFACTOR THIS IN A WAY TO ACCEPT RETURN THE STRING OR JUST DELIVER THE FILES IF NEEDED
-		return $tmpzipfile;
-		/*
-		ilUtil::deliverFile($tmpzipfile, (strlen($assTitle) == 0
-			? strtolower($lng->txt("exc_assignment"))
-			: $assTitle). ".zip", "", false, true);
-		*/
+		if($to_path) {
+			return $tmpzipfile;
+		} else {
+			//not used anymore since we are using background tasks.
+			ilUtil::deliverFile($tmpzipfile, (strlen($assTitle) == 0
+					? strtolower($lng->txt("exc_assignment"))
+					: $assTitle). ".zip", "", false, true);
+		}
 	}
 
 	/**

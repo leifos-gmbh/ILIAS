@@ -23,6 +23,11 @@ class ilBookCronNotification extends ilCronJob
 	protected $access;
 
 	/**
+	 * @var ilLogger
+	 */
+	protected $book_log;
+
+	/**
 	 * Constructor
 	 */
 	function __construct()
@@ -34,6 +39,8 @@ class ilBookCronNotification extends ilCronJob
 		{
 			$this->access = $DIC->access();
 		}
+
+		$this->book_log = ilLoggerFactory::getLogger("book");
 
 	}
 
@@ -103,7 +110,14 @@ class ilBookCronNotification extends ilCronJob
 	 */
 	protected function sendNotifications()
 	{
+		$log = $this->book_log;
+
 		// get all booking pools with notification setting
+
+
+
+		$log->debug("start");
+
 		/*
 		 * pool id 123 > 2 days, ...
 		 */
@@ -116,6 +130,9 @@ class ilBookCronNotification extends ilCronJob
 			$from_ts = max($next_day_ts, $last_reminder_to_ts);
 			$to_ts = mktime(0, 0, 0, date('n'), date('j') + $p["reminder_day"] + 1);
 			$res = [];
+
+			$log->debug("pool id: ".$p["booking_pool_id"].$from_ts."-".$to_ts);
+
 			if ($to_ts > $from_ts)
 			{
 				$res = ilBookingReservation::getListByDate(true, null, [
@@ -128,15 +145,20 @@ class ilBookCronNotification extends ilCronJob
 			// get subscriber of pool id
 			$user_ids = ilNotification::getNotificationsForObject(ilNotification::TYPE_BOOK, $p["booking_pool_id"]);
 
+			$log->debug("users: ".$p["booking_pool_id"].count($user_ids));
+
 			// group by user, type, pool
 			$notifications = [];
 			foreach ($res as $r)
 			{
 
+				// users
 				if (in_array($r["user_id"], $user_ids))
 				{
-					// check pool read permission
-					$notifications[$r["user_id"]]["personal"][$r["pool_id"]][] = $r;
+					if ($this->checkAccess("read", $r["user_id"], $p["booking_pool_id"]))
+					{
+						$notifications[$r["user_id"]]["personal"][$r["pool_id"]][] = $r;
+					}
 				}
 
 				// admins
@@ -144,13 +166,14 @@ class ilBookCronNotification extends ilCronJob
 				{
 					if ($this->checkAccess("write", $uid, $p["booking_pool_id"]))
 					{
-						// check pool read permission
 						$notifications[$uid]["admin"][$r["pool_id"]][] = $r;
 					}
 				}
 			}
 			ilObjBookingPool::writeLastReminderTimestamp($p["booking_pool_id"], $to_ts);
 		}
+
+		$log->debug("notifications to users: ".count($notifications));
 
 		// send mails
 		$this->sendMails($notifications);

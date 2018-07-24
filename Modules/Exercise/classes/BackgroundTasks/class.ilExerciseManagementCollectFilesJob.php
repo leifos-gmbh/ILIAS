@@ -28,6 +28,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	protected $assignment;
 	protected $temp_dir;
 	protected $lng;
+	protected $excel_title; //sanitized file name/sheet title
 
 	const FBK_DIRECTORY = "Feedback_files";
 	const LINK_COLOR = "0,0,255";
@@ -84,9 +85,9 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 
 		//assignment object
 		$this->assignment = new ilExAssignment($assignment_id);
-		//TODO sanitize this title.
 		$assignment_title = $this->assignment->getTitle();
 		$assignment_type = $this->assignment->getType();
+		$this->excel_title = ilUtil::getASCIIFilename($assignment_title);
 
 		// directories
 		$this->createUniqueTempDirectory();
@@ -105,14 +106,12 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 			$peer_review = new ilExPeerReview($this->assignment);
 		}
 
-		//TODO Find another method to check the Criteria Catalogue items(It returns items even when the Assignment has no criteria at all)
-		//Todo: Remove this as soon as possible.
 		if($criteria_items = $this->assignment->getPeerReviewCriteriaCatalogueItems()){
 			$ass_has_criteria = true;
 		}
 
 		//Excel sheet title
-		$excel->addSheet($assignment_title);
+		$excel->addSheet($this->excel_title);
 
 		//TODO: they are lang vars
 		$title_columns = array(
@@ -153,8 +152,10 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 			if($assignment_type == ilExAssignment::TYPE_TEXT) {
 				$excel->setCell($row, ++$col, $submission_files[$submission_counter]['atext']);
 			} else {
+				$this->collectSubmissionFiles($exercise_id);
 				// TODO LINK THE FILE ass type upload
-				$excel->setCell($row, ++$col, 'EXTERNAL LINK');
+				//Problem I can only add link to the cell not to the text.
+				$excel->setCell($row, ++$col, 'EXTERNAL LINK TO DIRECTORY WITH THE NAME OF THE USER');
 				$excel->addLink($row,$col,"http://www.ilias.de");
 				//$excel->addLink(1,2,"./Feedback_files/grafic.png");
 				$excel->setColors($excel->getCoordByColumnAndRow($col,$row), self::BG_COLOR,self::LINK_COLOR);
@@ -180,13 +181,16 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 
 				foreach($criteria_items as $item)
 				{
-					//ilLoggerFactory::getRootLogger()->debug("Criteria title => ".$item->getTitle());
+					//Criteria without catalog doesn't have ID nor TITLE.
 					$crit_id = $item->getId();
 					$crit_type = $item->getType();
+					$crit_title = $item->getTitle();
+					if($crit_title == ""){
+						$crit_title = $item->getTranslatedType();
+					}
 
-					if(!in_array($item->getTitle(), $title_columns)) {
-						//todo multilanguage??
-						$title_columns[] = $item->getTitle();
+					if(!in_array($crit_title, $title_columns)) {
+						$title_columns[] = $crit_title;
 					}
 					switch ($crit_type){
 						case 'bool':
@@ -220,8 +224,11 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 							$excel->setCell($row,++$col, $values[$crit_id]);
 							break;
 						case 'file':
-							//Todo move the file to the temp dir as a ZIP.
-							$crit_file_obj = ilExcCriteriaFile::getInstanceById($crit_id);
+							if($crit_id) {
+								$crit_file_obj = ilExcCriteriaFile::getInstanceById($crit_id);
+							} else {
+								$crit_file_obj = ilExcCriteriaFile::getInstanceByType($crit_type);
+							}
 							$crit_file_obj->setPeerReviewContext($this->assignment, $participant_id, $feedback_giver);
 							$files = $crit_file_obj->getFiles();
 							$str_files = "";
@@ -242,8 +249,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 		//ADD column titles
 		$this->addColumnTitles($title_columns, $excel);
 
-		//TODO sanitize this title to avoid problems when file creation.
-		$excel->writeToFile($this->target_directory."/$assignment_title");
+		$excel->writeToFile($this->target_directory."/".$this->excel_title);
 
 		$out = new StringValue();
 		$out->setValue($this->target_directory);
@@ -301,7 +307,39 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	protected function createTargetDirectory()
 	{
 		//todo sanitize this name.
-		$this->target_directory = $this->temp_dir."/".$this->assignment->getTitle();
+		$this->target_directory = $this->temp_dir."/".$this->excel_title;
 		ilUtil::createDirectory($this->target_directory);
+	}
+
+	function collectSubmissionFiles($a_exercise_id)
+	{
+		$members = array();
+
+		$exercise = new ilObjExercise($a_exercise_id, false);
+
+		foreach($exercise->members_obj->getMembers() as $member_id)
+		{
+			$submission = new ilExSubmission($this->assignment, $member_id);
+			$submission->updateTutorDownloadTime();
+
+			// get member object (ilObjUser)
+			if (ilObject::_exists($member_id))
+			{
+				// adding file metadata
+				foreach($submission->getFiles() as $file)
+				{
+					$members[$file["user_id"]]["files"][$file["returned_id"]] = $file;
+				}
+
+				$tmp_obj =& ilObjectFactory::getInstanceByObjId($member_id);
+				$members[$member_id]["name"] = $tmp_obj->getFirstname() . " " . $tmp_obj->getLastname();
+				unset($tmp_obj);
+			}
+		}
+
+		// REFACTOR THE DOWNLOAD METHOD TO ACCEPT DELIVER THE FILES DIRECTLY OR GET THE FILE NAME TO
+		// BE DOWNLOADED IN A BACKGROUND TASK
+		$zip_file = ilExSubmission::downloadAllAssignmentFiles($this->assignment, $members);
+		copy($zip_file,$this->target_directory."/submissions.zip");
 	}
 }

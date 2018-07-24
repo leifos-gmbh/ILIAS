@@ -1096,9 +1096,14 @@ class ilExSubmission
 
 		$assTitle = $a_ass->getTitle()."_".$a_ass->getId();
 		chdir($cdir);
+
+		//TODO REFACTOR THIS IN A WAY TO ACCEPT RETURN THE STRING OR JUST DELIVER THE FILES IF NEEDED
+		return $tmpzipfile;
+		/*
 		ilUtil::deliverFile($tmpzipfile, (strlen($assTitle) == 0
 			? strtolower($lng->txt("exc_assignment"))
 			: $assTitle). ".zip", "", false, true);
+		*/
 	}
 
 	/**

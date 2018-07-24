@@ -195,8 +195,8 @@ class ilExerciseManagementGUI
 				$cmd = $ilCtrl->getCmd();
 				switch($cmd)
 				{
-					case 'downloadExcelTextSubmissions':
-						$cmd = $ilCtrl->getCmd("downloadExcelTextSubmissions");
+					case 'downloadSubmissions':
+						$cmd = $ilCtrl->getCmd("downloadSubmissions");
 						break;
 					default:
 						$cmd = $ilCtrl->getCmd("listPublicSubmissions");
@@ -393,23 +393,11 @@ class ilExerciseManagementGUI
 			if(ilExSubmission::hasAnySubmissions($this->assignment->getId()))
 			{
 				$ass_type = $this->assignment->getType();
-
-				switch($ass_type)
-				{
-					case ilExAssignment::TYPE_TEXT:
-						//todo change addFormButton for addButtonInstance
-						//todo lang vars and implement the methods.
-						//todo define better method names.
-						$ilToolbar->addFormButton($lng->txt("exc_list_text_assignment"), "listTextAssignment");
-						//TODO rename the method to downloadTextSubmissionsData
-						$ilToolbar->addFormButton($lng->txt("xus download_all_returned_files"), "downloadExcelTextSubmissions");
-						break;
-					default:
-						//TODO : Move to Background Tasks.
-						$ilToolbar->addFormButton($lng->txt("download_all_returned_files"), "downloadAll");
-						//$ilToolbar->addFormButton($lng->txt("download_all_returned_files"), "downloadSubmissionFiles");
-						break;
+				//todo change addFormButton for addButtonInstance
+				if($ass_type == ilExAssignment::TYPE_TEXT) {
+					$ilToolbar->addFormButton($lng->txt("exc_list_text_assignment"), "listTextAssignment");
 				}
+				$ilToolbar->addFormButton($lng->txt("download_all_returned_files"), "downloadSubmissions");
 			}
 			$this->ctrl->setParameter($this, "vw", self::VIEW_ASSIGNMENT);
 			
@@ -430,8 +418,7 @@ class ilExerciseManagementGUI
 		return;		
 	}
 
-	//TODO rename this method to something more appropriate.
-	function downloadExcelTextSubmissionsObject()
+	function downloadSubmissionsObject()
 	{
 		include_once './Modules/Exercise/classes/BackgroundTasks/class.ilDownloadSubmissionsBackgroundTask.php';
 		//TODO not always have assignment. In Participants view sub tab we don't have such object.
@@ -822,36 +809,6 @@ class ilExerciseManagementGUI
 				)
 			));
 		}
-	}
-	
-	/**
-	* Download all submitted files (of all members).
-	*/
-	function downloadAllObject()
-	{		
-		$members = array();
-		
-		foreach($this->exercise->members_obj->getMembers() as $member_id)
-		{
-			$submission = new ilExSubmission($this->assignment, $member_id);
-			$submission->updateTutorDownloadTime();
-			
-			// get member object (ilObjUser)
-			if (ilObject::_exists($member_id))
-			{				
-				// adding file metadata
-				foreach($submission->getFiles() as $file)
-				{
-					$members[$file["user_id"]]["files"][$file["returned_id"]] = $file;
-				}			
-			
-				$tmp_obj =& ilObjectFactory::getInstanceByObjId($member_id);
-				$members[$member_id]["name"] = $tmp_obj->getFirstname() . " " . $tmp_obj->getLastname();
-				unset($tmp_obj);
-			}
-		}
-		
-		ilExSubmission::downloadAllAssignmentFiles($this->assignment, $members);		
 	}
 	
 	protected function getMultiActionUserIds($a_keep_teams = false)

@@ -677,6 +677,9 @@ class ilExerciseManagementGUI
 			$ilToolbar->setFormAction($ilCtrl->getFormAction($this));		
 		}
 
+		$ilToolbar->addFormButton($lng->txt("download_all_returned_files"), "downloadSubmissions");
+
+
 		if (count($mems) > 0)
 		{
 			$this->ctrl->setParameter($this, "vw", self::VIEW_PARTICIPANT);

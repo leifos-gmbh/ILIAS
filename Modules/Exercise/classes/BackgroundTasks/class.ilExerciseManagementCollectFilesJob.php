@@ -143,6 +143,8 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 		$submission_counter = 0;
 		foreach($this->assignment->getMemberListData() as $participant_id => $participant)
 		{
+			$submission = new ilExSubmission($this->assignment,$participant_id);
+
 			$col = 1;
 			$excel->setCell($row,$col, $participant['name']);
 			$excel->setCell($row,++$col, $participant['submission']);
@@ -156,8 +158,8 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 			} elseif($assignment_type == ilExAssignment::TYPE_UPLOAD) {
 				// TODO LINK THE FILE ass type upload
 				//Problem I can only add link to the cell not to the text.
-				//$excel->addLink($row,$col,$this->target_directory."/".self::SUB_DIRECTORY."/submissions.zip");
-				$excel->setCell($row, ++$col, "FILE");
+				$excel->setCell($row, ++$col, $submission_files[$submission_counter]['filetitle']);
+				//$excel->addLink($row, $col,ilUtil::getASCIIFilename($this->lng->txt("exc_ass_submission_zip")).DIRECTORY_SEPARATOR.$submission_files[$submission_counter]['filetitle']);
 				$excel->setColors($excel->getCoordByColumnAndRow($col,$row), self::BG_COLOR,self::LINK_COLOR);
 			}
 
@@ -174,9 +176,6 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 			//TODO Bugged Only works when criteria belongs to a catalog
 			if(isset($feedback_giver) && $ass_has_criteria)
 			{
-				//check if really need this submission
-				$submission = new ilExSubmission($this->assignment,$participant_id);
-
 				$values = $submission->getPeerReview()->getPeerReviewValues($feedback_giver, $participant_id);
 
 				foreach($criteria_items as $item)

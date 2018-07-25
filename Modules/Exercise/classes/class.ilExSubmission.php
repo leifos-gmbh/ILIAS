@@ -921,14 +921,11 @@ class ilExSubmission
 
 	/**
 	 * Download all submitted files of an assignment (all user)
-	 *
-	 * // TODO Refactor this
-	 * // TODO Remove all the zips created in the temp directory.
 	 * @param $a_ass ilExAssignment
 	 * @param	$members		array of user names, key is user id
 	 * @param $to_path string
 	 * @throws ilExerciseException
-	 * @return mixed
+	 * @return void
 	 */
 	public static function downloadAllAssignmentFiles(ilExAssignment $a_ass, array $members, $to_path = "")
 	{
@@ -957,20 +954,10 @@ class ilExSubmission
 		}
 		// Safe mode fix
 //		chdir($this->getExercisePath());
-		chdir($storage->getTempPath());
-		$zip = PATH_TO_ZIP;
 
-		// check first, if we have enough free disk space to copy all files to temporary directory
-
-		if($to_path) {
-			//TODO remove this ugly submissions here... pass it in the param.
-			$tmpdir = $to_path."/submissions";
-		} else {
-			$tmpdir = ilUtil::ilTempnam();
-		}
-		ilUtil::makeDir($tmpdir);
-
+		$tmpdir = $storage->getTempPath();
 		chdir($tmpdir);
+		$zip = PATH_TO_ZIP;
 
 		// check free diskspace
 		$dirsize = 0;
@@ -1098,25 +1085,13 @@ class ilExSubmission
 
 			}
 		}
-		
-		$tmpfile = ilUtil::ilTempnam();
-		$tmpzipfile = $tmpfile . ".zip";
+		$tmpzipfile = ilUtil::getASCIIFilename($lng->txt("exc_ass_submission_zip")).".zip";
 		// Safe mode fix
 		$zipcmd = $zip." -r ".ilUtil::escapeShellArg($tmpzipfile)." .";
 		exec($zipcmd);
+		copy($tmpzipfile,$to_path.DIRECTORY_SEPARATOR.$tmpzipfile);
 		ilUtil::delDir($tmpdir);
-
-		$assTitle = $a_ass->getTitle()."_".$a_ass->getId();
 		chdir($cdir);
-
-		if($to_path) {
-			return $tmpzipfile;
-		} else {
-			//not used anymore since we are using background tasks.
-			ilUtil::deliverFile($tmpzipfile, (strlen($assTitle) == 0
-					? strtolower($lng->txt("exc_assignment"))
-					: $assTitle). ".zip", "", false, true);
-		}
 	}
 
 	/**

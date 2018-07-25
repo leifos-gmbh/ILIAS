@@ -31,7 +31,6 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	protected $excel_title; //sanitized file name/sheet title
 
 	const FBK_DIRECTORY = "Feedback_files";
-	const SUB_DIRECTORY = "Submissions";
 	const LINK_COLOR = "0,0,255";
 	const BG_COLOR = "255,255,255";
 
@@ -73,7 +72,6 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	}
 
 	/**
-	 * //TODO Refactor this method at the end of development.
 	 * run the job
 	 * @param array $input
 	 * @param Observer $observer
@@ -119,6 +117,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 			'name_of_participants',
 			'last_submission'
 		);
+
 		switch($assignment_type)
 		{
 			case ilExAssignment::TYPE_TEXT:
@@ -126,6 +125,8 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 				break;
 			case ilExAssignment::TYPE_UPLOAD:
 				$title_columns[] = 'submission_file';
+				//get submissions zip file
+				$this->collectSubmissionFiles($exercise_id);
 				break;
 			default:
 				$title_columns[] = 'submission';
@@ -153,10 +154,10 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 			if($assignment_type == ilExAssignment::TYPE_TEXT) {
 				$excel->setCell($row, ++$col, $submission_files[$submission_counter]['atext']);
 			} elseif($assignment_type == ilExAssignment::TYPE_UPLOAD) {
-				$this->collectSubmissionFiles($exercise_id);
 				// TODO LINK THE FILE ass type upload
 				//Problem I can only add link to the cell not to the text.
-				$excel->addLink($row,$col,$this->target_directory."/".self::SUB_DIRECTORY."/submissions.zip");
+				//$excel->addLink($row,$col,$this->target_directory."/".self::SUB_DIRECTORY."/submissions.zip");
+				$excel->setCell($row, ++$col, "FILE");
 				$excel->setColors($excel->getCoordByColumnAndRow($col,$row), self::BG_COLOR,self::LINK_COLOR);
 			}
 
@@ -241,9 +242,9 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 							}
 
 							//TODO: following code is just for test... THIS STUFF IS NOT FROM HERE!!!!
-							$str_files .= "\n FINAL SUBMISSION DIRECTORY => ".$this->target_directory."/".self::SUB_DIRECTORY;
+							//$str_files .= "\n FINAL SUBMISSION DIRECTORY => ".$this->target_directory.DIRECTORY_SEPARATOR.self::SUB_DIRECTORY;
 							$excel->setCell($row,++$col, $str_files);
-							$excel->addLink($row,$col,$this->target_directory."/".self::SUB_DIRECTORY);
+							//$excel->addLink($row,$col,$this->target_directory.DIRECTORY_SEPARATOR.self::SUB_DIRECTORY);
 							break;
 					}
 				}
@@ -346,11 +347,6 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 			}
 		}
 
-		// REFACTOR THE DOWNLOAD METHOD TO ACCEPT DELIVER THE FILES DIRECTLY OR GET THE FILE NAME TO
-		// BE DOWNLOADED IN A BACKGROUND TASK
-
-		$zip_file = ilExSubmission::downloadAllAssignmentFiles($this->assignment, $members,$this->target_directory);
-		//copy($zip_file,$this->target_directory."/".self::SUB_DIRECTORY."/submissions.zip");
-		copy($zip_file,$this->target_directory."/submissions.zip");
+		ilExSubmission::downloadAllAssignmentFiles($this->assignment, $members,$this->target_directory);
 	}
 }

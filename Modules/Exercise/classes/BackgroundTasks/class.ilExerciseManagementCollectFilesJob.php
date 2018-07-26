@@ -172,12 +172,19 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 				$submission_files = ilExSubmission::getAllAssignmentFiles($exercise_id, $assignment_id);
 
 				//Get the submission Text
-				if($assignment_type == ilExAssignment::TYPE_TEXT) {
+				if(!in_array($assignment_type, $this->ass_types_with_files)) {
 					$this->excel->setCell($row, ++$col, $submission_files[$submission_counter]['atext']);
-				} elseif($assignment_type == ilExAssignment::TYPE_UPLOAD) {
+				} else {
+					//can handle more than one uploaded file
+					++$col;
+					$str_files = "";
+					foreach($submission_files as $submission_file)
+					{
+						$str_files .= $submission_file['filetitle']."\n";
+					}
 					// TODO LINK THE FILE ass type upload
 					//Problem I can only add link to the cell not to the text.
-					$this->excel->setCell($row, ++$col, $submission_files[$submission_counter]['filetitle']);
+					$this->excel->setCell($row, $col, $str_files);
 					//$excel->addLink($row, $col,ilUtil::getASCIIFilename($this->lng->txt("exc_ass_submission_zip")).DIRECTORY_SEPARATOR.$submission_files[$submission_counter]['filetitle']);
 					$this->excel->setColors($this->excel->getCoordByColumnAndRow($col,$row), self::BG_COLOR,self::LINK_COLOR);
 				}

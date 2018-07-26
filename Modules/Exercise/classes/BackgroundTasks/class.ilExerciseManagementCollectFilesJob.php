@@ -32,6 +32,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	protected $excel; //ilExcel
 	protected $criteria_items; //array
 	protected $title_columns;
+	protected $ass_types_with_files; //TODO will be deprecated when use the new assignment type interface
 
 	const FBK_DIRECTORY = "Feedback_files";
 	const LINK_COLOR = "0,0,255";
@@ -46,6 +47,13 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 		//TODO instead fo root use exc
 		$this->logger = $DIC->logger()->root();
 		$this->lng = $DIC->language();
+		//TODO will be deprecated when use the new assignment type interface
+		$this->ass_types_with_files = array(
+			ilExAssignment::TYPE_UPLOAD ||
+			ilExAssignment::TYPE_UPLOAD_TEAM ||
+			ilExAssignment::TYPE_BLOG ||
+			ilExAssignment::TYPE_PORTFOLIO
+		);
 		//$this->logger = $DIC->logger()->exc();
 	}
 
@@ -99,9 +107,8 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 		$this->createUniqueTempDirectory();
 		$this->createTargetDirectory();
 
-		//Collect submission files if its upload types.
-		if($assignment_type == ilExAssignment::TYPE_UPLOAD || $assignment_type == ilExAssignment::TYPE_UPLOAD_TEAM)
-		{
+		//Collect submission files if needed by assignment type.
+		if(in_array($assignment_type,$this->ass_types_with_files)) {
 			$this->collectSubmissionFiles($exercise_id);
 		}
 

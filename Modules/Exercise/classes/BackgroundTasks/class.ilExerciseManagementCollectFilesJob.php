@@ -33,6 +33,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	protected $criteria_items; //array
 	protected $title_columns;
 	protected $ass_types_with_files; //TODO will be deprecated when use the new assignment type interface
+	protected $participant_id;
 
 	const FBK_DIRECTORY = "Feedback_files";
 	const LINK_COLOR = "0,0,255";
@@ -49,9 +50,9 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 		$this->lng = $DIC->language();
 		//TODO will be deprecated when use the new assignment type interface
 		$this->ass_types_with_files = array(
-			ilExAssignment::TYPE_UPLOAD ||
-			ilExAssignment::TYPE_UPLOAD_TEAM ||
-			ilExAssignment::TYPE_BLOG ||
+			ilExAssignment::TYPE_UPLOAD,
+			ilExAssignment::TYPE_UPLOAD_TEAM,
+			ilExAssignment::TYPE_BLOG,
 			ilExAssignment::TYPE_PORTFOLIO
 		);
 		//$this->logger = $DIC->logger()->exc();
@@ -62,6 +63,15 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	 */
 	public function getInputTypes()
 	{
+		if($this->participant_id) {
+			return
+				[
+					new SingleType(StringValue::class),
+					new SingleType(StringValue::class),
+					new SingleType(StringValue::class)
+				];
+		}
+
 		return
 			[
 				new SingleType(StringValue::class),
@@ -90,6 +100,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	 */
 	public function run(array $input, Observer $observer)
 	{
+		ilLoggerFactory::getRootLogger()->debug("****** RUNNING THE JOB **** ");
 		$ass_has_feedback = false;
 		$ass_has_criteria = false;
 
@@ -108,6 +119,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 		$this->createTargetDirectory();
 
 		//Collect submission files if needed by assignment type.
+		//TODO check participant id and download only the own files.
 		if(in_array($assignment_type,$this->ass_types_with_files)) {
 			$this->collectSubmissionFiles($exercise_id);
 		}
@@ -152,11 +164,13 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 			}
 
 			//criteria
+			//Possible TODO -> getPeerReviewCriteriaCatalogueItems can return just an empty instance without data.
 			if($this->criteria_items = $this->assignment->getPeerReviewCriteriaCatalogueItems()){
 				$ass_has_criteria = true;
 			}
 
 			//Members who sent the submission.
+			//TODO edit this to get the same array but only with one participant depending on participant_id.
 			$participants = $this->assignment->getMemberListData();
 
 			$row = 2;
@@ -193,16 +207,17 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 				{
 					$review = $peer_review->getPeerReviewsByPeerId($participant_id);
 
-					$feedback_giver = $review[0]['giver_id']; // user who made the review.
-					$this->excel->setCell($row, ++$col, ilObjUser::_lookupFullname($feedback_giver));
-					//TODO check/ask if one submission can have more than one peer feedback
-					$this->excel->setCell($row, ++$col, $review[0]['tstamp']);
-
-				}
-
-				if(isset($feedback_giver) && $ass_has_criteria)
-				{
-					$this->addCriteriaToExcel($feedback_giver, $participant_id, $row, $col);
+					if($review[0]['tstamp'])
+					{
+						$feedback_giver = $review[0]['giver_id']; // user who made the review.
+						$this->excel->setCell($row, ++$col, ilObjUser::_lookupFullname($feedback_giver));
+						//TODO check/ask if one submission can have more than one peer feedback
+						$this->excel->setCell($row, ++$col, $review[0]['tstamp']);
+						if($ass_has_criteria)
+						{
+							$this->addCriteriaToExcel($feedback_giver, $participant_id, $row, $col);
+						}
+					}
 				}
 
 				$submission_counter++;
@@ -332,11 +347,15 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	{
 		$submission = new ilExSubmission($this->assignment,$participant_id);
 
+		//Possible TODO: This getPeerReviewValues doesn't return always the same array structure then the client classes have
+		//to deal with this. Use only one data structure will avoid this extra work.
+		//values can be [19] => "blablablab" or ["text"] => "blablabla"
+		//Again different array depending if an id is given.
 		$values = $submission->getPeerReview()->getPeerReviewValues($feedback_giver, $participant_id);
 
 		foreach($this->criteria_items as $item)
 		{
-			//Criteria without catalog doesn't have ID nor TITLE.
+			//Criteria without catalog doesn't have ID nor TITLE. The criteria instance is given via "type" ilExcCriteria::getInstanceByType
 			$crit_id = $item->getId();
 			$crit_type = $item->getType();
 			$crit_title = $item->getTitle();
@@ -351,7 +370,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 				case 'bool':
 					if($values[$crit_id] == 1){
 						$this->excel->setCell($row,++$col,$this->lng->txt("yes"));
-					} else {
+					} elseif($values[$crit_id] == -1){
 						$this->excel->setCell($row,++$col,$this->lng->txt("no"));
 					}
 					break;
@@ -365,7 +384,13 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 					 * peer id -> il_rating.user_id
 					 * I don`t know if the category_id is relevant here.
 					 */
-					$sub_obj_type = "peer_".$crit_id;
+					// Possible TODO: refactor ilExAssignment->getPeerReviewCriteriaCatalogueItems somehow to avoid client
+					// classes to deal with ilExCriteria instances with persistence (by id) or instances on the fly (by type)
+					// I will hate all setters and getters because of this.
+					$sub_obj_type = "peer";
+					if($crit_id) {
+						$sub_obj_type .= "_".$crit_id;
+					}
 					$rating = ilRating::getRatingForUserAndObject(
 						$this->assignment->getId(),
 						'ass',
@@ -373,20 +398,26 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 						$sub_obj_type,
 						$feedback_giver
 					);
-					$this->excel->setCell($row,++$col, round((int)$rating));
+					if($rating_int = round((int)$rating))
+					{
+						$this->excel->setCell($row,++$col, $rating_int);
+					}
 					break;
 				case 'text':
-					$this->excel->setCell($row,++$col, $values[$crit_id]);
+					//again another check for criteria id (if instantiated via type)
+					if($crit_id) {
+						$this->excel->setCell($row,++$col, $values[$crit_id]);
+					} else {
+						$this->excel->setCell($row,++$col, $values['text']);
+					}
 					break;
-				case 'file':
-
-					//TODO probably we should move the files first somehow.
+				case 'file':  //BUG HERE! the file is not always in the proper row, check when addcriteriatoexcel to avoid it.
 					if($crit_id) {
 						$crit_file_obj = ilExcCriteriaFile::getInstanceById($crit_id);
 					} else {
 						$crit_file_obj = ilExcCriteriaFile::getInstanceByType($crit_type);
 					}
-					$crit_file_obj->setPeerReviewContext($this->assignment, $participant_id, $feedback_giver);
+					$crit_file_obj->setPeerReviewContext($this->assignment, $feedback_giver, $participant_id);
 					$files = $crit_file_obj->getFiles();
 					$str_files = "";
 					//problem here how to link multiple files in one cell.

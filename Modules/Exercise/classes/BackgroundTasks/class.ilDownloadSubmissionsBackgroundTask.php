@@ -57,7 +57,11 @@ class ilDownloadSubmissionsBackgroundTask
 		$bucket->setUserId($this->user_id);
 		include_once './Modules/Exercise/classes/BackgroundTasks/class.ilExerciseManagementCollectFilesJob.php';
 
-		$collect_data_job = $this->task_factory->createTask(ilExerciseManagementCollectFilesJob::class,[$this->exc_id, $this->ass_id]);
+		if($this->participant_id) {
+			$collect_data_job = $this->task_factory->createTask(ilExerciseManagementCollectFilesJob::class,[$this->exc_id, $this->ass_id, $this->participant_id]);
+		} else {
+			$collect_data_job = $this->task_factory->createTask(ilExerciseManagementCollectFilesJob::class,[$this->exc_id, $this->ass_id]);
+		}
 		$zip_job = $this->task_factory->createTask(ilCalendarZipJob::class, [$collect_data_job]);
 
 		$bucket->setTitle("THIS IS THE DUMMY BUCKET TITLE");

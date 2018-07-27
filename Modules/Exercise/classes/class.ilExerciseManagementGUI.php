@@ -421,8 +421,10 @@ class ilExerciseManagementGUI
 	function downloadSubmissionsObject()
 	{
 		include_once './Modules/Exercise/classes/BackgroundTasks/class.ilDownloadSubmissionsBackgroundTask.php';
-		//TODO not always have assignment. In Participants view sub tab we don't have such object.
-		$download_task = new ilDownloadSubmissionsBackgroundTask($GLOBALS['DIC']->user()->getId(), $this->exercise->getId(), $this->ass_id);
+
+		$participant_id = $_REQUEST['part_id'];
+		//ilLoggerFactory::getRootLogger()->debug("Participant id = ".$participant_id);
+		$download_task = new ilDownloadSubmissionsBackgroundTask($GLOBALS['DIC']->user()->getId(), $this->exercise->getId(), $this->ass_id, $participant_id);
 
 		if($download_task->run())
 		{

@@ -342,7 +342,8 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 		return false;
 
 	}
-	//TODO Bugged Only works when criteria belongs to a catalog
+
+
 	protected function addCriteriaToExcel($feedback_giver,$participant_id, $row, $col)
 	{
 		$submission = new ilExSubmission($this->assignment,$participant_id);
@@ -350,7 +351,6 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 		//Possible TODO: This getPeerReviewValues doesn't return always the same array structure then the client classes have
 		//to deal with this. Use only one data structure will avoid this extra work.
 		//values can be [19] => "blablablab" or ["text"] => "blablabla"
-		//Again different array depending if an id is given.
 		$values = $submission->getPeerReview()->getPeerReviewValues($feedback_giver, $participant_id);
 
 		foreach($this->criteria_items as $item)
@@ -382,11 +382,9 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 					 * participant id -> il_rating.sub_obj_id
 					 * "peer_" + criteria_id -> il_rating.sub_obj_type (peer or e.g. peer_12)
 					 * peer id -> il_rating.user_id
-					 * I don`t know if the category_id is relevant here.
 					 */
 					// Possible TODO: refactor ilExAssignment->getPeerReviewCriteriaCatalogueItems somehow to avoid client
 					// classes to deal with ilExCriteria instances with persistence (by id) or instances on the fly (by type)
-					// I will hate all setters and getters because of this.
 					$sub_obj_type = "peer";
 					if($crit_id) {
 						$sub_obj_type .= "_".$crit_id;
@@ -423,12 +421,17 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 					//problem here how to link multiple files in one cell.
 					foreach($files as $file)
 					{
+						if($str_files != ""){
+							$str_files .= "\n";
+						}
 						$this->copyFileToSubDirectory(self::FBK_DIRECTORY,$file);
-						$str_files .= $file."\n";
+						$str_files .= "./".self::FBK_DIRECTORY.DIRECTORY_SEPARATOR.basename($file);
 					}
+					//TODO Fix this depending on JF decision.
 					//$str_files .= "\n FINAL SUBMISSION DIRECTORY => ".$this->target_directory.DIRECTORY_SEPARATOR.self::SUB_DIRECTORY;
 					$this->excel->setCell($row,++$col, $str_files);
-					//$excel->addLink($row,$col,$this->target_directory.DIRECTORY_SEPARATOR.self::SUB_DIRECTORY);
+					$this->excel->addLink($row, $col, './'.self::FBK_DIRECTORY.basename($file));
+					$this->excel->setColors($this->excel->getCoordByColumnAndRow($col,$row), self::BG_COLOR,self::LINK_COLOR);
 					break;
 			}
 		}

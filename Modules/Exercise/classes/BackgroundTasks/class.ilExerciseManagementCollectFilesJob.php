@@ -38,6 +38,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	const FBK_DIRECTORY = "Feedback_files";
 	const LINK_COLOR = "0,0,255";
 	const BG_COLOR = "255,255,255";
+	const FIRST_DEFAULT_REVIEW_COLUM = 3;
 
 	/**
 	 * Constructor
@@ -100,7 +101,6 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	 */
 	public function run(array $input, Observer $observer)
 	{
-		ilLoggerFactory::getRootLogger()->debug("****** RUNNING THE JOB **** ");
 		$ass_has_feedback = false;
 		$ass_has_criteria = false;
 
@@ -128,6 +128,8 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 			$ass_has_feedback = true;
 			//obj to get the reviews in the foreach below.
 			$peer_review = new ilExPeerReview($this->assignment);
+			//default start column for revisions.
+			$first_excel_column_for_review = self::FIRST_DEFAULT_REVIEW_COLUM;
 		}
 
 		if($this->isExcelNeeded($assignment_type, $ass_has_feedback))
@@ -151,7 +153,12 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 					$this->title_columns[] = 'submission_text';
 					break;
 				case ilExAssignment::TYPE_UPLOAD:
-					$this->title_columns[] = 'submission_file';
+					$num_columns_submission = $this->getNumOfColumnsForSubmissionFiles($exercise_id,$assignment_id);
+					for($i = 1; $i <= $num_columns_submission; $i++)
+					{
+						$this->title_columns[] = 'submission_file_'.$i;
+					}
+					$first_excel_column_for_review += $num_columns_submission;
 					break;
 				default:
 					$this->title_columns[] = 'submission';
@@ -181,41 +188,57 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 				$col = 1;
 				$this->excel->setCell($row,$col, $participant['name']);
 				$this->excel->setCell($row,++$col, $participant['submission']);
-				//TODO why not check for user specific files? There is only one method for get all files..
-				//TODO because of this we are trusting in array ids as a sequence...
-				$submission_files = ilExSubmission::getAllAssignmentFiles($exercise_id, $assignment_id);
+
+				$submission = new ilExSubmission($this->assignment,$participant_id);
+				$submission_files = $submission->getFiles();
 
 				//Get the submission Text
 				if(!in_array($assignment_type, $this->ass_types_with_files)) {
 					$this->excel->setCell($row, ++$col, $submission_files[$submission_counter]['atext']);
 				} else {
-					//can handle more than one uploaded file
-					++$col;
-					$str_files = "";
 					foreach($submission_files as $submission_file)
 					{
-						$str_files .= $submission_file['filetitle']."\n";
+						++$col;
+						$this->excel->setCell($row, $col, $submission_file['filetitle']);
+						$this->excel->setColors($this->excel->getCoordByColumnAndRow($col,$row), self::BG_COLOR,self::LINK_COLOR);
+						$this->excel->addLink($row, $col, './'.$this->lng->txt("exc_ass_submission_zip").$submission_file['filetitle']);
 					}
-					// TODO LINK THE FILE ass type upload
-					//Problem I can only add link to the cell not to the text.
-					$this->excel->setCell($row, $col, $str_files);
-					//$excel->addLink($row, $col,ilUtil::getASCIIFilename($this->lng->txt("exc_ass_submission_zip")).DIRECTORY_SEPARATOR.$submission_files[$submission_counter]['filetitle']);
-					$this->excel->setColors($this->excel->getCoordByColumnAndRow($col,$row), self::BG_COLOR,self::LINK_COLOR);
 				}
 
 				if($ass_has_feedback)
 				{
-					$review = $peer_review->getPeerReviewsByPeerId($participant_id);
+					if($col < $first_excel_column_for_review) {
 
-					if($review[0]['tstamp'])
+						$col = $first_excel_column_for_review;
+					}
+					$reviews = $peer_review->getPeerReviewsByPeerId($participant_id);
+
+					//extra lines
+					$current_review_row = 0;
+					foreach($reviews as $review)
 					{
-						$feedback_giver = $review[0]['giver_id']; // user who made the review.
-						$this->excel->setCell($row, ++$col, ilObjUser::_lookupFullname($feedback_giver));
-						//TODO check/ask if one submission can have more than one peer feedback
-						$this->excel->setCell($row, ++$col, $review[0]['tstamp']);
-						if($ass_has_criteria)
+						++$current_review_row;
+						if($review['tstamp'])
 						{
-							$this->addCriteriaToExcel($feedback_giver, $participant_id, $row, $col);
+							if($current_review_row > 1)
+							{
+								for($i=1;$i<$first_excel_column_for_review;$i++)
+								{
+									$cell_to_copy = $this->excel->getCell($row,$i);
+									$this->excel->setCell($row +1, $i, $cell_to_copy);
+									if($i >= self::FIRST_DEFAULT_REVIEW_COLUM){
+										$this->excel->setColors($this->excel->getCoordByColumnAndRow($i,$row+1), self::BG_COLOR,self::LINK_COLOR);
+									}
+								}
+								++$row;
+							}
+							$feedback_giver = $review['giver_id']; // user who made the review.
+							$this->excel->setCell($row, $col, ilObjUser::_lookupFullname($feedback_giver));
+							$this->excel->setCell($row, $col+1, $review['tstamp']);
+							if($ass_has_criteria)
+							{
+								$this->addCriteriaToExcel($feedback_giver, $participant_id, $row, $col+1);
+							}
 						}
 					}
 				}
@@ -417,23 +440,39 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 					}
 					$crit_file_obj->setPeerReviewContext($this->assignment, $feedback_giver, $participant_id);
 					$files = $crit_file_obj->getFiles();
-					$str_files = "";
-					//problem here how to link multiple files in one cell.
+
+					$extra_crit_column = 0;
 					foreach($files as $file)
 					{
-						if($str_files != ""){
-							$str_files .= "\n";
+						if($extra_crit_column) {
+							$this->title_columns[] = $crit_title."_".$extra_crit_column;
 						}
+						$extra_crit_column++;
 						$this->copyFileToSubDirectory(self::FBK_DIRECTORY,$file);
-						$str_files .= "./".self::FBK_DIRECTORY.DIRECTORY_SEPARATOR.basename($file);
+						$this->excel->setCell($row,++$col, "./".self::FBK_DIRECTORY.DIRECTORY_SEPARATOR.basename($file));
+						$this->excel->addLink($row, $col, './'.self::FBK_DIRECTORY.DIRECTORY_SEPARATOR.basename($file));
+						$this->excel->setColors($this->excel->getCoordByColumnAndRow($col,$row), self::BG_COLOR,self::LINK_COLOR);
 					}
-					//TODO Fix this depending on JF decision.
-					//$str_files .= "\n FINAL SUBMISSION DIRECTORY => ".$this->target_directory.DIRECTORY_SEPARATOR.self::SUB_DIRECTORY;
-					$this->excel->setCell($row,++$col, $str_files);
-					$this->excel->addLink($row, $col, './'.self::FBK_DIRECTORY.basename($file));
-					$this->excel->setColors($this->excel->getCoordByColumnAndRow($col,$row), self::BG_COLOR,self::LINK_COLOR);
 					break;
 			}
 		}
+	}
+
+	/**
+	 * Get the number of max amount of files submitted by a single user in the assignment.
+	 * Used to add columns to the excel.
+	 * @param $a_obj_id
+	 * @param $a_ass_id
+	 * @return mixed
+	 */
+	public function getNumOfColumnsForSubmissionFiles($a_obj_id, $a_ass_id)
+	{
+		global $DIC;
+		$ilDB = $DIC->database();
+
+		$query = "SELECT MAX(max_num) AS max FROM (SELECT COUNT(user_id) AS max_num FROM exc_returned WHERE obj_id=".$a_obj_id." AND ass_id=".$a_ass_id." AND mimetype IS NOT NULL GROUP BY user_id) AS COUNTS";
+		$set = $ilDB->query($query);
+		$row = $ilDB->fetchAssoc($set);
+		return $row['max'];
 	}
 }

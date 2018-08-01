@@ -58,6 +58,8 @@ class ilDownloadSubmissionsBackgroundTask
 
 		include_once './Modules/Exercise/classes/BackgroundTasks/class.ilExerciseManagementCollectFilesJob.php';
 		include_once './Modules/Exercise/classes/BackgroundTasks/class.ilSubmissionsZipJob.php';
+		include_once './Modules/Exercise/classes/BackgroundTasks/class.ilExDownloadSubmissionsZipInteraction.php';
+
 
 		if($this->participant_id) {
 			$collect_data_job = $this->task_factory->createTask(ilExerciseManagementCollectFilesJob::class,[$this->exc_id, $this->ass_id, $this->participant_id]);
@@ -66,8 +68,11 @@ class ilDownloadSubmissionsBackgroundTask
 		}
 		$zip_job = $this->task_factory->createTask(ilSubmissionsZipJob::class, [$collect_data_job]);
 
-		$bucket->setTitle("THIS IS THE DUMMY BUCKET TITLE");
-		$bucket->setTask($zip_job);
+		$download_name = ilUtil::getASCIIFilename(ilExAssignment::lookupTitle($this->ass_id));
+		$download_interaction = $this->task_factory->createTask(ilExDownloadSubmissionsZipInteraction::class,[$zip_job, $download_name]);
+
+		$bucket->setTitle($download_name);
+		$bucket->setTask($download_interaction);
 		$this->task_manager->run($bucket);
 		return true;
 	}

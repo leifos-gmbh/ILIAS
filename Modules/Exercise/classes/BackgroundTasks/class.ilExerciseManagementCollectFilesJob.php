@@ -38,7 +38,8 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	const FBK_DIRECTORY = "Feedback_files";
 	const LINK_COLOR = "0,0,255";
 	const BG_COLOR = "255,255,255";
-	const FIRST_DEFAULT_REVIEW_COLUM = 3;
+	const FIRST_DEFAULT_REVIEW_COLUM = 4;
+	const FIRST_DEFAULT_SUBMIT_COLUMN = 3;
 
 	/**
 	 * Constructor
@@ -153,12 +154,13 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 					$this->title_columns[] = 'submission_text';
 					break;
 				case ilExAssignment::TYPE_UPLOAD:
-					$num_columns_submission = $this->getNumOfColumnsForSubmissionFiles($exercise_id,$assignment_id);
-					for($i = 1; $i <= $num_columns_submission; $i++)
+					$num_columns_submission = $this->getExtraColumnsForSubmissionFiles($exercise_id,$assignment_id);
+					$this->title_columns[] = 'submission_file';
+					for($i = 1; $i < $num_columns_submission; $i++)
 					{
 						$this->title_columns[] = 'submission_file_'.$i;
 					}
-					$first_excel_column_for_review += $num_columns_submission;
+					$first_excel_column_for_review += $num_columns_submission -1;
 					break;
 				default:
 					$this->title_columns[] = 'submission';
@@ -181,77 +183,77 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 			$participants = $this->assignment->getMemberListData();
 
 			$row = 2;
-			$submission_counter = 0;
-
+			//FILL THE EXCEL
 			foreach($participants as $participant_id => $participant)
 			{
-				$col = 1;
-				$this->excel->setCell($row,$col, $participant['name']);
-				$this->excel->setCell($row,++$col, $participant['submission']);
-
 				$submission = new ilExSubmission($this->assignment,$participant_id);
 				$submission_files = $submission->getFiles();
 
-				//Get the submission Text
-				if(!in_array($assignment_type, $this->ass_types_with_files)) {
-					$this->excel->setCell($row, ++$col, $submission_files[$submission_counter]['atext']);
-				} else {
-					foreach($submission_files as $submission_file)
-					{
-						++$col;
-						$this->excel->setCell($row, $col, $submission_file['filetitle']);
-						$this->excel->setColors($this->excel->getCoordByColumnAndRow($col,$row), self::BG_COLOR,self::LINK_COLOR);
-						$this->excel->addLink($row, $col, './'.$this->lng->txt("exc_ass_submission_zip").$submission_file['filetitle']);
-					}
-				}
-
-				if($ass_has_feedback)
+				if($submission_files)
 				{
-					if($col < $first_excel_column_for_review) {
+					$col = 1;
 
-						$col = $first_excel_column_for_review;
+					$this->excel->setCell($row, $col, $participant['name']);
+					$this->excel->setCell($row, ++$col, $participant['submission']);
+
+					//Get the submission Text
+					if (!in_array($assignment_type, $this->ass_types_with_files)) {
+						foreach($submission_files as $submission_file) {
+							$this->excel->setCell($row, ++$col, $submission_file['atext']);
+						}
+					} else {
+						foreach ($submission_files as $submission_file) {
+							$this->excel->setCell($row, ++$col, $submission_file['filetitle']);
+							$this->excel->setColors($this->excel->getCoordByColumnAndRow($col, $row), self::BG_COLOR, self::LINK_COLOR);
+							$this->excel->addLink($row, $col, './' . $this->lng->txt("exc_ass_submission_zip") . $submission_file['filetitle']);
+						}
 					}
-					$reviews = $peer_review->getPeerReviewsByPeerId($participant_id);
 
-					//extra lines
-					$current_review_row = 0;
-					foreach($reviews as $review)
+					if($ass_has_feedback)
 					{
-						++$current_review_row;
-						if($review['tstamp'])
+						if($col < $first_excel_column_for_review) {
+							$col = $first_excel_column_for_review;
+						}
+						$reviews = $peer_review->getPeerReviewsByPeerId($participant_id);
+
+						//extra lines
+						$current_review_row = 0;
+						foreach($reviews as $review)
 						{
-							if($current_review_row > 1)
+							//not all reviews are done, we check it via date of review.
+							if($review['tstamp'])
 							{
-								for($i=1;$i<$first_excel_column_for_review;$i++)
+								$current_review_row++;
+								if($current_review_row > 1)
 								{
-									$cell_to_copy = $this->excel->getCell($row,$i);
-									$this->excel->setCell($row +1, $i, $cell_to_copy);
-									if($i >= self::FIRST_DEFAULT_REVIEW_COLUM){
-										$this->excel->setColors($this->excel->getCoordByColumnAndRow($i,$row+1), self::BG_COLOR,self::LINK_COLOR);
+									for($i=1;$i<$first_excel_column_for_review;$i++)
+									{
+										$cell_to_copy = $this->excel->getCell($row,$i);
+										$this->excel->setCell($row +1, $i, $cell_to_copy);
+										//-1 because we want to start at first submission column not at default review.
+										if($i >= self::FIRST_DEFAULT_SUBMIT_COLUMN){
+											$this->excel->setColors($this->excel->getCoordByColumnAndRow($i,$row+1), self::BG_COLOR,self::LINK_COLOR);
+										}
 									}
+									++$row;
 								}
-								++$row;
-							}
-							$feedback_giver = $review['giver_id']; // user who made the review.
-							$this->excel->setCell($row, $col, ilObjUser::_lookupFullname($feedback_giver));
-							$this->excel->setCell($row, $col+1, $review['tstamp']);
-							if($ass_has_criteria)
-							{
-								$this->addCriteriaToExcel($feedback_giver, $participant_id, $row, $col+1);
+								$feedback_giver = $review['giver_id']; // user who made the review.
+								$this->excel->setCell($row, $col, ilObjUser::_lookupFullname($feedback_giver));
+								$this->excel->setCell($row, $col+1, $review['tstamp']);
+								if($ass_has_criteria)
+								{
+									$this->addCriteriaToExcel($feedback_giver, $participant_id, $row, $col+1);
+								}
 							}
 						}
 					}
-				}
 
-				$submission_counter++;
-				$row++;
+					$row++;
+				}
 			}
 
-			//ADD column titles
 			$this->addColumnTitles();
-
 			$this->excel->writeToFile($this->target_directory."/".$this->sanitized_title);
-
 		}
 
 		$out = new StringValue();
@@ -465,7 +467,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	 * @param $a_ass_id
 	 * @return mixed
 	 */
-	public function getNumOfColumnsForSubmissionFiles($a_obj_id, $a_ass_id)
+	public function getExtraColumnsForSubmissionFiles($a_obj_id, $a_ass_id)
 	{
 		global $DIC;
 		$ilDB = $DIC->database();
@@ -473,6 +475,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 		$query = "SELECT MAX(max_num) AS max FROM (SELECT COUNT(user_id) AS max_num FROM exc_returned WHERE obj_id=".$a_obj_id." AND ass_id=".$a_ass_id." AND mimetype IS NOT NULL GROUP BY user_id) AS COUNTS";
 		$set = $ilDB->query($query);
 		$row = $ilDB->fetchAssoc($set);
+		// -1 because: 1 column for submission defined in FIRST_DEFAULT_REVIEW_COLUM + number of total files = columns +1
 		return $row['max'];
 	}
 }

@@ -1053,6 +1053,12 @@ class ilAccountRegistrationGUI
 			true,
 			ilSession::get('registered_user')
 		);
+
+		// cdpatch start
+		ilUtil::redirect('ilias.php?baseClass=ilPersonalDesktopGUI&cmd=jumpToSelectedItems');
+		return;
+		// cdpatch end
+
 		return ilInitialisation::redirectToStartingPage();
 	}
 

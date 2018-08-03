@@ -47,8 +47,6 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	public function __construct()
 	{
 		global $DIC;
-		//TODO instead fo root use exc
-		$this->logger = $DIC->logger()->root();
 		$this->lng = $DIC->language();
 		//TODO will be deprecated when use the new assignment type interface
 		$this->ass_types_with_files = array(
@@ -57,7 +55,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 			ilExAssignment::TYPE_BLOG,
 			ilExAssignment::TYPE_PORTFOLIO
 		);
-		//$this->logger = $DIC->logger()->exc();
+		$this->logger = $DIC->logger()->exc();
 	}
 
 	/**
@@ -144,31 +142,35 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 			//add common excel Columns
 			//TODO: they are lang vars
 			$this->title_columns = array(
-				'name_of_participants',
-				'last_submission'
+				$this->lng->txt('name'),
+				$this->lng->txt('exc_last_submission')
 			);
 			switch($assignment_type)
 			{
 				case ilExAssignment::TYPE_TEXT:
-					$this->title_columns[] = 'submission_text';
+					$this->title_columns[] = $this->lng->txt("exc_submission_text");
 					break;
 				case ilExAssignment::TYPE_UPLOAD:
 					$num_columns_submission = $this->getExtraColumnsForSubmissionFiles($exercise_id,$assignment_id);
-					$this->title_columns[] = 'submission_file';
-					for($i = 1; $i < $num_columns_submission; $i++)
-					{
-						$this->title_columns[] = 'submission_file_'.$i;
+					if($num_columns_submission > 1){
+						for($i = 1; $i <= $num_columns_submission; $i++)
+						{
+							$this->title_columns[] = $this->lng->txt("exc_submission_file")." ".$i;
+						}
+					} else {
+						$this->title_columns[] = $this->lng->txt("exc_submission_file");
 					}
+
 					$first_excel_column_for_review += $num_columns_submission -1;
 					break;
 				default:
-					$this->title_columns[] = 'submission';
+					$this->title_columns[] = $this->lng->txt("exc_submission");
 					break;
 			}
 			if($ass_has_feedback)
 			{
-				$this->title_columns[] = 'name_of_feedback_giver';
-				$this->title_columns[] = 'last_feedback';
+				$this->title_columns[] = $this->lng->txt("exc_peer_review_giver");
+				$this->title_columns[] = $this->lng->txt('exc_last_submission');
 			}
 
 			//criteria
@@ -201,8 +203,13 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 							$this->excel->setCell($row, ++$col, $submission_file['atext']);
 						}
 					} else {
-						foreach ($submission_files as $submission_file) {
-							$this->excel->setCell($row, ++$col, $submission_file['filetitle']);
+						foreach ($submission_files as $submission_file)
+						{
+							if($assignment_type == ilExAssignment::TYPE_PORTFOLIO || $assignment_type == ilExAssignment::TYPE_BLOG) {
+								$this->excel->setCell($row, ++$col, $this->lng->txt("open"));
+							} else{
+								$this->excel->setCell($row, ++$col, $submission_file['filetitle']);
+							}
 							$this->excel->setColors($this->excel->getCoordByColumnAndRow($col, $row), self::BG_COLOR, self::LINK_COLOR);
 							$this->addLink($row, $col, $submission_file);
 						}
@@ -229,7 +236,6 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 									{
 										$cell_to_copy = $this->excel->getCell($row,$i);
 										$this->excel->setCell($row +1, $i, $cell_to_copy);
-										//-1 because we want to start at first submission column not at default review.
 										if($i >= self::FIRST_DEFAULT_SUBMIT_COLUMN){
 											$this->excel->setColors($this->excel->getCoordByColumnAndRow($i,$row+1), self::BG_COLOR,self::LINK_COLOR);
 										}
@@ -536,13 +542,12 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 				break;
 
 			case ilExAssignment::TYPE_PORTFOLIO:
-				$filepath .= "prt_".$a_submission_file['filetitle'];
+				$filepath .= "prt_".$a_submission_file['filetitle'].DIRECTORY_SEPARATOR."index.html";
 				break;
 
 			default:
 				$filepath = "";
 		}
-
 		$this->excel->addLink($a_row, $a_col, $filepath);
 	}
 

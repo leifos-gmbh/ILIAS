@@ -532,10 +532,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 					$wsp_tree->createTreeForUser($user_id);
 				}
 				$node = $wsp_tree->getNodeData((int)$a_submission_file['filetitle']);
-				$blog_id = $node['obj_id'];
-
-				$blog_dir = "blog_".$a_submission_file['obj_id'];
-				$filepath .= $blog_dir.DIRECTORY_SEPARATOR.$blog_id;
+				$filepath .= "blog_".$node['obj_id'].DIRECTORY_SEPARATOR."index.html";
 				break;
 
 			case ilExAssignment::TYPE_PORTFOLIO:

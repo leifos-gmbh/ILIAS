@@ -927,7 +927,7 @@ class ilExSubmission
 	 * @throws ilExerciseException
 	 * @return void
 	 */
-	public static function downloadAllAssignmentFiles(ilExAssignment $a_ass, array $members, $to_path = "")
+	public static function downloadAllAssignmentFiles(ilExAssignment $a_ass, array $members, $to_path)
 	{
 		global $DIC;
 
@@ -1089,8 +1089,19 @@ class ilExSubmission
 		// Safe mode fix
 		$zipcmd = $zip." -r ".ilUtil::escapeShellArg($tmpzipfile)." .";
 		exec($zipcmd);
-		copy($tmpzipfile,$to_path.DIRECTORY_SEPARATOR.$tmpzipfile);
+		//$path_final_zip_file = $to_path.DIRECTORY_SEPARATOR."Submissions/".$tmpzipfile;
+		$path_final_zip_file = $to_path.DIRECTORY_SEPARATOR.$tmpzipfile;
+
+		copy($tmpzipfile,$path_final_zip_file);
 		ilUtil::delDir($tmpdir);
+
+		//unzip the submissions zip file.(decided to unzip to allow the excel link the files more obvious when blog/portfolio)
+		chdir($to_path);
+		//TODO Bug in ilUtil -> if flat unzip fails. We can get rid of creating Submissions directory
+		//ilUtil::unzip($path_final_zip_file,FALSE, TRUE);
+		ilUtil::unzip($path_final_zip_file);
+		unlink($path_final_zip_file);
+
 		chdir($cdir);
 	}
 

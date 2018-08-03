@@ -24,7 +24,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	 * @var string
 	 */
 	protected $target_directory;
-
+	protected $submissions_directory;
 	protected $assignment;
 	protected $temp_dir;
 	protected $lng;
@@ -116,8 +116,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 		$this->sanitized_title = ilUtil::getASCIIFilename($this->assignment->getTitle());
 
 		// directories
-		$this->createUniqueTempDirectory();
-		$this->createTargetDirectory();
+		$this->createDirectories();
 
 		//Collect submission files if needed by assignment type.
 		//TODO check participant id and download only the own files.
@@ -205,7 +204,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 						foreach ($submission_files as $submission_file) {
 							$this->excel->setCell($row, ++$col, $submission_file['filetitle']);
 							$this->excel->setColors($this->excel->getCoordByColumnAndRow($col, $row), self::BG_COLOR, self::LINK_COLOR);
-							$this->excel->addLink($row, $col, './' . $this->lng->txt("exc_ass_submission_zip") . $submission_file['filetitle']);
+							$this->addLink($row, $col, $submission, $submission_file);
 						}
 					}
 
@@ -262,6 +261,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	}
 
 	/**
+	 * Copy a file in the Feedback_files directory
 	 * TODO use the new filesystem.
 	 * @param $a_directory string
 	 * @param $a_file string
@@ -291,6 +291,9 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 		return 30;
 	}
 
+	/**
+	 * Set the Excel column titles.
+	 */
 	protected function addColumnTitles()
 	{
 		$col = 1;
@@ -304,7 +307,6 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	/**
 	 * @todo refactor to new file system access
 	 * Create unique temp directory
-	 * @return string absolute path to new temp directory
 	 */
 	protected function createUniqueTempDirectory()
 	{
@@ -312,15 +314,34 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 		ilUtil::makeDirParents($this->temp_dir);
 	}
 
+	/**
+	 * Create the directory with the assignment title.
+	 */
 	protected function createTargetDirectory()
 	{
-		//todo sanitize this name.
-		$this->target_directory = $this->temp_dir."/".$this->sanitized_title;
+		$this->target_directory = $this->temp_dir.DIRECTORY_SEPARATOR.$this->sanitized_title;
 		ilUtil::createDirectory($this->target_directory);
+	}
+	/**
+	 * Create the directory with the assignment title.
+	 */
+	protected function createSubmissionsDirectory()
+	{
+		$this->submissions_directory = $this->target_directory.DIRECTORY_SEPARATOR.$this->lng->txt("exc_ass_submission_zip");
+		ilUtil::createDirectory($this->submissions_directory);
+	}
+
+	protected function createDirectories()
+	{
+		$this->createUniqueTempDirectory();
+		$this->createTargetDirectory();
+		$this->createSubmissionsDirectory(); //TODO  we can get rid of this if unzip creates this submission directory
 	}
 
 	/**
+	 * Store the zip file which contains all submission files in the target directory.
 	 * TODO -> put the reference of the original code.
+	 * Possible TODO -> extract this to another BT job.
 	 * @param $a_exercise_id
 	 */
 	function collectSubmissionFiles($a_exercise_id)
@@ -349,26 +370,31 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 			}
 		}
 
-		ilExSubmission::downloadAllAssignmentFiles($this->assignment, $members,$this->target_directory);
+		ilExSubmission::downloadAllAssignmentFiles($this->assignment, $members, $this->submissions_directory);
 	}
 
 	/**
 	 * @param $a_ass_type string
 	 * @param $a_has_fbk bool
+	 * @return bool
 	 */
 	protected function isExcelNeeded($a_ass_type, $a_has_fbk)
 	{
 		if($a_ass_type == ilExAssignment::TYPE_TEXT) {
 			return true;
-		}elseif($a_has_fbk && $a_ass_type != ilExAssignment::TYPE_UPLOAD_TEAM){
+		} elseif($a_has_fbk && $a_ass_type != ilExAssignment::TYPE_UPLOAD_TEAM){
 			return true;
 		}
-
 		return false;
-
 	}
 
-
+	/**
+	 * Add criteria data to the excel.
+	 * @param $feedback_giver
+	 * @param $participant_id
+	 * @param $row
+	 * @param $col
+	 */
 	protected function addCriteriaToExcel($feedback_giver,$participant_id, $row, $col)
 	{
 		$submission = new ilExSubmission($this->assignment,$participant_id);
@@ -434,7 +460,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 						$this->excel->setCell($row,++$col, $values['text']);
 					}
 					break;
-				case 'file':  //BUG HERE! the file is not always in the proper row, check when addcriteriatoexcel to avoid it.
+				case 'file':
 					if($crit_id) {
 						$crit_file_obj = ilExcCriteriaFile::getInstanceById($crit_id);
 					} else {
@@ -475,7 +501,63 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 		$query = "SELECT MAX(max_num) AS max FROM (SELECT COUNT(user_id) AS max_num FROM exc_returned WHERE obj_id=".$a_obj_id." AND ass_id=".$a_ass_id." AND mimetype IS NOT NULL GROUP BY user_id) AS COUNTS";
 		$set = $ilDB->query($query);
 		$row = $ilDB->fetchAssoc($set);
-		// -1 because: 1 column for submission defined in FIRST_DEFAULT_REVIEW_COLUM + number of total files = columns +1
 		return $row['max'];
+	}
+
+	/**
+	 * Mapping the links to use them on the excel.
+	 * @param $a_row int
+	 * @param $a_col int
+	 * @param $a_submission ilExSubmission
+	 * @param $a_submission_file array
+	 */
+	public function addLink($a_row, $a_col, $a_submission, $a_submission_file)
+	{
+		$user_id = $a_submission_file['user_id'];
+		$targetdir = $this->getDirectoryWithUserData($user_id);
+		$blog_node_id = (int)$a_submission_file['filetitle'];
+
+		$filepath = './'.$this->lng->txt("exc_ass_submission_zip").DIRECTORY_SEPARATOR.$targetdir.DIRECTORY_SEPARATOR;
+		switch ($this->assignment->getType())
+		{
+			case ilExAssignment::TYPE_UPLOAD:
+				$filepath .= $a_submission_file['filetitle'];
+				break;
+
+			case ilExAssignment::TYPE_BLOG:
+				include_once "Services/PersonalWorkspace/classes/class.ilWorkspaceTree.php";
+				$wsp_tree = new ilWorkspaceTree($a_submission->getUserId());
+				// #12939
+				if(!$wsp_tree->getRootId())
+				{
+					$wsp_tree->createTreeForUser($a_submission->getUserId());
+				}
+				$node = $wsp_tree->getNodeData($blog_node_id);
+				$blog_id = $node['obj_id'];
+
+				$blog_dir = "blog_".$a_submission_file['obj_id'];
+				$filepath .= $blog_dir.DIRECTORY_SEPARATOR.$blog_id;
+				break;
+		}
+		//ilLoggerFactory::getRootLogger()->debug("******* FILE PATH => ".$filepath);
+		$this->excel->addLink($a_row, $a_col, $filepath);
+	}
+
+	/**
+	 * //todo move this to ilExSubmission as static
+	 * @param $a_user_id
+	 * @return string
+	 */
+	public function getDirectoryWithUserData($a_user_id)
+	{
+		$userName = ilObjUser::_lookupName($a_user_id);
+		$targetdir = ilUtil::getASCIIFilename(
+			trim($userName["lastname"])."_".
+			trim($userName["firstname"])."_".
+			trim($userName["login"])."_".
+			$userName["user_id"]
+		);
+
+		return $targetdir;
 	}
 }

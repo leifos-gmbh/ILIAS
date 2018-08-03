@@ -204,7 +204,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 						foreach ($submission_files as $submission_file) {
 							$this->excel->setCell($row, ++$col, $submission_file['filetitle']);
 							$this->excel->setColors($this->excel->getCoordByColumnAndRow($col, $row), self::BG_COLOR, self::LINK_COLOR);
-							$this->addLink($row, $col, $submission, $submission_file);
+							$this->addLink($row, $col, $submission_file);
 						}
 					}
 
@@ -511,11 +511,10 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	 * @param $a_submission ilExSubmission
 	 * @param $a_submission_file array
 	 */
-	public function addLink($a_row, $a_col, $a_submission, $a_submission_file)
+	public function addLink($a_row, $a_col, $a_submission_file)
 	{
 		$user_id = $a_submission_file['user_id'];
 		$targetdir = $this->getDirectoryWithUserData($user_id);
-		$blog_node_id = (int)$a_submission_file['filetitle'];
 
 		$filepath = './'.$this->lng->txt("exc_ass_submission_zip").DIRECTORY_SEPARATOR.$targetdir.DIRECTORY_SEPARATOR;
 		switch ($this->assignment->getType())
@@ -526,20 +525,27 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 
 			case ilExAssignment::TYPE_BLOG:
 				include_once "Services/PersonalWorkspace/classes/class.ilWorkspaceTree.php";
-				$wsp_tree = new ilWorkspaceTree($a_submission->getUserId());
+				$wsp_tree = new ilWorkspaceTree($user_id);
 				// #12939
 				if(!$wsp_tree->getRootId())
 				{
-					$wsp_tree->createTreeForUser($a_submission->getUserId());
+					$wsp_tree->createTreeForUser($user_id);
 				}
-				$node = $wsp_tree->getNodeData($blog_node_id);
+				$node = $wsp_tree->getNodeData((int)$a_submission_file['filetitle']);
 				$blog_id = $node['obj_id'];
 
 				$blog_dir = "blog_".$a_submission_file['obj_id'];
 				$filepath .= $blog_dir.DIRECTORY_SEPARATOR.$blog_id;
 				break;
+
+			case ilExAssignment::TYPE_PORTFOLIO:
+				$filepath .= "prt_".$a_submission_file['filetitle'];
+				break;
+
+			default:
+				$filepath = "";
 		}
-		//ilLoggerFactory::getRootLogger()->debug("******* FILE PATH => ".$filepath);
+
 		$this->excel->addLink($a_row, $a_col, $filepath);
 	}
 

@@ -97,7 +97,11 @@ class ilExDownloadSubmissionsZipInteraction extends AbstractUserInteraction {
 
 		$this->logger->info("Delivering File.");
 
-		ilFileDelivery::deliverFileAttached($download_name->getValue(), $zip_name->getValue());
+
+		$zip_name = $zip_name->getValue();
+		$zip_name .= ".zip";
+
+		ilFileDelivery::deliverFileAttached($download_name->getValue(), $zip_name);
 
 		return $input;
 	}

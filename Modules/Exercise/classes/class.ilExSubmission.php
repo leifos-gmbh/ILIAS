@@ -992,9 +992,7 @@ class ilExSubmission
 			{
 				continue;
 			}
-			
-			$userName = ilObjUser::_lookupName($id);
-			
+
 			// group by teams
 			$team_dir= "";
 			if(is_array($team_map) &&
@@ -1010,12 +1008,7 @@ class ilExSubmission
 				$team_dir = $team_dirs[$team_id].DIRECTORY_SEPARATOR;
 			}
 			
-			$targetdir = $team_dir.ilUtil::getASCIIFilename(				
-				trim($userName["lastname"])."_".
-				trim($userName["firstname"])."_".
-				trim($userName["login"])."_".
-				$userName["user_id"]
-			);						
+			$targetdir = self::getDirectoryNameFromUserData($id);
 			ilUtil::makeDir($targetdir);			
 						
 			$sourcefiles = scandir($sourcedir);
@@ -1389,6 +1382,23 @@ class ilExSubmission
 		$ilCtrl->setParameterByClass("ilexsubmissionfilegui", "member_id", "");
 		
 		return $result;
+	}
+
+	/**
+	 * @param $a_user_id
+	 * @return string
+	 */
+	static function getDirectoryNameFromUserData($a_user_id)
+	{
+		$userName = ilObjUser::_lookupName($a_user_id);
+		$targetdir = ilUtil::getASCIIFilename(
+			trim($userName["lastname"])."_".
+			trim($userName["firstname"])."_".
+			trim($userName["login"])."_".
+			$userName["user_id"]
+		);
+
+		return $targetdir;
 	}
 }
 

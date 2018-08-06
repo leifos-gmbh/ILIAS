@@ -64,13 +64,27 @@ class ilDownloadSubmissionsBackgroundTask
 
 		$zip_job = $this->task_factory->createTask(ilSubmissionsZipJob::class, [$collect_data_job]);
 
-		$download_name = ilUtil::getASCIIFilename(ilExAssignment::lookupTitle($this->ass_id));
-		$download_interaction = $this->task_factory->createTask(ilExDownloadSubmissionsZipInteraction::class,[$zip_job, $download_name]);
+		if($this->participant_id > 0) {
+			$download_name = ilExSubmission::getDirectoryNameFromUserData($this->participant_id);
+			$bucket->setTitle($this->getParticipantBucketTitle());
+		} else {
+			$download_name = ilUtil::getASCIIFilename(ilExAssignment::lookupTitle($this->ass_id));
+			$bucket->setTitle($download_name);
+		}
 
-		$bucket->setTitle($download_name);
+		$download_interaction = $this->task_factory->createTask(ilExDownloadSubmissionsZipInteraction::class,[$download_name, $zip_job]);
+
+		 //download name
 		$bucket->setTask($download_interaction);
 		$this->task_manager->run($bucket);
 		return true;
+	}
+
+	protected function getParticipantBucketTitle()
+	{
+		$name = ilObjUser::_lookupName($this->participant_id);
+		$title = ucfirst($name['lastname']).", ".ucfirst($name['firstname']);
+		return $title;
 	}
 
 }

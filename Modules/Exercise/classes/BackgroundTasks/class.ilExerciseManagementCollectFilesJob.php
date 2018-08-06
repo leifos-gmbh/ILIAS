@@ -113,7 +113,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 			{
 				$this->collectAssignmentData($assignment->getId());
 			}
-			$final_directory = $this->temp_dir.DIRECTORY_SEPARATOR.$this->getDirectoryNameFromUserData($participant_id);
+			$final_directory = $this->temp_dir.DIRECTORY_SEPARATOR.ilExSubmission::getDirectoryNameFromUserData($participant_id);
 
 		}
 
@@ -184,7 +184,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	{
 		$path = $this->temp_dir.DIRECTORY_SEPARATOR;
 		if($this->participant_id > 0) {
-			$user_dir = $this->getDirectoryNameFromUserData($this->participant_id);
+			$user_dir = ilExSubmission::getDirectoryNameFromUserData($this->participant_id);
 			$path .= $user_dir.DIRECTORY_SEPARATOR;
 		}
 		$this->target_directory = $path.$this->sanitized_title;
@@ -399,7 +399,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	public function addLink($a_row, $a_col, $a_submission_file)
 	{
 		$user_id = $a_submission_file['user_id'];
-		$targetdir = $this->getDirectoryNameFromUserData($user_id);
+		$targetdir = ilExSubmission::getDirectoryNameFromUserData($user_id);
 
 		$filepath = './'.$this->lng->txt("exc_ass_submission_zip").DIRECTORY_SEPARATOR.$targetdir.DIRECTORY_SEPARATOR;
 		switch ($this->assignment->getType())
@@ -429,24 +429,6 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 		}
 		$this->excel->addLink($a_row, $a_col, $filepath);
 	}
-
-	/**
-	 * @param $a_user_id
-	 * @return string
-	 */
-	public function getDirectoryNameFromUserData($a_user_id)
-	{
-		$userName = ilObjUser::_lookupName($a_user_id);
-		$targetdir = ilUtil::getASCIIFilename(
-			trim($userName["lastname"])."_".
-			trim($userName["firstname"])."_".
-			trim($userName["login"])."_".
-			$userName["user_id"]
-		);
-
-		return $targetdir;
-	}
-
 
 	protected function collectAssignmentData($assignment_id)
 	{

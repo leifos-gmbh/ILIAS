@@ -423,8 +423,8 @@ class ilExerciseManagementGUI
 		include_once './Modules/Exercise/classes/BackgroundTasks/class.ilDownloadSubmissionsBackgroundTask.php';
 
 		$participant_id = $_REQUEST['part_id'];
-		//ilLoggerFactory::getRootLogger()->debug("Participant id = ".$participant_id);
-		$download_task = new ilDownloadSubmissionsBackgroundTask($GLOBALS['DIC']->user()->getId(), $this->exercise->getId(), $this->ass_id, $participant_id);
+
+		$download_task = new ilDownloadSubmissionsBackgroundTask($GLOBALS['DIC']->user()->getId(), $this->exercise->getId(), (int)$this->ass_id, (int)$participant_id);
 
 		if($download_task->run())
 		{

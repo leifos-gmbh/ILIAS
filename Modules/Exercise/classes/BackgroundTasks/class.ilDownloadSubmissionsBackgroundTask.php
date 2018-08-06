@@ -37,7 +37,7 @@ class ilDownloadSubmissionsBackgroundTask
 	 * @param integer $a_ass_id
 	 * @param integer $a_participant_id
 	 */
-	public function __construct($a_usr_id, $a_exc_id, $a_ass_id = null, $a_participant_id = null)
+	public function __construct($a_usr_id, $a_exc_id, $a_ass_id, $a_participant_id)
 	{
 		global $DIC;
 
@@ -60,12 +60,8 @@ class ilDownloadSubmissionsBackgroundTask
 		include_once './Modules/Exercise/classes/BackgroundTasks/class.ilSubmissionsZipJob.php';
 		include_once './Modules/Exercise/classes/BackgroundTasks/class.ilExDownloadSubmissionsZipInteraction.php';
 
+		$collect_data_job = $this->task_factory->createTask(ilExerciseManagementCollectFilesJob::class,[$this->exc_id, (int)$this->ass_id, (int)$this->participant_id]);
 
-		if($this->participant_id) {
-			$collect_data_job = $this->task_factory->createTask(ilExerciseManagementCollectFilesJob::class,[$this->exc_id, $this->ass_id, $this->participant_id]);
-		} else {
-			$collect_data_job = $this->task_factory->createTask(ilExerciseManagementCollectFilesJob::class,[$this->exc_id, $this->ass_id]);
-		}
 		$zip_job = $this->task_factory->createTask(ilSubmissionsZipJob::class, [$collect_data_job]);
 
 		$download_name = ilUtil::getASCIIFilename(ilExAssignment::lookupTitle($this->ass_id));

@@ -26,6 +26,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	protected $target_directory;
 	protected $submissions_directory;
 	protected $assignment;
+	protected $exercise_id;
 	protected $temp_dir;
 	protected $lng;
 	protected $sanitized_title; //sanitized file name/sheet title
@@ -38,8 +39,10 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	const FBK_DIRECTORY = "Feedback_files";
 	const LINK_COLOR = "0,0,255";
 	const BG_COLOR = "255,255,255";
-	const FIRST_DEFAULT_REVIEW_COLUM = 4;
+	const PARTICIPANT_NAME_COLUMN = 1;
+	const SUBMISSION_DATE_COLUMN = 2;
 	const FIRST_DEFAULT_SUBMIT_COLUMN = 3;
+	const FIRST_DEFAULT_REVIEW_COLUMN = 4;
 
 	/**
 	 * Constructor
@@ -63,19 +66,10 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	 */
 	public function getInputTypes()
 	{
-		if($this->participant_id) {
-			return
-				[
-					new SingleType(StringValue::class),
-					new SingleType(StringValue::class),
-					new SingleType(StringValue::class)
-				];
-		}
-
 		return
 			[
 				new SingleType(StringValue::class),
-				new SingleType(StringValue::class)
+				new SingleType(\ILIAS\BackgroundTasks\Implementation\Values\ScalarValues\IntegerValue::class)
 			];
 	}
 
@@ -100,170 +94,33 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	 */
 	public function run(array $input, Observer $observer)
 	{
-		$ass_has_feedback = false;
-		$ass_has_criteria = false;
-
-		$exercise_id = $input[0]->getValue();
+		$this->exercise_id = $input[0]->getValue();
 		$assignment_id = $input[1]->getValue();
+		$participant_id = $input[2]->getValue();
 
-		//assignment object
-		$this->assignment = new ilExAssignment($assignment_id);
-		$assignment_type = $this->assignment->getType();
-
-		//Sanitized title for excel file and target directory.
-		$this->sanitized_title = ilUtil::getASCIIFilename($this->assignment->getTitle());
-
-		// directories
-		$this->createDirectories();
-
-		//Collect submission files if needed by assignment type.
-		//TODO check participant id and download only the own files.
-		if(in_array($assignment_type,$this->ass_types_with_files)) {
-			$this->collectSubmissionFiles($exercise_id);
-		}
-
-		if($this->assignment->getPeerReview()) {
-			$ass_has_feedback = true;
-			//obj to get the reviews in the foreach below.
-			$peer_review = new ilExPeerReview($this->assignment);
-			//default start column for revisions.
-			$first_excel_column_for_review = self::FIRST_DEFAULT_REVIEW_COLUM;
-		}
-
-		if($this->isExcelNeeded($assignment_type, $ass_has_feedback))
+		//if we have assignment
+		if($assignment_id > 0)
 		{
-			// PhpSpreadsheet object
-			include_once "./Services/Excel/classes/class.ilExcel.php";
-			$this->excel = new ilExcel();
+			$this->collectAssignmentData($assignment_id);
+			$final_directory = $this->target_directory;
+		}
 
-			//Excel sheet title
-			$this->excel->addSheet($this->sanitized_title);
-
-			//add common excel Columns
-			//TODO: they are lang vars
-			$this->title_columns = array(
-				$this->lng->txt('name'),
-				$this->lng->txt('exc_last_submission')
-			);
-			switch($assignment_type)
+		if($participant_id > 0)
+		{
+			$this->participant_id = $participant_id;
+			$assignments = ilExAssignment::getInstancesByExercise($this->exercise_id);
+			foreach($assignments as $assignment)
 			{
-				case ilExAssignment::TYPE_TEXT:
-					$this->title_columns[] = $this->lng->txt("exc_submission_text");
-					break;
-				case ilExAssignment::TYPE_UPLOAD:
-					$num_columns_submission = $this->getExtraColumnsForSubmissionFiles($exercise_id,$assignment_id);
-					if($num_columns_submission > 1){
-						for($i = 1; $i <= $num_columns_submission; $i++)
-						{
-							$this->title_columns[] = $this->lng->txt("exc_submission_file")." ".$i;
-						}
-					} else {
-						$this->title_columns[] = $this->lng->txt("exc_submission_file");
-					}
-
-					$first_excel_column_for_review += $num_columns_submission -1;
-					break;
-				default:
-					$this->title_columns[] = $this->lng->txt("exc_submission");
-					break;
+				$this->collectAssignmentData($assignment->getId());
 			}
-			if($ass_has_feedback)
-			{
-				$this->title_columns[] = $this->lng->txt("exc_peer_review_giver");
-				$this->title_columns[] = $this->lng->txt('exc_last_submission');
-			}
+			$final_directory = $this->temp_dir.DIRECTORY_SEPARATOR.$this->getDirectoryNameFromUserData($participant_id);
 
-			//criteria
-			//Possible TODO -> getPeerReviewCriteriaCatalogueItems can return just an empty instance without data.
-			if($this->criteria_items = $this->assignment->getPeerReviewCriteriaCatalogueItems()){
-				$ass_has_criteria = true;
-			}
-
-			//Members who sent the submission.
-			//TODO edit this to get the same array but only with one participant depending on participant_id.
-			$participants = $this->assignment->getMemberListData();
-
-			$row = 2;
-			//FILL THE EXCEL
-			foreach($participants as $participant_id => $participant)
-			{
-				$submission = new ilExSubmission($this->assignment,$participant_id);
-				$submission_files = $submission->getFiles();
-
-				if($submission_files)
-				{
-					$col = 1;
-
-					$this->excel->setCell($row, $col, $participant['name']);
-					$this->excel->setCell($row, ++$col, $participant['submission']);
-
-					//Get the submission Text
-					if (!in_array($assignment_type, $this->ass_types_with_files)) {
-						foreach($submission_files as $submission_file) {
-							$this->excel->setCell($row, ++$col, $submission_file['atext']);
-						}
-					} else {
-						foreach ($submission_files as $submission_file)
-						{
-							if($assignment_type == ilExAssignment::TYPE_PORTFOLIO || $assignment_type == ilExAssignment::TYPE_BLOG) {
-								$this->excel->setCell($row, ++$col, $this->lng->txt("open"));
-							} else{
-								$this->excel->setCell($row, ++$col, $submission_file['filetitle']);
-							}
-							$this->excel->setColors($this->excel->getCoordByColumnAndRow($col, $row), self::BG_COLOR, self::LINK_COLOR);
-							$this->addLink($row, $col, $submission_file);
-						}
-					}
-
-					if($ass_has_feedback)
-					{
-						if($col < $first_excel_column_for_review) {
-							$col = $first_excel_column_for_review;
-						}
-						$reviews = $peer_review->getPeerReviewsByPeerId($participant_id);
-
-						//extra lines
-						$current_review_row = 0;
-						foreach($reviews as $review)
-						{
-							//not all reviews are done, we check it via date of review.
-							if($review['tstamp'])
-							{
-								$current_review_row++;
-								if($current_review_row > 1)
-								{
-									for($i=1;$i<$first_excel_column_for_review;$i++)
-									{
-										$cell_to_copy = $this->excel->getCell($row,$i);
-										$this->excel->setCell($row +1, $i, $cell_to_copy);
-										if($i >= self::FIRST_DEFAULT_SUBMIT_COLUMN){
-											$this->excel->setColors($this->excel->getCoordByColumnAndRow($i,$row+1), self::BG_COLOR,self::LINK_COLOR);
-										}
-									}
-									++$row;
-								}
-								$feedback_giver = $review['giver_id']; // user who made the review.
-								$this->excel->setCell($row, $col, ilObjUser::_lookupFullname($feedback_giver));
-								$this->excel->setCell($row, $col+1, $review['tstamp']);
-								if($ass_has_criteria)
-								{
-									$this->addCriteriaToExcel($feedback_giver, $participant_id, $row, $col+1);
-								}
-							}
-						}
-					}
-
-					$row++;
-				}
-			}
-
-			$this->addColumnTitles();
-			$this->excel->writeToFile($this->target_directory."/".$this->sanitized_title);
 		}
 
 		$out = new StringValue();
-		$out->setValue($this->target_directory);
+		$out->setValue($final_directory);
 		return $out;
+
 	}
 
 	/**
@@ -325,8 +182,14 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	 */
 	protected function createTargetDirectory()
 	{
-		$this->target_directory = $this->temp_dir.DIRECTORY_SEPARATOR.$this->sanitized_title;
-		ilUtil::createDirectory($this->target_directory);
+		$path = $this->temp_dir.DIRECTORY_SEPARATOR;
+		if($this->participant_id > 0) {
+			$user_dir = $this->getDirectoryNameFromUserData($this->participant_id);
+			$path .= $user_dir.DIRECTORY_SEPARATOR;
+		}
+		$this->target_directory = $path.$this->sanitized_title;
+
+		ilUtil::makeDirParents($this->target_directory);
 	}
 	/**
 	 * Create the directory with the assignment title.
@@ -339,7 +202,9 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 
 	protected function createDirectories()
 	{
-		$this->createUniqueTempDirectory();
+		if(!isset($this->temp_dir)) {
+			$this->createUniqueTempDirectory();
+		}
 		$this->createTargetDirectory();
 		$this->createSubmissionsDirectory(); //TODO  we can get rid of this if unzip creates this submission directory
 	}
@@ -348,15 +213,20 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	 * Store the zip file which contains all submission files in the target directory.
 	 * TODO -> put the reference of the original code.
 	 * Possible TODO -> extract this to another BT job.
-	 * @param $a_exercise_id
 	 */
-	function collectSubmissionFiles($a_exercise_id)
+	function collectSubmissionFiles()
 	{
 		$members = array();
 
-		$exercise = new ilObjExercise($a_exercise_id, false);
+		$exercise = new ilObjExercise($this->exercise_id, false);
 
-		foreach($exercise->members_obj->getMembers() as $member_id)
+		if($this->participant_id > 0) {
+			$exc_members_id = array($this->participant_id);
+		} else {
+			$exc_members_id = $exercise->members_obj->getMembers();
+		}
+
+		foreach( $exc_members_id as $member_id)
 		{
 			$submission = new ilExSubmission($this->assignment, $member_id);
 			$submission->updateTutorDownloadTime();
@@ -504,7 +374,16 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 		global $DIC;
 		$ilDB = $DIC->database();
 
-		$query = "SELECT MAX(max_num) AS max FROM (SELECT COUNT(user_id) AS max_num FROM exc_returned WHERE obj_id=".$a_obj_id." AND ass_id=".$a_ass_id." AND mimetype IS NOT NULL GROUP BY user_id) AS COUNTS";
+		$and = "";
+		if($this->participant_id > 0) {
+			$and = " AND user_id = ".$this->participant_id;
+		}
+
+		$query = "SELECT MAX(max_num) AS max".
+			" FROM (SELECT COUNT(user_id) AS max_num FROM exc_returned".
+			" WHERE obj_id=".$a_obj_id.". AND ass_id=".$a_ass_id.$and." AND mimetype IS NOT NULL".
+			" GROUP BY user_id) AS COUNTS";
+
 		$set = $ilDB->query($query);
 		$row = $ilDB->fetchAssoc($set);
 		return $row['max'];
@@ -520,7 +399,7 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	public function addLink($a_row, $a_col, $a_submission_file)
 	{
 		$user_id = $a_submission_file['user_id'];
-		$targetdir = $this->getDirectoryWithUserData($user_id);
+		$targetdir = $this->getDirectoryNameFromUserData($user_id);
 
 		$filepath = './'.$this->lng->txt("exc_ass_submission_zip").DIRECTORY_SEPARATOR.$targetdir.DIRECTORY_SEPARATOR;
 		switch ($this->assignment->getType())
@@ -552,11 +431,10 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 	}
 
 	/**
-	 * //todo move this to ilExSubmission as static
 	 * @param $a_user_id
 	 * @return string
 	 */
-	public function getDirectoryWithUserData($a_user_id)
+	public function getDirectoryNameFromUserData($a_user_id)
 	{
 		$userName = ilObjUser::_lookupName($a_user_id);
 		$targetdir = ilUtil::getASCIIFilename(
@@ -567,5 +445,196 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 		);
 
 		return $targetdir;
+	}
+
+
+	protected function collectAssignmentData($assignment_id)
+	{
+		$ass_has_feedback = false;
+		$ass_has_criteria = false;
+
+		//assignment object
+		$this->assignment = new ilExAssignment($assignment_id);
+		$assignment_type = $this->assignment->getType();
+
+		//Sanitized title for excel file and target directory.
+		$this->sanitized_title = ilUtil::getASCIIFilename($this->assignment->getTitle());
+
+		// directories
+		$this->createDirectories();
+
+		//Collect submission files if needed by assignment type.
+		if(in_array($assignment_type,$this->ass_types_with_files)) {
+			$this->collectSubmissionFiles();
+		}
+
+		if($this->assignment->getPeerReview()) {
+			$ass_has_feedback = true;
+			//obj to get the reviews in the foreach below.
+			$peer_review = new ilExPeerReview($this->assignment);
+			//default start column for revisions.
+			$first_excel_column_for_review = self::FIRST_DEFAULT_REVIEW_COLUMN;
+		}
+
+		if($this->isExcelNeeded($assignment_type, $ass_has_feedback))
+		{
+			// PhpSpreadsheet object
+			include_once "./Services/Excel/classes/class.ilExcel.php";
+			$this->excel = new ilExcel();
+
+			//Excel sheet title
+			$this->excel->addSheet($this->sanitized_title);
+
+			//add common excel Columns
+			$this->title_columns = array(
+				$this->lng->txt('name'),
+				$this->lng->txt('exc_last_submission')
+			);
+			switch($assignment_type)
+			{
+				case ilExAssignment::TYPE_TEXT:
+					$this->title_columns[] = $this->lng->txt("exc_submission_text");
+					break;
+				case ilExAssignment::TYPE_UPLOAD:
+					$num_columns_submission = $this->getExtraColumnsForSubmissionFiles($this->exercise_id,$assignment_id);
+					if($num_columns_submission > 1){
+						for($i = 1; $i <= $num_columns_submission; $i++)
+						{
+							$this->title_columns[] = $this->lng->txt("exc_submission_file")." ".$i;
+						}
+					} else {
+						$this->title_columns[] = $this->lng->txt("exc_submission_file");
+					}
+
+					$first_excel_column_for_review += $num_columns_submission -1;
+					break;
+				default:
+					$this->title_columns[] = $this->lng->txt("exc_submission");
+					break;
+			}
+			if($ass_has_feedback)
+			{
+				$this->title_columns[] = $this->lng->txt("exc_peer_review_giver");
+				$this->title_columns[] = $this->lng->txt('exc_last_submission');
+			}
+
+			//criteria
+			//Notice:getPeerReviewCriteriaCatalogueItems can return just an empty instance without data.
+			if($this->criteria_items = $this->assignment->getPeerReviewCriteriaCatalogueItems()){
+				$ass_has_criteria = true;
+			}
+
+			if($this->participant_id > 0) {
+				$participants = array($this->participant_id);
+			} else {
+				$participants = $this->getAssignmentMembersIds();
+			}
+
+			$row = 2;
+			// Fill the excel
+			foreach($participants as $participant_id)
+			{
+				$submission = new ilExSubmission($this->assignment,$participant_id);
+				$submission_files = $submission->getFiles();
+
+				if($submission_files)
+				{
+					$participant_name = ilObjUser::_lookupName($participant_id);
+					$this->excel->setCell($row, self::PARTICIPANT_NAME_COLUMN, $participant_name['lastname'].", ".$participant_name['firstname']);
+
+					//Get the submission Text
+					if (!in_array($assignment_type, $this->ass_types_with_files))
+					{
+						foreach($submission_files as $submission_file)
+						{
+							$this->excel->setCell($row, self::SUBMISSION_DATE_COLUMN, $submission_file['timestamp']);
+							$this->excel->setCell($row, self::FIRST_DEFAULT_SUBMIT_COLUMN, $submission_file['atext']);
+						}
+					}
+					else
+					{
+						$col = self::FIRST_DEFAULT_SUBMIT_COLUMN;
+						foreach ($submission_files as $submission_file)
+						{
+							$this->excel->setCell($row, self::SUBMISSION_DATE_COLUMN, $submission_file['timestamp']);
+
+							if($assignment_type == ilExAssignment::TYPE_PORTFOLIO || $assignment_type == ilExAssignment::TYPE_BLOG) {
+								$this->excel->setCell($row, $col, $this->lng->txt("open"));
+
+							} else{
+								$this->excel->setCell($row, $col, $submission_file['filetitle']);
+							}
+							$this->excel->setColors($this->excel->getCoordByColumnAndRow($col, $row), self::BG_COLOR, self::LINK_COLOR);
+							$this->addLink($row, $col, $submission_file);
+							$col++; //does not affect blogs and portfolios.
+						}
+					}
+
+					if($ass_has_feedback)
+					{
+						if($col < $first_excel_column_for_review) {
+							$col = $first_excel_column_for_review;
+						}
+						$reviews = $peer_review->getPeerReviewsByPeerId($participant_id);
+
+						//extra lines
+						$current_review_row = 0;
+						foreach($reviews as $review)
+						{
+							//not all reviews are done, we check it via date of review.
+							if($review['tstamp'])
+							{
+								$current_review_row++;
+								if($current_review_row > 1)
+								{
+									for($i=1;$i<$first_excel_column_for_review;$i++)
+									{
+										$cell_to_copy = $this->excel->getCell($row,$i);
+										$this->excel->setCell($row +1, $i, $cell_to_copy);
+										if($i >= self::FIRST_DEFAULT_SUBMIT_COLUMN){
+											$this->excel->setColors($this->excel->getCoordByColumnAndRow($i,$row+1), self::BG_COLOR,self::LINK_COLOR);
+										}
+									}
+									++$row;
+								}
+								$feedback_giver = $review['giver_id']; // user who made the review.
+								$this->excel->setCell($row, $col, ilObjUser::_lookupFullname($feedback_giver));
+								$this->excel->setCell($row, $col+1, $review['tstamp']);
+								if($ass_has_criteria)
+								{
+									$this->addCriteriaToExcel($feedback_giver, $participant_id, $row, $col+1);
+								}
+							}
+						}
+					}
+
+					$row++;
+				}
+			}
+
+			$this->addColumnTitles();
+			$this->excel->writeToFile($this->target_directory."/".$this->sanitized_title);
+		}
+
+	}
+
+	// get ONLY the members ids for this assignment
+	public function getAssignmentMembersIds()
+	{
+		global $DIC;
+
+		$ilDB = $DIC->database();
+		$members = array();
+
+		$set = $ilDB->query("SELECT usr_id".
+			" FROM exc_mem_ass_status".
+			" WHERE ass_id = ".$ilDB->quote($this->assignment->getId(), "integer"));
+
+		while ($rec = $ilDB->fetchAssoc($set))
+		{
+			$members[] = $rec['usr_id'];
+		}
+
+		return $members;
 	}
 }

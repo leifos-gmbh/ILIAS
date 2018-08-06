@@ -1092,17 +1092,21 @@ class ilExSubmission
 		//$path_final_zip_file = $to_path.DIRECTORY_SEPARATOR."Submissions/".$tmpzipfile;
 		$path_final_zip_file = $to_path.DIRECTORY_SEPARATOR.$tmpzipfile;
 
-		copy($tmpzipfile,$path_final_zip_file);
-		ilUtil::delDir($tmpdir);
+		if(file_exists($tmpdir.DIRECTORY_SEPARATOR.$tmpzipfile))
+		{
+			copy($tmpzipfile,$path_final_zip_file);
+			ilUtil::delDir($tmpdir);
 
-		//unzip the submissions zip file.(decided to unzip to allow the excel link the files more obvious when blog/portfolio)
-		chdir($to_path);
-		//TODO Bug in ilUtil -> if flat unzip fails. We can get rid of creating Submissions directory
-		//ilUtil::unzip($path_final_zip_file,FALSE, TRUE);
-		ilUtil::unzip($path_final_zip_file);
-		unlink($path_final_zip_file);
+			//unzip the submissions zip file.(decided to unzip to allow the excel link the files more obvious when blog/portfolio)
+			chdir($to_path);
+			//TODO Bug in ilUtil -> if flat unzip fails. We can get rid of creating Submissions directory
+			//ilUtil::unzip($path_final_zip_file,FALSE, TRUE);
+			ilUtil::unzip($path_final_zip_file);
+			unlink($path_final_zip_file);
+		}
 
 		chdir($cdir);
+
 	}
 
 	/**

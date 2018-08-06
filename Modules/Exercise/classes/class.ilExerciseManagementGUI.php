@@ -202,7 +202,7 @@ class ilExerciseManagementGUI
 						$cmd = $ilCtrl->getCmd("listPublicSubmissions");
 						break;
 				}
-				$this->{$cmd."Object"}();				
+				$this->{$cmd."Object"}();
 				break;
 		}
 	}	
@@ -426,9 +426,14 @@ class ilExerciseManagementGUI
 
 		$download_task = new ilDownloadSubmissionsBackgroundTask($GLOBALS['DIC']->user()->getId(), $this->exercise->getId(), (int)$this->ass_id, (int)$participant_id);
 
-		if($download_task->run())
-		{
-			ilUtil::sendSuccess($this->lng->txt('dummy text, change me'),true);
+		if($download_task->run()) {
+			ilUtil::sendSuccess($this->lng->txt('exc_down_files_started'),true);
+		}
+
+		if($this->assignment) {
+			$this->ctrl->redirect($this, "members");
+		} else{
+			$this->ctrl->redirect($this, "showParticipant");
 		}
 	}
 	

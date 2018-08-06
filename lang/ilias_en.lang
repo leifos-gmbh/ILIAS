@@ -14291,3 +14291,4 @@ exc#:#exc_ass_submission_zip#:#Submissions
 exc#:#exc_submission_file#:#Submission File
 exc#:#exc_submission_text#:#Submission Text
 common#:#open#:#Open
+exc#:#exc_down_files_started#:#Download of submission files has started.

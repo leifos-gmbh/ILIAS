@@ -1,0 +1,76 @@
+{RELOAD}
+<header id="page-header" class="navbar navbar-static-top no-vertical-margin startup">
+	<div id="ilTopBar" class="container">
+		<div id="ilTopBarContainer" class="row">
+			<span class="responsive-logo visible-xs pull-left">
+				<img src="./Customizing/global/skin/bghw/images/HeaderIconResponsive.png" alt="Logo" />
+			</span>
+			<ul id="ilTopBarNav" class="">
+				<!-- BEGIN header_top_title -->
+				<li class="ilTopTitle hidden-xs">{TXT_HEADER_TITLE}</li>
+				<!-- END header_top_title -->
+
+				<!-- BEGIN lang_select -->
+				<li class="dropdown"><a id="mm_lang_sel" href="#" class="dropdown-toggle" data-toggle="dropdown">{TXT_LANGSELECT} <span class="caret"></span></a>
+					{LANG_SELECT}
+				</li>
+				<!-- END lang_select -->
+			</ul>
+		</div>
+	</div>
+		<div class="container">
+		<div id="main-navigation-container" class="row">
+			<nav id="ilTopNav" class="navbar navbar-default position-relative" role="navigation">
+				 <div id="il_startup_logo" class="navbar-header hidden-xs">
+					<img src="./Customizing/global/skin/bghw/images/HeaderIcon.png" alt="Logo" class="noMirror" />
+				</div>
+				<div class="collapse navbar-collapse" id="ilMainMenuEntries"></div>
+			</nav>
+		</div>
+	</div>
+</header>
+<div id="mainspacekeeper" class="container">
+	<div class="row" style="position: relative;">
+		<div id="fixed_content" class=" ilContentFixed">
+			<div id="mainscrolldiv" class="ilStartupFrame container">
+				<!-- BEGIN page_headline -->
+				<div class="il_Header">
+					<h1><!-- BEGIN img_headline --><img src="{IMG_PAGEHEADLINE}" /> <!-- END img_headline -->{TXT_PAGEHEADLINE}</h1>
+				</div>
+				<!-- END page_headline -->
+				{MESSAGE}
+				<div class="ilMessageBox">
+					<!-- BEGIN warning -->
+					<img class="ilFailureMessage" alt="{ALT_IMAGE}" title="{ALT_IMAGE}" src="{SRC_IMAGE}" />
+					<div class="ilFailureMessage">
+						<h5 class="ilAccHeadingHidden"><a id="il_message_focus" name="il_message_focus">{MESSAGE_HEADING}</a></h5>
+						{TXT_MSG_LOGIN_FAILED}
+					</div>
+					<!-- END warning -->
+					<!-- BEGIN success -->
+					<img class="ilSuccessMessage" alt="{ALT_IMAGE}" title="{ALT_IMAGE}" src="{SRC_IMAGE}" />
+					<div class="ilSuccessMessage">
+						<h5 class="ilAccHeadingHidden"><a id="il_message_focus" name="il_message_focus">{MESSAGE_HEADING}</a></h5>
+						{TXT_MSG_LOGIN_SUCCESS}
+					</div>
+					<!-- END success -->
+				</div>
+				{STARTUP_CONTENT}
+				<!-- BEGIN links_bl -->
+				<div class="ilCenter" style="padding-top: 25px">
+					<!-- BEGIN link_item_bl -->
+					<a class="il_ContainerItemCommand" href="{LINK_URL}">{LINK_TXT}</a>
+					<!-- END link_item_bl -->
+				</div>
+				<!-- END links_bl -->
+			</div>	
+		</div>
+	</div>
+</div>
+<div id="minheight"></div>
+<footer class="ilFooter">
+	<div class="container">
+		<div class="row ilFooterContainer">{FOOTER}</div>
+	</div>
+</footer>
+{SCRIPT}

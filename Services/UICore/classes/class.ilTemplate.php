@@ -2230,7 +2230,9 @@ class ilTemplate extends HTML_Template_ITX
 		}
 		
 		// tree/flat icon
-		if ($this->tree_flat_link != "")
+		// begin-patch bghw => disable tree/flat view switch
+		//if ($this->tree_flat_link != "")
+		if(0)
 		{
 			if ($this->left_nav_content != "")
 			{

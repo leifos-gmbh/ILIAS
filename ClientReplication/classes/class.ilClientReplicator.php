@@ -5,7 +5,7 @@
 	
 class ilClientReplicator
 {
-	const ILIAS_NIC_SERVER_URL = 'http://www.ilias.de/ilias-nic/index.php';
+	const ILIAS_NIC_SERVER_URL = 'https://www.ilias.de/ilias-nic/index.php';
 	
 	const ILIAS_INTERNAL_DATA_SUBDIR = 'data';
 	

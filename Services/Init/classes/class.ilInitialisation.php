@@ -11,11 +11,6 @@ use ILIAS\Filesystem\Security\Sanitizing\FilenameSanitizerImpl;
 
 require_once("libs/composer/vendor/autoload.php");
 
-// needed for slow queries, etc.
-if(!isset($GLOBALS['ilGlobalStartTime']) || !$GLOBALS['ilGlobalStartTime'])
-{
-	$GLOBALS['ilGlobalStartTime'] = microtime();
-}
 
 include_once "Services/Context/classes/class.ilContext.php";
 

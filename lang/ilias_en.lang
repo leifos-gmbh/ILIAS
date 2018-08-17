@@ -221,6 +221,7 @@ assessment#:#autosave#:#Automatic saving
 assessment#:#autosave_info#:#Answers are automatically saved in specified intervals to avoid data loss.
 assessment#:#autosave_ival#:#Interval
 assessment#:#for#:#for
+assessment#:#question_browse_area_info#:#Please select an object from which you want to import questions.
 assessment#:#wait_for_next_pass_hint_msg#:#Additional pass is possible on time: %s
 assessment#:#tst_pass_waiting_enabled#:#Force Waiting Time between Passes
 assessment#:#tst_pass_waiting_info#:#With this option additional passes can not be started before the defined time is lapsed relating to the last finished pass.
@@ -268,6 +269,8 @@ assessment#:#add_questionpool#:#Add Question Pool###deprecated
 assessment#:#add_rect#:#Add rectangle area
 assessment#:#add_solution#:#Add Content for Recapitulation###deprecated
 assessment#:#addSuggestedSolution#:#Add Content for Recapitulation
+assessment#:#tst_answer_aggr_answer_header#:#Answer
+assessment#:#tst_answer_aggr_frequency_header#:#Frequency
 assessment#:#all_available_question_pools#:#All available question pools
 assessment#:#allow_images#:#Image Support for Answers
 assessment#:#allowedextensions_info#:#Enter a comma separated list of allowed file extensions if you want to restrict the upload to a given set of file extensions (e.g. doc,xls,odt).
@@ -772,7 +775,7 @@ assessment#:#tst_source_question_pool#:#Question Pool
 assessment#:#tst_filter_taxonomy#:#Taxonomy
 assessment#:#tst_filter_tax_node#:#Taxonomy Node
 assessment#:#tst_non_avail_pools_table#:#Non Available Questionpools
-assessment#:#tst_non_avail_pool_msg_status_trashed#:#This question pool is trashed, when it gets removed from system permanently, the test is no longer able to synchronize questions from it.###deprecated
+assessment#:#tst_non_avail_pool_msg_status_trashed#:#This question pool is trashed, when it gets removed from system permanently, the test is no longer able to synchronize questions from it.
 assessment#:#tst_non_avail_pool_msg_status_lost#:#This question pool is not available anymore. Synchronizing questions from this pool is not possible any longer. You can derive a new question pool from the questions contained in this test.
 assessment#:#tst_derive_new_pool#:#Derive New Question Pool
 assessment#:#tst_derive_new_pools#:#Derive New Question Pools
@@ -1058,7 +1061,7 @@ assessment#:#test_reference#:#Test Reference###deprecated
 assessment#:#text_answers_saved#:#Essay points modified!###deprecated
 assessment#:#text_correct#:#Correct Text
 assessment#:#text_gap#:#Text Gap
-assessment#:#text_maximum_chars_allowed#:#Please do not enter more than a maximum of %s characters. Any characters above will be cut.
+assessment#:#text_maximum_chars_allowed#:#Please do not enter more than a maximum of %s characters. Additional characters won't get cut, but the exceeding might be considered during scoring.
 assessment#:#text_rating#:#Text Matching Method
 assessment#:#text_wrong#:#Wrong Text
 assessment#:#textsize_errortext_info#:#Enter the text size of the error text in percent if you want another size than 100 percent.
@@ -1242,7 +1245,7 @@ assessment#:#tst_postpone_off#:#Unanswered Questions Stay in Position
 assessment#:#tst_postpone_off_desc#:#Question that users just look at and flip over without answering them, will stay at their position in the test and will not be enqueued at the end of the test.
 assessment#:#tst_print_date#:#Date of Print###deprecated
 assessment#:#tst_print#:#Test and Assessment - Print View
-assessment#:#tst_processing_time_desc#:#Participants can work through the test only for a specified period of time. Time is clocking away from the moment a user starts a test for the first time. Suspending the test does not stop the clock.
+assessment#:#tst_processing_time_desc#:#Participants can work through the test only for a specified period of time. Time is clocking away from the moment a user starts a test for the first time. Suspending the test does not stop the clock. If the number of possible test passes is limited an additional feature for granting extra time to participants appears in the tab 'Participants'.
 assessment#:#tst_processing_time#:#Limit Duration of Test
 assessment#:#tst_properties#:#Test Properties###deprecated
 assessment#:#tst_qst_order#:#No.
@@ -3622,7 +3625,7 @@ common#:#obj_chac_desc#:#Configure your chat server here. Enable/disable chats.#
 common#:#obj_chac#:#Chat Server###deprecated
 common#:#obj_chap#:#Chapter
 common#:#obj_chat#:#Chat###deprecated
-common#:#obj_cmps_desc#:#General settings for Repository Plugins
+common#:#obj_cmps_desc#:#General settings for Plugins
 common#:#obj_cmps#:#Plugins
 common#:#obj_crs_duplicate#:#Copy Course
 common#:#obj_crs_select#:#-- Please select one course --###deprecated
@@ -6054,8 +6057,8 @@ crs#:#sess_gen_signature#:#Generate Column for Signatures###deprecated
 crs#:#sess_join_info#:#Please click Attend if you want to take part at this session.
 crs#:#sess_limit_info#:#Participants are not presented with the list of all sessions but a limited number of sessions.
 crs#:#sess_limit#:#Limit Number of Sessions Shown
-crs#:#sess_num_next#:#Number of Future Sessions
-crs#:#sess_num_prev#:#Number of Past Sessions
+crs#:#sess_num_next#:#Number of Following Sessions (from tomorrow)
+crs#:#sess_num_prev#:#Number of Past Sessions (until yesterday)
 crs#:#sess_print_attendance_list#:#Print List
 crs#:#sess_signature#:#Signature
 crs#:#subscription_times_not_valid#:#The registration period is not valid.
@@ -9599,8 +9602,8 @@ search#:#search_item_filter#:#Search by Type###deprecated
 search#:#search_item_filter_form#:#Search by Type
 search#:#search_item_filter_form_info#:#Search can be restricted to the chosen file types.
 administration#:#group_export#:#Visible in Groups
-tbl#:#tbl_export_csv#:#Export .csv
-tbl#:#tbl_export_excel#:#Export .xls
+tbl#:#tbl_export_csv#:#Export CSV
+tbl#:#tbl_export_excel#:#Export Excel
 crs#:#crs_custom_user_fields#:#Course Relevant User Data
 grp#:#grp_custom_user_fields#:#Group Relevant User Data
 assessment#:#info_answer_type_change#:#The question already contains images. You can't change the answer type to multi-line answers.
@@ -9620,7 +9623,7 @@ wiki#:#wiki_change_notification_subject#:#Wiki "%1$s" has been changed: %2$s
 wiki#:#wiki_change_notification_page_body_update#:#the following wiki page has been updated
 wiki#:#wiki_change_notification_page_body_delete#:#the following wiki page has been deleted###deprecated
 wiki#:#wiki_change_notification_page_link#:#URL
-wiki#:#wiki_change_notification_body_new#:#the following wiki page was created###deprecated
+wiki#:#wiki_change_notification_body_new#:#the following wiki page was created
 wiki#:#wiki_change_notification_link#:#URL
 wiki#:#wiki_notification_toggle_info#:#Change Notification###deprecated
 wiki#:#wiki_notification_toggle_wiki_activate#:#Activate for Wiki###deprecated
@@ -9648,9 +9651,9 @@ rbac#:#log#:#Log
 rbac#:#rbac_log#:#Log
 rbac#:#rbac_changes#:#Changes
 rbac#:#rbac_log_operation_add#:#Added Operation for "%s"
-rbac#:#rbac_log_operation_rmv#:#Removed Operation for "%s"###deprecated
+rbac#:#rbac_log_operation_rmv#:#Removed Operation for "%s"
 rbac#:#rbac_log_inheritance_add#:#Stopped Inheritance for "%s"
-rbac#:#rbac_log_inheritance_rmv#:#Allowed Inheritance for "%s"###deprecated
+rbac#:#rbac_log_inheritance_rmv#:#Allowed Inheritance for "%s"
 rbac#:#rbac_log_source_object#:#Source object
 rbac#:#rbac_log_edit_permissions#:#Edit Permissions
 rbac#:#rbac_log_move_object#:#Move Object
@@ -10581,7 +10584,7 @@ wsp#:#wsp_set_permission_single_user#:#A Single User
 wsp#:#wsp_set_permission_group#:#Members of Group
 wsp#:#wsp_set_permission_course#:#Members of Course
 wsp#:#wsp_set_permission_all_password#:#World Wide Web with Password
-wsp#:#wsp_permission_removed#:#The item has been removed.
+wsp#:#wsp_permission_removed#:#Entry has been removed.
 wsp#:#wsp_share_with_members#:#Share with members
 wsp#:#wsp_share_success#:#A new entry has been added.
 wsp#:#wsp_share_search_users#:#Search Users
@@ -11416,7 +11419,7 @@ blog#:#blog_change_notification_subject#:#Blog "%s" has been updated
 blog#:#blog_change_notification_salutation#:#Hello %s,###deprecated
 blog#:#blog_change_notification_body_new#:#the following blog posting was created.
 blog#:#blog_change_notification_body_update#:#the following blog posting has been updated.
-blog#:#blog_change_notification_body_comment#:#the following blog posting has been commented.###deprecated
+blog#:#blog_change_notification_body_comment#:#the following blog posting has been commented.
 blog#:#blog_changed_by#:#Last Changed By###deprecated
 blog#:#blog_change_notification_link#:#Link to Blog Posting
 blog#:#blog_notification_toggle_on#:#Activate Notification
@@ -11668,7 +11671,8 @@ assessment#:#tst_question_hints_table_link_edit_hint_page#:#Edit Page
 assessment#:#tst_question_hints_form_cmd_save_points#:#Save Points
 assessment#:#tst_question_hints_form_cmd_save_points_and_edit_page#:# Save Points and Edit Page
 assessment#:#tst_question_hints_back_to_hint_list#:#Question Hint List
-assessment#:#conf_delete_pass#:#Really delete pass?
+assessment#:#conf_delete_pass_ctm#:#Wollen Sie Ihre bisherigen Antworten wirklich löschen?
+assessment#:#conf_delete_pass#:#Are you sure you want to delete your existing answers?
 help#:#help_tooltips#:#Help Tooltips
 help#:#help_tooltip_id#:#Tooltip ID
 help#:#help_tt_text#:#Text
@@ -12153,9 +12157,9 @@ dcl#:#dcl_change_notification_subject#:#Data Collection "%s" has been changed
 dcl#:#dcl_edit_notification#:#Email Notification on Change###deprecated
 dcl#:#dcl_edit_notification_info#:#You will be notified when any table is edited###deprecated
 dcl#:#dcl_change_notification_link#:#Link to the Data Collection
-dcl#:#dcl_change_notification_dcl_new_record#:#The following Entry has been created
-dcl#:#dcl_change_notification_dcl_update_record#:#The following Entry has been updated
-dcl#:#dcl_change_notification_dcl_delete_record#:#The following Entry page has been deleted###deprecated
+dcl#:#dcl_change_notification_dcl_new_record#:#The following data record has been created
+dcl#:#dcl_change_notification_dcl_update_record#:#The following data record has been updated
+dcl#:#dcl_change_notification_dcl_delete_record#:#The following data record has been deleted
 dcl#:#dcl_change_why_you_receive_this_email#:#You receive this message because you have activated the notification about this data collection.
 dcl#:#dcl_table#:#Table
 dcl#:#dcl_changed_by#:#Changed by
@@ -12282,14 +12286,14 @@ rbac#:#blog_contribute#:#User can create postings
 blog#:#blog_contribute_other_roles#:#In addition to the list of ‘Contributors’, users with one of the following roles can also add postings: %s
 dcl#:#dcl_no_content_warning#:#Attention, the Data Collection is online but does not have content yet!
 dcl#:#dcl_visible#:#Visible for all users
-dcl#:#dcl_empty_view#:#Delete this View
+dcl#:#dcl_empty_detailed_view#:#Delete this detailed view
 dcl#:#dcl_activate_view#:#Activate this view
 dcl#:#dcl_deactivate_view#:#Deactivate this view
 dcl#:#dcl_confirm_delete_field#:#Do you really want to delete this field?
 dcl#:#dcl_table_info_title#:#Info
-dcl#:#dcl_confirm_delete_view_title#:#Do you really want to delete this view?
-dcl#:#dcl_confirm_delete_view_text#:#The View Definition of entries of this table will be removed irreversibly, the entries and fields themselves will not be changed.
-dcl#:#dcl_empty_view_success#:#The View Definition has been deleted successfully.
+dcl#:#dcl_confirm_delete_detailed_view_title#:#Do you really want to delete this detailed view?
+dcl#:#dcl_confirm_delete_detailed_view_text#:#The detailed view definition of entries of this table will be removed irreversibly, the entries and fields themselves will not be changed.
+dcl#:#dcl_empty_detailed_view_success#:#The detailed view definition has been deleted successfully.
 dcl#:#dcl_permissions_form#:#User actions
 rating#:#rating_number_votes#:#%s Ratings
 administration#:#system_check_no_owner#:#Ownerless Objects
@@ -12418,6 +12422,8 @@ ecs#:#ecs_cmap_all_in_one_info#:#Create all new courses in one category.
 ecs#:#ecs_cmap_all_in_one_cat#:#Course Category
 ecs#:#ecs_cmap_multiple_atts#:#Multiple Attributes
 ecs#:#ecs_cmap_att_organisation#:#Organisation
+ecs#:#ecs_cmap_att_orgunit#:#Organisational Unit
+ecs#:#ecs_member_auth_type#:#Authentication Mode (Participants)
 ecs#:#ecs_cmap_att_term#:#Term
 ecs#:#ecs_cmap_att_title#:#Title
 ecs#:#ecs_cmap_att_lecturer#:#Lecturer
@@ -12599,14 +12605,16 @@ dcl#:#dcl_save_confirmation_desc#:#Users have to confirm a new DataCollection en
 dcl#:#dcl_confirm_storing_records#:#Please validate and confirm your input.
 dcl#:#dcl_confirm_storing_records_no_permission#:#You have no permission to change the record afterwards.
 dcl#:#dcl_save_record#:#Save Entry
-dcl#:#dlc_xls_async_export#:#Asynchronous XLSX-Export
-dcl#:#dcl_export_started#:#Asynchronous Export started
+dcl#:#dlc_xls_async_export#:#Asynchronous Excel export
+dcl#:#dcl_export_started#:#Asynchronous export started
 dcl#:#dcl_export_finished#:#Export finished
 dcl#:#dcl_supported_filetypes#:#Allowed file-extensions
 dcl#:#dcl_supported_filetypes_desc#:#You can set the allowed extensions comma seperated. For example: pdf, docx
 dcl#:#dcl_no_export_data_available#:#No data or fields available for export.
 dcl#:#dcl_no_export_content_available#:#No data available for export.
 dcl#:#dcl_no_export_fields_available#:#No fields activated for export. Mark at least one field as exportable in the <a href="%s">table settings</a>.
+dcl#:#dcl_no_read_access_on_any_standard_view#:#You don't have read access on any standard view of a table.
+dcl#:#dcl_rbac_roles_without_read_access_on_any_standard_view#:#The following rbac roles have read access on the data collection, but no read access on any standard view of a table:
 rbac#:#dcl_edit_content#:#Edit entries
 common#:#obj_bibl#:#Bibliography
 common#:#objs_bibl#:#Bibliographies
@@ -15362,6 +15370,8 @@ chatroom#:#chatroom_auth#:#Authentication
 chatroom#:#chatroom_auth_key#:#Authentication-Key
 chatroom#:#chatroom_auth_secret#:#Authentication-Secret
 chatroom#:#chatroom_auth_btn_txt#:#Generate Keys
+chatroom#:#chatroom_client_name#:#Name
+chatroom#:#chatroom_client_name_info#:#Please enter a name for this ILIAS client. The entered string must be globally unique. Initially this value is set to the client id of the ILIAS client. If changed, the chat server must be restarted.
 chatroom#:#key#:#Key
 chatroom#:#dhparam#:#Diffie-Hellman Parameter
 chatroom#:#ilias_chatserver_connection#:#ILIAS to Server Connection
@@ -15535,7 +15545,7 @@ assessment#:#save_on_navigation#:#Save on Navigation###fau: testNav
 assessment#:#save_on_navigation_confirmation#:#Your changed answers will be automatically saved when you navigate.###fau: testNav
 assessment#:#save_on_navigation_locked_confirmation#:#Your changed answers will be automatically saved and locked when you navigate.###fau: testNav
 assessment#:#save_on_navigation_forced_feedback_hint#:#Before you get feedback on your given answer.###fau: testNav
-assessment#:#save_on_navigation_prevent_confirmation#:#Don't show this message again###fau: testNav
+assessment#:#save_on_navigation_prevent_confirmation#:#Don't show this message again in my current session.
 assessment#:#tst_answer_status_editing#:# (editing)###fau: testNav
 assessment#:#tst_answer_status_answered#:#Answered###fau: testNav
 assessment#:#tst_answer_status_not_answered#:#Not answered###fau: testNav
@@ -15970,3 +15980,11 @@ wiki#:#wiki_pg_list_no_search_fields#:#No searchable meta data fields found in t
 content#:#cont_transl_master_language_not_allowed#:#To import a translation you need to activate at least one additional language under Settings > Multilingualism
 dateplaner#:#crs_start#:#Course starts
 dateplaner#:#crs_end#:#Course ends
+file#:#file_suffix_default_white#:#Default Suffix Whitelist
+file#:#file_suffix_default_white_info#:#Default list of accepted file suffixes.
+file#:#file_suffix_custom_black#:#Custom Suffix Blacklist
+file#:#file_suffix_custom_black_info#:#These suffixes will be removed from the default whitelist.
+file#:#file_suffix_custom_white#:#Custom Suffix Whitelist
+file#:#file_suffix_custom_white_info#:#These suffixes will be added to the default whitelist.
+file#:#file_suffix_overall_white#:#Overal Suffix Whitelist
+file#:#file_suffix_overall_white_info#:#Resulting overall list of accepted file suffixes.

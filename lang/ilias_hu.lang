@@ -213,6 +213,7 @@ assessment#:#autosave#:#Automatikus mentés
 assessment#:#autosave_info#:#A válaszokat meghatározott időközönként automatikusan mentjük, az adatvesztés elkerülése érdekében.
 assessment#:#autosave_ival#:#Időköz
 assessment#:#for#:#ehhez
+assessment#:#question_browse_area_info#:#Válasszon egy objektumot, melyből kérdéseket kíván importálni.
 assessment#:#wait_for_next_pass_hint_msg#:#További kitöltés lehetséges ekkor: %s
 assessment#:#tst_pass_waiting_enabled#:#Várakozási idő kikényszerítése kitöltések között
 assessment#:#tst_pass_waiting_info#:#Ha be van kapcsolva, további kitöltés nem indítható amíg megadott idő el nem telik az utolsó kitöltés befejezése óta.
@@ -12242,14 +12243,14 @@ rbac#:#blog_contribute#:#A felhasználó blogbejegyzést írhat és tehet közz�
 blog#:#blog_contribute_other_roles#:#A 'Blogszerzők' szerepkör mellett, a következő szerepek tagjai is hozhatnak létre új bejegyzéseket: %s.
 dcl#:#dcl_no_content_warning#:#Figyelem, az adatgyűjtés online, de még nincs tartalma!
 dcl#:#dcl_visible#:#Az összes felhasználó láthatja 
-dcl#:#dcl_empty_view#:#Ezen nézet törlése
+dcl#:#dcl_empty_detailed_view#:#Ezen nézet törlése
 dcl#:#dcl_activate_view#:#Nézet bekapcsolása
 dcl#:#dcl_deactivate_view#:#Nézet kikapcsolása
 dcl#:#dcl_confirm_delete_field#:#Biztos, hogy törli ezt a mezőt?
 dcl#:#dcl_table_info_title#:#Információ
-dcl#:#dcl_confirm_delete_view_title#:#Biztos, hogy törli ezt a nézetet?
-dcl#:#dcl_confirm_delete_view_text#:#A tábla bejegyzéseinek nézetsablonját véglegesen eltávolítja, de a tábla rekordjai és a mezői nem módosulnak.
-dcl#:#dcl_empty_view_success#:#A nézetsablont sikeresen törölte.
+dcl#:#dcl_confirm_delete_detailed_view_title#:#Biztos, hogy törli ezt a nézetet?
+dcl#:#dcl_confirm_delete_detailed_view_text#:#A tábla bejegyzéseinek nézetsablonját véglegesen eltávolítja, de a tábla rekordjai és a mezői nem módosulnak.
+dcl#:#dcl_empty_detailed_view_success#:#A nézetsablont sikeresen törölte.
 dcl#:#dcl_permissions_form#:#Felhasználói műveletek
 rating#:#rating_number_votes#:#%s értékelés
 administration#:#system_check_no_owner#:#Tulajdonos nélküli objektumok
@@ -15953,3 +15954,20 @@ wfe#:#wfe_request_missing_process_id#:#The process id is missing, cannot perform
 wfe#:#wfe_started_listening#:#Process armed###26 01 2018 new variable
 wfe#:#wfe_stopped_listening#:#Process disarmed###26 01 2018 new variable
 assessment#:#log_user_solution_willingly_deleted#:#User deleted the answer.###15 03 2018 new variable
+dateplaner#:#crs_start#:#Course starts###25 04 2018 new variable
+dateplaner#:#crs_end#:#Course ends###25 04 2018 new variable
+file#:#file_suffix_default_white#:#Default Suffix Whitelist###25 04 2018 new variable
+file#:#file_suffix_default_white_info#:#Default list of accepted file suffixes.###25 04 2018 new variable
+file#:#file_suffix_custom_black#:#Custom Suffix Blacklist###25 04 2018 new variable
+file#:#file_suffix_custom_black_info#:#These suffixes will be removed from the default whitelist.###25 04 2018 new variable
+file#:#file_suffix_custom_white#:#Custom Suffix Whitelist###25 04 2018 new variable
+file#:#file_suffix_custom_white_info#:#These suffixes will be added to the default whitelist.###25 04 2018 new variable
+file#:#file_suffix_overall_white#:#Overal Suffix Whitelist###25 04 2018 new variable
+file#:#file_suffix_overall_white_info#:#Resulting overall list of accepted file suffixes.###25 04 2018 new variable
+assessment#:#conf_delete_pass_ctm#:#Wollen Sie Ihre bisherigen Antworten wirklich löschen?###28 06 2018 new variable
+dcl#:#dcl_no_read_access_on_any_standard_view#:#You don't have read access on any standard view of a table.###28 06 2018 new variable
+dcl#:#dcl_rbac_roles_without_read_access_on_any_standard_view#:#The following rbac roles have read access on the data collection, but no read access on any standard view of a table:###28 06 2018 new variable
+chatroom#:#chatroom_client_name#:#Name###28 06 2018 new variable
+chatroom#:#chatroom_client_name_info#:#Please enter a name for this ILIAS client. The entered string must be globally unique. Initially this value is set to the client id of the ILIAS client. If changed, the chat server must be restarted.###28 06 2018 new variable
+ecs#:#ecs_cmap_att_orgunit#:#Organisational Unit###08 08 2018 new variable
+ecs#:#ecs_member_auth_type#:#Authentication Mode (Participants)###08 08 2018 new variable

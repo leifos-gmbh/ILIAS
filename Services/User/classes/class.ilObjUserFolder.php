@@ -403,6 +403,9 @@ class ilObjUserFolder extends ilObject
 			}
 		}
 		array_push($export_settings, "usr_id");
+		// begin-patch montcenis
+		array_push($export_settings, "ecs_import_id");
+		// end-patch montcenis
 		array_push($export_settings, "login");
 		array_push($export_settings, "last_login");
 		array_push($export_settings, "last_update");
@@ -484,6 +487,12 @@ class ilObjUserFolder extends ilObject
 		$result = $ilDB->query($query);
 		while ($row = $ilDB->fetchAssoc($result))
 		{
+			// begin-patch montcenis
+			$obj_id = $row['usr_id'];
+			$import_id = ilObject::_lookupImportId($obj_id);
+			$row['ecs_import_id'] = $import_id;
+			// end-patch montcenis
+
 			if(isset($languages[$row['usr_id']]))
 			{
 				$row['language'] = $languages[$row['usr_id']];

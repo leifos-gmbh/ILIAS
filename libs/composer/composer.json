@@ -25,7 +25,11 @@
 		"simplesamlphp/simplesamlphp": "1.15.3",
 		"ralouphie/getallheaders": "^2.0",
 		"league/flysystem": "^1.0",
-		"james-heinrich/getid3": "^1.9"
+		"james-heinrich/getid3": "^1.9",
+		"jakoch/phantomjs-installer": "2.1.1-p05"
+	},
+	"config": {
+		"bin-dir": "bin"
 	},
 	"require-dev": {
 		"mikey179/vfsStream": "^1.6",
@@ -39,6 +43,14 @@
 		"psr-4" : { "ILIAS\\" : "../../src" },
 		"classmap": ["../../Services/", "../../Modules"],
 		"exclude-from-classmap": ["../../Services/Migration", "../../*/*/lib", "../../*/*/test", "../../Services/CAS/phpcas"]
+	},
+	"scripts": {
+		"post-install-cmd": [
+			"PhantomInstaller\\Installer::installPhantomJS"
+		],
+		"post-update-cmd": [
+			"PhantomInstaller\\Installer::installPhantomJS"
+		]
 	},
 	"extra": {
 		"cweagans/composer-patches" : {

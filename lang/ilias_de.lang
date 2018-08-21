@@ -283,6 +283,7 @@ assessment#:#autosave#:#Automatisches Speichern
 assessment#:#autosave_info#:#Antworten werden von ILIAS automatisch gespeichert, um einen Datenverlust zu vermeiden.
 assessment#:#autosave_ival#:#Speicherintervall
 assessment#:#for#:#für
+assessment#:#question_browse_area_info#:#Wählen sie bitte ein Objekt aus dem sie Fragen importieren wollen.
 assessment#:#char_selector_btn_label#:#&nbsp;Ω&nbsp;
 assessment#:#tst_objective_oriented_test_pass_without_questions#:#Der gestartete Durchlauf im Test "%s" enthält keine Fragen.
 assessment#:#tst_dyn_quest_set_pool_deleted#:#Der aktuell konfigurierte Fragenpool "%s" ist gelöscht worden.
@@ -322,6 +323,8 @@ assessment#:#add_questionpool#:#Fragenpool hinzufügen
 assessment#:#add_rect#:#Rechteck hinzufügen
 assessment#:#add_solution#:#Hinweis auf Inhalte zur Wiederholung hinzufügen
 assessment#:#addSuggestedSolution#:#Inhalte zur Wiederholung
+assessment#:#tst_answer_aggr_answer_header#:#Antwort
+assessment#:#tst_answer_aggr_frequency_header#:#Häufigkeit
 assessment#:#adm_settings_templates#:#Einstellungsvorlagen
 assessment#:#all_available_question_pools#:#Alle vorhandenen Fragenpools
 assessment#:#allow_images#:#Grafikunterstützung für Antworten
@@ -1143,7 +1146,7 @@ assessment#:#test_using_template_link#:#Vorlage nicht mehr verwenden
 assessment#:#text_answers_saved#:#Die Punkte der Textfragen wurden gespeichert!
 assessment#:#text_correct#:#Korrekter Text
 assessment#:#text_gap#:#Textlücke
-assessment#:#text_maximum_chars_allowed#:#Bitte geben Sie nicht mehr als ein Maximum von %s Zeichen ein. Alle weiteren Zeichen werden am Ende abgeschnitten.
+assessment#:#text_maximum_chars_allowed#:#Bitte geben Sie nicht mehr als ein Maximum von %s Zeichen ein. Eingaben über das Limit hinaus werden nicht abgeschnitten, können aber ggf. in die Bewertung mit eingehen.
 assessment#:#text_rating#:#Methode für Textvergleiche
 assessment#:#text_wrong#:#Fehlerhafter Text
 assessment#:#textsize#:#Textgröße
@@ -1339,7 +1342,7 @@ assessment#:#tst_presentation_properties#:#Durchführung: Verhalten der Frage
 assessment#:#tst_print#:#Test und Assessment – Druckansicht
 assessment#:#tst_print_date#:#Datum des Ausdrucks
 assessment#:#tst_processing_time#:#Bearbeitungsdauer begrenzen
-assessment#:#tst_processing_time_desc#:#Teilnehmer können den Test nur für eine begrenzte Zeit bearbeiten. Die Zeit läuft von dem Moment des ersten Startens durch den Teilnehmer. "Test unterbrechen" stoppt den Ablauf der Bearbeitungsdauer nicht.
+assessment#:#tst_processing_time_desc#:#Teilnehmer können den Test nur für eine begrenzte Zeit bearbeiten. Die Zeit läuft von dem Moment des ersten Startens durch den Teilnehmer. "Test unterbrechen" stoppt den Ablauf der Bearbeitungsdauer nicht. Wenn die Anzahl möglicher Testdurchläufe eingeschränkt wird, erscheint im Tab "Teilnehmer" eine zusätzliche Funktion um Teilnehmern zusätzliche Zeit zu gewähren.
 assessment#:#tst_properties#:#Test-Eigenschaften
 assessment#:#tst_qst_order#:#Nr.
 assessment#:#tst_qst_resetsolved#:#markiere als ungelöst
@@ -12506,6 +12509,7 @@ assessment#:#tst_question_hints_table_link_edit_hint_page#:#Seite bearbeiten
 assessment#:#tst_question_hints_form_cmd_save_points#:#Speichere Punkte
 assessment#:#tst_question_hints_form_cmd_save_points_and_edit_page#:# Speichere Punkte und bearbeite Seite
 assessment#:#tst_question_hints_back_to_hint_list#:#Liste der Lösungshinweise
+assessment#:#conf_delete_pass_ctm#:#Wollen Sie Ihre bisherigen Antworten wirklich löschen?
 assessment#:#conf_delete_pass#:#Durchgang wirklich löschen?
 common#:#objs_blog#:#Blogs
 common#:#obj_blog_duplicate#:#Blog kopieren

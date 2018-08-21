@@ -187,6 +187,7 @@ assessment#:#autosave#:#Automatic saving
 assessment#:#autosave_info#:#Answers are automatically saved in specified intervals to avoid data loss.
 assessment#:#autosave_ival#:#Interval
 assessment#:#for#:#for
+assessment#:#question_browse_area_info#:#Please select an object from which you want to import questions.
 assessment#:#char_selector_btn_label#:#&nbsp;Ω&nbsp;
 assessment#:#tst_objective_oriented_test_pass_without_questions#:#The started pass for test "%s" does not contain any questions.
 assessment#:#tst_dyn_quest_set_pool_deleted#:#The currently configured question pool "%s" has been deleted.
@@ -225,6 +226,8 @@ assessment#:#add_questionpool#:#Add Question Pool
 assessment#:#add_rect#:#Add rectangle area
 assessment#:#add_solution#:#Add Content for Recapitulation
 assessment#:#addSuggestedSolution#:#Add Content for Recapitulation
+assessment#:#tst_answer_aggr_answer_header#:#Answer
+assessment#:#tst_answer_aggr_frequency_header#:#Frequency
 assessment#:#all_available_question_pools#:#All available question pools
 assessment#:#allow_images#:#Image Support for Answers
 assessment#:#allowedextensions_info#:#Enter a comma separated list of allowed file extensions if you want to restrict the upload to a given set of file extensions (e.g. doc,xls,odt).
@@ -997,7 +1000,7 @@ assessment#:#test_reference#:#Test Reference
 assessment#:#text_answers_saved#:#Essay points modified!
 assessment#:#text_correct#:#Correct Text
 assessment#:#text_gap#:#Text Gap
-assessment#:#text_maximum_chars_allowed#:#Please do not enter more than a maximum of %s characters. Any characters above will be cut.
+assessment#:#text_maximum_chars_allowed#:#Please do not enter more than a maximum of %s characters. Additional characters won't get cut, but the exceeding might be considered during scoring.
 assessment#:#text_rating#:#Text Matching Method
 assessment#:#text_wrong#:#Wrong Text
 assessment#:#textsize_errortext_info#:#Enter the text size of the error text in percent if you want another size than 100 percent.
@@ -12557,7 +12560,8 @@ assessment#:#tst_question_hints_table_link_edit_hint_page#:#Edit Page
 assessment#:#tst_question_hints_form_cmd_save_points#:#Save Points
 assessment#:#tst_question_hints_form_cmd_save_points_and_edit_page#:# Save Points and Edit Page
 assessment#:#tst_question_hints_back_to_hint_list#:#Question Hint List
-assessment#:#conf_delete_pass#:#Really delete pass?
+assessment#:#conf_delete_pass_ctm#:#Wollen Sie Ihre bisherigen Antworten wirklich löschen?
+assessment#:#conf_delete_pass#:#Are you sure you want to delete your existing answers?
 help#:#help_tooltips#:#Help Tooltips
 help#:#help_tooltip_id#:#Tooltip ID
 help#:#help_tt_text#:#Text

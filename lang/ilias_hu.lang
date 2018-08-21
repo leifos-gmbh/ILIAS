@@ -187,6 +187,7 @@ assessment#:#autosave#:#Automatikus mentés
 assessment#:#autosave_info#:#A válaszokat meghatározott időközönként automatikusan mentjük, az adatvesztés elkerülése érdekében.
 assessment#:#autosave_ival#:#Időköz
 assessment#:#for#:#ehhez
+assessment#:#question_browse_area_info#:#Válasszon egy objektumot, melyből kérdéseket kíván importálni.
 assessment#:#char_selector_btn_label#:#&nbsp;Ω&nbsp;
 assessment#:#tst_objective_oriented_test_pass_without_questions#:#'%s' teszt induló kitöltése nem tartalmaz kérdését.
 assessment#:#tst_dyn_quest_set_pool_deleted#:#A jelenleg beállított '%s' kérdésgyűjteményt törölték.
@@ -16239,3 +16240,4 @@ file#:#file_suffix_custom_white#:#Custom Suffix Whitelist###25 04 2018 new varia
 file#:#file_suffix_custom_white_info#:#These suffixes will be added to the default whitelist.###25 04 2018 new variable
 file#:#file_suffix_overall_white#:#Overal Suffix Whitelist###25 04 2018 new variable
 file#:#file_suffix_overall_white_info#:#Resulting overall list of accepted file suffixes.###25 04 2018 new variable
+assessment#:#conf_delete_pass_ctm#:#Wollen Sie Ihre bisherigen Antworten wirklich löschen?###01 08 2018 new variable

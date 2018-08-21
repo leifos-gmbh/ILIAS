@@ -319,6 +319,18 @@ abstract class assQuestion
 		require_once 'Services/Randomization/classes/class.ilArrayElementOrderKeeper.php';
 		$this->shuffler = new ilArrayElementOrderKeeper();
 	}
+	
+	protected static $forcePassResultsUpdateEnabled = false;
+	
+	public static function setForcePassResultUpdateEnabled($forcePassResultsUpdateEnabled)
+	{
+		self::$forcePassResultsUpdateEnabled = $forcePassResultsUpdateEnabled;
+	}
+	
+	public static function isForcePassResultUpdateEnabled()
+	{
+		return self::$forcePassResultsUpdateEnabled;
+	}
 
 	public static function isAllowedImageMimeType($mimeType)
 	{
@@ -1196,6 +1208,11 @@ abstract class assQuestion
 	 */
 	final public function persistPreviewState(ilAssQuestionPreviewSession $previewSession)
 	{
+		if( !$this->validateSolutionSubmit() )
+		{
+			return false;
+		}
+		
 		$this->savePreviewData($previewSession);
 	}
 	
@@ -3460,14 +3477,7 @@ abstract class assQuestion
 	*/
 	function isHTML($a_text)
 	{
-		if (preg_match("/<[^>]*?>/", $a_text))
-		{
-			return TRUE;
-		}
-		else
-		{
-			return FALSE; 
-		}
+		return ilUtil::isHTML($a_text);
 	}
 	
 	/**
@@ -3627,7 +3637,7 @@ abstract class assQuestion
 				);
 			}
 
-			if($old_points != $points || !$rowsnum)
+			if(self::isForcePassResultUpdateEnabled() || $old_points != $points || !$rowsnum)
 			{
 				assQuestion::_updateTestPassResults($active_id, $pass, $obligationsEnabled);
 				// finally update objective result
@@ -5111,6 +5121,11 @@ abstract class assQuestion
 	public function setObligationsToBeConsidered($obligationsToBeConsidered)
 	{
 		$this->obligationsToBeConsidered = $obligationsToBeConsidered;
+	}
+	
+	public function validateSolutionSubmit()
+	{
+		return true;
 	}
 
 	public function updateTimestamp()

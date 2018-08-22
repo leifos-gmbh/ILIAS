@@ -3,4 +3,7 @@
 	<style 	name = "SKYGUIDE"
 			id = "skyguide"
 			image_directory = "images" />
+	<style 	name = "STCDOC"
+			id = "stcdoc"
+			image_directory = "images" />
 </template>

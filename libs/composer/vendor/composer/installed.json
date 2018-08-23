@@ -22,7 +22,7 @@
             "composer/composer": "~1.0",
             "phpunit/phpunit": "~4.6"
         },
-        "time": "2016-03-28T18:54:21+00:00",
+        "time": "2016-03-28 18:54:21",
         "type": "composer-plugin",
         "extra": {
             "class": "cweagans\\Composer\\Patches"
@@ -69,7 +69,7 @@
             "phpunit/phpunit": "~4.5",
             "squizlabs/php_codesniffer": "~2.3"
         },
-        "time": "2016-03-28T09:10:18+00:00",
+        "time": "2016-03-28 09:10:18",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -120,7 +120,7 @@
         "require-dev": {
             "simpletest/simpletest": "^1.1"
         },
-        "time": "2017-06-03T02:28:16+00:00",
+        "time": "2017-06-03 02:28:16",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -176,7 +176,7 @@
             "symfony/var-dumper": "Pretty print complex values better with var-dumper available",
             "whoops/soap": "Formats errors as SOAP responses"
         },
-        "time": "2017-11-23T18:22:44+00:00",
+        "time": "2017-11-23 18:22:44",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -226,7 +226,7 @@
             "reference": "ac5c9c1f26eba2e6d0a9e374dc3d8316b586cdcc",
             "shasum": ""
         },
-        "time": "2016-02-01T23:14:34+00:00",
+        "time": "2016-02-01 23:14:34",
         "type": "library",
         "installation-source": "source",
         "autoload": {
@@ -281,7 +281,7 @@
             "twig/extensions": "Is necessary if you want to use the Twig extractor",
             "twig/twig": "Is necessary if you want to use the Twig extractor"
         },
-        "time": "2016-08-01T18:09:57+00:00",
+        "time": "2016-08-01 18:09:57",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -333,7 +333,7 @@
         "require-dev": {
             "phpunit/phpunit": "^4"
         },
-        "time": "2017-03-23T17:02:28+00:00",
+        "time": "2017-03-23 17:02:28",
         "bin": [
             "bin/export-plural-rules",
             "bin/export-plural-rules.php"
@@ -400,7 +400,7 @@
         "require-dev": {
             "phpunit/phpunit": "~4.0"
         },
-        "time": "2017-03-20T17:10:46+00:00",
+        "time": "2017-03-20 17:10:46",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -460,7 +460,7 @@
         "require": {
             "php": ">=5.6.0"
         },
-        "time": "2016-09-18T04:22:22+00:00",
+        "time": "2016-09-18 04:22:22",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -502,7 +502,7 @@
         "require": {
             "twig/extensions": "^1.3"
         },
-        "time": "2016-10-03T12:34:15+00:00",
+        "time": "2016-10-03 12:34:15",
         "type": "project",
         "installation-source": "dist",
         "autoload": {
@@ -548,7 +548,7 @@
         "require": {
             "php": ">=5.3.0"
         },
-        "time": "2017-03-27T21:12:55+00:00",
+        "time": "2017-03-27 21:12:55",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -609,7 +609,7 @@
             "league/flysystem-ziparchive": "Allows you to use ZipArchive adapter",
             "spatie/flysystem-dropbox": "Allows you to use Dropbox storage"
         },
-        "time": "2017-04-28T10:15:08+00:00",
+        "time": "2017-04-28 10:15:08",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -701,7 +701,7 @@
             "ruflin/elastica": "Allow sending log messages to an Elastic Search server",
             "sentry/sentry": "Allow sending log messages to a Sentry server"
         },
-        "time": "2016-07-29T03:23:52+00:00",
+        "time": "2016-07-29 03:23:52",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -775,7 +775,7 @@
         "suggest": {
             "league/oauth2-google": "Needed for Google XOAUTH2 authentication"
         },
-        "time": "2017-07-26T21:00:20+00:00",
+        "time": "2017-07-26 21:00:20",
         "type": "library",
         "extra": {
             "patches_applied": {
@@ -837,7 +837,7 @@
             "ext-xmlwriter": "*",
             "php": ">=5.2.0"
         },
-        "time": "2015-05-01T07:00:55+00:00",
+        "time": "2015-05-01 07:00:55",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -895,7 +895,7 @@
         "require": {
             "php": ">=5.3.0"
         },
-        "time": "2015-09-11T15:10:35+00:00",
+        "time": "2015-09-11 15:10:35",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -943,7 +943,7 @@
         "require": {
             "php": ">=5.3.0"
         },
-        "time": "2016-08-06T14:39:51+00:00",
+        "time": "2016-08-06 14:39:51",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -995,7 +995,7 @@
         "require": {
             "php": ">=5.3.0"
         },
-        "time": "2016-10-10T12:19:37+00:00",
+        "time": "2016-10-10 12:19:37",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1048,7 +1048,7 @@
             "phpunit/phpunit": "~3.7.0",
             "satooshi/php-coveralls": ">=1.0"
         },
-        "time": "2016-02-11T07:05:27+00:00",
+        "time": "2016-02-11 07:05:27",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -1089,7 +1089,7 @@
         "suggest": {
             "ext-openssl": "OpenSSL extension"
         },
-        "time": "2017-08-31T09:27:07+00:00",
+        "time": "2017-08-31 09:27:07",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -1141,7 +1141,7 @@
             "sensiolabs/security-checker": "~1.1",
             "squizlabs/php_codesniffer": "~1.4"
         },
-        "time": "2018-04-18T04:43:35+00:00",
+        "time": "2018-04-18 04:43:35",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1207,7 +1207,7 @@
             "mikey179/vfsstream": "~1.6",
             "phpunit/phpunit": "~4.8"
         },
-        "time": "2018-02-27T09:21:42+00:00",
+        "time": "2018-02-27 09:21:42",
         "type": "project",
         "extra": {
             "patches_applied": {
@@ -1270,7 +1270,7 @@
         "require": {
             "php": ">=5.5.9"
         },
-        "time": "2016-07-17T14:02:08+00:00",
+        "time": "2016-07-17 14:02:08",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1321,7 +1321,7 @@
         "require": {
             "php": ">=5.3.0"
         },
-        "time": "2012-03-14T16:36:15+00:00",
+        "time": "2012-03-14 16:36:15",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -1346,7 +1346,8 @@
             "File parser",
             "RIS",
             "Reference"
-        ]
+        ],
+        "abandoned": true
     },
     {
         "name": "tecnickcom/tcpdf",
@@ -1366,7 +1367,7 @@
         "require": {
             "php": ">=5.3.0"
         },
-        "time": "2015-09-12T10:08:34+00:00",
+        "time": "2015-09-12 10:08:34",
         "type": "library",
         "extra": {
             "patches_applied": {
@@ -1443,7 +1444,7 @@
         "suggest": {
             "symfony/translation": "Allow the time_diff output to be translated"
         },
-        "time": "2017-06-08T18:19:53+00:00",
+        "time": "2017-06-08 18:19:53",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1499,7 +1500,7 @@
             "symfony/debug": "^2.7",
             "symfony/phpunit-bridge": "^3.3"
         },
-        "time": "2018-03-20T04:25:58+00:00",
+        "time": "2018-03-20 04:25:58",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -1564,7 +1565,7 @@
         "require-dev": {
             "phpunit/phpunit": "4.0.*"
         },
-        "time": "2015-02-11T11:06:42+00:00",
+        "time": "2015-02-11 11:06:42",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -1587,6 +1588,50 @@
         "keywords": [
             "MD5",
             "apr1"
+        ]
+    },
+    {
+        "name": "jakoch/phantomjs-installer",
+        "version": "2.1.1-p05",
+        "version_normalized": "2.1.1.0-patch05",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/jakoch/phantomjs-installer.git",
+            "reference": "1aa2a29da48fee62679f7f7a3d446b0e52df494a"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/jakoch/phantomjs-installer/zipball/1aa2a29da48fee62679f7f7a3d446b0e52df494a",
+            "reference": "1aa2a29da48fee62679f7f7a3d446b0e52df494a",
+            "shasum": ""
+        },
+        "require": {
+            "ext-bz2": "*",
+            "ext-openssl": "*"
+        },
+        "time": "2016-07-11 09:07:23",
+        "type": "custom-installer",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "PhantomInstaller\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Jens-André Koch",
+                "email": "jakoch@web.de"
+            }
+        ],
+        "description": "A Composer package which installs the PhantomJS binary (Linux, Windows, Mac) into `/bin` of your project.",
+        "keywords": [
+            "binaries",
+            "headless",
+            "phantomjs"
         ]
     }
 ]

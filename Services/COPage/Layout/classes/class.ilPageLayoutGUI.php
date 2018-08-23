@@ -11,7 +11,7 @@ include_once("./Modules/Scorm2004/classes/class.ilSCORM2004Page.php");
 * @version $Id$
 *
 * @ilCtrl_Calls ilPageLayoutGUI: ilPageEditorGUI, ilEditClipboardGUI
-* @ilCtrl_Calls ilPageLayoutGUI: ilPublicUserProfileGUI, ilPageObjectGUI
+* @ilCtrl_Calls ilPageLayoutGUI: ilPublicUserProfileGUI, ilPageObjectGUI, ilPCPluggedGUI
 *
 */
 class ilPageLayoutGUI extends ilPageObjectGUI

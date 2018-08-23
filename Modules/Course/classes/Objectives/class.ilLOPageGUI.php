@@ -12,7 +12,7 @@ include_once("./Modules/Course/classes/Objectives/class.ilLOPageGUI.php");
  *
  * @ilCtrl_Calls ilLOPageGUI: ilPageEditorGUI, ilEditClipboardGUI, ilMDEditorGUI
  * @ilCtrl_Calls ilLOPageGUI: ilPublicUserProfileGUI, ilNoteGUI
- * @ilCtrl_Calls ilLOPageGUI: ilPropertyFormGUI, ilInternalLinkGUI, ilPageMultiLangGUI
+ * @ilCtrl_Calls ilLOPageGUI: ilPropertyFormGUI, ilInternalLinkGUI, ilPageMultiLangGUI, ilPCPluggedGUI
  *
  * @ingroup ModulesCourse
  */

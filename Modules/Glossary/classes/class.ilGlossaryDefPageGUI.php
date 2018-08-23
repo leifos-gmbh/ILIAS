@@ -12,7 +12,7 @@ include_once("./Modules/Glossary/classes/class.ilGlossaryDefPage.php");
  *
  * @ilCtrl_Calls ilGlossaryDefPageGUI: ilPageEditorGUI, ilEditClipboardGUI, ilObjectMetaDataGUI
  * @ilCtrl_Calls ilGlossaryDefPageGUI: ilPublicUserProfileGUI, ilNoteGUI
- * @ilCtrl_Calls ilGlossaryDefPageGUI: ilPropertyFormGUI, ilInternalLinkGUI
+ * @ilCtrl_Calls ilGlossaryDefPageGUI: ilPropertyFormGUI, ilInternalLinkGUI, ilPCPluggedGUI
  *
  * @ingroup ModulesGlossary
  */

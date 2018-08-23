@@ -10,7 +10,7 @@ require_once("./Services/Imprint/classes/class.ilImprint.php");
 * @author Jörg Lützenkirchen <luetzenkirchen@leifos.com>
 * 
 * @ilCtrl_Calls ilImprintGUI: ilPageEditorGUI, ilEditClipboardGUI, ilMediaPoolTargetSelector
-* @ilCtrl_Calls ilImprintGUI: ilPublicUserProfileGUI, ilPageObjectGUI
+* @ilCtrl_Calls ilImprintGUI: ilPublicUserProfileGUI, ilPageObjectGUI, ilPCPluggedGUI
 * 
 * @ingroup ModulesImprint
 */

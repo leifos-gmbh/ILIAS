@@ -11,7 +11,7 @@ include_once("./Services/Container/classes/class.ilContainerPage.php");
  * @author Alex Killing <alex.killing@gmx.de> 
  *
  * @ilCtrl_Calls ilContainerPageGUI: ilPageEditorGUI, ilEditClipboardGUI, ilMDEditorGUI
- * @ilCtrl_Calls ilContainerPageGUI: ilPublicUserProfileGUI, ilNoteGUI
+ * @ilCtrl_Calls ilContainerPageGUI: ilPublicUserProfileGUI, ilNoteGUI, ilPCPluggedGUI
  * @ilCtrl_Calls ilContainerPageGUI: ilPropertyFormGUI, ilInternalLinkGUI, ilPageMultiLangGUI
  *
  * @ingroup ServicesContainer

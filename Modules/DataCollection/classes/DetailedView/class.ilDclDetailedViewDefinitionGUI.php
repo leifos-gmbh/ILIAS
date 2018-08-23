@@ -11,7 +11,7 @@
  * @author       Jörg Lützenkirchen <luetzenkirchen@leifos.com>
  *
  * @ilCtrl_Calls ilDclDetailedViewDefinitionGUI: ilPageEditorGUI, ilEditClipboardGUI, ilMediaPoolTargetSelector
- * @ilCtrl_Calls ilDclDetailedViewDefinitionGUI: ilPublicUserProfileGUI, ilPageObjectGUI
+ * @ilCtrl_Calls ilDclDetailedViewDefinitionGUI: ilPublicUserProfileGUI, ilPageObjectGUI, ilPCPluggedGUI
  */
 class ilDclDetailedViewDefinitionGUI extends ilPageObjectGUI {
 	

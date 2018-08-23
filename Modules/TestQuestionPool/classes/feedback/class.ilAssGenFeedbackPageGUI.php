@@ -10,7 +10,7 @@ include_once("./Modules/TestQuestionPool/classes/feedback/class.ilAssGenFeedback
  * @author Alex Killing <alex.killing@gmx.de> 
  *
  * @ilCtrl_Calls ilAssGenFeedbackPageGUI: ilPageEditorGUI, ilEditClipboardGUI, ilMDEditorGUI
- * @ilCtrl_Calls ilAssGenFeedbackPageGUI: ilPublicUserProfileGUI, ilNoteGUI
+ * @ilCtrl_Calls ilAssGenFeedbackPageGUI: ilPublicUserProfileGUI, ilNoteGUI, ilPCPluggedGUI
  * @ilCtrl_Calls ilAssGenFeedbackPageGUI: ilPropertyFormGUI, ilInternalLinkGUI
  *
  * @ingroup ModulesTestQuestionPool

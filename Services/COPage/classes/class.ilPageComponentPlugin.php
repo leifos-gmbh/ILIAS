@@ -182,6 +182,16 @@ abstract class ilPageComponentPlugin extends ilPlugin
 	}
 
 	/**
+	 * Get name of page gui class
+	 *
+	 * @return string
+	 */
+	public function getPageGUIClass()
+	{
+		return get_class($this->page_obj)."GUI";
+	}
+
+	/**
 	 * This function is called when the page content is cloned
 	 * @param array 	$a_properties		(properties saved in the page, should be modified if neccessary)
 	 * @param string	$a_plugin_version	(plugin version of the properties)

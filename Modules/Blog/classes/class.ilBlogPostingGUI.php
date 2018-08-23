@@ -11,7 +11,7 @@ include_once("./Modules/Blog/classes/class.ilBlogPosting.php");
  * @version $Id$
  *
  * @ilCtrl_Calls ilBlogPostingGUI: ilPageEditorGUI, ilEditClipboardGUI, ilMediaPoolTargetSelector
- * @ilCtrl_Calls ilBlogPostingGUI: ilRatingGUI, ilPublicUserProfileGUI, ilPageObjectGUI, ilNoteGUI
+ * @ilCtrl_Calls ilBlogPostingGUI: ilRatingGUI, ilPublicUserProfileGUI, ilPageObjectGUI, ilNoteGUI, ilPCPluggedGUI
  *
  * @ingroup ModulesBlog
  */

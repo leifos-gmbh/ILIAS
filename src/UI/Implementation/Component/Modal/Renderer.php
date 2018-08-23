@@ -17,11 +17,20 @@ class Renderer extends AbstractComponentRenderer {
 	public function render(Component\Component $component, RendererInterface $default_renderer) {
 		$this->checkComponent($component);
 
+		global $DIC;
+
+		$log = $DIC->logger()->root();
+
 		// If the modal is rendered async, we just create a fake container which will be
 		// replaced by the modal upon successful ajax request
 		/** @var Modal $component */
 		if ($component->getAsyncRenderUrl()) {
+
+			$log->debug("///// Modal getAsyncRenderURL");
 			return $this->renderAsync($component);
+		} else
+		{
+			$log->debug("///// MOdal else not async render URL");
 		}
 
 		if ($component instanceof Component\Modal\Interruptive) {
@@ -48,12 +57,28 @@ class Renderer extends AbstractComponentRenderer {
 	 * @param string $id
 	 */
 	protected function registerSignals(Component\Modal\Modal $modal) {
+
+		/**
+		 * THis method is not called temporary by the roundtrip modal.
+		 */
+		$replacement = array(
+			'"'=> '\"',
+			"\n"=>"",
+			"\t"=>"",
+			"\r"=>"",
+		);
+
 		$show = $modal->getShowSignal();
 		$close = $modal->getCloseSignal();
-		$options = json_encode(array(
+		$replace = $modal->getReplaceContentSignal();
+
+		$is_async = $modal->getAsyncContentUrl();
+
+		$options = array(
 			'ajaxRenderUrl' => $modal->getAsyncRenderUrl(),
 			'keyboard' => $modal->getCloseWithKeyboard(),
-		));
+			//'template'  => str_replace(array_keys($replacement), array_values($replacement), $tpl->get())
+		);
 		// ATTENTION, ATTENTION:
 		// with(Additional)OnLoadCode opens a wormhole into the future, where some unspecified
 		// entity magically created an id for the component that can be used to refer to it
@@ -70,10 +95,15 @@ class Renderer extends AbstractComponentRenderer {
 		//   created
 		// * since withAdditionalOnLoadCode refers to some yet unknown future, it disencourages
 		//   tempering with the id _here_.
-		return $modal->withAdditionalOnLoadCode(function($id) use ($show, $close, $options) {
+		return $modal->withAdditionalOnLoadCode(function($id) use ($show, $close, $options, $replace, $is_async) {
+			if (!$is_async) {
+				$options["url"] = "#{$id}";
+			}
+			$options = json_encode($options);
 			return
-				"$(document).on('{$show}', function() { il.UI.modal.showModal('{$id}', {$options}); return false; });".
-				"$(document).on('{$close}', function() { il.UI.modal.closeModal('{$id}'); return false; });";
+				"$(document).on('{$show}', function(event, signalData) { il.UI.modal.showModal('{$id}', {$options}, signalData); return false; });".
+				"$(document).on('{$close}', function() { il.UI.modal.closeModal('{$id}'); return false; });".
+				"$(document).on('{$replace}', function(event, signalData) { il.UI.modal.replaceContentFromSignal('{$show}', signalData);});";
 		});
 	}
 
@@ -126,10 +156,69 @@ class Renderer extends AbstractComponentRenderer {
 	 *
 	 * @return string
 	 */
-	protected function renderRoundTrip(Component\Modal\RoundTrip $modal, RendererInterface $default_renderer) {
+	protected function renderRoundTrip(Component\Modal\RoundTrip $modal, RendererInterface $default_renderer)
+	{
+		global $DIC;
+
+		$log = $DIC->logger()->root();
+
 		$tpl = $this->getTemplate('tpl.roundtrip.html', true, true);
-		$modal = $this->registerSignals($modal);
+
+		/**
+		 * Todo after fixing: Put the proper code in registerSignals method.
+		 */
+		//$modal = $this->registerSignals($modal);
+
+		$replacement = array(
+			'"'=> '\"',
+			"\n"=>"",
+			"\t"=>"",
+			"\r"=>"",
+		);
+
+		$options = array(
+			'ajaxRenderUrl' => $modal->getAsyncRenderUrl(),
+			'keyboard' => $modal->getCloseWithKeyboard()
+			//'template'  => str_replace(array_keys($replacement), array_values($replacement), $tpl->get())
+		);
+		$is_async = $modal->getAsyncContentUrl();
+		if ($is_async) {
+$log->debug("RENDER IS ASYNCR.");
+			$options['type'] = 'async';
+			$options['url'] = $modal->getAsyncContentUrl();
+		} else
+		{
+$log->debug("ELSE: RENDER IS NOT ASYNCR.");
+		}
+
+		$show = $modal->getShowSignal();
+		$close = $modal->getCloseSignal();
+		$replace = $modal->getReplaceContentSignal();
+
+$ar = $replace->getAsyncRenderUrl();
+$log->debug("Async render URL => ".$ar);
+
+		$modal = $modal->withAdditionalOnLoadCode(function($id) use ($show, $close, $options, $replace, $is_async) {
+			if (!$is_async) {
+				$options["url"] = "#{$id}";
+			}
+			$options = json_encode($options);
+
+			return
+				"$(document).on('{$show}', function() { il.UI.modal.showModal('{$id}', {$options}); return false; });".
+				"$(document).on('{$close}', function() { il.UI.modal.closeModal('{$id}'); return false; });".
+				"$(document).on('{$replace}', function(event, signalData) { il.UI.modal.replaceContentFromSignal('{$show}', signalData);});";
+		});
+
+		//should we send it via param to the renderer?
 		$id = $this->bindJavaScript($modal);
+
+		if ($modal->getAsyncContentUrl()) {
+			$log->debug("RETURN WITHOUT CONTENT");
+			return '';
+		} else {
+			$log->debug("ELSE no async content");
+		}
 		$tpl->setVariable('ID', $id);
 		$tpl->setVariable('TITLE', $modal->getTitle());
 		foreach ($modal->getContent() as $content) {

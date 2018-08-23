@@ -12,7 +12,7 @@ include_once("./Modules/MediaPool/classes/class.ilMediaPoolItem.php");
 * @version $Id$
 *
 * @ilCtrl_Calls ilMediaPoolPageGUI: ilPageEditorGUI, ilEditClipboardGUI, ilMediaPoolTargetSelector
-* @ilCtrl_Calls ilMediaPoolPageGUI: ilPublicUserProfileGUI
+* @ilCtrl_Calls ilMediaPoolPageGUI: ilPublicUserProfileGUI, ilPCPluggedGUI
 *
 * @ingroup ModulesMediaPool
 */

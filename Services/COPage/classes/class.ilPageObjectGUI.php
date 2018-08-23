@@ -22,7 +22,7 @@ include_once("./Services/Utilities/classes/class.ilDOMUtil.php");
  * @version $Id$
  *
  * @ilCtrl_Calls ilPageObjectGUI: ilPageEditorGUI, ilEditClipboardGUI, ilObjectMetaDataGUI
- * @ilCtrl_Calls ilPageObjectGUI: ilPublicUserProfileGUI, ilNoteGUI, ilNewsItemGUI
+ * @ilCtrl_Calls ilPageObjectGUI: ilPublicUserProfileGUI, ilNoteGUI, ilNewsItemGUI, ilPCPluggedGUI
  * @ilCtrl_Calls ilPageObjectGUI: ilPropertyFormGUI, ilInternalLinkGUI, ilPageMultiLangGUI
  *
  * @ingroup ServicesCOPage
@@ -987,6 +987,7 @@ return;
 
 		$next_class = $this->ctrl->getNextClass($this);
 		$this->log->debug("next_class: ".$next_class);
+
 		switch($next_class)
 		{
 			case 'ilobjectmetadatagui':
@@ -1038,6 +1039,14 @@ return;
 				//$page_editor->executeCommand();
 				$ret = $this->ctrl->forwardCommand($page_editor);
 				break;
+
+			// Plugged Component
+			case "ilpcpluggedgui":
+				include_once ("./Services/COPage/classes/class.ilPCPluggedGUI.php");
+				$plugged_gui = new ilPCPluggedGUI($this->obj, null, 0, "", "");
+				$ret = $this->ctrl->forwardCommand($plugged_gui);
+				break;
+
 
 			case 'ilnewsitemgui':
 				include_once("./Services/News/classes/class.ilNewsItemGUI.php");

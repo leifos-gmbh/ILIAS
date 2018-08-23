@@ -11,7 +11,7 @@ include_once("./Modules/LearningModule/classes/class.ilLMPage.php");
  * @author Alex Killing <alex.killing@gmx.de>
  * @version $Id$
  * @ilCtrl_Calls ilLMPageGUI: ilPageEditorGUI, ilObjectMetaDataGUI, ilEditClipboardGUI, ilMediaPoolTargetSelector, ilCommonActionDispatcherGUI, ilPageObjectGUI
- * @ilCtrl_Calls ilLMPageGUI: ilNewsItemGUI, ilQuestionEditGUI, ilAssQuestionFeedbackEditingGUI, ilPageMultiLangGUI, ilPropertyFormGUI
+ * @ilCtrl_Calls ilLMPageGUI: ilNewsItemGUI, ilQuestionEditGUI, ilAssQuestionFeedbackEditingGUI, ilPageMultiLangGUI, ilPropertyFormGUI, ilPCPluggedGUI
  * @ingroup ModuleLearningModule
  */
 class ilLMPageGUI extends ilPageObjectGUI

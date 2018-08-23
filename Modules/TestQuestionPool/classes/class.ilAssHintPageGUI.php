@@ -11,7 +11,7 @@ include_once("./Modules/TestQuestionPool/classes/class.ilAssHintPage.php");
  *
  * @ilCtrl_Calls ilAssHintPageGUI: ilPageEditorGUI, ilEditClipboardGUI, ilMDEditorGUI
  * @ilCtrl_Calls ilAssHintPageGUI: ilPublicUserProfileGUI, ilNoteGUI
- * @ilCtrl_Calls ilAssHintPageGUI: ilPropertyFormGUI, ilInternalLinkGUI
+ * @ilCtrl_Calls ilAssHintPageGUI: ilPropertyFormGUI, ilInternalLinkGUI, ilPCPluggedGUI
  *
  * @ingroup ModulesTestQuestionPool
  * ilasshintpagegui

@@ -14,6 +14,7 @@ require_once("./Services/COPage/classes/class.ilPageContentGUI.php");
  * @author Alex Killing <alex.killing@gmx.de>
  * @version $Id$
  *
+ * @ilCtrl_Calls ilPCPluggedGUI: ilPasswordAssistanceGUI
  * @ingroup ServicesCOPage
  */
 class ilPCPluggedGUI extends ilPageContentGUI
@@ -34,7 +35,7 @@ class ilPCPluggedGUI extends ilPageContentGUI
 	* Constructor
 	* @access	public
 	*/
-	function __construct(&$a_pg_obj, &$a_content_obj, $a_hier_id, $a_plugin_name = "", $a_pc_id = "")
+	function __construct($a_pg_obj, $a_content_obj, $a_hier_id, $a_plugin_name = "", $a_pc_id = "")
 	{
 		global $DIC;
 

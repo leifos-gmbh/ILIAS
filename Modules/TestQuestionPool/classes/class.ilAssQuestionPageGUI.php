@@ -10,7 +10,7 @@ require_once('./Modules/TestQuestionPool/classes/class.ilAssQuestionPage.php');
  * @author Alex Killing <alex.killing@gmx.de> 
  *
  * @ilCtrl_Calls ilAssQuestionPageGUI: ilPageEditorGUI, ilEditClipboardGUI, ilMDEditorGUI
- * @ilCtrl_Calls ilAssQuestionPageGUI: ilPublicUserProfileGUI, ilNoteGUI
+ * @ilCtrl_Calls ilAssQuestionPageGUI: ilPublicUserProfileGUI, ilNoteGUI, ilPCPluggedGUI
  * @ilCtrl_Calls ilAssQuestionPageGUI: ilPropertyFormGUI, ilInternalLinkGUI
  *
  * @ingroup ModulesTestQuestionPool

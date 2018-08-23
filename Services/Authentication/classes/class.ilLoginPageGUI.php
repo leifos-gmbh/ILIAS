@@ -11,7 +11,7 @@ include_once("./Services/Authentication/classes/class.ilLoginPage.php");
  * @author Alex Killing <alex.killing@gmx.de> 
  *
  * @ilCtrl_Calls ilLoginPageGUI: ilPageEditorGUI, ilEditClipboardGUI, ilMDEditorGUI
- * @ilCtrl_Calls ilLoginPageGUI: ilPublicUserProfileGUI, ilNoteGUI
+ * @ilCtrl_Calls ilLoginPageGUI: ilPublicUserProfileGUI, ilNoteGUI, ilPCPluggedGUI
  * @ilCtrl_Calls ilLoginPageGUI: ilPropertyFormGUI, ilInternalLinkGUI
  *
  * @ingroup ServicesAuthentication

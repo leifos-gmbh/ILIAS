@@ -1237,8 +1237,8 @@ class ilObjFileGUI extends ilObject2GUI
 				{
 					// handle the file
 					$inp = $dnd_form_gui->getInput("upload_files");
-					$this->log->debug("ilObjFileGUI::uploadFiles ".print_r($_POST, true));
-					$this->log->debug("ilObjFileGUI::uploadFiles ".print_r($_FILES, true));
+					$this->log->info("ilObjFileGUI::uploadFiles ".print_r($_POST, true));
+					$this->log->info("ilObjFileGUI::uploadFiles ".print_r($_FILES, true));
 					$fileresult = $this->handleFileUpload($inp);
 					if ($fileresult)
 						$response = (object)array_merge((array)$response, (array)$fileresult);
@@ -1282,6 +1282,9 @@ class ilObjFileGUI extends ilObject2GUI
 	 */
 	protected function handleFileUpload($file_upload) 
 	{
+		ilLoggerFactory::getLogger('file')->dump($file_upload);
+
+
 		global $ilUser;
 		require_once('./Services/Utilities/classes/class.ilFileUtils.php');
 		// file upload params

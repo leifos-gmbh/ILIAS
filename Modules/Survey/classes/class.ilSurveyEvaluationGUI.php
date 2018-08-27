@@ -1924,17 +1924,23 @@ class ilSurveyEvaluationGUI
 		$parts = parse_url(ILIAS_HTTP_PATH);
 
 		$target = ilUtil::ilTempnam() . "." . $a_suffix;
+		$path = $parts["path"];
+		if(empty($path)) {
+			$path = "''";
+		}
 
 		$args = array(
 			session_id(),
 			$parts["host"],
-			$parts["path"],
+			$path,
 			CLIENT_ID,
 			"\"" . ILIAS_HTTP_PATH . "/" . $a_url . "\"",
 			$target
 		);
 
 		$output = $return = "";
+
+		ilLoggerFactory::getRootLogger()->debug("EXEC => ".$bin . " " . $script . " " . implode(" ", $args));
 		exec($bin . " " . $script . " " . implode(" ", $args), $output, $return);
 
 		$log = ilLoggerFactory::getLogger("svy");
@@ -1942,8 +1948,10 @@ class ilSurveyEvaluationGUI
 		$log->dump($return, ilLogLevel::DEBUG);
 
 		if (!$a_return) {
+			ilLoggerFactory::getRootLogger()->debug("**** Deliver the file. Target = ".$target);
 			ilUtil::deliverFile($target, $a_filename);
 		} else {
+			ilLoggerFactory::getRootLogger()->debug("**** Return a target = ".$target);
 			return $target;
 		}
 	}

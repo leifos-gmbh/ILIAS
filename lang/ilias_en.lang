@@ -313,6 +313,8 @@ assessment#:#add_imagemap#:#Import Image Map
 assessment#:#add_poly#:#Add polygon area
 assessment#:#add_rect#:#Add rectangle area
 assessment#:#addSuggestedSolution#:#Add Content for Recapitulation
+assessment#:#tst_answer_aggr_answer_header#:#Answer
+assessment#:#tst_answer_aggr_frequency_header#:#Frequency
 assessment#:#all_available_question_pools#:#All available question pools
 assessment#:#allow_images#:#Image Support for Answers
 assessment#:#allowedextensions_info#:#Enter a comma separated list of allowed file extensions if you want to restrict the upload to a given set of file extensions (e.g. doc,xls,odt).
@@ -713,6 +715,7 @@ assessment#:#tst_source_question_pool#:#Question Pool
 assessment#:#tst_filter_taxonomy#:#Taxonomy
 assessment#:#tst_filter_tax_node#:#Taxonomy Node
 assessment#:#tst_non_avail_pools_table#:#Non Available Questionpools
+assessment#:#tst_non_avail_pool_msg_status_trashed#:#This question pool is trashed, when it gets removed from system permanently, the test is no longer able to synchronize questions from it.
 assessment#:#tst_non_avail_pool_msg_status_lost#:#This question pool is not available anymore. Synchronizing questions from this pool is not possible any longer. You can derive a new question pool from the questions contained in this test.
 assessment#:#tst_derive_new_pool#:#Derive New Question Pool
 assessment#:#tst_derive_new_pools#:#Derive New Question Pools
@@ -1525,6 +1528,7 @@ cmps#:#cmps_needs_update#:#Needs update.
 cmps#:#cmps_needs_upgrade#:#The plugin version currently installed is older than a previously installed version. Please upgrade the plugin.
 cmps#:#cmps_no_db_update_file_available#:#No DB update script available.
 cmps#:#cmps_no_language_file_available#:#No language file available.
+cmps#:#cmps_must_installed#:#The component must be installed.
 cmps#:#cmps_plugin_activated#:#The plugin has been activated.
 cmps#:#cmps_plugin_db_prefixes#:#DB Table Prefixes
 cmps#:#cmps_plugin_deactivated#:#The plugin has been deactivated.
@@ -2896,7 +2900,7 @@ common#:#obj_cert_desc#:#Settings for certificates
 common#:#obj_cert#:#Certificates
 common#:#obj_wfe#:#Workflow Engine
 common#:#obj_chap#:#Chapter
-common#:#obj_cmps_desc#:#General settings for Repository Plugins
+common#:#obj_cmps_desc#:#General settings for Plugins
 common#:#obj_cmps#:#Plugins
 common#:#obj_crs_duplicate#:#Copy Course
 common#:#obj_crs#:#Course
@@ -3832,7 +3836,7 @@ content#:#cont_current_chapter#:#Current Chapter
 content#:#cont_current_page#:#Current Page
 content#:#cont_current_style#:#Current Style
 content#:#cont_current_version#:#Current Version
-content#:#cont_custom_size#:#Custom Size
+content#:#cont_custom_size#:#Fixed Size
 content#:#cont_custom#:#Custom
 content#:#cont_data_from_lms#:#adlcp:datafromlms
 content#:#cont_de_activate#:#(De-)Activate
@@ -4165,7 +4169,8 @@ content#:#cont_replace_mob_feature_info#:#Activates a feature that allows you to
 content#:#cont_replace_mob_feature#:#Replace Media Objects in Content
 content#:#cont_repository_item#:#Repository Item
 content#:#cont_resize_img#:#Resize Image File
-content#:#cont_resource_size#:#Original Resource Size
+content#:#cont_resource_size#:#Original Resource Size / No Size Declaration
+content#:#cont_resource_size_info#:#Without size declaration the size can be controlled by the content style. If neither a size is declared nor the content style contains a rule that determines the size, only images will be displayed in their default size.
 content#:#cont_resource_type#:#type
 content#:#cont_resource#:#Resource
 content#:#cont_resources#:#Resources
@@ -4676,8 +4681,8 @@ crs#:#sess_gen_attendance_list#:#Generate List
 crs#:#sess_join_info#:#Please click Attend if you want to take part at this session.
 crs#:#sess_limit_info#:#Participants are not presented with the list of all sessions but a limited number of sessions.
 crs#:#sess_limit#:#Limit Number of Sessions Shown
-crs#:#sess_num_next#:#Number of Future Sessions
-crs#:#sess_num_prev#:#Number of Past Sessions
+crs#:#sess_num_next#:#Number of Following Sessions (from tomorrow)
+crs#:#sess_num_prev#:#Number of Past Sessions (until yesterday)
 crs#:#sess_print_attendance_list#:#Print List
 crs#:#sess_signature#:#Signature
 crs#:#subscription_times_not_valid#:#The registration period is not valid.
@@ -7202,7 +7207,7 @@ survey#:#maintenance#:#Participants
 survey#:#manage_phrases#:#My Phrases
 survey#:#material_added_successfully#:#You successfully set a material link!
 survey#:#material#:#Material
-survey#:#materials_deleted#:#Material(s) deleted
+survey#:#materials_deleted#:#Material(s) have been removed from the question.
 survey#:#materials#:#Materials
 survey#:#matrix_appearance#:#Appearance
 survey#:#matrix_bipolar_adjectives_description#:#You may use a pair of bipolar adjectives to scale the column responses to words, short phrases, or texts
@@ -7649,12 +7654,14 @@ mail#:#mail_smtp_user#:#User
 mail#:#mail_smtp_password#:#Password
 mail#:#mail_smtp_password_req#:#If you defined a user for authentication purposes, a password must be set.
 mail#:#mail_system_usr_from_addr#:#Sender E-Mail (From)
+mail#:#mail_system_usr_from_addr_info#:#Please enter the e-mail address to be put in the 'FROM' header. The 'FROM' header is used to display the sender in the recipient e-mail client. The e-mail address of the user sending an e-mail via ILIAS will be automatically put in the 'Reply-To' header.<br /><br />Examples: <span style="font-style: italic">info@institution.de</span> or <span style="font-style: italic">no-reply@institution.de</span>
 mail#:#mail_system_usr_from_name#:#Sender Fullname (From)
 mail#:#mail_system_usr_from_name_info#:#You can use the placeholders [FULLNAME], [FIRSTNAME] and [LASTNAME]. These will then be replaced by the respective date of the e-mail initiator.
 mail#:#mail_system_usr_env_from_addr#:#Technical Sender
 mail#:#mail_system_usr_env_from_addr_info#:#If you leave this field empty, the sender e-mail address will be used if SMTP transfer is enabled. Otherwise it is the server administrator's responsibility to configure this value.
 mail#:#mail_system_sys_env_from_addr_info#:#If you leave this field empty, the sender e-mail address will be used if SMTP transfer is enabled. Otherwise it is the server administrator's responsibility to configure this value.
 mail#:#mail_system_sys_from_addr#:#Sender E-Mail (From)
+mail#:#mail_system_sys_from_addr_info#:#Please enter the e-mail address to be put in the 'FROM' header. The 'FROM' header is used to display the sender in the recipient e-mail client.<br /><br />Examples: <span style="font-style: italic">info@institution.de</span> or <span style="font-style: italic">no-reply@institution.de</span>
 mail#:#mail_system_sys_from_name#:#Sender Fullname (From)
 mail#:#mail_system_sys_reply_to_addr#:#Reply-To
 mail#:#mail_system_sys_env_from_addr#:#Technical Sender
@@ -7787,7 +7794,9 @@ rbac#:#log#:#Log
 rbac#:#rbac_log#:#Log
 rbac#:#rbac_changes#:#Changes
 rbac#:#rbac_log_operation_add#:#Added Operation for "%s"
+rbac#:#rbac_log_operation_rmv#:#Removed Operation for "%s"
 rbac#:#rbac_log_inheritance_add#:#Stopped Inheritance for "%s"
+rbac#:#rbac_log_inheritance_rmv#:#Allowed Inheritance for "%s"
 rbac#:#rbac_log_source_object#:#Source object
 rbac#:#rbac_log_edit_permissions#:#Edit Permissions
 rbac#:#rbac_log_move_object#:#Move Object
@@ -9914,6 +9923,7 @@ common#:#crs_list_reg_start#:#Registration Begin
 common#:#crs_list_reg_end#:#Registration End
 common#:#crs_list_reg_noreg#:#No Registration Possible
 common#:#crs_list_reg_period#:#Registration Period
+common#:#crs_list_reg#:#Registration
 common#:#crs_list_reg_limit_full#:#No places left
 common#:#crs_list_reg_limit_places#:#Free places
 search#:#lucene_offline_filter#:#Online-Status
@@ -9927,6 +9937,7 @@ common#:#grp_list_reg_start#:#Registration Begin
 common#:#grp_list_reg_end#:#Registration End
 common#:#grp_list_reg_noreg#:#No Registration Possible
 common#:#grp_list_reg_period#:#Registration Period
+common#:#grp_list_reg#:#Registration
 common#:#grp_list_reg_limit_full#:#No places left
 common#:#grp_list_reg_limit_places#:#Free places
 survey#:#svy_matrix_layout_percentages_sum_invalid#:#The column settings do not sum up to 100%.
@@ -10042,8 +10053,9 @@ rtst#:#rtst_call#:#Call ECS Test
 rbac#:#contribute#:#Contribute
 dcl#:#dcl_change_notification_subject#:#Data Collection "%s" has been changed
 dcl#:#dcl_change_notification_link#:#Link to the Data Collection
-dcl#:#dcl_change_notification_dcl_new_record#:#The following Entry has been created
-dcl#:#dcl_change_notification_dcl_update_record#:#The following Entry has been updated
+dcl#:#dcl_change_notification_dcl_new_record#:#The following data record has been created
+dcl#:#dcl_change_notification_dcl_update_record#:#The following data record has been updated
+dcl#:#dcl_change_notification_dcl_delete_record#:#The following data record has been deleted
 dcl#:#dcl_change_why_you_receive_this_email#:#You receive this message because you have activated the notification about this data collection.
 dcl#:#dcl_table#:#Table
 dcl#:#dcl_changed_by#:#Changed by
@@ -10153,14 +10165,14 @@ rbac#:#blog_contribute#:#User can create postings
 blog#:#blog_contribute_other_roles#:#In addition to the list of ‘Contributors’, users with one of the following roles can also add postings: %s
 dcl#:#dcl_no_content_warning#:#Attention, the Data Collection is online but does not have content yet!
 dcl#:#dcl_visible#:#Visible for all users
-dcl#:#dcl_empty_view#:#Delete this View
+dcl#:#dcl_empty_detailed_view#:#Delete this detailed view
 dcl#:#dcl_activate_view#:#Activate this view
 dcl#:#dcl_deactivate_view#:#Deactivate this view
 dcl#:#dcl_confirm_delete_field#:#Do you really want to delete this field?
 dcl#:#dcl_table_info_title#:#Info
-dcl#:#dcl_confirm_delete_view_title#:#Do you really want to delete this view?
-dcl#:#dcl_confirm_delete_view_text#:#The View Definition of entries of this table will be removed irreversibly, the entries and fields themselves will not be changed.
-dcl#:#dcl_empty_view_success#:#The View Definition has been deleted successfully.
+dcl#:#dcl_confirm_delete_detailed_view_title#:#Do you really want to delete this detailed view?
+dcl#:#dcl_confirm_delete_detailed_view_text#:#The detailed view definition of entries of this table will be removed irreversibly, the entries and fields themselves will not be changed.
+dcl#:#dcl_empty_detailed_view_success#:#The detailed view definition has been deleted successfully.
 dcl#:#dcl_permissions_form#:#User actions
 rating#:#rating_number_votes#:#%s Ratings
 administration#:#system_check_no_owner#:#Ownerless Objects
@@ -10287,6 +10299,7 @@ ecs#:#ecs_cmap_all_in_one_cat#:#Course Category
 ecs#:#ecs_cmap_multiple_atts#:#Multiple Attributes
 ecs#:#ecs_cmap_att_organisation#:#Organisation
 ecs#:#ecs_cmap_att_orgunit#:#Organisational Unit
+ecs#:#ecs_member_auth_type#:#Authentication Mode (Participants)
 ecs#:#ecs_cmap_att_term#:#Term
 ecs#:#ecs_cmap_att_title#:#Title
 ecs#:#ecs_cmap_att_lecturer#:#Lecturer
@@ -10374,6 +10387,9 @@ cron#:#cron_result_status_no_action#:#Ok, no processing
 cron#:#cron_result_status_ok#:#Ok
 cron#:#cron_result_status_crashed#:#Crashed
 cron#:#cron_result_status_reset#:#Reset
+cron#:#cro_job_rc_job_manual_reset#:#Cron job re-activated by admin
+cron#:#cro_job_rc_job_no_result#:#Cron job did not return a proper result
+cron#:#cro_job_rc_job_auto_deactivation_time_limit#:#Cron job deactivated because it has been inactive for 3 hours
 cron#:#cron_action_activate#:#Activate
 cron#:#cron_action_deactivate#:#Deactivate
 cron#:#cron_action_reset#:#Reset
@@ -10404,8 +10420,6 @@ cron#:#cron_action_deactivate_success#:#Cron-Job deactivated.
 cron#:#cron_action_reset_success#:#Cron-Job reset.
 cron#:#cron_action_edit_success#:#Schedule updated.
 cron#:#cron_no_executable_job_selected#:#Please select at least one executable cron-job.
-cron#:#cro_job_rc_job_manual_reset#:#RESET MANUALLY
-cron#:#cro_job_rc_job_auto_deactivation_time_limit#:#PROBABLY CRASHED
 dcl#:#dcl_no_warnings#:#The import terminated with no warnings.
 dcl#:#dcl_not_supported_in_import#:#This type of field is not supported in the import
 dcl#:#dcl_no_such_reference#:#The following value is not available in the reference table:
@@ -12407,6 +12421,7 @@ dcl#:#dcl_selection_type#:#Type
 dcl#:#dcl_selection_type_single#:#Single Selection
 dcl#:#dcl_selection_type_multi#:#Multiple Selection
 dcl#:#dcl_selection_type_combobox#:#Combobox (Dropdown)
+dcl#:#dcl_title_standardview#:#Standard View
 adve#:#adve_auto_url_linking#:#URL Auto-Linking
 adve#:#adve_auto_url_linking_info#:#Tries to identify URLs like "http://.." in text paragraphs and automatically creates links around them.
 content#:#cont_auto_time#:#Auto Animation Waiting Time
@@ -13153,6 +13168,8 @@ chatroom#:#chatroom_auth#:#Authentication
 chatroom#:#chatroom_auth_key#:#Authentication-Key
 chatroom#:#chatroom_auth_secret#:#Authentication-Secret
 chatroom#:#chatroom_auth_btn_txt#:#Generate Keys
+chatroom#:#chatroom_client_name#:#Name
+chatroom#:#chatroom_client_name_info#:#Please enter a name for this ILIAS client. The entered string must be globally unique. Initially this value is set to the client id of the ILIAS client. If changed, the chat server must be restarted.
 chatroom#:#key#:#Key
 chatroom#:#dhparam#:#Diffie-Hellman Parameter
 chatroom#:#ilias_chatserver_connection#:#ILIAS to Server Connection
@@ -13713,6 +13730,7 @@ chatroom#:#chtr_activation_limited_visibility_info#:#If checked, the title of th
 chatroom#:#chat_osc_subs_rej_msgs#:#Currently it is not possible to continue this conversation. Your chat-partner must activate chats in the chat-settings.
 chatroom#:#chat_osc_subs_rej_msgs_p#:#The following chat partners of your conversation do not want to receive messages anymore: %s
 chatroom#:#chat_osc_self_rej_msgs#:#You currently cannot take part in this conversation because you suppressed receiving messages in your settings.
+chatroom#:#chat_osc_search_modal_info#:#Here you can search for users you would like to add to a conversation. If the search dialogue was opened within a group chat, the new user will be added to this chat. If you started the search within a 1:1 chat, a new group chat window will be opened. 
 chatroom#:#chtr_server_status#:#Server Status
 chatroom#:#chtr_ban_actor_tbl_head#:#Akteur
 chatroom#:#chtr_ban_ts_tbl_head#:#Timestamp
@@ -13813,7 +13831,6 @@ mep#:#mobs_black_list_file_types_info#:#Enter a comma separated list of file suf
 form#:#form_msg_file_type_is_not_allowed#:#This file type is not allowed.
 common#:#file_no_valid_file_type#:#This file type is not allowed.
 common#:#file_some_invalid_file_types_removed#:#Some file types are not allowed and have been removed.
-ecs#:#ecs_member_auth_type#:#Course Member Auth Mode
 background_tasks#:#background_tasks#:#Background Tasks
 background_tasks#:#background_tasks_running#:#Background Tasks
 background_tasks#:#scheduled#:#Scheduled
@@ -14155,7 +14172,7 @@ content#:#cont_sc_name_setting_fullname#:#Title, First name and Last name
 content#:#cont_sc_name_setting_salutation_lastname#:#Salutation and Last name
 content#:#cont_sc_name_setting_first_name#:#First name
 content#:#cont_sc_name_setting_no_name#:#no name
-dateplaner#:#cal_download_files_started#:#Download of calendar files has started.
+dateplaner#:#cal_download_files_started#:#ILIAS is generating a ZIP archive of all available files. You can download them by clicking on the bag icon in the top bar.
 poll#:#poll_voting_period_full_info#:#Voting period from %s to %s
 common#:#usr_name_undisclosed#:#Undisclosed
 common#:#obj_exc_duplicate#:#Copy Exercise
@@ -14180,3 +14197,5 @@ file#:#file_suffix_custom_white#:#Custom Suffix Whitelist
 file#:#file_suffix_custom_white_info#:#These suffixes will be added to the default whitelist.
 file#:#file_suffix_overall_white#:#Overal Suffix Whitelist
 file#:#file_suffix_overall_white_info#:#Resulting overall list of accepted file suffixes.
+wiki#:#wiki_change_notification_body_new#:#the following wiki page was created
+mob#:#mob_no_fixed_size_map_editing#:#Please define a fixed size for your image before using map areas. If your image is scaled by content style or other CSS rules, your map areas will not fit anymore.

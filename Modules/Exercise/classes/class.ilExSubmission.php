@@ -8,7 +8,13 @@
  * @ingroup ModulesExercise
  */
 class ilExSubmission
-{	
+{
+	const TYPE_FILE = "File";
+	const TYPE_OBJECT = "Object";
+	const TYPE_TEXT = "Text";
+
+
+
 	/**
 	 * @var ilObjUser
 	 */
@@ -73,19 +79,20 @@ class ilExSubmission
 		
 	public function getSubmissionType()
 	{
-		switch($this->assignment->getType())
+		return $this->assignment->getAssignmentType()->getSubmissionType();
+		/*switch($this->assignment->getType())
 		{
 			case ilExAssignment::TYPE_UPLOAD_TEAM:					
 			case ilExAssignment::TYPE_UPLOAD:		
 				return "File";
 
 			case ilExAssignment::TYPE_BLOG:			
-			case ilExAssignment::TYPE_PORTFOLIO:				
-				return "Object";	
+			case ilExAssignment::TYPE_PORTFOLIO:
+				return "Object";
 
 			case ilExAssignment::TYPE_TEXT:												
 				return "Text";	
-		};
+		};*/
 	}
 	
 	
@@ -424,6 +431,14 @@ class ilExSubmission
 		return $delivered ? $delivered : array();
 	}
 
+	/**
+	 * Get submission items (not only files)
+	 * @todo this also returns non-file entries, rename this, see dev.txt.php
+	 * @param array|null $a_file_ids
+	 * @param bool $a_only_valid
+	 * @param null $a_min_timestamp
+	 * @return array
+	 */
 	function getFiles(array $a_file_ids = null, $a_only_valid = false, $a_min_timestamp = null)
 	{
 		$ilDB = $this->db;
@@ -469,8 +484,7 @@ class ilExSubmission
 					"/".$row["user_id"]."/".basename($row["filename"]);
 
 				// see 22301, 22719
-				if (is_file($row["filename"]) || (!in_array($this->assignment->getType(),
-						array(ilExAssignment::TYPE_UPLOAD, ilExAssignment::TYPE_UPLOAD_TEAM))))
+				if (is_file($row["filename"]) || (!$this->assignment->getAssignmentType()->usesFileUpload()))
 				{
 					array_push($delivered_files, $row);
 				}

@@ -50,10 +50,26 @@ class ilExAssignmentEditorGUI
 	 */
 	protected $help;
 
-	protected $exercise_id; // [int]
-	protected $assignment; // [ilExAssignment]
-	protected $enable_peer_review_completion; // [bool]
-	
+	/**
+	 * @var int
+	 */
+	protected $exercise_id;
+
+	/**
+	 * @var ilExAssignment
+	 */
+	protected $assignment;
+
+	/**
+	 * @var bool
+	 */
+	protected $enable_peer_review_completion;
+
+	/**
+	 * @var ilExAssignmentTypes
+	 */
+	protected $types;
+
 	/**
 	 * Constructor
 	 * 
@@ -76,6 +92,10 @@ class ilExAssignmentEditorGUI
 		$this->exercise_id = $a_exercise_id;
 		$this->assignment = $a_ass;
 		$this->enable_peer_review_completion = (bool)$a_enable_peer_review_completion_settings;
+		include_once("./Modules/Exercise/AssignmentTypes/classes/class.ilExAssignmentTypes.php");
+		$this->types = ilExAssignmentTypes::getInstance();
+		include_once("./Modules/Exercise/AssignmentTypes/GUI/classes/class.ilExAssignmentTypesGUI.php");
+		$this->type_guis = ilExAssignmentTypesGUI::getInstance();
 	}
 	
 	public function executeCommand()
@@ -90,7 +110,7 @@ class ilExAssignmentEditorGUI
 		switch($class)
 		{
 			case "ilpropertyformgui":
-				$form = $this->initAssignmentForm(ilExAssignment::TYPE_PORTFOLIO);
+				$form = $this->initAssignmentForm($_GET["ass_type"]);
 				$ilCtrl->forwardCommand($form);
 				break;
 
@@ -181,22 +201,14 @@ class ilExAssignmentEditorGUI
 	 */
 	protected function getTypeDropdown()
 	{
-		$ilSetting = $this->settings;
 		$lng = $this->lng;
-		
-		$types = array(
-			ilExAssignment::TYPE_UPLOAD => $lng->txt("exc_type_upload"),
-			ilExAssignment::TYPE_UPLOAD_TEAM => $lng->txt("exc_type_upload_team"),
-			ilExAssignment::TYPE_TEXT => $lng->txt("exc_type_text")
-		);
-		if(!$ilSetting->get('disable_wsp_blogs'))
+
+		$types = [];
+		foreach ($this->types->getAllActivated() as $k => $t)
 		{
-			$types[ilExAssignment::TYPE_BLOG] = $lng->txt("exc_type_blog");
+			$types[$k] = $t->getTitle();
 		}
-		if($ilSetting->get('user_portfolios'))
-		{
-			$types[ilExAssignment::TYPE_PORTFOLIO] = $lng->txt("exc_type_portfolio");
-		}		
+
 		$ty = new ilSelectInputGUI($lng->txt("exc_assignment_type"), "type");
 		$ty->setOptions($types);
 		$ty->setRequired(true);
@@ -213,11 +225,14 @@ class ilExAssignmentEditorGUI
 	{
 		$lng = $this->lng;
 		$ilCtrl = $this->ctrl;
+
+		$ass_type = $this->types->getById($a_type);
+		$ass_type_gui = $this->type_guis->getById($a_type);
+		$ilCtrl->setParameter($this, "ass_type", $a_type);
 		
 		$lng->loadLanguageModule("form");
 		include_once("./Services/Form/classes/class.ilPropertyFormGUI.php");
 		$form = new ilPropertyFormGUI();
-		$form->setTableWidth("600px");
 		if ($a_mode == "edit")
 		{
 			$form->setTitle($lng->txt("exc_edit_assignment"));
@@ -240,6 +255,13 @@ class ilExAssignmentEditorGUI
 		$ty->setDisabled(true);
 		$form->addItem($ty);
 
+		//
+		// type specific start
+		//
+
+		$ass_type_gui->addEditFormCustomProperties($form);
+
+		/*
 		if($a_type == ilExAssignment::TYPE_TEXT)
 		{
 			$rb_limit_chars = new ilCheckboxInputGUI($lng->txt("exc_limit_characters"),"limit_characters");
@@ -259,9 +281,10 @@ class ilExAssignmentEditorGUI
 			$rb_limit_chars->addSubItem($max_char_limit);
 
 			$form->addItem($rb_limit_chars);
-		}
+		}*/
 
 		// portfolio template
+		/*
 		if($a_type == ilExAssignment::TYPE_PORTFOLIO)
 		{
 			$rd_template = new ilRadioGroupInputGUI($lng->txt("exc_template"), "template");
@@ -283,7 +306,12 @@ class ilExAssignmentEditorGUI
 			$rd_template->addOption($radio_no_template);
 			$rd_template->addOption($radio_with_template);
 			$form->addItem($rd_template);
-		}
+		}*/
+
+		//
+		// type specific end
+		//
+
 
 		// mandatory
 		$cb = new ilCheckboxInputGUI($lng->txt("exc_mandatory"), "mandatory");
@@ -333,21 +361,10 @@ class ilExAssignmentEditorGUI
 
 
 		// max number of files
-		if($a_type == ilExAssignment::TYPE_UPLOAD ||
-			$a_type == ilExAssignment::TYPE_UPLOAD_TEAM)
+		if($ass_type->usesFileUpload())
 		{
-			if($a_type == ilExAssignment::TYPE_UPLOAD)
-			{
-				$type_name = $lng->txt("exc_type_upload");
-			}
-			if($a_type == ilExAssignment::TYPE_UPLOAD_TEAM)
-			{
-				$type_name = $lng->txt("exc_type_upload_team");
-			}
-
-			// custom section depending of assignment type
 			$sub_header = new ilFormSectionHeaderGUI();
-			$sub_header->setTitle($type_name);
+			$sub_header->setTitle($ass_type->getTitle());
 			$form->addItem($sub_header);
 			$max_file_tgl = new ilCheckboxInputGUI($lng->txt("exc_max_file_tgl"), "max_file_tgl");
 			$form->addItem($max_file_tgl);
@@ -360,7 +377,7 @@ class ilExAssignmentEditorGUI
 			$max_file_tgl->addSubItem($max_file);
 		}
 
-		if($a_type == ilExAssignment::TYPE_UPLOAD_TEAM)
+		if($ass_type->usesTeams())
 		{
 			$cbtut = new ilCheckboxInputGUI($lng->txt("exc_team_management_tutor"), "team_tutor");
 			$cbtut->setInfo($lng->txt("exc_team_management_tutor_info"));
@@ -371,7 +388,7 @@ class ilExAssignmentEditorGUI
 		$sub_header = new ilFormSectionHeaderGUI();
 		$sub_header->setTitle($lng->txt("exc_after_submission"), "after_submission");
 		$form->addItem($sub_header);
-		if($a_type != ilExAssignment::TYPE_UPLOAD_TEAM)
+		if (!$ass_type->usesTeams())
 		{
 			// peer review
 			$peer = new ilCheckboxInputGUI($lng->txt("exc_peer_review"), "peer");		
@@ -556,12 +573,13 @@ class ilExAssignmentEditorGUI
 					,"team_tutor" => $a_form->getInput("team_tutor")							
 				);
 				// portfolio template
-				if($a_form->getInput("template_id") && $a_form->getInput("template"))
-				{
-					$res['template_id'] = $a_form->getInput("template_id");
-				}
+				//if($a_form->getInput("template_id") && $a_form->getInput("template"))
+				//{
+				//	$res['template_id'] = $a_form->getInput("template_id");
+				//}
 
 				// text limitations
+				/*
 				if($a_form->getInput("limit_characters"))
 				{
 					$res['limit_characters'] = $a_form->getInput("limit_characters");
@@ -574,7 +592,7 @@ class ilExAssignmentEditorGUI
 				{
 					$res['min_char_limit'] = $a_form->getInput("min_char_limit");
 
-				}
+				}*/
 
 				// peer
 				if($a_form->getInput("peer") ||
@@ -633,10 +651,10 @@ class ilExAssignmentEditorGUI
 		$a_ass->setMaxFile($a_input["max_file"]);		
 		$a_ass->setTeamTutor($a_input["team_tutor"]);
 
-		$a_ass->setPortfolioTemplateId($a_input['template_id']);
+		//$a_ass->setPortfolioTemplateId($a_input['template_id']);
 
-		$a_ass->setMinCharLimit($a_input['min_char_limit']);
-		$a_ass->setMaxCharLimit($a_input['max_char_limit']);
+		//$a_ass->setMinCharLimit($a_input['min_char_limit']);
+		//$a_ass->setMaxCharLimit($a_input['max_char_limit']);
 
 		$a_ass->setPeerReview((bool)$a_input["peer"]);
 		
@@ -711,13 +729,18 @@ class ilExAssignmentEditorGUI
 		{								
 			$ass = new ilExAssignment();
 			$ass->setExerciseId($this->exercise_id);
-			$ass->setType($input["type"]);	
-			
-			$this->importFormToAssignment($ass, $input);			
+			$ass->setType($input["type"]);
+			$ass_type = $ass->getAssignmentType();
+			$ass_type_gui = $this->type_guis->getById($ass->getType());
+
+			$this->importFormToAssignment($ass, $input);
+			$ass_type_gui->importFormToAssignment($ass, $form);
+			$ass->update();
+
 			ilUtil::sendSuccess($lng->txt("msg_obj_modified"), true);
 						
 			// adopt teams for team upload?
-			if($ass->getType() == ilExAssignment::TYPE_UPLOAD_TEAM)
+			if ($ass_type->usesTeams())
 			{				
 				include_once "Modules/Exercise/classes/class.ilExAssignmentTeam.php";
 				if(sizeof(ilExAssignmentTeam::getAdoptableTeamAssignments($this->exercise_id, $ass->getId())))
@@ -762,20 +785,22 @@ class ilExAssignmentEditorGUI
 	{
 		$lng = $this->lng;
 		$ilCtrl = $this->ctrl;
-		
+
+		$ass_type_gui = $this->type_guis->getById($this->assignment->getType());
+
 		$values = array();	
 		$values["type"] = $this->assignment->getType();
 		$values["title"] = $this->assignment->getTitle();
 		$values["mandatory"] = $this->assignment->getMandatory();
 		$values["instruction"] = $this->assignment->getInstruction();
-		$values['template_id'] = $this->assignment->getPortfolioTemplateId();
+		//$values['template_id'] = $this->assignment->getPortfolioTemplateId();
 
-		if($this->assignment->getPortfolioTemplateId())
-		{
-			$values["template"] = 1;
-		}
+		//if($this->assignment->getPortfolioTemplateId())
+		//{
+		//	$values["template"] = 1;
+		//}
 
-		if($this->assignment->getMinCharLimit())
+		/*if($this->assignment->getMinCharLimit())
 		{
 			$values['limit_characters'] = 1;
 			$values['min_char_limit'] = $this->assignment->getMinCharLimit();
@@ -784,15 +809,14 @@ class ilExAssignmentEditorGUI
 		{
 			$values['limit_characters'] = 1;
 			$values['max_char_limit'] = $this->assignment->getMaxCharLimit();
-		}
+		}*/
 
 		if ($this->assignment->getStartTime())
 		{			
 			$values["start_time"] = new ilDateTime($this->assignment->getStartTime(), IL_CAL_UNIX);		
 		}
 		
-		if($this->assignment->getType() == ilExAssignment::TYPE_UPLOAD ||
-			$this->assignment->getType() == ilExAssignment::TYPE_UPLOAD_TEAM)
+		if ($this->assignment->getAssignmentType()->usesFileUpload())
 		{
 			if ($this->assignment->getMaxFile())
 			{
@@ -801,11 +825,14 @@ class ilExAssignmentEditorGUI
 			}
 		}
 					
-		if($this->assignment->getType() == ilExAssignment::TYPE_UPLOAD_TEAM)
+		if($this->assignment->getAssignmentType()->usesTeams())
 		{		
 			$values["team_tutor"] = $this->assignment->getTeamTutor();
-		}		
-		
+		}
+
+		$type_values = $ass_type_gui->getFormValuesArray($this->assignment);
+		$values = array_merge($values, $type_values);
+
 		$a_form->setValuesByArray($values);
 		
 		// global feedback		
@@ -856,7 +883,7 @@ class ilExAssignmentEditorGUI
 		
 		// team assignments do not support peer review			
 		// with no active peer review there is nothing to protect		
-		if($this->assignment->getType() != ilExAssignment::TYPE_UPLOAD_TEAM &&
+		if(!$this->assignment->getAssignmentType()->usesTeams() &&
 			$this->assignment->getPeerReview())
 		{		
 			// #14450 
@@ -892,13 +919,19 @@ class ilExAssignmentEditorGUI
 		
 		$form = $this->initAssignmentForm($this->assignment->getType(), "edit");
 		$input = $this->processForm($form);
+
+		$ass_type = $this->assignment->getType();
+		$ass_type_gui = $this->type_guis->getById($ass_type);
+
 		if(is_array($input))
 		{							
 			$old_deadline = $this->assignment->getDeadline();
 			$old_ext_deadline = $this->assignment->getExtendedDeadline();
-			
+
 			$this->importFormToAssignment($this->assignment, $input);
-			
+			$ass_type_gui->importFormToAssignment($this->assignment, $form);
+			$this->assignment->update();
+
 			$new_deadline = $this->assignment->getDeadline();
 			$new_ext_deadline = $this->assignment->getExtendedDeadline();
 			
@@ -1034,7 +1067,7 @@ class ilExAssignmentEditorGUI
 			$lng->txt("settings"),
 			$ilCtrl->getLinkTarget($this, "editAssignment"));
 
-		if($this->assignment->getType() != ilExAssignment::TYPE_UPLOAD_TEAM &&
+		if(!$this->assignment->getAssignmentType()->usesTeams() &&
 			$this->assignment->getPeerReview())
 		{
 			$ilTabs->addTab("peer_settings",

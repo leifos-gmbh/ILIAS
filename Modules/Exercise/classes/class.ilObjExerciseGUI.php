@@ -762,6 +762,10 @@ class ilObjExerciseGUI extends ilObjectGUI
 			$state = ilExcAssMemberState::getInstanceByIds($this->ass->getId(), $ilUser->getId());
 			if (!$state->getCommonDeadline() && $state->getRelativeDeadline())
 			{
+				// make sure user is assigned to exercise
+				$this->object->members_obj->assignMembers(array($ilUser->getId()));
+
+				// set starting ts
 				$idl = $state->getIndividualDeadlineObject();
 				$idl->setStartingTimestamp(time());
 				$idl->save();

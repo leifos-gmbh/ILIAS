@@ -52,5 +52,11 @@ interface ilExcRepoObjAssignmentInfoInterface
 	 */
 	function getExerciseTitle();
 
+	/**
+	 * Get readable ref IDs
+	 *
+	 * @return int[]
+	 */
+	function getReadableRefIds();
 
 }

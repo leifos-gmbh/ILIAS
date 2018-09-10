@@ -833,6 +833,12 @@ class ilExSubmission
 							$file["filetitle"]["login"].").zip";
 						break;
 
+					// @todo: generalize
+					case ilExAssignment::TYPE_WIKI_TEAM:
+						$file["filetitle"] = ilObject::_lookupTitle($this->assignment->getExerciseId())." - ".
+							$this->assignment->getTitle()." (Team ".$this->getTeam()->getId().").zip";
+						break;
+
 					default:
 						break;
 				}		
@@ -1103,12 +1109,11 @@ class ilExSubmission
 		{
 			$team_dirs = array();
 			$team_map = ilExAssignmentTeam::getAssignmentTeamMap($a_ass->getId());
-		}		
+		}
 		foreach ($members as $id => $item)
-		{		
+		{
 			$user = $item["name"];
 			$user_files = $item["files"];
-			
 			$sourcedir = $savepath.DIRECTORY_SEPARATOR.$id;
 			if (!is_dir($sourcedir))
 			{
@@ -1131,13 +1136,27 @@ class ilExSubmission
 				}
 				$team_dir = $team_dirs[$team_id].DIRECTORY_SEPARATOR;
 			}
-			
-			$targetdir = $team_dir.ilUtil::getASCIIFilename(				
-				trim($userName["lastname"])."_".
-				trim($userName["firstname"])."_".
-				trim($userName["login"])."_".
-				$userName["user_id"]
-			);						
+
+			if ($a_ass->getAssignmentType()->isSubmissionAssignedToTeam())
+			{
+				$targetdir = $team_dir . ilUtil::getASCIIFilename(
+						$item["name"]
+					);
+				if ($targetdir == "")
+				{
+					continue;
+				}
+
+			}
+			else
+			{
+				$targetdir = $team_dir . ilUtil::getASCIIFilename(
+						trim($userName["lastname"]) . "_" .
+						trim($userName["firstname"]) . "_" .
+						trim($userName["login"]) . "_" .
+						$userName["user_id"]
+					);
+			}
 			ilUtil::makeDir($targetdir);			
 						
 			$sourcefiles = scandir($sourcedir);
@@ -1154,6 +1173,14 @@ class ilExSubmission
 				{						
 					$targetfile= substr($targetfile, $pos + 1);
 				}
+
+				if ($a_ass->getAssignmentType()->getSubmissionType() == self::TYPE_REPO_OBJECT)
+				{
+					$obj_id = ilObject::_lookupObjId($targetfile);
+					$obj_type = ilObject::_lookupType($obj_id);
+					$targetfile = $obj_type."_".$obj_id.".zip";
+				}
+
 				
 				// #14536 
 				if(array_key_exists($targetfile, $duplicates))

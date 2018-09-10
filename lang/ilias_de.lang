@@ -14,15 +14,21 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
-wiki#:#wiki_type_wiki_team#:#Team Wiki
-exc#:#exc_without_wiki_template#:#Without Wiki Template
-exc#:#exc_with_wiki_template#:#With Wiki Template
-exc#:#exc_without_wiki_template_info#:#Participants will create their wiki from scratch.
-exc#:#exc_with_wiki_template_info#:#The template wiki will be copied to create the wikis of participants.
-exc#:#exc_wiki_container#:#Wiki Container
-exc#:#exc_wiki_container_info#:#Location where wikis of participants will be created.
-exc#:#exc_ass_team_wiki#:#Assignment Team Wiki
-exc#:#exc_create_wiki#:#Create Wiki
+wiki#:#wiki_type_wiki_team#:#Team-Wiki
+exc#:#exc_without_wiki_template#:#Ohne Vorlage
+exc#:#exc_with_wiki_template#:#Mit Vorlage
+exc#:#exc_without_wiki_template_info#:#Teilnehmer starten mit leerem Wiki.
+exc#:#exc_with_wiki_template_info#:#Neue Wikis der Teilnehmer werden durch Kopie der Vorlage erstellt.
+exc#:#exc_wiki_container#:#Wiki-Container
+exc#:#exc_wiki_container_info#:#Ort in dem neue Wikis der Teilnehmer angelegt werden.
+exc#:#exc_ass_team_wiki#:#Team-Wiki
+exc#:#exc_create_wiki#:#Wiki erstellen
+wiki#:#wiki_exercise_info#:#Dieses Wiki ist der Übungseinheit "%s" in der Übung "%s" zugeordnet.
+wiki#:#wiki_finalize_wiki#:#Wiki abschließen und abgeben
+wiki#:#wiki_finalized#:#Das Wiki wurde abgegeben.
+wiki#:#wiki_exercise_submitted_info#:#Ihre letzte Einreichung war am %s. Bitte prüfen Sie die Export-Datei: %s
+wiki#:#wiki_team_members#:#Teammitglieder
+wiki#:#wiki_exc_wiki_created#:#Wiki wurde erstellt
 common#:#obj_ltis#:#LTI
 common#:#obj_ltis_desc#:#Learning Tools Interoperability
 common#:#lti_outcome#:#Übermittlung LTI-Lernfortschritt

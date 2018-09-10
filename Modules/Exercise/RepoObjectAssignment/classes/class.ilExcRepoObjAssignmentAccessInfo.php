@@ -27,6 +27,11 @@ class ilExcRepoObjAssignmentAccessInfo implements ilExcRepoObjAssignmentAccessIn
 	protected $lng;
 
 	/**
+	 * @var ilAccessHandler
+	 */
+	protected $access;
+
+	/**
 	 * Constructor
 	 * @param bool $a_is_granted
 	 * @param string[] $a_not_granted_reasons
@@ -35,6 +40,7 @@ class ilExcRepoObjAssignmentAccessInfo implements ilExcRepoObjAssignmentAccessIn
 	{
 		global $DIC;
 
+		$this->access = $DIC->access();
 		$this->is_granted = $a_is_granted;
 		$this->not_granted_reasons = $a_not_granted_reasons;
 
@@ -76,6 +82,7 @@ class ilExcRepoObjAssignmentAccessInfo implements ilExcRepoObjAssignmentAccessIn
 		include_once("./Modules/Exercise/RepoObjectAssignment/classes/class.ilExcRepoObjAssignment.php");
 		$repo_obj_ass = ilExcRepoObjAssignment::getInstance();
 		$lng = $DIC->language();
+		$access = $DIC->access();
 
 		// if this object is not assigned to any assignment, we do not deny the access
 		$assignment_info = $repo_obj_ass->getAssignmentInfoOfObj($a_ref_id, $a_user_id);
@@ -90,8 +97,19 @@ class ilExcRepoObjAssignmentAccessInfo implements ilExcRepoObjAssignmentAccessIn
 		{
 			if (!$i->isUserSubmission())
 			{
-				$granted = false;
-				$reasons[0] = $lng->txt("exc_obj_not_submitted_by_user");
+				$has_write_permission = false;
+				foreach ($i->getReadableRefIds() as $exc_ref_id)
+				{
+					if ($access->checkAccessOfUser($a_user_id, "write", "", $exc_ref_id))
+					{
+						$has_write_permission = true;
+					}
+				}
+				if (!$has_write_permission)
+				{
+					$granted = false;
+					$reasons[0] = $lng->txt("exc_obj_not_submitted_by_user");
+				}
 			}
 		}
 

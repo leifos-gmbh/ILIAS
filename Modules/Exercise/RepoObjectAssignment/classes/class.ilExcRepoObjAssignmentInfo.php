@@ -120,6 +120,15 @@ class ilExcRepoObjAssignmentInfo implements ilExcRepoObjAssignmentInfoInterface
 	}
 
 	/**
+	 * @inheritdoc
+	 */
+	function getReadableRefIds()
+	{
+		return $this->ref_ids;
+	}
+
+
+	/**
 	 * Get all info objects for a ref id of an repo object
 	 *
 	 * @param int $a_ref_id ref id
@@ -153,6 +162,7 @@ class ilExcRepoObjAssignmentInfo implements ilExcRepoObjAssignmentInfoInterface
 				: false;
 
 
+			// determine all readable ref ids of the exercise
 			$ref_ids = ilObject::_getAllReferences($s["exc_id"]);
 			$readable_ref_ids = array();
 			foreach ($ref_ids as $ref_id)

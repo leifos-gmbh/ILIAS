@@ -118,11 +118,15 @@ class ilExSubmissionGUI
 				
 				$this->tabs_gui->clearTargets();		
 				$this->tabs_gui->setBackTarget($this->lng->txt("back"), 
-					$this->ctrl->getLinkTarget($this, "returnToParent"));	
-		
-				$this->tabs_gui->addTab("submission", $this->lng->txt("exc_submission"), 
-					$this->ctrl->getLinkTargetByClass("ilexsubmission".$this->submission->getSubmissionType()."gui", ""));
-			
+					$this->ctrl->getLinkTarget($this, "returnToParent"));
+
+				// forward to type gui
+				if ($this->submission->getSubmissionType() != ilExSubmission::TYPE_REPO_OBJECT)
+				{
+					$this->tabs_gui->addTab("submission", $this->lng->txt("exc_submission"),
+						$this->ctrl->getLinkTargetByClass("ilexsubmission" . $this->submission->getSubmissionType() . "gui", ""));
+				}
+
 				include_once "Modules/Exercise/classes/class.ilExSubmissionTeamGUI.php";
 				$gui = new ilExSubmissionTeamGUI($this->exercise, $this->submission);
 				$ilCtrl->forwardCommand($gui);

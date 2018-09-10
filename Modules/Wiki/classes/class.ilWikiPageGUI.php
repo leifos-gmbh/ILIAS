@@ -1428,10 +1428,7 @@ class ilWikiPageGUI extends ilPageObjectGUI
 
 			$user_data = ilObjUser::_lookupName($submitted["user_id"]);
 			$title = ilObject::_lookupTitle($submitted["obj_id"])." - ".
-				$ass->getTitle()." - ".
-				$user_data["firstname"]." ".
-				$user_data["lastname"]." (".
-				$user_data["login"].").zip";
+				$ass->getTitle()." (Team ".$submission->getTeam()->getId().").zip";
 
 			ilUtil::deliverFile($submitted["filename"], $title);
 		}

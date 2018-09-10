@@ -28,9 +28,14 @@ class ilExAssTypeWikiTeamGUI implements ilExAssignmentTypeGUIInterface
 	protected $ctrl;
 
 	/**
-	 * @var ilTree 
+	 * @var ilTree
 	 */
 	protected $tree;
+
+	/**
+	 * @var ilAccessHandler
+	 */
+	protected $access;
 
 	/**
 	 * Constructor
@@ -42,6 +47,7 @@ class ilExAssTypeWikiTeamGUI implements ilExAssignmentTypeGUIInterface
 		$this->lng = $DIC->language();
 		$this->ctrl = $DIC->ctrl();
 		$this->tree = $DIC->repositoryTree();
+		$this->access = $DIC->access();
 	}
 
 	/**
@@ -174,6 +180,9 @@ class ilExAssTypeWikiTeamGUI implements ilExAssignmentTypeGUIInterface
 		$files_str = "";
 		$valid_wiki = false;
 
+		$team_members = $a_submission->getTeam()->getMembers();
+		$team_available = (sizeof($team_members));
+
 		$selected_wiki = $a_submission->getSelectedObject();
 		if($selected_wiki)
 		{
@@ -188,16 +197,7 @@ class ilExAssTypeWikiTeamGUI implements ilExAssignmentTypeGUIInterface
 				{
 					// #10116 / #12791
 					$ctrl->setParameterByClass("ilobjwikigui", "ref_id", $wiki_ref_id);
-
-					//$ref_id = $_REQUEST['ref_id'];
-					//$ctrl->setParameterByClass("ilobjportfoliogui", "ref_id", $ref_id);
-
-					//$ctrl->setParameterByClass("ilobjportfoliogui", "exc_back_ref_id", (int) $_GET["ref_id"]);
-
 					$wiki_link = ilLink::_getLink($wiki_ref_id);
-					//$ctrl->setParameterByClass("ilobjportfoliogui", "prt_id", "");
-					//$ctrl->setParameterByClass("ilobjportfoliogui", "ref_id", "");
-
 					$files_str = '<a href="'.$wiki_link.
 						'">'.$wiki->getTitle().'</a>';
 					$valid_wiki = true;
@@ -212,7 +212,7 @@ class ilExAssTypeWikiTeamGUI implements ilExAssignmentTypeGUIInterface
 		}
 		if($a_submission->canSubmit())
 		{
-			if(!$valid_wiki)
+			if(!$valid_wiki && $team_available)
 			{
 				$button = ilLinkButton::getInstance();
 				$button->setCaption("exc_create_wiki");
@@ -264,19 +264,40 @@ class ilExAssTypeWikiTeamGUI implements ilExAssignmentTypeGUIInterface
 	 */
 	protected function createWiki()
 	{
-		if (!$this->submission->canSubmit())
-		{
-			ilUtil::sendInfo($this->lng->txt("exercise_time_over"), true);
-			$this->ctrl->returnToParent($this);
-		}
+		$access = $this->access;
+		$lng = $this->lng;
 
 		include_once("./Modules/Exercise/AssignmentTypes/classes/class.ilExAssWikiTeamAR.php");
 		$ar = new ilExAssWikiTeamAR($this->submission->getAssignment()->getId());
 		$template_ref_id = $ar->getTemplateRefId();
 		$container_ref_id = $ar->getContainerRefId();
 
+		// @todo: move checks to central place
+		// check if team exists
+		$team_members = $this->submission->getTeam()->getMembers();
+		$team_available = (sizeof($team_members));
+		if (!$team_available)
+		{
+			$lng->loadLanguageModule("exc");
+			ilUtil::sendInfo($lng->txt("exc_team_needed_first"), true);
+			$this->ctrl->returnToParent($this);
+		}
 
-		// @todo: check permission of owner
+		// check if submission is possible
+		if (!$this->submission->canSubmit())
+		{
+			$lng->loadLanguageModule("exc");
+			ilUtil::sendInfo($lng->txt("exercise_time_over"), true);
+			$this->ctrl->returnToParent($this);
+		}
+
+		// check create permission of exercise owner
+		if (!$access->checkAccessOfUser($this->exercise->getOwner(),"create", "", $container_ref_id, "wiki"))
+		{
+			$lng->loadLanguageModule("exc");
+			ilUtil::sendInfo($lng->txt("exc_owner_has_no_permission_to_create_wiki"), true);
+			$this->ctrl->returnToParent($this);
+		}
 
 		if ($template_ref_id > 0 && ilObject::_exists($template_ref_id, true, "wiki"))
 		{
@@ -299,13 +320,15 @@ class ilExAssTypeWikiTeamGUI implements ilExAssignmentTypeGUIInterface
 
 		$wiki->setOwner($this->exercise->getOwner());
 		$wiki->update();
+		$wiki->updateOwner();
 
 		$this->submission->deleteAllFiles();
 		//$this->handleRemovedUpload();
 
 		$this->submission->addResourceObject($wiki->getRefId());
 
-		ilUtil::sendSuccess($this->lng->txt("exc_wiki_created"), true);
+		$lng->loadLanguageModule("wiki");
+		ilUtil::sendSuccess($lng->txt("wiki_exc_wiki_created"), true);
 		$this->ctrl->returnToParent($this);
 	}
 

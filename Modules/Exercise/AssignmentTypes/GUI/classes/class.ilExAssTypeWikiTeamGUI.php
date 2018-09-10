@@ -28,6 +28,11 @@ class ilExAssTypeWikiTeamGUI implements ilExAssignmentTypeGUIInterface
 	protected $ctrl;
 
 	/**
+	 * @var ilTree 
+	 */
+	protected $tree;
+
+	/**
 	 * Constructor
 	 */
 	function __construct()
@@ -36,6 +41,7 @@ class ilExAssTypeWikiTeamGUI implements ilExAssignmentTypeGUIInterface
 
 		$this->lng = $DIC->language();
 		$this->ctrl = $DIC->ctrl();
+		$this->tree = $DIC->repositoryTree();
 	}
 
 	/**
@@ -175,7 +181,7 @@ class ilExAssTypeWikiTeamGUI implements ilExAssignmentTypeGUIInterface
 			$wiki_obj_id = ilObject::_lookupObjectId($wiki_ref_id);
 
 			// #11746
-			if(ilObject::_exists($wiki_ref_id, true, "wiki"))
+			if(ilObject::_exists($wiki_ref_id, true, "wiki") && $this->tree->isInTree($wiki_ref_id))
 			{
 				$wiki = new ilObjWiki($wiki_ref_id);
 				if($wiki->getTitle())
@@ -264,26 +270,35 @@ class ilExAssTypeWikiTeamGUI implements ilExAssignmentTypeGUIInterface
 			$this->ctrl->returnToParent($this);
 		}
 
-		// @todo: check permission of owner
-
-		include_once "Modules/Wiki/classes/class.ilObjWiki.php";
-		$wiki = new ilObjWiki();
-		$wiki->setTitle($this->exercise->getTitle()." - ".$this->submission->getAssignment()->getTitle());
-		$wiki->create();
-
-		$wiki->setStartPage($this->submission->getAssignment()->getTitle());
-		$wiki->update();
-
 		include_once("./Modules/Exercise/AssignmentTypes/classes/class.ilExAssWikiTeamAR.php");
 		$ar = new ilExAssWikiTeamAR($this->submission->getAssignment()->getId());
+		$template_ref_id = $ar->getTemplateRefId();
 		$container_ref_id = $ar->getContainerRefId();
 
-		$wiki->createReference();
-		$wiki->putInTree($container_ref_id);
-		$wiki->setPermissions($container_ref_id);
 
+		// @todo: check permission of owner
 
-		// @todo: set owner to owner of exercise
+		if ($template_ref_id > 0 && ilObject::_exists($template_ref_id, true, "wiki"))
+		{
+			$template_wiki = new ilObjWiki($template_ref_id);
+			$wiki = $template_wiki->cloneObject($container_ref_id);
+			$wiki->setTitle($this->exercise->getTitle() . " - " . $this->submission->getAssignment()->getTitle());
+		}
+		else
+		{
+			include_once "Modules/Wiki/classes/class.ilObjWiki.php";
+			$wiki = new ilObjWiki();
+			$wiki->setTitle($this->exercise->getTitle() . " - " . $this->submission->getAssignment()->getTitle());
+			$wiki->create();
+			$wiki->setStartPage($this->submission->getAssignment()->getTitle());
+
+			$wiki->createReference();
+			$wiki->putInTree($container_ref_id);
+			$wiki->setPermissions($container_ref_id);
+		}
+
+		$wiki->setOwner($this->exercise->getOwner());
+		$wiki->update();
 
 		$this->submission->deleteAllFiles();
 		//$this->handleRemovedUpload();

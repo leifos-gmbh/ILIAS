@@ -30,3 +30,17 @@ if (!$ilDB->tableExists("exc_ass_wiki_team"))
 <?php
 	$ilCtrlStructureReader->getStructure();
 ?>
+<#3>
+<?php
+
+	if (!$ilDB->tableColumnExists('exc_returned', 'team_id'))
+	{
+		$ilDB->addTableColumn('exc_returned', 'team_id', array(
+			"type" => "integer",
+			"notnull" => true,
+			"length" => 4,
+			"default" => 0
+		));
+	}
+
+?>

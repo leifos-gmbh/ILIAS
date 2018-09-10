@@ -72,4 +72,12 @@ class ilExAssTypeUploadTeam implements ilExAssignmentTypeInterface
 		return ilExSubmission::TYPE_FILE;
 	}
 
+	/**
+	 * @inheritdoc
+	 */
+	public function isSubmissionAssignedToTeam()
+	{
+		return false;
+	}
+
 }

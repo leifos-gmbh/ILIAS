@@ -201,7 +201,8 @@ class ilExSubmissionGUI
 		
 		$submission_type = $a_submission->getSubmissionType();
 		// old handling -> forward to submission type gui class
-		if ($submission_type != "")
+		// @todo migrate everything to new concept
+		if ($submission_type != ilExSubmission::TYPE_REPO_OBJECT)
 		{
 			$class = "ilExSubmission" . $submission_type . "GUI";
 			include_once "Modules/Exercise/classes/class." . $class . ".php";

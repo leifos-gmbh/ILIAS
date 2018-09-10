@@ -136,5 +136,24 @@ class ilExAssignmentTypes
 		// we should throw some exception here
 	}
 
+	/**
+	 * Get assignment type IDs for given submission type
+	 *
+	 * @param int $a_submission_type
+	 * @return array
+	 */
+	public function getIdsForSubmissionType($a_submission_type)
+	{
+		$ids = [];
+		foreach ($this->getAllIds() as $id)
+		{
+			if ($this->getById($id)->getSubmissionType() == $a_submission_type)
+			{
+				$ids[] = $id;
+			}
+		}
+		return $ids;
+	}
+	
 
 }

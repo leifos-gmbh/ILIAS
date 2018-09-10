@@ -72,5 +72,12 @@ class ilExAssTypeText implements ilExAssignmentTypeInterface
 		return ilExSubmission::TYPE_TEXT;
 	}
 
+	/**
+	 * @inheritdoc
+	 */
+	public function isSubmissionAssignedToTeam()
+	{
+		return false;
+	}
 
 }

@@ -23,6 +23,11 @@ exc#:#exc_wiki_container#:#Wiki Container
 exc#:#exc_wiki_container_info#:#Location where wikis of participants will be created.
 exc#:#exc_ass_team_wiki#:#Assignment Team Wiki
 exc#:#exc_create_wiki#:#Create Wiki
+wiki#:#wiki_exercise_info#:#This wiki is part of the assignment "%s" of exercise "%s".
+wiki#:#wiki_finalize_wiki#:#Finalize and Submit Wiki
+wiki#:#wiki_finalized#:#Wiki has been finalized and submitted.
+wiki#:#wiki_exercise_submitted_info#:#Your last submission was on %s. Please check the export file: %s
+wiki#:#wiki_team_members#:#Team Members
 common#:#obj_ltis#:#LTI
 common#:#obj_ltis_desc#:#Learning Tools Interoperability
 common#:#lti_outcome#:#LTI Lernfortschritt Benachrichtigung

@@ -44,5 +44,11 @@ interface ilExAssignmentTypeInterface
 	 */
 	public function getSubmissionType();
 
+	/**
+	 * Get submission type
+	 *
+	 * @return string
+	 */
+	public function isSubmissionAssignedToTeam();
 
 }

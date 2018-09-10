@@ -86,4 +86,12 @@ class ilExAssTypePortfolio implements ilExAssignmentTypeInterface
 		return ilExSubmission::TYPE_OBJECT;
 	}
 
+	/**
+	 * @inheritdoc
+	 */
+	public function isSubmissionAssignedToTeam()
+	{
+		return false;
+	}
+
 }

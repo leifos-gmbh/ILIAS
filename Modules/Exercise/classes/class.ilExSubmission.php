@@ -10,8 +10,9 @@
 class ilExSubmission
 {
 	const TYPE_FILE = "File";
-	const TYPE_OBJECT = "Object";
+	const TYPE_OBJECT = "Object";	// Blogs in WSP/Portfolio
 	const TYPE_TEXT = "Text";
+	const TYPE_REPO_OBJECT = "RepoObject";	// Wikis
 
 
 
@@ -41,6 +42,16 @@ class ilExSubmission
 	protected $peer_review; // [ilExPeerReview]
 	protected $is_tutor; // [bool]
 	protected $public_submissions; // [bool]
+
+	/**
+	 * @var ilExAssignmentTypeInterface
+	 */
+	protected $ass_type;
+
+	/**
+	 * @var ilExAssignmentTypes
+	 */
+	protected $ass_types;
 	
 	public function __construct(ilExAssignment $a_ass, $a_user_id, ilExAssignmentTeam $a_team = null, $a_is_tutor = false, $a_public_submissions = false)
 	{				
@@ -53,7 +64,10 @@ class ilExSubmission
 		$ilUser = $DIC->user();
 		
 		$this->assignment = $a_ass;
-		$this->user_id = $a_user_id;	
+		$this->ass_type = $this->assignment->getAssignmentType();
+		$this->ass_types = ilExAssignmentTypes::getInstance();
+
+		$this->user_id = $a_user_id;
 		$this->is_tutor = (bool)$a_is_tutor;
 		$this->public_submissions = (bool)$a_public_submissions;
 		
@@ -288,7 +302,26 @@ class ilExSubmission
 		include_once("./Modules/Exercise/classes/class.ilFSStorageExercise.php");
 		return new ilFSStorageExercise($this->assignment->getExerciseId(), $this->assignment->getId());
 	}
-	
+
+	/**
+	 * Get storage id
+	 *
+	 * @return int
+	 */
+	protected function getStorageId()
+	{
+		if ($this->ass_type->isSubmissionAssignedToTeam())
+		{
+			$storage_id = $this->getTeam()->getId();
+		}
+		else
+		{
+			$storage_id = $this->getUserId();
+		}
+		return $storage_id;
+	}
+
+
 	/**
 	 * Save submitted file of user
 	 */
@@ -301,23 +334,40 @@ class ilExSubmission
 			return false;
 		}
 
-		$deliver_result = $this->initStorage()->uploadFile($a_http_post_files, $this->getUserId(), $unzip);
+		if ($this->ass_type->isSubmissionAssignedToTeam())
+		{
+			$team_id = $this->getTeam()->getId();
+			$user_id = 0;
+			if ($team_id == 0)
+			{
+				return false;
+			}
+		}
+		else
+		{
+			$team_id = 0;
+			$user_id = $this->getUserId();
+		}
+		$storage_id = $this->getStorageId();
+
+		$deliver_result = $this->initStorage()->uploadFile($a_http_post_files, $storage_id, $unzip);
 
 		if ($deliver_result)
 		{			
 			$next_id = $ilDB->nextId("exc_returned");
 			$query = sprintf("INSERT INTO exc_returned ".
-							 "(returned_id, obj_id, user_id, filename, filetitle, mimetype, ts, ass_id, late) ".
-							 "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+							 "(returned_id, obj_id, user_id, filename, filetitle, mimetype, ts, ass_id, late, team_id) ".
+							 "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
 				$ilDB->quote($next_id, "integer"),
 				$ilDB->quote($this->assignment->getExerciseId(), "integer"),
-				$ilDB->quote($this->getUserId(), "integer"),
+				$ilDB->quote($user_id, "integer"),
 				$ilDB->quote($deliver_result["fullname"], "text"),
 				$ilDB->quote(ilFileUtils::getValidFilename($a_http_post_files["name"]), "text"),
 				$ilDB->quote($deliver_result["mimetype"], "text"),
 				$ilDB->quote(ilUtil::now(), "timestamp"),
 				$ilDB->quote($this->assignment->getId(), "integer"),
-				$ilDB->quote($this->isLate(), "integer")
+				$ilDB->quote($this->isLate(), "integer"),
+				$ilDB->quote($team_id, "integer")
 			);
 			$ilDB->manipulate($query);
 		
@@ -328,7 +378,8 @@ class ilExSubmission
 			}			
 			
 			return true;
-		}		
+		}
+		return false;
 	}
 	
 	/**
@@ -416,15 +467,27 @@ class ilExSubmission
 		include_once("./Modules/Exercise/classes/class.ilFSStorageExercise.php");
 		$storage = new ilFSStorageExercise($a_exc_id, $a_ass_id);
 		$path = $storage->getAbsoluteSubmissionPath();
-		
+
+		include_once("./Modules/Exercise/AssignmentTypes/classes/class.ilExAssignmentTypes.php");
+		$ass_type = ilExAssignmentTypes::getInstance()->getById(ilExAssignment::lookupType($a_ass_id));
+
 		$query = "SELECT * FROM exc_returned WHERE ass_id = ".
 			$ilDB->quote($a_ass_id, "integer");
 
 		$res = $ilDB->query($query);
 		while($row = $ilDB->fetchAssoc($res))
 		{
+			if ($ass_type->isSubmissionAssignedToTeam())
+			{
+				$storage_id = $row["team_id"];
+			}
+			else
+			{
+				$storage_id = $row["user_id"];
+			}
+
 			$row["timestamp"] = $row["ts"];
-			$row["filename"] = $path."/".$row["user_id"]."/".basename($row["filename"]);
+			$row["filename"] = $path."/".$storage_id."/".basename($row["filename"]);
 			$delivered[] = $row;
 		}
 		
@@ -444,9 +507,11 @@ class ilExSubmission
 		$ilDB = $this->db;
 		
 		$sql = "SELECT * FROM exc_returned".
-			" WHERE ass_id = ".$ilDB->quote($this->getAssignment()->getId(), "integer").
-			" AND ".$ilDB->in("user_id", $this->getUserIds(), "", "integer");
-		
+			" WHERE ass_id = ".$ilDB->quote($this->getAssignment()->getId(), "integer");
+
+		$sql.= " AND ".$this->getTableUserWhere(true);
+
+
 		if($a_file_ids)
 		{
 			$sql .= " AND ".$ilDB->in("returned_id", $a_file_ids, false, "integer");
@@ -480,8 +545,19 @@ class ilExSubmission
 					substr($row["ts"], 5, 2).substr($row["ts"], 8, 2).
 					substr($row["ts"], 11, 2).substr($row["ts"], 14, 2).
 					substr($row["ts"], 17, 2);
+
+				if ($this->getAssignment()->getAssignmentType()->isSubmissionAssignedToTeam())
+				{
+					$storage_id = $row["team_id"];
+				}
+				else
+				{
+					$storage_id = $row["user_id"];
+				}
+
+
 				$row["filename"] = $path.
-					"/".$row["user_id"]."/".basename($row["filename"]);
+					"/".$storage_id."/".basename($row["filename"]);
 
 				// see 22301, 22719
 				if (is_file($row["filename"]) || (!$this->assignment->getAssignmentType()->usesFileUpload()))
@@ -509,12 +585,14 @@ class ilExSubmission
 			? $a_tutor
 			: $ilUser->getId();
 
-  		$q = "SELECT exc_returned.returned_id AS id ".
+		$where = " AND ".$this->getTableUserWhere(true);
+
+		$q = "SELECT exc_returned.returned_id AS id ".
 			"FROM exc_usr_tutor, exc_returned ".
 			"WHERE exc_returned.ass_id = exc_usr_tutor.ass_id ".
 			" AND exc_returned.user_id = exc_usr_tutor.usr_id ".
 			" AND exc_returned.ass_id = ".$ilDB->quote($this->getAssignment()->getId(), "integer").
-			" AND ".$ilDB->in("exc_returned.user_id", $this->getUserIds(), "", "integer").
+			$where.
 			" AND exc_usr_tutor.tutor_id = ".$ilDB->quote($tutor, "integer").
 			" AND exc_usr_tutor.download_time < exc_returned.ts ";
 
@@ -596,10 +674,12 @@ class ilExSubmission
 	function deleteSelectedFiles(array $file_id_array)
 	{		
 		$ilDB = $this->db;
-				
-		$user_ids = $this->getUserIds();
-		if(!$user_ids || 
-			!sizeof($file_id_array))
+
+
+		$where = " AND ".$this->getTableUserWhere(true);
+
+
+		if(!sizeof($file_id_array))
 		{
 			return;
 		}
@@ -608,7 +688,7 @@ class ilExSubmission
 		{										
 			$result = $ilDB->query("SELECT * FROM exc_returned".
 				" WHERE ".$ilDB->in("returned_id", $file_id_array, false, "integer").
-				" AND ".$ilDB->in("user_id", $user_ids, "", "integer"));	
+				$where);
 			
 			if ($ilDB->numRows($result))
 			{								
@@ -622,7 +702,7 @@ class ilExSubmission
 				// delete the entries in the database
 				$ilDB->manipulate("DELETE FROM exc_returned".
 					" WHERE ".$ilDB->in("returned_id", $file_id_array, false, "integer").
-					" AND ".$ilDB->in("user_id", $user_ids, "", "integer"));
+					$where);
 				
 				// delete the files				
 				$path = $this->initStorage()->getAbsoluteSubmissionPath();
@@ -635,8 +715,17 @@ class ilExSubmission
 							$this->team->writeLog(ilExAssignmentTeam::TEAM_LOG_REMOVE_FILE, 
 								$value["filetitle"]);
 						}
-						
-						$filename = $path."/".$value["user_id"]."/".basename($value["filename"]);
+
+						if ($this->getAssignment()->getAssignmentType()->isSubmissionAssignedToTeam())
+						{
+							$storage_id = $value["team_id"];
+						}
+						else
+						{
+							$storage_id = $value["user_id"];
+						}
+
+						$filename = $path."/".$storage_id."/".basename($value["filename"]);
 						unlink($filename);
 					}
 				}
@@ -759,13 +848,22 @@ class ilExSubmission
 						$file["filetitle"];
 				}
 
-				$this->downloadSingleFile($file["user_id"], $file["filename"], $file["filetitle"]);
+				$this->downloadSingleFile($file["user_id"], $file["filename"], $file["filetitle"], $file["team_id"]);
 			}
 			else 
 			{
 				$array_files = array();
 				foreach($files as $seq => $file)
-				{						
+				{
+					if ($this->assignment->getAssignmentType()->isSubmissionAssignedToTeam())
+					{
+						$storage_id = $file["team_id"];
+					}
+					else
+					{
+						$storage_id = $file["user_id"];
+					}
+
 					$src = basename($file["filename"]);				
 					if($a_peer_review_mask_filename)
 					{									
@@ -773,14 +871,14 @@ class ilExSubmission
 						$tgt = $this->assignment->getTitle()."_peer".$peer_id.
 							"_".(++$seq).".".$suffix;			
 						
-						$array_files[$file["user_id"]][] = array(
+						$array_files[$storage_id][] = array(
 							"src" => $src, 
 							"tgt" => $tgt
 						);
 					}
 					else
 					{						
-						$array_files[$file["user_id"]][] = array(
+						$array_files[$storage_id][] = array(
 							"src" => $src,
 							"late" => $file["late"]							
 						);
@@ -822,16 +920,25 @@ class ilExSubmission
 		}
 	}
 
-	protected function downloadSingleFile($a_user_id, $filename, $filetitle)
-	{	
+	protected function downloadSingleFile($a_user_id, $filename, $filetitle, $a_team_id)
+	{
+		if ($this->ass_type->isSubmissionAssignedToTeam())
+		{
+			$storage_id = $a_team_id;
+		}
+		else
+		{
+			$storage_id = $a_user_id;
+		}
+
 		$filename = $this->initStorage()->getAbsoluteSubmissionPath().
-			"/".$a_user_id."/".basename($filename);
+			"/".$storage_id."/".basename($filename);
 
 		ilUtil::deliverFile($filename, $filetitle);
 	}
 
 	protected function downloadMultipleFiles($a_filenames, $a_user_id, $a_multi_user = false)
-	{					
+	{
 		$lng = $this->lng;
 		
 		$path = $this->initStorage()->getAbsoluteSubmissionPath();
@@ -864,9 +971,9 @@ class ilExSubmission
 			
 		//copy all files to a temporary directory and remove them afterwards
 		$parsed_files = $duplicates = array();
-		foreach ($a_filenames as $user_id => $files)
+		foreach ($a_filenames as $storage_id => $files)
 		{
-			$pathname = $path."/".$user_id;
+			$pathname = $path."/".$storage_id;
 
 			foreach($files as $filename)
 			{
@@ -1115,6 +1222,37 @@ class ilExSubmission
 			: $assTitle). ".zip", "", false, true);
 	}
 
+
+	/**
+	 * Get user/team where clause
+	 *
+	 * @param
+	 * @return
+	 */
+	protected function getTableUserWhere($a_team_mode = false)
+	{
+		$ilDB = $this->db;
+
+		if ($this->getAssignment()->getAssignmentType()->isSubmissionAssignedToTeam())
+		{
+			$team_id = $this->getTeam()->getId();
+			$where = " team_id = ".$ilDB->quote($team_id, "integer")." ";
+		}
+		else
+		{
+			if ($a_team_mode)
+			{
+				$where = " " . $ilDB->in("user_id", $this->getUserIds(), "", "integer") . " ";
+			}
+			else
+			{
+				$where = " user_id = ".$ilDB->quote($this->getUserId(), "integer");
+			}
+		}
+		return $where;
+	}
+
+
 	/**
 	 * Get the date of the last submission of a user for the assignment
 	 *
@@ -1128,7 +1266,7 @@ class ilExSubmission
 
 		$q = "SELECT obj_id,user_id,ts FROM exc_returned".
 			" WHERE ass_id = ".$ilDB->quote($this->assignment->getId(), "integer").
-			" AND ".$ilDB->in("user_id", $this->getUserIds(), "", "integer").
+			" AND ".$this->getTableUserWhere(true).
 			" AND (filename IS NOT NULL OR atext IS NOT NULL)".
 			" AND ts IS NOT NULL".
 			" ORDER BY ts DESC";
@@ -1143,27 +1281,55 @@ class ilExSubmission
 	// 
 	
 	/**
-	 * Add personal resource to assigment
+	 * Add personal resource or repository object (ref_id) to assigment
 	 * 
 	 * @param int $a_wsp_id
 	 * @param string $a_text 
+	 * @return int
+	 * @throws ilExerciseException
 	 */
 	function addResourceObject($a_wsp_id, $a_text = null)
 	{
 		$ilDB = $this->db;
-	
+
+		if ($this->getAssignment()->getAssignmentType()->isSubmissionAssignedToTeam())
+		{
+			$user_id = 0;
+			$team_id = $this->getTeam()->getId();
+		}
+		else
+		{
+			$user_id = $this->getUserId();
+			$team_id = 0;
+		}
+
+		// repository objects must be unique in submissions
+		// the same repo object cannot be used in different submissions or even different assignment/exercises
+		// why? -> the access handling would fail, since the access depends e.g. on teams or even phase of the
+		// assignment
+		if ($this->getAssignment()->getAssignmentType()->getSubmissionType() == ilExSubmission::TYPE_REPO_OBJECT)
+		{
+			$repos_ass_type_ids = $this->ass_types->getIdsForSubmissionType(ilExSubmission::TYPE_REPO_OBJECT);
+			$subs = $this->getSubmissionsForFilename($a_wsp_id, $repos_ass_type_ids);
+			if (count($subs) > 0)
+			{
+				throw new ilExerciseException("Repository object $a_wsp_id is already assigned to another assignment.");
+			}
+		}
+
 		$next_id = $ilDB->nextId("exc_returned");
 		$query = sprintf("INSERT INTO exc_returned ".
-						 "(returned_id, obj_id, user_id, filetitle, ass_id, ts, atext, late) ".
-						 "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+						 "(returned_id, obj_id, user_id, filetitle, ass_id, ts, atext, late, team_id) ".
+						 "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
 			$ilDB->quote($next_id, "integer"),
 			$ilDB->quote($this->assignment->getExerciseId(), "integer"),
-			$ilDB->quote($this->getUserId(), "integer"),
+			$ilDB->quote($user_id, "integer"),
 			$ilDB->quote($a_wsp_id, "text"),
 			$ilDB->quote($this->assignment->getId(), "integer"),
 			$ilDB->quote(ilUtil::now(), "timestamp"),
 			$ilDB->quote($a_text, "text"),
-			$ilDB->quote($this->isLate(), "integer")
+			$ilDB->quote($this->isLate(), "integer"),
+			$ilDB->quote($team_id, "integer")
 		);
 		$ilDB->manipulate($query);
 		
@@ -1181,7 +1347,7 @@ class ilExSubmission
 		
 		$ilDB->manipulate("DELETE FROM exc_returned".
 			" WHERE obj_id = ".$ilDB->quote($this->assignment->getExerciseId(), "integer").
-			" AND user_id = ".$ilDB->quote($this->getUserId(), "integer").
+			" AND ".$this->getTableUserWhere(false).
 			" AND ass_id = ".$ilDB->quote($this->assignment->getId(), "integer").
 			" AND returned_id = ".$ilDB->quote($a_returned_id, "integer"));		
 	}
@@ -1390,11 +1556,68 @@ class ilExSubmission
 					}
 				}
 				break;
+
+			case ilExAssignment::TYPE_WIKI_TEAM:
+				$result["files"]["txt"] = $lng->txt("exc_wiki_returned");
+				$objs = $this->getFiles();
+				if($objs)
+				{
+					$objs = array_pop($objs);
+					if($objs && substr($objs["filename"], -1) != "/")
+					{
+						if($objs["late"])
+						{
+							$result["files"]["txt"].= ' - <span class="warning">'.$lng->txt("exc_late_submission")."</span>";
+						}
+
+						$result["files"]["count"] = 1;
+
+						$result["files"]["download_url"] =
+							$ilCtrl->getLinkTargetByClass("ilexsubmissionfilegui", "downloadReturned");
+
+						$result["files"]["download_txt"] = $lng->txt("exc_tbl_action_download_files");
+					}
+				}
+				break;
 		}
 		
 		$ilCtrl->setParameterByClass("ilexsubmissionfilegui", "member_id", "");
 		
 		return $result;
 	}
+
+	/**
+	 * Get assignment return entries for a filename
+	 *
+	 * @param string $a_filename
+	 * @param int[] $a_assignment_types
+	 * @return array
+	 */
+	public static function getSubmissionsForFilename($a_filename, $a_assignment_types = array())
+	{
+		global $DIC;
+
+		$db = $DIC->database();
+
+		$query = "SELECT * FROM exc_returned r LEFT JOIN exc_assignment a".
+			" ON (r.ass_id = a.id) ".
+			" WHERE r.filetitle = ".$db->quote($a_filename, "string");
+
+		if (is_array($a_assignment_types) && count($a_assignment_types) > 0)
+		{
+			$query.= " AND ".$db->in("a.type", $a_assignment_types, false, "integer");
+		}
+
+		$set = $db->query($query);
+		$rets = array();
+		while ($rec = $db->fetchAssoc($set))
+		{
+			$rets[] = $rec;
+		}
+
+
+		return $rets;
+	}
+
 }
 

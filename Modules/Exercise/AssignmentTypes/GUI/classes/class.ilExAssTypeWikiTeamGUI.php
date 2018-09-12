@@ -84,10 +84,10 @@ class ilExAssTypeWikiTeamGUI implements ilExAssignmentTypeGUIInterface
 		$radio_with_template = new ilRadioOption($lng->txt("exc_with_wiki_template"), 1 , $lng->txt("exc_with_wiki_template_info"));
 
 		include_once "Services/Form/classes/class.ilRepositorySelector2InputGUI.php";
-		$repo = new ilRepositorySelector2InputGUI($lng->txt("exc_portfolio_template"), "template_ref_id");
+		$repo = new ilRepositorySelector2InputGUI($lng->txt("wiki_exc_template"), "template_ref_id");
 		$repo->setRequired(true);
 		$repo->getExplorerGUI()->setSelectableTypes(array("wiki"));
-		$repo->getExplorerGUI()->setTypeWhiteList(array("root", "wiki", "cat", "crs", "grp"));
+		$repo->getExplorerGUI()->setTypeWhiteList(array("root", "wiki", "cat", "crs", "grp", "fold"));
 		$radio_with_template->addSubItem($repo);
 
 		$rd_template->addOption($radio_no_template);
@@ -319,6 +319,7 @@ class ilExAssTypeWikiTeamGUI implements ilExAssignmentTypeGUIInterface
 		}
 
 		$wiki->setOwner($this->exercise->getOwner());
+		$wiki->setOnline(true);
 		$wiki->update();
 		$wiki->updateOwner();
 

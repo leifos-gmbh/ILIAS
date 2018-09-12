@@ -29,6 +29,7 @@ wiki#:#wiki_finalized#:#Das Wiki wurde abgegeben.
 wiki#:#wiki_exercise_submitted_info#:#Ihre letzte Einreichung war am %s. Bitte prüfen Sie die Export-Datei: %s
 wiki#:#wiki_team_members#:#Teammitglieder
 wiki#:#wiki_exc_wiki_created#:#Wiki wurde erstellt
+wiki#:#wiki_exc_template#:#Wikivorlage
 common#:#obj_ltis#:#LTI
 common#:#obj_ltis_desc#:#Learning Tools Interoperability
 common#:#lti_outcome#:#Übermittlung LTI-Lernfortschritt
@@ -13968,7 +13969,7 @@ exc#:#exc_submit_convenience_no_deadline#:#Geben Sie nach Bearbeitung der Übung
 exc#:#exc_select_portfolio_unlink#:#Portfolio entfernen
 exc#:#exc_sure_unlink_portfolio#:#Möchten Sie das Portfolio aus dieser Übungseinheit entfernen?
 exc#:#exc_portfolio_unlinked_from_assignment#:#Das Portfolio wurde aus der Übungseinheit entfernt.
-exc#:#exc_template#:#Portfoliovorlage
+exc#:#exc_template#:#Vorlage
 exc#:#exc_portfolio_template#:#Portfoliovorlage bestimmen
 exc#:#exc_without_template#:#Ohne Portfoliovorlage
 exc#:#exc_with_template#:#Mit Portfoliovorlage

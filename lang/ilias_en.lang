@@ -29,6 +29,7 @@ wiki#:#wiki_finalized#:#Wiki has been finalized and submitted.
 wiki#:#wiki_exercise_submitted_info#:#Your last submission was on %s. Please check the export file: %s
 wiki#:#wiki_team_members#:#Team Members
 wiki#:#wiki_exc_wiki_created#:#Wiki has been created.
+wiki#:#wiki_exc_template#:#Wiki Template
 common#:#obj_ltis#:#LTI
 common#:#obj_ltis_desc#:#Learning Tools Interoperability
 common#:#lti_outcome#:#LTI Lernfortschritt Benachrichtigung

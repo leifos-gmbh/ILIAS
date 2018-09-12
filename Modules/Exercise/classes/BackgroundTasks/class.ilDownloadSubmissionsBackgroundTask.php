@@ -72,8 +72,7 @@ class ilDownloadSubmissionsBackgroundTask
 			$bucket->setTitle($download_name);
 		}
 
-		//$download_interaction = $this->task_factory->createTask(ilExDownloadSubmissionsZipInteraction::class,[$download_name, $zip_job]);
-		$download_interaction = $this->task_factory->createTask(ilExDownloadSubmissionsZipInteraction::class,[$zip_job, $download_name]);
+		$download_interaction = $this->task_factory->createTask(ilExDownloadSubmissionsZipInteraction::class,[$download_name, $zip_job]);
 
 		 //download name
 		$bucket->setTask($download_interaction);

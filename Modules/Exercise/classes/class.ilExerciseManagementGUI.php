@@ -680,17 +680,15 @@ class ilExerciseManagementGUI
 			$button->setCaption("exc_select_part");
 			$button->setCommand("selectParticipant");			
 			$ilToolbar->addStickyItem($button);
-			
-			$ilToolbar->setFormAction($ilCtrl->getFormAction($this));		
 		}
-
-		$ilToolbar->addFormButton($lng->txt("download_all_returned_files"), "downloadSubmissions");
-
 
 		if (count($mems) > 0)
 		{
 			$this->ctrl->setParameter($this, "vw", self::VIEW_PARTICIPANT);
 			$this->ctrl->setParameter($this, "part_id", $current_participant);
+
+			$ilToolbar->setFormAction($ilCtrl->getFormAction($this));
+			$ilToolbar->addFormButton($lng->txt("download_all_returned_files"), "downloadSubmissions");
 			
 			include_once("./Modules/Exercise/classes/class.ilExParticipantTableGUI.php");
 			$part_tab = new ilExParticipantTableGUI($this, "showParticipant",

@@ -200,15 +200,6 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 		ilUtil::createDirectory($this->submissions_directory);
 	}
 
-	protected function createDirectories()
-	{
-		if(!isset($this->temp_dir)) {
-			$this->createUniqueTempDirectory();
-		}
-		$this->createTargetDirectory();
-		$this->createSubmissionsDirectory(); //TODO  we can get rid of this if unzip creates this submission directory
-	}
-
 	/**
 	 * Store the zip file which contains all submission files in the target directory.
 	 * TODO -> put the reference of the original code.
@@ -443,10 +434,14 @@ class ilExerciseManagementCollectFilesJob extends AbstractJob
 		$this->sanitized_title = ilUtil::getASCIIFilename($this->assignment->getTitle());
 
 		// directories
-		$this->createDirectories();
+		if(!isset($this->temp_dir)) {
+			$this->createUniqueTempDirectory();
+		}
+		$this->createTargetDirectory();
 
 		//Collect submission files if needed by assignment type.
 		if(in_array($assignment_type,$this->ass_types_with_files)) {
+			$this->createSubmissionsDirectory();
 			$this->collectSubmissionFiles();
 		}
 

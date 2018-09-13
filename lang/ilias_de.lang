@@ -14291,3 +14291,8 @@ mail#:#show_mail_settings#:#Einstellungen anzeigen
 mail#:#show_mail_settings_info#:#Falls aktiviert, können Benutzer Ihre Mail-Einstellungen im Bereich 'Einstellungen oder 'Mail' selber vornehmen.
 mob#:#mob_no_fixed_size_map_editing#:#Bitte bestimmen Sie eine feste Größe für ihr Bild, bevor Sie verlinkte Bereiche definieren. Die Bereiche werden nicht angepasst, wenn ihr Bild durch einen Content-Style oder andere CSS-Regeln skaliert wird.
 common#:#presentation_table_more#:#mehr
+exc#:#exc_ass_submission_zip#:#Submissions
+exc#:#exc_submission_file#:#Submission File
+exc#:#exc_submission_text#:#Submission Text
+common#:#open#:#Open
+exc#:#exc_down_files_started#:#Download of submission files has started.

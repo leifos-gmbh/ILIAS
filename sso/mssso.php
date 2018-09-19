@@ -2,9 +2,12 @@
 <?php
 
 chdir ('..');
+$cookie_path = dirname(dirname($_SERVER['PHP_SELF']));
+define('IL_COOKIE_PATH', $cookie_path);
 
-$attributes = base64_encode($_SERVER['HTTP_X_TRUSTED_REMOTE_ATTR']);
-$user = base64_encode($_SERVER['HTTP_X_TRUSTED_REMOTE_USER']);
+$_POST['username'] = 'mssso';
+$_POST['password'] = 'dummy';
+
 
 /**
  * LTI launch target script

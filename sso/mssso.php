@@ -1,12 +1,23 @@
 
 <?php
 
+
+if($_SERVER['HTTP_HOST'] == 'sso.uni-muenster.de')
+{
+	$attr = base64_encode($_SERVER['HTTP_X_TRUSTED_REMOTE_ATTR']);
+	$user = base64_encode($_SERVER['HTTP_X_TRUSTED_REMOTE_USER']);
+	header('Location: ./mssso.php?mssso_attr='.$attr.'&mssso_user='.$user);
+	exit;
+}
+
 chdir ('..');
 $cookie_path = dirname(dirname($_SERVER['PHP_SELF']));
 define('IL_COOKIE_PATH', $cookie_path);
 
 $_POST['username'] = 'mssso';
 $_POST['password'] = 'dummy';
+
+
 
 
 /**

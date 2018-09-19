@@ -6,7 +6,7 @@ if($_SERVER['HTTP_HOST'] == 'sso.uni-muenster.de')
 {
 	$attr = base64_encode($_SERVER['HTTP_X_TRUSTED_REMOTE_ATTR']);
 	$user = base64_encode($_SERVER['HTTP_X_TRUSTED_REMOTE_USER']);
-	header('Location: http://unirep-online.de/sso/mssso.php?mssso_attr='.$attr.'&mssso_user='.$user);
+	header('Location: https://unirep-online.de/sso/mssso.php?mssso_attr='.$attr.'&mssso_user='.$user);
 	exit;
 }
 

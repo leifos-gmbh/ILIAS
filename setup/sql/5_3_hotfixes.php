@@ -294,3 +294,57 @@ if (!$ilrqtix) {
 	$setting->set('iloscmsgidx3', 1);
 }
 ?>
+<#23>
+<?php
+if(!$ilDB->tableExists('exc_ass_reminders'))
+{
+	$ilDB->createTable('exc_ass_reminders', array(
+		'type' => array(
+			'type'     => 'text',
+			'length'   => 32,
+		),
+		'ass_id' => array(
+			"type"    => "integer",
+			"length"  => 4,
+			"default" => NULL
+		),
+		'exc_id' => array(
+			"type"    => "integer",
+			"length"  => 4,
+			"default" => NULL
+		),
+		'status' => array(
+			"type"    => "integer",
+			"length"  => 1,
+			"default" => NULL
+		),
+		'start' => array(
+			"type"    => "integer",
+			"length"  => 4,
+			"default" => NULL
+		),
+		'end' => array(
+			"type"    => "integer",
+			"length"  => 4,
+			"default" => NULL
+		),
+		'freq' => array(
+			"type"    => "integer",
+			"length"  => 4,
+			"default" => NULL
+		),
+		'last_send' => array (
+			"type"    => "integer",
+			"length"  => 4,
+			"default" => NULL
+		),
+		'template_id' => array (
+			"type" => "integer",
+			"length" => 4,
+			"default" => NULL
+		)
+	));
+
+	$ilDB->addPrimaryKey("exc_ass_reminders", array("ass_id", "exc_id", "type"));
+	}
+?>

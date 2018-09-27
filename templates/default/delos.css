@@ -13932,6 +13932,10 @@ div.ilRatingOverlay {
   display: inline-block;
   cursor: pointer;
 }
+.ilExcReportFeedback {
+  background-color: #F9F9F9;
+  padding: 9px;
+}
 .progress {
   height: 15px;
   min-width: 100px;
@@ -15511,4 +15515,34 @@ table.mceToolbar td {
   a[href]:after {
     content: "";
   }
+}
+.read-more-state {
+  display: none;
+}
+.read-more-target {
+  opacity: 0;
+  max-height: 0;
+  font-size: 0;
+  transition: .25s ease;
+}
+.read-more-state:checked ~ .read-more-wrap .read-more-target {
+  opacity: 1;
+  font-size: inherit;
+  max-height: 999em;
+}
+.read-more-state ~ .read-more-trigger:before {
+  content: 'Show more';
+}
+.read-more-state:checked ~ .read-more-trigger:before {
+  content: 'Show less';
+}
+.read-more-trigger {
+  cursor: pointer;
+  display: inline-block;
+  padding: 0 .5em;
+  color: #666;
+  font-size: .9em;
+  line-height: 2;
+  border: 1px solid #ddd;
+  border-radius: .25em;
 }

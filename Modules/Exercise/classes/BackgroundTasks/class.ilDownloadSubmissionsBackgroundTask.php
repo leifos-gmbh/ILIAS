@@ -72,6 +72,8 @@ class ilDownloadSubmissionsBackgroundTask
 			$bucket->setTitle($download_name);
 		}
 
+
+		ilLoggerFactory::getRootLogger()->debug("*** Interaction task ::: 1st parameter :: Download name should be the directory name => ".$download_name);
 		$download_interaction = $this->task_factory->createTask(ilExDownloadSubmissionsZipInteraction::class,[$download_name, $zip_job]);
 
 		 //download name

@@ -20,7 +20,7 @@ include_once('./Modules/Group/classes/class.ilObjGroup.php');
 * @ilCtrl_Calls ilObjGroupGUI: ilCommonActionDispatcherGUI, ilObjectServiceSettingsGUI, ilSessionOverviewGUI
 * @ilCtrl_Calls ilObjGroupGUI: ilGroupMembershipGUI, ilBadgeManagementGUI, ilMailMemberSearchGUI, ilNewsTimelineGUI, ilContainerNewsSettingsGUI
 * @ilCtrl_Calls ilObjGroupGUI: ilContainerSkillGUI, ilCalendarPresentationGUI
-* @ilCtrl_Calls ilObjGroupGUI: ilLTIProviderObjectSettingGUI, ilObjectCustomIconConfigurationGUI
+* @ilCtrl_Calls ilObjGroupGUI: ilLTIProviderObjectSettingGUI, ilObjectCustomIconConfigurationGUI, ilObjectTranslationGUI
 * 
 *
 *
@@ -309,6 +309,15 @@ class ilObjGroupGUI extends ilContainerGUI
 				include_once('./Services/Calendar/classes/class.ilCalendarPresentationGUI.php');
 				$cal = new ilCalendarPresentationGUI($this->object->getRefId());
 				$ret = $this->ctrl->forwardCommand($cal);
+				break;
+
+			case 'ilobjecttranslationgui':
+				$this->checkPermissionBool("write");
+				$this->setSubTabs("settings");
+				$this->tabs->activateTab("settings");
+				include_once("./Services/Object/classes/class.ilObjectTranslationGUI.php");
+				$transgui = new ilObjectTranslationGUI($this);
+				$this->ctrl->forwardCommand($transgui);
 				break;
 
 			default:
@@ -1463,28 +1472,9 @@ class ilObjGroupGUI extends ilContainerGUI
 			}
 		}
 		
-		// title
-		$title = new ilTextInputGUI($this->lng->txt('title'),'title');
-		$title->setSubmitFormOnEnter(true);
-		if ($a_mode == "edit")
-		{
-			$title->setValue($this->object->getTitle());
-		}
-		$title->setSize(min(40, ilObject::TITLE_LENGTH));
-		$title->setMaxLength(ilObject::TITLE_LENGTH);
-		$title->setRequired(true);
-		$form->addItem($title);
-		
-		// desc
-		$desc = new ilTextAreaInputGUI($this->lng->txt('description'),'desc');
-		if ($a_mode == "edit")
-		{
-			$desc->setValue($this->object->getLongDescription());
-		}
-		$desc->setRows(2);
-		$desc->setCols(40);
-		$form->addItem($desc);
-		
+		// title/description
+		$this->initFormTitleDescription($form);
+
 		$form = $this->initDidacticTemplate($form);
 		
 		if($a_mode == 'edit')
@@ -1845,7 +1835,11 @@ class ilObjGroupGUI extends ilContainerGUI
 						$this->ctrl->getLinkTargetByClass(ilLTIProviderObjectSettingGUI::class)
 					);
 				}
-				
+
+				$this->tabs_gui->addSubTabTarget("obj_multilinguality",
+					$this->ctrl->getLinkTargetByClass("ilobjecttranslationgui", ""),
+					"", "ilobjecttranslationgui");
+
 
 				break;
 				

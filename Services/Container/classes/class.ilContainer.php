@@ -157,6 +157,15 @@ class ilContainer extends ilObject
 	}
 
 	/**
+	 * Get object translation
+	 * @param ilObjectTranslation $obj_trans
+	 */
+	public function setObjectTranslation(ilObjectTranslation $obj_trans)
+	{
+		$this->obj_trans = $obj_trans;
+	}
+
+	/**
 	* Create directory for the container.
 	* It is <webspace_dir>/container_data.
 	*/

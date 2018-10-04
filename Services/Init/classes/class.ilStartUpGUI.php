@@ -1987,7 +1987,7 @@ class ilStartUpGUI
 					"",
 					$path_ref_id,
 					$pobj_id,
-					$ptype
+					$ptype,
 					$ilUser->getId()) ||
 					!$ilAccess->doStatusCheck(
 						"read",

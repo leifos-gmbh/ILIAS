@@ -1042,6 +1042,22 @@ class ilObject
 //echo "<br>LOOKING-$a_id-:$tit";		
 		return $tit;
 	}
+
+	/**
+	 * Lookup offline status using objectDataCache
+	 *
+	 * @static
+	 * @param $a_obj_id
+	 * @return null | bool
+	 */
+	public static function lookupOfflineStatus($a_obj_id)
+	{
+		global $DIC;
+
+		return $DIC['ilObjDataCache']->lookupOfflineStatus($a_obj_id);
+	}
+
+
 	
 	/**
 	* lookup object owner

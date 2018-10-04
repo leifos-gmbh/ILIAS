@@ -99,7 +99,24 @@ class ilExDownloadSubmissionsZipInteraction extends AbstractUserInteraction {
 
 
 		$zip_name = $zip_name->getValue();
-		$zip_name .= ".zip";
+
+/**
+ * TODO remove this
+ * DEBUG AND TEST
+ */
+		//$zip_name => user_root_root_6.zip.zip  ---> sometimes we get this double '.zip' generating the white pages.
+		$this->logger->info("download_name value => ".$download_name->getValue());
+		$this->logger->info("zip name => ".$zip_name);
+
+		$ending = substr($zip_name, -4);
+		if($ending != ".zip"){
+			$zip_name .= ".zip";
+			$this->logger->info("Add .zip extension");
+		}
+/**
+ * Todo remove this
+ * END DEBUG AND TEST
+ */
 
 		ilFileDelivery::deliverFileAttached($download_name->getValue(), $zip_name);
 

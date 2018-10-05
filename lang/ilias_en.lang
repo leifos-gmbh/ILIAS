@@ -9826,7 +9826,8 @@ help#:#help_all#:#All
 help#:#help_component#:#Component
 help#:#help_filter#:#Filter
 help#:#help_open_online_help#:#Open Online Help
-help#:#help_toggle_tooltips#:#Toggle Help Tooltips
+help#:#help_toggle_tooltips#:#Help Tooltips
+help#:#help_toggle_tooltips_info#:#Show Help Tooltips for menues and tabs.
 common#:#objs_blog#:#Blogs
 common#:#obj_blog_duplicate#:#Copy Blog
 blog#:#blog_copy#:#Copy Blog
@@ -14825,9 +14826,4 @@ exc#:#exc_start_assignment#:#Start Assignment
 exc#:#exc_needs_fixed_deadline#:#This feature only works with a fixed deadline.
 exc#:#exc_tbl_calculated_deadline#:#Calculated Deadline
 
-=======
->>>>>>> Added tutorial support
-=======
->>>>>>> Added ical link
-=======
->>>>>>> Fixed ical style
+

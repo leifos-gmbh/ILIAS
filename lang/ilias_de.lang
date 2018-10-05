@@ -9792,7 +9792,8 @@ help#:#help_all#:#Alle
 help#:#help_component#:#Komponente
 help#:#help_filter#:#Filter
 help#:#help_open_online_help#:#Online-Hilfe öffnen
-help#:#help_toggle_tooltips#:#Hilfe-Tooltips an-/ausschalten
+help#:#help_toggle_tooltips#:#Hilfe-Tooltips
+help#:#help_toggle_tooltips_info#:#Hilfe-Tooltips zu Menüs und Reitern anzeigen.
 rbac#:#trac_write#:#Einstellungen für Zugriffsstatistiken und Lernfortschrittsverwaltung bearbeiten
 common#:#obj_dcl#:#Datensammlung
 common#:#objs_dcl#:#Datensammlungen
@@ -14822,6 +14823,3 @@ exc#:#exc_rem_time_after_start#:#Bearbeitungszeitraum nach Start
 exc#:#exc_start_assignment#:#Übungseinheit starten
 exc#:#exc_needs_fixed_deadline#:#Diese Funktion benötigt ein festes Abgabedatum.
 exc#:#exc_tbl_calculated_deadline#:#Errechneter Abgabetermin
->>>>>>> Added ical link
-=======
->>>>>>> Fixed ical style

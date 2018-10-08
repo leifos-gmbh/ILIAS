@@ -2188,7 +2188,9 @@ class ilObjectListGUI
 		if($this->checkCommandAccess('delete','',$this->ref_id,$this->type))
 		{
 			// begin-patch fhoev delete
-			if($htis->context == self::CONTEXT_REPOSITORY)
+			if(
+				0 &&
+				$this->context == self::CONTEXT_REPOSITORY)
 			{
 				$this->ctrl->setParameterByClass('ilobjectdeletiongui','ref_id',$this->container_obj->object->getRefId());
 				$this->ctrl->setParameterByClass('ilobjectdeletiongui','item_ref_id',$this->getCommandId());

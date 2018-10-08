@@ -1665,12 +1665,12 @@ class ilObjectGUI
 	{
 		$ilCtrl = $this->ctrl;
 		
-		$GLOBALS['ilTabs']->clearTargets();
-		include_once './Services/Object/classes/class.ilObjectDeletionGUI.php';
-		$del = new ilObjectDeletionGUI($this,$this->object->getRefId());
-		$this->ctrl->setCmdClass('ilobjectdeletiongui');
-		$this->ctrl->setCmd('');
-		return $this->ctrl->forwardCommand($del);
+		#$GLOBALS['ilTabs']->clearTargets();
+		#include_once './Services/Object/classes/class.ilObjectDeletionGUI.php';
+		#$del = new ilObjectDeletionGUI($this,$this->object->getRefId());
+		#$this->ctrl->setCmdClass('ilobjectdeletiongui');
+		#$this->ctrl->setCmd('');
+		#return $this->ctrl->forwardCommand($del);
 		
 		
 		if ($_GET["item_ref_id"] != "")

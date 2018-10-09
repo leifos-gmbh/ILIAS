@@ -29,3 +29,13 @@ if(!$ilDB->tableColumnExists('object_data', 'offline'))
 }
 ?>
 
+<#4>
+<?php
+
+// migration of course offline status
+$query = 'update object_data od set offline = '.
+	'(select if( activation_type = 0,1,0) from crs_settings '.
+	'where obj_id = od.obj_id) where type = '.$ilDB->quote('crs','text');
+$ilDB->manipulate($query);
+?>
+

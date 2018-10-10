@@ -39,3 +39,25 @@ $query = 'update object_data od set offline = '.
 $ilDB->manipulate($query);
 ?>
 
+<#5>
+<?php
+$ilCtrlStructureReader->getStructure();
+?>
+
+<#6>
+<?php
+$ilCtrlStructureReader->getStructure();
+?>
+
+<#7>
+<?php
+
+// migration of lm offline status
+$query = 'update object_data od set offline = '.
+	'(select if( is_online = '.$ilDB->quote('n','text').',1,0) from content_object '.
+	'where id = od.obj_id) where type = '.$ilDB->quote('lm','text');
+$ilDB->manipulate($query);
+
+?>
+
+

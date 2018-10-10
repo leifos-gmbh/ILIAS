@@ -182,7 +182,27 @@ class ilMapUtil
 				return new ilGoogleMapGUI();
 		}
 	}
-	
+
+	//TODO This method only wants to show the problem with maps on modals.
+	static public function onLoadComponent()
+	{
+		$type = self::getType();
+		switch ($type) {
+			case "googlemaps":
+				//$extra = "<script type=\"text/javascript\" src=\"//maps.google.com/maps/api/js?key=".ilMapUtil::getApiKey()."></script>";
+				//$extra .= "<script type=\"text/javascript\" src=\"Services/Maps/js/ServiceGoogleMaps.js\"></script>";
+				//this ilInitMaps() call works only when the main page displays maps and the libraries are loaded.
+				//the ADT calls the getMapGUI and add the libraries to the main template. So e.g. if we are in calendar month
+				//view the main template does not have this libraries, then this ilInitMaps call is not working obviously
+				$extra = "<script>ilInitMaps();</script>";
+				break;
+			case "openlayers":
+				//todo
+				$extra = "";
+		}
+		return $extra;
+	}
+
 	/**
 	* Get a dict { $id => $name } for available maps services.
 	*

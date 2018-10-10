@@ -689,9 +689,8 @@ class ilObjSurveyGUI extends ilObjectGUI
 				// both are saved in object, too
 				$this->object->setTitle(ilUtil::stripSlashes($_POST['title']));
 				$this->object->setDescription(ilUtil::stripSlashes($_POST['description']));
+				$this->object->setOfflineStatus((bool) !$_POST['online']);
 				$this->object->update();
-
-				$this->object->setStatus($_POST['online']);
 
 				// activation
 				$period = $form->getItemByPostVar("access_period");		
@@ -962,8 +961,8 @@ class ilObjSurveyGUI extends ilObjectGUI
 		
 		$online = new ilCheckboxInputGUI($this->lng->txt('rep_activation_online'),'online');		
 		$online->setInfo($this->lng->txt('svy_activation_online_info').$act_obj_info);
-		$online->setChecked($this->object->isOnline());
-		$form->addItem($online);				
+		$online->setChecked(!$this->object->getOfflineStatus());
+		$form->addItem($online);
 		
 		include_once "Services/Form/classes/class.ilDateDurationInputGUI.php";
 		$dur = new ilDateDurationInputGUI($this->lng->txt('rep_visibility_until'), "access_period");

@@ -74,4 +74,15 @@ $ilDB->manipulate($query);
 
 ?>
 
+<#10>
+<?php
+
+// migration of svy offline status
+$query = 'update object_data od set offline = '.
+	'(select if( status = 0,1,0) from svy_svy '.
+	'where obj_fi = od.obj_id) where type = '.$ilDB->quote('svy','text');
+$ilDB->manipulate($query);
+?>
+
+
 

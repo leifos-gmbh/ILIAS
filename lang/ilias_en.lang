@@ -14370,3 +14370,4 @@ exc#:#exc_team_min_small_than_members#:#Minimal Number of Participants can not b
 exc#:#exc_participants#:#Participants
 exc#:#exc_team_by_tutors_manual_info#:#Tutors manually allocate participants to teams.
 exc#:#exc_team_by_tutors_manual#:#Manually
+exc#:#exc_team_creation#:#Creation

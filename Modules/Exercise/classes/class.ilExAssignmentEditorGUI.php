@@ -315,7 +315,7 @@ class ilExAssignmentEditorGUI
 			if(!$has_teams)
 			{
 				// Creation options
-				$rd_creation_method = new ilRadioGroupInputGUI($lng->txt("dummy: creation options"), "team_creation");
+				$rd_creation_method = new ilRadioGroupInputGUI($lng->txt("exc_team_creation"), "team_creation");
 				$rd_creation_method->setRequired(true);
 
 				//manual
@@ -328,7 +328,7 @@ class ilExAssignmentEditorGUI
 
 				//random options
 				$rd_creation_random = new ilRadioOption(
-					$lng->txt("exc_team_by_random_info"),
+					$lng->txt("exc_team_by_random"),
 					ilExAssignment::TEAMS_FORMED_BY_RANDOM,
 						$lng->txt("exc_team_by_random_info")."<br>".$lng->txt("exc_total_members").": ".$this->getExerciseTotalMembers()
 				);

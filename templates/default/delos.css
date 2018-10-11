@@ -14148,6 +14148,12 @@ div#ilContRepIntro img {
   background-color: white;
   margin-bottom: 10px;
 }
+.ilContainerShowMore {
+  padding: 15px 10px;
+  background-color: white;
+  text-align: center;
+  margin: 0 -15px;
+}
 /* Modules/LearningModule */
 .ilLMMenu {
   clear: both;

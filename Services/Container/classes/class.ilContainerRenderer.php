@@ -48,8 +48,23 @@ class ilContainerRenderer
 	protected $block_pos = array(); // [array]
 	protected $block_custom_pos = array(); // [array]
 	protected $order_cnt = 0; // [int]
+
+	/**
+	 * @var array
+	 */
+	protected $show_more = [];
 	
 	const UNIQUE_SEPARATOR = "-";
+
+	/**
+	 * @var \ILIAS\DI\UIServices
+	 */
+	protected $ui;
+
+	/**
+	 * @var ilCtrl
+	 */
+	protected $ctrl;
 		
 	/**
 	 * Constructor
@@ -58,19 +73,22 @@ class ilContainerRenderer
 	 * @param bool $a_enable_multi_download
 	 * @param bool $a_active_block_ordering
 	 * @param array $a_block_custom_positions
-	 * @return self
 	 */
-	public function __construct($a_enable_manage_select_all = false, $a_enable_multi_download = false, $a_active_block_ordering = false, array $a_block_custom_positions = null)
+	public function __construct($a_enable_manage_select_all, $a_enable_multi_download, $a_active_block_ordering, $a_block_custom_positions,
+								$container_gui_obj)
 	{
 		global $DIC;
 
 		$this->lng = $DIC->language();
 		$this->settings = $DIC->settings();
+		$this->ui = $DIC->ui();
 		$this->obj_definition = $DIC["objDefinition"];
 		$this->enable_manage_select_all = (bool)$a_enable_manage_select_all;
 		$this->enable_multi_download = (bool)$a_enable_multi_download;				
 		$this->active_block_ordering = (bool)$a_active_block_ordering;			
 		$this->block_custom_pos = $a_block_custom_positions;
+		$this->container_gui = $container_gui_obj;
+		$this->ctrl = $DIC->ctrl();
 	}
 	
 	
@@ -136,7 +154,7 @@ class ilContainerRenderer
 	/**
 	 * Custom block already exists?
 	 * 
-	 * @param mixede $a_id
+	 * @param mixed $a_id
 	 * @return bool
 	 */
 	public function hasCustomBlock($a_id)
@@ -238,7 +256,7 @@ class ilContainerRenderer
 	 * @return boolean
 	 */
 	public function addItemToBlock($a_block_id, $a_item_type, $a_item_id, $a_item_html, $a_force = false)
-	{		
+	{
 		if($this->isValidBlock($a_block_id) &&
 			$a_item_type != "itgr" &&
 			(!$this->hasItem($a_item_id) || $a_force) &&
@@ -259,7 +277,15 @@ class ilContainerRenderer
 			return true;
 		}
 		return false;
-	}		
+	}
+
+	/**
+	 * Add show more button to a block
+	 */
+	public function addShowMoreButton($a_block_id)
+	{
+		$this->show_more[] = $a_block_id;
+	}
 	
 	/**
 	 * Add details level
@@ -353,7 +379,7 @@ class ilContainerRenderer
 		$block_tpl = $this->initBlockTemplate();
 
 		if($this->renderHelperTypeBlock($block_tpl, $a_type, true))
-		{					
+		{
 			return $block_tpl->get();
 		}					
 	}
@@ -471,10 +497,9 @@ class ilContainerRenderer
 	protected function renderHelperTypeBlock(ilTemplate $a_block_tpl, $a_type, $a_is_single = false)
 	{
 		if($this->hasTypeBlock($a_type))
-		{						
+		{
 			$block = $this->type_blocks[$a_type];
 			$block["type"] = $a_type;
-			
 			return $this->renderHelperGeneric($a_block_tpl, $a_type, $block, $a_is_single);		
 		}		
 		return false;
@@ -490,9 +515,10 @@ class ilContainerRenderer
 	 * @return boolean
 	 */
 	protected function renderHelperGeneric(ilTemplate $a_block_tpl, $a_block_id, array $a_block, $a_is_single = false)
-	{					
+	{
+		$ctrl = $this->ctrl;
 		if(!in_array($a_block_id, $this->rendered_blocks))
-		{	
+		{
 			$this->rendered_blocks[] = $a_block_id;
 		
 			$block_types = array();
@@ -506,12 +532,11 @@ class ilContainerRenderer
 					}
 				}
 			}
-			
+
 			// #14610 - manage empty item groups
 			if(is_array($this->block_items[$a_block_id]) ||
 				is_numeric($a_block_id))
 			{
-			
 				$order_id = (!$a_is_single && $this->active_block_ordering) 
 					? $a_block_id
 					: null;			
@@ -533,6 +558,32 @@ class ilContainerRenderer
 				if($a_block["postfix"])
 				{
 					$this->addStandardRow($a_block_tpl, $a_block["postfix"]);
+				}
+
+				// show more
+				if (in_array($a_block_id, $this->show_more))
+				{
+					$a_block_tpl->setCurrentBlock("show_more");
+
+					$url = $ctrl->getLinkTarget($this->container_gui, "renderBlockAsynch", "", true);
+
+					$f = $this->ui->factory();
+					$renderer = $this->ui->renderer();
+					$button = $f->button()->standard($this->lng->txt("cont_show_more"), "")
+						->withOnLoadCode(function ($id) use ($a_block_id, $url) {
+							return "il.Container.initShowMore('$id', '$a_block_id', '".$url."');";
+						});
+					if ($ctrl->isAsynch())
+					{
+						$a_block_tpl->setVariable("SHOW_MORE_BUTTON",  $renderer->renderAsync($button));
+					}
+					else
+					{
+						$a_block_tpl->setVariable("SHOW_MORE_BUTTON",  $renderer->render($button));
+					}
+					$a_block_tpl->parseCurrentBlock();
+					$a_block_tpl->setCurrentBlock("show_more");
+					$a_block_tpl->parseCurrentBlock();
 				}
 							
 				return true;

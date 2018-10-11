@@ -14,7 +14,7 @@ require_once "./Services/Container/classes/class.ilContainerGUI.php";
 * @ilCtrl_Calls ilObjCategoryGUI: ilPermissionGUI, ilContainerPageGUI, ilContainerLinkListGUI, ilObjUserGUI, ilObjUserFolderGUI
 * @ilCtrl_Calls ilObjCategoryGUI: ilInfoScreenGUI, ilObjStyleSheetGUI, ilCommonActionDispatcherGUI, ilObjectTranslationGUI
 * @ilCtrl_Calls ilObjCategoryGUI: ilColumnGUI, ilObjectCopyGUI, ilUserTableGUI, ilDidacticTemplateGUI, ilExportGUI
-* @ilCtrl_Calls ilObjCategoryGUI: ilObjTaxonomyGUI, ilObjectMetaDataGUI, ilObjectCustomIconConfigurationGUI
+* @ilCtrl_Calls ilObjCategoryGUI: ilObjTaxonomyGUI, ilObjectMetaDataGUI, ilObjectCustomIconConfigurationGUI, ilContainerFilterAdminGUI
 * 
 * @ingroup ModulesCategory
 */
@@ -261,6 +261,13 @@ class ilObjCategoryGUI extends ilContainerGUI
 				require_once 'Services/Object/Icon/classes/class.ilObjectCustomIconConfigurationGUI.php';
 				$gui = new \ilObjectCustomIconConfigurationGUI($GLOBALS['DIC'], $this, $this->object);
 				$this->ctrl->forwardCommand($gui);
+				break;
+
+			case 'ilcontainerfilteradmingui':
+				$this->checkPermissionBool("write");
+				$this->prepareOutput();
+				$this->tabs_gui->activateTab('settings');
+				$this->ctrl->forwardCommand(new ilContainerFilterAdminGUI($this));
 				break;
 
 			default:
@@ -735,6 +742,10 @@ class ilObjCategoryGUI extends ilContainerGUI
 			);
 		}
 
+		$this->tabs_gui->addSubTab("settings_filter",
+			$this->lng->txt("cont_filters"),
+			$this->ctrl->getLinkTargetByClass("ilcontainerfilteradmingui", ""));
+
 		$this->tabs_gui->activateTab("settings");
 		$this->tabs_gui->activateSubTab($active_tab);
 	}
@@ -796,6 +807,12 @@ class ilObjCategoryGUI extends ilContainerGUI
 					ilContainer::SORT_MANUAL
 				)
 		);
+
+		// block limit
+		$bl = new ilNumberInputGUI($this->lng->txt("cont_block_limit"), "block_limit");
+		$bl->setInfo($this->lng->txt("cont_block_limit_info"));
+		$bl->setValue(ilContainer::_lookupContainerSetting($this->object->getId(), "block_limit"));
+		$form->addItem($bl);
 				
 		// icon settings
 //		$this->showCustomIconsEditing(1, $form, false);
@@ -884,7 +901,16 @@ class ilObjCategoryGUI extends ilContainerGUI
 						ilObjectServiceSettingsGUI::CUSTOM_METADATA
 					)
 				);
-				
+
+				// block limit
+				if ((int) $form->getInput("block_limit") > 0)
+				{
+					ilContainer::_writeContainerSetting($this->object->getId(), "block_limit", (int) $form->getInput("block_limit"));
+				}
+				else
+				{
+					ilContainer::_deleteContainerSettings($this->object->getId(), "block_limit");
+				}
 				// Update ecs export settings
 				include_once 'Modules/Category/classes/class.ilECSCategorySettings.php';	
 				$ecs = new ilECSCategorySettings($this->object);			

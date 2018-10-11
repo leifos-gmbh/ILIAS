@@ -526,7 +526,7 @@ class ilTestInfoScreenToolbarGUI extends ilToolbarGUI
 			}
 		}
 
-		if( $this->getTestOBJ()->isOnline() && $this->getTestOBJ()->isComplete( $this->getTestQuestionSetConfig() ) )
+		if( !$this->getTestOBJ()->getOfflineStatus() && $this->getTestOBJ()->isComplete( $this->getTestQuestionSetConfig() ) )
 		{
 			if ((!$this->getTestOBJ()->getFixedParticipants() || $online_access) && $this->access->checkAccess("read", "", $this->getTestOBJ()->getRefId()))
 			{
@@ -604,7 +604,7 @@ class ilTestInfoScreenToolbarGUI extends ilToolbarGUI
 				$this->addFormButton($this->lng->txt('submit'), 'setAnonymousId');
 			}
 		}
-		if( !$this->getTestOBJ()->isOnline() && !$this->getTestQuestionSetConfig()->areDepenciesBroken() )
+		if( $this->getTestOBJ()->getOfflineStatus() && !$this->getTestQuestionSetConfig()->areDepenciesBroken() )
 		{
 			$message = $this->lng->txt("test_is_offline");
 

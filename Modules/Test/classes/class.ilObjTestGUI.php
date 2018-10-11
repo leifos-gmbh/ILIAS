@@ -146,7 +146,7 @@ class ilObjTestGUI extends ilObjectGUI
 			'resumePlayer', 'resumePlayer', 'outUserResultsOverview', 'outUserListOfAnswerPasses'
 		);
 
-		if(!$this->getCreationMode() && !$this->object->isOnline() && in_array($cmd, $cmdsDisabledDueToOfflineStatus))
+		if(!$this->getCreationMode() && $this->object->getOfflineStatus() && in_array($cmd, $cmdsDisabledDueToOfflineStatus))
 		{
 			$cmd = 'infoScreen';
 		}
@@ -2171,7 +2171,7 @@ class ilObjTestGUI extends ilObjectGUI
 					}
 				}
 
-				if( $this->object->isOnline() && $this->object->isComplete( $this->testQuestionSetConfigFactory->getQuestionSetConfig() ) )
+				if( !$this->object->getOfflineStatus() && $this->object->isComplete( $this->testQuestionSetConfigFactory->getQuestionSetConfig() ) )
 				{
 					if ((!$this->object->getFixedParticipants() || $online_access) && $ilAccess->checkAccess("read", "", $this->ref_id))
 					{
@@ -2664,9 +2664,9 @@ class ilObjTestGUI extends ilObjectGUI
 				return;
 		}
 
-		if( $questionSetTypeSettingSwitched && $this->object->isOnline() )
+		if( $questionSetTypeSettingSwitched && !$this->getOfflineStatus() )
 		{
-			$this->object->setOnline(false);
+			$this->object->setOfflineStatus(true);
 
 			$info = $this->lng->txt("tst_set_offline_due_to_switched_question_set_type_setting");
 
@@ -2807,8 +2807,9 @@ class ilObjTestGUI extends ilObjectGUI
 			$info->addProperty($this->lng->txt("author"), $this->object->getAuthor());
 			$info->addProperty($this->lng->txt("title"), $this->object->getTitle());
 		}
-		if( $this->object->isOnline() && $this->object->isComplete( $this->testQuestionSetConfigFactory->getQuestionSetConfig() ) )
+		if( !$this->object->getOfflineStatus() && $this->object->isComplete( $this->testQuestionSetConfigFactory->getQuestionSetConfig() ) )
 		{
+			// note smeyer: $online_access is not defined here
 			if ((!$this->object->getFixedParticipants() || $online_access) && $ilAccess->checkAccess("read", "", $this->ref_id))
 			{
 				if ($this->object->getShowInfo() || !$this->object->getForceJS())
@@ -3255,7 +3256,7 @@ class ilObjTestGUI extends ilObjectGUI
 			}
 		}
 
-		if($this->object->isOnline() && $this->object->isComplete( $this->testQuestionSetConfigFactory->getQuestionSetConfig() ))
+		if(!$this->object->getOfflineStatus() && $this->object->isComplete( $this->testQuestionSetConfigFactory->getQuestionSetConfig() ))
 		{
 			if((!$this->object->getFixedParticipants() || $online_access) && $ilAccess->checkAccess("read", "", $this->ref_id))
 			{

@@ -167,7 +167,6 @@ class ilUIFilterService
 		$result = null;
 		//if ($_REQUEST["cmdFilter"] == "apply" && $request->getMethod() == "POST") {
 		if ($request->getMethod() == "POST") {
-			var_dump($_POST); exit;
 			$filter = $filter->withRequest($request);
 			$result = $filter->getData();
 		}

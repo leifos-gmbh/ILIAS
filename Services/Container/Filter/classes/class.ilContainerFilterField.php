@@ -31,10 +31,27 @@ class ilContainerFilterField
 
 	/**
 	 * Constructor
+	 * @param int $record_set_id
+	 * @param int $field_id
 	 */
-	public function __construct($record_set_id, $field_id)
-	{
+	public function __construct(int $record_set_id, int $field_id) {
 		$this->record_set_id = $record_set_id;
 		$this->field_id = $field_id;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getFieldId()
+	{
+		return $this->field_id;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getRecordSetId()
+	{
+		return $this->record_set_id;
 	}
 }

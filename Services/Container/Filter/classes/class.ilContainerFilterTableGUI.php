@@ -24,30 +24,42 @@ class ilContainerFilterTableGUI extends ilTable2GUI
 	protected $lng;
 
 	/**
+	 * @var ilContainerFilterService
+	 */
+	protected $container_filter_service;
+
+	/**
+	 * @var int
+	 */
+	protected $ref_id;
+
+	/**
 	 * Constructor
 	 */
-	function __construct($a_parent_obj, $a_parent_cmd)
+	function __construct(ilContainerFilterAdminGUI $a_parent_obj, string $a_parent_cmd, ilContainerFilterService $container_filter_service, ilObjCategory $cat)
 	{
 		global $DIC;
 
-		$this->id = "";
+		$this->id = "t";
 		$this->lng = $DIC->language();
 		$this->ctrl = $DIC->ctrl();
+		$this->container_filter_service = $container_filter_service;
+		$this->ref_id = $cat->getRefId();
 
 		parent::__construct($a_parent_obj, $a_parent_cmd);
 
 		$this->setData($this->getItems());
 		$this->setTitle($this->lng->txt(""));
 
-		$this->addColumn($this->lng->txt("cont_type_of_metadata_set"));
-		$this->addColumn($this->lng->txt("cont_type_of_metadata_set"));
-		$this->addColumn($this->lng->txt("actions"));
+		$this->addColumn($this->lng->txt("cont_filter_record"));
+		$this->addColumn($this->lng->txt("cont_filter_field"));
+		//$this->addColumn($this->lng->txt("actions"));
 
 		$this->setFormAction($this->ctrl->getFormAction($a_parent_obj));
-		$this->setRowTemplate("tpl.cont_filter_row.html", "");
+		$this->setRowTemplate("tpl.cont_filter_row.html", "Services/Container/Filter");
 
-		$this->addMultiCommand("", $this->lng->txt(""));
-		$this->addCommandButton("", $this->lng->txt(""));
+		//$this->addMultiCommand("", $this->lng->txt(""));
+		//$this->addCommandButton("", $this->lng->txt(""));
 	}
 
 	/**
@@ -57,8 +69,18 @@ class ilContainerFilterTableGUI extends ilTable2GUI
 	 */
 	protected function getItems()
 	{
-		$items = [];
+		$service = $this->container_filter_service;
 
+		$items = array_map(function($i) use ($service) {
+			/** @var ilContainerFilterField $i */
+			return array(
+				"sort" => ($i->getRecordSetId()*100000) + $i->getFieldId(),
+				"record_set_id" => $i->getRecordSetId(),
+				"record_title" => $service->util()->getContainerRecordTitle($i->getRecordSetId()),
+				"field_title" => $service->util()->getContainerFieldTitle($i->getRecordSetId(), $i->getFieldId())
+			);
+		}, $service->data()->getFilterSetForRefId($this->ref_id)->getFields());
+		$items = ilUtil::sortArray($items, "sort", "asc", true);
 		return $items;
 	}
 
@@ -68,9 +90,8 @@ class ilContainerFilterTableGUI extends ilTable2GUI
 	protected function fillRow($a_set)
 	{
 		$tpl = $this->tpl;
-		$ctrl = $this->ctrl;
-		$lng = $this->lng;
 
-		$tpl->setVariable("ID", $a_set["id"]);
+		$tpl->setVariable("RECORD_TITLE", $a_set["record_title"]);
+		$tpl->setVariable("FIELD_TITLE", $a_set["field_title"]);
 	}
 }

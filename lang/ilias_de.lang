@@ -14,6 +14,20 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+cont#:#cont_std_filter_title_1#:#Title
+cont#:#cont_std_filter_title_2#:#Description
+cont#:#cont_std_filter_title_3#:#Title/Description
+cont#:#cont_std_filter_title_4#:#Keyword
+cont#:#cont_std_filter_title_5#:#Author
+cont#:#cont_std_filter_title_6#:#Copyright
+cont#:#cont_std_filter_title_7#:#Tutorial Support
+cont#:#cont_std_filter_title_8#:#Object Type
+cont#:#cont_filter#:#Filter
+cont#:#cont_select_fields#:#Select Fields
+cont#:#cont_std_record_title#:#Standard
+cont#:#cont_filter_record#:#Record
+cont#:#cont_filter_field#:#Field
+cont#:#cont_filter_fields#:#Filter Fields
 cont#:#cont_show_more#:#Show More
 cont#:#cont_block_limit#:#Limit Items per Block
 cont#:#cont_block_limit_info#:#If a block contains more items, a "Show more" button will appear.

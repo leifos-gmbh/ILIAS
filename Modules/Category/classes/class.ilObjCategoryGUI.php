@@ -266,6 +266,7 @@ class ilObjCategoryGUI extends ilContainerGUI
 			case 'ilcontainerfilteradmingui':
 				$this->checkPermissionBool("write");
 				$this->prepareOutput();
+				$this->setEditTabs($active_tab = "settings_filter");
 				$this->tabs_gui->activateTab('settings');
 				$this->ctrl->forwardCommand(new ilContainerFilterAdminGUI($this));
 				break;
@@ -743,7 +744,7 @@ class ilObjCategoryGUI extends ilContainerGUI
 		}
 
 		$this->tabs_gui->addSubTab("settings_filter",
-			$this->lng->txt("cont_filters"),
+			$this->lng->txt("cont_filter"),
 			$this->ctrl->getLinkTargetByClass("ilcontainerfilteradmingui", ""));
 
 		$this->tabs_gui->activateTab("settings");

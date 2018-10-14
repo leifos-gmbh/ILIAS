@@ -23,10 +23,10 @@ class ilContainerFilterFieldData
 	/**
 	 * Get filter for ref id
 	 *
-	 * @param
-	 * @return
+	 * @param int $ref_id
+	 * @return ilContainerFilterSet
 	 */
-	protected function getFilterSetForRefId($ref_id)
+	public function getFilterSetForRefId(int $ref_id): ilContainerFilterSet
 	{
 		$db = $this->db;
 
@@ -42,6 +42,31 @@ class ilContainerFilterFieldData
 		}
 		return new ilContainerFilterSet($filter);
 	}
+
+	/**
+	 * Save filter set for ref id
+	 * @param int $ref_id
+	 * @param ilContainerFilterSet $set
+	 */
+	public function saveFilterSetForRefId(int $ref_id, ilContainerFilterSet $set)
+	{
+		$db = $this->db;
+
+		$db->manipulateF("DELETE FROM cont_filter_field WHERE ".
+			" ref_id = %s",
+			array("integer"),
+			array($ref_id));
+
+		foreach ($set->getFields() as $f)
+		{
+			$db->insert("cont_filter_field", array(
+				"ref_id" => array("integer", $ref_id),
+				"record_set_id" => array("integer", $f->getRecordSetId()),
+				"field_id" => array("integer", $f->getFieldId())
+			));
+		}
+	}
+
 
 
 }

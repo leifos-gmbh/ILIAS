@@ -10,7 +10,15 @@
  */
 class ilContainerFilterSet
 {
+	/**
+	 * @var ilContainerFilterField[]
+	 */
 	protected $filters;
+
+	/**
+	 * @var array
+	 */
+	protected $ids = [];
 
 	/**
 	 * Constructor
@@ -19,6 +27,12 @@ class ilContainerFilterSet
 	public function __construct(array $filters)
 	{
 		$this->filters = $filters;
+
+		$this->ids = array_map(function($f) {
+			/** @var ilContainerFilterField $f */
+			return $f->getRecordSetId()."_".$f->getFieldId();
+		}, $filters);
+
 	}
 	
 	/**
@@ -26,10 +40,22 @@ class ilContainerFilterSet
 	 *
 	 * @return ilContainerFilterField[]
 	 */
-	protected function getFilters(): array
+	public function getFields(): array
 	{
 		return $this->filters;
 	}
+
+	/**
+	 * Has filter field
+	 * @param int $record_set_id
+	 * @param int $field_id
+	 * @return bool
+	 */
+	public function has(int $record_set_id, int $field_id): bool
+	{
+		return in_array($record_set_id."_".$field_id, $this->ids);
+	}
+
 	
 
 }

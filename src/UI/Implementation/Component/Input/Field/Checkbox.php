@@ -80,4 +80,66 @@ class Checkbox extends Input implements C\Input\Field\Checkbox, C\Changeable, C\
 
 		return $clone;
 	}
+
+
+	/**
+	 * @inheritdoc
+	 */
+	public function withDependantGroup(C\Input\Field\DependantGroup $dependant_group) {
+		$clone = clone $this;
+		/**
+		 * @var $clone           Checkbox
+		 * @var $dependant_group DependantGroup
+		 */
+		$clone = $clone->withOnChange($dependant_group->getToggleSignal());
+		$clone = $clone->appendOnLoad($dependant_group->getInitSignal());
+
+		$clone->inputs["dependant_group"] = $dependant_group;
+
+		return $clone;
+	}
+
+
+	/**
+	 * @return C\Input\Field\DependantGroup|null
+	 */
+	public function getDependantGroup() {
+		if (is_array($this->inputs)) {
+			return $this->inputs["dependant_group"];
+		} else {
+			return null;
+		}
+	}
+
+
+	/**
+	 * @inheritdoc
+	 */
+	public function withOnChange(C\Signal $signal) {
+		return $this->withTriggeredSignal($signal, 'change');
+	}
+
+
+	/**
+	 * @inheritdoc
+	 */
+	public function appendOnChange(C\Signal $signal) {
+		return $this->appendTriggeredSignal($signal, 'change');
+	}
+
+
+	/**
+	 * @inheritdoc
+	 */
+	public function withOnLoad(C\Signal $signal) {
+		return $this->withTriggeredSignal($signal, 'load');
+	}
+
+
+	/**
+	 * @inheritdoc
+	 */
+	public function appendOnLoad(C\Signal $signal) {
+		return $this->appendTriggeredSignal($signal, 'load');
+	}
 }

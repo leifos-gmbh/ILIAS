@@ -259,4 +259,49 @@ interface Factory {
 	 */
 	public function bulky($icon_or_glyph, $label, $action);
 
+	/**
+	 * ---
+	 * description:
+	 *   purpose: >
+	 *       The Toggle Button triggers the activation/deactivation of some content already shown on the screen, i.e.
+	 *       a filter. The deactivation of content means, that it is still shown and the user can still interact
+	 *       with it, but it has no effect to the system.
+	 *   composition: >
+	 *       The Toggle Button uses different colors as background for the activated and deactivated state.
+	 *       The toggle of the Toggle Button is placed on the left side when it is deactivated, and on the right side
+	 *       when it is activated.
+	 *   effect: >
+	 *       Clicking the Toggle Button activates/deactivates the related content. The activated/deactivated state of
+	 *       the content is visually noticeable for the user, i.e. by greying out the content in the deactivated state
+	 *       (like the Toggle Button itself).
+	 *   rivals:
+	 *     Checkbox: >
+	 *       Checkboxes are established as controls for choosing a value for submission and are therefore handled as Inputs.
+	 *       Toggle Buttons are used for switching the functionality of some content and are therefore handled as Buttons.
+	 *     Collapse/Expand Glyph: >
+	 *       Collapse and Expand Glyphs hide or trigger the display of some content. Toggle Buttons leave the content
+	 *       visible to the user, but activate or deactivate it.
+	 *
+	 * rules:
+	 *   usage:
+	 *       1: >
+	 *           The Toggle Button MUST be placed in the same section as the content it activates/deactivates.
+	 *   ordering:
+	 *       1: >
+	 *           The Toggle Button SHOULD be placed above the content it activates/deactivates.
+	 *   accessibility:
+	 *       1: >
+	 *           The functionality of the Toggle Button MUST be indicated for screen
+	 *           readers by an aria-label.
+	 *       2: >
+	 *           The state of the Toggle Button MUST be indicated for screen readers
+	 *           by using the aria-pressed attribute.
+	 * ---
+	 * @param	string		$label
+	 * @param	string|Signal		$action
+	 * @param	string|Signal		$action_deactivated
+	 * @return  \ILIAS\UI\Component\Button\Toggle
+	 */
+	public function toggle($label, $action, $action_deactivated);
+
 }

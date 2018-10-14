@@ -50,11 +50,7 @@ class ILIAS_UI_Component_TriggererTest extends PHPUnit_Framework_TestCase {
 	public function testAppendTriggeredSignalIsImmutable() {
 		$signal = $this->getSignalMock();
 
-<<<<<<< HEAD
 		$mock = $this->mock->_appendTriggeredSignal($signal, "some_event");
-=======
-		$mock = $this->mock->_appendTriggeredSignal($signal, "click");
->>>>>>> e3b0948b48... UI: added tests for Triggerer
 		$this->assertNotSame($mock, $this->mock);
 	}
 
@@ -63,7 +59,6 @@ class ILIAS_UI_Component_TriggererTest extends PHPUnit_Framework_TestCase {
 		$signal2 = $this->getSignalMock();
 		$signal3 = $this->getSignalMock();
 
-<<<<<<< HEAD
 		$mock = $this->mock->_appendTriggeredSignal($signal1, "some_event");
 		$mock2 = $this->mock
 			->_appendTriggeredSignal($signal2, "some_event")
@@ -72,26 +67,12 @@ class ILIAS_UI_Component_TriggererTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals([], $this->mock->getTriggeredSignals());
 		$this->assertEquals([new TriggeredSignal($signal1, "some_event")], $mock->getTriggeredSignals());
 		$this->assertEquals([new TriggeredSignal($signal2, "some_event"), new TriggeredSignal($signal3, "some_event")], $mock2->getTriggeredSignals());
-=======
-		$mock = $this->mock->_appendTriggeredSignal($signal1, "click");
-		$mock2 = $this->mock
-			->_appendTriggeredSignal($signal2, "click")
-			->_appendTriggeredSignal($signal3, "click");
-
-		$this->assertEquals([], $this->mock->getTriggeredSignals());
-		$this->assertEquals([new TriggeredSignal($signal1, "click")], $mock->getTriggeredSignals());
-		$this->assertEquals([new TriggeredSignal($signal2, "click"), new TriggeredSignal($signal3, "click")], $mock2->getTriggeredSignals());
->>>>>>> e3b0948b48... UI: added tests for Triggerer
 	}
 
 	public function testWithTriggeredSignalIsImmutable() {
 		$signal = $this->getSignalMock();
 
-<<<<<<< HEAD
 		$mock = $this->mock->_withTriggeredSignal($signal, "some_event");
-=======
-		$mock = $this->mock->_withTriggeredSignal($signal, "click");
->>>>>>> e3b0948b48... UI: added tests for Triggerer
 
 		$this->assertNotSame($mock, $this->mock);
 	}
@@ -100,36 +81,21 @@ class ILIAS_UI_Component_TriggererTest extends PHPUnit_Framework_TestCase {
 		$signal1 = $this->getSignalMock();
 		$signal2 = $this->getSignalMock();
 
-<<<<<<< HEAD
-		$mock = $this->mock->_withTriggeredSignal($signal1, "some_event");
-		$mock2 = $mock->_withTriggeredSignal($signal2, "some_event");
-
-		$this->assertEquals([new TriggeredSignal($signal1, "some_event")], $mock->getTriggeredSignals());
-		$this->assertEquals([new TriggeredSignal($signal2, "some_event")], $mock2->getTriggeredSignals());
-=======
 		$mock = $this->mock->_withTriggeredSignal($signal1, "click");
 		$mock2 = $mock->_withTriggeredSignal($signal2, "click");
 
 		$this->assertEquals([new TriggeredSignal($signal1, "click")], $mock->getTriggeredSignals());
 		$this->assertEquals([new TriggeredSignal($signal2, "click")], $mock2->getTriggeredSignals());
->>>>>>> e3b0948b48... UI: added tests for Triggerer
 	}
 
 	public function testSetTriggeredSignal() {
 		$signal1 = $this->getSignalMock();
 		$signal2 = $this->getSignalMock();
 
-<<<<<<< HEAD
-		$this->mock->_setTriggeredSignal($signal1, "some_event");
-		$this->mock->_setTriggeredSignal($signal2, "some_event");
-
-		$this->assertEquals([new TriggeredSignal($signal2, "some_event")], $this->mock->getTriggeredSignals());
-=======
 		$this->mock->_setTriggeredSignal($signal1, "click");
 		$this->mock->_setTriggeredSignal($signal2, "click");
 
 		$this->assertEquals([new TriggeredSignal($signal2, "click")], $this->mock->getTriggeredSignals());
->>>>>>> e3b0948b48... UI: added tests for Triggerer
 	}
 
 	public function testWithResetTriggeredSignalIsImmutable() {
@@ -145,18 +111,12 @@ class ILIAS_UI_Component_TriggererTest extends PHPUnit_Framework_TestCase {
 		$signal2 = $this->getSignalMock();
 
 		$mock = $this->mock
-<<<<<<< HEAD
 			->_appendTriggeredSignal($signal1, "some_event")
 			->_appendTriggeredSignal($signal2, "some_event")
-=======
-			->_appendTriggeredSignal($signal1, "click")
-			->_appendTriggeredSignal($signal2, "click")
->>>>>>> e3b0948b48... UI: added tests for Triggerer
 			->withResetTriggeredSignals();
 
 		$this->assertEquals([], $mock->getTriggeredSignals());
 	}
-<<<<<<< HEAD
 
 	public function testGetTriggeredSignalsForNonRegisteredSignal() {
 		$signals = $this->mock->getTriggeredSignalsFor("some_event");
@@ -175,6 +135,4 @@ class ILIAS_UI_Component_TriggererTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals([$signal1, $signal2], $signals);
 	}
-=======
->>>>>>> e3b0948b48... UI: added tests for Triggerer
 }

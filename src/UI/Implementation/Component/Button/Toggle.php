@@ -8,6 +8,7 @@ use ILIAS\UI\Component as C;
 use ILIAS\UI\Implementation\Component\ComponentHelper;
 use ILIAS\UI\Implementation\Component\JavaScriptBindable;
 use ILIAS\UI\Implementation\Component\Triggerer;
+use ILIAS\UI\Implementation\Component\TriggeredSignal;
 
 class Toggle extends Button implements C\Button\Toggle {
 	use ComponentHelper;
@@ -15,40 +16,72 @@ class Toggle extends Button implements C\Button\Toggle {
 	use Triggerer;
 
 	/**
+	 * @var bool
+	 */
+	protected $is_on;
+
+	/**
 	 * @var string|null
 	 */
-	protected $action_deactivated;
+	protected $action_off;
 
-	public function __construct($label, $action, $action_deactivated)
+	protected $action_off_signal;
+	protected $action_on_signal;
+
+	public function __construct($label, $action, $action_off, $is_on)
 	{
-		parent::__construct($label, $action);
+		$this->checkStringArg("label", $label);
+		$this->checkStringOrSignalArg("action", $action);
+		$this->checkStringOrSignalArg("action_off", $action_off);
 
-		$this->checkStringOrSignalArg("action_deactivated", $action_deactivated);
-		if (is_string($action_deactivated)) {
-			$this->action_deactivated = $action_deactivated;
+		$this->label = $label;
+		if (is_string($action)) {
+			$this->action = $action;
 		}
 		else {
-			$this->action_deactivated = null;
-			$this->setTriggeredSignal($action_deactivated, "click");
+			$this->action = null;
+			$this->action_on_signal = new TriggeredSignal($action, "click");
 		}
+
+		if (is_string($action_off)) {
+			$this->action_off = $action_off;
+		}
+		else {
+			$this->action_off = null;
+			$this->action_off_signal = new TriggeredSignal($action_off, "click");
+		}
+		$this->checkBoolArg("is_on", $is_on);
+		$this->is_on = $is_on;
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	public function getActionDeactivated()
+	public function isOn()
 	{
-		if ($this->action_deactivated !== null) {
-			return $this->action_deactivated;
+		return $this->is_on;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getActionOff()
+	{
+		if ($this->action_off !== null) {
+			return $this->action_off;
 		}
-		$triggered_click_signals = $this->triggered_signals["click"];
-		if ($triggered_click_signals === null) {
-			return [];
+		return $this->action_off_signal;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getAction()
+	{
+		if ($this->action !== null) {
+			return $this->action;
 		}
-		return array_map(
-			function($ts) { return $ts->getSignal(); },
-			$triggered_click_signals
-		);
+		return $this->action_on_signal;
 	}
 
 }

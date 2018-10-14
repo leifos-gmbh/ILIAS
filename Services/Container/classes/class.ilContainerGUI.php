@@ -3803,6 +3803,8 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 	{
 		global $DIC;
 
+		$request = $DIC->http()->request();
+
 		/** @var ilTemplate $main_tpl */
 		$main_tpl = $this->tpl;
 
@@ -3821,7 +3823,11 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 		$filter = $DIC->uiService()->filter()->standard("filter_ID", $action, [$text_input1, $text_input2],
 			[true, true], false, false);
 
-		//Step 4: Render the filter
+		//Step 6: Define some data processing.
+		if ($request->getMethod() == "POST") {
+			$result = $DIC->uiService()->filter()->getData($filter);
+			var_dump($result); exit;
+		}
 
 		$main_tpl->setFilter($renderer->render($filter));
 	}

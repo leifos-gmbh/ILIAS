@@ -77,6 +77,7 @@ class ilTemplate extends HTML_Template_ITX
 	protected $header_action;
 	protected $lightbox = array();
 	protected $standard_template_loaded = false;
+	protected $filter = null;
 
 	protected $translation_linked = false; // fix #9992: remember if a translation link is added
 
@@ -289,6 +290,7 @@ class ilTemplate extends HTML_Template_ITX
 			$this->fillLeftNav();
 			$this->fillRightContent();
 			$this->fillAdminPanel();
+			$this->renderFilter();
 			$this->fillToolbar();
 			$this->fillPermanentLink();
 			
@@ -567,6 +569,7 @@ class ilTemplate extends HTML_Template_ITX
 					$this->fillLeftNav();
 					$this->fillRightContent();
 					$this->fillAdminPanel();
+					$this->renderFilter();
 					$this->fillToolbar();
 					$this->fillPermanentLink();
 
@@ -2425,6 +2428,23 @@ class ilTemplate extends HTML_Template_ITX
 			$this->admin_panel_arrow = true;
 		}
 		$this->admin_panel_top_only = false;
+	}
+
+	/**
+	 * Add admin panel commands as toolbar
+	 * @param string $filter filter html
+	 */
+	public function setFilter($filter)
+	{
+		$this->filter = $filter;
+	}
+
+	protected function renderFilter()
+	{
+		if (!is_null($this->filter))
+		{
+			$this->setVariable("FILTER", $this->filter);
+		}
 	}
 
 	/**

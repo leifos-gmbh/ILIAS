@@ -592,7 +592,9 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 			$this->showAdministrationPanel();
 			$this->showPossibleSubObjects();
 		}
-		
+
+		$this->showContainerFilter();
+
 		$this->showPermanentLink();
 
 		// add tree updater javascript
@@ -3793,6 +3795,17 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 	{
 		$this->ctrl->setReturn($this, "");
 	}
+
+	/**
+	 * Show container filter
+	 */
+	protected function showContainerFilter()
+	{
+		$main_tpl = $this->tpl;
+
+//		$main_tpl->setFilter("FILTER");
+	}
+
 
 }
 ?>

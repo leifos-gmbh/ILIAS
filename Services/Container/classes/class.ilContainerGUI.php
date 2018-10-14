@@ -3801,9 +3801,29 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 	 */
 	protected function showContainerFilter()
 	{
+		global $DIC;
+
+		/** @var ilTemplate $main_tpl */
 		$main_tpl = $this->tpl;
 
-//		$main_tpl->setFilter("FILTER");
+
+		$ui = $DIC->ui()->factory();
+		$renderer = $DIC->ui()->renderer();
+
+		//Step 1: Define some input fields to plug into the filter.
+		$text_input1 = $ui->input()->field()->text("Titel");
+		$text_input2 = $ui->input()->field()->text("Description");
+		//$numeric_input1 = $ui->input()->field()->numeric("Number 1");
+		//$numeric_input2 = $ui->input()->field()->numeric("Number 2");
+
+		//Step 3: Define the filter and attach the inputs. The filter is initially activated in this case.
+		$action = $DIC->ctrl()->getLinkTarget($this, "render", "", true);
+		$filter = $DIC->uiService()->filter()->standard("filter_ID", $action, [$text_input1, $text_input2],
+			[true, true], false, false);
+
+		//Step 4: Render the filter
+
+		$main_tpl->setFilter($renderer->render($filter));
 	}
 
 

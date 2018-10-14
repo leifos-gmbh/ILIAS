@@ -2443,7 +2443,9 @@ class ilTemplate extends HTML_Template_ITX
 	{
 		if (!is_null($this->filter))
 		{
+			$this->setCurrentBlock("filter");
 			$this->setVariable("FILTER", $this->filter);
+			$this->parseCurrentBlock();
 		}
 	}
 

@@ -968,6 +968,7 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
         'ILIAS\\UI\\Implementation\\Component\\Input\\Container\\Factory' => __DIR__ . '/../..' . '/../../src/UI/Implementation/Component/Input/Container/Factory.php',
         'ILIAS\\UI\\Implementation\\Component\\Input\\Container\\Filter\\Factory' => __DIR__ . '/../..' . '/../../src/UI/Implementation/Component/Input/Container/Filter/Factory.php',
         'ILIAS\\UI\\Implementation\\Component\\Input\\Container\\Filter\\Filter' => __DIR__ . '/../..' . '/../../src/UI/Implementation/Component/Input/Container/Filter/Filter.php',
+        'ILIAS\\UI\\Implementation\\Component\\Input\\Container\\Filter\\PostDataFromServerRequest' => __DIR__ . '/../..' . '/../../src/UI/Implementation/Component/Input/Container/Filter/PostDataFromServerRequest.php',
         'ILIAS\\UI\\Implementation\\Component\\Input\\Container\\Filter\\ProxyFilterField' => __DIR__ . '/../..' . '/../../src/UI/Implementation/Component/Input/Container/Filter/ProxyFilterField.php',
         'ILIAS\\UI\\Implementation\\Component\\Input\\Container\\Filter\\Renderer' => __DIR__ . '/../..' . '/../../src/UI/Implementation/Component/Input/Container/Filter/Renderer.php',
         'ILIAS\\UI\\Implementation\\Component\\Input\\Container\\Filter\\Standard' => __DIR__ . '/../..' . '/../../src/UI/Implementation/Component/Input/Container/Filter/Standard.php',

@@ -8513,67 +8513,6 @@ ul.breadcrumb li:hover {
   height: unset;
   width: unset;
 }
-.il-input-tag {
-  height: auto;
-  min-height: 1.42857143;
-}
-.il-input-tag input {
-  border: none;
-  box-shadow: none;
-  outline: none;
-  padding: 0 6px 4px;
-  line-height: 1.42857143;
-}
-.il-input-tag .tag {
-  font-size: 100%;
-  display: inline-block;
-  margin-bottom: 3px;
-}
-.il-input-tag .tag [data-role="remove"] {
-  margin-left: 8px;
-  cursor: pointer;
-}
-.il-input-tag .tag [data-role="remove"]:after {
-  content: "x";
-  padding: 0px 2px;
-}
-.il-input-tag .bootstrap-tagsinput {
-  margin-bottom: -3px;
-}
-.il-input-tag .tt-suggestion:hover,
-.il-input-tag .tt-suggestion:focus,
-.il-input-tag .tt-cursor {
-  color: #FFFFFF;
-  text-decoration: none;
-  outline: 0;
-  background-color: #4c6586;
-}
-.il-input-password .revelation-glyph {
-  float: right;
-  margin-top: -21px;
-  margin-right: 5px;
-}
-.il-input-password .revelation-reveal {
-  display: block;
-}
-.il-input-password .revelation-mask {
-  display: none;
-}
-.revealed.il-input-password .revelation-reveal {
-  display: none;
-}
-.revealed.il-input-password .revelation-mask {
-  display: block;
-}
-.il-input-radio .form-control.il-input-radiooption {
-  height: unset;
-  border: unset;
-  background-color: unset;
-}
-.il-input-multiselect {
-  list-style: none;
-  padding-left: 0px;
-}
 .il-standard-form .il-filter-bar {
   padding: 10px;
   padding-bottom: 25px;
@@ -8639,6 +8578,67 @@ ul.breadcrumb li:hover {
   .il-standard-form .bulky-label {
     display: none;
   }
+}
+.il-input-tag {
+  height: auto;
+  min-height: 1.42857143;
+}
+.il-input-tag input {
+  border: none;
+  box-shadow: none;
+  outline: none;
+  padding: 0 6px 4px;
+  line-height: 1.42857143;
+}
+.il-input-tag .tag {
+  font-size: 100%;
+  display: inline-block;
+  margin-bottom: 3px;
+}
+.il-input-tag .tag [data-role="remove"] {
+  margin-left: 8px;
+  cursor: pointer;
+}
+.il-input-tag .tag [data-role="remove"]:after {
+  content: "x";
+  padding: 0px 2px;
+}
+.il-input-tag .bootstrap-tagsinput {
+  margin-bottom: -3px;
+}
+.il-input-tag .tt-suggestion:hover,
+.il-input-tag .tt-suggestion:focus,
+.il-input-tag .tt-cursor {
+  color: #FFFFFF;
+  text-decoration: none;
+  outline: 0;
+  background-color: #4c6586;
+}
+.il-input-password .revelation-glyph {
+  float: right;
+  margin-top: -21px;
+  margin-right: 5px;
+}
+.il-input-password .revelation-reveal {
+  display: block;
+}
+.il-input-password .revelation-mask {
+  display: none;
+}
+.revealed.il-input-password .revelation-reveal {
+  display: none;
+}
+.revealed.il-input-password .revelation-mask {
+  display: block;
+}
+.il-input-radio .form-control.il-input-radiooption {
+  height: unset;
+  border: unset;
+  background-color: unset;
+}
+.il-input-multiselect {
+  list-style: none;
+  padding-left: 0px;
 }
 .il-table-presentation-viewcontrols {
   height: 40px;

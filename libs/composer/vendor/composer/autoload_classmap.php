@@ -724,6 +724,7 @@ return array(
     'ILIAS\\UI\\Implementation\\Component\\Input\\Container\\Factory' => $baseDir . '/../../src/UI/Implementation/Component/Input/Container/Factory.php',
     'ILIAS\\UI\\Implementation\\Component\\Input\\Container\\Filter\\Factory' => $baseDir . '/../../src/UI/Implementation/Component/Input/Container/Filter/Factory.php',
     'ILIAS\\UI\\Implementation\\Component\\Input\\Container\\Filter\\Filter' => $baseDir . '/../../src/UI/Implementation/Component/Input/Container/Filter/Filter.php',
+    'ILIAS\\UI\\Implementation\\Component\\Input\\Container\\Filter\\PostDataFromServerRequest' => $baseDir . '/../../src/UI/Implementation/Component/Input/Container/Filter/PostDataFromServerRequest.php',
     'ILIAS\\UI\\Implementation\\Component\\Input\\Container\\Filter\\ProxyFilterField' => $baseDir . '/../../src/UI/Implementation/Component/Input/Container/Filter/ProxyFilterField.php',
     'ILIAS\\UI\\Implementation\\Component\\Input\\Container\\Filter\\Renderer' => $baseDir . '/../../src/UI/Implementation/Component/Input/Container/Filter/Renderer.php',
     'ILIAS\\UI\\Implementation\\Component\\Input\\Container\\Filter\\Standard' => $baseDir . '/../../src/UI/Implementation/Component/Input/Container/Filter/Standard.php',

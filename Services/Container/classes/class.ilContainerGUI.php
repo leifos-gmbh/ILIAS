@@ -3815,13 +3815,24 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 		//Step 1: Define some input fields to plug into the filter.
 		$text_input1 = $ui->input()->field()->text("Titel")->withValue("Initial");
 		$text_input2 = $ui->input()->field()->text("Description");
+
+		//Define the options.
+		$options = array(
+			"crs" => "Course",
+			"glo" => "Glossary",
+			"lm" => "Learning Module"
+		);
+
+		//Step 1: define the select
+		$select = $ui->input()->field()->select("Type", $options);
+
 		//$numeric_input1 = $ui->input()->field()->numeric("Number 1");
 		//$numeric_input2 = $ui->input()->field()->numeric("Number 2");
 
 		//Step 3: Define the filter and attach the inputs. The filter is initially activated in this case.
 		$action = $DIC->ctrl()->getLinkTarget($this, "render", "", true);
-		$filter = $DIC->uiService()->filter()->standard("filter_ID", $action, [$text_input1, $text_input2],
-			[true, true], false, false);
+		$filter = $DIC->uiService()->filter()->standard("filter_ID", $action, [$text_input1, $text_input2, $select],
+			[true, true, true], false, false);
 
 		//Step 6: Define some data processing.
 		if ($request->getMethod() == "POST") {

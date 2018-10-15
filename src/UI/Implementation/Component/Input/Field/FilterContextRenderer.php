@@ -188,12 +188,7 @@ class FilterContextRenderer extends AbstractComponentRenderer {
 					$tpl->parseCurrentBlock();
 				}
 
-				$input = $input->withAdditionalOnLoadCode(function ($id) {
-					$code = "$('#$id').on('input', function(event) {
-							il.UI.filter.handleChange(event, '$id', $('#$id').val());
-						});";
-					return $code;
-				});
+				$input = $input->withAdditionalOnLoadCode($input->getUpdateOnLoadCode());
 				$this->maybeRenderId($input, $tpl);
 				break;
 		}

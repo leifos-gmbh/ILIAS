@@ -51,6 +51,8 @@ class FilterContextRenderer extends AbstractComponentRenderer {
 			$input_tpl = $this->getTemplate("tpl.text.html", true, true);
 		} elseif ($input instanceof Component\Input\Field\Numeric) {
 			$input_tpl = $this->getTemplate("tpl.numeric.html", true, true);
+		} else if ($input instanceof Select) {
+			$input_tpl = $this->getTemplate("tpl.select.html", true, true);
 		} else {
 			throw new \LogicException("Cannot render '" . get_class($input) . "'");
 		}
@@ -157,15 +159,48 @@ class FilterContextRenderer extends AbstractComponentRenderer {
 					$tpl->setVariable("VALUE", $input->getValue());
 					$tpl->parseCurrentBlock();
 				}
-
-				$input = $input->withAdditionalOnLoadCode($input->getUpdateOnLoadCode());
-				$this->maybeRenderId($input, $tpl);
 				break;
+
+			case ($input instanceof Select):
+				$tpl = $this->renderSelectInput($tpl, $input);
+				break;
+
 		}
+		$input = $input->withAdditionalOnLoadCode($input->getUpdateOnLoadCode());
+		$this->maybeRenderId($input, $tpl);
 
 		return $tpl->get();
 	}
 
+	public function renderSelectInput(Template $tpl, Select $input)
+	{
+		$value = $input->getValue();
+		//disable first option if required.
+		$tpl->setCurrentBlock("options");
+		if(!$value) {
+			$tpl->setVariable("SELECTED", "selected");
+		}
+		if($input->isRequired()) {
+			$tpl->setVariable("DISABLED", "disabled");
+			$tpl->setVariable("HIDDEN", "hidden");
+		}
+		$tpl->setVariable("VALUE", NULL);
+		$tpl->setVariable("VALUE_STR", "-");
+		$tpl->parseCurrentBlock();
+		//rest of options.
+		foreach ($input->getOptions() as $option_key => $option_value)
+		{
+			$tpl->setCurrentBlock("options");
+			if($value == $option_key) {
+				$tpl->setVariable("SELECTED", "selected");
+			}
+			$tpl->setVariable("VALUE", $option_key);
+			$tpl->setVariable("VALUE_STR", $option_value);
+			$tpl->parseCurrentBlock();
+		}
+
+		return $tpl;
+	}
 
 	/**
 	 * @param RendererInterface $default_renderer
@@ -219,7 +254,8 @@ class FilterContextRenderer extends AbstractComponentRenderer {
 		return [
 			Component\Input\Field\Text::class,
 			Component\Input\Field\Numeric::class,
-			Component\Input\Field\Group::class
+			Component\Input\Field\Group::class,
+			Component\Input\Field\Select::class
 		];
 	}
 }

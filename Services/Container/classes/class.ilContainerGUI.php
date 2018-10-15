@@ -3813,7 +3813,7 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 		$renderer = $DIC->ui()->renderer();
 
 		//Step 1: Define some input fields to plug into the filter.
-		$text_input1 = $ui->input()->field()->text("Titel");
+		$text_input1 = $ui->input()->field()->text("Titel")->withValue("Initial");
 		$text_input2 = $ui->input()->field()->text("Description");
 		//$numeric_input1 = $ui->input()->field()->numeric("Number 1");
 		//$numeric_input2 = $ui->input()->field()->numeric("Number 2");
@@ -3826,7 +3826,7 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 		//Step 6: Define some data processing.
 		if ($request->getMethod() == "POST") {
 			$result = $DIC->uiService()->filter()->getData($filter);
-			var_dump($result); exit;
+//			var_dump($result); exit;
 		}
 
 		$main_tpl->setFilter($renderer->render($filter));

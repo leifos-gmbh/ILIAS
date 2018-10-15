@@ -162,6 +162,7 @@ class FilterContextRenderer extends AbstractComponentRenderer {
 				break;
 
 			case ($input instanceof Select):
+				$tpl->setVariable("NAME", $input->getName());
 				$tpl = $this->renderSelectInput($tpl, $input);
 				break;
 

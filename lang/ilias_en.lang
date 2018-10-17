@@ -17,6 +17,10 @@
 rbac#:#sess_manage_members#:#Manage Participants of a Session
 rbac#:#manage_materials#:#Manage Materials
 rbac#:#sess_manage_materials#:#Manage Session Materials
+meta#:#md_adv_col_presentation_ordering#:#Position
+rbac#:#sess_manage_members#:#Manage Participants of a Session
+rbac#:#manage_materials#:#Manage Materials
+rbac#:#sess_manage_materials#:#Manage Session Materials
 rbac#:#sess_manage_members#:#Manage Participants of a Session
 rbac#:#sess_manage_materials#:#Manage Session Materials
 rbac#:#sess_manage_members#:#Manage Participants of a Session

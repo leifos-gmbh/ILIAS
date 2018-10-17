@@ -17,6 +17,10 @@
 rbac#:#sess_manage_members#:#Teilnehmer einer Sitzung verwalten
 rbac#:#sess_manage_materials#:#Materialzuordnungen verwalten
 rbac#:#manage_materials#:#Materialien verwalten
+meta#:#md_adv_col_presentation_ordering#:#Position
+rbac#:#sess_manage_members#:#Teilnehmer einer Sitzung verwalten
+rbac#:#sess_manage_materials#:#Materialzuordnungen verwalten
+rbac#:#manage_materials#:#Materialien verwalten
 rbac#:#sess_manage_members#:#Teilnehmer einer Sitzung verwalten
 rbac#:#sess_manage_materials#:#Materialzuordnungen verwalten
 rbac#:#sess_manage_members#:#Teilnehmer einer Sitzung verwalten

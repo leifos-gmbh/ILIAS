@@ -14368,3 +14368,8 @@ skmg#:#skmg_all#:#Alle
 skmg#:#skmg_refresh_view#:#Ansicht aktualisieren
 prtf#:#prtf_copy_tab#:#Reiter kopieren
 prtf#:#prtt_title_info#:#Bitte beachten Sie, dass dieser Titel auch für die aus der Vorlage erstellten Porfolios verwendet wird.
+prtf#:#prtf_edit_content#:#Inhalt bearbeiten
+prtf#:#prtf_set_online#:#Online setzen
+prtf#:#prtf_set_offline#:#Offline setzen
+prtf#:#prtf_no_submission#:#Keine Abgabe
+prtf#:#prtf_submission_on#:#Abgabe am $1

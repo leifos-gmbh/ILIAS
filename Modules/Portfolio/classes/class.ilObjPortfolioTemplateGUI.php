@@ -339,6 +339,9 @@ class ilObjPortfolioTemplateGUI extends ilObjPortfolioBaseGUI
 		$a_form->addItem($section);
 	
 		parent::initEditCustomForm($a_form);
+
+		$tit = $a_form->getItemByPostVar("title");
+		$tit->setInfo($this->lng->txt('prtt_title_info'));
 	}
 	
 	protected function getEditFormCustomValues(array &$a_values)

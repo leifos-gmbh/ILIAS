@@ -173,17 +173,18 @@ class ilPortfolioPageTableGUI extends ilTable2GUI
 
 		$ilCtrl->setParameter($this->parent_obj, "prtf_pages[]", $a_set["id"]);
 
+		// copy
+		$action_item = ilLinkButton::getInstance();
+		$action_item->setCaption('prtf_copy_tab');
+		$action_item->setUrl($ilCtrl->getLinkTarget($this->parent_obj, "copyPageForm"));
+		$action_items[] = $action_item;
+
 		// delete
 		$action_item = ilLinkButton::getInstance();
 		$action_item->setCaption('delete');
 		$action_item->setUrl($ilCtrl->getLinkTarget($this->parent_obj, "confirmPortfolioPageDeletion"));
 		$action_items[] = $action_item;
 
-		// copy
-		$action_item = ilLinkButton::getInstance();
-		$action_item->setCaption('prtf_copy_tab');
-		$action_item->setUrl($ilCtrl->getLinkTarget($this->parent_obj, "copyPageForm"));
-		$action_items[] = $action_item;
 
 		$ilCtrl->setParameter($this->parent_obj, "prtf_pages[]", "");
 

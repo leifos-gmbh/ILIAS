@@ -14,9 +14,6 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
-skmg#:#skmg_type_of_formation#:#Type of Formation
-skmg#:#skmg_all#:#Alle
-skmg#:#skmg_refresh_view#:#Ansicht aktualisieren
 common#:#obj_ltis#:#LTI
 common#:#obj_ltis_desc#:#Learning Tools Interoperability
 commocommon#:#lti_outcome#:#Übermittlung LTI-Lernfortschritt
@@ -14166,7 +14163,7 @@ prtf#:#prtf_portfolio_created_from_template#:#Dies ist die Vorschau Ihres neuen 
 style#:#open_documentation#:#Dokumentation öffnen
 style#:#ks_documentation_of_style#:#'Kitchen Sink'-Dokumentation von Style:
 style#:#ks_documentation_of_substyle#:#'Kitchen Sink'-Dokumentation von Sub-Style:
-prtf#:#prtf_pdf#:#PDF erzeugen
+prtf#:#prtf_pdf#:#Exportieren als PDF
 prtf#:#prtf_print_selection#:#Auswahl
 prtf#:#prtf_all_pages#:#Gesamtes Portfolio
 prtf#:#prtf_selected_pages#:#Ausgewählte Teile des Portfolios
@@ -14366,3 +14363,7 @@ lhist#:#lhist_learning_history#:#Learning History
 lhist#:#lhist_no_entries#:#You do not have any entries in your learning history yet. Start learning and make achievments!
 pd#:#pd_enable_learning_history#:#Lernhistorie
 pd#:#pd_enable_learning_history_info#:#Aktiviert eine Übersicht aller Lernerfolge eines Benutzers.
+skmg#:#skmg_type_of_formation#:#Type of Formation
+skmg#:#skmg_all#:#Alle
+skmg#:#skmg_refresh_view#:#Ansicht aktualisieren
+prtf#:#prtf_copy_tab#:#Reiter kopieren

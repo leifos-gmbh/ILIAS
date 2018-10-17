@@ -16,6 +16,9 @@
 <!-- language file start -->
 rbac#:#sess_manage_members#:#Teilnehmer einer Sitzung verwalten
 rbac#:#sess_manage_materials#:#Materialzuordnungen verwalten
+rbac#:#manage_materials#:#Materialien verwalten
+rbac#:#sess_manage_members#:#Teilnehmer einer Sitzung verwalten
+rbac#:#sess_manage_materials#:#Materialzuordnungen verwalten
 rbac#:#sess_manage_members#:#Teilnehmer einer Sitzung verwalten
 rbac#:#sess_manage_members#:#Teilnehmer einer Sitzung verwalten
 crs#:#crs_shorten_breadcrumb#:#Breadcrumb

@@ -15,6 +15,9 @@
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
 rbac#:#sess_manage_members#:#Manage Participants of a Session
+rbac#:#manage_materials#:#Manage Materials
+rbac#:#sess_manage_materials#:#Manage Session Materials
+rbac#:#sess_manage_members#:#Manage Participants of a Session
 rbac#:#sess_manage_materials#:#Manage Session Materials
 rbac#:#sess_manage_members#:#Manage Participants of a Session
 rbac#:#sess_manage_members#:#Manage Participants of a Session

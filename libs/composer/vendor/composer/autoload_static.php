@@ -3128,6 +3128,8 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
         'ilAdvancedMDRecordExportFilesTableGUI' => __DIR__ . '/../..' . '/../../Services/AdvancedMetaData/classes/class.ilAdvancedMDRecordExportFilesTableGUI.php',
         'ilAdvancedMDRecordGUI' => __DIR__ . '/../..' . '/../../Services/AdvancedMetaData/classes/class.ilAdvancedMDRecordGUI.php',
         'ilAdvancedMDRecordImportFiles' => __DIR__ . '/../..' . '/../../Services/AdvancedMetaData/classes/class.ilAdvancedMDRecordImportFiles.php',
+        'ilAdvancedMDRecordObjectOrdering' => __DIR__ . '/../..' . '/../../Services/AdvancedMetaData/classes/class.ilAdvancedMDRecordObjectOrdering.php',
+        'ilAdvancedMDRecordObjectOrderings' => __DIR__ . '/../..' . '/../../Services/AdvancedMetaData/classes/class.ilAdvancedMDRecordObjectOrderings.php',
         'ilAdvancedMDRecordParser' => __DIR__ . '/../..' . '/../../Services/AdvancedMetaData/classes/class.ilAdvancedMDRecordParser.php',
         'ilAdvancedMDRecordScope' => __DIR__ . '/../..' . '/../../Services/AdvancedMetaData/classes/class.ilAdvancedMDRecordScope.php',
         'ilAdvancedMDRecordTableGUI' => __DIR__ . '/../..' . '/../../Services/AdvancedMetaData/classes/class.ilAdvancedMDRecordTableGUI.php',

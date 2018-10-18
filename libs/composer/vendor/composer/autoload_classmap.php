@@ -2828,6 +2828,8 @@ return array(
     'ilAdvancedMDRecordExportFilesTableGUI' => $baseDir . '/../../Services/AdvancedMetaData/classes/class.ilAdvancedMDRecordExportFilesTableGUI.php',
     'ilAdvancedMDRecordGUI' => $baseDir . '/../../Services/AdvancedMetaData/classes/class.ilAdvancedMDRecordGUI.php',
     'ilAdvancedMDRecordImportFiles' => $baseDir . '/../../Services/AdvancedMetaData/classes/class.ilAdvancedMDRecordImportFiles.php',
+    'ilAdvancedMDRecordObjectOrdering' => $baseDir . '/../../Services/AdvancedMetaData/classes/class.ilAdvancedMDRecordObjectOrdering.php',
+    'ilAdvancedMDRecordObjectOrderings' => $baseDir . '/../../Services/AdvancedMetaData/classes/class.ilAdvancedMDRecordObjectOrderings.php',
     'ilAdvancedMDRecordParser' => $baseDir . '/../../Services/AdvancedMetaData/classes/class.ilAdvancedMDRecordParser.php',
     'ilAdvancedMDRecordScope' => $baseDir . '/../../Services/AdvancedMetaData/classes/class.ilAdvancedMDRecordScope.php',
     'ilAdvancedMDRecordTableGUI' => $baseDir . '/../../Services/AdvancedMetaData/classes/class.ilAdvancedMDRecordTableGUI.php',

@@ -14360,7 +14360,7 @@ crs#:#crs_lhist_objective_completed#:#Mastered $3$ in $1$.
 trac#:#trac_lhist_obj_completed_in#:#$1$ was completed in $2$.
 trac#:#trac_lhist_obj_completed#:#$1$ was completed.
 lhist#:#lhist_learning_history#:#Learning History
-lhist#:#lhist_no_entries#:#You do not have any entries in your learning history yet. Start learning and make achievments!
+lhist#:#lhist_no_entries#:#Achieve your goals! Learn something today to further your learning history.
 pd#:#pd_enable_learning_history#:#Lernhistorie
 pd#:#pd_enable_learning_history_info#:#Aktiviert eine Übersicht aller Lernerfolge eines Benutzers.
 skmg#:#skmg_type_of_formation#:#Type of Formation
@@ -14384,3 +14384,4 @@ user#:#user_prompt_once_after_login_info#:#Nach dieser Zeit wird der Benutzer au
 user#:#user_prompt_repeat#:#Wiederholt nach x Tagen
 user#:#user_prompt_repeat_info#:#Benutzer werden wiederholt aufgefordert ihr Profil zu konfigurieren, falls es nicht bereits veröffentlicht ist.
 user#:#user_profile_prompt_text_info#:#Dieser Text ersetzt den Standard-Infotext, falls der Benutzer zur Konfiguration des Profils aufgefordert wird.
+lhist#:#lhist_first_login#:#First Login

@@ -14364,7 +14364,7 @@ crs#:#crs_lhist_objective_completed#:#Mastered $3$ in $1$.
 trac#:#trac_lhist_obj_completed_in#:#$1$ was completed in $2$.
 trac#:#trac_lhist_obj_completed#:#$1$ was completed.
 lhist#:#lhist_learning_history#:#Learning History
-lhist#:#lhist_no_entries#:#You do not have any entries in your learning history yet. Start learning and make achievments!
+lhist#:#lhist_no_entries#:#Achieve your goals! Learn something today to further your learning history.
 pd#:#pd_enable_learning_history#:#Learning History
 pd#:#pd_enable_learning_history_info#:#Enables an overview of all achievements of a user.
 skmg#:#skmg_type_of_formation#:#Type of Formation
@@ -14388,3 +14388,4 @@ user#:#user_prompt_once_after_login_info#:#After this period the user will be pr
 user#:#user_prompt_repeat#:#Repeat every specific number of days
 user#:#user_prompt_repeat_info#:#The user will be prompted periodically with the profile, if the user did not publish the profile yet.
 user#:#user_profile_prompt_text_info#:#This text will replace the default info text, if a user has been prompted to the profile.
+lhist#:#lhist_first_login#:#First Login

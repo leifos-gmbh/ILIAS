@@ -14373,3 +14373,5 @@ prtf#:#prtf_set_online#:#Online setzen
 prtf#:#prtf_set_offline#:#Offline setzen
 prtf#:#prtf_no_submission#:#Keine Abgabe
 prtf#:#prtf_submission_on#:#Abgabe am $1
+prtf#:#prtf_no_offline_share_info#:#Das Portfolio muss zunächst online gesetzt werden bevor es für bestimmte Benutzer freigegeben werden kann.
+prtf#:#prtf_has_been_set_online#:#Das Portfolio wurde online gesetzt.

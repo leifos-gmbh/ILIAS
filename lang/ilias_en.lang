@@ -14377,3 +14377,5 @@ prtf#:#prtf_set_online#:#Set Online
 prtf#:#prtf_set_offline#:#Set Offline
 prtf#:#prtf_no_submission#:#No Submission
 prtf#:#prtf_submission_on#:#Submitted on $1
+prtf#:#prtf_no_offline_share_info#:#A portfolio has to be online to be shared by other users.
+prtf#:#prtf_has_been_set_online#:#Portfolio has been set online.

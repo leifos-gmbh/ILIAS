@@ -18,6 +18,12 @@ rbac#:#sess_manage_members#:#Teilnehmer einer Sitzung verwalten
 rbac#:#sess_manage_materials#:#Materialzuordnungen verwalten
 rbac#:#manage_materials#:#Materialien verwalten
 meta#:#md_adv_col_presentation_ordering#:#Position
+sess#:#sess_show_members#:#Teilnehmergalerie
+sess#:#sess_show_participants_info#:#Alle Teilnehmer können im Reiter "Teilnehmer" die Teilnehmergalerie einsehen.
+rbac#:#sess_manage_members#:#Teilnehmer einer Sitzung verwalten
+rbac#:#sess_manage_materials#:#Materialzuordnungen verwalten
+rbac#:#manage_materials#:#Materialien verwalten
+meta#:#md_adv_col_presentation_ordering#:#Position
 rbac#:#sess_manage_members#:#Teilnehmer einer Sitzung verwalten
 rbac#:#sess_manage_materials#:#Materialzuordnungen verwalten
 rbac#:#manage_materials#:#Materialien verwalten

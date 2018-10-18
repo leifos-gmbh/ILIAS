@@ -144,3 +144,20 @@ if (!$ilDB->tableExists('adv_md_record_obj_ord'))
 	);
 }
 ?>
+
+<#15>
+<?php
+if(!$ilDB->tableColumnExists('event', 'show_members'))
+{
+	$ilDB->addTableColumn(
+			'event',
+			'show_members',
+			[
+				"notnull" => true,
+				"length" => 1,
+				"type" => "integer"
+			]
+	);
+}
+?>
+

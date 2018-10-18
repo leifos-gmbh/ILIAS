@@ -1776,10 +1776,6 @@ class ilObjGroupGUI extends ilContainerGUI
 					)
 				);
 
-			// Notification Settings
-			/*$notification = new ilFormSectionHeaderGUI();
-			$notification->setTitle($this->lng->txt('grp_notification'));
-			$form->addItem($notification);*/
 
 			$mem = new ilCheckboxInputGUI($this->lng->txt('grp_show_members'),'show_members');
 			$mem->setChecked($this->object->getShowMembers());

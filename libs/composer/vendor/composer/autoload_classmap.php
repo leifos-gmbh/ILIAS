@@ -6281,6 +6281,7 @@ return array(
     'ilSurveyCodesEditTableGUI' => $baseDir . '/../../Modules/Survey/classes/tables/class.ilSurveyCodesEditTableGUI.php',
     'ilSurveyCodesTableGUI' => $baseDir . '/../../Modules/Survey/classes/tables/class.ilSurveyCodesTableGUI.php',
     'ilSurveyConstraintsGUI' => $baseDir . '/../../Modules/Survey/classes/class.ilSurveyConstraintsGUI.php',
+    'ilSurveyContainsDataMessageBoxGUI' => $baseDir . '/../../Modules/Survey/classes/class.ilSurveyContainsDataMessageBoxGUI.php',
     'ilSurveyCronNotification' => $baseDir . '/../../Modules/Survey/classes/class.ilSurveyCronNotification.php',
     'ilSurveyDataSet' => $baseDir . '/../../Modules/Survey/classes/class.ilSurveyDataSet.php',
     'ilSurveyEditorGUI' => $baseDir . '/../../Modules/Survey/classes/class.ilSurveyEditorGUI.php',

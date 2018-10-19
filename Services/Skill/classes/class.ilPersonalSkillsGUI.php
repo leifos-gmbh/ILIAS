@@ -28,6 +28,11 @@ class ilPersonalSkillsGUI
 	protected $hidden_skills = array();
 
 	/**
+	 * @var \ILIAS\DI\UIServices
+	 */
+	protected $ui;
+
+	/**
 	 * @var ilCtrl
 	 */
 	protected $ctrl;
@@ -109,6 +114,7 @@ class ilPersonalSkillsGUI
 		$this->access = $DIC->access();
 		$this->ui_fac = $DIC->ui()->factory();
 		$this->ui_ren = $DIC->ui()->renderer();
+		$this->ui = $DIC->ui();
 
 		$ilCtrl = $this->ctrl;
 		$ilHelp = $this->help;
@@ -864,10 +870,15 @@ class ilPersonalSkillsGUI
 		$tpl = $this->tpl;
 		$ilTabs = $this->tabs;
 		$ilSetting = $this->setting;
+		$ui = $this->ui;
 
 		if(!$ilSetting->get("disable_personal_workspace"))
 		{
-			ilUtil::sendInfo($lng->txt("skmg_ass_materials_from_workspace")." » <a href='ilias.php?baseClass=ilPersonalDesktopGUI&amp;cmd=jumpToWorkspace'>".$lng->txt("personal_workspace")."</a>");
+			$url = 'ilias.php?baseClass=ilPersonalDesktopGUI&amp;cmd=jumpToWorkspace';
+			$mbox = $ui->factory()->messageBox()->info($lng->txt("skmg_ass_materials_from_workspace"))
+				->withLinks([$ui->factory()->link()->standard($lng->txt("personal_workspace"),
+					$url)]);
+			$message =  $ui->renderer()->render($mbox);
 		}
 		
 		$ilCtrl->saveParameter($this, "skill_id");
@@ -905,7 +916,7 @@ class ilPersonalSkillsGUI
 		$tb->setCloseFormTag(true);
 		$mtpl->setVariable("TOOLBAR2", $tb->getHTML());
 		
-		$tpl->setContent($mtpl->get());
+		$tpl->setContent($message.$mtpl->get());
 	}
 	
 	/**

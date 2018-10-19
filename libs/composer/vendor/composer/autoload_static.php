@@ -6525,6 +6525,7 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
         'ilSurveyCodesEditTableGUI' => __DIR__ . '/../..' . '/../../Modules/Survey/classes/tables/class.ilSurveyCodesEditTableGUI.php',
         'ilSurveyCodesTableGUI' => __DIR__ . '/../..' . '/../../Modules/Survey/classes/tables/class.ilSurveyCodesTableGUI.php',
         'ilSurveyConstraintsGUI' => __DIR__ . '/../..' . '/../../Modules/Survey/classes/class.ilSurveyConstraintsGUI.php',
+        'ilSurveyContainsDataMessageBoxGUI' => __DIR__ . '/../..' . '/../../Modules/Survey/classes/class.ilSurveyContainsDataMessageBoxGUI.php',
         'ilSurveyCronNotification' => __DIR__ . '/../..' . '/../../Modules/Survey/classes/class.ilSurveyCronNotification.php',
         'ilSurveyDataSet' => __DIR__ . '/../..' . '/../../Modules/Survey/classes/class.ilSurveyDataSet.php',
         'ilSurveyEditorGUI' => __DIR__ . '/../..' . '/../../Modules/Survey/classes/class.ilSurveyEditorGUI.php',

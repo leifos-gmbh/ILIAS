@@ -249,7 +249,101 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
 	//
 	// CREATE/EDIT
 	// 
-	
+
+	/**
+	 * create new object form
+	 *
+	 * @access	public
+	 */
+	public function create()
+	{
+		$tpl = $this->tpl;
+		$ilErr = $this->ilErr;
+
+		$new_type = $_REQUEST["new_type"];
+
+		// add new object to custom parent container
+		$this->ctrl->saveParameter($this, "crtptrefid");
+		// use forced callback after object creation
+		$this->ctrl->saveParameter($this, "crtcb");
+
+		if (!$this->checkPermissionBool("create", "", $new_type))
+		{
+			$ilErr->raiseError($this->lng->txt("permission_denied"),$ilErr->MESSAGE);
+		}
+		else
+		{
+			$this->lng->loadLanguageModule($new_type);
+			$this->ctrl->setParameter($this, "new_type", $new_type);
+
+			$forms = $this->initCreationForms($new_type);
+
+			// copy form validation error: do not show other creation forms
+			if($_GET["cpfl"] && isset($forms[self::CFORM_CLONE]))
+			{
+				$forms = array(self::CFORM_CLONE => $forms[self::CFORM_CLONE]);
+			}
+			$tpl->setContent($this->getCreateInfoMessage().$this->getCreationFormsHTML($forms));
+		}
+	}
+
+	/**
+	 * Get cereat info message
+	 *
+	 * @param
+	 * @return
+	 */
+	protected function getCreateInfoMessage()
+	{
+		global $DIC;
+
+		$ctrl = $this->ctrl;
+		$lng = $this->lng;
+		$ui = $DIC->ui();
+		$ilSetting =$DIC->settings();
+
+		$message = "";
+		// page type: blog
+		if (!$ilSetting->get('disable_wsp_blogs'))
+		{
+			$options = array();
+			include_once "Services/PersonalWorkspace/classes/class.ilWorkspaceTree.php";
+			$tree = new ilWorkspaceTree($this->user_id);
+			$root = $tree->readRootId();
+			if ($root)
+			{
+				$root = $tree->getNodeData($root);
+				foreach ($tree->getSubTree($root) as $node)
+				{
+					if ($node["type"] == "blog")
+					{
+						$options[$node["obj_id"]] = $node["title"];
+					}
+				}
+				asort($options);
+			}
+			if (!sizeof($options))
+			{
+
+				// #18147
+				$this->lng->loadLanguageModule('pd');
+				$url = $this->ctrl->getLinkTargetByClass("ilpersonaldesktopgui", "jumpToWorkspace");
+				$text = $this->lng->txt("pd_personal_workspace");
+
+				$text = sprintf($this->lng->txt("prtf_no_blogs_info"), $text);
+
+				$mbox = $ui->factory()->messageBox()->info($text)
+					->withLinks([$ui->factory()->link()->standard($this->lng->txt("pd_personal_workspace"),
+						$url)]);
+
+				$message = $ui->renderer()->render($mbox);
+			}
+
+		}
+		return $message;
+	}
+
+
 	protected function initCreationForms($a_new_type)
 	{		
 		return array(self::CFORM_NEW => $this->initCreateForm($a_new_type));		
@@ -352,12 +446,6 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
 			}
 			else
 			{
-				// #18147
-				$this->lng->loadLanguageModule('pd');
-				$url = $this->ctrl->getLinkTargetByClass("ilpersonaldesktopgui", "jumpToWorkspace");
-				$url = '<a href="'.$url.'">'.$this->lng->txt("pd_personal_workspace").'</a>';
-
-				ilUtil::sendInfo(sprintf($this->lng->txt("prtf_no_blogs_info"), $url), true);				
 				$type->setValue("page");
 			}
 		}

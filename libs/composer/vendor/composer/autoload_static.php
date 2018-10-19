@@ -3000,6 +3000,8 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
         'ilAccountCodesTableGUI' => __DIR__ . '/../..' . '/../../Services/User/classes/class.ilAccountCodesTableGUI.php',
         'ilAccountMail' => __DIR__ . '/../..' . '/../../Services/Mail/classes/class.ilAccountMail.php',
         'ilAccountRegistrationGUI' => __DIR__ . '/../..' . '/../../Services/Registration/classes/class.ilAccountRegistrationGUI.php',
+        'ilAchievements' => __DIR__ . '/../..' . '/../../Services/PersonalDesktop/Achievements/classes/class.ilAchievements.php',
+        'ilAchievementsGUI' => __DIR__ . '/../..' . '/../../Services/PersonalDesktop/Achievements/classes/class.ilAchievementsGUI.php',
         'ilActivationEmitter' => __DIR__ . '/../..' . '/../../Services/WorkflowEngine/classes/emitters/class.ilActivationEmitter.php',
         'ilActivity' => __DIR__ . '/../..' . '/../../Services/WorkflowEngine/interfaces/ilActivity.php',
         'ilAdminSubItemsTableGUI' => __DIR__ . '/../..' . '/../../Services/Repository/classes/class.ilAdminSubItemsTableGUI.php',

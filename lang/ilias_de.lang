@@ -14386,3 +14386,4 @@ user#:#user_prompt_repeat_info#:#Benutzer werden wiederholt aufgefordert ihr Pro
 user#:#user_profile_prompt_text_info#:#Dieser Text ersetzt den Standard-Infotext, falls der Benutzer zur Konfiguration des Profils aufgefordert wird.
 lhist#:#lhist_first_login#:#First Login
 prtf#:#prtf_decl_authorship#:#Declaration of Authorship
+pd#:#pd_achievements#:#Achievements

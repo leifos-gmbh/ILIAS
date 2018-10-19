@@ -306,8 +306,8 @@ class ilPersonalSkillsGUI
 
 		$cmd = $ilCtrl->getCmd($std_cmd);
 		
-		$tpl->setTitle($lng->txt("skills"));
-		$tpl->setTitleIcon(ilUtil::getImagePath("icon_skmg.svg"));
+		//$tpl->setTitle($lng->txt("skills"));
+		//$tpl->setTitleIcon(ilUtil::getImagePath("icon_skmg.svg"));
 
 		switch($next_class)
 		{
@@ -328,20 +328,20 @@ class ilPersonalSkillsGUI
 		$ilTabs = $this->tabs;
 
 		// list skills
-		$ilTabs->addTab("list_skills",
+		$ilTabs->addSubTab("list_skills",
 			$lng->txt("skmg_selected_skills"),
 			$ilCtrl->getLinkTarget($this, "listSkills"));
 
 		if (count($this->user_profiles) > 0)
 		{
-			$ilTabs->addTab("profile",
+			$ilTabs->addSubTab("profile",
 				$lng->txt("skmg_assigned_profiles"),
 				$ilCtrl->getLinkTarget($this, "listAssignedProfile"));
 		}
 
 		// assign materials
 
-		$ilTabs->activateTab($a_activate);
+		$ilTabs->activateSubTab($a_activate);
 	}
 	
 	function setOfflineMode($a_file_path)

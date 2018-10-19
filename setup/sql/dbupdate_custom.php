@@ -155,7 +155,8 @@ if(!$ilDB->tableColumnExists('event', 'show_members'))
 			[
 				"notnull" => true,
 				"length" => 1,
-				"type" => "integer"
+				"type" => "integer",
+				'default' => 0
 			]
 	);
 }
@@ -166,4 +167,20 @@ if(!$ilDB->tableColumnExists('event', 'show_members'))
 $ilCtrlStructureReader->getStructure();
 ?>
 
+<#17>
+<?php
+if(!$ilDB->tableColumnExists('event', 'mail_members'))
+{
+	$ilDB->addTableColumn(
+		'event',
+		'mail_members',
+		[
+			"notnull" => true,
+			"length" => 1,
+			"type" => "integer",
+			'default' => 0
+		]
+	);
+}
+?>
 

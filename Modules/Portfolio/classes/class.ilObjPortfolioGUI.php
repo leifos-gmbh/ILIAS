@@ -28,6 +28,11 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
 	 * @var \ILIAS\DI\UIServices
 	 */
 	protected $ui;
+
+	/**
+	 * @var ilPortfolioDeclarationOfAuthorship
+	 */
+	protected $declaration_authorship;
 	
 	public function __construct($a_id = 0)
 	{		
@@ -42,6 +47,7 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
 		$this->ui = $DIC->ui();
 
 		parent::__construct($a_id, self::PORTFOLIO_OBJECT_ID, 0);
+		$this->declaration_authorship = new ilPortfolioDeclarationOfAuthorship();
 
 		$this->ctrl->saveParameter($this, "exc_back_ref_id");
 	}
@@ -1239,6 +1245,14 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
 		// because of PDF export
 		$form->setPreventDoubleSubmission(false);
 
+		// declaration of authorship
+		if ($this->declaration_authorship->getForUser($this->user) != "")
+		{
+			$cb = new ilCheckboxInputGUI($this->lng->txt("prtf_decl_authorship"), "decl_author");
+			$cb->setInfo($this->declaration_authorship->getForUser($this->user));
+			$form->addItem($cb);
+		}
+
 		// signature
 		$cb = new ilCheckboxInputGUI($this->lng->txt("prtf_signature"), "signature");
 		$cb->setInfo($this->lng->txt("prtf_signature_info"));
@@ -1392,6 +1406,14 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
 		{
 			$cover_tpl->setCurrentBlock("signature");
 			$cover_tpl->setVariable("TXT_SIGNATURE", $lng->txt("prtf_signature_date"));
+			$cover_tpl->parseCurrentBlock();
+		}
+
+		if ($_POST["decl_author"])
+		{
+			$cover_tpl->setCurrentBlock("decl_author");
+			$cover_tpl->setVariable("TXT_DECL_AUTHOR",
+				nl2br($this->declaration_authorship->getForUser($this->user)));
 			$cover_tpl->parseCurrentBlock();
 		}
 

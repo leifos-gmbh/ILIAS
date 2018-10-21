@@ -33,6 +33,7 @@ class ilDateDurationInputGUI extends ilSubEnabledFormPropertyGUI implements ilTa
 	protected $toggle_fulltime = false;
 	protected $toggle_fulltime_txt = '';
 	protected $toggle_fulltime_checked = false;
+	protected $open_end = false;
 	
 	/**
 	* Constructor
@@ -234,6 +235,27 @@ class ilDateDurationInputGUI extends ilSubEnabledFormPropertyGUI implements ilTa
 	{
 	 	return $this->minute_step_size;
 	}
+
+	/**
+	 * Set is open end allowed (only one of the two dates is given)
+	 *
+	 * @param bool $a_val is open end allowed
+	 */
+	function setAllowedOpenEnd($a_val)
+	{
+		$this->open_end = $a_val;
+	}
+
+	/**
+	 * Get is open end allowed
+	 *
+	 * @return bool is open end allowed
+	 */
+	function isAllowedOpenEnd()
+	{
+		return $this->open_end;
+	}
+
 	
 	/**
 	* Set value by array
@@ -299,12 +321,12 @@ class ilDateDurationInputGUI extends ilSubEnabledFormPropertyGUI implements ilTa
 				$valid_start = true;
 			}						
 		}
-		else if(!$this->getRequired() && !trim($end))
+		else if(!$this->getRequired() && (!trim($end) || $this->isAllowedOpenEnd()))
 		{
 			$valid_start = true;			
 		}
 								
-		$valid_end = false;		
+		$valid_end = false;
 		if(trim($end))
 		{			
 			$parsed = ilCalendarUtil::parseIncomingDate($end, $format);		
@@ -314,7 +336,7 @@ class ilDateDurationInputGUI extends ilSubEnabledFormPropertyGUI implements ilTa
 				$valid_end = true;
 			}					
 		}
-		else if(!$this->getRequired() && !trim($start))
+		else if(!$this->getRequired() && (!trim($start) || $this->isAllowedOpenEnd()))
 		{					
 			$valid_end = true;			
 		}
@@ -332,9 +354,8 @@ class ilDateDurationInputGUI extends ilSubEnabledFormPropertyGUI implements ilTa
 				$valid_end = false;
 			}
 		}
-		
-		$valid = ($valid_start && $valid_end);	
-		
+		$valid = ($valid_start && $valid_end);
+
 		if($valid && 
 			$this->getStart() && 
 			$this->getEnd() &&
@@ -342,7 +363,7 @@ class ilDateDurationInputGUI extends ilSubEnabledFormPropertyGUI implements ilTa
 		{
 			$valid = false;			
 		}
-		
+
 		if(!$valid)
 		{
 			$this->invalid_input_start = $start;
@@ -355,9 +376,9 @@ class ilDateDurationInputGUI extends ilSubEnabledFormPropertyGUI implements ilTa
 		}	
 		else
 		{
-			if(
+			if( !$this->isAllowedOpenEnd() && (
 				!$this->getStart() ||
-				!$this->getEnd()
+				!$this->getEnd())
 			)
 			{
 				$_POST[$this->getPostVar()]["start"] = null;

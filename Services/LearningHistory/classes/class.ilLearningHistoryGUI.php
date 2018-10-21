@@ -51,6 +51,17 @@ class ilLearningHistoryGUI
 	}
 
 	/**
+	 * Set user id
+	 *
+	 * @param int $user_id
+	 */
+	public function setUserId($user_id)
+	{
+		$this->user_id = $user_id;
+	}
+
+
+	/**
 	 * Execute command
 	 */
 	function executeCommand()
@@ -77,10 +88,31 @@ class ilLearningHistoryGUI
 	{
 		$main_tpl = $this->main_tpl;
 		$lng = $this->lng;
-		$collector = $this->lhist_service->factory()->collector();
-
 		$f = $this->ui->factory();
 		$renderer = $this->ui->renderer();
+
+		$html = $this->getHistoryHtml();
+
+		if ($html != "")
+		{
+			$main_tpl->setContent($html);
+		}
+		else
+		{
+			$main_tpl->setContent(
+				$renderer->render($f->messageBox()->info($lng->txt("lhist_no_entries"))
+				));
+		}
+	}
+	
+	/**
+	 * Get history html
+	 *
+	 * @return string
+	 */
+	public function getHistoryHtml()
+	{
+		$collector = $this->lhist_service->factory()->collector();
 
 		$to = time();
 		$from = time() - (365 * 24 * 60 * 60);
@@ -94,19 +126,15 @@ class ilLearningHistoryGUI
 				$this->lhist_service->repositoryTree()));
 		}
 
-		//$main_tpl->setTitle($lng->txt("lhist_learning_history"));
-
+		$html = "";
 		if (count($entries) > 0)
 		{
-			$main_tpl->setContent($timeline->render());
+			$html = $timeline->render();
 		}
-		else
-		{
-			$main_tpl->setContent(
-				$renderer->render($f->messageBox()->info($lng->txt("lhist_no_entries"))
-				));
-		}
+
+		return $html;
 	}
+	
 	
 
 }

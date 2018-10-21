@@ -110,14 +110,18 @@ class ilLearningHistoryGUI
 	 *
 	 * @return string
 	 */
-	public function getHistoryHtml()
+	public function getHistoryHtml($from = null, $to = null, $classes = null)
 	{
 		$collector = $this->lhist_service->factory()->collector();
 
-		$to = time();
-		$from = time() - (365 * 24 * 60 * 60);
+		$to = (is_null($to))
+			? time()
+			: $to;
+		$from = (is_null($from))
+			? time() - (365 * 24 * 60 * 60)
+			: $from;
 
-		$entries = $collector->getEntries($from, $to, $this->user_id);
+		$entries = $collector->getEntries($from, $to, $this->user_id, $classes);
 
 		$timeline = ilTimelineGUI::getInstance();
 		foreach ($entries as $e)

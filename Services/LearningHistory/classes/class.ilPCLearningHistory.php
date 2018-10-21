@@ -201,6 +201,9 @@ class ilPCLearningHistory extends ilPageContent
 			$from = $param[1];
 			$to = $param[2];
 			$classes = explode(";", $param[3]);
+			$classes = array_map(function($i) {
+				return trim($i);
+			}, $classes);
 
 
 			$a_html = substr($a_html, 0, $start).
@@ -247,7 +250,20 @@ class ilPCLearningHistory extends ilPageContent
 		{
 			$hist_gui = new ilLearningHistoryGUI();
 			$hist_gui->setUserId($user_id);
-			return $hist_gui->getHistoryHtml();
+			$from_unix = ($from != "")
+				? (new ilDateTime($from." 00:00:00", IL_CAL_DATETIME))->get(IL_CAL_UNIX)
+				: null;
+			$to_unix = ($to != "")
+				? (new ilDateTime($to." 23:59:59", IL_CAL_DATETIME))->get(IL_CAL_UNIX)
+				: null;
+			$classes = (is_array($classes))
+				? array_filter($classes, function($i) {return ($i != "");})
+				: null;
+			if (count($classes) == 0)
+			{
+				$classes = null;
+			}
+			return $hist_gui->getHistoryHtml($from_unix, $to_unix, $classes);
 		}
 
 		return ilPCLearningHistoryGUI::getPlaceHolderPresentation();

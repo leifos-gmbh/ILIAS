@@ -14,6 +14,29 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+
+
+
+rbac#:#sess_manage_members#:#Manage Participants of a Session
+rbac#:#manage_materials#:#Manage Materials
+rbac#:#sess_manage_materials#:#Manage Session Materials
+meta#:#md_adv_col_presentation_ordering#:#Position
+sess#:#sess_show_members#:#Show Participants
+sess#:#sess_show_participants_info#:#If activated, session participants can access the participant gallery
+sess#:#sess_member_administration#:#Edit Participants
+sess#:#sess_members_gallery#:#Session Gallery
+sess#:#sess_mail_context_participant_title#:#Sitzung: Mail to Participants
+sess#:#sess_mail_context_participant_info#:#For the participant e-mails on the participants and learning progress screens of a session
+sess#:#mail_sess_roles#:#Send Mail to Session Roles
+sess#:#send_mail_participants#:#All Participants of Session
+sess#:#il_sess_participant#:#Session Participants
+sess#:#sess_mail_type#:#Mail to Participants
+sess#:#sess_mail_admins_only#:#For Administrators only
+sess#:#sess_mail_admins_only_info#:#Only administrators can use the feature ‘Mail to Participants’ in the ‘Participants’ tab.
+sess#:#sess_mail_all#:#For all Participants
+sess#:#sess_mail_all_info#:#All participants can use the feature ‘Mail to Participants’ in the ‘Participants’ tab.
+sess#:#sess_contact#:#Contact
+sess#:#sess_mem_contacts#:#Tutorial Support
 rbac#:#sess_manage_members#:#Manage Participants of a Session
 rbac#:#manage_materials#:#Manage Materials
 rbac#:#sess_manage_materials#:#Manage Session Materials
@@ -14754,3 +14777,5 @@ exc#:#exc_start_assignment#:#Start Assignment
 exc#:#exc_needs_fixed_deadline#:#This feature only works with a fixed deadline.
 exc#:#exc_tbl_calculated_deadline#:#Calculated Deadline
 
+=======
+>>>>>>> Added tutorial support

@@ -14,6 +14,49 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+
+
+
+
+rbac#:#sess_manage_members#:#Teilnehmer einer Sitzung verwalten
+rbac#:#sess_manage_materials#:#Materialzuordnungen verwalten
+rbac#:#manage_materials#:#Materialien verwalten
+meta#:#md_adv_col_presentation_ordering#:#Position
+sess#:#sess_show_members#:#Teilnehmergalerie
+sess#:#sess_show_participants_info#:#Alle Teilnehmer können im Reiter "Teilnehmer" die Teilnehmergalerie einsehen.
+sess#:#sess_member_administration#:#Teilnehmerverwaltung
+sess#:#sess_members_gallery#:#Teilnehmergalerie
+sess#:#sess_mail_context_participant_title#:#Sitzung: Mail an Teilnehmer
+sess#:#sess_mail_context_participant_info#:#Für die Teilnehmer-E-Mails auf den Mitglieds- und Lernfortschrittsansichten einer Sitzung
+sess#:#mail_sess_roles#:#Verschicke Mail an folgende Rollen der Sitzung
+sess#:#send_mail_participants#:#Alle Teilnehmer der Sitzung
+sess#:#il_sess_participant#:#Sitzungsteilnehmer
+sess#:#sess_mail_type#:#Mail an Teilnehmer
+sess#:#sess_mail_admins_only#:#Nur für Administratoren
+sess#:#sess_mail_admins_only_info#:#Nur Administratoren können die Funktion "Mail an Teilnehmer" im Reiter Teilnehmer nutzen.
+sess#:#sess_mail_all#:#Für alle Teilnehmer
+sess#:#sess_mail_all_info#:#Alle Teilnehmer können die Funktion "Mail an Teilnehmer" im Reiter Teilnehmer nutzen.
+sess#:#sess_contact#:#Kontakt
+sess#:#sess_mem_contacts#:#Tutorielle Betreuung
+dateplaner#:#cal_calendar_subscription_modal_title#:#Kalender abonnieren
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 rbac#:#sess_manage_members#:#Teilnehmer einer Sitzung verwalten
 rbac#:#sess_manage_materials#:#Materialzuordnungen verwalten
 rbac#:#manage_materials#:#Materialien verwalten
@@ -14780,3 +14823,5 @@ exc#:#exc_start_assignment#:#Übungseinheit starten
 exc#:#exc_needs_fixed_deadline#:#Diese Funktion benötigt ein festes Abgabedatum.
 exc#:#exc_tbl_calculated_deadline#:#Errechneter Abgabetermin
 >>>>>>> Added ical link
+=======
+>>>>>>> Fixed ical style

@@ -593,7 +593,7 @@ class ilCalendarBlockGUI extends ilBlockGUI
 			"", "",
 			true,
 			false,
-			'<span>'.$out.'</span>'
+			'<span class="ilIcalIcon">'.$out.'</span>'
 		);
 	}
 

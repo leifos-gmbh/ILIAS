@@ -38,7 +38,6 @@ if (!$ilDB->tableColumnExists('usr_data', 'first_login'))
 			));
 		}
 	}
-	exit;
 }
 ?>
 <#4>

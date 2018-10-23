@@ -98,7 +98,7 @@ class ilContainerFilterUtil
 				switch ($field->getFieldId())
 				{
 					case ilContainerFilterField::STD_FIELD_TITLE:
-						$fields["title"] = $ui->input()->field()->text($lng->txt("title"));
+						$fields["title"] = $ui->input()->field()->text($lng->txt("title"))->withValue("test");
 						$fields_act[] = true;
 						break;
 					case ilContainerFilterField::STD_FIELD_DESCRIPTION:

@@ -166,10 +166,11 @@ class ilUIFilterService
 		$request = $DIC->http()->request();
 		$result = null;
 		//if ($_REQUEST["cmdFilter"] == "apply" && $request->getMethod() == "POST") {
-		if ($request->getMethod() == "POST") {
+		if ($request->getMethod() == "POST")
+		{
 			$filter = $filter->withRequest($request);
-			$result = $filter->getData();
 		}
+		$result = $filter->getData();
 		return $result;
 	}
 

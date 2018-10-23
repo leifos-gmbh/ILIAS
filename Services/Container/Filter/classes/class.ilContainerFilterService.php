@@ -52,7 +52,7 @@ class ilContainerFilterService
 	 */
 	public function util(): ilContainerFilterUtil
 	{
-		return new ilContainerFilterUtil($this->adv_adapter, $this->lng);
+		return new ilContainerFilterUtil($this, $this->adv_adapter, $this->lng);
 	}
 
 	/**
@@ -114,6 +114,16 @@ class ilContainerFilterService
 		);
 	}
 
+	/**
+	 * User filter
+	 *
+	 * @param array $data
+	 * @return ilContainerUserFilter
+	 */
+	public function userFilter($data)
+	{
+		return new ilContainerUserFilter($data);
+	}
 
 
 }

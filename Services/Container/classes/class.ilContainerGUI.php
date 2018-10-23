@@ -97,8 +97,18 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 	protected $app_event_handler;
 
 	var $bl_cnt = 1;		// block counter
-	var $multi_download_enabled = false;	
-	
+	var $multi_download_enabled = false;
+
+	/**
+	 * @var ilContainerFilterService
+	 */
+	protected $container_filter_service;
+
+	/**
+	 * @var ilContainerUserFilter
+	 */
+	protected $container_user_filter = null;
+
 	/**
 	* Constructor
 	* @access public
@@ -136,6 +146,9 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 		// prepare output things should generally be made in executeCommand
 		// method (maybe dependent on current class/command
 		parent::__construct($a_data, $a_id, $a_call_by_reference, false);
+
+		$this->container_filter_service = new ilContainerFilterService();
+		$this->initFilter();
 	}
 
 	/**
@@ -549,10 +562,9 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 			case ilContainer::VIEW_BY_TYPE:
 			default:
 				include_once("./Services/Container/classes/class.ilContainerByTypeContentGUI.php");
-				$container_view = new ilContainerByTypeContentGUI($this);
+				$container_view = new ilContainerByTypeContentGUI($this, $this->container_user_filter);
 				break;
 		}
-
 		return $container_view;
 	}
 	
@@ -568,7 +580,7 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 		$ilTabs = $this->tabs;
 		$ilCtrl = $this->ctrl;
 		$ilSetting = $this->settings;
-		
+
 		$container_view = $this->getContentGUI();
 		
 		$this->setContentSubTabs();
@@ -3797,50 +3809,49 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 	}
 
 	/**
+	 * Init filter
+	 */
+	protected function initFilter()
+	{
+		global $DIC;
+
+		$filter_service = $this->container_filter_service;
+		$request = $DIC->http()->request();
+
+		$filter = $filter_service->util()->getFilterForRefId($this->ref_id,
+			$DIC->ctrl()->getLinkTarget($this, "render", "", true));
+
+		$filter_data = [];
+
+		// @todo: this is something we need to do better
+		if ($request->getMethod() == "POST" && $_GET["cmd"] == "render") {
+			$filter_data = $DIC->uiService()->filter()->getData($filter);
+		}
+		else {
+			/** @var \ILIAS\UI\Implementation\Component\Input\Field\Input $i */
+			foreach ($filter->getInputs() as $k => $i)
+			{
+				$filter_data[$k] = $i->getValue();
+			}
+		}
+
+		$this->container_user_filter = $filter_service->userFilter($filter_data);
+		$this->ui_filter = $filter;
+	}
+
+
+	/**
 	 * Show container filter
 	 */
 	protected function showContainerFilter()
 	{
 		global $DIC;
 
-		$request = $DIC->http()->request();
+		$renderer = $DIC->ui()->renderer();
 
 		/** @var ilTemplate $main_tpl */
 		$main_tpl = $this->tpl;
-
-
-		$ui = $DIC->ui()->factory();
-		$renderer = $DIC->ui()->renderer();
-
-		//Step 1: Define some input fields to plug into the filter.
-		$text_input1 = $ui->input()->field()->text("Titel")->withValue("Initial");
-		$text_input2 = $ui->input()->field()->text("Description");
-
-		//Define the options.
-		$options = array(
-			"crs" => "Course",
-			"glo" => "Glossary",
-			"lm" => "Learning Module"
-		);
-
-		//Step 1: define the select
-		$select = $ui->input()->field()->select("Type", $options);
-
-		//$numeric_input1 = $ui->input()->field()->numeric("Number 1");
-		//$numeric_input2 = $ui->input()->field()->numeric("Number 2");
-
-		//Step 3: Define the filter and attach the inputs. The filter is initially activated in this case.
-		$action = $DIC->ctrl()->getLinkTarget($this, "render", "", true);
-		$filter = $DIC->uiService()->filter()->standard("filter_ID", $action, [$text_input1, $text_input2, $select],
-			[true, true, true], false, false);
-
-		//Step 6: Define some data processing.
-		if ($request->getMethod() == "POST") {
-			$result = $DIC->uiService()->filter()->getData($filter);
-//			var_dump($result); exit;
-		}
-
-		$main_tpl->setFilter($renderer->render($filter));
+		$main_tpl->setFilter($renderer->render($this->ui_filter));
 	}
 
 

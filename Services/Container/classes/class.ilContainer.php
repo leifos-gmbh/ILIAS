@@ -690,7 +690,8 @@ class ilContainer extends ilObject
 	*
 	* @return	array
 	*/
-	public function getSubItems($a_admin_panel_enabled = false, $a_include_side_block = false, $a_get_single = 0)
+	public function getSubItems($a_admin_panel_enabled = false, $a_include_side_block = false, $a_get_single = 0,
+		\ilContainerUserFilter $container_user_filter = null)
 	{
 		$objDefinition = $this->obj_definition;
 		$tree = $this->tree;
@@ -704,7 +705,7 @@ class ilContainer extends ilObject
 		
 		$type_grps = $this->getGroupedObjTypes();
 		$objects = $tree->getChilds($this->getRefId(), "title");
-
+		$objects = $this->applyContainerUserFilter($objects, $container_user_filter);
 		$objects = self::getCompleteDescriptions($objects);
 
 		$found = false;
@@ -1064,6 +1065,76 @@ class ilContainer extends ilObject
 			}
 		}
 	}
-	
+
+	/**
+	 * Apply container user filter on objects
+	 *
+	 * @param
+	 * @return
+	 */
+	protected function applyContainerUserFilter($objects, ilContainerUserFilter $container_user_filter = null)
+	{
+
+		if (is_null($container_user_filter))
+		{
+			return $objects;
+		}
+
+		$obj_ids = array_map(function($i) {
+			return $i["obj_id"];
+			},$objects);
+		$filter_data = $container_user_filter->getData();
+
+		foreach($filter_data as $key => $val)
+		{
+			if (count($obj_ids) == 0)	// stop if no object ids are left
+			{
+				continue;
+			}
+			if (substr($key, 0 , 4) != "adv_")
+			{
+				continue;
+			}
+			if ($val == "")
+			{
+				continue;
+			}
+			$field_id = substr($key, 4);
+			$field = ilAdvancedMDFieldDefinition::getInstance($field_id);
+
+			$field_form = ilADTFactory::getInstance()->getSearchBridgeForDefinitionInstance($field->getADTDefinition(), true, false);
+			$field_form->setElementId("query[" . $key . "]");
+			//$field_form->setForm($this->form);
+
+			// reload search values
+			$field_form->importFromPost($this->options);
+			$field_form->validate();
+
+			// this must be done by some bridge instance in the future
+			$parser_value = $val;
+
+			include_once 'Services/Search/classes/class.ilQueryParser.php';
+			include_once 'Services/Search/classes/class.ilObjectSearchFactory.php';
+			$adv_md_search = ilObjectSearchFactory::_getAdvancedMDSearchInstance(new ilQueryParser($parser_value));
+			//$adv_md_search->setFilter($this->filter);	// this could be set to an array of object types
+			$adv_md_search->setDefinition($field);
+			$adv_md_search->setIdFilter(array(0));
+			$adv_md_search->setSearchElement($field_form);
+			$res_field = $adv_md_search->performSearch();
+			if ($res_field instanceof ilSearchResult)
+			{
+				$result_obj_ids = array_map(function($i) { return $i["obj_id"];},
+					$res_field->getEntries());
+				$obj_ids = array_intersect($obj_ids, $result_obj_ids);
+				//$this->__storeEntries($res, $res_field);
+			}
+		}
+		$objects = array_filter($objects, function($o) use ($obj_ids) {
+			return in_array($o["obj_id"], $obj_ids);
+		});
+
+		return $objects;
+	}
+
 } // END class ilContainer
 ?>

@@ -12,6 +12,13 @@ class ilContainerFilterAdvMDAdapter
 {
 	protected $types = ["crs", "cat", "grp", "sess"];
 
+	protected $supported_types = [
+		ilAdvancedMDFieldDefinition::TYPE_SELECT,
+		ilAdvancedMDFieldDefinition::TYPE_TEXT,
+		ilAdvancedMDFieldDefinition::TYPE_INTEGER,
+		ilAdvancedMDFieldDefinition::TYPE_SELECT_MULTI,
+	];
+
 	/**
 	 * @var ilLanguage
 	 */
@@ -55,7 +62,11 @@ class ilContainerFilterAdvMDAdapter
 	 */
 	public function getFields($a_record_id): array
 	{
-		return ilAdvancedMDFieldDefinition::getInstancesByRecordId($a_record_id);
+		$fields = array_filter(ilAdvancedMDFieldDefinition::getInstancesByRecordId($a_record_id), function ($f) {
+			/** @var ilAdvancedMDFieldDefinition $f */
+			return in_array($f->getType(), $this->supported_types);
+		});
+		return $fields;
 	}
 
 	/**
@@ -65,7 +76,7 @@ class ilContainerFilterAdvMDAdapter
 	 * @return string
 	 * @throws ilException
 	 */
-	function getTitle($record_id, $filter_id)
+	public function getTitle($record_id, $filter_id)
 	{
 		$lng = $this->lng;
 
@@ -77,5 +88,18 @@ class ilContainerFilterAdvMDAdapter
 		$field = ilAdvancedMDFieldDefinition::getInstance($filter_id);
 		return $field->getTitle();
 	}
+
+	/**
+	 * Get adv type
+	 * @param int $filter_id
+	 * @return string
+	 * @throws ilException
+	 */
+	public function getAdvType($filter_id)
+	{
+		$field = ilAdvancedMDFieldDefinition::getInstance($filter_id);
+		return $field->getType();
+	}
+
 
 }

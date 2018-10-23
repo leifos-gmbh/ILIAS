@@ -182,7 +182,7 @@ abstract class Filter implements C\Input\Container\Filter\Filter, CI\Input\NameS
 
 
 	/**
-	 * @inheritdocs
+	 * @return CI\Input\Field\Group
 	 */
 	public function getInputGroup() {
 		return $this->input_group;
@@ -233,7 +233,7 @@ abstract class Filter implements C\Input\Container\Filter\Filter, CI\Input\NameS
 	 *
 	 * @param    ServerRequestInterface $request
 	 *
-	 * @return    PostData
+	 * @return    PostDataFromServerRequest
 	 */
 	protected function extractPostData(ServerRequestInterface $request) {
 		return new PostDataFromServerRequest($request);

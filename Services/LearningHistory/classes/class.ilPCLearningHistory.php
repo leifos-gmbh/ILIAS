@@ -46,7 +46,7 @@ class ilPCLearningHistory extends ilPageContent
 	 * @param string $a_hier_id
 	 * @param string $a_pc_id
 	 */
-	function create(ilPageObject $a_pg_obj, string $a_hier_id, string $a_pc_id = "")
+	function create(ilPageObject $a_pg_obj, string $a_hier_id, $a_pc_id = "")
 	{
 		$this->node = $this->createPageContentNode();
 		$a_pg_obj->insertContent($this, $a_hier_id, IL_INSERT_AFTER, $a_pc_id);

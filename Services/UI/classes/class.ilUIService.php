@@ -15,17 +15,19 @@ class ilUIService
 	 */
 	protected $_deps;
 
+
 	/**
 	 * Constructor
-	 * @param ilLanguage $lng
+	 *
+	 * @param \Psr\Http\Message\ServerRequestInterface $request
 	 */
-	public function __construct(ilLanguage $lng)
+	public function __construct(\Psr\Http\Message\ServerRequestInterface $request)
 	{
-		$this->_deps = new ilUIServiceDependencies($lng);
+		$this->_deps = new ilUIServiceDependencies(new ilUIFilterRequestAdapter($request));
 	}
 
 	/**
-	 * @inheritdoc
+	 * @return ilUIFilterService
 	 */
 	public function filter(): ilUIFilterService
 	{

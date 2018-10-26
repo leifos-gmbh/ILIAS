@@ -84,6 +84,9 @@
         color: #b0b0b0;
       }
     }
+    .il-filter-bar-opener-disabled {
+      font-size: 0.7em;
+    }
     .glyph {
       padding-right: 0.3em;
     }
@@ -159,6 +162,14 @@
   }
 }
 
+.il-filter.collapsed.disabled .il-filter-input-section{
+  display: none;
+}
+
+.il-filter.expanded .il-filter-inputs-active {
+  display: none;
+}
+
 .il-filter.disabled {
   .input-group-addon {
     background-color: @il-primary-container-bg;
@@ -169,11 +180,60 @@
   }
 }
 
+.il-filter-bar-opener-disabled {
+  display: none;
+}
 
-//== Specific Inputs
-//
-//
-@import "tag.less";
-@import "password.less";
-@import "radio.less";
-@import "multiselect.less";
+@media (min-width: @screen-sm) {
+  .il-filter.collapsed.enabled{
+    .il-filter-inputs-active, .il-filter-bar-opener {
+      display: none;
+    }
+    .il-filter-bar-opener-disabled {
+      display: inline-block;
+    }
+  }
+  .il-filter.enabled{
+    .il-filter-bar-opener {
+      display: none;
+    }
+    .il-filter-bar-opener-disabled {
+      display: inline-block;
+    }
+  }
+}
+
+@media (max-width: @screen-sm) {
+  .il-filter {
+    .webui-popover {
+      position: static;
+      max-width: none;
+
+    }
+
+    .webui-popover.bottom > .webui-arrow, .webui-popover.bottom-right > .webui-arrow, .webui-popover.bottom-left > .webui-arrow {
+      display: none;
+    }
+    .webui-popover.bottom, .webui-popover.bottom-left, .webui-popover.bottom-right {
+      padding: 4px;
+      margin-top: 0;
+      border: 0;
+      box-shadow: none;
+      background-color: @il-secondary-container-bg;
+    }
+  }
+  .il-filter.collapsed .il-filter-input-section {
+    display: none;
+  }
+
+}
+
+
+    //== Specific Inputs
+    //
+    //
+    @import "tag.less";
+    @import "password.less";
+    @import "radio.less";
+    @import "multiselect.less";
+

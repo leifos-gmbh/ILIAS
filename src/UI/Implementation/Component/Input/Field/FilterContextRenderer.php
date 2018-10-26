@@ -49,9 +49,7 @@ class FilterContextRenderer extends AbstractComponentRenderer {
 
 		if ($input instanceof Component\Input\Field\Text) {
 			$input_tpl = $this->getTemplate("tpl.text.html", true, true);
-		} elseif ($input instanceof Component\Input\Field\Numeric) {
-			$input_tpl = $this->getTemplate("tpl.numeric.html", true, true);
-		} else if ($input instanceof Select) {
+		} elseif ($input instanceof Component\Input\Field\Select) {
 			$input_tpl = $this->getTemplate("tpl.select.html", true, true);
 		} else {
 			throw new \LogicException("Cannot render '" . get_class($input) . "'");
@@ -236,9 +234,15 @@ class FilterContextRenderer extends AbstractComponentRenderer {
 
 		$links = array();
 		foreach ($input_labels as $label) {
-			$links[] = $f->button()->shy($label, "");
+			$links[] = $f->button()->shy($label, "")->withAdditionalOnLoadCode(function ($id) {
+				$code = "$('#$id').on('click', function(event) {
+						il.UI.filter.onAddClick(event, '$id');
+						return false; // stop event propagation
+				});";
+				return $code;
+			});
 		}
-		//var_dump($links); exit;
+
 		$list = $f->listing()->unordered($links);
 		$popover = $f->popover()->standard($list)->withVerticalPosition();
 		$tpl->setVariable("POPOVER", $default_renderer->render($popover));
@@ -280,9 +284,8 @@ class FilterContextRenderer extends AbstractComponentRenderer {
 	protected function getComponentInterfaceName() {
 		return [
 			Component\Input\Field\Text::class,
-			Component\Input\Field\Numeric::class,
-			Component\Input\Field\Group::class,
-			Component\Input\Field\Select::class
+			Component\Input\Field\Select::class,
+			Component\Input\Field\Group::class
 		];
 	}
 }

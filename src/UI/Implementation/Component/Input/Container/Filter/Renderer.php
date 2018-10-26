@@ -7,6 +7,7 @@ namespace ILIAS\UI\Implementation\Component\Input\Container\Filter;
 use ILIAS\UI\Implementation\Render\AbstractComponentRenderer;
 use ILIAS\UI\Renderer as RendererInterface;
 use ILIAS\UI\Component;
+use ILIAS\UI\Implementation as I;
 
 class Renderer extends AbstractComponentRenderer {
 
@@ -31,31 +32,61 @@ class Renderer extends AbstractComponentRenderer {
 		//$opener = [$f->glyph()->collapse($component->getCollapseAction()), $f->glyph()->expand($component->getExpandAction())];
 		//replace with language variable
 		if ($component->isExpanded() == false) {
-			$opener_expand = $f->button()->bulky($f->glyph()->expand(), "Filter", $component->getExpandAction());
+
+			if ($component->isActivated())
+			{
+				$opener_expand = $f->button()->bulky($f->glyph()->expand(), "Filter", "")
+					->withOnLoadCode(function ($id) use ($component) {
+						return "$('#{$id}').on('click', function(ev) {" . "	$('#{$id}').parents('form').attr('action', '" . $component->getExpandAction() . "').submit();" . "});";
+					});
+			} else {
+				$opener_expand = $f->button()->bulky($f->glyph()->expand(), "Filter", $component->getExpandAction());
+			}
+
 			$tpl->setVariable("OPENER", $default_renderer->render($opener_expand));
+			$tpl->touchBlock("collapsed");
 		}
-		elseif ($component->isExpanded() == true) {
-			$opener_collapse = $f->button()->bulky($f->glyph()->collapse(), "Filter", $component->getCollapseAction());
+		else {
+
+			if ($component->isActivated()) {
+				$opener_collapse = $f->button()->bulky($f->glyph()->collapse(), "Filter", "")
+					->withOnLoadCode(function ($id) use ($component) {
+						return "$('#{$id}').on('click', function(ev) {" . "	$('#{$id}').parents('form').attr('action', '" . $component->getCollapseAction() . "').submit();" . "});";
+					});
+			} else {
+				$opener_collapse = $f->button()->bulky($f->glyph()->collapse(), "Filter", $component->getCollapseAction());
+			}
+
 			$tpl->setVariable("OPENER", $default_renderer->render($opener_collapse));
-			$tpl->setVariable("COLLAPSE", "in");
+			$tpl->touchBlock("expanded");
 		}
+		$tpl->setVariable("OPENER_TITLE", "Filter");
 		//replace with Apply Glyph and use language variable
-		$apply = $f->button()->bulky($f->glyph()->note(), "Apply", "");
+		$apply = $f->button()->bulky($f->glyph()->apply(), "Apply", "");
 
 		if (!$component->isActivated()) {
 			$apply = $apply->withUnavailableAction(true);
-			$reset = $f->button()->bulky($f->glyph()->comment(), "Reset", "") //replace with Reset Glyph and use
+			$reset = $f->button()->bulky($f->glyph()->reset(), "Reset", "") //replace with Reset Glyph and use
 			->withUnavailableAction(true);
 		} else {
-			$apply = $apply->withOnLoadCode(function ($id) {
-				return "$('#{$id}').on('click', function(ev) {" . "	$('#{$id}').parents('form').submit();" . "});";
+			$apply = $apply->withOnLoadCode(function ($id) use ($component) {
+				return "$('#{$id}').on('click', function(ev) {" . "	$('#{$id}').parents('form').attr('action', '".$component->getApplyAction()."').submit();" . "});";
 			});
-			$reset = $f->button()->bulky($f->glyph()->comment(), "Reset", $component->getResetAction()); //replace with Reset Glyph and use
+			$reset = $f->button()->bulky($f->glyph()->reset(), "Reset", $component->getResetAction());
 		}
 
+		$component->getToggleOnAction();
 
-		//todo: Expand Filter when acitvated (only desktop, not mobile)
-		$toggle = $f->button()->toggle("", $component->getToggleOnAction(), $component->getToggleOffAction(), $component->isActivated());
+		// toggle on signal
+		$signal_generator = new I\Component\SignalGenerator();
+		$toggle_on_signal = $signal_generator->create();
+		$toggle_on_action = $component->getToggleOnAction();
+
+		// toggle button
+		$toggle = $f->button()->toggle("", $toggle_on_signal, $component->getToggleOffAction(), $component->isActivated())
+			->withAdditionalOnLoadCode(function ($id) use ($toggle_on_signal, $toggle_on_action) {
+				return "$(document).on('{$toggle_on_signal}',function(ev) {" . "	$('#{$id}').parents('form').attr('action', '$toggle_on_action').submit();" . "});";
+			});
 
 		$tpl->setVariable("APPLY", $default_renderer->render($apply));
 		$tpl->setVariable("RESET", $default_renderer->render($reset));
@@ -65,22 +96,20 @@ class Renderer extends AbstractComponentRenderer {
 
 		if ($component->isActivated())
 		{
-			if (!$component->isExpanded())
+			for ($i = 1; $i <= count($component->getInputs()); $i++)
 			{
-				for ($i = 1; $i <= count($component->getInputs()); $i++)
-				{
-					$tpl->setCurrentBlock("active_inputs");
-					$tpl->setVariable("ID", $i);
-					$tpl->parseCurrentBlock();
-				}
-				if (count($component->getInputs()) > 0)
-				{
-					$tpl->setCurrentBlock("active_inputs_section");
-					$tpl->parseCurrentBlock();
-				}
+				$tpl->setCurrentBlock("active_inputs");
+				$tpl->setVariable("ID", $i);
+				$tpl->parseCurrentBlock();
 			}
+			if (count($component->getInputs()) > 0)
+			{
+				$tpl->setCurrentBlock("active_inputs_section");
+				$tpl->parseCurrentBlock();
+			}
+			$tpl->touchBlock("enabled");
 		} else {
-			$tpl->touchBlock("deactivated");
+			$tpl->touchBlock("disabled");
 			$input_group = $input_group->withLabel("disabled");
 		}
 

@@ -133,7 +133,6 @@ class ilUIFilterService
 			$filter = $this->request->getFilterWithRequest($filter);
 			$result = $filter->getData();
 		}
-		$result = $filter->getData();
 		return $result;
 	}
 

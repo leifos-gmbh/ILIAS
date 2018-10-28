@@ -14,6 +14,11 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+obj#:#cont_filter_empty#:#Please use the filter to see any objects.
+obj#:#obj_tool_setting_filter#:#Filter
+obj#:#obj_tool_setting_filter_info#:#A filter will be displayed in the content tab.
+obj#:#obj_tool_setting_filter_empty#:#Show on Empty Filter
+obj#:#obj_tool_setting_filter_empty_info#:#Show all items while filter is empty.
 cont#:#cont_std_filter_title_1#:#Title
 cont#:#cont_std_filter_title_2#:#Description
 cont#:#cont_std_filter_title_3#:#Title/Description

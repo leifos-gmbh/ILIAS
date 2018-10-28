@@ -36,5 +36,27 @@ class ilContainerUserFilter
 		return $this->data;
 	}
 
+	/**
+	 * Is empty?
+	 *
+	 * @return bool
+	 */
+	public function isEmpty(): bool
+	{
+		$empty = true;
+		if (is_array($this->data))
+		{
+			foreach ($this->data as $d)
+			{
+				if (trim($d) != "")
+				{
+					$empty = false;
+				}
+			}
+		}
+		return $empty;
+	}
+
+
 
 }

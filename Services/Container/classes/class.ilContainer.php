@@ -1069,8 +1069,13 @@ class ilContainer extends ilObject
 	/**
 	 * Apply container user filter on objects
 	 *
-	 * @param
-	 * @return
+	 * @todo this deserces a decentralized general concept (consumers provide object filter types)
+	 * @todo move selects to respective components
+	 *
+	 * @param $objects
+	 * @param ilContainerUserFilter|null $container_user_filter
+	 * @return array
+	 * @throws ilException
 	 */
 	protected function applyContainerUserFilter($objects, ilContainerUserFilter $container_user_filter = null)
 	{
@@ -1082,28 +1087,16 @@ class ilContainer extends ilObject
 			return $objects;
 		}
 
+		if ($container_user_filter->isEmpty() && !ilContainer::_lookupContainerSetting($this->getId(), "filter_show_empty", false))
+		{
+			return [];
+		}
+
+
 		$obj_ids = array_map(function($i) {
 			return $i["obj_id"];
 			},$objects);
 		$filter_data = $container_user_filter->getData();
-
-		include_once 'Services/Search/classes/class.ilObjectSearchFactory.php';
-		include_once 'Services/Search/classes/class.ilQueryParser.php';
-
-		$query_parser = new ilQueryParser(ilUtil::stripSlashes($this->options['lom_content']));
-		#$query_parser->setCombination($this->options['title_ao']);
-		$query_parser->setCombination(QP_COMBINATION_OR);
-		$query_parser->parse();
-		$meta_search =& ilObjectSearchFactory::_getAdvancedSearchInstance($query_parser);
-
-		$meta_search->setFilter($this->filter);
-		$meta_search->setMode('title_description');
-		$meta_search->setOptions($this->options);
-		$res_tit =& $meta_search->performSearch();
-
-		$meta_search->setMode('keyword_all');
-		$res_key =& $meta_search->performSearch();
-
 
 		foreach($filter_data as $key => $val)
 		{

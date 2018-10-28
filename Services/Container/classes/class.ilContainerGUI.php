@@ -3815,6 +3815,11 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 	{
 		global $DIC;
 
+		if (!ilContainer::_lookupContainerSetting($this->object->getId(), "filter", false))
+		{
+			return;
+		}
+
 		$filter_service = $this->container_filter_service;
 		$request = $DIC->http()->request();
 
@@ -3847,11 +3852,19 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 	{
 		global $DIC;
 
-		$renderer = $DIC->ui()->renderer();
+		if (!is_null($this->ui_filter))
+		{
+			$renderer = $DIC->ui()->renderer();
 
-		/** @var ilTemplate $main_tpl */
-		$main_tpl = $this->tpl;
-		$main_tpl->setFilter($renderer->render($this->ui_filter));
+			/** @var ilTemplate $main_tpl */
+			$main_tpl = $this->tpl;
+			$main_tpl->setFilter($renderer->render($this->ui_filter));
+			
+			if ($this->container_user_filter->isEmpty() && !ilContainer::_lookupContainerSetting($this->object->getId(), "filter_show_empty", false))
+			{
+				ilUtil::sendInfo($this->lng->txt("cont_filter_empty"));
+			}
+		}
 	}
 
 

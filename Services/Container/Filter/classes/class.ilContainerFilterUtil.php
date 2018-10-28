@@ -77,8 +77,10 @@ class ilContainerFilterUtil
 	/**
 	 * Get filter element for reference id
 	 *
-	 * @param int $ref_id
+	 * @param $ref_id
+	 * @param $action
 	 * @return \ILIAS\UI\Component\Input\Container\Filter\Standard
+	 * @throws ilException
 	 */
 	public function getFilterForRefId($ref_id, $action): \ILIAS\UI\Component\Input\Container\Filter\Standard
 	{
@@ -86,6 +88,8 @@ class ilContainerFilterUtil
 		$ui = $DIC->ui()->factory();
 		$service = $this->service;
 		$lng = $this->lng;
+		/** @var ilObjectDefinition $obj_definition */
+		$obj_definition = $DIC["objDefinition"];
 
 		$set = $service->data()->getFilterSetForRefId($ref_id);
 
@@ -95,41 +99,56 @@ class ilContainerFilterUtil
 			// standard fields
 			if ($field->getRecordSetId() == 0)
 			{
+				$title = $service->util()->getContainerFieldTitle(0, $field->getFieldId());
+				$key = "std_".$field->getFieldId();
 				switch ($field->getFieldId())
 				{
 					case ilContainerFilterField::STD_FIELD_TITLE:
-						$fields["title"] = $ui->input()->field()->text($lng->txt("title"))->withValue("test");
-						$fields_act[] = true;
+						$fields[$key] = $ui->input()->field()->text($title);
+						$fields_act[] = false;
 						break;
 					case ilContainerFilterField::STD_FIELD_DESCRIPTION:
-						$fields["description"] = $ui->input()->field()->text($lng->txt("description"));
-						$fields_act[] = true;
+						$fields[$key] = $ui->input()->field()->text($title);
+						$fields_act[] = false;
 						break;
 					case ilContainerFilterField::STD_FIELD_TITLE_DESCRIPTION:
-						$fields["title_desc"] = $ui->input()->field()->text($lng->txt("title")."/".$lng->txt("description"));
-						$fields_act[] = true;
+						$fields[$key] = $ui->input()->field()->text($title);
+						$fields_act[] = false;
 						break;
 					case ilContainerFilterField::STD_FIELD_KEYWORD:
-						$fields["keyword"] = $ui->input()->field()->text($lng->txt("keyword"));
-						$fields_act[] = true;
+						$fields[$key] = $ui->input()->field()->text($title);
+						$fields_act[] = false;
 						break;
 					case ilContainerFilterField::STD_FIELD_AUTHOR:
-						$fields["author"] = $ui->input()->field()->text($lng->txt("author"));
-						$fields_act[] = true;
+						$fields[$key] = $ui->input()->field()->text($title);
+						$fields_act[] = false;
 						break;
 					case ilContainerFilterField::STD_FIELD_COPYRIGHT:
+						$md_settings = ilMDSettings::_getInstance();
+						$entries = ilMDCopyrightSelectionEntry::_getEntries();
+						$use_selection = ($md_settings->isCopyrightSelectionActive() && count($entries));
 						$options = [];
-						$fields["copyright"] = $select = $ui->input()->field()->select($lng->txt("copyright"), $options);
-						$fields_act[] = true;
+						if ($use_selection)
+						{
+							foreach ($entries as $entry)
+							{
+								$options[$entry->getEntryId()] = $entry->getTitle();
+							}
+						}
+						$fields[$key] = $ui->input()->field()->select($title, $options);
+						$fields_act[] = false;
 						break;
 					case ilContainerFilterField::STD_FIELD_TUTORIAL_SUPPORT:
-						$fields["tutorial_support"] = $ui->input()->field()->text($lng->txt("tutorial_support"));
-						$fields_act[] = true;
+						$fields[$key] = $ui->input()->field()->text($title);
+						$fields_act[] = false;
 						break;
 					case ilContainerFilterField::STD_FIELD_OBJECT_TYPE:
 						$options = [];
-						$fields["type"] = $ui->input()->field()->select($lng->txt("type"), $options);
-						$fields_act[] = true;
+						foreach ($obj_definition->getCreatableSubObjects("cat") as $k => $t) {
+							$options[$k] = $lng->txt("obj_$k");
+						}
+						$fields[$key] = $ui->input()->field()->select($title, $options);
+						$fields_act[] = false;
 						break;
 				}
 			}
@@ -142,21 +161,27 @@ class ilContainerFilterUtil
 					case ilAdvancedMDFieldDefinition::TYPE_SELECT:
 					case ilAdvancedMDFieldDefinition::TYPE_SELECT_MULTI:
 						$options = [];
+						foreach ($service->advancedMetadata()->getOptions($field->getFieldId()) as $op)
+						{
+							$options[$op] = $op;
+						}
 						$fields["adv_".$field->getFieldId()] =
 							$ui->input()->field()->select($title, $options);
-						$fields_act[] = true;
+						$fields_act[] = false;
 						break;
 
 					case ilAdvancedMDFieldDefinition::TYPE_TEXT:
 					case ilAdvancedMDFieldDefinition::TYPE_INTEGER:
 						$fields["adv_".$field->getFieldId()] =
 							$ui->input()->field()->text($title);
-						$fields_act[] = true;
+						$fields_act[] = false;
 						break;
 				}
 			}
 		}
-
+		if (count($fields_act) > 0) {
+			$fields_act[0] = true;
+		}
 		$filter = $DIC->uiService()->filter()->standard("filter_ID", $action,
 			$fields, $fields_act, false, false);
 		return $filter;

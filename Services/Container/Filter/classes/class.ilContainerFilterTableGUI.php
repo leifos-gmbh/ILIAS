@@ -74,13 +74,11 @@ class ilContainerFilterTableGUI extends ilTable2GUI
 		$items = array_map(function($i) use ($service) {
 			/** @var ilContainerFilterField $i */
 			return array(
-				"sort" => ($i->getRecordSetId()*100000) + $i->getFieldId(),
 				"record_set_id" => $i->getRecordSetId(),
 				"record_title" => $service->util()->getContainerRecordTitle($i->getRecordSetId()),
 				"field_title" => $service->util()->getContainerFieldTitle($i->getRecordSetId(), $i->getFieldId())
 			);
 		}, $service->data()->getFilterSetForRefId($this->ref_id)->getFields());
-		$items = ilUtil::sortArray($items, "sort", "asc", true);
 		return $items;
 	}
 

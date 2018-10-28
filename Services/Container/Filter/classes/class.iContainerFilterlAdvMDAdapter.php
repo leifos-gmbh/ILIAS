@@ -101,5 +101,18 @@ class ilContainerFilterAdvMDAdapter
 		return $field->getType();
 	}
 
+	/**
+	 * Get options
+	 *
+	 * @param
+	 * @return
+	 */
+	public function getOptions($filter_id)
+	{
+		$field = ilAdvancedMDFieldDefinition::getInstance($filter_id);
+		return $field->getOptions();
+	}
+
+
 
 }

@@ -163,31 +163,21 @@ class ilObjRepositorySettingsGUI extends ilObjectGUI
 
 		$form->addItem($radg);	
 	
-		/* OBSOLETE
-		// synchronize repository tree with main view
-		$cb = new ilCheckboxInputGUI($this->lng->txt("adm_synchronize_rep_tree"), "rep_tree_synchronize");
-		$cb->setInfo($this->lng->txt("adm_synchronize_rep_tree_info"));
-		$cb->setChecked($ilSetting->get("rep_tree_synchronize"));
-		$form->addItem($cb);
-		*/
-		
-		/* DISABLED
-		// repository access check
-		$options = array(
-			0 => "0",
-			10 => "10",
-			30 => "30",
-			60 => "60",
-			120 => "120"
-			);
-		$si = new ilSelectInputGUI($this->lng->txt("adm_repository_cache_time"), "rep_cache");
-		$si->setOptions($options);
-		$si->setValue($ilSetting->get("rep_cache"));
-		$si->setInfo($this->lng->txt("adm_repository_cache_time_info")." ".
-			$this->lng->txt("adm_repository_cache_time_info2"));
-		$form->addItem($si);
-		*/
-	
+		// limit items in tree
+		$tree_limit = new ilCheckboxInputGUI($this->lng->txt("rep_tree_limit"), "rep_tree_limit");
+		$tree_limit->setChecked($ilSetting->get("rep_tree_limit_number") > 0);
+		$tree_limit->setInfo($this->lng->txt("rep_tree_limit_info"));
+		$form->addItem($tree_limit);
+
+		// limit items in tree (number)
+		$tree_limit_number = new ilNumberInputGUI($this->lng->txt("rep_tree_limit_number"), "rep_tree_limit_number");
+		$tree_limit_number->setMaxLength(3);
+		$tree_limit_number->setSize(3);
+		$tree_limit_number->setValue($ilSetting->get("rep_tree_limit_number"));
+		$tree_limit_number->setInfo($this->lng->txt("rep_tree_limit_number_info"));
+		$tree_limit->addSubItem($tree_limit_number);
+
+
 		// trash
 		$cb = new ilCheckboxInputGUI($this->lng->txt("enable_trash"), "enable_trash");
 		$cb->setInfo($this->lng->txt("enable_trash_info"));
@@ -294,8 +284,14 @@ class ilObjRepositorySettingsGUI extends ilObjectGUI
 			$ilSetting->set("rep_shorten_description_length", (int)$form->getInput('rep_shorten_description_length'));										
 			$ilSetting->set('item_cmd_asynch',(int) $_POST['item_cmd_asynch']);			
      		$ilSetting->set('comments_tagging_in_lists',(int) $_POST['comments_tagging_in_lists']);	
-     		$ilSetting->set('comments_tagging_in_lists_tags',(int) $_POST['comments_tagging_in_lists_tags']);	
-						
+     		$ilSetting->set('comments_tagging_in_lists_tags',(int) $_POST['comments_tagging_in_lists_tags']);
+
+     		// repository tree limit of children
+     		$limit_number = ($_POST['rep_tree_limit'] && $_POST['rep_tree_limit_number'] > 0)
+				? (int) $_POST['rep_tree_limit_number']
+				: 0;
+			$ilSetting->set('rep_tree_limit_number', $limit_number);
+
 			require_once 'Services/Tracking/classes/class.ilChangeEvent.php';			
 			if ($form->getInput('change_event_tracking'))
 			{

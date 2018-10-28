@@ -41,6 +41,11 @@ abstract class ilExplorerBaseGUI
 	protected $sec_highl_nodes = array();
 	protected $enable_dnd = false;
 
+	/**
+	 * @var int 
+	 */
+	protected $child_limit = 0;
+
 	private $nodeOnclickEnabled;
 
 	/**
@@ -69,6 +74,27 @@ abstract class ilExplorerBaseGUI
 
 		$this->nodeOnclickEnabled = true;
 	}
+	
+	/**
+	 * Set child limit
+	 *
+	 * @param int $a_val child limit	
+	 */
+	function setChildLimit($a_val)
+	{
+		$this->child_limit = $a_val;
+	}
+	
+	/**
+	 * Get child limit
+	 *
+	 * @return int child limit
+	 */
+	function getChildLimit()
+	{
+		return $this->child_limit;
+	}
+	
 	
 	/**
 	 * Set main template (that is responsible for adding js/css)
@@ -834,9 +860,46 @@ abstract class ilExplorerBaseGUI
 
 		if (count($childs) > 0)
 		{
-			$any = false;
+			// collect visible childs
+
+			$visible_childs = [];
+			$cnt_child = 0;
+
 			foreach ($childs as $child)
 			{
+				$cnt_child++;
+				if ($this->getChildLimit() > 0 && $this->getChildLimit() < $cnt_child)
+				{
+					continue;
+				}
+
+				if ($this->isNodeVisible($child))
+				{
+					$visible_childs[] = $child;
+				}
+			}
+
+			// search field, if too many childs
+			$any = false;
+			if ($this->getChildLimit() > 0 && $this->getChildLimit() < $cnt_child)
+			{
+				if (!$any)
+				{
+					$this->listStart($tpl);
+					$any = true;
+				}
+				$tpl->setCurrentBlock("list_search");
+				$tpl->setVariable("SEARCH_CONTAINER_ID", $a_node_id);
+				$tpl->parseCurrentBlock();
+				$tpl->touchBlock("tag");
+			}
+
+			// render visible childs
+			foreach ($visible_childs as $child)
+			{
+				// check child limit
+				$cnt_child++;
+
 				if ($this->isNodeVisible($child))
 				{
 					if (!$any)

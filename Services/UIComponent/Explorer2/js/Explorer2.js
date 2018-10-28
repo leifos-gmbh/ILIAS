@@ -27,7 +27,17 @@ il.Explorer2 = {
 				for (i = 0; i < config.second_hnodes.length; i++) {
 					$("#" + config.second_hnodes[i]).addClass("ilExplSecHighlight");
 				}
-			}).on("open_node.jstree close_node.jstree", function (event, data) {
+
+				$(".ilExpSearchInput").on("keydown", function(e) {
+					if(e.keyCode === 13) {
+						var pid = $(e.target).parent().parents("li").attr("id");
+						console.log("Enter pressed: " + pid);
+						$('#jstree').jstree('close_node', pid);
+					}
+				});
+
+
+		}).on("open_node.jstree close_node.jstree", function (event, data) {
 				il.Explorer2.toggle(event, data);
 			}).jstree(js_tree_config);
 	},

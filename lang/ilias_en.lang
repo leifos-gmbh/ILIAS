@@ -14,6 +14,10 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+rep#:#rep_tree_limit#:#Limit Items in Tree
+rep#:#rep_tree_limit_info#:#The number of objects in the repository tree will be limited to enhance performance.
+rep#:#rep_tree_limit_number#:#Maximum Number
+rep#:#rep_tree_limit_number_info#:#Maximum Number of children elements that are initially shown for an expanded node. If more children elements are present, a search input field is shown to filter the children elements by title.
 obj#:#cont_filter_empty#:#Please use the filter to see any objects.
 obj#:#obj_tool_setting_filter#:#Filter
 obj#:#obj_tool_setting_filter_info#:#A filter will be displayed in the content tab.

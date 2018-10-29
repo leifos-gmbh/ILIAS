@@ -14,32 +14,32 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
-rep#:#rep_tree_limit#:#Limit Items in Tree
-rep#:#rep_tree_limit_info#:#The number of objects in the repository tree will be limited to enhance performance.
-rep#:#rep_tree_limit_number#:#Maximum Number
-rep#:#rep_tree_limit_number_info#:#Maximum Number of children elements that are initially shown for an expanded node. If more children elements are present, a search input field is shown to filter the children elements by title.
-obj#:#cont_filter_empty#:#Please use the filter to see any objects.
+rep#:#rep_tree_limit#:#Anzahl Einträge im Baum begrenzen
+rep#:#rep_tree_limit_info#:#Zeigt nur eine begrenzt Anzahl von Elementen im Baum an, um die Performanz zu erhöhen.
+rep#:#rep_tree_limit_number#:#Maximale Anzahl
+rep#:#rep_tree_limit_number_info#:#Maximale Anzahl an Kindelementen, die initial für einen Knoten angezeigt wird. Falls mehr Kindelemente existieren, wird ein Sucheingabefeld angezeigt, mit dem die Kindelemente nach Titeln gefiltert werden können.
+obj#:#cont_filter_empty#:#Bitte nutzen Sie den Filter zur Anzeige von Objekten.
 obj#:#obj_tool_setting_filter#:#Filter
-obj#:#obj_tool_setting_filter_info#:#A filter will be displayed in the content tab.
-obj#:#obj_tool_setting_filter_empty#:#Show on Empty Filter
-obj#:#obj_tool_setting_filter_empty_info#:#Show all items while filter is empty.
-cont#:#cont_std_filter_title_1#:#Title
-cont#:#cont_std_filter_title_2#:#Description
-cont#:#cont_std_filter_title_3#:#Title/Description
-cont#:#cont_std_filter_title_4#:#Keyword
-cont#:#cont_std_filter_title_5#:#Author
+obj#:#obj_tool_setting_filter_info#:#Ein Filter wird im Reiter "Inhalte" angezeigt.
+obj#:#obj_tool_setting_filter_empty#:#Anzeige bei leerem Filter
+obj#:#obj_tool_setting_filter_empty_info#:#Zeigt alle Elemente, wenn der Filter leer ist.
+cont#:#cont_std_filter_title_1#:#Titel
+cont#:#cont_std_filter_title_2#:#Beschreibung
+cont#:#cont_std_filter_title_3#:#Titel/Beschreibung
+cont#:#cont_std_filter_title_4#:#Schlagwort
+cont#:#cont_std_filter_title_5#:#Autor
 cont#:#cont_std_filter_title_6#:#Copyright
-cont#:#cont_std_filter_title_7#:#Tutorial Support
-cont#:#cont_std_filter_title_8#:#Object Type
+cont#:#cont_std_filter_title_7#:#Tutorielle Betreuung
+cont#:#cont_std_filter_title_8#:#Objekttyp
 cont#:#cont_filter#:#Filter
-cont#:#cont_select_fields#:#Select Fields
+cont#:#cont_select_fields#:#Felder auswählen
 cont#:#cont_std_record_title#:#Standard
-cont#:#cont_filter_record#:#Record
-cont#:#cont_filter_field#:#Field
-cont#:#cont_filter_fields#:#Filter Fields
-cont#:#cont_show_more#:#Show More
-cont#:#cont_block_limit#:#Limit Items per Block
-cont#:#cont_block_limit_info#:#If a block contains more items, a "Show more" button will appear.
+cont#:#cont_filter_record#:#Datensatz
+cont#:#cont_filter_field#:#Feld
+cont#:#cont_filter_fields#:#Filterfelder
+cont#:#cont_show_more#:#Mehr anzeigen
+cont#:#cont_block_limit#:#Einträge per Block begrenzen
+cont#:#cont_block_limit_info#:#Falls ein Block mehr Einträge beinhaltet, erscheint ein Aktionsknopf "Mehr anzeigen".
 common#:#obj_ltis#:#LTI
 common#:#obj_ltis_desc#:#Learning Tools Interoperability
 commocommon#:#lti_outcome#:#Übermittlung LTI-Lernfortschritt

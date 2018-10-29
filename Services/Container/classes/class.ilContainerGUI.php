@@ -3815,7 +3815,7 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 	{
 		global $DIC;
 
-		if (!ilContainer::_lookupContainerSetting($this->object->getId(), "filter", false))
+		if (!$this->object || !ilContainer::_lookupContainerSetting($this->object->getId(), "filter", false))
 		{
 			return;
 		}

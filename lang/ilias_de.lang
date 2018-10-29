@@ -14689,3 +14689,6 @@ dateplaner#:#cal_calendar_subscription_modal_title#:#Kalender abonnieren
 sess#:#sess_members#:#Teilnehmer
 grp#:#grp_contact#:#Kontakt
 grp#:#grp_mem_contacts#:#Tutorielle Betreuung
+dateplaner#:#back_to_crs#:#Kursinhalt
+dateplaner#:#back_to_grp#:#Gruppeninhalt
+dateplaner#:#back_to_pd#:#Zum Persönlichen Schreibtisch

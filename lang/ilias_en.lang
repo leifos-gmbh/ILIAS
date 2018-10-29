@@ -14714,3 +14714,6 @@ dateplaner#:#cal_calendar_subscription_modal_title#:#Calendar Subscription
 sess#:#sess_members#:#Participants
 grp#:#grp_contact#:#Contact
 grp#:#grp_mem_contacts#:#Tutorial Support
+dateplaner#:#back_to_crs#:#Go to Course
+dateplaner#:#back_to_grp#:#Go to Group
+dateplaner#:#back_to_pd#:#Back to Personal Desktop

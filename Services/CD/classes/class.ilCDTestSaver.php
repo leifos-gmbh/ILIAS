@@ -105,10 +105,28 @@ class ilCDTestSaver
 				"\nName: ".$rec2["lastname"].
 				"\nVorname: ".$rec2["firstname"].
 				/// EINBAUEN ÜBER data array (points, duration, target_lang) /// Ergänzung Heller Sprache des TESTS - 14.09.2015
-				"\nLevel: ".$data["result_level"].
-				"\nTestID: ".$data["test_id"].
+				/// Neue Daten in der Mail an Kundenbetreuer/Mitarbeiter der Centren --> Heller 26.06.2018
+				"\n\nLevel: ".$data["result_level"].
+				"\nPunkte: ".$data["result_points"].
+				"\n\nGrammatik: ".$data["result_grammar"].
+				"\nVokabeln: ".$data["result_voca"].
+				"\nLesen: ".$data["result_read"].
+				"\nHören: ".$data["result_listen"].
+				"\n\nTestID: ".$data["test_id"].
 				"\nZielsprache: ".$type[1].
 				"\n\nMit freundlichen Grüßen".
+				"\n\n\nDas interne Punktesystem".
+				"\n0     -     1.4   A1".
+				"\n1.4   -     2.4   A2.1".
+				"\n2.5   -     3.4   A2.2".
+				"\n3.5   -     4.4   B1.1".
+				"\n4.5   -     5.4   B1.2".
+				"\n5.5   -     6.4   B2.1".
+				"\n6.5   -     7.4   B2.2".
+				"\n7.5   -     8.4   B2.3".
+				"\n8.5   -     9.4   C1.1".
+				"\n9.5   -     9.8   C1.2".
+				"\n9.9         +     C1.2".
 				"\n\n".ILIAS_HTTP_PATH;
 				$m->Body($message);
 				//$m->Priority(4) ;	// set the priority to Low 

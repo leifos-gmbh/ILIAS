@@ -424,13 +424,13 @@ class ilUserProfile
 		include_once("./Services/CD/classes/class.cdUtil.php");
 		if (cdUtil::isDAF())
 		{
-			$unset = array("title", "upload", "institution",
+			$unset = array("title", "institution",
 				"hobby", "referral_comment", "instant_messengers", "matriculation",
 				"delicious", "interests_general", "interests_help_offered", "interests_help_looking", "org_units");
 		}
 		else
 		{
-			$unset = array("title", "birthday", "upload", "institution", "phone_home",
+			$unset = array("title", "birthday", "institution", "phone_home",
 				"phone_mobile", "hobby", "referral_comment", "instant_messengers", "matriculation",
 				"delicious", "interests_general", "interests_help_offered", "interests_help_looking", "org_units");
 		}

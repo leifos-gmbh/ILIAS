@@ -91,7 +91,7 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
 		$this->setFormName('participants');
 
 		$this->addColumn('', 'f', "1");
-		$this->addColumn($this->lng->txt('name'), 'name', '20%');
+		$this->addColumn($this->lng->txt('name'), 'name', '10%');
 		
 		$all_cols = $this->getSelectableColumns();
 		foreach($this->getSelectedColumns() as $col)
@@ -107,7 +107,7 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
 			if (is_object($this->pl))
 			{
 				$this->pl->includeClass("class.cdParticipantEvaluation.php");
-				$this->addColumn($this->pl->txt('evaluations'));
+				//$this->addColumn($this->pl->txt('evaluations'));
 			}
 
 			//$this->addColumn($this->lng->txt('learning_progress'), 'progress');
@@ -115,7 +115,7 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
 
 		if($this->privacy->enabledCourseAccessTimes())
 		{
-			$this->addColumn($this->lng->txt('last_access'), 'access_ut', '16em');
+			$this->addColumn($this->lng->txt('last_access'), 'access_ut', '5%');
 		}
 		
 		$this->addColumn($this->lng->txt('crs_member_passed'), 'passed');

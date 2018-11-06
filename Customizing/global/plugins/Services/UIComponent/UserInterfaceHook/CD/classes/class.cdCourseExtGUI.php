@@ -32,6 +32,11 @@ class cdCourseExtGUI
 	static function modifyCourseToolbar($a_ctb, $a_pl)
 	{
 		global $ilCtrl;
+
+		if (ilObject::_lookupType((int) $_GET["ref_id"], true) !== "crs")
+		{
+			return;
+		}
 		
 		$a_ctb->addSeparator();
 		

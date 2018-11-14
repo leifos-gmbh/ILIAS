@@ -20,3 +20,12 @@ survey#:#svy_notification_tutor_results_info#:#Nach dem Ablauf des Enddatum wird
 survey#:#svy_notification_tutor_results_alert#:#Diese Funktion erfordert ein Enddatum.
 survey#:#survey_results_tutor_subject#:#Ergebnisse der Umfrage "%s"
 survey#:#survey_results_tutor_body#:#Im Anhang finden Sie die Ergebnisse der folgenden Umfrage
+exc#:#exc_fixed_date#:#Festes Datum
+exc#:#exc_fixed_date_info#:#Alle Teilnehmenden erhalten zunächst das gleiche feste Abgabedatum.
+exc#:#exc_relative_date#:#Relatives Datum
+exc#:#exc_relative_date_info#:#Das Abgabedatum ergibt sich aus dem Bearbeitungszeitraum und dem durch den Teilnehmer gewählten Startzeitpunkt.
+exc#:#exc_earliest_start_time#:#Frühester Starttermin
+exc#:#exc_rem_time_after_start#:#Bearbeitungszeitraum nach Start
+exc#:#exc_start_assignment#:#Übungseinheit starten
+exc#:#exc_needs_fixed_deadline#:#Diese Funktion benötigt ein festes Abgabedatum.
+exc#:#exc_tbl_calculated_deadline#:#Errechneter Abgabetermin

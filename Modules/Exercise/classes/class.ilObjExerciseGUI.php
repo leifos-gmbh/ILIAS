@@ -33,6 +33,11 @@ class ilObjExerciseGUI extends ilObjectGUI
 	protected $help;
 
 	/**
+	 * @var ilExAssignment
+	 */
+	protected $ass = null;
+
+	/**
 	* Constructor
 	* @access public
 	*/
@@ -880,7 +885,37 @@ class ilObjExerciseGUI extends ilObjectGUI
 		$certificate = new ilCertificate(new ilExerciseCertificateAdapter($this->object));
 		$certificate->outCertificate(array("user_id" => $ilUser->getId()));					
 	}		
-	
+
+	/**
+	 * Start assignment with relative deadline
+	 */
+	function startAssignmentObject()
+	{
+		global $DIC;
+
+		$ilCtrl = $DIC->ctrl();
+		$ilUser = $DIC->user();
+
+		if ($this->ass)
+		{
+			include_once("./Modules/Exercise/classes/class.ilExcAssMemberState.php");
+			$state = ilExcAssMemberState::getInstanceByIds($this->ass->getId(), $ilUser->getId());
+			if (!$state->getCommonDeadline() && $state->getRelativeDeadline())
+			{
+				// make sure user is assigned to exercise
+				$this->object->members_obj->assignMembers(array($ilUser->getId()));
+
+				// set starting ts
+				$idl = $state->getIndividualDeadlineObject();
+				$idl->setStartingTimestamp(time());
+				$idl->save();
+			}
+		}
+
+		$ilCtrl->redirect($this, "showOverview");
+	}
+
+
 }
 
 ?>

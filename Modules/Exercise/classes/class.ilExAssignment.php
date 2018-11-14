@@ -42,6 +42,9 @@ class ilExAssignment
 	const PEER_REVIEW_VALID_NONE = 1;
 	const PEER_REVIEW_VALID_ONE = 2;
 	const PEER_REVIEW_VALID_ALL = 3;
+
+	const DEADLINE_ABSOLUTE = 0;
+	const DEADLINE_RELATIVE = 1;
 	
 	protected $id;
 	protected $exc_id;
@@ -72,7 +75,10 @@ class ilExAssignment
 	protected $portfolio_template;
 	protected $min_char_limit;
 	protected $max_char_limit;
-	
+	protected $deadline_mode = 0;
+	protected $relative_deadline = 0;
+	protected $starting_timestamp = null;
+
 	protected $member_status = array(); // [array]
 
 	protected $log;
@@ -239,9 +245,49 @@ class ilExAssignment
 	{
 		return $this->deadline;
 	}
+
+	/**
+	 * Set deadline mode
+	 *
+	 * @param int $a_val deadline mode	
+	 */
+	function setDeadlineMode($a_val)
+	{
+		$this->deadline_mode = $a_val;
+	}
 	
 	/**
-	 * Get individual deadline
+	 * Get deadline mode
+	 *
+	 * @return int deadline mode
+	 */
+	function getDeadlineMode()
+	{
+		return $this->deadline_mode;
+	}
+	
+	/**
+	 * Set relative deadline
+	 *
+	 * @param int $a_val relative deadline	
+	 */
+	function setRelativeDeadline($a_val)
+	{
+		$this->relative_deadline = $a_val;
+	}
+	
+	/**
+	 * Get relative deadline
+	 *
+	 * @return int relative deadline
+	 */
+	function getRelativeDeadline()
+	{
+		return $this->relative_deadline;
+	}
+	
+	/**
+	 * Get individual deadline (max of common or idl (team) deadline = Official Deadline)
 	 * @param int $a_user_id
 	 * @return int
 	 */
@@ -257,7 +303,7 @@ class ilExAssignment
 			if(!$team_id)
 			{
 				// #0021043
-				$this->getDeadline();
+				return $this->getDeadline();
 			}
 			$a_user_id = $team_id;
 			$is_team = true;
@@ -278,7 +324,7 @@ class ilExAssignment
 	 * 
 	 * @return int
 	 */
-	protected function getLastPersonalDeadline()
+	public function getLastPersonalDeadline()
 	{
 		$ilDB = $this->db;
 		
@@ -879,6 +925,8 @@ class ilExAssignment
 		$this->setPortfolioTemplateId($a_set["portfolio_template"]);
 		$this->setMinCharLimit($a_set["min_char_limit"]);
 		$this->setMaxCharLimit($a_set["max_char_limit"]);
+		$this->setDeadlineMode($a_set["deadline_mode"]);
+		$this->setRelativeDeadline($a_set["relative_deadline"]);
 	}
 	
 	/**
@@ -925,7 +973,9 @@ class ilExAssignment
 			"max_file" => array("integer", $this->getMaxFile()),
 			"portfolio_template" => array("integer", $this->getPortFolioTemplateId()),
 			"min_char_limit" => array("integer", $this->getMinCharLimit()),
-			"max_char_limit" => array("integer", $this->getMaxCharLimit())
+			"max_char_limit" => array("integer", $this->getMaxCharLimit()),
+			"relative_deadline" => array("integer", $this->getRelativeDeadline()),
+			"deadline_mode" => array("integer", $this->getDeadlineMode())
 			));
 		$this->setId($next_id);
 		$exc = new ilObjExercise($this->getExerciseId(), false);
@@ -971,7 +1021,9 @@ class ilExAssignment
 			"max_file" => array("integer", $this->getMaxFile()),
 			"portfolio_template" => array("integer", $this->getPortFolioTemplateId()),
 			"min_char_limit" => array("integer", $this->getMinCharLimit()),
-			"max_char_limit" => array("integer", $this->getMaxCharLimit())
+			"max_char_limit" => array("integer", $this->getMaxCharLimit()),
+			"deadline_mode" => array("integer", $this->getDeadlineMode()),
+			"relative_deadline" => array("integer", $this->getRelativeDeadline())
 			),
 			array(
 			"id" => array("integer", $this->getId()),
@@ -1040,6 +1092,8 @@ class ilExAssignment
 				"fb_file" => $rec["fb_file"],
 				"fb_date" => $rec["fb_date"],
 				"fb_cron" => $rec["fb_cron"],
+				"deadline_mode" => $rec["deadline_mode"],
+				"relative_deadline" => $rec["relative_deadline"]
 				);
 			$order_val += 10;
 		}
@@ -1089,6 +1143,9 @@ class ilExAssignment
 			$new_ass->setPortfolioTemplateId($d->getPortfolioTemplateId());
 
 
+			$new_ass->setDeadlineMode($d->getDeadlineMode());
+			$new_ass->setRelativeDeadline($d->getRelativeDeadline());
+			
 			// criteria catalogue(s)
 			if($d->getPeerReviewCriteriaCatalogue() &&
 				array_key_exists($d->getPeerReviewCriteriaCatalogue(), $a_crit_cat_map))
@@ -1254,7 +1311,7 @@ class ilExAssignment
 	/**
 	 * Order assignments by deadline date
 	 */
-	function orderAssByDeadline($a_ex_id)
+	static function orderAssByDeadline($a_ex_id)
 	{
 		$ilDB = $this->db;
 		
@@ -1840,15 +1897,15 @@ class ilExAssignment
 	
 	// status
 	
-	public function afterDeadline()
+	public function afterDeadline()									// like: after effective deadline (for single user), no deadline: true
 	{
 		$ilUser = $this->user;
 				
 		// :TODO: always current user?
-		$idl = $this->getPersonalDeadline($ilUser->getId());
+		$idl = $this->getPersonalDeadline($ilUser->getId());		// official deadline
 		
 		// no deadline === true
-		$deadline = max($this->deadline, $this->deadline2, $idl);
+		$deadline = max($this->deadline, $this->deadline2, $idl);	// includes grace period
 		return ($deadline - time() <= 0);
 	}
 	
@@ -1865,16 +1922,16 @@ class ilExAssignment
 		$deadline = max($this->deadline, $this->deadline2, $idl);		
 		
 		// #18271 - afterDeadline() does not handle last personal deadline
-		if($idl && $deadline == $idl)
+		if($idl && $deadline == $idl)								// after effective deadline of all users
 		{
 			return ($deadline - time() <= 0);
 		}
 		
-		return ($deadline > 0 && 
+		return ($deadline > 0 && 									// like: after effective deadline (for single user), except: no deadline false
 			$this->afterDeadline());	
 	}
 	
-	public function beforeDeadline()
+	public function beforeDeadline()								// like: before effective deadline (for all users), no deadline: true
 	{
 		// no deadline === true
 		return !$this->afterDeadlineStrict();
@@ -2009,7 +2066,13 @@ class ilExAssignment
 			$id = substr($id, 1);
 			$is_team = true;
 		}
-		
+
+		include_once("./Modules/Exercise/classes/class.ilExcIndividualDeadline.php");
+		$idl = ilExcIndividualDeadline::getInstance($this->getId(), $id, $is_team);
+		$idl->setIndividualDeadline($date->get(IL_CAL_UNIX));
+		$idl->save();
+
+		/*
 		$ilDB->replace("exc_idl",
 			array(
 				"ass_id" => array("integer", $this->getId()),
@@ -2019,7 +2082,7 @@ class ilExAssignment
 			array(
 				"tstamp" => array("integer", $date->get(IL_CAL_UNIX))
 			)
-		);
+		);*/
 	}
 	
 	public function getIndividualDeadlines()
@@ -2324,6 +2387,36 @@ class ilExAssignment
 		return $this->max_char_limit;
 	}
 
+	/**
+	 * Get calculated deadlines for user/team members. These arrays will contain no entries, if team or user
+	 * has not started the assignment yet.
+	 *
+	 * @return array[array] contains two arrays one with key "user", second with key "team", each one has
+	 * 						member id as keys and calculated deadline as value
+	 */
+	public function getCalculatedDeadlines()
+	{
+		$calculated_deadlines = array(
+			"user" => array(),
+			"team" => array()
+		);
+
+		if ($this->getRelativeDeadline() && $this->getDeadlineMode() == self::DEADLINE_RELATIVE)
+		{
+			include_once("./Modules/Exercise/classes/class.ilExcIndividualDeadline.php");
+			foreach (ilExcIndividualDeadline::getStartingTimestamps($this->getId()) as $ts)
+			{
+				$type = $ts["is_team"]
+					? "team"
+					: "user";
+
+				$calculated_deadlines[$type][$ts["member_id"]] = array(
+					"calculated_deadline" => $ts["starting_ts"] + ($this->getRelativeDeadline() * 24 * 60 * 60)
+				);
+			}
+		}
+		return $calculated_deadlines;
+	}
 }
 
 ?>

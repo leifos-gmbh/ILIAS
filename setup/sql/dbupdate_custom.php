@@ -1,5 +1,21 @@
 <#1>
 <?php
+	//
+?>
+<#2>
+<?php
+	//
+?>
+<#3>
+<?php
+	//
+?>
+<#4>
+<?php
+	//
+?>
+<#5>
+<?php
 if(!$ilDB->tableColumnExists('exc_assignment','deadline_mode'))
 {
     $ilDB->addTableColumn(
@@ -13,7 +29,7 @@ if(!$ilDB->tableColumnExists('exc_assignment','deadline_mode'))
         ));
 }
 ?>
-<#2>
+<#6>
 <?php
 if(!$ilDB->tableColumnExists('exc_assignment','relative_deadline'))
 {
@@ -28,7 +44,7 @@ if(!$ilDB->tableColumnExists('exc_assignment','relative_deadline'))
         ));
 }
 ?>
-<#3>
+<#7>
 <?php
 if(!$ilDB->tableColumnExists('exc_idl','starting_ts'))
 {

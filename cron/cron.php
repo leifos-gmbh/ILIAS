@@ -24,7 +24,7 @@ try {
 }
 catch(Exception $e)
 {
-	$cron->logout();
+#	$cron->logout();
 
 	echo $e->getMessage()."\n";
 	exit(1);

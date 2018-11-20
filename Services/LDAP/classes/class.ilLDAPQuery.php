@@ -570,7 +570,7 @@ class ilLDAPQuery
 	 */
 	private function connect()
 	{
-		$this->lh = @ldap_connect($this->ldap_server_url);
+		$this->lh = ldap_connect($this->ldap_server_url);
 		
 		// LDAP Connect
 		if(!$this->lh)

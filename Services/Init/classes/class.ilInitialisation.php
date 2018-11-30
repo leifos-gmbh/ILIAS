@@ -239,12 +239,24 @@ class ilInitialisation
 			return $delegatingFactory->getLocal($customizingConfiguration);
 		};
 
+		$DIC['filesystem.libs'] = function ($c) {
+			//customizing
+
+			/**
+			 * @var FilesystemFactory $delegatingFactory
+			 */
+			$delegatingFactory = $c['filesystem.factory'];
+			$customizingConfiguration = new \ILIAS\Filesystem\Provider\Configuration\LocalConfig(ILIAS_ABSOLUTE_PATH . '/' . 'libs');
+			return $delegatingFactory->getLocal($customizingConfiguration, true);
+		};
+
 		$DIC['filesystem'] = function($c) {
 			return new \ILIAS\Filesystem\FilesystemsImpl(
 				$c['filesystem.storage'],
 				$c['filesystem.web'],
 				$c['filesystem.temp'],
-				$c['filesystem.customizing']
+				$c['filesystem.customizing'],
+				$c['filesystem.libs']
 			);
 		};
 	}
@@ -1639,7 +1651,7 @@ class ilInitialisation
 		}
 
 		if($a_current_script == 'goto.php' && in_array($_GET['target'], array(
-			'usr_registration', 'usr_nameassist', 'usr_pwassist'
+			'usr_registration', 'usr_nameassist', 'usr_pwassist', 'usr_agreement'
 		)))
 		{
 			ilLoggerFactory::getLogger('auth')->debug('Blocked authentication for goto target: ' . $_GET['target']);

@@ -493,7 +493,7 @@ class ilExportGUI
 		}
 
 		// Delete export options
-		$eo->delete();
+		//$eo->delete();
 
 		ilUtil::sendSuccess($lng->txt('export_created'),true);
 		$ilCtrl->redirect($this, "listExportFiles");

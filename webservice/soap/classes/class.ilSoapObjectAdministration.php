@@ -1093,6 +1093,9 @@ class ilSoapObjectAdministration extends ilSoapAdministration
 				'Server');
 		}
 
+		// delete old page entries
+		$cont_page = new ilContainerPage($obj_id);
+		$cont_page->delete();
 
 		try {
 

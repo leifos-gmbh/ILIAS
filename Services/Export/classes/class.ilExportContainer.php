@@ -65,6 +65,10 @@ class ilExportContainer extends ilExport
 
 		ilUtil::zip($this->cont_export_dir, $this->cont_export_dir.'.zip');
 		ilUtil::delDir($this->cont_export_dir);
+
+		// patch-ibi start
+		return $this->cont_export_dir.'.zip';
+		// patch-ibi end
 	}
 	
 	/**

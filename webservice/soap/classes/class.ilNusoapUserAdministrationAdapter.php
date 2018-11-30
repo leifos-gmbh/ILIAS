@@ -406,6 +406,21 @@ class ilNusoapUserAdministrationAdapter
 								SERVICE_USE,
 								'Update Role Template Permissions'
 		);
+
+		$this->server->register('updateContainer',
+			array('sid' => 'xsd:string',
+				'ref_id' => 'xsd:string',
+				'zip_path' => 'xsd:string',
+				'old_id' => 'xsd:string'),
+			array('success' => 'xsd:boolean'),
+			SERVICE_NAMESPACE,
+			SERVICE_NAMESPACE.'#updateContainer',
+			SERVICE_STYLE,
+			SERVICE_USE,
+			'Update container'
+		);
+
+
 		// ibi-patch end
 		// get obj_id by import id
 		$this->server->register('getRefIdsByObjId',

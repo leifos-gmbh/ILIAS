@@ -1047,6 +1047,78 @@ class ilSoapObjectAdministration extends ilSoapAdministration
 	}
 
 	// ibi-patch start
+	public function updateContainer($sid, $ref_id, $zip_path, $a_old_id)
+	{
+		$this->initAuth($sid);
+		$this->initIlias();
+
+		if(!$this->__checkSession($sid))
+		{
+			return $this->__raiseError($this->__getMessage(),$this->__getMessageCode());
+		}
+		global $rbacsystem, $tree, $ilLog;
+
+		if(ilObject::_isInTrash($ref_id))
+		{
+			return $this->__raiseError('Cannot perform update since container has been deleted.', 'CLIENT_OBJECT_DELETED');
+		}
+		// get obj_id
+		if(!$obj_id = ilObject::_lookupObjectId($ref_id))
+		{
+			return $this->__raiseError('No container found for id: '.$ref_id,
+				'Client');
+		}
+
+		// Check access
+		$permission_ok = false;
+		foreach($ref_ids = ilObject::_getAllReferences($obj_id) as $ref_id)
+		{
+			if($rbacsystem->checkAccess('write',$ref_id))
+			{
+				$permission_ok = true;
+				break;
+			}
+		}
+
+		if(!$permission_ok)
+		{
+			return $this->__raiseError('No permission to edit container with id: '.$ref_id,
+				'Server');
+		}
+
+		$container = ilObjectFactory::getInstanceByObjId($obj_id, false);
+		if(!$container instanceof ilContainer) {
+			return $this->__raiseError(
+				'Wrong obj id or type for container with id '.$ref_id,
+				'Server');
+		}
+
+
+		try {
+
+			include_once './Services/Export/classes/class.ilImport.php';
+			$imp = new ilImport((int) $ref_id);
+			$obj_id = ilObject::_lookupObjId($ref_id);
+			$type = ilObject::_lookupType($obj_id);
+			$imp->getMapping()->addMapping('Services/Container','objs',$a_old_id,$obj_id);
+			$imp->getMapping()->addMapping('Services/Container','refs',0,$ref_id);
+
+			$imp->importObject(
+				'unused',
+				$zip_path,
+				basename($zip_path),
+				$type,
+				'',
+				true
+			);
+		}
+		catch(Exception $e) {
+			return $this->__raiseError($e->getMessage(),'Server');
+		}
+	}
+
+
+
 	function removeReferenceByImportId($sid,$import_id,$parent)
 	{
 		$this->initAuth($sid);

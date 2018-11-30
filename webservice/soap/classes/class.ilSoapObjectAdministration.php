@@ -1094,8 +1094,13 @@ class ilSoapObjectAdministration extends ilSoapAdministration
 		}
 
 		// delete old page entries
-		$cont_page = new ilContainerPage($obj_id);
-		$cont_page->delete();
+		try {
+			$cont_page = new ilContainerPage($obj_id);
+			$cont_page->delete();
+		}
+		catch(ilCOPageNotFoundException $e) {
+			// ignoring page not found exception
+		}
 
 		try {
 

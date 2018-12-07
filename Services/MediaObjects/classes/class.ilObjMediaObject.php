@@ -1508,6 +1508,10 @@ class ilObjMediaObject extends ilObject
 				
 			// Media Pool
 			case "mep":
+			// fhoev-patch start
+			// see https://github.com/DatabayAG/InteractiveVideo#workaround-patch-for-making-the-interactive-videos-work-with-the-web-access-checker
+			case "xvid":
+			// fhoev-patch end
 				$obj_id = $id;
 				break;
 

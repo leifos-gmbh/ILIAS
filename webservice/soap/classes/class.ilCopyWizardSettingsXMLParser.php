@@ -73,8 +73,17 @@ class ilCopyWizardSettingsXMLParser extends ilSaxParser
 		{
 			throw new ilSaxParserException("target id".$this->target_id." is in trash");
 		}
-        
+
         $this->default_action = ilCopyWizardSettingsXMLParser::getActionForString($a_attribs["default_action"]);
+
+        // begin patch montcenis
+        if($a_attribs['import_id'])
+		{
+			$this->options[ilCopyWizardOptions::IMPORT_ID] = array($a_attribs['import_id']);
+		}
+		// end patch montcenis
+
+
         break;
       case 'Option':
       	$id = (int) $a_attribs["id"];

@@ -41,7 +41,10 @@ class ilCopyWizardOptions
 	const DISABLE_SOAP = -4;
 	const ROOT_NODE = -5;
 	const DISABLE_TREE_COPY = -6;
-	
+
+	// begin patch montcenis
+	const IMPORT_ID = -10;
+
 	private $db;
 	
 	private $copy_id;
@@ -163,7 +166,34 @@ class ilCopyWizardOptions
 
 		return true;
 	}
-	
+
+	// begin patch montcenis
+	public function saveImportId($a_import_id)
+	{
+		global $ilDB;
+
+		$ilDB->insert("copy_wizard_options", array(
+			"copy_id" 	=> array("integer", $this->getCopyId()),
+			"source_id" => array("integer", self::IMPORT_ID),
+			"options"	=> array('clob',serialize(array($a_import_id)))
+		));
+
+		return true;
+	}
+
+	/**
+	 * @return mixed|string
+	 */
+	public function getImportId()
+	{
+		if(isset($this->options[self::IMPORT_ID]) && is_array($this->options[self::IMPORT_ID]))
+		{
+			return end($this->options[self::IMPORT_ID]);
+		}
+		return '';
+	}
+	// end patch montcenis
+
 	/**
 	 * Save root node id
 	 *

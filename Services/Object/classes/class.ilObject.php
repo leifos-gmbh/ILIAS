@@ -1938,6 +1938,25 @@ class ilObject
 		$new_obj->setTitle($title);
 		$new_obj->setDescription($this->getLongDescription());
 		$new_obj->setType($this->getType());
+
+		// begin patch montcenis
+		include_once('Services/CopyWizard/classes/class.ilCopyWizardOptions.php');
+		$cp_options = ilCopyWizardOptions::_getInstance($a_copy_id);
+		if($cp_options->isRootNode($this->getRefId()))
+		{
+			if($cp_options->getImportId())
+			{
+				ilLoggerFactory::getLogger('obj')->info('Save import id');
+				$new_obj->setImportId($cp_options->getImportId());
+			}
+			else
+			{
+				ilLoggerFactory::getLogger('obj')->info('No import id given');
+			}
+		}
+		// end patch montcenis
+
+
 		// Choose upload mode to avoid creation of additional settings, db entries ...
 		$new_obj->create(true);
 

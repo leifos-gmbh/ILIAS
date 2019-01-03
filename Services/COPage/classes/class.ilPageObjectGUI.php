@@ -7,10 +7,6 @@ define ("IL_PAGE_PREVIEW", "preview");
 define ("IL_PAGE_OFFLINE", "offline");
 define ("IL_PAGE_PRINT", "print");
 
-include_once ("./Services/COPage/classes/class.ilPageEditorGUI.php");
-include_once("./Services/COPage/classes/class.ilPageObject.php");
-include_once("./Services/Clipboard/classes/class.ilEditClipboardGUI.php");
-include_once("./Services/Utilities/classes/class.ilDOMUtil.php");
 
 /**
  * Class ilPageObjectGUI
@@ -24,6 +20,7 @@ include_once("./Services/Utilities/classes/class.ilDOMUtil.php");
  * @ilCtrl_Calls ilPageObjectGUI: ilPageEditorGUI, ilEditClipboardGUI, ilObjectMetaDataGUI
  * @ilCtrl_Calls ilPageObjectGUI: ilPublicUserProfileGUI, ilNoteGUI, ilNewsItemGUI
  * @ilCtrl_Calls ilPageObjectGUI: ilPropertyFormGUI, ilInternalLinkGUI, ilPageMultiLangGUI
+ * @ilCtrl_Calls ilPageObjectGUI: ilPageEditor2GUI
  *
  * @ingroup ServicesCOPage
  */
@@ -1042,6 +1039,17 @@ return;
 				$page_editor->setPageBackTitle($this->page_back_title);
 				$page_editor->setIntLinkReturn($this->int_link_return);
 				//$page_editor->executeCommand();
+				$ret = $this->ctrl->forwardCommand($page_editor);
+				break;
+
+			case "ilpageeditor2gui":
+				if (!$this->getEnableEditing())
+				{
+					ilUtil::sendFailure($this->lng->txt("permission_denied"), true);
+					$this->ctrl->redirect($this, "preview");
+				}
+				$page_editor = new ilPageEditor2GUI($this,
+					$this->ctrl, $this->tpl);
 				$ret = $this->ctrl->forwardCommand($page_editor);
 				break;
 
@@ -3260,6 +3268,9 @@ return;
 			{
 				$this->tabs_gui->addTarget("edit", $this->ctrl->getLinkTarget($this, "edit")
 					, array("", "edit"));
+
+				$this->tabs_gui->addTarget("edit", $this->ctrl->getLinkTargetByClass("ilpageeditor2gui", "")
+					, array("ilpageeditor2gui", ""));
 			}
 		}
 		else

@@ -6036,6 +6036,7 @@ return array(
     'ilPageContent' => $baseDir . '/../../Services/COPage/classes/class.ilPageContent.php',
     'ilPageContentGUI' => $baseDir . '/../../Services/COPage/classes/class.ilPageContentGUI.php',
     'ilPageContentUsage' => $baseDir . '/../../Services/COPage/classes/class.ilPageContentUsage.php',
+    'ilPageEditor2GUI' => $baseDir . '/../../Services/COPage/Editor/classes/class.ilPageEditor2GUI.php',
     'ilPageEditorGUI' => $baseDir . '/../../Services/COPage/classes/class.ilPageEditorGUI.php',
     'ilPageEditorSettings' => $baseDir . '/../../Services/COPage/classes/class.ilPageEditorSettings.php',
     'ilPageFormats' => $baseDir . '/../../Services/Certificate/classes/File/Template/class.ilPageFormats.php',

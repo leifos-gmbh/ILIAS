@@ -6349,6 +6349,7 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
         'ilPageContent' => __DIR__ . '/../..' . '/../../Services/COPage/classes/class.ilPageContent.php',
         'ilPageContentGUI' => __DIR__ . '/../..' . '/../../Services/COPage/classes/class.ilPageContentGUI.php',
         'ilPageContentUsage' => __DIR__ . '/../..' . '/../../Services/COPage/classes/class.ilPageContentUsage.php',
+        'ilPageEditor2GUI' => __DIR__ . '/../..' . '/../../Services/COPage/Editor/classes/class.ilPageEditor2GUI.php',
         'ilPageEditorGUI' => __DIR__ . '/../..' . '/../../Services/COPage/classes/class.ilPageEditorGUI.php',
         'ilPageEditorSettings' => __DIR__ . '/../..' . '/../../Services/COPage/classes/class.ilPageEditorSettings.php',
         'ilPageFormats' => __DIR__ . '/../..' . '/../../Services/Certificate/classes/File/Template/class.ilPageFormats.php',

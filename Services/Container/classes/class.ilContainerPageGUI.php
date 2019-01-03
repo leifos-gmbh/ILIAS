@@ -13,6 +13,7 @@ include_once("./Services/Container/classes/class.ilContainerPage.php");
  * @ilCtrl_Calls ilContainerPageGUI: ilPageEditorGUI, ilEditClipboardGUI, ilMDEditorGUI
  * @ilCtrl_Calls ilContainerPageGUI: ilPublicUserProfileGUI, ilNoteGUI
  * @ilCtrl_Calls ilContainerPageGUI: ilPropertyFormGUI, ilInternalLinkGUI, ilPageMultiLangGUI
+ * @ilCtrl_Calls ilContainerPageGUI: ilPageEditor2GUI
  *
  * @ingroup ServicesContainer
  */

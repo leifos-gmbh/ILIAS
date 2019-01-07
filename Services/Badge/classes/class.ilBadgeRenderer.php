@@ -204,4 +204,25 @@ class ilBadgeRenderer
 		
 		return $modal->getHTML();
 	}
+
+	public function renderModalKS() {
+		global $DIC;
+		$f = $DIC->ui()->factory();
+		$renderer = $DIC->ui()->renderer();
+		$parent = $this->badge->getParentMeta();
+
+		$image = $f->image()->standard(
+			ilObject::_getIcon($parent["id"], "big", $parent["type"]),
+			"Thumbnail Example");
+
+		//Generate List
+		$descriptive = $f->listing()->descriptive([
+				"Title 1"=>"Description 1",
+				"Title 2"=>"Description 2",
+				"Title 3"=>$image]
+		);
+
+		//Render
+		return $renderer->render($descriptive);
+}
 }

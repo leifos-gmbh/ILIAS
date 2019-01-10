@@ -481,4 +481,46 @@ interface Factory {
  	 * @return \ILIAS\UI\Component\Input\Field\MultiSelect
  	 */
  	public function multiSelect($label, array $options, $byline = null);
+
+	/**
+	 * ---
+	 * description:
+	 *   purpose: >
+	 *     A Tree Select is used to allow users to pick several options from a finite set of elements.
+	 *     This can be done either in an one-to-many relationship (single choice), which allows to select
+	 *     exactly one out of n elements, or in an many-to-many relationship (multiple choice), which
+	 *     allows to select m elements of a set of n elements, where m <= n.
+	 *   composition: >
+	 *     The Tree Select is composed of a field placed in the Container which shows a label and a shy button to add a new element (or glyph?)
+	 *     When one or more elements are chosen, these elements will additionally be displayed in the field, each element
+	 *     in one line. Next to each element, a shy button (or glyph) for changing it to another element and a shy button for deleting it
+	 *     are shown. When the shy button (glyph) is clicked... to select one or more elements from the tree.
+	 *     The selectable elements are shown in a tree, which in turn is shown in a roundtrip modal.
+	 *     (Technisch eventuell schwer neue Elemente zum Picker hinzuzufügen und sich dabei die bereits ausgewählten zu merken.
+	 *     Eventuell muss "Hinzufügen" durch "Auswählen" o.ä. ausgetauscht werden um klar zu machen, dass eine neue Auswahl
+	 *     gleichzeitig ein Reset bedeutet. Ändern oder löschen von einzelnen ausgewählten Elemente wäre dann auch nicht möglich.
+	 *     Ist so eine Lösung auch akzeptabel?)
+	 *   effect: >
+	 *     Clicking on the "Add" shy button opens a roundtrip modal.
+	 *
+	 *   rivals:
+	 *     Radio Field: Use a Radio Input for choosing from custom options.
+	 *     Multi Select Field: Use a Multi Select Input for choosing from custom options.
+	 *
+	 * rules:
+	 *   interaction:
+	 *     1: >
+	 *       An element in a single choice Tree Select input MUST be selectable by a radio button.
+	 *     2: >
+	 *       Elements in a multiple choice Tree Select input MUST be selectable by checkboxes.
+	 *
+	 * ---
+	 * @param string 	$label
+	 * @param mixed 	$tree 	the future Tree component
+	 * @param bool		$is_multiple 	if you can choose single or multiple elements in the Tree
+	 * @param string 	$byline
+	 *
+	 * @return \ILIAS\UI\Component\Input\Field\TreeSelect
+	 */
+ 	public function treeSelect($label, $tree, $is_multiple, $byline = null);
 }

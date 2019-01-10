@@ -146,4 +146,12 @@ class Factory implements Field\Factory {
 		return new MultiSelect($this->data_factory, $this->validation_factory, $this->transformation_factory, $label, $options, $byline);
 	}
 
+	/**
+	 * @inheritdoc
+	 */
+	public function treeSelect($label, $tree, $is_multiple, $byline = null)
+	{
+		return new TreeSelect($this->data_factory, $this->validation_factory, $this->transformation_factory, $label, $tree, $is_multiple, $byline);
+	}
+
 }

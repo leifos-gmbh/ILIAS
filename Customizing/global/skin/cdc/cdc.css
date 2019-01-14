@@ -8695,7 +8695,7 @@ img.spacer {
 
 div#agreement {
     width: 100%;
-    height: 375px;
+    min-height: 15px;
     overflow: auto;
     overflow-x: hidden;
 }

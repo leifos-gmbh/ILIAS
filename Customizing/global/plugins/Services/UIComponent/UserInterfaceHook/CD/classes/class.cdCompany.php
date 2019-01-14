@@ -554,14 +554,19 @@ class cdCompany
 		$set = $ilDB->query("SELECT * FROM cd_company ".$where." ORDER BY title");
 
 		$company = array();
+		$company_ids = [];
 		while ($rec = $ilDB->fetchAssoc($set))
 		{
-			if ($a_incl_nr_users)
-			{
-				$rec["nr_users"] =
-					cdCompany::lookupNrOfUsers($rec["id"]);
-			}
+			$company_ids[$rec["id"]] = $rec["id"];
 			$company[] = $rec;
+		}
+		if ($a_incl_nr_users)
+		{
+			$nr_of_users = cdCompany::lookupNrOfUsers($company_ids);
+			foreach ($company as $k => $v)
+			{
+				$company[$k]["nr_users"] = (int) $nr_of_users[$v["id"]];
+			}
 		}
 
 		return $company;
@@ -655,18 +660,24 @@ class cdCompany
 	/**
 	 * Lookup nr of users
 	 *
-	 * @param
-	 * @return
+	 * @param array $a_comp_ids
+	 * @return array
 	 */
-	static function lookupNrOfUsers($a_comp_id)
+	static function lookupNrOfUsers($a_comp_ids)
 	{
 		global $ilDB;
 
-		$set = $ilDB->query("SELECT count(usr_id) cnt FROM usr_data WHERE ".
-			" company_id = ".$ilDB->quote($a_comp_id, "integer")
+		$set = $ilDB->query("SELECT company_id, count(usr_id) cnt FROM usr_data WHERE ".
+			$ilDB->in("company_id", $a_comp_ids, false, "integer").
+			" GROUP BY company_id"
 			);
-		$rec = $ilDB->fetchAssoc($set);
-		return (int) $rec["cnt"];
+
+		$nrs = [];
+		while($rec = $ilDB->fetchAssoc($set))
+		{
+			$nrs[$rec["company_id"]] = $rec["cnt"];
+		}
+		return $nrs;
 	}
 
 	/**

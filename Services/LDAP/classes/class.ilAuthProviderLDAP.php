@@ -36,7 +36,7 @@ class ilAuthProviderLDAP extends ilAuthProvider implements ilAuthProviderInterfa
 	{
 		return $this->server;
 	}
-	
+
 	
 	/**
 	 * Do authentication
@@ -61,9 +61,19 @@ class ilAuthProviderLDAP extends ilAuthProvider implements ilAuthProviderInterfa
 		{
 			// Read user data, which does ensure a sucessful authentication.
 			$users = $query->fetchUser(
-				$this->getCredentials()->getUsername()
+				$this->getCredentials()->getUsername(),
+				false
 			);
-			
+
+			if(!$users && $this->getServer()->isMembershipOptional())
+			{
+				$users = $query->fetchUser(
+					$this->getCredentials()->getUsername(),
+					true
+				);
+			}
+
+
 			if(!$users)
 			{
 				$this->handleAuthenticationFail($status, 'err_wrong_login');

@@ -98,6 +98,7 @@ class ilSurveyEvaluationGUI
 	{
 		include_once("./Services/Skill/classes/class.ilSkillManagementSettings.php");
 		$skmg_set = new ilSkillManagementSettings();
+
 		if ($this->object->get360SkillService() && $skmg_set->isActivated())
 		{
 			$cmd = $this->ctrl->getCmd("competenceEval");
@@ -110,6 +111,9 @@ class ilSurveyEvaluationGUI
 		$next_class = $this->ctrl->getNextClass($this);
 
 		$cmd = $this->getCommand($cmd);
+
+		$this->log->debug($cmd);
+
 		switch($next_class)
 		{
 			default:
@@ -808,6 +812,8 @@ class ilSurveyEvaluationGUI
 		$ui_factory = $ui->factory();
 		$ui_renderer = $ui->renderer();
 
+		$this->log->debug("check access");
+
 		// auth
 		if (!$rbacsystem->checkAccess("write", $_GET["ref_id"]))
 		{			
@@ -833,6 +839,8 @@ class ilSurveyEvaluationGUI
 					break;
 			}
 		}
+
+		$this->log->debug("check access ok");
 		
 		$ilToolbar->setFormAction($this->ctrl->getFormAction($this));
 		include_once "Services/Form/classes/class.ilPropertyFormGUI.php";
@@ -1030,8 +1038,10 @@ class ilSurveyEvaluationGUI
 			$this->tpl->setVariable("HEADER_PROP_VALUE", $value);
 			$this->tpl->parseCurrentBlock();
 		}
-		
-		// $this->tpl->addCss("./Modules/Survey/templates/default/survey_print.css", "print");				
+
+		$this->log->debug("end");
+
+		// $this->tpl->addCss("./Modules/Survey/templates/default/survey_print.css", "print");
 	}
 	
 	/**
@@ -1097,10 +1107,12 @@ class ilSurveyEvaluationGUI
 			$card_table_tpl->setVariable("QUESTION_STATISTIC_VALUE", $value);
 			$card_table_tpl->parseCurrentBlock();
 		}
-		//anchor in title. Used in TOC
+
+		// patch BGHW: added anchor
 		$anchor_id = "svyrdq".$question->getId();
-		$title = "<span id='$anchor_id'>$qst_title</span>";
-		$panel_qst_card = $ui_factory->panel()->sub($title, $ui_factory->legacy($svy_text))
+		$anchor = "<a name='".$anchor_id."'></a>";
+
+		$panel_qst_card = $ui_factory->panel()->sub($anchor.$qst_title, $ui_factory->legacy($svy_text))
 			->withCard($ui_factory->card($svy_type_title)->withSections(array($ui_factory->legacy($card_table_tpl->get()))));
 		array_push($this->array_panels, $panel_qst_card);
 
@@ -1158,6 +1170,11 @@ class ilSurveyEvaluationGUI
 			{
 				include_once "Services/Accordion/classes/class.ilAccordionGUI.php";
 				$acc = new ilAccordionGUI();
+				// patch BGHW: fixed accordion in pdf output
+				if ($_GET["pdf"] == 1)
+				{
+					$acc->setBehaviour(ilAccordionGUI::FORCE_ALL_OPEN);
+				}
 				$acc->setId("svyevaltxt".$question->getId());
 
 				$a_tpl->setVariable("TEXT_HEADING", $this->lng->txt("freetext_answers"));
@@ -1217,6 +1234,7 @@ class ilSurveyEvaluationGUI
 
 			}
 		}
+
 		$panel = $ui_factory->panel()->sub("", $ui_factory->legacy($a_tpl->get()));
 		array_push($this->array_panels, $panel);
 	}
@@ -1921,6 +1939,11 @@ class ilSurveyEvaluationGUI
 			? ILIAS_ABSOLUTE_PATH . "/libs/composer/vendor/jakoch/phantomjs/bin/phantomjs.exe"
 			: ILIAS_ABSOLUTE_PATH . "/libs/composer/vendor/jakoch/phantomjs/bin/phantomjs";
 
+		if (is_file ("/opt/phantomjs-2.1.1-macosx/bin/phantomjs"))
+		{
+			$bin = "/opt/phantomjs-2.1.1-macosx/bin/phantomjs";
+		}
+
 		$parts = parse_url(ILIAS_HTTP_PATH);
 
 		$target = ilUtil::ilTempnam() . "." . $a_suffix;
@@ -1932,24 +1955,35 @@ class ilSurveyEvaluationGUI
 		$args = array(
 			session_id(),
 			$parts["host"],
-			$path,
+			$parts["path"] ? $parts["path"] : '/',
 			CLIENT_ID,
 			"\"" . ILIAS_HTTP_PATH . "/" . $a_url . "\"",
 			$target
 		);
 
+		ilSession::_writeData(session_id(), session_encode());
+
 		$output = $return = "";
 
-		ilLoggerFactory::getRootLogger()->debug("EXEC => ".$bin . " " . $script . " " . implode(" ", $args));
-		exec($bin . " " . $script . " " . implode(" ", $args), $output, $return);
+		exec($executable_string = $bin . " " . $script . " " . implode(" ", $args), $output, $return);
 
 		$log = ilLoggerFactory::getLogger("svy");
+		$log->debug($executable_string);
 		$log->dump($output, ilLogLevel::DEBUG);
 		$log->dump($return, ilLogLevel::DEBUG);
+		
+		$mime_type = '';
+		if(substr($a_filename, -3) == 'pdf')
+		{
+			$mime_type = 'application/pdf';
+		}
+		elseif(substr($a_filename,-3) == 'png')
+		{
+			$mime_type = 'image/png';
+		}
 
 		if (!$a_return) {
-			ilLoggerFactory::getRootLogger()->debug("**** Deliver the file. Target = ".$target);
-			ilUtil::deliverFile($target, $a_filename);
+			ilUtil::deliverFile($target, $a_filename, $mime_type);
 		} else {
 			ilLoggerFactory::getRootLogger()->debug("**** Return a target = ".$target);
 			return $target;

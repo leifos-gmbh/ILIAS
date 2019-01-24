@@ -1,9 +1,18 @@
 var system = require('system');
 if(system.args.length < 7)
-{   
-    phantom.exit();
+{
+    system.console.log("Number of arguments is: " + system.args.length + " expecting 7.");
+    phantom.exit(1);
 }
-	
+
+/*
+console.log("PHPSESSID value:" + system.args[1]);
+console.log("PHPSESSID domain:" + system.args[2]);
+console.log("PHPSESSID path:" + system.args[3]);
+console.log("ilClientId value:" + system.args[4]);
+console.log("ilClientId domain:" + system.args[2]);
+console.log("ilClientId path:" + system.args[3]);*/
+
 // auth
 phantom.addCookie({
 	'name'     : 'PHPSESSID',  

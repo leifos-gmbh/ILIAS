@@ -1605,9 +1605,6 @@ class ilUtil
 	 * @see        Filesystem::copyDir()
 	 */
 	public static function rCopy($a_sdir, $a_tdir, $preserveTimeAttributes = false) {
-		$a_sdir = realpath($a_sdir); // See https://www.ilias.de/mantis/view.php?id=23056
-		$a_tdir = realpath($a_tdir); // See https://www.ilias.de/mantis/view.php?id=23056
-
 		$sourceFS = LegacyPathHelper::deriveFilesystemFrom($a_sdir);
 		$targetFS = LegacyPathHelper::deriveFilesystemFrom($a_tdir);
 
@@ -1625,10 +1622,13 @@ class ilUtil
 			if ($item->isDir()) {
 				continue;
 			}
-
-			$itemPath = $targetDir . '/' . substr($item->getPath(), strlen($sourceDir));
-			$stream = $sourceFS->readStream($item->getPath());
-			$targetFS->writeStream($itemPath, $stream);
+			try {
+				$itemPath = $targetDir . '/' . substr($item->getPath(), strlen($sourceDir));
+				$stream = $sourceFS->readStream($item->getPath());
+				$targetFS->writeStream($itemPath, $stream);
+			} catch (\ILIAS\Filesystem\Exception\FileAlreadyExistsException $e) {
+				// Do nothing with that type of exception
+			}
 		}
 
 		return true;
@@ -2613,6 +2613,17 @@ class ilUtil
 		}
 
 		return $a_arr;
+	}
+
+	/**
+	 * @param string $clientId
+	 * @return \ILIAS\Data\ClientId
+	 */
+	public static function getClientIdByString($clientId)
+	{
+		$df = new \ILIAS\Data\Factory;
+
+		return $df->clientId($clientId);
 	}
 	
 	/**
@@ -5358,12 +5369,12 @@ class ilUtil
 	
 	public static function MB2Bytes($a_value)
 	{
-		return  $a_value * pow(self::_getSizeMagnitude(), 2);
+		return  ((int) $a_value) * pow(self::_getSizeMagnitude(), 2);
 	}
 	
 	public static function Bytes2MB($a_value)
 	{
-		return  $a_value / (pow(self::_getSizeMagnitude(), 2));
+		return  ((int) $a_value) / (pow(self::_getSizeMagnitude(), 2));
 	}
 
 	/**

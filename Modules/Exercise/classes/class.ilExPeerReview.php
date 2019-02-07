@@ -188,7 +188,6 @@ class ilExPeerReview
 	{
 		if($this->hasPeerReviewGroups())
 		{			
-			include_once "./Modules/Exercise/classes/class.ilExerciseMembers.php";
 			$all_exc = ilExerciseMembers::_getMembers($this->assignment->getExerciseId());
 			$all_valid = $this->getValidPeerReviewUsers(); // only returned
 			

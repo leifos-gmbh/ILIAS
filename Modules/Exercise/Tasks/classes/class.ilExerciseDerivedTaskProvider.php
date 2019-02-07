@@ -70,6 +70,16 @@ class ilExerciseDerivedTaskProvider implements ilDerivedTaskProvider
 				(int) $state->getOfficialDeadline(), (int) $state->getGeneralStart());
 		}
 
+		// open peer feedbacks
+		foreach ($this->task_action->getOpenPeerReviewsOfUser($user_id) as $ass)
+		{
+			$ref_id = $this->getFirstRefIdWithPermission("read", $ass->getExerciseId(), $user_id);
+			$state = ilExcAssMemberState::getInstanceByIds($ass->getId(), $user_id);
+			$title = str_replace("%1", $ass->getTitle(), $lng->txt("exc_task_peer_feedback"));
+			$tasks[] = $this->task_service->derived()->factory()->task($title, $ref_id,
+				(int) $state->getPeerReviewDeadline(), 0);
+		}
+
 		// open gradings
 		foreach ($this->task_action->getOpenGradingsOfUser($user_id) as $ass)
 		{

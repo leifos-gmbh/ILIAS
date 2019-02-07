@@ -52,6 +52,24 @@ class ilExerciseDerivedTaskAction
 	}
 
 	/**
+	 * Get all open peer reviews of a user
+	 *
+	 * @param int $user_id
+	 * @return ilExAssignment[]
+	 */
+	public function getOpenPeerReviewsOfUser(int $user_id): array
+	{
+		$user_exc_ids = $this->exc_mem_repo->getExerciseIdsOfUser($user_id);
+		$assignments = [];
+		foreach ($this->state_repo->getAssignmentIdsWithPeerFeedbackNeeded($user_exc_ids, $user_id) as $ass_id)
+		{
+			$assignments[] = new ilExAssignment($ass_id);
+			// to do: permission check
+		}
+		return $assignments;
+	}
+
+	/**
 	 * Get all open gradings of a user
 	 *
 	 * @param int $user_id

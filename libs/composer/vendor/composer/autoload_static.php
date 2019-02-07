@@ -4558,6 +4558,7 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
         'ilExcRepoObjAssignmentInfo' => __DIR__ . '/../..' . '/../../Modules/Exercise/RepoObjectAssignment/classes/class.ilExcRepoObjAssignmentInfo.php',
         'ilExcRepoObjAssignmentInfoInterface' => __DIR__ . '/../..' . '/../../Modules/Exercise/RepoObjectAssignment/interfaces/interface.ilExcRepoObjAssignmentInfoInterface.php',
         'ilExcRepoObjAssignmentInterface' => __DIR__ . '/../..' . '/../../Modules/Exercise/RepoObjectAssignment/interfaces/interface.ilExcRepoObjAssignmentInterface.php',
+        'ilExcTutorRepository' => __DIR__ . '/../..' . '/../../Modules/Exercise/Tutor/classes/class.ilExcTutorRepository.php',
         'ilExcel' => __DIR__ . '/../..' . '/../../Services/Excel/classes/class.ilExcel.php',
         'ilException' => __DIR__ . '/../..' . '/../../Services/Exceptions/classes/class.ilException.php',
         'ilExclusiveGatewayElement' => __DIR__ . '/../..' . '/../../Services/WorkflowEngine/classes/parser/elements/gateway/class.ilExclusiveGatewayElement.php',

@@ -20,7 +20,9 @@ task#:#task_tasks_without_deadline#:#Ohne Endtermin
 task#:#task_deadline#:#Ende
 task#:#task_no_tasks#:#Sie haben derzeit keine offenen Aufgaben.
 task#:#task_start#:#Beginn
-exc#:#exc_task_submission#:#Submission of Assignment "%1"
+exc#:#exc_task_submission#:#Abgabe zur Übungseinheit "%1"
+exc#:#exc_task_grading#:#Bewertung der Übungseinheit "%1"
+exc#:#exc_task_peer_feedback#:#Peer-Feedback geben in Übungseinheit "%1"
 meta#:#meta_oer_harvester#:#OER Harvester
 meta#:#meta_oer_harvester_desc#:#OER Harvester
 meta#:#meta_oer_target#:#Kategorie für OER-Freigaben

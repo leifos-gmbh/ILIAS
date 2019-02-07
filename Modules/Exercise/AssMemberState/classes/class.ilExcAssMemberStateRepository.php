@@ -29,7 +29,7 @@ class ilExcAssMemberStateRepository
 	/**
 	 * Get all assignments for a user where the user may hand in submissions
 	 *
-	 * @param int[] $exc_ids
+	 * @param int[] $exc_ids	exercises the user is "member" in
 	 * @param int $user_id
 	 * @return int[]
 	 */
@@ -62,7 +62,7 @@ class ilExcAssMemberStateRepository
 	/**
 	 * Get assignments with open gradings
 	 *
-	 * @param int[] $exc_ids
+	 * @param int[] $exc_ids exercises the user is "tutor" of
 	 * @return int[]
 	 */
 	public function getAssignmentIdsWithGradingNeeded(array $exc_ids)
@@ -86,6 +86,69 @@ class ilExcAssMemberStateRepository
 		return $open_gradings;
 	}
 
-	
+	/**
+	 * Get all assignments for a user where the user may hand in submissions
+	 *
+	 * @param int[] $exc_ids	exercises the user is "member" in
+	 * @param int $user_id
+	 * @return int[]
+	 */
+	public function getAssignmentIdsWithPeerFeedbackNeeded(array $exc_ids, int $user_id): array
+	{
+		$db = $this->db;
+
+		// peer groups exist
+		$set = $db->queryF('SELECT ass.id, count(*) nr_given, ass.peer_min, max(idl.tstamp) maxidl, max(peer.tstamp) maxpeer 
+			FROM exc_assignment ass
+			LEFT JOIN exc_assignment_peer peer ON (ass.id = peer.ass_id)
+			LEFT JOIN exc_idl idl ON (ass.id = idl.ass_id)
+			WHERE '.$db->in("ass.exc_id", $exc_ids, false, "integer").' 
+				AND ass.deadline_mode = %s
+				AND ass.time_stamp < %s
+				AND (ass.deadline2 < %s OR ass.deadline2 IS NULL)
+				AND ass.peer = %s
+				AND (peer.giver_id = %s)
+				AND (ass.peer_dl > %s OR ass.peer_dl IS NULL)
+				AND (peer.is_valid = %s)
+			GROUP BY (ass.id)
+			HAVING (ass.peer_min > nr_given) AND (maxidl < %s OR maxidl IS NULL)
+					',
+			array("integer", "integer", "integer", "integer", "integer", "integer", "integer", "integer"),
+			array(0, time(), time(), 1, $user_id, time(), 1, time())
+		);
+		$ids = [];
+		while ($rec = $db->fetchAssoc($set))
+		{
+			$ids[] = $rec["id"];
+		}
+
+		// peer groups do not exist
+		$set = $db->queryF('SELECT ass.id, count(*) nr_given, ass.peer_min, max(idl.tstamp) maxidl, max(peer.tstamp) maxpeer 
+			FROM exc_assignment ass
+			LEFT JOIN exc_assignment_peer peer ON (ass.id = peer.ass_id)
+			LEFT JOIN exc_idl idl ON (ass.id = idl.ass_id)
+			WHERE '.$db->in("ass.exc_id", $exc_ids, false, "integer").' 
+				AND ass.deadline_mode = %s
+				AND ass.time_stamp < %s
+				AND (ass.deadline2 < %s OR ass.deadline2 IS NULL)
+				AND ass.peer = %s
+				AND (peer.giver_id IS NULL)
+				AND (ass.peer_dl > %s OR ass.peer_dl IS NULL)
+				AND (peer.tstamp IS NULL)
+			GROUP BY (ass.id)
+			HAVING (maxpeer IS NULL) AND (maxidl < %s OR maxidl IS NULL)
+					',
+			array("integer", "integer", "integer", "integer", "integer", "integer", "integer"),
+			array(0, time(), time(), 1, $user_id, time(), time())
+		);
+		while ($rec = $db->fetchAssoc($set))
+		{
+			$ids[] = $rec["id"];
+		}
+
+
+		return $ids;
+	}
+
 	
 }

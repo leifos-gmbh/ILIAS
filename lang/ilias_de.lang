@@ -14,12 +14,15 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
-task#:#task_derived_tasks#:#Aufgaben
+task#:#task_derived_tasks#:#To-Do
 task#:#task_tasks_with_deadline#:#Mit Endtermin
 task#:#task_tasks_without_deadline#:#Ohne Endtermin
 task#:#task_deadline#:#Ende
-task#:#task_no_tasks#:#Sie haben derzeit keine offenen Aufgaben.
+task#:#task_no_tasks#:#Sie haben derzeit keine offenen To-Do.
 task#:#task_start#:#Beginn
+task#:#task_task#:#Aufgabe
+task#:#task_details#:#Details
+pd#:#block_show_pdtasks#:#To-Do anzeigen
 exc#:#exc_task_submission#:#Abgabe zur Übungseinheit "%1"
 exc#:#exc_task_grading#:#Bewertung der Übungseinheit "%1"
 exc#:#exc_task_peer_feedback#:#Peer-Feedback geben in Übungseinheit "%1"

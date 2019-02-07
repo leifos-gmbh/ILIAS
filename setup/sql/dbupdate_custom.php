@@ -10,3 +10,7 @@ if (!$ilDB->tableColumnExists('exc_assignment_peer', 'is_valid'))
 	));
 }
 ?>
+<#2>
+<?php
+	$ilCtrlStructureReader->getStructure();
+?>

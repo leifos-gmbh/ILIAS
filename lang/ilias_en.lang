@@ -20,6 +20,9 @@ task#:#task_tasks_without_deadline#:#Without Deadline
 task#:#task_deadline#:#End
 task#:#task_no_tasks#:#You do not have any open tasks.
 task#:#task_start#:#Start
+task#:#task_task#:#Task
+task#:#task_details#:#Details
+pd#:#block_show_pdtasks#:#Show Tasks
 exc#:#exc_task_submission#:#Submission of Assignment "%1"
 exc#:#exc_task_grading#:#Grading of Assignment "%1"
 exc#:#exc_task_peer_feedback#:#Give Peer Feedback in Assignment "%1"

@@ -1340,6 +1340,7 @@ class ilSoapObjectAdministration extends ilSoapAdministration
 				{
 					case 'cat':
 						// begin-patch ibi
+					case 'root':
 						$tmp_obj->removeTranslations();
 						foreach($object_data['translations'] as $lang_key => $trans)
 						{

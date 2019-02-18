@@ -354,6 +354,10 @@ class ilObjRootFolderGUI extends ilContainerGUI
 					$this->object->saveIcons($_FILES["cont_icon"]['tmp_name']);
 				}
 
+				// begin-patch ibi
+				$this->object->update();
+				// end-patch ibi
+
 				// hide icon/title
 				ilContainer::_writeContainerSetting($this->object->getId(),
 					"hide_header_icon_and_title",

@@ -1027,7 +1027,7 @@ class ilTestServiceGUI
 		}
 
 		require_once './Modules/Test/classes/class.ilTestPDFGenerator.php';
-		ilTestPDFGenerator::generatePDF($output, ilTestPDFGenerator::PDF_OUTPUT_DOWNLOAD, $question_gui->object->getTitle());
+		ilTestPDFGenerator::generatePDF($output, ilTestPDFGenerator::PDF_OUTPUT_DOWNLOAD, $question_gui->object->getTitleFilenameCompliant(), PDF_USER_RESULT);
 	}
 
 	/**
@@ -1157,7 +1157,7 @@ class ilTestServiceGUI
 			require_once 'class.ilTestPDFGenerator.php';
 
 			ilTestPDFGenerator::generatePDF(
-				$content, ilTestPDFGenerator::PDF_OUTPUT_DOWNLOAD, $this->object->getTitle()
+				$content, ilTestPDFGenerator::PDF_OUTPUT_DOWNLOAD, $this->object->getTitleFilenameCompliant(), PDF_USER_RESULT
 			);
 		}
 		else
@@ -1209,6 +1209,15 @@ class ilTestServiceGUI
 		$pass = (int)$_GET['pass'];
 
 		$questionId = (int)$_GET['evaluation'];
+		
+		$testSequence = $this->testSequenceFactory->getSequenceByActiveIdAndPass($activeId, $pass);
+		$testSequence->loadFromDb();
+		$testSequence->loadQuestions();
+		
+		if( !$testSequence->questionExists($questionId) )
+		{
+			ilObjTestGUI::accessViolationRedirect();
+		}
 
 		if( $this->getObjectiveOrientedContainer()->isObjectiveOrientedPresentationRequired() )
 		{

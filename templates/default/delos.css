@@ -9415,6 +9415,11 @@ div.ilPermanentLinkWrapper .ilPermalinkContainer > label {
     width: 24px;
   }
 }
+div.ilPermanentLinkWrapper .ilPermalinkContainer > input,
+div.ilPermanentLinkWrapper .ilPermalinkContainer .btn-group {
+  z-index: 0;
+  /* see bug #24567 */
+}
 div.ilPermanentLinkWrapper .ilPermalinkContainer .input-group-btn {
   width: 28px;
 }
@@ -14841,6 +14846,11 @@ div.ilBadgeBackpackPanelContent img {
 span.ilProfileBadge {
   display: inline-block;
   padding: 5px;
+}
+span.ilProfileBadge a {
+  width: 50px;
+  height: 50px;
+  display: inline-block;
 }
 /*!
  * Datetimepicker for Bootstrap 3

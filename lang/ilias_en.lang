@@ -413,6 +413,8 @@ assessment#:#close_text_hint#:#To add a new gap set the cursor to the position o
 assessment#:#insert_gap#:#Insert Gap
 assessment#:#cloze_fixed_textlength_description#:#If you enter a value, all text gap fields, not providing an own maximum character limitation, as well as all numeric gap fields will be created with a fixed length of this value, so entering more than the allowed characters is not possible. Note, that for numeric gaps the decimal separator is counted as a regular character.
 assessment#:#qpl_maxchars_info_numeric_question#:#If you enter a value, the field for the numerical answer will be created with a fixed length of this value, so entering more than the allowed characters is not possible. Note, that for numeric gaps the decimal separator is counted as a regular character.
+assessment#:#qpl_numeric_lower_needs_valid_lower_alert#:#The lower bound needs to be valid numerical value lower than the upper bound.
+assessment#:#qpl_numeric_upper_needs_valid_upper_alert#:#The upper bound needs to be valid numerical value greater than the lower bound.
 assessment#:#cloze_fixed_textlength#:#Text Field Length
 assessment#:#cloze_text#:#Cloze Text
 assessment#:#cloze_textgap_case_insensitive#:#Case Insensitive
@@ -1109,6 +1111,7 @@ assessment#:#tst_questions_inserted#:#Question(s) inserted!
 assessment#:#tst_questions_removed#:#Question(s) removed!
 assessment#:#tst_random_nr_of_questions#:#How many questions?
 assessment#:#tst_random_select_questionpool#:#Select the question pool to choose the questions from
+common#:#select_question_pool_info#:#As long as the import file contains questions, these questions will be imported to the selected questionpool as well.
 assessment#:#tst_nonpool_questions_get_lost_warning#:#<b>The current test mode includes questions in its configuration that are not assigned to any question pool. If you change the test mode, these questions will be lost permanently.</b>
 assessment#:#tst_reached_points#:#Points
 assessment#:#tst_remove_mark#:#Remove this mark
@@ -2084,8 +2087,8 @@ common#:#enable_calendar#:#Enable Calendar
 common#:#enable_custom_icons_info#:#This allows you to define custom icons for single categories, courses and groups. The properties section of categories, courses and groups will provide an image upload dialog.
 common#:#enable_custom_icons#:#Enable custom icons
 common#:#enable_disk_quota_reminder_mail#:#Send disk quota reminder mails
-common#:#enable_download_folder_info#:#Allows download of a folder including sub structures as zip file.
-common#:#enable_download_folder#:#Enable Downloading Folders
+common#:#enable_download_folder_info#:#Enables a download option inside the action drop-down of folders.
+common#:#enable_download_folder#:#"Download Action for Folders" enabled
 common#:#enable_fora_statistics_desc#:#If disabled, nobody is able to access the forum statistics.
 common#:#enable_fora_statistics#:#Enable Statistics in Forum
 common#:#enable_hide_user_toggle#:#Member is not allowed to deactivate
@@ -3286,6 +3289,7 @@ rbac#:#sahs_write#:#User can edit content and settings of SCORM learning module
 common#:#sahs#:#Learning Module SCORM
 common#:#salutation_f#:#Ms./Mrs.
 common#:#salutation_m#:#Mr.
+common#:#salutation_n#:#Not Applicable
 common#:#salutation#:#Salutation
 common#:#save_and_back#:#Save And Back
 common#:#save_message#:#Save as Draft
@@ -3598,7 +3602,7 @@ common#:#use_default_instructions#:#Use default instructions.
 common#:#user_activated#:#User has been approved
 common#:#user_added#:#User added
 common#:#user_assignment#:#User Assignment
-common#:#user_cant_receive_mail#:#%1$s (user is not allowed to use the mail system) 
+common#:#user_cant_receive_mail#:#%1$s – user is not allowed to use mail system.
 common#:#user_comment#:#User comment
 common#:#user_deactivated#:#User has been disapproved
 common#:#user_defined_fields#:#Custom Fields
@@ -5080,7 +5084,7 @@ export#:#export_omit_resource#:#Omit Resource
 export#:#export_omit#:#Omit
 export#:#export_resource#:#Resource
 export#:#export_select_resources#:#Select Resources
-feed#:#block_feed_block_feed_url_info#:#Must be a valid RSS/Atom URL, e.g. http://www.ilias.de/rss.php
+feed#:#block_feed_block_feed_url_info#:#Must be a valid RSS/Atom URL
 feed#:#block_feed_block_feed_url#:#Feed URL
 feed#:#block_feed_block_head#:#External Web Feed
 feed#:#block_feed_block_title#:#Title
@@ -5176,6 +5180,7 @@ forum#:#frm_default_view#:#Default View
 forum#:#frm_detach_moderator_role#:#Detach Moderator Role
 forum#:#frm_moderator_f#:#Moderator
 forum#:#frm_moderator_m#:#Moderator
+forum#:#frm_moderator_n#:#Moderation
 forum#:#frm_moderator_role_added_successfully#:#The user was added as moderator successfully.
 forum#:#frm_moderators_detached_role_successfully#:#The moderator role was detached for all selected users successfully.
 forum#:#frm_moderators_not_exist_yet#:#Please choose a moderator.
@@ -7579,7 +7584,7 @@ wiki#:#wiki_what_links_here#:#What Links Here?
 wiki#:#wiki_what_links_to_page#:#What links to page "%s"?
 wiki#:#wiki_wiki_page#:#Wiki Page
 wiki#:#wiki_wiki_search#:#Wiki Search
-common#:#db_need_hotfix#:#Hotfix available. Please open setup program.
+common#:#db_need_hotfix#:#Hotfix available. Please open <a href="./setup/setup.php">»Setup</a>!
 common#:#session_config#:#Session Settings
 common#:#session_config_maintenance_disabled#:#Maintenance by client not allowed
 common#:#session_max_count#:#Max active sessions
@@ -7771,6 +7776,8 @@ exc#:#exc_submission_notification_body#:#A new submission for exercise "%s" has 
 exc#:#exc_submission_notification_link#:#Link to exercise: %s
 exc#:#exc_submission_notification_subject#:#Exercise "%s" - New submission uploaded
 wiki#:#wiki_change_notification_subject#:#Wiki "%1$s" has been changed: %2$s
+wiki#:#wiki_change_notification_page_body_comment#:#a comment has been added to the following wiki page
+wiki#:#wiki_change_notification_page_body_delete#:#the following wiki page has been deleted
 wiki#:#wiki_change_notification_page_body_update#:#the following wiki page has been updated
 wiki#:#wiki_change_notification_page_link#:#URL
 wiki#:#wiki_change_notification_link#:#URL
@@ -9774,6 +9781,7 @@ survey#:#svy_neutral_answer#:#Text for a Neutral Answer (‘Not Specified’, �
 dcl#:#dcl_activate_notification#:#Enable Notification
 dcl#:#dcl_table_id#:#Table ID
 dcl#:#dcl_add_new_record#:#Add New Entry
+dcl#:#dcl_list_visibility_and_filter#:#Visibility and filter
 dcl#:#dcl_list_fields#:#Fields
 dcl#:#dcl_add_new_field#:#Add New Field
 dcl#:#dcl_add_new_table#:#Add New Table
@@ -9918,6 +9926,7 @@ pd#:#block_show_pdnews#:#Show News
 pd#:#block_show_pdnotes#:#Show Notes
 pd#:#block_show_chatviewer#:#Show Chat Viewer
 pd#:#block_show_pdbookm#:#Show Bookmarks
+pd#:#block_show_pdfrmpostdraft#:#Show Postings Drafts
 pd#:#block_create_pdfeed#:#Add New Webfeed
 pd#:#block_show_x#:#Show %s
 common#:#crs_list_reg_start#:#Registration Begin
@@ -11446,6 +11455,8 @@ common#:#obj_wiks#:#Wiki
 common#:#obj_wiks_desc#:#Global Wiki Settings
 blog#:#blog_edit_posting#:#Edit Posting
 sop#:#sop_check_system_requirements#:#Checking system requirements
+sop#:#sop_system_check_error#:#Your Browser does not support the required HTML5 features.
+sop#:#sop_system_check_https#:#You should use https instead of http for the required HTML5 features.
 sop#:#sop_lm_not_exists#:#The Learning Module does not exist in the offline storage of this browser. <br />Please use use same device and browser as on Learning Module export.<br /><br />If this is the right device and right browser maybe the Learning Module was removed by deleting the browser cache. Please contact your admininstrator.
 sop#:#sop_already_exported#:#This Learning Module has already been exported. Please open it with the computer on which you have installed Firefox with the SCORM Offline Player addon.
 sop#:#sop_reload_page#:#Reload page
@@ -14211,3 +14222,19 @@ wiki#:#wiki_change_notification_body_new#:#the following wiki page was created
 mob#:#mob_no_fixed_size_map_editing#:#Please define a fixed size for your image before using map areas. If your image is scaled by content style or other CSS rules, your map areas will not fit anymore.
 survey#:#svy_answer_too_long#:#Your current answer is too long (%s characters). Please shorten your answer.
 survey#:#svy_appraisses_cannot_be_raters#:#User cannot be added as rater. Use self evaluation option in the survey settings instead.
+sess#:#sess_material_assigned#:#Assigned
+sess#:#sess_material_not_assigned#:#Not Assigned
+rbac#:#iass_amend_grading#:#Amend gradings in an Individual Assessment
+rbac#:#lso_read#:#Users can access the Learning Sequence
+rbac#:#lso_manage_members#:#Manage members of Learning Sequence
+rbac#:#lso_edit_permission#:#User can change permission settings of Learning Sequence
+common#:#unparticipate#:#Unsubscribe
+common#:#participate#:#Subscribe
+rbac#:#lso_participate#:#User can subscribe to a Learning Sequence
+rbac#:#lso_unparticipate#:#User can unsubscribe from a Learning Sequence
+rbac#:#lso_edit_learning_progress#:#User can edit learning progress settings
+rbac#:#mcst_edit_learning_progress#:#User can edit learning progress settings
+user#:#obj_ref_id_not_exist#:#The entered Reference-Id does not exist
+user#:#msg_spoint_not_modified#:#Starting point not modified
+lti#:#lti_cron_title#:#LTI Outcome Service
+lti#:#lti_cron_title_desc#:#Synchronizes the learning progress of LTI users with the LTI consumer, if it supports the outcome service. This cron job is only required to transfer status updates after Learning progress settings updates.

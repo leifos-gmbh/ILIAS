@@ -336,7 +336,8 @@ class ilImport
 		{
 			foreach ($obj_map as $obj_id_old => $obj_id_new)
 			{
-				ilObject::_writeImportId($obj_id_new, "il_".$this->mapping->getInstallId()."_".ilObject::_lookupType($obj_id_new)."_".$obj_id_old);
+			    // begin-patch ibi -> this destroys custom id handling.
+				//ilObject::_writeImportId($obj_id_new, "il_".$this->mapping->getInstallId()."_".ilObject::_lookupType($obj_id_new)."_".$obj_id_old);
 			}
 		}
 

@@ -511,9 +511,10 @@ class ilContainer extends ilObject
 			foreach($settings as $keyword => $value)
 			{
 				// :TODO: proper custom icon export/import
+				// begin-patch ibi => enable icon settings support
 				if(stristr($keyword, "icon"))
 				{
-					continue;
+					//continue;
 				}
 				
 				$a_xml->xmlStartTag(

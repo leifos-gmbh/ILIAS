@@ -42,7 +42,7 @@ class ilRootFolderExporter extends ilXmlExporter
 	 * @param object $a_entity
 	 * @param object $a_schema_version
 	 * @param object $a_id
-	 * @return
+	 * @return string
 	 */
 	public function getXmlRepresentation($a_entity, $a_schema_version, $a_id)
 	{
@@ -56,6 +56,15 @@ class ilRootFolderExporter extends ilXmlExporter
 			$DIC->logger()->root()->error($a_id . ' is not instance if type root');
 			return '';
 		}
+
+		$writer = new ilXmlWriter();
+		$writer->xmlStartTag('RootFolder');
+        ilContainerSortingSettings::_exportContainerSortingSettings($writer,ROOT_FOLDER_ID);
+        ilContainer::_exportContainerSettings($writer, ROOT_FOLDER_ID);
+        $writer->xmlEndTag('RootFolder');
+
+        return $writer->xmlDumpMem(false);
+
 	}
 
 	/**

@@ -221,7 +221,7 @@ class ilSoapClient
 		$error_message = '';
 		$is_fault = false;
 		
-		$this->log->debug('Calling webseervice: ' . $a_operation);
+		$this->log->debug('Calling webservice: ' . $a_operation);
 		$this->log->dump($a_params, ilLogLevel::DEBUG);
 
 		$this->setSocketTimeout(false);

@@ -1,0 +1,67 @@
+
+[WIP]
+
+Refactoring proposal for Modules to allow them among other things to use the repository pattern.
+The following dir/file structure represents how exercise submissions will look at the end of the refactoring.
+
+Modules/
+   |...
+   |
+   |---Exercise/
+   			|
+	        |-README.md
+	        |-ROADMAP.md
+	        |-maintenance.json
+	        |-module.xml
+	        |-Submission/
+	        		|
+	        		|-classes/
+	        				|
+	        				|- ilSubmission.php (object logic)
+	        				|- ...
+			        |-controllers/
+			    			|
+			         		|- xxxxGUI.php (view logic)
+			         		|- xxxxGUI.php
+			         		|- xxxxTableGUI.php. (??? move tables to an specific dir?)
+			         		|- ...
+			         		|
+			         		|- actions/
+			         				|
+			    				    |- xxxxxAction.php
+			    			       	|- xxxxxAction.php
+			    			       	|- ...
+			    			       	|- interfaces/ (if considered for Action layer classes)
+			    			       			|
+			    			       			|- xxxxActionInterface.php
+			    			|
+			    			|
+			    			|- interfaces/ (if considered for controllers)
+			    	|-models/
+			    		|
+			    		|- submissionData.php (mapping the table exc_returned)
+			    		|- xxxxData.php
+			    	|-repositories
+			    	      |
+			    	      |- ilExSubmissionRepository.php
+			    	      |- xxxxxxRespository.php
+			    	      |- ...
+			    	      |- interfaces/
+			    	      		|
+			    	      		|- ilExSubmissionRepositoryInterface.php
+			    	      		|- xxxxxRepositoryInterface.php
+			|- Assignment
+			|- Criteria
+			|...
+
+ - A "Controller" is responsible to collect all the resulted logic and provide it to the user.
+
+ - A "Model" is an object to map the db tables in a way to provide data consistency to the repositories.
+ Usually "models" are used to interact with the database and allow us to query and manipulate the tables. Since the proposal
+ is using the directory "models" to store kind of DTO's or object definitions, we may think about change the directory name to something else.
+
+ - A "Actions" is a frontend independent process (detailed in the current roadmap)
+
+ - [WIP]
+
+

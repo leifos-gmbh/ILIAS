@@ -35,6 +35,8 @@ class ilExcRepoObjAssignment implements ilExcRepoObjAssignmentInterface
 	/**
 	 * Get assignment(s) information of repository object
 	 *
+	 * TODO:: this description "if user id is provided, only readable links will be added" is not accurate because user_id is mandatory.
+	 *
 	 * @param int $a_ref_id ref id
 	 * @param int $a_user_id if user id is provided, only readable links will be added
 	 * @return ilExcRepoObjAssignmentInfoInterface[]
@@ -61,6 +63,7 @@ class ilExcRepoObjAssignment implements ilExcRepoObjAssignmentInterface
 	/**
 	 * Is access denied
 	 *
+	 * TODO:: returning negated value?
 	 * @param int $a_ref_id ref id
 	 * @param int $a_user_id user id
 	 * @return bool

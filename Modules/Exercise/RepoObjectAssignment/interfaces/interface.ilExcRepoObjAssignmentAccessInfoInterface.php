@@ -12,14 +12,14 @@ interface ilExcRepoObjAssignmentAccessInfoInterface
 	/**
 	 * Is access granted due to exercise assignment conditions?
 	 *
-	 * @return int assignment id
+	 * @return int assignment id  //TODO why id and not null?
 	 */
 	function isGranted();
 
 	/**
 	 * Get reasons why access is not granted.
 	 *
-	 * @return string[]
+	 * @return string[]  TODO -> return type array
 	 */
 	function getNotGrantedReasons();
 }

@@ -355,7 +355,8 @@ class ilExSubmission
 		$deliver_result = $this->initStorage()->uploadFile($a_http_post_files, $storage_id, $unzip);
 
 		if ($deliver_result)
-		{			
+		{
+			//TODO :: At this point we need to think about how to map the db tables.
 			$next_id = $ilDB->nextId("exc_returned");
 			$query = sprintf("INSERT INTO exc_returned ".
 							 "(returned_id, obj_id, user_id, filename, filetitle, mimetype, ts, ass_id, late, team_id) ".
@@ -720,7 +721,9 @@ class ilExSubmission
 		{
 			return;
 		}
-		
+
+
+		//todo move this to the repository
 		if (count($file_id_array))
 		{										
 			$result = $ilDB->query("SELECT * FROM exc_returned".
@@ -1328,19 +1331,13 @@ class ilExSubmission
 	 */
 	function getLastSubmission()
 	{
-		$ilDB = $this->db;
-	
-		$ilDB->setLimit(1);
+		//TODO: add the file to the class map/autoload
+		//code moved to the repository
+		require_once("Modules/Exercise/Submission/repositories/class.ilExSubmissionRepository.php");
 
-		$q = "SELECT obj_id,user_id,ts FROM exc_returned".
-			" WHERE ass_id = ".$ilDB->quote($this->assignment->getId(), "integer").
-			" AND ".$this->getTableUserWhere(true).
-			" AND (filename IS NOT NULL OR atext IS NOT NULL)".
-			" AND ts IS NOT NULL".
-			" ORDER BY ts DESC";
-		$usr_set = $ilDB->query($q);
-		$array = $ilDB->fetchAssoc($usr_set);		
-		return ilUtil::getMySQLTimestamp($array["ts"]);  		
+		$sql_and = $this->getTableUserWhere(true);
+		$submission_repo = new ilExSubmissionRepository($this->db);
+		return $submission_repo->getLastSubmission($this->assignment->getId(), $sql_and);
 	}
 
 	

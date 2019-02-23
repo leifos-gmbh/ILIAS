@@ -7,6 +7,9 @@ include_once("./Modules/Exercise/RepoObjectAssignment/interfaces/interface.ilExc
 /**
  * Repository object assignment information
  *
+ * //TODO why not ilExAssignmentInfoRepository
+ * //TODO why not Remove the RepoObj from the naming?
+ *
  * @author Alex Killing <killing@leifos.de>
  */
 class ilExcRepoObjAssignmentInfo implements ilExcRepoObjAssignmentInfoInterface

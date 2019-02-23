@@ -9,6 +9,8 @@
  */
 interface ilExcRepoObjAssignmentInterface
 {
+	// TODO :: Why the assignment info has to deal with users?
+
 	/**
 	 * Get assignment(s) info of repository object
 	 *
@@ -18,6 +20,7 @@ interface ilExcRepoObjAssignmentInterface
 	 */
 	function getAssignmentInfoOfObj($a_ref_id, $a_user_id);
 
+	// TODO :: Why the assignment info has to deal with users? If it is permission related why not check it on Exercise level?
 	/**
 	 * Get assignment access info for a repository object
 	 *

@@ -952,11 +952,21 @@ class ilCalendarBlockGUI extends ilBlockGUI
 
 			if ($this->getRepositoryMode())
 			{
+				#23921
+				$ilCtrl->setParameterByClass('ilcalendarpresentationgui','seed', '');
 				$this->addFooterLink($lng->txt("cal_open_calendar"),
 					$ilCtrl->getLinkTargetByClass($this->getTargetGUIClassPath(), ""),
 					"",
 					"block_" . $this->getBlockType() . "_" . $this->block_id,
 					false, false);
+
+				$ilCtrl->setParameter($this, "add_mode", "");
+				$this->addFooterLink($lng->txt("add_appointment"),
+					$ilCtrl->getLinkTargetByClass("ilCalendarAppointmentGUI", "add"),
+					"",
+					"block_" . $this->getBlockType() . "_" . $this->block_id,
+					false, false);
+				$ilCtrl->setParameter($this, "add_mode", "");
 			}
 		}
 	}

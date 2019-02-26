@@ -151,7 +151,8 @@ class ilCronManager
 		}
 		// initiate run?
 		else if($a_job->isActive($a_job_data["job_result_ts"], 
-			$a_job_data["schedule_type"], $a_job_data["schedule_value"], $a_manual) || $a_job->getId() == "survey_notification")
+			$a_job_data["schedule_type"], $a_job_data["schedule_value"], $a_manual) || $a_job->getId() == "survey_notification"
+		)
 		{
 			$ilLog->write("CRON - job ".$a_job_data["job_id"]." started");
 
@@ -167,10 +168,14 @@ class ilCronManager
 				$result = new \ilCronJobResult();
 				$result->setStatus(\ilCronJobResult::STATUS_CRASHED);
 				$result->setMessage(sprintf("Exception: %s", $e->getMessage()));
+
+				$ilLog->log($e->getTraceAsString());
 			} catch (\Throwable $e) { // Could be appended to the catch block with a | in PHP 7.1
 				$result = new \ilCronJobResult();
 				$result->setStatus(\ilCronJobResult::STATUS_CRASHED);
 				$result->setMessage(sprintf("Exception: %s", $e->getMessage()));
+
+				$ilLog->log($e->getTraceAsString());
 			}
 			$ts_dur = self::getMicrotime()-$ts_in;
 

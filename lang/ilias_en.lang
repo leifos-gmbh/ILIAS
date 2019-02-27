@@ -413,6 +413,8 @@ assessment#:#close_text_hint#:#To add a new gap set the cursor to the position o
 assessment#:#insert_gap#:#Insert Gap
 assessment#:#cloze_fixed_textlength_description#:#If you enter a value, all text gap fields, not providing an own maximum character limitation, as well as all numeric gap fields will be created with a fixed length of this value, so entering more than the allowed characters is not possible. Note, that for numeric gaps the decimal separator is counted as a regular character.
 assessment#:#qpl_maxchars_info_numeric_question#:#If you enter a value, the field for the numerical answer will be created with a fixed length of this value, so entering more than the allowed characters is not possible. Note, that for numeric gaps the decimal separator is counted as a regular character.
+assessment#:#qpl_numeric_lower_needs_valid_lower_alert#:#The lower bound needs to be valid numerical value lower than the upper bound.
+assessment#:#qpl_numeric_upper_needs_valid_upper_alert#:#The upper bound needs to be valid numerical value greater than the lower bound.
 assessment#:#cloze_fixed_textlength#:#Text Field Length
 assessment#:#cloze_text#:#Cloze Text
 assessment#:#cloze_textgap_case_insensitive#:#Case Insensitive
@@ -1109,6 +1111,7 @@ assessment#:#tst_questions_inserted#:#Question(s) inserted!
 assessment#:#tst_questions_removed#:#Question(s) removed!
 assessment#:#tst_random_nr_of_questions#:#How many questions?
 assessment#:#tst_random_select_questionpool#:#Select the question pool to choose the questions from
+common#:#select_question_pool_info#:#As long as the import file contains questions, these questions will be imported to the selected questionpool as well.
 assessment#:#tst_nonpool_questions_get_lost_warning#:#<b>The current test mode includes questions in its configuration that are not assigned to any question pool. If you change the test mode, these questions will be lost permanently.</b>
 assessment#:#tst_reached_points#:#Points
 assessment#:#tst_remove_mark#:#Remove this mark
@@ -7579,7 +7582,7 @@ wiki#:#wiki_what_links_here#:#What Links Here?
 wiki#:#wiki_what_links_to_page#:#What links to page "%s"?
 wiki#:#wiki_wiki_page#:#Wiki Page
 wiki#:#wiki_wiki_search#:#Wiki Search
-common#:#db_need_hotfix#:#Hotfix available. Please open setup program.
+common#:#db_need_hotfix#:#Hotfix available. Please open <a href="./setup/setup.php">»Setup</a>!
 common#:#session_config#:#Session Settings
 common#:#session_config_maintenance_disabled#:#Maintenance by client not allowed
 common#:#session_max_count#:#Max active sessions
@@ -14230,3 +14233,5 @@ rbac#:#lso_edit_learning_progress#:#User can edit learning progress settings
 rbac#:#mcst_edit_learning_progress#:#User can edit learning progress settings
 user#:#obj_ref_id_not_exist#:#The entered Reference-Id does not exist
 user#:#msg_spoint_not_modified#:#Starting point not modified
+lti#:#lti_cron_title#:#LTI Outcome Service
+lti#:#lti_cron_title_desc#:#Synchronizes the learning progress of LTI users with the LTI consumer, if it supports the outcome service. This cron job is only required to transfer status updates after Learning progress settings updates.

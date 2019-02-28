@@ -162,6 +162,7 @@ class ilBadgeProfileGUI
 				"title" => $badge->getTitle(),
 				"description" => $badge->getDescription(),
 				"image" => $badge->getImagePath(),
+				"name" => $badge->getImage(),
 				"issued_on" => $ass->getTimestamp(),
 				"renderer" => new ilBadgeRenderer($ass)
 			);			
@@ -169,8 +170,8 @@ class ilBadgeProfileGUI
 		
 		// :TODO:
 		$data = ilUtil::sortArray($data, "issued_on", "desc", true);
-		
-		//$tmpl = new ilTemplate("tpl.badge_backpack.html", true, true, "Services/Badge");
+
+		$tmpl = new ilTemplate("tpl.badge_backpack.html", true, true, "Services/Badge");
 
 		ilDatePresentation::setUseRelativeDates(false);
 
@@ -179,29 +180,23 @@ class ilBadgeProfileGUI
 
 		foreach($data as $badge)
 		{
-			$modal = $this->factory->modal()->roundtrip($badge["title"], $this->factory->legacy($badge["renderer"]->renderModalKS()));
-			$image = $this->factory->image()->responsive($badge["image"], "")->withAction($modal->getShowSignal());
+			$modal = $this->factory->modal()->roundtrip(
+				$badge["title"], $this->factory->legacy($badge["renderer"]->renderModalContent())
+			)->withCancelButtonLabel("ok");
+			$image = $this->factory->image()->responsive($badge["image"], $badge["name"])->withAction($modal->getShowSignal());
 			$cards[] = $this->factory->card()->standard($badge["title"], $image)
 				->withSections([$this->factory->legacy(
 					ilDatePresentation::formatDate(new ilDateTime($badge["issued_on"], IL_CAL_UNIX))
 				)]);
 
 			$components[] = $modal;
-
-			/*
-			$tmpl->setCurrentBlock("badge_bl");
-			$tmpl->setVariable("BADGE_TITLE", $badge["title"]);
-			// $tmpl->setVariable("BADGE_DESC", $badge["description"]); :TODO:
-			$tmpl->setVariable("BADGE_IMAGE", $badge["image"]);
-			$tmpl->setVariable("BADGE_CRITERIA", $badge["renderer"]->getHref());
-			$tmpl->setVariable("BADGE_DATE", ilDatePresentation::formatDate(new ilDateTime($badge["issued_on"], IL_CAL_UNIX)));
-			$tmpl->parseCurrentBlock();
-			*/
 		}
 
 		$deck = $this->factory->deck($cards);
 		$components[] = $deck;
-		$tpl->setContent($this->renderer->render($components));
+
+		$tmpl->setVariable("DECK", $this->renderer->render($components));
+		$tpl->setContent($tmpl->get());
 	}
 	
 	protected function manageBadges()

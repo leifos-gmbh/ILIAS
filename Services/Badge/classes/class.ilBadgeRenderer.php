@@ -28,6 +28,16 @@ class ilBadgeRenderer
 	 */
 	protected $lng;
 
+	/**
+	 * @var \ILIAS\UI\Factory
+	 */
+	protected $factory;
+
+	/**
+	 * @var \ILIAS\UI\Renderer
+	 */
+	protected $renderer;
+
 	protected $assignment; // [ilBadgeAssignment]
 	protected $badge; // [ilBadge]
 	
@@ -40,6 +50,8 @@ class ilBadgeRenderer
 		$this->tpl = $DIC["tpl"];
 		$this->ctrl = $DIC->ctrl();
 		$this->lng = $DIC->language();
+		$this->factory = $DIC->ui()->factory();
+		$this->renderer = $DIC->ui()->renderer();
 		if($a_assignment)
 		{
 			$this->assignment = $a_assignment;					
@@ -84,32 +96,18 @@ class ilBadgeRenderer
 	
 	public function getHTML()
 	{				
-		$tpl = $this->tpl;
-		$ilCtrl = $this->ctrl;
-		
-		if(!self::$init)
-		{
-			self::$init = true;
-			
-			$url = $ilCtrl->getLinkTargetByClass("ilBadgeHandlerGUI", 
-				"render", "", true, false);
-			
-			$tpl->addJavaScript("Services/Badge/js/ilBadgeRenderer.js");
-			$tpl->addOnLoadCode('il.BadgeRenderer.init("'.$url.'");');
-		}
-				
-		$hash = $this->getBadgeHash();
+		$components = array();
 
-		$btpl = new ilTemplate("tpl.badge_renderer.html", true, true, "Services/Badge");		
-		$btpl->setVariable("BADGE_IMG", $this->badge->getImagePath());
-		$btpl->setVariable("BADGE_TXT", $this->badge->getTitle());
-		$btpl->setVariable("BADGE_ID", "badge_".
-			($this->assignment 
-				? $this->assignment->getUserId()
-				: "")."_".
-			$this->badge->getId()."_".
-			$hash);	
-		return $btpl->get();
+		$modal = $this->factory->modal()->roundtrip(
+			$this->badge->getTitle(), $this->factory->legacy($this->renderModalContent())
+		)->withCancelButtonLabel("ok");
+		$components[] = $modal;
+
+		$image = $this->factory->image()->responsive($this->badge->getImagePath(), $this->badge->getTitle())
+			->withAction($modal->getShowSignal());
+		$components[] = $image;
+
+		return $this->renderer->render($components);
 	}
 	
 	public function getHref()
@@ -147,82 +145,50 @@ class ilBadgeRenderer
 			$this->badge->getId());
 	}
 	
-	public function renderModal()
+	public function renderModalContent()
 	{
 		$lng = $this->lng;
-		
-		include_once "Services/UIComponent/Modal/classes/class.ilModalGUI.php";
-		
-		// only needed for modal-js-calls
-		// ilModalGUI::initJS();
-		
-		$modal = ilModalGUI::getInstance();
-		$modal->setId("badge_modal_".$this->getBadgeHash());
-		$modal->setType(ilModalGUI::TYPE_SMALL);
-		$modal->setHeading($this->badge->getTitle());
-		
 		$lng->loadLanguageModule("badge");
-		
-		$tpl = new ilTemplate("tpl.badge_modal.html", true, true, "Services/Badge");
-		
-		$tpl->setVariable("IMG_SRC", $this->badge->getImagePath());
-		$tpl->setVariable("IMG_TXT", $this->badge->getImage());
-		
-		$tpl->setVariable("TXT_DESC", $lng->txt("description"));	
-		$tpl->setVariable("DESC", nl2br($this->badge->getDescription()));
-		
-		$tpl->setVariable("TXT_CRITERIA", $lng->txt("badge_criteria"));	
-		$tpl->setVariable("CRITERIA", nl2br($this->badge->getCriteria()));
-		
+
+		$components = array();
+
+		$image = $this->factory->image()->responsive($this->badge->getImagePath(), $this->badge->getImage());
+		$components[] = $image;
+
+		$badge_information = [
+			$lng->txt("description")=>$this->badge->getDescription(),
+			$lng->txt("badge_criteria")=>$this->badge->getCriteria(),
+		];
+
 		if($this->assignment)
 		{
-			$tpl->setVariable("TXT_TSTAMP", $lng->txt("badge_issued_on"));	
-			$tpl->setVariable("TSTAMP", 
-				ilDatePresentation::formatDate(new ilDateTime($this->assignment->getTimestamp(), IL_CAL_UNIX)));		
+			$badge_information[$lng->txt("badge_issued_on")] = ilDatePresentation::formatDate(
+				new ilDateTime($this->assignment->getTimestamp(), IL_CAL_UNIX)
+			);
 		}
 
 		if($this->badge->getParentId())
 		{
 			$parent = $this->badge->getParentMeta();	
 			if($parent["type"] != "bdga")
-			{												
-				$tpl->setVariable("TXT_PARENT", $lng->txt("object"));			
-				$tpl->setVariable("PARENT", $parent["title"]);
-				$tpl->setVariable("PARENT_TYPE", $lng->txt("obj_".$parent["type"]));
-				$tpl->setVariable("PARENT_ICON", 
-					ilObject::_getIcon($parent["id"], "big", $parent["type"]));
+			{
+				$parent_icon = $this->factory->icon()->custom(
+					ilObject::_getIcon($parent["id"], "big", $parent["type"]), $lng->txt("obj_".$parent["type"])
+				)->withSize("medium");
+
+				$parent_icon_with_text = $this->factory->legacy($this->renderer->render($parent_icon) . $parent["title"]);
+				$badge_information[$lng->txt("object")] = $parent_icon_with_text;
 			}				
 		}
 		
 		if($this->badge->getValid())
 		{
-			$tpl->setVariable("TXT_VALID", $lng->txt("badge_valid"));		
-			$tpl->setVariable("VALID", $this->badge->getValid());		
+			$badge_information[$lng->txt("badge_valid")] = $this->badge->getValid();
 		}
-		
-		$modal->setBody($tpl->get());
-		
-		return $modal->getHTML();
+
+		$list = $this->factory->listing()->descriptive($badge_information);
+		$components[] = $list;
+
+		return $this->renderer->render($components);
 	}
-
-	public function renderModalKS() {
-		global $DIC;
-		$f = $DIC->ui()->factory();
-		$renderer = $DIC->ui()->renderer();
-		$parent = $this->badge->getParentMeta();
-
-		$image = $f->image()->standard(
-			ilObject::_getIcon($parent["id"], "big", $parent["type"]),
-			"Thumbnail Example");
-
-		//Generate List
-		$descriptive = $f->listing()->descriptive([
-				"Title 1"=>"Description 1",
-				"Title 2"=>"Description 2",
-				"Title 3"=>$image]
-		);
-
-		//Render
-		return $renderer->render($descriptive);
-}
 }

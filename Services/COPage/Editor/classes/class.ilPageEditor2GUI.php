@@ -5,6 +5,7 @@
 /**
  * Page editor
  *
+ * @ilCtrl_Calls ilPageEditor2GUI: ilPageEditorRpcAdapterGUI
  * @author killing@leifos.de
  * @ingroup ServicesCOPage
  */
@@ -48,6 +49,11 @@ class ilPageEditor2GUI
 
 		switch ($next_class)
 		{
+			case "ilpageeditorrpcadaptergui":
+				$rpc_gui = new ilPageEditorRpcAdapterGUI();
+				$ctrl->forwardCommand($rpc_gui);
+				break;
+
 			default:
 				if (in_array($cmd, array("showEditScreen")))
 				{

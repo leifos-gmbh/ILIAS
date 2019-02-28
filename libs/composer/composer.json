@@ -27,7 +27,9 @@
 		"james-heinrich/getid3": "^1.9",
 		"phpoffice/phpspreadsheet": "^1.3.1",
 		"jumbojett/openid-connect-php": "^0.7.0",
-		"sabre/dav": "~3.2.2"
+		"sabre/dav": "~3.2.2",
+		"datto/json-rpc": "^5.0",
+		"guzzlehttp/guzzle": "^6.3"
 	},
 	"require-dev": {
 		"mikey179/vfsStream": "^1.6",

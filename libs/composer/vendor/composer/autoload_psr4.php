@@ -35,8 +35,11 @@ return array(
     'IMSGlobal\\LTI\\' => array($vendorDir . '/imsglobal/lti/src'),
     'ILIAS\\' => array($baseDir . '/../../src'),
     'GuzzleHttp\\Psr7\\' => array($vendorDir . '/guzzlehttp/psr7/src'),
+    'GuzzleHttp\\Promise\\' => array($vendorDir . '/guzzlehttp/promises/src'),
+    'GuzzleHttp\\' => array($vendorDir . '/guzzlehttp/guzzle/src'),
     'Gettext\\Languages\\' => array($vendorDir . '/gettext/languages/src'),
     'Gettext\\' => array($vendorDir . '/gettext/gettext/src'),
     'Dflydev\\FigCookies\\' => array($vendorDir . '/dflydev/fig-cookies/src/Dflydev/FigCookies'),
+    'Datto\\JsonRpc\\' => array($vendorDir . '/datto/json-rpc/src'),
     'Complex\\' => array($vendorDir . '/markbaker/complex/classes/src'),
 );

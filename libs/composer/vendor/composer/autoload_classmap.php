@@ -3344,7 +3344,6 @@ return array(
     'ilBadgeBackpack' => $baseDir . '/../../Services/Badge/classes/class.ilBadgeBackpack.php',
     'ilBadgeGlobalScreenProvider' => $baseDir . '/../../Services/Badge/classes/class.ilBadgeGlobalScreenProvider.php',
     'ilBadgeHandler' => $baseDir . '/../../Services/Badge/classes/class.ilBadgeHandler.php',
-    'ilBadgeHandlerGUI' => $baseDir . '/../../Services/Badge/classes/class.ilBadgeHandlerGUI.php',
     'ilBadgeImageTemplate' => $baseDir . '/../../Services/Badge/classes/class.ilBadgeImageTemplate.php',
     'ilBadgeImageTemplateTableGUI' => $baseDir . '/../../Services/Badge/classes/class.ilBadgeImageTemplateTableGUI.php',
     'ilBadgeLearningHistoryProvider' => $baseDir . '/../../Services/Badge/LearningHistory/classes/class.ilBadgeLearningHistoryProvider.php',

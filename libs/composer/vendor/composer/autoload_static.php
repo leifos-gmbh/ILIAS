@@ -3681,7 +3681,6 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
         'ilBadgeBackpack' => __DIR__ . '/../..' . '/../../Services/Badge/classes/class.ilBadgeBackpack.php',
         'ilBadgeGlobalScreenProvider' => __DIR__ . '/../..' . '/../../Services/Badge/classes/class.ilBadgeGlobalScreenProvider.php',
         'ilBadgeHandler' => __DIR__ . '/../..' . '/../../Services/Badge/classes/class.ilBadgeHandler.php',
-        'ilBadgeHandlerGUI' => __DIR__ . '/../..' . '/../../Services/Badge/classes/class.ilBadgeHandlerGUI.php',
         'ilBadgeImageTemplate' => __DIR__ . '/../..' . '/../../Services/Badge/classes/class.ilBadgeImageTemplate.php',
         'ilBadgeImageTemplateTableGUI' => __DIR__ . '/../..' . '/../../Services/Badge/classes/class.ilBadgeImageTemplateTableGUI.php',
         'ilBadgeLearningHistoryProvider' => __DIR__ . '/../..' . '/../../Services/Badge/LearningHistory/classes/class.ilBadgeLearningHistoryProvider.php',

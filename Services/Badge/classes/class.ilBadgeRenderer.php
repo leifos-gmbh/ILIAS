@@ -14,16 +14,6 @@ include_once "Services/Badge/classes/class.ilBadge.php";
 class ilBadgeRenderer
 {
 	/**
-	 * @var ilTemplate
-	 */
-	protected $tpl;
-
-	/**
-	 * @var ilCtrl
-	 */
-	protected $ctrl;
-
-	/**
 	 * @var ilLanguage
 	 */
 	protected $lng;
@@ -41,14 +31,10 @@ class ilBadgeRenderer
 	protected $assignment; // [ilBadgeAssignment]
 	protected $badge; // [ilBadge]
 	
-	protected static $init; // [bool]
-	
 	public function __construct(ilBadgeAssignment $a_assignment = null, ilBadge $a_badge = null)
 	{
 		global $DIC;
 
-		$this->tpl = $DIC["tpl"];
-		$this->ctrl = $DIC->ctrl();
 		$this->lng = $DIC->language();
 		$this->factory = $DIC->ui()->factory();
 		$this->renderer = $DIC->ui()->renderer();
@@ -60,37 +46,6 @@ class ilBadgeRenderer
 		else
 		{
 			$this->badge = $a_badge;
-		}
-	}
-	
-	public static function initFromId($a_id)
-	{
-		$id = explode("_", $_GET["id"]);
-		if(sizeof($id) == 3)
-		{
-			$user_id = $id[0];
-			$badge_id = $id[1];
-			$hash = $id[2];
-			
-			if($user_id)
-			{		
-				include_once "Services/Badge/classes/class.ilBadgeAssignment.php";
-				$assignment = new ilBadgeAssignment($badge_id, $user_id);
-				if($assignment->getTimestamp())
-				{
-					$obj = new self($assignment);							
-				}
-			}
-			else
-			{
-				include_once "Services/Badge/classes/class.ilBadge.php";
-				$badge = new ilBadge($badge_id);
-				$obj = new self(null, $badge);
-			}
-			if($hash == $obj->getBadgeHash())
-			{
-				return $obj;
-			}		
 		}
 	}
 	
@@ -108,41 +63,6 @@ class ilBadgeRenderer
 		$components[] = $image;
 
 		return $this->renderer->render($components);
-	}
-	
-	public function getHref()
-	{
-		$ilCtrl = $this->ctrl;
-		$tpl = $this->tpl;
-		
-		if(!self::$init)
-		{
-			self::$init = true;
-			
-			$url = $ilCtrl->getLinkTargetByClass("ilBadgeHandlerGUI", 
-				"render", "", true, false);
-			
-			$tpl->addJavaScript("Services/Badge/js/ilBadgeRenderer.js");
-			$tpl->addOnLoadCode('il.BadgeRenderer.init("'.$url.'");');
-		}
-				
-		$hash = $this->getBadgeHash();
-		
-		return "#\" data-id=\"badge_".
-			($this->assignment 
-				? $this->assignment->getUserId()
-				: "")."_".
-			$this->badge->getId()."_".
-			$hash;	
-	}
-	
-	protected function getBadgeHash()
-	{
-		return md5("bdg-".
-			($this->assignment 
-				? $this->assignment->getUserId()
-				: "")."-".
-			$this->badge->getId());
 	}
 	
 	public function renderModalContent()

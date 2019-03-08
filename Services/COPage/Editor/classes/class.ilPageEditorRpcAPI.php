@@ -17,17 +17,9 @@ class ilPageEditorRpcApi implements Evaluator
 	 */
 	public function evaluate($method, $arguments)
 	{
-		global $DIC;
 
-		//$request_content = $DIC->http()->request()->getBody()->getContents();
-		//$request_content = print_r($DIC->http()->request()->getBody()->getContents(), true);
-		//$request_content = "*";
 		if ($method === 'add') {
 			return self::add($arguments);
-		}
-
-		if ($method === 'passthru') {
-			return $request_content."---";
 		}
 
 		throw new MethodException();

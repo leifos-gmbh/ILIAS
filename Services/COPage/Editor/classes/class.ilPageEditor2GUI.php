@@ -39,6 +39,7 @@ class ilPageEditor2GUI
 
 	/**
 	 * Execute command
+	 * @throws ilCtrlException
 	 */
 	function executeCommand()
 	{
@@ -68,9 +69,15 @@ class ilPageEditor2GUI
 	 */
 	protected function showEditScreen()
 	{
+		$ctrl = $this->ctrl;
 		$main_tpl = $this->main_tpl;
 
-		$main_tpl->setContent("Editor");
+		$main_tpl->setContent("<div id='copg-editor-canvas'></div>");
+		$main_tpl->setRightContent("<div id='copg-editor-slate'></div>");
+
+		$main_tpl->addJavaScript("./Services/COPage/Editor/dist/Editor.js");
+		$uri = $ctrl->getLinkTargetByClass(["ilPageEditorRpcAdapterGUI"], "", "", false, false);
+		$main_tpl->addOnLoadCode("il.copg.editor.init('$uri');");
 	}
 
 }

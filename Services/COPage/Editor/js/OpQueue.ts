@@ -1,43 +1,36 @@
-/// <reference path="Operation.ts" />
+import Operation from './Operation';
 
-/// <reference path="../typings/JQueryStatic.d.ts" />
-declare var $: JQueryStatic;
-//$("div").appendChild($(".iltest"));
+// internal interface, not exported
+interface IOpQueue {
+    push(op: Operation, par?: number): void,
+    pop(): Operation
+}
 
-namespace il.Editor {
+/**
+ * Stores operations being done in the editor
+ */
+export default class OpQueue implements IOpQueue {
+    operations: Operation[];
 
-    // internal interface, not exported to the namespace!
-    interface IOpQueue {
-        push(op: Operation, par?: number): void,
-        pop(): Operation
+    constructor() {
     }
 
     /**
-     * Stores operations being done in the editor
+     * Push operation to queue
+     * @param {Operation} op
+     * @param {number} par
      */
-    export class OpQueue implements IOpQueue {
-        operations: Operation[];
+    push(op: Operation, par?: number): void {
+        console.log(par);
+        this.operations.push(op);
+    }
 
-        constructor() {
-        }
-
-        /**
-         * Push operation to queue
-         * @param {Editor.Operation} op
-         * @param {number} par
-         */
-        push(op: Operation, par?: number): void {
-            console.log(par);
-            this.operations.push(op);
-        }
-
-        /**
-         * Pop operation from queue
-         * @returns {Editor.Operation}
-         */
-        pop(): Operation {
-            return this.operations.shift();
-        }
+    /**
+     * Pop operation from queue
+     * @returns {Operation}
+     */
+    pop(): Operation {
+        return this.operations.shift();
     }
 
 }

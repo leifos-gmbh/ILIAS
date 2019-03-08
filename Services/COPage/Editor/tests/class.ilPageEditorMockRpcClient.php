@@ -162,5 +162,5 @@ $mock_client->addQuery(1, 'add', array('a', 'b'));
 $mock_client->send();
 
 $mock_client->addQuery(1, 'add', array(1, 6));
-$mock_client->addQuery(1, 'add', array('a', 'b'));
+$mock_client->addQuery(2, 'add', array('a', 'b'));
 $mock_client->send();

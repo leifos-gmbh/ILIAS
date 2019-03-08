@@ -4,10 +4,12 @@
 /* Copyright (c) 1998-2019 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 /**
- * Adapter for JsonRpc frontend
+ * Adapter for JsonRpc frontend, currently a GUI class
+ * since the requests are routed through the whole ilCtrl
+ * execution path.
  *
  * @author killing@leifos.de
- * @ingroup
+ * @ingroup ServicesCOPage
  */
 class ilPageEditorRpcAdapterGUI
 {

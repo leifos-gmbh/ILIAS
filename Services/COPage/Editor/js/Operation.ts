@@ -1,12 +1,26 @@
-namespace il.Editor {
+import OperationType from './OperationType';
 
-    export class Operation {
-        op: string;
+/**
+ * Examples:
+ *
+ *
+ * DeletePC pcid
+ * MovePC (after) pcid, targetid
+ * CreatePC (after) pctype, targetid, pcmodel
+ * ModifyPC pcid, pctype, pcmodel
+ * ...
+ *
+ */
+export default class Operation {
+    type: OperationType;
+    pcid: string;
+    targetid: string;
+    pcmodel: Object;
 
-        constructor(op: string) {
-            this.op = op;
-        }
+    constructor(type: OperationType, pcid: string, targetid: string, pcmodel: Object) {
+        this.type = type;
+        this.pcid = pcid;
+        this.targetid = targetid;
+        this.pcmodel = pcmodel;
     }
-
-
 }

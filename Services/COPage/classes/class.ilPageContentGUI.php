@@ -673,5 +673,26 @@ class ilPageContentGUI
 		return array();
 	}
 
+	/**
+	 * Get creation form
+	 *
+	 * @return string|null
+	 */
+	public function getCreationForm()
+	{
+		return null;
+	}
+
+	/**
+	 * Get creation form
+	 *
+	 * @return string|null
+	 */
+	public function getEditForm()
+	{
+		return null;
+	}
+
+
 }
 ?>

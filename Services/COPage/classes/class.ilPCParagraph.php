@@ -2195,6 +2195,30 @@ if (!$a_wysiwyg)
 		return array();
 	}
 
+	/**
+	 * Get model
+	 *
+	 * @return stdClass
+	 */
+	public function getModel(): \stdClass
+	{
+		$model = new \stdClass();
+		$model->text = $this->getText();
+		$model->characteristic = $this->getCharacteristic();
+
+		return $model;
+	}
+
+	/**
+	 * Set from model
+	 *
+	 * @param stdClass $model
+	 */
+	public function setFromModel(\stdClass $model)
+	{
+		$this->setText($model->text);
+		$this->setCharacteristic($model->characteristic);
+	}
 
 }
 ?>

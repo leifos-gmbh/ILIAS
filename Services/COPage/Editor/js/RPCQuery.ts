@@ -3,9 +3,9 @@ export default class RPCQuery {
     params: Object;
     id: number;
 
-    constructor(method: string, params: Object) {
+    constructor(method: string, params: Object, id: number) {
         this.method = method;
         this.params = params;
-        this.id = Date.now();
+        this.id = id;
     }
 }

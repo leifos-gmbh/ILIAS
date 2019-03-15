@@ -23,12 +23,24 @@ class ilPageEditorRpcServer
 	protected $json_rpc_request;
 
 	/**
+	 * @var ilPageObjectGUI
+	 */
+	protected $page_gui;
+
+	/**
+	 * @var \ILIAS\DI\UIServices
+	 */
+	protected $ui;
+
+	/**
 	 * Constructor
 	 */
-	public function __construct()
+	public function __construct(ilPageObjectGUI $page_gui, \ILIAS\DI\UIServices $ui)
 	{
 		$this->log = ilLoggerFactory::getLogger("copg");
 		$this->json_rpc_request = "";
+		$this->ui = $ui;
+		$this->page_gui = $page_gui;
 	}
 
 	/**
@@ -52,7 +64,7 @@ class ilPageEditorRpcServer
 	 */
 	public function reply()
 	{
-		$api = new ilPageEditorRpcApi();
+		$api = new ilPageEditorRpcApi($this->page_gui, $this->ui);
 		$server = new Server($api);
 		$reply = $server->reply($this->json_rpc_request);
 		echo $reply, "\n";

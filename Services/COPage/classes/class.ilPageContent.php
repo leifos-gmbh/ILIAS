@@ -510,5 +510,25 @@ abstract class ilPageContent
 	{
 	}
 
+	/**
+	 * Get model
+	 *
+	 * @return stdClass
+	 */
+	public function getModel()
+	{
+		return new \stdClass();
+	}
+
+	/**
+	 * Set from model
+	 *
+	 * @param stdClass $model
+	 */
+	public function setFromModel(\stdClass $model)
+	{
+
+	}
+
 }
 ?>

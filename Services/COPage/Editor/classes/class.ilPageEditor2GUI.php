@@ -21,6 +21,10 @@ class ilPageEditor2GUI
 	 */
 	protected $main_tpl;
 
+	/**
+	 * @var \ILIAS\DI\UIServices
+	 */
+	protected $ui;
 
 	/**
 	 * @var ilCtrl
@@ -30,11 +34,13 @@ class ilPageEditor2GUI
 	/**
 	 * Constructor
 	 */
-	public function __construct(ilPageObjectGUI $a_page_gui, ilCtrl $ctrl, ilTemplate $main_tpl)
+	public function __construct(ilPageObjectGUI $a_page_gui, ilCtrl $ctrl, ilTemplate $main_tpl,
+								\ILIAS\DI\UIServices $ui)
 	{
 		$this->page_gui = $a_page_gui;
 		$this->ctrl = $ctrl;
 		$this->main_tpl = $main_tpl;
+		$this->ui = $ui;
 	}
 
 	/**
@@ -51,7 +57,7 @@ class ilPageEditor2GUI
 		switch ($next_class)
 		{
 			case "ilpageeditorrpcadaptergui":
-				$rpc_gui = new ilPageEditorRpcAdapterGUI();
+				$rpc_gui = new ilPageEditorRpcAdapterGUI($this->page_gui, $ctrl, $this->ui);
 				$ctrl->forwardCommand($rpc_gui);
 				break;
 

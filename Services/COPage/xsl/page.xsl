@@ -86,6 +86,7 @@
 <xsl:param name="current_ts"/>
 <xsl:param name="enable_html_mob"/>
 <xsl:param name="page_perma_link"/>
+<xsl:param name="edit2"/>
 
 <xsl:template match="PageObject">
 	<xsl:if test="$mode != 'edit'">
@@ -296,7 +297,7 @@
 <!-- PageContent -->
 <xsl:template match="PageContent">
 	<xsl:apply-templates select="Anchor"/>
-	<xsl:if test="$mode = 'edit'">
+	<xsl:if test="$mode = 'edit' or $edit2 = 'y'">
 		<xsl:variable name="content_type" select="name(./*[1])"/>
 		<div>
 			<xsl:if test="(./MediaObject/MediaAliasItem[@Purpose = 'Standard']/Layout/@HorizontalAlign = 'RightFloat') or
@@ -310,7 +311,7 @@
 				<xsl:attribute name="style"><!--<xsl:if test="./Table/@Width">width:<xsl:value-of select="./Table/@Width"/>;</xsl:if>--> float:left; clear:both; background-color:#FFFFFF;</xsl:attribute>
 			</xsl:if>
 			<div>
-				<xsl:if test="not(../../../@DataTable) or (../../../@DataTable = 'n')">
+				<xsl:if test="(not(../../../@DataTable) or (../../../@DataTable = 'n'))">
 					<xsl:if test="$javascript='enable'">
 						<xsl:attribute name="class">il_editarea</xsl:attribute>
 					</xsl:if>
@@ -320,7 +321,7 @@
 					<xsl:if test="@Enabled='False'">
 						<xsl:attribute name="class">il_editarea_disabled</xsl:attribute>
 					</xsl:if>
-					<xsl:if test="$javascript = 'enable'">
+					<xsl:if test="$javascript = 'enable' and ($edit2 != 'y')">
 						<xsl:attribute name="onMouseOver">doMouseOver(this.id, 'il_editarea_active', '<xsl:value-of select="$content_type"/>','<xsl:value-of select="./*[1]/@Characteristic"/>');</xsl:attribute>
 						<xsl:attribute name="onMouseOut">doMouseOut(this.id, 'il_editarea', '<xsl:value-of select="$content_type"/>','<xsl:value-of select="./*[1]/@Characteristic"/>');</xsl:attribute>
 						<xsl:attribute name="onMouseDown">doMouseDown(this.id);</xsl:attribute>
@@ -337,7 +338,7 @@
 			</div>
 			
 			<!-- drop area -->
-			<xsl:if test="(not(../../../@DataTable) or (../../../@DataTable = 'n')) and ($javascript != 'disable')">
+			<xsl:if test="(not(../../../@DataTable) or (../../../@DataTable = 'n')) and ($javascript != 'disable') and ($edit2 != 'y')">
 				<div class="il_droparea">
 					<xsl:attribute name="onMouseOver">doMouseOver(this.id, '', null, null);</xsl:attribute>
 					<xsl:attribute name="onMouseOut">doMouseOut(this.id, '', null, null);</xsl:attribute>
@@ -347,7 +348,7 @@
 			</xsl:if>
 	
 			<!-- insert menu for drop area -->
-			<xsl:if test="$mode = 'edit'">
+			<xsl:if test="$mode = 'edit' and ($edit2 != 'y')">
 				<xsl:if test="$javascript='enable'">
 					<xsl:call-template name="EditMenu">
 						<xsl:with-param name="hier_id" select="@HierId" />
@@ -358,7 +359,7 @@
 		
 		</div>
 	</xsl:if>
-	<xsl:if test="$mode != 'edit' and (not(@Enabled) or @Enabled='True')">
+	<xsl:if test="$mode != 'edit' and (not(@Enabled) or @Enabled='True') and $edit2 = 'n'">
 		<xsl:if test="//PageObject/DivClass/@HierId = current()/@HierId">
 			<div>
 				<xsl:attribute name="class"><xsl:value-of select="//PageObject/DivClass[@HierId = current()/@HierId]/@Class" /></xsl:attribute>

@@ -11,7 +11,8 @@ enum OperationType
     PageModel = 'page/model',
     UIButtons = 'ui/buttons',
     UIForms = 'ui/forms',
-    UIDropdowns = 'ui/dropdowns'
+    UIDropdowns = 'ui/dropdowns',
+    UIAll = 'ui/all'
 }
 
 export default OperationType;

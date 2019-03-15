@@ -1,10 +1,10 @@
 "use strict";
 exports.__esModule = true;
 var RPCQuery = /** @class */ (function () {
-    function RPCQuery(method, params) {
+    function RPCQuery(method, params, id) {
         this.method = method;
         this.params = params;
-        this.id = Date.now();
+        this.id = id;
     }
     return RPCQuery;
 }());

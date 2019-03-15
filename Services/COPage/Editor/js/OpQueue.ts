@@ -13,6 +13,7 @@ export default class OpQueue implements IOpQueue {
     operations: Operation[];
 
     constructor() {
+        this.operations = [];
     }
 
     /**
@@ -21,7 +22,8 @@ export default class OpQueue implements IOpQueue {
      * @param {number} par
      */
     push(op: Operation, par?: number): void {
-        console.log(par);
+        console.log("OpQueue push called.");
+        console.log(op);
         this.operations.push(op);
     }
 

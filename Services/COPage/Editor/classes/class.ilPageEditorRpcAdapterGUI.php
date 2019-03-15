@@ -14,13 +14,28 @@
 class ilPageEditorRpcAdapterGUI
 {
 	/**
+	 * @var ilPageObjectGUI
+	 */
+	protected $page_gui;
+
+	/**
+	 * @var \ILIAS\DI\UIServices
+	 */
+	protected $ui;
+
+	/**
+	 * @var ilCtrl
+	 */
+	protected $ctrl;
+
+	/**
 	 * Constructor
 	 */
-	public function __construct()
+	public function __construct(ilPageObjectGUI $page_gui, ilCtrl $ctrl, \ILIAS\DI\UIServices $ui)
 	{
-		global $DIC;
-
-		$this->ctrl = $DIC->ctrl();
+		$this->ctrl = $ctrl;
+		$this->ui = $ui;
+		$this->page_gui = $page_gui;
 	}
 
 	/**
@@ -48,7 +63,7 @@ class ilPageEditorRpcAdapterGUI
 	 */
 	protected function invokeRpcServer()
 	{
-		$server = new ilPageEditorRpcServer();
+		$server = new ilPageEditorRpcServer($this->page_gui, $this->ui);
 		$server->getRequest();
 		$server->reply();
 	}

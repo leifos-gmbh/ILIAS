@@ -896,6 +896,39 @@ class ilPCParagraphGUI extends ilPageContentGUI
 		$a_tpl->setCurrentBlock("help");
 		$a_tpl->parseCurrentBlock();
 	}
-	
+
+
+	/**
+	 * Get creation form
+	 *
+	 * @return string|null
+	 */
+	public function getCreationForm()
+	{
+		return $this->getEditForm();
+	}
+
+	/**
+	 * Get creation form
+	 *
+	 * @return string|null
+	 */
+	public function getEditForm()
+	{
+		$lng = $this->lng;
+		$form = new ilPropertyFormGUI();
+
+		// characteristic
+		$si = new ilSelectInputGUI($lng->txt("cont_characteristic"), "characteristic");
+		$si->setOptions($this->getCharacteristics());
+		$si->setInfo($lng->txt(""));
+		$form->addItem($si);
+
+		//	text
+		$ti = new ilTextareaInputGUI($lng->txt(""), "text");
+		$form->addItem($ti);
+
+		return $form->getHTML();
+	}
 }
 ?>

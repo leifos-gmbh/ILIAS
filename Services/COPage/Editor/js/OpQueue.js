@@ -5,6 +5,7 @@ exports.__esModule = true;
  */
 var OpQueue = /** @class */ (function () {
     function OpQueue() {
+        this.operations = [];
     }
     /**
      * Push operation to queue
@@ -12,7 +13,8 @@ var OpQueue = /** @class */ (function () {
      * @param {number} par
      */
     OpQueue.prototype.push = function (op, par) {
-        console.log(par);
+        console.log("OpQueue push called.");
+        console.log(op);
         this.operations.push(op);
     };
     /**

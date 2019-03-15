@@ -14,6 +14,7 @@ var OperationType;
     OperationType["UIButtons"] = "ui/buttons";
     OperationType["UIForms"] = "ui/forms";
     OperationType["UIDropdowns"] = "ui/dropdowns";
+    OperationType["UIAll"] = "ui/all";
 })(OperationType || (OperationType = {}));
 exports["default"] = OperationType;
 //# sourceMappingURL=OperationType.js.map

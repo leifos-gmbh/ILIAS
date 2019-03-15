@@ -2,7 +2,7 @@
 var path = require('path');
 
 module.exports = {
-	mode: 'production',
+	mode: 'development',
 	entry: "./js/Editor.ts",
 	output: {
 		filename: "Editor.js",

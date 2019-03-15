@@ -4076,7 +4076,7 @@ abstract class ilPageObject
 	 * @param
 	 * @return
 	 */
-	function getAllPCIds()
+	function getAllPCIds($a_include_hier_ids = false)
 	{
 		$this->builddom();
 		$mydom = $this->dom;
@@ -4097,7 +4097,10 @@ abstract class ilPageObject
 		for ($i = 0; $i < count ($res->nodeset); $i++)
 		{
 			$node = $res->nodeset[$i];
-			$pcids[] = $node->get_attribute("PCID");
+			$hier_id = ($a_include_hier_ids)
+				? $node->get_attribute("HierId").":"
+				: "";
+			$pcids[] = $hier_id.$node->get_attribute("PCID");
 		}
 		return $pcids;
 	}

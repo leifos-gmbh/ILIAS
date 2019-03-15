@@ -106,6 +106,8 @@ class ilPageObjectGUI
 	private $abstract_only = false;
 	protected $parent_type = "";
 
+	protected $edit2 = false;
+
 
 	//var $pl_start = "&#123;&#123;&#123;&#123;&#123;";
 	//var $pl_end = "&#125;&#125;&#125;&#125;&#125;";
@@ -204,6 +206,27 @@ class ilPageObjectGUI
 			$this->getLanguage());
 		$this->setPageObject($page);
 	}
+	
+	/**
+	 * Set editor v 2
+	 *
+	 * @param bool $a_val edit v2 mode	
+	 */
+	function setEdit2($a_val)
+	{
+		$this->edit2 = $a_val;
+	}
+	
+	/**
+	 * Get editor v 2
+	 *
+	 * @return bool edit v2 mode
+	 */
+	function getEdit2()
+	{
+		return $this->edit2;
+	}
+	
 	
 	/**
 	 * Set parent type
@@ -1049,7 +1072,8 @@ return;
 					$this->ctrl->redirect($this, "preview");
 				}
 				$page_editor = new ilPageEditor2GUI($this,
-					$this->ctrl, $this->tpl);
+					$this->ctrl, $this->tpl, $this->ui);
+				$this->tabs_gui->activateTab("cont_edit_new");
 				$ret = $this->ctrl->forwardCommand($page_editor);
 				break;
 
@@ -1785,7 +1809,8 @@ return;
 						 'current_ts' => $current_ts,
 			 			 'enable_html_mob' =>  ilObjMediaObject::isTypeAllowed("html") ? "y" : "n",
 						 'flv_video_player' => $flv_video_player,
-					     'page_perma_link' => $this->getPagePermaLink()
+					     'page_perma_link' => $this->getPagePermaLink(),
+						 'edit2' => $this->getEdit2() ? "y" : "n"
 						);
 		if($this->link_frame != "")		// todo other link types
 			$params["pg_frame"] = $this->link_frame;
@@ -3269,8 +3294,8 @@ return;
 				$this->tabs_gui->addTarget("edit", $this->ctrl->getLinkTarget($this, "edit")
 					, array("", "edit"));
 
-				$this->tabs_gui->addTarget("edit", $this->ctrl->getLinkTargetByClass("ilpageeditor2gui", "")
-					, array("ilpageeditor2gui", ""));
+				$this->tabs_gui->addTarget("cont_edit_new", $this->ctrl->getLinkTargetByClass("ilpageeditor2gui", "")
+					, "", "ilpageeditor2gui");
 			}
 		}
 		else

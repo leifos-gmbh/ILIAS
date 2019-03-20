@@ -6376,6 +6376,9 @@ class ilObjSurvey extends ilObject
 	
 	public function checkReminder()
 	{
+		$log = ilLoggerFactory::getLogger("svy");
+		$log->debug("Checking for ref id: ".$this->getRefId());
+
 		$ilDB = $this->db;
 		$ilAccess = $this->access;
 		
@@ -6392,6 +6395,7 @@ class ilObjSurvey extends ilObject
 			($this->getStartDate() && $now_with_format < $this->getStartDate()) ||
 			($this->getEndDate() && $now_with_format > $this->getEndDate()))
 		{
+			$log->debug("...no reminder! (1)");
 			return false;
 		}
 						
@@ -6409,6 +6413,7 @@ class ilObjSurvey extends ilObject
 		if($today < $start ||
 			($end && $today > $end))
 		{
+			$log->debug("...no reminder! (2)");
 			return false;
 		}
 
@@ -6421,10 +6426,11 @@ class ilObjSurvey extends ilObject
 			($now < $item_data["timing_start"] ||
 			$now > $item_data["timing_end"]))
 		{
+			$log->debug("...no reminder! (3)");
 			return false;
 		}
 
-		$this->log->debug("Check frequency.");
+		$log->debug("Check frequency.");
 
 		// check frequency
 		$cut = new ilDate($today, IL_CAL_DATE);
@@ -6436,7 +6442,7 @@ class ilObjSurvey extends ilObject
 
 			if (!$this->get360Mode())
 			{
-				$this->log->debug("Entering survey mode.");
+				$log->debug("Entering survey mode.");
 
 				// #16871
 				$user_ids = $this->getNotificationTargetUserIds(($this->getReminderTarget() == self::NOTIFICATION_INVITED_USERS));
@@ -6474,7 +6480,7 @@ class ilObjSurvey extends ilObject
 			}
 			else
 			{
-				$this->log->debug("Entering 360 mode.");
+				$log->debug("Entering 360 mode.");
 
 				$this->sent360Reminders();
 			}
@@ -6484,6 +6490,10 @@ class ilObjSurvey extends ilObject
 			$this->saveToDb();
 
 			return sizeof($missing_ids);
+		}
+		else
+		{
+			$log->debug("...no reminder! (4)");
 		}
 		
 		return false;

@@ -312,10 +312,10 @@
 			</xsl:if>
 			<div>
 				<xsl:if test="(not(../../../@DataTable) or (../../../@DataTable = 'n'))">
-					<xsl:if test="$javascript='enable'">
+					<xsl:if test="$javascript='enable' or $edit2 = 'y'">
 						<xsl:attribute name="class">il_editarea</xsl:attribute>
 					</xsl:if>
-					<xsl:if test="$javascript!='enable'">
+					<xsl:if test="$javascript!='enable' and $edit2 = 'n'">
 						<xsl:attribute name="class">il_editarea_nojs</xsl:attribute>
 					</xsl:if>
 					<xsl:if test="@Enabled='False'">

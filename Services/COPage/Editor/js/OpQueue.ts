@@ -22,8 +22,6 @@ export default class OpQueue implements IOpQueue {
      * @param {number} par
      */
     push(op: Operation, par?: number): void {
-        console.log("OpQueue push called.");
-        console.log(op);
         this.operations.push(op);
     }
 

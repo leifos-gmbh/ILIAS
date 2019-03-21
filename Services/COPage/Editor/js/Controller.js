@@ -76,6 +76,9 @@ var Controller = /** @class */ (function () {
         console.log(type);
         console.log(result);
         switch (type) {
+            case OperationType_1["default"].PageModel:
+                this.handlePageModel(result);
+                break;
             case OperationType_1["default"].PageHtml:
                 this.handlePageHTML(result);
                 break;
@@ -90,6 +93,13 @@ var Controller = /** @class */ (function () {
      */
     Controller.prototype.handlePageHTML = function (result) {
         this.ui.setPageHtml(result);
+    };
+    /**
+     *
+     * @param result
+     */
+    Controller.prototype.handlePageModel = function (result) {
+        this.ui.setPageModel(result);
     };
     /**
      *

@@ -9,7 +9,10 @@ module.exports = {
 		path: path.resolve(__dirname, 'dist')
 	},
 	resolve: {
-		extensions: [".webpack.js", ".web.js", ".ts", ".js"]
+		extensions: [".webpack.js", ".web.js", ".ts", ".js"],
+		alias: {
+			node_modules: __dirname + '/node_modules'
+		}
 	},
 	module: {
 		rules: [{ test: /\.ts$/, loader: "ts-loader" }]

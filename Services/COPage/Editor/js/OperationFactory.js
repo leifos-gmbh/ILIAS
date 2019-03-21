@@ -13,7 +13,7 @@ var OperationFactory = /** @class */ (function () {
      * @param {OperationType} type
      * @param {string} pcid
      * @param {string} targetid
-     * @param {Object} pcmodel
+     * @param {object} pcmodel
      * @returns {Operation}
      */
     OperationFactory.prototype.operation = function (type, pcid, targetid, pcmodel) {
@@ -23,7 +23,7 @@ var OperationFactory = /** @class */ (function () {
      *
      * @param {OperationType} type
      * @param {boolean} is_error
-     * @param {Object} result
+     * @param {object} result
      * @returns {OperationResponse}
      */
     OperationFactory.prototype.operationResponse = function (type, is_error, result) {

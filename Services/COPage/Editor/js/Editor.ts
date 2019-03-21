@@ -5,6 +5,7 @@ import OpQueue from "./OpQueue";
 import OperationRpcGateway from "./OperationRpcGateway";
 import RPCFactory from "./RPCFactory";
 import UI from "./UI";
+import PageContentFactory from "./PageContent/PageContentFactory";
 
 /// <reference path="../typings/JQueryStatic.d.ts" />
 declare var $: JQueryStatic;
@@ -23,6 +24,7 @@ il.copg = il.copg || {};
             let op_rpc_gateway: OperationRpcGateway;
             let rpc_factory: RPCFactory;
             let ui: UI;
+            let pc_factory: PageContentFactory;
 
             function init(endpoint: string) {
 
@@ -36,7 +38,8 @@ il.copg = il.copg || {};
                 op_rpc_gateway = new OperationRpcGateway(rpcclient, rpc_factory, op_factory);
 
                 // editor ui
-                ui = new UI(jquery);
+                pc_factory = new PageContentFactory();
+                ui = new UI(jquery, pc_factory);
 
                 // main controller
                 controller = new Controller(op_rpc_gateway, op_factory, op_queue, ui);

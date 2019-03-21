@@ -13,8 +13,6 @@ var OpQueue = /** @class */ (function () {
      * @param {number} par
      */
     OpQueue.prototype.push = function (op, par) {
-        console.log("OpQueue push called.");
-        console.log(op);
         this.operations.push(op);
     };
     /**

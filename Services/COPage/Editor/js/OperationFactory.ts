@@ -15,10 +15,10 @@ export default class OperationFactory {
      * @param {OperationType} type
      * @param {string} pcid
      * @param {string} targetid
-     * @param {Object} pcmodel
+     * @param {object} pcmodel
      * @returns {Operation}
      */
-    operation(type: OperationType, pcid: string, targetid: string, pcmodel: Object): Operation {
+    operation(type: OperationType, pcid: string, targetid: string, pcmodel: object): Operation {
         return new Operation(type, pcid, targetid, pcmodel);
     }
 
@@ -26,10 +26,10 @@ export default class OperationFactory {
      *
      * @param {OperationType} type
      * @param {boolean} is_error
-     * @param {Object} result
+     * @param {object} result
      * @returns {OperationResponse}
      */
-    operationResponse(type: OperationType, is_error: boolean, result: Object): OperationResponse {
+    operationResponse(type: OperationType, is_error: boolean, result: object): OperationResponse {
         return new OperationResponse(type, is_error, result);
     }
 }

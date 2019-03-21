@@ -50,7 +50,6 @@ var RpcClient = /** @class */ (function () {
                     responses = [];
                     if (Array.isArray(r)) {
                         for (i = 0; i < r.length; ++i) {
-                            console.log(r[i]);
                             if (query = query_map.get(r[i].id)) {
                                 responses.push(rpc_factory.response(query, false, r[i].result));
                             }
@@ -62,23 +61,6 @@ var RpcClient = /** @class */ (function () {
                     reject(err);
                 }
             });
-            /* this.jquery.ajax({
-                url: this.endpoint,
-                data: JSON.stringify ({
-                    jsonrpc: '2.0',
-                    method: method,
-                    params: params,
-                    id: Date.now()
-                }),
-                type: "POST",
-                dataType: "json",
-                success: function(r) {
-                    resolve(r);
-                },
-                error: function (err) {
-                    reject(err);
-                }
-            });*/
         });
     };
     return RpcClient;

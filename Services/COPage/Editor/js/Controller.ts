@@ -101,6 +101,10 @@ export default class Controller {
         console.log(result);
         switch (type)
         {
+            case OperationType.PageModel:
+                this.handlePageModel(result);
+                break;
+
             case OperationType.PageHtml:
                 this.handlePageHTML(result);
                 break;
@@ -117,6 +121,14 @@ export default class Controller {
      */
     handlePageHTML(result) {
         this.ui.setPageHtml(result);
+    }
+
+    /**
+     *
+     * @param result
+     */
+    handlePageModel(result) {
+        this.ui.setPageModel(result);
     }
 
     /**

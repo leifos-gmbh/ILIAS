@@ -14,6 +14,7 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+common#:#msg_wrong_filetypes#:#Allowed Files-Types:
 common#:#obj_ltis#:#LTI
 common#:#obj_ltis_desc#:#Learning Tools Interoperability
 common#:#lti_outcome#:#LTI Learning Progress Notification
@@ -3289,6 +3290,7 @@ rbac#:#sahs_write#:#User can edit content and settings of SCORM learning module
 common#:#sahs#:#Learning Module SCORM
 common#:#salutation_f#:#Ms./Mrs.
 common#:#salutation_m#:#Mr.
+common#:#salutation_n#:#Not Applicable
 common#:#salutation#:#Salutation
 common#:#save_and_back#:#Save And Back
 common#:#save_message#:#Save as Draft
@@ -4423,7 +4425,8 @@ crs#:#crs_grouping_deleted#:#Deleted course grouping.
 crs#:#crs_grouping_select_one#:#Please select a course grouping.
 crs#:#crs_groupings#:#Course groupings
 crs#:#crs_grp_added_grouping#:#Added new membership limitation.
-crs#:#crs_grp_already_assigned#:#You are already member of this course grouping.
+crs#:#crs_grp_already_assigned#:#You are already member of this grouping of courses.
+crs#:#grp_grp_already_assigned#:#You are already member of this grouping of groups.
 crs#:#crs_grp_assign_crs#:#Assign course
 crs#:#crs_grp_enter_title#:#Please enter a title.
 crs#:#crs_grp_info_reg#:#You can only register to one of this courses:
@@ -5179,6 +5182,7 @@ forum#:#frm_default_view#:#Default View
 forum#:#frm_detach_moderator_role#:#Detach Moderator Role
 forum#:#frm_moderator_f#:#Moderator
 forum#:#frm_moderator_m#:#Moderator
+forum#:#frm_moderator_n#:#Moderation
 forum#:#frm_moderator_role_added_successfully#:#The user was added as moderator successfully.
 forum#:#frm_moderators_detached_role_successfully#:#The moderator role was detached for all selected users successfully.
 forum#:#frm_moderators_not_exist_yet#:#Please choose a moderator.
@@ -5618,7 +5622,7 @@ mail#:#mail_select_group#:#Please select at least one group.
 mail#:#mail_select_one_entry#:#You must select one entry
 mail#:#mail_select_one_file#:#You must select one file
 mail#:#mail_settings_incoming_type_see_also#:#You can find a further possibility to modify the incoming type of e-mails for users <a href="%s">here</a>.
-mail#:#mail_subject_prefix_info#:#Enter a text, which will be prepended to the subject line of outgoing auto generated e-mails.
+mail#:#mail_subject_prefix_info#:#Enter a text, which will be prepended to the subject line of outgoing auto generated e-mails. It is recommended the usage of a prefix for supporting message filtering by users.
 mail#:#mail_subject_prefix#:#Mail Subject
 mail#:#mail_sure_delete_entry#:#Are you sure you want to delete the following entries?
 mail#:#mail_sure_delete_file#:#Are you sure you want to delete the selected files?
@@ -8137,6 +8141,7 @@ administration#:#language_remove_local_file#:#Delete the custom language file
 rbac#:#export_member_data#:#Access User Data
 rbac#:#rbac_change_existing_objects_desc_new_role#:#The permission settings of this role will be adopted to ALL existing objects.
 forum#:#frm_edit_title#:#Edit Title
+common#:#webdav_additional_information#:#To be sure, that Windows Explorer can add a WebDAV connection, read the installation instruction file <a href="%s" target="_blank">install.md</a> chapter: "WebDAV Configuration (OPTIONAL)"
 common#:#webdav_pwd_instruction#:#We suggest to create a local password for opening the repository as webfolder.<br />This password is only required for the webfolder functionality.
 common#:#webdav_pwd_instruction_success#:#A new local password has been created. You can now open the repository as webfolder.
 administration#:#language_merged_global#:#The local changes were merged into the standard language file.
@@ -9779,6 +9784,7 @@ survey#:#svy_neutral_answer#:#Text for a Neutral Answer (‘Not Specified’, �
 dcl#:#dcl_activate_notification#:#Enable Notification
 dcl#:#dcl_table_id#:#Table ID
 dcl#:#dcl_add_new_record#:#Add New Entry
+dcl#:#dcl_list_visibility_and_filter#:#Visibility and filter
 dcl#:#dcl_list_fields#:#Fields
 dcl#:#dcl_add_new_field#:#Add New Field
 dcl#:#dcl_add_new_table#:#Add New Table

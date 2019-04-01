@@ -483,7 +483,7 @@ class ilWikiStat
 		
 		// wiki: del_pages+1, num_pages (count), avg_rating
 		$rating = self::getAverageRating($a_page_obj->getWikiId());		
-		self::writeStat($a_page_obj->getWikiId(), 
+		self::writeStat((int) $a_page_obj->getWikiId(),
 			array(
 				"del_pages" => array("increment", 1),
 				"num_pages" => array("integer", self::countPages($a_page_obj->getWikiId())),

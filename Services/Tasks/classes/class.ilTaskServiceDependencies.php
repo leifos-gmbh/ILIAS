@@ -31,18 +31,34 @@ class ilTaskServiceDependencies
 	protected $access;
 
 	/**
+	 * @var ilDerivedTaskProviderMasterFactory
+	 */
+	protected $derived_task_provider_master_factory;
+
+	/**
 	 * Constructor
 	 * @param ilObjUser $user
 	 * @param ilLanguage $lng
 	 * @param \ILIAS\DI\UIServices $ui
 	 */
 	public function __construct(ilObjUser $user, ilLanguage $lng, \ILIAS\DI\UIServices $ui,
-								\ilAccessHandler $access)
+								\ilAccessHandler $access, \ilDerivedTaskProviderMasterFactory $derived_task_provider_master_factory)
 	{
 		$this->lng = $lng;
 		$this->ui = $ui;
 		$this->user = $user;
 		$this->access = $access;
+		$this->derived_task_provider_master_factory = $derived_task_provider_master_factory;
+	}
+
+	/**
+	 * Get derived task provider master factory
+	 *
+	 * @return ilDerivedTaskProviderMasterFactory
+	 */
+	public function getDerivedTaskProviderMasterFactory(): \ilDerivedTaskProviderMasterFactory
+	{
+		return $this->derived_task_provider_master_factory;
 	}
 
 	/**

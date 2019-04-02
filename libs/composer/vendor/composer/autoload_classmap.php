@@ -6021,6 +6021,7 @@ return array(
     'ilPDStudyProgrammeSimpleListGUI' => $baseDir . '/../../Modules/StudyProgramme/classes/class.ilPDStudyProgrammeSimpleListGUI.php',
     'ilPDSysMessageBlockGUI' => $baseDir . '/../../Services/Mail/classes/class.ilPDSysMessageBlockGUI.php',
     'ilPDTaggingBlockGUI' => $baseDir . '/../../Services/Tagging/classes/class.ilPDTaggingBlockGUI.php',
+    'ilPDTasksBlockGUI' => $baseDir . '/../../Services/Tasks/classes/class.ilPDTasksBlockGUI.php',
     'ilPHPOutputDelivery' => $baseDir . '/../../Services/FileDelivery/classes/class.ilPHPOutputDelivery.php',
     'ilPageComponentPlugin' => $baseDir . '/../../Services/COPage/classes/class.ilPageComponentPlugin.php',
     'ilPageComponentPluginExporter' => $baseDir . '/../../Services/COPage/classes/class.ilPageComponentPluginExporter.php',

@@ -6334,6 +6334,7 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
         'ilPDStudyProgrammeSimpleListGUI' => __DIR__ . '/../..' . '/../../Modules/StudyProgramme/classes/class.ilPDStudyProgrammeSimpleListGUI.php',
         'ilPDSysMessageBlockGUI' => __DIR__ . '/../..' . '/../../Services/Mail/classes/class.ilPDSysMessageBlockGUI.php',
         'ilPDTaggingBlockGUI' => __DIR__ . '/../..' . '/../../Services/Tagging/classes/class.ilPDTaggingBlockGUI.php',
+        'ilPDTasksBlockGUI' => __DIR__ . '/../..' . '/../../Services/Tasks/classes/class.ilPDTasksBlockGUI.php',
         'ilPHPOutputDelivery' => __DIR__ . '/../..' . '/../../Services/FileDelivery/classes/class.ilPHPOutputDelivery.php',
         'ilPageComponentPlugin' => __DIR__ . '/../..' . '/../../Services/COPage/classes/class.ilPageComponentPlugin.php',
         'ilPageComponentPluginExporter' => __DIR__ . '/../..' . '/../../Services/COPage/classes/class.ilPageComponentPluginExporter.php',

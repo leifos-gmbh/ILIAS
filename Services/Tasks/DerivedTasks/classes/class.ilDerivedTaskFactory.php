@@ -25,9 +25,9 @@ class ilDerivedTaskFactory
 	 * @param ilTaskService $service
 	 * @param ilTaskServiceDependencies $_deps
 	 */
-	public function __construct(ilTaskService $service, ilTaskServiceDependencies $_deps)
+	public function __construct(ilTaskService $service)
 	{
-		$this->_deps = $_deps;
+		$this->_deps = $service->getDependencies();
 		$this->service = $service;
 	}
 
@@ -65,7 +65,7 @@ class ilDerivedTaskFactory
 	 */
 	public function getAllProviders($active_only = false, $user_id = null)
 	{
-		$master_factory = new ilDerivedTaskProviderMasterFactory($this->service, $this->_deps);
+		$master_factory = $this->service->getDependencies()->getDerivedTaskProviderMasterFactory();
 		return $master_factory->getAllProviders($active_only, $user_id);
 	}
 }

@@ -22,12 +22,12 @@ class ilDerivedTaskService
 
 	/**
 	 * Constructor
+	 *
 	 * @param ilTaskService $service
-	 * @param ilTaskServiceDependencies $_deps
 	 */
-	public function __construct(ilTaskService $service, ilTaskServiceDependencies $_deps)
+	public function __construct(ilTaskService $service)
 	{
-		$this->_deps = $_deps;
+		$this->_deps = $service->getDependencies();
 		$this->service = $service;
 	}
 
@@ -38,7 +38,7 @@ class ilDerivedTaskService
 	 */
 	public function factory(): ilDerivedTaskFactory
 	{
-		return new ilDerivedTaskFactory($this->service, $this->_deps);
+		return new ilDerivedTaskFactory($this->service);
 	}
 
 

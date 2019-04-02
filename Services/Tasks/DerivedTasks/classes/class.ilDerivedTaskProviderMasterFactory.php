@@ -16,11 +16,6 @@ class ilDerivedTaskProviderMasterFactory
 	protected $service;
 
 	/**
-	 * @var ilTaskServiceDependencies
-	 */
-	protected $_deps;
-
-	/**
 	 * @var array
 	 */
 	protected static $provider_factories = array(
@@ -30,10 +25,9 @@ class ilDerivedTaskProviderMasterFactory
 	/**
 	 * Constructor
 	 */
-	public function __construct(ilTaskService $service, ilTaskServiceDependencies $deps)
+	public function __construct(ilTaskService $service)
 	{
 		$this->service = $service;
-		$this->_deps = $deps;
 	}
 
 	/**
@@ -48,7 +42,7 @@ class ilDerivedTaskProviderMasterFactory
 		$providers = array();
 
 		if ($user_id == 0) {
-			$user_id = $this->_deps->user()->getId();
+			$user_id = $this->service->getDependencies()->user()->getId();
 		}
 
 		foreach (self::$provider_factories as $provider_factory_class) {

@@ -1,4 +1,4 @@
-The document contains to parts
+
 
 * [API](#api)
 * [General Documentation](#general-documentation)
@@ -8,14 +8,14 @@ The document contains to parts
 
 ##Repository Objects as Assignments
 
-#Step 1
+####Step 1 [WIP]
 
 - Provide an implementation of `ilExAssignmentTypeInterface` under Exercise/AssignmentTypes/classes (this should be decentralized in the future)
 - Provide an implenetation of ilExAssignmentTypeGUIInterface under Exercise/AssignmentTypes/GUI/classes
 
 In both cases you need to add your classes to the factory methods in `ilExAssignmentTypes` and `ilExAssignmentTypesGUI`.
 
-#Step 2 [WIP]
+####Step 2 [WIP]
 
 In your repository object use...
 

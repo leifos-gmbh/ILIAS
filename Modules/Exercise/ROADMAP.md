@@ -4,11 +4,18 @@ Note: Some of the rules listed in this roadmap may be superseded by general ILIA
 
 ## Short Term
 
+### Web Directory Access for Portfolios and Blogs
+
+- Assignment Types will get a supportsWebDirAccess()
+- 
+
 ## Mid Term
 
 ### Directory structure
 
 Subdirectories for domain concepts SHOULD be located directly under the `Exercise` main directory. The main `classes` subdirectory SHOULD only contain code has to be located in this directory due to rules of other components (e.g. the Object service).
+
+### Introduce stronger Tutor Contept
 
 ### Introduce Repository Pattern
 

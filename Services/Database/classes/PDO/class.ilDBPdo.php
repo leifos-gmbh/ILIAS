@@ -782,6 +782,7 @@ abstract class ilDBPdo implements ilDBInterface, ilDBPdoInterface {
 			return 'NULL';
 		}
 
+		$pdo_type = PDO::PARAM_STR;
 		switch ($type) {
 			case ilDBConstants::T_TIMESTAMP:
 			case ilDBConstants::T_DATETIME:
@@ -2054,9 +2055,12 @@ abstract class ilDBPdo implements ilDBInterface, ilDBPdoInterface {
 	public function sanitizeMB4StringIfNotSupported($query)
 	{
 		if (!$this->doesCollationSupportMB4Strings()) {
-			$query = preg_replace(
+			$query_replaced = preg_replace(
 				'/[\x{10000}-\x{10FFFF}]/u', ilDBConstants::MB4_REPLACEMENT, $query
 			);
+			if (!empty($query_replaced)) {
+				return $query_replaced;
+			}
 		}
 
 		return $query;

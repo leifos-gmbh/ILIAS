@@ -2103,8 +2103,9 @@ class ilObjCourseGUI extends ilContainerGUI
 				$this->ctrl->getLinkTarget($this, "edit"),
 				array("edit", "editMapSettings", "editCourseIcons", "listStructure"), "", "", $force_active);
 		}
-		
-		
+
+
+		include_once './Modules/Course/classes/class.ilCourseParticipants.php';
 		$is_participant = ilCourseParticipants::_isParticipant($this->ref_id, $ilUser->getId());
 		include_once './Services/Mail/classes/class.ilMail.php';
 		$mail = new ilMail($GLOBALS['ilUser']->getId());
@@ -2552,6 +2553,7 @@ class ilObjCourseGUI extends ilContainerGUI
 				include_once("./Services/News/classes/class.ilNewsTimelineGUI.php");
 				$t = ilNewsTimelineGUI::getInstance($this->object->getRefId(), $this->object->getNewsTimelineAutoENtries());
 				$t->setUserEditAll($ilAccess->checkAccess('write','',$this->object->getRefId(),'grp'));
+				$this->showPermanentLink($tpl);
 				$this->ctrl->forwardCommand($t);
 				break;
 			

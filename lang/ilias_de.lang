@@ -481,6 +481,8 @@ assessment#:#insert_gap#:#Lücke einfügen
 assessment#:#cloze_fixed_textlength#:#Länge des Textfeldes
 assessment#:#cloze_fixed_textlength_description#:#Wenn Sie hier einen Wert eintragen, werden Textlücken, welche keinen eigenen Wert für eine maximale Länge definieren, sowie numerische Lücken mit dieser Länge erzeugt, so dass es nicht möglich ist eine größere Anzahl an Zeichen einzugeben. Für numerische Lücken ist darüber hinaus zu beachten, dass das Dezimaltrennzeichen dabei mit gezählt wird.
 assessment#:#qpl_maxchars_info_numeric_question#:#Wenn Sie hier einen Wert eintragen, wird das Feld für die numerische Antwort mit der angegebenen Länge erzeugt, so dass es nicht möglich ist eine größere Anzahl an Zeichen einzugeben. Zu beachten ist dabei, dass das Dezimaltrennzeichen dabei mit gezählt wird.
+assessment#:#qpl_numeric_lower_needs_valid_lower_alert#:#Die untere Schranke muss ein gültiger numerischer Wert sein, der niedriger ist als die obere Schranke.
+assessment#:#qpl_numeric_upper_needs_valid_upper_alert#:#Die obere Schranke muss ein gültiger numerischer Wert sein, der größer ist als die untere Schranke.
 assessment#:#cloze_text#:#Lückentextfrage
 assessment#:#cloze_textgap_case_insensitive#:#Zwischen Groß- und Kleinschreibung wird nicht unterschieden
 assessment#:#cloze_textgap_case_sensitive#:#Groß- und Kleinschreibung beachten
@@ -4793,6 +4795,7 @@ common#:#select_one#:#Bitte treffen Sie eine Auswahl
 common#:#select_page#:#Seite auswählen###deprecated
 common#:#select_password#:#Neues Passwort wählen###deprecated
 common#:#select_questionpool#:#Fragen einfügen in
+common#:#select_question_pool_info#:#Sofern die Import Datei Fragen enthält, werden diese ebenfalls in den ausgewählten Fragenpool importiert.
 common#:#select_questionpool_option#:#--- Bitte wählen Sie einen Fragenpool aus ---###deprecated
 common#:#selected#:#Ausgewählte
 common#:#selected_items#:#Ausgewählte Angebote
@@ -7651,6 +7654,7 @@ form#:#form_msg_file_partially_uploaded#:#Die Datei konnte nicht vollständig ho
 form#:#form_msg_file_size_exceeds#:#Die hochzuladende Datei überschreitet die maximale Dateigröße.
 form#:#form_msg_file_upload_stopped_ext#:#Upload durch PHP-Extension abgebrochen.
 form#:#form_msg_file_virus_found#:#In der hochzuladenden Datei wurde ein Virus gefunden!
+form#:#form_msg_file_missing_file_ext#:#Die hochgeladene Datei hat keine Dateiendung.
 form#:#form_msg_file_wrong_file_type#:#Falscher Dateityp
 form#:#form_msg_formula_is_required#:#Bitte geben Sie eine korrekte Formel an.
 form#:#form_msg_numeric_value_required#:#Bitte geben Sie einen numerischen Wert ein.
@@ -11644,6 +11648,7 @@ dcl#:#dcl_table_id#:#Tabellen ID
 dcl#:#dcl_add_new_record#:#Eintrag hinzufügen
 dcl#:#dcl_list_fields#:#Felder
 dcl#:#dcl_record_view_viewdefinition#:#Seitenvorlage###deprecated
+dcl#:#dcl_list_visibility_and_filter#:#Sichtbarkeit und Filter
 dcl#:#dcl_record#:#Eintrag
 dcl#:#dcl_add_new_field#:#Feld hinzufügen
 dcl#:#dcl_add_new_table#:#Neue Tabelle hinzufügen
@@ -13720,7 +13725,7 @@ skmg#:#skmg_usage_type_info_gen#:#Allgemeiner Gebrauch in Magazinobjekten
 skmg#:#skmg_usage_type_info_mat#:#Benutzer haben Material zugeordnet
 skmg#:#skmg_usage_type_info_user#:#Zuordnung zu Benutzern
 skmg#:#skmg_usage_type_info_pers#:#Von Benutzern als persönliche Kompetenz ausgewählt
-skmg#:#skmg_usage_type_info_seval#:#Selbsteinschätzungen###deprecated
+skmg#:#skmg_usage_type_info_seval#:#Selbsteinschätzungen
 skmg#:#skmg_usage_type_info_prof#:#Nutzung in Kompetenzprofilen
 skmg#:#skmg_usage_type_info_res#:#Zuordnung zu Magazinobjekten
 skmg#:#skmg_usage_obj_objects#:#Objekt(e)
@@ -13780,6 +13785,7 @@ obj#:#obj_deactivate_multilang_conf#:#Wollen Sie die Unterstützung für mehrspr
 obj#:#obj_multilang_deactivated#:#Die Unterstützung für mehrsprachige Inhalte wurde deaktiviert.
 cntr#:#cntr_container_only_on_their_own#:#Kategorien, Kurse, Gruppen und Ordner können nur einzeln kopiert werden. Bitte wählen Sie nur ein solches Objekt aus.
 cntr#:#objects_duplicated#:#Die Objekte wurden kopiert.
+cntr#:#msg_no_downloadable_objects#:#Keine herunterladbaren Objekte gefunden.
 poll#:#poll_max_number_of_answers#:#Maximale Anzahl Antworten je Teilnehmer
 poll#:#poll_vote_error_single#:#Wählen Sie eine Antwort aus.
 poll#:#poll_vote_error_multi#:#Wählen Sie maximal %s Antworten aus.
@@ -14637,6 +14643,7 @@ dcl#:#dcl_formula_detail_desc#:#Einträge in diesem Feld generieren sich automat
 dcl#:#dcl_text_email_detail_desc#:#Bitte geben Sie eine gültige E-Mail-Adresse oder eine URL ein.
 dcl#:#dcl_text_email_title#:#Titel
 dcl#:#dcl_text_email_title_info#:#Titel für die URL oder E-Mail-Adresse (optional).
+dcl#:#dcl_title_standardview#:#Standard-Ansicht
 adve#:#adve_auto_url_linking#:#URL Auto-Linking
 adve#:#adve_auto_url_linking_info#:#ILIAS durchsucht Textparagraphen nach URLs (z.B. "http://..") und verlinkt diese entsprechend automatisch.
 content#:#cont_auto_time#:#Wartezeit Animation
@@ -15986,3 +15993,5 @@ file#:#file_suffix_custom_white_info#:#Diese Dateiendungen werden der obigen Pos
 file#:#file_suffix_overall_white#:#Effektive Positivliste
 file#:#file_suffix_overall_white_info#:#Dies ist die endgültige Liste akzeptierter Dateiendungen.
 ecs#:#ecs_cmap_att_orgunit#:#Organisational Unit###08 08 2018 new variable
+survey#:#svy_answer_too_long#:#Ihre Antwort ist zu lang (%s Zeichen). Bitte kürzen Sie ihre Antwort.
+survey#:#svy_appraisses_cannot_be_raters#:#Benutzer können sich nicht selbst als Feedback-Geber zugeordnet werden. Nutzen Sie stattdessen die Option "Selbsteinschätzung" in den Einstellungen der Umfrage.

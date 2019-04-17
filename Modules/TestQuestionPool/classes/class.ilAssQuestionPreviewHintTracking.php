@@ -107,4 +107,23 @@ class ilAssQuestionPreviewHintTracking
 
 		return $requestedHintsList;
 	}
+	
+	public function getRequestStatisticData()
+	{
+		$count = 0;
+		$points = 0;
+		
+		foreach($this->getRequestedHintsList() as $hint)
+		{
+			$count++;
+			$points += $hint->getPoints();
+		}
+		
+		require_once 'Modules/TestQuestionPool/classes/class.ilAssQuestionHintRequestStatisticData.php';
+		$requestsStatisticData = new ilAssQuestionHintRequestStatisticData();
+		$requestsStatisticData->setRequestsCount($count);
+		$requestsStatisticData->setRequestsPoints($points);
+		
+		return $requestsStatisticData;
+	}
 } 

@@ -375,6 +375,8 @@ assessment#:#close_text_hint#:#To add a new gap set the cursor to the position o
 assessment#:#insert_gap#:#Insert Gap
 assessment#:#cloze_fixed_textlength_description#:#If you enter a value, all text gap fields, not providing an own maximum character limitation, as well as all numeric gap fields will be created with a fixed length of this value, so entering more than the allowed characters is not possible. Note, that for numeric gaps the decimal separator is counted as a regular character.
 assessment#:#qpl_maxchars_info_numeric_question#:#If you enter a value, the field for the numerical answer will be created with a fixed length of this value, so entering more than the allowed characters is not possible. Note, that for numeric gaps the decimal separator is counted as a regular character.
+assessment#:#qpl_numeric_lower_needs_valid_lower_alert#:#The lower bound needs to be valid numerical value lower than the upper bound.
+assessment#:#qpl_numeric_upper_needs_valid_upper_alert#:#The upper bound needs to be valid numerical value greater than the lower bound.
 assessment#:#cloze_fixed_textlength#:#Text Field Length
 assessment#:#cloze_text#:#Cloze Text
 assessment#:#cloze_textgap_case_insensitive#:#Case Insensitive
@@ -4193,6 +4195,7 @@ common#:#select_page#:#Select Page###deprecated
 common#:#select_password#:#Select a new password###deprecated
 common#:#select_questionpool_option#:#--- Please select a question pool ---###deprecated
 common#:#select_questionpool#:#Insert questions into
+common#:#select_question_pool_info#:#As long as the import file contains questions, these questions will be imported to the selected questionpool as well.
 common#:#select#:#Select
 common#:#selected_items_back#:#Back to Personal Items
 common#:#selected_items#:#Personal Items
@@ -6590,6 +6593,7 @@ form#:#form_msg_file_partially_uploaded#:#The file could not be uploaded complet
 form#:#form_msg_file_size_exceeds#:#The uploaded file exceeds the max. allowed file size.
 form#:#form_msg_file_upload_stopped_ext#:#File upload stopped by extension.
 form#:#form_msg_file_virus_found#:#Virus found in uploaded file.
+form#:#form_msg_file_missing_file_ext#:#The uploaded file has no file type exension.
 form#:#form_msg_file_wrong_file_type#:#Wrong file type.
 form#:#form_msg_formula_is_required#:#Please enter a correct formula.
 form#:#form_msg_numeric_value_required#:#Please enter a numeric value.
@@ -11844,6 +11848,7 @@ dcl#:#dcl_activate_approval#:#Activate Entry Approval###deprecated
 dcl#:#dcl_activate_notification#:#Enable Notification
 dcl#:#dcl_table_id#:#Table ID
 dcl#:#dcl_add_new_record#:#Add New Entry
+dcl#:#dcl_list_visibility_and_filter#:#Visibility and filter
 dcl#:#dcl_list_fields#:#Fields
 dcl#:#dcl_record_view_viewdefinition#:#Edit Detailed View###deprecated
 dcl#:#dcl_record_edit_viewdefinition#:#Edit Detailed View###deprecated
@@ -13722,7 +13727,7 @@ skmg#:#skmg_usage_type_info_gen#:#General Use in Repository Objects
 skmg#:#skmg_usage_type_info_mat#:#Users assigned material from their personal workspace
 skmg#:#skmg_usage_type_info_user#:#Assigned to Users
 skmg#:#skmg_usage_type_info_pers#:#Selected by Users as Personal Skill
-skmg#:#skmg_usage_type_info_seval#:#Self Evaluations###deprecated
+skmg#:#skmg_usage_type_info_seval#:#Self Evaluations
 skmg#:#skmg_usage_type_info_prof#:#Used in Skill Profiles
 skmg#:#skmg_usage_type_info_res#:#Repository Objects Assigned as Suggested Resource
 skmg#:#skmg_usage_obj_objects#:#Object(s)
@@ -13833,6 +13838,7 @@ obj#:#obj_deactivate_multilang_conf#:#Do you really want to deactivate multiling
 obj#:#obj_multilang_deactivated#:#Multilingualism has been deactivated.
 cntr#:#cntr_container_only_on_their_own#:#Categories, courses, groups or folders can only be copied as single objects. Please select one item only.
 cntr#:#objects_duplicated#:#Objects copied
+cntr#:#msg_no_downloadable_objects#:#No downloadable objects found.
 poll#:#poll_max_number_of_answers#:#Maximum Number Of Answers per Participant
 poll#:#poll_vote_error_single#:#Please select 1 answer.
 poll#:#poll_vote_error_multi#:#Please select no more than %s answers.
@@ -14625,6 +14631,7 @@ dcl#:#dcl_formula_detail_desc#:#Entries are generated automatically, you are not
 dcl#:#dcl_text_email_detail_desc#:#Please enter a valid URL or E-Mail address.
 dcl#:#dcl_text_email_title#:#Title
 dcl#:#dcl_text_email_title_info#:#A Title for the above URL or E-Mail address (optional).
+dcl#:#dcl_title_standardview#:#Standard View
 adve#:#adve_auto_url_linking#:#URL Auto-Linking
 adve#:#adve_auto_url_linking_info#:#Tries to identify URLs like "http://.." in text paragraphs and automatically creates links around them.
 content#:#cont_auto_time#:#Auto Animation Waiting Time
@@ -15130,7 +15137,7 @@ log#:#log_browser_users#:#Usernames Using Console Log
 log#:#log_component_col_component#:#Component
 log#:#log_component_col_level#:#Log-Level
 log#:#log_component_btn_reset#:#Reset Settings
-forum#:#frm_search#:#Suche
+forum#:#frm_search#:#Search
 mail#:#mail_enable_crs_admin_notification#:#Notify Course Administrators
 mail#:#mail_enable_grp_admin_notification#:#Notify Group Administrators
 mail#:#mail_enable_crs_admin_notification_info#:#In new courses the setting 'Notification About New Members' will be activated by default. It is set in the 'Member'-tab of courses. Course administrators will receive an e-mail when a member joins the course or leaves it or if the minimally required number of participants is not met the course needs to take place.
@@ -15988,3 +15995,5 @@ file#:#file_suffix_custom_white#:#Custom Suffix Whitelist
 file#:#file_suffix_custom_white_info#:#These suffixes will be added to the default whitelist.
 file#:#file_suffix_overall_white#:#Overal Suffix Whitelist
 file#:#file_suffix_overall_white_info#:#Resulting overall list of accepted file suffixes.
+survey#:#svy_answer_too_long#:#Your current answer is too long (%s characters). Please shorten your answer.
+survey#:#svy_appraisses_cannot_be_raters#:#User cannot be added as rater. Use self evaluation option in the survey settings instead.

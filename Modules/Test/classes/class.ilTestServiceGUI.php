@@ -351,11 +351,11 @@ class ilTestServiceGUI
 	/**
 	 * @return ilTestPassOverviewTableGUI $tableGUI
 	 */
-	public function buildPassOverviewTableGUI($targetGUI)
+	public function buildPassOverviewTableGUI($targetGUI, $targetCmd = '')
 	{
 		require_once 'Modules/Test/classes/tables/class.ilTestPassOverviewTableGUI.php';
 
-		$table = new ilTestPassOverviewTableGUI($targetGUI, '');
+		$table = new ilTestPassOverviewTableGUI($targetGUI, $targetCmd);
 		
 		$table->setPdfPresentationEnabled(
 			isset($_GET['pdf']) && $_GET['pdf'] == 1
@@ -578,7 +578,7 @@ class ilTestServiceGUI
 		return $maintemplate->get();
 	}
 
-	protected function getPassDetailsOverviewTableGUI($result_array, $active_id, $pass, $targetGUI, $targetCMD, $questionDetailsCMD, $questionAnchorNav, ilTestQuestionRelatedObjectivesList $objectivesList = null)
+	protected function getPassDetailsOverviewTableGUI($result_array, $active_id, $pass, $targetGUI, $targetCMD, $questionDetailsCMD, $questionAnchorNav, ilTestQuestionRelatedObjectivesList $objectivesList = null, $multipleObjectivesInvolved = true)
 	{
 		$this->ctrl->setParameter($targetGUI, 'active_id', $active_id);
 		$this->ctrl->setParameter($targetGUI, 'pass', $pass);
@@ -594,6 +594,8 @@ class ilTestServiceGUI
 			$tableGUI->setQuestionRelatedObjectivesList($objectivesList);
 			$tableGUI->setObjectiveOrientedPresentationEnabled(true);
 		}
+		
+		$tableGUI->setMultipleObjectivesInvolved($multipleObjectivesInvolved);
 
 		$tableGUI->setActiveId($active_id);
 		$tableGUI->setShowSuggestedSolution(false);
@@ -1023,7 +1025,7 @@ class ilTestServiceGUI
 		}
 
 		require_once './Modules/Test/classes/class.ilTestPDFGenerator.php';
-		ilTestPDFGenerator::generatePDF($output, ilTestPDFGenerator::PDF_OUTPUT_DOWNLOAD, $question_gui->object->getTitle());
+		ilTestPDFGenerator::generatePDF($output, ilTestPDFGenerator::PDF_OUTPUT_DOWNLOAD, $question_gui->object->getTitleFilenameCompliant());
 	}
 
 	/**
@@ -1153,7 +1155,7 @@ class ilTestServiceGUI
 			require_once 'class.ilTestPDFGenerator.php';
 
 			ilTestPDFGenerator::generatePDF(
-				$content, ilTestPDFGenerator::PDF_OUTPUT_DOWNLOAD, $this->object->getTitle()
+				$content, ilTestPDFGenerator::PDF_OUTPUT_DOWNLOAD, $this->object->getTitleFilenameCompliant()
 			);
 		}
 		else
@@ -1205,6 +1207,15 @@ class ilTestServiceGUI
 		$pass = (int)$_GET['pass'];
 
 		$questionId = (int)$_GET['evaluation'];
+		
+		$testSequence = $this->testSequenceFactory->getSequenceByActiveIdAndPass($activeId, $pass);
+		$testSequence->loadFromDb();
+		$testSequence->loadQuestions();
+		
+		if( !$testSequence->questionExists($questionId) )
+		{
+			ilObjTestGUI::accessViolationRedirect();
+		}
 
 		if( $this->getObjectiveOrientedContainer()->isObjectiveOrientedPresentationRequired() )
 		{

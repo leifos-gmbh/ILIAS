@@ -231,7 +231,7 @@ class ilObjDataCollectionGUI extends ilObject2GUI {
 				$recordview_gui = new ilDclDetailedViewGUI($this);
 				$this->ctrl->forwardCommand($recordview_gui);
 				$ilTabs->clearTargets();
-				$ilTabs->setBackTarget($this->lng->txt("back"), $ilCtrl->getLinkTargetByClass("ilObjDataCollectionGUI", ""));
+				$ilTabs->setBackTarget($this->lng->txt("back"), $ilCtrl->getLinkTargetByClass(ilDclRecordListGUI::class, ilDclRecordListGUI::CMD_LIST_RECORDS));
 				break;
 
 			case 'ilnotegui':
@@ -251,7 +251,7 @@ class ilObjDataCollectionGUI extends ilObject2GUI {
 
 				require_once 'Modules/DataCollection/classes/Content/class.ilDclContentExporter.php';
 				$exporter = new ilDclContentExporter($this->object->getRefId());
-				$exp_gui->addFormat("xls", $this->lng->txt('dlc_xls_async_export'), $exporter, 'exportAsync');
+				$exp_gui->addFormat("xlsx", $this->lng->txt('dlc_xls_async_export'), $exporter, 'exportAsync');
 
 				$this->ctrl->forwardCommand($exp_gui);
 				break;

@@ -716,14 +716,14 @@ class ilObjMediaObject extends ilObject
 					if ($item->getCaption() != "")
 					{
 						$xml .= "<Caption Align=\"bottom\">".
-							str_replace("&", "&amp;", $item->getCaption())."</Caption>";
+							$this->escapeProperty($item->getCaption())."</Caption>";
 					}
 
 					// Text Representation
 					if ($item->getTextRepresentation() != "")
 					{
 						$xml .= "<TextRepresentation>".
-							str_replace("&", "&amp;", $item->getTextRepresentation())."</TextRepresentation>";
+							$this->escapeProperty($item->getTextRepresentation())."</TextRepresentation>";
 					}
 
 					// Parameter
@@ -752,8 +752,11 @@ class ilObjMediaObject extends ilObject
 					$xml .= "<MediaItem Purpose=\"".$item->getPurpose()."\">";
 
 					// Location
+					$loc = ($item->getLocationType() == "Reference")
+						? ilUtil::secureUrl($item->getLocation())
+						: $item->getLocation();
 					$xml.= "<Location Type=\"".$item->getLocationType()."\">".
-						$this->handleAmps($item->getLocation())."</Location>";
+						$this->handleAmps($loc)."</Location>";
 
 					// Format
 					$xml.= "<Format>".$item->getFormat()."</Format>";
@@ -774,14 +777,14 @@ class ilObjMediaObject extends ilObject
 					if ($item->getCaption() != "")
 					{
 						$xml .= "<Caption Align=\"bottom\">".
-							str_replace("&", "&amp;", $item->getCaption())."</Caption>";
+							$this->escapeProperty($item->getCaption())."</Caption>";
 					}
 					
 					// Text Representation
 					if ($item->getTextRepresentation() != "")
 					{
 						$xml .= "<TextRepresentation>".
-							str_replace("&", "&amp;", $item->getTextRepresentation())."</TextRepresentation>";
+							$this->escapeProperty($item->getTextRepresentation())."</TextRepresentation>";
 					}
 
 					// Parameter
@@ -881,6 +884,18 @@ class ilObjMediaObject extends ilObject
 		$xml .= "</MediaObject>";
 		return $xml;
 	}
+
+	/**
+	 * Escape property (e.g. title, caption) to XSLT -> HTML output
+	 *
+	 * @param string $a_value
+	 * @return string
+	 */
+	protected function escapeProperty($a_value)
+	{
+		return htmlspecialchars($a_value);
+	}
+
 
 	/**
 	* Replace "&" (if not an "&amp;") with "&amp;"
@@ -1948,6 +1963,12 @@ class ilObjMediaObject extends ilObject
 	 */
 	function uploadVideoPreviewPic($a_prevpic)
 	{
+		// remove old one
+		if ($this->getVideoPreviewPic(true) != "")
+		{
+			$this->removeAdditionalFile($this->getVideoPreviewPic(true));
+		}
+
 		$pi = pathinfo($a_prevpic["name"]);
 		$ext = $pi["extension"];
 		if (in_array($ext, array("jpg", "jpeg", "png")))

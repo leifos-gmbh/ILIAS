@@ -630,15 +630,17 @@ class ilObjContentObject extends ilObject
 	* @access	public
 	* @return	boolean	true if all object data were removed; false if only a references were removed
 	*/
-	function delete()
+	// begin-patch ibi
+	function delete($a_delete_parent_data = true)
 	{
 		$ilDB = $this->db;
 
 		// always call parent delete function first!!
-		if (!parent::delete())
+		if ($a_delete_parent_data && !parent::delete())
 		{
 			return false;
 		}
+		// end-patch ibi
 
 		// delete lm object data
 		include_once("./Modules/LearningModule/classes/class.ilLMObject.php");

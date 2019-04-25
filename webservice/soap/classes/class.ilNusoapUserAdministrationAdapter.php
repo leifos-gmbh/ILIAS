@@ -1094,6 +1094,15 @@ class ilNusoapUserAdministrationAdapter
 								'ILIAS updateFile():update existing file, update file properties from xml (see ilias_file_3_8.dtd for details). obj_id in xml must match according obj id of refid.!');
 
 		// ibi-patch start
+		$this->server->register('updateLearningModule',
+			array('sid' => 'xsd:string', 'ref_id' => 'xsd:int', 'zip' => 'xsd:string', 'online' => 'xsd:int', 'old_id' => 'xsd:int', 'title' => 'xsd:string', 'desc' => 'xsd:string'),
+			array('success' => 'xsd:boolean'),
+			SERVICE_NAMESPACE,
+			SERVICE_NAMESPACE.'#updateLearningModule',
+			SERVICE_STYLE,
+			SERVICE_USE,
+			'ILIAS updateLearningModule():update existing learning module');
+
 		$this->server->register('updateHtmlLearningModule',
 								array('sid' => 'xsd:string', 'ref_id' => 'xsd:int', 'zip' => 'xsd:string', 'online' => 'xsd:int', 'old_id' => 'xsd:int', 'title' => 'xsd:string', 'desc' => 'xsd:string', 'start' => 'xsd:string'),
 								array('success' => 'xsd:boolean'),

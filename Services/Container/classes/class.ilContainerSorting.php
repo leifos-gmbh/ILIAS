@@ -323,7 +323,7 @@ class ilContainerSorting
 			}
 			return $a_items;
 		}
-		if(!count($a_items))
+		if(!is_array($a_items) || !count($a_items))
 		{
 			return $a_items;
 		}

@@ -7,8 +7,8 @@ namespace Composer\Autoload;
 class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
 {
     public static $files = array (
-        '6175f5662c2e26de0149cb048cda7209' => __DIR__ . '/..' . '/simplesamlphp/saml2/src/_autoload.php',
         '253c157292f75eb38082b5acb06f3f01' => __DIR__ . '/..' . '/nikic/fast-route/src/functions.php',
+        '6175f5662c2e26de0149cb048cda7209' => __DIR__ . '/..' . '/simplesamlphp/saml2/src/_autoload.php',
         '2cffec82183ee1cea088009cef9a6fc3' => __DIR__ . '/..' . '/ezyang/htmlpurifier/library/HTMLPurifier.composer.php',
         'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
@@ -2797,6 +2797,7 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
         'ilAccountCodesTableGUI' => __DIR__ . '/../..' . '/../../Services/User/classes/class.ilAccountCodesTableGUI.php',
         'ilAccountMail' => __DIR__ . '/../..' . '/../../Services/Mail/classes/class.ilAccountMail.php',
         'ilAccountRegistrationGUI' => __DIR__ . '/../..' . '/../../Services/Registration/classes/class.ilAccountRegistrationGUI.php',
+        'ilAccountRegistrationMail' => __DIR__ . '/../..' . '/../../Services/Registration/classes/class.ilAccountRegistrationMail.php',
         'ilActivationEmitter' => __DIR__ . '/../..' . '/../../Services/WorkflowEngine/classes/emitters/class.ilActivationEmitter.php',
         'ilActivity' => __DIR__ . '/../..' . '/../../Services/WorkflowEngine/interfaces/ilActivity.php',
         'ilAdminSubItemsTableGUI' => __DIR__ . '/../..' . '/../../Services/Repository/classes/class.ilAdminSubItemsTableGUI.php',
@@ -4875,7 +4876,6 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
         'ilMySQLQueryUtils' => __DIR__ . '/../..' . '/../../Services/Database/classes/QueryUtils/class.ilMySQLQueryUtils.php',
         'ilMyStaffAccess' => __DIR__ . '/../..' . '/../../Services/MyStaff/classes/class.ilMyStaffAccess.php',
         'ilMyStaffGUI' => __DIR__ . '/../..' . '/../../Services/MyStaff/classes/class.ilMyStaffGUI.php',
-        'ilMyStaffUser' => __DIR__ . '/../..' . '/../../Services/MyStaff/classes/class.ilMyStaffUser.php',
         'ilNavigationHistory' => __DIR__ . '/../..' . '/../../Services/Navigation/classes/class.ilNavigationHistory.php',
         'ilNavigationHistoryGUI' => __DIR__ . '/../..' . '/../../Services/Navigation/classes/class.ilNavigationHistoryGUI.php',
         'ilNestedList' => __DIR__ . '/../..' . '/../../Services/UIComponent/NestedList/classes/class.ilNestedList.php',

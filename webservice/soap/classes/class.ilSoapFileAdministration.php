@@ -197,6 +197,49 @@ class ilSoapFileAdministration extends ilSoapAdministration
     }
 
 	// ibi-patch start
+
+	/**
+	 * @param $sid
+	 * @param $mode
+	 * @param $zip_path
+	 * @return bool|soap_fault|SoapFault
+	 * @throws ilImportException
+	 */
+	public function createHelp($sid, $mode, $zip_path)
+	{
+		$this->initAuth($sid);
+		$this->initIlias();
+
+		if(!$this->__checkSession($sid))
+		{
+			return $this->__raiseError($this->__getMessage(),$this->__getMessageCode());
+		}
+		global $DIC;
+
+		$help_id = ilObjHelpSettings::createHelpModule();
+
+		$imp = new ilImport();
+		$conf = $imp->getConfig("Services/Help");
+		$conf->setModuleId($help_id);
+		$new_id = $imp->importObject(
+			"unused",
+			$zip_path,
+			basename($zip_path),
+			'lm',
+			'Module/LearningModule',
+			true
+		);
+
+		$new_obj = new ilObjLearningModule($new_id, false);
+		ilObjHelpSettings::writeHelpModuleLmId($help_id, $new_obj->getId());
+
+		$DIC->settings()->set('help_module', $new_id);
+		$DIC->settings()->set('help_mode', $mode);
+
+		return true;
+	}
+
+
 	public function updateLearningModule($sid,$ref_id, $zip_path, $a_online,$a_old_id, $a_title, $a_desc)
 	{
 		$this->initAuth($sid);

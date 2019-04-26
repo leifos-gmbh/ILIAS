@@ -745,6 +745,13 @@ class ilSoapFunctions {
 	}
 
 	// ibi-patch start
+	public static function createHelp($sid, $a_mode, $a_zip)
+	{
+		include_once './webservice/soap/classes/class.ilSoapFileAdministration.php';
+		$sta = new ilSoapFileAdministration();
+		return $sta->createHelp($sid, $a_mode, $a_zip);
+	}
+
 	public static function updateLearningModule($sid, $ref_id, $xml_path, $a_online, $a_old_id, $a_title, $a_desc)
 	{
 		include_once './webservice/soap/classes/class.ilSoapFileAdministration.php';

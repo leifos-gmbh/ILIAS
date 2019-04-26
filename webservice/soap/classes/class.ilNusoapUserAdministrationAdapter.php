@@ -1103,6 +1103,15 @@ class ilNusoapUserAdministrationAdapter
 			SERVICE_USE,
 			'ILIAS updateLearningModule():update existing learning module');
 
+		$this->server->register('createHelp',
+			array('sid' => 'xsd:string', 'mode' => 'xsd:int', 'zip' => 'xsd:string'),
+			array('success' => 'xsd:boolean'),
+			SERVICE_NAMESPACE,
+			SERVICE_NAMESPACE.'#createHelp',
+			SERVICE_STYLE,
+			SERVICE_USE,
+			'Create help module from existing help export file.');
+
 		$this->server->register('updateHtmlLearningModule',
 								array('sid' => 'xsd:string', 'ref_id' => 'xsd:int', 'zip' => 'xsd:string', 'online' => 'xsd:int', 'old_id' => 'xsd:int', 'title' => 'xsd:string', 'desc' => 'xsd:string', 'start' => 'xsd:string'),
 								array('success' => 'xsd:boolean'),

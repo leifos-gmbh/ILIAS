@@ -417,6 +417,7 @@ class ilLMPresentationGUI
 		$ilUser = $this->user;
 
 		$layout = $this->determineLayout();
+		$layout = 'toc2win';
 
 		// xmldocfile is deprecated! Use domxml_open_file instead.
 		// But since using relative pathes with domxml under windows don't work,

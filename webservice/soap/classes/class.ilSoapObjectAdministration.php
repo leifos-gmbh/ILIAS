@@ -809,7 +809,9 @@ class ilSoapObjectAdministration extends ilSoapAdministration
 					break;
 				// end-patch fm
 				case 'lm':
-					$newObj->createLMTree();
+					// begin-patch ibi
+					//$newObj->createLMTree();
+					// end-patch ibi
 					break;
 				case 'cat':
 					$newObj->addTranslation($object_data["title"],$object_data["description"], $lng->getLangKey(), $lng->getLangKey());

@@ -85,6 +85,17 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 	}
 
 	/**
+	 * Is tile view
+	 *
+	 * @return bool
+	 */
+	protected function isTileView()
+	{
+		return true;
+	}
+
+
+	/**
 	 *
 	 */
 	protected function initViewSettings()
@@ -195,6 +206,11 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 	public function getHTML()
 	{
 		global $DIC;
+
+		if ($this->isTileView())
+		{
+			return $this->getTileHTML();
+		}
 
 		$DIC->database()->useSlave(true);
 
@@ -791,4 +807,66 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 		$ilCtrl->setParameterByClass('ilpersonaldesktopgui', 'view', $this->viewSettings->getCurrentView());
 		$ilCtrl->redirectByClass("ilpersonaldesktopgui", "show");
 	}
+
+
+	/**
+	 * Get tile html
+	 *
+	 * @param
+	 * @return
+	 */
+	protected function getTileHTML()
+	{
+		$ilCtrl = $this->ctrl;
+		$lng = $this->lng;
+		$ilAccess = $this->access;
+		$ilUser = $this->user;
+		$objDefinition = $this->obj_def;
+
+		$this->tpl = new ilTemplate("tpl.block_tiles.html", true, true, "Services/PersonalDesktop");
+
+		
+		$this->dropdown = array();
+
+		// commands
+		if (count($this->getBlockCommands()) > 0)
+		{
+			$has_block_command = false;
+
+			foreach($this->getBlockCommands() as $command)
+			{
+				// to do see getHTML in ilBlockGUI
+			}
+		}
+
+
+		// fill row for setting details
+		$this->fillDetailRow();
+
+		// header links
+		if(count($this->getHeaderLinks()))
+		{
+			// to do see getHTML in ilBlockGUI
+		}
+
+
+		$this->tpl->setCurrentBlock("tiles");
+		$this->tpl->setVariable("TILES", "tiles here..");
+		$this->tpl->parseCurrentBlock();
+		$this->tpl->setCurrentBlock("grouped_tiles");
+		$this->tpl->parseCurrentBlock();
+
+		if ($ilCtrl->isAsynch())
+		{
+			// return without div wrapper
+			echo $this->tpl->getAsynch();
+		}
+		else
+		{
+			// return incl. wrapping div with id
+			return '<div id="'."block_".$this->getBlockType()."_".$this->block_id.'">'.
+				$this->tpl->get().'</div>';
+		}
+	}
+
 }

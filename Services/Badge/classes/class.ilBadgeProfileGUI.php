@@ -38,6 +38,11 @@ class ilBadgeProfileGUI
 	protected $user;
 
 	/**
+	 * @var ilAccessHandler
+	 */
+	protected $access;
+
+	/**
 	 * @var \ILIAS\UI\Factory
 	 */
 	protected $factory;
@@ -60,6 +65,7 @@ class ilBadgeProfileGUI
 		$this->tpl = $DIC["tpl"];
 		$this->tabs = $DIC->tabs();
 		$this->user = $DIC->user();
+		$this->access = $DIC->access();
 		$this->factory = $DIC->ui()->factory();
 		$this->renderer = $DIC->ui()->renderer();
 	}
@@ -164,6 +170,8 @@ class ilBadgeProfileGUI
 				"image" => $badge->getImagePath(),
 				"name" => $badge->getImage(),
 				"issued_on" => $ass->getTimestamp(),
+				"active" => (bool)$ass->getPosition(),
+				"object" => $badge->getParentMeta(),
 				"renderer" => new ilBadgeRenderer($ass)
 			);			
 		}	
@@ -176,26 +184,62 @@ class ilBadgeProfileGUI
 		ilDatePresentation::setUseRelativeDates(false);
 
 		$cards = array();
-		$components = array();
+		$badge_components = array();
 
 		foreach($data as $badge)
 		{
 			$modal = $this->factory->modal()->roundtrip(
 				$badge["title"], $this->factory->legacy($badge["renderer"]->renderModalContent())
 			)->withCancelButtonLabel("ok");
-			$image = $this->factory->image()->responsive($badge["image"], $badge["name"])->withAction($modal->getShowSignal());
-			$cards[] = $this->factory->card()->standard($badge["title"], $image)
-				->withSections([$this->factory->legacy(
-					ilDatePresentation::formatDate(new ilDateTime($badge["issued_on"], IL_CAL_UNIX))
-				)]);
+			$image = $this->factory->image()->responsive($badge["image"], $badge["name"])
+				->withAction($modal->getShowSignal());
 
-			$components[] = $modal;
+			$this->ctrl->setParameter($this, "badge_id", $badge["id"]);
+			$url = $this->ctrl->getLinkTarget($this, $badge["active"]
+				? "deactivate_in_card"
+				: "activate_in_card");
+			$this->ctrl->setParameter($this, "badge_id", "");
+			$profile_button = $this->factory->button()->standard(
+				$this->lng->txt(!$badge["active"] ? "badge_add_to_profile" : "badge_remove_from_profile"),
+				$url);
+
+			if ($badge["object"]["type"] != "bdga") {
+				$parent_icon = $this->factory->icon()->custom(
+					ilObject::_getIcon($badge["object"]["id"],"big", $badge["object"]["type"]),
+					$this->lng->txt("obj_".$badge["object"]["type"]),
+					"medium"
+				);
+
+				$parent_ref_id = array_shift(ilObject::_getAllReferences($badge["object"]["id"]));
+				if($this->access->checkAccess("read", "", $parent_ref_id)) {
+					$parent_link = $this->factory->link()->standard($badge["object"]["title"], ilLink::_getLink($parent_ref_id));
+				} else {
+					$parent_link = $this->factory->legacy($badge["object"]["title"]);
+				}
+
+				$badge_sections = [
+					$this->factory->listing()->descriptive([
+						$this->lng->txt("object") => $this->factory->legacy(
+							$this->renderer->render($parent_icon) . $this->renderer->render($parent_link)
+						)
+					]),
+					$profile_button
+				];
+			} else {
+				$badge_sections = [
+					$this->factory->legacy(""),
+					$profile_button];
+			}
+
+			$cards[] = $this->factory->card()->standard($badge["title"], $image)->withSections($badge_sections);
+
+			$badge_components[] = $modal;
 		}
 
 		$deck = $this->factory->deck($cards);
-		$components[] = $deck;
+		$badge_components[] = $deck;
 
-		$tmpl->setVariable("DECK", $this->renderer->render($components));
+		$tmpl->setVariable("DECK", $this->renderer->render($badge_components));
 		$tpl->setContent($tmpl->get());
 	}
 	
@@ -299,6 +343,44 @@ class ilBadgeProfileGUI
 		
 		ilUtil::sendSuccess($lng->txt("settings_saved"), true);
 		$ilCtrl->redirect($this, "manageBadges");		
+	}
+
+	protected function activate_in_card()
+	{
+		$lng = $this->lng;
+		$ilCtrl = $this->ctrl;
+
+		foreach($this->getMultiSelection() as $ass)
+		{
+			// already active?
+			if(!$ass->getPosition())
+			{
+				$ass->setPosition(999);
+				$ass->store();
+			}
+		}
+
+		ilUtil::sendSuccess($lng->txt("settings_saved"), true);
+		$ilCtrl->redirect($this, "listBadges");
+	}
+
+	protected function deactivate_in_card()
+	{
+		$lng = $this->lng;
+		$ilCtrl = $this->ctrl;
+
+		foreach($this->getMultiSelection() as $ass)
+		{
+			// already inactive?
+			if($ass->getPosition())
+			{
+				$ass->setPosition(null);
+				$ass->store();
+			}
+		}
+
+		ilUtil::sendSuccess($lng->txt("settings_saved"), true);
+		$ilCtrl->redirect($this, "listBadges");
 	}
 	
 	

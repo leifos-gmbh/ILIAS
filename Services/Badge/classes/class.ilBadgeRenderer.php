@@ -70,10 +70,10 @@ class ilBadgeRenderer
 		$lng = $this->lng;
 		$lng->loadLanguageModule("badge");
 
-		$components = array();
+		$modal_content = array();
 
 		$image = $this->factory->image()->responsive($this->badge->getImagePath(), $this->badge->getImage());
-		$components[] = $image;
+		$modal_content[] = $image;
 
 		$badge_information = [
 			$lng->txt("description")=>$this->badge->getDescription(),
@@ -107,8 +107,8 @@ class ilBadgeRenderer
 		}
 
 		$list = $this->factory->listing()->descriptive($badge_information);
-		$components[] = $list;
+		$modal_content[] = $list;
 
-		return $this->renderer->render($components);
+		return $this->renderer->render($modal_content);
 	}
 }

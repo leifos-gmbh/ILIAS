@@ -239,6 +239,86 @@ class ilSoapFileAdministration extends ilSoapAdministration
 		return true;
 	}
 
+	/**
+	 * @param $sid
+	 * @param $ref_id
+	 * @param $zip_path
+	 */
+	public function updateBlog($sid, $ref_id, $zip_path, $original_id)
+	{
+		$this->initAuth($sid);
+		$this->initIlias();
+
+		if(!$this->__checkSession($sid))
+		{
+			return $this->__raiseError($this->__getMessage(),$this->__getMessageCode());
+		}
+		global $DIC;
+		$tree = $DIC->repositoryTree();
+		$ilLog = $DIC->logger()->wsrv();
+		$access = $DIC->access();
+
+		if(ilObject::_isInTrash($ref_id))
+		{
+			return $this->__raiseError('Cannot perform update since blog has been deleted.', 'CLIENT_OBJECT_DELETED');
+		}
+		// get obj_id
+		if(!$obj_id = ilObject::_lookupObjectId($ref_id))
+		{
+			return $this->__raiseError('No blog found for id: '.$ref_id,
+				'Client');
+		}
+
+		// Check access
+		$permission_ok = false;
+		foreach($ref_ids = ilObject::_getAllReferences($obj_id) as $ref_id)
+		{
+			if($access->checkAccess('write','',$ref_id))
+			{
+				$permission_ok = true;
+				break;
+			}
+		}
+		if(!$permission_ok)
+		{
+			return $this->__raiseError('No permission to edit the blog with id: '.$ref_id,
+				'Server');
+		}
+		$blog = ilObjectFactory::getInstanceByObjId($obj_id, false);
+		if(!$blog instanceof ilObjBlog)
+		{
+			return $this->__raiseError('Wrong obj id or type for blog with id '.$ref_id,
+				'Server');
+		}
+
+		try {
+
+			// delete blog specific data
+			foreach(ilBlogPosting::getAllPostings($blog->getId()) as $blog_posting_id => $blog_info)
+			{
+				$post = new ilBlogPosting($blog_posting_id);
+				$post->delete();
+			}
+
+			include_once './Services/Export/classes/class.ilImport.php';
+			$imp = new ilImport((int) $ref_id);
+
+			$obj_id = ilObject::_lookupObjId($ref_id);
+			$imp->getMapping()->addMapping('Services/Container','objs',$original_id,$obj_id);
+			$imp->importObject(
+				'unused',
+				$zip_path,
+				basename($zip_path),
+				'blog',
+				'',
+				true
+			);
+		}
+		catch(Exception $e) {
+			return $this->__raiseError($e->getMessage(),'Server');
+		}
+	}
+
 
 	public function updateLearningModule($sid,$ref_id, $zip_path, $a_online,$a_old_id, $a_title, $a_desc)
 	{

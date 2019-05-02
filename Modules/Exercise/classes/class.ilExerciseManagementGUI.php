@@ -2256,7 +2256,7 @@ class ilExerciseManagementGUI
 
 		$submission_time = $submission->getLastSubmission();
 
-		$zip_original_full_path = $this->getSubmissionZipFile($submission);
+		$zip_original_full_path = $this->getSubmissionZipFilePath($submission);
 
 		$zip_internal_path = $this->getWebFilePathFromExternalFilePath($zip_original_full_path);
 
@@ -2313,7 +2313,7 @@ class ilExerciseManagementGUI
 	 * @param ilExSubmission user who created the submission
 	 * @return string|null
 	 */
-	protected function getSubmissionZipFile(ilExSubmission $submission): ?string
+	protected function getSubmissionZipFilePath(ilExSubmission $submission): ?string
 	{
 		$submitted = $submission->getFiles();
 

@@ -17,22 +17,6 @@ interface ilExcSubmissionRepositoryInterface
 	public function getUserId(int $submission_id): int;
 
 	/**
-	 * Get mysql timestamp with the last submission date.
-	 * @param int $assignment_id
-	 * @param string extra condition to add in the sql where clause
-	 * @return string | null
-	 */
-	public function getLastSubmission(int $assignment_id, string $extra_where);
-
-	/**
-	 * Get mysql timestamp with the last HTML opening view date
-	 * @param int $assignment_id
-	 * @param string $extra_where
-	 * @return string
-	 */
-	public function getLastOpeningHTMLView(int $assignment_id, string $extra_where);
-
-	/**
 	 * Get number of submissions from assignment id
 	 * @param int $assignment_id
 	 * @return int

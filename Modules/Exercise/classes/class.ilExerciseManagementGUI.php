@@ -2252,11 +2252,9 @@ class ilExerciseManagementGUI
 
 		$submission = new ilExSubmission($this->assignment, $member_id);
 
-		$submission_repository = new ilExcSubmissionRepository();
+		$last_opening = $submission->getLastOpeningHTMLView();
 
-		$last_opening = $submission_repository->getLastOpeningHTMLView($this->ass_id, $submission->getTableUserWhere(true));
-
-		$submission_time = $submission_repository->getLastSubmission($this->ass_id,$submission->getTableUserWhere(true));
+		$submission_time = $submission->getLastSubmission();
 
 		$zip_original_full_path = $this->getSubmissionZipFile($submission);
 
@@ -2294,6 +2292,7 @@ class ilExerciseManagementGUI
 
 				$web_filesystem->delete($zip_internal_path);
 
+				$submission_repository = new ilExcSubmissionRepository();
 				$submission_repository->updateWebDirAccessTime($this->assignment->getId(), $member_id);
 
 				ilUtil::redirect($index_html_file);

@@ -1307,6 +1307,7 @@ class ilExSubmission
 
 
 	/**
+	 * TODO -> get rid of getTableUserWhere and move to repository class
 	 * Get the date of the last submission of a user for the assignment
 	 *
 	 * @return	mixed	false or mysql timestamp of last submission
@@ -1326,6 +1327,28 @@ class ilExSubmission
 		$usr_set = $ilDB->query($q);
 		$array = $ilDB->fetchAssoc($usr_set);		
 		return ilUtil::getMySQLTimestamp($array["ts"]);  		
+	}
+
+	/**
+	 * TODO -> get rid of getTableUserWhere and move to repository class
+	 * Get a mysql timestamp from the last HTML view opening.
+	 */
+	public function getLastOpeningHTMLView()
+	{
+		$this->db->setLimit(1);
+
+		$q = "SELECT web_dir_access_time FROM exc_returned".
+			" WHERE ass_id = ".$this->db->quote($this->assignment->getId(), "integer").
+			" AND (filename IS NOT NULL OR atext IS NOT NULL)".
+			" AND web_dir_access_time IS NOT NULL".
+			" AND ".$this->getTableUserWhere(true).
+			" ORDER BY web_dir_access_time DESC";
+
+		$res = $this->db->query($q);
+
+		$data = $this->db->fetchAssoc($res);
+
+		return ilUtil::getMySQLTimestamp($data["web_dir_access_time"]);
 	}
 
 	

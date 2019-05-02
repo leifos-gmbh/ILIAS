@@ -43,48 +43,6 @@ class ilExcSubmissionRepository implements ilExcSubmissionRepositoryInterface
 	/**
 	 * @inheritdoc
 	 */
-	public function getLastSubmission(int $assignment_id, string $extra_where)
-	{
-		$this->db->setLimit(1);
-
-		$q = "SELECT ts FROM ".self::TABLE_NAME.
-			" WHERE ass_id = ".$this->db->quote($assignment_id, "integer").
-			" AND (filename IS NOT NULL OR atext IS NOT NULL)".
-			" AND ts IS NOT NULL".
-			" AND ".$extra_where.
-			" ORDER BY ts DESC";
-
-		$res = $this->db->query($q);
-
-		$data = $this->db->fetchAssoc($res);
-
-		return ilUtil::getMySQLTimestamp($data["ts"]);
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function getLastOpeningHTMLView(int $assignment_id, string $extra_where)
-	{
-		$this->db->setLimit(1);
-
-		$q = "SELECT web_dir_access_time FROM ".self::TABLE_NAME.
-			" WHERE ass_id = ".$this->db->quote($assignment_id, "integer").
-			" AND (filename IS NOT NULL OR atext IS NOT NULL)".
-			" AND web_dir_access_time IS NOT NULL".
-			" AND ".$extra_where.
-			" ORDER BY web_dir_access_time DESC";
-
-		$res = $this->db->query($q);
-
-		$data = $this->db->fetchAssoc($res);
-
-		return ilUtil::getMySQLTimestamp($data["web_dir_access_time"]);
-	}
-
-	/**
-	 * @inheritdoc
-	 */
 	public function hasSubmissions(int $ass_id): int
 	{
 		$query = "SELECT * FROM ".self::TABLE_NAME.

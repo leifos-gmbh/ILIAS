@@ -90,7 +90,7 @@ class ilFSWebStorageExercise extends ilFileSystemStorage
 
 	}
 
-	public function delete_user_submission_directory(int $user_id): void
+	public function deleteUserSubmissionDirectory(int $user_id): void
 	{
 		$internal_dir = $this->submissions_path."/".$user_id;
 

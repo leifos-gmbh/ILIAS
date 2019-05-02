@@ -1319,7 +1319,7 @@ class ilExerciseManagementGUI
 	function removeUserSubmissionFilesFromWebDir(int $user_id): void
 	{
 		$storage = new ilFSWebStorageExercise($this->exercise->getId(),$this->ass_id);
-		$storage->delete_user_submission_directory($user_id);
+		$storage->deleteUserSubmissionDirectory($user_id);
 	}
 
 	function saveCommentsObject() 

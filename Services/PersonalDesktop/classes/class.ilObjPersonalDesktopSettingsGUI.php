@@ -29,6 +29,16 @@ class ilObjPersonalDesktopSettingsGUI extends ilObjectGUI
     private static $ERROR_MESSAGE;
 
 	/**
+	 * @var \ILIAS\UI\Factory
+	 */
+    protected $ui_factory;
+
+	/**
+	 * @var \ILIAS\UI\Renderer
+	 */
+    protected $ui_renderer;
+
+	/**
 	 * @var ilPDSelectedItemsBlockViewSettings
 	 */
 	protected $viewSettings; 
@@ -143,6 +153,8 @@ class ilObjPersonalDesktopSettingsGUI extends ilObjectGUI
 		$ilAccess = $this->access;
 		
 		$pd_set = new ilSetting("pd");
+
+		$this->setSettingsSubTabs("general");
 		
 		$enable_calendar = ilCalendarSettings::_getInstance()->isEnabled();
 		#$enable_calendar = $ilSetting->get("enable_calendar");		
@@ -487,6 +499,100 @@ class ilObjPersonalDesktopSettingsGUI extends ilObjectGUI
 				return array(array("editWsp", $fields));			
 		}
 	}
+
+	/**
+	 * Get tabs
+	 *
+	 * @access public
+	 *
+	 */
+	public function setSettingsSubTabs($a_active)
+	{
+		$rbacsystem = $this->rbacsystem;
+		$ilAccess = $this->access;
+
+		$tabs = $this->tabs_gui;
+		$ctrl = $this->ctrl;
+		$lng = $this->lng;
+
+		if ($rbacsystem->checkAccess("visible,read",$this->object->getRefId()))
+		{
+			$tabs->addSubtab("general", $lng->txt("general_settings"),
+				$ctrl->getLinkTarget($this, "editSettings"));
+
+			$tabs->addSubtab("view_favourites", $lng->txt("pd_view_favourites"),
+				$ctrl->getLinkTarget($this, "editViewFavourites"));
+
+			$tabs->addSubtab("view_courses_groups", $lng->txt("pd_view_courses_groups"),
+				$ctrl->getLinkTarget($this, "editViewCoursesGroups"));
+		}
+
+		$tabs->activateSubtab($a_active);
+	}
+
+	/**
+	 * Edit settings of courses and groups overview
+	 */
+	protected function editViewCoursesGroups()
+	{
+		$main_tpl = $this->tpl;
+		$ctrl = $this->ctrl;
+		$lng = $this->lng;
+		$ui_factory = $this->ui_factory;
+		$ui_renderer = $this->ui_renderer;
+
+		$this->setSettingsSubTabs("view_courses_groups");
+
+		// activation
+		$cb_activate = $ui_factory->input()->field()->checkbox($lng->txt("pd_activate_courses_groups"));
+		$sec_activation = $ui_factory->input()->field()->section(
+			["active" => $cb_activate],
+			$lng->txt("pd_activation"));
+
+		// presentation
+		$options = array(
+			"list" => $lng->txt("pd_list"),
+			"tile" => $lng->txt("pd_tile")
+		);
+		$avail_pres = $ui_factory->input()->field()->multiselect($lng->txt("pd_avail_presentation"), $options);
+		$default_pres = $ui_factory->input()->field()->radio($lng->txt("pd_default_presentation"))
+			->withOption('list', $lng->txt("pd_list"))
+			->withOption('tile', $lng->txt("pd_tile"));
+		$sec_presentation = $ui_factory->input()->field()->section(
+			["avail_pres" => $avail_pres, "default_pres" => $default_pres],
+			$lng->txt("pd_presentation"));
+
+		// sortation
+		$options = array(
+			"location" => $lng->txt("pd_location"),
+			"type" => $lng->txt("pd_type"),
+			"start_date" => $lng->txt("pd_start_date"),
+		);
+		$avail_sort = $ui_factory->input()->field()->multiselect($lng->txt("pd_avail_sortation"), $options);
+		$default_sort = $ui_factory->input()->field()->radio($lng->txt("pd_default_sortation"))
+			->withOption('location', $lng->txt("pd_location"))
+			->withOption('type', $lng->txt("pd_type"))
+			->withOption('start_date', $lng->txt("pd_start_date"));
+		$sec_sortation = $ui_factory->input()->field()->section(
+			["avail_sort" => $avail_sort, "default_sort" => $default_sort],
+			$lng->txt("pd_sortation"));
+
+		$form = $ui_factory->input()->container()->form()->standard($ctrl->getFormAction($this, "saveViewCoursesGroups"),
+			[$sec_activation, $sec_presentation, $sec_sortation]);
+
+		$main_tpl->setContent($ui_renderer->render($form));
+	}
+
+	/**
+	 * Save settings of courses and groups overview
+	 *
+	 */
+	protected function saveViewCoursesGroups()
+	{
+		
+	}
+	
+
 }
 
 ?>

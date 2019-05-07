@@ -41,7 +41,13 @@ class ilObjPersonalDesktopSettingsGUI extends ilObjectGUI
 	/**
 	 * @var ilPDSelectedItemsBlockViewSettings
 	 */
-	protected $viewSettings; 
+	protected $viewSettings;
+
+	/**
+	 * @var \Psr\Http\Message\ServerRequestInterface
+	 */
+	protected $request;
+
 	/**
 	 * Contructor
 	 *
@@ -60,6 +66,7 @@ class ilObjPersonalDesktopSettingsGUI extends ilObjectGUI
 		$lng = $DIC->language();
 		$this->ui_factory = $DIC->ui()->factory();
 		$this->ui_renderer = $DIC->ui()->renderer();
+		$this->request = $DIC->http()->request();
 		
 		$this->type = 'pdts';
 		parent::__construct($a_data, $a_id, $a_call_by_reference, $a_prepare_output);
@@ -536,15 +543,53 @@ class ilObjPersonalDesktopSettingsGUI extends ilObjectGUI
 	protected function editViewCoursesGroups()
 	{
 		$main_tpl = $this->tpl;
+		$tabs = $this->tabs_gui;
+		$ui_renderer = $this->ui_renderer;
+
+		$tabs->activateTab("pd_settings");
+		$this->setSettingsSubTabs("view_courses_groups");
+
+		$form = $this->getViewSettingsForm(false);
+
+		$main_tpl->setContent($ui_renderer->render($form));
+	}
+
+	/**
+	 * Get view courses and groups settings form
+	 *
+	 * @return \ILIAS\UI\Component\Input\Container\Form\Standard
+	 */
+	protected function getViewSettingsForm($favourites = true)
+	{
 		$ctrl = $this->ctrl;
 		$lng = $this->lng;
 		$ui_factory = $this->ui_factory;
-		$ui_renderer = $this->ui_renderer;
 
-		$this->setSettingsSubTabs("view_courses_groups");
+		if ($favourites)
+		{
+			$activation_text = $lng->txt("pd_enable_my_offers");
+			$activation_value = $this->viewSettings->enabledSelectedItems();
+			$sortation_options = array(
+				"location" => $lng->txt("pd_sort_by_location"),
+				"type" => $lng->txt("pd_sort_by_type")
+			);
+			$default_sortation_value = (string) $this->viewSettings->getDefaultSortType();
+		}
+		else
+		{
+			$activation_text = $lng->txt("pd_enable_my_memberships");
+			$activation_value = $this->viewSettings->enabledMemberships();
+			$sortation_options = array(
+				"location" => $lng->txt("pd_sort_by_location"),
+				"type" => $lng->txt("pd_sort_by_type"),
+				"start_date" => $lng->txt("pd_sort_by_start_date"),
+			);
+			$default_sortation_value = (string) $this->viewSettings->getDefaultSortType();
+		}
 
 		// activation
-		$cb_activate = $ui_factory->input()->field()->checkbox($lng->txt("pd_activate_courses_groups"));
+		$cb_activate = $ui_factory->input()->field()->checkbox($activation_text)
+			->withValue($activation_value);
 		$sec_activation = $ui_factory->input()->field()->section(
 			["active" => $cb_activate],
 			$lng->txt("pd_activation"));
@@ -563,25 +608,26 @@ class ilObjPersonalDesktopSettingsGUI extends ilObjectGUI
 			$lng->txt("pd_presentation"));
 
 		// sortation
-		$options = array(
-			"location" => $lng->txt("pd_location"),
-			"type" => $lng->txt("pd_type"),
-			"start_date" => $lng->txt("pd_start_date"),
-		);
-		$avail_sort = $ui_factory->input()->field()->multiselect($lng->txt("pd_avail_sortation"), $options);
+		$avail_sort = $ui_factory->input()->field()->multiselect($lng->txt("pd_avail_sortation"), $sortation_options);
 		$default_sort = $ui_factory->input()->field()->radio($lng->txt("pd_default_sortation"))
-			->withOption('location', $lng->txt("pd_location"))
-			->withOption('type', $lng->txt("pd_type"))
-			->withOption('start_date', $lng->txt("pd_start_date"));
+			->withOption($this->viewSettings->getSortByLocationMode(), $lng->txt("pd_sort_by_location"))
+			->withOption($this->viewSettings->getSortByTypeMode(), $lng->txt("pd_sort_by_type"));
+		if (isset($sortation_options["start_date"]))
+		{
+			$default_sort = $default_sort->withOption($this->viewSettings->getSortByStartDateMode(), $lng->txt("pd_sort_by_start_date"));
+		}
+		$default_sort = $default_sort->withValue($default_sortation_value);
 		$sec_sortation = $ui_factory->input()->field()->section(
 			["avail_sort" => $avail_sort, "default_sort" => $default_sort],
 			$lng->txt("pd_sortation"));
 
-		$form = $ui_factory->input()->container()->form()->standard($ctrl->getFormAction($this, "saveViewCoursesGroups"),
-			[$sec_activation, $sec_presentation, $sec_sortation]);
 
-		$main_tpl->setContent($ui_renderer->render($form));
+		$form = $ui_factory->input()->container()->form()->standard($ctrl->getFormAction($this, "saveViewCoursesGroups"),
+			["activation" => $sec_activation, "presentation" => $sec_presentation, "sortation" => $sec_sortation]);
+
+		return $form;
 	}
+
 
 	/**
 	 * Save settings of courses and groups overview
@@ -589,9 +635,37 @@ class ilObjPersonalDesktopSettingsGUI extends ilObjectGUI
 	 */
 	protected function saveViewCoursesGroups()
 	{
-		
+		$request = $this->request;
+		$lng = $this->lng;
+		$ctrl = $this->ctrl;
+
+		$form = $this->getViewCoursesGroupsForm();
+		$form = $form->withRequest($request);
+		$form_data = $form->getData();
+		$this->viewSettings->enableMemberships((int) ($form_data['activation']['active'] != ""));
+		$this->viewSettings->storeDefaultSortType($form_data['sortation']['default_sort']);
+
+		ilUtil::sendSuccess($lng->txt("msg_obj_modified"));
+		$ctrl->redirect($this, "editViewCoursesGroups");
 	}
-	
+
+	/**
+	 * Edit favourites view
+	 */
+	protected function editViewFavourites()
+	{
+		$main_tpl = $this->tpl;
+		$tabs = $this->tabs_gui;
+		$ui_renderer = $this->ui_renderer;
+
+		$tabs->activateTab("pd_settings");
+		$this->setSettingsSubTabs("view_favourites");
+
+		$form = $this->getViewSettingsForm();
+
+		$main_tpl->setContent($ui_renderer->render($form));
+	}
+
 
 }
 

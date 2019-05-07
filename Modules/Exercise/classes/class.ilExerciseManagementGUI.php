@@ -2069,19 +2069,18 @@ class ilExerciseManagementGUI
 				foreach($users as $ass_id => $users)
 				{
 					$ass = $ass_map[$ass_id];
-					
-					// :TODO: should individual deadlines BEFORE extended be possible?			
-					$dl = new ilDateTime($ass->getDeadline(), IL_CAL_UNIX);	
-					
+
+					$now = new ilDateTime(time(), IL_CAL_UNIX);
+
 					foreach($users as $user_id)
 					{
 						$date_field = $form->getItemByPostVar("dl_".$ass_id."_".$user_id);
-						if(ilDate::_before($date_field->getDate(), $dl))
+						if(ilDate::_before($date_field->getDate(), $now))
 						{
-							$date_field->setAlert(sprintf($this->lng->txt("exc_individual_deadline_before_global"), ilDatePresentation::formatDate($dl)));
+							$date_field->setAlert(sprintf($this->lng->txt("exc_individual_deadline_before_global"), ilDatePresentation::formatDate($now)));
 							$valid = false;
 						}
-						else						
+						else
 						{
 							$res[$ass_id][$user_id] = $date_field->getDate();
 						}

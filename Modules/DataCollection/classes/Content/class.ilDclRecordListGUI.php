@@ -320,7 +320,7 @@ class ilDclRecordListGUI {
 		$table->initFilter();
 		$table->resetOffset();
 		$table->writeFilterToSession();
-		$this->ctrl->redirect($this, 'listRecords');
+		$this->ctrl->redirect($this, self::CMD_LIST_RECORDS);
 	}
 
 
@@ -328,10 +328,11 @@ class ilDclRecordListGUI {
 	 *
 	 */
 	protected function resetFilter() {
-		$table = new ilDclRecordListTableGUI($this, "listRecords", $this->table_obj, $this->tableview_id);
+		$table = new ilDclRecordListTableGUI($this, "show", $this->table_obj, $this->tableview_id);
+		$table->initFilter();
 		$table->resetOffset();
 		$table->resetFilter();
-		$this->listRecords(true);
+		$this->ctrl->redirect($this, self::CMD_SHOW);
 	}
 
 
@@ -349,10 +350,10 @@ class ilDclRecordListGUI {
 			if (isset($_GET['ilfilehash'])) {
 				$filehash = $_GET['ilfilehash'];
 				$field_id = $_GET['field_id'];
-				$file = ilDclPropertyFormGUI::getTempFileByHash($filehash, $ilUser->getId());
+				ilDclPropertyFormGUI::rebuildTempFileByHash($filehash);
 
-				$filepath = $file["field_" . $field_id]['tmp_name'];
-				$filetitle = $file["field_" . $field_id]['name'];
+				$filepath = $_FILES["field_" . $field_id]['tmp_name'];
+				$filetitle = $_FILES["field_" . $field_id]['name'];
 			} else {
 				$rec_id = $_GET['record_id'];
 				$record = ilDclCache::getRecordCache($rec_id);
@@ -439,7 +440,7 @@ class ilDclRecordListGUI {
 		if ($n_skipped) {
 			ilUtil::sendInfo(sprintf($this->lng->txt('dcl_skipped_delete_records'), $n_skipped), true);
 		}
-		$this->ctrl->redirect($this, 'listRecords');
+		$this->ctrl->redirect($this, self::CMD_LIST_RECORDS);
 	}
 
 
@@ -467,12 +468,12 @@ class ilDclRecordListGUI {
 
 		/** @var ilTabsGUI $ilTabs */
 		$this->ctrl->setParameter($this, self::GET_MODE, self::MODE_VIEW);
-		$ilTabs->addSubTab('mode_1', $this->lng->txt('view'), $this->ctrl->getLinkTarget($this, 'listRecords'));
+		$ilTabs->addSubTab('mode_1', $this->lng->txt('view'), $this->ctrl->getLinkTarget($this, self::CMD_LIST_RECORDS));
 		$this->ctrl->clearParameters($this);
 
 		if ($this->table_obj->hasPermissionToDeleteRecords((int)$_GET['ref_id'])) {
 			$this->ctrl->setParameter($this, self::GET_MODE, self::MODE_MANAGE);
-			$ilTabs->addSubTab('mode_2', $this->lng->txt('dcl_manage'), $this->ctrl->getLinkTarget($this, 'listRecords'));
+			$ilTabs->addSubTab('mode_2', $this->lng->txt('dcl_manage'), $this->ctrl->getLinkTarget($this, self::CMD_LIST_RECORDS));
 			$this->ctrl->clearParameters($this);
 		}
 
@@ -512,6 +513,8 @@ class ilDclRecordListGUI {
 
 		$list = new ilDclRecordListTableGUI($this, "listRecords", $table_obj, $this->tableview_id, $this->mode);
 		if ($use_tableview_filter) {
+			$list->initFilter();
+			$list->resetFilter();
 			$list->initFilterFromTableView();
 		} else {
 			$list->initFilter();

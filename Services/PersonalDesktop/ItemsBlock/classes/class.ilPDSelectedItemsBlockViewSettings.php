@@ -29,6 +29,14 @@ class ilPDSelectedItemsBlockViewSettings implements ilPDSelectedItemsBlockConsta
 	/**
 	 * @var array
 	 */
+	protected static $availablePresentations = array(
+		self::PRESENTATION_LIST,
+		self::PRESENTATION_TILE
+	);
+
+	/**
+	 * @var array
+	 */
 	protected static $availableSortOptionsByView = array(
 		self::VIEW_SELECTED_ITEMS => array(
 			self::SORT_BY_LOCATION,
@@ -38,6 +46,22 @@ class ilPDSelectedItemsBlockViewSettings implements ilPDSelectedItemsBlockConsta
 			self::SORT_BY_LOCATION,
 			self::SORT_BY_TYPE,
 			self::SORT_BY_START_DATE
+		),
+		self::VIEW_MY_STUDYPROGRAMME => array(
+		)
+	);
+
+	/**
+	 * @var array
+	 */
+	protected static $availablePresentationsByView = array(
+		self::VIEW_SELECTED_ITEMS => array(
+			self::PRESENTATION_LIST,
+			self::PRESENTATION_TILE
+		),
+		self::VIEW_MY_MEMBERSHIPS => array(
+			self::PRESENTATION_LIST,
+			self::PRESENTATION_TILE
 		),
 		self::VIEW_MY_STUDYPROGRAMME => array(
 		)
@@ -158,12 +182,56 @@ class ilPDSelectedItemsBlockViewSettings implements ilPDSelectedItemsBlockConsta
 	}
 
 	/**
+	 * Get available sort options by view
+	 *
+	 * @param int $view
+	 * @return array
+	 */
+	public function getAvailabelSortOptionsByView(int $view)
+	{
+		return self::$availableSortOptionsByView[$view];
+	}
+
+	/**
 	 * @return string
 	 */
-	public function getDefaultSortType()
+	public function getDefaultSortType(int $view)
 	{
-		return $this->settings->get('my_memberships_def_sort', $this->getSortByLocationMode());
+		switch ($view)
+		{
+			case $this->getSelectedItemsView();
+				return $this->settings->get('selected_items_def_sort', $this->getSortByLocationMode());
+
+			default:
+				return $this->settings->get('my_memberships_def_sort', $this->getSortByLocationMode());
+		}
 	}
+
+	/**
+	 * Get active sort options by view
+	 *
+	 * @param int $view
+	 * @return array
+	 */
+	public function getActiveSortOptionsByView(int $view)
+	{
+		$val = $this->settings->get('pd_active_sort_view_'.$view);
+		return ($val == "")
+			? []
+			: unserialize($val);
+	}
+
+	/**
+	 * Get active sort options by view
+	 *
+	 * @param int $view
+	 * @param array $options
+	 */
+	public function setActiveSortOptionsByView(int $view, array $options)
+	{
+		$this->settings->set('pd_active_sort_view_'.$view, serialize($options));
+	}
+
 
 	/**
 	 * @return boolean
@@ -192,10 +260,19 @@ class ilPDSelectedItemsBlockViewSettings implements ilPDSelectedItemsBlockConsta
 	/**
 	 * @param string $type
 	 */
-	public function storeDefaultSortType($type)
+	public function storeDefaultSortType(int $view, $type)
 	{
-		assert(in_array($type, self::$availableSortOptions));
-		$this->settings->set('my_memberships_def_sort', $type);
+		assert(in_array($type, $this->getAvailabelSortOptionsByView($view)));
+		switch ($view)
+		{
+			case $this->getSelectedItemsView();
+				$this->settings->set('selected_items_def_sort', $type);
+				break;
+
+			default:
+				$this->settings->set('my_memberships_def_sort', $type);
+				break;
+		}
 	}
 
 	/**
@@ -296,14 +373,7 @@ class ilPDSelectedItemsBlockViewSettings implements ilPDSelectedItemsBlockConsta
 		$this->currentSortOption = $this->actor->getPref('pd_order_items');
 		if(!in_array($this->currentSortOption, self::$availableSortOptionsByView[$this->currentView]))
 		{
-			if($this->isSelectedItemsViewActive())
-			{
-				$this->currentSortOption = self::SORT_BY_LOCATION;
-			}
-			else if($this->isStudyProgrammeViewActive())
-			{
-				$this->currentSortOption = $this->getDefaultSortType();
-			}
+			$this->currentSortOption = $this->getDefaultSortType($this->currentView);
 		}
 	}
 

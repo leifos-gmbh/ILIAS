@@ -231,7 +231,8 @@ class ilBadgeProfileGUI
 					$profile_button];
 			}
 
-			$cards[] = $this->factory->card()->standard($badge["title"], $image)->withSections($badge_sections);
+			$cards[] = $this->factory->card()->standard($badge["title"], $image)->withSections($badge_sections)
+				->withTitleAction($modal->getShowSignal());
 
 			$badge_components[] = $modal;
 		}

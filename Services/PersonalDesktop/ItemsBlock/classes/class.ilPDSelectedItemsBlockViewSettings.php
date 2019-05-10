@@ -439,6 +439,9 @@ class ilPDSelectedItemsBlockViewSettings implements ilPDSelectedItemsBlockConsta
 		if (!in_array($this->currentSortOption, $this->getAvailableSortOptionsByView($this->currentView))) {
 			$this->currentSortOption = $this->getDefaultSortingByView($this->currentView);
 		}
+		if (!in_array($this->currentSortOption, $this->getActiveSortingsByView($this->currentView))) {
+			$this->currentSortOption = $this->getDefaultSortingByView($this->currentView);
+		}
 
 		$this->currentPresentationOption = $this->actor->getPref('pd_view_pres_' . $this->currentView);
 		if (!in_array($this->currentSortOption, $this->getAvailablePresentationsByView($this->currentView))) {

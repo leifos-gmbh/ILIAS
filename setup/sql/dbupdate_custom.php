@@ -23,3 +23,15 @@ $ilDB->insert('rbac_ta', array(
 ));
 
 ?>
+<#2>
+<?php
+// We should ensure that settings are set for new installations and ILIAS version upgrades
+$setting = new ilSetting();
+
+$setting->set('pd_active_sort_view_0', serialize(['location', 'type']));
+$setting->set('pd_active_sort_view_1', serialize(['location', 'type', 'start_date']));
+$setting->set('pd_active_pres_view_0', serialize(['list', 'title']));
+$setting->set('pd_active_pres_view_1', serialize(['list', 'title']));
+$setting->set('pd_def_pres_view_0', 'list');
+$setting->set('pd_def_pres_view_1', 'list');
+?>

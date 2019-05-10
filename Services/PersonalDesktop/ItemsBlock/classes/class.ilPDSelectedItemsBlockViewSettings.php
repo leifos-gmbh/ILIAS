@@ -444,11 +444,11 @@ class ilPDSelectedItemsBlockViewSettings implements ilPDSelectedItemsBlockConsta
 		}
 
 		$this->currentPresentationOption = $this->actor->getPref('pd_view_pres_' . $this->currentView);
-		if (!in_array($this->currentSortOption, $this->getAvailablePresentationsByView($this->currentView))) {
-			$this->currentSortOption = $this->getDefaultPresentationByView($this->currentView);
+		if (!in_array($this->currentPresentationOption, $this->getAvailablePresentationsByView($this->currentView))) {
+			$this->currentPresentationOption = $this->getDefaultPresentationByView($this->currentView);
 		}
-		if (!in_array($this->currentSortOption, $this->getActivePresentationsByView($this->currentView))) {
-			$this->currentSortOption = $this->getDefaultPresentationByView($this->currentView);
+		if (!in_array($this->currentPresentationOption, $this->getActivePresentationsByView($this->currentView))) {
+			$this->currentPresentationOption = $this->getDefaultPresentationByView($this->currentView);
 		}
 	}
 

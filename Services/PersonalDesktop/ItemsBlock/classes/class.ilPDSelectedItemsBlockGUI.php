@@ -1,10 +1,5 @@
 <?php
-
 /* Copyright (c) 1998-2011 ILIAS open source, Extended GPL, see docs/LICENSE */
-
-include_once("Services/Block/classes/class.ilBlockGUI.php");
-include_once './Services/PersonalDesktop/interfaces/interface.ilDesktopItemHandling.php';
-require_once('./Services/Repository/classes/class.ilObjectPlugin.php');
 
 /**
 * BlockGUI class for Selected Items on Personal Desktop
@@ -17,19 +12,13 @@ require_once('./Services/Repository/classes/class.ilObjectPlugin.php');
 */
 class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandling
 {
-	/**
-	 * @var ilRbacSystem
-	 */
+	/** @var ilRbacSystem */
 	protected $rbacsystem;
 
-	/**
-	 * @var ilSetting
-	 */
+	/** @var ilSetting */
 	protected $settings;
 
-	/**
-	 * @var ilObjectDefinition
-	 */
+	/** @var ilObjectDefinition */
 	protected $obj_definition;
 
 	/** @var string */
@@ -56,10 +45,11 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 	/** @var ilObjUser */
 	protected $user;
 
-	/**
-	 * @var \ILIAS\DI\UIServices
-	 */
+	/** @var \ILIAS\DI\UIServices */
 	protected $ui;
+	
+	/** @var \ILIAS\HTTP\GlobalHttpState */
+	protected $http;
 
 	/**
 	 * ilPDSelectedItemsBlockGUI constructor.
@@ -67,11 +57,13 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 	public function __construct()
 	{
 		global $DIC;
+
 		$this->rbacsystem = $DIC->rbac()->system();
 		$this->settings = $DIC->settings();
 		$this->obj_definition = $DIC["objDefinition"];
 		$this->access = $DIC->access();
 		$this->ui = $DIC->ui();
+		$this->http = $DIC->http();
 
 		parent::__construct();
 
@@ -91,36 +83,24 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 	}
 
 	/**
-	 * Is tile view
-	 *
-	 * @return bool
-	 */
-	protected function isTileView()
-	{
-		return true;
-	}
-
-
-	/**
-	 *
+	 * Evaluates the view settings of this block
 	 */
 	protected function initViewSettings()
 	{
-		require_once 'Services/PersonalDesktop/ItemsBlock/classes/class.ilPDSelectedItemsBlockViewSettings.php';
-		$this->viewSettings = new ilPDSelectedItemsBlockViewSettings($this->user, (int)$_GET['view']);
+		$view = (int) ($this->http->request()->getQueryParams()['view'] ?? 0);
+
+		$this->viewSettings = new ilPDSelectedItemsBlockViewSettings($this->user, $view);
 		$this->viewSettings->parse();
 
-		require_once 'Services/PersonalDesktop/ItemsBlock/classes/class.ilPDSelectedItemsBlockViewGUI.php';
 		$this->view = ilPDSelectedItemsBlockViewGUI::bySettings($this->viewSettings);
 
-		$_GET['view'] = $this->viewSettings->getCurrentView();
-		$this->ctrl->saveParameter($this, 'view');
+		$this->ctrl->setParameter($this, 'view', $this->viewSettings->getCurrentView());
 	}
 
 	/**
 	 * @return ilPDSelectedItemsBlockViewSettings
 	 */
-	public function getViewSettings()
+	public function getViewSettings() : ilPDSelectedItemsBlockViewSettings
 	{
 		return $this->viewSettings;
 	}
@@ -128,7 +108,7 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 	/**
 	 *
 	 */
-	public function isManagedView()
+	public function isManagedView() : bool
 	{
 		return $this->manage;
 	}
@@ -138,9 +118,7 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 	 */
 	public function fillDetailRow()
 	{
-//		$this->ctrl->setParameterByClass('ilpersonaldesktopgui', 'view', $this->viewSettings->getCurrentView());
 		parent::fillDetailRow();
-//		$this->ctrl->setParameterByClass('ilpersonaldesktopgui', 'view', '');
 	}
 
 	/**
@@ -148,7 +126,6 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 	 */
 	public function addToDeskObject()
 	{
-		include_once './Services/PersonalDesktop/classes/class.ilDesktopItemGUI.php';
 		ilDesktopItemGUI::addToDesktop();
 		ilUtil::sendSuccess($this->lng->txt("msg_obj_modified"), true);
 		$this->ctrl->setParameterByClass('ilpersonaldesktopgui', 'view', $this->viewSettings->getCurrentView());
@@ -160,7 +137,6 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 	 */
 	public function removeFromDeskObject()
 	{
-		include_once './Services/PersonalDesktop/classes/class.ilDesktopItemGUI.php';
 		ilDesktopItemGUI::removeFromDesktop();
 		ilUtil::sendSuccess($this->lng->txt("removed_from_desktop"), true);
 		$this->ctrl->setParameterByClass('ilpersonaldesktopgui', 'view', $this->viewSettings->getCurrentView());
@@ -213,8 +189,7 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 	{
 		global $DIC;
 
-		if ($this->isTileView())
-		{
+		if ($this->viewSettings->isTilePresentation()) {
 			return $this->getTileHTML();
 		}
 
@@ -223,7 +198,6 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 		// workaround to show details row
 		$this->setData(array('dummy'));
 
-		require_once 'Services/Object/classes/class.ilObjectListGUI.php';
 		ilObjectListGUI::prepareJSLinks('',
 			$this->ctrl->getLinkTargetByClass(array('ilcommonactiondispatchergui', 'ilnotegui'), '', '', true, false),
 			$this->ctrl->getLinkTargetByClass(array('ilcommonactiondispatchergui', 'iltagginggui'), '', '', true, false)
@@ -238,7 +212,6 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 			$this->setEnableDetailRow(false);
 		}
 
-//		$this->ctrl->clearParametersByClass('ilpersonaldesktopgui');
 		$this->ctrl->clearParameters($this);
 
 		$DIC->database()->useSlave(false);
@@ -290,7 +263,7 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 	/**
 	 * @return string
 	 */
-	protected function getContent()
+	protected function getContent() : string 
 	{
 		return $this->content;
 	}
@@ -298,7 +271,7 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 	/**
 	 * @param string $a_content
 	 */
-	protected  function setContent($a_content)
+	protected function setContent(string $a_content)
 	{
 		$this->content = $a_content;
 	}
@@ -816,12 +789,10 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 
 
 	/**
-	 * Get tile html
-	 *
-	 * @param
-	 * @return
+	 * @return string
+	 * @throws ilTemplateException
 	 */
-	protected function getTileHTML()
+	protected function getTileHTML() : string
 	{
 		$ilCtrl = $this->ctrl;
 		$lng = $this->lng;

@@ -321,7 +321,7 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 			return '';
 		}
 
-		$sortings = $this->viewSettings->getActiveSortingsByView($this->viewSettings->getCurrentView());
+		$sortings = $this->viewSettings->getSelectableSortingModes();
 		$effectiveSorting = $this->viewSettings->getEffectiveSortingMode();
 		foreach ($sortings as $sorting) {
 			$this->ctrl->setParameter($this, 'sorting', $sorting);
@@ -337,7 +337,7 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 			$this->ctrl->setParameter($this, 'sorting', null);
 		}
 
-		$presentations = $this->viewSettings->getActivePresentationsByView($this->viewSettings->getCurrentView());
+		$presentations = $this->viewSettings->getSelectablePresentationModes();
 		$effectivePresentation = $this->viewSettings->getEffectivePresentationMode();
 		foreach ($presentations as $presentation) {
 			$this->ctrl->setParameter($this, 'presentation', $presentation);
@@ -589,9 +589,8 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 	 */
 	public function changePDItemPresentation()
 	{
-		$this->user->writePref(
-			'pd_view_pres_' . $this->viewSettings->getCurrentView(),
-			\ilUtil::stripSlashes($this->http->request()->getQueryParams()['presentation'])
+		$this->viewSettings->storeActorPresentationMode(
+			\ilUtil::stripSlashes((string) ($this->http->request()->getQueryParams()['presentation'] ?? ''))
 		);
 		$this->initAndShow();
 	}
@@ -601,10 +600,10 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 	 */
 	public function changePDItemSorting()
 	{
-		$this->user->writePref(
-			'pd_order_items_' . $this->viewSettings->getCurrentView(),
-			\ilUtil::stripSlashes($this->http->request()->getQueryParams()['sorting'])
+		$this->viewSettings->storeActorSortingMode(
+			\ilUtil::stripSlashes((string) ($this->http->request()->getQueryParams()['sorting'] ?? ''))
 		);
+
 		$this->initAndShow();
 	}
 

@@ -116,14 +116,6 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 	/**
 	 * @inheritdoc
 	 */
-	public function fillDetailRow()
-	{
-		parent::fillDetailRow();
-	}
-
-	/**
-	 * @inheritdoc
-	 */
 	public function addToDeskObject()
 	{
 		ilDesktopItemGUI::addToDesktop();
@@ -189,6 +181,8 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 	{
 		global $DIC;
 
+		$this->setTitle($this->view->getTitle());
+
 		if ($this->viewSettings->isTilePresentation()) {
 			return $this->getTileHTML();
 		}
@@ -196,19 +190,18 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 		$DIC->database()->useSlave(true);
 
 		// workaround to show details row
-		$this->setData(array('dummy'));
+		$this->setData(['dummy']);
 
 		ilObjectListGUI::prepareJSLinks('',
-			$this->ctrl->getLinkTargetByClass(array('ilcommonactiondispatchergui', 'ilnotegui'), '', '', true, false),
-			$this->ctrl->getLinkTargetByClass(array('ilcommonactiondispatchergui', 'iltagginggui'), '', '', true, false)
+			$this->ctrl->getLinkTargetByClass(['ilcommonactiondispatchergui', 'ilnotegui'], '', '', true, false),
+			$this->ctrl->getLinkTargetByClass(['ilcommonactiondispatchergui', 'iltagginggui'], '', '', true, false)
 		);
 
 		$DIC['ilHelp']->setDefaultScreenId(ilHelpGUI::ID_PART_SCREEN, $this->view->getScreenId());
-		$this->setTitle($this->view->getTitle());
+
 		$this->setContent($this->getViewBlockHtml());
 
-		if($this->getContent() == '')
-		{
+		if ('' === $this->getContent()) {
 			$this->setEnableDetailRow(false);
 		}
 
@@ -281,12 +274,9 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 	 */
 	public function fillDataSection()
 	{
-		if($this->getContent() == '')
-		{
+		if ($this->getContent() == '') {
 			$this->setDataSection($this->view->getIntroductionHtml());
-		}
-		else
-		{
+		} else {
 			$this->tpl->setVariable('BLOCK_ROW', $this->getContent());
 		}
 	}
@@ -300,12 +290,71 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 		$this->setFooterLinks();
 		$this->fillFooterLinks();
 		$this->tpl->setVariable('FCOLSPAN', $this->getColSpan());
-		if($this->tpl->blockExists('block_footer'))
-		{
+		if ($this->tpl->blockExists('block_footer')) {
 			$this->tpl->setCurrentBlock('block_footer');
 			$this->tpl->parseCurrentBlock();
 		}
 	}
+
+	/**
+	 * @return array
+	 */
+	protected function getViewCommandGroups() : array
+	{
+		$commandGroups = [];
+
+		$sortingCommands = [];
+		$sortings = $this->viewSettings->getSelectableSortingModes();
+		$effectiveSorting = $this->viewSettings->getEffectiveSortingMode();
+		foreach ($sortings as $sorting) {
+			$this->ctrl->setParameter($this, 'sorting', $sorting);
+			$sortingCommands[] = [
+				'txt' => $this->lng->txt('pd_sort_by_' . $sorting),
+				'url' => $this->ctrl->getLinkTarget($this, 'changePDItemSorting'),
+				'asyncUrl' => $this->ctrl->getLinkTarget($this, 'changePDItemSorting', '', true),
+				'active' => $sorting === $effectiveSorting,
+			];
+			$this->ctrl->setParameter($this, 'sorting', null);
+		}
+
+		if (count($sortingCommands) > 0) {
+			$commandGroups[] = $sortingCommands;
+		}
+
+		$presentationCommands = [];
+		$presentations = $this->viewSettings->getSelectablePresentationModes();
+		$effectivePresentation = $this->viewSettings->getEffectivePresentationMode();
+		foreach ($presentations as $presentation) {
+			$this->ctrl->setParameter($this, 'presentation', $presentation);
+			$presentationCommands[] = [
+				'txt' => $this->lng->txt('pd_presentation_mode_' . $presentation),
+				'url' => $this->ctrl->getLinkTarget($this, 'changePDItemPresentation'),
+				'asyncUrl' => $this->ctrl->getLinkTarget($this, 'changePDItemPresentation', '', true),
+				'active' => $presentation === $effectivePresentation,
+			];
+			$this->ctrl->setParameter($this, 'presentation', null);
+		}
+
+		if (count($presentationCommands) > 0) {
+			$commandGroups[] = $presentationCommands;
+		}
+
+		if (!$this->viewSettings->isTilePresentation()) {
+			$commandGroups[] = [
+				[
+					'txt' => $this->viewSettings->isSelectedItemsViewActive() ?
+						$this->lng->txt('pd_remove_multiple') :
+						$this->lng->txt('pd_unsubscribe_multiple_memberships'),
+					'url' => $this->ctrl->getLinkTarget($this, 'manage'),
+					'asyncUrl' => null,
+					'active' => false,
+				]
+			];
+		}
+
+		return $commandGroups;
+	}
+		
 
 	/**
 	 *
@@ -321,46 +370,19 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 			return '';
 		}
 
-		$sortings = $this->viewSettings->getSelectableSortingModes();
-		$effectiveSorting = $this->viewSettings->getEffectiveSortingMode();
-		foreach ($sortings as $sorting) {
-			$this->ctrl->setParameter($this, 'sorting', $sorting);
-			$this->addFooterLink(
-				$this->lng->txt('pd_sort_by_' . $sorting),
-				$this->ctrl->getLinkTarget($this, 'changePDItemSorting'),
-				$this->ctrl->getLinkTarget($this, 'changePDItemSorting', '', true),
-				'block_' . $this->getBlockType() . '_' . $this->block_id,
-				false,
-				false,
-				$sorting === $effectiveSorting
-			);
-			$this->ctrl->setParameter($this, 'sorting', null);
-		}
-
-		$presentations = $this->viewSettings->getSelectablePresentationModes();
-		$effectivePresentation = $this->viewSettings->getEffectivePresentationMode();
-		foreach ($presentations as $presentation) {
-			$this->ctrl->setParameter($this, 'presentation', $presentation);
-			$this->addFooterLink(
-				$this->lng->txt('pd_presentation_mode_' . $presentation),
-				$this->ctrl->getLinkTarget($this, 'changePDItemPresentation'),
-				$this->ctrl->getLinkTarget($this, 'changePDItemPresentation', '', true),
-				'block_' . $this->getBlockType() . '_' . $this->block_id,
-				false,
-				false,
-				$presentation === $effectivePresentation
-			);
-			$this->ctrl->setParameter($this, 'presentation', null);
-		}
-
-		if (!$this->viewSettings->isTilePresentation()) {
-			$this->addFooterLink($this->viewSettings->isSelectedItemsViewActive() ?
-				$this->lng->txt('pd_remove_multiple') :
-				$this->lng->txt('pd_unsubscribe_multiple_memberships'),
-				$this->ctrl->getLinkTarget($this, 'manage'),
-				null,
-				'block_' . $this->getBlockType() . '_' . $this->block_id
-			);
+		$commandGroups = $this->getViewCommandGroups();
+		foreach ($commandGroups as $group) {
+			foreach ($group as $command) {
+				$this->addFooterLink(
+					$command['txt'],
+					$command['url'],
+					$command['asyncUrl'],
+					'block_' . $this->getBlockType() . '_' . $this->block_id,
+					false,
+					false,
+					$command['active']
+				);
+			}
 		}
 	}
 
@@ -466,8 +488,7 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 			($this->getCurrentDetailLevel() >= $this->view->getMinimumDetailLevelForSection())
 		);
 
-		if($this->manage && $this->view->supportsSelectAll())
-		{
+		if ($this->manage && $this->view->supportsSelectAll()) {
 			// #11355 - see ContainerContentGUI::renderSelectAllBlock()
 			$tpl->setCurrentBlock('select_all_row');
 			$tpl->setVariable('CHECKBOXNAME', 'ilToolbarSelectAll');
@@ -771,28 +792,18 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 	 * @return string
 	 * @throws ilTemplateException
 	 */
-	protected function getTileHTML() : string
+	protected function getTileHTML()
 	{
-		$ilCtrl = $this->ctrl;
-		$lng = $this->lng;
-		$ilAccess = $this->access;
-		$ilUser = $this->user;
-		$objDefinition = $this->obj_def;
 		$f = $this->ui->factory();
 		$r = $this->ui->renderer();
 
-		$this->tpl = new ilTemplate("tpl.block_tiles.html", true, true, "Services/PersonalDesktop");
-
-		
-		$this->dropdown = array();
+		$this->tpl = new ilTemplate('tpl.block_tiles.html', true, true, 'Services/PersonalDesktop');
 
 		// commands
-		if (count($this->getBlockCommands()) > 0)
-		{
+		if (count($this->getBlockCommands()) > 0) {
 			$has_block_command = false;
 
-			foreach($this->getBlockCommands() as $command)
-			{
+			foreach ($this->getBlockCommands() as $command) {
 				// to do see getHTML in ilBlockGUI
 			}
 		}
@@ -802,54 +813,60 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 		$this->fillDetailRow();
 
 		// header links
-		if(count($this->getHeaderLinks()))
-		{
+		if (count($this->getHeaderLinks())) {
 			// to do see getHTML in ilBlockGUI
 		}
 
-		require_once 'Services/Object/classes/class.ilObjectActivation.php';
-		require_once 'Services/PersonalDesktop/ItemsBlock/classes/class.ilPDSelectedItemsBlockListGUIFactory.php';
 		$list_factory = new ilPDSelectedItemsBlockListGUIFactory($this);
 
 		$groups = $this->view->getItemGroups();
 
-		foreach ($groups as $group)
-		{
+		foreach ($groups as $group) {
 			$items = $group->getItems();
-			if (count($items) > 0)
-			{
+			if (count($items) > 0) {
 				$cards = [];
-				foreach ($group->getItems() as $item)
-				{
+				foreach ($group->getItems() as $item) {
 					$cards[] = $this->getCard($item, $list_factory);
 				}
 
-				$this->tpl->setCurrentBlock("head");
-				$this->tpl->setVariable("HEAD", $group->getLabel());
+				$this->tpl->setCurrentBlock('head');
+				$this->tpl->setVariable('HEAD', $group->getLabel());
 				$this->tpl->parseCurrentBlock();
 
 				$deck = $f->deck($cards)->withNormalCardsSize();
-				$this->tpl->setCurrentBlock("tiles");
-				$this->tpl->setVariable("TILES", $r->render($deck));
+				$this->tpl->setCurrentBlock('tiles');
+				$this->tpl->setVariable('TILES', $r->render($deck));
 				$this->tpl->parseCurrentBlock();
 
-				$this->tpl->setCurrentBlock("grouped_tiles");
+				$this->tpl->setCurrentBlock('grouped_tiles');
 				$this->tpl->parseCurrentBlock();
 			}
 		}
 
+		// Needs to be called to generate relevant block actions
+		$this->setContent(' ');
+		$this->setFooterLinks();
 
+		$dropdownItems = [];
+		$commandGroups = $this->getViewCommandGroups();
+		foreach ($commandGroups as $group) {
+			if (count($dropdownItems) > 0) {
+				$dropdownItems[] = $f->divider()->horizontal();
+			}
+			foreach ($group as $command) {
+				$dropdownItems[] = $f->button()->shy($command['txt'], $command['url']);
+			}
+		}
+		$dd = $f->dropdown()->standard($dropdownItems);
+		$this->tpl->setVariable('BLOCK_COMMANDS', $r->render($dd));
 
-		if ($ilCtrl->isAsynch())
-		{
+		if ($this->ctrl->isAsynch()) {
 			// return without div wrapper
 			echo $this->tpl->getAsynch();
-		}
-		else
-		{
+		} else {
 			// return incl. wrapping div with id
-			return '<div id="'."block_".$this->getBlockType()."_".$this->block_id.'">'.
-				$this->tpl->get().'</div>';
+			return '<div id="' . "block_" . $this->getBlockType() . "_" . $this->block_id . '">' .
+				$this->tpl->get() . '</div>';
 		}
 	}
 
@@ -857,9 +874,9 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 	 * Render card
 	 * @param $item
 	 * @param $list_factory
-	 * @return \ILIAS\UI\Component\Card\RepositoryObject|\ILIAS\UI\Component\Card\Standard
+	 * @return \ILIAS\UI\Component\Card\Card
 	 */
-	function getCard($item, $list_factory)
+	protected function getCard($item, $list_factory) : \ILIAS\UI\Component\Card\Card
 	{
 		global $DIC;
 

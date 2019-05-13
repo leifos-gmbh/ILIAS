@@ -308,7 +308,8 @@ class ilPDSelectedItemsBlockViewSettings implements ilPDSelectedItemsBlockConsta
 	 * Store default presentation
 	 *
 	 * @param int $view
-	 * @param string $pres
+	 * @param string $default
+	 * @param array $active
 	 */
 	public function storeViewPresentation(int $view, string $default, array $active)
 	{

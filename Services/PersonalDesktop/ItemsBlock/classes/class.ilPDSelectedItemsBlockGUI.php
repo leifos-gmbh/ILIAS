@@ -396,9 +396,13 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 		}
 
 		if ($this->viewSettings->isTilePresentation()) {
+			$tpl->touchBlock('row_type_2');
+
 			$tpl->setCurrentBlock("container_standard_row");
 			$tpl->setVariable("BLOCK_ROW_CONTENT", $this->getTileHTML());
 			$tpl->parseCurrentBlock();
+
+			$tpl->touchBlock("container_row");
 			return true;
 		}
 

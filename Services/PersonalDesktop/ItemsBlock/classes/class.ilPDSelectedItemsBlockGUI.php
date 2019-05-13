@@ -183,10 +183,6 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 
 		$this->setTitle($this->view->getTitle());
 
-		if ($this->viewSettings->isTilePresentation()) {
-			return $this->getTileHTML();
-		}
-
 		$DIC->database()->useSlave(true);
 
 		// workaround to show details row
@@ -394,12 +390,16 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 	 */
 	protected function renderGroupedItems(ilTemplate $tpl, array $grouped_items, $show_header = false)
 	{
-		/** @var $rbacsystem ilRbacSystem */
-		$rbacsystem = $this->rbacsystem;
-
 		if(0 == count($grouped_items))
 		{
 			return false;
+		}
+
+		if ($this->viewSettings->isTilePresentation()) {
+			$tpl->setCurrentBlock("container_standard_row");
+			$tpl->setVariable("BLOCK_ROW_CONTENT", $this->getTileHTML());
+			$tpl->parseCurrentBlock();
+			return true;
 		}
 
 		$output = false;
@@ -488,7 +488,7 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 			($this->getCurrentDetailLevel() >= $this->view->getMinimumDetailLevelForSection())
 		);
 
-		if ($this->manage && $this->view->supportsSelectAll()) {
+		if (!$this->viewSettings->isTilePresentation() && $this->manage && $this->view->supportsSelectAll()) {
 			// #11355 - see ContainerContentGUI::renderSelectAllBlock()
 			$tpl->setCurrentBlock('select_all_row');
 			$tpl->setVariable('CHECKBOXNAME', 'ilToolbarSelectAll');
@@ -797,25 +797,7 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 		$f = $this->ui->factory();
 		$r = $this->ui->renderer();
 
-		$this->tpl = new ilTemplate('tpl.block_tiles.html', true, true, 'Services/PersonalDesktop');
-
-		// commands
-		if (count($this->getBlockCommands()) > 0) {
-			$has_block_command = false;
-
-			foreach ($this->getBlockCommands() as $command) {
-				// to do see getHTML in ilBlockGUI
-			}
-		}
-
-
-		// fill row for setting details
-		$this->fillDetailRow();
-
-		// header links
-		if (count($this->getHeaderLinks())) {
-			// to do see getHTML in ilBlockGUI
-		}
+		$tpl = new ilTemplate('tpl.block_tiles.html', true, true, 'Services/PersonalDesktop');
 
 		$list_factory = new ilPDSelectedItemsBlockListGUIFactory($this);
 
@@ -829,25 +811,21 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 					$cards[] = $this->getCard($item, $list_factory);
 				}
 
-				$this->tpl->setCurrentBlock('head');
-				$this->tpl->setVariable('HEAD', $group->getLabel());
-				$this->tpl->parseCurrentBlock();
+				$tpl->setCurrentBlock('head');
+				$tpl->setVariable('HEAD', $group->getLabel());
+				$tpl->parseCurrentBlock();
 
 				$deck = $f->deck($cards)->withNormalCardsSize();
-				$this->tpl->setCurrentBlock('tiles');
-				$this->tpl->setVariable('TILES', $r->render($deck));
-				$this->tpl->parseCurrentBlock();
+				$tpl->setCurrentBlock('tiles');
+				$tpl->setVariable('TILES', $r->render($deck));
+				$tpl->parseCurrentBlock();
 
-				$this->tpl->setCurrentBlock('grouped_tiles');
-				$this->tpl->parseCurrentBlock();
+				$tpl->setCurrentBlock('grouped_tiles');
+				$tpl->parseCurrentBlock();
 			}
 		}
 
-		// Needs to be called to generate relevant block actions
-		$this->setContent(' ');
-		$this->setFooterLinks();
-
-		$dropdownItems = [];
+		/*$dropdownItems = [];
 		$commandGroups = $this->getViewCommandGroups();
 		foreach ($commandGroups as $group) {
 			if (count($dropdownItems) > 0) {
@@ -857,17 +835,9 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 				$dropdownItems[] = $f->button()->shy($command['txt'], $command['url']);
 			}
 		}
-		$dd = $f->dropdown()->standard($dropdownItems);
-		$this->tpl->setVariable('BLOCK_COMMANDS', $r->render($dd));
+		$dd = $f->dropdown()->standard($dropdownItems);*/
 
-		if ($this->ctrl->isAsynch()) {
-			// return without div wrapper
-			echo $this->tpl->getAsynch();
-		} else {
-			// return incl. wrapping div with id
-			return '<div id="' . "block_" . $this->getBlockType() . "_" . $this->block_id . '">' .
-				$this->tpl->get() . '</div>';
-		}
+		return $tpl->get();
 	}
 
 	/**

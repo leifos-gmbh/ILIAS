@@ -821,7 +821,11 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 
 				$deck = $f->deck($cards)->withNormalCardsSize();
 				$tpl->setCurrentBlock('tiles');
-				$tpl->setVariable('TILES', $r->render($deck));
+				if ($this->ctrl->isAsynch()) {
+					$tpl->setVariable('TILES', $r->renderAsync($deck));
+				} else {
+					$tpl->setVariable('TILES', $r->render($deck));
+				}
 				$tpl->parseCurrentBlock();
 
 				$tpl->setCurrentBlock('grouped_tiles');
@@ -841,7 +845,12 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 		}
 		$dd = $f->dropdown()->standard($dropdownItems);*/
 
-		return $tpl->get();
+		$html = $tpl->get();
+		if ($this->ctrl->isAsynch()) {
+			$html .= $tpl->getOnLoadCodeForAsynch();
+		}
+
+		return $html;
 	}
 
 	/**

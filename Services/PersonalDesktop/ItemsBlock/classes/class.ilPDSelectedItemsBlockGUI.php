@@ -869,9 +869,11 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 		foreach ($itemListGui->current_selection_list->getItems() as $action_item) {
 			$actions[] = $this->ui->factory()
 				->button()
-				->shy($action_item["title"], $action_item["link"]);
+				->shy($action_item['title'], $action_item['link']);
 		}
-		$dropdown = $this->ui->factory()->dropdown()->standard($actions);
+		$dropdown = $this->ui->factory()
+			->dropdown()
+			->standard($actions);
 
 		$def_command = $itemListGui->getDefaultCommand();
 
@@ -906,10 +908,13 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 			->standard($item['type'], $this->lng->txt('obj_' . $item['type']))
 			->withIsOutlined(true);
 		$card = $this->ui->factory()->card()->repositoryObject(
-			$title . '<span data-list-item-id="' . $itemListGui->getUniqueItemId(true) . '""></span>',
+			$title . '<span data-list-item-id="' . $itemListGui->getUniqueItemId(true) . '"></span>',
 			$image
-		)->withObjectIcon($icon)
-			->withActions($dropdown);
+		)->withObjectIcon(
+			$icon
+		)->withActions(
+			$dropdown
+		);
 
 		// #24256
 		if ($def_command['link']) {
@@ -918,12 +923,14 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 
 		$l = [];
 		foreach ($itemListGui->determineProperties() as $p) {
-			if ($p["property"] != $this->lng->txt("learning_progress")) {
-				$l[(string)$p["property"]] = (string)$p["value"];
+			if ($p['property'] !== $this->lng->txt('learning_progress')) {
+				$l[(string) $p['property']] = (string) $p['value'];
 			}
 		}
 		if (count($l) > 0) {
-			$prop_list = $this->ui->factory()->listing()->descriptive($l);
+			$prop_list = $this->ui->factory()
+				->listing()
+				->descriptive($l);
 			$card = $card->withSections([$prop_list]);
 		}
 
@@ -934,7 +941,12 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 				$percentage = 100;
 			}
 
-			$card = $card->withProgress($this->ui->factory()->chart()->progressMeter()->mini(100, $percentage));
+			$card = $card->withProgress(
+				$this->ui->factory()
+					->chart()
+					->progressMeter()
+					->mini(100, $percentage)
+			);
 		}
 
 		return $card;

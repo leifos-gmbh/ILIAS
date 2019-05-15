@@ -51,6 +51,9 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 	/** @var \ILIAS\HTTP\GlobalHttpState */
 	protected $http;
 
+	/** @var \ilObjectService */
+	protected $objectService;
+
 	/**
 	 * ilPDSelectedItemsBlockGUI constructor.
 	 */
@@ -64,6 +67,7 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 		$this->access = $DIC->access();
 		$this->ui = $DIC->ui();
 		$this->http = $DIC->http();
+		$this->objectService = $DIC->object();
 
 		parent::__construct();
 
@@ -833,18 +837,6 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 			}
 		}
 
-		/*$dropdownItems = [];
-		$commandGroups = $this->getViewCommandGroups();
-		foreach ($commandGroups as $group) {
-			if (count($dropdownItems) > 0) {
-				$dropdownItems[] = $f->divider()->horizontal();
-			}
-			foreach ($group as $command) {
-				$dropdownItems[] = $f->button()->shy($command['txt'], $command['url']);
-			}
-		}
-		$dd = $f->dropdown()->standard($dropdownItems);*/
-
 		$html = $tpl->get();
 		if ($this->ctrl->isAsynch()) {
 			$html .= $tpl->getOnLoadCodeForAsynch();
@@ -855,114 +847,96 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 
 	/**
 	 * Render card
-	 * @param $item
-	 * @param $list_factory
+	 * @param array $item
+	 * @param ilPDSelectedItemsBlockListGUIFactory $listFactory
 	 * @return \ILIAS\UI\Component\Card\Card
+	 * @throws ilException
 	 */
-	protected function getCard($item, $list_factory) : \ILIAS\UI\Component\Card\Card
+	protected function getCard(array $item, ilPDSelectedItemsBlockListGUIFactory $listFactory) : \ILIAS\UI\Component\Card\Card
 	{
-		global $DIC;
+		$itemListGui = $listFactory->byType($item['type']);
+		ilObjectActivation::addListGUIActivationProperty($itemListGui, $item);
 
-		$f = $DIC->ui()->factory();
-
-		$item_list_gui = $list_factory->byType($item['type']);
-		ilObjectActivation::addListGUIActivationProperty($item_list_gui, $item);
-
-		$user = $DIC->user();
-
-		$item_list_gui->initItem($item['ref_id'], $item['obj_id'],
-			$item['title'], $item['description']);
-
-		// actions
-		$item_list_gui->insertCommands();
-		$actions = [];
-		foreach ($item_list_gui->current_selection_list->getItems() as $action_item)
-		{
-			$actions[] =
-				$f->button()->shy($action_item["title"], $action_item["link"]);
-
-		}
-		$dropdown = $f->dropdown()->standard($actions);
-
-		$def_command = $item_list_gui->getDefaultCommand();
-
-		$img = $DIC->object()->commonSettings()->tileImage()->getByObjId($item['obj_id']);
-
-		if ($img->exists())
-		{
-			$path = $img->getFullPath();
-		}
-		else
-		{
-			$path = ilUtil::getImagePath("cont_tile/cont_tile_default_".$item['type'].".svg");
-			if (!is_file($path))
-			{
-				$path = ilUtil::getImagePath("cont_tile/cont_tile_default.svg");
-			}
-		}
-
-		$image = $f->image()->responsive($path, "");
-		if ($def_command["link"] != "")	// #24256
-		{
-			$image = $image->withAction($def_command["link"]);
-		}
-
-		// card
-		$title = $item["title"];
-
-		if ($item["type"] == "sess" && $item["title"] == "")
-		{
-			$app_info = ilSessionAppointment::_lookupAppointment($item['obj_id']);
-			$title = ilSessionAppointment::_appointmentToString($app_info['start'], $app_info['end'], $app_info['fullday']);
-		}
-
-		$icon = $f->icon()->standard($item["type"], $this->lng->txt("obj_".$item["type"]))
-			->withIsOutlined(true);
-		$card = $f->card()->repositoryObject(
-			$title."<span data-list-item-id='".$item_list_gui->getUniqueItemId(true)."'></span>",
-			$image
-		)->withObjectIcon(
-			$icon
-		)->withActions($dropdown
+		$itemListGui->initItem(
+			$item['ref_id'],
+			$item['obj_id'],
+			$item['title'],
+			$item['description']
 		);
 
-		if ($def_command["link"] != "")	// #24256
-		{
-			$card = $card->withTitleAction($def_command["link"]);
+		$itemListGui->insertCommands();
+		$actions = [];
+		foreach ($itemListGui->current_selection_list->getItems() as $action_item) {
+			$actions[] = $this->ui->factory()
+				->button()
+				->shy($action_item["title"], $action_item["link"]);
 		}
+		$dropdown = $this->ui->factory()->dropdown()->standard($actions);
 
-		// properties
-		$l = [];
-		foreach ($item_list_gui->determineProperties() as $p)
-		{
-			if ($p["property"] != $this->lng->txt("learning_progress"))
-			{
-				$l[(string) $p["property"]] = (string) $p["value"];
+		$def_command = $itemListGui->getDefaultCommand();
+
+		$img = $this->objectService->commonSettings()->tileImage()->getByObjId($item['obj_id']);
+		if ($img->exists()) {
+			$path = $img->getFullPath();
+		} else {
+			$path = ilUtil::getImagePath('cont_tile/cont_tile_default_' . $item['type'] . '.svg');
+			if (!is_file($path)) {
+				$path = ilUtil::getImagePath('cont_tile/cont_tile_default.svg');
 			}
 		}
-		if (count($l) > 0)
+
+		$image = $this->ui->factory()
+			->image()
+			->responsive($path, '');
+		if ($def_command['link'] != '')    // #24256
 		{
-			$prop_list = $f->listing()->descriptive($l);
+			$image = $image->withAction($def_command['link']);
+		}
+
+		$title = $item['title'];
+
+		if ($item['type'] == 'sess' && $item['title'] == '') {
+			$app_info = ilSessionAppointment::_lookupAppointment($item['obj_id']);
+			$title = ilSessionAppointment::_appointmentToString($app_info['start'], $app_info['end'],
+				$app_info['fullday']);
+		}
+
+		$icon = $this->ui->factory()
+			->icon()
+			->standard($item['type'], $this->lng->txt('obj_' . $item['type']))
+			->withIsOutlined(true);
+		$card = $this->ui->factory()->card()->repositoryObject(
+			$title . '<span data-list-item-id="' . $itemListGui->getUniqueItemId(true) . '""></span>',
+			$image
+		)->withObjectIcon($icon)
+			->withActions($dropdown);
+
+		// #24256
+		if ($def_command['link']) {
+			$card = $card->withTitleAction($def_command['link']);
+		}
+
+		$l = [];
+		foreach ($itemListGui->determineProperties() as $p) {
+			if ($p["property"] != $this->lng->txt("learning_progress")) {
+				$l[(string)$p["property"]] = (string)$p["value"];
+			}
+		}
+		if (count($l) > 0) {
+			$prop_list = $this->ui->factory()->listing()->descriptive($l);
 			$card = $card->withSections([$prop_list]);
 		}
 
-		// learning progress
-		include_once "Services/Tracking/classes/class.ilLPStatus.php";
-		$lp = ilLPStatus::getListGUIStatus($item["obj_id"], false);
-		if ($lp)
-		{
-			$percentage = (int) ilLPStatus::_lookupPercentage($item["obj_id"], $user->getId());
-			if ($lp["status"] == ilLPStatus::LP_STATUS_COMPLETED_NUM)
-			{
+		$lp = ilLPStatus::getListGUIStatus($item['obj_id'], false);
+		if (is_array($lp) && array_key_exists('status', $lp)) {
+			$percentage = (int)ilLPStatus::_lookupPercentage($item['obj_id'], $this->user->getId());
+			if ($lp['status'] == ilLPStatus::LP_STATUS_COMPLETED_NUM) {
 				$percentage = 100;
 			}
-			//var_dump(ilLPStatus::_lookupPercentage($a_item_data["obj_id"], $user->getId())); exit;
-			$progressmeter = $f->chart()->progressMeter()->mini(100, $percentage);
-			$card = $card->withProgress($progressmeter);
+
+			$card = $card->withProgress($this->ui->factory()->chart()->progressMeter()->mini(100, $percentage));
 		}
 
 		return $card;
 	}
-
-
 }

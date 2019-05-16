@@ -291,7 +291,7 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 	/**
 	 * @return array
 	 */
-	protected function getViewCommandGroups() : array
+	protected function getGroupedCommandsForView() : array
 	{
 		$commandGroups = [];
 
@@ -362,8 +362,8 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 			return;
 		}
 
-		$commandGroups = $this->getViewCommandGroups();
-		foreach ($commandGroups as $group) {
+		$groupedCommands = $this->getGroupedCommandsForView();
+		foreach ($groupedCommands as $group) {
 			foreach ($group as $command) {
 				$this->addFooterLink(
 					$command['txt'],

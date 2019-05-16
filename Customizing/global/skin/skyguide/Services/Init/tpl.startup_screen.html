@@ -7,8 +7,7 @@
             <!-- END header_top_title -->
             <ul id="ilTopBarNav" class="">
                 <!-- BEGIN lang_select -->
-                <li class="dropdown"><a id="mm_lang_sel" href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="visible-xs-inline glyphicon glyphicon-flag"><span class="caret"></span></span>
-                        <span class="hidden-xs">{TXT_LANGSELECT} <span class="caret"></span></span></a>
+                <li class="dropdown"><a id="mm_lang_sel" href="#" class="dropdown-toggle" data-toggle="dropdown">{TXT_LANGSELECT} <span class="caret"></span></a>
                     {LANG_SELECT}
                 </li>
                 <!-- END lang_select -->
@@ -16,11 +15,11 @@
 		</div>
 	</div>
 </div>
-<div class="ilMainHeader startup">
+<div class="ilMainHeader">
 	<header class="container">
 		<div id="il_startup_logo" class="row">
-			<img src="./Customizing/global/skin/skyguide/images/HeaderIcon.png" alt="Logo skyguide" class="hidden-xs" />
-				<img src="./Customizing/global/skin/skyguide/images/HeaderIcon.jpg" alt="Logo skyguide" class="visible-xs-inline-block" />
+			<img class="hidden-xs noMirror" src="{HEADER_ICON}" alt="Logo" />
+			<img class="visible-xs-inline-block noMirror" src="{HEADER_ICON_RESPONSIVE}" alt="Logo" />
 		</div>
 	</header>
 </div>
@@ -65,14 +64,14 @@
 					<!-- END link_item_bl -->
 				</div>
 				<!-- END links_bl -->
-			</div>	
+			</div>
 		</div>
 	</div>
 </div>
 <div id="minheight"></div>
-<footer class="ilFooter">
+<footer id="ilFooter" class="ilFooter hidden-print">
 	<div class="container">
-		<div class="row ilFooterContainer">{FOOTER}</div>
+		<div class="row"><div class="ilFooterContainer">{PRMLINK} {FOOTER}</div></div>
 	</div>
 </footer>
 {SCRIPT}

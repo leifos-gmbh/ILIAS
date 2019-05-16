@@ -4,37 +4,43 @@
 <script type="text/javascript">il.Util.addOnLoad(il.Util.setStdScreenReaderFocus); var il_sr_opt = true;</script>
 <!-- END sr_focus -->
 
+
 <div id="mainspacekeeper" class="container-fluid ilContainerWidth {MAINMENU_SPACER}">
-	<div class="row" style="position: relative;">
 	<!-- BEGIN tree_mode -->
-<a {TREE_ACC_KEY} class="ilTreeView{RIGHT}<!-- BEGIN tree_lns --> kilLeftNavSpace<!-- END tree_lns -->" href="{LINK_MODE}" target="{TARGET_TREE}" id="imgtree">
-	<!--img id="ilSideBarIcon" src="{IMG_TREE}" alt="{ALT_TREE}" title="{ALT_TREE}" /></a-->
-    <span class="glyphicon glyphicon-chevron-right"></span>
-			<span class="glyphicon glyphicon-chevron-left"></span></a>
-<!-- END tree_mode -->
+	<a {TREE_ACC_KEY} class="ilTreeView{RIGHT}<!-- BEGIN tree_lns --> kilLeftNavSpace<!-- END tree_lns -->" href="{LINK_MODE}" target="{TARGET_TREE}" id="imgtree">
+		<img id="ilSideBarIcon" src="{IMG_TREE}" alt="{ALT_TREE}" title="{ALT_TREE}" />
+		<span class="glyphicon glyphicon-chevron-left"></span>
+	</a>
+	<a {TREE_ACC_KEY} class="ilTreeView{RIGHT}<!-- BEGIN tree_lns --> kilLeftNavSpace<!-- END tree_lns -->" href="{LINK_MODE}" target="{TARGET_TREE}" id="imgtree">
+		<img id="ilSideBarIcon" src="{IMG_TREE}" alt="{ALT_TREE}" title="{ALT_TREE}" />
+		<span class="glyphicon glyphicon-chevron-right"></span>
+	</a>
+
+	<!-- END tree_mode -->
+	<div class="row" style="position: relative;">
 	<!-- BEGIN left_nav -->
-	<div id="left_nav" class="ilLeftNav">{LEFT_NAV_CONTENT}</div>
+	<div id="left_nav" class="ilLeftNav hidden-print">{LEFT_NAV_CONTENT}</div>
 	<!-- END left_nav -->
 	<div id="fixed_content" class="<!-- BEGIN left_nav_space -->ilLeftNavSpace<!-- END left_nav_space --> ilContentFixed" >
 		<div id="mainscrolldiv" {FRAME_BG_COLOR}>
 			{STATUSLINE}
-			
+
 	<!-- BEGIN banner_bl -->
-	<div class="ilFrameFixedWidthHeader">				
+	<div class="ilFrameFixedWidthHeader">
 		<div class="ilHeaderBanner" style="height:{BANNER_HEIGHT}px">
 			<img class="ilHeaderImg" src="{BANNER_URL}">
 		</div>
 		<div class="ilClearFloat"></div>
-	</div>	
+	</div>
 	<!-- END banner_bl -->
-	
+
 	<div class="media il_HeaderInner"{FILEUPLOAD_DROPZONE_ID}>
 		<!-- BEGIN head_action -->
-		<div class="ilHeadAction" id="il_head_action">
+		<div class="ilHeadAction hidden-print" id="il_head_action">
 			<!-- BEGIN head_action_inner -->{HEAD_ACTION}<!-- END head_action_inner -->
 		</div>
 		<!-- END head_action -->
-		
+
 		<!-- BEGIN headerbl -->
 			<!-- BEGIN header_image -->
 			<img id="headerimage" class="media-object" src="{IMG_HEADER}" alt="{IMAGE_ALT}" title="{IMAGE_DESC}" />
@@ -50,11 +56,11 @@
 		{H_PROP} <!-- END header_alert_prop_name -->{H_VALUE}</div><!-- END header_alert -->
 		</div>
 	</div>
-	
+
     <!-- BEGIN header_fileupload -->
     {HEADER_FILEUPLOAD_SCRIPT}
     <!-- END header_fileupload -->
-	
+
 	<!-- BEGIN tree_icons -->
 	<div class="il_TreeIcons ilNoDisplay">
 		<!-- BEGIN top -->
@@ -67,7 +73,7 @@
 		<!-- END mount_webfolder -->
 	</div>
 	<!-- END tree_icons -->
-	
+
 	<div class="ilClearFloat"><!-- BEGIN stop_floating -->&nbsp;<!-- END stop_floating --></div>
 
 {TABS}
@@ -100,6 +106,7 @@
 			{ADM_CONTENT}
 			{OBJECTS}
 			{SYSTEMSETTINGS}
+			<div class="RepositoryPermaLink">{PRMLINK}</div>
 			<!-- BEGIN adm_view_components2 -->
 			<div style="margin-bottom:10px;">{ADM_PANEL2}</div>
 			<!-- END adm_view_components2 -->
@@ -113,7 +120,6 @@
 		<div id="il_right_col" class="col-sm-3">{RIGHT_CONTENT}</div>
 		<!-- END right_column -->
 	</div>
-    {PRMLINK}
 </div>
 
 <!-- BEGIN print_content --><div class="ilPrintContent">{PRINT_CONTENT}</div><!-- END print_content -->
@@ -126,6 +132,6 @@
 </div>
 </div>
 <div id="minheight"></div>
-<footer id="ilFooter" class="ilFooter"><div class="container-fluid ilContainerWidth">
-		<div class="row"><div class="ilFooterContainer">{FOOTER}</div></div></div></footer>
+<footer id="ilFooter" class="ilFooter hidden-print"><div class="container-fluid ilContainerWidth">
+		<div class="row"><div class="ilFooterContainer form-inline">{FOOTER}</div></div></div></footer>
 {LIGHTBOX}

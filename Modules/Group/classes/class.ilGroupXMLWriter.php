@@ -87,6 +87,7 @@ class ilGroupXMLWriter extends ilXmlWriter
 			$this->__buildTitleDescription();
 			$this->__buildRegistration();
 			$this->__buildExtraSettings();
+			$this->__buildPeriod();
 			if ($this->attach_users) 
 			{
 				$this->__buildAdmin();
@@ -217,8 +218,10 @@ class ilGroupXMLWriter extends ilXmlWriter
 		{
 			$this->xmlElement('password',null,$pwd);
 		}
+		$accessCodeAttrs = array();
+		$accessCodeAttrs['enabled'] = $this->group_obj->isRegistrationAccessCodeEnabled() ? 'Yes' : 'No';
+		$this->xmlElement("AccessCode", $accessCodeAttrs, $this->group_obj->getRegistrationAccessCode());
 
-		
 		// limited registration period
 		if(!$this->group_obj->isRegistrationUnlimited())
 		{
@@ -247,6 +250,7 @@ class ilGroupXMLWriter extends ilXmlWriter
 	function __buildExtraSettings()
 	{
 		$this->xmlElement('showMembers',null,$this->group_obj->getShowMembers());
+		$this->xmlElement('viewMode',null,$this->group_obj->getViewMode());
 	}
 
 	function __buildAdmin()

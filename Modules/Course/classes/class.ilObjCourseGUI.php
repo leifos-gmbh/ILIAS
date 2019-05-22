@@ -231,7 +231,7 @@ class ilObjCourseGUI extends ilContainerGUI
 		include_once('Services/MetaData/classes/class.ilMDUtils.php');
 		ilMDUtils::_fillHTMLMetaTags($this->object->getId(),$this->object->getId(),'crs');
 
-		$this->tabs_gui->setTabActive('info_short');
+		$this->tabs_gui->setTabActive('crs_info_short');
 
 		include_once("./Services/InfoScreen/classes/class.ilInfoScreenGUI.php");
 		include_once 'Modules/Course/classes/class.ilCourseFile.php';
@@ -268,7 +268,7 @@ class ilObjCourseGUI extends ilContainerGUI
 		
 		global $ilPluginAdmin;
 		$pl_names = $ilPluginAdmin->getActivePluginsForSlot(IL_COMP_SERVICE, "Cron", "crnhk");
-		$info->addSection('Kursinformation');
+		$info->addSection('Seminare');
 		foreach($pl_names as $plugin)
 		{
 			$ui_plugin = ilPluginAdmin::getPluginObject(IL_COMP_SERVICE, "Cron", "crnhk", $plugin);
@@ -2144,7 +2144,7 @@ class ilObjCourseGUI extends ilContainerGUI
 				|| strtolower($_GET["cmdClass"]) == "ilnotegui")
 				? true
 				: false;
-			$this->tabs_gui->addTarget("info_short",
+			$this->tabs_gui->addTarget("crs_info_short",
 								 $this->ctrl->getLinkTargetByClass(
 								 array("ilobjcoursegui", "ilinfoscreengui"), "showSummary"),
 								 "infoScreen",

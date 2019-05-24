@@ -752,11 +752,18 @@ class ilSoapFunctions {
 		return $sta->createHelp($sid, $a_mode, $a_zip);
 	}
 
-	public static function updateBlog($sid, $ref_id, $xml_path, $a_online, $a_old_id)
+	public static function updateBlog($sid, $ref_id, $xml_path, $a_old_id)
 	{
 		include_once './webservice/soap/classes/class.ilSoapFileAdministration.php';
 		$sta = new ilSoapFileAdministration();
-		return $sta->updateBlog($sid, $ref_id, $xml_path,$a_online,$a_old_id);
+		return $sta->updateBlog($sid, $ref_id, $xml_path,$a_old_id);
+	}
+
+	public static function updateItemGroup($sid, $ref_id, $xml_path, $a_old_id, $a_mappings)
+	{
+		include_once './webservice/soap/classes/class.ilSoapFileAdministration.php';
+		$sta = new ilSoapFileAdministration();
+		return $sta->updateItemGroup($sid, $ref_id, $xml_path,$a_old_id,$a_mappings);
 	}
 
  	public static function updateLearningModule($sid, $ref_id, $xml_path, $a_online, $a_old_id, $a_title, $a_desc)

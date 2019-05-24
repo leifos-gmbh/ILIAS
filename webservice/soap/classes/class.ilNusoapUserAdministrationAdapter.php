@@ -1104,13 +1104,26 @@ class ilNusoapUserAdministrationAdapter
 			'ILIAS updateLearningModule():update existing learning module');
 
 		$this->server->register('updateBlog',
-			array('sid' => 'xsd:string', 'ref_id' => 'xsd:int', 'zip' => 'xsd:string', 'online' => 'xsd:int', 'old_id' => 'xsd:int'),
+			array(
+				'sid' => 'xsd:string', 'ref_id' => 'xsd:int',
+				'zip' => 'xsd:string', 'old_id' => 'xsd:int'),
 			array('success' => 'xsd:boolean'),
 			SERVICE_NAMESPACE,
 			SERVICE_NAMESPACE.'#updateBlog',
 			SERVICE_STYLE,
 			SERVICE_USE,
 			'ILIAS updateBlog():update existing blog');
+
+		$this->server->register('updateItemGroup',
+			array(
+				'sid' => 'xsd:string', 'ref_id' => 'xsd:int',
+				'zip' => 'xsd:string', 'old_id' => 'xsd:int', 'mappings' => 'tns:stringArray'),
+			array('success' => 'xsd:boolean'),
+			SERVICE_NAMESPACE,
+			SERVICE_NAMESPACE.'#updateItemGroup',
+			SERVICE_STYLE,
+			SERVICE_USE,
+			'ILIAS updateItemGroup():update existing ItemGroup');
 
 		$this->server->register('createHelp',
 			array('sid' => 'xsd:string', 'mode' => 'xsd:int', 'zip' => 'xsd:string'),

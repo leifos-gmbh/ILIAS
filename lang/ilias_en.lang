@@ -14506,7 +14506,7 @@ exc#:#filter#:#Filter
 exc#:#fiter_no_results#:#The current filter did not match any submission.
 exc#:#exc_reminder_submit_setting#:#Remind Users to Submit
 exc#:#exc_reminder_start#:#Start Reminders before Deadline
-exc#:#exc_reminder_start_info#:#All members of the parent course/group will be sent reminders.<br>No parent course/group girven - no reminder will be sent!
+exc#:#exc_reminder_start_info#:#All members of the parent course/group will be sent reminders.<br>No parent course/group given - no reminder will be sent!
 exc#:#exc_reminder_frequency#:#Frequency
 exc#:#exc_reminder_grade_setting#:#Remind Tutors to Grade
 exc#:#exc_reminder_feedback_setting#:#Remind Participants to Feedback
@@ -14965,7 +14965,7 @@ crs#:#crs_lobj_pm_score#:#Your Result
 crs#:#crs_lobj_pm_min_goal#:#Required Score
 dateplaner#:#back_to_crs#:#Go to Course
 dateplaner#:#back_to_grp#:#Go to Group
-dateplaner#:#back_to_pd#:#Back to Personal Desktop
+dateplaner#:#back_to_pd#:#Back
 common#:#il_lso_admin#:#Learning Sequence Admin
 common#:#il_lso_member#:#Learning Sequence Member
 lso#:#entries_updated#:#Entries saved

@@ -27,6 +27,10 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 	 */
 	protected $tabs;
 
+	/**
+	 * @var \ILIAS\DI\UIServices
+	 */
+	protected $ui;
 
 	/**
 	 * Constructor
@@ -42,6 +46,7 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 		$this->user = $DIC->user();
 		$this->tabs = $DIC->tabs();
 		$this->ctrl = $DIC->ctrl();
+		$this->ui = $DIC->ui();
 	}
 
 	function getType()
@@ -227,10 +232,12 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 			$this->ctrl->getLinkTargetByClass(array("ilcommonactiondispatchergui", "ilnotegui"), "", "", true, false), 
 			$this->ctrl->getLinkTargetByClass(array("ilcommonactiondispatchergui", "iltagginggui"), "", "", true, false));
 		
-		include_once "Modules/WorkspaceFolder/classes/class.ilObjWorkspaceFolderTableGUI.php";
-		$table = new ilObjWorkspaceFolderTableGUI($this, "render", $this->node_id, $this->getAccessHandler(),
-			$this->isActiveAdministrationPanel());
-		$tpl->setContent($table->getHTML());
+		include_once "Modules/WorkspaceFolder/classes/class.ilWorkspaceContentGUI.php";
+		$gui = new ilWorkspaceContentGUI($this,
+			$this->node_id,
+			$this->isActiveAdministrationPanel(),
+			$this->getAccessHandler(), $this->ui, $this->lng);
+		$tpl->setContent($gui->render());
 
 		include_once("./Services/PersonalWorkspace/classes/class.ilWorkspaceExplorerGUI.php");
 		$exp = new ilWorkspaceExplorerGUI($ilUser->getId(), $this, "render", $this, "", "wsp_id");

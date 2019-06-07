@@ -101,10 +101,10 @@ class ilWorkspaceContentGUI
 			return "";
 		}
 
-		$leg = $this->ui->factory()->legacy($html)
-			->withViewControls(array($sortation));
+		$leg = $this->ui->factory()->legacy($html);
 
-		$panel = $this->ui->factory()->panel()->standard($this->lng->txt("content"), [$leg]);
+		$panel = $this->ui->factory()->panel()->standard($this->lng->txt("content"), [$leg])
+			->withViewControls(array($sortation));
 
 
 		return $this->ui->renderer()->render($panel);

@@ -41,10 +41,21 @@ class ilWorkspaceContentGUI
 	protected $user;
 
 	/**
+	 * @var ilObjectDefinition
+	 */
+	protected $obj_definition;
+
+	/**
+	 * @var ilCtrl
+	 */
+	protected $ctrl;
+
+	/**
 	 * Constructor
 	 */
 	public function __construct($object_gui, int $node_id, bool $admin, $access_handler,
-	                            \ILIAS\DI\UIServices $ui, ilLanguage $lng, ilObjUser $user)
+				\ILIAS\DI\UIServices $ui, ilLanguage $lng, ilObjUser $user,
+				ilObjectDefinition $obj_definition, ilCtrl $ctrl)
 	{
 		$this->current_node = $node_id;
 		$this->admin = $admin;
@@ -53,6 +64,8 @@ class ilWorkspaceContentGUI
 		$this->ui = $ui;
 		$this->lng = $lng;
 		$this->user = $user;
+		$this->obj_definition = $obj_definition;
+		$this->ctrl = $ctrl;
 	}
 
 	/**
@@ -61,18 +74,40 @@ class ilWorkspaceContentGUI
 	 */
 	public function render()
 	{
-		$panel = $this->ui->factory()->panel()->standard($this->lng->txt("content"), []);
+		$html = "";
+		$first = true;
+		foreach ($this->getItems() as $i)
+		{
+			if ($first)
+			{
+				$first = false;
+			}
+			else
+			{
+				$html .= $this->ui->renderer()->render($this->ui->factory()->divider()->horizontal());
+			}
+			$html .= $this->getItemHTML($i);
+		}
+
+		$sort_options = array(
+			'internal_rating' => 'Best',
+			'date_desc' => 'Most Recent',
+			'date_asc' => 'Oldest',
+		);
+		$sortation = $this->ui->factory()->viewControl()->sortation($sort_options);
+
+		if ($first)
+		{
+			return "";
+		}
+
+		$leg = $this->ui->factory()->legacy($html)
+			->withViewControls(array($sortation));
+
+		$panel = $this->ui->factory()->panel()->standard($this->lng->txt("content"), [$leg]);
+
 
 		return $this->ui->renderer()->render($panel);
-
-		include_once "Modules/WorkspaceFolder/classes/class.ilObjWorkspaceFolderTableGUI.php";
-		$table = new ilObjWorkspaceFolderTableGUI(
-			$this->object_gui,
-			"render",
-			$this->current_node,
-			$this->access_handler,
-			$this->admin);
-		return $table->getHTML();
 	}
 
 	/**
@@ -83,8 +118,8 @@ class ilWorkspaceContentGUI
 		$user = $this->user;
 
 		include_once "Services/PersonalWorkspace/classes/class.ilWorkspaceTree.php";
-		$tree = new ilWorkspaceTree($ilUser->getId());
-		$nodes = $tree->getChilds($this->node_id, "title");
+		$tree = new ilWorkspaceTree($user->getId());
+		$nodes = $tree->getChilds($this->current_node, "title");
 
 		if(sizeof($nodes))
 		{
@@ -101,6 +136,68 @@ class ilWorkspaceContentGUI
 		$this->shared_objects = $this->access_handler->getObjectsIShare();
 
 		return $nodes;
+	}
+
+	/**
+	 * Get item HTML
+	 *
+	 * @param
+	 * @return
+	 */
+	protected function getItemHTML($node)
+	{
+		$objDefinition = $this->obj_definition;
+		$ilCtrl = $this->ctrl;
+
+		$class = $objDefinition->getClassName($node["type"]);
+		$location = $objDefinition->getLocation($node["type"]);
+		$full_class = "ilObj".$class."ListGUI";
+
+		include_once($location."/class.".$full_class.".php");
+		$item_list_gui = new $full_class(ilObjectListGUI::CONTEXT_WORKSPACE);
+
+		$item_list_gui->setDetailsLevel(ilObjectListGUI::DETAILS_ALL);
+		$item_list_gui->enableDelete(true);
+		$item_list_gui->enableCut(true);
+		$item_list_gui->enableSubscribe(false);
+		$item_list_gui->enableLink(false);
+		$item_list_gui->enablePath(false);
+		$item_list_gui->enableLinkedPath(false);
+		$item_list_gui->enableSearchFragments(true);
+		$item_list_gui->enableRelevance(false);
+		$item_list_gui->enableIcon(true);
+		$item_list_gui->enableTimings(false);
+		$item_list_gui->enableCheckbox($this->admin);
+		// $item_list_gui->setSeparateCommands(true);
+
+		$item_list_gui->enableNotes(true);
+		$item_list_gui->enableCopy($objDefinition->allowCopy($node["type"]));
+
+		if($node["type"] == "file")
+		{
+			$item_list_gui->enableRepositoryTransfer(true);
+		}
+
+		$item_list_gui->setContainerObject($this->object_gui);
+
+		if(in_array($node["type"], array("file", "blog")))
+		{
+			// add "share" link
+			$ilCtrl->setParameterByClass("ilworkspaceaccessgui", "wsp_id", $node["wsp_id"]);
+			$share_link = $ilCtrl->getLinkTargetByClass(array("ilObj".$class."GUI", "ilworkspaceaccessgui"), "share");
+			$item_list_gui->addCustomCommand($share_link, "wsp_permissions");
+
+			// show "shared" status
+			if(in_array($node["obj_id"], $this->shared_objects))
+			{
+				$item_list_gui->addCustomProperty($this->lng->txt("status"), $this->lng->txt("wsp_status_shared"), true, true);
+			}
+		}
+
+		$html = $item_list_gui->getListItemHTML($node["wsp_id"], $node["obj_id"],
+			$node["title"], $node["description"]);
+
+		return $html;
 	}
 
 

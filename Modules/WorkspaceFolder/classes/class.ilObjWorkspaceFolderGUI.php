@@ -236,7 +236,7 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 		$gui = new ilWorkspaceContentGUI($this,
 			$this->node_id,
 			$this->isActiveAdministrationPanel(),
-			$this->getAccessHandler(), $this->ui, $this->lng);
+			$this->getAccessHandler(), $this->ui, $this->lng, $this->user, $this->objDefinition, $this->ctrl);
 		$tpl->setContent($gui->render());
 
 		include_once("./Services/PersonalWorkspace/classes/class.ilWorkspaceExplorerGUI.php");

@@ -29,6 +29,12 @@ class Panel implements C\Panel\Panel {
 	 */
 	protected $actions = null;
 
+
+	/**
+	 * @var \ILIAS\UI\Component\ViewControl[]
+	 */
+	protected $view_controls;
+
 	/**
 	 * @param string $title
 	 * @param \ILIAS\UI\Component\Component[] | \ILIAS\UI\Component\Component $content
@@ -73,5 +79,23 @@ class Panel implements C\Panel\Panel {
 		return $this->actions;
 	}
 
+	/**
+	 * @param array $view_controls
+	 * @return \ILIAS\UI\Component\Panel\Standard
+	 */
+	public function withViewControls(array $view_controls) : \ILIAS\UI\Component\Panel\Standard
+	{
+		$clone = clone $this;
+		$clone->view_controls = $view_controls;
+		return $clone;
+	}
+
+	/**
+	 * @return array|null
+	 */
+	public function getViewControls(): ?array
+	{
+		return $this->view_controls;
+	}
 }
 ?>

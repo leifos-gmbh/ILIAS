@@ -97,9 +97,9 @@ class Container implements \ArrayAccess
         	if($id == 'tpl') {
 
         		try {
-        			throw new Exception();
+        			throw new \Exception();
 				}
-				catch (Exception $e) {
+				catch (\Exception $e) {
         			file_put_contents('tpl_error.txt',$e->getTraceAsString());
 				}
 			}

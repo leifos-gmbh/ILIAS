@@ -94,7 +94,17 @@ class Container implements \ArrayAccess
     {
         if (!isset($this->keys[$id])) {
 
-        	$this->logger()->root()->logStack();
+        	if($id == 'tpl') {
+
+        		try {
+        			throw new Exception();
+				}
+				catch (Exception $e) {
+        			file_put_contents('tpl_error.txt',$e->getTraceAsString());
+				}
+			}
+
+
             throw new \InvalidArgumentException(sprintf('Identifier "%s" is not defined.', $id));
         }
 

@@ -282,8 +282,8 @@ class ilExAssignmentGUI
 			$a_info->addProperty($lng->txt("exc_rem_time_after_start"), $state->getRelativeDeadlinePresentation().
 				" ".$but);
 		}
-		
-		if ($state->getOfficialDeadline() > $state->getCommonDeadline())
+
+		if($idl)
 		{
 			$until = $state->getOfficialDeadlinePresentation();
 			
@@ -295,7 +295,7 @@ class ilExAssignmentGUI
 			
 			$a_info->addProperty($lng->txt("exc_individual_deadline"), $until);	
 		}
-				
+
 		if ($state->hasSubmissionStarted())
 		{
 			$a_info->addProperty($lng->txt("exc_time_to_send"),

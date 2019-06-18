@@ -21,11 +21,4 @@ class CommandFactory implements I\CommandFactory
 	{
 		$this->factory_collection;
 	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function addParentFactory(I\CommandFactory $factory) {
-
-	}
 }

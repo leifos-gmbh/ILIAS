@@ -18,5 +18,15 @@ interface API
 	 * @param int|null $ref_id
 	 * @return \ILIAS\API\Course\Int\CommandFactory
 	 */
-	function course(int $ref_id = null): \ILIAS\API\Course\Int\CommandFactory;
+	public function course(int $ref_id = null): \ILIAS\API\Course\Int\CommandFactory;
+
+	// more entry points for domain level apis
+	// ...
+
+
+	/**
+	 * @param Command $command
+	 * @return CommandResponse
+	 */
+	public function dispatch(Command $command): CommandResponse;
 }

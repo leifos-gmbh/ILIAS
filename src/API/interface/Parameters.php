@@ -5,14 +5,10 @@
 namespace ILIAS\API\Int;
 
 /**
- * Command
+ * Parameters
  *
  * @author killing@leifos.de
  */
-interface Command
+interface Parameters
 {
-	/**
-	 * @return FactoryCollection
-	 */
-	public function getFactoryCollection(): FactoryCollection;
 }

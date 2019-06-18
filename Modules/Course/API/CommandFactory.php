@@ -7,21 +7,20 @@ use ILIAS\API\Course\Int as I;
 use ILIAS\API as API;
 
 /**
- *
+ * Course api command factory
  *
  * @author killing@leifos.de
  */
 class CommandFactory extends API\Int\AbstractCommandFactory implements I\CommandFactory
 {
-	protected $course_ref_id = null;
-
 	/**
 	 * Constructor
 	 */
 	public function __construct(API\Int\FactoryCollection $factory_collection, int $course_ref_id = null)
 	{
 		parent::__construct($factory_collection);
-		$this->course_ref_id = $course_ref_id;
+
+		$this->parameters = new Parameters($course_ref_id);
 	}
 
 	/**
@@ -34,7 +33,7 @@ class CommandFactory extends API\Int\AbstractCommandFactory implements I\Command
 	/**
 	 * @inheritdoc
 	 */
-	function create(string $title, string $description, int $parent_ref_id): CreateCommand {
+	function create(string $title, string $description, int $parent_ref_id): I\CreateCommand {
 		return new CreateCommand($this->factory_collection, $title, $description, $parent_ref_id);
 	}
 }

@@ -25,7 +25,7 @@ class CommandFactory extends API\Int\AbstractCommandFactory implements I\Command
 	/**
 	 * @inheritdoc
 	 */
-	public function add(int $user_id, int $local_role_id): AddCommand {
+	public function add(int $user_id, int $local_role_id): I\AddCommand {
 		return new AddCommand($this->factory_collection, $user_id, $local_role_id);
 	}
 

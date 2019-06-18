@@ -21,14 +21,36 @@ class API
 	 */
 	public function __construct()
 	{
-		// could be injected...
+		// should be injected...
 		$this->factory_collection = new FactoryCollection();
+		$this->command_bus = new CommandBus();
+	}
+
+	/**
+	 * Get initial (empty) factory collection for an api call
+	 */
+	private function getInitialFactoryCollection()
+	{
+		return clone $this->factory_collection;
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	function course(int $ref_id = null): \ILIAS\API\Course\Int\CommandFactory {
-		return new \ILIAS\API\Course\CommandFactory($this->factory_collection, $ref_id);
+	public function course(int $ref_id = null): Course\Int\CommandFactory {
+		return new \ILIAS\API\Course\CommandFactory($this->getInitialFactoryCollection(), $ref_id);
 	}
+
+
+	/**
+	 * @param Int\Command $command
+	 * @param int $actor_id
+	 * @return CommandResponse|null
+	 */
+	public function dispatch(Int\Command $command, int $actor_id): ?CommandResponse {
+		$this->command_bus->dispatch($command, $actor_id);
+
+		return null;
+	}
+
 }

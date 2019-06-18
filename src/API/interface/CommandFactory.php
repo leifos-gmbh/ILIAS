@@ -11,4 +11,10 @@ namespace ILIAS\API\Int;
  */
 interface CommandFactory
 {
+	/**
+	 * Get parameters
+	 * @return Parameters
+	 */
+	public function getParameters(): ?Parameters;
+
 }

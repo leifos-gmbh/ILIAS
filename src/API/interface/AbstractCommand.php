@@ -9,7 +9,7 @@ namespace ILIAS\API\Int;
  *
  * @author killing@leifos.de
  */
-class AbstractCommand implements Command
+abstract class AbstractCommand implements Command
 {
 	/**
 	 * @var FactoryCollection
@@ -21,6 +21,14 @@ class AbstractCommand implements Command
 	 */
 	public function __construct(FactoryCollection $factory_collection) {
 		$this->factory_collection = $factory_collection;
+	}
+
+	/**
+	 * @return FactoryCollection
+	 */
+	public function getFactoryCollection(): FactoryCollection
+	{
+		return $this->factory_collection;
 	}
 
 }

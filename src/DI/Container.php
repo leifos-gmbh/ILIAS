@@ -286,10 +286,10 @@ class Container extends \Pimple\Container {
 	}
 
 	/**
-	 * @return \ILIAS\API
+	 * @return \ILIAS\API\API
 	 */
-	public function api(): \ILIAS\API {
-		return new \ILIAS\API();
+	public function api(): \ILIAS\API\API {
+		return new \ILIAS\API\API();
 	}
 
 

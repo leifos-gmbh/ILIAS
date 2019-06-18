@@ -9,12 +9,17 @@ namespace ILIAS\API\Int;
  *
  * @author killing@leifos.de
  */
-class AbstractCommandFactory implements CommandFactory
+abstract class AbstractCommandFactory implements CommandFactory
 {
 	/**
 	 * @var FactoryCollection
 	 */
 	protected $factory_collection;
+
+	/**
+	 * @var Parameters
+	 */
+	protected $parameters = null;
 
 	/**
 	 * Constructor
@@ -23,4 +28,13 @@ class AbstractCommandFactory implements CommandFactory
 		$this->factory_collection = $factory_collection;
 		$this->factory_collection->add($this);
 	}
+	
+	/**
+	 * @inheritdoc
+	 */
+	public function getParameters(): ?Parameters
+	{
+		return $this->parameters;
+	}
+	
 }

@@ -16,7 +16,7 @@ require_once "./Services/Object/classes/class.ilObjectGUI.php";
 * @ilCtrl_Calls ilObjExerciseGUI: ilObjectCopyGUI, ilExportGUI
 * @ilCtrl_Calls ilObjExerciseGUI: ilCommonActionDispatcherGUI, ilCertificateGUI 
 * @ilCtrl_Calls ilObjExerciseGUI: ilExAssignmentEditorGUI, ilExSubmissionGUI
-* @ilCtrl_Calls ilObjExerciseGUI: ilExerciseManagementGUI, ilExcCriteriaCatalogueGUI
+* @ilCtrl_Calls ilObjExerciseGUI: ilExerciseManagementGUI, ilExcCriteriaCatalogueGUI, ilObjectMetaDataGUI
 * 
 * @ingroup ModulesExercise
 */
@@ -203,6 +203,13 @@ class ilObjExerciseGUI extends ilObjectGUI
 				$crit_gui = new ilExcCriteriaCatalogueGUI($this->object);
 				$this->ctrl->forwardCommand($crit_gui);
 				break;
+
+			case 'ilobjectmetadatagui';
+				$this->checkPermissionBool("write",'','',$this->object->getRefId());
+				$this->tabs_gui->setTabActive('meta_data');
+				$md_gui = new ilObjectMetaDataGUI($this->object);
+				$this->ctrl->forwardCommand($md_gui);
+				break;
 				
 			default:						
 				if(!$cmd)
@@ -342,8 +349,20 @@ class ilObjExerciseGUI extends ilObjectGUI
 		$fdb->addOption($option);
 		$option = new ilCheckboxOption($this->lng->txt("exc_settings_feedback_text"), ilObjExercise::TUTOR_FEEDBACK_TEXT);
 		$option->setInfo($this->lng->txt("exc_settings_feedback_text_info"));
-		$fdb->addOption($option);	
-		
+		$fdb->addOption($option);
+
+		$section = new ilFormSectionHeaderGUI();
+		$section->setTitle($this->lng->txt('obj_features'));
+		$a_form->addItem($section);
+
+		ilObjectServiceSettingsGUI::initServiceSettingsForm(
+			$this->object->getId(),
+			$a_form,
+			array(
+				ilObjectServiceSettingsGUI::CUSTOM_METADATA
+			)
+		);
+
 		$position_settings = ilOrgUnitGlobalSettings::getInstance()
 			->getObjectPositionSettingsByType($this->object->getType());
 
@@ -407,6 +426,12 @@ class ilObjExerciseGUI extends ilObjectGUI
 		$a_values['obj_orgunit_positions'] = (bool) ilOrgUnitGlobalSettings::getInstance()
 			->isPositionAccessActiveForObject($this->object->getId());
 
+		$a_values['cont_custom_md'] = ilContainer::_lookupContainerSetting(
+			$this->object->getId(),
+			ilObjectServiceSettingsGUI::CUSTOM_METADATA,
+			false
+		);
+
 	}
 
 	protected function updateCustom(ilPropertyFormGUI $a_form)
@@ -440,7 +465,8 @@ class ilObjExerciseGUI extends ilObjectGUI
 			$this->object->getId(),
 			$a_form,
 			array(
-				ilObjectServiceSettingsGUI::ORGU_POSITION_ACCESS
+				ilObjectServiceSettingsGUI::ORGU_POSITION_ACCESS,
+				ilObjectServiceSettingsGUI::CUSTOM_METADATA
 			)
 		);
 		
@@ -530,6 +556,20 @@ class ilObjExerciseGUI extends ilObjectGUI
 				$this->ctrl->getLinkTargetByClass(array('ilobjexercisegui','illearningprogressgui'),''));
 		}
 
+		// meta data
+		if ($this->access->checkAccess('write','',$this->object->getRefId()))
+		{
+			$mdgui = new ilObjectMetaDataGUI($this->object);
+			$mdtab = $mdgui->getTab();
+			if($mdtab)
+			{
+				$this->tabs_gui->addTarget("meta_data",
+					$mdtab,
+					"",
+					"ilobjectmetadatagui");
+			}
+		}
+
 		$_GET["sort_order"] = $save_sort_order;		// hack, part ii
 		$_GET["sort_by"] = $save_sort_by;
 		$_GET["offset"] = $save_offset;
@@ -591,9 +631,13 @@ class ilObjExerciseGUI extends ilObjectGUI
 			$info->enableNewsEditing();
 			$info->setBlockProperty("news", "settings", true);
 		}
-		
+
+		$record_gui = new ilAdvancedMDRecordGUI(ilAdvancedMDRecordGUI::MODE_INFO,'exc',$this->object->getId());
+		$record_gui->setInfoObject($info);
+		$record_gui->parse();
+
 		// standard meta data
-		//$info->addMetaDataSections($this->object->getId(),0, $this->object->getType());
+		$info->addMetaDataSections($this->object->getId(),0, $this->object->getType());
 
 		// instructions
 		$info->addSection($this->lng->txt("exc_overview"));

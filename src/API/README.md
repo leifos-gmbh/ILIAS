@@ -269,7 +269,7 @@ class AddCommand extends API\Int\AbstractCommand implements I\AddCommand {
 Sub-APIs are integrated into Command Factories my implementing a method that returns the command factory of the sub component.
 
 The method MUST
-- be named according to the sub component (e.g. if the subcomponent is Membershipt the method must be named membership()).
+- be named according to the sub component (e.g. if the subcomponent is Membership the method must be named membership()).
 - return the specific extended `\ILIAS\API\Int\CommandFactory` interface e.g. 
 ```
 public function membership(): \ILIAS\API\Membership\Int\CommandFactory;

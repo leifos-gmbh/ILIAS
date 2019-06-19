@@ -21,9 +21,11 @@ The API does not include low level infrastructure actions that are only parts of
 Examples
 
 - The command to add a member to a course should be part of the API. Executing the command should include all the necessary checks (e.g. has the actor the permission to add the member) and supporting actions that are also performed if the action is done through the user interface, e.g. sending notifications, writing log entries and so on.
-- The action to write a log entry should not be available through the API. This is considered as a supporting action that is only part of a larger user commands.
+- The action to write a log entry MUST not be available through the API. This is considered as a supporting action that is only part of a larger user commands.
 
 Performing commands should leave the system always in a consistent state.
+
+This implies an important rule: **Commands MUST not be nested**. The implementation of commands (located in so-called command handlers) MUST not call other commands through the API. This contradicts the rule that only top level commands are accessible through the API. This rule also exists to keep the overall processing simple and to ensure performance (e.g. policy checks should be done only one time).
 
 ## Using the API
 
@@ -303,6 +305,10 @@ Command handlers **MUST**
 - implement a method `checkPolicyForCommand` that checks if a commmand
   may be performed by the current actor and if yes, return self::POLICY_OK otherwise self::POLICY_FAILED.
 - implement a method `handle` that performs the command. Note that **this method MUST not call the check-methods again**, since this is already done by the command bus.
+
+Command handlers **MUST NOT**
+
+- Make use of the API to call other commands.
 
 Example
 ```

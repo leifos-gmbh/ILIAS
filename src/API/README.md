@@ -12,6 +12,19 @@ The main goals of the API development are:
 - Fostering policy compliance
 - Re-use of sub-APIs in higher contexts (e.g. membership API in course or group contexts)
 
+## Scope of the API
+
+The API includes methods to perform typical user actions (called commands) of the ILIAS plattform. If something can be performed in ILIAS by hitting a button, sending a form or watching a view in the ILIAS user interface, it should probably be available through a command in the API, too - without a user interface.
+
+The API does not include low level infrastructure actions that are only parts of larger user processes.
+
+Examples
+
+- The command to add a member to a course should be part of the API. Executing the command should include all the necessary checks (e.g. has the actor the permission to add the member) and supporting actions that are also performed if the action is done through the user interface, e.g. sending notifications, writing log entries and so on.
+- The action to write a log entry should not be available through the API. This is considered as a supporting action that is only part of a larger user commands.
+
+Performing commands should leave the system always in a consistent state.
+
 ## Using the API
 
 Using the API consists of two main steps

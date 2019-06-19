@@ -301,8 +301,7 @@ use \ILIAS\API\Exceptions as Exc;
 
 /**
  * Command handler
- *
- * @author killing@leifos.de
+ * ...
  */
 class CommandHandler extends API\Int\AbstractCommandHandler
 {

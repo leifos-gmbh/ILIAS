@@ -145,19 +145,20 @@ class CommandFactory extends API\Int\AbstractCommandFactory implements I\Command
 	 */
 	public function __construct(API\Int\FactoryCollection $factory_collection, int $course_ref_id = null)
 	{
+		// accepting parameters and passing them to parent via parameter object
 		$pars = new Parameters($course_ref_id);
 		parent::__construct($factory_collection, $pars);
 	}
 
 	/**
-	 * @inheritdoc
+	 * Returning a Sup-API
 	 */
 	function membership(): \ILIAS\API\Membership\Int\CommandFactory {
 		return new \ILIAS\API\Membership\CommandFactory($this->factory_collection);
 	}
 
 	/**
-	 * @inheritdoc
+	 * Returning a command...
 	 */
 	function create(string $title, string $description, int $parent_ref_id): I\CreateCommand {
 		return new CreateCommand($this->factory_collection, $title, $description, $parent_ref_id);

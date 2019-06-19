@@ -25,7 +25,9 @@ Examples
 
 Performing commands should leave the system always in a consistent state.
 
-This implies an important rule: **Commands MUST not be nested**. The implementation of commands (located in so-called command handlers) MUST not call other commands through the API. This contradicts the rule that only top level commands are accessible through the API. This rule also exists to keep the overall processing simple and to ensure performance (e.g. policy checks should be done only one time).
+This implies an important rule: **Commands MUST not be nested**. The implementation of commands (located in so-called command handlers) MUST not call other commands through the API. This would contradict the rule that only top level commands are accessible through the API. This rule also exists to keep the overall processing simple and to ensure performance (e.g. policy checks should be done only one time).
+
+Front-Ends have to ensure that these rules are respected, too. Especially any event driven code most probably SHOULD not call the API, since events are usually triggered by higher level processes that are already performing a top level actions.
 
 ## Using the API
 

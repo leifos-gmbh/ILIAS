@@ -64,7 +64,7 @@ $course_metadata_api = $DIC->api()->course(...)->metadata(...);
 
 ### Command Bus
 
-The API mainly follows a command bus pattern. The domain logic is availabe through single commands that are passed to a command dispatcher (bus) which enforces a common execution process for commands.
+The API mainly follows a command bus pattern. The domain logic is available through single commands that are passed to a command dispatcher (bus) which enforces a common execution process for commands.
 
 ### Commands and Command Factories
 
@@ -78,7 +78,7 @@ The `course()` and `membership()` calls will return command factories and the la
 
 ### Command Dispatching
 
-To execute a command it will be passed to the command bus by calling `$api->dispatch(...)`. This method takes to arguments, the command object and the actor id.
+To execute a command it will be passed to the command bus by calling `$api->dispatch(...)`. This method takes two arguments, the command object and the actor id.
 
 ### Parameters
 
@@ -111,7 +111,7 @@ The final command execution has to be implemented by the handler of the last inv
 ## Implementing the API
 
 ### Adding a top level domain component
-The top level domains need to add their main command factory to `src/API/API.php` and the corresponing interface.
+The top level domains need to add their main command factory to `src/API/API.php` and the corresponding interface.
 
 All other code goes to your component and should use a namespace `ILIAS\API\ComponentName`, e.g. `namespace ILIAS\API\Course;`.
 
@@ -127,15 +127,41 @@ The command factory of your component **MUST**
 
 If a command factory accepts **parameters** it MUST pass a `Parameter` object to the parent constructor (see next chapter).
 
-E.g.
+Example
 ```
+namespace ILIAS\API\Course;
+use ILIAS\API\Course\Int as I;
+use ILIAS\API as API;
+
 /**
- * Constructor
+ * Course api command factory
+ *
+ * @author killing@leifos.de
  */
-public function __construct(API\Int\FactoryCollection $factory_collection, int $course_ref_id = null)
+class CommandFactory extends API\Int\AbstractCommandFactory implements I\CommandFactory
 {
-	$pars = new Parameters($course_ref_id);
-	parent::__construct($factory_collection, $pars);
+	/**
+	 * Constructor
+	 */
+	public function __construct(API\Int\FactoryCollection $factory_collection, int $course_ref_id = null)
+	{
+		$pars = new Parameters($course_ref_id);
+		parent::__construct($factory_collection, $pars);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	function membership(): \ILIAS\API\Membership\Int\CommandFactory {
+		return new \ILIAS\API\Membership\CommandFactory($this->factory_collection);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	function create(string $title, string $description, int $parent_ref_id): I\CreateCommand {
+		return new CreateCommand($this->factory_collection, $title, $description, $parent_ref_id);
+	}
 }
 ```
 

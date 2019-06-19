@@ -38,7 +38,7 @@ class CommandHandler extends API\Int\AbstractCommandHandler
 			/** @var Parameters $p */
 			$p = $this->getParameters();
 
-			// pseudo check: if ref id is 3, do not allow
+			// pseudo check: if ref id is 7 everything is ok
 			if ($p->getCourseRefId() == 7)
 			{
 				return self::POLICY_OK;
@@ -53,6 +53,18 @@ class CommandHandler extends API\Int\AbstractCommandHandler
 	 */
 	public function checkPolicyForCommand(API\Int\Command $command, int $actor_id): int
 	{
+		// create command
+		if ($command instanceof CreateCommand)
+		{
+			/** @var CreateCommand $command */
+			$parent_ref_id = $command->getParentRefId();
+
+			// pseudo check: if ref id is 7 everything is ok
+			if ($parent_ref_id == 7)
+			{
+				return self::POLICY_OK;
+			};
+		}
 		return self::POLICY_FAILED;
 	}
 
@@ -61,6 +73,19 @@ class CommandHandler extends API\Int\AbstractCommandHandler
 	 */
 	public function handle(API\Int\Command $command, int $actor_id)
 	{
+		// create command
+		if ($command instanceof CreateCommand)
+		{
+			/** @var CreateCommand $command */
+			$title = $command->getTitel();
+			$description = $command->getDescription();
+			$parent_ref_id = $command->getParentRefId();
+
+			// now code for performing the command
+			// ....
+
+			return;
+		}
 		throw new Exc\UnknownCommand("Command unknown $command");
 	}
 

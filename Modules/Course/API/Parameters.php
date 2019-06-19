@@ -12,6 +12,9 @@ use ILIAS\API as API;
  */
 class Parameters implements API\Int\Parameters
 {
+	/**
+	 * @var int|null
+	 */
 	protected $course_ref_id = null;
 
 	/**
@@ -23,9 +26,9 @@ class Parameters implements API\Int\Parameters
 	}
 
 	/**
-	 * @return int
+	 * @return int|null
 	 */
-	function getCourseRefId(): int
+	function getCourseRefId(): ?int
 	{
 		return $this->course_ref_id;
 	}

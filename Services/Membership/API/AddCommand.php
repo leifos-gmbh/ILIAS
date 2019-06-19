@@ -7,7 +7,7 @@ use ILIAS\API\Membership\Int as I;
 use ILIAS\API as API;
 
 /**
- * Course create command
+ * Add membership command
  */
 class AddCommand extends API\Int\AbstractCommand implements I\AddCommand {
 

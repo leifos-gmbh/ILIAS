@@ -135,8 +135,7 @@ use ILIAS\API as API;
 
 /**
  * Course api command factory
- *
- * @author killing@leifos.de
+ * ...
  */
 class CommandFactory extends API\Int\AbstractCommandFactory implements I\CommandFactory
 {
@@ -175,6 +174,37 @@ Parameter objects **MUST**
 - implement `\ILIAS\API\Int\Parameters`
 - be implemented as an immutable value object that retrieves all its parameters through the constructor and corresponding get...() methods for accessing the parameters.
 
+Example
+```
+namespace ILIAS\API\Course;
+use ILIAS\API as API;
+
+/**
+ * Course api factory parameters
+ * ...
+ */
+class Parameters implements API\Int\Parameters
+{
+	protected $course_ref_id = null;
+
+	/**
+	 * Constructor
+	 */
+	public function __construct(int $course_ref_id = null)
+	{
+		$this->course_ref_id = $course_ref_id;
+	}
+
+	/**
+	 * @return int|null
+	 */
+	function getCourseRefId(): ?int
+	{
+		return $this->course_ref_id;
+	}
+}
+```
+
 ### Implementing a Command
 
 A command of your component **MUST**
@@ -184,6 +214,55 @@ A command of your component **MUST**
 - implement `\ILIAS\API\Int\Command`
 - retrieve a `\ILIAS\API\Int\FactoryCollection` object via constructor and pass it to its parent constructor
 - be implemented as an immutable value object that retrieves all its parameters through the constructor and corresponding get...() methods for accessing the parameters.
+
+Example
+```
+namespace ILIAS\API\Membership;
+use ILIAS\API\Membership\Int as I;
+use ILIAS\API as API;
+
+/**
+ * Add membership command
+ */
+class AddCommand extends API\Int\AbstractCommand implements I\AddCommand {
+
+	/**
+	 * @var int
+	 */
+	protected $user_id;
+
+	/**
+	 * @var int
+	 */
+	protected $local_role_id;
+
+	/**
+	 * CreateCommand constructor.
+	 * @param int $user_id
+	 * @param int $local_role_id
+	 */
+	public function __construct(API\Int\FactoryCollection $factory_collection, int $user_id, int $local_role_id) {
+		parent::__construct($factory_collection);
+		$this->user_id = $user_id;
+		$this->local_role_id = $local_role_id;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getUserId(): int {
+		return $this->user_id;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getLocalRoleId(): int {
+		return $this->local_role_id;
+	}
+}
+
+```
 
 ### Integrating Sub-APIs
 
@@ -199,3 +278,107 @@ public function membership(): \ILIAS\API\Membership\Int\CommandFactory;
 ### Configuring Sub-APIs
 
 tbd
+
+### Implementing Command Handlers
+
+Command handlers **MUST**
+
+- be a class named `CommandHandler`
+- extend `\ILIAS\API\Int\AbstractCommandHandler`
+- implement a method `checkPolicyForSubHandler` that checks if a sub commmand handler
+  may be called by the current actor and if yes, return self::POLICY_OK otherwise self::POLICY_FAILED. E.g. a course command handler may check the `manageMembers` permission before allowing to pass the command to a Membership command handler.
+- implement a method `checkPolicyForCommand` that checks if a commmand
+  may be performed by the current actor and if yes, return self::POLICY_OK otherwise self::POLICY_FAILED.
+- implement a method `handle` that performs the command. Note that **this method MUST not call the check-methods again**, since this is already done by the command bus.
+
+Example
+```
+namespace ILIAS\API\Course;
+
+use ILIAS\API as API;
+use \ILIAS\API\Exceptions as Exc;
+
+
+/**
+ * Command handler
+ *
+ * @author killing@leifos.de
+ */
+class CommandHandler extends API\Int\AbstractCommandHandler
+{
+	/**
+	 * @inheritdoc
+	 */
+	public function getConfigForSubHandler(API\Int\CommandHandler $sub_handler)
+	{
+		// @todo check sub handlers and configure them
+
+		return null;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function checkPolicyForSubHandler(API\Int\CommandHandler $sub_handler, int $actor_id): int
+	{
+		// membership subhandler
+		if ($sub_handler instanceof \ILIAS\API\Membership\CommandHandler)
+		{
+			// check manage members permission
+
+			/** @var Parameters $p */
+			$p = $this->getParameters();
+
+			// pseudo check: if ref id is 7 everything is ok
+			if ($p->getCourseRefId() == 7)
+			{
+				return self::POLICY_OK;
+			};
+		}
+
+		return self::POLICY_FAILED;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function checkPolicyForCommand(API\Int\Command $command, int $actor_id): int
+	{
+		// create command
+		if ($command instanceof CreateCommand)
+		{
+			/** @var CreateCommand $command */
+			$parent_ref_id = $command->getParentRefId();
+
+			// pseudo check: if ref id is 7 everything is ok
+			if ($parent_ref_id == 7)
+			{
+				return self::POLICY_OK;
+			};
+		}
+		return self::POLICY_FAILED;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function handle(API\Int\Command $command, int $actor_id)
+	{
+		// create command
+		if ($command instanceof CreateCommand)
+		{
+			/** @var CreateCommand $command */
+			$title = $command->getTitel();
+			$description = $command->getDescription();
+			$parent_ref_id = $command->getParentRefId();
+
+			// now code for performing the command
+			// ....
+
+			return;
+		}
+		throw new Exc\UnknownCommand("Command unknown $command");
+	}
+
+}
+```

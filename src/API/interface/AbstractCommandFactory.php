@@ -24,9 +24,10 @@ abstract class AbstractCommandFactory implements CommandFactory
 	/**
 	 * Constructor
 	 */
-	public function __construct(FactoryCollection $factory_collection) {
+	public function __construct(FactoryCollection $factory_collection, Parameters $parameters = null) {
 		$this->factory_collection = $factory_collection;
 		$this->factory_collection->add($this);
+		$this->parameters = $parameters;
 	}
 	
 	/**

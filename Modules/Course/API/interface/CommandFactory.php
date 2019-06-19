@@ -14,7 +14,7 @@ interface CommandFactory extends \ILIAS\API\Int\CommandFactory
 	/**
 	 * @return \ILIAS\API\Membership\CommandFactory
 	 */
-	public function membership(): \ILIAS\API\Membership\CommandFactory;
+	public function membership(): \ILIAS\API\Membership\Int\CommandFactory;
 
 	/**
 	 * @param string $title

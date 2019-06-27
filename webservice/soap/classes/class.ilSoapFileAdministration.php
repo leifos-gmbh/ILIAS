@@ -444,7 +444,7 @@ class ilSoapFileAdministration extends ilSoapAdministration
 			return $this->__raiseError('No permission to edit the learning module with id: '.$ref_id,
 				'Server');
 		}
-		$lm = ilObjectFactory::getInstanceByObjId($obj_id, false);
+		$lm = ilObjectFactory::getInstanceByRefId($ref_id,false);
 		if(!$lm instanceof ilObjLearningModule)
 		{
 			return $this->__raiseError('Wrong obj id or type for Html learning module with id '.$ref_id,
@@ -455,6 +455,7 @@ class ilSoapFileAdministration extends ilSoapAdministration
 
 			// delete lm specific data
 			$lm->delete(false);
+			$lm->createProperties();
 
 			include_once './Services/Export/classes/class.ilImport.php';
 			$imp = new ilImport((int) $ref_id);

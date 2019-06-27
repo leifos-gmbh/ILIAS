@@ -475,6 +475,7 @@ class ilSoapFileAdministration extends ilSoapAdministration
 			return $this->__raiseError($e->getMessage(),'Server');
 		}
 
+		$lm->readProperties();
 		$lm->setOnline((bool) $a_online);
 		$lm->setTitle($a_title);
 		$lm->setDescription($a_desc);

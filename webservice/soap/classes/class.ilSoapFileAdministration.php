@@ -523,7 +523,7 @@ class ilSoapFileAdministration extends ilSoapAdministration
 		}
 
 
-		$html = ilObjectFactory::getInstanceByObjId($obj_id, false);
+		$html = ilObjectFactory::getInstanceByRefId($ref_id, false);
 
 		if (!is_object($html) || $html->getType()!= "htlm")
 		{
@@ -553,6 +553,7 @@ class ilSoapFileAdministration extends ilSoapAdministration
 			return $this->__raiseError($e->getMessage(),'Server');
 		}
 
+		$html->read();
 		$html->setOnline((bool) $a_online);
 		$html->setTitle($a_title);
 		$html->setDescription($a_desc);

@@ -271,25 +271,22 @@ class ilSoapFileAdministration extends ilSoapAdministration
 
 		// Check access
 		$permission_ok = false;
-		foreach($ref_ids = ilObject::_getAllReferences($obj_id) as $ref_id)
-		{
-			if($access->checkAccess('write','',$ref_id))
-			{
-				$permission_ok = true;
-				break;
-			}
-		}
-		if(!$permission_ok)
-		{
-			return $this->__raiseError('No permission to edit the ItemGroup with id: '.$ref_id,
+		if(!$access->checkAccess('write','',$ref_id)) {
+			return $this->__raiseError(
+				'No permission to edit the ItemGroup with id: '.$ref_id,
 				'Server');
 		}
-		$itgr = ilObjectFactory::getInstanceByObjId($obj_id, false);
+
+		$itgr = ilObjectFactory::getInstanceByRefId($ref_id, false);
 		if(!$itgr instanceof ilObjItemGroup)
 		{
 			return $this->__raiseError('Wrong obj id or type for ItemGroup with id '.$ref_id,
 				'Server');
 		}
+
+		$items = new ilItemGroupItems($ref_id);
+		$items->delete();
+
 
 		try {
 

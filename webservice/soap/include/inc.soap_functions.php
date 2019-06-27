@@ -780,11 +780,11 @@ class ilSoapFunctions {
 		return $sta->updateHtmlLearningModule($sid, $ref_id, $xml_path,$a_online,$a_old_id,$a_title,$a_desc,$a_start);
 	}
 
-	public static function updateContainer($sid,$ref_id,$zip_path,$old_id)
+	public static function updateContainer($sid,$ref_id,$zip_path,$old_id,$mappings)
 	{
 		include_once './webservice/soap/classes/class.ilSoapObjectAdministration.php';
 		$obj = new ilSoapObjectAdministration();
-		return $obj->updatecontainer($sid,$ref_id,$zip_path,$old_id);
+		return $obj->updateContainer($sid,$ref_id,$zip_path,$old_id,$mappings);
 	}
 
 	public static function updateLomMetaData($sid,$ref_id,$obj_id,$xml)

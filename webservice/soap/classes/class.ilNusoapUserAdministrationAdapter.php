@@ -411,7 +411,9 @@ class ilNusoapUserAdministrationAdapter
 			array('sid' => 'xsd:string',
 				'ref_id' => 'xsd:string',
 				'zip_path' => 'xsd:string',
-				'old_id' => 'xsd:string'),
+				'old_id' => 'xsd:string',
+				'mappings' => 'tns:stringArray'
+			),
 			array('success' => 'xsd:boolean'),
 			SERVICE_NAMESPACE,
 			SERVICE_NAMESPACE.'#updateContainer',

@@ -1062,10 +1062,14 @@ class ilSoapObjectAdministration extends ilSoapAdministration
 	}
 
 	// ibi-patch start
-	public function updateContainer($sid, $ref_id, $zip_path, $a_old_id)
+	public function updateContainer($sid, $ref_id, $zip_path, $a_old_id, $mappings)
 	{
 		$this->initAuth($sid);
 		$this->initIlias();
+
+		global $DIC;
+
+		$tree = $DIC->repositoryTree();
 
 		if(!$this->__checkSession($sid))
 		{
@@ -1125,6 +1129,34 @@ class ilSoapObjectAdministration extends ilSoapAdministration
 			$type = ilObject::_lookupType($obj_id);
 			$imp->getMapping()->addMapping('Services/Container','objs',$a_old_id,$obj_id);
 			$imp->getMapping()->addMapping('Services/Container','refs',0,$ref_id);
+
+			ilLoggerFactory::getLogger('wsrv')->dump($mappings, ilLogLevel::INFO);
+			foreach($mappings as  $mapping_import_id)
+			{
+				list($remote_ref_id, $remote_obj_id, $import_id) = explode('__',$mapping_import_id);
+				$local_obj_id = ilObject::_getIdForImportId($import_id);
+				if($local_obj_id) {
+					$imp->getMapping()->addMapping(
+						'Services/Container',
+						'objs',
+						$remote_obj_id,
+						ilObject::_getIdForImportId($import_id)
+					);
+					ilLoggerFactory::getLogger('wsrv')->debug('Added mapping: ' . $remote_obj_id .' => ' . ilObject::_getIdForImportId($import_id));
+					foreach(ilObject::_getAllReferences($local_obj_id) as $idx => $local_ref) {
+						ilLoggerFactory::getLogger('wsrv')->info('relation: ' . $tree->getRelation($ref_id,$local_ref));
+						if($tree->getRelation($ref_id, $local_ref) == ilTree::RELATION_PARENT) {
+							$imp->getMapping()->addMapping(
+								'Services/Container',
+								'refs',
+								$remote_ref_id,
+								$local_ref
+							);
+							ilLoggerFactory::getLogger('wsrv')->debug('Added ref mapping: ' . $remote_ref_id .' => ' . $local_ref);
+						}
+					}
+				}
+			}
 
 			$imp->importObject(
 				'unused',

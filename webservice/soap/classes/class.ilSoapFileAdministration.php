@@ -226,14 +226,14 @@ class ilSoapFileAdministration extends ilSoapAdministration
 			$zip_path,
 			basename($zip_path),
 			'lm',
-			'Module/LearningModule',
+			'Modules/LearningModule',
 			true
 		);
 
 		$new_obj = new ilObjLearningModule($new_id, false);
 		ilObjHelpSettings::writeHelpModuleLmId($help_id, $new_obj->getId());
 
-		$DIC->settings()->set('help_module', $new_id);
+		$DIC->settings()->set('help_module', $help_id);
 		$DIC->settings()->set('help_mode', $mode);
 
 		return true;

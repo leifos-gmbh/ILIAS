@@ -1990,6 +1990,12 @@ class ilObject
 		// Choose upload mode to avoid creation of additional settings, db entries ...
 		$new_obj->create(true);
 
+		if($this->supportsOfflineHandling())
+		{
+			$new_obj->setOffLineStatus($this->getOfflineStatus());
+			$new_obj->update();
+		}
+
 		if(!$options->isTreeCopyDisabled() && !$a_omit_tree)
 		{
 			ilLoggerFactory::getLogger('obj')->debug('Tree copy is enabled');

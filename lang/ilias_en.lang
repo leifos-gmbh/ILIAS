@@ -14,6 +14,19 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+pd#:#pd_avail_sortation#:#Available Sortations
+pd#:#pd_default_sortation#:#Default Sortation
+pd#:#pd_sortation#:#Sortation
+pd#:#pd_presentation#:#Presentation
+pd#:#pd_avail_presentation#:#Available Presentations
+pd#:#pd_default_presentation#:#Default Presentation
+pd#:#pd_list#:#List
+pd#:#pd_tile#:#Tile
+pd#:#pd_activation#:#activation
+pd#:#pd_view_courses_groups#:#View ‘Courses and Groups’
+pd#:#pd_view_favourites#:#View ‘Selected Items’
+rbac#:#pdts_change_presentation#:#Change presentation of personal desktop view
+rbac#:#change_presentation#:#Change Presentation
 meta#:#meta_oer_harvester#:#OER Harvester
 meta#:#meta_oer_harvester_desc#:#OER Harvester
 meta#:#meta_oer_copyright_selection#:#Lizenzauswahl
@@ -1942,6 +1955,8 @@ common#:#btn_undelete#:#Restore
 pd#:#pd_sort_by_location#:#Sort by Location
 pd#:#pd_sort_by_type#:#Sort by Type
 pd#:#pd_sort_by_start_date#:#Sort by Start Date
+pd#:#pd_presentation_mode_list#:#Item List Presentation
+pd#:#pd_presentation_mode_tile#:#Tile Presentation
 pd#:#pd_my_memberships_sort_default#:#Default of Sort Option
 pd#:#pd_upcoming#:#Upcoming
 pd#:#pd_ongoing#:#Ongoing

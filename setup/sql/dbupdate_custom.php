@@ -43,7 +43,8 @@ if (!$ilDB->tableColumnExists('svy_svy', 'tutor_res_cron'))
 		"length" => 1
 	));
 }
-?><#5>
+?>
+<#5>
 <?php
 
 // get tst type id

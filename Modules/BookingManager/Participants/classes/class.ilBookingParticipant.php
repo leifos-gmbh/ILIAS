@@ -168,11 +168,10 @@ class ilBookingParticipant
 
 		$set = $ilDB->query($query);
 
-		while($row = $ilDB->fetchAssoc($set))
-		{
+		while($row = $ilDB->fetchAssoc($set)) {
 			$status = $row['status'];
 			//Nothing to show if the status is canceled when filtering by object
-			if($status == ilBookingReservation::STATUS_CANCELLED && $a_object_id){
+			if ($status == ilBookingReservation::STATUS_CANCELLED && $a_object_id) {
 				continue;
 			}
 
@@ -180,28 +179,26 @@ class ilBookingParticipant
 			$name = $user_name['lastname'].", ".$user_name['firstname'];
 			$index = $a_booking_pool."_".$row['user_id'];
 
-			if(!isset($res[$index]))
-			{
+			if (!isset($res[$index])) {
 				$res[$index] = array(
 					"object_title" => array(),
 					"name" => $name
 				);
 
-				if($status !=  ilBookingReservation::STATUS_CANCELLED && $row['title'] != "") {
+				if ($status != ilBookingReservation::STATUS_CANCELLED && $row['title'] != "") {
 					$res[$index]['object_title'] = array($row['title']);
 					$res[$index]['obj_count'] = 1;
+					$res[$index]['object_ids'][] = $row['object_id'];
 				}
-			}
-			else
-			{
-				if($row['title'] != "" && (!in_array($row['title'], $res[$index]['object_title']) && $status !=  ilBookingReservation::STATUS_CANCELLED)) {
+			} else {
+				if ($row['title'] != "" && (!in_array($row['title'],
+							$res[$index]['object_title']) && $status != ilBookingReservation::STATUS_CANCELLED)) {
 					array_push($res[$index]['object_title'], $row['title']);
 					$res[$index]['obj_count'] = $res[$index]['obj_count'] + 1;
+					$res[$index]['object_ids'][] = $row['object_id'];
 				}
 			}
 			$res[$index]['user_id'] = $row['user_id'];
-			$res[$index]['object_ids'][] = $row['object_id'];
-
 		}
 		return $res;
 	}

@@ -2,7 +2,6 @@
 
 /* Copyright (c) 1998-2018 ILIAS open source, Extended GPL, see docs/LICENSE */
 
-include_once "Services/Cron/classes/class.ilCronJob.php";
 
 /**
  * Cron for booking manager notification
@@ -204,7 +203,6 @@ class ilBookCronNotification extends ilCronJob
 	{
 		foreach ($notifications as $uid => $n)
 		{
-			include_once "./Services/Notification/classes/class.ilSystemNotification.php";
 			$ntf = new ilSystemNotification();
 			$lng = $ntf->getUserLanguage($uid);
 			$lng->loadLanguageModule("book");

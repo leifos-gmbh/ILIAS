@@ -6,9 +6,9 @@ use ILIAS\BookingManager;
 
 /**
  * This class is used for inegration of the booking manager as a service
- * into other repository objects.
+ * into other repository objects, e.g. courses.
  *
- * @ilCtrl_Calls ilBookingGatewayGUI: ilPropertyFormGUI, ilBookingObjectServiceGUI
+ * @ilCtrl_Calls ilBookingGatewayGUI: ilPropertyFormGUI, ilBookingObjectServiceGUI, ilBookingReservationsGUI
  * @author killing@leifos.de
  * @ingroup ModulesBookingManager
  */
@@ -55,6 +55,11 @@ class ilBookingGatewayGUI
 	protected $current_settings;
 
 	/**
+	 * @var int
+	 */
+	protected $current_pool_ref_id;
+
+	/**
 	 * Constructor
 	 */
 	public function __construct(ilObjectGUI $parent_gui)
@@ -81,6 +86,44 @@ class ilBookingGatewayGUI
 		);
 		$this->current_settings = $handler->handle()->getSettings();
 
+		$this->initPool();
+	}
+
+	/**
+	 * Init pool. Determin the current pool in $this->current_pool_ref_id.
+	 *
+	 * Host objects (e.g. courses) may use multiple booking pools. This method determines the current selected
+	 * pool (stored in request parameter "pool_ref_id") within the host object user interface.
+	 *
+	 * If no pool has been selected yet, the first one attached to the host object is choosen.
+	 *
+	 * If no pools are attached to the host object at all we get a 0 ID.
+	 */
+	protected function initPool()
+	{
+		$ctrl = $this->ctrl;
+
+		$ctrl->saveParameter($this, "pool_ref_id");
+		$pool_ref_id  = (int) $_GET["pool_ref_id"];
+
+		$book_ref_ids = $this->use_book_repo->getUsedBookingPools(ilObject::_lookupObjId($this->ref_id));
+
+		if (!in_array($pool_ref_id, $book_ref_ids))
+		{
+			if (count($book_ref_ids) > 0)
+			{
+				$pool_ref_id = current($book_ref_ids);
+			}
+			else
+			{
+				$pool_ref_id = 0;
+			}
+		}
+		$this->current_pool_ref_id = $pool_ref_id;
+		if ($this->current_pool_ref_id > 0)
+		{
+			$ctrl->setParameter($this, "pool_ref_id", $this->current_pool_ref_id);
+		}
 	}
 
 	/**
@@ -103,9 +146,20 @@ class ilBookingGatewayGUI
 				break;
 
 			case "ilbookingobjectservicegui":
-				$book_ser_gui = new ilBookingObjectServiceGUI($this->ref_id);
+				$this->setSubTabs("book_obj");
+				$book_ser_gui = new ilBookingObjectServiceGUI($this->ref_id,
+					$this->current_pool_ref_id,
+					$this->use_book_repo);
 				$ctrl->forwardCommand($book_ser_gui);
 				break;
+
+			case "ilbookingreservationsgui":
+				$this->setSubTabs("reservations");
+				$pool = new ilObjBookingPool($this->current_pool_ref_id);
+				$res_gui = new ilBookingReservationsGUI($pool);
+				$this->ctrl->forwardCommand($res_gui);
+				break;
+
 
 			default:
 				if (in_array($cmd, array("show", "settings", "saveSettings")))
@@ -131,7 +185,7 @@ class ilBookingGatewayGUI
 			$ctrl->getLinkTargetByClass("ilbookingobjectservicegui", ""));
 		$tabs->addSubTab("reservations",
 			$lng->txt("book_reservations"),
-			$ctrl->getLinkTarget($this, "reservations"));
+			$ctrl->getLinkTargetByClass("ilbookingreservationsgui", ""));
 		$tabs->addSubTab("settings",
 			$lng->txt("settings"),
 			$ctrl->getLinkTarget($this, "settings"));
@@ -145,10 +199,8 @@ class ilBookingGatewayGUI
 	 */
 	protected function show()
 	{
-		$this->setSubTabs("");
-		$main_tpl = $this->main_tpl;
-
-		$main_tpl->setContent("test");
+		$ctrl = $this->ctrl;
+		$ctrl->redirectByClass("ilbookingobjectservicegui");
 	}
 
 	//

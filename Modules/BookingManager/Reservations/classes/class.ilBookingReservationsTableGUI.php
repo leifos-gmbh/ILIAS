@@ -1,9 +1,6 @@
 <?php
 /* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
 
-include_once("./Services/Table/classes/class.ilTable2GUI.php");
-include_once 'Modules/BookingManager/classes/class.ilBookingReservation.php';
-require_once "Services/Calendar/classes/class.ilCalendarUtil.php";
 
 /**
  * List booking objects 
@@ -162,16 +159,7 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
 		
 		if($ilUser->getId() != ANONYMOUS_USER_ID)
 		{			
-			/*
-			if($ilAccess->checkAccess('write', '', $this->ref_id))
-			{
-				$this->addMultiCommand('rsvInUse', $lng->txt('book_set_in_use'));			
-				$this->addMultiCommand('rsvNotInUse', $lng->txt('book_set_not_in_use'));							
-			}
-			*/
-			
 			$this->addMultiCommand('rsvConfirmCancel', $lng->txt('book_set_cancel'));
-			// $this->addMultiCommand('rsvUncancel', $lng->txt('book_set_not_cancel'));			
 			$this->setSelectAllCheckbox('mrsv');
 		}
 		
@@ -230,7 +218,6 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
 
 			if ($this->access->checkAccess("manage_members", "", $parent["ref_id"]))
 			{
-				include_once './Services/PrivacySecurity/classes/class.ilExportFieldsInfo.php';
 				$ef = ilExportFieldsInfo::_getInstanceByType($parent["type"]);
 				foreach ($ef->getSelectableFieldsInfo(ilObject::_lookupObjectId($parent["ref_id"])) as $k => $v)
 				{
@@ -303,7 +290,6 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
 		}
 		
 		$this->objects = array();
-		include_once "Modules/BookingManager/classes/class.ilBookingObject.php";
 		foreach(ilBookingObject::getList($this->pool_id) as $item)
 		{
 			$this->objects[$item["booking_object_id"]] = $item["title"];
@@ -329,7 +315,6 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
 				$to = null;
 				
 				// add period end from pool settings?
-				include_once "Modules/BookingManager/classes/class.ilObjBookingPool.php";
 				$bpool = new ilObjBookingPool($this->pool_id, false);
 				$period = $bpool->getReservationFilterPeriod();
 				if($period !== null)
@@ -359,7 +344,6 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
 				$options = array(""=>$this->lng->txt('book_all'));
 				
 				// schedule to slot
-				require_once "Modules/BookingManager/classes/class.ilBookingSchedule.php";
 				foreach(ilBookingSchedule::getList($this->pool_id) as $def)
 				{
 					$schedule = new ilBookingSchedule($def["booking_schedule_id"]);
@@ -524,13 +508,11 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
 			$filter["user_id"] = $ilUser->getId();
 		}
 	
-		include_once "Modules/BookingManager/classes/class.ilBookingReservation.php";
-		$data = ilBookingReservation::getListByDate($this->has_schedule, $ids, $filter);	
+		$data = ilBookingReservation::getListByDate($this->has_schedule, $ids, $filter);
 		
 		if($this->advmd)
 		{			
 			// advanced metadata
-			include_once('Services/AdvancedMetaData/classes/class.ilAdvancedMDRecordGUI.php');
 			$this->record_gui = new ilAdvancedMDRecordGUI(ilAdvancedMDRecordGUI::MODE_FILTER, "book", $this->pool_id, "bobj");
 			$this->record_gui->setTableGUI($this);
 			$this->record_gui->parse();
@@ -540,7 +522,6 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
 				$data[$idx]["pool_id"] = $this->pool_id;
 			}
 			
-			include_once("./Services/AdvancedMetaData/classes/class.ilAdvancedMDValues.php");
 			$data = ilAdvancedMDValues::queryForRecords(
 				$this->ref_id, "book", "bobj",
 				$this->pool_id, "bobj", $data, "pool_id", "object_id", $this->record_gui->getFilterElements());
@@ -626,10 +607,6 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
 		}
 		else
 		{			
-			//$ilCtrl->setParameter($this->parent_obj, 'user_id', $a_set['user_id']);
-			//$this->tpl->setVariable("HREF_PROFILE", $ilCtrl->getLinkTarget($this->parent_obj, 'showprofile'));
-			//$ilCtrl->setParameter($this->parent_obj, 'user_id', '');
-			include_once("./Services/User/classes/class.ilUserUtil.php");
 			$uname = ilUserUtil::getNamePresentation($a_set['user_id'], false, true, "", true);
 		}
 		$this->tpl->setVariable("TXT_CURRENT_USER", $uname);
@@ -706,61 +683,6 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
 			$this->tpl->setVariable("TXT_ACTION", $lng->txt('book_set_cancel'));
 		}	
 		
-		/* advsellist version
-		if (!$this->has_schedule || $date_to->get(IL_CAL_UNIX) > time())
-		{
-			include_once("./Services/UIComponent/AdvancedSelectionList/classes/class.ilAdvancedSelectionListGUI.php");
-			$alist = new ilAdvancedSelectionListGUI();
-			$alist->setId($a_set['booking_reservation_id']);
-			$alist->setListTitle($lng->txt("actions"));
-
-			$ilCtrl->setParameter($this->parent_obj, 'reservation_id', $a_set['booking_reservation_id']);
-
-			if(!$a_set['group_id'])
-			{
-				if($ilAccess->checkAccess('write', '', $this->ref_id))
-				{
-					if($a_set['status'] == ilBookingReservation::STATUS_CANCELLED)
-					{					
-						// can be uncancelled?
-						// if(ilBookingReservation::getAvailableObject(array($a_set['object_id']), $date_from->get(IL_CAL_UNIX), $date_to->get(IL_CAL_UNIX)))
-						// {
-						//	  $alist->addItem($lng->txt('book_set_not_cancel'), 'not_cancel', $ilCtrl->getLinkTarget($this->parent_obj, 'rsvUncancel'));
-						// }						
-					}
-					else if($a_set['status'] != ilBookingReservation::STATUS_IN_USE)
-					{
-						if($this->has_schedule)
-						{
-							$alist->addItem($lng->txt('book_set_in_use'), 'in_use', $ilCtrl->getLinkTarget($this->parent_obj, 'rsvInUse'));
-						}
-						$alist->addItem($lng->txt('book_set_cancel'), 'cancel', $ilCtrl->getLinkTarget($this->parent_obj, 'rsvConfirmCancel'));
-					}
-					else if($this->has_schedule)
-					{
-						$alist->addItem($lng->txt('book_set_not_in_use'), 'not_in_use', $ilCtrl->getLinkTarget($this->parent_obj, 'rsvNotInUse'));
-					}
-				}
-				else if($a_set['user_id'] == $ilUser->getId() && $a_set['status'] != ilBookingReservation::STATUS_CANCELLED)
-				{
-					$alist->addItem($lng->txt('book_set_cancel'), 'cancel', $ilCtrl->getLinkTarget($this->parent_obj, 'rsvConfirmCancel'));
-				}
-			}
-			else if($ilAccess->checkAccess('write', '', $this->ref_id) || $a_set['user_id'] == $ilUser->getId())
-			{				
-				$alist->addItem($lng->txt('details'), 'details', $ilCtrl->getLinkTarget($this->parent_obj, 'logDetails'));
-			}
-			
-			if(sizeof($alist->getItems()))
-			{
-				if(!$a_set['group_id'])
-				{
-					$this->tpl->setVariable('MULTI_ID', $a_set['booking_reservation_id']);
-				}
-				$this->tpl->setVariable('LAYER', $alist->getHTML());
-			}
-		}		
-		*/
 	}
 	
 	protected function fillHeaderExcel(ilExcel $a_excel, &$a_row)

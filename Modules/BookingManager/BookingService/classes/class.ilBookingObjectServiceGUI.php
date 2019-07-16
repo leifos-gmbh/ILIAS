@@ -11,12 +11,30 @@
 class ilBookingObjectServiceGUI extends ilBookingObjectGUI
 {
 	/**
+	 * @var int
+	 */
+	protected $host_obj_ref_id;
+
+	/**
+	 * @var ilObjUseBookDBRepository
+	 */
+	protected $use_book_repo;
+
+	/**
+	 * @var
+	 */
+	//protected $current_pool_ref_id;
+
+	/**
 	 * ilBookingObjectServiceGUI constructor.
 	 * @param int $host_obj_ref_id Host object ref id (e.g. course)
 	 */
-	public function __construct(int $host_obj_ref_id)
+	public function __construct(int $host_obj_ref_id, int $current_pool_ref_id, \ilObjUseBookDBRepository $use_book_repo)
 	{
 		parent::__construct(null);
+		$this->host_obj_ref_id = (int) $host_obj_ref_id;
+		$this->use_book_repo = $use_book_repo;
+		$this->pool_gui = new ilObjBookingPoolGUI("", $current_pool_ref_id, true, false);
 	}
 
 }

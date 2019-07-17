@@ -71,9 +71,11 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 		parent::__construct($a_data,$a_id,$a_call_by_reference,$a_prepare_output);
 		$this->lng->loadLanguageModule("book");
 
-		$this->help = new ilBookingHelpAdapter($this->object, $DIC["ilHelp"]);
-
-		$DIC["ilHelp"]->setScreenIdComponent("book");
+		// not on creation
+		if (is_object($this->object)) {
+			$this->help = new ilBookingHelpAdapter($this->object, $DIC["ilHelp"]);
+			$DIC["ilHelp"]->setScreenIdComponent("book");
+		}
 
 		$this->user_profile_id = (int)$_GET["user_id"];
 		$this->book_obj_id = (int)$_REQUEST['object_id'];

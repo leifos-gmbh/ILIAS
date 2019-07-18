@@ -132,20 +132,20 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 			case 'ilpermissiongui':
 				$this->tabs_gui->setTabActive('perm_settings');
 				$perm_gui = new ilPermissionGUI($this);
-				$ret =& $this->ctrl->forwardCommand($perm_gui);
+				$this->ctrl->forwardCommand($perm_gui);
 				break;
 
 			case 'ilbookingobjectgui':
 				$this->tabs_gui->setTabActive('render');
 				$object_gui = new ilBookingObjectGUI($this,
 					$this->seed, $this->sseed, $this->help);
-				$ret =& $this->ctrl->forwardCommand($object_gui);
+				$this->ctrl->forwardCommand($object_gui);
 				break;
 
 			case 'ilbookingschedulegui':
 				$this->tabs_gui->setTabActive('schedules');
 				$schedule_gui = new ilBookingScheduleGUI($this);
-				$ret =& $this->ctrl->forwardCommand($schedule_gui);
+				$this->ctrl->forwardCommand($schedule_gui);
 				break;
 
 			case 'ilpublicuserprofilegui':

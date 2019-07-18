@@ -106,7 +106,13 @@ A booking pool is the main entity for managing booking objects (resources) and t
 
 ### Properties
 
-...
+* **User**: User who 'owns' the reservation. (`booking_reservation.user`)
+* **Assigner**: User who created the reservation. A tutor (assigner) may assign a reservation to a student (user who owns the reservation). (`booking_reservation.assigner_id`)
+* **Object**: Object that is reserved. (`booking_reservation.object_id`) 
+* **Reservation Period**: Timestamps that correspond to a concrete instance of a slot of the object schedule. (`booking_reservation.date_from`, `booking_reservation.date_to`)
+* **Reservation Status**: Currently `NULL` (reserved) or `ilBookingReservation::STATUS_CANCELLED` (reservation cancelled). (`booking_reservation.status`)
+* **Reservation Grouping**: If multiple instances of an object are reserved, each of them will get an entry in the reservation table. They will all share the same internal group ID. (`booking_reservation.group_id`)
+* **Context Object**: If a reservation is done within another repository object (e.g. course), this is stored with the reservation. (`booking_reservation.context_obj_id`)
 
 ## Participants
 

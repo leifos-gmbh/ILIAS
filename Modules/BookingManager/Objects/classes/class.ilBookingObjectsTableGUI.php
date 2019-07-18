@@ -34,7 +34,12 @@ class ilBookingObjectsTableGUI extends ilTable2GUI
 	protected $filter; // [array]
 	protected $ui_factory;
 	protected $ui_renderer;
-	
+
+	/**
+	 * @var bool
+	 */
+	protected $active_management;
+
 	/**
 	 * Constructor
 	 * @param	object	$a_parent_obj
@@ -44,7 +49,8 @@ class ilBookingObjectsTableGUI extends ilTable2GUI
 	 * @param	bool	$a_pool_has_schedule
 	 * @param	int		$a_pool_overall_limit
 	 */
-	function __construct($a_parent_obj, $a_parent_cmd, $a_ref_id, $a_pool_id, $a_pool_has_schedule, $a_pool_overall_limit)
+	function __construct($a_parent_obj, $a_parent_cmd, $a_ref_id, $a_pool_id, $a_pool_has_schedule, $a_pool_overall_limit,
+		bool $active_management = true)
 	{
 		global $DIC;
 
@@ -62,9 +68,11 @@ class ilBookingObjectsTableGUI extends ilTable2GUI
 		$this->pool_id = $a_pool_id;
 		$this->has_schedule = $a_pool_has_schedule;
 		$this->overall_limit = $a_pool_overall_limit;
-		$this->may_edit = $ilAccess->checkAccess('write', '', $this->ref_id);
-		$this->may_assign = $ilAccess->checkAccess('edit_permission', '', $this->ref_id);
-		
+		$this->may_edit = ($this->active_management &&
+			$ilAccess->checkAccess('write', '', $this->ref_id));
+		$this->may_assign = ($this->active_management &&
+			$ilAccess->checkAccess('write', '', $this->ref_id));
+
 		$this->advmd = ilObjBookingPool::getAdvancedMDFields($this->ref_id);
 		
 		$this->setId("bkobj");

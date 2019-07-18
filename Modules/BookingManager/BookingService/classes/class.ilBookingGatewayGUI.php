@@ -60,6 +60,16 @@ class ilBookingGatewayGUI
 	protected $current_pool_ref_id;
 
 	/**
+	 * @var ilObjBookingPool|null
+	 */
+	protected $pool = null;
+
+	/**
+	 * @var ilToolbarGUI
+	 */
+	protected $toolbar;
+
+	/**
 	 * Constructor
 	 */
 	public function __construct(ilObjectGUI $parent_gui)
@@ -77,7 +87,17 @@ class ilBookingGatewayGUI
 		$this->obj_id = (int) $parent_gui->object->getId();
 		$this->ref_id = (int) $parent_gui->object->getRefId();
 
+		$this->seed = ilUtil::stripSlashes($_GET['seed']);
+		$this->sseed = ilUtil::stripSlashes($_GET['sseed']);
+
+		$this->toolbar = $DIC->toolbar();
+
 		$this->use_book_repo = new ilObjUseBookDBRepository($DIC->database());
+
+		if (in_array($_REQUEST["return_to"], ["ilbookingobjectservicegui", "ilbookingreservationsgui"]))
+		{
+			$this->return_to = $_REQUEST["return_to"];
+		}
 
 		// get current settings
 		$handler = new BookingManager\getObjectSettingsCommandHandler(
@@ -87,6 +107,11 @@ class ilBookingGatewayGUI
 		$this->current_settings = $handler->handle()->getSettings();
 
 		$this->initPool();
+
+		if (is_object($this->pool)) {
+			$this->help = new ilBookingHelpAdapter($this->pool, $DIC["ilHelp"]);
+			$DIC["ilHelp"]->setScreenIdComponent("book");
+		}
 	}
 
 	/**
@@ -104,9 +129,11 @@ class ilBookingGatewayGUI
 		$ctrl = $this->ctrl;
 
 		$ctrl->saveParameter($this, "pool_ref_id");
-		$pool_ref_id  = (int) $_GET["pool_ref_id"];
+		$pool_ref_id  = ($_POST["pool_ref_id"] > 0)
+			? (int) $_POST["pool_ref_id"]
+			: (int) $_GET["pool_ref_id"];
 
-		$book_ref_ids = $this->use_book_repo->getUsedBookingPools(ilObject::_lookupObjId($this->ref_id));
+		$book_ref_ids = $this->use_book_repo->getUsedBookingPools($this->obj_id);
 
 		if (!in_array($pool_ref_id, $book_ref_ids))
 		{
@@ -122,6 +149,7 @@ class ilBookingGatewayGUI
 		$this->current_pool_ref_id = $pool_ref_id;
 		if ($this->current_pool_ref_id > 0)
 		{
+			$this->pool = new ilObjBookingPool($this->current_pool_ref_id);
 			$ctrl->setParameter($this, "pool_ref_id", $this->current_pool_ref_id);
 		}
 	}
@@ -147,25 +175,59 @@ class ilBookingGatewayGUI
 
 			case "ilbookingobjectservicegui":
 				$this->setSubTabs("book_obj");
+				$this->showPoolSelector("ilbookingobjectservicegui");
 				$book_ser_gui = new ilBookingObjectServiceGUI($this->ref_id,
 					$this->current_pool_ref_id,
-					$this->use_book_repo);
+					$this->use_book_repo, $this->seed, $this->sseed, $this->help);
 				$ctrl->forwardCommand($book_ser_gui);
 				break;
 
 			case "ilbookingreservationsgui":
+				$this->showPoolSelector("ilbookingreservationsgui");
 				$this->setSubTabs("reservations");
-				$pool = new ilObjBookingPool($this->current_pool_ref_id);
-				$res_gui = new ilBookingReservationsGUI($pool);
+				$res_gui = new ilBookingReservationsGUI($this->pool, $this->help);
 				$this->ctrl->forwardCommand($res_gui);
 				break;
 
 
 			default:
-				if (in_array($cmd, array("show", "settings", "saveSettings")))
+				if (in_array($cmd, array("show", "settings", "saveSettings", "selectPool")))
 				{
 					$this->$cmd();
 				}
+		}
+	}
+
+	/**
+	 * Pool selector
+	 */
+	protected function showPoolSelector($return_to)
+	{
+		//
+		$options = [];
+		foreach ($this->use_book_repo->getUsedBookingPools($this->obj_id) as $ref_id)
+		{
+			$options[$ref_id] = ilObject::_lookupTitle(ilObject::_lookupObjId($ref_id));
+		}
+
+		$this->ctrl->setParameter($this,"return_to", $return_to);
+		if (count($options) > 0) {
+			$si = new ilSelectInputGUI("", "pool_ref_id");
+			$si->setOptions($options);
+			$si->setValue($this->current_pool_ref_id);
+			$this->toolbar->setFormAction($this->ctrl->getFormAction($this));
+			$this->toolbar->addInputItem($si, false);
+			$this->toolbar->addFormButton($this->lng->txt("book_select_pool"), "selectPool");
+		}
+	}
+	
+	/**
+	 * Select pool
+	 */
+	protected function selectPool()
+	{
+		if ($this->return_to != "") {
+			$this->ctrl->redirectByClass($this->return_to);
 		}
 	}
 
@@ -181,10 +243,10 @@ class ilBookingGatewayGUI
 		$lng = $this->lng;
 
 		$tabs->addSubTab("book_obj",
-			$lng->txt("book_objects"),
+			$lng->txt("book_objects_list"),
 			$ctrl->getLinkTargetByClass("ilbookingobjectservicegui", ""));
 		$tabs->addSubTab("reservations",
-			$lng->txt("book_reservations"),
+			$lng->txt("book_log"),
 			$ctrl->getLinkTargetByClass("ilbookingreservationsgui", ""));
 		$tabs->addSubTab("settings",
 			$lng->txt("settings"),
@@ -239,7 +301,7 @@ class ilBookingGatewayGUI
 
 		$form->addCommandButton("saveSettings", $lng->txt("save"));
 
-		$form->setTitle($lng->txt("..."));
+		$form->setTitle($lng->txt("book_pool_selection"));
 		$form->setFormAction($ctrl->getFormAction($this));
 
 		return $form;

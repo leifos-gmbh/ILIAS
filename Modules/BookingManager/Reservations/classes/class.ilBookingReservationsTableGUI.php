@@ -42,6 +42,11 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
 	protected $tree;
 
 	/**
+	 * @var array ids of context objects (e.g. course ids) 
+	 */
+	protected $context_obj_ids;
+	
+	/**
 	 * Constructor
 	 * @param	object	$a_parent_obj
 	 * @param	string	$a_parent_cmd
@@ -52,7 +57,8 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
 	 * @param	array	$a_filter_pre
 	 * @param	array	$a_group_id
 	 */
-	function __construct($a_parent_obj, $a_parent_cmd, $a_ref_id, $a_pool_id, $a_show_all, $a_has_schedule, array $a_filter_pre = null, $a_group_id = null)
+	function __construct($a_parent_obj, $a_parent_cmd, $a_ref_id, $a_pool_id, $a_show_all, $a_has_schedule, array $a_filter_pre = null, $a_group_id = null,
+		array $context_obj_ids = null)
 	{
 		global $DIC;
 
@@ -66,6 +72,7 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
 		$ilAccess = $DIC->access();
 		$this->tree = $DIC->repositoryTree();
 
+		$this->context_obj_ids = $context_obj_ids;
 		$this->pool_id = $a_pool_id;
 		$this->ref_id = $a_ref_id;
 		$this->show_all = $a_show_all;
@@ -461,7 +468,11 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
 		{
 			$filter["user_id"] = $this->filter["user_id"];
 		}
-		
+		if(is_array($this->context_obj_ids))
+		{
+			$filter["context_obj_ids"] = $this->context_obj_ids;
+		}
+
 		if($this->has_schedule)
 		{
 			if(!$filter["status"])
@@ -489,7 +500,7 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
 			
 			$filter["past"] = (bool)$this->filter["past"];	
 		}
-		
+
 		return $filter;
 	}
 	
@@ -674,7 +685,7 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
 			{
 				$advmd_id = (int)$item["id"];
 				
-				if(!in_array("advmd".$advmd_id, $selected))						
+				if(!in_array("advmd".$advmd_id, $selected))
 				{
 					continue;
 				}
@@ -689,7 +700,7 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
 					}
 				}		
 				
-				$this->tpl->setCurrentBlock("advmd_bl");										
+				$this->tpl->setCurrentBlock("advmd_bl");
 				$this->tpl->setVariable("VALUE_ADVMD", $val);
 				$this->tpl->parseCurrentBlock();
 			}

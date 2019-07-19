@@ -70,9 +70,20 @@ class ilBookingGatewayGUI
 	protected $toolbar;
 
 	/**
+	 * @var int
+	 */
+	protected $main_host_ref_id = 0;
+
+	/**
+	 * Have any pools been already selected?
+	 * @var bool
+	 */
+	protected $pools_selected = false;
+
+	/**
 	 * Constructor
 	 */
-	public function __construct(ilObjectGUI $parent_gui)
+	public function __construct(ilObjectGUI $parent_gui, $main_host_ref_id = 0)
 	{
 		global $DIC;
 
@@ -84,8 +95,14 @@ class ilBookingGatewayGUI
 
 		$this->lng->loadLanguageModule("book");
 
+		// current parent context (e.g. session in course)
 		$this->obj_id = (int) $parent_gui->object->getId();
 		$this->ref_id = (int) $parent_gui->object->getRefId();
+
+		$this->main_host_ref_id = ($main_host_ref_id == 0)
+			? $this->ref_id
+			: $main_host_ref_id;
+
 
 		$this->seed = ilUtil::stripSlashes($_GET['seed']);
 		$this->sseed = ilUtil::stripSlashes($_GET['sseed']);
@@ -133,7 +150,9 @@ class ilBookingGatewayGUI
 			? (int) $_POST["pool_ref_id"]
 			: (int) $_GET["pool_ref_id"];
 
-		$book_ref_ids = $this->use_book_repo->getUsedBookingPools($this->obj_id);
+		$book_ref_ids = $this->use_book_repo->getUsedBookingPools(ilObject::_lookupObjId($this->main_host_ref_id));
+
+		$this->pools_selected = (count($book_ref_ids) > 0);
 
 		if (!in_array($pool_ref_id, $book_ref_ids))
 		{
@@ -185,7 +204,7 @@ class ilBookingGatewayGUI
 			case "ilbookingreservationsgui":
 				$this->showPoolSelector("ilbookingreservationsgui");
 				$this->setSubTabs("reservations");
-				$res_gui = new ilBookingReservationsGUI($this->pool, $this->help);
+				$res_gui = new ilBookingReservationsGUI($this->pool, $this->help, $this->obj_id);
 				$this->ctrl->forwardCommand($res_gui);
 				break;
 
@@ -242,15 +261,19 @@ class ilBookingGatewayGUI
 		$ctrl = $this->ctrl;
 		$lng = $this->lng;
 
-		$tabs->addSubTab("book_obj",
-			$lng->txt("book_objects_list"),
-			$ctrl->getLinkTargetByClass("ilbookingobjectservicegui", ""));
-		$tabs->addSubTab("reservations",
-			$lng->txt("book_log"),
-			$ctrl->getLinkTargetByClass("ilbookingreservationsgui", ""));
-		$tabs->addSubTab("settings",
-			$lng->txt("settings"),
-			$ctrl->getLinkTarget($this, "settings"));
+		if ($this->pools_selected) {
+			$tabs->addSubTab("book_obj",
+				$lng->txt("book_objects_list"),
+				$ctrl->getLinkTargetByClass("ilbookingobjectservicegui", ""));
+			$tabs->addSubTab("reservations",
+				$lng->txt("book_log"),
+				$ctrl->getLinkTargetByClass("ilbookingreservationsgui", ""));
+		}
+		if ($this->ref_id == $this->main_host_ref_id) {
+			$tabs->addSubTab("settings",
+				$lng->txt("settings"),
+				$ctrl->getLinkTarget($this, "settings"));
+		}
 
 		$tabs->activateSubTab($active);
 	}
@@ -262,7 +285,14 @@ class ilBookingGatewayGUI
 	protected function show()
 	{
 		$ctrl = $this->ctrl;
-		$ctrl->redirectByClass("ilbookingobjectservicegui");
+		if ($this->pools_selected) {
+			$ctrl->redirectByClass("ilbookingobjectservicegui");
+		}
+		else if ($this->ref_id == $this->main_host_ref_id) {
+			$ctrl->redirect($this, "settings");
+		}
+
+		ilUtil::sendFailure($this->lng->txt("book_no_pools_selected"));
 	}
 
 	//

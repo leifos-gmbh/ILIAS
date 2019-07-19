@@ -745,6 +745,11 @@ class ilBookingReservation
 			$where = array($ilDB->in('object_id', $a_object_ids, '', 'integer'));
 		}
 
+		if (is_array($filter['context_obj_ids']) && count($filter['context_obj_ids']) > 0)
+		{
+			$where = array($ilDB->in('context_obj_id', $filter['context_obj_ids'], '', 'integer'));
+		}
+
 		if($filter['status'])
 		{
 			if($filter['status'] > 0)

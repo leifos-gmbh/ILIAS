@@ -3359,6 +3359,7 @@ return array(
     'ilBookingEntry' => $baseDir . '/../../Services/Booking/classes/class.ilBookingEntry.php',
     'ilBookingGatewayGUI' => $baseDir . '/../../Modules/BookingManager/BookingService/classes/class.ilBookingGatewayGUI.php',
     'ilBookingHelpAdapter' => $baseDir . '/../../Modules/BookingManager/Help/classes/class.ilBookingHelpAdapter.php',
+    'ilBookingInfoScreenAdapter' => $baseDir . '/../../Modules/BookingManager/BookingService/classes/class.ilBookingInfoScreenAdapter.php',
     'ilBookingObject' => $baseDir . '/../../Modules/BookingManager/Objects/classes/class.ilBookingObject.php',
     'ilBookingObjectGUI' => $baseDir . '/../../Modules/BookingManager/Objects/classes/class.ilBookingObjectGUI.php',
     'ilBookingObjectServiceGUI' => $baseDir . '/../../Modules/BookingManager/BookingService/classes/class.ilBookingObjectServiceGUI.php',

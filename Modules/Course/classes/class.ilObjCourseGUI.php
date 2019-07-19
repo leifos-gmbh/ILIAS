@@ -242,6 +242,7 @@ class ilObjCourseGUI extends ilContainerGUI
 		$info->enablePrivateNotes();
 		$info->enableFeedback();
 		$info->enableNews();
+		$info->enableBookingInfo(true);
 		if ($ilAccess->checkAccess("write", "", $_GET["ref_id"]))
 		{
 			$info->enableNewsEditing();
@@ -2175,7 +2176,7 @@ class ilObjCourseGUI extends ilContainerGUI
 		}
 
 		// booking
-		if($ilAccess->checkAccess('read','',$this->ref_id) && ilContainer::_lookupContainerSetting($this->object->getId(),
+		if($ilAccess->checkAccess('write','',$this->ref_id) && ilContainer::_lookupContainerSetting($this->object->getId(),
 				ilObjectServiceSettingsGUI::BOOKING, false))
 		{
 			$this->tabs_gui->addTarget("obj_tool_setting_booking",

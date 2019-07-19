@@ -3696,6 +3696,7 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
         'ilBookingEntry' => __DIR__ . '/../..' . '/../../Services/Booking/classes/class.ilBookingEntry.php',
         'ilBookingGatewayGUI' => __DIR__ . '/../..' . '/../../Modules/BookingManager/BookingService/classes/class.ilBookingGatewayGUI.php',
         'ilBookingHelpAdapter' => __DIR__ . '/../..' . '/../../Modules/BookingManager/Help/classes/class.ilBookingHelpAdapter.php',
+        'ilBookingInfoScreenAdapter' => __DIR__ . '/../..' . '/../../Modules/BookingManager/BookingService/classes/class.ilBookingInfoScreenAdapter.php',
         'ilBookingObject' => __DIR__ . '/../..' . '/../../Modules/BookingManager/Objects/classes/class.ilBookingObject.php',
         'ilBookingObjectGUI' => __DIR__ . '/../..' . '/../../Modules/BookingManager/Objects/classes/class.ilBookingObjectGUI.php',
         'ilBookingObjectServiceGUI' => __DIR__ . '/../..' . '/../../Modules/BookingManager/BookingService/classes/class.ilBookingObjectServiceGUI.php',

@@ -16,12 +16,18 @@ class ilBookingReservationsGUI
 	protected $help;
 
 	/**
+	 * @var int
+	 */
+	protected $context_obj_id;
+
+	/**
 	 * ilBookingReservationsGUI constructor.
 	 * @param ilObjBookingPool $pool
 	 * @param ilBookingHelpAdapter $help
+	 * @param int $context_obj_id filter ui for a context object (e.g. course)
 	 * @throws ilException
 	 */
-	public function __construct(ilObjBookingPool $pool, ilBookingHelpAdapter $help)
+	public function __construct(ilObjBookingPool $pool, ilBookingHelpAdapter $help, int $context_obj_id = 0)
 	{
 		global $DIC;
 
@@ -36,6 +42,8 @@ class ilBookingReservationsGUI
 		$this->user = $DIC->user();
 
 		$this->book_obj_id = (int)$_REQUEST['object_id'];
+
+		$this->context_obj_id = $context_obj_id;
 
 		// user who's reservation is being tackled (e.g. canceled)
 		$this->booked_user = (int)$_REQUEST['bkusr'];
@@ -125,7 +133,7 @@ class ilBookingReservationsGUI
 		$table = new ilBookingReservationsTableGUI($this, 'log', $this->ref_id,
 			$this->pool->getId(), $show_all,
 			($this->pool->getScheduleType() != ilObjBookingPool::TYPE_NO_SCHEDULE),
-			$filter);
+			$filter, null,  [$this->context_obj_id]);
 		$tpl->setContent($table->getHTML());
 	}
 

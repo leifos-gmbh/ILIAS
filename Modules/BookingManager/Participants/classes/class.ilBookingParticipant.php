@@ -176,7 +176,6 @@ class ilBookingParticipant
 			}
 
 			$user_name = ilObjUser::_lookupName($row['user_id']);
-			$actions = array();
 			$name = $user_name['lastname'].", ".$user_name['firstname'];
 			$index = $a_booking_pool."_".$row['user_id'];
 
@@ -201,60 +200,6 @@ class ilBookingParticipant
 			}
 			$res[$index]['user_id'] = $row['user_id'];
 		}
-
-		$bp = new ilObjBookingPool($a_booking_pool, false);
-
-		foreach ($res as $index => $val)
-		{
-			$actions = [];
-			// action assign only if user did not booked all objects.
-			//if($res[$index]['obj_count'] < ilBookingObject::getNumberOfObjectsForPool($a_booking_pool))
-
-			// alex: this does not seem to be correct: assignments are always possible for all objects
-			$has_schedule = ($bp->getScheduleType() == ilObjBookingPool::TYPE_FIX_SCHEDULE);
-			$limit_reached = (!$has_schedule && $bp->getOverallLimit() <= $val['obj_count']);
-			if(!$limit_reached)
-			{
-				$ctrl->setParameterByClass('ilbookingparticipantgui', 'bkusr', $val['user_id']);
-				$actions[] = array(
-					'text' => $lng->txt("book_assign_object"),
-					'url' => $ctrl->getLinkTargetByClass("ilbookingparticipantgui", 'assignObjects')
-				);
-				$ctrl->setParameterByClass('ilbookingparticipantgui', 'bkusr', '');
-			}
-			
-
-			if($bp->getScheduleType() == ilObjBookingPool::TYPE_NO_SCHEDULE && $val['obj_count'] == 1)
-			{
-				$ctrl->setParameterByClass('ilbookingobjectgui', 'bkusr', $val['user_id']);
-				$ctrl->setParameterByClass('ilbookingobjectgui', 'object_id', $val['object_ids'][0]);
-				$ctrl->setParameterByClass('ilbookingobjectgui', 'part_view',ilBookingParticipantGUI::PARTICIPANT_VIEW);
-
-				$actions[] = array(
-					'text' => $lng->txt("book_deassign"),
-					'url' => $ctrl->getLinkTargetByClass("ilbookingobjectgui", 'rsvConfirmCancelUser')
-				);
-
-				$ctrl->setParameterByClass('ilbookingparticipantgui', 'bkusr', '');
-				$ctrl->setParameterByClass('ilbookingparticipantgui', 'object_id', '');
-				$ctrl->setParameterByClass('ilbookingobjectgui', 'part_view', '');
-			}
-			else if($bp->getScheduleType() == ilObjBookingPool::TYPE_FIX_SCHEDULE || $res[$index]['obj_count'] > 1)
-			{
-				$ctrl->setParameterByClass('ilobjbookingpoolgui', 'user_id', $val['user_id']);
-				$actions[] = array(
-					'text' => $lng->txt("book_deassign"),
-					'url' => $ctrl->getLinkTargetByClass("ilobjbookingpoolgui", 'log')
-				);
-				$ctrl->setParameterByClass('ilobjbookingpoolgui', 'user_id', '');
-			}
-
-			//add the actions
-			$res[$index]['actions'] = $actions;
-			$res[$index]['object_ids'][] = $row['object_id'];
-
-		}
-		//echo "<pre>"; print_r($res); exit;
 		return $res;
 	}
 

@@ -24,7 +24,7 @@ require_once "./Services/Container/classes/class.ilContainerGUI.php";
  * @ilCtrl_Calls ilObjCourseGUI: ilLOPageGUI, ilObjectMetaDataGUI, ilNewsTimelineGUI, ilContainerNewsSettingsGUI
  * @ilCtrl_Calls ilObjCourseGUI: ilCourseMembershipGUI, ilPropertyFormGUI, ilContainerSkillGUI, ilCalendarPresentationGUI
  * @ilCtrl_Calls ilObjCourseGUI: ilMemberExportSettingsGUI
- * @ilCtrl_Calls ilObjCourseGUI: ilLTIProviderObjectSettingGUI, ilObjectTranslationGUI
+ * @ilCtrl_Calls ilObjCourseGUI: ilLTIProviderObjectSettingGUI, ilObjectTranslationGUI, ilBookingGatewayGUI
  *
  * @extends ilContainerGUI
  */
@@ -1012,7 +1012,6 @@ class ilObjCourseGUI extends ilContainerGUI
 		$this->object->update();
 		
 		
-		include_once './Services/Object/classes/class.ilObjectServiceSettingsGUI.php';
 		ilObjectServiceSettingsGUI::updateServiceSettingsForm(
 			$this->object->getId(),
 			$form,
@@ -1024,7 +1023,8 @@ class ilObjCourseGUI extends ilContainerGUI
 				ilObjectServiceSettingsGUI::CUSTOM_METADATA,
 				ilObjectServiceSettingsGUI::BADGES,
 				ilObjectServiceSettingsGUI::ORGU_POSITION_ACCESS,
-				ilObjectServiceSettingsGUI::SKILLS
+				ilObjectServiceSettingsGUI::SKILLS,
+				ilObjectServiceSettingsGUI::BOOKING
 			)
 		);
 		
@@ -1503,7 +1503,8 @@ class ilObjCourseGUI extends ilContainerGUI
 					ilObjectServiceSettingsGUI::CUSTOM_METADATA,
 					ilObjectServiceSettingsGUI::BADGES,
 					ilObjectServiceSettingsGUI::ORGU_POSITION_ACCESS,
-					ilObjectServiceSettingsGUI::SKILLS
+					ilObjectServiceSettingsGUI::SKILLS,
+					ilObjectServiceSettingsGUI::BOOKING
 				)
 			);
 
@@ -2173,6 +2174,14 @@ class ilObjCourseGUI extends ilContainerGUI
 				array("ilcontainerskillgui", "ilcontskillpresentationgui", "ilcontskilladmingui"));
 		}
 
+		// booking
+		if($ilAccess->checkAccess('read','',$this->ref_id) && ilContainer::_lookupContainerSetting($this->object->getId(),
+				ilObjectServiceSettingsGUI::BOOKING, false))
+		{
+			$this->tabs_gui->addTarget("obj_tool_setting_booking",
+				$this->ctrl->getLinkTargetByClass(array("ilbookinggatewaygui"), ""));
+		}
+
 		// learning progress
 		include_once './Services/Tracking/classes/class.ilLearningProgressAccess.php';
 		if(ilLearningProgressAccess::checkAccess($this->object->getRefId(), $is_participant))
@@ -2644,6 +2653,11 @@ class ilObjCourseGUI extends ilContainerGUI
 				$this->ctrl->forwardCommand($transgui);
 				break;
 
+			case "ilbookinggatewaygui":
+				$this->tabs_gui->activateTab('obj_tool_setting_booking');
+				$gui = new ilBookingGatewayGUI($this);
+				$this->ctrl->forwardCommand($gui);
+				break;
 
 			default:
 /*                if(!$this->creation_mode)

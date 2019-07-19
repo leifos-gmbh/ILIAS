@@ -176,9 +176,9 @@ class ilBookingParticipant
 			}
 
 			$user_name = ilObjUser::_lookupName($row['user_id']);
-			$name = $user_name['lastname'] . ", " . $user_name['firstname'];
-			$index = $a_booking_pool . "_" . $row['user_id'];
 			$actions = array();
+			$name = $user_name['lastname'].", ".$user_name['firstname'];
+			$index = $a_booking_pool."_".$row['user_id'];
 
 			if (!isset($res[$index])) {
 				$res[$index] = array(
@@ -251,6 +251,8 @@ class ilBookingParticipant
 
 			//add the actions
 			$res[$index]['actions'] = $actions;
+			$res[$index]['object_ids'][] = $row['object_id'];
+
 		}
 		//echo "<pre>"; print_r($res); exit;
 		return $res;

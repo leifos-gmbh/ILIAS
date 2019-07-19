@@ -7,6 +7,8 @@
  *
  * @author killing@leifos.de
  * @ingroup ModulesBookingManager
+ *
+ * @ilCtrl_Calls ilBookingObjectServiceGUI: ilPropertyFormGUI, ilBookingProcessGUI
  */
 class ilBookingObjectServiceGUI extends ilBookingObjectGUI
 {
@@ -29,12 +31,16 @@ class ilBookingObjectServiceGUI extends ilBookingObjectGUI
 	 * ilBookingObjectServiceGUI constructor.
 	 * @param int $host_obj_ref_id Host object ref id (e.g. course)
 	 */
-	public function __construct(int $host_obj_ref_id, int $current_pool_ref_id, \ilObjUseBookDBRepository $use_book_repo)
+	public function __construct(int $host_obj_ref_id, int $current_pool_ref_id, \ilObjUseBookDBRepository $use_book_repo,
+		string $seed, string $sseed, ilBookingHelpAdapter $help)
 	{
-		parent::__construct(null);
+		parent::__construct(null, $seed, $sseed,
+			$help,
+			ilObject::_lookupObjId($host_obj_ref_id));
 		$this->host_obj_ref_id = (int) $host_obj_ref_id;
 		$this->use_book_repo = $use_book_repo;
 		$this->pool_gui = new ilObjBookingPoolGUI("", $current_pool_ref_id, true, false);
+		$this->activateManagement(false);
 	}
 
 }

@@ -53,6 +53,17 @@ class ilBookingObjectGUI
 	protected $pool_has_schedule; // [bool]
 	protected $pool_overall_limit; // [int]
 
+	/**
+	 * Is management of objects (create/edit/delete) activated?
+	 * @var bool
+	 */
+	protected $management = true;
+
+	/**
+	 * Context object id (e.g. course with booking service activated)
+	 * @var int
+	 */
+	protected $context_obj_id;
 
 	/**
 	 * @var int
@@ -63,7 +74,7 @@ class ilBookingObjectGUI
 	 * Constructor
 	 * @param	object	$a_parent_obj
 	 */
-	function __construct($a_parent_obj, $seed, $sseed, ilBookingHelpAdapter $help)
+	function __construct($a_parent_obj, $seed, $sseed, ilBookingHelpAdapter $help, int $context_obj_id = 0)
 	{
 		global $DIC;
 
@@ -79,6 +90,8 @@ class ilBookingObjectGUI
 		$this->seed = $seed;
 		$this->sseed = $sseed;
 
+		$this->context_obj_id = $context_obj_id;
+
 		/** @var ilObjBookingPoolGUI $this->pool_gui */
 		$this->pool_gui = $a_parent_obj;
 
@@ -87,6 +100,27 @@ class ilBookingObjectGUI
 
 		$this->rsv_ids = array_map('intval', explode(";", $_GET["rsv_ids"]));
 	}
+
+	/**
+	 * Activate management
+	 *
+	 * @param bool $a_val
+	 */
+	function activateManagement($a_val)
+	{
+		$this->management = $a_val;
+	}
+
+	/**
+	 * Is management activated?
+	 *
+	 * @return bool
+	 */
+	function isManagementActivated()
+	{
+		return $this->management;
+	}
+
 
 	/**
 	 * Get ref id of booking pool
@@ -156,7 +190,8 @@ class ilBookingObjectGUI
 					$this->object_id,
 					$this->help,
 					$this->seed,
-					$this->sseed
+					$this->sseed,
+					$this->context_obj_id
 				);
 				$this->ctrl->forwardCommand($process_gui);
 				break;
@@ -191,7 +226,7 @@ class ilBookingObjectGUI
 		$lng = $this->lng;
 		$ilAccess = $this->access;
 
-		if ($ilAccess->checkAccess('write', '', $this->getPoolRefId()))
+		if ($this->isManagementActivated() && $ilAccess->checkAccess('write', '', $this->getPoolRefId()))
 		{
 			$bar = new ilToolbarGUI;
 			$bar->addButton($lng->txt('book_add_object'), $ilCtrl->getLinkTarget($this, 'create'));
@@ -200,7 +235,7 @@ class ilBookingObjectGUI
 		
 		$tpl->setPermanentLink('book', $this->getPoolRefId());
 		
-		$table = new ilBookingObjectsTableGUI($this, 'render', $this->getPoolRefId(), $this->getPoolObjId(), $this->hasPoolSchedule(), $this->getPoolOverallLimit());
+		$table = new ilBookingObjectsTableGUI($this, 'render', $this->getPoolRefId(), $this->getPoolObjId(), $this->hasPoolSchedule(), $this->getPoolOverallLimit(), $this->isManagementActivated());
 		$tpl->setContent($bar.$table->getHTML());
 	}
 	

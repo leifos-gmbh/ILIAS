@@ -71,9 +71,11 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 		parent::__construct($a_data,$a_id,$a_call_by_reference,$a_prepare_output);
 		$this->lng->loadLanguageModule("book");
 
-		$this->help = new ilBookingHelpAdapter($this->object, $DIC["ilHelp"]);
-
-		$DIC["ilHelp"]->setScreenIdComponent("book");
+		// not on creation
+		if (is_object($this->object)) {
+			$this->help = new ilBookingHelpAdapter($this->object, $DIC["ilHelp"]);
+			$DIC["ilHelp"]->setScreenIdComponent("book");
+		}
 
 		$this->user_profile_id = (int)$_GET["user_id"];
 		$this->book_obj_id = (int)$_REQUEST['object_id'];
@@ -130,20 +132,20 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 			case 'ilpermissiongui':
 				$this->tabs_gui->setTabActive('perm_settings');
 				$perm_gui = new ilPermissionGUI($this);
-				$ret =& $this->ctrl->forwardCommand($perm_gui);
+				$this->ctrl->forwardCommand($perm_gui);
 				break;
 
 			case 'ilbookingobjectgui':
 				$this->tabs_gui->setTabActive('render');
 				$object_gui = new ilBookingObjectGUI($this,
 					$this->seed, $this->sseed, $this->help);
-				$ret =& $this->ctrl->forwardCommand($object_gui);
+				$this->ctrl->forwardCommand($object_gui);
 				break;
 
 			case 'ilbookingschedulegui':
 				$this->tabs_gui->setTabActive('schedules');
 				$schedule_gui = new ilBookingScheduleGUI($this);
-				$ret =& $this->ctrl->forwardCommand($schedule_gui);
+				$this->ctrl->forwardCommand($schedule_gui);
 				break;
 
 			case 'ilpublicuserprofilegui':

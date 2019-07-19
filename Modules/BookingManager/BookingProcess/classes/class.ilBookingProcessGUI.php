@@ -42,12 +42,18 @@ class ilBookingProcessGUI
 	protected $help;
 
 	/**
+	 * @var int
+	 */
+	protected $context_obj_id;
+
+	/**
 	 * Constructor
 	 */
 	public function __construct(ilObjBookingPool $pool,
 		int $booking_object_id, ilBookingHelpAdapter $help,
 		string $seed = "",
-		string $sseed = "")
+		string $sseed = "",
+		int $context_obj_id = 0)
 	{
 		global $DIC;
 
@@ -58,6 +64,8 @@ class ilBookingProcessGUI
 		$this->tabs_gui = $DIC->tabs();
 		$this->user = $DIC->user();
 		$this->help = $help;
+
+		$this->context_obj_id = $context_obj_id;
 
 		$this->book_obj_id = $booking_object_id;
 
@@ -780,6 +788,7 @@ class ilBookingProcessGUI
 		$reservation->setFrom($a_from);
 		$reservation->setTo($a_to);
 		$reservation->setGroupId($a_group_id);
+		$reservation->setContextObjId($this->context_obj_id);
 		$reservation->save();
 
 		if($a_from)

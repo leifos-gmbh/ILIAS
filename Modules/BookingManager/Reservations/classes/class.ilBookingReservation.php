@@ -25,6 +25,11 @@ class ilBookingReservation
 	protected $group_id;	// int
 	protected $assigner_id;	// int
 
+	/**
+	 * @var int 
+	 */
+	protected $context_obj_id = 0;
+
 	const STATUS_IN_USE = 2;
 	const STATUS_CANCELLED = 5;
 
@@ -201,6 +206,27 @@ class ilBookingReservation
 	}
 
 	/**
+	 * Set context object id
+	 *
+	 * @param int $a_val context object id (e.g. course id)	
+	 */
+	function setContextObjId($a_val)
+	{
+		$this->context_obj_id = $a_val;
+	}
+	
+	/**
+	 * Get context object id
+	 *
+	 * @return int context object id (e.g. course id)
+	 */
+	function getContextObjId()
+	{
+		return $this->context_obj_id;
+	}
+	
+	
+	/**
 	 * Get dataset from db
 	 */
 	protected function read()
@@ -220,6 +246,7 @@ class ilBookingReservation
 			$this->setTo($row['date_to']);
 			$this->setStatus($row['status']);
 			$this->setGroupId($row['group_id']);
+			$this->setContextObjId($row['context_obj_id']);
 		}
 	}
 
@@ -237,17 +264,18 @@ class ilBookingReservation
 		}
 
 		$this->id = $ilDB->nextId('booking_reservation');
-		
-		return $ilDB->manipulate('INSERT INTO booking_reservation'.
-			' (booking_reservation_id,user_id,assigner_id,object_id,date_from,date_to,status,group_id)'.
+		$res = $ilDB->manipulate('INSERT INTO booking_reservation'.
+			' (booking_reservation_id,user_id,assigner_id,object_id,context_obj_id,date_from,date_to,status,group_id)'.
 			' VALUES ('.$ilDB->quote($this->id, 'integer').
 			','.$ilDB->quote($this->getUserId(), 'integer').
 			','.$ilDB->quote($this->getAssignerId(), 'integer').
 			','.$ilDB->quote($this->getObjectId(), 'integer').
+			','.$ilDB->quote($this->getContextObjId(), 'integer').
 			','.$ilDB->quote($this->getFrom(), 'integer').
 			','.$ilDB->quote($this->getTo(), 'integer').
 			','.$ilDB->quote($this->getStatus(), 'integer').
 			','.$ilDB->quote($this->getGroupId(), 'integer').')');
+		return $res;
 	}
 
 	/**
@@ -281,6 +309,7 @@ class ilBookingReservation
 			', date_to = '.$ilDB->quote($this->getTo(), 'integer').
 			', status = '.$ilDB->quote($this->getStatus(), 'integer').
 			', group_id = '.$ilDB->quote($this->getGroupId(), 'integer').
+			', context_obj_id = '.$ilDB->quote($this->getContextObjId(), 'integer').
 			' WHERE booking_reservation_id = '.$ilDB->quote($this->id, 'integer'));
 	}
 
@@ -716,6 +745,11 @@ class ilBookingReservation
 			$where = array($ilDB->in('object_id', $a_object_ids, '', 'integer'));
 		}
 
+		if (is_array($filter['context_obj_ids']) && count($filter['context_obj_ids']) > 0)
+		{
+			$where = array($ilDB->in('context_obj_id', $filter['context_obj_ids'], '', 'integer'));
+		}
+
 		if($filter['status'])
 		{
 			if($filter['status'] > 0)
@@ -775,7 +809,7 @@ class ilBookingReservation
 				
 		$set = $ilDB->query($sql);			
 		while($row = $ilDB->fetchAssoc($set))
-		{								
+		{
 			$obj_id = $row["object_id"];
 			$user_id = $row["user_id"];
 						
@@ -788,6 +822,7 @@ class ilBookingReservation
 			{
 				$idx = $obj_id."_".$user_id;
 			}
+			$idx.= "_".$row["context_obj_id"];
 			
 			if($a_has_schedule && $filter["slot"])
 			{
@@ -807,6 +842,7 @@ class ilBookingReservation
 					"object_id" => $obj_id
 					,"title" => $row["title"]
 					,"pool_id" => $row["pool_id"]
+					,"context_obj_id" => (int) $row["context_obj_id"]
 					,"user_id" => $user_id
 					,"counter" => 1						
 					,"user_name" => $uname["lastname"].", ".$uname["firstname"] // #17862

@@ -40,6 +40,11 @@ class ilBookingParticipantsTableGUI extends ilTable2GUI
 	 * @var
 	 */
 	protected $objects; // array
+
+	/**
+	 * @var ilObjBookingPool
+	 */
+	protected $pool;
 	
 	/**
 	 * Constructor
@@ -58,6 +63,8 @@ class ilBookingParticipantsTableGUI extends ilTable2GUI
 		$this->access = $DIC->access();
 		$this->ref_id = $a_ref_id;
 		$this->pool_id = $a_pool_id;
+
+		$this->pool = new ilObjBookingPool($a_pool_id, false);
 
 		$this->setId("bkprt".$a_ref_id);
 
@@ -171,7 +178,12 @@ class ilBookingParticipantsTableGUI extends ilTable2GUI
 		// determin actions form data
 		// action assign only if user did not booked all objects.
 		$actions = [];
-		if($a_set['obj_count'] < ilBookingObject::getNumberOfObjectsForPool($this->pool_id))
+		//if($a_set['obj_count'] < ilBookingObject::getNumberOfObjectsForPool($this->pool_id))
+		//{
+
+		$has_schedule = ($this->pool->getScheduleType() == ilObjBookingPool::TYPE_FIX_SCHEDULE);
+		$limit_reached = (!$has_schedule && $this->pool->getOverallLimit() <= $a_set['obj_count']);
+		if(!$limit_reached)
 		{
 			$ctrl->setParameterByClass('ilbookingparticipantgui', 'bkusr', $a_set['user_id']);
 			$actions[] = array(

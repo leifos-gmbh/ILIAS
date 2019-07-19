@@ -220,6 +220,9 @@ class ilBookingParticipantGUI
 		$this->render();
 	}
 
+	/**
+	 * Book objects for other users
+	 */
 	function assignObjects()
 	{
 		$this->tabs->clearTargets();

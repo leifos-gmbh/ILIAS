@@ -157,11 +157,11 @@ class ilBookingObjectGUI
 	 *
 	 * @return int
 	 */
-	protected function getPoolOverallLimit(): ?int
+	protected function getPoolOverallLimit(): int
 	{
 		return $this->hasPoolSchedule()
 			? null
-			: $this->pool_gui->object->getOverallLimit();;
+			: $this->pool_gui->object->getOverallLimit();
 	}
 
 	/**

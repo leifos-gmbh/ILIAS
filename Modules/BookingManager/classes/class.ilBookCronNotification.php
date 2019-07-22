@@ -142,7 +142,9 @@ class ilBookCronNotification extends ilCronJob
 
 			if ($to_ts > $from_ts)
 			{
-				$res = ilBookingReservation::getListByDate(true, null, [
+				$f = new ilBookingReservationDBRepositoryFactory();
+				$repo = $f->getRepo();
+				$res = $repo->getListByDate(true, null, [
 					"from" => $from_ts,
 					"to" => $to_ts
 				], [$p["booking_pool_id"]]);

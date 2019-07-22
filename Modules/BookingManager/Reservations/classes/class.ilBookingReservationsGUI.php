@@ -115,7 +115,18 @@ class ilBookingReservationsGUI
 	function log()
 	{
 		$tpl = $this->tpl;
+		$table = $this->getReservationsTable();
+		$tpl->setContent($table->getHTML());
+	}
 
+	/**
+	 * Get reservationsTable
+	 *
+	 * @param string $reservation_id
+	 * @return ilTableGUI
+	 */
+	protected function getReservationsTable($reservation_id = null)
+	{
 		$show_all = ($this->checkPermissionBool('write') || $this->pool->hasPublicLog());
 
 		$filter = null;
@@ -123,19 +134,21 @@ class ilBookingReservationsGUI
 		{
 			$filter["object"] = $this->book_obj_id;
 		}
-
 		// coming from participants tab to cancel reservations.
 		if($_GET['user_id'])
 		{
 			$filter["user_id"] = (int)$_GET['user_id'];
 		}
+		$context_filter = ($this->context_obj_id > 0)
+			? [$this->context_obj_id]
+			: null;
 
-		$table = new ilBookingReservationsTableGUI($this, 'log', $this->ref_id,
+		return new ilBookingReservationsTableGUI($this, 'log', $this->ref_id,
 			$this->pool->getId(), $show_all,
 			($this->pool->getScheduleType() != ilObjBookingPool::TYPE_NO_SCHEDULE),
-			$filter, null,  [$this->context_obj_id]);
-		$tpl->setContent($table->getHTML());
+			$filter, $reservation_id,  $context_filter);
 	}
+
 
 	function logDetails()
 	{
@@ -145,18 +158,7 @@ class ilBookingReservationsGUI
 		$this->tabs_gui->setBackTarget($this->lng->txt("back"),
 			$this->ctrl->getLinkTarget($this, "log"));
 
-		$show_all = ($this->checkPermissionBool('write') ||	$this->pool->hasPublicLog());
-
-		$filter = null;
-		if ($this->book_obj_id > 0)
-		{
-			$filter["object"] = $this->book_obj_id;
-		}
-
-		$table = new ilBookingReservationsTableGUI($this, 'log', $this->ref_id,
-			$this->pool->getId(), $show_all,
-			($this->pool->getScheduleType() != ilObjBookingPool::TYPE_NO_SCHEDULE),
-			$filter, $this->reservation_id);
+		$table = $this->getReservationsTable($this->reservation_id);
 		$tpl->setContent($table->getHTML());
 	}
 
@@ -185,11 +187,7 @@ class ilBookingReservationsGUI
 	 */
 	function applyLogFilter()
 	{
-		$show_all = ($this->checkPermissionBool('write') ||	$this->pool->hasPublicLog());
-
-		$table = new ilBookingReservationsTableGUI($this, 'log', $this->ref_id,
-			$this->pool->getId(), $show_all,
-			($this->pool->getScheduleType() != ilObjBookingPool::TYPE_NO_SCHEDULE));
+		$table = $this->getReservationsTable();
 		$table->resetOffset();
 		$table->writeFilterToSession();
 		$this->log();
@@ -200,11 +198,7 @@ class ilBookingReservationsGUI
 	 */
 	function resetLogFilter()
 	{
-		$show_all = ($this->checkPermissionBool('write') ||	$this->pool->hasPublicLog());
-
-		$table = new ilBookingReservationsTableGUI($this, 'log', $this->ref_id,
-			$this->pool->getId(), $show_all,
-			($this->pool->getScheduleType() != ilObjBookingPool::TYPE_NO_SCHEDULE));
+		$table = $this->getReservationsTable();
 		$table->resetOffset();
 		$table->resetFilter();
 		$this->log();

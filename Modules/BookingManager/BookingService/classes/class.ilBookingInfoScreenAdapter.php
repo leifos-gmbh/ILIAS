@@ -58,7 +58,11 @@ class ilBookingInfoScreenAdapter
 	protected function getList(): array
 	{
 		$filter = ["context_obj_ids" => [$this->context_obj_id]];
-		$list = ilBookingReservation::getListByDate(true, null, $filter, $this->getPoolIds());
+		$filter['past'] = true;
+		$filter['status'] = -ilBookingReservation::STATUS_CANCELLED;
+		$f = new ilBookingReservationDBRepositoryFactory();
+		$repo = $f->getRepo();
+		$list = $repo->getListByDate(true, null, $filter, $this->getPoolIds());
 		$list = ilUtil::sortArray($list, "slot", "asc", true);
 		$list = ilUtil::stableSortArray($list, "date", "asc", true);
 		$list = ilUtil::stableSortArray($list, "pool_id", "asc", true);

@@ -34,6 +34,11 @@ class ilBookingReservation
 	const STATUS_CANCELLED = 5;
 
 	/**
+	 * @var ilBookingReservationDBRepository
+	 */
+	protected $repo;
+
+	/**
 	 * Constructor
 	 *
 	 * if id is given will read dataset from db
@@ -46,6 +51,10 @@ class ilBookingReservation
 
 		$this->db = $DIC->database();
 		$this->id = (int)$a_id;
+
+		$f = new ilBookingReservationDBRepositoryFactory();
+		$this->repo = $f->getRepo();
+
 		$this->read();
 	}
 
@@ -231,14 +240,9 @@ class ilBookingReservation
 	 */
 	protected function read()
 	{
-		$ilDB = $this->db;
-		
-		if($this->id)
+		if ($this->id)
 		{
-			$set = $ilDB->query('SELECT *'.
-				' FROM booking_reservation'.
-				' WHERE booking_reservation_id = '.$ilDB->quote($this->id, 'integer'));
-			$row = $ilDB->fetchAssoc($set);
+			$row = $this->repo->getForId($this->id);
 			$this->setUserId($row['user_id']);
 			$this->setAssignerId($row['assigner_id']);
 			$this->setObjectId($row['object_id']);
@@ -252,94 +256,56 @@ class ilBookingReservation
 
 	/**
 	 * Create new entry in db
-	 * @return	bool
+	 * @return bool
 	 */
 	function save()
 	{
-		$ilDB = $this->db;
-
 		if($this->id)
 		{
 			return false;
 		}
 
-		$this->id = $ilDB->nextId('booking_reservation');
-		$res = $ilDB->manipulate('INSERT INTO booking_reservation'.
-			' (booking_reservation_id,user_id,assigner_id,object_id,context_obj_id,date_from,date_to,status,group_id)'.
-			' VALUES ('.$ilDB->quote($this->id, 'integer').
-			','.$ilDB->quote($this->getUserId(), 'integer').
-			','.$ilDB->quote($this->getAssignerId(), 'integer').
-			','.$ilDB->quote($this->getObjectId(), 'integer').
-			','.$ilDB->quote($this->getContextObjId(), 'integer').
-			','.$ilDB->quote($this->getFrom(), 'integer').
-			','.$ilDB->quote($this->getTo(), 'integer').
-			','.$ilDB->quote($this->getStatus(), 'integer').
-			','.$ilDB->quote($this->getGroupId(), 'integer').')');
-		return $res;
+		$this->id = $this->repo->create($this->getUserId(),
+				$this->getAssignerId(),
+				$this->getObjectId(),
+				$this->getContextObjId(),
+				$this->getFrom(),
+				$this->getTo(),
+				$this->getStatus(),
+				$this->getGroupId());
+		return ($this->id > 0);
 	}
 
 	/**
 	 * Update entry in db
-	 * @return	bool
 	 */
 	function update()
 	{
-		$ilDB = $this->db;
-
 		if(!$this->id)
 		{
 			return false;
 		}
 
-		/* there can only be 1
-		if($this->getStatus() == self::STATUS_IN_USE)
-		{
-			$ilDB->manipulate('UPDATE booking_reservation'.
-			' SET status = '.$ilDB->quote(NULL, 'integer').
-			' WHERE object_id = '.$ilDB->quote($this->getObjectId(), 'integer').
-			' AND status = '.$ilDB->quote(self::STATUS_IN_USE, 'integer'));
-		}
-		*/
-		
-		return $ilDB->manipulate('UPDATE booking_reservation'.
-			' SET object_id = '.$ilDB->quote($this->getObjectId(), 'text').
-			', user_id = '.$ilDB->quote($this->getUserId(), 'integer').
-			', assigner_id = '.$ilDB->quote($this->getAssignerId(), 'integer').
-			', date_from = '.$ilDB->quote($this->getFrom(), 'integer').
-			', date_to = '.$ilDB->quote($this->getTo(), 'integer').
-			', status = '.$ilDB->quote($this->getStatus(), 'integer').
-			', group_id = '.$ilDB->quote($this->getGroupId(), 'integer').
-			', context_obj_id = '.$ilDB->quote($this->getContextObjId(), 'integer').
-			' WHERE booking_reservation_id = '.$ilDB->quote($this->id, 'integer'));
+		$this->repo->update($this->id,
+			$this->getUserId(),
+			$this->getAssignerId(),
+			$this->getObjectId(),
+			$this->getContextObjId(),
+			$this->getFrom(),
+			$this->getTo(),
+			$this->getStatus(),
+			$this->getGroupId());
+		return true;
 	}
 
 	/**
 	 * Delete single entry
-	 * @return bool
 	 */
 	function delete()
 	{
-		$ilDB = $this->db;
-
-		if($this->id)
-		{
-			return $ilDB->manipulate('DELETE FROM booking_reservation'.
-				' WHERE booking_reservation_id = '.$ilDB->quote($this->id, 'integer'));
-		}
+		$this->repo->delete($this->id);
 	}
 	
-	/**
-	 * Get next group id	
-	 * @return int
-	 */
-	public static function getNewGroupId()
-	{
-		global $DIC;
-
-		$ilDB = $DIC->database();
-		
-		return $ilDB->nextId('booking_reservation_group');
-	}
 
 	/**
 	 * Check if any of given objects are bookable
@@ -351,25 +317,13 @@ class ilBookingReservation
 	 */
 	static function getAvailableObject(array $a_ids, $a_from, $a_to, $a_return_single = true, $a_return_counter = false)
 	{
-		global $DIC;
-
-		$ilDB = $DIC->database();
-		
 		$nr_map = ilBookingObject::getNrOfItemsForObjects($a_ids);
-		
-		$from = $ilDB->quote($a_from, 'integer');
-		$to = $ilDB->quote($a_to, 'integer');
-		
-		$set = $ilDB->query('SELECT count(*) cnt, object_id'.
-			' FROM booking_reservation'.
-			' WHERE '.$ilDB->in('object_id', $a_ids, '', 'integer').
-			' AND (status IS NULL OR status <> '.$ilDB->quote(self::STATUS_CANCELLED, 'integer').')'.
-			' AND ((date_from <= '.$from.' AND date_to >= '.$from.')'.
-			' OR (date_from <= '.$to.' AND date_to >= '.$to.')'.
-			' OR (date_from >= '.$from.' AND date_to <= '.$to.'))'.
-			' GROUP BY object_id');
+
+		$f = new ilBookingReservationDBRepositoryFactory();
+		$repo = $f->getRepo();
+
 		$blocked = $counter = array();
-		while($row = $ilDB->fetchAssoc($set))
+		foreach ($repo->getNumberOfReservations($a_ids, $a_from, $a_to) as $row)
 		{
 			if($row['cnt'] >= $nr_map[$row['object_id']])
 			{
@@ -449,22 +403,12 @@ class ilBookingReservation
 		{
 			return;
 		}
-		
-		$from = $ilDB->quote($a_from, 'integer');
-		$to = $ilDB->quote($a_to, 'integer');				
-		
-		// all bookings in period
-		$now = time();
-		$set = $ilDB->query('SELECT count(*) cnt'.
-			' FROM booking_reservation'.
-			' WHERE object_id = '.$ilDB->quote($a_obj_id, 'integer').
-			' AND (status IS NULL OR status <> '.$ilDB->quote(self::STATUS_CANCELLED, 'integer').')'.
-			' AND date_to > '.$now.
-			' AND ((date_from <= '.$from.' AND date_to >= '.$from.')'.
-			' OR (date_from <= '.$to.' AND date_to >= '.$to.')'.
-			' OR (date_from >= '.$from.' AND date_to <= '.$to.'))');			
-		$row = $ilDB->fetchAssoc($set);
-		$booked_in_period = $row["cnt"];
+
+		// all nr of reservations in period that are not over yet (to >= now)
+		$f = new ilBookingReservationDBRepositoryFactory();
+		$repo = $f->getRepo();
+		$res = $repo->getNumberOfReservations([$a_obj_id], $a_from, $a_to, true);
+		$booked_in_period = $res[$a_obj_id]["cnt"];
 		
 		$per_slot = ilBookingObject::getNrOfItemsForObjects(array($a_obj_id));		
 		$per_slot = $per_slot[$a_obj_id];
@@ -485,7 +429,7 @@ class ilBookingReservation
 			? strtotime($a_schedule->getAvailabilityTo()->get(IL_CAL_DATE)." 23:59:59")
 			: null;
 		
-		// sum up max available items in period per (week)day
+		// sum up max available (to >= now) items in period per (week)day
 		$available_in_period = 0;
 		$loop = 0;
 		while($a_from < $a_to &&
@@ -714,168 +658,7 @@ class ilBookingReservation
 		return array('data'=>$res, 'counter'=>$counter);
 	}
 	
-	/**
-	 * List all reservations by date
-	 * @param	bool	$a_has_schedule has schedule
-	 * @param	array	$a_object_ids object ids
-	 * @param	array	$filter filter
-	 * @param	array	$a_pool_ids pool ids
-	 * @return	array
-	 */
-	static function getListByDate($a_has_schedule, array $a_object_ids = null, array $filter = null,
-								  array $a_pool_ids = null)
-	{		
-		global $DIC;
 
-		$ilDB = $DIC->database();
-		
-		$res = array();
-		
-		$sql = 'SELECT r.*, o.title, o.pool_id'.
-			' FROM booking_reservation r'.
-			' JOIN booking_object o ON (o.booking_object_id = r.object_id)';
-
-		if ($a_pool_ids !== null)
-		{
-			$where = array($ilDB->in('pool_id', $a_pool_ids, '', 'integer'));
-		}
-
-		if ($a_object_ids !== null)
-		{
-			$where = array($ilDB->in('object_id', $a_object_ids, '', 'integer'));
-		}
-
-		if (is_array($filter['context_obj_ids']) && count($filter['context_obj_ids']) > 0)
-		{
-			$where = array($ilDB->in('context_obj_id', $filter['context_obj_ids'], '', 'integer'));
-		}
-
-		if($filter['status'])
-		{
-			if($filter['status'] > 0)
-			{
-				$where[] = 'status = '.$ilDB->quote($filter['status'], 'integer');
-			}
-			else
-			{
-				$where[] = '(status != '.$ilDB->quote(-$filter['status'], 'integer').
-					' OR status IS NULL)';
-			}
-		}
-		if($filter['title'])
-		{
-			$where[] = '('.$ilDB->like('title', 'text', '%'.$filter['title'].'%').
-				' OR '.$ilDB->like('description', 'text', '%'.$filter['title'].'%').')';
-		}
-		if($a_has_schedule)
-		{
-			if($filter['from'])
-			{
-				$where[] = 'date_from >= '.$ilDB->quote($filter['from'], 'integer');
-			}
-			if($filter['to'])
-			{
-				$where[] = 'date_to <= '.$ilDB->quote($filter['to'], 'integer');
-			}		
-			if(!$filter['past'])
-			{
-				$where[] = 'date_to > '.$ilDB->quote(time(), 'integer');
-			}
-		}
-		if($filter['user_id']) // #16584
-		{
-			$where[] = 'user_id = '.$ilDB->quote($filter['user_id'], 'integer');
-		}	
-		/*
-		if($a_group_id)
-		{
-			$where[] = 'group_id = '.$ilDB->quote(substr($a_group_id, 1), 'integer');
-		}		 
-		*/		
-		if(sizeof($where))
-		{
-			$sql .= ' WHERE '.implode(' AND ', $where);		
-		}
-		
-		if($a_has_schedule)
-		{			
-			$sql .= ' ORDER BY date_from DESC';			
-		}
-		else
-		{
-			// #16155 - could be cancelled and re-booked
-			$sql .= ' ORDER BY status';
-		}
-				
-		$set = $ilDB->query($sql);			
-		while($row = $ilDB->fetchAssoc($set))
-		{
-			$obj_id = $row["object_id"];
-			$user_id = $row["user_id"];
-						
-			if($a_has_schedule)
-			{
-				$slot = $row["date_from"]."_".$row["date_to"];		
-				$idx = $obj_id."_".$user_id."_".$slot;										
-			}
-			else
-			{
-				$idx = $obj_id."_".$user_id;
-			}
-			$idx.= "_".$row["context_obj_id"];
-			
-			if($a_has_schedule && $filter["slot"])
-			{
-				$slot_idx = date("w",  $row["date_from"])."_".date("H:i", $row["date_from"]).
-					"-".date("H:i", $row["date_to"]+1);
-				if($filter["slot"] != $slot_idx)
-				{
-					continue;
-				}
-			}
-			
-			if(!isset($res[$idx]))
-			{					
-				$uname = ilObjUser::_lookupName($user_id);
-				
-				$res[$idx] = array(					
-					"object_id" => $obj_id
-					,"title" => $row["title"]
-					,"pool_id" => $row["pool_id"]
-					,"context_obj_id" => (int) $row["context_obj_id"]
-					,"user_id" => $user_id
-					,"counter" => 1						
-					,"user_name" => $uname["lastname"].", ".$uname["firstname"] // #17862
-				);
-				
-				if($a_has_schedule)
-				{
-					$res[$idx]["booking_reservation_id"] = $idx;
-					$res[$idx]["date"] = date("Y-m-d", $row["date_from"]);
-					$res[$idx]["slot"] = date("H:i", $row["date_from"])." - ".
-						date("H:i", $row["date_to"]+1);
-					$res[$idx]["week"] = date("W",  $row["date_from"]);				
-					$res[$idx]["weekday"] = date("w",  $row["date_from"]);				
-					$res[$idx]["can_be_cancelled"] = ($row["status"] != self::STATUS_CANCELLED &&
-						$row["date_from"] > time());	
-					$res[$idx]["_sortdate"] = $row["date_from"]; 
-				}
-				else
-				{
-					$res[$idx]["booking_reservation_id"] = $row["booking_reservation_id"];
-					$res[$idx]["status"] = $row["status"];
-					$res[$idx]["can_be_cancelled"] = ($row["status"] != self::STATUS_CANCELLED);					
-				}
-			}
-			else
-			{
-				$res[$idx]["counter"]++;
-			}
-		}				
-		
-		return $res;
-	}
-	
 	/**
 	 * Get all users who have reservations for object(s)
 	 * 

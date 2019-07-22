@@ -74,6 +74,8 @@ class ilBookingProcessGUI
 		$this->seed = $seed;
 		$this->sseed = $sseed;
 
+		$this->rsv_ids = explode(";", $_REQUEST["rsv_ids"]);
+
 
 		$this->user_id_assigner = $this->user->getId();
 		if($_GET['bkusr']) {
@@ -102,7 +104,9 @@ class ilBookingProcessGUI
 					"saveMultipleBookings",
 					"confirmedBooking",
 					"confirmBookingNumbers",
-					"confirmedBookingNumbers"
+					"confirmedBookingNumbers",
+					"displayPostInfo",
+					"deliverPostFile"
 			)))
 				{
 					$this->$cmd();
@@ -722,7 +726,9 @@ class ilBookingProcessGUI
 					$group_id = null;
 					$nr = ilBookingObject::getNrOfItemsForObjects(array($object_id));
 					// needed for recurrence
-					$group_id = ilBookingReservation::getNewGroupId();
+					$f = new ilBookingReservationDBRepositoryFactory();
+					$repo = $f->getRepo();
+					$group_id = $repo->getNewGroupId();
 					foreach($_POST['date'] as $date)
 					{
 						$fromto = explode('_', $date);
@@ -1095,18 +1101,138 @@ class ilBookingProcessGUI
 		$obj = new ilBookingObject($a_obj_id);
 		$pfile = $obj->getPostFile();
 		$ptext = $obj->getPostText();
+
 		if(trim($ptext) || $pfile)
 		{
 			if(sizeof($a_rsv_ids))
 			{
-				$this->ctrl->setParameterByClass('ilbookingobjectgui', 'rsv_ids', implode(";", $a_rsv_ids));
+				$this->ctrl->setParameter($this, 'rsv_ids', implode(";", $a_rsv_ids));
 			}
-			$this->ctrl->setParameterByClass('ilbookingobjectgui', 'object_id', $obj->getId());
-			$this->ctrl->redirectByClass('ilbookingobjectgui', 'displayPostInfo');
+			$this->ctrl->redirect($this, 'displayPostInfo');
 		}
 		else
 		{
 			$this->back();
+		}
+	}
+
+	/**
+	 * Display post booking informatins
+	 */
+	public function displayPostInfo()
+	{
+		$tpl = $this->tpl;
+		$lng = $this->lng;
+		$ilCtrl = $this->ctrl;
+		$id = $this->book_obj_id;
+		if(!$id)
+		{
+			return;
+		}
+
+		// placeholder
+
+		$book_ids = ilBookingReservation::getObjectReservationForUser($id, $this->user_id_assigner, true);
+		$tmp = array();
+		foreach($book_ids as $book_id)
+		{
+			if(in_array($book_id, $this->rsv_ids))
+			{
+				$obj = new ilBookingReservation($book_id);
+				$from = $obj->getFrom();
+				$to = $obj->getTo();
+				if($from > time())
+				{
+					$tmp[$from."-".$to]++;
+				}
+			}
+		}
+
+		$olddt = ilDatePresentation::useRelativeDates();
+		ilDatePresentation::setUseRelativeDates(false);
+
+		$period = array();
+		ksort($tmp);
+		foreach($tmp as $time => $counter)
+		{
+			$time = explode("-", $time);
+			$time = ilDatePresentation::formatPeriod(
+				new ilDateTime($time[0], IL_CAL_UNIX),
+				new ilDateTime($time[1], IL_CAL_UNIX));
+			if($counter > 1)
+			{
+				$time .= " (".$counter.")";
+			}
+			$period[] = $time;
+		}
+		$book_id = array_shift($book_ids);
+
+		ilDatePresentation::setUseRelativeDates($olddt);
+
+
+		/*
+		#23578 since Booking pool participants.
+		$obj = new ilBookingReservation($book_id);
+		if ($obj->getUserId() != $ilUser->getId())
+		{
+			return;
+		}
+		*/
+
+		$obj = new ilBookingObject($id);
+		$pfile = $obj->getPostFile();
+		$ptext = $obj->getPostText();
+
+		$mytpl = new ilTemplate('tpl.booking_reservation_post.html', true, true, 'Modules/BookingManager/BookingProcess');
+		$mytpl->setVariable("TITLE", $lng->txt('book_post_booking_information'));
+
+		if($ptext)
+		{
+			// placeholder
+			$ptext = str_replace("[OBJECT]", $obj->getTitle(), $ptext);
+			$ptext = str_replace("[PERIOD]", implode("<br />", $period), $ptext);
+
+			$mytpl->setVariable("POST_TEXT", nl2br($ptext));
+		}
+
+		if($pfile)
+		{
+			$url = $ilCtrl->getLinkTarget($this, 'deliverPostFile');
+
+			$mytpl->setVariable("DOWNLOAD", $lng->txt('download'));
+			$mytpl->setVariable("URL_FILE", $url);
+			$mytpl->setVariable("TXT_FILE", $pfile);
+		}
+
+		$mytpl->setVariable("TXT_SUBMIT", $lng->txt('ok'));
+		$mytpl->setVariable("URL_SUBMIT", $ilCtrl->getLinkTarget($this, "back"));
+
+		$tpl->setContent($mytpl->get());
+	}
+
+	/**
+	 * Deliver post booking file
+	 */
+	public function deliverPostFile()
+	{
+		$id = $this->book_obj_id;
+		if(!$id)
+		{
+			return;
+		}
+
+		$book_id = ilBookingReservation::getObjectReservationForUser($id, $this->user_id_assigner);
+		$obj = new ilBookingReservation($book_id);
+		if ($obj->getUserId() != $this->user_id_assigner)
+		{
+			return;
+		}
+
+		$obj = new ilBookingObject($id);
+		$file = $obj->getPostFileFullPath();
+		if($file)
+		{
+			ilUtil::deliverFile($file, $obj->getPostFile());
 		}
 	}
 

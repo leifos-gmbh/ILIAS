@@ -224,7 +224,7 @@ class ilBookingGatewayGUI
 	{
 		//
 		$options = [];
-		foreach ($this->use_book_repo->getUsedBookingPools($this->obj_id) as $ref_id)
+		foreach ($this->use_book_repo->getUsedBookingPools(ilObject::_lookupObjectId($this->main_host_ref_id)) as $ref_id)
 		{
 			$options[$ref_id] = ilObject::_lookupTitle(ilObject::_lookupObjId($ref_id));
 		}

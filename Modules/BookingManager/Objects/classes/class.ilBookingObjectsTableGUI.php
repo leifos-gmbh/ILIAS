@@ -68,6 +68,7 @@ class ilBookingObjectsTableGUI extends ilTable2GUI
 		$this->pool_id = $a_pool_id;
 		$this->has_schedule = $a_pool_has_schedule;
 		$this->overall_limit = $a_pool_overall_limit;
+		$this->active_management = $active_management;
 		$this->may_edit = ($this->active_management &&
 			$ilAccess->checkAccess('write', '', $this->ref_id));
 		$this->may_assign = ($this->active_management &&
@@ -396,7 +397,8 @@ class ilBookingObjectsTableGUI extends ilTable2GUI
 		{						
 			if(trim($a_set['post_text']) || $a_set['post_file'])
 			{
-				$items[] = $this->ui_factory->button()->shy($lng->txt('book_post_booking_information'), $ilCtrl->getLinkTarget($this->parent_obj, 'displayPostInfo'));
+				$items[] = $this->ui_factory->button()->shy($lng->txt('book_post_booking_information'),
+					$ilCtrl->getLinkTargetByClass("ilbookingprocessgui", 'displayPostInfo'));
 			}
 			$items[] = $this->ui_factory->button()->shy($lng->txt('book_set_cancel'), $ilCtrl->getLinkTarget($this->parent_obj, 'rsvConfirmCancelUser'));
 		}
@@ -404,7 +406,8 @@ class ilBookingObjectsTableGUI extends ilTable2GUI
 		if($this->may_edit || $has_booking)
 		{
 			$ilCtrl->setParameterByClass('ilBookingReservationsGUI', 'object_id', $a_set['booking_object_id']);
-			$items[] = $this->ui_factory->button()->shy($lng->txt('book_log'), $ilCtrl->getLinkTargetByClass('ilBookingReservationsGUI', 'log'));
+			$items[] = $this->ui_factory->button()->shy($lng->txt('book_log'),
+				$ilCtrl->getLinkTargetByClass('ilBookingReservationsGUI', 'log'));
 			$ilCtrl->setParameterByClass('ilBookingReservationsGUI', 'object_id', '');
 		}
 

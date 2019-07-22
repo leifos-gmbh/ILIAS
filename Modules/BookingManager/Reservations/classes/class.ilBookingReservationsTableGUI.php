@@ -532,8 +532,10 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
 		{
 			$filter["user_id"] = $ilUser->getId();
 		}
-	
-		$data = ilBookingReservation::getListByDate($this->has_schedule, $ids, $filter);
+
+		$f = new ilBookingReservationDBRepositoryFactory();
+		$repo = $f->getRepo();
+		$data = $repo->getListByDate($this->has_schedule, $ids, $filter);
 		
 		if($this->advmd)
 		{			

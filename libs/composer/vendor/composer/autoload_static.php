@@ -3718,6 +3718,7 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
         'ilBookingSchedule' => __DIR__ . '/../..' . '/../../Modules/BookingManager/Schedule/classes/class.ilBookingSchedule.php',
         'ilBookingScheduleGUI' => __DIR__ . '/../..' . '/../../Modules/BookingManager/Schedule/classes/class.ilBookingScheduleGUI.php',
         'ilBookingSchedulesTableGUI' => __DIR__ . '/../..' . '/../../Modules/BookingManager/Schedule/classes/class.ilBookingSchedulesTableGUI.php',
+        'ilBookingService' => __DIR__ . '/../..' . '/../../Modules/BookingManager/BookingService/classes/class.ilBookingService.php',
         'ilBookmark' => __DIR__ . '/../..' . '/../../Services/Bookmarks/classes/class.ilBookmark.php',
         'ilBookmarkAdministrationGUI' => __DIR__ . '/../..' . '/../../Services/Bookmarks/classes/class.ilBookmarkAdministrationGUI.php',
         'ilBookmarkAdministrationTableGUI' => __DIR__ . '/../..' . '/../../Services/Bookmarks/classes/class.ilBookmarkAdministrationTableGUI.php',

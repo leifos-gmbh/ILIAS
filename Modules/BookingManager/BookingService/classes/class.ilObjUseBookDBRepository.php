@@ -39,7 +39,7 @@ class ilObjUseBookDBRepository
 		{
 			$db->insert(self::TABLE_NAME, array(
 				"obj_id" => array("integer", (int) $obj_id),
-				"book_obj_id" => array("integer", (int) $id)
+				"book_ref_id" => array("integer", (int) $id)
 			));
 		}
 	}
@@ -47,7 +47,7 @@ class ilObjUseBookDBRepository
 	/**
 	 * Get used booking pools
 	 * @param int $obj_id
-	 * @return int[]
+	 * @return int[] ref ids
 	 */
 	public function getUsedBookingPools(int $obj_id): array
 	{
@@ -61,7 +61,7 @@ class ilObjUseBookDBRepository
 		$book_ids = [];
 		while ($rec = $db->fetchAssoc($set))
 		{
-			$book_ids[] = $rec["book_obj_id"];
+			$book_ids[] = $rec["book_ref_id"];
 		}
 		return $book_ids;
 	}

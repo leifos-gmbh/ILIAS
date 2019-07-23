@@ -20,6 +20,7 @@ obj#:#obj_tool_booking_info#:#Use the booking pools to book resources.
 book#:#book_select_pool#:#Select Pool
 book#:#book_pool_selection#:#Booking Pool Selection
 book#:#book_booked_in#:#Booked in
+book#:#book_all_pools_need_schedules#:#Settings not saved. All assigned pools need to have at least one schedule.
 meta#:#meta_oer_harvester#:#OER Harvester
 meta#:#meta_oer_harvester_desc#:#OER Harvester
 meta#:#meta_oer_copyright_selection#:#Lizenzauswahl

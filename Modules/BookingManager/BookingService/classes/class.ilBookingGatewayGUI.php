@@ -355,6 +355,14 @@ class ilBookingGatewayGUI
 					return (int) $i;
 				}, $b_ids)
 				: [];
+
+			if (!$this->checkBookingPoolsForSchedules($b_ids)) {
+				ilUtil::sendFailure($lng->txt("book_all_pools_need_schedules"));
+				$form->setValuesByPost();
+				$main_tpl->setContent($form->getHtml());
+				return;
+			}
+
 			$cmd = new BookingManager\saveObjectSettingsCommand(new ilObjBookingServiceSettings(
 				$this->obj_id,
 				$b_ids
@@ -373,5 +381,22 @@ class ilBookingGatewayGUI
 			$main_tpl->setContent($form->getHtml());
 		}
 	}
+
+	/**
+	 * Check if all pools have schedules
+	 *
+	 * @param int[] $ids pool ref ids
+	 * @return bool
+	 */
+	protected function checkBookingPoolsForSchedules($ids)
+	{
+		foreach ($ids as $pool_ref_id) {
+			if (!ilBookingSchedule::hasExistingSchedules(ilObject::_lookupObjectId($pool_ref_id))) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 
 }

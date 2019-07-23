@@ -3379,6 +3379,7 @@ return array(
     'ilBookingSchedule' => $baseDir . '/../../Modules/BookingManager/Schedule/classes/class.ilBookingSchedule.php',
     'ilBookingScheduleGUI' => $baseDir . '/../../Modules/BookingManager/Schedule/classes/class.ilBookingScheduleGUI.php',
     'ilBookingSchedulesTableGUI' => $baseDir . '/../../Modules/BookingManager/Schedule/classes/class.ilBookingSchedulesTableGUI.php',
+    'ilBookingService' => $baseDir . '/../../Modules/BookingManager/BookingService/classes/class.ilBookingService.php',
     'ilBookmark' => $baseDir . '/../../Services/Bookmarks/classes/class.ilBookmark.php',
     'ilBookmarkAdministrationGUI' => $baseDir . '/../../Services/Bookmarks/classes/class.ilBookmarkAdministrationGUI.php',
     'ilBookmarkAdministrationTableGUI' => $baseDir . '/../../Services/Bookmarks/classes/class.ilBookmarkAdministrationTableGUI.php',

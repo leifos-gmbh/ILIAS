@@ -57,4 +57,7 @@ if(!$ilDB->tableColumnExists('booking_reservation','context_obj_id'))
 }
 
 ?>
-
+<#5>
+<?php
+$ilDB->renameTableColumn('book_obj_use_book', "book_obj_id", 'book_ref_id');
+?>

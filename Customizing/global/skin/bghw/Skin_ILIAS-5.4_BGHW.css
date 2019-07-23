@@ -1,60 +1,60 @@
 @font-face {
-  font-family: 'MetaWeb-Normal';
-  src: url('../../../../Customizing/global/skin/Skin_ILIAS-5.4_BGHW/fonts/DGUV_Meta_Web/DGUVMetaWeb-Normal.woff') format('woff');
+  font-family: 'Open Sans';
+  src: url('fonts/OpenSansWeb/OpenSans-Regular.woff2') format('woff2'), url('fonts/OpenSansWeb/OpenSans-Regular.woff') format('woff');
   font-weight: 400;
   font-style: normal;
 }
 @font-face {
-  font-family: 'MetaWeb-Normal';
-  src: url('../../../../Customizing/global/skin/Skin_ILIAS-5.4_BGHW/fonts/DGUV_Meta_Web/DGUVMetaWeb-Bold.woff') format('woff');
+  font-family: 'Open Sans';
+  src: url('fonts/OpenSansWeb/OpenSans-Bold.woff2') format('woff2'), url('fonts/OpenSansWeb/OpenSans-Bold.woff') format('woff');
   font-weight: 700;
   font-style: normal;
 }
 @font-face {
-  font-family: 'MetaWeb-Normal';
-  src: url('../../../../Customizing/global/skin/Skin_ILIAS-5.4_BGHW/fonts/DGUV_Meta_Web/DGUVMetaWeb-NormalIta.woff') format('woff');
+  font-family: 'Open Sans';
+  src: url('fonts/OpenSansWeb/OpenSans-Italic.woff2') format('woff2'), url('fonts/OpenSansWeb/OpenSans-Italic.woff') format('woff');
   font-weight: 400;
   font-style: italic;
 }
 @font-face {
-  font-family: 'MetaWeb-Normal';
-  src: url('../../../../Customizing/global/skin/Skin_ILIAS-5.4_BGHW/fonts/DGUV_Meta_Web/DGUVMetaWeb-NormalIta.woff') format('woff');
+  font-family: 'Open Sans';
+  src: url('fonts/OpenSansWeb/OpenSans-BoldItalic.woff2') format('woff2'), url('fonts/OpenSansWeb/OpenSans-BoldItalic.woff') format('woff');
   font-weight: 700;
   font-style: italic;
 }
 @font-face {
-  font-family: 'MetaWeb-Normal';
-  src: url('../../../../Customizing/global/skin/Skin_ILIAS-5.4_BGHW/fonts/DGUV_Meta_Web/DGUVMetaWeb-Normal.woff') format('woff');
+  font-family: 'Open Sans';
+  src: url('fonts/OpenSansWeb/OpenSans-Light.woff2') format('woff2'), url('fonts/OpenSansWeb/OpenSans-Light.woff') format('woff');
   font-weight: 300;
   font-style: normal;
 }
 @font-face {
-  font-family: 'MetaWeb-Normal';
-  src: url('../../../../Customizing/global/skin/Skin_ILIAS-5.4_BGHW/fonts/DGUV_Meta_Web/DGUVMetaWeb-NormalIta.woff') format('woff');
+  font-family: 'Open Sans';
+  src: url('fonts/OpenSansWeb/OpenSans-LightItalic.woff2') format('woff2'), url('fonts/OpenSansWeb/OpenSans-LightItalic.woff') format('woff');
   font-weight: 300;
   font-style: italic;
 }
 @font-face {
-  font-family: 'MetaWeb-Normal';
-  src:url('../../../../Customizing/global/skin/Skin_ILIAS-5.4_Skin_ILIAS-5.4_BGHW/fonts/DGUV_Meta_Web/DGUVMetaWeb-Bold.woff') format('woff');
+  font-family: 'Open Sans';
+  src: url('fonts/OpenSansWeb/OpenSans-Semibold.woff2') format('woff2'), url('fonts/OpenSansWeb/OpenSans-Semibold.woff') format('woff');
   font-weight: 600;
   font-style: normal;
 }
 @font-face {
-  font-family: 'MetaWeb-Normal';
-  src: url('../../../../Customizing/global/skin/Skin_ILIAS-5.4_Skin_ILIAS-5.4_BGHW/fonts/DGUV_Meta_Web/DGUVMetaWeb-NormalIta.woff') format('woff');
+  font-family: 'Open Sans';
+  src: url('fonts/OpenSansWeb/OpenSans-SemiboldItalic.woff2') format('woff2'), url('fonts/OpenSansWeb/OpenSans-SemiboldItalic.woff') format('woff');
   font-weight: 600;
   font-style: italic;
 }
 @font-face {
-  font-family: 'MetaWeb-Normal';
-  src: url('../../../../Customizing/global/skin/Skin_ILIAS-5.4_BGHW/fonts/DGUV_Meta_Web/DGUVMetaWeb-Bold.woff') format('woff');
+  font-family: 'Open Sans';
+  src: url('fonts/OpenSansWeb/OpenSans-ExtraBold.woff2') format('woff2'), url('fonts/OpenSansWeb/OpenSans-ExtraBold.woff') format('woff');
   font-weight: 800;
   font-style: normal;
 }
 @font-face {
-  font-family: 'MetaWeb-Normal';
-  src: url('../../../../Customizing/global/skin/Skin_ILIAS-5.4_BGHW/fonts/DGUV_Meta_Web/DGUVMetaWeb-NormalIta.woff') format('woff');
+  font-family: 'Open Sans';
+  src: url('fonts/OpenSansWeb/OpenSans-ExtraBoldItalic.woff2') format('woff2'), url('fonts/OpenSansWeb/OpenSans-ExtraBoldItalic.woff') format('woff');
   font-weight: 800;
   font-style: italic;
 }
@@ -16895,6 +16895,7 @@ html {
 /*----------PAGE HEADER----------*/
 .ilTopTitle {
   padding: 0 15px 0 15px;
+  font-weight: bold;
 }
 #ilTopBarNav {
   margin: 0 0 0 15px;
@@ -17001,6 +17002,11 @@ div.ilTopBar {
 #ilTopNav .dropdown-menu li a:hover {
   background-color: inherit;
 }
+.dropdown-header {
+  color: #666;
+  background-color: transparent;
+  border-bottom: 1px solid #004994;
+}
 /*----------BODY----------*/
 body {
   font-family: 'MetaWeb-Normal';
@@ -17057,6 +17063,10 @@ a.ilTreeView {
   top: 135px;
   display: none;
 }
+.ilLeftNav {
+  margin-left: 0px;
+  top: 135px;
+}
 /*CALENDER*/
 .ilBlockContent .il-viewcontrol-section .btn.btn-default {
   color: #004994;
@@ -17089,6 +17099,97 @@ footer.ilFooter div.ilFooterContainer {
 footer.ilFooter a.permalink_label,
 footer.ilFooter div.ilFooterContainer > a {
   color: #666;
+}
+/*----------PAGE HEADER----------*/
+div#il_error_logo img {
+  height: 65px;
+  width: 206px;
+  margin: 0;
+}
+div#il_error_logo {
+  margin: -20px 0 0 -15px;
+}
+/*----------BODY----------*/
+.ilFixedTopSpacerError {
+  padding-top: 175px;
+}
+.ilMainHeader.ilMainHeaderError {
+  position: static;
+  height: 104px;
+}
+.ilMainMenu.ilMainMenuError {
+  position: static;
+  margin-bottom: 40px;
+}
+.ilErrorSection {
+  padding-top: 0px;
+}
+.ilErrorSection .ilFormHeader {
+  padding-left: 10px;
+}
+p.ilErrorSection {
+  margin-top: 50px;
+}
+/*----------FOOTER----------*/
+@font-face {
+  font-family: 'MetaWeb-Normal';
+  src: url('../../../../Customizing/global/skin/Skin_ILIAS-5.4_BGHW/fonts/DGUV_Meta_Web/DGUVMetaWeb-Normal.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'MetaWeb-Normal';
+  src: url('../../../../Customizing/global/skin/Skin_ILIAS-5.4_BGHW/fonts/DGUV_Meta_Web/DGUVMetaWeb-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'MetaWeb-Normal';
+  src: url('../../../../Customizing/global/skin/Skin_ILIAS-5.4_BGHW/fonts/DGUV_Meta_Web/DGUVMetaWeb-NormalIta.woff') format('woff');
+  font-weight: 400;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'MetaWeb-Normal';
+  src: url('../../../../Customizing/global/skin/Skin_ILIAS-5.4_BGHW/fonts/DGUV_Meta_Web/DGUVMetaWeb-NormalIta.woff') format('woff');
+  font-weight: 700;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'MetaWeb-Normal';
+  src: url('../../../../Customizing/global/skin/Skin_ILIAS-5.4_BGHW/fonts/DGUV_Meta_Web/DGUVMetaWeb-Normal.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'MetaWeb-Normal';
+  src: url('../../../../Customizing/global/skin/Skin_ILIAS-5.4_BGHW/fonts/DGUV_Meta_Web/DGUVMetaWeb-NormalIta.woff') format('woff');
+  font-weight: 300;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'MetaWeb-Normal';
+  src: url('../../../../Customizing/global/skin/Skin_ILIAS-5.4_BGHW/fonts/DGUV_Meta_Web/DGUVMetaWeb-Bold.woff') format('woff');
+  font-weight: 600;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'MetaWeb-Normal';
+  src: url('../../../../Customizing/global/skin/Skin_ILIAS-5.4_BGHW/fonts/DGUV_Meta_Web/DGUVMetaWeb-NormalIta.woff') format('woff');
+  font-weight: 600;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'MetaWeb-Normal';
+  src: url('../../../../Customizing/global/skin/Skin_ILIAS-5.4_BGHW/fonts/DGUV_Meta_Web/DGUVMetaWeb-Bold.woff') format('woff');
+  font-weight: 800;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'MetaWeb-Normal';
+  src: url('../../../../Customizing/global/skin/Skin_ILIAS-5.4_BGHW/fonts/DGUV_Meta_Web/DGUVMetaWeb-NormalIta.woff') format('woff');
+  font-weight: 800;
+  font-style: italic;
 }
 /*----------PAGE HEADER----------*/
 div#il_startup_logo img {
@@ -17140,37 +17241,6 @@ body.ilc_text_block_Headline1 {
 .ilStartupFrame .alert.alert-danger {
   width: 100%;
   Margin-top: 15px;
-}
-/*----------FOOTER----------*/
-/*----------PAGE HEADER----------*/
-div#il_error_logo img {
-  height: 65px;
-  width: 206px;
-  margin: 0;
-}
-div#il_error_logo {
-  margin: -20px 0 0 -15px;
-}
-/*----------BODY----------*/
-.ilFixedTopSpacerError {
-  padding-top: 175px;
-}
-.ilMainHeader.ilMainHeaderError {
-  position: static;
-  height: 104px;
-}
-.ilMainMenu.ilMainMenuError {
-  position: static;
-  margin-bottom: 40px;
-}
-.ilErrorSection {
-  padding-top: 0px;
-}
-.ilErrorSection .ilFormHeader {
-  padding-left: 10px;
-}
-p.ilErrorSection {
-  margin-top: 50px;
 }
 /*----------FOOTER----------*/
 /*----------PAGE HEADER----------*/

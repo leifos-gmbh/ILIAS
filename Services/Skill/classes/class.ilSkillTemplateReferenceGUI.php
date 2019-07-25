@@ -185,6 +185,11 @@ class ilSkillTemplateReferenceGUI extends ilBasicSkillTemplateGUI
 		$ti = new ilTextInputGUI($lng->txt("title"), "title");
 		$ti->setRequired(true);
 		$this->form->addItem($ti);
+
+		// description
+		$ta = new ilTextAreaInputGUI($lng->txt("description"), "description");
+		$ta->setRows(1);
+		$this->form->addItem($ta);
 		
 		// order nr
 		$ni = new ilNumberInputGUI($lng->txt("skmg_order_nr"), "order_nr");
@@ -256,6 +261,7 @@ class ilSkillTemplateReferenceGUI extends ilBasicSkillTemplateGUI
 		$values = array();
 		$values["skill_template_id"] = $this->node_object->getSkillTemplateId();
 		$values["title"] = $this->node_object->getTitle();
+		$values["description"] = $this->node_object->getDescription();
 		$values["selectable"] = $this->node_object->getSelfEvaluation();
 		$values["status"] = $this->node_object->getStatus();
 		$values["order_nr"] = $this->node_object->getOrderNr();
@@ -274,6 +280,7 @@ class ilSkillTemplateReferenceGUI extends ilBasicSkillTemplateGUI
 
 		$sktr = new ilSkillTemplateReference();
 		$sktr->setTitle($_POST["title"]);
+		$sktr->setDescription($_POST["description"]);
 		$sktr->setSkillTemplateId($_POST["skill_template_id"]);
 		$sktr->setSelfEvaluation($_POST["selectable"]);
 		$sktr->setOrderNr($_POST["order_nr"]);
@@ -317,6 +324,7 @@ class ilSkillTemplateReferenceGUI extends ilBasicSkillTemplateGUI
 			// perform update
 //			$this->node_object->setSkillTemplateId($_POST["skill_template_id"]);
 			$this->node_object->setTitle($_POST["title"]);
+			$this->node_object->setDescription($_POST["description"]);
 			$this->node_object->setSelfEvaluation($_POST["selectable"]);
 			$this->node_object->setOrderNr($_POST["order_nr"]);
 			$this->node_object->setStatus($_POST["status"]);

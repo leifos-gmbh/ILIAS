@@ -10815,7 +10815,7 @@ objref#:#objref_reuse_title#:#Titel des verlinkten Objekts übernehmen
 objref#:#objref_title_settings#:#Titel des verlinkten Objekts
 objref#:#objref_failure_target_type#:#Das Ziel des Links muss vom folgendem Typ sein:
 crs#:#crs_ref_member_update#:#Neue Mitglieder hinzufügen
-crs#:#crs_ref_member_update_info#:#Alle neuen Mitglieder des Kurses auf den dieser Kurs-Link verweist, werden automatisch in den übergeordneten Kurs eingetragen.
+crs#:#crs_ref_member_update_info#:#Alle neuen Mitglieder des übergeordneten Kurses werden automatisch in den Kurs, auf den dieser Kurs-Link verweist, eingetragen.
 crs#:#crs_ref_missing_parent_crs#:#Die Option kann nicht ausgewählt werden, da dieser Kurs-Link keinen übergeordneten Kurs besitzt.
 crs#:#crs_ref_missing_access#:#Die Option kann nicht ausgewählt werden, da Sie nicht die Berechtigung "Mitglieder verwalten" für beide Kurse besitzen.
 orgu#:#Actions#:#Aktionen

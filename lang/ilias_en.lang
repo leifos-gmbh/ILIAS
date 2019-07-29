@@ -13012,7 +13012,7 @@ rbac#:#wiki_activate_wiki_protection#:#Set Wiki Pages to Read-Only
 rbac#:#wiki_wiki_html_export#:#Export Wiki as HTML
 crs#:#crs_loc_settings_it_type#:#Initial Test
 crs#:#crs_loc_settings_type_it_placement_all#:#Comprehensive Placement Test Covering all Objectives
-crs#:#crs_loc_settings_it_start_object#:#Initial Test is Start Objects
+crs#:#crs_loc_settings_it_start_object#:#Initial Test is Start Object
 crs#:#crs_loc_settings_type_it_placement_sel#:#Separate Placement Test for Each Objective
 crs#:#crs_loc_settings_type_it_qualifying_all#:#Comprehensive Achievement Test Covering all Objectives
 crs#:#crs_loc_settings_type_it_qualifying_sel#:#Separate Achievement Test for Each Objective
@@ -13028,9 +13028,9 @@ crs#:#crs_loc_btn_new_assignment#:#New Test Assignment
 crs#:#crs_objective_tbl_col_final_tsts#:#Final Tests
 crs#:#crs_objective_action_qtest_sep#:#Assign Final Test
 crs#:#crs_loc_settings_tbl_its_q_all#:#Initial Qualifying Test (all Objecives)
-crs#:#crs_loc_settings_tbl_its_nq_all#:#Initial Diagnostic Test (all Objectives)
+crs#:#crs_loc_settings_tbl_its_nq_all#:#Initial Placement Test (all Objectives)
 crs#:#crs_loc_settings_tbl_it_q#:#Initial Qualifying Test (per Objective)
-crs#:#crs_loc_settings_tbl_it_nq#:#Initial Diagnostic Test (per Objective)
+crs#:#crs_loc_settings_tbl_it_nq#:#Initial Placement Test (per Objective)
 crs#:#crs_loc_settings_tbl_qts_all#:#Final Test (all objectives)
 crs#:#crs_loc_settings_tbl_qt#:#Final Test (per objective)
 crs#:#crs_loc_objective_passed_confirmation#:#You have already passed this learning objective. Starting a new test run will reset the result. Do you really want to start a new test run?
@@ -15052,3 +15052,6 @@ certificate#:#certificate_learning_progress_must_be_active#:#Only objects with a
 certificate#:#learning_progress_deactivated#:#The Learning Progress for this object is deactivated. To edit the certificate template and achieve user certificates the learning progress for this object must be activated.
 content#:#msg_no_page_access#:#You do not have the permission to access this page.
 forum#:#frm_move_invalid_file_type#:#The thread "%s" has an unsupported file type attached. Remove the file or contact the administrator of the system to add this file type to the file type whitelist.
+crs#:#crs_objective_result_summary_initial#:#Placement Test: %1$s (%2$s required)
+crs#:#crs_objective_result_summary_qualifying#:#Achievement Test: %1$s (%2$s required)
+crs#:#crs_objective_result_details#:#« Show Details

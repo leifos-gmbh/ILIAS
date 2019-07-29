@@ -20,6 +20,7 @@ book#:#book_pool_selection#:#Auswahl Buchungspool
 book#:#book_booked_in#:#Gebucht in
 obj#:#obj_tool_booking#:#Ressourcen
 obj#:#obj_tool_booking_info#:#Buchungspools nutzen um Ressourcen zu buchen.
+book#:#book_all_pools_need_schedules#:#Die Änderungen wurden nicht gespeichert. Alle zugeordneten Buchungspools benötigen mindestens einen Zeitplan.
 acc#:#acc_access_key#:#Access-Key
 acc#:#acc_access_keys#:#Access-Keys
 acc#:#acc_comp_frm#:#Forum

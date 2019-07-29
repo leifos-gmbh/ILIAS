@@ -58,6 +58,10 @@ if(!$ilDB->tableColumnExists('booking_reservation','context_obj_id'))
 ?>
 <#5>
 <?php
+$ilDB->renameTableColumn('book_obj_use_book', "book_obj_id", 'book_ref_id');
+?>
+<#6>
+<?php
 if(!$ilDB->tableExists('crs_reference_settings'))
 {
 	$ilDB->createTable('crs_reference_settings', [
@@ -76,7 +80,7 @@ if(!$ilDB->tableExists('crs_reference_settings'))
 	]);
 }
 ?>
-<#6>
+<#7>
 <?php
 $ilCtrlStructureReader->getStructure();
 ?>

@@ -10818,6 +10818,7 @@ crs#:#crs_ref_member_update#:#Neue Mitglieder hinzufügen
 crs#:#crs_ref_member_update_info#:#Alle neuen Mitglieder des übergeordneten Kurses werden automatisch in den Kurs, auf den dieser Kurs-Link verweist, eingetragen.
 crs#:#crs_ref_missing_parent_crs#:#Die Option kann nicht ausgewählt werden, da dieser Kurs-Link keinen übergeordneten Kurs besitzt.
 crs#:#crs_ref_missing_access#:#Die Option kann nicht ausgewählt werden, da Sie nicht die Berechtigung "Mitglieder verwalten" für beide Kurse besitzen.
+crs#:#crs_ref_delete_confirmation_info#:#Möchten Sie folgende Mitglieder aus diesem Kurs austragen? Wenn diese Mitglieder auch aus den im Kurs enthaltenden verlinkten Kursen ausgetragen werden sollen, dann aktivieren Sie die entsprechenden Checkboxen.
 orgu#:#Actions#:#Aktionen
 orgu#:#add_position#:#Position hinzufügen
 orgu#:#authorities#:#Befugnisse

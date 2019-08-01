@@ -87,7 +87,12 @@ class ilWaitingListTableGUI extends ilTable2GUI
 		$this->addMultiCommand('confirmAssignFromWaitingList',$this->lng->txt('assign'));
 		$this->addMultiCommand('confirmRefuseFromList',$this->lng->txt('refuse'));
 		$this->addMultiCommand('sendMailToSelectedUsers',$this->lng->txt('crs_mem_send_mail'));
-		
+
+		// begin-patch clipboard
+		$this->lng->loadLanguageModule('user');
+		$this->addMultiCommand('addToClipboard', $this->lng->txt('clipboard_add_btn'));
+		// end-patch clipboard
+
 		$this->setPrefix('waiting');
 		$this->setSelectAllCheckbox('waiting',true);
 		$this->setRowTemplate("tpl.show_waiting_list_row.html","Services/Membership");

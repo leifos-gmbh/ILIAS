@@ -14,6 +14,12 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+wfld#:#wfld_sortation#:#Sortation
+wfld#:#wfld_derive#:#Adopt from parent
+wfld#:#wfld_alphabetically_asc#:#Alphabetically, asc.
+wfld#:#wfld_alphabetically_desc#:#Alphabetically, desc.
+wfld#:#wfld_creation_asc#:#Creation Date, asc.
+wfld#:#wfld_creation_desc#:#Creation Date, desc.
 meta#:#meta_oer_harvester#:#OER Harvester
 meta#:#meta_oer_harvester_desc#:#OER Harvester
 meta#:#meta_oer_copyright_selection#:#Lizenzauswahl

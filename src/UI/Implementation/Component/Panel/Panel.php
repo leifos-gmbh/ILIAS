@@ -93,7 +93,7 @@ class Panel implements C\Panel\Panel {
 	/**
 	 * @return array|null
 	 */
-	public function getViewControls(): ?array
+	public function getViewControls()
 	{
 		return $this->view_controls;
 	}

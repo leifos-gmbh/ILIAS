@@ -22,6 +22,6 @@ interface Standard extends Panel {
 	 *
 	 * @return array Array of ViewControls
 	 */
-	public function getViewControls(): ?array;
+	public function getViewControls();
 
 }

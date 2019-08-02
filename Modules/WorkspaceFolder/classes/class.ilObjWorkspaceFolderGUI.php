@@ -33,6 +33,16 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 	protected $ui;
 
 	/**
+	 * @var ilWorkspaceFolderUserSettings
+	 */
+	protected $user_folder_settings;
+
+	/**
+	 * @var int
+	 */
+	protected $requested_sortation;
+
+	/**
 	 * Constructor
 	 */
 	function __construct($a_id = 0, $a_id_type = self::REPOSITORY_NODE_ID, $a_parent_node_id = 0)
@@ -47,6 +57,13 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 		$this->tabs = $DIC->tabs();
 		$this->ctrl = $DIC->ctrl();
 		$this->ui = $DIC->ui();
+
+		$this->user_folder_settings = new ilWorkspaceFolderUserSettings($this->user->getId(),
+			new ilWorkspaceFolderUserSettingsRepository($this->user->getId()));
+
+		$this->requested_sortation = (int) $_GET["sortation"];
+
+		$this->lng->loadLanguageModule("cntr");
 	}
 
 	function getType()
@@ -62,7 +79,7 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 		$ilHelp->setScreenIdComponent("wfld");
 		
 		$this->ctrl->setParameter($this,"wsp_id",$this->node_id);
-		
+
 		$this->tabs_gui->addTab("wsp", $lng->txt("wsp_tab_personal"), 
 			$this->ctrl->getLinkTarget($this, ""));
 		
@@ -76,7 +93,8 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 			$this->ctrl->getLinkTargetByClass(array("ilObjWorkspaceRootFolderGUI", "ilObjectOwnershipManagementGUI"), "listObjects"));		
 		
 		if(!$this->ctrl->getNextClass($this))
-		{		
+		{
+
 			if(stristr($this->ctrl->getCmd(), "share"))
 			{
 				$this->tabs_gui->activateTab("share");
@@ -84,23 +102,7 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 			else
 			{
 				$this->tabs_gui->activateTab("wsp");
-
-				if($a_show_settings)
-				{
-					if ($this->checkPermissionBool("read"))
-					{
-						$this->tabs_gui->addSubTab("content",
-							$lng->txt("content"),
-							$this->ctrl->getLinkTarget($this, ""));
-					}
-
-					if ($this->checkPermissionBool("write"))
-					{
-						$this->tabs_gui->addSubTab("settings",
-							$lng->txt("settings"),
-							$this->ctrl->getLinkTarget($this, "edit"));
-					}
-				}
+				$this->addContentSubTabs($a_show_settings);
 			}
 		}
 	}
@@ -125,18 +127,29 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 	/**
 	 * Add content subtabs
 	 */
-	protected function addContentSubTabs()
+	protected function addContentSubTabs($a_show_settings)
 	{
 		$tabs = $this->tabs;
 		$ctrl = $this->ctrl;
 		$lng = $this->lng;
 
-		$tabs->addSubTab("view_content", $lng->txt("view"), $ctrl->getLinkTarget($this, "disableAdminPanel"));
-		$tabs->addSubTab("manage", $lng->txt("cntr_manage"), $ctrl->getLinkTarget($this, "enableAdminPanel"));
+		if ($this->checkPermissionBool("read"))
+		{
+			$tabs->addSubTab("content", $lng->txt("view"), $ctrl->getLinkTarget($this, "disableAdminPanel"));
+			$tabs->addSubTab("manage", $lng->txt("cntr_manage"), $ctrl->getLinkTarget($this, "enableAdminPanel"));
+		}
+
+		if ($this->checkPermissionBool("write") && $a_show_settings)
+		{
+			$this->tabs_gui->addSubTab("settings",
+				$lng->txt("settings"),
+				$this->ctrl->getLinkTarget($this, "edit"));
+		}
+
 		if ($this->isActiveAdministrationPanel()) {
 			$tabs->activateSubTab("manage");
 		} else {
-			$tabs->activateSubTab("view_content");
+			$tabs->activateSubTab("content");
 		}
 	}
 
@@ -146,7 +159,7 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 	protected function enableAdminPanel()
 	{
 		$this->setAdministrationPanel(true);
-		$this->render();
+		$this->ctrl->redirect($this, "");
 	}
 
 	/**
@@ -155,7 +168,7 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 	protected function disableAdminPanel()
 	{
 		$this->setAdministrationPanel(false);
-		$this->render();
+		$this->ctrl->redirect($this, "");
 	}
 
 	function executeCommand()
@@ -215,7 +228,7 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 		$ilTabs = $this->tabs;
 		$ilCtrl = $this->ctrl;
 
-		$this->addContentSubTabs();
+		//$this->addContentSubTabs();
 		$this->showAdministrationPanel();
 
 		unset($_SESSION['clipboard']['wsp2repo']);
@@ -236,7 +249,8 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 		$gui = new ilWorkspaceContentGUI($this,
 			$this->node_id,
 			$this->isActiveAdministrationPanel(),
-			$this->getAccessHandler(), $this->ui, $this->lng, $this->user, $this->objDefinition, $this->ctrl);
+			$this->getAccessHandler(), $this->ui, $this->lng, $this->user, $this->objDefinition, $this->ctrl,
+			$this->user_folder_settings);
 		$tpl->setContent($gui->render());
 
 		include_once("./Services/PersonalWorkspace/classes/class.ilWorkspaceExplorerGUI.php");
@@ -1046,6 +1060,15 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 		}
 	}
 
+
+	/**
+	 * Set sortation
+	 */
+	protected function setSortation()
+	{
+		$this->user_folder_settings->updateSortation($this->object->getId(), $this->requested_sortation);
+		$this->ctrl->redirect($this, "");
+	}
 
 }
 

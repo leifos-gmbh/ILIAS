@@ -51,11 +51,16 @@ class ilWorkspaceContentGUI
 	protected $ctrl;
 
 	/**
+	 * @var ilWorkspaceFolderSorting
+	 */
+	protected $folder_sorting;
+
+	/**
 	 * Constructor
 	 */
 	public function __construct($object_gui, int $node_id, bool $admin, $access_handler,
 				\ILIAS\DI\UIServices $ui, ilLanguage $lng, ilObjUser $user,
-				ilObjectDefinition $obj_definition, ilCtrl $ctrl)
+				ilObjectDefinition $obj_definition, ilCtrl $ctrl, ilWorkspaceFolderUserSettings $user_folder_settings)
 	{
 		$this->current_node = $node_id;
 		$this->admin = $admin;
@@ -66,11 +71,13 @@ class ilWorkspaceContentGUI
 		$this->user = $user;
 		$this->obj_definition = $obj_definition;
 		$this->ctrl = $ctrl;
+		$this->user_folder_settings = $user_folder_settings;
+
+		$this->folder_sorting = new ilWorkspaceFolderSorting();
 	}
 
 	/**
 	 * Render
-	 *
 	 */
 	public function render()
 	{
@@ -89,12 +96,17 @@ class ilWorkspaceContentGUI
 			$html .= $this->getItemHTML($i);
 		}
 
-		$sort_options = array(
-			'internal_rating' => 'Best',
-			'date_desc' => 'Most Recent',
-			'date_asc' => 'Oldest',
-		);
-		$sortation = $this->ui->factory()->viewControl()->sortation($sort_options);
+		// output sortation
+		$tree = new ilWorkspaceTree($this->user->getId());
+		$parent_id = $tree->getParentId($this->object_gui->ref_id);
+		$parent_effective = ($parent_id > 0)
+			? $this->user_folder_settings->getEffectiveSortation($parent_id)
+			: 0;
+		$selected = $this->user_folder_settings->getSortation($this->object_gui->object->getId());
+		$sort_options = $this->folder_sorting->getOptionsByType($this->object_gui->object->getType(), $selected, $parent_effective);
+		$sortation = $this->ui->factory()->viewControl()->sortation($sort_options)
+			->withTargetURL($this->ctrl->getLinkTarget($this->object_gui, "setSortation"), 'sortation')
+			->withLabel($this->lng->txt("wfld_sortation"));
 
 		if ($first)
 		{
@@ -134,6 +146,8 @@ class ilWorkspaceContentGUI
 		}
 
 		$this->shared_objects = $this->access_handler->getObjectsIShare();
+
+		$nodes = $this->folder_sorting->sortNodes($nodes, $this->user_folder_settings->getEffectiveSortation($this->object_gui->ref_id));
 
 		return $nodes;
 	}

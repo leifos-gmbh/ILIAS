@@ -1012,6 +1012,10 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 					$this->lng->txt('copy_selected_items'),
 					'copy'
 				);
+				$toolbar->addFormButton(
+					$this->lng->txt('download_selected_items'),
+					'download'
+				);
 				// add download button if multi download enabled
 
 				//@todo download
@@ -1068,6 +1072,49 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 	{
 		$this->user_folder_settings->updateSortation($this->object->getId(), $this->requested_sortation);
 		$this->ctrl->redirect($this, "");
+	}
+
+	function download()
+	{
+		// This variable determines whether the task has been initiated by a folder's action drop-down to prevent a folder
+		// duplicate inside the zip.
+		$initiated_by_folder_action = false;
+
+		if ($_GET["item_ref_id"] != "")
+		{
+			$_POST["id"] = array($_GET["item_ref_id"]);
+		}
+
+		if (!isset($_POST["id"]))
+		{
+			/*$object = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
+			$object_type = $object->getType();
+			if($object_type == "fold")
+			{
+				$_POST["id"] = array($_GET['ref_id']);
+				$initiated_by_folder_action = true;
+			}
+			else
+			{
+				$ilErr->raiseError($this->lng->txt("no_checkbox"), $ilErr->MESSAGE);
+			}
+			ilUtil::sendFailure($this->lng->txt("no_checkbox"), true);*/
+			$this->ctrl->redirect($this, "");
+		}
+
+		$download_job = new ilDownloadWorkspaceFolderBackgroundTask($GLOBALS['DIC']->user()->getId(), $_POST["id"], $initiated_by_folder_action);
+
+		$download_job->setBucketTitle($this->getBucketTitle());
+		if($download_job->run())
+		{
+			ilUtil::sendSuccess($this->lng->txt('msg_bt_download_started'),true);
+		}
+		$this->ctrl->redirect($this);
+	}
+
+	public function getBucketTitle()
+	{
+		return $bucket_title = ilUtil::getAsciiFilename($this->object->getTitle());
 	}
 
 }

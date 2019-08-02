@@ -34,12 +34,12 @@ include_once "./Services/Object/classes/class.ilObjectGUI.php";
  * @extends      ilObjectGUI
  * @package      webdav
  */
-class ilObjFileAccessSettingsGUI extends ilObjectGUI {
+class ilObjFileAccessSettingsGUI extends ilObjectGUI
+{
 
 	const INSTALL_README_PATH = '/docs/configuration/install.md';
 	const CMD_EDIT_DOWNLOADING_SETTINGS = 'editDownloadingSettings';
 	const CMD_EDIT_WEBDAV_SETTINGS = 'editWebDAVSettings';
-	
 	/**
 	 * @var \ilSetting
 	 */
@@ -55,7 +55,8 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI {
 	 *
 	 * @access public
 	 */
-	function __construct($a_data, $a_id, $a_call_by_reference) {
+	function __construct($a_data, $a_id, $a_call_by_reference)
+	{
 		$this->type = "facs";
 		parent::__construct($a_data, $a_id, $a_call_by_reference, false);
 		$this->folderSettings = new ilSetting('fold');
@@ -73,7 +74,8 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI {
 	 * @access public
 	 *
 	 */
-	public function executeCommand() {
+	public function executeCommand()
+	{
 		global $DIC;
 		$ilAccess = $DIC['ilAccess'];
 		$ilias = $DIC['ilias'];
@@ -124,7 +126,8 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI {
 	 * @access public
 	 *
 	 */
-	public function getAdminTabs() {
+	public function getAdminTabs()
+	{
 		global $DIC;
 		$rbacsystem = $DIC['rbacsystem'];
 
@@ -156,7 +159,8 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI {
 	/**
 	 * Edit settings.
 	 */
-	protected function initDownloadingSettingsForm() {
+	protected function initDownloadingSettingsForm()
+	{
 		global $DIC;
 		$ilCtrl = $DIC['ilCtrl'];
 		$lng = $DIC['lng'];
@@ -197,40 +201,16 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI {
 		$dl_prop->setInfo($lng->txt('enable_multi_download_info'));
 		$form->addItem($dl_prop);
 
-		// background task
-
+		// download limit
 		$lng->loadLanguageModule("bgtask");
-		$dl_bg = new ilCheckboxInputGUI($lng->txt("bgtask_setting"), "enable_bg");
-		$dl_bg->setInfo($lng->txt("bgtask_setting_info"));
-		$dl_bg->setChecked($this->folderSettings->get("bgtask_download", 0));
-		$form->addItem($dl_bg);
-
-		$dl_bgtc = new ilNumberInputGUI($lng->txt("bgtask_setting_threshold_count"), "bg_tcount");
-		$dl_bgtc->setInfo($lng->txt("bgtask_setting_threshold_count_info"));
-		$dl_bgtc->setRequired(true);
-		$dl_bgtc->setSize(10);
-		$dl_bgtc->setMinValue(1);
-		$dl_bgtc->setSuffix($lng->txt("files"));
-		$dl_bgtc->setValue($this->folderSettings->get("bgtask_download_tcount", null));
-		$dl_bg->addSubItem($dl_bgtc);
-
-		$dl_bgts = new ilNumberInputGUI($lng->txt("bgtask_setting_threshold_size"), "bg_tsize");
-		$dl_bgts->setInfo($lng->txt("bgtask_setting_threshold_size_info"));
-		$dl_bgts->setRequired(true);
-		$dl_bgts->setSize(10);
-		$dl_bgts->setMinValue(1);
-		$dl_bgts->setSuffix($lng->txt("lang_size_mb"));
-		$dl_bgts->setValue($this->folderSettings->get("bgtask_download_tsize", null));
-		$dl_bg->addSubItem($dl_bgts);
-
-		$dl_bgl = new ilNumberInputGUI($lng->txt("bgtask_setting_limit"), "bg_limit");
-		$dl_bgl->setInfo($lng->txt("bgtask_setting_limit_info"));
-		$dl_bgl->setRequired(true);
-		$dl_bgl->setSize(10);
-		$dl_bgl->setMinValue(1);
-		$dl_bgl->setSuffix($lng->txt("lang_size_mb"));
-		$dl_bgl->setValue($this->folderSettings->get("bgtask_download_limit", null));
-		$dl_bg->addSubItem($dl_bgl);
+		$dl_prop = new ilNumberInputGUI($lng->txt("bgtask_setting_limit"), "bg_limit");
+		$dl_prop->setInfo($lng->txt("bgtask_setting_limit_info"));
+		$dl_prop->setRequired(true);
+		$dl_prop->setSize(10);
+		$dl_prop->setMinValue(1);
+		$dl_prop->setSuffix($lng->txt("lang_size_mb"));
+		$dl_prop->setValue($this->folderSettings->get("bgtask_download_limit", null));
+		$form->addItem($dl_prop);
 
 		// Inline file extensions
 		$tai_prop = new ilTextAreaInputGUI($lng->txt('inline_file_extensions'), 'inline_file_extensions');
@@ -251,7 +231,8 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI {
 	/**
 	 * Edit settings.
 	 */
-	public function editDownloadingSettings(ilPropertyFormGUI $a_form = null) {
+	public function editDownloadingSettings(ilPropertyFormGUI $a_form = null)
+	{
 		global $rbacsystem, $ilErr, $tpl, $lng;
 
 		$this->tabs_gui->setTabActive('downloading_settings');
@@ -271,7 +252,8 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI {
 	/**
 	 * Save settings
 	 */
-	public function saveDownloadingSettings() {
+	public function saveDownloadingSettings()
+	{
 		global $DIC;
 		$rbacsystem = $DIC['rbacsystem'];
 
@@ -289,13 +271,7 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI {
 			$this->folderSettings->set("enable_download_folder", $_POST["enable_download_folder"] == 1);
 			$this->folderSettings->set("enable_multi_download", $_POST["enable_multi_download"] == 1);
 
-			$this->folderSettings->set("bgtask_download", (bool)$_POST["enable_bg"]);
-			if ((bool)$_POST["enable_bg"]) {
-				$this->folderSettings->set("bgtask_download_limit", (int)$_POST["bg_limit"]);
-				$this->folderSettings->set("bgtask_download_tcount", (int)$_POST["bg_tcount"]);
-				$this->folderSettings->set("bgtask_download_tsize", (int)$_POST["bg_tsize"]);
-			}
-
+			$this->folderSettings->set("bgtask_download_limit", (int) $_POST["bg_limit"]);
 			ilUtil::sendSuccess($DIC->language()->txt('settings_saved'), true);
 			$DIC->ctrl()->redirect($this, self::CMD_EDIT_DOWNLOADING_SETTINGS);
 		}
@@ -304,51 +280,54 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI {
 		$this->editDownloadingSettings($form);
 	}
 
-	protected function initWebDAVSettingsForm() {
-	    global $DIC;
-	    
-	    $lng = $DIC->language();
-	    
-	    require_once("./Services/Form/classes/class.ilPropertyFormGUI.php");
-	    require_once("./Services/Form/classes/class.ilCheckboxInputGUI.php");
-	    require_once("./Services/Form/classes/class.ilRadioGroupInputGUI.php");
-	    require_once("./Services/Form/classes/class.ilRadioOption.php");
-	    require_once("./Services/Form/classes/class.ilTextAreaInputGUI.php");
-	    
-	    $form = new ilPropertyFormGUI();
-	    $form->setFormAction($DIC->ctrl()->getFormAction($this));
-	    $form->setTitle($lng->txt("settings"));
-	    
-	    // Enable webdav
-	    $cb_prop = new ilCheckboxInputGUI($lng->txt("enable_webdav"), "enable_webdav");
-	    $cb_prop->setValue('1');
-	    $cb_prop->setChecked($this->object->isWebdavEnabled());
-	    $cb_prop->setInfo($this->getAdditionalWebDAVInformation());
-	    $form->addItem($cb_prop);
-	    
-	    $rgi_prop = new ilRadioGroupInputGUI($lng->txt('webfolder_instructions'), 'custom_webfolder_instructions_choice');
-	    $rgi_prop->addOption(new ilRadioOption($lng->txt('use_default_instructions'), 'default'));
-	    $rgi_prop->addOption(new ilRadioOption($lng->txt('use_customized_instructions'), 'custom'));
-	    $rgi_prop->setValue($this->object->isCustomWebfolderInstructionsEnabled() ? 'custom' : 'default');
-	    $form->addItem($rgi_prop);
-	    $tai_prop = new ilTextAreaInputGUI('', 'custom_webfolder_instructions');
-	    $tai_prop->setValue($this->object->getCustomWebfolderInstructions());
-	    $tai_prop->setInfo($lng->txt("webfolder_instructions_info"));
-	    $tai_prop->setRows(20);
-	    $form->addItem($tai_prop);
-	    
-	    // command buttons
-	    $form->addCommandButton('saveWebDAVSettings', $lng->txt('save'));
-	    $form->addCommandButton('view', $lng->txt('cancel'));
-	    
-	    return $form;
+
+	protected function initWebDAVSettingsForm()
+	{
+		global $DIC;
+
+		$lng = $DIC->language();
+
+		require_once("./Services/Form/classes/class.ilPropertyFormGUI.php");
+		require_once("./Services/Form/classes/class.ilCheckboxInputGUI.php");
+		require_once("./Services/Form/classes/class.ilRadioGroupInputGUI.php");
+		require_once("./Services/Form/classes/class.ilRadioOption.php");
+		require_once("./Services/Form/classes/class.ilTextAreaInputGUI.php");
+
+		$form = new ilPropertyFormGUI();
+		$form->setFormAction($DIC->ctrl()->getFormAction($this));
+		$form->setTitle($lng->txt("settings"));
+
+		// Enable webdav
+		$cb_prop = new ilCheckboxInputGUI($lng->txt("enable_webdav"), "enable_webdav");
+		$cb_prop->setValue('1');
+		$cb_prop->setChecked($this->object->isWebdavEnabled());
+		$cb_prop->setInfo($this->getAdditionalWebDAVInformation());
+		$form->addItem($cb_prop);
+
+		$rgi_prop = new ilRadioGroupInputGUI($lng->txt('webfolder_instructions'), 'custom_webfolder_instructions_choice');
+		$rgi_prop->addOption(new ilRadioOption($lng->txt('use_default_instructions'), 'default'));
+		$rgi_prop->addOption(new ilRadioOption($lng->txt('use_customized_instructions'), 'custom'));
+		$rgi_prop->setValue($this->object->isCustomWebfolderInstructionsEnabled() ? 'custom' : 'default');
+		$form->addItem($rgi_prop);
+		$tai_prop = new ilTextAreaInputGUI('', 'custom_webfolder_instructions');
+		$tai_prop->setValue($this->object->getCustomWebfolderInstructions());
+		$tai_prop->setInfo($lng->txt("webfolder_instructions_info"));
+		$tai_prop->setRows(20);
+		$form->addItem($tai_prop);
+
+		// command buttons
+		$form->addCommandButton('saveWebDAVSettings', $lng->txt('save'));
+		$form->addCommandButton('view', $lng->txt('cancel'));
+
+		return $form;
 	}
-	
+
 
 	/**
 	 * Edit settings.
 	 */
-	public function editWebDAVSettings() {
+	public function editWebDAVSettings()
+	{
 		global $DIC;
 		$rbacsystem = $DIC['rbacsystem'];
 		$ilErr = $DIC['ilErr'];
@@ -370,7 +349,8 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI {
 	/**
 	 * Save settings
 	 */
-	public function saveWebDAVSettings()  {
+	public function saveWebDAVSettings()
+	{
 		global $DIC;
 		$rbacsystem = $DIC['rbacsystem'];
 		$ilErr = $DIC['ilErr'];
@@ -379,44 +359,46 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI {
 		$lng = $DIC['lng'];
 
 		if (!$rbacsystem->checkAccess("write", $this->object->getRefId())) {
-		    ilUtil::sendFailure($DIC->language()->txt('no_permission'), true);
-		    $DIC->ctrl()->redirect($this, self::CMD_EDIT_WEBDAV_SETTINGS);
+			ilUtil::sendFailure($DIC->language()->txt('no_permission'), true);
+			$DIC->ctrl()->redirect($this, self::CMD_EDIT_WEBDAV_SETTINGS);
 		}
-		
+
 		$form = $this->initWebDAVSettingsForm();
-		if($form->checkInput())
-		{
-		    $this->object->setWebdavEnabled($_POST['enable_webdav'] == '1');
-		    //		$this->object->setWebdavActionsVisible($_POST['webdav_actions_visible'] == '1');
-		    $this->object->setCustomWebfolderInstructionsEnabled($_POST['custom_webfolder_instructions_choice'] == 'custom');
-		    $this->object->setCustomWebfolderInstructions(ilUtil::stripSlashes($_POST['custom_webfolder_instructions'], false));
-		    $this->object->update();
-		    ilUtil::sendSuccess($lng->txt('settings_saved'), true);
-		    $ilCtrl->redirect($this, self::CMD_EDIT_WEBDAV_SETTINGS);
-		}
-		else 
-		{
-		    $form->setValuesByPost();
-		    $tpl->setContent($form->getHTML());
+		if ($form->checkInput()) {
+			$this->object->setWebdavEnabled($_POST['enable_webdav'] == '1');
+			//		$this->object->setWebdavActionsVisible($_POST['webdav_actions_visible'] == '1');
+			$this->object->setCustomWebfolderInstructionsEnabled($_POST['custom_webfolder_instructions_choice'] == 'custom');
+			$this->object->setCustomWebfolderInstructions(ilUtil::stripSlashes($_POST['custom_webfolder_instructions'], false));
+			$this->object->update();
+			ilUtil::sendSuccess($lng->txt('settings_saved'), true);
+			$ilCtrl->redirect($this, self::CMD_EDIT_WEBDAV_SETTINGS);
+		} else {
+			$form->setValuesByPost();
+			$tpl->setContent($form->getHTML());
 		}
 	}
 
-	public function getAdditionalWebDAVInformation() {
+
+	public function getAdditionalWebDAVInformation()
+	{
 		global $DIC;
 		$lng = $DIC->language();
 
 		return $furtherInformation = sprintf($lng->txt('webdav_additional_information'), $this->getInstallationDocsLink());
 	}
 
+
 	public function getInstallationDocsLink()
 	{
 		return ilUtil::_getHttpPath() . self::INSTALL_README_PATH;
 	}
 
+
 	/**
 	 * called by prepare output
 	 */
-	function setTitleAndDescription() {
+	function setTitleAndDescription()
+	{
 		parent::setTitleAndDescription();
 		$this->tpl->setDescription($this->object->getDescription());
 	}
@@ -428,7 +410,8 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI {
 	/**
 	 * Add disk quota subtabs
 	 */
-	function addDiskQuotaSubtabs($a_active_subtab) {
+	function addDiskQuotaSubtabs($a_active_subtab)
+	{
 		global $DIC;
 		$ilCtrl = $DIC['ilCtrl'];
 		$ilTabs = $DIC['ilTabs'];
@@ -452,7 +435,8 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI {
 	/**
 	 * Edit disk quota settings.
 	 */
-	public function editDiskQuotaSettings() {
+	public function editDiskQuotaSettings()
+	{
 		global $DIC;
 		$rbacsystem = $DIC['rbacsystem'];
 		$ilErr = $DIC['ilErr'];
@@ -496,7 +480,8 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI {
 	/**
 	 * Save disk quota settings.
 	 */
-	public function saveDiskQuotaSettings() {
+	public function saveDiskQuotaSettings()
+	{
 		global $DIC;
 		$rbacsystem = $DIC['rbacsystem'];
 		$ilErr = $DIC['ilErr'];
@@ -516,7 +501,8 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI {
 	 * The disk quota report list shows user accounts, their disk quota and their
 	 * disk usage, as well as the last time a reminder was sent.
 	 */
-	public function viewDiskQuotaReport() {
+	public function viewDiskQuotaReport()
+	{
 		global $DIC;
 		$rbacsystem = $DIC['rbacsystem'];
 		$ilErr = $DIC['ilErr'];
@@ -592,23 +578,23 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI {
 		// title & header columns
 		$header_vars = array('login', 'firstname', 'lastname', 'email', 'access_until', 'last_login', 'disk_quota', 'disk_usage', 'last_reminder');
 		$tbl->setHeaderNames(array(
-				$lng->txt('login'),
-				$lng->txt('firstname'),
-				$lng->txt('lastname'),
-				$lng->txt('email'),
-				$lng->txt('access_until'),
-				$lng->txt('last_login'),
-				$lng->txt('disk_quota'),
-				$lng->txt('disk_usage'),
-				$lng->txt('last_reminder'),
-			));
+			$lng->txt('login'),
+			$lng->txt('firstname'),
+			$lng->txt('lastname'),
+			$lng->txt('email'),
+			$lng->txt('access_until'),
+			$lng->txt('last_login'),
+			$lng->txt('disk_quota'),
+			$lng->txt('disk_usage'),
+			$lng->txt('last_reminder'),
+		));
 		$tbl->setHeaderVars($header_vars, $this->ctrl->getParameterArray($this, 'viewDiskQuotaReport', false));
 
 		$tbl->enable("numinfo_header");
 		$tbl->setFormName("cmd");
 		$tbl->setSelectAllCheckbox("id");
 
-		// sorting 
+		// sorting
 		$tbl->setOrderColumn($_GET["sort_by"]);
 		$tbl->setOrderDirection($_GET["sort_order"]);
 
@@ -715,7 +701,8 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI {
 	}
 
 
-	protected function initDiskQuotaMailTemplateForm() {
+	protected function initDiskQuotaMailTemplateForm()
+	{
 		global $DIC;
 		$lng = $DIC['lng'];
 
@@ -776,7 +763,8 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI {
 	/**
 	 * Edit disk quota settings.
 	 */
-	public function editDiskQuotaMailTemplate(ilPropertyFormGUI $a_form = null) {
+	public function editDiskQuotaMailTemplate(ilPropertyFormGUI $a_form = null)
+	{
 		global $DIC;
 		$rbacsystem = $DIC['rbacsystem'];
 		$ilErr = $DIC['ilErr'];
@@ -817,7 +805,8 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI {
 	}
 
 
-	function saveDiskQuotaMailTemplate() {
+	function saveDiskQuotaMailTemplate()
+	{
 		global $DIC;
 		$lng = $DIC['lng'];
 
@@ -841,7 +830,8 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI {
 	/**
 	 * Initializes the upload settings form.
 	 */
-	private function initUploadSettingsForm() {
+	private function initUploadSettingsForm()
+	{
 		global $DIC;
 		$ilCtrl = $DIC['ilCtrl'];
 		$lng = $DIC['lng'];
@@ -917,7 +907,8 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI {
 	/**
 	 * Edit upload settings.
 	 */
-	public function editUploadSettings() {
+	public function editUploadSettings()
+	{
 		global $DIC;
 		$rbacsystem = $DIC['rbacsystem'];
 		$ilErr = $DIC['ilErr'];
@@ -953,7 +944,8 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI {
 	/**
 	 * Save upload settings
 	 */
-	public function saveUploadSettings() {
+	public function saveUploadSettings()
+	{
 		global $DIC;
 		$rbacsystem = $DIC['rbacsystem'];
 		$ilErr = $DIC['ilErr'];
@@ -990,7 +982,8 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI {
 	/**
 	 * Initializes the preview settings form.
 	 */
-	private function initPreviewSettingsForm() {
+	private function initPreviewSettingsForm()
+	{
 		global $DIC;
 		$ilCtrl = $DIC['ilCtrl'];
 		$lng = $DIC['lng'];
@@ -1032,7 +1025,8 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI {
 	/**
 	 * Edit preview settings.
 	 */
-	public function editPreviewSettings() {
+	public function editPreviewSettings()
+	{
 		global $DIC;
 		$rbacsystem = $DIC['rbacsystem'];
 		$ilErr = $DIC['ilErr'];
@@ -1084,7 +1078,8 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI {
 	/**
 	 * Save preview settings
 	 */
-	public function savePreviewSettings() {
+	public function savePreviewSettings()
+	{
 		global $DIC;
 		$rbacsystem = $DIC['rbacsystem'];
 		$ilErr = $DIC['ilErr'];
@@ -1114,7 +1109,8 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI {
 	}
 
 
-	public function addToExternalSettingsForm($a_form_id) {
+	public function addToExternalSettingsForm($a_form_id)
+	{
 		global $DIC;
 		$ilSetting = $DIC['ilSetting'];
 
@@ -1127,5 +1123,3 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI {
 		}
 	}
 }
-
-?>

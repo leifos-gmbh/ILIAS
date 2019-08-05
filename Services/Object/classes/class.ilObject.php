@@ -1183,10 +1183,11 @@ class ilObject
 	
 	/**
 	 * Set deleted date
-	 * @param type $a_ref_ids
-	 * @return type
+	 * @param int[] $a_ref_ids
+	 * @param int $a_user_id
+	 * @return void
 	 */
-	public static function setDeletedDates($a_ref_ids)
+	public static function setDeletedDates($a_ref_ids, $a_user_id = 0)
 	{
 		global $DIC;
 
@@ -1194,9 +1195,8 @@ class ilObject
 		$log = $DIC->logger()->root();
 		
 		$query = 'UPDATE object_reference SET deleted = '.$ilDB->now().' '.
-				'WHERE '.$ilDB->in('ref_id',(array) $a_ref_ids,false,'integer');
-
-		$log->debug(__METHOD__.': Query is '. $query);
+			'deleted_by = ' . $ilDB->quote($a_user_id, ilDBConstants::T_INTEGER).' '.
+			'WHERE '.$ilDB->in('ref_id',(array) $a_ref_ids,false,'integer');
 		$ilDB->manipulate($query);
 		return;
 	}

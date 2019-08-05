@@ -136,7 +136,8 @@ class ilSoapCourseAdministration extends ilSoapAdministration
 
 		global $DIC;
 
-		$tree = $DIC['tree'];
+		$tree = $DIC->repositoryTree();
+		$user = $DIC->user();
 		$rbacadmin = $DIC['rbacadmin'];
 		$log = $DIC['log'];
 
@@ -154,7 +155,7 @@ class ilSoapCourseAdministration extends ilSoapAdministration
 			$affected_users = ilUtil::removeItemFromDesktops($subnode["child"]);
 				
 		}
-		if(!$tree->saveSubTree($course_id,true))
+		if(!$tree->moveToTrash($course_id, true, $user->getId()))
 		{
 			return $this->__raiseError('Node already deleted','Client');
 		}

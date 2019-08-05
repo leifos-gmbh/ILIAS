@@ -225,7 +225,7 @@ class ilObjectTest extends TestCase
 		// isSaved() uses internal cache!
 		$tree->useCache(false);
 		
-		$tree->saveSubTree($ref_id, true);
+		$tree->moveToTrash($ref_id, true);
 		if ($tree->isDeleted($ref_id))
 		{
 			$value.= "tree3-";

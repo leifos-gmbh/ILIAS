@@ -58,6 +58,7 @@ class ilRepUtil
 		$tree = $DIC->repositoryTree();
 		$lng = $DIC->language();
 		$ilSetting = $DIC->settings();
+		$user = $DIC->user();
 
 		$log = $ilLog;
 		
@@ -172,7 +173,7 @@ throw new ilRepositoryException($lng->txt("ilRepUtil::deleteObjects: Type inform
 				include_once('./Services/WebServices/ECS/classes/class.ilECSObjectSettings.php');
 				ilECSObjectSettings::_handleDelete($subnodes);				
 
-				if(!$tree->saveSubTree($id, true))
+				if(!$tree->moveToTrash($id, true, $user->getId()))
 				{
 					$log->write(__METHOD__.': Object with ref_id: '.$id.' already deleted.');
 					throw new ilRepositoryException($lng->txt("msg_obj_already_deleted"));

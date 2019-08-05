@@ -1020,9 +1020,10 @@ class ilSoapObjectAdministration extends ilSoapAdministration
 		}
 		global $DIC;
 
-		$tree = $DIC['tree'];
+		$tree = $DIC->repositoryTree();
 		$rbacsystem = $DIC['rbacsystem'];
 		$rbacadmin = $DIC['rbacadmin'];
+		$user = $DIC->user();
 
 		if(!$del_obj =& ilObjectFactory::getInstanceByRefId($reference_id,false))
 		{
@@ -1053,7 +1054,7 @@ class ilSoapObjectAdministration extends ilSoapAdministration
 			// remove item from all user desktops
 			$affected_users = ilUtil::removeItemFromDesktops($subnode["child"]);
 		}
-		if(!$tree->saveSubTree($reference_id,true))
+		if(!$tree->moveToTrash($reference_id, true, $user->getId()))
 		{
 			return $this->__raiseError('Node already deleted','Client');
 		}

@@ -1194,7 +1194,7 @@ class ilObject
 		$ilDB = $DIC->database();
 		$log = $DIC->logger()->root();
 		
-		$query = 'UPDATE object_reference SET deleted = '.$ilDB->now().' '.
+		$query = 'UPDATE object_reference SET deleted = '.$ilDB->now().', '.
 			'deleted_by = ' . $ilDB->quote($a_user_id, ilDBConstants::T_INTEGER).' '.
 			'WHERE '.$ilDB->in('ref_id',(array) $a_ref_ids,false,'integer');
 		$ilDB->manipulate($query);

@@ -3915,7 +3915,11 @@ return array(
     'ilCourseReferenceDeleteConfirmationTableGUI' => $baseDir . '/../../Modules/CourseReference/classes/class.ilCourseReferenceDeleteConfirmationTableGUI.php',
     'ilCourseReferenceExporter' => $baseDir . '/../../Modules/CourseReference/classes/class.ilCourseReferenceExporter.php',
     'ilCourseReferenceImporter' => $baseDir . '/../../Modules/CourseReference/classes/class.ilCourseReferenceImporter.php',
+<<<<<<< Updated upstream
     'ilCourseReferencePathInfo' => $baseDir . '/../../Modules/CourseReference/classes/class.ilCourseReferencePathInfo.php',
+=======
+    'ilCourseReferenceLP' => $baseDir . '/../../Modules/CourseReference/classes/class.ilCourseReferenceLP.php',
+>>>>>>> Stashed changes
     'ilCourseReferenceXmlParser' => $baseDir . '/../../Modules/CourseReference/classes/class.ilCourseReferenceXmlParser.php',
     'ilCourseReferenceXmlWriter' => $baseDir . '/../../Modules/CourseReference/classes/class.ilCourseReferenceXmlWriter.php',
     'ilCourseRegistrationGUI' => $baseDir . '/../../Modules/Course/classes/class.ilCourseRegistrationGUI.php',
@@ -5903,7 +5907,6 @@ return array(
     'ilOerHarvester' => $baseDir . '/../../Services/MetaData/OerHarvester/classes/class.ilOerHarvester.php',
     'ilOerHarvesterObjectStatus' => $baseDir . '/../../Services/MetaData/OerHarvester/classes/class.ilOerHarvesterObjectStatus.php',
     'ilOerHarvesterSettings' => $baseDir . '/../../Services/MetaData/OerHarvester/classes/class.ilOerHarvesterSettings.php',
-    'ilOnScreenChat' => $baseDir . '/../../Services/OnScreenChat/classes/class.ilOnScreenChat.php',
     'ilOnScreenChatAppEventListener' => $baseDir . '/../../Services/OnScreenChat/classes/class.ilOnScreenChatAppEventListener.php',
     'ilOnScreenChatGUI' => $baseDir . '/../../Services/OnScreenChat/classes/class.ilOnScreenChatGUI.php',
     'ilOnScreenChatMenuGUI' => $baseDir . '/../../Services/OnScreenChat/classes/class.ilOnScreenChatMenuGUI.php',

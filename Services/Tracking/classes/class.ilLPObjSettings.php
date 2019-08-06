@@ -46,6 +46,7 @@ class ilLPObjSettings
 	const LP_MODE_COLLECTION_MOBS = 21;
 	const LP_MODE_STUDY_PROGRAMME = 22;
 	const LP_MODE_INDIVIDUAL_ASSESSMENT = 23;
+	const LP_MODE_COURSE_REFERENCE = 24;
 
 	const LP_DEFAULT_VISITS = 30; // ???
 	
@@ -121,9 +122,19 @@ class ilLPObjSettings
 
 		,self::LP_MODE_INDIVIDUAL_ASSESSMENT => array('ilLPStatusIndividualAssessment',
 			'trac_mode_individual_assessment', 'trac_mode_individual_assessment_info')
+
+		,self::LP_MODE_COURSE_REFERENCE => [
+			'ilLPStatusCourseReference',
+			'trac_mode_course_reference',
+			'trac_mode_course_reference_info'
+		]
 	);
 
-	function __construct($a_obj_id)
+	/**
+	 * ilLPObjSettings constructor.
+	 * @param int $a_obj_id
+	 */
+	public function __construct($a_obj_id)
 	{
 		global $DIC;
 

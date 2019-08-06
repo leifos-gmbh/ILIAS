@@ -78,6 +78,7 @@ class ilLPCollectionOfRepositoryObjects extends ilLPCollection
 						case 'iass':
 						case 'copa':
 						case 'lso':
+						case 'crsr':
 							if(!$a_full_data)
 							{
 								$all_possible[] = $item_ref_id;

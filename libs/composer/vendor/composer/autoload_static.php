@@ -4252,11 +4252,8 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
         'ilCourseReferenceDeleteConfirmationTableGUI' => __DIR__ . '/../..' . '/../../Modules/CourseReference/classes/class.ilCourseReferenceDeleteConfirmationTableGUI.php',
         'ilCourseReferenceExporter' => __DIR__ . '/../..' . '/../../Modules/CourseReference/classes/class.ilCourseReferenceExporter.php',
         'ilCourseReferenceImporter' => __DIR__ . '/../..' . '/../../Modules/CourseReference/classes/class.ilCourseReferenceImporter.php',
-<<<<<<< Updated upstream
-        'ilCourseReferencePathInfo' => __DIR__ . '/../..' . '/../../Modules/CourseReference/classes/class.ilCourseReferencePathInfo.php',
-=======
         'ilCourseReferenceLP' => __DIR__ . '/../..' . '/../../Modules/CourseReference/classes/class.ilCourseReferenceLP.php',
->>>>>>> Stashed changes
+        'ilCourseReferencePathInfo' => __DIR__ . '/../..' . '/../../Modules/CourseReference/classes/class.ilCourseReferencePathInfo.php',
         'ilCourseReferenceXmlParser' => __DIR__ . '/../..' . '/../../Modules/CourseReference/classes/class.ilCourseReferenceXmlParser.php',
         'ilCourseReferenceXmlWriter' => __DIR__ . '/../..' . '/../../Modules/CourseReference/classes/class.ilCourseReferenceXmlWriter.php',
         'ilCourseRegistrationGUI' => __DIR__ . '/../..' . '/../../Modules/Course/classes/class.ilCourseRegistrationGUI.php',
@@ -6244,6 +6241,7 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
         'ilOerHarvester' => __DIR__ . '/../..' . '/../../Services/MetaData/OerHarvester/classes/class.ilOerHarvester.php',
         'ilOerHarvesterObjectStatus' => __DIR__ . '/../..' . '/../../Services/MetaData/OerHarvester/classes/class.ilOerHarvesterObjectStatus.php',
         'ilOerHarvesterSettings' => __DIR__ . '/../..' . '/../../Services/MetaData/OerHarvester/classes/class.ilOerHarvesterSettings.php',
+        'ilOnScreenChat' => __DIR__ . '/../..' . '/../../Services/OnScreenChat/classes/class.ilOnScreenChat.php',
         'ilOnScreenChatAppEventListener' => __DIR__ . '/../..' . '/../../Services/OnScreenChat/classes/class.ilOnScreenChatAppEventListener.php',
         'ilOnScreenChatGUI' => __DIR__ . '/../..' . '/../../Services/OnScreenChat/classes/class.ilOnScreenChatGUI.php',
         'ilOnScreenChatMenuGUI' => __DIR__ . '/../..' . '/../../Services/OnScreenChat/classes/class.ilOnScreenChatMenuGUI.php',

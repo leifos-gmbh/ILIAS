@@ -270,6 +270,13 @@ class Container extends \Pimple\Container {
 		return new \ilUIService($this->http()->request(), $this->ui());
 	}
 
+	/**
+	 * @return \ILIAS\API\API
+	 */
+	public function api(): \ILIAS\API\API {
+		return new \ILIAS\API\API();
+	}
+
 
 	/**
 	 * Note: Only use isDependencyAvailable if strictly required. The need for this,

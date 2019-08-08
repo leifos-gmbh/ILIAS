@@ -5128,6 +5128,7 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
         'ilLPStatusCollectionMobs' => __DIR__ . '/../..' . '/../../Services/Tracking/classes/status/class.ilLPStatusCollectionMobs.php',
         'ilLPStatusCollectionTLT' => __DIR__ . '/../..' . '/../../Services/Tracking/classes/status/class.ilLPStatusCollectionTLT.php',
         'ilLPStatusContentVisited' => __DIR__ . '/../..' . '/../../Services/Tracking/classes/status/class.ilLPStatusContentVisited.php',
+        'ilLPStatusCourseReference' => __DIR__ . '/../..' . '/../../Services/Tracking/classes/status/class.ilLPStatusCourseReference.php',
         'ilLPStatusEvent' => __DIR__ . '/../..' . '/../../Services/Tracking/classes/status/class.ilLPStatusEvent.php',
         'ilLPStatusExerciseReturned' => __DIR__ . '/../..' . '/../../Services/Tracking/classes/status/class.ilLPStatusExerciseReturned.php',
         'ilLPStatusFactory' => __DIR__ . '/../..' . '/../../Services/Tracking/classes/class.ilLPStatusFactory.php',

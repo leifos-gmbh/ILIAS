@@ -4791,6 +4791,7 @@ return array(
     'ilLPStatusCollectionMobs' => $baseDir . '/../../Services/Tracking/classes/status/class.ilLPStatusCollectionMobs.php',
     'ilLPStatusCollectionTLT' => $baseDir . '/../../Services/Tracking/classes/status/class.ilLPStatusCollectionTLT.php',
     'ilLPStatusContentVisited' => $baseDir . '/../../Services/Tracking/classes/status/class.ilLPStatusContentVisited.php',
+    'ilLPStatusCourseReference' => $baseDir . '/../../Services/Tracking/classes/status/class.ilLPStatusCourseReference.php',
     'ilLPStatusEvent' => $baseDir . '/../../Services/Tracking/classes/status/class.ilLPStatusEvent.php',
     'ilLPStatusExerciseReturned' => $baseDir . '/../../Services/Tracking/classes/status/class.ilLPStatusExerciseReturned.php',
     'ilLPStatusFactory' => $baseDir . '/../../Services/Tracking/classes/class.ilLPStatusFactory.php',

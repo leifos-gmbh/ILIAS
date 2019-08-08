@@ -557,7 +557,7 @@ class ilSkillTreeNodeGUI
 			} else
 			{
 				$this->form->addCommandButton("update", $lng->txt("save"));
-				$this->form->setTitle($lng->txt("skmg_edit_" . $this->getType())); // Bug, hier fehlt die Sprachvariable
+				$this->form->setTitle($lng->txt("skmg_edit_" . $this->getType()));
 			}
 		}
 		

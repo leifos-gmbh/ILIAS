@@ -109,3 +109,8 @@ if($read_ops_id && $edit_ops_id)
 <?php
 $ilCtrlStructureReader->getStructure();
 ?>
+
+<#10>
+<?php
+$ilCtrlStructureReader->getStructure();
+?>

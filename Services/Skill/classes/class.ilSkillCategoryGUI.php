@@ -189,7 +189,7 @@ class ilSkillCategoryGUI extends ilSkillTreeNodeGUI
 
 		// description
 		$ta = new ilTextAreaInputGUI($lng->txt("description"), "description");
-		$ta->setRows(1);
+		$ta->setRows(5);
 		$this->form->addItem($ta);
 		
 		// order nr

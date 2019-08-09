@@ -187,9 +187,15 @@ class ilSkillTemplateReferenceGUI extends ilBasicSkillTemplateGUI
 		$this->form->addItem($ti);
 
 		// description
-		$ta = new ilTextAreaInputGUI($lng->txt("description"), "description");
-		$ta->setRows(1);
-		$this->form->addItem($ta);
+		if ($a_mode == "edit") {
+			$desc = ilSkillTreeNode::_lookupDescription($this->node_object->getSkillTemplateId());
+			if (!empty($desc)) {
+				$ne = new ilNonEditableValueGUI($lng->txt("description"), "template_description");
+				$ne->setValue($desc);
+				$ne->setInfo($lng->txt("skmg_description_info"));
+				$this->form->addItem($ne);
+			}
+		}
 		
 		// order nr
 		$ni = new ilNumberInputGUI($lng->txt("skmg_order_nr"), "order_nr");

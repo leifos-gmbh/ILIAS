@@ -1813,7 +1813,7 @@ class ilPersonalSkillsGUI
 		$tpl = new ilTemplate("tpl.skill_description_category.html", true, true, "Services/Skill");
 
 		//if (ilSkillTreeNode::_lookupType($skill_id) == "scat") {
-			$des = ilSkillTreeNode::_lookupDescription($skill_id, $tref_id);
+			$des = ilSkillTreeNode::_lookupDescription($skill_id);
 			if (!is_null($des) && !empty($des)) {
 				$tpl->setCurrentBlock("description_category");
 				$tpl->setVariable("DESCRIPTION_CATEGORY", $des);

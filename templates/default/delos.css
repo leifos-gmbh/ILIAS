@@ -13815,7 +13815,7 @@ th.ilSkillEntryHead {
 .ilSkillLevelDescription,
 .ilSkillMaterial,
 .ilSkillSuggResources {
-  padding: 15px 10px 10px 0px;
+  padding: 5px 10px 5px 15px;
 }
 .ilSkillLevelDescription > .row > div,
 .ilSkillMaterial > .row > div,

@@ -40,6 +40,7 @@ class ilSkillAppEventListener implements ilAppEventListener
 								{
 									ilBasicSkill::writeUserSkillLevelStatus($sk["level_id"], $usr_id,
 										$ref_id, $sk["tref_id"]);
+									ilPersonalSkill::addPersonalSkill($usr_id, $sk["base_skill_id"]);
 								}
 							}
 						}

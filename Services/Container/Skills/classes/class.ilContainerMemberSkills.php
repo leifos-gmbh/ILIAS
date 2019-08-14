@@ -213,6 +213,7 @@ class ilContainerMemberSkills
 			$sk = explode(":", $sk);
 			ilBasicSkill::writeUserSkillLevelStatus($l, $this->user_id, $a_ref_id, $sk[1], ilBasicSkill::ACHIEVED,
 				false, false, $this->obj_id);
+			ilPersonalSkill::addPersonalSkill($this->getUserId(), $sk[0]);
 		}
 
 		$db->manipulate("UPDATE cont_member_skills SET ".

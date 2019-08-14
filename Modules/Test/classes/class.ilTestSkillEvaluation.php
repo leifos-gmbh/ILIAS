@@ -352,6 +352,7 @@ class ilTestSkillEvaluation
 		foreach($this->getReachedSkillLevels() as $reachedSkillLevel)
 		{
 			$this->invokeSkillLevelTrigger($reachedSkillLevel['sklLevelId'], $reachedSkillLevel['sklTrefId']);
+			ilPersonalSkill::addPersonalSkill($this->getUserId(), $reachedSkillLevel['sklBaseId']);
 		}
 	}
 

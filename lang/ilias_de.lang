@@ -14,6 +14,12 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+crs#:#timings_cron_reminder_freshly_start#:#Der Bearbeitungszeitraum hat begonnen bei:
+crs#:#timings_cron_reminder_started_subject#:#Der Bearbeitungszeitraum hat begonnen
+crs#:#timings_cron_reminder_exceeded_subject#:#Sie haben den Bearbeitungszeitraum überschritten
+crs#:#timings_cron_reminder_exceeded_start#:#Der Bearbeitungszeitraum ist überfällig bei:
+crs#:#timings_reminder_notifications#:#Benachrichtigungen zur Lernplanung versenden
+crs#:#timings_reminder_notifications_info#:#Wenn aktiviert, werden Kursteilnehmer über überschrittene Lernplanungsmaterialien informiert.
 acc#:#acc_access_key#:#Access-Key
 acc#:#acc_access_keys#:#Access-Keys
 acc#:#acc_comp_frm#:#Forum
@@ -8543,6 +8549,7 @@ file#:#personal_workspace_quota_status_legend#:#Sie belegen %1$s Ihrer Disk-Quot
 file#:#replace_file_info#:#Alle Dateiversionen werden gelöscht.
 file#:#upload_info#:#Datei
 file#:#upload_info_desc#:#Sie können die Dateien und die Dateiversionen im Tab "Versionen" verwalten.
+file#:#generate_sanitize_report#:#Report über nicht erreichbare Dateien
 file#:#repository_disk_quota#:#Disk-Quota für Magazin
 file#:#repository_disk_quota_info#:#Wenn aktiviert, werden für alle Benutzer die Disk-Quota im Magazin geprüft und optional E-Mails an Administratoren und Benutzer versendet.
 fm#:#fm_settings_active#:#Dateimanager aktivieren
@@ -12967,6 +12974,7 @@ skmg#:#skmg_confirm_level_resources_removal#:#Wollen Sie wirklich die folgenden 
 skmg#:#skmg_confirm_remove_level_ass#:#Wollen Sie wirklich die folgenden Kompetenzausprägungen aus dem Profil entfernen?
 skmg#:#skmg_confirm_user_removal#:#Wollen Sie wirklich die folgenden Benutzer aus dem Profil entfernen?
 skmg#:#skmg_create_sctp#:#Vorlagenkategorie erstellen
+skmg#:#skmg_edit_sctp#:#Vorlagenkategorie bearbeiten
 skmg#:#skmg_create_skill_category#:#Kategorie erstellen
 skmg#:#skmg_create_skill_template#:#Vorlage erstellen
 skmg#:#skmg_create_skill_template_category#:#Vorlagenkategorie erstellen

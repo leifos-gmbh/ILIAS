@@ -129,7 +129,15 @@ return;
 				{
 					ilBasicSkill::writeUserSkillLevelStatus($nl["new_level_id"],
 						$app["user_id"], $this->survey->getRefId(), $nl["tref_id"], ilBasicSkill::ACHIEVED);
-					ilPersonalSkill::addPersonalSkill($app["user_id"], $nl["base_skill_id"]);
+
+					if ($nl["tref_id"] > 0)
+					{
+						ilPersonalSkill::addPersonalSkill($app["user_id"], $nl["tref_id"]);
+					}
+					else
+					{
+						ilPersonalSkill::addPersonalSkill($app["user_id"], $nl["base_skill_id"]);
+					}
 				}
 			}
 		}

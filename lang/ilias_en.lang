@@ -1750,6 +1750,7 @@ common#:#add_member#:#Add Member
 common#:#add_new_user_defined_field#:#Add New Custom Field
 common#:#add_note#:#Add Note
 common#:#add_parameter#:#New Parameter
+common#:#add_role#:#Add Role
 common#:#add_translation#:#Add translation
 common#:#add_user_defined_field#:#Add New Field
 common#:#add_user#:#Add Local User
@@ -6926,9 +6927,9 @@ search#:#search_crs_title#:#Course Name
 search#:#search_details_info#:#Detailed search. Please select one or more resource types.
 search#:#search_direct#:#Direct search
 search#:#search_fast_info#:#Search for titles, descriptions and keywords in all object types
-search#:#search_for_crs_members#:#Search for Course Members
-search#:#search_for_grp_members#:#Search for Group Members
-search#:#search_for_role_members#:#Search for Role Members
+search#:#search_for_crs_members#:#Search for Courses
+search#:#search_for_grp_members#:#Search for Groups
+search#:#search_for_role_members#:#Search for Roles
 search#:#search_for_users#:#Search for users
 search#:#search_full_info#:#Choose this option to search in a large amount of data.
 search#:#search_grp_title#:#Group Name
@@ -10838,6 +10839,8 @@ skmg#:#skmg_select_skill_level_assign#:#Please select a skill.
 skmg#:#skmg_confirm_remove_level_ass#:#So you really want to remove the following competence levels from the profile?
 skmg#:#skmg_assigned_users#:#Assigned Users
 skmg#:#skmg_assign_user#:#Assign User
+skmg#:#skmg_add_assignment#:#Add Assignment
+skmg#:#skmg_add_user_to_profile#:#Add user(s) or role(s) to profile
 skmg#:#skmg_confirm_user_removal#:#Do you really want to remove the following users from this profile?
 skmg#:#skmg_resources#:#Resources
 skmg#:#skmg_add_resource#:#Add Resource

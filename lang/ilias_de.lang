@@ -2969,6 +2969,7 @@ common#:#add_new_user_defined_field#:#Neues benutzerdefiniertes Feld anlegen
 common#:#add_note#:#Notiz hinzufügen
 common#:#add_parameter#:#Neuer Parameter
 common#:#add_remove_edit_entries_of_main_menu#:#Hinzufügen, entfernen oder bearbeiten von Einträgen im Hauptmenü
+common#:#add_role#:#Rolle hinzufügen
 common#:#add_translation#:#Übersetzung hinzufügen
 common#:#add_user#:#Lokalen Benutzer hinzufügen
 common#:#add_user_defined_field#:#Neues Feld anlegen
@@ -12785,9 +12786,9 @@ search#:#search_err_user_not_exist#:#Es konnte kein entsprechender Benutzer gefu
 search#:#search_fast_info#:#Suche nach Titeln, Beschreibungen und Schlagwörtern
 search#:#search_filter_by_type#:#Typfilter
 search#:#search_filter_cd#:#Filter nach Erstellungsdatum
-search#:#search_for_crs_members#:#Nach Kursmitgliedern suchen
-search#:#search_for_grp_members#:#Nach Gruppenmitgliedern suchen
-search#:#search_for_role_members#:#Nach Rollenmitgliedern suchen
+search#:#search_for_crs_members#:#Nach Kursen suchen
+search#:#search_for_grp_members#:#Nach Gruppen suchen
+search#:#search_for_role_members#:#Nach Rollen suchen
 search#:#search_for_users#:#Nach Benutzern suchen
 search#:#search_full_info#:#Diese Suchart benutzt einen Index, um in großen Datenmengen zu suchen.
 search#:#search_grp_title#:#Gruppenname
@@ -12961,6 +12962,8 @@ skmg#:#skmg_ass_materials_from_workspace#:#An dieser Stelle können Sie Material
 skmg#:#skmg_assign_level#:#Ausprägung zuordnen
 skmg#:#skmg_assign_materials#:#Materialien zuordnen
 skmg#:#skmg_assign_user#:#Benutzer zuordnen
+skmg#:#skmg_add_assignment#:#Zuordnung hinzufügen
+skmg#:#skmg_add_user_to_profile#:#Benutzer oder Rolle(n) hinzufügen
 skmg#:#skmg_assigned_profiles#:#Zugewiesene Profile
 skmg#:#skmg_assigned_skill_levels#:#Zugeordnete Kompetenzausprägungen
 skmg#:#skmg_assigned_users#:#Zugeordnete Benutzer

@@ -586,6 +586,7 @@ assessment#:#tst_conflict_reset_fbh_force#:#Die Einstellung "Antworten nach Rüc
 assessment#:#enlarge#:#vergrößern
 assessment#:#enter_anonymous_code#:#Zugangsschlüssel für anonymen Zugang
 assessment#:#enter_enough_positive_points#:#Die maximale Punktezahl für die Frage muss größer als Null sein! Bitte geben Sie ausreichend viele nicht-negative Punkte für die Antworten ein.
+assessment#:#enter_enough_positive_points_checked#:#Mindestens eine Antwort muss Punkte erziehlen. Bitte geben Sie eine positive Punktezahl für das Auwählen einer Antwort ein.
 assessment#:#err_no_numeric_value#:#Bitte geben Sie einen numerischen Wert ein
 assessment#:#error_importing_question#:#Beim Importieren der Frage(n) ist ein Fehler aufgetreten!
 assessment#:#error_open_image_file#:#Fehler beim Öffnen einer Bilddatei!
@@ -746,7 +747,7 @@ assessment#:#ass_lac_expression#:#Ausdruck
 assessment#:#ass_lac_unable_to_parse_condition#:#Der Ausdruck "%s" kann nicht validiert werden.
 assessment#:#tst_skill_triggerings_num_req_answers#:#Benötigte Anzahl Antworten für Kompetenzerhebungen
 assessment#:#tst_skill_triggerings_num_req_answers_desc#:#Kompetenzen werden erst erhoben, wenn mindestens diese Anzahl Antworten zur Berechnung der Kompetenz-Ausprägung beitragen.
-assessment#:#tst_skill_triggerings_num_req_answers_not_reached_warn#:#Mindestens eine im Test adressierte Kompetenz ist nicht ausreichend vielen Fragen zugeordnet.<br />Die Mindestanzahl für zugewiesene Fragen: %s
+assessment#:#tst_skill_triggerings_num_req_answers_not_reached_warn#:#Mindestens eine im Test adressierte Kompetenz ist nicht ausreichend vielen Fragen zugeordnet. Für diese Kompetenzen werden keine Kompetenzeinträge für Teilnehmer erfasst.<br />Die Mindestanzahl für zugewiesene Fragen: %s
 assessment#:#qpl_qst_skl_usg_skill_col#:#Kompetenz
 assessment#:#qpl_qst_skl_usg_numq_col#:#Fragenanzahl im gesamten Pool, welche die Kompetenz adressieren
 assessment#:#qpl_qst_skl_usg_sklpnt_col#:#Summe aller Kompetenzpunkte je Kompetenz
@@ -6610,10 +6611,10 @@ mail#:#mail_system_sys_env_from_addr#:#Technischer Absender
 mail#:#mail_system_sys_signature#:#Signatur
 mail#:#mail_s#:#Mails
 mail#:#mail_salutation_anonymous#:#Hallo
-mail#:#mail_salutation_f#:#Hallo
+mail#:#mail_salutation_f#:#Sehr geehrte Frau
 mail#:#mail_salutation_female#:#Ausgabe für Platzhalter [MAIL_SALUTATION], wenn Empfänger 'Frau'
 mail#:#mail_salutation_general#:#Ausgabe für Platzhalter [MAIL_SALUTATION], wenn keine Anrede angegeben oder gewünscht
-mail#:#mail_salutation_m#:#Hallo
+mail#:#mail_salutation_m#:#Sehr geehrter Herr
 mail#:#mail_salutation_male#:#Ausgabe für Platzhalter [MAIL_SALUTATION], wenn Empfänger 'Herr'
 mail#:#mail_salutation_n#:#Hallo
 mail#:#mail_saved#:#Ihre Mail wurde gespeichert
@@ -8250,6 +8251,7 @@ skmg#:#skmg_cert_skill_level_title#:#Titel Kompetenzausprägung
 skmg#:#skmg_cert_skill_title#:#Titel Kompetenz
 skmg#:#skmg_cert_skill_trigger_title#:#Titel Auslöser
 skmg#:#skmg_create_sctp#:#Vorlagenkategorie erstellen
+skmg#:#skmg_edit_sctp#:#Vorlagenkategorie bearbeiten
 skmg#:#skmg_create_skill_category#:#Kategorie erstellen
 skmg#:#skmg_create_skill_template#:#Vorlage erstellen
 skmg#:#skmg_create_skill_template_category#:#Vorlagenkategorie erstellen
@@ -14246,3 +14248,4 @@ lti#:#lti_cron_title#:#LTI Outcome Service
 lti#:#lti_cron_title_desc#:#Überträgt den Lernfortschritt von LTI-Benutzern an die aufrufende Plattform. Dieser Cron-Job wird nur in den Fällen benötigt, wenn der Lernfortschritt aufgrund von Einstellungsänderungen neu berechnet werden muss. 
 dateplaner#:#cal_usr_info#:#Informationen zum Termin
 content#:#msg_no_page_access#:#Sie sind nicht berechtigt auf diese Seite zuzugreifen.
+forum#:#frm_move_invalid_file_type#:#Das ausgewählte Thema "%s" hat einen nicht unterstützten Dateitypen im Dateianhang. Entfernen Sie diese Datei oder kontaktieren Sie den Administrator, um den Dateitypen zur Positivliste hinzuzufügen.

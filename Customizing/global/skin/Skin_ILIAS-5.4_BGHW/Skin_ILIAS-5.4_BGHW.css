@@ -17261,6 +17261,9 @@ h3.ilBlockHeader {
 .ilObjListRow:hover {
   background-color: white;
 }
+.card-title .btn {
+  font-size: 100%;
+}
 /*BUTTONS*/
 .btn-default {
   color: white;
@@ -17498,7 +17501,6 @@ div#il_startup_logo {
 }
 .ilStartupSection {
   padding-top: 0px;
-  margin-top: 50px;
   text-align: center;
 }
 .ilStartupSection .ilFormHeader {

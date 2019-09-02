@@ -308,7 +308,7 @@ class ilPortfolioExerciseGUI
      * @param int $ass_id
      * @return object
      */
-    public function getSubmitButton(int $ass_id): object
+    public function getSubmitButton(int $ass_id)
     {
         $ilCtrl = $this->ctrl;
         $ui = $this->ui;
@@ -332,7 +332,7 @@ class ilPortfolioExerciseGUI
      * @param
      * @return
      */
-    public function getDownloadSubmissionButton(int $ass_id): object
+    public function getDownloadSubmissionButton(int $ass_id)
     {
         $ilCtrl = $this->ctrl;
         $lng = $this->lng;

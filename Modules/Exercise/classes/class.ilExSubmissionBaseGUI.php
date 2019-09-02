@@ -35,6 +35,11 @@ abstract class ilExSubmissionBaseGUI
 	protected $submission; // [ilExSubmission]
 	protected $assignment; // [ilExAssignment]
 
+    /**
+     * @var \ILIAS\GlobalScreen\ScreenContext\ContextServices
+     */
+    protected $tool_context;
+
 	/**
 	 * @var ilExAssignmentTypesGUI
 	 */
@@ -61,6 +66,7 @@ abstract class ilExSubmissionBaseGUI
 
 		include_once("./Modules/Exercise/AssignmentTypes/GUI/classes/class.ilExAssignmentTypesGUI.php");
 		$this->type_guis = ilExAssignmentTypesGUI::getInstance();
+        $this->tool_context = $DIC->globalScreen()->tool()->context();
 
 	}
 	
@@ -124,4 +130,15 @@ abstract class ilExSubmissionBaseGUI
 		// #16532 - always send notifications
 		$this->handleNewUpload();
 	}
+
+    /**
+     * Trigger assigment tool
+     */
+    protected function triggerAssignmentTool()
+    {
+        $ass_ids = [$this->assignment->getId()];
+        $this->tool_context->current()->addAdditionalData(ilExerciseGSToolProvider::SHOW_EXC_ASSIGNMENT_INFO, true);
+        $this->tool_context->current()->addAdditionalData(ilExerciseGSToolProvider::EXC_ASS_IDS, $ass_ids);
+    }
+
 }

@@ -100,7 +100,7 @@ class ilExSubmissionTextGUI extends ilExSubmissionBaseGUI
 		{
 			$text = new ilTextAreaInputGUI($this->lng->txt("exc_your_text"), "atxt");
 			$text->setRequired((bool)$this->submission->getAssignment()->getMandatory());				
-			$text->setRows(40);
+			$text->setRows(30);
 			$text->setMaxNumOfChars($this->assignment->getMaxCharLimit());
 			$text->setMinNumOfChars($this->assignment->getMinCharLimit());
 
@@ -168,7 +168,10 @@ class ilExSubmissionTextGUI extends ilExSubmissionBaseGUI
 			ilUtil::sendFailure($this->lng->txt("exercise_time_over"), true);
 			$ilCtrl->redirect($this, "returnToParent");
 		}
-		
+
+        $this->triggerAssignmentTool();
+
+		/*
 		$deadline = max($this->assignment->getDeadline(), $this->assignment->getExtendedDeadline());
 		if($deadline)
 		{			
@@ -187,7 +190,7 @@ class ilExSubmissionTextGUI extends ilExSubmissionBaseGUI
 			}
 			
 			ilUtil::sendInfo($this->lng->txt("exc_edit_until").": ".$dl_info);
-		}
+		}*/
 		
 		$this->handleTabs();
 

@@ -192,9 +192,9 @@ class ilExAssignmentGUI
 
 		$info = new ilExAssignmentInfo($a_ass->getId(), $ilUser->getId());
 		$inst = $info->getInstructionInfo();
-
 		if (count($inst) > 0)
 		{
+            $a_info->addSection($inst["instruction"]["txt"]);
 			$a_info->addProperty("", $inst["instruction"]["value"]);
 		}
 	}

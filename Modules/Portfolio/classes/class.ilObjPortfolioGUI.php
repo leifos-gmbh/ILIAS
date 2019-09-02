@@ -94,27 +94,10 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
 		$next_class = $this->ctrl->getNextClass($this);
 		$cmd = $this->ctrl->getCmd("view");		
 		
-		/*
-		if($_REQUEST["ecal"])
-		{	
-			$cmd = "preview";
-			$next_class = "";
-		}
-		*/
 
 		// trigger assignment tool
-        $pe = new ilPortfolioExercise($this->user_id, $this->object->getId());
-        $pe_gui = new ilPortfolioExerciseGUI($this->user_id, $this->object->getId());
-        $assignments = $pe->getAssignmentsOfPortfolio();
-        if (count($assignments) > 0) {
-            $ass_ids = array_map(function ($i) {
-                return $i["ass_id"];
-            }, $assignments);
-            $this->tool_context->current()->addAdditionalData(ilExerciseGSToolProvider::SHOW_EXC_ASSIGNMENT_INFO, true);
-            $this->tool_context->current()->addAdditionalData(ilExerciseGSToolProvider::EXC_ASS_IDS, $ass_ids);
-            $this->tool_context->current()->addAdditionalData(ilExerciseGSToolProvider::EXC_ASS_BUTTONS, $pe_gui->getActionButtons());
-        }
-		
+		$this->triggerAssignmentTool();
+
 		switch($next_class)
 		{
 			case "ilworkspaceaccessgui";	
@@ -201,7 +184,27 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
 
 		return true;
 	}
-	
+
+	/**
+	 * Trigger assignment tool
+	 *
+	 * @param
+	 */
+	protected function triggerAssignmentTool()
+	{
+        $pe = new ilPortfolioExercise($this->user_id, $this->object->getId());
+        $pe_gui = new ilPortfolioExerciseGUI($this->user_id, $this->object->getId());
+        $assignments = $pe->getAssignmentsOfPortfolio();
+        if (count($assignments) > 0) {
+            $ass_ids = array_map(function ($i) {
+                return $i["ass_id"];
+            }, $assignments);
+            $this->tool_context->current()->addAdditionalData(ilExerciseGSToolProvider::SHOW_EXC_ASSIGNMENT_INFO, true);
+            $this->tool_context->current()->addAdditionalData(ilExerciseGSToolProvider::EXC_ASS_IDS, $ass_ids);
+            $this->tool_context->current()->addAdditionalData(ilExerciseGSToolProvider::EXC_ASS_BUTTONS, $pe_gui->getActionButtons());
+        }
+    }
+
 	protected function setTabs()
 	{
 		$ilHelp = $this->help;

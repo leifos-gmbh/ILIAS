@@ -109,14 +109,16 @@ class ilExerciseGSToolProvider extends AbstractDynamicToolProvider
 
             // instruction files
             $files = $info->getInstructionFileInfo($readable_ref_id);
-            $list = $ui->factory()->listing()->unordered(array_map(function($i) use ($ui) {
-                $v = $i["txt"];
-                if ($i["value"] != "") {
-                    $v =$ui->renderer()->render($ui->factory()->button()->shy($v, $i["value"]));
-                }
-                return $v;
-            }, $files));
-            $this->addSection($tpl, $lng->txt("exc_instruction_files"), $ui->renderer()->render($list));
+            if (is_array($files)) {
+                $list = $ui->factory()->listing()->unordered(array_map(function ($i) use ($ui) {
+                    $v = $i["txt"];
+                    if ($i["value"] != "") {
+                        $v = $ui->renderer()->render($ui->factory()->button()->shy($v, $i["value"]));
+                    }
+                    return $v;
+                }, $files));
+                $this->addSection($tpl, $lng->txt("exc_instruction_files"), $ui->renderer()->render($list));
+            }
 
             // buttons
             if (is_array($buttons[$ass_id])) {

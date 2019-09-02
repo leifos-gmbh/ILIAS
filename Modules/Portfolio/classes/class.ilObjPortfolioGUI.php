@@ -29,6 +29,11 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
 	 */
 	protected $ui;
 
+    /**
+     * @var \ILIAS\GlobalScreen\ScreenContext\ContextServices
+     */
+	protected $tool_context;
+
 	/**
 	 * @var ilPortfolioDeclarationOfAuthorship
 	 */
@@ -45,6 +50,8 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
 		$this->user = $DIC->user();
 		$this->ctrl = $DIC->ctrl();
 		$this->ui = $DIC->ui();
+
+		$this->tool_context = $DIC->globalScreen()->tool()->context();
 
 		parent::__construct($a_id, self::PORTFOLIO_OBJECT_ID, 0);
 		$this->declaration_authorship = new ilPortfolioDeclarationOfAuthorship();
@@ -94,6 +101,19 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
 			$next_class = "";
 		}
 		*/
+
+		// trigger assignment tool
+        $pe = new ilPortfolioExercise($this->user_id, $this->object->getId());
+        $pe_gui = new ilPortfolioExerciseGUI($this->user_id, $this->object->getId());
+        $assignments = $pe->getAssignmentsOfPortfolio();
+        if (count($assignments) > 0) {
+            $ass_ids = array_map(function ($i) {
+                return $i["ass_id"];
+            }, $assignments);
+            $this->tool_context->current()->addAdditionalData(ilExerciseGSToolProvider::SHOW_EXC_ASSIGNMENT_INFO, true);
+            $this->tool_context->current()->addAdditionalData(ilExerciseGSToolProvider::EXC_ASS_IDS, $ass_ids);
+            $this->tool_context->current()->addAdditionalData(ilExerciseGSToolProvider::EXC_ASS_BUTTONS, $pe_gui->getActionButtons());
+        }
 		
 		switch($next_class)
 		{

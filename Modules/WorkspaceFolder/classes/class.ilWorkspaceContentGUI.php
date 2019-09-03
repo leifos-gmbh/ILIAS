@@ -83,20 +83,24 @@ class ilWorkspaceContentGUI
 	{
 		$html = "";
 		$first = true;
-		foreach ($this->getItems() as $i)
-		{
-			if ($first)
-			{
-				$first = false;
-			}
-			else
-			{
-				$html .= $this->ui->renderer()->render($this->ui->factory()->divider()->horizontal());
-			}
-			$html .= $this->getItemHTML($i);
-		}
+		foreach ($this->getItems() as $i) {
+            if ($first) {
+                $first = false;
+            } else {
+                $html .= $this->ui->renderer()->render($this->ui->factory()->divider()->horizontal());
+            }
+            $html .= $this->getItemHTML($i);
+        }
 
-		// output sortation
+        if ($this->admin) {
+            $tpl = new ilTemplate("tpl.admin_container.html", true, true, "Modules/WorkspaceFolder");
+            $tpl->setVariable("ITEMS", $html);
+            $tpl->setVariable("TXT_SELECT_ALL", $this->lng->txt("select_all"));
+            $html = $tpl->get();
+        }
+
+
+        // output sortation
 		$tree = new ilWorkspaceTree($this->user->getId());
 		$parent_id = $tree->getParentId($this->object_gui->ref_id);
 		$parent_effective = ($parent_id > 0)
@@ -107,6 +111,7 @@ class ilWorkspaceContentGUI
 		$sortation = $this->ui->factory()->viewControl()->sortation($sort_options)
 			->withTargetURL($this->ctrl->getLinkTarget($this->object_gui, "setSortation"), 'sortation')
 			->withLabel($this->lng->txt("wfld_sortation"));
+
 
 		if ($first)
 		{

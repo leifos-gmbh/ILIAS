@@ -1747,6 +1747,7 @@ common#:#activation#:#Edit Timings
 common#:#active#:#Active
 common#:#add_condition#:#Add Precondition
 common#:#add_member#:#Add Member
+common#:#add_member_role#:#Add Member Role
 common#:#add_new_user_defined_field#:#Add New Custom Field
 common#:#add_note#:#Add Note
 common#:#add_parameter#:#New Parameter
@@ -2503,6 +2504,7 @@ common#:#grp_err_administrator_required#:#Member could not be removed, at least 
 common#:#grp_header_edit_members#:#Edit members
 rbac#:#grp_join#:#User can join group
 rbac#:#grp_leave#:#User can unsubscribe from group
+common#:#grp_list_members#:#List members
 common#:#grp_list_users#:#List users
 common#:#grp_mem_change_status#:#Change Participant Status
 common#:#grp_mem_send_mail#:#Send Participants a Message
@@ -10837,10 +10839,10 @@ skmg#:#skmg_profile#:#Profile
 skmg#:#skmg_remove_levels#:#Remove Levels
 skmg#:#skmg_select_skill_level_assign#:#Please select a skill.
 skmg#:#skmg_confirm_remove_level_ass#:#So you really want to remove the following competence levels from the profile?
-skmg#:#skmg_assigned_users#:#Assigned Users
+skmg#:#skmg_assigned_users#:#Assigned Roles and Users
 skmg#:#skmg_assign_user#:#Assign User
-skmg#:#skmg_add_assignment#:#Add Assignment
-skmg#:#skmg_add_user_to_profile#:#Add user(s) or role(s) to profile
+skmg#:#skmg_add_assignment#:#Add Roles / Users
+skmg#:#skmg_add_user_to_profile#:#Add users or roles to profile
 skmg#:#skmg_confirm_user_removal#:#Do you really want to remove the following users from this profile?
 skmg#:#skmg_resources#:#Resources
 skmg#:#skmg_add_resource#:#Add Resource

@@ -45,8 +45,19 @@ class ilRepositoryObjectResultTableGUI extends ilTable2GUI
 		$this->enable('select_all');
 		$this->setSelectAllCheckbox("obj[]");
 
-		$this->addMultiCommand('listUsers', $this->lng->txt('grp_list_users'));
-		$this->addMultiCommand('addRole', $this->lng->txt('add_role'));
+		switch ($this->parent_obj->search_type) {
+			case 'grp':
+			case 'crs':
+				$this->addMultiCommand('addRole', $this->lng->txt('add_member_role'));
+				$this->addMultiCommand('listUsers', $this->lng->txt('grp_list_members'));
+				break;
+
+			case 'role':
+				$this->addMultiCommand('addRole', $this->lng->txt('add_role'));
+				$this->addMultiCommand('listUsers', $this->lng->txt('grp_list_users'));
+				break;
+		}
+
 		if((bool)$a_allow_object_selection)
 		{
 			$this->addMultiCommand('selectObject', $this->lng->txt('grp_select_object'));

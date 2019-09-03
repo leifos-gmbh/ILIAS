@@ -2965,6 +2965,7 @@ common#:#add#:#Hinzufügen
 common#:#add_condition#:#Neue Vorbedingung erstellen
 common#:#add_entry#:#Eintragen
 common#:#add_member#:#Mitglied hinzufügen
+common#:#add_member_role#:#Mitgliederrolle hinzufügen
 common#:#add_new_user_defined_field#:#Neues benutzerdefiniertes Feld anlegen
 common#:#add_note#:#Notiz hinzufügen
 common#:#add_parameter#:#Neuer Parameter
@@ -3743,6 +3744,7 @@ common#:#grp_dismiss_myself#:#Sind Sie sicher, dass Sie die Mitgliedschaft in di
 common#:#grp_edit#:#Einstellungen der Gruppe
 common#:#grp_err_administrator_required#:#Gruppenmitglied wurde nicht entfernt, es wird mindestens ein Administrator pro Gruppe benötigt.
 common#:#grp_header_edit_members#:#Mitglieder bearbeiten
+common#:#grp_list_members#:#Teilnehmer auflisten
 common#:#grp_list_reg#:#Beitritt
 common#:#grp_list_reg_end#:#Anmeldungsende
 common#:#grp_list_reg_limit_full#:#Keine freien Plätze verfügbar
@@ -12962,11 +12964,11 @@ skmg#:#skmg_ass_materials_from_workspace#:#An dieser Stelle können Sie Material
 skmg#:#skmg_assign_level#:#Ausprägung zuordnen
 skmg#:#skmg_assign_materials#:#Materialien zuordnen
 skmg#:#skmg_assign_user#:#Benutzer zuordnen
-skmg#:#skmg_add_assignment#:#Zuordnung hinzufügen
-skmg#:#skmg_add_user_to_profile#:#Benutzer oder Rolle(n) hinzufügen
+skmg#:#skmg_add_assignment#:#Rollen / Benutzer zuordnen
+skmg#:#skmg_add_user_to_profile#:#Benutzer oder Rollen suchen
 skmg#:#skmg_assigned_profiles#:#Zugewiesene Profile
 skmg#:#skmg_assigned_skill_levels#:#Zugeordnete Kompetenzausprägungen
-skmg#:#skmg_assigned_users#:#Zugeordnete Benutzer
+skmg#:#skmg_assigned_users#:#Zugeordnete Rollen und Benutzer
 skmg#:#skmg_cannot_delete_nodes_in_use#:#Einige Objekte können nicht gelöscht werden, da sie noch in Gebrauch sind.
 skmg#:#skmg_cert_skill_level_title#:#Titel Kompetenzausprägung
 skmg#:#skmg_cert_skill_title#:#Titel Kompetenz

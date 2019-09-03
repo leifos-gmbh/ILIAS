@@ -14,6 +14,8 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+wsp#:#wsp_switch_to_repo_tree#:#Zum Magazin wechseln
+wsp#:#wsp_switch_to_wsp_tree#:#Zum Arbeitsraum wechseln
 wfld#:#wfld_sortation#:#Sortierung
 wfld#:#wfld_derive#:#Wie übergeordneter Ordner
 wfld#:#wfld_alphabetically_asc#:#Alphabetisch, aufst.

@@ -42,6 +42,11 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 	 */
 	protected $requested_sortation;
 
+    /**
+     * @var ilLogger
+     */
+	protected $wsp_log;
+
 	/**
 	 * Constructor
 	 */
@@ -57,6 +62,8 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 		$this->tabs = $DIC->tabs();
 		$this->ctrl = $DIC->ctrl();
 		$this->ui = $DIC->ui();
+
+        $this->wsp_log = ilLoggerFactory::getLogger("pwsp");
 
 		$this->user_folder_settings = new ilWorkspaceFolderUserSettings($this->user->getId(),
 			new ilWorkspaceFolderUserSettingsRepository($this->user->getId()));
@@ -328,10 +335,14 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 
 		// check permission
 		$no_cut = array();
+		$repo_switch_allowed = true;
 		foreach ($item_ids as $item_id)
 		{
 			foreach ($this->tree->getSubTree($this->tree->getNodeData($item_id)) as $node)
 			{
+			    if (ilObject::_lookupType($node["obj_id"]) != "file") {
+                    $repo_switch_allowed = false;
+                }
 				if (!$this->checkPermissionBool("delete", "", "", $node["wsp_id"]))
 				{
 					$obj = ilObjectFactory::getInstanceByObjId($node["obj_id"]);
@@ -359,11 +370,11 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 		$_SESSION['clipboard']['source_ids'] = $item_ids;
 		$_SESSION['clipboard']['cmd'] = 'cut';
 
-		return $this->showMoveIntoObjectTree();
+		return $this->showMoveIntoObjectTree($repo_switch_allowed);
 	}
 		
 	/**
-	 * Move node preparation (to repository)
+	 * Move node preparation (to workspace)
 	 *
 	 * cut object(s) out from a container and write the information to clipboard
 	 */
@@ -373,6 +384,17 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 		$this->cut();		
 	}
 	
+	/**
+	 * Move node preparation (to workspace)
+	 *
+	 * cut object(s) out from a container and write the information to clipboard
+	 */
+	function cut_for_workspace()
+	{
+		$_SESSION['clipboard']['wsp2repo'] = false;
+		$this->cut();
+	}
+
 	/**
 	 * Copy node preparation
 	 *
@@ -392,9 +414,14 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 		// on cancel or fail we return to parent node
 		$this->ctrl->setParameter($this, "wsp_id", $this->node_id);
 
+        $repo_switch_allowed = true;
 		foreach ($item_ids as $item_id)
 		{
-			$current_node = $item_id;
+		    $node = $this->tree->getNodeData($item_id);
+            if (ilObject::_lookupType($node["obj_id"]) != "file") {
+                $repo_switch_allowed = false;
+            }
+            $current_node = $item_id;
 			$owner = $this->tree->lookupOwner($current_node);
 			if ($owner == $ilUser->getId())
 			{
@@ -418,7 +445,7 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 		$_SESSION['clipboard']['source_ids'] = $item_ids;
 		$_SESSION['clipboard']['cmd'] = 'copy';
 
-		return $this->showMoveIntoObjectTree();
+		return $this->showMoveIntoObjectTree($repo_switch_allowed);
 	}
 	
 	function copyShared()
@@ -466,9 +493,20 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 	}
 
 	/**
+	 * Copy node preparation (to repository)
+	 *
+	 * copy object(s) out from a container and write the information to clipboard
+	 */
+	function copy_to_workspace()
+	{
+		$_SESSION['clipboard']['wsp2repo'] = false;
+		$this->copy();
+	}
+
+	/**
 	 * Move node: select target (via explorer)
 	 */
-	function showMoveIntoObjectTree()
+	function showMoveIntoObjectTree($repo_switch_allowed = false)
 	{
 		$ilTabs = $this->tabs;
 		$tree = $this->tree;
@@ -506,6 +544,23 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 				return;
 			}
 			$this->tpl->setVariable('OBJECT_TREE', $exp->getHTML());
+
+			// switch to repo?
+            if ($repo_switch_allowed) {
+                $switch_cmd = ($mode == "cut")
+                    ? "cut_for_repository"
+                    : "copy_to_repository";
+                $this->tpl->setCurrentBlock("switch_button");
+                $this->tpl->setVariable('CMD_SWITCH', $switch_cmd);
+                $this->tpl->setVariable('TXT_SWITCH', $this->lng->txt('wsp_switch_to_repo_tree'));
+                $this->tpl->parseCurrentBlock();
+
+                foreach ($this->getRequestItemIds() as $id) {
+                    $this->tpl->setCurrentBlock("hidden");
+                    $this->tpl->setVariable('VALUE', $id);
+                    $this->tpl->parseCurrentBlock();
+                }
+            }
 		}
 		// move/copy to repository
 		else
@@ -529,7 +584,23 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 			$exp->setExpand($expanded);
 			$exp->setOutput(0);
 			$this->tpl->setVariable('OBJECT_TREE', $exp->getOutput());
-		}
+
+            if (in_array($mode, ["copy", "cut"])) {
+                $switch_cmd = ($mode == "cut")
+                    ? "cut_for_workspace"
+                    : "copy_to_workspace";
+                $this->tpl->setCurrentBlock("switch_button");
+                $this->tpl->setVariable('CMD_SWITCH', $switch_cmd);
+                $this->tpl->setVariable('TXT_SWITCH', $this->lng->txt('wsp_switch_to_wsp_tree'));
+                $this->tpl->parseCurrentBlock();
+
+                foreach ($this->getRequestItemIds() as $id) {
+                    $this->tpl->setCurrentBlock("hidden");
+                    $this->tpl->setVariable('VALUE', $id);
+                    $this->tpl->parseCurrentBlock();
+                }
+            }
+        }
 		
 
 		unset($exp);
@@ -638,6 +709,9 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 
 		foreach ($source_node_ids as $source_node_id)
 		{
+		    $node_data = $this->tree->getNodeData($source_node_id);
+            $source_object = ilObjectFactory::getInstanceByObjId($node_data["obj_id"]);
+
 			// move the node
 			if ($mode == "cut")
 			{
@@ -667,7 +741,8 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 				include_once('Services/CopyWizard/classes/class.ilCopyWizardOptions.php');
 				$copy_id = ilCopyWizardOptions::_allocateCopyId();
 				$wizard_options = ilCopyWizardOptions::_getInstance($copy_id);
-
+				$this->wsp_log->debug("Copy ID: ".$copy_id.", Source Node: ".$source_node_id
+                    .", source object: ".$source_object->getId());
 				if (!$_SESSION['clipboard']['wsp2repo'])
 				{
 					$wizard_options->disableTreeCopy();
@@ -677,10 +752,10 @@ class ilObjWorkspaceFolderGUI extends ilObject2GUI
 				$wizard_options->read();
 
 				$new_obj = $source_object->cloneObject($target_node_id, $copy_id);
-
 				// insert into workspace tree
 				if ($new_obj && !$_SESSION['clipboard']['wsp2repo'])
 				{
+                    $this->wsp_log->debug("New Obj ID: ".$new_obj->getId());
 					$new_obj_node_id = $this->tree->insertObject($target_node_id, $new_obj->getId());
 					$this->getAccessHandler()->setPermissions($target_node_id, $new_obj_node_id);
 				}

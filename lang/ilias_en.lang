@@ -10842,7 +10842,7 @@ skmg#:#skmg_select_skill_level_assign#:#Please select a skill.
 skmg#:#skmg_confirm_remove_level_ass#:#So you really want to remove the following competence levels from the profile?
 skmg#:#skmg_assigned_users#:#Assigned Roles and Users
 skmg#:#skmg_assign_user#:#Assign User
-skmg#:#skmg_add_assignment#:#Add Roles / Users
+skmg#:#skmg_add_assignment#:#Add Roles / Members
 skmg#:#skmg_add_user_to_profile#:#Add users or roles to profile
 skmg#:#skmg_confirm_user_removal#:#Do you really want to remove the following users from this profile?
 skmg#:#skmg_resources#:#Resources

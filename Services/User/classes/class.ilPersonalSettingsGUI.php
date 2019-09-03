@@ -368,6 +368,20 @@ class ilPersonalSettingsGUI
 			if (!$error)
 			{
 				$ilUser->resetPassword($_POST["new_password"], $_POST["new_password"]);
+
+				// begin-patch veda
+				$ilAppEventHandler = $DIC['ilAppEventHandler'];
+				$ilAppEventHandler->raise(
+					'Services/User',
+					'passwordChanged',
+					[
+						'usr_id' => $ilUser->getId()
+
+					]
+				);
+				// end-patch veda
+
+
 				if ($_POST["current_password"] != $_POST["new_password"])
 				{
 					$ilUser->setLastPasswordChangeToNow();

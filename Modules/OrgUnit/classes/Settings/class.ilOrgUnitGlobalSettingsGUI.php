@@ -71,6 +71,8 @@ class ilOrgUnitGlobalSettingsGUI
 	 */
 	protected function initSettingsForm() {
 		global $DIC;
+		/** @var ilObjectDefinition $definitions */
+		$definitions = $DIC['objDefinition'];
 
 		$form = new ilPropertyFormGUI();
 		$form->setFormAction($this->ctrl->getFormAction($this, 'saveSettings'));
@@ -91,40 +93,44 @@ class ilOrgUnitGlobalSettingsGUI
 		$section->setTitle($this->lng->txt('orgu_global_set_positions'));
 		$form->addItem($section);
 		
-		$available_types = $GLOBALS['DIC']['objDefinition']->getOrgUnitPermissionTypes();
+		$available_types = $definitions->getOrgUnitPermissionTypes();
 		foreach($available_types as $object_type) {
-			
+			$is_multi = !$definitions->isSystemObject($object_type);
+			$lang_prefix = $is_multi ? 'objs_' : 'obj_';
+
 			$setting = new ilOrgUnitObjectTypePositionSetting($object_type);
 			
 			$type = new ilCheckboxInputGUI(
-				$this->lng->txt('orgu_global_set_positions_type_active').' '.$this->lng->txt('objs_'. $object_type),
+				$this->lng->txt('orgu_global_set_positions_type_active').' '.$this->lng->txt($lang_prefix. $object_type),
 				$object_type.'_active'
 			);
 			$type->setValue(1);
 			$type->setChecked($setting->isActive());
-			
-			$scope = new ilRadioGroupInputGUI($this->lng->txt('orgu_global_set_type_changeable'),$object_type.'_changeable');
-			$scope->setValue((int) $setting->isChangeableForObject());
+			if($is_multi)
+			{
+				$scope = new ilRadioGroupInputGUI($this->lng->txt('orgu_global_set_type_changeable'), $object_type . '_changeable');
+				$scope->setValue((int)$setting->isChangeableForObject());
 
-			$scope_object = new ilRadioOption(
-				$this->lng->txt('orgu_global_set_type_changeable_object'), 
-				1
-			);
-			$default = new ilCheckboxInputGUI($this->lng->txt('orgu_global_set_type_default'), $object_type.'_default');
-			$default->setInfo($this->lng->txt('orgu_global_set_type_default_info'));
-			$default->setValue(ilOrgUnitObjectTypePositionSetting::DEFAULT_ON);
-			$default->setChecked($setting->getActivationDefault());
-			
-			$scope_object->addSubItem($default);
-			$scope->addOption($scope_object);
-			
-			$scope_global = new ilRadioOption(
-				$this->lng->txt('orgu_global_set_type_changeable_no'),  
-				0
-			);
-			$scope->addOption($scope_global);
-			
-			$type->addSubItem($scope);
+				$scope_object = new ilRadioOption(
+					$this->lng->txt('orgu_global_set_type_changeable_object'),
+					1
+				);
+				$default = new ilCheckboxInputGUI($this->lng->txt('orgu_global_set_type_default'), $object_type . '_default');
+				$default->setInfo($this->lng->txt('orgu_global_set_type_default_info'));
+				$default->setValue(ilOrgUnitObjectTypePositionSetting::DEFAULT_ON);
+				$default->setChecked($setting->getActivationDefault());
+
+				$scope_object->addSubItem($default);
+				$scope->addOption($scope_object);
+
+				$scope_global = new ilRadioOption(
+					$this->lng->txt('orgu_global_set_type_changeable_no'),
+					0
+				);
+				$scope->addOption($scope_global);
+
+				$type->addSubItem($scope);
+			}
 			$form->addItem($type);
 		}
 		$form->addCommandButton('saveSettings', $this->lng->txt('save'));

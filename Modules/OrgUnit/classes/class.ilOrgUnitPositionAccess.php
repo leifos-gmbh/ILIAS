@@ -106,46 +106,42 @@ class ilOrgUnitPositionAccess implements ilOrgUnitPositionAccessHandler, ilOrgUn
 			return $user_ids;
 		}
 
-		$allowed_user_ids = [];
-		foreach ($this->ua->getPositionsOfUserId($user_id) as $position) {
-			$permissions = ilOrgUnitPermissionQueries::getSetForRefId($ref_id, $position->getId());
-			if (!$permissions->isOperationIdSelected($operation->getOperationId())) {
-				continue;
-			}
-
-			foreach ($position->getAuthorities() as $authority) {
-				switch ($authority->getOver()) {
-					case ilOrgUnitAuthority::OVER_EVERYONE:
-						switch ($authority->getScope()) {
-							case ilOrgUnitAuthority::SCOPE_SAME_ORGU:
-								$allowed = $this->ua->getUserIdsOfOrgUnitsOfUsersPosition($position->getId(), $user_id);
-								$allowed_user_ids = $allowed_user_ids + $allowed;
-								break;
-							case ilOrgUnitAuthority::SCOPE_SUBSEQUENT_ORGUS:
-								$allowed = $this->ua->getUserIdsOfOrgUnitsOfUsersPosition($position->getId(), $user_id, true);
-								$allowed_user_ids = $allowed_user_ids + $allowed;
-								break;
-						}
-						break;
-					default:
-						switch ($authority->getScope()) {
-							case ilOrgUnitAuthority::SCOPE_SAME_ORGU:
-								$allowed = $this->ua->getUserIdsOfUsersOrgUnitsInPosition($user_id, $position->getId(), $authority->getOver());
-								$allowed_user_ids = $allowed_user_ids + $allowed;
-								break;
-							case ilOrgUnitAuthority::SCOPE_SUBSEQUENT_ORGUS:
-								$allowed = $this->ua->getUserIdsOfUsersOrgUnitsInPosition($user_id, $position->getId(), $authority->getOver(), true);
-								$allowed_user_ids = $allowed_user_ids + $allowed;
-								break;
-						}
-						break;
-				}
-			}
-		}
-
-		return array_intersect($user_ids, $allowed_user_ids);
+		return array_intersect($user_ids, $this->getAllowedUserIds($user_id, $ref_id, $operation));
 	}
 
+	/**
+	 * @inheritdoc
+	 */
+	public function getUserIdsByPositionOfCurrentUser($pos_perm, $ref_id)
+	{
+		// If context is not activated, return same array of $user_ids
+		if (!$this->set->getObjectPositionSettingsByType($this->getTypeForRefId($ref_id))->isActive()) {
+			return array();
+		}
+
+		$current_user_id = $this->getCurrentUsersId();
+
+		return $this->getUserIdsByPositionOfUser($current_user_id, $pos_perm, $ref_id);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getUserIdsByPositionOfUser($user_id, $pos_perm, $ref_id)
+	{
+		// If context is not activated, return same array of $user_ids
+		if (!$this->set->getObjectPositionSettingsByType($this->getTypeForRefId($ref_id))->isActive()) {
+			return array();
+		}
+
+		// $all_available_users = $this->ua->getUserIdsOfOrgUnit()
+		$operation = ilOrgUnitOperationQueries::findByOperationString($pos_perm, $this->getTypeForRefId($ref_id));
+		if (!$operation) {
+			return array();
+		}
+
+		return $this->getAllowedUserIds($user_id, $ref_id, $operation);
+	}
 
 	/**
 	 * @inheritdoc
@@ -298,5 +294,53 @@ class ilOrgUnitPositionAccess implements ilOrgUnitPositionAccessHandler, ilOrgUn
 		$obj_id = $this->getObjIdForRefId($ref_id); // TODO this will change to ref_id!!
 
 		return $this->set->isPositionAccessActiveForObject($obj_id);
+	}
+
+	/**
+	 * @param int $user_id
+	 * @param int $ref_id
+	 * @param ilOrgUnitOperation $operation
+	 * @return array|ilOrgUnitUserAssignment[]|int[]
+	 * @throws ilException
+	 */
+	protected function getAllowedUserIds($user_id, $ref_id, $operation)
+	{
+		$allowed_user_ids = [];
+		foreach ($this->ua->getPositionsOfUserId($user_id) as $position) {
+			$permissions = ilOrgUnitPermissionQueries::getSetForRefId($ref_id, $position->getId());
+			if (!$permissions->isOperationIdSelected($operation->getOperationId())) {
+				continue;
+			}
+
+			foreach ($position->getAuthorities() as $authority) {
+				switch ($authority->getOver()) {
+					case ilOrgUnitAuthority::OVER_EVERYONE:
+						switch ($authority->getScope()) {
+							case ilOrgUnitAuthority::SCOPE_SAME_ORGU:
+								$allowed = $this->ua->getUserIdsOfOrgUnitsOfUsersPosition($position->getId(), $user_id);
+								$allowed_user_ids = $allowed_user_ids + $allowed;
+								break;
+							case ilOrgUnitAuthority::SCOPE_SUBSEQUENT_ORGUS:
+								$allowed = $this->ua->getUserIdsOfOrgUnitsOfUsersPosition($position->getId(), $user_id, true);
+								$allowed_user_ids = $allowed_user_ids + $allowed;
+								break;
+						}
+						break;
+					default:
+						switch ($authority->getScope()) {
+							case ilOrgUnitAuthority::SCOPE_SAME_ORGU:
+								$allowed = $this->ua->getUserIdsOfUsersOrgUnitsInPosition($user_id, $position->getId(), $authority->getOver());
+								$allowed_user_ids = $allowed_user_ids + $allowed;
+								break;
+							case ilOrgUnitAuthority::SCOPE_SUBSEQUENT_ORGUS:
+								$allowed = $this->ua->getUserIdsOfUsersOrgUnitsInPosition($user_id, $position->getId(), $authority->getOver(), true);
+								$allowed_user_ids = $allowed_user_ids + $allowed;
+								break;
+						}
+						break;
+				}
+			}
+		}
+		return $allowed_user_ids;
 	}
 }

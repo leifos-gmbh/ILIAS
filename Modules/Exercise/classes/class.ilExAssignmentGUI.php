@@ -27,11 +27,21 @@ class ilExAssignmentGUI
 
 	protected $exc; // [ilObjExercise]
 	protected $current_ass_id; // [int]
+
+    /**
+     * @var ilExerciseInternalService
+     */
+    protected $service;
+
+    /**
+     * @var ilExcMandatoryAssignmentManager
+     */
+    protected $mandatory_manager;
 	
 	/**
 	 * Constructor
 	 */
-	function __construct(ilObjExercise $a_exc)
+	function __construct(ilObjExercise $a_exc, ilExerciseInternalService $service)
 	{
 		global $DIC;
 
@@ -41,6 +51,8 @@ class ilExAssignmentGUI
 		$this->ui = $DIC->ui();
 
 		$this->exc = $a_exc;
+		$this->service = $service;
+		$this->mandatory_manager = $service->getMandatoryAssignmentManager($this->exc);
 	}
 	
 	/**
@@ -132,7 +144,7 @@ class ilExAssignmentGUI
 		}
 
 		$mand = "";
-		if ($a_ass->getMandatory())
+        if ($this->mandatory_manager->isMandatoryForUser($a_ass->getId(), $this->user->getId()))
 		{
 			$mand = " (".$lng->txt("exc_mandatory").")";
 		}

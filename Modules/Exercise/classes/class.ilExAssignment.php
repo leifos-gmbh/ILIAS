@@ -1428,7 +1428,7 @@ class ilExAssignment
 	}
 
 	/**
-	 * Order assignments by deadline date
+	 * Count the number of mandatory assignments
 	 */
 	static function countMandatory($a_ex_id)
 	{
@@ -1442,6 +1442,41 @@ class ilExAssignment
 			);
 		$rec = $ilDB->fetchAssoc($set);
 		return $rec["cntm"];
+	}
+
+	/**
+	 * Order assignments by deadline date
+	 */
+	static function count($a_ex_id)
+	{
+		global $DIC;
+
+		$ilDB = $DIC->database();
+
+		$set = $ilDB->query("SELECT count(*) cntm FROM exc_assignment ".
+			" WHERE exc_id = ".$ilDB->quote($a_ex_id, "integer")
+			);
+		$rec = $ilDB->fetchAssoc($set);
+		return $rec["cntm"];
+	}
+
+	/**
+	 * Is assignment in exercise?
+	 */
+	static function isInExercise($a_ass_id, $a_ex_id)
+	{
+		global $DIC;
+
+		$ilDB = $DIC->database();
+
+		$set = $ilDB->query("SELECT * FROM exc_assignment ".
+			" WHERE exc_id = ".$ilDB->quote($a_ex_id, "integer").
+			" AND id = ".$ilDB->quote($a_ass_id, "integer")
+			);
+		if ($rec = $ilDB->fetchAssoc($set)) {
+		    return true;
+        }
+        return false;
 	}
 
 ///

@@ -239,6 +239,12 @@ class Container extends \Pimple\Container {
 		return new \ilObjectService($this->language(), $this->settings(), $this->filesystem(), $this->upload());
 	}
 
+    /**
+     * @return \ilExerciseFactory
+     */
+    public function exercise() {
+        return new \ilExerciseFactory();
+    }
 
 	/**
 	 * Note: Only use isDependencyAvailable if strictly required. The need for this,

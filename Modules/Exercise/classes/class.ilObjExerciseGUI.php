@@ -16,7 +16,7 @@ require_once "./Services/Object/classes/class.ilObjectGUI.php";
 * @ilCtrl_Calls ilObjExerciseGUI: ilObjectCopyGUI, ilExportGUI
 * @ilCtrl_Calls ilObjExerciseGUI: ilCommonActionDispatcherGUI, ilCertificateGUI 
 * @ilCtrl_Calls ilObjExerciseGUI: ilExAssignmentEditorGUI, ilExSubmissionGUI
-* @ilCtrl_Calls ilObjExerciseGUI: ilExerciseManagementGUI, ilExcCriteriaCatalogueGUI
+* @ilCtrl_Calls ilObjExerciseGUI: ilExerciseManagementGUI, ilExcCriteriaCatalogueGUI, ilExcRandomAssignmentGUI
 * 
 * @ingroup ModulesExercise
 */
@@ -41,6 +41,26 @@ class ilObjExerciseGUI extends ilObjectGUI
 	 * @var ilExAssignment
 	 */
 	protected $ass = null;
+
+    /**
+     * @var ilExerciseInternalService
+     */
+	protected $service;
+
+    /**
+     * @var ilExerciseUIRequest
+     */
+	protected $request;
+
+    /**
+     * @var ilExerciseUI
+     */
+	protected $exercise_ui;
+
+    /**
+     * @var int
+     */
+	protected $requested_ass_id;
 
 	/**
 	* Constructor
@@ -70,17 +90,22 @@ class ilObjExerciseGUI extends ilObjectGUI
 		$this->ctrl->saveParameter($this, "ass_id");
 
 		include_once("./Modules/Exercise/classes/class.ilExAssignment.php");
-		if ($_REQUEST["ass_id"] > 0 && is_object($this->object) && ilExAssignment::lookupExerciseId($_REQUEST["ass_id"]) == $this->object->getId())
+
+        $this->service = $DIC->exercise()->internal()->service();
+        $this->request = $DIC->exercise()->internal()->request();
+        $this->exercise_ui = $DIC->exercise()->internal()->ui();
+		$this->requested_ass_id = $this->request->getRequestedAssId();
+
+		if ($this->requested_ass_id > 0 && is_object($this->object) && ilExAssignment::lookupExerciseId($this->requested_ass_id) == $this->object->getId())
 		{
-			$this->ass = new ilExAssignment((int) $_REQUEST["ass_id"]);
+			$this->ass = $this->request->getRequestedAssignment();
 		}
-		else if ($_REQUEST["ass_id"] > 0)
+		else if ($this->requested_ass_id > 0)
 		{
 			throw new ilExerciseException("Assignment ID does not match Exercise.");
 		}
 
-
-		$this->certificateDownloadValidator = new ilCertificateDownloadValidator();
+        $this->certificateDownloadValidator = new ilCertificateDownloadValidator();
 	}
 
 	function executeCommand()
@@ -170,8 +195,7 @@ class ilObjExerciseGUI extends ilObjectGUI
 				$ilTabs->activateTab("content");
 				$this->addContentSubTabs("content");
 				$this->ctrl->setReturn($this, "showOverview");
-				include_once("./Modules/Exercise/classes/class.ilExSubmissionGUI.php");
-				$sub_gui = new ilExSubmissionGUI($this->object, $this->ass, (int)$_REQUEST["member_id"]);
+				$sub_gui = $this->exercise_ui->getSubmissionGUI();
 				$this->ctrl->forwardCommand($sub_gui);
 				break;
 			
@@ -185,7 +209,7 @@ class ilObjExerciseGUI extends ilObjectGUI
 				{
 					$ilTabs->activateTab("grades");
 					include_once("./Modules/Exercise/classes/class.ilExerciseManagementGUI.php");
-					$mgmt_gui = new ilExerciseManagementGUI($this->object, $this->ass);
+					$mgmt_gui = new ilExerciseManagementGUI($this->getService(), $this->ass);
 					$this->ctrl->forwardCommand($mgmt_gui);
 				}
 				else
@@ -203,6 +227,11 @@ class ilObjExerciseGUI extends ilObjectGUI
 				$crit_gui = new ilExcCriteriaCatalogueGUI($this->object);
 				$this->ctrl->forwardCommand($crit_gui);
 				break;
+
+            case "ilexcrandomassignmentgui":
+                $gui = $this->exercise_ui->getRandomAssignmentGUI();
+                $this->ctrl->forwardCommand($gui);
+                break;
 				
 			default:						
 				if(!$cmd)
@@ -256,6 +285,9 @@ class ilObjExerciseGUI extends ilObjectGUI
 	{
 		$obj_service = $this->getObjectService();
 
+		$service = $this->getService();
+		$random_manager = $service->getRandomAssignmentManager($this->object);
+
 		$a_form->setTitle($this->lng->txt("exc_edit_exercise"));
 
 		$pres = new ilFormSectionHeaderGUI();
@@ -272,12 +304,35 @@ class ilObjExerciseGUI extends ilObjectGUI
 		// pass mode
 		$radg = new ilRadioGroupInputGUI($this->lng->txt("exc_pass_mode"), "pass_mode");
 	
-			$op1 = new ilRadioOption($this->lng->txt("exc_pass_all"), "all",
+			$op1 = new ilRadioOption($this->lng->txt("exc_pass_all"), ilObjExercise::PASS_MODE_ALL,
 				$this->lng->txt("exc_pass_all_info"));
 			$radg->addOption($op1);
-			$op2 = new ilRadioOption($this->lng->txt("exc_pass_minimum_nr"), "nr",
+			$op2 = new ilRadioOption($this->lng->txt("exc_pass_minimum_nr"), ilObjExercise::PASS_MODE_NR,
 				$this->lng->txt("exc_pass_minimum_nr_info"));
 			$radg->addOption($op2);
+            $op3 = new ilRadioOption($this->lng->txt("exc_random_selection"), ilObjExercise::PASS_MODE_RANDOM,
+                $this->lng->txt("exc_random_selection_info"));
+            if (!$random_manager->canBeActivated()) {
+                $op3->setDisabled(true);
+                $op3->setInfo($this->lng->txt("exc_random_selection_not_changeable_info")." ".
+                    implode(" ", $random_manager->getDeniedActivationReasons()));
+            }
+            if ($this->object->getPassMode() == "random" && !$random_manager->canBeDeactivated()) {
+                $radg->setDisabled(true);
+                $radg->setInfo($this->lng->txt("exc_pass_mode_not_changeable_info")." ".
+                    implode(" ", $random_manager->getDeniedDeactivationReasons()));
+            }
+                // minimum number of assignments to pass
+                $rn = new ilNumberInputGUI($this->lng->txt("exc_nr_random_mand"), "nr_random_mand");
+                $rn->setSize(4);
+                $rn->setMaxLength(4);
+                $rn->setRequired(true);
+                $rn->setMinValue(1, false);
+                $cnt = ilExAssignment::count($this->object->getId());
+                $rn->setMaxValue($cnt, true);
+                $op3->addSubItem($rn);
+
+            $radg->addOption($op3);
 
 			// minimum number of assignments to pass
 			$ni = new ilNumberInputGUI($this->lng->txt("exc_min_nr"), "pass_nr");
@@ -380,6 +435,8 @@ class ilObjExerciseGUI extends ilObjectGUI
 		{
 			$a_values["pass_nr"] = $this->object->getPassNr();
 		}
+
+		$a_values["nr_random_mand"] = $this->object->getNrMandatoryRandom();
 		
 		include_once "./Services/Notification/classes/class.ilNotification.php";
 		$a_values["notification"] = ilNotification::hasNotification(
@@ -420,7 +477,11 @@ class ilObjExerciseGUI extends ilObjectGUI
 		{
 			$this->object->setPassNr($a_form->getInput("pass_nr"));
 		}
-		
+		if ($this->object->getPassMode() == ilObjExercise::PASS_MODE_RANDOM)
+		{
+			$this->object->setNrMandatoryRandom($a_form->getInput("nr_random_mand"));
+		}
+
 		$this->object->setCompletionBySubmission($a_form->getInput('completion_by_submission') == 1 ? true : false);
 		
 		$feedback = $a_form->getInput("tfeedback");
@@ -565,6 +626,16 @@ class ilObjExerciseGUI extends ilObjectGUI
 	}
 
 	/**
+	 * Get service
+	 *
+	 * @return ilExerciseInternalService
+	 */
+	protected function getService()
+	{
+		return $this->service;
+	}
+
+	/**
 	* show information screen
 	*/
 	function infoScreen()
@@ -574,6 +645,9 @@ class ilObjExerciseGUI extends ilObjectGUI
 		$lng = $this->lng;
 		
 		$ilTabs->activateTab("info");
+
+		/** @var ilObjExercise $exc */
+		$exc = $this->object;
 
 		if (!$this->checkPermissionBool("read"))
 		{
@@ -610,17 +684,24 @@ class ilObjExerciseGUI extends ilObjectGUI
 			}
 		}
 		$info->addProperty($lng->txt("exc_assignments"), $cnt);
-		$info->addProperty($lng->txt("exc_mandatory"), $mcnt);
-		if ($this->object->getPassMode() != "nr")
+		if ($this->object->getPassMode() == ilObjExercise::PASS_MODE_ALL)
 		{
+            $info->addProperty($lng->txt("exc_mandatory"), $mcnt);
 			$info->addProperty($lng->txt("exc_pass_mode"),
 				$lng->txt("exc_msg_all_mandatory_ass"));
 		}
-		else
+		else if ($this->object->getPassMode() == ilObjExercise::PASS_MODE_NR)
 		{
+            $info->addProperty($lng->txt("exc_mandatory"), $mcnt);
 			$info->addProperty($lng->txt("exc_pass_mode"),
 				sprintf($lng->txt("exc_msg_min_number_ass"), $this->object->getPassNr()));
 		}
+        else if ($this->object->getPassMode() == ilObjExercise::PASS_MODE_RANDOM)
+        {
+            $info->addProperty($lng->txt("exc_mandatory"), $exc->getNrMandatoryRandom());
+            $info->addProperty($lng->txt("exc_pass_mode"),
+                $lng->txt("exc_msg_all_mandatory_ass"));
+        }
 
 		// feedback from tutor
 		include_once("Services/Tracking/classes/class.ilLPMarks.php");
@@ -831,14 +912,19 @@ class ilObjExerciseGUI extends ilObjectGUI
 		
 		$this->checkPermission("read");
 
+        $ilTabs->activateTab("content");
+        $this->addContentSubTabs("content");
+
+        if ($this->handleRandomAssignmentEntryPage()) {
+		    return;
+        }
+
 		$tpl->addJavaScript("./Modules/Exercise/js/ilExcPresentation.js");
 		
 		include_once("./Services/Tracking/classes/class.ilLearningProgress.php");
 		ilLearningProgress::_tracProgress($ilUser->getId(),$this->object->getId(),
 			$this->object->getRefId(), 'exc');
 		
-		$ilTabs->activateTab("content");
-		$this->addContentSubTabs("content");
 
 		if($this->certificateDownloadValidator->isCertificateDownloadable((int) $ilUser->getId(), (int) $this->object->getId())) {
 			$ilToolbar->addButton($this->lng->txt("certificate"),
@@ -846,7 +932,7 @@ class ilObjExerciseGUI extends ilObjectGUI
 		}
 
 		include_once("./Modules/Exercise/classes/class.ilExAssignmentGUI.php");
-		$ass_gui = new ilExAssignmentGUI($this->object);
+		$ass_gui = new ilExAssignmentGUI($this->object, $this->getService());
 				
 		include_once("./Modules/Exercise/classes/class.ilExAssignment.php");
 		include_once("./Services/Accordion/classes/class.ilAccordionGUI.php");
@@ -949,6 +1035,23 @@ class ilObjExerciseGUI extends ilObjectGUI
 
 		$ilCtrl->redirect($this, "showOverview");
 	}
-}
 
-?>
+    /**
+     * Display random assignment start page, if necessary
+     *
+     * @return bool
+     */
+    protected function handleRandomAssignmentEntryPage()
+    {
+        $service = $this->getService();
+        $random_manager = $service->getRandomAssignmentManager($this->object);
+        if ($random_manager->needsStart()) {
+            $gui = $this->exercise_ui->getRandomAssignmentGUI();
+            $gui->renderStartPage();
+            return true;
+        }
+
+        return false;
+    }
+
+}

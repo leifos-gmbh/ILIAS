@@ -19,6 +19,11 @@ class ilAssignmentsTableGUI extends ilTable2GUI
 	 */
 	protected $types;
 
+    /**
+     * @var ilExcRandomAssignmentManager
+     */
+	protected $random_manager;
+
 	/**
 	* Constructor
 	*/
@@ -35,6 +40,11 @@ class ilAssignmentsTableGUI extends ilTable2GUI
 
 		$this->exc_id = $a_exc_id;
 		$this->setId("excass".$this->exc_id);
+
+		$request = $DIC->exercise()->internal()->request();
+		$this->random_manager = $DIC->exercise()->internal()->service()->getRandomAssignmentManager(
+            $request->getRequestedExercise()
+        );
 		
 		parent::__construct($a_parent_obj, $a_parent_cmd);
 	
@@ -134,15 +144,14 @@ class ilAssignmentsTableGUI extends ilTable2GUI
 		}
 		$this->tpl->setVariable("TXT_INSTRUCTIONS",
 			nl2br(trim(ilUtil::shortenText(strip_tags($d["instruction"]), 200, true))));
-		
-		if ($d["mandatory"])
-		{
-			$this->tpl->setVariable("TXT_MANDATORY", $lng->txt("yes"));
-		}
-		else
-		{
-			$this->tpl->setVariable("TXT_MANDATORY", $lng->txt("no"));
-		}
+
+		if (!$this->random_manager->isActivated()) {
+            if ($d["mandatory"]) {
+                $this->tpl->setVariable("TXT_MANDATORY", $lng->txt("yes"));
+            } else {
+                $this->tpl->setVariable("TXT_MANDATORY", $lng->txt("no"));
+            }
+        }
 		
 		$ilCtrl->setParameter($this->parent_obj, "ass_id", $d["id"]);
 		

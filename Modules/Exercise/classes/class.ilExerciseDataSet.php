@@ -335,7 +335,7 @@ class ilExerciseDataSet extends ilDataSet
 				case "5.2.0":
 				case "5.3.0":
 					$this->getDirectDataFromQuery("SELECT exc_data.obj_id id, title, description,".
-						" pass_mode, pass_nr, show_submissions, compl_by_submission, tfeedback".
+						" pass_mode, pass_nr, show_submissions, compl_by_submission, tfeedback,nr_mandatory_random".
 						" FROM exc_data JOIN object_data ON (exc_data.obj_id = object_data.obj_id)".
 						" WHERE ".$ilDB->in("exc_data.obj_id", $a_ids, false, "integer"));
 					break;
@@ -586,6 +586,7 @@ class ilExerciseDataSet extends ilDataSet
 				$newObj->setDescription($a_rec["Description"]);
 				$newObj->setPassMode($a_rec["PassMode"]);
 				$newObj->setPassNr($a_rec["PassNr"]);
+				$newObj->setNrMandatoryRandom((int) $a_rec["NrMandatoryRandom"]);
 				$newObj->setShowSubmissions($a_rec["ShowSubmissions"]);
 				$newObj->setCompletionBySubmission($a_rec["ComplBySubmission"]);
 				$newObj->setTutorFeedback($a_rec["Tfeedback"]);

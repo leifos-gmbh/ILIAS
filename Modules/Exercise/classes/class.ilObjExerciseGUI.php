@@ -312,12 +312,12 @@ class ilObjExerciseGUI extends ilObjectGUI
 			$radg->addOption($op2);
             $op3 = new ilRadioOption($this->lng->txt("exc_random_selection"), ilObjExercise::PASS_MODE_RANDOM,
                 $this->lng->txt("exc_random_selection_info"));
-            if (!$random_manager->canBeActivated()) {
+            if (!$random_manager->canBeActivated() && $this->object->getPassMode() != ilObjExercise::PASS_MODE_RANDOM) {
                 $op3->setDisabled(true);
                 $op3->setInfo($this->lng->txt("exc_random_selection_not_changeable_info")." ".
                     implode(" ", $random_manager->getDeniedActivationReasons()));
             }
-            if ($this->object->getPassMode() == "random" && !$random_manager->canBeDeactivated()) {
+            if ($this->object->getPassMode() == ilObjExercise::PASS_MODE_RANDOM && !$random_manager->canBeDeactivated()) {
                 $radg->setDisabled(true);
                 $radg->setInfo($this->lng->txt("exc_pass_mode_not_changeable_info")." ".
                     implode(" ", $random_manager->getDeniedDeactivationReasons()));

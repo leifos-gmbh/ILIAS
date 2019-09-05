@@ -50,7 +50,7 @@ class ilExerciseUIRequest
         if ($this->getRequestedAssId() > 0) {
             $this->ass = new ilExAssignment($this->getRequestedAssId());
         }
-        if ($this->getRequestedRefId() > 0) {
+        if ($this->getRequestedRefId() > 0 && ilObject::_lookupType($this->getRequestedRefId(), true) == "exc") {
             $this->exc = new ilObjExercise($this->getRequestedRefId());
         }
     }

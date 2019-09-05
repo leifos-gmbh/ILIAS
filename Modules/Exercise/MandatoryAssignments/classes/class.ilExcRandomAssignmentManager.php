@@ -92,7 +92,7 @@ class ilExcRandomAssignmentManager
             if ($ass->getPeerReview()) {
                 $has_peer_reviews = true;
             }
-            if ($ass->getPeerReview() || $ass->getAssignmentType()->usesTeams()) {
+            if ($ass->getAssignmentType()->usesTeams()) {
                 $has_teams = true;
             }
         }

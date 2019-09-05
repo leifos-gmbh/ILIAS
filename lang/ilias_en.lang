@@ -14,6 +14,8 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+exc#:#exc_rel_last_submission#:#Last Possible Submission
+exc#:#exc_rel_last_submission_info#:#If this optional date is set, all user have to submit until this deadline is reached.
 exc#:#exc_mandatory_rand_determined#:#Randomly determined
 exc#:#exc_random_selection#:#Random Selection
 exc#:#exc_random_selection_info#:#Each user gets assigned a random selection of mandatory assignments.

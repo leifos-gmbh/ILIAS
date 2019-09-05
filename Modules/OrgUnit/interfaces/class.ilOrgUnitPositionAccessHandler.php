@@ -106,4 +106,19 @@ interface ilOrgUnitPositionAccessHandler {
 	 * @return int[]
 	 */
 	public function filterUserIdsByPositionOfUser($user_id, $pos_perm, $ref_id, array $user_ids);
+
+	/**
+	 * @param string $pos_perm
+	 * @param int $ref_id
+	 * @return array
+	 */
+	public function getUserIdsByPositionOfCurrentUser($pos_perm, $ref_id);
+
+	/**
+	 * @param int $user_id
+	 * @param string $pos_perm
+	 * @param int $ref_id
+	 * @return array
+	 */
+	public function getUserIdsByPositionOfUser($user_id, $pos_perm, $ref_id);
 }

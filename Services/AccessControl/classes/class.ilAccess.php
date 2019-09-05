@@ -913,4 +913,20 @@ class ilAccess implements ilAccessHandler {
 	public function hasUserRBACorAnyPositionAccess($rbac_perm, $ref_id) {
 		return $this->ilOrgUnitPositionAccess->hasUserRBACorAnyPositionAccess($rbac_perm, $ref_id);
 	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getUserIdsByPositionOfCurrentUser($pos_perm, $ref_id)
+	{
+		return $this->ilOrgUnitPositionAccess->getUserIdsByPositionOfCurrentUser($pos_perm, $ref_id);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getUserIdsByPositionOfUser($user_id, $pos_perm, $ref_id)
+	{
+		return $this->ilOrgUnitPositionAccess->getUserIdsByPositionOfCurrentUser($user_id, $pos_perm, $ref_id);
+	}
 }

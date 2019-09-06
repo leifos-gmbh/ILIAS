@@ -48,12 +48,18 @@ class ilRepositoryObjectResultTableGUI extends ilTable2GUI
 		switch ($this->parent_obj->search_type) {
 			case 'grp':
 			case 'crs':
-				$this->addMultiCommand('addRole', $this->lng->txt('add_member_role'));
+				if ($this->parent_obj->role_callback)
+				{
+					$this->addMultiCommand('addRole', $this->lng->txt('add_member_role'));
+				}
 				$this->addMultiCommand('listUsers', $this->lng->txt('grp_list_members'));
 				break;
 
 			case 'role':
-				$this->addMultiCommand('addRole', $this->lng->txt('add_role'));
+				if ($this->parent_obj->role_callback)
+				{
+					$this->addMultiCommand('addRole', $this->lng->txt('add_role'));
+				}
 				$this->addMultiCommand('listUsers', $this->lng->txt('grp_list_users'));
 				break;
 		}

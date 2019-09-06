@@ -2984,8 +2984,16 @@ class ilObjUserFolderGUI extends ilObjectGUI
 			ilUtil::sendFailure($this->lng->txt('select_one'));
 			return $this->viewObject();
 		}
-		$this->object->buildExportFile("userfolder_export_excel_x86", $user_ids);		
-		$this->ctrl->redirectByClass("ilobjuserfoldergui", "export");
+
+		if($this->checkPermissionBool("write,read_users"))
+		{
+			$this->object->buildExportFile("userfolder_export_excel_x86", $user_ids);
+			$this->ctrl->redirectByClass("ilobjuserfoldergui", "export");
+		}else
+		{
+			$fullname = $this->object->buildExportFile("userfolder_export_excel_x86", $user_ids, true);
+			ilUtil::deliverFile($fullname.'.xlsx', $this->object->getExportFilename('userfolder_export_excel_x86'),'',false, true);
+		}
 	}
 	
 	function usrExportCsvObject()
@@ -2996,8 +3004,16 @@ class ilObjUserFolderGUI extends ilObjectGUI
 			ilUtil::sendFailure($this->lng->txt('select_one'));
 			return $this->viewObject();
 		}
-		$this->object->buildExportFile("userfolder_export_csv", $user_ids);		
-		$this->ctrl->redirectByClass("ilobjuserfoldergui", "export");
+
+		if($this->checkPermissionBool("write,read_users"))
+		{
+			$this->object->buildExportFile("userfolder_export_csv", $user_ids);
+			$this->ctrl->redirectByClass("ilobjuserfoldergui", "export");
+		}else
+		{
+			$fullname = $this->object->buildExportFile("userfolder_export_csv", $user_ids, true);
+			ilUtil::deliverFile($fullname, $this->object->getExportFilename('userfolder_export_csv'),'',false, true);
+		}
 	}
 	
 	function usrExportXmlObject()
@@ -3008,8 +3024,15 @@ class ilObjUserFolderGUI extends ilObjectGUI
 			ilUtil::sendFailure($this->lng->txt('select_one'));
 			return $this->viewObject();
 		}
-		$this->object->buildExportFile("userfolder_export_xml", $user_ids);		
-		$this->ctrl->redirectByClass("ilobjuserfoldergui", "export");
+		if($this->checkPermissionBool("write,read_users"))
+		{
+			$this->object->buildExportFile("userfolder_export_xml", $user_ids);
+			$this->ctrl->redirectByClass("ilobjuserfoldergui", "export");
+		}else
+		{
+			$fullname = $this->object->buildExportFile("userfolder_export_xml", $user_ids, true);
+			ilUtil::deliverFile($fullname, $this->object->getExportFilename('userfolder_export_xml'),'',false, true);
+		}
 	}
 	
 	function mailObject()

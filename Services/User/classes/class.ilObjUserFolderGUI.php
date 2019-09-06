@@ -23,6 +23,9 @@ class ilObjUserFolderGUI extends ilObjectGUI
 
 	protected $log;
 
+	/** @var ilObjUserFolder */
+	public $object;
+
 	/**
 	* Constructor
 	* @access public
@@ -2987,12 +2990,12 @@ class ilObjUserFolderGUI extends ilObjectGUI
 
 		if($this->checkPermissionBool("write,read_users"))
 		{
-			$this->object->buildExportFile("userfolder_export_excel_x86", $user_ids);
+			$this->object->buildExportFile(ilObjUserFolder::FILE_TYPE_EXCEL, $user_ids);
 			$this->ctrl->redirectByClass("ilobjuserfoldergui", "export");
 		}else
 		{
-			$fullname = $this->object->buildExportFile("userfolder_export_excel_x86", $user_ids, true);
-			ilUtil::deliverFile($fullname.'.xlsx', $this->object->getExportFilename('userfolder_export_excel_x86'),'',false, true);
+			$fullname = $this->object->buildExportFile(ilObjUserFolder::FILE_TYPE_EXCEL, $user_ids, true);
+			ilUtil::deliverFile($fullname.'.xlsx', $this->object->getExportFilename(ilObjUserFolder::FILE_TYPE_EXCEL),'',false, true);
 		}
 	}
 	
@@ -3007,12 +3010,12 @@ class ilObjUserFolderGUI extends ilObjectGUI
 
 		if($this->checkPermissionBool("write,read_users"))
 		{
-			$this->object->buildExportFile("userfolder_export_csv", $user_ids);
+			$this->object->buildExportFile(ilObjUserFolder::FILE_TYPE_CSV, $user_ids);
 			$this->ctrl->redirectByClass("ilobjuserfoldergui", "export");
 		}else
 		{
-			$fullname = $this->object->buildExportFile("userfolder_export_csv", $user_ids, true);
-			ilUtil::deliverFile($fullname, $this->object->getExportFilename('userfolder_export_csv'),'',false, true);
+			$fullname = $this->object->buildExportFile(ilObjUserFolder::FILE_TYPE_CSV, $user_ids, true);
+			ilUtil::deliverFile($fullname, $this->object->getExportFilename(ilObjUserFolder::FILE_TYPE_CSV),'',false, true);
 		}
 	}
 	
@@ -3026,12 +3029,12 @@ class ilObjUserFolderGUI extends ilObjectGUI
 		}
 		if($this->checkPermissionBool("write,read_users"))
 		{
-			$this->object->buildExportFile("userfolder_export_xml", $user_ids);
+			$this->object->buildExportFile(ilObjUserFolder::FILE_TYPE_XML,  $user_ids);
 			$this->ctrl->redirectByClass("ilobjuserfoldergui", "export");
 		}else
 		{
-			$fullname = $this->object->buildExportFile("userfolder_export_xml", $user_ids, true);
-			ilUtil::deliverFile($fullname, $this->object->getExportFilename('userfolder_export_xml'),'',false, true);
+			$fullname = $this->object->buildExportFile(ilObjUserFolder::FILE_TYPE_XML, $user_ids, true);
+			ilUtil::deliverFile($fullname, $this->object->getExportFilename(ilObjUserFolder::FILE_TYPE_XML),'',false, true);
 		}
 	}
 	

@@ -30,3 +30,8 @@ if(!$ilDB->tableExists('skl_profile_role'))
 	$ilDB->addPrimaryKey('skl_profile_role', array('profile_id', 'role_id'));
 }
 ?>
+<#3>
+<?php
+// old competences (templates) and competence categories (templates) get an empty string as description instead of null
+$ilDB->manipulate("UPDATE skl_tree_node SET description = '' WHERE description IS NULL AND type IN ('scat', 'skll', 'sctp', 'sktp')");
+?>

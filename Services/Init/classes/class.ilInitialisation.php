@@ -1463,6 +1463,7 @@ class ilInitialisation
 			return new Services(new ilGSProviderFactory($c));
 		};
 		$c->globalScreen()->tool()->context()->stack()->main();
+        $c->globalScreen()->tool()->context()->current()->addAdditionalData('DEVMODE', (bool)DEVMODE);
 	}
 
 	/**
@@ -1639,19 +1640,22 @@ class ilInitialisation
 							, $c["ui.template_factory"]
 							, $c["lng"]
 							, $c["ui.javascript_binding"]
+							, $c["refinery"]
 							),
 						  new ILIAS\UI\Implementation\Component\Symbol\Glyph\GlyphRendererFactory
 							($c["ui.factory"]
 							, $c["ui.template_factory"]
 							, $c["lng"]
 							, $c["ui.javascript_binding"]
-							),
+							, $c["refinery"]
+						  ),
 						  new ILIAS\UI\Implementation\Component\Input\Field\FieldRendererFactory
 						  	($c["ui.factory"]
 						  	, $c["ui.template_factory"]
 						  	, $c["lng"]
 						  	, $c["ui.javascript_binding"]
-							)
+							, $c["refinery"]
+						  )
 						)
 					)
 				);
@@ -1672,6 +1676,19 @@ class ilInitialisation
 			return new ILIAS\UI\Implementation\Component\Tree\Factory($c["ui.signal_generator"]);
 		};
 
+		$plugins = ilPluginAdmin::getActivePlugins();
+		foreach ($plugins as $plugin_data){
+			$plugin = ilPluginAdmin::getPluginObject($plugin_data["component_type"],$plugin_data["component_name"]
+				,$plugin_data["slot_id"],$plugin_data["name"]);
+
+			$c['ui.renderer'] =  $plugin->exchangeUIRendererAfterInitialization($c);
+
+			foreach ($c->keys() as $key){
+				if(strpos($key,"ui.factory") === 0){
+					$c[$key] = $plugin->exchangeUIFactoryAfterInitialization($key,$c);
+				}
+			}
+		}
 	}
 
 	/**

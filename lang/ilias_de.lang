@@ -218,6 +218,12 @@ exc#:#exc_wait_for_files#:#Der Download sollte automatisch starten. Bei Probleme
 exc#:#exc_target_not_valid#:#Das Link-Ziel ist nicht mehr gültig.
 exc#:#exc_no_get_target#:#Kein gültiges Link-Ziel gefunden.
 exc#:#exc_all_new_files_offered_already#:#Alle neuen Dateien wurden bereits zum Download angeboten. Für einen erneuten Download klicken Sie bitte auf die entsprechenden Aktionslinks in der untenstehenden Liste.
+crs#:#timings_cron_reminder_freshly_start#:#Der Bearbeitungszeitraum hat begonnen bei:
+crs#:#timings_cron_reminder_started_subject#:#Der Bearbeitungszeitraum hat begonnen
+crs#:#timings_cron_reminder_exceeded_subject#:#Sie haben den Bearbeitungszeitraum überschritten
+crs#:#timings_cron_reminder_exceeded_start#:#Der Bearbeitungszeitraum ist überfällig bei:
+crs#:#timings_reminder_notifications#:#Benachrichtigungen zur Lernplanung versenden
+crs#:#timings_reminder_notifications_info#:#Wenn aktiviert, werden Kursteilnehmer über überschrittene Lernplanungsmaterialien informiert.
 acc#:#acc_access_key#:#Access-Key
 acc#:#acc_access_keys#:#Access-Keys
 acc#:#acc_comp_frm#:#Forum
@@ -240,7 +246,7 @@ administration#:#adm_pub_section_domain_filter_info#:#Domänen-Filter für anony
 administration#:#adm_activate_db_benchmark#:#Messung aktivieren
 administration#:#adm_activate_db_benchmark_desc#:#Die Messung wird automatisch nach einem Server-Request beendet.
 administration#:#adm_add_settings_template#:#Vorlagen hinzufügen
-administration#:#adm_basic#:#Allgemein
+administration#:#adm_layout_and_navigation#:#Layout und Navigation
 administration#:#adm_db_bench_by_first_table#:#Aggregiert nach dem ersten Tabellennamen
 administration#:#adm_db_bench_chronological#:#Chronologisch
 administration#:#adm_db_bench_slowest_first#:#Langsamste zuerst
@@ -724,6 +730,7 @@ assessment#:#tst_conflicting_setting#:#Diese Einstellung steht in Konflikt mit e
 assessment#:#enlarge#:#vergrößern
 assessment#:#enter_anonymous_code#:#Zugangsschlüssel für anonymen Zugang
 assessment#:#enter_enough_positive_points#:#Die maximale Punktezahl für die Frage muss größer als Null sein! Bitte geben Sie ausreichend viele nicht-negative Punkte für die Antworten ein.
+assessment#:#enter_enough_positive_points_checked#:#Mindestens eine Antwort muss Punkte erziehlen. Bitte geben Sie eine positive Punktezahl für das Auwählen einer Antwort ein.
 assessment#:#err_no_numeric_value#:#Bitte geben Sie einen numerischen Wert ein
 assessment#:#error_importing_question#:#Beim Importieren der Frage(n) ist ein Fehler aufgetreten!
 assessment#:#error_open_image_file#:#Fehler beim Öffnen einer Bilddatei!
@@ -5237,7 +5244,7 @@ content#:#glo_presentation_view#:#Präsentationsansicht
 content#:#glo_quick_navigation#:#Schnellzugriff
 content#:#glo_table_form#:#Tabelle
 content#:#glo_table_form_info#:#Begriffe und gekürzte Definitionen werden in einer Übersichtstabelle dargestellt. Beim Anklicken eines Begriffes wird dieser mit der vollständigen Definition angezeigt.
-content#:#glo_term_is_used_n_times#:#Der Begriff wird %s in Lernmodulen verwendet.
+content#:#glo_term_is_used_n_times#:#Der Begriff wird %s Mal verwendet.
 content#:#glo_term_used_in#:#Folgende Ressourcen verweisen auf diesen Begriff
 content#:#glo_text_snippet_length#:#Länge der gekürzten Definitionen
 content#:#glo_text_snippet_length_info#:#Anzahl der Zeichen, nach der Definitionen in der Übersichtstabelle abgeschnitten werden.
@@ -6258,6 +6265,7 @@ file#:#replace_file_info#:#Alle Dateiversionen werden gelöscht.
 common#:#page_count#:#Anzahl Seiten
 file#:#upload_info#:#Datei
 file#:#upload_info_desc#:#Sie können die Dateien und die Dateiversionen im Tab "Versionen" verwalten.
+file#:#generate_sanitize_report#:#Report über nicht erreichbare Dateien
 fold#:#fold_import#:#Ordner importieren
 form#:#form_alphabet_all#:#Alle
 form#:#form_days#:#Tage
@@ -8454,6 +8462,7 @@ skmg#:#skmg_cert_skill_level_title#:#Titel Kompetenzausprägung
 skmg#:#skmg_cert_skill_title#:#Titel Kompetenz
 skmg#:#skmg_cert_skill_trigger_title#:#Titel Auslöser
 skmg#:#skmg_create_sctp#:#Vorlagenkategorie erstellen
+skmg#:#skmg_edit_sctp#:#Vorlagenkategorie bearbeiten
 skmg#:#skmg_create_skill_category#:#Kategorie erstellen
 skmg#:#skmg_create_skill_template#:#Vorlage erstellen
 skmg#:#skmg_create_skill_template_category#:#Vorlagenkategorie erstellen
@@ -13442,13 +13451,13 @@ mcst#:#mcst_copy#:#Mediacast kopieren
 prg#:#prg_can_not_manage_in_repo#:#Sie dürfen dieses Studienprogramm nicht verwalten, da Ihm bereits Mitglieder zugeordnet sind.
 scov#:#scov_create#:#SCORM-Zertifikat erstellen
 scov#:#scov_create_info#:#Wählen Sie ein SCORM-Modul, für das Sie ein Zertifikat benötigen
-administration#:#adm_container#:#Containerobjekte
-administration#:#adm_content_objects#:#Inhaltsobjekte
-administration#:#adm_content_services#:#Content-Services
-administration#:#adm_learning_outcomes#:#Lernergebnisse
-administration#:#adm_maintenance#:#Wartung
+administration#:#adm_repository_and_objects#:#Magazin und Objekte
+administration#:#adm_extending_ilias#:#ILIAS Erweitern
+administration#:#adm_search_and_find#:#Suchen und Finden
+administration#:#adm_achievements#:#Lernerfolge
+administration#:#adm_maintenance#:#Systemeinstellungen und Wartung
 administration#:#adm_user_administration#:#Benutzerverwaltung
-administration#:#adm_user_services#:#Benutzer-Services
+administration#:#adm_personal_workspace#:#Persönlicher Arbeitsraum
 common#:#enter_new_name#:#Bitte geben Sie einen Namen an
 rbac#:#awra_visible#:#Verwaltung der „Wer ist online?“-Anzeige ist sichtbar
 rbac#:#awra_read#:#Lesezugriff auf Verwaltung der „Wer ist online?“-Anzeige
@@ -15031,6 +15040,7 @@ validation#:#not_greater_than#:#'%s' ist nicht größer als '%s'.
 validation#:#not_less_than#:#'%s' ist nicht kleiner als '%s'.
 validation#:#not_min_length#:#Ihre Eingabe hat eine Länge von %d und liegt damit unter der Mindestlänge von %d.
 validation#:#not_numeric#:#'%s' ist nicht nummerisch.
+validation#:#not_numeric_empty_string#:#Ihre Eingabe ist nicht numerisch.
 validation#:#not_generic#:#Es ist nicht der Fall, dass %s
 validation#:#not_max_length#:#Der eingegebene Text hat eine Länge von mehr als '%s'.
 validation#:#not_an_array#:#'%s' ist kein Array.
@@ -15184,3 +15194,8 @@ common#:#mm_portfolio#:#Portfolio
 common#:#mm_certificates#:#Zertifikate
 common#:#mm_personal_and_shared_r#:#Persönliche und geteilte Ressourcen
 common#:#mm_personal_workspace#:#Persönlicher Arbeitsraum
+content#:#lm_editing_view#:#Bearbeitungsansicht
+common#:#mm_repo_tree_view_act#:#Baumansicht an
+common#:#mm_repo_tree_view_deact#:#Baumansicht aus
+content#:#cont_tool_media#:#Media
+content#:#cont_tool_faq#:#FAQ

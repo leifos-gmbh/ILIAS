@@ -199,6 +199,7 @@ class ilObjectTest extends TestCase
 	{
 		global $DIC;
 		$tree = $DIC->repositoryTree();
+		$user = $DIC->user();
 		
 		$obj = new ilObject();
 		$obj->setType("xxx");
@@ -225,7 +226,7 @@ class ilObjectTest extends TestCase
 		// isSaved() uses internal cache!
 		$tree->useCache(false);
 		
-		$tree->moveToTrash($ref_id, true);
+		$tree->moveToTrash($ref_id, true,$user->getId());
 		if ($tree->isDeleted($ref_id))
 		{
 			$value.= "tree3-";

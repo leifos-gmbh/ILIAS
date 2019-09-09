@@ -42,12 +42,13 @@ class ilRepUtil
 
 
 	/**
-	* Delete objects. Move them to trash (if trash feature is enabled).
-	*
-	* @param	integer		current ref id
-	* @param	array		array of ref(!) ids to be deleted
-	*/
-	static public function deleteObjects($a_cur_ref_id, $a_ids)
+	 * Delete objects. Move them to trash (if trash feature is enabled).
+	 *
+	 * @param    integer        current ref id
+	 * @param    array        array of ref(!) ids to be deleted
+	 * @throws \ilRepositoryException on missing permission, objects already deleted,...
+	 */
+	public static function deleteObjects($a_cur_ref_id, $a_ids)
 	{
 		global $DIC;
 
@@ -116,27 +117,9 @@ class ilRepUtil
 		// DELETE THEM
 		if (!$all_node_data[0]["type"])
 		{
-// alex: this branch looks suspicious to me... I deactivate it for
-// now. Objects that aren't in the tree should overwrite this method.
-throw new ilRepositoryException($lng->txt("ilRepUtil::deleteObjects: Type information missing."));
-			// OBJECTS ARE NO 'TREE OBJECTS'
-			if ($rbacsystem->checkAccess('delete', $a_cur_ref_id))
-			{
-				foreach($a_ids as $id)
-				{
-					$obj = ilObjectFactory::getInstanceByObjId($id);
-					$obj->delete();
-					
-					// write log entry
-					$log->write("ilObjectGUI::confirmedDeleteObject(), deleted obj_id ".$obj->getId().
-						", type: ".$obj->getType().", title: ".$obj->getTitle());
-				}
-			}
-			else
-			{
-				throw new ilRepositoryException(
-					$lng->txt("no_perm_delete")."<br/>".$lng->txt("msg_cancel"));
-			}
+			// alex: this branch looks suspicious to me... I deactivate it for
+			// now. Objects that aren't in the tree should overwrite this method.
+			throw new ilRepositoryException($lng->txt("ilRepUtil::deleteObjects: Type information missing."));
 		}
 		else
 		{

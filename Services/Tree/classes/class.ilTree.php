@@ -1960,7 +1960,12 @@ class ilTree
 	{
 		global $DIC;
 
-		$ilDB = $DIC['ilDB'];
+		$ilDB = $DIC->database();
+		$user = $DIC->user();
+
+		if(!$a_deleted_by) {
+			$a_deleted_by = $user->getId();
+		}
 
 		if(!$a_node_id)
 		{

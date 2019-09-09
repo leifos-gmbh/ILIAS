@@ -80,7 +80,7 @@ class ilAdministrationGUI
 	* Constructor
 	* @access	public
 	*/
-	function __construct()
+	public function __construct()
 	{
 		global $DIC;
 
@@ -150,9 +150,9 @@ class ilAdministrationGUI
 		$ilDB = $this->db;
 		
 		// permission checks
-		include_once './Services/MainMenu/classes/class.ilMainMenuGUI.php';
-		if(!$rbacsystem->checkAccess("visible", SYSTEM_FOLDER_ID) &&
-				!$rbacsystem->checkAccess("read", SYSTEM_FOLDER_ID))
+		if(
+			!$rbacsystem->checkAccess("visible", SYSTEM_FOLDER_ID) &&
+			!$rbacsystem->checkAccess("read", SYSTEM_FOLDER_ID))
 		{
 			$ilErr->raiseError($this->lng->txt('permission_denied'),$ilErr->WARNING);
 		}

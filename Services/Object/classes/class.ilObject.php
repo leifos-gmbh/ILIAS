@@ -1166,17 +1166,19 @@ class ilObject
 
 		return (int) $ilObjDataCache->lookupObjId($a_id);
 	}
-	
+
 	/**
-	* only called in ilTree::saveSubTree
-	*/
-	static function _setDeletedDate($a_ref_id)
+	 * @param $a_ref_id
+	 * @param int $a_deleted_by
+	 */
+	public static function _setDeletedDate($a_ref_id, $a_deleted_by)
 	{
 		global $DIC;
 
 		$ilDB = $DIC->database();
 		
-		$query = "UPDATE object_reference SET deleted= ".$ilDB->now().' '.
+		$query = "UPDATE object_reference SET deleted= ".$ilDB->now().', '.
+			'deleted_by = ' . $ilDB->quote($a_deleted_by, \ilDBConstants::T_INTEGER) . ' ' .
 			"WHERE ref_id = ".$ilDB->quote($a_ref_id,'integer');
 		$res = $ilDB->manipulate($query);
 	}
@@ -1187,7 +1189,7 @@ class ilObject
 	 * @param int $a_user_id
 	 * @return void
 	 */
-	public static function setDeletedDates($a_ref_ids, $a_user_id = 0)
+	public static function setDeletedDates($a_ref_ids, $a_user_id)
 	{
 		global $DIC;
 
@@ -1210,7 +1212,8 @@ class ilObject
 
 		$ilDB = $DIC->database();
 		
-		$query = "UPDATE object_reference SET deleted = ".$ilDB->quote(null,'timestamp').
+		$query = "UPDATE object_reference SET deleted = ".$ilDB->quote(null,'timestamp').', '.
+			'deleted_by = ' . $ilDB->quote(0, \ilDBConstants::T_INTEGER). ' '.
 			" WHERE ref_id = ".$ilDB->quote($a_ref_id,'integer');
 		$ilDB->manipulate($query);
 	}

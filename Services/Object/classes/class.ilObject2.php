@@ -194,7 +194,7 @@ abstract class ilObject2 extends ilObject
 	final static function _lookupLastUpdate($a_id, $a_as_string = false) { return parent::_lookupLastUpdate($a_id, $a_as_string); }
 	final static function _getLastUpdateOfObjects($a_objs) { return parent::_getLastUpdateOfObjects($a_objs); }
 	final static function _lookupObjId($a_id) { return parent::_lookupObjId($a_id); }
-	final static function _setDeletedDate($a_ref_id) { return parent::_setDeletedDate($a_ref_id); }
+	final static function _setDeletedDate($a_ref_id, $a_deleted_by) { return parent::_setDeletedDate($a_ref_id, $a_deleted_by); }
 	final public static function _resetDeletedDate($a_ref_id) { return parent::_resetDeletedDate($a_ref_id); }
 	final static function _lookupDeletedDate($a_ref_id) { return parent::_lookupDeletedDate($a_ref_id); }
 	final static function _writeTitle($a_obj_id, $a_title) { return parent::_writeTitle($a_obj_id, $a_title); }

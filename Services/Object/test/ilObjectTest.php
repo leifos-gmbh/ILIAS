@@ -177,7 +177,7 @@ class ilObjectTest extends TestCase
 		}
 		
 		$d1 = ilObject::_lookupDeletedDate($ref_id);
-		ilObject::_setDeletedDate($ref_id);
+		ilObject::_setDeletedDate($ref_id, $ilUser->getId());
 		$d2 = ilObject::_lookupDeletedDate($ref_id);
 		ilObject::_resetDeletedDate($ref_id);
 		$d3 = ilObject::_lookupDeletedDate($ref_id);
@@ -274,10 +274,12 @@ class ilObjectTest extends TestCase
 	 */
 	public function testObjectReference()
 	{
-		include_once './Services/Object/classes/class.ilObject.php';
-		
+		global $DIC;
+
+		$user = $DIC->user();
+
 		$ref_ids = ilObject::_getAllReferences(1);
-		$bool = ilObject::_setDeletedDate(1);
+		$bool = ilObject::_setDeletedDate(1, $user->getId());
 		$bool = ilObject::_resetDeletedDate(1);
 		$date = ilObject::_lookupDeletedDate(1);
 		

@@ -98,7 +98,7 @@ class ilObjFileAccess extends ilObjectAccess implements ilWACCheckingClass
         $commands[] = array(
             "permission" => "write",
             "cmd"        => "edit",
-            "lang_var"   => "edit_content",
+            "lang_var"   => "edit",
         );
         $commands[] = array(
             "permission" => "write",

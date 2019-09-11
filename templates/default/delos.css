@@ -15680,6 +15680,11 @@ div.ilChecklist ul li img {
 #tbl_wfld.table-striped > tbody > tr > td {
   background-color: transparent;
 }
+.ilWspContainerListFooter {
+  background-color: #f9f9f9;
+  margin: 0px -15px -15px -15px;
+  padding: 5px 25px;
+}
 /* Services/FileUpload */
 .ilFileUploadEntryProgressPercent {
   font-size: 75%;

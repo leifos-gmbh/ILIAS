@@ -1,24 +1,24 @@
 <?php
 /*
-	+-----------------------------------------------------------------------------+
-	| ILIAS open source                                                           |
-	+-----------------------------------------------------------------------------+
-	| Copyright (c) 1998-2001 ILIAS open source, University of Cologne            |
-	|                                                                             |
-	| This program is free software; you can redistribute it and/or               |
-	| modify it under the terms of the GNU General Public License                 |
-	| as published by the Free Software Foundation; either version 2              |
-	| of the License, or (at your option) any later version.                      |
-	|                                                                             |
-	| This program is distributed in the hope that it will be useful,             |
-	| but WITHOUT ANY WARRANTY; without even the implied warranty of              |
-	| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the               |
-	| GNU General Public License for more details.                                |
-	|                                                                             |
-	| You should have received a copy of the GNU General Public License           |
-	| along with this program; if not, write to the Free Software                 |
-	| Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. |
-	+-----------------------------------------------------------------------------+
+    +-----------------------------------------------------------------------------+
+    | ILIAS open source                                                           |
+    +-----------------------------------------------------------------------------+
+    | Copyright (c) 1998-2001 ILIAS open source, University of Cologne            |
+    |                                                                             |
+    | This program is free software; you can redistribute it and/or               |
+    | modify it under the terms of the GNU General Public License                 |
+    | as published by the Free Software Foundation; either version 2              |
+    | of the License, or (at your option) any later version.                      |
+    |                                                                             |
+    | This program is distributed in the hope that it will be useful,             |
+    | but WITHOUT ANY WARRANTY; without even the implied warranty of              |
+    | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the               |
+    | GNU General Public License for more details.                                |
+    |                                                                             |
+    | You should have received a copy of the GNU General Public License           |
+    | along with this program; if not, write to the Free Software                 |
+    | Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. |
+    +-----------------------------------------------------------------------------+
 */
 
 use ILIAS\BackgroundTasks\Implementation\Bucket\BasicBucket;
@@ -207,40 +207,16 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI
         $dl_prop->setInfo($lng->txt('enable_multi_download_info'));
         $form->addItem($dl_prop);
 
-        // background task
-
+        // download limit
         $lng->loadLanguageModule("bgtask");
-        $dl_bg = new ilCheckboxInputGUI($lng->txt("bgtask_setting"), "enable_bg");
-        $dl_bg->setInfo($lng->txt("bgtask_setting_info"));
-        $dl_bg->setChecked($this->folderSettings->get("bgtask_download", 0));
-        $form->addItem($dl_bg);
-
-        $dl_bgtc = new ilNumberInputGUI($lng->txt("bgtask_setting_threshold_count"), "bg_tcount");
-        $dl_bgtc->setInfo($lng->txt("bgtask_setting_threshold_count_info"));
-        $dl_bgtc->setRequired(true);
-        $dl_bgtc->setSize(10);
-        $dl_bgtc->setMinValue(1);
-        $dl_bgtc->setSuffix($lng->txt("files"));
-        $dl_bgtc->setValue($this->folderSettings->get("bgtask_download_tcount", null));
-        $dl_bg->addSubItem($dl_bgtc);
-
-        $dl_bgts = new ilNumberInputGUI($lng->txt("bgtask_setting_threshold_size"), "bg_tsize");
-        $dl_bgts->setInfo($lng->txt("bgtask_setting_threshold_size_info"));
-        $dl_bgts->setRequired(true);
-        $dl_bgts->setSize(10);
-        $dl_bgts->setMinValue(1);
-        $dl_bgts->setSuffix($lng->txt("lang_size_mb"));
-        $dl_bgts->setValue($this->folderSettings->get("bgtask_download_tsize", null));
-        $dl_bg->addSubItem($dl_bgts);
-
-        $dl_bgl = new ilNumberInputGUI($lng->txt("bgtask_setting_limit"), "bg_limit");
-        $dl_bgl->setInfo($lng->txt("bgtask_setting_limit_info"));
-        $dl_bgl->setRequired(true);
-        $dl_bgl->setSize(10);
-        $dl_bgl->setMinValue(1);
-        $dl_bgl->setSuffix($lng->txt("lang_size_mb"));
-        $dl_bgl->setValue($this->folderSettings->get("bgtask_download_limit", null));
-        $dl_bg->addSubItem($dl_bgl);
+        $dl_prop = new ilNumberInputGUI($lng->txt("bgtask_setting_limit"), "bg_limit");
+        $dl_prop->setInfo($lng->txt("bgtask_setting_limit_info"));
+        $dl_prop->setRequired(true);
+        $dl_prop->setSize(10);
+        $dl_prop->setMinValue(1);
+        $dl_prop->setSuffix($lng->txt("lang_size_mb"));
+        $dl_prop->setValue($this->folderSettings->get("bgtask_download_limit", null));
+        $form->addItem($dl_prop);
 
         // Inline file extensions
         $tai_prop = new ilTextAreaInputGUI($lng->txt('inline_file_extensions'), 'inline_file_extensions');
@@ -321,13 +297,7 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI
             $this->folderSettings->set("enable_download_folder", $_POST["enable_download_folder"] == 1);
             $this->folderSettings->set("enable_multi_download", $_POST["enable_multi_download"] == 1);
 
-            $this->folderSettings->set("bgtask_download", (bool) $_POST["enable_bg"]);
-            if ((bool) $_POST["enable_bg"]) {
-                $this->folderSettings->set("bgtask_download_limit", (int) $_POST["bg_limit"]);
-                $this->folderSettings->set("bgtask_download_tcount", (int) $_POST["bg_tcount"]);
-                $this->folderSettings->set("bgtask_download_tsize", (int) $_POST["bg_tsize"]);
-            }
-
+            $this->folderSettings->set("bgtask_download_limit", (int) $_POST["bg_limit"]);
             ilUtil::sendSuccess($DIC->language()->txt('settings_saved'), true);
             $DIC->ctrl()->redirect($this, self::CMD_EDIT_DOWNLOADING_SETTINGS);
         }

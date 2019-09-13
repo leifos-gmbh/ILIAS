@@ -203,6 +203,27 @@ class ilTree
 		// init tree implementation 
 		$this->initTreeImplementation();
 	}
+
+	/**
+	 * @param int $node_id
+	 * @return array
+	 */
+	public static function lookupTreesForNode(int $node_id) : array
+	{
+		global $DIC;
+
+		$db = $DIC->database();
+
+		$query = 'select tree from tree ' .
+			'where child = ' . $db->quote($node_id, \ilDBConstants::T_INTEGER);
+		$res = $db->query($query);
+
+		$trees = [];
+		while($row = $res->fetchRow(\ilDBConstants::FETCHMODE_OBJECT)) {
+			$trees[] = $row->tree;
+		}
+		return $trees;
+	}
 	
 	/**
 	 * Init tree implementation

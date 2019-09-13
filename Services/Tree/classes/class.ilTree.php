@@ -23,6 +23,9 @@ include_once './Services/Tree/exceptions/class.ilInvalidTreeStructureException.p
 */
 class ilTree
 {
+	public const TREE_TYPE_MATERIALIZED_PATH = 'mp';
+	public const TREE_TYPE_NESTED_SET = 'ns';
+
 	const POS_LAST_NODE = -2;
 	const POS_FIRST_NODE = -1;
 	
@@ -2513,14 +2516,33 @@ class ilTree
 		global $DIC;
 
 		$ilDB = $DIC['ilDB'];
-		
-		$query = 'UPDATE '.$this->table_tree.' SET lft = %s WHERE child = %s AND tree = %s';
-		$res = $ilDB->manipulateF($query,array('integer','integer','integer'),array(
-			$i,
-			$node_id,
-			$this->tree_id));
 
-		$childs = $this->getChildIds($node_id);
+		if($this->isRepositoryTree()) {
+			$query = 'UPDATE '.$this->table_tree.' SET lft = %s WHERE child = %s';
+			$ilDB->manipulateF($query,array('integer','integer'),array(
+				$i,
+				$node_id)
+			);
+		}
+		else {
+			$query = 'UPDATE '.$this->table_tree.' SET lft = %s WHERE child = %s AND tree = %s';
+			$ilDB->manipulateF($query,array('integer','integer','integer'),array(
+				$i,
+				$node_id,
+				$this->tree_id)
+			);
+		}
+
+		$query = 'SELECT * FROM '. $this->table_tree . ' ' .
+			'WHERE parent = '.$ilDB->quote($node_id,'integer').' '.
+			'ORDER BY lft';
+		$res = $ilDB->query($query);
+
+		$childs = [];
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
+		{
+			$childs[] = $row->child;
+		}
 
 		foreach ($childs as $child)
 		{
@@ -2534,12 +2556,21 @@ class ilTree
 			$i += $this->gap * 2;
 		}
 		
-		
-		$query = 'UPDATE '.$this->table_tree.' SET rgt = %s WHERE child = %s AND tree = %s';
-		$res = $ilDB->manipulateF($query,array('integer','integer', 'integer'),array(
-			$i,
-			$node_id,
-			$this->tree_id));
+
+		if($this->isRepositoryTree()) {
+			$query = 'UPDATE '.$this->table_tree.' SET rgt = %s WHERE child = %s';
+			$res = $ilDB->manipulateF($query,array('integer','integer'),array(
+				$i,
+				$node_id)
+			);
+		}
+		else {
+			$query = 'UPDATE '.$this->table_tree.' SET rgt = %s WHERE child = %s AND tree = %s';
+			$res = $ilDB->manipulateF($query,array('integer','integer', 'integer'),array(
+				$i,
+				$node_id,
+				$this->tree_id));
+		}
 		return $i;
 	}
 
@@ -2945,6 +2976,17 @@ class ilTree
 			$types_deleted[] = $row->type;
 		}
 		return $types_deleted;
+	}
+
+	/**
+	 * check if current tree instance operates on repository tree table
+	 */
+	public function isRepositoryTree()
+	{
+		if($this->table_tree == 'tree') {
+			return true;
+		}
+		return false;
 	}
 	
 	

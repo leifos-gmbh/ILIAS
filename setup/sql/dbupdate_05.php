@@ -1355,5 +1355,25 @@ $ilDB->modifyTableColumn('frm_notification', 'thread_id', array(
 	'notnull' => true,
 	'default' => 0
 ));
-?>	
-	
+?>
+
+<#5520>
+<?php
+
+$settings = new \ilSetting();
+$tree_type = $settings->get('main_tree_impl', \ilTree::TREE_TYPE_NESTED_SET);
+
+$tree = new \ilTree(ROOT_FOLDER_ID);
+switch($tree_type) {
+
+	case \ilTree::TREE_TYPE_NESTED_SET:
+		$tree->renumber();
+		break;
+
+	case \ilTree::TREE_TYPE_MATERIALIZED_PATH:
+		\ilMaterializedPathTree::createFromParentReleation();
+		break;
+
+
+}
+?>

@@ -4,21 +4,18 @@
 
 
 /**
-* Class ilObjRootFolderGUI
-*
-* @author Stefan Meyer <meyer@leifos.com>
-* @version $Id$Id: class.ilObjRootFolderGUI.php,v 1.13 2006/03/10 09:22:58 akill Exp $
-*
-* @ilCtrl_Calls ilObjRootFolderGUI: ilPermissionGUI, ilContainerPageGUI, ilContainerLinkListGUI, 
-* @ilCtrl_Calls ilObjRootFolderGUI: ilColumnGUI, ilObjectCopyGUI, ilObjStyleSheetGUI
-* @ilCtrl_Calls ilObjRootFolderGUI: ilCommonActionDispatcherGUI, ilObjectTranslationGUI
-* 
-* @extends ilObjectGUI
-*/
-
-require_once "./Services/Container/classes/class.ilContainerGUI.php";
-require_once "./Modules/Category/classes/class.ilObjCategoryGUI.php";
-
+ * Class ilObjRootFolderGUI
+ *
+ * @author Stefan Meyer <meyer@leifos.com>
+ * @version $Id$Id: class.ilObjRootFolderGUI.php,v 1.13 2006/03/10 09:22:58 akill Exp $
+ *
+ * @ilCtrl_Calls ilObjRootFolderGUI: ilPermissionGUI, ilContainerPageGUI, ilContainerLinkListGUI,
+ * @ilCtrl_Calls ilObjRootFolderGUI: ilColumnGUI, ilObjectCopyGUI, ilObjStyleSheetGUI
+ * @ilCtrl_Calls ilObjRootFolderGUI: ilCommonActionDispatcherGUI, ilObjectTranslationGUI
+ * @ilCtrl_Calls ilObjRootFolderGUI: ilRepUtilGUI
+ *
+ * @extends ilObjectGUI
+ */
 class ilObjRootFolderGUI extends ilContainerGUI
 {
 	/**
@@ -113,6 +110,13 @@ class ilObjRootFolderGUI extends ilContainerGUI
 		
 		switch($next_class)
 		{
+			case 'ilreputilgui':
+				$ru = new \ilRepUtilGUI($this);
+				$this->ctrl->setReturn($this, 'trash');
+				$this->ctrl->forwardCommand($ru);
+				break;
+
+
 			case 'ilcontainerlinklistgui':
 				include_once("Services/Container/classes/class.ilContainerLinkListGUI.php");
 				$link_list_gui = new ilContainerLinkListGUI();

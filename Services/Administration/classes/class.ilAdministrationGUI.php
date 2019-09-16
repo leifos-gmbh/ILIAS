@@ -38,7 +38,7 @@ include_once("./Services/Table/classes/class.ilTableGUI.php");
 * @ilCtrl_Calls ilAdministrationGUI: ilObjBibliographicAdminGUI, ilObjBibliographicGUI
 * @ilCtrl_Calls ilAdministrationGUI: ilObjStudyProgrammeAdminGUI, ilObjStudyProgrammeGUI
 * @ilCtrl_Calls ilAdministrationGUI: ilObjBadgeAdministrationGUI, ilMemberExportSettingsGUI
-* @ilCtrl_Calls ilAdministrationGUI: ilObjFileAccessSettingsGUI, ilPermissionGUI, ilObjRemoteTestGUI, ilPropertyFormGUI
+* @ilCtrl_Calls ilAdministrationGUI: ilObjFileAccessSettingsGUI, ilPermissionGUI, ilObjRemoteTestGUI
 */
 class ilAdministrationGUI
 {
@@ -77,6 +77,11 @@ class ilAdministrationGUI
 	var $ctrl;
 
 	/**
+	 * @var \ilLogger|null
+	 */
+	private $logger = null;
+
+	/**
 	* Constructor
 	* @access	public
 	*/
@@ -103,6 +108,8 @@ class ilAdministrationGUI
 		$this->rbacsystem = $rbacsystem;
 		$this->objDefinition = $objDefinition;
 		$this->ctrl = $ilCtrl;
+
+		$this->logger = $DIC->logger()->adm();
 
 		$context = $DIC->globalScreen()->tool()->context();
 		$context->claim()->administration();
@@ -154,7 +161,7 @@ class ilAdministrationGUI
 		{
 			$ilErr->raiseError($this->lng->txt('permission_denied'),$ilErr->WARNING);
 		}
-		
+
 
 		// set next_class directly for page translations
 		// (no cmdNode is given in translation link)

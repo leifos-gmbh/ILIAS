@@ -3827,12 +3827,12 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 	/**
 	 * @param \ilPropertyFormGUI|null $form
 	 */
-	protected function undeleteToNewLocationObject(\ilPropertyFormGUI $form = null)
+	protected function restoreToNewLocationObject(\ilPropertyFormGUI $form = null)
 	{
 		$this->tabs_gui->activateTab('trash');
 
 		$ru = new \ilRepUtilGUI($this);
-		$ru->undeleteToNewLocation();
+		$ru->restoreToNewLocation();
 	}
 
 

@@ -13,7 +13,7 @@
 * @ilCtrl_Calls ilObjFolderGUI: ilInfoScreenGUI, ilContainerPageGUI, ilColumnGUI
 * @ilCtrl_Calls ilObjFolderGUI: ilObjectCopyGUI, ilObjStyleSheetGUI
 * @ilCtrl_Calls ilObjFolderGUI: ilExportGUI, ilCommonActionDispatcherGUI, ilDidacticTemplateGUI
-* @ilCtrl_Calls ilObjFolderGUI: ilBackgroundTaskHub, ilObjectTranslationGUI
+* @ilCtrl_Calls ilObjFolderGUI: ilBackgroundTaskHub, ilObjectTranslationGUI, ilRepUtilGUI
 *
 * @extends ilObjectGUI
 */
@@ -106,7 +106,13 @@ class ilObjFolderGUI extends ilContainerGUI
 		$this->showRepTree();
 
 		switch ($next_class)
-		{			
+		{
+			case 'ilreputilgui':
+				$ru = new \ilRepUtilGUI($this);
+				$this->ctrl->setReturn($this, 'trash');
+				$this->ctrl->forwardCommand($ru);
+				break;
+
 			case 'ilpermissiongui':
 				$this->prepareOutput();
 				$this->tabs_gui->activateTab('perm_settings');

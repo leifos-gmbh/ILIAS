@@ -14,6 +14,19 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+book#:#book_schedule_type_none_direct#:#Ohne Zeitplan, direkte Buchung
+book#:#book_schedule_type_none_direct_info#:#Dieser Typ ist geeignet für Referatsthemen, Seminarplätze, etc. Teilnehmer können direkt Buchungen vornehmen.
+book#:#book_schedule_type_none_preference#:#No Schedule, Using Preferences
+book#:#book_schedule_type_none_preference_info#:#Dieser Typ ist geeignet für Referatsthemen, Seminarplätze, etc. Teilnehmer können zunächst Präferenzen nennen. Nach einer Frist werden dann die Buchungen automatisch vorgenommen.
+book#:#book_nr_of_preferences#:#Anzahl Präferenzen
+book#:#book_nr_of_preferences_info#:#Anzahl an Präferenzen die jeder Teilnehmer abgeben darf.
+book#:#book_pref_deadline#:#Frist
+book#:#book_preference_info#:#Bitte wählen Sie %1 Präferenz(en) bis %2. Nach der Frist werden die Zuordnunge auf der Basis der Präferenzen aller Teilnehmer automatisch durchgeführt.
+book#:#book_preferences#:#Präferenzen
+book#:#book_your_bookings#:#Ihre Buchungen
+book#:#book_your_preferences#:#Ihre Präferenzen
+book#:#book_no_bookings_for_you#:#Es wurden keine Buchungen für Sie durchgeführt.
+book#:#book_no_preferences_for_you#:#Sie haben keine Präferenzen abgespeichert.
 crs#:#timings_cron_reminder_freshly_start#:#Der Bearbeitungszeitraum hat begonnen bei:
 crs#:#timings_cron_reminder_started_subject#:#Der Bearbeitungszeitraum hat begonnen
 crs#:#timings_cron_reminder_exceeded_subject#:#Sie haben den Bearbeitungszeitraum überschritten

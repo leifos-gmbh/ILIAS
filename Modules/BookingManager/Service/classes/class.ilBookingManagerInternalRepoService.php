@@ -30,5 +30,13 @@ class ilBookingManagerInternalRepoService
         return new ilBookingPreferencesDBRepository($this->data_sercice->preferencesFactory());
     }
 
+    /**
+     * @return ilBookingPrefBasedBookGatewayRepository
+     */
+    public function getPreferenceBasedBookingRepo()
+    {
+        return new ilBookingPrefBasedBookGatewayRepository();
+    }
+
 
 }

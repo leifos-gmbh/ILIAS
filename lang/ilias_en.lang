@@ -23,9 +23,13 @@ book#:#book_nr_of_preferences_info#:#Number of preferences each participant can 
 book#:#book_pref_deadline#:#Deadline
 book#:#book_preference_info#:#Please select %1 preference(s) until %2. After the deadline bookings will be done automatically based on the preferences of all users.
 book#:#book_preferences#:#Preferences
-book#:#book_your_bookings#:#Your Bookings
+book#:#book_your_bookings#:#Your Reservations
 book#:#book_your_preferences#:#Your Preferences
-book#:#book_no_bookings_for_you#:#No bookings have been performed for you.
+book#:#book_no_bookings_for_you#:#No reservations have been performed for you.
+book#:#book_all_users#:#All Participants
+book#:#book_pref_overview#:#Overview
+book#:#book_pref_book_cron#:#Booking with Preferences
+book#:#book_pref_book_cron_info#:#Automatically book pools using preferences after the deadline
 book#:#book_no_preferences_for_you#:#No preferences have been stored for you.
 crs#:#timings_cron_reminder_freshly_start#:#Der Bearbeitungszeitraum hat begonnen bei:
 crs#:#timings_cron_reminder_started_subject#:#Der Bearbeitungszeitraum hat begonnen

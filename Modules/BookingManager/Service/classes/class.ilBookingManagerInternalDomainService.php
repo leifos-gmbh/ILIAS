@@ -21,11 +21,16 @@ class ilBookingManagerInternalDomainService
      * Booking preferences
      *
      * @param ilObjBookingPool $pool
+     * @param ilBookingPrefBasedBookGatewayRepository|null $book_repo
      * @return ilBookingPreferencesManager
      */
-    public function preferences(ilObjBookingPool $pool)
+    public function preferences(ilObjBookingPool $pool, ilBookingPrefBasedBookGatewayRepository $book_repo = null)
     {
-        return new ilBookingPreferencesManager($pool);
+        if (!$book_repo) {
+            $book_repo = new ilBookingPrefBasedBookGatewayRepository();
+        }
+
+        return new ilBookingPreferencesManager($pool, $book_repo);
     }
 
 }

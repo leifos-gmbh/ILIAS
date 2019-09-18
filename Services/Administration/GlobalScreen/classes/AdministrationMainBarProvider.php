@@ -44,7 +44,7 @@ class AdministrationMainBarProvider extends AbstractStaticMainMenuProvider
                     $path = \ilObject::_getIcon("", "tiny", $titems[$group_item]["type"]);
                     $icon = $this->dic->ui()->factory()->symbol()->icon()->custom($path, $titems[$group_item]["type"]);
 
-                    if ($_GET["admin_mode"] == "settings" && $titems[$group_item]["ref_id"] == ROOT_FOLDER_ID) {
+                    if ($_GET["admin_mode"] != 'repository' && $titems[$group_item]["ref_id"] == ROOT_FOLDER_ID) {
                         $identification = $this->if->identifier('mm_adm_rep');
                         $action = "ilias.php?baseClass=ilAdministrationGUI&ref_id=" . $titems[$group_item]["ref_id"] . "&admin_mode=repository";
                     } else {

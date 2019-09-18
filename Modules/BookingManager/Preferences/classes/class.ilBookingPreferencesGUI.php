@@ -120,8 +120,13 @@ class ilBookingPreferencesGUI
     protected function listPreferenceOptions()
     {
         $ui = $this->ui;
-        $form = $this->initPreferenceForm();
-        $this->main_tpl->setContent($ui->renderer()->render($form));
+        if (count(ilBookingObject::getList($this->pool->getId())) > 0) {
+            $form = $this->initPreferenceForm();
+            $this->main_tpl->setContent($ui->renderer()->render($form));
+        } else {
+            ilUtil::sendInfo($this->lng->txt("book_type_warning"));
+        }
+
     }
 
     /**
@@ -141,6 +146,7 @@ class ilBookingPreferencesGUI
 
         $this->renderBookingInfo();
 
+        $fields = [];
         foreach (ilBookingObject::getList($this->pool->getId()) as $book_obj) {
             $checked = (is_array($preferences[$this->user->getId()]) &&
                 in_array($book_obj["booking_object_id"], $preferences[$this->user->getId()]))

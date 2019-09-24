@@ -192,6 +192,10 @@ class ilObjExerciseGUI extends ilObjectGUI
 			
 			case "ilexsubmissiongui":
 				$this->checkPermission("read");
+				$random_manager = $this->service->getRandomAssignmentManager($this->object);
+				if (!$random_manager->isAssignmentVisible($this->requested_ass_id, $this->user->getId())) {
+				    return;
+                }
 				$ilTabs->activateTab("content");
 				$this->addContentSubTabs("content");
 				$this->ctrl->setReturn($this, "showOverview");
@@ -940,8 +944,13 @@ class ilObjExerciseGUI extends ilObjectGUI
 		$acc->setId("exc_ow_".$this->object->getId());
 
 		$ass_data = ilExAssignment::getInstancesByExercise($this->object->getId());
+        $random_manager = $this->service->getRandomAssignmentManager($this->object);
 		foreach ($ass_data as $ass)
 		{
+		    if (!$random_manager->isAssignmentVisible($ass->getId(), $this->user->getId())) {
+		        continue;
+            }
+
 			// incoming assignment deeplink
 			$force_open = false;
 			if(isset($_GET["ass_id_goto"]) &&

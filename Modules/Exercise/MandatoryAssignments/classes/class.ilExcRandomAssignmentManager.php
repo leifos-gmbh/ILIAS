@@ -234,6 +234,21 @@ class ilExcRandomAssignmentManager
 
         return $selected;
     }
-    
+
+    /**
+     * Is assignment visible for user
+     *
+     * @param int $ass_id
+     * @param int $user_id
+     * @return bool
+     */
+    public function isAssignmentVisible(int $ass_id, int $user_id)
+    {
+        if ($this->isActivated() && !in_array($ass_id, $this->getMandatoryAssignmentsOfUser($user_id))) {
+            return false;
+        }
+        return true;
+    }
+
 
 }

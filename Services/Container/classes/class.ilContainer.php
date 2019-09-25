@@ -1268,7 +1268,26 @@ class ilContainer extends ilObject
 						$result_obj_ids[] = $rec["obj_id"];
 					}
 					$obj_ids = array_intersect($obj_ids, $result_obj_ids);
-				}
+				} else if ($field_id == ilContainerFilterField::STD_FIELD_ONLINE)
+                {
+                    if (in_array($val, [1,2])) {
+                        $online_where = ($val == 1)
+                            ? " (offline <> ".$db->quote(1, "integer")." OR offline IS NULL) "
+                            :" offline = ".$db->quote(1, "integer")." ";
+                        $result = null;
+                        $set = $db->queryF("SELECT obj_id FROM object_data " .
+                            " WHERE  " . $db->in("obj_id", $obj_ids, false, "integer") .
+                            " AND ".$online_where,
+                            [],
+                            []
+                        );
+                        $result_obj_ids = [];
+                        while ($rec = $db->fetchAssoc($set)) {
+                            $result_obj_ids[] = $rec["obj_id"];
+                        }
+                        $obj_ids = array_intersect($obj_ids, $result_obj_ids);
+                    }
+                }
 				else if ($field_id == ilContainerFilterField::STD_FIELD_TUTORIAL_SUPPORT)
 				{
 					$result = null;

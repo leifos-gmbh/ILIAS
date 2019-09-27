@@ -15208,3 +15208,10 @@ common#:#nc_contact_requests_number_s#:#You have %s Contact Request
 common#:#nc_contact_requests_number_p#:#You have %s Contact Requests
 exc#:#exc_team_by_random_add_info#:#Please note that you have to assign all participants first before using this mode.
 cont#:#cont_std_filter_title_9#:#Online/Offline
+rep#:#rep_export_limitation#:#Container Export Limitation
+rep#:#rep_export_limitation_info#:#Limits the number of objects for container exports (courses, categories, ...) in the repository.
+rep#:#rep_export_limitation_disabled#:#Container Export Disabled
+rep#:#rep_export_limitation_limited#:#Limit Export
+rep#:#rep_export_limit_number#:#Number of Objects
+exp#:#exp_error_too_many_objects#:#The export exceeds the maximum number of allowerd objects (%1). Please select a lower number of objects.
+exp#:#exp_error_disabled#:#The export feature is disabled for containers. You may contact your system administrator.

@@ -3891,7 +3891,7 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 
 		$filter = $filter_service->util()->getFilterForRefId($this->ref_id,
 			$DIC->ctrl()->getLinkTarget($this, "render", "", true),
-            $this->isActiveAdministrationPanel());
+            (bool) $this->isActiveAdministrationPanel());
 
 
 		$filter_data = [];

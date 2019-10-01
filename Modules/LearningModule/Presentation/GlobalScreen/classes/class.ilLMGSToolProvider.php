@@ -77,7 +77,7 @@ class ilLMGSToolProvider extends AbstractDynamicToolProvider
     {
         try {
             $renderer = new ilLMSlateTocRendererGUI();
-            return $renderer->render();
+            return "<div class='ilLMTocSlate'>".$renderer->render()."</div>";
         } catch (Exception $e) {
             return "";
         }

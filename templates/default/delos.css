@@ -15945,6 +15945,51 @@ div#right_bottom_area iframe {
   height: 18px;
   margin-top: -3px;
 }
+.ilLMTocSlate > div > div > ul {
+  margin-left: -20px;
+}
+.ilLMTocSlate > div > div > ul > li > a {
+  width: 100%;
+  padding-right: 25px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background-color: #e8e8e8 !important;
+  font-size: 120% !important;
+}
+.ilLMTocSlate > div > div > ul > li > ul > li {
+  background-color: #f0f0f0 !important;
+  padding-top: 5px;
+  border-top: solid 1px #e4e4e4;
+  /* padding-bottom: 5px; */
+}
+.ilLMTocSlate > div > div > ul > li > ul > li > ul {
+  margin-left: -24px;
+}
+.ilLMTocSlate > div > div > ul > li > ul > li > ul > li > ul > li {
+  background-color: #ffffff !important;
+  margin-left: 23px !important;
+}
+.ilLMTocSlate > div > div > ul > li > ul > li > ul > li > i {
+  margin-top: 2px !important;
+}
+.ilLMTocSlate > div > div > ul > li > ul > li > ul > li > a {
+  background-color: #ffffff !important;
+  width: 100%;
+  padding-right: 20px;
+  margin-left: -1px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+.ilLMTocSlate > div > div > ul > li > ul > li > i {
+  position: relative;
+}
+.ilLMTocSlate > div > div > ul > li > ul > li > a {
+  width: 100%;
+  margin-left: -25px;
+  padding-left: 25px;
+  padding-bottom: 5px;
+  font-size: 110% !important;
+}
 /* Services/PersonalDesktop */
 h3.ilPDBlockSubHeader {
   margin: 0;

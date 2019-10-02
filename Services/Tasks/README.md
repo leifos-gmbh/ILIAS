@@ -11,7 +11,7 @@ The class provided at this location MUST implement `Services/Tasks/DerivedTasks/
 
 Method `getProviders()` must return an array of objects that implement the `Services/Tasks/DerivedTasks/interfaces/interface.ilDerivedTaskProvider.php` interface
 
-In this interface the method `getTasks($user_id)` must return all tasks fo a user. To create the entries in the `ilDerivedTask[]` array a factory provided by the service should be used.
+In this interface the method `getTasks($user_id)` must return all tasks for a user. To create the entries in the `ilDerivedTask[]` array a factory provided by the service should be used.
 
 ```
 $tasks[] = $this->derived()->factory()->task($title, $ref_id,

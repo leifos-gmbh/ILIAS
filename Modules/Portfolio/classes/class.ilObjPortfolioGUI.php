@@ -192,6 +192,9 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
 	 */
 	protected function triggerAssignmentTool()
 	{
+		if (!is_object($this->object) || $this->object->getId() <= 0) {
+			return;
+		}
         $pe = new ilPortfolioExercise($this->user_id, $this->object->getId());
         $pe_gui = new ilPortfolioExerciseGUI($this->user_id, $this->object->getId());
         $assignments = $pe->getAssignmentsOfPortfolio();

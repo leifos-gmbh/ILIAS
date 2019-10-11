@@ -117,11 +117,13 @@ class ilBookingPreferencesGUI
     /**
      * List preference options
      */
-    protected function listPreferenceOptions()
+    protected function listPreferenceOptions($form = null)
     {
         $ui = $this->ui;
         if (count(ilBookingObject::getList($this->pool->getId())) > 0) {
-            $form = $this->initPreferenceForm();
+            if (is_null($form)) {
+                $form = $this->initPreferenceForm();
+            }
             $this->main_tpl->setContent($ui->renderer()->render($form));
         } else {
             ilUtil::sendInfo($this->lng->txt("book_type_warning"));
@@ -195,15 +197,30 @@ class ilBookingPreferencesGUI
                         $obj_ids[] = (int) $id[1];
                     }
                 }
+
+                if (count($obj_ids) > $this->pool->getPreferenceNumber()) {
+                    ilUtil::sendFailure($lng->txt("book_too_many_preferences"), true);
+                    $this->listPreferenceOptions($form);
+                    return;
+                }
+
+                if (count($obj_ids) < $this->pool->getPreferenceNumber()) {
+                    ilUtil::sendFailure($lng->txt("book_not_enough_preferences"), true);
+                    $this->listPreferenceOptions($form);
+                    return;
+                }
+
                 $preferences = $this->service->data()->preferencesFactory()->preferences(
                     [$this->user->getId() => $obj_ids]
                 );
                 $repo->savePreferencesOfUser($this->pool->getId(), $this->user->getId(), $preferences);
-                ilUtil::sendInfo($lng->txt("msg_obj_modified"), true);
+                ilUtil::sendSuccess($lng->txt("book_preferences_saved"), true);
             }
         }
         $ctrl->redirect($this, "show");
     }
+
+
 
     /**
      * Render booking info

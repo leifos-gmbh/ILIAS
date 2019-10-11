@@ -119,9 +119,9 @@ class ilBookingPreferencesManager
         $preferences = $preferences->getPreferences();
 
         // we calculate if a) any preferences are given and b) the deadline is reached
-        if (!is_array($preferences) || count($preferences) == 0) {
+        /*if (!is_array($preferences) || count($preferences) == 0) {
             throw new ilBookingCalculationException("No preferences given.");
-        }
+        }*/
         if (!$this->isPreferenceDeadlineReached()) {
             throw new ilBookingCalculationException("Preference deadline not reached.");
         }

@@ -169,7 +169,6 @@ class ilPersonalDesktopGUI
 			case "ilpersonalprofilegui":
 				$this->getStandardTemplates();
 				$this->setTabs();
-				include_once("./Services/User/classes/class.ilPersonalProfileGUI.php");
 				$profile_gui = new ilPersonalProfileGUI();
 				$ret = $this->ctrl->forwardCommand($profile_gui);
 				break;

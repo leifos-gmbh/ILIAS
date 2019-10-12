@@ -12,9 +12,16 @@
 class ilPersonalProfileGUI
 {
 	var $tpl;
-	var $lng;
-	var $ilias;
-	var $ctrl;
+
+    /**
+     * @var ilLanguage
+     */
+	protected $lng;
+
+    /**
+     * @var mixed
+     */
+	protected $ctrl;
 
 	var $user_defined_fields = null;
 
@@ -23,6 +30,11 @@ class ilPersonalProfileGUI
 
 	/** @var \ilTermsOfServiceDocumentEvaluation */
 	protected $termsOfServiceEvaluation;
+
+    /**
+     * @var ilProfileChecklistGUI
+     */
+	protected $checklist;
 
 	/**
 	* constructor
@@ -34,13 +46,15 @@ class ilPersonalProfileGUI
 	{
 		global $DIC;
 
-		$ilias = $DIC['ilias'];
-		$tpl = $DIC['tpl'];
-		$lng = $DIC['lng'];
-		$ilCtrl = $DIC['ilCtrl'];
         $this->tabs = $DIC->tabs();
+        $this->user = $DIC->user();
+        $this->lng = $DIC->language();
+        $this->setting = $DIC->settings();
+        $this->tpl = $DIC->ui()->mainTemplate();
+        $this->ctrl = $DIC->ctrl();
 
-		if ($termsOfServiceEvaluation === null) {
+
+        if ($termsOfServiceEvaluation === null) {
 			$termsOfServiceEvaluation = $DIC['tos.document.evaluator'];
 		}
 		$this->termsOfServiceEvaluation = $termsOfServiceEvaluation;
@@ -48,18 +62,14 @@ class ilPersonalProfileGUI
 		include_once './Services/User/classes/class.ilUserDefinedFields.php';
 		$this->user_defined_fields =& ilUserDefinedFields::_getInstance();
 
-		$this->tpl = $tpl;
-		$this->lng = $lng;
-		$this->ilias = $ilias;
-		$this->ctrl = $ilCtrl;
-		$this->settings = $ilias->getAllSettings();
-		$lng->loadLanguageModule("jsmath");
-		$lng->loadLanguageModule("pd");
+		$this->lng->loadLanguageModule("jsmath");
+        $this->lng->loadLanguageModule("pd");
 		$this->upload_error = "";
 		$this->password_error = "";
-		$lng->loadLanguageModule("user");
-		$ilCtrl->saveParameter($this, "prompted");
-		// $ilCtrl->saveParameter($this, "user_page");
+		$this->lng->loadLanguageModule("user");
+        $this->ctrl->saveParameter($this, "prompted");
+
+        $this->checklist = new ilProfileChecklistGUI();
 	}
 
 	/**
@@ -651,10 +661,15 @@ class ilPersonalProfileGUI
 			$this->lng->txt("personal_data"),
 			$this->ctrl->getLinkTarget($this, "showPersonalData"));
 		
-		// public profile
+		// publishing options
 		$ilTabs->addTab("public_profile",
-			$this->lng->txt("public_profile"),
+			$this->lng->txt("user_publish_options"),
 			$this->ctrl->getLinkTarget($this, "showPublicProfile"));
+
+		// visibility settings
+		$ilTabs->addTab("visibility_settings",
+			$this->lng->txt("user_visibility_settings"),
+			$this->ctrl->getLinkTarget($this, "showVisibilitySettings"));
 
 		// export
 		$ilTabs->addTab("export",
@@ -814,6 +829,8 @@ class ilPersonalProfileGUI
 		}
 
 		$this->setHeader();
+
+		$this->showChecklist(ilProfileChecklistStatus::STEP_PROFILE_DATA);
 
 		if (!$a_no_init)
 		{
@@ -1050,14 +1067,10 @@ class ilPersonalProfileGUI
 	*/
 	function showPublicProfile($a_no_init = false)
 	{
-		global $DIC;
-
-		$ilUser = $DIC['ilUser'];
-		$lng = $DIC['lng'];
-		$ilSetting = $DIC['ilSetting'];
-		$ilTabs = $DIC['ilTabs'];
+		$ilTabs = $this->tabs;
 		
 		$ilTabs->activateTab("public_profile");
+        $this->showChecklist(ilProfileChecklistStatus::STEP_PUBLISH_OPTIONS);
 
 		$this->setHeader();
 
@@ -1068,9 +1081,6 @@ class ilPersonalProfileGUI
 		
 		$ptpl = new ilTemplate("tpl.edit_personal_profile.html", true, true, "Services/User");
 		$ptpl->setVariable("FORM", $this->form->getHTML());
-		include_once("./Services/User/classes/class.ilPublicUserProfileGUI.php");
-		$pub_profile = new ilPublicUserProfileGUI($ilUser->getId());
-		$ptpl->setVariable("PREVIEW", $pub_profile->getEmbeddable());
 		$this->tpl->setContent($ptpl->get());
 		$this->tpl->printToStdout();
 	}
@@ -1633,4 +1643,39 @@ class ilPersonalProfileGUI
 			$tpl->printToStdout();
 		}
 	}
+
+    /**
+     * Show checklist
+     *
+     * @param int
+     */
+    protected function showChecklist($active_step)
+    {
+        $main_tpl = $this->tpl;
+
+        $main_tpl->setRightContent($this->checklist->render($active_step));
+    }
+
+    /**
+     * Show visibility settings
+     *
+     * @param
+     */
+    protected function showVisibilitySettings()
+    {
+        $main_tpl = $this->tpl;
+        $user = $this->user;
+        $tabs = $this->tabs;
+
+        $tabs->activateTab("visibility_settings");
+        $this->setHeader();
+        $this->showChecklist(ilProfileChecklistStatus::STEP_VISIBILITY_OPTIONS);
+
+        $pub_profile = new ilPublicUserProfileGUI($user->getId());
+
+        $main_tpl->setContent($pub_profile->getEmbeddable());
+        $main_tpl->printToStdout();
+    }
+	
+	
 }

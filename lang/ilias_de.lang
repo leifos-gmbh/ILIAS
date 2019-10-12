@@ -14,6 +14,9 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+user#:#user_privacy_checklist#:#Privacy Checklist
+user#:#user_publish_options#:#Publishing Options
+user#:#user_visibility_settings#:#Visibility Settings
 chatroom#:#osc_noti_title#:#Neue Chat-Nachricht
 chatroom#:#osc_enable_browser_notifications_label#:#Browser-Benachrichtigungen
 chatroom#:#osc_enable_browser_notifications_info#:#Wenn aktiviert, erhalten Sie beim Eintreffen neuer Konversationen oder Chat-Nachrichten eine Browser-Benachrichtigung, wenn zwischen zwei Nachrichten einer Konversation mehr als %s Minute(n) vergangen ist/sind. Befindet sich ILIAS im Hintergrund und arbeiten Sie in anderen Browser-Tabs, oder ist der Browser ausgeblendet, erhalten Sie ebenfalls eine Benachrichtigung.

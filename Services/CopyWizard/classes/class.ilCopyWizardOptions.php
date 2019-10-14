@@ -41,6 +41,9 @@ class ilCopyWizardOptions
 	const DISABLE_SOAP = -4;
 	const ROOT_NODE = -5;
 	const DISABLE_TREE_COPY = -6;
+
+	// begin-patch veda
+	const TRAINING_COURSE_TRAIN = -100;
 	
 	private $db;
 	
@@ -69,7 +72,7 @@ class ilCopyWizardOptions
 			$this->read();
 		}	
 	}
-	
+
 	/**
 	 * Get instance of copy wizard options
 	 *
@@ -195,7 +198,39 @@ class ilCopyWizardOptions
 		return true;
 		
 	}
-	
+
+	/**
+	 * @param $info
+	 * @return bool
+	 */
+	public function saveTrainingCourseInfo($info)
+	{
+		global $DIC;
+
+		$ilDB = $DIC['ilDB'];
+
+		$ilDB->insert("copy_wizard_options", array(
+			"copy_id" 	=> array("integer", $this->getCopyId()),
+			"source_id" => array("integer", self::TRAINING_COURSE_TRAIN),
+			"options"	=> array('clob',serialize([$info]))
+		));
+
+		return true;
+	}
+
+	/**
+	 * @return \Swagger\Client\Model\Ausbildungszug[]
+	 */
+	public function getTrainingCourseInfo() : ?array
+	{
+		if(array_key_exists(self::TRAINING_COURSE_TRAIN, $this->options))
+		{
+			$options = $this->getOptions(self::TRAINING_COURSE_TRAIN);
+			return $options[0];
+		}
+		return null;
+	}
+
 	/**
 	 * Is root node
 	 *

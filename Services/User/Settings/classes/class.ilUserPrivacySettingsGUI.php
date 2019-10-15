@@ -146,7 +146,9 @@ class ilUserPrivacySettingsGUI
         if ($this->profile_mode->isEnabled()) {
             $html.= $pub_profile->getEmbeddable();
         } else {
-            $html.= $ui->renderer()->render([$ui->factory()->messageBox()->info($lng->txt("usr_public_profile_disabled"))]);
+            if (!$this->checklist_status->anyVisibilitySettings()) {
+                $html .= $ui->renderer()->render([$ui->factory()->messageBox()->info($lng->txt("usr_public_profile_disabled"))]);
+            }
         }
 
         $main_tpl->setContent($html);

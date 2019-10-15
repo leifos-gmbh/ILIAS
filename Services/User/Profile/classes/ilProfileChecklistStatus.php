@@ -103,7 +103,8 @@ class ilProfileChecklistStatus
                 };
                 break;
             case self::STEP_VISIBILITY_OPTIONS:
-                if ($user->getPref("profile_visibility_opt_saved")) {
+                if ($user->getPref("profile_visibility_opt_saved") ||
+                    (!$this->anyVisibilitySettings() && $user->getPref("profile_publish_opt_saved"))) {
                     $status = self::STATUS_SUCCESSFUL;
                 };
                 break;
@@ -157,7 +158,9 @@ class ilProfileChecklistStatus
                     }
                     $details = implode(",<br>", $status);
                 } else {
-                    $details = $lng->txt("user_set_visibilty_options");
+                    if ($this->anyVisibilitySettings()) {
+                        $details = $lng->txt("user_set_visibilty_options");
+                    }
                 }
                 break;
         }

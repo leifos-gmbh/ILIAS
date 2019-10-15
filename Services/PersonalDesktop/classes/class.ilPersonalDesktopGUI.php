@@ -177,7 +177,6 @@ class ilPersonalDesktopGUI
 			case "ilpersonalsettingsgui":
 				$this->getStandardTemplates();
 				$this->setTabs();
-				include_once("./Services/User/classes/class.ilPersonalSettingsGUI.php");
 				$settings_gui = new ilPersonalSettingsGUI();
 				$ret = $this->ctrl->forwardCommand($settings_gui);
 				break;

@@ -60,8 +60,8 @@ class ilProfileChecklistGUI
                 $active_step_nr = $cnt;
             }
             $cnt++;
-            $s = $workflow_factory->step($txt, '')
-                ->withStatus(Step::IN_PROGRESS);
+            $s = $workflow_factory->step($txt, $status->getStatusDetails($step))
+                ->withStatus($this->getUIChecklistStatus($status->getStatus($step)));
             $steps[] = $s;
         }
 
@@ -72,6 +72,21 @@ class ilProfileChecklistGUI
         //render
         return $ui->renderer()->render($wf);
     }
+
+    /**
+     * Get ui checklist status. Maps the checklist status to the UI element status.
+     * @param int $check_list_status
+     * @return int
+     */
+    protected function getUIChecklistStatus(int $check_list_status)
+    {
+        switch ($check_list_status) {
+            case ilProfileChecklistStatus::STATUS_NOT_STARTED: return Step::NOT_STARTED; break;
+            case ilProfileChecklistStatus::STATUS_IN_PROGRESS: return Step::IN_PROGRESS; break;
+            case ilProfileChecklistStatus::STATUS_SUCCESSFUL: return Step::SUCCESSFULLY; break;
+        }
+    }
+
 
 
 }

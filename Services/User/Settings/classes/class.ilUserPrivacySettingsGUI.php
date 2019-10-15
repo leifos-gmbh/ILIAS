@@ -56,6 +56,11 @@ class ilUserPrivacySettingsGUI
     protected $checklist_status;
 
     /**
+     * @var ilPersonalProfileMode
+     */
+    protected $profile_mode;
+
+    /**
      * constructor
      */
     function __construct()
@@ -74,6 +79,7 @@ class ilUserPrivacySettingsGUI
         $this->user_settings_config = new ilUserSettingsConfig();
         $this->settings = $DIC->settings();
         $this->checklist_status = new ilProfileChecklistStatus();
+        $this->profile_mode = new ilPersonalProfileMode($this->user, $this->settings);
     }
 
     /**
@@ -126,14 +132,24 @@ class ilUserPrivacySettingsGUI
         $main_tpl = $this->main_tpl;
         $ui = $this->ui;
         $user = $this->user;
+        $lng = $this->lng;
 
-        if (is_null($form))
-        {
-            $form = $this->initPrivacySettingsForm();
+        $html = "";
+        if ($this->checklist_status->anyVisibilitySettings()) {
+            if (is_null($form)) {
+                $form = $this->initPrivacySettingsForm();
+            }
+            $html = $ui->renderer()->render([$form]);
         }
 
         $pub_profile = new ilPublicUserProfileGUI($user->getId());
-        $main_tpl->setContent($ui->renderer()->render([$form]).$pub_profile->getEmbeddable());
+        if ($this->profile_mode->isEnabled()) {
+            $html.= $pub_profile->getEmbeddable();
+        } else {
+            $html.= $ui->renderer()->render([$ui->factory()->messageBox()->info($lng->txt("usr_public_profile_disabled"))]);
+        }
+
+        $main_tpl->setContent($html);
     }
 
     /**

@@ -50,13 +50,32 @@ class ilProfileChecklistStatus
     {
         $lng = $this->lng;
 
+        $txt_visibility = $this->anyVisibilitySettings()
+            ? $lng->txt("user_visibility_settings")
+            : $lng->txt("preview");
+
         return [
             self::STEP_PROFILE_DATA => $lng->txt("user_profile_data"),
             self::STEP_PUBLISH_OPTIONS => $lng->txt("user_publish_options"),
-            self::STEP_VISIBILITY_OPTIONS => $lng->txt("user_visibility_settings")
+            self::STEP_VISIBILITY_OPTIONS => $txt_visibility
         ];
     }
 
+    /**
+     * Any visibility settings?
+     *
+     * @return bool
+     */
+    public function anyVisibilitySettings(): bool
+    {
+        $awrn_set = new ilSetting("awrn");
+        if ($awrn_set->get("awrn_enabled", false) ||
+            ilBuddySystem::getInstance()->isEnabled()) {
+            return true;
+        }
+
+        return false;
+    }
 
     /**
      * Get status of step

@@ -669,8 +669,11 @@ class ilPersonalProfileGUI
 			$this->ctrl->getLinkTarget($this, "showPublicProfile"));
 
 		// visibility settings
+        $txt_visibility = $this->checklist_status->anyVisibilitySettings()
+            ? $this->lng->txt("user_visibility_settings")
+            : $this->lng->txt("preview");
 		$ilTabs->addTab("visibility_settings",
-			$this->lng->txt("user_visibility_settings"),
+            $txt_visibility,
 			$this->ctrl->getLinkTargetByClass("ilUserPrivacySettingsGUI", ""));
 
 		// export

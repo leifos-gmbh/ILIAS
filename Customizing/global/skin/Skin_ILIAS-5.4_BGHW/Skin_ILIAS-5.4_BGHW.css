@@ -17277,8 +17277,8 @@ h3.ilBlockHeader {
 .btn-default.active,
 .open > .dropdown-toggle.btn-default {
   color: white;
-  background-color: #0099CC;
-  border-color: #0099CC;
+  background-color: #0099CC !important;
+  border-color: #0099CC !important;
 }
 .btn-default:active:hover,
 .btn-default.active:hover,
@@ -17312,6 +17312,14 @@ fieldset[disabled] .btn:active,
 .btn[disabled].active,
 fieldset[disabled] .btn.active {
   border-color: #b0b0b0;
+}
+input.ilc_qsubmit_Submit {
+  background-color: #004994 !important;
+  border-color: #004994 !important;
+  color: white;
+}
+#etherpad-lite {
+  height: inherit !important;
 }
 /*TREE*/
 a.ilTreeView {
@@ -17445,6 +17453,14 @@ p.ilErrorSection {
   src: url('../../../../Customizing/global/skin/Skin_ILIAS-5.4_BGHW/fonts/DGUV_Meta_Web/DGUVMetaWeb-NormalIta.woff') format('woff');
   font-weight: 800;
   font-style: italic;
+}
+/**********ETHERPAD**********/
+.icon.xpdl.medium.outlined {
+  display: none;
+}
+/**********MEDIA GALLERY**********/
+.icon.xmg.medium.outlined {
+  display: none;
 }
 /*----------PAGE HEADER----------*/
 div.ilMemberViewMainHeader a {
@@ -17635,6 +17651,7 @@ a.il_ContainerItemCommand:visited {
   font-size: 120%;
   margin-left: -15px !important;
   line-height: 45px;
+  margin-top: 10px;
 }
 .ilLSOKioskTopBarTitle {
   font-size: 120%;

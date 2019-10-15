@@ -17261,6 +17261,9 @@ h3.ilBlockHeader {
 .ilObjListRow:hover {
   background-color: white;
 }
+.card-title .btn {
+  font-size: 100%;
+}
 /*BUTTONS*/
 .btn-default {
   color: white;
@@ -17274,8 +17277,8 @@ h3.ilBlockHeader {
 .btn-default.active,
 .open > .dropdown-toggle.btn-default {
   color: white;
-  background-color: #0099CC;
-  border-color: #0099CC;
+  background-color: #0099CC !important;
+  border-color: #0099CC !important;
 }
 .btn-default:active:hover,
 .btn-default.active:hover,
@@ -17309,6 +17312,14 @@ fieldset[disabled] .btn:active,
 .btn[disabled].active,
 fieldset[disabled] .btn.active {
   border-color: #b0b0b0;
+}
+input.ilc_qsubmit_Submit {
+  background-color: #004994 !important;
+  border-color: #004994 !important;
+  color: white;
+}
+#etherpad-lite {
+  height: inherit !important;
 }
 /*TREE*/
 a.ilTreeView {
@@ -17443,6 +17454,14 @@ p.ilErrorSection {
   font-weight: 800;
   font-style: italic;
 }
+/**********ETHERPAD**********/
+.icon.xpdl.medium.outlined {
+  display: none;
+}
+/**********MEDIA GALLERY**********/
+.icon.xmg.medium.outlined {
+  display: none;
+}
 /*----------PAGE HEADER----------*/
 div.ilMemberViewMainHeader a {
   color: white;
@@ -17498,6 +17517,7 @@ div#il_startup_logo {
 }
 .ilStartupSection {
   padding-top: 0px;
+  text-align: center;
 }
 .ilStartupSection .ilFormHeader {
   padding-left: 10px;
@@ -17518,20 +17538,19 @@ body.ilc_text_block_Headline1 {
   width: 100%;
   Margin-top: 15px;
 }
-.ilStartupSection {
-  margin-top: 50px;
+.ilStartupFrame {
   text-align: center;
+  padding-top: 15px;
+  padding-bottom: 10px;
+}
+#il_prop_cont_password {
+  padding-bottom: 20px;
 }
 a.il_ContainerItemCommand2:link,
 a.il_ContainerItemCommand2:visited,
 a.il_ContainerItemCommand:link,
 a.il_ContainerItemCommand:visited {
   font-size: 100%;
-}
-.ilStartupFrame {
-  text-align: center;
-  padding-top: 15px;
-  padding-bottom: 10px;
 }
 /*----------FOOTER----------*/
 /*----------PAGE HEADER----------*/
@@ -17632,6 +17651,7 @@ a.il_ContainerItemCommand:visited {
   font-size: 120%;
   margin-left: -15px !important;
   line-height: 45px;
+  margin-top: 10px;
 }
 .ilLSOKioskTopBarTitle {
   font-size: 120%;
@@ -17715,13 +17735,20 @@ a.il_ContainerItemCommand:visited {
 }
 .il-card .caption .card-title {
   font-weight: 600;
-  font-size: 130%;
+  font-size: 18px;
   margin-top: 0px;
   margin-bottom: 0px;
   padding-top: 9px;
 }
 .thumbnail .caption {
   padding-top: 0px;
+}
+.card-title .btn-link {
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  line-height: 1.1;
 }
 /*----------REPOSITORY----------*/
 .il-card {

@@ -32,9 +32,6 @@
 		"enshrined/svg-sanitize": "^0.10.0",
 		"jakoch/phantomjs-installer": "2.1.1-p05"
 	},
-	"config": {
-		"bin-dir": "bin"
-	},
 	"require-dev": {
 		"mikey179/vfsStream": "^1.6",
 		"phpunit/phpunit": "^5.7",

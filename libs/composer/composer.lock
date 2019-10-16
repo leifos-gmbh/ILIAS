@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8e0533642400924ec433300e6080f187",
+    "content-hash": "bc706ae8f4fa983cef6de3703ae1554d",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -588,6 +588,48 @@
             ],
             "abandoned": "simplesamlphp/twig-configurable-i18n",
             "time": "2016-10-03T12:34:15+00:00"
+        },
+        {
+            "name": "jakoch/phantomjs-installer",
+            "version": "2.1.1-p05",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jakoch/phantomjs-installer.git",
+                "reference": "1aa2a29da48fee62679f7f7a3d446b0e52df494a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jakoch/phantomjs-installer/zipball/1aa2a29da48fee62679f7f7a3d446b0e52df494a",
+                "reference": "1aa2a29da48fee62679f7f7a3d446b0e52df494a",
+                "shasum": ""
+            },
+            "require": {
+                "ext-bz2": "*",
+                "ext-openssl": "*"
+            },
+            "type": "custom-installer",
+            "autoload": {
+                "psr-0": {
+                    "PhantomInstaller\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jens-André Koch",
+                    "email": "jakoch@web.de"
+                }
+            ],
+            "description": "A Composer package which installs the PhantomJS binary (Linux, Windows, Mac) into `/bin` of your project.",
+            "keywords": [
+                "binaries",
+                "headless",
+                "phantomjs"
+            ],
+            "time": "2016-07-11T09:07:23+00:00"
         },
         {
             "name": "james-heinrich/getid3",

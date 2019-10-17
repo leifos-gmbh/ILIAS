@@ -45,16 +45,11 @@ class ilObjCourseListGUI extends ilObjectListGUI
 	}
 	
 	/**
-	* inititialize new item
-	*
-	* @param	int			$a_ref_id		reference id
-	* @param	int			$a_obj_id		object id
-	* @param	string		$a_title		title
-	* @param	string		$a_description	description
-	*/
-	function initItem($a_ref_id, $a_obj_id, $a_title = "", $a_description = "")
+	 * @inheritdoc
+	 */
+	function initItem($a_ref_id, $a_obj_id, $type, $a_title = "", $a_description = "")
 	{		
-		parent::initItem($a_ref_id, $a_obj_id, $a_title, $a_description);
+		parent::initItem($a_ref_id, $a_obj_id, $type, $a_title, $a_description);
 
 		$this->conditions_ok = ilConditionHandler::_checkAllConditionsOfTarget($a_ref_id,$this->obj_id);
 	}
@@ -170,6 +165,11 @@ class ilObjCourseListGUI extends ilObjectListGUI
 			$props[] = array("alert" => false, "property" => $lng->txt("passed"),
 				"value" => '<a href="' . $cmd_link . '">' . $lng->txt("download_certificate") . '</a>');
 		}
+
+		// booking information
+		$repo = ilObjCourseAccess::getBookingInfoRepo();
+		$book_info = new ilBookingInfoListItemPropertiesAdapter($repo);
+		$props = $book_info->appendProperties($this->obj_id, $props);
 
 		return $props;
 	}

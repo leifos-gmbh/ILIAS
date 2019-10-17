@@ -8,49 +8,51 @@ require_once(__DIR__ . "/FilterTest.php");
 
 use ILIAS\UI\Implementation\Component\SignalGenerator;
 use \ILIAS\Data;
-use \ILIAS\Refinery\Validation;
-use \ILIAS\Refinery\Transformation;
+use ILIAS\Refinery;
 
-class WithNoUIFactories extends NoUIFactory {
-
-	protected $button_factory;
-	protected $glyph_factory;
-	protected $popover_factory;
-	protected $legacy_factory;
-	protected $listing_factory;
-
-
-	public function __construct($button_factory, $glyph_factory, $popover_factory, $legacy_factory, $listing_factory) {
-		$this->button_factory = $button_factory;
-		$this->glyph_factory = $glyph_factory;
-		$this->popover_factory = $popover_factory;
-		$this->legacy_factory = $legacy_factory;
-		$this->listing_factory = $listing_factory;
-	}
+class WithNoUIFactories extends NoUIFactory
+{
+    protected $button_factory;
+    protected $symbol_factory;
+    protected $popover_factory;
+    protected $legacy_factory;
+    protected $listing_factory;
 
 
-	public function button() {
-		return $this->button_factory;
-	}
+    public function __construct($button_factory, $symbol_factory, $popover_factory, $legacy_factory, $listing_factory)
+    {
+        $this->button_factory = $button_factory;
+        $this->symbol_factory = $symbol_factory;
+        $this->popover_factory = $popover_factory;
+        $this->legacy_factory = $legacy_factory;
+        $this->listing_factory = $listing_factory;
+    }
 
-	public function glyph() {
-		return $this->glyph_factory;
-	}
 
-	public function popover()
-	{
-		return $this->popover_factory;
-	}
+    public function button()
+    {
+        return $this->button_factory;
+    }
 
-	public function legacy($content)
-	{
-		return $this->legacy_factory;
-	}
+    public function symbol() : \ILIAS\UI\Component\Symbol\Factory
+    {
+        return $this->symbol_factory;
+    }
 
-	public function listing()
-	{
-		return $this->listing_factory;
-	}
+    public function popover()
+    {
+        return $this->popover_factory;
+    }
+
+    public function legacy($content)
+    {
+        return $this->legacy_factory;
+    }
+
+    public function listing()
+    {
+        return $this->listing_factory;
+    }
 }
 
 /**
@@ -59,62 +61,88 @@ class WithNoUIFactories extends NoUIFactory {
 
 class StandardFilterTest extends ILIAS_UI_TestBase
 {
+    protected function buildFactory()
+    {
+        return new ILIAS\UI\Implementation\Component\Input\Container\Filter\Factory(
+            new SignalGenerator(),
+            $this->buildInputFactory()
+        );
+    }
 
-	protected function buildFactory() {
-		return new ILIAS\UI\Implementation\Component\Input\Container\Filter\Factory(
-			new SignalGenerator(),
-			$this->buildInputFactory());
-	}
+    protected function buildInputFactory()
+    {
+        $df = new Data\Factory();
+        $language = $this->createMock(\ilLanguage::class);
+        return new ILIAS\UI\Implementation\Component\Input\Field\Factory(
+            new SignalGenerator(),
+            $df,
+            new ILIAS\Refinery\Factory($df, $language)
+        );
+    }
 
-	protected function buildInputFactory() {
-		$df = new Data\Factory();
-		return new ILIAS\UI\Implementation\Component\Input\Field\Factory(
-			new SignalGenerator(),
-			$df,
-			new Validation\Factory($df, $this->createMock(\ilLanguage::class)),
-			new Transformation\Factory()
-		);
-	}
+    protected function buildButtonFactory()
+    {
+        return new ILIAS\UI\Implementation\Component\Button\Factory;
+    }
 
-	protected function buildButtonFactory() {
-		return new ILIAS\UI\Implementation\Component\Button\Factory;
-	}
+    protected function buildSymbolFactory()
+    {
+        return new ILIAS\UI\Implementation\Component\Symbol\Factory(
+            new ILIAS\UI\Implementation\Component\Symbol\Icon\Factory,
+            new ILIAS\UI\Implementation\Component\Symbol\Glyph\Factory
+        );
+    }
 
-	protected function buildGlyphFactory() {
-		return new ILIAS\UI\Implementation\Component\Glyph\Factory;
-	}
+    protected function buildPopoverFactory()
+    {
+        return new ILIAS\UI\Implementation\Component\Popover\Factory(new SignalGenerator());
+    }
 
-	protected function buildPopoverFactory() {
-		return new ILIAS\UI\Implementation\Component\Popover\Factory(new SignalGenerator());
-	}
+    protected function buildLegacyFactory()
+    {
+        return new ILIAS\UI\Implementation\Component\Legacy\Legacy("");
+    }
 
-	protected function buildLegacyFactory() {
-		return new ILIAS\UI\Implementation\Component\Legacy\Legacy("");
-	}
+    protected function buildListingFactory()
+    {
+        return new ILIAS\UI\Implementation\Component\Listing\Factory;
+    }
 
-	protected function buildListingFactory() {
-		return new ILIAS\UI\Implementation\Component\Listing\Factory;
-	}
+    public function getUIFactory()
+    {
+        return new WithNoUIFactories(
+            $this->buildButtonFactory(),
+            $this->buildSymbolFactory(),
+            $this->buildPopoverFactory(),
+            $this->buildLegacyFactory(),
+            $this->buildListingFactory()
+        );
+    }
 
-	public function getUIFactory() {
-		return new WithNoUIFactories($this->buildButtonFactory(), $this->buildGlyphFactory(), $this->buildPopoverFactory(),
-			$this->buildLegacyFactory(), $this->buildListingFactory());
-	}
+    public function test_render_activated_collapsed()
+    {
+        $f = $this->buildFactory();
+        $if = $this->buildInputFactory();
+        $inputs = [$if->text("Title"), $if->select("Selection", ["One", "Two", "Three"])];
+        $inputs_rendered = [true, false];
 
-	public function test_render_activated_collapsed() {
+        $filter = $f->standard(
+            "#",
+            "#",
+            "#",
+            "#",
+            "#",
+            "#",
+            $inputs,
+            $inputs_rendered,
+            true,
+            false
+        );
 
-		$f = $this->buildFactory();
-		$if = $this->buildInputFactory();
-		$inputs = [$if->text("Title"), $if->select("Selection", ["One", "Two", "Three"])];
-		$inputs_rendered = [true, false];
+        $r = $this->getDefaultRenderer();
+        $html = $r->render($filter);
 
-		$filter = $f->standard("#", "#", "#", "#",
-			"#", "#", $inputs, $inputs_rendered, true, false);
-
-		$r = $this->getDefaultRenderer();
-		$html = $r->render($filter);
-
-		$expected = <<<EOT
+        $expected = <<<EOT
 <div class="il-filter enabled" id="id_1">
     <form class="il-standard-form form-horizontal" enctype="multipart/formdata" method="get" novalidate="novalidate" data-cmd-expand="#" data-cmd-collapse="#" data-cmd-apply="#" data-cmd-toggleOn="#">
         <div class="il-filter-bar">
@@ -166,7 +194,7 @@ class StandardFilterTest extends ILIAS_UI_TestBase
 							<span class="glyphicon glyphicon-minus-sign" aria-hidden="true"></span>
 						</a>
 					</span>
-				</div> 
+				</div>
 			</div>
 			<div class="col-md-4 il-popover-container">
     			<div class="input-group">
@@ -177,7 +205,7 @@ class StandardFilterTest extends ILIAS_UI_TestBase
 						<div>
 							<span class="bulky-label"></span>
 						</div>
-					</button>    
+					</button>
     			</div>
     			<div class="il-standard-popover-content" style="display:none;" id="id_17"></div>
 			</div>
@@ -188,23 +216,33 @@ class StandardFilterTest extends ILIAS_UI_TestBase
 </div>
 EOT;
 
-		$this->assertHTMLEquals($expected, $html);
-	}
+        $this->assertHTMLEquals($expected, $html);
+    }
 
-	public function test_render_deactivated_collapsed() {
+    public function test_render_deactivated_collapsed()
+    {
+        $f = $this->buildFactory();
+        $if = $this->buildInputFactory();
+        $inputs = [$if->text("Title"), $if->select("Selection", ["One", "Two", "Three"])];
+        $inputs_rendered = [true, false];
 
-		$f = $this->buildFactory();
-		$if = $this->buildInputFactory();
-		$inputs = [$if->text("Title"), $if->select("Selection", ["One", "Two", "Three"])];
-		$inputs_rendered = [true, false];
+        $filter = $f->standard(
+            "#",
+            "#",
+            "#",
+            "#",
+            "#",
+            "#",
+            $inputs,
+            $inputs_rendered,
+            false,
+            false
+        );
 
-		$filter = $f->standard("#", "#", "#", "#",
-			"#", "#", $inputs, $inputs_rendered, false, false);
+        $r = $this->getDefaultRenderer();
+        $html = $r->render($filter);
 
-		$r = $this->getDefaultRenderer();
-		$html = $r->render($filter);
-
-		$expected = <<<EOT
+        $expected = <<<EOT
 <div class="il-filter disabled" id="id_1">
     <form class="il-standard-form form-horizontal" enctype="multipart/formdata" method="get" novalidate="novalidate" data-cmd-expand="#" data-cmd-collapse="#" data-cmd-apply="#" data-cmd-toggleOn="#">
         <div class="il-filter-bar">
@@ -265,23 +303,33 @@ EOT;
 </div>
 EOT;
 
-		$this->assertHTMLEquals($expected, $html);
-	}
+        $this->assertHTMLEquals($expected, $html);
+    }
 
-	public function test_render_activated_expanded() {
+    public function test_render_activated_expanded()
+    {
+        $f = $this->buildFactory();
+        $if = $this->buildInputFactory();
+        $inputs = [$if->text("Title"), $if->select("Selection", ["One", "Two", "Three"])];
+        $inputs_rendered = [true, false];
 
-		$f = $this->buildFactory();
-		$if = $this->buildInputFactory();
-		$inputs = [$if->text("Title"), $if->select("Selection", ["One", "Two", "Three"])];
-		$inputs_rendered = [true, false];
+        $filter = $f->standard(
+            "#",
+            "#",
+            "#",
+            "#",
+            "#",
+            "#",
+            $inputs,
+            $inputs_rendered,
+            true,
+            true
+        );
 
-		$filter = $f->standard("#", "#", "#", "#",
-			"#", "#", $inputs, $inputs_rendered, true, true);
+        $r = $this->getDefaultRenderer();
+        $html = $r->render($filter);
 
-		$r = $this->getDefaultRenderer();
-		$html = $r->render($filter);
-
-		$expected = <<<EOT
+        $expected = <<<EOT
 <div class="il-filter enabled" id="id_1">
     <form class="il-standard-form form-horizontal" enctype="multipart/formdata" method="get" novalidate="novalidate" data-cmd-expand="#" data-cmd-collapse="#" data-cmd-apply="#" data-cmd-toggleOn="#">
         <div class="il-filter-bar">
@@ -326,7 +374,7 @@ EOT;
             <div class="col-md-4 il-popover-container">
                 <div class="input-group">
                     <span class="input-group-addon leftaddon">Selection</span>
-                    <span role="button" tabindex="0" class="form-control il-filter-field" id="id_13" data-placement="bottom"></span> 
+                    <span role="button" tabindex="0" class="form-control il-filter-field" id="id_13" data-placement="bottom"></span>
                     <div class="il-standard-popover-content" style="display:none;" id="id_12"></div>
                     <span class="input-group-addon rightaddon"><a class="glyph" href="" aria-label="remove" id="id_14">
                     <span class="glyphicon glyphicon-minus-sign" aria-hidden="true"></span>
@@ -352,23 +400,33 @@ EOT;
 </div>
 EOT;
 
-		$this->assertHTMLEquals($expected, $html);
-	}
+        $this->assertHTMLEquals($expected, $html);
+    }
 
-	public function test_render_deactivated_expanded() {
+    public function test_render_deactivated_expanded()
+    {
+        $f = $this->buildFactory();
+        $if = $this->buildInputFactory();
+        $inputs = [$if->text("Title"), $if->select("Selection", ["One", "Two", "Three"])];
+        $inputs_rendered = [true, false];
 
-		$f = $this->buildFactory();
-		$if = $this->buildInputFactory();
-		$inputs = [$if->text("Title"), $if->select("Selection", ["One", "Two", "Three"])];
-		$inputs_rendered = [true, false];
+        $filter = $f->standard(
+            "#",
+            "#",
+            "#",
+            "#",
+            "#",
+            "#",
+            $inputs,
+            $inputs_rendered,
+            false,
+            true
+        );
 
-		$filter = $f->standard("#", "#", "#", "#",
-			"#", "#", $inputs, $inputs_rendered, false, true);
+        $r = $this->getDefaultRenderer();
+        $html = $r->render($filter);
 
-		$r = $this->getDefaultRenderer();
-		$html = $r->render($filter);
-
-		$expected = <<<EOT
+        $expected = <<<EOT
 <div class="il-filter disabled" id="id_1">
     <form class="il-standard-form form-horizontal" enctype="multipart/formdata" method="get" novalidate="novalidate" data-cmd-expand="#" data-cmd-collapse="#" data-cmd-apply="#" data-cmd-toggleOn="#">
         <div class="il-filter-bar">
@@ -400,7 +458,7 @@ EOT;
             <div class="col-md-4 il-popover-container">
                 <div class="input-group">
                     <span class="input-group-addon leftaddon">Title</span>
-                    <span role="button"  class="form-control il-filter-field"  data-placement="bottom"></span> 
+                    <span role="button"  class="form-control il-filter-field"  data-placement="bottom"></span>
                     <div class="il-standard-popover-content" style="display:none;" id="id_6"></div>
                     <span class="input-group-addon rightaddon"><a class="glyph disabled" aria-label="remove" aria-disabled="true">
                     <span class="glyphicon glyphicon-minus-sign" aria-hidden="true"></span>
@@ -411,7 +469,7 @@ EOT;
             <div class="col-md-4 il-popover-container">
                 <div class="input-group">
                     <span class="input-group-addon leftaddon">Selection</span>
-                    <span role="button"  class="form-control il-filter-field"  data-placement="bottom"></span> 
+                    <span role="button"  class="form-control il-filter-field"  data-placement="bottom"></span>
                     <div class="il-standard-popover-content" style="display:none;" id="id_8"></div>
                     <span class="input-group-addon rightaddon"><a class="glyph disabled" aria-label="remove" aria-disabled="true">
                     <span class="glyphicon glyphicon-minus-sign" aria-hidden="true"></span>
@@ -426,6 +484,6 @@ EOT;
 </div>
 EOT;
 
-		$this->assertHTMLEquals($expected, $html);
-	}
+        $this->assertHTMLEquals($expected, $html);
+    }
 }

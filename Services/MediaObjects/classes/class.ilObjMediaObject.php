@@ -37,7 +37,6 @@ class ilObjMediaObject extends ilObject
 
 	var $is_alias;
 	var $origin_id;
-	var $id;
 	var $media_items;
 	var $contains_int_link;
 
@@ -413,19 +412,6 @@ class ilObjMediaObject extends ilObject
 	}
 
 	/**
-	* set id
-	*/
-	function setId($a_id)
-	{
-		$this->id = $a_id;
-	}
-
-	function getId()
-	{
-		return $this->id;
-	}
-
-	/**
 	* set wether page object is an alias
 	*/
 	function setAlias($a_is_alias)
@@ -671,7 +657,11 @@ class ilObjMediaObject extends ilObject
 	 */
 	function createDirectory()
 	{
-		ilUtil::createDirectory(ilObjMediaObject::_getDirectory($this->getId()));
+		$path = ilObjMediaObject::_getDirectory($this->getId());
+		ilUtil::createDirectory($path);
+		if (!is_dir($path)) {
+			$this->ilias->raiseError("Failed to create directory $path.", $this->ilias->error_obj->FATAL);
+		}
 	}
 
 	/**
@@ -795,7 +785,10 @@ class ilObjMediaObject extends ilObject
 					}
 					else
 					{
-						$location = ilUtil::secureUrl($item->getLocation());
+                        $location = $item->getLocation();
+                        if($item->getLocationType() != "LocalFile") {  //#25941
+                            $location = ilUtil::secureUrl($location); //#23518
+                        }
 					}
 
 					$xml.= "<Location Type=\"".$item->getLocationType()."\">".

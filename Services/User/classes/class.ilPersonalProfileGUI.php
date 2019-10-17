@@ -7,7 +7,7 @@
  * @author Alex Killing <alex.killing@gmx.de>
  * @version $Id$
  *
- * @ilCtrl_Calls ilPersonalProfileGUI: ilPublicUserProfileGUI, ilCertificateMigrationGUI
+ * @ilCtrl_Calls ilPersonalProfileGUI: ilPublicUserProfileGUI
  */
 class ilPersonalProfileGUI
 {
@@ -88,15 +88,6 @@ class ilPersonalProfileGUI
 				$tpl->printToStdout();
 				break;
 
-			case 'ilcertificatemigrationgui':
-				$migrationGui = new \ilCertificateMigrationGUI();
-				$resultMessageString = $ilCtrl->forwardCommand($migrationGui);
-				/** @var ilTemplate $tpl */
-				$tpl->setMessage(\ilTemplate::MESSAGE_TYPE_SUCCESS, $resultMessageString, true);
-				$this->setTabs();
-				$this->showPersonalData(false, true);
-				break;
-			
 			default:
 				$this->setTabs();
 				$cmd = $this->ctrl->getCmd("showPersonalData");							
@@ -834,8 +825,6 @@ class ilPersonalProfileGUI
 			}
 		}
 
-		$this->renderCertificateMigration($ilUser, $a_migration_started);
-
 		$this->tpl->setContent($this->form->getHTML());
 
 		$this->tpl->printToStdout();
@@ -1042,21 +1031,7 @@ class ilPersonalProfileGUI
 				
 				ilUtil::sendSuccess($lng->txt("msg_obj_modified"), true);
 
-				if(ilSession::get('orig_request_target'))
-				{
-					$target = ilSession::get('orig_request_target');
-					ilSession::set('orig_request_target', '');
-					ilUtil::redirect($target);
-				}
-				else if($redirect = $_SESSION['profile_complete_redirect'])
-				{
-					unset($_SESSION['profile_complete_redirect']);
-					ilUtil::redirect($redirect);
-				}
-				else
-				{
-					$ilCtrl->redirect($this, "showPersonalData");
-				}
+				$ilCtrl->redirect($this, "showPublicProfile");
 			}
 		}
 		
@@ -1435,9 +1410,14 @@ class ilPersonalProfileGUI
 			$handler = ilBadgeHandler::getInstance();
 			if($handler->isActive())
 			{
-				if(isset($_POST["bpos"]) && is_array($_POST["bpos"]) && sizeof($_POST["bpos"])) {
+				$badgePositions = [];
+				if (isset($_POST["bpos"]) && is_array($_POST["bpos"])) {
+					$badgePositions = $_POST["bpos"];
+				}
+
+				if (count($badgePositions) > 0) {
 					include_once "Services/Badge/classes/class.ilBadgeAssignment.php";
-					ilBadgeAssignment::updatePositions($ilUser->getId(), $_POST["bpos"]);
+					ilBadgeAssignment::updatePositions($ilUser->getId(), $badgePositions);
 				}				
 			}
 			
@@ -1446,7 +1426,22 @@ class ilPersonalProfileGUI
 			ilLuceneIndexer::updateLuceneIndex(array((int) $GLOBALS['DIC']['ilUser']->getId()));
 			
 			ilUtil::sendSuccess($lng->txt("msg_obj_modified"), true);
-			$ilCtrl->redirect($this, "showPublicProfile");
+
+            if(ilSession::get('orig_request_target'))
+            {
+                $target = ilSession::get('orig_request_target');
+                ilSession::set('orig_request_target', '');
+                ilUtil::redirect($target);
+            }
+            else if($redirect = $_SESSION['profile_complete_redirect'])
+            {
+                unset($_SESSION['profile_complete_redirect']);
+                ilUtil::redirect($redirect);
+            }
+            else
+            {
+                $ilCtrl->redirect($this, "showPublicProfile");
+            }
 		}
 		$this->form->setValuesByPost();
 		$tpl->showPublicProfile(true);
@@ -1636,33 +1631,6 @@ class ilPersonalProfileGUI
 			$this->form->setValuesByPost();
 			$tpl->setContent($this->form->getHtml());
 			$tpl->printToStdout();
-		}
-	}
-
-	/**
-	 * @param \ilObjUser
-	 * @param bool $migrationIsStartedInRequest
-	 */
-	protected function renderCertificateMigration(\ilObjUser $user, bool $migrationIsStartedInRequest)
-	{
-		$migrationVisibleValidator = new ilCertificateMigrationValidator(new \ilSetting('certificate'));
-
-		$showMigrationBox = $migrationVisibleValidator->isMigrationAvailable(
-			$user,
-			new \ilCertificateMigration($user->getId())
-		);
-		if (!$migrationIsStartedInRequest && true === $showMigrationBox) {
-			$migrationUiEl = new \ilCertificateMigrationUIElements();
-
-			$startMigrationCommand = $this->ctrl->getLinkTargetByClass(
-				['ilCertificateMigrationGUI'], 'startMigrationAndReturnMessage',
-				false,true, false
-			);
-			$messageBoxHtml = $migrationUiEl->getMigrationMessageBox($startMigrationCommand);
-
-			$this->tpl->setCurrentBlock('mess');
-			$this->tpl->setVariable('MESSAGE', $messageBoxHtml);
-			$this->tpl->parseCurrentBlock('mess');
 		}
 	}
 }

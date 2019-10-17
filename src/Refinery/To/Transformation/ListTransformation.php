@@ -8,45 +8,60 @@ declare(strict_types=1);
 
 namespace ILIAS\Refinery\To\Transformation;
 
-
-use ILIAS\In\Transformation\DeriveApplyToFromTransform;
-use ILIAS\Refinery\Transformation\Transformation;
+use ILIAS\Refinery\ConstraintViolationException;
+use ILIAS\Refinery\DeriveApplyToFromTransform;
+use ILIAS\Refinery\Transformation;
 
 class ListTransformation implements Transformation
 {
-	use DeriveApplyToFromTransform;
-	/**
-	 * @var Transformation
-	 */
-	private $transformation;
+    use DeriveApplyToFromTransform;
+    /**
+     * @var Transformation
+     */
+    private $transformation;
 
-	/**
-	 * @param Transformation $transformation
-	 */
-	public function __construct(Transformation $transformation)
-	{
-		$this->transformation = $transformation;
-	}
+    /**
+     * @param Transformation $transformation
+     */
+    public function __construct(Transformation $transformation)
+    {
+        $this->transformation = $transformation;
+    }
 
-	/**
-	 * @inheritdoc
-	 */
-	public function transform($from)
-	{
-		$result = array();
-		foreach ($from as $value) {
-			$transformedValue = $this->transformation->transform($value);
-			$result[] = $transformedValue;
-		}
+    /**
+     * @inheritdoc
+     */
+    public function transform($from)
+    {
+        if (false === is_array($from)) {
+            throw new ConstraintViolationException(
+                'The input value must be an array',
+                'must_be_array'
+            );
+        }
+        if (array() === $from) {
+            throw new ConstraintViolationException(
+                'Value array is empty',
+                'value_array_is_empty'
+            );
+        }
 
-		return $result;
-	}
+        $result = array();
+        foreach ($from as $value) {
+            $transformedValue = $this->transformation->transform($value);
+            $result[] = $transformedValue;
+        }
 
-	/**
-	 * @inheritdoc
-	 */
-	public function __invoke($from)
-	{
-		return $this->transform($from);
-	}
+
+
+        return $result;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function __invoke($from)
+    {
+        return $this->transform($from);
+    }
 }

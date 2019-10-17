@@ -160,14 +160,16 @@ class ilTestParticipantList implements Iterator
 		$usrIds = call_user_func_array($userAccessFilter, [$this->getAllUserIds()]);
 		
 		$accessFilteredList = new self($this->getTestObj());
-		
-		foreach($usrIds as $usrId)
+
+		foreach($this as $participant)
 		{
-			$participant = $this->getParticipantByUsrId($usrId);
-			$participant = clone $participant;
-			$accessFilteredList->addParticipant($participant);
+			if( in_array($participant->getUsrId(), $usrIds) )
+			{
+				$participant = clone $participant;
+				$accessFilteredList->addParticipant($participant);
+			}
 		}
-		
+
 		return $accessFilteredList;
 	}
 
@@ -236,8 +238,8 @@ class ilTestParticipantList implements Iterator
 			$scoring->setAnsweredQuestions((int)$row['answeredquestions']);
 			$scoring->setTotalQuestions((int)$row['questioncount']);
 			
-			$scoring->setReachedPoints((int)$row['reached_points']);
-			$scoring->setMaxPoints((int)$row['max_points']);
+			$scoring->setReachedPoints((float)$row['reached_points']);
+			$scoring->setMaxPoints((float)$row['max_points']);
 			
 			$scoring->setPassed((bool)$row['passed']);
 			$scoring->setFinalMark((string)$row['mark_official']);
@@ -345,6 +347,10 @@ class ilTestParticipantList implements Iterator
 				$row['percent_result'] = $participant->getScoring()->getPercentResult();
 				$row['passed_status'] = $participant->getScoring()->isPassed();
 				$row['final_mark'] = $participant->getScoring()->getFinalMark();
+
+                $row['pass_finished'] = ilObjTest::lookupLastTestPassAccess(
+                    $participant->getActiveId(), $participant->getScoring()->getScoredPass()
+                );
 			}
 			
 			$rows[] = $row;

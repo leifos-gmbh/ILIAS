@@ -507,7 +507,7 @@ ilDBUpdateNewObjectType::updateOperationOrder('unparticipate', 1020);
 /**
  * @var $ilDB ilDBInterface
  */
-$ilDB->modifyTableColumn('il_gs_identifications', 'identification', ['length' => 255]);
+// $ilDB->modifyTableColumn('il_gs_identifications', 'identification', ['length' => 255]);
 $ilDB->modifyTableColumn('il_mm_items', 'identification', ['length' => 255]);
 ?>
 <#5461>
@@ -520,7 +520,7 @@ if( !$ilDB->tableColumnExists('qpl_questions', 'lifecycle') )
 		'notnull' => false,
 		'default' => 'draft'
 	));
-	
+
 	$ilDB->queryF('UPDATE qpl_questions SET lifecycle = %s', array('text'), array('draft'));
 }
 ?>
@@ -695,27 +695,35 @@ if(!$ilDB->tableColumnExists('lso_activation', 'activation_end_ts')) {
 ?>
 <#5476>
 <?php
-$ilDB->manipulate(
-	'UPDATE lso_activation'
-	.'	SET activation_start_ts = UNIX_TIMESTAMP(activation_start)'
-	.'	WHERE activation_start IS NOT NULL'
-);
+if($ilDB->tableColumnExists('lso_activation', 'activation_start')) {
+	$ilDB->manipulate(
+		'UPDATE lso_activation'
+		.'	SET activation_start_ts = UNIX_TIMESTAMP(activation_start)'
+		.'	WHERE activation_start IS NOT NULL'
+	);
+}
 ?>
 <#5477>
 <?php
-$ilDB->manipulate(
-	'UPDATE lso_activation'
-	.'	SET activation_end_ts = UNIX_TIMESTAMP(activation_end)'
-	.'	WHERE activation_end IS NOT NULL'
-);
+if($ilDB->tableColumnExists('lso_activation', 'activation_end')) {
+	$ilDB->manipulate(
+		'UPDATE lso_activation'
+		.'	SET activation_end_ts = UNIX_TIMESTAMP(activation_end)'
+		.'	WHERE activation_end IS NOT NULL'
+	);
+}
 ?>
 <#5478>
 <?php
-$ilDB->dropTableColumn("lso_activation", "activation_start");
+if($ilDB->tableColumnExists('lso_activation', 'activation_start')) {
+	$ilDB->dropTableColumn("lso_activation", "activation_start");
+}
 ?>
 <#5479>
 <?php
-$ilDB->dropTableColumn("lso_activation", "activation_end");
+if($ilDB->tableColumnExists('lso_activation', 'activation_end')) {
+	$ilDB->dropTableColumn("lso_activation", "activation_end");
+}
 ?>
 <#5480>
 <?php
@@ -867,4 +875,652 @@ while ($row = $ilDB->fetchAssoc($res)) {
 <#5494>
 <?php
 $ilCtrlStructureReader->getStructure();
+?>
+<#5495>
+<?php
+if($ilDB->tableColumnExists("map_area", "href")) {
+	$field = array(
+		'type' 		=> 'text',
+		'length' 	=> 800,
+		'notnull' 	=> false
+	);
+
+	$ilDB->modifyTableColumn("map_area", "href", $field);
+}
+?>
+<#5496>
+<?php
+if (!$ilDB->tableColumnExists('usr_data', 'passwd_policy_reset')) {
+	$ilDB->addTableColumn('usr_data', 'passwd_policy_reset', array(
+		'type' => 'integer',
+		'notnull' => true,
+		'length' => 1,
+		'default' => 0
+	));
+}
+?>
+<#5497>
+<?php
+$ilDB->manipulateF(
+	'DELETE FROM settings WHERE keyword = %s',
+	['text'],
+	['block_activated_chatviewer']
+);
+
+$ilDB->manipulateF(
+	'DELETE FROM usr_pref WHERE keyword = %s',
+	['text'],
+	['chatviewer_last_selected_room']
+);
+?>
+<#5498>
+<?php
+if ($ilDB->tableColumnExists('mail_saved', 'm_type')) {
+	$ilDB->dropTableColumn('mail_saved', 'm_type');
+}
+
+if ($ilDB->tableColumnExists('mail', 'm_type')) {
+	$ilDB->dropTableColumn('mail', 'm_type');
+}
+
+$ilDB->manipulateF(
+	'DELETE FROM settings WHERE keyword = %s',
+	['text'],
+	['pd_sys_msg_mode']
+);
+?>
+<#5499>
+<?php
+$res = $ilDB->queryF('SELECT * FROM rbac_operations WHERE operation = %s', ['text'], ['system_message']);
+$row = $ilDB->fetchAssoc($res);
+
+if ($row['ops_id']) {
+	$opsId = $row['ops_id'];
+
+	$ilDB->manipulateF('DELETE FROM rbac_templates WHERE ops_id = %s', ['integer'], [$opsId]);
+	$ilDB->manipulateF('DELETE FROM rbac_ta WHERE ops_id = %s', ['integer'], [$opsId]);
+	$ilDB->manipulateF('DELETE FROM rbac_operations WHERE ops_id = %s', ['integer'], [$opsId]);
+}
+?>
+<#5500>
+<?php
+$ilDB->manipulateF(
+	'DELETE FROM settings WHERE keyword = %s',
+	['text'],
+	['block_activated_pdfrmpostdraft']
+);
+?>
+<#5501>
+<?php
+
+$tempTableName = 'tmp_tst_qst_fixparent';
+
+$tempTableFields = array(
+        'qst_id' => array(
+			'type' => 'integer',
+			'notnull' => true,
+			'length' => 4,
+			'default' => 0
+		),
+        'tst_obj_id' => array(
+			'type' => 'integer',
+			'notnull' => true,
+			'length' => 4,
+			'default' => 0
+		),
+        'qpl_obj_id' => array(
+			'type' => 'integer',
+			'notnull' => true,
+			'length' => 4,
+			'default' => 0
+		)
+);
+
+$brokenFixedTestQuestionsQuery = "
+    SELECT qq.question_id qst_id, t.obj_fi tst_obj_id, qq.obj_fi qpl_obj_id
+    FROM tst_tests t
+    INNER JOIN tst_test_question tq
+    ON t.test_id = tq.test_fi
+    INNER JOIN qpl_questions qq
+    ON qq.question_id = tq.question_fi
+    WHERE t.question_set_type = 'FIXED_QUEST_SET'
+    AND t.obj_fi != qq.obj_fi
+";
+
+$brokenRandomTestQuestionsQuery = "
+    SELECT qq.question_id qst_id, t.obj_fi tst_obj_id, qq.obj_fi qpl_obj_id
+    FROM tst_tests t
+    INNER JOIN tst_rnd_cpy tq
+    ON t.test_id = tq.tst_fi
+    INNER JOIN qpl_questions qq
+    ON qq.question_id = tq.qst_fi
+    WHERE t.question_set_type = 'RANDOM_QUEST_SET'
+    AND t.obj_fi != qq.obj_fi
+";
+
+$brokenQuestionCountQuery = "
+    SELECT COUNT(broken.qst_id) cnt FROM (
+        SELECT q1.qst_id FROM ( {$brokenFixedTestQuestionsQuery} ) q1
+        UNION
+        SELECT q2.qst_id FROM ( {$brokenRandomTestQuestionsQuery} ) q2
+    ) broken
+";
+
+$brokenQuestionSelectQuery = "
+    SELECT q1.qst_id, q1.tst_obj_id, q1.qpl_obj_id FROM ( {$brokenFixedTestQuestionsQuery} ) q1
+    UNION
+    SELECT q2.qst_id, q2.tst_obj_id, q2.qpl_obj_id FROM ( {$brokenRandomTestQuestionsQuery} ) q2
+";
+
+$res = $ilDB->query($brokenQuestionCountQuery);
+$row = $ilDB->fetchAssoc($res);
+
+if( $ilDB->tableExists($tempTableName) )
+{
+	$ilDB->dropTable($tempTableName);
+}
+
+if( $row['cnt'] > 0 )
+{
+	$ilDB->createTable($tempTableName, $tempTableFields);
+	$ilDB->addPrimaryKey($tempTableName, array('qst_id'));
+	$ilDB->addIndex($tempTableName, array('tst_obj_id', 'qpl_obj_id'), 'i1');
+
+    $ilDB->manipulate("
+        INSERT INTO {$tempTableName} (qst_id, tst_obj_id, qpl_obj_id) {$brokenQuestionSelectQuery}
+    ");
+}
+
+?>
+<#5502>
+<?php
+
+$tempTableName = 'tmp_tst_qst_fixparent';
+
+if( $ilDB->tableExists($tempTableName) )
+{
+	$updateStatement = $ilDB->prepareManip("
+        UPDATE qpl_questions SET obj_fi = ? WHERE obj_fi = ? AND question_id IN(
+            SELECT qst_id FROM {$tempTableName} WHERE tst_obj_id = ? AND qpl_obj_id = ?
+        )
+    ", array('integer', 'integer', 'integer', 'integer')
+	);
+
+	$deleteStatement = $ilDB->prepareManip("
+        DELETE FROM {$tempTableName} WHERE tst_obj_id = ? AND qpl_obj_id = ?
+    ", array('integer', 'integer')
+	);
+
+	$res = $ilDB->query("SELECT DISTINCT tst_obj_id, qpl_obj_id FROM {$tempTableName}");
+
+    while( $row = $ilDB->fetchAssoc($res) )
+    {
+        $ilDB->execute($updateStatement, array(
+			$row['tst_obj_id'], $row['qpl_obj_id'], $row['tst_obj_id'], $row['qpl_obj_id']
+        ));
+
+		$ilDB->execute($deleteStatement, array(
+			$row['tst_obj_id'], $row['qpl_obj_id']
+        ));
+    }
+
+	$ilDB->dropTable($tempTableName);
+}
+
+?>
+<#5503>
+<?php
+if( !$ilDB->tableExists('cont_filter_field') )
+{
+	$ilDB->createTable('cont_filter_field', array(
+		'ref_id' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true,
+			'default' => 0
+		),
+		'record_set_id' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true,
+			'default' => 0
+		),
+		'field_id' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true,
+			'default' => 0
+		)
+	));
+}
+?>
+<#5504>
+<?php
+if(!$ilDB->tableExists('il_cert_bgtask_migr')) {
+	$ilDB->dropTable('il_cert_bgtask_migr');
+}
+?>
+<#5505>
+<?php
+if ($ilDB->tableExists('il_bt_task')) {
+    if ($ilDB->tableExists('il_bt_value_to_task')) {
+        if ($ilDB->tableExists('il_bt_value')) {
+            $deleteBucketValuesSql = '
+DELETE FROM il_bt_value WHERE id IN (
+    SELECT value_id FROM il_bt_value_to_task WHERE task_id IN (
+        SELECT id FROM il_bt_task WHERE ' . $ilDB->like('type', 'text', 'ilCertificateMigration%') . '
+    )
+)';
+            $ilDB->manipulate($deleteBucketValuesSql);
+        }
+
+        $deleteValueToTask = '
+DELETE FROM il_bt_value_to_task
+WHERE task_id IN (
+    SELECT id FROM il_bt_task WHERE ' . $ilDB->like('type', 'text', 'ilCertificateMigration%') . '
+)';
+
+        $ilDB->manipulate($deleteValueToTask);
+    }
+    $deleteBackgroundTasksSql = 'DELETE FROM il_bt_task WHERE ' . $ilDB->like('type', 'text', 'ilCertificateMigration%');
+    $ilDB->manipulate($deleteBackgroundTasksSql);
+}
+
+if ($ilDB->tableExists('il_bt_bucket')) {
+    $deleteBucketsSql = 'DELETE FROM il_bt_bucket WHERE title = ' . $ilDB->quote('Certificate Migration', 'text') ;
+    $ilDB->manipulate($deleteBucketsSql);
+}
+
+?>
+<#5506>
+<?php
+
+// get pdts type id
+$row = $ilDB->fetchAssoc($ilDB->queryF(
+	"SELECT obj_id FROM object_data WHERE type = %s AND title = %s",
+	array('text', 'text'), array('typ', 'pdts')
+));
+$pdts_id = $row['obj_id'];
+
+// register new 'object' rbac operation for tst
+$op_id = $ilDB->nextId('rbac_operations');
+$ilDB->insert('rbac_operations', array(
+	'ops_id' => array('integer', $op_id),
+	'operation' => array('text', 'change_presentation'),
+	'description' => array('text', 'change presentation of a view'),
+	'class' => array('text', 'object'),
+	'op_order' => array('integer', 200)
+));
+$ilDB->insert('rbac_ta', array(
+	'typ_id' => array('integer', $pdts_id),
+	'ops_id' => array('integer', $op_id)
+));
+
+?>
+<#5507>
+<?php
+// We should ensure that settings are set for new installations and ILIAS version upgrades
+$setting = new ilSetting();
+
+$setting->set('pd_active_sort_view_0', serialize(['location', 'type']));
+$setting->set('pd_active_sort_view_1', serialize(['location', 'type', 'start_date']));
+$setting->set('pd_active_pres_view_0', serialize(['list', 'tile']));
+$setting->set('pd_active_pres_view_1', serialize(['list', 'tile']));
+$setting->set('pd_def_pres_view_0', 'list');
+$setting->set('pd_def_pres_view_1', 'list');
+?>
+<#5508>
+<?php
+include_once('./Services/Migration/DBUpdate_3560/classes/class.ilDBUpdateNewObjectType.php');
+$tgt_ops_id = ilDBUpdateNewObjectType::addCustomRBACOperation('upload_blacklisted_files', "Upload Blacklisted Files", "object", 1);
+if ($tgt_ops_id) {
+    $lp_type_id = ilDBUpdateNewObjectType::getObjectTypeId('facs');
+    if ($lp_type_id) {
+        ilDBUpdateNewObjectType::addRBACOperation($lp_type_id, $tgt_ops_id);
+    }
+}
+?>
+<#5509>
+<?php
+
+if($ilDB->indexExistsByFields('read_event',array('usr_id')))
+{
+	$ilDB->dropIndexByFields('read_event',array('usr_id'));
+}
+$ilDB->addIndex('read_event', array('usr_id'), 'i1');
+
+?>
+<#5510>
+<?php
+
+if ($ilDB->tableExists('il_gs_identifications')) {
+    $ilDB->dropTable('il_gs_identifications');
+}
+
+if ($ilDB->tableExists('il_gs_providers')) {
+    $ilDB->dropTable('il_gs_providers');
+}
+?>
+<#5511>
+<?php
+if (!$ilDB->tableColumnExists('tst_manual_fb', 'finalized_tstamp')) {
+	$ilDB->addTableColumn('tst_manual_fb', 'finalized_tstamp', array(
+		"type"   => "integer",
+		"length" => 8,
+	));
+}
+if (!$ilDB->tableColumnExists('tst_manual_fb', 'finalized_evaluation')) {
+	$ilDB->addTableColumn('tst_manual_fb', 'finalized_evaluation', array(
+		"type"   => "integer",
+		"length" => 1,
+	));
+	$ilDB->manipulateF(
+		'UPDATE tst_manual_fb SET finalized_evaluation = %s WHERE feedback IS NOT NULL',
+		['integer'],
+		[1]
+	);
+}
+if (!$ilDB->tableColumnExists('tst_manual_fb', 'finalized_by_usr_id')) {
+	$ilDB->addTableColumn('tst_manual_fb', 'finalized_by_usr_id', array(
+		"type"   => "integer",
+		"length" => 8,
+	));
+}
+?>
+<#5512>
+<?php
+$ilCtrlStructureReader->getStructure();
+?>
+<#5513>
+<?php
+
+$map = [
+    'ilMMCustomProvider' => 'ILIAS\MainMenu\Provider\CustomMainBarProvider',
+    'ilAdmGlobalScreenProvider' => 'ILIAS\\Administration\\AdministrationMainBarProvider',
+    'ilBadgeGlobalScreenProvider' => 'ILIAS\\Badge\\Provider\\BadgeMainBarProvider',
+    'ilCalendarGlobalScreenProvider' => 'ILIAS\\Certificate\\Provider\\CertificateMainBarProvider',
+    'ilContactGlobalScreenProvider' => 'ILIAS\\Contact\\Provider\\ContactMainBarProvider',
+    'ilDerivedTaskGlobalScreenProvider' => 'ILIAS\\Tasks\\DerivedTasks\\Provider\\DerivedTaskMainBarProvider',
+    'ilLPGlobalScreenProvider' => 'ILIAS\\LearningProgress\\LPMainBarProvider',
+    'ilMailGlobalScreenProvider' => 'ILIAS\\Mail\\Provider\\MailMainBarProvider',
+    'ilNewsGlobalScreenProvider' => 'ILIAS\\News\\Provider\\NewsMainBarProvider',
+    'ilNotesGlobalScreenProvider' => 'ILIAS\\Notes\\Provider\\NotesMainBarProvider',
+    'ilPDGlobalScreenProvider' => 'ILIAS\\PersonalDesktop\\PDMainBarProvider',
+    'ilPrtfGlobalScreenProvider' => 'ILIAS\\Portfolio\\Provider\\PortfolioMainBarProvider',
+    'ilRepositoryGlobalScreenProvider' => 'ILIAS\\Repository\\Provider\\RepositoryMainBarProvider',
+    'ilSkillGlobalScreenProvider' => 'ILIAS\\Skill\\Provider\\SkillMainBarProvider',
+    'ilStaffGlobalScreenProvider' => 'ILIAS\\MyStaff\\Provider\\StaffMainBarProvider',
+    'ilWorkspaceGlobalScreenProvider' => 'ILIAS\\PersonalWorkspace\\Provider\\WorkspaceMainBarProvider',
+];
+
+foreach ($map as $old => $new) {
+    $ilDB->manipulateF("UPDATE il_mm_items SET 
+identification = REPLACE(identification, %s, %s) WHERE identification LIKE %s", ['text', 'text', 'text'], [$old, $new, "$old|%"]);
+
+    $ilDB->manipulateF("UPDATE il_mm_items SET 
+parent_identification = REPLACE(parent_identification, %s, %s) WHERE parent_identification LIKE %s", ['text', 'text', 'text'], [$old, $new, "$old|%"]);
+
+    $ilDB->manipulateF("UPDATE il_mm_translation SET 
+id = REPLACE(id, %s, %s) WHERE id LIKE %s", ['text', 'text', 'text'], [$old, $new, "$old|%|%"]);
+
+    $ilDB->manipulateF("UPDATE il_mm_translation SET 
+identification = REPLACE(id, %s, %s) WHERE identification LIKE %s", ['text', 'text', 'text'], [$old, $new, "$old|%"]);
+
+    $ilDB->manipulateF("UPDATE il_mm_actions SET 
+identification = REPLACE(identification, %s, %s) WHERE identification LIKE %s", ['text', 'text', 'text'], [$old, $new, "$old|%"]);
+}
+
+
+?>
+
+
+<#5514>
+<?php
+if(!$ilDB->tableExists('crs_timings_exceeded'))
+{
+	$ilDB->createTable('crs_timings_exceeded', array(
+		'user_id' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true,
+			'default' => 0
+		),
+		'ref_id' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true,
+			'default' => 0
+		)
+	,
+		'sent' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true,
+			'default' => 0
+		)
+	));
+	$ilDB->addPrimaryKey('crs_timings_exceeded', array('user_id', 'ref_id'));
+}
+?>
+<#5515>
+<?php
+if(!$ilDB->tableExists('crs_timings_started'))
+{
+	$ilDB->createTable('crs_timings_started', array(
+		'user_id' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true,
+			'default' => 0
+		),
+		'ref_id' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true,
+			'default' => 0
+		)
+	,
+		'sent' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true,
+			'default' => 0
+		)
+	));
+	$ilDB->addPrimaryKey('crs_timings_started', array('user_id', 'ref_id'));
+}
+?>
+<#5516>
+<?php
+$ilDB->addIndex('frm_posts', ['pos_thr_fk', 'pos_date'], 'i5');
+?>
+<#5517>
+<?php
+$ilCtrlStructureReader->getStructure();
+?>
+<#5518>
+<?php
+$ilDB->modifyTableColumn('frm_notification', 'frm_id', array(
+	'type'    => 'integer',
+	'length'  => 8,
+	'notnull' => true,
+	'default' => 0
+));
+?>
+<#5519>
+<?php
+$ilDB->modifyTableColumn('frm_notification', 'thread_id', array(
+	'type'    => 'integer',
+	'length'  => 8,
+	'notnull' => true,
+	'default' => 0
+));
+?>
+<#5520>
+<?php
+$ilDB->modifyTableColumn('il_cert_template', 'version', array(
+    'type'    => 'integer',
+    'length'  => 8,
+    'notnull' => true,
+    'default' => 0
+));
+?>
+<#5521>
+<?php
+$ilDB->addIndex('rbac_log', ['created'], 'i2');
+?>
+<#5522>
+<?php
+	$ilCtrlStructureReader->getStructure();
+?>
+<#5523>
+<?php
+$q = "SELECT prg_settings.obj_id FROM prg_settings"
+	."	JOIN object_reference prg_ref ON prg_settings.obj_id = prg_ref.obj_id"
+	."	JOIN tree ON parent = prg_ref.ref_id"
+	."	LEFT JOIN object_reference child_ref ON tree.child = child_ref.ref_id"
+	."	LEFT JOIN object_data child ON child_ref.obj_id = child.obj_id"
+	."	WHERE lp_mode = 2 AND prg_ref.deleted IS NULL AND child.obj_id IS NULL";
+$res = $ilDB->query($q);
+$to_adjsut = [];
+while($rec = $ilDB->fetchAssoc($res)) {
+		$to_adjust[] = (int)$rec['obj_id'];
+}
+$ilDB->manipulate('UPDATE prg_settings SET lp_mode = 0 WHERE '.$ilDB->in('obj_id',$to_adjust,false,'integer'));
+$q = "SELECT prg_settings.obj_id FROM prg_settings"
+	."	JOIN object_reference prg_ref ON prg_settings.obj_id = prg_ref.obj_id"
+	."	JOIN tree ON parent = prg_ref.ref_id"
+	."	JOIN object_reference child_ref ON tree.child = child_ref.ref_id"
+	."	JOIN object_data child ON child_ref.obj_id = child.obj_id"
+	."	WHERE lp_mode = 2 AND prg_ref.deleted IS NULL AND child.type = 'prg'";
+$res = $ilDB->query($q);
+$to_adjsut = [];
+while($rec = $ilDB->fetchAssoc($res)) {
+		$to_adjust[] = (int)$rec['obj_id'];
+}
+$ilDB->manipulate('UPDATE prg_settings SET lp_mode = 1 WHERE '.$ilDB->in('obj_id',$to_adjust,false,'integer'));
+?>
+<#5524>
+<?php
+if(!$ilDB->tableExists('wfld_user_setting'))
+{
+	$ilDB->createTable('wfld_user_setting', array(
+		'user_id' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true,
+			'default' => 0
+		),
+		'wfld_id' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true,
+			'default' => 0
+		),
+		'sortation' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true,
+			'default' => 0,
+		)
+	));
+	$ilDB->addPrimaryKey('wfld_user_setting',array('user_id','wfld_id'));
+}
+?>
+<#5525>
+<?php
+	if (!$ilDB->tableExists("book_obj_use_book"))
+	{
+		$fields = array(
+			"obj_id" => array(
+				"type" => "integer",
+				"notnull" => true,
+				"length" => 4,
+				"default" => 0
+			),
+			"book_obj_id" => array(
+				"type" => "integer",
+				"notnull" => true,
+				"length" => 4,
+				"default" => 0
+			)
+		);
+	 	$ilDB->createTable("book_obj_use_book", $fields);
+	 }
+?>
+<#5526>
+<?php
+	$ilDB->addPrimaryKey("book_obj_use_book", array("obj_id", "book_obj_id"));
+?>
+<#5527>
+<?php
+if(!$ilDB->tableColumnExists('booking_reservation','context_obj_id'))
+{
+	$ilDB->addTableColumn(
+		'booking_reservation',
+		'context_obj_id',
+		array(
+			'type' => 'integer',
+			'length' => 1,
+			'notnull' => false,
+			'default' => 0
+		));
+}
+?>
+<#5528>
+<?php
+$ilDB->dropTableColumn('booking_reservation', 'context_obj_id');
+if(!$ilDB->tableColumnExists('booking_reservation','context_obj_id'))
+{
+	$ilDB->addTableColumn(
+		'booking_reservation',
+		'context_obj_id',
+		array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => false,
+			'default' => 0
+		));
+}
+?>
+<#5529>
+<?php
+$ilDB->renameTableColumn('book_obj_use_book', "book_obj_id", 'book_ref_id');
+?>
+<#5530>
+<?php
+if(!$ilDB->tableColumnExists('skl_tree_node','description'))
+{
+	$ilDB->addTableColumn(
+		'skl_tree_node',
+		'description',
+		array(
+			'type' 		=> 'clob',
+			'notnull'	=> false
+		)
+	);
+}
+?>
+<#5531>
+<?php
+// old competences (+ templates) and competence categories (+ templates) get an empty string as description instead of null
+$ilDB->manipulate("UPDATE skl_tree_node SET description = '' WHERE description IS NULL AND type IN ('scat', 'skll', 'sctp', 'sktp')");
+?>
+<#5532>
+<?php
+if(!$ilDB->tableExists('skl_profile_role'))
+{
+	$fields = array (
+		'profile_id' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true),
+		'role_id' => array(
+			'type' => 'integer',
+			'length' => 4,
+			'notnull' => true)
+	);
+	$ilDB->createTable('skl_profile_role', $fields);
+	$ilDB->addPrimaryKey('skl_profile_role', array('profile_id', 'role_id'));
+}
 ?>

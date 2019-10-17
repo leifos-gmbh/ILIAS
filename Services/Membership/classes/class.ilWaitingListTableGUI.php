@@ -42,16 +42,15 @@ class ilWaitingListTableGUI extends ilTable2GUI
 
 	protected static $all_columns = null;
 	protected static $has_odf_definitions = FALSE;
-	
-	
+
+
 	/**
-	 * Constructor
-	 *
-	 * @access public
-	 * @param
-	 * @return
+	 * ilWaitingListTableGUI constructor.
+	 * @param $a_parent_obj
+	 * @param \ilObject $rep_object
+	 * @param \ilWaitingList $waiting_list
 	 */
-	public function __construct($a_parent_obj,ilObject $rep_object, $waiting_list,$show_content = true)
+	public function __construct($a_parent_obj,ilObject $rep_object, $waiting_list)
 	{
 	 	global $DIC;
 
@@ -66,11 +65,15 @@ class ilWaitingListTableGUI extends ilTable2GUI
 	 	$this->ctrl = $ilCtrl;
 		
 		$this->rep_object = $rep_object;
-	 	
+
+		$this->setExternalSorting(true);
+		$this->setExternalSegmentation(true);
 		$this->setId('crs_wait_'. $this->getRepositoryObject()->getId());
+		$this->setFormName('waiting');
+		$this->setPrefix('waiting');
+
 		parent::__construct($a_parent_obj,'participants');
 
-		$this->setFormName('waiting');
 		$this->setFormAction($this->ctrl->getFormAction($a_parent_obj,'participants'));
 
 	 	$this->addColumn('','f',"1",true);
@@ -81,34 +84,25 @@ class ilWaitingListTableGUI extends ilTable2GUI
 		{
 			$this->addColumn($all_cols[$col]['txt'], $col);
 		}
-		
+
 	 	$this->addColumn($this->lng->txt('application_date'),'sub_time',"10%");
 	 	$this->addColumn('','mail','10%');
 		
 		$this->addMultiCommand('confirmAssignFromWaitingList',$this->lng->txt('assign'));
 		$this->addMultiCommand('confirmRefuseFromList',$this->lng->txt('refuse'));
 		$this->addMultiCommand('sendMailToSelectedUsers',$this->lng->txt('crs_mem_send_mail'));
-		
+
+		$this->setDefaultOrderField('sub_time');
 		$this->setPrefix('waiting');
 		$this->setSelectAllCheckbox('waiting',true);
+		
 		$this->setRowTemplate("tpl.show_waiting_list_row.html","Services/Membership");
 		
-		if($show_content)
-		{
-			$this->enable('sort');
-			$this->enable('header');
-			$this->enable('numinfo');
-			$this->enable('select_all');
-		}
-		else
-		{
-			$this->disable('content');
-			$this->disable('header');
-			$this->disable('footer');
-			$this->disable('numinfo');
-			$this->disable('select_all');
-		}	
-		
+		$this->enable('sort');
+		$this->enable('header');
+		$this->enable('numinfo');
+		$this->enable('select_all');
+
 		$this->waiting_list = $waiting_list;
 		
 		include_once('Modules/Course/classes/Export/class.ilCourseDefinedFieldDefinition.php');
@@ -169,6 +163,17 @@ class ilWaitingListTableGUI extends ilTable2GUI
 		)
 		{
 			unset(self::$all_columns['consultation_hour']);
+		}
+
+		if(
+			!is_array(self::$all_columns) ||
+			!array_key_exists('login',self::$all_columns)
+		)
+		{
+			self::$all_columns['login'] = [
+				'default' => 1,
+				'txt' => $this->lng->txt('login')
+			];
 		}
 		return self::$all_columns;
 	}
@@ -286,6 +291,7 @@ class ilWaitingListTableGUI extends ilTable2GUI
 			$usr_data_fields[] = $field;
 		}
 
+		$l = $this->getLimit();
 		$usr_data = ilUserQuery::getUserListData(
 			$this->getOrderField(),
 			$this->getOrderDirection(),
@@ -302,6 +308,29 @@ class ilWaitingListTableGUI extends ilTable2GUI
 			$usr_data_fields,
 			$this->wait_user_ids
 		);
+		if (0 === count($usr_data['set']) && $this->getOffset() > 0 && $this->getExternalSegmentation()) {
+			$this->resetOffset();
+
+			$usr_data = ilUserQuery::getUserListData(
+				$this->getOrderField(),
+				$this->getOrderDirection(),
+				$this->getOffset(),
+				$this->getLimit(),
+				'',
+				'',
+				null,
+				false,
+				false,
+				0,
+				0,
+				null,
+				$usr_data_fields,
+				$this->wait_user_ids
+			);
+		}
+
+		ilLoggerFactory::getLogger('mem')->dump($this->wait_user_ids);
+		ilLoggerFactory::getLogger('mem')->dump($usr_data);
 		
 		foreach((array) $usr_data['set'] as $user)
 		{
@@ -400,9 +429,11 @@ class ilWaitingListTableGUI extends ilTable2GUI
 		}
 		
 		// Waiting list subscription
-		foreach($this->wait as $usr_id => $usr_data)
+		foreach($this->wait as $usr_id => $wait_usr_data)
 		{
-			$a_user_data[$usr_id]['sub_time'] = $usr_data['time'];
+			if (isset($a_user_data[$usr_id])) {
+				$a_user_data[$usr_id]['sub_time'] = $wait_usr_data['time'];
+			}
 		}
 		
 		$this->setMaxCount($usr_data['cnt'] ? $usr_data['cnt'] : 0);

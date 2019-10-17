@@ -6,8 +6,8 @@ declare(strict_types=1);
 namespace ILIAS\UI\Implementation\Component\Menu;
 
 use ILIAS\UI\Component\Menu as IMenu;
-use ILIAS\UI\Component\Icon\Icon;
-use ILIAS\UI\Component\Glyph\Glyph;
+use ILIAS\UI\Component\Symbol\Icon\Icon;
+use ILIAS\UI\Component\Symbol\Glyph\Glyph;
 use ILIAS\UI\Implementation\Component\JavaScriptBindable;
 
 /**
@@ -15,41 +15,40 @@ use ILIAS\UI\Implementation\Component\JavaScriptBindable;
  */
 class Sub extends LabeledMenu implements IMenu\Sub
 {
-	use JavaScriptBindable;
+    use JavaScriptBindable;
 
-	/**
-	 * @var bool
-	 */
-	protected $active = false;
+    /**
+     * @var bool
+     */
+    protected $active = false;
 
-	/**
-	 * @param Component\Clickable | string $label
-	 * @param array <Sub | Component\Clickable | Component\Divider\Horizontal> $items
-	 */
-	public function __construct($label, array $items)
-	{
-		$this->checkLabelParameter($label);
-		$this->checkItemParameter($items);
-		$this->label = $label;
-		$this->items = $items;
-	}
+    /**
+     * @param Component\Clickable | string $label
+     * @param array <Sub | Component\Clickable | Component\Divider\Horizontal> $items
+     */
+    public function __construct($label, array $items)
+    {
+        $this->checkLabelParameter($label);
+        $this->checkItemParameter($items);
+        $this->label = $label;
+        $this->items = $items;
+    }
 
-	/**
-	 * @inheritdoc
-	 */
-	public function withInitiallyActive(): IMenu\Sub
-	{
-		$clone = clone $this;
-		$clone->active = true;
-		return $clone;
-	}
+    /**
+     * @inheritdoc
+     */
+    public function withInitiallyActive() : IMenu\Sub
+    {
+        $clone = clone $this;
+        $clone->active = true;
+        return $clone;
+    }
 
-	/**
-	 * @inheritdoc
-	 */
-	public function isInitiallyActive(): bool
-	{
-		return $this->active;
-	}
-
+    /**
+     * @inheritdoc
+     */
+    public function isInitiallyActive() : bool
+    {
+        return $this->active;
+    }
 }

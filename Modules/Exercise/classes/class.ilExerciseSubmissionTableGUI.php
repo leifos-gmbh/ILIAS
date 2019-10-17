@@ -126,6 +126,12 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 		// multi actions
 		
 		$this->addMultiCommand("saveStatusSelected", $this->lng->txt("exc_save_selected"));
+
+		// TODO get rid of the constant from ilExAssignment. Get this value from ilExAssignmentTypes
+		if($this->mode == self::MODE_BY_ASSIGNMENT && $this->ass->getType() == ilExAssignment::TYPE_TEXT)
+		{
+			$this->addMultiCommand("compareTextAssignments",$this->lng->txt("exc_compare_submissions"));
+		}
 			
 		$this->setFormName("ilExcIDlForm");
 
@@ -443,7 +449,7 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 				case "mark":	
 					if($has_no_team_yet)
 					{
-						continue;
+						break;
 					}
 					// fallthrough
 					
@@ -488,7 +494,7 @@ abstract class ilExerciseSubmissionTableGUI extends ilTable2GUI
 				case "login":
 					if($a_ass->hasTeam())
 					{
-						continue;
+						break;
 					}
 					// fallthrough
 				

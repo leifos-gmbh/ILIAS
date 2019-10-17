@@ -11,7 +11,14 @@
 */
 class ilUserQuery
 {
-	private $order_field = 'login';
+	const DEFAULT_ORDER_FIELD = 'login';
+
+	/**
+	 * @var \ilLogger | null
+	 */
+	private $logger = null;
+
+	private $order_field = self::DEFAULT_ORDER_FIELD;
 	private $order_dir = 'asc';
 	private $offset = 0;
 	private $limit = 50;
@@ -54,7 +61,9 @@ class ilUserQuery
 	 */
 	public function __construct()
 	{
-		;
+		global $DIC;
+
+		$this->logger = $DIC->logger()->usr();
 	}
 
 	/**
@@ -62,9 +71,19 @@ class ilUserQuery
 	 *
 	 * @param array $a_val udf filter array	
 	 */
-	function setUdfFilter($a_val)
+	public function setUdfFilter($a_val)
 	{
-		$this->udf_filter = $a_val;
+		$valid_udfs = [];
+
+		$definitions = \ilUserDefinedFields::_getInstance()->getDefinitions();
+		foreach((array) $a_val as $udf_name => $udf_value) {
+
+			list($udf_string, $udf_id) = explode('_',$udf_name);
+			if(array_key_exists((int) $udf_id, $definitions)) {
+				$valid_udfs[$udf_name] = $udf_value;
+			}
+		}
+		$this->udf_filter = $valid_udfs;
 	}
 	
 	/**
@@ -72,7 +91,7 @@ class ilUserQuery
 	 *
 	 * @return array udf filter array
 	 */
-	function getUdfFilter()
+	public function getUdfFilter()
 	{
 		return $this->udf_filter;
 	}
@@ -352,12 +371,14 @@ class ilUserQuery
 		$query.= " WHERE usr_data.usr_id <> ".$ilDB->quote(ANONYMOUS_USER_ID, "integer");
 
 		// User filter
-		if($this->users and is_array(($this->users)))
-		{
-			$query .= ' AND '.$ilDB->in('usr_data.usr_id',$this->users,false,'integer');
+		$count_query.= " WHERE 1 = 1 ";
+		$count_user_filter = "usr_data.usr_id != ".$ilDB->quote(ANONYMOUS_USER_ID, "integer");
+		if ($this->users and is_array(($this->users))) {
+			$query .= ' AND ' . $ilDB->in('usr_data.usr_id', $this->users, false, 'integer');
+			$count_user_filter =  $ilDB->in('usr_data.usr_id', $this->users, false, 'integer');
 		}
 
-		$count_query.= " WHERE usr_data.usr_id <> ".$ilDB->quote(ANONYMOUS_USER_ID, "integer");
+		$count_query.= " AND " . $count_user_filter . " ";
 		$where = " AND";
 
 		if ($this->first_letter != "")
@@ -538,7 +559,14 @@ class ilUserQuery
 				}
 				if (substr($this->order_field, 0, 4) == "udf_")
 				{
-					$query .= " ORDER BY ud_".((int)substr($this->order_field, 4)).".value " . strtoupper($this->order_dir);
+					// #25311 check if order field is in field list
+					if(is_array($this->getUdfFilter()) && array_key_exists($this->order_field,$this->getUdfFilter()))
+					{
+						$query .= " ORDER BY ud_".((int)substr($this->order_field, 4)).".value " . strtoupper($this->order_dir);
+					}
+					else {
+						$query .= ' ORDER BY '. self::DEFAULT_ORDER_FIELD . ' ' . strtoupper($this->order_dir);
+					}
 				}
 				else
 				{

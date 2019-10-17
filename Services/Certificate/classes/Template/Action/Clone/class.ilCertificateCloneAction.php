@@ -6,172 +6,201 @@
  */
 class ilCertificateCloneAction
 {
-	/**
-	 * @var ilLogger
-	 */
-	private $logger;
+    /**
+     * @var ilLogger
+     */
+    private $logger;
 
-	/**
-	 * @var ilCertificateFactory
-	 */
-	private $certificateFactory;
+    /**
+     * @var ilCertificatePathFactory
+     */
+    private $pathFactory;
 
-	/**
-	 * @var ilCertificateTemplateRepository
-	 */
-	private $templateRepository;
+    /**
+     * @var ilCertificateTemplateRepository
+     */
+    private $templateRepository;
 
-	/**
-	 * @var ilDBInterface
-	 */
-	private $database;
+    /**
+     * @var ilDBInterface
+     */
+    private $database;
 
-	/**
-	 * @var \ILIAS\Filesystem\Filesystem|null
-	 */
-	private $fileSystem;
+    /**
+     * @var \ILIAS\Filesystem\Filesystem|null
+     */
+    private $fileSystem;
 
-	/**
-	 * @var ilCertificateObjectHelper|null
-	 */
-	private $objectHelper;
+    /**
+     * @var ilCertificateObjectHelper|null
+     */
+    private $objectHelper;
 
-	/**
-	 * @param ilDBInterface $database
-	 * @param ilCertificateFactory $certificateFactory
-	 * @param ilCertificateTemplateRepository $templateRepository
-	 * @param \ILIAS\Filesystem\Filesystem|null $fileSystem
-	 * @param illLogger $logger
-	 * @param ilCertificateObjectHelper|null $objectHelper
-	 * @param string $rootDirectory
-	 */
-	public function __construct(
-		ilDBInterface $database,
-		ilCertificateFactory $certificateFactory,
-		ilCertificateTemplateRepository $templateRepository,
-		\ILIAS\Filesystem\Filesystem $fileSystem = null,
-		ilLogger $logger = null,
-		ilCertificateObjectHelper $objectHelper = null
-	) {
-		$this->database = $database;
-		$this->certificateFactory = $certificateFactory;
-		$this->templateRepository = $templateRepository;
+    /**
+     * @var string
+     */
+    private $webDirectory;
 
-		if (null === $logger) {
-			global $DIC;
-			$logger = $DIC->logger()->cert();
-		}
-		$this->logger = $logger;
+    /**
+     * @param ilDBInterface $database
+     * @param ilCertificateFactory $certificateFactory
+     * @param ilCertificateTemplateRepository $templateRepository
+     * @param \ILIAS\Filesystem\Filesystem|null $fileSystem
+     * @param illLogger $logger
+     * @param ilCertificateObjectHelper|null $objectHelper
+     * @param string $rootDirectory
+     */
+    public function __construct(
+        ilDBInterface $database,
+        ilCertificatePathFactory $pathFactory,
+        ilCertificateTemplateRepository $templateRepository,
+        \ILIAS\Filesystem\Filesystem $fileSystem = null,
+        ilLogger $logger = null,
+        ilCertificateObjectHelper $objectHelper = null,
+        string $webDirectory = CLIENT_WEB_DIR
+    ) {
+        $this->database           = $database;
+        $this->pathFactory        = $pathFactory;
+        $this->templateRepository = $templateRepository;
 
-		if (null === $fileSystem) {
-			global $DIC;
-			$fileSystem = $DIC->filesystem()->web();
-		}
-		$this->fileSystem = $fileSystem;
+        if (null === $logger) {
+            global $DIC;
+            $logger = $DIC->logger()->cert();
+        }
+        $this->logger = $logger;
 
-		if (null === $objectHelper) {
-			$objectHelper = new ilCertificateObjectHelper();
-		}
-		$this->objectHelper = $objectHelper;
-	}
+        if (null === $fileSystem) {
+            global $DIC;
+            $fileSystem = $DIC->filesystem()->web();
+        }
+        $this->fileSystem = $fileSystem;
 
-	/**
-	 * @param ilObject $oldObject
-	 * @param ilObject $newObject
-	 * @param string $iliasVersion
-	 * @throws \ILIAS\Filesystem\Exception\FileAlreadyExistsException
-	 * @throws \ILIAS\Filesystem\Exception\FileNotFoundException
-	 * @throws \ILIAS\Filesystem\Exception\IOException
-	 * @throws ilDatabaseException
-	 * @throws ilException
-	 */
-	public function cloneCertificate(
-		ilObject $oldObject,
-		ilObject $newObject,
-		string $iliasVersion = ILIAS_VERSION_NUMERIC,
-		string $webDir = CLIENT_WEB_DIR
-	) {
-		$oldType = $oldObject->getType();
-		$newType = $newObject->getType();
+        if (null === $objectHelper) {
+            $objectHelper = new ilCertificateObjectHelper();
+        }
+        $this->objectHelper = $objectHelper;
 
-		if ($oldType !== $newType) {
-			throw new ilException(sprintf(
-				'The types "%s" and "%s" for cloning  does not match',
-				$oldType,
-				$newType
-			));
-		}
+        $this->webDirectory = $webDirectory;
+    }
 
-		$newCertificate = $this->certificateFactory->create($newObject);
+    /**
+     * @param ilObject $oldObject
+     * @param ilObject $newObject
+     * @param string $iliasVersion
+     * @throws \ILIAS\Filesystem\Exception\FileAlreadyExistsException
+     * @throws \ILIAS\Filesystem\Exception\FileNotFoundException
+     * @throws \ILIAS\Filesystem\Exception\IOException
+     * @throws ilDatabaseException
+     * @throws ilException
+     */
+    public function cloneCertificate(
+        ilObject $oldObject,
+        ilObject $newObject,
+        string $iliasVersion = ILIAS_VERSION_NUMERIC,
+        string $webDir = CLIENT_WEB_DIR
+    ) {
+        $oldType = $oldObject->getType();
+        $newType = $newObject->getType();
 
-		$templates = $this->templateRepository->fetchCertificateTemplatesByObjId($oldObject->getId());
+        if ($oldType !== $newType) {
+            throw new ilException(sprintf(
+                'The types "%s" and "%s" for cloning  does not match',
+                $oldType,
+                $newType
+            ));
+        }
 
-		/** @var ilCertificateTemplate $template */
-		foreach ($templates as $template) {
-			$backgroundImagePath = $template->getBackgroundImagePath();
-			$backgroundImageFile = basename($backgroundImagePath);
-			$backgroundImageThumbnail = dirname($backgroundImagePath) . '/background.jpg.thumb.jpg';
+        $certificatePath = $this->pathFactory->create($newObject);
 
-			$newBackgroundImage = $newCertificate->getBackgroundImageDirectory() . $backgroundImageFile;
-			$newBackgroundImageThumbnail = str_replace($webDir, '', $newCertificate->getBackgroundImageThumbPath());
+        $templates = $this->templateRepository->fetchCertificateTemplatesByObjId($oldObject->getId());
 
-			if ($this->fileSystem->has($backgroundImagePath)) {
-				if ($this->fileSystem->has($newBackgroundImage)) {
-					$this->fileSystem->delete($newBackgroundImage);
-				}
+        /** @var ilCertificateTemplate $template */
+        foreach ($templates as $template) {
+            $backgroundImagePath = $template->getBackgroundImagePath();
+            $backgroundImageFile = basename($backgroundImagePath);
+            $backgroundImageThumbnail = dirname($backgroundImagePath) . '/background.jpg.thumb.jpg';
 
-				$this->fileSystem->copy(
-					$backgroundImagePath,
-					$newBackgroundImage
-				);
-			}
+            $newBackgroundImage = $certificatePath . $backgroundImageFile;
+            $newBackgroundImageThumbnail = str_replace($webDir, '', $this->getBackgroundImageThumbPath($certificatePath));
 
-			if ($this->fileSystem->has($backgroundImageThumbnail)) {
-				if ($this->fileSystem->has($newBackgroundImageThumbnail)) {
-					$this->fileSystem->delete($newBackgroundImageThumbnail);
-				}
+            if ($this->fileSystem->has($backgroundImagePath)) {
+                if ($this->fileSystem->has($newBackgroundImage)) {
+                    $this->fileSystem->delete($newBackgroundImage);
+                }
 
-				$this->fileSystem->copy(
-					$backgroundImageThumbnail,
-					$newBackgroundImageThumbnail
-				);
-			}
+                $this->fileSystem->copy(
+                    $backgroundImagePath,
+                    $newBackgroundImage
+                );
+            }
 
-			$newTemplate = new ilCertificateTemplate(
-				$newObject->getId(),
-				$this->objectHelper->lookupObjId($newObject->getId()),
-				$template->getCertificateContent(),
-				$template->getCertificateHash(),
-				$template->getTemplateValues(),
-				$template->getVersion(),
-				$iliasVersion,
-				time(),
-				$template->isCurrentlyActive(),
-				$newBackgroundImage
-			);
+            if ($this->fileSystem->has($backgroundImageThumbnail)) {
+                if ($this->fileSystem->has($newBackgroundImageThumbnail)) {
+                    $this->fileSystem->delete($newBackgroundImageThumbnail);
+                }
 
-			$this->templateRepository->save($newTemplate);
-		}
+                $this->fileSystem->copy(
+                    $backgroundImageThumbnail,
+                    $newBackgroundImageThumbnail
+                );
+            }
 
-		// #10271
-		if($this->readActive($oldObject->getId())) {
-			$this->database->replace('il_certificate',
-				array('obj_id' => array('integer', $newObject->getId())),
-				array()
-			);
-		}
-	}
+            $newTemplate = new ilCertificateTemplate(
+                $newObject->getId(),
+                $this->objectHelper->lookupObjId((int) $newObject->getId()),
+                $template->getCertificateContent(),
+                $template->getCertificateHash(),
+                $template->getTemplateValues(),
+                $template->getVersion(),
+                $iliasVersion,
+                time(),
+                $template->isCurrentlyActive(),
+                $newBackgroundImage
+            );
 
-	/**
-	 * @param integer $objectId
-	 * @return int
-	 */
-	private function readActive(int $objectId) : int
-	{
-		$sql = 'SELECT obj_id FROM il_certificate WHERE obj_id = ' . $this->database->quote($objectId, 'integer');
+            $this->templateRepository->save($newTemplate);
+        }
 
-		$query = $this->database->query($sql);
+        // #10271
+        if ($this->readActive($oldObject->getId())) {
+            $this->database->replace(
+                'il_certificate',
+                array('obj_id' => array('integer', $newObject->getId())),
+                array()
+            );
+        }
+    }
 
-		return $this->database->numRows($query);
-	}
+    /**
+     * @param integer $objectId
+     * @return int
+     */
+    private function readActive(int $objectId) : int
+    {
+        $sql = 'SELECT obj_id FROM il_certificate WHERE obj_id = ' . $this->database->quote($objectId, 'integer');
+
+        $query = $this->database->query($sql);
+
+        return $this->database->numRows($query);
+    }
+
+    /**
+     * Returns the filename of the background image
+     *
+     * @return string The filename of the background image
+     */
+    private function getBackgroundImageName()
+    {
+        return "background.jpg";
+    }
+
+    /**
+     * Returns the filesystem path of the background image thumbnail
+     * @param $certificatePath
+     * @return string The filesystem path of the background image thumbnail
+     */
+    private function getBackgroundImageThumbPath(string $certificatePath) : string
+    {
+        return $this->webDirectory . $certificatePath . $this->getBackgroundImageName() . ".thumb.jpg";
+    }
 }

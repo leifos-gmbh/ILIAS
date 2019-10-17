@@ -334,64 +334,6 @@ abstract class ilObject2GUI extends ilObjectGUI
 		}
 	}
 
-	/**
-	 * Display delete confirmation form (workspace specific)
-	 *
-	 * This should probably be moved elsewhere as done with RepUtil
-	 */
-	protected function deleteConfirmation()
-	{
-		global $DIC;
-
-		$tpl = $DIC["tpl"];
-		$lng = $DIC["lng"];
-
-		$node_id = (int)$_REQUEST["item_ref_id"];
-		if (!$node_id)
-		{
-			ilUtil::sendFailure($lng->txt("no_checkbox"), true);
-			$this->ctrl->redirect($this, "");
-		}
-
-		// on cancel or fail we return to parent node
-		$parent_node = $this->tree->getParentId($node_id);
-		$this->ctrl->setParameter($this, "wsp_id", $parent_node);
-
-		include_once("./Services/Utilities/classes/class.ilConfirmationGUI.php");
-		$cgui = new ilConfirmationGUI();
-		$cgui->setHeaderText($lng->txt("info_delete_sure")."<br/>".
-			$lng->txt("info_delete_warning_no_trash"));
-
-		$cgui->setFormAction($this->ctrl->getFormAction($this));
-		$cgui->setCancel($lng->txt("cancel"), "cancelDelete");
-		$cgui->setConfirm($lng->txt("confirm"), "confirmedDelete");
-
-	    $a_ids = array($node_id);
-		foreach ($a_ids as $node_id)
-		{
-			$children = $this->tree->getSubTree($this->tree->getNodeData($node_id));
-			foreach($children as $child)
-			{
-				$node_id = $child["wsp_id"];
-				$obj_id = $this->tree->lookupObjectId($node_id);
-				$type = ilObject::_lookupType($obj_id);
-				$title = call_user_func(array(ilObjectFactory::getClassByType($type),'_lookupTitle'), $obj_id);
-
-				// if anything fails, abort the whole process
-				if(!$this->checkPermissionBool("delete", "", "", $node_id))
-				{
-					ilUtil::sendFailure($lng->txt("msg_no_perm_delete")." ".$title, true);
-					$this->ctrl->redirect($this);
-				}
-
-				$cgui->addItem("id[]", $node_id, $title,
-					ilObject::_getIcon($obj_id, "small", $type),
-					$lng->txt("icon")." ".$lng->txt("obj_".$type));
-			}
-		}
-		
-		$tpl->setContent($cgui->getHTML());
-	}
 
 	/**
 	 * Delete objects (repository/workspace switch)
@@ -477,7 +419,6 @@ abstract class ilObject2GUI extends ilObjectGUI
 	final public function prepareOutput($a_show_subobjects = true) { return parent::prepareOutput($a_show_subobjects); }
 	protected function setTitleAndDescription() { return parent::setTitleAndDescription(); }
 	final protected function showUpperIcon() { return parent::showUpperIcon(); }
-//	final private function showMountWebfolderIcon() { return parent::showMountWebfolderIcon(); }
 	final protected function omitLocator($a_omit = true) { return parent::omitLocator($a_omit); }
 	final protected  function getTargetFrame($a_cmd, $a_target_frame = "") { return parent::getTargetFrame($a_cmd, $a_target_frame); }
 	final protected  function setTargetFrame($a_cmd, $a_target_frame) { return parent::setTargetFrame($a_cmd, $a_target_frame); }

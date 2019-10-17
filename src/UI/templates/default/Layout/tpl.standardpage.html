@@ -1,19 +1,20 @@
-
 <!DOCTYPE html>
-<html lang="de" dir="ltr">
+<html lang="de" dir="ltr" id="{ID}">
 <head>
 	<meta charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 
+	<!-- BEGIN base -->
 	<base href="{BASE}" />
+	<!-- END base -->
 
 	<style type="text/css">
 		{CSS_INLINE}
 	</style>
 
 	<!-- BEGIN css_file -->
-	<link rel="stylesheet" type="text/css" href="{CSS_FILE}" media="{CSS_MEDIA}"/>
+	<link rel="stylesheet" type="text/css" href="{CSS_FILE}" />
 	<!-- END css_file -->
 
 	<!-- BEGIN js_file -->
@@ -30,6 +31,16 @@
 				<div class="il-logo">
 					{LOGO}
 				</div>
+
+				<div class="il-pagetitle">
+					{TITLE}
+				</div>
+
+				<!-- BEGIN header_locator -->
+				<nav class="il-header-locator">
+					{HEADER_BREADCRUMBS}
+				</nav>
+				<!-- END header_locator -->
 				{METABAR}
 			</div>
 		</header>
@@ -45,20 +56,23 @@
 		<!-- html5 main-tag is not supported in IE / div is needed -->
 		<main class="il-layout-page-content">
 			{CONTENT}
+
+			<footer>
+				{FOOTER}
+			</footer>
 		</main>
 
-		<footer>
-			{FOOTER}
-		</footer>
+
 	</section>
+
 
 <!-- BEGIN on_load_code -->
 <script type="text/javascript">
-	il.Util.addOnLoad(function() {
 	<!-- BEGIN on_load_code_inner -->
-		{OLCODE}
+		il.Util.addOnLoad(function() {
+			{OLCODE}
+		});
 	<!-- END on_load_code_inner -->
-});
 </script>
 <!-- END on_load_code -->
 

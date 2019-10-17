@@ -114,7 +114,7 @@ class ilICalParser
 		
 		$lines = $this->tokenize($this->ical,ilICalUtils::ICAL_EOL);
 		
-		if(count(lines) == 1)
+		if(count($lines) == 1)
 		{
 			$lines = $this->tokenize($this->ical, ilICalUtils::ICAL_EOL_FB);
 		}
@@ -234,7 +234,7 @@ class ilICalParser
 				if(strpos(trim($line),'BEGIN') === 0)
 				{
 					$this->log->info('Do not handling line:'.$line);
-					continue;
+					break;
 				}
 				if(strpos(trim($line),'X-WR-TIMEZONE') === 0)
 				{

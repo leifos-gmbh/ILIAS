@@ -470,11 +470,13 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 	 * @param bool $a_include_side_block[optional]
 	 * @return array 
 	 */
-	public function getSubItems($a_admin_panel_enabled = false, $a_include_side_block = false, $a_get_single = 0)
+	public function getSubItems($a_admin_panel_enabled = false, $a_include_side_block = false, $a_get_single = 0,
+		\ilContainerUserFilter $container_user_filter = null)
 	{
 		global $DIC;
 
 		$ilUser = $DIC['ilUser'];
+		$access = $DIC->access();
 
 		// Caching
 		if (is_array($this->items[(int) $a_admin_panel_enabled][(int) $a_include_side_block]))
@@ -513,8 +515,17 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 		{
 			$ilUser->writePref('crs_sess_show_next_'.$this->getId(), (string) (int) $_GET['crs_next_sess']);
 		}
-		
-		$sessions = ilUtil::sortArray($this->items['sess'],'start','ASC',true,false);
+
+		$session_rbac_checked = [];
+		foreach($this->items['sess'] as $session_tree_info)
+		{
+			if($access->checkAccess('visible','',$session_tree_info['ref_id']))
+			{
+				$session_rbac_checked[] = $session_tree_info;
+			}
+		}
+		$sessions = ilUtil::sortArray($session_rbac_checked, 'start','ASC',true,false);
+		//$sessions = ilUtil::sortArray($this->items['sess'],'start','ASC',true,false);
 		$today = new ilDate(date('Ymd',time()),IL_CAL_DATE);
 		$previous = $current = $next = array();
 		foreach($sessions as $key => $item)
@@ -1025,12 +1036,12 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 		unset($obj_settings);
 		
 		// clone certificate (#11085)
-		$factory = new ilCertificateFactory();
+		$pathFactory = new ilCertificatePathFactory();
 		$templateRepository = new ilCertificateTemplateRepository($ilDB);
 
 		$cloneAction = new ilCertificateCloneAction(
 			$ilDB,
-			$factory,
+			$pathFactory,
 			$templateRepository,
 			$DIC->filesystem()->web(),
 			$certificateLogger,
@@ -1038,6 +1049,10 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 		);
 
 		$cloneAction->cloneCertificate($this, $new_obj);
+
+		$book_service = new ilBookingService();
+		$book_service->cloneSettings($this->getId(), $new_obj->getId());
+
 
 		return $new_obj;
 	}

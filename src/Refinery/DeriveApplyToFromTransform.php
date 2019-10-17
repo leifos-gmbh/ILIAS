@@ -5,24 +5,31 @@
  * @author  Niels Theen <ntheen@databay.de>
  */
 
-namespace ILIAS\In\Transformation;
+namespace ILIAS\Refinery;
 
 use ILIAS\Data\Result;
 
 trait DeriveApplyToFromTransform
 {
-	/**
-	 * @param Result $result
-	 * @return Result
-	 */
-	public function applyTo(Result $result) : Result
-	{
-		try {
-			$value = $this->transform($result->value());
-		} catch (\Exception $exception) {
-			return new Result\Error($exception);
-		}
+    /**
+     * @param mixed $from
+     * @return mixed
+     * @throws \Exception
+     */
+    abstract public function transform($from);
 
-		return new Result\Ok($value);
-	}
+    /**
+     * @param Result $result
+     * @return Result
+     */
+    public function applyTo(Result $result) : Result
+    {
+        try {
+            $value = $this->transform($result->value());
+        } catch (\Exception $exception) {
+            return new Result\Error($exception);
+        }
+
+        return new Result\Ok($value);
+    }
 }

@@ -629,6 +629,12 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 					$tpl->loadStandardTemplate();
 				}
 
+				if(!$this->checkPermissionBool("read") && !$this->prtf_embed)
+				{
+					ilUtil::sendInfo($lng->txt("no_permission"));
+					return;
+				}
+
 				// #9680
 				if ($this->id_type == self::REPOSITORY_NODE_ID)
 				{
@@ -754,8 +760,9 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 								// #9737
 								$info[] = $lng->txt("blog_posting_edit_approval_info");
 							}
-							if(sizeof($info) && !$tpl->hasMessage("info")) // #15121
-							{
+							//TODO can we get rid of this conditional? hasMessage belongs to the old ilBlogGlobalTemplate class
+							//if(sizeof($info) && !$tpl->hasMessage("info")) // #15121
+							//{
 								if($public_action)
 								{
 									ilUtil::sendSuccess(implode("<br />", $info));
@@ -764,7 +771,7 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 								{
 									ilUtil::sendInfo(implode("<br />", $info));
 								}
-							}
+							//}
 							// revert to edit cmd to avoid confusion
 							$this->addHeaderActionForCommand("render");	
 							$tpl->setContent($ret);
@@ -1018,7 +1025,7 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 		$ilToolbar = new ilToolbarGUI();
 		$ilUser = $this->user;
 		$tree = $this->tree;
-		
+
 		if(!$this->checkPermissionBool("read"))
 		{
 			ilUtil::sendInfo($lng->txt("no_permission"));
@@ -1334,7 +1341,7 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 			
 		// #13564
 		$this->ctrl->setParameter($this, "bmn", "");
-		$tpl->setTitleUrl($this->ctrl->getLinkTarget($this, "preview")); 
+		//$tpl->setTitleUrl($this->ctrl->getLinkTarget($this, "preview"));
 		$this->ctrl->setParameter($this, "bmn", $this->month);
 				
 		$this->setContentStyleSheet();		
@@ -1422,18 +1429,14 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 		}
 		
 		$a_tpl->resetHeaderBlock(false);
-		// $a_tpl->setBackgroundColor($this->object->getBackgroundColor());
-		$a_tpl->setBanner($banner, $banner_width, $banner_height, $a_export);
+		// @todo fix
+		//$a_tpl->setBanner($banner, $banner_width, $banner_height, $a_export);
 		$a_tpl->setTitleIcon($ppic);
 		$a_tpl->setTitle($this->object->getTitle());
-		// $a_tpl->setTitleColor($this->object->getFontColor());		
-		$a_tpl->setDescription($name);		
+		$a_tpl->setDescription($name);
 		
 		// to get rid of locator in repository preview
 		$a_tpl->setVariable("LOCATOR", "");
-		
-		// :TODO: obsolete?
-		// $a_tpl->setBodyClass("std ilExternal ilBlog");		
 	}
 	
 	/**
@@ -1486,7 +1489,7 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 		
 		include_once "Services/Calendar/classes/class.ilCalendarUtil.php";
 		$wtpl = new ilTemplate("tpl.blog_list.html", true, true, "Modules/Blog");
-		
+
 		// quick editing in portfolio
 		if ($this->prt_id > 0 &&
 			stristr($a_cmd, "embedded"))
@@ -1756,8 +1759,15 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 			// title
 			$wtpl->setVariable("URL_TITLE", $preview);
 			$wtpl->setVariable("TITLE", $item["title"]);
+
+            $kw = ilBlogPosting::getKeywords($this->obj_id, $item["id"]);
+            natcasesort($kw);
+            $keywords = (count($kw) > 0)
+                ? "<br>".$this->lng->txt("keywords").": ".implode(", ", $kw)
+                : "";
+
 			$wtpl->setVariable("DATETIME", $author.
-				ilDatePresentation::formatDate($item["created"]));
+				ilDatePresentation::formatDate($item["created"]).$keywords);
 
 			// content			
 			$wtpl->setVariable("CONTENT", $snippet);			
@@ -2161,6 +2171,10 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 
 		$f = $DIC->ui()->factory();
 
+		$cmd = ($this->prtf_embed)
+            ? "previewEmbedded"
+            : "previewFullscreen";
+
 		if ($single_posting)	// single posting view
 		{
 			include_once "Services/Calendar/classes/class.ilCalendarUtil.php";
@@ -2170,7 +2184,7 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 			{
 				$ctrl->setParameterByClass("ilblogpostinggui", "blpg", $latest_posting);
 				$mb = $f->button()->standard($lng->txt("blog_latest_posting"),
-					$ctrl->getLinkTargetByClass("ilblogpostinggui", "previewFullscreen"));
+					$ctrl->getLinkTargetByClass("ilblogpostinggui", $cmd));
 			}
 			else
 			{
@@ -2182,7 +2196,7 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 			{
 				$ctrl->setParameterByClass("ilblogpostinggui", "blpg", $prev_posting);
 				$pb = $f->button()->standard($lng->txt("previous"),
-					$ctrl->getLinkTargetByClass("ilblogpostinggui", "previewFullscreen"));
+					$ctrl->getLinkTargetByClass("ilblogpostinggui", $cmd));
 			} else
 			{
 				$pb = $f->button()->standard($lng->txt("previous"), "#")->withUnavailableAction();
@@ -2193,7 +2207,7 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 			{
 				$ctrl->setParameterByClass("ilblogpostinggui", "blpg", $next_posting);
 				$nb = $f->button()->standard($lng->txt("next"),
-					$ctrl->getLinkTargetByClass("ilblogpostinggui", "previewFullscreen"));
+					$ctrl->getLinkTargetByClass("ilblogpostinggui", $cmd));
 			} else
 			{
 				$nb = $f->button()->standard($lng->txt("next"), "#")->withUnavailableAction();
@@ -2430,12 +2444,6 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 					$keywords = $this->lng->txt("blog_no_keywords");
 				}
 				$cmd = null;
-				if($may_edit_keywords)
-				{
-					$ilCtrl->setParameterByClass("ilblogpostinggui", "blpg", $blpg);
-					$cmd = 	$ilCtrl->getLinkTargetByClass("ilblogpostinggui", "editKeywords");	
-					$ilCtrl->setParameterByClass("ilblogpostinggui", "blpg", "");
-				}
 				$blocks[$order["keywords"]] = array(
 					$this->lng->txt("blog_keywords"),
 					$keywords,
@@ -2481,24 +2489,28 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 		
 		if(sizeof($blocks))
 		{			
-			include_once "Services/UIComponent/Panel/classes/class.ilPanelGUI.php";
-			
+			global $DIC;
+
+			$ui_factory = $DIC->ui()->factory();
+			$ui_renderer = $DIC->ui()->renderer();
+
 			ksort($blocks);
 			foreach($blocks as $block)
 			{
-				$panel = ilPanelGUI::getInstance();
-				$panel->setPanelStyle(ilPanelGUI::PANEL_STYLE_SECONDARY);
-				$panel->setHeadingStyle(ilPanelGUI::HEADING_STYLE_BLOCK);
-				$panel->setHeading($block[0]);
-				$panel->setBody($block[1]);
-				
+				$title = $block[0];
+
+				$content = $block[1];
+
+				$secondary_panel = $ui_factory->panel()->secondary()->legacy($title, $ui_factory->legacy($content));
+
 				if(isset($block[2]) && is_array($block[2]))
-				{										
-					$panel->setFooter('<a href="'.$block[2][0].'">'.$block[2][1].'</a>');
+				{
+					$link = $ui_factory->button()->shy($block[2][1], $block[2][0]);
+					$secondary_panel = $secondary_panel->withFooter($link);
 				}
-				
-				$wtpl->setCurrentBlock("block_bl");		
-				$wtpl->setVariable("BLOCK", $panel->getHTML());
+
+				$wtpl->setCurrentBlock("block_bl");
+				$wtpl->setVariable("BLOCK", $ui_renderer->render($secondary_panel));
 				$wtpl->parseCurrentBlock();
 			}
 		}

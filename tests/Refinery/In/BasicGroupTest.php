@@ -7,8 +7,8 @@
 
 namespace ILIAS\Tests\Refinery\In;
 
-use ILIAS\In\Transformation\Parallel;
-use ILIAS\In\Transformation\Series;
+use ILIAS\Refinery\In\Parallel;
+use ILIAS\Refinery\In\Series;
 use ILIAS\Refinery\In\Group;
 use ILIAS\Refinery\To\Transformation\IntegerTransformation;
 use ILIAS\Refinery\To\Transformation\StringTransformation;
@@ -18,25 +18,25 @@ require_once('./libs/composer/vendor/autoload.php');
 
 class BasicGroupTest extends TestCase
 {
-	/**
-	 * @var Group
-	 */
-	private $group;
+    /**
+     * @var Group
+     */
+    private $group;
 
-	public function setUp() : void
-	{
-		$this->group = new Group();
-	}
+    public function setUp() : void
+    {
+        $this->group = new Group();
+    }
 
-	public function testParallelInstanceCreated()
-	{
-		$transformation = $this->group->parallel(array(new StringTransformation(), new IntegerTransformation()));
-		$this->assertInstanceOf(Parallel::class, $transformation);
-	}
+    public function testParallelInstanceCreated()
+    {
+        $transformation = $this->group->parallel(array(new StringTransformation(), new IntegerTransformation()));
+        $this->assertInstanceOf(Parallel::class, $transformation);
+    }
 
-	public function testSeriesInstanceCreated()
-	{
-		$transformation = $this->group->series(array(new StringTransformation(), new IntegerTransformation()));
-		$this->assertInstanceOf(Series::class, $transformation);
-	}
+    public function testSeriesInstanceCreated()
+    {
+        $transformation = $this->group->series(array(new StringTransformation(), new IntegerTransformation()));
+        $this->assertInstanceOf(Series::class, $transformation);
+    }
 }

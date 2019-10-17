@@ -90,11 +90,20 @@ class ilCopyWizardOptions
 
 	/**
 	 * Get required steps
-	 * @return type
+	 * @return int
 	 */
 	public function getRequiredSteps()
 	{
-		return count($this->options[0]) + count($this->options[-1]);
+		$steps = 0;
+		if(is_array($this->options) && array_key_exists(0,$this->options) && is_array($this->options[0]))
+		{
+			$steps += count($this->options[0]);
+		}
+		if(is_array($this->options) && array_key_exists(-1,$this->options) && is_array($this->options[-1]))
+		{
+			$steps += count($this->options[-1]);
+		}
+		return $steps;
 	}
 	
 	
@@ -564,6 +573,10 @@ class ilCopyWizardOptions
 	 	global $DIC;
 
 	 	$ilDB = $DIC['ilDB'];
+
+	 	if (isset(self::$instances[$this->copy_id])) {
+            unset (self::$instances[$this->copy_id]);
+        }
 	 	
 	 	$query = "DELETE FROM copy_wizard_options ".
 	 		"WHERE copy_id = ".$this->db->quote($this->copy_id ,'integer');

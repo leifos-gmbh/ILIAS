@@ -1,11 +1,13 @@
 // slates
 .il-maincontrols-slate {
+
 	&.engaged {
 	}
 	&.disengaged {
 		display:none;
 	}
-	.btn-bulky {
+	.btn-bulky,
+	.link-bulky {
 		align-items: center;
 		background-color: @il-slate-bulky-bg-color;
 		display: flex;
@@ -14,13 +16,13 @@
 		&.disengaged:before {
 				content: " \e606";
 				font-family: "il-icons";
-				font-size: 2.1rem;
+				font-size: 1.7rem;
 				margin-right: 10px;
 		}
 		&.engaged:before {
 				content: " \e604";
 				font-family: "il-icons";
-				font-size: 2.1rem;
+				font-size: 1.7rem;
 				margin-right: 10px;
 		}
 		&:hover,
@@ -42,9 +44,6 @@
 	}
 }
 
-.il-maincontrols-slate-overflow {
-	min-height: 0;
-}
 
 .il-maincontrols-slate-content {
 	p, h1, h2, h3, h4 {

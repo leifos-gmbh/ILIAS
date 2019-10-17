@@ -225,7 +225,11 @@ class ilBlogPostingGUI extends ilPageObjectGUI
 		
 		// page commands		 
 		if(!$a_mode)
-		{		
+		{
+			if (!$this->getEnableEditing())
+			{
+				$this->ctrl->redirect($this, "previewFullscreen");
+			}
 			/*
 			// delete
 			$page_commands = false;
@@ -484,8 +488,11 @@ class ilBlogPostingGUI extends ilPageObjectGUI
 	{
 		$tpl = $this->tpl;
 		$ilTabs = $this->tabs;
-		
-		$ilTabs->activateTab("edit");
+
+        $ilTabs->clearTargets();
+        $ilTabs->setBackTarget($this->lng->txt("back"), $this->ctrl->getLinkTargetByClass("ilobjblogGUI"));
+
+        $ilTabs->activateTab("edit");
 		
 		if(!$a_form)
 		{
@@ -503,14 +510,18 @@ class ilBlogPostingGUI extends ilPageObjectGUI
 		$form = $this->initTitleForm();
 		if($form->checkInput())
 		{
-			$page = $this->getPageObject();
-			$page->setTitle($form->getInput("title"));
-			$page->update();			
-			
-			$page->handleNews(true);
-			
-			ilUtil::sendSuccess($lng->txt("settings_saved"), true);
-			$ilCtrl->redirect($this, "preview");
+			if ($this->checkAccess("write") || $this->checkAccess("contribute"))
+			{
+				$page = $this->getPageObject();
+				$page->setTitle($form->getInput("title"));
+				$page->update();
+
+				$page->handleNews(true);
+
+				ilUtil::sendSuccess($lng->txt("settings_saved"), true);
+				//$ilCtrl->redirect($this, "preview");
+                $this->ctrl->redirectByClass("ilObjBlogGUI", "");
+			}
 		}
 		
 		$form->setValuesByPost();
@@ -534,7 +545,7 @@ class ilBlogPostingGUI extends ilPageObjectGUI
 		$title->setValue($this->getPageObject()->getTitle());
 	
 		$form->addCommandButton('updateTitle', $lng->txt('save'));
-		$form->addCommandButton('preview', $lng->txt('cancel'));
+		$form->addCommandButton('cancelEdit', $lng->txt('cancel'));
 
 		return $form;		
 	}
@@ -543,7 +554,10 @@ class ilBlogPostingGUI extends ilPageObjectGUI
 	{
 		$tpl = $this->tpl;
 		$ilTabs = $this->tabs;
-		
+
+		$ilTabs->clearTargets();
+		$ilTabs->setBackTarget($this->lng->txt("back"), $this->ctrl->getLinkTargetByClass("ilobjblogGUI"));
+
 		$ilTabs->activateTab("edit");
 		
 		if(!$a_form)
@@ -562,15 +576,19 @@ class ilBlogPostingGUI extends ilPageObjectGUI
 		$form = $this->initDateForm();
 		if($form->checkInput())
 		{
-			$dt = $form->getItemByPostVar("date");
-			$dt = $dt->getDate();
-			
-			$page = $this->getPageObject();
-			$page->setCreated($dt);
-			$page->update();			
-			
-			ilUtil::sendSuccess($lng->txt("settings_saved"), true);
-			$ilCtrl->redirect($this, "preview");
+			if ($this->checkAccess("write") || $this->checkAccess("contribute"))
+			{
+				$dt = $form->getItemByPostVar("date");
+				$dt = $dt->getDate();
+
+				$page = $this->getPageObject();
+				$page->setCreated($dt);
+				$page->update();
+
+				ilUtil::sendSuccess($lng->txt("settings_saved"), true);
+				//$ilCtrl->redirect($this, "preview");
+                $this->ctrl->redirectByClass("ilObjBlogGUI", "");
+			}
 		}
 		
 		$form->setValuesByPost();
@@ -596,10 +614,22 @@ class ilBlogPostingGUI extends ilPageObjectGUI
 		$date->setDate($this->getPageObject()->getCreated());
 	
 		$form->addCommandButton('updateDate', $lng->txt('save'));
-		$form->addCommandButton('preview', $lng->txt('cancel'));
+		$form->addCommandButton('cancelEdit', $lng->txt('cancel'));
 
 		return $form;		
 	}
+
+	/**
+	 * Cancel editing
+	 *
+	 * @param
+	 * @return
+	 */
+	protected function cancelEdit()
+	{
+        $this->ctrl->redirectByClass("ilObjBlogGUI", "");
+	}
+
 	
 	function observeNoteAction($a_blog_id, $a_posting_id, $a_type, $a_action, $a_note_id)
 	{
@@ -627,7 +657,10 @@ class ilBlogPostingGUI extends ilPageObjectGUI
 	
 	function deactivatePage($a_to_list = false)
 	{
-		$this->getBlogPosting()->unpublish();
+		if ($this->checkAccess("write") || $this->checkAccess("contribute"))
+		{
+			$this->getBlogPosting()->unpublish();
+		}
 
 		if(!$a_to_list)
 		{
@@ -649,10 +682,13 @@ class ilBlogPostingGUI extends ilPageObjectGUI
 	{
 		// send notifications
 		include_once "Modules/Blog/classes/class.ilObjBlog.php";
-		ilObjBlog::sendNotification("new", $this->isInWorkspace(), $this->node_id, $this->getBlogPosting()->getId());		 
-		
-		$this->getBlogPosting()->setActive(true);
-		$this->getBlogPosting()->update(true, false, false);
+		ilObjBlog::sendNotification("new", $this->isInWorkspace(), $this->node_id, $this->getBlogPosting()->getId());
+
+		if ($this->checkAccess("write") || $this->checkAccess("contribute"))
+		{
+			$this->getBlogPosting()->setActive(true);
+			$this->getBlogPosting()->update(true, false, false);
+		}
 		if(!$a_to_list)
 		{
 			$this->ctrl->redirect($this, "edit");
@@ -676,8 +712,11 @@ class ilBlogPostingGUI extends ilPageObjectGUI
 
 		$ilTabs = $this->tabs;
 		$tpl = $this->tpl;
-		
-		if (!$this->checkAccess("contribute"))
+
+        $ilTabs->clearTargets();
+        $ilTabs->setBackTarget($this->lng->txt("back"), $this->ctrl->getLinkTargetByClass("ilobjblogGUI"));
+
+        if (!$this->checkAccess("contribute"))
 		{
 			return;
 		}
@@ -785,12 +824,15 @@ class ilBlogPostingGUI extends ilPageObjectGUI
 			//TODO identify the input instead of use 0
 			$keywords = $result["tags"][0];
 
-			if(is_array($keywords))
+			if ($this->checkAccess("write") || $this->checkAccess("contribute"))
 			{
-				$this->getBlogPosting()->updateKeywords($keywords);
+				if (is_array($keywords))
+				{
+					$this->getBlogPosting()->updateKeywords($keywords);
+				}
 			}
 
-			$this->ctrl->redirect($this, "preview");
+			$this->ctrl->redirectByClass("ilObjBlogGUI", "");
 		}
 	}
 

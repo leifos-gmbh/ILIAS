@@ -204,7 +204,7 @@ class ilBadgeProfileGUI
 				$url);
 
 			if ($badge["object"]["type"] != "bdga") {
-				$parent_icon = $this->factory->icon()->custom(
+				$parent_icon = $this->factory->symbol()->icon()->custom(
 					ilObject::_getIcon($badge["object"]["id"],"big", $badge["object"]["type"]),
 					$this->lng->txt("obj_".$badge["object"]["type"]),
 					"medium"
@@ -226,9 +226,7 @@ class ilBadgeProfileGUI
 					$profile_button
 				];
 			} else {
-				$badge_sections = [
-					$this->factory->legacy(""),
-					$profile_button];
+				$badge_sections = [$profile_button];
 			}
 
 			$cards[] = $this->factory->card()->standard($badge["title"], $image)->withSections($badge_sections)

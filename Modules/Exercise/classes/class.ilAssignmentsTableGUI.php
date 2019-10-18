@@ -164,6 +164,8 @@ class ilAssignmentsTableGUI extends ilTable2GUI
             } else {
                 $this->tpl->setVariable("TXT_MANDATORY", $lng->txt("no"));
             }
+        } else {
+            $this->tpl->setVariable("TXT_MANDATORY", $lng->txt("exc_random"));
         }
 		
 		$ilCtrl->setParameter($this->parent_obj, "ass_id", $d["id"]);

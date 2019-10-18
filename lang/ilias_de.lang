@@ -30,6 +30,7 @@ exc#:#exc_random_assignment#:#Zufällige Auswahl
 exc#:#exc_random_assignment_info#:#Wenn Sie die Übung starten, wird Ihnen eine zufällige Auswahl an verpflichtenden Übungseinheiten zugewiesen.
 exc#:#exc_rand_overall_ass#:#Gesamtzahl an Übungseinheiten
 exc#:#exc_rand_nr_mandatory#:#Anzahl verpflichtender Übungseinheiten
+exc#:#exc_random#:#Zufällig
 crs#:#timings_cron_reminder_freshly_start#:#Der Bearbeitungszeitraum hat begonnen bei:
 crs#:#timings_cron_reminder_started_subject#:#Der Bearbeitungszeitraum hat begonnen
 crs#:#timings_cron_reminder_exceeded_subject#:#Sie haben den Bearbeitungszeitraum überschritten

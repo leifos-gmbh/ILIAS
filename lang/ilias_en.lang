@@ -30,6 +30,7 @@ exc#:#exc_random_assignment#:#Random Assignment
 exc#:#exc_random_assignment_info#:#When starting the exercise some assignments will be randomly selected being mandatory for you.
 exc#:#exc_rand_overall_ass#:#Overall Number of Assignments
 exc#:#exc_rand_nr_mandatory#:#Number of Mandatory Assignments
+exc#:#exc_random#:#Random
 crs#:#timings_cron_reminder_freshly_start#:#Der Bearbeitungszeitraum hat begonnen bei:
 crs#:#timings_cron_reminder_started_subject#:#Der Bearbeitungszeitraum hat begonnen
 crs#:#timings_cron_reminder_exceeded_subject#:#Sie haben den Bearbeitungszeitraum überschritten

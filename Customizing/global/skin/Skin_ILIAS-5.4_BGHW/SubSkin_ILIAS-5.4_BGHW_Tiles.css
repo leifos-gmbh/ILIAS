@@ -6957,8 +6957,16 @@ button.close {
     display: flex;
     flex-direction: column;
   }
-  .row-eq-height .il-card :nth-child(4) {
+  .row-eq-height .il-card :last-child {
     flex-grow: 2;
+  }
+}
+/* see bug #25920, limit size of cards for small screens */
+@media (max-width: 768px) {
+  .il-card {
+    max-width: 350px;
+    margin-right: auto;
+    margin-left: auto;
   }
 }
 .il-deck .row {
@@ -7491,7 +7499,9 @@ hr.il-divider-with-label {
   float: none;
   zoom: 1;
   vertical-align: top;
-  width: auto;
+  /* using auto has issues on firefox, using calc(100%-45px) seems to have issues on IE,
+        see known issues at https://caniuse.com/#search=calc */
+  width: 100%;
 }
 .il-narrow-content .il-item .dropdown {
   position: static;
@@ -14690,6 +14700,9 @@ div#ilContRepIntro img {
 .ilContainerTileRows .il-chart-progressmeter-container {
   height: 100%;
 }
+.ilContainerTileRows .il-card h5 button.btn {
+  font-size: inherit;
+}
 .ilContainerShowMore {
   padding: 15px 10px;
   background-color: white;
@@ -17316,10 +17329,10 @@ fieldset[disabled] .btn.active {
 input.ilc_qsubmit_Submit {
   background-color: #004994 !important;
   border-color: #004994 !important;
-  color: white;
+  color: white !important;
 }
 #etherpad-lite {
-  height: inherit !important;
+  min-height: 600px !important;
 }
 /*TREE*/
 a.ilTreeView {
@@ -17749,6 +17762,9 @@ a.il_ContainerItemCommand:visited {
   margin-top: 0px;
   margin-bottom: 0px;
   line-height: 1.1;
+}
+.il-chart-progressmeter-box.il-chart-progressmeter-mini {
+  display: none;
 }
 /*----------REPOSITORY----------*/
 .il-card {

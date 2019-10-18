@@ -46,7 +46,7 @@ class ilExcMandatoryAssignmentManager
             if ($i->getMandatory()) {
                 return true;
             }
-            return true;
+            return false;
         });
     }
 
@@ -61,10 +61,11 @@ class ilExcMandatoryAssignmentManager
         if ($this->rand_ass_manager->isActivated()) {
             return $this->rand_ass_manager->getMandatoryAssignmentsOfUser($user_id);
         }
-        return array_map(function($i) {
+        $r =  array_map(function($i) {
             /** @var ilExAssignment $i */
             return $i->getId();
         }, $this->set_to_mandatory_assignments);
+        return $r;
     }
 
     /**

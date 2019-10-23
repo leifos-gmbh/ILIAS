@@ -20,6 +20,11 @@ class ilChapterHierarchyFormGUI extends ilHierarchyFormGUI
 	 */
 	protected $user;
 
+    /**
+     * @var array
+     */
+	protected $page_layouts;
+
 	/**
 	* Constructor
 	*
@@ -39,6 +44,9 @@ class ilChapterHierarchyFormGUI extends ilHierarchyFormGUI
 			: $a_lang;
 		parent::__construct();
 		$this->setCheckboxName("id");
+
+        $this->page_layouts = ilPageLayout::activeLayouts(false,
+            ilPageLayout::MODULE_LM);
 	}
 	
 	/**
@@ -95,7 +103,12 @@ class ilChapterHierarchyFormGUI extends ilHierarchyFormGUI
 				{
 					$cmds[] = array("text" => $lng->txt("cont_insert_page"), "cmd" => "insertPage", "multi" => 10,
 						"as_subitem" => true);
-					if ($ilUser->clipboardHasObjectsOfType("pg"))
+                    if (count($this->page_layouts) > 0)
+                    {
+                        $cmds[] = array("text" => $lng->txt("cont_insert_pagelayout"), "cmd" => "insertTemplate", "multi" => 10,
+                            "as_subitem" => true);
+                    }
+                    if ($ilUser->clipboardHasObjectsOfType("pg"))
 					{
 						$cmds[] = array("text" => $lng->txt("cont_insert_page_from_clip"),
 							"cmd" => "insertPageClip", "as_subitem" => true);
@@ -104,7 +117,11 @@ class ilChapterHierarchyFormGUI extends ilHierarchyFormGUI
 				else
 				{
 					$cmds[] = array("text" => $lng->txt("cont_insert_page"), "cmd" => "insertPage", "multi" => 10);
-					if ($ilUser->clipboardHasObjectsOfType("pg"))
+                    if (count($this->page_layouts) > 0)
+                    {
+                        $cmds[] = array("text" => $lng->txt("cont_insert_pagelayout"), "cmd" => "insertTemplate", "multi" => 10);
+                    }
+                    if ($ilUser->clipboardHasObjectsOfType("pg"))
 					{
 						$cmds[] = array("text" => $lng->txt("cont_insert_page_from_clip"),
 							"cmd" => "insertPageClip");
@@ -140,7 +157,11 @@ class ilChapterHierarchyFormGUI extends ilHierarchyFormGUI
 			{
 				$cmds[] = array("text" => $lng->txt("cont_insert_page"),
 					"cmd" => "insertPage", "multi" => 10);
-				if ($ilUser->clipboardHasObjectsOfType("pg"))
+                if (count($this->page_layouts) > 0)
+                {
+                    $cmds[] = array("text" => $lng->txt("cont_insert_pagelayout"), "cmd" => "insertTemplate", "multi" => 10);
+                }
+                if ($ilUser->clipboardHasObjectsOfType("pg"))
 				{
 					$cmds[] = array("text" => $lng->txt("cont_insert_page_from_clip"),
 						"cmd" => "insertPageClip");

@@ -55,6 +55,19 @@ class ilLMPage extends ilPageObject
 		}
 	}
 
+	/**
+	 * Create new scorm 2004 with page-layout
+	 */
+	function createWithLayoutId($a_layout_id)
+	{
+
+		//get XML Data for Layout
+		$layout_obj = new ilPageLayout($a_layout_id);
+
+		parent::setXMLContent($layout_obj->getXMLContent());
+		parent::create();
+	}
+
 }
 
 ?>

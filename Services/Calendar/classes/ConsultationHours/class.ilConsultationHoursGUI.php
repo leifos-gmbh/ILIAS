@@ -42,6 +42,11 @@ class ilConsultationHoursGUI
 	protected $user_id;
 	protected $ctrl;
 
+	/**
+	 * @var null | \ilLogger
+	 */
+	private $logger = null;
+
 	protected $booking = null;
 	
 	/**
@@ -55,6 +60,8 @@ class ilConsultationHoursGUI
 		$ilCtrl = $DIC['ilCtrl'];
 		$tpl = $DIC['tpl'];
 		$ilUser = $DIC['ilUser'];
+
+		$this->logger = $DIC->logger()->cal();
 
 		$user_id = (int)$_GET['user_id'];
 		if($user_id)
@@ -897,7 +904,8 @@ class ilConsultationHoursGUI
 			}
 
 			$tgt = explode(',',$this->form->getInput('tgt'));
-			$obj_ids = array();
+			$obj_ids = [];
+
 			foreach((array) $tgt as $ref_id)
 			{
 				if(!trim($ref_id))
@@ -906,7 +914,8 @@ class ilConsultationHoursGUI
 				}
 				$obj_id = $ilObjDataCache->lookupObjId($ref_id);
 				$type = ilObject::_lookupType($obj_id);
-				$valid_types = array('crs','grp');
+				$valid_types = ['crs','grp'];
+
 				if(!$obj_id or !in_array($type, $valid_types))
 				{
 					ilUtil::sendFailure($this->lng->txt('cal_ch_unknown_repository_object'));

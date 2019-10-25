@@ -17647,6 +17647,12 @@ div.ilTopMemberView {
   #mainspacekeeper > .row {
     background-color: white;
   }
+  .ilMainHeader {
+    background: none;
+  }
+  html {
+    background: none;
+  }
 }
 /*----------PAGE HEADER----------*/
 div#il_startup_logo img {
@@ -17764,6 +17770,17 @@ a.il_ContainerItemCommand:visited {
 }
 #ilLMPageContent .ilPermanentLinkWrapper.form-inline {
   display: none;
+}
+@media print {
+  #mainspacekeeper > .row {
+    background-color: white;
+  }
+  .ilMainHeader {
+    background: none;
+  }
+  html {
+    background: none;
+  }
 }
 .il-card {
   max-width: 300px;

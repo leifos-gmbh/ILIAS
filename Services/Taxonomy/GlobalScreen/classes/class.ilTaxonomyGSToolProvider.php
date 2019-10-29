@@ -67,6 +67,7 @@ class ilTaxonomyGSToolProvider extends AbstractDynamicToolProvider
     private function getEditTree($gui_path, $tax_id, $cmd, $parent_cmd) : string
     {
         $target_gui = $gui_path[count($gui_path)-1];
+        //var_dump($gui_path); exit;
         $tax_exp = new ilTaxonomyExplorerGUI($gui_path, $parent_cmd, $tax_id,
             $target_gui, $cmd);
         return $tax_exp->getHTML();

@@ -764,6 +764,28 @@ class ilContainer extends ilObject
 		$objects = $this->applyContainerUserFilter($objects, $container_user_filter);
 		$objects = self::getCompleteDescriptions($objects);
 
+		// apply container classification filters
+        $repo = new ilClassificationSessionRepository($this->getRefId());
+        foreach (ilClassificationProvider::getValidProviders($this->getRefId(), $this->getId(), $this->getType()) as $class_provider) {
+            $id = get_class($class_provider);
+            $current = $repo->getValueForProvider($id);
+            if($current)
+            {
+                $class_provider->setSelection($current);
+                $filtered = $class_provider->getFilteredObjects();
+                $objects = array_filter ($objects, function ($i) use ($filtered) {
+                    return (is_array($filtered) && in_array($i["obj_id"], $filtered));
+                });
+                //if (count($filtered) > 0) {
+                //    var_dump($filtered);
+                //    echo "<br><br>";
+                //    var_dump($objects);
+                //    exit;
+                //}
+            }
+        }
+
+
 		$found = false;
 		$all_ref_ids = array();
 		

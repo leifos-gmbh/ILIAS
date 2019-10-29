@@ -819,6 +819,7 @@ class ilObjCategoryGUI extends ilContainerGUI
 					ilObjectServiceSettingsGUI::NEWS_VISIBILITY,
 					ilObjectServiceSettingsGUI::TAXONOMIES,
 					ilObjectServiceSettingsGUI::CUSTOM_METADATA,
+					ilObjectServiceSettingsGUI::TAG_CLOUD,
 					ilObjectServiceSettingsGUI::FILTER
 				)
 			);
@@ -893,6 +894,7 @@ class ilObjCategoryGUI extends ilContainerGUI
 						ilObjectServiceSettingsGUI::NEWS_VISIBILITY,
 						ilObjectServiceSettingsGUI::TAXONOMIES,						
 						ilObjectServiceSettingsGUI::CUSTOM_METADATA,
+						ilObjectServiceSettingsGUI::TAG_CLOUD,
 						ilObjectServiceSettingsGUI::FILTER
 					)
 				);

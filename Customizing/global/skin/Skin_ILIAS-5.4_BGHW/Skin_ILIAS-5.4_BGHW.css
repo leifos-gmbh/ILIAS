@@ -17598,17 +17598,18 @@ div.ilTopMemberView {
     margin: 0 7px 0 75px;
   }
   #ilTopBarNav > li > a {
-    margin-right: 8px;
     margin-top: 10px;
-  }
-  #ilTopBarNav .navbar-toggle {
-    display: inline-block;
-    float: none;
-    top: 2.5px;
   }
   #ilTopBarNav > li {
     float: none;
     display: inline-block;
+  }
+  #userlog {
+    top: -1px;
+    margin-right: 4px;
+  }
+  #ilMMSearch {
+    margin-right: 4px;
   }
 }
 /*MAIN MENU*/
@@ -17617,11 +17618,14 @@ div.ilTopMemberView {
     top: 50px;
   }
   #ilTopBarNav .navbar-toggle {
+    display: inline-block;
+    float: none;
     height: 40px;
     width: 40px;
     background-color: #004994;
-    margin-right: 8px;
+    margin-right: 5px;
     margin-top: 10px;
+    top: 2.5px;
   }
   #ilTopBarNav .icon-bar {
     background-color: white;

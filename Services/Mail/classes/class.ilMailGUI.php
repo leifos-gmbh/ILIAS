@@ -68,9 +68,9 @@ class ilMailGUI
                            ->context()
                            ->current();
 
-        $additionalDataExists = $toolContext->getAdditionalData()->exists(ilMailGlobalScreenToolProvider::SHOW_MAIL_FOLDERS_TOOL);
+        $additionalDataExists = $toolContext->getAdditionalData()->exists(MailGlobalScreenToolProvider::SHOW_MAIL_FOLDERS_TOOL);
         if (false === $additionalDataExists) {
-            $toolContext->addAdditionalData(ilMailGlobalScreenToolProvider::SHOW_MAIL_FOLDERS_TOOL, true);
+            $toolContext->addAdditionalData(MailGlobalScreenToolProvider::SHOW_MAIL_FOLDERS_TOOL, true);
         }
     }
 
@@ -280,5 +280,14 @@ class ilMailGUI
         if (isset($this->httpRequest->getQueryParams()['message_sent'])) {
             $DIC->tabs()->setTabActive('fold');
         }
+    }
+
+    /**
+     * Toggle explorer tree node
+     */
+    protected function toggleExplorerNodeState() : void
+    {
+        $exp = new ilMailExplorer($this, $this->user->getId());
+        $exp->toggleExplorerNodeState();
     }
 }

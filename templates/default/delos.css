@@ -8253,6 +8253,69 @@ fieldset[disabled] .il-table-presentation-viewcontrols .btn-default:not(.disable
   font-size: 14px;
   font-weight: 600;
 }
+/* common css for characteristic value listing */
+.il-listing-characteristic-value-row {
+  /* i tried .ilClearFloat, did not work as expected */
+  border-top: solid #ddd 1px;
+  padding: 12px 0;
+}
+.il-listing-characteristic-value-row:before,
+.il-listing-characteristic-value-row:after {
+  content: " ";
+  display: table;
+}
+.il-listing-characteristic-value-row:after {
+  clear: both;
+}
+.il-listing-characteristic-value-row:before,
+.il-listing-characteristic-value-row:after {
+  content: " ";
+  display: table;
+}
+.il-listing-characteristic-value-row:after {
+  clear: both;
+}
+.il-listing-characteristic-value-row:first-child {
+  border-top: none;
+}
+.il-listing-characteristic-value-label {
+  float: left;
+  width: 50%;
+  right: 50%;
+}
+@media (max-width: 768px) {
+  .il-listing-characteristic-value-label {
+    width: 75%;
+    right: 75%;
+  }
+}
+.il-listing-characteristic-value-item {
+  float: right;
+  padding-left: 12px;
+  width: 50%;
+  left: 50%;
+}
+@media (max-width: 768px) {
+  .il-listing-characteristic-value-item {
+    width: 25%;
+    left: 25%;
+  }
+}
+/* when characteristic value listing is used in the card */
+.il-card .il-listing-characteristic-value-row {
+  border-top: none;
+  padding: 6px 3px;
+}
+.il-card .il-listing-characteristic-value-label {
+  padding-left: 6px;
+  width: 75%;
+  right: 75%;
+}
+.il-card .il-listing-characteristic-value-item {
+  text-align: right;
+  width: 25%;
+  left: 25%;
+}
 div.alert div {
   margin-top: 10px;
 }
@@ -8297,30 +8360,33 @@ div.alert ul > li:before {
 }
 .il-tree ul {
   list-style-type: none;
-  padding-left: 20px;
+  padding: 4px 0 4px 20px;
 }
 .il-tree li.il-tree-node .node-line {
   cursor: pointer;
+  display: flex;
+  flex-wrap: wrap;
 }
-.il-tree .il-tree-node > ul {
-  display: none;
+.il-tree li.il-tree-node .node-line > .node-label .icon {
+  vertical-align: text-bottom;
 }
-.il-tree .il-tree-node.expanded > ul {
-  display: block;
+.il-tree li.il-tree-node .node-line > .node-byline {
+  width: 100%;
 }
-.il-tree .il-tree-node.expandable .node-label {
-  padding-left: 2px;
+.il-tree li.il-tree-node.highlighted > .node-line {
+  background-color: #ffffd0;
 }
-.il-tree .il-tree-node.expandable > .node-line:before {
+.il-tree li.il-tree-node.expandable > .node-line:before {
   font-family: 'Glyphicons Halflings';
   content: "\e250";
+  position: absolute;
+  margin-left: -20px;
 }
-.il-tree .il-tree-node.expandable.expanded > .node-line:before {
-  font-family: 'Glyphicons Halflings';
+.il-tree li.il-tree-node.expandable.expanded > .node-line:before {
   content: "\e252";
 }
-.il-tree .il-tree-node.highlighted > .node-line {
-  background-color: #ffffd0;
+.il-tree li.il-tree-node:not(.expanded) > ul {
+  display: none;
 }
 .shadow-right {
   box-shadow: 1px 3px 4px rgba(0, 0, 0, 0.1);
@@ -8742,14 +8808,14 @@ footer {
 .il-maincontrols-slate .link-bulky.disengaged:before {
   content: " \e606";
   font-family: "il-icons";
-  font-size: 2.1rem;
+  font-size: 1.7rem;
   margin-right: 10px;
 }
 .il-maincontrols-slate .btn-bulky.engaged:before,
 .il-maincontrols-slate .link-bulky.engaged:before {
   content: " \e604";
   font-family: "il-icons";
-  font-size: 2.1rem;
+  font-size: 1.7rem;
   margin-right: 10px;
 }
 .il-maincontrols-slate .btn-bulky:hover,
@@ -9178,6 +9244,30 @@ footer {
     font-size: 4rem;
     height: 50px;
   }
+}
+.il-maincontrols-footer {
+  color: white;
+  font-size: 0.9em;
+  padding: 2px 10px;
+}
+.il-maincontrols-footer .il-footer-content div {
+  float: left;
+}
+.il-maincontrols-footer .il-footer-links ul {
+  list-style: none;
+  paddinng: 0px;
+  margin: 0px;
+}
+.il-maincontrols-footer .il-footer-links ul li {
+  display: inline-block;
+  margin-left: 5px;
+}
+.il-maincontrols-footer .il-footer-links ul li a {
+  color: white;
+}
+.il-maincontrols-footer .il-footer-permanent-url {
+  display: inline-block;
+  border: 1px solid gray;
 }
 .il-drilldown ul {
   list-style: none;
@@ -12169,7 +12259,7 @@ div.ilTopBarRight span#ilAdvSelListAnchorElement_asl {
   margin-left: 25px;
 }
 div.ilSideBarHead {
-  background-color: #f0f0f0;
+  margin-top: 10px;
   margin-bottom: 5px;
   padding: 5px;
 }
@@ -12177,6 +12267,7 @@ div.ilSideBarHead h3 {
   font-size: 110%;
   color: #606060;
   display: inline;
+  padding: 0;
 }
 div.ilSideBarContent {
   padding: 5px;
@@ -13235,9 +13326,14 @@ div.ilEditVAccordICont {
 div.ilTinyMenuSection {
   float: left;
   white-space: nowrap;
-  border-right: 1px solid #e0e0e0;
-  padding: 0 10px 4px 0;
+  /* border-right: 1px solid #e0e0e0; */
+  /* padding: 0 10px 4px 0; */
   margin-right: 10px;
+}
+div.ilTinyMenuSection p {
+  margin: 20px 0 5px 0;
+  padding: 2px 5px;
+  background-color: #efefef;
 }
 @media only screen and (max-width: 768px) {
   div.ilTinyMenuSection {
@@ -13275,14 +13371,13 @@ div.ilTinyMenuSection {
   margin: 0;
 }
 #iltinymenu {
-  z-index: 1040 !important;
-  position: fixed;
-  left: 0;
-  right: 0;
-  top: 0;
-  background-color: #f9f9f9;
-  -webkit-box-shadow: 3px 9px 9px 0 rgba(0, 0, 0, 0.176);
-  box-shadow: 3px 9px 9px 0 rgba(0, 0, 0, 0.176);
+  /*z-index: 1040 !important;
+	position: fixed;
+	left: 0;
+	right: 0;
+	top: 0;
+	background-color: @il-secondary-container-bg;
+    .box-shadow(3px 9px 9px 0 rgba(0, 0, 0, 0.176));*/
 }
 #iltinymenu .bd div.last {
   float: left;
@@ -14939,12 +15034,12 @@ th.ilSkillEntryHead {
 .ilSkillEvalItem.ilSkillEvalType2 {
   border-color: #21c5d8;
 }
-.ilSkillDescription,
+.ilSkillLevelDescription,
 .ilSkillMaterial,
 .ilSkillSuggResources {
   padding: 5px 10px 5px 15px;
 }
-.ilSkillDescription > .row > div,
+.ilSkillLevelDescription > .row > div,
 .ilSkillMaterial > .row > div,
 .ilSkillSuggResources > .row > div {
   padding-top: 2px;
@@ -14974,6 +15069,9 @@ th.ilSkillEntryHead {
 }
 .ilSkillFilter .ilToolbar select.form-control {
   display: block;
+}
+.ilSkillCategoryDescription {
+  margin: 0px 5px;
 }
 /* Modules/Poll */
 .ilPollDescription {
@@ -16412,6 +16510,20 @@ div.ilRatingOverlay {
   background-color: #F9F9F9;
   padding: 9px;
 }
+.ilExcAssignmentInfoTool {
+  padding: 10px;
+}
+.ilExcAssignmentInfoTool h4 {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+.ilExcAssignmentInfoTool p {
+  padding: 0px;
+}
+.ilExcAssignmentInfoTool ul {
+  padding-left: 30px;
+  margin: 0;
+}
 .progress {
   height: 15px;
   min-width: 100px;
@@ -16696,9 +16808,8 @@ div.ilSurveyPageEditActionMenu {
 }
 /* Services/Tags */
 .ilTagCloud {
-  max-height: 400px;
-  overflow: auto;
-  font-size: 90%;
+  font-size: 12px;
+  padding: 6px 12px;
 }
 .ilTag {
   background-color: #75deea;
@@ -16776,6 +16887,11 @@ div.ilChecklist ul li img {
 /* Modules/WorkspaceFolder */
 #tbl_wfld.table-striped > tbody > tr > td {
   background-color: transparent;
+}
+.ilWspContainerListFooter {
+  background-color: #f9f9f9;
+  margin: 0px -15px -15px -15px;
+  padding: 5px 25px;
 }
 /* Services/FileUpload */
 .ilFileUploadEntryProgressPercent {
@@ -17322,12 +17438,15 @@ img.ilBadgeImage {
   max-width: 150px;
   max-height: 150px;
 }
-img.ilBadgeImageThumbnail {
+.ilBadgeImageThumbnail a .img-responsive {
   max-width: 50px;
   max-height: 50px;
+  display: inline-block;
 }
-img.ilBadgeImageModal {
+.ilBadgeImageThumbnail .modal .img-responsive {
   margin: auto;
+  width: 50%;
+  height: auto;
 }
 div.ilBadgeBackpackPanelContent {
   min-height: 200px;
@@ -17339,10 +17458,33 @@ span.ilProfileBadge {
   display: inline-block;
   padding: 5px;
 }
-span.ilProfileBadge a {
+span.ilProfileBadge > a {
   width: 50px;
   height: 50px;
   display: inline-block;
+}
+span.ilProfileBadge > a img {
+  margin: auto;
+  max-width: 50px;
+  max-height: 50px;
+}
+span.ilProfileBadge .modal .img-responsive {
+  margin: auto;
+  width: 50%;
+  height: auto;
+}
+.ilBadgeDeck .il-card img {
+  width: 75%;
+  height: auto;
+}
+.ilBadgeDeck .icon img {
+  width: 100%;
+  height: auto;
+}
+.ilBadgeDeck .modal .img-responsive {
+  margin: auto;
+  width: 50%;
+  height: auto;
 }
 /*!
  * Datetimepicker for Bootstrap 3

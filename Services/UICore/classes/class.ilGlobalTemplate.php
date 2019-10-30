@@ -304,7 +304,7 @@ class ilGlobalTemplate implements ilGlobalTemplateInterface {
 	private function initHelp()
 	{
 		include_once("./Services/Help/classes/class.ilHelpGUI.php");
-		ilHelpGUI::initHelp($this);
+		//ilHelpGUI::initHelp($this);
 	}
 
 
@@ -727,14 +727,6 @@ class ilGlobalTemplate implements ilGlobalTemplateInterface {
 			if (!$a_skip_main_menu) {
 				$this->getMainMenu();
 				$this->initHelp();
-			}
-
-			if ($this->blockExists("content") && $this->variableExists('MAINMENU')) {
-				$tpl = $DIC["tpl"];
-
-				include_once 'Services/Authentication/classes/class.ilSessionReminderGUI.php';
-				$session_reminder_gui = new ilSessionReminderGUI(ilSessionReminder::createInstanceWithCurrentUserSession());
-				$tpl->setVariable('SESSION_REMINDER', $session_reminder_gui->getHtml());
 			}
 
 			// these fill blocks in tpl.main.html

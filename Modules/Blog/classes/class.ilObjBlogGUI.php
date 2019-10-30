@@ -116,6 +116,11 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 	 */
 	protected $prt_id;
 
+    /**
+     * @var \ILIAS\GlobalScreen\ScreenContext\ContextServices
+     */
+	protected $tool_context;
+
 	protected static $keyword_export_map; // [array]
 	
 	function __construct($a_id = 0, $a_id_type = self::REPOSITORY_NODE_ID, $a_parent_node_id = 0)
@@ -151,6 +156,8 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 		$this->keyword = ilUtil::stripSlashes($_REQUEST["kwd"]);
 		$this->author = (int) $_REQUEST["ath"];
 		$this->prt_id = (int) $_REQUEST["prt_id"];
+
+        $this->tool_context = $DIC->globalScreen()->tool()->context();
 
 		parent::__construct($a_id, $a_id_type, $a_parent_node_id);
 		
@@ -591,6 +598,8 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 		$lng = $this->lng;
 		$ilNavigationHistory = $this->nav_history;
 
+		$this->triggerAssignmentTool();
+
 		// goto link to blog posting
 		if($this->gtp > 0)
 		{
@@ -638,7 +647,7 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 					$tpl->loadStandardTemplate();
 				}
 
-				if(!$this->checkPermissionBool("read"))
+				if(!$this->checkPermissionBool("read") && !$this->prtf_embed)
 				{
 					ilUtil::sendInfo($lng->txt("no_permission"));
 					return;
@@ -924,8 +933,29 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 		
 		return true;
 	}
-	
-	/**
+
+    /**
+     * Trigger assignment tool
+     *
+     * @param
+     */
+    protected function triggerAssignmentTool()
+    {
+        $be = new ilBlogExercise($this->node_id);
+        $be_gui = new ilBlogExerciseGUI($this->node_id);
+        $assignments = $be->getAssignmentsOfBlog();
+        if (count($assignments) > 0) {
+            $ass_ids = array_map(function ($i) {
+                return $i["ass_id"];
+            }, $assignments);
+            $this->tool_context->current()->addAdditionalData(ilExerciseGSToolProvider::SHOW_EXC_ASSIGNMENT_INFO, true);
+            $this->tool_context->current()->addAdditionalData(ilExerciseGSToolProvider::EXC_ASS_IDS, $ass_ids);
+            $this->tool_context->current()->addAdditionalData(ilExerciseGSToolProvider::EXC_ASS_BUTTONS,
+                $be_gui->getActionButtons());
+        }
+    }
+
+    /**
 	* this one is called from the info button in the repository
 	* not very nice to set cmdClass/Cmd manually, if everything
 	* works through ilCtrl in the future this may be changed
@@ -1077,7 +1107,7 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 						
 			// exercise blog?			
 			include_once "Modules/Blog/classes/class.ilBlogExerciseGUI.php";			
-			$message = ilBlogExerciseGUI::checkExercise($this->node_id);
+			//$message = ilBlogExerciseGUI::checkExercise($this->node_id);
 		}
 								
 		// $is_owner = ($this->object->getOwner() == $ilUser->getId());
@@ -1498,7 +1528,7 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 		
 		include_once "Services/Calendar/classes/class.ilCalendarUtil.php";
 		$wtpl = new ilTemplate("tpl.blog_list.html", true, true, "Modules/Blog");
-		
+
 		// quick editing in portfolio
 		if ($this->prt_id > 0 &&
 			stristr($a_cmd, "embedded"))
@@ -1768,8 +1798,15 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 			// title
 			$wtpl->setVariable("URL_TITLE", $preview);
 			$wtpl->setVariable("TITLE", $item["title"]);
+
+            $kw = ilBlogPosting::getKeywords($this->obj_id, $item["id"]);
+            natcasesort($kw);
+            $keywords = (count($kw) > 0)
+                ? "<br>".$this->lng->txt("keywords").": ".implode(", ", $kw)
+                : "";
+
 			$wtpl->setVariable("DATETIME", $author.
-				ilDatePresentation::formatDate($item["created"]));
+				ilDatePresentation::formatDate($item["created"]).$keywords);
 
 			// content			
 			$wtpl->setVariable("CONTENT", $snippet);			
@@ -2173,6 +2210,10 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 
 		$f = $DIC->ui()->factory();
 
+		$cmd = ($this->prtf_embed)
+            ? "previewEmbedded"
+            : "previewFullscreen";
+
 		if ($single_posting)	// single posting view
 		{
 			include_once "Services/Calendar/classes/class.ilCalendarUtil.php";
@@ -2182,7 +2223,7 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 			{
 				$ctrl->setParameterByClass("ilblogpostinggui", "blpg", $latest_posting);
 				$mb = $f->button()->standard($lng->txt("blog_latest_posting"),
-					$ctrl->getLinkTargetByClass("ilblogpostinggui", "previewFullscreen"));
+					$ctrl->getLinkTargetByClass("ilblogpostinggui", $cmd));
 			}
 			else
 			{
@@ -2194,7 +2235,7 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 			{
 				$ctrl->setParameterByClass("ilblogpostinggui", "blpg", $prev_posting);
 				$pb = $f->button()->standard($lng->txt("previous"),
-					$ctrl->getLinkTargetByClass("ilblogpostinggui", "previewFullscreen"));
+					$ctrl->getLinkTargetByClass("ilblogpostinggui", $cmd));
 			} else
 			{
 				$pb = $f->button()->standard($lng->txt("previous"), "#")->withUnavailableAction();
@@ -2205,7 +2246,7 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 			{
 				$ctrl->setParameterByClass("ilblogpostinggui", "blpg", $next_posting);
 				$nb = $f->button()->standard($lng->txt("next"),
-					$ctrl->getLinkTargetByClass("ilblogpostinggui", "previewFullscreen"));
+					$ctrl->getLinkTargetByClass("ilblogpostinggui", $cmd));
 			} else
 			{
 				$nb = $f->button()->standard($lng->txt("next"), "#")->withUnavailableAction();
@@ -2442,12 +2483,6 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 					$keywords = $this->lng->txt("blog_no_keywords");
 				}
 				$cmd = null;
-				if($may_edit_keywords)
-				{
-					$ilCtrl->setParameterByClass("ilblogpostinggui", "blpg", $blpg);
-					$cmd = 	$ilCtrl->getLinkTargetByClass("ilblogpostinggui", "editKeywords");	
-					$ilCtrl->setParameterByClass("ilblogpostinggui", "blpg", "");
-				}
 				$blocks[$order["keywords"]] = array(
 					$this->lng->txt("blog_keywords"),
 					$keywords,

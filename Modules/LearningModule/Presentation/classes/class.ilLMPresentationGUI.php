@@ -703,7 +703,7 @@ class ilLMPresentationGUI
 
 	function media()
 	{
-        $this->tpl = new ilGlobalTemplate("tpl.fullscreen.html", true, true, true);
+        $this->tpl = new ilGlobalTemplate("tpl.fullscreen.html", true, true, "Modules/LearningModule");
         $GLOBALS["tpl"] = $this->tpl;
 
         $this->ilMedia();
@@ -729,7 +729,7 @@ class ilLMPresentationGUI
         //}
         //else
         //{
-			$this->tpl = new ilGlobalTemplate("tpl.glossary_term_output.html", true, true, true);
+			$this->tpl = new ilGlobalTemplate("tpl.glossary_term_output.html", true, true, "Modules/LearningModule");
 			$GLOBALS["tpl"] = $this->tpl;
 			$this->renderPageTitle();
 
@@ -768,7 +768,7 @@ class ilLMPresentationGUI
         //}
         //else
         //{
-        $this->tpl = new ilGlobalTemplate("tpl.page_fullscreen.html", true, true, true);
+        $this->tpl = new ilGlobalTemplate("tpl.page_fullscreen.html", true, true, "Modules/LearningModule");
         $GLOBALS["tpl"] = $this->tpl;
         $this->renderPageTitle();
 
@@ -903,7 +903,7 @@ class ilLMPresentationGUI
 		}
 
 
-		$tpl_menu = new ilTemplate("tpl.lm_sub_menu.html", true, true, true);
+		$tpl_menu = new ilTemplate("tpl.lm_sub_menu.html", true, true, "Modules/LearningModule");
 
 		$pg_id = $this->getCurrentPageId();
 		if ($pg_id == 0)
@@ -1710,7 +1710,8 @@ class ilLMPresentationGUI
 						{
 							$ilCtrl->setParameter($this, "obj_id", $this->getCurrentPageId());
 							$ilCtrl->setParameter($this, "file_id", "il__file_".$target_id);
-							$href = $ilCtrl->getLinkTarget($this, "downloadFile");
+							$href = $ilCtrl->getLinkTarget($this, "downloadFile",
+								"",false, true);
 							$ilCtrl->setParameter($this, "file_id", "");
 							$ilCtrl->setParameter($this, "obj_id", $_GET["obj_id"]);
 						}
@@ -1720,7 +1721,8 @@ class ilLMPresentationGUI
 						$obj_type = ilObject::_lookupType($target_id);
 						if ($obj_type == "usr")
 						{
-							$back = $this->ctrl->getLinkTarget($this, "layout");
+							$back = $this->ctrl->getLinkTarget($this, "layout",
+								"",false, true);
 							//var_dump($back); exit;
 							$this->ctrl->setParameterByClass("ilpublicuserprofilegui", "user_id", $target_id);
 							$this->ctrl->setParameterByClass("ilpublicuserprofilegui", "back_url",
@@ -1728,7 +1730,8 @@ class ilLMPresentationGUI
 							$href = "";
 							if (ilUserUtil::hasPublicProfile($target_id))
 							{
-								$href = $this->ctrl->getLinkTargetByClass("ilpublicuserprofilegui", "getHTML");
+								$href = $this->ctrl->getLinkTargetByClass("ilpublicuserprofilegui", "getHTML",
+									"",false, true);
 							}
 							$this->ctrl->setParameterByClass("ilpublicuserprofilegui", "user_id", "");
 							$lcontent = ilUserUtil::getNamePresentation($target_id, false, false);
@@ -2128,7 +2131,6 @@ class ilLMPresentationGUI
 			return;
 		}
 
-		//$this->tpl = new ilTemplate("tpl.lm_toc.html", true, true, true);
 		$this->tpl->setCurrentBlock("ContentStyle");
 		if (!$this->offlineMode())
 		{
@@ -2384,7 +2386,6 @@ class ilLMPresentationGUI
 		}
 		
 
-		//$this->tpl = new ilTemplate("tpl.lm_toc.html", true, true, true);
 		$this->tpl->setCurrentBlock("ContentStyle");
 		if (!$this->offlineMode())
 		{
@@ -2423,6 +2424,7 @@ class ilLMPresentationGUI
 		$this->tpl->setVariable("FORMACTION", $this->ctrl->getFormaction($this));
 
 		$nodes = $this->lm_tree->getSubtree($this->lm_tree->getNodeData($this->lm_tree->getRootId()));
+		$nodes = $this->filterNonAccessibleNode($nodes);
 
 		if (!is_array($_POST["item"]))
 		{
@@ -2551,6 +2553,27 @@ class ilLMPresentationGUI
 		$this->tpl->printToStdout();
 
 	}
+
+    /**
+     * @param array $nodes
+     * @return array
+     */
+    protected function filterNonAccessibleNode($nodes)
+    {
+        $tracker = $this->getTracker();
+        // if navigation is restricted based on correct answered questions
+        // check if we have preceeding pages including unsanswered/incorrect answered questions
+        if (!$this->offlineMode())
+        {
+            if ($this->lm->getRestrictForwardNavigation()) {
+                $nodes = array_filter($nodes, function ($node) use ($tracker) {
+                    return !$tracker->hasPredIncorrectAnswers($node["child"]);
+                });
+            }
+        }
+        return $nodes;
+    }
+
 
 	/**
 	 * Init print view selection form.
@@ -2755,7 +2778,11 @@ class ilLMPresentationGUI
 					$activated = false;
 				}
 			}
-
+            if ($this->lm->getRestrictForwardNavigation()) {
+                if ($this->getTracker()->hasPredIncorrectAnswers($node["obj_id"])) {
+                    continue;
+                }
+            }
 			if ($activated &&
 				ilObjContentObject::_checkPreconditionsOfPage($this->lm->getRefId(),$this->lm->getId(), $node["obj_id"]))
 			{
@@ -3212,7 +3239,6 @@ class ilLMPresentationGUI
 			return;
 		}
 
-		//$this->tpl = new ilTemplate("tpl.lm_toc.html", true, true, true);
 		$this->tpl->setCurrentBlock("ContentStyle");
 		if (!$this->offlineMode())
 		{
@@ -3230,9 +3256,6 @@ class ilLMPresentationGUI
 		$this->tpl->loadStandardTemplate();
 
         $this->renderTabs("download", 0);
-		/*$this->tpl->setVariable("TABS", $this->lm_gui->setilLMMenu($this->offlineMode()
-			,$this->getExportFormat(), "download", true,false, 0,
-			$this->lang, $this->export_all_languages));*/
 
 		$this->ilLocator(true);
 		//$this->tpl->stopTitleFloating();

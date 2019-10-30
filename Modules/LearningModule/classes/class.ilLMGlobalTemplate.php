@@ -296,7 +296,7 @@ class ilLMGlobalTemplate implements ilGlobalTemplateInterface
 	 */
 	private function initHelp()
 	{
-		ilHelpGUI::initHelp($this);
+		//ilHelpGUI::initHelp($this);
 	}
 
 
@@ -1544,14 +1544,6 @@ class ilLMGlobalTemplate implements ilGlobalTemplateInterface
 					{
 						$this->getMainMenu();
 						$this->initHelp();
-					}
-
-					if($this->blockExists("content") && $this->variableExists('MAINMENU'))
-					{
-						$tpl = $DIC["tpl"];
-
-						$session_reminder_gui = new ilSessionReminderGUI(ilSessionReminder::createInstanceWithCurrentUserSession());
-						$tpl->setVariable('SESSION_REMINDER', $session_reminder_gui->getHtml());
 					}
 
 					// these fill blocks in tpl.main.html

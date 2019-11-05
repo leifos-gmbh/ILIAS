@@ -17208,12 +17208,12 @@ p.ilErrorSection {
   font-style: italic;
 }
 #ilLMPageContent {
-  padding-bottom: 30px;
+  padding-bottom: 60px;
 }
 #ilLMPageContent .ilPermanentLinkWrapper.form-inline {
   display: none;
 }
-#ilLMPageContent .ilPermanentLinkWrapper.form-inline {
+#ilLMPageContent .il_ContainerItemCommand {
   display: none;
 }
 /*----------KIOSK MODE----------*/

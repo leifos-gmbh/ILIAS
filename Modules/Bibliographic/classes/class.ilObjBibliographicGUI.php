@@ -220,7 +220,7 @@ class ilObjBibliographicGUI extends ilObject2GUI implements ilDesktopItemHandlin
 
         if (!$this->checkPermissionBoolAndReturn("visible") && !$this->checkPermissionBoolAndReturn('read')) {
             ilUtil::sendFailure($DIC['lng']->txt("msg_no_perm_read"), true);
-            $this->ctrl->redirectByClass('ilDashboardGUI', '');
+            $this->ctrl->redirectByClass(ilDashboardGUI::class, '');
         }
         $DIC->tabs()->activateTab(self::TAB_ID_INFO);
         $info = new ilInfoScreenGUI($this);

@@ -57,6 +57,10 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 	 */
 	protected $gtp;
 
+	/**
+	 * edit command
+	 * @var string
+	 */
 	protected $edt;
 
 	/**
@@ -142,7 +146,7 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 		$ilCtrl = $DIC->ctrl();
 
 		$this->gtp = (int) $_GET["gtp"];
-		$this->edt = $_REQUEST["edt"];
+		$this->edt = $_GET["edt"];
 		$this->blpg = (int) $_REQUEST["blpg"];
 		$this->old_nr = (int) $_GET["old_nr"];
 		$this->ppage = (int) $_GET["ppage"];
@@ -609,7 +613,6 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 				// #12312
 				$ilCtrl->setCmdClass("ilblogpostinggui");
 				$ilCtrl->setParameterByClass("ilblogpostinggui", "blpg", $page_id);
-				//var_dump($this->edt); exit;
 				if ($this->edt == "edit") {
 					$ilCtrl->redirectByClass("ilblogpostinggui", "edit");
 				}
@@ -3583,11 +3586,9 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 
 		$ilCtrl = $DIC->ctrl();
 
-		var_dump($a_target);
 		if(substr($a_target, -3) == "wsp")
 		{		
 			$id = explode("_", $a_target);
-			//var_dump("Workspace!"); var_dump($id); exit;
 
 			$ilCtrl->setTargetScript("ilias.php");
 			$ilCtrl->initBaseClass("ilSharedResourceGUI");
@@ -3598,11 +3599,14 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 				if(is_numeric($id[1]))
 				{
 					$ilCtrl->setParameterByClass("ilSharedResourceGUI", "gtp", $id[1]);
-					$ilCtrl->setParameterByClass("ilSharedResourceGUI", "edt", $id[2]); // klappt hier nicht?
 				}
 				else
 				{
 					$ilCtrl->setParameterByClass("ilSharedResourceGUI", "kwd", $id[1]);
+				}
+				if($id[2] == "edit")
+				{
+					$ilCtrl->setParameterByClass("ilSharedResourceGUI", "edt", $id[2]);
 				}
 			}
 			$ilCtrl->redirectByClass("ilSharedResourceGUI", "");
@@ -3610,24 +3614,12 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 		else
 		{
 			$id = explode("_", $a_target);
-			//var_dump("Magazin!"); var_dump($id); exit;
 
 			$ilCtrl->setTargetScript("ilias.php");
 			$ilCtrl->initBaseClass("ilRepositoryGUI");
 			$ilCtrl->setParameterByClass("ilRepositoryGUI", "ref_id", $id[0]);
 
-			if(sizeof($id) == 2)
-			{
-				if(is_numeric($id[1]))
-				{
-					$ilCtrl->setParameterByClass("ilRepositoryGUI", "gtp", $id[1]);
-				}
-				else
-				{
-					$ilCtrl->setParameterByClass("ilRepositoryGUI", "kwd", $id[1]);
-				}				
-			}
-			if(sizeof($id) == 3)
+			if(sizeof($id) >= 2)
 			{
 				if(is_numeric($id[1]))
 				{
@@ -3638,7 +3630,7 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 					$ilCtrl->setParameterByClass("ilRepositoryGUI", "kwd", $id[1]);
 				}
 
-				if(is_numeric($id[2]))
+				if($id[2] == "edit")
 				{
 					$ilCtrl->setParameterByClass("ilRepositoryGUI", "edt", $id[2]);
 				}

@@ -2814,3 +2814,18 @@ ilDBUpdateNewObjectType::addAdminNode('prss', 'Personal Resources Settings');
 	}
 
 ?>
+<#5585>
+<?php
+if(!$ilDB->tableColumnExists('il_blog_posting','last_withdrawn'))
+{
+	$ilDB->addTableColumn(
+		'il_blog_posting',
+		'last_withdrawn',
+		array(
+			'type' 		=> 'timestamp',
+			'notnull'	=> false,
+			'default'	=> null
+		)
+	);
+}
+?>

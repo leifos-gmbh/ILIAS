@@ -66,6 +66,16 @@ class ilDerivedTask
 	}
 
 	/**
+	 * Get wsp id
+	 *
+	 * @return int
+	 */
+	public function getWspId()
+	{
+		return $this->wsp_id;
+	}
+
+	/**
 	 * @return int
 	 */
 	public function getDeadline()

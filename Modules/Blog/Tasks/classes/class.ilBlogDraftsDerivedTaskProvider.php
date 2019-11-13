@@ -19,29 +19,23 @@ class ilBlogDraftsDerivedTaskProvider implements ilDerivedTaskProvider
 	/** @var \ilSetting */
 	protected $settings;
 
-	/** @var \ilCtrl */
-	protected $ctrl;
-
 	/**
 	 * ilBlogDraftsDerivedTaskProvider constructor.
 	 * @param \ilTaskService $taskService
 	 * @param \ilAccessHandler $accessHandler
 	 * @param \ilLanguage $lng
 	 * @param \ilSetting $settings
-	 * @param \ilCtrl $ctrl
 	 */
 	public function __construct(
 		ilTaskService $taskService,
 		\ilAccessHandler $accessHandler,
 		\ilLanguage $lng,
-		\ilSetting $settings,
-		\ilCtrl $ctrl
+		\ilSetting $settings
 	) {
 		$this->taskService = $taskService;
 		$this->accessHandler = $accessHandler;
 		$this->lng = $lng;
 		$this->settings = $settings;
-		$this->ctrl = $ctrl;
 
 		$this->lng->loadLanguageModule('blog');
 	}
@@ -51,8 +45,7 @@ class ilBlogDraftsDerivedTaskProvider implements ilDerivedTaskProvider
 	 */
 	public function isActive(): bool
 	{
-		return (bool)$this->settings->get('save_post_drafts', false);
-		//return true;
+		return true;
 	}
 
 	/**
@@ -65,30 +58,28 @@ class ilBlogDraftsDerivedTaskProvider implements ilDerivedTaskProvider
 		$blogs = ilBlogPosting::searchBlogsByAuthor($user_id);
 		foreach ($blogs as $blog_id) {
 			$posts = ilBlogPosting::getAllPostings($blog_id);
-			//var_dump($posts);
 			foreach ($posts as $post_id => $post) {
 				if ((int)$post['author'] !== $user_id) {
 					continue;
 				}
 
 				$active = ilBlogPosting::_lookupActive($post_id, "blp");
-				if (!$active) {
+				$withdrawn = $post['last_withdrawn']->get(IL_CAL_DATETIME);
+				if (!$active && $withdrawn === null) {
 					$refId = $this->getFirstRefIdWithPermission('read', $blog_id, $user_id);
 					$wspId = 0;
-					//var_dump($post, $refId);
+
+					$url = ilLink::_getStaticLink($refId, 'blog', true, "_" . $post_id . "_edit");
 
 					if ($refId === 0) {
-						$wspId = $this->getWsId($blog_id, $user_id);
-						//var_dump($wspId);
-						//$aa = $this->getOId($wsId, $user_id);
-						//var_dump($aa);
+						$wspId = $this->getWspId($blog_id, $user_id);
+						$url = ilLink::_getStaticLink($wspId, 'blog', true, "_" . $post_id . "_edit_wsp");
 					}
 
 					$title = sprintf(
-						$this->lng->txt('frm_task_publishing_draft_title'),
+						$this->lng->txt('blog_task_publishing_draft_title'),
 						$post['title']
 					);
-					//var_dump($refId);
 
 					$task = $this->taskService->derived()->factory()->task(
 						$title,
@@ -98,26 +89,10 @@ class ilBlogDraftsDerivedTaskProvider implements ilDerivedTaskProvider
 						$wspId
 					);
 
-					$params['blpg'] = $post_id;
-					//$params['cmd'] = 'edit';
-					//$params['cmdClass'] = 'ilobjbloggui';
-					/*$params['thr_pk'] = $draft->getThreadId();
-					$params['pos_pk'] = $draft->getPostId();
-					$params['cmd'] = 'viewThread';
-					$anchor = '#draft_' . $draft->getDraftId();*/
-
-					//$url = \ilLink::_getStaticLink($wspId, 'blog', true, "_" . $post_id . "_edit");
-					$url = \ilLink::_getStaticLink($wspId, 'blog', true, "_" . $post_id . "_edit_wsp");
-					//$url = \ilLink::_getLink($refId, 'blpg', $params);
-					var_dump($url);
-
 					$tasks[] = $task->withUrl($url);
-
-					//$tasks[] = $task;
 				}
 			}
 		}
-
 
 		return $tasks;
 	}
@@ -139,17 +114,15 @@ class ilBlogDraftsDerivedTaskProvider implements ilDerivedTaskProvider
 		return 0;
 	}
 
-	protected function getWsId(int $objId, int $userId): int
+	/**
+	 * @param int $objId
+	 * @param int $userId
+	 * @return int
+	 */
+	protected function getWspId(int $objId, int $userId): int
 	{
 		$wst = new ilWorkspaceTree($userId);
 		$nodeId = $wst->lookupNodeId($objId);
 		return $nodeId;
-	}
-
-	protected function getOId(int $objId, int $userId): int
-	{
-		$wst = new ilWorkspaceTree($userId);
-		$aa = $wst->lookupOwner($objId);
-		return $aa;
 	}
 }

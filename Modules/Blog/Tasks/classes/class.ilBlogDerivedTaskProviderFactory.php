@@ -19,23 +19,18 @@ class ilBlogDerivedTaskProviderFactory implements ilDerivedTaskProviderFactory
 	/** @var \ilLanguage */
 	protected $lng;
 
-	/** @var \ilCtrl */
-	protected $ctrl;
-
 	/**
 	 * ilBlogDerivedTaskProviderFactory constructor.
 	 * @param ilTaskService $taskService
 	 * @param \ilAccess|null $accessHandler
 	 * @param \ilSetting|null $settings
 	 * @param \ilLanguage|null $lng
-	 * @param ilCtrl|null $ctrl
 	 */
 	public function __construct(
 		ilTaskService $taskService,
 		\ilAccess $accessHandler = null,
 		\ilSetting $settings = null,
-		\ilLanguage $lng = null,
-		\ilCtrl $ctrl = null
+		\ilLanguage $lng = null
 	) {
 		global $DIC;
 
@@ -52,10 +47,6 @@ class ilBlogDerivedTaskProviderFactory implements ilDerivedTaskProviderFactory
 		$this->lng = is_null($lng)
 			? $DIC->language()
 			: $lng;
-
-		$this->ctrl = is_null($ctrl)
-			? $DIC->ctrl()
-			: $ctrl;
 	}
 
 	/**
@@ -68,8 +59,7 @@ class ilBlogDerivedTaskProviderFactory implements ilDerivedTaskProviderFactory
 				$this->taskService,
 				$this->accessHandler,
 				$this->lng,
-				$this->settings,
-				$this->ctrl
+				$this->settings
 			)
 		];
 	}

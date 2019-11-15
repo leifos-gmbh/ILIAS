@@ -16,26 +16,20 @@ class ilBlogDraftsDerivedTaskProvider implements ilDerivedTaskProvider
 	/** @var \ilLanguage */
 	protected $lng;
 
-	/** @var \ilSetting */
-	protected $settings;
-
 	/**
 	 * ilBlogDraftsDerivedTaskProvider constructor.
 	 * @param \ilTaskService $taskService
 	 * @param \ilAccessHandler $accessHandler
 	 * @param \ilLanguage $lng
-	 * @param \ilSetting $settings
 	 */
 	public function __construct(
 		ilTaskService $taskService,
 		\ilAccessHandler $accessHandler,
-		\ilLanguage $lng,
-		\ilSetting $settings
+		\ilLanguage $lng
 	) {
 		$this->taskService = $taskService;
 		$this->accessHandler = $accessHandler;
 		$this->lng = $lng;
-		$this->settings = $settings;
 
 		$this->lng->loadLanguageModule('blog');
 	}

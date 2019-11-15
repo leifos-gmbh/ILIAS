@@ -13,9 +13,6 @@ class ilBlogDerivedTaskProviderFactory implements ilDerivedTaskProviderFactory
 	/** @var \ilAccess */
 	protected $accessHandler;
 
-	/** @var \ilSetting */
-	protected $settings;
-
 	/** @var \ilLanguage */
 	protected $lng;
 
@@ -23,13 +20,11 @@ class ilBlogDerivedTaskProviderFactory implements ilDerivedTaskProviderFactory
 	 * ilBlogDerivedTaskProviderFactory constructor.
 	 * @param ilTaskService $taskService
 	 * @param \ilAccess|null $accessHandler
-	 * @param \ilSetting|null $settings
 	 * @param \ilLanguage|null $lng
 	 */
 	public function __construct(
 		ilTaskService $taskService,
 		\ilAccess $accessHandler = null,
-		\ilSetting $settings = null,
 		\ilLanguage $lng = null
 	) {
 		global $DIC;
@@ -39,10 +34,6 @@ class ilBlogDerivedTaskProviderFactory implements ilDerivedTaskProviderFactory
 		$this->accessHandler = is_null($accessHandler)
 			? $DIC->access()
 			: $accessHandler;
-
-		$this->settings = is_null($settings)
-			? $DIC->settings()
-			: $settings;
 
 		$this->lng = is_null($lng)
 			? $DIC->language()
@@ -58,8 +49,7 @@ class ilBlogDerivedTaskProviderFactory implements ilDerivedTaskProviderFactory
 			new ilBlogDraftsDerivedTaskProvider(
 				$this->taskService,
 				$this->accessHandler,
-				$this->lng,
-				$this->settings
+				$this->lng
 			)
 		];
 	}

@@ -56,6 +56,7 @@ class ilObjAccessibilitySettingsGUI extends ilObjectGUI
 		parent::__construct($a_data, $a_id, $a_call_by_reference, $a_prepare_output);
 
 		$this->lng->loadLanguageModule('acc');
+		$this->lng->loadLanguageModule('adm');
 	}
 
 	/**
@@ -107,17 +108,62 @@ class ilObjAccessibilitySettingsGUI extends ilObjectGUI
 	protected function  getSettingsForm()
 	{
 		require_once 'Services/Form/classes/class.ilPropertyFormGUI.php';
-		$form = new ilPropertyFormGUI();
-		$form->setTitle($this->lng->txt('settings'));
+		$this->form = new ilPropertyFormGUI();
+		$this->form->setTitle($this->lng->txt('settings'));
+
+		$ti = new ilTextInputGUI($this->lng->txt("adm_accessibility_contacts"), "accessibility_support_contacts");
+		$ti->setMaxLength(500);
+		$ti->setValue(ilAccessibilitySupportContacts::getList());
+		$ti->setInfo($this->lng->txt("adm_accessibility_contacts_info"));
+		$this->form->addItem($ti);
+
+		$se = new ilFormSectionHeaderGUI();
+		$se ->setTitle($this->lng->txt('obj_accs_captcha'));
+		$this->form->addItem($se);
 
 		require_once 'Services/Administration/classes/class.ilAdministrationSettingsFormHandler.php';
 		ilAdministrationSettingsFormHandler::addFieldsToForm(
 			ilAdministrationSettingsFormHandler::FORM_ACCESSIBILITY,
-			$form,
+			$this->form,
 			$this
 		);
-		
-		return $form;
+
+		$this->form->addCommandButton("saveAccessibilitySettings", $this->lng->txt("save"));
+		$this->form->setFormAction($this->ctrl->getFormAction($this));
+
+		return $this->form;
+	}
+
+	/**
+	 * Save accessibility settings form
+	 */
+	public function saveAccessibilitySettings()
+	{
+		$tpl = $this->tpl;
+		$lng = $this->lng;
+		$ilCtrl = $this->ctrl;
+		$rbacsystem = $this->rbacsystem;
+		$ilErr = $this->error;
+
+		if (!$rbacsystem->checkAccess("write",$this->object->getRefId()))
+		{
+			$ilErr->raiseError($this->lng->txt("permission_denied"),$ilErr->MESSAGE);
+		}
+
+		$this->getSettingsForm();
+		if ($this->form->checkInput())
+		{
+			// Accessibility support contacts
+			ilAccessibilitySupportContacts::setList($_POST["accessibility_support_contacts"]);
+
+			ilUtil::sendSuccess($lng->txt("msg_obj_modified"), true);
+			$ilCtrl->redirect($this, "editAccessibilitySettings");
+		}
+		else
+		{
+			$this->form->setValuesByPost();
+			$tpl->setContent($this->form->getHtml());
+		}
 	}
 
 	/**
@@ -128,10 +174,10 @@ class ilObjAccessibilitySettingsGUI extends ilObjectGUI
 		$this->tabs_gui->setTabActive('acc_settings');
 		if(!$form)
 		{
-			$form = $this->getSettingsForm();
+			$this->form = $this->getSettingsForm();
 		}
 		
-		$this->tpl->setContent($form->getHTML());
+		$this->tpl->setContent($this->form->getHTML());
 	}
 
 	/**

@@ -3153,6 +3153,7 @@ rbac#:#nwss_read#:#User has read access to ews and Web Feeds administration
 rbac#:#nwss_visible#:#News and Web Feeds administration is visible
 rbac#:#nwss_write#:#User can edit settings in News and Web Feeds administration
 common#:#obj_accs_desc#:#Settings for accessibility features.
+common#:#obj_accs_captcha#:#Captchas
 common#:#obj_accs#:#Accessibility
 common#:#obj_adm_desc#:#Main system settings folder containing all panels to administrate your ILIAS installation.
 common#:#obj_adm#:#Administration
@@ -13195,6 +13196,8 @@ awrn#:#awrn_incl_offline#:#Online and Offline
 adm#:#adm_support_contacts#:#Technical Support
 adm#:#adm_awrn_support_contacts_info#:#All technical support contacts are listed. Users are defined as technical support contacts in the section "General Settings" > "Contact Information".
 adm#:#adm_support_contacts_info#:#Support contacts used in the footer link and (if activated) in the ‘Who is online?’-Tool. Comma separated list of account logins.
+adm#:#adm_accessibility_contacts#:#Accessibility Point of Contact
+adm#:#adm_accessibility_contacts_info#:#Contacts for reporting accessibility issues in the footer link. Comma separated list of account logins.
 mmbr#:#mmbr_awrn_my_groups_courses#:#My Groups and Courses
 mmbr#:#mmbr_awrn_my_groups_courses_info#:#All members of groups or courses of the current user are listed.
 crs#:#crs_awrn_current_course#:#Current Course
@@ -13207,6 +13210,8 @@ awrn#:#awrn_max_nr_entries_info#:#Maximum number of items in the ‘Who is onlin
 awrn#:#awrn_hide_from_awareness#:#Hide Me From ‘Who is online?’-Tool
 awrn#:#awrn_hide_from_awareness_info#:#The ‘Who is online?’-Tool is in the top bar and listing selected users (e.g. contacts or members of your courses).
 common#:#contact_sysadmin#:#Contact Technical Support
+common#:#report_accessibility_issue#:#Report Accessibility Issue
+common#:#report_accessibility_link#:#Reported Link:
 ldap#:#ldap_servers#:#LDAP Server
 ldap#:#add_ldap_server#:#Add Server
 ldap#:#ldap_username_filter#:#Username Filter

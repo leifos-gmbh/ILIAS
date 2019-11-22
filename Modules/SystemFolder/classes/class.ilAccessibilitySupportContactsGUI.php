@@ -72,7 +72,7 @@ class ilAccessibilitySupportContactsGUI
 				[
 					'type' => 'new',
 					'rcp_to' => $this->getContactLogins(),
-					'sig' => $this->getAppointmentMailMessage($back_url)
+					'sig' => $this->getAccessibilityIssueMailMessage($back_url)
 				]
 			)
 		);
@@ -81,7 +81,7 @@ class ilAccessibilitySupportContactsGUI
 	/**
 	 * @return string
 	 */
-	private function getAppointmentMailMessage(string $back_url) : string
+	private function getAccessibilityIssueMailMessage(string $back_url) : string
 	{
 		$sig = chr(13).chr(10).chr(13).chr(10).chr(13).chr(10);
 		$sig .= $this->lng->txt('report_accessibility_link');

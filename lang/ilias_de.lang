@@ -6527,6 +6527,7 @@ cron#:#cron_status#:#Status
 cron#:#cron_status_active#:#Aktiv
 cron#:#cron_status_inactive#:#Inaktiv
 cron#:#cron_status_info#:#Status-Info
+crs#:#crs_target_group#:#Zielgruppe
 crs#:#activation_times_not_valid#:#Die Zeitdauer für 'Verfügbarkeit' ist nicht gültig.
 crs#:#assigned#:#Zugeordnet
 crs#:#contact_email_not_valid#:#Die E-Mail Adresse ist nicht gültig.

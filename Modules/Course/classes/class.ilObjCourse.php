@@ -97,6 +97,12 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 
 
 	/**
+	 * @var string
+	 */
+	private $target_group = '';
+
+
+	/**
 	* Constructor
 	* @access	public
 	* @param	integer	reference_id or object_id
@@ -211,6 +217,23 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 	{
 		$this->syllabus = $a_syllabus;
 	}
+
+	/**
+	 * @return string|null
+	 */
+	public function getTargetGroup() : ?string
+	{
+		return $this->target_group;
+	}
+
+	/**
+	 * @param string|null $a_tg
+	 */
+	public function setTargetGroup(?string $a_tg)
+	{
+		$this->target_group = $a_tg;
+	}
+
 	function getContactName()
 	{
 		return $this->contact_name;
@@ -1289,6 +1312,9 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 		
 	}
 
+	/**
+	 * Update settings
+	 */
 	function updateSettings()
 	{
 		global $DIC;
@@ -1326,6 +1352,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 			"abo = ".$ilDB->quote($this->getAboStatus() ,'integer').", ".
 			"waiting_list = ".$ilDB->quote($this->enabledWaitingList() ,'integer').", ".
 			"important = ".$ilDB->quote($this->getImportantInformation() ,'text').", ".
+			'target_group = ' . $ilDB->quote($this->getTargetGroup(), \ilDBConstants::T_TEXT) . ', ' .
 			"show_members = ".$ilDB->quote($this->getShowMembers() ,'integer').", ".
 			"show_members_export = ".$ilDB->quote($this->getShowMembersExport() ,'integer').", ".
 			"latitude = ".$ilDB->quote($this->getLatitude() ,'text').", ".
@@ -1405,6 +1432,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 		$new_obj->setAboStatus($this->getAboStatus());
 		$new_obj->enableWaitingList($this->enabledWaitingList());
 		$new_obj->setImportantInformation($this->getImportantInformation());
+		$new_obj->setTargetGroup($this->getTargetGroup());
 		$new_obj->setShowMembers($this->getShowMembers());
 		// patch mem_exp
 		$new_obj->setShowMembersExport($this->getShowMembersExport());
@@ -1507,6 +1535,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
 		{
 			$this->setSyllabus($row->syllabus);
+			$this->setTargetGroup($row->target_group);
 			$this->setContactName($row->contact_name);
 			$this->setContactResponsibility($row->contact_responsibility);
 			$this->setContactPhone($row->contact_phone);

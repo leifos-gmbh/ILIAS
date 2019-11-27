@@ -114,3 +114,22 @@ $ilCtrlStructureReader->getStructure();
 <?php
 $ilCtrlStructureReader->getStructure();
 ?>
+
+<#11>
+<?php
+
+global $ilDB;
+
+if(!$ilDB->tableColumnExists('crs_settings', 'target_group')) {
+
+	$ilDB->addTableColumn(
+			'crs_settings',
+			'target_group',
+			[
+				'type' => \ilDBConstants::T_TEXT,
+				'length' => 4000,
+				'notnull' => false
+			]
+	);
+}
+?>

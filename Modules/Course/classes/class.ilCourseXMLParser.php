@@ -247,6 +247,9 @@ class ilCourseXMLParser extends ilMDSaxParser implements ilSaxSubsetParser
 			case 'Syllabus':
 				break;
 
+			case 'TargetGroup':
+				break;
+
 			case 'Contact':
 				break;
 
@@ -596,6 +599,9 @@ class ilCourseXMLParser extends ilMDSaxParser implements ilSaxSubsetParser
 				$this->course_obj->setSyllabus(trim($this->cdata));
 				break;
 
+			case 'TargetGroup':
+				$this->course_obj->setTargetGroup(trim($this->cdata));
+				break;
 
 			case 'ImportantInformation':
 				$this->course_obj->setImportantInformation(trim($this->cdata));

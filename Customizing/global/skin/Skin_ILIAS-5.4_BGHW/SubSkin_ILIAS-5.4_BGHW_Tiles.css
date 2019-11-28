@@ -17745,13 +17745,19 @@ a.il_ContainerItemCommand:visited {
     margin: -50px 0 0 0;
   }
 }
-/**********ETHERPAD**********/
+/*----------ETHERPAD----------*/
 .icon.xpdl.medium.outlined {
   display: none;
 }
-/**********MEDIA GALLERY**********/
+/*----------MEDIA GALLERY----------*/
 .icon.xmg.medium.outlined {
   display: none;
+}
+/*----------MOBILE VIEW----------*/
+@media only screen and (min-width: 768px) {
+  .row-eq-height .il-card {
+    display: block;
+  }
 }
 /*		Color scheme
 		Dark BLue: #0f2152;
@@ -17851,5 +17857,10 @@ a.il_ContainerItemCommand:visited {
   .il-card {
     margin-left: auto;
     margin-right: auto;
+  }
+}
+@media only screen and (min-width: 768px) {
+  .row-eq-height .il-card {
+    display: block;
   }
 }

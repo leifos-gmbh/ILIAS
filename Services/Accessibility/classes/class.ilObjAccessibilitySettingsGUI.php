@@ -9,13 +9,18 @@ include_once("./Services/Object/classes/class.ilObjectGUI.php");
 * @author Alex Killing <alex.killing@gmx.de>
 * @version $Id$
 *
-* @ilCtrl_Calls ilObjAccessibilitySettingsGUI: ilPermissionGUI
+* @ilCtrl_Calls ilObjAccessibilitySettingsGUI: ilPermissionGUI, ilAccessibilityDocumentGUI
 * @ilCtrl_IsCalledBy ilObjAccessibilitySettingsGUI: ilAdministrationGUI
 *
 * @ingroup ServicesAccessibility
 */
 class ilObjAccessibilitySettingsGUI extends ilObjectGUI
 {
+	/**
+	 * @var \ILIAS\DI\Container
+	 */
+	protected $dic;
+
 	/**
 	 * @var ilRbacSystem
 	 */
@@ -45,6 +50,7 @@ class ilObjAccessibilitySettingsGUI extends ilObjectGUI
 	{
 		global $DIC;
 
+		$this->dic = $DIC;
 		$this->rbacsystem = $DIC->rbac()->system();
 		$this->error = $DIC["ilErr"];
 		$this->access = $DIC->access();
@@ -57,6 +63,7 @@ class ilObjAccessibilitySettingsGUI extends ilObjectGUI
 
 		$this->lng->loadLanguageModule('acc');
 		$this->lng->loadLanguageModule('adm');
+		$this->lng->loadLanguageModule('meta');
 	}
 
 	/**
@@ -88,6 +95,35 @@ class ilObjAccessibilitySettingsGUI extends ilObjectGUI
 				include_once("Services/AccessControl/classes/class.ilPermissionGUI.php");
 				$perm_gui = new ilPermissionGUI($this);
 				$ret = $this->ctrl->forwardCommand($perm_gui);
+				break;
+
+			case 'ilaccessibilitydocumentgui':
+				$this->tabs_gui->activateTab('acc_ctrl_cpt');
+
+				$tableDataProviderFactory = new ilAccessibilityTableDataProviderFactory();
+				$tableDataProviderFactory->setDatabaseAdapter($this->dic->database());
+
+				$documentGui = new ilAccessibilityDocumentGUI(
+					$this->object,
+					$this->dic['acc.criteria.type.factory'],
+					$this->dic->ui()->mainTemplate(),
+					$this->dic->user(),
+					$this->dic->ctrl(),
+					$this->dic->language(),
+					$this->dic->rbac()->system(),
+					$this->dic['ilErr'],
+					$this->dic->logger()->acc(),
+					$this->dic->toolbar(),
+					$this->dic->http(),
+					$this->dic->ui()->factory(),
+					$this->dic->ui()->renderer(),
+					$this->dic->filesystem(),
+					$this->dic->upload(),
+					$tableDataProviderFactory,
+					new ilAccessibilityTrimmedDocumentPurifier(new ilAccessibilityDocumentHtmlPurifier())
+				);
+
+				$this->ctrl->forwardCommand($documentGui);
 				break;
 
 			default:
@@ -202,6 +238,15 @@ class ilObjAccessibilitySettingsGUI extends ilObjectGUI
 			$ilTabs->addTarget("acc_access_keys",
 				$this->ctrl->getLinkTarget($this, "editAccessKeys"),
 				array("editAccessKeys", "view"));
+		}
+
+		if ($rbacsystem->checkAccess("read", $this->object->getRefId()))
+		{
+			$ilTabs->addTab(
+				'acc_ctrl_cpt',
+				$this->lng->txt('acc_ctrl_cpt_txt'),
+				$this->ctrl->getLinkTargetByClass('ilaccessibilitydocumentgui')
+			);
 		}
 
 		if ($rbacsystem->checkAccess("edit_permission", $this->object->getRefId()))

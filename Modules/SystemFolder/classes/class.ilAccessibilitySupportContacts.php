@@ -38,8 +38,7 @@ class ilAccessibilitySupportContacts
 		$accounts = array();
 		foreach ($list as $l)
 		{
-			if (ilObjUser::_lookupId(trim($l)) > 0)
-			{
+			if (ilObjUser::_lookupId(trim($l)) > 0) {
 				$accounts[] = trim($l);
 			}
 		}
@@ -59,6 +58,25 @@ class ilAccessibilitySupportContacts
 
 		return ilObjUser::_lookupId($list);
 	}
-}
 
-?>
+	/*
+	 * Get mailto: emails
+	 */
+	static function getMailsToAddress()
+	{
+		$emails = array();
+		foreach(self::getValidSupportContactIds() as $id)
+		{
+			if (($e = ilObjUser::_lookupEmail($id)) != "") {
+				$emails[] = $e;
+			}
+		}
+		if (!empty($emails)) {
+			$emails = implode(',', $emails);
+			if (trim($emails)) {
+				return $emails;
+			}
+		}
+		return "";
+	}
+}

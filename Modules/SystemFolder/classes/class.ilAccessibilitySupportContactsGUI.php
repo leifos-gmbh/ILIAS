@@ -126,16 +126,7 @@ class ilAccessibilitySupportContactsGUI
 		{
 			if(!$ilUser->getId() || $ilUser->getId() == ANONYMOUS_USER_ID)
 			{
-				$mails = [];
-				foreach($users as $user)
-				{
-					$mails[] = ilObjUser::_lookupEmail($user);
-				}
-				$mails = implode(',', $mails);
-				if(trim($mails))
-				{
-					return "mailto:".$mails;
-				}
+				return "mailto:" . ilUtil::prepareFormOutput(ilAccessibilitySupportContacts::getMailsToAddress());
 			}
 			else
 			{

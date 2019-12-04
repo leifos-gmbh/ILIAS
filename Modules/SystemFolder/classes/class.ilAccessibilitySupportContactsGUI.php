@@ -36,12 +36,12 @@ class ilAccessibilitySupportContactsGUI
 	{
 		global $DIC;
 
-		$ilCtrl = $DIC->ctrl();
+		$ctrl = $DIC->ctrl();
 		$tpl = $DIC["tpl"];
 		$lng = $DIC->language();
 		$http = $DIC->http();
 
-		$this->ctrl = $ilCtrl;
+		$this->ctrl = $ctrl;
 		$this->tpl = $tpl;
 		$this->lng = $lng;
 		$this->http = $http;
@@ -118,19 +118,23 @@ class ilAccessibilitySupportContactsGUI
 	{
 		global $DIC;
 
-		$ilCtrl = $DIC->ctrl();
-		$ilUser = $DIC->user();
+		$ctrl = $DIC->ctrl();
+		$user = $DIC->user();
+		$http = $DIC->http();
+
 
 		$users = ilAccessibilitySupportContacts::getValidSupportContactIds();
 		if (count($users) > 0)
 		{
-			if(!$ilUser->getId() || $ilUser->getId() == ANONYMOUS_USER_ID)
+			if(!$user->getId() || $user->getId() == ANONYMOUS_USER_ID)
 			{
-				return "mailto:" . ilUtil::prepareFormOutput(ilAccessibilitySupportContacts::getMailsToAddress());
+				$mails = ilUtil::prepareFormOutput(ilAccessibilitySupportContacts::getMailsToAddress());
+				$url = $http->request()->getServerParams()['REQUEST_URI'];
+				return "mailto:".$mails."?body=%0D%0A%0D%0AGemeldeter%20Link:%0D%0A".rawurlencode($url);
 			}
 			else
 			{
-				return $ilCtrl->getLinkTargetByClass("ilaccessibilitysupportcontactsgui", "");
+				return $ctrl->getLinkTargetByClass("ilaccessibilitysupportcontactsgui", "");
 			}
 		}
 		return "";

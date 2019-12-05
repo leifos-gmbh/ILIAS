@@ -15379,6 +15379,7 @@ administration#:#adm_personal_workspace#:#Personal Workspace
 dash#:#dash_favourites#:#Favourites
 dash#:#dash_memberships#:#My Courses and Groups
 dash#:#dash_learningsequences#:#My Learning Sequences
+dash#:#dash_studyprogramme#:#My Study Programmes
 rbac#:#read_outcomes#:#View learning experiences of other users
 rbac#:#add_consume_provider#:#Add Own LTI Provider Settings
 rbac#:#ltis_add_consume_provider#:#User can add own provider settings for LTI consumer
@@ -15822,3 +15823,135 @@ style#:#style_page_layout_module_learning_module#:#ILIAS Learning Module
 content#:#cont_insert_pagelayout#:#Insert Template Page
 content#:#cont_page_template#:#Page Template
 content#:#cont_page_created#:#Page created
+prg#:#assignment_date#:#Assignment Date
+prg#:#completion_date#:#Completion Date
+prg#:#prg_no_deadline#:#No fixed prozessing time
+prg#:#prg_deadline_period#:#Processing time is determined inividually
+prg#:#prg_deadline_period_desc#:#The programme must be finished within a given timespan.
+prg#:#prg_deadline_date#:#Processing time expires at fixed date
+prg#:#prg_deadline_date_desc#:#The programme must be finished until a given date.
+prg#:#prg_no_validity_qalification#:#Long-Lasting qualification
+prg#:#prg_validity_of_qualification#:#Validity of Achieved Qualifications
+prg#:#validity_qalification_period#:#Qualification expires individually
+prg#:#validity_qalification_period_desc#:#days after completion
+prg#:#validity_qalification_date#:#Qualification expires at fixed date
+prg#:#validity_qalification_date_desc#:#expiry date
+prg#:#prg_no_restart#:#No restart required
+prg#:#restart_period#:#Restart obligatory
+prg#:#restart_period_desc#:#days before expiry
+prg#:#sp_certificate_title#:#Title of the Study Programme
+prg#:#sp_certificate_description#:#Description of the Study Programme
+prg#:#sp_certificate_type#:#Type of the Study Programme
+prg#:#sp_certificate_points#:#Amount of points that have been acquired
+prg#:#sp_certificate_completion_date#:#Date of completion
+prg#:#sp_certificate_progress_expires_at#:#Date of expiry of qualification
+prg#:#prg_completion_date#:#Completion date
+prg#:#prg_expiry_date#:#Expiry date
+prg#:#prg_validity#:#Validity
+prg#:#prg_still_valid#:#still valid
+prg#:#prg_renewal_required#:#renewal required
+prg#:#prg_restart_assignments_temporal_progress_title#:#Restart Studyprogramme assignments
+prg#:#prg_restart_assignments_temporal_progress_desc#:#Restart Studyprogramme assignments with progresses about to expire
+prg#:#prg_invalidate_expired_progresses_title#:#Limited validity of Studyprogramme progress
+prg#:#prg_invalidate_expired_progresses_desc#:#Marks expired progresses at Studyprogrammes as 'not passed'
+prg#:#prg_orgus#:#Organisational Units
+prg#:#content_automation_title#:#Automatically add and remove Courses from these categories
+prg#:#content_automation#:#Content Automation
+prg#:#last_edited_by#:#Last Editor
+prg#:#last_edited#:#Last edited
+prg#:#add_category#:#Add Category
+prg#:#modal_categories_title#:#Category to be monitored
+prg#:#category#:#Category RefId
+common#:#obj_prgr#:#Link to Study Programme
+common#:#obj_prgrs#:#Links to Study Programmes
+prg#:#prgr_new#:#Create Study Programme Link
+prg#:#prgr_edit_info#:#Please choose one Study Programme for creating a new link.
+prg#:#prgr_may_not_create_circular_reference#:#This Study Programme may not be linked here since the parent object is alredy linked within the target.
+prg#:#prg_validity_of_qualification_limit#:#Qualification Expiry
+prg#:#prg_validity_of_qualification_restart#:#Restart
+prg#:#prg_deadline_settings#:#Processing Period
+prg#:#edit_participants#:#Edit Members
+prg#:#auto_memberships#:#Membership Automation
+prg#:#orgu#:#Organisational Unit
+prg#:#rol#:#Role
+prg#:#auto_membership_title#:#Sources for Membership Automation
+prg#:#add_automembership_source#:#Add Source
+prg#:#auto_membership_src_type#:#Type
+prg#:#membership_source_id#:#Id
+prg#:#membership_source_id_byline_objid#:#Please use the <b>object-id</b>
+prg#:#membership_source_id_byline_refid#:#Please use the <b>reference-id</b>
+prg#:#modal_automembership_title#:#Automatismus hinzufügen
+prg#:#membership_source_type#:#Source
+prg#:#prg_autoassignment#:#(auto)
+prg#:#some_users_may_not_be_accredited#:#Partially marked users accredited.
+prg#:#some_users_may_not_be_unmarked_accredited#:#Partially unmarked users accredited.
+prg#:#some_users_may_not_be_marked_relevant#:#Partially marked relevant.
+prg#:#some_users_may_not_be_marked_not_relevant#:#Partially unmarked relevant.
+orgu#:#org_op_view_members#:#View Members
+orgu#:#org_op_view_individual_plan#:#View Individual Plan
+orgu#:#org_op_edit_individual_plan#:#Edit Individual Plan
+prg#:#prg_formatted_period#:#%d days
+prg#:#deadline_information#:#Information regarding processing period
+prg#:#dealine_period_info#:#Days to process after assignment
+prg#:#dealine_date_info#:#Deadline date
+prg#:#vq_information#:#Information regarding validity of achived qualification
+prg#:#vq_period_info#:#Days until qualification will expire after achivement
+prg#:#vq_date_info#:#Qualification expires at fixed date
+prg#:#restart_information#:#Information regarding automatic restart upon pending qualification expiration
+prg#:#restart_period_info#:#Days before qualification expiration to restart qualification
+prg#:#access_ctr_by_orgu_position#:#Access control according to Organisational Unit Positions
+prg#:#could_not_add_users_no_permissons#:#Could not assign %d Users due to lacking permissions.
+prg#:#not_a_valid_cat_id#:#%s is not a valid ref-id of a category.
+prg#:#prg_mail_permanent_link#:#Click on the following link to find all of the information you need regarding the study programm:
+prg#:#prg_title#:#Title
+prg#:#re_assigned_mail_subject#:#Renewed participation in the study programm
+prg#:#re_assigned_mail_body#:#%s %s,<br \><br \>you were reassigned to study program '%s' as participants.
+prg#:#info_to_re_assign_mail_subject#:#Reminder of renewed participation in the study programm
+prg#:#info_to_re_assign_mail_body#:#%s %s,<br \><br \>The validity of their participation in the study programm '% s' expires soon. Please sign in again.
+prg#:#prg_user_not_restarted_time_input#:#Reminder mail restart
+prg#:#prg_user_not_restarted_time_input_info#:#Reminder Mail Reminds the user x days before the invalidation that he must restart the programm.
+prg#:#prg_processing_ends_no_success#:#Reminder mail failing
+prg#:#prg_processing_ends_no_success_info#:#Reminds the user x days before the program expires that he is at risk of failing.
+prg#:#prg_cron_job_configuration#:#Configuration automatic Mails
+prg#:#send_re_assigned_mail#:#E-mail renewed participation
+prg#:#send_re_assigned_mail_info#:#Send an e-mail to automatically re-join the sudy program.
+prg#:#send_info_to_re_assign_mail#:#E-mail reminder restart
+prg#:#send_info_to_re_assign_mail_info#:#Send an e-mail to remind the user to restart the study program.
+prg#:#prg_user_risky_to_fail_title#:#Send warning mail about possible failure
+prg#:#prg_user_risky_to_fail_desc#:#Sends users a warning mail if they are at the risk to fail a study programme due to a deadline.
+prg#:#prg_user_not_restarted_title#:#Send warning mail about restart
+prg#:#prg_user_not_restarted_desc#:#Sends users a warning mail if a qualification at a study programme expires and they haven't restarted the program yet.
+prg#:#send_risky_to_fail_mail#:#E-mail in case of failure
+prg#:#send_risky_to_fail_mail_info#:#Send an e-mail if the user is at risk of failure of the study program.
+search#:#search_for_orgu_members#:#Search for Organisational Units
+search#:#select_orgu#:#Select Organisational Units
+prg#:#prg_dash_label_valid#:#Valid:
+prg#:#prg_dash_label_minimum#:#Minimum Completion:
+prg#:#prg_dash_label_gain#:#Current Completion:
+prg#:#prg_dash_label_status#:#Status:
+prg#:#prg_dash_label_finish_until#:#Finish until:
+prg#:#prg_dash_label_restart_from#:#Restart from:
+prg#:#percentage#:#%
+prg#:#prg_status_1#:#In Progress
+prg#:#prg_status_2#:#Completed
+prg#:#prg_status_3#:#Accredited
+prg#:#prg_status_4#:#Not Relevant
+prg#:#prg_status_5#:#failed
+prg#:#prg_multi_change_deadline#:#Change deadline
+prg#:#prg_multi_change_expire_date#:#Change expire date
+prg#:#update_expire_date#:#Successfuly update expire date.
+prg#:#update_deadline#:#Successfuly update deadline.
+prg#:#error_updating_expire_date#:#Error during updating expire date.
+prg#:#error_updating_deadline#:#Error during updating deadline.
+prg#:#select_crs#:#Search for Courses
+prg#:#select_grp#:#Search for Groups
+prg#:#select_role#:#Search for Roles
+prg#:#select_org#:#Search for Organisational Unit
+prg#:#label_crs#:#Course Name
+prg#:#label_grp#:#Group Name
+prg#:#label_role#:#Role Name
+prg#:#modal_member_auto_select_title#:#Select Source for auto assignment
+prg#:#prg_auto_member_select_crs#:#Courses
+prg#:#prg_auto_member_select_grp#:#Groups
+prg#:#prg_auto_member_select_role#:#Roles
+badge#:#badge_new_badges#:#You have %1 new badge(s).

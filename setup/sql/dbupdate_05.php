@@ -3383,3 +3383,19 @@ if(!$ilDB->tableColumnExists('crs_settings', 'target_group')) {
         );
 }
 ?>
+
+<#5613>
+<?php
+if (!$ilDB->tableColumnExists('grp_settings', 'auto_notification'))
+{
+	$ilDB->addTableColumn(
+		'grp_settings',
+		'auto_notification', [
+			'type'    => 'integer',
+			'notnull' => true,
+			'default' => 1
+		]
+	);
+}
+?>
+

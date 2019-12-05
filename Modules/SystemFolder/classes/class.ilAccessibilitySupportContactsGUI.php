@@ -129,7 +129,13 @@ class ilAccessibilitySupportContactsGUI
 			if(!$user->getId() || $user->getId() == ANONYMOUS_USER_ID)
 			{
 				$mails = ilUtil::prepareFormOutput(ilAccessibilitySupportContacts::getMailsToAddress());
-				$url = $http->request()->getServerParams()['REQUEST_URI'];
+				$request_scheme =
+					isset($http->request()->getServerParams()['HTTPS'])
+					&& $http->request()->getServerParams()['HTTPS'] !== 'off'
+						? 'https' : 'http';
+				$url = $request_scheme . '://'
+					. $http->request()->getServerParams()['HTTP_HOST']
+					. $http->request()->getServerParams()['REQUEST_URI'];
 				return "mailto:".$mails."?body=%0D%0A%0D%0AGemeldeter%20Link:%0D%0A".rawurlencode($url);
 			}
 			else

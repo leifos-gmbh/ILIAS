@@ -2543,10 +2543,12 @@ class ilObjectListGUI
 	/**
 	* insert all commands into html code
 	*
-	* @access	private
-	* @param	object		$a_tpl		template object
-	* @param	int			$a_ref_id	item reference id
-	*/
+	 * @param bool $a_use_asynch
+	 * @param bool $a_get_asynch_commands
+	 * @param string $a_asynch_url
+	 * @param bool $a_header_actions
+	 * @return string
+	 */
 	function insertCommands($a_use_asynch = false, $a_get_asynch_commands = false,
 		$a_asynch_url = "", $a_header_actions = false)
 	{

@@ -28,14 +28,13 @@
   ),
   'ILIAS\\GlobalScreen\\Scope\\MetaBar\\Provider\\StaticMetaBarProvider' => 
   array (
-    0 => 'ILIAS\\BackgroundTasks\\Provider\\BackgroundTasksMetaBarProvider',
-    1 => 'ILIAS\\GlobalScreen\\Provider\\GSMetaBarProvider',
-    2 => 'ILIAS\\GlobalScreen\\Scope\\MetaBar\\Provider\\NotificationCenterProvider',
-    3 => 'ILIAS\\Init\\Provider\\StartUpMetaBarProvider',
-    4 => 'ILIAS\\Search\\Provider\\SearchMetaBarProvider',
-    5 => 'ILIAS\\User\\Provider\\UserMetaBarProvider',
-    6 => 'ilAwarenessMetaBarProvider',
-    7 => 'ilHelpMetaBarProvider',
+    0 => 'ILIAS\\GlobalScreen\\Provider\\GSMetaBarProvider',
+    1 => 'ILIAS\\GlobalScreen\\Scope\\MetaBar\\Provider\\NotificationCenterProvider',
+    2 => 'ILIAS\\Init\\Provider\\StartUpMetaBarProvider',
+    3 => 'ILIAS\\Search\\Provider\\SearchMetaBarProvider',
+    4 => 'ILIAS\\User\\Provider\\UserMetaBarProvider',
+    5 => 'ilAwarenessMetaBarProvider',
+    6 => 'ilHelpMetaBarProvider',
   ),
   'ILIAS\\GlobalScreen\\Scope\\Tool\\Provider\\DynamicToolProvider' => 
   array (

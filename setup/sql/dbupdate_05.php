@@ -3324,3 +3324,19 @@ if (!$ilDB->tableColumnExists('page_layout','mod_lm')) {
         ));
 }
 ?>
+<#5609>
+<?php
+if (!$ilDB->tableColumnExists('event_participants','excused'))
+{
+	$ilDB->addTableColumn(
+		'event_participants',
+		'excused', [
+			'type'    => 'integer',
+			'length' => 1,
+			'notnull' => true,
+			'default' => 0
+		]
+	);
+}
+?>
+

@@ -9,7 +9,7 @@ use ILIAS\Data\DateFormat\DateFormat;
 /**
  * This describes the duration input.
  */
-interface Duration extends Group
+interface Duration extends FilterInput
 {
     /**
      * Get an input like this using the given format.

@@ -15,6 +15,8 @@ function base()
     $select = $ui->input()->field()->select("Selection", ["one" => "One", "two" => "Two", "three" => "Three"]);
     $with_def = $ui->input()->field()->text("With Default")->withValue("Def.Value");
     $init_hide = $ui->input()->field()->text("Hidden initially");
+    $date = $ui->input()->field()->dateTime("Ein Date");
+    $duration = $ui->input()->field()->duration("Eine Duration");
 
     //Step 2: Define the filter and attach the inputs.
     $action = $DIC->ctrl()->getLinkTargetByClass("ilsystemstyledocumentationgui", "entries", "", true);
@@ -26,8 +28,10 @@ function base()
         "select" => $select,
         "with_def" => $with_def,
         "init_hide" => $init_hide,
+        "date" => $date,
+        "duration" => $duration
     ],
-        [true, true, true, false],
+        [true, true, true, false, true, true],
         true,
         true
     );

@@ -10,6 +10,7 @@ use ILIAS\UI\Renderer as RendererInterface;
 use ILIAS\UI\Implementation\Render\ResourceRegistry;
 use ILIAS\UI\Component;
 use \ILIAS\UI\Implementation\Render\Template;
+use ILIAS\Data\DateFormat as DateFormat;
 
 /**
  * Class Renderer
@@ -18,6 +19,22 @@ use \ILIAS\UI\Implementation\Render\Template;
  */
 class FilterContextRenderer extends AbstractComponentRenderer
 {
+
+    const DATEPICKER_MINMAX_FORMAT = 'Y/m/d';
+
+    const DATEPICKER_FORMAT_MAPPING = [
+        'd' => 'DD',
+        'jS' => 'Do',
+        'l' => 'dddd',
+        'D' => 'dd',
+        'S' => 'o',
+        'W' => '',
+        'm' => 'MM',
+        'F' => 'MMMM',
+        'M' => 'MMM',
+        'Y' => 'YYYY',
+        'y' => 'YY'
+    ];
 
     /**
      * @inheritdoc
@@ -86,6 +103,8 @@ class FilterContextRenderer extends AbstractComponentRenderer
             $input_tpl = $this->getTemplate("tpl.select.html", true, true);
         } elseif ($input instanceof Component\Input\Field\MultiSelect) {
             $input_tpl = $this->getTemplate("tpl.multiselect.html", true, true);
+        } elseif ($input instanceof Component\Input\Field\DateTime) {
+            $input_tpl = $this->getTemplate("tpl.datetime.html", true, true);
         } else {
             throw new \LogicException("Cannot render '" . get_class($input) . "'");
         }
@@ -95,7 +114,7 @@ class FilterContextRenderer extends AbstractComponentRenderer
 
 
     /**
-     * @param Group             $group
+     * @param Group $group
      * @param RendererInterface $default_renderer
      *
      * @return string
@@ -105,8 +124,21 @@ class FilterContextRenderer extends AbstractComponentRenderer
         $inputs = "";
         $input_labels = array();
         foreach ($group->getInputs() as $input) {
-            $inputs .= $default_renderer->render($input);
-            $input_labels[] = $input->getLabel();
+            if ($input instanceof Duration) {
+                $duration = $this->renderDurationInput($input, $default_renderer);
+                $input_html = '';
+                $inpt = array_shift($duration); //from
+                $inputs .= $default_renderer->render($inpt);
+
+                $inpt = array_shift($duration)->withAdditionalPickerconfig([ //until
+                    'useCurrent' => false
+                ]);
+                $inputs .= $default_renderer->render($inpt);
+                //$inputs .= $default_renderer->render($input_html);
+            } else {
+                $inputs .= $default_renderer->render($input);
+                $input_labels[] = $input->getLabel();
+            }
         }
         if (!$group->isDisabled()) {
             $inputs .= $this->renderAddField($input_labels, $default_renderer);
@@ -118,7 +150,7 @@ class FilterContextRenderer extends AbstractComponentRenderer
 
     /**
      * @param Template $input_tpl
-     * @param Input    $input
+     * @param Input $input
      * @param RendererInterface $default_renderer
      *
      * @return string
@@ -156,8 +188,8 @@ class FilterContextRenderer extends AbstractComponentRenderer
 
     /**
      * @param Template $input_tpl
-     * @param Input    $input
-     * @param RendererInterface    $default_renderer
+     * @param Input $input
+     * @param RendererInterface $default_renderer
      *
      * @return string
      */
@@ -215,7 +247,9 @@ class FilterContextRenderer extends AbstractComponentRenderer
             case ($input instanceof MultiSelect):
                 $tpl = $this->renderMultiSelectInput($tpl, $input);
                 break;
-
+            case ($input instanceof DateTime):
+                return $this->renderDateTimeInput($tpl, $input);
+                break;
         }
 
         if ($id === null) {
@@ -230,7 +264,7 @@ class FilterContextRenderer extends AbstractComponentRenderer
      * @param MultiSelect $input
      * @return Template
      */
-    public function renderMultiSelectInput(Template $tpl, MultiSelect $input) : Template
+    public function renderMultiSelectInput(Template $tpl, MultiSelect $input): Template
     {
         $value = $input->getValue();
         $name = $input->getName();
@@ -293,6 +327,120 @@ class FilterContextRenderer extends AbstractComponentRenderer
     }
 
     /**
+     * Return the datetime format in a form fit for the JS-component of this input.
+     * Currently, this means transforming the elements of DateFormat to momentjs.
+     *
+     * http://eonasdan.github.io/bootstrap-datetimepicker/Options/#format
+     * http://momentjs.com/docs/#/displaying/format/
+     */
+    protected function getTransformedDateFormat(
+        DateFormat\DateFormat $origin,
+        array $mapping
+    ): string
+    {
+        $ret = '';
+        foreach ($origin->toArray() as $element) {
+            if (array_key_exists($element, $mapping)) {
+                $ret .= $mapping[$element];
+            } else {
+                $ret .= $element;
+            }
+        }
+        return $ret;
+    }
+
+    /**
+     * @param Template $tpl
+     * @param DateTime $input
+     *
+     * @return string
+     */
+    protected function renderDateTimeInput(Template $tpl, DateTime $input): string
+    {
+        global $DIC;
+        $f = $this->getUIFactory();
+        $renderer = $DIC->ui()->renderer()->withAdditionalContext($input);
+        if ($input->getTimeOnly() === true) {
+            $cal_glyph = $f->symbol()->glyph()->time("#");
+            $format = $input::TIME_FORMAT;
+        } else {
+            $cal_glyph = $f->symbol()->glyph()->calendar("#");
+
+            $format = $this->getTransformedDateFormat(
+                $input->getFormat(),
+                self::DATEPICKER_FORMAT_MAPPING
+            );
+
+            if ($input->getUseTime() === true) {
+                $format .= ' ' . $input::TIME_FORMAT;
+            }
+        }
+
+        $tpl->setVariable("CALENDAR_GLYPH", $renderer->render($cal_glyph));
+
+        $config = [
+            'showClear' => true,
+            'sideBySide' => true,
+            'format' => $format,
+        ];
+        $config = array_merge($config, $input->getAdditionalPickerConfig());
+
+        $min_date = $input->getMinValue();
+        if (!is_null($min_date)) {
+            $config['minDate'] = date_format($min_date, self::DATEPICKER_MINMAX_FORMAT);
+        }
+        $max_date = $input->getMaxValue();
+        if (!is_null($max_date)) {
+            $config['maxDate'] = date_format($max_date, self::DATEPICKER_MINMAX_FORMAT);
+        }
+        require_once("./Services/Calendar/classes/class.ilCalendarUtil.php");
+        \ilCalendarUtil::initDateTimePicker();
+        $input = $this->setSignals($input);
+        $input = $input->withAdditionalOnLoadCode(function ($id) use ($config) {
+            return '$("#' . $id . '").datetimepicker(' . json_encode($config) . ')';
+        });
+        $id = $this->bindJavaScript($input);
+        $tpl->setVariable("ID", $id);
+
+        $tpl->setVariable("NAME", $input->getName());
+        $tpl->setVariable("PLACEHOLDER", $format);
+
+        if ($input->getValue() !== null) {
+            $tpl->setCurrentBlock("value");
+            $tpl->setVariable("VALUE", $input->getValue());
+            $tpl->parseCurrentBlock();
+        }
+
+        return $tpl->get();
+    }
+
+    /**
+     * @param Duration $input
+     * @param RendererInterface $default_renderer
+     * @return
+     */
+    protected function renderDurationInput(Duration $input, RendererInterface $default_renderer)
+    {
+        $tpl_duration = $this->getTemplate("tpl.duration.html", true, true);
+
+        $input = $this->setSignals($input);
+        $input = $input->withAdditionalOnLoadCode(
+            function ($id) {
+                return "$(document).ready(function() {
+					il.UI.Input.duration.init('$id');
+				});";
+            }
+        );
+        $id = $this->bindJavaScript($input);
+        $tpl_duration->setVariable("ID", $id);
+
+        $input_html = '';
+        $inputs = $input->getInputs();
+
+        return $inputs;
+    }
+
+    /**
      * @param array $input_labels
      * @param RendererInterface $default_renderer
      *
@@ -330,7 +478,7 @@ class FilterContextRenderer extends AbstractComponentRenderer
 
     /**
      * @param Component\JavascriptBindable $component
-     * @param Template                     $tpl
+     * @param Template $tpl
      */
     protected function maybeRenderId(Component\JavascriptBindable $component, $tpl)
     {
@@ -350,6 +498,7 @@ class FilterContextRenderer extends AbstractComponentRenderer
         parent::registerResources($registry);
         $registry->register('./src/UI/templates/js/Input/Container/filter.js');
         $registry->register('./src/UI/templates/js/Input/Field/input.js');
+        $registry->register('./src/UI/templates/js/Input/Field/duration.js');
     }
 
 
@@ -363,7 +512,9 @@ class FilterContextRenderer extends AbstractComponentRenderer
             Component\Input\Field\Numeric::class,
             Component\Input\Field\Group::class,
             Component\Input\Field\Select::class,
-            Component\Input\Field\MultiSelect::class
+            Component\Input\Field\MultiSelect::class,
+            Component\Input\Field\DateTime::class,
+            Component\Input\Field\Duration::class
         ];
     }
 }

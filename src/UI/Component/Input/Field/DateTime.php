@@ -9,7 +9,7 @@ use ILIAS\Data\DateFormat\DateFormat;
 /**
  * This describes the datetime-field.
  */
-interface DateTime extends Input
+interface DateTime extends FilterInput
 {
     /**
      * Get an input like this using the given format.

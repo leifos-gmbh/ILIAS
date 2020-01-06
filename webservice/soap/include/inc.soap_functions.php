@@ -41,6 +41,20 @@ class ilSoapFunctions
     // These functions are wrappers for soap, since it cannot register methods inside classes
 
     // USER ADMINISTRATION
+    public static function login($request)
+    {
+        try {
+            ilInitialisation::reinitILIAS();
+        }
+        catch(Exception $e) {
+        }
+
+        global $DIC;
+
+        $logger = $DIC->logger()->wsrv();
+        $logger->dump($request);
+    }
+/*
     public static function login($client, $username, $password)
     {
         include_once './webservice/soap/classes/class.ilSoapUserAdministration.php';
@@ -49,7 +63,7 @@ class ilSoapFunctions
 
         return $sua->login($client, $username, $password);
     }
-
+*/
     public static function loginCAS($client, $PT, $user)
     {
         include_once './webservice/soap/classes/class.ilSoapUserAdministration.php';

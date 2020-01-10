@@ -45,9 +45,7 @@ if (IL_SOAPMODE == IL_SOAPMODE_INTERNAL && strcasecmp($_SERVER["REQUEST_METHOD"]
         $wsdl = $uri . '?wsdl';
     }
     $soapServer = new SoapServer($wsdl, array('uri' => $uri));
-    //$soapServer->setObject(new ilSoapFunctions());
-    include_once './webservice/soap/classes/class.ilSoapRequestHandler.php';
-    $soapServer->setObject(new \ilSoapRequestHandler());
+    $soapServer->setObject(new ilSoapFunctions());
     $soapServer->handle();
 } else {
     // This is a request to display the available SOAP methods or WSDL...

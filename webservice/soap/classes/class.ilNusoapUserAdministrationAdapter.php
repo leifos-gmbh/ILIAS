@@ -50,8 +50,13 @@ class ilNusoapUserAdministrationAdapter
     {
         define('SERVICE_NAME', 'ILIASSoapWebservice');
         define('SERVICE_NAMESPACE', 'urn:ilUserAdministration');
+
+        // begin-patch doclit
         define('SERVICE_STYLE', 'document');
         define('SERVICE_USE', 'literal');
+        //define('SERVICE_STYLE', 'rpc');
+        //define('SERVICE_USE', 'encoded');
+        // end-patch doclit
         $this->server = new soap_server();
         $this->server->decode_utf8 = false;
         $this->server->class = "ilSoapFunctions";

@@ -13,7 +13,8 @@ class ilSoapRequestHandler
      */
     protected const SOAP_CLASSES = [
         'ilSoapUserAdministration',
-        'ilSoapCourseAdministration'
+        'ilSoapCourseAdministration',
+        'ilSoapObjectAdministration'
     ];
 
     /**
@@ -21,13 +22,17 @@ class ilSoapRequestHandler
      */
     private $logger = null;
 
-    public function __construct()
+    private $server = null;
+
+    public function __construct(SoapServer $server)
     {
         $this->initIlias();
 
         global $DIC;
 
-        $this->logger = $DIC->logger()->wsrc();
+        $this->logger = $DIC->logger()->wsrv();
+        $this->logger->dump('Current context is: ' . \ilContext::getType());
+        $this->server = $server;
     }
 
     /**
@@ -44,19 +49,23 @@ class ilSoapRequestHandler
 
             $arguments_array = null;
             if(is_array($arguments)) {
-                foreach((array) $arguments[0] as $argument) {
-                    $arguments_array[] = $argument;
+                $this->logger->dump($arguments);
+                foreach ((array) $arguments as $index => $argument_obj) {
+                    $this->logger->dump($argument_obj);
+                    foreach ((array) $argument_obj as $property => $value) {
+                        $arguments_array[] = $value;
+                    }
                 }
             }
+            $this->logger->dump($arguments_array, \ilLogLevel::DEBUG);
 
-            $this->logger->dump($arguments_array);
-            #$return = call_user_func_array($reflection_closure, $arguments_array);
+            $return = call_user_func_array($reflection_closure, $arguments_array);
 
-            $user_admin = new ilSoapUserAdministration();
-            $return  = $user_admin->login($arguments_array[0],$arguments_array[1],$arguments_array[2]);
+            $this->logger->debug('Return value is: ');
+            $this->logger->dump($return , \ilLogLevel::DEBUG);
 
+            return $return;
 
-            $this->logger->dump($return);
         }
         else {
             throw new SoapFault('SOAP-ENV:Server', 'Call to undefined SOAP method: ' . $name);
@@ -90,10 +99,15 @@ class ilSoapRequestHandler
     protected function initIlias()
     {
         try {
+            \ilContext::init(\ilContext::CONTEXT_SOAP_NO_AUTH);
             ilInitialisation::reinitILIAS();
+            \ilContext::init(\ilContext::CONTEXT_SOAP);
         }
         catch(Exception $e) {
-            // authentication failed
+
+            global $DIC;
+            $logger = $DIC->logger()->wsrv();
+            $logger->error($e->getMessage());
         }
     }
 }

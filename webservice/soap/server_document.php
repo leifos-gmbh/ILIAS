@@ -9,6 +9,8 @@
 * @package ilias
 */
 
+//ini_set("soap.wsdl_cache_enabled", 0);
+
 chdir("../..");
 define("ILIAS_MODULE", "webservice/soap");
 define("IL_SOAPMODE_NUSOAP", 0);
@@ -42,7 +44,7 @@ if (strcasecmp($_SERVER["REQUEST_METHOD"], "post") == 0) {
     $soapServer = new SoapServer($wsdl, array('uri' => $uri));
 
     include_once './webservice/soap/classes/class.ilSoapRequestHandler.php';
-    $soapServer->setObject(new \ilSoapRequestHandler());
+    $soapServer->setObject(new \ilSoapRequestHandler($soapServer));
     $soapServer->handle();
 } else {
     // This is a request to display the available SOAP methods or WSDL...

@@ -46,16 +46,21 @@ class ilNusoapUserAdministrationAdapter
     public $server = null;
 
 
-    public function __construct($a_use_wsdl = true)
+    // begin-patch doclit
+    public function __construct($a_use_wsdl = true, $a_use_document_style = false)
+    // end-patch doclit
     {
         define('SERVICE_NAME', 'ILIASSoapWebservice');
         define('SERVICE_NAMESPACE', 'urn:ilUserAdministration');
 
         // begin-patch doclit
-        define('SERVICE_STYLE', 'document');
-        define('SERVICE_USE', 'literal');
-        //define('SERVICE_STYLE', 'rpc');
-        //define('SERVICE_USE', 'encoded');
+        if($a_use_document_style) {
+            define('SERVICE_STYLE', 'document');
+            define('SERVICE_USE', 'literal');
+        } else {
+            define('SERVICE_STYLE', 'rpc');
+            define('SERVICE_USE', 'encoded');
+        }
         // end-patch doclit
         $this->server = new soap_server();
         $this->server->decode_utf8 = false;

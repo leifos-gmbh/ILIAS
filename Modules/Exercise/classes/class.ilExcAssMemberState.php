@@ -12,7 +12,8 @@
  * - Submission Start: For absolute deadlines this is General Start, for relative deadlines Individual Start
  * - Deadline: absolute Deadline (e.g. 5.12.2017) as set in settings
  * - Relative Deadline: relative Deadline (e.g. 10 Days) as set in settings
- * - Calculated Deadline: Starting Timestamp + Relative Deadline
+ * - Last Submission for Relative Deadlines: As set in the settings
+ * - Calculated Deadline: Min of (Starting Timestamp + Relative Deadline, Last Submission for Relative Deadlines)
  * - Individual Deadline: Set by tutor in "Submissions and Grade" screen
  * - Common Deadline: Deadline or Calculated Deadline
  *   Used for "Ended on" or "Edit Until" presentation
@@ -198,6 +199,7 @@ class ilExcAssMemberState
 
     /**
      * Calculated deadline is only given, if a relative deadline is given and the user started the assignment
+     * the value may be restricted by the last submission date for relative deadlines
      *
      * @return int
      */
@@ -207,6 +209,10 @@ class ilExcAssMemberState
         if ($this->assignment->getDeadlineMode() == ilExAssignment::DEADLINE_RELATIVE) {
             if ($this->idl->getStartingTimestamp() && $this->assignment->getRelativeDeadline()) {
                 $calculated_deadline = $this->idl->getStartingTimestamp() + ($this->assignment->getRelativeDeadline() * 24 * 60 * 60);
+            }
+            if ($this->assignment->getRelDeadlineLastSubmission() > 0 &&
+                $calculated_deadline > $this->assignment->getRelDeadlineLastSubmission()) {
+                $calculated_deadline = $this->assignment->getRelDeadlineLastSubmission();
             }
         }
         return $calculated_deadline;
@@ -224,6 +230,20 @@ class ilExcAssMemberState
         }
         return 0;
     }
+
+    /**
+     * Get last submission for relative deadline
+     *
+     * @return int
+     */
+    public function getLastSubmissionOfRelativeDeadline()
+    {
+        if ($this->assignment->getDeadlineMode() == ilExAssignment::DEADLINE_RELATIVE) {
+            return $this->assignment->getRelDeadlineLastSubmission();
+        }
+        return 0;
+    }
+
 
     /**
      * Get relative deadline presentation
@@ -271,6 +291,22 @@ class ilExcAssMemberState
 
         return "";
     }
+
+    /**
+     * Get last submission for relative deadlines
+     *
+     * @return string
+     */
+    public function getLastSubmissionOfRelativeDeadlinePresentation()
+    {
+        if ($this->getLastSubmissionOfRelativeDeadline() > 0) {
+            return $this->getTimePresentation($this->getLastSubmissionOfRelativeDeadline());
+        }
+
+        return "";
+    }
+
+
 
     /**
      * Check if official deadline exists and has ended

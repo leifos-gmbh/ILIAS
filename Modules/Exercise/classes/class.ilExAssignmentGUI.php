@@ -107,6 +107,13 @@ class ilExAssignmentGUI
                 $tpl->setVariable("PROP", $lng->txt("exc_rem_time_after_start"));
                 $tpl->setVariable("PROP_VAL", $state->getRelativeDeadlinePresentation());
                 $tpl->parseCurrentBlock();
+
+                if ($state->getLastSubmissionOfRelativeDeadline()) {		// if we only have a relative deadline (not started yet)
+                    $tpl->setCurrentBlock("prop");
+                    $tpl->setVariable("PROP", $lng->txt("exc_rel_last_submission"));
+                    $tpl->setVariable("PROP_VAL", $state->getLastSubmissionOfRelativeDeadlinePresentation());
+                    $tpl->parseCurrentBlock();
+                }
             }
 
 
@@ -251,6 +258,12 @@ class ilExAssignmentGUI
             }
             $a_info->addProperty($lng->txt("exc_rem_time_after_start"), $state->getRelativeDeadlinePresentation() .
                 " " . $but);
+            if ($state->getLastSubmissionOfRelativeDeadline()) {		// if we only have a relative deadline (not started yet)
+                $a_info->addProperty(
+                    $lng->txt("exc_rel_last_submission"),
+                    $state->getLastSubmissionOfRelativeDeadlinePresentation()
+                );
+            }
         }
 
         if ($state->getOfficialDeadline() > $state->getCommonDeadline()) {

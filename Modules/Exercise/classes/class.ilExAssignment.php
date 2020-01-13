@@ -1057,7 +1057,7 @@ class ilExAssignment
             "min_char_limit" => array("integer", $this->getMinCharLimit()),
             "max_char_limit" => array("integer", $this->getMaxCharLimit()),
             "relative_deadline" => array("integer", $this->getRelativeDeadline()),
-            "rel_deadline_last_subm" => array("integer", $this->getRelDeadlineLastSubmission()),
+            "rel_deadline_last_subm" => array("integer", (int) $this->getRelDeadlineLastSubmission()),
             "deadline_mode" => array("integer", $this->getDeadlineMode())
             ));
         $this->setId($next_id);
@@ -1109,7 +1109,7 @@ class ilExAssignment
             "max_char_limit" => array("integer", $this->getMaxCharLimit()),
             "deadline_mode" => array("integer", $this->getDeadlineMode()),
             "relative_deadline" => array("integer", $this->getRelativeDeadline()),
-            "rel_deadline_last_subm" => array("integer", $this->getRelDeadlineLastSubmission())
+            "rel_deadline_last_subm" => array("integer", (int) $this->getRelDeadlineLastSubmission())
             ),
             array(
             "id" => array("integer", $this->getId()),

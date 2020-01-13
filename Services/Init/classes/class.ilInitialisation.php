@@ -1337,7 +1337,11 @@ class ilInitialisation
         global $ilAuth, $ilSetting;
         
         ilLoggerFactory::getLogger('init')->debug('Handling of failed authentication.');
-        
+
+        if(\ilContext::CONTEXT_SOAP_NO_AUTH) {
+            return true;
+        }
+
         // #10608
         if (
             ilContext::getType() == ilContext::CONTEXT_SOAP ||

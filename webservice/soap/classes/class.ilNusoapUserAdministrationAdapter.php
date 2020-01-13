@@ -40,10 +40,18 @@ require_once('./Services/Init/classes/class.ilInitialisation.php');
 
 class ilNusoapUserAdministrationAdapter
 {
+    public const RPC_ENCODED_STYLE = 1;
+    public const DOCUMENT_LITERAL_STYLE = 2;
+
     /*
      * @var object Nusoap-Server
      */
     public $server = null;
+
+    /**
+     * @var int
+     */
+    private $mode = self::RPC_ENCODED_STYLE;
 
 
     // begin-patch doclit
@@ -55,6 +63,7 @@ class ilNusoapUserAdministrationAdapter
 
         // begin-patch doclit
         if($a_use_document_style) {
+            $this->mode = self::DOCUMENT_LITERAL_STYLE;
             define('SERVICE_STYLE', 'document');
             define('SERVICE_USE', 'literal');
         } else {
@@ -83,7 +92,7 @@ class ilNusoapUserAdministrationAdapter
     // PRIVATE
     public function __enableWSDL()
     {
-        $this->server->configureWSDL(SERVICE_NAME, SERVICE_NAMESPACE);
+        $this->server->configureWSDL(SERVICE_NAME, SERVICE_NAMESPACE, false, SERVICE_STYLE);
 
         return true;
     }
@@ -93,38 +102,105 @@ class ilNusoapUserAdministrationAdapter
     {
 
         // Add useful complex types. E.g. array("a","b") or array(1,2)
-        $this->server->wsdl->addComplexType(
-            'intArray',
-            'complexType',
-            'array',
-            '',
-            'SOAP-ENC:Array',
-            array(),
-            array(array('ref'=>'SOAP-ENC:arrayType','wsdl:arrayType'=>'xsd:int[]')),
-            'xsd:int'
-        );
 
-        $this->server->wsdl->addComplexType(
-            'stringArray',
-            'complexType',
-            'array',
-            '',
-            'SOAP-ENC:Array',
-            array(),
-            array(array('ref'=>'SOAP-ENC:arrayType','wsdl:arrayType'=>'xsd:string[]')),
-            'xsd:string'
-        );
+        if($this->mode == self::RPC_ENCODED_STYLE) {
+            $this->server->wsdl->addComplexType(
+                'intArray',
+                'complexType',
+                'array',
+                '',
+                'SOAP-ENC:Array',
+                array(),
+                array(array('ref'=>'SOAP-ENC:arrayType','wsdl:arrayType'=>'xsd:int[]')),
+                'xsd:int'
+            );
+        }
+        else {
+            $this->server->wsdl->addComplexType(
+                'intArray',
+                'complexType',
+                'array',
+                'sequence',
+                '',
+                [
+                    'value' => [
+                        'name' => 'value',
+                        'type' => 'xsd:int',
+                        'minOccurs' => 0,
+                        'maxOccurs' => 'unbounded'
+                    ]
+                ],
+                [],
+                'xsd:int[]'
+            );
+        }
 
-        $this->server->wsdl->addComplexType(
-            'doubleArray',
-            'complexType',
-            'array',
-            '',
-            'SOAP-ENC:Array',
-            array(),
-            array(array('ref'=>'SOAP-ENC:arrayType','wsdl:arrayType'=>'xsd:double[]')),
-            'xsd:double'
-        );
+        if($this->mode == self::RPC_ENCODED_STYLE) {
+            $this->server->wsdl->addComplexType(
+                'stringArray',
+                'complexType',
+                'array',
+                '',
+                'SOAP-ENC:Array',
+                array(),
+                array(array('ref'=>'SOAP-ENC:arrayType','wsdl:arrayType'=>'xsd:string[]')),
+                'xsd:string'
+            );
+        }
+        else {
+            $this->server->wsdl->addComplexType(
+                'stringArray',
+                'complexType',
+                'array',
+                'sequence',
+                '',
+                [
+                    'value' => [
+                        'name' => 'value',
+                        'type' => 'xsd:string',
+                        'minOccurs' => 0,
+                        'maxOccurs' => 'unbounded'
+                    ]
+                ],
+                [],
+                'xsd:string[]'
+            );
+        }
+
+        if($this->mode == self::RPC_ENCODED_STYLE) {
+            $this->server->wsdl->addComplexType(
+                'doubleArray',
+                'complexType',
+                'array',
+                '',
+                'SOAP-ENC:Array',
+                array(),
+                array(array('ref'=>'SOAP-ENC:arrayType','wsdl:arrayType'=>'xsd:double[]')),
+                'xsd:double'
+            );
+        }
+        else {
+            $this->server->wsdl->addComplexType(
+                'doubleArray',
+                'complexType',
+                'array',
+                'sequence',
+                '',
+                [
+                    'value' => [
+                        'name' => 'value',
+                        'type' => 'xsd:double',
+                        'minOccurs' => 0,
+                        'maxOccurs' => 'unbounded'
+                    ]
+                ],
+                [],
+                'xsd:double[]'
+            );
+        }
+
+
+
 
         // It's not possible to register classes in nusoap
 

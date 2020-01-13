@@ -12,9 +12,19 @@ class ilSoapRequestHandler
      * @var string[]
      */
     protected const SOAP_CLASSES = [
-        'ilSoapUserAdministration',
-        'ilSoapCourseAdministration',
-        'ilSoapObjectAdministration'
+        ilSoapUserAdministration::class,
+        ilSoapCourseAdministration::class,
+        ilSoapObjectAdministration::class,
+        ilSoapTestAdministration::class,
+        ilSoapRBACAdministration::class,
+        ilSoapGroupAdministration::class,
+        ilSoapExerciseAdministration::class,
+        ilSoapFileAdministration::class,
+        ilSoapLearningProgressAdministration::class,
+        ilSoapDataCollectionAdministration::class,
+        ilSoapWebLinkAdministration::class,
+        ilSoapStructureObjectAdministration::class,
+        ilSoapSCORMAdministration::class
     ];
 
     /**
@@ -49,11 +59,18 @@ class ilSoapRequestHandler
 
             $arguments_array = null;
             if(is_array($arguments)) {
-                $this->logger->dump($arguments);
-                foreach ((array) $arguments as $index => $argument_obj) {
-                    $this->logger->dump($argument_obj);
-                    foreach ((array) $argument_obj as $property => $value) {
-                        $arguments_array[] = $value;
+                $arguments_array = null;
+                foreach ($arguments as $idx => $argument) {
+                    if (is_object($argument)) {
+                        if (is_array($argument->value)) {
+                            $arguments_array[] = $argument->value;
+                        }
+                        else {
+                            $arguments_array[] = [$argument->value];
+                        }
+                    }
+                    else {
+                        $arguments_array[] = $argument;
                     }
                 }
             }
@@ -65,7 +82,6 @@ class ilSoapRequestHandler
             $this->logger->dump($return , \ilLogLevel::DEBUG);
 
             return $return;
-
         }
         else {
             throw new SoapFault('SOAP-ENV:Server', 'Call to undefined SOAP method: ' . $name);

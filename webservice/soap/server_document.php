@@ -9,7 +9,7 @@
 * @package ilias
 */
 
-//ini_set("soap.wsdl_cache_enabled", 0);
+ini_set("soap.wsdl_cache_enabled", 0);
 
 chdir("../..");
 define("ILIAS_MODULE", "webservice/soap");

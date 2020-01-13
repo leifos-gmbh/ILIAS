@@ -38,7 +38,7 @@ class ilExerciseDataSet extends ilDataSet
 	 * @param
 	 * @return
 	 */
-	function getXmlNamespace($a_entity, $a_schema_version)
+    public function getXmlNamespace($a_entity, $a_schema_version)
 	{
 		return "http://www.ilias.de/xml/Modules/Exercise/".$a_entity;
 	}
@@ -51,10 +51,8 @@ class ilExerciseDataSet extends ilDataSet
 	 */
 	protected function getTypes($a_entity, $a_version)
 	{
-		if ($a_entity == "exc")
-		{
-			switch ($a_version)
-			{
+        if ($a_entity == "exc") {
+            switch ($a_version) {
 				case "4.1.0":
 					return array(
 						"Id" => "integer",
@@ -93,10 +91,8 @@ class ilExerciseDataSet extends ilDataSet
 			}
 		}
 
-		if ($a_entity == "exc_assignment")
-		{
-			switch ($a_version)
-			{
+        if ($a_entity == "exc_assignment") {
+            switch ($a_version) {
 				case "4.1.0":
 					return array(
 						"Id" => "integer",
@@ -225,10 +221,8 @@ class ilExerciseDataSet extends ilDataSet
 			}
 		}
 		
-		if ($a_entity == "exc_cit_cat")
-		{
-			switch ($a_version)
-			{
+        if ($a_entity == "exc_cit_cat") {
+            switch ($a_version) {
 				case "5.1.0":
 				case "5.2.0":
 				case "5.3.0":
@@ -241,10 +235,8 @@ class ilExerciseDataSet extends ilDataSet
 			}
 		}
 
-		if ($a_entity == "exc_cit")
-		{
-			switch ($a_version)
-			{
+        if ($a_entity == "exc_cit") {
+            switch ($a_version) {
 				case "5.1.0":
 				case "5.2.0":
 				case "5.3.0":
@@ -262,10 +254,8 @@ class ilExerciseDataSet extends ilDataSet
 			}
 		}
 
-		if ($a_entity == "exc_ass_file_order")
-		{
-			switch ($a_version)
-			{
+        if ($a_entity == "exc_ass_file_order") {
+            switch ($a_version) {
 				case "5.3.0":
 					return array(
 					"Id" => "integer"
@@ -276,10 +266,8 @@ class ilExerciseDataSet extends ilDataSet
 			}
 		}
 
-		if ($a_entity == "exc_ass_reminders")
-		{
-			switch($a_version)
-			{
+        if ($a_entity == "exc_ass_reminders") {
+            switch ($a_version) {
 				case "5.3.0":
 					return array(
 						"Type" => "text",
@@ -303,19 +291,16 @@ class ilExerciseDataSet extends ilDataSet
 	 * @param
 	 * @return
 	 */
-	function readData($a_entity, $a_version, $a_ids, $a_field = "")
+    public function readData($a_entity, $a_version, $a_ids, $a_field = "")
 	{
 		$ilDB = $this->db;
 
-		if (!is_array($a_ids))
-		{
+        if (!is_array($a_ids)) {
 			$a_ids = array($a_ids);
 		}
 				
-		if ($a_entity == "exc")
-		{
-			switch ($a_version)
-			{
+        if ($a_entity == "exc") {
+            switch ($a_version) {
 				case "4.1.0":
 					$this->getDirectDataFromQuery("SELECT exc_data.obj_id id, title, description,".
 						" pass_mode, pass_nr, show_submissions".
@@ -342,10 +327,8 @@ class ilExerciseDataSet extends ilDataSet
 			}
 		}
 
-		if ($a_entity == "exc_assignment")
-		{
-			switch ($a_version)
-			{
+        if ($a_entity == "exc_assignment") {
+            switch ($a_version) {
 				case "4.1.0":
 					$this->getDirectDataFromQuery("SELECT id, exc_id exercise_id, time_stamp deadline, ".
 						" instruction, title, start_time, mandatory, order_nr".
@@ -383,10 +366,8 @@ class ilExerciseDataSet extends ilDataSet
 			}
 		}
 		
-		if ($a_entity == "exc_crit_cat")
-		{
-			switch ($a_version)
-			{
+        if ($a_entity == "exc_crit_cat") {
+            switch ($a_version) {
 				case "5.1.0":
 				case "5.2.0":
 				case "5.3.0":
@@ -397,10 +378,8 @@ class ilExerciseDataSet extends ilDataSet
 			}
 		}
 		
-		if ($a_entity == "exc_crit")
-		{
-			switch ($a_version)
-			{
+        if ($a_entity == "exc_crit") {
+            switch ($a_version) {
 				case "5.1.0":
 				case "5.2.0":
 				case "5.3.0":
@@ -408,11 +387,9 @@ class ilExerciseDataSet extends ilDataSet
 						", descr, pos, required, def".
 						" FROM exc_crit".
 						" WHERE ".$ilDB->in("parent", $a_ids, false, "integer"));
-					foreach ($this->data as $k => $v)
-					{
+                    foreach ($this->data as $k => $v) {
 						$this->data[$k]["DefJson"] = "";
-						if ($v["Def"] != "")
-						{
+                        if ($v["Def"] != "") {
 							$this->data[$k]["DefJson"] = json_encode(unserialize($v["Def"]));
 						}
 					}
@@ -420,23 +397,18 @@ class ilExerciseDataSet extends ilDataSet
 			}
 		}
 
-		if ($a_entity == "exc_ass_file_order")
-		{
-			switch ($a_version)
-			{
+        if ($a_entity == "exc_ass_file_order") {
+            switch ($a_version) {
 				case "5.3.0":
 					$this->getDirectDataFromQuery("SELECT id, assignment_id, filename, order_nr".
 						" FROM exc_ass_file_order".
 						" WHERE ".$ilDB->in("assignment_id", $a_ids, false, "integer"));
 					break;
 			}
-
 		}
 
-		if($a_entity == "exc_ass_reminders")
-		{
-			switch ($a_version)
-			{
+        if ($a_entity == "exc_ass_reminders") {
+            switch ($a_version) {
 				case "5.3.0":
 					$this->getDirectDataFromQuery("SELECT type, ass_id, exc_id, status, start, end, freq, last_send, template_id".
 						" FROM exc_ass_reminders".
@@ -452,23 +424,19 @@ class ilExerciseDataSet extends ilDataSet
 	 * @param	array	abstract data record
 	 * @return	array	xml record
 	 */
-	function getXmlRecord($a_entity, $a_version, $a_set)
-	{
-		if ($a_entity == "exc_assignment")
+    public function getXmlRecord($a_entity, $a_version, $a_set)
 		{
+        if ($a_entity == "exc_assignment") {
 			// convert server dates to utc
-			if($a_set["StartTime"] != "")
-			{
+            if ($a_set["StartTime"] != "") {
 				$start = new ilDateTime($a_set["StartTime"], IL_CAL_UNIX);
 				$a_set["StartTime"] = $start->get(IL_CAL_DATETIME,'','UTC');
 			}
-			if($a_set["Deadline"] != "")
-			{
+            if ($a_set["Deadline"] != "") {
 				$deadline = new ilDateTime($a_set["Deadline"], IL_CAL_UNIX);
 				$a_set["Deadline"] = $deadline->get(IL_CAL_DATETIME,'','UTC');
 			}
-			if($a_set["Deadline2"] != "")
-			{
+            if ($a_set["Deadline2"] != "") {
 				$deadline = new ilDateTime($a_set["Deadline2"], IL_CAL_UNIX);
 				$a_set["Deadline2"] = $deadline->get(IL_CAL_DATETIME,'','UTC');
 			}
@@ -488,16 +456,12 @@ class ilExerciseDataSet extends ilDataSet
 		}
 
 		//Discuss if necessary when working with timestamps.
-		if($a_entity == "exc_ass_reminders")
-		{
-
-			if($a_set["End"] != "")
-			{
+        if ($a_entity == "exc_ass_reminders") {
+            if ($a_set["End"] != "") {
 				$end = new ilDateTime($a_set["End"], IL_CAL_UNIX);
 				$a_set["End"] = $end->get(IL_CAL_DATETIME,'','UTC');
 			}
-			if($a_set["LastSend"] != "")
-			{
+            if ($a_set["LastSend"] != "") {
 				$last = new ilDateTime($a_set["LastSend"], IL_CAL_UNIX);
 				$a_set["LastSend"] = $last->get(IL_CAL_DATETIME,'','UTC');
 			}
@@ -512,11 +476,9 @@ class ilExerciseDataSet extends ilDataSet
 	 */
 	protected function getDependencies($a_entity, $a_version, $a_rec, $a_ids)
 	{
-		switch ($a_entity)
-		{
+        switch ($a_entity) {
 			case "exc":
-				switch ($a_version)
-				{
+                switch ($a_version) {
 					case "4.1.0":
 					case "4.4.0":
 					case "5.0.0":
@@ -540,8 +502,7 @@ class ilExerciseDataSet extends ilDataSet
 				);
 
 			case "exc_assignment":
-				switch ($a_version)
-				{
+                switch ($a_version) {
 					case "5.3.0":
 						return array(
 							"exc_ass_file_order" => array("ids" => $a_rec["Id"]),
@@ -561,22 +522,18 @@ class ilExerciseDataSet extends ilDataSet
 	 * @param
 	 * @return
 	 */
-	function importRecord($a_entity, $a_types, $a_rec, $a_mapping, $a_schema_version)
+    public function importRecord($a_entity, $a_types, $a_rec, $a_mapping, $a_schema_version)
 	{
 //echo $a_entity;
 //var_dump($a_rec);
 
-		switch ($a_entity)
-		{
+        switch ($a_entity) {
 			case "exc":
 				include_once("./Modules/Exercise/classes/class.ilObjExercise.php");
 				
-				if($new_id = $a_mapping->getMapping('Services/Container','objs',$a_rec['Id']))
-				{
+                if ($new_id = $a_mapping->getMapping('Services/Container', 'objs', $a_rec['Id'])) {
 					$newObj = ilObjectFactory::getInstanceByObjId($new_id,false);
-				}
-				else
-				{
+                } else {
 					$newObj = new ilObjExercise();
 					$newObj->setType("exc");
 					$newObj->create(true);
@@ -604,14 +561,10 @@ class ilExerciseDataSet extends ilDataSet
 
 			case "exc_assignment":
 				$exc_id = $a_mapping->getMapping("Modules/Exercise", "exc", $a_rec["ExerciseId"]);
-				if ($exc_id > 0)
-				{
-					if (is_object($this->current_exc) && $this->current_exc->getId() == $exc_id)
-					{
+                if ($exc_id > 0) {
+                    if (is_object($this->current_exc) && $this->current_exc->getId() == $exc_id) {
 						$exc = $this->current_exc;
-					}
-					else
-					{
+                    } else {
 						include_once("./Modules/Exercise/classes/class.ilObjExercise.php");
 						$exc = new ilObjExercise($exc_id, false);
 					}
@@ -621,14 +574,12 @@ class ilExerciseDataSet extends ilDataSet
 					$ass = new ilExAssignment();
 					$ass->setExerciseId($exc_id);
 					
-					if ($a_rec["StartTime"] != "")
-					{
+                    if ($a_rec["StartTime"] != "") {
 						$start = new ilDateTime($a_rec["StartTime"], IL_CAL_DATETIME, "UTC");
 						$ass->setStartTime($start->get(IL_CAL_UNIX));
 					}
 
-					if ($a_rec["Deadline"] != "")
-					{
+                    if ($a_rec["Deadline"] != "") {
 						$deadline = new ilDateTime($a_rec["Deadline"], IL_CAL_DATETIME, "UTC");
 						$ass->setDeadline($deadline->get(IL_CAL_UNIX));
 					}
@@ -654,8 +605,7 @@ class ilExerciseDataSet extends ilDataSet
 					$ass->setPeerReviewPersonalized($a_rec["PeerPersonal"]);
 					
 					// 5.1									
-					if ($a_rec["Deadline2"] != "")
-					{
+                    if ($a_rec["Deadline2"] != "") {
 						$deadline = new ilDateTime($a_rec["Deadline2"], IL_CAL_DATETIME, "UTC");
 						$ass->setExtendedDeadline($deadline->get(IL_CAL_UNIX));
 					}					
@@ -671,8 +621,7 @@ class ilExerciseDataSet extends ilDataSet
 					$ass->setFeedbackDateCustom($a_rec["FbDateCustom"]);
 					
 					// criteria catalogue
-					if($a_rec["PeerCritCat"])
-					{
+                    if ($a_rec["PeerCritCat"]) {
 						$ass->setPeerReviewCriteriaCatalogue($a_mapping->getMapping("Modules/Exercise", "exc_crit_cat", $a_rec["PeerCritCat"]));						
 					}
 															
@@ -684,8 +633,7 @@ class ilExerciseDataSet extends ilDataSet
 					
 					// assignment files
 					$dir = str_replace("..", "", $a_rec["Dir"]);
-					if ($dir != "" && $this->getImportDirectory() != "")
-					{
+                    if ($dir != "" && $this->getImportDirectory() != "") {
 						$source_dir = $this->getImportDirectory()."/".$dir;
 						$target_dir = $fstorage->getPath();
 						ilUtil::rCopy($source_dir, $target_dir);
@@ -693,8 +641,7 @@ class ilExerciseDataSet extends ilDataSet
 					
 					// (4.4) global feedback file
 					$dir = str_replace("..", "", $a_rec["FeedbackDir"]);
-					if ($dir != "" && $this->getImportDirectory() != "")
-					{
+                    if ($dir != "" && $this->getImportDirectory() != "") {
 						$source_dir = $this->getImportDirectory()."/".$dir;
 						$target_dir = $fstorage->getGlobalFeedbackPath();
 						ilUtil::rCopy($source_dir, $target_dir);
@@ -705,23 +652,20 @@ class ilExerciseDataSet extends ilDataSet
 					$fwebstorage = new ilFSWebStorageExercise($exc_id, $ass->getId());
 					$fwebstorage->create();
 					$dir = str_replace("..", "", $a_rec["WebDataDir"]);
-					if ($dir != "" && $this->getImportDirectory() != "")
-					{
+                    if ($dir != "" && $this->getImportDirectory() != "") {
 						$source_dir = $this->getImportDirectory()."/".$dir;
 						$target_dir = $fwebstorage->getPath();
 						ilUtil::rCopy($source_dir, $target_dir);
 					}
 
 					$a_mapping->addMapping("Modules/Exercise", "exc_assignment", $a_rec["Id"], $ass->getId());
-
 				}
 
 				break;
 				
 			case "exc_crit_cat":
 				$exc_id = $a_mapping->getMapping("Modules/Exercise", "exc", $a_rec["Parent"]);
-				if ($exc_id > 0)
-				{
+                if ($exc_id > 0) {
 					include_once("./Modules/Exercise/classes/class.ilExcCriteriaCatalogue.php");
 					$crit_cat = new ilExcCriteriaCatalogue();
 					$crit_cat->setParent($exc_id);
@@ -735,8 +679,7 @@ class ilExerciseDataSet extends ilDataSet
 			
 			case "exc_crit":
 				$crit_cat_id = $a_mapping->getMapping("Modules/Exercise", "exc_crit_cat", $a_rec["Parent"]);
-				if ($crit_cat_id > 0)
-				{
+                if ($crit_cat_id > 0) {
 					include_once("./Modules/Exercise/classes/class.ilExcCriteria.php");
 					$crit = ilExcCriteria::getInstanceByType($a_rec["Type"]);
 					$crit->setParent($crit_cat_id);
@@ -752,8 +695,7 @@ class ilExerciseDataSet extends ilDataSet
 			case "exc_ass_file_order":
 
 				$ass_id = $a_mapping->getMapping("Modules/Exercise", "exc_assignment", $a_rec["AssignmentId"]);
-				if ($ass_id > 0)
-				{
+                if ($ass_id > 0) {
 					ilExAssignment::instructionFileInsertOrder($a_rec["Filename"], $ass_id, $a_rec["OrderNr"]);
 				}
 				break;
@@ -776,4 +718,3 @@ class ilExerciseDataSet extends ilDataSet
 		}
 	}
 }
-?>

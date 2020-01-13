@@ -85,8 +85,7 @@ class ilAdvancedMDPermissionHelper extends ilClaimingPermissionHelper
 
 		$ilDB = $DIC['ilDB'];
 		
-		switch($a_context_type)
-		{
+        switch ($a_context_type) {
 			case self::CONTEXT_MD:
 				return array($_REQUEST["ref_id"]);
 			
@@ -114,8 +113,7 @@ class ilAdvancedMDPermissionHelper extends ilClaimingPermissionHelper
 		}
 		
 		$res = array();		
-		while($row = $ilDB->fetchAssoc($set))
-		{
+        while ($row = $ilDB->fetchAssoc($set)) {
 			$res[] = $row["id"];
 		}		
 		return $res;
@@ -260,10 +258,13 @@ class ilAdvancedMDPermissionHelper extends ilClaimingPermissionHelper
 		
 		$res = array();
 		
-		foreach($ilPluginAdmin->getActivePluginsForSlot(IL_COMP_SERVICE, "AdvancedMetaData", "amdc") as $plugin_name)
-		{
-			 $res[] = $ilPluginAdmin->getPluginObject(IL_COMP_SERVICE, 
-					"AdvancedMetaData", "amdc", $plugin_name);			
+        foreach ($ilPluginAdmin->getActivePluginsForSlot(IL_COMP_SERVICE, "AdvancedMetaData", "amdc") as $plugin_name) {
+            $res[] = $ilPluginAdmin->getPluginObject(
+                 IL_COMP_SERVICE,
+                 "AdvancedMetaData",
+                 "amdc",
+                 $plugin_name
+             );
 		}
 		
 		return $res;
@@ -275,20 +276,16 @@ class ilAdvancedMDPermissionHelper extends ilClaimingPermissionHelper
 
 		$ilAccess = $DIC['ilAccess'];
 		
-		if(!$this->checkPlugins($a_context_type, $a_context_id, $a_action_id, $a_action_sub_id))
-		{
+        if (!$this->checkPlugins($a_context_type, $a_context_id, $a_action_id, $a_action_sub_id)) {
 			return false;
 		}
 		
 		// export is considered read-action
 		if($a_context_type == ilAdvancedMDPermissionHelper::CONTEXT_RECORD &&
-			$a_action_id == ilAdvancedMDPermissionHelper::ACTION_RECORD_EXPORT)
-		{
+            $a_action_id == ilAdvancedMDPermissionHelper::ACTION_RECORD_EXPORT) {
 			 return $ilAccess->checkAccessOfUser($this->getUserId(), "read", "", $this->getRefId());
 		}
 		
 		return $this->checkRBAC();
 	}
 }
-
-?>

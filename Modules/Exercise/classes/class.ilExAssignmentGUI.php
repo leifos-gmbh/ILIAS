@@ -253,7 +253,7 @@ class ilExAssignmentGUI
                 " " . $but);
         }
 
-        if ($idl) {
+        if ($state->getOfficialDeadline() > $state->getCommonDeadline()) {
             $until = $state->getOfficialDeadlinePresentation();
             
             // add late info?

@@ -16,7 +16,7 @@ class ilObjExerciseListGUI extends ilObjectListGUI
 	/**
 	* initialisation
 	*/
-	function init()
+    public function init()
 	{
 		$this->static_link_enabled = true;
 		$this->delete_enabled = true;
@@ -48,7 +48,7 @@ class ilObjExerciseListGUI extends ilObjectListGUI
 	* @param	string		$a_title		title
 	* @param	string		$a_description	description
 	*/
-	function initItem($a_ref_id, $a_obj_id, $a_title = "", $a_description = "")
+    public function initItem($a_ref_id, $a_obj_id, $a_title = "", $a_description = "")
 	{
 		parent::initItem($a_ref_id, $a_obj_id, $a_title, $a_description);
 	}
@@ -61,10 +61,9 @@ class ilObjExerciseListGUI extends ilObjectListGUI
 	*
 	* @return	string		command target frame
 	*/
-	function getCommandFrame($a_cmd)
-	{
-		switch($a_cmd)
+    public function getCommandFrame($a_cmd)
 		{
+        switch ($a_cmd) {
 			default:
 				$frame = ilFrameTargetInfo::_getFrame("MainContent");
 				break;
@@ -83,15 +82,14 @@ class ilObjExerciseListGUI extends ilObjectListGUI
 	*						"property" (string) => property name
 	*						"value" (string) => property value
 	*/
-	function getProperties()
+    public function getProperties()
 	{
 		$lng = $this->lng;
 		$ilUser = $this->user;
 
 		$props = array();
 		$rem = ilObjExerciseAccess::_lookupRemainingWorkingTimeString($this->obj_id);		
-		if ($rem["mtime"] != "")
-		{
+        if ($rem["mtime"] != "") {
 			$props[] = array(
 				"property" => ($rem["cnt"] > 1)
 					? $this->lng->txt("exc_next_deadline")
@@ -111,15 +109,11 @@ class ilObjExerciseListGUI extends ilObjectListGUI
 	* @param	string		$a_cmd			command
 	*
 	*/
-	function getCommandLink($a_cmd)
+    public function getCommandLink($a_cmd)
 	{
 		// separate method for this line
 		$cmd_link = "ilias.php?baseClass=ilExerciseHandlerGUI&ref_id=".$this->ref_id."&cmd=$a_cmd";
 
 		return $cmd_link;
 	}
-
-
-
 } // END class.ilObjTestListGUI
-?>

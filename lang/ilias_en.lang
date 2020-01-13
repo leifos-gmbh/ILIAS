@@ -37,6 +37,7 @@ meta#:#meta_save_order#:#Save Order
 meta#:#meta_order#:#Order
 meta#:#meta_copyright_change_warning_title#:#Modification of Copyright Settings
 meta#:#meta_copyright_change_info#:#You are going to change the licence assigned to this content. This should only be done in accordance with the copyright owner. Please continue only if the new licence is not more restrictive than the one used before.
+auth#:#auth_oidc_role_info#:#OpenID Connect Attribute::Value (e.g: "roles::employee").
 auth#:#auth_oidconnect#:#OpenID Connect
 auth#:#auth_oidc_settings_title#:#OpenID Connect Authentifizierung konfigurieren
 auth#:#auth_oidc_settings_activation#:#OpenID Connect aktivieren
@@ -600,6 +601,7 @@ assessment#:#tst_conflicting_setting#:#This setting does conflict with another s
 assessment#:#enlarge#:#Enlarge
 assessment#:#enter_anonymous_code#:#Enter Anonymous Access Code
 assessment#:#enter_enough_positive_points#:#The maximum available points must be greater than 0! Please enter sufficient positive points for your answers.
+assessment#:#enter_enough_positive_points_checked#:#At least one answer needs to score. Please enter a positive score for the selection of an answer.
 assessment#:#err_no_numeric_value#:#Please enter a numeric value
 assessment#:#error_importing_question#:#There was an error importing the question(s) from the file you have selected!
 assessment#:#error_open_image_file#:#Error opening an image file!
@@ -1195,6 +1197,7 @@ assessment#:#tst_reached_points_of_max#:#%s of %s
 assessment#:#tst_passed#:#Passed
 assessment#:#tst_failed#:#Failed
 assessment#:#tst_tbl_col_scored_pass#:#Scored Pass
+assessment#:#tst_tbl_col_pass_finished#:#Pass Finished
 assessment#:#tst_tbl_col_answered_questions#:#Answered Questions
 assessment#:#tst_tbl_col_reached_points#:#Reached Points
 assessment#:#tst_tbl_col_percent_result#:#Percent Solved
@@ -5682,7 +5685,7 @@ mail#:#mail_add_subject#:#Please enter a subject
 mail#:#mail_assign_entry_to_mailing_list#:#Assign an Entry of Your Contacts to Mailing List
 mail#:#mail_attachments#:#Attachments
 mail#:#mail_auto_generated_info#:#This mail was automatically sent to you by the ILIAS installation %s, %s
-mail#:#mail_change_to_folder#:#Switch to folder:
+mail#:#mail_change_to_folder#:#Switch to folder: %s
 mail#:#mail_cronjob_notification_info#:#You can activate a periodic notification about new mail here.
 mail#:#mail_crs_list_members_not_available_for_at_least_one_crs#:#The members of at least one selected course can not be listed.
 mail#:#mail_crs_list_members_not_available#:#It is not possible to list the members of the marked courses.
@@ -7085,7 +7088,7 @@ style#:#sty_media_char#:#Media
 style#:#sty_min_height#:#Minimum Height
 style#:#sty_move_lm_styles#:#Change Style of Learning Modules
 style#:#sty_move_style#:#Change Style
-style#:#sty_msg_characteristic_must_only_include#:#The title of style classes may only include the following characters:
+style#:#sty_msg_characteristic_must_only_include#:#The title of style classes must start with a letter and only include the following characters:
 style#:#sty_msg_color_must_only_include#:#The color name may only include the following characters:
 style#:#sty_msg_input_must_be_numeric#:#Input must be numeric.
 style#:#sty_name#:#Name
@@ -7768,20 +7771,20 @@ style#:#sty_glo_char#:#Glossary
 style#:#sty_type_glo_overlay#:#Glossary Overlay
 style#:#sty_type_glo_ovtitle#:#Term/Title (Overlay)
 content#:#cont_sco_glossary#:#Unit Glossary
-common#:#delete_inactive_user_accounts#:#Delete inactive user accounts
-common#:#delete_inactive_user_accounts_desc#:#If enabled, user accounts will be deleted depending on the date of the last login.
+common#:#delete_inactive_user_accounts#:#Delete user accounts with no login for a long time
+common#:#delete_inactive_user_accounts_desc#:#If enabled, user accounts will be deleted depending on the date of their last login.
 common#:#delete_inactive_user_accounts_period#:#Days passed since last login
-common#:#delete_inactive_user_accounts_period_desc#:#All user accounts without login within the defined period of time will be deleted.
-common#:#delete_inactive_user_accounts_include_roles#:#Included roles
-common#:#delete_inactive_user_accounts_include_roles_desc#:#Defines the roles that will participate in the deletion.
+common#:#delete_inactive_user_accounts_period_desc#:#All user accounts without login within the defined number of days will be deleted automatically.
+common#:#delete_inactive_user_accounts_include_roles#:#Considered roles
+common#:#delete_inactive_user_accounts_include_roles_desc#:#Only user accounts with one of the marked roles will be checked and deleted if maximum number of days is exceeded.
 common#:#update_orgunits#:#Update assigned organisational units
 common#:#update_orgunits_desc#:#If enabled, the field 'Organisational Units' will be updated for all user accounts.
 common#:#delete_inactivated_user_accounts#:#Delete inactivated user accounts
-common#:#delete_inactivated_user_accounts_desc#:#If enabled, user accounts will be deleted %s days after inactivation.
+common#:#delete_inactivated_user_accounts_desc#:#If enabled, user accounts will be deleted %s days after their inactivation.
 common#:#delete_inactivated_user_accounts_period#:#Days passed since inactivation
-common#:#delete_inactivated_user_accounts_period_desc#:#Accounts will be deleted if this period of time has passed since inactivation.
-common#:#delete_inactivated_user_accounts_include_roles#:#Included roles
-common#:#delete_inactivated_user_accounts_include_roles_desc#:#Defines the roles that will participate in the deletion.
+common#:#delete_inactivated_user_accounts_period_desc#:#Accounts will be deleted if this number of days has passed since inactivation.
+common#:#delete_inactivated_user_accounts_include_roles#:#Considered roles
+common#:#delete_inactivated_user_accounts_include_roles_desc#:#Only user accounts with one of the marked roles will be checked and deleted if maximum number of days is exceeded.
 mail#:#mail_allow_external#:#External E-Mails
 mail#:#mail_allow_external_info#:#If disabled, the delivery of external e-mails (via SMTP) is globally disabled.
 mail#:#mail_settings_general_tab#:#General
@@ -13500,6 +13503,7 @@ logging#:#log_error_settings#:#Error logging settings
 logging#:#error_settings_saved#:#Saved settings
 logging#:#log_error_file_cleanup_title#:#Delete old or orphaned error log files
 logging#:#log_error_file_cleanup_info#:#Deletes old or orphand files of error log.
+logging#:#log_error_path_not_configured_or_wrong#:#Path to errors (error_path) is not configured or unreachable.
 logging#:#frm_clear_older_then#:#Deletes files older then
 logging#:#frm_clear_older_then_info#:#Please enter duration in days.
 blog#:#blog_show_latest#:#Show latest postings/drafts
@@ -13604,7 +13608,7 @@ badge#:#badge_subtype_manual#:#manual
 badge#:#badge_subtype_auto#:#automatic
 badge#:#badge_course_lp_invalid#:#The following objects have a LP mode which is not supported: %s.
 trac#:#trac_defaults#:#Completion Status
-trac#:#trac_defaults_info#:#Set the completion status determination mode for supported object types. Used by certain badge types.
+trac#:#trac_defaults_info#:#Set the completion status determination mode for supported object types. Used by certain badge types and certificates.
 trac#:#trac_defaults_inactive#:#Inactive
 copg#:#copg_snippet_cannot_be_edited#:#This is a predefined content snippet and cannot be edited here.
 assessment#:#tst_revert_changes#:#Undo Editing###fau: testNav
@@ -14779,7 +14783,7 @@ exc#:#exc_team_by_assignment_info#:#Teams formed in other Assignments will be us
 exc#:#exc_num_teams#:#Number
 exc#:#exc_min_team_participants#:#Minimal Number
 exc#:#exc_max_team_participants#:#Maximal Number
-exc#:#exc_total_members#:#Total Exercise Members
+exc#:#exc_total_members#:#Total Exercise Participants
 exc#:#exc_value_can_not_set#:#This value can not be set.
 exc#:#exc_teams_assignment_adopted#:#Teams adopted from existing assignment
 exc#:#exc_team_minimal_too_big#:#Minimal number of team participants %s is too big, please decrease the value.
@@ -15059,3 +15063,7 @@ forum#:#frm_move_invalid_file_type#:#The thread "%s" has an unsupported file typ
 crs#:#crs_objective_result_summary_initial#:#Placement Test: %1$s (%2$s required)
 crs#:#crs_objective_result_summary_qualifying#:#Achievement Test: %1$s (%2$s required)
 crs#:#crs_objective_result_details#:#« Show Details
+exc#:#exc_text_saved#:#Text has been saved.
+exc#:#exc_team_by_random_add_info#:#Please note that you have to assign all participants first before using this mode.
+exc#:#exc_members_already_assigned_team#:#This user is already assigned to a team.
+style#:#sty_add_media_query_info#:#E.g. "only screen and (max-width: 600px)" for browser window smaller than 600px or "print" for printing devices.

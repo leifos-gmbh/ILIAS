@@ -479,16 +479,19 @@
 		receiveMessage: function(messageObject) {
 			var conversation = getModule().storage.get(messageObject.conversationId);
 
-			if(getModule().historyTimestamps[conversation.id] === undefined) {
-				getModule().historyTimestamps[conversation.id] = messageObject.timestamp;
+			var username = findUsernameInConversationByMessage(messageObject);
+			if (username !== "") {
+				if (getModule().historyTimestamps[conversation.id] === undefined) {
+					getModule().historyTimestamps[conversation.id] = messageObject.timestamp;
+				}
+
+				conversation.latestMessage = messageObject;
+
+				conversation.action = ACTION_SHOW_CONV;
+				getModule().storage.save(conversation, function () {
+					getModule().addMessage(messageObject, false);
+				});
 			}
-
-			conversation.latestMessage = messageObject;
-
-			conversation.action = ACTION_SHOW_CONV;
-			getModule().storage.save(conversation, function() {
-				getModule().addMessage(messageObject, false);
-			});
 		},
 
 		onParticipantsSuppressedMessages: function(messageObject) {
@@ -897,8 +900,16 @@
 			var position = (messageObject.userId == getModule().config.userId)? 'right' : 'left';
 			var message = messageObject.message.replace(/(?:\r\n|\r|\n)/g, '<br />');
 			var chatWindow = $('[data-onscreenchat-window=' + messageObject.conversationId + ']');
+			var username = findUsernameInConversationByMessage(messageObject);
 
-			template = template.replace(/\[\[username\]\]/g, findUsernameInConversationByMessage(messageObject));
+			if (username === "") {
+				if(prepend === false) {
+					getModule().historyBlocked = false;
+				}
+				return;
+			}
+
+			template = template.replace(/\[\[username\]\]/g, username);
 			template = template.replace(/\[\[time\]\]/g, momentFromNowToTime(messageObject.timestamp));
 			template = template.replace(/\[\[time_raw\]\]/g, messageObject.timestamp);
 			template = template.replace(/\[\[message]\]/g, getModule().getMessageFormatter().format(message));
@@ -1230,21 +1241,23 @@
 			}
 		}
 
-		/**
-		 * 
-		 * @param {string} src
-		 * @returns {Promise<unknown>}
-		 */
-		let Img = function(src) {
-			return new Promise((resolve, reject) => {
-				let img = new Image();
-				img.addEventListener('load', e => resolve(src));
-				img.addEventListener('error', () => {
-					reject(new Error("Failed to load image's URL: " + src));
-				});
-				img.src = src;
-			});
-		};
+        /**
+         *
+         * @param {string} src
+         * @returns {Promise<unknown>}
+         */
+        let Img = function(src) {
+            return new Promise(function(resolve, reject) {
+                let img = new Image();
+                img.addEventListener('load', function(e) {
+                    resolve(src)
+                    img.addEventListener('error', function() {
+                        reject(new Error("Failed to load image's URL: " + src));
+                    });
+                });
+                img.src = src;
+            });
+        };
 
 		/**
 		 * Sets smileys into text

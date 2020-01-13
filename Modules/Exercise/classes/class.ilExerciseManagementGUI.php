@@ -1907,8 +1907,8 @@ class ilExerciseManagementGUI
 
                     foreach ($users as $user_id) {
                         $date_field = $form->getItemByPostVar("dl_" . $ass_id . "_" . $user_id);
-                        if (ilDate::_before($date_field->getDate(), $now)) {
-                            $date_field->setAlert(sprintf($this->lng->txt("exc_individual_deadline_before_global"), ilDatePresentation::formatDate($now)));
+                        if (ilDate::_before($date_field->getDate(), $dl)) {
+                            $date_field->setAlert(sprintf($this->lng->txt("exc_individual_deadline_before_global"), ilDatePresentation::formatDate($dl)));
                             $valid = false;
                         } else {
                             $res[$ass_id][$user_id] = $date_field->getDate();

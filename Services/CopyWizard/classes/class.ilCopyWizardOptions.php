@@ -67,8 +67,7 @@ class ilCopyWizardOptions
 		$this->db = $ilDB;
 		$this->copy_id = $a_copy_id;
 		
-		if($this->copy_id)
-		{
+        if ($this->copy_id) {
 			$this->read();
 		}	
 	}
@@ -83,8 +82,7 @@ class ilCopyWizardOptions
 	 */
 	public static function _getInstance($a_copy_id)
 	{
-		if(is_array(self::$instances) and isset(self::$instances[$a_copy_id]))
-		{
+        if (is_array(self::$instances) and isset(self::$instances[$a_copy_id])) {
 			return self::$instances[$a_copy_id];
 		}
 		return self::$instances[$a_copy_id] = new ilCopyWizardOptions($a_copy_id);
@@ -98,12 +96,10 @@ class ilCopyWizardOptions
 	public function getRequiredSteps()
 	{
 		$steps = 0;
-		if(is_array($this->options) && array_key_exists(0,$this->options) && is_array($this->options[0]))
-		{
+        if (is_array($this->options) && array_key_exists(0, $this->options) && is_array($this->options[0])) {
 			$steps += count($this->options[0]);
 		}
-		if(is_array($this->options) && array_key_exists(-1,$this->options) && is_array($this->options[-1]))
-		{
+        if (is_array($this->options) && array_key_exists(-1, $this->options) && is_array($this->options[-1])) {
 			$steps += count($this->options[-1]);
 		}
 		return $steps;
@@ -196,7 +192,6 @@ class ilCopyWizardOptions
 			));
 
 		return true;
-		
 	}
 
 	/**
@@ -291,12 +286,10 @@ class ilCopyWizardOptions
 	 */
 	public function isTreeCopyDisabled()
 	{
-	 	if(isset($this->options[self::DISABLE_TREE_COPY]) and $this->options[self::DISABLE_TREE_COPY])
-	 	{
+        if (isset($this->options[self::DISABLE_TREE_COPY]) and $this->options[self::DISABLE_TREE_COPY]) {
 	 		return true;
 	 	}
 	 	return false;
-		
 	}
 	
 	/**
@@ -307,8 +300,7 @@ class ilCopyWizardOptions
 	 */
 	public function isSOAPEnabled()
 	{
-	 	if(isset($this->options[self::DISABLE_SOAP]) and $this->options[self::DISABLE_SOAP])
-	 	{
+        if (isset($this->options[self::DISABLE_SOAP]) and $this->options[self::DISABLE_SOAP]) {
 	 		return false;
 	 	}
 	 	return true;
@@ -404,8 +396,7 @@ class ilCopyWizardOptions
 	private function fetchFirstNodeById($a_id)
 	{
 		$tree = $this->getOptions($a_id);
-		if(isset($tree[0]) and is_array($tree[0]))
-		{
+        if (isset($tree[0]) and is_array($tree[0])) {
 			return $tree[0];
 		}
 		return false;
@@ -446,8 +437,7 @@ class ilCopyWizardOptions
 
 		$ilDB = $DIC['ilDB'];
 		
-		if(!isset($this->options[$a_id]) or !is_array($this->options[$a_id]))
-		{
+        if (!isset($this->options[$a_id]) or !is_array($this->options[$a_id])) {
 			return false;
 		}
 		
@@ -461,12 +451,10 @@ class ilCopyWizardOptions
 		
 		$this->read();
 		// check for role_folder
-		if(($node = $this->fetchFirstNodeById($a_id)) === false)
-		{
+        if (($node = $this->fetchFirstNodeById($a_id)) === false) {
 			return true;
 		}
-		if($node['type'] == 'rolf')
-		{
+        if ($node['type'] == 'rolf') {
 			$this->dropFirstNodeById($a_id);
 		}
 		return true;
@@ -503,8 +491,7 @@ class ilCopyWizardOptions
 	 */
 	public function getOptions($a_source_id)
 	{
-		if(isset($this->options[$a_source_id]) and is_array($this->options[$a_source_id]))
-		{
+        if (isset($this->options[$a_source_id]) and is_array($this->options[$a_source_id])) {
 			return $this->options[$a_source_id];
 		}
 		return array();
@@ -524,8 +511,7 @@ class ilCopyWizardOptions
 
 		$ilDB = $DIC['ilDB'];
 
-		if(!is_array($a_options))
-		{
+        if (!is_array($a_options)) {
 			return false;
 		}
 		
@@ -561,8 +547,7 @@ class ilCopyWizardOptions
 			"AND source_id = -2 ";
 		$res = $this->db->query($query);
 		$mappings = array();
-		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
-		{
+        while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
 			$mappings = unserialize($row->options);
 		}
 		$mappings[$a_source_id] = $a_target_id;
@@ -590,8 +575,7 @@ class ilCopyWizardOptions
 	 */
 	public function getMappings()
 	{
-	 	if(isset($this->options[-2]) and is_array($this->options[-2]))
-	 	{
+        if (isset($this->options[-2]) and is_array($this->options[-2])) {
 	 		return $this->options[-2];
 	 	}
 	 	return array();
@@ -632,8 +616,7 @@ class ilCopyWizardOptions
 	 	$res = $this->db->query($query);
 	 	
 	 	$this->options = array();
-	 	while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
-	 	{
+        while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
 	 		$this->options[$row->source_id] = unserialize($row->options);
 	 	}
 
@@ -656,19 +639,14 @@ class ilCopyWizardOptions
 	 	$this->tmp_tree[] = $tree->getNodeData($a_source_id);
 	 	
 	 	
-	 	foreach($tree->getChilds($a_source_id) as $sub_nodes)
-	 	{
+        foreach ($tree->getChilds($a_source_id) as $sub_nodes) {
 	 		$sub_node_ref_id = $sub_nodes['child'];
 	 		// check ommited, linked ...
 	 		$options = $this->options[$sub_node_ref_id];
 	 		if($options['type'] == self::COPY_WIZARD_COPY or
-	 			$options['type'] == self::COPY_WIZARD_LINK)
-	 		{
+                $options['type'] == self::COPY_WIZARD_LINK) {
 				$this->readTree($sub_node_ref_id);
 	 		}
 	 	}
 	}
 }
-
-
-?>

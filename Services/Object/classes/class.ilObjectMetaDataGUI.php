@@ -91,44 +91,37 @@ class ilObjectMetaDataGUI
 
 
 
-		if(!$this->sub_type)
-		{
+        if (!$this->sub_type) {
 			$this->sub_type = "-";
 		}
 
-		if($a_object)
-		{
+        if ($a_object) {
 			$this->object = $a_object;
 			$this->obj_id = $a_object->getId();
 			$this->obj_type = $a_object->getType();
 			$this->ref_id = $a_object->getRefId();
 			
-			if(!$a_object->withReferences())
-			{
+            if (!$a_object->withReferences()) {
 				$this->logger->logStack(ilLogLevel::WARNING);
 				$this->logger->warning('ObjectMetaDataGUI called without valid reference id.');
 			}
 			
-			if(!$this->ref_id)
-			{
+            if (!$this->ref_id) {
 				$this->logger->logStack(ilLogLevel::WARNING);
 				$this->logger->warning('ObjectMetaDataGUI called without valid reference id.');
 			}
 
 			$this->md_obj = new ilMD((int)$this->obj_id, (int)$this->sub_id, $this->getLOMType());
 
-			if (!$this->in_workspace)
-			{
+            if (!$this->in_workspace) {
 				// (parent) container taxonomies?
 				include_once "Services/Taxonomy/classes/class.ilTaxMDGUI.php";
 				$this->tax_md_gui = new ilTaxMDGUI($this->md_obj->getRBACId(),$this->md_obj->getObjId(),$this->md_obj->getObjType(),$this->ref_id);
 				$tax_ids = $this->tax_md_gui->getSelectableTaxonomies();
-				if(!is_array($tax_ids) || count($tax_ids) == 0)
-				{
+                if (!is_array($tax_ids) || count($tax_ids) == 0) {
 					$this->tax_md_gui = null;
 				}
 			}
-
 		}
 
 		$this->lng->loadLanguageModule("meta");
@@ -142,24 +135,20 @@ class ilObjectMetaDataGUI
 		$next_class = $ilCtrl->getNextClass($this);
 		$cmd = $ilCtrl->getCmd("edit");
 		
-		switch($next_class)
-		{			
+        switch ($next_class) {
 			case 'ilmdeditorgui':										
 				$this->setSubTabs("lom");					
 				include_once 'Services/MetaData/classes/class.ilMDEditorGUI.php';
 				$md_gui = new ilMDEditorGUI((int)$this->obj_id, (int)$this->sub_id, $this->getLOMType());	
 				// custom observers?
-				if(is_array($this->md_observers))
-				{
-					foreach($this->md_observers as $observer)
-					{
+                if (is_array($this->md_observers)) {
+                    foreach ($this->md_observers as $observer) {
 						$md_gui->addObserver($observer["class"], $observer["method"], $observer["section"]);
 					}
 				}
 				// "default" repository object observer
 				else if(!$this->sub_id && 
-					$this->object)
-				{
+                    $this->object) {
 					$md_gui->addObserver($this->object, 'MDUpdateListener', 'General');
 				}
 				$ilCtrl->forwardCommand($md_gui);				
@@ -201,7 +190,7 @@ class ilObjectMetaDataGUI
 	 *
 	 * @param string $a_link link traget
 	 */
-	function setTaxonomySettings(closure $a_form_manipulator, closure $a_form_saver)
+    public function setTaxonomySettings(closure $a_form_manipulator, closure $a_form_saver)
 	{
 		$this->taxonomy_settings_form_manipulator = $a_form_manipulator;
 		$this->taxonomy_settings_form_saver = $a_form_saver;
@@ -212,7 +201,7 @@ class ilObjectMetaDataGUI
 	 *
 	 * @return string link traget
 	 */
-	function getTaxonomySettings()
+    public function getTaxonomySettings()
 	{
 		return $this->taxonomy_settings;
 	}
@@ -223,15 +212,12 @@ class ilObjectMetaDataGUI
 	 * @param
 	 * @return
 	 */
-	function enableTaxonomyDefinition($a_enable)
-	{
-		if ($a_enable)
+    public function enableTaxonomyDefinition($a_enable)
 		{
+        if ($a_enable) {
 			$this->tax_obj_gui = new ilObjTaxonomyGUI();
 			$this->tax_obj_gui->setAssignedObject($this->object->getId());
-		}
-		else
-		{
+        } else {
 			$this->tax_obj_gui = null;
 		}
 	}
@@ -241,7 +227,7 @@ class ilObjectMetaDataGUI
 	 *
 	 * @return ilObjTaxonomyGUI|null
 	 */
-	function getTaxonomyObjGUI()
+    public function getTaxonomyObjGUI()
 	{
 		return $this->tax_obj_gui;
 	}
@@ -259,12 +245,9 @@ class ilObjectMetaDataGUI
 	protected function getLOMType()
 	{
 		if($this->sub_type != "-" &&
-			$this->sub_id)
-		{
+            $this->sub_id) {
 			return $this->sub_type;
-		}
-		else
-		{
+        } else {
 			return $this->obj_type;
 		}
 	}
@@ -275,7 +258,7 @@ class ilObjectMetaDataGUI
 	 *
 	 * @param string $a_val adv type
 	 */
-	function setAdvMdRecordObject($a_adv_ref_id, $a_adv_type, $a_adv_subtype = "-")
+    public function setAdvMdRecordObject($a_adv_ref_id, $a_adv_type, $a_adv_subtype = "-")
 	{
 		$this->adv_ref_id = $a_adv_ref_id;
 		$this->adv_type = $a_adv_type;
@@ -287,10 +270,9 @@ class ilObjectMetaDataGUI
 	 *
 	 * @return array adv type
 	 */
-	function getAdvMdRecordObject()
-	{
-		if ($this->adv_type == null)
+    public function getAdvMdRecordObject()
 		{
+        if ($this->adv_type == null) {
 			return [$this->ref_id, $this->obj_type, $this->sub_type];
 		}
 		return [$this->adv_ref_id, $this->adv_type, $this->adv_subtype];
@@ -301,13 +283,11 @@ class ilObjectMetaDataGUI
 	{
 //		$this->setAdvMdRecordObject(70,"mep", "mob");
 		include_once 'Services/AdvancedMetaData/classes/class.ilAdvancedMDRecord.php';
-		foreach(ilAdvancedMDRecord::_getAssignableObjectTypes(false) as $item)
-		{
+        foreach (ilAdvancedMDRecord::_getAssignableObjectTypes(false) as $item) {
 			list ($adv_ref_id, $adv_type, $adv_subtype) = $this->getAdvMdRecordObject();
 
 //			echo ("<br>".$item["obj_type"]."-".$adv_type."-".$adv_subtype);
-			if($item["obj_type"] == $adv_type)
-			{
+            if ($item["obj_type"] == $adv_type) {
 //				 ("<br>-- ".$adv_type."-".$adv_subtype);
 //				exit;
 				return ((!$item["sub_type"] && $adv_subtype == "-") ||
@@ -321,8 +301,7 @@ class ilObjectMetaDataGUI
 	protected function isLOMAvailable()
 	{						
 		$type = $this->getLOMType();
-		if($type == $this->sub_type)
-		{
+        if ($type == $this->sub_type) {
 			$type = $this->obj_type.":".$type;
 		}
 		
@@ -346,8 +325,7 @@ class ilObjectMetaDataGUI
 	
 	protected function hasAdvancedMDSettings()
 	{					
-		if($this->sub_id)
-		{
+        if ($this->sub_id) {
 			return false;
 		}
 		
@@ -357,7 +335,8 @@ class ilObjectMetaDataGUI
 		return ilContainer::_lookupContainerSetting(
 			$this->obj_id,
 			ilObjectServiceSettingsGUI::CUSTOM_METADATA,
-			false);	
+            false
+        );
 	}		
 	
 	/**
@@ -374,7 +353,8 @@ class ilObjectMetaDataGUI
 		(bool) sizeof(ilAdvancedMDRecord::_getSelectedRecordsByObject(
 			$adv_type,
 			$adv_ref_id,
-			$adv_subtype));
+            $adv_subtype
+        ));
 	}
 	
 	protected function canEdit()
@@ -382,11 +362,9 @@ class ilObjectMetaDataGUI
 //		if($this->hasActiveRecords() &&
 //			$this->obj_id)
 //		{
-		if($this->hasActiveRecords())
-		{
+        if ($this->hasActiveRecords()) {
 			if($this->sub_type == "-" ||
-				$this->sub_id)
-			{
+                $this->sub_id) {
 				return true;
 			}
 		}
@@ -403,36 +381,26 @@ class ilObjectMetaDataGUI
 	{
 		$ilCtrl = $this->ctrl;
 		
-		if(!$a_base_class)
-		{
+        if (!$a_base_class) {
 			$path = array();
-		}
-		else
-		{
+        } else {
 			$path = array($a_base_class);
 		}
 		$path[] = "ilobjectmetadatagui";
 		
 		$link = null;
-		if($this->isLOMAvailable())
-		{
+        if ($this->isLOMAvailable()) {
 			$path[] = "ilmdeditorgui";
 			$link = $ilCtrl->getLinkTargetByClass($path, "listSection");
-		}
-		else if($this->isAdvMDAvailable())
-		{
-			if($this->canEdit())
-			{
+        } elseif ($this->isAdvMDAvailable()) {
+            if ($this->canEdit()) {
 				$link = $ilCtrl->getLinkTarget($this, "edit");
-			}
-			else if($this->hasAdvancedMDSettings())
-			{
+            } elseif ($this->hasAdvancedMDSettings()) {
 				$path[] = "iladvancedmdsettingsgui";
 				$link = $ilCtrl->getLinkTargetByClass($path, "showRecords");
 			}	
 		}
-		if ($link == null && is_object($this->tax_obj_gui))		// taxonomy definition available?
-		{
+        if ($link == null && is_object($this->tax_obj_gui)) {		// taxonomy definition available?
 			$path[] = "ilobjtaxonomygui";
 			$link = $ilCtrl->getLinkTargetByClass($path, "");
 		}
@@ -445,48 +413,54 @@ class ilObjectMetaDataGUI
 		$lng = $this->lng;
 		$ilCtrl = $this->ctrl;
 				
-		if($this->isLOMAvailable())
-		{
-			$ilTabs->addSubTab("lom",			
+        if ($this->isLOMAvailable()) {
+            $ilTabs->addSubTab(
+                "lom",
 				$lng->txt("meta_tab_lom"),
 				$ilCtrl->getLinkTargetByClass("ilmdeditorgui", "listSection")
 			);
 		}
-		if($this->isAdvMDAvailable())
-		{
-			if($this->canEdit())
-			{
-				$ilTabs->addSubTab("advmd",
+        if ($this->isAdvMDAvailable()) {
+            if ($this->canEdit()) {
+                $ilTabs->addSubTab(
+                    "advmd",
 					$lng->txt("meta_tab_advmd"),
-					$ilCtrl->getLinkTarget($this, "edit"));
+                    $ilCtrl->getLinkTarget($this, "edit")
+                );
 			}
-			if($this->hasAdvancedMDSettings())
-			{
-				$ilTabs->addSubTab("advmddef",
+            if ($this->hasAdvancedMDSettings()) {
+                $ilTabs->addSubTab(
+                    "advmddef",
 					$lng->txt("meta_tab_advmd_def"),
-					$ilCtrl->getLinkTargetByClass("iladvancedmdsettingsgui", "showRecords"));
+                    $ilCtrl->getLinkTargetByClass("iladvancedmdsettingsgui", "showRecords")
+                );
 								
-				$ilTabs->addSubTab("md_adv_file_list",
+                $ilTabs->addSubTab(
+                    "md_adv_file_list",
 					$lng->txt("md_adv_file_list"),
-					$ilCtrl->getLinkTargetByClass("iladvancedmdsettingsgui", "showFiles"));
+                    $ilCtrl->getLinkTargetByClass("iladvancedmdsettingsgui", "showFiles")
+                );
 			}				
 		}
 
-		if ($this->tax_md_gui != null)
-		{
+        if ($this->tax_md_gui != null) {
 			$this->tax_md_gui->addSubTab();
 		}
 
-		if ($this->tax_obj_gui != null)
-		{
-			$ilTabs->addSubTab("tax_definition", $lng->txt("cntr_taxonomy_definitions"),
-				$ilCtrl->getLinkTargetByClass("ilobjtaxonomygui", ""));
+        if ($this->tax_obj_gui != null) {
+            $ilTabs->addSubTab(
+                "tax_definition",
+                $lng->txt("cntr_taxonomy_definitions"),
+                $ilCtrl->getLinkTargetByClass("ilobjtaxonomygui", "")
+            );
 		}
 
-		if ($this->taxonomy_settings_form_manipulator != null)
-		{
-			$ilTabs->addSubTab("tax_settings", $lng->txt("tax_tax_settings"),
-				$ilCtrl->getLinkTarget($this, "editTaxonomySettings"));
+        if ($this->taxonomy_settings_form_manipulator != null) {
+            $ilTabs->addSubTab(
+                "tax_settings",
+                $lng->txt("tax_tax_settings"),
+                $ilCtrl->getLinkTarget($this, "editTaxonomySettings")
+            );
 		}
 
 		$ilTabs->activateSubTab($a_active);
@@ -516,8 +490,7 @@ class ilObjectMetaDataGUI
 			$this->sub_id
 		);
 
-		if ($this->adv_type != "")
-		{
+        if ($this->adv_type != "") {
 			$this->record_gui->setAdvMdRecordObject($this->adv_ref_id, $this->adv_type, $this->adv_subtype);
 		}
 
@@ -533,8 +506,7 @@ class ilObjectMetaDataGUI
 	{
 		$tpl = $this->tpl;
 		
-		if(!$a_form)
-		{
+        if (!$a_form) {
 			$a_form = $this->initEditForm();
 		}
 		
@@ -549,13 +521,11 @@ class ilObjectMetaDataGUI
 		$form = $this->initEditForm();
 		if(
 			$form->checkInput() && 
-			$this->record_gui->importEditFormPostValues())
-		{
+            $this->record_gui->importEditFormPostValues()) {
 			$this->record_gui->writeEditForm();
 			
 			// Update ECS content
-			if($this->obj_type == "crs")
-			{
+            if ($this->obj_type == "crs") {
 				include_once "Modules/Course/classes/class.ilECSCourseSettings.php";
 				$ecs = new ilECSCourseSettings($this->object);
 				$ecs->handleContentUpdate();
@@ -584,14 +554,11 @@ class ilObjectMetaDataGUI
 		include_once "Services/AdvancedMetaData/classes/class.ilAdvancedMDRecord.php";
 		include_once "Services/AdvancedMetaData/classes/class.ilAdvancedMDValues.php";
 		list ($adv_ref_id, $adv_type, $adv_subtype) = $this->getAdvMdRecordObject();
-		foreach(ilAdvancedMDRecord::_getSelectedRecordsByObject($adv_type, $adv_ref_id, $adv_subtype) as $record)
-		{				
+        foreach (ilAdvancedMDRecord::_getSelectedRecordsByObject($adv_type, $adv_ref_id, $adv_subtype) as $record) {
 			$block = new ilObjectMetaDataBlockGUI($record, $a_callback);
 			$block->setValues(new ilAdvancedMDValues($record->getRecordId(), $this->obj_id, $this->sub_type, $this->sub_id));			
-			if($a_cmds)
-			{
-				foreach($a_cmds as $caption => $url)
-				{
+            if ($a_cmds) {
+                foreach ($a_cmds as $caption => $url) {
 					$block->addBlockCommand($url, $lng->txt($caption), "_top");		
 				}
 			}
@@ -618,8 +585,7 @@ class ilObjectMetaDataGUI
 		include_once "Services/AdvancedMetaData/classes/class.ilAdvancedMDRecord.php";
 		include_once "Services/AdvancedMetaData/classes/class.ilAdvancedMDValues.php";
 		list ($adv_ref_id, $adv_type, $adv_subtype) = $this->getAdvMdRecordObject();
-		foreach(ilAdvancedMDRecord::_getSelectedRecordsByObject($adv_type, $adv_ref_id, $adv_subtype) as $record)
-		{
+        foreach (ilAdvancedMDRecord::_getSelectedRecordsByObject($adv_type, $adv_ref_id, $adv_subtype) as $record) {
 			$vals = new ilAdvancedMDValues($record->getRecordId(), $this->obj_id, $this->sub_type, $this->sub_id);
 
 
@@ -630,21 +596,16 @@ class ilObjectMetaDataGUI
 			$vals->read();
 
 			$defs = $vals->getDefinitions();
-			foreach ($vals->getADTGroup()->getElements() as $element_id => $element)
-			{
-				if($element instanceof ilADTLocation)
-				{
+            foreach ($vals->getADTGroup()->getElements() as $element_id => $element) {
+                if ($element instanceof ilADTLocation) {
 					continue;
 				}
 
 				$html.= $sep.$defs[$element_id]->getTitle().": ";
 
-				if($element->isNull())
-				{
+                if ($element->isNull()) {
 					$value = "-";
-				}
-				else
-				{
+                } else {
 					$value = ilADTFactory::getInstance()->getPresentationBridgeForInstance($element);
 
 					$value = $value->getHTML();
@@ -652,7 +613,6 @@ class ilObjectMetaDataGUI
 				$html.= $value;
 				$sep = ",&nbsp;&nbsp;&nbsp; ";
 			}
-
 		}
 
 		ilDatePresentation::setUseRelativeDates($old_dt);
@@ -690,20 +650,14 @@ class ilObjectMetaDataGUI
 	protected function saveTaxonomySettings()
 	{
 		$form = $this->initTaxonomySettingsForm();
-		if ($form->checkInput())
-		{
+        if ($form->checkInput()) {
 			$this->taxonomy_settings_form_saver->bindTo($this);
 			call_user_func_array($this->taxonomy_settings_form_saver, [$form]);
 			ilUtil::sendSuccess($this->lng->txt("msg_obj_modified"), true);
 			$this->ctrl->redirect($this, "editTaxonomySettings");
-		}
-		else
-		{
+        } else {
 			$form->setValuesByPost();
 			$this->tpl->setContent($form->getHtml());
 		}
 	}
-
 }
-
-?>

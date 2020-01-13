@@ -49,16 +49,13 @@ abstract class ilClaimingPermissionHelper
 		global $DIC;
 		$ilUser = $DIC->user();
 		
-		if(!$a_user_id)
-		{
+        if (!$a_user_id) {
 			$a_user_id = $ilUser->getId();
 		}	
-		if(!$a_ref_id)
-		{
+        if (!$a_ref_id) {
 			$a_ref_id = (int)$_REQUEST["ref_id"];
 		}	
-		if(!isset(self::$instances[$a_user_id][$a_ref_id]))
-		{
+        if (!isset(self::$instances[$a_user_id][$a_ref_id])) {
 			self::$instances[$a_user_id][$a_ref_id] = new static($a_user_id, $a_ref_id);
 		}
 		return self::$instances[$a_user_id][$a_ref_id];
@@ -150,20 +147,14 @@ abstract class ilClaimingPermissionHelper
 	{	
 		$valid = false;
 		
-		if(array_key_exists($a_context_type, $this->map))
-		{
-			if(!$a_action_sub_id)
-			{
-				if(in_array($a_action_id, $this->map[$a_context_type]["actions"]))
-				{
+        if (array_key_exists($a_context_type, $this->map)) {
+            if (!$a_action_sub_id) {
+                if (in_array($a_action_id, $this->map[$a_context_type]["actions"])) {
 					$valid = true;
 				}
-			}
-			else
-			{
+            } else {
 				if(array_key_exists($a_action_id, $this->map[$a_context_type]["subactions"]) &&
-					in_array($a_action_sub_id, $this->map[$a_context_type]["subactions"][$a_action_id]))
-				{
+                    in_array($a_action_sub_id, $this->map[$a_context_type]["subactions"][$a_action_id])) {
 					$valid = true;
 				}
 			}
@@ -171,13 +162,11 @@ abstract class ilClaimingPermissionHelper
 		
 		if($valid && 
 			$a_context_id && 
-			!in_array($a_context_id, $this->getValidContextIds($a_context_type)))
-		{
+            !in_array($a_context_id, $this->getValidContextIds($a_context_type))) {
 			$valid = false;
 		}
 		
-		if(DEVMODE && !$valid)
-		{
+        if (DEVMODE && !$valid) {
 			trigger_error("INVALID permission context - ".$a_context_type.":".$a_context_id.":".$a_action_id.":".$a_action_sub_id, E_USER_WARNING);
 		}
 		
@@ -193,8 +182,7 @@ abstract class ilClaimingPermissionHelper
 	 */
 	protected function getValidContextIds($a_context_type)
 	{
-		if(!array_key_exists($a_context_type, $this->context_ids))
-		{
+        if (!array_key_exists($a_context_type, $this->context_ids)) {
 			$this->context_ids[$a_context_type] = $this->readContextIds($a_context_type);			
 		}	
 		return (array)$this->context_ids[$a_context_type];
@@ -211,8 +199,7 @@ abstract class ilClaimingPermissionHelper
 	 */
 	public function hasPermission($a_context_type, $a_context_id, $a_action_id, $a_action_sub_id = null)
 	{
-		if($this->isValidContextAndAction($a_context_type, $a_context_id, $a_action_id, $a_action_sub_id))
-		{
+        if ($this->isValidContextAndAction($a_context_type, $a_context_id, $a_action_id, $a_action_sub_id)) {
 			return $this->checkPermission($a_context_type, $a_context_id, $a_action_id, $a_action_sub_id);
 		}			
 		// :TODO: exception?
@@ -230,17 +217,13 @@ abstract class ilClaimingPermissionHelper
 	{		
 		$res = array();
 		
-		foreach($a_action_ids as $action_id)
-		{			
-			if(is_array($action_id))
-			{
+        foreach ($a_action_ids as $action_id) {
+            if (is_array($action_id)) {
 				$action_sub_id = $action_id[1];
 				$action_id = $action_id[0];
 				
 				$res[$action_id][$action_sub_id] = $this->hasPermission($a_context_type, $a_context_id, $action_id, $action_sub_id);
-			}
-			else
-			{
+            } else {
 				$res[$action_id] = $this->hasPermission($a_context_type, $a_context_id, $action_id);
 			}			
 		}
@@ -297,15 +280,12 @@ abstract class ilClaimingPermissionHelper
 	{		
 		$valid = true;
 		
-		if(!is_array($this->plugins))
-		{
+        if (!is_array($this->plugins)) {
 			$this->plugins = (array)$this->getActivePlugins();	
 		}
 		
-		foreach($this->plugins as $plugin)
-		{		
-			if(!$plugin->checkPermission($this->getUserId(), $a_context_type, $a_context_id, $a_action_id, $a_action_sub_id))
-			{			
+        foreach ($this->plugins as $plugin) {
+            if (!$plugin->checkPermission($this->getUserId(), $a_context_type, $a_context_id, $a_action_id, $a_action_sub_id)) {
 				$valid = false;
 				break;
 			}
@@ -337,5 +317,3 @@ abstract class ilClaimingPermissionHelper
 	}
 
 }
-
-?>

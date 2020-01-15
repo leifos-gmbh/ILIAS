@@ -1128,6 +1128,7 @@ img {
   display: block;
   max-width: 100%;
   height: auto;
+  display: inherit;
 }
 .img-rounded {
   border-radius: 0px;
@@ -17758,6 +17759,24 @@ a.il_ContainerItemCommand:visited {
   .row-eq-height .il-card {
     display: block;
   }
+}
+/*----------IE BUGFIXES----------*/
+.card-title .btn {
+  word-break: break-all;
+}
+.il-card .caption .card-title {
+  word-break: break-all;
+}
+.img-responsive,
+.thumbnail > img,
+.thumbnail a > img,
+.carousel-inner > .item > img,
+.carousel-inner > .item > a > img,
+.thumbnail > img,
+.thumbnail a > img,
+.carousel-inner > .item > img,
+.carousel-inner > .item > a > img {
+  display: inherit;
 }
 /*		Color scheme
 		Dark BLue: #0f2152;

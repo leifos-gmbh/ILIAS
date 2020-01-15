@@ -2,13 +2,29 @@
 .icon.xpdl.medium.outlined {
     display: none;
 }
+
 /*----------MEDIA GALLERY----------*/
 .icon.xmg.medium.outlined {
     display: none;
 }
+
 /*----------MOBILE VIEW----------*/
 @media only screen and (min-width: 768px) {
 .row-eq-height .il-card{
   display: block;
   }
+}
+
+/*----------IE BUGFIXES----------*/
+.card-title .btn {
+   word-break: break-all;
+}
+.il-card .caption .card-title {
+   word-break: break-all;
+}
+.img-responsive, .thumbnail > img,
+.thumbnail a > img,
+.carousel-inner > .item > img,
+.carousel-inner > .item > a > img {
+   display: inherit;
 }

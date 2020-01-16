@@ -17756,10 +17756,20 @@ a.il_ContainerItemCommand:visited {
 }
 /*----------IE BUGFIXES----------*/
 .card-title .btn {
-  word-wrap: break-all;
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  -ms-hyphens: auto:
+    hyphens: auto;
+  word-break: normal;
+  -ms-word-break: normal;
 }
 .il-card .caption .card-title {
-  word-wrap: break-all;
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  -ms-hyphens: auto:
+   hyphens: auto;
+  word-break: normal;
+  -ms-word-break: normal;
 }
 .img-responsive,
 .thumbnail > img,

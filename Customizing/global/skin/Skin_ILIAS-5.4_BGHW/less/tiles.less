@@ -10,10 +10,20 @@
 
 /*----------IE BUGFIXES----------*/
 .card-title .btn {
-   word-wrap: break-all;
+   -ms-word-break: break-all;
 }
 .il-card .caption .card-title {
-   word-wrap: break-all;
+   -ms-word-break: break-all;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    -ms-word-break: normal;
+    word-break: normal;
+    word-break: break-word;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+
 }
 .img-responsive,
 .thumbnail > img,

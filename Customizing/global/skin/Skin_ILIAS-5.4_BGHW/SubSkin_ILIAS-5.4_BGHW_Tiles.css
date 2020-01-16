@@ -1129,7 +1129,6 @@ img {
   max-width: 100%;
   height: auto;
   display: inherit;
-  cursor: pointer;
 }
 .img-rounded {
   border-radius: 0px;
@@ -17770,6 +17769,8 @@ a.il_ContainerItemCommand:visited {
 .carousel-inner > .item > img,
 .carousel-inner > .item > a > img {
   display: inherit;
+}
+.il-card img {
   cursor: pointer;
 }
 /*		Color scheme

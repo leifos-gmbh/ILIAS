@@ -4139,3 +4139,92 @@ while ($rec = $ilDB->fetchAssoc($set))
     );
 }
 ?>
+<#5652>
+<?php
+if (!$ilDB->tableExists('webr_lists')) {
+    $fields = [
+        'list_id' => [
+            'type'    => 'integer',
+            'length'  => 4,
+            'notnull' => true,
+            'default' => 0
+        ],
+        'webr_id' => [
+            'type'    => 'integer',
+            'length'  => 4,
+            'notnull' => true,
+            'default' => 0
+        ],
+        'title' => [
+            'type'     => 'text',
+            'length'   => 127,
+            'notnull'  => false
+        ],
+        'description' => [
+            'type'     => 'text',
+            'length'   => 4000,
+            'notnull'  => false
+        ],
+        'create_date' => [
+            'type'     => 'integer',
+            'length'   => 4,
+            'notnull'  => true,
+            'default'  => 0
+        ],
+        'last_update' => [
+            'type'     => 'integer',
+            'length'   => 4,
+            'notnull'  => true,
+            'default'  => 0
+        ]
+    ];
+    $ilDB->createTable('webr_lists', $fields);
+    $ilDB->addPrimaryKey('webr_lists', ['list_id']);
+    $ilDB->addIndex("webr_lists", ['list_id','webr_id'], "i1");
+    $ilDB->createSequence('webr_lists');
+}
+?>
+<#5653>
+<?php
+if ($ilDB->tableExists('webr_lists')) {
+    $res_lists = $ilDB->query("
+        SELECT *
+        FROM object_data o, webr_lists l
+        WHERE o.type = 'webr'
+        AND o.obj_id = l.webr_id
+    ");
+
+    $res_items = $ilDB->query("
+        SELECT *
+        FROM object_data o
+        WHERE
+            (SELECT COUNT(*) 
+            FROM webr_items w
+            WHERE w.webr_id = o.obj_id) <> 1
+        AND o.type = 'webr'
+    ");
+
+    $webr_ids = [];
+    while ($row_lists = $ilDB->fetchAssoc($res_lists)) {
+        $webr_ids[] = $row_lists['webr_id'];
+    }
+
+    while ($row_items = $ilDB->fetchAssoc($res_items)) {
+        if (!in_array($row_items['obj_id'], $webr_ids)) {
+            $id = $ilDB->nextId('webr_lists');
+            $ilDB->manipulate(
+                "INSERT INTO webr_lists (list_id, webr_id, title, description, create_date, last_update)" .
+                " VALUES (" .
+                $ilDB->quote($id, "integer") .
+                "," . $ilDB->quote($row_items['obj_id'], "integer") .
+                "," . $ilDB->quote($row_items['title'], "text") .
+                "," . $ilDB->quote($row_items['description'], "text") .
+                "," . $ilDB->quote(time(), "integer") .
+                "," . $ilDB->quote(time(), "integer") .
+                ")"
+            );
+        }
+    }
+
+}
+?>

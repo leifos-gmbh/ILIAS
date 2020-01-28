@@ -53,7 +53,31 @@ class ilAccountRegistrationGUI
         $this->code_enabled = ($this->registration_settings->registrationCodeRequired() ||
             $this->registration_settings->getAllowCodes());
 
+
         $this->termsOfServiceEvaluation = $DIC['tos.document.evaluator'];
+
+        // cdpatch start
+        // get cd plugin
+        global $ilPluginAdmin;
+
+        $pl_names    = $ilPluginAdmin->getActivePluginsForSlot(IL_COMP_SERVICE, "UIComponent", "uihk");
+        $plugin_html = false;
+        foreach ($pl_names as $pl) {
+            if ($pl == "CD") {
+                $this->cd_plugin = ilPluginAdmin::getPluginObject(IL_COMP_SERVICE, "UIComponent", "uihk", $pl);
+            }
+        }
+
+        if ($_GET["mode"] == "trainer") {
+            include_once("./Services/jQuery/classes/class.iljQueryUtil.php");
+            iljQueryUtil::initjQuery();
+
+            $this->mode = "trainer";
+            $ilCtrl->saveParameter($this, "mode");
+            $lng->loadLanguageModule("cd");
+        }
+        // cdpatch end
+
     }
 
     public function executeCommand()
@@ -98,6 +122,32 @@ class ilAccountRegistrationGUI
 
         ilStartUpGUI::initStartUpTemplate(array('tpl.usr_registration.html', 'Services/Registration'), true);
         $this->tpl->setVariable('TXT_PAGEHEADLINE', $this->lng->txt('registration'));
+
+        // cdpatch start
+        if (!is_object($this->cd_plugin)) {
+            die("CD Plugin missing.");
+        }
+
+        // check valid center in trainer mode
+        global $ilCtrl;
+        if ($this->mode == "trainer") {
+            $this->cd_plugin->includeClass("class.cdCenter.php");
+            if (!cdCenter::exists(ilUtil::stripSlashes($_REQUEST["center_id"]))) {
+                die("No valid center ID given.");
+                return;
+            }
+            $prefields = array("firstname", "lastname", "email", "center_id", "title", "gender");
+            foreach ($prefields as $v) {
+                $ilCtrl->setParameter($this, $v, $_REQUEST[$v]);
+            }
+        }
+        // cdpatch end
+
+        // cdpatch start
+        if ($this->mode == "trainer") {
+            $this->tpl->setVariable("TXT_PAGEHEADLINE", $lng->txt("cd_reg_trainer"));
+        }
+        // cdpatch end
 
         if (!$this->form) {
             $this->__initForm();
@@ -163,9 +213,21 @@ class ilAccountRegistrationGUI
         // standard fields
         include_once("./Services/User/classes/class.ilUserProfile.php");
         $up = new ilUserProfile();
+
+        // cdpatch start
+        if ($this->mode == "trainer") {
+            include_once("./Services/CD/classes/class.ilCDTrainerProfile.php");
+            $up = new ilCDTrainerProfile($this->cd_plugin);
+        }
+        // cdpatch end
+
         $up->setMode(ilUserProfile::MODE_REGISTRATION);
         $up->skipGroup("preferences");
-        
+
+        // cdpatch start
+        $up->skipField("password_addon");
+        // cdpatch end
+
         $up->setAjaxCallback(
             $this->ctrl->getLinkTarget($this, 'doProfileAutoComplete', '', true)
         );
@@ -241,8 +303,25 @@ class ilAccountRegistrationGUI
         }
 
         $this->form->addCommandButton("saveForm", $lng->txt("register"));
+        // cdpatch start
+        $this->form->addCommandButton("quitForm", $lng->txt("refuse_exit"));
+        // cdpatch end
     }
-    
+
+    // cdpatch start
+
+    /**
+     * Quit form
+     * @param
+     * @return
+     */
+    function quitForm()
+    {
+        ilUtil::redirect("login.php");
+    }
+
+    // cdpatch end
+
     public function saveForm()
     {
         global $DIC;
@@ -288,6 +367,19 @@ class ilAccountRegistrationGUI
         
         // valid codes override email domain check
         if (!$valid_code) {
+            // cdpatch start
+            if ($this->mode != "trainer") {
+                $this->cd_plugin->includeClass("class.cdCompany.php");
+                $company_id = cdCompany::getCompanyIdForPassword($_POST["usr_company_password"]);
+                if ($company_id <= 0) {
+                    ilUtil::sendFailure($lng->txt("form_input_not_valid"));
+                    $pw = $this->form->getItemByPostVar("usr_company_password");
+                    $pw->setAlert($this->cd_plugin->txt("company_password_does_not_exist"));
+                    $form_valid = false;
+                }
+            }
+            // cdpatch end
+
             // validate email against restricted domains
             $email = $this->form->getInput("usr_email");
             if ($email) {
@@ -424,7 +516,16 @@ class ilAccountRegistrationGUI
             $ilias->raiseError("Invalid role selection in registration" .
                 ", IP: " . $_SERVER["REMOTE_ADDR"], $ilias->error_obj->FATAL);
         }
-        
+
+        // cdpatch start
+        if ($this->mode == "trainer") {
+            $this->userObj = new ilObjUser();
+
+            include_once("./Services/CD/classes/class.ilCDTrainerProfile.php");
+            $prof = new ilCDTrainerProfile($this->cd_plugin);
+            return $prof->createUserFromForm($this->form, $this->userObj);
+        }
+        // cdpatch end
 
         $this->userObj = new ilObjUser();
         
@@ -471,7 +572,12 @@ class ilAccountRegistrationGUI
             $password = $this->form->getInput("usr_password");
         }
         $this->userObj->setPasswd($password);
-        
+
+        // cdpatch start
+        $this->cd_plugin->includeClass("class.cdCompany.php");
+        $company_id = cdCompany::getCompanyIdForPassword($_POST["usr_company_password"]);
+        $this->userObj->setCompanyId($company_id);
+        // cdpatch end
         
         // Set user defined data
         include_once './Services/User/classes/class.ilUserDefinedFields.php';
@@ -638,6 +744,13 @@ class ilAccountRegistrationGUI
             }
         }
 
+        // cdpatch start
+//		$rbacadmin->assignUser((int)$default_role, $this->userObj->getId(), true);
+        include_once("./Services/CD/classes/class.ilCDPermWrapper.php");
+        ilCDPermWrapper::initCompanyUserRoles($this->userObj->getId(), $company_id);
+        // cdpatch end
+
+
         return $password;
     }
 
@@ -682,6 +795,7 @@ class ilAccountRegistrationGUI
                 )
             );
             $mail->send();
+
         } else {
             $accountMail = new ilAccountRegistrationMail(
                 $this->registration_settings,
@@ -689,6 +803,33 @@ class ilAccountRegistrationGUI
                 ilLoggerFactory::getLogger('user')
             );
             $accountMail->withDirectRegistrationMode()->send($this->userObj, $password, $this->code_was_used);
+
+            // cdpatch: start
+            $bcc = "";
+            if ($this->mode == "trainer") {
+                include_once("./Services/CD/classes/class.ilCDTrainer.php");
+                $cent_id = ilCDTrainer::lookupCenterId($this->userObj->getId());
+                if ($cent_id > 0) {
+                    // get cd plugin
+                    global $ilPluginAdmin;
+
+                    $pl_names = $ilPluginAdmin->getActivePluginsForSlot(IL_COMP_SERVICE, "UIComponent", "uihk");
+                    foreach ($pl_names as $pl) {
+                        if ($pl == "CD") {
+                            $this->cd_plugin = ilPluginAdmin::getPluginObject(IL_COMP_SERVICE, "UIComponent", "uihk", $pl);
+                            $this->cd_plugin->includeClass("class.cdCenter.php");
+                            $center_staff_email = cdCenter::lookupEmail($cent_id);
+                            if ($center_staff_email != "") {
+                                $bcc = $center_staff_email;
+                            }
+                        }
+                    }
+                }
+            }
+            // cdpatch: end
+
+            // cdpatch: added bcc
+            $accountMail->withDirectRegistrationMode()->send($this->userObj, $password, $this->code_was_used, $bcc);
         }
     }
 
@@ -706,6 +847,12 @@ class ilAccountRegistrationGUI
 
         ilStartUpGUI::initStartUpTemplate(array('tpl.usr_registered.html', 'Services/Registration'), false);
         $this->tpl->setVariable('TXT_PAGEHEADLINE', $this->lng->txt('registration'));
+
+        // cdpatch start
+        if ($this->mode == "trainer") {
+            $this->tpl->setVariable("TXT_PAGEHEADLINE", $lng->txt("cd_reg_trainer"));
+        }
+        // cdpatch end
 
         $this->tpl->setVariable("TXT_WELCOME", $lng->txt("welcome") . ", " . $this->userObj->getTitle() . "!");
         if (

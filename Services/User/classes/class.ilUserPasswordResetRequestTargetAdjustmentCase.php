@@ -22,7 +22,14 @@ class ilUserPasswordResetRequestTargetAdjustmentCase extends ilUserRequestTarget
     public function isInFulfillment()
     {
         if (!isset($_GET['baseClass']) || strtolower($_GET['baseClass']) != 'ilpersonaldesktopgui') {
-            return false;
+            // cdpatch: out-commented
+            //return false;
+
+            // cdpatch start
+            if (strtolower($_GET['baseClass']) != 'iluihookplugingui') {
+                return false;
+            }
+            // cdpatch end
         }
 
         return (

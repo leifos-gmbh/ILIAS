@@ -198,11 +198,15 @@ class ilObjSkillManagementGUI extends ilObjectGUI
                 $this->ctrl->getLinkTarget($this, "editSkills")
             );
 
+            // cdpatch start
+            /*
             $this->tabs_gui->addTab(
                 "skill_templates",
                 $lng->txt("skmg_skill_templates"),
                 $this->ctrl->getLinkTarget($this, "editSkillTemplates")
             );
+            */
+            // cdpatch end
 
             $this->tabs_gui->addTab(
                 "settings",

@@ -1091,6 +1091,13 @@ class ilSetupGUI
         $ti->setInfo($lng->txt("ghostscript_path_comment" . $lvext));
         $this->form->addItem($ti);
 
+		// cdpatch start
+		// htmldoc path
+		$ti = new ilTextInputGUI($lng->txt("htmldoc_path"), "htmldoc_path");
+		$ti->setInfo($lng->txt("htmldoc_path_comment"));
+		$this->form->addItem($ti);
+		// cdpatch end
+
         // ffmpeg path
         $ti = new ilTextInputGUI($lng->txt("ffmpeg_path"), "ffmpeg_path");
         $ti->setInfo($lng->txt("ffmpeg_path_comment"));
@@ -1188,6 +1195,9 @@ class ilSetupGUI
         //$values["mkisofs_path"] = $this->setup->ini->readVariable("tools","mkisofs");
         $values["ffmpeg_path"] = $this->setup->ini->readVariable("tools", "ffmpeg");
         $values["phantomjs_path"] = $this->setup->ini->readVariable("tools", "phantomjs");
+        // cdpatch start
+        $values["htmldoc_path"] = $this->setup->ini->readVariable("tools", "htmldoc");
+        // cdpatch end
         $values["latex_url"] = $this->setup->ini->readVariable("tools", "latex");
         $values["fop_path"] = $this->setup->ini->readVariable("tools", "fop");
         $values["vscanner_type"] = $this->setup->ini->readVariable("tools", "vscantype");

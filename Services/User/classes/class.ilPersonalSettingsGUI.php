@@ -89,6 +89,11 @@ class ilPersonalSettingsGUI
     // init sub tabs
     public function __initSubTabs($a_cmd)
     {
+
+        // cdpatch start
+        return;
+        // cdpatch end
+
         /**
          * @var $rbacsystem ilRbacSystem
          */
@@ -192,7 +197,9 @@ class ilPersonalSettingsGUI
         $ilUser = $DIC['ilUser'];
         
         $this->__initSubTabs("showPersonalData");
-        $ilTabs->activateTab("password");
+
+        // cdpatch: out-commented next line
+        //$ilTabs->activateTab("password");
 
         $this->setHeader();
         // check whether password of user have to be changed
@@ -441,7 +448,8 @@ class ilPersonalSettingsGUI
         $ilTabs = $DIC['ilTabs'];
 
         $this->__initSubTabs("showPersonalData");
-        $ilTabs->activateTab("general_settings");
+        // cdpatch: out-commented next line
+        //$ilTabs->activateTab("general_settings");
 
         $this->setHeader();
 

@@ -42,6 +42,10 @@ class ilUserQuery
      */
     protected $udf_filter = array();
 
+    // cdpatch start
+    public $company_id = 0;
+    // cdpatch end
+
     private $default_fields = array(
         "usr_id",
         "login",
@@ -277,7 +281,6 @@ class ilUserQuery
 
         $ilDB = $DIC['ilDB'];
 
-
         $udf_fields = array();
 
         $join = "";
@@ -309,22 +312,22 @@ class ilUserQuery
             $udf_table = ($udf_def[$id]["field_type"] != UDF_TYPE_WYSIWYG)
                 ? "udf_text"
                 : "udf_clob";
-            $join.= " LEFT JOIN " . $udf_table . " ud_" . $id . " ON (ud_" . $id . ".field_id=" . $ilDB->quote($id) . " AND ud_" . $id . ".usr_id = usr_data.usr_id) ";
+            $join .= " LEFT JOIN " . $udf_table . " ud_" . $id . " ON (ud_" . $id . ".field_id=" . $ilDB->quote($id) . " AND ud_" . $id . ".usr_id = usr_data.usr_id) ";
         }
 
         // count query
         $count_query = "SELECT count(usr_data.usr_id) cnt" .
             " FROM usr_data";
-        
+
         $all_multi_fields = array("interests_general", "interests_help_offered", "interests_help_looking");
         $multi_fields = array();
-        
+
         $sql_fields = array();
         foreach ($this->default_fields as $idx => $field) {
             if (!$field) {
                 continue;
             }
-            
+
             if (in_array($field, $all_multi_fields)) {
                 $multi_fields[] = $field;
             } elseif (!stristr($field, ".")) {
@@ -348,61 +351,61 @@ class ilUserQuery
             $join;
 
         // filter
-        $query.= " WHERE usr_data.usr_id <> " . $ilDB->quote(ANONYMOUS_USER_ID, "integer");
+        $query .= " WHERE usr_data.usr_id <> " . $ilDB->quote(ANONYMOUS_USER_ID, "integer");
 
         // User filter
-        $count_query.= " WHERE 1 = 1 ";
+        $count_query .= " WHERE 1 = 1 ";
         $count_user_filter = "usr_data.usr_id != " . $ilDB->quote(ANONYMOUS_USER_ID, "integer");
         if ($this->users and is_array(($this->users))) {
             $query .= ' AND ' . $ilDB->in('usr_data.usr_id', $this->users, false, 'integer');
-            $count_user_filter =  $ilDB->in('usr_data.usr_id', $this->users, false, 'integer');
+            $count_user_filter = $ilDB->in('usr_data.usr_id', $this->users, false, 'integer');
         }
 
-        $count_query.= " AND " . $count_user_filter . " ";
+        $count_query .= " AND " . $count_user_filter . " ";
         $where = " AND";
 
         if ($this->first_letter != "") {
             $add = $where . " (" . $ilDB->upper($ilDB->substr("usr_data.lastname", 1, 1)) . " = " . $ilDB->upper($ilDB->quote($this->first_letter, "text")) . ") ";
-            $query.= $add;
-            $count_query.= $add;
+            $query .= $add;
+            $count_query .= $add;
             $where = " AND";
         }
-        
-        if ($this->text_filter != "") {		// email, name, login
+
+        if ($this->text_filter != "") {        // email, name, login
             $add = $where . " (" . $ilDB->like("usr_data.login", "text", "%" . $this->text_filter . "%") . " " .
                 "OR " . $ilDB->like("usr_data.firstname", "text", "%" . $this->text_filter . "%") . " " .
                 "OR " . $ilDB->like("usr_data.lastname", "text", "%" . $this->text_filter . "%") . " " .
                 "OR " . $ilDB->like("usr_data.second_email", "text", "%" . $this->text_filter . "%") . " " .
                 "OR " . $ilDB->like("usr_data.email", "text", "%" . $this->text_filter . "%") . ") ";
-            $query.= $add;
-            $count_query.= $add;
+            $query .= $add;
+            $count_query .= $add;
             $where = " AND";
         }
-        
-        if ($this->activation != "") {		// activation
+
+        if ($this->activation != "") {        // activation
             if ($this->activation == "inactive") {
                 $add = $where . " usr_data.active = " . $ilDB->quote(0, "integer") . " ";
             } else {
                 $add = $where . " usr_data.active = " . $ilDB->quote(1, "integer") . " ";
             }
-            $query.= $add;
-            $count_query.= $add;
+            $query .= $add;
+            $count_query .= $add;
             $where = " AND";
         }
 
-        if ($this->last_login instanceof ilDateTime) {	// last login
+        if ($this->last_login instanceof ilDateTime) {    // last login
             if (ilDateTime::_before($this->last_login, new ilDateTime(time(), IL_CAL_UNIX), IL_CAL_DAY)) {
                 $add = $where . " usr_data.last_login < " .
                     $ilDB->quote($this->last_login->get(IL_CAL_DATETIME), "timestamp");
-                $query.= $add;
-                $count_query.= $add;
+                $query .= $add;
+                $count_query .= $add;
                 $where = " AND";
             }
         }
-        if ($this->limited_access) {		// limited access
+        if ($this->limited_access) {        // limited access
             $add = $where . " usr_data.time_limit_unlimited= " . $ilDB->quote(0, "integer");
-            $query.= $add;
-            $count_query.= $add;
+            $query .= $add;
+            $count_query .= $add;
             $where = " AND";
         }
 
@@ -415,11 +418,20 @@ class ilUserQuery
                 } else {
                     $add = $where . " ud_" . $udf_id . ".value = " . $ilDB->quote($f, "text");
                 }
-                $query.= $add;
-                $count_query.= $add;
+                $query .= $add;
+                $count_query .= $add;
                 $where = " AND";
             }
         }
+
+        // cdpatch start
+        if ($this->company_id > 0) {
+            $add = $where . " company_id = " . $ilDB->quote($this->company_id, "integer");
+            $query .= $add;
+            $count_query .= $add;
+            $where = " AND";
+        }
+        // cdpatch end
 
         if ($this->has_access) { //user is limited but has access
             $unlimited = "time_limit_unlimited = " . $ilDB->quote(1, 'integer');
@@ -544,7 +556,6 @@ class ilUserQuery
         if (sizeof($multi_fields)) {
             $usr_ids = array();
         }
-        
         // set query
         $set = $ilDB->query($query);
         $result = array();
@@ -578,6 +589,7 @@ class ilUserQuery
      * Get data for user administration list.
      * @deprecated
      */
+    // cdpatch: added company id
     public static function getUserListData(
         $a_order_field,
         $a_order_dir,
@@ -595,6 +607,7 @@ class ilUserQuery
         $a_user_filter = null,
         $a_first_letter = "",
         $a_authentication_filter = null
+        , $a_company_id = 0
     ) {
         $query = new ilUserQuery();
         $query->setOrderField($a_order_field);
@@ -612,7 +625,13 @@ class ilUserQuery
         $query->setAdditionalFields($a_additional_fields);
         $query->setUserFilter($a_user_filter);
         $query->setFirstLetterLastname($a_first_letter);
+
         $query->setAuthenticationFilter($a_authentication_filter);
+
+        // cdpatch start
+        $query->company_id = $a_company_id;
+        // cdpatch end
+
         return $query->query();
     }
 }

@@ -64,6 +64,16 @@ class ilMembershipGUI
         $this->ctrl = $GLOBALS['DIC']->ctrl();
         $this->logger = $DIC->logger()->mmbr();
         $this->access = $GLOBALS['DIC']->access();
+
+        // cdpatch start
+        global $ilPluginAdmin;
+        $pl_names = $ilPluginAdmin->getActivePluginsForSlot(IL_COMP_SERVICE, "UIComponent", "uihk");
+        foreach ($pl_names as $pl) {
+            if ($pl == "CD") {
+                $this->cd_plugin = ilPluginAdmin::getPluginObject(IL_COMP_SERVICE, "UIComponent", "uihk", $pl);
+            }
+        }
+        // cdpatch end
     }
     
     /**
@@ -847,7 +857,14 @@ class ilMembershipGUI
         global $DIC;
 
         $ilToolbar = $DIC['ilToolbar'];
-        
+
+        // cdpatch start
+        if (!$GLOBALS['ilAccess']->checkAccess('write', '', $this->getParentObject()->getRefId())) {
+            return;
+        }
+        // cdpatch end
+
+
         if ($this->canAddOrSearchUsers()) {
             include_once './Services/Search/classes/class.ilRepositorySearchGUI.php';
             ilRepositorySearchGUI::fillAutoCompleteToolbar(
@@ -882,7 +899,14 @@ class ilMembershipGUI
             $this->lng->txt($this->getParentObject()->getType() . "_print_list"),
             $this->ctrl->getLinkTarget($this, 'printMembers')
         );
-        
+
+        // cdpatch start
+        if (is_object($this->cd_plugin)) {
+            $this->cd_plugin->modifyCourseToolbar($ilToolbar);
+        }
+        // cdpatch end
+
+
         $this->showMailToMemberToolbarButton($ilToolbar, 'participants', false);
     }
     
@@ -1056,6 +1080,8 @@ class ilMembershipGUI
             );
 
             // show group overview
+            // cdpatch start
+            /*
             if ($this instanceof ilCourseMembershipGUI) {
                 $tabs->addSubTabTarget(
                     "crs_members_groups",
@@ -1064,6 +1090,8 @@ class ilMembershipGUI
                     "ilCourseParticipantsGroupsGUI"
                 );
             }
+            */
+            // cdpatch end
             
             $childs = (array) $GLOBALS['DIC']['tree']->getChildsByType($this->getParentObject()->getRefId(), 'sess');
             if (count($childs)) {
@@ -1075,12 +1103,16 @@ class ilMembershipGUI
                 );
             }
 
+            // cdpatch start
+            /*
             $tabs->addSubTabTarget(
                 $this->getParentObject()->getType() . '_members_gallery',
                 $this->ctrl->getLinkTargetByClass(array(get_class($this),'ilUsersGalleryGUI')),
                 'view',
                 'ilUsersGalleryGUI'
             );
+            */
+            // cdpatch end
         } elseif ($this->getParentObject()->getShowMembers()) {
             // gallery
             $tabs->addSubTabTarget(

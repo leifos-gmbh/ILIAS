@@ -33,9 +33,11 @@ class ilCopyWizardOptions
 {
 	private static $instances = null;
 	
+    const COPY_WIZARD_UNDEFINED = 0;
 	const COPY_WIZARD_OMIT = 1;
 	const COPY_WIZARD_COPY = 2;
 	const COPY_WIZARD_LINK = 3;
+    const COPY_WIZARD_LINK_TO_TARGET = 4;
 	
 	const OWNER_KEY = -3;
 	const DISABLE_SOAP = -4;
@@ -239,6 +241,18 @@ class ilCopyWizardOptions
 	 }
 	
 	/**
+     * @return array|mixed
+     */
+    public function getRootNode()
+    {
+        $options = $this->getOptions(self::ROOT_NODE);
+        if (!is_array($options) || !array_key_exists(0, $options)) {
+            return null;
+        }
+        return (int) $options[0];
+    }
+    
+    /**
 	 * Disable soap calls. Recursive call of ilClone and ilCloneDependencies
 	 *
 	 * @access public

@@ -147,6 +147,11 @@ cd#:#export_excel#:#Excel-Export
 cd#:#cd_enter_valid_date_format#:#Bitte tragen Sie gültige Daten im Format dd.mm.yyyy ein.
 cd#:#cd_reg_trainer#:#Als Dozent/in registrieren
 cd#:#cd_notes#:#Interne Bewertung
+cd#:#cd_edit#:#Editieren
+cd#:#cd_activate#:#<span style="color:green;">Aktivieren</span>
+cd#:#cd_deactivate#:#<span style="color:darkred;">Deaktivieren</span>
+cd#:#cd_trainer_yes#:#<span style="color:green;">Ja</span>
+cd#:#cd_trainer_no#:#<span style="color:red;">Nein</span>
 cd#:#cd_other#:#Weitere Notizen
 cd#:#cd_qm_evaluation#:#QM Bewertung
 cd#:#cd_entry_date#:#Einstellungsdatum
@@ -170,3 +175,19 @@ cd#:#pdf_export_short#:#Kurz-Profil (PDF)
 cd#:#pdf_export_full#:#Profil (PDF)
 cd#:#daf_certificate#:#DAF-Zertifikat
 cd#:#tm_apps#:#Apps
+cd#:#cd_current_trainer#:#Aktuelle Trainer
+cd#:#cd_former_trainer#:#Ehemalige Trainer
+cd#:#cd_make_current_trainer#:#<< Aktueller Trainer
+cd#:#cd_make_former_trainer#:#>> Ehemaliger Trainer
+cd#:#cd_sure_former_trainer#:#Soll der Trainer wirklich ein ehemaliger Trainer werden?
+cd#:#cd_sure_current_trainer#:#Soll der Trainer wirklich wieder ein aktueller Trainer werden?
+cd#:#cd_confirm#:#Bestätigen
+cd#:#cd_assign_course#:#Kurs zuordnen
+cd#:#cd_select_course#:#Bitte wählen Sie den Kurs aus.
+cd#:#cd_really_assign_as_trainer#:#Sollen die folgenden Benutzer dem Kurs wirklich als Trainer zugeordnet werden?
+cd#:#cd_really_assign_as_member#:#Sollen die folgenden Benutzer dem Kurs wirklich als Mitglieder zugeordnet werden?
+cd#:#cd_assign#:#Zuordnen
+cd#:#cd_registration#:#Registrierung
+cd#:#cd_profile_changes#:#Profiländerungen
+common#:#form_date_duration_start#:#Von
+common#:#form_date_duration_end#:#Bis

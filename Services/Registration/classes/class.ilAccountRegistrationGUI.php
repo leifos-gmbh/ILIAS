@@ -851,6 +851,11 @@ class ilAccountRegistrationGUI
         // cdpatch start
         if ($this->mode == "trainer") {
             $this->tpl->setVariable("TXT_PAGEHEADLINE", $lng->txt("cd_reg_trainer"));
+			if (!$this->userObj->getActive())
+			{
+				$this->tpl->setVariable('TXT_REGISTERED', $lng->txt('txt_submitted'));
+				return;
+			}
         }
         // cdpatch end
 

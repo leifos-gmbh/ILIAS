@@ -930,8 +930,8 @@ class cdCompanyGUI
 			$ilCtrl->getLinkTarget($this, "listUsers"));
 
 		// needs analysis
-		$this->pl->includeClass("class.cdNeedsAnalysisGUI.php");
-		$na_gui = new cdNeedsAnalysisGUI($this->pl);
+		$this->pl->includeClass("class.cdNeedsAnalysisFactory.php");
+		$na_gui = cdNeedsAnalysisFactory::getGUIInstance($this->pl);
 		$html = $na_gui->getPresentationView($this->user_id);
 
 		// self evaluation

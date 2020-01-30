@@ -56,6 +56,12 @@ class ilCDConfigGUI extends ilPluginConfigGUI
 		$ni->setSize(8);
 		$ni->setValue($ilSetting->get("cd_mat_ref_id"));
 		$this->form->addItem($ni);
+
+		// learning studio href
+		$ti = new ilTextInputGUI($this->getPluginObject()->txt("learning_studio"), "learning_studio");
+		$ti->setValue($ilSetting->get("cd_learn_studio"));
+		$this->form->addItem($ti);
+
 	
 		$this->form->addCommandButton("save", $lng->txt("save"));
 	                
@@ -75,6 +81,7 @@ class ilCDConfigGUI extends ilPluginConfigGUI
 		if ($this->form->checkInput())
 		{
 			$ilSetting->set("cd_mat_ref_id", (int) $_POST["material_ref_id"]);
+			$ilSetting->set("cd_learn_studio", $_POST["learning_studio"]);
 			ilUtil::sendSuccess($lng->txt("msg_obj_modified"), true);
 			$ilCtrl->redirect($this, "configure");
 		}

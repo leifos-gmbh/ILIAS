@@ -144,7 +144,7 @@ class cdDesktopGUI
 	 */
 	function setTabs($a_active)
 	{
-		global $ilTabs, $ilCtrl, $lng, $ilUser;
+		global $ilTabs, $ilCtrl, $lng, $ilUser, $ilSetting;
 		
 		if (count($this->courses) > 0)
 		{
@@ -184,6 +184,13 @@ class cdDesktopGUI
 			$ilTabs->addTab("addon",
 				$this->pl->txt("tab_addon"),
 				$ilCtrl->getLinkTargetByClass(array("cddesktopgui", "cdaddongui"), ""));
+		}
+
+		if ($ilSetting->get("cd_learn_studio") != "")
+		{
+			$ilTabs->addTab("learning_studio",
+				$this->pl->txt("learning_studio"),
+				$ilCtrl->getLinkTarget($this, "showLearningStudio"));
 		}
 
 		$ilTabs->activateTab($a_active);
@@ -351,6 +358,28 @@ class cdDesktopGUI
 		
 		$tpl->setContent($t->getHTML());
 	}
+
+	/**
+	 * Show learning studio
+	 *
+	 * @param
+	 * @return
+	 */
+	protected function showLearningStudio()
+	{
+		global $ilSetting, $tpl;
+
+		$this->setTabs("learning_studio");
+
+		if ($ilSetting->get("cd_learn_studio") != "")
+		{
+			$ls_tpl = $this->pl->getTemplate("tpl.learn_studio.html");
+			$ls_tpl->setVariable("SRC", $ilSetting->get("cd_learn_studio"));
+			$ls_tpl->setVariable("TXT", $this->pl->txt("open_learning_studio"));
+			$tpl->setContent($ls_tpl->get());
+		}
+	}
+
 	
 }
 

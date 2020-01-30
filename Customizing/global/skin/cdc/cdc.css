@@ -8695,7 +8695,7 @@ img.spacer {
 
 div#agreement {
     width: 100%;
-    height: 375px;
+    min-height: 15px;
     overflow: auto;
     overflow-x: hidden;
 }
@@ -15435,3 +15435,14 @@ table.mceToolbar td {
 .cd-active-trainer {background: #ddd;padding: .2em;text-align: center;	}
 
 .cd-name-trainer {font-weight: bold;}
+
+
+/*#ilMMSearch .dropdown-toggle, #ilMMSearch li,#ilTopBarNav > li > a{
+	background: rgba(236,128,0,1);
+}
+
+#ilMMSearch .dropdown-toggle:hover, #ilMMSearch li:hover,#ilTopBarNav > li > a:hover{
+	background: rgba(236,128,0,.8);
+}	*/
+
+

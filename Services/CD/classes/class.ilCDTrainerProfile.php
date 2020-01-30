@@ -561,7 +561,7 @@ class ilCDTrainerProfile extends ilUserProfile
 				include_once("./Services/CD/classes/class.ilLangSkillInputGUI.php");
 				$si = new ilLangSkillInputGUI($lng->txt($lv), "usr_".$f);
 				$si->setMulti(true);
-				$si->setRequired(true);
+				//$si->setRequired(true);
 				$a_form->addItem($si);
 				break;
 

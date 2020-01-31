@@ -165,7 +165,9 @@ class ilLMPresentationGUI
         $a_export_format = "",
         $a_all_languages = false,
         $a_export_dir = "",
-        bool $claim_repo_context = true
+        bool $claim_repo_context = true,
+        $query_params = null,
+        $embed_mode = false
     ) {
         global $DIC;
 
@@ -201,7 +203,10 @@ class ilLMPresentationGUI
 
         // note: using $DIC->http()->request()->getQueryParams() here will
         // fail, since the goto magic currently relies on setting $_GET
-        $this->initByRequest($_GET);
+        if (!is_array($query_params)) {
+            $query_params = $_GET;
+        }
+        $this->initByRequest($query_params, $embed_mode);
 
         // check, if learning module is online
         if (!$rbacsystem->checkAccess("write", $this->requested_ref_id)) {
@@ -224,14 +229,16 @@ class ilLMPresentationGUI
      *
      * @param array $query_params request query params
      */
-    public function initByRequest($query_params)
+    public function initByRequest($query_params, bool $embed_mode = false)
     {
         $this->service = new ilLMPresentationService(
             $this->user,
             $query_params,
             $this->offline,
             $this->export_all_languages,
-            $this->export_format
+            $this->export_format,
+            null,
+            $embed_mode
         );
 
         $request = $this->service->getRequest();
@@ -257,6 +264,15 @@ class ilLMPresentationGUI
 
         $this->lm_tree = $this->service->getLMTree();
         $this->focus_id = $this->service->getPresentationStatus()->getFocusId();
+    }
+
+    /**
+     * Get service
+     * @return ilLMPresentationService
+     */
+    public function getService(): \ilLMPresentationService
+    {
+        return $this->service;
     }
 
     /**
@@ -698,6 +714,7 @@ class ilLMPresentationGUI
 
         // @todo 6.0
         //$this->tpl->fillBodyClass();
+
 
         if ($doShow) {
             // (horrible) workaround for preventing template engine
@@ -1429,7 +1446,7 @@ class ilLMPresentationGUI
      * @param int $a_page_id header / footer page id
      * @return string
      */
-    public function getContent()
+    public function getContent($skip_nav = false)
     {
         $this->fill_on_load_code = true;
         $this->setContentStyles();
@@ -1451,8 +1468,10 @@ class ilLMPresentationGUI
         );
 
 
-        $tpl->setVariable("TOP_NAVIGATION", $navigation_renderer->renderTop());
-        $tpl->setVariable("BOTTOM_NAVIGATION", $navigation_renderer->renderBottom());
+        if (!$skip_nav) {
+            $tpl->setVariable("TOP_NAVIGATION", $navigation_renderer->renderTop());
+            $tpl->setVariable("BOTTOM_NAVIGATION", $navigation_renderer->renderBottom());
+        }
         $tpl->setVariable("PAGE_CONTENT", $this->getPageContent());
 
         return $tpl->get();
@@ -1556,7 +1575,7 @@ class ilLMPresentationGUI
      * @param
      * @return
      */
-    public function basicPageGuiInit($a_page_gui)
+    public function basicPageGuiInit(\ilLMPageGUI $a_page_gui)
     {
         $a_page_gui->setStyleId(ilObjStyleSheet::getEffectiveContentStyleId(
             $this->lm->getStyleSheetId(),
@@ -1578,6 +1597,7 @@ class ilLMPresentationGUI
             $this->ctrl->setParameter($this, "obj_id", $this->requested_obj_id);
         }
         $a_page_gui->setFullscreenLink($this->linker->getLink("fullscreen"));
+        $a_page_gui->setSourcecodeDownloadScript($this->linker->getLink("download_paragraph"));
     }
 
 
@@ -3036,4 +3056,22 @@ class ilLMPresentationGUI
         );
         $navigation_renderer->render();
     }
+
+    /**
+     * Get HTML (called by kios mode through ilCtrl)
+     * @param $pars
+     * @return string|void
+     * @throws ilLMPresentationException
+     */
+    public function getHTML($pars)
+    {
+        switch ($pars["cmd"]) {
+            case "layout":
+                $content = $this->getContent(true);
+                $content.= $this->ilLMNotes();
+                return $content;
+        }
+        return "";
+    }
+
 }

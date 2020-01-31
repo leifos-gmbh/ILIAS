@@ -17,6 +17,11 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
     protected $offline;
 
     /**
+     * @var bool
+     */
+    protected $embed_mode;
+
+    /**
      * Constructor
      */
     public function __construct(
@@ -30,7 +35,8 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
         bool $offline,
         string $export_format,
         bool $export_all_languages,
-        ilCtrl $ctrl = null
+        ilCtrl $ctrl = null,
+        $embed_mode = false
     ) {
         global $DIC;
 
@@ -48,6 +54,7 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
         $this->requested_ref_id = $ref_id;
         $this->offline = $offline;
         $this->export_format = $export_format;
+        $this->embed_mode = $embed_mode;
     }
 
     /**
@@ -98,8 +105,22 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
             }
         }
 
-        // handle online links
-        if (!$this->offline) {
+        // handle kiosk mode links
+        if ($this->embed_mode) {
+            $base = $this->ctrl->getLinkTargetByClass([
+                \ilLMPresentationGUI::class, \ilLMPageGUI::class
+            ]);
+            switch($a_cmd) {
+                case "downloadFile":
+                    return $base."&cmd=downloadFile";
+                case "download_paragraph":
+                    return $base."&cmd=download_paragraph";
+                case "fullscreen":
+                    return $base."&cmd=displayMediaFullscreen";
+            }
+            return "";
+            // handle online links
+        } else if (!$this->offline) {
             if ($this->from_page == "") {
                 // added if due to #23216 (from page has been set in lots of usual navigation links)
                 if (!in_array($a_frame, array("", "_blank"))) {
@@ -216,7 +237,6 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
                     break;
             }
         }
-
         $this->ctrl->clearParametersByClass(self::TARGET_GUI);
 
         return $link;

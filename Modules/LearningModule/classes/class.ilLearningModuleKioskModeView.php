@@ -92,6 +92,7 @@ class ilLearningModuleKioskModeView extends ilKioskModeView
             case "layout":
                 if ($param > 0) {
                     $this->current_page_id = $param;
+                    $state->withValueFor("current_page", (string) $this->current_page_id);
                 }
                 break;
             case self::CMD_TOGGLE_LEARNING_PROGRESS:
@@ -107,18 +108,19 @@ class ilLearningModuleKioskModeView extends ilKioskModeView
     /**
      * Init learning module presentation service
      */
-    protected function initLMService()
+    protected function initLMService($current_page = "")
     {
         if (is_object($this->lm_pres)) {
             return;
         }
+        $current_page = $this->current_page_id;
         $this->lm_pres = new ilLMPresentationGUI(
             "",
             false,
             "",
             false,
             ["ref_id" => $this->lm->getRefId(),
-             "obj_id" => $this->current_page_id],
+             "obj_id" => (int) $current_page],
             true
         );
 
@@ -136,9 +138,10 @@ class ilLearningModuleKioskModeView extends ilKioskModeView
     /**
      * @inheritDoc
      */
-    public function buildInitialState(State $empty_state) : State
+    public function buildInitialState(State $state) : State
     {
-        return $empty_state;
+        $state->withValueFor("current_page", "");
+        return $state;
     }
 
     /**
@@ -147,6 +150,9 @@ class ilLearningModuleKioskModeView extends ilKioskModeView
     public function buildControls(State $state, ControlBuilder $builder)
     {
         // this may be necessary if updateGet has not been processed
+
+        // THIS currently fails
+        //$this->initLMService($state->getValueFor("current_page"));
         $this->initLMService();
 
         $nav_stat = $this->lm_pres_service->getNavigationStatus();
@@ -180,7 +186,6 @@ class ilLearningModuleKioskModeView extends ilKioskModeView
             if (!$isCompleted) {
                 $learningProgressToggleCtrlLabel = $this->lng->txt('lm_btn_lp_toggle_state_not_completed');
             }
-
             $builder->generic(
                 $learningProgressToggleCtrlLabel,
                 self::CMD_TOGGLE_LEARNING_PROGRESS,

@@ -33,7 +33,6 @@ class ilLMGSToolProvider extends AbstractDynamicToolProvider
     public function getToolsForContextStack(CalledContexts $called_contexts) : array
     {
         global $DIC;
-
         $lng = $DIC->language();
         $lng->loadLanguageModule("content");
 
@@ -47,7 +46,6 @@ class ilLMGSToolProvider extends AbstractDynamicToolProvider
                 return $this->dic->ui()->factory()->legacy($content);
             };
             $ref_id = $called_contexts->current()->getReferenceId()->toInt();
-
             $tools[] = $this->getTocTool($additional_data);
 
             $title = $lng->txt("obj_glo");
@@ -80,7 +78,6 @@ class ilLMGSToolProvider extends AbstractDynamicToolProvider
                 ->withSymbol($icon)
                 ->withPosition(13);
         }
-
         return $tools;
     }
 

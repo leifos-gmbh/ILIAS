@@ -193,163 +193,103 @@ class ilCDUIHookGUI extends ilUIHookPluginGUI
 		return array("mode" => ilUIHookPluginGUI::KEEP, "html" => "");
 	}
 
-	/**
-	 * Replace main menu list entries
-	 *
-	 * @param
-	 * @return
-	 */
-	function replaceMainMenuListEntries($a_par)
-	{
-		global $ilCtrl, $lng, $tree, $ilUser, $ilSetting, $ilAccess;
+    /**
+     * Get custom entry
+     * @param
+     * @return
+     */
+    protected function getCustomEntry($title, $link)
+    {
+        global $DIC;
+        $ui = $DIC->ui();
+        return $ui->factory()->legacy('<li><a href="'.$link.'" class="dropdown-toggle">'.$title.'</a></li>');
+	}
 
-		$tpl = $this->getPluginObject()->getTemplate("tpl.cd_main_menu_list_entries.html");
+    /**
+     * Replace main menu list entries
+     *
+     * @param
+     * @return
+     */
+    function replaceMainMenuListEntries($a_par)
+    {
+        global $DIC;
 
-		if ($_GET["baseClass"] == "ilUIHookPluginGUI")
-		{
-			$a_par["main_menu_gui"]->setActive("cd_desktop");
-			if (strtolower($ilCtrl->getCmdClass()) == "cdcompanygui")
-			{
-				$a_par["main_menu_gui"]->setActive("companies");
-			}
-		}
+        $lng = $DIC->language();
+        $setting = $DIC->settings();
+        $access = $DIC->access();
+        $tree = $DIC->repositoryTree();
 
-		// standard entries
-		$a_par["main_menu_gui"]->renderMainMenuListEntries($tpl, false);
+        $top_items = (new ilMMItemRepository())->getStackedTopItemsForPresentation();
+        $tpl = new ilTemplate("tpl.main_menu_legacy.html", true, true, 'Services/MainMenu');
+        /**
+         * @var $top_item \ILIAS\GlobalScreen\Scope\MainMenu\Factory\isItem|\ILIAS\GlobalScreen\Scope\MainMenu\Factory\isTopItem
+         */
+        $components = [];
 
-		// cd desktop
-		$tpl->setCurrentBlock("cd_desktop");
-		if ($_GET["baseClass"] == "ilUIHookPluginGUI" && strtolower($ilCtrl->getCmdClass()) != "cdcompanygui"
-			&& strtolower($ilCtrl->getCmdClass()) != "ilcdtrainergui")
-		{
-			$tpl->setVariable("MM_CLASS", "MMActive");
-		}
-		else
-		{
-			$tpl->setVariable("MM_CLASS", "MMInactive");
-		}
-		$tpl->setVariable("TXT_CD_DESKTOP", $lng->txt("personal_desktop"));
-		$tpl->setVariable("SCRIPT_CD_DESKTOP",
-			"ilias.php?baseClass=ilUIHookPluginGUI&amp;cmd=setCmdClass&amp;cmdClass=ilcduihookgui&amp;forwardTo=cdDesktopGUI");
-		$tpl->parseCurrentBlock();
+        // cd desktop
+        $components[] = $this->getCustomEntry($lng->txt("personal_desktop"),
+            "ilias.php?baseClass=ilUIHookPluginGUI&cmd=setCmdClass&cmdClass=ilcduihookgui&forwardTo=cdDesktopGUI");
 
-		// material
-		$in_mat = false;
-		if ($ilSetting->get("cd_mat_ref_id") > 0 && $ilAccess->checkAccess("read", "", $ilSetting->get("cd_mat_ref_id")))
-		{
-			if ($_GET["ref_id"] > 0)
-			{
-				$path = $tree->getPathId((int) $_GET["ref_id"]);
-				if (in_array($ilSetting->get("cd_mat_ref_id"), $path))
-				{
-					$in_mat = true;
-				}
-			}
-			include_once('Services/Link/classes/class.ilLink.php');
-			$tpl->setCurrentBlock("cd_material");
-			if ($a_par["main_menu_gui"]->active == "" && $in_mat)
-			{
-				$tpl->setVariable("MM_CLASS", "MMActive");
-			}
-			else
-			{
-				$tpl->setVariable("MM_CLASS", "MMInactive");
-			}
-			$tpl->setVariable("TXT_CD_MATERIAL",
-				$this->getPluginObject()->txt("material"));
-			$tpl->setVariable("SCRIPT_CD_MATERIAL",
-				ilLink::_getStaticLink($ilSetting->get("cd_mat_ref_id"),'cat',true));
-			$tpl->parseCurrentBlock();
-		}
+        // material
+        if ($setting->get("cd_mat_ref_id") > 0 && $access->checkAccess("read", "", $setting->get("cd_mat_ref_id")))
+        {
+            $components[] = $this->getCustomEntry($this->getPluginObject()->txt("material"),
+                ilLink::_getStaticLink($setting->get("cd_mat_ref_id"),'cat',true));
+        }
 
-		// cd repository
-		include_once("./Services/CD/classes/class.ilCDPermWrapper.php");
-		$user_admin_centers = ilCDPermWrapper::getAdminCenters();
-		if ($ilAccess->checkAccess("visible", "", ROOT_FOLDER_ID)
-			&& is_array($user_admin_centers) && count($user_admin_centers) > 0)
-		{
-			include_once('Services/Link/classes/class.ilLink.php');
-			$nd = $tree->getNodeData(ROOT_FOLDER_ID);
-			$title = $nd["title"];
-			if ($title == "ILIAS")
-			{
-				$title = $lng->txt("repository");
-			}
-			$tpl->setCurrentBlock("cd_repository");
-			if ($a_par["main_menu_gui"]->active == "" && !$in_mat)
-			{
-				$tpl->setVariable("MM_CLASS", "MMActive");
-			}
-			else
-			{
-				$tpl->setVariable("MM_CLASS", "MMInactive");
-			}
-			$tpl->setVariable("TXT_CD_REPOSITORY", $title);
-			$tpl->setVariable("SCRIPT_CD_REPOSITORY",
-				ilLink::_getStaticLink(1,'root',true));
-			$tpl->parseCurrentBlock();
-		}
+        // cd repository
+        include_once("./Services/CD/classes/class.ilCDPermWrapper.php");
+        $user_admin_centers = ilCDPermWrapper::getAdminCenters();
+        if (($access->checkAccess("visible", "", ROOT_FOLDER_ID)
+            && is_array($user_admin_centers) && count($user_admin_centers) > 0) ||
+            ilCDPermWrapper::isAdmin())
+        {
+            $nd = $tree->getNodeData(ROOT_FOLDER_ID);
+            $title = $nd["title"];
+            if ($title == "ILIAS")
+            {
+                $title = $lng->txt("repository");
+            }
+            $components[] = $this->getCustomEntry($title,
+                ilLink::_getStaticLink(1,'root',true));
+        }
 
-		// cd companies
-		if (is_array($user_admin_centers) && count($user_admin_centers) > 0)
-		{
-			$tpl->setCurrentBlock("cd_companies");
-			if (strtolower($ilCtrl->getCmdClass()) == "cdcompanygui")
-			{
-				$tpl->setVariable("MM_CLASS", "MMActive");
-			}
-			else
-			{
-				$tpl->setVariable("MM_CLASS", "MMInactive");
-			}
-			$tpl->setVariable("TXT_COMPANIES", $this->getPluginObject()->txt("companies"));
-			$tpl->setVariable("SCRIPT_COMPANIES",
-				"ilias.php?baseClass=ilUIHookPluginGUI&amp;cmd=setCmdClass&amp;cmdClass=ilcduihookgui&amp;forwardTo=cdCompanyGUI");
-			$tpl->parseCurrentBlock();
-		}
-		else
-		{
-			// participants list for kunde-per roles
-			if (ilCDPermWrapper::isPerRole())
-			{
-				$tpl->setCurrentBlock("cd_participants");
-				if (strtolower($ilCtrl->getCmdClass()) == "cdcompanygui")
-				{
-					$tpl->setVariable("MM_CLASS", "MMActive");
-				}
-				else
-				{
-					$tpl->setVariable("MM_CLASS", "MMInactive");
-				}
-				$tpl->setVariable("TXT_PARTICIPANTS", $this->getPluginObject()->txt("participants"));
-				$tpl->setVariable("SCRIPT_PARTICIPANTS",
-					"ilias.php?baseClass=ilUIHookPluginGUI&amp;cmd=setCmdClass&amp;cmdClass=ilcduihookgui&amp;forwardTo=cdCompanyGUI");
-				$tpl->parseCurrentBlock();
-			}
-		}
+        // cd companies
+        if (is_array($user_admin_centers) && count($user_admin_centers) > 0)
+        {
+            $components[] = $this->getCustomEntry($this->getPluginObject()->txt("companies"),
+                "ilias.php?baseClass=ilUIHookPluginGUI&cmd=setCmdClass&cmdClass=ilcduihookgui&forwardTo=cdCompanyGUI");
+        }
+        else
+        {
+            // participants list for kunde-per roles
+            if (ilCDPermWrapper::isPerRole())
+            {
+                $components[] = $this->getCustomEntry($this->getPluginObject()->txt("participants"),
+                    "ilias.php?baseClass=ilUIHookPluginGUI&cmd=setCmdClass&cmdClass=ilcduihookgui&forwardTo=cdCompanyGUI");
+            }
+        }
 
-		// trainer
-		include_once("./Services/CD/classes/class.ilCDPermWrapper.php");
-		$user_admin_centers = ilCDPermWrapper::getAdminCenters();
-		if (is_array($user_admin_centers) && count($user_admin_centers) > 0)
-		{
-			$tpl->setCurrentBlock("cd_trainers");
-			if (strtolower($ilCtrl->getCmdClass()) == "ilcdtrainergui")
-			{
-				$tpl->setVariable("MM_CLASS", "MMActive");
-			}
-			else
-			{
-				$tpl->setVariable("MM_CLASS", "MMInactive");
-			}
-			$tpl->setVariable("TXT_TRAINERS", $this->getPluginObject()->txt("trainers"));
-			$tpl->setVariable("SCRIPT_TRAINERS",
-				"ilias.php?baseClass=ilUIHookPluginGUI&amp;cmd=setCmdClass&amp;cmdClass=ilcduihookgui&amp;forwardTo=ilCDTrainerGUI");
-			$tpl->parseCurrentBlock();
-		}
+        // trainer
+        $user_admin_centers = ilCDPermWrapper::getAdminCenters();
+        if (is_array($user_admin_centers) && count($user_admin_centers) > 0)
+        {
+            $components[] = $this->getCustomEntry($this->getPluginObject()->txt("trainers"),
+                "ilias.php?baseClass=ilUIHookPluginGUI&cmd=setCmdClass&cmdClass=ilcduihookgui&forwardTo=ilCDTrainerGUI");
+        }
 
-		$html = $tpl->get();
-		return array("mode" => ilUIHookPluginGUI::REPLACE, "html" => $html);
+        // administration
+        reset($top_items);
+        foreach ($top_items as $top_item) {
+            if ($top_item->getTitle() == $lng->txt("administration")) {
+                $components[] = $top_item->getTypeInformation()->getRenderer()->getComponentForItem($top_item);
+            }
+        }
+
+        $tpl->setVariable("ENTRIES", $DIC->ui()->renderer()->render($components));
+
+        return array("mode" => ilUIHookPluginGUI::REPLACE, "html" => $tpl->get());
 	}
 
 

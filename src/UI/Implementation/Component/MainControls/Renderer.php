@@ -8,6 +8,7 @@ use ILIAS\UI\Implementation\Render\AbstractComponentRenderer;
 use ILIAS\UI\Renderer as RendererInterface;
 use ILIAS\UI\Component;
 use ILIAS\UI\Component\Signal;
+use ILIAS\UI\Component\Button\Button;
 use ILIAS\UI\Component\MainControls\MainBar;
 use ILIAS\UI\Component\MainControls\MetaBar;
 use ILIAS\UI\Component\MainControls\Slate\Slate;
@@ -121,6 +122,7 @@ class Renderer extends AbstractComponentRenderer
                 $trigger_signal = $component->getTriggerSignal($mb_id, $component::ENTRY_ACTION_TRIGGER);
                 $this->trigger_signals[] = $trigger_signal;
                 $button = $f->button()->bulky($entry->getSymbol(), $entry->getName(), '#')
+                    ->withAriaRole(Button::MENUITEM)
                     ->withOnClick($trigger_signal)
                     ->withAdditionalOnLoadCode(
                         function ($id) use ($js, $mb_id, $k, $is_tool) {
@@ -150,6 +152,8 @@ class Renderer extends AbstractComponentRenderer
     {
         $f = $this->getUIFactory();
         $tpl = $this->getTemplate("tpl.mainbar.html", true, true);
+
+        $tpl->setVariable("ARIA_LABEL", $this->txt('mainbar_aria_label'));
 
         //add "more"-slate
         $more_slate = $f->maincontrols()->slate()->combined(
@@ -242,6 +246,8 @@ class Renderer extends AbstractComponentRenderer
 				";
             }
         );
+        $tpl->setVariable('ARIA_LABEL', $this->txt('metabar_aria_label'));
+
         $id = $this->bindJavaScript($component);
         $tpl->setVariable('ID', $id);
         return $tpl->get();
@@ -283,6 +289,13 @@ class Renderer extends AbstractComponentRenderer
                     ->withOnClick($entry_signal)
                     ->appendOnClick($secondary_signal)
                     ->withEngagedState($engaged);
+
+                if ($entry->getName() == "Search") {
+                    $button = $button->withAriaRole(Button::MENUITEM_SEARCH);
+                }
+                else {
+                    $button = $button->withAriaRole(Button::MENUITEM);
+                }
 
                 $slate = $entry;
             } else {

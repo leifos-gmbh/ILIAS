@@ -91,6 +91,15 @@ class Renderer extends AbstractComponentRenderer
         } else {
             $tpl->touchBlock("disabled");
         }
+        $aria_role = $component->getAriaRole();
+        if ($aria_role != null) {
+            $tpl->setCurrentBlock("with_aria_role");
+            $tpl->setVariable("ARIA_ROLE", $aria_role);
+            $tpl->parseCurrentBlock();
+        }
+        if ($aria_role == Button::MENUITEM || $aria_role == Button::MENUITEM_SEARCH) {
+            $tpl->touchBlock("with_aria_haspopup");
+        }
         $aria_label = $component->getAriaLabel();
         if ($aria_label != null) {
             $tpl->setCurrentBlock("with_aria_label");

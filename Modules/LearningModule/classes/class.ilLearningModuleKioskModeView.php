@@ -58,6 +58,9 @@ class ilLearningModuleKioskModeView extends ilKioskModeView
 
     protected $current_page_id = 0;
 
+    /** @var UI/Component[] */
+    protected $additional_content = [];
+
     /**
      * @inheritDoc
      */
@@ -146,7 +149,7 @@ class ilLearningModuleKioskModeView extends ilKioskModeView
     /**
      * @inheritDoc
      */
-    public function buildControls(State $state, ControlBuilder $builder)
+    public function buildControls(State $state, ControlBuilder $builder): ControlBuilder
     {
         // this may be necessary if updateGet has not been processed
 
@@ -166,13 +169,32 @@ class ilLearningModuleKioskModeView extends ilKioskModeView
             $builder->previous("layout", $prev_id);
         }
 
-        $this->builtLearningProgressToggleControl($builder);
+        $builder = $this->maybeBuildLearningProgressToggleControl($builder);
+
+        $builder = $this->addAdditionalMenuButtons($builder);
+
+        return $builder;
+    }
+
+    protected function addAdditionalMenuButtons(ControlBuilder $builder): ControlBuilder
+    {
+        $modal = $this->uiFactory->modal()->roundtrip(
+            'Some Modal',
+            $this->uiFactory->legacy('some modal')
+        );
+
+        $this->additional_content[] = $modal;
+        return $builder->genericWithSignal(
+            'open the modal',
+            $modal->getShowSignal()
+        );
+
     }
 
     /**
      * @param ControlBuilder $builder
      */
-    protected function builtLearningProgressToggleControl(ControlBuilder $builder)
+    protected function maybeBuildLearningProgressToggleControl(ControlBuilder $builder): ControlBuilder
     {
         $learningProgress = \ilObjectLP::getInstance($this->lm->getId());
         if ($learningProgress->getCurrentMode() == \ilLPObjSettings::LP_MODE_MANUAL) {
@@ -183,12 +205,13 @@ class ilLearningModuleKioskModeView extends ilKioskModeView
             if (!$isCompleted) {
                 $learningProgressToggleCtrlLabel = $this->lng->txt('lm_btn_lp_toggle_state_not_completed');
             }
-            $builder->generic(
+            $builder = $builder->generic(
                 $learningProgressToggleCtrlLabel,
                 self::CMD_TOGGLE_LEARNING_PROGRESS,
                 1
             );
         }
+        return $builder;
     }
 
     /**
@@ -233,6 +256,7 @@ class ilLearningModuleKioskModeView extends ilKioskModeView
     ) : Component {
         $this->ctrl->setParameterByClass("illmpresentationgui", 'ref_id', $this->lm->getRefId());
         $content = $this->ctrl->getHTML($this->lm_pres, ["cmd" => "layout"], ["illmpresentationgui"]);
+        $content .= $this->uiRenderer->render($this->additional_content);
         return $factory->legacy($content);
     }
 

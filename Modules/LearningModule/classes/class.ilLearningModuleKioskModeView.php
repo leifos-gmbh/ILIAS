@@ -92,7 +92,7 @@ class ilLearningModuleKioskModeView extends ilKioskModeView
             case "layout":
                 if ($param > 0) {
                     $this->current_page_id = $param;
-                    $state->withValueFor("current_page", (string) $this->current_page_id);
+                    $state = $state->withValueFor("current_page", (string) $this->current_page_id);
                 }
                 break;
             case self::CMD_TOGGLE_LEARNING_PROGRESS:
@@ -140,8 +140,7 @@ class ilLearningModuleKioskModeView extends ilKioskModeView
      */
     public function buildInitialState(State $state) : State
     {
-        $state->withValueFor("current_page", "");
-        return $state;
+        return $state->withValueFor("current_page", "");
     }
 
     /**
@@ -152,9 +151,7 @@ class ilLearningModuleKioskModeView extends ilKioskModeView
         // this may be necessary if updateGet has not been processed
 
         // THIS currently fails
-        //$this->initLMService($state->getValueFor("current_page"));
-        $this->initLMService();
-
+        $this->initLMService($state->getValueFor("current_page"));
         $nav_stat = $this->lm_pres_service->getNavigationStatus();
 
         // next

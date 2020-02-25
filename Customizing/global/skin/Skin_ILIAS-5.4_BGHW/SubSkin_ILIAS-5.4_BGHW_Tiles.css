@@ -17657,6 +17657,15 @@ div.ilTopMemberView {
   }
 }
 /*----------FOOTER----------*/
+/*----------FILE UPLOAD----------*/
+.ilFileUploadDropAlternative a.submit,
+.ilFileUploadDropAlternative a.submit:hover {
+  height: 120px;
+}
+.ilFileUploadDropAlternative a.submit,
+.ilFileUploadDropAlternative a.submit:hover {
+  line-height: 10px;
+}
 @media print {
   #mainspacekeeper > .row {
     background-color: white;
@@ -17781,6 +17790,7 @@ a.il_ContainerItemCommand:visited {
 }
 .il-card img {
   cursor: pointer;
+  background: #E5E5E5;
 }
 .il-card .il-card-repository-head > div.il-card-repository-dropdown > .dropdown > button {
   background-color: transparent !important;

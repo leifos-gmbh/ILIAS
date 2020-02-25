@@ -103,7 +103,7 @@ class ilLearningModuleKioskModeView extends ilKioskModeView
                 break;
         }
 
-        $this->initLMService();
+        $this->initLMService($this->current_page_id);
 
         return $state;
     }
@@ -111,12 +111,11 @@ class ilLearningModuleKioskModeView extends ilKioskModeView
     /**
      * Init learning module presentation service
      */
-    protected function initLMService($current_page = "")
+    protected function initLMService($current_page)
     {
         if (is_object($this->lm_pres)) {
             return;
         }
-        $current_page = $this->current_page_id;
         $this->lm_pres = new ilLMPresentationGUI(
             "",
             false,

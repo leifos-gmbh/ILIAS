@@ -146,10 +146,10 @@ class ilLMGSToolProvider extends AbstractDynamicToolProvider
         // get params via additional_data, set query params
         $params = $additional_data->get(self::LM_QUERY_PARAMS);
         $offline = $additional_data->is(self::LM_OFFLINE, true);
+
         if (!is_array($params)) {
             $params = $_GET;
         }
-
         try {
             $service = new ilLMPresentationService($DIC->user(), $params, $offline);
             $renderer = new ilLMSlateTocRendererGUI($service);

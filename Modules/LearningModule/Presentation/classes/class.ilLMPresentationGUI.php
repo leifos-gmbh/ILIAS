@@ -219,6 +219,15 @@ class ilLMPresentationGUI
             $DIC->globalScreen()->tool()->context()->claim()->repository();
         }
         $DIC->globalScreen()->tool()->context()->current()->addAdditionalData(ilLMGSToolProvider::SHOW_TOC_TOOL, true);
+
+        if ($embed_mode) {
+            $params = [
+                "obj_id" => $this->requested_obj_id,
+                "ref_id" => $this->lm->getRefId(),
+                "frame" => ""
+            ];
+            $DIC->globalScreen()->tool()->context()->current()->addAdditionalData(\ilLMGSToolProvider::LM_QUERY_PARAMS, $params);
+        }
     }
 
     /**

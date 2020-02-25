@@ -54,8 +54,12 @@ class ilLSViewLayoutProvider extends AbstractModificationProvider implements Mod
         return $this->globalScreen()->layout()->factory()->mainbar()
             ->withModification(
                 function (MainBar $mainbar) : ?MainBar {
+                    $entries = array_merge(
+                        $this->data_collection->get(\ilLSPlayer::GS_DATA_LS_MAINBARCONTROLS),
+                        $mainbar->getToolEntries()
+                    );
                     $mainbar = $mainbar->withClearedEntries();
-                    foreach ($this->data_collection->get(\ilLSPlayer::GS_DATA_LS_MAINBARCONTROLS) as $key => $entry) {
+                    foreach ($entries as $key => $entry) {
                         $mainbar = $mainbar->withAdditionalEntry($key, $entry);
                     }
                     return $mainbar;

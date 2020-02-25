@@ -142,7 +142,6 @@ class ilLMGSToolProvider extends AbstractDynamicToolProvider
     private function getToc($additional_data) : string
     {
         global $DIC;
-
         // get params via additional_data, set query params
         $params = $additional_data->get(self::LM_QUERY_PARAMS);
         $offline = $additional_data->is(self::LM_OFFLINE, true);

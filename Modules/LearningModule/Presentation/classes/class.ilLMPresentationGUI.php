@@ -218,7 +218,11 @@ class ilLMPresentationGUI
         if ($claim_repo_context) {
             $DIC->globalScreen()->tool()->context()->claim()->repository();
         }
-        $DIC->globalScreen()->tool()->context()->current()->addAdditionalData(ilLMGSToolProvider::SHOW_TOC_TOOL, true);
+
+        if (!$ilCtrl->isAsynch()) {
+            // moved this into the if due to #0027200
+            $DIC->globalScreen()->tool()->context()->current()->addAdditionalData(ilLMGSToolProvider::SHOW_TOC_TOOL, true);
+        }
 
         if ($embed_mode) {
             $params = [

@@ -136,8 +136,9 @@ class ilNoteGUI
             $this->obj_type = ilObject::_lookupType($a_rep_obj_id);
         }
         
-        $this->ajax = $ilCtrl->isAsynch();
-        
+        //$this->ajax = $ilCtrl->isAsynch();
+        $this->ajax = true;
+
         $this->ctrl = $ilCtrl;
         $this->lng = $lng;
         
@@ -448,7 +449,7 @@ class ilNoteGUI
             $ntpl->parseCurrentBlock();
         }
 
-        if ($this->ajax) {
+        if ($ilCtrl->isAsynch()) {
             echo $ntpl->get();
             exit;
         }
@@ -544,7 +545,7 @@ class ilNoteGUI
             : "";
 
         // title
-        if ($this->ajax && !$this->only_latest) {
+        if ($ilCtrl->isAsynch() && !$this->only_latest) {
             switch ($this->obj_type) {
                 case "grpr":
                 case "catr":
@@ -571,6 +572,10 @@ class ilNoteGUI
             $tpl->setCurrentBlock("title");
             $tpl->setVariable("TITLE", $img . " " . $title);
             $tpl->parseCurrentBlock();
+        }
+
+        if (!$ilCtrl->isAsynch()) {
+            $tpl->setVariable("OUTER_ID", " id='notes_embedded_outer' ");
         }
 
         if ($this->delete_note) {

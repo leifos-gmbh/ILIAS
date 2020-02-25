@@ -76,7 +76,6 @@ var ilNotes =
 	cmdAjaxLink: function (e, url)
 	{				
 		e.preventDefault();
-		
 		this.sendAjaxGetRequestToUrl(url, {}, {mode: 'cmd'});
 	},
 	
@@ -138,6 +137,10 @@ var ilNotes =
 		return false;
 	},
 
+  inModal: function () {
+	  var cs = $("#il_notes_modal").css("display");
+	  return ($("#il_notes_modal").length && cs != "none");
+  },
 
 	handleAjaxSuccess: function(o)
 	{
@@ -157,7 +160,11 @@ var ilNotes =
 					il.UICore.setRightPanelContent(o.responseText);
 				}
 				else {
-					$("#il_notes_modal .modal-body").html(o.responseText);
+				  if (t.inModal()) {
+            $("#il_notes_modal .modal-body").html(o.responseText);
+          } else {
+            $("#notes_embedded_outer").html(o.responseText);
+          }
 				}
 
 //				ilNotes.insertPanelHTML(o.responseText);

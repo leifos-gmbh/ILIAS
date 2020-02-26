@@ -168,6 +168,10 @@ class ilLearningModuleKioskModeView extends ilKioskModeView
             $builder->previous("layout", $prev_id);
         }
 
+        $toc = $builder->tableOfContent($this->lm->getTitle(), 'layout', 0);
+        $lm_toc_renderer = new ilLMSlateTocRendererGUI($this->lm_pres_service);
+        $lm_toc_renderer->renderLSToc($toc, $lm_toc_renderer, 0);
+
         $builder = $this->maybeBuildLearningProgressToggleControl($builder);
 
         $builder = $this->addAdditionalMenuButtons($builder);
@@ -271,4 +275,6 @@ class ilLearningModuleKioskModeView extends ilKioskModeView
             )
         );
     }
+
+
 }

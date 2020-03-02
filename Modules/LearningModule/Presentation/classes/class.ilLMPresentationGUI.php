@@ -86,6 +86,8 @@ class ilLMPresentationGUI
     public $offline;
     public $offline_directory;
 
+    protected $embed_mode = false;
+
     /**
      * @var int
      */
@@ -225,6 +227,7 @@ class ilLMPresentationGUI
         }
 
         if ($embed_mode) {
+            $ilCtrl->setParameter($this, "embed_mode", 1);
             $params = [
                 "obj_id" => $this->requested_obj_id,
                 "ref_id" => $this->lm->getRefId(),
@@ -271,6 +274,10 @@ class ilLMPresentationGUI
         $this->lm = $this->service->getLearningModule();
         $this->tracker = $this->service->getTracker();
         $this->linker = $this->service->getLinker();
+        $this->embed_mode = $embed_mode;
+        if ($request->getRequestedEmbedMode()) {
+            $this->embed_mode = true;
+        }
 
         // language translation
         $this->lang = $this->service->getPresentationStatus()->getLang();
@@ -607,6 +614,7 @@ class ilLMPresentationGUI
                         $this->renderPageTitle();
                         $this->setHeader();
                         $this->ilLMMenu();
+                        $this->addHeaderAction();
                         $content = $this->getContent();
                         $content.= $this->ilLMNotes();
                         $this->tpl->setContent($content);
@@ -1017,19 +1025,28 @@ class ilLMPresentationGUI
      */
     public function redrawHeaderAction()
     {
-        echo $this->addHeaderAction(true);
+        echo $this->getHeaderAction(true);
         exit;
     }
 
     /**
      * Add header action
      */
-    public function addHeaderAction($a_redraw = false)
+    public function addHeaderAction()
+    {
+        $this->tpl->setVariable("HEAD_ACTION", $this->getHeaderAction());
+    }
+
+    /**
+     * Add header action
+     */
+    public function getHeaderAction($a_redraw = false)
     {
         if ($this->offline) {
             return;
         }
         $ilAccess = $this->access;
+        $ilSetting = $this->settings;
         $tpl = $this->tpl;
 
         $lm_id = $this->lm->getId();
@@ -1046,16 +1063,19 @@ class ilLMPresentationGUI
         );
         $dispatcher->setSubObject("pg", $this->getCurrentPageId());
 
+        $this->ctrl->setParameter($this, "embed_mode", $this->embed_mode);
         ilObjectListGUI::prepareJSLinks(
             $this->ctrl->getLinkTarget($this, "redrawHeaderAction", "", true),
             $this->ctrl->getLinkTargetByClass(array("ilcommonactiondispatchergui", "ilnotegui"), "", "", true, false),
             $this->ctrl->getLinkTargetByClass(array("ilcommonactiondispatchergui", "iltagginggui"), "", "", true, false),
             $this->tpl
         );
-
+        
         $lg = $dispatcher->initHeaderAction();
-        $lg->enableNotes(true);
-        $lg->enableComments($this->lm->publicNotes(), false);
+        if (!$ilSetting->get("disable_notes") && !$this->embed_mode) {
+            $lg->enableNotes(true);
+            $lg->enableComments($this->lm->publicNotes(), false);
+        }
                 
         if ($this->lm->hasRating() && !$this->offlineMode()) {
             $lg->enableRating(
@@ -1067,7 +1087,7 @@ class ilLMPresentationGUI
         }
 
         // notification
-        if ($this->user->getId() != ANONYMOUS_USER_ID) {
+        if ($this->user->getId() != ANONYMOUS_USER_ID && !$this->embed_mode) {
             if (ilNotification::hasNotification(ilNotification::TYPE_LM, $this->user->getId(), $lm_id)) {
                 $this->ctrl->setParameter($this, "ntf", 1);
                 if (ilNotification::hasOptOut($lm_id)) {
@@ -1107,7 +1127,7 @@ class ilLMPresentationGUI
         }
         
         if (!$a_redraw) {
-            $this->tpl->setVariable("HEAD_ACTION", $lg->getHeaderAction($this->tpl));
+            return $lg->getHeaderAction($this->tpl);
         } else {
             // we need to add onload code manually (rating, comments, etc.)
             return $lg->getHeaderAction() .
@@ -1126,12 +1146,6 @@ class ilLMPresentationGUI
         // no notes in offline (export) mode
         if ($this->offlineMode()) {
             return "";
-        }
-        
-        // output notes (on top)
-        
-        if (!$ilSetting->get("disable_notes")) {
-            $this->addHeaderAction();
         }
         
         // now output comments
@@ -3080,9 +3094,11 @@ class ilLMPresentationGUI
     {
         switch ($pars["cmd"]) {
             case "layout":
-                $content = $this->getContent(true);
-                $content.= $this->ilLMNotes();
-                return $content;
+                $tpl = new ilTemplate("tpl.embedded_view.html", true, true, "Modules/LearningModule");
+                $tpl->setVariable("HEAD_ACTION", $this->getHeaderAction());
+                $tpl->setVariable("PAGE", $this->getContent(true));
+                $tpl->setVariable("COMMENTS", $this->ilLMNotes());
+                return $tpl->get();
         }
         return "";
     }

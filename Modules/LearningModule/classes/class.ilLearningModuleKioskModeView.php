@@ -174,21 +174,26 @@ class ilLearningModuleKioskModeView extends ilKioskModeView
 
         $builder = $this->maybeBuildLearningProgressToggleControl($builder);
 
-        $builder = $this->addAdditionalMenuButtons($builder);
+        $builder = $this->addPrintViewSelectionMenuButton($builder);
 
         return $builder;
     }
 
-    protected function addAdditionalMenuButtons(ControlBuilder $builder): ControlBuilder
+    protected function addPrintViewSelectionMenuButton(ControlBuilder $builder): ControlBuilder
     {
+        global $DIC;
+
+        $DIC->ui()->mainTemplate()->addJavaScript("./Services/Form/js/Form.js");
+
+        $this->ctrl->setParameterByClass("illmpresentationgui", 'ref_id', $this->lm->getRefId());
         $modal = $this->uiFactory->modal()->roundtrip(
-            'Some Modal',
+            $this->lng->txt("cont_print_view"),
             $this->uiFactory->legacy('some modal')
-        );
+        )->withAsyncRenderUrl($this->ctrl->getLinkTargetByClass("illmpresentationgui", "showPrintViewSelection"));
 
         $this->additional_content[] = $modal;
         return $builder->genericWithSignal(
-            'open the modal',
+            $this->lng->txt("cont_print_view"),
             $modal->getShowSignal()
         );
 

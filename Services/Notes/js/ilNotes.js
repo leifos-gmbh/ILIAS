@@ -82,8 +82,8 @@ var ilNotes =
 	cmdAjaxForm: function (e, url)
 	{			
 		e.preventDefault();
-		
-		this.sendAjaxPostRequest("ilNoteFormAjax", url, {mode: 'cmd'});
+
+		this.sendAjaxPostRequest(e.target, url, {mode: 'cmd'});
 	},
 	
 	setAjaxUrl: function(url)
@@ -121,9 +121,8 @@ var ilNotes =
 	},
 
 	// send request per ajax
-	sendAjaxPostRequest: function(form_id, url, args)
+	sendAjaxPostRequest: function(form, url, args)
 	{
-		console.log('form_id' + form_id);
 		args.reg_type = "post";
 		var cb =
 		{
@@ -131,7 +130,7 @@ var ilNotes =
 			failure: this.handleAjaxFailure,
 			argument: args
 		};
-		var form_str = YAHOO.util.Connect.setForm(form_id);
+		var form_str = YAHOO.util.Connect.setForm(form);
 		var request = YAHOO.util.Connect.asyncRequest('POST', url, cb);
 		
 		return false;

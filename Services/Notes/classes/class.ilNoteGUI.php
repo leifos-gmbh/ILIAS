@@ -598,7 +598,11 @@ class ilNoteGUI
                     $ilCtrl->getFormActionByClass("ilnotegui", "", "", true) .
                     "'); return false;\"";
                 $tpl->setVariable("ON_SUBMIT_FORM", $os);
-                $tpl->setVariable("FORM_ID", "id='ilNoteFormAjax'");
+                /*if ($a_type == IL_NOTE_PRIVATE) {
+                    $tpl->setVariable("FORM_ID", "id='ilNoteFormAjax'");
+                } else {
+                    $tpl->setVariable("FORM_ID", "id='ilCommentFormAjax'");
+                }*/
             }
         }
 

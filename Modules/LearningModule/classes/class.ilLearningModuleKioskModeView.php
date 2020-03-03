@@ -150,6 +150,10 @@ class ilLearningModuleKioskModeView extends ilKioskModeView
      */
     public function buildControls(State $state, ControlBuilder $builder): ControlBuilder
     {
+        global $DIC;
+
+        $main_tpl = $DIC->ui()->mainTemplate();
+
         // this may be necessary if updateGet has not been processed
 
         // THIS currently fails
@@ -172,32 +176,32 @@ class ilLearningModuleKioskModeView extends ilKioskModeView
         $lm_toc_renderer = new ilLMSlateTocRendererGUI($this->lm_pres_service);
         $lm_toc_renderer->renderLSToc($toc, $lm_toc_renderer, 0);
 
+
+        // learning progress
         $builder = $this->maybeBuildLearningProgressToggleControl($builder);
 
-        $builder = $this->addPrintViewSelectionMenuButton($builder);
+        // menu
+        $menu = new \ILIAS\LearningModule\Menu\ilLMMenuGUI($this->lm_pres_service);
+        foreach ($menu->getEntries() as $entry) {
+            if (is_object($entry["signal"])) {
+                $builder = $builder->genericWithSignal(
+                    $entry["label"],
+                    $entry["signal"]
+                );
+            }
+            if (is_object($entry["modal"])) {
+                $this->additional_content[] = $entry["modal"];
+            }
+            if ($entry["on_load"] != "") {
+                $main_tpl->addOnLoadCode($entry["on_load"]);
+            }
+        }
+
+        //$builder = $this->addPrintViewSelectionMenuButton($builder);
 
         return $builder;
     }
 
-    protected function addPrintViewSelectionMenuButton(ControlBuilder $builder): ControlBuilder
-    {
-        global $DIC;
-
-        $DIC->ui()->mainTemplate()->addJavaScript("./Services/Form/js/Form.js");
-
-        $this->ctrl->setParameterByClass("illmpresentationgui", 'ref_id', $this->lm->getRefId());
-        $modal = $this->uiFactory->modal()->roundtrip(
-            $this->lng->txt("cont_print_view"),
-            $this->uiFactory->legacy('some modal')
-        )->withAsyncRenderUrl($this->ctrl->getLinkTargetByClass("illmpresentationgui", "showPrintViewSelection"));
-
-        $this->additional_content[] = $modal;
-        return $builder->genericWithSignal(
-            $this->lng->txt("cont_print_view"),
-            $modal->getShowSignal()
-        );
-
-    }
 
     /**
      * @param ControlBuilder $builder

@@ -2821,20 +2821,20 @@ class ilLMPresentationGUI
             return;
         }
 
-        $this->setContentStyles();
-        $this->renderPageTitle();
+        //$this->setContentStyles();
+        //$this->renderPageTitle();
 
-        $this->tpl->loadStandardTemplate();
+        //$this->tpl->loadStandardTemplate();
 
-        $this->renderTabs("download", 0);
+        //$this->renderTabs("download", 0);
 
-        $this->ilLocator(true);
+        //$this->ilLocator(true);
         //$this->tpl->stopTitleFloating();
-        $this->tpl->addBlockFile("ADM_CONTENT", "adm_content", "tpl.lm_download_list.html", "Modules/LearningModule");
+        $tpl = new ilTemplate("tpl.lm_download_list.html", true, true, "Modules/LearningModule");
 
         // set title header
-        $this->tpl->setTitle($this->getLMPresentationTitle());
-        $this->tpl->setTitleIcon(ilUtil::getImagePath("icon_lm.svg"));
+        //$this->tpl->setTitle($this->getLMPresentationTitle());
+        //$this->tpl->setTitleIcon(ilUtil::getImagePath("icon_lm.svg"));
 
         // output copyright information
         $md = new ilMD($this->lm->getId(), 0, $this->lm->getType());
@@ -2845,17 +2845,23 @@ class ilLMPresentationGUI
 
             if ($copyright != "") {
                 $this->lng->loadLanguageModule("meta");
-                $this->tpl->setCurrentBlock("copyright");
-                $this->tpl->setVariable("TXT_COPYRIGHT", $this->lng->txt("meta_copyright"));
-                $this->tpl->setVariable("LM_COPYRIGHT", $copyright);
-                $this->tpl->parseCurrentBlock();
+                $tpl->setCurrentBlock("copyright");
+                $tpl->setVariable("TXT_COPYRIGHT", $this->lng->txt("meta_copyright"));
+                $tpl->setVariable("LM_COPYRIGHT", $copyright);
+                $tpl->parseCurrentBlock();
             }
         }
 
-
         $download_table = new ilLMDownloadTableGUI($this, "showDownloadList", $this->lm);
-        $this->tpl->setVariable("DOWNLOAD_TABLE", $download_table->getHTML());
-        $this->tpl->printToStdout();
+        $tpl->setVariable("DOWNLOAD_TABLE", $download_table->getHTML());
+        //$this->tpl->printToStdout();
+
+        $modal = $this->ui->factory()->modal()->roundtrip(
+            $this->lng->txt("download"),
+            $this->ui->factory()->legacy($tpl->get())
+        );
+        echo $this->ui->renderer()->render($modal);
+        exit();
     }
 
     

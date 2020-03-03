@@ -106,7 +106,8 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
         }
 
         // handle kiosk mode links
-        if ($this->embed_mode) {
+        if ($this->embed_mode && in_array($a_cmd, ["downloadFile", "download_paragraph", "fullscreen"])) {
+            $this->ctrl->setParameterByClass(\ilLMPresentationGUI::class, "ref_id", $this->lm->getRefId());
             $base = $this->ctrl->getLinkTargetByClass([
                 \ilLMPresentationGUI::class, \ilLMPageGUI::class
             ]);
@@ -140,6 +141,7 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
             if ($a_srcstring != "") {
                 $this->ctrl->setParameterByClass(self::TARGET_GUI, "srcstring", $a_srcstring);
             }
+            $this->ctrl->setParameterByClass(self::TARGET_GUI, "ref_id", $this->lm->getRefId());
             switch ($a_cmd) {
                 case "fullscreen":
                     $link = $this->ctrl->getLinkTargetByClass(self::TARGET_GUI, "fullscreen", "", false, false);
@@ -349,6 +351,9 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
                             if ($lm_id == "") {
                                 $href = "";
                             }
+                            if ($this->embed_mode) {
+                                $ltarget = "_blank";
+                            }
                         } else {
                             if (!$this->offline) {
                                 if ($type == "PageObject") {
@@ -364,7 +369,7 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
                                 }
                             }
                             $ltarget = "";
-                            if ($targetframe == "New") {
+                            if ($targetframe == "New" || $this->embed_mode) {
                                 $ltarget = "_blank";
                             }
                         }
@@ -392,6 +397,7 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
                         if ($this->offline) {
                             $href = "media_" . $target_id . ".html";
                         } else {
+                            $this->ctrl->setParameterByClass("illmpagegui", "ref_id", $this->lm->getRefId());
                             $this->ctrl->setParameterByClass("illmpagegui", "mob_id", $target_id);
                             $href = $this->ctrl->getLinkTargetByClass(
                                 "illmpagegui",
@@ -413,10 +419,16 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
                             $href = ILIAS_HTTP_PATH . "/goto.php?target=" . $obj_type . "_" . $target_id . "&amp;client_id=" . CLIENT_ID;
                         }
                         $ltarget = ilFrameTargetInfo::_getFrame("MainContent");
+                        if ($this->embed_mode) {
+                            $ltarget = "_blank";
+                        }
                         break;
 
                     case "WikiPage":
                         $href = ilWikiPage::getGotoForWikiPageTarget($target_id);
+                        if ($this->embed_mode) {
+                            $ltarget = "_blank";
+                        }
                         break;
 
                     case "File":
@@ -438,13 +450,15 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
                     case "User":
                         $obj_type = ilObject::_lookupType($target_id);
                         if ($obj_type == "usr") {
-                            $back = $this->ctrl->getLinkTarget(
-                                $this,
-                                "layout",
-                                "",
-                                false,
-                                true
-                            );
+                            if (!$this->embed_mode) {
+                                $back = $this->ctrl->getLinkTarget(
+                                    $this,
+                                    "layout",
+                                    "",
+                                    false,
+                                    true
+                                );
+                            }
                             //var_dump($back); exit;
                             $this->ctrl->setParameterByClass("ilpublicuserprofilegui", "user_id", $target_id);
                             $this->ctrl->setParameterByClass(
@@ -480,7 +494,7 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
         $link_info.= "</IntLinkInfos>";
 
         $link_info.= $this->getLinkTargetsXML();
-
+//echo htmlentities($link_info); exit;
         return $link_info;
     }
 

@@ -503,7 +503,14 @@ class ilLMTOCExplorerGUI extends ilLMExplorerGUI
             if ($root) {
                 $node_toc = $toc;
             } else {
-                $node_toc = $toc->node($current_node["title"], $current_node["child"]);
+                // current workaround
+                $lp = LSTOCBuilder::LP_IN_PROGRESS;
+                $node_icon = $this->getNodeIcon($current_node);
+                if (strpos($node_icon, "complete")) {
+                    $lp = LSTOCBuilder::LP_COMPLETED;
+                }
+
+                $node_toc = $toc->node($current_node["title"], $current_node["child"], $lp);
             }
             foreach ($this->getChildren($current_node) as $child) {
                 $this->renderLSTocNode($node_toc, $child);

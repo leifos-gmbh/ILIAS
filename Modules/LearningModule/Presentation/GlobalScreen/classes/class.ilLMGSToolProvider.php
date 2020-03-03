@@ -14,6 +14,7 @@ class ilLMGSToolProvider extends AbstractDynamicToolProvider
     use \ILIAS\GlobalScreen\Scope\MainMenu\Collector\Renderer\Hasher;
 
     const SHOW_TOC_TOOL = 'show_toc_tool';
+    const SHOW_LINK_SLATES = 'show_link_slates';
     const LM_QUERY_PARAMS = 'lm_query_params';
     const LM_OFFLINE = 'lm_offline';
 
@@ -38,16 +39,19 @@ class ilLMGSToolProvider extends AbstractDynamicToolProvider
 
         $tools = [];
         $additional_data = $called_contexts->current()->getAdditionalData();
+        $iff = function ($id) {
+            return $this->identification_provider->contextAwareIdentifier($id);
+        };
+        $l = function (string $content) {
+            return $this->dic->ui()->factory()->legacy($content);
+        };
+
         if ($additional_data->is(self::SHOW_TOC_TOOL, true)) {
-            $iff = function ($id) {
-                return $this->identification_provider->contextAwareIdentifier($id);
-            };
-            $l = function (string $content) {
-                return $this->dic->ui()->factory()->legacy($content);
-            };
             $ref_id = $called_contexts->current()->getReferenceId()->toInt();
             $tools[] = $this->getTocTool($additional_data);
+        }
 
+        if ($additional_data->is(self::SHOW_LINK_SLATES, true)) {
             $title = $lng->txt("obj_glo");
             $icon = $DIC->ui()->factory()->symbol()->icon()->custom(\ilUtil::getImagePath("outlined/icon_glo.svg"),$title);
             $tools[] = $this->factory->tool($iff("lm_glossary"))

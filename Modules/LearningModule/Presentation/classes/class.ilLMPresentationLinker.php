@@ -451,8 +451,8 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
                         $obj_type = ilObject::_lookupType($target_id);
                         if ($obj_type == "usr") {
                             if (!$this->embed_mode) {
-                                $back = $this->ctrl->getLinkTarget(
-                                    $this,
+                                $back = $this->ctrl->getLinkTargetByClass(
+                                    "illmpagegui",
                                     "layout",
                                     "",
                                     false,

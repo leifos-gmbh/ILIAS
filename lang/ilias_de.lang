@@ -1897,6 +1897,8 @@ auth#:#auth_oidc_roles#:#Rollenzuordnung
 auth#:#auth_oidc_settings#:#Server-Einstellungen
 auth#:#auth_oidc_settings_activation#:#OpenID Connect aktivieren
 auth#:#auth_oidc_settings_client_id#:#Client-ID
+auth#:#auth_oidc_settings_additional_scopes#:#Zusätzliche Scopes
+auth#:#auth_oidc_settings_invalid_scopes#:#Folgende Werte sind keine gültigen Scopes: %s
 auth#:#auth_oidc_settings_custom_session_duration#:#Sitzungsdauer
 auth#:#auth_oidc_settings_custom_session_duration_option#:#Eigene Sitzungsdauer
 auth#:#auth_oidc_settings_custom_session_duration_type#:#Einstellungen zur Sitzungsdauer

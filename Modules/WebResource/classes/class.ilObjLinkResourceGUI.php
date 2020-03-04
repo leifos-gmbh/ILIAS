@@ -427,6 +427,11 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
             )
             ->withActionButtons([$submit]);
 
+        // modal triggers its show signal on load if form validation failed
+        if (isset($_POST['cmd']) && $_POST['cmd'] == 'submit') {
+            $modal = $modal->withOnLoad($modal->getShowSignal());
+        }
+
         return $modal;
     }
 

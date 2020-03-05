@@ -100,7 +100,7 @@ class cdCompanyGUI
 	 */
 	function readCompany()
 	{
-		$this->company = new cdCompany((int) $_GET[company_id]);
+		$this->company = new cdCompany((int) $_GET["company_id"]);
 	}
 
 	/**

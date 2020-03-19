@@ -17661,9 +17661,17 @@ div.ilTopMemberView {
 .ilFileUploadDropAlternative a.submit img {
   width: 20px;
 }
-/*----------STARTUP SCREEN----------*/
+/*----------ALERTS----------*/
+/*STARTUP SCREEN*/
+.alert img {
+  width: 16px;
+}
 .ilStartupFrame .alert img {
   width: 16px;
+}
+/*----------ITEM GROUP----------*/
+.ilContainerBlock img {
+  width: 32px;
 }
 @media print {
   #mainspacekeeper > .row {

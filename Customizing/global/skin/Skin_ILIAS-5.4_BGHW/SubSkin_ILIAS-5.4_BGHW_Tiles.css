@@ -17668,9 +17668,16 @@ div.ilTopMemberView {
 #repmodtbl img {
   width: 32px;
 }
-/*STARTUP SCREEN*/
-.ilStartupFrame .alert img {
-  width: 16px;
+/*----------REPOSITORY----------*/
+.ilContainerListItemOuter > img {
+  width: 35px;
+}
+tbody .std > img {
+  width: 32px;
+}
+/*MEDIA POOL*/
+.ilMepListRow img {
+  width: auto !important;
 }
 @media print {
   #mainspacekeeper > .row {

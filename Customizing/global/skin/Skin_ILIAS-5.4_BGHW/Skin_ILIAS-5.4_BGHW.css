@@ -17657,21 +17657,6 @@ div.ilTopMemberView {
   }
 }
 /*----------FOOTER----------*/
-/*----------FILE UPLOAD----------*/
-.ilFileUploadDropAlternative a.submit img {
-  width: 20px;
-}
-/*----------ALERTS----------*/
-.alert img {
-  width: 16px;
-}
-#repmodtbl img {
-  width: 32px;
-}
-/*STARTUP SCREEN*/
-.ilStartupFrame .alert img {
-  width: 16px;
-}
 @media print {
   #mainspacekeeper > .row {
     background-color: white;

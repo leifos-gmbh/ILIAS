@@ -17782,6 +17782,7 @@ a.il_ContainerItemCommand:visited {
 .il-card img {
   cursor: pointer;
   background: #E5E5E5;
+  min-height: 1px;
 }
 .il-card .il-card-repository-head > div.il-card-repository-dropdown > .dropdown > button {
   background-color: transparent !important;

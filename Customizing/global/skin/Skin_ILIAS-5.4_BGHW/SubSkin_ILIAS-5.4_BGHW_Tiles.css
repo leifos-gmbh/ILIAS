@@ -17657,28 +17657,6 @@ div.ilTopMemberView {
   }
 }
 /*----------FOOTER----------*/
-/*----------FILE UPLOAD----------*/
-.ilFileUploadDropAlternative a.submit img {
-  width: 20px;
-}
-/*----------ALERTS----------*/
-.alert img {
-  width: 16px;
-}
-#repmodtbl img {
-  width: 32px;
-}
-/*----------REPOSITORY----------*/
-.ilContainerListItemOuter > img {
-  width: 35px;
-}
-tbody .std > img {
-  width: 32px;
-}
-/*MEDIA POOL*/
-.ilMepListRow img {
-  width: auto !important;
-}
 @media print {
   #mainspacekeeper > .row {
     background-color: white;
@@ -17804,6 +17782,7 @@ a.il_ContainerItemCommand:visited {
 .il-card img {
   cursor: pointer;
   background: #E5E5E5;
+  min-height: 1px;
 }
 .il-card .il-card-repository-head > div.il-card-repository-dropdown > .dropdown > button {
   background-color: transparent !important;

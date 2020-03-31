@@ -99,6 +99,7 @@ class Renderer extends AbstractComponentRenderer
         }
         if ($aria_role == Button::MENUITEM || $aria_role == Button::MENUITEM_SEARCH) {
             $tpl->touchBlock("with_aria_haspopup");
+            $tpl->touchBlock("with_aria_hidden");
         }
         $aria_label = $component->getAriaLabel();
         if ($aria_label != null) {

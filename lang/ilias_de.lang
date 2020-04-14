@@ -1888,11 +1888,11 @@ auth#:#auth_info_add#:#Wählen Sie diese Einstellung, falls Sie sich noch nie f�
 auth#:#auth_info_migrate#:#Wenn Sie bereits ein ILIAS-Benutzerkonto besitzen, geben Sie bitte den Benutzernamen und das Passwort ein, um Ihre persönlichen Daten (Mails, Testergebnisse ...) zu übernehmen.
 auth#:#auth_ldap_server_ds#:#LDAP-Server
 auth#:#auth_login_editor#:#Loginseite gestalten
-auth#:#auth_oidc_role_info#:#OpenID Connect Attribut::Wert (zum Beispiel: "roles::Mitarbeitende").
-auth#:#auth_oidc#:#OpenId Connect
-auth#:#auth_oidc_mapping_table#:#Zuordnung von ILIAS-Benutzerdaten zu OpenId Connect Attributen
+auth#:#auth_oidc_role_info#:#OpenID-Connect-Attribut::Wert (zum Beispiel: "roles::Mitarbeitende").
+auth#:#auth_oidc#:#OpenID Connect
+auth#:#auth_oidc_mapping_table#:#Zuordnung von ILIAS-Benutzerdaten zu OpenID-Connect-Attributen
 auth#:#auth_oidc_profile#:#Zuordnung der Profildaten
-auth#:#auth_oidc_role_mapping_table#:#Zurodnung von ILIAS-Rollen zu OpenId Connect Attributen
+auth#:#auth_oidc_role_mapping_table#:#Zuordnung von ILIAS-Rollen zu OpenID-Connect-Attributen
 auth#:#auth_oidc_roles#:#Rollenzuordnung
 auth#:#auth_oidc_settings#:#Server-Einstellungen
 auth#:#auth_oidc_settings_activation#:#OpenID Connect aktivieren
@@ -1903,28 +1903,28 @@ auth#:#auth_oidc_settings_custom_session_duration_type#:#Einstellungen zur Sitzu
 auth#:#auth_oidc_settings_default_role#:#Rollenzuordnung
 auth#:#auth_oidc_settings_default_role_info#:#Bitte wählen Sie eine globale Rolle für neu anzulegende ILIAS-Benutzer
 auth#:#auth_oidc_settings_img#:#Bild
-auth#:#auth_oidc_settings_img_file_info#:#Laden Sie ein Bild hoch das auf der Anmeldeseite angezeigt werden soll. Das Bild verlinkt automatisch auf das OpenId Connect Anmeldeskript.
+auth#:#auth_oidc_settings_img_file_info#:#Laden Sie ein Bild hoch, das auf der Anmeldeseite angezeigt werden soll. Das Bild verlinkt automatisch auf das OpenID-Connect-Anmeldeskript.
 auth#:#auth_oidc_settings_le#:#Darstellung Anmeldeseite
 auth#:#auth_oidc_settings_login_option_default#:#Anmeldung nicht erzwingen
-auth#:#auth_oidc_settings_login_option_default_info#:#Eine Anmeldung beim OpenId Connect Server ist nicht notwendig, wenn bereits eine gültige Sitzung vorliegt.
+auth#:#auth_oidc_settings_login_option_default_info#:#Eine Anmeldung beim OpenID-Connect-Server ist nicht notwendig, wenn bereits eine gültige Sitzung vorliegt.
 auth#:#auth_oidc_settings_login_option_enforce#:#Anmeldung erzwingen
-auth#:#auth_oidc_settings_login_option_enforce_info#:#Eine Anmeldung beim OpenId Connect Server ist in jedem Fall notwendig - auch wenn bereits eine gültige Sitzung vorliegt.
+auth#:#auth_oidc_settings_login_option_enforce_info#:#Eine Anmeldung beim OpenID-Connect-Server ist in jedem Fall notwendig – auch wenn bereits eine gültige Sitzung vorliegt.
 auth#:#auth_oidc_settings_login_options#:#Anmeldeoptionen
 auth#:#auth_oidc_settings_logout_scope#:#Verhalten beim Abmelden
 auth#:#auth_oidc_settings_logout_scope_global#:#Global abmelden
-auth#:#auth_oidc_settings_logout_scope_global_info#:#Wenn aktiviert, wird beim Abmelden sowohl die OpenId Connect Sitzung als auch die ILIAS-Sitzung beendet.
+auth#:#auth_oidc_settings_logout_scope_global_info#:#Wenn aktiviert, wird beim Abmelden sowohl die OpenID-Connect-Sitzung als auch die ILIAS-Sitzung beendet.
 auth#:#auth_oidc_settings_logout_scope_local#:#nur bei ILIAS abmelden
 auth#:#auth_oidc_settings_logout_scope_local_info#:#Wenn aktiviert, wird beim Abmelden nur die ILIAS-Sitzung beendet.
 auth#:#auth_oidc_settings_provider#:#Provider-Url
 auth#:#auth_oidc_settings_secret#:#Client-Schlüssel
 auth#:#auth_oidc_settings_section_user_sync#:#Einstellungen zur Benutzersynchronisierung
 auth#:#auth_oidc_settings_session_duration#:#Dauer
-auth#:#auth_oidc_settings_title#:#OpenID Connect Authentifizierung konfigurieren
+auth#:#auth_oidc_settings_title#:#OpenID-Connect-Authentifizierung konfigurieren
 auth#:#auth_oidc_settings_txt#:#Text
-auth#:#auth_oidc_settings_txt_val_info#:#Tragen Sie einen Text ein der auf der Anmeldeseite angezeigt werden soll. Der Text verlinkt automatisch auf das OpenId Connect Anmeldeskript.
+auth#:#auth_oidc_settings_txt_val_info#:#Tragen Sie einen Text ein, der auf der Anmeldeseite angezeigt werden soll. Der Text verlinkt automatisch auf das OpenID-Connect-Anmeldeskript.
 auth#:#auth_oidc_settings_user_attr#:#Attributname der Benutzerzugänge
 auth#:#auth_oidc_settings_user_sync#:#Automatische Synchronisierung
-auth#:#auth_oidc_settings_user_sync_info#:#Wenn aktiviert, wird für Benutzer, die sich erfolgreich gegen Open ID Connect authentifiziert haben aber kein ILIAS-Benutzerkonto besitzen, automatisch ein neues Benutzerkonto erzeugt.
+auth#:#auth_oidc_settings_user_sync_info#:#Wenn aktiviert, wird für Benutzer automatisch ein neues Benutzerkonto erzeugt, wenn sie sich erfolgreich gegen OpenID Connect authentifiziert haben, aber kein ILIAS-Benutzerkonto besitzen.
 auth#:#auth_oidc_update_field_info#:#Automatisch aktualisieren
 auth#:#auth_oidc_update_role_info#:#Nur bei Erstanmeldung (automatische Synchronisierung) anwenden
 auth#:#auth_oidconnect#:#OpenID Connect
@@ -5888,8 +5888,8 @@ content#:#cont_location#:#Position
 content#:#cont_lpe_cas_login_form#:#CAS-Loginmaske
 content#:#cont_lpe_language_selection#:#Sprachauswahl
 content#:#cont_lpe_login_form#:#Loginmaske
-content#:#cont_lpe_openid_connect_login#:#OpenId Connect Login
-content#:#cont_lpe_openid_login_form#:#OpenId-Loginmaske
+content#:#cont_lpe_openid_connect_login#:#OpenID-Connect-Login
+content#:#cont_lpe_openid_login_form#:#OpenID-Loginmaske
 content#:#cont_lpe_registration_link#:#Link zur Neuanmeldung
 content#:#cont_lpe_shib_login_form#:#Shibboleth-Loginmaske
 content#:#cont_lpe_user_agreement_link#:#Link zur Benutzervereinbarung
@@ -11412,7 +11412,7 @@ pwassist#:#pwassist_enter_email#:#Geben Sie eine E-Mail-Adresse ein, und klicken
 pwassist#:#pwassist_enter_username_and_email#:#Geben Sie einen Benutzernamen und die dazugehörende E-Mail-Adresse ein, und klicken Sie auf Abschicken.\nILIAS sendet eine E-Mail an diese Adresse. Die E-Mail enthält eine Adresse zu einer Webseite, mit der Sie ein neues Passwort für das Benutzerkonto eingeben können.\nFalls Sie mit dieser Funktion Ihr Passwort nicht setzen können, benachrichtigen Sie bitte Ihre Kursleitung oder senden Sie ein E-Mail an %1$s.
 pwassist#:#pwassist_enter_username_and_new_password#:#Geben Sie den Benutzernamen, für den Sie Passwort-Unterstützung angefordert haben, und das zuzuweisende Passwort ein.
 pwassist#:#pwassist_login_not_match#:#Bitte geben Sie einen anderen Benutzernamen ein.\nDer Benutzername, den Sie eingegeben haben, stimmt nicht mit dem Benutzernamen überein, für den Sie Passwort-Unterstützung angefordert hatten.
-pwassist#:#pwassist_mail_body#:#Tragen Sie ein neues Passwort für Ihr Benutzerkonto ein:\n\t%1$s\n\nDiese Nachricht wurde automatisch generiert von der ILIAS-Installation:\n\t%2$s\n\nSie (oder jemand mit der Adresse %3$s) hat Passwort-Unterstützung für den Benutzernamen "%4$s" angefordert.\n\nBitte prüfen Sie sorgfältig die nachfolgend aufgeführten Fälle, und handeln Sie wie vorgeschlagen:\n\n-Sie haben die Passwort-Unterstützung auf dem Server versehentlich benutzt:\nLöschen Sie diese Mail.\n\n-Sie sind sicher, dass Sie nie Passwort-Unterstützung für den angegebenen ILIAS-Server angefordert haben:\nBitte nehmen Sie mit %5$s Kontakt auf.\n\n- Sie haben um Passwort-Unterstützung angefragt.\nBitte gehen Sie wie folgt vor:\n\n1. Starten Sie Ihren Browser.\n\n2. Geben Sie folgende Adresse in Ihrem Browser ein:\n\t%6$s\n\nWichtig: Die Adresse besteht aus einer einzigen Zeile. Wenn Sie die Adresse aufgetrennt in mehrere Zeilen sehen, dann hat Ihr E-Mail-Programm diese Zeilenumbrüche eingefügt.\n\n3. Ihr Browser zeigt nun eine Seite an, mit der Sie ein neues Passwort an das Benutzerkonto zuweisen können.\n\nBitte beachen Sie:\nAus Sicherheitsgründen können Sie diese drei Schritte nur exakt einmal und innerhalb einer begrenzten Zeit ausführen. Danach wird die Adresse ungültig, und Sie müssen die Passwort-Unterstützung auf dem ILIAS-Server erneut anfordern.
+pwassist#:#pwassist_mail_body#:#Tragen Sie ein neues Passwort für Ihr Benutzerkonto ein:\n\t%1$s\n\nDiese Nachricht wurde automatisch generiert von der ILIAS-Installation:\n\t%2$s\n\nSie (oder jemand mit der Adresse %3$s) hat Passwort-Unterstützung für den Benutzernamen "%4$s" angefordert.\n\nBitte prüfen Sie sorgfältig die nachfolgend aufgeführten Fälle, und handeln Sie wie vorgeschlagen:\n\n-Sie haben die Passwort-Unterstützung auf dem Server versehentlich benutzt:\nLöschen Sie diese Mail.\n\n-Sie sind sicher, dass Sie nie Passwort-Unterstützung für den angegebenen ILIAS-Server angefordert haben:\nBitte nehmen Sie mit %5$s Kontakt auf.\n\n- Sie haben um Passwort-Unterstützung angefragt.\nBitte gehen Sie wie folgt vor:\n\n1. Starten Sie Ihren Browser.\n\n2. Geben Sie folgende Adresse in Ihrem Browser ein:\n\t%6$s\n\nWichtig: Die Adresse besteht aus einer einzigen Zeile. Wenn Sie die Adresse aufgetrennt in mehrere Zeilen sehen, dann hat Ihr E-Mail-Programm diese Zeilenumbrüche eingefügt.\n\n3. Ihr Browser zeigt nun eine Seite an, mit der Sie ein neues Passwort an das Benutzerkonto zuweisen können.\n\nBitte beachten Sie:\nAus Sicherheitsgründen können Sie diese drei Schritte nur exakt einmal und innerhalb einer begrenzten Zeit ausführen. Danach wird die Adresse ungültig, und Sie müssen die Passwort-Unterstützung auf dem ILIAS-Server erneut anfordern.
 pwassist#:#pwassist_mail_sent#:#ILIAS hat eine E-Mail an die Adresse %1$s versandt.\nWeitere Anweisungen finden Sie in dieser Mail.
 pwassist#:#pwassist_mail_sent_generic#:#ILIAS hat eine E-Mail an die hinterlegte Adresse versandt.\nWeitere Anweisungen finden Sie in dieser Mail.
 pwassist#:#pwassist_mail_subject#:#ILIAS-Passwort-Unterstützung
@@ -14238,7 +14238,7 @@ sysc#:#sysc_status_running#:#Wird durchgeführt
 sysc#:#sysc_tab_trash#:#Gelöschte Objekte
 sysc#:#sysc_task_overview#:#Aufgaben
 sysc#:#sysc_task_structure#:#Baumstruktur
-sysc#:#sysc_task_structure_desc#:#Analyiert und korrigiert die Struktur des Magazinbaums
+sysc#:#sysc_task_structure_desc#:#Analysiert und korrigiert die Struktur des Magazinbaums
 sysc#:#sysc_task_tree_dump#:#Baum auflisten
 sysc#:#sysc_task_tree_dump_desc#:#Analysiert die Baumstruktur und listet alle Baumknoten zusammen mit den Analysedaten auf.
 sysc#:#sysc_task_tree_duplicates#:#Doppelte Einträge in der Baumstruktur
@@ -15067,3 +15067,28 @@ exc#:#exc_text_saved#:#Der Text wurde gespeichert.
 exc#:#exc_team_by_random_add_info#:#Bitte beachten Sie, dass Sie der Übung zunächst alle Teilnehmer zuordnen müssen, bevor Sie diese Option sinnvoll nutzen können.
 exc#:#exc_members_already_assigned_team#:#Dieser Benutzer ist bereits einem Team zugeordnet.
 style#:#sty_add_media_query_info#:#Z.B. "only screen and (max-width: 600px)" für Fenstergrößen kleiner als 600px oder "print" für Druckausgaben.
+ps#:#participants_list_courses#:#Allow Activation of Participant Lists in the Member Gallery of Courses###24 01 2020 new variable
+common#:#msg_unknown_value#:#Ein unbekannter Wert wurde übergeben.
+exc#:#exc_deleted_user#:#Gelöschter Benutzer
+copg#:#copg_allow_html#:#HTML/Javascript erlauben
+copg#:#copg_allow_html_info#:#Benutzer können HTML oder Javascript in Seiteninhalten verwenden. Dies kann zu Sicherheitsproblemen führen. Sie sollten diese Funktion nur für Komponenten aktivieren, die von vertrauenswürdige Benutzern verwendet werden. Die Möglichkeit HTML in dieser Art einzubinden wird evtl. in einer zukünftigen Version komplett entfallen.
+dcl#:#dcl_page_type_dclf#:#Detailansicht
+crs#:#crs_page_type_lobj#:#Lernzieleinleitung
+copa#:#copa_page_type_copa#:#Inhaltsseite
+mep#:#mep_page_type_mep#:#Inhaltsbaustein
+wiki#:#wiki_page_type_wpg#:#Wikiseite
+blog#:#blog_page_type_blp#:#Blogbeitrag
+prtf#:#prtf_page_type_prtf#:#Portfolioseite
+prtf#:#prtf_page_type_prtt#:#Portfoliovorlagenseite
+glo#:#glo_page_type_gdf#:#Begriffsdefinition
+lm#:#lm_page_type_lm#:#Lernmodulseite
+qpl#:#qpl_page_type_qht#:#Hinweis
+qpl#:#qpl_page_type_qpl#:#Fragenseite
+qpl#:#qpl_page_type_qfbg#:#Generelles Feedback
+qpl#:#qpl_page_type_qfbs#:#Spezielles Feedback
+sc13#:#sc13_page_type_sahs#:#SCORM-Editor-Seite
+copg#:#copg_page_type_stys#:#Seitenlayout
+cont#:#cont_page_type_cont#:#Magazinseite (Kurs, Gruppe, Kategorie, ...)
+cont#:#cont_page_type_cstr#:#Startseite lernzielorientierter Kurs
+auth#:#auth_page_type_auth#:#Loginseite
+impr#:#impr_page_type_impr#:#Impressum

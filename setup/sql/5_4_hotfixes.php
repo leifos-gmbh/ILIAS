@@ -1277,3 +1277,29 @@ while ($rec = $ilDB->fetchAssoc($set))
     );
 }
 ?>
+<#85>
+<?php
+$ilCtrlStructureReader->getStructure();
+?>
+<#86>
+<?php
+$set = $ilDB->queryF("SELECT * FROM object_description ",
+    [],
+    []
+);
+while ($rec = $ilDB->fetchAssoc($set)) {
+	if ($rec["description"] != "") {
+        $ilDB->update("object_translation", [
+            "description" => ["text", $rec["description"]]
+        ], [    // where
+                "obj_id" => ["integer", $rec["obj_id"]],
+                "lang_default" => ["integer", 1]
+            ]
+        );
+    }
+}
+?>
+<#87>
+<?php
+$ilCtrlStructureReader->getStructure();
+?>

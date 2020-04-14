@@ -331,18 +331,22 @@ class ilNusoapUserAdministrationAdapter
         );
 
 
-        // getUser()
-        $this->server->register(
-            'getUser',
-            array('sid' => 'xsd:string',
-                                      'user_id' => 'xsd:int'),
-            array('user_data' => 'tns:ilUserData'),
-            SERVICE_NAMESPACE,
-            SERVICE_NAMESPACE . '#getUser',
-            SERVICE_STYLE,
-            SERVICE_USE,
-            'ILIAS getUser(): get complete set of user data. DEPRECATED with release 5.2, will be deleted with 5.3. Use searchUsers() instead.'
-        );
+        // begin-patch doclit
+        if($this->mode == self::RPC_ENCODED_STYLE) {
+            // getUser()
+            $this->server->register(
+                'getUser',
+                array('sid' => 'xsd:string',
+                      'user_id' => 'xsd:int'),
+                array('user_data' => 'tns:ilUserData'),
+                SERVICE_NAMESPACE,
+                SERVICE_NAMESPACE . '#getUser',
+                SERVICE_STYLE,
+                SERVICE_USE,
+                'ILIAS getUser(): get complete set of user data. DEPRECATED with release 5.2, will be deleted with 5.3. Use searchUsers() instead.'
+            );
+        }
+        // end-patch doclit
 
         // deleteUser()
         $this->server->register(
@@ -678,43 +682,47 @@ class ilNusoapUserAdministrationAdapter
             'ILIAS deleteUserRoleEntry. Deassign user from role.'
         );
 
+        // begin-patch doclit
+        if ($this->mode == self::RPC_ENCODED_STYLE) {
+            // Add complex type for operations e.g array(array('name' => 'read','ops_id' => 2),...)
+            $this->server->wsdl->addComplexType(
+                'ilOperation',
+                'complexType',
+                'struct',
+                'all',
+                '',
+                array('ops_id' => array('name' => 'ops_id',
+                                        'type' => 'xsd:int'),
+                      'operation' => array('name' => 'operation',
+                                           'type' => 'xsd:string'),
+                      'description' => array('name' => 'description',
+                                             'type' => 'xsd:string'))
+            );
+            // Now create an array of ilOperations
+            $this->server->wsdl->addComplexType(
+                'ilOperations',
+                'complexType',
+                'array',
+                '',
+                'SOAP-ENC:Array',
+                array(),
+                array(array('ref' => 'SOAP-ENC:arrayType',
+                            'wsdl:arrayType' => 'tns:ilOperation[]')),
+                'tns:ilOperation'
+            );
+            $this->server->register(
+                'getOperations',
+                array('sid' => 'xsd:string'),
+                array('operations' => 'tns:ilOperations'),
+                SERVICE_NAMESPACE,
+                SERVICE_NAMESPACE . '#getOperations',
+                SERVICE_STYLE,
+                SERVICE_USE,
+                'ILIAS getOperations(): get complete set of RBAC operations.'
+            );
+        }
+        // end-patch doclit
 
-        // Add complex type for operations e.g array(array('name' => 'read','ops_id' => 2),...)
-        $this->server->wsdl->addComplexType(
-            'ilOperation',
-            'complexType',
-            'struct',
-            'all',
-            '',
-            array('ops_id' => array('name' => 'ops_id',
-                                                                    'type' => 'xsd:int'),
-                                                  'operation' => array('name' => 'operation',
-                                                                       'type' => 'xsd:string'),
-                                                  'description' => array('name' => 'description',
-                                                                         'type' => 'xsd:string'))
-        );
-        // Now create an array of ilOperations
-        $this->server->wsdl->addComplexType(
-            'ilOperations',
-            'complexType',
-            'array',
-            '',
-            'SOAP-ENC:Array',
-            array(),
-            array(array('ref' => 'SOAP-ENC:arrayType',
-                                                        'wsdl:arrayType' => 'tns:ilOperation[]')),
-            'tns:ilOperation'
-        );
-        $this->server->register(
-            'getOperations',
-            array('sid' => 'xsd:string'),
-            array('operations' => 'tns:ilOperations'),
-            SERVICE_NAMESPACE,
-            SERVICE_NAMESPACE . '#getOperations',
-            SERVICE_STYLE,
-            SERVICE_USE,
-            'ILIAS getOperations(): get complete set of RBAC operations.'
-        );
 
         $this->server->register(
             'revokePermissions',
@@ -729,17 +737,19 @@ class ilNusoapUserAdministrationAdapter
             'ILIAS revokePermissions(): Revoke all permissions for a specific role on an object.'
         );
 
-        $this->server->wsdl->addComplexType(
-            'ilOperationIds',
-            'complexType',
-            'array',
-            '',
-            'SOAP-ENC:Array',
-            array(),
-            array(array('ref' => 'SOAP-ENC:arrayType',
-                                                        'wsdl:arrayType' => 'xsd:int[]')),
-            'xsd:int'
-        );
+        if ($this->mode == self::RPC_ENCODED_STYLE) {
+            $this->server->wsdl->addComplexType(
+                'ilOperationIds',
+                'complexType',
+                'array',
+                '',
+                'SOAP-ENC:Array',
+                array(),
+                array(array('ref' => 'SOAP-ENC:arrayType',
+                            'wsdl:arrayType' => 'xsd:int[]')),
+                'xsd:int'
+            );
+        }
 
         $this->server->register(
             'grantPermissions',
@@ -822,19 +832,23 @@ class ilNusoapUserAdministrationAdapter
                                 'In addition to addRole the template permissions will be copied from the given role template'
         );
 
-        $this->server->register(
-            'getObjectTreeOperations',
-            array('sid' => 'xsd:string',
-                                      'ref_id' => 'xsd:int',
-                                      'user_id' => 'xsd:int'),
-            array('operations' => 'tns:ilOperations'),
-            SERVICE_NAMESPACE,
-            SERVICE_NAMESPACE . '#getPermissionsForObject',
-            SERVICE_STYLE,
-            SERVICE_USE,
-            'ILIAS getObjectTreeOperations(): Get all granted permissions for all references of ' .
-                                'an object for a specific user. Returns array of granted operations or empty array'
-        );
+        // begin-patch doclit
+        if ($this->mode == self::RPC_ENCODED_STYLE) {
+            $this->server->register(
+                'getObjectTreeOperations',
+                array('sid' => 'xsd:string',
+                      'ref_id' => 'xsd:int',
+                      'user_id' => 'xsd:int'),
+                array('operations' => 'tns:ilOperations'),
+                SERVICE_NAMESPACE,
+                SERVICE_NAMESPACE . '#getPermissionsForObject',
+                SERVICE_STYLE,
+                SERVICE_USE,
+                'ILIAS getObjectTreeOperations(): Get all granted permissions for all references of ' .
+                'an object for a specific user. Returns array of granted operations or empty array'
+            );
+        }
+        // end-patch doclit
 
         $this->server->register(
             'addGroup',

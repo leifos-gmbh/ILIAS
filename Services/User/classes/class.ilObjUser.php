@@ -1273,6 +1273,18 @@ class ilObjUser extends ilObject
         }
     }
 
+    /**
+     * @param $a_keyword
+     * @return bool
+     */
+    public function existsPref($a_keyword)
+    {
+        if (array_key_exists($a_keyword, $this->prefs)) {
+            return true;
+        }
+        return false;
+    }
+
     public static function _lookupPref($a_usr_id, $a_keyword)
     {
         global $DIC;

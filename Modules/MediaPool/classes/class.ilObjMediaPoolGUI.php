@@ -612,6 +612,15 @@ class ilObjMediaPoolGUI extends ilObject2GUI
                 $lng->txt("mep_bulk_upload"),
                 $ilCtrl->getLinkTarget($this, "bulkUpload")
             );
+
+            $move_ids = ilSession::get("mep_move_ids");
+            if (is_array($move_ids) && count($move_ids) > 0) {
+                $ilToolbar->addSeparator();
+                $ilToolbar->addButton(
+                    $lng->txt("paste"),
+                    $ilCtrl->getLinkTarget($this, "paste")
+                );
+            }
         }
 
         // tree
@@ -2212,4 +2221,68 @@ class ilObjMediaPoolGUI extends ilObject2GUI
         ilUtil::sendSuccess($lng->txt("msg_obj_modified"), true);
         $ctrl->redirect($this, "listMedia");
     }
+
+
+    /**
+     * Move items
+     * @param
+     * @return
+     */
+    protected function move()
+    {
+        ilSession::set("mep_move_ids", $_POST["id"]);
+        $this->ctrl->redirect($this, "listMedia");
+    }
+
+    /**
+     * Paste
+     */
+    protected function paste()
+    {
+        /** @var ilTree $target_tree */
+        $target_tree = $this->object->getTree();
+
+        // sanity check
+        $move_ids = ilSession::get("mep_move_ids");
+        if  (is_array($move_ids)) {
+            foreach ($move_ids as $id) {
+                $pool_ids = ilMediaPoolItem::getPoolForItemId($id);
+
+                $parent_id = (int) $_GET["mepitem_id"];
+                if (ilMediaPoolItem::lookupType($parent_id) != "fold") {
+                    $parent_id = $target_tree->readRootId();
+                }
+
+                $subnodes = [];
+                foreach ($pool_ids as $pool_id) {
+
+                    $pool = new ilObjMediaPool($pool_id, false);
+                    $source_tree = $pool->getTree();
+
+                    // if source tree == target tree, check if target is within source tree
+                    $subnodes = $source_tree->getSubtree($source_tree->getNodeData($id));
+                    if ($pool_id == $target_tree->getTreeId()) {
+                        // check, if target is within subtree
+                        foreach ($subnodes as $subnode) {
+                            if ($subnode["child"] == $parent_id) {
+                                ilUtil::sendFailure($this->lng->txt("mep_target_in_source_not_allowed"), true);
+                                $this->ctrl->redirect($this, "listMedia");
+                            }
+                        }
+                    }
+                    $source_tree->deleteTree($source_tree->getNodeData($id));
+                }
+
+                $target_tree->insertNode($id, $parent_id);
+                foreach ($subnodes as $node) {
+                    if ($node["child"] != $id) {
+                        $target_tree->insertNode($node["child"], $node["parent"]);
+                    }
+                }
+            }
+        }
+        ilSession::clear("mep_move_ids");
+        $this->ctrl->redirect($this, "listMedia");
+    }
+
 }

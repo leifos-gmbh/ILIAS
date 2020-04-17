@@ -14,6 +14,23 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+mcst#:#mcst_prev_items#:#Vorherige Videos anzeigen
+mcst#:#mcst_next_items#:#Weitere Videos anzeigen
+mcst#:#mcst_autoplay#:#Autoplay
+mcst#:#mcst_video_cast#:#Videoliste
+mcst#:#mcst_no_autoplay#:#Kein Autoplay
+mcst#:#mcst_autoplay_active#:#Autoplay (Standard 'an')
+mcst#:#mcst_autoplay_inactive#:#Autoplay (Standard 'aus')
+mcst#:#mcst_nr_videos#:#Anzahl initial angezeigter Videos
+mcst#:#mcst_show_description#:#Beschreibung anzeigen
+mob#:#mob_upload_file#:#Datei hochladen
+mob#:#mob_external_url#:#Externe URL
+mob#:#mob_choose_from_pool#:#Aus Medienpool
+mob#:#mob_url#:#URL
+mob#:#mob_url_info#:#Externe URL, z.B. Youtube oder Vimeo URL.
+mob#:#mob_mime_type_not_allowed#:#Die folgenden Mime-Typen sind am Zielort nicht erlaubt.
+mcst#:#mcst_new_items_det_lp#:#Neue Einträge dem Lernfortschritt zuordnen
+mcst#:#mcst_new_items_det_lp_info#:#Neue Einträge werden automatisch zur Lernfortschrittsbestimmung hinzugefügt.
 crs#:#timings_cron_reminder_freshly_start#:#Der Bearbeitungszeitraum hat begonnen bei:
 crs#:#timings_cron_reminder_started_subject#:#Der Bearbeitungszeitraum hat begonnen
 crs#:#timings_cron_reminder_exceeded_subject#:#Sie haben den Bearbeitungszeitraum überschritten

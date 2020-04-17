@@ -1954,20 +1954,54 @@ class ilObjMediaObject extends ilObject
      * @param
      * @return
      */
-    public function generatePreviewPic($a_width, $a_height)
+    public function generatePreviewPic($a_width = 0, $a_height = 0, $sec = 1)
     {
         $item = $this->getMediaItem("Standard");
 
-        if ($item->getLocationType() == "LocalFile" &&
-            is_int(strpos($item->getFormat(), "image/"))) {
-            $dir = ilObjMediaObject::_getDirectory($this->getId());
-            $file = $dir . "/" .
-                $item->getLocation();
-            if (is_file($file)) {
-                if (ilUtil::isConvertVersionAtLeast("6.3.8-3")) {
-                    ilUtil::execConvert(ilUtil::escapeShellArg($file) . "[0] -geometry " . $a_width . "x" . $a_height . "^ -gravity center -extent " . $a_width . "x" . $a_height . " PNG:" . $dir . "/mob_vpreview.png");
-                } else {
-                    ilUtil::convertImage($file, $dir . "/mob_vpreview.png", "PNG", $a_width . "x" . $a_height);
+        if ($item->getLocationType() == "LocalFile") {
+            if (is_int(strpos($item->getFormat(), "image/"))) {
+                $dir = ilObjMediaObject::_getDirectory($this->getId());
+                $file = $dir . "/" .
+                    $item->getLocation();
+                if (is_file($file)) {
+                    if (ilUtil::isConvertVersionAtLeast("6.3.8-3")) {
+                        ilUtil::execConvert(ilUtil::escapeShellArg($file) . "[0] -geometry " . $a_width . "x" . $a_height . "^ -gravity center -extent " . $a_width . "x" . $a_height . " PNG:" . $dir . "/mob_vpreview.png");
+                    } else {
+                        ilUtil::convertImage($file, $dir . "/mob_vpreview.png", "PNG", $a_width . "x" . $a_height);
+                    }
+                }
+            }
+            if (is_int(strpos($item->getFormat(), "video/"))) {
+                try {
+                    if ($sec < 0) {
+                        $sec = 0;
+                    }
+                    if ($this->getVideoPreviewPic() != "") {
+                        $this->removeAdditionalFile($this->getVideoPreviewPic(true));
+                    }
+                    include_once("./Services/MediaObjects/classes/class.ilFFmpeg.php");
+                    $med = $this->getMediaItem("Standard");
+                    $mob_file = ilObjMediaObject::_getDirectory($this->getId()) . "/" . $med->getLocation();
+                    $new_file = ilFFmpeg::extractImage(
+                        $mob_file,
+                        "mob_vpreview.png",
+                        ilObjMediaObject::_getDirectory($this->getId()),
+                        $sec
+                    );
+
+/*                    if ($new_file != "") {
+                        ilUtil::sendInfo($this->lng->txt("mcst_image_extracted"), true);
+                    } else {
+                        ilUtil::sendFailure($this->lng->txt("mcst_no_extraction_possible"), true);
+                    }*/
+                } catch (ilException $e) {
+                    if (DEVMODE == 1) {
+                        $ret = ilFFmpeg::getLastReturnValues();
+                        $add = (is_array($ret) && count($ret) > 0)
+                            ? "<br />" . implode($ret, "<br />")
+                            : "";
+                    }
+//                    ilUtil::sendFailure($e->getMessage() . $add, true);
                 }
             }
         }
@@ -2099,4 +2133,37 @@ class ilObjMediaObject extends ilObject
             ilUtil::rRenameSuffix($a_dir, "html", "sec");        // see #20187
         }
     }
+
+    /**
+     * Get external metadata
+     * @param
+     * @return
+     */
+    public function getExternalMetadata()
+    {
+        $st_item = $this->getMediaItem("Standard");
+        if ($st_item->getLocationType() == "Reference") {
+            if (ilExternalMediaAnalyzer::isVimeo($st_item->getLocation())) {
+                $st_item->setFormat("video/vimeo");
+                $par = ilExternalMediaAnalyzer::extractVimeoParameters($st_item->getLocation());
+                $meta = ilExternalMediaAnalyzer::getVimeoMetadata($par["id"]);
+                $this->setTitle($meta["title"]);
+                $description = str_replace("\n", "", $meta["description"]);
+                $description = str_replace(["<br>", "<br />"], ["\n", "\n"], $description);
+                $description = strip_tags($description);
+                $this->setDescription($description);
+                $st_item->setDuration((int) $meta["duration"]);
+
+                $url = parse_url($meta["thumbnail_large"]);
+                $file = basename($url["path"]);
+                copy ($meta["thumbnail_large"],
+                    ilObjMediaObject::_getDirectory($this->getId())."/mob_vpreview.".
+                    pathinfo($file, PATHINFO_EXTENSION)
+                );
+
+            }
+        }
+
+    }
+
 }

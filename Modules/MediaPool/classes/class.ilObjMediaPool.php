@@ -186,8 +186,8 @@ class ilObjMediaPool extends ilObject
     
     
     /**
-    * get media pool folder tree
-    */
+     * @return ilTree
+     */
     public function &getTree()
     {
         return $this->mep_tree;

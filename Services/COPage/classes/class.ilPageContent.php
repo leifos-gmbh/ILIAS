@@ -483,6 +483,16 @@ abstract class ilPageContent
     }
 
     /**
+     * After repository (container) copy action
+     *
+     * @param ilPageObject $page
+     * @param array        $mapping
+     * @param int          $source_ref_id
+     */
+    public static function afterRepositoryCopy(ilPageObject $page, array $mapping, int $source_ref_id) {
+    }
+
+    /**
      * After page history entry has been created
      *
      * @param object $a_page page object

@@ -172,6 +172,26 @@ class ilExternalMediaAnalyzer
     }
 
     /**
+     * Get vimeo metadata
+     * @param string
+     * @return array
+     */
+    public static function getVimeoMetadata($vid)
+    {
+        $json_url = 'http://vimeo.com/api/v2/video/'.$vid.'.json';
+
+        $curl = curl_init($json_url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 10);
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+        $return = curl_exec($curl);
+        curl_close($curl);
+
+        $r = json_decode($return, true);
+        return $r[0];
+    }
+
+    /**
     * Identify Google Document links
     */
     public static function isGoogleDocument($a_location)

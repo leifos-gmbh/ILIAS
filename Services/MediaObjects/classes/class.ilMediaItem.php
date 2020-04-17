@@ -43,6 +43,8 @@ class ilMediaItem
     public $color1;			// map area line color 1
     public $color2;			// map area line color 2
 
+    protected $duration = 0;
+
     /**
      * @var string
      */
@@ -118,6 +120,25 @@ class ilMediaItem
     }
 
     /**
+     * Set duration
+     * @param int $a_val duration
+     */
+    function setDuration($a_val)
+    {
+        $this->duration = $a_val;
+    }
+
+    /**
+     * Get duration
+     * @return int duration
+     */
+    function getDuration()
+    {
+        return $this->duration;
+    }
+    
+
+    /**
      * Set text representation
      *
      * @param	string	text representation
@@ -168,7 +189,7 @@ class ilMediaItem
         $item_id = $ilDB->nextId("media_item");
         $query = "INSERT INTO media_item (id,mob_id, purpose, location, " .
             "location_type, format, width, " .
-            "height, halign, caption, nr, text_representation, upload_hash) VALUES " .
+            "height, halign, caption, nr, text_representation, upload_hash, duration) VALUES " .
             "(" .
             $ilDB->quote($item_id, "integer") . "," .
             $ilDB->quote($this->getMobId(), "integer") . "," .
@@ -182,7 +203,8 @@ class ilMediaItem
             $ilDB->quote($this->getCaption(), "text") . "," .
             $ilDB->quote($this->getNr(), "integer") . "," .
             $ilDB->quote($this->getTextRepresentation(), "text") . "," .
-            $ilDB->quote($this->getUploadHash(), "text") .
+            $ilDB->quote($this->getUploadHash(), "text") . "," .
+            $ilDB->quote($this->getDuration(), "integer") .
             ")";
         $ilDB->manipulate($query);
         
@@ -227,7 +249,8 @@ class ilMediaItem
             " caption = " . $ilDB->quote($this->getCaption(), "text") . "," .
             " nr = " . $ilDB->quote($this->getNr(), "integer") . "," .
             " text_representation = " . $ilDB->quote($this->getTextRepresentation(), "text") . "," .
-            " upload_hash = " . $ilDB->quote($this->getUploadHash(), "text") .
+            " upload_hash = " . $ilDB->quote($this->getUploadHash(), "text") . "," .
+            " duration = " . $ilDB->quote($this->getDuration(), "integer") .
             " WHERE id = " . $ilDB->quote($this->getId(), "integer");
         $ilDB->manipulate($query);
 
@@ -300,6 +323,7 @@ class ilMediaItem
             $this->setThumbTried($item_rec["tried_thumb"]);
             $this->setTextRepresentation($item_rec["text_representation"]);
             $this->setUploadHash($item_rec["upload_hash"]);
+            $this->setDuration($item_rec["duration"]);
 
             // get item parameter
             $query = "SELECT * FROM mob_parameter WHERE med_item_id = " .
@@ -434,6 +458,7 @@ class ilMediaItem
             $media_item->setThumbTried($item_rec["tried_thumb"]);
             $media_item->setTextRepresentation($item_rec["text_representation"]);
             $media_item->setUploadHash($item_rec["upload_hash"]);
+            $media_item->setDuration($item_rec["duration"]);
 
             // get item parameter
             $query = "SELECT * FROM mob_parameter WHERE med_item_id = " .
@@ -1207,6 +1232,16 @@ class ilMediaItem
         foreach ($par as $k => $v) {
             $this->setParameter($k, $v);
         }
+    }
+
+    /**
+     * Determine the duration by analysing the file
+     */
+    public function determineDuration() {
+        $ana = new ilMediaAnalyzer();
+        $ana->setFile(ilObjMediaObject::_getDirectory($this->getMobId()) . "/" . $this->getLocation());
+        $ana->analyzeFile();
+        $this->setDuration($ana->getPlaytimeSeconds());
     }
 
     /**

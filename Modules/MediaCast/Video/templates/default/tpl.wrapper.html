@@ -1,0 +1,33 @@
+<div class="il-mcst-videocast">
+    <div id="{ID}"></div>
+    <script>
+    $(function () {
+      il.VideoWidget.init('{ID}', '{TPL}');
+      <!-- BEGIN loadfile -->il.VideoWidget.loadFile('{FID}', '{FILE}', false);<!-- END loadfile -->
+    });
+    </script>
+    <div data-elementtype="nav" class="ilFloatRight">{VIEWCONTROL}</div>
+    <h3 data-elementtype="title">{TITLE}</h3>
+    <div data-elementtype="description-wrapper" class="ilNoDisplay">
+        <div data-elementtype="description-trigger">{DESCRIPTION_LINK}</div>
+        <div data-elementtype="description" class="ilNoDisplay">{DESCRIPTION}</div>
+    </div>
+</div>
+<style>
+    .mcst-completed-preview img {
+        filter: grayscale(100%);
+    }
+    #mcst_playlist > div.media {
+        margin: 8px 0px;
+        padding: 5px;
+    }
+    #mcst_playlist img {
+        cursor: pointer;
+    }
+    .mcst-current {
+        background-color: #fff6be;
+    }
+    #mcst_playlist .mcst-current img {
+        cursor: default;
+    }
+</style>

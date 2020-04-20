@@ -17668,6 +17668,12 @@ div.ilTopMemberView {
     background: none;
   }
 }
+#block_pditems_0 > .il_Block > .ilObjListRow > .ilCLI > .ilContainerListItemOuter > .ilContainerListItemContent .btn-group {
+  display: none;
+}
+#block_pditems_0 .ilContainerTileRows .dropdown {
+  display: none;
+}
 /*----------PAGE HEADER----------*/
 div#il_startup_logo img {
   height: 65px;
@@ -17859,6 +17865,9 @@ a.il_ContainerItemCommand:visited {
 }
 .il-chart-progressmeter-box.il-chart-progressmeter-mini {
   display: none;
+}
+.il-card dl {
+  display: none !important;
 }
 /*----------REPOSITORY----------*/
 .il-card {

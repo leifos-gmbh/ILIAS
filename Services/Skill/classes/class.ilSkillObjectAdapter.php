@@ -20,7 +20,11 @@ class ilSkillObjectAdapter implements ilSkillObjectAdapterInterface
      */
     public function getObjIdForRefId(int $a_ref_id) : int
     {
-        return ilObject::_lookupObjId($a_ref_id);
+        $trigger_obj_id = ($a_ref_id > 0)
+            ? ilObject::_lookupObjId($a_ref_id)
+            : 0;
+
+        return $trigger_obj_id;
     }
 
     /**

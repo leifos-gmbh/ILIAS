@@ -99,8 +99,6 @@ interface ilBasicSkillUserLevelRepository
         int $a_level_id,
         int $a_user_id,
         int $a_tref_id = 0,
-        int $a_status = ilBasicSkill::ACHIEVED,
-        bool $a_force = false,
         bool $a_self_eval = false,
         string $a_unique_identifier = ""
     );

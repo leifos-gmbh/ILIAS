@@ -10,9 +10,13 @@ class ilBasicSkillLevelDBRepository implements ilBasicSkillLevelRepository
      */
     protected $db;
 
-    public function __construct(ilDBInterface $db)
+    public function __construct(ilDBInterface $db = null)
     {
-        $this->db = $db;
+        global $DIC;
+
+        $this->db = ($db)
+            ? $db
+            : $DIC->database();
     }
 
     /**

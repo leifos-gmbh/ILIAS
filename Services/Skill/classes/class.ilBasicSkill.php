@@ -325,8 +325,8 @@ class ilBasicSkill extends ilSkillTreeNode implements ilSkillUsageInfo
 
         $repository = new ilBasicSkillUserLevelDBRepository($ilDB);
         $repository->writeUserSkillLevelStatus($skill_id, $trigger_ref_id, $trigger_obj_id, $trigger_title,
-            $trigger_type, $update, $status_date, $a_level_id, $a_user_id, $a_tref_id, $a_status, $a_force,
-            $a_self_eval, $a_unique_identifier);
+            $trigger_type, $update, $status_date, $a_level_id, $a_user_id, $a_tref_id, $a_self_eval,
+            $a_unique_identifier);
     }
 
     public static function removeAllUserSkillLevelStatusOfObject(

@@ -7,9 +7,13 @@ class ilBasicSkillUserLevelDBRepository implements ilBasicSkillUserLevelReposito
      */
     protected $db;
 
-    public function __construct(ilDBInterface $db)
+    public function __construct(ilDBInterface $db = null)
     {
-        $this->db = $db;
+        global $DIC;
+
+        $this->db = ($db)
+            ? $db
+            : $DIC->database();
     }
 
     /**
@@ -165,12 +169,11 @@ class ilBasicSkillUserLevelDBRepository implements ilBasicSkillUserLevelReposito
         int $a_level_id,
         int $a_user_id,
         int $a_tref_id = 0,
-        int $a_status = ilBasicSkill::ACHIEVED,
-        bool $a_force = false,
         bool $a_self_eval = false,
         string $a_unique_identifier = ""
     ) {
         $ilDB = $this->db;
+        $a_status = ilBasicSkill::ACHIEVED;
 
         if ($update) {
             // this will only be set in self eval case, means this will always have a $rec

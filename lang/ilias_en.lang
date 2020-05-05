@@ -14,10 +14,23 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
-crs#:#timings_cron_reminder_freshly_start#:#The processing period has started at:
-crs#:#timings_cron_reminder_started_subject#:#The processing period has started
-crs#:#timings_cron_reminder_exceeded_subject#:#You exceeded the processing period
-crs#:#timings_cron_reminder_exceeded_start#:#The processing period is overdue at:
+book#:#book_schedule_type_none_direct#:#No Schedule, Direct Booking
+book#:#book_schedule_type_none_direct_info#:#This type can be used for seminar papers, seminar places and such. Participants can book items directly.
+book#:#book_schedule_type_none_preference#:#No Schedule, Using Preferences
+book#:#book_schedule_type_none_preference_info#:#This type can be used for seminar papers, seminar places and such. Participants will indicate their preferences. Items will be assigned automatically after the preferences deadline.
+book#:#book_nr_of_preferences#:#Number of Preferences
+book#:#book_nr_of_preferences_info#:#Number of preferences each participant can indicate.
+book#:#book_pref_deadline#:#Deadline
+book#:#book_preference_info#:#Please select %1 preference(s) until %2. After the deadline bookings will be done automatically based on the preferences of all users.
+book#:#book_preferences#:#Preferences
+book#:#book_your_bookings#:#Your Bookings
+book#:#book_your_preferences#:#Your Preferences
+book#:#book_no_bookings_for_you#:#No bookings have been performed for you.
+book#:#book_no_preferences_for_you#:#No preferences have been stored for you.
+crs#:#timings_cron_reminder_freshly_start#:#Der Bearbeitungszeitraum hat begonnen bei:
+crs#:#timings_cron_reminder_started_subject#:#Der Bearbeitungszeitraum hat begonnen
+crs#:#timings_cron_reminder_exceeded_subject#:#Sie haben den Bearbeitungszeitraum überschritten
+crs#:#timings_cron_reminder_exceeded_start#:#Der Bearbeitungszeitraum ist überfällig bei:
 crs#:#timings_reminder_notifications#:#Course Timings Notifications
 crs#:#timings_reminder_notifications_info#:#If enabled, course participants will be notified about exceeded timing materials.
 meta#:#meta_oer_harvester#:#OER Harvester

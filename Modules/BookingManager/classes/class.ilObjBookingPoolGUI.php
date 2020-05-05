@@ -12,7 +12,7 @@ require_once "./Services/Object/classes/class.ilObjectGUI.php";
 * @ilCtrl_Calls ilObjBookingPoolGUI: ilPermissionGUI, ilBookingObjectGUI
 * @ilCtrl_Calls ilObjBookingPoolGUI: ilBookingScheduleGUI, ilInfoScreenGUI, ilPublicUserProfileGUI
 * @ilCtrl_Calls ilObjBookingPoolGUI: ilCommonActionDispatcherGUI, ilObjectCopyGUI, ilObjectMetaDataGUI
-* @ilCtrl_Calls ilObjBookingPoolGUI: ilBookingParticipantGUI
+* @ilCtrl_Calls ilObjBookingPoolGUI: ilBookingParticipantGUI, ilBookingPreferencesGUI
 * @ilCtrl_IsCalledBy ilObjBookingPoolGUI: ilRepositoryGUI, ilAdministrationGUI
 */
 class ilObjBookingPoolGUI extends ilObjectGUI
@@ -43,6 +43,11 @@ class ilObjBookingPoolGUI extends ilObjectGUI
     protected $user_id_assigner; // user who performs the reservation.(self/another)
 
     /**
+     * @var ilBookingManagerInternalService
+     */
+    protected $service;
+
+	/**
     * Constructor
     *
     */
@@ -66,6 +71,8 @@ class ilObjBookingPoolGUI extends ilObjectGUI
         $this->sseed = ilUtil::stripSlashes($_GET['sseed']);
         $this->reservation_id = ilUtil::stripSlashes($_GET["reservation_id"]);
         $this->profile_user_id = (int) $_GET['user_id'];
+
+		$this->service = $DIC->bookingManager()->internal();
 
         $this->user_id_assigner = $this->user->getId();
         if ($_GET['bkusr']) {
@@ -96,7 +103,13 @@ class ilObjBookingPoolGUI extends ilObjectGUI
         
         if (!$next_class && $cmd == 'render') {
             if ($ilUser->getId() != ANONYMOUS_USER_ID) {
-                $this->ctrl->setCmdClass('ilBookingObjectGUI');
+                if ($this->object->getScheduleType() == ilObjBookingPool::TYPE_NO_SCHEDULE_PREFERENCES &&
+                    !$this->checkPermissionBool('write')) {
+                    $this->ctrl->setCmdClass('ilBookingPreferencesGUI');
+                }
+                else {
+                    $this->ctrl->setCmdClass('ilBookingObjectGUI');
+                }
                 $next_class = $this->ctrl->getNextClass($this);
             } else {
                 $this->ctrl->redirect($this, "infoscreen");
@@ -189,6 +202,12 @@ class ilObjBookingPoolGUI extends ilObjectGUI
                 $this->ctrl->forwardCommand($object_gui);
                 break;
             
+            case 'ilbookingpreferencesgui':
+                $this->tabs_gui->setTabActive('preferences');
+                $gui = $this->service->ui()->getPreferencesGUI($this->object);
+                $this->ctrl->forwardCommand($gui);
+                break;
+			
             default:
                 if (!in_array($cmd, ["create", "save", "infoScreen"])) {
                     $this->checkPermission('read');
@@ -238,7 +257,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
     {
         // if we have no schedules yet - show info
         include_once "Modules/BookingManager/classes/class.ilBookingSchedule.php";
-        if ($this->object->getScheduleType() != ilObjBookingPool::TYPE_NO_SCHEDULE &&
+        if ($this->object->getScheduleType() == ilObjBookingPool::TYPE_FIX_SCHEDULE &&
             !sizeof(ilBookingSchedule::getList($this->object->getId()))) {
             ilUtil::sendInfo($this->lng->txt("book_schedule_warning_edit"));
         }
@@ -289,8 +308,9 @@ class ilObjBookingPoolGUI extends ilObjectGUI
         $rmd_day->setMinValue(1);
         $rmd->addSubItem($rmd_day);
         
-        $none = new ilRadioOption($this->lng->txt("book_schedule_type_none"), ilObjBookingPool::TYPE_NO_SCHEDULE);
-        $none->setInfo($this->lng->txt("book_schedule_type_none_info"));
+        // no schedule, direct booking
+		$none = new ilRadioOption($this->lng->txt("book_schedule_type_none_direct"), ilObjBookingPool::TYPE_NO_SCHEDULE);
+		$none->setInfo($this->lng->txt("book_schedule_type_none_direct_info"));
         $type->addOption($none);
         
         $limit = new ilNumberInputGUI($this->lng->txt("book_overall_limit"), "limit");
@@ -299,6 +319,25 @@ class ilObjBookingPoolGUI extends ilObjectGUI
         $limit->setInfo($this->lng->txt("book_overall_limit_info"));
         $none->addSubItem($limit);
     
+		// no schedule, using preferences
+        $pref = new ilRadioOption($this->lng->txt("book_schedule_type_none_preference"), ilObjBookingPool::TYPE_NO_SCHEDULE_PREFERENCES);
+        $pref->setInfo($this->lng->txt("book_schedule_type_none_preference_info"));
+        $type->addOption($pref);
+
+        // number of preferences
+        $pref_nr = new ilNumberInputGUI($this->lng->txt("book_nr_of_preferences"), "preference_nr");
+        $pref_nr->setSize(4);
+        $pref_nr->setMinValue(1);
+        $pref_nr->setInfo($this->lng->txt("book_nr_of_preferences_info"));
+        $pref_nr->setRequired(true);
+        $pref->addSubItem($pref_nr);
+
+        // preference deadline
+        $pref_deadline = new ilDateTimeInputGUI($this->lng->txt("book_pref_deadline"), "pref_deadline");
+        $pref_deadline->setShowTime(true);
+        $pref_deadline->setRequired(true);
+        $pref->addSubItem($pref_deadline);
+
         $public = new ilCheckboxInputGUI($this->lng->txt("book_public_log"), "public");
         $public->setInfo($this->lng->txt("book_public_log_info"));
         $a_form->addItem($public);
@@ -326,11 +365,21 @@ class ilObjBookingPoolGUI extends ilObjectGUI
         $a_values["period"] = $this->object->getReservationFilterPeriod();
         $a_values["rmd"] = $this->object->getReminderStatus();
         $a_values["rmd_day"] = $this->object->getReminderDay();
+		$a_values["preference_nr"] = $this->object->getPreferenceNumber();
+        if ($this->object->getPreferenceDeadline() > 0)
+        {
+            $a_values["pref_deadline"] = new ilDateTime($this->object->getPreferenceDeadline(), IL_CAL_UNIX);
+        }
     }
 
     protected function updateCustom(ilPropertyFormGUI $a_form)
     {
         $obj_service = $this->getObjectService();
+
+        $pref_deadline = $a_form->getItemByPostVar("pref_deadline")->getDate();
+        $pref_deadline = $pref_deadline
+            ? $pref_deadline->get(IL_CAL_UNIX)
+            : 0;
 
         $this->object->setOffline(!$a_form->getInput('online'));
         $this->object->setReminderStatus($a_form->getInput('rmd'));
@@ -339,6 +388,8 @@ class ilObjBookingPoolGUI extends ilObjectGUI
         $this->object->setScheduleType($a_form->getInput('stype'));
         $this->object->setOverallLimit($a_form->getInput('limit') ? $a_form->getInput('limit') : null);
         $this->object->setReservationFilterPeriod(strlen($a_form->getInput('period')) ? (int) $a_form->getInput('period') : null);
+		$this->object->setPreferenceDeadline($pref_deadline);
+		$this->object->setPreferenceNumber($a_form->getInput('preference_nr'));
 
         // tile image
         $obj_service->commonSettings()->legacyForm($a_form, $this->object)->saveTileImage();
@@ -371,21 +422,32 @@ class ilObjBookingPoolGUI extends ilObjectGUI
         $ilHelp = $this->help;
         $ilUser = $this->user;
         
+        /** @var ilObjBookingPool $pool */
+        $pool = $this->object;
+
         if (in_array($this->ctrl->getCmd(), array("create", "save")) && !$this->ctrl->getNextClass()) {
             return;
         }
         
         $ilHelp->setScreenIdComponent("book");
-        
+
         if ($this->checkPermissionBool('read')) {
             if ($ilUser->getId() != ANONYMOUS_USER_ID) {
-                $this->tabs_gui->addTab(
-                    "render",
-                    $this->lng->txt("book_booking_types"),
-                    $this->ctrl->getLinkTarget($this, "render")
-                );
+                if ($pool->getScheduleType() == ilObjBookingPool::TYPE_NO_SCHEDULE_PREFERENCES) {
+                    $this->tabs_gui->addTab("preferences",
+                        $this->lng->txt("book_preferences"),
+                        $this->ctrl->getLinkTargetByClass("ilbookingpreferencesgui", ""));
+                }
+
+                if ($pool->getScheduleType() != ilObjBookingPool::TYPE_NO_SCHEDULE_PREFERENCES ||
+                    $this->checkPermissionBool('write')) {
+                    $this->tabs_gui->addTab("render",
+                        $this->lng->txt("book_booking_types"),
+                        $this->ctrl->getLinkTarget($this, "render")
+                    );
+                }
             }
-        
+
             $this->tabs_gui->addTab(
                 "info",
                 $this->lng->txt("info_short"),
@@ -400,11 +462,10 @@ class ilObjBookingPoolGUI extends ilObjectGUI
                 );
             }
         }
-        
+
         if ($this->checkPermissionBool('write')) {
-            if ($this->object->getScheduleType() != ilObjBookingPool::TYPE_NO_SCHEDULE) {
-                $this->tabs_gui->addTab(
-                    "schedules",
+            if ($this->object->getScheduleType() == ilObjBookingPool::TYPE_FIX_SCHEDULE) {
+                $this->tabs_gui->addTab("schedules",
                     $this->lng->txt("book_schedules"),
                     $this->ctrl->getLinkTargetByClass("ilbookingschedulegui", "render")
                 );
@@ -451,9 +512,11 @@ class ilObjBookingPoolGUI extends ilObjectGUI
     {
         $ilHelp = $this->help;
         
-        $object_subtype = ($this->object->getScheduleType() == ilObjBookingPool::TYPE_FIX_SCHEDULE)
-            ? '-schedule'
-            : '-nonschedule';
+		switch ($this->object->getScheduleType()) {
+            case ilObjBookingPool::TYPE_FIX_SCHEDULE: $object_subtype = "-schedule"; break;
+            case ilObjBookingPool::TYPE_NO_SCHEDULE: $object_subtype = "-noschedule"; break;
+            case ilObjBookingPool::TYPE_NO_SCHEDULE_PREFERENCES: $object_subtype = "-noschedulepref"; break;
+        }
         
         $ilHelp->setScreenIdComponent('book');
         $ilHelp->setScreenId('object' . $object_subtype);
@@ -1226,15 +1289,10 @@ class ilObjBookingPoolGUI extends ilObjectGUI
         }
 
         include_once 'Modules/BookingManager/classes/class.ilBookingReservationsTableGUI.php';
-        $table = new ilBookingReservationsTableGUI(
-            $this,
-            'log',
-            $this->ref_id,
-            $this->object->getId(),
-            $show_all,
-            ($this->object->getScheduleType() != ilObjBookingPool::TYPE_NO_SCHEDULE),
-            $filter
-        );
+        $table = new ilBookingReservationsTableGUI($this, 'log', $this->ref_id,
+            $this->object->getId(), $show_all,
+            ($this->object->getScheduleType() == ilObjBookingPool::TYPE_FIX_SCHEDULE),
+            $filter);
         $tpl->setContent($table->getHTML());
     }
     
@@ -1256,16 +1314,10 @@ class ilObjBookingPoolGUI extends ilObjectGUI
         }
 
         include_once 'Modules/BookingManager/classes/class.ilBookingReservationsTableGUI.php';
-        $table = new ilBookingReservationsTableGUI(
-            $this,
-            'log',
-            $this->ref_id,
-            $this->object->getId(),
-            $show_all,
-            ($this->object->getScheduleType() != ilObjBookingPool::TYPE_NO_SCHEDULE),
-            $filter,
-            $this->reservation_id
-        );
+        $table = new ilBookingReservationsTableGUI($this, 'log', $this->ref_id,
+            $this->object->getId(), $show_all,
+            ($this->object->getScheduleType() == ilObjBookingPool::TYPE_FIX_SCHEDULE),
+            $filter, $this->reservation_id);
         $tpl->setContent($table->getHTML());
     }
     
@@ -1298,14 +1350,9 @@ class ilObjBookingPoolGUI extends ilObjectGUI
         $show_all = ($this->checkPermissionBool('write') || $this->object->hasPublicLog());
         
         include_once 'Modules/BookingManager/classes/class.ilBookingReservationsTableGUI.php';
-        $table = new ilBookingReservationsTableGUI(
-            $this,
-            'log',
-            $this->ref_id,
-            $this->object->getId(),
-            $show_all,
-            ($this->object->getScheduleType() != ilObjBookingPool::TYPE_NO_SCHEDULE)
-        );
+		$table = new ilBookingReservationsTableGUI($this, 'log', $this->ref_id,
+			$this->object->getId(), $show_all,
+			($this->object->getScheduleType() == ilObjBookingPool::TYPE_FIX_SCHEDULE));
         $table->resetOffset();
         $table->writeFilterToSession();
         $this->logObject();
@@ -1319,14 +1366,9 @@ class ilObjBookingPoolGUI extends ilObjectGUI
         $show_all = ($this->checkPermissionBool('write') || $this->object->hasPublicLog());
         
         include_once 'Modules/BookingManager/classes/class.ilBookingReservationsTableGUI.php';
-        $table = new ilBookingReservationsTableGUI(
-            $this,
-            'log',
-            $this->ref_id,
-            $this->object->getId(),
-            $show_all,
-            ($this->object->getScheduleType() != ilObjBookingPool::TYPE_NO_SCHEDULE)
-        );
+        $table = new ilBookingReservationsTableGUI($this, 'log', $this->ref_id,
+            $this->object->getId(), $show_all,
+            ($this->object->getScheduleType() == ilObjBookingPool::TYPE_FIX_SCHEDULE));
         $table->resetOffset();
         $table->resetFilter();
         $this->logObject();
@@ -1482,7 +1524,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
             $obj = new ilBookingObject($rsv->getObjectId());
             
             $details = $obj->getTitle();
-            if ($this->object->getScheduleType() != ilObjBookingPool::TYPE_NO_SCHEDULE) {
+            if ($this->object->getScheduleType() == ilObjBookingPool::TYPE_FIX_SCHEDULE) {
                 $details .= ", " . ilDatePresentation::formatPeriod(
                     new ilDateTime($rsv->getFrom(), IL_CAL_UNIX),
                     new ilDateTime($rsv->getTo() + 1, IL_CAL_UNIX)
@@ -1632,7 +1674,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
                 $obj->setStatus(ilBookingReservation::STATUS_CANCELLED);
                 $obj->update();
 
-                if ($this->object->getScheduleType() != ilObjBookingPool::TYPE_NO_SCHEDULE) {
+                if ($this->object->getScheduleType() == ilObjBookingPool::TYPE_FIX_SCHEDULE) {
                     // remove user calendar entry (#11086)
                     $cal_entry_id = $obj->getCalendarEntry();
                     if ($cal_entry_id) {

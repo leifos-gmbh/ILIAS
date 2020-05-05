@@ -111,7 +111,6 @@ class ilBookingAssignParticipantsTableGUI extends ilTable2GUI
         }
         $this->getItems();
 
-
         if ($this->pool->getScheduleType() == ilObjBookingPool::TYPE_NO_SCHEDULE) {
             ilUtil::sendInfo(
                 sprintf(

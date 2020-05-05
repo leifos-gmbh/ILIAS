@@ -119,9 +119,9 @@ class ilBookingPreferencesManager
         $preferences = $preferences->getPreferences();
 
         // we calculate if a) any preferences are given and b) the deadline is reached
-        if (!is_array($preferences) || count($preferences) == 0) {
+        /*if (!is_array($preferences) || count($preferences) == 0) {
             throw new ilBookingCalculationException("No preferences given.");
-        }
+        }*/
         if (!$this->isPreferenceDeadlineReached()) {
             throw new ilBookingCalculationException("Preference deadline not reached.");
         }
@@ -146,6 +146,7 @@ class ilBookingPreferencesManager
         // phase one: assign lowest popular items to random user
         while (!$end_phase_one) {
             $popularity = $this->calculatePopularity($booking_object_ids, $preferences);
+
             $low_pop_book_obj_id = $this->getObjectWithLowestPopularity($popularity, $availability);
             if ($low_pop_book_obj_id > 0) {
                 $user_ids = $this->getUsersForObject($preferences, $low_pop_book_obj_id);

@@ -14,9 +14,12 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+book#:#book_too_many_preferences#:#Sie haben zu viele Präferenzen ausgewählt. Die Präferenzen wurden nicht gespeichert.
+book#:#book_not_enough_preferences#:#Sie haben nicht genügend Präferenzen ausgewählt. Die Präferenzen wurden nicht gespeichert.
+book#:#book_preferences_saved#:#Die Präferenzen wurden gespeichert.
 book#:#book_schedule_type_none_direct#:#Ohne Zeitplan, direkte Buchung
 book#:#book_schedule_type_none_direct_info#:#Dieser Typ ist geeignet für Referatsthemen, Seminarplätze, etc. Teilnehmer können direkt Buchungen vornehmen.
-book#:#book_schedule_type_none_preference#:#No Schedule, Using Preferences
+book#:#book_schedule_type_none_preference#:#Ohne Zeitplan, mit Präferenzen
 book#:#book_schedule_type_none_preference_info#:#Dieser Typ ist geeignet für Referatsthemen, Seminarplätze, etc. Teilnehmer können zunächst Präferenzen nennen. Nach einer Frist werden dann die Buchungen automatisch vorgenommen.
 book#:#book_nr_of_preferences#:#Anzahl Präferenzen
 book#:#book_nr_of_preferences_info#:#Anzahl an Präferenzen die jeder Teilnehmer abgeben darf.

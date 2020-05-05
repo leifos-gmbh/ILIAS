@@ -27,17 +27,28 @@ class ilBookingPreferencesManager
     protected $bookings_per_user;
 
     /**
+     * @var ilBookingPrefBasedBookGatewayRepository
+     */
+    protected $book_repo;
+
+    /**
      * Constructor
      * @param ilObjBookingPool $pool
      * @param int|null $current_time
      */
-    public function __construct(ilObjBookingPool $pool, int $current_time = null, $bookings_per_user = self::BOOKINGS_PER_USER_DEFAULT)
+    public function __construct(
+        ilObjBookingPool $pool,
+        ilBookingPrefBasedBookGatewayRepository $book_repo,
+        int $current_time = null,
+        $bookings_per_user = self::BOOKINGS_PER_USER_DEFAULT
+    )
     {
         $this->current_time = ($current_time > 0)
             ? $current_time
             : time();
         $this->pool = $pool;
         $this->bookings_per_user = $bookings_per_user;
+        $this->book_repo = $book_repo;
     }
 
     /**
@@ -73,13 +84,25 @@ class ilBookingPreferencesManager
      *
      * @param ilBookingPreferences $preferences
      * @param int[] $booking_object_ids
-     * @return array
      * @throws ilBookingCalculationException
      */
     public function storeBookings($preferences, $booking_object_ids = null)
     {
         $bookings = $this->calculateBookings($preferences, $booking_object_ids);
-        return $bookings;
+        $this->book_repo->storeBookings($this->pool->getId(), $bookings);
+    }
+
+    /**
+     * Read the bookings
+     *
+     * @return int[][]
+     */
+    public function readBookings()
+    {
+        $booking_object_ids = array_map(function ($i) {
+            return $i["booking_object_id"];
+        }, ilBookingObject::getList($this->pool->getId()));
+        return $this->book_repo->getBookings($booking_object_ids);
     }
 
 
@@ -90,7 +113,7 @@ class ilBookingPreferencesManager
      * @return array
      * @throws ilBookingCalculationException
      */
-    protected function calculateBookings(ilBookingPreferences $preferences, $booking_object_ids = null,
+    public function calculateBookings(ilBookingPreferences $preferences, $booking_object_ids = null,
         $availability = null)
     {
         $preferences = $preferences->getPreferences();

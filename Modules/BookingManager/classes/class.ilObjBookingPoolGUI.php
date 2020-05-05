@@ -435,7 +435,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
             if ($ilUser->getId() != ANONYMOUS_USER_ID) {
                 if ($pool->getScheduleType() == ilObjBookingPool::TYPE_NO_SCHEDULE_PREFERENCES) {
                     $this->tabs_gui->addTab("preferences",
-                        $this->lng->txt("book_preferences"),
+                        $this->lng->txt("book_pref_overview"),
                         $this->ctrl->getLinkTargetByClass("ilbookingpreferencesgui", ""));
                 }
 

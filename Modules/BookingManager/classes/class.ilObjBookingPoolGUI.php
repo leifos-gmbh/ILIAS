@@ -884,8 +884,8 @@ class ilObjBookingPoolGUI extends ilObjectGUI
         
         $success = false;
         $rsv_ids = array();
-        
-        if ($this->object->getScheduleType() == ilObjBookingPool::TYPE_NO_SCHEDULE) {
+
+        if ($this->object->getScheduleType() != ilObjBookingPool::TYPE_FIX_SCHEDULE) {
             if ($this->book_obj_id > 0) {
                 $object_id = $this->book_obj_id;
                 if ($object_id) {

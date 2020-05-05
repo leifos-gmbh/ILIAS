@@ -14,6 +14,7 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+book#:#book_no_objects#:#Keine Zuweisung
 book#:#book_too_many_preferences#:#Sie haben zu viele Präferenzen ausgewählt. Die Präferenzen wurden nicht gespeichert.
 book#:#book_not_enough_preferences#:#Sie haben nicht genügend Präferenzen ausgewählt. Die Präferenzen wurden nicht gespeichert.
 book#:#book_preferences_saved#:#Die Präferenzen wurden gespeichert.
@@ -24,7 +25,7 @@ book#:#book_schedule_type_none_preference_info#:#Dieser Typ ist geeignet für Re
 book#:#book_nr_of_preferences#:#Anzahl Präferenzen
 book#:#book_nr_of_preferences_info#:#Anzahl an Präferenzen die jeder Teilnehmer abgeben darf.
 book#:#book_pref_deadline#:#Frist
-book#:#book_preference_info#:#Bitte wählen Sie %1 Präferenz(en) bis %2. Nach der Frist werden die Zuordnunge auf der Basis der Präferenzen aller Teilnehmer automatisch durchgeführt.
+book#:#book_preference_info#:#Bitte wählen Sie %1 Präferenz(en) bis %2. Nach der Frist werden die Zuordnungen auf der Basis der Präferenzen aller Teilnehmer automatisch durchgeführt.
 book#:#book_preferences#:#Präferenzen
 book#:#book_your_bookings#:#Ihre Reservierungen
 book#:#book_your_preferences#:#Ihre Präferenzen

@@ -14,6 +14,7 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+book#:#book_no_objects#:#No Assignment
 book#:#book_too_many_preferences#:#You selected too many preferences. The preferences have not been saved.
 book#:#book_not_enough_preferences#:#You selected not enough preferences. The preferences have not been saved.
 book#:#book_preferences_saved#:#The preferences have been saved.

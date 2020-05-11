@@ -15,14 +15,14 @@ interface ilSkillObjectAdapterInterface
     /**
      * Get object type for object id
      * @param int $a_obj_id
-     * @return string
+     * @return null|string
      */
-    public function getTypeForObjId(int $a_obj_id) : string;
+    public function getTypeForObjId(int $a_obj_id) : ?string;
 
     /**
      * Get object title for object id
      * @param int $a_obj_id
-     * @return string
+     * @return null|string
      */
-    public function getTitleForObjId(int $a_obj_id) : string;
+    public function getTitleForObjId(int $a_obj_id) : ?string;
 }

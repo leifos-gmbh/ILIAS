@@ -9,11 +9,6 @@
 class ilBasicSkill extends ilSkillTreeNode implements ilSkillUsageInfo
 {
     /**
-     * @var ilDBInterface
-     */
-    protected $db;
-
-    /**
      * @var ilObjUser
      */
     protected $user;
@@ -44,14 +39,17 @@ class ilBasicSkill extends ilSkillTreeNode implements ilSkillUsageInfo
     public $id;
 
     /**
-     * Constructor
-     * @access    public
+     * ilBasicSkill constructor.
+     * @param int                                  $a_id
+     * @param ilBasicSkillLevelRepository|null     $bsc_skl_lvl_db_rep
+     * @param ilBasicSkillUserLevelRepository|null $bsc_skl_usr_lvl_db_rep
+     * @param ilBasicSkillTreeRepository|null      $bsc_skl_tre_rep
      */
     public function __construct(
-        $a_id = 0,
-        ilBasicSkillLevelDBRepository $bsc_skl_lvl_db_rep = null,
-        ilBasicSkillUserLevelDBRepository $bsc_skl_usr_lvl_db_rep = null,
-        ilBasicSkillTreeDBRepository $bsc_skl_tre_rep = null
+        int $a_id = 0,
+        ilBasicSkillLevelRepository $bsc_skl_lvl_db_rep = null,
+        ilBasicSkillUserLevelRepository $bsc_skl_usr_lvl_db_rep = null,
+        ilBasicSkillTreeRepository $bsc_skl_tre_rep = null
     ) {
         global $DIC;
 
@@ -59,15 +57,24 @@ class ilBasicSkill extends ilSkillTreeNode implements ilSkillUsageInfo
         $this->user = $DIC->user();
 
         if (is_null($bsc_skl_lvl_db_rep)) {
-            $this->bsc_skl_lvl_db_rep = new ilBasicSkillLevelDBRepository($this->db);
+            $this->bsc_skl_lvl_db_rep = $DIC->skills()->internal()->repo()->getLevelRepo();
+        }
+        else {
+            $this->bsc_skl_lvl_db_rep = $bsc_skl_lvl_db_rep;
         }
 
         if (is_null($bsc_skl_usr_lvl_db_rep)) {
-            $this->bsc_skl_usr_lvl_db_rep = new ilBasicSkillUserLevelDBRepository($this->db);
+            $this->bsc_skl_usr_lvl_db_rep = $DIC->skills()->internal()->repo()->getUserLevelRepo();
+        }
+        else {
+            $this->bsc_skl_usr_lvl_db_rep = $bsc_skl_usr_lvl_db_rep;
         }
 
         if (is_null($bsc_skl_tre_rep)) {
-            $this->bsc_skl_tre_rep = new ilBasicSkillTreeDBRepository($this->db);
+            $this->bsc_skl_tre_rep = $DIC->skills()->internal()->repo()->getTreeRepo();
+        }
+        else {
+            $this->bsc_skl_tre_rep = $bsc_skl_tre_rep;
         }
 
         parent::__construct($a_id);

@@ -73,34 +73,34 @@ interface ilBasicSkillUserLevelRepository
 
     /**
      * Write skill level status
-     * @param int    $skill_id            skill id
-     * @param int    $trigger_ref_id      triggering repository object ref id
-     * @param int    $trigger_obj_id      triggering object id
-     * @param string $trigger_title       triggering object title
-     * @param string $trigger_type        triggering object type
-     * @param bool   $update              update or insert
-     * @param mixed  $status_date         date status
-     * @param int    $a_level_id          skill level id
-     * @param int    $a_user_id           user id
-     * @param int    $a_tref_id           skill tref id
-     * @param int    $a_status            DEPRECATED, always use ilBasicSkill::ACHIEVED
-     * @param bool   $a_force             DEPRECATED
-     * @param bool   $a_self_eval         self evaluation
-     * @param string $a_unique_identifier a  unique identifier (should be used with trigger_ref_id > 0)
+     * @param int         $skill_id                skill id
+     * @param int         $trigger_ref_id          triggering repository object ref id
+     * @param int         $trigger_obj_id          triggering object id
+     * @param null|string $trigger_title           triggering object title
+     * @param null|string $trigger_type            triggering object type
+     * @param bool        $update                  update or insert
+     * @param mixed       $status_date             date status
+     * @param int         $a_level_id              skill level id
+     * @param int         $a_user_id               user id
+     * @param int         $a_tref_id               skill tref id
+     * @param bool        $a_self_eval             self evaluation
+     * @param string      $a_unique_identifier     a  unique identifier (should be used with trigger_ref_id > 0)
+     * @param float       $a_next_level_fulfilment next level percentage fulfilment value (value must be >=0 and <1)
      */
     public function writeUserSkillLevelStatus(
         int $skill_id,
         int $trigger_ref_id,
         int $trigger_obj_id,
-        string $trigger_title,
-        string $trigger_type,
+        ?string $trigger_title,
+        ?string $trigger_type,
         bool $update,
         $status_date,
         int $a_level_id,
         int $a_user_id,
         int $a_tref_id = 0,
         bool $a_self_eval = false,
-        string $a_unique_identifier = ""
+        string $a_unique_identifier = "",
+        float $a_next_level_fulfilment = 0.0
     );
 
     /**
@@ -225,7 +225,7 @@ interface ilBasicSkillUserLevelRepository
      * @param int $a_object_id
      * @param int $a_user_id
      * @param int $a_self_eval
-     * @return int
+     * @return null|int
      */
     public function getLastLevelPerObject(
         int $skill_id,
@@ -233,7 +233,7 @@ interface ilBasicSkillUserLevelRepository
         int $a_object_id,
         int $a_user_id = 0,
         int $a_self_eval = 0
-    ) : int;
+    ) : ?int;
 
     /**
      * Get last update per object
@@ -242,7 +242,7 @@ interface ilBasicSkillUserLevelRepository
      * @param int $a_object_id
      * @param int $a_user_id
      * @param int $a_self_eval
-     * @return ilDateTime
+     * @return null|string
      */
     public function getLastUpdatePerObject(
         int $skill_id,
@@ -250,5 +250,5 @@ interface ilBasicSkillUserLevelRepository
         int $a_object_id,
         int $a_user_id = 0,
         int $a_self_eval = 0
-    ) : ilDateTime;
+    ) : ?string;
 }

@@ -14,9 +14,7 @@ class ilSkillObjectAdapter implements ilSkillObjectAdapterInterface
     }
 
     /**
-     * Get object id for reference id
-     * @param int $a_ref_id
-     * @return int
+     * @inheritDoc
      */
     public function getObjIdForRefId(int $a_ref_id) : int
     {
@@ -28,21 +26,17 @@ class ilSkillObjectAdapter implements ilSkillObjectAdapterInterface
     }
 
     /**
-     * Get object type for object id
-     * @param int $a_obj_id
-     * @return string
+     * @inheritDoc
      */
-    public function getTypeForObjId(int $a_obj_id) : string
+    public function getTypeForObjId(int $a_obj_id) : ?string
     {
         return ilObject::_lookupType($a_obj_id);
     }
 
     /**
-     * Get object title for object id
-     * @param int $a_obj_id
-     * @return string
+     * @inheritDoc
      */
-    public function getTitleForObjId(int $a_obj_id) : string
+    public function getTitleForObjId(int $a_obj_id) : ?string
     {
         return ilObject::_lookupTitle($a_obj_id);
     }

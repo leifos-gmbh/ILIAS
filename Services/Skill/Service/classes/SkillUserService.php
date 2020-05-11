@@ -11,7 +11,7 @@ namespace ILIAS\Skill\Service;
 class SkillUserService
 {
     /**
-     * @var SkillUserManagerService
+     * @var SkillInternalManagerService $manager_service
      */
     protected $manager_service;
 
@@ -23,12 +23,14 @@ class SkillUserService
     /**
      * Constructor
      */
-    public function __construct(int $user_id)
+    public function __construct(int $user_id, SkillInternalManagerService $manager_service = null)
     {
         global $DIC;
 
         $this->user_id = $user_id;
-        $this->manager_service = $DIC->skills()->internal()->manager();
+        $this->manager_service = ($manager_service)
+            ? $manager_service
+            : $DIC->skills()->internal()->manager();
     }
 
     /**
@@ -41,15 +43,15 @@ class SkillUserService
      */
     public function writeSkillLevel(
         int $a_level_id,
-        int $a_user_id,
         int $a_trigger_ref_id,
         int $a_tref_id = 0,
         bool $a_self_eval = false,
-        string $a_unique_identifier = ""
+        string $a_unique_identifier = "",
+        float $a_next_level_fulfilment = 0.0
     ) {
-        //TODO: next level percentage fulfilment value (value must be >=0 and <1)
-        $this->manager_service->writeSkillLevel($a_level_id, $a_user_id,
-            $a_trigger_ref_id, $a_tref_id, $a_self_eval, $a_unique_identifier);
+        $user_id = $this->user_id;
+        $this->manager_service->getUserLevelManager()->writeSkillLevel($user_id, $a_level_id, $a_trigger_ref_id,
+            $a_tref_id, $a_self_eval, $a_unique_identifier, $a_next_level_fulfilment);
     }
 
     public function getProfiles()

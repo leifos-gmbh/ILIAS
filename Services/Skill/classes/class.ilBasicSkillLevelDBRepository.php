@@ -115,7 +115,7 @@ class ilBasicSkillLevelDBRepository implements ilBasicSkillLevelRepository
      */
     public function lookupLevelTitle(int $a_id) : string
     {
-        $this->lookupLevelProperty($a_id, "title");
+        return $this->lookupLevelProperty($a_id, "title");
     }
 
     /**
@@ -123,7 +123,7 @@ class ilBasicSkillLevelDBRepository implements ilBasicSkillLevelRepository
      */
     public function lookupLevelDescription(int $a_id) : string
     {
-        $this->lookupLevelProperty($a_id, "description");
+        return $this->lookupLevelProperty($a_id, "description");
     }
 
     /**
@@ -131,7 +131,7 @@ class ilBasicSkillLevelDBRepository implements ilBasicSkillLevelRepository
      */
     public function lookupLevelSkillId(int $a_id) : int
     {
-        $this->lookupLevelProperty($a_id, "skill_id");
+        return $this->lookupLevelProperty($a_id, "skill_id");
     }
 
     /**

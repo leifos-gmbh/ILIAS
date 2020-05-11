@@ -28,6 +28,6 @@ class SkillInternalService
 
     public function manager()
     {
-        return new SkillUserManagerService($this->repo());
+        return new SkillInternalManagerService();
     }
 }

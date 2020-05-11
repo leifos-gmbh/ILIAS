@@ -48,6 +48,7 @@ class ilBasicSkillUserLevelDBRepository implements ilBasicSkillUserLevelReposito
             $now = ilUtil::now();
             $ilDB->manipulate("UPDATE skl_user_skill_level SET " .
                 " level_id = " . $ilDB->quote(0, "integer") . "," .
+                " next_level_fulfilment = " . $ilDB->quote(0.0, "float") . "," .
                 " status_date = " . $ilDB->quote($now, "timestamp") .
                 " WHERE user_id = " . $ilDB->quote($a_user_id, "integer") .
                 " AND status_date = " . $ilDB->quote($status_date, "timestamp") .
@@ -61,7 +62,8 @@ class ilBasicSkillUserLevelDBRepository implements ilBasicSkillUserLevelReposito
             $now = ilUtil::now();
             $ilDB->manipulate("INSERT INTO skl_user_skill_level " .
                 "(level_id, user_id, tref_id, status_date, skill_id, status, valid, trigger_ref_id," .
-                "trigger_obj_id, trigger_obj_type, trigger_title, self_eval, unique_identifier) VALUES (" .
+                "trigger_obj_id, trigger_obj_type, trigger_title, self_eval, unique_identifier," .
+                "next_level_fulfilment) VALUES (" .
                 $ilDB->quote(0, "integer") . "," .
                 $ilDB->quote($a_user_id, "integer") . "," .
                 $ilDB->quote((int) $a_tref_id, "integer") . "," .
@@ -74,7 +76,8 @@ class ilBasicSkillUserLevelDBRepository implements ilBasicSkillUserLevelReposito
                 $ilDB->quote("", "text") . "," .
                 $ilDB->quote("", "text") . "," .
                 $ilDB->quote($a_self_eval, "integer") . "," .
-                $ilDB->quote("", "text") .
+                $ilDB->quote("", "text") . "," .
+                $ilDB->quote(0.0, "float") .
                 ")");
         }
 
@@ -162,15 +165,16 @@ class ilBasicSkillUserLevelDBRepository implements ilBasicSkillUserLevelReposito
         int $skill_id,
         int $trigger_ref_id,
         int $trigger_obj_id,
-        string $trigger_title,
-        string $trigger_type,
+        ?string $trigger_title,
+        ?string $trigger_type,
         bool $update,
         $status_date,
         int $a_level_id,
         int $a_user_id,
         int $a_tref_id = 0,
         bool $a_self_eval = false,
-        string $a_unique_identifier = ""
+        string $a_unique_identifier = "",
+        float $a_next_level_fulfilment = 0.0
     ) {
         $ilDB = $this->db;
         $a_status = ilBasicSkill::ACHIEVED;
@@ -180,7 +184,8 @@ class ilBasicSkillUserLevelDBRepository implements ilBasicSkillUserLevelReposito
             $now = ilUtil::now();
             $ilDB->manipulate("UPDATE skl_user_skill_level SET " .
                 " level_id = " . $ilDB->quote($a_level_id, "integer") . "," .
-                " status_date = " . $ilDB->quote($now, "timestamp") .
+                " status_date = " . $ilDB->quote($now, "timestamp") . "," .
+                " next_level_fulfilment = " . $ilDB->quote((float) $a_next_level_fulfilment, "float") .
                 " WHERE user_id = " . $ilDB->quote($a_user_id, "integer") .
                 " AND status_date = " . $ilDB->quote($status_date, "timestamp") .
                 " AND skill_id = " . $ilDB->quote($skill_id, "integer") .
@@ -205,7 +210,8 @@ class ilBasicSkillUserLevelDBRepository implements ilBasicSkillUserLevelReposito
             $now = ilUtil::now();
             $ilDB->manipulate("INSERT INTO skl_user_skill_level " .
                 "(level_id, user_id, tref_id, status_date, skill_id, status, valid, trigger_ref_id," .
-                "trigger_obj_id, trigger_obj_type, trigger_title, self_eval, unique_identifier) VALUES (" .
+                "trigger_obj_id, trigger_obj_type, trigger_title, self_eval, unique_identifier," .
+                "next_level_fulfilment) VALUES (" .
                 $ilDB->quote($a_level_id, "integer") . "," .
                 $ilDB->quote($a_user_id, "integer") . "," .
                 $ilDB->quote((int) $a_tref_id, "integer") . "," .
@@ -218,7 +224,8 @@ class ilBasicSkillUserLevelDBRepository implements ilBasicSkillUserLevelReposito
                 $ilDB->quote($trigger_type, "text") . "," .
                 $ilDB->quote($trigger_title, "text") . "," .
                 $ilDB->quote($a_self_eval, "integer") . "," .
-                $ilDB->quote($a_unique_identifier, "text") .
+                $ilDB->quote($a_unique_identifier, "text") . "," .
+                $ilDB->quote((float) $a_next_level_fulfilment, "float") .
                 ")");
         }
 
@@ -234,7 +241,8 @@ class ilBasicSkillUserLevelDBRepository implements ilBasicSkillUserLevelReposito
 
         if ($a_status == ilBasicSkill::ACHIEVED) {
             $ilDB->manipulate("INSERT INTO skl_user_has_level " .
-                "(level_id, user_id, tref_id, status_date, skill_id, trigger_ref_id, trigger_obj_id, trigger_obj_type, trigger_title, self_eval) VALUES (" .
+                "(level_id, user_id, tref_id, status_date, skill_id, trigger_ref_id, trigger_obj_id, trigger_obj_type," .
+                "trigger_title, self_eval, next_level_fulfilment) VALUES (" .
                 $ilDB->quote($a_level_id, "integer") . "," .
                 $ilDB->quote($a_user_id, "integer") . "," .
                 $ilDB->quote($a_tref_id, "integer") . "," .
@@ -244,7 +252,8 @@ class ilBasicSkillUserLevelDBRepository implements ilBasicSkillUserLevelReposito
                 $ilDB->quote($trigger_obj_id, "integer") . "," .
                 $ilDB->quote($trigger_type, "text") . "," .
                 $ilDB->quote($trigger_title, "text") . "," .
-                $ilDB->quote($a_self_eval, "integer") .
+                $ilDB->quote($a_self_eval, "integer") . "," .
+                $ilDB->quote((float) $a_next_level_fulfilment, "float") .
                 ")");
         }
     }
@@ -482,7 +491,7 @@ class ilBasicSkillUserLevelDBRepository implements ilBasicSkillUserLevelReposito
         int $a_object_id,
         int $a_user_id = 0,
         int $a_self_eval = 0
-    ) : int {
+    ) : ?int {
         $ilDB = $this->db;
 
         $ilDB->setLimit(1);
@@ -509,7 +518,7 @@ class ilBasicSkillUserLevelDBRepository implements ilBasicSkillUserLevelReposito
         int $a_object_id,
         int $a_user_id = 0,
         int $a_self_eval = 0
-    ) : ilDateTime {
+    ) : ?string {
         $ilDB = $this->db;
 
         $ilDB->setLimit(1);

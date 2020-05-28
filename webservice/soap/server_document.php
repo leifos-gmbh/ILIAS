@@ -38,14 +38,18 @@ if ((bool) $ilIliasIniFile->readVariable('https', 'auto_https_detect_enabled')) 
 if (strcasecmp($_SERVER["REQUEST_METHOD"], "post") == 0) {
     // This is a SOAP request
     include_once('webservice/soap/include/inc.soap_functions.php');
-    $uri = ilSoapFunctions::buildHTTPPath() . '/webservice/soap/server.php';
-    $wsdl = $uri . '?wsdl';
-
+    $uri = ilSoapFunctions::buildHTTPPath() . '/webservice/soap/server_document.php';
+    if (isset($_GET['client_id'])) {
+        $uri .= '?client_id=' . $_GET['client_id'];
+        $wsdl = $uri . '&wsdl';
+    } else {
+        $wsdl = $uri . '?wsdl';
+    }
     $soapServer = new SoapServer($wsdl, array('uri' => $uri));
 
     include_once './webservice/soap/classes/class.ilSoapRequestHandler.php';
     $soapServer->setObject(new \ilSoapRequestHandler($soapServer));
-    $soapServer->handle();
+    $soapServer->handle(\ilSoapRequestHandler::parseHeader());
 } else {
     // This is a request to display the available SOAP methods or WSDL...
     include('webservice/soap/nusoapserver_document.php');

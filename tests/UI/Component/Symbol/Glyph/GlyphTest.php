@@ -94,11 +94,11 @@ class GlyphTest extends ILIAS_UI_TestBase
         , G\Glyph::CALENDAR => "calendar"
         , G\Glyph::TIME => "time"
         , G\Glyph::CLOSE => "close"
-        , G\Glyph::MORE => "more"
-        , G\Glyph::DISCLOSURE => "disclosure"
-        , G\Glyph::LANGUAGE => "switch language"
-        , G\Glyph::LOGIN => "login"
-        , G\Glyph::LOGOUT => "logout"
+        , G\Glyph::MORE => "show_more"
+        , G\Glyph::DISCLOSURE => "disclose"
+        , G\Glyph::LANGUAGE => "switch_language"
+        , G\Glyph::LOGIN => "log_in"
+        , G\Glyph::LOGOUT => "log_out"
     );
 
     /**
@@ -454,6 +454,25 @@ class GlyphTest extends ILIAS_UI_TestBase
 
         $id = $ids[0];
         $expected = "<a class=\"glyph\" href=\"http://www.ilias.de\" aria-label=\"$aria_label\" id=\"$id\"><span class=\"$css_classes\" aria-hidden=\"true\"></span></a>";
+        $this->assertEquals($expected, $html);
+    }
+
+    /**
+     * @dataProvider glyph_type_provider
+     */
+    public function test_render_with_action($type)
+    {
+        $f = $this->getGlyphFactory();
+        $r = $this->getDefaultRenderer();
+        $c = $f->$type("http://www.ilias.de");
+        $c = $c->withAction("http://www.ilias.de/open-source-lms-ilias/");
+
+        $html = $this->normalizeHTML($r->render($c));
+
+        $css_classes = self::$canonical_css_classes[$type];
+        $aria_label = self::$aria_labels[$type];
+
+        $expected = "<a class=\"glyph\" href=\"http://www.ilias.de/open-source-lms-ilias/\" aria-label=\"$aria_label\"><span class=\"$css_classes\" aria-hidden=\"true\"></span></a>";
         $this->assertEquals($expected, $html);
     }
 }

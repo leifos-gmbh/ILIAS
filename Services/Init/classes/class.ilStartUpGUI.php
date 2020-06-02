@@ -212,6 +212,9 @@ class ilStartUpGUI
         // Instantiate login template
         $tpl = self::initStartUpTemplate("tpl.login.html");
 
+        $this->mainTemplate->addCss(ilObjStyleSheet::getContentStylePath(0));
+        $this->mainTemplate->addCss(ilObjStyleSheet::getSyntaxStylePath());
+
         $page_editor_html = $this->getLoginPageEditorHTML();
         $page_editor_html = $this->showOpenIdConnectLoginForm($page_editor_html);
         $page_editor_html = $this->showLoginInformation($page_editor_html, $tpl);
@@ -1397,7 +1400,7 @@ class ilStartUpGUI
         $tpl->setVariable("PAGETITLE", $lng->txt("clientlist_clientlist"));
 
         // load client list template
-        self::initStartUpTemplate("tpl.client_list.html");
+        $tpl = self::initStartUpTemplate("tpl.client_list.html");
 
         // load template for table
         $tpl->addBlockfile("CLIENT_LIST", "client_list", "tpl.table.html");
@@ -1408,10 +1411,8 @@ class ilStartUpGUI
         // load table content data
         require_once("setup/classes/class.ilClientList.php");
         require_once("setup/classes/class.ilClient.php");
-        require_once("setup/classes/class.ilDBConnections.php");
         require_once("./Services/Table/classes/class.ilTableGUI.php");
-        $this->db_connections = new ilDBConnections();
-        $clientlist = new ilClientList($this->db_connections);
+        $clientlist = new \ilClientList();
         $list = $clientlist->getClients();
 
         if (count($list) == 0) {
@@ -1443,7 +1444,7 @@ class ilStartUpGUI
         }
 
         // create table
-        $tbl = new ilTableGUI();
+        $tbl = new ilTableGUI('', false);
 
         // title & header columns
         if ($hasPublicSection) {
@@ -1473,8 +1474,8 @@ class ilStartUpGUI
         $tbl->disable("footer");
 
         // render table
-        $tbl->render();
-        $tpl->printToStdout("DEFAULT", true, true);
+        $html_for_nothing = $tbl->render();
+        self::printToGlobalTemplate($tbl->getTemplateObject());
     }
 
     /**
@@ -1601,7 +1602,10 @@ class ilStartUpGUI
 
     public static function _checkGoto($a_target)
     {
+        global $DIC;
         global $objDefinition, $ilPluginAdmin, $ilUser;
+
+        $access = $DIC->access();
 
 
         if (is_object($ilPluginAdmin)) {
@@ -1684,11 +1688,10 @@ class ilStartUpGUI
                 $pobj_id = ilObject::_lookupObjId($path_ref_id);
 
                 // core checks: timings/object-specific
-                if (!$ilAccess->checkAccess(
-                    'read',
-                    '',
-                    $path_ref_id
-                )) {
+                if (
+                    !$access->doActivationCheck('read', '', $path_ref_id, $ilUser->getId(), $pobj_id, $ptype) ||
+                    !$access->doStatusCheck('read', '', $path_ref_id, $ilUser->getId(), $pobj_id, $ptype)
+                ) {
                     // object in path is inaccessible - aborting
                     return false;
                 } elseif ($ptype == "crs") {
@@ -1967,7 +1970,7 @@ class ilStartUpGUI
             }
 
             return $this->substituteLoginPageElements(
-                $DIC->ui()->mainTemplate(),
+                $GLOBALS['tpl'],
                 $page_editor_html,
                 $tpl->get(),
                 '[list-openid-connect-login]',

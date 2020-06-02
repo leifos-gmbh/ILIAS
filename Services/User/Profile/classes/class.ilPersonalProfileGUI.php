@@ -62,7 +62,6 @@ class ilPersonalProfileGUI
         $this->tpl = $DIC->ui()->mainTemplate();
         $this->ctrl = $DIC->ctrl();
 
-
         if ($termsOfServiceEvaluation === null) {
             $termsOfServiceEvaluation = $DIC['tos.document.evaluator'];
         }
@@ -676,7 +675,7 @@ class ilPersonalProfileGUI
                     $name,
                     $this->user_defined_fields->fieldValuesToSelectArray(
                         $definition['field_values']
-                                                                        ),
+                    ),
                     false,
                     true,
                     0,
@@ -756,7 +755,7 @@ class ilPersonalProfileGUI
                     [$DIC->ui()->factory()->link()->standard(
                         $lng->txt("user_make_profile_public"),
                         $ctrl->getLinkTarget($this, "showPublicProfile")
-                        )]
+                    )]
                 );
 
                 $it = $DIC->ui()->renderer()->render($box);
@@ -1152,13 +1151,12 @@ class ilPersonalProfileGUI
         // location
         include_once("./Services/Maps/classes/class.ilMapUtil.php");
         if (ilMapUtil::isActivated()) {
-            $val_array["location"] = ($ilUser->getLatitude() + $ilUser->getLongitude() + $ilUser->getLocationZoom() > 0)
+            $val_array["location"] = ((int) $ilUser->getLatitude() + (int) $ilUser->getLongitude() + (int) $ilUser->getLocationZoom() > 0)
                 ? " "
                 : "";
         }
-        
         foreach ($val_array as $key => $value) {
-            if (in_array($value, ["", "-"])) {
+            if (in_array($value, ["", "-"]) && !$anonymized) {
                 continue;
             }
             if ($anonymized) {
@@ -1243,6 +1241,15 @@ class ilPersonalProfileGUI
                     }
                 }
             }
+        }
+
+        // permalink
+        $ne = new ilNonEditableValueGUI($this->lng->txt("perma_link"), "");
+        $ne->setValue(ilLink::_getLink($this->user->getId(), "usr"));
+        if (!$parent) {
+            $form->addItem($ne);
+        } else {
+            $parent->addSubItem($ne);
         }
     }
     
@@ -1525,7 +1532,7 @@ class ilPersonalProfileGUI
                 (int) $_POST["settings"],
                 (int) $_POST["notes"],
                 (int) $_POST["calendar"]
-                );
+            );
             ilUtil::sendSuccess($this->lng->txt("msg_obj_modified"), true);
             $ilCtrl->redirect($this, "");
         } else {

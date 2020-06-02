@@ -307,13 +307,12 @@ class ilStudyProgrammeUserProgress
             throw new ilException("Can't mark as failed since program is passed.");
         }
 
-        $this->progress_repository->update(
-            $this->progress
-                ->setStatus(ilStudyProgrammeProgress::STATUS_FAILED)
-                ->setLastChangeBy($a_user_id)
-                ->setCompletionDate(null)
-        );
+        $this->progress
+            ->setStatus(ilStudyProgrammeProgress::STATUS_FAILED)
+            ->setLastChangeBy($a_user_id)
+            ->setCompletionDate(null);
 
+        $this->progress_repository->update($this->progress);
         $this->refreshLPStatus();
 
         return $this;
@@ -577,7 +576,10 @@ class ilStudyProgrammeUserProgress
         $deadline = $this->getDeadline();
         $today = date(ilStudyProgrammeProgress::DATE_FORMAT);
 
-        if ($deadline && $deadline->format(ilStudyProgrammeProgress::DATE_FORMAT) < $today) {
+        if ($deadline
+            && $deadline->format(ilStudyProgrammeProgress::DATE_FORMAT) < $today
+            && $this->progress->getStatus() === ilStudyProgrammeProgress::STATUS_IN_PROGRESS
+        ) {
             $this->progress_repository->update(
                 $this->progress
                     ->setStatus(ilStudyProgrammeProgress::STATUS_FAILED)
@@ -956,7 +958,7 @@ class ilStudyProgrammeUserProgress
         $lng = $DIC['lng'];
         $log = $DIC['ilLog'];
         $lng->loadLanguageModule("prg");
-        $senderFactory = $DIC["mail.mime.sender.factory"];
+        $lng->loadLanguageModule("mail");
 
         /** @var ilStudyProgrammeUserProgressDB $usr_progress_db */
         $usr_progress_db = ilStudyProgrammeDIC::dic()['ilStudyProgrammeUserProgressDB'];
@@ -970,27 +972,32 @@ class ilStudyProgrammeUserProgress
             return;
         }
 
-        $mail = new ilMimeMail();
-        $mail->From($senderFactory->system());
-
-        $mailOptions = new \ilMailOptions($usr_id);
-        $mail->To($mailOptions->getExternalEmailAddresses());
-
         $subject = $lng->txt("risky_to_fail_mail_subject");
-        $mail->Subject($subject);
-
         $gender = ilObjUser::_lookupGender($usr_id);
         $name = ilObjUser::_lookupFullname($usr_id);
-
         $body = sprintf(
             $lng->txt("risky_to_fail_mail_body"),
             $lng->txt("mail_salutation_" . $gender),
             $name,
             $prg->getTitle()
         );
-        $mail->Body($body);
 
-        if ($mail->Send()) {
+        $send = true;
+        $mail = new ilMail(ANONYMOUS_USER_ID);
+        try {
+            $mail->enqueue(
+                ilObjUser::_lookupLogin($usr_id),
+                '',
+                '',
+                $subject,
+                $body,
+                null
+            );
+        } catch (Exception $e) {
+            $send = false;
+        }
+
+        if ($send) {
             $usr_progress_db->reminderSendFor($usr_progress->getId());
         }
     }

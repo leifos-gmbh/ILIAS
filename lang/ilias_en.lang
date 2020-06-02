@@ -14,6 +14,26 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+rbac#:#rbac_form_copy_roles_adjust_type#:#Typ der Rechteanpassung
+rbac#:#rbac_form_copy_roles_adjust_type_add#:#Rechte hinzufügen
+rbac#:#rbac_form_copy_roles_adjust_type_clone#:#Rechte kopieren
+rbac#:#rbac_form_copy_roles_adjust_type_remove#:#Rechte entfernen
+rbac#:#rbac_form_copy_roles_adjust_type_add_info#:#Fügt MARKIERTE Rechte der ausgewählten globalen Rollenvorlage zu den lokalen Rechtevorgabe hinzu.
+rbac#:#rbac_form_copy_roles_adjust_type_clone_info#:#Alle Rechte der ausgewählten globalen Rollenvorlage überschreiben alle lokalen Rechtevorgaben.
+rbac#:#rbac_form_copy_roles_adjust_type_remove_info#:#Entfernt die MARKIERTEN Rechte der ausgewählten globalen Rollenvorlage aus den lokalen Rechtevorgaben.
+rbac#:#rbac_form_copy_roles_adjust_button#:#Rechte anpassen
+rbac#:#rbac_form_copy_roles_ce_add_yes#:#Vorhandene Objekte nur um ausgewählte Rechte ergänzen
+rbac#:#rbac_form_copy_roles_ce_add_no#:#Vorhandene Objekte NICHT anpassen
+rbac#:#rbac_form_copy_roles_ce_add_yes_info#:#Vorhandene lokale Rechtevorgaben und die Rechteeinstellungen vorhandener Objekte werden entsprechend ergänzt.
+rbac#:#rbac_form_copy_roles_ce_add_no_info#:#Vorhandene lokale Rechtevorgaben entsprechend ergänzt, die vorhandenen Objekte werden nicht in ihren Rechten angepasst.
+rbac#:#rbac_form_copy_roles_ce_clone_yes#:#Vorhandene Objekte ändern
+rbac#:#rbac_form_copy_roles_ce_clone_no#:#Vorhandene Objekte NICHT anpassen
+rbac#:#rbac_form_copy_roles_ce_clone_yes_info#:#Vorhandene lokale Rechtevorgaben entsprechend überschreiben und IN GÄNZE mit allen gecheckten und ungecheckten Vorgaben auf vorhandene Objekte angewendet.
+rbac#:#rbac_form_copy_roles_ce_clone_no_info#:#Vorhandene lokale Rechtevorgaben werden überschrieben, die vorhandenen Objekte werden nicht in ihren Rechten angepasst.
+rbac#:#rbac_form_copy_roles_ce_remove_yes#:#Vorhandene Objekte nur um ausgewählte Rechte reduzieren
+rbac#:#rbac_form_copy_roles_ce_remove_no#:#Vorhandene Objekte NICHT anpassen
+rbac#:#rbac_form_copy_roles_ce_remove_yes_info#:#Vorhandene lokale Rechtevorgaben und die Rechteeinstellungen vorhandener Objekte werden entsprechend reduziert.
+rbac#:#rbac_form_copy_roles_ce_remove_no_info#:#Markierte Rechte werden aus vorhandenen lokalen Rechtevorgaben entfernt, die vorhandenen Objekte werden nicht in ihren Rechten angepasst.
 dash#:#dash_remove_from_list#:#Remove from List
 dash#:#dash_make_favourite#:#Add to Favourites
 dash#:#dash_item_removed#:#Recommendation has been removed from the list.
@@ -169,6 +189,8 @@ auth#:#auth_oidc_settings_activation#:#OpenID Connect aktivieren
 auth#:#auth_oidc_settings_provider#:#Provider-Url
 auth#:#auth_oidc_settings_client_id#:#Client-ID
 auth#:#auth_oidc_settings_secret#:#Client-Schlüssel
+auth#:#auth_oidc_settings_additional_scopes#:#Additional Scopes
+auth#:#auth_oidc_settings_invalid_scopes#:#The following values are no valid Scopes: %s
 auth#:#auth_oidc_settings_le#:#Darstellung Anmeldeseite
 auth#:#auth_oidc_settings_txt#:#Text
 auth#:#auth_oidc_settings_txt_val_info#:#Tragen Sie einen Text ein der auf der Anmeldeseite angezeigt werden soll. Der Text verlinkt automatisch auf das OpenId Connect Anmeldeskript.
@@ -286,11 +308,11 @@ crs#:#crs_timings_optional_unchecked#:#Optional mode was deactivated for this us
 crs#:#crs_timings_optional_on#:#Optional mode is active.
 crs#:#crs_timings_optional_on_and_passed#:#Optional mode is active and cannot be changed because user is passed.
 crs#:#crs_timings_optional_off#:#Optional mode is not active.
-lti#:#lti_object_release_settings_form#:#LTI Freigaben bearbeiten
-lti#:#lti_provider#:#LTI-Freigaben
+lti#:#lti_object_release_settings_form#:#Edit LTI Releases
+lti#:#lti_provider#:#LTI Releases
 lti#:#lti_launch_url#:#Url
-lti#:#lti_released_objects#:#Objekt-Freigaben
-lti#:#lti_consumer#:#Freigabe für
+lti#:#lti_released_objects#:#Object Releases
+lti#:#lti_consumer#:#Release for
 orgu#:#orgu_global_set_form#:#Global Organisational Unit Settings
 orgu#:#orgu_global_set_positions#:#Show User Data according to Organisational Unit Positions
 orgu#:#orgu_global_set_positions_type_active#:#Positions in
@@ -2970,6 +2992,7 @@ common#:#local#:#Local
 common#:#location#:#Location
 common#:#locator#:#Location:
 common#:#log_in#:#Login
+common#:#log_out#:#Logout
 common#:#logic_or#:#or
 common#:#login_as#:#Logged in as
 common#:#login_data#:#Login data
@@ -3589,6 +3612,8 @@ common#:#role_add_user#:#Add User(s) to role
 common#:#role_added#:#Role added
 common#:#role_assignment_updated#:#Role assignment has been updated.
 common#:#role_assignment#:#Role Assignment
+common#:#global_role_assignment#:#Globale Rollenzuweisung
+common#:#local_role_assignment#:#Lokale Rollenzuweisung
 common#:#role_edit#:#Edit Role
 common#:#role_mailto#:#Mail to all assigned Users
 common#:#role_new_search#:#New search
@@ -3699,7 +3724,7 @@ common#:#server_software#:#Server Software
 common#:#server#:#Server
 rbac#:#sess_copy#:#User can copy session
 common#:#sess#:#Session
-common#:#session_reminder_alert#:#Your session expires in %1$s at %2$s!\n\nChoose OK to continue your session.\nIf you click Cancel you will not be reminded during the current browser session anymore.\n\nInstallation: %3$s.
+common#:#session_reminder_alert#:#Your session expires in %1$s at %2$s!  Choose OK to continue your session. If you click Cancel you will not be reminded during the current browser session anymore.  Installation: %3$s.
 common#:#session_reminder_info#:#If enabled, you receive a reminder before the online-session of your browser expires.
 common#:#session_reminder_lead_time_info#:#Please specify the lead time for the session reminder in minutes. The reminder displays a warning when only this time span is left before the session expires. Recommended value is 5 (minutes)<br / >The current length of a user session is %s.
 common#:#session_reminder_lead_time#:#Leadtime
@@ -4015,10 +4040,12 @@ rbac#:#usrf_write#:#Edit settings in User administration
 common#:#usrf#:#User accounts
 common#:#usrimport_action_ignored#:#Ignored action %1$s.
 common#:#usrimport_action_replaced#:#Replaced action %1$s by %2$s.
+common#:#usrimport_form_not_evaluabe#:#The form data couldn't be read.
+common#:#usrimport_wrong_file_count#:#Too many files in import-folder. Please try again.
 common#:#usrimport_cant_delete#:#Can't perform ‘Delete’ action. No such user in database.
 common#:#usrimport_cant_insert#:#Can't perform ‘Insert’ action. User is already in database.
 common#:#usrimport_cant_update#:#Can't perform ‘Update’ action. No such user in database.
-common#:#usrimport_conflict_handling_info#:#When ‘Ignore on conflict’ is selected, ILIAS ignores an action, if it can not be performed (e. g. an ‘Insert’ action is not done, if there is already a user with the same login in the database.)\nWhen ‘Update on conflict’ is selected, ILIAS updates the database if an action can not be performed. (e. g. an ‘Insert’ action is replaced by an ‘Update’ action, if a user with the same login exists in the database).
+common#:#usrimport_conflict_handling_info#:#When ‘Ignore on conflict’ is selected, ILIAS ignores an action, if it can not be performed (e. g. an ‘Insert’ action is not done, if there is already a user with the same login in the database.) When ‘Update on conflict’ is selected, ILIAS updates the database if an action can not be performed. (e. g. an ‘Insert’ action is replaced by an ‘Update’ action and the other way around, if a user with the same login exists in the database).
 common#:#usrimport_global_role_for_action_required#:#At least one global role must be specified for "%1$s" action.
 common#:#usrimport_ignore_role#:#Ignore role
 common#:#usrimport_login_is_not_unique#:#Login is not unique.
@@ -4764,7 +4791,7 @@ crs#:#crs_blocked_member#:#Membership blocked in course "%s"
 crs#:#crs_blocked#:#Access Refused
 crs#:#crs_cancel_subscr_request#:#Delete Membership Request
 crs#:#crs_cancel_subscription_body#:#%s has cancelled his/her membership for the course "%s".
-crs#:#crs_cancel_subscription_body2#:#There might be other members on a waiting list of your course.\nYou should check for the waiting list now.\nTo view the members of your course, click here:
+crs#:#crs_cancel_subscription_body2#:#There might be other members on a waiting list of your course. You should check for the waiting list now. To view the members of your course, click here:
 crs#:#crs_cancel_subscription#:#User left course "%s"
 crs#:#crs_contact_consultation#:#Consultation
 crs#:#crs_contact_email_info#:#Enter one or more (comma separated) e-mail addresses.
@@ -4945,7 +4972,7 @@ crs#:#crs_status#:#Status
 crs#:#crs_structure#:#Course structure
 crs#:#crs_subscribe_member_body#:#we are pleased to confirm your registration for the course "%s".
 crs#:#crs_subscribe_member#:#Your registration for course "%s"
-crs#:#crs_subscribe_wl_body#:#you have been assigned to the waiting list of course "%s".\nYou are assigned to position %s on the list.\n\nYou will receive a message from a course administrator when your request has been approved or rejected.
+crs#:#crs_subscribe_wl_body#:#you have been assigned to the waiting list of course "%s". You are assigned to position %s on the list.  You will receive a message from a course administrator when your request has been approved or rejected.
 crs#:#crs_subscribe_wl#:#Your registration for course "%s"
 crs#:#crs_subscriber#:#Subscriber
 crs#:#crs_subscribers_deleted#:#Deleted subscriber(s)
@@ -5625,7 +5652,7 @@ grp#:#grp_mail_notification_reg_req_bod2#:#To confirm this registration, go to:
 grp#:#grp_mail_notification_reg_req_sub#:#Request to join group "%s"
 grp#:#grp_mail_notification_reg_sub#:#User registered for group "%s"
 grp#:#grp_mail_notification_unsub_bod#:#%s has cancelled his/her membership for the group "%s".
-grp#:#grp_mail_notification_unsub_bod2#:#There might be other members on a waiting list of your group.\nYou should check for the waiting list now.\nTo view the members of your group, click here:
+grp#:#grp_mail_notification_unsub_bod2#:#There might be other members on a waiting list of your group. You should check for the waiting list now. To view the members of your group, click here:
 grp#:#grp_mail_notification_unsub_sub#:#User left group "%s"
 grp#:#grp_mail_permanent_link#:#Click on the following link to find all of the information you need regarding the group:
 grp#:#grp_mail_status_bod#:#your status in group "%s" has been changed.
@@ -5636,9 +5663,9 @@ grp#:#grp_mail_sub_dec_bod#:#we regret to say that your registration has been re
 grp#:#grp_mail_sub_dec_sub#:#Registration refused for group "%s"
 grp#:#grp_mail_subscribe_member_bod#:#we are pleased to confirm your registration for the group "%s".
 grp#:#grp_mail_subscribe_member_sub#:#Your registration for group "%s"
-grp#:#grp_mail_unsubscribe_member_bod#:#we confirm your cancellation of membership in group %s.\nWe hope that you find an opportunity to participate in another group.
+grp#:#grp_mail_unsubscribe_member_bod#:#we confirm your cancellation of membership in group %s. We hope that you find an opportunity to participate in another group.
 grp#:#grp_mail_unsubscribe_member_sub#:#Your cancellation of membership in group "%s"
-grp#:#grp_mail_wl_bod#:#you have been assigned to the waiting list of group "%s".\nYou are assigned to position %s on the list.\n\nYou will receive a message from a group administrator when your request has been approved or rejected.
+grp#:#grp_mail_wl_bod#:#you have been assigned to the waiting list of group "%s". You are assigned to position %s on the list.  You will receive a message from a group administrator when your request has been approved or rejected.
 grp#:#grp_mail_wl_sub#:#Your registration for group "%s"
 grp#:#grp_map_location#:#Group Map Location
 grp#:#grp_map_settings#:#Map Settings
@@ -5685,9 +5712,9 @@ grp#:#grp_wrong_max_members#:#A maximum number of members is needed for the wait
 grp#:#grp_wrong_reg_time_limit#:#Please check the registration start and finish time.
 grp#:#reg_grp_max_members_short#:#Limited Number of Members
 grp#:#reg_grp_max_members#:#Maximum Number of Members
-jscalendar#:#about_calendar_long#:#DHTML Date/Time Selector\n(c) dynarch.com 2002-2003\nFor latest version visit: http://dynarch.com/mishoo/calendar.epl\nDistributed under GNU LGPL.  See http://gnu.org/licenses/lgpl.html for details.\n\nDate selection:\n- Use the Â«, Â» buttons to select year\n- Use the <, > buttons to select month\n- Hold mouse button on any of the above buttons for faster selection.
+jscalendar#:#about_calendar_long#:#DHTML Date/Time Selector (c) dynarch.com 2002-2003 For latest version visit: http://dynarch.com/mishoo/calendar.epl Distributed under GNU LGPL.  See http://gnu.org/licenses/lgpl.html for details.  Date selection: - Use the Â«, Â» buttons to select year - Use the <, > buttons to select month - Hold mouse button on any of the above buttons for faster selection.
 jscalendar#:#about_calendar#:#About the calendar
-jscalendar#:#about_time#:#\n\nTime selection:\n- Click on any of the time parts to increase it\n- or Shift-click to decrease it\n- or click and drag for faster selection.
+jscalendar#:#about_time#:#  Time selection: - Click on any of the time parts to increase it - or Shift-click to decrease it - or click and drag for faster selection.
 jscalendar#:#close#:#Close
 jscalendar#:#day_first#:#Display %s first
 jscalendar#:#def_date_format#:#%Y-%m-%d
@@ -5867,7 +5894,7 @@ ldap#:#ldap_server_name_info#:#Please choose a name for this LDAP server configu
 ldap#:#ldap_server_name#:#Name of LDAP Configuration
 ldap#:#ldap_server_security_settings#:#Security Settings
 ldap#:#ldap_server_short#:#Server URL:
-ldap#:#ldap_server_url_info#:#A fully qualified URL for specifying the protocol, url and port to connect to. E.g "ldap://ldap.ilias.de:389".  You may add multiple servers with commas separated.
+ldap#:#ldap_server_url_info#:#A fully qualified URL for specifying the protocol, url and port to connect to. E.g "ldaps://ldap.ilias.de:636".
 ldap#:#ldap_server_version_info#:#LDAP version to use, usually 3.
 ldap#:#ldap_settings#:#Server Settings
 ldap#:#ldap_sync_cron#:#Per Cron-Job
@@ -5993,6 +6020,10 @@ mail#:#search_recipients#:#Search Recipients
 mail#:#send_mail_to#:#Mail to
 mail#:#mail_tbl_head_attachments#:#Attachment
 mail#:#mail_firstname_last_name_superior#:#Eine kommaseparierte Liste von Vor- und Nachname des/der jeweiligen Vorgesetzten.
+mail#:#mail_email_usr_subject#:#Test E-Mail User Mail
+mail#:#mail_email_usr_body#:#This is a test e-mail to test the delivery of user mails to the external mail account.
+mail#:#mail_email_sys_subject#:#Test E-Mail System Mail
+mail#:#mail_email_sys_body#:#This is a test e-mail to test the delivery of system mails to the external mail account.
 maps#:#maps_enable_maps_info#:#Activates Maps in user profiles, groups and courses.
 maps#:#maps_enable_maps#:#Enable Maps
 maps#:#maps_custom_tile_server_info#:#Server URL to provide tile-data. Multiple inputs should be separated by spaces. Defaults is "%s".
@@ -6755,7 +6786,7 @@ pd#:#pd_personal_items_default_view_info#:#Choose the preferred view of Personal
 pd#:#pd_personal_items_default_view#:#Default View
 pd#:#pd_view_select_at_least_one#:#You have to select at least one view, either ‘Selected Items’ and/or ‘My Memberships’.
 crs#:#crs_timing_err_start_end#:#The end date must be greater than or equals the start date.
-ps#:#participants_list_courses#:#Allow Activation of Participant Lists in the Member Gallery of Courses
+ps#:#ps_participants_list_courses#:#Allow Activation of Participant Lists in the Member Gallery of Courses
 ps#:#ps_agreement_accepted#:#User Agreement Accepted
 ps#:#ps_auto_https_description#:#If enabled, ILIAS tries to detect the HTTPs Status by analysing the header value specified below.
 ps#:#ps_auto_https_header_name#:#Header Name
@@ -6841,17 +6872,17 @@ ps#:#ps_warning_modify#:#Attention: Minimum one user has accepted the user agree
 ps#:#show_privacy#:#Privacy
 ps#:#show_security#:#Security
 pwassist#:#password_assistance#:#Password Assistance
-pwassist#:#pwassist_enter_email#:#Please enter an e-mail address and submit the form.\nILIAS will send an e-mail to that address. The e-mail contains all user names which have registered this e-mail address.\nChoose a suitable username and use the password service to retrieve a new password. If you do not retrieve any e-mail by this service please contact your course admin or %1$s.
-pwassist#:#pwassist_enter_username_and_email#:#Enter a username and the associated e-mail address in the fields shown below.\nILIAS will send a message to that e-mail address. The message contains an address for a web page, where you can enter a new password for the user account.\nIn case you are unable to assign a password to your user account using this form, contact your course administration or send an e-mail to %1$s.
+pwassist#:#pwassist_enter_email#:#Please enter an e-mail address and submit the form. ILIAS will send an e-mail to that address. The e-mail contains all user names which have registered this e-mail address. Choose a suitable username and use the password service to retrieve a new password. If you do not retrieve any e-mail by this service please contact your course admin or %1$s.
+pwassist#:#pwassist_enter_username_and_email#:#Enter a username and the associated e-mail address in the fields shown below. ILIAS will send a message to that e-mail address. The message contains an address for a web page, where you can enter a new password for the user account. In case you are unable to assign a password to your user account using this form, contact your course administration or send an e-mail to %1$s.
 pwassist#:#pwassist_enter_username_and_new_password#:#Enter the username and the new password in the fields below.
-pwassist#:#pwassist_login_not_match#:#Please enter another username.\nThe username you have entered does not match the username for which you had asked for password assistance.
-pwassist#:#pwassist_mail_body#:#Register a new password for your user account:\n\t%1$s\n\nThis message has been generated automatically by the ILIAS server\n\t%2$s\n\nYou (or someone at %3$s) has asked for password assistance for the user account "%4$s".\n\nPlease check carefully the conditions listed below, and proceed accordingly:\n\n- If you have used the password assistance form on the ILIAS server by accident:\nDelete this mail.\n\n- If you are certain, that you never asked for password assistance at this ILIAS server:\nPlease contact %5$s.\n\n- If you asked for password assistance, please proceed as follows:\n\n1. Open your browser.\n\n2. Enter the following address in your browser:\n\t%6$s\n\nImportant: The address is a single line. If you see this address split into multiple lines, then your e-mail program has inserted these line breaks.\n\n3. On the web page shown by your browser, enter a new password for your user account.\n\nPlease note, that for security reasons, you can perform the three steps above only exactly once and for a limited time only. Afterwards the address becomes invalid, and you have to use the password assistance page on the ILIAS server again.
-pwassist#:#pwassist_mail_sent#:#A message has been sent to %1$s.\nPlease check your mail box.
-pwassist#:#pwassist_mail_sent_generic#:#A message has been sent to the email address defined in ILIAS.\nPlease check your mail box.
+pwassist#:#pwassist_login_not_match#:#Please enter another username. The username you have entered does not match the username for which you had asked for password assistance.
+pwassist#:#pwassist_mail_body#:#Register a new password for your user account: \t%1$s  This message has been generated automatically by the ILIAS server \t%2$s  You (or someone at %3$s) has asked for password assistance for the user account "%4$s".  Please check carefully the conditions listed below, and proceed accordingly:  - If you have used the password assistance form on the ILIAS server by accident: Delete this mail.  - If you are certain, that you never asked for password assistance at this ILIAS server: Please contact %5$s.  - If you asked for password assistance, please proceed as follows:  1. Open your browser.  2. Enter the following address in your browser: \t%6$s  Important: The address is a single line. If you see this address split into multiple lines, then your e-mail program has inserted these line breaks.  3. On the web page shown by your browser, enter a new password for your user account.  Please note, that for security reasons, you can perform the three steps above only exactly once and for a limited time only. Afterwards the address becomes invalid, and you have to use the password assistance page on the ILIAS server again.
+pwassist#:#pwassist_mail_sent#:#A message has been sent to %1$s. Please check your mail box.
+pwassist#:#pwassist_mail_sent_generic#:#A message has been sent to the email address defined in ILIAS. Please check your mail box.
 pwassist#:#pwassist_mail_subject#:#ILIAS Password Assistance
 pwassist#:#pwassist_password_assigned#:#The password has been successfully assigned to user "%1$s".
-pwassist#:#pwassist_session_expired#:#Please fill in this form again.\nYour password assistance session has expired. This may have happened, because you tried to use the link that has been sent by e-mail to you more than once, or because too much time has passed since the link has been sent to you.
-pwassist#:#pwassist_username_mail_body#:#These are the active username found for the given e-mail address:\n%s\n\nThis message has been created automatically by the following ILIAS Server:\n\t%s\n\nYou (or somebody with IP  %s) have requested support for forgotten user names for the e-mail address '%s'.\n\nPlease check the following and act as suggested::\n\n-You have requested this e-mail by accident:\nDelete this e-mail.\n\n-You are sure, that you never requested this e-mail:\nPlease contact %s.\n\n- If you requested this e-mail, please proceed as follows::\n\n1. Start your internet browser.\n\n2. Enter the following url:\n\t%s\n\nImportant: The address is a single line. If you see this address split into multiple lines, then your e-mail program has inserted these line breaks.\n\n3. Your Browser now shows the Password-Service. Use this page together with one of the usernames and the according e-mail address to retrieve a new password.
+pwassist#:#pwassist_session_expired#:#Please fill in this form again. Your password assistance session has expired. This may have happened, because you tried to use the link that has been sent by e-mail to you more than once, or because too much time has passed since the link has been sent to you.
+pwassist#:#pwassist_username_mail_body#:#These are the active username found for the given e-mail address: %s  This message has been created automatically by the following ILIAS Server: \t%s  You (or somebody with IP  %s) have requested support for forgotten user names for the e-mail address '%s'.  Please check the following and act as suggested::  -You have requested this e-mail by accident: Delete this e-mail.  -You are sure, that you never requested this e-mail: Please contact %s.  - If you requested this e-mail, please proceed as follows::  1. Start your internet browser.  2. Enter the following url: \t%s  Important: The address is a single line. If you see this address split into multiple lines, then your e-mail program has inserted these line breaks.  3. Your Browser now shows the Password-Service. Use this page together with one of the usernames and the according e-mail address to retrieve a new password.
 pwassist#:#pwassist_disabled_no_access#:#Password assistance is not enabled. Please contact the system administration for further assistance: %s
 pwassist#:#unassist_disabled_no_access#:#Username assistance is not enabled. Please contact the system administration for further assistance: %s
 rating#:#rating_your_rating#:#Your Rating
@@ -8021,6 +8052,10 @@ mail#:#mail_system_sys_from_name#:#Sender Fullname (From)
 mail#:#mail_system_sys_reply_to_addr#:#Reply-To
 mail#:#mail_system_sys_env_from_addr#:#Technical Sender
 mail#:#mail_system_sys_signature#:#Signature
+mail#:#mail_use_global_reply_to_addr#:#Use Global Reply-To
+mail#:#mail_use_global_reply_to_addr_info#:#If enabled, the email address entered below is used as value for the 'Reply-To' header. The sender's email address will be not disclosed to recipients. A direct reply is not possible anymore. 
+mail#:#mail_global_reply_to_addr#:#Reply-To
+mail#:#mail_global_reply_to_addr_info#:#Please enter the desired 'Reply-To' address.
 content#:#glo_quick_navigation#:#Quick Navigation
 forum#:#post_reply#:#Re:
 forum#:#preset_subject#:#Preset subject on reply
@@ -8146,7 +8181,6 @@ dateplaner#:#cal_ch_form_header#:#Consultation Hours
 dateplaner#:#cal_ch_form_info#:#This option enables the management of personal consultation hours in the calendar.
 dateplaner#:#cal_ch_form#:#Enable Consultation Hours
 dateplaner#:#app_consultation_hours#:#Consultation Hours
-rbac#:#log#:#Log
 rbac#:#rbac_log#:#Log
 rbac#:#rbac_changes#:#Changes
 rbac#:#rbac_log_operation_add#:#Added Operation for "%s"
@@ -9237,7 +9271,7 @@ chatroom#:#chat_to_mainroom#:#To Main Room
 chatroom#:#chat_create_private_room_button#:#Create Private Room
 chatroom#:#chatroom_smiley_keyword#:#Keyword
 chatroom#:#chat_invitation#:#"[INVITER_NAME]" invites you into chat room "[ROOM_NAME]"
-chatroom#:#chat_invitation_long#:#[SALUTATION]\n\nYou have been invited to a chat room:\nChat Room Title: [ROOM_NAME]\nInvited by: [INVITER_NAME]\nURL: [LINK]\n\nTo join the chat room, please follow the given URL.
+chatroom#:#chat_invitation_long#:#[SALUTATION]  You have been invited to a chat room: Chat Room Title: [ROOM_NAME] Invited by: [INVITER_NAME] URL: [LINK]  To join the chat room, please follow the given URL.
 chatroom#:#chat_invitation_short#:#Please click the title link to enter the chat room.
 chatroom#:#settings_title#:#Settings
 chatroom#:#history_byday_title#:#Show Conversation per Day
@@ -11140,8 +11174,8 @@ dateplaner#:#cal_ch_delete_booking#:#Delete Booking
 dateplaner#:#cal_ch_reject_booking#:#Cancel Booking
 dateplaner#:#cal_ch_bookings_tbl#:#Booked Appointments
 dateplaner#:#cal_ch_app_bookings#:#Bookings
-dateplaner#:#cal_ch_canceled_bookings#:#The selected bookings have been deleted.
-dateplaner#:#cal_ch_deleted_bookings#:#The selected bookings have been canceled.
+dateplaner#:#cal_ch_deleted_bookings#:#The selected bookings have been deleted.
+dateplaner#:#cal_ch_canceled_bookings#:#The selected bookings have been canceled.
 dateplaner#:#cal_ch_delete_booking_sure#:#Do you really want to delete the following bookings?
 dateplaner#:#cal_ch_cancel_booking_sure#:#Do you really want to cancel the following bookings?
 dateplaner#:#cal_ch_assign_participants#:#Assign Users
@@ -11299,8 +11333,8 @@ wsp#:#wsp_shared_date_filter#:#Shared From
 wsp#:#wsp_shared_mandatory_filter_info#:#Please set at least one filter attribute. Text filters have to be at least 4 characters long.
 wsp#:#wsp_shared_member_filter#:#Members of Course / Group
 blog#:#blog_allow_html_info#:#Enables users to include HTML and/or Javascript in their blog postings. This can lead to security issues.
-common#:#scorm_without_session#:#SCORM: enable storing data without session
-common#:#scorm_without_session_info#:#This ensures the storage of SCORM learning data even if ILIAS session expired
+common#:#scorm_without_session#:#SCORM 2004: enable storing data without session
+common#:#scorm_without_session_info#:#This ensures the storage of SCORM 2004 learning data even if ILIAS session expired. For SCORM 1.2, storage without session is always enabled.
 common#:#msg_obj_no_download#:#cannot be downloaded.
 common#:#download_selected_items#:#Download
 common#:#download_multiple_objects#:#Download Multiple Objects
@@ -11459,12 +11493,13 @@ orgu#:#remove_user#:#Remove
 orgu#:#msg_confirm_remove_user#:#Would you really like to remove the following User from the Position %s?
 orgu#:#msg_confirm_d_ua#:#Would you like to assign these person to the position Employee of their respective Organisational Units?
 orgu#:#user_assignments#:#User Assignments
+orgu#:#user_assignments_recursive#:#User Assignments Subtree
 orgu#:#authorities#:#Authorities
 orgu#:#authority#:#Authority
 orgu#:#positions#:#Positions
 orgu#:#add_position#:#Add Position
 orgu#:#scope_1#:#Same Organisational Unit
-orgu#:#scope_2#:#Subsequent Organisational Units
+orgu#:#scope_2#:#Same and Subsequent Organisational Units
 orgu#:#scope_3#:#All Organisational Units
 orgu#:#over_-1#:#Everyone
 orgu#:#over#:#Over
@@ -13421,7 +13456,6 @@ prg#:#prg_remove_user_success#:#Removed User successfully.
 prg#:#prg_type_add#:#Study Programme Type
 prg#:#prg_subtypes#:#Subtypes
 prg#:#prg_subtype_add#:#Add new subtype
-prg#:#prg_adv_settings#:#Advanced Settings
 prg#:#prg_type_custom_icon#:#Custom Icons
 prg#:#prg_type_custom_icon_info#:#Custom icon info
 prg#:#prg_type_msg_error_custom_icon#:#Error while storing icon
@@ -13650,7 +13684,7 @@ chatroom#:#ilias_proxy_info#:#If the Server is not accessible with the default I
 chatroom#:#client_chatserver_connection#:#Client to Server Connection
 chatroom#:#client_proxy_info#:#If the Server is not accessible with the default IP-Address and Port, it is possible to configure a custom URL for Client to Server connection.
 chatroom#:#connection_url_info#:#Please insert an URL for the Server connection.
-chatroom#:#log#:#Chatserver Log
+chatroom#:#chatroom_log#:#Chatserver Log
 chatroom#:#error_log#:#Chatserver Error-Log
 chatroom#:#delete_private_room_question#:#Confirm delete private room?
 crs#:#event_tbl_admins#:#Administrators
@@ -14259,7 +14293,7 @@ pdfgen#:#webkit#:#wkhtmltopdf
 pdfgen#:#path#:#Path to wkhtmltopdf
 pdfgen#:#wkhtml_config#:#Configuration for WKHTML
 pdfgen#:#overwrite_font#:#Overwrite default font
-pdfgen#:#overwrite_font_info#:#Enter somthing similar to: 'serif', 'sans-serif', 'monospace' usw. 
+pdfgen#:#overwrite_font_info#:#Enter somthing similar to: 'serif', 'sans-serif', 'monospace' usw.
 pdfgen#:#external_links#:#Externel links
 pdfgen#:#enable_forms#:#Enable Forms
 pdfgen#:#user_stylesheet#:#User stylesheet
@@ -14705,6 +14739,7 @@ content#:#cont_lpe_user_agreement_link#:#User Agreement Link
 common#:#obj_fold_duplicate#:#Copy Folder
 common#:#fold_wizard_page#:#Copy Folder (Step 2/2)
 common#:#fold_copy_threads_info#:#Please decide which materials should be copied, linked or even omitted.
+file#:#general_upload_error_occured#:#An unexpected error occured during upload.
 file#:#file_suffix_custom_expl_black#:#Explizite Blacklist
 file#:#file_suffix_custom_expl_black_info#:#Dateien mit diesen Endungen werden nicht akzeptiert.
 file#:#file_suffix_default_white#:#Default Suffix Whitelist
@@ -14857,6 +14892,7 @@ mme#:#msg_languages_added#:#Added languages
 mme#:#msg_translations_saved#:#Translations saved
 mme#:#msg_translations_deleted#:#Translations deleted
 mme#:#topitem_css_id#:#CSS-ID
+mme#:#err_uri_not_valid#:#Please provide a valid URL
 common#:#mme_lost_item_title#:#No assignment
 common#:#mme_lost_item_reason#:#Item is no longer provided.
 mme#:#type_lost#:#Lost
@@ -15163,10 +15199,10 @@ lso#:#lso_notify_off#:#Notification about new registrations disabled
 lso#:#lso_new_status#:#Your new status is:
 lso#:#lso_notification_explanation_admin#:#You receive mail from ILIAS because you are learning sequence administrator with notification enabled.
 lso#:#lso_mail_unsubscribe_member_sub#:#Your cancellation of membership in learning sequence "%s"
-lso#:#lso_mail_unsubscribe_member_bod#:#we confirm your cancellation of membership in learning sequence %s.\nWe hope that you find an opportunity to participate in another learning sequence.
+lso#:#lso_mail_unsubscribe_member_bod#:#we confirm your cancellation of membership in learning sequence %s. We hope that you find an opportunity to participate in another learning sequence.
 lso#:#lso_mail_notification_unsub_sub#:#User left learning sequence "%s"
 lso#:#lso_mail_notification_unsub_bod#:#%s has cancelled his/her membership for the learning sequence "%s".
-lso#:#lso_mail_notification_unsub_bod2#:#There might be other members on a waiting list of your learning sequence.\nYou should check for the waiting list now.\nTo view the members of your learning sequence, click here:
+lso#:#lso_mail_notification_unsub_bod2#:#There might be other members on a waiting list of your learning sequence. You should check for the waiting list now. To view the members of your learning sequence, click here:
 lso#:#lso_mail_subscribe_member_sub#:#Your registration for learning sequence "%s"
 lso#:#lso_mail_subscribe_member_bod#:#we are pleased to confirm your registration for the learning sequence "%s".
 lso#:#lso_mail_notification_reg_req_sub#:#Request to join learning sequence "%s"
@@ -15177,7 +15213,7 @@ lso#:#lso_mail_sub_dec_bod#:#we regret to say that your registration has been re
 lso#:#lso_mail_sub_acc_sub#:#Registration confirmed for "%s"
 lso#:#lso_mail_sub_acc_bod#:#we are pleased to confirm your registration for the learning sequence "%s".
 lso#:#lso_mail_wl_sub#:#Your registration for learning sequence "%s"
-lso#:#lso_mail_wl_bod#:#you have been assigned to the waiting list of learning sequence "%s".\nYou are assigned to position %s on the list.\n\nYou will receive a message from a learning sequence administrator when your request has been approved or rejected.
+lso#:#lso_mail_wl_bod#:#you have been assigned to the waiting list of learning sequence "%s". You are assigned to position %s on the list.  You will receive a message from a learning sequence administrator when your request has been approved or rejected.
 lso#:#lso_mail_status_sub#:#Changed status in learning sequence "%s"
 lso#:#lso_mail_status_bod#:#your status in learning sequence "%s" has been changed.
 lso#:#first_access#:#First Access
@@ -15981,9 +16017,9 @@ prg#:#not_a_valid_cat_id#:#%s is not a valid ref-id of a category.
 prg#:#prg_mail_permanent_link#:#Click on the following link to find all of the information you need regarding the study programm:
 prg#:#prg_title#:#Title
 prg#:#re_assigned_mail_subject#:#Renewed participation in the study programm
-prg#:#re_assigned_mail_body#:#%s %s,<br \><br \>you were reassigned to study program '%s' as participants.
+prg#:#re_assigned_mail_body#:#%s %s,<br/><br/>you were reassigned to study program '%s' as participants.
 prg#:#info_to_re_assign_mail_subject#:#Reminder of renewed participation in the study programm
-prg#:#info_to_re_assign_mail_body#:#%s %s,<br \><br \>The validity of their participation in the study programm '% s' expires soon. Please sign in again.
+prg#:#info_to_re_assign_mail_body#:#%s %s,<br/><br/>The validity of their participation in the study programm '% s' expires soon. Please sign in again.
 prg#:#prg_user_not_restarted_time_input#:#Reminder mail restart
 prg#:#prg_user_not_restarted_time_input_info#:#Reminder Mail Reminds the user x days before the invalidation that he must restart the programm.
 prg#:#prg_processing_ends_no_success#:#Reminder mail failing
@@ -16113,3 +16149,28 @@ mail#:#mail_enable_lso_member_notification#:#Notify Learning Sequence Members
 mail#:#mail_enable_lso_member_notification_info#:#ILIAS will automatically send an e-mail to every member if his or her membership status is changed. This setting applies to all Learning Sequences on the platform.
 mail#:#mail_enable_lso_admin_notification#:#Notify Learning Sequence Administrators
 mail#:#mail_enable_lso_admin_notification_info#:#In new Learning Sequences the setting 'Notification About New Members' will be activated by default. It is set in the 'Member'-tab of Learning Sequences. Administrators will receive an e-mail when a member joins the Learning Sequence or leaves it.
+prg#:#risky_to_fail_mail_subject#:#Reminder, that the deadline for the study program will soon be reached
+prg#:#risky_to_fail_mail_body#:#%s %s,<br/><br/>the deadline for completing the study program '%s' will soon be reached.
+prg#:#prg_update_progress_title#:#Set Progress to Failed after Deadline
+prg#:#prg_update_progress_description#:#Set Progress from 'In Progress' to 'failed' after crossing Deadline.
+common#:#collapse_content#:#Collapse Content
+common#:#expand_content#:#Expand Content
+common#:#briefcase#:#Background Tasks
+common#:#sort_ascending#:#Sort Ascending
+common#:#sort_descending#:#Sort Descending
+common#:#show_who_is_online#:#Show who is online
+common#:#tags#:#Tags
+common#:#comments#:#Comments
+common#:#eyeclosed#:#Eye Closed - Click to hide the input's contents
+common#:#eyeopened#:#Eye Open - Click to reveal the input's contents
+common#:#show_more#:#Show More
+common#:#disclose#:#Disclose
+common#:#switch_language#:#Switch Language
+lti#:#lti_user_role_created#:#The recommended global role for LTI users has been created.
+lti#:#lti_create_lti_user_role#:#Create recommended global role for LTI users
+lti#:#lti_user_role_info#:#The recommended global role for LTI users has not yet been created in this installation. This special global role contains only the permission 'visible' for repository and categories.
+awrn#:#user_awrn_default#:#Default
+awrn#:#user_awrn_hide#:#Hide my status
+awrn#:#user_awrn_show#:#Show my status
+awrn#:#awrn_user_show#:#Show your account in "Who-is-online?"
+ui#:#ui_error_in_group#:#There is some error in this part.

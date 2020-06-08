@@ -40,8 +40,8 @@ require_once('./Services/Init/classes/class.ilInitialisation.php');
 
 class ilNusoapUserAdministrationAdapter
 {
-    public const RPC_ENCODED_STYLE = 1;
-    public const DOCUMENT_LITERAL_STYLE = 2;
+    const RPC_ENCODED_STYLE = 1;
+    const DOCUMENT_LITERAL_STYLE = 2;
 
     /*
      * @var object Nusoap-Server

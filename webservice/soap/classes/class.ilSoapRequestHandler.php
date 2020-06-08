@@ -234,7 +234,21 @@ class ilSoapRequestHandler
                 break;
             }
             foreach ($argument_obj as $argument_name => $argument_value) {
-                $array_arguments[] = $argument_value;
+
+                if (is_object($argument_value)) {
+                    if (is_array($argument_value->value) && count($argument_value->value)) {
+                        $array_arguments[] = $argument_value->value;
+                    }
+                    elseif (is_array($argument_value->value)) {
+                        $array_arguments[] = [];
+                    }
+                    else {
+                        $array_arguments[] = (array) $argument_value->value;
+                    }
+                }
+                else {
+                    $array_arguments[] = $argument_value;
+                }
             }
         }
         return $array_arguments;

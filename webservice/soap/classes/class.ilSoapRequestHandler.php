@@ -6,9 +6,9 @@
  */
 class ilSoapRequestHandler
 {
-    protected const SOAP_PATH = './webservice/soap/classes/';
+    const SOAP_PATH = './webservice/soap/classes/';
 
-    protected const RESPONSE_NAMES = [
+    const RESPONSE_NAMES = [
         'login' => 'sid',
         'loginCAS' => 'sid',
         'loginLDAP' => 'sid',
@@ -110,7 +110,7 @@ class ilSoapRequestHandler
     /**
      * @var string[]
      */
-    protected const SOAP_CLASSES = [
+    const SOAP_CLASSES = [
         ilSoapUserAdministration::class,
         ilSoapCourseAdministration::class,
         ilSoapObjectAdministration::class,

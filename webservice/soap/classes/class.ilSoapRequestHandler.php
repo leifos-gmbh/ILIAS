@@ -243,7 +243,7 @@ class ilSoapRequestHandler
     /**
      * @param string $method_name
      */
-    protected function find(string $method_name) :? Closure
+    protected function find(string $method_name)
     {
         foreach (self::SOAP_CLASSES as $soap_handler) {
 

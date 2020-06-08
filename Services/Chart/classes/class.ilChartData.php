@@ -138,6 +138,7 @@ abstract class ilChartData
         foreach ($this->getData() as $point) {
             $series->data[] = array($point[0], $point[1]);
         }
+        //var_dump($series->data); exit;
             
         $options = array("show" => ($this->isHidden() ? false : true));
                 

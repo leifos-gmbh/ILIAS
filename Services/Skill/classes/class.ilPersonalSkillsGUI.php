@@ -1437,7 +1437,35 @@ class ilPersonalSkillsGUI
                 }
 
                 $chart_html = $chart->getHTML();
+
+                $scatter_chart = new ilNewChartScatter("feverCurves");
+                $scatter_data1 = new ilNewChartDataScatter();
+                $scatter_data2 = new ilNewChartDataScatter();
+
+                $scatter_data1->setLabel("Zielstufe");
+                $scatter_data1->setColor("green");
+                $scatter_data1->addPoint(4, 4);
+                $scatter_data1->addPoint(3, 3);
+                $scatter_data1->addPoint(3, 2);
+                $scatter_data1->addPoint(4, 1);
+                $scatter_data1->addPoint(3, 0);
+
+                $scatter_data2->setLabel("Eine Quelle");
+                $scatter_data2->setColor("red");
+                $scatter_data2->addPoint(1, 4);
+                $scatter_data2->addPoint(0, 3);
+                $scatter_data2->addPoint(1, 2);
+                $scatter_data2->addPoint(2, 1);
+                $scatter_data2->addPoint(1, 0);
+
+                $scatter_chart->addData($scatter_data1);
+                $scatter_chart->addData($scatter_data2);
+
+
+                $chart_html1 = $scatter_chart->getHTML();
+
                 $all_chart_html .= $chart_html;
+                $all_chart_html .= $chart_html1;
             }
 
             $pan = ilPanelGUI::getInstance();

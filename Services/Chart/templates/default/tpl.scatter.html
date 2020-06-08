@@ -1,0 +1,77 @@
+<head>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+
+</head>
+
+<div><br><br></div>
+
+<div class="ilChartWrapper1" id="ilChart{ID}">
+    {SERIES}
+</div>
+
+<div><br><br><br><br></div>
+
+<canvas id="myChart{ID}" <!-- width="1200" height="600" -->></canvas>
+<script id="source1" language="javascript" type="text/javascript">
+
+  var beispiel = {SERIES};
+  console.log(beispiel);
+
+
+  var series = {SERIES}
+  //var options = {OPTIONS}
+
+
+
+  var xLabels = {
+    0 : 'Sehr niedrig', 1 : 'Niedrig', 2 : 'Mittel', 3 : 'Hoch', 4 : 'Sehr hoch', 0.5 : '', 1.5 : ''
+  }
+  var yLabels = {
+    0 : 'Erste Kompetenz', 1 : 'Zweite Kompetenz', 2 : 'Dritte Kompetenz', 3 : 'Vierte Kompetenz', 4 : 'Fünfte Kompetenz',
+    5: "Sechste Kompetenz", 6: "Siebente Kompetenz",
+  }
+
+
+  new Chart(document.getElementById('myChart{ID}'), {
+    type: 'scatter',
+
+    data: {
+      datasets: series,
+    },
+    options: {
+      //showLines: true,
+      scales: {
+        xAxes: [
+          {
+            type: 'linear',
+            ticks: {
+              //callback: function(value, index, values) {
+              // return xLabels[value];
+              //},
+              beginAtZero: true,
+              stepSize: 0.5,
+              max: 6
+            },
+          },
+        ],
+        yAxes: [
+          {
+            type: 'linear',
+            ticks: {
+              //callback: function(value, index, values) {
+              //  return yLabels[value];
+              // },
+              reverse: false,
+              beginAtZero: true,
+            },
+          },
+        ],
+      },
+      //legend
+      tooltips: {
+        enabled: true,
+      }
+    },
+  });
+</script>

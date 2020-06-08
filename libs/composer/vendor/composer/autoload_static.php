@@ -2905,7 +2905,6 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
         'Whoops\\Util\\TemplateHelper' => __DIR__ . '/..' . '/filp/whoops/src/Whoops/Util/TemplateHelper.php',
         'WordLevelDiff' => __DIR__ . '/../..' . '/../../Services/COPage/mediawikidiff/class.WordLevelDiff.php',
         'XML2DOM' => __DIR__ . '/../..' . '/../../Services/Xml/classes/class.ilXML2DOM.php',
-        'XMLSchema' => __DIR__ . '/../..' . '/../../Services/SOAPAuth/include/nusoap.php',
         'XMLStruct' => __DIR__ . '/../..' . '/../../Services/Xml/classes/class.ilXML2DOM.php',
         '_DiffEngine' => __DIR__ . '/../..' . '/../../Services/COPage/mediawikidiff/class.WordLevelDiff.php',
         '_DiffOp' => __DIR__ . '/../..' . '/../../Services/COPage/mediawikidiff/class.WordLevelDiff.php',
@@ -5694,6 +5693,10 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
         'ilNestedList' => __DIR__ . '/../..' . '/../../Services/UIComponent/NestedList/classes/class.ilNestedList.php',
         'ilNestedListInputGUI' => __DIR__ . '/../..' . '/../../Services/Form/classes/class.ilNestedListInputGUI.php',
         'ilNestedSetTree' => __DIR__ . '/../..' . '/../../Services/Tree/classes/class.ilNestedSetTree.php',
+        'ilNewChart' => __DIR__ . '/../..' . '/../../Services/Chart/classes/class.ilNewChart.php',
+        'ilNewChartData' => __DIR__ . '/../..' . '/../../Services/Chart/classes/class.ilNewChartData.php',
+        'ilNewChartDataScatter' => __DIR__ . '/../..' . '/../../Services/Chart/classes/class.ilNewChartDataScatter.php',
+        'ilNewChartScatter' => __DIR__ . '/../..' . '/../../Services/Chart/classes/class.ilNewChartScatter.php',
         'ilNewItemGroupTableGUI' => __DIR__ . '/../..' . '/../../Services/Repository/classes/class.ilNewItemGroupTableGUI.php',
         'ilNewsCache' => __DIR__ . '/../..' . '/../../Services/News/classes/class.ilNewsCache.php',
         'ilNewsContext' => __DIR__ . '/../..' . '/../../Services/News/classes/class.ilNewsContext.php',
@@ -7776,13 +7779,7 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
         'shibServerData' => __DIR__ . '/../..' . '/../../Services/AuthShibboleth/classes/ServerData/class.shibServerData.php',
         'shibUser' => __DIR__ . '/../..' . '/../../Services/AuthShibboleth/classes/User/class.shibUser.php',
         'soap_client' => __DIR__ . '/../..' . '/../../Services/SOAPAuth/include/nusoap.php',
-        'soap_fault' => __DIR__ . '/../..' . '/../../Services/SOAPAuth/include/nusoap.php',
-        'soap_parser' => __DIR__ . '/../..' . '/../../Services/SOAPAuth/include/nusoap.php',
-        'soap_server' => __DIR__ . '/../..' . '/../../Services/SOAPAuth/include/nusoap.php',
-        'soap_transport_http' => __DIR__ . '/../..' . '/../../Services/SOAPAuth/include/nusoap.php',
-        'soapval' => __DIR__ . '/../..' . '/../../Services/SOAPAuth/include/nusoap.php',
         'validator' => __DIR__ . '/../..' . '/../../Services/XHTMLValidator/validator/validator.inc',
-        'wsdl' => __DIR__ . '/../..' . '/../../Services/SOAPAuth/include/nusoap.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

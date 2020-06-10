@@ -17,6 +17,8 @@ abstract class ilNewChart
     protected $data; // [array]
     protected $series;
     protected $options;
+    protected $y_labels;
+    protected $x_labels;
 
     /**
      * Constructor
@@ -84,6 +86,26 @@ abstract class ilNewChart
         return $this->options;
     }
 
+    public function setYLabels(array $a_labels)
+    {
+        $this->y_labels = $a_labels;
+    }
+
+    public function getYLabels()
+    {
+        return $this->y_labels;
+    }
+
+    public function setXLabels(array $a_labels)
+    {
+        $this->x_labels = $a_labels;
+    }
+
+    public function getXLabels()
+    {
+        return $this->x_labels;
+    }
+
     /**
      * Render
      */
@@ -91,6 +113,25 @@ abstract class ilNewChart
     {
         $chart = new ilTemplate("tpl.scatter.html", true, true, "Services/Chart");
         $chart->setVariable("ID", $this->id);
+
+
+        $c1 = 0;
+        $y_labels = array();
+        foreach ($this->getYLabels() as $label) {
+            $y_labels[$c1] = $label;
+            $c1++;
+        }
+        //var_dump($y_labels); exit;
+        $chart->setVariable("YLABELS", json_encode($y_labels));
+
+        $c2 = 0;
+        $x_labels = array();
+        foreach ($this->getXLabels() as $label) {
+            $x_labels[$c2] = $label;
+            $c2++;
+        }
+        //var_dump($x_labels); exit;
+        $chart->setVariable("XLABELS", json_encode($x_labels));
 
         /*
         $json_data = new stdClass();

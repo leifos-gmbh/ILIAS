@@ -1353,6 +1353,7 @@ class ilPersonalSkillsGUI
                 $pkg_cnt++;
                 $max_cnt = 0;
                 $leg_labels = array();
+                $level_labels = array();
                 //var_dump($this->profile_levels);
                 //foreach ($this->profile_levels as $k => $l)
 
@@ -1377,6 +1378,10 @@ class ilPersonalSkillsGUI
                             }
                         }
                         $max_cnt = max($max_cnt, $cnt);
+
+                        if (!in_array($lv["title"], $level_labels)) {
+                            $level_labels[] = $lv["title"];
+                        }
                     }
                 }
 
@@ -1386,10 +1391,18 @@ class ilPersonalSkillsGUI
                 $chart->setYAxisMax($max_cnt);
                 $chart->setLegLabels($leg_labels);
 
+                $scatter_chart = new ilNewChartScatter("feverCurves");
+                $scatter_chart->setYLabels($leg_labels);
+                $scatter_chart->setXLabels($level_labels);
+
                 // target level
                 $cd = $chart->getDataInstance();
                 $cd->setLabel($lng->txt("skmg_target_level"));
                 $cd->setFill(true, "#A0A0A0");
+
+                $scatter_data1 = new ilNewChartDataScatter();
+                $scatter_data1->setLabel("Zielstufe");
+                $scatter_data1->setColor("green");
 
                 // other users
                 $cd2 = $chart->getDataInstance();
@@ -1415,6 +1428,7 @@ class ilPersonalSkillsGUI
                 $cnt = 0;
                 foreach ($pskills as $pl) {
                     $cd->addPoint($cnt, (int) $pl["target_cnt"]);
+                    $scatter_data1->addPoint(((int) $pl["target_cnt"]-1), $cnt);
                     $cd2->addPoint($cnt, (int) $pl["actual_cnt"]);
                     if ($incl_self_eval) {
                         $cd3->addPoint($cnt, (int) $pl["self_cnt"]);
@@ -1425,6 +1439,7 @@ class ilPersonalSkillsGUI
                 // add data to chart
                 if ($this->getProfileId() > 0) {
                     $chart->addData($cd);
+                    $scatter_chart->addData($scatter_data1);
                 }
                 $chart->addData($cd2);
                 if ($incl_self_eval && count($this->getGapAnalysisSelfEvalLevels()) > 0) {
@@ -1438,6 +1453,7 @@ class ilPersonalSkillsGUI
 
                 $chart_html = $chart->getHTML();
 
+                /*
                 $scatter_chart = new ilNewChartScatter("feverCurves");
                 $scatter_data1 = new ilNewChartDataScatter();
                 $scatter_data2 = new ilNewChartDataScatter();
@@ -1460,6 +1476,7 @@ class ilPersonalSkillsGUI
 
                 $scatter_chart->addData($scatter_data1);
                 $scatter_chart->addData($scatter_data2);
+                */
 
 
                 $chart_html1 = $scatter_chart->getHTML();

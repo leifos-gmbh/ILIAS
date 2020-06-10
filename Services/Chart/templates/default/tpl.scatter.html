@@ -7,7 +7,7 @@
 <div><br><br></div>
 
 <div class="ilChartWrapper1" id="ilChart{ID}">
-    {SERIES}
+    {XLABELS}
 </div>
 
 <div><br><br><br><br></div>
@@ -15,7 +15,7 @@
 <canvas id="myChart{ID}" <!-- width="1200" height="600" -->></canvas>
 <script id="source1" language="javascript" type="text/javascript">
 
-  var beispiel = {SERIES};
+  var beispiel = {XLABELS};
   console.log(beispiel);
 
 
@@ -23,14 +23,16 @@
   //var options = {OPTIONS}
 
 
+  var xLabels = {XLABELS}
+  //var xLabels = {
+  //  0 : 'Sehr niedrig', 1 : 'Niedrig', 2 : 'Mittel', 3 : 'Hoch', 4 : 'Sehr hoch', 0.5 : '', 1.5 : ''
+  //}
 
-  var xLabels = {
-    0 : 'Sehr niedrig', 1 : 'Niedrig', 2 : 'Mittel', 3 : 'Hoch', 4 : 'Sehr hoch', 0.5 : '', 1.5 : ''
-  }
-  var yLabels = {
-    0 : 'Erste Kompetenz', 1 : 'Zweite Kompetenz', 2 : 'Dritte Kompetenz', 3 : 'Vierte Kompetenz', 4 : 'Fünfte Kompetenz',
-    5: "Sechste Kompetenz", 6: "Siebente Kompetenz",
-  }
+  var yLabels = {YLABELS}
+  //var yLabels = {
+  //  0 : 'Erste Kompetenz', 1 : 'Zweite Kompetenz', 2 : 'Dritte Kompetenz', 3 : 'Vierte Kompetenz', 4 : 'Fünfte Kompetenz',
+  //  5: "Sechste Kompetenz", 6: "Siebente Kompetenz",
+  //}
 
 
   new Chart(document.getElementById('myChart{ID}'), {
@@ -46,12 +48,12 @@
           {
             type: 'linear',
             ticks: {
-              //callback: function(value, index, values) {
-              // return xLabels[value];
-              //},
+              callback: function(value, index, values) {
+               return xLabels[value];
+              },
               beginAtZero: true,
               stepSize: 0.5,
-              max: 6
+              max: 4
             },
           },
         ],
@@ -59,11 +61,12 @@
           {
             type: 'linear',
             ticks: {
-              //callback: function(value, index, values) {
-              //  return yLabels[value];
-              // },
-              reverse: false,
+              callback: function(value, index, values) {
+                return yLabels[value];
+               },
+              reverse: true,
               beginAtZero: true,
+              stepSize: 1,
             },
           },
         ],

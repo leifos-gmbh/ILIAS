@@ -2,7 +2,7 @@
 /* Copyright (c) 1998-2019 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 /**
- * @author  Niels Theen <ntheen@databay.de>
+ * @author  Marvin Barz <barz@leifos.de>
  */
 class ilObjectCustomUserFieldsPlaceholderValues implements ilCertificatePlaceholderValues
 {
@@ -53,7 +53,7 @@ class ilObjectCustomUserFieldsPlaceholderValues implements ilCertificatePlacehol
      * @param int $user_id
      * @param int $obj_id
      * @throws ilInvalidCertificateException
-     * @return mixed - [PLACEHOLDER] => 'actual value'
+     * @return array - [PLACEHOLDER] => 'actual value'
      * @throws ilException
      */
     public function getPlaceholderValues(int $user_id, int $obj_id)
@@ -71,7 +71,7 @@ class ilObjectCustomUserFieldsPlaceholderValues implements ilCertificatePlacehol
         foreach ($course_defined_fields as $key => $field) {
             $field_id = $field->getId();
 
-            $placeholderText = '+' . str_replace(' ', '_', ilStr::strToUpper($field->getName()));
+            $placeholderText = ilObjectCustomUserFieldsPlaceholderDescription::PLACEHOLDER_PRE_CHAR . str_replace(' ', '_', ilStr::strToUpper($field->getName()));
 
             $placeholder[$placeholderText] = !empty($field_values[$user_id][$field_id]) ? $field_values[$user_id][$field_id] : "";
         }
@@ -86,7 +86,7 @@ class ilObjectCustomUserFieldsPlaceholderValues implements ilCertificatePlacehol
      *
      * @param int $user_id
      * @param int $obj_id
-     * @return mixed - [PLACEHOLDER] => 'dummy value'
+     * @return array - [PLACEHOLDER] => 'dummy value'
      * @throws ilException
      * @throws ilInvalidCertificateException
      */
@@ -100,7 +100,7 @@ class ilObjectCustomUserFieldsPlaceholderValues implements ilCertificatePlacehol
 
         $placeholder = array();
         foreach ($course_defined_fields as $key => $field) {
-            $placeholderText = '+' . str_replace(' ', '_', ilStr::strToUpper($field->getName()));
+            $placeholderText = ilObjectCustomUserFieldsPlaceholderDescription::PLACEHOLDER_PRE_CHAR . str_replace(' ', '_', ilStr::strToUpper($field->getName()));
 
             $placeholder[$placeholderText] = $placeholderText . '_' . ilStr::strToUpper($lng->txt('value'));
         }

@@ -81,7 +81,7 @@ class ilUserDefinedFieldsPlaceholderValues implements ilCertificatePlaceholderVa
         $placeholder = array();
         foreach ($userDefinedFields as $field) {
             if ($field['certificate']) {
-                $placeholderText = '#' . str_replace(' ', '_', ilStr::strToUpper($field['field_name']));
+                $placeholderText = ilUserDefinedFieldsPlaceholderDescription::PLACEHOLDER_PRE_CHAR . str_replace(' ', '_', ilStr::strToUpper($field['field_name']));
 
                 $userDefinedData = $user->getUserDefinedData();
 
@@ -115,7 +115,7 @@ class ilUserDefinedFieldsPlaceholderValues implements ilCertificatePlaceholderVa
         $placeholder = array();
         foreach ($userDefinedFields as $field) {
             if ($field['certificate']) {
-                $placeholderText = '#' . str_replace(' ', '_', ilStr::strToUpper($field['field_name']));
+                $placeholderText = ilUserDefinedFieldsPlaceholderDescription::PLACEHOLDER_PRE_CHAR . str_replace(' ', '_', ilStr::strToUpper($field['field_name']));
 
                 $placeholder[$placeholderText] = $field['field_name'];
             }

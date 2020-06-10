@@ -1,9 +1,14 @@
 <?php
 /* Copyright (c) 1998-2019 ILIAS open source, Extended GPL, see docs/LICENSE */
 
+/**
+ * @author  Marvin Barz <barz@leifos.de>
+ */
 
 class ilObjectCustomUserFieldsPlaceholderDescription implements ilCertificatePlaceholderDescription
 {
+    const PLACEHOLDER_PRE_CHAR = '+';
+
     private $placeholder;
 
     /**
@@ -18,7 +23,7 @@ class ilObjectCustomUserFieldsPlaceholderDescription implements ilCertificatePla
         foreach ($courseDefinedFields as $field) {
             $name = $field->getName();
 
-            $placeholderText = '+' . str_replace(' ', '_', ilStr::strToUpper($name));
+            $placeholderText = self::PLACEHOLDER_PRE_CHAR . str_replace(' ', '_', ilStr::strToUpper($name));
 
             $this->placeholder[$placeholderText] = $name;
         }
@@ -28,7 +33,7 @@ class ilObjectCustomUserFieldsPlaceholderDescription implements ilCertificatePla
      * This method MUST return an array containing an array with
      * the the description as array value.
      *
-     * @return mixed - [PLACEHOLDER] => 'description'
+     * @return array - [PLACEHOLDER] => 'description'
      */
     public function getPlaceholderDescriptions()
     {

@@ -57,6 +57,7 @@ class ilCoursePlaceholderValuesTest extends PHPUnit_Framework_TestCase
             ->willReturn('2018-09-10 10:32:00');
 
         $valuesObject = new ilCoursePlaceholderValues(
+            null,
             $defaultPlaceholderValues,
             $language,
             $objectHelper,
@@ -123,6 +124,7 @@ class ilCoursePlaceholderValuesTest extends PHPUnit_Framework_TestCase
             });
 
         $valuesObject = new ilCoursePlaceholderValues(
+            null,
             $defaultPlaceholderValues,
             $language,
             $objectHelper,

@@ -29,7 +29,7 @@ class ilCoursePlaceholderDescriptionTest extends \PHPUnit_Framework_TestCase
         $userDefinePlaceholderMock->method('getPlaceholderDescriptions')
             ->willReturn(array());
 
-        $placeholderDescriptionObject = new ilCoursePlaceholderDescription(null, $languageMock, $userDefinePlaceholderMock);
+        $placeholderDescriptionObject = new ilCoursePlaceholderDescription(0, null, $languageMock, $userDefinePlaceholderMock);
 
         $html = $placeholderDescriptionObject->createPlaceholderHtmlDescription($templateMock);
 
@@ -59,7 +59,7 @@ class ilCoursePlaceholderDescriptionTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $placeholderDescriptionObject = new ilCoursePlaceholderDescription($defaultPlaceholder, $languageMock);
+        $placeholderDescriptionObject = new ilCoursePlaceholderDescription(0, $defaultPlaceholder, $languageMock);
 
         $placeHolders = $placeholderDescriptionObject->getPlaceholderDescriptions();
 

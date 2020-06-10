@@ -6,6 +6,8 @@
  */
 class ilUserDefinedFieldsPlaceholderDescription implements ilCertificatePlaceholderDescription
 {
+    const PLACEHOLDER_PRE_CHAR = '#';
+
     private $placeholder;
 
     /**
@@ -22,7 +24,7 @@ class ilUserDefinedFieldsPlaceholderDescription implements ilCertificatePlacehol
 
         foreach ($userDefinedFields as $field) {
             if ($field['certificate']) {
-                $placeholderText = '#' . str_replace(' ', '_', ilStr::strToUpper($field['field_name']));
+                $placeholderText = self::PLACEHOLDER_PRE_CHAR . str_replace(' ', '_', ilStr::strToUpper($field['field_name']));
 
                 $this->placeholder[$placeholderText] = $field['field_name'];
             }

@@ -155,24 +155,18 @@ class ilSoapRequestHandler
         $input = file_get_contents('php://input');
 
         $logger->debug('Original request: ' . $input);
-        $input_lines = explode("\n", $input);
-        $header_wrapped = [];
-        $in_header = false;
-        foreach ($input_lines as $input_line) {
-            $logger->debug('Input line: ' . $input_line);
-            if (stristr($input_line, '<soapenv:Header>') !== false) {
-                $in_header = true;
-            }
-            elseif (stristr($input_line, '</soapenv:Header>') !== false) {
-                $in_header = false;
-            }
-            elseif (!$in_header) {
-                $header_wrapped[] = $input_line;
+        $root = new SimpleXMLElement($input);
+        foreach ($root->getNamespaces() as $prefix => $ns) {
+            $headers = $root->xpath($prefix.':Header');
+            foreach ($headers as $header) {
+                // load dom and remove it
+                $header_dom = dom_import_simplexml($header);
+                $header_dom->parentNode->removeChild($header_dom);
             }
         }
-        $input_wrapped = implode('\n', $header_wrapped);
-        $logger->debug('Body filtered: ' . $input_wrapped);
-        return $input_wrapped;
+
+        $logger->debug('Parsed request: ' . $root->asXML());
+        return $root->asXML();
     }
 
     /**

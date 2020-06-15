@@ -166,7 +166,7 @@ class ilSoapRequestHandler
         }
 
         // remove Header without namespace
-        $root->xpath('/Header');
+        $header_dom = $root->xpath('/Header');
         $header_dom = dom_import_simplexml($header_dom);
         $header_dom->parentNode->removeChild($header_dom);
 

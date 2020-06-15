@@ -157,7 +157,7 @@ class ilSoapRequestHandler
         $logger->debug('Original request: ' . $input);
         $root = new SimpleXMLElement($input);
         foreach ($root->getNamespaces() as $prefix => $ns) {
-            $headers = $root->xpath('/' . $prefix.':Header');
+            $headers = $root->xpath('./' . $prefix.':Header');
             foreach ($headers as $header) {
                 // load dom and remove it
                 $header_dom = dom_import_simplexml($header);
@@ -166,9 +166,11 @@ class ilSoapRequestHandler
         }
 
         // remove Header without namespace
-        $header_dom = $root->xpath('/Header');
-        $header_dom = dom_import_simplexml($header_dom);
-        $header_dom->parentNode->removeChild($header_dom);
+        $headers = $root->xpath('./Header');
+        foreach ($headers as $header) {
+            $header_dom = dom_import_simplexml($header);
+            $header_dom->parentNode->removeChild($header_dom);
+        }
 
         $logger->debug('Parsed request: ' . $root->asXML());
         return $root->asXML();

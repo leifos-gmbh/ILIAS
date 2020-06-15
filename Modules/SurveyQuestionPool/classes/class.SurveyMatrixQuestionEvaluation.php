@@ -423,4 +423,25 @@ class SurveyMatrixQuestionEvaluation extends SurveyQuestionEvaluation
 			}
 		}		
 	}
+
+    /**
+     * Supports sum score?
+     * @return bool
+     */
+    protected function supportsSumScore()
+    {
+        return true;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function isSumScoreValid($nr_answer_records)
+    {
+        if ($nr_answer_records == $this->question->getRowCount()) {
+            return true;
+        }
+        return false;
+    }
+
 }

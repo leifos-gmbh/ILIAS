@@ -81,3 +81,15 @@ $setting->set('pd_active_pres_view_1', serialize(['list', 'tile']));
 $setting->set('pd_def_pres_view_0', 'list');
 $setting->set('pd_def_pres_view_1', 'list');
 ?>
+<#7>
+<?php
+if (!$ilDB->tableColumnExists('svy_svy', 'calculate_sum_score'))
+{
+    $ilDB->addTableColumn('svy_svy', 'calculate_sum_score', array(
+        "type" => "integer",
+        "notnull" => true,
+        "default" => 0,
+        "length" => 1
+    ));
+}
+?>

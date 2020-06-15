@@ -171,6 +171,14 @@ class ilSurveyEvaluationGUI
 				$this->ctrl->getLinkTarget($this, "evaluationuser"), 
 				array("evaluationuser")
 			);
+
+            if ($this->object->getCalculateSumScore()) {
+                $ilTabs->addSubTabTarget(
+                    "svy_sum_score",
+                    $this->ctrl->getLinkTarget($this, "sumscore"),
+                    array("sumscore")
+                );
+            }
 		}
 	}
 
@@ -1709,8 +1717,9 @@ class ilSurveyEvaluationGUI
 		
 		return $data;
 	}
-	
-	/**
+
+
+    /**
 	 * Competence Evaluation
 	 *
 	 * @param
@@ -2064,7 +2073,68 @@ class ilSurveyEvaluationGUI
 			return $target;
 		}
 	}
-	
+
+    /**
+     * Show sum score table
+     */
+    function sumscore()
+    {
+        $ilToolbar = $this->toolbar;
+
+        if(!$this->hasResultsAccess() &&
+            $this->object->getMode() != ilObjSurvey::MODE_SELF_EVAL)
+        {
+            ilUtil::sendFailure($this->lng->txt("no_permission"), TRUE);
+            $this->ctrl->redirectByClass("ilObjSurveyGUI", "infoScreen");
+        }
+
+        ilUtil::sendInfo($this->lng->txt("svy_max_sum_score").": " . $this->object->getMaxSumScore());
+
+        $ilToolbar->setFormAction($this->ctrl->getFormAction($this, "evaluationuser"));
+
+        $modal_id = "svy_ev_exp";
+        $modal = $this->buildExportModal($modal_id, "exportevaluationuser");
+
+        $button = ilLinkButton::getInstance();
+        $button->setCaption("print");
+        $button->setOnClick("window.print(); return false;");
+        $button->setOmitPreventDoubleSubmission(true);
+        $ilToolbar->addButtonInstance($button);
+
+        $finished_ids = null;
+
+        $sum_scores = $this->getSumScores($finished_ids);
+        include_once "./Modules/Survey/classes/tables/class.ilSumScoreTableGUI.php";
+        $table_gui = new ilSumScoreTableGUI($this, 'sumscore', $this->object->hasAnonymizedResults());
+        $table_gui->setSumScores($sum_scores);
+        $this->tpl->setContent($table_gui->getHTML().$modal);
+    }
+
+    protected function getSumScores(array $a_finished_ids = null)
+    {
+        $sum_scores = [];
+        foreach ($this->filterSurveyParticipantsByAccess($a_finished_ids) as $p) {
+            $sum_scores[$p["active_id"]] = [
+                "username" => $p["sortname"],
+                "score" => 0
+            ];
+        }
+
+        foreach($this->object->getSurveyQuestions() as $qdata)
+        {
+            $q_eval = SurveyQuestion::_instanciateQuestionEvaluation($qdata["question_id"], $a_finished_ids);
+            foreach($q_eval->getSumScores() as $finished_id => $sum_score) {
+                if ($sum_score === null) {
+                    $sum_scores[$finished_id]["score"] = null;
+                }
+                if ($sum_scores[$finished_id]["score"] !== null) {
+                    $sum_scores[$finished_id]["score"] += (int) $sum_score;
+                }
+            }
+        }
+        return $sum_scores;
+    }
+
 }
 
 ?>

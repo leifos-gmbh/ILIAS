@@ -313,12 +313,9 @@ abstract class ilChart
         // (series) data
         
         $json_series = array();
-        //var_dump($this->data); exit;
         foreach ($this->data as $series) {
-            //var_dump($series);
             $series->parseData($json_series);
         }
-        //exit;
         $chart->setVariable("SERIES", json_encode($json_series));
         
         

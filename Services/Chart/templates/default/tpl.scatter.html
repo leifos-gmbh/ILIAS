@@ -4,23 +4,20 @@
 
 </head>
 
-<div><br><br></div>
+<canvas id="{ID}" <!-- width="1200" height="600" -->></canvas>
 
-<div class="ilChartWrapper1" id="ilChart{ID}">
-    {XLABELS}
-</div>
 
-<div><br><br><br><br></div>
-
-<canvas id="myChart{ID}" <!-- width="1200" height="600" -->></canvas>
 <script id="source1" language="javascript" type="text/javascript">
 
-  var beispiel = {XLABELS};
-  console.log(beispiel);
+  var daten = {SERIES}
+  console.log(daten);
+
+  var optionen = {PREFERENCES}
+  console.log(optionen);
 
 
   var series = {SERIES}
-  //var options = {OPTIONS}
+  var preferences = {PREFERENCES}
 
 
   var xLabels = {XLABELS}
@@ -35,46 +32,52 @@
   //}
 
 
-  new Chart(document.getElementById('myChart{ID}'), {
+  new Chart(document.getElementById('{ID}'), {
     type: 'scatter',
-
     data: {
       datasets: series,
     },
     options: {
-      //showLines: true,
       scales: {
         xAxes: [
           {
-            type: 'linear',
+            type: preferences.xAxis.type,
             ticks: {
               callback: function(value, index, values) {
                return xLabels[value];
               },
-              beginAtZero: true,
-              stepSize: 0.5,
-              max: 4
+              beginAtZero: preferences.xAxis.beginAtZero,
+              stepSize: preferences.xAxis.stepSize,
+              min: preferences.xAxis.min,
+              max: preferences.xAxis.max,
+              padding: preferences.xAxis.padding,
             },
           },
         ],
         yAxes: [
           {
-            type: 'linear',
+            type: preferences.yAxis.type,
             ticks: {
               callback: function(value, index, values) {
                 return yLabels[value];
                },
-              reverse: true,
-              beginAtZero: true,
-              stepSize: 1,
+              reverse: preferences.yAxis.reverse,
+              beginAtZero: preferences.yAxis.beginAtZero,
+              stepSize: preferences.yAxis.stepSize,
+              min: preferences.yAxis.min,
+              max: preferences.yAxis.max,
+              padding: preferences.yAxis.padding,
             },
           },
         ],
       },
-      //legend
+      legend : {
+        position: preferences.legend.position,
+      },
       tooltips: {
-        enabled: true,
-      }
+        enabled: preferences.tooltips.enabled,
+      },
     },
   });
+
 </script>

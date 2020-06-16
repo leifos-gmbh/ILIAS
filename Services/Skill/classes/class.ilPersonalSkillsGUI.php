@@ -1391,9 +1391,11 @@ class ilPersonalSkillsGUI
                 $chart->setYAxisMax($max_cnt);
                 $chart->setLegLabels($leg_labels);
 
-                $scatter_chart = new ilNewChartScatter("feverCurves");
-                $scatter_chart->setYLabels($leg_labels);
-                $scatter_chart->setXLabels($level_labels);
+                $scatter_chart = new ilNewChartScatter("fever_curves" . $pkg_cnt);
+                $scatter_chart->setYAxisMax(sizeof($level_labels) - 1); // eleganteren Weg finden
+                $scatter_chart->setXAxisMax($max_cnt - 1);
+                $scatter_chart->setYAxisLabels($leg_labels);
+                $scatter_chart->setXAxisLabels($level_labels);
 
                 // target level
                 $cd = $chart->getDataInstance();
@@ -1401,37 +1403,48 @@ class ilPersonalSkillsGUI
                 $cd->setFill(true, "#A0A0A0");
 
                 $scatter_data1 = new ilNewChartDataScatter();
-                $scatter_data1->setLabel("Zielstufe");
-                $scatter_data1->setColor("green");
+                $scatter_data1->setLabel($lng->txt("skmg_target_level"));
+                $scatter_data1->setColor("green"); // change to hex code
 
                 // other users
                 $cd2 = $chart->getDataInstance();
+                $scatter_data2 = new ilNewChartDataScatter();
                 if ($this->gap_cat_title != "") {
                     $cd2->setLabel($this->gap_cat_title);
+                    $scatter_data2->setLabel($this->gap_cat_title);
                 } elseif ($this->gap_mode == "max_per_type") {
                     $cd2->setLabel($lng->txt("objs_" . $this->gap_mode_type));
+                    $scatter_data2->setLabel($lng->txt("objs_" . $this->gap_mode_type));
                 } elseif ($this->gap_mode == "max_per_object") {
                     $cd2->setLabel(ilObject::_lookupTitle($this->gap_mode_obj_id));
+                    $scatter_data2->setLabel(ilObject::_lookupTitle($this->gap_mode_obj_id));
                 }
                 //$cd2->setFill(true, "#dcb496");
                 $cd2->setFill(true, "#FF8080");
                 $cd2->setFill(true, "#cc8466");
+                $scatter_data2->setColor("red"); // change to hex code
 
                 // self evaluation
                 if ($incl_self_eval) {
                     $cd3 = $chart->getDataInstance();
                     $cd3->setLabel($lng->txt("skmg_self_evaluation"));
                     $cd3->setFill(true, "#6ea03c");
+
+                    $scatter_data3 = new ilNewChartDataScatter();
+                    $scatter_data3->setLabel($lng->txt("skmg_self_evaluation"));
+                    $scatter_data3->setColor("blue"); // change to hex code
                 }
 
                 // fill in data
                 $cnt = 0;
                 foreach ($pskills as $pl) {
                     $cd->addPoint($cnt, (int) $pl["target_cnt"]);
-                    $scatter_data1->addPoint(((int) $pl["target_cnt"]-1), $cnt);
+                    $scatter_data1->addPoint(((int) $pl["target_cnt"] - 1), $cnt); // addPoint prüfen ob Wert überhaupt vorhanden, ansonsten überspringen
                     $cd2->addPoint($cnt, (int) $pl["actual_cnt"]);
+                    $scatter_data2->addPoint((int) $pl["actual_cnt"] - 1, $cnt); // addPoint prüfen ob Wert überhaupt vorhanden, ansonsten überspringen
                     if ($incl_self_eval) {
                         $cd3->addPoint($cnt, (int) $pl["self_cnt"]);
+                        $scatter_data3->addPoint((int) $pl["self_cnt"] - 1, $cnt); // addPoint prüfen ob Wert überhaupt vorhanden, ansonsten überspringen
                     }
                     $cnt++;
                 }
@@ -1442,8 +1455,10 @@ class ilPersonalSkillsGUI
                     $scatter_chart->addData($scatter_data1);
                 }
                 $chart->addData($cd2);
+                $scatter_chart->addData($scatter_data2);
                 if ($incl_self_eval && count($this->getGapAnalysisSelfEvalLevels()) > 0) {
                     $chart->addData($cd3);
+                    $scatter_chart->addData($scatter_data3);
                 }
 
                 if ($pkg_cnt == 1) {
@@ -1453,36 +1468,10 @@ class ilPersonalSkillsGUI
 
                 $chart_html = $chart->getHTML();
 
-                /*
-                $scatter_chart = new ilNewChartScatter("feverCurves");
-                $scatter_data1 = new ilNewChartDataScatter();
-                $scatter_data2 = new ilNewChartDataScatter();
-
-                $scatter_data1->setLabel("Zielstufe");
-                $scatter_data1->setColor("green");
-                $scatter_data1->addPoint(4, 4);
-                $scatter_data1->addPoint(3, 3);
-                $scatter_data1->addPoint(3, 2);
-                $scatter_data1->addPoint(4, 1);
-                $scatter_data1->addPoint(3, 0);
-
-                $scatter_data2->setLabel("Eine Quelle");
-                $scatter_data2->setColor("red");
-                $scatter_data2->addPoint(1, 4);
-                $scatter_data2->addPoint(0, 3);
-                $scatter_data2->addPoint(1, 2);
-                $scatter_data2->addPoint(2, 1);
-                $scatter_data2->addPoint(1, 0);
-
-                $scatter_chart->addData($scatter_data1);
-                $scatter_chart->addData($scatter_data2);
-                */
-
-
-                $chart_html1 = $scatter_chart->getHTML();
+                $scatter_chart_html = $scatter_chart->getHTML();
 
                 $all_chart_html .= $chart_html;
-                $all_chart_html .= $chart_html1;
+                $all_chart_html .= $scatter_chart_html;
             }
 
             $pan = ilPanelGUI::getInstance();

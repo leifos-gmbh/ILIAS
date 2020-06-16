@@ -13,12 +13,15 @@ abstract class ilNewChart
      */
     protected $tpl;
 
-    protected $id; // [string]
-    protected $data; // [array]
-    protected $series;
-    protected $options;
-    protected $y_labels;
-    protected $x_labels;
+    /**
+     * @var string
+     */
+    protected $id;
+
+    /**
+     * @var array
+     */
+    protected $data;
 
     /**
      * Constructor
@@ -50,60 +53,8 @@ abstract class ilNewChart
         return $a_idx;
     }
 
-    public function getData1()
+    public function parseOptions(array &$a_options)
     {
-        $data1 = ["x" => 4, "y" => 4];
-        $data2 = ["x" => 3, "y" => 3];
-        $data3 = ["x" => 3, "y" => 2];
-        $data4 = ["x" => 4, "y" => 1];
-        $data5 = ["x" => 3, "y" => 0];
-
-        $this->series = [$data1, $data2, $data3, $data4, $data5];
-
-        return $this->series;
-    }
-
-    public function getData2()
-    {
-        $data1 = ["x" => 1, "y" => 4];
-        $data2 = ["x" => 0, "y" => 3];
-        $data3 = ["x" => 1, "y" => 2];
-        $data4 = ["x" => 2, "y" => 1];
-        $data5 = ["x" => 1, "y" => 0];
-
-        $this->series1 = [$data1, $data2, $data3,  $data5];
-
-        return $this->series1;
-    }
-
-    public function setOptions($a_options)
-    {
-        $this->options = $a_options;
-    }
-
-    public function getOptions()
-    {
-        return $this->options;
-    }
-
-    public function setYLabels(array $a_labels)
-    {
-        $this->y_labels = $a_labels;
-    }
-
-    public function getYLabels()
-    {
-        return $this->y_labels;
-    }
-
-    public function setXLabels(array $a_labels)
-    {
-        $this->x_labels = $a_labels;
-    }
-
-    public function getXLabels()
-    {
-        return $this->x_labels;
     }
 
     /**
@@ -115,86 +66,42 @@ abstract class ilNewChart
         $chart->setVariable("ID", $this->id);
 
 
-        $c1 = 0;
+        // labels for y axis
+
+        $y_index = 0;
         $y_labels = array();
-        foreach ($this->getYLabels() as $label) {
-            $y_labels[$c1] = $label;
-            $c1++;
+        foreach ($this->getYAxisLabels() as $label) {
+            $y_labels[$y_index] = $label;
+            $y_index++;
         }
-        //var_dump($y_labels); exit;
         $chart->setVariable("YLABELS", json_encode($y_labels));
 
-        $c2 = 0;
+
+        // labels for x axis
+
+        $x_index = 0;
         $x_labels = array();
-        foreach ($this->getXLabels() as $label) {
-            $x_labels[$c2] = $label;
-            $c2++;
+        foreach ($this->getXAxisLabels() as $label) {
+            $x_labels[$x_index] = $label;
+            $x_index++;
         }
-        //var_dump($x_labels); exit;
         $chart->setVariable("XLABELS", json_encode($x_labels));
-
-        /*
-        $json_data = new stdClass();
-        $json_data->dataset = new stdClass();
-        $json_data->dataset->label = "Zielstufe";
-        $json_data->dataset->data = $this->getData1();
-        $json_data->dataset->showLine = true;
-        $json_data->dataset->fill = false;
-        $json_data->dataset->lineTension = 0;
-        $json_data->dataset->borderColor = "green";
-
-        $json_dataset = new stdClass();
-        $json_dataset->label = "Zielstufe";
-        $json_dataset->data = $this->getData1();
-        $json_dataset->showLine = true;
-        $json_dataset->fill = false;
-        $json_dataset->lineTension = 0;
-        $json_dataset->borderColor = "green";
-
-        $json_dataset1 = new stdClass();
-        $json_dataset1->label = "Eine Quelle";
-        $json_dataset1->data = $this->getData2();
-        $json_dataset1->showLine = true;
-        $json_dataset1->fill = false;
-        $json_dataset1->lineTension = 0;
-        $json_dataset1->borderColor = "red";
-
-        */
-
-
 
 
         // (series) data
 
         $json_series = array();
-        //var_dump($this->data); exit;
         foreach ($this->data as $series) {
-            //var_dump($series);
             $series->parseData($json_series);
         }
-        //exit;
-
         $chart->setVariable("SERIES", json_encode($json_series));
 
 
         //options
 
-        //$json_options = new stdClass();
-       // $json_options->scales = new stdClass();
-        //...
-
-        //playground
-        $arr = ["blup" => "dieser Wert", "blop" => "anderer Wert"];
-        $arr1 = ["hop" => "ein Wert", $arr];
-
-        //$encoded = json_encode($json_dataset);
-        //$encoded1 = json_encode($json_dataset1);
-        //$encoded_all = json_encode([$json_dataset, $json_dataset1]);
-
-        //$chart->setVariable("SERIES", $encoded_all);
-
-
-
+        $json_preferences = array();
+        $this->parseOptions($json_preferences);
+        $chart->setVariable("PREFERENCES", json_encode($json_preferences));
 
 
         $ret = $chart->get();

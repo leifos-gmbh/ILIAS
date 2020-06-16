@@ -8,38 +8,29 @@
  */
 class ilNewChartDataScatter extends ilNewChartData
 {
+    /**
+     * @return string
+     */
     protected function getTypeString()
     {
         return "scatter";
     }
 
+    /**
+     * @param array $a_data
+     */
     public function parseData(array &$a_data)
     {
         parent::parseData($a_data);
-    }
 
-    public function parseGlobalOptions(stdClass $a_options, ilChart $a_chart)
-    {
-        /*
-        $spider = new stdClass();
-        $spider->active = true;
+        foreach ($a_data as $i => $data) {
+            $series = $a_data[$i];
+            $series->showLine = true;
+            $series->fill = false;
+            $series->lineTension = 0;
+            $a_data[$i] = $series;
+        }
 
-        $spider->highlight = new stdClass();
-        $spider->highlight->mode = "line";
 
-        //..............
-
-        $spider->spiderSize = 0.7;
-        $spider->lineWidth = 1;
-        $spider->pointSize = 0;
-
-        $spider->connection = new StdClass();
-        $spider->connection->width = 2;
-
-        $spider->legMin = 0.0000001;
-        $spider->legMax = $a_chart->getYAxisMax();
-
-        $a_options->series->spider = $spider;
-        */
     }
 }

@@ -8,9 +8,19 @@
  */
 abstract class ilNewChartData
 {
-    protected $type; // [string]
-    protected $label; // [string]
-    protected $data; // [array]
+    /**
+     * @var array
+     */
+    protected $data;
+
+    /**
+     * @var string
+     */
+    protected $label;
+
+    /**
+     * @var string
+     */
     protected $color;
 
     /**
@@ -21,13 +31,34 @@ abstract class ilNewChartData
     abstract protected function getTypeString();
 
     /**
+     * Set data
+     *
+     * @param float $a_x
+     * @param float $a_y
+     */
+    public function addPoint(float $a_x, float $a_y)
+    {
+        $this->data[] = array($a_x, $a_y);
+    }
+
+    /**
+     * Get data
+     *
+     * @return array
+     */
+    public function getPoints()
+    {
+        return $this->data;
+    }
+
+    /**
      * Set label
      *
      * @param string $a_label
      */
-    public function setLabel($a_label)
+    public function setLabel(string $a_label)
     {
-        $this->label = (string) $a_label;
+        $this->label = $a_label;
     }
 
     /**
@@ -40,30 +71,9 @@ abstract class ilNewChartData
         return $this->label;
     }
 
-    /**
-     * Set data
-     *
-     * @param float $a_x
-     * @param float $a_y
-     */
-    public function addPoint($a_x, $a_y)
+    public function setColor(string $a_color)
     {
-        $this->data[] = array($a_x, $a_y);
-    }
-
-    /**
-     * Get data
-     *
-     * @return array
-     */
-    public function getData()
-    {
-        return $this->data;
-    }
-
-    public function setColor($a_color)
-    {
-        $this->color = $a_color;
+        $this->color = $a_color; //change to hex code
     }
 
     public function getColor()
@@ -83,15 +93,10 @@ abstract class ilNewChartData
         $series = new stdClass();
         $series->label = $this->getLabel();
         $series->data = array();
-        foreach ($this->getData() as $point) {
+        foreach ($this->getPoints() as $point) {
             $series->data[] = ["x" => $point[0], "y" => $point[1]];
-            //$series->data[] = array($point[0], $point[1]);
         }
-        //var_dump($series->data); exit;
         $series->borderColor = $this->getColor();
-        $series->showLine = true; //fix?
-        $series->fill = false; //fix?
-        $series->lineTension = 0; //fix?
 
         $a_data[] = $series;
     }

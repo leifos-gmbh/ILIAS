@@ -411,6 +411,7 @@ class ilBasicSkill extends ilSkillTreeNode implements ilSkillUsageInfo
             $db->manipulate(
                 "UPDATE skl_user_skill_level SET " .
                 " level_id = " . $db->quote(0, "integer") . "," .
+                " next_level_fulfilment = " . $db->quote(0.0, "float") . "," .
                 " status_date = " . $db->quote($now, "timestamp") .
                 " WHERE user_id = " . $db->quote($a_user_id, "integer") .
                 " AND status_date = " . $db->quote($status_date, "timestamp") .
@@ -424,7 +425,8 @@ class ilBasicSkill extends ilSkillTreeNode implements ilSkillUsageInfo
             $now = ilUtil::now();
             $db->manipulate("INSERT INTO skl_user_skill_level " .
                 "(level_id, user_id, tref_id, status_date, skill_id, status, valid, trigger_ref_id," .
-                "trigger_obj_id, trigger_obj_type, trigger_title, self_eval, unique_identifier) VALUES (" .
+                "trigger_obj_id, trigger_obj_type, trigger_title, self_eval, unique_identifier," .
+                "next_level_fulfilment) VALUES (" .
                 $db->quote(0, "integer") . "," .
                 $db->quote($a_user_id, "integer") . "," .
                 $db->quote((int) $a_tref_id, "integer") . "," .
@@ -437,7 +439,8 @@ class ilBasicSkill extends ilSkillTreeNode implements ilSkillUsageInfo
                 $db->quote("", "text") . "," .
                 $db->quote("", "text") . "," .
                 $db->quote($a_self_eval, "integer") . "," .
-                $db->quote("", "text") .
+                $db->quote("", "text") . "," .
+                $db->quote(0.0, "float") .
                 ")");
         }
 
@@ -538,6 +541,7 @@ class ilBasicSkill extends ilSkillTreeNode implements ilSkillUsageInfo
      * @param bool $a_force DEPRECATED
      * @param bool $a_self_eval self evaluation
      * @param string $a_unique_identifier a  unique identifier (should be used with trigger_ref_id > 0)
+     * @param float $a_next_level_fulfilment next level percentage fulfilment value (value must be >=0 and <1)
      */
     public static function writeUserSkillLevelStatus(
         $a_level_id,
@@ -547,7 +551,8 @@ class ilBasicSkill extends ilSkillTreeNode implements ilSkillUsageInfo
         $a_status = ilBasicSkill::ACHIEVED,
         $a_force = false,
         $a_self_eval = false,
-        $a_unique_identifier = ""
+        $a_unique_identifier = "",
+        $a_next_level_fulfilment = 0.0
     ) {
         global $DIC;
 
@@ -569,13 +574,22 @@ class ilBasicSkill extends ilSkillTreeNode implements ilSkillUsageInfo
             }
         }
 
+        //next level percentage fulfilment value must be >=0 and <1
+        if (!($a_next_level_fulfilment >= 0) || !($a_next_level_fulfilment < 1)) {
+            throw new \UnexpectedValueException(
+                "Next level fulfilment must be equal to or greater than 0 and less than 1, '" .
+                $a_next_level_fulfilment . "' given."
+            );
+        }
+
         if ($update) {
             // this will only be set in self eval case, means this will always have a $rec
             $now = ilUtil::now();
             $ilDB->manipulate(
                 "UPDATE skl_user_skill_level SET " .
                 " level_id = " . $ilDB->quote($a_level_id, "integer") . "," .
-                " status_date = " . $ilDB->quote($now, "timestamp") .
+                " status_date = " . $ilDB->quote($now, "timestamp") . "," .
+                " next_level_fulfilment = " . $ilDB->quote((float) $a_next_level_fulfilment, "float") .
                 " WHERE user_id = " . $ilDB->quote($a_user_id, "integer") .
                 " AND status_date = " . $ilDB->quote($status_date, "timestamp") .
                 " AND skill_id = " . $ilDB->quote($skill_id, "integer") .
@@ -601,7 +615,8 @@ class ilBasicSkill extends ilSkillTreeNode implements ilSkillUsageInfo
             $now = ilUtil::now();
             $ilDB->manipulate("INSERT INTO skl_user_skill_level " .
                 "(level_id, user_id, tref_id, status_date, skill_id, status, valid, trigger_ref_id," .
-                "trigger_obj_id, trigger_obj_type, trigger_title, self_eval, unique_identifier) VALUES (" .
+                "trigger_obj_id, trigger_obj_type, trigger_title, self_eval, unique_identifier," .
+                "next_level_fulfilment) VALUES (" .
                 $ilDB->quote($a_level_id, "integer") . "," .
                 $ilDB->quote($a_user_id, "integer") . "," .
                 $ilDB->quote((int) $a_tref_id, "integer") . "," .
@@ -614,7 +629,8 @@ class ilBasicSkill extends ilSkillTreeNode implements ilSkillUsageInfo
                 $ilDB->quote($trigger_type, "text") . "," .
                 $ilDB->quote($trigger_title, "text") . "," .
                 $ilDB->quote($a_self_eval, "integer") . "," .
-                $ilDB->quote($a_unique_identifier, "text") .
+                $ilDB->quote($a_unique_identifier, "text") . "," .
+                $ilDB->quote((float) $a_next_level_fulfilment, "float") .
                 ")");
         }
 
@@ -631,7 +647,8 @@ class ilBasicSkill extends ilSkillTreeNode implements ilSkillUsageInfo
 
         if ($a_status == ilBasicSkill::ACHIEVED) {
             $ilDB->manipulate("INSERT INTO skl_user_has_level " .
-            "(level_id, user_id, tref_id, status_date, skill_id, trigger_ref_id, trigger_obj_id, trigger_obj_type, trigger_title, self_eval) VALUES (" .
+                "(level_id, user_id, tref_id, status_date, skill_id, trigger_ref_id, trigger_obj_id, trigger_obj_type," .
+                "trigger_title, self_eval, next_level_fulfilment) VALUES (" .
             $ilDB->quote($a_level_id, "integer") . "," .
             $ilDB->quote($a_user_id, "integer") . "," .
             $ilDB->quote($a_tref_id, "integer") . "," .
@@ -641,7 +658,8 @@ class ilBasicSkill extends ilSkillTreeNode implements ilSkillUsageInfo
             $ilDB->quote($trigger_obj_id, "integer") . "," .
             $ilDB->quote($trigger_type, "text") . "," .
             $ilDB->quote($trigger_title, "text") . "," .
-            $ilDB->quote($a_self_eval, "integer") .
+            $ilDB->quote($a_self_eval, "integer") . "," .
+            $ilDB->quote((float) $a_next_level_fulfilment, "float") .
             ")");
         }
     }

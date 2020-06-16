@@ -388,8 +388,6 @@ class ilLPTableBaseGUI extends ilTable2GUI
             $options['lres'] = $lng->txt('obj_lrss');
         }
 
-        $options['root'] = $lng->txt('obj_reps');
-        $options['cat'] = $lng->txt('cat');
         $options['crs'] = $lng->txt('objs_crs');
         $options['grp'] = $lng->txt('objs_grp');
         $options['exc'] = $lng->txt('objs_exc');
@@ -402,6 +400,8 @@ class ilLPTableBaseGUI extends ilTable2GUI
         $options['copa'] = $lng->txt('objs_copa');
         
         if ($a_allow_undefined_lp) {
+            $options['root'] = $lng->txt('obj_reps');
+            $options['cat'] = $lng->txt('objs_cat');
             $options["webr"] = $lng->txt("objs_webr");
             $options["wiki"] = $lng->txt("objs_wiki");
             $options["blog"] = $lng->txt("objs_blog");

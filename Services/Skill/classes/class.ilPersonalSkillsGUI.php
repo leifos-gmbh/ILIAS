@@ -23,13 +23,13 @@ class ilPersonalSkillsGUI
     protected $offline_mode;
     protected $skill_tree;
     public static $skill_tt_cnt = 1;
-    protected $actual_levels = array();
+    public $actual_levels = array();
     protected $gap_self_eval_levels = array();
     protected $mode = "";
     protected $history_view = false;
     protected $trigger_objects_filter = array();
     protected $intro_text = "";
-    protected $hidden_skills = array();
+    public $hidden_skills = array();
 
     /**
      * @var \ILIAS\DI\UIServices
@@ -91,7 +91,7 @@ class ilPersonalSkillsGUI
      */
     protected $ui_ren;
     protected $obj_id = 0;
-    protected $obj_skills = array();
+    public $obj_skills = array();
 
     /**
      * @var ilPersonalSkillsFilterGUI
@@ -1238,7 +1238,7 @@ class ilPersonalSkillsGUI
      * @param array $skills
      * @param int $user_id
      */
-    protected function getActualLevels($skills, $user_id)
+    public function getActualLevels($skills, $user_id)
     {
         // get actual levels for gap analysis
         $this->actual_levels = array();

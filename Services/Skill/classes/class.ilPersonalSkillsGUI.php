@@ -159,7 +159,7 @@ class ilPersonalSkillsGUI
      *
      * @return ilPersonalSkillsFilterGUI
      */
-    protected function getFilter()
+    public function getFilter()
     {
         return $this->filter;
     }

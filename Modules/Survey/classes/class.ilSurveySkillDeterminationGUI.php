@@ -128,7 +128,11 @@ class ilSurveySkillDeterminationGUI
                         $app["user_id"],
                         $this->survey->getRefId(),
                         $nl["tref_id"],
-                        ilBasicSkill::ACHIEVED
+                        ilBasicSkill::ACHIEVED,
+                        false,
+                        false,
+                        "",
+                        $nl["next_level_perc"]
                     );
                 }
             }

@@ -7,11 +7,17 @@ il.UI.maincontrols = il.UI.maincontrols || {};
 		var mappings = {},
 			external_commands = {
 				/**
-				 * Engage a certain tool
+				 * Engage a certain tool (or entry)
 				 */
 				engageTool: function(mapping_id) {
 					var tool_id = mappings[mapping_id];
-					this.model.actions.engageTool(tool_id);
+					if(Object.keys(this.model.getState().tools).includes(tool_id)) {
+						this.model.actions.engageTool(tool_id);
+					}
+					if(Object.keys(this.model.getState().entries).includes(tool_id)) {
+						this.model.actions.engageEntry(tool_id);
+					}
+
 					this.renderer.render(this.model.getState());
 				},
 				/**

@@ -349,12 +349,12 @@ class ilSkillDataSet extends ilDataSet
         if ($a_entity == "skl_prof_level") {
             switch ($a_version) {
                 case "5.1.0":
-                    $this->getDirectDataFromQuery("SELECT profile_id, base_skill_id, tref_id, level_id" . //hier order_nr, aber als neue Version
+                    $this->getDirectDataFromQuery("SELECT profile_id, base_skill_id, tref_id, level_id" .
                             " FROM skl_profile_level WHERE " .
                             $ilDB->in("profile_id", $a_ids, false, "integer"));
                     break;
                 case "7.0.0":
-                    $this->getDirectDataFromQuery("SELECT profile_id, base_skill_id, tref_id, level_id" .
+                    $this->getDirectDataFromQuery("SELECT profile_id, base_skill_id, tref_id, level_id, order_nr" .
                         " FROM skl_profile_level WHERE " .
                         $ilDB->in("profile_id", $a_ids, false, "integer"));
                     break;

@@ -4340,3 +4340,15 @@ if (!$ilDB->tableColumnExists('svy_svy', 'calculate_sum_score'))
     ));
 }
 ?>
+<#5669>
+<?php
+if (!$ilDB->tableColumnExists('skl_profile_level', 'order_nr'))
+{
+    $ilDB->addTableColumn('skl_profile_level', 'order_nr', array(
+        "type" => "integer",
+        "notnull" => true,
+        "default" => 0,
+        "length" => 4
+    ));
+}
+?>

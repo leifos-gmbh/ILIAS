@@ -584,7 +584,7 @@ class ilSkillDataSet extends ilDataSet
                         }
                     }
                     if ($level_id > 0) {
-                        $prof->addSkillLevel($base_skill, $tref_id, $level_id, 0);
+                        $prof->addSkillLevel($base_skill, $tref_id, $level_id, $a_rec["OrderNr"]);
                     }
                     $prof->update();
                 }

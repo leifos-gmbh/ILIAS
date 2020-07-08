@@ -50,6 +50,9 @@ class ilSkillProfileLevelsTableGUI extends ilTable2GUI
         $this->setTitle($lng->txt("skmg_skill_levels"));
         
         $this->addColumn("", "", "1", true);
+        // uni-freiburg-patch: begin
+        $this->addColumn($this->lng->txt("skmg_order"), "", "1px");
+        // uni-freiburg-patch: end
         $this->addColumn($this->lng->txt("skmg_skill"));
         $this->addColumn($this->lng->txt("skmg_level"));
         
@@ -59,7 +62,11 @@ class ilSkillProfileLevelsTableGUI extends ilTable2GUI
         if ($a_write_permission) {
             $this->addMultiCommand("confirmLevelAssignmentRemoval", $lng->txt("skmg_remove_levels"));
         }
-        //$this->addCommandButton("", $lng->txt(""));
+        // uni-freiburg-patch: begin
+        if (count($this->profile->getSkillLevels()) > 0) {
+            $this->addCommandButton("saveLevelOrder", $lng->txt("skmg_save_order"));
+        }
+        // uni-freiburg-patch: end
     }
     
     /**
@@ -83,10 +90,16 @@ class ilSkillProfileLevelsTableGUI extends ilTable2GUI
         );
         
         $this->tpl->setVariable("LEVEL_TITLE", ilBasicSkill::lookupLevelTitle($a_set["level_id"]));
-        
+
+        // uni-freiburg-patch: begin
         $this->tpl->setVariable(
             "ID",
-            ((int) $a_set["base_skill_id"]) . ":" . ((int) $a_set["tref_id"]) . ":" . ((int) $a_set["level_id"])
+            ((int) $a_set["base_skill_id"]) . ":" . ((int) $a_set["tref_id"]) . ":" . ((int) $a_set["level_id"]) .
+            ":" . ((int) $a_set["order_nr"])
         );
+
+        $this->tpl->setVariable("SKILL_ID", (int) $a_set["base_skill_id"]);
+        $this->tpl->setVariable("ORDER_NR", (int) $a_set["order_nr"]);
+        // uni-freiburg-patch: end
     }
 }

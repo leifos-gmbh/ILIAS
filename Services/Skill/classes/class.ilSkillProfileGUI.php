@@ -116,17 +116,20 @@ class ilSkillProfileGUI
                 $ilCtrl->setReturn($this, 'listUsers');
                 $ret = $ilCtrl->forwardCommand($user_search);
                 break;
-            
+
+            // uni-freiburg-patch: begin
             default:
                 if (in_array($cmd, array("listProfiles", "create", "edit", "save", "update",
                     "confirmDeleteProfiles", "deleteProfiles", "showLevels", "assignLevel",
                     "assignLevelSelectSkill", "assignLevelToProfile",
                     "confirmLevelAssignmentRemoval", "removeLevelAssignments",
                     "showUsers", "assignUser",
-                    "confirmUserRemoval", "removeUsers", "exportProfiles", "showImportForm", "importProfiles"))) {
+                    "confirmUserRemoval", "removeUsers", "exportProfiles", "showImportForm",
+                    "importProfiles", "saveLevelOrder"))) {
                     $this->$cmd();
                 }
                 break;
+            // uni-freiburg-patch: end
         }
     }
     
@@ -500,11 +503,14 @@ class ilSkillProfileGUI
 
         $parts = explode(":", $_GET["cskill_id"]);
 
+        // uni-freiburg-patch: begin
         $this->profile->addSkillLevel(
             (int) $parts[0],
             (int) $parts[1],
-            (int) $_GET["level_id"]
+            (int) $_GET["level_id"],
+            (int) $this->profile->getMaxLevelOrderNr() + 10
         );
+        // uni-freiburg-patch: end
         $this->profile->update();
         
         ilUtil::sendSuccess($lng->txt("msg_obj_modified"), true);
@@ -562,16 +568,40 @@ class ilSkillProfileGUI
             return;
         }
 
+        // uni-freiburg-patch: begin
         if (is_array($_POST["ass_id"])) {
             foreach ($_POST["ass_id"] as $i) {
                 $id_arr = explode(":", $i);
-                $this->profile->removeSkillLevel($id_arr[0], $id_arr[1], $id_arr[2]);
+                $this->profile->removeSkillLevel($id_arr[0], $id_arr[1], $id_arr[2], $id_arr[3]);
             }
             $this->profile->update();
+            $this->profile->fixSkillOrderNumbering();
         }
+        // uni-freiburg-patch: end
         
         $ilCtrl->redirect($this, "showLevels");
     }
+
+    // uni-freiburg-patch: begin
+    /**
+     * Save level order
+     */
+    public function saveLevelOrder()
+    {
+        $lng = $this->lng;
+        $ilCtrl = $this->ctrl;
+
+        if (!$this->checkPermissionBool("write")) {
+            return;
+        }
+
+        $order = ilUtil::stripSlashesArray($_POST["order"]);
+        $this->profile->updateSkillOrder($order);
+
+        ilUtil::sendSuccess($lng->txt("msg_obj_modified"), true);
+        $ilCtrl->redirect($this, "showLevels");
+    }
+    // uni-freiburg-patch: end
     
     /**
      * Show users

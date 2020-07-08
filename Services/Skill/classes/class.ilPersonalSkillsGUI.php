@@ -1449,10 +1449,14 @@ class ilPersonalSkillsGUI
         $stree = new ilSkillTree();
         $html = "";
 
-        // order skills per virtual skill tree
-        include_once("./Services/Skill/classes/class.ilVirtualSkillTree.php");
-        $vtree = new ilVirtualSkillTree();
-        $skills = $vtree->getOrderedNodeset($skills, "base_skill_id", "tref_id");
+        // uni-freiburg-patch: begin
+        if (!$this->getProfileId() > 0) {
+            // order skills per virtual skill tree
+            include_once("./Services/Skill/classes/class.ilVirtualSkillTree.php");
+            $vtree = new ilVirtualSkillTree();
+            $skills = $vtree->getOrderedNodeset($skills, "base_skill_id", "tref_id");
+        }
+        // uni-freiburg-patch: end
         foreach ($skills as $s) {
             $path = $stree->getSkillTreePath($s["base_skill_id"]);
 

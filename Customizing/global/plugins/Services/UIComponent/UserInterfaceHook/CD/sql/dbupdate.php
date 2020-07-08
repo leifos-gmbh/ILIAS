@@ -661,3 +661,14 @@ $ilDB->addTableColumn("cd_center", "email", array(
 		$ilDB->createSequence('cd_needs_analysis_daf');
 	}
 ?>
+<#44>
+<?php
+if (!$ilDB->tableColumnExists('cd_center', 'email')) {
+    $ilDB->addTableColumn("cd_center", "email", array(
+        "type" => "text",
+        "notnull" => false,
+        "length" => 200,
+        "default" => ''
+    ));
+}
+?>

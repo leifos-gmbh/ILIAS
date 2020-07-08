@@ -817,6 +817,16 @@ class cdCompany
 		$excel->setCell(1, $col++, $a_pl->txt("course_lang"));
 		$excel->setCell(1, $col++, $a_pl->txt("last_course"));
 		$excel->setCell(1, $col++, $a_pl->txt("lang_level"));
+		if (cdUtil::isDAF())
+		{
+			$a_pl->includeClass("class.cdNeedsAnalysisDAF.php");
+			foreach (cdNeedsAnalysisDAF::getQuestions($a_pl) as $k => $question)
+			{
+				$excel->setCell(1, $col++, $question);
+			}
+		}
+		else
+		{
 		foreach (cdNeedsAnalysis::$talk_understand as $k => $l)
 		{
 			$excel->setCell(1, $col++, $a_pl->txt($l));
@@ -827,13 +837,21 @@ class cdCompany
 		}
 		$excel->setCell(1, $col++, $a_pl->txt("technical_language"));
 		$excel->setCell(1, $col++, $a_pl->txt("other_technical_language"));
+		}
 		
 		// data rows
 		$cnt = 2;
 		reset($user_data);
 		foreach ($user_data as $user)
 		{
+			if (cdUtil::isDAF())
+			{
+				$nas = cdNeedsAnalysisDAF::getNeedsAnalysesOfUser($user["usr_id"]);
+			}
+			else
+			{
 			$nas = cdNeedsAnalysis::getNeedsAnalysesOfUser($user["usr_id"]);
+			}
 			foreach ($nas as $na)
 			{
 				$col = 0;
@@ -860,14 +878,22 @@ class cdCompany
 				}
 				$excel->setCell($cnt, $col++, $v);
 				
+				if (cdUtil::isDAF())
+				{
+					foreach (cdNeedsAnalysisDAF::getQuestions($a_pl) as $k => $question)
+					{
+						$excel->setCell($cnt, $col++, $na["daf"][$k]["answer"]);
+					}
+				}
+				else
+				{
 				$ta = unserialize($na["talk_understanding"]);
 				foreach (cdNeedsAnalysis::$talk_understand as $k => $l)
 				{
 					if($ta[$k] === 0)
 					{
 						$v = $a_pl->txt("option_never");
-					}
-					else
+						} else
 					{
 						$v = $a_pl->txt("freq_".$ta[$k]);
 					}
@@ -879,8 +905,7 @@ class cdCompany
 					if($wr[$k] === 0)
 					{
 						$v = $a_pl->txt("option_never");
-					}
-					else
+						} else
 					{
 						$v = $a_pl->txt("freq_".$wr[$k]);
 					}
@@ -891,14 +916,13 @@ class cdCompany
 				if(!(int)$na["tech_lang_sel"])
 				{
 					$v = $a_pl->txt("option_none");
-				}
-				else
+					} else
 				{
 					$v = $a_pl->txt($tl[$na["tech_lang_sel"]]);
 				}
 				$excel->setCell($cnt, $col++, $v);
 				$excel->setCell($cnt, $col++, $na["tech_lang_free"]);
-				
+				}
 				$cnt++;
 			}
 		}

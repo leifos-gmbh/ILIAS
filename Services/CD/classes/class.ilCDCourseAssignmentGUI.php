@@ -24,6 +24,8 @@ class ilCDCourseAssignmentGUI
 	{
 		global $ilCtrl, $tpl, $lng;
 
+		$lng->loadLanguageModule("cd");
+
 		$this->as_trainer = $a_as_trainer;
 		$this->ctrl = $ilCtrl;
 		$this->tpl = $tpl;

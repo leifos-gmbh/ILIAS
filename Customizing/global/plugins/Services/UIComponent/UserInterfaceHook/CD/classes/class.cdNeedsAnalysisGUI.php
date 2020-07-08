@@ -61,8 +61,8 @@ class cdNeedsAnalysisGUI
 	 */
 	function readNeedsAnalysis()
 	{
-		$this->needs_analysis = new cdNeedsAnalysis((int) $_GET["na_id"]);
-//var_dump($this->needs_analysis);
+		$this->pl->includeClass("class.cdNeedsAnalysisFactory.php");
+		$this->needs_analysis = cdNeedsAnalysisFactory::getInstance($this->pl, (int) $_GET["na_id"]);
 	}
 
 	/**
@@ -345,7 +345,8 @@ class cdNeedsAnalysisGUI
 		if ($this->form->checkInput())
 		{
 
-			$needs_analysis = new cdNeedsAnalysis();
+			$this->pl->includeClass("class.cdNeedsAnalysisFactory.php");
+			$needs_analysis = cdNeedsAnalysisFactory::getInstance($this->pl);
 			$needs_analysis->setUserId($ilUser->getId());
 			$needs_analysis->setCourseLanguage($_POST["course_lang"]);
 			$sel = array();
@@ -545,7 +546,8 @@ class cdNeedsAnalysisGUI
 		{
 			foreach ($_POST["needs_analysis_id"] as $i)
 			{
-				$needs_analysis = new cdNeedsAnalysis($i);
+				$this->pl->includeClass("class.cdNeedsAnalysisFactory.php");
+				$needs_analysis = cdNeedsAnalysisFactory::getInstance($this->pl, $i);
 				$needs_analysis->delete();
 			}
 		}

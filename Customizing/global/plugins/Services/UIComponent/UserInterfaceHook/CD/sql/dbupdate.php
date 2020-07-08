@@ -637,3 +637,27 @@ $ilDB->addTableColumn("cd_center", "email", array(
 <?php
 	# dummy step to synch with daf branch again
 ?>
+<#43>
+<?php
+	if (!$ilDB->tableExists("cd_needs_analysis_daf"))
+	{
+		$fields = array(
+			'na_id' => array(
+				'type' => 'integer',
+				'length' => 4,
+				'notnull' => true
+			),
+			'q_id' => array(
+				'type' => 'integer',
+				'length' => 4,
+				'notnull' => true
+			),
+			'answer' => array(
+				'type' => 'clob'
+			)
+		);
+		$ilDB->createTable('cd_needs_analysis_daf', $fields);
+		$ilDB->addPrimaryKey("cd_needs_analysis_daf", array("na_id", "q_id"));
+		$ilDB->createSequence('cd_needs_analysis_daf');
+	}
+?>

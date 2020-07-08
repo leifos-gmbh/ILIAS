@@ -1,0 +1,11 @@
+/* Services/FileUpload */
+.ilFileUploadEntryProgressPercent {
+  font-size: 75%;
+}
+.ilFileUploadEntryOptions {
+  font-size: 90%;
+}
+.ilFileUploadEntryOptions label.control-label {
+  padding-top: 3px;
+}
+/*# sourceMappingURL=delos.css.map */

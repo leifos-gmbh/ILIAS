@@ -9,7 +9,7 @@
  *
  * @ilCtrl_Calls cdDesktopGUI: cdNeedsAnalysisGUI, ilSkillSelfEvaluationGUI
  * @ilCtrl_Calls cdDesktopGUI: cdEntryLevelTestGUI, ilPersonalProfileGUI, cdAddonGUI, ilPersonalSettingsGUI
- * @ilCtrl_Calls cdDesktopGUI: ilCDTrainerGUI
+ * @ilCtrl_Calls cdDesktopGUI: ilCDTrainerGUI, cdNeedsAnalysisDAFGUI
  */
 class cdDesktopGUI
 {
@@ -45,9 +45,10 @@ class cdDesktopGUI
 		switch($next_class)
 		{
 			case "cdneedsanalysisgui":
+			case "cdneedsanalysisdafgui":
 				$this->setTabs("needs_analysis");
-				$this->pl->includeClass("class.cdNeedsAnalysisGUI.php");
-				$needs_gui = new cdNeedsAnalysisGUI($this->pl);
+				$this->pl->includeClass("class.cdNeedsAnalysisFactory.php");
+				$needs_gui = cdNeedsAnalysisFactory::getGUIInstance($this->pl);
 				$ilCtrl->forwardCommand($needs_gui);
 				$tpl->show();
 				break;

@@ -115,7 +115,9 @@ class ilSkillDataSet extends ilDataSet
      */
     public function getSupportedVersions()
     {
-        return array("5.1.0");
+        // uni-freiburg-patch: begin
+        return array("5.1.0", "5.4.0");
+        // uni-freiburg-patch: end
     }
     
     /**
@@ -140,6 +142,9 @@ class ilSkillDataSet extends ilDataSet
         if ($a_entity == "skmg") {
             switch ($a_version) {
                 case "5.1.0":
+                // uni-freiburg-patch: begin
+                case "5.4.0":
+                // uni-freiburg-patch: end
                     return array(
                             "Mode" => "text"
                     );
@@ -148,6 +153,9 @@ class ilSkillDataSet extends ilDataSet
         if ($a_entity == "skl_subtree") {
             switch ($a_version) {
                 case "5.1.0":
+                // uni-freiburg-patch: begin
+                case "5.4.0":
+                // uni-freiburg-patch: end
                     return array(
                             "SklTreeId" => "integer",
                             "TopNode" => "integer",
@@ -166,6 +174,9 @@ class ilSkillDataSet extends ilDataSet
         if ($a_entity == "skl_templ_subtree") {
             switch ($a_version) {
                 case "5.1.0":
+                // uni-freiburg-patch: begin
+                case "5.4.0":
+                // uni-freiburg-patch: end
                     return array(
                             "SklTreeId" => "integer",
                             "TopNode" => "integer",
@@ -183,6 +194,9 @@ class ilSkillDataSet extends ilDataSet
         if ($a_entity == "skl_level") {
             switch ($a_version) {
                 case "5.1.0":
+                // uni-freiburg-patch: begin
+                case "5.4.0":
+                // uni-freiburg-patch: end
                     return array(
                             "LevelId" => "integer",
                             "SkillId" => "integer",
@@ -195,6 +209,9 @@ class ilSkillDataSet extends ilDataSet
         if ($a_entity == "skl_prof") {
             switch ($a_version) {
                 case "5.1.0":
+                // uni-freiburg-patch: begin
+                case "5.4.0":
+                // uni-freiburg-patch: end
                     return array(
                             "Id" => "integer",
                             "Title" => "text",
@@ -211,6 +228,16 @@ class ilSkillDataSet extends ilDataSet
                             "TrefId" => "integer",
                             "LevelId" => "integer"
                     );
+                // uni-freiburg-patch: begin
+                case "5.4.0":
+                    return array(
+                        "ProfileId" => "integer",
+                        "BaseSkillId" => "integer",
+                        "TrefId" => "integer",
+                        "LevelId" => "integer",
+                        "OrderNr" => "integer"
+                    );
+                // uni-freiburg-patch: end
             }
         }
         return array();
@@ -234,6 +261,9 @@ class ilSkillDataSet extends ilDataSet
         if ($a_entity == "skmg") {	// dummy node
             switch ($a_version) {
                 case "5.1.0":
+                // uni-freiburg-patch: begin
+                case "5.4.0":
+                // uni-freiburg-patch: end
                     if ($this->getMode() == self::MODE_SKILLS) {
                         $this->data[] = array("Mode" => "Skills");
                     } elseif ($this->getMode() == self::MODE_PROFILES) {
@@ -246,6 +276,9 @@ class ilSkillDataSet extends ilDataSet
         if ($a_entity == "skl_subtree") {	// get subtree for top node
             switch ($a_version) {
                 case "5.1.0":
+                // uni-freiburg-patch: begin
+                case "5.4.0":
+                // uni-freiburg-patch: end
                     foreach ($a_ids as $id) {
                         $sub = $this->skill_tree->getSubTree($this->skill_tree->getNodeData($id));
                         foreach ($sub as $s) {
@@ -281,6 +314,9 @@ class ilSkillDataSet extends ilDataSet
         if ($a_entity == "skl_templ_subtree") {	// get template subtree for template id
             switch ($a_version) {
                 case "5.1.0":
+                // uni-freiburg-patch: begin
+                case "5.4.0":
+                // uni-freiburg-patch: end
                     foreach ($a_ids as $id) {
                         $sub = $this->skill_tree->getSubTree($this->skill_tree->getNodeData($id));
                         foreach ($sub as $s) {
@@ -309,6 +345,9 @@ class ilSkillDataSet extends ilDataSet
         if ($a_entity == "skl_level") {
             switch ($a_version) {
                 case "5.1.0":
+                // uni-freiburg-patch: begin
+                case "5.4.0":
+                // uni-freiburg-patch: end
                     $this->getDirectDataFromQuery("SELECT id level_id, skill_id, nr, title, description" .
                             " FROM skl_level WHERE " .
                             $ilDB->in("skill_id", $a_ids, false, "integer") . " ORDER BY skill_id ASC, nr ASC");
@@ -320,6 +359,9 @@ class ilSkillDataSet extends ilDataSet
         if ($a_entity == "skl_prof") {
             switch ($a_version) {
                 case "5.1.0":
+                // uni-freiburg-patch: begin
+                case "5.4.0":
+                // uni-freiburg-patch: end
                     $this->getDirectDataFromQuery("SELECT id, title, description" .
                             " FROM skl_profile WHERE " .
                             $ilDB->in("id", $a_ids, false, "integer"));
@@ -335,7 +377,13 @@ class ilSkillDataSet extends ilDataSet
                             " FROM skl_profile_level WHERE " .
                             $ilDB->in("profile_id", $a_ids, false, "integer"));
                     break;
-
+                // uni-freiburg-patch: begin
+                case "5.4.0":
+                    $this->getDirectDataFromQuery("SELECT profile_id, base_skill_id, tref_id, level_id, order_nr" .
+                        " FROM skl_profile_level WHERE " .
+                        $ilDB->in("profile_id", $a_ids, false, "integer"));
+                    break;
+                // uni-freiburg-patch: end
             }
         }
     }
@@ -567,7 +615,9 @@ class ilSkillDataSet extends ilDataSet
                         }
                     }
                     if ($level_id > 0) {
-                        $prof->addSkillLevel($base_skill, $tref_id, $level_id);
+                        // uni-freiburg-patch: begin
+                        $prof->addSkillLevel($base_skill, $tref_id, $level_id, $a_rec["OrderNr"]);
+                        // uni-freiburg-patch: end
                     }
                     $prof->update();
                 }

@@ -55,7 +55,7 @@ class ilSkillExporter extends ilXmlExporter
 
         return $deps;
     }
-    
+
     /**
      * Get xml representation
      *
@@ -78,7 +78,14 @@ class ilSkillExporter extends ilXmlExporter
      */
     public function getValidSchemaVersions($a_entity)
     {
+        // uni-freiburg-patch: begin
         return array(
+            "5.4.0" => array(
+                "namespace" => "http://www.ilias.de/Services/Skill/skll/5_4",
+                "xsd_file" => "ilias_skll_5_4.xsd",
+                "uses_dataset" => true,
+                "min" => "5.4.0",
+                "max" => ""),
             "5.1.0" => array(
                 "namespace" => "http://www.ilias.de/Services/Skill/skll/5_1",
                 "xsd_file" => "ilias_skll_5_1.xsd",
@@ -86,5 +93,6 @@ class ilSkillExporter extends ilXmlExporter
                 "min" => "5.1.0",
                 "max" => "")
         );
+        // uni-freiburg-patch: end
     }
 }

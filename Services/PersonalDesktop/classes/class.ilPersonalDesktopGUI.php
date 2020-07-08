@@ -138,6 +138,18 @@ class ilPersonalDesktopGUI
 
         $this->tpl->addCss(ilUtil::getStyleSheetLocation('filesystem', 'delos.css', 'Services/Calendar'));
 
+        // cdpatch start
+        global $ilPluginAdmin;
+
+        $pl_names = $ilPluginAdmin->getActivePluginsForSlot(IL_COMP_SERVICE, "UIComponent", "uihk");
+        foreach ($pl_names as $n) {
+            if ($n == "CD") {
+                ilUtil::redirect("ilias.php?baseClass=ilUIHookPluginGUI&cmd=setCmdClass&" .
+                    "cmdClass=ilcduihookgui&forwardTo=cdDesktopGUI");
+            }
+        }
+        // cdpatch end
+
         // read last active subsection
         if (isset($_GET['PDHistory']) && $_GET['PDHistory']) {
             $next_class = $this->__loadNextClass();

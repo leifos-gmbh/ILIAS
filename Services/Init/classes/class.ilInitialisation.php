@@ -140,6 +140,10 @@ class ilInitialisation
         define("PATH_TO_LESSC", $ilIliasIniFile->readVariable("tools", "lessc"));
         define("PATH_TO_PHANTOMJS", $ilIliasIniFile->readVariable("tools", "phantomjs"));
 
+        // cdpatch start
+        define("PATH_TO_HTMLDOC", $ilIliasIniFile->readVariable("tools", "htmldoc"));
+        // cdpatch end
+
         // read virus scanner settings
         switch ($ilIliasIniFile->readVariable("tools", "vscantype")) {
             case "sophos":

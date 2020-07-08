@@ -439,7 +439,9 @@ class ilObjectCopyGUI
             $t->addFormButton($lng->txt("paste"), "saveTarget");
         }
         $t->addSeparator();
-        $t->addFormButton($lng->txt("obj_insert_into_clipboard"), "keepObjectsInClipboard");
+        // cdpatch start
+        //$t->addFormButton($lng->txt("obj_insert_into_clipboard"), "keepObjectsInClipboard");
+        // cdpatch end
         $t->addFormButton($lng->txt("cancel"), "cancel");
         $t->setCloseFormTag(false);
         $t->setLeadingImage(ilUtil::getImagePath("arrow_upright.svg"), " ");

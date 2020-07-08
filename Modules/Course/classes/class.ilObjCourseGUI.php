@@ -926,9 +926,14 @@ class ilObjCourseGUI extends ilContainerGUI
 
         // custom icon
         $obj_service->commonSettings()->legacyForm($form, $this->object)->saveIcon();
+        */
+        // cdpatch end
 
         // tile image
         $obj_service->commonSettings()->legacyForm($form, $this->object)->saveTileImage();
+
+        // cdpatch start
+        /*
 
         // list presentation
         $this->saveListPresentation($form);
@@ -1339,12 +1344,13 @@ class ilObjCourseGUI extends ilContainerGUI
         $hi->setValue(ilContainer::SORT_TITLE);
         $form->addItem($hi);
 
-        // cdpatch start
-        /*
         $pres = new ilFormSectionHeaderGUI();
         $pres->setTitle($this->lng->txt('crs_view_mode'));
 
         $form->addItem($pres);
+
+        // cdpatch start
+        /*
 
         // title and icon visibility
         $form = $obj_service->commonSettings()->legacyForm($form, $this->object)->addTitleIconVisibility();
@@ -1368,12 +1374,16 @@ class ilObjCourseGUI extends ilContainerGUI
             $form->addItem($si);
         }
 
-
         // custom icon
         $form = $obj_service->commonSettings()->legacyForm($form, $this->object)->addIcon();
+        */
+        // cdpatch end
 
         // tile image
         $form = $obj_service->commonSettings()->legacyForm($form, $this->object)->addTileImage();
+
+        // cdpatch start
+        /*
 
         // list presentation
         $form = $this->initListPresentationForm($form);

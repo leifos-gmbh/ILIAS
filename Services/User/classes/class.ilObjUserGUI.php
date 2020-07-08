@@ -2195,8 +2195,12 @@ class ilObjUserGUI extends ilObjectGUI
 
                         $path .= $tmpPath[$i]["title"];
                     }*/
-
-                    $path = $tmpPath[count($tmpPath) - 1]["title"];
+                    // cd-patch added array check
+                    if (!is_array($tmpPath)) {
+                        $path = "-";
+                    } else {
+                        $path = $tmpPath[count($tmpPath) - 1]["title"];
+                    }
                 }
             } else {
                 $path = "<b>Rolefolder " . $rolf[0] . " not found in tree! (Role " . $role["obj_id"] . ")</b>";

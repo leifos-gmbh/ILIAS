@@ -105,9 +105,11 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
 
         $this->setFormName('participants');
 
-        $this->addColumn('', 'f', '1', true);
-        $this->addColumn($this->lng->txt('name'), 'name', '20%');
-        
+        // cdpatch start
+        $this->addColumn('', 'f', "1");
+        $this->addColumn($this->lng->txt('name'), 'name', '10%');
+        // cdpatch end
+
         $all_cols = $this->getSelectableColumns();
         foreach ($this->getSelectedColumns() as $col) {
             $this->addColumn($all_cols[$col]['txt'], $col);
@@ -118,13 +120,15 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
         if (true) {
             if (is_object($this->pl)) {
                 $this->pl->includeClass("class.cdParticipantEvaluation.php");
-                $this->addColumn($this->pl->txt('evaluations'));
+                // cdpatch
+                //$this->addColumn($this->pl->txt('evaluations'));
             }
             //$this->addColumn($this->lng->txt('learning_progress'), 'progress');
         }
 
         if ($this->privacy->enabledCourseAccessTimes()) {
-            $this->addColumn($this->lng->txt('last_access'), 'access_ut', '16em');
+            // cdpatch (next line)
+            $this->addColumn($this->lng->txt('last_access'), 'access_ut', '5%');
         }
         
         $this->addColumn($this->lng->txt('crs_member_passed'), 'passed');

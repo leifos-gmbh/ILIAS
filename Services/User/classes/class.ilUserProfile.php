@@ -443,7 +443,6 @@ class ilUserProfile
         if (cdUtil::isDAF()) {
             $unset = array(
                 "title",
-                "upload",
                 "institution",
                 "hobby",
                 "referral_comment",
@@ -459,7 +458,6 @@ class ilUserProfile
             $unset = array(
                 "title",
                 "birthday",
-                "upload",
                 "institution",
                 "phone_home",
                 "phone_mobile",

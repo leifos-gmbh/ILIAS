@@ -289,10 +289,12 @@ class ilSkillProfile implements ilSkillUsageInfo
 
         $cnt = 1;
         foreach ($order as $id => $o) {
+            $id_arr = explode("_", $id);
             $ilDB->manipulate(
                 "UPDATE skl_profile_level SET " .
                 " order_nr = " . $ilDB->quote(($cnt * 10), "integer") .
-                " WHERE base_skill_id = " . $ilDB->quote($id, "integer") .
+                " WHERE base_skill_id = " . $ilDB->quote($id_arr[0], "integer") .
+                " AND tref_id = " . $ilDB->quote($id_arr[1], "integer") .
                 " AND profile_id = " . $ilDB->quote($this->getId(), "integer")
             );
             $cnt++;
@@ -307,7 +309,7 @@ class ilSkillProfile implements ilSkillUsageInfo
         $ilDB = $this->db;
 
         $set = $ilDB->query(
-            "SELECT profile_id, base_skill_id, order_nr FROM skl_profile_level WHERE " .
+            "SELECT profile_id, base_skill_id, tref_id, order_nr FROM skl_profile_level WHERE " .
             " profile_id = " . $ilDB->quote($this->getId(), "integer") .
             " ORDER BY order_nr ASC"
         );
@@ -317,7 +319,8 @@ class ilSkillProfile implements ilSkillUsageInfo
                 "UPDATE skl_profile_level SET " .
                 " order_nr = " . $ilDB->quote(($cnt * 10), "integer") .
                 " WHERE profile_id = " . $ilDB->quote($rec["profile_id"], "integer") .
-                " AND base_skill_id = " . $ilDB->quote($rec["base_skill_id"], "integer")
+                " AND base_skill_id = " . $ilDB->quote($rec["base_skill_id"], "integer") .
+                " AND tref_id = " . $ilDB->quote($rec["tref_id"], "integer")
             );
             $cnt++;
         }

@@ -85,6 +85,7 @@ class ilSkillProfileLevelsTableGUI extends ilTable2GUI
         );
 
         $this->tpl->setVariable("SKILL_ID", (int) $a_set["base_skill_id"]);
+        $this->tpl->setVariable("TREF_ID", (int) $a_set["tref_id"]);
         $this->tpl->setVariable("ORDER_NR", (int) $a_set["order_nr"]);
     }
 }

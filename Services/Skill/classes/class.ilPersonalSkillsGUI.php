@@ -23,13 +23,15 @@ class ilPersonalSkillsGUI
     protected $offline_mode;
     protected $skill_tree;
     public static $skill_tt_cnt = 1;
+    // uni-freiburg-patch: begin
     public $actual_levels = array();
+    // uni-freiburg-patch: end
     protected $gap_self_eval_levels = array();
     protected $mode = "";
     protected $history_view = false;
     protected $trigger_objects_filter = array();
     protected $intro_text = "";
-    public $hidden_skills = array();
+    protected $hidden_skills = array();
 
     /**
      * @var \ILIAS\DI\UIServices
@@ -91,7 +93,9 @@ class ilPersonalSkillsGUI
      */
     protected $ui_ren;
     protected $obj_id = 0;
+    // uni-freiburg-patch: begin
     public $obj_skills = array();
+    // uni-freiburg-patch: end
 
     /**
      * @var ilPersonalSkillsFilterGUI
@@ -154,6 +158,7 @@ class ilPersonalSkillsGUI
         $this->filter = new ilPersonalSkillsFilterGUI();
     }
 
+    // uni-freiburg-patch: begin
     /**
      * Get filter
      *
@@ -163,6 +168,7 @@ class ilPersonalSkillsGUI
     {
         return $this->filter;
     }
+    // uni-freiburg-patch: end
 
 
     /**
@@ -1238,7 +1244,7 @@ class ilPersonalSkillsGUI
      * @param array $skills
      * @param int $user_id
      */
-    public function getActualLevels($skills, $user_id)
+    protected function getActualLevels($skills, $user_id)
     {
         // get actual levels for gap analysis
         $this->actual_levels = array();

@@ -372,6 +372,7 @@ class ilBasicSkill extends ilSkillTreeNode implements ilSkillUsageInfo
     //
 
 
+    // uni-freiburg-patch: begin
     /**
      * Reset skill level status. This is currently only used for self evaluations with a "no competence" level.
      * It has to be discussed, how this should be provided for non-self-evaluations.
@@ -453,6 +454,7 @@ class ilBasicSkill extends ilSkillTreeNode implements ilSkillUsageInfo
             . " AND self_eval = " . $db->quote($a_self_eval, "integer")
         );
     }
+    // uni-freiburg-patch: end
 
     /**
      * Has recent self evaluation. Check if self evaluation for user/object has been done on the same day
@@ -530,6 +532,7 @@ class ilBasicSkill extends ilSkillTreeNode implements ilSkillUsageInfo
     }
 
 
+    // uni-freiburg-patch: begin
     /**
      * Write skill level status
      *
@@ -663,6 +666,7 @@ class ilBasicSkill extends ilSkillTreeNode implements ilSkillUsageInfo
             ")");
         }
     }
+    // uni-freiburg-patch: end
 
     /**
      * Remove a user skill completely

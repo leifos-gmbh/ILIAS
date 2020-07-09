@@ -121,6 +121,7 @@ class ilSurveySkillDeterminationGUI
         $ctpl = new ilTemplate("tpl.svy_skill_list_changes.html", true, true, "Modules/Survey");
         foreach ($apps as $app) {
             $new_levels = $sskill->determineSkillLevelsForAppraisee($app["user_id"]);
+            // uni-freiburg-patch: begin
             foreach ($new_levels as $nl) {
                 if ($nl["new_level_id"] > 0) {
                     ilBasicSkill::writeUserSkillLevelStatus(
@@ -136,6 +137,7 @@ class ilSurveySkillDeterminationGUI
                     );
                 }
             }
+            // uni-freiburg-patch: end
         }
         ilUtil::sendSuccess($lng->txt("msg_obj_modified"), true);
         $ilCtrl->redirect($this, "listSkillChanges");

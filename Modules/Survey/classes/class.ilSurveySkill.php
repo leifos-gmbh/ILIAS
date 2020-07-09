@@ -316,6 +316,7 @@ class ilSurveySkill
             include_once("./Modules/Survey/classes/class.ilSurveySkillThresholds.php");
             $skthr = new ilSurveySkillThresholds($this->survey);
             $thresholds = $skthr->getThresholds();
+            // uni-freiburg-patch: begin
             $previous = 0;
             $previous_t = 0;
             foreach ($skills[$k]["level_data"] as $l) {
@@ -334,6 +335,7 @@ class ilSurveySkill
                     $previous_t = $t;
                 }
             }
+            // uni-freiburg-patch: end
         }
         return $skills;
     }
@@ -384,6 +386,7 @@ class ilSurveySkill
     {
         // write raters evaluation
         $new_levels = $this->determineSkillLevelsForAppraisee($a_app_id);
+        // uni-freiburg-patch: begin
         foreach ($new_levels as $nl) {
             if ($nl["new_level_id"] > 0) {
                 ilBasicSkill::writeUserSkillLevelStatus(
@@ -399,6 +402,7 @@ class ilSurveySkill
                 );
             }
         }
+        // uni-freiburg-patch: end
 
         // write self evaluation
         $this->writeSelfEvalSkills($a_app_id);
@@ -413,6 +417,7 @@ class ilSurveySkill
     {
         if ($user_id > 0 && in_array($this->survey->getMode(), [ilObjSurvey::MODE_SELF_EVAL, ilObjSurvey::MODE_360])) {
             $new_levels = $this->determineSkillLevelsForAppraisee($user_id, true);
+            // uni-freiburg-patch: begin
             foreach ($new_levels as $nl) {
                 if ($nl["new_level_id"] > 0) {
                     ilBasicSkill::writeUserSkillLevelStatus(
@@ -428,6 +433,7 @@ class ilSurveySkill
                     );
                 }
             }
+            // uni-freiburg-patch: end
         }
     }
 }

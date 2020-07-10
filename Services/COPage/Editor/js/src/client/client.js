@@ -1,6 +1,5 @@
 /* Copyright (c) 1998-2020 ILIAS open source, Extended GPL, see docs/LICENSE */
 
-import ActionFactory from '../actions/action-factory.js';
 import ResponseFactory from './response/response-factory.js';
 import FetchWrapper from './fetch-wrapper.js';
 import FormWrapper from './form-wrapper.js';
@@ -78,7 +77,7 @@ export default class Client {
         action_id: command_action.getId(),
         component: command_action.getComponent(),
         action: command_action.getType(),
-        data: command_action.getData()
+        data: command_action.getParams()
       }).then(response => resolve(
         this.response_factory.response(command_action, response.json())
       ))
@@ -93,8 +92,7 @@ export default class Client {
    */
   sendForm(command_action) {
 
-    const data = command_action.getData();
-
+    const data = command_action.getParams();
     if (data['cmd']) {
       data["cmd[" + data['cmd'] + "]"] = "-";
     }

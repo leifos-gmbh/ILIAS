@@ -1,7 +1,8 @@
 /* Copyright (c) 1998-2020 ILIAS open source, Extended GPL, see docs/LICENSE */
 
-import QueryActionFactory from '../client/actions/query-action-factory.js';
-import CommandActionFactory from '../client/actions/command-action-factory.js';
+import PageActionFactory from '../components/page/actions/page-action-factory.js';
+import ParagraphActionFactory from '../components/paragraph/actions/paragraph-action-factory.js';
+import ClientActionFactory from '../client/actions/client-action-factory.js';
 import EditorActionFactory from './editor-action-factory.js';
 
 /**
@@ -10,29 +11,34 @@ import EditorActionFactory from './editor-action-factory.js';
 export default class ActionFactory {
 
   /**
+   * @type {ClientActionFactory}
+   */
+  clientActionFactory;
+
+  /**
+   * @type {EditorActionFactory}
+   */
+  editorActionFactory;
+
+  /**
    */
   constructor() {
+    this.clientActionFactory = new ClientActionFactory();
+    this.editorActionFactory = new EditorActionFactory();
   }
 
   /**
-   * @returns {QueryActionFactory}
+   * @returns {PageActionFactory}
    */
-  query() {
-    return new QueryActionFactory();
+  page() {
+    return new PageActionFactory(this.clientActionFactory, this.editorActionFactory);
   }
 
   /**
-   * @returns {CommandActionFactory}
+   * @returns {ParagraphActionFactory}
    */
-  command() {
-    return new CommandActionFactory();
-  }
-
-  /**
-   * @returns {EditorActionFactory}
-   */
-  editor() {
-    return new EditorActionFactory();
+  paragraph() {
+    return new ParagraphActionFactory(this.editorActionFactory);
   }
 
 }

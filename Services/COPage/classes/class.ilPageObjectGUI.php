@@ -1305,7 +1305,7 @@ class ilPageObjectGUI
                 ilYuiUtil::initConnection();
                 ilYuiUtil::initPanel(false);
                 $main_tpl->addJavaScript("./Services/COPage/js/ilcopagecallback.js");
-                $main_tpl->addJavascript("Services/COPage/js/page_editing.js");
+                //$main_tpl->addJavascript("Services/COPage/js/page_editing.js");
                 $main_tpl->addOnloadCode("il.copg.editor.init('".
                     ILIAS_HTTP_PATH."/".$this->ctrl->getLinkTargetByClass(["ilPageEditorGUI", "ilPageEditorServerAdapterGUI"], "invokeServer")."','".
                     $this->ctrl->getFormActionByClass("ilPageEditorGUI")
@@ -1319,17 +1319,8 @@ class ilPageObjectGUI
 
                 include_once './Services/Style/Content/classes/class.ilObjStyleSheet.php';
                 $main_tpl->addOnloadCode("var preloader = new Image();
-						preloader.src = './templates/default/images/loader.svg';
-						ilCOPage.setUser('" . $this->user->getLogin() . "');
-						ilCOPage.setContentCss('" .
-                        ilObjStyleSheet::getContentStylePath((int) $this->getStyleId()) .
-                        ", " . ilUtil::getStyleSheetLocation() .
-                        ", ./Services/COPage/css/tiny_extra.css" .
-                        "')");
+						preloader.src = './templates/default/images/loader.svg';");
                 include_once("./Services/COPage/classes/class.ilPCParagraphGUI.php");
-                foreach (ilPCParagraphGUI::_getTextCharacteristics($this->getStyleId()) as $c) {
-                    $main_tpl->addOnloadCode("ilCOPage.addTextFormat('" . $c . "');");
-                }
 
                 $main_tpl->addJavascript("./node_modules/tinymce/tinymce.min.js");
                 $tpl->touchBlock("init_dragging");
@@ -2228,11 +2219,6 @@ class ilPageObjectGUI
         
         $btpl = new ilTemplate("tpl.tiny_menu.html", true, true, "Services/COPage");
         
-        // debug ghost element
-        if (DEVMODE == 1) {
-//            $btpl->touchBlock("debug_ghost");
-        }
-
         // bullet list
         $btpl->touchBlock("blist_button");
         ilTooltipGUI::addTooltip(
@@ -2306,9 +2292,9 @@ class ilPageObjectGUI
             $btpl->setVariable("TXT_PAR_FORMAT", $lng->txt("cont_par_format"));
             include_once("./Services/COPage/classes/class.ilPCParagraphGUI.php");
             $btpl->setVariable("STYLE_SELECTOR", ilPCParagraphGUI::getStyleSelector(
-                $a_selected,
+                "",
                 ilPCParagraphGUI::_getCharacteristics($a_style_id),
-                true
+                false
             ));
             
             ilTooltipGUI::addTooltip(
@@ -2439,12 +2425,6 @@ class ilPageObjectGUI
         $split_button_items[] = $item;
 
         $sdd->addItem($lng->txt("cancel"), "", "#", "", "", "", "", "", "ilCOPage.cmdCancel(); return false;");
-        /*
-        $item = ilLinkButton::getInstance();
-        $item->setCaption('cancel');
-        $item->setOnClick("\"ilCOPage.cmdCancel(); return false;");
-        $split_button_items[] = $item;*/
-
 
         if ($a_anchors) {
             $btpl->setCurrentBlock("bb_anc_button");

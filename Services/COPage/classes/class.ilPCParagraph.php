@@ -2022,4 +2022,24 @@ class ilPCParagraph extends ilPageContent
 
         return array();
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getModel()
+    {
+        $model = new \stdClass();
+        $s_text = $this->getText();
+        $s_text = $this->xml2output($s_text, true, false);
+        $s_text = ilPCParagraphGUI::xml2outputJS($s_text);
+        $char = $this->getCharacteristic();
+        if ($char == "") {
+            $char = "Standard";
+        }
+        $model->characteristic = $char;
+        $model->text = $s_text;
+
+        return $model;
+    }
+
 }

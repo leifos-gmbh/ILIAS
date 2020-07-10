@@ -112,11 +112,6 @@
 				<xsl:attribute name="data-pcid"><xsl:value-of select="@PCID"/></xsl:attribute>
 				<xsl:comment>dummy</xsl:comment>
 			</div>
-			<!-- insert menu for drop area -->
-			<xsl:call-template name="EditMenu">
-				<xsl:with-param name="hier_id" select="@HierId" />
-				<xsl:with-param name="droparea">y</xsl:with-param>
-			</xsl:call-template>
 		</xsl:if>
 		<xsl:if test="@HierId != 'pg' or $javascript != 'enable'">
 			<xsl:call-template name="EditMenu">
@@ -315,17 +310,12 @@
 						<xsl:attribute name="class">il_editarea_disabled</xsl:attribute>
 					</xsl:if>
 					<xsl:if test="$javascript = 'enable'">
-						<xsl:attribute name="onMouseOver">doMouseOver(this.id, 'il_editarea_active', '<xsl:value-of select="$content_type"/>','<xsl:value-of select="./*[1]/@Characteristic"/>');</xsl:attribute>
-						<xsl:attribute name="onMouseOut">doMouseOut(this.id, 'il_editarea', '<xsl:value-of select="$content_type"/>','<xsl:value-of select="./*[1]/@Characteristic"/>');</xsl:attribute>
-						<xsl:attribute name="onMouseDown">doMouseDown(this.id);</xsl:attribute>
-						<xsl:attribute name="onMouseUp">doMouseUp(this.id);</xsl:attribute>
-						<xsl:attribute name="onClick">doMouseClick(event,this.id,'<xsl:value-of select="$content_type"/>','<xsl:value-of select="./*[1]/@Characteristic"/>');</xsl:attribute>
 					</xsl:if>
 				</xsl:if>
 				<xsl:attribute name="id">CONTENT<xsl:value-of select="@HierId"/>:<xsl:value-of select="@PCID"/></xsl:attribute>
 				<xsl:attribute name="data-hierid"><xsl:value-of select="@HierId"/></xsl:attribute>
 				<xsl:attribute name="data-pcid"><xsl:value-of select="@PCID"/></xsl:attribute>
-				<xsl:attribute name="data-ctype"><xsl:value-of select="$content_type"/></xsl:attribute>
+				<xsl:attribute name="data-cname"><xsl:value-of select="$content_type"/></xsl:attribute>
 				<xsl:attribute name="data-characteristic"><xsl:value-of select="./*[1]/@Characteristic"/></xsl:attribute>
 				<xsl:apply-templates>
 					<xsl:with-param name="par_counter" select ="position()" />
@@ -896,12 +886,6 @@
 			<xsl:comment>dummy</xsl:comment>
 		</div>
 	</xsl:if>
-	<!-- insert menu for drop area -->
-	<xsl:call-template name="EditMenu">
-		<xsl:with-param name="hier_id" select="$hier_id" />
-		<xsl:with-param name="droparea">y</xsl:with-param>
-	</xsl:call-template>
-
 </xsl:template>
 
 <!-- Paragraph -->

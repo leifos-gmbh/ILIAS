@@ -103,7 +103,7 @@ class ilPCDataTableGUI extends ilPCTableGUI
         ilYuiUtil::initConnection();
         ilYuiUtil::initPanel(false);
         $this->tpl->addJavascript("./Services/COPage/phpBB/3_0_5/editor.js");
-        $this->tpl->addJavascript("./Services/COPage/js/page_editing.js");
+        //$this->tpl->addJavascript("./Services/COPage/js/page_editing.js");
         $this->tpl->addJavascript("./Services/COPage/js/paragraph_editing.js");
 
         // get all rows
@@ -655,7 +655,7 @@ class ilPCDataTableGUI extends ilPCTableGUI
         ilYuiUtil::initPanel(false);
         $main_tpl->addJavascript("./node_modules/tinymce/tinymce.min.js");
         $main_tpl->addJavaScript("./Services/COPage/js/ilcopagecallback.js");
-        $main_tpl->addJavascript("Services/COPage/js/page_editing.js");
+        //$main_tpl->addJavascript("Services/COPage/js/page_editing.js");
 
         $main_tpl->addOnloadCode("var preloader = new Image();
 			preloader.src = './templates/default/images/loader.svg';

@@ -619,6 +619,14 @@ class ilPCMediaObjectGUI extends ilPageContentGUI
 
 
     /**
+     * edit properties form
+     */
+    public function edit()
+    {
+        $this->editAlias();
+    }
+
+    /**
     * edit properties form
     */
     public function editAlias()

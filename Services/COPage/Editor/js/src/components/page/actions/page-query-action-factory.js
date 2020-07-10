@@ -1,0 +1,27 @@
+/* Copyright (c) 1998-2020 ILIAS open source, Extended GPL, see docs/LICENSE */
+
+import ACTIONS from "./page-action-types.js";
+
+/**
+ * COPage action factory
+ */
+export default class PageQueryActionFactory {
+
+  COMPONENT = "page";
+
+  /**
+   * @type {ClientActionFactory}
+   */
+  clientActionFactory;
+
+  /**
+   * @param {ClientActionFactory} clientActionFactory
+   */
+  constructor(clientActionFactory) {
+    this.clientActionFactory = clientActionFactory;
+  }
+
+  uiAll() {
+    return this.clientActionFactory.query(this.COMPONENT, ACTIONS.UI_ALL);
+  }
+}

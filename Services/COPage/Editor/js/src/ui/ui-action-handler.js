@@ -1,5 +1,8 @@
 /* Copyright (c) 1998-2020 ILIAS open source, Extended GPL, see docs/LICENSE */
 
+import PageUIActionHandler from '../components/page/ui/page-ui-action-handler.js';
+import ParagraphUIActionHandler from '../components/paragraph/ui/paragraph-ui-action-handler.js';
+
 /**
  * UI action handler
  */
@@ -26,12 +29,31 @@ export default class UIActionHandler {
   client;
 
   /**
+   * @type {PageUIActionHandler}
+   */
+  pageActionHandler;
+
+  /**
+   * @type {ParagraphUIActionHandler}
+   */
+  paragraphActionHandler;
+
+  /**
    * @param {ActionFactory} actionFactory
    * @param {Client} client
    */
   constructor(actionFactory, client) {
     this.actionFactory = actionFactory;
     this.client = client;
+    // @todo needs factory
+    this.pageActionHandler = new PageUIActionHandler(
+      this.actionFactory,
+      this.client
+    );
+    this.paragraphActionHandler = new ParagraphUIActionHandler(
+      this.actionFactory,
+      this.client
+    );
   }
 
   /**
@@ -39,6 +61,8 @@ export default class UIActionHandler {
    */
   setUI(ui) {
     this.ui = ui;
+    this.pageActionHandler.setUI(this.ui.page);
+    this.paragraphActionHandler.setUI(this.ui.paragraph);
   }
 
   /**
@@ -46,6 +70,8 @@ export default class UIActionHandler {
    */
   setDispatcher(dispatcher) {
     this.dispatcher = dispatcher;
+    this.pageActionHandler.setDispatcher(dispatcher);
+    this.paragraphActionHandler.setDispatcher(dispatcher);
   }
 
   /**
@@ -53,94 +79,7 @@ export default class UIActionHandler {
    * @param {Model} model
    */
   handle(action, model) {
-
-    const dispatcher = this.dispatcher;
-    const actionFactory = this.actionFactory;
-    const client = this.client;
-    let form_sent = false;
-
-    const params = action.getParams();
-    switch (action.getType()) {
-
-      case "dnd.drag":
-        //this.ui.hideAddButtons();
-        //this.ui.showDropareas();
-        break;
-
-      case "dnd.drop":
-        //this.ui.showAddButtons();
-        //this.ui.hideDropareas();
-        break;
-
-      case "create.add":
-        if (params.ctype !== "par") {
-          client.sendForm(actionFactory.command().copage().createLegacy(params.ctype, params.pcid,
-            params.hierid));
-          form_sent = true;
-        } else {
-          // @todo refactor legacy
-          editParagraph(params.hierid + ":" + params.pcid, 'insert', false);
-        }
-        break;
-
-      case "multi.toggle":
-        this.ui.highlightSelected(model.getSelected());
-        break;
-
-      case "multi.action":
-        let type = params.type;
-
-        // @todo refactor legacy
-        if (["delete", "cut", "copy", "characteristic", "activate"].includes(type)) {
-          client.sendForm(actionFactory.command().copage().multiLegacy(type,
-            Array.from(model.getSelected())));
-          form_sent = true;
-        }
-        if (["all", "none"].includes(type)) {
-          this.ui.highlightSelected(model.getSelected());
-        }
-        break;
-    }
-
-
-    // if we sent a (legacy) form, deactivate everything
-    if (form_sent === true) {
-      this.ui.showPageHelp();
-      this.ui.hideAddButtons();
-      this.ui.hideDropareas();
-      this.ui.disableDragDrop();
-    } else {
-
-      console.log(model.getState());
-
-      switch (model.getState()) {
-        case model.STATE_PAGE:
-          this.ui.showPageHelp();
-          this.ui.showAddButtons();
-          this.ui.hideDropareas();
-          this.ui.enableDragDrop();
-          break;
-
-        case model.STATE_MULTI_ACTION:
-          this.ui.showMultiButtons();
-          this.ui.hideAddButtons();
-          this.ui.hideDropareas();
-          this.ui.disableDragDrop();
-          break;
-
-        case model.STATE_DRAG_DROP:
-          this.ui.showPageHelp();
-          this.ui.hideAddButtons();
-          this.ui.showDropareas();
-          break;
-
-        case model.STATE_COMPONENT:
-          this.ui.showPageHelp();
-          this.ui.hideAddButtons();
-          this.ui.hideDropareas();
-          this.ui.disableDragDrop();
-          break;
-      }
-    }
+    this.pageActionHandler.handle(action, model.model("page"));
+    this.paragraphActionHandler.handle(action, model.model("page"));
   }
 }

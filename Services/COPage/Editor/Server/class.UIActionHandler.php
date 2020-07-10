@@ -27,6 +27,11 @@ class UIActionHandler implements ActionHandler
      */
     protected $page_gui;
 
+    /**
+     * @var \ilObjUser
+     */
+    protected $user;
+
     function __construct(\ilPageObjectGUI $page_gui)
     {
         global $DIC;
@@ -34,6 +39,7 @@ class UIActionHandler implements ActionHandler
         $this->ui = $DIC->ui();
         $this->lng = $DIC->language();
         $this->page_gui = $page_gui;
+        $this->user = $DIC->user();
     }
 
     /**
@@ -71,7 +77,26 @@ class UIActionHandler implements ActionHandler
         $o->addCommands = $this->getAddCommands();
         $o->pageHelp = $this->getPageHelp();
         $o->multiActions = $this->getMultiActions();
+        $o->config = $this->getConfig();
+        $o->pcModel = $this->getPCModel();
         return new Response($o);
+    }
+
+    /**
+     * Get config
+     * @return \stdClass
+     */
+    protected function getConfig()
+    {
+        $config = new \stdClass();
+        $config->user = $this->user->getLogin();
+        $config->content_css =
+            \ilObjStyleSheet::getContentStylePath((int) $this->page_gui->getStyleId()).", ".
+            \ilUtil::getStyleSheetLocation().", ".
+            "./Services/COPage/css/tiny_extra.css";
+        $config->text_formats = \ilPCParagraphGUI::_getTextCharacteristics($this->page_gui->getStyleId());
+
+        return $config;
     }
 
     /**
@@ -173,6 +198,16 @@ class UIActionHandler implements ActionHandler
                   document.querySelector('#$id').setAttribute('data-action', '$action');";
               }
           );
+    }
+
+    /**
+     * Get page component model
+     * @param
+     * @return
+     */
+    protected function getPCModel()
+    {
+        return $this->page_gui->getPageObject()->getPCModel();
     }
 
 }

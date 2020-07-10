@@ -277,7 +277,8 @@ class ilPageEditorGUI
                 ", hier_id: " . $hier_id . ", pc_id: " . $pc_id . ")");
             // note: ilinternallinkgui for page: no cont_obj is received
             // ilinternallinkgui for mob: cont_obj is received
-            if ($cmd != "insertFromClipboard" && $cmd != "pasteFromClipboard" &&
+            if ($_REQUEST["ctype"] == "" && $_REQUEST["cname"] == "" &&
+                $cmd != "insertFromClipboard" && $cmd != "pasteFromClipboard" &&
                 $cmd != "setMediaMode" && $cmd != "copyLinkedMediaToClipboard" &&
                 $cmd != "activatePage" && $cmd != "deactivatePage" &&
                 $cmd != "copyLinkedMediaToMediaPool" && $cmd != "showSnippetInfo" &&
@@ -305,6 +306,17 @@ class ilPageEditorGUI
             $this->log->debug("step PR: ctype: $ctype");
         }
 
+        // Step NC (handle empty next class)
+        if ($_REQUEST["ctype"] != "" || $_REQUEST["cname"] != "") {
+            $ctype = $_REQUEST["ctype"];
+            if ($_REQUEST["cname"] != "") {
+                $pc_def = ilCOPagePCDef::getPCDefinitionByName($_REQUEST["cname"]);
+                $ctype = $pc_def["pc_type"];
+            }
+            $pc_id = $_REQUEST["pcid"];
+            $hier_id = $_REQUEST["hier_id"];
+            $cont_obj = $this->page->getContentObject($hier_id, $pc_id);
+        }
 
         if ($ctype != "media" || !is_object($cont_obj)) {
             if ($this->getHeader() != "") {
@@ -316,12 +328,6 @@ class ilPageEditorGUI
         $this->cont_obj = $cont_obj;
 
 
-        // Step NC (handle empty next class)
-        if ($_REQUEST["ctype"] != "") {
-            $ctype = $_REQUEST["ctype"];
-            $pc_id = $_REQUEST["pcid"];
-            $hier_id = $_REQUEST["hier_id"];
-        }
         $this->ctrl->setParameter($this, "hier_id", $hier_id);
         $this->ctrl->setParameter($this, "pc_id", $pc_id);
         $this->ctrl->setCmd($cmd);

@@ -28,11 +28,13 @@ export default class Action {
   /**
    * @param {string} component
    * @param {string} type
+   * @param {Object} params
    */
-  constructor(component, type) {
+  constructor(component, type, params= {}) {
     this.component = component;
     this.type = type;
     this.id = Action.next_id++;       // maybe switch to uuid in the future
+    this.params = params;
   }
 
   /**
@@ -55,4 +57,12 @@ export default class Action {
   getId() {
     return this.id;
   }
+
+  /**
+   * @returns {Object}
+   */
+  getParams () {
+    return this.params;
+  }
+
 }

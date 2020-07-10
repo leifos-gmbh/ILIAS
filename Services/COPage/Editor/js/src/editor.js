@@ -44,7 +44,7 @@ export default (function ($, il) {
     const dispatcher = new Dispatcher(modelActionHandler, uiActionHandler);
 
     // ui
-    const ui = new UI(client, dispatcher, actionFactory);
+    const ui = new UI(client, dispatcher, actionFactory, model);
 
     // remaining dependecies for ui action handler
     uiActionHandler.setUI(ui);

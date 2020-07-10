@@ -5105,4 +5105,23 @@ abstract class ilPageObject
     {
         return $this->getParentId();
     }
+
+    /**
+     * Get page component model
+     * @return array
+     * @throws ilCOPageUnknownPCTypeException
+     */
+    public function getPCModel()
+    {
+        $model = [];
+        foreach ($this->getAllPCIds() as $pc_id) {
+            $co = $this->getContentObject("", $pc_id);
+            $co_model = $co->getModel();
+            if ($co_model !== null) {
+                $model[$pc_id] = $co_model;
+            }
+        }
+        return $model;
+    }
+
 }

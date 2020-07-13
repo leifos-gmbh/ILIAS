@@ -2562,6 +2562,9 @@ return;
 							{
 								$href = $this->ctrl->getLinkTargetByClass(["ilpersonaldesktopgui", "ilpublicuserprofilegui"], "getHTML");
 							}
+							else {
+								$href = '#';
+							}
 							$this->ctrl->setParameterByClass("ilpublicuserprofilegui", "user_id", "");
 
 							// begin-patch bghw_profile

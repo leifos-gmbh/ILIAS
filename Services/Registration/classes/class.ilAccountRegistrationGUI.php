@@ -351,7 +351,7 @@ class ilAccountRegistrationGUI
                 $this->cd_plugin->includeClass("class.cdCompany.php");
                 $company_id = cdCompany::getCompanyIdForPassword($_POST["usr_company_password"]);
                 if ($company_id <= 0) {
-                    ilUtil::sendFailure($lng->txt("form_input_not_valid"));
+                    ilUtil::sendFailure($this->lng->txt("form_input_not_valid"));
                     $pw = $this->form->getItemByPostVar("usr_company_password");
                     $pw->setAlert($this->cd_plugin->txt("company_password_does_not_exist"));
                     $form_valid = false;

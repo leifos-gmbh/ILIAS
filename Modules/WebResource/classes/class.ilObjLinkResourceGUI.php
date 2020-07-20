@@ -276,7 +276,7 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
         $this->form = new ilPropertyFormGUI();
         $this->form->setFormAction($this->ctrl->getFormAction($this, 'saveSettings'));
 
-        if (ilLinkResourceLists::checkListStatus($this->object->getId())) {
+        if (ilLinkResourceList::checkListStatus($this->object->getId())) {
             $this->form->setTitle($this->lng->txt('webr_edit_settings'));
 
             // Title
@@ -385,7 +385,7 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
                 $this->dynamic->add((int) $_REQUEST['link_id']);
             }
             
-            if (!ilLinkResourceLists::checkListStatus($this->object->getId())) {
+            if (!ilLinkResourceList::checkListStatus($this->object->getId())) {
                 $this->object->setTitle($this->form->getInput('tit'));
                 $this->object->setDescription($this->form->getInput('des'));
                 $this->object->update();
@@ -652,7 +652,7 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
                 $param->add($link_id);
             }
 
-            if (!ilLinkResourceLists::checkListStatus($this->object->getId())) {
+            if (!ilLinkResourceList::checkListStatus($this->object->getId())) {
                 $this->object->setTitle(ilUtil::stripSlashes($data['tit']));
                 $this->object->setDescription(ilUtil::stripSlashes($data['des']));
                 $this->object->update();
@@ -705,13 +705,13 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
         $valid = $this->form->checkInput();
 
         if ($a_mode == self::LINK_MOD_CREATE || $a_mode == self::LINK_MOD_EDIT_LIST) {
-            $this->list = new ilLinkResourceLists($a_webr_id);
+            $this->list = new ilLinkResourceList($a_webr_id);
             $this->list->setTitle($this->form->getInput('tit'));
             $this->list->setDescription($this->form->getInput('des'));
         }
 
         if ($a_mode == self::LINK_MOD_SET_LIST) {
-            $this->list = new ilLinkResourceLists($a_webr_id);
+            $this->list = new ilLinkResourceList($a_webr_id);
             $this->list->setTitle($this->form->getInput('lti'));
             $this->list->setDescription($this->form->getInput('tde'));
         }
@@ -1123,7 +1123,7 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
         include_once './Services/UIComponent/Toolbar/classes/class.ilToolbarGUI.php';
         $tool = new ilToolbarGUI();
         $tool->setFormAction($this->ctrl->getFormAction($this));
-        if (ilLinkResourceLists::checkListStatus($this->object->getId())) {
+        if (ilLinkResourceList::checkListStatus($this->object->getId())) {
             $tool->addButton(
                 $this->lng->txt('webr_add'),
                 $this->ctrl->getLinkTarget($this, 'addLink')

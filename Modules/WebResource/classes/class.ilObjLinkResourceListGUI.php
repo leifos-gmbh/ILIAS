@@ -24,7 +24,7 @@ class ilObjLinkResourceListGUI extends ilObjectListGUI
     public function getTitle()
     {
         if (ilObjLinkResourceAccess::_checkDirectLink($this->obj_id) &&
-            !ilLinkResourceLists::checkListStatus($this->obj_id)) {
+            !ilLinkResourceList::checkListStatus($this->obj_id)) {
             $this->__readLink();
             
             return $this->link_data['title'];
@@ -41,7 +41,7 @@ class ilObjLinkResourceListGUI extends ilObjectListGUI
         $ilSetting = $DIC['ilSetting'];
     
         if (ilObjLinkResourceAccess::_checkDirectLink($this->obj_id) &&
-            !ilLinkResourceLists::checkListStatus($this->obj_id)) {
+            !ilLinkResourceList::checkListStatus($this->obj_id)) {
             $this->__readLink();
             
             $desc = $this->link_data['description'];
@@ -90,7 +90,7 @@ class ilObjLinkResourceListGUI extends ilObjectListGUI
         // #16820 / #18419 / #18622
         if ($a_cmd == "" &&
             ilObjLinkResourceAccess::_checkDirectLink($this->obj_id) &&
-            !ilLinkResourceLists::checkListStatus($this->obj_id)) {
+            !ilLinkResourceList::checkListStatus($this->obj_id)) {
             $link = ilObjLinkResourceAccess::_getFirstLink($this->obj_id);
             
             // we could use the "internal" flag, but it would not work for "old" links
@@ -134,7 +134,7 @@ class ilObjLinkResourceListGUI extends ilObjectListGUI
     {
         if ($_REQUEST["wsp_id"] || $_REQUEST["cmdClass"] == "ilpersonalworkspacegui") {
             if (ilObjLinkResourceAccess::_checkDirectLink($this->obj_id) &&
-                !ilLinkResourceLists::checkListStatus($this->obj_id) &&
+                !ilLinkResourceList::checkListStatus($this->obj_id) &&
                 $a_cmd == '') {
                 $a_cmd = "calldirectlink";
             }
@@ -146,7 +146,7 @@ class ilObjLinkResourceListGUI extends ilObjectListGUI
             switch ($a_cmd) {
                 case '':
                     if (ilObjLinkResourceAccess::_checkDirectLink($this->obj_id) &&
-                        !ilLinkResourceLists::checkListStatus($this->obj_id)) {
+                        !ilLinkResourceList::checkListStatus($this->obj_id)) {
                         $this->__readLink();
                         // $cmd_link = $this->link_data['target'];
                         $cmd_link = "ilias.php?baseClass=ilLinkResourceHandlerGUI&ref_id=" . $this->ref_id . "&cmd=calldirectlink";

@@ -4143,12 +4143,6 @@ while ($rec = $ilDB->fetchAssoc($set))
 <?php
 if (!$ilDB->tableExists('webr_lists')) {
     $fields = [
-        'list_id' => [
-            'type'    => 'integer',
-            'length'  => 4,
-            'notnull' => true,
-            'default' => 0
-        ],
         'webr_id' => [
             'type'    => 'integer',
             'length'  => 4,
@@ -4179,9 +4173,7 @@ if (!$ilDB->tableExists('webr_lists')) {
         ]
     ];
     $ilDB->createTable('webr_lists', $fields);
-    $ilDB->addPrimaryKey('webr_lists', ['list_id']);
-    $ilDB->addIndex("webr_lists", ['list_id','webr_id'], "i1");
-    $ilDB->createSequence('webr_lists');
+    $ilDB->addPrimaryKey('webr_lists', ['webr_id']);
 }
 ?>
 <#5653>
@@ -4211,12 +4203,10 @@ if ($ilDB->tableExists('webr_lists')) {
 
     while ($row_items = $ilDB->fetchAssoc($res_items)) {
         if (!in_array($row_items['obj_id'], $webr_ids)) {
-            $id = $ilDB->nextId('webr_lists');
             $ilDB->manipulate(
-                "INSERT INTO webr_lists (list_id, webr_id, title, description, create_date, last_update)" .
+                "INSERT INTO webr_lists (webr_id, title, description, create_date, last_update)" .
                 " VALUES (" .
-                $ilDB->quote($id, "integer") .
-                "," . $ilDB->quote($row_items['obj_id'], "integer") .
+                $ilDB->quote($row_items['obj_id'], "integer") .
                 "," . $ilDB->quote($row_items['title'], "text") .
                 "," . $ilDB->quote($row_items['description'], "text") .
                 "," . $ilDB->quote(time(), "integer") .

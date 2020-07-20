@@ -131,7 +131,8 @@ class ilObjLinkResource extends ilObject
         // delete items and list
         include_once './Modules/WebResource/classes/class.ilLinkResourceItems.php';
         ilLinkResourceItems::_deleteAll($this->getId());
-        ilLinkResourceLists::_deleteAll($this->getId());
+        $list = new ilLinkResourceList($this->getId());
+        $list->delete();
 
 
         // Delete notify entries

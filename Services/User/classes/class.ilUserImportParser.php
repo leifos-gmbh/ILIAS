@@ -517,7 +517,10 @@ class ilUserImportParser extends ilSaxParser
                 );
                 
                 $this->userObj->setLanguage($a_attribs["Language"]);
-                $this->userObj->setImportId($a_attribs["Id"]);
+                // begin-patch veda
+                //$this->userObj->setImportId($a_attribs["Id"]);
+                $this->userObj->setImportId($a_attribs['ImportId']);
+                // begin-patch veda
                 $this->action = (is_null($a_attribs["Action"])) ? "Insert" : $a_attribs["Action"];
                 $this->currPassword = null;
                 $this->currPasswordType = null;

@@ -479,6 +479,23 @@ class ilSoapUtils extends ilSoapAdministration
         
         // Finally add new mapping entry
         $cp_options->appendMapping($source_id, $new_obj->getRefId());
+
+        /**
+         * begin-patch veda
+         */
+        $GLOBALS['DIC']['ilAppEventHandler']->raise(
+            'Services/Object',
+            'afterCloning',
+            [
+                'source_id' => $source_id,
+                'target_id' => $new_obj->getRefId(),
+                'copy_id' => $cp_options->getCopyId()
+            ]
+        );
+        /**
+         * end-patch veda
+         */
+
         return $new_obj->getRefId();
     }
     
@@ -512,16 +529,13 @@ class ilSoapUtils extends ilSoapAdministration
          */
         $GLOBALS['DIC']['ilAppEventHandler']->raise(
             'Services/Object',
-            'afterCloning',
+			'afterCloningDependencies',
             [
                 'source_id' => $source_id,
                 'target_id' => $target_id,
                 'copy_id' => $cp_options->getCopyId()
             ]
         );
-        /**
-         * end-patch veda
-         */
 
         return true;
     }

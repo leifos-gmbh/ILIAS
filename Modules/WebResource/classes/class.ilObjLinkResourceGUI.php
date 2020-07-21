@@ -155,14 +155,10 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
         $ilCtrl = $DIC['ilCtrl'];
 
         $this->initFormLink(self::LINK_MOD_CREATE);
-        if ($_POST['tar_mode_type'] == 'single' && $this->checkLinkInput(self::LINK_MOD_CREATE, 0, 0)) {
+        if ($this->checkLinkInput(self::LINK_MOD_CREATE, 0, 0) && $this->form->getInput('tar_mode_type') == 'single') {
             // Save new object
-            $_POST['title'] = $_POST['tit'];
-            $_POST['desc'] = $_POST['des'];
             parent::save();
-        } elseif ($_POST['tar_mode_type'] == 'list' && $this->checkListInput(self::LINK_MOD_CREATE, 0)) {
-            $_POST['title'] = $_POST['tit'];
-            $_POST['desc'] = $_POST['des'];
+        } elseif ($this->checkListInput(self::LINK_MOD_CREATE, 0) && $this->form->getInput('tar_mode_type') == 'list') {
             parent::save();
         } else {
             // Data incomplete or invalid
@@ -174,7 +170,7 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
 
     protected function afterSave(ilObject $a_new_object)
     {
-        if ($_POST['tar_mode_type'] == 'single') {
+        if ($this->form->getInput('tar_mode_type') == 'single') {
             // Save link
             $this->link->setLinkResourceId($a_new_object->getId());
             $link_id = $this->link->add();
@@ -183,7 +179,7 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
             ilUtil::sendSuccess($this->lng->txt('webr_link_added'));
         }
 
-        if ($_POST['tar_mode_type'] == 'list') {
+        if ($this->form->getInput('tar_mode_type') == 'list') {
             // Save list
             $this->list->setListResourceId($a_new_object->getId());
             $this->list->add();
@@ -240,8 +236,8 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
             $this->list->update();
 
             // update object
-            $this->object->setTitle($this->form->getInput('tit'));
-            $this->object->setDescription($this->form->getInput('des'));
+            $this->object->setTitle($this->form->getInput('title'));
+            $this->object->setDescription($this->form->getInput('desc'));
             $this->object->update();
             
             // update sorting
@@ -280,7 +276,7 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
             $this->form->setTitle($this->lng->txt('webr_edit_settings'));
 
             // Title
-            $tit = new ilTextInputGUI($this->lng->txt('webr_list_title'), 'tit');
+            $tit = new ilTextInputGUI($this->lng->txt('webr_list_title'), 'title');
             $tit->setValue($this->object->getTitle());
             $tit->setRequired(true);
             $tit->setSize(40);
@@ -288,7 +284,7 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
             $this->form->addItem($tit);
 
             // Description
-            $des = new ilTextAreaInputGUI($this->lng->txt('webr_list_desc'), 'des');
+            $des = new ilTextAreaInputGUI($this->lng->txt('webr_list_desc'), 'desc');
             $des->setValue($this->object->getDescription());
             $des->setCols(40);
             $des->setRows(3);
@@ -326,12 +322,12 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
             $this->form->setTitle($this->lng->txt('obj_presentation'));
 
             // hidden title
-            $tit = new ilHiddenInputGUI('tit');
+            $tit = new ilHiddenInputGUI('title');
             $tit->setValue($this->object->getTitle());
             $this->form->addItem($tit);
 
             // hidden description
-            $des = new ilHiddenInputGUI('des');
+            $des = new ilHiddenInputGUI('desc');
             $des->setValue($this->object->getDescription());
             $this->form->addItem($des);
 
@@ -386,8 +382,8 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
             }
             
             if (!ilLinkResourceList::checkListStatus($this->object->getId())) {
-                $this->object->setTitle($this->form->getInput('tit'));
-                $this->object->setDescription($this->form->getInput('des'));
+                $this->object->setTitle($this->form->getInput('title'));
+                $this->object->setDescription($this->form->getInput('desc'));
                 $this->object->update();
             }
             
@@ -415,7 +411,7 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
 
         $form_id = 'form_' . $this->form->getId();
 
-        $submit = $f->button()->primary('Submit', '#')
+        $submit = $f->button()->primary($this->lng->txt('save'), '#')
             ->withOnLoadCode(function ($id) use ($form_id) {
                 return "$('#{$id}').click(function() { $('#{$form_id}').submit(); return false; });";
             });
@@ -592,7 +588,7 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
             }
             
             
-            if (!strlen($data['tit'])) {
+            if (!strlen($data['title'])) {
                 $invalid[] = $link_id;
                 continue;
             }
@@ -635,8 +631,8 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
             $orig = ilLinkResourceItems::lookupItem($this->object->getId(), $link_id);
             
             $links->setLinkId($link_id);
-            $links->setTitle(ilUtil::stripSlashes($data['tit']));
-            $links->setDescription(ilUtil::stripSlashes($data['des']));
+            $links->setTitle(ilUtil::stripSlashes($data['title']));
+            $links->setDescription(ilUtil::stripSlashes($data['desc']));
             $links->setTarget(str_replace('"', '', ilUtil::stripSlashes($data['tar'])));
             $links->setActiveStatus((int) $data['act']);
             $links->setDisableCheckStatus((int) $data['che']);
@@ -653,8 +649,8 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
             }
 
             if (!ilLinkResourceList::checkListStatus($this->object->getId())) {
-                $this->object->setTitle(ilUtil::stripSlashes($data['tit']));
-                $this->object->setDescription(ilUtil::stripSlashes($data['des']));
+                $this->object->setTitle(ilUtil::stripSlashes($data['title']));
+                $this->object->setDescription(ilUtil::stripSlashes($data['desc']));
                 $this->object->update();
             }
             
@@ -682,9 +678,9 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
         
         $this->form->setValuesByArray(
             array(
-                'tit'		=> $values['title'],
+                'title'		=> $values['title'],
                 'tar'		=> $values['target'],
-                'des'		=> $values['description'],
+                'desc'		=> $values['description'],
                 'act'		=> (int) $values['active'],
                 'che'		=> (int) $values['disable_check'],
                 'vali'		=> (int) $values['valid']
@@ -706,8 +702,8 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
 
         if ($a_mode == self::LINK_MOD_CREATE || $a_mode == self::LINK_MOD_EDIT_LIST) {
             $this->list = new ilLinkResourceList($a_webr_id);
-            $this->list->setTitle($this->form->getInput('tit'));
-            $this->list->setDescription($this->form->getInput('des'));
+            $this->list->setTitle($this->form->getInput('title'));
+            $this->list->setDescription($this->form->getInput('desc'));
         }
 
         if ($a_mode == self::LINK_MOD_SET_LIST) {
@@ -736,8 +732,8 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
         include_once './Modules/WebResource/classes/class.ilLinkResourceItems.php';
         $this->link = new ilLinkResourceItems($a_webr_id);
         $this->link->setTarget(str_replace('"', '', ilUtil::stripSlashes($link_input)));
-        $this->link->setTitle($this->form->getInput('tit'));
-        $this->link->setDescription($this->form->getInput('des'));
+        $this->link->setTitle($this->form->getInput('title'));
+        $this->link->setDescription($this->form->getInput('desc'));
         $this->link->setDisableCheckStatus($this->form->getInput('che'));
         $this->link->setInternal(ilLinkInputGUI::isInternalLink($link_input));
         
@@ -882,14 +878,14 @@ class ilObjLinkResourceGUI extends ilObject2GUI implements ilLinkCheckerGUIRowHa
             $this->form->addItem($tar);
 
             // Title
-            $tit = new ilTextInputGUI($this->lng->txt('webr_link_title'), 'tit');
+            $tit = new ilTextInputGUI($this->lng->txt('webr_link_title'), 'title');
             $tit->setRequired(true);
             $tit->setSize(40);
             $tit->setMaxLength(127);
             $this->form->addItem($tit);
 
             // Description
-            $des = new ilTextAreaInputGUI($this->lng->txt('description'), 'des');
+            $des = new ilTextAreaInputGUI($this->lng->txt('description'), 'desc');
             $des->setRows(3);
             $des->setCols(40);
             $this->form->addItem($des);

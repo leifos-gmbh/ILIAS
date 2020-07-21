@@ -371,6 +371,16 @@ class ilPersonalSettingsGUI
                     $ilUser->setPasswordPolicyResetStatus(false);
                     $ilUser->update();
                 }
+                // begin-patch veda
+                $ilAppEventHandler = $DIC['ilAppEventHandler'];
+                $ilAppEventHandler->raise(
+                    'Services/User',
+                    'passwordChanged',
+                    [
+                        'usr_id' => $ilUser->getId()
+                    ]
+                );
+                // end-patch veda
 
                 if (ilSession::get('orig_request_target')) {
                     ilUtil::sendSuccess($this->lng->txt('saved_successfully'), true);

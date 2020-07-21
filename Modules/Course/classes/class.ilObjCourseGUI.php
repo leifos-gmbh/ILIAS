@@ -524,7 +524,28 @@ class ilObjCourseGUI extends ilContainerGUI
         ilUtil::sendSuccess($this->lng->txt("settings_saved"), true);
         $this->ctrl->redirect($this, "");
     }
-    
+    // begin-patch veda
+    public function validateVedaMDObject()
+    {
+        global $DIC;
+
+        $ilPluginAdmin = $DIC['ilPluginAdmin'];
+
+        $plugin = null;
+        foreach ($ilPluginAdmin->getActivePluginsForSlot(IL_COMP_SERVICE, "Cron", "crnhk") as $plugin_name) {
+            $plugin = \ilPluginAdmin::getPluginObject(IL_COMP_SERVICE, 'Cron', 'crnhk', $plugin_name);
+        }
+        if ($plugin instanceof \ilVedaConnectorPlugin) {
+            $validator = \ilVedaIDValidator::getInstanceByRefId($this->object->getRefId());
+            if (!$validator->validate()) {
+                ilUtil::sendFailure($validator->getErrorMessage());
+            } else {
+                ilUtil::sendSuccess($validator->getSuccessMessage());
+            }
+        }
+        $this->editInfoObject();
+    }
+
     /**
      * Edit info page informations
      *
@@ -541,6 +562,15 @@ class ilObjCourseGUI extends ilContainerGUI
         $ilAccess = $DIC['ilAccess'];
 
         $this->checkPermission('write');
+
+        // begin-patch veda
+        $toolbar = $DIC->toolbar();
+        $button  = ilLinkButton::getInstance();
+        $button->setCaption("validate");
+        $button->setUrl($this->ctrl->getLinkTarget($this, "validateVedaMD"));
+        $toolbar->addButtonInstance($button);
+        // end-patch veda
+
         /*
         if(!$ilAccess->checkAccess('write','',$this->object->getRefId()))
         {

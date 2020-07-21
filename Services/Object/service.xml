@@ -15,7 +15,7 @@
 		<event type="raise" id="toTrash" />
 		<event type="raise" id="delete" />
 		<event type="raise" id="undelete" />
-		<event type="raise" id="afterCloning" />
+		<event type="raise" id="afterCloning"/>
 		<event type="listen" id="Services/Object" />
 	</events>
 	<logging />

@@ -20,7 +20,6 @@
     "bootstrap": "3.3.7",
     "jquery-ui": "1.12.1",
     "jqueryui-touch-punch": "*",
-    "jquery-outside-events": "*",
     "yui2": "https://github.com/yui/yui2.git#067c9f82ecc90e4b392b7cb06a4a4f7fe3f6136e",
     "moment": "2.14.1",
     "eonasdan-bootstrap-datetimepicker": "4.17.42",
@@ -34,7 +33,6 @@
     "pouchdb": "^6.3.4",
     "openlayers": "^4.6.4",
     "owl.carousel": "^2.3.3",
-    "nestable2": "^1.6.0",
     "dropzone": "^5.5.0"
   },
   "extra": {
@@ -93,7 +91,8 @@
       "approved-by": "Jour Fixe",
       "developer": null,
       "purpose": "",
-      "last-update-for-ilias": null
+      "last-update-for-ilias": null,
+      "note": "rm -r libs/bower/bower_components/yui2/sandbox, see #28587"
     },
     "moment": {
       "introduction-date": null,

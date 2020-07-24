@@ -11,20 +11,42 @@ namespace ILIAS\Skill\Service;
 class SkillUserLevelManager
 {
     /**
-     * @var SkillInternalRepoService
+     * @var \ilBasicSkillLevelRepository
      */
-    protected $repo_service;
+    protected $level_repo;
+
+    /**
+     * @var \ilBasicSkillUserLevelRepository
+     */
+    protected $user_level_repo;
+
+    /**
+     * @var \ilSkillObjectAdapterInterface
+     */
+    protected $obj_adapter;
 
     /**
      * Constructor
+     * @param \ilBasicSkillLevelRepository|null     $a_level_repo
+     * @param \ilBasicSkillUserLevelRepository|null $a_user_level_repo
+     * @param \ilSkillObjectAdapterInterface|null   $a_obj_adapter
      */
-    public function __construct(SkillInternalRepoService $repo_service = null)
-    {
+    public function __construct(
+        \ilBasicSkillLevelRepository $a_level_repo = null,
+        \ilBasicSkillUserLevelRepository $a_user_level_repo = null,
+        \ilSkillObjectAdapterInterface $a_obj_adapter = null
+    ) {
         global $DIC;
 
-        $this->repo_service = ($repo_service)
-            ? $repo_service
-            : $DIC->skills()->internal()->repo();
+        $this->level_repo = ($a_level_repo)
+            ? $a_level_repo
+            : $DIC->skills()->internal()->repo()->getLevelRepo();
+        $this->user_level_repo = ($a_user_level_repo)
+            ? $a_user_level_repo
+            : $DIC->skills()->internal()->repo()->getUserLevelRepo();
+        $this->obj_adapter = ($a_obj_adapter)
+            ? $a_obj_adapter
+            : new \ilSkillObjectAdapter();
     }
 
     /**
@@ -45,24 +67,11 @@ class SkillUserLevelManager
         string $a_unique_identifier,
         float $a_next_level_fulfilment
     ) {
-        $skill_id = $this->repo_service->getLevelRepo()->lookupLevelSkillId($a_level_id);
+        $skill_id = $this->level_repo->lookupLevelSkillId($a_level_id);
         $trigger_ref_id = $a_trigger_ref_id;
-        $obj_adapter = new \ilSkillObjectAdapter();
-        $trigger_obj_id = $obj_adapter->getObjIdForRefId($trigger_ref_id);
-        $trigger_title = $obj_adapter->getTitleForObjId($trigger_obj_id);
-        $trigger_type = $obj_adapter->getTypeForObjId($trigger_obj_id);
-
-        $update = false;
-
-        // self evaluations will update, if the last self evaluation is on the same day
-        if ($a_self_eval && $this->repo_service->getUserLevelRepo()->hasRecentSelfEvaluation($trigger_obj_id,
-                $user_id, $skill_id, $a_tref_id, $trigger_ref_id)) {
-            $status_date = $this->repo_service->getUserLevelRepo()->hasRecentSelfEvaluation($trigger_obj_id, $user_id,
-                $skill_id, $a_tref_id, $trigger_ref_id);
-            if ($status_date != "") {
-                $update = true;
-            }
-        }
+        $trigger_obj_id = $this->obj_adapter->getObjIdForRefId($trigger_ref_id);
+        $trigger_title = $this->obj_adapter->getTitleForObjId($trigger_obj_id);
+        $trigger_type = $this->obj_adapter->getTypeForObjId($trigger_obj_id);
 
         //next level percentage fulfilment value must be >=0 and <1
         if (!($a_next_level_fulfilment >= 0) || !($a_next_level_fulfilment < 1)) {
@@ -72,8 +81,20 @@ class SkillUserLevelManager
             );
         }
 
-        $this->repo_service->getUserLevelRepo()->writeUserSkillLevelStatus($skill_id, $trigger_ref_id, $trigger_obj_id,
-            $trigger_title, $trigger_type, $update, $status_date, $a_level_id, $user_id, $a_tref_id, $a_self_eval,
-            $a_unique_identifier, $a_next_level_fulfilment);
+        $update = false;
+
+        // self evaluations will update, if the last self evaluation is on the same day
+        if ($a_self_eval && $this->user_level_repo->hasRecentSelfEvaluation($trigger_obj_id, $user_id, $skill_id,
+                $a_tref_id, $trigger_ref_id)) {
+            $status_date = $this->user_level_repo->hasRecentSelfEvaluation($trigger_obj_id, $user_id, $skill_id,
+                $a_tref_id, $trigger_ref_id);
+            if ($status_date != "") {
+                $update = true;
+            }
+        }
+
+        $this->user_level_repo->writeUserSkillLevelStatus($skill_id, $trigger_ref_id, $trigger_obj_id, $trigger_title,
+            $trigger_type, $update, $status_date, $a_level_id, $user_id, $a_tref_id, $a_self_eval, $a_unique_identifier,
+            $a_next_level_fulfilment);
     }
 }

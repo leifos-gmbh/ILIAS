@@ -42,7 +42,7 @@ class ilCompanyUserTableGUI extends ilTable2GUI
 		parent::__construct($a_parent_obj, $a_parent_cmd);
 		$this->setTitle($this->lng->txt("users"));
 		
-		$this->setLimit(20);
+//		$this->setLimit(20);
 		
 		$this->addColumn("", "", "1", true);
 		$this->addColumn($this->lng->txt("lastname"), "lastname");

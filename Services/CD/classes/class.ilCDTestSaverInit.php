@@ -18,12 +18,21 @@ class ilCDTestSaverInit extends ilInitialisation
 	 */
 	function init()
 	{
-		$this->initIliasIniFile();
+        $GLOBALS["DIC"] = new \ILIAS\DI\Container();
+        $GLOBALS["DIC"]["ilLoggerFactory"] = function ($c) {
+            return ilLoggerFactory::getInstance();
+        };
+
+        self::initCore();
+        self::initHTTPServices($GLOBALS["DIC"]);
+        self::initClient();
+
+        /*$this->initIliasIniFile();
 		$this->determineClient();
 		$this->initClientIniFile();
 		$this->initDatabase();
 		$this->initSettings();
-		$this->buildHttpPath();
+		$this->buildHttpPath();*/
 	}
 	
 }

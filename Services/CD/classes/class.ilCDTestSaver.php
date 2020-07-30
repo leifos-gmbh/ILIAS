@@ -23,7 +23,6 @@ class ilCDTestSaver
 		
 		$sess_id  = $_POST['user_id'];
 		$data = $_POST;
-
 		// check if session id exists in table
 		$set = $ilDB->query("SELECT * FROM cd_ext_test_sess WHERE ".
 			" session_id = ".$ilDB->quote($sess_id, "text")
@@ -36,7 +35,6 @@ class ilCDTestSaver
 				" session_id = ".$ilDB->quote($sess_id, "text")
 			);
 			$rec2 = $ilDB->fetchAssoc($set2);
-
 			// we got a test session -> refresh ilias session
 			$ilDB->replace("usr_session", array(
 					"session_id" => array("text", $rec["session_id"])
@@ -73,7 +71,6 @@ class ilCDTestSaver
 				$ilDB->quote($data["result_read"], "integer").",".
 				$ilDB->quote($data["result_listen"], "integer").
 			")");
-			
 			// get user
 			$set2 = $ilDB->query("SELECT * FROM usr_data ".
 				" WHERE usr_id = ".$ilDB->quote($rec["user_id"], "integer"));

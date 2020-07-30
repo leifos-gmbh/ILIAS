@@ -3,7 +3,7 @@
 //set_include_path("./Services/PEAR/lib".PATH_SEPARATOR.ini_get('include_path'));
 require_once("libs/composer/vendor/autoload.php");
 
-define ("DEVMODE", 0);
+//define ("DEVMODE", 0);
 
 /*$_POST['action'] = "save_testdata";
 $_POST['user_id'] = 2;

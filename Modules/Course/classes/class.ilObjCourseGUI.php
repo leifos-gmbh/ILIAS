@@ -260,6 +260,24 @@ class ilObjCourseGUI extends ilContainerGUI
                 ilUtil::makeClickable($this->object->getSyllabus(), true)
             ));
         }
+        // begin-patch montcenis
+        $ilPluginAdmin = $DIC['ilPluginAdmin'];
+        $pl_names = $ilPluginAdmin->getActivePluginsForSlot(IL_COMP_SERVICE, "Cron", "crnhk");
+        $info->addSection('Kursinformation');
+        foreach ($pl_names as $plugin) {
+            $ui_plugin = ilPluginAdmin::getPluginObject(IL_COMP_SERVICE, "Cron", "crnhk", $plugin);
+            if ($ui_plugin->getId() != 'fahi') {
+                continue;
+            }
+
+            $crsinfo = ilFAHCourseInfo::getInfoByImportId($this->object->getRefId());
+            foreach ($crsinfo as $key => $value) {
+                ilLoggerFactory::getLogger('crs')->info('Key: ' . $key . ' -> ' . $value);
+                $info->addProperty($key, nl2br($value));
+            }
+            break;
+        }
+        // end-patch montcenis
         // files
         if (count($files)) {
             $tpl = new ilTemplate('tpl.event_info_file.html', true, true, 'Modules/Course');

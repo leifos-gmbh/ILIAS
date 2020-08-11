@@ -71,7 +71,13 @@ class ilCopyWizardSettingsXMLParser extends ilSaxParser
         }
         
         $this->default_action = ilCopyWizardSettingsXMLParser::getActionForString($a_attribs["default_action"]);
-        break;
+
+          // begin patch montcenis
+          if ($a_attribs['import_id']) {
+              $this->options[ilCopyWizardOptions::IMPORT_ID] = array($a_attribs['import_id']);
+          }
+          // end patch montcenis
+          break;
       case 'Option':
           $id = (int) $a_attribs["id"];
           if (ilObject::_isInTrash($id)) {

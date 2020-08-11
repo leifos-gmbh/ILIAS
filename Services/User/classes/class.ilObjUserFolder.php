@@ -336,7 +336,7 @@ class ilObjUserFolder extends ilObject
         global $DIC;
 
         $ilDB = $DIC['ilDB'];
-		$lng = $DIC->language();
+        $lng = $DIC->language();
 
         $db_settings = array();
         

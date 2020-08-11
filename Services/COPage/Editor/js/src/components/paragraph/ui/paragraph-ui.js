@@ -1,3 +1,6 @@
+import ACTIONS from "../actions/paragraph-action-types.js";
+import TinyWrapper from "./tiny-wrapper.js";
+
 /* Copyright (c) 1998-2020 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 /**
@@ -34,6 +37,16 @@ export default class ParagraphUI {
   actionFactory;
 
   /**
+   * @type {ToolSlate}
+   */
+  toolSlate;
+
+  /**
+   * @type {TinyWrapper}
+   */
+  tinyWrapper;
+
+  /**
    * @type {Object}
    */
   text_formats = {
@@ -51,13 +64,16 @@ export default class ParagraphUI {
    * @param {Client} client
    * @param {Dispatcher} dispatcher
    * @param {ActionFactory} actionFactory
-   * @param {Model} model
+   * @param {PageModel} page_model
+   * @param {ToolSlate} toolSlate
    */
-  constructor(client, dispatcher, actionFactory, page_model) {
+  constructor(client, dispatcher, actionFactory, page_model, toolSlate) {
     this.client = client;
     this.dispatcher = dispatcher;
     this.actionFactory = actionFactory;
     this.page_model = page_model;
+    this.toolSlate = toolSlate;
+    this.tinyWrapper = new TinyWrapper();
   }
 
   //
@@ -77,7 +93,7 @@ export default class ParagraphUI {
     });
 
     this.uiModel.config.text_formats.forEach(f =>
-      this.addTextFormat(f)
+      this.tinyWrapper.addTextFormat(f)
     );
 
     this.initMenu();
@@ -207,10 +223,6 @@ export default class ParagraphUI {
     return this.insert_status;
   }
 
-  addTextFormat(f) {
-    this.text_formats[f] = { inline: 'span', classes: 'ilc_text_inline_' + f };
-  }
-
   ////
   //// Text editor commands
   ////
@@ -337,18 +349,6 @@ export default class ParagraphUI {
     this.setInsertStatus(false);
     this.copyInputToGhost(false);
     this.removeTiny();
-    this.hideToolbar();
-    if (this.current_td == "")
-    {
-      this.sendCmdRequest("cancel", this.ed_para, null, {},
-        true, {}, this.pageReloadAjaxSuccess);
-    }
-    else
-    {
-      this.sendCmdRequest("saveDataTable", this.ed_para, null,
-        {cancel_update: 1}, null, null);
-    }
-
   }
 
   setCharacterClass(i)
@@ -960,9 +960,7 @@ export default class ParagraphUI {
   prepareTinyForEditing (insert, switched)
   {
     var ed = tinyMCE.get('tinytarget');
-    //tinyMCE.execCommand('mceAddControl', false, 'tinytarget');
     tinyMCE.execCommand('mceAddEditor', false, 'tinytarget');
-    //console.log("prepareTiny");
     if (!switched)
     {
       this.showToolbar('tinytarget');
@@ -1390,13 +1388,13 @@ export default class ParagraphUI {
     const pcId = this.page_model.getCurrentPCId();
     const pc_model = this.page_model.getPCModel(pcId);
     this.pc_id_str = pcId;
-    this.setParagraphClass(pc_model.characteristic);
     const ed = tinyMCE.get('tinytarget');
     ed.setContent(pc_model.text);
     this.splitBR();
     ed.setProgressState(0); // Show progress
     this.prepareTinyForEditing(false, switched);
     this.autoResize();
+    this.setParagraphClass(pc_model.characteristic);
   }
 
 
@@ -1444,7 +1442,6 @@ export default class ParagraphUI {
         tinyMCE.get('tinytarget').setContent('');
 
         this.removeTiny();
-        //				hideToolbar();
 
         this.editParagraph(o.argument.switch_to, 'edit', true);
       }
@@ -1741,6 +1738,10 @@ export default class ParagraphUI {
 
     if (!moved)
     {
+      this.tinyWrapper.init();
+      this.tinyinit = true;
+      return;
+
       tinyMCE.init({
         /* part of 4 */
         toolbar: false,
@@ -2220,38 +2221,45 @@ export default class ParagraphUI {
     $("#tinytarget_ifr").parent().css("border-width", "0px");
     $("#tinytarget_ifr").parent().parent().parent().css("border-width", "0px");
 
-    // move parent node to end of body to ensure layer being on top
-    if (!this.menu_panel) {
-      obj = document.getElementById('iltinymenu');
-      //$(obj).appendTo("body");
-      $(obj).appendTo("#copg-editor-slate-content");
-      $("#copg-editor-help").css("display", "none");
 
-      obj = document.getElementById('ilEditorPanel');
-      // if statement added since this may miss if internal links not supported?
-      // e.g. table editing
-      if (obj) {
-        $(obj.parentNode).appendTo("body");
+    this.toolSlate.setContentFromComponent("Paragraph", "menu");
+    const dispatch = this.dispatcher;
+    const action = this.actionFactory;
+
+    document.querySelectorAll("[data-copg-ed-type='par-action']").forEach(char_button => {
+      const actionType = char_button.dataset.copgEdAction;
+      switch (actionType) {
+        case ACTIONS.SELECTION_FORMAT:
+          const format = char_button.dataset.copgEdParFormat;
+          char_button.addEventListener("click", (event) => {
+            dispatch.dispatch(action.paragraph().editor().selectionFormat(format));
+          });
+          break;
+        default:
+          const ef = action.paragraph().editor();
+          let map = {};
+          map[ACTIONS.SELECTION_REMOVE_FORMAT] = ef.selectionRemoveFormat();
+          map[ACTIONS.SELECTION_KEYWORD] = ef.selectionKeyword();
+          map[ACTIONS.SELECTION_TEX] = ef.selectionTex();
+          map[ACTIONS.SELECTION_ANCHOR] = ef.selectionAnchor();
+          map[ACTIONS.LIST_BULLET] = ef.listBullet();
+          map[ACTIONS.LIST_NUMBER] = ef.listNumber();
+          map[ACTIONS.LIST_OUTDENT] = ef.listOutdent();
+          map[ACTIONS.LIST_INDENT] = ef.listIndent();
+          map[ACTIONS.LINK_WIKI_SELECTION] = ef.linkWikiSelection();
+          map[ACTIONS.LINK_WIKI] = ef.linkWiki();
+          map[ACTIONS.LINK_INTERNAL] = ef.linkInternal();
+          map[ACTIONS.LINK_EXTERNAL] = ef.linkExternal();
+          map[ACTIONS.LINK_USER] = ef.linkUser();
+          map[ACTIONS.PAR_CANCEL] = ef.cancel();
+          char_button.addEventListener("click", (event) => {
+            dispatch.dispatch(map[actionType]);
+          });
+          break;
       }
-    }
-
-    $('#ilsaving').addClass("ilNoDisplay");
-
-    // make tinymenu a panel
-    obj = document.getElementById('iltinymenu');
-    obj.style.display = "";
-    this.menu_panel = true;
-
-    var m_el = document.getElementById('iltinymenu');
-    var m_reg = YAHOO.util.Region.getRegion(m_el);
+    });
   }
 
-  hideToolbar () {
-    obj = document.getElementById('iltinymenu');
-    obj.style.display = "none";
-    $("#copg-editor-help").css("display", "");
-    $(".il_droparea").css('visibility', '');
-  }
 
   removeToolbar () {
     //console.log("removing toolbar");

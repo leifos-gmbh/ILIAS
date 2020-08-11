@@ -32,6 +32,11 @@ class UIActionHandler implements ActionHandler
      */
     protected $user;
 
+    /**
+     * @var UIWrapper
+     */
+    protected $ui_wrapper;
+
     function __construct(\ilPageObjectGUI $page_gui)
     {
         global $DIC;
@@ -40,6 +45,8 @@ class UIActionHandler implements ActionHandler
         $this->lng = $DIC->language();
         $this->page_gui = $page_gui;
         $this->user = $DIC->user();
+
+        $this->ui_wrapper = new UIWrapper($this->ui, $this->lng);
     }
 
     /**
@@ -78,6 +85,7 @@ class UIActionHandler implements ActionHandler
         $o->pageHelp = $this->getPageHelp();
         $o->multiActions = $this->getMultiActions();
         $o->config = $this->getConfig();
+        $o->components = $this->getComponentsEditorUI();
         $o->pcModel = $this->getPCModel();
         return new Response($o);
     }
@@ -169,7 +177,8 @@ class UIActionHandler implements ActionHandler
         foreach ($sections as $buttons) {
             foreach ($buttons as $action => $lng_key) {
                 $tpl->setCurrentBlock("button");
-                $tpl->setVariable("BUTTON", $r->renderAsync($this->getMultiActionButton($lng_key, $action)));
+                $b = $this->ui_wrapper->getButton($this->lng->txt($lng_key), "multi", $action);
+                $tpl->setVariable("BUTTON", $r->renderAsync($b));
                 $tpl->parseCurrentBlock();
             }
             $tpl->setCurrentBlock("section");
@@ -179,26 +188,6 @@ class UIActionHandler implements ActionHandler
         return $tpl->get();
     }
 
-    /**
-     * Get multi button
-     * @param string $lng_key
-     * @param string $action
-     * @return \ILIAS\UI\Component\Button\Standard
-     */
-    protected function getMultiActionButton($lng_key, $action)
-    {
-        $ui = $this->ui;
-        $f = $ui->factory();
-        $lng = $this->lng;
-        return $f->button()->standard($lng->txt($lng_key), "#")
-          ->withOnLoadCode(
-              function ($id) use ($action){
-                  return "document.querySelector('#$id').setAttribute('data-copg-ed-type', 'multi');
-                  console.log('multi button js');
-                  document.querySelector('#$id').setAttribute('data-action', '$action');";
-              }
-          );
-    }
 
     /**
      * Get page component model
@@ -208,6 +197,29 @@ class UIActionHandler implements ActionHandler
     protected function getPCModel()
     {
         return $this->page_gui->getPageObject()->getPCModel();
+    }
+
+
+    /**
+     * Get components ui elements
+     * @param
+     * @return
+     */
+    protected function getComponentsEditorUI()
+    {
+        $ui = [];
+        foreach (\ilCOPagePCDef::getPCDefinitions() as $def) {
+            $pc_edit = \ilCOPagePCDef::getPCEditorInstanceByName($def["name"]);
+            if (!is_null($pc_edit)) {
+                $ui[$def["name"]] = $pc_edit->getEditorElements(
+                    $this->ui_wrapper,
+                    $this->page_gui->getPageObject()->getParentType(),
+                    $this->page_gui->getPageConfig(),
+                    $this->page_gui->getStyleId()
+                );
+            }
+        }
+        return $ui;
     }
 
 }

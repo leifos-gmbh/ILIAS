@@ -45,16 +45,23 @@ export default class PageUI {
   clickMap = new Map();
 
   /**
+   * @type {ToolSlate}
+   */
+  toolSlate;
+
+  /**
    * @param {Client} client
    * @param {Dispatcher} dispatcher
    * @param {ActionFactory} actionFactory
    * @param {Model} model
+   * @param {ToolSlate} toolSlate
    */
-  constructor(client, dispatcher, actionFactory, model) {
+  constructor(client, dispatcher, actionFactory, model, toolSlate) {
     this.client = client;
     this.dispatcher = dispatcher;
     this.actionFactory = actionFactory;
     this.model = model;
+    this.toolSlate = toolSlate;
   }
 
   //
@@ -260,7 +267,7 @@ export default class PageUI {
     const action = this.actionFactory;
 
     document.querySelectorAll("[data-copg-ed-type='multi']").forEach(multi_button => {
-      const type = multi_button.dataset.action;
+      const type = multi_button.dataset.copgEdAction;
       multi_button.addEventListener("click", (event) => {
         dispatch.dispatch(action.page().editor().multiAction(type));
       });
@@ -304,13 +311,11 @@ export default class PageUI {
   }
 
   showPageHelp() {
-    document.querySelector("#copg-editor-slate-content").innerHTML = this.uiModel.pageHelp;
+    this.toolSlate.setContent(this.uiModel.pageHelp);
   }
 
   showMultiButtons() {
-    // @todo hate to use jquery here, but only jquery evals the included script tags
-    //document.querySelector("#copg-editor-slate-content").innerHTML = this.uiModel.multiActions;
-    $("#copg-editor-slate-content").html(this.uiModel.multiActions);
+    this.toolSlate.setContent(this.uiModel.multiActions);
     this.initMultiButtons();
   }
 

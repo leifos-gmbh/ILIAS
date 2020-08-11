@@ -4672,15 +4672,15 @@ content#:#cont_text_code#:#Code:
 content#:#cont_text_com#:#Comment:
 content#:#cont_text_emp#:#Emphatic Text:
 content#:#cont_text_fn#:#Footnote:
-content#:#cont_text_iln#:#Internal Link, e.g.:
+content#:#cont_text_iln#:#Internal Link
 content#:#cont_text_imp#:#Important:
 content#:#cont_text_keyword#:#Keyword
 content#:#cont_text_placeh#:#Click and edit to insert text
 content#:#cont_text_placehl#:#Text Placeholder
-content#:#cont_text_quot#:#Quotation:
-content#:#cont_text_str#:#Strong Text:
-content#:#cont_text_tex#:#LaTeX Code:
-content#:#cont_text_xln#:#External Link:
+content#:#cont_text_quot#:#Quotation
+content#:#cont_text_str#:#Strong Text
+content#:#cont_text_tex#:#LaTeX Code
+content#:#cont_text_xln#:#External Link
 content#:#cont_time_limit_action#:#adlcp:timelimitaction
 content#:#cont_time#:#Time
 content#:#cont_toc_mode#:#Table of Contents Items
@@ -16182,3 +16182,4 @@ survey#:#survey_calculate_sum_score_info#:#Calculates the sum of all scale value
 survey#:#svy_sum_score#:#Sum Score
 survey#:#svy_max_sum_score#:#Maximum Sum Score
 content#:#cont_select_none#:#Clear Selection
+content#:#cont_link_user#:#User Link

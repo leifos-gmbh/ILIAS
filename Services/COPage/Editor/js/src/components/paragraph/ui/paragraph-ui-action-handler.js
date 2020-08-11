@@ -1,5 +1,7 @@
 /* Copyright (c) 1998-2020 ILIAS open source, Extended GPL, see docs/LICENSE */
 
+import ACTIONS from "../actions/paragraph-action-types.js";
+
 /**
  * Paragraph UI action handler
  */
@@ -76,9 +78,66 @@ export default class ParagraphUIActionHandler {
         }
         break;
 
-      case "par.cancel":
+      case ACTIONS.PAR_CANCEL:
         this.ui.cmdCancel();
         break;
+
+      case ACTIONS.SELECTION_FORMAT:
+        this.ui.cmdSpan(params.format);
+        break;
+
+      case ACTIONS.SELECTION_REMOVE_FORMAT:
+        this.ui.cmdRemoveFormat();
+        break;
+
+      case ACTIONS.SELECTION_KEYWORD:
+        this.ui.cmdKeyword();
+        break;
+
+      case ACTIONS.SELECTION_TEX:
+        this.ui.cmdTex();
+        break;
+
+      case ACTIONS.SELECTION_ANCHOR:
+        this.ui.cmdAnc();
+        break;
+
+      case ACTIONS.LIST_BULLET:
+        this.ui.cmdBList();
+        break;
+
+      case ACTIONS.LIST_NUMBER:
+        this.ui.cmdNList();
+        break;
+
+      case ACTIONS.LIST_OUTDENT:
+        this.ui.cmdListOutdent();
+        break;
+
+      case ACTIONS.LIST_INDENT:
+        this.ui.cmdListIndent();
+        break;
+
+      case ACTIONS.LINK_WIKI_SELECTION:
+        //this.ui.cmdListIndent();
+        break;
+
+      case ACTIONS.LINK_WIKI:
+        //this.ui.cmdListIndent();
+        break;
+
+      case ACTIONS.LINK_INTERNAL:
+        //this.ui.cmdExtLink();
+        break;
+
+      case ACTIONS.LINK_EXTERNAL:
+        this.ui.cmdExtLink();
+        break;
+
+      case ACTIONS.LINK_USER:
+        //this.ui.cmdListIndent();
+        break;
+
     }
 
   }

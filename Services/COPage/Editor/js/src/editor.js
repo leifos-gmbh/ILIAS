@@ -9,6 +9,7 @@ import Model from "./model/model.js";
 import Dispatcher from "./dispatcher.js";
 import ModelActionHandler from "./model/model-action-handler.js";
 import UIActionHandler from "./ui/ui-action-handler.js";
+import ToolSlate from "./ui/tool-slate.js";
 
 /**
  * Editor (mainly sets up dependency tree)
@@ -44,7 +45,8 @@ export default (function ($, il) {
     const dispatcher = new Dispatcher(modelActionHandler, uiActionHandler);
 
     // ui
-    const ui = new UI(client, dispatcher, actionFactory, model);
+    const toolSlate = new ToolSlate();
+    const ui = new UI(client, dispatcher, actionFactory, model, toolSlate);
 
     // remaining dependecies for ui action handler
     uiActionHandler.setUI(ui);

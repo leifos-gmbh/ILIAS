@@ -8,6 +8,20 @@ const ACTIONS = {
 
   // editor actions (things happening in the editor client side)
   PAR_CANCEL: "par.cancel",           // cancel paragraph editing
+  SELECTION_FORMAT: "selection.format",    // format character
+  SELECTION_REMOVE_FORMAT: "selection.removeFormat",
+  SELECTION_KEYWORD: "selection.keyword",
+  SELECTION_TEX: "selection.tex",
+  SELECTION_ANCHOR: "selection.anchor",
+  LIST_BULLET: "list.bullet",
+  LIST_NUMBER: "list.number",
+  LIST_OUTDENT: "list.outdent",
+  LIST_INDENT: "list.indent",
+  LINK_WIKI_SELECTION: "link.wikiSelection",
+  LINK_WIKI: "link.wiki",
+  LINK_INTERNAL: "link.internal",
+  LINK_EXTERNAL: "link.external",
+  LINK_USER: "link.user",
 
 };
 export default ACTIONS;

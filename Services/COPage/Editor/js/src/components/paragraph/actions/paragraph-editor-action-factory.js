@@ -30,4 +30,104 @@ export default class ParagraphEditorActionFactory {
   cancel() {
     return this.editorActionFactory.action(this.COMPONENT, ACTIONS.PAR_CANCEL);
   }
+
+  /**
+   * @returns {EditorAction}
+   */
+  selectionFormat(format) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.SELECTION_FORMAT, {
+      format: format
+    });
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  selectionRemoveFormat() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.SELECTION_REMOVE_FORMAT);
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  selectionKeyword() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.SELECTION_KEYWORD);
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  selectionTex() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.SELECTION_TEX);
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  selectionAnchor() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.SELECTION_ANCHOR);
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  listBullet() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.LIST_BULLET);
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  listNumber() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.LIST_NUMBER);
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  listOutdent() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.LIST_OUTDENT);
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  listIndent() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.LIST_INDENT);
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  linkWikiSelection() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.LINK_WIKI_SELECTION);
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  linkWiki() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.LINK_WIKI);
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  linkInternal() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.LINK_INTERNAL);
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  linkExternal() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.LINK_EXTERNAL);
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  linkUser() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.LINK_USER);
+  }
 }

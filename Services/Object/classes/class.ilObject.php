@@ -499,6 +499,35 @@ class ilObject
         return 0;
     }
 
+    // cognos-blu-patch: begin
+
+    /**
+     * Lookup obj ids by import id and optional type
+     * @param type  $a_import_id
+     * @param type  $a_obj_type
+     * @return type
+     * @global type $ilDB
+     */
+    public static function lookupObjIdsByImportId($a_import_id, $a_obj_type = '')
+    {
+        global $ilDB;
+
+        $query = 'SELECT obj_id FROM object_data ' .
+            'WHERE import_id = ' . $ilDB->quote($a_import_id, 'text') . ' ';
+
+        if ($a_obj_type) {
+            $query .= 'AND type = ' . $ilDB->quote($a_obj_type, 'text') . ' ';
+        }
+        $res = $ilDB->query($query);
+
+        $obj_ids = array();
+        while ($row = $res->fetchRow(DB_FETCHMODE_OBJECT)) {
+            $obj_ids[] = $row->obj_id;
+        }
+        return $obj_ids;
+    }
+    // cognos-blu-patch: end
+
     /**
      * Set offline status
      * @param bool $a_status

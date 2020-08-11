@@ -93,6 +93,8 @@ class Container implements \ArrayAccess
     public function offsetGet($id)
     {
         if (!isset($this->keys[$id])) {
+
+        	$this->logger()->root()->logStack();
             throw new \InvalidArgumentException(sprintf('Identifier "%s" is not defined.', $id));
         }
 

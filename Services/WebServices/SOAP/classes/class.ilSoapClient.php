@@ -13,6 +13,12 @@
  */
 class ilSoapClient
 {
+
+    // begin-patch montcenis
+    const ERROR_HANDLING_FOR_CLIENT_CALLS_NONE = 1;
+    const ERROR_HANDLING_FOR_CLIENT_CALLS_EXCEPTION = 2;
+    // end-patch montcenis
+
     const DEFAULT_CONNECT_TIMEOUT = 10;
     const DEFAULT_RESPONSE_TIMEOUT = 5;
 
@@ -32,8 +38,11 @@ class ilSoapClient
     private $response_timeout = 10;
     
     private $stored_socket_timeout = null;
-    
-    
+
+    // begin-patch montcenis
+    private $error_handling = self::ERROR_HANDLING_FOR_CLIENT_CALLS_NONE;
+    // end-patch montcenis
+
     /**
      * @param string $a_uri
      */
@@ -56,7 +65,14 @@ class ilSoapClient
         
         $this->response_timeout = self::DEFAULT_RESPONSE_TIMEOUT;
     }
-    
+
+    // begin-patch montcenis
+    public function setErrorHandlingForClientCalls($a_error)
+    {
+        $this->error_handling = $a_error;
+    }
+    // end-patch montcenis
+
     /**
      * Get server uri
      * @return string
@@ -153,6 +169,10 @@ class ilSoapClient
         } catch (SoapFault $ex) {
             $this->log->warning('Soap init failed with message: ' . $ex->getMessage());
             $this->resetSocketTimeout();
+
+            if ($this->error_handling == self::ERROR_HANDLING_FOR_CLIENT_CALLS_EXCEPTION) {
+                throw $ex;
+            }
             return false;
         } finally {
             $this->resetSocketTimeout();

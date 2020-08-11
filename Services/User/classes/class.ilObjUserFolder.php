@@ -336,6 +336,7 @@ class ilObjUserFolder extends ilObject
         global $DIC;
 
         $ilDB = $DIC['ilDB'];
+		$lng = $DIC->language();
 
         $db_settings = array();
         
@@ -370,6 +371,7 @@ class ilObjUserFolder extends ilObject
         }
         array_push($export_settings, "usr_id");
 		// begin-patch montcenis
+		$lng->loadLanguageModule("ecs");
 		array_push($export_settings, "ecs_import_id");
 		// end-patch montcenis
         array_push($export_settings, "login");

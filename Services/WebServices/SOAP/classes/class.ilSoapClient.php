@@ -225,11 +225,19 @@ class ilSoapClient
             $this->log->error('Calling webservice failed with message: ' . $exception->getMessage());
             $this->log->debug($this->client->__getLastResponseHeaders());
             $this->log->debug($this->client->__getLastResponse());
+
+            if ($this->error_handling == self::ERROR_HANDLING_FOR_CLIENT_CALLS_EXCEPTION) {
+                throw $exception;
+            }
+
             return false;
         } catch (Exception $exception) {
             $this->log->error('Caught unknown exception with message: ' . $exception->getMessage());
             $this->log->debug($this->client->__getLastResponseHeaders());
             $this->log->debug($this->client->__getLastResponse());
+            if ($this->error_handling == self::ERROR_HANDLING_FOR_CLIENT_CALLS_EXCEPTION) {
+                throw $exception;
+            }
         } finally {
             $this->resetSocketTimeout();
         }

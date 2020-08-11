@@ -33,6 +33,7 @@ class ilDatabaseException extends ilException
     protected function tranlateException($code)
     {
         $message = 'An undefined Database Exception occured';
+		ilLoggerFactory::getLogger('root')->logStack();
         switch ($code) {
             case static::DB_GENERAL:
                 $message = 'An undefined Database Exception occured';

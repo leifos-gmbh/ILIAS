@@ -95,6 +95,11 @@ class ilNoteGUI
     protected $no_actions = false;
 
     /**
+	 * @var bool
+	 */
+	protected $enable_sorting = true;
+
+	/**
     * constructor, specifies notes set
     *
     * @param	$a_rep_obj_id	int		object id of repository object (0 for personal desktop)
@@ -689,7 +694,7 @@ class ilNoteGUI
             $reldates = ilDatePresentation::useRelativeDates();
             ilDatePresentation::setUseRelativeDates(false);
             
-            if (sizeof($notes) && !$this->only_latest) {
+            if (sizeof($notes) && !$this->only_latest && $this->enable_sorting) {
                 if ((int) $_SESSION["comments_sort_asc"] == 1) {
                     $sort_txt = $lng->txt("notes_sort_desc");
                     $sort_cmd = "listSortDesc";
@@ -1826,6 +1831,16 @@ class ilNoteGUI
     }
 
     /**
+	 * Set export mode
+	 */
+	public function setExportMode()
+	{
+		$this->hide_new_form = true;
+		$this->no_actions = true;
+		$this->enable_sorting = false;
+	}
+
+	/**
      * Update widget
      *
      * @param

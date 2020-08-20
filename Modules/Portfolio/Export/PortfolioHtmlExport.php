@@ -74,6 +74,11 @@ class PortfolioHtmlExport
     protected $active_tab;
 
     /**
+     * @var bool
+     */
+    protected $include_comments = false;
+
+    /**
      * constructor
      * @param \ilObjPortfolioBaseGUI $portfolio_gui
      */
@@ -98,6 +103,15 @@ class PortfolioHtmlExport
             \ilHTMLExportViewLayoutProvider::HTML_EXPORT_RENDERING,
             true
         );
+    }
+
+    /**
+     * Include comments
+     * @param bool $a_include_comments
+     */
+    public function includeComments($a_include_comments)
+    {
+        $this->include_comments = $a_include_comments;
     }
 
     /**
@@ -333,7 +347,12 @@ class PortfolioHtmlExport
             true,
             "Modules/Portfolio"
         );
+
+        $comments = ($this->include_comments)
+            ? $pgui->getCommentsHTMLExport()
+            : "";
         $ep_tpl->setVariable("PAGE_CONTENT", $page_content);
+        $ep_tpl->setVariable("COMMENTS", $comments);
 
         $material = $pgui->getExportMaterial();
         $this->export_material[] = $material;

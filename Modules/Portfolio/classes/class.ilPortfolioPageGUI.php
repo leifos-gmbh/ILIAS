@@ -1282,4 +1282,17 @@ class ilPortfolioPageGUI extends ilPageObjectGUI
 		return '<div><a href="' . $url . '">' . $caption . '</a></div>';
 	}
 
+    /**
+     * @return string
+     */
+    public function getCommentsHTMLExport()
+    {
+        $notes_gui = new ilNoteGUI($this->portfolio_id,
+            $this->getPageObject()->getId(), "pfpg");
+        $notes_gui->enablePublicNotes(true);
+        $notes_gui->setRepositoryMode(false);
+        $notes_gui->setExportMode();
+        return  $notes_gui->getNotesHTML();
+    }
+
 }

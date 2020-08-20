@@ -24,8 +24,13 @@ abstract class ilObjPortfolioBaseGUI extends ilObject2GUI
 	protected $perma_link; // [string]		
 	protected $page_id; // [int]
 	protected $page_mode; // [string] preview|edit
-	
-	public function __construct($a_id = 0, $a_id_type = self::REPOSITORY_NODE_ID, $a_parent_node_id = 0)
+
+    /**
+     * @var \ILIAS\DI\UIServices
+     */
+    protected $ui;
+
+    public function __construct($a_id = 0, $a_id_type = self::REPOSITORY_NODE_ID, $a_parent_node_id = 0)
 	{
 		global $DIC;
 
@@ -38,6 +43,8 @@ abstract class ilObjPortfolioBaseGUI extends ilObject2GUI
 		$this->main_menu = $DIC["ilMainMenu"];
 		$this->tpl = $DIC["tpl"];
 		$ilUser = $DIC->user();
+
+        $this->ui = $DIC->ui();
 		
 		parent::__construct($a_id, $a_id_type, $a_parent_node_id);
 
@@ -289,6 +296,7 @@ abstract class ilObjPortfolioBaseGUI extends ilObject2GUI
 	 */
 	public function view()
 	{
+	    $ctrl = $this->ctrl;
 		$ilToolbar = $this->toolbar;
 		$ilSetting = $this->settings;
 		$tree = $this->tree;
@@ -316,14 +324,25 @@ abstract class ilObjPortfolioBaseGUI extends ilObject2GUI
 
 
 		// #16571
+        $modal_html = "";
 		if($this->getType() == "prtf")
 		{
 			$ilToolbar->addSeparator();
 
-			$button = ilLinkButton::getInstance();
-			$button->setCaption("export_html");
-			$button->setUrl($this->ctrl->getLinkTarget($this, "export"));
-			$ilToolbar->addButtonInstance($button);
+            $ui = $this->ui;
+
+            $comment_export_helper = new \ILIAS\Notes\Export\ExportHelperGUI();
+            $comment_modal = $comment_export_helper->getCommentIncludeModalDialog(
+                $this->lng->txt("export_html"),
+                $this->lng->txt("prtf_include_comments"),
+                $this->ctrl->getLinkTarget($this, "export"),
+                $this->ctrl->getLinkTarget($this, "exportWithComments")
+            );
+            $button = $ui->factory()->button()->standard($this->lng->txt("export_html"), '')
+                                              ->withOnClick($comment_modal->getShowSignal());
+            $ilToolbar->addComponent($button);
+            $modal_html = $ui->renderer()->render($comment_modal);
+
 
 			$button = ilLinkButton::getInstance();
 			$button->setCaption("prtf_pdf");
@@ -334,7 +353,7 @@ abstract class ilObjPortfolioBaseGUI extends ilObject2GUI
 		$table = new ilPortfolioPageTableGUI($this, "view");
 		
 
-		$this->tpl->setContent($message.$table->getHTML());
+		$this->tpl->setContent($message.$table->getHTML().$modal_html);
 	}
 	
 	/**
@@ -726,7 +745,8 @@ abstract class ilObjPortfolioBaseGUI extends ilObject2GUI
 		if($a_show_notes && $this->object->hasPublicComments() && !$current_blog && $current_page)
 		{			
 			$note_gui = new ilNoteGUI($portfolio_id, $current_page, "pfpg");
-			$note_gui->setRepositoryMode(false);			
+
+            $note_gui->setRepositoryMode(false);
 			$note_gui->enablePublicNotes(true);
 			$note_gui->enablePrivateNotes(false);
 			
@@ -858,15 +878,20 @@ abstract class ilObjPortfolioBaseGUI extends ilObject2GUI
 		// $a_tpl->setBodyClass("std ilExternal ilPortfolio");
 	}
 			
-	function export()
+	function export($a_with_comments = false)
 	{
 	    $port_export = new \ILIAS\Portfolio\Export\PortfolioHtmlExport($this);
+        $port_export->includeComments($a_with_comments);
         $zip = $port_export->exportHtml();
 
 	    ilUtil::deliverFile($zip, $this->object->getTitle().".zip", '', false, true);
 	}
-	
-	
+
+    function exportWithComments()
+    {
+        $this->export(true);
+    }
+
 	/**
 	 * Select target portfolio for page(s) copy
 	 */

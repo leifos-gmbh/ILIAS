@@ -1259,9 +1259,9 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 	/**
 	 * Build and deliver export file 	 
 	 */
-	function export()
+	function export($a_with_comments = false)
 	{
-		$zip = $this->buildExportFile();
+		$zip = $this->buildExportFile($a_with_comments);
 		
 	    ilUtil::deliverFile($zip, $this->object->getTitle().".zip", '', false, true);
 	}
@@ -2577,7 +2577,7 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
      *
      * @return string
      */
-    function buildExportFile()
+    function buildExportFile($a_include_comments = false)
     {
 	    // create export file
 	    ilExport::_createExportDirectory($this->object->getId(), "html", "blog");
@@ -2586,6 +2586,7 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 	    $subdir = $this->object->getType() . "_" . $this->object->getId();
 
 	    $blog_export = new \ILIAS\Blog\Export\BlogHtmlExport($this, $exp_dir, $subdir);
+	    $blog_export->includeComments($a_include_comments);
 	    return $blog_export->exportHTML();
     }
 
@@ -3285,6 +3286,17 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 			$ilCtrl->redirectByClass("ilRepositoryGUI", "preview");
 		}
 	}
+
+	/**
+	 * Handle export choice
+	 * @param
+	 * @return
+	 */
+	protected function exportWithComments()
+	{
+		$this->export(true);
+	}
+
 }
 
 ?>

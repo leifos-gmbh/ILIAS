@@ -205,7 +205,6 @@ class ilBlogPostingGUI extends ilPageObjectGUI
 	function preview($a_mode = null)
 	{
 		global $DIC;
-
 		$ilCtrl = $this->ctrl;
 		$tpl = $this->tpl;
 		$ilSetting = $this->settings;
@@ -252,7 +251,6 @@ class ilBlogPostingGUI extends ilPageObjectGUI
 				$ilSetting->get("comments_del_tutor", 1));
 
 			$wtpl->setVariable("TOOLBAR", $toolbar->getHTML());
-
 			$wtpl->setVariable("NOTES", $this->getNotesHTML($this->getBlogPosting(),
 				false, $this->enable_public_notes, $may_delete_comments, $callback));
 		}
@@ -942,6 +940,15 @@ class ilBlogPostingGUI extends ilPageObjectGUI
 	{
 		return $this->lng->txt("blog_draft_text");
 	}
+
+    /**
+     * @return string
+     */
+    public function getCommentsHTMLExport()
+    {
+        return $this->getNotesHTML($this->getBlogPosting(),
+            false, $this->enable_public_notes, false, null, true);
+    }
 
 }
 

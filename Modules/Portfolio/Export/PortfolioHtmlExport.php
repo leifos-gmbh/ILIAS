@@ -74,6 +74,11 @@ class PortfolioHtmlExport
     protected $active_tab;
 
     /**
+     * @var bool
+     */
+    protected $include_comments = false;
+
+    /**
      * constructor
      * @param \ilObjPortfolioBaseGUI $portfolio_gui
      */
@@ -96,6 +101,15 @@ class PortfolioHtmlExport
 
         $this->global_screen->tool()->context()->current()->addAdditionalData(\ilHTMLExportViewLayoutProvider::HTML_EXPORT_RENDERING,
             true);
+    }
+
+    /**
+     * Include comments
+     * @param bool $a_include_comments
+     */
+    public function includeComments($a_include_comments)
+    {
+        $this->include_comments = $a_include_comments;
     }
 
     /**
@@ -337,9 +351,15 @@ class PortfolioHtmlExport
         $pgui->setFullscreenLink("fullscreen.html"); // #12930 - see page.xsl
         $page_content = $pgui->showPage();
 
+        $comments = ($this->include_comments)
+            ? $pgui->getCommentsHTMLExport()
+            : "";
+
+
         $ep_tpl = new \ilTemplate("tpl.export_page.html", true, true,
             "Modules/Portfolio");
         $ep_tpl->setVariable("PAGE_CONTENT", $page_content);
+        $ep_tpl->setVariable("COMMENTS", $comments);
 
         $material = $pgui->getExportMaterial();
         $this->export_material[] = $material;

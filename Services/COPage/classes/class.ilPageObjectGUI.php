@@ -3442,7 +3442,7 @@ return;
 	 * @param bool $a_enable_notes_deletion
 	 * @return string
 	 */
-	function getNotesHTML($a_content_object = null, $a_enable_private_notes = true, $a_enable_public_notes = false, $a_enable_notes_deletion = false, $a_callback = null)
+	function getNotesHTML($a_content_object = null, $a_enable_private_notes = true, $a_enable_public_notes = false, $a_enable_notes_deletion = false, $a_callback = null, $export = false)
 	{
 		include_once("Services/Notes/classes/class.ilNoteGUI.php");
 
@@ -3462,7 +3462,6 @@ return;
 			$notes_gui = new ilNoteGUI($a_content_object->getParentId(),
 				$a_content_object->getId(), $a_content_object->getParentType());
 		}
-	
 		if($a_enable_private_notes)
 		{
 			$notes_gui->enablePrivateNotes();
@@ -3474,6 +3473,9 @@ return;
 			{
 				$notes_gui->enablePublicNotesDeletion(true);
 			}
+		}
+		if ($export) {
+			$notes_gui->setExportMode();
 		}
 		
 		if($a_callback)

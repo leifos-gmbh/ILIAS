@@ -95,6 +95,11 @@ class ilNoteGUI
 	protected $no_actions = false;
 
 	/**
+	 * @var bool
+	 */
+	protected $enable_sorting = true;
+
+	/**
 	* constructor, specifies notes set
 	*
 	* @param	$a_rep_obj_id	int		object id of repository object (0 for personal desktop)
@@ -712,7 +717,7 @@ if ($this->private_enabled && $this->public_enabled
 			$reldates = ilDatePresentation::useRelativeDates();
 			ilDatePresentation::setUseRelativeDates(false);
 			
-			if(sizeof($notes) && !$this->only_latest)
+			if(sizeof($notes) && !$this->only_latest && $this->enable_sorting)
 			{
 				if((int)$_SESSION["comments_sort_asc"] == 1)
 				{
@@ -724,7 +729,7 @@ if ($this->private_enabled && $this->public_enabled
 					$sort_txt = $lng->txt("notes_sort_asc");
 					$sort_cmd = "listSortAsc";
 				}	
-				$this->renderLink($tpl, "sort_list", $sort_txt, $sort_cmd, $anch);		
+				$this->renderLink($tpl, "sort_list", $sort_txt, $sort_cmd, $anch);
 			}
 			
 			$notes_given = false;
@@ -1917,6 +1922,16 @@ $ilCtrl->redirect($this, "showNotes", "notes_top", $this->ajax);
 		$ctrl->setParameter($this, "news_id", $_GET["news_id"]);
 		return $html;
 
+	}
+
+	/**
+	 * Set export mode
+	 */
+	public function setExportMode()
+	{
+		$this->hide_new_form = true;
+		$this->no_actions = true;
+		$this->enable_sorting = false;
 	}
 
 	/**

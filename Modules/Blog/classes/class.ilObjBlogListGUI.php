@@ -58,9 +58,13 @@ class ilObjBlogListGUI extends ilObjectListGUI
      */
     function insertCommand($a_href, $a_text, $a_frame = "", $a_img = "", $a_cmd = "", $a_onclick = "")
     {
+        $ctrl = $this->ctrl;
+
         if ($a_cmd != "export") {
             parent::insertCommand($a_href, $a_text, $a_frame, $a_img, $a_cmd, $a_onclick);
+            return;
         }
+
         // #11099
         $chksum = md5($a_href.$a_text);
         if($a_href == "#" ||
@@ -73,46 +77,33 @@ class ilObjBlogListGUI extends ilObjectListGUI
 
             $prevent_background_click = false;
 
-            $signal = $this->initModal();
+            $comment_export_helper = new \ILIAS\Notes\Export\ExportHelperGUI();
+            $this->comment_modal = $comment_export_helper->getCommentIncludeModalDialog(
+                'HTML Export',
+                $this->lng->txt("blog_include_comments"),
+                $ctrl->getLinkTargetByClass("ilobjbloggui", "export"),
+                $ctrl->getLinkTargetByClass("ilobjbloggui", "exportWithComments")
+            );
+            $signal = $this->comment_modal->getShowSignal();
             $this->current_selection_list->addItem($a_text, "", $a_href, $a_img, $a_text, $a_frame,
                 "", $prevent_background_click, "( function() { $(document).trigger('".$signal."', {'id': '".$signal."','triggerer':$(this), 'options': JSON.parse('[]')}); return false;})()");
         }
     }
 
-    function insertCommands($a_use_asynch = false, $a_get_asynch_commands = false,
-        $a_asynch_url = "", $a_header_actions = false) {
-        $ret = parent::insertCommands($a_use_asynch, $a_get_asynch_commands,
-            $a_asynch_url, $a_header_actions);
+    function getListItemHTML($a_ref_id, $a_obj_id, $a_title, $a_description,
+        $a_use_asynch = false, $a_get_asynch_commands = false, $a_asynch_url = "") {
 
-        if (!is_null($this->modal)) {
+
+        $html = parent::getListItemHTML($a_ref_id, $a_obj_id, $a_title, $a_description,
+            $a_use_asynch, $a_get_asynch_commands, $a_asynch_url);
+
+        if (!is_null($this->comment_modal)) {
             global $DIC;
             $renderer = $DIC->ui()->renderer();
-            $ret.= $renderer->render($this->modal);
+            $html.= $renderer->render($this->comment_modal);
         }
-        return $ret;
+        return $html;
     }
-
-    /**
-     *
-     *
-     * @param
-     * @return
-     */
-    protected function initModal()
-    {
-        global $DIC;
-        $factory = $DIC->ui()->factory();
-        $ctrl = $DIC->ctrl();
-        $renderer = $DIC->ui()->renderer();
-        $this->modal = $factory->modal()->interruptive('HTML Export', "Should comments be included", $ctrl->getLinkTargetByClass("ilobjbloggui", "handleExportChoice"))
-            ->withActionButtonLabel("action button label")
-            ->withCancelButtonLabel("cancel button label");
-
-
-        return $this->modal->getShowSignal();
-    }
-
-
 }
 
 ?>

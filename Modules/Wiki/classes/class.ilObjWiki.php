@@ -1078,14 +1078,14 @@ class ilObjWiki extends ilObject implements ilAdvancedMetaDataSubItems
      * @param
      * @return
      */
-    public function initUserHTMLExport()
+    public function initUserHTMLExport($with_comments = false)
     {
         $ilDB = $this->db;
         $ilUser = $this->user;
 
         include_once("./Modules/Wiki/classes/class.ilWikiUserHTMLExport.php");
 
-        $user_export = new ilWikiUserHTMLExport($this, $ilDB, $ilUser);
+        $user_export = new ilWikiUserHTMLExport($this, $ilDB, $ilUser, $with_comments);
         $user_export->initUserHTMLExport();
     }
 
@@ -1095,14 +1095,14 @@ class ilObjWiki extends ilObject implements ilAdvancedMetaDataSubItems
      * @param
      * @return
      */
-    public function startUserHTMLExport()
+    public function startUserHTMLExport($with_comments = false)
     {
         $ilDB = $this->db;
         $ilUser = $this->user;
 
         include_once("./Modules/Wiki/classes/class.ilWikiUserHTMLExport.php");
 
-        $user_export = new ilWikiUserHTMLExport($this, $ilDB, $ilUser);
+        $user_export = new ilWikiUserHTMLExport($this, $ilDB, $ilUser, $with_comments);
         $user_export->startUserHTMLExport();
     }
 
@@ -1111,29 +1111,29 @@ class ilObjWiki extends ilObject implements ilAdvancedMetaDataSubItems
      *
      * @return array progress info
      */
-    public function getUserHTMLExportProgress()
+    public function getUserHTMLExportProgress($with_comments = false)
     {
         $ilDB = $this->db;
         $ilUser = $this->user;
 
         include_once("./Modules/Wiki/classes/class.ilWikiUserHTMLExport.php");
 
-        $user_export = new ilWikiUserHTMLExport($this, $ilDB, $ilUser);
+        $user_export = new ilWikiUserHTMLExport($this, $ilDB, $ilUser, $with_comments);
         return $user_export->getProgress();
     }
 
     /**
      * Send user html export file
      */
-    public function deliverUserHTMLExport()
+    public function deliverUserHTMLExport($with_comments = false)
     {
         $ilDB = $this->db;
         $ilUser = $this->user;
 
         include_once("./Modules/Wiki/classes/class.ilWikiUserHTMLExport.php");
 
-        $user_export = new ilWikiUserHTMLExport($this, $ilDB, $ilUser);
-        return $user_export->deliverFile();
+        $user_export = new ilWikiUserHTMLExport($this, $ilDB, $ilUser, $with_comments);
+        $user_export->deliverFile();
     }
     
     

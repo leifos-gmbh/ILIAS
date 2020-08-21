@@ -52,6 +52,11 @@ class ilObjWikiGUI extends ilObjectGUI
     protected $ui;
 
     /**
+     * @var bool
+     */
+    protected $req_with_comments = false;
+
+    /**
     * Constructor
     * @access public
     */
@@ -87,6 +92,8 @@ class ilObjWikiGUI extends ilObjectGUI
         if ($_GET["page"] != "") {
             $ilCtrl->setParameter($this, "page", ilWikiUtil::makeUrlTitle($_GET["page"]));
         }
+
+        $this->req_with_comments = (bool) $_GET["with_comments"];
     }
     
     public function executeCommand()
@@ -2215,9 +2222,9 @@ class ilObjWikiGUI extends ilObjectGUI
      */
     public function initUserHTMLExportObject()
     {
-        $this->log->debug("init");
+        $this->log->debug("init: ".$this->req_with_comments);
         $this->checkPermission("wiki_html_export");
-        $this->object->initUserHTMLExport();
+        $this->object->initUserHTMLExport($this->req_with_comments);
     }
 
     /**
@@ -2225,9 +2232,9 @@ class ilObjWikiGUI extends ilObjectGUI
      */
     public function startUserHTMLExportObject()
     {
-        $this->log->debug("start");
+        $this->log->debug("start: ".$this->req_with_comments);
         $this->checkPermission("wiki_html_export");
-        $this->object->startUserHTMLExport();
+        $this->object->startUserHTMLExport($this->req_with_comments);
     }
 
     /**
@@ -2235,9 +2242,9 @@ class ilObjWikiGUI extends ilObjectGUI
      */
     public function getUserHTMLExportProgressObject()
     {
-        $this->log->debug("get progress");
+        $this->log->debug("get progress: ".$this->req_with_comments);
         $this->checkPermission("wiki_html_export");
-        $p = $this->object->getUserHTMLExportProgress();
+        $p = $this->object->getUserHTMLExportProgress($this->req_with_comments);
 
         include_once("./Services/UIComponent/ProgressBar/classes/class.ilProgressBar.php");
         $pb = ilProgressBar::getInstance();
@@ -2260,6 +2267,16 @@ class ilObjWikiGUI extends ilObjectGUI
         $this->log->debug("download");
         $this->checkPermission("wiki_html_export");
         $this->object->deliverUserHTMLExport();
+    }
+
+    /**
+     * Download user html export file
+     */
+    public function downloadUserHTMLExportWithCommentsObject()
+    {
+        $this->log->debug("download");
+        $this->checkPermission("wiki_html_export");
+        $this->object->deliverUserHTMLExport(true);
     }
 
     /**

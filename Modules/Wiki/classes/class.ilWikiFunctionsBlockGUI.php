@@ -343,6 +343,18 @@ class ilWikiFunctionsBlockGUI extends ilBlockGUI
                 "id" => "il_wiki_user_export",
                 "href" => $ilCtrl->getLinkTargetByClass("ilobjwikigui", "initUserHTMLExport")
             );
+            $comments_helper = new \ILIAS\Notes\Export\ExportHelperGUI();
+            $comments_modal = $comments_helper->getCommentIncludeModalDialog(
+                $this->lng->txt("wiki_html_export"),
+                $this->lng->txt("wiki_html_export_include_comments"),
+                "il.Wiki.Pres.performHTMLExport();",
+                "il.Wiki.Pres.performHTMLExportWithComments();",
+                true
+            );
+            $actions[] = array(
+                "txt" => $lng->txt("wiki_html_export"),
+                "modal" => $comments_modal
+            );
         }
 
         // manage
@@ -358,9 +370,18 @@ class ilWikiFunctionsBlockGUI extends ilBlockGUI
                 );
         }
 
+        $modal_html = "";
         foreach ($actions as $a) {
             $tpl->setCurrentBlock("action");
-            $tpl->setVariable("HREF", $a["href"]);
+            if ($a["modal"] != "") {
+                $signal = $a["modal"]->getShowSignal();
+                $onclick = "$(document).trigger('".$signal."', {'id': '".$signal."','triggerer':$(this), 'options': JSON.parse('[]')}); return false;";
+                $tpl->setVariable("ONCLICK", ' onclick="'.$onclick.'" ');
+                $tpl->setVariable("HREF", "#");
+                $modal_html.= $this->ui->renderer()->render($a["modal"]);
+            } else {
+                $tpl->setVariable("HREF", $a["href"]);
+            }
             $tpl->setVariable("TXT", $a["txt"]);
             if ($a["id"] != "") {
                 $tpl->setVariable("ACT_ID", "id='" . $a["id"] . "'");
@@ -370,6 +391,6 @@ class ilWikiFunctionsBlockGUI extends ilBlockGUI
             $tpl->touchBlock("item");
         }
 
-        return $tpl->get();
+        return $tpl->get().$modal_html;
     }
 }

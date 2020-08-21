@@ -1461,4 +1461,19 @@ class ilWikiPageGUI extends ilPageObjectGUI
             ilUtil::deliverFile($submitted["filename"], $title);
         }
     }
+
+    /**
+     * @return string
+     */
+    public function getCommentsHTMLExport()
+    {
+        return $this->getNotesHTML($this->getPageObject(),
+            false,
+            ilObjWiki::_lookupPublicNotes($this->getPageObject()->getParentId()),
+            false,
+            null,
+            true
+        );
+    }
+
 }

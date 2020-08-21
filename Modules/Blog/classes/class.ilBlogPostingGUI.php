@@ -253,7 +253,6 @@ class ilBlogPostingGUI extends ilPageObjectGUI
                 $ilSetting->get("comments_del_tutor", 1));
 
             $wtpl->setVariable("TOOLBAR", $toolbar->getHTML());
-<<<<<<< HEAD
 
             $wtpl->setVariable("NOTES", $this->getNotesHTML(
                 $this->getBlogPosting(),
@@ -262,10 +261,6 @@ class ilBlogPostingGUI extends ilPageObjectGUI
                 $may_delete_comments,
                 $callback
             ));
-=======
-			$wtpl->setVariable("NOTES", $this->getNotesHTML($this->getBlogPosting(),
-				false, $this->enable_public_notes, $may_delete_comments, $callback));
->>>>>>> dc1a58465e... notes export blog/port
         }
 
         // permanent link

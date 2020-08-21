@@ -36,7 +36,7 @@ class ExportHelperGUI
      * @param
      * @return
      */
-    public function getCommentIncludeModalDialog($title, $message, $export_cmd, $export_with_comments_cmd)
+    public function getCommentIncludeModalDialog($title, $message, $export_cmd, $export_with_comments_cmd, $js)
     {
         $ui = $this->ui;
         $factory = $ui->factory();
@@ -45,17 +45,23 @@ class ExportHelperGUI
         $modal = $factory->modal()->roundtrip($title, [$mess]);
 
         $b1 = $factory->button()->standard($this->lng->txt("no"), "")
-                      ->withAdditionalOnLoadCode(function ($id) use ($export_cmd) {
+                      ->withAdditionalOnLoadCode(function ($id) use ($export_cmd, $js) {
+                          $cmd_js = ($js)
+                              ? $export_cmd
+                              : "window.location.href='$export_cmd'";
                           return "document.querySelector('#$id').addEventListener('click', (e) => {
                     $('#$id').closest('.modal-content').find('button.close').click();
-                    window.location.href='$export_cmd';
+                    $cmd_js
                 });";
                       });
         $b2 = $factory->button()->standard($this->lng->txt("yes"), "")
-                      ->withAdditionalOnLoadCode(function ($id) use ($export_with_comments_cmd) {
+                      ->withAdditionalOnLoadCode(function ($id) use ($export_with_comments_cmd, $js) {
+                          $cmd_js = ($js)
+                              ? $export_with_comments_cmd
+                              : "window.location.href='$export_with_comments_cmd'";
                           return "document.querySelector('#$id').addEventListener('click', (e) => {
                     $('#$id').closest('.modal-content').find('button.close').click();
-                    window.location.href='$export_with_comments_cmd';
+                    $cmd_js
                 });";
 
                       });

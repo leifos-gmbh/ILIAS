@@ -591,7 +591,7 @@ class ilNoteGUI
         $anch = $this->anchor_jump
             ? "notes_top"
             : "";
-        if (!$this->only_latest) {
+        if (!$this->only_latest && !$this->hide_new_form) {
             $tpl->setVariable("FORMACTION", $ilCtrl->getFormAction($this, "getNotesHTML", $anch));
             if ($this->ajax) {
                 $os = "onsubmit = \"ilNotes.cmdAjaxForm(event, '" .

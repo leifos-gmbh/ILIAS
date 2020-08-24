@@ -15,6 +15,11 @@ class ilWikiFunctionsBlockGUI extends ilBlockGUI
 {
     public static $block_type = "wikiside";
     public static $st_data;
+
+    /**
+     * @var ilObjWiki
+     */
+    protected $wiki;
     
     /**
     * Constructor
@@ -38,6 +43,8 @@ class ilWikiFunctionsBlockGUI extends ilBlockGUI
         $this->allow_moving = false;
 
         $this->ref_id = (int) $_GET["ref_id"];
+
+        $this->wiki = new ilObjWiki($this->ref_id);
 
         $this->setPresentation(self::PRES_SEC_LEG);
     }
@@ -338,23 +345,28 @@ class ilWikiFunctionsBlockGUI extends ilBlockGUI
 
         // manage
         if (ilWikiPerm::check("wiki_html_export", $this->ref_id)) {
-            $actions[] = array(
-                "txt" => $lng->txt("wiki_html_export"),
-                "id" => "il_wiki_user_export",
-                "href" => $ilCtrl->getLinkTargetByClass("ilobjwikigui", "initUserHTMLExport")
-            );
-            $comments_helper = new \ILIAS\Notes\Export\ExportHelperGUI();
-            $comments_modal = $comments_helper->getCommentIncludeModalDialog(
-                $this->lng->txt("wiki_html_export"),
-                $this->lng->txt("wiki_html_export_include_comments"),
-                "il.Wiki.Pres.performHTMLExport();",
-                "il.Wiki.Pres.performHTMLExportWithComments();",
-                true
-            );
-            $actions[] = array(
-                "txt" => $lng->txt("wiki_html_export"),
-                "modal" => $comments_modal
-            );
+
+            if (!$this->wiki->isCommentsExportPossible()) {
+                $actions[] = array(
+                    "txt" => $lng->txt("wiki_html_export"),
+                    "id" => "il_wiki_user_export",
+                    "href" => $ilCtrl->getLinkTargetByClass("ilobjwikigui", "initUserHTMLExport")
+                );
+            } else {
+                $this->lng->loadLanguageModule("note");
+                $comments_helper = new \ILIAS\Notes\Export\ExportHelperGUI();
+                $comments_modal = $comments_helper->getCommentIncludeModalDialog(
+                    $this->lng->txt("wiki_html_export"),
+                    $this->lng->txt("note_html_export_include_comments"),
+                    "il.Wiki.Pres.performHTMLExport();",
+                    "il.Wiki.Pres.performHTMLExportWithComments();",
+                    true
+                );
+                $actions[] = array(
+                    "txt" => $lng->txt("wiki_html_export"),
+                    "modal" => $comments_modal
+                );
+            }
         }
 
         // manage

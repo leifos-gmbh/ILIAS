@@ -14,6 +14,9 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+common#:#enable_comments_export#:#Enable Comments Export
+note#:#note_enable_comments_export_info#:#This option enables comments export for content objects like portfolio, blog and wiki.
+note#:#note_html_export_include_comments#:#Should comments be included in the export?
 rbac#:#rbac_form_copy_roles_adjust_type#:#Kind of Adapting Permissions
 rbac#:#rbac_form_copy_roles_adjust_type_add#:#Add permissions
 rbac#:#rbac_form_copy_roles_adjust_type_clone#:#Copy permissions

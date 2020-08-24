@@ -30,6 +30,11 @@ class ilObjWiki extends ilObject implements ilAdvancedMetaDataSubItems
     protected $link_md_values = false;
 
     /**
+     * @var \ilSetting
+     */
+    protected $setting;
+
+    /**
     * Constructor
     * @access	public
     * @param	integer	reference_id or object_id
@@ -42,6 +47,7 @@ class ilObjWiki extends ilObject implements ilAdvancedMetaDataSubItems
         $this->db = $DIC->database();
         $this->user = $DIC->user();
         $this->type = "wiki";
+        $this->setting = $DIC->settings();
         parent::__construct($a_id, $a_call_by_reference);
     }
 
@@ -1153,4 +1159,26 @@ class ilObjWiki extends ilObject implements ilAdvancedMetaDataSubItems
 
         return $a_value;
     }
+
+    /**
+     * Is export possible
+     * @return bool
+     */
+    public function isCommentsExportPossible()
+    {
+        $setting = $this->setting;
+        $privacy = ilPrivacySettings::_getInstance();
+        if ($setting->get("disable_comments")) {
+            return false;
+        }
+
+        if (!$this->getPublicNotes()) {
+            return false;
+        }
+        if (!$privacy->enabledCommentsExport()) {
+            return false;
+        }
+        return true;
+    }
+
 }

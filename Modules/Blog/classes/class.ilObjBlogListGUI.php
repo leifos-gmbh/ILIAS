@@ -57,7 +57,7 @@ class ilObjBlogListGUI extends ilObjectListGUI
     {
         $ctrl = $this->ctrl;
 
-        if ($a_cmd != "export") {
+        if ($a_cmd != "export" || !ilObjBlogAccess::isCommentsExportPossible($this->obj_id)) {
             parent::insertCommand($a_href, $a_text, $a_frame, $a_img, $a_cmd, $a_onclick);
             return;
         }
@@ -74,16 +74,28 @@ class ilObjBlogListGUI extends ilObjectListGUI
 
             $prevent_background_click = false;
 
-            $comment_export_helper = new \ILIAS\Notes\Export\ExportHelperGUI();
-            $this->comment_modal = $comment_export_helper->getCommentIncludeModalDialog(
-                'HTML Export',
-                $this->lng->txt("blog_include_comments"),
-                $ctrl->getLinkTargetByClass("ilobjbloggui", "export"),
-                $ctrl->getLinkTargetByClass("ilobjbloggui", "exportWithComments")
-            );
-            $signal = $this->comment_modal->getShowSignal();
-            $this->current_selection_list->addItem($a_text, "", $a_href, $a_img, $a_text, $a_frame,
-                "", $prevent_background_click, "( function() { $(document).trigger('".$signal."', {'id': '".$signal."','triggerer':$(this), 'options': JSON.parse('[]')}); return false;})()");
+            if (ilObjBlogAccess::isCommentsExportPossible($this->obj_id)) {
+                $comment_export_helper = new \ILIAS\Notes\Export\ExportHelperGUI();
+                $this->lng->loadLanguageModule("note");
+                $this->comment_modal = $comment_export_helper->getCommentIncludeModalDialog(
+                    'HTML Export',
+                    $this->lng->txt("note_html_export_include_comments"),
+                    $ctrl->getLinkTargetByClass("ilobjbloggui", "export"),
+                    $ctrl->getLinkTargetByClass("ilobjbloggui", "exportWithComments")
+                );
+                $signal = $this->comment_modal->getShowSignal();
+                $this->current_selection_list->addItem(
+                    $a_text,
+                    "",
+                    $a_href,
+                    $a_img,
+                    $a_text,
+                    $a_frame,
+                    "",
+                    $prevent_background_click,
+                    "( function() { $(document).trigger('" . $signal . "', {'id': '" . $signal . "','triggerer':$(this), 'options': JSON.parse('[]')}); return false;})()"
+                );
+            }
         }
     }
 

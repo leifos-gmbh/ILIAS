@@ -322,17 +322,25 @@ abstract class ilObjPortfolioBaseGUI extends ilObject2GUI
 
             $ui = $this->ui;
 
-            $comment_export_helper = new \ILIAS\Notes\Export\ExportHelperGUI();
-            $comment_modal = $comment_export_helper->getCommentIncludeModalDialog(
-                $this->lng->txt("export_html"),
-                $this->lng->txt("prtf_include_comments"),
-                $this->ctrl->getLinkTarget($this, "export"),
-                $this->ctrl->getLinkTarget($this, "exportWithComments")
-            );
-            $button = $ui->factory()->button()->standard($this->lng->txt("export_html"), '')
-                                              ->withOnClick($comment_modal->getShowSignal());
-            $ilToolbar->addComponent($button);
-            $modal_html = $ui->renderer()->render($comment_modal);
+            if ($this->object->isCommentsExportPossible()) {
+                $this->lng->loadLanguageModule("note");
+                $comment_export_helper = new \ILIAS\Notes\Export\ExportHelperGUI();
+                $comment_modal = $comment_export_helper->getCommentIncludeModalDialog(
+                    $this->lng->txt("export_html"),
+                    $this->lng->txt("note_html_export_include_comments"),
+                    $this->ctrl->getLinkTarget($this, "export"),
+                    $this->ctrl->getLinkTarget($this, "exportWithComments")
+                );
+                $button = $ui->factory()->button()->standard($this->lng->txt("export_html"), '')
+                             ->withOnClick($comment_modal->getShowSignal());
+                $ilToolbar->addComponent($button);
+                $modal_html = $ui->renderer()->render($comment_modal);
+            } else {
+                $button = ilLinkButton::getInstance();
+                $button->setCaption("export_html");
+                $button->setUrl($this->ctrl->getLinkTarget($this, "export"));
+                $ilToolbar->addButtonInstance($button);
+            }
 
 
             $button = ilLinkButton::getInstance();

@@ -36,7 +36,7 @@ class ExportHelperGUI
      * @param
      * @return
      */
-    public function getCommentIncludeModalDialog($title, $message, $export_cmd, $export_with_comments_cmd, $js)
+    public function getCommentIncludeModalDialog($title, $message, $export_cmd, $export_with_comments_cmd, $js = false)
     {
         $ui = $this->ui;
         $factory = $ui->factory();

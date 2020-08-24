@@ -137,7 +137,7 @@ class ilAccountRegistrationGUI
 
         // cdpatch start
         if ($this->mode == "trainer") {
-            $this->tpl->setVariable("TXT_PAGEHEADLINE", $lng->txt("cd_reg_trainer"));
+            $this->tpl->setVariable("TXT_PAGEHEADLINE", $this->lng->txt("cd_reg_trainer"));
         }
         // cdpatch end
 

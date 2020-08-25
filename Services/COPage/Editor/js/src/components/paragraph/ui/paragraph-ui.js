@@ -10,6 +10,11 @@ export default class ParagraphUI {
 
 
   /**
+   * @type {boolean}
+   */
+  debug = true;
+
+  /**
    * Model
    * @type {Model}
    */
@@ -81,20 +86,37 @@ export default class ParagraphUI {
   //
 
   /**
+   * @param message
+   */
+  log(message) {
+    if (this.debug) {
+      console.log(message);
+    }
+  }
+
+
+  /**
    */
   init(uiModel) {
+    this.log("paragraph-ui.init");
+
     this.uiModel = uiModel;
     let t = this;
+    const wrapper = this.tinyWrapper;
+
+    this.uiModel.config.text_formats.forEach(f =>
+      wrapper.addTextFormat(f)
+    );
 
     il.Util.addOnLoad(function () {
       $(window).resize(() => {
-        t.autoResize();
+        wrapper.autoResize();
       });
     });
 
-    this.uiModel.config.text_formats.forEach(f =>
-      this.tinyWrapper.addTextFormat(f)
-    );
+    wrapper.setContentCss(this.uiModel.config.content_css);
+
+    this.log("css: " + this.uiModel.config.content_css);
 
     this.initMenu();
   }
@@ -139,8 +161,6 @@ export default class ParagraphUI {
   content_css = '';
   edit_status = false;
   insert_status = false;
-  minwidth = 50;
-  minheight = 20;
   current_td = "";
   edit_ghost = null;
   ghost_debugged = false;
@@ -374,14 +394,7 @@ export default class ParagraphUI {
 
   cmdSpan(t)
   {
-    const stype = {Strong: '0', Emph: '1', Important: '2', Comment: '3',
-      Quotation: '4', Accent: '5'};
-    let ed = tinyMCE.get('tinytarget');
-
-    tinymce.activeEditor.formatter.toggle(t);
-    ed.focus();
-    ed.selection.collapse(false);
-    this.autoResize(ed);
+    this.tinyWrapper.toggleFormat(t);
   }
 
   cmdCode()
@@ -575,16 +588,7 @@ export default class ParagraphUI {
 
   setParagraphClass(i) {
     document.getElementById("ilAdvSelListAnchorText_style_selection").firstChild.textContent = i + " ";
-    let ed = tinyMCE.activeEditor;
-    ed.focus();
-    let snode = ed.dom.getRoot();
-
-    if (snode) {
-      //snode.className = "ilc_text_block_" + i['hid_val'];
-      snode.className = "ilc_text_block_" + i;
-      snode.style.position = 'static';
-    }
-    this.autoResize(ed);
+    this.tinyWrapper.setParagraphClass(i);
   }
 
   ////
@@ -608,608 +612,21 @@ export default class ParagraphUI {
     return c;
   }
 
-  // convert <p> tags to <br />
-  p2br(c)
-  {
-    // remove <p> and \n
-    c = c.split("<p>").join("");
-    c = c.split("\n").join("");
-
-    // convert </p> to <br />
-    c = c.split("</p>").join("<br />");
-
-    // remove trailing <br />
-    if (c.substr(c.length - 6) == "<br />")
-    {
-      c = c.substr(0, c.length - 6);
-    }
-
-    return c;
-  }
 
 
-  /**
-   * This function converts all <br /> into corresponding paragraphs
-   * (server content comes with <br />, but tiny has all kind of issues
-   * in "<br>" mode (e.g. IE cannot handle lists). So we use the more
-   * reliable "<p>" mode of tiny.
-   */
-  splitBR()
-  {
-    let snode;
-    let ed = tinyMCE.activeEditor;
-    let r = ed.dom.getRoot();
-
-    // STEP 1: Handle all top level <br />
-
-    // make copy of root
-    let rcopy = r.cloneNode(true);
-
-    // remove all childs of top level
-    for (var k = r.childNodes.length - 1; k >= 0; k--)
-    {
-      r.removeChild(r.childNodes[k]);
-    }
-
-    // cp -> current P
-    let cp = ed.dom.create('p', {}, '');
-    let cp_content = false; // has current P any content?
-    let cc, pc; // cc: currrent child (top level), pc: P child
-
-    // walk through root copy and add content to emptied original root
-    for (var k = 0; k < rcopy.childNodes.length; k++)
-    {
-      cc = rcopy.childNodes[k];
-
-      // handle Ps on top level
-      // main purpose: convert <p> ...<br />...</p> to <p>...</p><p>...</p>
-      if (cc.nodeName == "P")
-      {
-        // is there a current P with content? -> add it to top level
-        if (cp_content)
-        {
-          r.appendChild(cp);
-          cp = ed.dom.create('p', {}, '');
-          cp_content = false;
-        }
-
-        // split all BRs into separate Ps on top level
-        for (var i = 0; i < cc.childNodes.length; i++)
-        {
-          pc = cc.childNodes[i];
-          if (pc.nodeName == "BR")
-          {
-            // append the current p an create a new one
-            r.appendChild(cp);
-            cp = ed.dom.create('p', {}, '');
-            cp_content = false;
-          }
-          else
-          {
-            // append the content to the current p
-            cp.appendChild(pc.cloneNode(true));
-            cp_content = true;
-          }
-        }
-
-        // append current p and create a new one
-        if (cp_content)
-        {
-          r.appendChild(cp);
-          cp = ed.dom.create('p', {}, '');
-          cp_content = false;
-        }
-      }
-      else if (cc.nodeName == "UL" || cc.nodeName == "OL")
-      {
-        // UL and OL are simply appended to the root
-        if (cp_content)
-        {
-          r.appendChild(cp);
-          cp = ed.dom.create('p', {}, '');
-          cp_content = false;
-        }
-        r.appendChild(rcopy.childNodes[k].cloneNode(true));
-      }
-      else
-      {
-        cp.appendChild(rcopy.childNodes[k].cloneNode(true));
-        cp_content = true;
-      }
-    }
-    if (cp_content)
-    {
-      r.appendChild(cp);
-    }
-
-    // STEP 2: Handle all non-top level <br />
-    // this is the standard tiny br splitting (which fails in top level Ps)
-    /*		tinymce.each(ed.dom.select('br').reverse(), function(b) {
-     try {
-     var snode = ed.dom.getParent(b, 'p,li');
-     ed.dom.split(snode, b);
-     } catch (ex) {
-     // IE can sometimes fire an unknown runtime error so we just ignore it
-     }
-     });*/
-    this.splitTopBr();
-
-
-    // STEP 3: Clean up
-
-    // remove brs (normally all should have been handled above)
-    var c = ed.getContent();
-    c = c.split("<br />").join("");
-    c = c.split("\n").join("");
-    ed.setContent(c);
-  }
-
-  // split all span classes that are direct "children of themselves"
-  // fixes bug #13019
-  splitSpans() {
-
-    let k, ed = tinyMCE.activeEditor, s,
-      classes = ['ilc_text_inline_Strong','ilc_text_inline_Emph', 'ilc_text_inline_Important',
-        'ilc_text_inline_Comment', 'ilc_text_inline_Quotation', 'ilc_text_inline_Accent'];
-
-    for (var i = 0; i < classes.length; i++) {
-
-      s = ed.dom.select('span[class="' + classes[i] + '"] > span[class="' + classes[i] + '"]');
-      for (k in s) {
-        ed.dom.split(s[k].parentNode, s[k]);
-      }
-    }
-  }
-
-  /**
-   * This one ensures that the standard ILIAS list style classes
-   * are assigned to list elements
-   */
-  fixListClasses(handle_inner_br)
-  {
-    let ed = tinyMCE.activeEditor, par, r;
-
-    // return;
-
-    ed.dom.addClass(tinyMCE.activeEditor.dom.select('ol'), 'ilc_list_o_NumberedList');
-    ed.dom.addClass(tinyMCE.activeEditor.dom.select('ul'), 'ilc_list_u_BulletedList');
-    ed.dom.addClass(tinyMCE.activeEditor.dom.select('li'), 'ilc_list_item_StandardListItem');
-
-    if (handle_inner_br)
-    {
-      let rcopy = ed.selection.getRng(true);
-      let target_pos = false;
-
-      // get selection start p or li tag
-      let st_cont = rcopy.startContainer.nodeName.toLowerCase();
-      if (st_cont !== "p" && st_cont !== "li")
-      {
-        par = rcopy.startContainer.parentNode;
-        if (par.nodeName.toLowerCase() === "body")
-        {
-          // starting from something like a text node under body
-          // not really a parent anymore, but ok to get the previous sibling from
-          par = rcopy.startContainer;
-        }
-        else
-        {
-          // starting from a deeper node in text
-          while (par.parentNode &&
-          par.nodeName.toLowerCase() !== "li" &&
-          par.nodeName.toLowerCase() !== "p" &&
-          par.nodeName.toLowerCase() !== "body")
-          {
-            par = par.parentNode;
-            //console.log(par);
-          }
-        }
-      }
-      else
-      {
-        par = rcopy.startContainer;
-      }
-      //console.log(par);
-
-
-      // get previous sibling
-      var ps = par.previousSibling;
-      if (ps)
-      {
-        if (ps.nodeName.toLowerCase() === "p" ||
-          ps.nodeName.toLowerCase() === "li")
-        {
-          target_pos = ps;
-        }
-        if (ps.nodeName.toLowerCase() === "ul")
-        {
-          if (ps.lastChild)
-          {
-            target_pos = ps.lastChild;
-          }
-        }
-      }
-      else
-      {
-        //console.log("case d");
-        // set selection to beginning
-        r = ed.dom.getRoot();
-        target_pos = r.childNodes[0];
-      }
-      if (this.splitTopBr())
-      {
-        //console.log("setting range");
-
-        // set selection to start of first div
-        if (target_pos)
-        {
-          r =  ed.dom.createRng();
-          r.setStart(target_pos, 0);
-          r.setEnd(target_pos, 0);
-          ed.selection.setRng(r);
-        }
-      }
-    }
-  }
-
-  splitTopBr()
-  {
-    let changed = false;
-
-    let ed = tinyMCE.activeEditor;
-    ed.getContent(); // this line is imporant and seems to fix some things
-    tinymce.each(ed.dom.select('br').reverse(), function(b) {
-
-      //console.log(b);
-      //return;
-
-      try {
-        let snode = ed.dom.getParent(b, 'p,li');
-        if (snode.nodeName !== "LI" &&
-          snode.childNodes.length !== 1)
-        {
-          //				ed.dom.split(snode, b);
-
-          function trim(node) {
-            var i, children = node.childNodes;
-
-            if (node.nodeType === 1 && node.getAttribute('_mce_type') === 'bookmark')
-              return;
-
-            for (i = children.length - 1; i >= 0; i--)
-              trim(children[i]);
-
-            if (node.nodeType !== 9) {
-              // Keep non whitespace text nodes
-              if (node.nodeType === 3 && node.nodeValue.length > 0) {
-                // If parent element isn't a block or there isn't any useful contents for example "<p>   </p>"
-                if (!t.isBlock(node.parentNode) || tinymce.trim(node.nodeValue).length > 0)
-                  return;
-              }
-
-              if (node.nodeType === 1) {
-                // If the only child is a bookmark then move it up
-                children = node.childNodes;
-                if (children.length === 1 && children[0] && children[0].nodeType === 1 && children[0].getAttribute('_mce_type') === 'bookmark')
-                  node.parentNode.insertBefore(children[0], node);
-
-                // Keep non empty elements or img, hr etc
-                if (children.length || /^(br|hr|input|img)$/i.test(node.nodeName))
-                  return;
-              }
-
-              t.remove(node);
-            }
-            return node;
-          }
-
-          let pe = snode;
-          let e = b;
-          if (pe && e) {
-            var t = ed.dom, r = t.createRng(), bef, aft, pa;
-
-            // Get before chunk
-            r.setStart(pe.parentNode, t.nodeIndex(pe));
-            r.setEnd(e.parentNode, t.nodeIndex(e));
-            bef = r.extractContents();
-
-            // Get after chunk
-            r = t.createRng();
-            r.setStart(e.parentNode, t.nodeIndex(e) + 1);
-            r.setEnd(pe.parentNode, t.nodeIndex(pe) + 1);
-            aft = r.extractContents();
-
-            // Insert before chunk
-            pa = pe.parentNode;
-            pa.insertBefore(trim(bef), pe);
-            //pa.insertBefore(bef, pe);
-
-            // Insert after chunk
-            pa.insertBefore(trim(aft), pe);
-            //pa.insertBefore(aft, pe);
-            t.remove(pe);
-
-            //					return re || e;
-            changed = true;
-          }
-        }
-
-      } catch (ex) {
-        // IE can sometimes fire an unknown runtime error so we just ignore it
-      }
-    });
-    return changed;
-  }
-
-  // remove all divs (used after pasting)
-  splitDivs()
-  {
-    // split all divs in divs
-    let ed = tinyMCE.activeEditor;
-    let divs = ed.dom.select('p > div');
-    let k;
-    for (k in divs)
-    {
-      ed.dom.split(divs[k].parentNode, divs[k]);
-    }
-  }
 
   ////
   //// Tiny/text area/menu handling
   ////
 
-  prepareTinyForEditing (insert, switched)
-  {
-    var ed = tinyMCE.get('tinytarget');
-    tinyMCE.execCommand('mceAddEditor', false, 'tinytarget');
-    if (!switched)
-    {
-      this.showToolbar('tinytarget');
-    }
 
-    // todo tinynew
-    //		tinyifr = document.getElementById("tinytarget_parent");
-    //		tinyifr.style.position = "absolute";
 
-    this.setEditStatus(true);
-    this.setInsertStatus(insert);
-    if (!insert)
-    {
-      this.focusTiny(false);
-    }
-    //this.autoScroll();
-    if (this.current_td !== "")
-    {
-      this.copyInputToGhost(false);
-    }
-    else
-    {
-      this.copyInputToGhost(true);
-    }
-    this.synchInputRegion();
-    this.updateMenuButtons();
-  }
 
-  focusTiny(delayed)
-  {
-    let timeout = 1;
-    if (delayed)
-    {
-      timeout = 500;
-    }
 
-    setTimeout(function () {
-      let ed = tinyMCE.get('tinytarget');
-      if (ed)
-      {
-        let e = tinyMCE.DOM.get(ed.id + '_external');
-        let r = ed.dom.getRoot();
-        let fc = r.childNodes[0];
-        if (r.className != null)
-        {
-          var st = r.className.substring(15);
-          il.AdvancedSelectionList.selectItem('style_selection', st);
-        }
-
-        ed.getWin().focus();
-      }
-    }, timeout);
-  }
-
-  removeTiny() {
-    tinyMCE.execCommand('mceRemoveEditor', false, 'tinytarget');
-    let tt = document.getElementById("tinytarget");
-    tt.style.display = 'none';
-  }
-
-  // set frame size of editor
-  setEditFrameSize(width, height)
-  {
-    let tinyifr = document.getElementById("tinytarget_ifr");
-    let tinytd = document.getElementById("tinytarget_tbl");
-    tinyifr.style.width = width + "px";
-    tinyifr.style.height = height + "px";
-
-    $("#tinytarget_ifr").css("width", width + "px");
-    $("#tinytarget_ifr").css("height", height + "px");
-
-    this.ed_width = width;
-    this.ed_height = height;
-  }
-
-  // copy input of tiny to ghost div in background
-  copyInputToGhost(add_final_spacer)
-  {
-    let ed = tinyMCE.get('tinytarget');
-
-    if (this.edit_ghost)
-    {
-      let pdiv = document.getElementById(this.edit_ghost);
-      if (pdiv)
-      {
-        let cl = ed.dom.getRoot().className;
-        let c = this.p2br(ed.getContent());
-        if (this.current_td === "")
-        {
-          c = "<div style='position:static;' class='" + cl + "'>" + c + "</div>";
-        }
-        else
-        {
-          this.tds[this.current_td] =
-            this.getContentForSaving();
-        }
-        let e = c.substr(c.length - 6);
-        let b = c.substr(c.length - 12, 6);
-        if (e === "</div>" && add_final_spacer)
-        {
-          // ensure at least one more line of space
-          if (b !== "<br />") {
-            c = c.substr(0, c.length - 6) + "<br />.</div>";
-          } else {
-            // this looks good under firefox. If this leads to problems on other
-            // browsers, ".</div>" would be the alternative for this case (last new empty line)
-            c = c.substr(0, c.length - 6) + "<br />.</div>";
-          }
-
-        }
-        pdiv.innerHTML = c;
-      }
-    }
-  }
-
-  // synchs the size/position of the tiny to the space the ghost
-  // object uses in the background
-  synchInputRegion()
-  {
-    let back_el, dummy;
-
-    if (this.current_td)
-    {
-      back_el = document.getElementById(this.edit_ghost);
-      back_el = back_el.parentNode;
-    }
-    else
-    {
-      back_el = document.getElementById(this.edit_ghost);
-    }
-
-    if (!back_el) {
-      return;
-    }
-
-    back_el.style.minHeight = this.minheight + "px";
-    //		back_el.style.minWidth = this.minwidth + "px";
-
-    // alex, 30 Dec 2011, see bug :
-    // for reasons I do not understand, the above does not
-    // work for IE7, even if minWidth is implemented there.
-    // so we do this "padding" trick which works for all browsers
-    if ($(back_el).width() < this.minwidth)
-    {
-      var new_pad = (this.minwidth - $(back_el).width()) / 2;
-      back_el.style.paddingLeft = new_pad + "px";
-      back_el.style.paddingRight = new_pad + "px";
-    }
-    else
-    {
-      back_el.style.paddingLeft = "";
-      back_el.style.paddingRight = "";
-    }
-
-    let tinyifr = document.getElementById("tinytarget_ifr");
-    tinyifr = tinyifr.parentNode;
-    $(tinyifr).css("position", "absolute");
-
-    // make sure, background element does not go beyond page bottom
-    back_el.style.display = '';
-    back_el.style.overflow = 'auto';
-    back_el.style.height = '';
-    var back_reg = YAHOO.util.Region.getRegion(back_el);
-    var cl_reg = YAHOO.util.Dom.getClientRegion();
-    if (back_reg.y + back_reg.height + 20 > cl_reg.top + cl_reg.height)
-    {
-      back_el.style.overflow = 'hidden';
-      back_el.style.height = (cl_reg.top + cl_reg.height - back_reg.y - 20) + "px";
-      back_reg = YAHOO.util.Region.getRegion(back_el);
-    }
-
-    if (this.current_td)
-    {
-      YAHOO.util.Dom.setX(tinyifr, back_reg.x -2);
-      YAHOO.util.Dom.setY(tinyifr, back_reg.y -2);
-      this.setEditFrameSize(back_reg.width-2,
-        back_reg.height);
-    }
-    else
-    {
-      if (this.getInsertStatus())
-      {
-        YAHOO.util.Dom.setX(tinyifr, back_reg.x - 1);
-        YAHOO.util.Dom.setY(tinyifr, back_reg.y);
-        this.setEditFrameSize(back_reg.width + 1,
-          back_reg.height);
-      }
-      else
-      {
-        YAHOO.util.Dom.setX(tinyifr, back_reg.x);
-        YAHOO.util.Dom.setY(tinyifr, back_reg.y);
-        this.setEditFrameSize(back_reg.width,
-          back_reg.height);
-      }
-    }
-
-    if (!this.current_td) {
-      this.autoScroll();
-    }
-
-    // force redraw for webkit based browsers (ILIAS chrome bug #0010871)
-    // http://stackoverflow.com/questions/3485365/how-can-i-force-webkit-to-redraw-repaint-to-propagate-style-changes
-    // no feature detection here since we are fixing a webkit bug and IE does not like this patch (starts flickering
-    // on "short" pages)
-    let isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
-    let isSafari = /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor);
-    if (isChrome || isSafari) {
-      back_el.style.display='none';
-      dummy = back_el.offsetHeight;
-      back_el.style.display='';
-    }
-  }
-
-  autoResize(ed) {
-    this.copyInputToGhost(true);
-    this.synchInputRegion();
-  }
-
-  // scrolls position of editor under editor menu
-  autoScroll() {
-    let tiny_reg, menu_reg, cl_reg, diff;
-
-    //var tinyifr = document.getElementById("tinytarget_parent");
-    let tinyifr = document.getElementById("tinytarget_ifr");
-    let menu = document.getElementById('iltinymenu');
-    let fc = document.getElementById('fixed_content');
-
-    if (tinyifr && menu) {
-
-      if ($(fc).css("position") === "static") {
-        tiny_reg = YAHOO.util.Region.getRegion(tinyifr);
-        menu_reg = YAHOO.util.Region.getRegion(menu);
-        //console.log(tiny_reg);
-        //console.log(menu_reg);
-        cl_reg = YAHOO.util.Dom.getClientRegion();
-        //console.log(cl_reg);
-        //console.log(-20 + tiny_reg.y - (menu_reg.height + menu_reg.y - cl_reg.top));
-        window.scrollTo(0, -20 + tiny_reg.y - (menu_reg.height + menu_reg.y - cl_reg.top));
-      } else {
-        diff = Math.floor($(menu).offset().top + $(menu).height()  + 20 - $(tinyifr).offset().top);
-        if (diff > 1 || diff < -1) {
-          $(fc).scrollTop($(fc).scrollTop() - diff);
-        }
-      }
-    }
-  }
 
   updateMenuButtons()
   {
+    return;                                       // characteristic should be set from model
     let ed = tinyMCE.get('tinytarget');
     // update buttons
     let cnode = ed.selection.getNode();
@@ -1388,12 +805,7 @@ export default class ParagraphUI {
     const pcId = this.page_model.getCurrentPCId();
     const pc_model = this.page_model.getPCModel(pcId);
     this.pc_id_str = pcId;
-    const ed = tinyMCE.get('tinytarget');
-    ed.setContent(pc_model.text);
-    this.splitBR();
-    ed.setProgressState(0); // Show progress
-    this.prepareTinyForEditing(false, switched);
-    this.autoResize();
+    this.tinyWrapper.setContent(pc_model.text);
     this.setParagraphClass(pc_model.characteristic);
   }
 
@@ -1621,9 +1033,12 @@ export default class ParagraphUI {
 
   editParagraph(pcId, hierId, mode, switched)
   {
+    console.log("editParagraph");
     let pdiv, pdiv_reg, ins_div, ta_div;
 
     let div_id = hierId + ":" + pcId;
+
+    console.log(div_id);
 
     //	this.setEditStatus(true);
 //    cmd_called = true;
@@ -1632,27 +1047,19 @@ export default class ParagraphUI {
 
     if (mode === 'edit')
     {
-      // get paragraph edit div
-      pdiv = document.getElementById("CONTENT" + div_id);
-      pdiv_reg = YAHOO.util.Region.getRegion(pdiv);
+      this.tinyWrapper.initEdit("CONTENT" + div_id);
+      this.setInsertStatus(false);
     }
 
     if (mode === 'insert')
     {
-      // get placeholder div
-      pdiv = document.getElementById("TARGET" + div_id);
-      let insert_ghost = new YAHOO.util.Element(document.createElement('div'));
-      insert_ghost = YAHOO.util.Dom.insertAfter(insert_ghost, pdiv);
-      insert_ghost.id = "insert_ghost";
-      insert_ghost.style.paddingTop = "5px";
-      insert_ghost.style.paddingBottom = "5px";
-
-      pdiv_reg = YAHOO.util.Region.getRegion(pdiv);
+      this.tinyWrapper.initInsert("TARGET" + div_id);
+      this.setInsertStatus(true);
     }
 
     // table editing mode (td)
     var moved = false;		// is edit area currently move from one td to another?
-    if (mode === 'td')
+    if (mode === 'td')                                                              // MISSING
     {
       // if current_td already set, we must move editor to new td
       if (this.current_td !== "")
@@ -1669,26 +1076,10 @@ export default class ParagraphUI {
       pdiv = document.getElementById('div_' + div_id);
       pdiv_reg = YAHOO.util.Region.getRegion(pdiv);
       this.current_td = div_id;
-    }
-
-
-    // set background "ghost" element
-    if (mode === 'td')
-    {
       this.edit_ghost = "div_" + this.current_td;
-      //this.edit_ghost = "td_" + this.current_td;
-    }
-    else if (mode === 'insert')
-    {
-      this.edit_ghost = "insert_ghost";
-    }
-    else
-    {
-      this.edit_ghost = "CONTENT" + this.ed_para;
     }
 
-
-    if (switched)
+    if (switched)                                                                     // MISSING
     {
       let ta = document.getElementById('tinytarget');
       if (ta != null)
@@ -1696,34 +1087,6 @@ export default class ParagraphUI {
         let ta_par = ta.parentNode;
         ta_par.removeChild(ta);
       }
-    }
-
-    // create new text area for tiny
-    if (!moved)
-    {
-      //var pdiv_width = pdiv_reg.right - pdiv_reg.left;
-      ta_div = new YAHOO.util.Element(document.createElement('div'));
-
-      let ta = new YAHOO.util.Element(document.createElement('textarea'));
-      ta = ta_div.appendChild(ta);
-      ta.id = 'tinytarget';
-      ta.className = 'par_textarea';
-      ta.style.height = '1px';
-
-      if (this.current_td !== "")
-      {
-        // this should be the table
-        ins_div = pdiv.parentNode.parentNode.parentNode.parentNode;
-      }
-      else
-      {
-        ins_div = pdiv;
-      }
-
-      ta_div = YAHOO.util.Dom.insertAfter(ta_div, ins_div);
-      ta_div.id = 'tinytarget_div';
-      ta_div.style.position = 'absolute';
-      ta_div.style.left = '-200px';
     }
 
     // init tiny
@@ -1736,9 +1099,11 @@ export default class ParagraphUI {
 
     let par_ui = this;
 
+    // create new text area for tiny
     if (!moved)
     {
-      this.tinyWrapper.init();
+      this.showToolbar();
+      this.updateMenuButtons();
       this.tinyinit = true;
       return;
 
@@ -2211,7 +1576,7 @@ export default class ParagraphUI {
   //
 
   // copied from TinyMCE editor_template_src.js
-  showToolbar(ed_id) {
+  showToolbar() {
     let obj;
 
     //#0017152

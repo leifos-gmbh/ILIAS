@@ -27,6 +27,11 @@ class ilCDTestSaverInit extends ilInitialisation
         self::initHTTPServices($GLOBALS["DIC"]);
         self::initClient();
 
+        //self::initSession();
+        //self::initUser();
+        //self::resumeUserSession();
+
+
         /*$this->initIliasIniFile();
 		$this->determineClient();
 		$this->initClientIniFile();

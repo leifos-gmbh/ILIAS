@@ -9,9 +9,60 @@
  * @version $Id$
  * @ingroup 
  */
-class ilCDTestSaver
+class ilCDTestSaver implements ilMailMimeSender
 {
-	/**
+    /**
+     * @return bool
+     */
+     public function hasReplyToAddress() {
+        return false;
+     }
+
+    /**
+     * @return string
+     */
+    public function getReplyToAddress() {
+        return "";
+    }
+
+    /**
+     * @return string
+     */
+    public function getReplyToName() {
+        return "";
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasEnvelopFromAddress() {
+        return false;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEnvelopFromAddress() {
+        return "";
+    }
+
+    /**
+     * @return string
+     */
+    public function getFromAddress() {
+        global $ilSetting;
+        return $ilSetting->get("admin_email");
+    }
+
+    /**
+     * @return string
+     */
+    public function getFromName() {
+        global $ilSetting;
+        return $ilSetting->get("admin_email");
+    }
+
+    /**
 	 * saveTestResults
 	 *
 	 * @param
@@ -19,7 +70,7 @@ class ilCDTestSaver
 	 */
 	static function saveTestResults()
 	{
-		global $ilDB, $ilSetting;
+		global $ilDB, $ilSetting, $DIC;
 		
 		$sess_id  = $_POST['user_id'];
 		$data = $_POST;
@@ -28,7 +79,7 @@ class ilCDTestSaver
 			" session_id = ".$ilDB->quote($sess_id, "text")
 		);
 		$rec = $ilDB->fetchAssoc($set);
-		//$rec = array("user_id" => 253, "session_id" => "14af7e99b461aabe43aaac572624ef40");
+//		$rec = array("user_id" => 253, "session_id" => "6349179172610e5e381f2e77dc038ab2");
 		if ($rec)
 		{
 			$set2 = $ilDB->query("SELECT * FROM usr_session WHERE ".
@@ -43,7 +94,7 @@ class ilCDTestSaver
 					"expires" => array("integer", time() + 3600),
 					"ctime" => array("integer", time()),
 					"user_id" => array("integer", $rec["user_id"]),
-					"last_remind_ts" => array("integer", $rec2["last_remind_ts"]),
+					"last_remind_ts" => array("integer", (int) $rec2["last_remind_ts"]),
 					"type" => array("integer", $rec2["type"]),
 					"createtime" => array("integer", $rec2["createtime"]),
 					"remote_addr" => array("text", $rec2["remote_addr"])
@@ -85,15 +136,21 @@ class ilCDTestSaver
 			$set4 = $ilDB->query("SELECT * FROM usr_data ".
 				" WHERE usr_id = ".$ilDB->quote($rec3["creation_user"], "integer"));
 			$rec4 = $ilDB->fetchAssoc($set4);
-			
-			
+
+//            $rec4["email"] = "alex.killing@gmx.de";
 			
 			if ($rec4["email"] != "")
 			{
+			    // set dic user to root
+                $set5 = $ilDB->query("SELECT * FROM usr_data ".
+                    " WHERE login = ".$ilDB->quote("root", "text"));
+                $rec5 = $ilDB->fetchAssoc($set5);
+                $DIC["ilUser"] = new ilObjUser($rec5["usr_id"]);
+
 				// send mail to owner of component
 				include_once("./Services/Mail/classes/class.ilMimeMail.php");
 				$m = new ilMimeMail();
-				$m->From($ilSetting->get("admin_email"));
+				$m->From(new ilCDTestSaver());
 				$m->To($rec4["email"]);
 				// über $m->Cc($rec4["email"]);
 				$m->Subject("Carl Duisberg Teilnehmerportal: Neue Einstufung abgeschlossen.");	

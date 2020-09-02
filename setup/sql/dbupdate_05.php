@@ -4451,3 +4451,14 @@ if (!$ilDB->tableColumnExists('skl_user_has_level', 'next_level_fulfilment')) {
     ));
 }
 ?>
+<#5678>
+<?php
+if (!$ilDB->tableColumnExists("skl_profile", "ref_id")) {
+    $ilDB->addTableColumn("skl_profile", "ref_id", array(
+        "type" => "integer",
+        "notnull" => true,
+        "default" => 0,
+        "length" => 4
+    ));
+}
+?>

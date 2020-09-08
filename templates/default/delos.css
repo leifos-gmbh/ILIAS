@@ -15701,6 +15701,16 @@ div.ilSurveyPageEditActionMenu {
   float: right;
   margin: 3px;
 }
+.il-svy-qst-compressed .questionTitle {
+  display: none;
+}
+.il-svy-qst-compressed tr:first-child {
+  visibility: hidden;
+  height: 1px;
+}
+.il-svy-qst-compressed table {
+  margin-top: -50px;
+}
 /* Modules/MediaPool */
 #ilMepPreviewContent {
   margin: 0;

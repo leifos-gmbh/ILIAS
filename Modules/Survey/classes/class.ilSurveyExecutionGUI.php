@@ -500,6 +500,11 @@ class ilSurveyExecutionGUI
                 $this->tpl->setVariable("TEXT_QUESTIONBLOCK_TITLE", $page[0]["questionblock_title"]);
                 $this->tpl->parseCurrentBlock();
             }
+            $compress_view = false;
+            if (count($page) > 1) {
+                $compress_view = $page[0]["questionblock_compress_view"];
+            }
+            $previous_page = null;
             foreach ($page as $data) {
                 $this->tpl->setCurrentBlock("survey_content");
                 if ($data["heading"]) {
@@ -520,13 +525,17 @@ class ilSurveyExecutionGUI
                     $error_messages = $_SESSION["svy_errors"];
                 }
                 $show_questiontext = ($data["questionblock_show_questiontext"]) ? 1 : 0;
-                $question_output = $question_gui->getWorkingForm($working_data, $this->object->getShowQuestionTitles(), $show_questiontext, $error_messages[$data["question_id"]], $this->object->getSurveyId());
+                $question_output = $question_gui->getWorkingForm($working_data, $this->object->getShowQuestionTitles(), $show_questiontext, $error_messages[$data["question_id"]], $this->object->getSurveyId(), $compress_view);
+                if ($this->compressQuestion($previous_page, $data)) {
+                    $question_output = '<div class="il-svy-qst-compressed">'.$question_output.'</div>';
+                }
                 $this->tpl->setVariable("QUESTION_OUTPUT", $question_output);
                 $this->ctrl->setParameter($this, "qid", $data["question_id"]);
                 $this->tpl->parse("survey_content");
                 if ($data["obligatory"]) {
                     $required = true;
                 }
+                $previous_page = $data;
             }
             if ($required) {
                 $this->tpl->setCurrentBlock("required");
@@ -544,7 +553,29 @@ class ilSurveyExecutionGUI
             $this->object->setStartTime($_SESSION["finished_id"][$this->object->getId()], $first_question);
         }
     }
-    
+
+    /**
+     *
+     * @param array $previous_page
+     * @param array $page
+     * @return bool
+     */
+    protected function compressQuestion($previous_page, $page)
+    {
+        if (!$previous_page) {
+            return false;
+        }
+
+        if ($previous_page["type_tag"] === $page["type_tag"] &&
+            $page["type_tag"] === "SurveySingleChoiceQuestion") {
+            if (SurveySingleChoiceQuestion::compressable($previous_page["question_id"], $page["question_id"])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
     * Save the user's input
     *

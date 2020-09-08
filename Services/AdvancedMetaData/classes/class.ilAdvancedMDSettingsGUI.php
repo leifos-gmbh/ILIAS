@@ -14,6 +14,9 @@ class ilAdvancedMDSettingsGUI
     public const CONTEXT_ADMINISTRATION = 1;
     public const CONTEXT_OBJECT = 2;
 
+    protected const TAB_RECORD_SETTINGS = 'editRecord';
+    protected const TAB_TRANSLATION = 'translations';
+
     /**
      * Active settings mode
      * @var null|int
@@ -23,6 +26,10 @@ class ilAdvancedMDSettingsGUI
 
     protected $lng;
     protected $tpl;
+
+    /**
+     * @var
+     */
     protected $ctrl;
 
     /**
@@ -109,6 +116,14 @@ class ilAdvancedMDSettingsGUI
         $next_class = $this->ctrl->getNextClass($this);
         $cmd = $this->ctrl->getCmd();
         switch ($next_class) {
+
+            case strtolower(ilAdvancedMDRecordTranslationGUI::class):
+                $record = $this->initRecordObject();
+                $this->setRecordSubTabs(1,true);
+                $int_gui = new \ilAdvancedMDRecordTranslationGUI($record);
+                $this->ctrl->forwardCommand($int_gui);
+                break;
+
             case "ilpropertyformgui":
                 $this->initRecordObject();
                 $this->initForm(
@@ -717,7 +732,8 @@ class ilAdvancedMDSettingsGUI
      */
     public function editRecord()
     {
-        $this->setRecordSubTabs();
+        $this->setRecordSubTabs(1,true);
+        $this->tabs_gui->activateTab(self::TAB_RECORD_SETTINGS);
         $this->ctrl->saveParameter($this, 'record_id');
         $this->initRecordObject();
         $this->initForm('edit');
@@ -906,7 +922,7 @@ class ilAdvancedMDSettingsGUI
     /**
      * Set subtabs for record editing/creation
      */
-    protected function setRecordSubTabs(int $level = 1)
+    protected function setRecordSubTabs(int $level = 1, bool $show_settings = false)
     {
         $this->tabs_gui->clearTargets();
         $this->tabs_gui->clearSubTabs();
@@ -916,6 +932,30 @@ class ilAdvancedMDSettingsGUI
                 $this->lng->txt('md_adv_record_list'),
                 $this->ctrl->getLinkTarget($this,'showRecords')
             );
+
+            if ($show_settings) {
+
+                $record = $this->initRecordObject();
+
+                $this->tabs_gui->addTab(
+                    self::TAB_RECORD_SETTINGS,
+                    $this->lng->txt('settings'),
+                    $this->ctrl->getLinkTarget($this, self::TAB_RECORD_SETTINGS)
+                );
+                $this->ctrl->setParameterByClass(
+                    strtolower(\ilAdvancedMDRecordTranslationGUI::class),
+                    'record_id',
+                    $record->getRecordId()
+                );
+                $this->tabs_gui->addTab(
+                    self::TAB_TRANSLATION,
+                    $this->lng->txt('translation'),
+                    $this->ctrl->getLinkTargetByClass(
+                        strtolower(\ilAdvancedMDRecordTranslationGUI::class),
+                        ''
+                    )
+                );
+            }
         }
         if ($level == 2) {
             $this->tabs_gui->setBack2Target(
@@ -1697,6 +1737,7 @@ class ilAdvancedMDSettingsGUI
      * Init record object
      *
      * @access protected
+     * @return ilAdvancedMDRecord
      */
     protected function initRecordObject()
     {
@@ -1705,6 +1746,7 @@ class ilAdvancedMDSettingsGUI
                 ? $_GET['record_id']
                 : 0;
             $this->record = ilAdvancedMDRecord::_getInstanceByRecordId($record_id);
+            $this->ctrl->saveParameter($this,'record_id');
             
             // bind to parent object (aka local adv md)
             if (!$record_id &&

@@ -3851,4 +3851,15 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
     {
         $this->ctrl->setReturn($this, "");
     }
+
+    /**
+     * Redirect to competences
+     */
+    public function competencesObject()
+    {
+        $ctrl = $this->ctrl;
+
+        $ctrl->redirectByClass(["ilContainerSkillGUI", "ilContSkillPresentationGUI"]);
+    }
+
 }

@@ -5,9 +5,11 @@ const ACTIONS = {
   // query actions (being sent to the server to "ask for stuff")
 
   // command actions (being sent to the server to "change things")
+  INSERT: "insert",                        // inserts paragraph
+  UPDATE: "update",                        // update paragraph
 
   // editor actions (things happening in the editor client side)
-  PAR_CANCEL: "par.cancel",           // cancel paragraph editing
+  PARAGRAPH_CLASS: "par.class",    // paragraph class
   SELECTION_FORMAT: "selection.format",    // format character
   SELECTION_REMOVE_FORMAT: "selection.removeFormat",
   SELECTION_KEYWORD: "selection.keyword",
@@ -22,6 +24,7 @@ const ACTIONS = {
   LINK_INTERNAL: "link.internal",
   LINK_EXTERNAL: "link.external",
   LINK_USER: "link.user",
+  SAVE_RETURN: "save.return",
 
 };
 export default ACTIONS;

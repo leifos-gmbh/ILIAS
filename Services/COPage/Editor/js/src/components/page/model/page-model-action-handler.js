@@ -1,5 +1,6 @@
 /* Copyright (c) 1998-2020 ILIAS open source, Extended GPL, see docs/LICENSE */
 
+
 /**
  * Model action handler
  */
@@ -68,10 +69,34 @@ export default class ModelActionHandler {
         }
         break;
 
-      case "edit.open":
+      case "component.edit":
         this.model.setState(this.model.STATE_COMPONENT);
-        this.model.setCurrentPageComponent(params.pcid, params.hierid);
+        this.model.setComponentState(this.model.STATE_COMPONENT_EDIT);
+        this.model.setCurrentPageComponent(params.cname, params.pcid, params.hierid);
+
+        this.model.setUndoPCModel(
+          this.model.getCurrentPCId(),
+          this.model.getPCModel(this.model.getCurrentPCId())
+        );
         break;
+
+      case "component.insert":
+        this.model.setState(this.model.STATE_COMPONENT);
+        this.model.setComponentState(this.model.STATE_COMPONENT_INSERT);
+        this.model.setCurrentInsertPCId(params.pcid);   // insert after...
+        const pcid = this.model.getNewPCId();
+        this.model.setCurrentPageComponent(params.cname, pcid, '');
+        break;
+
+      case "component.cancel":
+        this.model.undoPCModel(
+          this.model.getCurrentPCId()
+        );
+        this.model.setState(this.model.STATE_PAGE);
+        // note: we keep the component state and current component here, so that handlers
+        // can use this
+        break;
+
     }
   }
 }

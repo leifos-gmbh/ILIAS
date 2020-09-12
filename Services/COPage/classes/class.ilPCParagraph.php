@@ -1343,14 +1343,14 @@ class ilPCParagraph extends ilPageContent
         } else {
             $par = $a_pg_obj->getContentObject($pc_id[0], $pc_id[1]);
         }
-
+/*
         if ($a_insert_at != "") {
             $pc_id = $a_pg_obj->generatePCId();
             $par->writePCId($pc_id);
             $this->inserted_pc_id = $pc_id;
         } else {
             $this->inserted_pc_id = $pc_id[1];
-        }
+        }*/
 
         $par->setLanguage($ilUser->getLanguage());
         $par->setCharacteristic($t["class"]);
@@ -2040,6 +2040,64 @@ class ilPCParagraph extends ilPageContent
         $model->text = $s_text;
 
         return $model;
+    }
+
+    /**
+     * Save input coming from ajax
+     *
+     * @param
+     * @return
+     */
+    public function insert(\ilPageObject $page, $a_content, $a_char, $a_pc_id, $a_insert_at = "")
+    {
+        $ilUser = $this->user;
+
+        $this->log->debug("step 1: " . substr($a_content, 0, 1000));
+        $t = self::handleAjaxContent($a_content);
+        $this->log->debug("step 2: " . substr($t["text"], 0, 1000));
+        if ($t === false) {
+            return false;
+        }
+
+        $pc_id = explode(":", $a_pc_id);
+        $insert_at = explode(":", $a_insert_at);
+        $t_id = explode(":", $t["id"]);
+
+        // insert new paragraph
+        if ($a_insert_at != "") {
+            $par = new ilPCParagraph($this->getPage());
+            $par->create($page, $insert_at[0], $insert_at[1]);
+        } else {
+            $par = $a_pg_obj->getContentObject($pc_id[0], $pc_id[1]);
+        }
+
+        if ($a_insert_at != "") {
+            $pc_id = $a_pg_obj->generatePCId();
+            $par->writePCId($pc_id);
+            $this->inserted_pc_id = $pc_id;
+        } else {
+            $this->inserted_pc_id = $pc_id[1];
+        }
+
+        $par->setLanguage($ilUser->getLanguage());
+        $par->setCharacteristic($t["class"]);
+
+        $t2 = $par->input2xml($t["text"], true, false);
+        $this->log->debug("step 3: " . substr($t2, 0, 1000));
+
+        $t2 = ilPCParagraph::handleAjaxContentPost($t2);
+        $this->log->debug("step 4: " . substr($t2, 0, 1000));
+
+        $updated = $par->setText($t2, true);
+
+        if ($updated !== true) {
+            echo $updated;
+            exit;
+            return false;
+        }
+        $updated = $par->updatePage($a_pg_obj);
+        //$updated = $a_pg_obj->update();
+        return $updated;
     }
 
 }

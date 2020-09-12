@@ -7,6 +7,8 @@ import ACTIONS from "./page-action-types.js";
  */
 export default class PageCommandActionFactory {
 
+  COMPONENT = "Page";
+
   /**
    * @type {ClientActionFactory}
    */

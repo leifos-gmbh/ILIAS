@@ -9,7 +9,7 @@ import ACTIONS from "./paragraph-action-types.js";
  */
 export default class ParagraphEditorActionFactory {
 
-  COMPONENT = "par";
+  COMPONENT = "Paragraph";
 
   /**
    * @type {EditorActionFactory}
@@ -22,13 +22,6 @@ export default class ParagraphEditorActionFactory {
    */
   constructor(editorActionFactory) {
     this.editorActionFactory = editorActionFactory;
-  }
-
-  /**
-   * @returns {EditorAction}
-   */
-  cancel() {
-    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.PAR_CANCEL);
   }
 
   /**
@@ -130,4 +123,25 @@ export default class ParagraphEditorActionFactory {
   linkUser() {
     return this.editorActionFactory.action(this.COMPONENT, ACTIONS.LINK_USER);
   }
+
+  /**
+   * @returns {EditorAction}
+   */
+  saveReturn(text, characteristic) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.SAVE_RETURN, {
+        text: text,
+        characteristic: characteristic
+      });
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  paragraphClass(characteristic) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.PARAGRAPH_CLASS, {
+      characteristic: characteristic
+    });
+  }
+
+
 }

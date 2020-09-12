@@ -13,8 +13,9 @@ const ACTIONS = {
   // editor actions (things happening in the editor client side)
   DND_DRAG: "dnd.drag",           // start dragging
   DND_DROP: "dnd.drop",           // dropping
-  CREATE_ADD: "create.add",       // hit add link in add dropdown
-  EDIT_OPEN: "edit.open",         // hit componet for editing, opens form in slate or legacy view
+  COMPONENT_INSERT: "component.insert",       // hit add link in add dropdown
+  COMPONENT_EDIT: "component.edit",         // hit component for editing, opens form in slate or legacy view
+  COMPONENT_CANCEL: "component.cancel",         // components cancel button is pressed
   MULTI_TOGGLE: "multi.toggle",   // toggle an element for multi selection
   MULTI_ACTION: "multi.action",   // perform multi action
 

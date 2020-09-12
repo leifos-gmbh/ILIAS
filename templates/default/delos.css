@@ -12410,6 +12410,11 @@ body.mceContentBody {
 body#tinymce {
   background-color: white;
 }
+html.il-no-tiny-bg body#tinymce {
+  background-color: transparent;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
 .ilHidden {
   visibility: hidden;
 }
@@ -14318,7 +14323,8 @@ div.il_editarea {
   border: 2px solid transparent;
   min-height: 20px;
 }
-div.il_editarea:hover {
+div.il_editarea:hover,
+#tinytarget_ifr {
   border: 2px solid #4c6586;
 }
 div.ilc_page_Page > div.il_editarea_disabled {
@@ -14739,12 +14745,14 @@ div.ilCOPGMediaPrint {
   margin: 0;
   border: 0;
 }
-#ilAdvSelListTable_style_selection,
-#ilTinyMenuButtons ul.dropdown-menu {
+.ilTinyParagraphClassSelector ul.dropdown-menu {
   right: auto;
 }
 #iltinymenu .dropdown-menu li {
   padding: 0;
+}
+#tinytarget_ifr > body#tinymce {
+  background-color: inherit;
 }
 /* Services/Calendar */
 td.even {
@@ -19396,3 +19404,4 @@ table.mceToolbar td {
   border: 1px solid #ddd;
   border-radius: 0.25em;
 }
+/*# sourceMappingURL=delos.css.map */

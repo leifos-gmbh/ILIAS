@@ -5,10 +5,10 @@
 namespace ILIAS\COPage\Editor\Server;
 
 /**
- *
+ * Command action handler interface
  * @author Alexander Killing <killing@leifos.de>
  */
-interface ActionHandler
+interface CommandActionHandler
 {
     /**
      * @param $query

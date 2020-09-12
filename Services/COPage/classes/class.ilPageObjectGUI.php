@@ -1799,7 +1799,6 @@ class ilPageObjectGUI
         // should be modularized
         include_once("./Services/COPage/classes/class.ilPCSection.php");
         $md5_adds = ilPCSection::getCacheTriggerString($this->getPageObject());
-
         // run xslt
         $md5 = md5(serialize($params) . $link_xml . $template_xml . $md5_adds);
         
@@ -2328,20 +2327,12 @@ class ilPageObjectGUI
 
 
         if ($a_paragraph_styles) {
+            $sel = new \ILIAS\COPage\Editor\Components\Paragraph\ParagraphStyleSelector($ui_wrapper);
+            $dd = $sel->getStyleSelector("", ilPCParagraphGUI::_getCharacteristics($a_style_id));
             $btpl->setCurrentBlock("par_edit");
             $btpl->setVariable("TXT_PAR_FORMAT", $lng->txt("cont_par_format"));
-            include_once("./Services/COPage/classes/class.ilPCParagraphGUI.php");
-            $btpl->setVariable("STYLE_SELECTOR", ilPCParagraphGUI::getStyleSelector(
-                "",
-                ilPCParagraphGUI::_getCharacteristics($a_style_id),
-                false
-            ));
-            
-            ilTooltipGUI::addTooltip(
-                "ilAdvSelListAnchorText_style_selection",
-                $lng->txt("cont_paragraph_styles"),
-                "iltinymenu_bd"
-            );
+
+            $btpl->setVariable("STYLE_SELECTOR", $ui->renderer()->render($dd));
 
             $btpl->parseCurrentBlock();
         }
@@ -2349,60 +2340,11 @@ class ilPageObjectGUI
 
         include_once("./Services/UIComponent/AdvancedSelectionList/classes/class.ilAdvancedSelectionListGUI.php");
 
-        $split_button = ilSplitButtonGUI::getInstance();
-        $split_button->isPrimary(true);
-        $split_button_items = [];
-
-
-        $sdd = new ilAdvancedSelectionListGUI();
-        $sdd->setPullRight(false);
-        $sdd->setListTitle($lng->txt("save") . "...");
-
-        if ($a_save_return) {
-            //$btpl->setCurrentBlock("save_return");
-            //$btpl->setVariable("TXT_SAVE_RETURN", $lng->txt("save_return"));
-            //$btpl->parseCurrentBlock();
-            $sdd->addItem($lng->txt("save_return"), "", "#", "", "", "", "", "", "ilCOPage.cmdSaveReturn(false); return false;");
-
-            $item = ilLinkButton::getInstance();
-            $item->setCaption('save_return');
-            $item->setOnClick("ilCOPage.cmdSaveReturn(false); return false;");
-            $split_button_items[] = $item;
-        }
-
-        if ($a_save_new) {
-            //$btpl->setCurrentBlock("save_new");
-            //$btpl->setVariable("TXT_SAVE_NEW", $lng->txt("save_new"));
-            //$btpl->parseCurrentBlock();
-            $sdd->addItem($lng->txt("save_new"), "", "#", "", "", "", "", "", "ilCOPage.cmdSaveReturn(true); return false;");
-            $item = ilLinkButton::getInstance();
-            $item->setCaption('save_new');
-            $item->setOnClick("ilCOPage.cmdSaveReturn(true); return false;");
-            $split_button_items[] = $item;
-        }
-
-        $sdd->addItem($lng->txt("save"), "", "#", "", "", "", "", "", "ilCOPage.cmdSave(null); return false;");
-        $item = ilLinkButton::getInstance();
-        $item->setCaption('save');
-        $item->setOnClick("ilCOPage.cmdSave(null); return false;");
-        $split_button_items[] = $item;
-
-        $sdd->addItem($lng->txt("cancel"), "", "#", "", "", "", "", "", "ilCOPage.cmdCancel(); return false;");
-
-        $first = true;
-        foreach ($split_button_items as $item) {
-            if ($first) {
-                $item->setPrimary(true);
-                $split_button->setDefaultButton($item);
-            } else {
-                $split_button->addMenuItem(new ilButtonToSplitButtonMenuItemAdapter($item));
-            }
-            $first = false;
-        }
-        $btpl->setVariable("SPLIT_BUTTON", $split_button->render());
+        $btpl->setVariable("SPLIT_BUTTON",
+            $ui_wrapper->getRenderedButton($lng->txt("save_return"), "par-action", "save.return"));
 
         $btpl->setVariable("CANCEL_BUTTON",
-            $ui_wrapper->getRenderedButton($lng->txt("cancel"), "par-action", "par.cancel"));
+            $ui_wrapper->getRenderedButton($lng->txt("cancel"), "par-action", "component.cancel"));
 
         $btpl->setVariable("TXT_SAVING", $lng->txt("cont_saving"));
         

@@ -2,15 +2,15 @@
 
 /* Copyright (c) 1998-2020 ILIAS open source, Extended GPL, see docs/LICENSE */
 
-namespace ILIAS\COPage\Editor\Server;
+namespace ILIAS\COPage\Editor\Components\Page;
 
 use ILIAS\DI\Exceptions\Exception;
-use test\Mockery\Adapter\Phpunit\MockeryPHPUnitIntegrationTest;
+use ILIAS\COPage\Editor\Server;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
  */
-class UIActionHandler implements ActionHandler
+class PageQueryActionHandler implements Server\QueryActionHandler
 {
     /**
      * @var \ILIAS\DI\UIServices
@@ -33,7 +33,7 @@ class UIActionHandler implements ActionHandler
     protected $user;
 
     /**
-     * @var UIWrapper
+     * @var Server\UIWrapper
      */
     protected $ui_wrapper;
 
@@ -46,15 +46,15 @@ class UIActionHandler implements ActionHandler
         $this->page_gui = $page_gui;
         $this->user = $DIC->user();
 
-        $this->ui_wrapper = new UIWrapper($this->ui, $this->lng);
+        $this->ui_wrapper = new Server\UIWrapper($this->ui, $this->lng);
     }
 
     /**
      * @param $query
      * @param $body
-     * @return Response
+     * @return Server\Response
      */
-    public function handle($query, $body) : Response
+    public function handle($query) : Server\Response
     {
         $action = explode(".", $query["action"]);
         if ($action[0] === "ui") {
@@ -72,7 +72,7 @@ class UIActionHandler implements ActionHandler
      * @param
      * @return
      */
-    protected function allCommand() : Response
+    protected function allCommand() : Server\Response
     {
         $f = $this->ui->factory();
         $dd = $f->dropdown()->standard([
@@ -87,7 +87,8 @@ class UIActionHandler implements ActionHandler
         $o->config = $this->getConfig();
         $o->components = $this->getComponentsEditorUI();
         $o->pcModel = $this->getPCModel();
-        return new Response($o);
+        $o->pcDefinition = $this->getComponentsDefinitions();
+        return new Server\Response($o);
     }
 
     /**
@@ -220,6 +221,19 @@ class UIActionHandler implements ActionHandler
             }
         }
         return $ui;
+    }
+
+    /**
+     * Get components ui elements
+     * @return array
+     */
+    protected function getComponentsDefinitions() {
+        $pcdef = [];
+        foreach (\ilCOPagePCDef::getPCDefinitions() as $def) {
+            $pcdef["types"][$def["name"]] = $def["pc_type"];
+            $pcdef["names"][$def["pc_type"]] = $def["name"];
+        }
+        return $pcdef;
     }
 
 }

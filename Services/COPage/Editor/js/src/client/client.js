@@ -7,6 +7,11 @@ import FormWrapper from './form-wrapper.js';
 export default class Client {
 
   /**
+   * @type {boolean}
+   */
+  debug = true;
+
+  /**
    * @type {string}
    */
   query_endpoint;
@@ -41,12 +46,22 @@ export default class Client {
   }
 
   /**
+   * @param message
+   */
+  log(message) {
+    if (this.debug) {
+      console.log(message);
+    }
+  }
+
+  /**
    * Send query action
    * @param {QueryAction} query_action
    * @returns {Promise}
    */
   sendQuery(query_action) {
-
+    this.log("client.sendQuery");
+    this.log(query_action);
     return new Promise((resolve, reject) => {
       let params = {
         action_id: query_action.getId(),
@@ -56,6 +71,8 @@ export default class Client {
       params = Object.assign(params, query_action.getParams());
       FetchWrapper.getJson(this.query_endpoint, params)
       .then(response => {
+        this.log("client.sendQuery, response:");
+        this.log(response);
         // note that fetch.json() returns yet another promise
         response.json().then(json =>
           resolve(this.response_factory.response(query_action, json))
@@ -69,7 +86,9 @@ export default class Client {
    * @param {CommandAction} command_action
    * @returns {Promise}
    */
-  sendCommmand(command_action) {
+  sendCommand(command_action) {
+    this.log("client.sendCommand");
+    this.log(command_action);
 
     return new Promise((resolve, reject) => {
 
@@ -78,11 +97,14 @@ export default class Client {
         component: command_action.getComponent(),
         action: command_action.getType(),
         data: command_action.getParams()
-      }).then(response => resolve(
-        this.response_factory.response(command_action, response.json())
-      ))
-      .catch(err => reject(err));
-
+      }).then(response => {
+        this.log("client.sendCommand, response:");
+        this.log(response);
+        // note that fetch.json() returns yet another promise
+        response.json().then(json =>
+          resolve(this.response_factory.response(command_action, json))
+        ).catch(err => reject(err));
+      }).catch(err => reject(err));
     });
   }
 
@@ -96,6 +118,9 @@ export default class Client {
     if (data['cmd']) {
       data["cmd[" + data['cmd'] + "]"] = "-";
     }
+
+    this.log("client.sendForm " + this.form_action);
+    this.log(data);
 
     FormWrapper.postForm(this.form_action, data);
   }

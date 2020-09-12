@@ -51,18 +51,27 @@ export default class UI {
   toolSlate;
 
   /**
+   * @type {pageModifier}
+   */
+  pageModifier;
+
+  /**
    * @param {Client} client
    * @param {Dispatcher} dispatcher
    * @param {ActionFactory} actionFactory
    * @param {Model} model
    * @param {ToolSlate} toolSlate
+   * @param {PageModifer} pageModifer
    */
-  constructor(client, dispatcher, actionFactory, model, toolSlate) {
+  constructor(client, dispatcher, actionFactory, model, toolSlate,
+              pageModifer) {
     this.client = client;
     this.dispatcher = dispatcher;
     this.actionFactory = actionFactory;
     this.model = model;
     this.toolSlate = toolSlate;
+    this.pageModifer = pageModifer;
+
     // @todo we need a ui factory here...
     this.page = new PageUI(
       this.client,
@@ -75,7 +84,17 @@ export default class UI {
       this.dispatcher,
       this.actionFactory,
       this.model.model("page"),
-      this.toolSlate);
+      this.toolSlate,
+      this.pageModifer);
+
+    this.pageModifer.setPageUI(this.page);
+  }
+
+  /**
+   * @return {PageUI}
+   */
+  getPageUI() {
+    return this.page;
   }
 
   //

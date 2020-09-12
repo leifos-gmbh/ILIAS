@@ -1,7 +1,9 @@
 import ACTIONS from "../actions/paragraph-action-types.js";
+import PAGE_ACTIONS from "../../page/actions/page-action-types.js";
 import TinyWrapper from "./tiny-wrapper.js";
 
 /* Copyright (c) 1998-2020 ILIAS open source, Extended GPL, see docs/LICENSE */
+
 
 /**
  * paragraph ui
@@ -52,6 +54,11 @@ export default class ParagraphUI {
   tinyWrapper;
 
   /**
+   * @type {pageModifier}
+   */
+  pageModifier;
+
+  /**
    * @type {Object}
    */
   text_formats = {
@@ -72,13 +79,14 @@ export default class ParagraphUI {
    * @param {PageModel} page_model
    * @param {ToolSlate} toolSlate
    */
-  constructor(client, dispatcher, actionFactory, page_model, toolSlate) {
+  constructor(client, dispatcher, actionFactory, page_model, toolSlate, pageModifier) {
     this.client = client;
     this.dispatcher = dispatcher;
     this.actionFactory = actionFactory;
     this.page_model = page_model;
     this.toolSlate = toolSlate;
     this.tinyWrapper = new TinyWrapper();
+    this.pageModifier = pageModifier;
   }
 
   //
@@ -134,7 +142,7 @@ export default class ParagraphUI {
       switch (parButton.dataset.paction) {
         case "cancel":
           parButton.addEventListener("click", (event) => {
-            dispatch.dispatch(action.paragraph().editor().cancel());
+            dispatch.dispatch(action.page().editor().componentCancel());
           });
           break;
       }
@@ -363,80 +371,39 @@ export default class ParagraphUI {
 
   cmdCancel()
   {
-    let ed = tinyMCE.get('tinytarget');
-    this.autoResize(ed);
-    this.setEditStatus(false);
-    this.setInsertStatus(false);
-    this.copyInputToGhost(false);
-    this.removeTiny();
-  }
+    const pcId = this.page_model.getCurrentPCId();
+    const undo_pc_model = this.page_model.getUndoPCModel(pcId);
 
-  setCharacterClass(i)
-  {
-    switch (i.hid_val)
-    {
-      case "Quotation":
-      case "Comment":
-      case "Accent":
-        this.cmdSpan(i.hid_val);
-        break;
-
-      case "Code":
-        this.cmdCode();
-        break;
-
-      default:
-        this.cmdSpan(i.hid_val);
-        break;
+    if (this.page_model.getComponentState() === this.page_model.STATE_COMPONENT_EDIT) {
+      this.setParagraphClass(undo_pc_model.characteristic);
+      this.tinyWrapper.setContent(
+        undo_pc_model.text,
+        undo_pc_model.characteristic
+      );
     }
-    return false;
+
+    let ed = tinyMCE.get('tinytarget');
+    //this.autoResize(ed);
+    this.tinyWrapper.copyInputToGhost(false);
+    //this.tinyWrapper.removeTiny();
+    this.tinyWrapper.hide();
   }
 
-  cmdSpan(t)
-  {
+  cmdSpan(t) {
+    this.log("paragraph-ui.cmdSpan " + t);
     this.tinyWrapper.toggleFormat(t);
   }
 
-  cmdCode()
-  {
-    let ed = tinyMCE.get('tinytarget');
-
-    tinymce.activeEditor.formatter.register('mycode', {
-      inline : 'code'
-    });
-    ed.execCommand('mceToggleFormat', false, 'mycode');
-    this.autoResize(ed);
+  cmdSup() {
+    this.tinyWrapper.toggleFormat('Sup');
   }
 
-  cmdSup()
-  {
-    let ed = tinyMCE.get('tinytarget');
-
-    ed.execCommand('mceToggleFormat', false, 'Sup');
-    this.autoResize(ed);
+  cmdSub() {
+    this.tinyWrapper.toggleFormat('Sub');
   }
 
-  cmdSub()
-  {
-    let ed = tinyMCE.get('tinytarget');
-
-    ed.execCommand('mceToggleFormat', false, 'Sub');
-    this.autoResize(ed);
-  }
-
-  cmdRemoveFormat()
-  {
-    let ed = tinyMCE.get('tinytarget');
-    ed.focus();
-    ed.execCommand('RemoveFormat', false);
-    this.autoResize(ed);
-  }
-
-  cmdPasteWord()
-  {
-    let ed = tinyMCE.get('tinytarget');
-    ed.focus();
-    ed.execCommand('mcePasteWord');
+  cmdRemoveFormat() {
+    this.tinyWrapper.removeFormat();
   }
 
   cmdIntLink(b, e, content)
@@ -587,7 +554,12 @@ export default class ParagraphUI {
   }
 
   setParagraphClass(i) {
-    document.getElementById("ilAdvSelListAnchorText_style_selection").firstChild.textContent = i + " ";
+    this.log("setParagraphClass");
+    this.log(i);
+    const fc = document.querySelector(".ilTinyParagraphClassSelector .dropdown button");
+    if (fc) {
+      fc.firstChild.textContent = i + " ";
+    }
     this.tinyWrapper.setParagraphClass(i);
   }
 
@@ -1031,31 +1003,41 @@ export default class ParagraphUI {
   }
 
 
+  insertParagraph(pcid, after_pcid) {
+    this.log("paragraph-ui.insertParagraph");
+    this.pageModifier.insertComponentAfter(after_pcid, pcid, "Paragraph", "", "Paragraph");
+    let content_el = document.querySelector("[data-copg-ed-type='pc-area'][data-pcid='" + pcid + "']");
+    this.tinyWrapper.initInsert(content_el);
+    //this.setInsertStatus(true);
+    this.showToolbar();
+    this.setParagraphClass("Standard");
+    this.updateMenuButtons();
+    this.tinyinit = true;
+  }
+
+  handleSaveOnInsert() {
+    this.tinyWrapper.copyInputToGhost(false);
+    this.tinyWrapper.hide();
+  }
+
+  handleSaveOnEdit() {
+    this.handleSaveOnInsert();
+  }
+
+
   editParagraph(pcId, hierId, mode, switched)
   {
-    console.log("editParagraph");
-    let pdiv, pdiv_reg, ins_div, ta_div;
+    this.log("paragraph-ui.editParagraph");
+    let content_el = document.querySelector("[data-copg-ed-type='pc-area'][data-pcid='" + pcId + "']");
+    let pc_model = this.page_model.getPCModel(pcId);
+    this.tinyWrapper.initEdit(content_el, pc_model.text, pc_model.characteristic);
+    this.showToolbar();
+    this.setParagraphClass(pc_model.characteristic);
+    this.updateMenuButtons();
+    return;
 
-    let div_id = hierId + ":" + pcId;
 
-    console.log(div_id);
-
-    //	this.setEditStatus(true);
-//    cmd_called = true;
-    this.ed_para = div_id;
-    this.pc_id_str = "";
-
-    if (mode === 'edit')
-    {
-      this.tinyWrapper.initEdit("CONTENT" + div_id);
-      this.setInsertStatus(false);
-    }
-
-    if (mode === 'insert')
-    {
-      this.tinyWrapper.initInsert("TARGET" + div_id);
-      this.setInsertStatus(true);
-    }
+    //this.setInsertStatus(false);
 
     // table editing mode (td)
     var moved = false;		// is edit area currently move from one td to another?
@@ -1105,286 +1087,6 @@ export default class ParagraphUI {
       this.showToolbar();
       this.updateMenuButtons();
       this.tinyinit = true;
-      return;
-
-      tinyMCE.init({
-        /* part of 4 */
-        toolbar: false,
-        menubar: false,
-        statusbar: false,
-        theme : "modern",
-        language : "en",
-        plugins : "save,paste",
-        save_onsavecallback : "saveParagraph",
-        mode : "exact",
-        elements: "tinytarget",
-        content_css: this.uiModel.config.content_css,
-        fix_list_elements : true,
-        valid_elements : "p,br[_moz_dirty],span[class],code,sub[class],sup[class],ul[class],ol[class],li[class]",
-        forced_root_block : 'p',
-        entity_encoding : "raw",
-        paste_remove_styles: true,
-        formats : this.text_formats,
-        /* not found in 4 code or docu (the configs for p/br are defaults for 3, so this should be ok) */
-        removeformat_selector : 'span,code',
-        remove_linebreaks : true,
-        convert_newlines_to_brs : false,
-        force_p_newlines : true,
-        force_br_newlines : false,
-        /* not found in 3 docu (anymore?) */
-        cleanup_on_startup : true,
-        cleanup: true,
-        paste_auto_cleanup_on_paste : true,
-        branding: false,
-
-
-        /**
-         * Event is triggered after the paste plugin put the content
-         * that should be pasted into a dom structure now
-         * BUT the content is not put into the document yet
-         *
-         * still exists in 4
-         */
-        paste_preprocess: function (pl, o) {
-
-
-          // see #23696, since tinymce4 it seems not possible to disable link conversion (even if <a> tags are not valid elements)
-          // so we paste http string "on our own" and reset the paste content
-          if (o.content.substring(0, 4) === "http") {
-            par_ui.addBBCode(o.content, '', true);
-            o.content = '';
-          }
-
-          if (o.wordContent)
-          {
-            o.content = o.content.replace(/(\r\n|\r|\n)/g, '\n');
-            o.content = o.content.replace(/(\n)/g, ' ');
-          }
-          // remove any attributes from <p>
-          o.content = o.content.replace(/(<p [^>]*>)/g, '<p>');
-
-          // remove all divs
-          o.content = o.content.replace(/(<div [^>]*>)/g, '');
-          o.content = o.content.replace(/(<\/div>)/g, '');
-        },
-
-        /**
-         * Event is triggered after the paste plugin put the content
-         * that should be pasted into a dom structure now
-         * BUT the content is not put into the document yet
-         *
-         * still exists in 4
-         */
-        paste_postprocess: function (pl, o) {
-          var ed = ed = tinyMCE.activeEditor;
-
-          if (o.wordContent)
-          {
-
-          }
-
-          // we must handle all valid elements here
-          // p (handled in paste_preprocess)
-          // br[_moz_dirty] (investigate)
-          // span[class] (todo)
-          // code (should be ok, since no attributes allowed)
-          // ul[class],ol[class],li[class] handled here
-
-          // fix lists
-          ed.dom.setAttrib(ed.dom.select('ol', o.node), 'class', 'ilc_list_o_NumberedList');
-          ed.dom.setAttrib(ed.dom.select('ul', o.node), 'class', 'ilc_list_u_BulletedList');
-          ed.dom.setAttrib(ed.dom.select('li', o.node), 'class', 'ilc_list_item_StandardListItem');
-
-          // replace all b nodes by spans[Strong]
-          tinymce.each(ed.dom.select('b', o.node), function(n) {
-            ed.dom.replace(ed.dom.create('span', {'class': 'ilc_text_inline_Strong'}, n.innerHTML), n);
-          });
-          // replace all u nodes by spans[Important]
-          tinymce.each(ed.dom.select('u', o.node), function(n) {
-            ed.dom.replace(ed.dom.create('span', {'class': 'ilc_text_inline_Important'}, n.innerHTML), n);
-          });
-          // replace all i nodes by spans[Emph]
-          tinymce.each(ed.dom.select('i', o.node), function(n) {
-            ed.dom.replace(ed.dom.create('span', {'class': 'ilc_text_inline_Emph'}, n.innerHTML), n);
-          });
-
-          // remove all id attributes from the content
-          tinyMCE.each(ed.dom.select('*[id!=""]', o.node), function(el) {
-            el.id = '';
-          });
-
-          par_ui.pasting = true;
-        },
-
-        setup : function(ed) {
-
-          ed.on('KeyUp', function(ev)
-          {
-            var ed = tinyMCE.get('tinytarget');
-            //console.log("onKeyPress");
-            par_ui.autoResize(ed);
-          });
-          ed.on('KeyDown', function(ev)
-          {
-            var ed = tinyMCE.get('tinytarget');
-
-            if(ev.keyCode === 35 || ev.keyCode === 36)
-            {
-              var isMac = navigator.platform.toUpperCase().indexOf('MAC')>=0;
-              if (!ev.shiftKey && isMac) {
-                YAHOO.util.Event.preventDefault(ev);
-                YAHOO.util.Event.stopPropagation(ev);
-              }
-            }
-
-            if(ev.keyCode === 9 && !ev.shiftKey)
-            {
-              YAHOO.util.Event.preventDefault(ev);
-              YAHOO.util.Event.stopPropagation(ev);
-              if (par_ui.current_td !== "")
-              {
-                par_ui.editNextCell();
-              }
-              else
-              {
-                if (ed.queryCommandState('InsertUnorderedList') ||
-                  ed.queryCommandState('InsertOrderedList'))
-                {
-                  par_ui.cmdListIndent();
-                }
-              }
-            }
-            if(ev.keyCode == 9 && ev.shiftKey)
-            {
-              //						console.log("backtab");
-              YAHOO.util.Event.preventDefault(ev);
-              YAHOO.util.Event.stopPropagation(ev);
-              if (this.current_td != "")
-              {
-                par_ui.editPreviousCell();
-              }
-              else
-              {
-                if (ed.queryCommandState('InsertUnorderedList') ||
-                  ed.queryCommandState('InsertOrderedList'))
-                {
-                  par_ui.cmdListOutdent();
-                }
-              }
-            }
-            //console.log("onKeyDown");
-          });
-          ed.on('NodeChange', function(cm, n)
-          {
-            var ed = tinyMCE.get('tinytarget');
-            //console.log("onNodeChange");
-            //console.log("----");
-            //console.trace();
-
-            // clean content after paste (has this really an effect?)
-            // (yes, it does, at least splitSpans is important here #13019)
-            if (par_ui.pasting) {
-              par_ui.pasting = false;
-              par_ui.splitDivs();
-              par_ui.fixListClasses(false);
-              par_ui.splitSpans();
-            }
-
-            // update state of indent/outdent buttons
-            var ibut = document.getElementById('ilIndentBut');
-            var obut = document.getElementById('ilOutdentBut');
-            if (ibut != null && obut != null)
-            {
-              if (ed.queryCommandState('InsertUnorderedList') ||
-                ed.queryCommandState('InsertOrderedList'))
-              {
-                ibut.style.visibility = '';
-                obut.style.visibility = '';
-              }
-              else
-              {
-                ibut.style.visibility = 'hidden';
-                obut.style.visibility = 'hidden';
-              }
-            }
-
-            par_ui.updateMenuButtons();
-
-          });
-
-          var width = pdiv_reg.width;
-          var height = pdiv_reg.height;
-          if (width < par_ui.minwidth)
-          {
-            width = par_ui.minwidth;
-          }
-          if (height < par_ui.minheight)
-          {
-            height = par_ui.minheight;
-          }
-
-          //ed.onInit.add(function(ed, evt)
-          ed.on('init', function(evt)
-          {
-            var ed = tinyMCE.get('tinytarget');
-
-            // see https://www.tinymce.com/docs/api/tinymce/tinymce.shortcuts/
-            // removing does not seem to work, also the functions do not
-            // seem to be executed, but this way the shortcut is at least disabled
-            // on chrome/mac, see also 0008662
-            ed.shortcuts.add('meta+b', '', function() {par_ui.cmdSpan('Strong');});
-            ed.shortcuts.add('meta+u', '', function() {par_ui.cmdSpan('Important');});
-            ed.shortcuts.add('meta+i', '', function() {par_ui.cmdSpan('Emph');});
-
-            par_ui.setEditFrameSize(width, height);
-            if (mode === 'edit')
-            {
-              pdiv.style.display = "none";
-            }
-
-            if (mode === 'edit')
-            {
-
-              var tinytarget = document.getElementById("tinytarget_div");
-              ta_div.style.position = '';
-              ta_div.style.left = '';
-
-              ed.setProgressState(1); // Show progress
-              par_ui.loadCurrentParagraphIntoTiny(switched);
-            }
-
-
-            if (mode == 'insert')
-            {
-              ed.setContent("<p></p>");
-              //				console.log(ed.getContent());
-              var snode = ed.dom.getRoot();
-              snode.className = 'ilc_text_block_Standard';
-              par_ui.prepareTinyForEditing(true);
-              par_ui.synchInputRegion();
-              par_ui.focusTiny(true);
-              //		setTimeout('this.focusTiny();', 1000);
-//              cmd_called = false;
-              //				console.log(ed.getContent());
-            }
-
-            if (mode == 'td')
-            {
-              //console.log("Setting content to: " + pdiv.innerHTML);
-              ed.setContent(pdiv.innerHTML);
-              par_ui.splitBR();
-              par_ui.prepareTinyForEditing(false, false);
-              par_ui.synchInputRegion();
-              par_ui.focusTiny(true);
-//              cmd_called = false;
-            }
-
-            $('#tinytarget_ifr').contents().find("html").attr('lang', $('html').attr('lang'));
-            $('#tinytarget_ifr').contents().find("html").attr('dir', $('html').attr('dir'));
-          });
-        }
-
-      });
     }
     else	// moved (table editing)
     {
@@ -1578,30 +1280,46 @@ export default class ParagraphUI {
   // copied from TinyMCE editor_template_src.js
   showToolbar() {
     let obj;
+    const tiny = this.tinyWrapper;
+    const dispatch = this.dispatcher;
+    const action = this.actionFactory;
+    const ef = action.paragraph().editor();
 
     //#0017152
     $('#tinytarget_ifr').contents().find("html").attr('lang', $('html').attr('lang'));
     $('#tinytarget_ifr').contents().find("html").attr('dir', $('html').attr('dir'));
 
-    $("#tinytarget_ifr").parent().css("border-width", "0px");
-    $("#tinytarget_ifr").parent().parent().parent().css("border-width", "0px");
+//    $("#tinytarget_ifr").parent().css("border-width", "0px");
+//    $("#tinytarget_ifr").parent().parent().parent().css("border-width", "0px");
 
 
     this.toolSlate.setContentFromComponent("Paragraph", "menu");
-    const dispatch = this.dispatcher;
-    const action = this.actionFactory;
 
     document.querySelectorAll("[data-copg-ed-type='par-action']").forEach(char_button => {
       const actionType = char_button.dataset.copgEdAction;
       switch (actionType) {
+
         case ACTIONS.SELECTION_FORMAT:
           const format = char_button.dataset.copgEdParFormat;
           char_button.addEventListener("click", (event) => {
             dispatch.dispatch(action.paragraph().editor().selectionFormat(format));
           });
           break;
+
+        case ACTIONS.PARAGRAPH_CLASS:
+          const par_class = char_button.dataset.copgEdParClass;
+          char_button.addEventListener("click", (event) => {
+            dispatch.dispatch(action.paragraph().editor().paragraphClass(par_class));
+          });
+          break;
+
+        case ACTIONS.SAVE_RETURN:
+          char_button.addEventListener("click", (event) => {
+            dispatch.dispatch(ef.saveReturn(tiny.getText(), tiny.getCharacteristic()));
+          });
+          break;
+
         default:
-          const ef = action.paragraph().editor();
           let map = {};
           map[ACTIONS.SELECTION_REMOVE_FORMAT] = ef.selectionRemoveFormat();
           map[ACTIONS.SELECTION_KEYWORD] = ef.selectionKeyword();
@@ -1616,7 +1334,7 @@ export default class ParagraphUI {
           map[ACTIONS.LINK_INTERNAL] = ef.linkInternal();
           map[ACTIONS.LINK_EXTERNAL] = ef.linkExternal();
           map[ACTIONS.LINK_USER] = ef.linkUser();
-          map[ACTIONS.PAR_CANCEL] = ef.cancel();
+          map[PAGE_ACTIONS.COMPONENT_CANCEL] = action.page().editor().componentCancel();
           char_button.addEventListener("click", (event) => {
             dispatch.dispatch(map[actionType]);
           });

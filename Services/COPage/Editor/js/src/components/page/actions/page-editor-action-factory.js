@@ -9,7 +9,7 @@ import ACTIONS from "./page-action-types.js";
  */
 export default class PageEditorActionFactory {
 
-  COMPONENT = "page";
+  COMPONENT = "Page";
 
   /**
    * @type {EditorActionFactory}
@@ -41,9 +41,9 @@ export default class PageEditorActionFactory {
   /**
    * @returns {EditorAction}
    */
-  createAdd(ctype, pcid, hierid) {
-    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.CREATE_ADD, {
-      ctype: ctype,
+  componentInsert(cname, pcid, hierid) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.COMPONENT_INSERT, {
+      cname: cname,
       pcid: pcid,
       hierid: hierid
     });
@@ -52,13 +52,20 @@ export default class PageEditorActionFactory {
   /**
    * @returns {EditorAction}
    */
-  editOpen(cname, pcid, hierid, is_switch) {
-    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.EDIT_OPEN, {
+  componentEdit(cname, pcid, hierid, is_switch) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.COMPONENT_EDIT, {
       cname: cname,
       pcid: pcid,
       hierid: hierid,
       switch: is_switch
     });
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  componentCancel() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.COMPONENT_CANCEL, {});
   }
 
   /**

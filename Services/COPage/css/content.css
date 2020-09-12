@@ -108,7 +108,7 @@ a.ilc_section_Additional {
   padding-bottom: 20px;
 }
 div.ilc_text_block_Additional,
-body.ilc_text_block_Additional {
+html.il-no-tiny-bg body#tinymce.ilc_text_block_Additional {
   margin-bottom: 10px;
   margin-top: 10px;
   padding-left: 60px;
@@ -153,7 +153,7 @@ a.ilc_section_Attention {
   background-image: url("../../../libs/ilias/Style/basic_style/images/attention.png");
 }
 div.ilc_text_block_Attention,
-body.ilc_text_block_Attention {
+html.il-no-tiny-bg body#tinymce.ilc_text_block_Attention {
   padding-right: 20px;
   padding-top: 20px;
   margin-top: 10px;
@@ -204,11 +204,11 @@ a.ilc_section_Button:hover {
   background-color: #577399;
 }
 div.ilc_text_block_Button:hover,
-body.ilc_text_block_Button:hover {
+html.il-no-tiny-bg body#tinymce.ilc_text_block_Button:hover {
   background-color: #5774A0;
 }
 div.ilc_text_block_Citation,
-body.ilc_text_block_Citation {
+html.il-no-tiny-bg body#tinymce.ilc_text_block_Citation {
   background-repeat: no-repeat;
   background-position: 12px center;
   background-image: url("../../../libs/ilias/Style/basic_style/images/citation.png");
@@ -234,7 +234,7 @@ a.ilc_section_Confirmation {
   margin-top: 10px;
 }
 div.ilc_text_block_Confirmation,
-body.ilc_text_block_Confirmation {
+html.il-no-tiny-bg body#tinymce.ilc_text_block_Confirmation {
   border-width: thin;
   background-color: #f0f7ea;
   padding-left: 60px;
@@ -284,7 +284,7 @@ a.ilc_section_Example {
   background-repeat: no-repeat;
 }
 div.ilc_text_block_Example,
-body.ilc_text_block_Example {
+html.il-no-tiny-bg body#tinymce.ilc_text_block_Example {
   background-position: 10px;
   padding-left: 60px;
   padding-bottom: 20px;
@@ -463,7 +463,7 @@ a.ilc_section_Information {
   background-position: 10px;
 }
 div.ilc_text_block_Information,
-body.ilc_text_block_Information {
+html.il-no-tiny-bg body#tinymce.ilc_text_block_Information {
   background-position: 10px;
   background-repeat: no-repeat;
   background-image: url("../../../libs/ilias/Style/basic_style/images/information.png");
@@ -520,7 +520,7 @@ a.ilc_section_Link {
   background-position: 10px;
 }
 div.ilc_text_block_Link,
-body.ilc_text_block_Link {
+html.il-no-tiny-bg body#tinymce.ilc_text_block_Link {
   border-color: #4C6586;
   border-style: dashed;
   border-width: 1px;
@@ -536,7 +536,7 @@ body.ilc_text_block_Link {
   margin-top: 10px;
 }
 div.ilc_text_block_List,
-body.ilc_text_block_List {
+html.il-no-tiny-bg body#tinymce.ilc_text_block_List {
   margin-bottom: 3px;
   margin-top: 3px;
 }
@@ -554,7 +554,7 @@ a.ilc_section_Literature {
   margin-top: 10px;
 }
 div.ilc_text_block_Literature,
-body.ilc_text_block_Literature {
+html.il-no-tiny-bg body#tinymce.ilc_text_block_Literature {
   background-repeat: no-repeat;
   background-position: 10px center;
   background-image: url("../../../libs/ilias/Style/basic_style/images/literature.png");
@@ -588,7 +588,7 @@ a.ilc_section_Mnemonic {
   padding-top: 20px;
 }
 div.ilc_text_block_Mnemonic,
-body.ilc_text_block_Mnemonic {
+html.il-no-tiny-bg body#tinymce.ilc_text_block_Mnemonic {
   background-position: 16px center;
   background-repeat: no-repeat;
   background-image: url("../../../libs/ilias/Style/basic_style/images/mnemonic.png");
@@ -634,7 +634,7 @@ a.ilc_section_Remark {
   background-image: url("../../../libs/ilias/Style/basic_style/images/remark.png");
 }
 div.ilc_text_block_Remark,
-body.ilc_text_block_Remark {
+html.il-no-tiny-bg body#tinymce.ilc_text_block_Remark {
   padding-left: 60px;
   background-position: 10px center;
   padding-bottom: 20px;
@@ -674,7 +674,7 @@ a.ilc_section_Separator {
   margin-top: 10px;
 }
 div.ilc_text_block_Separator,
-body.ilc_text_block_Separator {
+html.il-no-tiny-bg body#tinymce.ilc_text_block_Separator {
   border-top-style: solid;
   border-color: #4C6586;
   padding-top: 20px;
@@ -708,19 +708,19 @@ div.ilc_question_Standard {
   background-position: right 15px;
 }
 div.ilc_text_block_Standard,
-body.ilc_text_block_Standard {
+html.il-no-tiny-bg body#tinymce.ilc_text_block_Standard {
   margin-top: 10px;
   margin-bottom: 10px;
 }
 div.ilc_text_block_StandardCenter,
-body.ilc_text_block_StandardCenter {
+html.il-no-tiny-bg body#tinymce.ilc_text_block_StandardCenter {
   text-align: center;
 }
 div.ilc_qover_StatusMessage {
   padding-bottom: 7px;
 }
 div.ilc_text_block_TableContent,
-body.ilc_text_block_TableContent {
+html.il-no-tiny-bg body#tinymce.ilc_text_block_TableContent {
   margin-left: 0px;
   margin-right: 0px;
   margin-bottom: 0px;
@@ -817,7 +817,7 @@ figure.ilc_media_cont_MediaContainerSeparated {
 }
 h1.ilc_glo_ovtitle_GlossaryOvTitle,
 div.ilc_text_block_GlossaryOvTitle,
-body.ilc_text_block_GlossaryOvTitle {
+html.il-no-tiny-bg body#tinymce.ilc_text_block_GlossaryOvTitle {
   margin-bottom: 10px;
   font-size: 120%;
   margin-top: 10px;
@@ -825,14 +825,14 @@ body.ilc_text_block_GlossaryOvTitle {
 }
 h1.ilc_heading1_Headline1,
 div.ilc_text_block_Headline1,
-body.ilc_text_block_Headline1 {
+html.il-no-tiny-bg body#tinymce.ilc_text_block_Headline1 {
   font-size: 140%;
   margin-top: 10px;
   margin-bottom: 10px;
 }
 h1.ilc_page_title_PageTitle,
 div.ilc_text_block_PageTitle,
-body.ilc_text_block_PageTitle {
+html.il-no-tiny-bg body#tinymce.ilc_text_block_PageTitle {
   white-space: normal;
   text-align: left;
   font-weight: bold;
@@ -846,7 +846,7 @@ body.ilc_text_block_PageTitle {
 }
 h2.ilc_heading2_Headline2,
 div.ilc_text_block_Headline2,
-body.ilc_text_block_Headline2 {
+html.il-no-tiny-bg body#tinymce.ilc_text_block_Headline2 {
   margin-bottom: 10px;
   margin-top: 20px;
   font-size: 120%;
@@ -854,7 +854,7 @@ body.ilc_text_block_Headline2 {
 }
 h3.ilc_heading3_Headline3,
 div.ilc_text_block_Headline3,
-body.ilc_text_block_Headline3 {
+html.il-no-tiny-bg body#tinymce.ilc_text_block_Headline3 {
   font-size: 100%;
   margin-bottom: 10px;
   margin-top: 15px;

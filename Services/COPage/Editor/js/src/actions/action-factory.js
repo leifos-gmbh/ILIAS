@@ -38,7 +38,7 @@ export default class ActionFactory {
    * @returns {ParagraphActionFactory}
    */
   paragraph() {
-    return new ParagraphActionFactory(this.editorActionFactory);
+    return new ParagraphActionFactory(this.clientActionFactory, this.editorActionFactory);
   }
 
 }

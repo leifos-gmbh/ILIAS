@@ -321,27 +321,27 @@
 					<xsl:with-param name="par_counter" select ="position()" />
 				</xsl:apply-templates>
 			</div>
-			
-			<!-- drop area -->
-			<xsl:if test="(not(../../../@DataTable) or (../../../@DataTable = 'n')) and ($javascript != 'disable')">
-				<div data-copg-ed-type="add-area">
-					<xsl:attribute name="data-hierid"><xsl:value-of select="@HierId"/></xsl:attribute>
-					<xsl:attribute name="data-pcid"><xsl:value-of select="@PCID"/></xsl:attribute>
-					<xsl:comment>dummy</xsl:comment>
-				</div>
-			</xsl:if>
-	
-			<!-- insert menu for drop area -->
-			<xsl:if test="$mode = 'edit'">
-				<xsl:if test="$javascript='enable'">
-					<xsl:call-template name="EditMenu">
-						<xsl:with-param name="hier_id" select="@HierId" />
-						<xsl:with-param name="droparea">y</xsl:with-param>
-					</xsl:call-template>
-				</xsl:if>
-			</xsl:if>
-		
 		</div>
+		<!-- drop area -->
+		<xsl:if test="(not(../../../@DataTable) or (../../../@DataTable = 'n')) and ($javascript != 'disable')">
+			<div data-copg-ed-type="add-area">
+				<xsl:attribute name="data-hierid"><xsl:value-of select="@HierId"/></xsl:attribute>
+				<xsl:attribute name="data-pcid"><xsl:value-of select="@PCID"/></xsl:attribute>
+				<xsl:comment>dummy</xsl:comment>
+			</div>
+		</xsl:if>
+
+		<!-- insert menu for drop area -->
+		<xsl:if test="$mode = 'edit'">
+			<xsl:if test="$javascript='enable'">
+				<xsl:call-template name="EditMenu">
+					<xsl:with-param name="hier_id" select="@HierId" />
+					<xsl:with-param name="droparea">y</xsl:with-param>
+				</xsl:call-template>
+			</xsl:if>
+		</xsl:if>
+		
+
 	</xsl:if>
 	<xsl:if test="$mode != 'edit' and (not(@Enabled) or @Enabled='True')">
 		<xsl:if test="//PageObject/DivClass/@HierId = current()/@HierId">

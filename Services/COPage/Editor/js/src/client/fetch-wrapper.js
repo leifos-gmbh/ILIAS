@@ -12,8 +12,7 @@ export default {
    * @returns {Promise<Response>}
    */
   postJson: async function (url = '', data = {}) {
-    // Default options are marked with *
-    const response = await fetch(url, {
+    return fetch(url, {
       method: 'POST',
       mode: 'same-origin',
       cache: 'no-cache',
@@ -25,7 +24,6 @@ export default {
       referrerPolicy: 'same-origin',
       body: JSON.stringify(data)
     });
-    return response.json(); // parses JSON response into native JavaScript objects
   },
 
   /**

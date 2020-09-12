@@ -5,6 +5,8 @@
  */
 export default class PageUIActionHandler {
 
+  debug = true;
+
   /**
    * @type {PageUI}
    */
@@ -34,6 +36,12 @@ export default class PageUIActionHandler {
     this.client = client;
   }
 
+  log(message) {
+    if (this.debug) {
+      console.log(message);
+    }
+  }
+
   /**
    * @param {PageUI} ui
    */
@@ -50,7 +58,7 @@ export default class PageUIActionHandler {
 
   /**
    * @param {EditorAction} action
-   * @param {Model} model
+   * @param {PageModel} model
    */
   handle(action, model) {
 
@@ -62,16 +70,17 @@ export default class PageUIActionHandler {
     const params = action.getParams();
     switch (action.getType()) {
 
-      case "create.add":
-        if (params.ctype !== "par") {
-          client.sendForm(actionFactory.page().command().createLegacy(params.ctype, params.pcid,
+      case "component.insert":
+        if (model.getCurrentPCName() !== "Paragraph") {
+          let ctype = this.ui.getPCTypeForName(params.cname);
+          client.sendForm(actionFactory.page().command().createLegacy(ctype, params.pcid,
             params.hierid));
           form_sent = true;
         }
         break;
 
-      case "edit.open":
-        if (params.cname !== "Paragraph") {
+      case "component.edit":
+        if (model.getCurrentPCName() !== "Paragraph") {
           client.sendForm(actionFactory.page().command().editLegacy(params.cname, params.pcid,
             params.hierid));
           form_sent = true;
@@ -105,6 +114,8 @@ export default class PageUIActionHandler {
       this.ui.hideDropareas();
       this.ui.disableDragDrop();
     } else {
+
+      this.log("page-ui-action-handler.handle state " + model.getState());
 
       switch (model.getState()) {
         case model.STATE_PAGE:

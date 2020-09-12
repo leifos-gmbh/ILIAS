@@ -78,7 +78,7 @@ export default class TinyWrapper {
   }
 
 
-  getConfig() {
+  getConfig(after_init) {
     if (!this.config) {
       this.config = {
         /* part of 4 */
@@ -116,7 +116,7 @@ export default class TinyWrapper {
           this.pastePostProcess(pl, o);
         },
         setup: (tiny) => {
-          this.setup(tiny);
+          this.setup(tiny, after_init);
         },
       };
     }
@@ -184,7 +184,7 @@ export default class TinyWrapper {
     this.pasting = true;
   }
 
-  setup(tiny) {
+  setup(tiny, after_init) {
     this.log("tiny-wrapper.init.setup");
     this.tiny = tiny;
     const wrapper = this;
@@ -294,6 +294,11 @@ export default class TinyWrapper {
       let ed = tiny;
 let mode = "insert";                                      // MISSING
 
+      ed.formatter.register('mycode', {
+        inline : 'code'
+      });
+
+
       wrapper.log("tiny-wrapper.init.tiny-init");
       // see https://www.tinymce.com/docs/api/tinymce/tinymce.shortcuts/
       // removing does not seem to work, also the functions do not
@@ -317,20 +322,11 @@ let mode = "insert";                                      // MISSING
       }
 
 
-      if (mode === 'insert')                                           // MISSING
-      {
-        wrapper.setContent("<p></p>");
-        //				console.log(ed.getContent());
-        var snode = ed.dom.getRoot();
-        snode.className = 'ilc_text_block_Standard';
-        wrapper.prepareTinyForEditing(true);
-        wrapper.synchInputRegion();
-        wrapper.focusTiny(true);
-        //		setTimeout('this.focusTiny();', 1000);
-        //              cmd_called = false;
-        //				console.log(ed.getContent());
+      if (mode === 'insert') {
+        wrapper.initContent("<p></p>", 'ilc_text_block_Standard');
       }
 
+      /*
       if (mode == 'td')
       {
         //console.log("Setting content to: " + pdiv.innerHTML);           // MISSING
@@ -340,33 +336,70 @@ let mode = "insert";                                      // MISSING
         this.synchInputRegion();
         this.focusTiny(true);
         //              cmd_called = false;
-      }
+      }*/
 
       $('#tinytarget_ifr').contents().find("html").attr('lang', $('html').attr('lang'));
       $('#tinytarget_ifr').contents().find("html").attr('dir', $('html').attr('dir'));
+
+      if (after_init) {
+        after_init();
+      }
     });
   }
 
-  initEdit(content_element_id) {
-    this.log('tiny-wrapper.initEdit');
-
-
-    this.setGhostAt(content_element_id);
-    this.createTextAreaForTiny(content_element_id);
-
-    this.lib.init(this.getConfig());
+  initContent(content, characteristic) {
+    this.log("tiny-wrapper.initContent");
+    this.setContent(content);
+    let ed = this.tiny;
+    this.setParagraphClass(characteristic);
+    this.synchInputRegion();
+    this.focusTiny(true);
   }
 
-  initInsert(target_element_id) {
+  initEdit(content_element, text, characteristic) {
+    this.log('tiny-wrapper.initEdit');
+
+    this.setGhostAt(content_element);
+
+    if (!this.tiny) {
+      this.createTextAreaForTiny(content_element);
+      this.lib.init(this.getConfig(() => {
+        this.initContent(text, characteristic);
+      }));
+    } else {
+      this.showAfter(content_element);
+      this.initContent(text, characteristic);
+    }
+
+  }
+
+  initInsert(content_element) {
     this.log('tiny-wrapper.initInsert');
     this.log(this.getConfig());
 
-    this.insertGhostAfter(target_element_id);
-    this.createTextAreaForTiny(target_element_id);
-    this.lib.init(this.getConfig());
+    this.setGhostAt(content_element);
+    if (!this.tiny) {
+      this.createTextAreaForTiny(content_element);
+      this.lib.init(this.getConfig());
+    } else {
+      this.showAfter(content_element);
+      this.initContent("<p></p>", 'ilc_text_block_Standard');
+    }
   }
 
-  createTextAreaForTiny(leading_element_id) {
+  hide() {
+    document.getElementById("tinytarget_div").style.display = "none";
+  }
+
+  showAfter(content_element) {
+    let tdiv = document.getElementById("tinytarget_div");
+
+//    content_element.parentNode.insertBefore(tdiv, content_element.nextSibling);
+
+    tdiv.style.display = "";
+  }
+
+  createTextAreaForTiny(leading_element) {
     this.log("tiny-wrapper.createTextAraForTiny");
 
     let ins_div;
@@ -380,30 +413,26 @@ let mode = "insert";                                      // MISSING
     ta.className = 'par_textarea';
     ta.style.height = '1px';
 
-    if (this.current_td !== "")
-    {
+    if (this.current_td !== "") {
       // this should be the table
-      ins_div = pdiv.parentNode.parentNode.parentNode.parentNode;     // missing
-    }
-    else
-    {
-      ins_div = document.getElementById(leading_element_id);
+      leading_element = pdiv.parentNode.parentNode.parentNode.parentNode;     // missing
     }
 
-    ta_div = YAHOO.util.Dom.insertAfter(ta_div, ins_div);
+    ta_div = YAHOO.util.Dom.insertAfter(ta_div, leading_element);
     ta_div.id = 'tinytarget_div';
     ta_div.style.position = 'absolute';
     ta_div.style.left = '-200px';
   }
 
 
-  setGhostAt(content_element_id) {
-    this.log("tiny-wrapper.setGhostAt " + content_element_id);
+  setGhostAt(content_element) {
+    this.log("tiny-wrapper.setGhostAt " + content_element);
     // get paragraph edit div
-    this.ghost = document.getElementById(content_element_id);
+    this.ghost = content_element;
     this.ghost_reg = YAHOO.util.Region.getRegion(this.ghost);
   }
 
+  /*
   insertGhostAfter(target_element_id) {
     this.log("tiny-wrapper.insertGhostAfter " + target_element_id);
 
@@ -417,7 +446,7 @@ let mode = "insert";                                      // MISSING
 
     this.ghost = document.getElementById("insert_ghost");
     this.ghost_reg = YAHOO.util.Region.getRegion(this.ghost);
-  }
+  }*/
 
   // copy input of tiny to ghost div in background
   copyInputToGhost(add_final_spacer)
@@ -502,6 +531,10 @@ let mode = "insert";                                      // MISSING
     back_el.style.overflow = 'auto';
     back_el.style.height = '';
     var back_reg = YAHOO.util.Region.getRegion(back_el);
+
+    this.log("Ghost region: ");
+    this.log(back_reg);
+
     var cl_reg = YAHOO.util.Dom.getClientRegion();
     if (back_reg.y + back_reg.height + 20 > cl_reg.top + cl_reg.height)
     {
@@ -680,8 +713,8 @@ let mode = "insert";                                      // MISSING
     const ed = this.tiny;
     ed.setContent(text);
     this.splitBR();
-    ed.setProgressState(0); // Show progress
-    this.prepareTinyForEditing(false, switched);
+//    ed.setProgressState(0); // Show progress
+    //    this.prepareTinyForEditing(false, switched);
     this.autoResize();
     this.setParagraphClass(characteristic);
   }
@@ -1011,9 +1044,12 @@ let mode = "insert";                                      // MISSING
     }
   }
 
-  // convert <p> tags to <br />
-  p2br(c)
-  {
+  /**
+   * convert <p> tags to <br />
+   * @param {string} c
+   * @return {string}
+   */
+  p2br(c) {
     // remove <p> and \n
     c = c.split("<p>").join("");
     c = c.split("\n").join("");
@@ -1022,8 +1058,7 @@ let mode = "insert";                                      // MISSING
     c = c.split("</p>").join("<br />");
 
     // remove trailing <br />
-    if (c.substr(c.length - 6) == "<br />")
-    {
+    if (c.substr(c.length - 6) === "<br />") {
       c = c.substr(0, c.length - 6);
     }
 
@@ -1035,21 +1070,48 @@ let mode = "insert";                                      // MISSING
     ed.focus();
     let snode = ed.dom.getRoot();
 
+    //snode = snode.querySelector("p");
+
     if (snode) {
       //snode.className = "ilc_text_block_" + i['hid_val'];
       snode.className = "ilc_text_block_" + i;
       snode.style.position = 'static';
     }
+    snode.parentNode.className = "il-no-tiny-bg";
+
     this.autoResize();
   }
 
-  toggleFormat(t)
-  {
+  toggleFormat(t) {
     let ed = this.tiny;
-    tinymce.activeEditor.formatter.toggle(t);
+    if (t === "Code") {
+      t = "mycode";
+    }
+    ed.execCommand('mceToggleFormat', false, t);
     ed.focus();
     ed.selection.collapse(false);
     this.autoResize();
+  }
+
+  removeFormat() {
+    let ed = this.tiny;
+    ed.focus();
+    ed.execCommand('RemoveFormat', false);
+    this.autoResize(ed);
+  }
+
+  getText() {
+      let ed = this.tiny;
+      let c = ed.getContent();
+      c = this.p2br(c);
+      return c;
+  }
+
+  getCharacteristic() {
+      let ed = this.tiny;
+      let parts = ed.dom.getRoot().className.split("_");
+      //console.log("---");
+      return parts[parts.length - 1];
   }
 
 }

@@ -6,6 +6,11 @@
 export default class PageUI {
 
   /**
+   * @type {boolean}
+   */
+  debug = true;
+
+  /**
    * temp legacy code
    * @type {string}
    */
@@ -69,6 +74,15 @@ export default class PageUI {
   //
 
   /**
+   * @param message
+   */
+  log(message) {
+    if (this.debug) {
+      console.log(message);
+    }
+  }
+
+  /**
    */
   init(uiModel) {
     this.uiModel = uiModel;
@@ -92,12 +106,16 @@ export default class PageUI {
   /**
    * Init add buttons
    */
-  initAddButtons() {
+  initAddButtons(selector) {
     const dispatch = this.dispatcher;
     const action = this.actionFactory;
 
+    if (!selector) {
+      selector = "[data-copg-ed-type='add-area']"
+    }
+
     // init add buttons
-    document.querySelectorAll("[data-copg-ed-type='add-area']").forEach(area => {
+    document.querySelectorAll(selector).forEach(area => {
 
       const uiModel = this.uiModel;
       let li, li_templ, ul;
@@ -123,8 +141,9 @@ export default class PageUI {
           for (const [ctype, txt] of Object.entries(uiModel.addCommands)) {
             li = li_templ.cloneNode(true);
             li.querySelector("a").innerHTML = txt;
+            let cname = this.getPCNameForType(ctype);
             li.querySelector("a").addEventListener("click", (event) => {
-              dispatch.dispatch(action.page().editor().createAdd(ctype,
+              dispatch.dispatch(action.page().editor().componentInsert(cname,
                 area.dataset.pcid,
                 area.dataset.hierid));
             });
@@ -135,16 +154,28 @@ export default class PageUI {
     });
   }
 
+  getPCTypeForName(name) {
+    return this.uiModel.pcDefinition.types[name];
+  }
+
+  getPCNameForType(type) {
+    return this.uiModel.pcDefinition.names[type];
+  }
 
   /**
    * Click and DBlClick is not naturally supported on browsers (click is also fired on
    * dblclick, time period for dblclick varies)
    */
-  initComponentClick() {
+  initComponentClick(selector) {
     let clickMap = this.clickMap;
     let period = 400;
+
+    if (!selector) {
+      selector = "[data-copg-ed-type='pc-area']";
+    }
+
     // init add buttons
-    document.querySelectorAll("[data-copg-ed-type='pc-area']").forEach(area => {
+    document.querySelectorAll(selector).forEach(area => {
       area.addEventListener("click", (event) => {
         if (event.isDropDownToggleEvent === true) {
           return;
@@ -172,10 +203,14 @@ export default class PageUI {
     });
   }
 
-  initComponentEditing() {
+  initComponentEditing(selector) {
+
+    if (!selector) {
+      selector = "[data-copg-ed-type='pc-area']";
+    }
 
     // init add buttons
-    document.querySelectorAll("[data-copg-ed-type='pc-area']").forEach(area => {
+    document.querySelectorAll(selector).forEach(area => {
       const dispatch = this.dispatcher;
       const action = this.actionFactory;
 
@@ -185,7 +220,7 @@ export default class PageUI {
           return;
         }
         let is_switch = (this.model.getState() === this.model.STATE_COMPONENT);
-        dispatch.dispatch(action.page().editor().editOpen(area.dataset.cname,
+        dispatch.dispatch(action.page().editor().componentEdit(area.dataset.cname,
           area.dataset.pcid,
           area.dataset.hierid,
           is_switch));
@@ -196,12 +231,22 @@ export default class PageUI {
   /**
    * Init drag and drop handling
    */
-  initDragDrop() {
+  initDragDrop(draggableSelector, droppableSelector) {
+
+    this.log("pag-ui.initDragDrop");
 
     const dispatch = this.dispatcher;
     const action = this.actionFactory;
 
-    $(".il_editarea").draggable({
+    if (!draggableSelector) {
+      draggableSelector = ".il_editarea";
+    }
+
+    if (!droppableSelector) {
+      droppableSelector = ".il_droparea";
+    }
+
+    $(draggableSelector).draggable({
         cursor: 'move',
         revert: true,
         scroll: true,
@@ -220,7 +265,7 @@ export default class PageUI {
       }
     );
 
-    $(".il_droparea").droppable({
+    $(droppableSelector).droppable({
       drop: (event, ui) => {
         ui.draggable.draggable( 'option', 'revert', false );
 
@@ -243,11 +288,15 @@ export default class PageUI {
   /**
    * Init multi selection
    */
-  initMultiSelection() {
+  initMultiSelection(selector) {
     const dispatch = this.dispatcher;
     const action = this.actionFactory;
 
-    document.querySelectorAll("[data-copg-ed-type='pc-area']").forEach(pc_area => {
+    if (!selector) {
+      selector = "[data-copg-ed-type='pc-area']";
+    }
+
+    document.querySelectorAll(selector).forEach(pc_area => {
       const pcid = pc_area.dataset.pcid;
       const hierid = pc_area.dataset.hierid;
       const ctype = pc_area.dataset.ctype;

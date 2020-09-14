@@ -1,0 +1,232 @@
+<?php
+
+/* Copyright (c) 1998-2020 ILIAS open source, Extended GPL, see docs/LICENSE */
+
+namespace ILIAS\COPage\Editor\Components\Page;
+
+use ILIAS\DI\Exceptions\Exception;
+use ILIAS\COPage\Editor\Server;
+
+/**
+ * @author Alexander Killing <killing@leifos.de>
+ */
+class PageCommandActionHandler implements Server\CommandActionHandler
+{
+    /**
+     * @var \ILIAS\DI\UIServices
+     */
+    protected $ui;
+
+    /**
+     * @var \ilLanguage
+     */
+    protected $lng;
+
+    /**
+     * @var \ilPageObjectGUI
+     */
+    protected $page_gui;
+
+    /**
+     * @var \ilObjUser
+     */
+    protected $user;
+
+    /**
+     * @var Server\UIWrapper
+     */
+    protected $ui_wrapper;
+
+    function __construct(\ilPageObjectGUI $page_gui)
+    {
+        global $DIC;
+
+        $this->ui = $DIC->ui();
+        $this->lng = $DIC->language();
+        $this->page_gui = $page_gui;
+        $this->user = $DIC->user();
+
+        $this->ui_wrapper = new Server\UIWrapper($this->ui, $this->lng);
+    }
+
+    /**
+     * @param $query
+     * @param $body
+     * @return Server\Response
+     */
+    public function handle($query, $body) : Server\Response
+    {
+        switch ($body["action"]) {
+            case "cut.paste":
+                return $this->cutPasteCommand($body);
+                break;
+
+            case "copy.paste":
+                return $this->copyPasteCommand($body);
+                break;
+
+            case "drag.drop":
+                return $this->dragDropCommand($body);
+                break;
+
+            default:
+                throw new Exception("Unknown action " . $body["action"]);
+                break;
+        }
+    }
+
+    /**
+     * All command
+     * @param $body
+     * @return Server\Response
+     */
+    protected function cutPasteCommand($body) : Server\Response
+    {
+        $pcids = $body["data"]["pcids"];
+        $target_pcid = $body["data"]["target_pcid"];
+        $page = $this->page_gui->getPageObject();
+
+        $hids = array_map(
+            function ($pcid) {
+                return $this->getIdForPCId($pcid);
+            },
+            $pcids
+        );
+
+        $page->cutContents($hids);
+        $page->pasteContents($this->getIdForPCId($target_pcid));
+
+        return $this->sendPage();
+    }
+
+    /**
+     * All command
+     * @param $body
+     * @return Server\Response
+     */
+    protected function copyPasteCommand($body) : Server\Response
+    {
+        $pcids = $body["data"]["pcids"];
+        $target_pcid = $body["data"]["target_pcid"];
+        $page = $this->page_gui->getPageObject();
+
+        $hids = array_map(
+            function ($pcid) {
+                return $this->getIdForPCId($pcid);
+            },
+            $pcids
+        );
+
+        $page->copyContents($hids);
+        $page->pasteContents($this->getIdForPCId($target_pcid));
+
+        return $this->sendPage();
+    }
+
+    /**
+     * All command
+     * @param $body
+     * @return Server\Response
+     */
+    protected function dragDropCommand($body) : Server\Response
+    {
+        $target = $body["data"]["target"];
+        $source = $body["data"]["source"];
+
+        $page = $this->page_gui->getPageObject();
+
+        /*
+        $hids = array_map(
+            function ($pcid) {
+                return $this->getIdForPCId($pcid);
+            },
+            $pcids
+        );*/
+
+        $source = explode(":", $source);
+        $target = explode(":", $target);
+
+        $page->moveContentAfter($source[0], $target[0], $source[1], $target[1]);
+
+        return $this->sendPage();
+    }
+
+    /**
+     * Send whole page as response
+     * @return Server\Response
+     */
+    protected function sendPage() : Server\Response
+    {
+        $this->page_gui->setOutputMode(\ilPageObjectGUI::EDIT);
+        $page_data = $this->page_gui->showPage();
+
+        $data = new \stdClass();
+        $data->renderedContent = $page_data;
+        return new Server\Response($data);
+    }
+
+    /**
+     * Get id for pcid
+     * @param
+     * @return
+     */
+    protected function getIdForPCId($pcid)
+    {
+        $page = $this->page_gui->getPageObject();
+        $id = "pg:";
+        if (!in_array($pcid, ["", "pg"])) {
+            $hier_ids = $page->getHierIdsForPCIds([$pcid]);
+            $id = $hier_ids[$pcid].":".$pcid;
+        }
+        return $id;
+    }
+
+    /**
+     * Get id for pcid
+     * @param
+     * @return
+     */
+    protected function getHierIdForPCId($pcid)
+    {
+        $page = $this->page_gui->getPageObject();
+        $id = "pg";
+        if (!in_array($pcid, ["", "pg"])) {
+            $hier_ids = $page->getHierIdsForPCIds([$pcid]);
+            $id = $hier_ids[$pcid];
+        }
+        return $id;
+    }
+
+
+    /**
+     * All command
+     * @param $body
+     * @return Server\Response
+     */
+    protected function updateCommand($body) : Server\Response
+    {
+        $page = $this->page_gui->getPageObject();
+
+        $hier_ids = $page->getHierIdsForPCIds([$body["data"]["pcid"]]);
+        $pcid = $hier_ids[$body["data"]["pcid"]].":".$body["data"]["pcid"];
+
+        $content = "<div id='" .
+            $pcid . "' class='ilc_text_block_" .
+            $body["data"]["characteristic"] . "'>" . $body["data"]["content"] . "</div>";
+
+        $this->content_obj = new \ilPCParagraph($page);
+
+        $this->updated = $this->content_obj->saveJS(
+            $page,
+            $content,
+            \ilUtil::stripSlashes($body["data"]["characteristic"]),
+            \ilUtil::stripSlashes($pcid)
+        );
+
+
+        $data = new \stdClass();
+        $data->renderedContent = "Test the rendered content";
+        return new Server\Response($data);
+    }
+
+}

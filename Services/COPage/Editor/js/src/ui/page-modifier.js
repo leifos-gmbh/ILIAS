@@ -51,8 +51,39 @@ export default class PageModifier {
 
     this.pageUI.hideAddButtons();
     this.pageUI.hideDropareas();
+  }
 
+  cut(items) {
+    for (let id of items) {
+      console.log("cut");
+      const pcid = id.split(":")[1];
+      const pcSelector = "[data-copg-ed-type='pc-area'][data-pcid='" + pcid + "']";
+      const el = document.querySelector(pcSelector).parentNode;
+      const next = el.nextSibling;
+      el.parentNode.removeChild(el);
+      next.parentNode.removeChild(next);
+    }
+  }
 
+  showToast(text) {
+    const OSDNotifier = OSDNotifications({
+      initialNotifications: [{
+        notification_osd_id: 123,
+        valid_until: 0,
+        visible_for: 3,
+        data: {
+          title: "",
+          link: false,
+          iconPath: false,
+          shortDescription: text,
+          handlerParams: {
+            osd: {
+              closable: false
+            }
+          }
+        }
+      }]
+    });
   }
 
 

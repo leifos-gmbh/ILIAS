@@ -96,6 +96,9 @@ class Server
             case "Paragraph":
                 $handler = new Paragraph\ParagraphCommandActionHandler($this->page_gui);
                 break;
+            case "Page":
+                $handler = new Page\PageCommandActionHandler($this->page_gui);
+                break;
         }
 
         if ($handler === null) {

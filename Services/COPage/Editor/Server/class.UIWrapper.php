@@ -62,6 +62,13 @@ class UIWrapper
         return $b;
     }
 
+    public function getRenderedInfoBox($text) {
+        $ui = $this->ui;
+        $f = $ui->factory();
+        $m = $f->messageBox()->info($text);
+        return $ui->renderer()->renderAsync($m);
+    }
+
     /**
      * Get rendered button
      * @param string     $content
@@ -76,5 +83,31 @@ class UIWrapper
         $b = $this->getButton($content, $type, $action, $data);
         return $ui->renderer()->renderAsync($b);
     }
+
+    /**
+     * Get multi actions
+     * @return string
+     */
+    public function getRenderedButtonGroups($groups)
+    {
+        $ui = $this->ui;
+        $r = $ui->renderer();
+
+        $tpl = new \ilTemplate("tpl.editor_button_group.html", true, true, "Services/COPage");
+
+        foreach ($groups as $buttons) {
+            foreach ($buttons as $action => $lng_key) {
+                $tpl->setCurrentBlock("button");
+                $b = $this->getButton($this->lng->txt($lng_key), "multi", $action);
+                $tpl->setVariable("BUTTON", $r->renderAsync($b));
+                $tpl->parseCurrentBlock();
+            }
+            $tpl->setCurrentBlock("section");
+            $tpl->parseCurrentBlock();
+        }
+
+        return $tpl->get();
+    }
+
 
 }

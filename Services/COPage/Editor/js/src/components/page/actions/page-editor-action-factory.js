@@ -34,8 +34,11 @@ export default class PageEditorActionFactory {
   /**
    * @returns {EditorAction}
    */
-  dndDrop() {
-    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.DND_DROP);
+  dndDrop(target, source) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.DND_DROP, {
+      target: target,
+      source: source
+    });
   }
 
   /**
@@ -85,6 +88,17 @@ export default class PageEditorActionFactory {
   multiAction(type) {
     return this.editorActionFactory.action(this.COMPONENT, ACTIONS.MULTI_ACTION, {
       type: type
+    });
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  multiPaste(pcid, hierid, mode) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.MULTI_PASTE, {
+      pcid: pcid,
+      hierid: hierid,
+      mode: mode
     });
   }
 

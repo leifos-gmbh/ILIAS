@@ -8,7 +8,7 @@ export default class TinyWrapper {
   /**
    * @type {boolean}
    */
-  debug = true;
+  debug = false;
 
   /**
    * @type {Object}
@@ -373,17 +373,17 @@ let mode = "insert";                                      // MISSING
 
   }
 
-  initInsert(content_element) {
+  initInsert(content_element, after_init) {
     this.log('tiny-wrapper.initInsert');
-    this.log(this.getConfig());
 
     this.setGhostAt(content_element);
     if (!this.tiny) {
       this.createTextAreaForTiny(content_element);
-      this.lib.init(this.getConfig());
+      this.lib.init(this.getConfig(after_init));
     } else {
       this.showAfter(content_element);
       this.initContent("<p></p>", 'ilc_text_block_Standard');
+      after_init();
     }
   }
 

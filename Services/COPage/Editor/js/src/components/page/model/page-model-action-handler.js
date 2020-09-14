@@ -57,6 +57,17 @@ export default class ModelActionHandler {
 
       case "multi.action":
         switch (params.type) {
+
+          case "cut":
+            this.model.cut();
+            this.model.selectNone();
+            break;
+
+          case "copy":
+            this.model.copy();
+            this.model.selectNone();
+            break;
+
           case "none":
             this.model.selectNone();
             this.model.setState(this.model.STATE_PAGE);
@@ -67,6 +78,11 @@ export default class ModelActionHandler {
             this.model.setState(this.model.STATE_MULTI_ACTION);
             break;
         }
+        break;
+
+      case "multi.paste":
+        this.model.setMultiState(this.model.STATE_MULTI_NONE);
+        this.model.setState(this.model.STATE_PAGE);
         break;
 
       case "component.edit":

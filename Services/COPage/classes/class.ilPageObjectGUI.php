@@ -2779,7 +2779,8 @@ class ilPageObjectGUI
                 $mess = $this->getBlockingInfoMessage();
             }
         }
-        
+
+        $this->lng->toJS("paste");
         $this->setOutputMode(self::EDIT);
 
         $html = $this->showPage();

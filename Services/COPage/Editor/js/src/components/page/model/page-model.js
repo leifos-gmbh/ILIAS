@@ -16,6 +16,10 @@ export default class PageModel {
   STATE_COMPONENT_INSERT = "insert";    // component inserting
   STATE_COMPONENT_NONE = "";
 
+  STATE_MULTI_COPY = "copy";        // multi copy
+  STATE_MULTI_CUT = "cut";          // multi cut
+  STATE_MULTI_NONE = "";
+
   /**
    * @type {*[]}
    */
@@ -26,6 +30,11 @@ export default class PageModel {
    */
   component_states = [];
 
+  /**
+   * @type {*[]}
+   */
+  multi_states = [];
+
   dom;
 
   /**
@@ -34,7 +43,10 @@ export default class PageModel {
   model = {
     state: this.STATE_PAGE,
     component_state: this.STATE_COMPONENT_NONE,
+    multi_state: this.STATE_MULTI_NONE,
     selectedItems: new Set(),
+    cutItems: new Set(),
+    copyItems: new Set(),
     currentPCID: null,
     currentHierId: null,
     currentInsertPCID: null,
@@ -46,6 +58,7 @@ export default class PageModel {
     this.dom = document;
     this.states = [this.STATE_PAGE, this.STATE_DRAG_DROP, this.STATE_COMPONENT, this.STATE_MULTI_ACTION];
     this.component_states = [this.STATE_COMPONENT_NONE, this.STATE_COMPONENT_EDIT, this.STATE_COMPONENT_INSERT];
+    this.multi_states = [this.STATE_MULTI_NONE, this.STATE_MULTI_CUT, this.STATE_MULTI_COPY];
   }
 
   log(message) {
@@ -89,6 +102,23 @@ export default class PageModel {
   }
 
   /**
+   * @param {string} state
+   */
+  setMultiState(state) {
+    if (this.multi_states.includes(state)) {
+      this.log("page-model.setMultiState " + state);
+      this.model.multi_state = state;
+    }
+  }
+
+  /**
+   * @return {string}
+   */
+  getMultiState() {
+    return this.model.multi_state;
+  }
+
+  /**
    *
    * @param {string} pcid
    * @param {string} hierid
@@ -128,6 +158,38 @@ export default class PageModel {
    */
   getSelected() {
     return this.model.selectedItems;
+  }
+
+  /**
+   * Cut (mark currently selected items as cut
+   */
+  cut() {
+    this.model.cutItems = new Set(this.model.selectedItems);
+    this.setMultiState(this.STATE_MULTI_CUT);
+  }
+
+  /**
+   * Get items to be cut
+   * @return {Set<string>}
+   */
+  getCutItems() {
+    return this.model.cutItems;
+  }
+
+  /**
+   * Copy (mark currently selected items as copied
+   */
+  copy() {
+    this.model.copyItems = new Set(this.model.selectedItems);
+    this.setMultiState(this.STATE_MULTI_COPY);
+  }
+
+  /**
+   * Get items to be copied
+   * @return {Set<string>}
+   */
+  getCopyItems() {
+    return this.model.copyItems;
   }
 
   /**

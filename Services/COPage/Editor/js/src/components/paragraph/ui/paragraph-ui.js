@@ -557,7 +557,9 @@ export default class ParagraphUI {
     this.log("setParagraphClass");
     this.log(i);
     const fc = document.querySelector(".ilTinyParagraphClassSelector .dropdown button");
+    console.log(fc);
     if (fc) {
+      console.log("SETTin DROP DOWN BUTTON: " + i)
       fc.firstChild.textContent = i + " ";
     }
     this.tinyWrapper.setParagraphClass(i);
@@ -1006,11 +1008,12 @@ export default class ParagraphUI {
   insertParagraph(pcid, after_pcid) {
     this.log("paragraph-ui.insertParagraph");
     this.pageModifier.insertComponentAfter(after_pcid, pcid, "Paragraph", "", "Paragraph");
+    this.pageModifier.showToast(il.Language.txt("cont_inserted"));
     let content_el = document.querySelector("[data-copg-ed-type='pc-area'][data-pcid='" + pcid + "']");
-    this.tinyWrapper.initInsert(content_el);
-    //this.setInsertStatus(true);
     this.showToolbar();
-    this.setParagraphClass("Standard");
+    this.tinyWrapper.initInsert(content_el, () => {
+      this.setParagraphClass("Standard");
+    });
     this.updateMenuButtons();
     this.tinyinit = true;
   }

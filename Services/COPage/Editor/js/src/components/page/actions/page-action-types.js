@@ -9,6 +9,9 @@ const ACTIONS = {
   CREATE_LEGACY: "create.legacy", // calls a legacy creation form for a page component
   EDIT_LEGACY: "edit.legacy",     // calls a legacy edit form for a page component
   MULTI_LEGACY: "multi.legacy",   // performas a multi-selection action the legacy way (send form)
+  CUT_PASTE: "cut.paste",   // cut and paste
+  COPY_PASTE: "copy.paste",   // copy and paste
+  DRAG_DROP: "drag.drop",   // drag and drop (single element)
 
   // editor actions (things happening in the editor client side)
   DND_DRAG: "dnd.drag",           // start dragging
@@ -18,6 +21,7 @@ const ACTIONS = {
   COMPONENT_CANCEL: "component.cancel",         // components cancel button is pressed
   MULTI_TOGGLE: "multi.toggle",   // toggle an element for multi selection
   MULTI_ACTION: "multi.action",   // perform multi action
+  MULTI_PASTE: "multi.paste",   // paste multi items
 
 };
 export default ACTIONS;

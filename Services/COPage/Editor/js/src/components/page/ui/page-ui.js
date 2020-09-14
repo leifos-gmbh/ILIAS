@@ -55,18 +55,26 @@ export default class PageUI {
   toolSlate;
 
   /**
+   * @type {pageModifier}
+   */
+  pageModifier;
+
+  /**
    * @param {Client} client
    * @param {Dispatcher} dispatcher
    * @param {ActionFactory} actionFactory
    * @param {Model} model
    * @param {ToolSlate} toolSlate
+   * @param {PageModifier} pageModifier
    */
-  constructor(client, dispatcher, actionFactory, model, toolSlate) {
+  constructor(client, dispatcher, actionFactory, model, toolSlate
+    , pageModifier) {
     this.client = client;
     this.dispatcher = dispatcher;
     this.actionFactory = actionFactory;
     this.model = model;
     this.toolSlate = toolSlate;
+    this.pageModifier = pageModifier;
   }
 
   //
@@ -121,6 +129,8 @@ export default class PageUI {
       let li, li_templ, ul;
       area.innerHTML = this.droparea + uiModel.addDropdown;
 
+      const model = this.model;
+
       // droparea
       const drop = area.firstChild;
       drop.id = "TARGET" + area.dataset.hierid + ":" + (area.dataset.pcid || "");
@@ -138,16 +148,37 @@ export default class PageUI {
           ul = b.parentNode.querySelector("ul");
           li_templ = ul.querySelector("li").cloneNode(true);
           ul.innerHTML = "";
-          for (const [ctype, txt] of Object.entries(uiModel.addCommands)) {
+
+          this.log("add dropdown: click");
+          this.log(model);
+
+          const multiCutOrCopy = ((model.getState() === model.STATE_MULTI_ACTION) &&
+            ([model.STATE_MULTI_CUT, model.STATE_MULTI_COPY].includes(model.getMultiState())));
+
+          if (multiCutOrCopy) {
+            // multi-action cut or copy
             li = li_templ.cloneNode(true);
-            li.querySelector("a").innerHTML = txt;
-            let cname = this.getPCNameForType(ctype);
+            li.querySelector("a").innerHTML = il.Language.txt("paste");
             li.querySelector("a").addEventListener("click", (event) => {
-              dispatch.dispatch(action.page().editor().componentInsert(cname,
+              dispatch.dispatch(action.page().editor().multiPaste(
                 area.dataset.pcid,
-                area.dataset.hierid));
+                area.dataset.hierid,
+                model.getMultiState()));
             });
             ul.appendChild(li);
+          } else {
+            // add each components
+            for (const [ctype, txt] of Object.entries(uiModel.addCommands)) {
+              li = li_templ.cloneNode(true);
+              li.querySelector("a").innerHTML = txt;
+              let cname = this.getPCNameForType(ctype);
+              li.querySelector("a").addEventListener("click", (event) => {
+                dispatch.dispatch(action.page().editor().componentInsert(cname,
+                  area.dataset.pcid,
+                  area.dataset.hierid));
+              });
+              ul.appendChild(li);
+            }
           }
         });
       });
@@ -257,7 +288,7 @@ export default class PageUI {
           dispatch.dispatch(action.page().editor().dndDrag());
         },
         stop: function( event, ui ) {
-          dispatch.dispatch(action.page().editor().dndDrop());
+
         },
         helper: (() => {
           return $("<div style='width: 40px; border: 1px solid blue;'>&nbsp;</div>");
@@ -269,13 +300,13 @@ export default class PageUI {
       drop: (event, ui) => {
         ui.draggable.draggable( 'option', 'revert', false );
 
+
+
         // @todo: remove legacy
         const target_id = event.target.id.substr(6);
         const source_id = ui.draggable[0].id.substr(7);
-        if (source_id !== target_id) {
-          ilCOPage.sendCmdRequest("moveAfter", source_id, target_id, {},
-            true, {}, ilCOPage.pageReloadAjaxSuccess);
-        }
+
+        dispatch.dispatch(action.page().editor().dndDrop(target_id, source_id));
       }
     });
 
@@ -364,8 +395,22 @@ export default class PageUI {
   }
 
   showMultiButtons() {
-    this.toolSlate.setContent(this.uiModel.multiActions);
-    this.initMultiButtons();
+    const model = this.model;
+
+    switch (model.getMultiState()) {
+      case model.STATE_MULTI_CUT:
+        this.toolSlate.setContent(this.uiModel.cutConfirm);
+        break;
+      case model.STATE_MULTI_COPY:
+        this.toolSlate.setContent(this.uiModel.copyConfirm);
+        break;
+      default:
+        this.toolSlate.setContent(this.uiModel.multiActions);
+        this.initMultiButtons();
+        break;
+    }
+
+
   }
 
   /**
@@ -381,5 +426,20 @@ export default class PageUI {
       }
     });
   }
+
+  // default callback for successfull ajax request, reloads page content
+  handlePageReloadResponse(result)
+  {
+    const pl = result.getPayload();
+    this.log("handlePageReloadResponse");
+
+    if(pl.renderedContent !== undefined)
+    {
+      $('#il_center_col').html(pl.renderedContent);
+      il.IntLink.refresh();
+      this.reInit();
+    }
+  }
+
 
 }

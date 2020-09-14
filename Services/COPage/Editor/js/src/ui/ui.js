@@ -78,7 +78,9 @@ export default class UI {
       this.dispatcher,
       this.actionFactory,
       this.model.model("page"),
-      this.toolSlate);
+      this.toolSlate,
+      this.pageModifer
+    );
     this.paragraph = new ParagraphUI(
       this.client,
       this.dispatcher,

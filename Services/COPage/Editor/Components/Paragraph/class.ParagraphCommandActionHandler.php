@@ -89,7 +89,7 @@ class ParagraphCommandActionHandler implements Server\CommandActionHandler
 
         $content = "<div id='" .
             $pcid . "' class='ilc_text_block_" .
-            $body["characteristic"] . "'>" . $body["data"]["content"] . "</div>";
+            $body["data"]["characteristic"] . "'>" . $body["data"]["content"] . "</div>";
 
         $this->content_obj = new \ilPCParagraph($page);
         $this->updated = $this->content_obj->saveJS(

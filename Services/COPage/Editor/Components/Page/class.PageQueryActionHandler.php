@@ -84,6 +84,8 @@ class PageQueryActionHandler implements Server\QueryActionHandler
         $o->addCommands = $this->getAddCommands();
         $o->pageHelp = $this->getPageHelp();
         $o->multiActions = $this->getMultiActions();
+        $o->cutConfirm = $this->getCutCopyConfirm("cut");
+        $o->copyConfirm = $this->getCutCopyConfirm("copy");
         $o->config = $this->getConfig();
         $o->components = $this->getComponentsEditorUI();
         $o->pcModel = $this->getPCModel();
@@ -153,13 +155,7 @@ class PageQueryActionHandler implements Server\QueryActionHandler
      */
     protected function getMultiActions()
     {
-        $ui = $this->ui;
-        $r = $ui->renderer();
-
-        // @todo: what kind of ks elements are these? button groups?
-        $tpl = new \ilTemplate("tpl.editor_multi_actions.html", true, true, "Services/COPage");
-
-        $sections = [
+        $groups = [
             [
                 "cut" => "cut",
                 "copy" => "copy",
@@ -175,20 +171,27 @@ class PageQueryActionHandler implements Server\QueryActionHandler
             ]
         ];
 
-        foreach ($sections as $buttons) {
-            foreach ($buttons as $action => $lng_key) {
-                $tpl->setCurrentBlock("button");
-                $b = $this->ui_wrapper->getButton($this->lng->txt($lng_key), "multi", $action);
-                $tpl->setVariable("BUTTON", $r->renderAsync($b));
-                $tpl->parseCurrentBlock();
-            }
-            $tpl->setCurrentBlock("section");
-            $tpl->parseCurrentBlock();
-        }
-
-        return $tpl->get();
+        return $this->ui_wrapper->getRenderedButtonGroups($groups);
     }
 
+    /**
+     * Confirmation screen for cut/paste step
+     * @return string
+     */
+    protected function getCutCopyConfirm($action)
+    {
+        $lng = $this->lng;
+
+        $groups = [
+            [
+                "cancel.".$action => "cancel"
+            ]
+        ];
+        $html = $this->ui_wrapper->getRenderedInfoBox($lng->txt("cont_sel_el_".$action."_use_paste")).
+            $this->ui_wrapper->getRenderedButtonGroups($groups);
+
+        return $html;
+    }
 
     /**
      * Get page component model

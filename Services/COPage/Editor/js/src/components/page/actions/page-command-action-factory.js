@@ -62,4 +62,41 @@ export default class PageCommandActionFactory {
       ids: ids
     });
   }
+
+  /**
+   * @param {[]} pcids
+   * @param {string} target_pcid
+   * @return {CommandAction}
+   */
+  cutPaste(pcids, target_pcid) {
+    return this.clientActionFactory.command(this.COMPONENT, ACTIONS.CUT_PASTE, {
+      pcids: pcids,
+      target_pcid: target_pcid
+    });
+  }
+
+  /**
+   * @param {[]} pcids
+   * @param {string} target_pcid
+   * @return {CommandAction}
+   */
+  copyPaste(pcids, target_pcid) {
+    return this.clientActionFactory.command(this.COMPONENT, ACTIONS.COPY_PASTE, {
+      pcids: pcids,
+      target_pcid: target_pcid
+    });
+  }
+
+  /**
+   * @param {string} target
+   * @param {string} source
+   * @return {CommandAction}
+   */
+  dragDrop(target, source) {
+    return this.clientActionFactory.command(this.COMPONENT, ACTIONS.DRAG_DROP, {
+      target: target,
+      source: source
+    });
+  }
+
 }

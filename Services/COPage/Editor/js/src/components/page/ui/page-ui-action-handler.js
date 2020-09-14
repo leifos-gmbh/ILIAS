@@ -1,5 +1,7 @@
 /* Copyright (c) 1998-2020 ILIAS open source, Extended GPL, see docs/LICENSE */
 
+import ACTIONS from "../actions/page-action-types.js";
+
 /**
  * Page UI action handler
  */
@@ -91,17 +93,30 @@ export default class PageUIActionHandler {
         this.ui.highlightSelected(model.getSelected());
         break;
 
+      case "multi.paste":
+        this.sendPasteCommand(model, params);
+        break;
+
+      case ACTIONS.DND_DROP:
+        this.sendDropCommand(params);
+        break;
+
       case "multi.action":
         let type = params.type;
 
         // @todo refactor legacy
-        if (["delete", "cut", "copy", "characteristic", "activate"].includes(type)) {
+        if (["delete", "characteristic", "activate"].includes(type)) {
           client.sendForm(actionFactory.page().command().multiLegacy(type,
             Array.from(model.getSelected())));
           form_sent = true;
         }
-        if (["all", "none"].includes(type)) {
+        if (["all", "none", "cut", "copy"].includes(type)) {
           this.ui.highlightSelected(model.getSelected());
+        }
+        switch (type) {
+          case "cut":
+            this.ui.pageModifier.cut(model.getCutItems());
+            break;
         }
         break;
     }
@@ -126,8 +141,12 @@ export default class PageUIActionHandler {
           break;
 
         case model.STATE_MULTI_ACTION:
+          if ([model.STATE_MULTI_CUT, model.STATE_MULTI_COPY].includes(model.getMultiState())) {
+            this.ui.showAddButtons();
+          } else {
+            this.ui.hideAddButtons();
+          }
           this.ui.showMultiButtons();
-          this.ui.hideAddButtons();
           this.ui.hideDropareas();
           this.ui.disableDragDrop();
           break;
@@ -147,4 +166,55 @@ export default class PageUIActionHandler {
       }
     }
   }
+
+  sendPasteCommand(model, params) {
+    let paste_action;
+    const af = this.actionFactory;
+
+    if (params.mode === model.STATE_MULTI_CUT) {
+
+      const cutPcIds = Array.from(
+        model.getCutItems()).map(x => (x.split(":")[1])
+      );
+
+      paste_action = af.page().command().cutPaste(
+        cutPcIds,
+        params.pcid,
+      );
+    } else if (params.mode === model.STATE_MULTI_COPY) {
+      const copyPcIds = Array.from(
+        model.getCopyItems()).map(x => (x.split(":")[1])
+      );
+
+      paste_action = af.page().command().copyPaste(
+        copyPcIds,
+        params.pcid,
+      );
+    }
+
+    this.client.sendCommand(paste_action).then(result => {
+      console.log("sendPasteCommand result");
+      this.ui.handlePageReloadResponse(result);
+      // replace pcid with pl.rendered_component;
+    });
+
+  }
+
+  sendDropCommand(params) {
+    let drop_action;
+    const af = this.actionFactory;
+
+    drop_action = af.page().command().dragDrop(
+      params.target,
+      params.source
+    );
+
+    this.client.sendCommand(drop_action).then(result => {
+      console.log("sendDragDropCommand result");
+      this.ui.handlePageReloadResponse(result);
+      // replace pcid with pl.rendered_component;
+    });
+
+  }
+
 }

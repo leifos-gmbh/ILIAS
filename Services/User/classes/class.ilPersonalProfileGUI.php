@@ -157,6 +157,10 @@ class ilPersonalProfileGUI
 
         $ilUser = $DIC['ilUser'];
 
+        // cdpatch start
+        return;
+        // cdpatch end
+
         if ($this->workWithUserSetting("upload")) {
             if (!$this->form->hasFileUpload("userfile")) {
                 if ($this->form->getItemByPostVar("userfile")->getDeletionFlag()) {
@@ -581,7 +585,11 @@ class ilPersonalProfileGUI
         $ilHelp = $DIC['ilHelp'];
 
         $ilHelp->setScreenIdComponent("user");
-        
+
+        // cdpatch start
+        return;
+        // cdpatch end
+		
         // personal data
         $ilTabs->addTab(
             "personal_data",
@@ -698,7 +706,8 @@ class ilPersonalProfileGUI
      */
     public function setHeader()
     {
-        $this->tpl->setTitle($this->lng->txt('personal_profile'));
+        // cdpatch: outcommented next line
+        //$this->tpl->setTitle($this->lng->txt('personal_profile'));
     }
 
     //
@@ -719,7 +728,8 @@ class ilPersonalProfileGUI
         $ilTabs = $DIC['ilTabs'];
         $prompt_service = new ilUserProfilePromptService();
 
-        $ilTabs->activateTab("personal_data");
+        // cdpatch: out-commented next line
+        //$ilTabs->activateTab("personal_data");
         $ctrl = $DIC->ctrl();
 
         $setting = new ilSetting("user");
@@ -741,7 +751,7 @@ class ilPersonalProfileGUI
                 );
                 $it .= "<br><br>" . $DIC->ui()->renderer()->render($button);
             }
-            
+
             ilUtil::sendInfo(nl2br($it));
         }
 
@@ -801,8 +811,15 @@ class ilPersonalProfileGUI
         include_once("./Services/User/classes/class.ilUserProfile.php");
         $up = new ilUserProfile();
         $up->skipField("password");
+        //cdpatch start
+        $up->skipField("company_password");
+        $up->skipField("password_addon");
+        //cdpatch end
         $up->skipGroup("settings");
         $up->skipGroup("preferences");
+        //cdpatch start
+        $up->skipField("roles");
+        //cdpatch end
         
         $up->setAjaxCallback(
             $this->ctrl->getLinkTargetByClass('ilPublicUserProfileGUI', 'doProfileAutoComplete', '', true)
@@ -865,6 +882,14 @@ class ilPersonalProfileGUI
                         case "second_email":
                             $ilUser->setSecondEmail($value);
                             break;
+
+                        // cdpatch start
+                        case "usr_branch":
+                        case "field_of_responsibility":
+                        case "usr_field_of_responsibility":
+                            break;
+                        // cdpatch end
+
                         default:
                             $m = ucfirst($f);
                             if (isset($map[$f])) {
@@ -876,6 +901,17 @@ class ilPersonalProfileGUI
                 }
             }
             $ilUser->setFullname();
+            // cdpatch start
+            if ($this->workWithUserSetting("branch")) {
+                $ilUser->setBranch($_POST["usr_branch"]);
+            }
+            if ($this->workWithUserSetting("field_of_responsibility")) {
+                $ilUser->setFieldOfResponsibility($_POST["usr_field_of_responsibility"]);
+            }
+            if ($this->workWithUserSetting("profession")) {
+                $ilUser->setProfession($_POST["usr_profession"]);
+            }
+            // cdpatch end
 
             // check map activation
             include_once("./Services/Maps/classes/class.ilMapUtil.php");

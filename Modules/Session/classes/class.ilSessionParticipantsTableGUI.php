@@ -154,7 +154,8 @@ class ilSessionParticipantsTableGUI extends ilTable2GUI
         }
         $this->addColumn($this->lng->txt('event_tbl_participated'), 'participated');
         $this->addColumn($this->lng->txt('sess_contact'), 'contact');
-        $this->addColumn($this->lng->txt('trac_mark'), 'mark');
+        // cdpatch: removed mark
+        //$this->addColumn($this->lng->txt('trac_mark'), 'mark');
         $this->addColumn($this->lng->txt('trac_comment'), 'comment');
         
         
@@ -365,7 +366,8 @@ class ilSessionParticipantsTableGUI extends ilTable2GUI
         $this->tpl->setVariable('LASTNAME', $a_set['lastname']);
         $this->tpl->setVariable('FIRSTNAME', $a_set['firstname']);
         $this->tpl->setVariable('LOGIN', $a_set['login']);
-        $this->tpl->setVariable('MARK', $a_set['mark']);
+        // cd-patch: disabled mark
+        //$this->tpl->setVariable('MARK',$a_set['mark']);
         $this->tpl->setVariable('COMMENT', $a_set['comment']);
         $this->tpl->setVariable('PART_CHECKED', $a_set['participated'] ? 'checked="checked"' : '');
         $this->tpl->setVariable('CONTACT_CHECKED', $a_set['contact'] ? 'checked="checked"' : '');

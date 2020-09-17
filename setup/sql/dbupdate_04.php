@@ -2352,16 +2352,10 @@ $ilDB->addTableColumn("content_object", "store_tries", $def);
 ?>
 <#4291>
 <?php
+
     $query = 'DELETE FROM rbac_fa WHERE parent = ' . $ilDB->quote(0, 'integer');
     $ilDB->manipulate($query);
 
-
-    /*$query = 'UPDATE rbac_fa f '.
-            'SET parent  = '.
-                '(SELECT t.parent FROM tree t where t.child = f.parent) '.
-            'WHERE f.parent != '.$ilDB->quote(8,'integer').' '.
-            'AND EXISTS (SELECT t.parent FROM tree t where t.child = f.parent) ';
-    $ilDB->manipulate($query);*/
 
     global $ilLog;
 
@@ -2419,13 +2413,21 @@ $ilDB->addTableColumn("content_object", "store_tries", $def);
         $new_parent_id = $row['grandparent'];
 
         $parent_res = $ilDB->execute($stmt3, array($parent_id));
-        $parent_row = $ilDB->fetchAssoc($parent_res);
-        if ($parent_row['type'] != 'rolf') {
+	    // cdpatch fixed this due to 0020510
+	    //$parent_row = $ilDB->fetchAssoc($parent_res);
+	    $parent_row = $ilDB->fetchAssoc($stmt3);
+	    if($parent_row['type'] != 'rolf')
+	    {
+	    	// cdpatch: added line
+	    	echo "<br>3:".sprintf("Parent of role with id %s is not a 'rolf' (obj_id: %s, type: %s), so skip record", $role_id, $parent_row['obj_id'], $parent_row['type']);
             $ilLog->write(sprintf("Parent of role with id %s is not a 'rolf' (obj_id: %s, type: %s), so skip record", $role_id, $parent_row['obj_id'], $parent_row['type']));
             continue;
         }
 
-        if ($new_parent_id <= 0) {
+	    if($new_parent_id <= 0)
+	    {
+	    	// cdpatch: added line
+	    	echo "<br>4:".sprintf("Could not migrate record with role_id %s and parent id %s because the grandparent is 0", $role_id, $parent_id);
             $ilLog->write(sprintf("Could not migrate record with role_id %s and parent id %s because the grandparent is 0", $role_id, $parent_id));
             continue;
         }
@@ -2446,6 +2448,7 @@ $ilDB->addTableColumn("content_object", "store_tries", $def);
         $ilDB->dropTable('rbac_fa_temp');
         $ilLog->write("Dropped new temporary table: rbac_fa_temp");
     }
+
 ?>
 
 <#4292>
@@ -2516,8 +2519,11 @@ $ilDB->addTableColumn("content_object", "store_tries", $def);
         $new_parent_id = $row['grandparent'];
 
         $parent_res = $ilDB->execute($stmt3, array($parent_id));
-        $parent_row = $ilDB->fetchAssoc($parent_res);
-        if ($parent_row['type'] != 'rolf') {
+	    // cdpatch: fixed this due to #0020510
+	    //$parent_row = $ilDB->fetchAssoc($parent_res);
+	    $parent_row = $ilDB->fetchAssoc($stmt3);
+	    if($parent_row['type'] != 'rolf')
+	    {
             $ilLog->write(sprintf("Parent of role with id %s is not a 'rolf' (obj_id: %s, type: %s), so skip record", $role_id, $parent_row['obj_id'], $parent_row['type']));
             continue;
         }
@@ -4469,7 +4475,7 @@ while ($row = $ilDB->fetchAssoc($res)) {
 
 <#4398>
 <?php
-
+/* cdpatch outcommented everything
 $indexName = $ilDB->constraintName('tst_dyn_quest_set_cfg', $ilDB->getPrimaryKeyIdentifier());
 
 if (($ilDB->db->options['portability'] & MDB2_PORTABILITY_FIX_CASE) && $ilDB->db->options['field_case'] == CASE_LOWER) {
@@ -4523,6 +4529,10 @@ if ($indexDefinition instanceof MDB2_Error) {
 
     $ilDB->addPrimaryKey('tst_dyn_quest_set_cfg', array('test_fi'));
 }
+*/
+
+// cdpatch: added this line outside
+$ilDB->addPrimaryKey('tst_dyn_quest_set_cfg', array('test_fi'));
 
 ?>
 
@@ -5451,14 +5461,10 @@ if ($tgt_ops_id) {
 ?>
 <#4451>
 <?php
+	/* cdpatch : outcommented this migration, we still use the old tables for self evaluations in the 5.2 patch
     $ilSetting = new ilSetting();
-    if ((int) $ilSetting->get("optes_360_db") <= 0) {
-        /*$ilDB->manipulate("DELETE FROM skl_user_has_level WHERE ".
-            " self_eval = ".$ilDB->quote(1, "integer")
-        );
-        $ilDB->manipulate("DELETE FROM skl_user_skill_level WHERE ".
-            " self_eval = ".$ilDB->quote(1, "integer")
-        );*/
+	if ((int) $ilSetting->get("optes_360_db") <= 0)
+	{
 
         $set = $ilDB->query("SELECT * FROM skl_self_eval_level ORDER BY last_update ASC");
         $writtenkeys = array();
@@ -5509,6 +5515,7 @@ if ($tgt_ops_id) {
             $ilDB->manipulate($q);
         }
     }
+	*/
 ?>
 <#4452>
 <?php

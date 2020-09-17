@@ -1,0 +1,236 @@
+//
+// German Language File for CD Plugin AKTUELLE DATEI 20.06.2013
+//
+
+<!-- language file start -->
+companyname#:#Gruppenname
+manage_center#:#Zentren
+centers#:#Zentren
+title#:#Titel
+actions#:#Aktionen
+add_center#:#Zentrum hinzufügen
+center#:#Zentrum
+edit_center#:#Zentrum ändern
+sure_delete_center#:#Sind Sie sicher, daß die folgenden Zentren gelöscht werden sollen?
+companies#:#Gruppen
+add_company#:#Gruppen hinzufügen
+edit_company#:#Gruppen ändern
+city#:#Stadt
+street#:#Straße und Hausnummer
+postal_code#:#Postleitzahl
+country#:#Land
+po_box#:#Postfach
+fax#:#Fax
+contact_firstname#:#Ansprechpartner, Vorname
+contact_lastname#:#Ansprechpartner, Nachname
+contact_tel#:#Ansprechpartner, Telefon
+sure_delete_company#:#Sind Sie sicher, daß die folgenden Gruppen gelöscht werden sollen?
+company_password#:#Zugangscode
+password_already_exists#:#Der Zugangscode wird bereits von einer anderen Gruppen verwendet.
+company_password_does_not_exist#:#Sie haben einen falschen Zugangscode eingegeben.
+nr_users#:#TN
+user_type#:#benutzertyp
+employee#:#CDC Angestellter
+customer#:#Kunde
+standard_user#:#Standardbenutzer
+company#:#Gruppen
+list_users#:#Benutzer anzeigen
+needs_analysis#:#Ihre Sprachlernbiographie
+needs_analysis_reiter#:#Bedarfsanalyse
+self_evaluation#:#Selbsteinschätzung
+entry_level_test#:#Einstufung
+course_lang_q#:#Für einen Sprachkurs in der Sprache:
+course_lang#:#Kurssprache
+other_languages_q#:#Welche anderen Sprachen sprechen Sie?
+other_lang_free_q#:#Weitere Sprachen
+last_course_q#:#Wann haben Sie zuletzt an einem Sprachkurs in der gewünschten Sprache teilgenommen?
+lang_level_q#:#Welches Niveau haben Sie beim letzten Sprachkurs erlangt?
+present_projects#:#Den Arbeitsplatz, die Firma, Produkte, Projekte etc. präsentieren
+conduct_negotiations#:#An Arbeitstreffen und Besprechungen teilnehmen
+participate_in_meetings#:#Besprechungen und Diskussionen leiten und moderieren
+make_phone_calls#:#An Telefonkonferenzen teilnehmen
+phone_questions#:#Allgemeine Anfragen am Telefon beantworten
+service_phone#:#Allgemeine Anfragen am Telefon beantworten
+typewriting#:#Maschinen und Prozesse beschreiben
+offers_negotiate#:#Angebote verhandeln
+business_hotel#:#Sich auf Geschäftsreisen orientieren (im Hotel, auf Reisen)
+visitors_supervise#:#Besucher betreuen (Gäste empfangen, Betriebsbesichtigung durchführen, an Geschäftsessen teilnehmen)
+sales_talk#:#Verkaufsgespräche
+socializing#:#Socializing
+write_faxes_or_memos#:#Memos schreiben
+write_letters_or_emails#:#E-Mails und Briefe schreiben/lesen
+write_reports#:#Berichte schreiben
+read_technical_specialized_text#:#(technische, medizinische, wirtschaftliche) Fachtexte lesen
+read_reports#:#Gruppen Berichte und Mitteilungen lesen
+read_financial_documents#:#Lesen von Finanzdokumenten
+law#:#Recht
+it#:#IT
+technology#:#Technik
+finance#:#Finanzen
+medicin#:#Medizin
+human_resources#:#Personalwesen
+marketing_and_sales#:#Marketing und Vertrieb
+management#:#Management
+freq_0#:#Nein
+freq_1#:#Ja
+freq_2#:#häufig
+freq_3#:#selten
+technical_language#:#Fachsprache
+other_technical_language#:#Andere Fachsprache
+which_situations_q#:#Ihr Bedarf - Für welche der folgenden Situationen an Ihrem Arbeitsplatz möchten Sie Ihre Fremdsprachenkenntnisse verbessern? Kreuzen Sie bitte an.
+talk_and_understand#:#Sprechen und Verstehen
+write_and_read#:#Schreiben und Lesen
+technical_language_q#:#Benötigen Sie für Ihren Arbeitsplatz Kenntnisse einer Fachsprache?
+your_recent_needs_analyses#:#Ihre letzten Sprachlernbiographien
+created_on#:#Erstellt
+last_update#:#Letzte Änderung
+add_needs_analysis#:#Bedarfsanalyse erstellen
+edit_needs_analysis#:#Sprachlernbiographie ändern
+center_category#:#Hauptkategorie des Zentrums
+other_languages#:#Andere Sprachen
+last_course#:#Letzter Kursbesuch in der gewünschten Sprache
+lang_level#:#Erreichtes Niveau
+which_situations#:#Situationen im zukünftigen Berufsleben
+technical_language#:#Benötigte berufliche Fachsprache
+learn_data#:#Lerndaten
+add_entry_level_test#:#Neue Einstufung
+your_recent_language_tests#:#Ihre bisherigen Einstufungen
+points#:#Punkte
+achieved_level#:#Sprachlevel Einstufung
+sure_delete_entry_level_test#:#Wollen sie diese Tests wirklick löschen?
+grammar#:#Grammatik
+voca#:#Vokabular
+read#:#Lesen
+listen#:#Hören
+finished#:#Komplett abgearbeitet
+yes#:#Ja
+no#:#Nein
+language#:#Sprache
+duration#:#Dauer
+test_in#:#In %s
+option_never#:#nie
+option_none#:#---
+internet#:#Internet
+add_user#:#Benutzer hinzufügen
+really_delete_users#:#Sollen die folgenden Benutzer wirklich gelöscht werden?
+users_have_been_deleted#:#Die ausgewählten Benutzer wurden gelöscht.
+added_user#:#Der neue Benutzeraccount wurde erstellt.
+participants#:#Teilnehmer
+next_step#:#Nächster Schritt
+previous_step#:#Voriger Schritt
+step#:#Schritt
+finish_needs_analysis#:#Sprachlernbiographie abschließen
+sure_delete_needs_analysis#:#Sind Sie sicher, daß die folgenden Sprachlernbiographien gelöscht werden sollen?
+online#:#Online
+avg_self#:#ØSelbst
+mother_tongue#:#MutterSp
+train_lang#:#TrainingSP
+oral#:#Mündlich
+target#:#Ziel
+type_of_training#:#Trainingsart
+tech_lang#:#Fachsprache
+company_title#:#Gruppen
+not_possible_to_create_user#:#It is currently not possible to add users for this center. Please create a center category first and for this category add a role named "Kunde".
+oral_target#:#Mündlich/Ziel/Trainingsart
+export_excel#:#Export (Excel)
+manage_course_types#:#Trainingsarten
+add_course_type#:#Trainingsart hinzufügen
+course_types#:#Trainingsarten
+edit_course_type#:#Trainingsart bearbeiten
+sure_delete_course_type#:#Wollen Sie die folgenden Trainingsarten wirklich löschen?
+course_type#:#Trainingsart
+parent_company#:#Muttergesellschaft
+freq_#:#Keine Angabe
+pointscdc#:#PunkteTest
+datumtest#:#letzter Test
+company_title_amendment#:#Zusatz Gruppen
+company_address_amendment#:#Zusatz Adresse
+creation_user#:#Ersteller
+participation_confirmation#:#Teilnahmebestätigung
+generate_part_confirmation#:#Teilnahmebestätigung generieren
+course_from#:#Kursteilnahme von
+course_until#:#Kursteilnahme bis
+date#:#Datum
+name_signature#:#Name für Unterschrift
+add_confirmation_template#:#Vorlage hinzufügen
+confirmation_templates#:#Vorlagen für Teilnahmebestätigungen
+new_confirmation_template#:#Neue Vorlage
+sure_delete_confirmations#:#Wollen Sie wirklich die folgenden Vorlagen löschen?
+confirmations_deleted#:#Die Vorlagen wurden gelöscht.
+tab_addon#:#e-Learning
+addon_info#:#Willkommen zu unserem e-Learning Angebot.
+addon_start#:#Start
+function#:#Funktion
+participant_evaluation#:#Lernfortschrittsmessung
+participant#:#Teilnehmer
+trainer#:#Trainer
+course_level#:#Kurslevel
+after_x_lessons#:#Lernfortschritt nach _ Unterrichtsstunden
+starting_cef#:#CEF Level zu Beginn
+current_cef#:#CEF Level, aktuell
+skills#:#Fähigkeiten
+listening#:#Hören
+speaking#:#Sprechen
+reading#:#Lesen
+language_fluency#:#Redefluss
+writing#:#Schreiben
+business_communication#:#Geschäftskommunikation
+needs_work#:#Kein Fortschritt
+satisfactory#:#wenig Fortschritt
+good#:#guter Fortschritt
+very_good#:#sehr guter Fortschritt
+excellent#:#keine Aussage möglich
+participant_evaluations#:#Lernfortschrittsmessung
+add_participant_evaluation#:#Lernfortschritt hinzufügen
+test_i_f_exam#:#Test (Zwischen/Abschlußprüfung)
+result#:#Resultat
+test_attendance#:#Teilnahme
+recommendation#:#Empfehlung
+stay_in_group#:#Gruppenverbleib
+recommended_level#:#Empfohlener Level
+evaluation_list#:#Liste des Lernfortschritts
+evaluations#:#Beurteilungen
+evaluation_notifications#:#Ausstehende Lernfortschrittsmessung
+test_level#:#Test-Art
+mid_of_course#:#Mitte des Kurses
+end_of_course#:#Ende des Kurses
+na_max_elements#:#Bitte wählen Sie maximal %s Einträge aus.
+export_evaluations#:#Beurteilungen exportieren
+part_lastname#:#Nachname, Teilnehmer
+part_firstname#:#Vorname, Teilnehmer
+trainer_lastname#:#Nachname, Trainer
+trainer_firstname#:#Vorname, Trainer
+creation#:#Erstellung
+last_update#:#Letzte Änderung
+evaluations_course#:#Lernfortschritt
+course_nr#:#Kursnummer
+cd_config#:#CD Konfiguration
+material_ref_id#:#Ref ID der Materialienkategorie
+material#:#Intern(Material)
+cdusername#:#Ersteller
+insurances#:#Versicherungen
+trainers#:#Trainer
+sure_delete_pe_evaluation#:#Wollen Sie wirklich die folgenden Beurteilungen von %1 löschen?
+change_company#:#Gruppe wechseln
+new_company#:#Neue Gruppe
+sure_to_change_company#:#Sollen die Personen wirklich einen neuen Gruppe zugeordnet werden?
+learning_progress#:#Lernfortschritt
+part_eval_overview#:#Lernfortschrittsübersicht
+after_x_lessons_short#:#Stunden
+starting_cef_short#:#CEF Beginn
+current_cef_short#:#CEF aktuell
+course#:#Kurs
+business_communication_short#:#Gesch.-Komm.
+published#:#Freigegeben
+publish#:#Zur Einsicht durch Lerner freigeben
+unpublish#:#Freigabe aufheben
+add_ot_entry#:#Eintrag hinzufügen
+sure_delete_ot#:#Sollen diese Einträge wirklich gelöscht werden?
+daf_how_long_german#:#Wie lange lernen Sie schon Deutsch? Wo haben Sie Deutsch gelernt? Mit welchem Buch (zuletzt)? Wann?
+daf_why_learn_german#:#Warum möchten Sie (jetzt) Deutsch lernen?
+daf_wishes_course#:#Welche Wünsche haben Sie für den Sprachkurs hier?
+daf_stay_germany#:#Waren Sie früher schon einmal in Deutschland? Wann? Wie lange? Wo?
+daf_hobbies#:#Womit beschäftigen Sie sich zu Hause in der Freizeit? Welche Hobbys haben Sie?
+daf_free_time#:#Was möchten Sie in Ihrer Freizeit im Sprachkurs machen?
+learning_studio#:#Lernstudio
+open_learning_studio#:#Lernstudio öffnen

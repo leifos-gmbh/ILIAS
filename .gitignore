@@ -29,12 +29,12 @@
 
 # Directories
 /data
-/Customizing/global
-/Customizing/clients
 /setup/sql/ilDBTemplate
 virtual-data
+/Customizing/global/plugins/Services/Repository
 
 # /dicto
 /dicto/results/*
 !/dicto/results/README.md
 override.php
+/.htaccess

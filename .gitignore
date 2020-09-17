@@ -26,12 +26,20 @@
 /db_template_writer.php
 /setup/sql/dbupdate_custom.php
 /install_client.php
+/einverstaednis_de.pdf
+/einverstaednis_en.pdf
+/internet_agb_en.pdf
+/internet_agb.pdf
+/internet_de.pdf
+/internet_en.pdf
+/foto_notes.pdf
 
 # Directories
 /data
 /setup/sql/ilDBTemplate
 virtual-data
 /Customizing/global/plugins/Services/Repository
+/etest
 
 # /dicto
 /dicto/results/*

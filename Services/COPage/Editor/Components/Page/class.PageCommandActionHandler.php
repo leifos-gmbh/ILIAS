@@ -73,6 +73,14 @@ class PageCommandActionHandler implements Server\CommandActionHandler
                 return $this->format($body);
                 break;
 
+            case "delete":
+                return $this->delete($body);
+                break;
+
+            case "activate":
+                return $this->activate($body);
+                break;
+
             default:
                 throw new Exception("Unknown action " . $body["action"]);
                 break;
@@ -147,9 +155,31 @@ class PageCommandActionHandler implements Server\CommandActionHandler
         );
 
         $updated = $page->assignCharacteristic($hids, $par, $sec);
+        return $this->sendPage();
+    }
 
-        //$page->copyContents($hids);
-        //$page->pasteContents($this->getIdForPCId($target_pcid));
+    /**
+     * Delete command
+     * @param $body
+     * @return Server\Response
+     */
+    protected function delete($body) : Server\Response
+    {
+        $pcids = $body["data"]["pcids"];
+        $page = $this->page_gui->getPageObject();
+
+        $hids = array_map(
+            function ($pcid) {
+                return $this->getIdForPCId($pcid);
+            },
+            $pcids
+        );
+
+        $updated = $page->deleteContents(
+            $hids,
+            true,
+            $this->page_gui->getPageConfig()->getEnableSelfAssessment()
+        );
 
         return $this->sendPage();
     }
@@ -258,6 +288,33 @@ class PageCommandActionHandler implements Server\CommandActionHandler
         $data = new \stdClass();
         $data->renderedContent = "Test the rendered content";
         return new Server\Response($data);
+    }
+
+    /**
+     * Activate command
+     * @param $body
+     * @return Server\Response
+     */
+    protected function activate($body) : Server\Response
+    {
+        $pcids = $body["data"]["pcids"];
+        $page = $this->page_gui->getPageObject();
+
+        $hids = array_map(
+            function ($pcid) {
+                return $this->getIdForPCId($pcid);
+            },
+            $pcids
+        );
+
+        $updated = $page->switchEnableMultiple(
+            $hids,
+            true,
+            $this->page_gui->getPageConfig()->getEnableSelfAssessment()
+        );
+
+
+        return $this->sendPage();
     }
 
 }

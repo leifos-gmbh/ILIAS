@@ -106,12 +106,28 @@ export default class PageEditorActionFactory {
    * @returns {EditorAction}
    */
   formatSave(pcids, parFormat, secFormat) {
-    console.log("PCIDS");
-    console.log(pcids);
     return this.editorActionFactory.action(this.COMPONENT, ACTIONS.FORMAT_SAVE, {
       pcids: pcids,
       parFormat: parFormat,
       secFormat: secFormat
+    });
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  multiDelete(pcids) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.MULTI_DELETE, {
+      pcids: pcids
+    });
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  multiActivate(pcids) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.MULTI_ACTIVATE, {
+      pcids: pcids
     });
   }
 

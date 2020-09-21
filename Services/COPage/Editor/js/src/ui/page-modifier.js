@@ -86,5 +86,40 @@ export default class PageModifier {
     });
   }
 
+  showModal(title, content, button_txt, onclick) {
+    const uiModel = this.pageUI.uiModel;
+
+    $("#il-copg-ed-modal").remove();
+    let modal_template = uiModel.modal.template;
+    modal_template = modal_template.replace("#title#", title);
+    modal_template = modal_template.replace("#content#", content);
+    modal_template = modal_template.replace("#button_title#", button_txt);
+
+    $("body").append("<div id='il-copg-ed-modal'>" + modal_template + "</div>");
+
+    $(document).trigger(
+      uiModel.modal.signal,
+      {
+        'id': uiModel.modal.signal,
+        'triggerer': $(this),
+        'options': JSON.parse('[]')
+      }
+    );
+
+    const b = document.querySelector("#il-copg-ed-modal .modal-footer button");
+    b.addEventListener("click", onclick);
+  }
+
+  hideCurrentModal() {
+    $("#il-copg-ed-modal .modal").modal("hide");
+  }
+
+  getConfirmation(text) {
+    const uiModel = this.pageUI.uiModel;
+
+    let confirmation_template = uiModel.confirmation;
+    confirmation_template = confirmation_template.replace("#text#", text);
+    return confirmation_template;
+  }
 
 }

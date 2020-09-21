@@ -352,7 +352,12 @@ export default class PageUI {
     document.querySelectorAll("[data-copg-ed-type='multi']").forEach(multi_button => {
       const type = multi_button.dataset.copgEdAction;
       multi_button.addEventListener("click", (event) => {
-        dispatch.dispatch(action.page().editor().multiAction(type));
+        if (type === "activate") {
+          const pcids = new Set(this.model.getSelected());
+          dispatch.dispatch(action.page().editor().multiActivate(pcids));
+        } else {
+          dispatch.dispatch(action.page().editor().multiAction(type));
+        }
       });
     });
   }
@@ -518,5 +523,23 @@ export default class PageUI {
     }
   }
 
+  showDeleteConfirmation() {
+    let content = this.pageModifier.getConfirmation(il.Language.txt("copg_confirm_el_deletion"))
+    const dispatch = this.dispatcher;
+    const action = this.actionFactory;
+
+    this.pageModifier.showModal(
+      il.Language.txt("cont_delete_content"),
+      content,
+      il.Language.txt("delete"),
+      () => {
+        const pcids = new Set(this.model.getSelected());
+        dispatch.dispatch(action.page().editor().multiDelete(pcids));
+      });
+  }
+
+  hideDeleteConfirmation() {
+    this.pageModifier.hideCurrentModal();
+  }
 
 }

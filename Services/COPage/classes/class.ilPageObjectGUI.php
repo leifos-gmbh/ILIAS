@@ -2781,6 +2781,9 @@ class ilPageObjectGUI
         }
 
         $this->lng->toJS("paste");
+        $this->lng->toJS("delete");
+        $this->lng->toJS("cont_delete_content");
+        $this->lng->toJS("copg_confirm_el_deletion");
         $this->setOutputMode(self::EDIT);
 
         $html = $this->showPage();

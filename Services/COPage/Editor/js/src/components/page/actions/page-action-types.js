@@ -13,6 +13,8 @@ const ACTIONS = {
   COPY_PASTE: "copy.paste",   // copy and paste
   DRAG_DROP: "drag.drop",   // drag and drop (single element)
   FORMAT: "format",   // format paragraphs and sections
+  DELETE: "delete",   // delete content
+  ACTIVATE: "activate",   // activate content
 
   // editor actions (things happening in the editor client side)
   DND_DRAG: "dnd.drag",           // start dragging
@@ -26,6 +28,8 @@ const ACTIONS = {
   FORMAT_SAVE: "format.save",             // save selected formats
   FORMAT_PARAGRAPH: "format.paragraph",   // select paragraph format
   FORMAT_SECTION: "format.section",       // select section format
+  MULTI_DELETE: "multi.delete",       // delete selection
+  MULTI_ACTIVATE: "multi.activate",       // activate selection
 
 };
 export default ACTIONS;

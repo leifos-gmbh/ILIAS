@@ -113,4 +113,24 @@ export default class PageCommandActionFactory {
     });
   }
 
+  /**
+   * @param {[]} pcids
+   * @return {CommandAction}
+   */
+  delete(pcids) {
+    return this.clientActionFactory.command(this.COMPONENT, ACTIONS.DELETE, {
+      pcids: pcids
+    });
+  }
+
+  /**
+   * @param {[]} pcids
+   * @return {CommandAction}
+   */
+  activate(pcids) {
+    return this.clientActionFactory.command(this.COMPONENT, ACTIONS.ACTIVATE, {
+      pcids: pcids
+    });
+  }
+
 }

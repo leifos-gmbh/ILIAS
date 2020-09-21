@@ -108,6 +108,4 @@ class UIWrapper
 
         return $tpl->get();
     }
-
-
 }

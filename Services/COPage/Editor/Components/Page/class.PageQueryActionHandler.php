@@ -93,6 +93,8 @@ class PageQueryActionHandler implements Server\QueryActionHandler
         $o->pcModel = $this->getPCModel();
         $o->pcDefinition = $this->getComponentsDefinitions();
         $o->formatSelection = $this->getFormatSelection();
+        $o->modal = $this->getModalTemplate();
+        $o->confirmation = $this->getConfirmationTemplate();
         return new Server\Response($o);
     }
 
@@ -264,5 +266,32 @@ class PageQueryActionHandler implements Server\QueryActionHandler
         }
         return $pcdef;
     }
+
+    /**
+     * Get modal template
+     */
+    public function getModalTemplate() {
+        $ui = $this->ui;
+        $modal = $ui->factory()->modal()->roundtrip('#title#', $ui->factory()->legacy('#content#'))
+                    ->withActionButtons([
+                        $ui->factory()->button()->standard('#button_title#', '#'),
+                    ]);
+        $modalt["signal"] = $modal->getShowSignal()->getId();
+        $modalt["template"] = $ui->renderer()->renderAsync($modal);
+
+        return $modalt;
+    }
+
+    /**
+     * Get confirmation template
+     */
+    public function getConfirmationTemplate() {
+        $ui = $this->ui;
+
+        $confirmation= $ui->factory()->messageBox()->confirmation("#text#");
+
+        return $ui->renderer()->renderAsync($confirmation);
+    }
+
 
 }

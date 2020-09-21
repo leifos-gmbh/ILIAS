@@ -104,12 +104,6 @@ export default class PageUIActionHandler {
       case "multi.action":
         let type = params.type;
 
-        // @todo refactor legacy
-        if (["delete", "activate"].includes(type)) {
-          client.sendForm(actionFactory.page().command().multiLegacy(type,
-            Array.from(model.getSelected())));
-          form_sent = true;
-        }
         if (["all", "none", "cut", "copy"].includes(type)) {
           this.ui.highlightSelected(model.getSelected());
         }
@@ -120,6 +114,14 @@ export default class PageUIActionHandler {
 
           case "characteristic":
             this.ui.initFormatButtons();
+            break;
+
+          case "delete":
+            this.ui.showDeleteConfirmation();
+            break;
+
+          case "activate":
+            this.sendActivateCommand();
             break;
         }
         break;
@@ -134,6 +136,15 @@ export default class PageUIActionHandler {
 
       case "format.save":
         this.sendFormatCommand(params);
+        break;
+
+      case "multi.delete":
+        this.ui.hideDeleteConfirmation();
+        this.sendDeleteCommand(params);
+        break;
+
+      case "multi.activate":
+        this.sendActivateCommand(params);
         break;
     }
 
@@ -209,9 +220,7 @@ export default class PageUIActionHandler {
     }
 
     this.client.sendCommand(paste_action).then(result => {
-      console.log("sendPasteCommand result");
       this.ui.handlePageReloadResponse(result);
-      // replace pcid with pl.rendered_component;
     });
 
   }
@@ -226,9 +235,7 @@ export default class PageUIActionHandler {
     );
 
     this.client.sendCommand(drop_action).then(result => {
-      console.log("sendDragDropCommand result");
       this.ui.handlePageReloadResponse(result);
-      // replace pcid with pl.rendered_component;
     });
   }
 
@@ -246,12 +253,40 @@ export default class PageUIActionHandler {
     );
 
     this.client.sendCommand(drop_action).then(result => {
-      console.log("sendFormatCommand result");
       this.ui.handlePageReloadResponse(result);
-      // replace pcid with pl.rendered_component;
     });
-
   }
 
+  sendDeleteCommand(params) {
+    let delete_action;
+    const af = this.actionFactory;
+    const pcids = Array.from(
+      params.pcids).map(x => (x.split(":")[1])
+    );
+
+    delete_action = af.page().command().delete(
+      pcids
+    );
+
+    this.client.sendCommand(delete_action).then(result => {
+      this.ui.handlePageReloadResponse(result);
+    });
+  }
+
+  sendActivateCommand(params) {
+    let activate_action;
+    const af = this.actionFactory;
+    const pcids = Array.from(
+      params.pcids).map(x => (x.split(":")[1])
+    );
+
+    activate_action = af.page().command().activate(
+      pcids
+    );
+
+    this.client.sendCommand(activate_action).then(result => {
+      this.ui.handlePageReloadResponse(result);
+    });
+  }
 
 }

@@ -9,3 +9,7 @@ if (!$ilDB->tableColumnExists("skl_profile", "ref_id")) {
     ));
 }
 ?>
+<#2>
+<?php
+$ilCtrlStructureReader->getStructure();
+?>

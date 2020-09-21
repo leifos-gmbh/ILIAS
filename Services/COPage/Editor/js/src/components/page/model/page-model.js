@@ -18,6 +18,7 @@ export default class PageModel {
 
   STATE_MULTI_COPY = "copy";        // multi copy
   STATE_MULTI_CUT = "cut";          // multi cut
+  STATE_MULTI_CHARACTERISTIC = "characteristic";          // multi cut
   STATE_MULTI_NONE = "";
 
   /**
@@ -51,14 +52,16 @@ export default class PageModel {
     currentHierId: null,
     currentInsertPCID: null,
     page_components: [],
-    page_components_undo: []
+    page_components_undo: [],
+    sectionFormat: "",
+    paragraphFormat: ""
   };
 
   constructor() {
     this.dom = document;
     this.states = [this.STATE_PAGE, this.STATE_DRAG_DROP, this.STATE_COMPONENT, this.STATE_MULTI_ACTION];
     this.component_states = [this.STATE_COMPONENT_NONE, this.STATE_COMPONENT_EDIT, this.STATE_COMPONENT_INSERT];
-    this.multi_states = [this.STATE_MULTI_NONE, this.STATE_MULTI_CUT, this.STATE_MULTI_COPY];
+    this.multi_states = [this.STATE_MULTI_NONE, this.STATE_MULTI_CUT, this.STATE_MULTI_COPY, this.STATE_MULTI_CHARACTERISTIC];
   }
 
   log(message) {
@@ -105,6 +108,7 @@ export default class PageModel {
    * @param {string} state
    */
   setMultiState(state) {
+    this.log("TRY page-model.setMultiState " + state);
     if (this.multi_states.includes(state)) {
       this.log("page-model.setMultiState " + state);
       this.model.multi_state = state;
@@ -301,6 +305,22 @@ export default class PageModel {
     let vals = new Uint32Array(1);
     window.crypto.getRandomValues(vals);
     return vals[0];
+  }
+
+  setSectionFormat(format) {
+    this.model.sectionFormat = format;
+  }
+
+  getSectionFormat() {
+    return this.model.sectionFormat;
+  }
+
+  setParagraphFormat(format) {
+    this.model.paragraphFormat = format;
+  }
+
+  getParagraphFormat() {
+    return this.model.paragraphFormat;
   }
 
 }

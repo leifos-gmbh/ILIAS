@@ -160,6 +160,7 @@ export default class PageUI {
             li = li_templ.cloneNode(true);
             li.querySelector("a").innerHTML = il.Language.txt("paste");
             li.querySelector("a").addEventListener("click", (event) => {
+              event.isDropDownSelectionEvent = true;
               dispatch.dispatch(action.page().editor().multiPaste(
                 area.dataset.pcid,
                 area.dataset.hierid,
@@ -173,6 +174,7 @@ export default class PageUI {
               li.querySelector("a").innerHTML = txt;
               let cname = this.getPCNameForType(ctype);
               li.querySelector("a").addEventListener("click", (event) => {
+                event.isDropDownSelectionEvent = true;
                 dispatch.dispatch(action.page().editor().componentInsert(cname,
                   area.dataset.pcid,
                   area.dataset.hierid));
@@ -208,7 +210,8 @@ export default class PageUI {
     // init add buttons
     document.querySelectorAll(selector).forEach(area => {
       area.addEventListener("click", (event) => {
-        if (event.isDropDownToggleEvent === true) {
+        if (event.isDropDownToggleEvent === true ||
+          event.isDropDownSelectionEvent === true) {
           return;
         }
         event.stopPropagation();
@@ -354,6 +357,76 @@ export default class PageUI {
     });
   }
 
+  initFormatButtons() {
+
+    const dispatch = this.dispatcher;
+    const action = this.actionFactory;
+    const model = this.model;
+
+
+    this.toolSlate.setContent(this.uiModel.formatSelection);
+
+    document.querySelectorAll("[data-copg-ed-type='format']").forEach(multi_button => {
+      const act = multi_button.dataset.copgEdAction;
+      const format = multi_button.dataset.copgEdParFormat;
+
+      switch (act) {
+
+        case "format.paragraph":
+          multi_button.addEventListener("click", (event) => {
+            dispatch.dispatch(action.page().editor().formatParagraph(format));
+          });
+          break;
+
+        case "format.section":
+          multi_button.addEventListener("click", (event) => {
+            dispatch.dispatch(action.page().editor().formatSection(format));
+          });
+          break;
+
+        case "format.save":
+          multi_button.addEventListener("click", (event) => {
+            const pcids = new Set(this.model.getSelected());
+            dispatch.dispatch(action.page().editor().formatSave(
+              pcids,
+              model.getParagraphFormat(),
+              model.getSectionFormat()
+            ));
+          });
+          break;
+      }
+    });
+
+    // get first values and dispatch their selection
+    const b1 = document.querySelector("#il-copg-format-paragraph div.dropdown ul li button");
+    const f1 = b1.dataset.copgEdParFormat;
+    if (f1) {
+      dispatch.dispatch(action.page().editor().formatParagraph(f1));
+    }
+    const b2 = document.querySelector("#il-copg-format-section div.dropdown ul li button");
+    const f2 = b2.dataset.copgEdParFormat;
+    if (f2) {
+      dispatch.dispatch(action.page().editor().formatSection(f2));
+    }
+  }
+
+  setParagraphFormat(format) {
+    console.log("setParagraphFormat " + format);
+    const b1 = document.querySelector("#il-copg-format-paragraph div.dropdown > button");
+    console.log(b1);
+    if (b1) {
+      b1.firstChild.textContent = format + " ";
+    }
+  }
+
+  setSectionFormat(format) {
+    const b2 = document.querySelector("#il-copg-format-section div.dropdown > button");
+    if (b2) {
+      b2.firstChild.textContent = format + " ";
+    }
+  }
+
+
   //
   // Show/Hide single elements
   //
@@ -404,6 +477,10 @@ export default class PageUI {
       case model.STATE_MULTI_COPY:
         this.toolSlate.setContent(this.uiModel.copyConfirm);
         break;
+
+      case model.STATE_MULTI_CHARACTERISTIC:
+        break;
+
       default:
         this.toolSlate.setContent(this.uiModel.multiActions);
         this.initMultiButtons();

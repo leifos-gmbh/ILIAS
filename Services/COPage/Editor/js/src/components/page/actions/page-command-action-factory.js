@@ -99,4 +99,18 @@ export default class PageCommandActionFactory {
     });
   }
 
+  /**
+   * @param {[]} pcids
+   * @param {string} paragraph_format
+   * @param {string} section_format
+   * @return {CommandAction}
+   */
+  format(pcids, paragraph_format, section_format) {
+    return this.clientActionFactory.command(this.COMPONENT, ACTIONS.FORMAT, {
+      pcids: pcids,
+      paragraph_format: paragraph_format,
+      section_format: section_format
+    });
+  }
+
 }

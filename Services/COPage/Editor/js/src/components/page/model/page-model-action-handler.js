@@ -56,6 +56,7 @@ export default class ModelActionHandler {
         break;
 
       case "multi.action":
+        console.log("page-model-action-hanlder multi.action " + params.type);
         switch (params.type) {
 
           case "cut":
@@ -66,6 +67,10 @@ export default class ModelActionHandler {
           case "copy":
             this.model.copy();
             this.model.selectNone();
+            break;
+
+          case "characteristic":
+            this.model.setMultiState(this.model.STATE_MULTI_CHARACTERISTIC);
             break;
 
           case "none":
@@ -111,6 +116,20 @@ export default class ModelActionHandler {
         this.model.setState(this.model.STATE_PAGE);
         // note: we keep the component state and current component here, so that handlers
         // can use this
+        break;
+
+      case "format.section":
+        this.model.setSectionFormat(params.format);
+        break;
+
+      case "format.paragraph":
+        this.model.setParagraphFormat(params.format);
+        break;
+
+      case "format.save":
+        this.model.selectNone();
+        this.model.setState(this.model.STATE_PAGE);
+        this.model.setMultiState(this.model.STATE_MULTI_NONE);
         break;
 
     }

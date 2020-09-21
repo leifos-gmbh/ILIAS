@@ -2327,8 +2327,8 @@ class ilPageObjectGUI
 
 
         if ($a_paragraph_styles) {
-            $sel = new \ILIAS\COPage\Editor\Components\Paragraph\ParagraphStyleSelector($ui_wrapper);
-            $dd = $sel->getStyleSelector("", ilPCParagraphGUI::_getCharacteristics($a_style_id));
+            $sel = new \ILIAS\COPage\Editor\Components\Paragraph\ParagraphStyleSelector($ui_wrapper, $a_style_id);
+            $dd = $sel->getStyleSelector("");
             $btpl->setCurrentBlock("par_edit");
             $btpl->setVariable("TXT_PAR_FORMAT", $lng->txt("cont_par_format"));
 

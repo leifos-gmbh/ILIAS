@@ -69,6 +69,10 @@ class PageCommandActionHandler implements Server\CommandActionHandler
                 return $this->dragDropCommand($body);
                 break;
 
+            case "format":
+                return $this->format($body);
+                break;
+
             default:
                 throw new Exception("Unknown action " . $body["action"]);
                 break;
@@ -100,7 +104,7 @@ class PageCommandActionHandler implements Server\CommandActionHandler
     }
 
     /**
-     * All command
+     * Copy/paste command
      * @param $body
      * @return Server\Response
      */
@@ -124,7 +128,34 @@ class PageCommandActionHandler implements Server\CommandActionHandler
     }
 
     /**
-     * All command
+     * Format command
+     * @param $body
+     * @return Server\Response
+     */
+    protected function format($body) : Server\Response
+    {
+        $pcids = $body["data"]["pcids"];
+        $par = $body["data"]["paragraph_format"];
+        $sec = $body["data"]["section_format"];
+        $page = $this->page_gui->getPageObject();
+
+        $hids = array_map(
+            function ($pcid) {
+                return $this->getIdForPCId($pcid);
+            },
+            $pcids
+        );
+
+        $updated = $page->assignCharacteristic($hids, $par, $sec);
+
+        //$page->copyContents($hids);
+        //$page->pasteContents($this->getIdForPCId($target_pcid));
+
+        return $this->sendPage();
+    }
+
+    /**
+     * Drag and dropt command
      * @param $body
      * @return Server\Response
      */

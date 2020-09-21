@@ -804,23 +804,12 @@ class ilPageEditorGUI
     {
         $char_par = ilUtil::stripSlashes($_POST["char_par"]);
         $char_sec = ilUtil::stripSlashes($_POST["char_sec"]);
-        if (is_array($_POST["target"])) {
-            foreach ($_POST["target"] as $t) {
-                $tarr = explode(":", $t);
-                $cont_obj = $this->page->getContentObject($tarr[0], $tarr[1]);
-                if (is_object($cont_obj) && $cont_obj->getType() == "par") {
-                    $cont_obj->setCharacteristic($char_par);
-                }
-                if (is_object($cont_obj) && $cont_obj->getType() == "sec") {
-                    $cont_obj->setCharacteristic($char_sec);
-                }
-            }
-            $updated = $this->page->update();
-            if ($updated !== true) {
-                $_SESSION["il_pg_error"] = $updated;
-            } else {
-                unset($_SESSION["il_pg_error"]);
-            }
+
+        $updated = $this->page->assignCharacteristic($_POST["target"], $char_par, $char_sec);
+        if ($updated !== true) {
+            $_SESSION["il_pg_error"] = $updated;
+        } else {
+            unset($_SESSION["il_pg_error"]);
         }
         $this->ctrl->returnToParent($this);
     }

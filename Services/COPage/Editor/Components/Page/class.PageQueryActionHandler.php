@@ -6,6 +6,8 @@ namespace ILIAS\COPage\Editor\Components\Page;
 
 use ILIAS\DI\Exceptions\Exception;
 use ILIAS\COPage\Editor\Server;
+use ILIAS\COPage\Editor\Components\Paragraph\ParagraphStyleSelector;
+use ILIAS\COPage\Editor\Components\Section\SectionStyleSelector;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
@@ -90,6 +92,7 @@ class PageQueryActionHandler implements Server\QueryActionHandler
         $o->components = $this->getComponentsEditorUI();
         $o->pcModel = $this->getPCModel();
         $o->pcDefinition = $this->getComponentsDefinitions();
+        $o->formatSelection = $this->getFormatSelection();
         return new Server\Response($o);
     }
 
@@ -192,6 +195,29 @@ class PageQueryActionHandler implements Server\QueryActionHandler
 
         return $html;
     }
+
+    /**
+     * Format selection
+     */
+    protected function getFormatSelection() {
+        $lng = $this->lng;
+        $ui = $this->ui;
+        $tpl = new \ilTemplate("tpl.format_selection.html", true, true, "Services/COPage/Editor");
+        $tpl->setVariable("TXT_PAR", $lng->txt("cont_choose_characteristic_text"));
+        $tpl->setVariable("TXT_SECTION", $lng->txt("cont_choose_characteristic_section"));
+
+        $par_sel = new ParagraphStyleSelector($this->ui_wrapper, (int) $this->page_gui->getStyleId());
+        $tpl->setVariable("PAR_SELECTOR", $ui->renderer()->renderAsync($par_sel->getStyleSelector("", "format", "format.paragraph", "format")));
+
+        $sec_sel = new SectionStyleSelector($this->ui_wrapper, (int) $this->page_gui->getStyleId());
+        $tpl->setVariable("SEC_SELECTOR", $ui->renderer()->renderAsync($sec_sel->getStyleSelector("", "format", "format.section", "format")));
+
+        $tpl->setVariable("SAVE_BUTTON", $this->ui_wrapper->getRenderedButton(
+            $lng->txt("save"),  "format", "format.save")
+        );
+        return $tpl->get();
+    }
+
 
     /**
      * Get page component model

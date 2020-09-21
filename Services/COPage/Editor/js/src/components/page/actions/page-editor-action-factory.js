@@ -102,4 +102,35 @@ export default class PageEditorActionFactory {
     });
   }
 
+  /**
+   * @returns {EditorAction}
+   */
+  formatSave(pcids, parFormat, secFormat) {
+    console.log("PCIDS");
+    console.log(pcids);
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.FORMAT_SAVE, {
+      pcids: pcids,
+      parFormat: parFormat,
+      secFormat: secFormat
+    });
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  formatParagraph(format) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.FORMAT_PARAGRAPH, {
+      format: format
+    });
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+    formatSection(format) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.FORMAT_SECTION, {
+      format: format
+    });
+  }
+
 }

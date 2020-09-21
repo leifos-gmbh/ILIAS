@@ -12,6 +12,7 @@ const ACTIONS = {
   CUT_PASTE: "cut.paste",   // cut and paste
   COPY_PASTE: "copy.paste",   // copy and paste
   DRAG_DROP: "drag.drop",   // drag and drop (single element)
+  FORMAT: "format",   // format paragraphs and sections
 
   // editor actions (things happening in the editor client side)
   DND_DRAG: "dnd.drag",           // start dragging
@@ -22,6 +23,9 @@ const ACTIONS = {
   MULTI_TOGGLE: "multi.toggle",   // toggle an element for multi selection
   MULTI_ACTION: "multi.action",   // perform multi action
   MULTI_PASTE: "multi.paste",   // paste multi items
+  FORMAT_SAVE: "format.save",             // save selected formats
+  FORMAT_PARAGRAPH: "format.paragraph",   // select paragraph format
+  FORMAT_SECTION: "format.section",       // select section format
 
 };
 export default ACTIONS;

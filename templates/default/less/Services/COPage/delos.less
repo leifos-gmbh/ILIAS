@@ -222,15 +222,23 @@ div.ilEditVAccordICont {
 	background-color: white;
 }
 
-div.ilTinyMenuSection {
+.ilTinyMenuSection .dropdown, .il-copg-button-group .dropdown {
+	display:inline-block;
+}
+.ilTinyMenuSection .dropdown-menu .btn, .il-copg-button-group .dropdown-menu .btn {
+	border: 0;
+}
+
+div.ilTinyMenuSection, .il-copg-button-group {
 	float: left;
 	white-space: nowrap;
 	/* border-right: 1px solid #e0e0e0; */
 	/* padding: 0 10px 4px 0; */
 	margin-right: 10px;
+	margin: 10px 10px 10px 0;
 
 	p {
-		margin: 20px 0 5px 0;
+		margin-bottom: 5px;
 		padding: 2px 5px;
 		background-color: darken(@il-secondary-container-bg, 4%);
 	}
@@ -241,6 +249,15 @@ div.ilTinyMenuSection {
 		padding: 0 10px 0 0;
 		border-right: 0 none;
 	}
+}
+
+div.il-copg-button-group ul.dropdown-menu {
+	right: auto;
+}
+
+div.il-copg-button-group-wide {
+	width: 100%;
+	float: none;
 }
 
 [dir="rtl"] div.ilTinyMenuSection {

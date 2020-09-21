@@ -1008,7 +1008,6 @@ export default class ParagraphUI {
   insertParagraph(pcid, after_pcid) {
     this.log("paragraph-ui.insertParagraph");
     this.pageModifier.insertComponentAfter(after_pcid, pcid, "Paragraph", "", "Paragraph");
-    this.pageModifier.showToast(il.Language.txt("cont_inserted"));
     let content_el = document.querySelector("[data-copg-ed-type='pc-area'][data-pcid='" + pcid + "']");
     this.showToolbar();
     this.tinyWrapper.initInsert(content_el, () => {

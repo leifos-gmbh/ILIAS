@@ -2,13 +2,13 @@
 
 /* Copyright (c) 1998-2020 ILIAS open source, Extended GPL, see docs/LICENSE */
 
-namespace ILIAS\COPage\Editor\Components\Paragraph;
+namespace ILIAS\COPage\Editor\Components\Section;
 
 /**
  *
  * @author Alexander Killing <killing@leifos.de>
  */
-class ParagraphStyleSelector
+class SectionStyleSelector
 {
 
     public static $style_selector_reset = "margin-top:2px; margin-bottom:2px; text-indent:0px; position:static; float:none; width: auto;";
@@ -38,21 +38,16 @@ class ParagraphStyleSelector
     /**
      * Get style selector
      */
-    public function getStyleSelector($a_selected, $type = "par-action", $action = "par.class", $attr = "class")
+    public function getStyleSelector($a_selected, $type = "sec-action", $action = "sec.class", $attr = "class")
     {
-        $a_chars = \ilPCParagraphGUI::_getCharacteristics($this->style_id);
+        $a_chars = \ilPCSectionGUI::_getCharacteristics($this->style_id);
         $ui_wrapper = $this->ui_wrapper;
         $ui = $this->ui;
 
         $buttons = [];
         foreach ($a_chars as $char => $char_lang) {
-            $t = "text_block";
+            $t = "section";
             $tag = "div";
-            switch ($char) {
-                case "Headline1": $t = "heading1"; $tag = "h1"; break;
-                case "Headline2": $t = "heading2"; $tag = "h2"; break;
-                case "Headline3": $t = "heading3"; $tag = "h3"; break;
-            }
             $html = '<div class="ilCOPgEditStyleSelectionItem"><' . $tag . ' class="ilc_' . $t . '_' . $char . '" style="' . self::$style_selector_reset . '">' . $char_lang . "</" . $tag . "></div>";
             $buttons[] = $ui_wrapper->getButton($html, $type, $action, [$attr => $char]);
         }

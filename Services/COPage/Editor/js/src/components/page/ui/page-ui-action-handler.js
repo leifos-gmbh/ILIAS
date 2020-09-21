@@ -105,7 +105,7 @@ export default class PageUIActionHandler {
         let type = params.type;
 
         // @todo refactor legacy
-        if (["delete", "characteristic", "activate"].includes(type)) {
+        if (["delete", "activate"].includes(type)) {
           client.sendForm(actionFactory.page().command().multiLegacy(type,
             Array.from(model.getSelected())));
           form_sent = true;
@@ -117,7 +117,23 @@ export default class PageUIActionHandler {
           case "cut":
             this.ui.pageModifier.cut(model.getCutItems());
             break;
+
+          case "characteristic":
+            this.ui.initFormatButtons();
+            break;
         }
+        break;
+
+      case "format.paragraph":
+        this.ui.setParagraphFormat(model.getParagraphFormat());
+        break;
+
+      case "format.section":
+        this.ui.setSectionFormat(model.getSectionFormat());
+        break;
+
+      case "format.save":
+        this.sendFormatCommand(params);
         break;
     }
 
@@ -214,7 +230,28 @@ export default class PageUIActionHandler {
       this.ui.handlePageReloadResponse(result);
       // replace pcid with pl.rendered_component;
     });
+  }
+
+  sendFormatCommand(params) {
+    let drop_action;
+    const af = this.actionFactory;
+    const pcids = Array.from(
+      params.pcids).map(x => (x.split(":")[1])
+    );
+
+    drop_action = af.page().command().format(
+      pcids,
+      params.parFormat,
+      params.secFormat
+    );
+
+    this.client.sendCommand(drop_action).then(result => {
+      console.log("sendFormatCommand result");
+      this.ui.handlePageReloadResponse(result);
+      // replace pcid with pl.rendered_component;
+    });
 
   }
+
 
 }

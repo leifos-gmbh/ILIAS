@@ -5124,4 +5124,25 @@ abstract class ilPageObject
         return $model;
     }
 
+    /**
+     * Assign characteristic
+     */
+    public function assignCharacteristic($targets, $char_par, $char_sec)
+    {
+        if (is_array($targets)) {
+            foreach ($targets as $t) {
+                $tarr = explode(":", $t);
+                $cont_obj = $this->getContentObject($tarr[0], $tarr[1]);
+                if (is_object($cont_obj) && $cont_obj->getType() == "par") {
+                    $cont_obj->setCharacteristic($char_par);
+                }
+                if (is_object($cont_obj) && $cont_obj->getType() == "sec") {
+                    $cont_obj->setCharacteristic($char_sec);
+                }
+            }
+            return $this->update();
+        }
+        return true;
+    }
+
 }

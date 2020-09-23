@@ -74,6 +74,18 @@ export default class PageEditorActionFactory {
   /**
    * @returns {EditorAction}
    */
+  componentSave(afterPcid, pcid, component, data) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.COMPONENT_SAVE, {
+      afterPcid: afterPcid,
+      pcid: pcid,
+      component: component,
+      data: data
+    });
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
   multiToggle(ctype, pcid, hierid) {
     return this.editorActionFactory.action(this.COMPONENT, ACTIONS.MULTI_TOGGLE, {
       ctype: ctype,

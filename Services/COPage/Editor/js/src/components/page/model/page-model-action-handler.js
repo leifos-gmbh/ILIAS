@@ -109,6 +109,10 @@ export default class ModelActionHandler {
         this.model.setCurrentPageComponent(params.cname, pcid, '');
         break;
 
+      case "component.save":
+        this.model.setState(this.model.STATE_PAGE);
+        break;
+
       case "component.cancel":
         this.model.undoPCModel(
           this.model.getCurrentPCId()

@@ -8,6 +8,8 @@ use \Psr\Http\Message;
 use ILIAS\DI\Exceptions\Exception;
 use ILIAS\COPage\Editor\Components\Page;
 use ILIAS\COPage\Editor\Components\Paragraph;
+use ILIAS\COPage\Editor\Components\Grid;
+use ILIAS\COPage\Editor\Components\Section;
 
 /**
  * Page editor json server
@@ -51,7 +53,12 @@ class Server
     public function reply()
     {
         $query = $this->request->getQueryParams();
-        $body = json_decode($this->request->getBody()->getContents(), true);
+
+        if (is_array($_POST) && count($_POST) > 0) {
+            $body = $this->request->getParsedBody();
+        } else {
+            $body = json_decode($this->request->getBody()->getContents(), true);
+        }
         if (isset($query["component"])) {
             $action_handler = $this->getActionHandlerForQuery($query);
             $response = $action_handler->handle($query);
@@ -98,6 +105,12 @@ class Server
                 break;
             case "Page":
                 $handler = new Page\PageCommandActionHandler($this->page_gui);
+                break;
+            case "Grid":
+                $handler = new Grid\GridCommandActionHandler($this->page_gui);
+                break;
+            case "Section":
+                $handler = new Section\SectionCommandActionHandler($this->page_gui);
                 break;
         }
 

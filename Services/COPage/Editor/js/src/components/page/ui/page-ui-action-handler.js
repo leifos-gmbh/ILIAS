@@ -73,12 +73,32 @@ export default class PageUIActionHandler {
     switch (action.getType()) {
 
       case "component.insert":
-        if (model.getCurrentPCName() !== "Paragraph") {
+        // legacy
+        console.log(model.getCurrentPCName());
+
+        if (!["Paragraph", "Grid", "MediaObject", "Section"].includes(model.getCurrentPCName())) {
           let ctype = this.ui.getPCTypeForName(params.cname);
           client.sendForm(actionFactory.page().command().createLegacy(ctype, params.pcid,
             params.hierid));
           form_sent = true;
         }
+        // generic
+        if (["Grid", "MediaObject", "Section"].includes(model.getCurrentPCName())) {
+          this.ui.showGenericCreationForm();
+        }
+        break;
+
+      case "component.cancel":
+        if (model.getComponentState() === model.STATE_COMPONENT_INSERT) {
+          if (model.getCurrentPCName() !== "Paragraph") {
+            const pcid = model.getCurrentPCId();
+            this.ui.removeInsertedComponent(pcid);
+          }
+        }
+        break;
+
+      case "component.save":
+        this.sendInsertCommand(params);
         break;
 
       case "component.edit":
@@ -285,6 +305,22 @@ export default class PageUIActionHandler {
     );
 
     this.client.sendCommand(activate_action).then(result => {
+      this.ui.handlePageReloadResponse(result);
+    });
+  }
+
+  sendInsertCommand(params) {
+    let insert_action;
+    const af = this.actionFactory;
+
+    insert_action = af.page().command().insert(
+      params.afterPcid,
+      params.pcid,
+      params.component,
+      params.data
+  );
+
+    this.client.sendCommand(insert_action).then(result => {
       this.ui.handlePageReloadResponse(result);
     });
   }

@@ -28,6 +28,24 @@ export default {
 
   /**
    * @param {string} url
+   * @param {FormData} formData
+   * @returns {Promise<Response>}
+   */
+  postForm: async function (url = '', formData = {}) {
+    console.log("POST FORM");
+    return fetch(url, {
+      method: 'POST',
+      mode: 'same-origin',
+      cache: 'no-cache',
+      credentials: 'same-origin',
+      redirect: 'follow',
+      referrerPolicy: 'same-origin',
+      body: formData
+    });
+  },
+
+  /**
+   * @param {string} url
    * @param {Object} params
    * @returns {Promise<Response>}
    */

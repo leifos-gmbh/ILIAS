@@ -14,10 +14,10 @@ interface PageComponentEditor
      * Get rendered editor elements
      * @param UIWrapper $this
      * @param string       $page_type
-     * @param \ilPageConfig $page_config
+     * @param \ilPageObjectGUI $page_gui
      * @param int          $style_id
      * @return array
      */
-    function getEditorElements(UIWrapper $ui_wrapper, string $page_type, \ilPageConfig $page_config, int $style_id): array;
+    function getEditorElements(UIWrapper $ui_wrapper, string $page_type, \ilPageObjectGUI $page_gui, int $style_id): array;
 
 }

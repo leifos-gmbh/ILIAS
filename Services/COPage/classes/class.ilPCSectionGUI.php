@@ -23,7 +23,7 @@ class ilPCSectionGUI extends ilPageContentGUI
     * Constructor
     * @access	public
     */
-    public function __construct(&$a_pg_obj, &$a_content_obj, $a_hier_id, $a_pc_id = "")
+    public function __construct($a_pg_obj, $a_content_obj, $a_hier_id, $a_pc_id = "")
     {
         global $DIC;
 
@@ -33,6 +33,25 @@ class ilPCSectionGUI extends ilPageContentGUI
         parent::__construct($a_pg_obj, $a_content_obj, $a_hier_id, $a_pc_id);
         
         $this->setCharacteristics(ilPCSectionGUI::_getStandardCharacteristics());
+    }
+
+    /**
+     * Get HTML
+     * @param array $params
+     * @return string
+     */
+    public function getHTML(array $params)
+    {
+        if ($params["form"] == true) {
+            $form = $this->initForm(true);
+            $form->setShowTopButtons(false);
+            $html = $params["ui_wrapper"]->getRenderedForm(
+                $form,
+                $params["buttons"]
+            );
+            return $html;
+        }
+        return "";
     }
 
     /**

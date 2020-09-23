@@ -331,17 +331,6 @@
 			</div>
 		</xsl:if>
 
-		<!-- insert menu for drop area -->
-		<xsl:if test="$mode = 'edit'">
-			<xsl:if test="$javascript='enable'">
-				<xsl:call-template name="EditMenu">
-					<xsl:with-param name="hier_id" select="@HierId" />
-					<xsl:with-param name="droparea">y</xsl:with-param>
-				</xsl:call-template>
-			</xsl:if>
-		</xsl:if>
-		
-
 	</xsl:if>
 	<xsl:if test="$mode != 'edit' and (not(@Enabled) or @Enabled='True')">
 		<xsl:if test="//PageObject/DivClass/@HierId = current()/@HierId">

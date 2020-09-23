@@ -37,8 +37,11 @@ export default class PageModifier {
     // insert after addArea
     addArea.parentNode.insertBefore(d, addArea.nextSibling);
     d.innerHTML =
-      '<div data-copg-ed-type="pc-area" class="il_editarea" id="CONTENT:' + pcid + '"  data-pcid="' + pcid + '" data-cname="' + cname + '"><div class="ilEditLabel">' + label + '<!--Dummy--></div>' + content + '</div></div>' +
-      '<div data-copg-ed-type="add-area" data-pcid="' + pcid + '"></div>';
+      '<div data-copg-ed-type="pc-area" class="il_editarea" id="CONTENT:' + pcid + '"  data-pcid="' + pcid + '" data-cname="' + cname + '"><div class="ilEditLabel">' + label + '<!--Dummy--></div>' + content + '</div></div>';
+    let newAddArea = document.createElement("div");
+    newAddArea.dataset.copgEdType = "add-area";
+    newAddArea.dataset.pcid = pcid;
+    d.parentNode.insertBefore(newAddArea, d.nextSibling);
 
     let addSelector = "[data-copg-ed-type='add-area'][data-pcid='" + pcid + "']";
     let pcSelector = "[data-copg-ed-type='pc-area'][data-pcid='" + pcid + "']";
@@ -51,6 +54,14 @@ export default class PageModifier {
 
     this.pageUI.hideAddButtons();
     this.pageUI.hideDropareas();
+  }
+
+  removeInsertedComponent(pcid) {
+    const pcSelector = "[data-copg-ed-type='pc-area'][data-pcid='" + pcid + "']";
+    const el = document.querySelector(pcSelector).parentNode;
+    const next = el.nextSibling;
+    el.parentNode.removeChild(el);
+    next.parentNode.removeChild(next);
   }
 
   cut(items) {

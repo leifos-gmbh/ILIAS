@@ -133,4 +133,18 @@ export default class PageCommandActionFactory {
     });
   }
 
+  /**
+   *
+   * @param {string} after_pcid
+   * @param {string} pcid
+   * @param {string} component
+   * @param {formData} data
+   * @return {CommandAction}
+   */
+  insert(after_pcid, pcid, component, data) {
+    data.append("after_pcid", after_pcid);
+    data.append("pcid", pcid);
+    return this.clientActionFactory.formCommand(component, ACTIONS.INSERT, data);
+  }
+
 }

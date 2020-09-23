@@ -12,8 +12,8 @@ class ilPCParagraphEditorGUI implements \ILIAS\COPage\Editor\Components\PageComp
     /**
      * @inheritDoc
      */
-    function getEditorElements(\ILIAS\COPage\Editor\Server\UIWrapper $ui_wrapper, string $page_type, ilPageConfig $cfg, int $style_id): array {
-
+    function getEditorElements(\ILIAS\COPage\Editor\Server\UIWrapper $ui_wrapper, string $page_type, ilPageObjectGUI $page_gui, int $style_id): array {
+        $cfg = $page_gui->getPageConfig();
         $menu = ilPageObjectGUI::getTinyMenu(
             $page_type,
             $cfg->getEnableInternalLinks(),

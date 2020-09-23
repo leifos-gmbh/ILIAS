@@ -246,7 +246,7 @@ class PageQueryActionHandler implements Server\QueryActionHandler
                 $ui[$def["name"]] = $pc_edit->getEditorElements(
                     $this->ui_wrapper,
                     $this->page_gui->getPageObject()->getParentType(),
-                    $this->page_gui->getPageConfig(),
+                    $this->page_gui,
                     $this->page_gui->getStyleId()
                 );
             }

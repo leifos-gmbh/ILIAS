@@ -3,6 +3,7 @@
 import ResponseFactory from './response/response-factory.js';
 import FetchWrapper from './fetch-wrapper.js';
 import FormWrapper from './form-wrapper.js';
+import FormCommandAction from './actions/form-command-action.js';
 
 export default class Client {
 
@@ -90,22 +91,45 @@ export default class Client {
     this.log("client.sendCommand");
     this.log(command_action);
 
-    return new Promise((resolve, reject) => {
+    // POST FORM
+    if (command_action instanceof FormCommandAction) {
 
-      FetchWrapper.postJson(this.command_endpoint, {
-        action_id: command_action.getId(),
-        component: command_action.getComponent(),
-        action: command_action.getType(),
-        data: command_action.getParams()
-      }).then(response => {
-        this.log("client.sendCommand, response:");
-        this.log(response);
-        // note that fetch.json() returns yet another promise
-        response.json().then(json =>
-          resolve(this.response_factory.response(command_action, json))
-        ).catch(err => reject(err));
-      }).catch(err => reject(err));
-    });
+      return new Promise((resolve, reject) => {
+
+        const formData = command_action.getParams();
+        formData.append("action_id", command_action.getId());
+        formData.append("component", command_action.getComponent());
+        formData.append("action", command_action.getType());
+
+        FetchWrapper.postForm(this.command_endpoint, formData).then(response => {
+          this.log("client.sendCommand, response:");
+          this.log(response);
+          // note that fetch.json() returns yet another promise
+          response.json().then(json =>
+            resolve(this.response_factory.response(command_action, json))
+          ).catch(err => reject(err));
+        }).catch(err => reject(err));
+      });
+
+    } else {      // POST JSON
+
+      return new Promise((resolve, reject) => {
+
+        FetchWrapper.postJson(this.command_endpoint, {
+          action_id: command_action.getId(),
+          component: command_action.getComponent(),
+          action: command_action.getType(),
+          data: command_action.getParams()
+        }).then(response => {
+          this.log("client.sendCommand, response:");
+          this.log(response);
+          // note that fetch.json() returns yet another promise
+          response.json().then(json =>
+            resolve(this.response_factory.response(command_action, json))
+          ).catch(err => reject(err));
+        }).catch(err => reject(err));
+      });
+    }
   }
 
   /**

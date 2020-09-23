@@ -15,6 +15,7 @@ const ACTIONS = {
   FORMAT: "format",   // format paragraphs and sections
   DELETE: "delete",   // delete content
   ACTIVATE: "activate",   // activate content
+  INSERT: "insert",   // generic insert component (after showing the generic insert form)
 
   // editor actions (things happening in the editor client side)
   DND_DRAG: "dnd.drag",           // start dragging
@@ -22,6 +23,7 @@ const ACTIONS = {
   COMPONENT_INSERT: "component.insert",       // hit add link in add dropdown
   COMPONENT_EDIT: "component.edit",         // hit component for editing, opens form in slate or legacy view
   COMPONENT_CANCEL: "component.cancel",         // components cancel button is pressed
+  COMPONENT_SAVE: "component.save",         // components save button is pressed (standard creation form)
   MULTI_TOGGLE: "multi.toggle",   // toggle an element for multi selection
   MULTI_ACTION: "multi.action",   // perform multi action
   MULTI_PASTE: "multi.paste",   // paste multi items

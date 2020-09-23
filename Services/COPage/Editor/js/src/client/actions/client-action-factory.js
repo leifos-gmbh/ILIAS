@@ -2,6 +2,7 @@
 
 import QueryAction from "./query-action.js";
 import CommandAction from "./command-action.js";
+import FormCommandAction from "./form-command-action.js";
 
 /**
  * COPage action factory
@@ -29,5 +30,16 @@ export default class ClientActionFactory {
    */
   command(component, type, params) {
     return new CommandAction(component, type, params);
+  }
+
+  /**
+   *
+   * @param {string} component
+   * @param {string} type
+   * @param {formData} data
+   * @return {FormCommandAction}
+   */
+  formCommand(component, type, data) {
+    return new FormCommandAction(component, type, data);
   }
 }

@@ -108,4 +108,42 @@ class UIWrapper
 
         return $tpl->get();
     }
+
+    /**
+     * @param \ilPropertyFormGUI $form
+     * @param                    $buttons
+     * @return string
+     */
+    public function getRenderedForm(\ilPropertyFormGUI $form, $buttons) {
+        $form->clearCommandButtons();
+        $cnt = 0;
+        foreach ($buttons as $button) {
+            $cnt++;
+            $form->addCommandButton("", $button[2], "cmd-".$cnt);
+        }
+        $html = $form->getHTML();
+        $cnt = 0;
+        foreach ($buttons as $button) {
+            $cnt++;
+            $html = str_replace("id='cmd-".$cnt."'",
+                " data-copg-ed-type='form-button' data-copg-ed-action='".$button[1]."' data-copg-ed-component='".$button[0]."'",
+                $html);
+        }
+        return $html;
+    }
+
+    /**
+     * Send whole page as response
+     * @return Response
+     */
+    public function sendPage($page_gui) : Response
+    {
+        $page_gui->setOutputMode(\ilPageObjectGUI::EDIT);
+        $page_data = $page_gui->showPage();
+
+        $data = new \stdClass();
+        $data->renderedContent = $page_data;
+        return new Response($data);
+    }
+
 }

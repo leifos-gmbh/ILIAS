@@ -218,12 +218,7 @@ class PageCommandActionHandler implements Server\CommandActionHandler
      */
     protected function sendPage() : Server\Response
     {
-        $this->page_gui->setOutputMode(\ilPageObjectGUI::EDIT);
-        $page_data = $this->page_gui->showPage();
-
-        $data = new \stdClass();
-        $data->renderedContent = $page_data;
-        return new Server\Response($data);
+        return $this->ui_wrapper->sendPage($this->page_gui);
     }
 
     /**

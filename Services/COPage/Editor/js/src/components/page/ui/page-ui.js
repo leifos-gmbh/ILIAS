@@ -19,7 +19,7 @@ export default class PageUI {
 
   /**
    * Model
-   * @type {Model}
+   * @type {PageModel}
    */
   model = {};
 
@@ -55,7 +55,7 @@ export default class PageUI {
   toolSlate;
 
   /**
-   * @type {pageModifier}
+   * @type {PageModifier}
    */
   pageModifier;
 
@@ -63,7 +63,7 @@ export default class PageUI {
    * @param {Client} client
    * @param {Dispatcher} dispatcher
    * @param {ActionFactory} actionFactory
-   * @param {Model} model
+   * @param {PageModel} model
    * @param {ToolSlate} toolSlate
    * @param {PageModifier} pageModifier
    */
@@ -133,7 +133,10 @@ export default class PageUI {
 
       // droparea
       const drop = area.firstChild;
-      drop.id = "TARGET" + area.dataset.hierid + ":" + (area.dataset.pcid || "");
+      const hier_id = (area.dataset.hierid)
+        ? area.dataset.hierid
+        : "";
+      drop.id = "TARGET" + hier_id + ":" + (area.dataset.pcid || "");
 
       // add dropdown
       area.querySelectorAll("div.dropdown > button").forEach(b => {
@@ -163,7 +166,7 @@ export default class PageUI {
               event.isDropDownSelectionEvent = true;
               dispatch.dispatch(action.page().editor().multiPaste(
                 area.dataset.pcid,
-                area.dataset.hierid,
+                hier_id,
                 model.getMultiState()));
             });
             ul.appendChild(li);
@@ -177,7 +180,7 @@ export default class PageUI {
                 event.isDropDownSelectionEvent = true;
                 dispatch.dispatch(action.page().editor().componentInsert(cname,
                   area.dataset.pcid,
-                  area.dataset.hierid));
+                  hier_id));
               });
               ul.appendChild(li);
             }
@@ -541,5 +544,65 @@ export default class PageUI {
   hideDeleteConfirmation() {
     this.pageModifier.hideCurrentModal();
   }
+
+  //
+  // Generic creation
+  //
+
+  showGenericCreationForm() {
+    const model = this.model;
+    this.pageModifier.insertComponentAfter(
+      model.getCurrentInsertPCId(),
+      model.getCurrentPCId(),
+      this.model.getCurrentPCName(),
+      this.model.getCurrentPCName(),
+      this.model.getCurrentPCName()
+    );
+    this.toolSlate.setContentFromComponent(this.model.getCurrentPCName(), "creation_form");
+    this.initFormButtons();
+  }
+
+  initFormButtons() {
+    const model = this.model;
+
+    document.querySelectorAll("#copg-editor-slate-content [data-copg-ed-type='form-button']").forEach(form_button => {
+      const dispatch = this.dispatcher;
+      const action = this.actionFactory;
+      const act = form_button.dataset.copgEdAction;
+      const cname = form_button.dataset.copgEdComponent;
+      if (cname === "Page") {
+        form_button.addEventListener("click", (event) => {
+          event.preventDefault();
+          switch (act) {
+            case "component.cancel":
+              dispatch.dispatch(action.page().editor().componentCancel());
+              break;
+            case "component.save":
+              const form = form_button.closest("form");
+              const form_data = new FormData(form);
+
+              console.log("component.save");
+              console.log(form);
+              console.log(form_data);
+              console.log(form_data.getAll("layout_template"));
+
+              //after_pcid, pcid, component, data
+              dispatch.dispatch(action.page().editor().componentSave(
+                model.getCurrentInsertPCId(),
+                model.getCurrentPCId(),
+                model.getCurrentPCName(),
+                form_data
+              ));
+              break;
+          }
+        });
+      }
+    });
+  }
+
+  removeInsertedComponent(pcid) {
+    this.pageModifier.removeInsertedComponent(pcid);
+  }
+
 
 }

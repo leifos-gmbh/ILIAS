@@ -1245,6 +1245,9 @@ class ilPageObjectGUI
         //if($this->outputToTemplate())
         //{
         if ($this->getOutputMode() == "edit") {
+
+            $this->getPageObject()->buildDom();
+
             $this->log->debug("ilPageObjectGUI, showPage() in edit mode.");
 
             //echo ":".$this->getTemplateTargetVar().":";
@@ -1495,7 +1498,6 @@ class ilPageObjectGUI
             }
                 
             // content snippets used
-            include_once("./Services/COPage/classes/class.ilPCContentInclude.php");
             $snippets = ilPCContentInclude::collectContentIncludes(
                 $this->getPageObject(),
                 $this->getPageObject()->getDomDoc()

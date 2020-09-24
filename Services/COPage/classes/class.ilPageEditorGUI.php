@@ -315,7 +315,9 @@ class ilPageEditorGUI
             }
             $pc_id = $_REQUEST["pcid"];
             $hier_id = $_REQUEST["hier_id"];
-            $cont_obj = $this->page->getContentObject($hier_id, $pc_id);
+            if (!in_array($cmd, ["insert", "create"])) {
+                $cont_obj = $this->page->getContentObject($hier_id, $pc_id);
+            }
         }
 
         if ($ctype != "media" || !is_object($cont_obj)) {

@@ -186,7 +186,6 @@ class ilPCSectionGUI extends ilPageContentGUI
             $this->lng->txt("cont_characteristic"),
             "characteristic"
         );
-            
         $chars = $this->getCharacteristics();
         if (is_object($this->content_obj)) {
             if ($chars[$a_seleted_value] == "" && ($this->content_obj->getCharacteristic() != "")) {

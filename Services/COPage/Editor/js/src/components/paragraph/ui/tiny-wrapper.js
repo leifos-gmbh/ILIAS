@@ -356,7 +356,7 @@ let mode = "insert";                                      // MISSING
     this.focusTiny(true);
   }
 
-  initEdit(content_element, text, characteristic) {
+  initEdit(content_element, text, characteristic, after_init) {
     this.log('tiny-wrapper.initEdit');
 
     this.setGhostAt(content_element);
@@ -365,10 +365,12 @@ let mode = "insert";                                      // MISSING
       this.createTextAreaForTiny(content_element);
       this.lib.init(this.getConfig(() => {
         this.initContent(text, characteristic);
+        after_init();
       }));
     } else {
       this.showAfter(content_element);
       this.initContent(text, characteristic);
+      after_init();
     }
 
   }
@@ -668,7 +670,6 @@ let mode = "insert";                                      // MISSING
         if (r.className != null)
         {
           var st = r.className.substring(15);
-          il.AdvancedSelectionList.selectItem('style_selection', st);
         }
 
         ed.getWin().focus();

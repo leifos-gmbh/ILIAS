@@ -102,6 +102,7 @@ class PageQueryActionHandler implements Server\QueryActionHandler
         $o->formatSelection = $this->getFormatSelection();
         $o->modal = $this->getModalTemplate();
         $o->confirmation = $this->getConfirmationTemplate();
+        $o->autoSaveInterval = $this->getAutoSaveInterval();
         return new Server\Response($o);
     }
 
@@ -508,5 +509,14 @@ class PageQueryActionHandler implements Server\QueryActionHandler
         return $ui->renderer()->renderAsync($confirmation);
     }
 
+    /**
+     * Get auto save intervall
+     * @return int
+     */
+    protected function getAutoSaveInterval()
+    {
+        $aset = new \ilSetting("adve");
+        return (int) $aset->get("autosave");
+    }
 
 }

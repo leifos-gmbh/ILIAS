@@ -16184,3 +16184,5 @@ survey#:#svy_sum_score#:#Skalenpunktesumme
 survey#:#svy_max_sum_score#:#Maximale Skalenpunktesumme
 content#:#cont_select_none#:#Auswahl aufheben
 content#:#cont_delete_content#:#Inhalte löschen
+adve#:#adve_autosave#:#Intervall automatisches Speichern
+adve#:#adve_autosave_info#:#Textinhalte werden in diesem Intervall automatisch gespeichert. Kürzere Intervalle führen zu höherer Serverlast und geringerer Systemperformanz.

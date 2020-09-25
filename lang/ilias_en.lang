@@ -16184,3 +16184,5 @@ survey#:#svy_max_sum_score#:#Maximum Sum Score
 content#:#cont_select_none#:#Clear Selection
 content#:#cont_link_user#:#User Link
 content#:#cont_delete_content#:#Delete Content
+adve#:#adve_autosave#:#Automatic Saving Intervall
+adve#:#adve_autosave_info#:#Auto-save for text content. With shorter intervals, the server load increases and the performance of the system decreases.

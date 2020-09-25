@@ -1032,10 +1032,11 @@ export default class ParagraphUI {
     this.log("paragraph-ui.editParagraph");
     let content_el = document.querySelector("[data-copg-ed-type='pc-area'][data-pcid='" + pcId + "']");
     let pc_model = this.page_model.getPCModel(pcId);
-    this.tinyWrapper.initEdit(content_el, pc_model.text, pc_model.characteristic);
-    this.showToolbar();
-    this.setParagraphClass(pc_model.characteristic);
-    this.updateMenuButtons();
+    this.tinyWrapper.initEdit(content_el, pc_model.text, pc_model.characteristic, () => {
+      this.showToolbar();
+      this.setParagraphClass(pc_model.characteristic);
+      this.updateMenuButtons();
+    });
     return;
 
 

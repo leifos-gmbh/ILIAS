@@ -1403,4 +1403,17 @@ export default class ParagraphUI {
     this.autoSave.displayAutoSave("&nbsp;");
   }
 
+  replaceRenderedParagraph(pcid, content) {
+    const pcarea = document.querySelector("[data-copg-ed-type='pc-area'][data-pcid='" + pcid + "']");
+    const contentDiv = pcarea.getElementsByTagName('div')[1];
+    console.log(pcid);
+    console.log(pcarea);
+    console.log(contentDiv);
+    contentDiv.remove();
+    pcarea.innerHTML = pcarea.innerHTML + content;
+  }
+
+  showLastUpdate(last_update) {
+    this.autoSave.displayAutoSave(last_update);
+  }
 }

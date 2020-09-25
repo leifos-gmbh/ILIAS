@@ -151,13 +151,15 @@ export default class ParagraphUIActionHandler {
             this.sendInsertCommand(
               page_model.getCurrentPCId(),
               page_model.getCurrentInsertPCId(),
-              page_model.getPCModel(page_model.getCurrentPCId())
+              page_model.getPCModel(page_model.getCurrentPCId()),
+              page_model
             );
             this.ui.handleSaveOnInsert();
           } else {
             this.sendUpdateCommand(
               page_model.getCurrentPCId(),
-              page_model.getPCModel(page_model.getCurrentPCId())
+              page_model.getPCModel(page_model.getCurrentPCId()),
+              page_model
             );
             this.ui.handleSaveOnEdit();
           }
@@ -168,12 +170,14 @@ export default class ParagraphUIActionHandler {
             this.sendAutoInsertCommand(
               page_model.getCurrentPCId(),
               page_model.getCurrentInsertPCId(),
-              page_model.getPCModel(page_model.getCurrentPCId())
+              page_model.getPCModel(page_model.getCurrentPCId()),
+              page_model
             );
           } else {
             this.sendAutoSaveCommand(
               page_model.getCurrentPCId(),
-              page_model.getPCModel(page_model.getCurrentPCId())
+              page_model.getPCModel(page_model.getCurrentPCId()),
+              page_model
             );
           }
           break;
@@ -182,7 +186,7 @@ export default class ParagraphUIActionHandler {
     }
   }
 
-  sendInsertCommand(pcid, target_pcid, pcmodel) {
+  sendInsertCommand(pcid, target_pcid, pcmodel, page_model) {
     const af = this.actionFactory;
     const insert_action = af.paragraph().command().insert(
       target_pcid,
@@ -192,11 +196,11 @@ export default class ParagraphUIActionHandler {
     );
     this.client.sendCommand(insert_action).then(result => {
       const pl = result.getPayload();
-      // replace pcid with pl.rendered_component;
+      this.handleSaveResponse(pcid, pl);
     });
   }
 
-  sendAutoInsertCommand(pcid, target_pcid, pcmodel) {
+  sendAutoInsertCommand(pcid, target_pcid, pcmodel, page_model) {
     const af = this.actionFactory;
     const dispatch = this.dispatcher;
     const insert_action = af.paragraph().command().autoInsert(
@@ -212,11 +216,11 @@ export default class ParagraphUIActionHandler {
 
       dispatch.dispatch(af.paragraph().editor().autoInsertPostProcessing());
 
-      // replace pcid with pl.rendered_component;
+      this.handleSaveResponse(pcid, pl, page_model);
     });
   }
 
-  sendUpdateCommand(pcid, pcmodel) {
+  sendUpdateCommand(pcid, pcmodel, page_model) {
     const af = this.actionFactory;
     const update_action = af.paragraph().command().update(
       pcid,
@@ -226,11 +230,11 @@ export default class ParagraphUIActionHandler {
     console.log(this.client);
     this.client.sendCommand(update_action).then(result => {
       const pl = result.getPayload();
-      // replace pcid with pl.rendered_component;
+      this.handleSaveResponse(pcid, pl, page_model);
     });
   }
 
-  sendAutoSaveCommand(pcid, pcmodel) {
+  sendAutoSaveCommand(pcid, pcmodel, page_model) {
     const af = this.actionFactory;
     const auto_save_action = af.paragraph().command().autoSave(
       pcid,
@@ -241,8 +245,19 @@ export default class ParagraphUIActionHandler {
     this.client.sendCommand(auto_save_action).then(result => {
       this.ui.autoSaveEnded();
       const pl = result.getPayload();
-      // replace pcid with pl.rendered_component;
+      this.handleSaveResponse(pcid, pl, page_model);
     });
   }
+
+  handleSaveResponse(pcid, pl, page_model) {
+    const still_editing = (pcid === page_model.getCurrentPCId() && page_model.getState() === page_model.STATE_COMPONENT);
+    if (pl.renderedContent && !still_editing) {
+      this.ui.replaceRenderedParagraph(pcid, pl.renderedContent);
+    }
+    if (pl.last_update && still_editing) {
+      this.ui.showLastUpdate(pl.last_update);
+    }
+  }
+
 
 }

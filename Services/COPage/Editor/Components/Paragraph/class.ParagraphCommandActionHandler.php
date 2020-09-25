@@ -33,6 +33,11 @@ class ParagraphCommandActionHandler implements Server\CommandActionHandler
     protected $user;
 
     /**
+     * @var ParagraphResponseFactory
+     */
+    protected $response_factory;
+
+    /**
      * @var Server\UIWrapper
      */
     protected $ui_wrapper;
@@ -45,6 +50,8 @@ class ParagraphCommandActionHandler implements Server\CommandActionHandler
         $this->lng = $DIC->language();
         $this->page_gui = $page_gui;
         $this->user = $DIC->user();
+
+        $this->response_factory = new ParagraphResponseFactory();
 
         $this->ui_wrapper = new Server\UIWrapper($this->ui, $this->lng);
     }
@@ -100,7 +107,7 @@ class ParagraphCommandActionHandler implements Server\CommandActionHandler
             $body["data"]["characteristic"] . "'>" . $body["data"]["content"] . "</div>";
 
         $this->content_obj = new \ilPCParagraph($page);
-        $this->updated = $this->content_obj->saveJS(
+        $updated = $this->content_obj->saveJS(
             $page,
             $content,
             \ilUtil::stripSlashes($body["data"]["characteristic"]),
@@ -108,9 +115,7 @@ class ParagraphCommandActionHandler implements Server\CommandActionHandler
             $insert_id
         );
 
-        $data = new \stdClass();
-        $data->renderedContent = "Test the rendered content";
-        return new Server\Response($data);
+        return $this->response_factory->getResponseObject($this->page_gui, $updated, $body["data"]["pcid"]);
     }
 
     /**
@@ -141,16 +146,14 @@ class ParagraphCommandActionHandler implements Server\CommandActionHandler
 
         $this->content_obj = new \ilPCParagraph($page);
 
-        $this->updated = $this->content_obj->saveJS(
+        $updated = $this->content_obj->saveJS(
             $page,
             $content,
             \ilUtil::stripSlashes($body["data"]["characteristic"]),
             \ilUtil::stripSlashes($pcid)
         );
 
-        $data = new \stdClass();
-        $data->renderedContent = "Test the rendered content";
-        return new Server\Response($data);
+        return $this->response_factory->getResponseObject($this->page_gui, $updated, $body["data"]["pcid"]);
     }
 
     /**

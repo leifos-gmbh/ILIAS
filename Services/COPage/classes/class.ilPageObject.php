@@ -1381,6 +1381,24 @@ abstract class ilPageObject
         return "";
     }
 
+    public function getParagraphForPCID($pcid)
+    {
+        if ($this->dom) {
+            require_once("./Services/COPage/classes/class.ilPCParagraph.php");
+            $xpc = xpath_new_context($this->dom);
+            $path = "//PageContent[@PCID='".$pcid."']/Paragraph[1]";
+            $res = xpath_eval($xpc, $path);
+            if (count($res->nodeset) > 0) {
+                $cont_node = $res->nodeset[0]->parent_node();
+                $par = new ilPCParagraph($this);
+                $par->setNode($cont_node);
+                return $par;
+            }
+        }
+        return null;
+    }
+
+
     /**
      * Set content of paragraph
      * @param string $a_hier_id Hier ID

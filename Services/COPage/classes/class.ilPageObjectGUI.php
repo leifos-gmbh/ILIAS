@@ -119,6 +119,11 @@ class ilPageObjectGUI
     protected $page_linker;
 
     /**
+     * @var string pcid of single paragraph
+     */
+    protected $abstract_pcid = "";
+
+    /**
      * @var ilToolbarGUI
      */
     protected $toolbar;
@@ -852,9 +857,10 @@ class ilPageObjectGUI
      *
      * @param boolean $a_val get only abstract (first text paragraph)
      */
-    public function setAbstractOnly($a_val)
+    public function setAbstractOnly($a_val, $pcid = "")
     {
         $this->abstract_only = $a_val;
+        $this->abstract_pcid = $pcid;
     }
     
     /**
@@ -1660,9 +1666,16 @@ class ilPageObjectGUI
         }
 
         if ($this->getAbstractOnly()) {
-            $content = "<dummy><PageObject><PageContent><Paragraph>" .
-                $this->obj->getFirstParagraphText() . $link_xml .
-                "</Paragraph></PageContent></PageObject></dummy>";
+            if (!$this->abstract_pcid) {
+                $content = "<dummy><PageObject><PageContent><Paragraph>" .
+                    $this->obj->getFirstParagraphText() . $link_xml .
+                    "</Paragraph></PageContent></PageObject></dummy>";
+            } else {
+                $par = $this->obj->getParagraphForPCID($this->abstract_pcid);
+                $content = "<dummy><PageObject><PageContent><Paragraph Characteristic='".$par->getCharacteristic()."'>" .
+                    $par->getText() . $link_xml .
+                    "</Paragraph></PageContent></PageObject></dummy>";
+            }
         } else {
             $content = $this->obj->getXMLFromDom(
                 false,
@@ -2603,6 +2616,7 @@ class ilPageObjectGUI
         $this->lng->toJS("cont_delete_content");
         $this->lng->toJS("copg_confirm_el_deletion");
         $this->lng->toJS("cont_saving");
+        $this->lng->toJS("cont_ed_par");
         $this->setOutputMode(self::EDIT);
 
         $html = $this->showPage();

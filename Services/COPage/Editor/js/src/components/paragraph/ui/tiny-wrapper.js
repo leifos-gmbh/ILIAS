@@ -467,7 +467,9 @@ let mode = "insert";                                      // MISSING
         if (add_final_spacer) {
           cl = "copg-input-ghost " + cl;
         }
-        c = "<div style='position:static;' class='" + cl + "'>" + c + "</div>";
+        const cl_arr = cl.split("_");
+        c = "<div class='ilEditLabel'>" + il.Language.txt("cont_ed_par") +
+          " (" + cl_arr[cl_arr.length-1] + ")</div><div style='position:static;' class='" + cl + "'>" + c + "</div>";
       }
       else
       {

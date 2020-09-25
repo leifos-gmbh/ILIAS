@@ -323,7 +323,6 @@ div.il-copg-button-group-wide {
 }
 
 #iltinymenu_bd {
-	padding: 10px;
 }
 
 #ilsaving {
@@ -522,7 +521,6 @@ a.nostyle:hover {
 }
 
 #ilPageEditLegend {
-	padding: 10px;
 	> div {
 		margin: 5px 0;
 	}
@@ -610,11 +608,6 @@ div.ilc_question_MultipleChoice .ilc_qanswer_Answer > div:first-child {
 	padding-right: 10px;
 }
 
-.ilTinyInfo {
-	@media only screen and (max-width: @grid-float-breakpoint-max) {
-		display: none;
-	}
-}
 
 div.ilCOPGMediaPrint {
 	background-color: @il-secondary-container-bg !important;
@@ -648,15 +641,41 @@ div.ilCOPGMediaPrint {
 
 /* todo this belongs somewhere else, maybe stlate.less */
 
-.il-maincontrols-slate-content div.alert {
-	margin: 10px 20px;
+#tinytarget_div {
+	div.mce-edit-area {
+		background-color: transparent;
+	}
+
+	.mce-panel {
+		border: 0;
+		background-color: transparent;
+	}
+}
+
+.copg-input-ghost {
+	visibility: hidden;
 }
 
 #copg-editor-slate-content {
+	padding: 15px;
+
+	p {
+		padding: 10px 0;
+	}
+
+	p.ilTinyInfo {
+		padding: 2px;
+		@media only screen and (max-width: @grid-float-breakpoint-max) {
+			display: none;
+		}
+	}
+
+	div.alert {
+		margin: 10px 0;
+	}
 	form {
 		.ilFormHeader {
 			padding: 10px;
-			margin: 15px 15px 0 15px;
 
 			h3.ilHeader {
 				font-size: @font-size-base;
@@ -670,7 +689,6 @@ div.ilCOPGMediaPrint {
 			font-weight: bold;
 		}
 		.ilFormFooter {
-			margin: 0 15px 15px 15px;
 		}
 	}
 }

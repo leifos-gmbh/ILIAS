@@ -39,6 +39,12 @@ class PageQueryActionHandler implements Server\QueryActionHandler
      */
     protected $ui_wrapper;
 
+    /**
+     * @var \ilCtrl
+     */
+    protected $ctrl;
+
+
     function __construct(\ilPageObjectGUI $page_gui)
     {
         global $DIC;
@@ -47,6 +53,7 @@ class PageQueryActionHandler implements Server\QueryActionHandler
         $this->lng = $DIC->language();
         $this->page_gui = $page_gui;
         $this->user = $DIC->user();
+        $this->ctrl = $DIC->ctrl();
 
         $this->ui_wrapper = new Server\UIWrapper($this->ui, $this->lng);
     }
@@ -140,7 +147,10 @@ class PageQueryActionHandler implements Server\QueryActionHandler
      */
     protected function getPageHelp()
     {
-        // @todo remove legacy
+        $ui = $this->ui;
+        $ctrl = $this->ctrl;
+        $user = $this->user;
+
         $lng = $this->lng;
         $lng->loadLanguageModule("content");
         $tpl = new \ilTemplate("tpl.editor_slate.html", true, true, "Services/COPage");
@@ -151,8 +161,213 @@ class PageQueryActionHandler implements Server\QueryActionHandler
         $tpl->setVariable("TXT_DRAG", $lng->txt("cont_drag_and_drop_elements"));
         $tpl->setVariable("TXT_SEL", $lng->txt("cont_double_click_to_delete"));
         $tpl->parseCurrentBlock();
+
+        $dd = $this->getActionsDropDown();
+        $tpl->setVariable("DROPDOWN", $ui->renderer()->renderAsync($dd));
+
+        if ($this->page_gui->getPageObject()->getEffectiveEditLockTime() > 0) {
+            $mess = $this->page_gui->getBlockingInfoMessage();
+            $tpl->setVariable("MESSAGE", $mess);
+            $b = $ui->factory()->button()->standard(
+                $lng->txt("cont_finish_editing"),
+                $ctrl->getLinkTarget($this->page_gui, "releasePageLock"));
+        } else {
+            $b = $ui->factory()->button()->standard(
+                $lng->txt("cont_finish_editing"),
+                $ctrl->getLinkTarget($this->page_gui, "finishEditing"));
+        }
+        $tpl->setVariable("MESSAGE2", $this->getMultiLangInfo());
+        $tpl->setVariable("QUIT_BUTTON", $ui->renderer()->renderAsync($b));
+
+
         return $tpl->get();
     }
+
+    /**
+     * Add actions menu
+     */
+    public function getActionsDropDown()
+    {
+        $ui = $this->ui;
+        $user = $this->user;
+        $config = $this->page_gui->getPageConfig();
+        $page = $this->page_gui->getPageObject();
+        $ctrl = $this->ctrl;
+        $lng = $this->lng;
+
+        // determine media, html and javascript mode
+        $sel_media_mode = ($user->getPref("ilPageEditor_MediaMode") != "disable");
+        $sel_html_mode = ($user->getPref("ilPageEditor_HTMLMode") != "disable");
+        $sel_js_mode = \ilPageEditorGUI::_doJSEditing();
+
+        $items = [];
+
+        // activate/deactivate
+        if ($config->getEnableActivation()) {
+            $captions = $this->page_gui->getActivationCaptions();
+
+            if ($page->getActive()) {
+                $items[] = $ui->factory()->link()->standard(
+                    $captions["deactivatePage"],
+                    $ctrl->getLinkTarget($this->page_gui, "deactivatePage")
+                );
+            } else {
+                $items[] = $ui->factory()->link()->standard(
+                    $captions["activatePage"],
+                    $ctrl->getLinkTarget($this->page_gui, "activatePage")
+                );
+            }
+        }
+
+        // initially opened content
+        if ($config->getUseAttachedContent()) {
+            $items[] = $ui->factory()->link()->standard(
+                $lng->txt("cont_initial_attached_content"),
+                $ctrl->getLinkTarget($this->page_gui, "initialOpenedContent")
+            );
+        }
+
+        // multi-lang actions
+        foreach ($this->getMultiLangActions() as $item) {
+            $items[] = $item;
+        }
+
+        $lng->loadLanguageModule("content");
+
+        // media mode
+        if ($sel_media_mode) {
+            $ctrl->setParameter($this->page_gui, "media_mode", "disable");
+            $items[] = $ui->factory()->link()->standard(
+                $lng->txt("cont_deactivate_media"),
+                $ctrl->getLinkTarget($this->page_gui, "setEditMode")
+            );
+        } else {
+            $ctrl->setParameter($this->page_gui, "media_mode", "enable");
+            $items[] = $ui->factory()->link()->standard(
+                $lng->txt("cont_activate_media"),
+                $ctrl->getLinkTarget($this->page_gui, "setEditMode")
+            );
+        }
+        $ctrl->setParameter($this, "media_mode", "");
+
+        // html mode
+        if (!$config->getPreventHTMLUnmasking()) {
+            if ($sel_html_mode) {
+                $ctrl->setParameter($this->page_gui, "html_mode", "disable");
+                $items[] = $ui->factory()->link()->standard(
+                    $lng->txt("cont_deactivate_html"),
+                    $ctrl->getLinkTarget($this->page_gui, "setEditMode")
+                );
+            } else {
+                $ctrl->setParameter($this->page_gui, "html_mode", "enable");
+                $items[] = $ui->factory()->link()->standard(
+                    $lng->txt("cont_activate_html"),
+                    $ctrl->getLinkTarget($this->page_gui, "setEditMode")
+                );
+            }
+        }
+        $ctrl->setParameter($this->page_gui, "html_mode", "");
+
+        // js mode
+        /*
+        if ($sel_js_mode) {
+            $ctrl->setParameter($this->page_gui, "js_mode", "disable");
+            $items[] = $ui->factory()->link()->standard(
+                $lng->txt("cont_deactivate_js"),
+                $ctrl->getLinkTarget($this->page_gui, "setEditMode")
+            );
+        } else {
+            $ctrl->setParameter($this->page_gui, "js_mode", "enable");
+            $items[] = $ui->factory()->link()->standard(
+                $lng->txt("cont_activate_js"),
+                $ctrl->getLinkTarget($this->page_gui, "setEditMode")
+            );
+        }
+        $ctrl->setParameter($this->page_gui, "js_mode", "");*/
+
+        return $ui->factory()->dropdown()->standard($items);
+    }
+
+    /**
+     * Add multi-language actions to menu
+     *
+     * @param
+     * @return
+     */
+    public function getMultiLangActions()
+    {
+        $config = $this->page_gui->getPageConfig();
+        $page = $this->page_gui->getPageObject();
+        $ctrl = $this->ctrl;
+        $ui = $this->ui;
+        $lng = $this->lng;
+
+        $items = [];
+
+
+        // general multi lang support and single page mode?
+        if ($config->getMultiLangSupport()) {
+            $ot = \ilObjectTranslation::getInstance($page->getParentId());
+
+            if ($ot->getContentActivated()) {
+                $lng->loadLanguageModule("meta");
+
+                if ($page->getLanguage() != "-") {
+                    $l = $ot->getMasterLanguage();
+                    $items[] = $ui->factory()->link()->standard(
+                        $lng->txt("cont_edit_language_version") . ": " .
+                        $lng->txt("meta_l_" . $l),
+                        $ctrl->getLinkTarget($this->page_gui, "editMasterLanguage")
+                    );
+                }
+
+                foreach ($ot->getLanguages() as $al => $lang) {
+                    if ($page->getLanguage() != $al &&
+                        $al != $ot->getMasterLanguage()) {
+                        $ctrl->setParameter($this->page_gui, "totransl", $al);
+                        $items[] = $ui->factory()->link()->standard(
+                            $lng->txt("cont_edit_language_version") . ": " .
+                            $lng->txt("meta_l_" . $al),
+                            $ctrl->getLinkTarget($this->page_gui, "switchToLanguage")
+                        );
+                        $ctrl->setParameter($this->page_gui, "totransl", $_GET["totransl"]);
+                    }
+                }
+
+            }
+        }
+
+        return $items;
+    }
+
+    public function getMultiLangInfo()
+    {
+        $info = "";
+
+        $config = $this->page_gui->getPageConfig();
+        $page = $this->page_gui->getPageObject();
+        $lng = $this->lng;
+        $ui = $this->ui;
+
+        // general multi lang support and single page mode?
+        if ($config->getMultiLangSupport()) {
+            $ot = \ilObjectTranslation::getInstance($page->getParentId());
+
+            if ($ot->getContentActivated()) {
+                $lng->loadLanguageModule("meta");
+
+                $ml_gui = new \ilPageMultiLangGUI(
+                    $page->getParentType(),
+                    $page->getParentId()
+                );
+                $info = $ml_gui->getMultiLangInfo($page->getLanguage());
+                $info = $ui->renderer()->renderAsync($ui->factory()->messageBox()->info($info));
+            }
+        }
+
+        return $info;
+    }
+
 
     /**
      * Get multi actions

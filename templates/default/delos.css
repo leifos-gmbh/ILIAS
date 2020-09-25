@@ -14501,9 +14501,6 @@ div.il-copg-button-group-wide {
 #iltinymenu a.btn {
   min-width: 30px;
 }
-#iltinymenu_bd {
-  padding: 10px;
-}
 #ilsaving {
   position: fixed;
   top: 0;
@@ -14668,9 +14665,6 @@ a.nostyle:hover {
 #error_panel_c {
   z-index: 2000 !important;
 }
-#ilPageEditLegend {
-  padding: 10px;
-}
 #ilPageEditLegend > div {
   margin: 5px 0;
 }
@@ -14743,11 +14737,6 @@ div.ilc_question_SingleChoice .ilc_qanswer_Answer > div:first-child,
 div.ilc_question_MultipleChoice .ilc_qanswer_Answer > div:first-child {
   padding-right: 10px;
 }
-@media only screen and (max-width: 768px) {
-  .ilTinyInfo {
-    display: none;
-  }
-}
 div.ilCOPGMediaPrint {
   background-color: #f9f9f9 !important;
   position: relative !important;
@@ -14774,12 +14763,35 @@ div.ilCOPGMediaPrint {
   background-color: inherit;
 }
 /* todo this belongs somewhere else, maybe stlate.less */
-.il-maincontrols-slate-content div.alert {
-  margin: 10px 20px;
+#tinytarget_div div.mce-edit-area {
+  background-color: transparent;
+}
+#tinytarget_div .mce-panel {
+  border: 0;
+  background-color: transparent;
+}
+.copg-input-ghost {
+  visibility: hidden;
+}
+#copg-editor-slate-content {
+  padding: 15px;
+}
+#copg-editor-slate-content p {
+  padding: 10px 0;
+}
+#copg-editor-slate-content p.ilTinyInfo {
+  padding: 2px;
+}
+@media only screen and (max-width: 768px) {
+  #copg-editor-slate-content p.ilTinyInfo {
+    display: none;
+  }
+}
+#copg-editor-slate-content div.alert {
+  margin: 10px 0;
 }
 #copg-editor-slate-content form .ilFormHeader {
   padding: 10px;
-  margin: 15px 15px 0 15px;
 }
 #copg-editor-slate-content form .ilFormHeader h3.ilHeader {
   font-size: 14px;
@@ -14791,9 +14803,6 @@ div.ilCOPGMediaPrint {
 #copg-editor-slate-content form .control-label {
   text-align: left;
   font-weight: bold;
-}
-#copg-editor-slate-content form .ilFormFooter {
-  margin: 0 15px 15px 15px;
 }
 /* Services/Calendar */
 td.even {

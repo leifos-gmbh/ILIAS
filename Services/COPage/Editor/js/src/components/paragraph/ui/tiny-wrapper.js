@@ -461,6 +461,9 @@ let mode = "insert";                                      // MISSING
       let c = this.p2br(ed.getContent());
       if (this.current_td === "")
       {
+        if (add_final_spacer) {
+          cl = "copg-input-ghost " + cl;
+        }
         c = "<div style='position:static;' class='" + cl + "'>" + c + "</div>";
       }
       else

@@ -119,6 +119,11 @@ class ilPageObjectGUI
     protected $page_linker;
 
     /**
+     * @var ilToolbarGUI
+     */
+    protected $toolbar;
+
+    /**
      * Constructor
      *
      * @param string $a_parent_type type of parent object
@@ -146,6 +151,7 @@ class ilPageObjectGUI
         $this->user = $DIC->user();
         $this->help = $DIC["ilHelp"];
         $this->ui = $DIC->ui();
+        $this->toolbar = $DIC->toolbar();
 
         $this->setParentType($a_parent_type);
         $this->setId($a_id);
@@ -996,12 +1002,18 @@ class ilPageObjectGUI
     */
     public function executeCommand()
     {
-        $this->getTabs();
-
         $this->ctrl->setReturn($this, "edit");
 
         $next_class = $this->ctrl->getNextClass($this);
         $this->log->debug("next_class: " . $next_class);
+
+        if ($next_class == "" && $this->ctrl->getCmd() == "edit") {
+            $this->tabs_gui->clearTargets();
+        } else {
+            $this->getTabs();
+        }
+
+
         switch ($next_class) {
             case 'ilobjectmetadatagui':
                 $this->tabs_gui->activateTab("meta_data");
@@ -1147,6 +1159,15 @@ class ilPageObjectGUI
 
             default:
                 $cmd = $this->ctrl->getCmd("preview");
+                // presentation view
+                if ($this->getViewPageLink() != "" && $cmd != "edit") {
+                    $this->tabs_gui->addNonTabbedLink(
+                        "pres_view",
+                        $this->getViewPageText(),
+                        $this->getViewPageLink(),
+                        $this->getViewPageTarget()
+                    );
+                }
                 $ret = $this->$cmd();
                 break;
         }
@@ -1216,11 +1237,31 @@ class ilPageObjectGUI
     }
 
     /**
+     * Show edit toolbar
+     */
+    protected function showEditToolbar()
+    {
+        $ui = $this->ui;
+        $lng = $this->lng;
+        if ($this->getEnableEditing()) {
+            $b = $ui->factory()->button()->standard(
+                $lng->txt("edit"),
+                $this->ctrl->getLinkTarget($this, "edit")
+            );
+            $this->toolbar->addComponent($b);
+        }
+    }
+
+    /**
      * display content of page
      */
     public function showPage()
     {
         $main_tpl = $this->tpl;
+
+        if ($this->getOutputMode() == self::PREVIEW) {
+            $this->showEditToolbar();
+        }
 
         // jquery and jquery ui are always provided for components
         include_once("./Services/jQuery/classes/class.iljQueryUtil.php");
@@ -1270,36 +1311,15 @@ class ilPageObjectGUI
                 );
 
             // determine media, html and javascript mode
-            $sel_media_mode = ($this->user->getPref("ilPageEditor_MediaMode") == "disable")
-                    ? "disable"
-                    : "enable";
-            $sel_html_mode = ($this->user->getPref("ilPageEditor_HTMLMode") == "disable")
-                    ? "disable"
-                    : "enable";
-            $sel_js_mode = "disable";
-            //if($ilSetting->get("enable_js_edit", 1))
-            //{
             $sel_js_mode = (ilPageEditorGUI::_doJSEditing())
                         ? "enable"
                         : "disable";
-            //}
+            $sel_js_mode = "enable";
 
             // show prepending html
             $tpl->setVariable("PREPENDING_HTML", $this->getPrependingHtml());
             $tpl->setVariable("TXT_CONFIRM_DELETE", $this->lng->txt("cont_confirm_delete"));
 
-            // presentation view
-            if ($this->getViewPageLink() != "") {
-                $this->tabs_gui->addNonTabbedLink(
-                    "pres_view",
-                    $this->getViewPageText(),
-                    $this->getViewPageLink(),
-                    $this->getViewPageTarget()
-                    );
-            }
-
-            // show actions drop down
-            $this->addActionsMenu($tpl, $sel_media_mode, $sel_html_mode, $sel_js_mode);
 
             // get js files for JS enabled editing
             if ($sel_js_mode == "enable") {
@@ -1366,7 +1386,7 @@ class ilPageObjectGUI
 
         } else {
             // presentation or preview here
-                
+
             $tpl = new ilTemplate("tpl.page.html", true, true, "Services/COPage");
             if ($this->getEnabledPageFocus()) {
                 $tpl->touchBlock("page_focus");
@@ -1951,215 +1971,11 @@ class ilPageObjectGUI
     /**
      * Get captions for activation action menu entries
      */
-    protected function getActivationCaptions()
+    public function getActivationCaptions()
     {
         return array("deactivatePage" => $this->lng->txt("cont_deactivate_page"),
                 "activatePage" => $this->lng->txt("cont_activate_page"));
     }
-    
-    /**
-     * Add actions menu
-     */
-    public function addActionsMenu($a_tpl, $sel_media_mode, $sel_html_mode, $sel_js_mode)
-    {
-        global $DIC;
-        
-        $ui = $DIC->ui();
-        
-        // actions
-        include_once("./Services/UIComponent/AdvancedSelectionList/classes/class.ilAdvancedSelectionListGUI.php");
-
-        // activate/deactivate
-        $list = new ilAdvancedSelectionListGUI();
-        $list->setListTitle($this->lng->txt("actions"));
-        $list->setId("copage_act");
-        $entries = false;
-        if ($this->getPageConfig()->getEnableActivation()) {
-            $entries = true;
-            $captions = $this->getActivationCaptions();
-
-            if ($this->getPageObject()->getActive()) {
-                $list->addItem(
-                    $captions["deactivatePage"],
-                    "",
-                    $this->ctrl->getLinkTarget($this, "deactivatePage")
-                );
-            } else {
-                $list->addItem(
-                    $captions["activatePage"],
-                    "",
-                    $this->ctrl->getLinkTarget($this, "activatePage")
-                );
-            }
-            
-            $a_tpl->setVariable("PAGE_ACTIONS", $list->getHTML());
-        }
-
-        // initially opened content
-        if ($this->getPageConfig()->getUseAttachedContent()) {
-            $entries = true;
-            $list->addItem(
-                $this->lng->txt("cont_initial_attached_content"),
-                "",
-                $this->ctrl->getLinkTarget($this, "initialOpenedContent")
-            );
-        }
-        
-        // multi-lang actions
-        if ($this->addMultiLangActionsAndInfo($list, $a_tpl)) {
-            $entries = true;
-        }
-        
-        if ($entries) {
-            $items = $list->getItems();
-            if (count($items) > 1) {
-                $a_tpl->setVariable("PAGE_ACTIONS", $list->getHTML());
-            } elseif (count($items) == 1) {
-                $b = $ui->factory()->button()->standard($items[0]["title"], $items[0]["link"]);
-                $a_tpl->setVariable("PAGE_ACTIONS", $ui->renderer()->render($b));
-            }
-        }
-
-        $this->lng->loadLanguageModule("content");
-        $list = new ilAdvancedSelectionListGUI();
-        $list->setListTitle($this->lng->txt("cont_edit_mode"));
-        $list->setId("copage_ed_mode");
-
-        // media mode
-        if ($sel_media_mode == "enable") {
-            $this->ctrl->setParameter($this, "media_mode", "disable");
-            $list->addItem(
-                $this->lng->txt("cont_deactivate_media"),
-                "",
-                $this->ctrl->getLinkTarget($this, "setEditMode")
-            );
-        } else {
-            $this->ctrl->setParameter($this, "media_mode", "enable");
-            $list->addItem(
-                $this->lng->txt("cont_activate_media"),
-                "",
-                $this->ctrl->getLinkTarget($this, "setEditMode")
-            );
-        }
-        $this->ctrl->setParameter($this, "media_mode", "");
-
-        // html mode
-        if (!$this->getPageConfig()->getPreventHTMLUnmasking()) {
-            if ($sel_html_mode == "enable") {
-                $this->ctrl->setParameter($this, "html_mode", "disable");
-                $list->addItem(
-                    $this->lng->txt("cont_deactivate_html"),
-                    "",
-                    $this->ctrl->getLinkTarget($this, "setEditMode")
-                );
-            } else {
-                $this->ctrl->setParameter($this, "html_mode", "enable");
-                $list->addItem(
-                    $this->lng->txt("cont_activate_html"),
-                    "",
-                    $this->ctrl->getLinkTarget($this, "setEditMode")
-                );
-            }
-        }
-        $this->ctrl->setParameter($this, "html_mode", "");
-
-        // js mode
-        if ($sel_js_mode == "enable") {
-            $this->ctrl->setParameter($this, "js_mode", "disable");
-            $list->addItem(
-                $this->lng->txt("cont_deactivate_js"),
-                "",
-                $this->ctrl->getLinkTarget($this, "setEditMode")
-            );
-        } else {
-            $this->ctrl->setParameter($this, "js_mode", "enable");
-            $list->addItem(
-                $this->lng->txt("cont_activate_js"),
-                "",
-                $this->ctrl->getLinkTarget($this, "setEditMode")
-            );
-        }
-        $this->ctrl->setParameter($this, "js_mode", "");
-
-        $a_tpl->setVariable("EDIT_MODE", $list->getHTML());
-    }
-
-    /**
-     * Add multi-language actions to menu
-     *
-     * @param
-     * @return
-     */
-    public function addMultiLangActionsAndInfo($a_list, $a_tpl)
-    {
-        $any_items = false;
-        
-        $cfg = $this->getPageConfig();
-        
-        // general multi lang support and single page mode?
-        if ($cfg->getMultiLangSupport()) {
-            //include_once("./Services/COPage/classes/class.ilPageMultiLang.php");
-            //$ml = new ilPageMultiLang($this->getPageObject()->getParentType(),
-            //	$this->getPageObject()->getParentId());
-
-            include_once("./Services/Object/classes/class.ilObjectTranslation.php");
-            $ot = ilObjectTranslation::getInstance($this->getPageObject()->getParentId());
-            
-            if (!$ot->getContentActivated()) {
-                /*				if ($cfg->getSinglePageMode())
-                                {
-                                    $a_list->addItem($this->lng->txt("cont_activate_multi_lang"), "",
-                                        $this->ctrl->getLinkTargetByClass("ilpagemultilanggui", "activateMultilinguality"));
-
-                                    $any_items = true;
-                                }*/
-            } else {
-                $this->lng->loadLanguageModule("meta");
-                //echo $this->getPageObject()->getLanguage();
-                if ($this->getPageObject()->getLanguage() != "-") {
-                    $l = $ot->getMasterLanguage();
-                    $a_list->addItem(
-                        $this->lng->txt("cont_edit_language_version") . ": " .
-                        $this->lng->txt("meta_l_" . $l),
-                        "",
-                        $this->ctrl->getLinkTarget($this, "editMasterLanguage")
-                    );
-                }
-
-                foreach ($ot->getLanguages() as $al => $lang) {
-                    if ($this->getPageObject()->getLanguage() != $al &&
-                        $al != $ot->getMasterLanguage()) {
-                        $this->ctrl->setParameter($this, "totransl", $al);
-                        $a_list->addItem(
-                            $this->lng->txt("cont_edit_language_version") . ": " .
-                            $this->lng->txt("meta_l_" . $al),
-                            "",
-                            $this->ctrl->getLinkTarget($this, "switchToLanguage")
-                        );
-                        $this->ctrl->setParameter($this, "totransl", $_GET["totransl"]);
-                    }
-                }
-
-                /*				if ($cfg->getSinglePageMode())
-                                {
-                                    $a_list->addItem($this->lng->txt("cont_manage_multilang"), "",
-                                        $this->ctrl->getLinkTargetByClass("ilpagemultilanggui", "settings"));
-                                }*/
-
-                include_once("./Services/COPage/classes/class.ilPageMultiLangGUI.php");
-                $ml_gui = new ilPageMultiLangGUI(
-                    $this->getPageObject()->getParentType(),
-                    $this->getPageObject()->getParentId()
-                );
-                $a_tpl->setVariable("MULTI_LANG_INFO", $ml_gui->getMultiLangInfo($this->getPageObject()->getLanguage()));
-
-                $any_items = true;
-            }
-        }
-        
-        return $any_items;
-    }
-    
 
     /**
      * Set edit mode
@@ -2777,9 +2593,9 @@ class ilPageObjectGUI
                 exit;
             }
         } else {
-            if ($this->getPageObject()->getEffectiveEditLockTime() > 0) {
+            /*if ($this->getPageObject()->getEffectiveEditLockTime() > 0) {
                 $mess = $this->getBlockingInfoMessage();
-            }
+            }*/
         }
 
         $this->lng->toJS("paste");
@@ -2801,7 +2617,7 @@ class ilPageObjectGUI
      * Get block info message
      * @return string
      */
-    protected function getBlockingInfoMessage() : string
+    public function getBlockingInfoMessage() : string
     {
         $ctrl = $this->ctrl;
         $lng = $this->lng;
@@ -2811,8 +2627,7 @@ class ilPageObjectGUI
         $info = $this->lng->txt("cont_got_lock_release");
         $info = str_replace("%1", ilDatePresentation::formatDate(new ilDateTime($lock["edit_lock_until"], IL_CAL_UNIX)), $info);
 
-        $mbox = $ui->factory()->messageBox()->info($info)
-            ->withButtons([$ui->factory()->button()->standard($lng->txt("cont_finish_editing"), $ctrl->getLinkTarget($this, "releasePageLock"))]);
+        $mbox = $ui->factory()->messageBox()->info($info);
 
         return $ui->renderer()->render($mbox);
     }
@@ -3052,7 +2867,7 @@ class ilPageObjectGUI
     public function getTabs($a_activate = "")
     {
         $this->setScreenIdComponent();
-        
+
         if (!$this->getEnabledTabs()) {
             return;
         }
@@ -3061,13 +2876,7 @@ class ilPageObjectGUI
         if (!$this->getEditPreview()) {
             $this->tabs_gui->addTarget("pg", $this->ctrl->getLinkTarget($this, "preview"), array("", "preview"));
     
-            if ($this->getEnableEditing()) {
-                $this->tabs_gui->addTarget("edit", $this->ctrl->getLinkTarget($this, "edit"), array("", "edit"));
-            }
         } else {
-            if ($this->getEnableEditing()) {
-                $this->tabs_gui->addTarget("edit", $this->ctrl->getLinkTarget($this, "edit"), array("", "edit"));
-            }
 
             $this->tabs_gui->addTarget("cont_preview", $this->ctrl->getLinkTarget($this, "preview"), array("", "preview"));
         }
@@ -3534,6 +3343,11 @@ class ilPageObjectGUI
     {
         $this->getPageObject()->releasePageLock();
         ilUtil::sendSuccess($this->lng->txt("cont_page_lock_released"), true);
+        $this->finishEditing();
+    }
+
+    public function finishEditing()
+    {
         $this->ctrl->redirect($this, "preview");
     }
     

@@ -99,6 +99,7 @@ export default class PageUI {
     this.initDragDrop();
     this.initMultiSelection();
     this.initComponentEditing();
+    this.showPageHelp();
   }
 
   /**
@@ -287,6 +288,7 @@ export default class PageUI {
         cursor: 'move',
         revert: true,
         scroll: true,
+        distance: 3,
         cursorAt: { top: 5, left:20 },
         snap: true,
         snapMode: 'outer',

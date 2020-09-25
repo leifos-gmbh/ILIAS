@@ -2,6 +2,7 @@
 
 import PageUI from '../components/page/ui/page-ui.js';
 import ParagraphUI from '../components/paragraph/ui/paragraph-ui.js';
+import AutoSave from '../components/paragraph/ui/auto-save.js';
 
 /**
  * editor ui
@@ -87,7 +88,8 @@ export default class UI {
       this.actionFactory,
       this.model.model("page"),
       this.toolSlate,
-      this.pageModifer);
+      this.pageModifer,
+      new AutoSave());
 
     this.pageModifer.setPageUI(this.page);
   }

@@ -65,6 +65,14 @@ class ParagraphCommandActionHandler implements Server\CommandActionHandler
                 return $this->updateCommand($body);
                 break;
 
+            case "update.auto":
+                return $this->autoUpdateCommand($body);
+                break;
+
+            case "insert.auto":
+                return $this->autoInsertCommand($body);
+                break;
+
             default:
                 throw new Exception("Unknown action " . $body["action"]);
                 break;
@@ -76,15 +84,15 @@ class ParagraphCommandActionHandler implements Server\CommandActionHandler
      * @param $body
      * @return Server\Response
      */
-    protected function insertCommand($body) : Server\Response
+    protected function insertCommand($body, $auto = false) : Server\Response
     {
         $page = $this->page_gui->getPageObject();
 
-        $pcid = ":".$body["data"]["pcid"];
+        $pcid = ":" . $body["data"]["pcid"];
         $insert_id = "pg:";
         if (!in_array($body["data"]["after_pcid"], ["", "pg"])) {
             $hier_ids = $page->getHierIdsForPCIds([$body["data"]["after_pcid"]]);
-            $insert_id = $hier_ids[$body["data"]["after_pcid"]].":".$body["data"]["after_pcid"];
+            $insert_id = $hier_ids[$body["data"]["after_pcid"]] . ":" . $body["data"]["after_pcid"];
         }
 
         $content = "<div id='" .
@@ -100,23 +108,32 @@ class ParagraphCommandActionHandler implements Server\CommandActionHandler
             $insert_id
         );
 
-
         $data = new \stdClass();
         $data->renderedContent = "Test the rendered content";
         return new Server\Response($data);
     }
 
     /**
-     * All command
+     * Auto update
      * @param $body
      * @return Server\Response
      */
-    protected function updateCommand($body) : Server\Response
+    protected function autoInsertCommand($body) : Server\Response
+    {
+        return $this->insertCommand($body, true);
+    }
+
+    /**
+     * Update
+     * @param $body
+     * @return Server\Response
+     */
+    protected function updateCommand($body, $auto = false) : Server\Response
     {
         $page = $this->page_gui->getPageObject();
 
         $hier_ids = $page->getHierIdsForPCIds([$body["data"]["pcid"]]);
-        $pcid = $hier_ids[$body["data"]["pcid"]].":".$body["data"]["pcid"];
+        $pcid = $hier_ids[$body["data"]["pcid"]] . ":" . $body["data"]["pcid"];
 
         $content = "<div id='" .
             $pcid . "' class='ilc_text_block_" .
@@ -131,10 +148,19 @@ class ParagraphCommandActionHandler implements Server\CommandActionHandler
             \ilUtil::stripSlashes($pcid)
         );
 
-
         $data = new \stdClass();
         $data->renderedContent = "Test the rendered content";
         return new Server\Response($data);
+    }
+
+    /**
+     * Auto update
+     * @param $body
+     * @return Server\Response
+     */
+    protected function autoUpdateCommand($body) : Server\Response
+    {
+        return $this->updateCommand($body, true);
     }
 
 }

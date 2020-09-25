@@ -51,4 +51,35 @@ export default class ParagraphCommandActionFactory {
     });
   }
 
+  /**
+   * @param pcid
+   * @param content
+   * @param characteristic
+   * @return {CommandAction}
+   */
+  autoSave(pcid, content, characteristic) {
+    return this.clientActionFactory.command(this.COMPONENT, ACTIONS.UPDATE_AUTO, {
+      pcid: pcid,
+      content: content,
+      characteristic: characteristic
+    });
+  }
+
+  /**
+   * @param after_pcid
+   * @param pcid
+   * @param content
+   * @param characteristic
+   * @return {CommandAction}
+   */
+  autoInsert(after_pcid, pcid, content, characteristic) {
+    return this.clientActionFactory.command(this.COMPONENT, ACTIONS.INSERT_AUTO, {
+      after_pcid: after_pcid,
+      pcid: pcid,
+      content: content,
+      characteristic: characteristic
+    });
+  }
+
+
 }

@@ -78,7 +78,7 @@ export default class TinyWrapper {
   }
 
 
-  getConfig(after_init) {
+  getConfig(after_init, after_keyup) {
     if (!this.config) {
       this.config = {
         /* part of 4 */
@@ -116,7 +116,7 @@ export default class TinyWrapper {
           this.pastePostProcess(pl, o);
         },
         setup: (tiny) => {
-          this.setup(tiny, after_init);
+          this.setup(tiny, after_init, after_keyup);
         },
       };
     }
@@ -184,7 +184,7 @@ export default class TinyWrapper {
     this.pasting = true;
   }
 
-  setup(tiny, after_init) {
+  setup(tiny, after_init, after_keyup) {
     this.log("tiny-wrapper.init.setup");
     this.tiny = tiny;
     const wrapper = this;
@@ -195,6 +195,7 @@ export default class TinyWrapper {
 
     tiny.on('KeyUp', function(ev) {
       wrapper.autoResize();
+      after_keyup();
     });
 
     tiny.on('KeyDown', function(ev)
@@ -356,7 +357,7 @@ let mode = "insert";                                      // MISSING
     this.focusTiny(true);
   }
 
-  initEdit(content_element, text, characteristic, after_init) {
+  initEdit(content_element, text, characteristic, after_init, after_keyup) {
     this.log('tiny-wrapper.initEdit');
 
     this.setGhostAt(content_element);
@@ -366,7 +367,7 @@ let mode = "insert";                                      // MISSING
       this.lib.init(this.getConfig(() => {
         this.initContent(text, characteristic);
         after_init();
-      }));
+      }, after_keyup));
     } else {
       this.showAfter(content_element);
       this.initContent(text, characteristic);
@@ -375,13 +376,13 @@ let mode = "insert";                                      // MISSING
 
   }
 
-  initInsert(content_element, after_init) {
+  initInsert(content_element, after_init, after_keyup) {
     this.log('tiny-wrapper.initInsert');
 
     this.setGhostAt(content_element);
     if (!this.tiny) {
       this.createTextAreaForTiny(content_element);
-      this.lib.init(this.getConfig(after_init));
+      this.lib.init(this.getConfig(after_init, after_keyup));
     } else {
       this.showAfter(content_element);
       this.initContent("<p></p>", 'ilc_text_block_Standard');

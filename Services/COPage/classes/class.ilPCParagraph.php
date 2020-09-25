@@ -1340,6 +1340,7 @@ class ilPCParagraph extends ilPageContent
         if ($a_insert_at != "") {
             $par = new ilPCParagraph($this->getPage());
             $par->create($a_pg_obj, $insert_at[0], $insert_at[1]);
+            $par->writePCId($pc_id[1]);
         } else {
             $par = $a_pg_obj->getContentObject($pc_id[0], $pc_id[1]);
         }
@@ -2048,7 +2049,7 @@ class ilPCParagraph extends ilPageContent
      * @param
      * @return
      */
-    public function insert(\ilPageObject $page, $a_content, $a_char, $a_pc_id, $a_insert_at = "")
+    public function insert(\ilPageObject $page, $a_content, $a_char, $a_pc_id, $a_insert_at = "", $a_new_pc_id = "")
     {
         $ilUser = $this->user;
 
@@ -2072,7 +2073,9 @@ class ilPCParagraph extends ilPageContent
         }
 
         if ($a_insert_at != "") {
-            $pc_id = $a_pg_obj->generatePCId();
+            $pc_id = ($a_new_pc_id != "")
+                ? $a_new_pc_id
+                : $a_pg_obj->generatePCId();
             $par->writePCId($pc_id);
             $this->inserted_pc_id = $pc_id;
         } else {

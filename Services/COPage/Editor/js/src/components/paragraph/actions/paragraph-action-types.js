@@ -7,6 +7,8 @@ const ACTIONS = {
   // command actions (being sent to the server to "change things")
   INSERT: "insert",                        // inserts paragraph
   UPDATE: "update",                        // update paragraph
+  UPDATE_AUTO: "update.auto",              // auto update paragraph
+  INSERT_AUTO: "insert.auto",              // auto insert paragraph
 
   // editor actions (things happening in the editor client side)
   PARAGRAPH_CLASS: "par.class",    // paragraph class
@@ -25,6 +27,8 @@ const ACTIONS = {
   LINK_EXTERNAL: "link.external",
   LINK_USER: "link.user",
   SAVE_RETURN: "save.return",
+  AUTO_SAVE: "save.auto",
+  AUTO_INSERT_POST: "post.insert.auto"
 
 };
 export default ACTIONS;

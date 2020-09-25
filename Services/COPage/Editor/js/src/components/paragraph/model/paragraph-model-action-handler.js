@@ -50,6 +50,17 @@ export default class ParagraphModelActionHandler {
           // can use this
           break;
 
+        case ACTIONS.AUTO_SAVE:
+          this.pageModel.setPCModel(this.pageModel.getCurrentPCId(), {
+            text: params.text,
+            characteristic: params.characteristic
+          });
+          break;
+
+        // switch from insert to edit mode after auto insert being called
+        case ACTIONS.AUTO_INSERT_POST:
+          this.pageModel.setComponentState(this.pageModel.STATE_COMPONENT_EDIT);
+          break;
       }
     }
   }

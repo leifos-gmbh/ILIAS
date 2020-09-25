@@ -14804,6 +14804,10 @@ div.ilCOPGMediaPrint {
   text-align: left;
   font-weight: bold;
 }
+p#copg-auto-save {
+  padding: 0;
+  margin: -5px 0 0 0;
+}
 /* Services/Calendar */
 td.even {
   color: #222;

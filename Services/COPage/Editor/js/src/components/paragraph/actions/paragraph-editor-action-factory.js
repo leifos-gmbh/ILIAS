@@ -143,5 +143,22 @@ export default class ParagraphEditorActionFactory {
     });
   }
 
+  /**
+   * @returns {EditorAction}
+   */
+  autoSave(text, characteristic) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.AUTO_SAVE, {
+      text: text,
+      characteristic: characteristic
+    });
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  autoInsertPostProcessing() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.AUTO_INSERT_POST, {
+    });
+  }
 
 }

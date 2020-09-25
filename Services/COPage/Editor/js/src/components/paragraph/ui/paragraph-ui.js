@@ -1,6 +1,7 @@
 import ACTIONS from "../actions/paragraph-action-types.js";
 import PAGE_ACTIONS from "../../page/actions/page-action-types.js";
 import TinyWrapper from "./tiny-wrapper.js";
+import AutoSave from "./auto-save.js";
 
 /* Copyright (c) 1998-2020 ILIAS open source, Extended GPL, see docs/LICENSE */
 
@@ -59,6 +60,12 @@ export default class ParagraphUI {
   pageModifier;
 
   /**
+   *
+   * @type {AutoSave}
+   */
+  autoSave;
+
+  /**
    * @type {Object}
    */
   text_formats = {
@@ -79,7 +86,7 @@ export default class ParagraphUI {
    * @param {PageModel} page_model
    * @param {ToolSlate} toolSlate
    */
-  constructor(client, dispatcher, actionFactory, page_model, toolSlate, pageModifier) {
+  constructor(client, dispatcher, actionFactory, page_model, toolSlate, pageModifier, autosave) {
     this.client = client;
     this.dispatcher = dispatcher;
     this.actionFactory = actionFactory;
@@ -87,6 +94,7 @@ export default class ParagraphUI {
     this.toolSlate = toolSlate;
     this.tinyWrapper = new TinyWrapper();
     this.pageModifier = pageModifier;
+    this.autoSave = autosave;
   }
 
   //
@@ -108,6 +116,9 @@ export default class ParagraphUI {
   init(uiModel) {
     this.log("paragraph-ui.init");
 
+    const action = this.actionFactory;
+    const dispatch = this.dispatcher;
+
     this.uiModel = uiModel;
     let t = this;
     const wrapper = this.tinyWrapper;
@@ -127,6 +138,12 @@ export default class ParagraphUI {
     this.log("css: " + this.uiModel.config.content_css);
 
     this.initMenu();
+
+    this.log("set interval: " + this.uiModel.autoSaveInterval);
+    this.autoSave.setInterval(this.uiModel.autoSaveInterval);
+    this.autoSave.setOnAutoSave(() => {
+      dispatch.dispatch(action.paragraph().editor().autoSave(wrapper.getText(), wrapper.getCharacteristic()));
+    });
   }
 
   /**
@@ -1012,6 +1029,8 @@ export default class ParagraphUI {
     this.showToolbar();
     this.tinyWrapper.initInsert(content_el, () => {
       this.setParagraphClass("Standard");
+    }, () => {
+      this.autoSave.handleAutoSaveKeyPressed();
     });
     this.updateMenuButtons();
     this.tinyinit = true;
@@ -1036,6 +1055,8 @@ export default class ParagraphUI {
       this.showToolbar();
       this.setParagraphClass(pc_model.characteristic);
       this.updateMenuButtons();
+    }, () => {
+      this.autoSave.handleAutoSaveKeyPressed();
     });
     return;
 
@@ -1107,7 +1128,6 @@ export default class ParagraphUI {
 
     this.tinyinit = true;
   }
-
 
   eventT(ed)
   {
@@ -1371,5 +1391,16 @@ export default class ParagraphUI {
     }
   }
 
+  autoSaveStarted() {
+    document.querySelector("[data-copg-ed-action='save.return']").disabled = true;
+    document.querySelector("[data-copg-ed-action='component.cancel']").disabled = true;
+    this.autoSave.displayAutoSave(il.Language.txt("cont_saving"));
+  }
+
+  autoSaveEnded() {
+    document.querySelector("[data-copg-ed-action='save.return']").disabled = false;
+    document.querySelector("[data-copg-ed-action='component.cancel']").disabled = false;
+    this.autoSave.displayAutoSave("&nbsp;");
+  }
 
 }

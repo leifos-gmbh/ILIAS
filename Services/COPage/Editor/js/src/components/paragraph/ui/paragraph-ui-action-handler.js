@@ -163,6 +163,21 @@ export default class ParagraphUIActionHandler {
           }
           break;
 
+        case ACTIONS.AUTO_SAVE:
+          if (page_model.getComponentState() === page_model.STATE_COMPONENT_INSERT) {
+            this.sendAutoInsertCommand(
+              page_model.getCurrentPCId(),
+              page_model.getCurrentInsertPCId(),
+              page_model.getPCModel(page_model.getCurrentPCId())
+            );
+          } else {
+            this.sendAutoSaveCommand(
+              page_model.getCurrentPCId(),
+              page_model.getPCModel(page_model.getCurrentPCId())
+            );
+          }
+          break;
+
       }
     }
   }
@@ -175,9 +190,28 @@ export default class ParagraphUIActionHandler {
       pcmodel.text,
       pcmodel.characteristic
     );
-    console.log(this.client);
     this.client.sendCommand(insert_action).then(result => {
       const pl = result.getPayload();
+      // replace pcid with pl.rendered_component;
+    });
+  }
+
+  sendAutoInsertCommand(pcid, target_pcid, pcmodel) {
+    const af = this.actionFactory;
+    const dispatch = this.dispatcher;
+    const insert_action = af.paragraph().command().autoInsert(
+      target_pcid,
+      pcid,
+      pcmodel.text,
+      pcmodel.characteristic
+    );
+    this.ui.autoSaveStarted();
+    this.client.sendCommand(insert_action).then(result => {
+      this.ui.autoSaveEnded();
+      const pl = result.getPayload();
+
+      dispatch.dispatch(af.paragraph().editor().autoInsertPostProcessing());
+
       // replace pcid with pl.rendered_component;
     });
   }
@@ -191,6 +225,21 @@ export default class ParagraphUIActionHandler {
     );
     console.log(this.client);
     this.client.sendCommand(update_action).then(result => {
+      const pl = result.getPayload();
+      // replace pcid with pl.rendered_component;
+    });
+  }
+
+  sendAutoSaveCommand(pcid, pcmodel) {
+    const af = this.actionFactory;
+    const auto_save_action = af.paragraph().command().autoSave(
+      pcid,
+      pcmodel.text,
+      pcmodel.characteristic
+    );
+    this.ui.autoSaveStarted();
+    this.client.sendCommand(auto_save_action).then(result => {
+      this.ui.autoSaveEnded();
       const pl = result.getPayload();
       // replace pcid with pl.rendered_component;
     });

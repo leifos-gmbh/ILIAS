@@ -18,6 +18,11 @@ class ilAdvancedMDRecordTranslations
     private $record_id;
 
     /**
+     * @var ilAdvancedMDRecord
+     */
+    private $record;
+
+    /**
      * @var ilAdvancedMDRecordTranslation[]
      */
     private $translations = [];
@@ -123,6 +128,8 @@ class ilAdvancedMDRecordTranslations
                 (bool) $row->lang_default
             );
         }
+
+        $this->record = ilAdvancedMDRecord::_getInstanceByRecordId($this->record_id);
     }
 
     public function addTranslationEntry(string $language_code, bool $default = false)
@@ -224,5 +231,28 @@ class ilAdvancedMDRecordTranslations
         $translation->setTitle($title);
         $translation->setDescription($description);
         $translation->update();
+    }
+
+    /**
+     * @param string $language
+     * @return string
+     */
+    public function getTitleForLanguage(string $language)
+    {
+        if ($this->getTranslation($language) && strlen($this->getTranslation($language)->getTitle())) {
+            return $this->getTranslation($language)->getTitle();
+        }
+        return $this->record->getTitle();
+    }
+    /**
+     * @param string $language
+     * @return string
+     */
+    public function getDescriptionForLanguage(string $language)
+    {
+        if ($this->getTranslation($language) && strlen($this->getTranslation($language)->getDescription())) {
+            return $this->getTranslation($language)->getDescription();
+        }
+        return $this->record->getDescription();
     }
 }

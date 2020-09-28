@@ -53,6 +53,11 @@ class ilAdvancedMDRecordGUI
      */
     protected $adv_subtype = null;
 
+    /**
+     * @var ilObjUser
+     */
+    protected $user;
+
 
     /**
      * Constructor
@@ -67,7 +72,8 @@ class ilAdvancedMDRecordGUI
         global $DIC;
 
         $lng = $DIC['lng'];
-        
+
+        $this->user = $DIC->user();
         $this->lng = $lng;
         $this->mode = $a_mode;
         $this->obj_type = $a_obj_type;
@@ -207,13 +213,7 @@ class ilAdvancedMDRecordGUI
         $this->editor_form = array();
         
         foreach ($this->getActiveRecords() as $record_obj) {
-            /* :TODO:
-            if($this->handleECSDefinitions($def))
-             {
-                 continue;
-             }
-            */
-            
+
             $record_id = $record_obj->getRecordId();
             
             $values = new ilAdvancedMDValues($record_id, $this->obj_id, $this->sub_type, $this->sub_id);
@@ -224,11 +224,14 @@ class ilAdvancedMDRecordGUI
             if (!sizeof($defs)) {
                 continue;
             }
+
+            $translations = ilAdvancedMDRecordTranslations::getInstanceByRecordId($record_obj->getRecordId());
             
             $adt_group_form = ilADTFactory::getInstance()->getFormBridgeForInstance($values->getADTGroup());
             $adt_group_form->setForm($this->form);
-            $adt_group_form->setTitle($record_obj->getTitle());
-            $adt_group_form->setInfo($record_obj->getDescription());
+
+            $adt_group_form->setTitle($translations->getTitleForLanguage($this->user->getLanguage()));
+            $adt_group_form->setInfo($translations->getDescriptionForLanguage($this->user->getLanguage()));
             
             foreach ($defs as $def) {
                 $element = $adt_group_form->getElement($def->getFieldId());
@@ -333,10 +336,11 @@ class ilAdvancedMDRecordGUI
             if (!sizeof($fields)) {
                 continue;
             }
-            
+
+            $translations = ilAdvancedMDRecordTranslations::getInstanceByRecordId($record->getRecordId());
             $section = new ilFormSectionHeaderGUI();
-            $section->setTitle($record->getTitle());
-            $section->setInfo($record->getDescription());
+            $section->setTitle($translations->getTitleForLanguage($this->user->getLanguage()));
+            $section->setInfo($translations->getDescriptionForLanguage($this->user->getLanguage()));
             $this->form->addItem($section);
             
             foreach ($fields as $field) {
@@ -407,8 +411,9 @@ class ilAdvancedMDRecordGUI
         foreach (ilAdvancedMDValues::getInstancesForObjectId($this->obj_id, $this->obj_type, $this->sub_type, $this->sub_id) as $record_id => $a_values) {
             // this correctly binds group and definitions
             $a_values->read();
-            
-            $this->info->addSection(ilAdvancedMDRecord::_lookupTitle($record_id));
+
+            $translations = ilAdvancedMDRecordTranslations::getInstanceByRecordId($record_id);
+            $this->info->addSection($translations->getTitleForLanguage($this->user->getLanguage()));
         
             $defs = $a_values->getDefinitions();
             foreach ($a_values->getADTGroup()->getElements() as $element_id => $element) {

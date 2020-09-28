@@ -667,6 +667,10 @@ class ilLuceneAdvancedSearchFields
      */
     protected function readSections()
     {
+        global $DIC;
+
+        $user = $DIC->user();
+
         foreach ($this->getActiveFields() as $field_name => $translation) {
             switch ($field_name) {
                 // Default section
@@ -792,9 +796,10 @@ class ilLuceneAdvancedSearchFields
                     include_once './Services/AdvancedMetaData/classes/class.ilAdvancedMDRecord.php';
                     $field = ilAdvancedMDFieldDefinition::getInstance($field_id);
                     $record_id = $field->getRecordId();
-                    
+
+                    $translations = ilAdvancedMDRecordTranslations::getInstanceByRecordId($record_id);
                     $this->active_sections['adv_record_' . $record_id]['fields'][] = $field_name;
-                    $this->active_sections['adv_record_' . $record_id]['name'] = ilAdvancedMDRecord::_lookupTitle($record_id);
+                    $this->active_sections['adv_record_' . $record_id]['name'] = $translations->getTitleForLanguage($user->getLanguage());
                     break;
             }
         }

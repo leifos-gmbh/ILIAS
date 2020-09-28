@@ -85,8 +85,8 @@ export default class TinyWrapper {
         toolbar: false,
         menubar: false,
         statusbar: false,
-        theme: "modern",
         language: "en",
+        height: "100%",
         plugins: "save,paste",
         save_onsavecallback: "saveParagraph",
         mode: "exact",
@@ -292,6 +292,7 @@ export default class TinyWrapper {
     //ed.onInit.add(function(ed, evt)
     tiny.on('init', function(evt)
     {
+
       let ed = tiny;
 let mode = "insert";                                      // MISSING
 
@@ -299,15 +300,7 @@ let mode = "insert";                                      // MISSING
         inline : 'code'
       });
 
-
       wrapper.log("tiny-wrapper.init.tiny-init");
-      // see https://www.tinymce.com/docs/api/tinymce/tinymce.shortcuts/
-      // removing does not seem to work, also the functions do not
-      // seem to be executed, but this way the shortcut is at least disabled
-      // on chrome/mac, see also 0008662
-//        tiny.shortcuts.add('meta+b', '', function() {par_ui.cmdSpan('Strong');});       // MISSING (per setter von aussen!)
-//        tiny.shortcuts.add('meta+u', '', function() {par_ui.cmdSpan('Important');});
-//        tiny.shortcuts.add('meta+i', '', function() {par_ui.cmdSpan('Emph');});
 
       wrapper.setEditFrameSize(width, height);           // MISSING
       if (mode === 'edit')
@@ -326,7 +319,6 @@ let mode = "insert";                                      // MISSING
       if (mode === 'insert') {
         wrapper.initContent("<p></p>", 'ilc_text_block_Standard');
       }
-
       /*
       if (mode == 'td')
       {
@@ -363,10 +355,10 @@ let mode = "insert";                                      // MISSING
     this.setGhostAt(content_element);
 
     if (!this.tiny) {
-      this.createTextAreaForTiny(content_element);
+      this.createTextAreaForTiny();
       this.lib.init(this.getConfig(() => {
-        this.initContent(text, characteristic);
-        after_init();
+              this.initContent(text, characteristic);
+              after_init();
       }, after_keyup));
     } else {
       this.showAfter(content_element);
@@ -381,7 +373,7 @@ let mode = "insert";                                      // MISSING
 
     this.setGhostAt(content_element);
     if (!this.tiny) {
-      this.createTextAreaForTiny(content_element);
+      this.createTextAreaForTiny();
       this.lib.init(this.getConfig(after_init, after_keyup));
     } else {
       this.showAfter(content_element);
@@ -391,40 +383,34 @@ let mode = "insert";                                      // MISSING
   }
 
   hide() {
-    document.getElementById("tinytarget_div").style.display = "none";
+    const tdiv = document.getElementById("tinytarget_div");
+    tdiv.style.display = "none";
   }
 
   showAfter(content_element) {
-    let tdiv = document.getElementById("tinytarget_div");
-
-//    content_element.parentNode.insertBefore(tdiv, content_element.nextSibling);
-
+    const tdiv = document.getElementById("tinytarget_div");
     tdiv.style.display = "";
   }
 
-  createTextAreaForTiny(leading_element) {
+  /**
+   * Note: we always add tiny at the end of the document, since it does not
+   * like to be moved around, see
+   * https://stackoverflow.com/questions/2535569/tinymce-editor-dislikes-being-moved-around
+   */
+  createTextAreaForTiny() {
     this.log("tiny-wrapper.createTextAraForTiny");
 
-    let ins_div;
+    let ta = document.createElement("textarea");
+    let ta_div = document.createElement("div");
 
-    //var pdiv_width = pdiv_reg.right - pdiv_reg.left;
-    let ta_div = new YAHOO.util.Element(document.createElement('div'));
-    let ta = new YAHOO.util.Element(document.createElement('textarea'));
+    const center_col = document.getElementById("il_center_col");
 
-    ta = ta_div.appendChild(ta);
-    ta.id = 'tinytarget';
-    ta.className = 'par_textarea';
-    ta.style.height = '1px';
+    center_col.appendChild(ta_div);
+    ta_div.appendChild(ta);
 
-    if (this.current_td !== "") {
-      // this should be the table
-      leading_element = pdiv.parentNode.parentNode.parentNode.parentNode;     // missing
-    }
-
-    ta_div = YAHOO.util.Dom.insertAfter(ta_div, leading_element);
     ta_div.id = 'tinytarget_div';
-    ta_div.style.position = 'absolute';
-    ta_div.style.left = '-200px';
+    ta.id = "tinytarget";
+    ta.className = 'par_textarea';
   }
 
 
@@ -432,6 +418,8 @@ let mode = "insert";                                      // MISSING
     this.log("tiny-wrapper.setGhostAt " + content_element);
     // get paragraph edit div
     this.ghost = content_element;
+    this.ghost.classList.add("copg-ghost-wrapper");
+
     this.ghost_reg = YAHOO.util.Region.getRegion(this.ghost);
   }
 
@@ -489,8 +477,16 @@ let mode = "insert";                                      // MISSING
           c = c.substr(0, c.length - 6) + "<br />.</div>";
         }
 
+        // note: the tiny is the last (third) sub div here, we want to keep it
+
+        // we remove the first child div content div (edit label)
+        this.ghost.querySelector("div").remove();
+
+        // we replace the second div (content) with c
+        this.ghost.querySelector("div").outerHTML = c;
+
       }
-      this.ghost.innerHTML = c;
+
     }
   }
 
@@ -511,28 +507,11 @@ let mode = "insert";                                      // MISSING
       return;
     }
 
-    back_el.style.minHeight = this.minheight + "px";
-    //		back_el.style.minWidth = this.minwidth + "px";
+    back_el.style.paddingLeft = "";
+    back_el.style.paddingRight = "";
 
-    // alex, 30 Dec 2011, see bug :
-    // for reasons I do not understand, the above does not
-    // work for IE7, even if minWidth is implemented there.
-    // so we do this "padding" trick which works for all browsers
-    if ($(back_el).width() < this.minwidth)
-    {
-      var new_pad = (this.minwidth - $(back_el).width()) / 2;
-      back_el.style.paddingLeft = new_pad + "px";
-      back_el.style.paddingRight = new_pad + "px";
-    }
-    else
-    {
-      back_el.style.paddingLeft = "";
-      back_el.style.paddingRight = "";
-    }
 
-    let tinyifr = document.getElementById("tinytarget_ifr");
-    tinyifr = tinyifr.parentNode;
-    $(tinyifr).css("position", "absolute");
+    let tdiv = document.getElementById("tinytarget_div");
 
     // make sure, background element does not go beyond page bottom
     back_el.style.display = '';
@@ -569,8 +548,8 @@ let mode = "insert";                                      // MISSING
       }
       else
       {*/
-        YAHOO.util.Dom.setX(tinyifr, back_reg.x);
-        YAHOO.util.Dom.setY(tinyifr, back_reg.y);
+        YAHOO.util.Dom.setX(tdiv, back_reg.x);
+        YAHOO.util.Dom.setY(tdiv, back_reg.y);
         this.setEditFrameSize(back_reg.width,
           back_reg.height);
 //      }
@@ -584,13 +563,14 @@ let mode = "insert";                                      // MISSING
     // http://stackoverflow.com/questions/3485365/how-can-i-force-webkit-to-redraw-repaint-to-propagate-style-changes
     // no feature detection here since we are fixing a webkit bug and IE does not like this patch (starts flickering
     // on "short" pages)
+    /*
     let isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
     let isSafari = /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor);
     if (isChrome || isSafari) {
       back_el.style.display='none';
       dummy = back_el.offsetHeight;
       back_el.style.display='';
-    }
+    }*/
   }
 
   autoResize() {

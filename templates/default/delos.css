@@ -14324,7 +14324,7 @@ div.il_editarea {
   min-height: 20px;
 }
 div.il_editarea:hover,
-#tinytarget_ifr {
+.copg-ghost-wrapper {
   border: 2px solid #4c6586;
 }
 div.ilc_page_Page > div.il_editarea_disabled {
@@ -14416,6 +14416,10 @@ div.ilEditVAccordICont {
 .ilTinyMenuSection .dropdown-menu .btn,
 .il-copg-button-group .dropdown-menu .btn {
   border: 0;
+}
+.ilTinyMenuSection .btn svg {
+  fill: white;
+  margin: -8px;
 }
 div.ilTinyMenuSection,
 .il-copg-button-group {
@@ -14762,13 +14766,26 @@ div.ilCOPGMediaPrint {
 #tinytarget_ifr > body#tinymce {
   background-color: inherit;
 }
-/* todo this belongs somewhere else, maybe stlate.less */
-#tinytarget_div div.mce-edit-area {
+#tinytarget_ifr {
   background-color: transparent;
 }
-#tinytarget_div .mce-panel {
+#tinytarget_div {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+#tinytarget_div div.tox-edit-area {
+  background-color: transparent;
+}
+#tinytarget_div .tox-tinymce {
   border: 0;
   background-color: transparent;
+}
+.copg-ghost-wrapper {
+  min-height: 20px;
+  position: relative;
+  /* important for the absolute positioned tinytarget_div */
 }
 .copg-input-ghost {
   visibility: hidden;

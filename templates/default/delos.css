@@ -14268,7 +14268,6 @@ button.copg-add.dropdown-toggle.btn,
 button.copg-add.dropdown-toggle.btn:focus,
 button.copg-add.dropdown-toggle.btn:hover {
   padding: 1px 5px;
-  color: #b6b6b6;
   text-align: center;
   font-size: 12px;
   background-color: transparent;
@@ -14277,12 +14276,14 @@ button.copg-add.dropdown-toggle.btn:hover {
   height: 30px;
   border: 0;
 }
-button.copg-add.dropdown-toggle.btn .glyphicon,
-button.copg-add.dropdown-toggle.btn:focus .glyphicon,
-button.copg-add.dropdown-toggle.btn:hover .glyphicon {
+button.copg-add.dropdown-toggle.btn .glyphicon-plus,
+button.copg-add.dropdown-toggle.btn:focus .glyphicon-plus,
+button.copg-add.dropdown-toggle.btn:hover .glyphicon-plus,
+#copg-editor-help .glyphicon-plus {
   border-radius: 50%;
   background-color: #f3f3f3;
   padding: 4px;
+  color: #b6b6b6;
 }
 button.copg-add.dropdown-toggle.btn:hover {
   background-color: #f3f3f3;
@@ -14794,7 +14795,8 @@ div.ilCOPGMediaPrint {
   padding: 15px;
 }
 #copg-editor-slate-content p {
-  padding: 10px 0;
+  padding: 0;
+  margin: 5px 0;
 }
 #copg-editor-slate-content p.ilTinyInfo {
   padding: 2px;
@@ -14824,6 +14826,9 @@ div.ilCOPGMediaPrint {
 p#copg-auto-save {
   padding: 0;
   margin: -5px 0 0 0;
+}
+.copg-edit-container {
+  border: 1px dashed #d0d0d0;
 }
 /* Services/Calendar */
 td.even {

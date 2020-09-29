@@ -44,15 +44,17 @@ export default class ModelActionHandler {
         this.model.setState(this.model.STATE_PAGE);
         break;
 
+      case "switch.multi":
+        this.model.setState(this.model.STATE_MULTI_ACTION);
+        break;
+
+      case "switch.single":
+        this.model.selectNone();
+        this.model.setState(this.model.STATE_PAGE);
+        break;
+
       case "multi.toggle":
         this.model.toggleSelect(params.pcid, params.hierid);
-        console.log(this.model.hasSelected());
-        if (this.model.hasSelected()) {
-          this.model.setState(this.model.STATE_MULTI_ACTION);
-        } else {
-          this.model.setState(this.model.STATE_PAGE);
-        }
-        console.log(this.model.getState());
         break;
 
       case "multi.action":
@@ -75,19 +77,16 @@ export default class ModelActionHandler {
 
           case "none":
             this.model.selectNone();
-            this.model.setState(this.model.STATE_PAGE);
             break;
 
           case "all":
             this.model.selectAll();
-            this.model.setState(this.model.STATE_MULTI_ACTION);
             break;
         }
         break;
 
       case "multi.paste":
         this.model.setMultiState(this.model.STATE_MULTI_NONE);
-        this.model.setState(this.model.STATE_PAGE);
         break;
 
       case "component.edit":
@@ -132,19 +131,16 @@ export default class ModelActionHandler {
 
       case "format.save":
         this.model.selectNone();
-        this.model.setState(this.model.STATE_PAGE);
         this.model.setMultiState(this.model.STATE_MULTI_NONE);
         break;
 
       case "multi.delete":
         this.model.selectNone();
-        this.model.setState(this.model.STATE_PAGE);
         this.model.setMultiState(this.model.STATE_MULTI_NONE);
         break;
 
       case "multi.activate":
         this.model.selectNone();
-        this.model.setState(this.model.STATE_PAGE);
         this.model.setMultiState(this.model.STATE_MULTI_NONE);
         break;
     }

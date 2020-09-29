@@ -3353,17 +3353,20 @@
 		<xsl:call-template name="EditReturnAnchors"/>
 		<!-- command selectbox -->
 		<xsl:if test="$mode = 'edit'">
-			<xsl:call-template name="DropArea">
-				<xsl:with-param name="hier_id"><xsl:value-of select="@HierId"/></xsl:with-param>
-				<xsl:with-param name="pc_id"><xsl:value-of select="@PCID"/></xsl:with-param>
-			</xsl:call-template>
-		</xsl:if>
-		<xsl:if test="($mode = 'edit')">
 			<xsl:if test="@ActiveFrom or @ActiveTo">
 				<div style="text-align:right;" class="small">{{{{{Section;ActiveFrom;<xsl:value-of select="@ActiveFrom"/>;ActiveTo;<xsl:value-of select="@ActiveTo"/>}}}}}</div>
 			</xsl:if>
+			<div class="copg-edit-container">
+				<xsl:call-template name="DropArea">
+					<xsl:with-param name="hier_id"><xsl:value-of select="@HierId"/></xsl:with-param>
+					<xsl:with-param name="pc_id"><xsl:value-of select="@PCID"/></xsl:with-param>
+				</xsl:call-template>
+				<xsl:apply-templates/>
+			</div>
 		</xsl:if>
-		<xsl:apply-templates/>
+		<xsl:if test="$mode != 'edit'">
+			<xsl:apply-templates/>
+		</xsl:if>
 		<xsl:if test="$mode = 'edit'">
 			<!-- <xsl:value-of select="../@HierId"/> -->
 			<xsl:if test="$javascript='disable'">
@@ -3934,9 +3937,6 @@
 <!-- GridCell -->
 <xsl:template match="GridCell">
 	<div>
-		<xsl:if test="$mode = 'edit'">
-			<xsl:attribute name="style">border:dashed 1px #C0C0C0;</xsl:attribute>
-		</xsl:if>
 		<xsl:attribute name="class">
 			<xsl:if test="@WIDTH_S != ''"> col-xs-<xsl:value-of select="@WIDTH_S"/></xsl:if>
 			<xsl:if test="@WIDTH_M != ''"> col-sm-<xsl:value-of select="@WIDTH_M"/></xsl:if>
@@ -3946,15 +3946,10 @@
 		</xsl:attribute>
 		<div class="flex-col flex-grow">
 			<xsl:if test="$mode = 'edit'">
+				<xsl:attribute name="class">flex-col flex-grow copg-edit-container</xsl:attribute>
+			</xsl:if>
+			<xsl:if test="$mode = 'edit'">
 				<xsl:call-template name="EditReturnAnchors"/>
-				<xsl:call-template name="Icon">
-					<xsl:with-param name="img_src"><xsl:value-of select="$img_cell"/></xsl:with-param>
-					<xsl:with-param name="img_id">CONTENTg<xsl:value-of select="@HierId"/>:<xsl:value-of select="@PCID"/></xsl:with-param>
-				</xsl:call-template>
-				<div class="ilOverlay il_editmenu ilNoDisplay">
-					<xsl:attribute name="id">contextmenu_g<xsl:value-of select="@HierId"/></xsl:attribute>
-					<xsl:call-template name="GridCellMenu"/>
-				</div>
 			</xsl:if>
 			<!-- insert commands -->
 			<!-- <xsl:value-of select="@HierId"/> -->

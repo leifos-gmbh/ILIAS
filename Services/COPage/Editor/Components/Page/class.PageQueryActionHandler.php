@@ -91,7 +91,8 @@ class PageQueryActionHandler implements Server\QueryActionHandler
         $o = new \stdClass();
         $o->addDropdown = $r->render($dd);
         $o->addCommands = $this->getAddCommands();
-        $o->pageHelp = $this->getPageHelp();
+        $o->pageEditHelp = $this->getPageEditHelp();
+        $o->pageTopActions = $this->getTopActions();
         $o->multiActions = $this->getMultiActions();
         $o->cutConfirm = $this->getCutCopyConfirm("cut");
         $o->copyConfirm = $this->getCutCopyConfirm("copy");
@@ -146,15 +147,11 @@ class PageQueryActionHandler implements Server\QueryActionHandler
      * @param
      * @return
      */
-    protected function getPageHelp()
+    protected function getPageEditHelp()
     {
-        $ui = $this->ui;
-        $ctrl = $this->ctrl;
-        $user = $this->user;
-
         $lng = $this->lng;
         $lng->loadLanguageModule("content");
-        $tpl = new \ilTemplate("tpl.editor_slate.html", true, true, "Services/COPage");
+        $tpl = new \ilTemplate("tpl.page_edit_help.html", true, true, "Services/COPage/Editor");
         $tpl->setCurrentBlock("help");
         $tpl->setVariable("TXT_ADD_EL", $lng->txt("cont_add_elements"));
         $tpl->setVariable("PLUS", \ilGlyphGUI::get(\ilGlyphGUI::ADD));
@@ -162,6 +159,22 @@ class PageQueryActionHandler implements Server\QueryActionHandler
         $tpl->setVariable("TXT_DRAG", $lng->txt("cont_drag_and_drop_elements"));
         $tpl->setVariable("TXT_SEL", $lng->txt("cont_double_click_to_delete"));
         $tpl->parseCurrentBlock();
+
+        return $tpl->get();
+    }
+
+    /**
+     * Get page help (drag drop explanation)
+     * @return string
+     */
+    protected function getTopActions()
+    {
+        $ui = $this->ui;
+        $ctrl = $this->ctrl;
+
+        $lng = $this->lng;
+        $lng->loadLanguageModule("content");
+        $tpl = new \ilTemplate("tpl.top_actions.html", true, true, "Services/COPage/Editor");
 
         $dd = $this->getActionsDropDown();
         $tpl->setVariable("DROPDOWN", $ui->renderer()->renderAsync($dd));
@@ -180,6 +193,12 @@ class PageQueryActionHandler implements Server\QueryActionHandler
         $tpl->setVariable("MESSAGE2", $this->getMultiLangInfo());
         $tpl->setVariable("QUIT_BUTTON", $ui->renderer()->renderAsync($b));
 
+        $html = $this->ui_wrapper->getRenderedViewControl(
+            [
+                ["Page", "switch.single", $lng->txt("cont_edit_comp")],
+                ["Page", "switch.multi", $lng->txt("cont_edit_multi")]
+            ]);
+        $tpl->setVariable("SWITCH", $html);
 
         return $tpl->get();
     }

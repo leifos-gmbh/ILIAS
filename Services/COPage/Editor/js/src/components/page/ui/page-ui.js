@@ -1,5 +1,7 @@
 /* Copyright (c) 1998-2020 ILIAS open source, Extended GPL, see docs/LICENSE */
 
+import ACTIONS from "../actions/page-action-types.js";
+
 /**
  * page ui
  */
@@ -99,7 +101,7 @@ export default class PageUI {
     this.initDragDrop();
     this.initMultiSelection();
     this.initComponentEditing();
-    this.showPageHelp();
+    this.showEditPage();
   }
 
   /**
@@ -219,6 +221,10 @@ export default class PageUI {
           return;
         }
         event.stopPropagation();
+
+        area.dispatchEvent(new Event("areaClick"));
+
+        /*
         if(!clickMap.has(area)) {
           clickMap.set(area, 0);
         }
@@ -236,7 +242,7 @@ export default class PageUI {
             }
             clickMap.set(area, 0);
           }, period);
-        }
+        }*/
       });
     });
   }
@@ -339,9 +345,8 @@ export default class PageUI {
       const pcid = pc_area.dataset.pcid;
       const hierid = pc_area.dataset.hierid;
       const ctype = pc_area.dataset.ctype;
-      pc_area.addEventListener("areaDblClick", (event) => {
-        if (this.model.getState() !== this.model.STATE_PAGE &&
-          this.model.getState() !== this.model.STATE_MULTI_ACTION
+      pc_area.addEventListener("areaClick", (event) => {
+        if (this.model.getState() !== this.model.STATE_MULTI_ACTION
         ) {
           return;
         }
@@ -365,6 +370,41 @@ export default class PageUI {
         }
       });
     });
+  }
+
+  initTopActions() {
+    const dispatch = this.dispatcher;
+    const action = this.actionFactory;
+
+    document.querySelectorAll("[data-copg-ed-type='view-control']").forEach(button => {
+      const act = button.dataset.copgEdAction;
+      button.addEventListener("click", (event) => {
+          switch (act) {
+            case ACTIONS.SWITCH_SINGLE:
+              dispatch.dispatch(action.page().editor().switchSingle());
+              break;
+            case ACTIONS.SWITCH_MULTI:
+              dispatch.dispatch(action.page().editor().switchMulti());
+              break;
+          }
+      });
+    });
+    this.refreshModeSelector();
+  }
+
+  refreshModeSelector() {
+    const model = this.model;
+    const multi = document.querySelector("[data-copg-ed-type='view-control'][data-copg-ed-action='switch.multi']");
+    const single = document.querySelector("[data-copg-ed-type='view-control'][data-copg-ed-action='switch.single']");
+    if (model.getState() === model.STATE_PAGE) {
+      multi.disabled = false;
+      single.disabled = true;
+    } else {
+      multi.disabled = true;
+      single.disabled = false;
+    }
+    multi.classList.remove("engaged");
+    single.classList.remove("engaged");
   }
 
   initFormatButtons() {
@@ -473,8 +513,9 @@ export default class PageUI {
     });
   }
 
-  showPageHelp() {
-    this.toolSlate.setContent(this.uiModel.pageHelp);
+  showEditPage() {
+    this.toolSlate.setContent(this.uiModel.pageTopActions + this.uiModel.pageEditHelp);
+    this.initTopActions();
   }
 
   showMultiButtons() {
@@ -492,7 +533,8 @@ export default class PageUI {
         break;
 
       default:
-        this.toolSlate.setContent(this.uiModel.multiActions);
+        this.toolSlate.setContent(this.uiModel.pageTopActions + this.uiModel.multiActions);
+        this.initTopActions();
         this.initMultiButtons();
         break;
     }

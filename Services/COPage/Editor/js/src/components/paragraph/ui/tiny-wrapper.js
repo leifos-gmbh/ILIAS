@@ -8,7 +8,7 @@ export default class TinyWrapper {
   /**
    * @type {boolean}
    */
-  debug = false;
+  debug = true;
 
   /**
    * @type {Object}
@@ -333,6 +333,7 @@ let mode = "insert";                                      // MISSING
 
       $('#tinytarget_ifr').contents().find("html").attr('lang', $('html').attr('lang'));
       $('#tinytarget_ifr').contents().find("html").attr('dir', $('html').attr('dir'));
+      $('#tinytarget_ifr').contents().find("html").css("overflow", "auto");
 
       if (after_init) {
         after_init();
@@ -452,9 +453,7 @@ let mode = "insert";                                      // MISSING
       let c = this.p2br(ed.getContent());
       if (this.current_td === "")
       {
-        if (add_final_spacer) {
-          cl = "copg-input-ghost " + cl;
-        }
+        cl = "copg-input-ghost " + cl;
         const cl_arr = cl.split("_");
         c = "<div class='ilEditLabel'>" + il.Language.txt("cont_ed_par") +
           " (" + cl_arr[cl_arr.length-1] + ")</div><div style='position:static;' class='" + cl + "'>" + c + "</div>";
@@ -466,8 +465,7 @@ let mode = "insert";                                      // MISSING
       }
       let e = c.substr(c.length - 6);
       let b = c.substr(c.length - 12, 6);
-      if (e === "</div>" && add_final_spacer)
-      {
+      if (e === "</div>" && add_final_spacer) {
         // ensure at least one more line of space
         if (b !== "<br />") {
           c = c.substr(0, c.length - 6) + "<br />.</div>";
@@ -476,21 +474,36 @@ let mode = "insert";                                      // MISSING
           // browsers, ".</div>" would be the alternative for this case (last new empty line)
           c = c.substr(0, c.length - 6) + "<br />.</div>";
         }
-
-        // note: the tiny is the last (third) sub div here, we want to keep it
-
-        // we remove the first child div content div (edit label)
-        this.ghost.querySelector("div").remove();
-
-        // we replace the second div (content) with c
-        this.ghost.querySelector("div").outerHTML = c;
-
       }
+
+      // we remove the first child div content div (edit label)
+      this.ghost.querySelector("div").remove();
+
+      // we replace the second div (content) with c
+      this.ghost.querySelector("div").outerHTML = c;
 
     }
   }
 
-  // synchs the size/position of the tiny to the space the ghost
+  stopEditing() {
+    this.copyInputToGhost(false);
+    this.clearGhost();
+    this.hide();
+  }
+
+  clearGhost() {
+    this.log('tiny-wrapper.clearGhost');
+
+    if (this.ghost) {
+      this.ghost.classList.remove("copg-ghost-wrapper");
+      this.ghost.style.overflow = "";
+      this.ghost.style.height = "";
+      const content = this.ghost.querySelector(".copg-input-ghost");
+      content.classList.remove("copg-input-ghost");
+      this.ghost = null;
+    }
+  }
+      // synchs the size/position of the tiny to the space the ghost
   // object uses in the background
   synchInputRegion() {
     this.log('tiny-wrapper.synchInputRegion');

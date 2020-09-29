@@ -161,4 +161,18 @@ export default class PageEditorActionFactory {
     });
   }
 
+  /**
+   * @returns {EditorAction}
+   */
+  switchSingle(pcids) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.SWITCH_SINGLE);
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  switchMulti(pcids) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.SWITCH_MULTI);
+  }
+
 }

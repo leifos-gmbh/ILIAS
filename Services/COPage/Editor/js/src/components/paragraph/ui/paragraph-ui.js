@@ -399,11 +399,7 @@ export default class ParagraphUI {
       );
     }
 
-    let ed = tinyMCE.get('tinytarget');
-    //this.autoResize(ed);
-    this.tinyWrapper.copyInputToGhost(false);
-    //this.tinyWrapper.removeTiny();
-    this.tinyWrapper.hide();
+    this.tinyWrapper.stopEditing();
   }
 
   cmdSpan(t) {
@@ -1037,14 +1033,12 @@ export default class ParagraphUI {
   }
 
   handleSaveOnInsert() {
-    this.tinyWrapper.copyInputToGhost(false);
-    this.tinyWrapper.hide();
+    this.tinyWrapper.stopEditing();
   }
 
   handleSaveOnEdit() {
     this.handleSaveOnInsert();
   }
-
 
   editParagraph(pcId, hierId, mode, switched)
   {

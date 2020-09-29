@@ -146,4 +146,28 @@ class UIWrapper
         return new Response($data);
     }
 
+    public function getRenderedViewControl($actions): string
+    {
+        $ui = $this->ui;
+        $cnt = 0;
+        $view_modes = [];
+        foreach ($actions as $act) {
+            $cnt++;
+            $view_modes[$act[2]] = "cmd-".$cnt;
+        }
+        $vc = $ui->factory()->viewControl()->mode($view_modes, "");
+        $html = $ui->renderer()->render($vc);
+        $cnt = 0;
+        foreach ($actions as $act) {
+            $cnt++;
+            $html = str_replace('data-action="cmd-'.$cnt.'"',
+                " data-copg-ed-type='view-control' data-copg-ed-action='".$act[1]."' data-copg-ed-component='".$act[0]."'",
+                $html);
+        }
+        $html = str_replace("id=", "data-id=", $html);
+        return $html;
+    }
+
+
+
 }

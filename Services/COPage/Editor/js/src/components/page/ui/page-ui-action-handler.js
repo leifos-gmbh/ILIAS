@@ -109,6 +109,12 @@ export default class PageUIActionHandler {
         }
         break;
 
+      case ACTIONS.SWITCH_MULTI:
+      case ACTIONS.SWITCH_SINGLE:
+        this.ui.refreshModeSelector();
+        this.ui.highlightSelected(model.getSelected());
+        break;
+
       case "multi.toggle":
         this.ui.highlightSelected(model.getSelected());
         break;
@@ -181,7 +187,7 @@ export default class PageUIActionHandler {
 
       switch (model.getState()) {
         case model.STATE_PAGE:
-          this.ui.showPageHelp();
+          this.ui.showEditPage();
           this.ui.showAddButtons();
           this.ui.hideDropareas();
           this.ui.enableDragDrop();
@@ -199,7 +205,7 @@ export default class PageUIActionHandler {
           break;
 
         case model.STATE_DRAG_DROP:
-          this.ui.showPageHelp();
+          this.ui.showEditPage();
           this.ui.hideAddButtons();
           this.ui.showDropareas();
           break;

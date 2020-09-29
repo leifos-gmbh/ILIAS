@@ -166,19 +166,21 @@ export default class ParagraphUIActionHandler {
           break;
 
         case ACTIONS.AUTO_SAVE:
-          if (page_model.getComponentState() === page_model.STATE_COMPONENT_INSERT) {
-            this.sendAutoInsertCommand(
-              page_model.getCurrentPCId(),
-              page_model.getCurrentInsertPCId(),
-              page_model.getPCModel(page_model.getCurrentPCId()),
-              page_model
-            );
-          } else {
-            this.sendAutoSaveCommand(
-              page_model.getCurrentPCId(),
-              page_model.getPCModel(page_model.getCurrentPCId()),
-              page_model
-            );
+          if (page_model.getState() === page_model.STATE_COMPONENT) {
+            if (page_model.getComponentState() === page_model.STATE_COMPONENT_INSERT) {
+              this.sendAutoInsertCommand(
+                page_model.getCurrentPCId(),
+                page_model.getCurrentInsertPCId(),
+                page_model.getPCModel(page_model.getCurrentPCId()),
+                page_model
+              );
+            } else {
+              this.sendAutoSaveCommand(
+                page_model.getCurrentPCId(),
+                page_model.getPCModel(page_model.getCurrentPCId()),
+                page_model
+              );
+            }
           }
           break;
 

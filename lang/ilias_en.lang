@@ -16186,3 +16186,5 @@ content#:#cont_link_user#:#User Link
 content#:#cont_delete_content#:#Delete Content
 adve#:#adve_autosave#:#Automatic Saving Intervall
 adve#:#adve_autosave_info#:#Auto-save for text content. With shorter intervals, the server load increases and the performance of the system decreases.
+content#:#cont_edit_comp#:#Editing
+content#:#cont_edit_multi#:#Selection

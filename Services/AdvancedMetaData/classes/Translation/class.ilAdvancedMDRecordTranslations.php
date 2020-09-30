@@ -28,6 +28,11 @@ class ilAdvancedMDRecordTranslations
     private $translations = [];
 
     /**
+     * @var string
+     */
+    private $default_language = '';
+
+    /**
      * @var ilDBInterface
      */
     private $db;
@@ -63,6 +68,14 @@ class ilAdvancedMDRecordTranslations
     }
 
     /**
+     * @return string
+     */
+    public function getDefaultLanguage() :string
+    {
+        return $this->default_language;
+    }
+
+    /**
      * @return int
      */
     public function getRecordId() : int
@@ -89,7 +102,7 @@ class ilAdvancedMDRecordTranslations
             return null;
         }
         return $this->translations[$lang_key];
-    }
+   }
 
     /**
      * @return ilAdvancedMDRecordTranslation[]
@@ -105,7 +118,7 @@ class ilAdvancedMDRecordTranslations
     public function getDefaultTranslation() : ?ilAdvancedMDRecordTranslation
     {
         foreach ($this->getTranslations() as $translation) {
-            if ($translation->isLangDefault()) {
+            if ($translation->getLangKey() == $this->default_language) {
                 return $translation;
             }
         }
@@ -124,12 +137,12 @@ class ilAdvancedMDRecordTranslations
                 (int) $row->record_id,
                 (string) $row->title,
                 (string) $row->description,
-                (string) $row->lang_code,
-                (bool) $row->lang_default
+                (string) $row->lang_code
             );
         }
 
         $this->record = ilAdvancedMDRecord::_getInstanceByRecordId($this->record_id);
+        $this->default_language = $this->record->getDefaultLanguage();
     }
 
     public function addTranslationEntry(string $language_code, bool $default = false)
@@ -173,7 +186,7 @@ class ilAdvancedMDRecordTranslations
         $txt = $this->lng->txt('md_adv_int_current'). ' ' . $this->lng->txt('meta_l_' . $active_language);
         $txt .= ', ';
         foreach ($this->translations as $translation) {
-            if ($translation->isLangDefault()) {
+            if ($translation->getLangKey() == $this->default_language) {
                 $txt .= ($this->lng->txt('md_adv_int_default') . ' ' . $this->lng->txt('meta_l_' . $translation->getLangKey()));
                 break;
             }

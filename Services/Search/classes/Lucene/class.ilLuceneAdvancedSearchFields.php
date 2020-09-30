@@ -83,7 +83,7 @@ class ilLuceneAdvancedSearchFields
     {
         global $DIC;
 
-        $lng = $DIC['lng'];
+        $lng = $DIC->language();
         
         $lng->loadLanguageModule('meta');
         
@@ -121,7 +121,8 @@ class ilLuceneAdvancedSearchFields
         include_once './Services/AdvancedMetaData/classes/class.ilAdvancedMDFieldDefinition.php';
         foreach (ilAdvancedMDRecord::_getRecords() as $record) {
             foreach (ilAdvancedMDFieldDefinition::getInstancesByRecordId($record->getRecordId(), true) as $def) {
-                $fields['adv_' . $def->getFieldId()] = $def->getTitle();
+                $field_translations = ilAdvancedMDFieldTranslations::getInstanceByRecordId($record->getRecordId());
+                $fields['adv_' . $def->getFieldId()] = $field_translations->getTitleForLanguage($def->getFieldId(), $lng->getLangKey());
             }
         }
         return $fields;
@@ -400,7 +401,7 @@ class ilLuceneAdvancedSearchFields
             case 'lom_copyright':
                 $select = new ilSelectInputGUI($this->active_fields[$a_field_name], $a_post_name);
                 $select->setValue($a_query['lom_copyright']);
-                $select->setOptions(ilMDUtilSelect::_getCopyrightAndOtherRestrictionsSelect(
+                $select->setOptions((array) ilMDUtilSelect::_getCopyrightAndOtherRestrictionsSelect(
                     '',
                     $a_field_name,
                     array(0 => $this->lng->txt('search_any')),

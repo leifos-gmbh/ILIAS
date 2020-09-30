@@ -98,7 +98,7 @@ class ilAdvancedMDRecordLanguageTableGUI extends ilTable2GUI
             if ($this->record_translation->isConfigured($language_code)) {
                 $row[self::COL_ACTIVE] = true;
                 $translation = $this->record_translation->getTranslation($language_code);
-                $row[self::COL_DEFAULT] = $translation->isLangDefault();
+                $row[self::COL_DEFAULT] = ($translation->getLangKey() == $this->record->getDefaultLanguage());
             }
             else {
                 $row[self::COL_ACTIVE] = false;

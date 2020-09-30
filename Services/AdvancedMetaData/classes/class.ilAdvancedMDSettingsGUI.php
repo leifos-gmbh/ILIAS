@@ -1146,17 +1146,20 @@ class ilAdvancedMDSettingsGUI
      */
     public function editField(ilPropertyFormGUI $a_form = null)
     {
-        if (!$_REQUEST["record_id"] || !$_REQUEST["field_id"]) {
+        $record_id = (int) $this->request->getQueryParams()['record_id'] ?? 0;
+        $field_id = (int) $this->request->getQueryParams()['field_id'] ?? 0;
+
+        if (!$record_id || !$field_id) {
             return $this->editFields();
         }
-        
         $this->ctrl->saveParameter($this, 'field_id');
         $this->initRecordObject();
         $this->setRecordSubTabs(2);
+        $this->showLanguageSwitch($this->record->getRecordId(), 'editField');
                  
-        $field_definition = ilAdvancedMDFieldDefinition::getInstance((int) $_REQUEST['field_id']);
+        $field_definition = ilAdvancedMDFieldDefinition::getInstance((int) $field_id);
                  
-        if (!$a_form) {
+        if (!$a_form instanceof ilPropertyFormGUI) {
             $a_form = $this->initFieldForm($field_definition);
         }
          
@@ -1164,7 +1167,6 @@ class ilAdvancedMDSettingsGUI
         if ($field_definition->hasComplexOptions()) {
             $table = $field_definition->getComplexOptionsOverview($this, "editField");
         }
-         
         $this->tpl->setContent($a_form->getHTML() . $table);
     }
     
@@ -1176,23 +1178,30 @@ class ilAdvancedMDSettingsGUI
      */
     public function updateField()
     {
-        if (!$_REQUEST["record_id"] || !$_REQUEST["field_id"]) {
-            return $this->editFields();
-        }
-        
+        $record_id = $this->request->getQueryParams()['record_id'] ?? 0;
+        $field_id = $this->request->getQueryParams()['field_id'] ?? 0;
         $this->ctrl->saveParameter($this, 'record_id');
         $this->ctrl->saveParameter($this, 'field_id');
-         
+
+        if (!$record_id || !$field_id) {
+            return $this->editFields();
+        }
+
+        $this->initRecordObject();
+        $this->showLanguageSwitch($record_id, 'editFields');
+
         $confirm = false;
-        $field_definition = ilAdvancedMDFieldDefinition::getInstance((int) $_REQUEST['field_id']);
+        $field_definition = ilAdvancedMDFieldDefinition::getInstance((int) $field_id);
         $form = $this->initFieldForm($field_definition);
         if ($form->checkInput()) {
-            $field_definition->importDefinitionFormPostValues($form, $this->getPermissions());
+            $field_definition->importDefinitionFormPostValues($form, $this->getPermissions(), $this->active_language);
             if (!$field_definition->importDefinitionFormPostValuesNeedsConfirmation()) {
                 $field_definition->update();
+                $translations = ilAdvancedMDFieldTranslations::getInstanceByRecordId($this->record->getRecordId());
+                $translations->updateFromForm($field_id, $this->active_language, $form);
 
                 ilUtil::sendSuccess($this->lng->txt('settings_saved'), true);
-                $this->ctrl->redirect($this, "editFields");
+                $this->ctrl->redirect($this, 'editField');
             } else {
                 $confirm = true;
             }
@@ -1276,15 +1285,21 @@ class ilAdvancedMDSettingsGUI
 
         $form = new ilPropertyFormGUI();
         $form->setFormAction($this->ctrl->getFormAction($this));
-        
+
+        $translations = ilAdvancedMDFieldTranslations::getInstanceByRecordId($this->record->getRecordId());
+        $form->setDescription($translations->getFormTranslationInfo(
+            $a_definition->getFieldId(),
+            $this->active_language
+        ));
         $type = new ilNonEditableValueGUI($this->lng->txt("type"));
         $type->setValue($this->lng->txt($a_definition->getTypeTitle()));
         $form->addItem($type);
         
-        $a_definition->addToFieldDefinitionForm($form, $this->getPermissions());
+        $a_definition->addToFieldDefinitionForm($form, $this->getPermissions(), $this->active_language);
     
         if (!$a_definition->getFieldId()) {
             $form->setTitle($this->lng->txt('md_adv_create_field'));
+
             $form->addCommandButton('saveField', $this->lng->txt('create'));
         } else {
             $form->setTitle($this->lng->txt('md_adv_edit_field'));
@@ -2036,7 +2051,7 @@ class ilAdvancedMDSettingsGUI
         $default = '';
         foreach ($translations->getTranslations() as $translation) {
 
-            if ($translation->isLangDefault()) {
+            if ($translation->getLangKey() == $translations->getDefaultLanguage()) {
                 $default = $translation->getLangKey();
             }
             $this->ctrl->setParameter($this, 'mdlang', $translation->getLangKey());

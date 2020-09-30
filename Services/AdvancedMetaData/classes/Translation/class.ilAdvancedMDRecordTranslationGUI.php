@@ -47,7 +47,10 @@ class ilAdvancedMDRecordTranslationGUI extends ilAdvancedMDTranslationGUI
                 $translations->addTranslationEntry($lang_key);
             }
         }
-        $translations->updateDefault($default);
+
+        $this->record->setDefaultLanguage($default);
+        $this->record->update();
+
         $default = $translations->getTranslation($default);
         $default->setTitle($this->record->getTitle());
         $default->setDescription($this->record->getDescription());

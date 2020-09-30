@@ -641,7 +641,7 @@ abstract class ilAdvancedMDFieldDefinition
      * @param ilPropertyFormGUI $a_form
      * @param ilAdvancedMDPermissionHelper $a_form
      */
-    public function addToFieldDefinitionForm(ilPropertyFormGUI $a_form, ilAdvancedMDPermissionHelper $a_permissions)
+    public function addToFieldDefinitionForm(ilPropertyFormGUI $a_form, ilAdvancedMDPermissionHelper $a_permissions, string $active_language)
     {
         global $DIC;
 
@@ -663,11 +663,15 @@ abstract class ilAdvancedMDFieldDefinition
         );
                 
         // title
+        $translations = ilAdvancedMDFieldTranslations::getInstanceByRecordId($this->getRecordId());
+
         $title = new ilTextInputGUI($lng->txt('title'), 'title');
         $title->setValue($this->getTitle());
         $title->setSize(20);
         $title->setMaxLength(70);
         $title->setRequired(true);
+        $translations->modifyTranslationInfoForTitle($this->getFieldId(), $a_form, $title, $active_language);
+
         $a_form->addItem($title);
         
         if (!$perm[ilAdvancedMDPermissionHelper::ACTION_FIELD_EDIT_PROPERTY][ilAdvancedMDPermissionHelper::SUBACTION_FIELD_TITLE]) {
@@ -679,7 +683,9 @@ abstract class ilAdvancedMDFieldDefinition
         $desc->setValue($this->getDescription());
         $desc->setRows(3);
         $desc->setCols(50);
+        $translations->modifyTranslationInfoForDescription($this->getFieldId(), $a_form, $desc, $active_language);
         $a_form->addItem($desc);
+
         
         if (!$perm[ilAdvancedMDPermissionHelper::ACTION_FIELD_EDIT_PROPERTY][ilAdvancedMDPermissionHelper::SUBACTION_FIELD_DESCRIPTION]) {
             $desc->setDisabled(true);
@@ -725,12 +731,14 @@ abstract class ilAdvancedMDFieldDefinition
      * @param ilPropertyFormGUI $a_form
      * @param ilAdvancedMDPermissionHelper $a_permissions
      */
-    public function importDefinitionFormPostValues(ilPropertyFormGUI $a_form, ilAdvancedMDPermissionHelper $a_permissions)
+    public function importDefinitionFormPostValues(ilPropertyFormGUI $a_form, ilAdvancedMDPermissionHelper $a_permissions, string $active_language)
     {
-        if (!$a_form->getItemByPostVar("title")->getDisabled()) {
+        $record = ilAdvancedMDRecord::_getInstanceByRecordId($this->record_id);
+        $is_translation = (($active_language == '') || ($active_language != $record->getDefaultLanguage()));
+        if (!$a_form->getItemByPostVar("title")->getDisabled() && !$is_translation) {
             $this->setTitle($a_form->getInput("title"));
         }
-        if (!$a_form->getItemByPostVar("description")->getDisabled()) {
+        if (!$a_form->getItemByPostVar("description")->getDisabled() && !$is_translation) {
             $this->setDescription($a_form->getInput("description"));
         }
         if (!$a_form->getItemByPostVar("searchable")->getDisabled()) {

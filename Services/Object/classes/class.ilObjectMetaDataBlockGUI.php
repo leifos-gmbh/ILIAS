@@ -127,8 +127,11 @@ class ilObjectMetaDataBlockGUI extends ilBlockGUI
 
         $defs = $this->values->getDefinitions();
         foreach ($this->values->getADTGroup()->getElements() as $element_id => $element) {
+
+            $field_translations = ilAdvancedMDFieldTranslations::getInstanceByRecordId($defs[$element_id]->getRecordId());
+
             $btpl->setCurrentBlock("item");
-            $btpl->setVariable("CAPTION", $defs[$element_id]->getTitle());
+            $btpl->setVariable("CAPTION", $field_translations->getTitleForLanguage($element_id, $this->lng->getLangKey()));
             if ($element->isNull()) {
                 $value = "-";
             } else {

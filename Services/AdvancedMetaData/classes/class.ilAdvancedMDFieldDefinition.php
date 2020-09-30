@@ -670,7 +670,13 @@ abstract class ilAdvancedMDFieldDefinition
         $title->setSize(20);
         $title->setMaxLength(70);
         $title->setRequired(true);
-        $translations->modifyTranslationInfoForTitle($this->getFieldId(), $a_form, $title, $active_language);
+        if ($this->getFieldId()) {
+            $translations->modifyTranslationInfoForTitle($this->getFieldId(), $a_form, $title, $active_language);
+        }
+        else {
+            $title->setValue($this->getTitle());
+        }
+
 
         $a_form->addItem($title);
         
@@ -683,7 +689,13 @@ abstract class ilAdvancedMDFieldDefinition
         $desc->setValue($this->getDescription());
         $desc->setRows(3);
         $desc->setCols(50);
-        $translations->modifyTranslationInfoForDescription($this->getFieldId(), $a_form, $desc, $active_language);
+        if ($this->getFieldId()) {
+            $translations->modifyTranslationInfoForDescription($this->getFieldId(), $a_form, $desc, $active_language);
+        }
+        else {
+            $desc->setValue($this->getDescription());
+        }
+
         $a_form->addItem($desc);
 
         
@@ -734,7 +746,7 @@ abstract class ilAdvancedMDFieldDefinition
     public function importDefinitionFormPostValues(ilPropertyFormGUI $a_form, ilAdvancedMDPermissionHelper $a_permissions, string $active_language)
     {
         $record = ilAdvancedMDRecord::_getInstanceByRecordId($this->record_id);
-        $is_translation = (($active_language == '') || ($active_language != $record->getDefaultLanguage()));
+        $is_translation = (($active_language !== '') && ($active_language != $record->getDefaultLanguage()));
         if (!$a_form->getItemByPostVar("title")->getDisabled() && !$is_translation) {
             $this->setTitle($a_form->getInput("title"));
         }

@@ -1262,19 +1262,23 @@ class ilAdvancedMDSettingsGUI
      */
     public function saveField()
     {
-        if (!$_REQUEST["record_id"] || !$_REQUEST["ftype"]) {
+        $record_id = $this->request->getQueryParams()['record_id'];
+        $ftype = $this->request->getQueryParams()['ftype'];
+
+        if (!$record_id || !$ftype) {
             return $this->editFields();
         }
+
         $this->initRecordObject();
         $this->ctrl->saveParameter($this, 'ftype');
         
         include_once('Services/AdvancedMetaData/classes/class.ilAdvancedMDFieldDefinition.php');
-        $field_definition = ilAdvancedMDFieldDefinition::getInstance(null, $_REQUEST["ftype"]);
-        $field_definition->setRecordId($_REQUEST["record_id"]);
+        $field_definition = ilAdvancedMDFieldDefinition::getInstance(null, $ftype);
+        $field_definition->setRecordId($record_id);
         $form = $this->initFieldForm($field_definition);
         
         if ($form->checkInput()) {
-            $field_definition->importDefinitionFormPostValues($form, $this->getPermissions());
+            $field_definition->importDefinitionFormPostValues($form, $this->getPermissions(), $this->active_language);
             $field_definition->save();
             
             ilUtil::sendSuccess($this->lng->txt('save_settings'), true);
@@ -1292,25 +1296,29 @@ class ilAdvancedMDSettingsGUI
      */
     protected function initFieldForm(ilAdvancedMDFieldDefinition $a_definition)
     {
-        include_once("./Services/Form/classes/class.ilPropertyFormGUI.php");
+        $is_creation_mode = $a_definition->getFieldId() ? false : true;
 
         $form = new ilPropertyFormGUI();
         $form->setFormAction($this->ctrl->getFormAction($this));
 
         $translations = ilAdvancedMDFieldTranslations::getInstanceByRecordId($this->record->getRecordId());
-        $form->setDescription($translations->getFormTranslationInfo(
-            $a_definition->getFieldId(),
-            $this->active_language
-        ));
+        if ($is_creation_mode) {
+            $form->setDescription($a_definition->getDescription());
+        }
+        else {
+            $form->setDescription($translations->getFormTranslationInfo(
+                $a_definition->getFieldId(),
+                $this->active_language
+            ));
+        }
         $type = new ilNonEditableValueGUI($this->lng->txt("type"));
         $type->setValue($this->lng->txt($a_definition->getTypeTitle()));
         $form->addItem($type);
         
         $a_definition->addToFieldDefinitionForm($form, $this->getPermissions(), $this->active_language);
     
-        if (!$a_definition->getFieldId()) {
+        if ($is_creation_mode) {
             $form->setTitle($this->lng->txt('md_adv_create_field'));
-
             $form->addCommandButton('saveField', $this->lng->txt('create'));
         } else {
             $form->setTitle($this->lng->txt('md_adv_edit_field'));

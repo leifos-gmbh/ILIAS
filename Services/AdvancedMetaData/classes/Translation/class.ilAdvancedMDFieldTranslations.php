@@ -163,7 +163,7 @@ class ilAdvancedMDFieldTranslations
             ) {
                 $this->definitions[$row->ofield] = ilAdvancedMDFieldDefinition::getInstance($row->ofield);
                 $this->translations[$row->ofield][$row->lang_code]->setTitle($this->definitions[$row->ofield]->getTitle());
-                $this->translations[$row->ofield][$row->lang_code]->setDescription($this->definitions[$row->ofield]->getDescription());
+                $this->translations[$row->ofield][$row->lang_code]->setDescription((string) $this->definitions[$row->ofield]->getDescription());
             }
         }
     }

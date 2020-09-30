@@ -792,12 +792,13 @@ class ilAdvancedMDSettingsGUI
     {
         global $DIC;
 
+        $record_id = $this->request->getQueryParams()['record_id'] ?? 0;
+
         $this->ctrl->saveParameter($this, 'record_id');
         $this->initRecordObject();
         $this->setRecordSubTabs();
+        $this->showLanguageSwitch($record_id, 'editFields');
 
-        $ilToolbar = $DIC['ilToolbar'];
-        
 
         $perm = $this->getPermissions()->hasPermissions(
             ilAdvancedMDPermissionHelper::CONTEXT_RECORD,
@@ -823,15 +824,19 @@ class ilAdvancedMDSettingsGUI
                 }
             }
             $types->setOptions($options);
-            $ilToolbar->addInputItem($types);
+
+            if (count($this->toolbar->getItems())) {
+                $this->toolbar->addSeparator();
+            }
+            $this->toolbar->addInputItem($types);
             
-            $ilToolbar->setFormAction($this->ctrl->getFormAction($this, "createField"));
+            $this->toolbar->setFormAction($this->ctrl->getFormAction($this, "createField"));
             
             include_once "Services/UIComponent/Button/classes/class.ilSubmitButton.php";
             $button = ilSubmitButton::getInstance();
             $button->setCaption("add");
             $button->setCommand("createField");
-            $ilToolbar->addButtonInstance($button);
+            $this->toolbar->addButtonInstance($button);
         }
         
         // #17092
@@ -844,7 +849,13 @@ class ilAdvancedMDSettingsGUI
         $fields = ilAdvancedMDFieldDefinition::getInstancesByRecordId($this->record->getRecordId());
         
         include_once("./Services/AdvancedMetaData/classes/class.ilAdvancedMDFieldTableGUI.php");
-        $table_gui = new ilAdvancedMDFieldTableGUI($this, "editRecord", $this->getPermissions(), $perm[ilAdvancedMDPermissionHelper::ACTION_RECORD_FIELD_POSITIONS]);
+        $table_gui = new ilAdvancedMDFieldTableGUI(
+            $this,
+            "editRecord",
+            $this->getPermissions(),
+            $perm[ilAdvancedMDPermissionHelper::ACTION_RECORD_FIELD_POSITIONS],
+            $this->active_language
+        );
         $table_gui->setTitle($this->lng->txt("md_adv_field_table"));
         $table_gui->parseDefinitions($fields);
         if (sizeof($fields)) {

@@ -51,6 +51,18 @@ export default class TinyWrapper {
   htmlTransform;
 
   /**
+   * current range in down/right moving
+   * @type {Object}
+   */
+  downRightRng = null;
+
+  /**
+   * current range in up/left moving
+   * @type {Object}
+   */
+  upLeftRng = null;
+
+  /**
    * @type {Object}
    */
   text_formats = {
@@ -87,7 +99,7 @@ export default class TinyWrapper {
   }
 
 
-  getConfig(after_init, after_keyup) {
+  getConfig(after_init, after_keyup, previous, next) {
     if (!this.config) {
       this.config = {
         /* part of 4 */
@@ -125,7 +137,7 @@ export default class TinyWrapper {
           this.pastePostProcess(pl, o);
         },
         setup: (tiny) => {
-          this.setup(tiny, after_init, after_keyup);
+          this.setup(tiny, after_init, after_keyup, previous, next);
         },
       };
     }
@@ -181,7 +193,7 @@ export default class TinyWrapper {
     this.pasting = true;
   }
 
-  setup(tiny, after_init, after_keyup) {
+  setup(tiny, after_init, after_keyup, previous, next) {
     this.log("tiny-wrapper.init.setup");
     this.tiny = tiny;
     const wrapper = this;
@@ -192,6 +204,33 @@ export default class TinyWrapper {
     tiny.on('KeyUp', function (ev) {
       wrapper.autoResize();
       after_keyup();
+
+      // down, right
+      if ([39,40].includes(ev.keyCode)) {
+        const currentRng = tiny.selection.getRng();
+        if (wrapper.downRightRng &&
+          wrapper.downRightRng.endContainer === currentRng.endContainer &&
+          wrapper.downRightRng.endOffset === currentRng.endOffset
+        ) {
+          if (next) {
+            next();
+          }
+        }
+      }
+
+      // down, right
+      if ([37,38].includes(ev.keyCode)) {
+        const currentRng = tiny.selection.getRng();
+        if (wrapper.upLeftRng &&
+          wrapper.upLeftRng.endContainer === currentRng.endContainer &&
+          wrapper.upLeftRng.endOffset === currentRng.endOffset
+        ) {
+          if (previous) {
+            previous();
+          }
+        }
+      }
+
     });
 
     tiny.on('KeyDown', function (ev) {
@@ -201,6 +240,16 @@ export default class TinyWrapper {
           ev.preventDefault();
           ev.stopPropagation();
         }
+      }
+
+      // down, right
+      if ([39,40].includes(ev.keyCode)) {
+        wrapper.downRightRng = tiny.selection.getRng();
+      }
+
+      // down, right
+      if ([37,38].includes(ev.keyCode)) {
+        wrapper.upLeftRng = tiny.selection.getRng();
       }
 
       if (ev.keyCode === 9 && !ev.shiftKey) {
@@ -317,7 +366,7 @@ export default class TinyWrapper {
     this.focusTiny(true);
   }
 
-  initEdit(content_element, text, characteristic, after_init, after_keyup) {
+  initEdit(content_element, text, characteristic, after_init, after_keyup, previous, next) {
     this.log('tiny-wrapper.initEdit');
 
     this.setGhostAt(content_element);
@@ -327,7 +376,7 @@ export default class TinyWrapper {
       this.lib.init(this.getConfig(() => {
               this.initContent(text, characteristic);
               after_init();
-      }, after_keyup));
+      }, after_keyup, previous, next));
     } else {
       this.showAfter(content_element);
       this.initContent(text, characteristic);
@@ -335,13 +384,13 @@ export default class TinyWrapper {
     }
   }
 
-  initInsert(content_element, after_init, after_keyup) {
+  initInsert(content_element, after_init, after_keyup, previous, next) {
     this.log('tiny-wrapper.initInsert');
 
     this.setGhostAt(content_element);
     if (!this.tiny) {
       this.createTextAreaForTiny();
-      this.lib.init(this.getConfig(after_init, after_keyup));
+      this.lib.init(this.getConfig(after_init, after_keyup, previous, next));
     } else {
       this.showAfter(content_element);
       this.initContent("<p></p>", 'ilc_text_block_Standard');

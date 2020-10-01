@@ -992,6 +992,10 @@ export default class ParagraphUI {
       this.setParagraphClass("Standard");
     }, () => {
       this.autoSave.handleAutoSaveKeyPressed();
+    }, () => {
+      this.switchToPrevious();
+    }, () => {
+      this.switchToNext();
     });
     this.updateMenuButtons();
     this.tinyinit = true;
@@ -1012,6 +1016,74 @@ export default class ParagraphUI {
     }
   }
 
+  switchToPrevious() {
+    this.log("paragraph-ui switchToPrevious");
+    const dispatch = this.dispatcher;
+    const action = this.actionFactory;
+
+    const cpcid = this.page_model.getCurrentPCId();
+    let found = false;
+    let previousPcid = null;
+    let previousHierId = null;
+    document.querySelectorAll("[data-copg-ed-type='pc-area']").forEach((el) => {
+      const pcid = el.dataset.pcid;
+      const hierid = el.dataset.hierid;
+      const cname = el.dataset.cname;
+      if (cname === "Paragraph") {
+        if (!found && cpcid === pcid) {
+          found = true;
+        }
+        if (!found) {
+          previousPcid = pcid;
+          previousHierId = hierid;
+        }
+      }
+    });
+    if (previousPcid) {
+      dispatch.dispatch(action.page().editor().componentSwitch(
+        "Paragraph",
+        this.page_model.getComponentState(),
+        this.page_model.getCurrentPCId(),
+        this.getSwitchParameters(),
+        previousPcid,
+        previousHierId));
+    }
+  }
+
+  switchToNext() {
+    this.log("paragraph-ui switchToNext");
+    const dispatch = this.dispatcher;
+    const action = this.actionFactory;
+
+    const cpcid = this.page_model.getCurrentPCId();
+    let found = false;
+    let nextPcid = null;
+    let nextHierId = null;
+    document.querySelectorAll("[data-copg-ed-type='pc-area']").forEach((el) => {
+      const pcid = el.dataset.pcid;
+      const hierid = el.dataset.hierid;
+      const cname = el.dataset.cname;
+      if (cname === "Paragraph") {
+        if (found && !nextPcid) {
+          nextPcid = pcid;
+          nextHierId = hierid;
+        }
+        if (!found && cpcid === pcid) {
+          found = true;
+        }
+      }
+    });
+    if (nextPcid) {
+      dispatch.dispatch(action.page().editor().componentSwitch(
+        "Paragraph",
+        this.page_model.getComponentState(),
+        this.page_model.getCurrentPCId(),
+        this.getSwitchParameters(),
+        nextPcid,
+        nextHierId));
+    }
+  }
+
   editParagraph(pcId, hierId, mode, switched)
   {
     this.log("paragraph-ui.editParagraph");
@@ -1023,6 +1095,10 @@ export default class ParagraphUI {
       this.updateMenuButtons();
     }, () => {
       this.autoSave.handleAutoSaveKeyPressed();
+    }, () => {
+      this.switchToPrevious();
+    }, () => {
+      this.switchToNext();
     });
     return;
 

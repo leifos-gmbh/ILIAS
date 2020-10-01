@@ -1,5 +1,8 @@
 /* Copyright (c) 1998-2020 ILIAS open source, Extended GPL, see docs/LICENSE */
 
+import HTMLTransform from "./html-transform.js";
+import TinyDomTransform from "./tiny-dom-transform.js";
+
 /**
  * Wraps tiny
  */
@@ -43,17 +46,22 @@ export default class TinyWrapper {
   current_td = "";                                      // MISSING
 
   /**
+   * @type {HTMLTransform}
+   */
+  htmlTransform;
+
+  /**
    * @type {Object}
    */
   text_formats = {
-    Strong: {inline : 'span', classes : 'ilc_text_inline_Strong'},
-    Emph: {inline : 'span', classes : 'ilc_text_inline_Emph'},
-    Important: {inline : 'span', classes : 'ilc_text_inline_Important'},
-    Comment: {inline : 'span', classes : 'ilc_text_inline_Comment'},
-    Quotation: {inline : 'span', classes : 'ilc_text_inline_Quotation'},
-    Accent: {inline : 'span', classes : 'ilc_text_inline_Accent'},
-    Sup: {inline : 'sup', classes : 'ilc_sup_Sup'},
-    Sub: {inline : 'sub', classes : 'ilc_sub_Sub'}
+    Strong: { inline: 'span', classes: 'ilc_text_inline_Strong' },
+    Emph: { inline: 'span', classes: 'ilc_text_inline_Emph' },
+    Important: { inline: 'span', classes: 'ilc_text_inline_Important' },
+    Comment: { inline: 'span', classes: 'ilc_text_inline_Comment' },
+    Quotation: { inline: 'span', classes: 'ilc_text_inline_Quotation' },
+    Accent: { inline: 'span', classes: 'ilc_text_inline_Accent' },
+    Sup: { inline: 'sup', classes: 'ilc_sup_Sup' },
+    Sub: { inline: 'sub', classes: 'ilc_sub_Sub' }
   };
 
 
@@ -62,6 +70,7 @@ export default class TinyWrapper {
    */
   constructor(content_css) {
     this.lib = tinyMCE;
+    this.htmlTransform = new HTMLTransform();
   }
 
   setContentCss(content_css) {
@@ -87,7 +96,7 @@ export default class TinyWrapper {
         statusbar: false,
         language: "en",
         height: "100%",
-        plugins: "save,paste",
+        plugins: "save,paste,lists",
         save_onsavecallback: "saveParagraph",
         mode: "exact",
         elements: this.id,
@@ -128,6 +137,8 @@ export default class TinyWrapper {
   }
 
   pastePreProcess(pl, o) {
+    const html = this.htmlTransform;
+
     // see #23696, since tinymce4 it seems not possible to disable link conversion (even if <a> tags are not valid elements)
     // so we paste http string "on our own" and reset the paste content
     if (o.content.substring(0, 4) === "http") {
@@ -135,21 +146,21 @@ export default class TinyWrapper {
       o.content = '';
     }
 
-    if (o.wordContent)
-    {
-      o.content = o.content.replace(/(\r\n|\r|\n)/g, '\n');
-      o.content = o.content.replace(/(\n)/g, ' ');
+    if (o.wordContent) {
+      o.content = html.removeLineFeeds(o.content);
     }
-    // remove any attributes from <p>
-    o.content = o.content.replace(/(<p [^>]*>)/g, '<p>');
+    o.content = html.removeAttributesFromTag("p", o.content);
+    o.content = html.removeTag("div", o.content);
+  }
 
-    // remove all divs
-    o.content = o.content.replace(/(<div [^>]*>)/g, '');
-    o.content = o.content.replace(/(<\/div>)/g, '');
+  getTinyDomTransform() {
+    return new TinyDomTransform(this.tiny);
   }
 
   pastePostProcess(pl, o) {
     const tiny = this.tiny;
+
+    const tinyDom = this.getTinyDomTransform();
 
     // we must handle all valid elements here
     // p (handled in paste_preprocess)
@@ -158,28 +169,14 @@ export default class TinyWrapper {
     // code (should be ok, since no attributes allowed)
     // ul[class],ol[class],li[class] handled here
 
-    // fix lists
-    tiny.dom.setAttrib(tiny.dom.select('ol', o.node), 'class', 'ilc_list_o_NumberedList');
-    tiny.dom.setAttrib(tiny.dom.select('ul', o.node), 'class', 'ilc_list_u_BulletedList');
-    tiny.dom.setAttrib(tiny.dom.select('li', o.node), 'class', 'ilc_list_item_StandardListItem');
+    // add standard ilias list classes
+    tinyDom.addListClasses(o.node);
 
-    // replace all b nodes by spans[Strong]
-    tinymce.each(tiny.dom.select('b', o.node), function(n) {
-      tiny.dom.replace(tiny.dom.create('span', {'class': 'ilc_text_inline_Strong'}, n.innerHTML), n);
-    });
-    // replace all u nodes by spans[Important]
-    tinymce.each(tiny.dom.select('u', o.node), function(n) {
-      tiny.dom.replace(tiny.dom.create('span', {'class': 'ilc_text_inline_Important'}, n.innerHTML), n);
-    });
-    // replace all i nodes by spans[Emph]
-    tinymce.each(tiny.dom.select('i', o.node), function(n) {
-      tiny.dom.replace(tiny.dom.create('span', {'class': 'ilc_text_inline_Emph'}, n.innerHTML), n);
-    });
+    // replace all b, u, i tags by ilias spans
+    tinyDom.replaceBoldUnderlineItalic(o.node);
 
     // remove all id attributes from the content
-    tinyMCE.each(tiny.dom.select('*[id!=""]', o.node), function(el) {
-      el.id = '';
-    });
+    tinyDom.removeIds(o.node);
 
     this.pasting = true;
   }
@@ -192,119 +189,89 @@ export default class TinyWrapper {
     // if this does not work this.tiny = this.lib.get(this.id); ??
 
 
-
-    tiny.on('KeyUp', function(ev) {
+    tiny.on('KeyUp', function (ev) {
       wrapper.autoResize();
       after_keyup();
     });
 
-    tiny.on('KeyDown', function(ev)
-    {
-      if(ev.keyCode === 35 || ev.keyCode === 36)
-      {
-        const isMac = navigator.platform.toUpperCase().indexOf('MAC')>=0;
+    tiny.on('KeyDown', function (ev) {
+      if (ev.keyCode === 35 || ev.keyCode === 36) {
+        const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
         if (!ev.shiftKey && isMac) {
-          YAHOO.util.Event.preventDefault(ev);
-          YAHOO.util.Event.stopPropagation(ev);
+          ev.preventDefault();
+          ev.stopPropagation();
         }
       }
 
-      if(ev.keyCode === 9 && !ev.shiftKey)
-      {
-        YAHOO.util.Event.preventDefault(ev);
-        YAHOO.util.Event.stopPropagation(ev);
-        if (par_ui.current_td !== "")
-        {
-          //par_ui.editNextCell();                              // MISSING
-        }
-        else
-        {
-          if (tiny.queryCommandState('InsertUnorderedList') ||
-            tiny.queryCommandState('InsertOrderedList'))
-          {
-            //par_ui.cmdListIndent();                              // MISSING
-          }
-        }
+      if (ev.keyCode === 9 && !ev.shiftKey) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        /*        if (par_ui.current_td !== "")
+                {
+                  //par_ui.editNextCell();                              // MISSING
+                }*/
       }
-      if(ev.keyCode == 9 && ev.shiftKey)
-      {
-        //						console.log("backtab");
-        YAHOO.util.Event.preventDefault(ev);
-        YAHOO.util.Event.stopPropagation(ev);
-        if (wrapper.current_td != "")
+
+      if (ev.keyCode === 9 && ev.shiftKey) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        /*if (wrapper.current_td != "")
         {
-          //par_ui.editPreviousCell();                              // MISSING
-        }
-        else
-        {
-          if (ed.queryCommandState('InsertUnorderedList') ||
-            ed.queryCommandState('InsertOrderedList'))
-          {
-            //par_ui.cmdListOutdent();                              // MISSING
-          }
-        }
+          //par_ui.editPreviousCell();                          // MISSING
+        }*/
       }
     });
 
 
-    tiny.on('NodeChange', function(cm, n) {
+    tiny.on('NodeChange', function (cm, n) {
 
-        // clean content after paste (has this really an effect?)
-        // (yes, it does, at least splitSpans is important here #13019)
-        if (wrapper.pasting) {
-          wrapper.pasting = false;
-          wrapper.splitDivs();                                         // MISSING
-          wrapper.fixListClasses(false);                               // MISSING
-          wrapper.splitSpans();                                    // MISSING
-        }
-
-        // update state of indent/outdent buttons
-        const ibut = document.getElementById('ilIndentBut');
-        const obut = document.getElementById('ilOutdentBut');
-        if (ibut != null && obut != null)
-        {
-          if (tiny.queryCommandState('InsertUnorderedList') ||
-            tiny.queryCommandState('InsertOrderedList'))
-          {
-            ibut.style.visibility = '';
-            obut.style.visibility = '';
-          }
-          else
-          {
-            ibut.style.visibility = 'hidden';
-            obut.style.visibility = 'hidden';
-          }
-        }
-
-//        this.updateMenuButtons();                                 // MISSING
-
-      });
-
-      let width = wrapper.ghost_reg.width;
-      let height = wrapper.ghost_reg.height;
-      if (width < wrapper.minwidth) {
-        width = wrapper.minwidth;
+      // clean content after paste (has this really an effect?)
+      // (yes, it does, at least splitSpans is important here #13019)
+      if (wrapper.pasting) {
+        wrapper.pasting = false;
+        wrapper.splitDivs();
+        wrapper.fixListClasses(false);
+        wrapper.splitSpans();
       }
-      if (height < wrapper.minheight) {
-        height = wrapper.minheight;
+
+      // update state of indent/outdent buttons
+      const ibut = document.querySelector("[data-copg-ed-action='list.indent']");
+      const obut = document.querySelector("[data-copg-ed-action='list.outdent']");
+      if (ibut != null && obut != null) {
+        if (tiny.queryCommandState('InsertUnorderedList') ||
+          tiny.queryCommandState('InsertOrderedList')) {
+          ibut.disabled = false;
+          obut.disabled = false;
+        } else {
+          ibut.disabled = true;
+          obut.disabled = true;
+        }
+      }
+    });
+
+    let width = wrapper.ghost_reg.width;
+    let height = wrapper.ghost_reg.height;
+    if (width < wrapper.minwidth) {
+      width = wrapper.minwidth;
+    }
+    if (height < wrapper.minheight) {
+      height = wrapper.minheight;
     }
 
     //ed.onInit.add(function(ed, evt)
-    tiny.on('init', function(evt)
-    {
+    tiny.on('init', function (evt) {
 
       let ed = tiny;
-let mode = "insert";                                      // MISSING
+      let mode = "insert";                                      // MISSING
 
       ed.formatter.register('mycode', {
-        inline : 'code'
+        inline: 'code'
       });
 
       wrapper.log("tiny-wrapper.init.tiny-init");
 
       wrapper.setEditFrameSize(width, height);           // MISSING
-      if (mode === 'edit')
-      {
+      if (mode === 'edit') {
         pdiv.style.display = "none";
 
         var tinytarget = document.getElementById("tinytarget_div");
@@ -312,7 +279,7 @@ let mode = "insert";                                      // MISSING
         ta_div.style.left = '';
 
         ed.setProgressState(1); // Show progress
-//          par_ui.loadCurrentParagraphIntoTiny(switched);                        // MISSING
+        //          par_ui.loadCurrentParagraphIntoTiny(switched);                        // MISSING
       }
 
 
@@ -366,7 +333,6 @@ let mode = "insert";                                      // MISSING
       this.initContent(text, characteristic);
       after_init();
     }
-
   }
 
   initInsert(content_element, after_init, after_keyup) {
@@ -404,9 +370,9 @@ let mode = "insert";                                      // MISSING
     let ta = document.createElement("textarea");
     let ta_div = document.createElement("div");
 
-    const center_col = document.getElementById("il_center_col");
+    const parent = document.getElementById("ilContentContainer");
 
-    center_col.appendChild(ta_div);
+    parent.appendChild(ta_div);
     ta_div.appendChild(ta);
 
     ta_div.id = 'tinytarget_div';
@@ -424,63 +390,54 @@ let mode = "insert";                                      // MISSING
     this.ghost_reg = YAHOO.util.Region.getRegion(this.ghost);
   }
 
-  /*
-  insertGhostAfter(target_element_id) {
-    this.log("tiny-wrapper.insertGhostAfter " + target_element_id);
-
-    // get placeholder div
-    const pdiv = document.getElementById(target_element_id);
-    let insert_ghost = new YAHOO.util.Element(document.createElement('div'));
-    insert_ghost = YAHOO.util.Dom.insertAfter(insert_ghost, pdiv);
-    insert_ghost.id = "insert_ghost";
-    insert_ghost.style.paddingTop = "5px";
-    insert_ghost.style.paddingBottom = "5px";
-
-    this.ghost = document.getElementById("insert_ghost");
-    this.ghost_reg = YAHOO.util.Region.getRegion(this.ghost);
-  }*/
-
   // copy input of tiny to ghost div in background
-  copyInputToGhost(add_final_spacer)
-  {
+  copyInputToGhost(add_final_spacer) {
     this.log('tiny-wrapper.copyInputToGhost');
-
+    let tag;
     let ed = this.tiny;
 
-    if (this.ghost)
-    {
+    if (this.ghost) {
       let cl = ed.dom.getRoot().className;
       let c = this.p2br(ed.getContent());
-      if (this.current_td === "")
-      {
+      if (this.current_td === "") {
         cl = "copg-input-ghost " + cl;
+        console.log(cl);
         const cl_arr = cl.split("_");
+        const characteristic = cl_arr[cl_arr.length - 1];
+        switch (characteristic) {
+          case "Headline1":
+            tag = "h1";
+            break;
+          case "Headline2":
+            tag = "h2";
+            break;
+          case "Headline3":
+            tag = "h3";
+            break;
+          default:
+            tag = "div";
+            break;
+        }
+
+        if (add_final_spacer) {
+          c = c + "<br />.";
+        }
+
         c = "<div class='ilEditLabel'>" + il.Language.txt("cont_ed_par") +
-          " (" + cl_arr[cl_arr.length-1] + ")</div><div style='position:static;' class='" + cl + "'>" + c + "</div>";
-      }
-      else
-      {
+          " (" + characteristic + ")</div><" + tag + " style='position:static;' class='" + cl + "'>" + c + "</" + tag + ">";
+      } else {
         this.tds[this.current_td] =
           this.getContentForSaving();
-      }
-      let e = c.substr(c.length - 6);
-      let b = c.substr(c.length - 12, 6);
-      if (e === "</div>" && add_final_spacer) {
-        // ensure at least one more line of space
-        if (b !== "<br />") {
-          c = c.substr(0, c.length - 6) + "<br />.</div>";
-        } else {
-          // this looks good under firefox. If this leads to problems on other
-          // browsers, ".</div>" would be the alternative for this case (last new empty line)
-          c = c.substr(0, c.length - 6) + "<br />.</div>";
-        }
       }
 
       // we remove the first child div content div (edit label)
       this.ghost.querySelector("div").remove();
+      this.ghost.querySelector("div, h1, h2, h3").remove();
+
+      console.log("replacing with: " + c);
 
       // we replace the second div (content) with c
-      this.ghost.querySelector("div").outerHTML = c;
+      this.ghost.innerHTML = c;
 
     }
   }
@@ -503,7 +460,8 @@ let mode = "insert";                                      // MISSING
       this.ghost = null;
     }
   }
-      // synchs the size/position of the tiny to the space the ghost
+
+  // synchs the size/position of the tiny to the space the ghost
   // object uses in the background
   synchInputRegion() {
     this.log('tiny-wrapper.synchInputRegion');
@@ -523,7 +481,6 @@ let mode = "insert";                                      // MISSING
     back_el.style.paddingLeft = "";
     back_el.style.paddingRight = "";
 
-
     let tdiv = document.getElementById("tinytarget_div");
 
     // make sure, background element does not go beyond page bottom
@@ -536,37 +493,16 @@ let mode = "insert";                                      // MISSING
     this.log(back_reg);
 
     var cl_reg = YAHOO.util.Dom.getClientRegion();
-    if (back_reg.y + back_reg.height + 20 > cl_reg.top + cl_reg.height)
-    {
+    if (back_reg.y + back_reg.height + 20 > cl_reg.top + cl_reg.height) {
       back_el.style.overflow = 'hidden';
       back_el.style.height = (cl_reg.top + cl_reg.height - back_reg.y - 20) + "px";
       back_reg = YAHOO.util.Region.getRegion(back_el);
     }
 
-/*    if (this.current_td)
-    {
-      YAHOO.util.Dom.setX(tinyifr, back_reg.x -2);
-      YAHOO.util.Dom.setY(tinyifr, back_reg.y -2);
-      this.setEditFrameSize(back_reg.width-2,
-        back_reg.height);
-    }
-    else
-    {
-      if (this.getInsertStatus())
-      {
-        YAHOO.util.Dom.setX(tinyifr, back_reg.x - 1);
-        YAHOO.util.Dom.setY(tinyifr, back_reg.y);
-        this.setEditFrameSize(back_reg.width + 1,
-          back_reg.height);
-      }
-      else
-      {*/
-        YAHOO.util.Dom.setX(tdiv, back_reg.x);
-        YAHOO.util.Dom.setY(tdiv, back_reg.y);
-        this.setEditFrameSize(back_reg.width,
-          back_reg.height);
-//      }
-//    }
+    YAHOO.util.Dom.setX(tdiv, back_reg.x);
+    YAHOO.util.Dom.setY(tdiv, back_reg.y);
+    this.setEditFrameSize(back_reg.width,
+      back_reg.height);
 
     if (!this.current_td) {
       this.autoScroll();
@@ -632,8 +568,7 @@ let mode = "insert";                                      // MISSING
   }
 
   // set frame size of editor
-  setEditFrameSize(width, height)
-  {
+  setEditFrameSize(width, height) {
     this.log('tiny-wrapper.setEditFrameSize');
     let tinyifr = document.getElementById("tinytarget_ifr");
     let tinytd = document.getElementById("tinytarget_tbl");
@@ -647,24 +582,20 @@ let mode = "insert";                                      // MISSING
     this.ed_height = height;
   }
 
-  focusTiny(delayed)
-  {
+  focusTiny(delayed) {
     this.log('tiny-wrapper.focusTiny');
     let timeout = 1;
-    if (delayed)
-    {
+    if (delayed) {
       timeout = 500;
     }
 
     setTimeout(function () {
       let ed = tinyMCE.get('tinytarget');
-      if (ed)
-      {
+      if (ed) {
         let e = tinyMCE.DOM.get(ed.id + '_external');
         let r = ed.dom.getRoot();
         let fc = r.childNodes[0];
-        if (r.className != null)
-        {
+        if (r.className != null) {
           var st = r.className.substring(15);
         }
 
@@ -673,48 +604,12 @@ let mode = "insert";                                      // MISSING
     }, timeout);
   }
 
-  prepareTinyForEditing (insert, switched)
-  {
-    this.log('tiny-wrapper.prepareTinyForEditing');
-    var ed = tinyMCE.get('tinytarget');
-    this.log(ed);
-
-    tinyMCE.execCommand('mceAddEditor', false, 'tinytarget');
-    if (!switched)
-    {
-//      this.showToolbar('tinytarget');
-    }
-
-    // todo tinynew
-    //		tinyifr = document.getElementById("tinytarget_parent");
-    //		tinyifr.style.position = "absolute";
-
-//    this.setEditStatus(true);                           // MISSING, does not seem to be used anywhere
-//    this.setInsertStatus(insert);
-    if (!insert)
-    {
-      this.focusTiny(false);
-    }
-    //this.autoScroll();
-    if (this.current_td !== "")
-    {
-      this.copyInputToGhost(false);
-    }
-    else
-    {
-      this.copyInputToGhost(true);
-    }
-    this.synchInputRegion();
-    //this.updateMenuButtons();
-  }
 
   setContent (text, characteristic) {
     const switched = false;                                   // MISSING
     const ed = this.tiny;
     ed.setContent(text);
     this.splitBR();
-//    ed.setProgressState(0); // Show progress
-    //    this.prepareTinyForEditing(false, switched);
     this.autoResize();
     this.setParagraphClass(characteristic);
   }
@@ -1114,4 +1009,53 @@ let mode = "insert";                                      // MISSING
       return parts[parts.length - 1];
   }
 
+  bulletList() {
+    let ed = this.tiny;
+    ed.focus();
+    ed.execCommand('InsertUnorderedList', false);
+    this.fixListClasses(true);
+    this.autoResize(ed);
+  }
+
+  numberedList() {
+    let ed = this.tiny;
+    ed.focus();
+    ed.execCommand('InsertOrderedList', false);
+    this.fixListClasses(true);
+    this.autoResize(ed);
+  }
+
+  listIndent() {
+    let blockq = false, range, ed = this.tiny;
+
+    this.log("listIndent");
+
+    ed.focus();
+    ed.execCommand('Indent');
+    range = ed.selection.getRng(true);
+
+    // if path contains blockquote, top level list has been indented -> undo, see bug #0016243
+    let cnode = range.startContainer;
+    while (cnode = cnode.parentNode) {
+      if (cnode.nodeName === "BLOCKQUOTE") {
+        blockq = true;
+      }
+    }
+    if (blockq) {
+      ed.execCommand('Undo', false);
+    }
+
+    //tinyMCE.execCommand('mceCleanup', false, 'tinytarget');
+    this.fixListClasses(false);
+    this.autoResize(ed);
+  }
+
+  listOutdent() {
+    this.log("listOutdent");
+    let ed = this.tiny;
+    ed.focus();
+    ed.execCommand('Outdent', false);
+    this.fixListClasses(true);
+    this.autoResize(ed);
+  }
 }

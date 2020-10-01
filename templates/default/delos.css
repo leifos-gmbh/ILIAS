@@ -14325,7 +14325,7 @@ div.il_editarea {
   min-height: 20px;
 }
 div.il_editarea:hover,
-.copg-ghost-wrapper {
+#tinytarget_ifr {
   border: 2px solid #4c6586;
 }
 div.ilc_page_Page > div.il_editarea_disabled {
@@ -14384,7 +14384,8 @@ div.ilEditLabel {
   height: 15px;
   display: none;
 }
-div.il_editarea:hover > div.ilEditLabel {
+div.il_editarea:hover > div.ilEditLabel,
+.copg-ghost-wrapper div.ilEditLabel {
   display: block;
 }
 div.il_editarea_selected:hover > div.ilEditLabel {

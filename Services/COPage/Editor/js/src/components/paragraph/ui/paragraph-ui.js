@@ -515,55 +515,20 @@ export default class ParagraphUI {
     this.addBBCode('[anc name=""]', '[/anc]');
   }
 
-  cmdBList()
-  {
-    let ed = tinyMCE.get('tinytarget');
-    ed.focus();
-    ed.execCommand('InsertUnorderedList', false);
-    this.fixListClasses(true);
-    this.autoResize(ed);
+  cmdBList() {
+    this.tinyWrapper.bulletList();
   }
 
-  cmdNList()
-  {
-    let ed = tinyMCE.get('tinytarget');
-    ed.focus();
-    ed.execCommand('InsertOrderedList', false);
-    this.fixListClasses(true);
-    this.autoResize(ed);
+  cmdNList() {
+    this.tinyWrapper.numberedList();
   }
 
-  cmdListIndent()
-  {
-    let blockq = false, range, ed = tinyMCE.get('tinytarget');
-
-    ed.focus();
-    ed.execCommand('Indent', false);
-    range = ed.selection.getRng(true);
-
-    // if path contains blockquote, top level list has been indented -> undo, see bug #0016243
-    let cnode = range.startContainer;
-    while (cnode = cnode.parentNode) {
-      if (cnode.nodeName === "BLOCKQUOTE") {
-        blockq = true;
-      }
-    }
-    if (blockq) {
-      ed.execCommand('Undo', false);
-    }
-
-    //tinyMCE.execCommand('mceCleanup', false, 'tinytarget');
-    this.fixListClasses(false);
-    this.autoResize(ed);
+  cmdListIndent() {
+    this.tinyWrapper.listIndent();
   }
 
-  cmdListOutdent()
-  {
-    let ed = tinyMCE.get('tinytarget');
-    ed.focus();
-    ed.execCommand('Outdent', false);
-    this.fixListClasses(true);
-    this.autoResize(ed);
+  cmdListOutdent() {
+    this.tinyWrapper.listOutdent();
   }
 
   setParagraphClass(i) {
@@ -1399,11 +1364,24 @@ export default class ParagraphUI {
 
   replaceRenderedParagraph(pcid, content) {
     const pcarea = document.querySelector("[data-copg-ed-type='pc-area'][data-pcid='" + pcid + "']");
+    const children = Array.from(pcarea.childNodes);
+    let cnt = 0;
+
+    // we remove all children except the first one which is the EditLabel div
+    children.forEach(function(item){
+      if (cnt > 0) {
+        item.remove();
+      }
+      cnt++;
+    });
+    /*
+    pcarea.querySelectorAll("div", (d) => {
+    })
     const contentDiv = pcarea.getElementsByTagName('div')[1];
     console.log(pcid);
     console.log(pcarea);
     console.log(contentDiv);
-    contentDiv.remove();
+    contentDiv.remove();*/
     pcarea.innerHTML = pcarea.innerHTML + content;
   }
 

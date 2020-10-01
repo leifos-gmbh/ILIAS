@@ -52,7 +52,7 @@ class ParagraphResponseFactory
      * @param
      * @return
      */
-    protected function getParagraphOutput($page_gui, $pcid)
+    protected function getParagraphOutput(\ilPageObjectGUI $page_gui, $pcid)
     {
         $page_gui->setRawPageContent(true);
         $page_gui->setAbstractOnly(true, $pcid);

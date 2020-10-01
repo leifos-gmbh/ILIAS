@@ -1351,7 +1351,11 @@ class ilPageObjectGUI
 						preloader.src = './templates/default/images/loader.svg';");
                 include_once("./Services/COPage/classes/class.ilPCParagraphGUI.php");
 
-                $main_tpl->addJavascript("./node_modules/tinymce/tinymce.min.js");
+                if (DEVMODE == 1) {
+                    $main_tpl->addJavascript("./node_modules/tinymce/tinymce.js");
+                } else {
+                    $main_tpl->addJavascript("./node_modules/tinymce/tinymce.min.js");
+                }
                 $tpl->touchBlock("init_dragging");
 
                 $cfg = $this->getPageConfig();

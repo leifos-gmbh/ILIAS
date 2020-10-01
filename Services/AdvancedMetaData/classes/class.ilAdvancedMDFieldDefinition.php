@@ -285,7 +285,7 @@ abstract class ilAdvancedMDFieldDefinition
             self::TYPE_ADDRESS
         );
     }
-    
+
     /**
      * Is given type valid
      *
@@ -328,6 +328,19 @@ abstract class ilAdvancedMDFieldDefinition
             );
             return $map[$a_type];
         }
+    }
+
+    /**
+     * Check if default language mode has to be used: no language given or language equals default language
+     * @param string $language
+     */
+    public function useDefaultLanguageMode(string $language)
+    {
+        if (!strlen($language)) {
+            return true;
+        }
+        $record = ilAdvancedMDRecord::_getInstanceByRecordId($this->record_id);
+        return strcmp($record->getDefaultLanguage(), $language) === 0;
     }
     
     /**
@@ -630,18 +643,18 @@ abstract class ilAdvancedMDFieldDefinition
      * @param ilPropertyFormGUI $a_form
      * @param bool $a_disabled
      */
-    protected function addCustomFieldToDefinitionForm(ilPropertyFormGUI $a_form, $a_disabled = false)
+    protected function addCustomFieldToDefinitionForm(ilPropertyFormGUI $a_form, $a_disabled = false, string $language = '')
     {
         // type-specific
     }
-    
+
     /**
      * Add input elements to definition form
-     *
-     * @param ilPropertyFormGUI $a_form
-     * @param ilAdvancedMDPermissionHelper $a_form
+     * @param ilPropertyFormGUI            $a_form
+     * @param ilAdvancedMDPermissionHelper $a_permissions
+     * @param string                       $language
      */
-    public function addToFieldDefinitionForm(ilPropertyFormGUI $a_form, ilAdvancedMDPermissionHelper $a_permissions, string $active_language)
+    public function addToFieldDefinitionForm(ilPropertyFormGUI $a_form, ilAdvancedMDPermissionHelper $a_permissions, string $language = '')
     {
         global $DIC;
 
@@ -671,7 +684,7 @@ abstract class ilAdvancedMDFieldDefinition
         $title->setMaxLength(70);
         $title->setRequired(true);
         if ($this->getFieldId()) {
-            $translations->modifyTranslationInfoForTitle($this->getFieldId(), $a_form, $title, $active_language);
+            $translations->modifyTranslationInfoForTitle($this->getFieldId(), $a_form, $title, $language);
         }
         else {
             $title->setValue($this->getTitle());
@@ -690,7 +703,7 @@ abstract class ilAdvancedMDFieldDefinition
         $desc->setRows(3);
         $desc->setCols(50);
         if ($this->getFieldId()) {
-            $translations->modifyTranslationInfoForDescription($this->getFieldId(), $a_form, $desc, $active_language);
+            $translations->modifyTranslationInfoForDescription($this->getFieldId(), $a_form, $desc, $language);
         }
         else {
             $desc->setValue($this->getDescription());
@@ -723,16 +736,17 @@ abstract class ilAdvancedMDFieldDefinition
         
         $this->addCustomFieldToDefinitionForm(
             $a_form,
-            !$perm[ilAdvancedMDPermissionHelper::ACTION_FIELD_EDIT_PROPERTY][ilAdvancedMDPermissionHelper::SUBACTION_FIELD_PROPERTIES]
+            !$perm[ilAdvancedMDPermissionHelper::ACTION_FIELD_EDIT_PROPERTY][ilAdvancedMDPermissionHelper::SUBACTION_FIELD_PROPERTIES],
+            $language
         );
     }
-    
+
     /**
      * Import custom post values from definition form
-     *
      * @param ilPropertyFormGUI $a_form
+     * @param string            $language
      */
-    public function importCustomDefinitionFormPostValues(ilPropertyFormGUI $a_form)
+    public function importCustomDefinitionFormPostValues(ilPropertyFormGUI $a_form, string $language = '')
     {
         // type-specific
     }
@@ -763,7 +777,7 @@ abstract class ilAdvancedMDFieldDefinition
             ilAdvancedMDPermissionHelper::ACTION_FIELD_EDIT_PROPERTY,
             ilAdvancedMDPermissionHelper::SUBACTION_FIELD_PROPERTIES
         )) {
-            $this->importCustomDefinitionFormPostValues($a_form);
+            $this->importCustomDefinitionFormPostValues($a_form, $active_language);
         }
     }
     

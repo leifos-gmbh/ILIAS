@@ -129,14 +129,14 @@ class ilAdvancedMDFieldDefinitionText extends ilAdvancedMDFieldDefinition
         
         return $res;
     }
-    
+
     /**
      * Add input elements to definition form
-     *
      * @param ilPropertyFormGUI $a_form
-     * @param bool $a_disabled
+     * @param bool              $a_disabled
+     * @param string            $language
      */
-    public function addCustomFieldToDefinitionForm(ilPropertyFormGUI $a_form, $a_disabled = false)
+    public function addCustomFieldToDefinitionForm(ilPropertyFormGUI $a_form, $a_disabled = false, string $language = '')
     {
         global $DIC;
 
@@ -159,13 +159,13 @@ class ilAdvancedMDFieldDefinitionText extends ilAdvancedMDFieldDefinition
             $multi->setDisabled(true);
         }
     }
-    
+
     /**
      * Import custom post values from definition form
-     *
      * @param ilPropertyFormGUI $a_form
+     * @param string            $language
      */
-    public function importCustomDefinitionFormPostValues(ilPropertyFormGUI $a_form)
+    public function importCustomDefinitionFormPostValues(ilPropertyFormGUI $a_form, string $language = '')
     {
         $max = $a_form->getInput("max");
         $this->setMaxLength(($max !== "") ? $max : null);

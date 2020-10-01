@@ -47,8 +47,12 @@ class ilAdvancedMDFieldDefinitionSelectMulti extends ilAdvancedMDFieldDefinition
     //
     // definition (NOT ADT-based)
     //
-    
-    public function importCustomDefinitionFormPostValues(ilPropertyFormGUI $a_form)
+
+    /**
+     * @param ilPropertyFormGUI $a_form
+     * @param string            $language
+     */
+    public function importCustomDefinitionFormPostValues(ilPropertyFormGUI $a_form, string $language = '')
     {
         $old = $this->getOptions();
         $new = $a_form->getInput("opts");

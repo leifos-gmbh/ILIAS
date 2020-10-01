@@ -1166,14 +1166,13 @@ class ilAdvancedMDSettingsGUI
         $this->ctrl->saveParameter($this, 'field_id');
         $this->initRecordObject();
         $this->setRecordSubTabs(2);
-        $this->showLanguageSwitch($this->record->getRecordId(), 'editField');
-                 
+
         $field_definition = ilAdvancedMDFieldDefinition::getInstance((int) $field_id);
                  
         if (!$a_form instanceof ilPropertyFormGUI) {
+            $this->showLanguageSwitch($this->record->getRecordId(), 'editField');
             $a_form = $this->initFieldForm($field_definition);
         }
-         
         $table = null;
         if ($field_definition->hasComplexOptions()) {
             $table = $field_definition->getComplexOptionsOverview($this, "editField");

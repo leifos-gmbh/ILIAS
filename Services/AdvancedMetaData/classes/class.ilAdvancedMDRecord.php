@@ -549,7 +549,7 @@ class ilAdvancedMDRecord
         // Save import id if given
         $next_id = $ilDB->nextId('adv_md_record');
         
-        $query = "INSERT INTO adv_md_record (record_id,import_id,active,title,description,parent_obj) " .
+        $query = "INSERT INTO adv_md_record (record_id,import_id,active,title,description,parent_obj,lang_default) " .
             "VALUES(" .
             $ilDB->quote($next_id, 'integer') . ", " .
             $this->db->quote($this->getImportId(), 'text') . ", " .

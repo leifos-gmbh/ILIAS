@@ -162,14 +162,14 @@ class ilAdvancedMDFieldDefinitionInteger extends ilAdvancedMDFieldDefinition
         
         return $res;
     }
-    
+
     /**
      * Add input elements to definition form
-     *
      * @param ilPropertyFormGUI $a_form
-     * @param bool $a_disabled
+     * @param bool              $a_disabled
+     * @param string            $language
      */
-    public function addCustomFieldToDefinitionForm(ilPropertyFormGUI $a_form, $a_disabled = false)
+    public function addCustomFieldToDefinitionForm(ilPropertyFormGUI $a_form, $a_disabled = false, string $language = '')
     {
         global $DIC;
 
@@ -196,13 +196,13 @@ class ilAdvancedMDFieldDefinitionInteger extends ilAdvancedMDFieldDefinition
             $suffix->setDisabled(true);
         }
     }
-    
+
     /**
      * Import custom post values from definition form
-     *
      * @param ilPropertyFormGUI $a_form
+     * @param string            $language
      */
-    public function importCustomDefinitionFormPostValues(ilPropertyFormGUI $a_form)
+    public function importCustomDefinitionFormPostValues(ilPropertyFormGUI $a_form, string $language = '')
     {
         $min = $a_form->getInput("min");
         $this->setMin(($min !== "") ? $min : null);

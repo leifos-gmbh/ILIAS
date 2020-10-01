@@ -577,6 +577,8 @@ export default class TinyWrapper {
 
     $("#tinytarget_ifr").css("width", width + "px");
     $("#tinytarget_ifr").css("height", height + "px");
+    $("#tinytarget_div").css("width", width + "px");
+    $("#tinytarget_div").css("height", height + "px");
 
     this.ed_width = width;
     this.ed_height = height;

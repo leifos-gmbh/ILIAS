@@ -108,6 +108,10 @@ export default class ModelActionHandler {
         this.model.setCurrentPageComponent(params.cname, pcid, '');
         break;
 
+      case "component.switch":
+        // we do nothing here, the components decide whether to perform the switch or not
+        break;
+
       case "component.save":
         this.model.setState(this.model.STATE_PAGE);
         break;

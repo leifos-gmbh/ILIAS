@@ -1005,6 +1005,13 @@ export default class ParagraphUI {
     this.handleSaveOnInsert();
   }
 
+  getSwitchParameters() {
+    return {
+      text: this.tinyWrapper.getText(),
+      characteristic: this.tinyWrapper.getCharacteristic()
+    }
+  }
+
   editParagraph(pcId, hierId, mode, switched)
   {
     this.log("paragraph-ui.editParagraph");

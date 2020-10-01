@@ -79,6 +79,26 @@ export default class ParagraphUIActionHandler {
         case PAGE_ACTIONS.COMPONENT_CANCEL:
           this.ui.cmdCancel();
           break;
+
+        case PAGE_ACTIONS.COMPONENT_SWITCH:
+          if (params.oldComponentState === page_model.STATE_COMPONENT_INSERT) {
+            this.sendInsertCommand(
+              params.oldPcid,
+              page_model.getCurrentInsertPCId(),
+              page_model.getPCModel(params.oldPcid),
+              page_model
+            );
+            this.ui.handleSaveOnInsert();
+          } else {
+            this.sendUpdateCommand(
+              params.oldPcid,
+              page_model.getPCModel(params.oldPcid),
+              page_model
+            );
+            this.ui.handleSaveOnEdit();
+          }
+          this.ui.editParagraph(page_model.getCurrentPCId());
+          break;
       }
     }
 

@@ -62,6 +62,11 @@ export default class PageUI {
   pageModifier;
 
   /**
+   * @type {Map<any, any>}
+   */
+  componentUI = new Map();
+
+  /**
    * @param {Client} client
    * @param {Dispatcher} dispatcher
    * @param {ActionFactory} actionFactory
@@ -112,6 +117,10 @@ export default class PageUI {
     this.initDragDrop();
     this.initMultiSelection();
     this.initComponentEditing();
+  }
+
+  addComponentUI(cname, ui) {
+    this.componentUI.set(cname, ui);
   }
 
   /**
@@ -206,8 +215,6 @@ export default class PageUI {
    * dblclick, time period for dblclick varies)
    */
   initComponentClick(selector) {
-    let clickMap = this.clickMap;
-    let period = 400;
 
     if (!selector) {
       selector = "[data-copg-ed-type='pc-area']";
@@ -223,26 +230,6 @@ export default class PageUI {
         event.stopPropagation();
 
         area.dispatchEvent(new Event("areaClick"));
-
-        /*
-        if(!clickMap.has(area)) {
-          clickMap.set(area, 0);
-        }
-        if (clickMap.get(area) < 2) {
-          clickMap.set(area, clickMap.get(area) + 1);
-        }
-        if (clickMap.get(area) === 1) {
-          setTimeout(() => {
-            if (clickMap.get(area) === 1) {
-              console.log("areaClick");
-              area.dispatchEvent(new Event("areaClick"));
-            } else if (clickMap.get(area) === 2) {
-              console.log("areaDblClick");
-              area.dispatchEvent(new Event("areaDblClick"));
-            }
-            clickMap.set(area, 0);
-          }, period);
-        }*/
       });
     });
   }
@@ -259,15 +246,35 @@ export default class PageUI {
       const action = this.actionFactory;
 
       area.addEventListener("areaClick", (event) => {
-        // temp disable switching
-        if (this.model.getState() !== this.model.STATE_PAGE) {
-          return;
+        this.log("*** Component click event");
+        // start editing from page state
+        if (this.model.getState() === this.model.STATE_PAGE) {
+          dispatch.dispatch(action.page().editor().componentEdit(area.dataset.cname,
+            area.dataset.pcid,
+            area.dataset.hierid));
+        } else if (this.model.getState() === this.model.STATE_COMPONENT) {
+
+          // Invoke switch action, if click is on other component of same type
+          if (this.model.getCurrentPCName() === area.dataset.cname &&
+            this.model.getCurrentPCId() !== area.dataset.pcid) {
+
+            let compPara = {};
+            if (this.componentUI.has(area.dataset.cname)) {
+              const componentUI = this.componentUI.get(area.dataset.cname);
+              if (typeof componentUI.getSwitchParameters === 'function') {
+                compPara = componentUI.getSwitchParameters();
+              }
+            }
+
+            dispatch.dispatch(action.page().editor().componentSwitch(
+              area.dataset.cname,
+              this.model.getComponentState(),
+              this.model.getCurrentPCId(),
+              compPara,
+              area.dataset.pcid,
+              area.dataset.hierid));
+          }
         }
-        let is_switch = (this.model.getState() === this.model.STATE_COMPONENT);
-        dispatch.dispatch(action.page().editor().componentEdit(area.dataset.cname,
-          area.dataset.pcid,
-          area.dataset.hierid,
-          is_switch));
       });
     });
   }

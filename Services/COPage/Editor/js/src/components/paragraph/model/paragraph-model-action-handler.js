@@ -28,6 +28,25 @@ export default class ParagraphModelActionHandler {
 
     const params = action.getParams();
 
+    if (action.getComponent() === "Page") {
+
+      switch (action.getType()) {
+
+        case "component.switch":
+          this.pageModel.setComponentState(this.pageModel.STATE_COMPONENT_EDIT);
+          this.pageModel.setPCModel(params.oldPcid, {
+            text: params.oldParameters.text,
+            characteristic: params.oldParameters.characteristic
+          });
+          this.pageModel.setCurrentPageComponent(params.cname, params.newPcid, params.newHierid);
+          this.pageModel.setUndoPCModel(
+            this.pageModel.getCurrentPCId(),
+            this.pageModel.getPCModel(this.pageModel.getCurrentPCId())
+          );
+          break;
+      }
+    }
+
     if (action.getComponent() === "Paragraph") {
 
       switch (action.getType()) {

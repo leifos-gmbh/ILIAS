@@ -91,6 +91,7 @@ export default class UI {
       this.pageModifer,
       new AutoSave());
 
+    this.page.addComponentUI("Paragraph", this.paragraph);
     this.pageModifer.setPageUI(this.page);
   }
 

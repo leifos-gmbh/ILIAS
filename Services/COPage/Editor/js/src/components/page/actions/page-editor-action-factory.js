@@ -55,12 +55,25 @@ export default class PageEditorActionFactory {
   /**
    * @returns {EditorAction}
    */
-  componentEdit(cname, pcid, hierid, is_switch) {
+  componentEdit(cname, pcid, hierid) {
     return this.editorActionFactory.action(this.COMPONENT, ACTIONS.COMPONENT_EDIT, {
       cname: cname,
       pcid: pcid,
-      hierid: hierid,
-      switch: is_switch
+      hierid: hierid
+    });
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  componentSwitch(cname, state, oldPcid, oldPara, newPcid, newHierid) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.COMPONENT_SWITCH, {
+      cname: cname,
+      oldComponentState: state,
+      oldPcid: oldPcid,
+      oldParameters: oldPara,
+      newPcid: newPcid,
+      newHierid: newHierid
     });
   }
 

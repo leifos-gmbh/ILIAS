@@ -23,6 +23,11 @@ abstract class ilAdvancedMDFieldDefinition
     protected $required; // [bool]
     protected $adt_def; // [ilADTDefinition]
     protected $adt; // [ilADT]
+
+    /**
+     * @var mixed|string
+     */
+    protected $language = '';
     
     const TYPE_SELECT = 1;
     const TYPE_TEXT = 2;
@@ -44,6 +49,10 @@ abstract class ilAdvancedMDFieldDefinition
      */
     public function __construct($a_field_id = null)
     {
+        global $DIC;
+
+        $this->language = $DIC->language()->getLangKey();
+
         $this->init();
         $this->read($a_field_id);
     }

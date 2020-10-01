@@ -40,10 +40,13 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
     {
         $def = ilADTFactory::getInstance()->getDefinitionInstanceByType("Enum");
         $def->setNumeric(false);
-        
+
         $options = $this->getOptions();
-        $def->setOptions(array_combine($options, $options));
-        
+        $translated_options = [];
+        if (isset($this->getOptionTranslations()[$this->language])) {
+            $translated_options = $this->getOptionTranslations()[$this->language];
+        }
+        $def->setOptions(array_replace($options, $translated_options));
         return $def;
     }
     

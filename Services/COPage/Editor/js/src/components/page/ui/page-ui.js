@@ -572,6 +572,14 @@ export default class PageUI {
     if(pl.renderedContent !== undefined)
     {
       $('#il_center_col').html(pl.renderedContent);
+
+      console.log("PCMODEL---");
+      console.log(pl.pcModel);
+
+      for (const [key, value] of Object.entries(pl.pcModel)) {
+        this.model.addPCModelIfNotExists(key, value);
+      }
+
       il.IntLink.refresh();
       this.reInit();
     }

@@ -270,6 +270,17 @@ export default class PageModel {
   }
 
   /**
+   *
+   * @param {string} pcid
+   * @param {Object} model
+   */
+  addPCModelIfNotExists(pcid, model) {
+    if (!this.model.page_components[pcid]) {
+      this.model.page_components[pcid] = model;
+    }
+  }
+
+  /**
    * @param {string} pcid
    * @return {null|Object}
    */

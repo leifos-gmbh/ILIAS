@@ -143,6 +143,7 @@ class UIWrapper
 
         $data = new \stdClass();
         $data->renderedContent = $page_data;
+        $data->pcModel = $page_gui->getPageObject()->getPCModel();
         return new Response($data);
     }
 

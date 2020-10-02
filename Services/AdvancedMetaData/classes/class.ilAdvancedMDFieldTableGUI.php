@@ -159,6 +159,8 @@ class ilAdvancedMDFieldTableGUI extends ilTable2GUI
             
             $defs_arr[] = $tmp_arr;
         }
+
+
         $this->setData($defs_arr ? $defs_arr : array());
     }
 }

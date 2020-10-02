@@ -846,7 +846,7 @@ class ilAdvancedMDSettingsGUI
     
         // show field table
         include_once('./Services/AdvancedMetaData/classes/class.ilAdvancedMDFieldDefinition.php');
-        $fields = ilAdvancedMDFieldDefinition::getInstancesByRecordId($this->record->getRecordId());
+        $fields = ilAdvancedMDFieldDefinition::getInstancesByRecordId($this->record->getRecordId(), false, $this->active_language);
         
         include_once("./Services/AdvancedMetaData/classes/class.ilAdvancedMDFieldTableGUI.php");
         $table_gui = new ilAdvancedMDFieldTableGUI(

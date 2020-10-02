@@ -25,7 +25,7 @@ abstract class ilAdvancedMDFieldDefinition
     protected $adt; // [ilADT]
 
     /**
-     * @var mixed|string
+     * @var string
      */
     protected $language = '';
     
@@ -47,11 +47,14 @@ abstract class ilAdvancedMDFieldDefinition
      * @param init $a_field_id
      * @return self
      */
-    public function __construct($a_field_id = null)
+    public function __construct($a_field_id = null, string $language = '')
     {
         global $DIC;
 
         $this->language = $DIC->language()->getLangKey();
+        if ($language) {
+            $this->language = $language;
+        }
 
         $this->init();
         $this->read($a_field_id);
@@ -64,7 +67,7 @@ abstract class ilAdvancedMDFieldDefinition
      * @param int $a_type
      * @return self
      */
-    public static function getInstance($a_field_id, $a_type = null)
+    public static function getInstance($a_field_id, $a_type = null, string $language = '')
     {
         global $DIC;
 
@@ -81,7 +84,7 @@ abstract class ilAdvancedMDFieldDefinition
         if (self::isValidType($a_type)) {
             $class = "ilAdvancedMDFieldDefinition" . self::getTypeString($a_type);
             require_once "Services/AdvancedMetaData/classes/Types/class." . $class . ".php";
-            return new $class($a_field_id);
+            return new $class($a_field_id, $language);
         }
         
         throw new ilException("unknown type " . $a_type);
@@ -142,7 +145,7 @@ abstract class ilAdvancedMDFieldDefinition
      * @param bool $a_only_searchable
      * @return array self
      */
-    public static function getInstancesByRecordId($a_record_id, $a_only_searchable = false)
+    public static function getInstancesByRecordId($a_record_id, $a_only_searchable = false, string $language = '')
     {
         global $DIC;
 
@@ -158,7 +161,7 @@ abstract class ilAdvancedMDFieldDefinition
         $query .= " ORDER BY position";
         $set = $ilDB->query($query);
         while ($row = $ilDB->fetchAssoc($set)) {
-            $field = self::getInstance(null, $row["field_type"]);
+            $field = self::getInstance(null, $row["field_type"], $language);
             $field->import($row);
             $defs[$row["field_id"]] = $field;
         }

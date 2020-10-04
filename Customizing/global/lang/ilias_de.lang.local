@@ -1,0 +1,11 @@
+<!-- language file start -->
+meta#:#md_adv_field_list#:#Datenfelder
+meta#:#md_adv_record_lng_table#:#Sprachenverwaltung
+meta#:#md_adv_record_lng_table_lng#:#Sprache
+meta#:#md_adv_record_lng_table_default#:#Default
+meta#:#md_adv_record_lng_table_active#:#Aktiv
+meta#:#md_adv_record_lng_table_inst#:#Installiert
+meta#:#md_adv_record_activate_languages#:#Sprachen aktivieren
+meta#:#md_aria_language_selection#:#Sprachauswahl
+meta#:#md_adv_int_current#:#Aktuelle Sprache:
+meta#:#md_adv_int_default#:#Standardsprache:

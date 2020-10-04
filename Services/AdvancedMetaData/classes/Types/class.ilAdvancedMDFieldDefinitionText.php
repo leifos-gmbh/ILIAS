@@ -11,7 +11,7 @@ require_once "Services/AdvancedMetaData/classes/class.ilAdvancedMDFieldDefinitio
  *
  * @ingroup ServicesAdvancedMetaData
  */
-class ilAdvancedMDFieldDefinitionText extends ilAdvancedMDFieldDefinition
+class ilAdvancedMDFieldDefinitionText extends ilAdvancedMDFieldDefinitionGroupBased
 {
     protected $max_length; // [int]
     protected $multi; // [bool]
@@ -25,26 +25,47 @@ class ilAdvancedMDFieldDefinitionText extends ilAdvancedMDFieldDefinition
     {
         return self::TYPE_TEXT;
     }
-    
-    
-    //
-    // ADT
-    //
-    
+
+
+    public function getADTGroup()
+    {
+        return $this->getADTDefinition();
+    }
+
+    public function getTitles()
+    {
+        return [];
+    }
+
+    public function hasComplexOptions()
+    {
+        return false;
+    }
+
+
+
     protected function initADTDefinition()
     {
-        $def = ilADTFactory::getInstance()->getDefinitionInstanceByType("Text");
-                
-        $max = $this->getMaxLength();
-        if (is_numeric($max)) {
-            $def->setMaxLength($max);
+        $field_translations = ilAdvancedMDFieldTranslations::getInstanceByRecordId($this->getRecordId());
+
+        $def = ilADTFactory::getInstance()->getDefinitionInstanceByType("Group");
+        $default = ilADTFactory::getInstance()->getDefinitionInstanceByType("Text");
+        $def->addElement($this->getFieldId(), $default);
+
+        foreach ($field_translations->getTranslations($this->getFieldId()) as $field_translation) {
+            if (
+                !strlen($field_translation->getTitle()) ||
+                $field_translation->getLangKey() == $field_translations->getDefaultLanguage()
+            ) {
+                continue;
+            }
+            $translation = ilADTFactory::getInstance()->getDefinitionInstanceByType('Text');
+            $translation->setMaxLength($this->getMaxLength());
+            $def->addElement($this->getFieldId(). '_' . $field_translation->getLangKey(), $translation);
         }
-        
-        // multi-line is presentation property
-        
         return $def;
     }
-    
+
     
     //
     // properties
@@ -231,17 +252,32 @@ class ilAdvancedMDFieldDefinitionText extends ilAdvancedMDFieldDefinition
         }
         return false;
     }
-    
+
     //
     // presentation
     //
     
-    public function prepareElementForEditor(ilADTFormBridge $a_text)
+    public function prepareElementForEditor(ilADTFormBridge $group)
     {
-        assert($a_text instanceof ilADTTextFormBridge);
-        
-        // seems to be default in course info editor
-        $a_text->setMulti($this->isMulti(), 80, 6);
+        $translation = ilAdvancedMDFieldTranslations::getInstanceByRecordId($this->getRecordId());
+
+        if (!$this->getADTDefinition() instanceof ilADTGroupDefinition) {
+            return;
+        }
+        if (!$group instanceof ilADTGroupFormBridge) {
+            return;
+        }
+
+        $group->setTitle('');
+        $group->setInfo('');
+        foreach ($group->getElements() as $name => $text) {
+            list($field_id, $language) = explode('_', $name);
+            if (!$language) {
+                $text->setTitle($this->getTitle());
+            } else {
+                $text->setTitle($translation->getTitleForLanguage($field_id, $language));
+            }
+        }
     }
     
     

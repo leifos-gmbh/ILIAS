@@ -80,6 +80,10 @@ class ParagraphCommandActionHandler implements Server\CommandActionHandler
                 return $this->autoInsertCommand($body);
                 break;
 
+            case "split":
+                return $this->split($body);
+                break;
+
             default:
                 throw new Exception("Unknown action " . $body["action"]);
                 break;
@@ -87,7 +91,7 @@ class ParagraphCommandActionHandler implements Server\CommandActionHandler
     }
 
     /**
-     * All command
+     * Insert command
      * @param $body
      * @return Server\Response
      */
@@ -164,6 +168,83 @@ class ParagraphCommandActionHandler implements Server\CommandActionHandler
     protected function autoUpdateCommand($body) : Server\Response
     {
         return $this->updateCommand($body, true);
+    }
+
+    /**
+     * Split command
+     * @param $body
+     * @return Server\Response
+     */
+    protected function split($body, $auto = false) : Server\Response
+    {
+        $page = $this->page_gui->getPageObject();
+
+        $pcid = ":" . $body["data"]["pcid"];
+        $insert_id = null;
+        if ($body["data"]["insert_mode"]) {
+            $insert_id = $this->getFullIdForPCId($page, $body["data"]["after_pcid"]);
+        }
+
+        $content = $this->getContentForSaving($pcid, $body["data"]["text"], $body["data"]["characteristic"]);
+
+        $content_obj = new \ilPCParagraph($page);
+        $updated = $content_obj->saveJS(
+            $page,
+            $content,
+            \ilUtil::stripSlashes($body["data"]["characteristic"]),
+            \ilUtil::stripSlashes($pcid),
+            $insert_id
+        );
+        $current_after_id = $body["data"]["pcid"];
+        $all_pc_ids[] = $current_after_id;
+
+        foreach ($body["data"]["new_paragraphs"] as $p) {
+            if ($updated === true) {
+                $page->addHierIDs();
+                $insert_id = $this->getFullIdForPCId($page, $current_after_id);
+                $content = $this->getContentForSaving($p["pcid"], $p["model"]["text"], $p["model"]["characteristic"]);
+                $content_obj = new \ilPCParagraph($page);
+                $updated = $content_obj->saveJS(
+                    $page,
+                    $content,
+                    \ilUtil::stripSlashes($p["model"]["characteristic"]),
+                    ":".\ilUtil::stripSlashes($p["pcid"]),
+                    $insert_id
+                );
+                $all_pc_ids[] = $p["pcid"];
+                $current_after_id = $p["pcid"];
+            }
+        }
+
+        return $this->response_factory->getResponseObjectMulti($this->page_gui, $updated, $all_pc_ids);
+    }
+
+    /**
+     * Get full id for pc id
+     * @param $page
+     * @param $pc_id
+     * @return string
+     */
+    protected function getFullIdForPCId($page, $pc_id)
+    {
+        $id = "pg:";
+        if (!in_array($pc_id, ["", "pg"])) {
+            $hier_ids = $page->getHierIdsForPCIds([$pc_id]);
+            $id = $hier_ids[$pc_id] . ":" . $pc_id;
+        }
+        return $id;
+    }
+
+    /**
+     * Get content for saving
+     * @param
+     * @return
+     */
+    protected function getContentForSaving($pcid, $content, $characteristic)
+    {
+        return "<div id='" .
+            $pcid . "' class='ilc_text_block_" .
+            $characteristic . "'>" . $content . "</div>";
     }
 
 }

@@ -1416,7 +1416,7 @@ class ilPCParagraph extends ilPageContent
 
         //		$content = str_replace("&lt;", "<", $content);
         //		$content = str_replace("&gt;", ">", $content);
-        //echo "<br><br>".htmlentities($content); mk();
+        //echo "\n\n".$content;
         $res = $doc->loadXML($content);
 
         if (!$res) {

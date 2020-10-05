@@ -92,7 +92,10 @@ export default class ParagraphUI {
     this.actionFactory = actionFactory;
     this.page_model = page_model;
     this.toolSlate = toolSlate;
-    this.tinyWrapper = new TinyWrapper();
+    this.tinyWrapper = new TinyWrapper((tiny, contents) => {
+      dispatcher.dispatch(actionFactory.paragraph().editor().
+        splitParagraph(this.page_model.getCurrentPCId(), tiny.getText(), tiny.getCharacteristic(), contents));
+    });
     this.pageModifier = pageModifier;
     this.autoSave = autosave;
   }
@@ -597,13 +600,14 @@ export default class ParagraphUI {
   }
 
 
-  insertParagraph(pcid, after_pcid) {
+  insertParagraph(pcid, after_pcid, content = "", characteristic = "Standard") {
     this.log("paragraph-ui.insertParagraph");
-    this.pageModifier.insertComponentAfter(after_pcid, pcid, "Paragraph", "", "Paragraph");
+    this.pageModifier.insertComponentAfter(after_pcid, pcid, "Paragraph", content, "Paragraph");
     let content_el = document.querySelector("[data-copg-ed-type='pc-area'][data-pcid='" + pcid + "']");
     this.showToolbar();
     this.tinyWrapper.initInsert(content_el, () => {
-      this.setParagraphClass("Standard");
+      this.tinyWrapper.setContent(content, characteristic);
+      this.setParagraphClass(characteristic);
     }, () => {
       this.autoSave.handleAutoSaveKeyPressed();
     }, () => {
@@ -613,6 +617,16 @@ export default class ParagraphUI {
     });
     this.updateMenuButtons();
     this.tinyinit = true;
+  }
+
+  performAutoSplit(pcid, text, characteristic, newParagraphs) {
+    let afterPcid = pcid;
+    this.tinyWrapper.setContent(text, characteristic);
+    for (let k = 0; k < newParagraphs.length; k++) {
+      this.tinyWrapper.stopEditing();
+      this.insertParagraph(newParagraphs[k].pcid, afterPcid, newParagraphs[k].model.text, characteristic);
+      afterPcid = newParagraphs[k].pcid;
+    }
   }
 
   handleSaveOnInsert() {

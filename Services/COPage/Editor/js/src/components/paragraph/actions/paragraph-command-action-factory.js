@@ -81,5 +81,26 @@ export default class ParagraphCommandActionFactory {
     });
   }
 
+  /**
+   *
+   * @param insertMode
+   * @param after_pcid
+   * @param pcid
+   * @param text
+   * @param characteristic
+   * @param newParagraphs
+   * @return {CommandAction}
+   */
+  split(insertMode, after_pcid, pcid, text, characteristic, newParagraphs) {
+    return this.clientActionFactory.command(this.COMPONENT, ACTIONS.SPLIT, {
+      insert_mode: insertMode,
+      after_pcid: after_pcid,
+      pcid: pcid,
+      text: text,
+      characteristic: characteristic,
+      new_paragraphs: newParagraphs
+    });
+  }
+
 
 }

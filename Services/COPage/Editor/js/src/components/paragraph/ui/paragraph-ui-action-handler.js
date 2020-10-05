@@ -204,6 +204,34 @@ export default class ParagraphUIActionHandler {
           }
           break;
 
+        case ACTIONS.SPLIT_PARAGRAPH:
+          let newParagraphs = [];
+          let after_pcid = "";
+          const splitIds = page_model.getSplitPCIds();
+          let insertMode = false;
+          if (page_model.getComponentState() === page_model.STATE_COMPONENT_INSERT) {
+            after_pcid = page_model.getCurrentInsertPCId()
+            insertMode = true;
+          }
+          let pcmodel = page_model.getPCModel(params.pcid);
+          for (let k = 0; k < splitIds.length; k++) {
+            newParagraphs.push({
+                pcid: splitIds[k],
+                model: page_model.getPCModel(splitIds[k])
+              });
+          }
+          this.ui.performAutoSplit(
+            params.pcid,
+            pcmodel.text,
+            pcmodel.characteristic,
+            newParagraphs
+          );
+          this.sendSplitCommand(insertMode, after_pcid, params.pcid,
+            pcmodel.text,
+            pcmodel.characteristic,
+            newParagraphs,
+            page_model);
+          break;
       }
     }
   }
@@ -277,6 +305,41 @@ export default class ParagraphUIActionHandler {
       this.ui.replaceRenderedParagraph(pcid, pl.renderedContent);
     }
     if (pl.last_update && still_editing) {
+      this.ui.showLastUpdate(pl.last_update);
+    }
+  }
+
+  sendSplitCommand(insertMode, after_pcid, pcid, text, characteristic, newParagraphs, page_model) {
+    const af = this.actionFactory;
+    const dispatch = this.dispatcher;
+    const insert_action = af.paragraph().command().split(
+      insertMode,
+      after_pcid,
+      pcid,
+      text,
+      characteristic,
+      newParagraphs
+    );
+    this.ui.autoSaveStarted();
+    this.client.sendCommand(insert_action).then(result => {
+      this.ui.autoSaveEnded();
+      const pl = result.getPayload();
+
+      dispatch.dispatch(af.paragraph().editor().splitPostProcessing());
+
+      this.handleSaveResponseSplit(pl, page_model);
+    });
+  }
+
+  handleSaveResponseSplit(pl, page_model) {
+    let still_editing;
+    for (const [pcid, renderedContent] of Object.entries(pl.renderedContent)) {
+      still_editing = (pcid === page_model.getCurrentPCId() && page_model.getState() === page_model.STATE_COMPONENT);
+      if (renderedContent && !still_editing) {
+        this.ui.replaceRenderedParagraph(pcid, renderedContent);
+      }
+    }
+    if (pl.last_update) {
       this.ui.showLastUpdate(pl.last_update);
     }
   }

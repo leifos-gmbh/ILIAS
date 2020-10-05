@@ -80,6 +80,37 @@ export default class ParagraphModelActionHandler {
         case ACTIONS.AUTO_INSERT_POST:
           this.pageModel.setComponentState(this.pageModel.STATE_COMPONENT_EDIT);
           break;
+
+        // switch from insert to edit mode after auto insert being called
+        case ACTIONS.SPLIT_POST:
+          this.pageModel.setComponentState(this.pageModel.STATE_COMPONENT_EDIT);
+          break;
+
+        case ACTIONS.SPLIT_PARAGRAPH:
+          let splitIds = [];
+          for (let k=0; k < params.contents.length; k++) {
+            if (k === 0) {
+              this.pageModel.setPCModel(this.pageModel.getCurrentPCId(), {
+                text: params.contents[k],
+                characteristic: params.characteristic
+              });
+            } else {
+              const pcid = this.pageModel.getNewPCId();
+              splitIds.push(pcid);
+              this.pageModel.setPCModel(pcid, {
+                text: params.contents[k],
+                characteristic: params.characteristic
+              });
+              this.pageModel.setCurrentPageComponent("Paragraph", pcid, "");
+              this.pageModel.setUndoPCModel(
+                this.pageModel.getCurrentPCId(),
+                this.pageModel.getPCModel(this.pageModel.getCurrentPCId())
+              );
+            }
+          }
+          this.pageModel.setSplitPCIds(splitIds);
+
+          break;
       }
     }
   }

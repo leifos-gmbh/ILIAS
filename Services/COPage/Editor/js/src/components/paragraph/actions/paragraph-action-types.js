@@ -8,7 +8,7 @@ const ACTIONS = {
   INSERT: "insert",                        // inserts paragraph
   UPDATE: "update",                        // update paragraph
   UPDATE_AUTO: "update.auto",              // auto update paragraph
-  INSERT_AUTO: "insert.auto",              // auto insert paragraph
+  SPLIT: "split",              // split paragraph
 
   // editor actions (things happening in the editor client side)
   PARAGRAPH_CLASS: "par.class",    // paragraph class
@@ -28,7 +28,9 @@ const ACTIONS = {
   LINK_USER: "link.user",
   SAVE_RETURN: "save.return",
   AUTO_SAVE: "save.auto",
-  AUTO_INSERT_POST: "post.insert.auto"
+  AUTO_INSERT_POST: "post.insert.auto",
+  SPLIT_POST: "post.split",
+  SPLIT_PARAGRAPH: "par.split"
 
 };
 export default ACTIONS;

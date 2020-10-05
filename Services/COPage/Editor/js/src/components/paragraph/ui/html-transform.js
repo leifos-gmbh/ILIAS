@@ -47,5 +47,26 @@ export default class HTMLTransform {
     return str;
   }
 
+  /**
+   * convert <p> tags to <br />
+   * @param {string} c
+   * @return {string}
+   */
+  p2br(c) {
+    // remove <p> and \n
+    c = c.split("<p>").join("");
+    c = c.split("\n").join("");
+
+    // convert </p> to <br />
+    c = c.split("</p>").join("<br />");
+
+    // remove trailing <br />
+    if (c.substr(c.length - 6) === "<br />") {
+      c = c.substr(0, c.length - 6);
+    }
+
+    return c;
+  }
+
 
 }

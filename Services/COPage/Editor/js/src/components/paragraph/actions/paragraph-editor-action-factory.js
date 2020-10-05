@@ -161,4 +161,21 @@ export default class ParagraphEditorActionFactory {
     });
   }
 
+  /**
+   * @returns {EditorAction}
+   */
+  splitPostProcessing() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.SPLIT_POST, {
+    });
+  }
+
+  splitParagraph(pcid, text, characteristic, contents) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.SPLIT_PARAGRAPH, {
+      pcid: pcid,
+      text: text,
+      characteristic: characteristic,
+      contents: contents
+    });
+  }
+
 }

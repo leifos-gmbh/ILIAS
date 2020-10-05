@@ -48,6 +48,36 @@ class ParagraphResponseFactory
     }
 
     /**
+     * Get reponse data object
+     * @param \ilPageObjectGUI $page_gui
+     * @param                  $updated
+     * @param string           $pcid
+     * @return Server\Response
+     */
+    public function getResponseObjectMulti(\ilPageObjectGUI $page_gui, $updated, array $pcids): Server\Response
+    {
+        $error = null;
+        $rendered_content = null;
+        $last_change = null;
+
+        if ($updated === false) {
+            $error = "An error occured";
+        } else {
+            foreach ($pcids as $pcid) {
+                $rendered_content[$pcid] = $this->getParagraphOutput($page_gui, $pcid);
+            }
+            $last_change = $page_gui->getPageObject()->getLastChange();
+        }
+
+        $data = new \stdClass();
+        $data->renderedContent = $rendered_content;
+        $data->error = $error;
+        $data->last_update = $last_change;
+
+        return new Server\Response($data);
+    }
+
+    /**
      * Get paragraph output
      * @param
      * @return

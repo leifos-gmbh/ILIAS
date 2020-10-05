@@ -63,6 +63,14 @@ export default class TinyWrapper {
   upLeftRng = null;
 
   /**
+   * New behaviour that splits paragraphs on return
+   * @type {boolean}
+   */
+  splitOnReturn = true;
+
+  splitOnReturnCallback = null;
+
+  /**
    * @type {Object}
    */
   text_formats = {
@@ -80,9 +88,10 @@ export default class TinyWrapper {
   /**
    * @param {string} content_css
    */
-  constructor(content_css) {
+  constructor(splitOnReturnCallback) {
     this.lib = tinyMCE;
     this.htmlTransform = new HTMLTransform();
+    this.splitOnReturnCallback = splitOnReturnCallback;
   }
 
   setContentCss(content_css) {
@@ -171,7 +180,6 @@ export default class TinyWrapper {
 
   pastePostProcess(pl, o) {
     const tiny = this.tiny;
-
     const tinyDom = this.getTinyDomTransform();
 
     // we must handle all valid elements here
@@ -230,7 +238,7 @@ export default class TinyWrapper {
           }
         }
       }
-
+      wrapper.checkSplitOnReturn();
     });
 
     tiny.on('KeyDown', function (ev) {
@@ -278,9 +286,9 @@ export default class TinyWrapper {
       // (yes, it does, at least splitSpans is important here #13019)
       if (wrapper.pasting) {
         wrapper.pasting = false;
-        wrapper.splitDivs();
-        wrapper.fixListClasses(false);
-        wrapper.splitSpans();
+        wrapper.getTinyDomTransform().splitDivs();
+        wrapper.getTinyDomTransform().fixListClasses(false);
+        wrapper.getTinyDomTransform().splitSpans();
       }
 
       // update state of indent/outdent buttons
@@ -444,10 +452,11 @@ export default class TinyWrapper {
     this.log('tiny-wrapper.copyInputToGhost');
     let tag;
     let ed = this.tiny;
+    let html = this.htmlTransform;
 
     if (this.ghost) {
       let cl = ed.dom.getRoot().className;
-      let c = this.p2br(ed.getContent());
+      let c = html.p2br(ed.getContent());
       if (this.current_td === "") {
         cl = "copg-input-ghost " + cl;
         console.log(cl);
@@ -657,359 +666,30 @@ export default class TinyWrapper {
 
 
   setContent (text, characteristic) {
-    const switched = false;                                   // MISSING
     const ed = this.tiny;
     ed.setContent(text);
-    this.splitBR();
+    if (!this.splitOnReturn) {
+      this.getTinyDomTransform().splitBR();
+    }
     this.autoResize();
     this.setParagraphClass(characteristic);
   }
 
-  /**
-   * This function converts all <br /> into corresponding paragraphs
-   * (server content comes with <br />, but tiny has all kind of issues
-   * in "<br>" mode (e.g. IE cannot handle lists). So we use the more
-   * reliable "<p>" mode of tiny.
-   */
-  splitBR()
-  {
-    let snode;
-    let ed = tinyMCE.activeEditor;
-    let r = ed.dom.getRoot();
-
-    // STEP 1: Handle all top level <br />
-
-    // make copy of root
-    let rcopy = r.cloneNode(true);
-
-    // remove all childs of top level
-    for (var k = r.childNodes.length - 1; k >= 0; k--)
-    {
-      r.removeChild(r.childNodes[k]);
-    }
-
-    // cp -> current P
-    let cp = ed.dom.create('p', {}, '');
-    let cp_content = false; // has current P any content?
-    let cc, pc; // cc: currrent child (top level), pc: P child
-
-    // walk through root copy and add content to emptied original root
-    for (var k = 0; k < rcopy.childNodes.length; k++)
-    {
-      cc = rcopy.childNodes[k];
-
-      // handle Ps on top level
-      // main purpose: convert <p> ...<br />...</p> to <p>...</p><p>...</p>
-      if (cc.nodeName == "P")
-      {
-        // is there a current P with content? -> add it to top level
-        if (cp_content)
-        {
-          r.appendChild(cp);
-          cp = ed.dom.create('p', {}, '');
-          cp_content = false;
-        }
-
-        // split all BRs into separate Ps on top level
-        for (var i = 0; i < cc.childNodes.length; i++)
-        {
-          pc = cc.childNodes[i];
-          if (pc.nodeName == "BR")
-          {
-            // append the current p an create a new one
-            r.appendChild(cp);
-            cp = ed.dom.create('p', {}, '');
-            cp_content = false;
-          }
-          else
-          {
-            // append the content to the current p
-            cp.appendChild(pc.cloneNode(true));
-            cp_content = true;
-          }
-        }
-
-        // append current p and create a new one
-        if (cp_content)
-        {
-          r.appendChild(cp);
-          cp = ed.dom.create('p', {}, '');
-          cp_content = false;
-        }
-      }
-      else if (cc.nodeName == "UL" || cc.nodeName == "OL")
-      {
-        // UL and OL are simply appended to the root
-        if (cp_content)
-        {
-          r.appendChild(cp);
-          cp = ed.dom.create('p', {}, '');
-          cp_content = false;
-        }
-        r.appendChild(rcopy.childNodes[k].cloneNode(true));
-      }
-      else
-      {
-        cp.appendChild(rcopy.childNodes[k].cloneNode(true));
-        cp_content = true;
-      }
-    }
-    if (cp_content)
-    {
-      r.appendChild(cp);
-    }
-
-    // STEP 2: Handle all non-top level <br />
-    // this is the standard tiny br splitting (which fails in top level Ps)
-    /*		tinymce.each(ed.dom.select('br').reverse(), function(b) {
-     try {
-     var snode = ed.dom.getParent(b, 'p,li');
-     ed.dom.split(snode, b);
-     } catch (ex) {
-     // IE can sometimes fire an unknown runtime error so we just ignore it
-     }
-     });*/
-    this.splitTopBr();
-
-
-    // STEP 3: Clean up
-
-    // remove brs (normally all should have been handled above)
-    var c = ed.getContent();
-    c = c.split("<br />").join("");
-    c = c.split("\n").join("");
-    ed.setContent(c);
-  }
-
-  // split all span classes that are direct "children of themselves"
-  // fixes bug #13019
-  splitSpans() {
-
-    let k, ed = tinyMCE.activeEditor, s,
-      classes = ['ilc_text_inline_Strong','ilc_text_inline_Emph', 'ilc_text_inline_Important',
-        'ilc_text_inline_Comment', 'ilc_text_inline_Quotation', 'ilc_text_inline_Accent'];
-
-    for (var i = 0; i < classes.length; i++) {
-
-      s = ed.dom.select('span[class="' + classes[i] + '"] > span[class="' + classes[i] + '"]');
-      for (k in s) {
-        ed.dom.split(s[k].parentNode, s[k]);
-      }
-    }
-  }
-
-  /**
-   * This one ensures that the standard ILIAS list style classes
-   * are assigned to list elements
-   */
-  fixListClasses(handle_inner_br)
-  {
-    let ed = tinyMCE.activeEditor, par, r;
-
-    // return;
-
-    ed.dom.addClass(tinyMCE.activeEditor.dom.select('ol'), 'ilc_list_o_NumberedList');
-    ed.dom.addClass(tinyMCE.activeEditor.dom.select('ul'), 'ilc_list_u_BulletedList');
-    ed.dom.addClass(tinyMCE.activeEditor.dom.select('li'), 'ilc_list_item_StandardListItem');
-
-    if (handle_inner_br)
-    {
-      let rcopy = ed.selection.getRng(true);
-      let target_pos = false;
-
-      // get selection start p or li tag
-      let st_cont = rcopy.startContainer.nodeName.toLowerCase();
-      if (st_cont !== "p" && st_cont !== "li")
-      {
-        par = rcopy.startContainer.parentNode;
-        if (par.nodeName.toLowerCase() === "body")
-        {
-          // starting from something like a text node under body
-          // not really a parent anymore, but ok to get the previous sibling from
-          par = rcopy.startContainer;
-        }
-        else
-        {
-          // starting from a deeper node in text
-          while (par.parentNode &&
-          par.nodeName.toLowerCase() !== "li" &&
-          par.nodeName.toLowerCase() !== "p" &&
-          par.nodeName.toLowerCase() !== "body")
-          {
-            par = par.parentNode;
-            //console.log(par);
-          }
-        }
-      }
-      else
-      {
-        par = rcopy.startContainer;
-      }
-      //console.log(par);
-
-
-      // get previous sibling
-      var ps = par.previousSibling;
-      if (ps)
-      {
-        if (ps.nodeName.toLowerCase() === "p" ||
-          ps.nodeName.toLowerCase() === "li")
-        {
-          target_pos = ps;
-        }
-        if (ps.nodeName.toLowerCase() === "ul")
-        {
-          if (ps.lastChild)
-          {
-            target_pos = ps.lastChild;
-          }
-        }
-      }
-      else
-      {
-        //console.log("case d");
-        // set selection to beginning
-        r = ed.dom.getRoot();
-        target_pos = r.childNodes[0];
-      }
-      if (this.splitTopBr())
-      {
-        //console.log("setting range");
-
-        // set selection to start of first div
-        if (target_pos)
-        {
-          r =  ed.dom.createRng();
-          r.setStart(target_pos, 0);
-          r.setEnd(target_pos, 0);
-          ed.selection.setRng(r);
-        }
-      }
-    }
-  }
-
-  splitTopBr()
-  {
-    let changed = false;
-
-    let ed = tinyMCE.activeEditor;
-    ed.getContent(); // this line is imporant and seems to fix some things
-    tinymce.each(ed.dom.select('br').reverse(), function(b) {
-
-      //console.log(b);
-      //return;
-
-      try {
-        let snode = ed.dom.getParent(b, 'p,li');
-        if (snode.nodeName !== "LI" &&
-          snode.childNodes.length !== 1)
-        {
-          //				ed.dom.split(snode, b);
-
-          function trim(node) {
-            var i, children = node.childNodes;
-
-            if (node.nodeType === 1 && node.getAttribute('_mce_type') === 'bookmark')
-              return;
-
-            for (i = children.length - 1; i >= 0; i--)
-              trim(children[i]);
-
-            if (node.nodeType !== 9) {
-              // Keep non whitespace text nodes
-              if (node.nodeType === 3 && node.nodeValue.length > 0) {
-                // If parent element isn't a block or there isn't any useful contents for example "<p>   </p>"
-                if (!t.isBlock(node.parentNode) || tinymce.trim(node.nodeValue).length > 0)
-                  return;
-              }
-
-              if (node.nodeType === 1) {
-                // If the only child is a bookmark then move it up
-                children = node.childNodes;
-                if (children.length === 1 && children[0] && children[0].nodeType === 1 && children[0].getAttribute('_mce_type') === 'bookmark')
-                  node.parentNode.insertBefore(children[0], node);
-
-                // Keep non empty elements or img, hr etc
-                if (children.length || /^(br|hr|input|img)$/i.test(node.nodeName))
-                  return;
-              }
-
-              t.remove(node);
-            }
-            return node;
-          }
-
-          let pe = snode;
-          let e = b;
-          if (pe && e) {
-            var t = ed.dom, r = t.createRng(), bef, aft, pa;
-
-            // Get before chunk
-            r.setStart(pe.parentNode, t.nodeIndex(pe));
-            r.setEnd(e.parentNode, t.nodeIndex(e));
-            bef = r.extractContents();
-
-            // Get after chunk
-            r = t.createRng();
-            r.setStart(e.parentNode, t.nodeIndex(e) + 1);
-            r.setEnd(pe.parentNode, t.nodeIndex(pe) + 1);
-            aft = r.extractContents();
-
-            // Insert before chunk
-            pa = pe.parentNode;
-            pa.insertBefore(trim(bef), pe);
-            //pa.insertBefore(bef, pe);
-
-            // Insert after chunk
-            pa.insertBefore(trim(aft), pe);
-            //pa.insertBefore(aft, pe);
-            t.remove(pe);
-
-            //					return re || e;
-            changed = true;
-          }
-        }
-
-      } catch (ex) {
-        // IE can sometimes fire an unknown runtime error so we just ignore it
-      }
-    });
-    return changed;
-  }
-
-  // remove all divs (used after pasting)
-  splitDivs()
-  {
-    // split all divs in divs
-    let ed = tinyMCE.activeEditor;
-    let divs = ed.dom.select('p > div');
-    let k;
-    for (k in divs)
-    {
-      ed.dom.split(divs[k].parentNode, divs[k]);
-    }
-  }
-
-  /**
-   * convert <p> tags to <br />
-   * @param {string} c
-   * @return {string}
-   */
-  p2br(c) {
-    // remove <p> and \n
-    c = c.split("<p>").join("");
-    c = c.split("\n").join("");
-
-    // convert </p> to <br />
-    c = c.split("</p>").join("<br />");
-
-    // remove trailing <br />
-    if (c.substr(c.length - 6) === "<br />") {
-      c = c.substr(0, c.length - 6);
-    }
-
+  getText() {
+    let ed = this.tiny;
+    let html = this.htmlTransform;
+    let c = ed.getContent();
+    c = html.p2br(c);         // this is kept event if we "split on return" to remove the outer <p> tag
     return c;
   }
+
+  getCharacteristic() {
+    let ed = this.tiny;
+    let parts = ed.dom.getRoot().className.split("_");
+    //console.log("---");
+    return parts[parts.length - 1];
+  }
+
 
   setParagraphClass(i) {
     let ed = tinyMCE.activeEditor;
@@ -1046,25 +726,11 @@ export default class TinyWrapper {
     this.autoResize(ed);
   }
 
-  getText() {
-      let ed = this.tiny;
-      let c = ed.getContent();
-      c = this.p2br(c);
-      return c;
-  }
-
-  getCharacteristic() {
-      let ed = this.tiny;
-      let parts = ed.dom.getRoot().className.split("_");
-      //console.log("---");
-      return parts[parts.length - 1];
-  }
-
   bulletList() {
     let ed = this.tiny;
     ed.focus();
     ed.execCommand('InsertUnorderedList', false);
-    this.fixListClasses(true);
+    this.getTinyDomTransform().fixListClasses(true);
     this.autoResize(ed);
   }
 
@@ -1072,7 +738,7 @@ export default class TinyWrapper {
     let ed = this.tiny;
     ed.focus();
     ed.execCommand('InsertOrderedList', false);
-    this.fixListClasses(true);
+    this.getTinyDomTransform().fixListClasses(true);
     this.autoResize(ed);
   }
 
@@ -1097,7 +763,7 @@ export default class TinyWrapper {
     }
 
     //tinyMCE.execCommand('mceCleanup', false, 'tinytarget');
-    this.fixListClasses(false);
+    this.getTinyDomTransform().fixListClasses(false);
     this.autoResize(ed);
   }
 
@@ -1106,7 +772,32 @@ export default class TinyWrapper {
     let ed = this.tiny;
     ed.focus();
     ed.execCommand('Outdent', false);
-    this.fixListClasses(true);
+    this.getTinyDomTransform().fixListClasses(true);
     this.autoResize(ed);
   }
+
+  checkSplitOnReturn() {
+    const tiny = this.tiny;
+    let contents = [];
+    let html = this.htmlTransform;
+    let children = tiny.dom.getRoot().childNodes;
+    if (children.length > 1) {
+      if (this.splitOnReturn && this.splitOnReturnCallback) {
+        let dummy = document.createElement("div");
+        dummy.innerHTML = tiny.getContent().replace("\n", "");        // we are not using the dom directly, since getContent() removes tiny internal stuff
+        children = dummy.childNodes;
+        for (var k = 0; k < children.length; k++) {
+          if (children[k].nodeName === "P") {   // paragraphs
+            contents.push(html.p2br(children[k].innerHTML));
+          } else if (children[k].nodeType === 3) {                 // text nodes (seems to be only \n)
+//            contents.push(html.p2br(children[k].textContent));
+          } else {
+            contents.push(html.p2br(children[k].outerHTML));   // should be only lists
+          }
+        }
+        this.splitOnReturnCallback(this, contents);
+      }
+    }
+  }
+
 }

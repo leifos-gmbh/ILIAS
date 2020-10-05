@@ -39,6 +39,12 @@ export default class PageModel {
   dom;
 
   /**
+   * Paragraph auto splitting
+   * @type {*[]}
+   */
+  splitIds = [];
+
+  /**
    * @type {Object}
    */
   model = {
@@ -334,4 +340,11 @@ export default class PageModel {
     return this.model.paragraphFormat;
   }
 
+  setSplitPCIds(splitIds) {
+    this.model.splitIds = splitIds;
+  }
+
+  getSplitPCIds() {
+    return this.model.splitIds;
+  }
 }

@@ -439,6 +439,7 @@ class SurveySingleChoiceQuestionGUI extends SurveyQuestionGUI
                     }
                     $template->parseCurrentBlock();
                 }
+                $perc = round(70 / $this->object->categories->getCategoryCount(), 2);
                 for ($i = 0; $i < $this->object->categories->getCategoryCount(); $i++) {
                     $cat = $this->object->categories->getCategory($i);
 
@@ -451,6 +452,7 @@ class SurveySingleChoiceQuestionGUI extends SurveyQuestionGUI
                     }
                     $template->setVariable("VALUE_SC", ($cat->scale) ? ($cat->scale - 1) : $i);
                     $template->setVariable("TEXT_SC", ilUtil::prepareFormOutput($cat->title));
+                    $template->setVariable("PERC", $perc);
                     $template->setVariable("QUESTION_ID", $this->object->getId());
                     $template->parseCurrentBlock();
                 }

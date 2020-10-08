@@ -100,4 +100,48 @@ if (!$ilDB->tableColumnExists('adv_md_record','lang_default')) {
 
 }
 ?>
+<#7>
+<?php
+
+if (!$ilDB->tableExists('adv_md_values_ltext')) {
+    $ilDB->createTable('adv_md_values_ltext', [
+        'obj_id' => [
+            'type' => 'integer',
+            'length' => 4,
+            'notnull' => true,
+            'default' => 0
+        ],
+        'sub_type' => [
+            'type' => 'text',
+            'length' => 10,
+            'notnull' => true,
+            'default' => "-"
+        ],
+        'sub_id' => [
+            'type' => 'integer',
+            'length' => 4,
+            'notnull' => true,
+            'default' => 0
+        ],
+        'field_id' => [
+            'type' => 'integer',
+            'length' => 4,
+            'notnull' => true,
+            'default' => 0
+        ],
+        'value_index' => [
+            'type' => ilDBConstants::T_TEXT,
+            'length' => 16,
+            'notnull' => true,
+        ],
+        'value' => [
+            'type' => ilDBConstants::T_TEXT,
+            'length' => 4000,
+            'notnull' => false
+        ]
+    ]);
+
+    $ilDB->addPrimaryKey('adv_md_values_ltext', array('obj_id', 'sub_type', 'sub_id', 'field_id', 'value_index'));
+}
+?>
 

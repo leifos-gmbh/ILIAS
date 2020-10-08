@@ -42,28 +42,19 @@ class ilAdvancedMDFieldDefinitionText extends ilAdvancedMDFieldDefinitionGroupBa
         return false;
     }
 
-
-
+    /**
+     * @return ilADTDefinition
+     * @throws Exception
+     */
     protected function initADTDefinition()
     {
         $field_translations = ilAdvancedMDFieldTranslations::getInstanceByRecordId($this->getRecordId());
 
-        $def = ilADTFactory::getInstance()->getDefinitionInstanceByType("Group");
-        $default = ilADTFactory::getInstance()->getDefinitionInstanceByType("Text");
-        $def->addElement($this->getFieldId(), $default);
-
-        foreach ($field_translations->getTranslations($this->getFieldId()) as $field_translation) {
-            if (
-                !strlen($field_translation->getTitle()) ||
-                $field_translation->getLangKey() == $field_translations->getDefaultLanguage()
-            ) {
-                continue;
-            }
-            $translation = ilADTFactory::getInstance()->getDefinitionInstanceByType('Text');
-            $translation->setMaxLength($this->getMaxLength());
-            $def->addElement($this->getFieldId(). '_' . $field_translation->getLangKey(), $translation);
-        }
-        return $def;
+        $definition = ilADTFactory::getInstance()->getDefinitionInstanceByType(ilADTFactory::TYPE_LOCALIZED_TEXT);
+        $definition->setMaxLength((int) $this->getMaxLength());
+        $definition->setActiveLanguages($field_translations->getActivatedLanguages($this->getFieldId(), true));
+        $definition->setDefaultLanguage($field_translations->getDefaultLanguage());
+        return $definition;
     }
 
     

@@ -90,6 +90,19 @@ class ilAdvancedMDFieldTranslations
         return $this->default_language;
     }
 
+    public function getActivatedLanguages(int $field_id, bool $with_default = true)
+    {
+        $activated = [];
+        foreach ($this->getTranslations($field_id) as $language => $translation)
+        {
+            if ($language == self::getDefaultLanguage() && !$with_default) {
+                continue;
+            }
+            $activated[] = $language;
+        }
+        return $activated;
+    }
+
 
     /**
      * @param int    $field_id
@@ -150,6 +163,7 @@ class ilAdvancedMDFieldTranslations
         $this->default_language = $this->record->getDefaultLanguage();
 
         $this->translations = [];
+        $this->definitions = ilAdvancedMDFieldDefinition::getInstancesByRecordId($this->record_id, false);
         while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
             $this->translations[$row->ofield][$row->lang_code] = new ilAdvancedMDFieldTranslation(
                 (int) $row->ofield,
@@ -161,7 +175,6 @@ class ilAdvancedMDFieldTranslations
                 $row->lang_code == $this->default_language &&
                 $row->tfield == null
             ) {
-                $this->definitions[$row->ofield] = ilAdvancedMDFieldDefinition::getInstance($row->ofield);
                 $this->translations[$row->ofield][$row->lang_code]->setTitle($this->definitions[$row->ofield]->getTitle());
                 $this->translations[$row->ofield][$row->lang_code]->setDescription((string) $this->definitions[$row->ofield]->getDescription());
             }

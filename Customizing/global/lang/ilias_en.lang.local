@@ -3,9 +3,10 @@ meta#:#md_adv_field_list#:#Fields
 meta#:#md_adv_record_lng_table#:#Language Managment
 meta#:#md_adv_record_lng_table_lng#:#Language
 meta#:#md_adv_record_lng_table_default#:#Default
-meta#:#md_adv_record_lng_table_active#:#Aktive
+meta#:#md_adv_record_lng_table_active#:#Active
 meta#:#md_adv_record_lng_table_inst#:#Installed
 meta#:#md_adv_record_activate_languages#:#Activate Languages
 meta#:#md_aria_language_selection#:#Language Selection
 meta#:#md_adv_int_current#:#Current Language:
 meta#:#md_adv_int_default#:#Default Language:
+meta#:#md_adv_int_translation_info#:#Translation:

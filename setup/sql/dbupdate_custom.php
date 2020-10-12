@@ -144,4 +144,9 @@ if (!$ilDB->tableExists('adv_md_values_ltext')) {
     $ilDB->addPrimaryKey('adv_md_values_ltext', array('obj_id', 'sub_type', 'sub_id', 'field_id', 'value_index'));
 }
 ?>
+<#8>
+<?php
+$ilCtrlStructureReader->getStructure();
+?>
+
 

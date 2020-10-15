@@ -17677,6 +17677,9 @@ div.ilTopMemberView {
 #block_pditems_0 .ilContainerTileRows .dropdown {
   display: none;
 }
+.jstree-icon.jstree-ocl {
+  display: none;
+}
 #il_right_col {
   padding-top: 30.9667px;
 }

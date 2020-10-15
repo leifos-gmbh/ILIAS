@@ -11,7 +11,7 @@ export default class TinyWrapper {
   /**
    * @type {boolean}
    */
-  debug = true;
+  debug = false;
 
   /**
    * @type {Object}

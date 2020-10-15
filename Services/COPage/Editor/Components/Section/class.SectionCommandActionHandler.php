@@ -85,18 +85,18 @@ class SectionCommandActionHandler implements Server\CommandActionHandler
         }
 
         // if ($form->checkInput()) {
-        $post_layout_template = (int) $body["layout_template"];
-        $grid = new \ilPCGrid($page);
-        $grid->create($page, $hier_id, $pc_id);
-        $grid->applyTemplate(
-            $post_layout_template,
-            (int) $body["number_of_cells"],
-            $body["s"],
-            $body["m"],
-            $body["l"],
-            $body["xl"]
-        );
-        $updated = $page->update();
+        $sec = new \ilPCSection($page);
+        $sec->create($page, $hier_id, $pc_id);
+        $sec_gui = new \ilPCSectionGUI($page, $sec, "", "");
+        $sec_gui->setPageConfig($page->getPageConfig());
+
+        $form = $sec_gui->initForm(true);
+
+        // note: we  have everyting in _POST here, form works the usual way
+        if ($form->checkInput()) {
+            $sec_gui->setValuesFromForm($form);
+            $updated = $page->update();
+        }
 
         return $this->ui_wrapper->sendPage($this->page_gui);
     }

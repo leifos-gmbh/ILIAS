@@ -9,6 +9,7 @@ const ACTIONS = {
   UPDATE: "update",                        // update paragraph
   UPDATE_AUTO: "update.auto",              // auto update paragraph
   SPLIT: "split",              // split paragraph
+  CMD_SECTION_CLASS: "cmd.sec.class",    // section format
 
   // editor actions (things happening in the editor client side)
   PARAGRAPH_CLASS: "par.class",    // paragraph class
@@ -30,7 +31,8 @@ const ACTIONS = {
   AUTO_SAVE: "save.auto",
   AUTO_INSERT_POST: "post.insert.auto",
   SPLIT_POST: "post.split",
-  SPLIT_PARAGRAPH: "par.split"
+  SPLIT_PARAGRAPH: "par.split",
+  SECTION_CLASS: "sec.class"    // section format
 
 };
 export default ACTIONS;

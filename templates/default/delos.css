@@ -14759,7 +14759,8 @@ div.ilCOPGMediaPrint {
   margin: 0;
   border: 0;
 }
-.ilTinyParagraphClassSelector ul.dropdown-menu {
+.ilTinyParagraphClassSelector ul.dropdown-menu,
+.ilSectionClassSelector ul.dropdown-menu {
   right: auto;
 }
 #iltinymenu .dropdown-menu li {

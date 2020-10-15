@@ -178,4 +178,17 @@ export default class ParagraphEditorActionFactory {
     });
   }
 
+  /**
+   * @returns {EditorAction}
+   */
+  sectionClass(parText, parCharacteristic, oldSectionCharacteristic, newSectionCharacteristic) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.SECTION_CLASS, {
+      parText: parText,
+      parCharacteristic: parCharacteristic,
+      oldSectionCharacteristic: oldSectionCharacteristic,
+      newSectionCharacteristic: newSectionCharacteristic
+    });
+  }
+
+
 }

@@ -24,6 +24,11 @@ class SectionStyleSelector
     protected $ui;
 
     /**
+     * @var \ilLanguage
+     */
+    protected $lng;
+
+    /**
      * Constructor
      */
     public function __construct($ui_wrapper, $style_id)
@@ -33,18 +38,26 @@ class SectionStyleSelector
         $this->ui = $DIC->ui();
         $this->ui_wrapper = $ui_wrapper;
         $this->style_id = $style_id;
+        $this->lng = $DIC->language();
     }
 
     /**
      * Get style selector
      */
-    public function getStyleSelector($a_selected, $type = "sec-action", $action = "sec.class", $attr = "class")
+    public function getStyleSelector($a_selected, $type = "sec-action", $action = "sec.class", $attr = "class", $include_none = false)
     {
         $a_chars = \ilPCSectionGUI::_getCharacteristics($this->style_id);
         $ui_wrapper = $this->ui_wrapper;
         $ui = $this->ui;
+        $lng = $this->lng;
 
         $buttons = [];
+        if ($include_none) {
+            $t = "section";
+            $tag = "div";
+            $html = '<div class="ilCOPgEditStyleSelectionItem"><' . $tag . ' class="" style="' . self::$style_selector_reset . '">' . $lng->txt("cont_none") . "</" . $tag . "></div>";
+            $buttons[] = $ui_wrapper->getButton($html, $type, $action, [$attr => ""]);
+        }
         foreach ($a_chars as $char => $char_lang) {
             $t = "section";
             $tag = "div";

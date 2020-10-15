@@ -102,5 +102,28 @@ export default class ParagraphCommandActionFactory {
     });
   }
 
+  /**
+   *
+   * @param pcid
+   * @param after_pcid
+   * @param model
+   * @param is_insert
+   * @param oldCharacteristic
+   * @param newCharacteristic
+   * @return {CommandAction}
+   */
+  sectionClass(pcid, after_pcid, model, is_insert, oldCharacteristic, newCharacteristic) {
+    return this.clientActionFactory.command(this.COMPONENT, ACTIONS.CMD_SECTION_CLASS, {
+      insert_mode: is_insert,
+      after_pcid: after_pcid,
+      pcid: pcid,
+      text: model.text,
+      characteristic: model.characteristic,
+      old_section_characteristic: oldCharacteristic,
+      new_section_characteristic: newCharacteristic
+    });
+  }
+
+
 
 }

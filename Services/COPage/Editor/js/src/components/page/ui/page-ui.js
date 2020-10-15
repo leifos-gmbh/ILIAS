@@ -567,7 +567,6 @@ export default class PageUI {
   handlePageReloadResponse(result)
   {
     const pl = result.getPayload();
-    this.log("handlePageReloadResponse");
 
     if(pl.renderedContent !== undefined)
     {

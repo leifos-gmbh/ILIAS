@@ -2180,6 +2180,12 @@ class ilPageObjectGUI
             $btpl->parseCurrentBlock();
         }
 
+        // block styles
+        $sel = new \ILIAS\COPage\Editor\Components\Section\SectionStyleSelector($ui_wrapper, $a_style_id);
+        $dd = $sel->getStyleSelector("", $type = "par-action", $action = "sec.class", $attr = "class", true);
+        $btpl->setVariable("TXT_BLOCK", $lng->txt("cont_block_format"));
+        $btpl->setVariable("BLOCK_STYLE_SELECTOR", $ui->renderer()->render($dd));
+
 
         include_once("./Services/UIComponent/AdvancedSelectionList/classes/class.ilAdvancedSelectionListGUI.php");
 
@@ -2629,6 +2635,9 @@ class ilPageObjectGUI
         $this->lng->toJS("copg_confirm_el_deletion");
         $this->lng->toJS("cont_saving");
         $this->lng->toJS("cont_ed_par");
+        // workaroun: we need this js for the new editor version, e.g. for new section form to work
+        // @todo: solve this in a smarter way
+        $this->tpl->addJavascript("./Services/UIComponent/AdvancedSelectionList/js/AdvancedSelectionList.js");
         $this->setOutputMode(self::EDIT);
 
         $html = $this->showPage();

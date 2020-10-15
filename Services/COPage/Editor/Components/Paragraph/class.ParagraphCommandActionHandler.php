@@ -84,6 +84,10 @@ class ParagraphCommandActionHandler implements Server\CommandActionHandler
                 return $this->split($body);
                 break;
 
+            case "cmd.sec.class":
+                return $this->sectionClassCommand($body);
+                break;
+
             default:
                 throw new Exception("Unknown action " . $body["action"]);
                 break;
@@ -97,29 +101,32 @@ class ParagraphCommandActionHandler implements Server\CommandActionHandler
      */
     protected function insertCommand($body, $auto = false) : Server\Response
     {
+        $updated = $this->insertParagraph($body["data"]["pcid"], $body["data"]["after_pcid"], $body["data"]["content"], $body["data"]["characteristic"]);
+
+        return $this->response_factory->getResponseObject($this->page_gui, $updated, $body["data"]["pcid"]);
+    }
+
+    /**
+     * Insert paragraph
+     * @param
+     * @return
+     */
+    protected function insertParagraph($pcid, $after_pcid, $content, $characteristic)
+    {
         $page = $this->page_gui->getPageObject();
 
-        $pcid = ":" . $body["data"]["pcid"];
-        $insert_id = "pg:";
-        if (!in_array($body["data"]["after_pcid"], ["", "pg"])) {
-            $hier_ids = $page->getHierIdsForPCIds([$body["data"]["after_pcid"]]);
-            $insert_id = $hier_ids[$body["data"]["after_pcid"]] . ":" . $body["data"]["after_pcid"];
-        }
-
-        $content = "<div id='" .
-            $pcid . "' class='ilc_text_block_" .
-            $body["data"]["characteristic"] . "'>" . $body["data"]["content"] . "</div>";
+        $pcid = ":" . $pcid;
+        $insert_id = $this->getFullIdForPCId($page, $after_pcid);
+        $content = $this->getContentForSaving($pcid, $content, $characteristic);
 
         $this->content_obj = new \ilPCParagraph($page);
-        $updated = $this->content_obj->saveJS(
+        return $this->content_obj->saveJS(
             $page,
             $content,
-            \ilUtil::stripSlashes($body["data"]["characteristic"]),
+            \ilUtil::stripSlashes($characteristic),
             \ilUtil::stripSlashes($pcid),
             $insert_id
         );
-
-        return $this->response_factory->getResponseObject($this->page_gui, $updated, $body["data"]["pcid"]);
     }
 
     /**
@@ -139,25 +146,28 @@ class ParagraphCommandActionHandler implements Server\CommandActionHandler
      */
     protected function updateCommand($body, $auto = false) : Server\Response
     {
+        $updated = $this->updateParagraph($body["data"]["pcid"], $body["data"]["content"], $body["data"]["characteristic"]);
+        return $this->response_factory->getResponseObject($this->page_gui, $updated, $body["data"]["pcid"]);
+    }
+
+    /**
+     * Update paragraph
+     * @param
+     * @return
+     */
+    protected function updateParagraph($pcid, $content, $characteristic)
+    {
         $page = $this->page_gui->getPageObject();
 
-        $hier_ids = $page->getHierIdsForPCIds([$body["data"]["pcid"]]);
-        $pcid = $hier_ids[$body["data"]["pcid"]] . ":" . $body["data"]["pcid"];
-
-        $content = "<div id='" .
-            $pcid . "' class='ilc_text_block_" .
-            $body["data"]["characteristic"] . "'>" . $body["data"]["content"] . "</div>";
-
+        $pcid = $this->getFullIdForPCId($page, $pcid);
+        $content = $this->getContentForSaving($pcid, $content, $characteristic);
         $this->content_obj = new \ilPCParagraph($page);
-
-        $updated = $this->content_obj->saveJS(
+        return $this->content_obj->saveJS(
             $page,
             $content,
-            \ilUtil::stripSlashes($body["data"]["characteristic"]),
+            \ilUtil::stripSlashes($characteristic),
             \ilUtil::stripSlashes($pcid)
         );
-
-        return $this->response_factory->getResponseObject($this->page_gui, $updated, $body["data"]["pcid"]);
     }
 
     /**
@@ -245,6 +255,61 @@ class ParagraphCommandActionHandler implements Server\CommandActionHandler
         return "<div id='" .
             $pcid . "' class='ilc_text_block_" .
             $characteristic . "'>" . $content . "</div>";
+    }
+
+    /**
+     * Section class
+     * @param
+     * @return
+     */
+    protected function sectionClassCommand($body)
+    {
+        $insert_mode = $body["data"]["insert_mode"];
+        $after_pcid = $body["data"]["after_pcid"];
+        $pcid = $body["data"]["pcid"];
+        $content = $body["data"]["text"];
+        $characteristic = $body["data"]["characteristic"];
+        $old_section_characteristic = $body["data"]["old_section_characteristic"];
+        $new_section_characteristic = $body["data"]["new_section_characteristic"];
+
+        // first insert/update the current paragraph
+        if (!$insert_mode) {
+            $updated = $this->updateParagraph($pcid, $content, $characteristic);
+        } else {
+            $updated = $this->insertParagraph($pcid, $after_pcid, $content, $characteristic);
+        }
+
+        /** @var \ilPageObject $page */
+        if ($updated) {
+            $page = $this->page_gui->getPageObject();
+            $page->addHierIDs();
+            $parent = $page->getParentContentObjectForPcId($pcid);
+            // case 1: parent section exists and new characteristic is not empty
+            if (!is_null($parent) && $parent->getType() == "sec" && $new_section_characteristic != "") {
+                $parent->setCharacteristic($new_section_characteristic);
+                $updated = $page->update();
+            }
+            // case 2: move from none to section
+            if ((is_null($parent) || $parent->getType() != "sec") && $old_section_characteristic == "" && $new_section_characteristic != "") {
+                $sec = new \ilPCSection($page);
+                $hier_ids = $page->getHierIdsForPCIds([$pcid]);
+                $sec->create($page, $hier_ids[$pcid], $pcid);
+                $sec->setCharacteristic($new_section_characteristic);
+                $sec_pcid = $page->generatePcId();
+                $sec->writePCId($sec_pcid);
+                $updated = $page->update();
+                $page->addHierIDs();
+                $par = $page->getContentObjectForPcId($pcid);
+                $sec = $page->getContentObjectForPcId($sec_pcid);
+                $sec_node_pc_id = $sec->getNode()->first_child()->get_attribute("PCID");
+                $hier_ids = $page->getHierIdsForPCIds([$sec_node_pc_id]);
+                $node = $par->getNode();
+                $node->unlink_node();
+                $page->insertContentNode($node, $hier_ids[$sec_node_pc_id], IL_INSERT_CHILD, $sec_node_pc_id);
+                $updated = $page->update();
+            }
+        }
+        return $this->ui_wrapper->sendPage($this->page_gui);
     }
 
 }

@@ -158,6 +158,10 @@ export default class ParagraphUIActionHandler {
           //this.ui.cmdExtLink();
           break;
 
+        case ACTIONS.SECTION_CLASS:
+          this.handleSectionClass(params.oldSectionCharacteristic, params.newSectionCharacteristic, page_model);
+          break;
+
         case ACTIONS.LINK_EXTERNAL:
           this.ui.cmdExtLink();
           break;
@@ -342,6 +346,41 @@ export default class ParagraphUIActionHandler {
     if (pl.last_update) {
       this.ui.showLastUpdate(pl.last_update);
     }
+  }
+
+  handleSectionClass(oldCharacteristic, newCharacteristic, page_model) {
+    const af = this.actionFactory;
+    const dispatch = this.dispatcher;
+    this.ui.setSectionClass(page_model.getCurrentPCId(), newCharacteristic);
+
+    const is_insert = (page_model.getComponentState() === page_model.STATE_COMPONENT_INSERT);
+    const secClassAction = af.paragraph().command().sectionClass(
+      page_model.getCurrentPCId(),
+      page_model.getCurrentInsertPCId(),
+      page_model.getPCModel(page_model.getCurrentPCId()),
+      is_insert,
+      oldCharacteristic,
+      newCharacteristic
+    );
+
+    //this.ui.autoSaveStarted();
+    this.client.sendCommand(secClassAction).then(result => {
+      //this.ui.autoSaveEnded();
+      const pl = result.getPayload();
+
+      if (is_insert) {
+        dispatch.dispatch(af.paragraph().editor().autoInsertPostProcessing());
+      }
+
+      if (oldCharacteristic === "" && newCharacteristic !== "") {
+        this.ui.pageModifier.handlePageReloadResponse(result);
+        let content_el = document.querySelector("[data-copg-ed-type='pc-area'][data-pcid='" + page_model.getCurrentPCId() + "']");
+        this.ui.tinyWrapper.setGhostAt(content_el);
+        this.ui.tinyWrapper.synchInputRegion();
+        this.ui.tinyWrapper.copyInputToGhost();
+      }
+    });
+
   }
 
 

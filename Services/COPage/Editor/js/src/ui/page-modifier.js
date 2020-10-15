@@ -133,4 +133,9 @@ export default class PageModifier {
     return confirmation_template;
   }
 
+  // default callback for successfull ajax request, reloads page content
+  handlePageReloadResponse(result) {
+    this.pageUI.handlePageReloadResponse(result);
+  }
+
 }

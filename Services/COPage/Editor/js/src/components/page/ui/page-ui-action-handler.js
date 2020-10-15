@@ -76,14 +76,14 @@ export default class PageUIActionHandler {
         // legacy
         console.log(model.getCurrentPCName());
 
-        if (!["Paragraph", "Grid", "MediaObject", "xSection"].includes(model.getCurrentPCName())) {
+        if (!["Paragraph", "Grid", "MediaObject", "Section"].includes(model.getCurrentPCName())) {
           let ctype = this.ui.getPCTypeForName(params.cname);
           client.sendForm(actionFactory.page().command().createLegacy(ctype, params.pcid,
             params.hierid));
           form_sent = true;
         }
         // generic
-        if (["Grid", "MediaObject", "xSection"].includes(model.getCurrentPCName())) {
+        if (["Grid", "MediaObject", "Section"].includes(model.getCurrentPCName())) {
           this.ui.showGenericCreationForm();
         }
         break;

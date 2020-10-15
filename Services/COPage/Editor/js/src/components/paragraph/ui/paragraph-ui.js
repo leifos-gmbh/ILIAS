@@ -608,6 +608,7 @@ export default class ParagraphUI {
     this.tinyWrapper.initInsert(content_el, () => {
       this.tinyWrapper.setContent(content, characteristic);
       this.setParagraphClass(characteristic);
+      this.setSectionClassSelector(this.getSectionClass(pcid));
     }, () => {
       this.autoSave.handleAutoSaveKeyPressed();
     }, () => {
@@ -721,6 +722,7 @@ export default class ParagraphUI {
       this.showToolbar();
       this.setParagraphClass(pc_model.characteristic);
       this.updateMenuButtons();
+      this.setSectionClassSelector(this.getSectionClass(pcId));
     }, () => {
       this.autoSave.handleAutoSaveKeyPressed();
     }, () => {
@@ -929,6 +931,18 @@ export default class ParagraphUI {
           });
           break;
 
+        case ACTIONS.SECTION_CLASS:
+          const sec_class = char_button.dataset.copgEdParClass;
+          char_button.addEventListener("click", (event) => {
+            dispatch.dispatch(action.paragraph().editor().sectionClass(
+              this.tinyWrapper.getText(),
+              this.tinyWrapper.getCharacteristic(),
+              this.getSectionClass(this.page_model.getCurrentPCId()),
+              sec_class
+            ));
+          });
+          break;
+
         case ACTIONS.SAVE_RETURN:
           char_button.addEventListener("click", (event) => {
             dispatch.dispatch(ef.saveReturn(tiny.getText(), tiny.getCharacteristic()));
@@ -1022,4 +1036,44 @@ export default class ParagraphUI {
   showLastUpdate(last_update) {
     this.autoSave.displayAutoSave(last_update);
   }
+
+  setSectionClass(pcid, characteristic) {
+    const currentPar = document.querySelector("[data-copg-ed-type='pc-area'][data-pcid='" + pcid + "']");
+    console.log(currentPar);
+    const parentComp = currentPar.parentNode.closest("[data-copg-ed-type='pc-area']");
+    console.log(parentComp);
+    if (parentComp && parentComp.dataset.cname === "Section") {
+      parentComp.childNodes[1].className = "ilc_section_" + characteristic + " ilCOPageSection";
+    }
+    this.setSectionClassSelector(characteristic);
+  }
+
+  /**
+   * Get outer section class for paragraph
+   * @param {string} pcid paragraph pcid
+   */
+  getSectionClass(pcid) {
+    let secClass = "";
+    const currentPar = document.querySelector("[data-copg-ed-type='pc-area'][data-pcid='" + pcid + "']");
+    const parentComp = currentPar.parentNode.closest("[data-copg-ed-type='pc-area']");
+    if (parentComp && parentComp.dataset.cname === "Section") {
+      parentComp.childNodes[1].classList.forEach((c) => {
+        if (c.substr(0, 12) === "ilc_section_") {
+          secClass = c.substr(12);
+        }
+      });
+    }
+    return secClass;
+  }
+
+  setSectionClassSelector(i) {
+    if (i === "") {
+      i = il.Language.txt("cont_none");
+    }
+    const fc = document.querySelector(".ilSectionClassSelector .dropdown button");
+    if (fc) {
+      fc.firstChild.textContent = i + " ";
+    }
+  }
+
 }

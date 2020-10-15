@@ -111,6 +111,13 @@ export default class ParagraphModelActionHandler {
           this.pageModel.setSplitPCIds(splitIds);
 
           break;
+
+        case ACTIONS.SECTION_CLASS:
+          this.pageModel.setPCModel(this.pageModel.getCurrentPCId(), {
+            text: params.parText,
+            characteristic: params.parCharacteristic
+          });
+          break;
       }
     }
   }

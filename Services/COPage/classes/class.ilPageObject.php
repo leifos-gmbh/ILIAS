@@ -874,6 +874,41 @@ abstract class ilPageObject
     }
 
     /**
+     * Get content object for pc id
+     * @param
+     * @return
+     */
+    public function getContentObjectForPcId($pcid)
+    {
+        $hier_ids = $this->getHierIdsForPCIds([$pcid]);
+        return $this->getContentObject($hier_ids[$pcid], $pcid);
+    }
+
+    /**
+     * Get parent content object for pc id
+     *
+     * @param string $pcid
+     * @return ilPageContent|null
+     */
+    public function getParentContentObjectForPcId($pcid)
+    {
+        $content_object = $this->getContentObjectForPcId($pcid);
+        $node = $content_object->getNode();
+        $node = $node->parent_node();
+        while($node) {
+            if ($node->node_name() == "PageContent") {
+                $pcid = $node->get_attribute("PCID");
+                if ($pcid != "") {
+                    return $this->getContentObjectForPcId($pcid);
+                }
+            }
+            $node = $node->parent_node();
+        }
+        return null;
+    }
+
+
+    /**
      * Get content node from dom
      * @param string $a_hier_id hierarchical ID
      * @param string $a_pc_id   page content ID
@@ -903,6 +938,7 @@ abstract class ilPageObject
             }
         }
     }
+
 
     /**
      * Get content node from dom
@@ -3488,7 +3524,6 @@ abstract class ilPageObject
         // move mode into container elements is always INSERT_CHILD
         $curr_node = $this->getContentNode($a_pos, $a_pcid);
         $curr_name = $curr_node->node_name();
-
         // @todo: try to generalize
         if (($curr_name == "TableData") || ($curr_name == "PageObject") ||
             ($curr_name == "ListItem") || ($curr_name == "Section")

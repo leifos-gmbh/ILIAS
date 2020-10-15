@@ -117,7 +117,7 @@ class ilObjectServiceSettingsGUI
                 );
                 $active->setValue(1);
                 $active->setChecked(ilCalendarSettings::lookupCalendarActivated($a_obj_id));
-                $active->setInfo($lng->txt('obj_tool_setting_calendar_info'));
+                $active->setInfo($lng->txt('obj_tool_setting_calendar_active_info'));
 
                 $visible = new ilCheckboxInputGUI(
                     $lng->txt('obj_tool_setting_calendar'),

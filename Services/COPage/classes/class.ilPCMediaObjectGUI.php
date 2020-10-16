@@ -58,7 +58,7 @@ class ilPCMediaObjectGUI extends ilPageContentGUI
      */
     protected $sub_cmd;
 
-    public function __construct($a_pg_obj, $a_content_obj, $a_hier_id = 0, $a_pc_id = "")
+    public function __construct(ilPageObject $a_pg_obj, $a_content_obj, $a_hier_id = 0, $a_pc_id = "")
     {
         global $DIC;
 
@@ -70,6 +70,12 @@ class ilPCMediaObjectGUI extends ilPageContentGUI
         $this->user = $DIC->user();
         $ilCtrl = $DIC->ctrl();
         $this->ui = $DIC->ui();
+
+        if ($_GET["pcid"] != "" && $a_hier_id == "") {
+            $hier_ids = $a_pg_obj->getHierIdsForPCIds([$_GET["pcid"]]);
+            $a_hier_id = $hier_ids[$_GET["pcid"]];
+            $ilCtrl->setParameter($this, "hier_id", $a_hier_id);
+        }
 
         $this->pool_view = "folder";
         if (in_array($_GET["pool_view"], array("folder", "all"))) {
@@ -541,7 +547,19 @@ class ilPCMediaObjectGUI extends ilPageContentGUI
         }
         $ilCtrl->redirect($this, "editAlias");
     }
-    
+
+    /**
+     * Redirect to parent
+     * @param string $hier_id
+     */
+    protected function redirectToParent($hier_id = "")
+    {
+        $ilCtrl = $this->ctrl;
+        $pcids = $this->pg_obj->getPCIdsForHierIds([$hier_id]);
+        $ret = $ilCtrl->getParentReturn($this)."#add".$pcids[$hier_id];
+        ilUtil::redirect($ret);
+    }
+
     /**
     * create new media object in dom and update page in db
     */
@@ -563,7 +581,7 @@ class ilPCMediaObjectGUI extends ilPageContentGUI
                 $this->updated = $this->pg_obj->update();
             }
 
-            $ilCtrl->returnToParent($this);
+            $this->redirectToParent($_GET["hier_id"]);
         }
         
         // check form input

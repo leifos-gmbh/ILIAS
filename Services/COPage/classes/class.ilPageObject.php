@@ -1896,6 +1896,32 @@ abstract class ilPageObject
     }
 
     /**
+     * Get hier ids for a set of pc ids
+     */
+    public function getPCIdsForHierIds($hier_ids)
+    {
+        if (!is_array($hier_ids) || count($hier_ids) == 0) {
+            return [];
+        }
+        $ret = [];
+        $this->addHierIDs();
+        if (is_object($this->dom)) {
+            $xpc = xpath_new_context($this->dom);
+            $path = "//*[@HierId]";
+            $res = xpath_eval($xpc, $path);
+            for ($i = 0; $i < count($res->nodeset); $i++) {    // should only be 1
+                $hier_id = $res->nodeset[$i]->get_attribute("HierId");
+                if (in_array($hier_id, $hier_ids)) {
+                    $ret[$hier_id] = $res->nodeset[$i]->get_attribute("PCID");
+                }
+            }
+            unset($xpc);
+        }
+        return $ret;
+    }
+
+
+    /**
      * add file sizes
      */
     // @todo: move to file item class

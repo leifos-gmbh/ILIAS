@@ -10,6 +10,7 @@ use ILIAS\COPage\Editor\Components\Page;
 use ILIAS\COPage\Editor\Components\Paragraph;
 use ILIAS\COPage\Editor\Components\Grid;
 use ILIAS\COPage\Editor\Components\Section;
+use ILIAS\COPage\Editor\Components\MediaObject;
 
 /**
  * Page editor json server
@@ -111,6 +112,9 @@ class Server
                 break;
             case "Section":
                 $handler = new Section\SectionCommandActionHandler($this->page_gui);
+                break;
+            case "MediaObject":
+                $handler = new MediaObject\MediaObjectCommandActionHandler($this->page_gui);
                 break;
         }
 

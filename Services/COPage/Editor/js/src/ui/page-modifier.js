@@ -138,4 +138,7 @@ export default class PageModifier {
     this.pageUI.handlePageReloadResponse(result);
   }
 
+  redirect(url) {
+    window.location.replace(url);
+  }
 }

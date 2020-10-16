@@ -2,6 +2,7 @@
 
 import PageUI from '../components/page/ui/page-ui.js';
 import ParagraphUI from '../components/paragraph/ui/paragraph-ui.js';
+import MediaUI from '../components/media/ui/media-ui.js';
 import AutoSave from '../components/paragraph/ui/auto-save.js';
 
 /**
@@ -47,6 +48,11 @@ export default class UI {
   paragraph;
 
   /**
+   * @type {MediaUI}
+   */
+  media;
+
+  /**
    * @type {ToolSlate}
    */
   toolSlate;
@@ -90,8 +96,17 @@ export default class UI {
       this.toolSlate,
       this.pageModifer,
       new AutoSave());
+    this.media = new MediaUI(
+      this.client,
+      this.dispatcher,
+      this.actionFactory,
+      this.model.model("page"),
+      this.toolSlate,
+      this.pageModifer
+    );
 
     this.page.addComponentUI("Paragraph", this.paragraph);
+    this.page.addComponentUI("Media", this.media);
     this.pageModifer.setPageUI(this.page);
   }
 
@@ -113,7 +128,6 @@ export default class UI {
     this.client.sendQuery(ui_all_action).then(result => {
       this.uiModel = result.getPayload();
 
-
       // move page component model to model
       console.log(this.uiModel);
       this.model.model("page").setComponentModel(this.uiModel.pcModel);
@@ -122,6 +136,7 @@ export default class UI {
       this.toolSlate.init(this.uiModel);
       this.page.init(this.uiModel);
       this.paragraph.init(this.uiModel);
+      this.media.init(this.uiModel);
     });
   }
 

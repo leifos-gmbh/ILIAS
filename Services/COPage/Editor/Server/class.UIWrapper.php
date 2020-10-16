@@ -170,5 +170,53 @@ class UIWrapper
     }
 
 
+    /**
+     * Get multi button
+     * @param string     $content
+     * @param string     $type
+     * @param string     $action
+     * @param array|null $data
+     * @return string
+     */
+    public function getLink(
+        string $content,
+        string $type,
+        string $action,
+        array $data = null): \ILIAS\UI\Component\Button\Shy
+    {
+        $ui = $this->ui;
+        $f = $ui->factory();
+        $l = $f->button()->shy($content, "");
+        if ($data === null) {
+            $data = [];
+        }
+        $l = $l->withOnLoadCode(
+            function ($id) use ($type, $data, $action) {
+                $code = "document.querySelector('#$id').setAttribute('data-copg-ed-type', '$type');
+                         document.querySelector('#$id').setAttribute('data-copg-ed-action', '$action')";
+                foreach ($data as $key => $val) {
+                    $code .= "\n document.querySelector('#$id').setAttribute('data-copg-ed-par-$key', '$val');";
+                }
+                return $code;
+            }
+        );
+        return $l;
+    }
+
+    /**
+     * Get rendered button
+     * @param string     $content
+     * @param string     $type
+     * @param string     $action
+     * @param array|null $data
+     * @return string
+     */
+    public function getRenderedLink(string $content, string $type, string $action, array $data = null): string
+    {
+        $ui = $this->ui;
+        $l = $this->getLink($content, $type, $action, $data);
+        return $ui->renderer()->renderAsync($l);
+    }
+
 
 }

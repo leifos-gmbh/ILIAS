@@ -110,6 +110,7 @@
 			<div data-copg-ed-type="add-area">
 				<xsl:attribute name="data-hierid"><xsl:value-of select="@HierId"/></xsl:attribute>
 				<xsl:attribute name="data-pcid"><xsl:value-of select="@PCID"/></xsl:attribute>
+				<xsl:attribute name="id">add<xsl:value-of select="@PCID"/></xsl:attribute>
 				<xsl:comment>dummy</xsl:comment>
 			</div>
 		</xsl:if>
@@ -327,6 +328,7 @@
 			<div data-copg-ed-type="add-area">
 				<xsl:attribute name="data-hierid"><xsl:value-of select="@HierId"/></xsl:attribute>
 				<xsl:attribute name="data-pcid"><xsl:value-of select="@PCID"/></xsl:attribute>
+				<xsl:attribute name="id">add<xsl:value-of select="@PCID"/></xsl:attribute>
 				<xsl:comment>dummy</xsl:comment>
 			</div>
 		</xsl:if>
@@ -872,6 +874,7 @@
 		<div data-copg-ed-type="add-area">
 			<xsl:attribute name="data-hierid"><xsl:value-of select="@HierId"/></xsl:attribute>
 			<xsl:attribute name="data-pcid"><xsl:value-of select="@PCID"/></xsl:attribute>
+			<xsl:attribute name="id">add<xsl:value-of select="@PCID"/></xsl:attribute>
 			<xsl:comment>dummy</xsl:comment>
 		</div>
 	</xsl:if>

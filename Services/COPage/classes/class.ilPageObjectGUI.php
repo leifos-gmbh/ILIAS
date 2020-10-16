@@ -2635,6 +2635,7 @@ class ilPageObjectGUI
         $this->lng->toJS("copg_confirm_el_deletion");
         $this->lng->toJS("cont_saving");
         $this->lng->toJS("cont_ed_par");
+        $this->lng->toJS("cont_no_block");
         // workaroun: we need this js for the new editor version, e.g. for new section form to work
         // @todo: solve this in a smarter way
         $this->tpl->addJavascript("./Services/UIComponent/AdvancedSelectionList/js/AdvancedSelectionList.js");

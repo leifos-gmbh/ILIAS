@@ -1068,7 +1068,7 @@ export default class ParagraphUI {
 
   setSectionClassSelector(i) {
     if (i === "") {
-      i = il.Language.txt("cont_none");
+      i = il.Language.txt("cont_no_block");
     }
     const fc = document.querySelector(".ilSectionClassSelector .dropdown button");
     if (fc) {

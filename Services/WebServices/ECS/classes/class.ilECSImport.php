@@ -143,6 +143,25 @@ class ilECSImport
         }
         return 0;
     }
+
+    /**
+     * @param int $server_id
+     * @param int $mid
+     * @param string $old_econtent_id
+     * @param string $new_econtent_id
+     */
+    public static function replaceEContentId($server_id, $mid, $old_econtent_id, $new_econtent_id)
+    {
+        global $DIC;
+
+        $db = $DIC->database();
+        $query = 'UPDATE ecs_import ' .
+            'SET econtent_id = ' . $db->quote($new_econtent_id, ilDBConstants::T_TEXT) . ' ' .
+            'WHERE econtent_id = ' . $db->quote($old_econtent_id, ilDBConstants::T_TEXT) . ' ' .
+            'AND server_id = ' . $db->quote($server_id, ilDBConstants::T_INTEGER) . ' ' .
+            'AND mid = ' . $db->quote($mid, ilDBConstants::T_INTEGER);
+        $db->manipulate($query);
+    }
     
     /**
      * get all imported links

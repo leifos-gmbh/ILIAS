@@ -262,9 +262,10 @@ class ilUserUtil
      *
      * @param int $a_value
      * @param int $a_ref_id
+     * @param array $a_cal_view
      * @return boolean
      */
-    public static function setStartingPoint($a_value, $a_ref_id = null)
+    public static function setStartingPoint($a_value, $a_ref_id = null, $a_cal_view = [])
     {
         global $DIC;
 
@@ -283,6 +284,11 @@ class ilUserUtil
         $valid = array_keys(self::getPossibleStartingPoints());
         if (in_array($a_value, $valid)) {
             $ilSetting->set("usr_starting_point", $a_value);
+            if($a_value == self::START_PD_CALENDAR) {
+                foreach ($a_cal_view as $key => $value) {
+                    $ilSetting->set($key, $value);
+                }
+            }
             return true;
         }
         return false;
@@ -424,6 +430,34 @@ class ilUserUtil
         $ilSetting = $DIC['ilSetting'];
         
         return $ilSetting->get("usr_starting_point_ref_id");
+    }
+
+    /**
+     * Get specific view of calendar starting point
+     *
+     * @return int
+     */
+    public static function getCalendarView()
+    {
+        global $DIC;
+
+        $ilSetting = $DIC['ilSetting'];
+
+        return $ilSetting->get("user_calendar_view");
+    }
+
+    /**
+     * Get time frame of calendar view
+     *
+     * @return int
+     */
+    public static function getCalendarPeriod()
+    {
+        global $DIC;
+
+        $ilSetting = $DIC['ilSetting'];
+
+        return $ilSetting->get("user_cal_period");
     }
     
     /**

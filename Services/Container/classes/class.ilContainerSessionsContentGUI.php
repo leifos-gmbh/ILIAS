@@ -297,21 +297,40 @@ class ilContainerSessionsContentGUI extends ilContainerContentGUI
 
         $user = $DIC->user();
         $access = $DIC->access();
+        $tree = $DIC->repositoryTree();
 
-
-        $limit_sess = false;
-        if (!$admin_panel_enabled &&
+        $limit_sessions = false;
+        if (
+            !$admin_panel_enabled &&
             !$include_side_block &&
             $items['sess'] &&
             is_array($items['sess']) &&
-            $container->isSessionLimitEnabled() &&
-            $container->getViewMode() == ilContainer::VIEW_SESSIONS) { // #16686
-            $limit_sess = true;
+            (($container->getViewMode() == ilContainer::VIEW_SESSIONS) || ($container->getViewMode() == ilContainer::VIEW_INHERIT))) {
+            $limit_sessions = true;
         }
 
-        if (!$limit_sess) {
-            return $items;
+        if ($container->getViewMode() == ilContainer::VIEW_INHERIT) {
+            $parent = $tree->checkForParentType($container->getRefId(), 'crs');
+            $crs = ilObjectFactory::getInstanceByRefId($parent, false);
+            if (!$crs instanceof ilObjCourse) {
+                return $items;
+            }
+
+            if (!$container->isSessionLimitEnabled()) {
+                $limit_sessions = false;
+            }
+            $limit_next = $crs->getNumberOfNextSessions();
+            $limit_prev = $crs->getNumberOfPreviousSessions();
+        } else {
+            $limit_next = $container->getNumberOfNextSessions();
+            $limit_prev = $container->getNumberOfPreviousSessions();
         }
+
+        if (!$limit_sessions) {
+            return  $items;
+        }
+
+
 
         // do session limit
         if (isset($_GET['crs_prev_sess'])) {
@@ -344,7 +363,7 @@ class ilContainerSessionsContentGUI extends ilContainerContentGUI
             }
         }
         $num_previous_remove = max(
-            count($previous) - $container->getNumberOfPreviousSessions(),
+            count($previous) - $limit_prev,
             0
         );
         while ($num_previous_remove--) {
@@ -355,7 +374,7 @@ class ilContainerSessionsContentGUI extends ilContainerContentGUI
         }
 
         $num_next_remove = max(
-            count($next) - $container->getNumberOfNextSessions(),
+            count($next) - $limit_next,
             0
         );
         while ($num_next_remove--) {

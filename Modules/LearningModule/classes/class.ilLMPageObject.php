@@ -424,15 +424,17 @@ class ilLMPageObject extends ilLMObject
             if ($trans_title == "") {
                 $trans_title = $lmobjtrans->getTitle();
             }
+            if ($trans_title == "") {
+                $lmobjtrans = new ilLMObjTranslation($a_pg_id, $ot->getFallbackLanguage());
+                $trans_title = $lmobjtrans->getTitle();
+            }
             if ($trans_title != "") {
                 $title = $trans_title;
             }
         }
-
         if ($a_mode == IL_PAGE_TITLE) {
             return $title;
         }
-
         include_once("./Modules/LearningModule/classes/class.ilLMTree.php");
         $tree = ilLMTree::getInstance($a_lm_id);
 

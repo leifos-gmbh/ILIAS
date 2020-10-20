@@ -204,6 +204,10 @@ class ilStructureObject extends ilLMObject
             if ($trans_title == "") {
                 $trans_title = $lmobjtrans->getTitle();
             }
+            if ($trans_title == "") {
+                $lmobjtrans = new ilLMObjTranslation($a_st_id, $ot->getFallbackLanguage());
+                $trans_title = $lmobjtrans->getTitle();
+            }
             if ($trans_title != "") {
                 $title = $trans_title;
             }

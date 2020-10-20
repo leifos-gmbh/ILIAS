@@ -834,6 +834,10 @@ class ilLMPresentationGUI
             if ($ltitle != "") {
                 return $ltitle;
             }
+            $ltitle = $data[$ot->getFallbackLanguage()]["title"];
+            if ($ltitle != "") {
+                return $ltitle;
+            }
         }
         return $this->lm->getTitle();
     }
@@ -4171,6 +4175,9 @@ class ilLMPresentationGUI
         if ($this->lang != "-" && ilPageObject::_exists("lm", $a_id, $this->lang)) {
             return new ilLMPageGUI($a_id, 0, false, $this->lang);
         }
+        if ($this->lang != "-" && ilPageObject::_exists("lm", $a_id, $this->ot->getFallbackLanguage())) {
+            return new ilLMPageGUI($a_id, 0, false, $this->ot->getFallbackLanguage());
+        }
         return new ilLMPageGUI($a_id);
     }
 
@@ -4185,6 +4192,9 @@ class ilLMPresentationGUI
         include_once("./Modules/LearningModule/classes/class.ilLMPage.php");
         if ($this->lang != "-" && ilPageObject::_exists("lm", $a_id, $this->lang)) {
             return new ilLMPage($a_id, 0, $this->lang);
+        }
+        if ($this->lang != "-" && ilPageObject::_exists("lm", $a_id, $this->ot->getFallbackLanguage())) {
+            return new ilLMPage($a_id, 0, $this->ot->getFallbackLanguage());
         }
         return new ilLMPage($a_id);
     }

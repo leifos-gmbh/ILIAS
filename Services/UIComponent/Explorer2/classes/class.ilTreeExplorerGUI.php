@@ -244,7 +244,6 @@ abstract class ilTreeExplorerGUI extends ilExplorerBaseGUI
                 $final_childs[$k] = $c;
             }
         }
-        
         return $final_childs;
     }
 

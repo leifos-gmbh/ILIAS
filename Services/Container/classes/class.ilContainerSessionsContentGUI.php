@@ -281,4 +281,99 @@ class ilContainerSessionsContentGUI extends ilContainerContentGUI
             $this->force_details = array($session);
         }
     }
+
+    /**
+     * @param array       $items
+     * @param ilContainer $container
+     * @return array
+     */
+    public static function prepareSessionPresentationLimitation(
+        array $items,
+        ilContainer $container,
+        bool $admin_panel_enabled = false,
+        bool $include_side_block = false) : array
+    {
+        global $DIC;
+
+        $user = $DIC->user();
+        $access = $DIC->access();
+
+
+        $limit_sess = false;
+        if (!$admin_panel_enabled &&
+            !$include_side_block &&
+            $items['sess'] &&
+            is_array($items['sess']) &&
+            $container->isSessionLimitEnabled() &&
+            $container->getViewMode() == ilContainer::VIEW_SESSIONS) { // #16686
+            $limit_sess = true;
+        }
+
+        if (!$limit_sess) {
+            return $items;
+        }
+
+        // do session limit
+        if (isset($_GET['crs_prev_sess'])) {
+            $user->writePref('crs_sess_show_prev_' . $container->getId(), (string) (int) $_GET['crs_prev_sess']);
+        }
+        if (isset($_GET['crs_next_sess'])) {
+            $user->writePref('crs_sess_show_next_' . $container->getId(), (string) (int) $_GET['crs_next_sess']);
+        }
+
+        $session_rbac_checked = [];
+        foreach ($items['sess'] as $session_tree_info) {
+            if ($access->checkAccess('visible', '', $session_tree_info['ref_id'])) {
+                $session_rbac_checked[] = $session_tree_info;
+            }
+        }
+        $sessions = ilUtil::sortArray($session_rbac_checked, 'start', 'ASC', true, false);
+        //$sessions = ilUtil::sortArray($this->items['sess'],'start','ASC',true,false);
+        $today = new ilDate(date('Ymd', time()), IL_CAL_DATE);
+        $previous = $current = $next = array();
+        foreach ($sessions as $key => $item) {
+            $start = new ilDateTime($item['start'], IL_CAL_UNIX);
+            $end = new ilDateTime($item['end'], IL_CAL_UNIX);
+
+            if (ilDateTime::_within($today, $start, $end, IL_CAL_DAY)) {
+                $current[] = $item;
+            } elseif (ilDateTime::_before($start, $today, IL_CAL_DAY)) {
+                $previous[] = $item;
+            } elseif (ilDateTime::_after($start, $today, IL_CAL_DAY)) {
+                $next[] = $item;
+            }
+        }
+        $num_previous_remove = max(
+            count($previous) - $container->getNumberOfPreviousSessions(),
+            0
+        );
+        while ($num_previous_remove--) {
+            if (!$user->getPref('crs_sess_show_prev_' . $container->getId())) {
+                array_shift($previous);
+            }
+            $items['sess_link']['prev']['value'] = 1;
+        }
+
+        $num_next_remove = max(
+            count($next) - $container->getNumberOfNextSessions(),
+            0
+        );
+        while ($num_next_remove--) {
+            if (!$user->getPref('crs_sess_show_next_' . $container->getId())) {
+                array_pop($next);
+            }
+            // @fixme
+            $items['sess_link']['next']['value'] = 1;
+        }
+
+        $sessions = array_merge($previous, $current, $next);
+        $items['sess'] = $sessions;
+
+        // #15389 - see ilContainer::getSubItems()
+        $sort = ilContainerSorting::_getInstance($container->getId());
+        $items[(int) $admin_panel_enabled][(int) $include_side_block] = $sort->sortItems($items);
+        return $items;
+    }
+
+
 } // END class.ilContainerSessionsContentGUI

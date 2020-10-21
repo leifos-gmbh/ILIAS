@@ -356,10 +356,10 @@ class ilUserStartingPointGUI
 
                 if (!empty($cal_view) && !empty($cal_period) && ($starting_point->getStartingPoint() == ilUserUtil::START_PD_CALENDAR)) {
                    $starting_point->setCalendarView($cal_view);
-                   $starting_point->setCalendarList($cal_period);
+                   $starting_point->setCalendarPeriod($cal_period);
                 } else {
                     $starting_point->setCalendarView(0);
-                    $starting_point->setCalendarList(0);
+                    $starting_point->setCalendarPeriod(0);
                 }
 
                 if ($start_point_id) {

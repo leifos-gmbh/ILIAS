@@ -367,7 +367,9 @@ class ilUserUtil
                         if (in_array($role_id, $roles_ids)) {
                             $gr[$roles[$role_id]['position']] = array(
                                 "point" => $roles[$role_id]['starting_point'],
-                                "object" => $roles[$role_id]['starting_object']
+                                "object" => $roles[$role_id]['starting_object'],
+                                "cal_view" => $roles[$role_id]['calendar_view'],
+                                "cal_period" => $roles[$role_id]['calendar_period']
                             );
                         }
                     }
@@ -377,16 +379,25 @@ class ilUserUtil
                     $role_point = array_pop($gr);
                     $current = $role_point['point'];
                     $ref_id = $role_point['object'];
+                    $cal_view = $role_point['cal_view'];
+                    $cal_period = $role_point['cal_period'];
                     $by_default = false;
                 }
             }
             if ($by_default) {
                 $current = self::getStartingPoint();
 
+                $cal_view = self::getCalendarView();
+                $cal_period = self::getCalendarPeriod();
                 if ($current == self::START_REPOSITORY_OBJ) {
                     $ref_id = self::getStartingObject();
                 }
             }
+        }
+
+        $calendar_string = "";
+        if(!empty($cal_view) && !empty($cal_period)) {
+            $calendar_string = "&cal_view=" . $cal_view . "&cal_agenda_per=" . $cal_period;
         }
 
         switch ($current) {
@@ -411,7 +422,7 @@ class ilUserUtil
                     self::START_PD_OVERVIEW => 'ilias.php?baseClass=ilDashboardGUI&cmd=jumpToSelectedItems',
                     self::START_PD_SUBSCRIPTION => 'ilias.php?baseClass=ilMembershipOverviewGUI',
                     self::START_PD_WORKSPACE => 'ilias.php?baseClass=ilDashboardGUI&cmd=jumpToWorkspace',
-                    self::START_PD_CALENDAR => 'ilias.php?baseClass=ilDashboardGUI&cmd=jumpToCalendar',
+                    self::START_PD_CALENDAR => 'ilias.php?baseClass=ilDashboardGUI&cmd=jumpToCalendar'. $calendar_string,
                     self::START_PD_MYSTAFF => 'ilias.php?baseClass=' . ilDashboardGUI::class . '&cmd=' . ilDashboardGUI::CMD_JUMP_TO_MY_STAFF
                 );
                 return $map[$current];

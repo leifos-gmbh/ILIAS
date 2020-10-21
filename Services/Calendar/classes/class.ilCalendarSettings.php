@@ -70,8 +70,8 @@ class ilCalendarSettings
     private $cal_settings_id = 0;
     
     private $consultation_hours = false;
-    private $default_cal = 1;
-    private $default_period = 1;
+    private $default_cal = self::DEFAULT_CAL_LIST;
+    private $default_period = 2;
     
     private $cache_enabled = true;
     private $cache_minutes = 1;

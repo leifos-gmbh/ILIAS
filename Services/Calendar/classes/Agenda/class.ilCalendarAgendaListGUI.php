@@ -110,6 +110,14 @@ class ilCalendarAgendaListGUI extends ilCalendarViewGUI
         }
         $this->period_end_day = $end_date->get(IL_CAL_DATE);
     }
+
+    /**
+     * @return int|null
+     */
+    protected function getEventPeriod() : ?int
+    {
+        return $this->period;
+    }
     
     /**
      * Execute command
@@ -330,27 +338,5 @@ class ilCalendarAgendaListGUI extends ilCalendarViewGUI
             $li = $plugin->editAgendaItem($a_item);
         }
         return $li;
-    }
-
-    /**
-     * needed in CalendarInboxGUI to get events using a proper period.
-     * todo define default period only once (self::PERIOD_WEEK, protected $period = self::PERIOD_WEEK)
-     * @return int|mixed
-     */
-    public static function getPeriod()
-    {
-        global $DIC;
-
-        $settings = ilCalendarSettings::_getInstance();
-        $ilUser   = $DIC->user();
-
-        $qp = $DIC->http()->request()->getQueryParams();
-        if ((int) $qp["cal_agenda_per"] > 0 && (int) $qp["cal_agenda_per"] <= 4) {
-            return $qp["cal_agenda_per"];
-        } elseif ($period = $ilUser->getPref('cal_list_view')) {
-            return $period;
-        } else {
-            return $settings->getDefaultPeriod();
-        }
     }
 }

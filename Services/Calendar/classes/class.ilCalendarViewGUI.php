@@ -101,8 +101,13 @@ class ilCalendarViewGUI
         return $this->ch_user_id;
     }
 
-
-    
+    /**
+     * @return int|null
+     */
+    protected function getEventPeriod() : ?int
+    {
+        return null;
+    }
     
 
     /**
@@ -164,12 +169,8 @@ class ilCalendarViewGUI
         switch ($this->presentation_type) {
             case self::CAL_PRESENTATION_AGENDA_LIST:
 
-                //if($this->period_end_day == "")
-                //{
-                    $this->period = ilCalendarAgendaListGUI::getPeriod();
-
                     $end_date = clone $this->seed;
-                    switch ($this->period) {
+                    switch ($this->getEventPeriod()) {
                         case ilCalendarAgendaListGUI::PERIOD_DAY:
                             $schedule = new ilCalendarSchedule($this->seed, ilCalendarSchedule::TYPE_DAY, $user, true);
                             $end_date->increment(IL_CAL_DAY, 1);
@@ -197,12 +198,6 @@ class ilCalendarViewGUI
                     }
                     $this->period_end_day = $end_date->get(IL_CAL_DATE);
                     $schedule->setPeriod($this->seed, $end_date);
-
-                //}
-                /*else
-                {
-                    $schedule = new ilCalendarSchedule($this->seed, ilCalendarSchedule::TYPE_PD_UPCOMING);
-                }*/
 
                 break;
             case self::CAL_PRESENTATION_DAY:
@@ -498,8 +493,7 @@ class ilCalendarViewGUI
     {
         $start = $this->seed;
         $end = clone $start;
-        $get_list_option = ilCalendarAgendaListGUI::getPeriod();
-        switch ($get_list_option) {
+        switch ($this->getEventPeriod()) {
             case ilCalendarAgendaListGUI::PERIOD_DAY:
                 //$end->increment(IL_CAL_DAY,1);
                 break;

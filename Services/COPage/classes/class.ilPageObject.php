@@ -1895,6 +1895,12 @@ abstract class ilPageObject
         return $ret;
     }
 
+    public function getHierIdForPcId($pcid)
+    {
+        $hier_ids = $this->getHierIdsForPCIds([$pcid]);
+        return $hier_ids[$pcid];
+    }
+
     /**
      * Get hier ids for a set of pc ids
      */
@@ -5194,7 +5200,7 @@ abstract class ilPageObject
     {
         $model = [];
         foreach ($this->getAllPCIds() as $pc_id) {
-            $co = $this->getContentObject("", $pc_id);
+            $co = $this->getContentObjectForPcId($pc_id);
             $co_model = $co->getModel();
             if ($co_model !== null) {
                 $model[$pc_id] = $co_model;

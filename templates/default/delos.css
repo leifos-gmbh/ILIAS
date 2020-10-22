@@ -14383,6 +14383,7 @@ div.ilEditLabel {
   border: 0;
   height: 15px;
   display: none;
+  z-index: 1;
 }
 div.il_editarea:hover > div.ilEditLabel,
 .copg-ghost-wrapper div.ilEditLabel {
@@ -14831,6 +14832,18 @@ p#copg-auto-save {
 }
 .copg-edit-container {
   border: 1px dashed #d0d0d0;
+}
+/* very important: add areas around floating images https://stackoverflow.com/questions/1260122/expand-a-div-to-fill-the-remaining-width  and https://css-tricks.com/popping-hidden-overflow/ */
+#il_EditPage [data-copg-ed-type="add-area"] {
+  position: relative;
+}
+#il_EditPage [data-copg-ed-type="add-area"] > .dropdown {
+  overflow: hidden;
+  position: static;
+}
+#il_EditPage [data-copg-ed-type="add-area"] > .dropdown > ul {
+  position: absolute;
+  z-index: 10;
 }
 /* Services/Calendar */
 td.even {

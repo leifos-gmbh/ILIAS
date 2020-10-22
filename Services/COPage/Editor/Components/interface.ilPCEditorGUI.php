@@ -18,6 +18,17 @@ interface PageComponentEditor
      * @param int          $style_id
      * @return array
      */
-    function getEditorElements(UIWrapper $ui_wrapper, string $page_type, \ilPageObjectGUI $page_gui, int $style_id): array;
+    public function getEditorElements(UIWrapper $ui_wrapper, string $page_type, \ilPageObjectGUI $page_gui, int $style_id): array;
+
+    /**
+     * Get rendered editor elements
+     * @param UIWrapper $this
+     * @param string       $page_type
+     * @param \ilPageObjectGUI $page_gui
+     * @param int          $style_id
+     * @param string        $pcid
+     * @return string
+     */
+    public function getEditComponentForm(UIWrapper $ui_wrapper, string $page_type, \ilPageObjectGUI $page_gui, int $style_id, $pcid): string;
 
 }

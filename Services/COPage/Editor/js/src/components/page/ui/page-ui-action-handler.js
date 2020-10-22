@@ -101,12 +101,27 @@ export default class PageUIActionHandler {
         this.sendInsertCommand(params);
         break;
 
+      case "component.update":
+        this.sendUpdateCommand(params);
+        break;
+
       case "component.edit":
-        if (model.getCurrentPCName() !== "Paragraph") {
+        if (["MediaObject"].includes(model.getCurrentPCName())) {   // generic load editing form
+          this.ui.loadGenericEditingForm(params.cname, params.pcid, params.hierid);
+        } else if (!["Paragraph"].includes(model.getCurrentPCName())) {   // legacy underworld
           client.sendForm(actionFactory.page().command().editLegacy(params.cname, params.pcid,
             params.hierid));
           form_sent = true;
         }
+        break;
+
+      // legacy underworld, note MediaObject e.g. use component.edit to show the
+      // generic editing form in the slate, then it is using component.settings to link to the
+      // advanced settings in (legacy underworld) afterwards
+      case "component.settings":
+        client.sendForm(actionFactory.page().command().editLegacy(params.cname, params.pcid,
+          params.hierid));
+        form_sent = true;
         break;
 
       case ACTIONS.SWITCH_MULTI:
@@ -327,6 +342,21 @@ export default class PageUIActionHandler {
   );
 
     this.client.sendCommand(insert_action).then(result => {
+      this.ui.handlePageReloadResponse(result);
+    });
+  }
+
+  sendUpdateCommand(params) {
+    let update_action;
+    const af = this.actionFactory;
+
+    update_action = af.page().command().update(
+      params.pcid,
+      params.component,
+      params.data
+  );
+
+    this.client.sendCommand(update_action).then(result => {
       this.ui.handlePageReloadResponse(result);
     });
   }

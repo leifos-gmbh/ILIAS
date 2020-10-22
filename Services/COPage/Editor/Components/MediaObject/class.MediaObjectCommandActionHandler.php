@@ -61,6 +61,10 @@ class MediaObjectCommandActionHandler implements Server\CommandActionHandler
                 return $this->insertCommand($body);
                 break;
 
+            case "update":
+                return $this->updateCommand($body);
+                break;
+
             default:
                 throw new Exception("Unknown action " . $body["action"]);
                 break;
@@ -68,7 +72,7 @@ class MediaObjectCommandActionHandler implements Server\CommandActionHandler
     }
 
     /**
-     * All command
+     * Insert command
      * @param $body
      * @return Server\Response
      */
@@ -92,6 +96,32 @@ class MediaObjectCommandActionHandler implements Server\CommandActionHandler
         \ilObjMediaObjectGUI::setObjectPerCreationForm($mob);
         $pc_media->createAlias($page, $hier_id, $pc_id);
         $updated = $page->update();
+
+        return $this->ui_wrapper->sendPage($this->page_gui);
+    }
+
+    /**
+     * Update command
+     * @param $body
+     * @return Server\Response
+     */
+    protected function updateCommand($body) : Server\Response
+    {
+        $page = $this->page_gui->getPageObject();
+        $pc_media = $page->getContentObjectForPcId($body["pcid"]);
+
+        $quick_edit = new \ilPCMediaObjectQuickEdit($pc_media);
+
+        $quick_edit->setTitle(\ilUtil::stripSlashes($body["standard_title"]));
+        $quick_edit->setClass(\ilUtil::stripSlashes($body["characteristic"]));
+        $quick_edit->setHorizontalAlign(\ilUtil::stripSlashes($body["horizontal_align"]));
+
+        $quick_edit->setUseFullscreen((bool) ($body["fullscreen"]));
+        $quick_edit->setCaption(\ilUtil::stripSlashes($body["standard_caption"]));
+        $quick_edit->setTextRepresentation(\ilUtil::stripSlashes($body["text_representation"]));
+
+        $pc_media->getMediaObject()->update();
+        $page->update();
 
         return $this->ui_wrapper->sendPage($this->page_gui);
     }

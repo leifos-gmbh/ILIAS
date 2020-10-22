@@ -180,6 +180,7 @@ class UIWrapper
      */
     public function getLink(
         string $content,
+        string $component,
         string $type,
         string $action,
         array $data = null): \ILIAS\UI\Component\Button\Shy
@@ -191,8 +192,9 @@ class UIWrapper
             $data = [];
         }
         $l = $l->withOnLoadCode(
-            function ($id) use ($type, $data, $action) {
-                $code = "document.querySelector('#$id').setAttribute('data-copg-ed-type', '$type');
+            function ($id) use ($component, $type, $data, $action) {
+                $code = "document.querySelector('#$id').setAttribute('data-copg-ed-component', '$component');
+                         document.querySelector('#$id').setAttribute('data-copg-ed-type', '$type');
                          document.querySelector('#$id').setAttribute('data-copg-ed-action', '$action')";
                 foreach ($data as $key => $val) {
                     $code .= "\n document.querySelector('#$id').setAttribute('data-copg-ed-par-$key', '$val');";
@@ -211,10 +213,10 @@ class UIWrapper
      * @param array|null $data
      * @return string
      */
-    public function getRenderedLink(string $content, string $type, string $action, array $data = null): string
+    public function getRenderedLink(string $content, string $component, string $type, string $action, array $data = null): string
     {
         $ui = $this->ui;
-        $l = $this->getLink($content, $type, $action, $data);
+        $l = $this->getLink($content, $component, $type, $action, $data);
         return $ui->renderer()->renderAsync($l);
     }
 

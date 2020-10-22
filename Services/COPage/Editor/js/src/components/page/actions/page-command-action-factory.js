@@ -147,4 +147,16 @@ export default class PageCommandActionFactory {
     return this.clientActionFactory.formCommand(component, ACTIONS.INSERT, data);
   }
 
+  /**
+   *
+   * @param {string} pcid
+   * @param {string} component
+   * @param {formData} data
+   * @return {CommandAction}
+   */
+  update(pcid, component, data) {
+    data.append("pcid", pcid);
+    return this.clientActionFactory.formCommand(component, ACTIONS.UPDATE, data);
+  }
+
 }

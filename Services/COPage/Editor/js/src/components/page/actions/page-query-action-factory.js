@@ -24,4 +24,12 @@ export default class PageQueryActionFactory {
   uiAll() {
     return this.clientActionFactory.query(this.COMPONENT, ACTIONS.UI_ALL);
   }
+
+  loadEditingForm(cname, pcid, hierid) {
+    return this.clientActionFactory.query(this.COMPONENT, ACTIONS.EDIT_FORM, {
+      cname: cname,
+      pcid: pcid,
+      hierid: hierid
+    });
+  }
 }

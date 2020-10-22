@@ -99,6 +99,28 @@ export default class PageEditorActionFactory {
   /**
    * @returns {EditorAction}
    */
+  componentUpdate(pcid, component, data) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.COMPONENT_UPDATE, {
+      pcid: pcid,
+      component: component,
+      data: data
+    });
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  componentSettings(cname, pcid, hierid) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.COMPONENT_SETTINGS, {
+      cname: cname,
+      pcid: pcid,
+      hierid: hierid
+    });
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
   multiToggle(ctype, pcid, hierid) {
     return this.editorActionFactory.action(this.COMPONENT, ACTIONS.MULTI_TOGGLE, {
       ctype: ctype,

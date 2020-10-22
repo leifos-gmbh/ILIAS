@@ -4,6 +4,7 @@ const ACTIONS = {
 
   // query actions (being sent to the server to "ask for stuff")
   UI_ALL: "ui.all",
+  EDIT_FORM: "component.edit.form",
 
   // command actions (being sent to the server to "change things")
   CREATE_LEGACY: "create.legacy", // calls a legacy creation form for a page component
@@ -16,6 +17,7 @@ const ACTIONS = {
   DELETE: "delete",   // delete content
   ACTIVATE: "activate",   // activate content
   INSERT: "insert",   // generic insert component (after showing the generic insert form)
+  UPDATE: "update",   // generic insert component (after showing the generic insert form)
 
   // editor actions (things happening in the editor client side)
   DND_DRAG: "dnd.drag",           // start dragging
@@ -25,6 +27,8 @@ const ACTIONS = {
   COMPONENT_SWITCH: "component.switch",         // hit other component of same type while editing
   COMPONENT_CANCEL: "component.cancel",         // components cancel button is pressed
   COMPONENT_SAVE: "component.save",         // components save button is pressed (standard creation form)
+  COMPONENT_UPDATE: "component.update",         // components save button is pressed (editing form)
+  COMPONENT_SETTINGS: "component.settings",         // routes to legacy settings -> edit.legacy
   MULTI_TOGGLE: "multi.toggle",   // toggle an element for multi selection
   MULTI_ACTION: "multi.action",   // perform multi action
   MULTI_PASTE: "multi.paste",   // paste multi items

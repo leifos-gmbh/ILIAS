@@ -33,4 +33,11 @@ class ilPCParagraphEditorGUI implements \ILIAS\COPage\Editor\Components\PageComp
         ];
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function getEditComponentForm(\ILIAS\COPage\Editor\Server\UIWrapper $ui_wrapper, string $page_type, \ilPageObjectGUI $page_gui, int $style_id, $pcid): string {
+        return "";
+    }
+
 }

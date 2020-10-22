@@ -292,12 +292,12 @@
 			<xsl:if test="(./MediaObject/MediaAliasItem[@Purpose = 'Standard']/Layout/@HorizontalAlign = 'RightFloat') or
 				(./Map/Layout/@HorizontalAlign = 'RightFloat') or
 				(./Table/@HorizontalAlign = 'RightFloat')">
-				<xsl:attribute name="style"><!--<xsl:if test="./Table/@Width">width:<xsl:value-of select="./Table/@Width"/>;</xsl:if>--> float:right; clear:both; background-color:#FFFFFF;</xsl:attribute>
+				<xsl:attribute name="style"><!--<xsl:if test="./Table/@Width">width:<xsl:value-of select="./Table/@Width"/>;</xsl:if>--> float:right; clear:both; position:relative; z-index:1;</xsl:attribute>
 			</xsl:if>
 			<xsl:if test="(./MediaObject/MediaAliasItem[@Purpose = 'Standard']/Layout/@HorizontalAlign = 'LeftFloat') or
 				(./Map/Layout/@HorizontalAlign = 'LeftFloat') or
 				(./Table/@HorizontalAlign = 'LeftFloat')">
-				<xsl:attribute name="style"><!--<xsl:if test="./Table/@Width">width:<xsl:value-of select="./Table/@Width"/>;</xsl:if>--> float:left; clear:both; background-color:#FFFFFF;</xsl:attribute>
+				<xsl:attribute name="style"><!--<xsl:if test="./Table/@Width">width:<xsl:value-of select="./Table/@Width"/>;</xsl:if>--> float:left; clear:both; position:relative; z-index:1;</xsl:attribute>
 			</xsl:if>
 			<div data-copg-ed-type="pc-area">
 				<xsl:if test="not(../../../@DataTable) or (../../../@DataTable = 'n')">

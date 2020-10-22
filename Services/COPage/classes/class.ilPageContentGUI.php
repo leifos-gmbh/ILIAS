@@ -186,7 +186,7 @@ class ilPageContentGUI
     /**
     * Get characteristics of current style
     */
-    protected function getCharacteristicsOfCurrentStyle($a_type)
+    public function getCharacteristicsOfCurrentStyle($a_type)
     {
         if ($this->getStyleId() > 0 &&
             ilObject::_lookupType($this->getStyleId()) == "sty") {

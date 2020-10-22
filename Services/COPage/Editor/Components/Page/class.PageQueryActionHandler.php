@@ -65,13 +65,13 @@ class PageQueryActionHandler implements Server\QueryActionHandler
      */
     public function handle($query) : Server\Response
     {
-        $action = explode(".", $query["action"]);
-        if ($action[0] === "ui") {
-            switch ($action[1]) {
-                case "all":
-                    return $this->allCommand();
-                    break;
-            }
+        switch ($query["action"]) {
+            case "ui.all":
+                return $this->allCommand();
+                break;
+            case "component.edit.form":
+                return $this->componentEditFormResponse($query);
+                break;
         }
         throw new Exception("Unknown action " . $query["action"]);
     }
@@ -466,6 +466,25 @@ class PageQueryActionHandler implements Server\QueryActionHandler
         return $this->page_gui->getPageObject()->getPCModel();
     }
 
+    /**
+     * @param array $query
+     * @return Server\Response
+     */
+    protected function componentEditFormResponse($query): Server\Response {
+        $pc_edit = \ilCOPagePCDef::getPCEditorInstanceByName($query["cname"]);
+        $form = "";
+        if (!is_null($pc_edit)) {
+            $form = $pc_edit->getEditComponentForm(
+                $this->ui_wrapper,
+                $this->page_gui->getPageObject()->getParentType(),
+                $this->page_gui,
+                $this->page_gui->getStyleId(),
+                $query["pcid"]);
+        }
+        $o = new \stdClass();
+        $o->editForm = $form;
+        return new Server\Response($o);
+    }
 
     /**
      * Get components ui elements

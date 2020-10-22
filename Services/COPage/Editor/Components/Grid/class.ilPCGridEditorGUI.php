@@ -24,13 +24,20 @@ class ilPCGridEditorGUI implements \ILIAS\COPage\Editor\Components\PageComponent
     /**
      * @inheritDoc
      */
-    function getEditorElements(\ILIAS\COPage\Editor\Server\UIWrapper $ui_wrapper, string $page_type, ilPageObjectGUI $page_gui, int $style_id): array {
+    public function getEditorElements(\ILIAS\COPage\Editor\Server\UIWrapper $ui_wrapper, string $page_type, ilPageObjectGUI $page_gui, int $style_id): array {
 
         $form = $this->getCreationForm($page_gui, $ui_wrapper);
 
         return [
             "creation_form" => $form
         ];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getEditComponentForm(\ILIAS\COPage\Editor\Server\UIWrapper $ui_wrapper, string $page_type, \ilPageObjectGUI $page_gui, int $style_id, $pcid): string {
+        return "";
     }
 
     /**

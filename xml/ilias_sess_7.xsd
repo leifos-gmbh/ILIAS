@@ -33,6 +33,7 @@
 			<element ref='t:Fulltime' minOccurs='1' maxOccurs='1'/>
 			<element ref='t:MailMembers' minOccurs='1' maxOccurs='1'/>
 			<element ref='t:ShowMembers' minOccurs='1' maxOccurs='1'/>
+			<element ref='t:ShowCannotPart' minOccurs='1' maxOccurs='1'/>
 		</sequence>
 		</complexType>
 	</element>
@@ -58,6 +59,7 @@
 	<element name='Fulltime' type='t:Data' />
 	<element name='MailMembers' type='t:Data' />
 	<element name='ShowMembers' type='t:Data' />
+	<element name='ShowCannotPart' type='t:Data' />
 
 	<!-- SessItem -->
 	<element name='SessItem'>

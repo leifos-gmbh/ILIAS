@@ -45,6 +45,11 @@ class ilObjSession extends ilObject
     protected $show_members = false;
 
     /**
+     * @var bool
+     */
+    protected $show_cannot_participate_option = true;
+
+    /**
      * @var int
      */
     protected $mail_members = self::MAIL_ALLOWED_ADMIN;
@@ -439,6 +444,19 @@ class ilObjSession extends ilObject
     {
         return $this->reg_type != ilMembershipRegistrationSettings::TYPE_NONE;
     }
+
+    public function isCannotParticipateOptionEnabled() : bool
+    {
+        return $this->show_cannot_participate_option;
+    }
+
+    /**
+     * @param bool $status
+     */
+    public function enableCannotParticipateOption(bool $status) : void
+    {
+        $this->show_cannot_participate_option = $status;
+    }
     
     /**
      * get appointments
@@ -606,7 +624,7 @@ class ilObjSession extends ilObject
             )
         );
 
-        // @var
+        // @var ilObjSession $new_obj
         $new_obj->setLocation($this->getLocation());
         $new_obj->setName($this->getName());
         $new_obj->setPhone($this->getPhone());
@@ -624,6 +642,7 @@ class ilObjSession extends ilObject
 
         $new_obj->setRegistrationNotificationEnabled($this->isRegistrationNotificationEnabled());
         $new_obj->setRegistrationNotificationOption($this->getRegistrationNotificationOption());
+        $new_obj->enableCannotParticipateOption($this->isCannotParticipateOptionEnabled());
 
         $new_obj->update(true);
         
@@ -679,7 +698,7 @@ class ilObjSession extends ilObject
         $next_id = $ilDB->nextId('event');
         $query = "INSERT INTO event (event_id,obj_id,location,tutor_name,tutor_phone,tutor_email,details,registration, " .
             'reg_type, reg_limit_users, reg_limited, reg_waiting_list, reg_min_users, reg_auto_wait,show_members,mail_members,
-			reg_notification, notification_opt) ' .
+			reg_notification, notification_opt, show_cannot_part) ' .
             "VALUES( " .
             $ilDB->quote($next_id, 'integer') . ", " .
             $this->db->quote($this->getId(), 'integer') . ", " .
@@ -698,7 +717,8 @@ class ilObjSession extends ilObject
             $this->db->quote($this->getShowMembers(), 'integer') . ', ' .
             $this->db->quote($this->getMailToMembersType(), 'integer') . ',' .
             $this->db->quote($this->isRegistrationNotificationEnabled(), 'integer') . ', ' .
-            $this->db->quote($this->getRegistrationNotificationOption(), 'text') .
+            $this->db->quote($this->getRegistrationNotificationOption(), 'text') . ', ' .
+            $this->db->quote($this->isCannotParticipateOptionEnabled(), ilDBConstants::T_INTEGER) . ' ' .
             ")";
         $res = $ilDB->manipulate($query);
         $this->event_id = $next_id;
@@ -754,7 +774,8 @@ class ilObjSession extends ilObject
             'mail_members = ' . $this->db->quote($this->getMailToMembersType(), 'integer') . ', ' .
             "reg_auto_wait = " . $this->db->quote($this->hasWaitingListAutoFill(), 'integer') . ", " .
             "reg_notification = " . $this->db->quote($this->isRegistrationNotificationEnabled(), 'integer') . ", " .
-            "notification_opt = " . $this->db->quote($this->getRegistrationNotificationOption(), 'text') . " " .
+            "notification_opt = " . $this->db->quote($this->getRegistrationNotificationOption(), 'text') . ", " .
+            'show_cannot_part = ' . $this->db->quote($this->isCannotParticipateOptionEnabled(), ilDBConstants::T_INTEGER) . ' ' .
             "WHERE obj_id = " . $this->db->quote($this->getId(), 'integer') . " ";
         $res = $ilDB->manipulate($query);
         
@@ -850,6 +871,7 @@ class ilObjSession extends ilObject
             $this->setMailToMembersType((int) $row->mail_members);
             $this->setRegistrationNotificationEnabled($row->reg_notification);
             $this->setRegistrationNotificationOption($row->notification_opt);
+            $this->enableCannotParticipateOption((bool) $row->show_cannot_part);
             $this->event_id = $row->event_id;
         }
 

@@ -65,6 +65,6 @@ class ilSkillProfileUserTableGUI extends ilTable2GUI
         $this->tpl->setVariable("TYPE", $a_set["type"]);
         $this->tpl->setVariable("NAME", $a_set["name"]);
         $this->tpl->setVariable("ID", $a_set["id"]);
-        $this->tpl->setVariable("OBJECT", $a_set["object"]);
+        $this->tpl->setVariable("OBJECT", $a_set["object_title"]);
     }
 }

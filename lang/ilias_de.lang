@@ -12461,6 +12461,8 @@ crs#:#crs_mem_tbl_header#:#Kursteilnehmer
 grp#:#grp_mem_tbl_header#:#Gruppenteilnehmer
 mmbr#:#mmbr_selected_users#:#Ausgewählte Teilnehmer
 mmbr#:#mmbr_btn_mail_selected_users#:#Mail verschicken
+sess#:#sess_reg_cannot_participate#:#Teilnahme absagen
+sess#:#sess_reg_cannot_participate_info#:#Benutzer haben auf der "Info-Seite" die Möglichkeit, ihre Teilnahme abzusagen.
 sess#:#sess_participation_refused_info#:#Ihre Teilnahme an dieser Sitzung wurde abgesagt.
 sess#:#sess_bt_refuse#:#Teilnahme absagen
 sess#:#sess_part_table_excused#:#Abgesagt

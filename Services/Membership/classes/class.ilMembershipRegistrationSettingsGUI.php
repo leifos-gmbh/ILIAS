@@ -109,6 +109,14 @@ abstract class ilMembershipRegistrationSettingsGUI
             $opt_req->addSubItem($cannot_participate);
 
         }
+        if (in_array(ilMembershipRegistrationSettings::TYPE_TUTOR, $this->getOptions())) {
+            $opt_tutor = new ilRadioOption(
+                $this->txt('reg_tutor'),
+                ilMembershipRegistrationSettings::TYPE_TUTOR,
+                $this->txt('reg_tutor_info')
+            );
+            $reg_type->addOption($opt_tutor);
+        }
         if (in_array(ilMembershipRegistrationSettings::TYPE_NONE, $this->getOptions())) {
             $opt_deact = new ilRadioOption($this->txt('reg_disabled'), ilMembershipRegistrationSettings::TYPE_NONE, $this->txt('reg_disabled_info'));
             $reg_type->addOption($opt_deact);

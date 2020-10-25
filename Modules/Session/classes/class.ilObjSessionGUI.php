@@ -538,11 +538,11 @@ class ilObjSessionGUI extends ilObjectGUI implements ilDesktopItemHandling
 
             $ilToolbar = $DIC['ilToolbar'];
         }
-        
-        if (!$this->getCurrentObject()->enabledRegistration() || $ilUser->isAnonymous()) {
+
+        if (!$this->getCurrentObject()->enabledRegistrationForUsers() || $ilUser->isAnonymous()) {
             return false;
         }
-        
+
         include_once './Modules/Session/classes/class.ilSessionWaitingList.php';
         
         include_once './Services/Membership/classes/class.ilParticipants.php';
@@ -563,13 +563,19 @@ class ilObjSessionGUI extends ilObjectGUI implements ilDesktopItemHandling
 
 
         if (ilEventParticipants::_isRegistered($ilUser->getId(), $this->getCurrentObject()->getId())) {
-            $ilToolbar->addButtonInstance($btn_excused);
+            if (!is_null($btn_excused)) {
+                $ilToolbar->addButtonInstance($btn_excused);
+            }
             return true;
-        } elseif ($part->isSubscriber($ilUser->getId()) && !is_null($btn_excused)) {
-            $ilToolbar->addButtonInstance($btn_excused);
+        } elseif ($part->isSubscriber($ilUser->getId())) {
+            if (!is_null($btn_excused)) {
+                $ilToolbar->addButtonInstance($btn_excused);
+            }
             return true;
-        } elseif (ilSessionWaitingList::_isOnList($ilUser->getId(), $this->getCurrentObject()->getId()) && !is_null($btn_excused)) {
-            $ilToolbar->addButtonInstance($btn_excused);
+        } elseif (ilSessionWaitingList::_isOnList($ilUser->getId(), $this->getCurrentObject()->getId())) {
+            if (!is_null($btn_excused)) {
+                $ilToolbar->addButtonInstance($btn_excused);
+            }
             return true;
         }
 
@@ -602,7 +608,6 @@ class ilObjSessionGUI extends ilObjectGUI implements ilDesktopItemHandling
                 if (!$event_part->isExcused($ilUser->getId()) && !is_null($btn_excused)) {
                     $ilToolbar->addButtonInstance($btn_excused);
                 }
-
                 return true;
             }
         }
@@ -1711,6 +1716,7 @@ class ilObjSessionGUI extends ilObjectGUI implements ilDesktopItemHandling
             array(
                     ilMembershipRegistrationSettings::TYPE_DIRECT,
                     ilMembershipRegistrationSettings::TYPE_REQUEST,
+                    ilMembershipRegistrationSettings::TYPE_TUTOR,
                     ilMembershipRegistrationSettings::TYPE_NONE,
                     ilMembershipRegistrationSettings::REGISTRATION_LIMITED_USERS
                 )

@@ -445,6 +445,16 @@ class ilObjSession extends ilObject
         return $this->reg_type != ilMembershipRegistrationSettings::TYPE_NONE;
     }
 
+    /**
+     * @return bool
+     */
+    public function enabledRegistrationForUsers() : bool
+    {
+        return
+            $this->reg_type != ilMembershipRegistrationSettings::TYPE_NONE &&
+            $this->reg_type != ilMembershipRegistrationSettings::TYPE_TUTOR;
+    }
+
     public function isCannotParticipateOptionEnabled() : bool
     {
         return $this->show_cannot_participate_option;
@@ -707,7 +717,7 @@ class ilObjSession extends ilObject
             $this->db->quote($this->getPhone(), 'text') . ", " .
             $this->db->quote($this->getEmail(), 'text') . ", " .
             $this->db->quote($this->getDetails(), 'text') . "," .
-            $this->db->quote($this->enabledRegistration(), 'integer') . ", " .
+            $this->db->quote($this->enabledRegistrationForUsers(), 'integer') . ", " .
             $this->db->quote($this->getRegistrationType(), 'integer') . ', ' .
             $this->db->quote($this->getRegistrationMaxUsers(), 'integer') . ', ' .
             $this->db->quote($this->isRegistrationUserLimitEnabled(), 'integer') . ', ' .
@@ -763,7 +773,7 @@ class ilObjSession extends ilObject
             "tutor_phone = " . $this->db->quote($this->getPhone(), 'text') . ", " .
             "tutor_email = " . $this->db->quote($this->getEmail(), 'text') . ", " .
             "details = " . $this->db->quote($this->getDetails(), 'text') . ", " .
-            "registration = " . $this->db->quote($this->enabledRegistration(), 'integer') . ", " .
+            "registration = " . $this->db->quote($this->enabledRegistrationForUsers(), 'integer') . ", " .
             "reg_type = " . $this->db->quote($this->getRegistrationType(), 'integer') . ", " .
             "reg_limited = " . $this->db->quote($this->isRegistrationUserLimitEnabled(), 'integer') . ", " .
             "reg_limit_users = " . $this->db->quote($this->getRegistrationMaxUsers(), 'integer') . ", " .
@@ -978,7 +988,7 @@ class ilObjSession extends ilObject
                 continue;
             }
             
-            if ($this->enabledRegistration()) {
+            if ($this->enabledRegistrationForUsers()) {
                 $this->session_logger->debug('Registration enabled: register user');
                 $parts->register($user_id);
                 $parts->sendNotification(

@@ -95,6 +95,8 @@ class ilDidacticTemplateImport
     {
         global $DIC;
 
+        $icon = '';
+
         $ilSetting = $DIC['ilSetting'];
         include_once './Services/DidacticTemplate/classes/class.ilDidacticTemplateSetting.php';
         $setting = new ilDidacticTemplateSetting();
@@ -108,6 +110,8 @@ class ilDidacticTemplateImport
             }
             $setting->setTitle(trim((string) $tpl->title));
             $setting->setDescription(trim((string) $tpl->description));
+
+            $icon = (string) $tpl->icon;
 
             $info = '';
             foreach ((array) $tpl->info->p as $paragraph) {
@@ -136,6 +140,10 @@ class ilDidacticTemplateImport
             }
         }
         $setting->save();
+
+        if (strlen($icon)) {
+            $setting->getIconHandler()->writeSvg($icon);
+        }
 
         include_once("./Services/Multilingualism/classes/class.ilMultilingualism.php");
         $trans = ilMultilingualism::getInstance($setting->getId(), "dtpl");

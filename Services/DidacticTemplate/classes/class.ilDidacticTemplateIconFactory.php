@@ -82,14 +82,15 @@ class ilDidacticTemplateIconFactory
         if (!$assigned_template) {
             return '';
         }
-        return $this->getIconPathForTemplate($assigned_template);
+        $path = $this->getIconPathForTemplate($assigned_template);
+        return $path;
     }
 
     /**
      * @param int $template_id
      * @return string
      */
-    protected function getIconPathforTemplate(int $template_id) : string
+    protected function getIconPathForTemplate(int $template_id) : string
     {
         foreach ($this->settings->getTemplates() as $template) {
             if ($template->getId() == $template_id) {

@@ -109,6 +109,7 @@ class ilDidacticTemplateIconFactory
                 return (int) $tpl_id;
             }
         }
+        return 0;
     }
 
     /**

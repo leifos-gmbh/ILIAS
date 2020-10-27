@@ -54,7 +54,7 @@ class ilDidacticTemplateIconHandler
     /**
      * @param FileUpload $upload
      */
-    public function handleUpload(FileUpload $upload)
+    public function handleUpload(FileUpload $upload, string $tmpname)
     {
         if ($upload->hasUploads() && !$upload->hasBeenProcessed()) {
             try {
@@ -64,9 +64,8 @@ class ilDidacticTemplateIconHandler
             }
         }
         $this->initWebDir();
-        $result = array_values($upload->getResults())[0];
+        $result = isset($upload->getResults()[$tmpname]) ? $upload->getResults()[$tmpname] : false;
         if ($result instanceof UploadResult && $result->isOK() && $result->getSize()) {
-            $this->logger->info('Deleting file');
             $this->delete();
             $upload->moveOneFileTo(
                 $result,

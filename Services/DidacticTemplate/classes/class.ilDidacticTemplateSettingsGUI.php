@@ -147,9 +147,9 @@ class ilDidacticTemplateSettingsGUI
     {
         global $DIC;
 
-        $ilTabs = $DIC['ilTabs'];
-        $ilCtrl = $DIC['ilCtrl'];
-        
+        $ilTabs = $DIC->tabs();
+        $ilCtrl = $DIC->ctrl();
+
         if (isset($_REQUEST["tplid"])) {
             $this->setEditTabs('import');
         } else {
@@ -188,6 +188,11 @@ class ilDidacticTemplateSettingsGUI
         $file->setSuffixes(array('xml'));
         $file->setRequired(true);
         $form->addItem($file);
+
+        $icon = new ilImageFileInputGUI($this->lng->txt('icon'), 'icon');
+        $icon->setAllowDeletion(false);
+        $icon->setSuffixes(false);
+        $form->addItem($icon);
 
         $created = true;
 
@@ -229,8 +234,6 @@ class ilDidacticTemplateSettingsGUI
         }
 
         // Do import
-        include_once './Services/DidacticTemplate/classes/class.ilDidacticTemplateImport.php';
-        
         $import = new ilDidacticTemplateImport(ilDidacticTemplateImport::IMPORT_FILE);
 
         $file = $form->getInput('file');
@@ -246,9 +249,10 @@ class ilDidacticTemplateSettingsGUI
 
         try {
             $settings = $import->import();
-
             if ($edit) {
                 $this->editImport($settings);
+            } else {
+                $settings->getIconHandler()->handleUpload($DIC->upload(), $_FILES['icon']['tmp_name']);
             }
         } catch (ilDidacticTemplateImportException $e) {
             ilLoggerFactory::getLogger('otpl')->error('Import failed with message: ' . $e->getMessage());
@@ -348,8 +352,7 @@ class ilDidacticTemplateSettingsGUI
             if ($upload->getDeletionFlag()) {
                 $temp->getIconHandler()->delete();
             }
-            $temp->getIconHandler()->handleUpload($DIC->upload());
-
+            $temp->getIconHandler()->handleUpload($DIC->upload(), $_FILES['icon']['tmp_name']);
             ilUtil::sendSuccess($this->lng->txt('settings_saved'), true);
             $ilCtrl->redirect($this, 'overview');
         }

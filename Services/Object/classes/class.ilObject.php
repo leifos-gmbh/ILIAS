@@ -2026,6 +2026,13 @@ class ilObject
                 $filename = $customIcon->getFullPath();
                 return $filename . '?tmp=' . filemtime($filename);
             }
+
+            $dtpl_icon_factory = ilDidacticTemplateIconFactory::getInstance();
+            $path = $dtpl_icon_factory->getIconPathForObject((int) $a_obj_id);
+            if ($path) {
+                return $path . '?tmp=' . filemtime($path);
+            }
+
         }
 
         if (!$a_offline) {

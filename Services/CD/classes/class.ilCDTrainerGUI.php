@@ -856,7 +856,7 @@ class ilCDTrainerGUI
 			$tgt_file = ilUtil::ilTempnam();
 
 			file_put_contents($src_file, $html);
-			ilUtil::execQuoted(PATH_TO_HTMLDOC, $src_file.' '.$tgt_file);		
+			ilUtil::execQuoted(PATH_TO_HTMLDOC, $src_file.' -f '.$tgt_file);
 			unlink($src_file);
 
 			if(file_exists($tgt_file))

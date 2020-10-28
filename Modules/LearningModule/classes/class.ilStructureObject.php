@@ -194,7 +194,7 @@ class ilStructureObject extends ilLMObject
         $ot = ilObjectTranslation::getInstance($a_lm_id);
         $languages = $ot->getLanguages();
 
-        if ($a_lang != "-" && $ot->getContentActivated() && isset($languages[$a_lang])) {
+        if ($a_lang != "-" && $ot->getContentActivated()) {
             include_once("./Modules/LearningModule/classes/class.ilLMObjTranslation.php");
             $lmobjtrans = new ilLMObjTranslation($a_st_id, $a_lang);
             $trans_title = "";

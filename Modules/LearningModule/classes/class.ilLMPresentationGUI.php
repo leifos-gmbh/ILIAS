@@ -132,7 +132,7 @@ class ilLMPresentationGUI
             $langs = $this->ot->getLanguages();
             if (isset($langs[$_GET["transl"]]) || $_GET["transl"] == $this->ot->getMasterLanguage()) {
                 $this->lang = $_GET["transl"];
-            } elseif (isset($langs[$ilUser->getCurrentLanguage()])) {
+            } else {
                 $this->lang = $ilUser->getCurrentLanguage();
             }
             if ($this->lang == $this->ot->getMasterLanguage()) {

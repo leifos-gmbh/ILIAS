@@ -264,6 +264,15 @@ class Container extends \Pimple\Container
         return new \ilObjectService($this->language(), $this->settings(), $this->filesystem(), $this->upload());
     }
 
+    /**
+     * @return \ilBookingManagerService
+     */
+    public function bookingManager()
+    {
+        return new \ilBookingManagerService();
+    }
+
+
 
     /**
      * Note: Only use isDependencyAvailable if strictly required. The need for this,

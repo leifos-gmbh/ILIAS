@@ -82,7 +82,7 @@ class ilBookingObjectGUI
         $this->pool_id = $a_parent_obj->object->getId();
         $this->pool_gui = $a_parent_obj;
         $this->pool_has_schedule =
-            ($a_parent_obj->object->getScheduleType() != ilObjBookingPool::TYPE_NO_SCHEDULE);
+			($a_parent_obj->object->getScheduleType() == ilObjBookingPool::TYPE_FIX_SCHEDULE);
         $this->pool_overall_limit = $this->pool_has_schedule
             ? null
             : $a_parent_obj->object->getOverallLimit();

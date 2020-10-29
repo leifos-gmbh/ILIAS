@@ -178,7 +178,7 @@ class ilBookingReservation
         }
         return false;
     }
-    
+
     /**
      * Set group id
      * @param	int	$a_group_id
@@ -203,7 +203,7 @@ class ilBookingReservation
     protected function read()
     {
         $ilDB = $this->db;
-        
+
         if ($this->id) {
             $set = $ilDB->query('SELECT *' .
                 ' FROM booking_reservation' .
@@ -232,7 +232,7 @@ class ilBookingReservation
         }
 
         $this->id = $ilDB->nextId('booking_reservation');
-        
+
         return $ilDB->manipulate('INSERT INTO booking_reservation' .
             ' (booking_reservation_id,user_id,assigner_id,object_id,date_from,date_to,status,group_id)' .
             ' VALUES (' . $ilDB->quote($this->id, 'integer') .
@@ -266,7 +266,7 @@ class ilBookingReservation
             ' AND status = '.$ilDB->quote(self::STATUS_IN_USE, 'integer'));
         }
         */
-        
+
         return $ilDB->manipulate('UPDATE booking_reservation' .
             ' SET object_id = ' . $ilDB->quote($this->getObjectId(), 'text') .
             ', user_id = ' . $ilDB->quote($this->getUserId(), 'integer') .
@@ -291,7 +291,7 @@ class ilBookingReservation
                 ' WHERE booking_reservation_id = ' . $ilDB->quote($this->id, 'integer'));
         }
     }
-    
+
     /**
      * Get next group id
      * @return int
@@ -301,7 +301,7 @@ class ilBookingReservation
         global $DIC;
 
         $ilDB = $DIC->database();
-        
+
         return $ilDB->nextId('booking_reservation_group');
     }
 
@@ -318,12 +318,12 @@ class ilBookingReservation
         global $DIC;
 
         $ilDB = $DIC->database();
-        
+
         $nr_map = ilBookingObject::getNrOfItemsForObjects($a_ids);
-        
+
         $from = $ilDB->quote($a_from, 'integer');
         $to = $ilDB->quote($a_to, 'integer');
-        
+
         $set = $ilDB->query('SELECT count(*) cnt, object_id' .
             ' FROM booking_reservation' .
             ' WHERE ' . $ilDB->in('object_id', $a_ids, '', 'integer') .
@@ -340,7 +340,7 @@ class ilBookingReservation
                 $counter[$row['object_id']] = (int) $nr_map[$row['object_id']] - (int) $row['cnt'];
             }
         }
-        
+
         // #17868 - validate against schedule availability
         foreach ($a_ids as $obj_id) {
             $bobj = new ilBookingObject($obj_id);
@@ -354,7 +354,7 @@ class ilBookingReservation
                 $av_to = ($schedule->getAvailabilityTo() && !$schedule->getAvailabilityTo()->isNull())
                     ? strtotime($schedule->getAvailabilityTo()->get(IL_CAL_DATE) . " 23:59:59")
                     : null;
-                
+
                 if (($av_from && $a_from < $av_from) ||
                     ($av_to && $a_to > $av_to)) {
                     $blocked[] = $obj_id;
@@ -362,7 +362,7 @@ class ilBookingReservation
                 }
             }
         }
-        
+
         $available = array_diff($a_ids, $blocked);
         if (sizeof($available)) {
             if ($a_return_counter) {
@@ -379,27 +379,27 @@ class ilBookingReservation
             }
         }
     }
-    
+
     public static function isObjectAvailableInPeriod($a_obj_id, ilBookingSchedule $a_schedule, $a_from, $a_to)
     {
         global $DIC;
 
         $ilDB = $DIC->database();
-            
+
         if (!$a_from) {
             $a_from = time();
         }
         if (!$a_to) {
             $a_to = strtotime("+1year", $a_from);
         }
-        
+
         if ($a_from > $a_to) {
             return;
         }
-        
+
         $from = $ilDB->quote($a_from, 'integer');
         $to = $ilDB->quote($a_to, 'integer');
-        
+
         // all bookings in period
         $now = time();
         $set = $ilDB->query('SELECT count(*) cnt' .
@@ -412,10 +412,10 @@ class ilBookingReservation
             ' OR (date_from >= ' . $from . ' AND date_to <= ' . $to . '))');
         $row = $ilDB->fetchAssoc($set);
         $booked_in_period = $row["cnt"];
-        
+
         $per_slot = ilBookingObject::getNrOfItemsForObjects(array($a_obj_id));
         $per_slot = $per_slot[$a_obj_id];
-                
+
         // max available nr of items per (week)day
         $schedule_slots = array();
         $definition = $a_schedule->getDefinition();
@@ -423,14 +423,14 @@ class ilBookingReservation
         foreach ($definition as $day => $day_slots) {
             $schedule_slots[$map[$day]] = $day_slots;
         }
-        
+
         $av_from = ($a_schedule->getAvailabilityFrom() && !$a_schedule->getAvailabilityFrom()->isNull())
             ? $a_schedule->getAvailabilityFrom()->get(IL_CAL_UNIX)
             : null;
         $av_to = ($a_schedule->getAvailabilityTo() && !$a_schedule->getAvailabilityTo()->isNull())
             ? strtotime($a_schedule->getAvailabilityTo()->get(IL_CAL_DATE) . " 23:59:59")
             : null;
-        
+
         // sum up max available items in period per (week)day
         $available_in_period = 0;
         $loop = 0;
@@ -453,7 +453,7 @@ class ilBookingReservation
                     }
                 }
             }
-            
+
             $a_from += (60 * 60 * 24);
         }
 
@@ -508,7 +508,7 @@ class ilBookingReservation
 
         return $res;
     }
-    
+
     public static function isObjectAvailableNoSchedule($a_obj_id)
     {
         $available = self::getNumAvailablesNoSchedule($a_obj_id);
@@ -564,13 +564,13 @@ class ilBookingReservation
         $row = $ilDB->fetchAssoc($set);
         return $row;
     }
-    
+
     public static function getObjectReservationForUser($a_object_id, $a_user_id, $a_multi = false)
     {
         global $DIC;
 
         $ilDB = $DIC->database();
-        
+
         $set = $ilDB->query('SELECT booking_reservation_id FROM booking_reservation' .
             ' WHERE user_id = ' . $ilDB->quote($a_user_id, 'integer') .
             ' AND object_id = ' . $ilDB->quote($a_object_id, 'integer') .
@@ -596,7 +596,7 @@ class ilBookingReservation
      * @param	array	$a_offset
      * @return	array
      */
-    public static function getList($a_object_ids, $a_limit = 10, $a_offset = 0, array $filter)
+    public static function getList($a_object_ids, $a_limit = 10, $a_offset = 0, array $filter = [])
     {
         global $DIC;
 

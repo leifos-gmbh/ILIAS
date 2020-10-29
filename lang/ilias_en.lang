@@ -59,10 +59,6 @@ book#:#book_pref_overview#:#Overview
 book#:#book_pref_book_cron#:#Booking with Preferences
 book#:#book_pref_book_cron_info#:#Automatically book pools using preferences after the deadline
 book#:#book_no_preferences_for_you#:#No preferences have been stored for you.
-crs#:#timings_cron_reminder_freshly_start#:#Der Bearbeitungszeitraum hat begonnen bei:
-crs#:#timings_cron_reminder_started_subject#:#Der Bearbeitungszeitraum hat begonnen
-crs#:#timings_cron_reminder_exceeded_subject#:#Sie haben den Bearbeitungszeitraum überschritten
-crs#:#timings_cron_reminder_exceeded_start#:#Der Bearbeitungszeitraum ist überfällig bei:
 crs#:#timings_reminder_notifications#:#Course Timings Notifications
 crs#:#timings_reminder_notifications_info#:#If enabled, course participants will be notified about exceeded timing materials.
 meta#:#meta_oer_harvester#:#OER Harvester

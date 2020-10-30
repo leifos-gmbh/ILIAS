@@ -1002,7 +1002,7 @@ class ilObjCourseGUI extends ilContainerGUI
             $this->object->getId(),
             $form,
             array(
-                ilObjectServiceSettingsGUI::CALENDAR_VISIBILITY,
+                ilObjectServiceSettingsGUI::CALENDAR_CONFIGURATION,
                 ilObjectServiceSettingsGUI::USE_NEWS,
                 ilObjectServiceSettingsGUI::AUTO_RATING_NEW_OBJECTS,
                 ilObjectServiceSettingsGUI::TAG_CLOUD,
@@ -1475,7 +1475,7 @@ class ilObjCourseGUI extends ilContainerGUI
             $this->object->getId(),
             $form,
             array(
-                    ilObjectServiceSettingsGUI::CALENDAR_VISIBILITY,
+                    ilObjectServiceSettingsGUI::CALENDAR_CONFIGURATION,
                     ilObjectServiceSettingsGUI::USE_NEWS,
                     ilObjectServiceSettingsGUI::AUTO_RATING_NEW_OBJECTS,
                     ilObjectServiceSettingsGUI::TAG_CLOUD,
@@ -2521,7 +2521,7 @@ class ilObjCourseGUI extends ilContainerGUI
                     $this,
                     $this->object->getId(),
                     array(
-                            ilObjectServiceSettingsGUI::CALENDAR_VISIBILITY
+                            ilObjectServiceSettingsGUI::CALENDAR_CONFIGURATION
                         )
                 );
                 $this->ctrl->forwardCommand($service);

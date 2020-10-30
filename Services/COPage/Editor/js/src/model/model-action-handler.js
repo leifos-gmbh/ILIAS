@@ -2,6 +2,7 @@
 
 import PageModelActionHandler from "../components/page/model/page-model-action-handler.js";
 import ParagraphModelActionHandler from "../components/paragraph/model/paragraph-model-action-handler.js";
+import TableModelActionHandler from "../components/table/model/table-model-action-handler.js";
 
 /**
  * Model action handler
@@ -9,9 +10,14 @@ import ParagraphModelActionHandler from "../components/paragraph/model/paragraph
 export default class ModelActionHandler {
 
   /**
-   * {Model}
+   * {PageModel}
    */
   model;
+
+  /**
+   * {PageModelActionHandler}
+   */
+  pageModelHandler;
 
   /**
    *
@@ -24,6 +30,10 @@ export default class ModelActionHandler {
     );
     this.paragraphModelHandler = new ParagraphModelActionHandler(
       model.model("page")
+    );
+    this.tableModelHandler = new TableModelActionHandler(
+      model.model("page"),
+      model.model("table")
     );
   }
 
@@ -41,5 +51,6 @@ export default class ModelActionHandler {
   handle(action) {
     this.pageModelHandler.handle(action);
     this.paragraphModelHandler.handle(action);
+    this.tableModelHandler.handle(action);
   }
 }

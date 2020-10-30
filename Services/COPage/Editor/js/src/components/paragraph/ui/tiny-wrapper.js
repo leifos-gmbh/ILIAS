@@ -26,7 +26,7 @@ export default class TinyWrapper {
   /**
    * @type {number}
    */
-  minwidth = 50;
+  minwidth = 200;
 
   /**
    * @type {number}
@@ -71,6 +71,11 @@ export default class TinyWrapper {
   splitOnReturnCallback = null;
 
   /**
+   * @type {boolean}
+   */
+  dataTableMode = false;
+
+  /**
    * @type {Object}
    */
   text_formats = {
@@ -94,7 +99,26 @@ export default class TinyWrapper {
     this.splitOnReturnCallback = splitOnReturnCallback;
   }
 
+  /**
+   *
+   * @param {boolean} mode
+   */
+  setDataTableMode(mode) {
+    this.dataTableMode = mode;
+    if (mode) {
+      this.splitOnReturn = false;
+    }
+  }
+
+  /**
+   * @return {boolean}
+   */
+  getDataTableMode() {
+    return this.dataTableMode;
+  }
+
   setContentCss(content_css) {
+    console.log("### tiny set content css:" + content_css);
     this.content_css = content_css;
   }
 
@@ -109,6 +133,7 @@ export default class TinyWrapper {
 
 
   getConfig(after_init, after_keyup, previous, next) {
+    console.log("*** getting config " + this.content_css);
     if (!this.config) {
       this.config = {
         /* part of 4 */
@@ -382,12 +407,10 @@ export default class TinyWrapper {
     if (!this.tiny) {
       this.createTextAreaForTiny();
       this.lib.init(this.getConfig(() => {
-              this.initContent(text, characteristic);
               after_init();
       }, after_keyup, previous, next));
     } else {
       this.showAfter(content_element);
-      this.initContent(text, characteristic);
       after_init();
     }
   }
@@ -408,7 +431,9 @@ export default class TinyWrapper {
 
   hide() {
     const tdiv = document.getElementById("tinytarget_div");
-    tdiv.style.display = "none";
+    if (tdiv) {
+      tdiv.style.display = "none";
+    }
   }
 
   showAfter(content_element) {
@@ -457,40 +482,44 @@ export default class TinyWrapper {
     if (this.ghost) {
       let cl = ed.dom.getRoot().className;
       let c = html.p2br(ed.getContent());
-      if (this.current_td === "") {
-        cl = "copg-input-ghost " + cl;
-        console.log(cl);
-        const cl_arr = cl.split("_");
-        const characteristic = cl_arr[cl_arr.length - 1];
-        switch (characteristic) {
-          case "Headline1":
-            tag = "h1";
-            break;
-          case "Headline2":
-            tag = "h2";
-            break;
-          case "Headline3":
-            tag = "h3";
-            break;
-          default:
-            tag = "div";
-            break;
-        }
 
-        if (add_final_spacer) {
-          c = c + "<br />.";
-        }
-
-        c = "<div class='ilEditLabel'>" + il.Language.txt("cont_ed_par") +
-          " (" + characteristic + ")</div><" + tag + " style='position:static;' class='" + cl + "'>" + c + "</" + tag + ">";
-      } else {
-        this.tds[this.current_td] =
-          this.getContentForSaving();
+      cl = "copg-input-ghost " + cl;
+      console.log(cl);
+      const cl_arr = cl.split("_");
+      const characteristic = cl_arr[cl_arr.length - 1];
+      switch (characteristic) {
+        case "Headline1":
+          tag = "h1";
+          break;
+        case "Headline2":
+          tag = "h2";
+          break;
+        case "Headline3":
+          tag = "h3";
+          break;
+        default:
+          tag = "div";
+          break;
       }
 
+      if (add_final_spacer) {
+        c = c + "<br />.";
+      }
+
+      let label = "";
+      if (!this.getDataTableMode()) {
+        label = "<div class='ilEditLabel'>" + il.Language.txt("cont_ed_par") +
+          " (" + characteristic + ")</div>";
+      }
+
+      c = label + "<" + tag + " style='position:static;' class='" + cl + "'>" + c + "</" + tag + ">";
+
       // we remove the first child div content div (edit label)
-      this.ghost.querySelector("div").remove();
-      this.ghost.querySelector("div, h1, h2, h3").remove();
+      this.ghost.querySelector("div").remove();             // edit label in case of paragraph, content div in case of td
+      const div2 = this.ghost.querySelector("div, h1, h2, h3");     // content element in case of paragraph
+      if (div2) {
+        div2.remove();
+      }
 
       console.log("replacing with: " + c);
 

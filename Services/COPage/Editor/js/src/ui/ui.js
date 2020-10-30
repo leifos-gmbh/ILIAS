@@ -3,6 +3,7 @@
 import PageUI from '../components/page/ui/page-ui.js';
 import ParagraphUI from '../components/paragraph/ui/paragraph-ui.js';
 import MediaUI from '../components/media/ui/media-ui.js';
+import TableUI from '../components/table/ui/table-ui.js';
 import AutoSave from '../components/paragraph/ui/auto-save.js';
 
 /**
@@ -104,9 +105,20 @@ export default class UI {
       this.toolSlate,
       this.pageModifer
     );
+    this.table = new TableUI(
+      this.client,
+      this.dispatcher,
+      this.actionFactory,
+      this.model.model("page"),
+      this.toolSlate,
+      this.pageModifer,
+      this.paragraph,
+      this.model.model("table"),
+    );
 
     this.page.addComponentUI("Paragraph", this.paragraph);
     this.page.addComponentUI("Media", this.media);
+    this.page.addComponentUI("Table", this.table);
     this.pageModifer.setPageUI(this.page);
   }
 
@@ -137,6 +149,7 @@ export default class UI {
       this.page.init(this.uiModel);
       this.paragraph.init(this.uiModel);
       this.media.init(this.uiModel);
+      this.table.init(this.uiModel);
     });
   }
 

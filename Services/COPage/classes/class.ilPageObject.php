@@ -796,7 +796,7 @@ abstract class ilPageObject
         }
         include_once("./Services/COPage/classes/class.ilCOPagePCDef.php");
         $node_name = $cont_node->node_name();
-        if ($node_name == "PageObject") {
+        if (in_array($node_name, ["PageObject", "TableRow"])) {
             return null;
         }
         if ($node_name == "PageContent") {
@@ -5201,9 +5201,11 @@ abstract class ilPageObject
         $model = [];
         foreach ($this->getAllPCIds() as $pc_id) {
             $co = $this->getContentObjectForPcId($pc_id);
-            $co_model = $co->getModel();
-            if ($co_model !== null) {
-                $model[$pc_id] = $co_model;
+            if ($co !== null) {
+                $co_model = $co->getModel();
+                if ($co_model !== null) {
+                    $model[$pc_id] = $co_model;
+                }
             }
         }
         return $model;

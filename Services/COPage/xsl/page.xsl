@@ -289,6 +289,7 @@
 	<xsl:if test="$mode = 'edit'">
 		<xsl:variable name="content_type" select="name(./*[1])"/>
 		<div>
+			<xsl:attribute name="id">pc<xsl:value-of select="@PCID"/></xsl:attribute>
 			<xsl:if test="(./MediaObject/MediaAliasItem[@Purpose = 'Standard']/Layout/@HorizontalAlign = 'RightFloat') or
 				(./Map/Layout/@HorizontalAlign = 'RightFloat') or
 				(./Table/@HorizontalAlign = 'RightFloat')">
@@ -316,7 +317,12 @@
 				<xsl:attribute name="id">CONTENT<xsl:value-of select="@HierId"/>:<xsl:value-of select="@PCID"/></xsl:attribute>
 				<xsl:attribute name="data-hierid"><xsl:value-of select="@HierId"/></xsl:attribute>
 				<xsl:attribute name="data-pcid"><xsl:value-of select="@PCID"/></xsl:attribute>
-				<xsl:attribute name="data-cname"><xsl:value-of select="$content_type"/></xsl:attribute>
+				<xsl:if test="not(./*[1][@DataTable])">
+					<xsl:attribute name="data-cname"><xsl:value-of select="$content_type"/></xsl:attribute>
+				</xsl:if>
+				<xsl:if test="./*[1][@DataTable]">
+					<xsl:attribute name="data-cname">DataTable</xsl:attribute>
+				</xsl:if>
 				<xsl:attribute name="data-characteristic"><xsl:value-of select="./*[1]/@Characteristic"/></xsl:attribute>
 				<xsl:apply-templates>
 					<xsl:with-param name="par_counter" select ="position()" />

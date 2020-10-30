@@ -3,6 +3,7 @@
 import PageUIActionHandler from '../components/page/ui/page-ui-action-handler.js';
 import ParagraphUIActionHandler from '../components/paragraph/ui/paragraph-ui-action-handler.js';
 import MediaUIActionHandler from '../components/media/ui/media-ui-action-handler.js';
+import TableUIActionHandler from '../components/table/ui/table-ui-action-handler.js';
 
 /**
  * UI action handler
@@ -45,6 +46,11 @@ export default class UIActionHandler {
   mediaActionHandler;
 
   /**
+   * @type {TableUIActionHandler}
+   */
+  tableActionHandler;
+
+  /**
    * @param {ActionFactory} actionFactory
    * @param {Client} client
    */
@@ -64,6 +70,10 @@ export default class UIActionHandler {
       this.actionFactory,
       this.client
     );
+    this.tableActionHandler = new TableUIActionHandler(
+      this.actionFactory,
+      this.client
+    );
   }
 
   /**
@@ -74,6 +84,7 @@ export default class UIActionHandler {
     this.pageActionHandler.setUI(this.ui.page);
     this.paragraphActionHandler.setUI(this.ui.paragraph);
     this.mediaActionHandler.setUI(this.ui.media);
+    this.tableActionHandler.setUI(this.ui.table);
   }
 
   /**
@@ -84,6 +95,7 @@ export default class UIActionHandler {
     this.pageActionHandler.setDispatcher(dispatcher);
     this.paragraphActionHandler.setDispatcher(dispatcher);
     this.mediaActionHandler.setDispatcher(dispatcher);
+    this.tableActionHandler.setDispatcher(dispatcher);
   }
 
   /**
@@ -94,5 +106,6 @@ export default class UIActionHandler {
     this.pageActionHandler.handle(action, model.model("page"));
     this.paragraphActionHandler.handle(action, model.model("page"));
     this.mediaActionHandler.handle(action, model.model("page"));
+    this.tableActionHandler.handle(action, model.model("page"), model.model("table"));
   }
 }

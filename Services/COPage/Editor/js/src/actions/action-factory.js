@@ -3,6 +3,7 @@
 import PageActionFactory from '../components/page/actions/page-action-factory.js';
 import ParagraphActionFactory from '../components/paragraph/actions/paragraph-action-factory.js';
 import MediaActionFactory from '../components/media/actions/media-action-factory.js';
+import TableActionFactory from '../components/table/actions/table-action-factory.js';
 import ClientActionFactory from '../client/actions/client-action-factory.js';
 import EditorActionFactory from './editor-action-factory.js';
 
@@ -47,6 +48,13 @@ export default class ActionFactory {
    */
   media() {
     return new MediaActionFactory(this.clientActionFactory, this.editorActionFactory);
+  }
+
+  /**
+   * @returns {TableActionFactory}
+   */
+  table() {
+    return new TableActionFactory(this.clientActionFactory, this.editorActionFactory);
   }
 
 }

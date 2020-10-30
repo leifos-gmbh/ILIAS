@@ -139,7 +139,7 @@ export default class PageUI {
 
       const uiModel = this.uiModel;
       let li, li_templ, ul;
-      area.innerHTML = this.droparea + uiModel.addDropdown;
+      area.innerHTML = this.droparea + uiModel.dropdown;
 
       const model = this.model;
 
@@ -579,7 +579,7 @@ export default class PageUI {
         this.model.addPCModelIfNotExists(key, value);
       }
 
-      il.IntLink.refresh();
+//      il.IntLink.refresh();           // missing
       this.reInit();
     }
   }

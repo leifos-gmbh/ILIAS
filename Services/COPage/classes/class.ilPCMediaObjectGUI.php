@@ -551,18 +551,6 @@ class ilPCMediaObjectGUI extends ilPageContentGUI
     }
 
     /**
-     * Redirect to parent
-     * @param string $hier_id
-     */
-    protected function redirectToParent($hier_id = "")
-    {
-        $ilCtrl = $this->ctrl;
-        $pcids = $this->pg_obj->getPCIdsForHierIds([$hier_id]);
-        $ret = $ilCtrl->getParentReturn($this)."#add".$pcids[$hier_id];
-        ilUtil::redirect($ret);
-    }
-
-    /**
     * create new media object in dom and update page in db
     */
     public function &create($a_create_alias = true, $a_change_obj_ref = false)

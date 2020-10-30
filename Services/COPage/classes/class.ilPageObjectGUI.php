@@ -1329,71 +1329,9 @@ class ilPageObjectGUI
 
             // get js files for JS enabled editing
             if ($sel_js_mode == "enable") {
-                include_once("./Services/YUI/classes/class.ilYuiUtil.php");
-                ilYuiUtil::initDragDrop();
-                ilYuiUtil::initConnection();
-                ilYuiUtil::initPanel(false);
-                $main_tpl->addJavaScript("./Services/COPage/js/ilcopagecallback.js");
-                //$main_tpl->addJavascript("Services/COPage/js/page_editing.js");
-                $main_tpl->addOnloadCode("il.copg.editor.init('".
-                    ILIAS_HTTP_PATH."/".$this->ctrl->getLinkTargetByClass(["ilPageEditorGUI", "ilPageEditorServerAdapterGUI"], "invokeServer")."','".
-                    $this->ctrl->getFormActionByClass("ilPageEditorGUI")
-                    ."');");
-
-                include_once("./Services/UIComponent/Modal/classes/class.ilModalGUI.php");
-                ilModalGUI::initJS();
-                $this->lng->toJS("cont_error");
-                $this->lng->toJS("cont_sel_el_cut_use_paste");
-                $this->lng->toJS("cont_sel_el_copied_use_paste");
-
-                include_once './Services/Style/Content/classes/class.ilObjStyleSheet.php';
-                $main_tpl->addOnloadCode("var preloader = new Image();
-						preloader.src = './templates/default/images/loader.svg';");
-                include_once("./Services/COPage/classes/class.ilPCParagraphGUI.php");
-
-                if (DEVMODE == 1) {
-                    $main_tpl->addJavascript("./node_modules/tinymce/tinymce.js");
-                } else {
-                    $main_tpl->addJavascript("./node_modules/tinymce/tinymce.min.js");
-                }
-                $tpl->touchBlock("init_dragging");
-
-                $cfg = $this->getPageConfig();
-/*                $tpl->setVariable(
-                    "IL_TINY_MENU",
-                    self::getTinyMenu(
-                        $this->getPageObject()->getParentType(),
-                        $cfg->getEnableInternalLinks(),
-                        $cfg->getEnableWikiLinks(),
-                        $cfg->getEnableKeywords(),
-                        $this->getStyleId(),
-                        true,
-                        true,
-                        $cfg->getEnableAnchors(),
-                        true,
-                        $cfg->getEnableUserLinks()
-                        )
-                    );*/
-                    
-                // add int link parts
-                include_once("./Services/Link/classes/class.ilInternalLinkGUI.php");
-                $tpl->setCurrentBlock("int_link_prep");
-                $tpl->setVariable("INT_LINK_PREP", ilInternalLinkGUI::getInitHTML(
-                    $this->ctrl->getLinkTargetByClass(
-                        array("ilpageeditorgui", "ilinternallinkgui"),
-                        "",
-                        false,
-                        true,
-                        false
-                        )
-                    ));
-                $tpl->parseCurrentBlock();
-
-                include_once("./Services/YUI/classes/class.ilYuiUtil.php");
-                ilYuiUtil::initConnection();
-                $main_tpl->addJavaScript("./Services/UIComponent/Explorer/js/ilExplorer.js");
+                $editor_init = new \ILIAS\COPage\Editor\UI\Init();
+                $editor_init->initUI($main_tpl);
             }
-
         } else {
             // presentation or preview here
 

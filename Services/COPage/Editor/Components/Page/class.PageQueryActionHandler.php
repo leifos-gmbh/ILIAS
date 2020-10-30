@@ -83,13 +83,14 @@ class PageQueryActionHandler implements Server\QueryActionHandler
      */
     protected function allCommand() : Server\Response
     {
+        $ctrl = $this->ctrl;
         $f = $this->ui->factory();
         $dd = $f->dropdown()->standard([
             $f->link()->standard("label", "#")
         ]);
         $r = $this->ui->renderer();
         $o = new \stdClass();
-        $o->addDropdown = $r->render($dd);
+        $o->dropdown = $r->render($dd);
         $o->addCommands = $this->getAddCommands();
         $o->pageEditHelp = $this->getPageEditHelp();
         $o->pageTopActions = $this->getTopActions();
@@ -104,6 +105,7 @@ class PageQueryActionHandler implements Server\QueryActionHandler
         $o->modal = $this->getModalTemplate();
         $o->confirmation = $this->getConfirmationTemplate();
         $o->autoSaveInterval = $this->getAutoSaveInterval();
+        $o->backUrl = $ctrl->getLinkTarget($this->page_gui, "edit");
         return new Server\Response($o);
     }
 

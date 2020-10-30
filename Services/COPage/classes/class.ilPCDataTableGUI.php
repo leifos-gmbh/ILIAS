@@ -458,32 +458,27 @@ class ilPCDataTableGUI extends ilPCTableGUI
      */
     public function editData()
     {
-        $lng = $this->lng;
-        $ilCtrl = $this->ctrl;
-        $main_tpl = $this->main_tpl;
-
-
         $this->tool_context->current()->addAdditionalData(ilCOPageEditGSToolProvider::SHOW_EDITOR, true);
-
-        if (!ilPageEditorGUI::_doJSEditing()) {
-            return $this->editDataCl();
-        }
-        
-        //var_dump($_GET);
-        //var_dump($_POST);
 
         $this->setTabs();
 
         $this->displayValidationError();
 
+        $editor_init = new \ILIAS\COPage\Editor\UI\Init();
+        $editor_init->initUI($this->tpl);
+
+        $this->tpl->setContent($this->getEditDataTable(true));
+    }
+
+    public function getEditDataTable($initial = false) {
+        $ilCtrl = $this->ctrl;
 
         include_once("./Services/COPage/classes/class.ilPCParagraph.php");
 
-        //$this->tpl->addBlockFile("ADM_CONTENT", "adm_content", "tpl.tabledata2.html", "Services/COPage");
-        //$dtpl = $this->tpl;
         $dtpl = new ilTemplate("tpl.tabledata2.html", true, true, "Services/COPage");
         $dtpl->setVariable("FORMACTION", $this->ctrl->getFormAction($this, "tableAction"));
-
+        $dtpl->setVariable("HIERID", $this->hier_id);
+        $dtpl->setVariable("PCID", $this->pc_id);
 
         $dtpl->setVariable(
             "WYSIWYG_ACTION",
@@ -509,22 +504,24 @@ class ilPCDataTableGUI extends ilPCTableGUI
                         $dtpl->touchBlock("empty_td");
                     }
 
+                    $move_forward = false;
+                    $move_backward = false;
                     if ($j == 0) {
                         if (count($res2->nodeset) == 1) {
-                            $move_type = "none";
+                            //
                         } else {
-                            $move_type = "forward";
+                            $move_forward = true;
                         }
                     } elseif ($j == (count($res2->nodeset) - 1)) {
-                        $move_type = "backward";
+                        $move_backward = true;
                     } else {
-                        $move_type = "both";
+                        $move_forward = true;
+                        $move_backward = true;
                     }
                     $dtpl->setCurrentBlock("col_icon");
-                    $dtpl->setVariable("COL_ICON_ALT", $lng->txt("content_column"));
-                    $dtpl->setVariable("COL_ICON", ilUtil::getImagePath("col.svg"));
-                    $dtpl->setVariable("COL_ONCLICK", "COL_" . $move_type);
-                    $dtpl->setVariable("NR", $j);
+                    $dtpl->setVariable("NR_COLUMN", $j+1);
+                    $dtpl->setVariable("PCID_COLUMN", $res2->nodeset[$j]->get_attribute("PCID"));
+                    $dtpl->setVariable("COLUMN_CAPTION", $j+1);
                     $dtpl->parseCurrentBlock();
                 }
                 $dtpl->setCurrentBlock("row");
@@ -547,10 +544,9 @@ class ilPCDataTableGUI extends ilPCTableGUI
                         $move_type = "both";
                     }
                     $dtpl->setCurrentBlock("row_icon");
-                    $dtpl->setVariable("ROW_ICON_ALT", $lng->txt("content_row"));
-                    $dtpl->setVariable("ROW_ICON", ilUtil::getImagePath("row.svg"));
-                    $dtpl->setVariable("ROW_ONCLICK", "ROW_" . $move_type);
-                    $dtpl->setVariable("NR", $i);
+                    $dtpl->setVariable("NR_ROW", $i+1);
+                    $dtpl->setVariable("PCID_ROW", $res2->nodeset[$j]->get_attribute("PCID"));
+                    $dtpl->setVariable("ROW_CAPTION", $i+1);
                     $dtpl->parseCurrentBlock();
                 }
 
@@ -580,6 +576,8 @@ class ilPCDataTableGUI extends ilPCTableGUI
 
                     $dtpl->setVariable("PAR_TA_NAME", "cell[" . $i . "][" . $j . "]");
                     $dtpl->setVariable("PAR_TA_ID", "cell_" . $i . "_" . $j);
+                    $dtpl->setVariable("PAR_ROW", (string) $i);
+                    $dtpl->setVariable("PAR_COLUMN", (string) $j);
 
                     $dtpl->setVariable("PAR_TA_CONTENT", $s_text);
 
@@ -602,101 +600,13 @@ class ilPCDataTableGUI extends ilPCTableGUI
             $dtpl->parseCurrentBlock();
         }
 
-        // init menues
-        $types = array("row", "col");
-        $moves = array("none", "backward", "both", "forward");
-        $commands = array(
-            "row" => array(	"newRowAfter" => "cont_ed_new_row_after",
-                            "newRowBefore" => "cont_ed_new_row_before",
-                            "moveRowUp" => "cont_ed_row_up",
-                            "moveRowDown" => "cont_ed_row_down",
-                            "deleteRow" => "cont_ed_delete_row"),
-            "col" => array(	"newColAfter" => "cont_ed_new_col_after",
-                            "newColBefore" => "cont_ed_new_col_before",
-                            "moveColLeft" => "cont_ed_col_left",
-                            "moveColRight" => "cont_ed_col_right",
-                            "deleteCol" => "cont_ed_delete_col")
-        );
 
-        foreach ($types as $type) {
-            foreach ($moves as $move) {
-                foreach ($commands[$type] as $command => $lang_var) {
-                    if ($move == "none" && (substr($command, 0, 4) == "move" || substr($command, 0, 6) == "delete")) {
-                        continue;
-                    }
-                    if (($move == "backward" && (in_array($command, array("movedown", "moveright")))) ||
-                        ($move == "forward" && (in_array($command, array("moveup", "moveleft"))))) {
-                        continue;
-                    }
-                    $dtpl->setCurrentBlock("menu_item");
-                    $dtpl->setVariable("MENU_ITEM_TITLE", $lng->txt($lang_var));
-                    $dtpl->setVariable("CMD", $command);
-                    $dtpl->setVariable("TYPE", $type);
-                    $dtpl->parseCurrentBlock();
-                }
-                $dtpl->setCurrentBlock("menu");
-                $dtpl->setVariable("TYPE", $type);
-                $dtpl->setVariable("MOVE", $move);
-                $dtpl->parseCurrentBlock();
-            }
-        }
-
-
-        $dtpl->setVariable(
-            "FORMACTION2",
-            $ilCtrl->getFormAction($this, "tableAction")
-        );
         $dtpl->setVariable("TXT_ACTION", $this->lng->txt("cont_table"));
 
-        // js editing preparation
-        include_once("./Services/YUI/classes/class.ilYuiUtil.php");
-        ilYuiUtil::initDragDrop();
-        ilYuiUtil::initConnection();
-        ilYuiUtil::initPanel(false);
-        $main_tpl->addJavascript("./node_modules/tinymce/tinymce.min.js");
-        $main_tpl->addJavaScript("./Services/COPage/js/ilcopagecallback.js");
-        //$main_tpl->addJavascript("Services/COPage/js/page_editing.js");
-
-        $main_tpl->addOnloadCode("var preloader = new Image();
-			preloader.src = './templates/default/images/loader.svg';
-			ilCOPage.setContentCss('" .
-            ilObjStyleSheet::getContentStylePath((int) $this->getStyleId()) .
-            ", " . ilUtil::getStyleSheetLocation() . ", ./Services/COPage/css/tiny_extra.css');
-			ilCOPage.editTD('cell_0_0');
-				");
-
-        $cfg = $this->getPageConfig();
-
-        $dtpl->setVariable(
-            "IL_TINY_MENU",
-            ilPageObjectGUI::getTinyMenu(
-                $this->pg_obj->getParentType(),
-                $cfg->getEnableInternalLinks(),
-                $cfg->getEnableWikiLinks(),
-                $cfg->getEnableKeywords(),
-                $this->getStyleId(),
-                false,
-                true,
-                $cfg->getEnableAnchors(),
-                false
-            )
-        );
-
-        // add int link parts
-        if ($cfg->getEnableInternalLinks() || $cfg->getEnableWikiLinks()) {
-            include_once("./Services/Link/classes/class.ilInternalLinkGUI.php");
-            $dtpl->setCurrentBlock("int_link_prep");
-            $dtpl->setVariable("INT_LINK_PREP", ilInternalLinkGUI::getInitHTML(
-                $ilCtrl->getLinkTargetByClass(
-                    array("ilpageeditorgui", "ilinternallinkgui"),
-                    "",
-                    false,
-                    true,
-                    false
-                )
-            ));
+        if ($initial) {
+            $dtpl->touchBlock("script");
         }
 
-        $this->tpl->setContent($dtpl->get());
+        return $dtpl->get();
     }
 }

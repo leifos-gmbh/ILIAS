@@ -14793,6 +14793,7 @@ div.ilCOPGMediaPrint {
 }
 .copg-input-ghost {
   visibility: hidden;
+  min-width: 100px;
 }
 #copg-editor-slate-content {
   padding: 15px;
@@ -14844,6 +14845,23 @@ p#copg-auto-save {
 #il_EditPage [data-copg-ed-type="add-area"] > .dropdown > ul {
   position: absolute;
   z-index: 10;
+}
+#ed_datatable {
+  background-color: #ffffff;
+}
+#ed_datatable th {
+  background-color: #fbfbfb;
+}
+#ed_datatable th .dropdown button {
+  background-color: #fbfbfb;
+  text-align: center;
+  color: #303030;
+  width: 100%;
+  border: 0;
+}
+#ed_datatable th,
+#ed_datatable td {
+  border: 1px solid #CCCCCC;
 }
 /* Services/Calendar */
 td.even {

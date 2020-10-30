@@ -66,6 +66,11 @@ export default class ParagraphUI {
   autoSave;
 
   /**
+   * @type {boolean}
+   */
+  dataTableMode = false;
+
+  /**
    * @type {Object}
    */
   text_formats = {
@@ -113,6 +118,24 @@ export default class ParagraphUI {
     }
   }
 
+  /**
+   *
+   * @param {boolean} mode
+   */
+  setDataTableMode(mode) {
+    this.dataTableMode = mode;
+    if (mode) {
+      this.splitOnReturn = false;
+    }
+  }
+
+  /**
+   * @return {boolean}
+   */
+  getDataTableMode() {
+    return this.dataTableMode;
+  }
+
 
   /**
    */
@@ -124,6 +147,20 @@ export default class ParagraphUI {
 
     this.uiModel = uiModel;
     let t = this;
+    this.initTinyWrapper();
+
+    this.log("css: " + this.uiModel.config.content_css);
+
+    this.initMenu();
+
+    this.log("set interval: " + this.uiModel.autoSaveInterval);
+    this.autoSave.setInterval(this.uiModel.autoSaveInterval);
+    this.autoSave.setOnAutoSave(() => {
+      dispatch.dispatch(action.paragraph().editor().autoSave(wrapper.getText(), wrapper.getCharacteristic()));
+    });
+  }
+
+  initTinyWrapper() {
     const wrapper = this.tinyWrapper;
 
     this.uiModel.config.text_formats.forEach(f =>
@@ -137,16 +174,6 @@ export default class ParagraphUI {
     });
 
     wrapper.setContentCss(this.uiModel.config.content_css);
-
-    this.log("css: " + this.uiModel.config.content_css);
-
-    this.initMenu();
-
-    this.log("set interval: " + this.uiModel.autoSaveInterval);
-    this.autoSave.setInterval(this.uiModel.autoSaveInterval);
-    this.autoSave.setOnAutoSave(() => {
-      dispatch.dispatch(action.paragraph().editor().autoSave(wrapper.getText(), wrapper.getCharacteristic()));
-    });
   }
 
   /**
@@ -380,33 +407,6 @@ export default class ParagraphUI {
 
 
 
-  ////
-  //// Tiny/text area/menu handling
-  ////
-
-
-
-
-
-
-  updateMenuButtons()
-  {
-    return;                                       // characteristic should be set from model
-    let ed = tinyMCE.get('tinytarget');
-    // update buttons
-    let cnode = ed.selection.getNode();
-    while (cnode)
-    {
-      if (cnode.parentNode &&
-        cnode.parentNode.nodeName.toLowerCase() === "body" &&
-        cnode.nodeName.toLowerCase() === "div")
-      {
-        var st = cnode.className.substring(15);
-        il.AdvancedSelectionList.selectItem('style_selection', st);
-      }
-      cnode = cnode.parentNode;
-    }
-  }
 
   ////
   //// Table editing
@@ -542,10 +542,11 @@ export default class ParagraphUI {
 
   insertJSAtPlaceholder(cmd_id)
   {
+    /*
     clickcmdid = cmd_id;
     let pl = document.getElementById('CONTENT' + cmd_id);
     pl.style.display = 'none';
-    doActionForm('cmd[exec]', 'command', 'insert_par', '', 'PageContent', '');
+    doActionForm('cmd[exec]', 'command', 'insert_par', '', 'PageContent', '');*/
   }
 
   ////
@@ -565,24 +566,6 @@ export default class ParagraphUI {
           // re-draw
           id = id.substr(9);
           eval("renderILQuestion" + id + "()");
-        }
-      }
-    }
-  }
-
-  removeRedundantContent() {
-    let k, d,
-      darr = this.pc_id_str.split(";");
-
-    for (k in darr) {
-      if (darr[k] !== this.ed_para) {
-        d = document.getElementById("CONTENT" + darr[k]);
-        if (d != null) {
-          d.style.display = 'none';
-        }
-        d = document.getElementById("TARGET" + darr[k]);
-        if (d != null) {
-          d.style.display = 'none';
         }
       }
     }
@@ -616,7 +599,6 @@ export default class ParagraphUI {
     }, () => {
       this.switchToNext();
     });
-    this.updateMenuButtons();
     this.tinyinit = true;
   }
 
@@ -718,10 +700,11 @@ export default class ParagraphUI {
     this.log("paragraph-ui.editParagraph");
     let content_el = document.querySelector("[data-copg-ed-type='pc-area'][data-pcid='" + pcId + "']");
     let pc_model = this.page_model.getPCModel(pcId);
-    this.tinyWrapper.initEdit(content_el, pc_model.text, pc_model.characteristic, () => {
+    const wrapper = this.tinyWrapper;
+    wrapper.initEdit(content_el, pc_model.text, pc_model.characteristic, () => {
+      wrapper.initContent(pc_model.text, pc_model.characteristic);
       this.showToolbar();
       this.setParagraphClass(pc_model.characteristic);
-      this.updateMenuButtons();
       this.setSectionClassSelector(this.getSectionClass(pcId));
     }, () => {
       this.autoSave.handleAutoSaveKeyPressed();
@@ -902,6 +885,7 @@ export default class ParagraphUI {
     const dispatch = this.dispatcher;
     const action = this.actionFactory;
     const ef = action.paragraph().editor();
+    const tblact = action.table().editor();
 
     //#0017152
     $('#tinytarget_ifr').contents().find("html").attr('lang', $('html').attr('lang'));
@@ -944,8 +928,13 @@ export default class ParagraphUI {
           break;
 
         case ACTIONS.SAVE_RETURN:
+          const paragraphUI = this;
           char_button.addEventListener("click", (event) => {
-            dispatch.dispatch(ef.saveReturn(tiny.getText(), tiny.getCharacteristic()));
+            if (!paragraphUI.getDataTableMode()) {
+              dispatch.dispatch(ef.saveReturn(tiny.getText(), tiny.getCharacteristic()));
+            } else {
+              dispatch.dispatch(tblact.saveReturn(tiny.getText()));
+            }
           });
           break;
 

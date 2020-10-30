@@ -138,6 +138,10 @@ export default class PageModifier {
     this.pageUI.handlePageReloadResponse(result);
   }
 
+  redirectToPage(pcid) {
+    this.redirect(this.pageUI.uiModel.backUrl + "#pc" + pcid);
+  }
+
   redirect(url) {
     window.location.replace(url);
   }

@@ -123,6 +123,10 @@ class ilDidacticTemplateSettingsGUI
      */
     protected function overview()
     {
+        global $DIC;
+
+        $tpl = $DIC->ui()->mainTemplate();
+
         if ($this->rbacsystem->checkAccess('write', $_REQUEST["ref_id"])) {
             $this->dic->toolbar()->addButton(
                 $this->lng->txt('didactic_import_btn'),
@@ -130,13 +134,43 @@ class ilDidacticTemplateSettingsGUI
             );
         }
 
-        include_once './Services/DidacticTemplate/classes/class.ilDidacticTemplateSettingsTableGUI.php';
+        $filter = new ilDidacticTemplateSettingsTableFilter($this->ctrl->getFormAction($this, 'overview'));
+        $filter->init();
+
+
         $table = new ilDidacticTemplateSettingsTableGUI($this, 'overview');
         $table->init();
-        $table->parse();
+        $table->parse($filter);
 
-        $GLOBALS['DIC']['tpl']->setContent($table->getHTML());
+        $tpl->setContent(
+            $filter->render() . '' . $table->getHTML()
+        );
     }
+
+    /**
+     * Apply table filter
+     */
+    public function applyFilter()
+    {
+        $table = new ilDidacticTemplateSettingsTableGUI($this, 'overview');
+        $table->init();
+        $table->resetOffset();
+        $table->writeFilterToSession();
+        $this->overview();
+    }
+
+    /**
+     * Reset filter
+     */
+    public function resetFilter()
+    {
+        $table = new ilDidacticTemplateSettingsTableGUI($this, 'overview');
+        $table->init();
+        $table->resetOffset();
+        $table->resetFilter();
+        $this->overview();
+    }
+
 
     /**
      * Show template import form

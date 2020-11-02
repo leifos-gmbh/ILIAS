@@ -241,6 +241,10 @@ meta#:#meta_local#:#Lokal
 meta#:#udf_type_externallink#:#Externer Link
 meta#:#udf_type_internallink#:#Interner Link
 didactic#:#didactic_scope_list_header#:#Beschränkt auf:
+didactic#:#didactic_global#:#Global
+didactic#:#didactic_filter_with_icon#:#mit Symbol
+didactic#:#didactic_filter_without_icon#:#ohne Symbol
+didactic#:#didactic_local#:#Lokal
 meta#:#md_adv_scope_list_header#:#Beschränkt auf:
 didactic#:#didactic_scope#:#Gültigkeitsbereich
 sess#:#sess_mem_tbl_header#:#Sitzungsteilnehmer

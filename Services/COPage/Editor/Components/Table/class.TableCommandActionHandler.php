@@ -180,10 +180,17 @@ class TableCommandActionHandler implements Server\CommandActionHandler
      */
     protected function modifyTableCommand($body) : Server\Response
     {
-        $this->updateData($body["data"]["tablePcid"], $body["data"]["content"]);
-
         $page = $this->page_gui->getPageObject();
         $page->addHierIDs();
+
+        /** @var $td \ilPCTableData */
+        $table = $page->getContentObjectForPcId($body["data"]["tablePcid"]);
+
+
+        if ($table->getType() == "dtab") {
+            $this->updateData($body["data"]["tablePcid"], $body["data"]["content"]);
+        }
+
 
         /** @var $td \ilPCTableData */
         $td = $page->getContentObjectForPcId($body["data"]["cellPcid"]);

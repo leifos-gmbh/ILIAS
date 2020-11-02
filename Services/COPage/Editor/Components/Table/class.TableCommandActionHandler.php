@@ -191,6 +191,8 @@ class TableCommandActionHandler implements Server\CommandActionHandler
             $this->updateData($body["data"]["tablePcid"], $body["data"]["content"]);
         }
 
+        $page->addHierIDs();
+
 
         /** @var $td \ilPCTableData */
         $td = $page->getContentObjectForPcId($body["data"]["cellPcid"]);

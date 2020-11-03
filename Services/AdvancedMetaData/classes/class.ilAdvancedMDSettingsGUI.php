@@ -1159,11 +1159,11 @@ class ilAdvancedMDSettingsGUI
     {
         $record_id = (int) $this->request->getQueryParams()['record_id'] ?? 0;
         $field_id = (int) $this->request->getQueryParams()['field_id'] ?? 0;
-
         if (!$record_id || !$field_id) {
             return $this->editFields();
         }
         $this->ctrl->saveParameter($this, 'field_id');
+        $this->ctrl->saveParameter($this, 'record_id');
         $this->initRecordObject();
         $this->setRecordSubTabs(2);
 
@@ -1198,7 +1198,7 @@ class ilAdvancedMDSettingsGUI
         }
 
         $this->initRecordObject();
-        $this->showLanguageSwitch($record_id, 'editFields');
+        $this->showLanguageSwitch($record_id, 'editField');
 
         $confirm = false;
         $field_definition = ilAdvancedMDFieldDefinition::getInstance((int) $field_id);

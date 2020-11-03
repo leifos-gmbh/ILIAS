@@ -616,9 +616,6 @@ class ilAdvancedMDSettingsGUI
         foreach ($positions as $record_id => $pos) {
             $sorted_positions[$record_id] = $i++;
         }
-
-        $this->logger->dump($sorted_positions);
-
         $selected_global = array();
         foreach ($this->getParsedRecordObjects() as $item) {
             $perm = $this->getPermissions()->hasPermissions(
@@ -931,18 +928,18 @@ class ilAdvancedMDSettingsGUI
      */
     public function updateRecord()
     {
-        if (!$this->request->getQueryParams()['record_id']) {
-            ilUtil::sendFailure($this->lng->txt('select_one'));
-            $this->showRecords();
-            return false;
+        $record_id = $this->request->getQueryParams()['record_id'] ?? 0;
+        if (!$record_id) {
+            $this->ctrl->redirect($this, 'showRecords');
         }
         $this->initRecordObject();
-        $this->showLanguageSwitch($this->record->getRecordId(),'editRecord');
+        $this->showLanguageSwitch($record_id,'editRecord');
+
         $this->initForm('edit');
         if (!$this->form->checkInput()) {
             ilUtil::sendFailure($this->lng->txt('err_check_input'));
             $this->form->setValuesByPost();
-            $this->editRecord();
+            $this->editRecord($this->form);
             return false;
         }
 
@@ -1850,20 +1847,17 @@ class ilAdvancedMDSettingsGUI
      */
     protected function initRecordObject()
     {
-        if (!is_object($this->record)) {
-            $record_id = isset($_GET['record_id'])
-                ? $_GET['record_id']
-                : 0;
+        if (!$this->record instanceof ilAdvancedMDRecord) {
+            $record_id = $this->request->getQueryParams()['record_id'] ?? 0;
             $this->record = ilAdvancedMDRecord::_getInstanceByRecordId($record_id);
             $this->ctrl->saveParameter($this,'record_id');
-            
+
             // bind to parent object (aka local adv md)
             if (!$record_id &&
                 $this->obj_id) {
                 $this->record->setParentObject($this->obj_id);
             }
         }
-                        
         return $this->record;
     }
 

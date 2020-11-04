@@ -10,14 +10,15 @@ export default class TableCommandActionFactory {
   /**
    * @type {ClientActionFactory}
    */
-  clientActionFactory;
+  //clientActionFactory;
 
-  COMPONENT = "Table";
+  //COMPONENT = "Table";
 
   /**
    * @param {ClientActionFactory} clientActionFactory
    */
   constructor(clientActionFactory) {
+    this.COMPONENT = "Table";
     this.clientActionFactory = clientActionFactory;
   }
 

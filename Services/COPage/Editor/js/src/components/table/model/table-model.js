@@ -5,12 +5,15 @@
  */
 export default class TableModel {
 
-  debug = true;
+  //debug = true;
 
-  currentRow = null;
-  currentCol = null;
+  //currentRow = null;
+  //currentCol = null;
 
   constructor() {
+    this.debug = true;
+    this.currentRow = null;
+    this.currentCol = null;
   }
 
   log(message) {

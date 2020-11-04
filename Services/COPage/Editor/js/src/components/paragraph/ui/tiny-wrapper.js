@@ -11,73 +11,72 @@ export default class TinyWrapper {
   /**
    * @type {boolean}
    */
-  debug = false;
+  //debug = false;
 
   /**
    * @type {Object}
    */
-  lib;
+  //lib;
 
   /**
    * @type {string}
    */
-  id = "tinytarget";
+  //id = "tinytarget";
 
   /**
    * @type {number}
    */
-  minwidth = 200;
+  //minwidth = 200;
 
   /**
    * @type {number}
    */
-  minheight = 20;
+  //minheight = 20;
 
   /**
    * @type {Object}
    */
-  config = null;
+  //config = null;
 
   /**
    * @type {string}
    */
-  content_css;
-
-  current_td = "";                                      // MISSING
+  //content_css;
 
   /**
    * @type {HTMLTransform}
    */
-  htmlTransform;
+  //htmlTransform;
 
   /**
    * current range in down/right moving
    * @type {Object}
    */
-  downRightRng = null;
+  //downRightRng = null;
 
   /**
    * current range in up/left moving
    * @type {Object}
    */
-  upLeftRng = null;
+  //upLeftRng = null;
 
   /**
    * New behaviour that splits paragraphs on return
    * @type {boolean}
    */
-  splitOnReturn = true;
+  //splitOnReturn = true;
 
-  splitOnReturnCallback = null;
+  //splitOnReturnCallback = null;
 
   /**
    * @type {boolean}
    */
-  dataTableMode = false;
+  //dataTableMode = false;
 
   /**
    * @type {Object}
    */
+  /*
   text_formats = {
     Strong: { inline: 'span', classes: 'ilc_text_inline_Strong' },
     Emph: { inline: 'span', classes: 'ilc_text_inline_Emph' },
@@ -88,12 +87,35 @@ export default class TinyWrapper {
     Sup: { inline: 'sup', classes: 'ilc_sup_Sup' },
     Sub: { inline: 'sub', classes: 'ilc_sub_Sub' }
   };
-
+  */
 
   /**
-   * @param {string} content_css
+   * @param {Function} splitOnReturnCallback
    */
   constructor(splitOnReturnCallback) {
+    this.debug = false;
+
+    this.id = "tinytarget";
+    this.minwidth = 200;
+    this.minheight = 20;
+    this.config = null;
+    this.content_css = "";
+    this.downRightRng = null;
+    this.upLeftRng = null;
+    this.splitOnReturn = true;
+    this.dataTableMode = false;
+
+    this.text_formats = {
+      Strong: { inline: 'span', classes: 'ilc_text_inline_Strong' },
+      Emph: { inline: 'span', classes: 'ilc_text_inline_Emph' },
+      Important: { inline: 'span', classes: 'ilc_text_inline_Important' },
+      Comment: { inline: 'span', classes: 'ilc_text_inline_Comment' },
+      Quotation: { inline: 'span', classes: 'ilc_text_inline_Quotation' },
+      Accent: { inline: 'span', classes: 'ilc_text_inline_Accent' },
+      Sup: { inline: 'sup', classes: 'ilc_sup_Sup' },
+      Sub: { inline: 'sub', classes: 'ilc_sub_Sub' }
+    };
+
     this.lib = tinyMCE;
     this.htmlTransform = new HTMLTransform();
     this.splitOnReturnCallback = splitOnReturnCallback;

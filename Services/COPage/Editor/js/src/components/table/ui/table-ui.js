@@ -14,59 +14,59 @@ export default class TableUI {
   /**
    * @type {boolean}
    */
-  debug = true;
+  //debug = true;
 
   /**
    * Model
    * @type {Model}
    */
-  page_model = {};
+  //page_model = {};
 
   /**
    * UI model
    * @type {Object}
    */
-  uiModel = {};
+  //uiModel = {};
 
   /**
    * @type {Client}
    */
-  client;
+  //client;
 
   /**
    * @type {Dispatcher}
    */
-  dispatcher;
+  //dispatcher;
 
   /**
    * @type {ActionFactory}
    */
-  actionFactory;
+  //actionFactory;
 
   /**
    * @type {ToolSlate}
    */
-  toolSlate;
+  //toolSlate;
 
   /**
    * @type {TinyWrapper}
    */
-  tinyWrapper;
+  //tinyWrapper;
 
   /**
    * @type {pageModifier}
    */
-  pageModifier;
+  //pageModifier;
 
   /**
    * @type {ParagraphUI}
    */
-  paragraphUI;
+  //paragraphUI;
 
   /**
    * @type {TableModel}
    */
-  tableModel;
+  //tableModel;
 
 
   /**
@@ -80,6 +80,11 @@ export default class TableUI {
    * @param {TableModel} tableModel
    */
   constructor(client, dispatcher, actionFactory, page_model, toolSlate, pageModifier, paragraphUI, tableModel) {
+
+    this.debug = true;
+    this.page_model = {};
+    this.uiModel = {};
+
     this.client = client;
     this.dispatcher = dispatcher;
     this.actionFactory = actionFactory;

@@ -10,9 +10,9 @@ export default class TableModelActionHandler {
   /**
    * {PageModel}
    */
-  pageModel;
+  //pageModel;
 
-  tableModel;
+  //tableModel;
 
   /**
    *

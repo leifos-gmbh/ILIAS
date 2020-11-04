@@ -10,11 +10,12 @@ export default class PageModifier {
    *
    * @type {PageUI}
    */
-  pageUI = null;
+  //pageUI = null;
 
   /**
    */
   constructor() {
+    this.pageUI = null;
   }
 
   setPageUI(pageUI) {

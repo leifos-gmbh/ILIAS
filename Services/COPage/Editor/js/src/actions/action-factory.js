@@ -15,12 +15,12 @@ export default class ActionFactory {
   /**
    * @type {ClientActionFactory}
    */
-  clientActionFactory;
+  //clientActionFactory;
 
   /**
    * @type {EditorActionFactory}
    */
-  editorActionFactory;
+  //editorActionFactory;
 
   /**
    */

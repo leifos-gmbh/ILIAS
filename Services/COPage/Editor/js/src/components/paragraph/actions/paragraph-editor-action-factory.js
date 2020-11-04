@@ -9,18 +9,19 @@ import ACTIONS from "./paragraph-action-types.js";
  */
 export default class ParagraphEditorActionFactory {
 
-  COMPONENT = "Paragraph";
+  //COMPONENT = "Paragraph";
 
   /**
    * @type {EditorActionFactory}
    */
-  editorActionFactory;
+  //editorActionFactory;
 
   /**
    *
    * @param {EditorActionFactory} editorActionFactory
    */
   constructor(editorActionFactory) {
+    this.COMPONENT = "Paragraph";
     this.editorActionFactory = editorActionFactory;
   }
 

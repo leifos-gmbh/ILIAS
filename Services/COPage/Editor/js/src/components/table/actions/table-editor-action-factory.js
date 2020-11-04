@@ -9,18 +9,19 @@ import ACTIONS from "./table-action-types.js";
  */
 export default class TableEditorActionFactory {
 
-  COMPONENT = "Table";
+  //COMPONENT = "Table";
 
   /**
    * @type {EditorActionFactory}
    */
-  editorActionFactory;
+  //editorActionFactory;
 
   /**
    *
    * @param {EditorActionFactory} editorActionFactory
    */
   constructor(editorActionFactory) {
+    this.COMPONENT = "Table";
     this.editorActionFactory = editorActionFactory;
   }
 

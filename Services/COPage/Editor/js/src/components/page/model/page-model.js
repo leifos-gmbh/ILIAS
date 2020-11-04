@@ -5,6 +5,7 @@
  */
 export default class PageModel {
 
+  /*
   debug = true;
 
   STATE_PAGE = "page";                  // page editing
@@ -20,33 +21,35 @@ export default class PageModel {
   STATE_MULTI_CUT = "cut";          // multi cut
   STATE_MULTI_CHARACTERISTIC = "characteristic";          // multi cut
   STATE_MULTI_NONE = "";
+  */
 
   /**
    * @type {*[]}
    */
-  states = [];
+  //states = [];
 
   /**
    * @type {*[]}
    */
-  component_states = [];
+  //component_states = [];
 
   /**
    * @type {*[]}
    */
-  multi_states = [];
+  //multi_states = [];
 
-  dom;
+  //dom;
 
   /**
    * Paragraph auto splitting
    * @type {*[]}
    */
-  splitIds = [];
+  //splitIds = [];
 
   /**
    * @type {Object}
    */
+  /*
   model = {
     state: this.STATE_PAGE,
     component_state: this.STATE_COMPONENT_NONE,
@@ -62,8 +65,42 @@ export default class PageModel {
     sectionFormat: "",
     paragraphFormat: ""
   };
+   */
 
   constructor() {
+    this.debug = true;
+
+    this.STATE_PAGE = "page";                  // page editing
+    this.STATE_DRAG_DROP = "drag_drop";        // drag drop
+    this.STATE_COMPONENT = "component";        // component editing (in slate)
+    this.STATE_MULTI_ACTION = "multi";         // multi action
+
+    this.STATE_COMPONENT_EDIT = "edit";        // component editing
+    this.STATE_COMPONENT_INSERT = "insert";    // component inserting
+    this.STATE_COMPONENT_NONE = "";
+
+    this.STATE_MULTI_COPY = "copy";        // multi copy
+    this.STATE_MULTI_CUT = "cut";          // multi cut
+    this.STATE_MULTI_CHARACTERISTIC = "characteristic";          // multi cut
+    this.STATE_MULTI_NONE = "";
+
+    this.model = {
+      state: this.STATE_PAGE,
+      component_state: this.STATE_COMPONENT_NONE,
+      multi_state: this.STATE_MULTI_NONE,
+      selectedItems: new Set(),
+      cutItems: new Set(),
+      copyItems: new Set(),
+      currentPCID: null,
+      currentHierId: null,
+      currentInsertPCID: null,
+      page_components: [],
+      page_components_undo: [],
+      sectionFormat: "",
+      paragraphFormat: ""
+    };
+
+    this.splitIds = [];
     this.dom = document;
     this.states = [this.STATE_PAGE, this.STATE_DRAG_DROP, this.STATE_COMPONENT, this.STATE_MULTI_ACTION];
     this.component_states = [this.STATE_COMPONENT_NONE, this.STATE_COMPONENT_EDIT, this.STATE_COMPONENT_INSERT];

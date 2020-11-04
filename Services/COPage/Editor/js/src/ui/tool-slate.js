@@ -8,11 +8,12 @@ export default class ToolSlate {
   /**
    * @type {string}
    */
-  content_id = "copg-editor-slate-content";
+  //content_id = "copg-editor-slate-content";
 
   /**
    */
   constructor() {
+    this.content_id = "copg-editor-slate-content";
   }
 
   /**

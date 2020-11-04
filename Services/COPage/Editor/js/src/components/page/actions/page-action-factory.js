@@ -13,12 +13,12 @@ export default class PageActionFactory {
   /**
    * @type {ClientActionFactory}
    */
-  clientActionFactory;
+  //clientActionFactory;
 
   /**
    * @type {EditorActionFactory}
    */
-  editorActionFactory;
+  //editorActionFactory;
 
 
   /**

@@ -12,44 +12,44 @@ export default class MediaUI {
   /**
    * @type {boolean}
    */
-  debug = true;
+  //debug = true;
 
   /**
    * Model
    * @type {PageModel}
    */
-  page_model = {};
+  //page_model = {};
 
   /**
    * UI model
    * @type {Object}
    */
-  uiModel = {};
+  //uiModel = {};
 
   /**
    * @type {Client}
    */
-  client;
+  //client;
 
   /**
    * @type {Dispatcher}
    */
-  dispatcher;
+  //dispatcher;
 
   /**
    * @type {ActionFactory}
    */
-  actionFactory;
+  //actionFactory;
 
   /**
    * @type {ToolSlate}
    */
-  toolSlate;
+  //toolSlate;
 
   /**
    * @type {pageModifier}
    */
-  pageModifier;
+//  pageModifier;
 
 
   /**
@@ -61,12 +61,14 @@ export default class MediaUI {
    * @param {PageModifier} pageModifier
    */
   constructor(client, dispatcher, actionFactory, page_model, toolSlate, pageModifier) {
+    this.debug = true;
     this.client = client;
     this.dispatcher = dispatcher;
     this.actionFactory = actionFactory;
     this.page_model = page_model;
     this.toolSlate = toolSlate;
     this.pageModifier = pageModifier;
+    this.uiModel = {};
   }
 
   //

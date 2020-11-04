@@ -10,9 +10,10 @@ export default class Model {
   /**
    * @type {Object}
    */
-  models = new Map();
+  //models = new Map();
 
   constructor() {
+    this.models = new Map();
     this.models.set("page", new PageModel());
     this.models.set("table", new TableModel());
   }

@@ -8,13 +8,13 @@ import ACTIONS from "../actions/paragraph-action-types.js";
 export default class ParagraphModelActionHandler {
 
   /**
-   * {Model}
+   * {PageModel}
    */
-  pageModel;
+  //pageModel;
 
   /**
    *
-   * @param {Model} model
+   * @param {PageModel} model
    */
   constructor(pageModel) {
     this.pageModel = pageModel;

@@ -10,27 +10,27 @@ export default class Client {
   /**
    * @type {boolean}
    */
-  debug = true;
+  //debug = true;
 
   /**
    * @type {string}
    */
-  query_endpoint;
+  //query_endpoint;
 
   /**
    * @type {string}
    */
-  command_endpoint;
+  //command_endpoint;
 
   /**
    * @type {ResponseFactory}
    */
-  response_factory;
+  //response_factory;
 
   /**
    * @type {string}
    */
-  form_action;
+  //form_action;
 
   /**
    * Constructor
@@ -40,6 +40,7 @@ export default class Client {
    * @param {ResponseFactory} response_factory
    */
   constructor(query_endpoint, command_endpoint, form_action, response_factory) {
+    this.debug = true;
     this.query_endpoint = query_endpoint;
     this.command_endpoint = command_endpoint;
     this.form_action = form_action;

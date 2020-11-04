@@ -15,64 +15,65 @@ export default class ParagraphUI {
   /**
    * @type {boolean}
    */
-  debug = true;
+  //debug = true;
 
   /**
    * Model
    * @type {Model}
    */
-  page_model = {};
+  //page_model = {};
 
   /**
    * UI model
    * @type {Object}
    */
-  uiModel = {};
+  //uiModel = {};
 
   /**
    * @type {Client}
    */
-  client;
+  //client;
 
   /**
    * @type {Dispatcher}
    */
-  dispatcher;
+  //dispatcher;
 
   /**
    * @type {ActionFactory}
    */
-  actionFactory;
+  //actionFactory;
 
   /**
    * @type {ToolSlate}
    */
-  toolSlate;
+  //toolSlate;
 
   /**
    * @type {TinyWrapper}
    */
-  tinyWrapper;
+  //tinyWrapper;
 
   /**
    * @type {pageModifier}
    */
-  pageModifier;
+  //pageModifier;
 
   /**
    *
    * @type {AutoSave}
    */
-  autoSave;
+  //autoSave;
 
   /**
    * @type {boolean}
    */
-  dataTableMode = false;
+  //dataTableMode = false;
 
   /**
    * @type {Object}
    */
+  /*
   text_formats = {
     Strong: {inline : 'span', classes : 'ilc_text_inline_Strong'},
     Emph: {inline : 'span', classes : 'ilc_text_inline_Emph'},
@@ -83,6 +84,7 @@ export default class ParagraphUI {
     Sup: {inline : 'sup', classes : 'ilc_sup_Sup'},
     Sub: {inline : 'sub', classes : 'ilc_sub_Sub'}
   };
+   */
 
   /**
    * @param {Client} client
@@ -92,6 +94,22 @@ export default class ParagraphUI {
    * @param {ToolSlate} toolSlate
    */
   constructor(client, dispatcher, actionFactory, page_model, toolSlate, pageModifier, autosave) {
+    this.debug = true;
+
+    this.text_formats = {
+      Strong: {inline : 'span', classes : 'ilc_text_inline_Strong'},
+      Emph: {inline : 'span', classes : 'ilc_text_inline_Emph'},
+      Important: {inline : 'span', classes : 'ilc_text_inline_Important'},
+      Comment: {inline : 'span', classes : 'ilc_text_inline_Comment'},
+      Quotation: {inline : 'span', classes : 'ilc_text_inline_Quotation'},
+      Accent: {inline : 'span', classes : 'ilc_text_inline_Accent'},
+      Sup: {inline : 'sup', classes : 'ilc_sup_Sup'},
+      Sub: {inline : 'sub', classes : 'ilc_sub_Sub'}
+    };
+
+    this.dataTableMode = false;
+    this.page_model = {};
+    this.uiModel = {};
     this.client = client;
     this.dispatcher = dispatcher;
     this.actionFactory = actionFactory;
@@ -103,6 +121,7 @@ export default class ParagraphUI {
     });
     this.pageModifier = pageModifier;
     this.autoSave = autosave;
+    this.pc_id_str = '';
   }
 
   //
@@ -213,13 +232,7 @@ export default class ParagraphUI {
   // PORTED STUFF
   //
 
-  content_css = '';
-  current_td = "";
-  edit_ghost = null;
-  pc_id_str = '';
-  tds = {};
-  tinyinit = false;
-  ed_para = null;
+
 
 
   ////
@@ -470,7 +483,7 @@ export default class ParagraphUI {
 
   handleDataTableCommand(type, command)
   {
-    let pars = this.tds;
+    //let pars = this.tds;
     pars["tab_cmd_type"] = type;
     pars["tab_cmd"] = command;
     pars["tab_cmd_id"] = current_row_col;
@@ -599,7 +612,6 @@ export default class ParagraphUI {
     }, () => {
       this.switchToNext();
     });
-    this.tinyinit = true;
   }
 
   performAutoSplit(pcid, text, characteristic, newParagraphs) {
@@ -806,21 +818,6 @@ export default class ParagraphUI {
     obj.submit();
   }
 
-  ccell = null;
-
-  M_in(cell)
-  {
-//    if (cmd_called) return;
-    doCloseContextMenuCounter=-1;
-    ccell = cell;
-  }
-
-  M_out(cell)
-  {
-//    if (cmd_called) return;
-    doCloseContextMenuCounter=5;
-    ccell = null;
-  }
 
   ilEditMultiAction(cmd)
   {

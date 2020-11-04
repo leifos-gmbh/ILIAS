@@ -12,22 +12,22 @@ export default class MediaUIActionHandler {
   /**
    * @type {MediaUI}
    */
-  ui;
+  //ui;
 
   /**
    * @type {ActionFactory}
    */
-  actionFactory;
+  //actionFactory;
 
   /**
    * @type {Dispatcher}
    */
-  dispatcher;
+  //dispatcher;
 
   /**
    * @type {Client}
    */
-  client;
+  //client;
 
   /**
    * @param {ActionFactory} actionFactory
@@ -36,6 +36,8 @@ export default class MediaUIActionHandler {
   constructor(actionFactory, client) {
     this.actionFactory = actionFactory;
     this.client = client;
+    this.ui = null;
+    this.dispatcher = null;
   }
 
   /**

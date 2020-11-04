@@ -12,7 +12,7 @@ export default class ParagraphActionFactory {
   /**
    * @type {EditorActionFactory}
    */
-  editorActionFactory;
+  //editorActionFactory;
 
 
   /**

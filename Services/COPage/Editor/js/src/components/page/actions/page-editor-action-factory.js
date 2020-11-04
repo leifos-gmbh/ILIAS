@@ -9,18 +9,19 @@ import ACTIONS from "./page-action-types.js";
  */
 export default class PageEditorActionFactory {
 
-  COMPONENT = "Page";
+  //COMPONENT = "Page";
 
   /**
    * @type {EditorActionFactory}
    */
-  editorActionFactory;
+  //editorActionFactory;
 
   /**
    *
    * @param {EditorActionFactory} editorActionFactory
    */
   constructor(editorActionFactory) {
+    this.COMPONENT = "Page";
     this.editorActionFactory = editorActionFactory;
   }
 

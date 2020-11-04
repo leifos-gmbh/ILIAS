@@ -8,22 +8,22 @@ export default class Action {
   /**
    * @type {string}
    */
-  component;
+  //component;
 
   /**
    * @type {string}
    */
-  type;
+  //type;
 
   /**
    * @type {number}
    */
-  static next_id = 1;
+  //  static next_id = 1;
 
   /**
    * @type {number}
    */
-  id;
+//  id;
 
   /**
    * @param {string} component
@@ -33,7 +33,8 @@ export default class Action {
   constructor(component, type, params= {}) {
     this.component = component;
     this.type = type;
-    this.id = Action.next_id++;       // maybe switch to uuid in the future
+    //this.id = Action.next_id++;       // maybe switch to uuid in the future
+    this.id = 1;
     this.params = params;
   }
 

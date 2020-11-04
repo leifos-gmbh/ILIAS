@@ -12,12 +12,12 @@ export default class ModelActionHandler {
   /**
    * {PageModel}
    */
-  model;
+  //model;
 
   /**
    * {PageModelActionHandler}
    */
-  pageModelHandler;
+  //pageModelHandler;
 
   /**
    *

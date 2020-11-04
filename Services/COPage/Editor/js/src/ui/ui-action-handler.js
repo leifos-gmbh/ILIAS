@@ -13,48 +13,50 @@ export default class UIActionHandler {
   /**
    * @type {UI}
    */
-  ui;
+  //ui;
 
   /**
    * @type {ActionFactory}
    */
-  actionFactory;
+  //actionFactory;
 
   /**
    * @type {Dispatcher}
    */
-  dispatcher;
+  //dispatcher;
 
   /**
    * @type {Client}
    */
-  client;
+  //client;
 
   /**
    * @type {PageUIActionHandler}
    */
-  pageActionHandler;
+  //pageActionHandler;
 
   /**
    * @type {ParagraphUIActionHandler}
    */
-  paragraphActionHandler;
+  //paragraphActionHandler;
 
   /**
    * @type {MediaUIActionHandler}
    */
-  mediaActionHandler;
+  //mediaActionHandler;
 
   /**
    * @type {TableUIActionHandler}
    */
-  tableActionHandler;
+  //tableActionHandler;
 
   /**
    * @param {ActionFactory} actionFactory
    * @param {Client} client
    */
   constructor(actionFactory, client) {
+    this.ui = null;
+    this.dispatcher = null;
     this.actionFactory = actionFactory;
     this.client = client;
     // @todo needs factory

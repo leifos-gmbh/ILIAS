@@ -7,17 +7,18 @@ import ACTIONS from "./page-action-types.js";
  */
 export default class PageCommandActionFactory {
 
-  COMPONENT = "Page";
+  //COMPONENT = "Page";
 
   /**
    * @type {ClientActionFactory}
    */
-  clientActionFactory;
+  //clientActionFactory;
 
   /**
    * @param {ClientActionFactory} clientActionFactory
    */
   constructor(clientActionFactory) {
+    this.COMPONENT = "Page";
     this.clientActionFactory = clientActionFactory;
   }
 

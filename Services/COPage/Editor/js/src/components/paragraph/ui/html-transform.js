@@ -8,10 +8,10 @@ export default class HTMLTransform {
   /**
    * @type {boolean}
    */
-  debug = true;
+  //debug = true;
 
   constructor() {
-
+    this.debug = true;
   }
 
   /**

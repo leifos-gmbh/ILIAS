@@ -10,61 +10,61 @@ export default class PageUI {
   /**
    * @type {boolean}
    */
-  debug = true;
+//  debug = true;
 
   /**
    * temp legacy code
    * @type {string}
    */
-  droparea = "<div class='il_droparea'></div>";
-  add = "<span class='glyphicon glyphicon-plus'></span>";
+    //  droparea = "<div class='il_droparea'></div>";
+  //add = "<span class='glyphicon glyphicon-plus'></span>";
 
   /**
    * Model
    * @type {PageModel}
    */
-  model = {};
+  //model = {};
 
   /**
    * UI model
    * @type {Object}
    */
-  uiModel = {};
+  //uiModel = {};
 
   /**
    * @type {Client}
    */
-  client;
+  //client;
 
   /**
    * @type {Dispatcher}
    */
-  dispatcher;
+  //dispatcher;
 
   /**
    * @type {ActionFactory}
    */
-  actionFactory;
+  //actionFactory;
 
   /**
    * @type {Map<any, any>}
    */
-  clickMap = new Map();
+  //clickMap = new Map();
 
   /**
    * @type {ToolSlate}
    */
-  toolSlate;
+  //toolSlate;
 
   /**
    * @type {PageModifier}
    */
-  pageModifier;
+  //pageModifier;
 
   /**
    * @type {Map<any, any>}
    */
-  componentUI = new Map();
+  //componentUI = new Map();
 
   /**
    * @param {Client} client
@@ -76,6 +76,15 @@ export default class PageUI {
    */
   constructor(client, dispatcher, actionFactory, model, toolSlate
     , pageModifier) {
+
+    this.debug = true;
+    this.droparea = "<div class='il_droparea'></div>";
+    this.add = "<span class='glyphicon glyphicon-plus'></span>";
+    this.model = {};
+    this.uiModel = {};
+
+    this.clickMap = new Map();
+    this.componentUI = new Map();
     this.client = client;
     this.dispatcher = dispatcher;
     this.actionFactory = actionFactory;

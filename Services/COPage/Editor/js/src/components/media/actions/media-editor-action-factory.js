@@ -9,18 +9,19 @@ import ACTIONS from "./media-action-types.js";
  */
 export default class ParagraphEditorActionFactory {
 
-  COMPONENT = "Media";
+  //COMPONENT = "Media";
 
   /**
    * @type {EditorActionFactory}
    */
-  editorActionFactory;
+  //editorActionFactory;
 
   /**
    *
    * @param {EditorActionFactory} editorActionFactory
    */
   constructor(editorActionFactory) {
+    this.COMPONENT = "Media";
     this.editorActionFactory = editorActionFactory;
   }
 

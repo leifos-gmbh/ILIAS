@@ -10,14 +10,15 @@ export default class ParagraphCommandActionFactory {
   /**
    * @type {ClientActionFactory}
    */
-  clientActionFactory;
+  //clientActionFactory;
 
-  COMPONENT = "Paragraph";
+  //COMPONENT = "Paragraph";
 
   /**
    * @param {ClientActionFactory} clientActionFactory
    */
   constructor(clientActionFactory) {
+    this.COMPONENT = "Paragraph";
     this.clientActionFactory = clientActionFactory;
   }
 

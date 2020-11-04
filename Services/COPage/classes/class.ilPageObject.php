@@ -5201,7 +5201,7 @@ abstract class ilPageObject
         $model = [];
         foreach ($this->getAllPCIds() as $pc_id) {
             $co = $this->getContentObjectForPcId($pc_id);
-            if ($co !== null) {
+            if ($co !== null && $co !== false) {
                 $co_model = $co->getModel();
                 if ($co_model !== null) {
                     $model[$pc_id] = $co_model;

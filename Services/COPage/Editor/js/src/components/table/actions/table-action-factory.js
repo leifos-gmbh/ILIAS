@@ -12,7 +12,7 @@ export default class TableActionFactory {
   /**
    * @type {EditorActionFactory}
    */
-  editorActionFactory;
+  //editorActionFactory;
 
 
   /**

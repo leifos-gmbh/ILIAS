@@ -6,41 +6,47 @@
  */
 export default class AutoSave {
 
-  AUTO_SAVE_ELEMENT_ID = "copg-auto-save";
+  //AUTO_SAVE_ELEMENT_ID = "copg-auto-save";
 
   /**
    *
    * @type {boolean}
    */
-  debug = false;
+  //debug = false;
 
   /**
    *
    * @type {boolean}
    */
-  auto_save_running = false;
+  //auto_save_running = false;
 
   /**
    *
    * @type {number}
    */
-  auto_save_ts = 0;
+  //auto_save_ts = 0;
 
   /**
    *
    * @type {number}
    */
-  autoSaveInterval = 0;
+  //autoSaveInterval = 0;
 
   /**
    *
    * @type {Function}
    */
-  onAutoSave = null;
+  //onAutoSave = null;
 
   /**
    */
   constructor() {
+    this.AUTO_SAVE_ELEMENT_ID = "copg-auto-save";
+    this.debug = false;
+    this.auto_save_running = false;
+    this.auto_save_ts = 0;
+    this.autoSaveInterval = 0;
+    this.onAutoSave = null;
   }
 
   setInterval(sec) {

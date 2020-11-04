@@ -11,22 +11,22 @@ export default class ParagraphUIActionHandler {
   /**
    * @type {ParagraphUI}
    */
-  ui;
+  //ui;
 
   /**
    * @type {ActionFactory}
    */
-  actionFactory;
+  //actionFactory;
 
   /**
    * @type {Dispatcher}
    */
-  dispatcher;
+  //dispatcher;
 
   /**
    * @type {Client}
    */
-  client;
+  //client;
 
   /**
    * @param {ActionFactory} actionFactory
@@ -35,6 +35,8 @@ export default class ParagraphUIActionHandler {
   constructor(actionFactory, client) {
     this.actionFactory = actionFactory;
     this.client = client;
+    this.dispatcher = null;
+    this.ui = null;
   }
 
   /**

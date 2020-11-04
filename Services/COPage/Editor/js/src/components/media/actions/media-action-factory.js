@@ -11,7 +11,7 @@ export default class MediaActionFactory {
   /**
    * @type {EditorActionFactory}
    */
-  editorActionFactory;
+//  editorActionFactory;
 
 
   /**

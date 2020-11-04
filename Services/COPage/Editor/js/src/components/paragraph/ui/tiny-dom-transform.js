@@ -8,11 +8,12 @@ export default class TinyDomTransform {
   /**
    * @type {boolean}
    */
-  debug = true;
+  //debug = true;
 
-  tiny;
+  //tiny;
 
   constructor(tiny) {
+    this.debug = true;
     this.tiny = tiny;
   }
 

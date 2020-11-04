@@ -15,53 +15,53 @@ export default class UI {
    * UI model
    * @type {Object}
    */
-  uiModel = {};
+  //uiModel = {};
 
   /**
    * Model
    * @type {Model}
    */
-  model = {};
+  //model = {};
 
   /**
    * @type {Client}
    */
-  client;
+  //client;
 
   /**
    * @type {Dispatcher}
    */
-  dispatcher;
+  //dispatcher;
 
   /**
    * @type {ActionFactory}
    */
-  actionFactory;
+  //actionFactory;
 
   /**
    * @type {PageUI}
    */
-  page;
+  //page;
 
   /**
    * @type {ParagraphUI}
    */
-  paragraph;
+  //paragraph;
 
   /**
    * @type {MediaUI}
    */
-  media;
+  //media;
 
   /**
    * @type {ToolSlate}
    */
-  toolSlate;
+  //toolSlate;
 
   /**
    * @type {pageModifier}
    */
-  pageModifier;
+  //pageModifier;
 
   /**
    * @param {Client} client
@@ -73,6 +73,7 @@ export default class UI {
    */
   constructor(client, dispatcher, actionFactory, model, toolSlate,
               pageModifer) {
+    this.uiModel = {};
     this.client = client;
     this.dispatcher = dispatcher;
     this.actionFactory = actionFactory;

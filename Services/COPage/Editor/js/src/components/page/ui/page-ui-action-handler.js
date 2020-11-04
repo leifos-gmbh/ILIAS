@@ -7,35 +7,38 @@ import ACTIONS from "../actions/page-action-types.js";
  */
 export default class PageUIActionHandler {
 
-  debug = true;
+  //debug = true;
 
   /**
    * @type {PageUI}
    */
-  ui;
+  //ui;
 
   /**
    * @type {ActionFactory}
    */
-  actionFactory;
+  //actionFactory;
 
   /**
    * @type {Dispatcher}
    */
-  dispatcher;
+  //dispatcher;
 
   /**
    * @type {Client}
    */
-  client;
+  //client;
 
   /**
    * @param {ActionFactory} actionFactory
    * @param {Client} client
    */
   constructor(actionFactory, client) {
+    this.debug = true;
     this.actionFactory = actionFactory;
     this.client = client;
+    this.dispatcher = null;
+    this.ui = null;
   }
 
   log(message) {

@@ -848,7 +848,7 @@ class ilAdvancedMDSettingsGUI
         include_once("./Services/AdvancedMetaData/classes/class.ilAdvancedMDFieldTableGUI.php");
         $table_gui = new ilAdvancedMDFieldTableGUI(
             $this,
-            "editRecord",
+            'editFields',
             $this->getPermissions(),
             $perm[ilAdvancedMDPermissionHelper::ACTION_RECORD_FIELD_POSITIONS],
             $this->active_language

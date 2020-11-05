@@ -95,8 +95,7 @@ class PageQueryActionHandler implements Server\QueryActionHandler
         $o->pageEditHelp = $this->getPageEditHelp();
         $o->pageTopActions = $this->getTopActions();
         $o->multiActions = $this->getMultiActions();
-        $o->cutConfirm = $this->getCutCopyConfirm("cut");
-        $o->copyConfirm = $this->getCutCopyConfirm("copy");
+        $o->pasteMessage = $this->getPasteMessage();
         $o->config = $this->getConfig();
         $o->components = $this->getComponentsEditorUI();
         $o->pcModel = $this->getPCModel();
@@ -106,6 +105,7 @@ class PageQueryActionHandler implements Server\QueryActionHandler
         $o->confirmation = $this->getConfirmationTemplate();
         $o->autoSaveInterval = $this->getAutoSaveInterval();
         $o->backUrl = $ctrl->getLinkTarget($this->page_gui, "edit");
+        $o->pasting = (bool) (in_array(\ilEditClipboard::getAction(), ["copy", "cut"]));
         return new Server\Response($o);
     }
 
@@ -420,17 +420,11 @@ class PageQueryActionHandler implements Server\QueryActionHandler
      * Confirmation screen for cut/paste step
      * @return string
      */
-    protected function getCutCopyConfirm($action)
+    protected function getPasteMessage()
     {
         $lng = $this->lng;
 
-        $groups = [
-            [
-                "cancel.".$action => "cancel"
-            ]
-        ];
-        $html = $this->ui_wrapper->getRenderedInfoBox($lng->txt("cont_sel_el_".$action."_use_paste")).
-            $this->ui_wrapper->getRenderedButtonGroups($groups);
+        $html = $this->ui_wrapper->getRenderedInfoBox($lng->txt("cont_sel_el_use_paste"));
 
         return $html;
     }

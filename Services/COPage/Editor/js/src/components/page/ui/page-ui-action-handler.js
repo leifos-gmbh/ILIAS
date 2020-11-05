@@ -154,6 +154,11 @@ export default class PageUIActionHandler {
         switch (type) {
           case "cut":
             this.ui.pageModifier.cut(model.getCutItems());
+            this.sendCutCommand(model);
+            break;
+
+          case "copy":
+            this.sendCopyCommand(model);
             break;
 
           case "characteristic":
@@ -238,30 +243,50 @@ export default class PageUIActionHandler {
     }
   }
 
+
+  sendCutCommand(model) {
+    let cut_action;
+    const af = this.actionFactory;
+
+    const cutPcIds = Array.from(
+      model.getCutItems()).map(x => (x.split(":")[1])
+    );
+
+    cut_action = af.page().command().cut(
+      cutPcIds
+    );
+
+    this.client.sendCommand(cut_action).then(result => {
+      this.ui.handlePageReloadResponse(result);
+    });
+
+  }
+
+  sendCopyCommand(model) {
+    let copy_action;
+    const af = this.actionFactory;
+
+    const copyPcIds = Array.from(
+      model.getCopyItems()).map(x => (x.split(":")[1])
+    );
+
+    copy_action = af.page().command().copy(
+      copyPcIds
+    );
+
+    this.client.sendCommand(copy_action).then(result => {
+      this.ui.handlePageReloadResponse(result);
+    });
+
+  }
+
   sendPasteCommand(model, params) {
     let paste_action;
     const af = this.actionFactory;
 
-    if (params.mode === model.STATE_MULTI_CUT) {
-
-      const cutPcIds = Array.from(
-        model.getCutItems()).map(x => (x.split(":")[1])
-      );
-
-      paste_action = af.page().command().cutPaste(
-        cutPcIds,
-        params.pcid,
-      );
-    } else if (params.mode === model.STATE_MULTI_COPY) {
-      const copyPcIds = Array.from(
-        model.getCopyItems()).map(x => (x.split(":")[1])
-      );
-
-      paste_action = af.page().command().copyPaste(
-        copyPcIds,
-        params.pcid,
-      );
-    }
+    paste_action = af.page().command().paste(
+      params.pcid,
+    );
 
     this.client.sendCommand(paste_action).then(result => {
       this.ui.handlePageReloadResponse(result);

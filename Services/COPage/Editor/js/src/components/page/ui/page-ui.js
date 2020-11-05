@@ -176,11 +176,9 @@ export default class PageUI {
           this.log("add dropdown: click");
           this.log(model);
 
-          const multiCutOrCopy = ((model.getState() === model.STATE_MULTI_ACTION) &&
-            ([model.STATE_MULTI_CUT, model.STATE_MULTI_COPY].includes(model.getMultiState())));
+          const pasting = this.uiModel.pasting;
 
-          if (multiCutOrCopy) {
-            // multi-action cut or copy
+          if (pasting) {
             li = li_templ.cloneNode(true);
             li.querySelector("a").innerHTML = il.Language.txt("paste");
             li.querySelector("a").addEventListener("click", (event) => {
@@ -191,20 +189,20 @@ export default class PageUI {
                 model.getMultiState()));
             });
             ul.appendChild(li);
-          } else {
-            // add each components
-            for (const [ctype, txt] of Object.entries(uiModel.addCommands)) {
-              li = li_templ.cloneNode(true);
-              li.querySelector("a").innerHTML = txt;
-              let cname = this.getPCNameForType(ctype);
-              li.querySelector("a").addEventListener("click", (event) => {
-                event.isDropDownSelectionEvent = true;
-                dispatch.dispatch(action.page().editor().componentInsert(cname,
-                  area.dataset.pcid,
-                  hier_id));
-              });
-              ul.appendChild(li);
-            }
+          }
+
+          // add each components
+          for (const [ctype, txt] of Object.entries(uiModel.addCommands)) {
+            li = li_templ.cloneNode(true);
+            li.querySelector("a").innerHTML = txt;
+            let cname = this.getPCNameForType(ctype);
+            li.querySelector("a").addEventListener("click", (event) => {
+              event.isDropDownSelectionEvent = true;
+              dispatch.dispatch(action.page().editor().componentInsert(cname,
+                area.dataset.pcid,
+                hier_id));
+            });
+            ul.appendChild(li);
           }
         });
       });
@@ -238,7 +236,11 @@ export default class PageUI {
         }
         event.stopPropagation();
 
-        area.dispatchEvent(new Event("areaClick"));
+        if (event.shiftKey || event.ctrlKey || event.metaKey) {
+          area.dispatchEvent(new Event("areaCmdClick"));
+        } else {
+          area.dispatchEvent(new Event("areaClick"));
+        }
       });
     });
   }
@@ -362,8 +364,13 @@ export default class PageUI {
       const hierid = pc_area.dataset.hierid;
       const ctype = pc_area.dataset.ctype;
       pc_area.addEventListener("areaClick", (event) => {
-        if (this.model.getState() !== this.model.STATE_MULTI_ACTION
-        ) {
+        if (this.model.getState() !== this.model.STATE_MULTI_ACTION) {
+          return;
+        }
+        dispatch.dispatch(action.page().editor().multiToggle(ctype, pcid, hierid));
+      });
+      pc_area.addEventListener("areaCmdClick", (event) => {
+        if (!([this.model.STATE_PAGE, this.model.STATE_MULTI_ACTION].includes(this.model.getState()))) {
           return;
         }
         dispatch.dispatch(action.page().editor().multiToggle(ctype, pcid, hierid));
@@ -530,7 +537,11 @@ export default class PageUI {
   }
 
   showEditPage() {
-    this.toolSlate.setContent(this.uiModel.pageTopActions + this.uiModel.pageEditHelp);
+    const model = this.model;
+    const pasteHelp = ([model.STATE_MULTI_CUT, model.STATE_MULTI_COPY].includes(model.getMultiState()))
+      ? this.uiModel.pasteMessage
+      : "";
+    this.toolSlate.setContent(this.uiModel.pageTopActions + pasteHelp + this.uiModel.pageEditHelp);
     this.initTopActions();
   }
 
@@ -538,12 +549,6 @@ export default class PageUI {
     const model = this.model;
 
     switch (model.getMultiState()) {
-      case model.STATE_MULTI_CUT:
-        this.toolSlate.setContent(this.uiModel.cutConfirm);
-        break;
-      case model.STATE_MULTI_COPY:
-        this.toolSlate.setContent(this.uiModel.copyConfirm);
-        break;
 
       case model.STATE_MULTI_CHARACTERISTIC:
         break;

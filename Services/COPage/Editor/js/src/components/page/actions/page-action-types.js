@@ -10,8 +10,9 @@ const ACTIONS = {
   CREATE_LEGACY: "create.legacy", // calls a legacy creation form for a page component
   EDIT_LEGACY: "edit.legacy",     // calls a legacy edit form for a page component
   MULTI_LEGACY: "multi.legacy",   // performas a multi-selection action the legacy way (send form)
-  CUT_PASTE: "cut.paste",   // cut and paste
-  COPY_PASTE: "copy.paste",   // copy and paste
+  CUT: "cut",                 // cut and paste
+  PASTE: "paste",             // cut and paste
+  COPY: "copy",             // copy and paste
   DRAG_DROP: "drag.drop",   // drag and drop (single element)
   FORMAT: "format",   // format paragraphs and sections
   DELETE: "delete",   // delete content

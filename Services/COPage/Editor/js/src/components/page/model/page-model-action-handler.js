@@ -13,7 +13,7 @@ export default class ModelActionHandler {
 
   /**
    *
-   * @param {Model} model
+   * @param {PageModel} model
    */
   constructor(model) {
     this.model = model;
@@ -54,6 +54,7 @@ export default class ModelActionHandler {
         break;
 
       case "multi.toggle":
+        this.model.setState(this.model.STATE_MULTI_ACTION);   // note that cmd+click comes from page state
         this.model.toggleSelect(params.pcid, params.hierid);
         break;
 
@@ -64,11 +65,15 @@ export default class ModelActionHandler {
           case "cut":
             this.model.cut();
             this.model.selectNone();
+            this.model.setState(this.model.STATE_PAGE);
+            this.model.setMultiState(this.model.STATE_MULTI_CUT);
             break;
 
           case "copy":
             this.model.copy();
             this.model.selectNone();
+            this.model.setMultiState(this.model.STATE_MULTI_COPY);
+            this.model.setState(this.model.STATE_PAGE);
             break;
 
           case "characteristic":
@@ -139,16 +144,19 @@ export default class ModelActionHandler {
 
       case "format.save":
         this.model.selectNone();
+        this.model.setState(this.model.STATE_PAGE);
         this.model.setMultiState(this.model.STATE_MULTI_NONE);
         break;
 
       case "multi.delete":
         this.model.selectNone();
+        this.model.setState(this.model.STATE_PAGE);
         this.model.setMultiState(this.model.STATE_MULTI_NONE);
         break;
 
       case "multi.activate":
         this.model.selectNone();
+        this.model.setState(this.model.STATE_PAGE);
         this.model.setMultiState(this.model.STATE_MULTI_NONE);
         break;
     }

@@ -69,22 +69,29 @@ export default class PageCommandActionFactory {
    * @param {string} target_pcid
    * @return {CommandAction}
    */
-  cutPaste(pcids, target_pcid) {
-    return this.clientActionFactory.command(this.COMPONENT, ACTIONS.CUT_PASTE, {
-      pcids: pcids,
+  paste(target_pcid) {
+    return this.clientActionFactory.command(this.COMPONENT, ACTIONS.PASTE, {
       target_pcid: target_pcid
     });
   }
 
   /**
    * @param {[]} pcids
-   * @param {string} target_pcid
    * @return {CommandAction}
    */
-  copyPaste(pcids, target_pcid) {
-    return this.clientActionFactory.command(this.COMPONENT, ACTIONS.COPY_PASTE, {
-      pcids: pcids,
-      target_pcid: target_pcid
+  cut(pcids) {
+    return this.clientActionFactory.command(this.COMPONENT, ACTIONS.CUT, {
+      pcids: pcids
+    });
+  }
+
+  /**
+   * @param {[]} pcids
+   * @return {CommandAction}
+   */
+  copy(pcids) {
+    return this.clientActionFactory.command(this.COMPONENT, ACTIONS.COPY, {
+      pcids: pcids
     });
   }
 

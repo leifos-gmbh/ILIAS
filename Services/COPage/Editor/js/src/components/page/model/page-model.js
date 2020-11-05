@@ -212,7 +212,6 @@ export default class PageModel {
    */
   cut() {
     this.model.cutItems = new Set(this.model.selectedItems);
-    this.setMultiState(this.STATE_MULTI_CUT);
   }
 
   /**
@@ -228,7 +227,6 @@ export default class PageModel {
    */
   copy() {
     this.model.copyItems = new Set(this.model.selectedItems);
-    this.setMultiState(this.STATE_MULTI_COPY);
   }
 
   /**

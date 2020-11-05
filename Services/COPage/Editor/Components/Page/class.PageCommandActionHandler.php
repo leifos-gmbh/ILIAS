@@ -57,12 +57,16 @@ class PageCommandActionHandler implements Server\CommandActionHandler
     public function handle($query, $body) : Server\Response
     {
         switch ($body["action"]) {
-            case "cut.paste":
-                return $this->cutPasteCommand($body);
+            case "cut":
+                return $this->cutCommand($body);
                 break;
 
-            case "copy.paste":
-                return $this->copyPasteCommand($body);
+            case "paste":
+                return $this->pasteCommand($body);
+                break;
+
+            case "copy":
+                return $this->copyCommand($body);
                 break;
 
             case "drag.drop":
@@ -92,10 +96,9 @@ class PageCommandActionHandler implements Server\CommandActionHandler
      * @param $body
      * @return Server\Response
      */
-    protected function cutPasteCommand($body) : Server\Response
+    protected function cutCommand($body) : Server\Response
     {
         $pcids = $body["data"]["pcids"];
-        $target_pcid = $body["data"]["target_pcid"];
         $page = $this->page_gui->getPageObject();
 
         $hids = array_map(
@@ -106,6 +109,20 @@ class PageCommandActionHandler implements Server\CommandActionHandler
         );
 
         $page->cutContents($hids);
+
+        return $this->sendPage();
+    }
+
+    /**
+     * All command
+     * @param $body
+     * @return Server\Response
+     */
+    protected function pasteCommand($body) : Server\Response
+    {
+        $target_pcid = $body["data"]["target_pcid"];
+        $page = $this->page_gui->getPageObject();
+
         $page->pasteContents($this->getIdForPCId($target_pcid));
 
         return $this->sendPage();
@@ -116,10 +133,9 @@ class PageCommandActionHandler implements Server\CommandActionHandler
      * @param $body
      * @return Server\Response
      */
-    protected function copyPasteCommand($body) : Server\Response
+    protected function copyCommand($body) : Server\Response
     {
         $pcids = $body["data"]["pcids"];
-        $target_pcid = $body["data"]["target_pcid"];
         $page = $this->page_gui->getPageObject();
 
         $hids = array_map(
@@ -130,7 +146,6 @@ class PageCommandActionHandler implements Server\CommandActionHandler
         );
 
         $page->copyContents($hids);
-        $page->pasteContents($this->getIdForPCId($target_pcid));
 
         return $this->sendPage();
     }

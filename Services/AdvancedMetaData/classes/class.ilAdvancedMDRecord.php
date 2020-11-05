@@ -851,7 +851,10 @@ class ilAdvancedMDRecord
             'id' => $this->generateImportId()));
         $writer->xmlElement('Title', null, $this->getTitle());
         $writer->xmlElement('Description', null, $this->getDescription());
-        
+
+        $translations = ilAdvancedMDRecordTranslations::getInstanceByRecordId($this->getRecordId());
+        $translations->toXML($writer);
+
         foreach ($this->getAssignedObjectTypes() as $obj_type) {
             $optional = array("optional" => $obj_type["optional"]);
             if ($obj_type["sub_type"] == "") {

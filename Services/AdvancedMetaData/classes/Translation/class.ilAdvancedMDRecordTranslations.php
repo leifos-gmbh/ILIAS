@@ -268,4 +268,35 @@ class ilAdvancedMDRecordTranslations
         }
         return $this->record->getDescription();
     }
+
+    /**
+     * @param ilXmlWriter $writer
+     * @return ilXmlWriter
+     */
+    public function toXML(ilXmlWriter $writer) : ilXmlWriter
+    {
+        if (!count($this->getTranslations())) {
+            return $writer;
+        }
+
+        $writer->xmlStartTag(
+            'Translations',
+            [
+                'defaultLanguage' => $this->getDefaultLanguage()
+            ]
+        );
+        foreach ($this->getTranslations() as $translation) {
+            $writer->xmlStartTag(
+                'Translation',
+                [
+                    'language' => $translation->getLangKey()
+                ]
+            );
+            $writer->xmlElement('Title', [], $translation->getTitle());
+            $writer->xmlElement('Description', [], $translation->getDescription());
+            $writer->xmlEndTag('Translation');
+        }
+        $writer->xmlEndTag('Translations');
+        return $writer;
+    }
 }

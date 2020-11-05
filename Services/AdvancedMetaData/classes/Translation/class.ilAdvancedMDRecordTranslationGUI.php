@@ -33,6 +33,7 @@ class ilAdvancedMDRecordTranslationGUI extends ilAdvancedMDTranslationGUI
 
         if (!in_array($default, $languages)) {
             ilUtil::sendFailure($this->language->txt('err_check_input'), true);
+            ilUtil::sendInfo($this->language->txt('md_adn_int_error_no_default'), true);
             $this->ctrl->redirect($this, self::CMD_DEFAULT);
         }
 

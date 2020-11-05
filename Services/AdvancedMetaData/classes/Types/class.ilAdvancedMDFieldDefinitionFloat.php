@@ -47,8 +47,8 @@ class ilAdvancedMDFieldDefinitionFloat extends ilAdvancedMDFieldDefinitionIntege
         $def->setMin($this->getMin());
         $def->setMax($this->getMax());
         $def->setDecimals($this->getDecimals());
-        $def->setSuffix($this->getSuffix());
-    
+        $def->setSuffix(isset($this->getSuffixTranslations()[$this->language]) ?  $this->getSuffixTranslations()[$this->language] : $this->getSuffix());
+
         return $def;
     }
     

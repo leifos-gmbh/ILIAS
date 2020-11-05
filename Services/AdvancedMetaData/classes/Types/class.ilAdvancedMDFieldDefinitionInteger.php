@@ -172,7 +172,7 @@ class ilAdvancedMDFieldDefinitionInteger extends ilAdvancedMDFieldDefinition
         );
     }
     
-    public function getFieldDefinitionForTableGUI()
+    public function getFieldDefinitionForTableGUI(string $content_language)
     {
         global $DIC;
 
@@ -187,7 +187,12 @@ class ilAdvancedMDFieldDefinitionInteger extends ilAdvancedMDFieldDefinition
             $res[$lng->txt("md_adv_number_max")] = $this->getMax();
         }
         if ($this->getSuffix()) {
-            $res[$lng->txt("md_adv_number_suffix")] = $this->getSuffix();
+            if ($this->useDefaultLanguageMode($content_language)) {
+                $suffix = $this->getSuffix();
+            } else {
+                $suffix = $this->getSuffixTranslations()[$content_language] ?? '';
+            }
+            $res[$lng->txt("md_adv_number_suffix")] = $suffix;
         }
         
         return $res;

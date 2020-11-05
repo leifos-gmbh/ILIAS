@@ -134,13 +134,20 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
         ];
     }
     
-    public function getFieldDefinitionForTableGUI()
+    public function getFieldDefinitionForTableGUI(string $content_language)
     {
         global $DIC;
 
         $lng = $DIC['lng'];
-        
-        return array($lng->txt("meta_advmd_select_options") => implode(",", $this->getOptions()));
+
+        if (strlen($content_language)) {
+            $options = $this->getOptionTranslation($content_language);
+        } else {
+            $options = $this->getOptions();
+        }
+        return [
+            $lng->txt("meta_advmd_select_options") => implode(",", $options)
+        ];
     }
 
     /**

@@ -95,13 +95,13 @@ class ilAdvancedMDFieldDefinitionFloat extends ilAdvancedMDFieldDefinitionIntege
         return $def;
     }
     
-    public function getFieldDefinitionForTableGUI()
+    public function getFieldDefinitionForTableGUI(string $content_language)
     {
         global $DIC;
 
         $lng = $DIC['lng'];
     
-        $res = parent::getFieldDefinitionForTableGUI();
+        $res = parent::getFieldDefinitionForTableGUI($content_language);
         $res[$lng->txt("md_adv_number_decimals")] = $this->getDecimals();
         return $res;
     }

@@ -86,7 +86,7 @@ abstract class ilAdvancedMDFieldDefinitionGroupBased extends ilAdvancedMDFieldDe
         );
     }
     
-    public function getFieldDefinitionForTableGUI()
+    public function getFieldDefinitionForTableGUI(string $content_language)
     {
         global $lng;
         

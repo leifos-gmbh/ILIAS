@@ -644,7 +644,7 @@ abstract class ilAdvancedMDFieldDefinition
      *
      * @return array
      */
-    public function getFieldDefinitionForTableGUI()
+    public function getFieldDefinitionForTableGUI(string $content_language)
     {
         // type-specific properties
     }

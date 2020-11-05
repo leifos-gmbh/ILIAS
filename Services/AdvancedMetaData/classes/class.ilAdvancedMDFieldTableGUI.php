@@ -144,7 +144,7 @@ class ilAdvancedMDFieldTableGUI extends ilTable2GUI
             $tmp_arr['fields'] = array();
             $tmp_arr['searchable'] = $definition->isSearchable();
             $tmp_arr['type'] = $this->lng->txt($definition->getTypeTitle());
-            $tmp_arr['properties'] = $definition->getFieldDefinitionForTableGUI();
+            $tmp_arr['properties'] = $definition->getFieldDefinitionForTableGUI($this->active_language);
             $tmp_arr['supports_search'] = $definition->isSearchSupported();
             
             $tmp_arr['perm'] = $this->permissions->hasPermissions(

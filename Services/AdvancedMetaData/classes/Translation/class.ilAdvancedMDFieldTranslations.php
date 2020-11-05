@@ -186,7 +186,7 @@ class ilAdvancedMDFieldTranslations
      */
     public function getFormTranslationInfo(int $field_id, string $active_language) : string
     {
-        if (!count($this->getTranslations($field_id))) {
+        if (count($this->getTranslations($field_id)) <= 1) {
             return '';
         }
 
@@ -208,7 +208,10 @@ class ilAdvancedMDFieldTranslations
      */
     public function modifyTranslationInfoForTitle(int $field_id, ilPropertyFormGUI $form, ilTextInputGUI $title, string $active_language)
     {
-        if ($active_language === $this->getDefaultLanguage() || !$this->getDefaultLanguage()) {
+        if (
+            !strlen($active_language) ||
+            $active_language === $this->getDefaultLanguage() || !$this->getDefaultLanguage()
+        ) {
             return;
         }
 
@@ -227,7 +230,11 @@ class ilAdvancedMDFieldTranslations
      */
     public function modifyTranslationInfoForDescription(int $field_id, ilPropertyFormGUI $form, ilTextAreaInputGUI $description, string $active_language)
     {
-        if ($active_language === $this->getDefaultLanguage() || !$this->getDefaultLanguage()) {
+        if (
+            !strlen($active_language) ||
+            $active_language === $this->getDefaultLanguage() ||
+            !$this->getDefaultLanguage()
+        ) {
             return;
         }
 

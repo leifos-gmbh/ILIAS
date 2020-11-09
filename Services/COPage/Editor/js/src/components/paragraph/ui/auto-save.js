@@ -127,7 +127,9 @@ export default class AutoSave {
   displayAutoSave(text) {
     this.log("AutoSave: display");
     const el = document.getElementById(this.AUTO_SAVE_ELEMENT_ID);
-    el.innerHTML = text;
+    if (el) {
+      el.innerHTML = text;
+    }
   }
 
   autoSave() {

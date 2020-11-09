@@ -167,6 +167,7 @@ export default class ParagraphUI {
     this.uiModel = uiModel;
     let t = this;
     this.initTinyWrapper();
+    const wrapper = this.tinyWrapper;
 
     this.log("css: " + this.uiModel.config.content_css);
 
@@ -1020,7 +1021,7 @@ export default class ParagraphUI {
   }
 
   showLastUpdate(last_update) {
-    this.autoSave.displayAutoSave(last_update);
+    this.autoSave.displayAutoSave(il.Language.txt("cont_last_update") + ": " + last_update);
   }
 
   setSectionClass(pcid, characteristic) {

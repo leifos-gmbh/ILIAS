@@ -39,7 +39,7 @@ class Init
             $this->ctrl->getFormActionByClass("ilPageEditorGUI")
             ."');");
 
-        $lang_vars = ["cont_error", "cont_sel_el_cut_use_paste", "cont_sel_el_copied_use_paste",
+        $lang_vars = ["cont_last_update", "cont_error", "cont_sel_el_cut_use_paste", "cont_sel_el_copied_use_paste",
                       "cont_ed_new_col_before", "cont_ed_new_col_after", "cont_ed_col_left", "cont_ed_col_right", "cont_ed_delete_col",
                       "cont_ed_new_row_before", "cont_ed_new_row_after", "cont_ed_row_up", "cont_ed_row_down", "cont_ed_delete_row"
         ];

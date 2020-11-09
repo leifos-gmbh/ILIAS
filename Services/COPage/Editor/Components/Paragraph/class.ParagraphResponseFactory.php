@@ -42,7 +42,12 @@ class ParagraphResponseFactory
         $data = new \stdClass();
         $data->renderedContent = $rendered_content;
         $data->error = $error;
-        $data->last_update = $last_change;
+        $data->last_update = null;
+        if ($last_change) {
+            $lu = new \ilDateTime($last_change, IL_CAL_DATETIME);
+            \ilDatePresentation::setUseRelativeDates(false);
+            $data->last_update = \ilDatePresentation::formatDate($lu, true);
+        }
 
         return new Server\Response($data);
     }
@@ -72,7 +77,12 @@ class ParagraphResponseFactory
         $data = new \stdClass();
         $data->renderedContent = $rendered_content;
         $data->error = $error;
-        $data->last_update = $last_change;
+        $data->last_update = null;
+        if ($last_change) {
+            $lu = new \ilDateTime($last_change, IL_CAL_DATETIME);
+            \ilDatePresentation::setUseRelativeDates(false);
+            $data->last_update = \ilDatePresentation::formatDate($lu, true);
+        }
 
         return new Server\Response($data);
     }

@@ -188,6 +188,20 @@ class ilDidacticTemplateSetting
     {
         return $this->type;
     }
+
+    /**
+     * @param ilObjectDefinition $definition
+     * @return bool
+     */
+    public function hasIconSupport(ilObjectDefinition $definition) : bool
+    {
+        foreach ($this->getAssignments() as $assignment) {
+            if (!$definition->isContainer()) {
+                return false;
+            }
+        }
+        return true;
+    }
     
     /**
      * Set assignments

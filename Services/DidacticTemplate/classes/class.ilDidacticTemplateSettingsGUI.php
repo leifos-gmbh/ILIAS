@@ -1,6 +1,8 @@
 <?php
 /* Copyright (c) 1998-2009 ILIAS open source, Extended GPL, see docs/LICENSE */
 
+use Psr\Http\Message\RequestInterface;
+
 include_once './Services/DidacticTemplate/classes/class.ilDidacticTemplateSetting.php';
 
 /**
@@ -37,6 +39,16 @@ class ilDidacticTemplateSettingsGUI
     private $ctrl;
 
     /**
+     * @var ilObjectDefinition
+     */
+    private $objDefinition;
+
+    /**
+     * @var RequestInterface
+     */
+    private $request;
+
+    /**
      * Constructor
      */
     public function __construct($a_parent_obj)
@@ -48,6 +60,8 @@ class ilDidacticTemplateSettingsGUI
         $this->lng = $this->dic->language();
         $this->rbacsystem = $this->dic->rbac()->system();
         $this->ctrl = $this->dic->ctrl();
+        $this->objDefinition = $DIC['objDefinition'];
+        $this->request = $DIC->http()->request();
 
         if (isset($_REQUEST["tplid"])) {
             $this->initObject($_REQUEST["tplid"]);
@@ -286,7 +300,9 @@ class ilDidacticTemplateSettingsGUI
             if ($edit) {
                 $this->editImport($settings);
             } else {
-                $settings->getIconHandler()->handleUpload($DIC->upload(), $_FILES['icon']['tmp_name']);
+                if ($settings->hasIconSupport($this->objDefinition)) {
+                    $settings->getIconHandler()->handleUpload($DIC->upload(), $_FILES['icon']['tmp_name']);
+                }
             }
         } catch (ilDidacticTemplateImportException $e) {
             ilLoggerFactory::getLogger('otpl')->error('Import failed with message: ' . $e->getMessage());
@@ -345,14 +361,29 @@ class ilDidacticTemplateSettingsGUI
         $ilCtrl = $DIC['ilCtrl'];
         $ilAccess = $DIC['ilAccess'];
 
+        $tpl_id = $this->request->getQueryParams()['tplid'] ?? 0;
+        $this->ctrl->saveParameter($this, 'tplid');
+
+
         if (!$ilAccess->checkAccess('write', '', $_REQUEST["ref_id"])) {
             $this->ctrl->redirect($this, "overview");
         }
 
-        $temp = new ilDidacticTemplateSetting((int) $_REQUEST['tplid']);
+        $temp = new ilDidacticTemplateSetting((int) $tpl_id);
         $form = $this->initEditTemplate($temp);
 
         if ($form->checkInput()) {
+
+            $tmp_file = $_FILES['icon']['tmp_name'];
+            $upload_element = $form->getItemByPostVar('icon');
+            if (
+                (strlen($tmp_file) || (!strlen($tmp_file) && $temp->getIconIdentifier())) &&
+                !$this->objDefinition->isContainer($form->getInput('type')) &&
+                !$upload_element->getDeletionFlag()
+            ) {
+                $icon = $form->getItemByPostVar('icon')->setAlert($this->lng->txt('didactic_icon_error'));
+                return $this->handleUpdateFailure($form);
+            }
             //change default entries if translation is active
             if (count($lang = $temp->getTranslationObject()->getLanguages())) {
                 $temp->getTranslationObject()->setDefaultTitle($form->getInput('title'));
@@ -390,7 +421,11 @@ class ilDidacticTemplateSettingsGUI
             ilUtil::sendSuccess($this->lng->txt('settings_saved'), true);
             $ilCtrl->redirect($this, 'overview');
         }
+        $this->handleUpdateFailure($form);
+    }
 
+    protected function handleUpdateFailure(ilPropertyFormGUI $form)
+    {
         ilUtil::sendFailure($this->lng->txt('err_check_input'));
         $form->setValuesByPost();
         $this->editTemplate($form);

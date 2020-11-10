@@ -21,6 +21,11 @@ class ilDidacticTemplateImport
      */
     private $logger = null;
 
+    /**
+     * @var ilObjectDefinition
+     */
+    protected $objDefinition;
+
 
     /**
      * Constructor
@@ -32,6 +37,7 @@ class ilDidacticTemplateImport
 
         $this->logger = $DIC->logger()->otpl();
         $this->type = $a_type;
+        $this->objDefinition = $DIC['objDefinition'];
     }
 
     /**
@@ -141,7 +147,7 @@ class ilDidacticTemplateImport
         }
         $setting->save();
 
-        if (strlen($icon)) {
+        if (strlen($icon) && $this->canUseIcons($setting)) {
             $setting->getIconHandler()->writeSvg($icon);
         }
 
@@ -154,6 +160,16 @@ class ilDidacticTemplateImport
         $trans->save();
         
         return $setting;
+    }
+
+    protected function canUseIcons(ilDidacticTemplateSetting $setting) : bool
+    {
+        foreach ($setting->getAssignments() as $assignment) {
+            if (!$this->objDefinition->isContainer($assignment)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

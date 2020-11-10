@@ -12,7 +12,7 @@ use ILIAS\Filesystem\Filesystem;
  */
 class ilScormImportDirectory extends ilImportDirectory
 {
-    private const PATH_PREFIX = 'scorm';
+    private const PATH_PREFIX = 'learningModule';
 
     /**
      * @return string

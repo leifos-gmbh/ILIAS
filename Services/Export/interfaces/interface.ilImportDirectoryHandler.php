@@ -8,7 +8,7 @@
  * @author	Stefan Meyer <smeyer.ilias@gmx.de>
  * @ingroup	ServicesExport
  */
-interface ilImportDirectoryAccess
+interface ilImportDirectoryHandler
 {
     public function exists() : bool;
 

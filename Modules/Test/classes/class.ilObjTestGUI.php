@@ -1030,6 +1030,11 @@ class ilObjTestGUI extends ilObjectGUI
     */
     protected function importFileObject($parent_id = null, $a_catch_errors = true)
     {
+        $upload_type = $this->request->getParsedBody()['upload_type'] ?? self::UPLOAD_TYPE_LOCAL;
+        if ($upload_type == self::UPLOAD_TYPE_UPLOAD_DIRECTORY) {
+            return parent::importFileObject($parent_id, $a_catch_errors);
+        }
+
         $form = $this->initImportForm($_REQUEST["new_type"]);
         if ($form->checkInput()) {
             $this->ctrl->setParameter($this, "new_type", $this->type);

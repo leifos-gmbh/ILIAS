@@ -14764,6 +14764,9 @@ div.ilCOPGMediaPrint {
 .ilSectionClassSelector ul.dropdown-menu {
   right: auto;
 }
+#il_prop_cont_characteristic ul.dropdown-menu {
+  right: auto;
+}
 #iltinymenu .dropdown-menu li {
   padding: 0;
 }

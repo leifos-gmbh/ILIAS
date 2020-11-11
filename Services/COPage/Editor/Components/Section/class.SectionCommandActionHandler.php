@@ -61,6 +61,10 @@ class SectionCommandActionHandler implements Server\CommandActionHandler
                 return $this->insertCommand($body);
                 break;
 
+            case "update":
+                return $this->updateCommand($body);
+                break;
+
             default:
                 throw new Exception("Unknown action " . $body["action"]);
                 break;
@@ -91,6 +95,31 @@ class SectionCommandActionHandler implements Server\CommandActionHandler
         $sec_gui->setPageConfig($page->getPageConfig());
 
         $form = $sec_gui->initForm(true);
+
+        // note: we  have everyting in _POST here, form works the usual way
+        if ($form->checkInput()) {
+            $sec_gui->setValuesFromForm($form);
+            $updated = $page->update();
+        }
+
+        return $this->ui_wrapper->sendPage($this->page_gui);
+    }
+
+    /**
+     * Update command
+     * @param $body
+     * @return Server\Response
+     */
+    protected function updateCommand($body) : Server\Response
+    {
+        $page = $this->page_gui->getPageObject();
+        $page->addHierIDs();
+        $hier_id = $page->getHierIdForPcId($body["pcid"]);
+        $sec = $page->getContentObjectForPcId($body["pcid"]);
+        $sec_gui = new \ilPCSectionGUI($page, $sec, $hier_id, $body["pcid"]);
+        $sec_gui->setPageConfig($page->getPageConfig());
+
+        $form = $sec_gui->initForm(false);
 
         // note: we  have everyting in _POST here, form works the usual way
         if ($form->checkInput()) {

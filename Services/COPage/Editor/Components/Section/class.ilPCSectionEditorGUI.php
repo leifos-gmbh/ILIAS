@@ -66,8 +66,32 @@ class ilPCSectionEditorGUI implements \ILIAS\COPage\Editor\Components\PageCompon
     /**
      * @inheritDoc
      */
+    /**
+     * @inheritDoc
+     */
     public function getEditComponentForm(\ILIAS\COPage\Editor\Server\UIWrapper $ui_wrapper, string $page_type, \ilPageObjectGUI $page_gui, int $style_id, $pcid): string {
-        return "";
+
+        $ctrl = $this->ctrl;
+        $lng = $this->lng;
+
+        $page = $page_gui->getPageObject();
+        $page->addHierIDs();
+        $hier_id = $page->getHierIdForPcId($pcid);
+        $sec = $page->getContentObjectForPcId($pcid);
+
+
+        $sec_gui = new ilPCSectionGUI($page_gui->getPageObject(), $sec, $hier_id, $pcid);
+        $sec_gui->setPageConfig($page_gui->getPageConfig());
+
+        $html = $ctrl->getHTML($sec_gui, [
+                "form" => true,
+                "ui_wrapper" => $ui_wrapper,
+                "buttons" => [["Page", "component.update", $lng->txt("save")],
+                              ["Page", "component.cancel", $lng->txt("cancel")]]
+            ]
+        );
+
+        return $html;
     }
 
 }

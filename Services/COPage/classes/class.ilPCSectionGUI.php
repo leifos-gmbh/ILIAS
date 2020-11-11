@@ -43,7 +43,8 @@ class ilPCSectionGUI extends ilPageContentGUI
     public function getHTML(array $params)
     {
         if ($params["form"] == true) {
-            $form = $this->initForm(true);
+            $insert = (bool) !($this->content_obj);
+            $form = $this->initForm($insert);
             $form->setShowTopButtons(false);
             $html = $params["ui_wrapper"]->getRenderedForm(
                 $form,

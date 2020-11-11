@@ -109,7 +109,7 @@ export default class PageUIActionHandler {
         break;
 
       case "component.edit":
-        if (["MediaObject"].includes(model.getCurrentPCName())) {   // generic load editing form
+        if (["MediaObject", "Section"].includes(model.getCurrentPCName())) {   // generic load editing form
           this.ui.loadGenericEditingForm(params.cname, params.pcid, params.hierid);
         } else if (!["Paragraph"].includes(model.getCurrentPCName())) {   // legacy underworld
           client.sendForm(actionFactory.page().command().editLegacy(params.cname, params.pcid,

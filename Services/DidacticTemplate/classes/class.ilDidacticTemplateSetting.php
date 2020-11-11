@@ -196,7 +196,7 @@ class ilDidacticTemplateSetting
     public function hasIconSupport(ilObjectDefinition $definition) : bool
     {
         foreach ($this->getAssignments() as $assignment) {
-            if (!$definition->isContainer()) {
+            if (!$definition->isContainer($assignment)) {
                 return false;
             }
         }

@@ -358,7 +358,7 @@ export default class PageUI {
     if (!selector) {
       selector = "[data-copg-ed-type='pc-area']";
     }
-
+    this.log("init multi section");
     document.querySelectorAll(selector).forEach(pc_area => {
       const pcid = pc_area.dataset.pcid;
       const hierid = pc_area.dataset.hierid;
@@ -381,6 +381,8 @@ export default class PageUI {
   initMultiButtons() {
     const dispatch = this.dispatcher;
     const action = this.actionFactory;
+    const selected = this.model.getSelected();
+    let buttonDisabled;
 
     document.querySelectorAll("[data-copg-ed-type='multi']").forEach(multi_button => {
       const type = multi_button.dataset.copgEdAction;
@@ -392,6 +394,10 @@ export default class PageUI {
           dispatch.dispatch(action.page().editor().multiAction(type));
         }
       });
+
+      buttonDisabled = (selected.size === 0 && type !== "all");
+      multi_button.disabled = buttonDisabled
+
     });
   }
 

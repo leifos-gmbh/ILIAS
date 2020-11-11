@@ -125,6 +125,21 @@ export default class ParagraphCommandActionFactory {
     });
   }
 
-
+  /**
+   *
+   * @param pcid
+   * @param previousPcid
+   * @param newPreviousContent
+   * @param previousCharacteristic
+   * @return {CommandAction}
+   */
+  mergePrevious(pcid, previousPcid, newPreviousContent, previousCharacteristic) {
+    return this.clientActionFactory.command(this.COMPONENT, ACTIONS.CMD_MERGE_PREVIOUS, {
+      pcid: pcid,
+      previousPcid: previousPcid,
+      newPreviousContent: newPreviousContent,
+      previousCharacteristic: previousCharacteristic
+    });
+  }
 
 }

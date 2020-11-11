@@ -94,7 +94,7 @@ export default class ParagraphUI {
    * @param {ToolSlate} toolSlate
    */
   constructor(client, dispatcher, actionFactory, page_model, toolSlate, pageModifier, autosave) {
-    this.debug = true;
+    this.debug = false;
 
     this.text_formats = {
       Strong: {inline : 'span', classes : 'ilc_text_inline_Strong'},
@@ -118,7 +118,10 @@ export default class ParagraphUI {
     this.tinyWrapper = new TinyWrapper((tiny, contents) => {
       dispatcher.dispatch(actionFactory.paragraph().editor().
         splitParagraph(this.page_model.getCurrentPCId(), tiny.getText(), tiny.getCharacteristic(), contents));
-    });
+    }, (tiny, previous) => {
+      this.checkMerge(tiny, previous);
+    }
+    );
     this.pageModifier = pageModifier;
     this.autoSave = autosave;
     this.pc_id_str = '';
@@ -221,7 +224,7 @@ export default class ParagraphUI {
       li.removeAttribute("onclick");
       li.addEventListener("click", (event) => {
         cl = li.querySelector(".ilCOPgEditStyleSelectionItem").querySelector("h1,h2,h3,div").classList[0];
-        console.log(cl);
+        this.log(cl);
         cl = cl.split("_");
         cl = cl[cl.length - 1];
         this.setParagraphClass(cl);
@@ -389,9 +392,9 @@ export default class ParagraphUI {
     this.log("setParagraphClass");
     this.log(i);
     const fc = document.querySelector(".ilTinyParagraphClassSelector .dropdown button");
-    console.log(fc);
+    this.log(fc);
     if (fc) {
-      console.log("SETTin DROP DOWN BUTTON: " + i)
+      this.log("SETTin DROP DOWN BUTTON: " + i)
       fc.firstChild.textContent = i + " ";
     }
     this.tinyWrapper.setParagraphClass(i);
@@ -641,7 +644,7 @@ export default class ParagraphUI {
   }
 
   switchToPrevious() {
-    this.log("paragraph-ui switchToPrevious");
+    console.log("paragraph-ui switchToPrevious");
     const dispatch = this.dispatcher;
     const action = this.actionFactory;
 
@@ -670,7 +673,8 @@ export default class ParagraphUI {
         this.page_model.getCurrentPCId(),
         this.getSwitchParameters(),
         previousPcid,
-        previousHierId));
+        previousHierId,
+        true));
     }
   }
 
@@ -708,7 +712,7 @@ export default class ParagraphUI {
     }
   }
 
-  editParagraph(pcId, hierId, mode, switched)
+  editParagraph(pcId, switchToEnd)
   {
     this.log("paragraph-ui.editParagraph");
     let content_el = document.querySelector("[data-copg-ed-type='pc-area'][data-pcid='" + pcId + "']");
@@ -719,6 +723,9 @@ export default class ParagraphUI {
       this.showToolbar();
       this.setParagraphClass(pc_model.characteristic);
       this.setSectionClassSelector(this.getSectionClass(pcId));
+      if (switchToEnd) {
+        wrapper.switchToEnd();
+      }
     }, () => {
       this.autoSave.handleAutoSaveKeyPressed();
     }, () => {
@@ -736,87 +743,6 @@ export default class ParagraphUI {
     tinymce.dom.Event.add(tinymce.dom.doc, 'mousedown',
       function() {console.log("mouse down");}
       , false);
-  }
-
-  doActionForm(cmd, command, value, target, type, char)
-  {
-//    if (cmd_called) return;
-    //alert("-" + cmd + "-" + command + "-" + value + "-" + target + "-"+ type + "-" + char + "-");
-    //alert(clickcmdid);
-    //-cmd[exec]-command-edit--
-    doCloseContextMenuCounter = 2;
-
-    if(cmd=="cmd[exec]")
-    {
-      cmd = "cmd[exec_"+clickcmdid+"]";
-    }
-
-    if (command=="command")
-    {
-      command += this.extractHierId(clickcmdid);
-    }
-
-    if (value=="edit" && type=="Paragraph" && char != "Code")
-    {
-      this.editParagraph(clickcmdid, 'edit', false);
-      return false;
-    }
-
-    if (value == 'insert_par')
-    {
-      this.editParagraph(clickcmdid, 'insert', false);
-      return false;
-    }
-
-    if (value=="delete")
-    {
-      if(!confirm(confirm_delete))
-      {
-        menuBlocked = true;
-        setTimeout("nextMenuClick()",500);
-        return;
-      }
-      menuBlocked = true;
-      setTimeout("nextMenuClick()",500);
-    }
-
-    obj = document.getElementById("cmform");
-    let hid_target = document.getElementById("cmform_target");
-    hid_target.value = target;
-    let hid_cmd = document.getElementById("cmform_cmd");
-    hid_cmd.name = command;
-    hid_cmd.value = value;
-    let hid_exec = document.getElementById("cmform_exec");
-    hid_exec.name = cmd;
-
-//    cmd_called = true;
-
-    if (ccell)
-    {
-      var loadergif = document.createElement('img');
-      loadergif.src = "./templates/default/images/loader.svg";
-      loadergif.border = 0;
-      //loadergif.style.position = 'absolute';
-      ccell.bgColor='';
-      ccell.appendChild(loadergif);
-    }
-    if (value === 'cut' || value === 'delete' || value === 'paste' || value === 'copy' || value === 'activate' || value === 'deactivate') {
-//      cmd_called = false;
-      var args= {};
-      if (value === 'cut') {
-        args = {osd_text: il.Language.txt("cont_sel_el_cut_use_paste")};
-      }
-      if (value === 'copy') {
-        args = {osd_text: il.Language.txt("cont_sel_el_copied_use_paste")};
-      }
-      this.sendCmdRequest(value, clickcmdid, "", {},
-        true, args, this.pageReloadAjaxSuccess);
-      //		console.log(value);
-      //		console.log(obj);
-      return;
-    }
-
-    obj.submit();
   }
 
 
@@ -1026,9 +952,9 @@ export default class ParagraphUI {
 
   setSectionClass(pcid, characteristic) {
     const currentPar = document.querySelector("[data-copg-ed-type='pc-area'][data-pcid='" + pcid + "']");
-    console.log(currentPar);
+    this.log(currentPar);
     const parentComp = currentPar.parentNode.closest("[data-copg-ed-type='pc-area']");
-    console.log(parentComp);
+    this.log(parentComp);
     if (parentComp && parentComp.dataset.cname === "Section") {
       parentComp.childNodes[1].className = "ilc_section_" + characteristic + " ilCOPageSection";
     }
@@ -1063,4 +989,104 @@ export default class ParagraphUI {
     }
   }
 
+  checkMerge(tiny, previous) {
+    // check if previous page content element is a paragraph
+    const dispatcher = this.dispatcher;
+    const actionFactory = this.actionFactory;
+    const pcid = this.page_model.getCurrentPCId();
+    let firstParagraph, firstParagraphPcid, firstParent, firstAddArea;
+    let secondParagraph, secondParagraphPcid, secondParent;
+
+    let el1 = document.createElement("div");
+    let el2 = document.createElement("div");
+
+    if (previous) { // merge current tiny with previous paragraph (backspace)
+      secondParagraph = document.querySelector("[data-copg-ed-type='pc-area'][data-pcid='" + pcid + "']");
+      secondParagraphPcid = pcid;
+      firstAddArea = secondParagraph.parentNode.previousSibling;
+
+      // we have an add-area in between...
+      if (firstAddArea && firstAddArea.dataset.copgEdType === "add-area") {
+        firstParent = firstAddArea.previousSibling;
+        if (firstParent && firstParent.firstChild && firstParent.firstChild.dataset.copgEdType === "pc-area" &&
+          firstParent.firstChild.dataset.cname === "Paragraph") {
+          firstParagraph = firstParent.firstChild;
+          firstParagraphPcid = firstParagraph.dataset.pcid;
+          const firstModel = this.page_model.getPCModel(firstParagraphPcid);
+          el1.innerHTML = firstModel.text;
+          el2.innerHTML = tiny.getText();
+        }
+      }
+    } else { // merge current tiny with next paragraph (delete)
+      firstParagraph = document.querySelector("[data-copg-ed-type='pc-area'][data-pcid='" + pcid + "']");
+      firstParagraphPcid = pcid;
+      firstAddArea = firstParagraph.parentNode.nextSibling;
+      if (firstAddArea && firstAddArea.dataset.copgEdType === "add-area") {
+        secondParent = firstAddArea.nextSibling;
+        if (secondParent && secondParent.firstChild && secondParent.firstChild.dataset.copgEdType === "pc-area" &&
+          secondParent.firstChild.dataset.cname === "Paragraph") {
+          secondParagraph = secondParent.firstChild;
+          secondParagraphPcid = secondParagraph.dataset.pcid;
+          const secondModel = this.page_model.getPCModel(secondParagraphPcid);
+          el1.innerHTML = tiny.getText();
+          el2.innerHTML = secondModel.text;
+        }
+      }
+    }
+
+
+    let newContent;
+    if (firstParagraph && secondParagraph) {
+
+      // first element is a list
+      while (el1.querySelector("ul") && el1.querySelector("ul").lastChild.nodeName === "UL") {
+        el1 = el1.querySelector("ul").lastChild;
+      }
+      if (el1.querySelector("ul")) {
+
+        // both are lists
+        if (el2.querySelector("ul")) {
+          const childs = Array.from(el2.querySelector("ul").children);
+          const el1Ul = el1.querySelector("ul");
+          childs.forEach((c) => {
+            el1Ul.append(c);
+          });
+          newContent = el1.innerHTML;
+
+        } else {    // first is list, second is no list
+          const lastChild = el1.querySelector("ul").lastChild;
+          if (lastChild.nodeName === "LI") {
+            lastChild.innerHTML = lastChild.innerHTML + el2.innerHTML;
+          }
+          newContent = el1.innerHTML;
+        }
+
+      } else {    // first element is not a list
+
+        // second element is a list
+        while (el2.querySelector("ul") && el2.querySelector("ul").firstChild.nodeName === "UL") {
+          el2 = el2.querySelector("ul").firstChild;
+        }
+        if (el2.querySelector("ul")) {
+          const firstChild = el2.querySelector("ul").firstChild;
+          if (firstChild.nodeName === "LI") {
+            firstChild.innerHTML = el1.innerHTML + firstChild.innerHTML;
+          }
+          newContent = el2.innerHTML;
+        } else {    // first and second element are no lists
+          newContent = el1.innerHTML + el2.innerHTML;
+        }
+      }
+
+      this.pageModifier.removeInsertedComponent(secondParagraphPcid);
+      dispatcher.dispatch(actionFactory.paragraph().editor().mergePrevious(secondParagraphPcid,
+        newContent,
+        firstParagraphPcid));
+    }
+  }
+
+  performMergePrevious(pcid, previousPcid, newContent) {
+    this.tinyWrapper.stopEditing();
+    this.editParagraph(previousPcid, true);
+  }
 }

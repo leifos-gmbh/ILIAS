@@ -354,9 +354,9 @@ export default class PageModel {
 
 
   getNewPCId() {
-    let vals = new Uint32Array(1);
+    let vals = new Uint32Array(2);
     window.crypto.getRandomValues(vals);
-    return vals[0];
+    return vals[0] + "" + vals[1];
   }
 
   setSectionFormat(format) {

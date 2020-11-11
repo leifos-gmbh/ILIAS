@@ -90,10 +90,15 @@ export default class TinyWrapper {
   */
 
   /**
-   * @param {Function} splitOnReturnCallback
+   * @param splitOnReturnCallback
+   * @param mergeCallback
    */
-  constructor(splitOnReturnCallback) {
+  constructor(splitOnReturnCallback, mergeCallback) {
     this.debug = false;
+    this.mergePrevious = false;
+    this.mergeNextContent = "";
+    this.gotoPrevious = false;
+    this.forwardOffset = 0;
 
     this.id = "tinytarget";
     this.minwidth = 200;
@@ -119,6 +124,7 @@ export default class TinyWrapper {
     this.lib = tinyMCE;
     this.htmlTransform = new HTMLTransform();
     this.splitOnReturnCallback = splitOnReturnCallback;
+    this.mergeCallback = mergeCallback;
   }
 
   /**
@@ -140,7 +146,7 @@ export default class TinyWrapper {
   }
 
   setContentCss(content_css) {
-    console.log("### tiny set content css:" + content_css);
+    this.log("### tiny set content css:" + content_css);
     this.content_css = content_css;
   }
 
@@ -155,7 +161,7 @@ export default class TinyWrapper {
 
 
   getConfig(after_init, after_keyup, previous, next) {
-    console.log("*** getting config " + this.content_css);
+    this.log("*** getting config " + this.content_css);
     if (!this.config) {
       this.config = {
         /* part of 4 */
@@ -259,13 +265,14 @@ export default class TinyWrapper {
     tiny.on('KeyUp', function (ev) {
       wrapper.autoResize();
       after_keyup();
+      const currentRng = tiny.selection.getRng();
 
       // down, right
       if ([39,40].includes(ev.keyCode)) {
-        const currentRng = tiny.selection.getRng();
-        if (wrapper.downRightRng &&
-          wrapper.downRightRng.endContainer === currentRng.endContainer &&
-          wrapper.downRightRng.endOffset === currentRng.endOffset
+        if (
+          currentRng.collapsed &&
+          currentRng.startOffset === currentRng.endOffset &&
+          currentRng.startOffset === wrapper.forwardOffset    // means offset did not change = end
         ) {
           if (next) {
             next();
@@ -273,22 +280,35 @@ export default class TinyWrapper {
         }
       }
 
-      // down, right
+      // up, left
       if ([37,38].includes(ev.keyCode)) {
-        const currentRng = tiny.selection.getRng();
-        if (wrapper.upLeftRng &&
-          wrapper.upLeftRng.endContainer === currentRng.endContainer &&
-          wrapper.upLeftRng.endOffset === currentRng.endOffset
-        ) {
-          if (previous) {
-            previous();
-          }
+        if (wrapper.gotoPrevious && previous) {
+          previous();
         }
       }
+
+      // backspace (8) -> merge with previous
+      if ([8].includes(ev.keyCode)) {
+        if (wrapper.mergePrevious) {
+          wrapper.mergeCallback(wrapper, true);
+        }
+      }
+
+      // delete (46) -> merge with next
+      if ([46].includes(ev.keyCode)) {
+        if (currentRng.collapsed &&
+          currentRng.startOffset === currentRng.endOffset &&
+          wrapper.mergeNextContent === wrapper.getText()) {
+          wrapper.mergeCallback(wrapper, false);
+        }
+      }
+
       wrapper.checkSplitOnReturn();
     });
 
     tiny.on('KeyDown', function (ev) {
+      const currentRng = tiny.selection.getRng();
+
       if (ev.keyCode === 35 || ev.keyCode === 36) {
         const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
         if (!ev.shiftKey && isMac) {
@@ -298,13 +318,49 @@ export default class TinyWrapper {
       }
 
       // down, right
-      if ([39,40].includes(ev.keyCode)) {
-        wrapper.downRightRng = tiny.selection.getRng();
+      if ([39,40].includes(ev.keyCode) && !ev.shiftKey) {
+        if (
+          currentRng.collapsed &&
+          currentRng.startOffset === currentRng.endOffset
+        ) {
+          wrapper.forwardOffset = currentRng.startOffset;
+        }
       }
 
-      // down, right
-      if ([37,38].includes(ev.keyCode)) {
-        wrapper.upLeftRng = tiny.selection.getRng();
+      // up, left
+      if ([37,38].includes(ev.keyCode) && !ev.shiftKey) {
+        console.log(currentRng);
+        wrapper.gotoPrevious = (
+          currentRng.collapsed &&
+          currentRng.startOffset === 0 &&
+          currentRng.endOffset === 0
+        );
+      }
+
+      // backspace (8)
+      if ([8].includes(ev.keyCode)) {
+        wrapper.mergePrevious = (
+          currentRng.collapsed &&
+          currentRng.startOffset === 0 &&
+          currentRng.endOffset === 0
+        );
+        if (wrapper.mergePrevious) {
+          const dom = tiny.dom;
+          if (dom.select('ol,ul')) {    // do not allow to outdent first list element
+            ev.preventDefault();
+            ev.stopPropagation();
+            return false;
+          }
+        }
+      }
+
+      // delete (46)
+      if ([46].includes(ev.keyCode)) {
+        if (currentRng.collapsed &&
+          currentRng.startOffset === currentRng.endOffset
+        ) {
+          wrapper.mergeNextContent = wrapper.getText();
+        }
       }
 
       if (ev.keyCode === 9 && !ev.shiftKey) {
@@ -506,7 +562,7 @@ export default class TinyWrapper {
       let c = html.p2br(ed.getContent());
 
       cl = "copg-input-ghost " + cl;
-      console.log(cl);
+      this.log(cl);
       const cl_arr = cl.split("_");
       const characteristic = cl_arr[cl_arr.length - 1];
       switch (characteristic) {
@@ -543,7 +599,7 @@ export default class TinyWrapper {
         div2.remove();
       }
 
-      console.log("replacing with: " + c);
+      this.log("replacing with: " + c);
 
       // we replace the second div (content) with c
       this.ghost.innerHTML = c;
@@ -849,6 +905,12 @@ export default class TinyWrapper {
         this.splitOnReturnCallback(this, contents);
       }
     }
+  }
+
+  switchToEnd() {
+    let ed = this.tiny;
+    ed.selection.select(ed.getBody(), true);
+    ed.selection.collapse(false);
   }
 
 }

@@ -10,6 +10,7 @@ const ACTIONS = {
   UPDATE_AUTO: "update.auto",              // auto update paragraph
   SPLIT: "split",              // split paragraph
   CMD_SECTION_CLASS: "cmd.sec.class",    // section format
+  CMD_MERGE_PREVIOUS: "cmd.merge.previous",    // merge with previous paragraph
 
   // editor actions (things happening in the editor client side)
   PARAGRAPH_CLASS: "par.class",    // paragraph class
@@ -32,6 +33,7 @@ const ACTIONS = {
   AUTO_INSERT_POST: "post.insert.auto",
   SPLIT_POST: "post.split",
   SPLIT_PARAGRAPH: "par.split",
+  MERGE_PREVIOUS: "merge.previous",
   SECTION_CLASS: "sec.class"    // section format
 
 };

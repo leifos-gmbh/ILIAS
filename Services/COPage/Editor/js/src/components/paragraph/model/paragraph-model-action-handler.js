@@ -109,7 +109,20 @@ export default class ParagraphModelActionHandler {
             }
           }
           this.pageModel.setSplitPCIds(splitIds);
+          break;
 
+        case ACTIONS.MERGE_PREVIOUS:
+          const previousModel = this.pageModel.getPCModel(params.previousPcid);
+          this.pageModel.setPCModel(params.previousPcid, {
+            text: params.newPreviousContent,
+            characteristic: previousModel.characteristic
+          });
+          this.pageModel.setCurrentPageComponent("Paragraph", params.previousPcid,
+            "");
+          this.pageModel.setUndoPCModel(
+            this.pageModel.getCurrentPCId(),
+            this.pageModel.getPCModel(this.pageModel.getCurrentPCId())
+          );
           break;
 
         case ACTIONS.SECTION_CLASS:

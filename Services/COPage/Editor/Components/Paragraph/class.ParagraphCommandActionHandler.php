@@ -88,6 +88,10 @@ class ParagraphCommandActionHandler implements Server\CommandActionHandler
                 return $this->sectionClassCommand($body);
                 break;
 
+            case "cmd.merge.previous":
+                return $this->mergePrevious($body);
+                break;
+
             default:
                 throw new Exception("Unknown action " . $body["action"]);
                 break;
@@ -309,6 +313,31 @@ class ParagraphCommandActionHandler implements Server\CommandActionHandler
                 $updated = $page->update();
             }
         }
+        return $this->ui_wrapper->sendPage($this->page_gui);
+    }
+
+    /**
+     * Merge with previous paragraph
+     * @param $body
+     * @return Server\Response
+     */
+    protected function mergePrevious($body) : Server\Response
+    {
+        $page = $this->page_gui->getPageObject();
+
+        $updated = $this->updateParagraph(
+            $body["data"]["previousPcid"],
+            $body["data"]["newPreviousContent"],
+            $body["data"]["previousCharacteristic"]
+        );
+
+        $page->addHierIDs();
+        $hier_id = $page->getHierIdForPcId($body["data"]["pcid"]);
+        $updated = $page->deleteContents(
+            [$hier_id],
+            true,
+            $this->page_gui->getPageConfig()->getEnableSelfAssessment()
+        );
         return $this->ui_wrapper->sendPage($this->page_gui);
     }
 

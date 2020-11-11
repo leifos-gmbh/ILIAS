@@ -191,5 +191,13 @@ export default class ParagraphEditorActionFactory {
     });
   }
 
+  mergePrevious(pcid, newPreviousContent, previousPcid) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.MERGE_PREVIOUS, {
+      pcid: pcid,
+      previousPcid: previousPcid,
+      newPreviousContent: newPreviousContent
+    });
+  }
+
 
 }

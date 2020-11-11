@@ -99,7 +99,7 @@ export default class ParagraphUIActionHandler {
             );
             this.ui.handleSaveOnEdit();
           }
-          this.ui.editParagraph(page_model.getCurrentPCId());
+          this.ui.editParagraph(page_model.getCurrentPCId(), params.switchToEnd);
           break;
       }
     }
@@ -238,6 +238,19 @@ export default class ParagraphUIActionHandler {
             newParagraphs,
             page_model);
           break;
+
+        case ACTIONS.MERGE_PREVIOUS:
+          this.ui.performMergePrevious(
+            params.pcid,
+            params.previousPcid,
+            params.newPreviousContent
+          );
+          this.sendMergePreviousCommand(params.pcid,
+            params.previousPcid,
+            params.newPreviousContent,
+            page_model);
+          break;
+
       }
     }
   }
@@ -385,5 +398,27 @@ export default class ParagraphUIActionHandler {
 
   }
 
+  sendMergePreviousCommand(pcid, previousPcid, newPreviousContent, page_model) {
+    const af = this.actionFactory;
+    const dispatch = this.dispatcher;
+
+    const previousModel = page_model.getPCModel(previousPcid);
+
+    const merge_action = af.paragraph().command().mergePrevious(
+      pcid,
+      previousPcid,
+      newPreviousContent,
+      previousModel.characteristic
+    );
+    this.ui.autoSaveStarted();
+    this.client.sendCommand(merge_action).then(result => {
+      this.ui.autoSaveEnded();
+      const pl = result.getPayload();
+
+      //dispatch.dispatch(af.paragraph().editor().splitPostProcessing());
+
+      //this.handleSaveResponseSplit(pl, page_model);
+    });
+  }
 
 }

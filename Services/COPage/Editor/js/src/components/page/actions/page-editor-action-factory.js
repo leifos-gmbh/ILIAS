@@ -67,14 +67,15 @@ export default class PageEditorActionFactory {
   /**
    * @returns {EditorAction}
    */
-  componentSwitch(cname, state, oldPcid, oldPara, newPcid, newHierid) {
+  componentSwitch(cname, state, oldPcid, oldPara, newPcid, newHierid, switchToEnd = false) {
     return this.editorActionFactory.action(this.COMPONENT, ACTIONS.COMPONENT_SWITCH, {
       cname: cname,
       oldComponentState: state,
       oldPcid: oldPcid,
       oldParameters: oldPara,
       newPcid: newPcid,
-      newHierid: newHierid
+      newHierid: newHierid,
+      switchToEnd: switchToEnd
     });
   }
 

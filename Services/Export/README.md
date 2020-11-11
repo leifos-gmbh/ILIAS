@@ -20,13 +20,13 @@ Files located in this directory must be named with the original export file name
 `1605001786__13243__fold_319.zip` for folder objects
 `1604568820__12654__cat_3191.zip` for category objects
 
-The file name must match the regular expression
+The file names must match the regular expression
   
-`/[0-9]{10}__[0-9]{3,6}__([a-z]{3,4})_[0-9]{2,9}.zip`
+`/[0-9]{10}__[0-9]{3,6}__([a-z]{1,4})_[0-9]{2,9}.zip`
 
 The "Add new Item" dialogue will only show export files with names matching the object 
 type ("Category" files are only presented in the category import form).
-All files will be shown to all users. 
+All files located in this directory will be shown to all users. 
 To restrict the "Upload from directory" service to specific users only, create 
 subdirectories with user ids and copy the export files to this location:
 
@@ -34,20 +34,20 @@ Example for category export files only for "Root" User (ID 6):
 `{PATH_TOEXTERN_DATA_OF_CLIENT}/upload/export/6/1604568820__12654__cat_3191.zip`
 
 #### Scorm and HTLMs
-The configuration of an upload directory has been removed in Release 7
+The configuration of an upload directory has been removed in Release 7.
 The fixed location is: 
 
 `{PATH_TOEXTERN_DATA_OF_CLIENT}/upload/export/learningModules`
 
-All files stored in this directory will be avalaible in the SCORM-upload 
+All files stored in this directory will be available in the SCORM-upload 
 and the HTLM-File-Browser. Only users with "write" permission to the administration
 can access the files.
 
 #### Media Objects
-The configuration of an upload directory has been removed in Release 7
+The configuration of an upload directory has been removed in Release 7.
 The fixed location is: 
 
-`{PATH_TOEXTERN_DATA_OF_CLIENT}/upload/export/mob`
+`{PATH_TO_EXTERN_DATA_OF_CLIENT}/upload/export/mob`
 
-All files stored in this directory will be accessible in the media pool management . 
+All files stored in this directory will be accessible in the media pool management. 
 Only users with "write" permission to the administration can access the files.

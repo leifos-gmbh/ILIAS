@@ -233,13 +233,14 @@ class ilDidacticTemplateSettingsGUI
         $form->addCommandButton('overview', $this->lng->txt('cancel'));
 
         $file = new ilFileInputGUI($this->lng->txt('import_file'), 'file');
-        $file->setSuffixes(array('xml'));
+        $file->setSuffixes(['xml']);
         $file->setRequired(true);
         $form->addItem($file);
 
         $icon = new ilImageFileInputGUI($this->lng->txt('icon'), 'icon');
         $icon->setAllowDeletion(false);
-        $icon->setSuffixes(false);
+        $icon->setSuffixes(['svg']);
+        $icon->setInfo($this->lng->txt('didactic_icon_info'));
         $form->addItem($icon);
 
         $created = true;
@@ -831,7 +832,7 @@ class ilDidacticTemplateSettingsGUI
         $form->addCommandButton('overview', $this->lng->txt('cancel'));
 
         $file = new ilFileInputGUI($this->lng->txt('didactic_template_update_import'), 'file');
-        $file->setSuffixes(array('xml'));
+        $file->setSuffixes(['xml']);
         $file->setInfo($this->lng->txt('didactic_template_update_import_info'));
         $form->addItem($file);
 

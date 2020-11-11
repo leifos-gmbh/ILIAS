@@ -262,12 +262,12 @@ class ilDidacticTemplateSettingsGUI
             $ilCtrl->redirect($this, "overview");
         }
 
-        $edit = isset($_REQUEST['tplid']);
-
+        $edit = $this->request->getQueryParams()['tplid'] ?? false;
         if ($edit) {
-            $form = $this->createImportForm();
-        } else {
+            $this->initObject($this->request->getQueryParams()['tplid']);
             $form = $this->editImportForm();
+        } else {
+            $form = $this->createImportForm();
         }
 
 
@@ -276,10 +276,11 @@ class ilDidacticTemplateSettingsGUI
             $form->setValuesByPost();
 
             if ($edit) {
-                $this->showEditImportForm();
+                $this->showEditImportForm($form);
             } else {
                 $this->showImportForm($form);
             }
+            return;
         }
 
         // Do import
@@ -808,12 +809,12 @@ class ilDidacticTemplateSettingsGUI
         }
     }
 
-    public function showEditImportForm()
+    public function showEditImportForm(ilPropertyFormGUI $form = null)
     {
         $this->setEditTabs("import");
-
-        $form = $this->editImportForm();
-        
+        if (!$form instanceof ilPropertyFormGUI) {
+            $form = $this->editImportForm();
+        }
         $GLOBALS['DIC']['tpl']->setContent($form->getHTML());
     }
 
@@ -832,6 +833,7 @@ class ilDidacticTemplateSettingsGUI
         $form->addCommandButton('overview', $this->lng->txt('cancel'));
 
         $file = new ilFileInputGUI($this->lng->txt('didactic_template_update_import'), 'file');
+        $file->setRequired(true);
         $file->setSuffixes(['xml']);
         $file->setInfo($this->lng->txt('didactic_template_update_import_info'));
         $form->addItem($file);

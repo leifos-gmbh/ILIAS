@@ -1296,7 +1296,7 @@ class ilObjectGUI
 
         $import_directory_factory = new ilImportDirectoryFactory();
         $export_directory = $import_directory_factory->getInstanceForComponent(ilImportDirectoryFactory::TYPE_EXPORT);
-        $upload_files = $export_directory->getFilesFor((int) $DIC->user(), (string) $a_new_type);
+        $upload_files = $export_directory->getFilesFor((int) $DIC->user()->getId(), (string) $a_new_type);
         $has_upload_files = false;
         if (count($upload_files)) {
             $has_upload_files = true;

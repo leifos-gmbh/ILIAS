@@ -38,19 +38,34 @@ class ilExportImportDirectory extends ilImportDirectory
      */
     public function getFilesFor(int $user_id, string $type) : array
     {
-        $finder = $this->storage->finder()->in([$this->getRelativePath()]);
-        if ($this->storage->hasDir($this->getRelativePath() . '/' . (string) $user_id)) {
-            $finder = $finder->append($this->storage->finder()->in([$this->getRelativePath() . '/' . (string) $user_id]));
+        if (!$this->exists()) {
+            return [];
         }
-        $finder = $finder->sortByName();
+        $finder = $this->storage->finder()
+                                ->in([$this->getRelativePath()])
+                                ->files()
+                                ->depth('< 1')
+                                ->sortByName();
         $files = [];
-        foreach ($finder->files() as $file) {
-            // @todo: use a custom finder
+        foreach ($finder as $file) {
             $basename = basename($file->getPath());
             if ($this->matchesType($type, $basename)) {
                 $files[base64_encode($file->getPath())] = $basename;
             }
         }
+        if ($this->storage->hasDir($this->getRelativePath() . '/' . (string) $user_id)) {
+            $finder = $this->storage->finder()->in([$this->getRelativePath() . '/' . (string) $user_id])
+                ->depth('< 1')
+                ->files()
+                ->sortByName();
+            foreach ($finder as $file) {
+                $basename = basename($file->getPath());
+                if ($this->matchesType($type, $basename)) {
+                    $files[base64_encode($file->getPath())] = $basename;
+                }
+            }
+        }
+        asort($files);
         return $files;
     }
 

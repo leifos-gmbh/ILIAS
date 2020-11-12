@@ -151,10 +151,24 @@ class BlogHtmlExport
         // export pages
         $this->exportHTMLPages();
 
+        // export comments user images
+        $this->exportUserImages();
+
         $this->export_util->exportResourceFiles();
         $this->co_page_html_export->exportPageElements();
 
         return $this->zipPackage();
+    }
+
+    /**
+     * Export user images
+     */
+    protected function exportUserImages()
+    {
+        if ($this->include_comments) {
+            $user_export = new \ILIAS\Notes\Export\UserImageExporter();
+            $user_export->exportUserImagesForRepObjId($this->target_dir, $this->blog->getId());
+        }
     }
 
     /**
@@ -183,12 +197,14 @@ class BlogHtmlExport
     {
         // zip it all
         $date = time();
-        $zip_file = \ilExport::_getExportDirectory($this->blog->getId(), "html", "blog") .
+        $type = ($this->include_comments)
+            ? "html_comments"
+            : "html";
+        $zip_file = \ilExport::_getExportDirectory($this->blog->getId(), $type, "blog") .
             "/" . $date . "__" . IL_INST_ID . "__" .
             $this->blog->getType() . "_" . $this->blog->getId() . ".zip";
         \ilUtil::zip($this->target_dir, $zip_file);
         \ilUtil::delDir($this->target_dir);
-
         return $zip_file;
     }
 

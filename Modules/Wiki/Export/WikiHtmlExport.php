@@ -4,9 +4,8 @@
 
 namespace ILIAS\Wiki\Export;
 
-/**
+use ILIAS\User\Export\UserHtmlExport;/**
  * Wiki HTML exporter class
- *
  * @author Alex Killing <alex.killing@gmx.de>
  */
 class WikiHtmlExport
@@ -37,6 +36,7 @@ class WikiHtmlExport
     protected $wiki;
 
     const MODE_DEFAULT = "html";
+    const MODE_COMMENTS = "html_comments";
     const MODE_USER = "user_html";
     const MODE_USER_COMMENTS = "user_html_comments";
 
@@ -174,6 +174,7 @@ class WikiHtmlExport
         $this->log->debug("export pages");
         $global_screen->tool()->context()->current()->addAdditionalData(\ilHTMLExportViewLayoutProvider::HTML_EXPORT_RENDERING, true);
         $this->exportHTMLPages();
+        $this->exportUserImages();
 
         $this->export_util->exportResourceFiles($global_screen, $this->export_dir);
 
@@ -188,6 +189,10 @@ class WikiHtmlExport
             $zip_file = \ilExport::_getExportDirectory($this->wiki->getId(), $this->getMode(), "wiki") .
                 "/" . $zip_file_name;
             $this->log->debug("zip: " . $zip_file);
+            //var_dump($zip_file);
+            //exit;
+            $this->log->debug("zip, export dir: ".$this->export_dir);
+            $this->log->debug("zip, export file: ".$zip_file);
             \ilUtil::zip($this->export_dir, $zip_file);
             \ilUtil::delDir($this->export_dir);
         }
@@ -225,6 +230,17 @@ class WikiHtmlExport
             }
         }
         $this->co_page_html_export->exportPageElements($this->updateUserHTMLStatusForPageElements);
+    }
+
+    /**
+     * Export user images
+     */
+    protected function exportUserImages()
+    {
+        if (in_array($this->getMode(), [self::MODE_COMMENTS, self::MODE_USER_COMMENTS])) {
+            $user_export = new \ILIAS\Notes\Export\UserImageExporter();
+            $user_export->exportUserImagesForRepObjId($this->export_dir, $this->wiki->getId());
+        }
     }
 
     /**
@@ -281,7 +297,7 @@ class WikiHtmlExport
         );
         $ep_tpl->setVariable("PAGE_CONTENT", $page_content);
 
-        $comments = ($this->getMode() === self::MODE_USER_COMMENTS)
+        $comments = (in_array($this->getMode(), [self::MODE_USER_COMMENTS, self::MODE_COMMENTS]))
             ? $wpg_gui->getCommentsHTMLExport()
             : "";
         $ep_tpl->setVariable("COMMENTS", $comments);

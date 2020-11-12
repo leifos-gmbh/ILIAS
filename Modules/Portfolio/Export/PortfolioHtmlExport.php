@@ -175,6 +175,8 @@ class PortfolioHtmlExport
         // export pages
         $this->exportHTMLPages();
 
+        $this->exportUserImages();
+
         // add js/images/file to zip
         // note: only files are still used for certificate files
         $images = $files = $js_files = [];
@@ -193,6 +195,17 @@ class PortfolioHtmlExport
         $this->co_page_html_export->exportPageElements();
 
         return $this->zipPackage();
+    }
+
+    /**
+     * Export user images
+     */
+    protected function exportUserImages()
+    {
+        if ($this->include_comments) {
+            $user_export = new \ILIAS\Notes\Export\UserImageExporter();
+            $user_export->exportUserImagesForRepObjId($this->target_dir, $this->portfolio->getId());
+        }
     }
 
     /**

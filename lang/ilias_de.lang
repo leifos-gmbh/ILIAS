@@ -16183,3 +16183,5 @@ common#:#eyeopened#:#Offenes Auge: Klicken Sie, um den Inhalt der Eingabe anzuze
 rbac#:#prgr_copy#:#Links zu Studienprogrammen kopieren
 ui#:#ui_error_in_group#:#Es gibt einen Fehler in diesem Bereich.
 feed#:#feed_no_local_url#:#Bitte geben sie eine gültige externe Feed URL an.
+wiki#:#wiki_incl_comments#:#inklusive Kommentare
+blog#:#blog_incl_comments#:#inklusive Kommentare

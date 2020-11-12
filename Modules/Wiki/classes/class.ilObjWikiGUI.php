@@ -228,6 +228,9 @@ class ilObjWikiGUI extends ilObjectGUI
                 $exp_gui = new ilExportGUI($this);
                 $exp_gui->addFormat("xml");
                 $exp_gui->addFormat("html", "", $this, "exportHTML");
+                if ($this->object->isCommentsExportPossible()) {
+                    $exp_gui->addFormat("html_comments", "HTML (" . $this->lng->txt("wiki_incl_comments") . ")", $this, "exportHTML");
+                }
                 $ret = $this->ctrl->forwardCommand($exp_gui);
 //				$this->tpl->show();
                 break;
@@ -2056,6 +2059,12 @@ class ilObjWikiGUI extends ilObjectGUI
     public function exportHTML()
     {
         $cont_exp = new Export\WikiHtmlExport($this->object);
+
+        $format = explode("_", $_POST["format"]);
+        if ($format[1] == "comments") {
+            $cont_exp->setMode(Export\WikiHtmlExport::MODE_COMMENTS);
+        }
+
         $cont_exp->buildExportFile();
     }
     

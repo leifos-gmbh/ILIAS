@@ -806,6 +806,9 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
                 $exp_gui = new ilExportGUI($this);
                 $exp_gui->addFormat("xml");
                 $exp_gui->addFormat("html", null, $this, "buildExportFile"); // #13419
+                if (ilObjBlogAccess::isCommentsExportPossible($this->object->getId())) {
+                    $exp_gui->addFormat("html_comments", "HTML (" . $this->lng->txt("blog_incl_comments") . ")", $this, "buildExportFile");
+                }
                 $ret = $ilCtrl->forwardCommand($exp_gui);
                 break;
             
@@ -1178,7 +1181,6 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
     public function export($a_with_comments = false)
     {
         $zip = $this->buildExportFile($a_with_comments);
-        
         ilUtil::deliverFile($zip, $this->object->getTitle() . ".zip", '', false, true);
     }
     
@@ -2389,9 +2391,16 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
      */
     public function buildExportFile($a_include_comments = false)
     {
+        $type = "html";
+        $format = explode("_", $_POST["format"]);
+        if ($format[1] == "comments" || $a_include_comments) {
+            $a_include_comments = true;
+            $type = "html_comments";
+        }
+
         // create export file
-        ilExport::_createExportDirectory($this->object->getId(), "html", "blog");
-        $exp_dir = ilExport::_getExportDirectory($this->object->getId(), "html", "blog");
+        ilExport::_createExportDirectory($this->object->getId(), $type, "blog");
+        $exp_dir = ilExport::_getExportDirectory($this->object->getId(), $type, "blog");
 
         $subdir = $this->object->getType() . "_" . $this->object->getId();
 

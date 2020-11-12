@@ -99,6 +99,8 @@ class ilNoteGUI
 	 */
 	protected $enable_sorting = true;
 
+	protected $user_img_export_html = false;
+
 	/**
     * constructor, specifies notes set
     *
@@ -774,7 +776,7 @@ class ilNoteGUI
                         $tpl->setCurrentBlock("user_img");
                         $tpl->setVariable(
                             "USR_IMG",
-                            ilObjUser::_getPersonalPicturePath($note->getAuthor(), "xsmall")
+                            ilObjUser::_getPersonalPicturePath($note->getAuthor(), "xsmall", false, false, $this->user_img_export_html)
                         );
                         $tpl->setVariable("USR_ALT", $lng->txt("user_image") . ": " .
                             ilObjUser::_lookupLogin($note->getAuthor()));
@@ -1838,6 +1840,7 @@ class ilNoteGUI
 		$this->hide_new_form = true;
 		$this->no_actions = true;
 		$this->enable_sorting = false;
+        $this->user_img_export_html = true;
 	}
 
 	/**

@@ -1,6 +1,7 @@
 /* Copyright (c) 1998-2020 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 import ACTIONS from "../actions/paragraph-action-types.js";
+import PAGE_ACTIONS from '../../page/actions/page-action-types.js';
 
 /**
  * Paragraph model action handler
@@ -32,7 +33,8 @@ export default class ParagraphModelActionHandler {
 
       switch (action.getType()) {
 
-        case "component.switch":
+        case PAGE_ACTIONS.COMPONENT_SWITCH:
+          this.pageModel.setAddedSection(false);
           this.pageModel.setComponentState(this.pageModel.STATE_COMPONENT_EDIT);
           this.pageModel.setPCModel(params.oldPcid, {
             text: params.oldParameters.text,
@@ -44,6 +46,15 @@ export default class ParagraphModelActionHandler {
             this.pageModel.getPCModel(this.pageModel.getCurrentPCId())
           );
           break;
+
+        case PAGE_ACTIONS.COMPONENT_INSERT:
+          this.pageModel.setAddedSection(false);
+          break;
+
+        case PAGE_ACTIONS.COMPONENT_EDIT:
+          this.pageModel.setAddedSection(false);
+          break;
+
       }
     }
 
@@ -126,6 +137,9 @@ export default class ParagraphModelActionHandler {
           break;
 
         case ACTIONS.SECTION_CLASS:
+          if (params.oldSectionCharacteristic === "" && params.newSectionCharacteristic !== "") {
+            this.pageModel.setAddedSection(true);
+          }
           this.pageModel.setPCModel(this.pageModel.getCurrentPCId(), {
             text: params.parText,
             characteristic: params.parCharacteristic

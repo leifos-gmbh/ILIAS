@@ -290,22 +290,24 @@ class PageQueryActionHandler implements Server\QueryActionHandler
         }
         $ctrl->setParameter($this->page_gui, "html_mode", "");
 
-        // js mode
-        /*
-        if ($sel_js_mode) {
-            $ctrl->setParameter($this->page_gui, "js_mode", "disable");
+        $lm_set = new \ilSetting("lm");
+        if ($this->page_gui->getEnableEditing() && $this->user->getId() != ANONYMOUS_USER_ID) {
+
+            // history
+            if ($lm_set->get("page_history", 1)) {
+                $items[] = $ui->factory()->link()->standard(
+                    $lng->txt("history"),
+                    $ctrl->getLinkTarget($this->page_gui, "history")
+                );
+            }
+
+            // clipboard
             $items[] = $ui->factory()->link()->standard(
-                $lng->txt("cont_deactivate_js"),
-                $ctrl->getLinkTarget($this->page_gui, "setEditMode")
-            );
-        } else {
-            $ctrl->setParameter($this->page_gui, "js_mode", "enable");
-            $items[] = $ui->factory()->link()->standard(
-                $lng->txt("cont_activate_js"),
-                $ctrl->getLinkTarget($this->page_gui, "setEditMode")
+                $lng->txt("clipboard"),
+                $ctrl->getLinkTargetByClass([get_class($this->page_gui), "ilEditClipboardGUI"], "view")
             );
         }
-        $ctrl->setParameter($this->page_gui, "js_mode", "");*/
+
 
         return $ui->factory()->dropdown()->standard($items);
     }

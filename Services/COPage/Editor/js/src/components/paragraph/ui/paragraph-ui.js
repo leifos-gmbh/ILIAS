@@ -248,7 +248,7 @@ export default class ParagraphUI {
     const pcId = this.page_model.getCurrentPCId();
     const undo_pc_model = this.page_model.getUndoPCModel(pcId);
 
-    if (this.page_model.getComponentState() === this.page_model.STATE_COMPONENT_EDIT) {
+    if (undo_pc_model && this.page_model.getComponentState() === this.page_model.STATE_COMPONENT_EDIT) {
       this.setParagraphClass(undo_pc_model.characteristic);
       this.tinyWrapper.setContent(
         undo_pc_model.text,

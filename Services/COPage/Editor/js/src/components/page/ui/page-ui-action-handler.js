@@ -367,7 +367,7 @@ export default class PageUIActionHandler {
       params.pcid,
       params.component,
       params.data
-  );
+    );
 
     this.client.sendCommand(insert_action).then(result => {
       this.ui.handlePageReloadResponse(result);

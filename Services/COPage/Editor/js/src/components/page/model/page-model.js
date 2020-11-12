@@ -97,7 +97,8 @@ export default class PageModel {
       page_components: [],
       page_components_undo: [],
       sectionFormat: "",
-      paragraphFormat: ""
+      paragraphFormat: "",
+      addedSection: false
     };
 
     this.splitIds = [];
@@ -381,5 +382,18 @@ export default class PageModel {
 
   getSplitPCIds() {
     return this.model.splitIds;
+  }
+
+  /**
+   * Set, if a section has been newly set for a paragraph
+   * @param {bool} as
+   */
+  setAddedSection(as) {
+    this.model.addedSection = as;
+    console.log("setAddedSection " + as);
+  }
+
+  getAddedSection() {
+    return this.model.addedSection;
   }
 }

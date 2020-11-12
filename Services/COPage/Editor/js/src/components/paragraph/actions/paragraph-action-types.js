@@ -11,6 +11,7 @@ const ACTIONS = {
   SPLIT: "split",              // split paragraph
   CMD_SECTION_CLASS: "cmd.sec.class",    // section format
   CMD_MERGE_PREVIOUS: "cmd.merge.previous",    // merge with previous paragraph
+  CMD_CANCEL: "cmd.cancel",    // cancel actions
 
   // editor actions (things happening in the editor client side)
   PARAGRAPH_CLASS: "par.class",    // paragraph class

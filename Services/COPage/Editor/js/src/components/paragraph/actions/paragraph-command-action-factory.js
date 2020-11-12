@@ -142,4 +142,17 @@ export default class ParagraphCommandActionFactory {
     });
   }
 
+  /**
+   *
+   * @param removeSectionFromPcid
+   * @return {CommandAction}
+   */
+  cancel(removeSectionFromPcid, paragraphText, paragraphCharacteristic) {
+    return this.clientActionFactory.command(this.COMPONENT, ACTIONS.CMD_CANCEL, {
+      removeSectionFromPcid: removeSectionFromPcid,
+      paragraphText: paragraphText,
+      paragraphCharacteristic: paragraphCharacteristic
+    });
+  }
+
 }

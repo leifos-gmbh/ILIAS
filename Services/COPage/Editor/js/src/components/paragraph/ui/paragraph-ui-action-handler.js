@@ -80,6 +80,7 @@ export default class ParagraphUIActionHandler {
 
         case PAGE_ACTIONS.COMPONENT_CANCEL:
           this.ui.cmdCancel();
+          this.sendCancelCommand(page_model);
           break;
 
         case PAGE_ACTIONS.COMPONENT_SWITCH:
@@ -419,6 +420,27 @@ export default class ParagraphUIActionHandler {
 
       //this.handleSaveResponseSplit(pl, page_model);
     });
+  }
+
+  sendCancelCommand(page_model) {
+    const af = this.actionFactory;
+    const pcModel = page_model.getPCModel(page_model.getCurrentPCId());
+    //console.log("send Cancel " + page_model.getCurrentPCId());
+
+    if (page_model.getAddedSection()) {
+      const cancel_action = af.paragraph().command().cancel(
+        page_model.getCurrentPCId(),
+        pcModel.text,
+        pcModel.characteristic
+      );
+
+      //this.ui.autoSaveStarted();
+      this.client.sendCommand(cancel_action).then(result => {
+        const pl = result.getPayload();
+
+        this.ui.pageModifier.handlePageReloadResponse(result);
+      });
+    }
   }
 
 }

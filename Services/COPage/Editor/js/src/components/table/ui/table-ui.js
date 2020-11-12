@@ -93,6 +93,7 @@ export default class TableUI {
     this.pageModifier = pageModifier;
     this.paragraphUI = paragraphUI;
     this.tinyWrapper = paragraphUI.tinyWrapper;
+    this.autoSave = paragraphUI.autoSave;
     this.tableModel = tableModel;
   }
 
@@ -129,6 +130,9 @@ export default class TableUI {
     //this.initMenu();
     this.initCellEditing();
     this.initDropdowns();
+    this.autoSave.setOnAutoSave(() => {
+      dispatch.dispatch(action.table().editor().autoSave());
+    });
   }
 
   /**
@@ -254,7 +258,7 @@ export default class TableUI {
     }, () => {
       pc_model.content[tableModel.getCurrentRow()][tableModel.getCurrentColumn()] = wrapper.getText();
       console.log(pc_model);
-      //this.autoSave.handleAutoSaveKeyPressed();
+      this.paragraphUI.autoSave.handleAutoSaveKeyPressed();
     }, () => {
       //this.switchToPrevious();
     }, () => {

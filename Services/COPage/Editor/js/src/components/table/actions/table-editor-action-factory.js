@@ -153,4 +153,11 @@ export default class TableEditorActionFactory {
     });
   }
 
+  /**
+   * @returns {EditorAction}
+   */
+  autoSave() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.AUTO_SAVE);
+  }
+
 }

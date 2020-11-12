@@ -79,7 +79,7 @@ export default class TableUIActionHandler {
           this.sendUpdateDataCommand(
             page_model.getCurrentPCId(),
             page_model.getPCModel(page_model.getCurrentPCId()),
-            page_model
+            true
           );
 //          this.ui.handleSaveOnEdit();
           break;
@@ -104,20 +104,36 @@ export default class TableUIActionHandler {
             params.cellPcid
           );
           break;
+
+        case ACTIONS.AUTO_SAVE:
+          this.sendUpdateDataCommand(
+            page_model.getCurrentPCId(),
+            page_model.getPCModel(page_model.getCurrentPCId()),
+            false
+          );
+          break;
       }
     }
   }
 
-  sendUpdateDataCommand(pcid, pcmodel, page_model) {
+  sendUpdateDataCommand(pcid, pcmodel, redirectToPage) {
     const af = this.actionFactory;
     const update_action = af.table().command().updateData(
       pcid,
-      pcmodel.content
+      pcmodel.content,
+      redirectToPage
     );
-    console.log(this.client);
+    this.tableUI.paragraphUI.autoSaveStarted();
     this.client.sendCommand(update_action).then(result => {
       const pl = result.getPayload();
-      this.tableUI.pageModifier.redirectToPage(pcid);
+      if (redirectToPage) {
+        this.tableUI.pageModifier.redirectToPage(pcid);
+      } else {
+        this.tableUI.paragraphUI.autoSaveEnded();
+        if (pl.last_update) {
+          this.tableUI.paragraphUI.showLastUpdate(pl.last_update);
+        }
+      }
     });
   }
 

@@ -25,12 +25,14 @@ export default class TableCommandActionFactory {
   /**
    * @param pcid
    * @param content
+   * @param redirect
    * @return {CommandAction}
    */
-  updateData(pcid, content) {
+  updateData(pcid, content, redirect) {
     return this.clientActionFactory.command(this.COMPONENT, ACTIONS.UPDATE_DATA, {
       pcid: pcid,
-      content: content
+      content: content,
+      redirect: redirect
     });
   }
 

@@ -20,7 +20,8 @@ const ACTIONS = {
   ROW_DOWN: "row.down",
   ROW_DELETE: "row.delete",
   EDIT_CELL: "edit.cell",    // edit cell
-  SAVE_RETURN: "save.return"
+  SAVE_RETURN: "save.return",
+  AUTO_SAVE: "save.auto"
 
 };
 export default ACTIONS;

@@ -139,9 +139,43 @@ class TableCommandActionHandler implements Server\CommandActionHandler
      */
     protected function updateDataCommand($body) : Server\Response
     {
-        $this->updateData($body["data"]["pcid"], $body["data"]["content"]);
-        return $this->ui_wrapper->sendPage($this->page_gui);
+        $updated = $this->updateData($body["data"]["pcid"], $body["data"]["content"]);
+        if ($body["data"]["redirect"]) {
+            return $this->ui_wrapper->sendPage($this->page_gui);
+        } else {
+            return $this->sendUpdateResponse($this->page_gui, $updated, $body["data"]["pcid"]);
+        }
     }
+
+    /**
+     * Get reponse data object
+     * @param \ilPageObjectGUI $page_gui
+     * @param                  $updated
+     * @param string           $pcid
+     * @return Server\Response
+     */
+    public function sendUpdateResponse(\ilPageObjectGUI $page_gui, $updated, string $pcid): Server\Response
+    {
+        $error = null;
+
+        if ($updated === false) {
+            $error = "An error occured";
+        } else {
+            $last_change = $page_gui->getPageObject()->getLastChange();
+        }
+
+        $data = new \stdClass();
+        $data->error = $error;
+        $data->last_update = null;
+        if ($last_change) {
+            $lu = new \ilDateTime($last_change, IL_CAL_DATETIME);
+            \ilDatePresentation::setUseRelativeDates(false);
+            $data->last_update = \ilDatePresentation::formatDate($lu, true);
+        }
+
+        return new Server\Response($data);
+    }
+
 
     /**
      * Update data
@@ -169,7 +203,9 @@ class TableCommandActionHandler implements Server\CommandActionHandler
         }
 
         $table->setData($data);
-        $page->update();
+        $updated = $page->update();
+
+        return $updated;
     }
 
 

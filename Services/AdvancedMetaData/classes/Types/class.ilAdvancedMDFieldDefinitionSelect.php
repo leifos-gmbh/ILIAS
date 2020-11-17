@@ -498,11 +498,24 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
         foreach ($this->getOptions() as $value) {
             $a_writer->xmlElement('FieldValue', null, $value);
         }
+        foreach ($this->getOptionTranslations() as $lang_key => $translations) {
+            foreach ((array) $translations as $value) {
+                $a_writer->xmlElement('FieldValue', ['id' => $lang_key], $value);
+            }
+        }
     }
-    
+
+    /**
+     * @param string $a_key
+     * @param string $a_value
+     */
     public function importXMLProperty($a_key, $a_value)
     {
-        $this->options[] = $a_value;
+        if (!$a_key) {
+            $this->options[] = $a_value;
+        } else {
+            $this->option_translations[$a_key][] = $a_value;
+        }
     }
     
     

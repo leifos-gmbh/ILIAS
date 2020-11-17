@@ -1323,7 +1323,6 @@ class ilAdvancedMDSettingsGUI
         $type = new ilNonEditableValueGUI($this->lng->txt("type"));
         $type->setValue($this->lng->txt($a_definition->getTypeTitle()));
         $form->addItem($type);
-        
         $a_definition->addToFieldDefinitionForm($form, $this->getPermissions(), $this->active_language);
     
         if ($is_creation_mode) {

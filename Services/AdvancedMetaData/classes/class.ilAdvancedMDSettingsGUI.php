@@ -27,8 +27,11 @@ class ilAdvancedMDSettingsGUI
      */
     private $context = null;
 
-
+    /**
+     * @var ilLanguage
+     */
     protected $lng;
+
     protected $tpl;
 
     /**
@@ -1132,7 +1135,7 @@ class ilAdvancedMDSettingsGUI
             return false;
         }
 
-        $this->loadRecordFormData();
+        $record = $this->loadRecordFormData();
         if ($this->obj_type) {
             $this->record->setAssignedObjectTypes(array(
                 array(
@@ -1141,7 +1144,17 @@ class ilAdvancedMDSettingsGUI
                     "optional" => false
             )));
         }
-        $this->record->save();
+
+        $record->setDefaultLanguage($this->lng->getDefaultLanguage());
+        $record->save();
+
+        $translations = ilAdvancedMDRecordTranslations::getInstanceByRecordId($record->getRecordId());
+        $translations->addTranslationEntry($record->getDefaultLanguage(), true);
+        $translations->updateTranslations(
+            $record->getDefaultLanguage(),
+            $this->form->getInput('title'),
+            $this->form->getInput('desc')
+        );
         ilUtil::sendSuccess($this->lng->txt('md_adv_added_new_record'),true);
         $this->ctrl->redirect($this, 'showRecords');
     }
@@ -1766,13 +1779,11 @@ class ilAdvancedMDSettingsGUI
         
         return true;
     }
-    
+
     /**
-     * load record form data
-     *
-     * @access protected
+     * @return ilAdvancedMDRecord
      */
-    protected function loadRecordFormData()
+    protected function loadRecordFormData() : ilAdvancedMDRecord
     {
         $translations = ilAdvancedMDRecordTranslations::getInstanceByRecordId($this->record->getRecordId());
 
@@ -1837,6 +1848,7 @@ class ilAdvancedMDSettingsGUI
         }
         $this->record->setScopes($_POST['scope'] ? $scopes : []);
         $this->record->enableScope($_POST['scope'] ? true : false);
+        return $this->record;
     }
     
     /**
@@ -2056,24 +2068,27 @@ class ilAdvancedMDSettingsGUI
     protected function showLanguageSwitch(int $record_id, string $target) : void
     {
         $translations = ilAdvancedMDRecordTranslations::getInstanceByRecordId($record_id);
+        // read active language
+        $default = '';
+        foreach ($translations->getTranslations() as $translation) {
+            if ($translation->getLangKey() == $translations->getDefaultLanguage()) {
+                $default = $translation->getLangKey();
+            }
+        }
+        $active = $this->request->getQueryParams()['mdlang'] ?? $default;
+        $this->active_language = $active;
+
         if (count($translations->getTranslations()) <= 1) {
             return;
         }
         $actions = [];
-        $default = '';
         foreach ($translations->getTranslations() as $translation) {
-
-            if ($translation->getLangKey() == $translations->getDefaultLanguage()) {
-                $default = $translation->getLangKey();
-            }
             $this->ctrl->setParameter($this, 'mdlang', $translation->getLangKey());
             $actions[$translation->getLangKey()] = $this->ctrl->getLinkTarget(
                 $this,
                 $target
             );
         }
-        $active = $this->request->getQueryParams()['mdlang'] ?? $default;
-        $this->active_language = $active;
         $this->ctrl->setParameter($this, 'mdlang', $active);
         $view_control = $this->ui_factory->viewControl()->mode(
             $actions,

@@ -216,8 +216,6 @@ class ilMailFolderGUI
      */
     protected function addSubFolderCommands(bool $isUserSubFolder = false) : void
     {
-        $this->toolbar->addSeparator();
-
         $this->ctrl->setParameter($this, 'mobj_id', $this->currentFolderId);
         $this->toolbar->addButton(
             $this->lng->txt('mail_add_subfolder'),
@@ -321,15 +319,6 @@ class ilMailFolderGUI
         }
 
         if ($oneConfirmationDialogueRendered === false && $this->confirmTrashDeletion === false) {
-            $si = new ilSelectInputGUI('', 'mobj_id');
-            $si->setOptions($folder_options);
-            $si->setValue($this->currentFolderId);
-            $this->toolbar->addStickyItem($si);
-
-            $btn = ilSubmitButton::getInstance();
-            $btn->setCaption('change');
-            $btn->setCommand('showFolder');
-            $this->toolbar->addStickyItem($btn);
             $this->toolbar->setFormAction($this->ctrl->getFormAction($this, 'showFolder'));
 
             if ($isUserRootFolder == true || $isUserSubFolder == true) {
@@ -973,7 +962,7 @@ class ilMailFolderGUI
         }
 
         $filename = $this->httpRequest->getParsedBody()['filename'] ?? '';
-        if (strlen(ilSession::get('filename')) > 0) {
+        if (is_string(ilSession::get('filename')) && strlen(ilSession::get('filename')) > 0) {
             $filename = ilSession::get('filename');
             ilSession::set('filename', null);
         }

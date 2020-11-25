@@ -878,6 +878,7 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
                 $tpl->setVariable('DRAFT_ANCHOR', 'draft_' . $draft->getDraftId());
 
                 $tpl->setVariable('USR_IMAGE', $authorinfo->getProfilePicture());
+                $tpl->setVariable('USR_ICON_ALT', ilUtil::prepareFormOutput($authorinfo->getAuthorShortName()));
                 if ($authorinfo->getAuthor()->getId() && ilForum::_isModerator(
                     (int) $_GET['ref_id'],
                     $draft->getPostAuthorId()
@@ -1091,16 +1092,19 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
         $this->ctrl->clearParameters($this);
 
         if ($authorinfo->hasSuffix()) {
+            if (!$authorinfo->isDeleted()) {
+                $tpl->setVariable('USR_NAME', $authorinfo->getAlias());
+            }
             $tpl->setVariable('AUTHOR', $authorinfo->getSuffix());
-            $tpl->setVariable('USR_NAME', $node->getUserAlias());
         } else {
-            $tpl->setVariable('AUTHOR', $authorinfo->getLinkedAuthorShortName());
             if ($authorinfo->getAuthorName(true) && !$this->objProperties->isAnonymized()) {
                 $tpl->setVariable('USR_NAME', $authorinfo->getAuthorName(true));
             }
+            $tpl->setVariable('AUTHOR', $authorinfo->getLinkedAuthorShortName());
         }
 
         $tpl->setVariable('USR_IMAGE', $authorinfo->getProfilePicture());
+        $tpl->setVariable('USR_ICON_ALT', ilUtil::prepareFormOutput($authorinfo->getAuthorShortName()));
         $isModerator = ilForum::_isModerator((int) $authorinfo->getAuthor()->getId(), $node->getPosAuthorId());
         if ($authorinfo->getAuthor()->getId() && $isModerator) {
             $authorRole = $this->lng->txt('frm_moderator_n');
@@ -1391,19 +1395,24 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
                     }
 
                     if (isset($new_ref_id) && $new_ref_id != $a_target) {
-                        ilUtil::redirect(ILIAS_HTTP_PATH . "/goto.php?target=frm_" . $new_ref_id . "_" . $a_thread . "_" . $a_posting);
+                        $DIC->ctrl()->redirectToURL(
+                            ILIAS_HTTP_PATH . '/goto.php?target=frm_' . $new_ref_id . '_' . $a_thread . '_' . $a_posting
+                        );
                     }
                 }
 
-                $_GET['ref_id'] = $a_target;
-                $_GET['pos_pk'] = $a_posting;
-                $_GET['thr_pk'] = $a_thread;
-                $_GET['anchor'] = $a_posting;
-                $_GET['cmdClass'] = 'ilObjForumGUI';
-                $_GET['cmd'] = 'viewThread';
-                $_GET['baseClass'] = 'ilRepositoryGUI';
-                include_once('ilias.php');
-                exit();
+                $DIC->ctrl()->setParameterByClass(ilObjForumGUI::class, 'ref_id', (int) $a_target);
+                if (is_numeric($a_thread)) {
+                    $DIC->ctrl()->setParameterByClass(ilObjForumGUI::class, 'thr_pk', (int) $a_thread);
+                }
+                if (is_numeric($a_posting)) {
+                    $DIC->ctrl()->setParameterByClass(ilObjForumGUI::class, 'pos_pk', (int) $a_posting);
+                }
+                $DIC->ctrl()->redirectByClass(
+                    [ilRepositoryGUI::class, self::class],
+                    'viewThread',
+                    is_numeric($a_posting) ? (int) $a_posting : ''
+                );
             } else {
                 $_GET['ref_id'] = $a_target;
                 $_GET['baseClass'] = 'ilRepositoryGUI';
@@ -2091,27 +2100,26 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
                 ));
                 $this->replyEditForm->addItem($draftInfoGUI);
             }
-
-            $selected_draft_id = (int) $_GET['draft_id'];
-            $draftObj = new ilForumPostDraft(
-                $this->user->getId(),
-                $this->objCurrentPost->getId(),
-                $selected_draft_id
-            );
-            if ($draftObj->getDraftId() > 0) {
-                $oFDForumDrafts = new ilFileDataForumDrafts(0, $draftObj->getDraftId());
-                if (count($oFDForumDrafts->getFilesOfPost())) {
-                    $oExistingAttachmentsGUI = new ilCheckboxGroupInputGUI(
-                        $this->lng->txt('forums_delete_file'),
-                        'del_file'
-                    );
-                    foreach ($oFDForumDrafts->getFilesOfPost() as $file) {
-                        $oAttachmentGUI = new ilCheckboxInputGUI($file['name'], 'del_file');
-                        $oAttachmentGUI->setValue($file['md5']);
-                        $oExistingAttachmentsGUI->addOption($oAttachmentGUI);
-                    }
-                    $this->replyEditForm->addItem($oExistingAttachmentsGUI);
+        }
+        $selected_draft_id = (int)$_GET['draft_id'];
+        $draftObj = new ilForumPostDraft(
+            $this->user->getId(),
+            $this->objCurrentPost->getId(),
+            $selected_draft_id
+        );
+        if ($draftObj->getDraftId() > 0) {
+            $oFDForumDrafts = new ilFileDataForumDrafts(0, $draftObj->getDraftId());
+            if (count($oFDForumDrafts->getFilesOfPost())) {
+                $oExistingAttachmentsGUI = new ilCheckboxGroupInputGUI(
+                    $this->lng->txt('forums_delete_file'),
+                    'del_file'
+                );
+                foreach ($oFDForumDrafts->getFilesOfPost() as $file) {
+                    $oAttachmentGUI = new ilCheckboxInputGUI($file['name'], 'del_file');
+                    $oAttachmentGUI->setValue($file['md5']);
+                    $oExistingAttachmentsGUI->addOption($oAttachmentGUI);
                 }
+                $this->replyEditForm->addItem($oExistingAttachmentsGUI);
             }
         }
 
@@ -2624,16 +2632,16 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
 
                     $oFDForum = $oForumObjects['file_obj'];
 
+                    $file2delete = $oReplyEditForm->getInput('del_file');
+                    if (is_array($file2delete) && count($file2delete)) {
+                        $oFDForum->unlinkFilesByMD5Filenames($file2delete);
+                    }
+
                     if ($this->objProperties->isFileUploadAllowed()) {
                         $file = $_FILES['userfile'];
                         if (is_array($file) && !empty($file)) {
                             $oFDForum->storeUploadedFile($file);
                         }
-                    }
-
-                    $file2delete = $oReplyEditForm->getInput('del_file');
-                    if (is_array($file2delete) && count($file2delete)) {
-                        $oFDForum->unlinkFilesByMD5Filenames($file2delete);
                     }
 
                     $GLOBALS['ilAppEventHandler']->raise(
@@ -2907,7 +2915,7 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
             ]) ? ilForumProperties::VIEW_DATE : ilForumProperties::VIEW_TREE);
         }
         $threadContentTemplate->setVariable('LIST_TYPE', $this->viewModeOptions[$currentViewMode]);
-        
+
         $numberOfPostings = 0;
 
         // get forum- and thread-data
@@ -4496,16 +4504,17 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
 
             \ilForumUtil::moveMediaObjects($form->getInput('message'), 'frm~d:html', $draftId, 'frm~d:html', $draftId);
 
+            $draftFileData = new \ilFileDataForumDrafts($this->object->getId(), $draftId);
+
+            $files2delete = $form->getInput('del_file');
+            if (is_array($files2delete) && count($files2delete) > 0) {
+                $draftFileData->unlinkFilesByMD5Filenames($files2delete);
+            }
+
             if ($this->objProperties->isFileUploadAllowed()) {
-                $draftFileData = new \ilFileDataForumDrafts($this->object->getId(), $draftId);
                 $file = $_FILES['userfile'];
                 if (is_array($file) && !empty($file)) {
                     $draftFileData->storeUploadedFile($file);
-                }
-
-                $files2delete = $form->getInput('del_file');
-                if (is_array($files2delete) && count($files2delete) > 0) {
-                    $draftFileData->unlinkFilesByMD5Filenames($files2delete);
                 }
             }
 
@@ -4571,16 +4580,17 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
                 $draft->getDraftId()
             );
 
+            $draftFileData = new \ilFileDataForumDrafts($this->object->getId(), $draft->getDraftId());
+
+            $files2delete = $form->getInput('del_file');
+            if (is_array($files2delete) && count($files2delete) > 0) {
+                $draftFileData->unlinkFilesByMD5Filenames($files2delete);
+            }
+
             if ($this->objProperties->isFileUploadAllowed()) {
-                $draftFileData = new \ilFileDataForumDrafts($this->object->getId(), $draft->getDraftId());
                 $file = $_FILES['userfile'];
                 if (is_array($file) && !empty($file)) {
                     $draftFileData->storeUploadedFile($file);
-                }
-
-                $files2delete = $form->getInput('del_file');
-                if (is_array($files2delete) && count($files2delete) > 0) {
-                    $draftFileData->unlinkFilesByMD5Filenames($files2delete);
                 }
             }
 
@@ -4824,17 +4834,18 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
                     $update_draft->getDraftId()
                 );
 
-                if ($this->objProperties->isFileUploadAllowed()) {
-                    $oFDForumDrafts = new ilFileDataForumDrafts($forumObj->getId(), $update_draft->getDraftId());
-                    $file = $_FILES['userfile'];
-                    if (is_array($file) && !empty($file)) {
-                        $oFDForumDrafts->storeUploadedFile($file);
-                    }
-                }
+                $oFDForumDrafts = new ilFileDataForumDrafts($forumObj->getId(), $update_draft->getDraftId());
 
                 $file2delete = $oReplyEditForm->getInput('del_file');
                 if (is_array($file2delete) && count($file2delete)) {
                     $oFDForumDrafts->unlinkFilesByMD5Filenames($file2delete);
+                }
+
+                if ($this->objProperties->isFileUploadAllowed()) {
+                    $file = $_FILES['userfile'];
+                    if (is_array($file) && !empty($file)) {
+                        $oFDForumDrafts->storeUploadedFile($file);
+                    }
                 }
 
                 $_SESSION['frm'][(int) $_GET['thr_pk']]['openTreeNodes'][] = (int) $this->objCurrentPost->getId();
@@ -5037,7 +5048,7 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
                             $actions['reply_to_postings'] = $this->ctrl->getLinkTarget(
                                 $this,
                                 'viewThread',
-                                $node->getId()
+                                'reply_' . $node->getId()
                             );
                         }
 
@@ -5366,7 +5377,7 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
             $this->error->raiseError($this->lng->txt('permission_denied'), $this->error->getMessage());
         }
 
-        $tpl->setVariable('REPLY_ANKER', $this->objCurrentPost->getId());
+        $tpl->setVariable('REPLY_ANKER', 'reply_' .$this->objCurrentPost->getId());
         $oEditReplyForm = $this->getReplyEditForm();
         if ($action !== 'editdraft') {
             switch ($this->objProperties->getSubjectSetting()) {

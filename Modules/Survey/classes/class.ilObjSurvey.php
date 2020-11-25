@@ -1298,7 +1298,7 @@ class ilObjSurvey extends ilObject
                 }
             }
         }
-        return join($author, ",");
+        return join(",", $author);
     }
 
     /**
@@ -3199,7 +3199,7 @@ class ilObjSurvey extends ilObject
                         "questionblock_id" => $row["questionblock_id"],
                         "title" => $row["title"],
                         "svy" => $surveytitles[$row["obj_fi"]],
-                        "contains" => join($questions_array, ", "),
+                        "contains" => join(", ", $questions_array),
                         "owner" => $row["owner_fi"]
                     );
                 }
@@ -6167,14 +6167,13 @@ class ilObjSurvey extends ilObject
             $mail_obj = new ilMail(ANONYMOUS_USER_ID);
             $mail_obj->appendInstallationSignature(true);
             $log->debug("send mail to user id: " . $user_id . ",login: " . ilObjUser::_lookupLogin($user_id));
-            $mail_obj->sendMail(
+            $mail_obj->enqueue(
                 ilObjUser::_lookupLogin($user_id),
                 "",
                 "",
                 $subject,
                 $message,
-                array($att),
-                array("system")
+                array($att)
             );
         }
         

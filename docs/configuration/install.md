@@ -122,12 +122,13 @@ Please note that different configurations SHOULD be possible, but it might be ha
 <a name="database-recommendations"></a>
 ## Database Recommendations
 
-> Please note that installing ILIAS in utf8mb4-collations is currently not supported! ILIAS supports utf8mb3 only.
+> Please note that installing ILIAS in utf8mb4-collations is currently not supported! ILIAS supports UTF-8 (with 3 bytes per character, such as utf8_general_ci) only.
 
 We RECOMMEND to use MySQL/MariaDB with the following settings:
 
   * InnoDB storage engine
-  * utf8_general_ci
+  * Character Set: utf8
+  * Collation: utf8_general_ci
   * query_cache_size (> 16M)
   * join_buffer_size (> 128.0K, or always use indexes with joins)
   * table_open_cache (> 400)
@@ -655,14 +656,14 @@ The ILIAS Testserver (https://test6.ilias.de) is currently configured as follows
 
 | Package        | Version                     |
 |----------------|-----------------------------|
-| Distribution   | Ubuntu 16.04.6 LTS          |
+| Distribution   | Ubuntu 16.04.7 LTS          |
 | MariaDB        | 10.0.38                     |
 | mysql          | 5.6                         |
-| PHP            | 7.3.18                      |
+| PHP            | 7.3.22                      |
 | Apache         | 2.4.18                      |
 | zip            | 3.0                         |
 | unzip          | 6.00                        |
-| JDK            | 1.8.0_252                   |
-| NodeJS         | v10.20.1                    |
+| JDK            | 1.8.0_265                   |
+| NodeJS         | v10.22.0                    |
 
 Please note: Shibboleth won't work with Nginx.

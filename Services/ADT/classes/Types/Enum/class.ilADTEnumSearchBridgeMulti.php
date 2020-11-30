@@ -96,32 +96,10 @@ class ilADTEnumSearchBridgeMulti extends ilADTSearchBridgeMulti
     {
         global $DIC;
 
-        $ilDB = $DIC['ilDB'];
-        
+        $ilDB = $DIC->database();
+
+        return $ilDB->in($a_element_id, $this->getADT()->getSelections(), "", ilDBConstants::T_INTEGER);
         if (!$this->isNull() && $this->isValid()) {
-            $type = ($this->getADT() instanceof ilADTMultiEnumText)
-                ? "text"
-                : "integer";
-            
-            if ($this->multi_source) {
-                include_once "Services/ADT/classes/Types/MultiEnum/class.ilADTMultiEnumDBBridge.php";
-                
-                // #16827 / #17087
-                $mode_concat = ($this->search_mode == self::SEARCH_MODE_ANY)
-                    ? " OR "
-                    : " AND ";
-                
-                $parts = array();
-                foreach ($this->getADT()->getSelections() as $item) {
-                    $item = "%" . ilADTMultiEnumDBBridge::SEPARATOR .
-                        $item .
-                        ilADTMultiEnumDBBridge::SEPARATOR . "%";
-                    $parts[] = $ilDB->like($a_element_id, "text", $item, false);
-                }
-                return "(" . implode($mode_concat, $parts) . ")";
-            }
-            
-            return $ilDB->in($a_element_id, $this->getADT()->getSelections(), "", $type);
         }
     }
     

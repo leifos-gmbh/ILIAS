@@ -577,6 +577,15 @@ class ilADTActiveRecordByType
                             $fields["loc_zoom"] = array("integer", $row["loc_zoom"]);
                             break;
 
+                        case 'ltext':
+                            $fields['value_index'] = [ilDBConstants::T_TEXT, $row['value_index']];
+                            $fields['value'] = [ilDBConstants::T_TEXT, $row['value']];
+                            break;
+
+                        case 'enum':
+                            $fields['value_index'] = [ilDBConstants::T_INTEGER, $row['value_index']];
+                            break;
+
                         default:
                             $fields[self::SINGLE_COLUMN_NAME] = array($type_map[$table], $row[self::SINGLE_COLUMN_NAME]);
                             break;

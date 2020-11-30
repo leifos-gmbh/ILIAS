@@ -110,17 +110,38 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
     }
 
     /**
+     * @param array  $translations
+     * @param string $language
+     */
+    public function setOptionTranslationsForLanguage(array  $translations, string $language)
+    {
+        $this->option_translations[$language] = $translations;
+    }
+
+    /**
      * @param array $a_def
      */
     protected function importFieldDefinition(array $a_def)
     {
-        if (isset($a_def['options'])) {
-            $this->setOptions((array) $a_def['options']);
-            $this->setOptionTranslations((array) $a_def['option_translations']);
+        global $DIC;
+
+        $db = $DIC->database();
+
+        $query = 'select * from adv_mdf_enum ' .
+            'where field_id = ' . $db->quote($this->getFieldId(), ilDBConstants::T_INTEGER) . ' ' .
+            'order by idx';
+        $res = $db->query($query);
+        $options = [];
+        $default = [];
+        $record = ilAdvancedMDRecord::_getInstanceByRecordId($this->getRecordId());
+        while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
+            if ($row->lang_code == $record->getDefaultLanguage()) {
+                $default[$row->idx] = $row->value;
+            }
+            $options[$row->lang_code][$row->idx] = $row->value;
         }
-        else {
-            $this->setOptions($a_def);
-        }
+        $this->setOptions($default);
+        $this->setOptionTranslations($options);
     }
 
     /**
@@ -128,6 +149,7 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
      */
     protected function getFieldDefinition()
     {
+        return [];
         return [
             'options' => (array) $this->getOptions(),
             'option_translations' => (array) $this->getOptionTranslations()
@@ -282,8 +304,11 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
             return $this->importTranslatedFormPostValues($a_form, $language);
         }
 
+        if (!strlen($language)) {
+            $language = ilAdvancedMDRecord::_getInstanceByRecordId($this->getRecordId())->getDefaultLanguage();
+        }
 
-        $old = $this->getOptions();
+        $old = $this->getOptionTranslation($language);
         $new = $a_form->getInput("opts");
         
         $missing = array_diff($old, $new);
@@ -291,10 +316,10 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
             $this->confirmed_objects = $this->buildConfirmedObjects($a_form);
             if (!is_array($this->confirmed_objects)) {
                 ilADTFactory::initActiveRecordByType();
-                $primary = array(
-                    "field_id" => array("integer", $this->getFieldId()),
-                    ilADTActiveRecordByType::SINGLE_COLUMN_NAME => array("text", $missing)
-                );
+                $primary = [
+                    'field_id' => [ilDBConstants::T_INTEGER, $this->getFieldId()],
+                    'value_index' => [ilDBConstants::T_TEXT, $missing]
+                ];
                 $in_use = ilADTActiveRecordByType::readByPrimary("adv_md_values", $primary, "Enum");
                 if ($in_use) {
                     $this->confirm_objects = [];
@@ -304,8 +329,7 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
                 }
             }
         }
-        
-        $this->setOptions($new);
+        $this->setOptionTranslationsForLanguage($new, $language);
     }
 
     /**
@@ -439,6 +463,57 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
             }
         }
     }
+
+    public function delete()
+    {
+        $this->deleteOptionTranslations();
+        parent::delete();
+    }
+
+    public function save($a_keep_pos = false)
+    {
+        parent::save($a_keep_pos);
+        $this->saveOptionTranslations();
+    }
+
+    /**
+     *
+     */
+    protected function deleteOptionTranslations()
+    {
+        global $DIC;
+
+        $db = $DIC->database();
+        $query = 'delete from adv_mdf_enum ' .
+            'where field_id = ' . $db->quote($this->getFieldId(), ilDBConstants::T_INTEGER);
+        $db->manipulate($query);
+    }
+
+    protected function updateOptionTranslations()
+    {
+        $this->deleteOptionTranslations();
+        $this->saveOptionTranslations();
+    }
+
+    protected function saveOptionTranslations()
+    {
+        global $DIC;
+
+        $db = $DIC->database();
+
+        foreach ($this->getOptionTranslations() as $lang_key => $options) {
+            foreach ($options as $idx => $option) {
+                $query = 'insert into adv_mdf_enum (field_id, lang_code, idx, value )' .
+                    'values (  ' .
+                    $db->quote($this->getFieldId(), ilDBConstants::T_INTEGER) . ', ' .
+                    $db->quote($lang_key, ilDBConstants::T_TEXT) . ', ' .
+                    $db->quote($idx, ilDBConstants::T_INTEGER) . ', ' .
+                    $db->quote($option, ilDBConstants::T_TEXT).
+                    ')' ;
+                $db->manipulate($query);
+            }
+        }
+    }
     
     
     //
@@ -448,6 +523,7 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
     public function update()
     {
         parent::update();
+        $this->updateOptionTranslations();
 
         if (is_array($this->confirmed_objects) && count($this->confirmed_objects) > 0) {
             ilADTFactory::initActiveRecordByType();

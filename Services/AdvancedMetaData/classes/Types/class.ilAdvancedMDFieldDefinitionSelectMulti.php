@@ -55,7 +55,12 @@ class ilAdvancedMDFieldDefinitionSelectMulti extends ilAdvancedMDFieldDefinition
         if (!$this->useDefaultLanguageMode($language)) {
             return $this->importTranslatedFormPostValues($a_form, $language);
         }
-        $old = $this->getOptions();
+        if (!strlen($language)) {
+            $language = ilAdvancedMDRecord::_getInstanceByRecordId($this->getRecordId())->getDefaultLanguage();
+        }
+
+
+        $old = $this->getOptionTranslation($language);
         $new = $a_form->getInput("opts");
         
         $missing = array_diff($old, $new);
@@ -66,7 +71,8 @@ class ilAdvancedMDFieldDefinitionSelectMulti extends ilAdvancedMDFieldDefinition
                 ilADTFactory::initActiveRecordByType();
                 
                 foreach ($missing as $missing_value) {
-                    $in_use = $this->findBySingleValue($search, $missing_value);
+                    //$in_use = $this->findBySingleValue($search, $missing_value);
+                    $in_use = $this->findBySingleValue($search, $missing);
                     if (sizeof($in_use)) {
                         foreach ($in_use as $item) {
                             $this->confirm_objects[$missing_value][] = $item;
@@ -77,7 +83,7 @@ class ilAdvancedMDFieldDefinitionSelectMulti extends ilAdvancedMDFieldDefinition
         }
         
         $this->old_options = $old;
-        $this->setOptions($new);
+        $this->setOptionTranslationsForLanguage($new, $language);
     }
     
     protected function findBySingleValue(ilADTEnumSearchBridgeMulti $a_search, $a_value)
@@ -85,7 +91,9 @@ class ilAdvancedMDFieldDefinitionSelectMulti extends ilAdvancedMDFieldDefinition
         $res = array();
         
         $a_search->getADT()->setSelections(array($a_value));
-        $condition = $a_search->getSQLCondition(ilADTActiveRecordByType::SINGLE_COLUMN_NAME);
+        $condition = $a_search->getSQLCondition('value_index');
+
+        ilLoggerFactory::getLogger('amet')->dump($condition);
                     
         $in_use = ilADTActiveRecordByType::find(
             "adv_md_values",

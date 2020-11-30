@@ -28,7 +28,16 @@ abstract class ilADTMultiEnum extends ilADT
     // properties
     
     abstract protected function handleSelectionValue($a_value);
-    
+
+    public function addSelection(int $value_index)
+    {
+        if (!$this->isValidOption($value_index)) {
+            return;
+        }
+        $this->values[] = $value_index;
+    }
+
+
     public function setSelections(array $a_values = null)
     {
         if ($a_values !== null) {

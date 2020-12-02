@@ -499,6 +499,36 @@ class ilObject
         return 0;
     }
 
+	// cognos-blu-patch: begin
+	/**
+	 * Lookup obj ids by import id and optional type
+	 * @global type $ilDB
+	 * @param type $a_import_id
+	 * @param type $a_obj_type
+	 * @return type
+	 */
+	public static function lookupObjIdsByImportId($a_import_id, $a_obj_type = '')
+	{
+		global $ilDB;
+		
+		$query = 'SELECT obj_id FROM object_data '.
+				'WHERE import_id = '.$ilDB->quote($a_import_id,'text').' ';
+		
+		if($a_obj_type)
+		{
+			$query .= 'AND type = '.$ilDB->quote($a_obj_type,'text').' ';
+		}
+		$res = $ilDB->query($query);
+		
+		$obj_ids = array();
+		while($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT))
+		{
+			$obj_ids[] = $row->obj_id;
+		}
+		return $obj_ids;
+	}
+	// cognos-blu-patch: end
+
     /**
      * Set offline status
      * @param bool $a_status
@@ -1851,6 +1881,19 @@ class ilObject
         $new_obj->setTitle($title);
         $new_obj->setDescription($this->getLongDescription());
         $new_obj->setType($this->getType());
+
+        // begin patch montcenis
+        include_once('Services/CopyWizard/classes/class.ilCopyWizardOptions.php');
+        $cp_options = ilCopyWizardOptions::_getInstance($a_copy_id);
+        if ($cp_options->isRootNode($this->getRefId())) {
+            if ($cp_options->getImportId()) {
+                ilLoggerFactory::getLogger('obj')->info('Save import id');
+                $new_obj->setImportId($cp_options->getImportId());
+            } else {
+                ilLoggerFactory::getLogger('obj')->info('No import id given');
+            }
+        }
+        // end patch montcenis
 
         // Choose upload mode to avoid creation of additional settings, db entries ...
         $new_obj->create(true);

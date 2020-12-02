@@ -1170,7 +1170,15 @@ class ilSoapObjectAdministration extends ilSoapAdministration
                 if ($objDefinition->supportsOfflineHandling($tmp_obj->getType())) {
                     $tmp_obj->setOfflineStatus($object_data['offline']);
                 }
-                
+
+                /*
+                switch ($object_data['type'])
+                {
+                    case 'cat':
+                        $tmp_obj->updateTranslation($object_data["title"],$object_data["description"], $lng->getLangKey(), $lng->getLangKey());
+                        break;
+                }
+                */
                 $tmp_obj->update();
                 if (strlen($object_data['owner']) && is_numeric($object_data['owner'])) {
                     $tmp_obj->setOwner($object_data['owner']);

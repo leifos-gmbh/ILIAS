@@ -290,7 +290,8 @@ class ilUserImportParser extends ilSaxParser
         $this->localRoleCache = array();
         $this->parentRolesCache = array();
         $this->send_mail = false;
-        $this->mapping_mode = IL_USER_MAPPING_LOGIN;
+		#$this->mapping_mode = IL_USER_MAPPING_LOGIN;
+		$this->mapping_mode = IL_USER_MAPPING_ID;
         
         // get all active style  instead of only assigned ones -> cannot transfer all to another otherwise
         $this->userStyles = array();
@@ -492,9 +493,31 @@ class ilUserImportParser extends ilSaxParser
 
                 // if we have an object id, store it
                 $this->user_id = -1;
-                if (!is_null($a_attribs["Id"]) && $this->getUserMappingMode() == IL_USER_MAPPING_ID) {
+
+                // cognos-blu-patch: begin
+                // first check new import id
+                if (isset($a_attribs['ImportId']) && $a_attribs['ImportId']) {
+                    $this->userObj->setImportId($a_attribs['ImportId']);
+                    $ids = ilObject::lookupObjIdsByImportId($this->userObj->getImportId(), 'usr');
+                    if (count($ids) > 1) {
+                        ilLoggerFactory::getLogger('usr')->error(
+                            'Multiple user import ids found. Cannot import/update user with import id: ' .
+                            $this->userObj->getImportId()
+                        );
+                        include_once './Services/User/exceptions/class.ilUserImportException.php';
+                        throw new ilUserImportException('', ilUserImportException::ERR_MULTIPLE_IMPORT_IDS);
+                    }
+                    if (count($ids) == 1) {
+                        $this->user_id = current($ids);
+                    }
+
+                } elseif (!is_null($a_attribs["Id"]) && $this->getUserMappingMode() == IL_USER_MAPPING_ID) {
+                    // cognos-blu-patch: end
                     if (is_numeric($a_attribs["Id"])) {
                         $this->user_id = $a_attribs["Id"];
+                        // cognos-blu-patch: begin
+                        $this->userObj->setImportId($a_attribs["Id"]);
+                        // cognos-blu-patch: end
                     } elseif ($id = ilUtil::__extractId($a_attribs["Id"], IL_INST_ID)) {
                         $this->user_id = $id;
                     }
@@ -510,7 +533,8 @@ class ilUserImportParser extends ilSaxParser
                 );
                 
                 $this->userObj->setLanguage($a_attribs["Language"]);
-                $this->userObj->setImportId($a_attribs["Id"]);
+				// cognos-blu-patch: begin
+				// cognos-blu-patch: end
                 $this->action = (is_null($a_attribs["Action"])) ? "Insert" : $a_attribs["Action"];
                 $this->currPassword = null;
                 $this->currPasswordType = null;
@@ -633,27 +657,54 @@ class ilUserImportParser extends ilSaxParser
                 $this->userCount++;
                 $this->userObj = new ilObjUser();
                 $this->userObj->setLanguage($a_attribs["Language"]);
-                $this->userObj->setImportId($a_attribs["Id"]);
+				// cognos-blu-patch: begin
+				// default bc 
+				$this->userObj->setImportId((string) $a_attribs["Id"]);
+				// cognos-blu-patch: end
                 $this->currentPrefKey = null;
                 // if we have an object id, store it
                 $this->user_id = -1;
 
-                if (!is_null($a_attribs["Id"]) && $this->getUserMappingMode() == IL_USER_MAPPING_ID) {
+                // cognos-blu-patch: begin
+                $this->action = (is_null($a_attribs["Action"])) ? "Insert" : $a_attribs["Action"];
+                if (
+                    $this->action != "Insert" &&
+                    $this->action != "Update" &&
+                    $this->action != "Delete"
+                ) {
+                    $this->logFailure($this->userObj->getImportId(),
+                        sprintf($lng->txt("usrimport_xml_attribute_value_illegal"), "User", "Action",
+                            $a_attribs["Action"]));
+                }
+
+                // first check new import id
+                if (isset($a_attribs['ImportId']) && strlen($a_attribs['ImportId'])) {
+                    $this->userObj->setImportId($a_attribs['ImportId']);
+                    $ids = ilObject::lookupObjIdsByImportId($this->userObj->getImportId(), 'usr');
+
+                    if (count($ids) == 1) {
+                        $this->user_id = current($ids);
+                    }
+                    // everything else (checks) is done verifyEndTag
+                } elseif (!is_null($a_attribs["Id"]) && $this->getUserMappingMode() == IL_USER_MAPPING_ID) {
+                    // cognos-blu-patch: end
                     if (is_numeric($a_attribs["Id"])) {
                         $this->user_id = $a_attribs["Id"];
+                        // cognos-blu-patch: begin
+                        $this->userObj->setImportId($a_attribs["Id"]);
+                        // cognos-blu-patch: end
                     } elseif ($id = ilUtil::__extractId($a_attribs["Id"], IL_INST_ID)) {
                         $this->user_id = $id;
                     }
                 }
 
                 $this->action = (is_null($a_attribs["Action"])) ? "Insert" : $a_attribs["Action"];
-                if ($this->action != "Insert"
-                && $this->action != "Update"
-                && $this->action != "Delete") {
+                if ($this->action != "Insert" && $this->action != "Update" && $this->action != "Delete") {
                     $this->logFailure($this->userObj->getImportId(), sprintf($lng->txt("usrimport_xml_attribute_value_illegal"), "User", "Action", $a_attribs["Action"]));
                 }
                 $this->currPassword = null;
                 $this->currPasswordType = null;
+				$this->currPasswordSalt     = null;
                 break;
 
             case 'Password':
@@ -949,11 +1000,22 @@ class ilUserImportParser extends ilSaxParser
                 $this->userObj->setFullname();
                 // Fetch the user_id from the database, if we didn't have it in xml file
                 // fetch as well, if we are trying to insert -> recognize duplicates!
-                if ($this->user_id == -1 || $this->action == "Insert") {
-                    $user_id = ilObjUser::getUserIdByLogin($this->userObj->getLogin());
+
+                // cognos-blu-patch: begin
+                if (
+                    $this->user_id == -1 || $this->action == "Insert"
+                ) {
+                    if (strlen($this->userObj->getImportId())) {
+                        $this->user_id = 0;
+                    } else {
+                        ilLoggerFactory::getLogger('usr')->info('Read user id from login.' . $this->userObj->getLogin());
+                        $user_id = ilObjUser::getUserIdByLogin($this->userObj->getLogin());
+                    }
                 } else {
+                    ilLoggerFactory::getLogger('usr')->info('Using user id: ' . $this->user_id . ' for ' . $this->userObj->getLogin());
                     $user_id = $this->user_id;
                 }
+                // cognos-blu-patch: end
 
                 //echo $user_id.":".$this->userObj->getLogin();
 
@@ -1059,6 +1121,7 @@ class ilUserImportParser extends ilSaxParser
                 switch ($this->action) {
                     case "Insert":
                         if ($user_id) {
+                            ilLoggerFactory::getLogger('usr')->info('Cannot insert (already exists): ' . $this->userObj->getLogin());
                             $this->logFailure($this->userObj->getLogin(), $lng->txt("usrimport_cant_insert"));
                         } else {
                             if (!strlen($this->currPassword) == 0) {
@@ -1319,6 +1382,13 @@ class ilUserImportParser extends ilSaxParser
                                 $updateUser->setAuthMode($this->userObj->getAuthMode());
                             }
                             
+							// cognos-blu-patch: begin
+							if($this->userObj->getImportId())
+							{
+								$updateUser->setImportId($this->userObj->getImportId());
+							}
+							// cognos-blu-patch: end
+
                             // Special handlin since it defaults to 7 (USER_FOLDER_ID)
                             if ($this->time_limit_owner_set) {
                                 $updateUser->setTimeLimitOwner($this->userObj->getTimeLimitOwner());
@@ -1696,11 +1766,21 @@ class ilUserImportParser extends ilSaxParser
 
             case "User":
                 $this->userObj->setFullname();
-                if ($this->user_id != -1 && ($this->action == "Update" || $this->action == "Delete")) {
-                    $user_exists = !is_null(ilObjUser::_lookupLogin($this->user_id));
+                // cognos-blu-patch: begin
+                if (strlen($this->userObj->getImportId())) {
+                    $user_exists = (bool) count(
+                        ilObject::lookupObjIdsByImportId(
+                            $this->userObj->getImportId(),
+                            'usr')
+                    );
                 } else {
-                    $user_exists = ilObjUser::getUserIdByLogin($this->userObj->getLogin()) != 0;
+                    if ($this->user_id != -1 && ($this->action == "Update" || $this->action == "Delete")) {
+                        $user_exists = !is_null(ilObjUser::_lookupLogin($this->user_id));
+                    } else {
+                        $user_exists = ilObjUser::getUserIdByLogin($this->userObj->getLogin()) != 0;
+                    }
                 }
+                // cognos-blu-patch: end
 
                 if (is_null($this->userObj->getLogin())) {
                     $this->logFailure("---", sprintf($lng->txt("usrimport_xml_element_for_action_required"), "Login", "Insert"));
@@ -1708,8 +1788,20 @@ class ilUserImportParser extends ilSaxParser
 
                 switch ($this->action) {
                     case "Insert":
+                        // cognos-blu-patch: begin
+                        if (ilObjUser::_lookupId($this->userObj->getLogin())) {
+                            $this->logFailure($this->userObj->getLogin(), $lng->txt('usrimport_login_is_not_unique'));
+                        }
+                        // cognos-blu-patch: end
+
                         if ($user_exists and $this->conflict_rule == IL_FAIL_ON_CONFLICT) {
-                            $this->logWarning($this->userObj->getLogin(), $lng->txt("usrimport_cant_insert"));
+                            // cognos-blu-patch: begin
+                            if (strlen($this->userObj->getImportId())) {
+                                $this->logWarning($this->userObj->getImportId(), $lng->txt("usrimport_cant_insert"));
+                            } else {
+                                $this->logWarning($this->userObj->getLogin(), $lng->txt("usrimport_cant_insert"));
+                            }
+                            // cognos-blu-patch: end
                         }
                         if (is_null($this->userObj->getGender()) && $this->isFieldRequired("gender")) {
                             $this->logFailure($this->userObj->getLogin(), sprintf($lng->txt("usrimport_xml_element_for_action_required"), "Gender", "Insert"));
@@ -1736,6 +1828,21 @@ class ilUserImportParser extends ilSaxParser
                         }
                         break;
                     case "Update":
+                        // cognos-blu-patch: begin
+                        if (strlen($this->userObj->getImportId())) {
+                            // check multiple accounts
+                            $ids = ilObject::lookupObjIdsByImportId(
+                                $this->userObj->getImportId(),
+                                'usr'
+                            );
+                            if (count($ids) > 1) {
+                                $this->logFailure(
+                                    $this->userObj->getImportId(),
+                                    $lng->txt('usrimport_multiple_accounts')
+                                );
+                            }
+                        }
+                        // cognos-blu-patch: end
                         if (!$user_exists) {
                             $this->logWarning($this->userObj->getLogin(), $lng->txt("usrimport_cant_update"));
                         } elseif ($this->user_id != -1 && !is_null($this->userObj->getLogin())) {
@@ -1748,6 +1855,21 @@ class ilUserImportParser extends ilSaxParser
                         }
                         break;
                     case "Delete":
+                        // cognos-blu-patch: begin
+                        if (strlen($this->userObj->getImportId())) {
+                            // check multiple accounts
+                            $ids = ilObject::lookupObjIdsByImportId(
+                                $this->userObj->getImportId(),
+                                'usr'
+                            );
+                            if (count($ids) > 1) {
+                                $this->logFailure(
+                                    $this->userObj->getImportId(),
+                                    $lng->txt('usrimport_multiple_accounts')
+                                );
+                            }
+                        }
+                        // cognos-blu-patch: end
                         if (!$user_exists) {
                             $this->logWarning($this->userObj->getLogin(), $lng->txt("usrimport_cant_delete"));
                         }
@@ -2038,8 +2160,12 @@ class ilUserImportParser extends ilSaxParser
     * @param	string		login
     * @param	string		message
      */
-    public function logWarning($aLogin, $aMessage)
+    function logWarning($aLogin, $aMessage)
     {
+        // cognos-blu-patch: begin
+        ilLoggerFactory::getLogger('usr')->warning('User import: ' . $aLogin . ' ' . $aMessage);
+        // cognos-blu-patch: end
+        if (!array_key_exists($aLogin, $this->protocol)) {
         if (!array_key_exists($aLogin, $this->protocol)) {
             $this->protocol[$aLogin] = array();
         }
@@ -2056,8 +2182,12 @@ class ilUserImportParser extends ilSaxParser
     * @param	string		login
     * @param	string		message
      */
-    public function logFailure($aLogin, $aMessage)
-    {
+        function logFailure($aLogin, $aMessage)
+        {
+            // cognos-blu-patch: begin
+            ilLoggerFactory::getLogger('usr')->error($aMessage);
+            // cognos-blu-patch: end
+            if (!array_key_exists($aLogin, $this->protocol)) {
         if (!array_key_exists($aLogin, $this->protocol)) {
             $this->protocol[$aLogin] = array();
         }
@@ -2076,6 +2206,9 @@ class ilUserImportParser extends ilSaxParser
      */
     public function logSuccess($aLogin, $userid, $action)
     {
+        // cognos-blu-patch: begin
+        ilLoggerFactory::getLogger('usr')->info('Successfully imported: ' . $aLogin . ' ' . $action);
+        // cognos-blu-patch: end
         $this->user_mapping[$userid] = array("login" => $aLogin, "action" => $action, "message" => "successful");
     }
 

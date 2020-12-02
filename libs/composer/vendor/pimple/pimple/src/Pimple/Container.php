@@ -93,6 +93,18 @@ class Container implements \ArrayAccess
     public function offsetGet($id)
     {
         if (!isset($this->keys[$id])) {
+
+        	if($id == 'tpl') {
+
+        		try {
+        			throw new \Exception();
+				}
+				catch (\Exception $e) {
+        			file_put_contents('tpl_error.txt',$e->getTraceAsString());
+				}
+			}
+
+
             throw new \InvalidArgumentException(sprintf('Identifier "%s" is not defined.', $id));
         }
 

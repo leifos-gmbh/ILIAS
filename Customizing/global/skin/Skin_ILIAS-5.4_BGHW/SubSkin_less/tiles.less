@@ -1,0 +1,58 @@
+.il-card {
+  max-width: 300px;
+  margin-left: 15px;
+  margin-right: 15px;
+  border: none;
+}
+.il-card .caption .card-title {
+    font-weight: 600;
+    font-size: 18px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding-top: 9px;
+}
+.thumbnail .caption {
+    padding-top: 0px;
+}
+.card-title .btn-link {
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    line-height: 1.1;
+}
+
+/*----------REPOSITORY----------*/
+.il-card {
+  border: none;
+}
+.il-card .il-card-repository-head .icon.outlined {
+    display: none;
+}
+.il-card .il-card-repository-head {
+    background-color: transparent;
+}
+.il-card .il-card-repository-head > div.il-card-repository-dropdown > .dropdown > button {
+    color: white;
+    background-color: @brand-primary;
+    border-color: @brand-primary;
+}
+.il-card .caption:nth-of-type(1n+3) {
+    border-top: none;
+}
+
+/*----------TABLET VIEW----------*/
+@media only screen and (max-width: 991px) {
+.il-card {
+  margin-left: auto;
+  margin-right: auto;
+  }
+}
+
+/*----------MOBILE VIEW----------*/
+@media only screen and (max-width: 767px) {
+.il-card {
+  margin-left: auto;
+  margin-right: auto;
+  }
+}

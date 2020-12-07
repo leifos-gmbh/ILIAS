@@ -11,11 +11,6 @@ use ILIAS\Filesystem\Security\Sanitizing\FilenameSanitizerImpl;
 
 require_once("libs/composer/vendor/autoload.php");
 
-// needed for slow queries, etc.
-if(!isset($GLOBALS['ilGlobalStartTime']) || !$GLOBALS['ilGlobalStartTime'])
-{
-	$GLOBALS['ilGlobalStartTime'] = microtime();
-}
 
 include_once "Services/Context/classes/class.ilContext.php";
 
@@ -110,7 +105,7 @@ class ilInitialisation
 	 * the ilias.ini.php file.
 	 */
 	protected static function initIliasIniFile()
-	{		
+	{
 		require_once("./Services/Init/classes/class.ilIniFile.php");
 		$ilIliasIniFile = new ilIniFile("./ilias.ini.php");				
 		$ilIliasIniFile->read();
@@ -1050,6 +1045,10 @@ class ilInitialisation
 
 			return;
 		}
+
+		// begin-patch bench
+		$GLOBALS['ilGlobalStartTime'] = microtime(true);
+		// end-patch bench
 
 		$GLOBALS["DIC"] = new \ILIAS\DI\Container();
 		$GLOBALS["DIC"]["ilLoggerFactory"] = function($c) {

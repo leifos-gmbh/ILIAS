@@ -24,12 +24,12 @@
 /ilias.ini.php
 /ilias.log
 /db_template_writer.php
-/setup/sql/dbupdate_custom.php
+#/setup/sql/dbupdate_custom.php
 /install_client.php
 
 # Directories
 /data
-/Customizing/global
+#/Customizing/global
 /Customizing/clients
 /setup/sql/ilDBTemplate
 virtual-data

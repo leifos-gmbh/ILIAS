@@ -952,12 +952,16 @@ class ilTemplate extends HTML_Template_ITX
 		$link_items = array();
 		
 		// imprint
-		include_once "Services/Imprint/classes/class.ilImprint.php";
-		if($_REQUEST["baseClass"] != "ilImprintGUI" && ilImprint::isActive())
-		{
-			include_once "Services/Link/classes/class.ilLink.php";
-			$link_items[ilLink::_getStaticLink(0, "impr")] = array($lng->txt("imprint"), true);
-		}
+		#include_once "Services/Imprint/classes/class.ilImprint.php";
+		#if($_REQUEST["baseClass"] != "ilImprintGUI" && ilImprint::isActive())
+		#{
+		#	include_once "Services/Link/classes/class.ilLink.php";
+		#	$link_items[ilLink::_getStaticLink(0, "impr")] = array($lng->txt("imprint"), true);
+		#}
+		
+		$link_items['https://www.bghw.de/die-bghw-ihr-partner-fuer-arbeitssicherheit-und-gesundheit-1/die-bghw/impressum'] = array($lng->txt('imprint'),true);
+		$link_items['https://www.bghw.de/die-bghw-ihr-partner-fuer-arbeitssicherheit-und-gesundheit-1/die-bghw/datenschutz/'] = array('Datenschutz', true);
+		
 
 		// system support contacts
 		include_once("./Modules/SystemFolder/classes/class.ilSystemSupportContactsGUI.php");
@@ -1096,14 +1100,23 @@ class ilTemplate extends HTML_Template_ITX
 
 		}
 
+		// begin-patch bench
+		$ftpl->setVariable(
+			'ELAPSED_TIME',
+			', '.number_format(microtime(true) - $GLOBALS['ilGlobalStartTime'],1).' sec.'
+		);
+		// end-patch bench
+
+
 		// BEGIN Usability: Non-Delos Skins can display the elapsed time in the footer
 		// The corresponding $ilBench->start invocation is in inc.header.php
+		/**
 		$ilBench = $DIC["ilBench"];
 		$ilBench->stop("Core", "ElapsedTimeUntilFooter");
 		$ftpl->setVariable("ELAPSED_TIME",
 			", ".number_format($ilBench->getMeasuredTime("Core", "ElapsedTimeUntilFooter"),1).' seconds');
 		// END Usability: Non-Delos Skins can display the elapsed time in the footer
-		
+		 **/
 		$this->setVariable("FOOTER", $ftpl->get());
 	}
 
@@ -2217,7 +2230,9 @@ class ilTemplate extends HTML_Template_ITX
 		}
 		
 		// tree/flat icon
-		if ($this->tree_flat_link != "")
+		// begin-patch bghw => disable tree/flat view switch
+		//if ($this->tree_flat_link != "")
+		if(0)
 		{
 			if ($this->left_nav_content != "")
 			{

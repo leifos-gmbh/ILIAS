@@ -67,20 +67,23 @@ class ilSurveyEvaluationGUI
 	{
 		global $DIC;
 
-		$this->tabs = $DIC->tabs();
+		if (ilContext::hasHTML())
+		{
+			$this->tabs = $DIC->tabs();
+			$this->toolbar = $DIC->toolbar();
+			$this->ui = $DIC->ui();
+			$tpl = $DIC["tpl"];
+			$this->tpl = $tpl;
+			$ilCtrl = $DIC->ctrl();
+			$this->ctrl = $ilCtrl;
+		}
 		$this->access = $DIC->access();
 		$this->user = $DIC->user();
 		$this->rbacsystem = $DIC->rbac()->system();
 		$this->tree = $DIC->repositoryTree();
-		$this->toolbar = $DIC->toolbar();
-		$this->ui = $DIC->ui();
 		$lng = $DIC->language();
-		$tpl = $DIC["tpl"];
-		$ilCtrl = $DIC->ctrl();
 
 		$this->lng = $lng;
-		$this->tpl = $tpl;
-		$this->ctrl = $ilCtrl;
 		$this->object = $a_object;
 		$this->log = ilLoggerFactory::getLogger("svy");
 		$this->array_panels = array();

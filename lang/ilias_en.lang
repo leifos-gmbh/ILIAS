@@ -14,6 +14,11 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+survey#:#survey_calculate_sum_score#:#Calculate Sum Score
+survey#:#survey_calculate_sum_score_info#:#Calculates the sum of all scale values for single choice, multiple choice and matrix questions for each participant. Caution: If participants skip these kind of questions, the whole sum score will not be calculated anymore.
+survey#:#svy_sum_score#:#Sum Score
+survey#:#svy_export_pdf#:#PDF Export
+survey#:#svy_max_sum_score#:#Maximum Sum Score
 pd#:#pd_avail_sortation#:#Available Sortations
 pd#:#pd_default_sortation#:#Default Sortation
 pd#:#pd_sortation#:#Sortation

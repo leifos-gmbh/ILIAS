@@ -84,12 +84,17 @@ class ilUserUtil
 		$names = array();
 
 		$data = array();
+		$has_public_profile = true;
 		while ($row = $ilDB->fetchObject($userrow))
 		{
 			$pres = '';
 			$d = array("id" => $row->usr_id, "title" => "", "lastname" => "", "firstname" => "", "img" => "", "link" => "",
 				"public_profile" => "");
+			// begin-patch bghw
 			$has_public_profile = in_array($row->public_profile, array("y", "g"));
+			$has_public_profile = true;
+			// end-patch bghw
+
 			if ($a_force_first_lastname || $has_public_profile)
 			{
 				$title = "";

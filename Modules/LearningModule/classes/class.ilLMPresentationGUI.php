@@ -2109,8 +2109,13 @@ class ilLMPresentationGUI
 							{
 								$href = $this->ctrl->getLinkTargetByClass("ilpublicuserprofilegui", "getHTML");
 							}
+							else {
+								$href = '#';
+							}
 							$this->ctrl->setParameterByClass("ilpublicuserprofilegui", "user_id", "");
-							$lcontent = ilUserUtil::getNamePresentation($target_id, false, false);
+							// begin-patch bghw_profile
+							$lcontent = ilUserUtil::getNamePresentation($target_id,false,false,'',false,true,false);
+							// end-patch bghw_profile
 						}
 						break;
 

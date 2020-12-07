@@ -937,6 +937,21 @@ class ilObjSurveyQuestionPool extends ilObject
 		
 		return $types;
 	}
+
+	/**
+	* Creates a list of all available question types
+	*
+	* @return array An array containing the available questiontypes
+	* @access public
+	*/
+	static function _getQuestionClasses()
+	{
+		$classes = array_map(function ($c) {
+			return $c["type_tag"];
+		},
+		self::_getQuestiontypes());
+		return $classes;
+	}
 	
 	public static function _getQuestionTypeTranslations()
 	{

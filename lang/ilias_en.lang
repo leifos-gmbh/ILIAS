@@ -40,6 +40,19 @@ crs#:#timings_cron_reminder_exceeded_subject#:#You exceeded the processing perio
 crs#:#timings_cron_reminder_exceeded_start#:#The processing period is overdue at:
 crs#:#timings_reminder_notifications#:#Course Timings Notifications
 crs#:#timings_reminder_notifications_info#:#If enabled, course participants will be notified about exceeded timing materials.
+pd#:#pd_avail_sortation#:#Available Sortations
+pd#:#pd_default_sortation#:#Default Sortation
+pd#:#pd_sortation#:#Sortation
+pd#:#pd_presentation#:#Presentation
+pd#:#pd_avail_presentation#:#Available Presentations
+pd#:#pd_default_presentation#:#Default Presentation
+pd#:#pd_list#:#List
+pd#:#pd_tile#:#Tile
+pd#:#pd_activation#:#activation
+pd#:#pd_view_courses_groups#:#View ‘Courses and Groups’
+pd#:#pd_view_favourites#:#View ‘Selected Items’
+rbac#:#pdts_change_presentation#:#Change presentation of personal desktop view
+rbac#:#change_presentation#:#Change Presentation
 meta#:#meta_oer_harvester#:#OER Harvester
 meta#:#meta_oer_harvester_desc#:#OER Harvester
 meta#:#meta_oer_copyright_selection#:#License Selection
@@ -1972,6 +1985,8 @@ common#:#btn_undelete#:#Restore
 pd#:#pd_sort_by_location#:#Sort by Location
 pd#:#pd_sort_by_type#:#Sort by Type
 pd#:#pd_sort_by_start_date#:#Sort by Start Date
+pd#:#pd_presentation_mode_list#:#Item List Presentation
+pd#:#pd_presentation_mode_tile#:#Tile Presentation
 pd#:#pd_my_memberships_sort_default#:#Default of Sort Option
 pd#:#pd_upcoming#:#Upcoming
 pd#:#pd_ongoing#:#Ongoing

@@ -68,4 +68,14 @@ class SurveySingleChoiceQuestionEvaluation extends SurveyQuestionEvaluation
             }
         }
     }
+
+    /**
+     * Supports sum score?
+     * @return bool
+     */
+    protected function supportsSumScore()
+    {
+        return true;
+    }
+
 }

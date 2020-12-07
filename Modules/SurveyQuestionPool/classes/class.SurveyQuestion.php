@@ -2153,4 +2153,15 @@ class SurveyQuestion
         }
         return $str;
     }
+
+    /**
+     * Get max sum score for specific survey (and this question type)
+     * @param
+     * @return
+     */
+    public static function getMaxSumScore($survey_id)
+    {
+        return 0;
+    }
+
 }

@@ -34,6 +34,11 @@ rbac#:#rbac_form_copy_roles_ce_remove_yes#:#Vorhandene Objekte um ausgewählte R
 rbac#:#rbac_form_copy_roles_ce_remove_no#:#Nur Rechtevorgaben reduzieren
 rbac#:#rbac_form_copy_roles_ce_remove_yes_info#:#Die markierten Rechte werden aus den Rechtevorgaben der Ziel-Rolle und aus den Rechteeinstellungen vorhandener Objekte entfernt.
 rbac#:#rbac_form_copy_roles_ce_remove_no_info#:#Markierte Rechte werden nur aus den Rechtevorgaben der Ziel-Rolle entfernt. Die Rechteeinstellungen bereits vorhandener Objekte werden dagegen nicht angepasst.
+survey#:#survey_calculate_sum_score#:#Skalenpunktesumme berechnen
+survey#:#survey_calculate_sum_score_info#:#Berechnet die Summe aller Skalenpunkt von Single Choice, Multiple Choice und Matrixfragen je Teilnehmer. Achtung: Wenn Teilnehmer solche Fragen überspringen, wird die gesammte Skalenpunktesumme nicht berechnet.
+survey#:#svy_sum_score#:#Skalenpunktesumme
+survey#:#svy_export_pdf#:#PDF Export
+survey#:#svy_max_sum_score#:#Maximale Skalenpunktesumme
 pd#:#pd_avail_sortation#:#Verfügbare Sortierungen
 pd#:#pd_default_sortation#:#Standard-Sortierung
 pd#:#pd_sortation#:#Sorierung

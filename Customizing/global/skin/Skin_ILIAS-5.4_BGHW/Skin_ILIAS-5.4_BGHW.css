@@ -17208,6 +17208,31 @@ p.ilErrorSection {
   font-weight: 800;
   font-style: italic;
 }
+div#minheight {
+  height: 159px;
+}
+footer.ilFooter {
+  height: 160px;
+  margin: 0 auto;
+  padding: 0;
+  color: #666;
+  background-color: transparent;
+}
+footer.ilFooter div.ilFooterContainer {
+  color: #666;
+  padding: 20px 15px 0;
+  height: 160px;
+  background-color: #E2EEF8;
+  text-align: center;
+}
+footer.ilFooter a.permalink_label,
+footer.ilFooter div.ilFooterContainer > a {
+  color: #666;
+}
+footer.ilFooter a.permalink_label:hover,
+footer.ilFooter div.ilFooterContainer > a:hover {
+  color: #666 !important;
+}
 #ilLMPageContent {
   padding-bottom: 60px;
 }
@@ -17523,28 +17548,6 @@ a {
 table.calmini td.calminitoday {
   background-color: #004994;
 }
-/*----------FOOTER----------*/
-div#minheight {
-  height: 159px;
-}
-footer.ilFooter {
-  height: 160px;
-  margin: 0 auto;
-  padding: 0;
-  color: #666;
-  background-color: transparent;
-}
-footer.ilFooter div.ilFooterContainer {
-  color: #666;
-  padding: 20px 15px 0;
-  height: 160px;
-  background-color: #E2EEF8;
-  text-align: center;
-}
-footer.ilFooter a.permalink_label,
-footer.ilFooter div.ilFooterContainer > a {
-  color: #666;
-}
 /*----------PAGE HEADER----------*/
 div.ilMemberViewMainHeader a {
   color: white;
@@ -17657,6 +17660,9 @@ div.ilTopMemberView {
   }
 }
 /*----------FOOTER----------*/
+.ilTinyMenuSection > .btn > span {
+  color: white !important;
+}
 @media print {
   #mainspacekeeper > .row {
     background-color: white;
@@ -17673,6 +17679,24 @@ div.ilTopMemberView {
 }
 #block_pditems_0 .ilContainerTileRows .dropdown {
   display: none;
+}
+#block_pdmail_0 {
+  margin-top: -30.9667px;
+}
+.jstree-icon.jstree-ocl {
+  display: none;
+}
+#il_right_col {
+  padding-top: 30.9667px;
+}
+div.ilNewObjectSelector {
+  padding: 0 15px;
+}
+div.ilAdminRow {
+  margin: 10px 0px 20px;
+  width: 100%;
+  padding-left: 15px;
+  padding-right: 15px;
 }
 /*----------PAGE HEADER----------*/
 div#il_startup_logo img {

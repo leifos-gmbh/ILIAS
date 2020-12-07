@@ -33,6 +33,12 @@ class ilAdvancedMDFieldTranslations
     private $translations = [];
 
     /**
+     * @var array
+     */
+    private $record_translations = [];
+
+
+    /**
      * @var string
      */
     private $default_language = '';
@@ -58,6 +64,7 @@ class ilAdvancedMDFieldTranslations
         $this->lng->loadLanguageModule('meta');
 
         $this->record_id = $record_id;
+        $this->record_translations = ilAdvancedMDRecordTranslations::getInstanceByRecordId($this->record_id);
         $this->read();
     }
 
@@ -111,6 +118,9 @@ class ilAdvancedMDFieldTranslations
      */
     public function isConfigured(int $field_id, string $lang_key)
     {
+        if (!$this->record_translations->isConfigured($lang_key)) {
+            return false;
+        }
         return isset($this->translations[$field_id][$lang_key]);
     }
 
@@ -288,6 +298,12 @@ class ilAdvancedMDFieldTranslations
         if ($this->getTranslation($field_id, $language) && strlen($this->getTranslation($field_id, $language)->getTitle())) {
             return $this->getTranslation($field_id, $language)->getTitle();
         }
+        if (
+            $this->getTranslation($field_id, $this->getDefaultLanguage()) &&
+            strlen(($this->getTranslation($field_id, $this->getDefaultLanguage())->getTitle()))
+        ) {
+            return $this->getTranslation($field_id, $this->getDefaultLanguage())->getTitle();
+        }
         if ($this->definitions[$field_id] instanceof ilAdvancedMDFieldDefinition) {
             return $this->definitions[$field_id]->getTitle();
         }
@@ -301,6 +317,11 @@ class ilAdvancedMDFieldTranslations
     {
         if ($this->getTranslation($field_id, $language) && strlen($this->getTranslation($field_id, $language)->getDescription())) {
             return $this->getTranslation($field_id, $language)->getDescription();
+        }
+        if ($this->getTranslation($field_id, $this->getDefaultLanguage()) &&
+            strlen($this->getTranslation($field_id, $this->getDefaultLanguage())->getDescription())
+        ) {
+            return $this->getTranslation($field_id, $this->getDefaultLanguage())->getDescription();
         }
         if ($this->definitions[$field_id] instanceof ilAdvancedMDFieldDefinition) {
             return $this->definitions[$field_id]->getDescription();

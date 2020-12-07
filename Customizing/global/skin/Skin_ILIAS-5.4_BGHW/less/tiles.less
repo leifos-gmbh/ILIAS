@@ -1,8 +1,45 @@
-/**********ETHERPAD**********/
+/*----------ETHERPAD----------*/
 .icon.xpdl.medium.outlined {
     display: none;
 }
-/**********MEDIA GALLERY**********/
+
+/*----------MEDIA GALLERY----------*/
 .icon.xmg.medium.outlined {
     display: none;
+}
+
+/*----------IE BUGFIXES----------*/
+.card-title .btn {
+   -ms-word-break: break-all;
+}
+.il-card .caption .card-title {
+   -ms-word-break: break-all;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    -ms-word-break: normal;
+    word-break: normal;
+    word-break: break-word;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+
+}
+.img-responsive,
+.thumbnail > img,
+.thumbnail a > img {
+   display: inherit;
+}
+.il-card img {
+    cursor: pointer;
+    background: #E5E5E5;
+    min-height: 1px;
+}
+.il-card .il-card-repository-head > div.il-card-repository-dropdown > .dropdown > button {
+    background-color: transparent !important;
+    border-color: white !important;
+}
+.il-card .il-card-repository-head > div.il-card-repository-dropdown > .dropdown > button:hover {
+    background-color: transparent !important;
+    border-color: white !important;
 }

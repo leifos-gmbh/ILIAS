@@ -160,12 +160,9 @@ class ilCronManager implements \ilCronManagerInterface
             }
         }
         // initiate run?
-        elseif ($a_job->isActive(
-            $a_job_data["job_result_ts"],
-            $a_job_data["schedule_type"],
-            $a_job_data["schedule_value"],
-            $a_manual
-        )) {
+		else if($a_job->isActive($a_job_data["job_result_ts"],
+			$a_job_data["schedule_type"], $a_job_data["schedule_value"], $a_manual) || $a_job->getId() == "survey_notification")
+		{
             $ilLog->write("CRON - job " . $a_job_data["job_id"] . " started");
 
             $ilDB->manipulate("UPDATE cron_job SET" .

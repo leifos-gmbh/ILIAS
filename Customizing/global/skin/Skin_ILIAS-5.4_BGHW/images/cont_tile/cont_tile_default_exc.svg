@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 18.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="32px" height="32px"
-	 viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve">
-<rect fill="#f3de2c" width="32" height="32"/>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="512" height="512" fill="#CCCCCC"/>
+<path d="M295.062 238.437V181H220.062L188.812 212.25V312.25H234.438" stroke="white" stroke-width="3" stroke-linecap="square" stroke-linejoin="round"/>
+<path d="M220.062 181V212.25H188.812" stroke="white" stroke-width="3" stroke-linejoin="round"/>
+<path d="M285.688 331C306.398 331 323.188 314.211 323.188 293.5C323.188 272.789 306.398 256 285.688 256C264.977 256 248.188 272.789 248.188 293.5C248.188 314.211 264.977 331 285.688 331Z" stroke="white" stroke-width="3" stroke-linejoin="round"/>
+<path d="M284.812 268.875V293.875L309.812 306.375" stroke="white" stroke-width="3" stroke-linejoin="round"/>
 </svg>

@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 18.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="32px" height="32px"
-	 viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve">
-<rect fill="#9e7c7d" width="32" height="32"/>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="512" height="512" fill="#CCCCCC"/>
+<path d="M306 181H209.125C206.639 181 204.254 181.988 202.496 183.746C200.738 185.504 199.75 187.889 199.75 190.375V324.75C199.75 326.408 200.408 327.997 201.581 329.169C202.753 330.342 204.342 331 206 331H306C307.658 331 309.247 330.342 310.419 329.169C311.592 327.997 312.25 326.408 312.25 324.75V206C312.25 204.342 311.592 202.753 310.419 201.581C309.247 200.408 307.658 199.75 306 199.75H209.125C206.639 199.75 204.254 198.762 202.496 197.004C200.738 195.246 199.75 192.861 199.75 190.375" stroke="white" stroke-width="3" stroke-miterlimit="10"/>
+<path d="M221.625 268.5H253.5" stroke="white" stroke-width="3" stroke-miterlimit="10" stroke-linecap="square"/>
+<path d="M221.625 287.25H274.75" stroke="white" stroke-width="3" stroke-miterlimit="10" stroke-linecap="square"/>
 </svg>

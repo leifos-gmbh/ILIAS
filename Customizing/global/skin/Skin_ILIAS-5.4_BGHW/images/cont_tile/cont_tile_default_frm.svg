@@ -1,7 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 18.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="32px" height="32px"
-	 viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve">
-<rect fill="#86cb92" width="32" height="32"/>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="512" height="512" fill="#CCCCCC"/>
+<path d="M306 240.625V202.312C305.996 196.662 303.748 191.244 299.75 187.25V187.25C295.756 183.252 290.338 181.004 284.688 181H202.312C196.662 181.004 191.244 183.252 187.25 187.25C183.252 191.244 181.004 196.662 181 202.312V256.688C181.034 260.314 182.12 263.853 184.125 266.875V266.875C185.785 269.305 188.013 271.293 190.617 272.666C193.22 274.038 196.12 274.754 199.062 274.75H199.75V306L225.813 274.75H247.188" stroke="white" stroke-width="3" stroke-linejoin="round"/>
+<path d="M199.75 202.875H287.25" stroke="white" stroke-width="3" stroke-linejoin="round"/>
+<path d="M199.75 221.625H287.25" stroke="white" stroke-width="3" stroke-linejoin="round"/>
+<path d="M199.75 240.375H234.125" stroke="white" stroke-width="3" stroke-linejoin="round"/>
+<path d="M333.312 260.938C336.233 263.98 337.868 268.032 337.875 272.25V297.813C337.894 302.035 336.256 306.097 333.312 309.125C331.8 310.701 329.986 311.956 327.978 312.815C325.97 313.674 323.809 314.12 321.625 314.125H319.125L299.75 338.313V314.125H279.125C276.941 314.12 274.78 313.674 272.772 312.815C270.764 311.956 268.95 310.701 267.437 309.125V309.125C264.494 306.097 262.856 302.035 262.875 297.813V272.25C262.882 268.032 264.516 263.98 267.437 260.938C268.961 259.381 270.779 258.143 272.786 257.296C274.792 256.448 276.947 256.008 279.125 256H321.625C323.803 256.008 325.958 256.448 327.964 257.296C329.971 258.143 331.789 259.381 333.312 260.938V260.938Z" stroke="white" stroke-width="3" stroke-linejoin="round"/>
+<path d="M277.562 277.375H323.187" stroke="white" stroke-width="3" stroke-linejoin="round"/>
+<path d="M277.562 293.5H303.5" stroke="white" stroke-width="3" stroke-linejoin="round"/>
 </svg>

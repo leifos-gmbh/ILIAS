@@ -10,18 +10,28 @@
         background-color: #E2EEF8;
     }
     #ilTopBar.ilTopBar {
-        height: 50px;
+        height: 100px;
     }
     .ilMainHeader > header > .row > a.navbar-brand > img {
         margin-top: 10px;
         margin-left: 15px;
     }
     #ilTopBarNav {
-        margin: 0 7px 0 15px;
+        margin: 0 7px 0 75px;
     }
     #ilTopBarNav > li > a {
-        margin-right: 8px;
         margin-top: 10px;
+    }
+      #ilTopBarNav > li {
+        float: none;
+        display: inline-block;
+    }
+      #userlog {
+        top: -1px;
+        margin-right: 4px;
+    }
+      #ilMMSearch {
+        margin-right: 4px;
     }
 }
 /*MAIN MENU*/
@@ -30,11 +40,14 @@
         top: 50px;
     }
     #ilTopBarNav .navbar-toggle {
+        display: inline-block;
+        float: none;
         height: 40px;
         width: 40px;
         background-color: @brand-primary;
-        margin-right: 8px;
+        margin-right: 5px;
         margin-top: 10px;
+        top: 2.5px;
     }
     #ilTopBarNav .icon-bar {
         background-color: white;
@@ -54,7 +67,7 @@
 /*----------BODY----------*/
 @media only screen and (max-width: 767px) {
     .ilFixedTopSpacer {
-        margin-top: 50px;
+        margin-top: 100px;
         padding-top: inherit;
      }
     .breadcrumb {

@@ -1,7 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 18.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="32px" height="32px"
-	 viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve">
-<rect fill="#82639e" width="32" height="32"/>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="512" height="512" fill="#CCCCCC"/>
+<path d="M256 239.375C266.044 239.375 274.187 230.337 274.187 219.187C274.187 208.038 266.044 199 256 199C245.955 199 237.812 208.038 237.812 219.187C237.812 230.337 245.955 239.375 256 239.375Z" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M247.5 313.312H290.375V275.812C290.375 266 283.5 258.125 273.188 253.188C271.852 254.027 270.452 254.758 269 255.375C264.928 257.188 260.52 258.125 256.063 258.125C251.605 258.125 247.197 257.188 243.125 255.375V255.375C241.673 254.758 240.273 254.027 238.938 253.188V253.188C228.625 258.125 221.75 266 221.75 275.812" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M314.75 255.375C321.308 255.375 326.625 249.471 326.625 242.187C326.625 234.904 321.308 229 314.75 229C308.192 229 302.875 234.904 302.875 242.187C302.875 249.471 308.192 255.375 314.75 255.375Z" stroke="white" stroke-width="3" stroke-linecap="square" stroke-linejoin="round"/>
+<path d="M309.188 304H337.25V279.438C337.001 276.147 335.807 272.999 333.811 270.371C331.816 267.743 329.103 265.748 326 264.625C325.138 265.202 324.216 265.684 323.25 266.063C320.602 267.272 317.723 267.89 314.813 267.875C312.063 267.88 309.342 267.327 306.812 266.25" stroke="white" stroke-width="3" stroke-linecap="square" stroke-linejoin="round"/>
+<path d="M197.25 255.375C203.808 255.375 209.125 249.471 209.125 242.187C209.125 234.904 203.808 229 197.25 229C190.691 229 185.375 234.904 185.375 242.187C185.375 249.471 190.691 255.375 197.25 255.375Z" stroke="white" stroke-width="3" stroke-linecap="square" stroke-linejoin="round"/>
+<path d="M174.75 287.25V279.438C174.999 276.147 176.193 272.999 178.189 270.371C180.184 267.743 182.897 265.748 186 264.625V264.625C186.862 265.202 187.784 265.684 188.75 266.063C191.398 267.272 194.277 267.89 197.188 267.875C199.937 267.88 202.658 267.327 205.187 266.25" stroke="white" stroke-width="3" stroke-linecap="square" stroke-linejoin="round"/>
+<path d="M206.625 328.25L228.875 306L206.625 283.75M176.937 306H226H176.937Z" stroke="white" stroke-width="3" stroke-linecap="square" stroke-linejoin="round"/>
 </svg>

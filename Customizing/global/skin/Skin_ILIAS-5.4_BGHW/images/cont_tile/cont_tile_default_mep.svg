@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 18.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="32px" height="32px"
-	 viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve">
-<rect fill="#86cb92" width="32" height="32"/>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="512" height="512" fill="#CCCCCC"/>
+<path d="M213.875 236H197.188C196.739 235.992 196.294 236.073 195.877 236.239C195.46 236.405 195.081 236.652 194.761 236.966C194.441 237.28 194.186 237.655 194.013 238.069C193.839 238.482 193.75 238.926 193.75 239.375V271.375C193.741 271.826 193.825 272.274 193.995 272.692C194.166 273.109 194.419 273.488 194.741 273.804C195.063 274.12 195.446 274.366 195.867 274.529C196.287 274.692 196.737 274.767 197.188 274.75H213.938L217.063 276.75L251.188 298.812C252.875 299.937 252.875 297.875 252.875 297.875V212.875C252.875 210.812 251.188 211.937 251.188 211.937L217.063 234L213.875 236Z" stroke="white" stroke-width="3" stroke-linejoin="round"/>
+<path d="M168.5 344L168.25 206.5L206.312 169H343.5L343.812 304.937L306.75 344H168.5Z" stroke="white" stroke-width="3" stroke-linejoin="round"/>
+<path d="M295.937 201.5C303.172 208.645 308.897 217.171 312.772 226.572C316.646 235.973 318.592 246.057 318.493 256.225C318.394 266.393 316.252 276.437 312.195 285.761C308.137 295.084 302.248 303.497 294.875 310.5" stroke="white" stroke-width="3" stroke-miterlimit="10"/>
+<path d="M279.687 218.5C284.628 223.43 288.54 229.294 291.193 235.75C293.846 242.206 295.189 249.125 295.142 256.105C295.095 263.084 293.661 269.985 290.922 276.405C288.183 282.825 284.194 288.636 279.187 293.5" stroke="white" stroke-width="3" stroke-miterlimit="10"/>
 </svg>

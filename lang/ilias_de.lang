@@ -34,6 +34,17 @@ rbac#:#rbac_form_copy_roles_ce_remove_yes#:#Vorhandene Objekte um ausgewählte R
 rbac#:#rbac_form_copy_roles_ce_remove_no#:#Nur Rechtevorgaben reduzieren
 rbac#:#rbac_form_copy_roles_ce_remove_yes_info#:#Die markierten Rechte werden aus den Rechtevorgaben der Ziel-Rolle und aus den Rechteeinstellungen vorhandener Objekte entfernt.
 rbac#:#rbac_form_copy_roles_ce_remove_no_info#:#Markierte Rechte werden nur aus den Rechtevorgaben der Ziel-Rolle entfernt. Die Rechteeinstellungen bereits vorhandener Objekte werden dagegen nicht angepasst.
+pd#:#pd_avail_sortation#:#Verfügbare Sortierungen
+pd#:#pd_default_sortation#:#Standard-Sortierung
+pd#:#pd_sortation#:#Sorierung
+pd#:#pd_presentation#:#Präsentation
+pd#:#pd_avail_presentation#:#Verfügbare Präsentationen
+pd#:#pd_default_presentation#:#Standard-Präsentation
+pd#:#pd_list#:#Liste
+pd#:#pd_tile#:#Kacheln
+pd#:#pd_activation#:#Aktivierung
+pd#:#pd_view_courses_groups#:#Ansicht ‘Kurse und Gruppen’
+pd#:#pd_view_favourites#:#Ansicht ‘Ausgewählte Angebote’
 crs#:#timings_cron_reminder_freshly_start#:#Der Bearbeitungszeitraum hat begonnen bei:
 crs#:#timings_cron_reminder_started_subject#:#Der Bearbeitungszeitraum hat begonnen
 crs#:#timings_cron_reminder_exceeded_subject#:#Sie haben den Bearbeitungszeitraum überschritten

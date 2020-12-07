@@ -1,7 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 18.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="32px" height="32px"
-	 viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve">
-<rect fill="#cddc39" width="32" height="32"/>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="512" height="512" fill="#CCCCCC"/>
+<path d="M206.437 208.5H168.937V308.5H206.437V208.5Z" stroke="white" stroke-width="3" stroke-linejoin="round"/>
+<path d="M168.937 231H206.437" stroke="white" stroke-width="3" stroke-miterlimit="10"/>
+<path d="M168.937 249.75H206.437" stroke="white" stroke-width="3" stroke-miterlimit="10"/>
+<path d="M262.687 208.5H225.187V308.5H262.687V208.5Z" stroke="white" stroke-width="3" stroke-linejoin="round"/>
+<path d="M225.187 231H262.687" stroke="white" stroke-width="3" stroke-miterlimit="10"/>
+<path d="M225.187 249.75H262.687" stroke="white" stroke-width="3" stroke-miterlimit="10"/>
+<path d="M317.174 202.88L280.952 212.586L306.834 309.179L343.056 299.473L317.174 202.88Z" stroke="white" stroke-width="3" stroke-linejoin="round"/>
+<path d="M286.813 234.312L323 224.562" stroke="white" stroke-width="3" stroke-miterlimit="10"/>
+<path d="M291.625 252.375L327.875 242.688" stroke="white" stroke-width="3" stroke-miterlimit="10"/>
 </svg>

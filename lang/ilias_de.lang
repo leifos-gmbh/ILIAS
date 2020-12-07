@@ -10989,6 +10989,8 @@ pd#:#pd_settings#:#Einstellungen
 pd#:#pd_sort_by_location#:#Nach Ort sortieren
 pd#:#pd_sort_by_start_date#:#Nach Startdatum sortieren
 pd#:#pd_sort_by_type#:#Nach Typ sortieren
+pd#:#pd_presentation_mode_list#:#Listenansicht
+pd#:#pd_presentation_mode_tile#:#Kachelansicht
 pd#:#pd_sys_msg_mail_block#:#Systemnachrichten im Block "Mail" anzeigen
 pd#:#pd_sys_msg_no_block#:#Keine Systemnachrichten auf Schreibtisch anzeigen
 pd#:#pd_sys_msg_own_block#:#Systemnachrichten im eigenen Block anzeigen

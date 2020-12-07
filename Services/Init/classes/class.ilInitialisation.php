@@ -1015,6 +1015,10 @@ class ilInitialisation
             return;
         }
 
+		// begin-patch bench
+		$GLOBALS['ilGlobalStartTime'] = microtime(true);
+		// end-patch bench
+
         $GLOBALS["DIC"] = new \ILIAS\DI\Container();
         $GLOBALS["DIC"]["ilLoggerFactory"] = function ($c) {
             return ilLoggerFactory::getInstance();

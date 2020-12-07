@@ -1,0 +1,33 @@
+/*----------PAGE HEADER----------*/
+div.ilMemberViewMainHeader a {
+    color: white;
+    font-size: 120%;
+}
+div.ilMemberViewMainHeader #ilTopBarNav {
+    float: inherit;
+    background-color: @brand-primary;
+    color: white;
+    margin: 0;
+}
+div.ilTopMemberView h3 {
+    font-weight: bold;
+    line-height: 45px;
+}
+div.ilTopMemberView {
+    text-align: right;
+    padding-right: 20px;
+}
+.ilMemberViewMainHeader .ilTopTitle {
+    line-height: 45px;
+}
+
+/*----------MEMBERVIEW MOBIL----------*/
+@media only screen and (max-width: 767px) {
+.ilMemberViewMainHeader #ilTopBarNav .navbar-toggle {
+    display: none;
+}
+div.ilMemberViewMainHeader {
+    background-color: @brand-primary !important;
+    height: 40px !important;
+}
+}

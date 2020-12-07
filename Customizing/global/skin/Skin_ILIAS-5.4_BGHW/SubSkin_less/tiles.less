@@ -21,10 +21,16 @@
     margin-bottom: 0px;
     line-height: 1.1;
 }
+.il-chart-progressmeter-box.il-chart-progressmeter-mini {
+    display: none;
+}
+.il-card dl {
+    display: none !important;
+}
 
 /*----------REPOSITORY----------*/
 .il-card {
-  border: none;
+    border: none;
 }
 .il-card .il-card-repository-head .icon.outlined {
     display: none;
@@ -34,8 +40,12 @@
 }
 .il-card .il-card-repository-head > div.il-card-repository-dropdown > .dropdown > button {
     color: white;
-    background-color: @brand-primary;
-    border-color: @brand-primary;
+    background-color: @brand-primary !important;
+    border-color: @brand-primary !important;
+}
+.il-card .il-card-repository-head > div.il-card-repository-dropdown > .dropdown > button:hover {
+    background-color: #0099CC !important;
+    border-color: #0099CC !important;
 }
 .il-card .caption:nth-of-type(1n+3) {
     border-top: none;
@@ -54,5 +64,10 @@
 .il-card {
   margin-left: auto;
   margin-right: auto;
+  }
+}
+@media only screen and (min-width: 768px) {
+.row-eq-height .il-card{
+  display: block;
   }
 }

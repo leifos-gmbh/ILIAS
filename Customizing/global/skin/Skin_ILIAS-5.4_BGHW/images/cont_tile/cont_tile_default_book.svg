@@ -1,7 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 18.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="32px" height="32px"
-	 viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve">
-<rect fill="#86cb92" width="32" height="32"/>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="512" height="512" fill="#CCCCCC"/>
+<path d="M224.75 254.562H199.75V273.312H224.75V254.562Z" stroke="white" stroke-width="3" stroke-linecap="square" stroke-linejoin="round"/>
+<path d="M268.5 254.562H243.5V273.312H268.5V254.562Z" stroke="white" stroke-width="3" stroke-linecap="square" stroke-linejoin="round"/>
+<path d="M312.25 254.562H287.25V273.312H312.25V254.562Z" stroke="white" stroke-width="3" stroke-linecap="square" stroke-linejoin="round"/>
+<path d="M224.75 292.062H199.75V310.812H224.75V292.062Z" stroke="white" stroke-width="3" stroke-linecap="square" stroke-linejoin="round"/>
+<path d="M268.5 292.062H243.5V310.812H268.5V292.062Z" stroke="white" stroke-width="3" stroke-linecap="square" stroke-linejoin="round"/>
+<path d="M312.25 292.062H287.25V310.812H312.25V292.062Z" stroke="white" stroke-width="3" stroke-linecap="square" stroke-linejoin="round"/>
+<path d="M306 201.5H331V338.937H181V201.5H206" stroke="white" stroke-width="3" stroke-linecap="square" stroke-linejoin="round"/>
+<path d="M231 201.438H281" stroke="white" stroke-width="3" stroke-linecap="square" stroke-linejoin="round"/>
+<path d="M231 176.438H206V213.938H231V176.438Z" stroke="white" stroke-width="3" stroke-linejoin="round"/>
+<path d="M306 176.438H281V213.938H306V176.438Z" stroke="white" stroke-width="3" stroke-linejoin="round"/>
 </svg>

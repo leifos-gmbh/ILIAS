@@ -916,8 +916,10 @@ class ilAdvancedMDSettingsGUI
                 $field->update();
             }
         }
-        
-        
+
+        if ($this->request->getQueryParams()['mdlang']) {
+            $this->ctrl->setParameter($this, 'mdlang', $this->request->getQueryParams()['mdlang']);
+        }
         ilUtil::sendSuccess($this->lng->txt('settings_saved'), true);
         $this->ctrl->redirect($this, "editFields");
     }

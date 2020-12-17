@@ -4,6 +4,8 @@ require_once "Services/ADT/classes/Bridges/class.ilADTSearchBridgeMulti.php";
 
 class ilADTEnumSearchBridgeMulti extends ilADTSearchBridgeMulti
 {
+    const ENUM_SEARCH_COLUMN = 'value_index';
+
     protected $multi_source; // [bool]
     protected $search_mode; // [int]
     
@@ -14,6 +16,12 @@ class ilADTEnumSearchBridgeMulti extends ilADTSearchBridgeMulti
     {
         $this->search_mode = (int) $a_mode;
     }
+
+    public function getSearchColumn() : string
+    {
+        return self::ENUM_SEARCH_COLUMN;
+    }
+
     
     protected function isValidADTDefinition(ilADTDefinition $a_adt_def)
     {
@@ -98,8 +106,13 @@ class ilADTEnumSearchBridgeMulti extends ilADTSearchBridgeMulti
 
         $ilDB = $DIC->database();
 
-        return $ilDB->in($a_element_id, $this->getADT()->getSelections(), "", ilDBConstants::T_INTEGER);
         if (!$this->isNull() && $this->isValid()) {
+            return $ilDB->in(
+                $this->getSearchColumn(),
+                $this->getADT()->getSelections(),
+                '',
+                ilDBConstants::T_INTEGER
+            );
         }
     }
     

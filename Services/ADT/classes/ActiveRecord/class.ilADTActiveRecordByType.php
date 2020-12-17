@@ -735,7 +735,7 @@ class ilADTActiveRecordByType
             while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_ASSOC)) {
                 $objects[] = $row;
             }
-            
+
             return $objects;
         }
     }

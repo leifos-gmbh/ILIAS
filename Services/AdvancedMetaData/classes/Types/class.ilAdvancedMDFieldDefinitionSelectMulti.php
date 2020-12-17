@@ -18,6 +18,13 @@ class ilAdvancedMDFieldDefinitionSelectMulti extends ilAdvancedMDFieldDefinition
     //
     // generic types
     //
+
+    // search
+    public function getSearchQueryParserValue(ilADTSearchBridge $search_bridge)
+    {
+        return $search_bridge->getADT()->getSelections()[0] ?? 0;
+    }
+
     
     public function getType()
     {

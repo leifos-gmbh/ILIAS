@@ -161,7 +161,7 @@ class ilAdvancedMDFieldTranslations
         return null;
     }
 
-    private function read()
+    public function read()
     {
         $query = 'select fi.field_id tfield, de.field_id ofield, fi.title, fi.description, ri.lang_code ' .
             'from adv_md_record_int ri join adv_mdf_definition de on ri.record_id = de.record_id ' .
@@ -257,12 +257,6 @@ class ilAdvancedMDFieldTranslations
      */
     public function updateFromForm(int $field_id, string $active_language, ilPropertyFormGUI $form)
     {
-        if (!strlen($active_language)) {
-            return;
-        }
-        if ($active_language == $this->getDefaultLanguage()) {
-            return;
-        }
         $translation = $this->getTranslation($field_id, $active_language);
         if (!$translation instanceof ilAdvancedMDFieldTranslation) {
             return;

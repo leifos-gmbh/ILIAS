@@ -782,6 +782,7 @@ class ilAdvancedMDSettingsGUI
         $this->tabs_gui->activateTab(self::TAB_RECORD_SETTINGS);
 
         if (!$form instanceof ilPropertyFormGUI) {
+            $this->initLanguage($record_id);
             $this->showLanguageSwitch($record_id, 'editRecord');
             $this->initForm('edit');
         }
@@ -797,6 +798,7 @@ class ilAdvancedMDSettingsGUI
         $this->ctrl->saveParameter($this, 'record_id');
         $this->initRecordObject();
         $this->setRecordSubTabs();
+        $this->initLanguage($record_id);
         $this->showLanguageSwitch($record_id, 'editFields');
 
 
@@ -938,6 +940,7 @@ class ilAdvancedMDSettingsGUI
             $this->ctrl->redirect($this, 'showRecords');
         }
         $this->initRecordObject();
+        $this->initLanguage($record_id);
         $this->showLanguageSwitch($record_id,'editRecord');
 
         $this->initForm('edit');
@@ -1169,8 +1172,8 @@ class ilAdvancedMDSettingsGUI
      */
     public function editField(ilPropertyFormGUI $a_form = null)
     {
-        $record_id = (int) $this->request->getQueryParams()['record_id'] ?? 0;
-        $field_id = (int) $this->request->getQueryParams()['field_id'] ?? 0;
+        $record_id = (int) ($this->request->getQueryParams()['record_id'] ?? 0);
+        $field_id = (int) ($this->request->getQueryParams()['field_id'] ?? 0);
         if (!$record_id || !$field_id) {
             return $this->editFields();
         }
@@ -1182,6 +1185,7 @@ class ilAdvancedMDSettingsGUI
         $field_definition = ilAdvancedMDFieldDefinition::getInstance((int) $field_id);
                  
         if (!$a_form instanceof ilPropertyFormGUI) {
+            $this->initLanguage($this->record->getRecordId());
             $this->showLanguageSwitch($this->record->getRecordId(), 'editField');
             $a_form = $this->initFieldForm($field_definition);
         }
@@ -1210,6 +1214,7 @@ class ilAdvancedMDSettingsGUI
         }
 
         $this->initRecordObject();
+        $this->initLanguage($record_id);
         $this->showLanguageSwitch($record_id, 'editField');
 
         $confirm = false;
@@ -1281,6 +1286,7 @@ class ilAdvancedMDSettingsGUI
         }
 
         $this->initRecordObject();
+        $this->initLanguage($record_id);
         $this->ctrl->saveParameter($this, 'ftype');
         
         include_once('Services/AdvancedMetaData/classes/class.ilAdvancedMDFieldDefinition.php');
@@ -1291,7 +1297,11 @@ class ilAdvancedMDSettingsGUI
         if ($form->checkInput()) {
             $field_definition->importDefinitionFormPostValues($form, $this->getPermissions(), $this->active_language);
             $field_definition->save();
-            
+
+            $translations = ilAdvancedMDFieldTranslations::getInstanceByRecordId($record_id);
+            $translations->read();
+            $translations->updateFromForm($field_definition->getFieldId(), $this->active_language, $form);
+
             ilUtil::sendSuccess($this->lng->txt('save_settings'), true);
             $this->ctrl->redirect($this, "editFields");
         }
@@ -2066,7 +2076,7 @@ class ilAdvancedMDSettingsGUI
     /**
      * @param int $record_id
      */
-    protected function showLanguageSwitch(int $record_id, string $target) : void
+    protected function initLanguage(int $record_id)
     {
         $translations = ilAdvancedMDRecordTranslations::getInstanceByRecordId($record_id);
         // read active language
@@ -2078,6 +2088,14 @@ class ilAdvancedMDSettingsGUI
         }
         $active = $this->request->getQueryParams()['mdlang'] ?? $default;
         $this->active_language = $active;
+    }
+
+    /**
+     * @param int $record_id
+     */
+    protected function showLanguageSwitch(int $record_id, string $target) : void
+    {
+        $translations = ilAdvancedMDRecordTranslations::getInstanceByRecordId($record_id);
 
         if (count($translations->getTranslations()) <= 1) {
             return;
@@ -2090,10 +2108,10 @@ class ilAdvancedMDSettingsGUI
                 $target
             );
         }
-        $this->ctrl->setParameter($this, 'mdlang', $active);
+        $this->ctrl->setParameter($this, 'mdlang', $this->active_language);
         $view_control = $this->ui_factory->viewControl()->mode(
             $actions,
-            $this->lng->txt('meta_aria_language_selection'))->withActive($active);
+            $this->lng->txt('meta_aria_language_selection'))->withActive($this->active_language);
         $this->toolbar->addComponent($view_control);
     }
 }

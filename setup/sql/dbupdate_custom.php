@@ -330,7 +330,7 @@ while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
 
 <#14>
 <?php
-$query = 'select * from adv_mdf_definition advf ' .
+$query = 'select advf.field_id, lang_default, advf.title, advf.description from adv_mdf_definition advf ' .
     'join adv_md_record advr on advf.record_id = advr.record_id ';
 $res = $ilDB->query($query);
 while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {

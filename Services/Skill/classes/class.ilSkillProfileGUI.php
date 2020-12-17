@@ -363,11 +363,10 @@ class ilSkillProfileGUI
         if ($this->request->getMethod() == "POST"
             && $this->request->getQueryParams()["profile"] == "profile_settings") {
             $form = $form->withRequest($this->request);
-            if (is_null($form->getData())) {
-                var_dump($form->getData()); exit;
-                //$this->ui_ren->render($this->initProfileForm("create"));
-            }
             $result = $form->getData();
+            if (is_null($result)) {
+                return $tpl->setContent($this->ui_ren->render($form));
+            }
             $prof = new ilSkillProfile();
             $prof->setTitle($result["section_basic"]["title"]);
             $prof->setDescription($result["section_basic"]["description"]);
@@ -376,10 +375,8 @@ class ilSkillProfileGUI
 
             ilUtil::sendSuccess($lng->txt("msg_obj_modified"), true);
             $ilCtrl->redirect($this, "listProfiles");
-        } else {
-            //$form->setValuesByPost();
-            //$tpl->setContent($form->getHtml());
         }
+        $ilCtrl->redirect($this, "listProfiles");
     }
 
     public function saveLocal()
@@ -398,6 +395,9 @@ class ilSkillProfileGUI
             && $this->request->getQueryParams()["profile"] == "profile_settings") {
             $form = $form->withRequest($this->request);
             $result = $form->getData();
+            if (is_null($result)) {
+                return $tpl->setContent($this->ui_ren->render($form));
+            }
             $prof = new ilSkillProfile();
             $prof->setTitle($result["section_basic"]["title"]);
             $prof->setDescription($result["section_basic"]["description"]);
@@ -409,6 +409,7 @@ class ilSkillProfileGUI
             ilUtil::sendSuccess($lng->txt("msg_obj_modified"), true);
             $ilCtrl->redirectByClass("ilcontskilladmingui", "listProfiles");
         }
+        $ilCtrl->redirectByClass("ilcontskilladmingui", "listProfiles");
     }
     
     /**
@@ -429,6 +430,9 @@ class ilSkillProfileGUI
             && $this->request->getQueryParams()["profile"] == "profile_settings") {
             $form = $form->withRequest($this->request);
             $result = $form->getData();
+            if (is_null($result)) {
+                return $tpl->setContent($this->ui_ren->render($form));
+            }
             $this->profile->setTitle($result["section_basic"]["title"]);
             $this->profile->setDescription($result["section_basic"]["description"]);
             $this->profile->setImageId($result["section_advanced"]["image"][0]);
@@ -437,6 +441,7 @@ class ilSkillProfileGUI
             ilUtil::sendInfo($lng->txt("msg_obj_modified"), true);
             $ilCtrl->redirect($this, "listProfiles");
         }
+        $ilCtrl->redirect($this, "listProfiles");
     }
     
     /**

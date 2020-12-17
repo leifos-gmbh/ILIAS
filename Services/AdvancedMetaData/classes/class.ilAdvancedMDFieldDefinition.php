@@ -1216,7 +1216,6 @@ abstract class ilAdvancedMDFieldDefinition
     public function searchObjects(ilADTSearchBridge $a_adt_search, ilQueryParser $a_parser, array $a_object_types, $a_locate, $a_search_type)
     {
         // search type only supported/needed for text
-        
         include_once('Services/ADT/classes/ActiveRecord/class.ilADTActiveRecordByType.php');
         $condition = $a_adt_search->getSQLCondition(ilADTActiveRecordByType::SINGLE_COLUMN_NAME);
         if ($condition) {

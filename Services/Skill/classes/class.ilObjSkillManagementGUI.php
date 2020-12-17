@@ -135,6 +135,11 @@ class ilObjSkillManagementGUI extends ilObjectGUI
                 $skprof_gui = new ilSkillProfileGUI();
                 $ret = $this->ctrl->forwardCommand($skprof_gui);
                 break;
+
+            case "ilskillprofileuploadhandlergui":
+                $skprof_upl_gui = new ilSkillProfileUploadHandlerGUI();
+                $ret = $this->ctrl->forwardCommand($skprof_upl_gui);
+                break;
                 
             case 'ilpermissiongui':
                 $this->tabs_gui->activateTab('permissions');

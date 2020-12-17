@@ -111,6 +111,11 @@ class ilContainer extends ilObject
 	const SORT_NEW_ITEMS_ORDER_CREATION = 1;
 	const SORT_NEW_ITEMS_ORDER_ACTIVATION = 2;
 
+	const TILE_NORMAL = 0;
+	const TILE_SMALL = 1;
+	const TILE_LARGE = 2;
+	const TILE_EXTRA_LARGE = 3;
+
 	static $data_preloaded = false;
 
 	/**
@@ -146,6 +151,17 @@ class ilContainer extends ilObject
 			$this->obj_trans = ilObjectTranslation::getInstance($this->getId());
 		}
 	}
+
+    public function getTileSizes()
+    {
+        $lng = $this->lng;
+        return [
+            self::TILE_SMALL => $lng->txt("cont_tile_size_1"),
+            self::TILE_NORMAL => $lng->txt("cont_tile_size_0"),
+            self::TILE_LARGE => $lng->txt("cont_tile_size_2"),
+            self::TILE_EXTRA_LARGE => $lng->txt("cont_tile_size_3")
+        ];
+    }
 
 	/**
 	 * Get object translation

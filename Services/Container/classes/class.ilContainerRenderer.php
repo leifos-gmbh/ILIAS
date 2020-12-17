@@ -555,6 +555,22 @@ class ilContainerRenderer
 				}
 			}
 
+            // determine view mode and tile size
+            $view_mode = $this->getViewMode();
+            if ($view_mode == ilContainerContentGUI::VIEW_MODE_TILE) {
+                $tile_size = ilContainer::_lookupContainerSetting($this->container_gui->object->getId(), "tile_size");
+            }
+            if (is_numeric($a_block_id)) {
+                $item_group = new ilObjItemGroup($a_block_id);
+                if ($item_group->getListPresentation() != "") {
+                    $view_mode = ($item_group->getListPresentation() == "tile")
+                        ? ilContainerContentGUI::VIEW_MODE_TILE
+                        : ilContainerContentGUI::VIEW_MODE_LIST;
+                    $tile_size = $item_group->getTileSize();
+                }
+            }
+
+
 			// #14610 - manage empty item groups
 			if(is_array($this->block_items[$a_block_id]) ||
 				is_numeric($a_block_id))
@@ -566,7 +582,7 @@ class ilContainerRenderer
 					: null;			
 				$this->addHeaderRow($a_block_tpl, $a_block["type"], $a_block["caption"], array_unique($block_types), $a_block["actions"], $order_id, $a_block["data"]);
 
-				if ($this->getViewMode() == ilContainerContentGUI::VIEW_MODE_LIST)
+				if ($view_mode == ilContainerContentGUI::VIEW_MODE_LIST)
 				{
 					if ($a_block["prefix"])
 					{
@@ -578,7 +594,7 @@ class ilContainerRenderer
 				{
 					foreach($this->block_items[$a_block_id] as $item_id)
 					{
-						if ($this->getViewMode() == ilContainerContentGUI::VIEW_MODE_LIST)
+						if ($view_mode == ilContainerContentGUI::VIEW_MODE_LIST)
 						{
 							$this->addStandardRow($a_block_tpl, $this->items[$item_id]["html"], $item_id);
 						}
@@ -589,7 +605,7 @@ class ilContainerRenderer
 					}	
 				}
 
-				if ($this->getViewMode() == ilContainerContentGUI::VIEW_MODE_LIST)
+				if ($view_mode == ilContainerContentGUI::VIEW_MODE_LIST)
 				{
 					if ($a_block["postfix"])
 					{
@@ -597,14 +613,29 @@ class ilContainerRenderer
 					}
 				}
 
-				if ($this->getViewMode() == ilContainerContentGUI::VIEW_MODE_TILE)
+				if ($view_mode == ilContainerContentGUI::VIEW_MODE_TILE)
 				{
 					$f = $this->ui->factory();
 					$renderer = $this->ui->renderer();
 
 					//Create a deck with large cards
-					$deck = $f->deck($cards)->withNormalCardsSize();
-					//$deck = $f->deck($cards)->withSmallCardsSize();
+                    switch ($tile_size) {
+                        case ilContainer::TILE_SMALL:
+                            $deck = $f->deck($cards)->withSmallCardsSize();
+                            break;
+
+                        case ilContainer::TILE_LARGE:
+                            $deck = $f->deck($cards)->withLargeCardsSize();
+                            break;
+
+                        case ilContainer::TILE_EXTRA_LARGE:
+                            $deck = $f->deck($cards)->withExtraLargeCardsSize();
+                            break;
+
+                        default:
+                            $deck = $f->deck($cards)->withNormalCardsSize();
+                            break;
+                    }
 
 
 					$html = $renderer->render($deck);

@@ -20,3 +20,14 @@ survey#:#svy_notification_tutor_results_info#:#After reaching the end data a cro
 survey#:#svy_notification_tutor_results_alert#:#This requires an end date.
 survey#:#survey_results_tutor_subject#:#Results for survey "%s"
 survey#:#survey_results_tutor_body#:#Attached you will find the detailed results for the following survey
+cont#:#cont_tile_size_1#:#small (up to six tiles in a row)
+cont#:#cont_tile_size_0#:#normal (up to four tiles in a row)
+cont#:#cont_tile_size_2#:#large (up to three tiles in a row)
+cont#:#cont_tile_size_3#:#extra large (up to two tiles in a row)
+cont#:#cont_tile_size#:#Tile Size
+itgr#:#itgr_tile_size#:#Tile Size
+itgr#:#itgr_tile#:#Tiles
+itgr#:#itgr_list#:#List
+itgr#:#itgr_list_presentation#:#Item Presentation
+itgr#:#itgr_list_default#:#Default
+itgr#:#itgr_list_default_info#:#Inherits value from upper container.

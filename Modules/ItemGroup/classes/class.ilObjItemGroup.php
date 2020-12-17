@@ -28,7 +28,7 @@ class ilObjItemGroup extends ilObject2
 	protected $access_end; // [timestamp]
 	protected $access_visibility; // [bool]
 	protected $item_data_ar = null; // active record
-	
+
 	/**
 	 * Constructor
 	 *
@@ -103,7 +103,47 @@ class ilObjItemGroup extends ilObject2
 		$this->item_data_ar->setBehaviour($a_val);
 	}
 
-	/**
+    /**
+     * Get list presentation
+     *
+     * @return string list presentation
+     */
+    function getListPresentation()
+    {
+        return $this->item_data_ar->getListPresentation();
+    }
+
+    /**
+     * Set list presentation
+     *
+     * @param string $a_val list presentation mode
+     */
+    function setListPresentation($a_val)
+    {
+        $this->item_data_ar->setListPresentation($a_val);
+    }
+
+    /**
+     * Get tile size
+     *
+     * @return int tile size
+     */
+    function getTileSize()
+    {
+        return $this->item_data_ar->getTileSize();
+    }
+
+    /**
+     * Set tile size
+     *
+     * @param int $a_val tile size
+     */
+    function setTileSize($a_val)
+    {
+        $this->item_data_ar->setTileSize($a_val);
+    }
+
+    /**
 	 * Get hide title
 	 *
 	 * @return int behaviour
@@ -166,6 +206,8 @@ class ilObjItemGroup extends ilObject2
 	{
 		$new_obj->setHideTitle($this->getHideTitle());
 		$new_obj->setBehaviour($this->getBehaviour());
+		$new_obj->setListPresentation($this->getListPresentation());
+		$new_obj->setTileSize($this->getTileSize());
 		$new_obj->update();
 	}
 

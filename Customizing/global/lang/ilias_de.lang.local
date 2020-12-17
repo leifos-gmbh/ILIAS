@@ -20,3 +20,14 @@ survey#:#svy_notification_tutor_results_info#:#Nach dem Ablauf des Enddatum wird
 survey#:#svy_notification_tutor_results_alert#:#Diese Funktion erfordert ein Enddatum.
 survey#:#survey_results_tutor_subject#:#Ergebnisse der Umfrage "%s"
 survey#:#survey_results_tutor_body#:#Im Anhang finden Sie die Ergebnisse der folgenden Umfrage
+cont#:#cont_tile_size_1#:#klein (bis zu sechs Kacheln in einer Zeile)
+cont#:#cont_tile_size_0#:#normal (bis zu vier Kacheln in einer Zeile)
+cont#:#cont_tile_size_2#:#groß (bis zu drei Kacheln in einer Zeile)
+cont#:#cont_tile_size_3#:#sehr groß (bis zu zwei Kacheln in einer Zeile)
+cont#:#cont_tile_size#:#Kachelgröße
+itgr#:#itgr_tile_size#:#Kachelgröße
+itgr#:#itgr_tile#:#Kacheln
+itgr#:#itgr_list#:#Liste
+itgr#:#itgr_list_presentation#:#Präsentationsansicht für Inhalte
+itgr#:#itgr_list_default#:#Standard
+itgr#:#itgr_list_default_info#:#Übernimmt die Einstellung des übergeordneten Containers.

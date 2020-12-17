@@ -3696,7 +3696,18 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 		//$tile_view->setInfo($this->lng->txt('cont_tile_view_info'));
 		$lpres->addOption($tile_view);
 
-		$lpres->setValue(
+        // tile size
+
+        $si = new ilRadioGroupInputGUI($this->lng->txt("cont_tile_size"), "tile_size");
+        foreach ($this->object->getTileSizes() as $key => $txt) {
+            $op = new ilRadioOption($txt, $key);
+            $si->addOption($op);
+        }
+        $lpres->addSubItem($si);
+        $si->setValue((int)
+            ilContainer::_lookupContainerSetting($this->object->getId(), "tile_size"));
+
+        $lpres->setValue(
 			ilContainer::_lookupContainerSetting($this->object->getId(), "list_presentation"));
 
 		$form->addItem($lpres);
@@ -3714,6 +3725,8 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 			? "tile"
 			: "";
 		ilContainer::_writeContainerSetting($this->object->getId(), "list_presentation", $val);
+        ilContainer::_writeContainerSetting($this->object->getId(), "tile_size",
+            (int) $form->getInput('tile_size'));
 	}
 
 

@@ -93,3 +93,25 @@ if (!$ilDB->tableColumnExists('svy_svy', 'calculate_sum_score'))
     ));
 }
 ?>
+<#8>
+<?php
+if (!$ilDB->tableColumnExists('itgr_data', 'list_presentation'))
+{
+    $ilDB->addTableColumn('itgr_data', 'list_presentation', array(
+        "type" => "text",
+        "length" => 10
+    ));
+}
+?>
+<#9>
+<?php
+if (!$ilDB->tableColumnExists('itgr_data', 'tile_size'))
+{
+    $ilDB->addTableColumn('itgr_data', 'tile_size', array(
+        "type" => "integer",
+        "notnull" => true,
+        "default" => 0,
+        "length" => 1
+    ));
+}
+?>

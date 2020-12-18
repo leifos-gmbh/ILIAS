@@ -27,8 +27,10 @@ class Renderer extends AbstractComponentRenderer
         foreach ($component->getCards() as $card) {
             $tpl_card->setCurrentBlock("card");
             $tpl_card->setVariable("CARD", $default_renderer->render($card, $default_renderer));
-            $tpl_card->setVariable("SIZE", $size);
-            $tpl_card->setVariable("SMALL_SIZE", $small_size);
+            $tpl_card->setVariable("SIZE_MD", $component->getCardsSizeForDisplaySize(Deck::SIZE_M));
+            $tpl_card->setVariable("SIZE_SM", $component->getCardsSizeForDisplaySize(Deck::SIZE_S));
+            $tpl_card->setVariable("SIZE_XS", $component->getCardsSizeForDisplaySize(Deck::SIZE_XS));
+            $tpl_card->setVariable("SIZE_LG", $component->getCardsSizeForDisplaySize(Deck::SIZE_L));
             $tpl_card->parseCurrentBlock();
 
             if (($i % $cards_per_row) == 0) {

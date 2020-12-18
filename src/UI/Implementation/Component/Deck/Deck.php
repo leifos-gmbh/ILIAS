@@ -132,20 +132,57 @@ class Deck implements D\Deck
      */
     public function getCardsSizeSmallDisplays()
     {
-        switch ($this->getCardsSize()) {
-            case self::SIZE_XS:
-                return 2;
-            case self::SIZE_S:
-                return 4;
-            case self::SIZE_M:
-                return 6;
-            case self::SIZE_L:
-                // no-break
-            case self::SIZE_XL:
-                // no-break
-            case self::SIZE_FULL:
-                return 12;
-        }
+        return $this->getCardsSizeForDisplaySize(self::SIZE_S);
+    }
+
+    /**
+     * @internal This function is only internal and returns the size of the cards for small displays.
+     * Note that this size tells how much space the card is using. The number of cards displayed by normal screen size is 12/size.
+     *
+     * @return int
+     */
+    public function getCardsSizeForDisplaySize($display_size)
+    {
+        $sizes = [
+            self::SIZE_XS => [
+                self::SIZE_XS => 4,
+                self::SIZE_S => 2,
+                self::SIZE_M => 2,
+                self::SIZE_L => 1
+            ],
+            self::SIZE_S => [
+                self::SIZE_XS => 6,
+                self::SIZE_S => 3,
+                self::SIZE_M => 3,
+                self::SIZE_L => 2
+            ],
+            self::SIZE_M => [
+                self::SIZE_XS => 12,
+                self::SIZE_S => 6,
+                self::SIZE_M => 4,
+                self::SIZE_L => 3
+            ],
+            self::SIZE_L => [
+                self::SIZE_XS => 12,
+                self::SIZE_S => 6,
+                self::SIZE_M => 6,
+                self::SIZE_L => 4
+            ],
+            self::SIZE_XL => [
+                self::SIZE_XS => 12,
+                self::SIZE_S => 12,
+                self::SIZE_M => 6,
+                self::SIZE_L => 6
+            ],
+            self::SIZE_FULL => [
+                self::SIZE_XS => 12,
+                self::SIZE_S => 12,
+                self::SIZE_M => 12,
+                self::SIZE_L => 12
+            ],
+        ];
+
+        return $sizes[$this->getCardsSize()][$display_size];
     }
 
     private static $sizes = array(self::SIZE_FULL

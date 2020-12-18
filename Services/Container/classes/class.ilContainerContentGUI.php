@@ -534,7 +534,7 @@ abstract class ilContainerContentGUI
      * @param string $a_pos_prefix
      * @return string
      */
-    public function renderItem($a_item_data, $a_position = 0, $a_force_icon = false, $a_pos_prefix = "")
+    public function renderItem($a_item_data, $a_position = 0, $a_force_icon = false, $a_pos_prefix = "", $item_group_list_presentation = "")
     {
         $ilSetting = $this->settings;
         $ilAccess = $this->access;
@@ -545,7 +545,14 @@ abstract class ilContainerContentGUI
             return '';
         }
 
-        if ($this->getViewMode() == self::VIEW_MODE_TILE) {
+        $view_mode = $this->getViewMode();
+        if ($item_group_list_presentation != "") {
+            $view_mode = ($item_group_list_presentation == "tile")
+                ? self::VIEW_MODE_TILE
+                : self::VIEW_MODE_LIST;
+        }
+
+        if ($view_mode == self::VIEW_MODE_TILE) {
             return $this->renderCard($a_item_data, $a_position, $a_force_icon, $a_pos_prefix);
         }
 
@@ -1074,9 +1081,10 @@ abstract class ilContainerContentGUI
         $commands_html = $item_list_gui->getCommandsHTML();
 
         // determine behaviour
+        $item_group = new ilObjItemGroup($a_itgr["ref_id"]);
         include_once("./Modules/ItemGroup/classes/class.ilObjItemGroup.php");
         include_once("./Modules/ItemGroup/classes/class.ilItemGroupBehaviour.php");
-        $beh = ilObjItemGroup::lookupBehaviour($a_itgr["obj_id"]);
+		$beh = $item_group->getBehaviour();
         include_once("./Services/Container/classes/class.ilContainerBlockPropertiesStorage.php");
         $stored_val = ilContainerBlockPropertiesStorage::getProperty("itgr_" . $a_itgr["ref_id"], $ilUser->getId(), "opened");
         if ($stored_val !== false && $beh != ilItemGroupBehaviour::ALWAYS_OPEN) {
@@ -1110,7 +1118,7 @@ abstract class ilContainerContentGUI
         $position = 1;
         foreach ($items as $item) {
             // we are NOT using hasItem() here, because item might be in multiple item groups
-            $html2 = $this->renderItem($item, $position++, false, "[itgr][" . $a_itgr['obj_id'] . "]");
+            $html2 = $this->renderItem($item, $position++, false, "[itgr][" . $a_itgr['obj_id'] . "]", $item_group->getListPresentation());
             if ($html2 != "") {
                 // :TODO: show it multiple times?
                 $this->renderer->addItemToBlock($a_itgr["ref_id"], $item["type"], $item["child"], $html2, true);

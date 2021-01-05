@@ -660,7 +660,47 @@ class ilADTActiveRecordByType
         
         return $res;
     }
-    
+
+    /**
+     * @param string $table
+     * @param array  $fields
+     * @param string $type
+     */
+    public static function create(string $table, array $fields, string $type)
+    {
+        global $DIC;
+
+        $db = $DIC->database();
+
+        $type_table_name = '';
+        foreach (self::getTablesMap() as $type_table_part => $types) {
+            if (in_array($type, $types)) {
+                $type_table_name = $type_table_part;
+                break;
+            }
+        }
+        if (!strlen($type_table_name)) {
+            return;
+        }
+        $table_name = $table . '_' . $type_table_name;
+
+        $insert = 'insert into ' . $table_name . ' ( ';
+        $cols = [];
+        foreach ($fields as $col => $field_definition) {
+            $cols[] = $col;
+        }
+        $insert .= implode(',', $cols);
+        $insert .= ') VALUES ( ';
+        $values = [];
+        foreach ($fields as $col => $field_definition) {
+            $values[] = $db->quote($field_definition[1], $field_definition[0]);
+        }
+        $insert .= implode(',', $values);
+        $insert .= ' )';
+
+        $db->manipulate($insert);
+    }
+
     /**
      * Write directly
      *
@@ -692,9 +732,12 @@ class ilADTActiveRecordByType
         }
         if ($found) {
             $type_map = self::getTableTypeMap();
-            
+            $value_col = self::SINGLE_COLUMN_NAME;
+            if ($found == 'enum') {
+                $value_col = 'value_index';
+            }
             $sql = "UPDATE " . $a_table . "_" . $found .
-                " SET " . self::SINGLE_COLUMN_NAME . "=" . $ilDB->quote($a_value, $type_map[$found]) .
+                " SET " . $value_col . "=" . $ilDB->quote($a_value, $type_map[$found]) .
                 " WHERE " . $where;
             $ilDB->manipulate($sql);
         }

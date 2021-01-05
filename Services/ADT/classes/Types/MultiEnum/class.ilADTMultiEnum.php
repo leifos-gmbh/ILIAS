@@ -40,18 +40,17 @@ abstract class ilADTMultiEnum extends ilADT
 
     public function setSelections(array $a_values = null)
     {
-        if ($a_values !== null) {
-            foreach ($a_values as $idx => $value) {
-                $value = $this->handleSelectionValue($value);
-                if (!$this->isValidOption($value)) {
-                    unset($a_values[$idx]);
-                }
-            }
-            if (!sizeof($a_values)) {
-                $a_values = null;
+        if ($a_values === null) {
+            return;
+        }
+        $checked_values = [];
+        foreach ($a_values as $value_index) {
+            $clean_value = $this->handleSelectionValue($value_index);
+            if ($this->isValidOption($clean_value)) {
+                $checked_values[] = (int) $clean_value;
             }
         }
-        $this->values = $a_values;
+        $this->values = count($checked_values) ? $checked_values : null;
     }
     
     public function getSelections()

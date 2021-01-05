@@ -15,6 +15,7 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
 {
     protected $options = [];
     protected $confirm_objects = [];
+    protected $confirm_objects_values = [];
     protected $confirmed_objects; // [array]
 
     protected $option_translations = [];
@@ -280,6 +281,10 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
                         if ($sum_act == self::REMOVE_ACTION_ID) {
                             $sum_act = "";
                         }
+                        if (substr($sum_act, 0, 4) == 'idx_') {
+                            $parts = explode('_', $sum_act);
+                            $sum_act = $parts[1];
+                        }
                         $res[$old_option][$obj_idx] = $sum_act;
                     }
                 } else {
@@ -290,12 +295,15 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
                         } elseif ($sgl_item == self::REMOVE_ACTION_ID) {
                             $sgl_act[$sgl_index] = "";
                         }
+                        if (substr($sgl_item, 0, 4) == 'idx_') {
+                            $parts = explode('_', $sgl_item);
+                            $sgl_act[$sgl_index] = $parts[1];
+                        }
                     }
                     
                     $res[$old_option] = $sgl_act;
                 }
             }
-            
             return $res;
         }
     }
@@ -317,27 +325,53 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
 
         $old = $this->getOptionTranslation($language);
         $new = $a_form->getInput("opts");
-        
-        $missing = array_diff($old, $new);
+
+
+        $missing = array_diff_assoc($old, $new);
+
+
         if (sizeof($missing)) {
             $this->confirmed_objects = $this->buildConfirmedObjects($a_form);
+
             if (!is_array($this->confirmed_objects)) {
-                ilADTFactory::initActiveRecordByType();
-                $primary = [
-                    'field_id' => [ilDBConstants::T_INTEGER, $this->getFieldId()],
-                    'value_index' => [ilDBConstants::T_TEXT, $missing]
-                ];
-                $in_use = ilADTActiveRecordByType::readByPrimary("adv_md_values", $primary, "Enum");
-                if ($in_use) {
-                    $this->confirm_objects = [];
-                    foreach ($in_use as $item) {
-                        $this->confirm_objects[$item[ilADTActiveRecordByType::SINGLE_COLUMN_NAME]][] = array($item["obj_id"], $item["sub_type"], $item["sub_id"]);
+                $search = ilADTFactory::getInstance()->getSearchBridgeForDefinitionInstance($this->getADTDefinition(), false, true);
+                foreach ($missing as $missing_idx => $missing_value) {
+                    $in_use = $this->findBySingleValue($search, $missing_idx);
+                    if (is_array($in_use)) {
+                        foreach ($in_use as $item) {
+                            $this->confirm_objects[$missing_idx][] = $item;
+                            $this->confirm_objects_values[$missing_idx] = $old[$missing_idx];
+                        }
                     }
+
                 }
             }
         }
+        $this->old_options = $old;
         $this->setOptionTranslationsForLanguage($new, $language);
     }
+
+    protected function findBySingleValue(ilADTEnumSearchBridgeMulti $a_search, $a_value)
+    {
+        $res = array();
+        $a_search->getADT()->setSelections((array) $a_value);
+        $condition = $a_search->getSQLCondition('value_index');
+
+        $in_use = ilADTActiveRecordByType::find(
+            "adv_md_values",
+            "Enum",
+            $this->getFieldId(),
+            $condition
+        );
+        if ($in_use) {
+            foreach ($in_use as $item) {
+                $res[] = array($item["obj_id"], $item["sub_type"], $item["sub_id"], $item["value_index"]);
+            }
+        }
+
+        return $res;
+    }
+
 
     /**
      * @param ilPropertyFormGUI $form
@@ -377,7 +411,8 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
             $a_form->addItem($sec);
                                     
             foreach ($this->confirm_objects as $old_option => $items) {
-                $details = new ilRadioGroupInputGUI($lng->txt("md_adv_confirm_definition_select_option") . ': "' . $old_option . '"', "conf_det[" . $this->getFieldId() . "][" . $old_option . "]");
+                $old_option_value = $this->confirm_objects_values[$old_option];
+                $details = new ilRadioGroupInputGUI($lng->txt("md_adv_confirm_definition_select_option") . ': "' . $old_option_value . '"', "conf_det[" . $this->getFieldId() . "][" . $old_option . "]");
                 $details->setRequired(true);
                 $details->setValue("sum");
                 $a_form->addItem($details);
@@ -399,8 +434,8 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
                     "" => $lng->txt("please_select"),
                     self::REMOVE_ACTION_ID => $lng->txt("md_adv_confirm_definition_select_option_remove")
                 );
-                foreach ($new_options as $new_option) {
-                    $options[$new_option] = $lng->txt("md_adv_confirm_definition_select_option_overwrite") . ': "' . $new_option . '"';
+                foreach ($new_options as $new_option_index => $new_option) {
+                    $options['idx_' . $new_option_index] = $lng->txt("md_adv_confirm_definition_select_option_overwrite") . ': "' . $new_option . '"';
                 }
                 $sel->setOptions($options);
                 $sum->addSubItem($sel);
@@ -450,8 +485,8 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
                         "" => $lng->txt("please_select"),
                         self::REMOVE_ACTION_ID => $lng->txt("md_adv_confirm_definition_select_option_remove")
                     );
-                    foreach ($new_options as $new_option) {
-                        $options[$new_option] = $lng->txt("md_adv_confirm_definition_select_option_overwrite") . ': "' . $new_option . '"';
+                    foreach ($new_options as $new_option_index => $new_option) {
+                        $options['idx_' . $new_option_index] = $lng->txt("md_adv_confirm_definition_select_option_overwrite") . ': "' . $new_option . '"';
                     }
                     $sel->setOptions($options);
                     
@@ -526,54 +561,92 @@ class ilAdvancedMDFieldDefinitionSelect extends ilAdvancedMDFieldDefinition
     //
     // definition CRUD
     //
-    
+
     public function update()
     {
-        parent::update();
-        $this->updateOptionTranslations();
-
         if (is_array($this->confirmed_objects) && count($this->confirmed_objects) > 0) {
+            // we need the "old" options for the search
+            $def = $this->getADTDefinition();
+            $def = clone($def);
+            $def->setOptions($this->old_options);
+            $search = ilADTFactory::getInstance()->getSearchBridgeForDefinitionInstance($def, false, true);
             ilADTFactory::initActiveRecordByType();
+
             foreach ($this->confirmed_objects as $old_option => $item_ids) {
+                // get complete old values
+                $old_values = array();
+                foreach ($this->findBySingleValue($search, $old_option) as $item) {
+                    $old_values[$item[0] . "_" . $item[1] . "_" . $item[2]] = $item[3];
+                }
+
+
                 foreach ($item_ids as $item => $new_option) {
-                    $item = explode("_", $item);
-                    $obj_id = $item[0];
-                    $sub_type = $item[1];
-                    $sub_id = $item[2];
-                    
-                    if (!$new_option) {
-                        // remove existing value
-                        $primary = array(
-                            "obj_id" => array("integer", $obj_id),
-                            "sub_type" => array("text", $sub_type),
-                            "sub_id" => array("integer", $sub_id),
-                            "field_id" => array("integer", $this->getFieldId())
-                        );
-                        ilADTActiveRecordByType::deleteByPrimary("adv_md_values", $primary, "Enum");
-                    } else {
-                        // update existing value
-                        $primary = array(
-                            "obj_id" => array("integer", $obj_id),
-                            "sub_type" => array("text", $sub_type),
-                            "sub_id" => array("integer", $sub_id),
-                            "field_id" => array("integer", $this->getFieldId())
-                        );
-                        ilADTActiveRecordByType::writeByPrimary("adv_md_values", $primary, "Enum", $new_option);
+                    $parts = explode("_", $item);
+                    $obj_id = $parts[0];
+                    $sub_type = $parts[1];
+                    $sub_id = $parts[2];
+
+                    // update existing value (with changed option)
+                    if (isset($old_values[$item])) {
+                        $old_value = $old_values[$item];
+                        // find changed option in old value
+                        //$old_value = explode(ilADTMultiEnumDBBridge::SEPARATOR, $old_values[$item]);
+                        // remove separators
+                        //array_shift($old_value);
+                        //array_pop($old_value);
+
+
+                        //$old_idx = array_keys($old_value, $old_option);
+                        $old_idx = $old_value;
+                        if (isset($old_idx)) {
+
+                            $primary = array(
+                                "obj_id" => array("integer", $obj_id),
+                                "sub_type" => array("text", $sub_type),
+                                "sub_id" => array("integer", $sub_id),
+                                "field_id" => array("integer", $this->getFieldId())
+                            );
+
+                            $index_old = array_merge(
+                                $primary,
+                                [
+                                    'value_index' => [ilDBConstants::T_INTEGER, $old_idx]
+                                ]
+                            );
+                            $index_new = array_merge(
+                                $primary,
+                                [
+                                    'value_index' => [ilDBConstants::T_INTEGER, $new_option]
+                                ]
+                            );
+                            ilADTActiveRecordByType::deleteByPrimary('adv_md_values', $index_old, 'MultiEnum');
+
+                            if (is_numeric($new_option)) {
+                                ilADTActiveRecordByType::deleteByPrimary('adv_md_values', $index_new, 'MultiEnum');
+                                ilADTActiveRecordByType::create('adv_md_values', $index_new, 'MultiEnum');
+                            } else {
+                            }
+                        }
                     }
-                    
+
                     if ($sub_type == "wpg") {
                         // #15763 - adapt advmd page lists
                         include_once "Modules/Wiki/classes/class.ilPCAMDPageList.php";
-                        ilPCAMDPageList::migrateField($obj_id, $this->getFieldId(), $old_option, $new_option);
+                        ilPCAMDPageList::migrateField($obj_id, $this->getFieldId(), $old_option, $new_option, true);
                     }
                 }
             }
+
+            $this->confirmed_objects = array();
         }
+
+        parent::update();
+        $this->updateOptionTranslations();
     }
-    
+
     
     //
-    // export/import
+    // export
     //
     
     protected function addPropertiesToXML(ilXmlWriter $a_writer)

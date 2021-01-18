@@ -50,6 +50,12 @@ class ilLDAPQuery
     private $log = null;
     
     private $user_fields = array();
+
+    /**
+     * LDAP Handle
+     * @var resource
+     */
+    private $lh;
     
     /**
      * Constructur
@@ -166,7 +172,7 @@ class ilLDAPQuery
                     $a_scope
                 ));
         }
-        return new ilLDAPResult($this->lh, $res);
+        return (new ilLDAPResult($this->lh, $res))->run();
     }
     
     /**
@@ -212,16 +218,94 @@ class ilLDAPQuery
             $dn .= ',';
         }
         $dn .= $this->settings->getBaseDN();
-        
-        // page results
+        $tmp_result = null;
+
+        if ($this->checkPaginationEnabled()) {
+            try {
+                $tmp_result = $this->runReadAllUsersPaged($dn);
+            } catch (ilLDAPPagingException $e) {
+                $this->log->warning('Using LDAP with paging failed. Trying to use fallback.');
+                $tmp_result = $this->runReadAllUsersPartial($dn);
+            }
+        } else {
+            $tmp_result = $this->runReadAllUsersPartial($dn);
+        }
+
+        if (!$tmp_result->numRows()) {
+            $this->log->notice('No users found. Aborting.');
+        }
+        $this->log->info('Found ' . $tmp_result->numRows() . ' users.');
+        $attribute = strtolower($this->settings->getUserAttribute());
+        foreach ($tmp_result->getRows() as $data) {
+            if (isset($data[$attribute])) {
+                $this->readUserData($data[$attribute], false, false);
+            } else {
+                $this->log->warning('Unknown error. No user attribute found.');
+            }
+        }
+        unset($tmp_result);
+
+        return true;
+    }
+
+    /**
+     * read all users with ldap paging
+     *
+     * @param string $dn
+     * @return ilLDAPResult
+     * @throws ilLDAPPagingException
+     */
+    private function runReadAllUsersPaged($dn)
+    {
+        $filter = '(&' . $this->settings->getFilter();
+        $filter .= ('(' . $this->settings->getUserAttribute() . '=*))');
+        $this->log->info('Searching with ldap search and filter ' . $filter . ' in ' . $dn);
+
+        $tmp_result = new ilLDAPResult($this->lh);
+        $cookie = '';
+
+        do {
+            try {
+                ldap_control_paged_result($this->lh, 100, true, $cookie);
+            } catch (Exception $e) {
+                throw new ilLDAPPagingException($e->getMessage());
+            }
+
+            $res = $this->queryByScope(
+                $this->settings->getUserScope(),
+                $dn,
+                $filter,
+                array($this->settings->getUserAttribute())
+            );
+            $tmp_result->setResult($res);
+            $tmp_result->run();
+            try {
+                ldap_control_paged_result_response($this->lh, $res, $cookie);
+            } catch (Exception $e) {
+                throw new ilLDAPPagingException($e->getMessage());
+            }
+        } while ($cookie !== null && $cookie != '');
+
+        return $tmp_result;
+    }
+
+    /**
+     * read all users partial by alphabet
+     *
+     * @param string $dn
+     * @return ilLDAPResult
+     */
+    private function runReadAllUsersPartial($dn)
+    {
         $filter = $this->settings->getFilter();
         $page_filter = array('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','-');
         $chars = array('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z');
-        
+        $tmp_result = new ilLDAPResult($this->lh);
+
         foreach ($page_filter as $letter) {
             $new_filter = '(&';
             $new_filter .= $filter;
-            
+
             switch ($letter) {
                 case '-':
                     $new_filter .= ('(!(|');
@@ -243,26 +327,13 @@ class ilLDAPQuery
                 $new_filter,
                 array($this->settings->getUserAttribute())
             );
-
-            $tmp_result = new ilLDAPResult($this->lh, $res);
-            if (!$tmp_result->numRows()) {
-                $this->log->notice('No users found. Aborting.');
-                continue;
-            }
-            $this->log->info('Found ' . $tmp_result->numRows() . ' users.');
-            $attribute = strtolower($this->settings->getUserAttribute());
-            foreach ($tmp_result->getRows() as $data) {
-                if (isset($data[$attribute])) {
-                    $this->readUserData($data[$attribute], false, false);
-                } else {
-                    $this->log->warning('Unknown error. No user attribute found.');
-                }
-            }
-            unset($tmp_result);
+            $tmp_result->setResult($res);
+            $tmp_result->run();
         }
-        return true;
+
+        return $tmp_result;
     }
-    
+
     /**
      * check group membership
      * @param string login name
@@ -314,6 +385,7 @@ class ilLDAPQuery
             $this->getLogger()->dump($res);
             
             $tmp_result = new ilLDAPResult($this->lh, $res);
+            $tmp_result->run();
             $group_result = $tmp_result->getRows();
             
             $this->getLogger()->debug('Group query returned: ');
@@ -372,6 +444,7 @@ class ilLDAPQuery
         );
             
         $tmp_result = new ilLDAPResult($this->lh, $res);
+        $tmp_result->run();
         $group_data = $tmp_result->getRows();
         
         
@@ -438,6 +511,7 @@ class ilLDAPQuery
         
         
         $tmp_result = new ilLDAPResult($this->lh, $res);
+        $tmp_result->run();
         if (!$tmp_result->numRows()) {
             $this->log->info('LDAP: No user data found for: ' . $a_name);
             unset($tmp_result);
@@ -665,6 +739,15 @@ class ilLDAPQuery
         if ($this->lh) {
             @ldap_unbind($this->lh);
         }
+    }
+
+    /**
+     *
+     * @return bool
+     */
+    public function checkPaginationEnabled()
+    {
+        return  LDAP_OPT_PROTOCOL_VERSION >= 3;
     }
 }
 

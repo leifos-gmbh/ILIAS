@@ -278,8 +278,7 @@ class ilLDAPQuery
 
         do {
             try {
-                $res = ldap_control_paged_result($this->lh, 100, true, $cookie, $estimated_results);
-                $this->log->info('Estimated number of results: ' . $estimated_results);
+                $res = ldap_control_paged_result($this->lh, 100, true, $cookie);
                 if ($res === false) {
                     throw new ilLDAPPagingException('paged result sets not supported.');
                 }

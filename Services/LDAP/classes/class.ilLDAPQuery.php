@@ -52,6 +52,11 @@ class ilLDAPQuery
      */
     const IL_LDAP_SUPPORTED_CONTROL = 'supportedControl';
 
+    /**
+     * @var int
+     */
+    const PAGINATION_SIZE = 1;
+
     private $ldap_server_url = null;
     private $settings = null;
     
@@ -275,12 +280,11 @@ class ilLDAPQuery
         $tmp_result = new ilLDAPResult($this->lh);
         $cookie = '';
         $estimated_results = 0;
-
         do {
             try {
-                $res = ldap_control_paged_result($this->lh, 100, true, $cookie);
+                $res = ldap_control_paged_result($this->lh, self::PAGINATION_SIZE, true, $cookie);
                 if ($res === false) {
-                    throw new ilLDAPPagingException('paged result sets not supported.');
+                    throw new ilLDAPPagingException('Result pagination failed.');
                 }
 
             } catch (Exception $e) {
@@ -298,7 +302,8 @@ class ilLDAPQuery
             $tmp_result->run();
             try {
                 ldap_control_paged_result_response($this->lh, $res, $cookie, $estimated_results);
-                $this->log->info('Estimated number of results: ' . $estimated_results);
+                $this->log->debug('Cookie value: '  . $cookie);
+                $this->log->debug('Estimated number of results: ' . $estimated_results);
             } catch (Exception $e) {
                 $this->log->warning('Result pagination failed with message: ' . $e->getMessage());
                 throw new ilLDAPPagingException($e->getMessage());

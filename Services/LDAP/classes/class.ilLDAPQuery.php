@@ -55,7 +55,7 @@ class ilLDAPQuery
     /**
      * @var int
      */
-    const PAGINATION_SIZE = 1;
+    const PAGINATION_SIZE = 100;
 
     private $ldap_server_url = null;
     private $settings = null;
@@ -302,7 +302,6 @@ class ilLDAPQuery
             $tmp_result->run();
             try {
                 ldap_control_paged_result_response($this->lh, $res, $cookie, $estimated_results);
-                $this->log->debug('Cookie value: '  . $cookie);
                 $this->log->debug('Estimated number of results: ' . $estimated_results);
             } catch (Exception $e) {
                 $this->log->warning('Result pagination failed with message: ' . $e->getMessage());

@@ -41,6 +41,17 @@ include_once('Services/LDAP/classes/class.ilLDAPQueryException.php');
 */
 class ilLDAPQuery
 {
+    /**
+     * @var string
+     * @deprecated with PHP 7.3 (LDAP_CONTROL_PAGEDRESULTS)
+     */
+    private const IL_LDAP_CONTROL_PAGEDRESULTS = '1.2.840.113556.1.4.319';
+
+    /**
+     * @var string
+     */
+    private const IL_LDAP_SUPPORTED_CONTROL = 'supportedControl';
+
     private $ldap_server_url = null;
     private $settings = null;
     
@@ -742,12 +753,32 @@ class ilLDAPQuery
     }
 
     /**
-     *
+     * Check if pagination is enabled (rfc: 2696)
      * @return bool
      */
-    public function checkPaginationEnabled()
+    public function checkPaginationEnabled() : bool
     {
-        return  LDAP_OPT_PROTOCOL_VERSION >= 3;
+        if ($this->getServer()->getVersion() != 3) {
+            $this->log->info('Pagination control unavailable for ldap v' . $this->getServer()->getVersion());
+            return false;
+        }
+
+        $result = ldap_read($this->lh, '', '(objectClass=*)', [self::IL_LDAP_SUPPORTED_CONTROL]);
+        if ($result === false) {
+            $this->log->warning('Failed to query for pagination control');
+            return false;
+        }
+        $entries = (array) (ldap_get_entries($this->lh, $result)[0] ?? []);
+        if (
+            array_key_exists(strtolower(self::IL_LDAP_SUPPORTED_CONTROL), $entries) &&
+            is_array($entries[strtolower(self::IL_LDAP_SUPPORTED_CONTROL)]) &&
+            in_array(self::IL_LDAP_CONTROL_PAGEDRESULTS, $entries[strtolower(self::IL_LDAP_SUPPORTED_CONTROL)])
+        ) {
+            $this->log->info('Using paged control');
+            return true;
+        }
+        $this->log->info('Paged control disabled');
+        return false;
     }
 }
 

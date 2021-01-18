@@ -45,12 +45,12 @@ class ilLDAPQuery
      * @var string
      * @deprecated with PHP 7.3 (LDAP_CONTROL_PAGEDRESULTS)
      */
-    private const IL_LDAP_CONTROL_PAGEDRESULTS = '1.2.840.113556.1.4.319';
+    const IL_LDAP_CONTROL_PAGEDRESULTS = '1.2.840.113556.1.4.319';
 
     /**
      * @var string
      */
-    private const IL_LDAP_SUPPORTED_CONTROL = 'supportedControl';
+    const IL_LDAP_SUPPORTED_CONTROL = 'supportedControl';
 
     private $ldap_server_url = null;
     private $settings = null;

@@ -274,7 +274,7 @@ class ilLDAPQuery
 
         $tmp_result = new ilLDAPResult($this->lh);
         $cookie = '';
-        $estimated_results = null;
+        $estimated_results = 0;
 
         do {
             try {
@@ -285,6 +285,7 @@ class ilLDAPQuery
                 }
 
             } catch (Exception $e) {
+                $this->log->warning('Result pagination failed with message: ' . $e->getMessage());
                 throw new ilLDAPPagingException($e->getMessage());
             }
 
@@ -297,12 +298,16 @@ class ilLDAPQuery
             $tmp_result->setResult($res);
             $tmp_result->run();
             try {
-                ldap_control_paged_result_response($this->lh, $res, $cookie);
+                ldap_control_paged_result_response($this->lh, $res, $cookie, $estimated_results);
+                $this->log->info('Estimated number of results: ' . $estimated_results);
             } catch (Exception $e) {
+                $this->log->warning('Result pagination failed with message: ' . $e->getMessage());
                 throw new ilLDAPPagingException($e->getMessage());
             }
         } while ($cookie !== null && $cookie != '');
 
+        // finally reset cookie
+        ldap_control_paged_result($this->lh, 10000, false, $cookie);
         return $tmp_result;
     }
 

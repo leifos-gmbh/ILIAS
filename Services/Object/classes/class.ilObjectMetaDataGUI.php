@@ -69,7 +69,7 @@ class ilObjectMetaDataGUI
      * Construct
      *
      * @param ilObject $a_object
-     * @param string $a_sub_type
+     * @param string|string[] $a_sub_type       // string array only for settings, in this case no sub id must be passed
      * @return self
      */
     public function __construct(ilObject $a_object = null, $a_sub_type = null, $a_sub_id = null)
@@ -88,8 +88,6 @@ class ilObjectMetaDataGUI
 
         $this->sub_type = $a_sub_type;
         $this->sub_id = $a_sub_id;
-
-
 
         if (!$this->sub_type) {
             $this->sub_type = "-";
@@ -290,8 +288,12 @@ class ilObjectMetaDataGUI
             if ($item["obj_type"] == $adv_type) {
                 //				 ("<br>-- ".$adv_type."-".$adv_subtype);
                 //				exit;
-                return ((!$item["sub_type"] && $adv_subtype == "-") ||
-                    ($item["sub_type"] == $adv_subtype));
+                if ((!$item["sub_type"] && $adv_subtype == "-") ||
+                    ($item["sub_type"] == $adv_subtype) ||
+                    (is_array($adv_subtype) && in_array($item["sub_type"], $adv_subtype))
+                ) {
+                    return true;
+                }
             }
         }
         //		exit;
@@ -304,7 +306,7 @@ class ilObjectMetaDataGUI
         if ($type == $this->sub_type) {
             $type = $this->obj_type . ":" . $type;
         }
-        
+
         return (($this->obj_id || !$this->obj_type) &&
             in_array($type, array(
                 "crs",
@@ -318,7 +320,8 @@ class ilObjectMetaDataGUI
                 "htlm",
                 "lm", "lm:st", "lm:pg",
                 "sahs", "sahs:sco", "sahs:page",
-                'sess', "iass"
+                'sess', "iass",
+                "mep:mpg"
         )));
     }
     
@@ -361,6 +364,10 @@ class ilObjectMetaDataGUI
         //		if($this->hasActiveRecords() &&
         //			$this->obj_id)
         //		{
+        if (is_array($this->sub_type)) {        // only settings
+            return false;
+        }
+
         if ($this->hasActiveRecords()) {
             if ($this->sub_type == "-" ||
                 $this->sub_id) {

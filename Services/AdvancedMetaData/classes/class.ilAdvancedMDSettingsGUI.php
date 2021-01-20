@@ -41,10 +41,10 @@ class ilAdvancedMDSettingsGUI
     private $logger = null;
     
     /**
-     * Constructor
-     *
-     * @access public
-     *
+     * ilAdvancedMDSettingsGUI constructor.
+     * @param int $a_ref_id
+     * @param string $a_obj_type
+     * @param string|string[] $a_sub_type
      */
     public function __construct($a_ref_id = null, $a_obj_type = null, $a_sub_type = null)
     {
@@ -171,7 +171,10 @@ class ilAdvancedMDSettingsGUI
         }
         
         include_once("./Services/AdvancedMetaData/classes/class.ilAdvancedMDRecordTableGUI.php");
-        $table_gui = new ilAdvancedMDRecordTableGUI($this, "showRecords", $this->getPermissions(), (bool) $this->obj_id);
+        $obj_type_context = ($this->obj_id > 0)
+            ? ilObject::_lookupType($this->obj_id)
+            : "";
+        $table_gui = new ilAdvancedMDRecordTableGUI($this, "showRecords", $this->getPermissions(), $obj_type_context);
         $table_gui->setTitle($this->lng->txt("md_record_list_table"));
         $table_gui->setData($this->getParsedRecordObjects());
         
@@ -560,6 +563,9 @@ class ilAdvancedMDSettingsGUI
         }
 
         $selected_global = array();
+        if ($this->obj_id > 0) {
+            ilAdvancedMDRecord::deleteObjRecSelection($this->obj_id);
+        }
         foreach ($this->getParsedRecordObjects() as $item) {
             $perm = $this->getPermissions()->hasPermissions(
                 ilAdvancedMDPermissionHelper::CONTEXT_RECORD,
@@ -571,26 +577,37 @@ class ilAdvancedMDSettingsGUI
                 )
             );
                         
-            if ($this->mode == self::MODE_ADMINISTRATION) {
-                $record_obj = ilAdvancedMDRecord::_getInstanceByRecordId($item['id']);
-                
-                if ($perm[ilAdvancedMDPermissionHelper::ACTION_RECORD_EDIT_PROPERTY][ilAdvancedMDPermissionHelper::SUBACTION_RECORD_OBJECT_TYPES]) {
-                    $obj_types = array();
-                    if (is_array($_POST['obj_types'][$record_obj->getRecordId()])) {
-                        foreach ($_POST['obj_types'][$record_obj->getRecordId()] as $type => $status) {
-                            if ($status) {
-                                $type = explode(":", $type);
-                                $obj_types[] = array(
-                                    "obj_type" => ilUtil::stripSlashes($type[0]),
-                                    "sub_type" => ilUtil::stripSlashes($type[1]),
-                                    "optional" => ((int) $status == 2)
-                                );
-                            }
+
+            $record_obj = ilAdvancedMDRecord::_getInstanceByRecordId($item['id']);
+
+            if ($perm[ilAdvancedMDPermissionHelper::ACTION_RECORD_EDIT_PROPERTY][ilAdvancedMDPermissionHelper::SUBACTION_RECORD_OBJECT_TYPES]) {
+                $obj_types = array();
+                if (is_array($_POST['obj_types'][$record_obj->getRecordId()])) {
+                    foreach ($_POST['obj_types'][$record_obj->getRecordId()] as $type => $status) {
+                        if ($status) {
+                            $type = explode(":", $type);
+                            $obj_types[] = array(
+                                "obj_type" => ilUtil::stripSlashes($type[0]),
+                                "sub_type" => ilUtil::stripSlashes($type[1]),
+                                "optional" => ((int) $status == 2)
+                            );
                         }
                     }
-                    $record_obj->setAssignedObjectTypes($obj_types);
                 }
-                
+
+                // global records in global administration and local records in local administration
+                if (!$item['readonly']) {
+                    // table adv_md_record_objs
+                    $record_obj->setAssignedObjectTypes($obj_types);
+                } else {    // global records in local administration
+                    foreach ($obj_types as $t) {
+                        // table adv_md_obj_rec_select
+                        ilAdvancedMDRecord::saveObjRecSelection($this->obj_id, $t["sub_type"], [$record_obj->getRecordId()], false);
+                    }
+                }
+            }
+
+            if ($this->mode == self::MODE_ADMINISTRATION) {
                 if ($perm[ilAdvancedMDPermissionHelper::ACTION_RECORD_TOGGLE_ACTIVATION]) {
                     $record_obj->setActive(isset($_POST['active'][$record_obj->getRecordId()]));
                 }
@@ -602,7 +619,7 @@ class ilAdvancedMDSettingsGUI
                 if ($item['readonly'] &&
                     $item['optional'] &&
                     $_POST['active'][$item['id']]) {
-                    $selected_global[] = $item['id'];
+                    //$selected_global[] = $item['id'];
                 } elseif ($item['local']) {
                     $record_obj = ilAdvancedMDRecord::_getInstanceByRecordId($item['id']);
                     $record_obj->setActive(isset($_POST['active'][$item['id']]));
@@ -621,7 +638,7 @@ class ilAdvancedMDSettingsGUI
         }
 
         if ($this->obj_type) {
-            ilAdvancedMDRecord::saveObjRecSelection($this->obj_id, $this->sub_type, $selected_global);
+//            ilAdvancedMDRecord::saveObjRecSelection($this->obj_id, $this->sub_type, $selected_global);
         }
 
         ilUtil::sendSuccess($this->lng->txt('settings_saved'), true);
@@ -1694,9 +1711,16 @@ class ilAdvancedMDSettingsGUI
     protected function getParsedRecordObjects()
     {
         $res = array();
-        
+
+        $sub_type = (!is_array($this->sub_type))
+            ? [$this->sub_type]
+            : $this->sub_type;
+
         if ($this->mode == self::MODE_OBJECT) {
-            $selected = ilAdvancedMDRecord::getObjRecSelection($this->obj_id, $this->sub_type);
+            // get all records selected for subtype
+            foreach ($sub_type as $st) {
+                $selected[$st] = ilAdvancedMDRecord::getObjRecSelection($this->obj_id, $st);
+            }
         }
 
         $records = ilAdvancedMDRecord::_getRecords();
@@ -1704,6 +1728,8 @@ class ilAdvancedMDSettingsGUI
         $records = $orderings->sortRecords($records, $this->obj_id);
 
         $position = 0;
+
+        // get all records usuable in current context
         foreach ($records as $record) {
             $parent_id = $record->getParentObject();
             
@@ -1731,7 +1757,6 @@ class ilAdvancedMDSettingsGUI
                     continue;
                 }
             }
-            
             $tmp_arr = array();
             $tmp_arr['id'] = $record->getRecordId();
             $tmp_arr['active'] = $record->isActive();
@@ -1753,7 +1778,6 @@ class ilAdvancedMDSettingsGUI
                         ilAdvancedMDPermissionHelper::SUBACTION_RECORD_OBJECT_TYPES)
                 )
             );
-
             if ($this->obj_type) {
                 $tmp_arr["readonly"] = !(bool) $parent_id;
                 $tmp_arr["local"] = $parent_id;
@@ -1762,26 +1786,35 @@ class ilAdvancedMDSettingsGUI
                 $assigned = $optional = false;
                 foreach ($tmp_arr['obj_types'] as $idx => $item) {
                     if ($item["obj_type"] == $this->obj_type &&
-                        $item["sub_type"] == $this->sub_type) {
+                        in_array($item["sub_type"], $sub_type)) {
                         $assigned = true;
                         $optional = $item["optional"];
                         $tmp_arr['obj_types'][$idx]['context'] = true;
-                        break;
                     }
                 }
                 if (!$assigned) {
-                    continue;
+                    //continue;
                 }
                 $tmp_arr['optional'] = $optional;
                 if ($optional) {
                     // in object context "active" means selected record
-                    $tmp_arr['active'] = in_array($record->getRecordId(), $selected);
+                    // $tmp_arr['active'] = (is_array($selected[$item["sub_type"]]) && in_array($record->getRecordId(), $selected[$item["sub_type"]]));
+                    $tmp_arr['local_selected'] = [];
+                    foreach ($selected as $key => $records) {
+                        if (in_array($record->getRecordId(), $records)) {
+                            $tmp_arr['local_selected'][$this->obj_type][] = $key;
+                        }
+                    }
                 }
             }
 
             $res[] = $tmp_arr;
         }
-        
+
+        /*
+        echo "<pre>";
+        print_r($res);
+        exit;*/
         return $res;
     }
 }

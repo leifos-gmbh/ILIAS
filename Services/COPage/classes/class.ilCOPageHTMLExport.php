@@ -26,6 +26,11 @@ class ilCOPageHTMLExport
     protected $files_direct = array();
 
     /**
+     * @var array
+     */
+    protected $int_links = [];
+
+    /**
      * @var string
      */
     protected $exp_dir = "";
@@ -344,39 +349,89 @@ class ilCOPageHTMLExport
 
         return $tpl;
     }
-    
+
     /**
      * Collect page elements (that need to be exported separately)
      *
      * @param string $a_pg_type page type
      * @param int $a_pg_id page id
      */
-    public function collectPageElements($a_type, $a_id)
+    public function collectPageElements($a_type, $a_id, $lang = "")
     {
         $this->log->debug("collect page elements");
 
-        // collect media objects
-        $pg_mobs = ilObjMediaObject::_getMobsOfObject($a_type, $a_id);
-        foreach ($pg_mobs as $pg_mob) {
-            $this->mobs[$pg_mob] = $pg_mob;
-        }
-        
-        // collect all files
-        include_once("./Modules/File/classes/class.ilObjFile.php");
-        $files = ilObjFile::_getFilesOfObject($a_type, $a_id);
-        foreach ($files as $f) {
-            $this->files[$f] = $f;
+        // collect all dependent pages (only one level deep)
+        $pages[] = [
+            "type" => $a_type,
+            "id" => $a_id
+        ];
+
+        // ... content includes
+        $pcs = ilPageContentUsage::getUsagesOfPage($a_id, $a_type, 0, false, $lang);
+        foreach ($pcs as $pc) {
+            // content includes
+            if ($pc["type"] == "incl") {
+                $pages[] = [
+                    "type" => "mep:pg",
+                    "id" => $pc["id"]
+                ];
+            }
         }
 
-        
+        // ... internal links
+        $pg_links = \ilInternalLink::_getTargetsOfSource($a_type, $a_id, $lang);
+        $this->int_links = array_merge($this->int_links, $pg_links);
+        $this->glossary_terms = [];
+
+        // ... glossary pages of internal links
+        foreach ($this->int_links as $int_link) {
+            if ($int_link["type"] == "git") {
+                $this->glossary_terms[] = $int_link["id"];
+                // store linked/embedded media objects of glosssary term
+                $defs = \ilGlossaryDefinition::getDefinitionList($int_link["id"]);
+                foreach ($defs as $def) {
+                    $pages[] = [
+                        "type" => "gdf:pg",
+                        "id" => $def["obj_id"]
+                    ];
+                }
+            }
+        }
+
+        // resources of pages
+        foreach ($pages as $page) {
+            $page_id = $page["id"];
+            $page_type = $page["type"];
+
+            // collect media objects
+            $pg_mobs = ilObjMediaObject::_getMobsOfObject($page_type, $page_id, 0, $lang);
+            foreach ($pg_mobs as $pg_mob) {
+                $this->mobs[$pg_mob] = $pg_mob;
+                $this->log->debug("HTML Export: Add media object $pg_mob (" . \ilObject::_lookupTitle($pg_mob) . ") " .
+                    " due to page $page_id, $page_type ).");
+            }
+
+            // collect all files
+            $files = ilObjFile::_getFilesOfObject($page_type, $page_id, 0, $lang);
+            foreach ($files as $f) {
+                $this->files[$f] = $f;
+            }
+
+            // collect all questions
+            $q_ids = \ilPCQuestion::_getQuestionIdsForPage($a_type, $a_id, $lang);
+            foreach ($q_ids as $q_id) {
+                $this->q_ids[$q_id] = $q_id;
+            }
+        }
+
+        // collect page content items
         $skill_tree = $ws_tree = null;
-        
-        $pcs = ilPageContentUsage::getUsagesOfPage($a_id, $a_type);
+
+        // skills
         foreach ($pcs as $pc) {
-            // skils
             if ($pc["type"] == "skmg") {
                 $skill_id = $pc["id"];
-                
+
                 // trying to find user id
                 $user_id = null;
                 switch ($a_type) {
@@ -385,32 +440,25 @@ class ilCOPageHTMLExport
                         $page = new ilPortfolioPage($a_id);
                         $user_id = $page->create_user;
                         break;
-                    
+
                     default:
                         // :TODO:
                         break;
                 }
-                
+
                 if ($user_id) {
                     // we only need 1 instance each
                     if (!$skill_tree) {
-                        include_once "Services/Skill/classes/class.ilSkillTree.php";
                         $skill_tree = new ilSkillTree();
 
-                        include_once "Services/Skill/classes/class.ilPersonalSkill.php";
-
-                        include_once "Services/PersonalWorkspace/classes/class.ilWorkspaceTree.php";
                         $ws_tree = new ilWorkspaceTree($user_id);
                     }
 
                     // walk skill tree
-                    include_once("./Services/Skill/classes/class.ilVirtualSkillTree.php");
                     $vtree = new ilVirtualSkillTree();
                     $tref_id = 0;
                     $skill_id = (int) $skill_id;
-                    include_once("./Services/Skill/classes/class.ilSkillTreeNode.php");
                     if (ilSkillTreeNode::_lookupType($skill_id) == "sktr") {
-                        include_once("./Services/Skill/classes/class.ilSkillTemplateReference.php");
                         $tref_id = $skill_id;
                         $skill_id = ilSkillTemplateReference::_lookupTemplateId($skill_id);
                     }
@@ -437,28 +485,40 @@ class ilCOPageHTMLExport
                                             include_once "Modules/Test/classes/class.ilObjTestVerification.php";
                                             $obj = new ilObjTestVerification($obj_id, false);
                                             $this->files_direct[$obj_id] = array($obj->getFilePath(),
-                                                $obj->getOfflineFilename());
+                                                                                 $obj->getOfflineFilename());
                                             break;
 
                                         case "excv":
                                             include_once "Modules/Exercise/classes/class.ilObjExerciseVerification.php";
                                             $obj = new ilObjExerciseVerification($obj_id, false);
                                             $this->files_direct[$obj_id] = array($obj->getFilePath(),
-                                                $obj->getOfflineFilename());
+                                                                                 $obj->getOfflineFilename());
                                             break;
-                                        
+
                                         case "crsv":
                                             include_once "Modules/Course/classes/Verification/class.ilObjCourseVerification.php";
                                             $obj = new ilObjCourseVerification($obj_id, false);
                                             $this->files_direct[$obj_id] = array($obj->getFilePath(),
-                                                $obj->getOfflineFilename());
+                                                                                 $obj->getOfflineFilename());
                                             break;
-                                        
+
+                                        case "cmxv":
+                                            $obj = new ilObjCmiXapiVerification($obj_id, false);
+                                            $this->files_direct[$obj_id] = array($obj->getFilePath(),
+                                                                                 $obj->getOfflineFilename());
+                                            break;
+
+                                        case "ltiv":
+                                            $obj = new ilObjLTIConsumerVerification($obj_id, false);
+                                            $this->files_direct[$obj_id] = array($obj->getFilePath(),
+                                                                                 $obj->getOfflineFilename());
+                                            break;
+
                                         case "scov":
                                             include_once "Modules/ScormAicc/classes/Verification/class.ilObjSCORMVerification.php";
                                             $obj = new ilObjSCORMVerification($obj_id, false);
                                             $this->files_direct[$obj_id] = array($obj->getFilePath(),
-                                                $obj->getOfflineFilename());
+                                                                                 $obj->getOfflineFilename());
                                             break;
                                     }
                                 }
@@ -482,7 +542,6 @@ class ilCOPageHTMLExport
 
         $total = count($this->mobs) + count($this->files) + count($this->files_direct);
         $cnt = 0;
-
         // export all media objects
         $linked_mobs = array();
         foreach ($this->mobs as $mob) {

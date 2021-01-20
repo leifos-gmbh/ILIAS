@@ -313,6 +313,10 @@ class ilSCORM2004Asset extends ilSCORM2004Node
         $tree->setTableNames('sahs_sc13_tree', 'sahs_sc13_tree_node');
         $tree->setTreeTablePK("slm_id");
 
+        // note: the co page html exporter is not yet fully used
+        // - used for mobs
+        $page_html_export = new ilCOPageHTMLExport($a_target_dir);
+
         // @todo
         // Why is that much HTML code in an application class?
         // Please extract all this HTML to a tpl.<t_name>.html file and use
@@ -398,6 +402,10 @@ class ilSCORM2004Asset extends ilSCORM2004Node
         $pages = $tree->getSubTree($tree->getNodeData($this->getId()), true, 'page');
         $sco_q_ids = array();
         foreach ($pages as $page) {
+
+            $page_html_export->collectPageElements("sahs:pg", $page["obj_id"], "-");
+
+
             //echo(print_r($page));
             $page_obj = new ilSCORM2004PageGUI(
                 $this->getType(),
@@ -518,9 +526,11 @@ class ilSCORM2004Asset extends ilSCORM2004Node
             $output = preg_replace("/<div class=\"ilc_page_title_PageTitle\">(.*?)<\/div>/i", "<h2>$1</h2>", $output);
         }
 
-        $output = preg_replace("/mobs\/mm_(\d+)\/([^\"]+)/i", "./objects/il_" . IL_INST_ID . "_mob_$1/$2", $output);
-        $output = preg_replace("/\.\/files\/file_(\d+)\/([^\"]+)/i", "./objects/il_" . IL_INST_ID . "_file_$1/$2", $output);
-        $output = preg_replace("/\.\/Services\/MediaObjects\/flash_mp3_player/i", "./players", $output);
+        $page_html_export->exportPageElements();
+
+        //$output = preg_replace("/mobs\/mm_(\d+)\/([^\"]+)/i", "./objects/il_" . IL_INST_ID . "_mob_$1/$2", $output);
+        //$output = preg_replace("/\.\/files\/file_(\d+)\/([^\"]+)/i", "./objects/il_" . IL_INST_ID . "_file_$1/$2", $output);
+        //$output = preg_replace("/\.\/Services\/MediaObjects\/flash_mp3_player/i", "./players", $output);
         $output = preg_replace("/file=..\/..\/..\/.\//i", "file=../", $output);
 
         if ($mode != 'pdf') {
@@ -561,8 +571,9 @@ class ilSCORM2004Asset extends ilSCORM2004Node
         } else {
             fputs(fopen($a_target_dir . '/index.html', 'w+'), $output);
         }
-                
-        $this->exportFileItems($a_target_dir, $expLog);
+
+        // old export of mobs and files, now done by $page_html_export->exportPageElements(); above
+        // $this->exportFileItems($a_target_dir, $expLog);
     }
     
     /**
@@ -825,6 +836,9 @@ class ilSCORM2004Asset extends ilSCORM2004Node
                 if ($mob_id > 0 && ilObject::_exists($mob_id)) {
                     $expLog->write(date("[y-m-d H:i:s] ") . "Media Object " . $mob_id);
                     $media_obj = new ilObjMediaObject($mob_id);
+                    // target dir here is e.g.
+                    // /datadir/clientid/lm_data/lm_1098/export__scorm2004/1611142834__11614__sahs_1098/2
+                    // subdir will be /objects/il_" . IL_INST_ID . "_mob_" . $id;
                     $media_obj->exportFiles($a_target_dir, $expLog);
                     $lmobs = $media_obj->getLinkedMediaObjects($this->mob_ids);
                     $linked_mobs = array_merge($linked_mobs, $lmobs);

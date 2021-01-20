@@ -39,6 +39,16 @@ class ilMediaPoolTableGUI extends ilTable2GUI
      * @var ilAdvancedMDRecordGUI
      */
     protected $adv_filter_record_gui;
+
+    /**
+     * @var ilObjMediaPool
+     */
+    protected $media_pool;
+
+    /**
+     * @var \ILIAS\MediaPool\MediaPoolRepository
+     */
+    protected $pool_repo;
     
     /**
     * Constructor
@@ -88,6 +98,9 @@ class ilMediaPoolTableGUI extends ilTable2GUI
         $this->media_pool = $a_media_pool;
         $this->tree = ilObjMediaPool::_getPoolTree($this->media_pool->getId());
         $this->folder_par = $a_folder_par;
+
+        include_once('./Modules/MediaPool/classes/class.MediaPoolRepository.php');
+        $this->pool_repo  = new \ILIAS\MediaPool\MediaPoolRepository();
         
         if ($this->all_objects) {
             $this->setExternalSorting(true);
@@ -246,10 +259,9 @@ class ilMediaPoolTableGUI extends ilTable2GUI
     */
     public function initFilter()
     {
+        $mset = new ilSetting("mobs");
         $lng = $this->lng;
-        $rbacreview = $this->rbacreview;
-        $ilUser = $this->user;
-        
+
         // title/description
         include_once("./Services/Form/classes/class.ilTextInputGUI.php");
         $ti = new ilTextInputGUI($lng->txt("title"), "title");
@@ -281,6 +293,10 @@ class ilMediaPoolTableGUI extends ilTable2GUI
         $options = array(
             "" => $lng->txt("mep_all"),
             );
+        if ($mset->get("mep_activate_pages")) {
+            $options["mob"] = $lng->txt("mep_mob");
+            $options["pg"] = $lng->txt("mep_mpg");
+        }
         $formats = $this->media_pool->getUsedFormats();
         $options = array_merge($options, $formats);
         $si = new ilSelectInputGUI($this->lng->txt("mep_format"), "format");
@@ -340,7 +356,8 @@ class ilMediaPoolTableGUI extends ilTable2GUI
             // merge everything together
             $objs = array_merge($f2objs, $m2objs);
         } else {
-            $objs = $this->media_pool->getMediaObjects(
+            $objs = $this->pool_repo->getItems(
+                $this->media_pool->getId(),
                 $this->filter["title"],
                 $this->filter["format"],
                 $this->filter['keyword'],
@@ -351,7 +368,8 @@ class ilMediaPoolTableGUI extends ilTable2GUI
         // add advanced metadata
         if ($this->showAdvMetadata()) {
             include_once("./Services/AdvancedMetaData/classes/class.ilAdvancedMDValues.php");
-            $objs = ilAdvancedMDValues::queryForRecords(
+
+            $mobs = ilAdvancedMDValues::queryForRecords(
                 $this->media_pool->getRefId(),
                 "mep",
                 "mob",
@@ -362,9 +380,22 @@ class ilMediaPoolTableGUI extends ilTable2GUI
                 "foreign_id",
                 $this->adv_filter_record_gui->getFilterElements()
             );
+
+            include_once("./Services/AdvancedMetaData/classes/class.ilAdvancedMDValues.php");
+            $snippets = ilAdvancedMDValues::queryForRecords(
+                $this->media_pool->getRefId(),
+                "mep",
+                "mpg",
+                $this->media_pool->getId(),
+                "mpg",
+                $objs,
+                "mep_id",
+                "obj_id",
+                $this->adv_filter_record_gui->getFilterElements()
+            );
+
+            $objs = array_merge($mobs, $snippets);
         }
-        //echo ("<br>".$this->media_pool->getRefId());
-        //var_dump($objs); exit;
         $this->setData($objs);
     }
 

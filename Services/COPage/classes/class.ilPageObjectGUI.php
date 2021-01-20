@@ -119,7 +119,22 @@ class ilPageObjectGUI
      * @var \ILIAS\DI\UIServices
      */
     protected $ui;
-    
+
+    // $adv_ref_id - $adv_type - $adv_subtype:
+    // Object, that defines the adv md records being used.
+    /**
+     * @var int
+     */
+    protected $adv_ref_id = null;
+    /**
+     * @var string
+     */
+    protected $adv_type = null;
+    /**
+     * @var string
+     */
+    protected $adv_subtype = null;
+
     /**
      * Constructor
      *
@@ -194,7 +209,32 @@ class ilPageObjectGUI
     public function afterConstructor()
     {
     }
-    
+
+    /**
+     * Set object, that defines the adv md records being used. Default is $this->object, but the
+     * context may set another object (e.g. media pool for media objects)
+     *
+     * @param string $a_val adv type
+     */
+    public function setAdvMdRecordObject($a_adv_ref_id, $a_adv_type, $a_adv_subtype = "-")
+    {
+        $this->adv_ref_id = $a_adv_ref_id;
+        $this->adv_type = $a_adv_type;
+        $this->adv_subtype = $a_adv_subtype;
+    }
+
+    /**
+     * Get adv md record type
+     *
+     * @return array adv type
+     */
+    public function getAdvMdRecordObject()
+    {
+        if ($this->adv_type == null) {
+            return [$this->ref_id, $this->obj_type, $this->sub_type];
+        }
+        return [$this->adv_ref_id, $this->adv_type, $this->adv_subtype];
+    }
 
     /**
      * Init page object
@@ -1012,6 +1052,10 @@ class ilPageObjectGUI
                         $this->meta_data_observer_func,
                         "General"
                     );
+                }
+                // set adv metadata record dobject
+                if ($this->adv_type != "") {
+                    $md_gui->setAdvMdRecordObject($this->adv_ref_id, $this->adv_type, $this->adv_subtype);
                 }
                 $this->ctrl->forwardCommand($md_gui);
                 break;
@@ -3315,7 +3359,6 @@ class ilPageObjectGUI
             
         //$tabs_gui->addTarget("properties", $this->ctrl->getLinkTarget($this, "properties")
         //	, "properties", get_class($this));
-
         if ($this->use_meta_data) {
             include_once "Services/Object/classes/class.ilObjectMetaDataGUI.php";
             $mdgui = new ilObjectMetaDataGUI(

@@ -304,64 +304,6 @@ class ilObjMediaPool extends ilObject
         return $objs;
     }
 
-    /**
-    * Get media objects
-    */
-    public function getMediaObjects($a_title_filter = "", $a_format_filter = "", $a_keyword_filter = '', $a_caption_filter)
-    {
-        $ilDB = $this->db;
-
-        $query = "SELECT DISTINCT mep_tree.*, object_data.* " .
-            "FROM mep_tree JOIN mep_item ON (mep_tree.child = mep_item.obj_id) " .
-            " JOIN object_data ON (mep_item.foreign_id = object_data.obj_id) ";
-            
-        if ($a_format_filter != "" or $a_caption_filter != '') {
-            $query .= " JOIN media_item ON (media_item.mob_id = object_data.obj_id) ";
-        }
-            
-        $query .=
-            " WHERE mep_tree.mep_id = " . $ilDB->quote($this->getId(), "integer") .
-            " AND object_data.type = " . $ilDB->quote("mob", "text");
-            
-        // filter
-        if (trim($a_title_filter) != "") {	// title
-            $query .= " AND " . $ilDB->like("object_data.title", "text", "%" . trim($a_title_filter) . "%");
-        }
-        if ($a_format_filter != "") {			// format
-            $filter = ($a_format_filter == "unknown")
-                ? ""
-                : $a_format_filter;
-            $query .= " AND " . $ilDB->equals("media_item.format", $filter, "text", true);
-        }
-        if (trim($a_caption_filter)) {
-            $query .= 'AND ' . $ilDB->like('media_item.caption', 'text', '%' . trim($a_caption_filter) . '%');
-        }
-            
-        $query .=
-            " ORDER BY object_data.title";
-        
-        $objs = array();
-        $set = $ilDB->query($query);
-        while ($rec = $ilDB->fetchAssoc($set)) {
-            $rec["foreign_id"] = $rec["obj_id"];
-            $rec["obj_id"] = "";
-            $objs[] = $rec;
-        }
-        
-        // Keyword filter
-        if ($a_keyword_filter) {
-            include_once './Services/MetaData/classes/class.ilMDKeyword.php';
-            $res = ilMDKeyword::_searchKeywords($a_keyword_filter, 'mob', 0);
-            
-            foreach ($objs as $obj) {
-                if (in_array($obj['foreign_id'], $res)) {
-                    $filtered[] = $obj;
-                }
-            }
-            return (array) $filtered;
-        }
-        return $objs;
-    }
 
 
     /**

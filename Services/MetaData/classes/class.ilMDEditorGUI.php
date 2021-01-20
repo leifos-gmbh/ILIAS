@@ -669,7 +669,6 @@ class ilMDEditorGUI
     {
         ilLoggerFactory::getLogger('root')->dump($_REQUEST);
 
-
         if (!trim($_POST['gen_title'])) {
             if ($this->md_obj->getObjType() != 'sess') {
                 ilUtil::sendFailure($this->lng->txt('title_required'));
@@ -714,7 +713,7 @@ class ilMDEditorGUI
             ilMDKeyword::updateKeywords($this->md_section, $_POST["keywords"]["value"]);
         }
         $this->callListeners('General');
-        
+
         // Copyright
         if ($_POST['copyright'] || $_POST['copyright_text']) {
             if (!is_object($this->md_section = $this->md_obj->getRights())) {

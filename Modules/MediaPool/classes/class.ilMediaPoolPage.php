@@ -14,6 +14,11 @@ include_once("./Services/COPage/classes/class.ilPageObject.php");
 class ilMediaPoolPage extends ilPageObject
 {
     /**
+     * @var ilObjMediaPool
+     */
+    protected $pool;
+
+    /**
      * Get parent type
      *
      * @return string parent type
@@ -21,6 +26,15 @@ class ilMediaPoolPage extends ilPageObject
     public function getParentType()
     {
         return "mep";
+    }
+
+    /**
+     * Set pool
+     * @param ilObjMediaPool $pool
+     */
+    public function setPool(ilObjMediaPool $pool)
+    {
+        $this->pool = $pool;
     }
 
     /**
@@ -126,8 +140,6 @@ class ilMediaPoolPage extends ilPageObject
     {
         global $DIC;
 
-        $ilDB = $DIC->database();
-    
         include_once("./Modules/MediaPool/classes/class.ilMediaPoolItem.php");
         return ilMediaPoolItem::lookupTitle($a_page_id);
     }
@@ -227,4 +239,98 @@ class ilMediaPoolPage extends ilPageObject
         
         return $ret;
     }
+
+    /**
+     * Get metadata tyoe
+     * @param
+     * @return
+     */
+    protected function getMetadataType()
+    {
+        return "mpg";
+    }
+
+    /**
+     * Meta data update listener
+     *
+     * Important note: Do never call create() or update()
+     * method of ilObject here. It would result in an
+     * endless loop: update object -> update meta -> update
+     * object -> ...
+     * Use static _writeTitle() ... methods instead.
+     *
+     * @param string $a_element md element
+     * @return boolean success
+     */
+    public function MDUpdateListener($a_element)
+    {
+        include_once 'Services/MetaData/classes/class.ilMD.php';
+
+        switch ($a_element) {
+            case 'General':
+
+                // Update Title and description
+                $md = new ilMD($this->pool->getId(), $this->getId(), $this->getMetadataType());
+                $md_gen = $md->getGeneral();
+
+                $item = new ilMediaPoolItem($this->getId());
+                $item->setTitle($md_gen->getTitle());
+                $item->update();
+
+                break;
+
+            default:
+        }
+        return true;
+    }
+
+    /**
+     * create meta data entry
+     */
+    public function createMetaData($pool_id)
+    {
+        //include_once 'Services/MetaData/classes/class.ilMDCreator.php';
+
+        $ilUser = $this->user;
+
+        $md_creator = new ilMDCreator($pool_id, $this->getId(), $this->getMetadataType());
+        $md_creator->setTitle(self::lookupTitle($this->getId()));
+        $md_creator->setTitleLanguage($ilUser->getPref('language'));
+        $md_creator->setDescription("");
+        $md_creator->setDescriptionLanguage($ilUser->getPref('language'));
+        $md_creator->setKeywordLanguage($ilUser->getPref('language'));
+        $md_creator->setLanguage($ilUser->getPref('language'));
+        $md_creator->create();
+
+        return true;
+    }
+
+    /**
+     * update meta data entry
+     */
+    public function updateMetaData()
+    {
+        //include_once("Services/MetaData/classes/class.ilMD.php");
+        //include_once("Services/MetaData/classes/class.ilMDGeneral.php");
+        //include_once("Services/MetaData/classes/class.ilMDDescription.php");
+
+        $md = new ilMD($this->pool->getId(), $this->getId(), $this->getMetadataType());
+        $md_gen = $md->getGeneral();
+        $md_gen->setTitle(self::lookupTitle($this->getId()));
+
+        $md_gen->update();
+    }
+
+
+    /**
+     * delete meta data entry
+     */
+    public function deleteMetaData()
+    {
+        // Delete meta data
+        include_once('Services/MetaData/classes/class.ilMD.php');
+        $md = new ilMD($this->pool->getId(), $this->getId(), $this->getMetadataType());
+        $md->deleteAll();
+    }
+
 }

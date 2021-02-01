@@ -354,16 +354,13 @@ class ilUserUtil
                 $roles = ilStartingPoint::getRolesWithStartingPoint();
 
                 $roles_ids = array_keys($roles);
-
                 $gr = array();
-                foreach ($rbacreview->getGlobalRoles() as $role_id) {
+                foreach ($roles_ids as $role_id) {
                     if ($rbacreview->isAssigned($ilUser->getId(), $role_id)) {
-                        if (in_array($role_id, $roles_ids)) {
-                            $gr[$roles[$role_id]['position']] = array(
-                                "point" => $roles[$role_id]['starting_point'],
-                                "object" => $roles[$role_id]['starting_object']
-                            );
-                        }
+                        $gr[$roles[$role_id]['position']] = array(
+                            "point" => $roles[$role_id]['starting_point'],
+                            "object" => $roles[$role_id]['starting_object']
+                        );
                     }
                 }
                 if (!empty($gr)) {

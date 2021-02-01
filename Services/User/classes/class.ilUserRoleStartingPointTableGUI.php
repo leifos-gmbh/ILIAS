@@ -19,13 +19,18 @@ class ilUserRoleStartingPointTableGUI extends ilTable2GUI
     const TABLE_POSITION_USER_CHOOSES = -1;
     const TABLE_POSITION_DEFAULT = 9999;
 
+    /**
+     * @var ilRbacReview
+     */
+    protected $rbacreview;
+
     public function __construct($a_parent_obj)
     {
         global $DIC;
 
         $ilCtrl = $DIC['ilCtrl'];
         $lng = $DIC['lng'];
-        $rbacsystem = $DIC['rbacsystem'];
+        $this->rbacreview = $DIC->rbac()->review();
 
         $this->log = ilLoggerFactory::getLogger("user");
 
@@ -170,7 +175,14 @@ class ilUserRoleStartingPointTableGUI extends ilTable2GUI
             $this->tpl->setVariable("VAL_ID", "position[" . $a_set['id'] . "]");
             $this->tpl->setVariable("VAL_POS", $a_set["starting_position"]);
 
-            $this->tpl->setVariable("TXT_TITLE", $this->lng->txt("has_role") . ": " . $a_set["criteria"]);
+            $parent_title = "";
+            if (ilObject::_lookupType($a_set["role_id"]) == "role") {
+                $ref_id = $this->rbacreview->getObjectReferenceOfRole($a_set["role_id"]);
+                if ($ref_id != ROLE_FOLDER_ID)
+                $parent_title = " (".ilObject::_lookupTitle(ilObject::_lookupObjId($ref_id)).")";
+            }
+            $this->tpl->setVariable("TXT_TITLE", $this->lng->txt("has_role") . ": " .
+                ilObjRole::_getTranslation($a_set["criteria"]).$parent_title);
         } else {
             if ($a_set['id'] == "default") {
                 $ilCtrl->setParameter($this->getParentObject(), "rolid", "default");

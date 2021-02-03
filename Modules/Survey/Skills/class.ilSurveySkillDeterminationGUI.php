@@ -138,6 +138,10 @@ class ilSurveySkillDeterminationGUI
                 }
             }
         }
+        //write profile completion entries if fulfilment status has changed
+        $prof_manager = new ilSkillProfileCompletionManager($app["user_id"]);
+        $prof_manager->writeCompletionEntryForAllProfiles();
+
         ilUtil::sendSuccess($lng->txt("msg_obj_modified"), true);
         $ilCtrl->redirect($this, "listSkillChanges");
     }

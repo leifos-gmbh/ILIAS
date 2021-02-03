@@ -16485,3 +16485,6 @@ rbac#:#cmis_visible#:#Administration für xAPI/cmi5 ist sichtbar.
 rbac#:#cmis_read#:#Lesezugriff auf Administration für xAPI/cmi5
 rbac#:#cmis_write#:#Einstellungen in Administration für xAPI/cmi5 ändern
 rbac#:#cmis_edit_permissions#:#Rechteeinstellungen der Administration für xAPI/cmi5 ändern
+skmg#:#skmg_custom_image_alt#:#Benutzerdefiniertes Bild für Kompetenzprofil
+skmg#:#skmg_form_presentation#:#Darstellung
+skll#:#skll_lhist_skill_profile_fulfilled#:#Kompetenzprofil $3$ wurde erfüllt.

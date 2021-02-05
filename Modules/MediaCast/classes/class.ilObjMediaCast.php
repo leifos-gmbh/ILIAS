@@ -32,6 +32,8 @@ class ilObjMediaCast extends ilObject
     
     const VIEW_LIST = "";
     const VIEW_GALLERY = "gallery";
+    const VIEW_IMG_GALLERY = "img_gallery";
+    const VIEW_PODCAST = "podcast";
 
     /**
      * access to rss news

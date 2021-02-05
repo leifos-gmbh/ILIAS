@@ -6,6 +6,7 @@ namespace ILIAS\UI\Component\Item;
 
 use \ILIAS\UI\Component\Symbol\Icon\Icon;
 use \ILIAS\UI\Component\Image\Image;
+use \ILIAS\UI\Component\Audio\Audio;
 use \ILIAS\Data\Color;
 
 /**
@@ -28,6 +29,11 @@ interface Standard extends Item
      * Set image as lead
      */
     public function withLeadImage(Image $image) : Item;
+
+    /**
+     * Set audio as lead
+     */
+    public function withLeadAudio(Audio $audio) : Item;
 
     /**
      * Set icon as lead

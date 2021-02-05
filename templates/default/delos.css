@@ -11214,6 +11214,12 @@ footer {
 .il-link.link-bulky .bulky-label {
   color: #333333;
 }
+.il-audio-container > button {
+  width: 100%;
+}
+.il-audio-player {
+  background: #666;
+}
 /*		Color scheme
 		Dark BLue: #0f2152;
 		Mid Blue: #4c6586;

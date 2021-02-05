@@ -12,7 +12,7 @@ require_once "./Services/Object/classes/class.ilObjectGUI.php";
 *
 * @ilCtrl_Calls ilObjMediaCastGUI: ilPermissionGUI, ilInfoScreenGUI, ilExportGUI
 * @ilCtrl_Calls ilObjMediaCastGUI: ilCommonActionDispatcherGUI
-* @ilCtrl_Calls ilObjMediaCastGUI: ilLearningProgressGUI, ilObjectCopyGUI
+* @ilCtrl_Calls ilObjMediaCastGUI: ilLearningProgressGUI, ilObjectCopyGUI, McstImageGalleryGUI, McstPodcastGUI
 * @ilCtrl_IsCalledBy ilObjMediaCastGUI: ilRepositoryGUI, ilAdministrationGUI
 */
 class ilObjMediaCastGUI extends ilObjectGUI
@@ -1220,10 +1220,6 @@ class ilObjMediaCastGUI extends ilObjectGUI
         $this->form_gui->addItem($sort);
         
         // view mode
-        $options = array(
-            ilObjMediaCast::VIEW_LIST => $lng->txt("mcst_list"),
-            ilObjMediaCast::VIEW_GALLERY => $lng->txt("mcst_gallery")
-            );
         $si = new ilRadioGroupInputGUI($this->lng->txt("mcst_viewmode"), "viewmode");
         $si->addOption(new ilRadioOption(
             $lng->txt("mcst_list"),
@@ -1232,6 +1228,14 @@ class ilObjMediaCastGUI extends ilObjectGUI
         $si->addOption(new ilRadioOption(
             $lng->txt("mcst_gallery"),
             ilObjMediaCast::VIEW_GALLERY
+        ));
+        $si->addOption(new ilRadioOption(
+            $lng->txt("mcst_img_gallery"),
+            ilObjMediaCast::VIEW_IMG_GALLERY
+        ));
+        $si->addOption(new ilRadioOption(
+            $lng->txt("mcst_podcast"),
+            ilObjMediaCast::VIEW_PODCAST
         ));
 
         //		$si->setOptions($options);
@@ -1537,6 +1541,18 @@ class ilObjMediaCastGUI extends ilObjectGUI
 
         if ($this->object->getViewMode() == ilObjMediaCast::VIEW_GALLERY) {
             $this->showGallery();
+        } else if ($this->object->getViewMode() == ilObjMediaCast::VIEW_IMG_GALLERY) {
+            include_once("./Modules/MediaCast/Presentation/class.McstImageGalleryGUI.php");
+            $view = new \McstImageGalleryGUI($this->object, $this->tpl);
+            $this->tabs->activateTab("content");
+            $this->addContentSubTabs("content");
+            $tpl->setContent($this->ctrl->getHTML($view));
+        } else if ($this->object->getViewMode() == ilObjMediaCast::VIEW_PODCAST) {
+            include_once("./Modules/MediaCast/Presentation/class.McstPodcastGUI.php");
+            $view = new \McstPodcastGUI($this->object, $this->tpl);
+            $this->tabs->activateTab("content");
+            $this->addContentSubTabs("content");
+            $tpl->setContent($this->ctrl->getHTML($view));
         } else {
             $this->listItemsObject(true);
         }

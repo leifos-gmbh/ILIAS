@@ -121,7 +121,7 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
             if (is_object($this->pl)) {
                 $this->pl->includeClass("class.cdParticipantEvaluation.php");
                 // cdpatch
-                //$this->addColumn($this->pl->txt('evaluations'));
+                $this->addColumn($this->pl->txt('evaluations'));
             }
             //$this->addColumn($this->lng->txt('learning_progress'), 'progress');
         }

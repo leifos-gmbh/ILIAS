@@ -49,27 +49,33 @@ class ilSkillProfileCompletionManager
     /**
      * Get actual max levels
      *
-     * @param array $skills
+     * @param array|null $a_skills
+     * @param string     $a_gap_mode
+     * @param string     $a_gap_mode_type
+     * @param int        $a_gap_mode_obj_id
+     * @return array
      */
     public function getActualMaxLevels(
-        array $a_skills,
+        array $a_skills = null,
         string $a_gap_mode = "",
         string $a_gap_mode_type = "",
         int $a_gap_mode_obj_id = 0
     ) {
         // get actual levels for gap analysis
         $actual_levels = array();
-        foreach ($a_skills as $sk) {
-            $bs = new ilBasicSkill($sk["base_skill_id"]);
-            if ($a_gap_mode == "max_per_type") {
-                $max = $bs->getMaxLevelPerType($sk["tref_id"], $a_gap_mode_type, $this->getUserId());
-                $actual_levels[$sk["base_skill_id"]][$sk["tref_id"]] = $max;
-            } elseif ($a_gap_mode == "max_per_object") {
-                $max = $bs->getMaxLevelPerObject($sk["tref_id"], $a_gap_mode_obj_id, $this->getUserId());
-                $actual_levels[$sk["base_skill_id"]][$sk["tref_id"]] = $max;
-            } else {
-                $max = $bs->getMaxLevel($sk["tref_id"], $this->getUserId());
-                $actual_levels[$sk["base_skill_id"]][$sk["tref_id"]] = $max;
+        if (is_array($a_skills)) {
+            foreach ($a_skills as $sk) {
+                $bs = new ilBasicSkill($sk["base_skill_id"]);
+                if ($a_gap_mode == "max_per_type") {
+                    $max = $bs->getMaxLevelPerType($sk["tref_id"], $a_gap_mode_type, $this->getUserId());
+                    $actual_levels[$sk["base_skill_id"]][$sk["tref_id"]] = $max;
+                } elseif ($a_gap_mode == "max_per_object") {
+                    $max = $bs->getMaxLevelPerObject($sk["tref_id"], $a_gap_mode_obj_id, $this->getUserId());
+                    $actual_levels[$sk["base_skill_id"]][$sk["tref_id"]] = $max;
+                } else {
+                    $max = $bs->getMaxLevel($sk["tref_id"], $this->getUserId());
+                    $actual_levels[$sk["base_skill_id"]][$sk["tref_id"]] = $max;
+                }
             }
         }
 
@@ -116,6 +122,9 @@ class ilSkillProfileCompletionManager
                 $achieved_count++;
             }
             $profile_count++;
+        }
+        if ($profile_count == 0) {
+            return 0;
         }
         $progress = $achieved_count / $profile_count * 100;
 

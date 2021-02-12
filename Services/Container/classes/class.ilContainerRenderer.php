@@ -632,6 +632,10 @@ class ilContainerRenderer
                             $deck = $f->deck($cards)->withExtraLargeCardsSize();
                             break;
 
+                        case ilContainer::TILE_FULL:
+                            $deck = $f->deck($cards)->withFullSizedCardsSize();
+                            break;
+
                         default:
                             $deck = $f->deck($cards)->withNormalCardsSize();
                             break;

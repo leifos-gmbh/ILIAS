@@ -24,6 +24,7 @@ cont#:#cont_tile_size_1#:#klein (bis zu sechs Kacheln in einer Zeile)
 cont#:#cont_tile_size_0#:#normal (bis zu vier Kacheln in einer Zeile)
 cont#:#cont_tile_size_2#:#groß (bis zu drei Kacheln in einer Zeile)
 cont#:#cont_tile_size_3#:#sehr groß (bis zu zwei Kacheln in einer Zeile)
+cont#:#cont_tile_size_4#:#volle Breite (eine Kachel in einer Zeile)
 cont#:#cont_tile_size#:#Kachelgröße
 itgr#:#itgr_tile_size#:#Kachelgröße
 itgr#:#itgr_tile#:#Kacheln

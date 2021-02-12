@@ -118,6 +118,7 @@ class ilContainer extends ilObject
     const TILE_SMALL = 1;
     const TILE_LARGE = 2;
     const TILE_EXTRA_LARGE = 3;
+	const TILE_FULL = 4;
 
     /**
      * @var ilSetting
@@ -159,7 +160,8 @@ class ilContainer extends ilObject
             self::TILE_SMALL => $lng->txt("cont_tile_size_1"),
             self::TILE_NORMAL => $lng->txt("cont_tile_size_0"),
             self::TILE_LARGE => $lng->txt("cont_tile_size_2"),
-            self::TILE_EXTRA_LARGE => $lng->txt("cont_tile_size_3")
+            self::TILE_EXTRA_LARGE => $lng->txt("cont_tile_size_3"),
+            self::TILE_FULL => $lng->txt("cont_tile_size_4")
         ];
     }
 

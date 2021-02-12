@@ -118,7 +118,7 @@ class ilContainer extends ilObject
     const TILE_SMALL = 1;
     const TILE_LARGE = 2;
     const TILE_EXTRA_LARGE = 3;
-	const TILE_FULL = 4;
+    const TILE_FULL = 4;
 
     /**
      * @var ilSetting

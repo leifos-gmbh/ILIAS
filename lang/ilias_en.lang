@@ -14,6 +14,8 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+form#:#form_use_camera#:#Use Camera
+form#:#form_take_snapshot#:#Take Snapshot
 rbac#:#rbac_form_copy_roles_adjust_type#:#Kind of Adapting Permissions
 rbac#:#rbac_form_copy_roles_adjust_type_add#:#Add permissions
 rbac#:#rbac_form_copy_roles_adjust_type_clone#:#Copy permissions

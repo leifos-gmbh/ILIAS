@@ -605,6 +605,9 @@ class ilUserProfile
                 case "picture":
                     if (ilUserProfile::userSettingVisible("upload") && $a_user) {
                         $ii = new ilImageFileInputGUI($lng->txt("personal_picture"), "userfile");
+                        // begin patch profile-image-patch – Killing 1.3.2021
+                        $ii->setAllowCapture(true);
+                        // end patch profile-image-patch – Killing 1.3.2021
                         $ii->setDisabled($ilSetting->get("usr_settings_disable_upload"));
                         
                         $upload = $a_form->getFileUpload("userfile");

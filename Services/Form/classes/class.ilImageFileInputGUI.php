@@ -11,6 +11,9 @@
 class ilImageFileInputGUI extends ilFileInputGUI
 {
     protected $cache;
+    // begin patch profile-image-patch – Killing 1.3.2021
+    protected $allow_capture;
+    // end patch profile-image-patch – Killing 1.3.2021
     
     /**
     * Constructor
@@ -52,6 +55,27 @@ class ilImageFileInputGUI extends ilFileInputGUI
     {
         return $this->allow_deletion;
     }
+
+    // begin patch profile-image-patch – Killing 1.3.2021
+    /**
+     * Set allow capture
+     * @param bool $a_val allow capture
+     */
+    function setAllowCapture($a_val)
+    {
+        $this->allow_capture = $a_val;
+    }
+
+    /**
+     * Get allow capture
+     * @return bool allow capture
+     */
+    function getAllowCapture()
+    {
+        return $this->allow_capture;
+    }
+    // end patch profile-image-patch – Killing 1.3.2021
+
     /**
     * Set cache
     *
@@ -135,6 +159,16 @@ class ilImageFileInputGUI extends ilFileInputGUI
         }
         
         $i_tpl = new ilTemplate("tpl.prop_image_file.html", true, true, "Services/Form");
+
+        // begin patch profile-image-patch – Killing 1.3.2021
+        if ($this->getAllowCapture()) {
+            $i_tpl->setCurrentBlock("capture");
+            $i_tpl->setVariable("POST_VAR_V", $this->getPostVar());
+            $i_tpl->setVariable("TXT_USE_CAMERA", $lng->txt("form_use_camera"));
+            $i_tpl->setVariable("TXT_TAKE_SNAPSHOT", $lng->txt("form_take_snapshot"));
+            $i_tpl->parseCurrentBlock();
+        }
+        // end patch profile-image-patch – Killing 1.3.2021
         
         if ($this->getImage() != "") {
             if (!$this->getDisabled() && $this->getALlowDeletion()) {
@@ -163,6 +197,7 @@ class ilImageFileInputGUI extends ilFileInputGUI
             } else {
                 $i_tpl->setVariable("SRC_IMAGE", $this->getImage());
             }
+            $i_tpl->setVariable("POST_VAR_I", $this->getPostVar());
             $i_tpl->setVariable("ALT_IMAGE", $this->getAlt());
             $i_tpl->parseCurrentBlock();
         }

@@ -14,6 +14,10 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+mcst#:#mcst_download_started_bg#:#Download of files has started. Please check your background tasks in the top right corner.
+mcst#:#mcst_download_all#:#Download All
+mcst#:#mcst_img_gallery#:#Image Gallery
+mcst#:#mcst_podcast#:#Podcast
 common#:#transcription#:#Transcript
 mcst#:#mcst_audio_files#:#Audio Files
 rbac#:#rbac_form_copy_roles_adjust_type#:#Kind of Adapting Permissions

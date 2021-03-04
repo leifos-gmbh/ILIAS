@@ -8709,6 +8709,10 @@ div.alert ul > li:before {
 .carousel.slide.text-only .carousel-control {
   background: none !important;
 }
+.carousel-inner .item img {
+  margin-right: auto;
+  margin-left: auto;
+}
 .il-tree {
   list-style-type: none;
   padding: 0 3px 0 3px;

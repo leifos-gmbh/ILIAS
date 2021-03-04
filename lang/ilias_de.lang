@@ -14,6 +14,10 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+mcst#:#mcst_download_started_bg#:#Das Download-Paket wird erstellt. Bitte überprüfen Sie ihre Hintergrundprozesse oben rechts in der Top-Bar.
+mcst#:#mcst_download_all#:#Alle herunterladen
+mcst#:#mcst_img_gallery#:#Bildergallerie
+mcst#:#mcst_podcast#:#Podcast
 common#:#transcription#:#Abschrift
 mcst#:#mcst_audio_files#:#Audiodateien
 rbac#:#rbac_form_copy_roles_adjust_type#:#Art der Rechteanpassung

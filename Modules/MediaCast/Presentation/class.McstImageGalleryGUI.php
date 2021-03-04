@@ -35,6 +35,16 @@ class McstImageGalleryGUI
     protected $user;
 
     /**
+     * @var \ilCtrl
+     */
+    protected $ctrl;
+
+    /**
+     * @var ilToolbarGUI
+     */
+    protected $toolbar;
+
+    /**
      * Constructor
      */
     public function __construct(\ilObjMediaCast $obj, $tpl = null)
@@ -46,6 +56,26 @@ class McstImageGalleryGUI
         $this->media_cast = $obj;
         $this->tpl = $tpl;
         $this->user = $DIC->user();
+        $this->ctrl = $DIC->ctrl();
+        $this->toolbar = $DIC->toolbar();
+    }
+
+    /**
+     * Execute command
+     */
+    function executeCommand()
+    {
+        $ctrl = $this->ctrl;
+
+        $next_class = $ctrl->getNextClass($this);
+        $cmd = $ctrl->getCmd();
+
+        switch ($next_class) {
+            default:
+                if (in_array($cmd, array("downloadAll"))) {
+                    $this->$cmd();
+                }
+        }
     }
 
     /**
@@ -57,9 +87,15 @@ class McstImageGalleryGUI
     {
         $f = $this->ui->factory();
         $renderer = $this->ui->renderer();
+        $ctrl = $this->ctrl;
+        $lng = $this->lng;
+        $toolbar = $this->toolbar;
 
-        //Generate some content
+        // toolbar
+        $toolbar->setFormAction($ctrl->getFormAction($this));
+        $toolbar->addFormButton($lng->txt("mcst_download_all"), "downloadAll");
 
+        // cards and modals
         $cards = [];
         $modals = [];
         foreach ($this->media_cast->getSortedItemsArray() as $item) {
@@ -70,10 +106,19 @@ class McstImageGalleryGUI
                 $resource = $med->getLocation();
             } else {
                 $path_to_file = \ilObjMediaObject::_getURL($mob->getId()) . "/" . $med->getLocation();
-                $resource = $path_to_file;
+                $resource = ilWACSignedPath::signFile($path_to_file);
+            }
+            $preview_resource = $resource;
+            if ($mob->getVideoPreviewPic() != "") {
+                $preview_resource =ilWACSignedPath::signFile($mob->getVideoPreviewPic());
             }
 
-            //Define the some responsive image
+
+            $preview_image = $f->image()->responsive(
+                $preview_resource,
+                $mob->getTitle()
+            );
+
             $image = $f->image()->responsive(
                 $resource,
                 $mob->getTitle()
@@ -82,11 +127,18 @@ class McstImageGalleryGUI
             $page = $f->modal()->lightboxImagePage($image, $mob->getTitle());
             $modal = $f->modal()->lightbox([$page]);
 
-            $card_image = $image->withAction($modal->getShowSignal());
+            $card_image = $preview_image->withAction($modal->getShowSignal());
 
             $sections = ($mob->getDescription())
                 ? [$f->legacy($mob->getDescription())]
                 : [];
+
+            if ($this->media_cast->getDownloadable()) {
+                $ctrl->setParameterByClass("ilobjmediacastgui", "item_id", $item["id"]);
+                $ctrl->setParameterByClass("ilobjmediacastgui", "purpose", "Standard");
+                $download = $ctrl->getLinkTargetByClass("ilobjmediacastgui", "downloadItem");
+                $sections[] = $f->button()->standard($lng->txt("download"), $download);
+            }
 
             //$title_button = $f->button()->shy($mob->getTitle(), $modal->getShowSignal());
             $title = $mob->getTitle();
@@ -105,6 +157,26 @@ class McstImageGalleryGUI
         $deck = $f->deck($cards);
 
         return $renderer->render(array_merge([$deck], $modals));
+    }
+
+    /**
+     * Download all
+     */
+    protected function downloadAll()
+    {
+        $user = $this->user;
+        include_once ("./Modules/MediaCast/BackgroundTasks/DownloadAllBackgroundTask.php");
+        $download_task = new \ILIAS\MediaCast\BackgroundTasks\DownloadAllBackgroundTask(
+            (int) $user->getId(),
+            (int) $this->media_cast->getRefId(),
+            (int) $this->media_cast->getId()
+        );
+
+        if ($download_task->run()) {
+            ilUtil::sendSuccess($this->lng->txt('mcst_download_started_bg'), true);
+        }
+
+        $this->ctrl->redirectByClass("ilobjmediacastgui", "showContent");
     }
 
 }

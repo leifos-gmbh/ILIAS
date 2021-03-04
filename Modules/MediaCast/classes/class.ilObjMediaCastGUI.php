@@ -146,7 +146,12 @@ class ilObjMediaCastGUI extends ilObjectGUI
                 $this->ctrl->forwardCommand($new_gui);
                 $this->tabs_gui->setTabActive('learning_progress');
                 break;
-        
+
+            case "mcstimagegallerygui":
+                $view = new \McstImageGalleryGUI($this->object, $this->tpl);
+                $this->ctrl->forwardCommand($view);
+                break;
+
             default:
                 if (!$cmd) {
                     $cmd = "infoScreen";

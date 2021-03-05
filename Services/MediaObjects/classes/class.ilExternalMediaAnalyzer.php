@@ -171,6 +171,34 @@ class ilExternalMediaAnalyzer
         return $par;
     }
 
+    // begin patch videocast – Killing 22.07.2020
+    /**
+     * Get vimeo metadata
+     * @param string
+     * @return array
+     */
+    public static function getVimeoMetadata($vid)
+    {
+        $json_url = 'https://vimeo.com/api/oembed.json?url=https%3A//vimeo.com/'.$vid;
+
+        $curl = curl_init($json_url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 10);
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($curl, CURLOPT_REFERER, ILIAS_HTTP_PATH);
+
+        $return = curl_exec($curl);
+        curl_close($curl);
+
+        $r = json_decode($return, true);
+
+        if ($return === false || is_null($r)) {
+            throw new ilExternalMediaApiException("Could not connect to vimeo API at $json_url.");
+        }
+        return $r;
+    }
+    // end patch videocast – Killing 22.07.2020
+
     /**
     * Identify Google Document links
     */

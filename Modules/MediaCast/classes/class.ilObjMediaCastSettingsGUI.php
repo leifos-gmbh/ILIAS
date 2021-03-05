@@ -144,19 +144,35 @@ class ilObjMediaCastSettingsGUI extends ilObjectGUI
     {
         $ilCtrl = $this->ctrl;
         $ilAccess = $this->access;
-        
+
+        // begin patch videocast – Killing 4.12.2020
+        $form = $this->getForm();
+        // end patch videocast
+
         if ($ilAccess->checkAccess("write", "", $this->object->getRefId())) {
             foreach ($this->settings->getPurposeSuffixes() as $purpose => $filetypes) {
                 $purposeSuffixes[$purpose] = explode(",", preg_replace("/[^\w,]/", "", strtolower($_POST[$purpose])));
             }
 
-            $this->settings->setPurposeSuffixes($purposeSuffixes);
-            $this->settings->setDefaultAccess($_POST["defaultaccess"]);
-            $this->settings->setMimeTypes(explode(",", $_POST["mimetypes"]));
+            // begin patch videocast – Killing 4.12.2020
+            if ($form->checkInput()) {
+                $this->settings->setPurposeSuffixes($purposeSuffixes);
+                $this->settings->setDefaultAccess($_POST["defaultaccess"]);
+                $this->settings->setMimeTypes(explode(",", $_POST["mimetypes"]));
+                // begin patch videocast – Killing 4.12.2020
+                $this->settings->setVideoCompletionThreshold((int) $_POST["video_completion_threshold"]);
+                // end patch videocast
 
-            $this->settings->save();
+                $this->settings->save();
 
-            ilUtil::sendSuccess($this->lng->txt("settings_saved"), true);
+                ilUtil::sendSuccess($this->lng->txt("settings_saved"), true);
+            }
+            else {
+                $form->setValuesByPost();
+                $this->initFormSettings($form);
+                return;
+            }
+            // end patch videocast
         }
         
         $ilCtrl->redirect($this, "view");
@@ -187,16 +203,17 @@ class ilObjMediaCastSettingsGUI extends ilObjectGUI
      *
      * @access protected
      */
-    protected function initFormSettings()
+    // begin patch videocast – Killing 4.12.2020 (outfactored getForm)
+    protected function getForm()
     {
         $lng = $this->lng;
         $ilAccess = $this->access;
         include_once('Services/Form/classes/class.ilPropertyFormGUI.php');
-        
+
         $form = new ilPropertyFormGUI();
         $form->setFormAction($this->ctrl->getFormAction($this));
         $form->setTitle($this->lng->txt('settings'));
-        
+
         if ($ilAccess->checkAccess("write", "", $this->object->getRefId())) {
             $form->addCommandButton('saveSettings', $this->lng->txt('save'));
             $form->addCommandButton('cancel', $this->lng->txt('cancel'));
@@ -214,6 +231,18 @@ class ilObjMediaCastSettingsGUI extends ilObjectGUI
         #$ch->addSubItem($radio_group);
         $form->addItem($radio_group);
 
+        // begin patch videocast – Killing 4.12.2020
+        // video completion threshold
+        $ti = new ilNumberInputGUI($lng->txt("mcst_video_completion_threshold"), "video_completion_threshold");
+        $ti->setMaxLength(3);
+        $ti->setSize(3);
+        $ti->setSuffix("%");
+        $ti->setMaxValue(100);
+        $ti->setMinValue(0);
+        $ti->setInfo($lng->txt("mcst_video_completion_threshold_info"));
+        $ti->setValue($this->settings->getVideoCompletionThreshold());
+        $form->addItem($ti);
+        // end patch videocast
 
         foreach ($this->settings->getPurposeSuffixes() as $purpose => $filetypes) {
             if ($purpose != "VideoAlternative") {
@@ -223,7 +252,7 @@ class ilObjMediaCastSettingsGUI extends ilObjectGUI
                 $form->addItem($text);
             }
         }
-        
+
         $text = new ilTextAreaInputGUI($lng->txt("mcst_mimetypes"), "mimetypes");
         $text->setInfo($lng->txt("mcst_mimetypes_info"));
         $text->setCols(120);
@@ -232,7 +261,21 @@ class ilObjMediaCastSettingsGUI extends ilObjectGUI
             $text->setValue(implode(",", $this->settings->getMimeTypes()));
         }
         $form->addItem($text);
-        
+
+        return $form;
+    }
+
+    /**
+     * Init settings property form
+     *
+     * @access protected
+     */
+    protected function initFormSettings($form = null)
+    {
+        if (!$form) {
+            $form = $this->getForm();
+        }
         $this->tpl->setContent($form->getHTML());
     }
+    // end patch videocast
 }

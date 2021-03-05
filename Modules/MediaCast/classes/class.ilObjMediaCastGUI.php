@@ -1,18 +1,15 @@
 <?php
 
-/* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
-
-require_once "./Services/Object/classes/class.ilObjectGUI.php";
+/* Copyright (c) 1998-2021 ILIAS open source, GPLv3, see LICENSE */
 
 /**
 * Class ilObjMediaCastGUI
 *
-* @author Alex Killing <alex.killing@gmx.de>
-* @version $Id$
+* @author Alexander Killing <killing@leifos.de>
 *
 * @ilCtrl_Calls ilObjMediaCastGUI: ilPermissionGUI, ilInfoScreenGUI, ilExportGUI
 * @ilCtrl_Calls ilObjMediaCastGUI: ilCommonActionDispatcherGUI
-* @ilCtrl_Calls ilObjMediaCastGUI: ilLearningProgressGUI, ilObjectCopyGUI, McstImageGalleryGUI, McstPodcastGUI
+* @ilCtrl_Calls ilObjMediaCastGUI: ilLearningProgressGUI, ilObjectCopyGUI, McstImageGalleryGUI, McstPodcastGUI, ilMediaCreationGUI
 * @ilCtrl_IsCalledBy ilObjMediaCastGUI: ilRepositoryGUI, ilAdministrationGUI
 */
 class ilObjMediaCastGUI extends ilObjectGUI
@@ -98,6 +95,22 @@ class ilObjMediaCastGUI extends ilObjectGUI
         $this->prepareOutput();
   
         switch ($next_class) {
+            // begin patch videocast – Killing 22.07.2020
+            case "ilmediacreationgui":
+                $this->ctrl->setReturn($this, "listItems");
+                $ilTabs->activateTab("content");
+                $this->addContentSubTabs("manage");
+                $creation = new ilMediaCreationGUI([ilMediaCreationGUI::TYPE_VIDEO], function($mob_id) {
+                    $this->afterUpload($mob_id);
+                }, function($mob_id, $long_desc) {
+                    $this->afterUrlSaving($mob_id, $long_desc);
+                },function($mob_ids) {
+                    $this->afterPoolInsert($mob_ids);
+                });
+                $this->ctrl->forwardCommand($creation);
+                break;
+            // end patch videocast – Killing 22.07.2020
+
             case "ilinfoscreengui":
                 if (!$this->checkPermissionBool("read")) {
                     $this->checkPermission("visible");
@@ -223,7 +236,13 @@ class ilObjMediaCastGUI extends ilObjectGUI
         $table_gui->setData($med_items);
         
         if ($ilAccess->checkAccess("write", "", $_GET["ref_id"]) && !$a_presentation_mode) {
-            $ilToolbar->addButton($lng->txt("add"), $this->ctrl->getLinkTarget($this, "addCastItem"));
+            // begin patch videocast – Killing 22.07.2020
+            if ($this->object->getViewMode() == ilObjMediaCast::VIEW_VCAST) {
+                $ilToolbar->addButton($lng->txt("add"), $this->ctrl->getLinkTargetByClass("ilMediaCreationGUI", ""));
+            } else {
+                $ilToolbar->addButton($lng->txt("add"), $this->ctrl->getLinkTarget($this, "addCastItem"));
+            }
+            // end patch videocast – Killing 22.07.2020
             
             $table_gui->addMultiCommand("confirmDeletionItems", $lng->txt("delete"));
             $table_gui->setSelectAllCheckbox("item_id");
@@ -621,7 +640,7 @@ class ilObjMediaCastGUI extends ilObjectGUI
             
             // determine duration for standard purpose
             $duration = $this->getDuration($file);
-            
+
             // handle other purposes
             foreach ($this->additionalPurposes as $purpose) {
                 // check if some purpose has been uploaded
@@ -860,6 +879,13 @@ class ilObjMediaCastGUI extends ilObjectGUI
             $mc_item->setUserId($ilUser->getId());
             if (isset($duration)) {
                 $mc_item->setPlaytime($duration);
+                // begin patch videocast – Killing 3.12.2020
+                $dur_arr = explode(":", $duration);
+                $seconds = ((int) $dur_arr[0] * 60 * 60) + ((int) $dur_arr[1] * 60) + ((int) $dur_arr[2]);
+                $st_med = $mob->getMediaItem("Standard");
+                $st_med->setDuration($seconds);
+                $st_med->update();
+                // end patch videocast
             }
             $mc_item->setTitle($title);
             $mc_item->setContent($description);
@@ -965,15 +991,47 @@ class ilObjMediaCastGUI extends ilObjectGUI
         $mob = new ilObjMediaObject($mob);
         $mob_dir = ilObjMediaObject::_getDirectory($mob->getId());
         $m_item = $mob->getMediaItem("Standard");
-        $file = $mob_dir . "/" . $m_item->getLocation();
-        $duration = $this->getDuration($file);
-        if ($duration != "00:00:00") {
-            $mc_item->setPlaytime($duration);
-            $mc_item->update();
-            ilUtil::sendSuccess($lng->txt("mcst_set_playtime"), true);
+
+        // begin patch videocast – Killing 3.12.2020
+        $success = false;
+        if ($m_item->getLocationType() == "Reference") {
+            if (ilExternalMediaAnalyzer::isVimeo($m_item->getLocation())) {
+                $par = ilExternalMediaAnalyzer::extractVimeoParameters($m_item->getLocation());
+                $meta = ilExternalMediaAnalyzer::getVimeoMetadata($par["id"]);
+                if ($meta["duration"] > 0) {
+                    $m_item->setDuration((int) $meta["duration"]);
+                    $m_item->update();
+                    $seconds = ($meta["duration"] % 60);
+                    $minutes = ((($meta["duration"] - $seconds) / 60) % 60);
+                    $hours = floor($meta["duration"] / 3600);
+                    $duration = str_pad($hours, 2, "0", STR_PAD_LEFT) . ":" .
+                        str_pad($minutes, 2, "0", STR_PAD_LEFT) . ":" .
+                        str_pad($seconds, 2, "0", STR_PAD_LEFT);
+                    $mc_item->setPlaytime($duration);
+                    $mc_item->update();
+                    $success = true;
+                    ilUtil::sendSuccess($lng->txt("mcst_set_playtime"), true);
+                }
+            }
         } else {
+            $file = $mob_dir . "/" . $m_item->getLocation();
+            $duration = $this->getDuration($file);
+            if ($duration != "00:00:00") {
+                $mc_item->setPlaytime($duration);
+                $mc_item->update();
+                $dur_arr = explode(":", $duration);
+                $seconds = ((int) $dur_arr[0] * 60 * 60) + ((int) $dur_arr[1] * 60) + ((int) $dur_arr[2]);
+                $st_med = $mob->getMediaItem("Standard");
+                $st_med->setDuration($seconds);
+                $st_med->update();
+                $success = true;
+                ilUtil::sendSuccess($lng->txt("mcst_set_playtime"), true);
+            }
+        }
+        if (!$success) {
             ilUtil::sendFailure($lng->txt("mcst_unable_to_determin_playtime"), true);
         }
+        // end patch videocast
 
         $ilCtrl->redirect($this, "listItems");
     }
@@ -1242,12 +1300,37 @@ class ilObjMediaCastGUI extends ilObjectGUI
             $lng->txt("mcst_podcast"),
             ilObjMediaCast::VIEW_PODCAST
         ));
+        // begin patch videocast – Killing 22.07.2020
+        $si->addOption($vc_opt = new ilRadioOption(
+            $lng->txt("mcst_video_cast"),
+            ilObjMediaCast::VIEW_VCAST
+        ));
+        // end patch videocast – Killing 22.07.2020
 
         //		$si->setOptions($options);
         $si->setValue($this->object->getViewMode());
         $this->form_gui->addItem($si);
-        
-        
+
+        // begin patch videocast – Killing 22.07.2020
+        // autoplay
+        //
+        $options = array(
+            ilObjMediaCast::AUTOPLAY_NO => $lng->txt("mcst_no_autoplay"),
+            ilObjMediaCast::AUTOPLAY_ACT => $lng->txt("mcst_autoplay_active"),
+            ilObjMediaCast::AUTOPLAY_INACT => $lng->txt("mcst_autoplay_inactive")
+        );
+        $si = new ilSelectInputGUI($lng->txt("mcst_autoplay"), "autoplaymode");
+        $si->setOptions($options);
+        $si->setValue($this->object->getAutoplayMode());
+        $vc_opt->addSubItem($si);
+
+        // number of initial videos
+        $ti = new ilNumberInputGUI($lng->txt("mcst_nr_videos"), "nr_videos");
+        $ti->setValue($this->object->getNumberInitialVideos());
+        $ti->setSize(2);
+        $vc_opt->addSubItem($ti);
+        // end patch videocast – Killing 22.07.2020
+
         // Downloadable
         $downloadable = new ilCheckboxInputGUI($lng->txt("mcst_downloadable"), "downloadable");
         $downloadable->setChecked($this->object->getDownloadable());
@@ -1302,7 +1385,22 @@ class ilObjMediaCastGUI extends ilObjectGUI
             #$ch->addSubItem($incl_files);
             $this->form_gui->addItem($incl_files);
         }
-        
+
+        // begin patch videocast – Killing 22.07.2020
+        if (ilLearningProgressAccess::checkAccess($this->object->getRefId())) {
+            $sh = new ilFormSectionHeaderGUI();
+            $sh->setTitle($lng->txt("learning_progress"));
+            $this->form_gui->addItem($sh);
+
+            // Include new items automatically in learning progress
+            $auto_lp = new ilCheckboxInputGUI($lng->txt("mcst_new_items_det_lp"), "auto_det_lp");
+            $auto_lp->setChecked($this->object->getNewItemsInLearningProgress());
+            $auto_lp->setInfo($lng->txt("mcst_new_items_det_lp_info"));
+            $this->form_gui->addItem($auto_lp);
+        }
+        // end patch videocast – Killing 22.07.2020
+
+
         // Form action and save button
         $this->form_gui->addCommandButton("saveSettings", $lng->txt("save"));
         $this->form_gui->setFormAction($ilCtrl->getFormAction($this, "saveSettings"));
@@ -1331,6 +1429,11 @@ class ilObjMediaCastGUI extends ilObjectGUI
             $this->object->setDownloadable($this->form_gui->getInput("downloadable"));
             $this->object->setOrder($this->form_gui->getInput("order"));
             $this->object->setViewMode($this->form_gui->getInput("viewmode"));
+            // begin patch videocast – Killing 22.07.2020
+            $this->object->setAutoplayMode((int) $this->form_gui->getInput("autoplaymode"));
+            $this->object->setNumberInitialVideos((int) $this->form_gui->getInput("nr_videos"));
+            $this->object->setNewItemsInLearningProgress((int) $this->form_gui->getInput("auto_det_lp"));
+            // end patch videocast – Killing 22.07.2020
 
             // tile image
             $obj_service->commonSettings()->legacyForm($this->form_gui, $this->object)->saveTileImage();
@@ -1529,7 +1632,10 @@ class ilObjMediaCastGUI extends ilObjectGUI
     public function showContentObject()
     {
         $tpl = $this->tpl;
+        // begin patch videocast – Killing 22.07.2020
         $ilUser = $this->user;
+        $ilTabs = $this->tabs;
+        // end patch videocast – Killing 22.07.2020
         
         // need read events for parent for LP statistics
         require_once 'Services/Tracking/classes/class.ilChangeEvent.php';
@@ -1558,6 +1664,18 @@ class ilObjMediaCastGUI extends ilObjectGUI
             $this->tabs->activateTab("content");
             $this->addContentSubTabs("content");
             $tpl->setContent($this->ctrl->getHTML($view));
+            // begin patch videocast – Killing 22.07.2020
+        } else if ($this->object->getViewMode() == ilObjMediaCast::VIEW_VCAST) {
+            $ilTabs->activateTab("content");
+            $this->addContentSubTabs("content");
+            include_once("./Modules/MediaCast/Presentation/class.VideoViewGUI.php");
+            $view = new \ILIAS\MediaCast\Presentation\VideoViewGUI($this->object, $tpl);
+            $view->setCompletedCallback($this->ctrl->getLinkTarget($this,
+            "handlePlayerCompletedEvent", "", true, false));
+            $view->setAutoplayCallback($this->ctrl->getLinkTarget($this,
+            "handleAutoplayTrigger", "", true, false));
+            $view->show();
+            // end patch videocast – Killing 22.07.2020
         } else {
             $this->listItemsObject(true);
         }
@@ -1788,4 +1906,79 @@ class ilObjMediaCastGUI extends ilObjectGUI
         }
         exit;
     }
+    // begin patch videocast – Killing 22.07.2020
+    /**
+     *
+     * @param
+     * @return
+     */
+    protected function handlePlayerCompletedEventObject()
+    {
+        $mob_id = (int) $_GET["mob_id"];
+        if ($mob_id > 0) {
+            $ilUser = $this->user;
+            $this->object->handleLPUpdate($ilUser->getId(), $mob_id);
+        }
+        exit;
+    }
+
+    /**
+     * After mob upload
+     * @param $mob_id
+     */
+    protected function afterUpload($mob_id) {
+        $mob = new ilObjMediaObject($mob_id);
+        $med_item = $mob->getMediaItem("Standard");
+        $med_item->determineDuration();
+        $med_item->update();
+
+        $this->addMobsToCast([$mob_id]);
+    }
+
+    /**
+     * After mob upload
+     * @param $mob_id
+     * @param $long_desc
+     */
+    protected function afterUrlSaving($mob_id, $long_desc) {
+        $this->addMobsToCast([$mob_id], $long_desc);
+    }
+
+    /**
+     * After mob upload
+     * @param array $mob_ids
+     * @param string $long_desc
+     */
+    protected function addMobsToCast($mob_ids, $long_desc = "") {
+        $ctrl = $this->ctrl;
+        $user = $this->user;
+
+        $item_ids = [];
+        foreach ($mob_ids as $mob_id) {
+            $item_ids[] = $this->object->addMobToCast($mob_id, $user->getId(), $long_desc);
+        }
+
+        if (count($item_ids) == 1) {
+            $ctrl->setParameter($this, "item_id", $item_ids[0]);
+            $ctrl->setParameter($this, "pupose", "Standard");
+            $ctrl->redirect($this, "editCastItem");
+        }
+        $ctrl->redirect($this, "listItems");
+    }
+
+
+    /**
+     * After pool insert
+     * @param $mob_ids
+     */
+    protected function afterPoolInsert($mob_ids)
+    {
+        $this->addMobsToCast($mob_ids);
+    }
+
+    protected function handleAutoplayTriggerObject () {
+        $this->user->writePref("mcst_autoplay", (int) $_GET["autoplay"]);
+        exit;
+    }
+    // end patch videocast – Killing 22.07.2020
 }

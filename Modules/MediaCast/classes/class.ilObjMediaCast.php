@@ -34,6 +34,16 @@ class ilObjMediaCast extends ilObject
     const VIEW_GALLERY = "gallery";
     const VIEW_IMG_GALLERY = "img_gallery";
     const VIEW_PODCAST = "podcast";
+    // begin patch videocast – Killing 22.07.2020
+    const VIEW_VCAST = "video";
+
+    const AUTOPLAY_NO = 0;
+    const AUTOPLAY_ACT = 1;
+    const AUTOPLAY_INACT = 2;
+
+    protected $nr_initial_videos = 5;
+    protected $new_items_in_lp = true;
+    // end patch videocast – Killing 22.07.2020
 
     /**
      * access to rss news
@@ -58,10 +68,16 @@ class ilObjMediaCast extends ilObject
         $this->db = $DIC->database();
         $this->user = $DIC->user();
         $this->type = "mcst";
-        parent::__construct($a_id, $a_call_by_reference);
+
+        // begin patch videocast – Killing 22.07.2020
+        $this->setViewMode(self::VIEW_VCAST);
+        $this->setAutoplayMode(self::AUTOPLAY_ACT);
+        // end patch videocast – Killing 22.07.2020
+
         $mcst_set = new ilSetting("mcst");
         $this->setDefaultAccess($mcst_set->get("defaultaccess") == "users" ? 0 : 1);
         $this->setOrder(self::ORDER_CREATION_DATE_DESC);
+        parent::__construct($a_id, $a_call_by_reference);
     }
 
     /**
@@ -143,6 +159,62 @@ class ilObjMediaCast extends ilObject
         return $this->itemsarray;
     }
 
+    // begin patch videocast – Killing 22.07.2020
+    /**
+     * Set autplay mode
+     * @param int $a_val autplay mode
+     */
+    function setAutoplayMode($a_val)
+    {
+        $this->autoplay_mode = $a_val;
+    }
+
+    /**
+     * Get autplay mode
+     * @return int autplay mode
+     */
+    function getAutoplayMode()
+    {
+        return $this->autoplay_mode;
+    }
+
+    /**
+     * Set number videos
+     * @param int $a_val number of initially shown videos
+     */
+    function setNumberInitialVideos($a_val)
+    {
+        $this->nr_initial_videos = $a_val;
+    }
+
+    /**
+     * Get number videos
+     * @return int number of initially shown videos
+     */
+    function getNumberInitialVideos()
+    {
+        return $this->nr_initial_videos;
+    }
+
+    /**
+     * Set new items automaticall in lp
+     * @param bool $a_val new items automatically in lp
+     */
+    function setNewItemsInLearningProgress($a_val)
+    {
+        $this->new_items_in_lp = $a_val;
+    }
+
+    /**
+     * Get new items automaticall in lp
+     * @return bool new items automatically in lp
+     */
+    function getNewItemsInLearningProgress()
+    {
+        return $this->new_items_in_lp;
+    }
+    // end patch videocast – Killing 22.07.2020
+
     /**
      * Get sorted items array
      *
@@ -183,7 +255,6 @@ class ilObjMediaCast extends ilObject
                 $med_items = ilUtil::sortArray($med_items, "order", "asc", true, true);
                 break;
         }
-
         return $med_items;
     }
     
@@ -275,6 +346,11 @@ class ilObjMediaCast extends ilObject
             ", def_access" .
             ", sortmode" .
             ", viewmode" .
+            // begin patch videocast – Killing 22.07.2020
+            ", autoplaymode" .
+            ", nr_initial_videos" .
+            ", new_items_in_lp" .
+            // end patch videocast – Killing 22.07.2020
             " ) VALUES (" .
             $ilDB->quote($this->getId(), "integer")
             . "," . $ilDB->quote((int) $this->getOnline(), "integer")
@@ -282,7 +358,12 @@ class ilObjMediaCast extends ilObject
             . "," . $ilDB->quote((int) $this->getDownloadable(), "integer")
             . "," . $ilDB->quote((int) $this->getDefaultAccess(), "integer")
             . "," . $ilDB->quote((int) $this->getOrder(), "integer")
-            . "," . $ilDB->quote((int) $this->getViewMode(), "text")
+            // begin patch videocast – Killing 22.07.2020
+            . "," . $ilDB->quote($this->getViewMode(), "text")
+            . "," . $ilDB->quote((int) $this->getAutoplayMode(), "integer")
+            . "," . $ilDB->quote((int) $this->getNumberInitialVideos(), "integer")
+            . "," . $ilDB->quote((int) $this->getNewItemsInLearningProgress(), "integer")
+            // end patch videocast – Killing 22.07.2020
             . ")";
         $ilDB->manipulate($query);
     }
@@ -309,6 +390,11 @@ class ilObjMediaCast extends ilObject
             ", def_access = " . $ilDB->quote((int) $this->getDefaultAccess(), "integer") .
             ", sortmode = " . $ilDB->quote((int) $this->getOrder(), "integer") .
             ", viewmode = " . $ilDB->quote($this->getViewMode(), "text") .
+            // begin patch videocast – Killing 22.07.2020
+            ", autoplaymode = " . $ilDB->quote($this->getAutoplayMode(), "integer") .
+            ", nr_initial_videos = " . $ilDB->quote($this->getNumberInitialVideos(), "integer") .
+            ", new_items_in_lp = " . $ilDB->quote($this->getNewItemsInLearningProgress(), "integer") .
+            // end patch videocast – Killing 22.07.2020
             " WHERE id = " . $ilDB->quote((int) $this->getId(), "integer");
 
         $ilDB->manipulate($query);
@@ -337,6 +423,11 @@ class ilObjMediaCast extends ilObject
         $this->setDefaultAccess($rec["def_access"]);
         $this->setOrder($rec["sortmode"]);
         $this->setViewMode($rec["viewmode"]);
+        // begin patch videocast – Killing 22.07.2020
+        $this->setAutoplayMode($rec["autoplaymode"]);
+        $this->setNumberInitialVideos($rec["nr_initial_videos"]);
+        $this->setNewItemsInLearningProgress($rec["new_items_in_lp"]);
+        // end patch videocast – Killing 22.07.2020
     }
 
 
@@ -441,7 +532,21 @@ class ilObjMediaCast extends ilObject
             $ilDB->manipulate($sql);
         }
     }
-    
+
+    // begin patch videocast – Killing 22.07.2020
+    /**
+     * Copy order
+     */
+    protected function copyOrder($newObj, $mapping)
+    {
+        $items = [];
+        foreach ($this->readOrder() as $i) {
+            $items[] = $mapping[$i];
+        }
+        $newObj->saveOrder($items);
+    }
+    // end patch videocast – Killing 22.07.2020
+
     /**
      * Clone media cast
      *
@@ -465,6 +570,12 @@ class ilObjMediaCast extends ilObject
         $new_obj->setDefaultAccess($this->getDefaultAccess());
         $new_obj->setOrder($this->getOrder());
         $new_obj->setViewMode($this->getViewMode());
+        // begin patch videocast – Killing 22.07.2020
+        $new_obj->setAutoplayMode($this->getAutoplayMode());
+        $new_obj->setNumberInitialVideos($this->getNumberInitialVideos());
+        $new_obj->setNewItemsInLearningProgress($this->getNewItemsInLearningProgress());
+        // end patch videocast – Killing 22.07.2020
+
         $new_obj->update();
 
         include_once("./Services/Block/classes/class.ilBlockSetting.php");
@@ -474,9 +585,12 @@ class ilObjMediaCast extends ilObject
         ilBlockSetting::_write("news", "keep_rss_min", $keeprss, 0, $new_obj->getId());
 
         // copy items
-        $this->copyItems($new_obj);
+        // begin patch videocast – Killing 22.07.2020
+        $mapping = $this->copyItems($new_obj);
         
         // copy order!?
+        $this->copyOrder($new_obj, $mapping);
+        // end patch videocast – Killing 22.07.2020
         
         // clone LP settings
         include_once('./Services/Tracking/classes/class.ilLPObjSettings.php');
@@ -504,7 +618,10 @@ class ilObjMediaCast extends ilObject
     public function copyItems($a_new_obj)
     {
         $ilUser = $this->user;
-        
+
+        // begin patch videocast – Killing 22.07.2020
+        $item_mapping = [];
+        // end patch videocast – Killing 22.07.2020
         include_once("./Services/MediaObjects/classes/class.ilObjMediaObject.php");
         foreach ($this->readItems(true) as $item) {
             // copy media object
@@ -527,7 +644,11 @@ class ilObjMediaCast extends ilObject
             $mc_item->setVisibility($item["visibility"]);
             $mc_item->create();
             $this->mob_mapping[$mob_id] = $new_mob->getId();
+            // begin patch videocast – Killing 22.07.2020
+            $item_mapping[$item["id"]] = $mc_item->getId();
         }
+        return $item_mapping;
+        // end patch videocast – Killing 22.07.2020
     }
     
     public function handleLPUpdate($a_user_id, $a_mob_id)
@@ -545,4 +666,64 @@ class ilObjMediaCast extends ilObject
         require_once 'Services/Tracking/classes/class.ilLPStatusWrapper.php';
         ilLPStatusWrapper::_updateStatus($this->getId(), $a_user_id);
     }
+
+    // begin patch videocast – Killing 22.07.2020
+    /**
+     * Add mob to cast
+     * @param        $mob_id
+     * @param        $user_id
+     * @param string $long_desc
+     */
+    public function addMobToCast($mob_id, $user_id, $long_desc = "")
+    {
+        $mob = new ilObjMediaObject($mob_id);
+        $news_set = new ilSetting("news");
+        $enable_internal_rss = $news_set->get("enable_rss_for_internal");
+
+        // create new media cast item
+        $mc_item = new ilNewsItem();
+        $mc_item->setMobId($mob->getId());
+        $mc_item->setContentType(NEWS_AUDIO);
+        $mc_item->setContextObjId($this->getId());
+        $mc_item->setContextObjType($this->getType());
+        $mc_item->setUserId($user_id);
+        $med_item = $mob->getMediaItem("Standard");
+        $mc_item->setPlaytime($this->getPlaytimeForSeconds($med_item->getDuration()));
+        $mc_item->setTitle($mob->getTitle());
+        $mc_item->setContent($mob->getLongDescription());
+        if ($long_desc != "") {
+            $mc_item->setContent($long_desc);
+        }
+        $mc_item->setLimitation(false);
+        // @todo handle visibility
+        $mc_item->create();
+
+        $lp = ilObjectLP::getInstance($this->getId());
+
+        // see ilLPListOfSettingsGUI assign
+        $collection = $lp->getCollectionInstance();
+        if ($collection && $collection->hasSelectableItems()) {
+            $collection->activateEntries([$mob_id]);
+            $lp->resetCaches();
+            ilLPStatusWrapper::_refreshStatus($this->getId());
+        }
+        return $mc_item->getId();
+    }
+
+    /**
+     * Get playtime for seconds
+     * @param int
+     * @return string
+     */
+    protected function getPlaytimeForSeconds(int $seconds)
+    {
+        $hours = floor($seconds/3600);
+        $minutes = floor(($seconds % 3600) / 60);
+        $seconds = $seconds % 60;
+        $duration = str_pad($hours, 2, "0", STR_PAD_LEFT) . ":" .
+            str_pad($minutes, 2, "0", STR_PAD_LEFT) . ":" .
+            str_pad($seconds, 2, "0", STR_PAD_LEFT);
+        return $duration;
+    }
+    // end patch videocast – Killing 22.07.2020
 }

@@ -11,12 +11,57 @@
  */
 class ilPlayerUtil
 {
+    // begin patch videocast – Killing 22.07.2020
+    public static function usePatch() : bool
+    {
+        global $DIC;
+
+        $ctrl = $DIC->ctrl();
+        if (strtolower($ctrl->getCmdClass()) == "ilobjmediacastgui" && $ctrl->getCmd() == "showContent") {
+            $cast = new ilObjMediaCast((int) $_GET["ref_id"]);
+            if ($cast->getViewMode() == ilObjMediaCast::VIEW_VCAST) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        $ref_id = (int) $_GET["ref_id"];
+        if ($ref_id == 0 && $_GET["target"] != "") {
+            $t = explode("_", $_GET["target"]);
+            if (count($t) > 0) {
+                $ref_id = (int) $t[count($t) - 1];
+            }
+        }
+        if ($ref_id > 0) {
+            $obj_id = ilObject::_lookupObjId($ref_id);
+            if (ilContainerPage::_exists("cont", $obj_id)) {
+                $page = new ilContainerPage($obj_id);
+                $content = $page->getXMLContent();
+                if (is_int(strpos($content, 'Plugged PluginName="PCVideoCast"'))) {
+                    return true;
+                }
+            }
+        }
+
+
+        return false;
+    }
+    // end patch videocast – Killing 22.07.2020
+
     /**
      * Get local path of jQuery file
      */
     public static function getLocalMediaElementJsPath()
     {
-        return "./libs/bower/bower_components/mediaelement/build/mediaelement-and-player.min.js";
+        // begin patch videocast – Killing 22.07.2020
+        if (self::usePatch()) {
+            return ["./libs/patch/mediaelement/build/mediaelement-and-player.min.js",
+                    "./libs/patch/mediaelement/build/renderers/vimeo.min.js"
+            ];
+        }
+        return ["./libs/bower/bower_components/mediaelement/build/mediaelement-and-player.min.js"];
+        // end patch videocast – Killing 22.07.2020
     }
 
     /**
@@ -24,7 +69,13 @@ class ilPlayerUtil
      */
     public static function getLocalMediaElementCssPath()
     {
-        return "./libs/bower/bower_components/mediaelement/build/mediaelementplayer.min.css";
+        // begin patch videocast – Killing 22.07.2020
+        if (self::usePatch()) {
+            return "./libs/patch/mediaelement/build/mediaelementplayer.min.css";
+        } else {
+            return "./libs/bower/bower_components/mediaelement/build/mediaelementplayer.min.css";
+        }
+        // end patch videocast – Killing 22.07.2020
     }
 
     /**
@@ -67,7 +118,9 @@ class ilPlayerUtil
      */
     public static function getJsFilePaths()
     {
-        return array(self::getLocalMediaElementJsPath());
+        // begin patch videocast – Killing 22.07.2020
+        return self::getLocalMediaElementJsPath();
+        // end patch videocast – Killing 22.07.2020
     }
     
 
@@ -78,7 +131,13 @@ class ilPlayerUtil
      */
     public static function getFlashVideoPlayerDirectory()
     {
-        return "libs/bower/bower_components/mediaelement/build";
+        // begin patch videocast – Killing 22.07.2020
+        if (self::usePatch()) {
+            return "libs/patch/mediaelement/build";
+        } else {
+            return "libs/bower/bower_components/mediaelement/build";
+        }
+        // end patch videocast – Killing 22.07.2020
     }
     
     

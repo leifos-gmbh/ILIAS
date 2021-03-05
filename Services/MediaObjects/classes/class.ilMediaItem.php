@@ -43,6 +43,10 @@ class ilMediaItem
     public $color1;			// map area line color 1
     public $color2;			// map area line color 2
 
+    // begin patch videocast – Killing 22.07.2020
+    protected $duration = 0;
+    // end patch videocast – Killing 22.07.2020
+
     /**
      * @var string
      */
@@ -117,6 +121,26 @@ class ilMediaItem
         return $this->nr;
     }
 
+    // begin patch videocast – Killing 22.07.2020
+    /**
+     * Set duration
+     * @param int $a_val duration
+     */
+    function setDuration($a_val)
+    {
+        $this->duration = $a_val;
+    }
+
+    /**
+     * Get duration
+     * @return int duration
+     */
+    function getDuration()
+    {
+        return $this->duration;
+    }
+    // end patch videocast – Killing 22.07.2020
+
     /**
      * Set text representation
      *
@@ -168,7 +192,9 @@ class ilMediaItem
         $item_id = $ilDB->nextId("media_item");
         $query = "INSERT INTO media_item (id,mob_id, purpose, location, " .
             "location_type, format, width, " .
-            "height, halign, caption, nr, text_representation, upload_hash) VALUES " .
+            // begin patch videocast – Killing 22.07.2020
+            "height, halign, caption, nr, text_representation, upload_hash, duration) VALUES " .
+            // end patch videocast – Killing 22.07.2020
             "(" .
             $ilDB->quote($item_id, "integer") . "," .
             $ilDB->quote($this->getMobId(), "integer") . "," .
@@ -182,7 +208,10 @@ class ilMediaItem
             $ilDB->quote($this->getCaption(), "text") . "," .
             $ilDB->quote($this->getNr(), "integer") . "," .
             $ilDB->quote($this->getTextRepresentation(), "text") . "," .
-            $ilDB->quote($this->getUploadHash(), "text") .
+            // begin patch videocast – Killing 22.07.2020
+            $ilDB->quote($this->getUploadHash(), "text") . "," .
+            $ilDB->quote($this->getDuration(), "integer") .
+            // end patch videocast – Killing 22.07.2020
             ")";
         $ilDB->manipulate($query);
         
@@ -227,7 +256,10 @@ class ilMediaItem
             " caption = " . $ilDB->quote($this->getCaption(), "text") . "," .
             " nr = " . $ilDB->quote($this->getNr(), "integer") . "," .
             " text_representation = " . $ilDB->quote($this->getTextRepresentation(), "text") . "," .
-            " upload_hash = " . $ilDB->quote($this->getUploadHash(), "text") .
+            // begin patch videocast – Killing 22.07.2020
+            " upload_hash = " . $ilDB->quote($this->getUploadHash(), "text") . "," .
+            " duration = " . $ilDB->quote($this->getDuration(), "integer") .
+            // end patch videocast – Killing 22.07.2020
             " WHERE id = " . $ilDB->quote($this->getId(), "integer");
         $ilDB->manipulate($query);
 
@@ -300,6 +332,9 @@ class ilMediaItem
             $this->setThumbTried($item_rec["tried_thumb"]);
             $this->setTextRepresentation($item_rec["text_representation"]);
             $this->setUploadHash($item_rec["upload_hash"]);
+            // begin patch videocast – Killing 22.07.2020
+            $this->setDuration((int) $item_rec["duration"]);
+            // end patch videocast – Killing 22.07.2020
 
             // get item parameter
             $query = "SELECT * FROM mob_parameter WHERE med_item_id = " .
@@ -434,6 +469,9 @@ class ilMediaItem
             $media_item->setThumbTried($item_rec["tried_thumb"]);
             $media_item->setTextRepresentation($item_rec["text_representation"]);
             $media_item->setUploadHash($item_rec["upload_hash"]);
+            // begin patch videocast – Killing 22.07.2020
+            $media_item->setDuration((int) $item_rec["duration"]);
+            // end patch videocast – Killing 22.07.2020
 
             // get item parameter
             $query = "SELECT * FROM mob_parameter WHERE med_item_id = " .
@@ -1215,6 +1253,18 @@ class ilMediaItem
             $this->setParameter($k, $v);
         }
     }
+
+    // begin patch videocast – Killing 22.07.2020
+    /**
+     * Determine the duration by analysing the file
+     */
+    public function determineDuration() {
+        $ana = new ilMediaAnalyzer();
+        $ana->setFile(ilObjMediaObject::_getDirectory($this->getMobId()) . "/" . $this->getLocation());
+        $ana->analyzeFile();
+        $this->setDuration((int) $ana->getPlaytimeSeconds());
+    }
+    // end patch videocast – Killing 22.07.2020
 
     /**
      * Get media items for upload hash

@@ -1,0 +1,31 @@
+<!-- patch (whole file) videocast – Killing 22.07.2020 -->
+<!-- BEGIN autoplay -->
+<div class="ilRight">
+    <strong style="padding-right:5px;">{TXT_AUTOPLAY}</strong> {TOGGLE}
+</div>
+<script>
+  $(function () {
+    $(document).on('{AUTOPLAY_ON}', function (event, signalData) {
+      il.VideoPlaylist.autoplay('mcst_playlist', true);
+    });
+    $(document).on('{AUTOPLAY_OFF}', function (event, signalData) {
+      il.VideoPlaylist.autoplay('mcst_playlist', false);
+    });
+  });
+</script>
+<!-- END autoplay -->
+<div id="mcst-prev-items">{PREV}</div>
+<div id="mcst_playlist">
+<!-- BEGIN item -->
+<div class="media">
+    <div class="media-left" style="width: 40%;">
+        {IMG}
+    </div>
+    <div class="media-body">
+        <div class="il-multi-line-cap-2"><strong>{TITLE}</strong></div>
+        <p class="il-multi-line-cap-2 light">{DESCRIPTION}</p>
+    </div>
+</div>
+<!-- END item -->
+</div>
+<div id="mcst-next-items">{NEXT}</div>

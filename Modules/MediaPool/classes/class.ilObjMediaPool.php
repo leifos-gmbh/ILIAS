@@ -186,8 +186,10 @@ class ilObjMediaPool extends ilObject
     
     
     /**
-    * get media pool folder tree
-    */
+     * begin patch videocast – Killing 22.07.2020
+     * @return ilTree
+     * end patch videocast – Killing 22.07.2020
+     */
     public function &getTree()
     {
         return $this->mep_tree;

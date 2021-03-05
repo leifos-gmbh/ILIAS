@@ -1937,23 +1937,61 @@ class ilObjMediaObject extends ilObject
      * @param
      * @return
      */
-    public function generatePreviewPic($a_width, $a_height)
+    // begin patch videocast – Killing 22.07.2020
+    public function generatePreviewPic($a_width = 0, $a_height = 0, $sec = 1)
+    // end patch videocast – Killing 22.07.2020
     {
         $item = $this->getMediaItem("Standard");
 
-        if ($item->getLocationType() == "LocalFile" &&
-            is_int(strpos($item->getFormat(), "image/"))) {
-            $dir = ilObjMediaObject::_getDirectory($this->getId());
-            $file = $dir . "/" .
-                $item->getLocation();
-            if (is_file($file)) {
-                if (ilUtil::isConvertVersionAtLeast("6.3.8-3")) {
-                    ilUtil::execConvert(ilUtil::escapeShellArg($file) . "[0] -geometry " . $a_width . "x" . $a_height . "^ -gravity center -extent " . $a_width . "x" . $a_height . " PNG:" . $dir . "/mob_vpreview.png");
-                } else {
-                    ilUtil::convertImage($file, $dir . "/mob_vpreview.png", "PNG", $a_width . "x" . $a_height);
+        // begin patch videocast – Killing 22.07.2020
+        if ($item->getLocationType() == "LocalFile") {
+            if (is_int(strpos($item->getFormat(), "image/"))) {
+                // end patch videocast – Killing 22.07.2020
+                $dir = ilObjMediaObject::_getDirectory($this->getId());
+                $file = $dir . "/" .
+                    $item->getLocation();
+                if (is_file($file)) {
+                    if (ilUtil::isConvertVersionAtLeast("6.3.8-3")) {
+                        ilUtil::execConvert(ilUtil::escapeShellArg($file) . "[0] -geometry " . $a_width . "x" . $a_height . "^ -gravity center -extent " . $a_width . "x" . $a_height . " PNG:" . $dir . "/mob_vpreview.png");
+                    } else {
+                        ilUtil::convertImage($file, $dir . "/mob_vpreview.png", "PNG", $a_width . "x" . $a_height);
+                    }
+                }
+            }
+            // begin patch videocast – Killing 22.07.2020
+            if (is_int(strpos($item->getFormat(), "video/"))) {
+                try {
+                    if ($sec < 0) {
+                        $sec = 0;
+                    }
+                    if ($this->getVideoPreviewPic() != "") {
+                        $this->removeAdditionalFile($this->getVideoPreviewPic(true));
+                    }
+                    include_once("./Services/MediaObjects/classes/class.ilFFmpeg.php");
+                    $med = $this->getMediaItem("Standard");
+                    $mob_file = ilObjMediaObject::_getDirectory($this->getId()) . "/" . $med->getLocation();
+                    ilFFmpeg::extractImage(
+                        $mob_file,
+                        "mob_vpreview.png",
+                        ilObjMediaObject::_getDirectory($this->getId()),
+                        $sec
+                    );
+                } catch (ilException $e) {
+                    $ret = ilFFmpeg::getLastReturnValues();
+
+                    $message = '';
+                    if (is_array($ret) && count($ret) > 0) {
+                        $message = "\n" . implode("\n", $ret);
+                    }
+
+                    /** @var ilLogger $logger */
+                    $logger = $GLOBALS['DIC']->logger()->mob();
+                    $logger->warning($e->getMessage() . $message);
+                    $logger->logStack(ilLogLevel::WARNING);
                 }
             }
         }
+        // end patch videocast – Killing 22.07.2020
     }
 
     /**
@@ -2082,4 +2120,38 @@ class ilObjMediaObject extends ilObject
             ilUtil::rRenameSuffix($a_dir, "html", "sec");        // see #20187
         }
     }
+
+    // begin patch videocast – Killing 22.07.2020
+    /**
+     * Get external metadata
+     * @param
+     * @return
+     */
+    public function getExternalMetadata()
+    {
+        $st_item = $this->getMediaItem("Standard");
+        if ($st_item->getLocationType() == "Reference") {
+            if (ilExternalMediaAnalyzer::isVimeo($st_item->getLocation())) {
+                $st_item->setFormat("video/vimeo");
+                $par = ilExternalMediaAnalyzer::extractVimeoParameters($st_item->getLocation());
+                $meta = ilExternalMediaAnalyzer::getVimeoMetadata($par["id"]);
+                $this->setTitle($meta["title"]);
+                $description = str_replace("\n", "", $meta["description"]);
+                $description = str_replace(["<br>", "<br />"], ["\n", "\n"], $description);
+                $description = strip_tags($description);
+                $this->setDescription($description);
+                $st_item->setDuration((int) $meta["duration"]);
+                $url = parse_url($meta["thumbnail_url"]);
+                $file = basename($url["path"]);
+                copy ($meta["thumbnail_url"],
+                    ilObjMediaObject::_getDirectory($this->getId())."/mob_vpreview.".
+                    pathinfo($file, PATHINFO_EXTENSION)
+                );
+
+            }
+        }
+
+    }
+    // end patch videocast – Killing 22.07.2020
+
 }

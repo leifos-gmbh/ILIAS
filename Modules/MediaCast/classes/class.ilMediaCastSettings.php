@@ -36,6 +36,9 @@ class ilMediaCastSettings
     private $defaultAccess = "users";
     private $purposeSuffixes = array();
     private $mimeTypes = array();
+    // begin patch videocast – Killing 4.12.2020
+    private $video_threshold = 0;
+    // end patch videocast
 
     /**
      * singleton contructor
@@ -112,7 +115,26 @@ class ilMediaCastSettings
         $this->mimeTypes = $mimeTypes;
     }
 
-    
+    // begin patch videocast – Killing 4.12.2020
+    /**
+     * Set video threshold
+     * @param int $a_val video threshold
+     */
+    function setVideoCompletionThreshold($a_val)
+    {
+        $this->video_threshold = $a_val;
+    }
+
+    /**
+     * Get video threshold
+     * @return int
+     */
+    function getVideoCompletionThreshold()
+    {
+        return $this->video_threshold;
+    }
+    // end patch videocast
+
     /**
      * save
      *
@@ -124,6 +146,9 @@ class ilMediaCastSettings
             $this->storage->set($purpose . "_types", implode(",", $filetypes));
         }
         $this->storage->set("defaultaccess", $this->defaultAccess);
+        // begin patch videocast – Killing 4.12.2020
+        $this->storage->set("video_threshold", $this->video_threshold);
+        // end patch videocast
         $this->storage->set("mimetypes", implode(",", $this->getMimeTypes()));
     }
 
@@ -142,6 +167,9 @@ class ilMediaCastSettings
             }
         }
         $this->setDefaultAccess($this->storage->get("defaultaccess"));
+        // begin patch videocast – Killing 4.12.2020
+        $this->setVideoCompletionThreshold($this->storage->get("video_threshold"));
+        // end patch videocast
         if ($this->storage->get("mimetypes")) {
             $this->setMimeTypes(explode(",", $this->storage->get("mimetypes")));
         }

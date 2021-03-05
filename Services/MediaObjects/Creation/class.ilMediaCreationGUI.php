@@ -4,6 +4,8 @@
 
 /* Copyright (c) 1998-2020 ILIAS open source, Extended GPL, see docs/LICENSE */
 
+use ILIAS\FileUpload\Location;
+
 /**
  * @author Alexander Killing <killing@leifos.de>
  * @ilCtrl_Calls ilMediaCreationGUI: ilPropertyFormGUI
@@ -43,12 +45,22 @@ class ilMediaCreationGUI
     /**
      * @var closure
      */
+    protected $finish_single_upload;
+
+    /**
+     * @var closure
+     */
     protected $after_url_saving;
 
     /**
      * @var closure
      */
     protected $after_pool_insert;
+
+    /**
+     * @var closure
+     */
+    protected $on_mob_update;
 
     /**
      * @var \ilAccessHandler
@@ -71,13 +83,27 @@ class ilMediaCreationGUI
     protected $pool_view = self::POOL_VIEW_FOLDER;
 
     /**
+     * @var \ILIAS\FileUpload\FileUpload
+     */
+    protected $upload;
+
+    /**
+     * @var ilLogger
+     */
+    protected $mob_log;
+
+
+    /**
      * Constructor
      */
     public function __construct(
         array $accept_types,
         closure $after_upload,
         closure $after_url_saving,
-        closure $after_pool_insert)
+        closure $after_pool_insert,
+        closure $finish_single_upload = null,
+        closure $on_mob_update = null
+    )
     {
         global $DIC;
 
@@ -89,11 +115,15 @@ class ilMediaCreationGUI
         $this->ctrl = $DIC->ctrl();
         $this->main_tpl = $DIC->ui()->mainTemplate();
         $this->ui = $DIC->ui();
+        $this->upload = $DIC->upload();
+        $this->mob_log = $DIC->logger()->mob();
 
         $this->accept_types = $accept_types;
         $this->after_upload = $after_upload;
         $this->after_url_saving = $after_url_saving;
         $this->after_pool_insert = $after_pool_insert;
+        $this->finish_single_upload = $finish_single_upload;
+        $this->on_mob_update = $on_mob_update;
 
         $this->ctrl->saveParameter($this, ["mep", "pool_view"]);
 
@@ -116,6 +146,15 @@ class ilMediaCreationGUI
         if (in_array(self::TYPE_VIDEO, $this->accept_types)) {
             $suffixes[] = "mp4";
         }
+        if (in_array(self::TYPE_AUDIO, $this->accept_types)) {
+            $suffixes[] = "mp3";
+        }
+        if (in_array(self::TYPE_IMAGE, $this->accept_types)) {
+            $suffixes[] = "jpeg";
+            $suffixes[] = "jpg";
+            $suffixes[] = "png";
+            $suffixes[] = "gif";
+        }
         return $suffixes;
     }
 
@@ -129,6 +168,14 @@ class ilMediaCreationGUI
         if (in_array(self::TYPE_VIDEO, $this->accept_types)) {
             $mimes[] = "video/vimeo";
             $mimes[] = "video/mp4";
+        }
+        if (in_array(self::TYPE_AUDIO, $this->accept_types)) {
+            $mimes[] = "audio/mpeg";
+        }
+        if (in_array(self::TYPE_IMAGE, $this->accept_types)) {
+            $mimes[] = "image/png";
+            $mimes[] = "image/jpeg";
+            $mimes[] = "image/gif";
         }
         return $mimes;
     }
@@ -152,7 +199,8 @@ class ilMediaCreationGUI
 
             default:
                 if (in_array($cmd, ["creationSelection", "uploadFile", "saveUrl", "cancel", "listPoolItems",
-                    "insertFromPool", "poolSelection", "selectPool", "applyFilter", "resetFilter"])) {
+                    "insertFromPool", "poolSelection", "selectPool", "applyFilter", "resetFilter", "performBulkUpload",
+                    "editTitlesAndDescriptions", "saveTitlesAndDescriptions"])) {
                     $this->$cmd();
                 }
         }
@@ -207,6 +255,7 @@ class ilMediaCreationGUI
         $ctrl = $this->ctrl;
         $lng = $this->lng;
 
+        /*
         include_once("Services/Form/classes/class.ilPropertyFormGUI.php");
         $form = new \ilPropertyFormGUI();
 
@@ -219,7 +268,21 @@ class ilMediaCreationGUI
         $form->addCommandButton("cancel", $lng->txt("cancel"));
 
         $form->setTitle($lng->txt("mob_upload_file"));
+        $form->setFormAction($ctrl->getFormAction($this));*/
+
+        $form = new ilPropertyFormGUI();
+
         $form->setFormAction($ctrl->getFormAction($this));
+        $form->setPreventDoubleSubmission(false);
+
+        $item = new ilFileStandardDropzoneInputGUI($lng->txt("files"), 'media_files');
+        $item->setUploadUrl($ctrl->getLinkTarget($this, "performBulkUpload", "", true, true));
+        $item->setSuffixes($this->getSuffixes());
+        $item->setRequired(true);
+        $item->setMaxFiles(20);
+        $form->addItem($item);
+        $form->addCommandButton("performBulkUpload", $lng->txt("upload"));
+        $form->setTitle($lng->txt("mob_upload_file"));
 
         return $form;
     }
@@ -336,6 +399,204 @@ class ilMediaCreationGUI
             ($this->after_upload)($mob->getId());
         }
 
+    }
+
+    /**
+     * Save bulk upload form
+     */
+    public function performBulkUpload()
+    {
+        $ctrl = $this->ctrl;
+        $lng = $this->lng;
+        $main_tpl = $this->main_tpl;
+        $upload = $this->upload;
+        $log = $this->mob_log;
+
+        $form = $this->initUploadForm();
+        if ($form->checkInput()) {
+            $item_ids = [];
+            // Check if this is a request to upload a file
+            $log->debug("checking for uploads...");
+            if ($upload->hasUploads()) {
+                $log->debug("has upload...");
+                try {
+                    $upload->process();
+                    $log->debug("nr of results: " . count($upload->getResults()));
+                    foreach ($upload->getResults() as $result) {
+                        $title = $result->getName();
+
+                        $mob = new ilObjMediaObject();
+                        $mob->setTitle($title);
+                        $mob->setDescription("");
+                        $mob->create();
+
+                        $mob->createDirectory();
+                        $media_item = new ilMediaItem();
+                        $mob->addMediaItem($media_item);
+                        $media_item->setPurpose("Standard");
+
+                        $mob_dir = ilObjMediaObject::_getRelativeDirectory($mob->getId());
+                        $file_name = ilObjMediaObject::fixFilename($title);
+                        $file = $mob_dir . "/" . $file_name;
+
+                        $upload->moveOneFileTo(
+                            $result,
+                            $mob_dir,
+                            Location::WEB,
+                            $file_name,
+                            true
+                        );
+
+                        /* this neds to go to a callback
+                        $mep_item = new ilMediaPoolItem();
+                        $mep_item->setTitle($title);
+                        $mep_item->setType("mob");
+                        $mep_item->setForeignId($mob->getId());
+                        $mep_item->create();
+
+                        $tree = $this->object->getTree();
+                        $parent = ($_GET["mepitem_id"] == "")
+                            ? $tree->getRootId()
+                            : $_GET["mepitem_id"];
+                        $tree->insertNode($mep_item->getId(), $parent);
+                        */
+
+                        // get mime type
+                        $format = ilObjMediaObject::getMimeType($file);
+                        $location = $file_name;
+
+                        // set real meta and object data
+                        $media_item->setFormat($format);
+                        $media_item->setLocation($location);
+                        $media_item->setLocationType("LocalFile");
+                        $media_item->setUploadHash(ilUtil::stripSlashes($_POST["ilfilehash"]));
+                        $mob->update();
+                        $item_ids[] = $mob->getId();
+
+                        $mob = new ilObjMediaObject($mob->getId());
+                        $mob->generatePreviewPic(320, 240);
+                    }
+                } catch (Exception $e) {
+                    $log->debug("Got exception: " . $e->getMessage());
+                    echo json_encode(array( 'success' => false, 'message' => $e->getMessage()));
+                }
+                $log->debug("end of 'has_uploads'");
+            }
+            $log->debug("has no upload...");
+
+            $log->debug("calling redirect... (" . $_POST["ilfilehash"] . ")");
+
+            ($this->after_upload)($item_ids);
+
+            ilUtil::sendSuccess($lng->txt("msg_obj_modified"), true);
+            $ctrl->setParameter($this, "mep_hash", $_POST["ilfilehash"]);
+            $ctrl->redirect($this, "editTitlesAndDescriptions");
+        }
+
+        $form->setValuesByPost();
+        $main_tpl->setContent($form->getHtml());
+    }
+
+    /**
+     * Edit titles and descriptions
+     */
+    protected function editTitlesAndDescriptions()
+    {
+        $ctrl = $this->ctrl;
+        $lng = $this->lng;
+
+        $ctrl->saveParameter($this, "mep_hash");
+
+        $main_tpl = $this->main_tpl;
+
+        include_once("./Services/MediaObjects/classes/class.ilMediaItem.php");
+        $media_items = ilMediaItem::getMediaItemsForUploadHash($_GET["mep_hash"]);
+
+        include_once("./Services/Accordion/classes/class.ilAccordionGUI.php");
+
+        $tb = new ilToolbarGUI();
+        $tb->setFormAction($ctrl->getFormAction($this));
+        $tb->addFormButton($lng->txt("save"), "saveTitlesAndDescriptions");
+        $tb->setOpenFormTag(true);
+        $tb->setCloseFormTag(false);
+        $tb->setId("tb_top");
+
+        if (count($media_items) == 1 && $this->finish_single_upload) {
+            $mi = current($media_items);
+            ($this->finish_single_upload)($mi["mob_id"]);
+            return;
+        }
+
+        $html = $tb->getHTML();
+        foreach ($media_items as $mi) {
+            $acc = new ilAccordionGUI();
+            $acc->setBehaviour(ilAccordionGUI::ALL_CLOSED);
+            $acc->setId("acc_" . $mi["mob_id"]);
+
+            $mob = new ilObjMediaObject($mi["mob_id"]);
+            $form = $this->initMediaBulkForm($mi["mob_id"], $mob->getTitle());
+            $acc->addItem($mob->getTitle(), $form->getHTML());
+
+            $html .= $acc->getHTML();
+        }
+
+        $html .= $tb->getHTML();
+        $tb->setOpenFormTag(false);
+        $tb->setCloseFormTag(true);
+        $tb->setId("tb_bottom");
+
+        $main_tpl->setContent($html);
+    }
+
+    /**
+     * Init media bulk form.
+     */
+    public function initMediaBulkForm($a_id, $a_title)
+    {
+        $lng = $this->lng;
+
+        include_once("Services/Form/classes/class.ilPropertyFormGUI.php");
+        $form = new ilPropertyFormGUI();
+        $form->setOpenTag(false);
+        $form->setCloseTag(false);
+
+        // title
+        $ti = new ilTextInputGUI($lng->txt("title"), "title_" . $a_id);
+        $ti->setValue($a_title);
+        $form->addItem($ti);
+
+        // description
+        $ti = new ilTextAreaInputGUI($lng->txt("description"), "description_" . $a_id);
+        $form->addItem($ti);
+
+        return $form;
+    }
+
+    /**
+     * Save titles and descriptions
+     */
+    protected function saveTitlesAndDescriptions()
+    {
+        $lng = $this->lng;
+        $ctrl = $this->ctrl;
+
+        $media_items = ilMediaItem::getMediaItemsForUploadHash($_GET["mep_hash"]);
+
+        foreach ($media_items as $mi) {
+            $mob = new ilObjMediaObject($mi["mob_id"]);
+            $form = $this->initMediaBulkForm($mi["mob_id"], $mob->getTitle());
+            $form->checkInput();
+            $title = $form->getInput("title_" . $mi["mob_id"]);
+            $desc = $form->getInput("description_" . $mi["mob_id"]);
+            if (trim($title) != "") {
+                $mob->setTitle($title);
+            }
+            $mob->setDescription($desc);
+            $mob->update();
+            ($this->on_mob_update)($mob->getId());
+        }
+        ilUtil::sendSuccess($lng->txt("msg_obj_modified"), true);
+        $ctrl->returnToParent($this);
     }
 
     /**

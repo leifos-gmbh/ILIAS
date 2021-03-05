@@ -100,12 +100,28 @@ class ilObjMediaCastGUI extends ilObjectGUI
                 $this->ctrl->setReturn($this, "listItems");
                 $ilTabs->activateTab("content");
                 $this->addContentSubTabs("manage");
-                $creation = new ilMediaCreationGUI([ilMediaCreationGUI::TYPE_VIDEO], function($mob_id) {
+                $med_type = [];
+                switch ($this->object->getViewMode()) {
+                    case ilObjMediaCast::VIEW_VCAST:
+                        $med_type = [ilMediaCreationGUI::TYPE_VIDEO];
+                        break;
+                    case ilObjMediaCast::VIEW_IMG_GALLERY:
+                        $med_type = [ilMediaCreationGUI::TYPE_IMAGE];
+                        break;
+                    case ilObjMediaCast::VIEW_PODCAST:
+                        $med_type = [ilMediaCreationGUI::TYPE_AUDIO];
+                        break;
+                }
+                $creation = new ilMediaCreationGUI($med_type, function($mob_id) {
                     $this->afterUpload($mob_id);
                 }, function($mob_id, $long_desc) {
                     $this->afterUrlSaving($mob_id, $long_desc);
                 },function($mob_ids) {
                     $this->afterPoolInsert($mob_ids);
+                }, function ($mob_id) {
+                    $this->finishSingleUpload($mob_id);
+                }, function ($mob_id) {
+                    $this->onMobUpdate($mob_id);
                 });
                 $this->ctrl->forwardCommand($creation);
                 break;
@@ -237,7 +253,12 @@ class ilObjMediaCastGUI extends ilObjectGUI
         
         if ($ilAccess->checkAccess("write", "", $_GET["ref_id"]) && !$a_presentation_mode) {
             // begin patch videocast – Killing 22.07.2020
-            if ($this->object->getViewMode() == ilObjMediaCast::VIEW_VCAST) {
+            if (in_array($this->object->getViewMode(),
+                [
+                    ilObjMediaCast::VIEW_VCAST,
+                    ilObjMediaCast::VIEW_IMG_GALLERY,
+                    ilObjMediaCast::VIEW_PODCAST
+                ])) {
                 $ilToolbar->addButton($lng->txt("add"), $this->ctrl->getLinkTargetByClass("ilMediaCreationGUI", ""));
             } else {
                 $ilToolbar->addButton($lng->txt("add"), $this->ctrl->getLinkTarget($this, "addCastItem"));
@@ -433,7 +454,37 @@ class ilObjMediaCastGUI extends ilObjectGUI
         $this->getCastItemValues();
         $tpl->setContent($this->form_gui->getHTML());
     }
-    
+
+    /**
+     * @param $mob_id
+     */
+    public function finishSingleUpload($mob_id) {
+        foreach ($this->object->getSortedItemsArray() as $item) {
+            if ($mob_id == $item["mob_id"]) {
+                $this->ctrl->setParameter($this, "item_id", $item["id"]);
+                $this->ctrl->redirect($this, "editCastItem");
+            }
+        }
+        $this->ctrl->redirect($this, "listItems");
+    }
+
+    /**
+     * On mob upate
+     * @param int $mob_id
+     */
+    protected function onMobUpdate(int $mob_id)
+    {
+        foreach ($this->object->getSortedItemsArray() as $item) {
+            if ($mob_id == $item["mob_id"]) {
+                $mob = new ilObjMediaObject($item["mob_id"]);
+                $mc_item = new ilNewsItem($item["id"]);
+                $mc_item->setTitle($mob->getTitle());
+                $mc_item->setContent($mob->getLongDescription());
+                $mc_item->update();
+            }
+        }
+    }
+
     /**
     * Init add cast item form.
     */
@@ -1926,13 +1977,15 @@ class ilObjMediaCastGUI extends ilObjectGUI
      * After mob upload
      * @param $mob_id
      */
-    protected function afterUpload($mob_id) {
-        $mob = new ilObjMediaObject($mob_id);
-        $med_item = $mob->getMediaItem("Standard");
-        $med_item->determineDuration();
-        $med_item->update();
+    protected function afterUpload($mob_ids) {
+        foreach ($mob_ids as $mob_id) {
+            $mob = new ilObjMediaObject($mob_id);
+            $med_item = $mob->getMediaItem("Standard");
+            $med_item->determineDuration();
+            $med_item->update();
+        }
 
-        $this->addMobsToCast([$mob_id]);
+        $this->addMobsToCast($mob_ids, "", false);
     }
 
     /**
@@ -1949,7 +2002,8 @@ class ilObjMediaCastGUI extends ilObjectGUI
      * @param array $mob_ids
      * @param string $long_desc
      */
-    protected function addMobsToCast($mob_ids, $long_desc = "") {
+    protected function addMobsToCast($mob_ids, $long_desc = "", $redirect = true)
+    {
         $ctrl = $this->ctrl;
         $user = $this->user;
 
@@ -1958,12 +2012,14 @@ class ilObjMediaCastGUI extends ilObjectGUI
             $item_ids[] = $this->object->addMobToCast($mob_id, $user->getId(), $long_desc);
         }
 
-        if (count($item_ids) == 1) {
-            $ctrl->setParameter($this, "item_id", $item_ids[0]);
-            $ctrl->setParameter($this, "pupose", "Standard");
-            $ctrl->redirect($this, "editCastItem");
+        if ($redirect) {
+            if (count($item_ids) == 1) {
+                $ctrl->setParameter($this, "item_id", $item_ids[0]);
+                $ctrl->redirect($this, "editCastItem");
+            }
+            $ctrl->redirect($this, "listItems");
         }
-        $ctrl->redirect($this, "listItems");
+
     }
 
 

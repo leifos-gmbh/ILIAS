@@ -65,7 +65,7 @@ class VideoSequence
                     $resource.= "?controls=0";
                 }
             }
-            if (in_array($mime, ["video/mp4", "video/vimeo"])) {
+            if (in_array($mime, ["video/mp4", "video/vimeo", "video/youtube"])) {
                 $videos[] = new VideoItem(
                     $item["mob_id"],
                     $title,

@@ -197,6 +197,33 @@ class ilExternalMediaAnalyzer
         }
         return $r;
     }
+
+    /**
+     * Get vimeo metadata
+     * @param string
+     * @return array
+     */
+    public static function getYoutubeMetadata($vid)
+    {
+        $json_url = 'https://www.youtube.com/oembed?url=http%3A//youtube.com/watch%3Fv%3D'.$vid.'&format=json';
+
+        $curl = curl_init($json_url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 10);
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($curl, CURLOPT_REFERER, ILIAS_HTTP_PATH);
+
+        $return = curl_exec($curl);
+        curl_close($curl);
+
+        $r = json_decode($return, true);
+
+        if ($return === false || is_null($r)) {
+            throw new ilExternalMediaApiException("Could not connect to vimeo API at $json_url.");
+        }
+        return $r;
+    }
+
     // end patch videocast – Killing 22.07.2020
 
     /**

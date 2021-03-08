@@ -266,6 +266,7 @@ class ilMediaItem
         // delete mob parameters
         $query = "DELETE FROM mob_parameter WHERE med_item_id = " .
             $ilDB->quote($this->getId(), "integer");
+        $ilDB->manipulate($query);
 
         // create mob parameters
         $params = $this->getParameters();

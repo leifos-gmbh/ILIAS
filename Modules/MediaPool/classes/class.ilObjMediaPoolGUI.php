@@ -130,7 +130,9 @@ class ilObjMediaPoolGUI extends ilObject2GUI
         $tpl = $this->tpl;
         $ilCtrl = $this->ctrl;
 
-        $tree = $this->object->getTree();
+        if ($this->object) {
+            $tree = $this->object->getTree();
+        }
         
         if ($this->ctrl->getRedirectSource() == "ilinternallinkgui") {
             $this->explorer();

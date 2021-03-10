@@ -294,7 +294,7 @@ il.VideoPlaylist = il.VideoPlaylist || {};
           const current = t.current_item[t.playlist[list_wrapper].player_wrapper];
           t.playlist[list_wrapper].items.forEach(function (v, i, a) {
             if (v.id === current) {
-              if (v.mime === "video/vimeo") {
+              if (["video/vimeo", "video/youtube"].includes(v.mime)) {
                 duration = v.duration;
               }
 

@@ -853,10 +853,10 @@ class ilCDTrainerGUI
 			{
 				$src_file .= ".html";
 			}
-			$tgt_file = ilUtil::ilTempnam();
+			$tgt_file = ilUtil::ilTempnam().".pdf";
 
 			file_put_contents($src_file, $html);
-			ilUtil::execQuoted(PATH_TO_HTMLDOC, $src_file.' -f '.$tgt_file);
+			ilUtil::execQuoted(PATH_TO_HTMLDOC, ' --charset utf-8 -f '.$tgt_file." ".$src_file);
 			unlink($src_file);
 
 			if(file_exists($tgt_file))

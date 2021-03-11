@@ -111,25 +111,21 @@ class ilSkillLearningHistoryProvider extends ilAbstractLearningHistoryProvider i
 
         // profiles
         $completions = ilSkillProfileCompletionRepository::getFulfilledEntriesForUser($this->getUserId());
-        foreach ($completions as $c) {
-            $this->ctrl->setParameterByClass("ilpersonalskillsgui", "profile_id", $c["profile_id"]);
-            $p_link = $this->ui_fac->link()->standard(
-                ilSkillProfile::lookupTitle($c["profile_id"]),
-                $this->ctrl->getLinkTargetByClass("ilpersonalskillsgui", "listassignedprofile")
-            );
-            $ts = new ilDateTime($c["date"], IL_CAL_DATETIME);
-            $text = str_replace(
-                "$3$",
-                $this->getEmphasizedTitle($this->ui_ren->render($p_link)),
-                $lng->txt("skll_lhist_skill_profile_fulfilled")
-            );
-            $entries[] = $this->getFactory()->entry(
-                $text,
-                $text,
-                ilUtil::getImagePath("icon_skmg.svg"),
-                $ts->get(IL_CAL_UNIX),
-                0
-            );
+        if (is_array($completions)) {
+            foreach ($completions as $c) {
+                $this->ctrl->setParameterByClass("ilpersonalskillsgui", "profile_id", $c["profile_id"]);
+                $p_link = $this->ui_fac->link()->standard(
+                    ilSkillProfile::lookupTitle($c["profile_id"]),
+                    $this->ctrl->getLinkTargetByClass("ilpersonalskillsgui", "listassignedprofile")
+                );
+                $ts = new ilDateTime($c["date"], IL_CAL_DATETIME);
+                $text = str_replace(
+                    "$3$",
+                    $this->getEmphasizedTitle($this->ui_ren->render($p_link)),
+                    $lng->txt("skll_lhist_skill_profile_fulfilled")
+                );
+
+            }
         }
 
         return $entries;

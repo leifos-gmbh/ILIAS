@@ -855,7 +855,7 @@ class ilPersonalSkillsGUI
 
         $ilTabs->setBackTarget(
             $lng->txt("back"),
-            $ilCtrl->getLinkTarget($this, "render")
+            $ilCtrl->getLinkTarget($this, "listAssignedProfile")
         );
         
         $ilCtrl->saveParameter($this, "skill_id");
@@ -1056,7 +1056,7 @@ class ilPersonalSkillsGUI
 
         $ilTabs->setBackTarget(
             $lng->txt("back"),
-            $ilCtrl->getLinkTarget($this, "render")
+            $ilCtrl->getLinkTarget($this, "listAssignedProfile")
         );
         
         $ilCtrl->saveParameter($this, "skill_id");
@@ -1138,7 +1138,7 @@ class ilPersonalSkillsGUI
                 $ilCtrl->saveParameter($this, "tref_id");
                 $ilCtrl->saveParameter($this, "basic_skill_id");*/
         
-        $ilCtrl->redirect($this, "render");
+        $ilCtrl->redirect($this, "listAssignedProfile");
     }
     
     /**

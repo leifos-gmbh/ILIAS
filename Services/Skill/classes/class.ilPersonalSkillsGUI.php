@@ -1940,11 +1940,7 @@ class ilPersonalSkillsGUI
             $prof_item = $this->ui_fac->item()->standard($link)
                             ->withDescription($p["description"])
                             ->withLeadImage($image)
-                            ->withProperties(array(
-                                "Progress" => $this->ui_fac->chart()->progressMeter()->standard(
-                                    100,
-                                    $chart_value))
-                            );
+                            ->withProgress($this->ui_fac->chart()->progressMeter()->standard(100, $chart_value));
 
             $prof_items[] = $prof_item;
         }

@@ -120,10 +120,17 @@ class ilLuceneAdvancedSearchFields
         include_once './Services/AdvancedMetaData/classes/class.ilAdvancedMDRecord.php';
         include_once './Services/AdvancedMetaData/classes/class.ilAdvancedMDFieldDefinition.php';
         foreach (ilAdvancedMDRecord::_getRecords() as $record) {
+            if ($record->getParentObject() > 0) {
+                if (!ilObject::_hasUntrashedReference($record->getParentObject())) {
+                    continue;
+                }
+            }
+
             foreach (ilAdvancedMDFieldDefinition::getInstancesByRecordId($record->getRecordId(), true) as $def) {
                 $fields['adv_' . $def->getFieldId()] = $def->getTitle();
             }
         }
+
         return $fields;
     }
     

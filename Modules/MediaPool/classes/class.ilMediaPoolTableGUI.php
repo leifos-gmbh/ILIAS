@@ -369,17 +369,25 @@ class ilMediaPoolTableGUI extends ilTable2GUI
         if ($this->showAdvMetadata()) {
             include_once("./Services/AdvancedMetaData/classes/class.ilAdvancedMDValues.php");
 
+            $mobs = array_filter($objs, function ($m) {
+                return ($m["type"] === "mob");
+            });
+
             $mobs = ilAdvancedMDValues::queryForRecords(
                 $this->media_pool->getRefId(),
                 "mep",
                 "mob",
                 0,
                 "mob",
-                $objs,
+                $mobs,
                 "",
                 "foreign_id",
                 $this->adv_filter_record_gui->getFilterElements()
             );
+
+            $snippets = array_filter($objs, function ($m) {
+                return ($m["type"] === "pg");
+            });
 
             include_once("./Services/AdvancedMetaData/classes/class.ilAdvancedMDValues.php");
             $snippets = ilAdvancedMDValues::queryForRecords(
@@ -388,7 +396,7 @@ class ilMediaPoolTableGUI extends ilTable2GUI
                 "mpg",
                 $this->media_pool->getId(),
                 "mpg",
-                $objs,
+                $snippets,
                 "mep_id",
                 "obj_id",
                 $this->adv_filter_record_gui->getFilterElements()

@@ -16,9 +16,21 @@ include_once("Services/Object/exceptions/class.ilObjectException.php");
  * @author            Alex Killing <alex.killing@gmx.de>
  * @author            Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version           $Id$*
+ *
+ * @ilCtrl_Calls ilSystemStyleOverviewGUI: ilSystemStyleAssignmentRulesGUI
  */
 class ilSystemStyleOverviewGUI
 {
+    /**
+     * @var string
+     */
+    protected const SUBTAB_OVERVIEW = 'overview';
+
+    /**
+     * @var string
+     */
+    protected const SUBTAB_ASSIGNMENT_RULES = 'assignmentRules';
+
     /**
      * @var ilCtrl
      */
@@ -38,6 +50,11 @@ class ilSystemStyleOverviewGUI
      * @var ilTemplate
      */
     protected $tpl;
+
+    /**
+     * @var ilTabsGUI
+     */
+    protected $tabs_gui;
 
     /**
      * @var ILIAS\DI\Container
@@ -71,6 +88,7 @@ class ilSystemStyleOverviewGUI
         $this->dic = $DIC;
         $this->ctrl = $DIC->ctrl();
         $this->toolbar = $DIC->toolbar();
+        $this->tabs_gui = $DIC->tabs();
         $this->lng = $DIC->language();
         $this->tpl = $DIC["tpl"];
 
@@ -91,7 +109,17 @@ class ilSystemStyleOverviewGUI
             $cmd = $this->isReadOnly()?"view":"edit";
         }
 
+        $next_class = $this->ctrl->getNextClass($this);
+        ilLoggerFactory::getLogger('sty')->warning($next_class);
+        switch ($next_class) {
+            case strtolower(ilSystemStyleAssignmentRulesGUI::class):
+                $this->setSubTabs(self::SUBTAB_ASSIGNMENT_RULES);
+                $assignment_gui = new ilSystemStyleAssignmentRulesGUI($this->isReadOnly());
+                $this->ctrl->forwardCommand($assignment_gui);
+                return;
+        }
 
+        $this->setSubTabs(self::SUBTAB_OVERVIEW);
         switch ($cmd) {
             case "addSystemStyle":
             case "addSubStyle":
@@ -122,6 +150,28 @@ class ilSystemStyleOverviewGUI
                 return;
 
         }
+    }
+
+    protected function setSubTabs(string $active_tab)
+    {
+        $this->tabs_gui->addSubTab(
+            self::SUBTAB_OVERVIEW,
+            $this->lng->txt('overview'),
+            $this->ctrl->getLinkTarget($this, 'view')
+        );
+        $this->tabs_gui->addSubTab(
+            self::SUBTAB_ASSIGNMENT_RULES,
+            $this->lng->txt('system_style_assignment_tab'),
+            $this->ctrl->getLinkTargetByClass(
+                [
+                    ilSystemStyleMainGUI::class,
+                    ilSystemStyleOverviewGUI::class,
+                    ilSystemStyleAssignmentRulesGUI::class
+                ],
+                'listAssignmentRules'
+            )
+        );
+        $this->tabs_gui->activateSubTab($active_tab);
     }
 
     protected function view()

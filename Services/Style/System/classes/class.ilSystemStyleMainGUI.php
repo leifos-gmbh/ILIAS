@@ -156,6 +156,10 @@ class ilSystemStyleMainGUI
                     $this->checkPermission("visible,read");
                     include_once("Overview/class.ilSystemStyleOverviewGUI.php");
                     $system_styles_overview = new ilSystemStyleOverviewGUI(!$this->checkPermission("sty_write_system", false), $this->checkPermission("sty_management", false));
+                    ilLoggerFactory::getLogger('sty')->warning($this->ctrl->getCmdClass());
+                    if ($this->ctrl->getCmdClass() == strtolower(ilSystemStyleMainGUI::class)) {
+                        $this->ctrl->setCmdClass(ilSystemStyleOverviewGUI::class);
+                    }
                     $this->ctrl->forwardCommand($system_styles_overview);
                     break;
             }

@@ -650,6 +650,7 @@ class ilObjMediaCastGUI extends ilObjectGUI
     */
     public function saveCastItemObject()
     {
+        return;
         $tpl = $this->tpl;
         $ilCtrl = $this->ctrl;
         $ilUser = $this->user;
@@ -743,28 +744,28 @@ class ilObjMediaCastGUI extends ilObjectGUI
     /**
      * get duration from form or from file analyzer
      *
-     * @param unknown_type $file
-     * @return unknown
+     * @param ilMediaItem $media_item
+     * @return string
      */
-    private function getDuration($file)
+    private function getDuration(ilMediaItem $media_item)
     {
         $duration = isset($this->form_gui)
             ? $this->form_gui->getInput("duration")
             : array("hh" => 0, "mm" => 0, "ss" => 0);
-        if ($duration["hh"] == 0 && $duration["mm"] == 0 && $duration["ss"] == 0 && is_file($file)) {
-            include_once("./Services/MediaObjects/classes/class.ilMediaAnalyzer.php");
-            $ana = new ilMediaAnalyzer();
-            $ana->setFile($file);
-            $ana->analyzeFile();
-            $dur = $ana->getPlaytimeString();
-            $dur = explode(":", $dur);
-            $duration["mm"] = $dur[0];
-            $duration["ss"] = $dur[1];
+
+        $duration_str = str_pad($duration["hh"], 2, "0", STR_PAD_LEFT) . ":" .
+            str_pad($duration["mm"], 2, "0", STR_PAD_LEFT) . ":" .
+            str_pad($duration["ss"], 2, "0", STR_PAD_LEFT);
+
+        if ($duration["hh"] == 0 && $duration["mm"] == 0 && $duration["ss"] == 0) {
+            $media_item->determineDuration();
+            $d = $media_item->getDuration();
+            if ($d > 0) {
+                $duration_str = $this->object->getPlaytimeForSeconds($d);
+            }
         }
-        $duration = str_pad($duration["hh"], 2, "0", STR_PAD_LEFT) . ":" .
-                    str_pad($duration["mm"], 2, "0", STR_PAD_LEFT) . ":" .
-                    str_pad($duration["ss"], 2, "0", STR_PAD_LEFT);
-        return $duration;
+
+        return $duration_str;
     }
     
     /**
@@ -845,7 +846,7 @@ class ilObjMediaCastGUI extends ilObjectGUI
                 $mob->setTitle($title);
             }
             if (isset($format)) {
-                $mob->setDescription($format);
+                //$mob->setDescription($format);
             }
         }
 
@@ -898,7 +899,7 @@ class ilObjMediaCastGUI extends ilObjectGUI
                 }
                 
                 if ($purpose == "Standard") {
-                    $duration = $this->getDuration($file);
+                    $duration = $this->getDuration($media_item);
                     $title = $this->form_gui->getInput("title") != "" ? $this->form_gui->getInput("title") : basename($file);
                     $description = $this->form_gui->getInput("description");
             
@@ -1045,40 +1046,16 @@ class ilObjMediaCastGUI extends ilObjectGUI
 
         // begin patch videocast – Killing 3.12.2020
         $success = false;
-        if ($m_item->getLocationType() == "Reference") {
-            if (ilExternalMediaAnalyzer::isVimeo($m_item->getLocation())) {
-                $par = ilExternalMediaAnalyzer::extractVimeoParameters($m_item->getLocation());
-                $meta = ilExternalMediaAnalyzer::getVimeoMetadata($par["id"]);
-                if ($meta["duration"] > 0) {
-                    $m_item->setDuration((int) $meta["duration"]);
-                    $m_item->update();
-                    $seconds = ($meta["duration"] % 60);
-                    $minutes = ((($meta["duration"] - $seconds) / 60) % 60);
-                    $hours = floor($meta["duration"] / 3600);
-                    $duration = str_pad($hours, 2, "0", STR_PAD_LEFT) . ":" .
-                        str_pad($minutes, 2, "0", STR_PAD_LEFT) . ":" .
-                        str_pad($seconds, 2, "0", STR_PAD_LEFT);
-                    $mc_item->setPlaytime($duration);
-                    $mc_item->update();
-                    $success = true;
-                    ilUtil::sendSuccess($lng->txt("mcst_set_playtime"), true);
-                }
-            }
-        } else {
-            $file = $mob_dir . "/" . $m_item->getLocation();
-            $duration = $this->getDuration($file);
-            if ($duration != "00:00:00") {
-                $mc_item->setPlaytime($duration);
-                $mc_item->update();
-                $dur_arr = explode(":", $duration);
-                $seconds = ((int) $dur_arr[0] * 60 * 60) + ((int) $dur_arr[1] * 60) + ((int) $dur_arr[2]);
-                $st_med = $mob->getMediaItem("Standard");
-                $st_med->setDuration($seconds);
-                $st_med->update();
-                $success = true;
-                ilUtil::sendSuccess($lng->txt("mcst_set_playtime"), true);
-            }
+
+        $m_item->determineDuration();
+        $dur = $m_item->getDuration();
+        if ($dur > 0) {
+            $mc_item->setPlaytime($this->object->getPlaytimeForSeconds($dur));
+            $mc_item->update();
+            $success = true;
+            ilUtil::sendSuccess($lng->txt("mcst_set_playtime"), true);
         }
+
         if (!$success) {
             ilUtil::sendFailure($lng->txt("mcst_unable_to_determin_playtime"), true);
         }
@@ -1902,20 +1879,10 @@ class ilObjMediaCastGUI extends ilObjectGUI
             if ($sec < 0) {
                 $sec = 0;
             }
-            if ($mob->getVideoPreviewPic() != "") {
-                $mob->removeAdditionalFile($mob->getVideoPreviewPic(true));
-            }
-            include_once("./Services/MediaObjects/classes/class.ilFFmpeg.php");
-            $med = $mob->getMediaItem("Standard");
-            $mob_file = ilObjMediaObject::_getDirectory($mob->getId()) . "/" . $med->getLocation();
-            $new_file = ilFFmpeg::extractImage(
-                $mob_file,
-                "mob_vpreview.png",
-                ilObjMediaObject::_getDirectory($mob->getId()),
-                $sec
-            );
+
+            $mob->generatePreviewPic(320, 240, $sec);
             
-            if ($new_file != "") {
+            if ($mob->getVideoPreviewPic() != "") {
                 ilUtil::sendInfo($this->lng->txt("mcst_image_extracted"), true);
             } else {
                 ilUtil::sendFailure($this->lng->txt("mcst_no_extraction_possible"), true);
@@ -1979,10 +1946,11 @@ class ilObjMediaCastGUI extends ilObjectGUI
      */
     protected function afterUpload($mob_ids) {
         foreach ($mob_ids as $mob_id) {
+            /* went to ilMediaCreationGUI
             $mob = new ilObjMediaObject($mob_id);
             $med_item = $mob->getMediaItem("Standard");
             $med_item->determineDuration();
-            $med_item->update();
+            $med_item->update();*/
         }
 
         $this->addMobsToCast($mob_ids, "", false);

@@ -1958,39 +1958,45 @@ class ilObjMediaObject extends ilObject
                     }
                 }
             }
-            // begin patch videocast – Killing 22.07.2020
-            if (is_int(strpos($item->getFormat(), "video/"))) {
-                try {
-                    if ($sec < 0) {
-                        $sec = 0;
-                    }
-                    if ($this->getVideoPreviewPic() != "") {
-                        $this->removeAdditionalFile($this->getVideoPreviewPic(true));
-                    }
-                    include_once("./Services/MediaObjects/classes/class.ilFFmpeg.php");
-                    $med = $this->getMediaItem("Standard");
-                    $mob_file = ilObjMediaObject::_getDirectory($this->getId()) . "/" . $med->getLocation();
-                    ilFFmpeg::extractImage(
-                        $mob_file,
-                        "mob_vpreview.png",
-                        ilObjMediaObject::_getDirectory($this->getId()),
-                        $sec
-                    );
-                } catch (ilException $e) {
-                    $ret = ilFFmpeg::getLastReturnValues();
+        }
 
-                    $message = '';
-                    if (is_array($ret) && count($ret) > 0) {
-                        $message = "\n" . implode("\n", $ret);
-                    }
-
-                    /** @var ilLogger $logger */
-                    $logger = $GLOBALS['DIC']->logger()->mob();
-                    $logger->warning($e->getMessage() . $message);
-                    $logger->logStack(ilLogLevel::WARNING);
+        // begin patch videocast – Killing 22.07.2020
+        if (is_int(strpos($item->getFormat(), "video/mp4"))) {
+            try {
+                if ($sec < 0) {
+                    $sec = 0;
                 }
+                if ($this->getVideoPreviewPic() != "") {
+                    $this->removeAdditionalFile($this->getVideoPreviewPic(true));
+                }
+                include_once("./Services/MediaObjects/classes/class.ilFFmpeg.php");
+                $med = $this->getMediaItem("Standard");
+                if ($med->getLocationType() == "LocalFile") {
+                    $mob_file = ilObjMediaObject::_getDirectory($this->getId()) . "/" . $med->getLocation();
+                } else {
+                    $mob_file = $med->getLocation();
+                }
+                ilFFmpeg::extractImage(
+                    $mob_file,
+                    "mob_vpreview.png",
+                    ilObjMediaObject::_getDirectory($this->getId()),
+                    $sec
+                );
+            } catch (ilException $e) {
+                $ret = ilFFmpeg::getLastReturnValues();
+
+                $message = '';
+                if (is_array($ret) && count($ret) > 0) {
+                    $message = "\n" . implode("\n", $ret);
+                }
+
+                /** @var ilLogger $logger */
+                $logger = $GLOBALS['DIC']->logger()->mob();
+                $logger->warning($e->getMessage() . $message);
+                $logger->logStack(ilLogLevel::WARNING);
             }
         }
+
         // end patch videocast – Killing 22.07.2020
     }
 

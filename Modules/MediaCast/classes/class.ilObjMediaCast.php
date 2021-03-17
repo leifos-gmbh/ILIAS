@@ -715,7 +715,7 @@ class ilObjMediaCast extends ilObject
      * @param int
      * @return string
      */
-    protected function getPlaytimeForSeconds(int $seconds)
+    public function getPlaytimeForSeconds(int $seconds)
     {
         $hours = floor($seconds/3600);
         $minutes = floor(($seconds % 3600) / 60);

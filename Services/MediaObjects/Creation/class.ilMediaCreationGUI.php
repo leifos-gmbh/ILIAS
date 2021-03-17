@@ -385,12 +385,20 @@ class ilMediaCreationGUI
             $mediaItem->setLocationType($locationType);
             $mediaItem->setHAlign("Left");
             $mob->setTitle($title);
-            $mob->setDescription($format);
+            //$mob->setDescription($format);
 
             $mob->update();
 
+            // preview pic
             $mob = new ilObjMediaObject($mob->getId());
             $mob->generatePreviewPic(320, 240);
+
+            // duration
+            $med_item = $mob->getMediaItem("Standard");
+            $med_item->determineDuration();
+            $med_item->update();
+
+
 
             //
             // @todo: save usage
@@ -475,6 +483,12 @@ class ilMediaCreationGUI
 
                         $mob = new ilObjMediaObject($mob->getId());
                         $mob->generatePreviewPic(320, 240);
+
+                        // duration
+                        $med_item = $mob->getMediaItem("Standard");
+                        $med_item->determineDuration();
+                        $med_item->update();
+
                     }
                 } catch (Exception $e) {
                     $log->debug("Got exception: " . $e->getMessage());
@@ -634,7 +648,8 @@ class ilMediaCreationGUI
             }
             $locationType = "Reference";
             $url = $form->getInput("url");
-            $title = $url;
+            $url_pi = pathinfo(basename($url));
+            $title = str_replace("_", " ", $url_pi["filename"]);
 
             // get mime type, if not already set!
             $format = ilObjMediaObject::getMimeType($url, true);
@@ -645,7 +660,7 @@ class ilMediaCreationGUI
             $mediaItem->setLocationType("Reference");
             $mediaItem->setHAlign("Left");
             $mob->setTitle($title);
-            $mob->setDescription($format);
+            //$mob->setDescription($format);
             try {
                 $mob->getExternalMetadata();
             } catch (Exception $e) {
@@ -657,6 +672,14 @@ class ilMediaCreationGUI
 
             $long_desc = $mob->getLongDescription();
             $mob->update();
+
+            $mob = new ilObjMediaObject($mob->getId());
+            $mob->generatePreviewPic(320, 240);
+
+            // duration
+            $med_item = $mob->getMediaItem("Standard");
+            $med_item->determineDuration();
+            $med_item->update();
 
             //
             // @todo: save usage

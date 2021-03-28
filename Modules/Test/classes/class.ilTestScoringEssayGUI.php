@@ -461,6 +461,11 @@ class ilTestScoringEssayGUI extends ilTestScoringGUI
 
         $rtestring = ilRTE::_getRTEClassname();
         $rte = new $rtestring(); /* @var ilTinyMCE $rte */
+        // patch begin: manual scoring pilot
+        require_once 'Services/RTE/classes/class.ilRTEManualScoringPilot.php';
+        $rtestring = ilRTEManualScoringPilot::_getRTEClassname();
+        $rte = new $rtestring(); /* @var ilTinyMCEManualScoringPilot $rte */
+        // patch end: manual scoring pilot
         $rte->addRteSupport($this->object->getId(), $this->object->getType(), $editorId);
 
         $manualFeedback = $this->object->getManualFeedback(

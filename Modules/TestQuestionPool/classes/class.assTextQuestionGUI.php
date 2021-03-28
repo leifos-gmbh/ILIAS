@@ -123,6 +123,10 @@ class assTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
         include_once "./Services/RTE/classes/class.ilRTE.php";
         $rtestring = ilRTE::_getRTEClassname();
+        // patch begin: manual scoring pilot
+        include_once "./Services/RTE/classes/class.ilRTEManualScoringPilot.php";
+        $rtestring = ilRTEManualScoringPilot::_getRTEClassname();
+        // patch end: manual scoring pilot
         include_once "./Services/RTE/classes/class.$rtestring.php";
         $rte = new $rtestring();
         include_once "./Services/Object/classes/class.ilObject.php";

@@ -252,8 +252,8 @@ class ilExAssignmentGUI
             $a_info->addProperty($lng->txt("exc_rem_time_after_start"), $state->getRelativeDeadlinePresentation() .
                 " " . $but);
         }
-        
-        if ($state->getOfficialDeadline() > $state->getCommonDeadline()) {
+        // patch veda
+        if($idl) {
             $until = $state->getOfficialDeadlinePresentation();
             
             // add late info?

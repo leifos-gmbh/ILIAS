@@ -249,10 +249,9 @@ class ilExcAssMemberState
     {
         $dl = $this->idl->getIndividualDeadline();		// team or user individual deadline
 
-        if ($this->assignment->getDeadlineMode() == ilExAssignment::DEADLINE_ABSOLUTE) {	// absolute deadline
-            return max($this->assignment->getDeadline(), $dl);				// take what's greater: idl or abs deadline
+        if ($this->assignment->getDeadlineMode() == ilExAssignment::DEADLINE_ABSOLUTE) {
+            return $dl; // deadlines can be set before of after the general deadline.
         }
-
         // relative deadline: take max idl or calculated deadline
         return max($this->getCalculatedDeadline(), $dl);
     }

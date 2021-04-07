@@ -476,6 +476,13 @@ class ilExAssignmentEditorGUI
         $ti->setSize(3);
         $op2->addSubItem($ti);
         
+        // last submission for relative deadline
+        $last_submission = new ilDateTimeInputGUI($lng->txt("exc_rel_last_submission"), "rel_deadline_last_subm");
+        $last_submission->setInfo($lng->txt("exc_rel_last_submission_info"));
+        $last_submission->setShowTime(true);
+        $op2->addSubItem($last_submission);
+
+
 
         // max number of files
         if ($ass_type->usesFileUpload()) {
@@ -797,6 +804,11 @@ class ilExAssignmentEditorGUI
 
                 if ($res["deadline_mode"] == ilExAssignment::DEADLINE_RELATIVE) {
                     $res["relative_deadline"] = $a_form->getInput("relative_deadline");
+                    $rel_deadline_last_subm = $a_form->getItemByPostVar("rel_deadline_last_subm")->getDate();
+                    $rel_deadline_last_subm = $rel_deadline_last_subm
+                        ? $rel_deadline_last_subm->get(IL_CAL_UNIX)
+                        : null;
+                    $res["rel_deadline_last_subm"] = $rel_deadline_last_subm;
                 }
 
                 // peer
@@ -863,6 +875,7 @@ class ilExAssignmentEditorGUI
         $a_ass->setExtendedDeadline($a_input["deadline_ext"]);
         $a_ass->setDeadlineMode($a_input["deadline_mode"]);
         $a_ass->setRelativeDeadline($a_input["relative_deadline"]);
+        $a_ass->setRelDeadlineLastSubmission($a_input["rel_deadline_last_subm"]);
                                     
         $a_ass->setMaxFile($a_input["max_file"]);
         $a_ass->setTeamTutor($a_input["team_creator"]);
@@ -1084,6 +1097,8 @@ class ilExAssignmentEditorGUI
 
         $values["deadline_mode"] = $this->assignment->getDeadlineMode();
         $values["relative_deadline"] = $this->assignment->getRelativeDeadline();
+        $values["rel_deadline_last_subm"] = new ilDateTime($this->assignment->getRelDeadlineLastSubmission(), IL_CAL_UNIX);
+
 
         $a_form->setValuesByArray($values);
         
@@ -1508,7 +1523,7 @@ class ilExAssignmentEditorGUI
         if ($reminder->getReminderStatus()) {
             $values["rmd_peer_status"] = $reminder->getReminderStatus();
             $values["rmd_peer_start"] = $reminder->getReminderStart();
-            $values["rmd_peer_end"] = new ilDateTime($reminder->getReminderEnd(), IL_CAL_UNIX);
+            $values["rmd_peer_end"] = 	new ilDateTime($reminder->getReminderEnd(), IL_CAL_UNIX);
             $values["rmd_peer_freq"] = $reminder->getReminderFrequency();
             $values["rmd_peer_template_id"] = $reminder->getReminderMailTemplate();
         }
@@ -1739,7 +1754,7 @@ class ilExAssignmentEditorGUI
         } else {
             if ($a_min_participants) {
                 $number_of_teams = round($total_members / $a_min_participants);
-                $participants_extra_team = $total_members % $a_min_participants;
+                $participants_extra_team =  $total_members % $a_min_participants;
                 if ($participants_extra_team > $number_of_teams) {
                     //Can't create teams with this minimum of participants.
                     $message = sprintf($this->lng->txt("exc_team_minimal_too_big"), $a_min_participants);

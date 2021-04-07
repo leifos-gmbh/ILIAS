@@ -84,6 +84,7 @@ class ilExerciseDataSet extends ilDataSet
                         "Description" => "text",
                         "PassMode" => "text",
                         "PassNr" => "integer",
+                        "NrMandatoryRandom" => "integer",
                         "ShowSubmissions" => "integer",
                         "ComplBySubmission" => "integer",
                         "Tfeedback" => "integer"
@@ -217,6 +218,7 @@ class ilExerciseDataSet extends ilDataSet
                         ,"FeedbackDate" => "integer"
                         ,"FeedbackDir" => "directory"
                         ,"FbDateCustom" => "integer"
+                        ,"RelDeadlineLastSubm" => "integer"
                     );
             }
         }
@@ -359,7 +361,7 @@ class ilExerciseDataSet extends ilDataSet
                         " instruction, title, start_time, mandatory, order_nr, team_tutor, max_file, peer, peer_min," .
                         " peer_dl peer_deadline, peer_file, peer_prsl peer_personal, peer_char, peer_unlock, peer_valid," .
                         " peer_text, peer_rating, peer_crit_cat, fb_file feedback_file, fb_cron feedback_cron, fb_date feedback_date," .
-                        " fb_date_custom" .
+                        " fb_date_custom, rel_deadline_last_subm" .
                         " FROM exc_assignment" .
                         " WHERE " . $ilDB->in("exc_id", $a_ids, false, "integer"));
                     break;
@@ -556,7 +558,9 @@ class ilExerciseDataSet extends ilDataSet
                 $a_mapping->addMapping(
                     "Services/MetaData",
                     "md",
-                    $a_rec["Id"] . ":0:exc", $newObj->getId() . ":0:exc");
+                    $a_rec["Id"] . ":0:exc",
+                    $newObj->getId() . ":0:exc"
+                );
                 break;
 
             case "exc_assignment":
@@ -619,6 +623,7 @@ class ilExerciseDataSet extends ilDataSet
 
                     // 5.3
                     $ass->setFeedbackDateCustom($a_rec["FbDateCustom"]);
+                    $ass->setRelDeadlineLastSubmission($a_rec["RelDeadlineLastSubm"]);
                     
                     // criteria catalogue
                     if ($a_rec["PeerCritCat"]) {

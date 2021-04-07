@@ -115,10 +115,28 @@ class ilAssignmentsTableGUI extends ilTable2GUI
         include_once("./Modules/Exercise/classes/class.ilExAssignment.php");
         $ass = new ilExAssignment($d["id"]);
 
-        if ($d["deadline"] > 0) {
-            $dl = ilDatePresentation::formatDate(new ilDateTime($d["deadline"], IL_CAL_UNIX));
-            if ($d["deadline2"] > 0) {
-                $dl .= "<br />(" . ilDatePresentation::formatDate(new ilDateTime($d["deadline2"], IL_CAL_UNIX)) . ")";
+        if ($ass->getDeadlineMode() == ilExAssignment::DEADLINE_ABSOLUTE) {
+            if ($d["deadline"] > 0) {
+                $dl = ilDatePresentation::formatDate(new ilDateTime($d["deadline"], IL_CAL_UNIX));
+                if ($d["deadline2"] > 0) {
+                    $dl .= "<br />(" . ilDatePresentation::formatDate(new ilDateTime(
+                        $d["deadline2"],
+                        IL_CAL_UNIX
+                    )) . ")";
+                }
+                $this->tpl->setVariable("TXT_DEADLINE", $dl);
+            } else {
+                $this->tpl->setVariable("TXT_DEADLINE", "-");
+            }
+        } else {
+            if ($ass->getRelativeDeadline() > 0) {
+                $dl = "" . $ass->getRelativeDeadline() . " " . $this->lng->txt("days");
+            }
+            if ($ass->getRelDeadlineLastSubmission() > 0) {
+                if ($dl != "") {
+                    $dl.= " / ";
+                }
+                $dl.= ilDatePresentation::formatDate(new ilDateTime($ass->getRelDeadlineLastSubmission(), IL_CAL_UNIX));
             }
             $this->tpl->setVariable("TXT_DEADLINE", $dl);
         }

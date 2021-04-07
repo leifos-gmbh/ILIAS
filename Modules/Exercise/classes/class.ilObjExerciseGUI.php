@@ -344,6 +344,18 @@ class ilObjExerciseGUI extends ilObjectGUI
         $option->setInfo($this->lng->txt("exc_settings_feedback_text_info"));
         $fdb->addOption($option);
         
+		$section = new ilFormSectionHeaderGUI();
+		$section->setTitle($this->lng->txt('obj_features'));
+		$a_form->addItem($section);
+
+		ilObjectServiceSettingsGUI::initServiceSettingsForm(
+			$this->object->getId(),
+			$a_form,
+			array(
+				ilObjectServiceSettingsGUI::CUSTOM_METADATA,
+			)
+		);
+
         $position_settings = ilOrgUnitGlobalSettings::getInstance()
             ->getObjectPositionSettingsByType($this->object->getType());
 

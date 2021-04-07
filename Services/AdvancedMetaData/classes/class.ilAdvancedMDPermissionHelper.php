@@ -22,6 +22,9 @@ class ilAdvancedMDPermissionHelper extends ilClaimingPermissionHelper
     const CONTEXT_SUBSTITUTION_SESSION = 7;
     const CONTEXT_SUBSTITUTION_IASS = 8;
     const CONTEXT_SUBSTITUTION_GROUP = 9;
+    // patch veda
+    const CONTEXT_SUBSTITUTION_EXERCISE = 10;
+    // patch veda
 
     
     const ACTION_MD_CREATE_RECORD = 1;
@@ -58,6 +61,10 @@ class ilAdvancedMDPermissionHelper extends ilClaimingPermissionHelper
 
     const ACTION_SUBSTITUTION_IASS_SHOW_FIELD = 27;
     const ACTION_SUBSTITUTION_IASS_EDIT_FIELD_PROPERTY = 28;
+    // patch veda
+    const ACTION_SUBSTITUTION_EXERCISE_SHOW_FIELD = 29;
+    const ACTION_SUBSTITUTION_EXERCISE_EDIT_FIELD_PROPERTY = 30;
+    // patch veda
 
     const SUBACTION_RECORD_TITLE = 1;
     const SUBACTION_RECORD_DESCRIPTION = 2;
@@ -96,12 +103,15 @@ class ilAdvancedMDPermissionHelper extends ilClaimingPermissionHelper
             case self::CONTEXT_SUBSTITUTION_SESSION:
             case self::CONTEXT_SUBSTITUTION_CATEGORY:
             case self::CONTEXT_SUBSTITUTION_IASS:
+            // patch veda
+            case self::CONTEXT_SUBSTITUTION_EXERCISE:
+            // patch veda
                 $set = $ilDB->query("SELECT field_id id" .
                     " FROM adv_mdf_definition");
                 break;
             
             case self::CONTEXT_SUBSTITUTION:
-                return ['crs','cat','sess','iass','grp'];
+				return $this->getAllowedObjectTypes();
                                         
             default:
                 return array();
@@ -226,6 +236,21 @@ class ilAdvancedMDPermissionHelper extends ilClaimingPermissionHelper
                         ,self::SUBACTION_SUBSTITUTION_NEWLINE
                         )
                 )
+            ),
+            // patch veda
+            self::CONTEXT_SUBSTITUTION_EXERCISE => array(
+                "actions" => array(
+                    self::ACTION_SUBSTITUTION_EXERCISE_SHOW_FIELD
+                ),
+                "subactions" => array(
+                    self::ACTION_SUBSTITUTION_EXERCISE_EDIT_FIELD_PROPERTY =>
+                        array(
+                            self::SUBACTION_SUBSTITUTION_BOLD
+                            ,
+                            self::SUBACTION_SUBSTITUTION_NEWLINE
+                        )
+                )
+                // patch veda
             )
         );
     }

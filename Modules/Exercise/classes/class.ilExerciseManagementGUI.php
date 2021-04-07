@@ -1907,10 +1907,10 @@ class ilExerciseManagementGUI
             if ($valid = $form->checkInput()) {
                 foreach ($users as $ass_id => $users) {
                     $ass = $ass_map[$ass_id];
-                    
-                    // :TODO: should individual deadlines BEFORE extended be possible?
-                    $dl = new ilDateTime($ass->getDeadline(), IL_CAL_UNIX);
-                    
+
+					// :TODO: should individual deadlines BEFORE extended be possible?			
+					$dl = new ilDateTime($ass->getDeadline(), IL_CAL_UNIX);	
+
                     foreach ($users as $user_id) {
                         $date_field = $form->getItemByPostVar("dl_" . $ass_id . "_" . $user_id);
                         if (ilDate::_before($date_field->getDate(), $dl)) {

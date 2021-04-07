@@ -318,8 +318,12 @@ class ilObjectMetaDataGUI
                 "htlm",
                 "lm", "lm:st", "lm:pg",
                 "sahs", "sahs:sco", "sahs:page",
-                'sess', "iass"
-        )));
+                // patch veda
+                'sess',
+                "iass",
+                'exc'
+                // patch veda
+            )));
     }
     
     protected function hasAdvancedMDSettings()

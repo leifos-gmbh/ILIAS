@@ -27,7 +27,14 @@ class ilObjExerciseListGUI extends ilObjectListGUI
         $this->info_screen_enabled = true;
         $this->type = "exc";
         $this->gui_class_name = "ilobjexercisegui";
-        
+
+        // patch veda
+        $this->substitutions = ilAdvancedMDSubstitution::_getInstanceByObjectType($this->type);
+        if ($this->substitutions->isActive()) {
+            $this->substitutions_enabled = true;
+        }
+        // patch veda
+
         // general commands array
         include_once('./Modules/Exercise/classes/class.ilObjExerciseAccess.php');
         $this->commands = ilObjExerciseAccess::_getCommands();

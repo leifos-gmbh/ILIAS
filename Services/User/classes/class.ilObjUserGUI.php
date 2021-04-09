@@ -1101,6 +1101,12 @@ class ilObjUserGUI extends ilObjectGUI
             $id = new ilNonEditableValueGUI($lng->txt("usr_id"), "id");
             $id->setValue($this->object->getId());
             $this->form_gui->addItem($id);
+
+            // begin-patch veda
+            $id = new ilNonEditableValueGUI($lng->txt("veda_id"), "importid");
+            $id->setValue($this->object->getImportId());
+            $this->form_gui->addItem($id);
+            // end-patch veda
         }
         
         // login

@@ -17261,7 +17261,6 @@ footer.ilFooter div.ilFooterContainer > a:hover {
   font-size: 120%;
   margin-left: -15px !important;
   line-height: 45px;
-  margin-top: 10px;
 }
 .ilLSOKioskTopBarTitle {
   font-size: 120%;
@@ -17667,6 +17666,9 @@ div.ilTopMemberView {
 /*----------FOOTER----------*/
 .ilTinyMenuSection > .btn > span {
   color: white !important;
+}
+.ilc_section_StandardColumnLayout.ilCOPageSection .il_ItemProperties {
+  display: none;
 }
 @media print {
   #mainspacekeeper > .row {

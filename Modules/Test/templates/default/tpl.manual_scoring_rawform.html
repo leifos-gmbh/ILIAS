@@ -2,8 +2,23 @@
 <form class="manual_scoring" action="{FORMACTION}" method="post">
     <textarea name="manual_feedback" class="manscoring-tinymce">{MANUAL_FEEDBACK}</textarea>
     <br />
-    <div><label>{POINTS_LABEL}</label></div>
-    <div>{POINTS_INPUT}</div>
-    <div class="ilRight"><input class="btn btn-default btn-sm" type="submit" value="{SUBMIT_LABEL}" name="cmd[{SUBMIT_CMD}]" /></div>
+    <div>
+        <label for="{POINTS_INPUT_ID}">
+            <input id="{POINTS_INPUT_ID}" name="{POINTS_INPUT_ID}" value="{POINTS_INPUT_VALUE}" type="text" size="3" />
+            <span class="{POINTS_INPUT_ID}">{POINTS_INPUT_LABEL}</span>
+        </label>
+    </div>
+    <div>
+        <label for="{SCORED_INPUT_ID}">
+            <input id="{SCORED_INPUT_ID}" name="{SCORED_INPUT_ID}" {SCORED_INPUT_VALUE} value="1" type="checkbox" />
+            <span class="{SCORED_INPUT_ID}">{SCORED_INPUT_LABEL}</span>
+        </label>
+    </div>
+    <div class="ilRight">
+        <input id="{ADDITIONALCMD_PARAMETER}" name="{ADDITIONALCMD_PARAMETER}" value="" type="hidden" />
+        <input id="{CHANGEPASS_PARAMETER}" name="{CHANGEPASS_PARAMETER}" value="" type="hidden" />
+        <input id="{CHANGEQST_PARAMETER}" name="{CHANGEQST_PARAMETER}" value="" type="hidden" />
+        <input id="feedback_save_submit" class="btn btn-default btn-sm" type="submit" value="{SUBMIT_LABEL}" name="cmd[{SUBMIT_CMD}]" />
+    </div>
 </form>
 <!-- END rawform -->

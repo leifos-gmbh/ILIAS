@@ -1,18 +1,4 @@
 <script type="text/javascript">
-    function saveTextarea()
-    {
-      tinyMCE.triggerSave();
-
-      $.post(
-        '{FEEDBACK_SAVE_URL}',
-        {
-          manual_feedback: $('#frameset_{ID} textarea').val()
-        },
-        function() {
-
-        }
-      )
-    }
 
     function resizeTinyMce(e, framesetId, frameClass)
     {
@@ -20,8 +6,46 @@
       return true;
     }
 
+    function changeQuestion(e)
+    {
+      $('#{ADDITIONALCMD_PARAMETER}').val('changeQuestion');
+
+      $('#{CHANGEPASS_PARAMETER}').val(
+        $('#passIndexSelect').val()
+      );
+
+      $('#{CHANGEQST_PARAMETER}').val(
+        $('#questionIdSelect').val()
+      );
+
+      saveManualScoring();
+
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+
+    function sendNotification(e)
+    {
+      $('#{ADDITIONALCMD_PARAMETER}').val('sendNotification');
+
+      saveManualScoring();
+
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+
+    function saveManualScoring()
+    {
+      $('#feedback_save_submit').trigger('click');
+    }
+
     (function($){
       $(document).ready(function() {
+
+        $('#changeQuestionBtn').click(changeQuestion);
+        $('#sendNotificationBtn').click(sendNotification);
 
         $('#frameset_{ID} form.manual_scoring').submit(function(e){
           tinyMCE.triggerSave();

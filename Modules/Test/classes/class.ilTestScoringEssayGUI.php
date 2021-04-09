@@ -17,6 +17,10 @@ class ilTestScoringEssayGUI extends ilTestScoringGUI
 
     const RESPECT_SIDE_FRAME_COOKIES = true;
 
+    const ADDITIONALCMD_PARAMETER = 'additionalCommand';
+    const CHANGEPASS_PARAMETER = 'passIndex';
+    const CHANGEQST_PARAMETER = 'questionId';
+
     /**
      * @var int
      */
@@ -127,9 +131,21 @@ class ilTestScoringEssayGUI extends ilTestScoringGUI
         switch( $DIC->ctrl()->getNextClass($this) )
         {
             default:
+
+                $this->saveParameters();
+
                 $command = $DIC->ctrl()->getCmd($this->getDefaultCommand()).'Cmd';
                 $this->{$command}();
         }
+    }
+
+    protected function saveParameters()
+    {
+        global $DIC; /* @var \ILIAS\DI\Container $DIC */
+
+        $DIC->ctrl()->setParameter($this, 'active_id', $this->curActiveId);
+        $DIC->ctrl()->setParameter($this, 'pass', $this->curPassIndex);
+        $DIC->ctrl()->setParameter($this, 'question_id', $this->curQuestionId);
     }
 
     /**
@@ -160,141 +176,6 @@ class ilTestScoringEssayGUI extends ilTestScoringGUI
         $passSelector->setActiveId($this->curActiveId);
         $passSelector->loadLastFinishedPass();
         return $passSelector;
-    }
-
-    /**
-     * @return array
-     */
-    protected function buildPassDropdownOptions(ilTestPassesSelector $passSelector)
-    {
-        global $DIC; /* @var \ILIAS\DI\Container $DIC */
-
-        $passOptions = array();
-
-        foreach ($passSelector->getClosedPasses() as $passIndex) {
-            $passOptions[$passIndex] = $DIC->language()->txt('pass') . ' ' . ($passIndex + 1);
-        }
-
-        return $passOptions;
-    }
-
-    /**
-     * @param array $questionGuiList
-     * @return array
-     */
-    protected function buildQuestionsDropdownOptions($questionGuiList)
-    {
-        $qstOptions = array();
-
-        foreach($this->questionGuiList as $questionGUI)
-        {
-            /* @var assQuestionGUI $questionGUI */
-            $qstOptions[$questionGUI->object->getId()] = $questionGUI->object->getTitle();
-        }
-
-        return $qstOptions;
-    }
-
-    /**
-     * @param ilTestPassesSelector $passSelector
-     * @param array $questionGuiList
-     */
-    protected function buildToolbar(ilTestPassesSelector $passSelector, $questionGuiList)
-    {
-        global $DIC; /* @var \ILIAS\DI\Container $DIC */
-
-        $passOptions = $this->buildPassDropdownOptions($passSelector);
-        $qstOptions = $this->buildQuestionsDropdownOptions($questionGuiList);
-
-        $passSelect = new ilSelectInputGUI('', 'pass');
-        $passSelect->setOptions($passOptions);
-        $passSelect->setValue($this->curPassIndex);
-        $passSelect->setRequired(true);
-        $DIC->toolbar()->addInputItem($passSelect);
-
-        $qstSelect = new ilSelectInputGUI('', 'question_id');
-        $qstSelect->setOptions($qstOptions);
-        $qstSelect->setValue($this->curQuestionId);
-        $qstSelect->setRequired(true);
-        $DIC->toolbar()->addInputItem($qstSelect);
-
-        $submitBtn = ilSubmitButton::getInstance();
-        $submitBtn->setCaption('open');
-        $submitBtn->setCommand('changeQuestion');
-        $DIC->toolbar()->addButtonInstance($submitBtn);
-
-        $DIC->toolbar()->addSeparator();
-
-        $scoringMarkingBtn = $this->buildParticipantScoringMarkButton();
-        $DIC->toolbar()->addButtonInstance($scoringMarkingBtn);
-
-        $DIC->toolbar()->addSeparator();
-
-        $sendNotificationBtn = $this->buildSendNotificationButton();
-        $DIC->toolbar()->addButtonInstance($sendNotificationBtn);
-
-        $DIC->toolbar()->setFormAction($DIC->ctrl()->getFormAction($this));
-    }
-
-    /**
-     * @return ilLinkButton
-     */
-    protected function buildSendNotificationButton()
-    {
-        global $DIC; /* @var \ILIAS\DI\Container $DIC */
-
-        $sendNotificationBtn = ilLinkButton::getInstance();
-        $sendNotificationBtn->setCaption('tst_manscoring_user_notification');
-        $sendNotificationBtn->setUrl($DIC->ctrl()->getLinkTarget($this, 'sendNotification'));
-
-        return $sendNotificationBtn;
-    }
-
-    /**
-     * @return ilLinkButton
-     */
-    protected function buildParticipantScoringMarkButton()
-    {
-        global $DIC; /* @var \ILIAS\DI\Container $DIC */
-
-        $scoringMarkBtn = ilLinkButton::getInstance();
-
-        $DIC->ctrl()->setParameterByClass(ilTestScoringPilotGUI::class,
-            'active_id', $this->curActiveId
-        );
-
-        if( ilTestService::isManScoringDone($this->curActiveId) )
-        {
-            $scoringMarkBtn->setCaption('tst_mark_unscored');
-            $scoringMarkBtn->setUrl($DIC->ctrl()->getLinkTargetByClass(
-                ilTestScoringPilotGUI::class, 'markParticipantUnscored'
-            ));
-        }
-        else
-        {
-            $scoringMarkBtn->setCaption('tst_mark_scored');
-            $scoringMarkBtn->setUrl($DIC->ctrl()->getLinkTargetByClass(
-                ilTestScoringPilotGUI::class, 'markParticipantScored'
-            ));
-        }
-
-        return $scoringMarkBtn;
-    }
-
-    protected function saveParameters()
-    {
-        global $DIC; /* @var \ILIAS\DI\Container $DIC */
-
-        $DIC->ctrl()->setParameter($this, 'active_id', $this->curActiveId);
-        $DIC->ctrl()->setParameter($this, 'pass', $this->curPassIndex);
-        $DIC->ctrl()->setParameter($this, 'question_id', $this->curQuestionId);
-    }
-
-    protected function changeQuestionCmd()
-    {
-        global $DIC; /* @var \ILIAS\DI\Container $DIC */
-        $this->saveParameters();
-        $DIC->ctrl()->redirect($this);
     }
 
     protected function showManualScoringCmd()
@@ -328,6 +209,117 @@ class ilTestScoringEssayGUI extends ilTestScoringGUI
         $DIC->ui()->mainTemplate()->setContent($this->buildTextQuestionOutput($panel));
     }
 
+    protected function saveManualScoringCmd()
+    {
+        global $DIC; /* @var \ILIAS\DI\Container $DIC */
+
+        $manScored = isset($_POST['manual_scored']) && (bool)$_POST['manual_scored'];
+        ilTestService::setManScoringDone($this->curActiveId, $manScored);
+
+        $this->object->saveManualFeedback(
+            $this->curActiveId, $this->curQuestionId, $this->curPassIndex,
+            $this->getCurrentQuestionGUI()->object->getHtmlQuestionContentPurifier()->purify($_POST['manual_feedback'])
+        );
+
+        $pointsValidAndSaved = false;
+
+        $manPoints = $_POST['manual_points'];
+        $maxPoints = assQuestion::_getMaximumPoints($this->curQuestionId);
+
+        if( is_numeric($manPoints) && $manPoints >= 0 && $manPoints <= $maxPoints )
+        {
+            assQuestion::_setReachedPoints(
+                $this->curActiveId,
+                $this->curQuestionId,
+                $manPoints,
+                $maxPoints,
+                $this->curPassIndex,
+                1,
+                $this->object->areObligationsEnabled()
+            );
+
+            $pointsValidAndSaved = true;
+        }
+        else
+        {
+            $failureMessage = sprintf($DIC->language()->txt('invalid_man_scoring_points'), $maxPoints, $manPoints);
+            ilUtil::sendFailure($failureMessage, true);
+
+            assQuestion::_setReachedPoints(
+                $this->curActiveId,
+                $this->curQuestionId,
+                0,
+                $maxPoints,
+                $this->curPassIndex,
+                1,
+                $this->object->areObligationsEnabled()
+            );
+        }
+
+        if( $pointsValidAndSaved )
+        {
+            $this->handleAdditionalActions();
+        }
+
+        $DIC->ctrl()->redirect($this, 'showManualScoring');
+    }
+
+    protected function handleAdditionalActions()
+    {
+        if( isset($_POST[self::ADDITIONALCMD_PARAMETER]) && strlen($_POST[self::ADDITIONALCMD_PARAMETER]) )
+        {
+            switch($_POST[self::ADDITIONALCMD_PARAMETER])
+            {
+                case 'changeQuestion':
+                    $this->handleChangeQuestionAction();
+                    break;
+
+                case 'sendNotification':
+                    $this->handleSendNotificationAction();
+                    break;
+            }
+        }
+    }
+
+    protected function handleChangeQuestionAction()
+    {
+        if( isset($_POST[self::CHANGEPASS_PARAMETER]) )
+        {
+            $this->curPassIndex = (int)$_POST[self::CHANGEPASS_PARAMETER];
+        }
+
+        if( isset($_POST[self::CHANGEQST_PARAMETER]) )
+        {
+            $this->curQuestionId = (int)$_POST[self::CHANGEQST_PARAMETER];
+        }
+
+        $this->saveParameters();
+    }
+
+    protected function handleSendNotificationAction()
+    {
+        $notificationData[$this->curQuestionId] = array(
+            'points' => assQuestion::_getReachedPoints($this->curActiveId, $this->curQuestionId),
+            'feedback' => $this->object->getManualFeedback(
+                $this->curActiveId, $this->curQuestionId, $this->curPassIndex
+            )
+        );
+
+        $notification = new ilTestManScoringParticipantNotification(
+            $this->object->_getUserIdFromActiveId($this->curActiveId),
+            $this->object->getRefId()
+        );
+
+        $notification->setAdditionalInformation(array(
+            'test_title' => $this->object->getTitle(),
+            'test_pass' => $this->curPassIndex + 1,
+            'questions_gui_list' => $this->questionGuiList,
+            'questions_scoring_data' => $notificationData
+        ));
+
+        $notification->send();
+    }
+
     protected function buildTextQuestionOutput($panel)
     {
         global $DIC; /* @var \ILIAS\DI\Container $DIC */
@@ -351,26 +343,29 @@ class ilTestScoringEssayGUI extends ilTestScoringGUI
 
         $tpl = new ilTemplate('tpl.manual_scoring_essay.html', true, true, 'Modules/Test');
 
-        $tpl->setVariable('FEEDBACK_SAVE_URL', $DIC->ctrl()->getLinkTarget(
-            $this, 'saveManualFeedbackAsync', '', true
-        ));
+        $tpl->setVariable('ADDITIONALCMD_PARAMETER', self::ADDITIONALCMD_PARAMETER);
+        $tpl->setVariable('CHANGEPASS_PARAMETER', self::CHANGEPASS_PARAMETER);
+        $tpl->setVariable('CHANGEQST_PARAMETER', self::CHANGEQST_PARAMETER);
 
         $tpl->setVariable('ID', $this->curQuestionId);
 
         return $tpl->get();
     }
 
-    protected function saveManualFeedbackAsyncCmd()
+    /**
+     * @return assQuestionGUI
+     */
+    protected function getCurrentQuestionGUI()
     {
-        /* assTextQuestionGUI $questionGui */
-        $questionGui = $this->getCurrentQuestionGUI();
+        foreach($this->questionGuiList as $questionGUI)
+        {
+            if( $questionGUI->object->getId() != $this->curQuestionId )
+            {
+                continue;
+            }
 
-        $this->object->saveManualFeedback(
-            $this->curActiveId, $this->curQuestionId, $this->curPassIndex,
-            $questionGui->object->getHtmlQuestionContentPurifier()->purify($_POST['manual_feedback'])
-        );
-
-        exit;
+            return $questionGUI;
+        }
     }
 
     protected function buildPanelTitle()
@@ -423,22 +418,6 @@ class ilTestScoringEssayGUI extends ilTestScoringGUI
         return $frameSet;
     }
 
-    /**
-     * @return assQuestionGUI
-     */
-    protected function getCurrentQuestionGUI()
-    {
-        foreach($this->questionGuiList as $questionGUI)
-        {
-            if( $questionGUI->object->getId() != $this->curQuestionId )
-            {
-                continue;
-            }
-
-            return $questionGUI;
-        }
-    }
-
     protected function getMainFrameContent(assTextQuestionGUI $questionGui)
     {
         return $questionGui->getUserSolutionSnippet($this->curActiveId, $this->curPassIndex);
@@ -477,94 +456,144 @@ class ilTestScoringEssayGUI extends ilTestScoringGUI
 
         $maxPoints = assQuestion::_getMaximumPoints($this->curQuestionId);
 
-        $pointsInput = new ilTextInputGUI('', 'manual_points');
-        $pointsInput->setValue($manualPoints);
+        $manualScored = ilTestService::isManScoringDone($this->curActiveId);
+
+        $formHtml = $this->renderManualScoringForm(
+            $formaction, $editorId, $manualFeedback, $manualPoints, $maxPoints, $manualScored
+        );
+
+        return $formHtml;
+    }
+
+    /**
+     * @param string $formaction
+     * @param string $editorId
+     * @param string $manualFeedback
+     * @param integer $manualPoints
+     * @param integer $maxPoints
+     * @param bool $manualScored
+     * @return string
+     * @throws ilTemplateException
+     */
+    protected function renderManualScoringForm($formaction, $editorId, $manualFeedback, $manualPoints, $maxPoints, $manualScored)
+    {
+        global $DIC; /* @var \ILIAS\DI\Container $DIC */
 
         $tpl = new ilTemplate('tpl.manual_scoring_rawform.html', true, true, 'Modules/Test');
 
         $tpl->setCurrentBlock('rawform');
-        $tpl->setVariable('EDITOR_SELECTOR', $editorId);
+
         $tpl->setVariable('FORMACTION', $formaction);
+        $tpl->setVariable('EDITOR_SELECTOR', $editorId);
+
         $tpl->setVariable('MANUAL_FEEDBACK', $manualFeedback);
-        $tpl->setVariable('POINTS_LABEL', sprintf($DIC->language()->txt('granted_points'), $maxPoints));
-        $tpl->setVariable('POINTS_INPUT', $pointsInput->render());
+
+        $tpl->setVariable('POINTS_INPUT_ID', 'manual_points');
+        $tpl->setVariable('POINTS_INPUT_LABEL', sprintf($DIC->language()->txt('granted_points'), $maxPoints));
+        $tpl->setVariable('POINTS_INPUT_VALUE', $manualPoints);
+
+        $tpl->setVariable('SCORED_INPUT_ID', 'manual_scored');
+        $tpl->setVariable('SCORED_INPUT_LABEL', $DIC->language()->txt('tst_mark_scored'));
+        $tpl->setVariable('SCORED_INPUT_VALUE', $manualScored ? 'checked="checked"' : '');
+
+        $tpl->setVariable('ADDITIONALCMD_PARAMETER', self::ADDITIONALCMD_PARAMETER);
+        $tpl->setVariable('CHANGEPASS_PARAMETER', self::CHANGEPASS_PARAMETER);
+        $tpl->setVariable('CHANGEQST_PARAMETER', self::CHANGEQST_PARAMETER);
+
         $tpl->setVariable('SUBMIT_LABEL', $DIC->language()->txt('save'));
-        $tpl->setVariable('SUBMIT_CMD', 'saveManualPoints');
+        $tpl->setVariable('SUBMIT_CMD', 'saveManualScoring');
+
         $tpl->parseCurrentBlock();
 
         return $tpl->get();
     }
 
-    protected function saveManualPointsCmd()
+    /**
+     * @param ilTestPassesSelector $passSelector
+     * @param array $questionGuiList
+     */
+    protected function buildToolbar(ilTestPassesSelector $passSelector, $questionGuiList)
     {
         global $DIC; /* @var \ILIAS\DI\Container $DIC */
 
-        $this->saveParameters();
+        $passOptions = $this->buildPassDropdownOptions($passSelector);
+        $qstOptions = $this->buildQuestionsDropdownOptions($questionGuiList);
 
-        $this->object->saveManualFeedback(
-            $this->curActiveId, $this->curQuestionId, $this->curPassIndex,
-            $this->getCurrentQuestionGUI()->object->getHtmlQuestionContentPurifier()->purify($_POST['manual_feedback'])
-        );
+        $passSelect = new ilSelectInputGUI('', 'passIndexSelect');
+        $passSelect->setOptions($passOptions);
+        $passSelect->setValue($this->curPassIndex);
+        $passSelect->setRequired(true);
+        $DIC->toolbar()->addInputItem($passSelect);
 
-        $manPoints = $_POST['manual_points'];
-        $maxPoints = assQuestion::_getMaximumPoints($this->curQuestionId);
+        $qstSelect = new ilSelectInputGUI('', 'questionIdSelect');
+        $qstSelect->setOptions($qstOptions);
+        $qstSelect->setValue($this->curQuestionId);
+        $qstSelect->setRequired(true);
+        $DIC->toolbar()->addInputItem($qstSelect);
 
-        if( is_numeric($manPoints) && $manPoints >= 0 && $manPoints <= $maxPoints )
-        {
-            assQuestion::_setReachedPoints(
-                $this->curActiveId,
-                $this->curQuestionId,
-                $manPoints,
-                $maxPoints,
-                $this->curPassIndex,
-                1,
-                $this->object->areObligationsEnabled()
-            );
-        }
-        else
-        {
-            $failureMessage = sprintf($DIC->language()->txt('invalid_man_scoring_points'), $maxPoints, $manPoints);
-            ilUtil::sendFailure($failureMessage, true);
+        $changeQuestionBtn = $this->buildChangeQuestionButton();
+        $DIC->toolbar()->addButtonInstance($changeQuestionBtn);
 
-            assQuestion::_setReachedPoints(
-                $this->curActiveId,
-                $this->curQuestionId,
-                0,
-                $maxPoints,
-                $this->curPassIndex,
-                1,
-                $this->object->areObligationsEnabled()
-            );
-        }
+        $DIC->toolbar()->addSeparator();
 
-        $DIC->ctrl()->redirect($this, 'showManualScoring');
+        $sendNotificationBtn = $this->buildSendNotificationButton();
+        $DIC->toolbar()->addButtonInstance($sendNotificationBtn);
     }
 
-    protected function sendNotificationCmd()
+    /**
+     * @return array
+     */
+    protected function buildPassDropdownOptions(ilTestPassesSelector $passSelector)
     {
         global $DIC; /* @var \ILIAS\DI\Container $DIC */
 
-        $notificationData[$this->curQuestionId] = array(
-            'points' => assQuestion::_getReachedPoints($this->curActiveId, $this->curQuestionId),
-            'feedback' => $this->object->getManualFeedback(
-                $this->curActiveId, $this->curQuestionId, $this->curPassIndex
-            )
-        );
+        $passOptions = array();
 
-        $notification = new ilTestManScoringParticipantNotification(
-            $this->object->_getUserIdFromActiveId($this->curActiveId),
-            $this->object->getRefId()
-        );
+        foreach ($passSelector->getClosedPasses() as $passIndex) {
+            $passOptions[$passIndex] = $DIC->language()->txt('pass') . ' ' . ($passIndex + 1);
+        }
 
-        $notification->setAdditionalInformation(array(
-            'test_title' => $this->object->getTitle(),
-            'test_pass' => $this->curPassIndex + 1,
-            'questions_gui_list' => $this->questionGuiList,
-            'questions_scoring_data' => $notificationData
-        ));
+        return $passOptions;
+    }
 
-        $notification->send();
+    /**
+     * @param array $questionGuiList
+     * @return array
+     */
+    protected function buildQuestionsDropdownOptions($questionGuiList)
+    {
+        $qstOptions = array();
 
-        $DIC->ctrl()->redirect($this);
+        foreach($this->questionGuiList as $questionGUI)
+        {
+            /* @var assQuestionGUI $questionGUI */
+            $qstOptions[$questionGUI->object->getId()] = $questionGUI->object->getTitle();
+        }
+
+        return $qstOptions;
+    }
+
+    /**
+     * @return ilLinkButton
+     */
+   protected function buildChangeQuestionButton()
+    {
+        $changeQuestionBtn = ilLinkButton::getInstance();
+        $changeQuestionBtn->setId('changeQuestionBtn');
+        $changeQuestionBtn->setCaption('open');
+
+        return $changeQuestionBtn;
+    }
+
+    /**
+     * @return ilLinkButton
+     */
+    protected function buildSendNotificationButton()
+    {
+        $sendNotificationBtn = ilLinkButton::getInstance();
+        $sendNotificationBtn->setId('sendNotificationBtn');
+        $sendNotificationBtn->setCaption('tst_manscoring_user_notification');
+
+        return $sendNotificationBtn;
     }
 }

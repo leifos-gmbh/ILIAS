@@ -107,12 +107,6 @@ class ilTestScoringPilotGUI extends ilTestScoringGUI
 
         ilTestService::setManScoringDone($this->getActiveIdParameter(), true);
 
-        if( $this->getActiveIdParameter() )
-        {
-            $DIC->ctrl()->saveParameterByClass(ilTestScoringEssayGUI::class, 'active_id');
-            $DIC->ctrl()->redirectByClass(ilTestScoringEssayGUI::class);
-        }
-
         $DIC->ctrl()->redirect($this);
     }
 
@@ -121,12 +115,6 @@ class ilTestScoringPilotGUI extends ilTestScoringGUI
         global $DIC; /* @var \ILIAS\DI\Container $DIC */
 
         ilTestService::setManScoringDone($this->getActiveIdParameter(), false);
-
-        if( $this->getActiveIdParameter() )
-        {
-            $DIC->ctrl()->saveParameterByClass(ilTestScoringEssayGUI::class, 'active_id');
-            $DIC->ctrl()->redirectByClass(ilTestScoringEssayGUI::class);
-        }
 
         $DIC->ctrl()->redirect($this);
     }

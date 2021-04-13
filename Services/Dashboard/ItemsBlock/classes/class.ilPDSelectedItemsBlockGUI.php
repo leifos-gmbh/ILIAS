@@ -1,15 +1,15 @@
 <?php
-/* Copyright (c) 1998-2011 ILIAS open source, Extended GPL, see docs/LICENSE */
+
+/* Copyright (c) 1998-2021 ILIAS open source, GPLv3, see LICENSE */
 
 /**
-* BlockGUI class for Selected Items on Personal Desktop
-*
-* @author Alex Killing <alex.killing@gmx.de>
-* @version $Id$
-*
-* @ilCtrl_IsCalledBy ilPDSelectedItemsBlockGUI: ilColumnGUI
-* @ilCtrl_Calls ilPDSelectedItemsBlockGUI: ilCommonActionDispatcherGUI
-*/
+ * BlockGUI class for Selected Items on Personal Desktop
+ *
+ * @author Alexander Killing <killing@leifos.de>
+ *
+ * @ilCtrl_IsCalledBy ilPDSelectedItemsBlockGUI: ilColumnGUI
+ * @ilCtrl_Calls ilPDSelectedItemsBlockGUI: ilCommonActionDispatcherGUI
+ */
 class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandling
 {
     /** @var ilRbacSystem */
@@ -262,7 +262,6 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
 
         switch ($next_class) {
             case 'ilcommonactiondispatchergui':
-                include_once('Services/Object/classes/class.ilCommonActionDispatcherGUI.php');
                 $gui = ilCommonActionDispatcherGUI::getInstanceFromAjaxCall();
                 $this->ctrl->forwardCommand($gui);
                 break;
@@ -569,7 +568,6 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
             $cmd = 'confirmedUnsubscribe';
         }
 
-        include_once('./Services/Utilities/classes/class.ilConfirmationGUI.php');
         $cgui = new ilConfirmationGUI();
         $cgui->setHeaderText($question);
 
@@ -653,7 +651,6 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
                         continue 2;
                 }
         
-                include_once './Modules/Forum/classes/class.ilForumNotification.php';
                 ilForumNotification::checkForumsExistsDelete($ref_id, $this->user->getId());
             }
         }
@@ -687,10 +684,11 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
         $groupedCommands = $this->getGroupedCommandsForView();
         foreach ($groupedCommands as $group) {
             foreach ($group as $command) {
+                $asynch_url = $command['asyncUrl'] ?? "";
                 $this->addBlockCommand(
                     (string) $command['url'],
                     (string) $command['txt'],
-                    (string) $command['asyncUrl']
+                    (string) $asynch_url
                 );
             }
         }
@@ -795,10 +793,11 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
         $groupedCommands = $this->getGroupedCommandsForView();
         foreach ($groupedCommands as $group) {
             foreach ($group as $command) {
+                $asynch_url = $command['asyncUrl'] ?? "";
                 $this->addBlockCommand(
                     (string) $command['url'],
                     (string) $command['txt'],
-                    (string) $command['asyncUrl']
+                    (string) $asynch_url
                 );
             }
         }
@@ -872,7 +871,6 @@ class ilPDSelectedItemsBlockGUI extends ilBlockGUI implements ilDesktopItemHandl
      */
     public function getNoItemFoundContent() : string
     {
-
         $txt = $this->lng->txt("rep_fav_intro1") . "<br>";
         $txt .= sprintf(
             $this->lng->txt('rep_fav_intro2'),

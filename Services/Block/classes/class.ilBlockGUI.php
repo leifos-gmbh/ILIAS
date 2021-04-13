@@ -1,20 +1,23 @@
 <?php
 
-/* Copyright (c) 1998-2017 ILIAS open source, Extended GPL, see docs/LICENSE */
+/* Copyright (c) 1998-2021 ILIAS open source, GPLv3, see LICENSE */
 
 /**
-* This class represents a block method of a block.
-*
-* @author Alex Killing <alex.killing@gmx.de>
-* @version $Id$
-*
-*/
+ * This class represents a block method of a block.
+ *
+ * @author Alex Killing <alex.killing@gmx.de>
+ */
 abstract class ilBlockGUI
 {
     const PRES_MAIN_LEG = 0;		// main legacy panel
     const PRES_SEC_LEG = 1;			// secondary legacy panel
     const PRES_SEC_LIST = 2;		// secondary list panel
     const PRES_MAIN_LIST = 3;		// main standard list panel
+
+    /**
+     * @var bool
+     */
+    protected $repositorymode = false;
 
     /**
      * @var \ILIAS\DI\UIServices
@@ -43,7 +46,12 @@ abstract class ilBlockGUI
     protected $max_count = false;
     protected $close_command = false;
     protected $image = false;
-    protected $property = false;
+
+    /**
+     * @var array
+     */
+    protected $property = [];
+
     protected $nav_value = "";
     protected $css_row = "";
 
@@ -101,6 +109,11 @@ abstract class ilBlockGUI
     protected $presentation;
 
     /**
+     * @var ?int
+     */
+    protected $requested_ref_id;
+
+    /**
      * Constructor
      *
      * @param
@@ -120,11 +133,12 @@ abstract class ilBlockGUI
         $this->obj_def = $DIC["objDefinition"];
         $this->ui = $DIC->ui();
 
-        include_once("./Services/YUI/classes/class.ilYuiUtil.php");
         ilYuiUtil::initConnection();
         $this->main_tpl->addJavaScript("./Services/Block/js/ilblockcallback.js");
 
         $this->setLimit($this->user->getPref("hits_per_page"));
+
+        $this->requested_ref_id = (int) ($_GET["ref_id"] ?? null);
     }
 
 
@@ -413,7 +427,7 @@ abstract class ilBlockGUI
 
     public function getProperty($a_property)
     {
-        return $this->property[$a_property];
+        return $this->property[$a_property] ?? null;
     }
 
     public function setProperty($a_property, $a_value)
@@ -550,14 +564,14 @@ abstract class ilBlockGUI
 
             if ($ilAccess->checkAccess("delete", "", $this->getRefId())) {
                 $this->addBlockCommand(
-                    "ilias.php?baseClass=ilRepositoryGUI&ref_id=" . $_GET["ref_id"] . "&cmd=delete" .
+                    "ilias.php?baseClass=ilRepositoryGUI&ref_id=" . $this->requested_ref_id . "&cmd=delete" .
                     "&item_ref_id=" . $this->getRefId(),
                     $lng->txt("delete")
                 );
 
                 // see ilObjectListGUI::insertCutCommand();
                 $this->addBlockCommand(
-                    "ilias.php?baseClass=ilRepositoryGUI&ref_id=" . $_GET["ref_id"] . "&cmd=cut" .
+                    "ilias.php?baseClass=ilRepositoryGUI&ref_id=" . $this->requested_ref_id . "&cmd=cut" .
                     "&item_ref_id=" . $this->getRefId(),
                     $lng->txt("move")
                 );
@@ -565,7 +579,7 @@ abstract class ilBlockGUI
 
             // #14595 - see ilObjectListGUI::insertCopyCommand()
             if ($ilAccess->checkAccess("copy", "", $this->getRefId())) {
-                $parent_type = ilObject::_lookupType($_GET["ref_id"], true);
+                $parent_type = ilObject::_lookupType($this->requested_ref_id, true);
                 $parent_gui = "ilObj" . $objDefinition->getClassName($parent_type) . "GUI";
 
                 $ilCtrl->setParameterByClass("ilobjectcopygui", "source_id", $this->getRefId());
@@ -637,7 +651,6 @@ abstract class ilBlockGUI
     public function fillHeaderCommands()
     {
         // adv selection gui
-        include_once "Services/UIComponent/AdvancedSelectionList/classes/class.ilAdvancedSelectionListGUI.php";
         $dropdown = new ilAdvancedSelectionListGUI();
         $dropdown->setUseImages(true);
         $dropdown->setStyle(ilAdvancedSelectionListGUI::STYLE_LINK_BUTTON);
@@ -1114,14 +1127,14 @@ abstract class ilBlockGUI
 
             if ($access->checkAccess("delete", "", $this->getRefId())) {
                 $this->addBlockCommand(
-                    "ilias.php?baseClass=ilRepositoryGUI&ref_id=" . $_GET["ref_id"] . "&cmd=delete" .
+                    "ilias.php?baseClass=ilRepositoryGUI&ref_id=" . $this->requested_ref_id . "&cmd=delete" .
                     "&item_ref_id=" . $this->getRefId(),
                     $lng->txt("delete")
                 );
 
                 // see ilObjectListGUI::insertCutCommand();
                 $this->addBlockCommand(
-                    "ilias.php?baseClass=ilRepositoryGUI&ref_id=" . $_GET["ref_id"] . "&cmd=cut" .
+                    "ilias.php?baseClass=ilRepositoryGUI&ref_id=" . $this->requested_ref_id . "&cmd=cut" .
                     "&item_ref_id=" . $this->getRefId(),
                     $lng->txt("move")
                 );
@@ -1129,7 +1142,7 @@ abstract class ilBlockGUI
 
             // #14595 - see ilObjectListGUI::insertCopyCommand()
             if ($access->checkAccess("copy", "", $this->getRefId())) {
-                $parent_type = ilObject::_lookupType($_GET["ref_id"], true);
+                $parent_type = ilObject::_lookupType($this->requested_ref_id, true);
                 $parent_gui = "ilObj" . $obj_def->getClassName($parent_type) . "GUI";
 
                 $ctrl->setParameterByClass("ilobjectcopygui", "source_id", $this->getRefId());

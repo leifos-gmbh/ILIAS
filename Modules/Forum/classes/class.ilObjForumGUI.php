@@ -811,7 +811,11 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
 
             $rowCol = 'tblrowmarked';
             $tpl->setVariable('ROWCOL', ' ' . $rowCol);
-            $tpl->setVariable('DEPTH', (int) ($referencePosting->getDepth() - 1));
+            $depth = (int) ($referencePosting->getDepth() - 1);
+            if ($this->selectedSorting === ilForumProperties::VIEW_TREE) {
+                $depth += 1;
+            }
+            $tpl->setVariable('DEPTH', $depth);
 
             $this->ctrl->setParameter($this, 'pos_pk', $referencePosting->getId());
             $this->ctrl->setParameter($this, 'thr_pk', $referencePosting->getThreadId());
@@ -1870,18 +1874,15 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
         $this->ctrl->setParameter($this, 'thr_pk', $this->objCurrentPost->getThreadId());
         if ($this->isTopLevelReplyCommand()) {
             $this->replyEditForm->setFormAction(
-                $this->ctrl->getFormAction($this, 'saveTopLevelPost'),
-                'frm_page_bottom'
+                $this->ctrl->getFormAction($this, 'saveTopLevelPost', 'frm_page_bottom')
             );
         } elseif (in_array($this->requestAction, ['publishDraft', 'editdraft'])) {
             $this->replyEditForm->setFormAction(
-                $this->ctrl->getFormAction($this, 'publishDraft'),
-                $this->objCurrentPost->getId()
+                $this->ctrl->getFormAction($this, 'publishDraft', $this->objCurrentPost->getId())
             );
         } else {
             $this->replyEditForm->setFormAction(
-                $this->ctrl->getFormAction($this, 'savePost'),
-                $this->objCurrentPost->getId()
+                $this->ctrl->getFormAction($this, 'savePost', $this->objCurrentPost->getId())
             );
         }
         $this->ctrl->clearParameters($this);
@@ -2033,7 +2034,7 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
             }
         }
 
-        $selected_draft_id = (int)$_GET['draft_id'];
+        $selected_draft_id = (int) $_GET['draft_id'];
         $draftObj = new ilForumPostDraft(
             $this->user->getId(),
             $this->objCurrentPost->getId(),
@@ -2699,7 +2700,7 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
 
         if (
             isset($this->httpRequest->getQueryParams()['viewmode']) &&
-            (int) $this->httpRequest->getQueryParams()['viewmode']  !== (int) $this->selectedSorting
+            (int) $this->httpRequest->getQueryParams()['viewmode'] !== (int) $this->selectedSorting
         ) {
             $this->selectedSorting = (int) $this->httpRequest->getQueryParams()['viewmode'];
         }
@@ -2836,7 +2837,7 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
             );
         }
 
-       $threadContentTemplate->setVariable('LIST_TYPE', $this->viewModeOptions[$this->selectedSorting]);
+        $threadContentTemplate->setVariable('LIST_TYPE', $this->viewModeOptions[$this->selectedSorting]);
 
         $numberOfPostings = 0;
 
@@ -2955,7 +2956,7 @@ class ilObjForumGUI extends \ilObjectGUI implements \ilDesktopItemHandling
                 $draftsObjects = ilForumPostDraft::getSortedDrafts(
                     (int) $this->user->getId(),
                     (int) $this->objCurrentTopic->getId(),
-                $this->selectedSorting
+                    $this->selectedSorting
                 );
             }
 

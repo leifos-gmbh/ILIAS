@@ -160,7 +160,7 @@ class ilStartUpGUI
         $ilAppEventHandler = $GLOBALS['DIC']['ilAppEventHandler'];
 
         $force_login = false;
-        if (
+        if (isset($_REQUEST['cmd']) &&
             !is_array($_REQUEST['cmd']) &&
             strcmp($_REQUEST['cmd'], 'force_login') === 0
         ) {
@@ -1340,13 +1340,13 @@ class ilStartUpGUI
             )
         );
 
-        // reset cookie
-        $client_id = $_COOKIE["ilClientId"];
-        ilUtil::setCookie("ilClientId", "");
-
         if ((int) $this->user->getAuthMode(true) == AUTH_SAML && ilSession::get('used_external_auth')) {
             $this->ctrl->redirectToURL('saml.php?action=logout&logout_url=' . urlencode(ILIAS_HTTP_PATH . '/login.php'));
         }
+
+        // reset cookie
+        $client_id = $_COOKIE["ilClientId"];
+        ilUtil::setCookie("ilClientId", "");
 
         // redirect and show logout information
         $this->ctrl->setParameter($this, 'client_id', $client_id);
@@ -1638,7 +1638,8 @@ class ilStartUpGUI
                 $tpl->setVariable('ACCEPT_TERMS_OF_SERVICE', $this->lng->txt('accept_usr_agreement'));
                 $tpl->setVariable('TXT_ACCEPT', $this->lng->txt('accept_usr_agreement_btn'));
                 $tpl->setVariable('DENY_TERMS_OF_SERVICE', $this->lng->txt('deny_usr_agreement'));
-                $tpl->setVariable('DENIAL_BUTTON',
+                $tpl->setVariable(
+                    'DENIAL_BUTTON',
                     $this->dic->ui()->renderer()->render(
                         $this->dic->ui()->factory()->button()->standard(
                             $this->dic->language()->txt('deny_usr_agreement_btn'),

@@ -213,9 +213,9 @@ lti#:#auth_lti#:#LTI Auth
 lti#:#lti_edit_consumer#:#LTI-Konsument bearbeiten
 lti#:#lti_obj_active#:#LTI-Tool-Provider
 lti#:#lti_obj_active_info#:#Wenn aktiviert, kann dieses Objekt über die LTI-Schnittstelle von anderen Plattformen eingebunden werden.
-lti#:#lti_admin#:#LTI-Administrator
-lti#:#lti_tutor#:#LTI-Tutor
-lti#:#lti_member#:#LTI-Member
+lti#:#lti_admin#:#LTI-Rolle Administrator
+lti#:#lti_tutor#:#LTI-Rolle Tutor
+lti#:#lti_member#:#LTI-Rolle Mitglied
 auth#:#lti_consumer_inactive#:#LTI-Tool-Consumer ist deaktivert
 crs#:#crs_timings_activate_optional#:#Freiwilligen-Modus des studyplans des Benutzers
 crs#:#crs_timings_activate_optional_own#:#Freiwilligen-Modus meines studyplans
@@ -1711,6 +1711,7 @@ assessment#:#tst_title_output_hide_points#:#Nur Fragentitel
 assessment#:#tst_title_output_no_title#:#Weder Fragentitel noch erreichbare Punkte
 assessment#:#tst_type#:#Test-Typ
 assessment#:#exam_id#:#ILIAS-Prüfungsnummer:
+assessment#:#exam_id_label#:#ILIAS-Prüfungsnummer
 assessment#:#examid_in_test_pass#:#ILIAS-Prüfungsnummer anzeigen
 assessment#:#examid_in_test_pass_desc#:#Im Test wird eine ILIAS-Prüfungsnummer angezeigt. Für jeden Testdurchlauf wird eine eigene Nummer erzeugt.
 assessment#:#examid_in_test_res#:#ILIAS-Prüfungsnummer anzeigen
@@ -3102,7 +3103,7 @@ common#:#firstname#:#Vorname
 common#:#flatview#:#Baumansicht aus
 common#:#fold#:#Ordner
 common#:#fold_add#:#Ordner anlegen
-common#:#fold_added#:#Ordner angelegt-
+common#:#fold_added#:#Ordner angelegt
 rbac#:#fold_copy#:#Ordner kopieren
 rbac#:#fold_delete#:#Ordner löschen oder verschieben
 common#:#fold_edit#:#Ordner bearbeiten
@@ -4730,7 +4731,7 @@ content#:#cont_active_areas#:#Auslöser
 content#:#cont_add_area#:#Bereich hinzufügen
 content#:#cont_add_change_comment#:#Überarbeitungskommentar hinzufügen
 content#:#cont_add_definition#:#Definition hinzufügen
-content#:#cont_add_elements#:#Klicken Sie auf einen Platzhalter, um ein neues Element hinzuzufügen.
+content#:#cont_add_elements#:#<b>Klicken</b> Sie auf ein <b>Plus-Symbol</b>, um ein neues Element <b>hinzuzufügen</b>.
 content#:#cont_add_file#:#Datei hinzufügen
 content#:#cont_add_images#:#Bild hinzufügen
 content#:#cont_add_popup#:#Popup hinzufügen
@@ -4861,14 +4862,16 @@ content#:#cont_dir_created#:#Verzeichnis wurde angelegt.
 content#:#cont_dir_deleted#:#Das Verzeichnis wurde gelöscht.
 content#:#cont_dir_file#:#Verzeichnis/Datei
 content#:#cont_dir_renamed#:#Das Verzeichnis wurde umbenannt.
-content#:#cont_double_click_to_delete#:#Mit einem Doppel-Klick auf ein Content-Element wählen Sie dieses für die De-/Aktivierung und für das Löschen aus.
+content#:#cont_shift_click_to_select#:#Mit <b>Shift + Klick</b> <b>wählen</b> Sie ein Seitenelement <b>aus</b> und wechseln in den Auswahlmodus.
+content#:#cont_click_multi_select#:#<b>Klicken</b> Sie Seitenelemente um diese <b>auszuwählen</b> oder die Auswahl wieder aufzuheben.
+content#:#cont_click_edit#:#<b>Klicken</b> Sie ein <b>Seitenelement</b>, um es zu <b>bearbeiten</b>.
 content#:#cont_download_no_download#:#Die Download-Funktion ist zur Zeit deaktiviert. Daher wird die Datei den Lernenden nicht angeboten.
 content#:#cont_download_no_menu#:#Das Lernmodulmenü ist zur Zeit deaktiviert. Daher wird die Datei den Lernenden nicht angeboten.
 content#:#cont_download_title#:#Titel der Download-Datei
 content#:#cont_downloads#:#Download
 content#:#cont_downloads_desc#:#Der Reiter "Download" wird in der Präsentationsansicht angezeigt. Dort können Benutzer freigegebene Exportdateien herunterladen, zum Beispiel für Offline-Nutzung oder Import.
 content#:#cont_downloads_public_desc#:#Erlaubt das Herunterladen auch für nichtangemeldete Benutzer (Öffentlicher Bereich)
-content#:#cont_drag_and_drop_elements#:#Um Content-Elemente zu bewegen, ziehen Sie diese mit der Maus auf die Platzhalter.
+content#:#cont_drag_and_drop_elements#:#<b>Ziehen</b> Sie ein Seitenelement mit der Maus auf einen Platzhalter um es zu <b>bewegen</b>.
 content#:#cont_drag_element_click_save#:#Bewegen Sie das Element an die gewünschte Position und klicken dann auf "Speichern".
 content#:#cont_ed_align_center#:#Mittig ausrichten
 content#:#cont_ed_align_left#:#Links ausrichten
@@ -6817,6 +6820,8 @@ ldap#:#ldap_deleted_rule#:#Ausgewählte Rollenzuordnung gelöscht
 ldap#:#ldap_dn_info#:#Wählen Sie hier den kompletten DN der LDAP-Gruppe.
 ldap#:#ldap_edit_role_ass_rule#:#Regel zur Rollenzuordnung bearbeiten
 ldap#:#ldap_err_missing_plugin_id#:#Bitte geben Sie eine gültige Plugin-Id ein.
+ldap#:#ldap_escapedn#:#DN maskieren
+ldap#:#ldap_escapedn_info#:#Wenn aktiviert, werden reservierte Zeichen im "Distinguished Name (DN)" für Abfragen von Gruppenzugehörigkeiten maskiert.
 ldap#:#ldap_filter_info#:#Filter, der dem Suchfilter folgendermaßen hinzugefügt wird: (&(userattr=username)<strong>(userfilter)</strong>)
 ldap#:#ldap_global_role#:#Globale Rolle
 ldap#:#ldap_global_role_assignment#:#Rollenzuordnung
@@ -6914,7 +6919,6 @@ ldap#:#ldap_user_scope_info#:#Bereich für die Benutzersuche. Wählen Sie im Zwe
 ldap#:#ldap_user_sync#:#Einstellungen zur Benutzersynchronisierung
 ldap#:#ldap_user_sync_info#:#Legt fest, ob noch nicht in ILIAS vorhandene Benutzer automatisch beim ersten Login oder aber regelmäßig per Cron-Job angelegt werden.
 mail#:#mail_serial_letter_placeholders#:#Platzhalter für Serienbrief
-mail#:#activate_serial_letter_placeholders#:#Platzhalter für Serienbrief aktivieren
 mail#:#bc#:#BCC
 chatroom#:#chat_select_room#:#Chatraum auswählen
 mail#:#back_to_folder#:#Zurück zum Ordner
@@ -7066,7 +7070,7 @@ mail#:#placeholders_advise#:#Persönliche Platzhalter werden nur für Empfänger
 mail#:#search_recipients#:#Empfänger suchen
 mail#:#send_mail_to#:#Mail an
 mail#:#mail_tbl_head_attachments#:#Anhang
-mail#:#mail_firstname_last_name_superior#:#A comma separated list for firstname and lastname of the user's superior(s).
+mail#:#mail_firstname_last_name_superior#:#Kommaseparierte Liste mit den Vor- und Nachnamen der Vorgesetzten eines Benutzers
 mail#:#mail_email_usr_subject#:#Test E-Mail Benutzer Mail
 mail#:#mail_email_usr_body#:#Dies ist eine Test-E-Mail um den Versand einer von einem Benutzer initiierten E-Mail an externe E-Mail-Adressen zu testen.
 mail#:#mail_email_sys_subject#:#Test E-Mail System Mail
@@ -7484,7 +7488,7 @@ meta#:#meta_education#:#Ausbildung
 meta#:#meta_educational#:#Pädagogik
 meta#:#meta_educational_level#:#Ausbildungsstufe
 meta#:#meta_educational_objective#:#Ausbildungsziel
-meta#:#meta_educationalvalidator#:#Educational Validator
+meta#:#meta_educationalvalidator#:#Pädagogische Abnahme
 meta#:#meta_entity#:#Instanz
 meta#:#meta_entry#:#Eintrag
 meta#:#meta_exam#:#Prüfung
@@ -8731,6 +8735,7 @@ skmg#:#skmg_skill#:#Kompetenz
 skmg#:#skmg_skill_level#:#Kompetenzausprägung
 skmg#:#skmg_skill_level_trigger#:#Auslöser
 skmg#:#skmg_skill_levels#:#Kompetenzausprägungen
+skmg#:#skmg_target_levels#:#Zielausprägungen
 skmg#:#skmg_skill_management_deactivated#:#Das Kompetenzmanagement ist momentan deaktiviert.
 skmg#:#skmg_skill_template#:#Vorlage
 skmg#:#skmg_skill_templates#:#Vorlagen
@@ -10030,7 +10035,7 @@ dcl#:#dcl_activate_notification#:#Benachrichtigung
 dcl#:#dcl_table_id#:#Tabellen ID
 dcl#:#dcl_add_new_record#:#Eintrag hinzufügen
 dcl#:#dcl_list_fields#:#Felder
-dcl#:#dcl_list_visibility_and_filter#:#Liste
+dcl#:#dcl_list_visibility_and_filter#:#Übersicht
 dcl#:#dcl_view_settings#:#Ansichtseinstellungen
 dcl#:#dcl_view_configuration#:#Ansichtskonfiguration
 dcl#:#dcl_configuration_complete#:#Konfiguration abgeschlossen
@@ -10337,15 +10342,15 @@ ecs#:#ecs_tst_export_disabled#:#Nicht freigeben
 ecs#:#ecs_tst_export_enabled#:#Freigeben
 rtst#:#rtst_call#:#ECS-Test aufrufen
 rbac#:#contribute#:#Beiträge erstellen
-dateplaner#:#cal_setting_global_vis_repos#:#Anzeige im Magazin
-dateplaner#:#cal_setting_global_crs_act#:#Aktivierung in Kursen
-dateplaner#:#cal_setting_global_grp_act#:#Aktivierung in Gruppen
-dateplaner#:#cal_setting_global_crs_act_info#:#Wenn ausgewählt, ist der Kurskalender standardmäßig in Kursen aktiviert. Unabhängig davon kann der Kalender in den Kurseinstellungen de/aktiviert werden.
-dateplaner#:#cal_setting_global_grp_act_info#:#Wenn ausgewählt, ist der Gruppenkalender standardmäßig in Gruppen aktiviert. Unabhängig davon kann der Kalender in den Gruppeneinstellungen de/aktiviert werden.
-dateplaner#:#cal_setting_global_crs_vis#:#Anzeige in Kursen
-dateplaner#:#cal_setting_global_grp_vis#:#Anzeige in Gruppen
-dateplaner#:#cal_setting_global_crs_vis_info#:#Wenn aktiviert, wird der Kurskalender standardmäßig in Kursen angezeigt. Unabhängig davon kann der Kalender in den Kurseinstellungen de/aktiviert werden.
-dateplaner#:#cal_setting_global_grp_vis_info#:#Wenn aktiviert, wird der Gruppenkalender standardmäßig in Gruppen angezeigt. Unabhängig davon kann der Kalender in den Gruppeneinstellungen de/aktiviert werden.
+dateplaner#:#cal_setting_global_vis_repos#:#Anzeige in Magazinobjekten
+dateplaner#:#cal_setting_global_crs_act#:#Kurskalender
+dateplaner#:#cal_setting_global_grp_act#:#Gruppenkalender
+dateplaner#:#cal_setting_global_crs_act_info#:#In neu erstellten Kursen ist der Kalender standardmäßig aktiviert.
+dateplaner#:#cal_setting_global_grp_act_info#:#In neu erstellten Gruppen ist der Kalender standardmäßig aktiviert.
+dateplaner#:#cal_setting_global_crs_vis#:#Kalenderblock
+dateplaner#:#cal_setting_global_grp_vis#:#Kalenderblock
+dateplaner#:#cal_setting_global_crs_vis_info#:#Der Kurskalender wird standardmäßig als Block im Reiter „Inhalt“ angezeigt.
+dateplaner#:#cal_setting_global_grp_vis_info#:#Der Gruppenkalender wird standardmäßig als Block im Reiter „Inhalt“ angezeigt.
 dcl#:#dcl_change_notification_subject#:#Die Datensatzsammlung "%s" wurde bearbeitet.
 dcl#:#dcl_change_notification_link#:#Zur Datensammlung gehen
 dcl#:#dcl_change_notification_dcl_new_record#:#Der folgende Eintrag wurde erzeugt
@@ -10408,8 +10413,8 @@ dcl#:#dcl_tableviews#:#Ansichten
 dcl#:#dcl_tableviews_table#:#Ansichten der ausgewählten Tabelle
 dcl#:#dcl_tableview#:#Ansicht
 dcl#:#dcl_detailed_view#:#Einzelansicht
-dcl#:#dcl_edit_entry_rules#:#Bearbeitung
-dcl#:#dcl_create_entry_rules#:#Erstellung
+dcl#:#dcl_edit_entry_rules#:#Eintragsbearbeitung
+dcl#:#dcl_create_entry_rules#:#Eintragserstellung
 dcl#:#dcl_tableview_copy#:#Ansicht erfolgreich kopiert
 dcl#:#dcl_tableview_default_value_fail#:#Einige numerische Standardwerte konnten nicht kopiert werden, da sich Zeichen darin befanden. Bitte versuchen Sie es erneut.
 dcl#:#dcl_tableview_add#:#Neue Ansicht hinzufügen
@@ -10574,6 +10579,7 @@ content#:#cont_resources_of_type#:#Inhalte vom Typ
 content#:#cont_element_refers_removed_itgr#:#Dieses Inhaltselement verweist auf einen Objekteblock, der in der Zwischenzeit gelöscht wurde.
 common#:#search_globally#:#Im gesamten Magazin
 common#:#search_at_current_position#:#An der aktuellen Position
+common#:#label_search_options#:#Suchbereich
 survey#:#svy_copy#:#Umfrage kopieren
 blog#:#blog_authors#:#Autoren
 blog#:#blog_author#:#Beiträge von
@@ -11121,12 +11127,12 @@ survey#:#survey_360_add_self_appraisee#:#Fügen Sie sich selbst als Feedback-Neh
 survey#:#survey_360_list_title#:#360°-Modus
 survey#:#survey_360_select_appraisee#:#Auswählen
 survey#:#survey_360_appraisee#:#Feedback-Nehmer
-skmg#:#skmg_skill_profiles#:#Profile
+skmg#:#skmg_skill_profiles#:#Kompetenzprofile
 skmg#:#skmg_add_local_profile#:#Lokales Profil hinzufügen
 skmg#:#skmg_add_profile#:#Profil hinzufügen
 skmg#:#skmg_edit_profile#:#Profil bearbeiten
 skmg#:#skmg_delete_profiles#:#Wollen Sie wirklich die folgenden Profile löschen?
-skmg#:#skmg_assigned_skill_levels#:#Zugeordnete Kompetenzausprägungen
+skmg#:#skmg_assigned_skill_levels#:#Zugeordnete Zielausprägungen
 skmg#:#skmg_assign_level#:#Ausprägung zuordnen
 skmg#:#skmg_profile#:#Profil
 skmg#:#skmg_remove_levels#:#Ausprägungen entfernen
@@ -12100,7 +12106,7 @@ skmg#:#skmg_cannot_delete_nodes_in_use#:#Einige Objekte können nicht gelöscht 
 skmg#:#skmg_status_draft#:#In Vorbereitung (Offline)
 skmg#:#skmg_status_draft_info#:#Eintrag wird Benutzern nicht angezeigt.
 skmg#:#skmg_status_publish#:#Veröffentlicht
-skmg#:#skmg_status_publish_info#:#Die Kompetenz kann von Benutzern genutzt werden falls alle übergeordneten Einträge ebenfalls freigegeben sind. Sobald die Kompetenz genutzt wird, kann sie nicht mehr gelöscht oder der Status "In Vorbereitung" gesetzt werden.
+skmg#:#skmg_status_publish_info#:#Die Kompetenz kann von Benutzern genutzt werden falls alle übergeordneten Einträge ebenfalls freigegeben sind.
 skmg#:#skmg_status_outdated#:#Veraltet
 skmg#:#skmg_status_outdated_info#:#Der Eintrag kann von Benutzer nicht mehr als persönliche Kompetenz neu ausgewählt werden. Wurde die Kompetenz bereits früher ausgewählt, so bleibt diese Auswahl weiterhin bestehen.
 skmg#:#skmg_status#:#Status
@@ -13228,6 +13234,7 @@ note#:#note_comment_notification_subject#:#Neuer Kommentar in "%s".
 note#:#note_comment_notification_subjectc#:#Geänderter Kommentar in "%s".
 note#:#note_comment_notification_salutation#:#Hallo %s,
 note#:#note_comment_notification_link#:#Link
+lng#:#language_detection#:#Automatische Spracherkennung
 lng#:#lng_enable_language_detection#:#Automatische Spracherkennung aktivieren
 lng#:#lng_disable_language_detection#:#Automatische Spracherkennung deaktivieren
 trac#:#trac_mode_content_visited#:#Besuch
@@ -13725,9 +13732,9 @@ rbac#:#svy_edit_learning_progress#:#Benutzer kann Lernfortschrittseinstellungen 
 rbac#:#sess_edit_learning_progress#:#Benutzer kann Lernfortschrittseinstellungen bearbeiten
 rbac#:#read_results#:#Umfrageergebnisse
 rbac#:#svy_read_results#:#Benutzer hat Zugriff auf alle Umfrageergebnisse
-maps#:#maps_custom_tile_server_info#:#Server URL to provide tile-data. Multiple inputs should be separated by spaces. Defaults is "%s".###23 12 2015 new variable
-maps#:#maps_custom_geolocation_server_info#:#Server URL to provide geolocation-data using Nominatim. Your entry should contain the placeholder [QUERY] to define a position for request information. Example: https://nominatim.example.com/search/[QUERY]?format=json.###23 12 2015 new variable
-maps#:#configure_geolocation#:#Please finish the geolocation configuration in the "Third Party Software" administration menu to enable address search.###23 12 2015 new variable
+maps#:#maps_custom_tile_server_info#:#URL des Servers für die Bereitstellung der Kacheln. Mehrere Einträge müssen mit Leerzeichen getrennt werden. Standardeingabe ist "%s".
+maps#:#maps_custom_geolocation_server_info#:#URL des Servers, über den die Geolocation-Daten mithilfe des Nominatim-Dienstes bereitgestellt werden. Der Eintrag muss den Platzhalter [QUERY] enthalten, um die Anfrageposition festzulegen. Beispiel: nominatim.example.com/search/[QUERY]?format=json.
+maps#:#configure_geolocation#:#Um nach Adressen suchen zu können, schließen Sie bitte die Konfiguration für die Geolocation im Administrationsmenü „Software von Drittanbietern“ ab.
 crs#:#event_user_selection_include_role#:#Binde alle Benutzer der Rolle "%1$s" ein
 crs#:#event_user_selection_include_waiting_list#:#Binde alle Benutzer der "Warteliste" ein
 crs#:#event_user_selection_include_requests#:#Binde alle Benutzer der Liste "Aufnahmeanträge" ein
@@ -14313,7 +14320,7 @@ usr#:#user_action#:#Benutzeraktion
 chatroom#:#chtr_activation_online_info#:#Wählen Sie diese Einstellung, um den Chatraum für Benutzer verfügbar zumachen.
 chatroom#:#chtr_activation_limited_visibility_info#:#Außerhalb des angegebenen Zeitraums wird der Chatraumtitel angezeigt, die Inhalte aber nicht.
 chatroom#:#chtr_server_status#:#Server-Status
-chatroom#:#chtr_ban_actor_tbl_head#:#Actor
+chatroom#:#chtr_ban_actor_tbl_head#:#gesperrt durch
 chatroom#:#chtr_ban_ts_tbl_head#:#Zeitpunkt
 common#:#chtr_import#:#Chatraum importieren
 buddysystem#:#buddy_handle_contact_request#:#Kontaktanfrage
@@ -14511,6 +14518,7 @@ auth#:#auth_saml_idp#:#IDP
 auth#:#auth_saml_configure_idp#:#SAML-IDP konfigurieren: %s
 auth#:#saml_tab_head_idp#:#IDP
 auth#:#auth_saml_idp_settings#:#IDP Einstellungen
+auth#:#auth_saml_err_sqlite_driver#:#Die SAML-Authentifizierung benötigt die SQLite-Treiber für PHP. Bitte installieren Sie diese und versuchen Sie es erneut.
 dateplaner#:#cal_origin#:#Herkunft
 dateplaner#:#cal_list#:#Liste
 dateplaner#:#cal_grp_curr_crs_cons#:#Sprechstunden
@@ -14552,10 +14560,10 @@ common#:#second_email#:#Zweite E-Mail
 iass#:#iass_usr_amend#:#Prüfungsdaten nachträglich ändern
 iass#:#iass_place#:#Ort der Prüfung
 iass#:#iass_event_time#:#Datum der Prüfung
-skmg#:#skmg_assigned_profiles#:#Zugewiesene Profile
+skmg#:#skmg_assigned_profiles#:#Zugewiesene Kompetenzprofile
 skmg#:#skmg_selected_skills#:#Kompetenzeinträge
-skmg#:#skmg_hide_profile_self_eval#:#Profilwerte nach Selbsteinschätzung anzeigen
-skmg#:#skmg_hide_profile_self_eval_info#:#Für einzelne Kompetenzwerte werden Profilwerte erst angezeigt, nachdem der Benutzer eine Selbsteinschätzung abgegeben hat.
+skmg#:#skmg_hide_profile_self_eval#:#Profil-Zielausprägung nach Selbsteinschätzung anzeigen
+skmg#:#skmg_hide_profile_self_eval_info#:#Für einzelne Kompetenzen wird die Profil-Zielausprägung erst angezeigt, nachdem der Benutzer eine Selbsteinschätzung abgegeben hat.
 skmg#:#skmg_local_assignment_profiles#:#Lokale Zuordnung von globalen Profilen erlauben
 skmg#:#skmg_allow_local_profiles#:#Erstellung von lokalen Profilen erlauben
 skmg#:#skmg_allow_local_profiles_info#:#Nutzer mit dem Recht 'Einstellungen bearbeiten' in Kursen und Gruppen können lokale Kompetenzprofile erstellen und dabei global definierte Kompetenzen verwenden.
@@ -14743,12 +14751,12 @@ prtf#:#prtf_date_of_print#:#Datum des Ausdrucks
 prtf#:#prtf_signature#:#Feld für Unterschrift
 prtf#:#prtf_signature_info#:#Das PDF enthält ein Feld, in welchem die Benutzer unterschreiben können.
 prtf#:#prtf_signature_date#:#Datum, Unterschrift
-lti#:#lti_not_allowed#:#Zugriff nicht erlaubt. Sie wurden in den ursprünglichen LTI Bereich umgeleitet.
+lti#:#lti_not_allowed#:#Zugriff nicht erlaubt. Sie wurden in den ursprünglichen LTI-Bereich umgeleitet.
 lti#:#lti_navigation#:#Navigation
-lti#:#lti_session#:#LTI Sitzung
-lti#:#lti_exit#:#LTI Sitzung beenden
-lti#:#lti_exited#:#LTI Sitzung beendet
-lti#:#lti_exited_info#:#Die LTI Sitzung wurde erfolgreich beendet
+lti#:#lti_session#:#LTI-Sitzung
+lti#:#lti_exit#:#LTI-Sitzung beenden
+lti#:#lti_exited#:#LTI-Sitzung beendet
+lti#:#lti_exited_info#:#Die LTI-Sitzung wurde erfolgreich beendet.
 blog#:#blog_nav_mode_month_list_num_month_with_post#:#Anzahl Monate mit Links zu allen Beiträgen
 blog#:#blog_nav_mode_month_list_num_month_with_post_info#:#Für diese Anzahl aktuellster Monate werden im Seitenblock Links zu allen Beiträge angezeigt.
 orgu#:#org_op_access_enrolments#:#Einschreibe-Status einsehen
@@ -14906,17 +14914,17 @@ mail#:#mail_bg_task_desc#:#Betreff: %s
 mob#:#mob_no_fixed_size_map_editing#:#Bitte bestimmen Sie eine feste Größe für ihr Bild, bevor Sie verlinkte Bereiche definieren. Die Bereiche werden nicht angepasst, wenn ihr Bild durch einen Content-Style oder andere CSS-Regeln skaliert wird.
 common#:#presentation_table_more#:#Mehr anzeigen
 exc#:#exc_global_feedback_file_after_date#:#Nach festem Datum
-exc#:#feedback_given#:#Feedback given
+exc#:#feedback_given#:#Gegebenes Feedback
 exc#:#feedback#:#Feedback
-exc#:#feedback_received#:#Feedback received
-exc#:#feedback_from#:#Feedback from
-exc#:#text_assignment#:#Text Assignment
-exc#:#not_yet#:#not yet
+exc#:#feedback_received#:#Gegebenes Feedback
+exc#:#feedback_from#:#Feedback von
+exc#:#text_assignment#:#Text Übungseinheit
+exc#:#not_yet#:#noch nicht
 exc#:#grade_evaluate#:#Bewerten/Benoten
 exc#:#submissions_feedback#:#Abgaben und Peer-Feedback
 exc#:#submissions_only#:#Nur Abgaben
 exc#:#filter#:#Filter
-exc#:#fiter_no_results#:#The current filter did not match any submission.
+exc#:#fiter_no_results#:#Zu den aktuellen Einstellungen des Filters passen kein Abgaben.
 exc#:#exc_reminder_link#:#URL
 exc#:#exc_mail_context_grade_reminder_info#:#Die Tutoren werden an die Bewertung der Enireichungen erinnert.
 exc#:#exc_mail_context_grade_reminder_title#:#Übung: Erinnerung an Bewertung
@@ -16512,9 +16520,15 @@ tagging#:#no_tag_text_2#:#Klicken Sie auf '%s' und wählen Sie aus dem verfügba
 tagging#:#no_tag_text_3#:#Öffnen Sie dann das <i>Aktionen</i>-Menü des Objektes und wählen Sie "<i>Tags setzen</i>".
 form#:#form_invalid_uri#:#Ungültiges URI-Format.
 common#:#installation_status#:#Status Installation
-skmg#:#skmg_custom_image_alt#:#Benutzerdefiniertes Bild für Kompetenzprofil
-skmg#:#skmg_form_presentation#:#Darstellung
-skll#:#skll_lhist_skill_profile_fulfilled#:#Kompetenzprofil $3$ wurde erfüllt.
-skmg#:#skmg_skill_needs_self_eval#:#Bitte führen Sie zunächst eine Selbsteinschätzung durch, damit Ihre Profil-Zielausprägung angezeigt wird. Klicken Sie hierzu auf die Schaltfläche "Aktionen".
-skmg#:#skmg_skill_needs_self_eval_box#:#Bitte beachten Sie, dass für mindestens eine Kompetenz in diesem Profil noch keine Selbsteinschätzung durchgeführt wurde. Ihnen wird die Profil-Zielausprägung für die betroffenen Kompetenzen angezeigt, sobald eine Selbsteinschätzung durchgeführt wurde.
-skmg#:#skmg_recommended_learning_material#:#Empfohlene Lernmaterialien
+copg#:#copg_an_error_occured#:#Es ist leider ein Problem aufgetreten.
+copg#:#copg_details#:#Details
+copg#:#copg_error#:#Problem
+copg#:#copg_page_element_not_found#:#Unbekanntes Seitenelement.
+adve#:#adve_autosave_info_min_10#:#Bitte setzen sie den Wert auf mindestens 10 Sekunden, falls sie Funktion nutzen.
+content#:#cont_keyword#:#Schlagwort
+content#:#cont_footnote#:#Fußnote
+content#:#cont_Book#:#Buchdruck
+content#:#cont_Numbers#:#Zahlen
+content#:#cont_Verse#:#Lyrik/Strophe
+content#:#cont_choose_from_clipboard#:#Aus Medien-Clipboard
+content#:#cont_open_clipboard#:#Medien-Clipboard öffnen

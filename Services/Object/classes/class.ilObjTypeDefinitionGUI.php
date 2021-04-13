@@ -1,20 +1,14 @@
 <?php
-/* Copyright (c) 1998-2009 ILIAS open source, Extended GPL, see docs/LICENSE */
 
+/* Copyright (c) 1998-2021 ILIAS open source, GPLv3, see LICENSE */
 
 /**
-* Class ilObjTypeDefinitionGUI
-*
-* handles operation assignment to objects (ONLY FOR TESTING PURPOSES!)
-*
-* @author Stefan Meyer <meyer@leifos.com>
-* $Id$Id: class.ilObjTypeDefinitionGUI.php,v 1.14 2005/11/21 17:12:08 shofmann Exp $
-*
-* @extends ilObjectGUI
-*/
-
-require_once "./Services/Object/classes/class.ilObjectGUI.php";
-
+ * Class ilObjTypeDefinitionGUI
+ *
+ * handles operation assignment to objects (ONLY FOR TESTING PURPOSES!)
+ *
+ * @author Stefan Meyer <meyer@leifos.com>
+ */
 class ilObjTypeDefinitionGUI extends ilObjectGUI
 {
     /**
@@ -110,8 +104,6 @@ class ilObjTypeDefinitionGUI extends ilObjectGUI
     */
     public function displayList()
     {
-        include_once "./Services/Table/classes/class.ilTableGUI.php";
-
         // load template for table
         $this->tpl->addBlockfile("ADM_CONTENT", "adm_content", "tpl.table.html");
         // load template for table content data
@@ -155,10 +147,6 @@ class ilObjTypeDefinitionGUI extends ilObjectGUI
             //table cell
             for ($i = 0; $i < count($this->data["data"]); $i++) {
                 $data = $this->data["data"][$i];
-                $ctrl = $this->data["ctrl"][$i];
-
-                // color changing
-                $css_row = ilUtil::switchColor($i + 1, "tblrow1", "tblrow2");
 
                 $this->tpl->setCurrentBlock("table_cell");
                 $this->tpl->setVariable("CELLSTYLE", "tblrow1");
@@ -190,7 +178,7 @@ class ilObjTypeDefinitionGUI extends ilObjectGUI
                 } //foreach
 
                 $this->tpl->setCurrentBlock("tbl_content");
-                $this->tpl->setVariable("CSS_ROW", $css_row);
+                $this->tpl->setVariable("CSS_ROW", " ");
                 $this->tpl->parseCurrentBlock();
             } //for
         } //if is_array
@@ -304,7 +292,6 @@ class ilObjTypeDefinitionGUI extends ilObjectGUI
         }
 
         // build table
-        include_once "./Services/Table/classes/class.ilTableGUI.php";
 
         // load template for table
         $this->tpl->addBlockfile("ADM_CONTENT", "adm_content", "tpl.table.html");
@@ -353,10 +340,6 @@ class ilObjTypeDefinitionGUI extends ilObjectGUI
             //table cell
             for ($i = 0; $i < count($this->data["data"]); $i++) {
                 $data = $this->data["data"][$i];
-                $ctrl = $this->data["ctrl"][$i];
-
-                // color changing
-                $css_row = ilUtil::switchColor($i + 1, "tblrow1", "tblrow2");
 
                 $this->tpl->setCurrentBlock("table_cell");
                 $this->tpl->setVariable("CELLSTYLE", "tblrow1");

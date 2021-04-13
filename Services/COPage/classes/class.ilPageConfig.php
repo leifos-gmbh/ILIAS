@@ -46,6 +46,11 @@ abstract class ilPageConfig
     /**
      * @var bool
      */
+    protected $use_page_container = true;
+
+    /**
+     * @var bool
+     */
     protected $enable_permission_checks = false;
 
     /**
@@ -70,7 +75,6 @@ abstract class ilPageConfig
 
         $this->lng = $DIC->language();
         // load pc_defs
-        include_once("./Services/COPage/classes/class.ilCOPagePCDef.php");
         $this->pc_defs = ilCOPagePCDef::getPCDefinitions();
         foreach ($this->pc_defs as $def) {
             $this->setEnablePCType($def["name"], (bool) $def["def_enabled"]);
@@ -125,7 +129,7 @@ abstract class ilPageConfig
      *
      * @return boolean enable pc type true/false
      */
-    public function getEnabledTopPCTypes(): array
+    public function getEnabledTopPCTypes() : array
     {
         $types = [];
         foreach ($this->pc_defs as $def) {
@@ -655,5 +659,23 @@ abstract class ilPageConfig
     public function getEditLockSupport()
     {
         return $this->edit_lock_support;
+    }
+
+    /**
+     * Set if page container css class should be used
+     * @param bool $a_val use page container
+     */
+    public function setUsePageContainer($a_val)
+    {
+        $this->use_page_container = $a_val;
+    }
+
+    /**
+     * Get if page container css class should be used
+     * @return bool use page container class
+     */
+    public function getUsePageContainer()
+    {
+        return $this->use_page_container;
     }
 }

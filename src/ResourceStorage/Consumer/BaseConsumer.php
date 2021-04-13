@@ -37,7 +37,7 @@ abstract class BaseConsumer implements DeliveryConsumer
         $this->storage_handler = $storage_handler;
     }
 
-    abstract function run() : void;
+    abstract public function run() : void;
 
     /**
      * @inheritDoc

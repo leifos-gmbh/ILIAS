@@ -1,16 +1,11 @@
 <?php
-/* Copyright (c) 1998-2009 ILIAS open source, Extended GPL, see docs/LICENSE */
 
-include_once("./Services/Object/classes/class.ilObject.php");
+/* Copyright (c) 1998-2021 ILIAS open source, GPLv3, see LICENSE */
 
 /**
-* Class ilObject2
-* This is an intermediate progress of ilObject class. Please do not ust it yet.
-*
-* @author Stefan Meyer <meyer@leifos.com>
-* @author Alex Killing <alex.killing@gmx.de>
-* @version $Id$
-*/
+ * @author Stefan Meyer <meyer@leifos.com>
+ * @author Alex Killing <alex.killing@gmx.de>
+ */
 abstract class ilObject2 extends ilObject
 {
     /**
@@ -277,9 +272,9 @@ abstract class ilObject2 extends ilObject
     {
         return parent::_lookupObjId($a_id);
     }
-    final public static function _setDeletedDate($a_ref_id)
+    final public static function _setDeletedDate($a_ref_id, $a_deleted_by)
     {
-        return parent::_setDeletedDate($a_ref_id);
+        return parent::_setDeletedDate($a_ref_id, $a_deleted_by);
     }
     final public static function _resetDeletedDate($a_ref_id)
     {

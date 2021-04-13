@@ -53,6 +53,20 @@ class ConsumerFactory
         return new FileStreamConsumer($resource, $this->storage_handler_factory->getHandlerForResource($resource));
     }
 
+    /**
+     * @param StorableResource $resource
+     * @return AbsolutePathConsumer
+     * @deprecated
+     */
+    public function absolutePath(StorableResource $resource) : AbsolutePathConsumer
+    {
+        return new AbsolutePathConsumer($resource, $this->storage_handler_factory->getHandlerForResource($resource));
+    }
+
+    /**
+     * @param StorableResource $resource
+     * @return SrcConsumer
+     */
     public function src(StorableResource $resource) : SrcConsumer
     {
         return new SrcConsumer($resource, $this->storage_handler_factory->getHandlerForResource($resource));

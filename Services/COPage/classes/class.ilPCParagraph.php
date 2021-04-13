@@ -1,18 +1,14 @@
 <?php
-/* Copyright (c) 1998-2009 ILIAS open source, Extended GPL, see docs/LICENSE */
 
-require_once("./Services/COPage/classes/class.ilPageContent.php");
+/* Copyright (c) 1998-2021 ILIAS open source, GPLv3, see LICENSE */
 
 /**
-* Class ilPCParagraph
-*
-* Paragraph of ilPageObject
-*
-* @author Alex Killing <alex.killing@gmx.de>
-* @version $Id$
-*
-* @ingroup ServicesCOPage
-*/
+ * Class ilPCParagraph
+ *
+ * Paragraph of ilPageObject
+ *
+ * @author Alex Killing <alex.killing@gmx.de>
+ */
 class ilPCParagraph extends ilPageContent
 {
     /**
@@ -22,6 +18,11 @@ class ilPCParagraph extends ilPageContent
 
     public $dom;
     public $par_node;			// node of Paragraph element
+
+    /**
+     * @var \ilLanguage
+     */
+    protected $lng;
 
     protected static $bb_tags = array(
             "com" => "Comment",
@@ -45,6 +46,7 @@ class ilPCParagraph extends ilPageContent
         global $DIC;
 
         $this->user = $DIC->user();
+        $this->lng = $DIC->language();
         $this->setType("par");
     }
 
@@ -257,7 +259,6 @@ class ilPCParagraph extends ilPageContent
             $text = str_replace("<SimpleNumberedList>", "\n<SimpleNumberedList>", $text);
             $text = str_replace("<Paragraph>\n", "<Paragraph>", $text);
             $text = str_replace("</Paragraph>", "</Paragraph>\n", $text);
-            include_once("./Services/Dom/classes/class.ilDomDocument.php");
             $doc = new ilDOMDocument();
             $text = '<?xml version="1.0" encoding="UTF-8"?><Paragraph>' . $text . '</Paragraph>';
             //echo htmlentities($text);
@@ -785,7 +786,6 @@ class ilPCParagraph extends ilPageContent
         while (preg_match("~\[(iln$ws((inst$ws=$ws([\"0-9])*)?" . $ws . "user$ws=$ws(\"([^\"])*)\")$ws)/\]~i", $a_text, $found)) {
             $attribs = ilUtil::attribsToArray($found[2]);
             $inst_str = $attribs["inst"];
-            include_once("./Services/User/classes/class.ilObjUser.php");
             $user_id = ilObjUser::_lookupId($attribs['user']);
             $a_text = preg_replace(
                 '~\[' . $found[1] . '/\]~i',
@@ -1074,7 +1074,6 @@ class ilPCParagraph extends ilPageContent
 
                 // User
                 case "User":
-                    include_once("./Services/User/classes/class.ilObjUser.php");
                     $a_text = preg_replace('~<IntLink' . $found[1] . '>~i', "[iln " . $inst_str . "user=\"" . ilObjUser::_lookupLogin($target_id) . "\"/]", $a_text);
                     break;
 
@@ -1325,8 +1324,14 @@ class ilPCParagraph extends ilPageContent
     {
         $ilUser = $this->user;
 
+        $a_content = str_replace("<br>", "<br />", $a_content);
+
         $this->log->debug("step 1: " . substr($a_content, 0, 1000));
-        $t = self::handleAjaxContent($a_content);
+        try {
+            $t = self::handleAjaxContent($a_content);
+        } catch (Exception $ex) {
+            return $ex->getMessage() . ": " . htmlentities($a_content);
+        }
         $this->log->debug("step 2: " . substr($t["text"], 0, 1000));
         if ($t === false) {
             return false;
@@ -1343,15 +1348,19 @@ class ilPCParagraph extends ilPageContent
             $par->writePCId($pc_id[1]);
         } else {
             $par = $a_pg_obj->getContentObject($pc_id[0], $pc_id[1]);
+
+            if (!$par) {
+                return $this->lng->txt("copg_page_element_not_found") . " (saveJS): " . $pc_id[0] . ":" . $pc_id[1] . ".";
+            }
         }
-/*
-        if ($a_insert_at != "") {
-            $pc_id = $a_pg_obj->generatePCId();
-            $par->writePCId($pc_id);
-            $this->inserted_pc_id = $pc_id;
-        } else {
-            $this->inserted_pc_id = $pc_id[1];
-        }*/
+        /*
+                if ($a_insert_at != "") {
+                    $pc_id = $a_pg_obj->generatePCId();
+                    $par->writePCId($pc_id);
+                    $this->inserted_pc_id = $pc_id;
+                } else {
+                    $this->inserted_pc_id = $pc_id[1];
+                }*/
 
         $par->setLanguage($ilUser->getLanguage());
         $par->setCharacteristic($t["class"]);
@@ -1429,7 +1438,6 @@ class ilPCParagraph extends ilPageContent
         $tags = self::getXMLTagMap();
 
         $elements = $xpath->query("//span");
-        include_once("./Services/Utilities/classes/class.ilDOM2Util.php");
         while (!is_null($elements) && !is_null($element = $elements->item(0))) {
             //$element = $elements->item(0);
             $class = $element->getAttribute("class");
@@ -1688,8 +1696,6 @@ class ilPCParagraph extends ilPageContent
             $parnodes = $xpath->query(".//Paragraph[@Characteristic != 'Code']", $a_par_node->parentNode);
         }
 
-        include_once("./Services/Utilities/classes/class.ilStr.php");
-
         foreach ($parnodes as $parnode) {
             $textnodes = $xpath->query('.//text()', $parnode);
             foreach ($textnodes as $node) {
@@ -1880,7 +1886,7 @@ class ilPCParagraph extends ilPageContent
             " page_parent_type = " . $ilDB->quote($a_parent_type, "text") .
             " AND page_id = " . $ilDB->quote($a_page_id, "integer") .
             " AND page_lang = " . $ilDB->quote($a_page_lang, "text")
-            );
+        );
     }
 
     /**
@@ -1919,7 +1925,7 @@ class ilPCParagraph extends ilPageContent
             " WHERE page_parent_type = " . $ilDB->quote($a_parent_type, "text") .
             " AND page_id = " . $ilDB->quote($a_page_id, "integer") .
             $and_lang
-            );
+        );
         $anchors = array();
         while ($rec = $ilDB->fetchAssoc($set)) {
             $anchors[] = $rec["anchor_name"];
@@ -1957,7 +1963,6 @@ class ilPCParagraph extends ilPageContent
             $meta_rep_id = $a_page->getParentId();
             $meta_id = $a_page->getId();
 
-            include_once("./Services/MetaData/classes/class.ilMD.php");
             $md_obj = new ilMD($meta_rep_id, $meta_id, $meta_type);
             $mkeywords = array();
             $lang = "";
@@ -2000,7 +2005,6 @@ class ilPCParagraph extends ilPageContent
         $adve_settings = new ilSetting("adve");
 
         if ($a_mode != "edit" && $adve_settings->get("auto_url_linking")) {
-            include_once("./Services/Link/classes/class.ilLinkifyUtil.php");
             return ilLinkifyUtil::getLocalJsPaths();
         }
 
@@ -2054,7 +2058,13 @@ class ilPCParagraph extends ilPageContent
         $ilUser = $this->user;
 
         $this->log->debug("step 1: " . substr($a_content, 0, 1000));
-        $t = self::handleAjaxContent($a_content);
+
+        try {
+            $t = self::handleAjaxContent($a_content);
+        } catch (Exception $ex) {
+            return $ex->getMessage() . ": " . htmlentities($a_content);
+        }
+
         $this->log->debug("step 2: " . substr($t["text"], 0, 1000));
         if ($t === false) {
             return false;
@@ -2102,5 +2112,4 @@ class ilPCParagraph extends ilPageContent
         //$updated = $a_pg_obj->update();
         return $updated;
     }
-
 }

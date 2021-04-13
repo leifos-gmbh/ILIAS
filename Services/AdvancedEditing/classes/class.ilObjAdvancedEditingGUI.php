@@ -1,18 +1,12 @@
 <?php
 
-/* Copyright (c) 1998-2011 ILIAS open source, Extended GPL, see docs/LICENSE */
-
-include_once "./Services/Object/classes/class.ilObjectGUI.php";
+/* Copyright (c) 1998-2021 ILIAS open source, GPLv3, see LICENSE */
 
 /**
  * Class ilObjAdvancedEditingGUI
  *
  * @author Helmut Schottmüller <hschottm@gmx.de>
- * @version $Id$
- *
  * @ilCtrl_Calls ilObjAdvancedEditingGUI: ilPermissionGUI
- *
- * @ingroup ServicesAdvancedEditing
  */
 class ilObjAdvancedEditingGUI extends ilObjectGUI
 {
@@ -64,14 +58,15 @@ class ilObjAdvancedEditingGUI extends ilObjectGUI
         parent::__construct($a_data, $a_id, $a_call_by_reference, false);
         $this->lng->loadLanguageModule('adve');
         $this->lng->loadLanguageModule('meta');
-
-        if (!$rbacsystem->checkAccess('read', $this->object->getRefId())) {
-            $this->ilias->raiseError($this->lng->txt("msg_no_perm_read_adve"), $this->ilias->error_obj->WARNING);
-        }
     }
     
     public function executeCommand()
     {
+        if (!$this->rbacsystem->checkAccess('read', $this->object->getRefId())) {
+            $mess = str_replace("%s", $this->object->getTitle(), $this->lng->txt("msg_no_perm_read_item"));
+            $this->ilias->raiseError($mess, $this->ilias->error_obj->WARNING);
+        }
+
         $next_class = $this->ctrl->getNextClass($this);
         $cmd = $this->ctrl->getCmd();
         $this->prepareOutput();
@@ -79,7 +74,6 @@ class ilObjAdvancedEditingGUI extends ilObjectGUI
         switch ($next_class) {
             
             case 'ilpermissiongui':
-                include_once("Services/AccessControl/classes/class.ilPermissionGUI.php");
                 $perm_gui = new ilPermissionGUI($this);
                 $ret = &$this->ctrl->forwardCommand($perm_gui);
                 break;
@@ -178,7 +172,6 @@ class ilObjAdvancedEditingGUI extends ilObjectGUI
             array("showGeneralPageEditorSettings", "", "view")
         );
 
-        include_once("./Services/COPage/classes/class.ilPageEditorSettings.php");
         $grps = ilPageEditorSettings::getGroups();
         
         foreach ($grps as $g => $types) {
@@ -246,7 +239,6 @@ class ilObjAdvancedEditingGUI extends ilObjectGUI
         
         $editor = $this->object->_getRichTextEditor();
         
-        include_once("Services/Form/classes/class.ilPropertyFormGUI.php");
         $this->form = new ilPropertyFormGUI();
         $this->form->setFormAction($ilCtrl->getFormAction($this));
         $this->form->setTitle($lng->txt("adve_activation"));
@@ -396,7 +388,6 @@ class ilObjAdvancedEditingGUI extends ilObjectGUI
     {
         $ilAccess = $this->access;
         
-        include_once "Services/Form/classes/class.ilPropertyFormGUI.php";
         $form = new ilPropertyFormGUI();
         $form->setFormAction($this->ctrl->getFormAction($this, $a_cmd));
         $form->setTitle($this->lng->txt($a_title));
@@ -404,7 +395,6 @@ class ilObjAdvancedEditingGUI extends ilObjectGUI
         $alltags = $this->object->getHTMLTags();
         $alltags = array_combine($alltags, $alltags);
         
-        include_once "Services/Form/classes/class.ilMultiSelectInputGUI.php";
         $tags = new ilMultiSelectInputGUI($this->lng->txt("advanced_editing_allow_html_tags"), "html_tags");
         $tags->setHeight(400);
         $tags->enableSelectAll(true);
@@ -455,7 +445,6 @@ class ilObjAdvancedEditingGUI extends ilObjectGUI
         
         $this->addPageEditorSettingsSubTabs();
         
-        include_once("./Services/COPage/classes/class.ilPageEditorSettings.php");
         $grps = ilPageEditorSettings::getGroups();
         
         $this->cgrp = $_GET["grp"];
@@ -482,12 +471,9 @@ class ilObjAdvancedEditingGUI extends ilObjectGUI
         
         $lng->loadLanguageModule("content");
         
-        include_once("Services/Form/classes/class.ilPropertyFormGUI.php");
         $this->form = new ilPropertyFormGUI();
     
         if ($this->cgrp == "test") {
-            require_once 'Modules/Test/classes/class.ilObjAssessmentFolder.php';
-        
             $this->form->setTitle($lng->txt("adve_activation"));
             $cb = new ilCheckboxInputGUI($this->lng->txt("advanced_editing_tst_editing"), "tst_page_edit");
             $cb->setInfo($this->lng->txt("advanced_editing_tst_editing_desc"));
@@ -516,9 +502,6 @@ class ilObjAdvancedEditingGUI extends ilObjectGUI
         }
 
         
-        include_once("./Services/COPage/classes/class.ilPageEditorSettings.php");
-        
-        include_once("./Services/COPage/classes/class.ilPageContentGUI.php");
         $buttons = ilPageContentGUI::_getCommonBBButtons();
         foreach ($buttons as $b => $t) {
             // command button activation
@@ -549,8 +532,6 @@ class ilObjAdvancedEditingGUI extends ilObjectGUI
     
         $this->initPageEditorForm();
         if ($this->form->checkInput()) {
-            include_once("./Services/COPage/classes/class.ilPageEditorSettings.php");
-            include_once("./Services/COPage/classes/class.ilPageContentGUI.php");
             $buttons = ilPageContentGUI::_getCommonBBButtons();
             foreach ($buttons as $b => $t) {
                 ilPageEditorSettings::writeSetting(
@@ -597,7 +578,6 @@ class ilObjAdvancedEditingGUI extends ilObjectGUI
         $lng = $this->lng;
         $ilCtrl = $this->ctrl;
     
-        include_once("Services/Form/classes/class.ilPropertyFormGUI.php");
         $form = new ilPropertyFormGUI();
         
         $aset = new ilSetting("adve");
@@ -702,26 +682,37 @@ class ilObjAdvancedEditingGUI extends ilObjectGUI
         
         $form = $this->initGeneralPageSettingsForm();
         if ($form->checkInput()) {
-            $aset = new ilSetting("adve");
-            $aset->set("use_physical", $_POST["use_physical"]);
-            if ($_POST["block_mode_act"]) {
-                $aset->set("block_mode_minutes", (int) $_POST["block_mode_minutes"]);
-            } else {
-                $aset->set("block_mode_minutes", 0);
+            $autosave = (int) $form->getInput("autosave");
+            $ok = true;
+
+            // autosave must be greater 10, if activated
+            if ($autosave > 0 && $autosave < 10) {
+                $form->getItemByPostVar("autosave")->setAlert($this->lng->txt("adve_autosave_info_min_10"));
+                $ok = false;
             }
-            $aset->set("auto_url_linking", $_POST["auto_url_linking"]);
 
-            $aset->set("autosave", $_POST["autosave"]);
-
-            $def = new ilCOPageObjDef();
-            foreach ($def->getDefinitions() as $key => $def) {
-                if (in_array($key, $this->getPageObjectKeysWithOptionalHTML())) {
-                    $aset->set("act_html_" . $key, (int) $_POST["act_html_" . $key]);
+            if ($ok) {
+                $aset = new ilSetting("adve");
+                $aset->set("use_physical", $_POST["use_physical"]);
+                if ($_POST["block_mode_act"]) {
+                    $aset->set("block_mode_minutes", (int) $_POST["block_mode_minutes"]);
+                } else {
+                    $aset->set("block_mode_minutes", 0);
                 }
-            }
+                $aset->set("auto_url_linking", $_POST["auto_url_linking"]);
 
-            ilUtil::sendSuccess($lng->txt("msg_obj_modified"), true);
-            $ilCtrl->redirect($this, "showGeneralPageEditorSettings");
+                $aset->set("autosave", $form->getInput("autosave"));
+
+                $def = new ilCOPageObjDef();
+                foreach ($def->getDefinitions() as $key => $def) {
+                    if (in_array($key, $this->getPageObjectKeysWithOptionalHTML())) {
+                        $aset->set("act_html_" . $key, (int) $_POST["act_html_" . $key]);
+                    }
+                }
+
+                ilUtil::sendSuccess($lng->txt("msg_obj_modified"), true);
+                $ilCtrl->redirect($this, "showGeneralPageEditorSettings");
+            }
         }
         
         $form->setValuesByPost();
@@ -736,7 +727,6 @@ class ilObjAdvancedEditingGUI extends ilObjectGUI
         $lng = $this->lng;
         $ilCtrl = $this->ctrl;
     
-        include_once("Services/Form/classes/class.ilPropertyFormGUI.php");
         $form = new ilPropertyFormGUI();
         $form->setTitle($lng->txt('settings'));
         $form->setFormAction($ilCtrl->getFormAction($this));
@@ -760,7 +750,6 @@ class ilObjAdvancedEditingGUI extends ilObjectGUI
 
         $ilTabs->activateTab("adve_char_selector_settings");
                 
-        require_once 'Services/UIComponent/CharSelector/classes/class.ilCharSelectorGUI.php';
         $char_selector = new ilCharSelectorGUI(ilCharSelectorConfig::CONTEXT_ADMIN);
         $char_selector->getConfig()->setAvailability($ilSetting->get('char_selector_availability'));
         $char_selector->getConfig()->setDefinition($ilSetting->get('char_selector_definition'));
@@ -782,7 +771,6 @@ class ilObjAdvancedEditingGUI extends ilObjectGUI
 
         $this->checkPermission("write");
         
-        require_once 'Services/UIComponent/CharSelector/classes/class.ilCharSelectorGUI.php';
         $char_selector = new ilCharSelectorGUI(ilCharSelectorConfig::CONTEXT_ADMIN);
         $form = $this->initCharSelectorSettingsForm($char_selector);
         if ($form->checkInput()) {
@@ -797,4 +785,4 @@ class ilObjAdvancedEditingGUI extends ilObjectGUI
         $form->setValuesByPost();
         $tpl->setContent($form->getHTML());
     }
-} // END class.ilObjAdvancedEditingGUI
+}

@@ -186,18 +186,18 @@ class ilSkillProfileGUI
             $ilCtrl->getLinkTarget($this, "")
         );
 
-        // users
-        $ilTabs->addTab(
-            "users",
-            $lng->txt("skmg_assigned_users"),
-            $ilCtrl->getLinkTarget($this, "showUsers")
-        );
-        
         // levels
         $ilTabs->addTab(
             "levels",
             $lng->txt("skmg_assigned_skill_levels"),
             $ilCtrl->getLinkTarget($this, "showLevels")
+        );
+
+        // users
+        $ilTabs->addTab(
+            "users",
+            $lng->txt("skmg_assigned_users"),
+            $ilCtrl->getLinkTarget($this, "showUsers")
         );
 
         // objects
@@ -326,7 +326,7 @@ class ilSkillProfileGUI
             if ($a_mode == "create") {
                 $sec_des = $lng->txt("skmg_add_profile");
                 $form_action = $ilCtrl->getFormAction($this, "save");
-            } else if ($a_mode == "createLocal") {
+            } elseif ($a_mode == "createLocal") {
                 $sec_des = $lng->txt("skmg_add_local_profile");
                 $form_action = $ilCtrl->getFormAction($this, "saveLocal");
             } else {

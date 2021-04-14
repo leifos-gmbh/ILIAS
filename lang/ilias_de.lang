@@ -1295,6 +1295,7 @@ assessment#:#tst_dynamic_question_set_selection#:#Auswahl der Testfragen und Aus
 assessment#:#tst_dynamic_question_set_source_questionpool_summary_string#:#%s (Pfad: %s) [%s Fragen]
 assessment#:#tst_edit_competence_assign#:#Bearbeite Zuordnungs-Eigenschaften
 assessment#:#tst_edit_scoring#:#Ändere Bewertung
+assessment#:#tst_scoring#:#Bewertung
 assessment#:#tst_ending_time#:#Ende
 assessment#:#tst_ending_time_desc#:#Zeitpunkt, zu dem der Test beendet wird. Teilnehmer können ab diesem Moment keine Antworten mehr abgeben. ILIAS beendet den Test.
 assessment#:#tst_enter_questionpool#:#Bitte geben Sie den Namen eines Fragenpools an, in dem die neue Frage abgelegt werden soll

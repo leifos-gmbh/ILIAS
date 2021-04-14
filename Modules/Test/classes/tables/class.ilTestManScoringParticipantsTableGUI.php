@@ -228,7 +228,7 @@ class ilTestManScoringParticipantsTableGUI extends ilTable2GUI
         $asl = new ilAdvancedSelectionListGUI();
 
         $asl->addItem(
-            $DIC->language()->txt('tst_edit_scoring'),
+            $DIC->language()->txt('tst_scoring'),
             '',
             $DIC->ctrl()->getLinkTargetByClass(
                 ilTestScoringEssayGUI::class, 'showManualScoring'

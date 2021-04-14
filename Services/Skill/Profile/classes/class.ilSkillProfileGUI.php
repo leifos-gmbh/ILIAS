@@ -71,7 +71,7 @@ class ilSkillProfileGUI
     protected $ui_ren;
 
     /**
-     * @var \ILIAS\DI\HTTPServices
+     * @var \Psr\Http\Message\ServerRequestInterface
      */
     protected $request;
 
@@ -326,6 +326,8 @@ class ilSkillProfileGUI
             //->withMaxFileSize(20000000); // does not work?
 
         // save commands
+        $sec_des = "";
+        $form_action = "";
         if ($this->checkPermissionBool("write")) {
             if ($a_mode == "create") {
                 $sec_des = $lng->txt("skmg_add_profile");
@@ -375,7 +377,8 @@ class ilSkillProfileGUI
             $form = $form->withRequest($this->request);
             $result = $form->getData();
             if (is_null($result)) {
-                return $tpl->setContent($this->ui_ren->render($form));
+                $tpl->setContent($this->ui_ren->render($form));
+                return;
             }
             $prof = new ilSkillProfile();
             $prof->setTitle($result["section_basic"]["title"]);
@@ -406,7 +409,8 @@ class ilSkillProfileGUI
             $form = $form->withRequest($this->request);
             $result = $form->getData();
             if (is_null($result)) {
-                return $tpl->setContent($this->ui_ren->render($form));
+                $tpl->setContent($this->ui_ren->render($form));
+                return;
             }
             $prof = new ilSkillProfile();
             $prof->setTitle($result["section_basic"]["title"]);
@@ -441,7 +445,8 @@ class ilSkillProfileGUI
             $form = $form->withRequest($this->request);
             $result = $form->getData();
             if (is_null($result)) {
-                return $tpl->setContent($this->ui_ren->render($form));
+                $tpl->setContent($this->ui_ren->render($form));
+                return;
             }
             $this->profile->setTitle($result["section_basic"]["title"]);
             $this->profile->setDescription($result["section_basic"]["description"]);

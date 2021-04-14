@@ -93,6 +93,7 @@ class ilSkillProfileCompletionRepository
             " WHERE profile_id = " . $ilDB->quote($this->getProfileId(), "integer") .
             " AND user_id = " . $ilDB->quote($this->getUserId(), "integer")
         );
+        $entries = array();
         while ($rec = $ilDB->fetchAssoc($set)) {
             $entries[] = array(
                 "profile_id" => $rec["profile_id"],
@@ -208,6 +209,7 @@ class ilSkillProfileCompletionRepository
             " WHERE user_id = " . $ilDB->quote($a_user_id, "integer") .
             " AND fulfilled = 1"
         );
+        $entries = array();
         while ($rec = $ilDB->fetchAssoc($set)) {
             $entries[] = array(
                 "profile_id" => $rec["profile_id"],
@@ -235,6 +237,7 @@ class ilSkillProfileCompletionRepository
             "SELECT * FROM skl_profile_completion " .
             " WHERE user_id = " . $ilDB->quote($a_user_id, "integer")
         );
+        $entries = array();
         while ($rec = $ilDB->fetchAssoc($set)) {
             $entries[] = array(
                 "profile_id" => $rec["profile_id"],
@@ -263,6 +266,7 @@ class ilSkillProfileCompletionRepository
             "SELECT * FROM skl_profile_completion " .
             " WHERE profile_id = " . $ilDB->quote($a_profile_id, "integer")
         );
+        $entries = array();
         while ($rec = $ilDB->fetchAssoc($set)) {
             $entries[] = array(
                 "profile_id" => $rec["profile_id"],

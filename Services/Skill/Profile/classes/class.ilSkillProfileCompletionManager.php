@@ -85,7 +85,10 @@ class ilSkillProfileCompletionManager
     /**
      * Get actual last levels
      *
-     * @param array $skills
+     * @param array  $a_skills
+     * @param string $a_gap_mode
+     * @param string $a_gap_mode_type
+     * @param int    $a_gap_mode_obj_id
      */
     public function getActualLastLevels(
         array $a_skills,
@@ -106,6 +109,7 @@ class ilSkillProfileCompletionManager
     {
         $profile = new ilSkillProfile($a_profile_id);
         $profile_levels = $profile->getSkillLevels();
+        $skills = array();
         foreach ($profile_levels as $l) {
             $skills[] = array(
                 "base_skill_id" => $l["base_skill_id"],

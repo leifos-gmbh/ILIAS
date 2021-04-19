@@ -11781,6 +11781,9 @@ img.il_ExplorerIcon {
 .jstree-default .jstree-anchor {
   line-height: inherit;
 }
+.ilExplorerContainer .jstree-node a:focus-visible {
+  outline: 2px solid #0056ae;
+}
 /* Modules/Forum */
 a.postread,
 a.postread:visited {
@@ -14170,10 +14173,9 @@ div.iosCaptchaInputCommandContainer .audio {
 }
 /* Services/User */
 div.ilProfile {
-  width: 450px;
+  max-width: 450px;
   margin: 0 auto;
   background-color: #f6f6f6;
-  border: 1px solid #d0d5ea;
   padding: 15px;
 }
 div.ilProfile + div.ilPermalinkContainer {
@@ -14181,6 +14183,9 @@ div.ilProfile + div.ilPermalinkContainer {
 }
 div.ilProfile + div.ilPermalinkContainer .input-group-btn {
   vertical-align: bottom;
+}
+img.ilProfileImage {
+  width: 100%;
 }
 h3.ilProfileName {
   margin: 0 0 10px;

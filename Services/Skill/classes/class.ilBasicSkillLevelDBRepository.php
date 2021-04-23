@@ -129,7 +129,7 @@ class ilBasicSkillLevelDBRepository implements ilBasicSkillLevelRepository
     /**
      * @inheritDoc
      */
-    public function lookupLevelSkillId(int $a_id) : int
+    public function lookupLevelSkillId(int $a_id) : ?int
     {
         return $this->lookupLevelProperty($a_id, "skill_id");
     }

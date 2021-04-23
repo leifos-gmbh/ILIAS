@@ -50,7 +50,7 @@ interface ilBasicSkillLevelRepository
      * @param int $a_id level id
      * @return int skill id
      */
-    public function lookupLevelSkillId(int $a_id) : int;
+    public function lookupLevelSkillId(int $a_id) : ?int;
 
     /**
      * Write level title

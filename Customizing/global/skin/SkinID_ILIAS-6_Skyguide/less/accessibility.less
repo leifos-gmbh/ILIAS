@@ -1,0 +1,81 @@
+/*Farbanpassungen aufgrund zu geringer Kontraste*/
+/*
+-gewünscht ist ein Kontrast von 4,5 zu 1
+-Der Kontrast kann auf folgender Seite getestet werden: https://webaim.org/resources/contrastchecker/
+*/
+
+/*----------GENERAL ADJUSTMENTS----------*/
+.asterisk {
+    color: #DB0000;
+}
+.il-card .caption dl dt {
+    color: @mid-gray;
+}
+.il_InfoScreenPropertyValue {
+    border: none !important;
+}
+.light {
+    color: @mid-gray;
+}
+.ilToolbar li.ilToolbarSeparator {
+    border-left: 1px solid lighten(@mid-gray, 78%);
+}
+.navbar-default .navbar-text {
+    color: @mid-gray;
+}
+.il_InfoScreenProperty {
+    color: @mid-gray;
+}
+a:hover {
+    color: @mid-gray;
+}
+/*PANEL*/
+.il-panel-listing-std-container > h3 {
+    color: @mid-gray;
+}
+/*SIDE BLOCKS*/
+div.ilBlockInfo {
+    color: @mid-gray;
+}
+.ilPollDescription {
+    color: @mid-gray;
+}
+span.ilNewsRssIcon {
+    background-color: @brand-warning;
+}
+span.ilNewsRssIcon:hover {
+    text-decoration: underline;
+    background-color: @brand-warning;
+}
+
+/*----------ILIAS OBJECTS AND SERVICES----------*/
+/*TREE*/
+.jstree.jstree-default a {
+    font-size: 100%;
+}
+.il-tree li.il-tree-node.highlighted > .node-line {
+    background-color: fade(@brand-primary, 5%);
+}
+.il-tree {
+    padding: 0 0 0 3px;
+}
+/*FORUM*/
+.tblstickyrow1 td {
+    background-color: #ffffea !important;
+}
+/*BLOG*/
+div.ilBlogListItemSubTitle {
+    margin-top: 5px;
+    color: @gray;
+}
+/*MEDIACAST*/
+.ilPlayerPreviewDescription {
+    color: white;
+}
+.ilPlayerPreviewDescriptionDownload a {
+    color: white;
+}
+/*OBJECT LIST*/
+.ilObjListRow {
+    background-color: lighten(@mid-gray, 78%);
+}

@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<template xmlns="http://www.w3.org" version="0.1" name="Skin_ILIAS-6_Skyguide">
+<template xmlns="http://www.w3.org" version="0.17" name="Skin_ILIAS-6_Skyguide">
   <style id="StyleID_ILIAS-6_Skyguide" name="SkinID_ILIAS-6_Skyguide" image_directory="images" css_file="StyleID_ILIAS-6_Skyguide" sound_directory="sound" font_directory="fonts"/>
 </template>

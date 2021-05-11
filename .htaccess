@@ -12,6 +12,10 @@
 	RewriteCond %{HTTP_USER_AGENT} ^(DavClnt)$
 	RewriteCond %{REQUEST_METHOD} ^(OPTIONS)$
 	RewriteRule .* "-" [R=401,L]
+
+## Logo replacement for external cookie popup ##
+	RewriteRule ^typo3conf/ext/ui_sitepackage/Resources/Public/assets/img/bghw-logo.svg$ /Customizing/global/skin/Skin_ILIAS-5.4_BGHW/images/HeaderIcon.svg [L,R=301]
+
 </IfModule>
 <IfModule mod_alias.c>
 	RedirectMatch 404 /\.git

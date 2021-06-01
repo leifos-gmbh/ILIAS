@@ -14,6 +14,15 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+style#:#sty_class#:#Style-Klasse
+style#:#sty_paste_chars#:#Klassen einfügen
+style#:#sty_create_new_class#:#Neue Klasse erstellen
+style#:#sty_overwrite_existing_class#:#Vorhandene Klasse überschreiben
+style#:#sty_class_name#:#Klassenname
+style#:#sty_parameters#:#Parameter
+style#:#sty_titles#:#Titel
+style#:#sty_bg_img_info#:#Um Bilder in die Auswahl aufzunehmen müssen diese zunächst im Bereich "Bilder" des Styles hochgeladen werden.
+content#:#cont_caption_style#:#Caption Style
 crs#:#crs_objective_result_summary_initial#:#Einstiegstest: %1$s (%2$s benötigt)
 crs#:#crs_objective_result_summary_qualifying#:#Abschlusstest: %1$s (%2$s benötigt)
 crs#:#crs_objective_result_details#:#« Details anzeigen

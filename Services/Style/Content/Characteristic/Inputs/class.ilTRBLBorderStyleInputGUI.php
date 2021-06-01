@@ -3,12 +3,10 @@
 /* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 /**
-* This class represents a border style with all/top/right/bottom/left in a property form.
-*
-* @author Alex Killing <alex.killing@gmx.de>
-* @version $Id$
-* @ingroup	ServicesForm
-*/
+ * This class represents a border style with all/top/right/bottom/left in a property form.
+ *
+ * @author Alexander Killing <killing@leifos.de>
+ */
 class ilTRBLBorderStyleInputGUI extends ilFormPropertyGUI
 {
     /**

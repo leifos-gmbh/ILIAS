@@ -5,6 +5,9 @@
 
 require_once("./Services/Xml/classes/class.ilSaxParser.php");
 
+use \ILIAS\Style\Content;
+
+
 /**
 * Style Import Parser
 *
@@ -20,6 +23,10 @@ class ilStyleImportParser extends ilSaxParser
      */
     protected $tree;
 
+    /**
+     * @var Content\ColorManager
+     */
+    protected $color_manager;
 
     /**
     * Constructor
@@ -29,14 +36,20 @@ class ilStyleImportParser extends ilSaxParser
     *
     * @access	public
     */
-    public function __construct($a_xml_file, &$a_style_obj)
+    public function __construct($a_xml_file, $a_style_obj)
     {
         global $DIC;
 
         $this->lng = $DIC->language();
         $this->tree = $DIC->repositoryTree();
-        $lng = $DIC->language();
-        $tree = $DIC->repositoryTree();
+
+        $access_manager = new Content\Access\StyleAccessManager(
+            $DIC->rbac()->system(),
+            0,
+            $DIC->user()->getId()
+        );
+        $access_manager->enableWrite(true);
+        $this->color_manager = new Content\ColorManager($a_style_obj->getId(), $access_manager);
 
         $this->style_obj = $a_style_obj;
 
@@ -109,7 +122,7 @@ class ilStyleImportParser extends ilSaxParser
                 break;
                 
             case "StyleColor":
-                $this->style_obj->addColor($a_attribs["Name"], $a_attribs["Code"]);
+                $this->color_manager->addColor($a_attribs["Name"], $a_attribs["Code"]);
                 break;
 
             case "StyleTemplate":

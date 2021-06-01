@@ -3,6 +3,8 @@
 
 require_once("./Services/COPage/classes/class.ilPageContent.php");
 
+use \ILIAS\Style;
+
 /**
 * User Interface for Editing of Page Content Objects (Paragraphs, Tables, ...)
 *
@@ -51,6 +53,11 @@ class ilPageContentGUI
         );
 
     /**
+     * @var Style\Content\CharacteristicManager
+     */
+    protected $char_manager;
+
+    /**
     * Constructor
     * @access	public
     */
@@ -77,6 +84,8 @@ class ilPageContentGUI
             //echo "-".$this->pc_id."-";
             $this->dom = $a_pg_obj->getDom();
         }
+
+        $this->char_manager = new Style\Content\CharacteristicManager();
     }
 
     /**
@@ -188,6 +197,7 @@ class ilPageContentGUI
     */
     protected function getCharacteristicsOfCurrentStyle($a_type)
     {
+        $type = [];
         if ($this->getStyleId() > 0 &&
             ilObject::_lookupType($this->getStyleId()) == "sty") {
             include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
@@ -197,7 +207,11 @@ class ilPageContentGUI
                 $a_type = array($a_type);
             }
             foreach ($a_type as $at) {
-                $chars = array_merge($chars, $style->getCharacteristics($at, true));
+                $new_chars = $style->getCharacteristics($at, true);
+                foreach ($new_chars as $c) {
+                    $type[$c] = $at;
+                }
+                $chars = array_merge($chars, $new_chars);
             }
             $new_chars = array();
             if (is_array($chars)) {
@@ -205,7 +219,11 @@ class ilPageContentGUI
                     if ($this->chars[$char] != "") {	// keep lang vars for standard chars
                         $new_chars[$char] = $this->chars[$char];
                     } else {
-                        $new_chars[$char] = $char;
+                        $new_chars[$char] = $this->char_manager->getPresentationTitle(
+                            $this->getStyleId(),
+                            $type[$char],
+                            $char
+                        );
                     }
                     asort($new_chars);
                 }

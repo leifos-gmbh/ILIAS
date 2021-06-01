@@ -1321,7 +1321,35 @@ class ilPCMediaObjectGUI extends ilPageContentGUI
 
         $char_prop->setValue($selected);
         $form->addItem($char_prop);
-        
+
+
+        // caption style
+        $cap_style = new ilAdvSelectInputGUI(
+            $this->lng->txt("cont_caption_style"),
+            "caption_style"
+        );
+        //$this->setBasicTableCellStyles();
+        $this->setCharacteristics([]);
+        $this->getCharacteristicsOfCurrentStyle("media_caption");
+        $chars = $this->getCharacteristics();
+        $options = $chars;
+        //$options = array_merge(array("" => $this->lng->txt("none")), $chars);
+        foreach ($options as $k => $option) {
+            $html = '<table border="0" cellspacing="0" cellpadding="0"><tr><td class="ilc_table_cell_' . $k . '">' .
+                $option . '</td></tr></table>';
+            $cap_style->addOption($k, $option, $html);
+        }
+
+        if (count($options) > 0) {
+            $current_value = $this->content_obj->getCaptionClass()
+                ? $this->content_obj->getCaptionClass()
+                : "MediaCaption";
+            $cap_style->setValue($current_value);
+            $form->addItem($cap_style);
+        }
+
+
+
         // save button
         $form->addCommandButton("saveStyle", $lng->txt("save"));
 
@@ -1335,7 +1363,9 @@ class ilPCMediaObjectGUI extends ilPageContentGUI
     */
     public function saveStyle()
     {
-        $this->content_obj->setClass($_POST["characteristic"]);
+        $this->content_obj->setClass(ilUtil::stripSlashes($_POST["characteristic"]));
+        $this->content_obj->setCaptionClass(ilUtil::stripSlashes($_POST["caption_style"]));
+
         $this->updated = $this->pg_obj->update();
         if ($this->updated === true) {
             $this->ctrl->returnToParent($this, "jump" . $this->hier_id);

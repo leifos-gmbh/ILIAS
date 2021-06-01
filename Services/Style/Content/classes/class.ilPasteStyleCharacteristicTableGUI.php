@@ -1,7 +1,7 @@
 <?php
 /* Copyright (c) 1998-2009 ILIAS open source, Extended GPL, see docs/LICENSE */
 
-include_once("./Services/Table/classes/class.ilTable2GUI.php");
+use \ILIAS\Style\Content;
 
 /**
  * Paste style overview table
@@ -23,11 +23,16 @@ class ilPasteStyleCharacteristicTableGUI extends ilTable2GUI
      */
     protected $access;
 
+    /**
+     * @var Content\CharacteristicManager
+     */
+    protected $manager;
 
     /**
      * Constructor
      */
-    public function __construct($a_parent_obj, $a_parent_cmd)
+    public function __construct(object $a_parent_obj, string $a_parent_cmd,
+        Content\CharacteristicManager $manager)
     {
         global $DIC;
 
@@ -35,17 +40,15 @@ class ilPasteStyleCharacteristicTableGUI extends ilTable2GUI
         $this->lng = $DIC->language();
         $this->access = $DIC->access();
         $ilCtrl = $DIC->ctrl();
-        $lng = $DIC->language();
-        $ilAccess = $DIC->access();
+        $this->manager = $manager;
         $lng = $DIC->language();
 
         parent::__construct($a_parent_obj, $a_parent_cmd);
         $this->setTitle($lng->txt("sty_paste_characteristics"));
         $this->setLimit(9999);
-        $st_c = explode(":::", $_SESSION["sty_copy"]);
-        $this->from_style_id = $st_c[0];
-        $this->from_style_type = $st_c[1];
-        $this->setData(explode("::", $st_c[2]));
+        $this->from_style_id = $this->manager->getCopyCharacteristicStyleId();
+        $this->from_style_type = $this->manager->getCopyCharacteristicStyleType();
+        $this->setData($this->manager->getCopyCharacteristics());
         $this->addColumn($this->lng->txt("name"));
         $this->addColumn($this->lng->txt("type"));
         $this->addColumn($this->lng->txt("sty_if_style_class_already_exists"));

@@ -100,10 +100,10 @@ class ilStyleImageTableGUI extends ilTable2GUI
         if (!is_file($thumbfile) || strtolower(pathinfo($a_set["entry"], PATHINFO_EXTENSION)) == "svg") {
             $thumbfile = $image_file;
         }
-        if (is_file($thumbfile)) {
+        if (is_file($image_file)) {
             $this->tpl->setCurrentBlock("thumbnail");
             $this->tpl->setVariable("IMG_ALT", $a_set["entry"]);
-            $this->tpl->setVariable("IMG_SRC", $thumbfile);
+            $this->tpl->setVariable("IMG_SRC", $image_file);
             $this->tpl->parseCurrentBlock();
         }
 

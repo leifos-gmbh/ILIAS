@@ -235,7 +235,7 @@ class ilPCMediaObject extends ilPageContent
     }
     
     /**
-    * Set Style Class of table
+    * Set Style Class of media object
     *
     * @param	string	$a_class		class
     */
@@ -270,7 +270,44 @@ class ilPCMediaObject extends ilPageContent
             }
         }
     }
-    
+
+    /**
+     * Set caption style class of media object
+     *
+     * @param	string	$a_class		class
+     */
+    public function setCaptionClass(string $a_class) : void
+    {
+        if (is_object($this->mob_node)) {
+            $mal_node = $this->mob_node->first_child();
+            if (is_object($mal_node)) {
+                if (!empty($a_class)) {
+                    $mal_node->set_attribute("CaptionClass", $a_class);
+                } else {
+                    if ($mal_node->has_attribute("CaptionClass")) {
+                        $mal_node->remove_attribute("CaptionClass");
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Get characteristic of section.
+     *
+     * @return	string		characteristic
+     */
+    public function getCaptionClass() : string
+    {
+        if (is_object($this->mob_node)) {
+            $mal_node = $this->mob_node->first_child();
+            if (is_object($mal_node)) {
+                $class = $mal_node->get_attribute("CaptionClass");
+                return $class;
+            }
+        }
+    }
+
     /**
      * Get lang vars needed for editing
      * @return array array of lang var keys

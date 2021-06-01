@@ -69,6 +69,7 @@
 <!ATTLIST MediaAlias
 	OriginId CDATA #REQUIRED
 	Class CDATA #IMPLIED
+	CaptionClass CDATA #IMPLIED
 >
 <!-- MediaAliasItem -->
 <!ELEMENT MediaAliasItem (Layout?, Caption?, TextRepresentation?, Parameter*, MapArea*)>

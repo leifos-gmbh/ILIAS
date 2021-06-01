@@ -87,9 +87,10 @@ class ilPCParagraphGUI extends ilPageContentGUI
     */
     public static function _getCharacteristics($a_style_id)
     {
+        $char_manager = new \ILIAS\Style\Content\CharacteristicManager();
         $st_chars = ilPCParagraphGUI::_getStandardCharacteristics();
         $chars = ilPCParagraphGUI::_getStandardCharacteristics();
-
+        $type = [];
         if ($a_style_id > 0 &&
             ilObject::_lookupType($a_style_id) == "sty") {
             include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
@@ -97,14 +98,22 @@ class ilPCParagraphGUI extends ilPageContentGUI
             $types = array("text_block", "heading1", "heading2", "heading3");
             $chars = array();
             foreach ($types as $t) {
-                $chars = array_merge($chars, $style->getCharacteristics($t));
+                $new_chars = $style->getCharacteristics($t);
+                foreach ($new_chars as $c) {
+                    $type[$c] = $t;
+                }
+                $chars = array_merge($chars, $new_chars);
             }
             $new_chars = array();
             foreach ($chars as $char) {
                 if ($st_chars[$char] != "") {	// keep lang vars for standard chars
                     $new_chars[$char] = $st_chars[$char];
                 } else {
-                    $new_chars[$char] = $char;
+                    $new_chars[$char] = $char_manager->getPresentationTitle(
+                        $a_style_id,
+                        $type[$char],
+                        $char
+                    );
                 }
                 asort($new_chars);
             }

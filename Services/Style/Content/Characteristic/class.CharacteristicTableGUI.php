@@ -88,12 +88,13 @@ class CharacteristicTableGUI extends \ilTable2GUI
         $this->ui = $DIC->ui();
         
         parent::__construct($a_parent_obj, $a_parent_cmd);
+        $this->setExternalSorting(true);
         $this->super_type = $a_super_type;
         $this->style = $a_style;
         $all_super_types = \ilObjStyleSheet::_getStyleSuperTypes();
         $this->types = $all_super_types[$this->super_type];
         $this->core_styles = \ilObjStyleSheet::_getCoreStyles();
-        $this->setData($a_chars);
+        $this->getItems();
         $this->setTitle($lng->txt("sty_" . $a_super_type . "_char"));
         $this->setLimit(9999);
 
@@ -150,7 +151,23 @@ class CharacteristicTableGUI extends \ilTable2GUI
         
         $this->setEnableTitle(true);
     }
-    
+
+    /**
+     * Get items
+     * @param
+     * @return
+     */
+    protected function getItems()
+    {
+        $data = [];
+        foreach ($this->manager->getBySuperType($this->super_type) as $char) {
+            $data[] = [
+                "obj" => $char
+            ];
+        }
+        $this->setData($data);
+    }
+
     /**
     * Standard Version of Fill Row. Most likely to
     * be overwritten by derived class.
@@ -161,65 +178,62 @@ class CharacteristicTableGUI extends \ilTable2GUI
         $ilCtrl = $this->ctrl;
         $ui = $this->ui;
 
-        $stypes = \ilObjStyleSheet::_getStyleSuperTypes();
-        $types = $stypes[$this->super_type];
-        
-        if (!in_array($a_set["type"], $types)) {
-            return;
-        }
+        $char = $a_set["obj"];
+
         if ($this->expandable) {
             $this->order_cnt = $this->order_cnt + 10;
             $this->tpl->setCurrentBlock("order");
-            $this->tpl->setVariable("OCHAR", $a_set["type"] . "." .
-                \ilObjStyleSheet::_determineTag($a_set["type"]) .
-                "." . $a_set["class"]);
+            $this->tpl->setVariable("OCHAR", $char->getType() . "." .
+                \ilObjStyleSheet::_determineTag($char->getType()) .
+                "." . $char->getCharacteristic());
             $this->tpl->setVariable("ORDER", $this->order_cnt);
             $this->tpl->parseCurrentBlock();
         }
 
 
         $this->tpl->setCurrentBlock("checkbox");
-        $this->tpl->setVariable("CHAR", $a_set["type"] . "." .
-            \ilObjStyleSheet::_determineTag($a_set["type"]) .
-                    "." . $a_set["class"]);
+        $this->tpl->setVariable("CHAR", $char->getType() . "." .
+            \ilObjStyleSheet::_determineTag($char->getType()) .
+                    "." . $char->getCharacteristic());
         $this->tpl->parseCurrentBlock();
 
         if ($this->hideable) {
-            if (!\ilObjStyleSheet::_isHideable($a_set["type"]) ||
-                (!empty($this->core_styles[$a_set["type"] . "." .
-                \ilObjStyleSheet::_determineTag($a_set["type"]) .
-                "." . $a_set["class"]]))) {
+            if (!\ilObjStyleSheet::_isHideable($char->getType()) ||
+                (!empty($this->core_styles[$char->getType() . "." .
+                \ilObjStyleSheet::_determineTag($char->getType()) .
+                "." . $char->getCharacteristic()]))) {
                 $this->tpl->touchBlock("no_hide_checkbox");
             } else {
                 $this->tpl->setCurrentBlock("hide_checkbox");
-                $this->tpl->setVariable("CHAR", $a_set["type"] . "." .
-                    \ilObjStyleSheet::_determineTag($a_set["type"]) .
-                    "." . $a_set["class"]);
-                if ($this->style->getHideStatus($a_set["type"], $a_set["class"])) {
+                $this->tpl->setVariable("CHAR", $char->getType() . "." .
+                    \ilObjStyleSheet::_determineTag($char->getType()) .
+                    "." . $char->getCharacteristic());
+                if ($this->style->getHideStatus($char->getType(), $char->getCharacteristic())) {
                     $this->tpl->setVariable("CHECKED", "checked='checked'");
                 }
                 $this->tpl->parseCurrentBlock();
             }
         }
-        
+
         // example
         $this->tpl->setVariable(
             "EXAMPLE",
-            \ilObjStyleSheetGUI::getStyleExampleHTML($a_set["type"], $a_set["class"])
+            \ilObjStyleSheetGUI::getStyleExampleHTML($char->getType(), $char->getCharacteristic())
         );
-        $tag_str = \ilObjStyleSheet::_determineTag($a_set["type"]) . "." . $a_set["class"];
-        $this->tpl->setVariable("TXT_TAG", $a_set["class"]);
-        $this->tpl->setVariable("TXT_TYPE", $lng->txt("sty_type_" . $a_set["type"]));
+        $tag_str = \ilObjStyleSheet::_determineTag($char->getType()) . "." . $char->getCharacteristic();
+        $this->tpl->setVariable("TXT_TAG", $char->getCharacteristic());
+        $this->tpl->setVariable("TXT_TYPE", $lng->txt("sty_type_" . $char->getType()));
+
         $this->tpl->setVariable("TITLE", $this->manager->getPresentationTitle(
-            $a_set["type"],
-            $a_set["class"],
+            $char->getType(),
+            $char->getCharacteristic(),
             false
         ));
 
         if ($this->access_manager->checkWrite()) {
 
             $ilCtrl->setParameter($this->parent_obj, "tag", $tag_str);
-            $ilCtrl->setParameter($this->parent_obj, "style_type", $a_set["type"]);
+            $ilCtrl->setParameter($this->parent_obj, "style_type", $char->getType());
 
             $links = [];
             $links[] = $ui->factory()->link()->standard(

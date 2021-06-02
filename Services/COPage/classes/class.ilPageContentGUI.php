@@ -53,11 +53,6 @@ class ilPageContentGUI
         );
 
     /**
-     * @var Style\Content\CharacteristicManager
-     */
-    protected $char_manager;
-
-    /**
     * Constructor
     * @access	public
     */
@@ -84,8 +79,6 @@ class ilPageContentGUI
             //echo "-".$this->pc_id."-";
             $this->dom = $a_pg_obj->getDom();
         }
-
-        $this->char_manager = new Style\Content\CharacteristicManager();
     }
 
     /**
@@ -197,35 +190,25 @@ class ilPageContentGUI
     */
     protected function getCharacteristicsOfCurrentStyle($a_type)
     {
-        $type = [];
         if ($this->getStyleId() > 0 &&
             ilObject::_lookupType($this->getStyleId()) == "sty") {
-            include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
-            $style = new ilObjStyleSheet($this->getStyleId());
-            $chars = array();
+
+            $access_manager = new Style\Content\Access\StyleAccessManager();
+            $char_manager = new Style\Content\CharacteristicManager($this->getStyleId(), $access_manager);
+
             if (!is_array($a_type)) {
                 $a_type = array($a_type);
             }
-            foreach ($a_type as $at) {
-                $new_chars = $style->getCharacteristics($at, true);
-                foreach ($new_chars as $c) {
-                    $type[$c] = $at;
-                }
-                $chars = array_merge($chars, $new_chars);
-            }
+            $chars = $char_manager->getByTypes($a_type);
             $new_chars = array();
-            if (is_array($chars)) {
-                foreach ($chars as $char) {
-                    if ($this->chars[$char] != "") {	// keep lang vars for standard chars
-                        $new_chars[$char] = $this->chars[$char];
-                    } else {
-                        $new_chars[$char] = $this->char_manager->getPresentationTitle(
-                            $this->getStyleId(),
-                            $type[$char],
-                            $char
-                        );
-                    }
-                    asort($new_chars);
+            foreach ($chars as $char) {
+                if ($this->chars[$char->getCharacteristic()] != "") {	// keep lang vars for standard chars
+                    $new_chars[$char->getCharacteristic()] = $this->chars[$char->getCharacteristic()];
+                } else {
+                    $new_chars[$char->getCharacteristic()] = $char_manager->getPresentationTitle(
+                        $char->getType(),
+                        $char->getCharacteristic()
+                    );
                 }
             }
             $this->setCharacteristics($new_chars);

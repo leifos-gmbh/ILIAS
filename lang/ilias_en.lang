@@ -14,6 +14,8 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+style#:#sty_save_hide_order_status#:#Save Order and Hidden Status
+style#:#sty_save_order_status#:#Save Order
 style#:#sty_class#:#Style Class
 style#:#sty_paste_chars#:#Paste Classes
 style#:#sty_create_new_class#:#Create new style class
@@ -7327,7 +7329,7 @@ style#:#sty_ha_icont_class#:#Hor. Accordion Item Content
 style#:#sty_ha_ihead_class#:#Hor. Accordion Item Header
 style#:#sty_haccordion_templates#:#Hor. Accordion Templates
 style#:#sty_height#:#Height
-style#:#sty_hide#:#Hide
+style#:#sty_hide#:#Hidden
 style#:#sty_horizontal#:#Horizontal
 style#:#sty_image_file#:#Image File
 style#:#sty_images#:#Images
@@ -7372,7 +7374,7 @@ style#:#sty_right#:#Right
 style#:#sty_row_foot_class#:#Row Footer
 style#:#sty_row_head_class#:#Row Header
 style#:#sty_save_active_styles#:#Save Active Styles
-style#:#sty_save_hide_status#:#Save Hide Status
+style#:#sty_save_hide_status#:#Save
 style#:#sty_sco_char#:#SCO and Objective
 style#:#sty_scope#:#Scope
 style#:#sty_section_char#:#Section

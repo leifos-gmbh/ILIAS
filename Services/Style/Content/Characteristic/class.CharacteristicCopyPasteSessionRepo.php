@@ -31,7 +31,7 @@ class CharacteristicCopyPasteSessionRepo
 
                 public function get(string $key) : string
                 {
-                    return \ilSession::get($key);
+                    return (string) \ilSession::get($key);
                 }
 
                 public function clear(string $key) : void

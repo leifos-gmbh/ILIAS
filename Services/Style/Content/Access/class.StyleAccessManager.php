@@ -31,11 +31,19 @@ class StyleAccessManager
     protected $rbacsystem;
 
     /**
-     * Constructor
+     * StyleAccessManager constructor.
+     * @param \ilRbacSystem|null $rbacsystem
+     * @param int                $ref_id
+     * @param int                $user_id
      */
-    public function __construct(\ilRbacSystem $rbacsystem, int $ref_id, int $user_id)
+    public function __construct(\ilRbacSystem $rbacsystem = null, int $ref_id = 0, int $user_id = 0)
     {
-        $this->rbacsystem = $rbacsystem;
+        /** @var \ILIAS\DI\Container $DIC */
+        global $DIC;
+
+        $this->rbacsystem = (!is_null($rbacsystem))
+            ? $rbacsystem
+            : $DIC->rbac()->system();
         $this->ref_id = $ref_id;
         $this->user_id = $user_id;
     }

@@ -14,6 +14,8 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+style#:#sty_save_hide_order_status#:#Reihefolge und Status speichern
+style#:#sty_save_order_status#:#Reihenfolge speichern
 style#:#sty_class#:#Style-Klasse
 style#:#sty_paste_chars#:#Klassen einfügen
 style#:#sty_create_new_class#:#Neue Klasse erstellen
@@ -8859,7 +8861,7 @@ style#:#sty_row_foot_class#:#Fuß (Zeilen)
 style#:#sty_row_head_class#:#Kopf (Zeilen)
 style#:#sty_rte_char#:#SCORM RTE#
 style#:#sty_save_active_styles#:#Aktive Stylesheets speichern
-style#:#sty_save_hide_status#:#Save Hide Status
+style#:#sty_save_hide_status#:#Status Speichern
 style#:#sty_sco_char#:#SCOs und Lernziele
 style#:#sty_scope#:#Geltungsbereich
 style#:#sty_section_char#:#Block

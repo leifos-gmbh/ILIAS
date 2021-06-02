@@ -183,6 +183,7 @@ class ilStyleCharacteristicGUI
                     "deleteCharacteristicConfirmation", "cancelCharacteristicDeletion", "deleteCharacteristic",
                     "copyCharacteristics", "pasteCharacteristicsOverview", "pasteCharacteristics",
                     "pasteCharacteristicsWithinStyle", "pasteCharacteristicsFromOtherStyle",
+                    "saveStatus",
                     "editTagStyle", "refreshTagStyle", "updateTagStyle",
                     "editTagTitles", "saveTagTitles"])) {
                     $this->$cmd();
@@ -1069,24 +1070,40 @@ class ilStyleCharacteristicGUI
      * Save hide status for characteristics
      * @throws Content\ContentStyleNoPermissionException
      */
-    public function saveHideStatusObject()
+    public function saveStatus()
     {
         $ilCtrl = $this->ctrl;
         $lng = $this->lng;
 
-        //var_dump($_POST);
+        // save hide status
+        if (is_array($_POST["all_chars"])) {
+            foreach ($_POST["all_chars"] as $char) {
+                $ca = explode(".", $char);
+                $this->manager->saveHidden(
+                    $ca[0],
+                    $ca[2],
+                    (is_array($_POST["hide"]) && in_array($char, $_POST["hide"]))
+                );
+            }
+        }
 
-        foreach ($_POST["all_chars"] as $char) {
-            $ca = explode(".", $char);
-            $this->manager->saveHidden(
-                $ca[0],
-                $ca[2],
-                (is_array($_POST["hide"]) && in_array($char, $_POST["hide"]))
-            );
+        // save order
+        if (is_array($_POST["order"])) {
+            $order_by_type = [];
+            foreach ($_POST["order"] as $char => $order_nr) {
+                $ca = explode(".", $char);
+                $order_by_type[$ca[0]][$ca[2]] = $order_nr;
+            }
+            foreach ($order_by_type as $type => $order_nrs) {
+                $this->manager->saveOrderNrs(
+                    $type,
+                    $order_nrs
+                );
+            }
         }
 
         ilUtil::sendInfo($lng->txt("msg_obj_modified"), true);
-        $ilCtrl->redirect($this, "edit");
+        $ilCtrl->redirect($this, "listCharacteristics");
     }
 
     /**

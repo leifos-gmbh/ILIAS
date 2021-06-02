@@ -127,6 +127,34 @@ class CharacteristicManager
     }
 
     /**
+     * Get characteristics by type
+     * @param string[] $types
+     * @return array
+     */
+    public function getByTypes(
+        array $types
+    ) : array {
+        return $this->repo->getByTypes(
+            $this->style_id,
+            $types
+        );
+    }
+
+    /**
+     * Get characteristics by supertype
+     * @param string $supertype
+     * @return array
+     */
+    public function getBySuperType(
+        string $supertype
+    ) : array {
+        return $this->repo->getBySuperType(
+            $this->style_id,
+            $supertype
+        );
+    }
+
+    /**
      * Get characteristic by key
      * @param string $type
      * @param string $characteristic
@@ -241,15 +269,13 @@ class CharacteristicManager
 
         asort($order_nrs, SORT_NUMERIC);
 
-        $cnt = 10;
-        foreach ($order_nrs as $char => $dummy) {
+        foreach ($order_nrs as $char => $nr) {
             $this->repo->saveOrderNr(
                 $this->style_id,
                 $type,
                 $char,
-                $cnt
+                $nr
             );
-            $cnt += 10;
         }
     }
 

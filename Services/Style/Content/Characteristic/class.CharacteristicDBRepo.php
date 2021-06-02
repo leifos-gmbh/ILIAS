@@ -149,12 +149,30 @@ class CharacteristicDBRepo
         string $type
     ) : array
     {
+        return $this->getByTypes(
+            $style_id,
+            [$type]
+        );
+    }
+
+    /**
+     * Get characteristics by types
+     * @param int    $style_id
+     * @param string[] $types
+     * @return Characteristic[]
+     */
+    public function getByTypes(
+        int $style_id,
+        array $types
+    ) : array
+    {
         $db = $this->db;
 
         $set = $db->queryF("SELECT * FROM style_char " .
-            " WHERE style_id = %s AND type = %s ",
-            ["integer", "text"],
-            [$style_id, $type]
+            " WHERE style_id = %s AND ". $db->in("type", $types, false, "text").
+            " ORDER BY order_nr, type, characteristic",
+            ["integer"],
+            [$style_id]
         );
         $chars = [];
         while ($rec = $db->fetchAssoc($set)) {
@@ -162,14 +180,14 @@ class CharacteristicDBRepo
             $set2 = $db->queryF("SELECT * FROM style_char_title " .
                 " WHERE style_id = %s AND type = %s AND characteristic = %s ",
                 ["integer", "text", "text"],
-                [$style_id, $type, $rec["characteristic"]]
+                [$style_id, $rec["type"], $rec["characteristic"]]
             );
             $titles = [];
             while ($rec2 = $db->fetchAssoc($set2)) {
                 $titles[$rec2["lang"]] = $rec2["title"];
             }
             $chars[] = $this->factory->characteristic(
-                $type,
+                $rec["type"],
                 $rec["characteristic"],
                 $rec["hide"],
                 $titles,
@@ -180,6 +198,27 @@ class CharacteristicDBRepo
         }
         return $chars;
     }
+
+    /**
+     * Get characteristics by supertype
+     * @param int    $style_id
+     * @param string $super_type
+     * @return Characteristic[]
+     */
+    public function getBySuperType(
+        int $style_id,
+        string $super_type
+    ) : array
+    {
+        $stypes = \ilObjStyleSheet::_getStyleSuperTypes();
+        $types = $stypes[$super_type];
+
+        return $this->getByTypes(
+            $style_id,
+            $types
+        );
+    }
+
 
     /**
      * Save titles for characteristic

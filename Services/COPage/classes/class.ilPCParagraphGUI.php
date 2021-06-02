@@ -4,6 +4,8 @@
 require_once("./Services/COPage/classes/class.ilPCParagraph.php");
 require_once("./Services/COPage/classes/class.ilPageContentGUI.php");
 
+use \ILIAS\Style;
+
 /**
 * Class ilPCParagraphGUI
 *
@@ -87,35 +89,25 @@ class ilPCParagraphGUI extends ilPageContentGUI
     */
     public static function _getCharacteristics($a_style_id)
     {
-        $char_manager = new \ILIAS\Style\Content\CharacteristicManager();
         $st_chars = ilPCParagraphGUI::_getStandardCharacteristics();
         $chars = ilPCParagraphGUI::_getStandardCharacteristics();
-        $type = [];
         if ($a_style_id > 0 &&
             ilObject::_lookupType($a_style_id) == "sty") {
-            include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
-            $style = new ilObjStyleSheet($a_style_id);
-            $types = array("text_block", "heading1", "heading2", "heading3");
-            $chars = array();
-            foreach ($types as $t) {
-                $new_chars = $style->getCharacteristics($t);
-                foreach ($new_chars as $c) {
-                    $type[$c] = $t;
-                }
-                $chars = array_merge($chars, $new_chars);
-            }
+
+            $access_manager = new Style\Content\Access\StyleAccessManager();
+            $char_manager = new Style\Content\CharacteristicManager($a_style_id, $access_manager);
+
+            $chars = $char_manager->getByTypes(["text_block", "heading1", "heading2", "heading3"]);
             $new_chars = array();
             foreach ($chars as $char) {
-                if ($st_chars[$char] != "") {	// keep lang vars for standard chars
-                    $new_chars[$char] = $st_chars[$char];
+                if ($st_chars[$char->getCharacteristic()] != "") {	// keep lang vars for standard chars
+                    $new_chars[$char->getCharacteristic()] = $st_chars[$char->getCharacteristic()];
                 } else {
-                    $new_chars[$char] = $char_manager->getPresentationTitle(
-                        $a_style_id,
-                        $type[$char],
-                        $char
+                    $new_chars[$char->getCharacteristic()] = $char_manager->getPresentationTitle(
+                        $char->getType(),
+                        $char->getCharacteristic()
                     );
                 }
-                asort($new_chars);
             }
             $chars = $new_chars;
         }

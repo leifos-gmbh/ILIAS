@@ -140,6 +140,7 @@ class ilStyleCharacteristicGUI
         $this->current_pseudo_class = (string) ($t[1] ?? "");
 
         $this->style_type = (string) ($params["style_type"] ?? "");
+        $this->requested_char = (string) ($params["char"] ?? "");
         $this->mq_id = (int) ($params["mq_id"] ?? 0);
         $this->tabs = $DIC->tabs();
         $this->ui = $DIC->ui();
@@ -183,7 +184,7 @@ class ilStyleCharacteristicGUI
                     "deleteCharacteristicConfirmation", "cancelCharacteristicDeletion", "deleteCharacteristic",
                     "copyCharacteristics", "pasteCharacteristicsOverview", "pasteCharacteristics",
                     "pasteCharacteristicsWithinStyle", "pasteCharacteristicsFromOtherStyle",
-                    "saveStatus",
+                    "saveStatus", "setOutdated", "removeOutdated",
                     "editTagStyle", "refreshTagStyle", "updateTagStyle",
                     "editTagTitles", "saveTagTitles"])) {
                     $this->$cmd();
@@ -1104,6 +1105,72 @@ class ilStyleCharacteristicGUI
 
         ilUtil::sendInfo($lng->txt("msg_obj_modified"), true);
         $ilCtrl->redirect($this, "listCharacteristics");
+    }
+
+    /**
+     * Set outdated
+     */
+    protected function setOutdated()
+    {
+        $data = $this->request->getParsedBody();
+
+        if (is_array($data)) {
+            if (is_array($data["char"])) {
+                foreach ($data["char"] as $c) {
+                    $c_parts = explode(".", $c);
+                    if (!\ilObjStyleSheet::isCoreStyle($c_parts[0], $c_parts[2])) {
+                        $this->manager->saveOutdated(
+                            $c_parts[0],
+                            $c_parts[2],
+                            true
+                        );
+                        ilUtil::sendInfo($this->lng->txt("msg_obj_modified"), true);
+                    }
+                }
+            }
+        } else {
+            $this->manager->saveOutdated(
+                $this->style_type,
+                $this->requested_char,
+                true
+            );
+            ilUtil::sendInfo($this->lng->txt("msg_obj_modified"), true);
+        }
+
+        $this->ctrl->redirect($this, "listCharacteristics");
+    }
+
+    /**
+     * Remove outdated state
+     */
+    protected function removeOutdated()
+    {
+        $data = $this->request->getParsedBody();
+
+        if (is_array($data)) {
+            if (is_array($data["char"])) {
+                foreach ($data["char"] as $c) {
+                    $c_parts = explode(".", $c);
+                    if (!\ilObjStyleSheet::isCoreStyle($c_parts[0], $c_parts[2])) {
+                        $this->manager->saveOutdated(
+                            $c_parts[0],
+                            $c_parts[2],
+                            false
+                        );
+                        ilUtil::sendInfo($this->lng->txt("msg_obj_modified"), true);
+                    }
+                }
+            }
+        } else {
+            $this->manager->saveOutdated(
+                $this->style_type,
+                $this->requested_char,
+                false
+            );
+            ilUtil::sendInfo($this->lng->txt("msg_obj_modified"), true);
+        }
+
+        $this->ctrl->redirect($this, "listCharacteristics");
     }
 
     /**

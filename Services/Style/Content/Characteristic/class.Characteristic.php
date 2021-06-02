@@ -43,7 +43,7 @@ class Characteristic
     /**
      * @var bool
      */
-    protected $deprecated;
+    protected $outdated;
 
     /**
      * Characteristic constructor.
@@ -52,7 +52,7 @@ class Characteristic
      * @param bool   $hide
      * @param array  $titles
      * @param int    $order_nr
-     * @param bool   $deprecated
+     * @param bool   $outdated
      */
     public function __construct(
         string $type,
@@ -60,7 +60,7 @@ class Characteristic
         bool $hide,
         array $titles,
         int $order_nr = 0,
-        bool $deprecated = false
+        bool $outdated = false
     )
     {
         $this->type = $type;
@@ -68,7 +68,7 @@ class Characteristic
         $this->hide = $hide;
         $this->titles = $titles;
         $this->order_nr = $order_nr;
-        $this->deprecated = $deprecated;
+        $this->outdated = $outdated;
     }
 
     /**
@@ -138,12 +138,12 @@ class Characteristic
     }
 
     /**
-     * Is char hidden?
+     * Is char outdated?
      * @return bool
      */
-    public function isDeprecated() : bool
+    public function isOutdated() : bool
     {
-        return $this->deprecated;
+        return $this->outdated;
     }
 
 }

@@ -121,6 +121,7 @@ class CharacteristicTableGUI extends \ilTable2GUI
         if ($this->hideable) {
             $this->addColumn($this->lng->txt("sty_hide"));	// hide checkbox
         }
+        $this->addColumn($this->lng->txt("sty_outdated"));
         $this->addColumn($this->lng->txt("actions"));
         $this->setEnableHeader(true);
         $this->setFormAction($ilCtrl->getFormAction($a_parent_obj));
@@ -141,7 +142,9 @@ class CharacteristicTableGUI extends \ilTable2GUI
             }
     
             $this->addMultiCommand("copyCharacteristics", $lng->txt("copy"));
-            
+            $this->addMultiCommand("setOutdated", $lng->txt("sty_set_outdated"));
+            $this->addMultiCommand("removeOutdated", $lng->txt("sty_remove_outdated"));
+
             // action commands
             if ($this->expandable) {
                 $this->addMultiCommand("deleteCharacteristicConfirmation", $lng->txt("delete"));
@@ -234,12 +237,29 @@ class CharacteristicTableGUI extends \ilTable2GUI
 
             $ilCtrl->setParameter($this->parent_obj, "tag", $tag_str);
             $ilCtrl->setParameter($this->parent_obj, "style_type", $char->getType());
+            $ilCtrl->setParameter($this->parent_obj, "char", $char->getCharacteristic());
 
             $links = [];
             $links[] = $ui->factory()->link()->standard(
                 $this->lng->txt("edit"),
                 $ilCtrl->getLinkTargetByClass("ilStyleCharacteristicGUI", "editTagStyle")
             );
+
+            if (!\ilObjStyleSheet::isCoreStyle($char->getType(), $char->getCharacteristic())) {
+                if ($char->isOutdated()) {
+                    $this->tpl->setVariable("OUTDATED", $lng->txt("yes"));
+                    $links[] = $ui->factory()->link()->standard(
+                        $this->lng->txt("sty_remove_outdated"),
+                        $ilCtrl->getLinkTargetByClass("ilStyleCharacteristicGUI", "removeOutdated")
+                    );
+                } else {
+                    $this->tpl->setVariable("OUTDATED", $lng->txt("no"));
+                    $links[] = $ui->factory()->link()->standard(
+                        $this->lng->txt("sty_set_outdated"),
+                        $ilCtrl->getLinkTargetByClass("ilStyleCharacteristicGUI", "setOutdated")
+                    );
+                }
+            }
 
             $dd = $ui->factory()->dropdown()->standard($links);
 

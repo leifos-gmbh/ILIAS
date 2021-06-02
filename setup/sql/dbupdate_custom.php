@@ -62,3 +62,8 @@ if (!$ilDB->tableColumnExists('style_char', 'deprecated')) {
     ));
 }
 ?>
+<#5>
+<?php
+$ilDB->renameTableColumn('style_char', "deprecated", 'outdated');
+?>
+

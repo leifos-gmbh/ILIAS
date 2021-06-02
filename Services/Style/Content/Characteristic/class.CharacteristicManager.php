@@ -128,15 +128,21 @@ class CharacteristicManager
 
     /**
      * Get characteristics by type
-     * @param string[] $types
+     * @param array $types
+     * @param bool  $include_hidden
+     * @param bool  $include_outdated
      * @return array
      */
     public function getByTypes(
-        array $types
+        array $types,
+        bool $include_hidden = true,
+        bool  $include_outdated = true
     ) : array {
         return $this->repo->getByTypes(
             $this->style_id,
-            $types
+            $types,
+            $include_hidden,
+            $include_outdated
         );
     }
 
@@ -231,30 +237,30 @@ class CharacteristicManager
     }
 
     /**
-     * Save characteristic deprecated status
+     * Save characteristic outdated status
      * @param string $type
      * @param string $characteristic
-     * @param bool   $deprecated
+     * @param bool   $outdated
      */
-    public function saveDeprecated(
+    public function saveOutdated(
         string $type,
         string $characteristic,
-        bool $deprecated
+        bool $outdated
     ) : void
     {
         if (!$this->access_manager->checkWrite()) {
             throw new ContentStyleNoPermissionException("No write permission for style.");
         }
-        $this->repo->saveDeprecated(
+        $this->repo->saveOutdated(
             $this->style_id,
             $type,
             $characteristic,
-            $deprecated
+            $outdated
         );
     }
 
     /**
-     * Save characteristic deprecated status
+     * Save characteristics order
      * @param string $type
      * @param array $order_nrs (key is characteristic value is order nr)
      */

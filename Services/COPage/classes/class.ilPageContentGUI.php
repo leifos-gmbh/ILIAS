@@ -199,7 +199,7 @@ class ilPageContentGUI
             if (!is_array($a_type)) {
                 $a_type = array($a_type);
             }
-            $chars = $char_manager->getByTypes($a_type);
+            $chars = $char_manager->getByTypes($a_type, false, false);
             $new_chars = array();
             foreach ($chars as $char) {
                 if ($this->chars[$char->getCharacteristic()] != "") {	// keep lang vars for standard chars

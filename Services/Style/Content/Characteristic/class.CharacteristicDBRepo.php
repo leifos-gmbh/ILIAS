@@ -46,7 +46,7 @@ class CharacteristicDBRepo
      * @param string $char
      * @param bool   $hidden
      * @param int   $order_nr
-     * @param bool   $deprecated
+     * @param bool   $outdated
      */
     public function addCharacteristic(
         int $style_id,
@@ -54,7 +54,7 @@ class CharacteristicDBRepo
         string $char,
         bool $hidden = false,
         int $order_nr = 0,
-        bool $deprecated = false
+        bool $outdated = false
     )
     {
         $db = $this->db;
@@ -65,7 +65,7 @@ class CharacteristicDBRepo
             "characteristic" => ["text", $char],
             "hide" => ["integer", $hidden],
             "order_nr" => ["integer", $order_nr],
-            "deprecated" => ["integer", $deprecated]
+            "outdated" => ["integer", $outdated]
         ]);
     }
 
@@ -132,7 +132,7 @@ class CharacteristicDBRepo
                 $titles,
                 $style_id,
                 $rec["order_nr"],
-                $rec["deprecated"]
+                $rec["outdated"]
             );
         }
         return null;
@@ -157,13 +157,17 @@ class CharacteristicDBRepo
 
     /**
      * Get characteristics by types
-     * @param int    $style_id
-     * @param string[] $types
-     * @return Characteristic[]
+     * @param int   $style_id
+     * @param array $types
+     * @param bool  $include_hidden
+     * @param bool  $include_outdated
+     * @return array
      */
     public function getByTypes(
         int $style_id,
-        array $types
+        array $types,
+        bool $include_hidden = true,
+        bool $include_outdated = true
     ) : array
     {
         $db = $this->db;
@@ -176,6 +180,11 @@ class CharacteristicDBRepo
         );
         $chars = [];
         while ($rec = $db->fetchAssoc($set)) {
+
+            if (($rec["hide"] && !$include_hidden) ||
+                ($rec["outdated"] && !$include_outdated)) {
+                continue;
+            }
 
             $set2 = $db->queryF("SELECT * FROM style_char_title " .
                 " WHERE style_id = %s AND type = %s AND characteristic = %s ",
@@ -193,7 +202,7 @@ class CharacteristicDBRepo
                 $titles,
                 $style_id,
                 $rec["order_nr"],
-                $rec["deprecated"]
+                $rec["outdated"]
             );
         }
         return $chars;
@@ -281,23 +290,23 @@ class CharacteristicDBRepo
     }
 
     /**
-     * Save characteristic hide status
+     * Save characteristic outdated status
      * @param int    $style_id
      * @param string $type
      * @param string $characteristic
-     * @param bool   $deprecated
+     * @param bool   $outdated
      */
-    public function saveDeprecated(
+    public function saveOutdated(
         int $style_id,
         string $type,
         string $characteristic,
-        bool $deprecated
+        bool $outdated
     ) : void
     {
         $db = $this->db;
 
         $db->update("style_char", [
-            "deprecated" => ["integer", $deprecated]
+            "outdated" => ["integer", $outdated]
         ], [    // where
                 "style_id" => ["integer", $style_id],
                 "type" => ["text", $type],

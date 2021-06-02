@@ -97,7 +97,11 @@ class ilPCParagraphGUI extends ilPageContentGUI
             $access_manager = new Style\Content\Access\StyleAccessManager();
             $char_manager = new Style\Content\CharacteristicManager($a_style_id, $access_manager);
 
-            $chars = $char_manager->getByTypes(["text_block", "heading1", "heading2", "heading3"]);
+            $chars = $char_manager->getByTypes(
+                ["text_block", "heading1", "heading2", "heading3"],
+                false,
+                false
+            );
             $new_chars = array();
             foreach ($chars as $char) {
                 if ($st_chars[$char->getCharacteristic()] != "") {	// keep lang vars for standard chars

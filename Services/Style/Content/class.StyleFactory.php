@@ -26,7 +26,7 @@ class StyleFactory
      * @param array  $titles
      * @param int    $style_id
      * @param int    $order_nr
-     * @param bool   $deprecated
+     * @param bool   $outdated
      * @return Characteristic
      */
     public function characteristic(
@@ -36,7 +36,7 @@ class StyleFactory
         array $titles,
         int $style_id = 0,
         int $order_nr = 0,
-        bool $deprecated = false
+        bool $outdated = false
     ) : Characteristic
     {
         $c = new Characteristic(
@@ -45,7 +45,7 @@ class StyleFactory
             $hide,
             $titles,
             $order_nr,
-            $deprecated
+            $outdated
         );
         if ($style_id > 0) {
             $c = $c->withStyleId($style_id);

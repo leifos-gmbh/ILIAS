@@ -15,28 +15,22 @@ class ColorDBRepo
     protected $db;
 
     /**
-     * @var StyleFactory
+     * @var DataFactory
      */
     protected $factory;
 
     /**
      * Constructor
      * @param \ilDBInterface|null $db
-     * @param StyleFactory|null   $factory
+     * @param DataFactory|null   $factory
      */
     public function __construct(
-        \ilDBInterface $db = null,
-        StyleFactory $factory = null)
+        \ilDBInterface $db,
+        DataFactory $factory
+    )
     {
-        global $DIC;
-
-        $this->db = (is_null($db))
-            ? $DIC->database()
-            : $db;
-
-        $this->factory = (is_null($factory))
-            ? new StyleFactory()
-            : $factory;
+        $this->db = $db;
+        $this->factory = $factory;
     }
 
     /**

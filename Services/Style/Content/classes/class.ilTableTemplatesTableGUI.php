@@ -23,6 +23,8 @@
 
 include_once("Services/Table/classes/class.ilTable2GUI.php");
 
+use \ILIAS\Style\Content;
+
 /**
 * Table templates table
 *
@@ -49,12 +51,24 @@ class ilTableTemplatesTableGUI extends ilTable2GUI
     protected $rbacsystem;
 
     /**
+     * @var Content\Access\StyleAccessManager
+     */
+    protected $access_manager;
+
+    /**
     * Constructor
     */
-    public function __construct($a_temp_type, $a_parent_obj, $a_parent_cmd, $a_style_obj)
+    public function __construct(
+        $a_temp_type,
+        $a_parent_obj,
+        $a_parent_cmd,
+        $a_style_obj,
+        Content\Access\StyleAccessManager $access_manager
+    )
     {
         global $DIC;
 
+        $this->access_manager = $access_manager;
         $this->ctrl = $DIC->ctrl();
         $this->lng = $DIC->language();
         $this->access = $DIC->access();
@@ -82,7 +96,7 @@ class ilTableTemplatesTableGUI extends ilTable2GUI
         $this->getItems();
 
         // action commands
-        if ($this->parent_obj->checkWrite()) {
+        if ($this->access_manager->checkWrite()) {
             $this->addMultiCommand("deleteTemplateConfirmation", $lng->txt("delete"));
         }
 
@@ -113,7 +127,7 @@ class ilTableTemplatesTableGUI extends ilTable2GUI
         $this->tpl->setVariable("TEMPLATE_NAME", $a_set["name"]);
         $ilCtrl->setParameter($this->parent_obj, "t_id", $a_set["id"]);
         
-        if ($this->parent_obj->checkWrite()) {
+        if ($this->access_manager->checkWrite()) {
             $this->tpl->setVariable(
                 "LINK_EDIT_TEMPLATE",
                 $ilCtrl->getLinkTarget($this->parent_obj, "editTemplate")

@@ -3,12 +3,13 @@
 /* Copyright (c) 1998-2021 ILIAS open source, GPLv3, see LICENSE */
 
 namespace ILIAS\Style\Content;
+use \ILIAS\Data\DataSize;
 
 /**
- * Content style factory
+ * Content style data object factory
  * @author Alexander Killing <killing@leifos.de>
  */
-class StyleFactory
+class DataFactory
 {
     /**
      * Constructor
@@ -51,6 +52,22 @@ class StyleFactory
             $c = $c->withStyleId($style_id);
         }
         return $c;
+    }
+
+    // image
+    public function image(
+        string $path,
+        DataSize $size,
+        int $width,
+        int $height
+    ) : Image
+    {
+        return new Image(
+            $path,
+            $size,
+            $width,
+            $height
+        );
     }
 
 }

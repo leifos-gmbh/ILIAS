@@ -14,21 +14,6 @@ use \ILIAS\Style\Content\Access;
 class CharacteristicTableGUI extends \ilTable2GUI
 {
     /**
-     * @var \ilCtrl
-     */
-    protected $ctrl;
-
-    /**
-     * @var \ilAccessHandler
-     */
-    protected $access;
-
-    /**
-     * @var \ilRbacSystem
-     */
-    protected $rbacsystem;
-
-    /**
      * @var Style\Content\CharacteristicManager
      */
     protected $manager;
@@ -54,54 +39,65 @@ class CharacteristicTableGUI extends \ilTable2GUI
     protected $hideable;
 
     /**
-     * @var \ILIAS\DI\UIServices
-     */
-    protected $ui;
-
-    /**
      * @var int
      */
     protected $order_cnt = 0;
 
     /**
-    * Constructor
-    */
+     * @var bool
+     */
+    protected $expandable = false;
+
+    /**
+     * @var UIFactory
+     */
+    protected $service_ui;
+
+    /**
+     * @var array
+     */
+    protected $core_styles = [];
+
+    /**
+     * CharacteristicTableGUI constructor.
+     * @param UIFactory                 $service_ui
+     * @param object                    $a_parent_obj
+     * @param string                    $a_parent_cmd
+     * @param string                    $a_super_type
+     * @param \ilObjStyleSheet          $a_style
+     * @param CharacteristicManager     $manager
+     * @param Access\StyleAccessManager $access_manager
+     */
     public function __construct(
+        UIFactory $service_ui,
         object $a_parent_obj,
         string $a_parent_cmd,
-        array $a_chars,
         string $a_super_type,
         \ilObjStyleSheet $a_style,
         Style\Content\CharacteristicManager $manager,
         Access\StyleAccessManager $access_manager)
     {
-        global $DIC;
-
-        $this->ctrl = $DIC->ctrl();
-        $this->lng = $DIC->language();
-        $this->access = $DIC->access();
-        $this->rbacsystem = $DIC->rbac()->system();
-        $ilCtrl = $DIC->ctrl();
-        $lng = $DIC->language();
+        $this->service_ui = $service_ui;
         $this->manager = $manager;
         $this->access_manager = $access_manager;
-        $this->ui = $DIC->ui();
-        
-        parent::__construct($a_parent_obj, $a_parent_cmd);
-        $this->setExternalSorting(true);
         $this->super_type = $a_super_type;
         $this->style = $a_style;
-        $all_super_types = \ilObjStyleSheet::_getStyleSuperTypes();
-        $this->types = $all_super_types[$this->super_type];
+
+        $ctrl = $this->service_ui->ctrl();
+
+        parent::__construct($a_parent_obj, $a_parent_cmd);
+        $this->setExternalSorting(true);
         $this->core_styles = \ilObjStyleSheet::_getCoreStyles();
         $this->getItems();
-        $this->setTitle($lng->txt("sty_" . $a_super_type . "_char"));
+        $this->setTitle($this->lng->txt("sty_" . $a_super_type . "_char"));
         $this->setLimit(9999);
 
         // check, whether any of the types is expandable
         $this->expandable = false;
         $this->hideable = false;
-        foreach ($this->types as $t) {
+        $all_super_types = \ilObjStyleSheet::_getStyleSuperTypes();
+        $types = $all_super_types[$this->super_type];
+        foreach ($types as $t) {
             if (\ilObjStyleSheet::_isExpandable($t)) {
                 $this->expandable = true;
             }
@@ -124,31 +120,30 @@ class CharacteristicTableGUI extends \ilTable2GUI
         $this->addColumn($this->lng->txt("sty_outdated"));
         $this->addColumn($this->lng->txt("actions"));
         $this->setEnableHeader(true);
-        $this->setFormAction($ilCtrl->getFormAction($a_parent_obj));
+        $this->setFormAction($ctrl->getFormAction($a_parent_obj));
         $this->setRowTemplate("tpl.style_row.html", "Services/Style/Content/Characteristic");
         $this->disable("footer");
 
         if ($this->access_manager->checkWrite()) {
             // action commands
             if ($this->hideable || $this->expandable) {
-                $txt = $lng->txt("sty_save_hide_status");
+                $txt = $this->lng->txt("sty_save_hide_status");
                 if ($this->hideable && $this->expandable) {
-                    $txt = $lng->txt("sty_save_hide_order_status");
+                    $txt = $this->lng->txt("sty_save_hide_order_status");
                 } else if (!$this->hideable) {
-                    $txt = $lng->txt("sty_save_order_status");
+                    $txt = $this->lng->txt("sty_save_order_status");
                 }
 
                 $this->addCommandButton("saveStatus", $txt);
             }
     
-            $this->addMultiCommand("copyCharacteristics", $lng->txt("copy"));
-            $this->addMultiCommand("setOutdated", $lng->txt("sty_set_outdated"));
-            $this->addMultiCommand("removeOutdated", $lng->txt("sty_remove_outdated"));
+            $this->addMultiCommand("copyCharacteristics", $this->lng->txt("copy"));
+            $this->addMultiCommand("setOutdated", $this->lng->txt("sty_set_outdated"));
+            $this->addMultiCommand("removeOutdated", $this->lng->txt("sty_remove_outdated"));
 
             // action commands
             if ($this->expandable) {
-                $this->addMultiCommand("deleteCharacteristicConfirmation", $lng->txt("delete"));
-                //$this->addCommandButton("addCharacteristicForm", $lng->txt("sty_add_characteristic"));
+                $this->addMultiCommand("deleteCharacteristicConfirmation", $this->lng->txt("delete"));
             }
         }
         
@@ -157,10 +152,8 @@ class CharacteristicTableGUI extends \ilTable2GUI
 
     /**
      * Get items
-     * @param
-     * @return
      */
-    protected function getItems()
+    protected function getItems() : void
     {
         $data = [];
         foreach ($this->manager->getBySuperType($this->super_type) as $char) {
@@ -172,14 +165,13 @@ class CharacteristicTableGUI extends \ilTable2GUI
     }
 
     /**
-    * Standard Version of Fill Row. Most likely to
-    * be overwritten by derived class.
-    */
-    protected function fillRow($a_set)
+     * @inheritDoc
+     */
+    protected function fillRow($a_set) : void
     {
         $lng = $this->lng;
-        $ilCtrl = $this->ctrl;
-        $ui = $this->ui;
+        $ilCtrl = $this->service_ui->ctrl();
+        $ui = $this->service_ui->ui();
 
         $char = $a_set["obj"];
 

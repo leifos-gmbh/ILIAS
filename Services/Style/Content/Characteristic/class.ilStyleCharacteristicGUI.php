@@ -14,25 +14,7 @@ use \ILIAS\Style\Content\Access;
  */
 class ilStyleCharacteristicGUI
 {
-    /**
-     * @var \ilGlobalTemplateInterface
-     */
-    protected $tpl;
-
-    /**
-     * @var ilToolbarGUI
-     */
-    protected $toolbar;
-
-    /**
-     * @var \ilLanguage
-     */
-    protected $lng;
-
-    /**
-     * @var \ilCtrl
-     */
-    protected $ctrl;
+    use Content\UI;
 
     /**
      * @var ilObjStyleSheet
@@ -78,21 +60,6 @@ class ilStyleCharacteristicGUI
     protected $mq_id;
 
     /**
-     * @var ilTabsGUI
-     */
-    protected $tabs;
-
-    /**
-     * @var \ILIAS\DI\UIServices
-     */
-    protected $ui;
-
-    /**
-     * @var Message\RequestInterface
-     */
-    protected $request;
-
-    /**
      * @var Content\CharacteristicManager
      */
     protected $manager;
@@ -103,32 +70,26 @@ class ilStyleCharacteristicGUI
     protected $access_manager;
 
     /**
-     * @var \ILIAS\Refinery\Factory
+     * @var Content\ImageManager
      */
-    protected $refinery;
+    protected $image_manager;
 
-    /**
-     * Constructor
-     */
     public function __construct(
+        Content\UIFactory $ui_factory,
         ilObjStyleSheet $style_sheet,
         string $super_type,
         Access\StyleAccessManager $access_manager,
-        Content\CharacteristicManager $manager
+        Content\CharacteristicManager $manager,
+        Content\ImageManager $image_manager
     )
     {
-        /** @var ILIAS\DI\Container $DIC */
-        global $DIC;
+        $this->initUI($ui_factory);
 
-        $this->tpl = $DIC->ui()->mainTemplate();
-        $this->toolbar = $DIC->toolbar();
-        $this->lng = $DIC->language();
-        $this->ctrl = $DIC->ctrl();
         $this->access_manager = $access_manager;
-
         $this->object = $style_sheet;
         $this->super_type = $super_type;
-        $this->request = $DIC->http()->request();
+        $this->manager = $manager;
+        $this->image_manager = $image_manager;
 
         $params = $this->request->getQueryParams();
         $cur = explode(".", $params["tag"] ?? "");
@@ -142,10 +103,6 @@ class ilStyleCharacteristicGUI
         $this->style_type = (string) ($params["style_type"] ?? "");
         $this->requested_char = (string) ($params["char"] ?? "");
         $this->mq_id = (int) ($params["mq_id"] ?? 0);
-        $this->tabs = $DIC->tabs();
-        $this->ui = $DIC->ui();
-        $this->manager = $manager;
-        $this->refinery = $DIC->refinery();
     }
 
     /**
@@ -246,10 +203,9 @@ class ilStyleCharacteristicGUI
             );
         }
 
-        $table_gui = new Content\CharacteristicTableGUI(
+        $table_gui = $this->service_ui->characteristic()->CharacteristicTableGUI(
             $this,
             "edit",
-            $chars,
             $style_type,
             $this->object,
             $this->manager,
@@ -719,11 +675,11 @@ class ilStyleCharacteristicGUI
 
                     case "background_image":
                         $im_input = new ilBackgroundImageInputGUI($lng->txt("sty_" . $var), $basepar);
-                        $imgs = array();
-                        foreach ($this->object->getImages() as $entry) {
-                            $imgs[] = $entry["entry"];
+                        $images = array();
+                        foreach ($this->image_manager->getImages() as $entry) {
+                            $images[] = $entry->getFilename();
                         }
-                        $im_input->setImages($imgs);
+                        $im_input->setImages($images);
                         $im_input->setInfo($lng->txt("sty_bg_img_info"));
                         $form_gui->addItem($im_input);
                         break;
@@ -993,6 +949,7 @@ class ilStyleCharacteristicGUI
      */
     protected function editTagTitles() : void
     {
+        $this->setTabs();
         $tpl = $this->tpl;
         $tabs = $this->tabs;
         $form = $this->getTagTitlesForm();

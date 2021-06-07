@@ -41,19 +41,20 @@ class CharacteristicManager
      */
     protected $style_id;
 
-    /**
-     * Constructor
-     */
-    public function __construct(int $style_id, Access\StyleAccessManager $access_manager)
+    public function __construct(
+        int $style_id,
+        Access\StyleAccessManager $access_manager,
+        CharacteristicDBRepo $char_repo,
+        CharacteristicCopyPasteSessionRepo $char_copy_paste_repo,
+        ColorDBRepo $color_repo,
+        \ilObjUser $user
+    )
     {
-        /** @var \ILIAS\DI\Container $DIC */
-        global $DIC;
-
-        $this->user = $DIC->user();
-        $this->repo = new CharacteristicDBRepo();
-        $this->color_repo = new ColorDBRepo();
+        $this->user = $user;
+        $this->repo = $char_repo;
+        $this->color_repo = $color_repo;
         $this->access_manager = $access_manager;
-        $this->session = new CharacteristicCopyPasteSessionRepo();
+        $this->session = $char_copy_paste_repo;
         $this->style_id = $style_id;
     }
 

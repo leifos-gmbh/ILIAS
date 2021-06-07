@@ -918,10 +918,13 @@ class ilObjStyleSheet extends ilObject
                 
                 // copy images from basic style
                 $this->createImagesDirectory();
+
+                // cross filesystem (lib -> web) rCopy
                 ilUtil::rCopy(
                     self::$basic_style_image_dir,
                     $this->getImagesDirectory()
                 );
+
             } else {
                 // add style_data record
                 $q = "INSERT INTO style_data (id, uptodate, category) VALUES " .
@@ -1309,60 +1312,6 @@ class ilObjStyleSheet extends ilObject
             "/thumbnails";
     }
 
-    /**
-    * Get images of style
-    */
-    public function getImages()
-    {
-        $dir = $this->getImagesDirectory();
-        $images = array();
-        if (is_dir($dir)) {
-            $entries = ilUtil::getDir($dir);
-            foreach ($entries as $entry) {
-                if (substr($entry["entry"], 0, 1) == ".") {
-                    continue;
-                }
-                if ($entry["type"] != "dir") {
-                    $images[] = $entry;
-                }
-            }
-        }
-        
-        return $images;
-    }
-    
-    /**
-    * Upload image
-    */
-    public function uploadImage($a_file)
-    {
-        $this->createImagesDirectory();
-        @ilUtil::moveUploadedFile(
-            $a_file["tmp_name"],
-            $a_file["name"],
-            $this->getImagesDirectory() . "/" . $a_file["name"]
-        );
-        @ilUtil::resizeImage(
-            $this->getImagesDirectory() . "/" . $a_file["name"],
-            $this->getThumbnailsDirectory() . "/" . $a_file["name"],
-            75,
-            75
-        );
-    }
-    
-    /**
-    * Delete an image
-    */
-    public function deleteImage($a_file)
-    {
-        if (is_file($this->getImagesDirectory() . "/" . $a_file)) {
-            unlink($this->getImagesDirectory() . "/" . $a_file);
-        }
-        if (is_file($this->getThumbnailsDirectory() . "/" . $a_file)) {
-            unlink($this->getThumbnailsDirectory() . "/" . $a_file);
-        }
-    }
-    
     /**
     * delete style parameter
     *

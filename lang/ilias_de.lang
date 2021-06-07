@@ -14,6 +14,8 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+style#:#sty_resize_image#:#Bildgröße anpassen
+style#:#sty_resize#:#Bildgröße anpassen
 style#:#sty_outdated#:#Veraltet
 style#:#sty_remove_outdated#:#"Veraltet"-Status entfernen
 style#:#sty_set_outdated#:#Als "veraltet" kennzeichnen

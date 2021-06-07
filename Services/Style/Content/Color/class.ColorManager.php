@@ -39,14 +39,19 @@ class ColorManager
     /**
      * Constructor
      */
-    public function __construct(int $style_id, Access\StyleAccessManager $access_manager)
+    public function __construct(
+        int $style_id,
+        Access\StyleAccessManager $access_manager,
+        CharacteristicDBRepo $char_repo,
+        ColorDBRepo $color_repo
+    )
     {
         /** @var \ILIAS\DI\Container $DIC */
         global $DIC;
 
         $this->user = $DIC->user();
-        $this->characteristic_repo = new CharacteristicDBRepo();
-        $this->color_repo = new ColorDBRepo();
+        $this->characteristic_repo = $char_repo;
+        $this->color_repo = $color_repo;
         $this->access_manager = $access_manager;
         $this->style_id = $style_id;
     }

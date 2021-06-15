@@ -43,26 +43,12 @@ class ilUserProfile
     //   "searchable", "required", "export", "course_export" and "registration")
     // 		- <settingsproperty>_hide: hide this property in settings (not implemented)
     // 		- <settingsproperty>_fix_value: property has a fix value (cannot be changed)
+	// cdpatch start (only new fields and reordering)
     private static $user_field = array(
-        "username" => array(
-                        "input" => "login",
-                        "maxlength" => 190,
-                        "size" => 190,
-                        "method" => "getLogin",
-                        "course_export_fix_value" => 1,
-                        "group_export_fix_value" => 1,
-                        "changeable_hide" => true,
-                        "required_hide" => true,
-                        "group" => "personal_data"),
-        "password" => array(
-                        "input" => "password",
-                        "required_hide" => true,
-                        "visib_reg_hide" => true,
-                        'visib_lua_fix_value' => 0,
-                        "course_export_hide" => true,
-                        "export_hide" => false,
-                        "group_export_hide" => true,
-                        "lists_hide" => true,
+        "gender" => array(
+            "input" => "radio",
+            "values" => array("n" => "salutation_n", "f" => "salutation_f", "m" => "salutation_m"),
+            "method" => "getGender",
                         "group" => "personal_data"),
         "firstname" => array(
                         "input" => "text",
@@ -86,6 +72,17 @@ class ilUserProfile
                         "course_export_fix_value" => 1,
                         "group_export_fix_value" => 1,
                         "group" => "personal_data"),
+        "username" => array(
+            "input" => "login",
+            "maxlength" => 64,
+            "size" => 40,
+            "method" => "getLogin",
+            "course_export_fix_value" => 1,
+            "group_export_fix_value" => 1,
+            "changeable_hide" => true,
+            "required_hide" => true,
+            "group" => "personal_data"
+        ),
         "title" => array(
                         "input" => "text",
                         "lang_var" => "person_title",
@@ -99,11 +96,6 @@ class ilUserProfile
                         "maxlength" => 32,
                         "size" => 40,
                         "method" => "getBirthday",
-                        "group" => "personal_data"),
-        "gender" => array(
-                        "input" => "radio",
-                        "values" => array("n" => "salutation_n", "f" => "salutation_f", "m" => "salutation_m"),
-                        "method" => "getGender",
                         "group" => "personal_data"),
         "upload" => array(
                         "input" => "picture",
@@ -124,6 +116,30 @@ class ilUserProfile
                         "group_export_hide" => true,
                         "lists_hide" => true,
                         "group" => "personal_data"),
+        "password" => array(
+            "input" => "password",
+            "required_hide" => true,
+            "visib_reg_hide" => true,
+            'visib_lua_fix_value' => 0,
+            "course_export_hide" => true,
+            "export_hide" => false,
+            "group_export_hide" => true,
+            "lists_hide" => true,
+            "group" => "personal_data"
+        ),
+        "company_password" => array(
+            "input" => "text",
+            "required_fix_value" => 1,
+            "maxlength" => 32,
+            "group" => "personal_data"
+        ),
+        "password_addon" => array(
+            "input" => "text",
+            "required_fix_value" => 0,
+            "maxlength" => 40,
+            "group" => "personal_data",
+            "method" => "getPasswordAddon"
+        ),
         "interests_general" => array(
                         "input" => "multitext",
                         "maxlength" => 40,
@@ -177,6 +193,27 @@ class ilUserProfile
                         "size" => 40,
                         "method" => "getDepartment",
                         "group" => "contact_data"),
+        "branch" => array(
+            "input" => "text",
+            "maxlength" => 80,
+            "size" => 40,
+            "method" => "getBranch",
+            "group" => "contact_data"
+        ),
+        "profession" => array(
+            "input" => "text",
+            "maxlength" => 80,
+            "size" => 40,
+            "method" => "getProfession",
+            "group" => "contact_data"
+        ),
+        "field_of_responsibility" => array(
+            "input" => "text",
+            "maxlength" => 80,
+            "size" => 40,
+            "method" => "getFieldOfResponsibility",
+            "group" => "contact_data"
+        ),
         "street" => array(
                         "input" => "text",
                         "maxlength" => 40,
@@ -367,6 +404,7 @@ class ilUserProfile
         
         );
 
+	// cdpatch end (only new fields and reordering)
 
     /**
      * @var ilUserSettingsConfig
@@ -407,9 +445,111 @@ class ilUserProfile
             }
             $fields[$f] = $p;
         }
+
+        // cdpatch start
+        include_once("./Services/CD/classes/class.cdUtil.php");
+        if (cdUtil::isDAF()) {
+            $unset = array(
+                "title",
+                "institution",
+                "hobby",
+                "referral_comment",
+                "instant_messengers",
+                "matriculation",
+                "delicious",
+                "interests_general",
+                "interests_help_offered",
+                "interests_help_looking",
+                "org_units"
+            );
+        } else {
+            $unset = array(
+                "title",
+                "birthday",
+                "institution",
+                "phone_home",
+                "phone_mobile",
+                "hobby",
+                "referral_comment",
+                "instant_messengers",
+                "matriculation",
+                "delicious",
+                "interests_general",
+                "interests_help_offered",
+                "interests_help_looking",
+                "org_units"
+            );
+        }
+        foreach ($unset as $u) {
+            unset($fields[$u]);
+        }
+        // cdpatch end
+
         return $fields;
     }
-    
+
+    // cdpatch start
+    // this function is deprecated in ILIAS 4.1 but is used by cdCompanyGUI
+    static function setUserFromFields($a_form, $a_user)
+    {
+        $map = array(
+            "username" => "setLogin",
+            "usr_firstname" => "setFirstName",
+            "usr_lastname" => "setLastName",
+            "usr_gender" => "setGender",
+            "usr_title" => "setUTitle",
+            "usr_institution" => "setInstitution",
+            "usr_department" => "setDepartment",
+            "usr_street" => "setStreet",
+            "usr_zipcode" => "setZipcode",
+            "usr_city" => "setCity",
+            "usr_country" => "setCountry",
+            "usr_phone_office" => "setPhoneOffice",
+            "usr_phone_home" => "setPhoneHome",
+            "usr_phone_mobile" => "setPhoneMobile",
+            "usr_fax" => "setFax",
+            "usr_email" => "setEmail",
+            "usr_hobby" => "setHobby",
+            "usr_referral_comment" => "setComment",
+            "usr_matriculation" => "setMatriculation",
+            "usr_delicious" => "setDelicious",
+        );
+        // cdpatch start
+        $map["usr_branch"] = "setBranch";
+        $map["usr_profession"] = "setProfession";
+        $map["usr_field_of_responsibility"] = "setFieldOfResponsibility";
+        // cdpatch end
+        foreach ($map as $field => $method) {
+            $field_obj = $a_form->getItemByPostVar($field);
+            if ($field_obj) {
+                $a_user->$method($a_form->getInput($field));
+            }
+        }
+        $a_user->setFullName();
+
+        $birthday_obj = $a_form->getItemByPostVar("usr_birthday");
+        if ($birthday_obj) {
+            $birthday = $a_form->getInput("usr_birthday");
+            $birthday = $birthday["date"];
+
+            // when birthday was not set, array will not be substituted with string by ilBirthdayInputGui
+            if (!is_array($birthday)) {
+                $a_user->setBirthday($birthday);
+            }
+        }
+
+        // messenger
+        $map = array("icq", "yahoo", "msn", "aim", "skype", "jabber", "voip");
+        foreach ($map as $client) {
+            $field = "usr_im_" . $client;
+            $field_obj = $a_form->getItemByPostVar($field);
+            if ($field_obj) {
+                $a_user->setInstantMessengerId($client, $a_form->getInput($field));
+            }
+        }
+    }
+    // cdpatch end
+
     /**
      * Get visible fields in local user administration
      * @return
@@ -470,6 +610,10 @@ class ilUserProfile
             self::$user_field["username"]["group"] = "login_data";
             self::$user_field["password"]["group"] = "login_data";
             self::$user_field["language"]["default"] = $lng->lang_key;
+            // cdpatch start
+            self::$user_field["username"]["group"] = "personal_data";
+            self::$user_field["password"]["group"] = "personal_data";
+            // cdpatch end
 
             // different position for role
             $roles = self::$user_field["roles"];
@@ -545,6 +689,11 @@ class ilUserProfile
                         $ti->setMaxLength($p["maxlength"]);
                         $ti->setSize($p["size"]);
                         $ti->setRequired($ilSetting->get("require_" . $f));
+                        // cdpatch start
+                        if ($p["required_fix_value"]) {
+                            $ti->setRequired(true);
+                        }
+                        // cdpatch end
                         if (!$ti->getRequired() || $ti->getValue()) {
                             $ti->setDisabled($ilSetting->get("usr_settings_disable_" . $f));
                         }
@@ -711,6 +860,13 @@ class ilUserProfile
                         $ta->setRows($p["rows"]);
                         $ta->setCols($p["cols"]);
                         $ta->setRequired($ilSetting->get("require_" . $f));
+
+                        // cdpatch start
+                        $ta->setInfo($lng->txt($p["info"]));
+                        if ($p["required_fix_value"]) {
+                            $ta->setRequired(true);
+                        }
+                        // cdpatch end
                         if (!$ta->getRequired() || $ta->getValue()) {
                             $ta->setDisabled($ilSetting->get("usr_settings_disable_" . $f));
                         }
@@ -782,6 +938,12 @@ class ilUserProfile
                         $a_form->addItem($ne);
                     }
                     break;
+
+                // cdpatch start
+                default:
+                    $this->addFormField($a_form, $f, $p, $a_user);
+                    break;
+                // cdpatch end
             }
         }
         
@@ -803,7 +965,20 @@ class ilUserProfile
     {
         $this->ajax_href = $a_href;
     }
-    
+
+    // cdpatch start
+
+    /**
+     * Add form field
+     * @param
+     * @return
+     */
+    function addFormField($a_form, $f, $p)
+    {
+
+    }
+    // cdpatch end
+
     /**
     * Checks whether user setting is visible
     */

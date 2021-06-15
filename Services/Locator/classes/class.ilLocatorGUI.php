@@ -270,6 +270,13 @@ class ilLocatorGUI
         
         $ilAccess = $this->access;
 
+        // cdpatch start
+        global $ilUser;
+        if ($a_ref_id == ROOT_FOLDER_ID && $ilUser->getCompanyId() > 0) {
+            return;
+        }
+        // cdpatch end
+
         if ($a_ref_id > 0 && !$ilAccess->checkAccess("visible", "", $a_ref_id)) {
             return;
         }

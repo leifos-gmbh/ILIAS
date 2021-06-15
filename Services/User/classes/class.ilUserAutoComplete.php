@@ -325,6 +325,27 @@ class ilUserAutoComplete
         if ($this->isFieldSearchableCheckEnabled() && !ilUserSearchOptions::_isEnabled("second_email")) {
             $add_second_email = false;
         }
+
+        // cdpatch start
+        $add_email = true;
+        global $ilPluginAdmin, $rbacsystem;
+
+        $pl_names = $ilPluginAdmin->getActivePluginsForSlot(IL_COMP_SERVICE, "UIComponent", "uihk");
+        foreach ($pl_names as $pl) {
+            if ($pl == "CD") {
+                $cd_plugin = ilPluginAdmin::getPluginObject(IL_COMP_SERVICE, "UIComponent", "uihk", $pl);
+                $cd_plugin->includeClass("class.cdCompany.php");
+            }
+        }
+        include_once("./Services/CD/classes/class.ilCDPermWrapper.php");
+        $centers = ilCDPermWrapper::getAdminCenters();
+
+        //if($rbacsystem->checkAccess("visible,read", SYSTEM_FOLDER_ID))
+        $is_admin = ($rbacsystem->checkAccess("visible", SYSTEM_FOLDER_ID))
+            ? true
+            : false;
+        // cdpatch end
+
         
         include_once './Services/Search/classes/class.ilSearchSettings.php';
         $max = $this->getLimit() ? $this->getLimit() : ilSearchSettings::getInstance()->getAutoCompleteLength();
@@ -360,7 +381,18 @@ class ilUserAutoComplete
             if ($add_second_email && $rec['second_email'] && (self::PRIVACY_MODE_RESPECT_USER_SETTING != $this->getPrivacyMode() || 'y' == $rec['second_email_value'])) {
                 $label .= ', ' . $rec['second_email'];
             }
-            
+
+            // cdpatch start
+            if ($cd_plugin) {
+                $label .= ', ' . cdCompany::lookupTitle($rec["company_id"]);
+            }
+
+            // only show users of companies that belong to center of staff
+            if (!$is_admin && $cd_plugin && !in_array(cdCompany::lookupCenterId($rec["company_id"]), $centers)) {
+                continue;
+            }
+            // cdpatch end
+
             $result[$cnt]['value'] = (string) $rec[$this->result_field];
             $result[$cnt]['label'] = $label;
             $result[$cnt]['id'] = $rec['usr_id'];
@@ -390,6 +422,10 @@ class ilUserAutoComplete
             'ud.email',
             'ud.second_email'
         );
+
+        // cdpatch start
+        $fields[] = "company_id";
+        // cdpatch end
 
         if (self::PRIVACY_MODE_RESPECT_USER_SETTING == $this->getPrivacyMode()) {
             $fields[] = 'profpref.value profile_value';

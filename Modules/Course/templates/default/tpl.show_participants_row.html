@@ -32,11 +32,20 @@
 		{VAL_ACCESS}
 	</td>
 	<!--  END access_time -->
+	<!--  cdpatch start -->
+	<!-- BEGIN eval -->
+	<td class="std" style="vertical-align: top">
+		{EVAL_NUM}
+	</td>
+	<!-- END eval -->
+	<!--  BEGIN passed -->
 	<td class="std">
 		<!--  BEGIN grade -->
 		<input type="checkbox" name="passed[]" value="{VAL_PASSED_ID}" {VAL_PASSED_CHECKED} />
 		<!--  END grade -->{VAL_PASSED_TXT}
 	</td>
+	<!--  END passed -->
+	<!--  cdpatch end -->
 	<!-- BEGIN passed_info_col -->
 	<td class="std">
 		{PASSED_INFO}

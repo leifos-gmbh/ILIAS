@@ -1894,4 +1894,37 @@ class ilCtrl
         }
         return $path;
     }
+
+    // cdpatch start
+
+    /**
+     * Forward to plugin (user interface plugin slot)
+     * @param
+     * @return
+     */
+    function forwardToPlugin()
+    {
+        global $ilPluginAdmin;
+
+        $next_class = $this->getNextClass();
+
+        if (strtolower(substr($next_class, strlen($next_class) - 9)) == "uihookgui") {
+            $pl_names = $ilPluginAdmin->getActivePluginsForSlot(IL_COMP_SERVICE, "UIComponent", "uihk");
+            foreach ($pl_names as $pl) {
+                if (strtolower($next_class) == strtolower("il" . $pl . "UIHookGUI")) {
+                    $ui_plugin = ilPluginAdmin::getPluginObject(IL_COMP_SERVICE, "UIComponent", "uihk", $pl);
+                    $gui_class = $ui_plugin->getUIClassInstance();
+                    $ret       = $this->forwardCommand($gui_class);
+                    if ($ret === false)        // false is only returned, when forwarding did not occur
+                    {
+                        $ret = true;
+                    }
+                    return $ret;
+                }
+            }
+        }
+        return false;                        // return false
+    }
+    // cdpatch end
+
 }

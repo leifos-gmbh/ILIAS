@@ -6,6 +6,9 @@
         </baseclasses>
 		<baseclasses>
 			<baseclass name="ilUIPluginRouterGUI" dir="classes" />
+			<!-- cdpatch start -->
+			<baseclass name="ilUIHookPluginGUI" dir="classes" />
+			<!-- cdpatch end -->
 		</baseclasses>
         <objects>
         </objects>

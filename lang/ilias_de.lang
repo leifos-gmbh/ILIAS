@@ -2939,6 +2939,8 @@ rbac#:#edit_roleassignment#:#Rollenzuweisung bearbeiten
 common#:#edit_stylesheet#:#Style bearbeiten
 common#:#editor#:#Editor
 common#:#email#:#E-Mail
+common#:#email_feedback#:#E-Mail-Feedback###deprecated
+common#:#email_footer#:#<br />###deprecated 
 common#:#email_not_valid#:#Die eingegebene E-Mail-Adresse ist nicht gültig!
 common#:#enable#:#Aktivieren
 common#:#enable_anonymous_fora#:#In Foren "mit Pseudonym schreiben"

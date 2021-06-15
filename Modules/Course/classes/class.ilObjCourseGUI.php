@@ -59,6 +59,17 @@ class ilObjCourseGUI extends ilContainerGUI
         $this->SEARCH_USER = 1;
         $this->SEARCH_GROUP = 2;
         $this->SEARCH_COURSE = 3;
+
+        // cdpatch start
+        global $ilPluginAdmin;
+        $pl_names = $ilPluginAdmin->getActivePluginsForSlot(IL_COMP_SERVICE, "UIComponent", "uihk");
+        foreach ($pl_names as $pl) {
+            if ($pl == "CD") {
+                $this->cd_plugin = ilPluginAdmin::getPluginObject(IL_COMP_SERVICE, "UIComponent", "uihk", $pl);
+            }
+        }
+        // cdpatch end
+
     }
 
     public function gatewayObject()
@@ -886,6 +897,8 @@ class ilObjCourseGUI extends ilContainerGUI
         }
             
         // subscription settings
+        // cdpatch start
+        /*
         $this->object->setSubscriptionPassword($form->getInput('subscription_password'));
         $this->object->setSubscriptionStart(null);
         $this->object->setSubscriptionEnd(null);
@@ -946,9 +959,14 @@ class ilObjCourseGUI extends ilContainerGUI
 
         // custom icon
         $obj_service->commonSettings()->legacyForm($form, $this->object)->saveIcon();
+        */
+        // cdpatch end
 
         // tile image
         $obj_service->commonSettings()->legacyForm($form, $this->object)->saveTileImage();
+
+        // cdpatch start
+        /*
 
         // list presentation
         $this->saveListPresentation($form);
@@ -963,6 +981,7 @@ class ilObjCourseGUI extends ilContainerGUI
         $this->object->setTimingMode($form->getInput('timing_mode'));
         $this->object->setOrderType($form->getInput('sorting'));
         $this->saveSortingSettings($form);
+        */
         
         $this->object->setAboStatus((int) $form->getInput('abo'));
         $this->object->setShowMembers((int) $form->getInput('show_members'));
@@ -978,6 +997,13 @@ class ilObjCourseGUI extends ilContainerGUI
         $this->object->setNumberOfPreviousSessions(is_numeric($session_sp) ? (int) $session_sp : -1);
         $session_sn = $form->getInput('sn');
         $this->object->setNumberOfnextSessions(is_numeric($session_sn) ? (int) $session_sn : -1);
+
+        // cdpatch start
+        $this->object->setCourseType((int) $_POST["course_type"]);
+        $this->object->setCourseLevel($_POST["course_level"]);
+        $this->object->setCourseNr($_POST["course_nr"]);
+        // cdpatch end
+
         $this->object->setAutoNotification($form->getInput('auto_notification') == 1 ? true : false);
 
         // lp sync
@@ -1116,7 +1142,52 @@ class ilObjCourseGUI extends ilContainerGUI
         
         // Show didactic template type
         $this->initDidacticTemplate($form);
-        
+
+        // cdpatch start
+        // course type
+        $opts = array("" => " --- ");
+        // get cd plugin
+        global $ilPluginAdmin;
+
+        $pl_names = $ilPluginAdmin->getActivePluginsForSlot(IL_COMP_SERVICE, "UIComponent", "uihk");
+        foreach ($pl_names as $pl) {
+            if ($pl == "CD") {
+                // course type information
+                $cd_plugin = ilPluginAdmin::getPluginObject(IL_COMP_SERVICE, "UIComponent", "uihk", $pl);
+                $cd_plugin->includeClass("class.cdCourseType.php");
+                foreach (cdCourseType::getAllCourseTypes() as $ct) {
+                    $opts[$ct["id"]] = $ct["title"];
+                }
+                $txt = $cd_plugin->txt("course_type");
+
+                // course nr
+                $ti = new ilTextInputGUI($cd_plugin->txt("course_nr"), "course_nr");
+                $ti->setMaxLength(64);
+                $ti->setSize(64);
+                $ti->setValue($this->object->getCourseNr());
+                $form->addItem($ti);
+
+                // course type
+                $si = new ilSelectInputGUI($txt, "course_type");
+                $si->setOptions($opts);
+                $si->setValue($this->object->getCourseType());
+                $form->addItem($si);
+
+                // course level
+                $cd_plugin->includeClass("class.cdLang.php");
+                $options = array("" => $cd_plugin->txt("option_none"));
+                foreach (cdLang::getLangLevels() as $l) {
+                    $options[$l] = $l;
+                }
+                $cl = new ilSelectInputGUI($cd_plugin->txt("course_level"), "course_level");
+                $cl->setOptions($options);
+                $cl->setValue($this->object->getCourseLevel());
+                $form->addItem($cl);
+            }
+        }
+        // cdpatch end
+
+
         // period
         include_once "Services/Form/classes/class.ilDateDurationInputGUI.php";
         $cdur = new ilDateDurationInputGUI($this->lng->txt('crs_period'), 'period');
@@ -1156,8 +1227,14 @@ class ilObjCourseGUI extends ilContainerGUI
         $visible->setInfo($this->lng->txt('crs_activation_limited_visibility_info'));
         $visible->setChecked($this->object->getActivationVisibility());
         $dur->addSubItem($visible);
-                
-        
+
+        // cdpatch: standard vlaue for subscription type
+        $hi = new ilHiddenInputGUI("subscription_type");
+        $hi->setValue(IL_CRS_SUBSCRIPTION_DIRECT);
+        $form->addItem($hi);
+
+        // cdpatch start
+        /*
         $section = new ilFormSectionHeaderGUI();
         $section->setTitle($this->lng->txt('crs_reg'));
         $form->addItem($section);
@@ -1203,11 +1280,6 @@ class ilObjCourseGUI extends ilContainerGUI
         $reg_code->setValue(1);
         $reg_code->setInfo($this->lng->txt('crs_reg_code_enabled_info'));
         
-        /*
-        $code = new ilNonEditableValueGUI($this->lng->txt('crs_reg_code_value'));
-        $code->setValue($this->object->getRegistrationAccessCode());
-        $reg_code->addSubItem($code);
-        */
         
         #$link = new ilNonEditableValueGUI($this->lng->txt('crs_reg_code_link'));
         // Create default access code
@@ -1273,23 +1345,6 @@ class ilObjCourseGUI extends ilContainerGUI
         
         $lim->addSubItem($max);
         
-        /*
-        $wait = new ilCheckboxInputGUI($this->lng->txt('crs_waiting_list'),'waiting_list');
-        $wait->setChecked($this->object->enabledWaitingList());
-        $wait->setInfo($this->lng->txt('crs_wait_info'));
-        $lim->addSubItem($wait);
-
-        $wait = new ilCheckboxInputGUI($this->lng->txt('crs_waiting_list'),'waiting_list');
-        $wait->setChecked($this->object->enabledWaitingList());
-        $wait->setInfo($this->lng->txt('crs_wait_info'));
-        $lim->addSubItem($wait);
-
-        $auto = new ilCheckboxInputGUI($this->lng->txt('crs_waiting_list_autofill'), 'auto_wait');
-        $auto->setChecked($this->object->hasWaitingListAutoFill());
-        $auto->setInfo($this->lng->txt('crs_waiting_list_autofill_info'));
-        $wait->addSubItem($auto);
-        */
-        
         $wait = new ilRadioGroupInputGUI($this->lng->txt('crs_waiting_list'), 'waiting_list');
             
         $option = new ilRadioOption($this->lng->txt('none'), 0);
@@ -1312,12 +1367,26 @@ class ilObjCourseGUI extends ilContainerGUI
         $lim->addSubItem($wait);
         
         $form->addItem($lim);
-    
+        */
+        // cdpatch end
+
+        // cdpatch: default value for view mode
+        $hi = new ilHiddenInputGUI("view_mode");
+        $hi->setValue(IL_CRS_VIEW_SESSIONS);
+        $form->addItem($hi);
+
+        // cdpatch: default value for sorting
+        $hi = new ilHiddenInputGUI("order_type");
+        $hi->setValue(ilContainer::SORT_TITLE);
+        $form->addItem($hi);
 
         $pres = new ilFormSectionHeaderGUI();
         $pres->setTitle($this->lng->txt('crs_view_mode'));
 
         $form->addItem($pres);
+
+        // cdpatch start
+        /*
 
         // title and icon visibility
         $form = $obj_service->commonSettings()->legacyForm($form, $this->object)->addTitleIconVisibility();
@@ -1341,12 +1410,16 @@ class ilObjCourseGUI extends ilContainerGUI
             $form->addItem($si);
         }
 
-
         // custom icon
         $form = $obj_service->commonSettings()->legacyForm($form, $this->object)->addIcon();
+        */
+        // cdpatch end
 
         // tile image
         $form = $obj_service->commonSettings()->legacyForm($form, $this->object)->addTileImage();
+
+        // cdpatch start
+        /*
 
         // list presentation
         $form = $this->initListPresentationForm($form);
@@ -1469,11 +1542,16 @@ class ilObjCourseGUI extends ilContainerGUI
             }
         }
 
+        */
+        // cdpatch end
+
         // additional features
         $feat = new ilFormSectionHeaderGUI();
         $feat->setTitle($this->lng->txt('obj_features'));
         $form->addItem($feat);
 
+        // cdpatch start
+        /*
         include_once './Services/Object/classes/class.ilObjectServiceSettingsGUI.php';
         ilObjectServiceSettingsGUI::initServiceSettingsForm(
             $this->object->getId(),
@@ -1491,6 +1569,8 @@ class ilObjCourseGUI extends ilContainerGUI
                     ilObjectServiceSettingsGUI::EXTERNAL_MAIL_PREFIX
                 )
             );
+        */
+        // cdpatch end
 
         $mem = new ilCheckboxInputGUI($this->lng->txt('crs_show_members'), 'show_members');
         $mem->setChecked($this->object->getShowMembers());
@@ -1590,13 +1670,15 @@ class ilObjCourseGUI extends ilContainerGUI
                     get_class($this)
                 );
 
+                // cdpatch start
+                /*
                 $this->tabs_gui->addSubTabTarget(
                     "crs_info_settings",
                     $this->ctrl->getLinkTarget($this, 'editInfo'),
                     "editInfo",
                     get_class($this)
                 );
-                
+
                 $this->tabs_gui->addSubTabTarget(
                     "preconditions",
                     $this->ctrl->getLinkTargetByClass('ilConditionHandlerGUI', 'listConditions'),
@@ -1623,6 +1705,14 @@ class ilObjCourseGUI extends ilContainerGUI
                         'lti_provider',
                         $this->ctrl->getLinkTargetByClass(ilLTIProviderObjectSettingGUI::class)
                     );
+                */
+                // cdpatch end
+
+                // custom icon
+                if ($this->ilias->getSetting("custom_icons")) {
+                    $this->tabs_gui->addSubTabTarget("icon_settings",
+                        $this->ctrl->getLinkTarget($this, 'editCourseIcons'),
+                        "editCourseIcons", get_class($this));
                 }
 
                 // map settings
@@ -2133,7 +2223,12 @@ class ilObjCourseGUI extends ilContainerGUI
         
         include_once './Modules/Course/classes/class.ilCourseMembershipGUI.php';
         $membership_gui = new ilCourseMembershipGUI($this, $this->object);
-        $membership_gui->addMemberTab($this->tabs_gui, $is_participant);
+        // cdpatch start
+        if ($ilAccess->checkAccess("write", "", $this->object->getRefId()) &&
+            $ilAccess->checkAccess("edit_learning_progress", "", $this->object->getRefId())) {
+            $membership_gui->addMemberTab($this->tabs_gui, $is_participant);
+        }
+        // cdpatch end
 
         // badges
         if ($ilAccess->checkAccess('write', '', $this->ref_id)) {
@@ -2171,6 +2266,8 @@ class ilObjCourseGUI extends ilContainerGUI
         }
 
         // learning progress
+        // cdpatch start
+        /*
         include_once './Services/Tracking/classes/class.ilLearningProgressAccess.php';
         if (ilLearningProgressAccess::checkAccess($this->object->getRefId(), $is_participant)) {
             $this->tabs_gui->addTarget(
@@ -2195,7 +2292,9 @@ class ilObjCourseGUI extends ilContainerGUI
                 );
             }
         }
-        
+        */
+        // cdpatch end
+
         if ($ilAccess->checkAccess('write', '', $this->object->getRefId())) {
             $this->tabs_gui->addTarget(
                 'export',
@@ -2233,6 +2332,9 @@ class ilObjCourseGUI extends ilContainerGUI
                 );
             }
         }
+
+        // cdpatch start
+        /*
         if ($ilAccess->checkAccess('leave', '', $this->object->getRefId())
             and $this->object->getMemberObject()->isMember()) {
             $this->tabs_gui->addTarget(
@@ -2242,6 +2344,8 @@ class ilObjCourseGUI extends ilContainerGUI
                 ""
             );
         }
+        */
+        // cdpatch end
     }
     
 
@@ -2294,7 +2398,15 @@ class ilObjCourseGUI extends ilContainerGUI
                 break;
                 
             case 'ilcoursemembershipgui':
-                
+
+                // cdpatch start
+                global $ilAccess;
+                if (!$ilAccess->checkAccess("write", "", $this->object->getRefId()) &&
+                    !$ilAccess->checkAccess("edit_learning_progress", "", $this->object->getRefId())) {
+                    $this->checkPermission('write');
+                }
+                // cdpatch end
+
                 $this->tabs_gui->activateTab('members');
                 
                 include_once './Modules/Course/classes/class.ilCourseMembershipGUI.php';
@@ -2659,6 +2771,17 @@ class ilObjCourseGUI extends ilContainerGUI
                 $gui = new ilBookingGatewayGUI($this);
                 $this->ctrl->forwardCommand($gui);
                 break;
+
+            // cdpatch start
+            case "ilcduihookgui":
+                $this->cd_plugin->includeClass("class.ilCDUIHookGUI.php");
+                $cd_ui_hook = new ilCDUIHookGUI();
+                $cd_ui_hook->setPluginObject($this->cd_plugin);
+                $this->ctrl->forwardCommand($cd_ui_hook);
+                global $ilTabs;
+                $ilTabs->activateTab("members");
+                break;
+            // cdpatch end
 
             default:
 /*                if(!$this->creation_mode)

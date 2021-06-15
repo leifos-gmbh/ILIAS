@@ -38,7 +38,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
      * @var ilLogger
      */
     protected $course_logger = null;
-    
+
 
     const CAL_REG_START = 1;
     const CAL_REG_END = 2;
@@ -49,27 +49,27 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
     const CAL_COURSE_TIMING_START = 7;
     const CAL_COURSE_TIMING_END = 8;
 
-    
+
     const STATUS_DETERMINATION_LP = 1;
     const STATUS_DETERMINATION_MANUAL = 2;
 
     private $member_obj = null;
     private $members_obj = null;
     public $archives_obj;
-    
+
     private $latitude = '';
     private $longitude = '';
     private $locationzoom = 0;
     private $enablemap = 0;
-    
+
     private $session_limit = 0;
     private $session_prev = -1;
     private $session_next = -1;
-    
+
     private $reg_access_code = '';
     private $reg_access_code_enabled = false;
     private $status_dt = null;
-    
+
     private $mail_members = ilCourseConstants::MAIL_ALLOWED_ALL;
 
     /**
@@ -124,7 +124,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
     */
     public function __construct($a_id = 0, $a_call_by_reference = true)
     {
-        
+
         #define("ILIAS_MODULE","course");
         #define("KEEP_IMAGE_PATH",1);
 
@@ -143,12 +143,12 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         $this->setStatusDetermination(self::STATUS_DETERMINATION_LP);
 
         $this->type = "crs";
-        
+
         $this->course_logger = $GLOBALS['DIC']->logger()->crs();
 
         parent::__construct($a_id, $a_call_by_reference);
     }
-    
+
     /**
      * Check if show member is enabled
      * @param int $a_obj_id
@@ -164,12 +164,12 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         }
         return false;
     }
-    
+
     public function getShowMembersExport()
     {
         return $this->member_export;
     }
-    
+
     public function setShowMembersExport($a_mem_export)
     {
         $this->member_export = $a_mem_export;
@@ -183,7 +183,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
     {
         return $this->reg_access_code;
     }
-    
+
     /**
      * Set refistration access code
      * @param string $a_code
@@ -193,7 +193,64 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
     {
         $this->reg_access_code = $a_code;
     }
-    
+
+    // cdpatch start
+
+    /**
+     * Set course type
+     * @param int $a_val course type
+     */
+    function setCourseType($a_val)
+    {
+        $this->course_type = $a_val;
+    }
+
+    /**
+     * Get course type
+     * @return int course type
+     */
+    function getCourseType()
+    {
+        return $this->course_type;
+    }
+
+    /**
+     * Set course level
+     * @param int $a_val course level
+     */
+    function setCourseLevel($a_val)
+    {
+        $this->course_level = $a_val;
+    }
+
+    /**
+     * Get course level
+     * @return int course level
+     */
+    function getCourseLevel()
+    {
+        return $this->course_level;
+    }
+
+    /**
+     * Set course nr
+     * @param string $a_val course nr
+     */
+    function setCourseNr($a_val)
+    {
+        $this->course_nr = $a_val;
+    }
+
+    /**
+     * Get course nr
+     * @return string course nr
+     */
+    function getCourseNr()
+    {
+        return $this->course_nr;
+    }
+    // cdpatch end
+
     /**
      * Check if access code is enabled
      * @return
@@ -202,7 +259,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
     {
         return (bool) $this->reg_access_code_enabled;
     }
-    
+
     /**
      * En/disable registration access code
      * @param object $a_status
@@ -390,7 +447,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         }
         return false;
     }
-    
+
     /**
      * en/disable limited number of sessions
      * @return
@@ -400,12 +457,12 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
     {
         $this->session_limit = $a_status;
     }
-    
+
     public function isSessionLimitEnabled()
     {
         return (bool) $this->session_limit;
     }
-    
+
     /**
      * enable max members
      *
@@ -427,7 +484,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
     {
         $this->session_prev = $a_num;
     }
-    
+
     /**
      * Set number of previous sessions
      * @return
@@ -436,7 +493,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
     {
         return $this->session_prev;
     }
-    
+
     /**
      * Set number of previous sessions
      * @return
@@ -446,7 +503,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
     {
         $this->session_next = $a_num;
     }
-    
+
     /**
      * Set number of previous sessions
      * @return
@@ -475,7 +532,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
     {
         $this->subscription_max_members = $a_value;
     }
-    
+
     /**
      * Check if subscription notification is enabled
      *
@@ -489,14 +546,14 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         global $DIC;
 
         $ilDB = $DIC['ilDB'];
-        
+
         $query = "SELECT * FROM crs_settings " .
             "WHERE obj_id = " . $ilDB->quote($a_course_id, 'integer') . " " .
             "AND sub_notify = 1";
         $res = $ilDB->query($query);
         return $res->numRows() ? true : false;
     }
-    
+
     /**
      * Get subitems of container
      * @param bool $a_admin_panel_enabled[optional]
@@ -524,7 +581,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         );
         return $this->items[(int) $a_admin_panel_enabled][(int) $a_include_side_block];
     }
-    
+
     public function getSubscriptionNotify()
     {
         return true;
@@ -600,6 +657,21 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         return false;
     }
 
+    // cdpatch start
+    static function _lookupLevel($a_id)
+    {
+        global $ilDB;
+
+        $query = "SELECT course_level FROM crs_settings WHERE obj_id = " . $ilDB->quote($a_id, 'integer') . " ";
+        $res = $ilDB->query($query);
+        while ($row = $res->fetchRow(DB_FETCHMODE_OBJECT)) {
+            return $row->course_level;
+        }
+        return false;
+    }
+
+    // cdpatch end
+
     public static function _lookupAboStatus($a_id)
     {
         global $DIC;
@@ -654,7 +726,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
     {
         return $this->show_members;
     }
-    
+
     /**
      * Set mail to members type
      * @see ilCourseConstants
@@ -664,7 +736,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
     {
         $this->mail_members = $a_type;
     }
-    
+
     /**
      * Get mail to members type
      * @return int
@@ -756,14 +828,14 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         global $DIC;
 
         $ilAppEventHandler = $DIC['ilAppEventHandler'];
-        
+
         parent::create($a_upload);
 
         if (!$a_upload) {
             $this->createMetaData();
         }
         $this->__createDefaultSettings();
-        
+
         $ilAppEventHandler->raise(
             'Modules/Course',
             'create',
@@ -772,7 +844,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
                 'appointments' => $this->prepareAppointments('create'))
         );
     }
-    
+
     /**
     * Set Latitude.
     *
@@ -842,7 +914,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
     {
         $this->enablemap = $a_enablemap;
     }
-    
+
     /**
      * Type independent wrapper
      * @return type
@@ -933,17 +1005,17 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
     {
         return $this->crs_end;
     }
-    
+
     public function setCancellationEnd(ilDate $a_value = null)
     {
         $this->leave_end = $a_value;
     }
-    
+
     public function getCancellationEnd()
     {
         return $this->leave_end;
     }
-    
+
     public function setSubscriptionMinMembers($a_value)
     {
         if ($a_value !== null) {
@@ -951,22 +1023,22 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         }
         $this->min_members = $a_value;
     }
-    
+
     public function getSubscriptionMinMembers()
     {
         return $this->min_members;
     }
-    
+
     public function setWaitingListAutoFill($a_value)
     {
         $this->auto_fill_from_waiting = (bool) $a_value;
     }
-    
+
     public function hasWaitingListAutoFill()
     {
         return (bool) $this->auto_fill_from_waiting;
     }
-    
+
     /**
      * Clone course (no member data)
      *
@@ -994,31 +1066,31 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         // cognos-blu-patch: begin
         $new_obj->getMemberObject()->updateContact($ilUser->getId(), 1);
         // cognos-blu-patch: end
-        
-            
+
+
         // #14596
         $cwo = ilCopyWizardOptions::_getInstance($a_copy_id);
         if ($cwo->isRootNode($this->getRefId())) {
             $this->setOfflineStatus(true);
         }
-        
+
         // Copy settings
         $this->cloneSettings($new_obj);
-    
+
         // Course Defined Fields
         include_once('Modules/Course/classes/Export/class.ilCourseDefinedFieldDefinition.php');
         ilCourseDefinedFieldDefinition::_clone($this->getId(), $new_obj->getId());
-        
+
         // Clone course files
         include_once('Modules/Course/classes/class.ilCourseFile.php');
         ilCourseFile::_cloneFiles($this->getId(), $new_obj->getId());
-        
+
         // Copy learning progress settings
         include_once('Services/Tracking/classes/class.ilLPObjSettings.php');
         $obj_settings = new ilLPObjSettings($this->getId());
         $obj_settings->cloneSettings($new_obj->getId());
         unset($obj_settings);
-        
+
         // clone certificate (#11085)
         $pathFactory = new ilCertificatePathFactory();
         $templateRepository = new ilCertificateTemplateRepository($ilDB);
@@ -1052,7 +1124,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
     public function cloneDependencies($a_target_id, $a_copy_id)
     {
         parent::cloneDependencies($a_target_id, $a_copy_id);
-        
+
         // Clone course start objects
         include_once('Services/Container/classes/class.ilContainerStartObjects.php');
         $start = new ilContainerStartObjects($this->getRefId(), $this->getId());
@@ -1061,7 +1133,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         // Clone course item settings
         include_once('Services/Object/classes/class.ilObjectActivation.php');
         ilObjectActivation::cloneDependencies($this->getRefId(), $a_target_id, $a_copy_id);
-        
+
         // clone objective settings
         include_once './Modules/Course/classes/Objectives/class.ilLOSettings.php';
         ilLOSettings::cloneSettings($a_copy_id, $this->getId(), ilObject::_lookupObjId($a_target_id));
@@ -1080,7 +1152,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 
         return true;
     }
-    
+
     /**
      * Clone automatic genrated roles (permissions and template permissions)
      *
@@ -1095,16 +1167,16 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         $ilLog = $DIC['ilLog'];
         $rbacadmin = $DIC['rbacadmin'];
         $rbacreview = $DIC['rbacreview'];
-        
+
         $admin = $this->getDefaultAdminRole();
         $new_admin = $new_obj->getDefaultAdminRole();
-        
+
         if (!$admin || !$new_admin || !$this->getRefId() || !$new_obj->getRefId()) {
             $ilLog->write(__METHOD__ . ' : Error cloning auto generated role: il_crs_admin');
         }
         $rbacadmin->copyRolePermissions($admin, $this->getRefId(), $new_obj->getRefId(), $new_admin, true);
         $ilLog->write(__METHOD__ . ' : Finished copying of role crs_admin.');
-        
+
         $tutor = $this->getDefaultTutorRole();
         $new_tutor = $new_obj->getDefaultTutorRole();
         if (!$tutor || !$new_tutor) {
@@ -1112,7 +1184,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         }
         $rbacadmin->copyRolePermissions($tutor, $this->getRefId(), $new_obj->getRefId(), $new_tutor, true);
         $ilLog->write(__METHOD__ . ' : Finished copying of role crs_tutor.');
-        
+
         $member = $this->getDefaultMemberRole();
         $new_member = $new_obj->getDefaultMemberRole();
         if (!$member || !$new_member) {
@@ -1120,10 +1192,10 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         }
         $rbacadmin->copyRolePermissions($member, $this->getRefId(), $new_obj->getRefId(), $new_member, true);
         $ilLog->write(__METHOD__ . ' : Finished copying of role crs_member.');
-        
+
         return true;
     }
-    
+
 
     public function validate()
     {
@@ -1150,7 +1222,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         if (!$this->getTitle() || !$this->getStatusDetermination()) {
             $this->appendMessage($this->lng->txt('err_check_input'));
         }
-        
+
         // :TODO: checkInput() is not used properly
         if (($this->getCourseStart() && !$this->getCourseEnd()) ||
             (!$this->getCourseStart() && $this->getCourseEnd()) ||
@@ -1169,7 +1241,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         $error = false;
         if ($this->getContactEmail()) {
             $emails = explode(",", $this->getContactEmail());
-            
+
             foreach ($emails as $email) {
                 $email = trim($email);
                 if (!(ilUtil::is_email($email) or ilObjUser::getUserIdByLogin($email))) {
@@ -1189,7 +1261,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
             strlen($this->getContactPhone()) or
             strlen($this->getContactConsultation());
     }
-            
+
 
     /**
     * delete course and all related data
@@ -1202,7 +1274,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         global $DIC;
 
         $ilAppEventHandler = $DIC['ilAppEventHandler'];
-        
+
         // always call parent delete function first!!
         if (!parent::delete()) {
             return false;
@@ -1226,10 +1298,10 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 
         include_once './Modules/Course/classes/class.ilCourseFile.php';
         ilCourseFile::_deleteByCourse($this->getId());
-        
+
         include_once('Modules/Course/classes/Export/class.ilCourseDefinedFieldDefinition.php');
         ilCourseDefinedFieldDefinition::_deleteByContainer($this->getId());
-        
+
         $ilAppEventHandler->raise(
             'Modules/Course',
             'delete',
@@ -1237,8 +1309,8 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
                 'obj_id' => $this->getId(),
                 'appointments' => $this->prepareAppointments('delete'))
         );
-        
-        
+
+
         return true;
     }
 
@@ -1289,7 +1361,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
             $this->__createDefaultSettings();
         }
 
-
+        // cdpatch: added course type and level
         $query = "UPDATE crs_settings SET " .
             "syllabus = " . $ilDB->quote($this->getSyllabus(), 'text') . ", " .
             "contact_name = " . $ilDB->quote($this->getContactName(), 'text') . ", " .
@@ -1331,16 +1403,19 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
             'period_time_indication = ' . $ilDB->quote($this->getCourseStartTimeIndication() ? 1 : 0, \ilDBConstants::T_INTEGER) . ', ' .
             'auto_wait = ' . $ilDB->quote((int) $this->hasWaitingListAutoFill(), 'integer') . ', ' .
             'leave_end = ' . $ilDB->quote(($this->getCancellationEnd() && !$this->getCancellationEnd()->isNull()) ? $this->getCancellationEnd()->get(IL_CAL_UNIX) : null, 'integer') . ', ' .
-            'min_members = ' . $ilDB->quote((int) $this->getSubscriptionMinMembers(), 'integer') . '  ' .
+            'min_members = ' . $ilDB->quote((int) $this->getSubscriptionMinMembers(), 'integer') . ', ' .
+            'course_type = ' . $ilDB->quote($this->getCourseType(), 'integer') . ', ' .
+            'course_level = ' . $ilDB->quote($this->getCourseLevel(), 'text') . ', ' .
+            'course_nr = ' . $ilDB->quote($this->getCourseNr(), 'text') . ' ' .
             "WHERE obj_id = " . $ilDB->quote($this->getId(), 'integer') . "";
-                
+
         $res = $ilDB->manipulate($query);
-        
+
         // moved activation to ilObjectActivation
         if ($this->ref_id) {
             include_once "./Services/Object/classes/class.ilObjectActivation.php";
             ilObjectActivation::getItem($this->ref_id);
-            
+
             $item = new ilObjectActivation;
             if (!$this->getActivationStart() || !$this->getActivationEnd()) {
                 $item->setTimingType(ilObjectActivation::TIMINGS_DEACTIVATED);
@@ -1350,11 +1425,11 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
                 $item->setTimingEnd($this->getActivationEnd());
                 $item->toggleVisible($this->getActivationVisibility());
             }
-            
+
             $item->update($this->ref_id);
         }
     }
-    
+
     /**
      * Clone entries in settings table
      *
@@ -1398,6 +1473,13 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         $new_obj->setNumberOfNextSessions($this->getNumberOfNextSessions());
         $new_obj->setAutoNotification($this->getAutoNotification());
         $new_obj->enableRegistrationAccessCode($this->isRegistrationAccessCodeEnabled());
+
+        // cdpatch start
+        $new_obj->setCourseType($this->getCourseType());
+        $new_obj->setCourseLevel($this->getCourseLevel());
+        $new_obj->setCourseNr($this->getCourseNr());
+        // cdpatch end
+
         include_once './Services/Membership/classes/class.ilMembershipRegistrationCodeUtils.php';
         $new_obj->setRegistrationAccessCode(ilMembershipRegistrationCodeUtils::generateCode());
         $new_obj->setStatusDetermination($this->getStatusDetermination());
@@ -1409,13 +1491,13 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         $new_obj->setCancellationEnd($this->getCancellationEnd());
         $new_obj->setWaitingListAutoFill($this->hasWaitingListAutoFill());
         $new_obj->setSubscriptionMinMembers($this->getSubscriptionMinMembers());
-        
+
         // #10271
         $new_obj->setEnableCourseMap($this->getEnableCourseMap());
         $new_obj->setLatitude($this->getLatitude());
         $new_obj->setLongitude($this->getLongitude());
         $new_obj->setLocationZoom($this->getLocationZoom());
-        
+
         $new_obj->update();
     }
 
@@ -1424,16 +1506,17 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         global $DIC;
 
         $ilDB = $DIC['ilDB'];
-        
+
         include_once './Services/Membership/classes/class.ilMembershipRegistrationCodeUtils.php';
         $this->setRegistrationAccessCode(ilMembershipRegistrationCodeUtils::generateCode());
 
+		// cdpatch: added course type
         $query = "INSERT INTO crs_settings (obj_id,syllabus,contact_name,contact_responsibility," .
             "contact_phone,contact_email,contact_consultation," .
             "sub_limitation_type,sub_start,sub_end,sub_type,sub_password,sub_mem_limit," .
             "sub_max_members,sub_notify,view_mode,timing_mode,abo," .
             "latitude,longitude,location_zoom,enable_course_map,waiting_list,show_members,show_members_export, " .
-            "session_limit,session_prev,session_next, reg_ac_enabled, reg_ac, auto_notification, status_dt,mail_members_type) " .
+            "session_limit,session_prev,session_next, reg_ac_enabled, reg_ac, auto_notification, status_dt,mail_members_type, course_type) " .
             "VALUES( " .
             $ilDB->quote($this->getId(), 'integer') . ", " .
             $ilDB->quote($this->getSyllabus(), 'text') . ", " .
@@ -1468,9 +1551,10 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
             $ilDB->quote($this->getRegistrationAccessCode(), 'text') . ', ' .
             $ilDB->quote((int) $this->getAutoNotification(), 'integer') . ', ' .
             $ilDB->quote((int) $this->getStatusDetermination(), 'integer') . ', ' .
-            $ilDB->quote((int) $this->getMailToMembersType(), 'integer') . ' ' .
+            $ilDB->quote((int) $this->getMailToMembersType(), 'integer') . ',' .
+            $ilDB->quote($this->getCourseType(), 'integer') . ' ' .
             ")";
-            
+
         $res = $ilDB->manipulate($query);
         $this->__readSettings();
 
@@ -1479,7 +1563,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         $sorting->setSortMode(ilContainer::SORT_MANUAL);
         $sorting->update();
     }
-    
+
 
     public function __readSettings()
     {
@@ -1528,6 +1612,11 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
             $this->setNumberOfNextSessions($row->session_next);
             $this->enableRegistrationAccessCode($row->reg_ac_enabled);
             $this->setRegistrationAccessCode($row->reg_ac);
+            // cdpatch start
+            $this->setCourseType($row->course_type);
+            $this->setCourseLevel($row->course_level);
+            $this->setCourseNr($row->course_nr);
+            // cdpatch end
             $this->setAutoNotification($row->auto_notification == 1 ? true : false);
             $this->setStatusDetermination((int) $row->status_dt);
             $this->setMailToMembersType($row->mail_members_type);
@@ -1548,7 +1637,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
             $this->setWaitingListAutoFill($row->auto_wait);
             $this->setSubscriptionMinMembers($row->min_members ? $row->min_members : null);
         }
-        
+
         // moved activation to ilObjectActivation
         if ($this->ref_id) {
             include_once "./Services/Object/classes/class.ilObjectActivation.php";
@@ -1573,7 +1662,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         }
         return true;
     }
-        
+
 
     /**
      * Init course member object
@@ -1660,10 +1749,10 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
             'il_crs_member',
             $this->getRefId()
         );
-        
+
         return array();
     }
-    
+
     /**
      * This method is called before "initDefaultRoles".
      * Therefore now local course roles are created.
@@ -1679,7 +1768,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 
         $rbacadmin = $DIC['rbacadmin'];
         $rbacreview = $DIC['rbacreview'];
-        
+
         $parent_roles = $rbacreview->getParentRoleIds($a_parent_ref);
         foreach ((array) $parent_roles as $parent_role) {
             $rbacadmin->initIntersectionPermissions(
@@ -1703,7 +1792,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         global $DIC;
 
         $ilDB = $DIC['ilDB'];
-        
+
         $q = "SELECT obj_id FROM object_data WHERE type='rolt' AND title='il_crs_non_member'";
         $res = $this->ilias->db->query($q);
         $row = $res->fetchRow(ilDBConstants::FETCHMODE_ASSOC);
@@ -1720,14 +1809,14 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         global $DIC;
 
         $ilDB = $DIC['ilDB'];
-        
+
         $query = 'SELECT obj_id FROM object_data WHERE type = ' . $ilDB->quote('rolt', 'text') . ' AND title = ' . $ilDB->quote('il_crs_non_member', 'text');
         $res = $ilDB->query($query);
         $row = $res->fetchRow(ilDBConstants::FETCHMODE_ASSOC);
-        
+
         return isset($row['obj_id']) ? $row['obj_id'] : 0;
     }
-    
+
     /**
     * get ALL local roles of course, also those created and defined afterwards
     * only fetch data once from database. info is stored in object variable
@@ -1761,7 +1850,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 
         return $this->local_roles;
     }
-    
+
 
 
     /**
@@ -1810,7 +1899,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
 
         return $arr_crsDefaultRoles;
     }
-    
+
     public function __getLocalRoles()
     {
         global $DIC;
@@ -1818,7 +1907,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         $rbacreview = $DIC['rbacreview'];
 
         // GET role_objects of predefined roles
-        
+
         return $rbacreview->getRolesOfRoleFolder($this->getRefId(), false);
     }
 
@@ -1827,15 +1916,15 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         global $DIC;
 
         $ilDB = $DIC['ilDB'];
-        
+
         $query = "DELETE FROM crs_settings " .
             "WHERE obj_id = " . $ilDB->quote($this->getId(), 'integer') . " ";
         $res = $ilDB->manipulate($query);
 
         return true;
     }
-    
-    
+
+
     public function getDefaultMemberRole()
     {
         $local_roles = $this->__getLocalRoles();
@@ -1889,7 +1978,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         include_once "Modules/Course/classes/Objectives/class.ilLOUserResults.php";
         ilLOUserResults::deleteResultsForUser($a_usr_id);
     }
-    
+
     /**
      * Overwriten Metadata update listener for ECS functionalities
      *
@@ -1911,12 +2000,12 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
                 $ecs = new ilECSCourseSettings($this);
                 $ecs->handleContentUpdate();
                 break;
-                
+
             default:
                 return true;
         }
     }
-    
+
     /**
     * Add additional information to sub item, e.g. used in
     * courses for timings information etc.
@@ -1926,7 +2015,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         include_once './Services/Object/classes/class.ilObjectActivation.php';
         ilObjectActivation::addAdditionalSubItemInformation($a_item_data);
     }
-    
+
     /**
      * Prepare calendar appointments
      *
@@ -1938,7 +2027,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
     {
         include_once('./Services/Calendar/classes/class.ilCalendarAppointmentTemplate.php');
         include_once('./Services/Calendar/classes/class.ilDateTime.php');
-        
+
         switch ($a_mode) {
             case 'create':
             case 'update':
@@ -2023,13 +2112,13 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
                     }
                 }
                 return $apps ? $apps : array();
-                
+
             case 'delete':
                 // Nothing to do: The category and all assigned appointments will be deleted.
                 return array();
         }
     }
-    
+
     ###### Interface ilMembershipRegistrationCodes
     /**
      * @see interface.ilMembershipRegistrationCodes
@@ -2040,19 +2129,19 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         global $DIC;
 
         $ilDB = $DIC['ilDB'];
-        
+
         $query = "SELECT obj_id FROM crs_settings " .
             "WHERE reg_ac_enabled = " . $ilDB->quote(1, 'integer') . " " .
             "AND reg_ac = " . $ilDB->quote($a_code, 'text');
         $res = $ilDB->query($query);
-        
+
         $obj_ids = array();
         while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
             $obj_ids[] = $row->obj_id;
         }
         return $obj_ids;
     }
-    
+
     /**
      * @see ilMembershipRegistrationCodes::register()
      * @param int user_id
@@ -2073,7 +2162,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         if ($part->isAssigned($a_user_id)) {
             return true;
         }
-        
+
         if (!$a_force_registration) {
             // offline
             if (ilObjCourseAccess::_isOffline($this->getId())) {
@@ -2089,7 +2178,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
                     ilMembershipRegistrationException::REGISTRATION_INVALID_AVAILABILITY
                 );
             }
-            
+
             if ($this->getSubscriptionLimitationType() == IL_CRS_SUBSCRIPTION_DEACTIVATED) {
                 if (!ilObjCourseAccess::_usingRegistrationCode()) {
                     throw new ilMembershipRegistrationException('Cant registrate to course ' . $this->getId() .
@@ -2130,15 +2219,15 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
                 }
             }
         }
-        
+
         $part->add($a_user_id, $a_role);
         $part->sendNotification($part->NOTIFY_ACCEPT_USER, $a_user_id);
         $part->sendNotification($part->NOTIFY_ADMINS, $a_user_id);
-        
-        
+
+
         include_once './Modules/Forum/classes/class.ilForumNotification.php';
         ilForumNotification::checkForumsExistsInsert($this->getRefId(), $a_user_id);
-        
+
         return true;
     }
 
@@ -2164,7 +2253,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
     {
         $this->auto_notification = $value;
     }
-    
+
     /**
      * Set status determination mode
      *
@@ -2173,7 +2262,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
     public function setStatusDetermination($a_value)
     {
         $a_value = (int) $a_value;
-        
+
         // #13905
         if ($a_value == self::STATUS_DETERMINATION_LP) {
             include_once("Services/Tracking/classes/class.ilObjUserTracking.php");
@@ -2181,10 +2270,10 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
                 $a_value = self::STATUS_DETERMINATION_MANUAL;
             }
         }
-        
+
         $this->status_dt = $a_value;
     }
-    
+
     /**
      * Get status determination mode
      *
@@ -2194,7 +2283,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
     {
         return $this->status_dt;
     }
-        
+
     /**
      * Set course status for all members by lp status
      */
@@ -2206,7 +2295,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
             ilLPStatusWrapper::_updateStatus($this->getId(), $user_id, null, false, true);
         }
     }
-            
+
     /**
      * sync course status from lp
      *
@@ -2226,7 +2315,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
             $this->getMembersObject()->updatePassed($a_member_id, $has_completed, false, true);
         }
     }
-    
+
     public function getOrderType()
     {
         if ($this->enabledObjectiveView()) {
@@ -2234,7 +2323,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         }
         return parent::getOrderType();
     }
-    
+
     /**
      * Handle course auto fill
      */
@@ -2247,13 +2336,13 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
             $this->course_logger->debug('Waiting list or auto fill disabled.');
             return;
         }
-        
+
         $max = $this->getSubscriptionMaxMembers();
         $now = ilCourseParticipants::lookupNumberOfMembers($this->getRefId());
 
         $this->course_logger->debug('Max members: ' . $max);
         $this->course_logger->debug('Current members: ' . $now);
-        
+
         if ($max <= $now) {
             return;
         }
@@ -2275,7 +2364,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
             $this->getMembersObject()->sendNotification($this->getMembersObject()->NOTIFY_ACCEPT_USER, $user_id, true);
             $waiting_list->removeFromList($user_id);
             $this->checkLPStatusSync($user_id);
-            
+
             $this->course_logger->info('Assigned user from waiting list to course: ' . $this->getTitle());
             $now++;
             if ($now >= $max) {
@@ -2283,18 +2372,18 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
             }
         }
     }
-    
+
     public static function mayLeave($a_course_id, $a_user_id = null, &$a_date = null)
     {
         global $DIC;
 
         $ilUser = $DIC['ilUser'];
         $ilDB = $DIC['ilDB'];
-        
+
         if (!$a_user_id) {
             $a_user_id = $ilUser->getId();
         }
-        
+
         $set = $ilDB->query("SELECT leave_end" .
             " FROM crs_settings" .
             " WHERE obj_id = " . $ilDB->quote($a_course_id, "integer"));
@@ -2309,7 +2398,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         }
         return true;
     }
-    
+
     /**
      * Minimum members check
      * @global type $ilDB
@@ -2319,7 +2408,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
     {
         $ilDB = $GLOBALS['DIC']->database();
         $tree = $GLOBALS['DIC']->repositoryTree();
-        
+
         $res = array();
 
         $before = new ilDateTime(time(), IL_CAL_UNIX);
@@ -2327,7 +2416,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         $now = $before->get(IL_CAL_UNIX);
 
         include_once "Modules/Course/classes/class.ilCourseParticipants.php";
-        
+
         $set = $ilDB->query("SELECT obj_id, min_members" .
             " FROM crs_settings" .
             " WHERE min_members > " . $ilDB->quote(0, "integer") .
@@ -2341,11 +2430,11 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
         while ($row = $ilDB->fetchAssoc($set)) {
             $refs = ilObject::_getAllReferences($row['obj_id']);
             $ref = end($refs);
-            
+
             if ($tree->isDeleted($ref)) {
                 continue;
             }
-            
+
             $part = new ilCourseParticipants($row["obj_id"]);
             $reci = $part->getNotificationRecipients();
             if (sizeof($reci)) {
@@ -2355,7 +2444,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
                 }
             }
         }
-        
+
         return $res;
     }
 } //END class.ilObjCourse

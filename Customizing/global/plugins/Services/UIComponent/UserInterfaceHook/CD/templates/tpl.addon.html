@@ -1,0 +1,13 @@
+<!--<form action="{ACTION}" name="loginForm" method="post">
+<div style="margin: 10px 0px;">{INFO}</div>
+<input type="hidden" name="user_login" value="{USER_EMAIL}"/>
+<input type="hidden" name="user_pwd" value="{PW_ADDON}"/>
+<input class="submit" type="submit" value=""/>
+</form>-->
+<div style="margin: 10px 0px;">{INFO}</div>
+<form name="loginForm" method="post" target="_blank" action="http://embed.language-academy.org/?loginregister">
+<input name="user_login" type="hidden" id="hiddenField" value="{USER_EMAIL}" />
+
+  <input name="user_pwd" type="hidden" id="hiddenField" value="{PW_ADDON}" />
+        <button type="submit" name="login_button">{CMD_TXT}</button>
+      </form> 

@@ -46,6 +46,12 @@ class ilUserProfileStartUpStep extends StartUpSequenceStep
             return false;
         }
 
+        // cdpatch start
+        if (strtolower($_GET['baseClass']) != 'iluihookplugingui') {
+            return false;
+        }
+        // cdpatch end
+
         return (
             strtolower($this->ctrl->getCmdClass()) == 'ilpersonalprofilegui' &&
             in_array(strtolower($this->ctrl->getCmd()), array(

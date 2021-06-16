@@ -9,18 +9,15 @@
  */
 class cdUtil
 {
-	/**
-	 * isDAF
-	 *
-	 * @return bool
-	 */
-	static function isDAF()
-	{
-		global $ilClientIniFile;
+    /**
+     * isDAF
+     *
+     * @return bool
+     */
+    public static function isDAF()
+    {
+        global $ilClientIniFile;
 
-		return ($ilClientIniFile->readVariable("system","DAF") == "1");
-	}
-
+        return ($ilClientIniFile->readVariable("system", "DAF") == "1");
+    }
 }
-
-?>

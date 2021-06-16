@@ -5,19 +5,19 @@
 include_once("./Services/Init/classes/class.ilInitialisation.php");
 
 /**
- *  
+ *
  *
  * @author Alex Killing <alex.killing@gmx.de>
  * @version $Id\$
- * @ingroup 
+ * @ingroup
  */
 class ilCDTestSaverInit extends ilInitialisation
 {
-	/**
-	 * Init
-	 */
-	function init()
-	{
+    /**
+     * Init
+     */
+    public function init()
+    {
         $GLOBALS["DIC"] = new \ILIAS\DI\Container();
         $GLOBALS["DIC"]["ilLoggerFactory"] = function ($c) {
             return ilLoggerFactory::getInstance();
@@ -33,13 +33,10 @@ class ilCDTestSaverInit extends ilInitialisation
 
 
         /*$this->initIliasIniFile();
-		$this->determineClient();
-		$this->initClientIniFile();
-		$this->initDatabase();
-		$this->initSettings();
-		$this->buildHttpPath();*/
-	}
-	
+        $this->determineClient();
+        $this->initClientIniFile();
+        $this->initDatabase();
+        $this->initSettings();
+        $this->buildHttpPath();*/
+    }
 }
-
-?>

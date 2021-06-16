@@ -7,28 +7,25 @@
  *
  * @author Alex Killing <alex.killing@gmx.de>
  * @version $Id$
- * @ingroup 
+ * @ingroup
  */
 class ilCDTeachType
 {
-	static public $teach_types = array(
-		"10" => "group_work",
-		"20" => "individual_teach",
-		"30" => "teach_top_management",
-		"40" => "edu_consultance",
-		"50" => "blended_learning_products");
+    public static $teach_types = array(
+        "10" => "group_work",
+        "20" => "individual_teach",
+        "30" => "teach_top_management",
+        "40" => "edu_consultance",
+        "50" => "blended_learning_products");
 
-	/**
-	 * Get all
-	 *
-	 * @param
-	 * @return
-	 */
-	static function getAll()
-	{
-		return self::$teach_types;
-	}
-	
+    /**
+     * Get all
+     *
+     * @param
+     * @return
+     */
+    public static function getAll()
+    {
+        return self::$teach_types;
+    }
 }
-
-?>

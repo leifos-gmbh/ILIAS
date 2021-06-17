@@ -89,6 +89,13 @@ class ilSystemSupportContactsGUI
     {
         global $DIC;
 
+        // begin-patch bghw
+        // no technical support contact on login page
+        if (stristr($_SERVER['REQUEST_URI'], 'login.php')) {
+            return '';
+        }
+        // begin-patch bghw
+
         $ilCtrl = $DIC->ctrl();
         $ilUser = $DIC->user();
         

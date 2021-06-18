@@ -869,3 +869,495 @@ if (!$ilDB->indexExistsByFields('il_object_subobj', array('subobj'))) {
 <?php
 $ilCtrlStructureReader->getStructure();
 ?>
+<#36>
+<?php
+if (!$ilDB->indexExistsByFields('tax_tree', ['child'])) {
+    $ilDB->addIndex('tax_tree', ['child'], 'i1');
+}
+?>
+<#37>
+<?php
+    $ilCtrlStructureReader->getStructure();
+?>
+<#38>
+<?php
+$set = $ilDB->queryF("SELECT availability_id FROM pdfgen_renderer_avail " .
+    " WHERE renderer = %s AND service = %s AND purpose = %s",
+    ["text", "text", "text"],
+    ["PhantomJS", "Survey", "Results"]
+);
+if (!$ilDB->fetchAssoc($set)) {
+    $ilDB->insert("pdfgen_renderer_avail", [
+        "availability_id" => ["integer", $ilDB->nextId('pdfgen_renderer_avail')],
+        "renderer" => ["text", "PhantomJS"],
+        "service" => ["text", "Survey"],
+        "purpose" => ["text", "Results"]
+    ]);
+}
+?>
+<#39>
+<?php
+$set = $ilDB->queryF("SELECT availability_id FROM pdfgen_renderer_avail " .
+    " WHERE renderer = %s AND service = %s AND purpose = %s",
+    ["text", "text", "text"],
+    ["WkhtmlToPdf", "Survey", "Results"]
+);
+if (!$ilDB->fetchAssoc($set)) {
+    $ilDB->insert("pdfgen_renderer_avail", [
+        "availability_id" => ["integer", $ilDB->nextId('pdfgen_renderer_avail')],
+        "renderer" => ["text", "WkhtmlToPdf"],
+        "service" => ["text", "Survey"],
+        "purpose" => ["text", "Results"]
+    ]);
+}
+?>
+<#40>
+<?php
+// deleted
+?>
+<#41>
+<?php
+global $DIC;
+$DIC->database()->modifyTableColumn("usr_data", "login", [
+    "type" => \ilDBConstants::T_TEXT,
+    "length" => 190,
+    "notnull" => false,
+    "fixed" => false
+]);
+?>
+<#42>
+<?php
+    $ilCtrlStructureReader->getStructure();
+?>
+<#43>
+<?php
+if($ilDB->tableExists('cmix_lrs_types'))
+{
+    if ( !$ilDB->tableColumnExists('cmix_lrs_types', 'only_moveon') ) {
+        $ilDB->addTableColumn('cmix_lrs_types', 'only_moveon', array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => true,
+            'default' => 0
+        ));
+    }
+    if ( !$ilDB->tableColumnExists('cmix_lrs_types', 'achieved') ) {
+        $ilDB->addTableColumn('cmix_lrs_types', 'achieved', array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => true,
+            'default' => 1
+        ));
+    }
+
+    if ( !$ilDB->tableColumnExists('cmix_lrs_types', 'answered') ) {
+        $ilDB->addTableColumn('cmix_lrs_types', 'answered', array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => true,
+            'default' => 1
+        ));
+    }
+
+    if ( !$ilDB->tableColumnExists('cmix_lrs_types', 'completed') ) {
+        $ilDB->addTableColumn('cmix_lrs_types', 'completed', array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => true,
+            'default' => 1
+        ));
+    }
+
+    if ( !$ilDB->tableColumnExists('cmix_lrs_types', 'failed') ) {
+        $ilDB->addTableColumn('cmix_lrs_types', 'failed', array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => true,
+            'default' => 1
+        ));
+    }
+
+    if ( !$ilDB->tableColumnExists('cmix_lrs_types', 'initialized') ) {
+        $ilDB->addTableColumn('cmix_lrs_types', 'initialized', array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => true,
+            'default' => 1
+        ));
+    }
+
+    if ( !$ilDB->tableColumnExists('cmix_lrs_types', 'passed') ) {
+        $ilDB->addTableColumn('cmix_lrs_types', 'passed', array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => true,
+            'default' => 1
+        ));
+    }
+
+    if ( !$ilDB->tableColumnExists('cmix_lrs_types', 'progressed') ) {
+        $ilDB->addTableColumn('cmix_lrs_types', 'progressed', array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => true,
+            'default' => 1
+        ));
+    }
+
+    if ( !$ilDB->tableColumnExists('cmix_lrs_types', 'satisfied') ) {
+        $ilDB->addTableColumn('cmix_lrs_types', 'satisfied', array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => true,
+            'default' => 1
+        ));
+    }
+
+    if ( !$ilDB->tableColumnExists('cmix_lrs_types', 'c_terminated') ) {
+        $ilDB->addTableColumn('cmix_lrs_types', 'c_terminated', array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => true,
+            'default' => 1
+        ));
+    }
+
+    if ( !$ilDB->tableColumnExists('cmix_lrs_types', 'hide_data') ) {
+        $ilDB->addTableColumn('cmix_lrs_types', 'hide_data', array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => true,
+            'default' => 0
+        ));
+    }
+
+    if ( !$ilDB->tableColumnExists('cmix_lrs_types', 'c_timestamp') ) {
+        $ilDB->addTableColumn('cmix_lrs_types', 'c_timestamp', array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => true,
+            'default' => 0
+        ));
+    }
+
+    if ( !$ilDB->tableColumnExists('cmix_lrs_types', 'duration') ) {
+        $ilDB->addTableColumn('cmix_lrs_types', 'duration', array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => true,
+            'default' => 1
+        ));
+    }
+
+    if ( !$ilDB->tableColumnExists('cmix_lrs_types', 'no_substatements') ) {
+        $ilDB->addTableColumn('cmix_lrs_types', 'no_substatements', array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => true,
+            'default' => 0
+        ));
+    }
+}
+?>
+<#44>
+<?php
+if($ilDB->tableExists('cmix_settings'))
+{
+    if ( !$ilDB->tableColumnExists('cmix_settings', 'only_moveon') ) {
+        $ilDB->addTableColumn('cmix_settings', 'only_moveon', array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => true,
+            'default' => 0
+        ));
+    }
+    if ( !$ilDB->tableColumnExists('cmix_settings', 'achieved') ) {
+        $ilDB->addTableColumn('cmix_settings', 'achieved', array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => true,
+            'default' => 1
+        ));
+    }
+
+    if ( !$ilDB->tableColumnExists('cmix_settings', 'answered') ) {
+        $ilDB->addTableColumn('cmix_settings', 'answered', array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => true,
+            'default' => 1
+        ));
+    }
+
+    if ( !$ilDB->tableColumnExists('cmix_settings', 'completed') ) {
+        $ilDB->addTableColumn('cmix_settings', 'completed', array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => true,
+            'default' => 1
+        ));
+    }
+
+    if ( !$ilDB->tableColumnExists('cmix_settings', 'failed') ) {
+        $ilDB->addTableColumn('cmix_settings', 'failed', array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => true,
+            'default' => 1
+        ));
+    }
+
+    if ( !$ilDB->tableColumnExists('cmix_settings', 'initialized') ) {
+        $ilDB->addTableColumn('cmix_settings', 'initialized', array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => true,
+            'default' => 1
+        ));
+    }
+
+    if ( !$ilDB->tableColumnExists('cmix_settings', 'passed') ) {
+        $ilDB->addTableColumn('cmix_settings', 'passed', array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => true,
+            'default' => 1
+        ));
+    }
+
+    if ( !$ilDB->tableColumnExists('cmix_settings', 'progressed') ) {
+        $ilDB->addTableColumn('cmix_settings', 'progressed', array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => true,
+            'default' => 1
+        ));
+    }
+
+    if ( !$ilDB->tableColumnExists('cmix_settings', 'satisfied') ) {
+        $ilDB->addTableColumn('cmix_settings', 'satisfied', array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => true,
+            'default' => 1
+        ));
+    }
+
+    if ( !$ilDB->tableColumnExists('cmix_settings', 'c_terminated') ) {
+        $ilDB->addTableColumn('cmix_settings', 'c_terminated', array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => true,
+            'default' => 1
+        ));
+    }
+
+    if ( !$ilDB->tableColumnExists('cmix_settings', 'hide_data') ) {
+        $ilDB->addTableColumn('cmix_settings', 'hide_data', array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => true,
+            'default' => 0
+        ));
+    }
+
+    if ( !$ilDB->tableColumnExists('cmix_settings', 'c_timestamp') ) {
+        $ilDB->addTableColumn('cmix_settings', 'c_timestamp', array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => true,
+            'default' => 0
+        ));
+    }
+
+    if ( !$ilDB->tableColumnExists('cmix_settings', 'duration') ) {
+        $ilDB->addTableColumn('cmix_settings', 'duration', array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => true,
+            'default' => 1
+        ));
+    }
+
+    if ( !$ilDB->tableColumnExists('cmix_settings', 'no_substatements') ) {
+        $ilDB->addTableColumn('cmix_settings', 'no_substatements', array(
+            'type' => 'integer',
+            'length' => 1,
+            'notnull' => true,
+            'default' => 0
+        ));
+    }
+}
+?>
+<#45>
+<?php
+if (!$ilDB->tableColumnExists('ldap_server_settings', 'escape_dn')) {
+    $ilDB->addTableColumn(
+        'ldap_server_settings',
+        'escape_dn',
+        [
+            'type' => ilDBConstants::T_INTEGER,
+            'length' => 1,
+            'notnull' => true,
+            'default' => 0
+        ]
+    );
+}
+?>
+<#46>
+<?php
+    //
+?>
+<#47>
+<?php
+if (!$ilDB->indexExistsByFields('exc_returned', array('filetitle'))) {
+    $ilDB->addIndex('exc_returned', array('filetitle'), 'i3');
+}
+?>
+<#48>
+<?php
+if ($ilDB->uniqueConstraintExists('cmi_gobjective', array('user_id','objective_id','scope_id'))) {
+    $ilDB->dropUniqueConstraintByFields('cmi_gobjective', array('user_id','objective_id','scope_id'));
+}
+$query = "show index from cmi_gobjective where Key_name = 'PRIMARY'";
+$res = $ilDB->query($query);
+if (!$ilDB->numRows($res)) {
+    $ilDB->addPrimaryKey('cmi_gobjective', array('user_id', 'scope_id', 'objective_id'));
+}
+?>
+<#49>
+<?php
+if ($ilDB->uniqueConstraintExists('cp_suspend', array('user_id','obj_id'))) {
+    $ilDB->dropUniqueConstraintByFields('cp_suspend', array('user_id','obj_id'));
+}
+$query = "show index from cp_suspend where Key_name = 'PRIMARY'";
+$res = $ilDB->query($query);
+if (!$ilDB->numRows($res)) {
+    $ilDB->addPrimaryKey('cp_suspend', array('user_id', 'obj_id'));
+}
+?>
+<#50>
+<?php
+//get all cmix objekts with read_learning_progress
+$read_learning_progress = 0;
+$read_outcomes = 0;
+$res = $ilDB->queryF(
+    "SELECT ops_id FROM rbac_operations WHERE operation = %s",
+    array('text'),
+    array('read_learning_progress')
+    );
+while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
+    $read_learning_progress = $row->ops_id;
+}
+$res = $ilDB->queryF(
+    "SELECT ops_id FROM rbac_operations WHERE operation = %s",
+    array('text'),
+    array('read_outcomes')
+    );
+while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
+    $read_outcomes = $row->ops_id;
+}
+if ($read_outcomes > 0 && $read_learning_progress > 0) {
+    $res = $ilDB->queryF(
+        "SELECT rol_id, parent, type FROM rbac_templates WHERE (type=%s OR type=%s) AND ops_id=%s",
+        array('text', 'text', 'integer'),
+        array('cmix', 'lti', $read_learning_progress)
+        );
+    while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
+        $resnum = $ilDB->queryF(
+            "SELECT rol_id FROM rbac_templates WHERE rol_id = %s AND type = %s AND ops_id = %s AND parent = %s",
+            array('integer', 'text', 'integer', 'integer'),
+            array($row->rol_id, $row->type, $read_outcomes, $row->parent)
+        );
+        if (!$ilDB->numRows($resnum)) {
+            $ilDB->insert('rbac_templates', array(
+                    'rol_id' => array('integer', $row->rol_id),
+                    'type' => array('text', $row->type),
+                    'ops_id' => array('integer', $read_outcomes),
+                    'parent' => array('integer', $row->parent)
+                ));
+        }
+    }
+}
+?>
+<#51>
+<?php
+$ilDB->update("rbac_operations", [
+    "op_order" => ["integer", 3900]
+], [    // where
+        "operation" => ["text", "redact"]
+    ]
+);
+?>
+<#52>
+<?php
+if (!$ilDB->indexExistsByFields('booking_reservation', array('date_from'))) {
+    $ilDB->addIndex('booking_reservation', array('date_from'), 'i3');
+}
+?>
+<#53>
+<?php
+if (!$ilDB->indexExistsByFields('booking_reservation', array('date_to'))) {
+    $ilDB->addIndex('booking_reservation', array('date_to'), 'i4');
+}
+?>
+<#54>
+<?php
+if (!$ilDB->indexExistsByFields('il_meta_oer_stat', ['obj_id'])) {
+	$ilDB->addPrimaryKey('il_meta_oer_stat', ['obj_id']);
+}
+?>
+<#55>
+<?php
+if (!$ilDB->tableColumnExists('il_bt_value', 'position')) {
+    $ilDB->addTableColumn(
+        'il_bt_value',
+        'position',
+        [
+            'type' => ilDBConstants::T_INTEGER,
+            'length' => 8,
+            'notnull' => true,
+            'default' => 0
+        ]
+    );
+}
+?>
+<#56>
+<?php
+if (!$ilDB->indexExistsByFields('il_bt_value', array('bucket_id'))) {
+    $ilDB->addIndex(
+        'il_bt_value',
+        array('bucket_id'),
+        'i1'
+    );
+}
+if (!$ilDB->indexExistsByFields('il_bt_value_to_task', array('task_id'))) {
+    $ilDB->addIndex(
+        'il_bt_value_to_task',
+        array('task_id'),
+        'i1'
+    );
+}
+if (!$ilDB->indexExistsByFields('il_bt_value_to_task', array('value_id'))) {
+    $ilDB->addIndex(
+        'il_bt_value_to_task',
+        array('value_id'),
+        'i2'
+    );
+}
+?>
+<#57>
+<?php
+if (!$ilDB->tableColumnExists('il_bt_value_to_task', 'position')) {
+    $ilDB->addTableColumn(
+        'il_bt_value_to_task',
+        'position',
+        [
+            'type' => ilDBConstants::T_INTEGER,
+            'length' => 8,
+            'notnull' => true,
+            'default' => 0
+        ]
+    );
+}
+?>

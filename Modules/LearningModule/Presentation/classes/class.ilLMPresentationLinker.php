@@ -124,6 +124,11 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
                     $link = $this->ctrl->getLinkTargetByClass(self::TARGET_GUI, "fullscreen", "", false, false);
                     break;
 
+                case "sourcecodeDownload":
+                    $this->ctrl->setParameterByClass(self::TARGET_GUI, "obj_id", $a_obj_id);
+                    $link = $this->ctrl->getLinkTargetByClass([self::TARGET_GUI, "ilLMPageGUI"], "", "", false, false);
+                    break;
+
                 default:
 
                     if ($back_pg != "") {
@@ -418,7 +423,7 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
                     case "User":
                         $obj_type = ilObject::_lookupType($target_id);
                         if ($obj_type == "usr") {
-                            $this->ctrl->setParameterByClass(self::TARGET_GUI, "obj_id", $this->current_page    );
+                            $this->ctrl->setParameterByClass(self::TARGET_GUI, "obj_id", $this->current_page);
                             $back = $this->ctrl->getLinkTargetByClass(
                                 self::TARGET_GUI,
                                 "layout",

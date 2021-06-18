@@ -63,20 +63,26 @@ class ilFavouritesListGUI
                 )->withLeadIcon($f->symbol()->icon()->custom(ilObject::_getIcon($item["obj_id"]), $item["title"]));
             }
             if (count($items) > 0) {
-                $item_groups[] = $f->item()->group($group->getLabel(), $items);
+                $item_groups[] = $f->item()->group((string) $group->getLabel(), $items);
             }
         }
-        $ctrl->setParameterByClass("ilPDSelectedItemsBlockGUI", "view", "0");
-        $ctrl->setParameterByClass("ilPDSelectedItemsBlockGUI", "col_side", "center");
-        $ctrl->setParameterByClass("ilPDSelectedItemsBlockGUI", "block_type", "pditems");
-        $panel = $f->panel()->secondary()->listing("", $item_groups);
-        $panel = $panel->withActions($f->dropdown()->standard([$f->link()->standard(
-            $this->lng->txt("rep_configure"),
-            $ctrl->getLinkTargetByClass(
-                ["ilDashboardGUI", "ilColumnGUI", "ilPDSelectedItemsBlockGUI"],
-                "manage"
-        )
-        )]));
-        return $this->ui->renderer()->render([$panel]);
+        if (count($item_groups) > 0) {
+            $ctrl->setParameterByClass("ilPDSelectedItemsBlockGUI", "view", "0");
+            $ctrl->setParameterByClass("ilPDSelectedItemsBlockGUI", "col_side", "center");
+            $ctrl->setParameterByClass("ilPDSelectedItemsBlockGUI", "block_type", "pditems");
+            $panel = $f->panel()->secondary()->listing("", $item_groups);
+            $panel = $panel->withActions($f->dropdown()->standard([$f->link()->standard(
+                $this->lng->txt("rep_configure"),
+                $ctrl->getLinkTargetByClass(
+                    ["ilDashboardGUI", "ilColumnGUI", "ilPDSelectedItemsBlockGUI"],
+                    "manage"
+                )
+            )
+            ]));
+            return $this->ui->renderer()->render([$panel]);
+        } else {
+            $pdblock = new ilPDSelectedItemsBlockGUI();
+            return $pdblock->getNoItemFoundContent();
+        }
     }
 }

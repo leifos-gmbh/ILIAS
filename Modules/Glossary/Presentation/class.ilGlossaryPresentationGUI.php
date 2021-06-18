@@ -541,7 +541,8 @@ class ilGlossaryPresentationGUI
         }
 
         // tabs
-        if ($this->glossary->getPresentationMode() != "full_def") {
+        if ($this->glossary->getPresentationMode() != "full_def" &&
+            $a_page_mode != ilPageObjectGUI::PRINTING) {
             $this->showDefinitionTabs("term_content");
         }
 
@@ -1149,7 +1150,7 @@ class ilGlossaryPresentationGUI
                 $lng->txt("cont_topic"),
                 "topic",
                 false
-                );
+            );
             if ($this->tax_node > 0) {
                 $si->setValue((int) $this->tax_node);
             }
@@ -1282,7 +1283,7 @@ class ilGlossaryPresentationGUI
                             "download",
                             $lng->txt("download"),
                             $ilCtrl->getLinkTarget($this, "showDownloadList")
-                            );
+                        );
                     }
                     //}
                 }

@@ -72,6 +72,9 @@ class ilObjContentPageGUI extends \ilObject2GUI implements \ilContentPageObjectC
      */
     protected $infoScreenEnabled = false;
 
+    /** @var ilHelp */
+    protected $help;
+
     /**
      * @inheritdoc
      */
@@ -91,6 +94,7 @@ class ilObjContentPageGUI extends \ilObject2GUI implements \ilContentPageObjectC
         $this->obj_service = $this->dic->object();
         $this->navHistory = $this->dic['ilNavigationHistory'];
         $this->error = $this->dic['ilErr'];
+        $this->help = $DIC['ilHelp'];
 
         $this->lng->loadLanguageModule('copa');
         $this->lng->loadLanguageModule('style');
@@ -123,23 +127,24 @@ class ilObjContentPageGUI extends \ilObject2GUI implements \ilContentPageObjectC
         if ($DIC->access()->checkAccess('read', '', $refId)) {
             $DIC->ctrl()->setTargetScript('ilias.php');
             $DIC->ctrl()->initBaseClass('ilRepositoryGUI');
+            if (isset($DIC->http()->request()->getQueryParams()['gotolp'])) {
+                $DIC->ctrl()->setParameterByClass(__CLASS__, 'gotolp', 1);
+            }
             $DIC->ctrl()->setParameterByClass(__CLASS__, 'ref_id', $refId);
             $DIC->ctrl()->redirectByClass(array(
                 'ilRepositoryGUI',
                 __CLASS__,
             ), self::UI_CMD_VIEW);
-        } else {
-            if ($DIC->access()->checkAccess('read', '', ROOT_FOLDER_ID)) {
-                \ilUtil::sendInfo(sprintf(
-                    $DIC->language()->txt('msg_no_perm_read_item'),
-                    \ilObject::_lookupTitle(\ilObject::_lookupObjId($refId))
-                ), true);
+        } elseif ($DIC->access()->checkAccess('read', '', ROOT_FOLDER_ID)) {
+            \ilUtil::sendInfo(sprintf(
+                $DIC->language()->txt('msg_no_perm_read_item'),
+                \ilObject::_lookupTitle(\ilObject::_lookupObjId($refId))
+            ), true);
 
-                $DIC->ctrl()->setTargetScript('ilias.php');
-                $DIC->ctrl()->initBaseClass('ilRepositoryGUI');
-                $DIC->ctrl()->setParameterByClass('ilRepositoryGUI', 'ref_id', ROOT_FOLDER_ID);
-                $DIC->ctrl()->redirectByClass('ilRepositoryGUI');
-            }
+            $DIC->ctrl()->setTargetScript('ilias.php');
+            $DIC->ctrl()->initBaseClass('ilRepositoryGUI');
+            $DIC->ctrl()->setParameterByClass('ilRepositoryGUI', 'ref_id', ROOT_FOLDER_ID);
+            $DIC->ctrl()->redirectByClass('ilRepositoryGUI');
         }
 
         $DIC['ilErr']->raiseError($DIC->language()->txt('msg_no_perm_read'), $DIC['ilErr']->FATAL);
@@ -158,6 +163,8 @@ class ilObjContentPageGUI extends \ilObject2GUI implements \ilContentPageObjectC
      */
     public function setTabs()
     {
+        $this->help->setScreenIdComponent($this->object->getType());
+
         if ($this->checkPermissionBool('read')) {
             $this->tabs->addTab(
                 self::UI_TAB_ID_CONTENT,

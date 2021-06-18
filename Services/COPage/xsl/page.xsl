@@ -2949,7 +2949,7 @@
 		<xsl:when test = "substring-before($data,'.flv') != '' or $type = 'video/mp4' or $type = 'video/webm'">
 			<!-- info on video preload attribute: http://www.stevesouders.com/blog/2013/04/12/html5-video-preload/ -->
 			<!-- see #bug12622 -->
-			<video class="ilPageVideo" controls="controls" preload="none">
+			<video class="ilPageVideo" controls="controls" preload="metadata">
 				<xsl:if test="$width != ''">
 					<xsl:attribute name="width"><xsl:value-of select="$width"/></xsl:attribute>
 				</xsl:if>
@@ -2958,7 +2958,7 @@
 				</xsl:if>
 				<!-- see #bug22632 -->
 				<xsl:if test="$width = '' and $height = ''">
-					<xsl:attribute name="style">max-width: 100%; width: 100%;</xsl:attribute>
+					<xsl:attribute name="style">max-width: 100%; width: 100%; max-height: 100%;</xsl:attribute>
 				</xsl:if>
 				<xsl:if test="$mode != 'edit' and
 					(../MediaAliasItem[@Purpose = $curPurpose]/Parameter[@Name = 'autostart']/@Value = 'true' or
@@ -3339,7 +3339,7 @@
 		<xsl:call-template name="EditLabel"><xsl:with-param name="text"><xsl:value-of select="//LVs/LV[@name='pc_sec']/@value"/> <xsl:if test="@Characteristic"> (<xsl:value-of select="@Characteristic"/>)</xsl:if></xsl:with-param></xsl:call-template>
 		<xsl:if test="($mode = 'edit') or ((not(@ActiveFrom) or (@ActiveFrom &lt; $current_ts)) and (not(@ActiveTo) or (@ActiveTo &gt; $current_ts)))">
 			<xsl:if test="@PermissionRefId">
-				{{{{{Section;Access;PermissionRefId;<xsl:value-of select="@PermissionRefId"/>;Permission;<xsl:value-of select="@Permission"/>}}}}}
+				{{{{{Section;Access;PermissionRefId;<xsl:value-of select="@PermissionRefId"/>;Permission;<xsl:value-of select="@Permission"/>;<xsl:number count="Section" level="any" />}}}}}
 			</xsl:if>
 			<xsl:if test="(./ExtLink or ./IntLink) and not($mode = 'edit')">
 				<a style="display:block;">
@@ -3366,7 +3366,7 @@
 				</div>
 			</xsl:if>
 			<xsl:if test="@PermissionRefId">
-				{{{{{Section;Access}}}}}
+				{{{{{Section;AccessEnd;<xsl:number count="Section" level="any" />}}}}}
 			</xsl:if>
 		</xsl:if>
 	</xsl:template>
@@ -3580,8 +3580,15 @@
 		<xsl:if test="@Type = 'VerticalAccordion' and $cwidth != 'null'">
 			<xsl:attribute name="style">width: <xsl:value-of select="$cwidth" />px; <xsl:value-of select="$halign" /><xsl:if test="$mode='edit'"> background-color:white;</xsl:if></xsl:attribute>
 		</xsl:if>
-		<xsl:if test="@Type = 'Carousel' and $cwidth != 'null'">
-			<xsl:attribute name="style">width: <xsl:value-of select="$cwidth" />px; <xsl:value-of select="$halign" /></xsl:attribute>
+		<xsl:if test="@Type = 'Carousel'">
+			<xsl:choose>
+				<xsl:when test="$cwidth != 'null'">
+					<xsl:attribute name="style">display: grid; width: <xsl:value-of select="$cwidth" />px; <xsl:value-of select="$halign" /></xsl:attribute>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:attribute name="style">display: grid;</xsl:attribute>
+				</xsl:otherwise>
+			</xsl:choose>
 		</xsl:if>
 		<xsl:variable name="cheight">
 			<xsl:choose>
@@ -3615,6 +3622,7 @@
 			<xsl:if test="@Template and //StyleTemplates/StyleTemplate[@Name=$ttemp]/StyleClass[@Type='ca_cntr']/@Value">
 				<xsl:attribute name = "class">ilc_ca_cntr_<xsl:value-of select = "//StyleTemplates/StyleTemplate[@Name=$ttemp]/StyleClass[@Type='ca_cntr']/@Value"/> owl-carousel</xsl:attribute>
 			</xsl:if>
+			<xsl:attribute name="style">overflow: hidden;</xsl:attribute>
 		</xsl:when>
 		</xsl:choose>
 			<xsl:apply-templates select="Tab">
@@ -3775,7 +3783,7 @@
 	</xsl:when>
 	</xsl:choose>
 
-		<div>
+		<div tabindex="0" role="button" aria-expanded="false">
 		<xsl:choose>
 		<xsl:when test="$mode = 'edit' or $mode = 'print' or $compare_mode = 'y'">
 			<xsl:attribute name="class">ilEditVAccordIHead</xsl:attribute>
@@ -3800,42 +3808,6 @@
 		</xsl:when>
 		</xsl:choose>
 		<xsl:attribute name="style"><xsl:if test="$cheight != 'null' and $mode != 'edit' and $mode != 'print' and $compare_mode = 'n' and ../@Type = 'HorizontalAccordion'">height: <xsl:value-of select="$cheight" />px;</xsl:if></xsl:attribute>
-		<xsl:if test="$javascript='disable'">
-			<!-- checkbox -->
-			<!--
-			<input type="checkbox" name="target[]">
-				<xsl:attribute name="value"><xsl:value-of select="@HierId"/>:<xsl:value-of select="@PCID"/>
-				</xsl:attribute>
-			</input>
-			<select size="1" class="ilEditSelect">
-				<xsl:attribute name="name">command<xsl:value-of select="@HierId"/>
-				</xsl:attribute>
-				<xsl:if test = "$javascript = 'disable'">
-					<xsl:call-template name="EditMenuInsertItems"/>
-				</xsl:if>
-				<xsl:call-template name="ListItemMenu"/>
-			</select>
-			<input class="ilEditSubmit" type="submit">
-				<xsl:attribute name="value"><xsl:value-of select="//LVs/LV[@name='ed_go']/@value"/></xsl:attribute>
-				<xsl:attribute name="name">cmd[exec_<xsl:value-of select="@HierId"/>:<xsl:value-of select="@PCID"/>]</xsl:attribute>
-			</input>
-			<br/>-->
-		</xsl:if>
-		<xsl:if test="$javascript = 'enable'">
-		<!--
-			<xsl:call-template name="Icon">
-				<xsl:with-param name="img_id">CONTENTi<xsl:value-of select="@HierId"/>:<xsl:value-of select="@PCID"/></xsl:with-param>
-				<xsl:with-param name="img_src"><xsl:value-of select="$img_item"/></xsl:with-param>
-				<xsl:with-param name="float">y</xsl:with-param>
-			</xsl:call-template>
-			<div style="position:absolute;left:0;top:0;visibility:hidden;">
-				<xsl:attribute name="id">contextmenu_i<xsl:value-of select="@HierId"/></xsl:attribute>
-				<table class="il_editmenu" cellspacing="0" cellpadding="3">
-					<xsl:call-template name="ListItemMenu"/>
-				</table>
-			</div>
-		-->
-		</xsl:if>
 		<div>
 			<xsl:choose>
 			<xsl:when test="$mode = 'edit' or $mode = 'print' or $compare_mode = 'y'">
@@ -3963,6 +3935,7 @@
 				<br/>
 			</xsl:if>
 		</xsl:if>
+		<xsl:comment>Break</xsl:comment>
 	</div>
 </xsl:template>
 

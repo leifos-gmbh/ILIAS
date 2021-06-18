@@ -2621,7 +2621,7 @@ class ilObjectListGUI
         // public area, category, no info tab
         // todo: make this faster and remove type specific implementation if possible
         if ($a_use_asynch && !$a_get_asynch_commands && !$a_header_actions) {
-            if ($ilUser->getId() == ANONYMOUS_USER_ID && $this->type == "cat") {
+            if ($ilUser->getId() == ANONYMOUS_USER_ID && $this->checkInfoPageOnAsynchronousRendering()) {
                 include_once("./Services/Container/classes/class.ilContainer.php");
                 include_once("./Services/Object/classes/class.ilObjectServiceSettingsGUI.php");
                 if (!ilContainer::_lookupContainerSetting(
@@ -3226,6 +3226,7 @@ class ilObjectListGUI
             // icon link
             if ($this->title_link_disabled || !$this->default_command || (!$this->getCommandsStatus() && !$this->restrict_to_goto)) {
             } else {
+                /*  see #28926
                 $this->tpl->setCurrentBlock("icon_link_s");
 
                 if ($this->default_command["frame"] != "") {
@@ -3238,14 +3239,15 @@ class ilObjectListGUI
                 );
                 $this->tpl->parseCurrentBlock();
                 $this->tpl->touchBlock("icon_link_e");
+                */
             }
 
             $this->tpl->setCurrentBlock("icon");
             if (!$objDefinition->isPlugin($this->getIconImageType())) {
-                $this->tpl->setVariable("ALT_ICON", $lng->txt("icon") . " " . $lng->txt("obj_" . $this->getIconImageType()));
+                $this->tpl->setVariable("ALT_ICON", $lng->txt("obj_" . $this->getIconImageType()));
             } else {
                 include_once("Services/Component/classes/class.ilPlugin.php");
-                $this->tpl->setVariable("ALT_ICON", $lng->txt("icon") . " " .
+                $this->tpl->setVariable("ALT_ICON",
                     ilObjectPlugin::lookupTxtById($this->getIconImageType(), "obj_" . $this->getIconImageType()));
             }
 
@@ -3592,11 +3594,9 @@ class ilObjectListGUI
     public static function preloadCommonProperties($a_obj_ids, $a_context)
     {
         global $DIC;
-
         $lng = $DIC->language();
         $ilSetting = $DIC->settings();
         $ilUser = $DIC->user();
-        
         if ($a_context == self::CONTEXT_REPOSITORY) {
             $active_notes = !$ilSetting->get("disable_notes");
             $active_comments = !$ilSetting->get("disable_comments");
@@ -3783,14 +3783,22 @@ class ilObjectListGUI
             $list_item = $ui->factory()->item()->standard($this->getTitle());
         }
 
+        if ($description != "") {
+            $list_item = $list_item->withDescription($description);
+        }
         $list_item = $list_item->withActions($dropdown)->withLeadIcon($icon);
 
 
         $l = [];
+        $this->enableComments(true);
+        $this->enableNotes(true);
+        $this->enableTags(true);
+        $this->enableRating(true);
+
         foreach ($this->determineProperties() as $p) {
-            if ($p['property'] !== $this->lng->txt('learning_progress')) {
+            //if ($p['property'] !== $this->lng->txt('learning_progress')) {
                 $l[(string) $p['property']] = (string) $p['value'];
-            }
+            //}
         }
         if (count($l) > 0) {
             $list_item = $list_item->withProperties($l);
@@ -3834,7 +3842,8 @@ class ilObjectListGUI
         string $type,
         string $title,
         string $description
-    ) : ?\ILIAS\UI\Component\Card\Card {
+    ) : ?\ILIAS\UI\Component\Card\Card
+    {
         $ui = $this->ui;
 
         $this->initItem(
@@ -3862,19 +3871,22 @@ class ilObjectListGUI
 
         foreach ($this->current_selection_list->getItems() as $action_item) {
             $actions[] = $ui->factory()
-                ->button()
-                ->shy($action_item['title'], $action_item['link']);
+                            ->button()
+                            ->shy($action_item['title'], $action_item['link']);
         }
 
         $def_command = $this->getDefaultCommand();
 
         if ($def_command["frame"] != "") {
+            /* this seems to be introduced due to #25624, but does not fix it
+                removed with ##30732
             $button =
                 $ui->factory()->button()->shy("Open", "")->withAdditionalOnLoadCode(function ($id) use ($def_command) {
                     return
-                        "$('#$id').click(function(e) { window.open('" . str_replace("&amp;", "&", $def_command["link"]) . "', '" . $def_command["frame"] . "');});";
+                        "$('#$id').click(function(e) { window.open('" . str_replace("&amp;", "&",
+                            $def_command["link"]) . "', '" . $def_command["frame"] . "');});";
                 });
-            $actions[] = $button;
+            $actions[] = $button;*/
         }
         $dropdown = $ui->factory()->dropdown()->standard($actions);
 
@@ -3900,19 +3912,22 @@ class ilObjectListGUI
             $this->modifySAHSlaunch($def_command["link"], $def_command["frame"]);
 
         $image = $this->ui->factory()
-            ->image()
-            ->responsive($path, '');
+                          ->image()
+                          ->responsive($path, '');
         if ($def_command['link'] != '') {    // #24256
             if ($def_command["frame"] != "" && ($modified_link == $def_command["link"])) {
                 $image = $image->withAdditionalOnLoadCode(function ($id) use ($def_command) {
                     return
-                        "$('#$id').click(function(e) { window.open('" . str_replace("&amp;", "&", $def_command["link"]) . "', '" . $def_command["frame"] . "');});";
+                        "$('#$id').click(function(e) { window.open('" . str_replace("&amp;", "&",
+                            $def_command["link"]) . "', '" . $def_command["frame"] . "');});";
                 });
 
                 $button =
-                    $ui->factory()->button()->shy($title, "")->withAdditionalOnLoadCode(function ($id) use ($def_command) {
+                    $ui->factory()->button()->shy($title, "")->withAdditionalOnLoadCode(function ($id) use ($def_command
+                    ) {
                         return
-                            "$('#$id').click(function(e) { window.open('" . str_replace("&amp;", "&", $def_command["link"]) . "', '" . $def_command["frame"] . "');});";
+                            "$('#$id').click(function(e) { window.open('" . str_replace("&amp;", "&",
+                                $def_command["link"]) . "', '" . $def_command["frame"] . "');});";
                     });
                 $title = $ui->renderer()->render($button);
             } else {
@@ -3926,33 +3941,35 @@ class ilObjectListGUI
             }
             $app_info = ilSessionAppointment::_lookupAppointment($obj_id);
             $title = ilSessionAppointment::_appointmentToString(
-                $app_info['start'],
-                $app_info['end'],
-                $app_info['fullday']
-            ) . $title;
+                    $app_info['start'],
+                    $app_info['end'],
+                    $app_info['fullday']
+                ) . $title;
         }
 
         $icon = $this->ui->factory()
-            ->symbol()
-            ->icon()
-            ->standard($type, $this->lng->txt('obj_' . $type))
-            ->withIsOutlined(true);
+                         ->symbol()
+                         ->icon()
+                         ->standard($type, $this->lng->txt('obj_' . $type))
+                         ->withIsOutlined(true);
 
         // card title action
         $card_title_action = "";
-        if ($def_command["link"] != "" && ($def_command["frame"] == "" || $modified_link != $def_command["link"])) {	// #24256
+        if ($def_command["link"] != "" && ($def_command["frame"] == "" || $modified_link != $def_command["link"])) {    // #24256
             $card_title_action = $modified_link;
-        } else if ($def_command['link'] == "" &&
-            $this->getInfoScreenStatus() &&
-            $access->checkAccessOfUser(
-                $user->getId(),
-                "visible",
-                "",
-                $ref_id
-            )) {
-            $card_title_action = ilLink::_getLink($ref_id);
-            if ($image->getAction() == "") {
-                $image = $image->withAction($card_title_action);
+        } else {
+            if ($def_command['link'] == "" &&
+                $this->getInfoScreenStatus() &&
+                $access->checkAccessOfUser(
+                    $user->getId(),
+                    "visible",
+                    "",
+                    $ref_id
+                )) {
+                $card_title_action = ilLink::_getLink($ref_id);
+                if ($image->getAction() == "") {
+                    $image = $image->withAction($card_title_action);
+                }
             }
         }
 
@@ -3992,12 +4009,20 @@ class ilObjectListGUI
 
             $card = $card->withProgress(
                 $ui->factory()
-                    ->chart()
-                    ->progressMeter()
-                    ->mini(100, $percentage)
+                   ->chart()
+                   ->progressMeter()
+                   ->mini(100, $percentage)
             );
         }
 
         return $card;
+    }
+
+    /**
+     * @return bool
+     */
+    public function checkInfoPageOnAsynchronousRendering() : bool
+    {
+        return false;
     }
 }

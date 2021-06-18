@@ -206,6 +206,23 @@ class ilStartUpGUI
 
         $this->getLogger()->debug('Showing login page');
 
+        $extUid = '';
+        if (isset($_GET['ext_uid']) && is_string($_GET['ext_uid'])) {
+            $extUid = $_GET['ext_uid'];
+        }
+        $soapPw = '';
+        if (isset($_GET['soap_pw']) && is_string($_GET['soap_pw'])) {
+            $soapPw = $_GET['soap_pw'];
+        }
+
+        require_once 'Services/Authentication/classes/Frontend/class.ilAuthFrontendCredentialsSoap.php';
+        $credentials = new ilAuthFrontendCredentialsSoap($GLOBALS['DIC']->http()->request(), $this->ctrl, $ilSetting);
+        $credentials->setUsername(ilUtil::stripSlashes($extUid));
+        $credentials->setPassword(ilUtil::stripSlashes($soapPw));
+        $credentials->tryAuthenticationOnLoginPage();
+        
+        // try apache auth
+        include_once './Services/Authentication/classes/Frontend/class.ilAuthFrontendCredentialsApache.php';
         $frontend = new ilAuthFrontendCredentialsApache($this->httpRequest, $this->ctrl);
         $frontend->tryAuthenticationOnLoginPage();
 
@@ -1307,13 +1324,13 @@ class ilStartUpGUI
             )
         );
 
-        // reset cookie
-        $client_id = $_COOKIE["ilClientId"];
-        ilUtil::setCookie("ilClientId", "");
-
         if ((int) $this->user->getAuthMode(true) == AUTH_SAML && ilSession::get('used_external_auth')) {
             $this->ctrl->redirectToURL('saml.php?action=logout&logout_url=' . urlencode(ILIAS_HTTP_PATH . '/login.php'));
         }
+
+        // reset cookie
+        $client_id = $_COOKIE["ilClientId"];
+        ilUtil::setCookie("ilClientId", "");
 
         // redirect and show logout information
         $this->ctrl->setParameter($this, 'client_id', $client_id);
@@ -1322,69 +1339,8 @@ class ilStartUpGUI
     }
 
     /**
-    * Show user selection screen, if external account could not be mapped
-    * to an ILIAS account, but the provided e-mail address is known.
-    */
-    public function showUserMappingSelection()
-    {
-        global $ilAuth, $tpl, $lng;
-
-        $valid = $ilAuth->getValidationData();
-
-        $tpl = self::initStartUpTemplate("tpl.user_mapping_selection.html");
-        $email_user = ilObjUser::_getLocalAccountsForEmail($valid["email"]);
-
-
-        if ($ilAuth->getSubStatus() == AUTH_WRONG_LOGIN) {
-            ilUtil::sendFailure($lng->txt("err_wrong_login"));
-        }
-
-        include_once('./Services/User/classes/class.ilObjUser.php');
-        if (count($email_user) == 1) {
-            //$user = new ilObjUser(key($email_user));
-            $tpl->setCurrentBlock("one_user");
-            $tpl->setVariable("TXT_USERNAME", $lng->txt("username"));
-            $tpl->setVariable("VAL_USERNAME", current($email_user));
-            $tpl->setVariable("USER_ID", key($email_user));
-            $tpl->parseCurrentBlock();
-        } else {
-            foreach ($email_user as $key => $login) {
-                $tpl->setCurrentBlock("user");
-                $tpl->setVariable("USR_ID", $key);
-                $tpl->setVariable("VAL_USER", $login);
-                $tpl->parseCurrentBlock();
-            }
-            $tpl->setCurrentBlock("multpiple_user");
-            $tpl->parseCurrentBlock();
-        }
-
-        $tpl->setCurrentBlock("content");
-        $this->ctrl->setParameter($this, "ext_uid", urlencode($_GET["ext_uid"]));
-        $this->ctrl->setParameter($this, "soap_pw", urlencode($_GET["soap_pw"]));
-        $this->ctrl->setParameter($this, "auth_stat", $_GET["auth_stat"]);
-        $tpl->setVariable(
-            "FORMACTION",
-            $this->ctrl->getFormAction($this)
-        );
-        $tpl->setVariable("TXT_ILIAS_LOGIN", $lng->txt("login_to_ilias"));
-        if (count($email_user) == 1) {
-            $tpl->setVariable("TXT_EXPLANATION", $lng->txt("ums_explanation"));
-            $tpl->setVariable("TXT_EXPLANATION_2", $lng->txt("ums_explanation_2"));
-        } else {
-            $tpl->setVariable("TXT_EXPLANATION", $lng->txt("ums_explanation_3"));
-            $tpl->setVariable("TXT_EXPLANATION_2", $lng->txt("ums_explanation_4"));
-        }
-        $tpl->setVariable("TXT_CREATE_USER", $lng->txt("ums_create_new_account"));
-        $tpl->setVariable("TXT_PASSWORD", $lng->txt("password"));
-        $tpl->setVariable("PASSWORD", ilUtil::prepareFormOutput($_POST["password"]));
-        $tpl->setVariable("TXT_SUBMIT", $lng->txt("login"));
-
-        self::printToGlobalTemplate($tpl);
-    }
-
-    /**
-    * show client list
-    */
+     * show client list
+     */
     public function showClientList()
     {
         global $tpl, $ilIliasIniFile, $lng;

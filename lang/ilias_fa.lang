@@ -5388,7 +5388,6 @@ ldap#:#ldap_user_scope#:#Search Scope
 ldap#:#ldap_user_scope_info#:#Scope for user searching. If unsure choose "Sub".
 ldap#:#ldap_user_sync#:#User Synchronization Settings
 ldap#:#ldap_user_sync_info#:#Defines whether new users are automatically created on login or regularly per Cron-Job.
-mail#:#activate_serial_letter_placeholders#:#Activate Serial-Letter Placeholders
 mail#:#bc#:#BCC
 mail#:#chat_users_have_been_invited#:#The Users have been invited.
 mail#:#chat_users_without_login#:#The following Users don't have an ILIAS Account and can't be invited to a Chat Room
@@ -12934,7 +12933,6 @@ style#:#skin_id#:#Skin ID###25 10 2016 new variable
 style#:#skin_name#:#Skin Name###25 10 2016 new variable
 style#:#skin#:#Skin###25 10 2016 new variable
 style#:#style_id#:#Style ID###25 10 2016 new variable
-style#:#Style#:#Style###25 10 2016 new variable
 style#:#style_name#:#Style Name###25 10 2016 new variable
 style#:#image_dir#:#Image Directory###25 10 2016 new variable
 style#:#font_dir#:#Font Directory###25 10 2016 new variable
@@ -14915,7 +14913,6 @@ buddysystem#:#buddy_noti_cr_profile_not_published#:#Profile not published###25 0
 content#:#cont_Attention#:#Attention###25 04 2019 new variable
 content#:#cont_Confirmation#:#Confirmation###25 04 2019 new variable
 content#:#cont_Information#:#Information###25 04 2019 new variable
-content#:#cont_Link#:#Link###25 04 2019 new variable
 content#:#cont_Literature#:#Literature###25 04 2019 new variable
 content#:#cont_Separator#:#Separator###25 04 2019 new variable
 content#:#cont_StandardCenter#:#Standard Center###25 04 2019 new variable
@@ -16191,3 +16188,58 @@ common#:#lso_admin_form_title#:#Settings###23 10 2020 new variable
 common#:#lso_admin_form_byline#:#General Settings for Learning Sequences###23 10 2020 new variable
 common#:#lso_admin_interval_label#:#Learning Progress Polling Interval (seconds)###23 10 2020 new variable
 common#:#lso_admin_interval_byline#:#Poll Learning Progress every x seconds. Be careful! A low value will increase server-requests and have an impact on overall system performance. Please choose highest value possible!###23 10 2020 new variable
+book#:#reservation_deleted#:#Reservation deleted###27 11 2020 new variable
+book#:#X_reservations_of#:#%s reservations of###27 11 2020 new variable
+book#:#book_set_delete#:#Delete###27 11 2020 new variable
+cmix#:#conf_user_ident_il_uuid_random#:#Random ID combined with a unique ILIAS platform ID formatted as an E-Mail address###27 11 2020 new variable
+cmix#:#conf_user_ident_il_uuid_random_info#:#For each ILIAS object and ILIAS user a random ID is generated which remains identical for each call. Conclusions about a user are very limited because it is practically impossible to create user profiles across objects.###27 11 2020 new variable
+common#:#err_valid_login_account_creation_disabled#:#Authentication succeeded, but the creation of new user accounts is currently disabled. Please contact your system administrator.###29 01 2021 new variable
+search#:#search_field#:#Search Input Field###29 01 2021 new variable
+search#:#search_on#:#On###29 01 2021 new variable
+administration#:#adm_auth_reg#:#Authentication Registration###29 01 2021 new variable
+administration#:#adm_auth_login#:#Authentication Login###29 01 2021 new variable
+mme#:#flush#:#Remove Lost Items###29 01 2021 new variable
+mme#:#msg_subitem_flushed#:#Lost Items removed.###29 01 2021 new variable
+file#:#personal_workspace_disk_quota#:#Hard Disk Quota for Personal Workspace###29 01 2021 new variable
+file#:#personal_workspace_quota_exceeded_warning#:#You have exceeded the disk quota for your personal workspace.###29 01 2021 new variable
+file#:#personal_workspace_quota_status_legend#:#You are using %1$s of your available disk quota of %2$s (%3$d%%).###29 01 2021 new variable
+common#:#tools#:#Tools###05 02 2021 new variable
+common#:#more#:#More###05 02 2021 new variable
+rbac#:#edit_in_online_editor#:#Open in online editor###05 02 2021 new variable
+rbac#:#cld_edit_in_online_editor#:#User can open and edit files in online editor###05 02 2021 new variable
+prg#:#no_srctype_or_id#:#Id and type may not be empty.###05 02 2021 new variable
+assessment#:#exam_id_label#:#Exam Id###19 03 2021 new variable
+assessment#:#autosavecontent#:#Autosave Content###19 03 2021 new variable
+form#:#form_msg_max_upload#:#Maximum number of simultaneously uploadable files:###19 03 2021 new variable
+survey#:#survey_notification_target_group_invited#:#All users manually invited to the survey###19 03 2021 new variable
+survey#:#survey_reminder_cron#:#Remind users to participate / Send results to tutors###19 03 2021 new variable
+auth#:#auth_saml_err_sqlite_driver#:#The SAML authentication requires the SQLite driver for PHP. Please install the SQLite package and try again.###19 03 2021 new variable
+tagging#:#no_tag_text_1#:#You have not yet used any tags. To do this, you must take two steps:###19 03 2021 new variable
+tagging#:#no_tag_text_2#:#Click on '%s' and select a learning object from the available offer, e.g. a learning module or a forum.###19 03 2021 new variable
+tagging#:#no_tag_text_3#:#To attach any tags to the object select 'Set Tags' from the actions menu.###19 03 2021 new variable
+form#:#form_invalid_uri#:#Invalid URI format.###19 03 2021 new variable
+crs#:#crs_objective_result_summary_initial#:#Placement Test: %1$s (%2$s required)###30 04 2021 new variable
+crs#:#crs_objective_result_summary_qualifying#:#Achievement Test: %1$s (%2$s required)###30 04 2021 new variable
+crs#:#crs_objective_result_details#:#« Show Details###30 04 2021 new variable
+assessment#:#tst_add_quest_cont_edit_mode_RTE_info#:#Allows text formatting of questions, answers, feedbacks and hints. But feedback and hints cannot be reused when question is embedded in ILIAS learning module.###30 04 2021 new variable
+assessment#:#tst_add_quest_cont_edit_mode_IPE_info#:#No formatting of text in question and answers. No use of LaTex either. But feedback and hints can be reused when question is embedded in ILIAS learning module.###30 04 2021 new variable
+ldap#:#ldap_escapedn#:#Escape DN###30 04 2021 new variable
+ldap#:#ldap_escapedn_info#:#If enabled, special characters in the "Distinguished Name (DN)" of user accounts are escaped in queries for group membership.###30 04 2021 new variable
+common#:#label_search_options#:#Search Area###30 04 2021 new variable
+mail#:#mail_sel_label#:#Choose the Recipients###30 04 2021 new variable
+awrn#:#awrn_filter#:#User Filter###30 04 2021 new variable
+help#:#help_search_label#:#Search Help###30 04 2021 new variable
+rbac#:#delete_xapi_data#:#Delete xAPI/cmi5 Data###30 04 2021 new variable
+trac#:#trac_mode_cmix_completed#:#Completed when verb 'completed' was sent. Verb 'failed' sets status of ILIAS to 'In Progress'.###30 04 2021 new variable
+trac#:#trac_mode_cmix_compl_with_failed#:#Completed when verb 'completed' was sent. Verb 'failed' sets status of ILIAS to 'Failed'.###30 04 2021 new variable
+trac#:#trac_mode_cmix_passed#:#Completed when verb 'passed' or 'satisfied' was sent. Verb 'failed' sets status of ILIAS to 'In Progress'.###30 04 2021 new variable
+trac#:#trac_mode_cmix_passed_with_failed#:#Completed when verb 'passed' or 'satisfied' was sent. Verb 'failed' sets status of ILIAS to 'Failed'.###30 04 2021 new variable
+trac#:#trac_mode_cmix_completed_or_passed#:#Completed when verb 'completed' or 'passed' or 'satisfied' was sent. Verb 'failed' sets status of ILIAS to 'In Progress'.###30 04 2021 new variable
+trac#:#trac_mode_cmix_compl_or_passed_with_failed#:#Completed when verb 'completed' or 'passed' or 'satisfied' was sent. Verb 'failed' sets status of ILIAS to 'Failed'.###30 04 2021 new variable
+cmix#:#toplist_top_n_results#:#Top Ranking###30 04 2021 new variable
+cmix#:#toplist_your_result#:#Own Rank###30 04 2021 new variable
+lti#:#toplist_top_n_results#:#Top Ranking###30 04 2021 new variable
+lti#:#toplist_your_result#:#Own Rank###30 04 2021 new variable
+rep#:#rep_no_last_visited_mess#:#You did not visited any resources yet.###30 04 2021 new variable
+dateplaner#:#cal_delete_recurrence_rule#:#Delete Series of Appoinments###04 06 2021 new variable
+dateplaner#:#cal_recurrence_confirm_deletion#:#Please decide wether you want to delete single appointments or the complete series of appointments.###04 06 2021 new variable

@@ -141,6 +141,7 @@ class ilPasswordAssistanceGUI
         require_once 'Services/Form/classes/class.ilPropertyFormGUI.php';
         $form = new ilPropertyFormGUI();
 
+        $form->setTitle($this->lng->txt('password_assistance'));
         $form->setFormAction($this->ctrl->getFormAction($this, 'submitAssistanceForm'));
         $form->setTarget('_parent');
 
@@ -333,7 +334,7 @@ class ilPasswordAssistanceGUI
         $sender = $senderFactory->system();
 
         $mm = new ilMimeMail();
-        $mm->Subject($this->lng->txt('pwassist_mail_subject'));
+        $mm->Subject($this->lng->txt('pwassist_mail_subject'), true);
         $mm->From($sender);
         $mm->To($userObj->getEmail());
         $mm->Body(
@@ -660,7 +661,7 @@ class ilPasswordAssistanceGUI
         $sender = $senderFactory->system();
 
         $mm = new ilMimeMail();
-        $mm->Subject($this->lng->txt('pwassist_mail_subject'));
+        $mm->Subject($this->lng->txt('pwassist_mail_subject'), true);
         $mm->From($sender);
         $mm->To($email);
         $mm->Body(

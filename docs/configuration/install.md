@@ -210,7 +210,7 @@ Usually Apache ships with a default configuration (e.g. ```/etc/apache2/sites-en
 
     DocumentRoot /var/www/html/ilias/
     <Directory /var/www/html/>
-        Options FollowSymLinks -Indexes
+        Options +FollowSymLinks -Indexes
         AllowOverride All
         Require all granted
     </Directory>
@@ -254,7 +254,7 @@ systemctl restart httpd.service
 
 On Debian/Ubuntu 14.04 or 16.04 execute:
 ```
-apt-get install libapache2-mod-php7.1 php7.1-gd php7.1-mysql php7.1-mbstring php7.1-curl php7.1-dom php7.1-zip php-xml
+apt-get install libapache2-mod-php7.3 php7.3-gd php7.3-mysql php7.3-mbstring php7.3-curl php7.3-dom php7.3-zip php7.3-xml php7.3-soap composer
 ```
 
 On RHEL/CentOS execute:
@@ -329,7 +329,7 @@ We RECOMMEND to create a dedicated database user for ILIAS:
 mysql -u root -p
 CREATE DATABASE ilias CHARACTER SET utf8 COLLATE utf8_general_ci;
 CREATE USER 'ilias'@'localhost' IDENTIFIED BY 'password';
-GRANT LOCK TABLES on *.* TO 'ilias@localhost';
+GRANT LOCK TABLES on *.* TO 'ilias'@'localhost';
 GRANT ALL PRIVILEGES ON ilias.* TO 'ilias'@'localhost';
 FLUSH PRIVILEGES;
 ```
@@ -449,7 +449,6 @@ Depending on your use case, you MAY want to install further dependencies (exact 
 
 * php-curl
 * php-xmlrpc
-* php-soap
 * php-ldap
 * ffmpeg
 * mimetex
@@ -656,14 +655,16 @@ The ILIAS Testserver (https://test6.ilias.de) is currently configured as follows
 
 | Package        | Version                     |
 |----------------|-----------------------------|
-| Distribution   | Ubuntu 16.04.7 LTS          |
-| MariaDB        | 10.0.38                     |
-| mysql          | 5.6                         |
-| PHP            | 7.3.22                      |
-| Apache         | 2.4.18                      |
+| Distribution   | Ubuntu 20.04.2 LTS          |
+| MySQL          | 5.6                         |
+| MariaDB        | 10.3                        |
+| PHP            | 7.3.28                      |
+| Apache         | 2.4.41                      |
+| Nginx          | 1.4.6                       |
 | zip            | 3.0                         |
 | unzip          | 6.00                        |
-| JDK            | 1.8.0_265                   |
-| NodeJS         | v10.22.0                    |
+| JDK            | 1.8.0_292                   |
+| NodeJS         | v10.24.1                    |
+
 
 Please note: Shibboleth won't work with Nginx.

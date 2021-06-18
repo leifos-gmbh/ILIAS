@@ -203,7 +203,6 @@ class ilMailSearchGroupsGUI
             $mail_data["rcp_to"],
             $mail_data["rcp_cc"],
             $mail_data["rcp_bcc"],
-            $mail_data["m_type"],
             $mail_data["m_email"],
             $mail_data["m_subject"],
             $mail_data["m_message"],
@@ -248,7 +247,6 @@ class ilMailSearchGroupsGUI
             $mail_data["rcp_to"],
             $mail_data["rcp_cc"],
             $mail_data["rcp_bcc"],
-            $mail_data["m_type"],
             $mail_data["m_email"],
             $mail_data["m_subject"],
             $mail_data["m_message"],
@@ -319,11 +317,10 @@ class ilMailSearchGroupsGUI
                     foreach ($grp_members as $key => $member) {
                         $tmp_usr = new ilObjUser($member);
                         
-                        if ($tmp_usr->checkTimeLimit() == false || $tmp_usr->getActive() == false) {
+                        if (!$tmp_usr->getActive()) {
                             unset($grp_members[$key]);
                         }
                     }
-                    unset($tmp_usr);
 
                     $hiddenMembers = false;
                     if ((int) $oTmpGrp->getShowMembers() == $oTmpGrp->SHOW_MEMBERS_DISABLED) {
@@ -426,12 +423,10 @@ class ilMailSearchGroupsGUI
 
                     foreach ($grp_members as $member) {
                         $tmp_usr = new ilObjUser($member['id']);
-                        if ($tmp_usr->checkTimeLimit() == false || $tmp_usr->getActive() == false) {
-                            unset($tmp_usr);
+                        if (!$tmp_usr->getActive()) {
                             continue;
                         }
-                        unset($tmp_usr);
-                        
+
                         $fullname = "";
                         if (in_array(ilObjUser::_lookupPref($member['id'], 'public_profile'), array("g", 'y'))) {
                             $fullname = $member['lastname'] . ', ' . $member['firstname'];

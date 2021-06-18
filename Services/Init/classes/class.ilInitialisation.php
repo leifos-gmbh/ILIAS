@@ -3,6 +3,7 @@
 
 // TODO:
 use ILIAS\BackgroundTasks\Dependencies\DependencyMap\BaseDependencyMap;
+use ILIAS\BackgroundTasks\Implementation\Persistence\BasicPersistence;
 use ILIAS\Filesystem\Provider\FilesystemFactory;
 use ILIAS\Filesystem\Security\Sanitizing\FilenameSanitizerImpl;
 use ILIAS\FileUpload\Processor\BlacklistExtensionPreProcessor;
@@ -488,10 +489,12 @@ class ilInitialisation
         global $ilClientIniFile;
 
         if (!$ilClientIniFile->readVariable("client", "access")) {
-            $mess = array("en" => "The server is not available due to maintenance." .
+            $mess = array(
+                "en" => "The server is not available due to maintenance." .
                     " We apologise for any inconvenience.",
                 "de" => "Der Server ist aufgrund von Wartungsarbeiten nicht verfügbar." .
-                    " Wir bitten um Verständnis.");
+                    " Wir bitten um Verständnis."
+            );
             $mess_id = "init_error_maintenance";
 
             if (ilContext::hasHTML() && is_file("./maintenance.html")) {
@@ -918,7 +921,7 @@ class ilInitialisation
         } else {
             self::initGlobal('lng', ilLanguage::getFallbackInstance());
         }
-        if (is_object($rbacsystem)) {
+        if (is_object($rbacsystem) && $DIC->offsetExists('tree')) {
             $rbacsystem->initMemberView();
         }
     }
@@ -1884,8 +1887,7 @@ class ilInitialisation
             }
             $message = $a_message_static[$lang];
         }
-
-        return utf8_decode($message);
+        return $message;
     }
 
     /**
@@ -1901,6 +1903,14 @@ class ilInitialisation
         if (defined("ILIAS_HTTP_PATH") &&
             !stristr($a_target, ILIAS_HTTP_PATH)) {
             $a_target = ILIAS_HTTP_PATH . "/" . $a_target;
+        }
+
+        foreach (['ext_uid', 'soap_pw'] as $param) {
+            if (false === strpos($a_target, $param . '=') && isset($GLOBALS['DIC']->http()->request()->getQueryParams()[$param])) {
+                $a_target = \ilUtil::appendUrlParameterString($a_target, $param . '=' . \ilUtil::stripSlashes(
+                    $GLOBALS['DIC']->http()->request()->getQueryParams()[$param]
+                ));
+            }
         }
 
         if (ilContext::supportsRedirects()) {
@@ -1982,7 +1992,7 @@ class ilInitialisation
         };
 
         $c["bt.persistence"] = function ($c) {
-            return new \ILIAS\BackgroundTasks\Implementation\Persistence\BasicPersistence();
+            return BasicPersistence::instance();
         };
 
         $c["bt.injector"] = function ($c) {

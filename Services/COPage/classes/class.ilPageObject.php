@@ -1030,8 +1030,12 @@ abstract class ilPageObject
     /**
      * Copy content of page; replace page components with copies
      * where necessary (e.g. questions)
+     * @param false $a_clone_mobs
+     * @param int   $a_new_parent_id
+     * @param int   $obj_copy_id
+     * @return string|string[]|null
      */
-    public function copyXmlContent($a_clone_mobs = false)
+    public function copyXmlContent($a_clone_mobs = false, $a_new_parent_id = 0, $obj_copy_id = 0)
     {
         $xml = $this->getXmlContent();
         $temp_dom = domxml_open_mem(
@@ -1040,7 +1044,7 @@ abstract class ilPageObject
             $error
         );
         if (empty($error)) {
-            $this->handleCopiedContent($temp_dom, true, $a_clone_mobs);
+            $this->handleCopiedContent($temp_dom, true, $a_clone_mobs, $a_new_parent_id, $obj_copy_id);
         }
         $xml = $temp_dom->dump_mem(0, $this->encoding);
         $xml = preg_replace('/<\?xml[^>]*>/i', "", $xml);
@@ -1063,7 +1067,8 @@ abstract class ilPageObject
      * @param bool $a_self_ass
      * @param bool $a_clone_mobs
      */
-    public function handleCopiedContent($a_dom, $a_self_ass = true, $a_clone_mobs = false)
+    public function handleCopiedContent($a_dom, bool $a_self_ass = true, bool $a_clone_mobs = false,
+        int $new_parent_id = 0, int $obj_copy_id = 0)
     {
         include_once("./Services/COPage/classes/class.ilCOPagePCDef.php");
         $defs = ilCOPagePCDef::getPCDefinitions();
@@ -1094,7 +1099,7 @@ abstract class ilPageObject
                 // the page object is provided for ilPageComponentPlugin
                 ilPCPlugged::handleCopiedPluggedContent($this, $a_dom);
             } else {
-                $cl::handleCopiedContent($a_dom, $a_self_ass, $a_clone_mobs);
+                $cl::handleCopiedContent($a_dom, $a_self_ass, $a_clone_mobs, $new_parent_id, $obj_copy_id);
             }
         }
     }
@@ -4838,16 +4843,29 @@ abstract class ilPageObject
 
     /**
      * Copy page
-     * @param int    $a_id          target page id
-     * @param string $a_parent_type target parent type
-     * @param int    $a_parent_id   target parent id
+     * @param int    $a_id          target page id (new page)
+     * @param string $a_parent_type target parent type (new page)
+     * @param int    $a_new_parent_id   target parent id (new page)
      */
-    public function copy($a_id, $a_parent_type = "", $a_parent_id = 0, $a_clone_mobs = false)
+    /**
+     * @param int    $a_id              target page id (new page)
+     * @param string $a_parent_type
+     * @param int    $a_new_parent_id
+     * @param false  $a_clone_mobs
+     * @param int    $obj_copy_id       copy wizard id
+     */
+    public function copy(
+        $a_id,
+        $a_parent_type = "",
+        $a_new_parent_id = 0,
+        $a_clone_mobs = false,
+        $obj_copy_id = 0
+    )
     {
         if ($a_parent_type == "") {
             $a_parent_type = $this->getParentType();
-            if ($a_parent_id == 0) {
-                $a_parent_id = $this->getParentId();
+            if ($a_new_parent_id == 0) {
+                $a_new_parent_id = $this->getParentId();
             }
         }
 
@@ -4860,10 +4878,10 @@ abstract class ilPageObject
                 $existed = true;
             } else {
                 $new_page_object = ilPageObjectFactory::getInstance($a_parent_type, 0, 0, $l);
-                $new_page_object->setParentId($a_parent_id);
+                $new_page_object->setParentId($a_new_parent_id);
                 $new_page_object->setId($a_id);
             }
-            $new_page_object->setXMLContent($orig_page->copyXMLContent($a_clone_mobs));
+            $new_page_object->setXMLContent($orig_page->copyXMLContent($a_clone_mobs, $a_new_parent_id, $obj_copy_id));
             $new_page_object->setActive($orig_page->getActive());
             $new_page_object->setActivationStart($orig_page->getActivationStart());
             $new_page_object->setActivationEnd($orig_page->getActivationEnd());

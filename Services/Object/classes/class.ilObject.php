@@ -1878,7 +1878,7 @@ class ilObject
         }
         
         include_once('./Services/AdvancedMetaData/classes/class.ilAdvancedMDValues.php');
-        ilAdvancedMDValues::_cloneValues($this->getId(), $new_obj->getId());
+        ilAdvancedMDValues::_cloneValues($a_copy_id, $this->getId(), $new_obj->getId());
 
         // BEGIN WebDAV: Clone WebDAV properties
         $query = "INSERT INTO dav_property (obj_id,node_id,ns,name,value) " .

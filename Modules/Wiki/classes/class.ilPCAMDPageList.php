@@ -136,8 +136,16 @@ class ilPCAMDPageList extends ilPageContent
         
         return $res;
     }
-    
-    public static function handleCopiedContent(DOMDocument $a_domdoc, $a_self_ass = true, $a_clone_mobs = false)
+
+    /**
+     * @inheritDoc
+     */
+    public static function handleCopiedContent(
+        DOMDocument $a_domdoc,
+        bool $a_self_ass = true,
+        bool $a_clone_mobs = false,
+        int $new_parent_id = 0,
+        int $obj_copy_id = 0)
     {
         global $DIC;
 

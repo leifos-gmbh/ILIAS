@@ -326,21 +326,24 @@ class ilAdvancedMDRecord
     
     /**
      * Get selected records by object
-     *
      * @param string $a_obj_type object type
-     * @param string $a_ref_id reference id
+     * @param int    $a_id ref or obj id
      * @param string $a_sub_type sub type
+     * @param bool   $is_ref_id is is a ref id
+     * @return array
      */
-    public static function _getSelectedRecordsByObject($a_obj_type, $a_ref_id, $a_sub_type = "")
+    public static function _getSelectedRecordsByObject(string $a_obj_type, int $a_id, string $a_sub_type = "", bool $is_ref_id = true) : array
     {
         $records = array();
         //		ilUtil::printBacktrace(10);
-        //		var_dump($a_obj_type."-".$a_ref_id."-".$a_sub_type); exit;
+        //		var_dump($a_obj_type."-".$a_id."-".$a_sub_type); exit;
         if ($a_sub_type == "") {
             $a_sub_type = "-";
         }
-        
-        $a_obj_id = ilObject::_lookupObjId($a_ref_id);
+
+        $a_obj_id = $is_ref_id
+            ? ilObject::_lookupObjId($a_id)
+            : $a_id;
         
         // object-wide metadata configuration setting
         include_once 'Services/Container/classes/class.ilContainer.php';
@@ -354,10 +357,9 @@ class ilAdvancedMDRecord
         $optional = array();
         foreach (self::_getActivatedRecordsByObjectType($a_obj_type, $a_sub_type) as $record) {
             // check scope
-            if (self::isFilteredByScope($a_ref_id, $record->getScopes())) {
+            if ($is_ref_id && self::isFilteredByScope($a_id, $record->getScopes())) {
                 continue;
             }
-            
             foreach ($record->getAssignedObjectTypes() as $item) {
                 if ($record->getParentObject()) {
                     // only matching local records
@@ -369,7 +371,7 @@ class ilAdvancedMDRecord
                         continue;
                     }
                 }
-                
+
                 if ($item['obj_type'] == $a_obj_type &&
                     $item['sub_type'] == $a_sub_type) {
                     if ($item['optional']) {
@@ -379,7 +381,7 @@ class ilAdvancedMDRecord
                 }
             }
         }
-        
+
         if ($optional) {
             if (!$config_setting && !in_array($a_sub_type, array("orgu_type", "prg_type"))) { //#16925 + #17777
                 $selected = array();
@@ -573,7 +575,6 @@ class ilAdvancedMDRecord
             global $DIC;
 
             $ilDB = $DIC['ilDB'];
-
             $query = "INSERT INTO adv_md_record_objs (record_id,obj_type,sub_type,optional) " .
                 "VALUES( " .
                 $this->db->quote($this->getRecordId(), 'integer') . ", " .

@@ -4172,7 +4172,12 @@
 	</xsl:if>
 </xsl:template>
 
-<!-- helper functions -->
+<!-- Advanced MD Page List -->
+<xsl:template match="AMDForm">
+	[[[[[AMDForm;<xsl:value-of select="@RecordIds"/>]]]]]
+</xsl:template>
+
+	<!-- helper functions -->
 
 <xsl:template name="substring-before-last">
 	<xsl:param name="originalString" select="''" />

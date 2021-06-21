@@ -996,12 +996,14 @@ class ilPCTable extends ilPageContent
 
 
     /**
-     * Handle copied content. This function must, e.g. create copies of
-     * objects referenced within the content (e.g. question objects)
-     *
-     * @param DOMDocument $a_domdoc dom document
+     * @inheritDoc
      */
-    public static function handleCopiedContent(DOMDocument $a_domdoc, $a_self_ass = true, $a_clone_mobs = false)
+    public static function handleCopiedContent(
+        DOMDocument $a_domdoc,
+        bool $a_self_ass = true,
+        bool $a_clone_mobs = false,
+        int $new_parent_id = 0,
+        int $obj_copy_id = 0)
     {
         $xpath = new DOMXPath($a_domdoc);
         $nodes = $xpath->query("//Table");

@@ -18,7 +18,7 @@ class ilPageObjectFactory
      * @param int $a_id page id
      * @param int $a_old_nr history number of page
      * @param string $a_lang language
-     * @return object
+     * @return ilPageObject
      */
     public static function getInstance($a_parent_type, $a_id = 0, $a_old_nr = 0, $a_lang = "-")
     {

@@ -37,13 +37,15 @@ class ilAdvancedMDRecordGUI
     
     protected $editor_form; // [array]
 
-    // $adv_ref_id - $adv_type - $adv_subtype:
+    // $adv_id - $adv_type - $adv_subtype:
     // Object, that defines the adv md records being used. Default is $this->object, but the
     // context may set another object (e.g. media pool for media objects)
+    // $adv_id must be a ref id, if $in_repository is true,
+    // otherwise an object id
     /**
      * @var int
      */
-    protected $adv_ref_id = null;
+    protected $adv_id = null;
     /**
      * @var string
      */
@@ -58,16 +60,27 @@ class ilAdvancedMDRecordGUI
      */
     protected $user;
 
+    /**
+     * This is false e.g. for portfolios
+     * @var bool
+     */
+    protected $in_repository = true;
+
+    /**
+     * @var ?int[] id filter for adv records
+     */
+    protected $record_filter = null;
 
     /**
      * Constructor
-     *
-     * @access public
-     * @param int mode either MODE_EDITOR or MODE_SEARCH
-     * @param int obj_type
-     *
+     * @param        $a_mode        MODE_EDITOR or MODE_SEARCH
+     * @param string $a_obj_type
+     * @param string $a_obj_id
+     * @param string $a_sub_type
+     * @param string $a_sub_id
+     * @param bool   $in_repository
      */
-    public function __construct($a_mode, $a_obj_type = '', $a_obj_id = '', $a_sub_type = '', $a_sub_id = '')
+    public function __construct($a_mode, $a_obj_type = '', $a_obj_id = '', $a_sub_type = '', $a_sub_id = '', $in_repository = true)
     {
         global $DIC;
 
@@ -81,21 +94,23 @@ class ilAdvancedMDRecordGUI
         $this->sub_type = $a_sub_type;
         $this->sub_id = $a_sub_id;
         
-        if ($a_obj_id) {
+        if ($a_obj_id && $this->in_repository) {
             $refs = ilObject::_getAllReferences($a_obj_id);
             $this->ref_id = end($refs);
         }
+        $this->in_repository = $in_repository;
     }
 
     /**
      * Set object, that defines the adv md records being used. Default is $this->object, but the
      * context may set another object (e.g. media pool for media objects)
-     *
-     * @param string $a_val adv type
+     * @param        $a_adv_id  ref id, if $in_repository is true, otherwise object id
+     * @param        $a_adv_type
+     * @param string $a_adv_subtype
      */
-    public function setAdvMdRecordObject($a_adv_ref_id, $a_adv_type, $a_adv_subtype = "-")
+    public function setAdvMdRecordObject($a_adv_id, $a_adv_type, $a_adv_subtype = "-")
     {
-        $this->adv_ref_id = $a_adv_ref_id;
+        $this->adv_id = $a_adv_id;
         $this->adv_type = $a_adv_type;
         $this->adv_subtype = $a_adv_subtype;
     }
@@ -105,12 +120,16 @@ class ilAdvancedMDRecordGUI
      *
      * @return array adv type
      */
-    public function getAdvMdRecordObject()
+    public function getAdvMdRecordObject() : array
     {
         if ($this->adv_type == null) {
-            return [$this->ref_id, $this->obj_type, $this->sub_type];
+            if ($this->in_repository) {
+                return [$this->ref_id, $this->obj_type, $this->sub_type];
+            } else {
+                return [$this->obj_id, $this->obj_type, $this->sub_type];
+            }
         }
-        return [$this->adv_ref_id, $this->adv_type, $this->adv_subtype];
+        return [$this->adv_id, $this->adv_type, $this->adv_subtype];
     }
 
 
@@ -159,7 +178,24 @@ class ilAdvancedMDRecordGUI
     {
         $this->info = $info;
     }
-    
+
+    /**
+     * Set advanced record filter
+     * @param ?int[] $filter
+     */
+    public function setRecordFilter(?array $filter = null) : void
+    {
+        $this->record_filter = $filter;
+    }
+
+    /**
+     * Check filter
+     */
+    protected function checkFilter($record_id) : bool
+    {
+        return !(is_array($this->record_filter) && !in_array($record_id, $this->record_filter));
+    }
+
     /**
      * Get HTML
      *
@@ -211,7 +247,6 @@ class ilAdvancedMDRecordGUI
     {
         include_once('Services/AdvancedMetaData/classes/class.ilAdvancedMDValues.php');
         $this->editor_form = array();
-        
         foreach ($this->getActiveRecords() as $record_obj) {
 
             $record_id = $record_obj->getRecordId();
@@ -222,6 +257,10 @@ class ilAdvancedMDRecordGUI
             
             // empty record?
             if (!sizeof($defs)) {
+                continue;
+            }
+
+            if (!$this->checkFilter($record_id)) {
                 continue;
             }
 
@@ -716,8 +755,8 @@ class ilAdvancedMDRecordGUI
     protected function getActiveRecords()
     {
         include_once('Services/AdvancedMetaData/classes/class.ilAdvancedMDRecord.php');
-        list($adv_ref_id, $adv_type, $adv_subtype) = $this->getAdvMdRecordObject();
-        return ilAdvancedMDRecord::_getSelectedRecordsByObject($adv_type, $adv_ref_id, $adv_subtype);
+        list($adv_id, $adv_type, $adv_subtype) = $this->getAdvMdRecordObject();
+        return ilAdvancedMDRecord::_getSelectedRecordsByObject($adv_type, $adv_id, $adv_subtype, $this->in_repository);
     }
     
     /**

@@ -329,13 +329,15 @@ class ilAdvancedMDValues
     /**
      * Clone Advanced Meta Data
      *
-     * @param int source obj_id
-     * @param int target obj_id
-     * @param string sub_type (both source/target)
-     * @param int source sub_id
-     * @param int target sub_id
+     * @param int  $copy_id
+     * @param int  $a_source_id
+     * @param int  $a_target_id
+     * @param string $a_sub_type
+     * @param int $a_source_sub_id
+     * @param int $a_target_sub_id
+     * @return bool
      */
-    public static function _cloneValues($a_source_id, $a_target_id, $a_sub_type = null, $a_source_sub_id = null, $a_target_sub_id = null)
+    public static function _cloneValues($copy_id, $a_source_id, $a_target_id, $a_sub_type = null, $a_source_sub_id = null, $a_target_sub_id = null)
     {
         global $DIC;
 
@@ -347,18 +349,24 @@ class ilAdvancedMDValues
         include_once "Services/AdvancedMetaData/classes/class.ilAdvancedMDRecord.php";
         $new_records = $fields_map = array();
 
+        $record_mapping = [];
         foreach (ilAdvancedMDRecord::_getRecords() as $record) {
             if ($record->getParentObject() == $a_source_id) {
                 $tmp = array();
                 if ($a_source_id != $a_target_id) {
                     $new_records[$record->getRecordId()] = $record->_clone($tmp, $a_target_id);
+                    $record_mapping[$record->getRecordId()] = $new_records[$record->getRecordId()]->getRecordId();
                 } else {
                     $new_records[$record->getRecordId()] = $record->getRecordId();
                 }
                 $fields_map[$record->getRecordId()] = $tmp;
             }
         }
-        
+        if ($copy_id > 0) {
+            $cp_options = ilCopyWizardOptions::_getInstance($copy_id);
+            $cp_options->appendMapping($a_target_id . '_adv_rec', (array) $record_mapping);
+            $cp_options->read();        // otherwise mapping will not be available for getMappings
+        }
         
         // object record selection
         

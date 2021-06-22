@@ -16,8 +16,13 @@ class cdUtil
      */
     public static function isDAF()
     {
-        global $ilClientIniFile;
+        global $DIC;
 
-        return ($ilClientIniFile->readVariable("system", "DAF") == "1");
+        if (isset($DIC['ilClientIniFile'])) {
+            $ilClientIniFile = $DIC['ilClientIniFile'];
+            return ($ilClientIniFile->readVariable("system", "DAF") == "1");
+        }
+
+        return false;
     }
 }

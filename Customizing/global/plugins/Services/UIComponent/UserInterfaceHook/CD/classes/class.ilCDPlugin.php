@@ -5,9 +5,7 @@ include_once("./Services/UIComponent/classes/class.ilUserInterfaceHookPlugin.php
 /**
  * User interface hook for hsu
  *
- * @author Alex Killing <alex.killing@gmx.de>
- * @version $Id$
- *
+ * @author Alexander Killing <killing@leifos.de>
  */
 class ilCDPlugin extends ilUserInterfaceHookPlugin
 {
@@ -18,8 +16,11 @@ class ilCDPlugin extends ilUserInterfaceHookPlugin
     {
         parent::__construct();
         global $DIC;
-        $this->includeClass("MainMenuProvider.php");
-        $this->provider_collection->setMainBarProvider(new \leifos\CD\MainMenuProvider($DIC, $this));
+
+        if (isset($DIC["global_screen"])) {
+            $this->includeClass("MainMenuProvider.php");
+            $this->provider_collection->setMainBarProvider(new \leifos\CD\MainMenuProvider($DIC, $this));
+        }
     }
 
     public function getPluginName()

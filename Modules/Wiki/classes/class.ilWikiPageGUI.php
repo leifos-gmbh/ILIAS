@@ -4,6 +4,8 @@
 include_once("./Services/COPage/classes/class.ilPageObjectGUI.php");
 include_once("./Modules/Wiki/classes/class.ilWikiPage.php");
 
+use \ILIAS\DI\HTTPServices;
+
 /**
 * Class ilWikiPage GUI class
 *
@@ -45,6 +47,11 @@ class ilWikiPageGUI extends ilPageObjectGUI
     protected $ui;
 
     /**
+     * @var HTTPServices
+     */
+    protected $http;
+
+    /**
     * Constructor
     */
     public function __construct($a_id = 0, $a_old_nr = 0, $a_wiki_ref_id = 0)
@@ -62,6 +69,7 @@ class ilWikiPageGUI extends ilPageObjectGUI
         $this->toolbar = $DIC->toolbar();
         $tpl = $DIC["tpl"];
         $this->ui = $DIC->ui();
+        $this->http = $DIC->http();
 
         // needed for notifications
         $this->setWikiRefId($a_wiki_ref_id);
@@ -491,16 +499,9 @@ class ilWikiPageGUI extends ilPageObjectGUI
     
     public function showPage()
     {
-        $tpl = $this->tpl;
-        $ilCtrl = $this->ctrl;
-        
-        // content style
-        /*		include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
-                $tpl->setCurrentBlock("ContentStyle");
-                $tpl->setVariable("LOCATION_CONTENT_STYLESHEET",
-                    ilObjStyleSheet::getContentStylePath(0));
-                $tpl->parseCurrentBlock();
-        */
+        if ($this->getOutputMode() == ilPageObjectGUI::PRESENTATION) {
+            $this->initToolbar();
+        }
         $this->setTemplateOutput(false);
         
         if (!$this->getAbstractOnly()) {
@@ -512,7 +513,45 @@ class ilWikiPageGUI extends ilPageObjectGUI
     
         return parent::showPage();
     }
-    
+
+    /**
+     * Init toolbar
+     * @param
+     * @return
+     */
+    protected function initToolbar()
+    {
+        $toolbar = $this->toolbar;
+
+        $print_view = $this->getPrintView();
+        $modal_elements = $print_view->getModalElements($this->ctrl->getLinkTarget(
+            $this,
+            "printViewSelection"
+        ));
+        $toolbar->addComponent($modal_elements->button);
+        $toolbar->addComponent($modal_elements->modal);
+    }
+
+    protected function getPrintView() : \ILIAS\Export\PrintProcessGUI
+    {
+        $provider = new \ILIAS\Wiki\PrintViewProviderGUI(
+            $this->lng,
+            $this->ctrl,
+            $this->getWikiPage()->getWikiRefId(),
+            []
+        );
+
+        return new \ILIAS\Export\PrintProcessGUI(
+            $provider,
+            $this->http,
+            $this->ui,
+            $this->lng
+        );
+
+    }
+
+
+
     protected function increaseViewCount()
     {
         $ilUser = $this->user;
@@ -623,17 +662,6 @@ class ilWikiPageGUI extends ilPageObjectGUI
                 "whatLinksHere"
             ),
             "whatLinksHere"
-        );
-        //$ilTabs->addTarget("wiki_print_view",
-        //	$this->ctrl->getLinkTargetByClass("ilobjwikigui",
-        //	"printViewSelection"), "printViewSelection");
-        $ilTabs->addTarget(
-            "wiki_print_view",
-            $this->ctrl->getLinkTargetByClass(
-                "ilwikipagegui",
-                "printViewSelection"
-            ),
-            "printViewSelection"
         );
     }
 
@@ -749,84 +777,12 @@ class ilWikiPageGUI extends ilPageObjectGUI
     //// Print view selection
     ////
 
-    /**
-     * Print view selection
-     *
-     * @param
-     * @return
-     */
     public function printViewSelection()
     {
-        $ilUser = $this->user;
-        $lng = $this->lng;
-        $ilToolbar = $this->toolbar;
-        $ilCtrl = $this->ctrl;
-        $tpl = $this->tpl;
-
-        /*$ilToolbar->setFormAction($ilCtrl->getFormActionByClass("ilobjwikigui", "printView"),
-            false, "print_view");
-        $ilToolbar->addFormButton($lng->txt("cont_show_print_view"), "printView");
-        $ilToolbar->setCloseFormTag(false);*/
-
-        $this->initPrintViewSelectionForm();
-
-        $tpl->setContent($this->form->getHTML());
+        $view = $this->getPrintView ();
+        $view->sendForm();
     }
 
-    /**
-     * Init print view selection form.
-     */
-    public function initPrintViewSelectionForm()
-    {
-        $lng = $this->lng;
-        $ilCtrl = $this->ctrl;
-
-        $pages = ilWikiPage::getAllWikiPages(ilObject::_lookupObjId($this->getWikiRefId()));
-
-        include_once("Services/Form/classes/class.ilPropertyFormGUI.php");
-        $this->form = new ilPropertyFormGUI();
-        
-        // because of PDF export
-        $this->form->setPreventDoubleSubmission(false);
-        
-        //var_dump($pages);
-        // selection type
-        $radg = new ilRadioGroupInputGUI($lng->txt("cont_selection"), "sel_type");
-        $radg->setValue("page");
-        $op1 = new ilRadioOption($lng->txt("cont_current_page"), "page");
-        $radg->addOption($op1);
-        $op2 = new ilRadioOption($lng->txt("wiki_whole_wiki")
-                . " (" . $lng->txt("wiki_pages") . ": " . count($pages) . ")", "wiki");
-        $radg->addOption($op2);
-        $op3 = new ilRadioOption($lng->txt("wiki_selected_pages"), "selection");
-        $radg->addOption($op3);
-
-        include_once("./Services/Form/classes/class.ilNestedListInputGUI.php");
-        $nl = new ilNestedListInputGUI("", "obj_id");
-        $op3->addSubItem($nl);
-
-        foreach ($pages as $p) {
-            $nl->addListNode(
-                $p["id"],
-                $p["title"],
-                0,
-                false,
-                false,
-                ilUtil::getImagePath("icon_pg.svg"),
-                $lng->txt("wiki_page")
-            );
-        }
-
-        $this->form->addItem($radg);
-
-        $this->form->addCommandButton("printViewOrder", $lng->txt("wiki_show_print_view"));
-        $this->form->addCommandButton("pdfExportOrder", $lng->txt("wiki_show_pdf_export"));
-        //$this->form->setOpenTag(false);
-        //$this->form->setCloseTag(false);
-
-        $this->form->setTitle($lng->txt("cont_print_selection"));
-        $this->form->setFormAction($ilCtrl->getFormAction($this, "printViewOrder"));
-    }
 
     public function printViewOrder()
     {

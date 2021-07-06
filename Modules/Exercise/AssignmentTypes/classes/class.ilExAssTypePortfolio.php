@@ -9,6 +9,8 @@
  */
 class ilExAssTypePortfolio implements ilExAssignmentTypeInterface
 {
+    protected const STR_IDENTIFIER = "prtf";
+
     /**
      * @var ilSetting
      */
@@ -113,6 +115,11 @@ class ilExAssTypePortfolio implements ilExAssignmentTypeInterface
      */
     public function getStringIdentifier() : string
     {
-        return ilExAssignmentTypes::STR_IDENTIFIER_PORTFOLIO;
+        return self::STR_IDENTIFIER;
+    }
+
+    public function getExportObjIdForResourceId(int $resource_id) : int
+    {
+        return $resource_id;
     }
 }

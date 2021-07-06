@@ -2011,37 +2011,7 @@ class ilLMPresentationGUI
             return;
         }
 
-
-
-//        $this->setContentStyles();
-//        $this->renderPageTitle();
-
-//        $this->tpl->loadStandardTemplate();
-
-//        $this->renderTabs("print", 0);
-        /*$this->tpl->setVariable("TABS", $this->lm_gui->setilLMMenu($this->offlineMode()
-            ,$this->getExportFormat(), "print", true,false, 0,
-            $this->lang, $this->export_all_languages));*/
-
-
         $tpl = new ilTemplate("tpl.lm_print_selection.html", true, true, "Modules/LearningModule");
-
-//        $this->ilLocator(true);
-        /*        $this->tpl->addBlockFile(
-                    "ADM_CONTENT",
-                    "adm_content",
-                    "tpl.lm_print_selection.html",
-                    "Modules/LearningModule"
-                );*/
-
-        // set title header
-//        $this->tpl->setTitle($this->getLMPresentationTitle());
-//        $this->tpl->setTitleIcon(ilUtil::getImagePath("icon_lm.svg"));
-
-        /*$this->tpl->setVariable("TXT_BACK", $this->lng->txt("back"));
-        $this->ctrl->setParameterByClass("illmpresentationgui", "obj_id", $this->requested_obj_id);
-        $this->tpl->setVariable("LINK_BACK",
-            $this->ctrl->getLinkTargetByClass("illmpresentationgui", ""));*/
 
         $this->ctrl->setParameterByClass("illmpresentationgui", "obj_id", $this->requested_obj_id);
         $tpl->setVariable("FORMACTION", $this->ctrl->getFormaction($this));

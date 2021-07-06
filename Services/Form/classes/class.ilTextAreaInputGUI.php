@@ -490,7 +490,6 @@ class ilTextAreaInputGUI extends ilSubEnabledFormPropertyGUI
                 $rtestring = ilRTE::_getRTEClassname();
                 include_once "./Services/RTE/classes/class.$rtestring.php";
                 $rte = new $rtestring($this->rteSupport['version']);
-
                 $rte->setInitialWidth($this->getInitialRteWidth());
                 
                 // @todo: Check this.

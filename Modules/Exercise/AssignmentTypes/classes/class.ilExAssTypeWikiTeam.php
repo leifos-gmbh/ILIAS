@@ -9,6 +9,8 @@
  */
 class ilExAssTypeWikiTeam implements ilExAssignmentTypeInterface
 {
+    protected const STR_IDENTIFIER = "wiki";
+
     /**
      * @var ilLanguage
      */
@@ -113,6 +115,18 @@ class ilExAssTypeWikiTeam implements ilExAssignmentTypeInterface
             );
             $submission->uploadFile($meta, true);
 
+            // print version
+            $file = $file = $exp->buildExportFile(true);
+            $size = filesize($file);
+            if ($size) {
+                $meta = array(
+                    "name" => $a_wiki_ref_id . "print",
+                    "tmp_name" => $file,
+                    "size" => $size
+                );
+                $submission->uploadFile($meta, true);
+            }
+
             $this->handleNewUpload($ass, $submission);
             return true;
         }
@@ -174,7 +188,7 @@ class ilExAssTypeWikiTeam implements ilExAssignmentTypeInterface
      */
     public function supportsWebDirAccess() : bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -182,6 +196,13 @@ class ilExAssTypeWikiTeam implements ilExAssignmentTypeInterface
      */
     public function getStringIdentifier() : string
     {
-        // TODO: Implement getSubmissionStringIdentifier() method.
+        return self::STR_IDENTIFIER;
     }
+
+    // In case of wikis we get the ref id as resource id
+    public function getExportObjIdForResourceId(int $resource_id) : int
+    {
+        return ilObject::_lookupObjectId($resource_id);
+    }
+
 }

@@ -47,12 +47,12 @@ class WikiHtmlExport
     protected $mode = self::MODE_DEFAULT;
 
     /**
-     * @var ilLogger
+     * @var \ilLogger
      */
     protected $log;
 
     /**
-     * @var ilCOPageHTMLExport
+     * @var \ilCOPageHTMLExport
      */
     protected $co_page_html_export;
 
@@ -75,6 +75,9 @@ class WikiHtmlExport
      * @var \ilWikiUserHTMLExport
      */
     protected $user_html_exp;
+
+    // has global context been initialized?
+    protected static $context_init = false;
 
     /**
      * Constructor
@@ -122,7 +125,7 @@ class WikiHtmlExport
      * @throws \ilTemplateException
      * @throws \ilWikiExportException
      */
-    public function buildExportFile()
+    public function buildExportFile($print_version = false)
     {
         $global_screen = $this->global_screen;
         $ilDB = $this->db;
@@ -155,6 +158,11 @@ class WikiHtmlExport
         } else {
             $subdir = $this->wiki->getType() . "_" . $this->wiki->getId();
         }
+
+        if ($print_version) {
+            $subdir.= "print";
+        }
+
         $this->export_dir = $exp_dir . "/" . $subdir;
 
         $this->export_util = new \ILIAS\Services\Export\HTML\Util($exp_dir, $subdir);
@@ -177,8 +185,16 @@ class WikiHtmlExport
 
         // export pages
         $this->log->debug("export pages");
-        $global_screen->tool()->context()->current()->addAdditionalData(\ilHTMLExportViewLayoutProvider::HTML_EXPORT_RENDERING, true);
-        $this->exportHTMLPages();
+        if (!self::$context_init) {
+            $global_screen->tool()->context()->current()->addAdditionalData(\ilHTMLExportViewLayoutProvider::HTML_EXPORT_RENDERING,
+                true);
+            self::$context_init = true;
+        }
+        if ($print_version) {
+            $this->exportHTMLPagesPrint();
+        } else {
+            $this->exportHTMLPages();
+        }
         $this->exportUserImages();
 
         $this->export_util->exportResourceFiles($global_screen, $this->export_dir);
@@ -235,6 +251,28 @@ class WikiHtmlExport
             }
         }
         $this->co_page_html_export->exportPageElements($this->updateUserHTMLStatusForPageElements);
+    }
+
+    /**
+     * Export all pages as one print version
+     */
+    public function exportHTMLPagesPrint()
+    {
+        // collect page elements
+        $pages = \ilWikiPage::getAllWikiPages($this->wiki->getId());
+        foreach ($pages as $page) {
+            if (\ilWikiPage::_exists("wpg", $page["id"])) {
+                $this->co_page_html_export->collectPageElements("wpg:pg", $page["id"]);
+            }
+        }
+        $this->co_page_html_export->exportPageElements();
+
+        // render print view
+        $wiki_gui = new \ilObjWikiGUI([], $this->wiki->getRefId(), true);
+        $print_view = $wiki_gui->getPrintView();
+        $print_view->setOffline(true);
+        $html = $print_view->renderPrintView();
+        file_put_contents($this->export_dir . "/index.html", $html);
     }
 
     /**

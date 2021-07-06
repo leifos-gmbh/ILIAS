@@ -470,11 +470,13 @@ class ilExSubmission
      * Get submission items (not only files)
      * @todo this also returns non-file entries, rename this, see dev.txt.php
      * @param array|null $a_file_ids
-     * @param bool $a_only_valid
-     * @param null $a_min_timestamp
+     * @param false      $a_only_valid
+     * @param null       $a_min_timestamp
+     * @param false      $print_versions
      * @return array
      */
-    public function getFiles(array $a_file_ids = null, $a_only_valid = false, $a_min_timestamp = null)
+    public function getFiles(array $a_file_ids = null, $a_only_valid = false, $a_min_timestamp = null,
+        $print_versions = false)
     {
         $ilDB = $this->db;
         
@@ -529,7 +531,18 @@ class ilExSubmission
                 }
             }
         }
-                
+
+        // filter print versions
+        if (in_array($this->assignment->getType(), [
+            ilExAssignment::TYPE_BLOG,
+            ilExAssignment::TYPE_PORTFOLIO,
+            ilExAssignment::TYPE_WIKI_TEAM
+        ])) {
+            $delivered_files = array_filter($delivered_files, function ($i) use ($print_versions) {
+                return ((substr($i["filetitle"], strlen($i["filetitle"]) - 5) == "print") == $print_versions);
+            });
+        }
+
         return $delivered_files;
     }
         
@@ -758,6 +771,7 @@ class ilExSubmission
         }
     
         $files = $this->getFiles($a_file_ids, false, $download_time);
+
         if ($files) {
             if (sizeof($files) == 1) {
                 $file = array_pop($files);

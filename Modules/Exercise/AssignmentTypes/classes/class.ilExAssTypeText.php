@@ -100,4 +100,10 @@ class ilExAssTypeText implements ilExAssignmentTypeInterface
     {
         // TODO: Implement getSubmissionStringIdentifier() method.
     }
+
+    public function getExportObjIdForResourceId(int $resource_id) : int
+    {
+        return 0;
+    }
+
 }

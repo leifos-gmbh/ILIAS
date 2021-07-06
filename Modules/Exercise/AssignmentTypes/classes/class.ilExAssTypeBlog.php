@@ -9,6 +9,8 @@
  */
 class ilExAssTypeBlog implements ilExAssignmentTypeInterface
 {
+    protected const STR_IDENTIFIER = "blog";
+
     /**
      * @var ilSetting
      */
@@ -104,11 +106,27 @@ class ilExAssTypeBlog implements ilExAssignmentTypeInterface
      */
     public function supportsWebDirAccess() : bool
     {
-        return false;
+        return true;
     }
 
+    /**
+     *  @inheritdoc
+     */
     public function getStringIdentifier() : string
     {
-        // TODO: Implement getSubmissionStringIdentifier() method.
+        return self::STR_IDENTIFIER;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getExportObjIdForResourceId(int $resource_id) : int
+    {
+        // in case of blogs the $resource id is the workspace id
+        $tree = new ilWorkspaceTree(0);
+        $owner = $tree->lookupOwner($resource_id);
+        $tree = new ilWorkspaceTree($owner);
+        return $tree->lookupObjectId($resource_id);
+    }
+
 }

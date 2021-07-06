@@ -3,6 +3,7 @@
 /* Copyright (c) 1998-2009 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 use \ILIAS\Wiki\Export;
+use \ILIAS\DI\HTTPServices;
 
 /**
  * Class ilObjWikiGUI
@@ -57,6 +58,11 @@ class ilObjWikiGUI extends ilObjectGUI
     protected $req_with_comments = false;
 
     /**
+     * @var HTTPServices
+     */
+    protected $http;
+
+    /**
     * Constructor
     * @access public
     */
@@ -77,6 +83,7 @@ class ilObjWikiGUI extends ilObjectGUI
         $this->toolbar = $DIC->toolbar();
         $ilCtrl = $DIC->ctrl();
         $lng = $DIC->language();
+        $this->http = $DIC->http();
         
         $this->type = "wiki";
 
@@ -1599,52 +1606,29 @@ class ilObjWikiGUI extends ilObjectGUI
         
         return $page_ids;
     }
-    
+
+    public function getPrintView() : \ILIAS\Export\PrintProcessGUI
+    {
+        $provider = new \ILIAS\Wiki\PrintViewProviderGUI(
+            $this->lng,
+            $this->ctrl,
+            $this->object->getRefId(),
+            $this->getPrintPageIds()
+        );
+
+        return new \ILIAS\Export\PrintProcessGUI(
+            $provider,
+            $this->http,
+            $this->ui,
+            $this->lng
+        );
+    }
+
+
     public function printViewObject($a_pdf_export = false)
     {
-        global $tpl;
-        $tpl = $this->tpl;
-
-        $tabs = $this->tabs_gui;
-
-        $tabs->clearTargets();
-        $tabs->setBackTarget(
-            $this->lng->txt("back"),
-            $this->ctrl->getLinkTargetByClass("ilwikipagegui", "printViewSelection")
-        );
-        
-        $page_ids = $this->getPrintPageIds();
-        if (!$page_ids) {
-            $this->ctrl->redirect($this, "");
-        }
-                                
-        $this->setContentStyleSheet($tpl);
-
-        $page_content = "";
-        foreach ($page_ids as $p_id) {
-            $page_gui = new ilWikiPageGUI($p_id);
-            $page_gui->setWiki($this->object);
-            $page_gui->setOutputMode("print");
-            $page_content .= $page_gui->showPage();
-            
-            if ($a_pdf_export) {
-                $page_content .= '<p style="page-break-after:always;"></p>';
-            }
-        }
-        
-        //$page_content = '<div class="ilInvisibleBorder">' . $page_content . '</div>';
-        
-        if (!$a_pdf_export) {
-            $tpl->addOnLoadCode("il.Util.print();");
-        }
-        
-        $tpl->setContent($page_content);
-        
-        if (!$a_pdf_export) {
-//            $tpl->printToStdout(false);
-        } else {
-            return $tpl->printToString();
-        }
+        $print_view = $this->getPrintView();
+        $print_view->sendPrintView();
     }
     
     public function pdfExportObject()

@@ -11,7 +11,6 @@
  */
 class ilExAssignmentTypes
 {
-    const STR_IDENTIFIER_PORTFOLIO = "prtf";
 
     /**
      * @var ilExerciseInternalService

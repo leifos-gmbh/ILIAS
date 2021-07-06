@@ -71,4 +71,6 @@ interface ilExAssignmentTypeInterface
      * @return string
      */
     public function getStringIdentifier() : string;
+
+    public function getExportObjIdForResourceId(int $resource_id) : int;
 }

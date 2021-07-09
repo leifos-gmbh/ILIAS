@@ -186,6 +186,7 @@ class ilObjSurvey extends ilObject
     const MODE_STANDARD = 0;
     const MODE_360 = 1;
     const MODE_SELF_EVAL = 2;
+    const MODE_IND_FEEDB = 3;
 
     //self evaluation only access to results
     const RESULTS_SELF_EVAL_NONE = 0;
@@ -199,6 +200,11 @@ class ilObjSurvey extends ilObject
     protected $invitation_manager;
 
     /**
+     * @var \ILIAS\Survey\InternalService
+     */
+    protected $survey_service;
+
+    /**
     * Constructor
     * @access	public
     * @param	integer	reference_id or object_id
@@ -206,7 +212,10 @@ class ilObjSurvey extends ilObject
     */
     public function __construct($a_id = 0, $a_call_by_reference = true)
     {
+        /** @var \ILIAS\DI\Container $DIC */
         global $DIC;
+
+        $this->survey_service = $DIC->survey()->internal();
 
         $this->user = $DIC->user();
         $this->lng = $DIC->language();
@@ -234,7 +243,11 @@ class ilObjSurvey extends ilObject
         $this->mode = self::MODE_STANDARD;
         $this->mode_self_eval_results = self::RESULTS_SELF_EVAL_OWN;
 
-        $this->invitation_manager = new Participants\InvitationsManager();
+        $this->invitation_manager = $this
+            ->survey_service
+            ->domain()
+            ->participants()
+            ->invitations();
 
         parent::__construct($a_id, $a_call_by_reference);
     }

@@ -70,10 +70,17 @@ class ilSurveyParticipantsGUI
      * @var Participants\InvitationsManager
      */
     protected $invitation_manager;
-    
+
+    /**
+     * @var \ILIAS\Survey\InternalService
+     */
+    protected $survey_service;
+
     public function __construct(ilObjSurveyGUI $a_parent_gui, $a_has_write_access)
     {
         global $DIC;
+
+        $this->survey_service = $DIC->survey()->internal();
 
         $this->tabs = $DIC->tabs();
         $this->toolbar = $DIC->toolbar();
@@ -93,7 +100,11 @@ class ilSurveyParticipantsGUI
         $this->ctrl = $ilCtrl;
         $this->lng = $lng;
         $this->tpl = $tpl;
-        $this->invitation_manager = new Participants\InvitationsManager();
+        $this->invitation_manager = $this
+            ->survey_service
+            ->domain()
+            ->participants()
+            ->invitations();
     }
     
     protected function handleWriteAccess()

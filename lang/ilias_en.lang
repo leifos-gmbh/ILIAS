@@ -14,6 +14,8 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+survey#:#svy_ind_feedb_mode#:#Individual Feedback
+survey#:#svy_ind_feedb_info#:#Users get distinct evaluations by others.
 exc#:#exc_print_pdf#:#Print/PDF
 exp#:#exp_print_pdf_info#:#To create a PDF please use the "Print to PDF" target as soon as the print view is presented.
 exp#:#exp_show_print_view#:#Show Print View

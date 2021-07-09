@@ -331,6 +331,10 @@ class Container extends \Pimple\Container
         return $this['resource_storage'];
     }
 
+    public function survey() : \ILIAS\Survey\Service
+    {
+        return new \ILIAS\Survey\Service();
+    }
 
     /**
      * Note: Only use isDependencyAvailable if strictly required. The need for this,

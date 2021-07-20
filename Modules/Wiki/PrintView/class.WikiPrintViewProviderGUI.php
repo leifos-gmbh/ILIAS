@@ -2,15 +2,16 @@
 
 /* Copyright (c) 1998-2021 ILIAS open source, GPLv3, see LICENSE */
 
-namespace ILIAS\Blog;
+namespace ILIAS\Wiki;
 use \ILIAS\COPage;
 use \ILIAS\Export;
+
 
 /**
  *
  * @author Alexander Killing <killing@leifos.de>
  */
-class PrintViewProviderGUI extends Export\AbstractPrintViewProvider
+class WikiPrintViewProviderGUI extends Export\AbstractPrintViewProvider
 {
     /**
      * @var \ilLanguage
@@ -23,58 +24,44 @@ class PrintViewProviderGUI extends Export\AbstractPrintViewProvider
     protected $selected_pages = null;
 
     /**
-     * @var \ilObjBlog
+     * @var \ilObjWiki
      */
-    protected $blog;
+    protected $wiki;
 
     /**
      * @var \ilCtrl
      */
     protected $ctrl;
 
-    protected $access_handler;
-
-    /**
-     * @var int
-     */
-    protected $style_sheet_id = 0;
-
-    /**
-     * @var int
-     */
-    protected $node_id = 0;
-
     /**
      * PrintView constructor.
      * @param \ilLanguage $lng
      * @param \ilCtrl     $ctrl
-     * @param \ilObjBlog  $blog
+     * @param int         $wiki_ref_id
      * @param array       $selected_pages
      */
     public function __construct(
         \ilLanguage $lng,
         \ilCtrl $ctrl,
-        \ilObjBlog $blog,
-        int $node_id,
-        $access_handler,
-        $style_id,
-        ?array $selected_pages = null
+        int $wiki_ref_id,
+        ?array $selected_pages
     ) {
         $this->lng = $lng;
         $this->ctrl = $ctrl;
-        $this->blog = $blog;
-        $this->node_id = $node_id;
-        $this->access_handler = $access_handler;
-        $this->style_sheet_id = $style_id;
-
-        $this->selected_pages = $selected_pages;
+        $this->wiki = new \ilObjWiki($wiki_ref_id);
+        $this->selected_pages = (!is_null($selected_pages))
+            ? $selected_pages
+            : array_map(function ($p) {
+                    return $p["id"];
+                }, \ilWikiPage::getAllWikiPages($this->wiki->getId())
+            );
     }
 
     public function getTemplateInjectors() : array
     {
         $resource_collector = new COPage\ResourcesCollector(
             \ilPageObjectGUI::OFFLINE,
-            new \ilBlogPosting()
+            new \ilWikiPage()
         );
         $resource_injector = new COPage\ResourcesInjector($resource_collector);
 
@@ -89,22 +76,9 @@ class PrintViewProviderGUI extends Export\AbstractPrintViewProvider
     {
         $print_pages = [];
 
-        $selected_pages = (is_array($this->selected_pages))
-            ? $this->selected_pages
-            : array_map(function ($i) {
-                return $i["id"];
-            }, \ilBlogPosting::getAllPostings($this->blog->getId()));
-
-        foreach ($selected_pages as $p_id) {
-            $page_gui = new \ilBlogPostingGUI(
-                $this->node_id,
-                $this->access_handler,
-                $p_id,
-                0,
-                false,
-                false,
-                $this->style_sheet_id
-            );
+        foreach ($this->selected_pages as $p_id) {
+            $page_gui = new \ilWikiPageGUI($p_id);
+            $page_gui->setWiki($this->wiki);
             $page_gui->setOutputMode($this->getOutputMode());
             $print_pages[] = $page_gui->showPage();
         }
@@ -116,7 +90,10 @@ class PrintViewProviderGUI extends Export\AbstractPrintViewProvider
     {
         $lng = $this->lng;
         $ilCtrl = $this->ctrl;
-        $postings = \ilBlogPosting::getAllPostings($this->blog->getId());
+
+        $pages = \ilWikiPage::getAllWikiPages(
+            \ilObject::_lookupObjId($this->wiki->getRefId())
+        );
 
         $form = new \ilPropertyFormGUI();
 
@@ -124,16 +101,18 @@ class PrintViewProviderGUI extends Export\AbstractPrintViewProvider
         // selection type
         $radg = new \ilRadioGroupInputGUI($lng->txt("cont_selection"), "sel_type");
         $radg->setValue("page");
-        $op1 = new \ilRadioOption($lng->txt("blog_whole_blog")
-            . " (" . $lng->txt("blog_postings") . ": " . count($postings) . ")", "wiki");
+        $op1 = new \ilRadioOption($lng->txt("cont_current_page"), "page");
         $radg->addOption($op1);
-        $op2 = new \ilRadioOption($lng->txt("blog_selected_pages"), "selection");
+        $op2 = new \ilRadioOption($lng->txt("wiki_whole_wiki")
+            . " (" . $lng->txt("wiki_pages") . ": " . count($pages) . ")", "wiki");
         $radg->addOption($op2);
+        $op3 = new \ilRadioOption($lng->txt("wiki_selected_pages"), "selection");
+        $radg->addOption($op3);
 
         $nl = new \ilNestedListInputGUI("", "obj_id");
-        $op2->addSubItem($nl);
+        $op3->addSubItem($nl);
 
-        foreach ($postings as $p) {
+        foreach ($pages as $p) {
             $nl->addListNode(
                 $p["id"],
                 $p["title"],
@@ -141,18 +120,18 @@ class PrintViewProviderGUI extends Export\AbstractPrintViewProvider
                 false,
                 false,
                 \ilUtil::getImagePath("icon_pg.svg"),
-                $lng->txt("blog_posting")
+                $lng->txt("wiki_page")
             );
         }
 
         $form->addItem($radg);
 
-        $form->addCommandButton("printPostings", $lng->txt("blog_show_print_view"));
+        $form->addCommandButton("printViewOrder", $lng->txt("wiki_show_print_view"));
 
         $form->setTitle($lng->txt("cont_print_selection"));
         $form->setFormAction($ilCtrl->getFormActionByClass(
-            "ilObjBlogGUI",
-            "printPostings")
+            "ilWikiPageGUI",
+            "printViewOrder")
         );
 
         return $form;

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 /* Copyright (c) 1998-2021 ILIAS open source, GPLv3, see LICENSE */
 
@@ -6,6 +7,7 @@ namespace ILIAS\Survey;
 use ILIAS\Survey\Settings;
 use ILIAS\Survey\Mode\ModeFactory;
 use ILIAS\Survey\Mode\UIModifier;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Survey internal ui service
@@ -40,6 +42,26 @@ class InternalUIService
     protected $domain_service;
 
     /**
+     * @var ServerRequestInterface
+     */
+    protected $request;
+
+    /**
+     * @var \ilObjUser
+     */
+    protected $user;
+
+    /**
+     * @var \ilGlobalTemplateInterface
+     */
+    protected $main_tpl;
+
+    /**
+     * @var \ILIAS\DI\UIServices
+     */
+    protected $ui;
+
+    /**
      * Constructor
      */
     public function __construct(
@@ -71,6 +93,22 @@ class InternalUIService
             $survey,
             $this->domain_service
         );
+    }
+
+    public function infoScreen(
+        \ilObjSurveyGUI $survey_gui,
+        \ilToolbarGUI $toolbar) : \ilInfoScreenGUI
+    {
+        $info_screen = new InfoScreen\InfoScreenGUI(
+            $survey_gui,
+            $toolbar,
+            $this->user,
+            $this->lng,
+            $this->ctrl,
+            $this->request,
+            $this->domain_service);
+
+        return $info_screen->getInfoScreenGUI();
     }
 
     public function modeUIModifier(int $mode) : UIModifier

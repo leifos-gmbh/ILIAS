@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 /* Copyright (c) 1998-2021 ILIAS open source, GPLv3, see LICENSE */
 
@@ -26,16 +27,6 @@ class UIModifier extends Mode\AbstractUIModifier
         $self_eval->setInfo($lng->txt("survey_360_self_evaluation_info"));
         $self_eval->setChecked($survey->get360SelfEvaluation());
         $items[] = $self_eval;
-
-        $self_rate = new \ilCheckboxInputGUI($lng->txt("survey_360_self_raters"), "self_rate");
-        $self_rate->setInfo($lng->txt("survey_360_self_raters_info"));
-        $self_rate->setChecked($survey->get360SelfRaters());
-        $items[] = $self_rate;
-
-        $self_appr = new \ilCheckboxInputGUI($lng->txt("survey_360_self_appraisee"), "self_appr");
-        $self_appr->setInfo($lng->txt("survey_360_self_appraisee_info"));
-        $self_appr->setChecked($survey->get360SelfAppraisee());
-        $items[] = $self_appr;
 
         return $items;
     }
@@ -124,8 +115,6 @@ class UIModifier extends Mode\AbstractUIModifier
         }
 
         $survey->set360SelfEvaluation((bool) $form->getInput("self_eval"));
-        $survey->set360SelfAppraisee((bool) $form->getInput("self_appr"));
-        $survey->set360SelfRaters((bool) $form->getInput("self_rate"));
         $survey->set360Results((int) $form->getInput("ts_res"));
     }
 

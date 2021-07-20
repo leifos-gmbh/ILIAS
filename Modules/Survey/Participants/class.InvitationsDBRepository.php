@@ -1,8 +1,11 @@
 <?php
+declare(strict_types = 1);
 
 namespace ILIAS\Survey\Participants;
 
 /* Copyright (c) 1998-2019 ILIAS open source, Extended GPL, see docs/LICENSE */
+
+use ILIAS\Survey\InternalDataService;
 
 /**
  * Survey invitations repository
@@ -17,15 +20,20 @@ class InvitationsDBRepository
     protected $db;
 
     /**
+     * @var InternalDataService
+     */
+    protected $data;
+
+    /**
      * Constructor
      */
-    public function __construct(\ilDBInterface $db = null)
+    public function __construct(
+        InternalDataService $data,
+        \ilDBInterface $db
+    )
     {
-        global $DIC;
-
-        $this->db = (is_null($db))
-            ? $DIC->database()
-            : $db;
+        $this->data = $data;
+        $this->db = $db;
     }
 
 
@@ -35,7 +43,7 @@ class InvitationsDBRepository
      * @param int $survey_id Survey ID not object ID!
      * @param int $user_id
      */
-    public function remove(int $survey_id, int $user_id)
+    public function remove(int $survey_id, int $user_id) : void
     {
         $db = $this->db;
 

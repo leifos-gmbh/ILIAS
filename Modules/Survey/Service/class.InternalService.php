@@ -1,4 +1,6 @@
 <?php
+declare(strict_types = 1);
+
 
 /* Copyright (c) 1998-2021 ILIAS open source, GPLv3, see LICENSE */
 
@@ -36,6 +38,11 @@ class InternalService
     protected $mode_factory;
 
     /**
+     * @var \ilDBInterface
+     */
+    protected $db;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -44,12 +51,18 @@ class InternalService
         global $DIC;
 
         $object_service = $DIC->object();
+        $this->db = $DIC->database();
 
         $this->mode_factory = new ModeFactory();
         $this->data = new InternalDataService();
-        $this->repo = new InternalRepoService($this->data());
+        $this->repo = new InternalRepoService(
+            $this->data(),
+            $this->db
+        );
         $this->domain = new InternalDomainService(
-            $this->mode_factory
+            $this->mode_factory,
+            $this->repo,
+            $this->data
         );
         $this->ui = new InternalUIService(
             $object_service,

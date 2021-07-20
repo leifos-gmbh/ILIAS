@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 /* Copyright (c) 1998-2021 ILIAS open source, GPLv3, see LICENSE */
 
@@ -203,10 +204,12 @@ class SettingsFormGUI
      */
     public function withGeneral(
         \ilPropertyFormGUI $form
-    ) : \ilPropertyFormGUI {
+    ) : \ilPropertyFormGUI
+    {
         $obj_service = $this->object_service;
         $survey = $this->survey;
         $lng = $this->ui_service->lng();
+        $feature_config = $this->feature_config;
 
         // general properties
         $header = new \ilFormSectionHeaderGUI();
@@ -242,6 +245,19 @@ class SettingsFormGUI
         $pool_usage->addOption($opt);
         $pool_usage->setValue($survey->getPoolUsage());
         $form->addItem($pool_usage);
+
+        if ($feature_config->usesAppraisees()) {
+
+            $self_rate = new \ilCheckboxInputGUI($lng->txt("survey_360_self_raters"), "self_rate");
+            $self_rate->setInfo($lng->txt("survey_360_self_raters_info"));
+            $self_rate->setChecked($survey->get360SelfRaters());
+            $form->addItem($self_rate);
+
+            $self_appr = new \ilCheckboxInputGUI($lng->txt("survey_360_self_appraisee"), "self_appr");
+            $self_appr->setInfo($lng->txt("survey_360_self_appraisee_info"));
+            $self_appr->setChecked($survey->get360SelfAppraisee());
+            $form->addItem($self_appr);
+        }
 
         foreach ($this->modifier->getSurveySettingsGeneral(
             $survey,
@@ -935,6 +951,11 @@ class SettingsFormGUI
         $survey->setMailNotification($form->getInput('mailnotification'));
         $survey->setMailAddresses($form->getInput('mailaddresses'));
         $survey->setMailParticipantData($form->getInput('mailparticipantdata'));
+
+        if ($feature_config->usesAppraisees()) {
+            $survey->set360SelfAppraisee((bool) $form->getInput("self_appr"));
+            $survey->set360SelfRaters((bool) $form->getInput("self_rate"));
+        }
 
         if ($feature_config->supportsCompetences()) {
             $survey->setSkillService((int) $form->getInput("skill_service"));

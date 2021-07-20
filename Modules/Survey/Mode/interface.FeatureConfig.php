@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 /* Copyright (c) 1998-2021 ILIAS open source, GPLv3, see LICENSE */
 
@@ -21,4 +22,11 @@ interface FeatureConfig
     public function supportsMemberReminder() : bool;
 
     public function supportsSumScore() : bool;
+
+    /**
+     * If raters rate single persons (appraisees) this mode is activated.
+     * Otherwise the participants screen will be shown
+     * @return bool
+     */
+    public function usesAppraisees() : bool;
 }

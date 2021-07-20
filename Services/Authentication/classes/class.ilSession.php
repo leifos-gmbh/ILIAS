@@ -442,7 +442,12 @@ class ilSession
     {
         return $_SESSION[$a_var];
     }
-    
+
+    public static function has($a_var) : bool
+    {
+        return isset($_SESSION[$a_var]);
+    }
+
     /**
      * Unset a value
      *

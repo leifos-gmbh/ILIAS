@@ -67,8 +67,10 @@ class DerivedTaskProvider implements \ilDerivedTaskProvider
             ->participants()
             ->invitations();
 
-        $this->set_repo = new SettingsDBRepository();
-        $this->svy_360_manager = new Survey360Manager();
+        $this->set_repo = $survey_service->repo()->settings();
+        $this->svy_360_manager = new Survey360Manager(
+            $survey_service->repo()
+        );
     }
 
     /**

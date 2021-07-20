@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 /* Copyright (c) 1998-2021 ILIAS open source, GPLv3, see LICENSE */
 
@@ -57,6 +58,14 @@ class FeatureConfig implements Mode\FeatureConfig
     public function supportsSumScore() : bool
     {
         return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function usesAppraisees() : bool
+    {
+        return true;
     }
 
 }

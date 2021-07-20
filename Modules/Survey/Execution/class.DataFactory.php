@@ -3,13 +3,12 @@ declare(strict_types = 1);
 
 /* Copyright (c) 1998-2021 ILIAS open source, GPLv3, see LICENSE */
 
-namespace ILIAS\Survey;
+namespace ILIAS\Survey\Execution;
 
 /**
- *
  * @author Alexander Killing <killing@leifos.de>
  */
-class Service
+class DataFactory
 {
     /**
      * Constructor
@@ -19,11 +18,13 @@ class Service
     }
 
     /**
-     * Internal service, do not use in other components
-     * @return InternalService
+     * @param int $survey_id
+     * @param int $user_id
+     * @return Run
      */
-    public function internal()
+    public function run(int $survey_id, int $user_id) : Run
     {
-        return new InternalService();
+        return new Run($survey_id, $user_id);
     }
+
 }

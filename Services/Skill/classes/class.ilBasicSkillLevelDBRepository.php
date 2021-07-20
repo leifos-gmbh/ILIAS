@@ -55,7 +55,7 @@ class ilBasicSkillLevelDBRepository implements ilBasicSkillLevelRepository
      * Get maximum level nr
      * @return    int        maximum level nr of skill
      */
-    protected function getMaxLevelNr(int $skill_id) : int
+    protected function getMaxLevelNr(int $skill_id) : ?int
     {
         $ilDB = $this->db;
 
@@ -69,7 +69,7 @@ class ilBasicSkillLevelDBRepository implements ilBasicSkillLevelRepository
     /**
      * @inheritDoc
      */
-    public function getLevelData(int $skill_id, int $a_id = 0) : array
+    public function getLevelData(int $skill_id, int $a_id = 0) : ?array
     {
         $ilDB = $this->db;
 
@@ -113,7 +113,7 @@ class ilBasicSkillLevelDBRepository implements ilBasicSkillLevelRepository
     /**
      * @inheritDoc
      */
-    public function lookupLevelTitle(int $a_id) : string
+    public function lookupLevelTitle(int $a_id) : ?string
     {
         return $this->lookupLevelProperty($a_id, "title");
     }
@@ -121,7 +121,7 @@ class ilBasicSkillLevelDBRepository implements ilBasicSkillLevelRepository
     /**
      * @inheritDoc
      */
-    public function lookupLevelDescription(int $a_id) : string
+    public function lookupLevelDescription(int $a_id) : ?string
     {
         return $this->lookupLevelProperty($a_id, "description");
     }

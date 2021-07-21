@@ -262,7 +262,7 @@ class ilObjSurveyGUI extends ilObjectGUI
                 break;
             
             case 'ilsurveyparticipantsgui':
-                if ($this->object->getMode() == ilObjSurvey::MODE_STANDARD || $this->object->getMode() == ilObjSurvey::MODE_SELF_EVAL) {
+                if (!$this->feature_config->usesAppraisees()) {
                     $ilTabs->activateTab("maintenance");
                 } else {
                     $ilTabs->activateTab("survey_360_appraisees");
@@ -448,7 +448,7 @@ class ilObjSurveyGUI extends ilObjectGUI
                 $this->ctrl->getLinkTarget($this, 'properties')
             );
         } elseif ($this->checkPermissionBool("read")) {
-            if ($this->object->get360Mode() &&
+            if ($this->feature_config->usesAppraisees() &&
                 $this->object->get360SelfRaters() &&
                 $this->object->isAppraisee($ilUser->getId()) &&
                 !$this->object->isAppraiseeClosed($ilUser->getId())) {

@@ -116,6 +116,9 @@ class ilSurveyParticipantsGUI
         $this->data_manager = $this
             ->survey_service
             ->data();
+        $this->feature_config = $this
+            ->survey_service
+            ->domain()->modeFeatureConfig($this->object->getMode());
     }
     
     protected function handleWriteAccess()
@@ -1234,7 +1237,7 @@ class ilSurveyParticipantsGUI
                 $this->ctrl->redirect($this, "listAppraisees");
             }
             return $appr_id;
-        } elseif ($this->object->get360Mode() &&
+        } elseif ($this->feature_config->usesAppraisees() &&
             $this->object->get360SelfRaters() &&
             $this->object->isAppraisee($ilUser->getId()) &&
             !$this->object->isAppraiseeClosed($ilUser->getId())) {
@@ -1249,9 +1252,8 @@ class ilSurveyParticipantsGUI
         $ilToolbar = $this->toolbar;
         $ilAccess = $this->access;
         $ilTabs->activateTab("survey_360_edit_raters");
-        
         $appr_id = $_REQUEST["appr_id"] = $this->handleRatersAccess();
-                
+
         $has_write = $ilAccess->checkAccess("write", "", $this->ref_id);
         if ($has_write) {
             $ilTabs->clearTargets();

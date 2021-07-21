@@ -3,6 +3,11 @@ declare(strict_types = 1);
 
 /* Copyright (c) 1998-2021 ILIAS open source, GPLv3, see LICENSE */
 
+// temp fix
+if(!defined("JSON_THROW_ON_ERROR")) {
+    define ("JSON_THROW_ON_ERROR", 4194304);
+}
+
 /**
  * 
  * @author Alexander Killing <killing@leifos.de>

@@ -226,6 +226,9 @@ class ilECSMappingUtils
                 $lng->txt('auth_shibboleth');
         }
 
+        foreach (ilSamlIdp::getAllIdps() as $idp) {
+            $options['saml_' . $idp->getIdpId()] = 'SAML (' . $idp->getEntityId() . ')';
+        }
         return $options;
     }
 }

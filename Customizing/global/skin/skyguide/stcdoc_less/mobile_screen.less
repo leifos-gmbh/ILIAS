@@ -5,29 +5,45 @@
     color: @mid-gray;
     border-bottom: 3px solid #f0f0f0;
  }
-#ilTopBarNav > li > a {
-    background-color: transparent;
-    margin-top: 9px;
-    font-size: initial;
-  }
+#ilTopBarNav {
+    > li > a {
+        background-color: transparent;
+        margin-top: 9px;
+        font-size: initial;
+        &:hover,
+        &:active,
+        &:focus {
+            background-color: darken(@sunset, 10%);
+        }
+    }
+    > .active > a,
+    > .open > a {
+        background-color: darken(@sunset, 10%);
+        &:hover,
+        &.active,
+        &:focus {
+            background-color: darken(@sunset, 10%);
+        }
+    }
+}
 #ilTopNav button.navbar-toggle {
     color: white;
     border: 1px solid white;
+    &:hover {
+        background-color: darken(@sunset, 10%);
+    }
+    .icon-bar {
+        background-color: white;
+    }
  }
 #ilTopNav {
      margin: 0px 0 0 0;
  }
-#ilTopNav button.navbar-toggle .icon-bar {
-     background-color: white;
- }
- #ilTopNav button.navbar-toggle:hover {
-    background-color: #ae5f00;
- }
-.ilMainMenu.ilTopFixed {
-    top: 60px;
- }
 .ilMainMenu {
-     background-color: #E5EEF6;
+    background-color: #E5EEF6;
+    &.ilTopFixed {
+        top: 60px;
+    }
  }
 #ilTopNav .navbar-nav > li > a {
     color: #666;
@@ -41,6 +57,7 @@
     float: right;
     margin-right: 0px;
     width: 100%;
+    height: inherit;
  }
 #ilTopNav .navbar-nav > li {
     border-bottom: 1px solid #ccc;
@@ -50,21 +67,16 @@
     padding: 0 0 0 0;
  }
 #ilTopBar.ilTopBar {
-    background-color: #dc7800;
+    background-color: @sunset;
  }
  #ilTopNav .navbar-nav > li > a:hover,
  #ilTopNav .navbar-nav > li > a:active,
  #ilTopNav .navbar-nav > li > a:focus {
-     background-color: #dc7800;
+     background-color: @sunset;
   }
 .navbar-nav {
     margin: 0px 0px;
  }
-#ilTopBarNav > li > a:hover,
-#ilTopBarNav > li > a:active,
-#ilTopBarNav > li > a:focus {
-    background-color: #ae5f00;
-}
 #ilTopNav .navbar-nav > .active > a,
 #ilTopNav .navbar-nav > .open > a,
 #ilTopNav .navbar-nav > .active > a:hover,
@@ -73,7 +85,7 @@
 #ilTopNav .navbar-nav > .open > a:active,
 #ilTopNav .navbar-nav > .active > a:focus,
 #ilTopNav .navbar-nav > .open > a:focus {
-    background-color: #dc7800;
+    background-color: @sunset;
  }
 .navbar-nav .open .dropdown-menu > li > a,
 .navbar-nav .open .dropdown-menu .dropdown-header {
@@ -82,19 +94,5 @@
  }
 #ilTopBarNav > li > a {
     color: white;
- }
-.ilMainHeader > header > .row > a.navbar-brand > img {
-    height: 30px !important;
-    top: 15px;
-    margin-left: 21px;
- }
-.ilMainHeader > header > .row > a.navbar-brand {
-    height: 40px;
-    width: 40px;
-    background-color: transparent;
-    border-radius: 3px;
-    border: 1px solid white;
-    margin: -30px 15px 0 !important;
-    position: fixed;
  }
 }

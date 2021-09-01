@@ -1,34 +1,40 @@
-#ilTopNav.navbar {
-    float: left;
-    margin-right: 15px;
-    margin-left: 180px;
-    > .navbar-collapse {
-        padding: 0 0 0 15px;
-    }
-}
 #ilTopNav {
-    margin: -48px 0 0 0;
+    margin: -47px 0 0 0;
+    &.navbar {
+        float: left;
+        margin-right: 15px;
+        margin-left: 140px;
+        height: 45px;
+        > .navbar-collapse {
+            padding: 0 0 0 15px;
+        }
+    }
     .navbar-nav > li > a {
-        border-top: none;   
+        border-top: none;  
         text-transform: inherit;
     }
-}
-#ilTopNav .navbar-nav > .active > a,
-#ilTopNav .navbar-nav > .open > a {
-    border-top: none;
-    &:hover,
-    &:active,
-    &:focus {
+    .navbar-nav > .active > a,
+    .navbar-nav > .open > a {
         border-top: none;
+        &:hover,
+        &:active,
+        &:focus {
+            border-top: none;
+        }
     }
 }
 .ilMainHeader > header > .row > a.navbar-brand {
-    margin: 1px 15px 0;
+    margin: 15px 15px 0;
     > img {
-        height: 75px !important;
         width: auto;
     }
 }
 .navbar-nav > li > .dropdown-menu {
     margin-top: 14px;
+}
+#ilTopBar.ilTopBar {
+    height: 45px;
+}
+.ilTopTitle {
+    padding: 2px 0 0 15px;
 }

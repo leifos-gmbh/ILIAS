@@ -4,12 +4,16 @@
     background-color: transparent;
     border-color: @accent-primary;
     font-size: inherit;
+    &:hover,
+    &:active,
+    &.active,
+    &:focus,
+    &.focus {
+        color: white;
+        background-color: @accent-primary;
+        border-color: @accent-primary;
+    }
 }
-.btn-default:hover,
-.btn-default:active,
-.btn-default.active,
-.btn-default:focus,
-.btn-default.focus,
 .open > .dropdown-toggle.btn-default {
     color: white;
     background-color: @accent-primary;

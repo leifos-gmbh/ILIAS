@@ -1,14 +1,21 @@
-/**********HEADER**********/
+//HEADER
 #ilTopNav.navbar {
     float: left;
     margin-right: 15px;
-    margin-left: 180px;
+    margin-left: 140px;
+}
+#ilTopBar.ilTopBar {
+    border: 2px solid @redsky !important;
+}
+.ilTopTitle {
+    color: @redsky;
+    padding: 0 0 0 15px;
 }
 #ilTopNav {
-    margin: -45px 0 0 0;
+    margin: -47px 0 0 0;
 }
 .ilMainHeader {
-    background-color: #dc7800;
+    background-color: @sunset;
 }
 #ilTopNav .navbar-nav > .active > a,
 #ilTopNav .navbar-nav > .open > a,
@@ -19,14 +26,14 @@
 #ilTopNav .navbar-nav > .active > a:focus,
 #ilTopNav .navbar-nav > .open > a:focus {
     border-top: none;
-    background-color: #ae5f00;
+    background-color: darken(@sunset, 10%);
 }
 #ilTopNav .navbar-nav > li > a:hover,
 #ilTopNav .navbar-nav > li > a:active,
 #ilTopNav .navbar-nav > li > a:focus {
-    background-color: #ae5f00;
+    background-color: darken(@sunset, 10%);
 }
 div.ilMemberViewMainHeader {
-    background-color: #dc7800;
+    background-color: @sunset;
     color: white !important;
 }

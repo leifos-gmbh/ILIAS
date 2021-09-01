@@ -1,4 +1,4 @@
-/**********BODY**********/
+//BODY
 .breadcrumb {
     padding-top: 10px;
     font-weight: 600;
@@ -10,51 +10,57 @@
     margin-left: 15px;
     background-color: white;
 }
-.ilFormHeader, .ilFormFooter {
+.ilFormHeader,
+.ilFormFooter {
     background-color: transparent;
 }
-.dropdown-menu li > a:hover,
-.dropdown-menu li > a:focus {
-    background-color: #ccddec;
-}
-table.calmini td.calminitoday > .il_calmini_monthday > a {
-    color: #0057a2;
-    border: 2px solid #0057a2;
-    background-color: transparent;
-    border-radius: 12px;
-    padding-left: 6px;
-    padding-right: 5px;
-    padding-bottom: 1px;
+.dropdown-menu li > a {
+    &:hover,
+    &:focus {
+        background-color: #ccddec;
+    }
 }
 table.calmini td.calminitoday {
     background-color: transparent;
+    > .il_calmini_monthday > a {
+        color: #0057a2;
+        border: 2px solid #0057a2;
+        background-color: transparent;
+        border-radius: 12px;
+        padding-left: 6px;
+        padding-right: 5px;
+        padding-bottom: 1px;
+    }
 }
+
 .ilErrorFrame .alert.alert-danger {
     margin-right: 30px;
 }
 
-/*Permalink*/
-.RepositoryPermaLink .ilPermalinkContainer {
-    display: -webkit-inline-box;
-    margin-bottom: 20px;
-    width: auto;
-}
-.RepositoryPermaLink label {
-    float: left;
-    padding-right: 5px;
-    padding-top: 4px;
-}
-.RepositoryPermaLink .permalink_label {
-    color: @accent-primary !important;
-}
-.RepositoryPermaLink #current_perma_link {
-    border: 1px solid @accent-primary;
-}
-.RepositoryPermaLink .input-group-btn {
-    float: left;
+//Permalink
+.RepositoryPermaLink {
+    .ilPermalinkContainer {
+        display: -webkit-inline-box;
+        margin-bottom: 20px;
+        width: auto;
+    }
+    label {
+        float: left;
+        padding-right: 5px;
+        padding-top: 4px;
+    }
+    .permalink_label {
+        color: @accent-primary !important;
+    }
+    #current_perma_link {
+        border: 1px solid @accent-primary;
+    }
+    .input-group-btn {
+        float: left;
+    }
 }
 
-/*Forms*/
+//Forms
 .form-control {
     height: 28px;
 }

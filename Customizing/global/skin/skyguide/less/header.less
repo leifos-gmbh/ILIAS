@@ -2,33 +2,33 @@
     float: left;
     margin-right: 15px;
     margin-left: 180px;
+    > .navbar-collapse {
+        padding: 0 0 0 15px;
+    }
 }
 #ilTopNav {
     margin: -48px 0 0 0;
-}
-#ilTopNav .navbar-nav > li > a {
-    border-top: none;
+    .navbar-nav > li > a {
+        border-top: none;   
+        text-transform: inherit;
+    }
 }
 #ilTopNav .navbar-nav > .active > a,
-#ilTopNav .navbar-nav > .open > a,
-#ilTopNav .navbar-nav > .active > a:hover,
-#ilTopNav .navbar-nav > .open > a:hover,
-#ilTopNav .navbar-nav > .active > a:active,
-#ilTopNav .navbar-nav > .open > a:active,
-#ilTopNav .navbar-nav > .active > a:focus,
-#ilTopNav .navbar-nav > .open > a:focus {
+#ilTopNav .navbar-nav > .open > a {
     border-top: none;
-}
-#ilTopNav .navbar-nav > li > a {
-    text-transform: inherit;
-}
-.navbar-nav > li > .dropdown-menu {
-    margin-top: 14px;
-}
-.ilMainHeader > header > .row > a.navbar-brand > img {
-    height: 75px !important;
-    width: auto;
+    &:hover,
+    &:active,
+    &:focus {
+        border-top: none;
+    }
 }
 .ilMainHeader > header > .row > a.navbar-brand {
     margin: 1px 15px 0;
+    > img {
+        height: 75px !important;
+        width: auto;
+    }
+}
+.navbar-nav > li > .dropdown-menu {
+    margin-top: 14px;
 }

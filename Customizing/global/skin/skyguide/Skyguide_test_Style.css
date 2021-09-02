@@ -17220,7 +17220,7 @@ table.calmini td.calminitoday > .il_calmini_monthday > a {
 #ilTopNav.navbar {
   float: left;
   margin-right: 15px;
-  margin-left: 140px;
+  margin-left: 75px;
   height: 45px;
 }
 #ilTopNav.navbar > .navbar-collapse {
@@ -17243,9 +17243,10 @@ table.calmini td.calminitoday > .il_calmini_monthday > a {
   border-top: none;
 }
 .ilMainHeader > header > .row > a.navbar-brand {
-  margin: 15px 15px 0;
+  margin: 25px 15px 0;
 }
 .ilMainHeader > header > .row > a.navbar-brand > img {
+  height: 30px;
   width: auto;
 }
 .navbar-nav > li > .dropdown-menu {
@@ -17254,7 +17255,7 @@ table.calmini td.calminitoday > .il_calmini_monthday > a {
 #ilTopBar.ilTopBar {
   height: 45px;
 }
-.ilTopTitle {
+#ilTopBar .ilTopTitle {
   padding: 2px 0 0 15px;
 }
 div.ilMemberViewMainHeader {
@@ -17362,6 +17363,9 @@ div.ilTopMemberView h3 {
     margin-left: -15px;
     margin-right: -15px;
   }
+  .ilMainHeader {
+    background-color: transparent !important;
+  }
   .ilMainHeader > header > .row > a.navbar-brand > img {
     height: 30px !important;
     top: 15px;
@@ -17380,8 +17384,9 @@ div.ilTopMemberView h3 {
   }
 }
 div#il_startup_logo img {
-  height: 50px;
+  height: 30px;
   width: auto;
+  margin: 25px 15px 0;
 }
 .ilStartupSection {
   padding-top: 0px;
@@ -17404,7 +17409,7 @@ div#il_startup_logo img {
   }
   div#il_startup_logo img {
     height: 30px !important;
-    margin: 15px 5px 0;
+    margin: 15px 0 0;
   }
   div.ilStartupFrame {
     margin-top: -15px;

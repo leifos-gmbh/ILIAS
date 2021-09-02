@@ -1,0 +1,92 @@
+.ilMainHeader {
+    background-color: @sunset;
+}
+#ilTopBar {
+    &.ilTopBar {
+        border: 2px solid @redsky !important;
+    }
+    .ilTopTitle {
+        color: @redsky;
+        padding: 0 0 0 15px;
+    }
+}
+#ilTopNav {
+    .navbar-nav > .active > a,
+    .navbar-nav > .open > a {
+        border-top: none;
+        background-color: darken(@sunset, 10%);
+        &:hover, 
+        &:active, 
+        &:focus {
+            border-top: none;
+            background-color: darken(@sunset, 10%);
+        }
+    }
+    .navbar-nav > li > a {
+        &:hover,
+        &:active,
+        &:focus {
+            background-color: darken(@sunset, 10%);
+        }
+    }
+}
+@media  (max-width: 767px) {
+    #ilTopBar.ilTopBar {
+        background-color: @sunset;
+    }
+    #ilTopBarNav {
+        > li > a {
+            background-color: transparent;
+            margin-top: 9px;
+            font-size: initial;
+            color: white;
+            &:hover,
+            &:active,
+            &:focus {
+                background-color: darken(@sunset, 10%);
+            }
+        }
+        > .active > a,
+        > .open > a {
+            background-color: darken(@sunset, 10%);
+            &:hover,
+            &.active,
+            &:focus {
+                background-color: darken(@sunset, 10%);
+            }
+        }
+    }
+    #ilTopNav {
+        button.navbar-toggle {
+            color: white;
+            border: 1px solid white;
+            &:hover {
+                background-color: darken(@sunset, 10%);
+            }
+            .icon-bar {
+                background-color: white;
+            }
+        }
+        .navbar-nav > li > a {
+            &:hover, 
+            &:active,
+            &:focus {
+                background-color: @sunset;
+            }
+        }
+        .navbar-nav > .active > a,
+        .navbar-nav > .open > a {
+            background-color: @sunset;
+            &:hover, 
+            &:active,
+            &:focus {
+                background-color: @sunset;
+            }
+        }
+    }
+    .navbar-nav .open .dropdown-menu > li > a,
+    .navbar-nav .open .dropdown-menu .dropdown-header {
+        margin-left: -15px;
+        margin-right: -15px;
+    }
+}

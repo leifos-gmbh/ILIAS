@@ -17380,9 +17380,8 @@ div.ilTopMemberView h3 {
   }
 }
 div#il_startup_logo img {
-  height: 75px;
+  height: 50px;
   width: auto;
-  margin: 1px 15px 0;
 }
 .ilStartupSection {
   padding-top: 0px;
@@ -17404,10 +17403,8 @@ div#il_startup_logo img {
     position: absolute;
   }
   div#il_startup_logo img {
-    margin: 0px;
-    height: 55px;
-    padding-left: 1px;
-    padding-top: 1px;
+    height: 30px !important;
+    margin: 15px 5px 0;
   }
   div.ilStartupFrame {
     margin-top: -15px;
@@ -17491,37 +17488,6 @@ a.ilTreeView[href*="mode=flat"] {
 a.ilTreeView:hover {
   background-color: #ccddec;
 }
-/*		Color scheme
-		Dark BLue: #0f2152;
-		Mid Blue: #4c6586;
-		Green: #6ea03c;
-		Light Brown: #dcb496;
-		Dark Brown: #523228;
-		Orange: #fa8228;
-		External Blue: #21c5d8;
-		ILIAS 4 MainMenu Color: #c8e6ff;
-*/
-/** if left unchanged, you have to copy all the background images to your skin/images folder.
-* To use the delos background images in your skin,
-* please change this value (in custom less data or in variables.less of your custom skin) to "../../../../templates/default/images/"
-*/
-/** if left unchanged, you have to copy delos fonts folder to your skin folder.
-* To use the delos fonts in your skin,
-* please change this value (in custom less data or variables.less of your custom skin) to "../../../../templates/default/fonts/"
-*/
-/* @il-highlight-bg: saturate(lighten(@brand-warning, 34%), 80%); */
-/* @il-highlight-bg: lighten(@brand-secondary, 44%); */
-/* @il-highlight-bg: lighten(#21c5d8, 40%); */
-/* @nav-tabs-link-hover-border-color: @brand-primary; */
-#ilTopNav.navbar {
-  float: left;
-  margin-right: 15px;
-  margin-left: 140px;
-  height: 45px;
-}
-#ilTopNav {
-  margin: -47px 0 0 0;
-}
 .ilMainHeader {
   background-color: #dcc87d;
 }
@@ -17547,21 +17513,15 @@ a.ilTreeView:hover {
 .ilTopTitle {
   padding: 2px 0 0 15px;
 }
-div.ilMemberViewMainHeader {
-  background-color: #b22552;
-  color: white !important;
-}
 @media (max-width: 767px) {
   #ilTopBar.ilTopBar {
-    height: 60px;
-    background-color: #f9f9f9;
-    color: #434343;
-    border-bottom: 3px solid #f0f0f0;
+    background-color: #dcc87d;
   }
   #ilTopBarNav > li > a {
     background-color: transparent;
     margin-top: 9px;
     font-size: initial;
+    color: white;
   }
   #ilTopBarNav > li > a:hover,
   #ilTopBarNav > li > a:active,
@@ -17590,49 +17550,15 @@ div.ilMemberViewMainHeader {
   #ilTopNav button.navbar-toggle .icon-bar {
     background-color: white;
   }
-  #ilTopNav {
-    margin: 0px 0 0 0;
-  }
-  .ilMainMenu {
-    background-color: #E5EEF6;
-  }
-  .ilMainMenu.ilTopFixed {
-    top: 60px;
-  }
-  #ilTopNav .navbar-nav > li > a {
-    color: #666;
-    margin: 0px;
-    padding: 7px 10px 8px;
-  }
-  #ilTopNav.navbar-default {
-    background-color: transparent;
-  }
-  #ilTopNav.navbar {
-    float: right;
-    margin-right: 0px;
-    width: 100%;
-    height: inherit;
-  }
-  #ilTopNav .navbar-nav > li {
-    border-bottom: 1px solid #ccc;
-    margin: 0px;
-  }
-  #ilTopNav.navbar > .navbar-collapse {
-    padding: 0 0 0 0;
-  }
-  #ilTopBar.ilTopBar {
-    background-color: #dcc87d;
-  }
   #ilTopNav .navbar-nav > li > a:hover,
   #ilTopNav .navbar-nav > li > a:active,
   #ilTopNav .navbar-nav > li > a:focus {
     background-color: #dcc87d;
   }
-  .navbar-nav {
-    margin: 0px 0px;
-  }
   #ilTopNav .navbar-nav > .active > a,
-  #ilTopNav .navbar-nav > .open > a,
+  #ilTopNav .navbar-nav > .open > a {
+    background-color: #dcc87d;
+  }
   #ilTopNav .navbar-nav > .active > a:hover,
   #ilTopNav .navbar-nav > .open > a:hover,
   #ilTopNav .navbar-nav > .active > a:active,
@@ -17646,45 +17572,26 @@ div.ilMemberViewMainHeader {
     margin-left: -15px;
     margin-right: -15px;
   }
-  #ilTopBarNav > li > a {
-    color: white;
-  }
 }
-div#il_startup_logo img {
-  height: 75px;
-  width: auto;
-  margin: 1px 15px 0;
-}
-.ilStartupSection {
-  padding-top: 0px;
-  padding-left: 15px;
-  padding-right: 15px;
-}
-.ilStartupFrame .alert.alert-danger {
-  margin-left: -15px;
-  margin-right: 15px;
-}
-.ilStartupFrame .help-block {
-  margin-right: 0px !important;
-  margin-left: 0px !important;
-}
-@media (max-width: 767px) {
-  .ilMainHeader {
-    background-color: transparent;
-    top: 0 !important;
-    position: absolute;
-  }
-  div#il_startup_logo img {
-    margin: 0px;
-    height: 55px;
-    padding-left: 1px;
-    padding-top: 1px;
-  }
-  div.ilStartupFrame {
-    margin-top: -15px;
-  }
-  .ilStartupFrame .alert.alert-danger {
-    margin-left: -15px;
-    margin-right: -15px;
-  }
-}
+/*		Color scheme
+		Dark BLue: #0f2152;
+		Mid Blue: #4c6586;
+		Green: #6ea03c;
+		Light Brown: #dcb496;
+		Dark Brown: #523228;
+		Orange: #fa8228;
+		External Blue: #21c5d8;
+		ILIAS 4 MainMenu Color: #c8e6ff;
+*/
+/** if left unchanged, you have to copy all the background images to your skin/images folder.
+* To use the delos background images in your skin,
+* please change this value (in custom less data or in variables.less of your custom skin) to "../../../../templates/default/images/"
+*/
+/** if left unchanged, you have to copy delos fonts folder to your skin folder.
+* To use the delos fonts in your skin,
+* please change this value (in custom less data or variables.less of your custom skin) to "../../../../templates/default/fonts/"
+*/
+/* @il-highlight-bg: saturate(lighten(@brand-warning, 34%), 80%); */
+/* @il-highlight-bg: lighten(@brand-secondary, 44%); */
+/* @il-highlight-bg: lighten(#21c5d8, 40%); */
+/* @nav-tabs-link-hover-border-color: @brand-primary; */

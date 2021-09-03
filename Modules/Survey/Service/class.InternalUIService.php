@@ -12,7 +12,7 @@ use Psr\Http\Message\ServerRequestInterface;
 /**
  * Survey internal ui service
  *
- * @author killing@leifos.de
+ * @author Alexander Killing <killing@leifos.de>
  */
 class InternalUIService
 {

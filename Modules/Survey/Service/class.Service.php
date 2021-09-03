@@ -6,7 +6,6 @@ declare(strict_types = 1);
 namespace ILIAS\Survey;
 
 /**
- *
  * @author Alexander Killing <killing@leifos.de>
  */
 class Service

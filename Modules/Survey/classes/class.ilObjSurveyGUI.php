@@ -65,7 +65,7 @@ class ilObjSurveyGUI extends ilObjectGUI
      */
     protected $session_manager;
 
-    protected $access_manager;
+    protected $access_manager = null;
 
     /**
      * @var \ILIAS\Survey\Execution\RunManager
@@ -76,6 +76,11 @@ class ilObjSurveyGUI extends ilObjectGUI
      * @var \ILIAS\Survey\Participants\StatusManager
      */
     protected $status_manager;
+
+    /**
+     * @var \ilObjSurvey
+     */
+    protected $survey = null;
 
     public function __construct()
     {
@@ -112,38 +117,40 @@ class ilObjSurveyGUI extends ilObjectGUI
 
         parent::__construct("", (int) $_GET["ref_id"], true, false);
 
-        /** @var $survey \ilObjSurvey */
-        $survey = $this->object;
-
-        $this->status_manager = $this->survey_service
-            ->domain()
-            ->participants()
-            ->status($survey, $this->user->getId());
-
         if ($this->object && $this->object->getType() == "svy") {
+            /** @var $survey \ilObjSurvey */
+            $survey = $this->object;
+            $this->survey = $survey;
+
+            $this->status_manager = $this->survey_service
+                ->domain()
+                ->participants()
+                ->status($survey, $this->user->getId());
             $this->feature_config = $this->survey_service->domain()
                 ->modeFeatureConfig($this->object->getMode());
             $this->session_manager = $this->survey_service->domain()
                 ->execution()->session($survey, $this->user->getId());
             $this->run_manager = $this->survey_service->domain()
                 ->execution()->run($survey, $this->user->getId());
+            $this->access_manager = $this->survey_service
+                ->domain()
+                ->access((int) $_GET["ref_id"], $this->user->getId());
         }
-
-        $this->access_manager = $this->survey_service
-            ->domain()
-            ->access((int) $_GET["ref_id"], $this->user->getId());
     }
     
     public function executeCommand()
     {
         $ilTabs = $this->tabs;
         $access_manager = $this->access_manager;
+        $survey = $this->survey;
 
-        if (!$access_manager->canAccessInfoScreen()) {
-            $this->noPermission();
+        if ($survey && !$access_manager->canAccessInfoScreen()) {
+            if (!$access_manager->canAccessInfoScreen()) {
+                $this->noPermission();
+            }
+            $this->addToNavigationHistory();
         }
-        $this->addToNavigationHistory();
-
+        
         $cmd = $this->ctrl->getCmd("properties");
         
         // workaround for bug #6288, needs better solution

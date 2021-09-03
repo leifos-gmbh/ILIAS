@@ -142,14 +142,14 @@ class ilBasicSkill extends ilSkillTreeNode implements ilSkillUsageInfo
         $this->bsc_skl_lvl_db_rep->addLevel($skill_id, $a_title, $a_description, $a_import_id);
     }
 
-    public function getLevelData(int $a_id = 0) : array
+    public function getLevelData(int $a_id = 0) : ?array
     {
         $skill_id = $this->getId();
 
         return $this->bsc_skl_lvl_db_rep->getLevelData($skill_id, $a_id);
     }
 
-    public static function lookupLevelTitle(int $a_id) : string
+    public static function lookupLevelTitle(int $a_id) : ?string
     {
         global $DIC;
 
@@ -160,7 +160,7 @@ class ilBasicSkill extends ilSkillTreeNode implements ilSkillUsageInfo
         return $repository->lookupLevelTitle($a_id);
     }
 
-    public static function lookupLevelDescription(int $a_id) : string
+    public static function lookupLevelDescription(int $a_id) : ?string
     {
         global $DIC;
 

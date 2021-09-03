@@ -1,25 +1,19 @@
 <?php
- /*
-   +----------------------------------------------------------------------------+
-   | ILIAS open source                                                          |
-   +----------------------------------------------------------------------------+
-   | Copyright (c) 1998-2001 ILIAS open source, University of Cologne           |
-   |                                                                            |
-   | This program is free software; you can redistribute it and/or              |
-   | modify it under the terms of the GNU General Public License                |
-   | as published by the Free Software Foundation; either version 2             |
-   | of the License, or (at your option) any later version.                     |
-   |                                                                            |
-   | This program is distributed in the hope that it will be useful,            |
-   | but WITHOUT ANY WARRANTY; without even the implied warranty of             |
-   | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the              |
-   | GNU General Public License for more details.                               |
-   |                                                                            |
-   | You should have received a copy of the GNU General Public License          |
-   | along with this program; if not, write to the Free Software                |
-   | Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. |
-   +----------------------------------------------------------------------------+
-*/
+
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ */
+
+use ILIAS\Survey\Mode;
 
 /**
 * Survey execution graphical output
@@ -92,6 +86,12 @@ class ilSurveyExecutionGUI
     protected $requested_appr_id;
 
     /**
+     * @var Mode\FeatureConfig
+     */
+    protected $feature_config;
+
+
+    /**
     * ilSurveyExecutionGUI constructor
     *
     * The constructor takes possible arguments an creates an instance of the ilSurveyExecutionGUI object.
@@ -141,6 +141,8 @@ class ilSurveyExecutionGUI
         );
         $this->access_manager = $domain_service->domain()->access($a_object->getRefId(),
             $this->user->getId());
+
+        $this->feature_config = $domain_service->domain()->modeFeatureConfig($a_object->getMode());
     }
     
     /**
@@ -212,7 +214,7 @@ class ilSurveyExecutionGUI
         
         // appraisee validation
         $appr_id = 0;
-        if ($this->object->get360Mode()) {
+        if ($this->feature_config->usesAppraisees()) {
             $appr_id = $this->requested_appr_id;
             //if (!$appr_id) {
             //    $appr_id = $_SESSION["appr_id"][$this->object->getId()];
@@ -490,7 +492,7 @@ class ilSurveyExecutionGUI
             //$this->tpl->addBlockFile("ADM_CONTENT", "adm_content", "tpl.il_svy_svy_content.html", "Modules/Survey");
             $stpl = new ilTemplate("tpl.il_svy_svy_content.html", true, true, "Modules/Survey");
             
-            if ($this->object->get360Mode()) {
+            if ($this->feature_config->usesAppraisees()) {
                 $appr_id = $this->requested_appr_id;
                 
                 $this->tpl->setTitle($this->object->getTitle() . " (" .
@@ -854,7 +856,7 @@ class ilSurveyExecutionGUI
         $tree = $this->tree;
         
         // #14971
-        if ($this->object->get360Mode()) {
+        if ($this->feature_config->usesAppraisees()) {
             $target_ref_id = $this->object->getRefId();
         } else {
             // #11534

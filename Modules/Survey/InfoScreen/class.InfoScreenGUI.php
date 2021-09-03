@@ -361,31 +361,34 @@ class InfoScreenGUI
             $appr_data = $appr_data[$this->user->getId()];
             $info->addProperty($this->lng->txt("survey_360_raters_status_info"), $appr_data["finished"]);
 
-            if (!$appr_data["closed"]) {
-                $button = \ilLinkButton::getInstance();
-                $button->setCaption("survey_360_appraisee_close_action");
-                $button->setUrl($this->ctrl->getLinkTargetByClass("ilsurveyparticipantsgui", "confirmappraiseeclose"));
-                $close_button_360 = '<div>' . $button->render() . '</div>';
+            if ($survey->get360Mode()) {
+                if (!$appr_data["closed"]) {
+                    $button = \ilLinkButton::getInstance();
+                    $button->setCaption("survey_360_appraisee_close_action");
+                    $button->setUrl($this->ctrl->getLinkTargetByClass("ilsurveyparticipantsgui",
+                        "confirmappraiseeclose"));
+                    $close_button_360 = '<div>' . $button->render() . '</div>';
 
-                $txt = "survey_360_appraisee_close_action_info";
-                if ($survey->getSkillService()) {
-                    $txt .= "_skill";
+                    $txt = "survey_360_appraisee_close_action_info";
+                    if ($survey->getSkillService()) {
+                        $txt .= "_skill";
+                    }
+                    $info->addProperty(
+                        $this->lng->txt("status"),
+                        $close_button_360 . $this->lng->txt($txt)
+                    );
+                } else {
+                    \ilDatePresentation::setUseRelativeDates(false);
+
+                    $dt = new \ilDateTime($appr_data["closed"], IL_CAL_UNIX);
+                    $info->addProperty(
+                        $this->lng->txt("status"),
+                        sprintf(
+                            $this->lng->txt("survey_360_appraisee_close_action_status"),
+                            \ilDatePresentation::formatDate($dt)
+                        )
+                    );
                 }
-                $info->addProperty(
-                    $this->lng->txt("status"),
-                    $close_button_360 . $this->lng->txt($txt)
-                );
-            } else {
-                \ilDatePresentation::setUseRelativeDates(false);
-
-                $dt = new \ilDateTime($appr_data["closed"], IL_CAL_UNIX);
-                $info->addProperty(
-                    $this->lng->txt("status"),
-                    sprintf(
-                        $this->lng->txt("survey_360_appraisee_close_action_status"),
-                        \ilDatePresentation::formatDate($dt)
-                    )
-                );
             }
         }
     }

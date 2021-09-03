@@ -193,7 +193,7 @@ class RunDBRepository
             $runs[$row["finished_id"]] = $this->data->run($survey_id, $user_id)
                 ->withId((int) $row["finished_id"])
                 ->withFinished((bool) $row["state"])
-                ->withCode((int) $row["anonymous_id"])
+                ->withCode((string) $row["anonymous_id"])
                 ->withTimestamp((int) $row["tstamp"])
                 ->withAppraiseeId((int) $row["appr_id"])
                 ->withLastPage((int) $row["lastpage"]);

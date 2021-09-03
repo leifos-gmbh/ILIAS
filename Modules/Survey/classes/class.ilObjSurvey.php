@@ -3,6 +3,7 @@
 /* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 use \ILIAS\Survey\Participants;
+use \ILIAS\Survey\Mode;
 
 /**
  * Class ilObjSurvey
@@ -215,6 +216,11 @@ class ilObjSurvey extends ilObject
     protected $data_manager;
 
     /**
+     * @var ?Mode\FeatureConfig
+     */
+    protected $feature_config;
+
+    /**
     * Constructor
     * @access	public
     * @param	integer	reference_id or object_id
@@ -275,6 +281,11 @@ class ilObjSurvey extends ilObject
                 ->domain()
                 ->code($this, $this->user->getId());
         }
+
+        $this->feature_config = $this
+            ->survey_service
+            ->domain()
+            ->modeFeatureConfig($this->getMode());
 
         $this->data_manager = $this
             ->survey_service
@@ -3691,23 +3702,14 @@ class ilObjSurvey extends ilObject
         $newObj->setMailOwnResults($this->hasMailOwnResults());
         $newObj->setMailConfirmation($this->hasMailConfirmation());
         $newObj->setAnonymousUserList($this->hasAnonymousUserList());
-        
-        // #12661
-        if ($this->get360Mode()) {
-            $newObj->setMode(ilObjSurvey::MODE_360);
-            $newObj->set360SelfEvaluation($this->get360SelfEvaluation());
-            $newObj->set360SelfAppraisee($this->get360SelfAppraisee());
-            $newObj->set360SelfRaters($this->get360SelfRaters());
-            $newObj->set360Results($this->get360Results());
-            $newObj->setSkillService($this->getSkillService());
-        }
-        //svy mode self eval: skills + view results
-        if ($svy_type == ilObjSurvey::MODE_SELF_EVAL) {
-            $newObj->setMode(ilObjSurvey::MODE_SELF_EVAL);
-            $newObj->setSkillService($this->getSkillService());
-            $newObj->setSelfEvaluationResults($this->getSelfEvaluationResults());
-        }
-                
+
+        $newObj->setMode($this->getMode());
+        $newObj->set360SelfEvaluation($this->get360SelfEvaluation());
+        $newObj->set360SelfAppraisee($this->get360SelfAppraisee());
+        $newObj->set360SelfRaters($this->get360SelfRaters());
+        $newObj->set360Results($this->get360Results());
+        $newObj->setSkillService($this->getSkillService());
+
         // reminder/notification
         $newObj->setReminderStatus($this->getReminderStatus());
         $newObj->setReminderStart($this->getReminderStart());
@@ -5226,7 +5228,7 @@ class ilObjSurvey extends ilObject
         if (!$this->isAccessibleWithoutCode()) {
             if (!$a_code) {
                 // registered raters do not need code
-                if ($this->get360Mode() &&
+                if ($this->feature_config->usesAppraisees() &&
                     $user_id != ANONYMOUS_USER_ID &&
                     $this->isRater(0, $user_id)) {
                     // auto-generate code
@@ -5810,7 +5812,7 @@ class ilObjSurvey extends ilObject
             $cut->get(IL_CAL_DATE) >= substr($this->getReminderLastSent(), 0, 10)) {
             $missing_ids = array();
 
-            if (!$this->get360Mode()) {
+            if (!$this->feature_config->usesAppraisees()) {
                 $this->log->debug("Entering survey mode.");
 
                 // #16871

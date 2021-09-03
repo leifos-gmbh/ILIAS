@@ -286,6 +286,21 @@ class ilObjSurveyAccess extends ilObjectAccess implements ilConditionHandling
                         }
                         break;
 
+                    case ilObjSurvey::MODE_IND_FEEDB:
+                        $svy = new ilObjSurvey($a_obj_id, false);
+                        $svy->read();
+                        switch ($svy->get360Results()) {
+                            case ilObjSurvey::RESULTS_360_NONE:
+                                return false;
+
+                            case ilObjSurvey::RESULTS_360_OWN:
+                                return true;
+
+                            case ilObjSurvey::RESULTS_360_ALL:
+                                return $svy->isAppraisee($user_id);
+                        }
+                        break;
+
                     case ilObjSurvey::MODE_SELF_EVAL:
                         $svy = new ilObjSurvey($a_obj_id, false);
                         $svy->read();

@@ -635,7 +635,7 @@ class SettingsFormGUI
         if (!$has_parent) {
             $has_parent = $tree->checkForParentType($survey->getRefId(), "crs");
         }
-        return $has_parent;
+        return (bool) $has_parent;
     }
 
     /**
@@ -961,6 +961,13 @@ class SettingsFormGUI
             $survey->setSkillService((int) $form->getInput("skill_service"));
         }
 
+        foreach ($this->modifier->getSurveySettingsResults(
+            $survey,
+            $this->ui_service
+        ) as $item) {
+            $this->modifier->setValuesFromForm($survey, $form);
+        }
+
         $survey->saveToDb();
 
         \ilObjectServiceSettingsGUI::updateServiceSettingsForm(
@@ -970,6 +977,7 @@ class SettingsFormGUI
                 \ilObjectServiceSettingsGUI::ORGU_POSITION_ACCESS
             )
         );
+
 
     }
 }

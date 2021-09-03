@@ -52,6 +52,40 @@ class UIModifier extends Mode\AbstractUIModifier
         return $items;
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function getSurveySettingsReminderTargets(
+        \ilObjSurvey $survey,
+        InternalUIService $ui_service
+    ) : array {
+        $items = [];
+        $lng = $ui_service->lng();
+
+        // remind appraisees
+        $cb = new \ilCheckboxInputGUI($lng->txt("survey_notification_target_group"), "remind_appraisees");
+        $cb->setOptionTitle($lng->txt("survey_360_appraisees"));
+        $cb->setInfo($lng->txt("survey_360_appraisees_remind_info"));
+        $cb->setValue("1");
+        $cb->setChecked(in_array(
+            $survey->getReminderTarget(),
+            array(\ilObjSurvey::NOTIFICATION_APPRAISEES, \ilObjSurvey::NOTIFICATION_APPRAISEES_AND_RATERS)
+        ));
+        $items[] = $cb;
+
+        // remind raters
+        $cb = new \ilCheckboxInputGUI("", "remind_raters");
+        $cb->setOptionTitle($lng->txt("survey_360_raters"));
+        $cb->setInfo($lng->txt("survey_360_raters_remind_info"));
+        $cb->setValue("1");
+        $cb->setChecked(in_array(
+            $survey->getReminderTarget(),
+            array(\ilObjSurvey::NOTIFICATION_RATERS, \ilObjSurvey::NOTIFICATION_APPRAISEES_AND_RATERS)
+        ));
+        $items[] = $cb;
+
+        return $items;
+    }
 
     /**
      * @inheritDoc
@@ -61,6 +95,16 @@ class UIModifier extends Mode\AbstractUIModifier
         \ilPropertyFormGUI $form
     ) : void
     {
+        if ($form->getInput("remind_appraisees") && $form->getInput("remind_raters")) {
+            $survey->setReminderTarget(\ilObjSurvey::NOTIFICATION_APPRAISEES_AND_RATERS);
+        } elseif ($form->getInput("remind_appraisees")) {
+            $survey->setReminderTarget(\ilObjSurvey::NOTIFICATION_APPRAISEES);
+        } elseif ($form->getInput("remind_raters")) {
+            $survey->setReminderTarget(\ilObjSurvey::NOTIFICATION_RATERS);
+        } else {
+            $survey->setReminderTarget(0);
+        }
+
         $survey->set360Results((int) $form->getInput("ts_res"));
     }
 

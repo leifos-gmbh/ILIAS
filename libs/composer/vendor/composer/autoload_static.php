@@ -7,8 +7,8 @@ namespace Composer\Autoload;
 class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
 {
     public static $files = array (
-        '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
+        '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
         '0d59ee240a4cd96ddbb4ff164fccea4d' => __DIR__ . '/..' . '/symfony/polyfill-php73/bootstrap.php',
         'e69f7f6ee287b969198c3c9d6777bd38' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/bootstrap.php',
@@ -28,6 +28,7 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
         '3569eecfeed3bcf0bad3c998a494ecb8' => __DIR__ . '/..' . '/sabre/xml/lib/Deserializer/functions.php',
         '93aa591bc4ca510c520999e34229ee79' => __DIR__ . '/..' . '/sabre/xml/lib/Serializer/functions.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
+        '2cffec82183ee1cea088009cef9a6fc3' => __DIR__ . '/..' . '/ezyang/htmlpurifier/library/HTMLPurifier.composer.php',
         'abede361264e2ae69ec1eee813a101af' => __DIR__ . '/..' . '/markbaker/complex/classes/src/functions/abs.php',
         '21a5860fbef5be28db5ddfbc3cca67c4' => __DIR__ . '/..' . '/markbaker/complex/classes/src/functions/acos.php',
         '1546e3f9d127f2a9bb2d1b6c31c26ef1' => __DIR__ . '/..' . '/markbaker/complex/classes/src/functions/acosh.php',
@@ -87,9 +88,8 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
         '4888a6f58c08148ebe17682f9ce9b2a8' => __DIR__ . '/..' . '/markbaker/matrix/classes/src/Operations/divideby.php',
         'eef6fa3879d3efa347cd24d5eb348f85' => __DIR__ . '/..' . '/markbaker/matrix/classes/src/Operations/divideinto.php',
         '253c157292f75eb38082b5acb06f3f01' => __DIR__ . '/..' . '/nikic/fast-route/src/functions.php',
-        'ebdb698ed4152ae445614b69b5e4bb6a' => __DIR__ . '/..' . '/sabre/http/lib/functions.php',
         'decc78cc4436b1292c6c0d151b19445c' => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib/bootstrap.php',
-        '2cffec82183ee1cea088009cef9a6fc3' => __DIR__ . '/..' . '/ezyang/htmlpurifier/library/HTMLPurifier.composer.php',
+        'ebdb698ed4152ae445614b69b5e4bb6a' => __DIR__ . '/..' . '/sabre/http/lib/functions.php',
         'e39a8b23c42d4e1452234d762b03835a' => __DIR__ . '/..' . '/ramsey/uuid/src/functions.php',
     );
 
@@ -159,6 +159,7 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
             'SimpleSAML\\Module\\riak\\' => 23,
             'SimpleSAML\\Module\\radius\\' => 25,
             'SimpleSAML\\Module\\preprodwarning\\' => 33,
+            'SimpleSAML\\Module\\oauth\\' => 24,
             'SimpleSAML\\Module\\negotiate\\' => 28,
             'SimpleSAML\\Module\\metarefresh\\' => 30,
             'SimpleSAML\\Module\\ldap\\' => 23,
@@ -425,6 +426,10 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
         'SimpleSAML\\Module\\preprodwarning\\' => 
         array (
             0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/preprodwarning/lib',
+        ),
+        'SimpleSAML\\Module\\oauth\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/oauth/lib',
         ),
         'SimpleSAML\\Module\\negotiate\\' => 
         array (
@@ -907,6 +912,7 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
         'Gettext\\Languages\\Exporter\\Php' => __DIR__ . '/..' . '/gettext/languages/src/Exporter/Php.php',
         'Gettext\\Languages\\Exporter\\Po' => __DIR__ . '/..' . '/gettext/languages/src/Exporter/Po.php',
         'Gettext\\Languages\\Exporter\\Prettyjson' => __DIR__ . '/..' . '/gettext/languages/src/Exporter/Prettyjson.php',
+        'Gettext\\Languages\\Exporter\\Ruby' => __DIR__ . '/..' . '/gettext/languages/src/Exporter/Ruby.php',
         'Gettext\\Languages\\Exporter\\Xml' => __DIR__ . '/..' . '/gettext/languages/src/Exporter/Xml.php',
         'Gettext\\Languages\\FormulaConverter' => __DIR__ . '/..' . '/gettext/languages/src/FormulaConverter.php',
         'Gettext\\Languages\\Language' => __DIR__ . '/..' . '/gettext/languages/src/Language.php',
@@ -3764,6 +3770,10 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
         'SimpleSAML\\Module\\metarefresh\\ARP' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/metarefresh/lib/ARP.php',
         'SimpleSAML\\Module\\metarefresh\\MetaLoader' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/metarefresh/lib/MetaLoader.php',
         'SimpleSAML\\Module\\negotiate\\Auth\\Source\\Negotiate' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/negotiate/lib/Auth/Source/Negotiate.php',
+        'SimpleSAML\\Module\\oauth\\Consumer' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/oauth/lib/Consumer.php',
+        'SimpleSAML\\Module\\oauth\\OAuthServer' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/oauth/lib/OAuthServer.php',
+        'SimpleSAML\\Module\\oauth\\OAuthStore' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/oauth/lib/OAuthStore.php',
+        'SimpleSAML\\Module\\oauth\\Registry' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/oauth/lib/Registry.php',
         'SimpleSAML\\Module\\preprodwarning\\Auth\\Process\\Warning' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/preprodwarning/lib/Auth/Process/Warning.php',
         'SimpleSAML\\Module\\radius\\Auth\\Source\\Radius' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/radius/lib/Auth/Source/Radius.php',
         'SimpleSAML\\Module\\riak\\Store\\Riak' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/riak/lib/Store/Riak.php',
@@ -5152,6 +5162,8 @@ class ComposerStaticInit2fffdf922cf8fdbf1f62eec345993c83
         'UnterminatedStringLiteralJSMinException' => __DIR__ . '/../../../..' . '/Modules/Scorm2004/classes/JSMin_lib.php',
         'ValueError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
         'Webmozart\\Assert\\Assert' => __DIR__ . '/..' . '/webmozart/assert/src/Assert.php',
+        'Webmozart\\Assert\\InvalidArgumentException' => __DIR__ . '/..' . '/webmozart/assert/src/InvalidArgumentException.php',
+        'Webmozart\\Assert\\Mixin' => __DIR__ . '/..' . '/webmozart/assert/src/Mixin.php',
         'WhiteHat101\\Crypt\\APR1_MD5' => __DIR__ . '/..' . '/whitehat101/apr1-md5/src/APR1_MD5.php',
         'Whoops\\Exception\\ErrorException' => __DIR__ . '/..' . '/filp/whoops/src/Whoops/Exception/ErrorException.php',
         'Whoops\\Exception\\Formatter' => __DIR__ . '/..' . '/filp/whoops/src/Whoops/Exception/Formatter.php',

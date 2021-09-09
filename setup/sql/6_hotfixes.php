@@ -1301,3 +1301,65 @@ if (!$ilDB->indexExistsByFields('booking_reservation', array('date_to'))) {
     $ilDB->addIndex('booking_reservation', array('date_to'), 'i4');
 }
 ?>
+<#54>
+<?php
+$query = "show index from il_meta_oer_stat where Key_name = 'PRIMARY'";
+$res = $ilDB->query($query);
+if (!$ilDB->numRows($res)) {
+    $ilDB->addPrimaryKey('il_meta_oer_stat', ['obj_id']);
+}
+?>
+<#55>
+<?php
+if (!$ilDB->tableColumnExists('il_bt_value', 'position')) {
+    $ilDB->addTableColumn(
+        'il_bt_value',
+        'position',
+        [
+            'type' => ilDBConstants::T_INTEGER,
+            'length' => 8,
+            'notnull' => true,
+            'default' => 0
+        ]
+    );
+}
+?>
+<#56>
+<?php
+if (!$ilDB->indexExistsByFields('il_bt_value', array('bucket_id'))) {
+    $ilDB->addIndex(
+        'il_bt_value',
+        array('bucket_id'),
+        'i1'
+    );
+}
+if (!$ilDB->indexExistsByFields('il_bt_value_to_task', array('task_id'))) {
+    $ilDB->addIndex(
+        'il_bt_value_to_task',
+        array('task_id'),
+        'i1'
+    );
+}
+if (!$ilDB->indexExistsByFields('il_bt_value_to_task', array('value_id'))) {
+    $ilDB->addIndex(
+        'il_bt_value_to_task',
+        array('value_id'),
+        'i2'
+    );
+}
+?>
+<#57>
+<?php
+if (!$ilDB->tableColumnExists('il_bt_value_to_task', 'position')) {
+    $ilDB->addTableColumn(
+        'il_bt_value_to_task',
+        'position',
+        [
+            'type' => ilDBConstants::T_INTEGER,
+            'length' => 8,
+            'notnull' => true,
+            'default' => 0
+        ]
+    );
+}
+?>

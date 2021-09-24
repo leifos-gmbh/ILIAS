@@ -266,7 +266,6 @@ class ilObjSurvey extends ilObject
             ->invitations();
 
         parent::__construct($a_id, $a_call_by_reference);
-
         $this->initServices();
     }
 
@@ -281,7 +280,6 @@ class ilObjSurvey extends ilObject
                 ->domain()
                 ->code($this, $this->user->getId());
         }
-
         $this->feature_config = $this
             ->survey_service
             ->domain()
@@ -298,7 +296,6 @@ class ilObjSurvey extends ilObject
     public function setRefId($id)
     {
         parent::setRefId($id);
-        $this->initServices();
     }
 
     /**
@@ -361,6 +358,7 @@ class ilObjSurvey extends ilObject
     {
         parent::read();
         $this->loadFromDb();
+        $this->initServices();
     }
     
     /**
@@ -816,7 +814,6 @@ class ilObjSurvey extends ilObject
         if (is_object($rmd_end)) {
             $rmd_end = $rmd_end->get(IL_CAL_DATE);
         }
-        
         if ($this->getSurveyId() < 1) {
             $next_id = $ilDB->nextId('svy_svy');
             $affectedRows = $ilDB->insert("svy_svy", array(
@@ -2872,7 +2869,6 @@ class ilObjSurvey extends ilObject
 
         // #15031 - should not matter if code was used by registered or anonymous (each code must be unique)
         if ($anonymize_id) {
-            var_dump("1");
             $result = $ilDB->queryF(
                 "SELECT finished_id FROM svy_finished" .
                 " WHERE survey_fi = %s AND anonymous_id = %s AND appr_id = %s",
@@ -5223,7 +5219,6 @@ class ilObjSurvey extends ilObject
         $ilDB = $this->db;
             
         $user_id = $ilUser->getId();
-                
         // code is obligatory?
         if (!$this->isAccessibleWithoutCode()) {
             if (!$a_code) {
@@ -5235,6 +5230,7 @@ class ilObjSurvey extends ilObject
                     $code = $this->data_manager->code("")
                         ->withUserId($user_id);
                     $this->code_manager->add($code);
+                    $a_code = $this->code_manager->getByUserId($user_id);
                 } else {
                     return null;
                 }
@@ -5272,7 +5268,6 @@ class ilObjSurvey extends ilObject
                 "code" => $row["anonymous_id"],
                 "finished" => (bool) $row["state"]);
         }
-        
         return array("code" => $a_code, "runs" => $res);
     }
     

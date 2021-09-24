@@ -62,6 +62,11 @@ class InternalUIService
     protected $ui;
 
     /**
+     * @var \ILIAS\DI\HTTPServices
+     */
+    protected $http;
+
+    /**
      * Constructor
      */
     public function __construct(
@@ -83,11 +88,22 @@ class InternalUIService
         $this->user = $DIC->user();
         $this->request = $DIC->http()->request();
         $this->main_tpl = $DIC->ui()->mainTemplate();
+        $this->http = $DIC->http();
     }
 
     public function surveySettings(\ilObjSurvey $survey) : Settings\UIFactory
     {
         return new Settings\UIFactory(
+            $this,
+            $this->object_service,
+            $survey,
+            $this->domain_service
+        );
+    }
+
+    public function evaluation(\ilObjSurvey $survey) : Evaluation\UIFactory
+    {
+        return new Evaluation\UIFactory(
             $this,
             $this->object_service,
             $survey,
@@ -125,6 +141,21 @@ class InternalUIService
     public function lng() : \ilLanguage
     {
         return $this->lng;
+    }
+
+    public function mainTemplate() : \ilGlobalTemplateInterface
+    {
+        return $this->main_tpl;
+    }
+
+    public function http() : \ILIAS\DI\HTTPServices
+    {
+        return $this->http;
+    }
+
+    public function ui() : \ILIAS\DI\UIServices
+    {
+        return $this->ui;
     }
 
 }

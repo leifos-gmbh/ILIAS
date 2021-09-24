@@ -180,11 +180,17 @@ class RunDBRepository
             " WHERE survey_fi = " . $db->quote($survey_id, "integer");
         // if proper user id is given, use it or current code
         if ($user_id != ANONYMOUS_USER_ID) {
-            $sql .= " AND (user_fi = " . $db->quote($user_id, "integer") .
-                " OR anonymous_id = " . $db->quote($code, "text") . ")";
+            $sql .= " AND (user_fi = " . $db->quote($user_id, "integer");
+            if ($code != "") {
+                $sql .= " OR anonymous_id = " . $db->quote($code, "text");
+            }
+            $sql .= ")";
         }
         // use anonymous code to find finished id(s)
         else {
+            if ($code == "") {
+                return [];
+            }
             $sql .= " AND anonymous_id = " . $db->quote($code, "text");
         }
         $set = $db->query($sql);

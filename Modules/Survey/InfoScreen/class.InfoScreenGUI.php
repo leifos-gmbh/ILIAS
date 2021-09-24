@@ -303,7 +303,6 @@ class InfoScreenGUI
                     }
 
                     $list = array();
-
                     foreach ($appr_ids as $appr_id) {
                         if ($survey->isAppraiseeClosed($appr_id)) {
                             // closed

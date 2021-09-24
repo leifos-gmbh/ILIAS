@@ -117,7 +117,7 @@ class CodeDBRepo
     protected function getUserKey(int $user_id)
     {
         $user_key = ($user_id > 0)
-            ? md5($user_id)
+            ? md5((string) $user_id)
             : null;
         return $user_key;
     }

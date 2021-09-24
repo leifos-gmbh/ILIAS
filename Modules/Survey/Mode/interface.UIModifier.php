@@ -5,6 +5,8 @@ declare(strict_types = 1);
 
 namespace ILIAS\Survey\Mode;
 use ILIAS\Survey\InternalUIService;
+use ILIAS\Survey\InternalDomainService;
+use ILIAS\Survey\InternalService;
 
 /**
  * Interface for modes
@@ -12,12 +14,14 @@ use ILIAS\Survey\InternalUIService;
  */
 interface UIModifier
 {
+    public function setInternalService(InternalService $internal_service) : void;
+    public function getInternalService() : InternalService;
+
     /**
      * @return \ilFormPropertyGUI[]
      */
     public function getSurveySettingsGeneral(
-        \ilObjSurvey $survey,
-        InternalUIService $ui_service
+        \ilObjSurvey $survey
     ) : array;
 
     /**
@@ -36,12 +40,28 @@ interface UIModifier
         InternalUIService $ui_service
     ) : array;
 
-    /**
-     * @inheritDoc
-     */
     public function setValuesFromForm(
         \ilObjSurvey $survey,
         \ilPropertyFormGUI $form
     ) : void;
+
+    public function setResultsOverviewToolbar(
+        \ilObjSurvey $survey,
+        \ilToolbarGUI $toolbar,
+        int $user_id,
+        int $appraisee_id = 0
+    ) : void;
+
+    public function setResultsDetailToolbar(
+        \ilObjSurvey $survey,
+        \ilToolbarGUI $toolbar,
+        int $user_id,
+        int $appraisee_id = 0
+    ) : void;
+
+    public function getDetailPanels(
+        array $participants,
+        \ILIAS\Survey\Evaluation\EvaluationGUIRequest $request,
+        \SurveyQuestionEvaluation $a_eval) : array;
 
 }

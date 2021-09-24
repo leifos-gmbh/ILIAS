@@ -209,8 +209,8 @@ class CodeManager
      */
     public function getByUserId(int $user_id) : string
     {
-        $this->checkPermission();
-        return $this->getByUserId($this->survey_id, $user_id);
+        //$this->checkPermission();
+        return $this->code_repo->getByUserId($this->survey_id, $user_id);
     }
 
 }

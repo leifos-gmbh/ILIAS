@@ -69,6 +69,7 @@ class InternalService
             $this->mode_factory,
             $this->domain
         );
+        $this->mode_factory->setInternalService($this);
     }
 
     /**

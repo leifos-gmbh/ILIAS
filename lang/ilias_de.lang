@@ -14,6 +14,7 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+survey#:#svy_rater#:#Feedback-Geber
 survey#:#svy_dont_send#:#Keine Nachricht senden
 survey#:#svy_save_and_continue#:#Speichern und Fortfahren
 survey#:#svy_external_rater#:#Externen Feedback-Geber hinzufügen

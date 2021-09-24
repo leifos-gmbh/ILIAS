@@ -5,8 +5,11 @@ declare(strict_types = 1);
 
 namespace ILIAS\Survey\Mode;
 
+use ILIAS\Survey\InternalDomainService;
+use ILIAS\Survey\InternalUIService;
+use ILIAS\Survey\InternalService;
+
 /**
- *
  * @author Alexander Killing <killing@leifos.de>
  */
 trait ModeProviderBase
@@ -20,6 +23,11 @@ trait ModeProviderBase
      * @var FeatureConfig
      */
     protected $feature_config;
+
+    /**
+     * @var InternalService
+     */
+    protected $service;
 
     /**
      * @var UIModifier
@@ -38,6 +46,13 @@ trait ModeProviderBase
 
     public function getUIModifier() : UIModifier
     {
-        return $this->ui_modifier;
+        $mod = $this->ui_modifier;
+        $mod->setInternalService($this->service);
+        return $mod;
+    }
+
+    public function setInternalService(InternalService $service)
+    {
+        $this->service = $service;
     }
 }

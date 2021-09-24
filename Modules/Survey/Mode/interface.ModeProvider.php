@@ -5,12 +5,18 @@ declare(strict_types = 1);
 
 namespace ILIAS\Survey\Mode;
 
+use ILIAS\Survey\InternalDomainService;
+use ILIAS\Survey\InternalUIService;
+use ILIAS\Survey\InternalService;
+
 /**
  * Interface for modes
  * @author Alexander Killing <killing@leifos.de>
  */
 interface ModeProvider
 {
+    public function setInternalService(InternalService $service);
+
     public function getId() : int;
 
     public function getFeatureConfig() : FeatureConfig;

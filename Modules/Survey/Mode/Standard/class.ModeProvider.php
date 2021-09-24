@@ -19,7 +19,9 @@ class ModeProvider implements Mode\ModeProvider
     public function __construct()
     {
         $this->feature_config = new FeatureConfig();
-        $this->ui_modifier = new UIModifier();
+        $this->ui_modifier = new UIModifier(
+
+        );
         $this->id = self::ID;
     }
 }

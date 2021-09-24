@@ -17,11 +17,10 @@ class UIModifier extends Mode\AbstractUIModifier
      * @inheritDoc
      */
     public function getSurveySettingsGeneral(
-        \ilObjSurvey $survey,
-        InternalUIService $ui_service
+        \ilObjSurvey $survey
     ) : array {
         $items = [];
-        $lng = $ui_service->lng();
+        $lng = $this->gui_service->lng();
 
         return $items;
     }
@@ -93,8 +92,7 @@ class UIModifier extends Mode\AbstractUIModifier
     public function setValuesFromForm(
         \ilObjSurvey $survey,
         \ilPropertyFormGUI $form
-    ) : void
-    {
+    ) : void {
         if ($form->getInput("remind_appraisees") && $form->getInput("remind_raters")) {
             $survey->setReminderTarget(\ilObjSurvey::NOTIFICATION_APPRAISEES_AND_RATERS);
         } elseif ($form->getInput("remind_appraisees")) {
@@ -106,6 +104,236 @@ class UIModifier extends Mode\AbstractUIModifier
         }
 
         $survey->set360Results((int) $form->getInput("ts_res"));
+    }
+
+
+    public function setResultsDetailToolbar(
+        \ilObjSurvey $survey,
+        \ilToolbarGUI $toolbar,
+        int $user_id,
+        int $appraisee_id = 0
+    ) : void
+    {
+        $gui = $this->service->ui();
+        $lng = $gui->lng();
+
+        $this->addApprSelectionToToolbar(
+            $survey,
+            $toolbar,
+            $user_id,
+            $appraisee_id
+        );
+
+
+        $this->addExportAndPrintButton(
+            $toolbar,
+            true
+        );
+    }
+
+    protected function getPanelChart(
+        \ILIAS\Survey\Evaluation\EvaluationGUIRequest $request,
+        \SurveyQuestionEvaluation $a_eval
+    ) : string {
+        return "";
+    }
+
+    protected function getPanelText(
+        \ILIAS\Survey\Evaluation\EvaluationGUIRequest $request,
+        \SurveyQuestionEvaluation $a_eval,
+        \ilSurveyEvaluationResults $question_res
+    ) : string {
+        return "";
+    }
+
+    protected function getPanelTable(
+        array $participants,
+        \ILIAS\Survey\Evaluation\EvaluationGUIRequest $request,
+        \SurveyQuestionEvaluation $a_eval) : string
+    {
+        $a_results = $a_eval->getResults();
+        $lng = $this->service->ui()->lng();
+        $matrix = false;
+        if (is_array($a_results)) {
+            $answers = $a_results[0][1]->getAnswers();
+            $q = $a_results[0][1]->getQuestion();
+            $matrix = true;
+        } else {
+            $answers = $a_results->getAnswers();
+            $q = $a_results->getQuestion();
+        }
+        // SurveySingleChoiceQuestion
+        if (!in_array($q->getQuestionType(), [
+            "SurveySingleChoiceQuestion",
+            "SurveyMultipleChoiceQuestion",
+            "SurveyMetricQuestion",
+            "SurveyTextQuestion"
+        ])) {
+            //var_dump($q->getQuestionType());
+            //var_dump($answers);
+            //exit;
+        }
+
+
+        \ilDatePresentation::setUseRelativeDates(false);
+
+        $a_tpl = new \ilTemplate("tpl.svy_results_details_table.html", true, true, "Modules/Survey/Evaluation");
+
+        // table
+        $ret = "";
+        if ($request->getShowTable()) {
+
+            if (!$matrix) {
+
+                // rater
+                $a_tpl->setCurrentBlock("grid_col_header_bl");
+                $a_tpl->setVariable("COL_HEADER", $lng->txt("svy_rater"));
+                $a_tpl->parseCurrentBlock();
+
+                // date
+                $a_tpl->setCurrentBlock("grid_col_header_bl");
+                $a_tpl->setVariable("COL_HEADER", $lng->txt("date"));
+                $a_tpl->parseCurrentBlock();
+
+                // answer
+                $a_tpl->setCurrentBlock("grid_col_header_bl");
+                $a_tpl->setVariable("COL_HEADER", $lng->txt("answers"));
+                $a_tpl->parseCurrentBlock();
+
+                $condensed_answers = [];
+                foreach ($answers as $answer) {
+                    $condensed_answers[$answer->active_id]["tstamp"] = $answer->tstamp;
+                    $condensed_answers[$answer->active_id]["active_id"] = $answer->active_id;
+                    // this moves the original multiple answers items of muliple choice question into one array
+                    $condensed_answers[$answer->active_id]["value"][] = $answer->value;
+                    $condensed_answers[$answer->active_id]["text"] = $answer->text;
+                }
+
+                /** @var $answer \ilSurveyEvaluationResultsAnswer */
+                foreach ($condensed_answers as $answer) {
+                    // rater
+                    $a_tpl->setCurrentBlock("grid_col_bl");
+                    $a_tpl->setVariable("COL_CAPTION", " ");
+                    $a_tpl->parseCurrentBlock();
+
+                    // rater
+                    $participant = $this->getParticipantByActiveId($participants, $answer["active_id"]);
+                    $part_caption = "";
+                    if ($participant) {
+                        $part_caption = $participant["sortname"];
+                    }
+                    $a_tpl->setCurrentBlock("grid_col_bl");
+                    $a_tpl->setVariable("COL_CAPTION", $part_caption);
+                    $a_tpl->parseCurrentBlock();
+
+                    // date
+                    $a_tpl->setCurrentBlock("grid_col_bl");
+                    $date = new \ilDate($answer["tstamp"], IL_CAL_UNIX);
+                    $a_tpl->setVariable("COL_CAPTION",
+                        \ilDatePresentation::formatDate($date));
+                    $a_tpl->parseCurrentBlock();
+
+                    // answer
+                    $a_tpl->setCurrentBlock("grid_col_bl");
+                    if ($matrix) {
+                        $a_tpl->setVariable("COL_CAPTION", "-");
+                    } else {
+                        if ($q->getQuestionType() == "SurveyTextQuestion") {
+                            $a_tpl->setVariable("COL_CAPTION",
+                                $a_results->getScaleText($answer["text"]));
+                        } else {
+
+                            $scale_texts = array_map(function ($v) use ($a_results) {
+                                return $a_results->getScaleText($v);
+                            }, $answer["value"]);
+                            $a_tpl->setVariable("COL_CAPTION",
+                                implode(", ", $scale_texts));
+                        }
+                    }
+                    $a_tpl->parseCurrentBlock();
+
+                    $a_tpl->touchBlock("grid_row_bl");
+                }
+                $ret = $a_tpl->get();
+            } else {
+
+                /** @var $answer \ilSurveyEvaluationResultsAnswer */
+                foreach ($answers as $answer) {
+
+                    /** @var $q \SurveyMatrixQuestion */
+
+                    $cats = $q->getColumns();
+                    foreach ($cats->getCategories() as $cat) {
+                        $a_tpl->touchBlock("grid_col_head_center");
+                        $a_tpl->setCurrentBlock("grid_col_header_bl");
+                        $a_tpl->setVariable("COL_HEADER", $cat->title);
+                        $a_tpl->parseCurrentBlock();
+                    }
+
+                    $cats_rows = $q->getRows();
+
+                    reset($a_results);
+                    foreach ($cats_rows->getCategories() as $cat) {
+                        $a_tpl->setCurrentBlock("grid_col_bl");
+                        $a_tpl->setVariable("COL_CAPTION", $cat->title);
+                        $a_tpl->parseCurrentBlock();
+
+                        $r = current($a_results);
+                        $row_answers = $r[1]->getAnswers();
+                        $user_answers = null;
+                        foreach ($row_answers as $ra) {
+                            if ($ra->active_id == $answer->active_id) {
+                                $user_answers = $ra;
+                            }
+                        }
+
+                        foreach ($cats->getCategories() as $catr) {
+
+                            if ($user_answers && $user_answers->value == $catr->scale) {
+                                $a_tpl->touchBlock("grid_col_center");
+                                $a_tpl->setCurrentBlock("grid_col_bl");
+                                $a_tpl->setVariable("COL_CAPTION", "X");
+
+                            } else {
+                                $a_tpl->setCurrentBlock("grid_col_bl");
+                                $a_tpl->setVariable("COL_CAPTION", " ");
+                            }
+
+                            $a_tpl->parseCurrentBlock();
+                        }
+
+                        $a_tpl->touchBlock("grid_row_bl");
+                        next($a_results);
+                    }
+
+                    // rater
+                    $participant = $this->getParticipantByActiveId($participants, $answer->active_id);
+                    $part_caption = "";
+                    if ($participant) {
+                        $part_caption = $participant["sortname"];
+                    }
+                    $date = new \ilDate($answer->tstamp, IL_CAL_UNIX);
+                    $part_caption .= ", " . \ilDatePresentation::formatDate($date);
+
+                    $a_tpl->setVariable("HEADER", $part_caption);
+                    $ret.= $a_tpl->get();
+                    $a_tpl = new \ilTemplate("tpl.svy_results_details_table.html", true, true, "Modules/Survey/Evaluation");
+                }
+
+
+            }
+        }
+        return $ret;
+    }
+
+    protected function getParticipantByActiveId(array $participants, int $active_id) : ?array
+    {
+        foreach ($participants as $part) {
+            if ((int) $part["active_id"] == $active_id) {
+                return $part;
+            }
+        }
+        return null;
     }
 
 }

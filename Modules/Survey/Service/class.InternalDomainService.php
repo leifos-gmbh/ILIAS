@@ -124,4 +124,14 @@ class InternalDomainService
         return $this->lng;
     }
 
+    public function evaluation(\ilObjSurvey $survey, int $user_id) : Evaluation\EvaluationManager
+    {
+        return new Evaluation\EvaluationManager(
+            $this,
+            $this->repo_service,
+            $survey,
+            $user_id
+        );
+    }
+
 }

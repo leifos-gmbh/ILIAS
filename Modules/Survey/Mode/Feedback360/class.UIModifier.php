@@ -17,11 +17,10 @@ class UIModifier extends Mode\AbstractUIModifier
      * @inheritDoc
      */
     public function getSurveySettingsGeneral(
-        \ilObjSurvey $survey,
-        InternalUIService $ui_service
+        \ilObjSurvey $survey
     ) : array {
         $items = [];
-        $lng = $ui_service->lng();
+        $lng = $this->gui_service->lng();
 
         $self_eval = new \ilCheckboxInputGUI($lng->txt("survey_360_self_evaluation"), "self_eval");
         $self_eval->setInfo($lng->txt("survey_360_self_evaluation_info"));

@@ -87,7 +87,7 @@ class UIModifier extends Mode\AbstractUIModifier
     ) : void
     {
         $survey->setEvaluationAccess($form->getInput("evaluation_access"));
-        $survey->setCalculateSumScore((int) $form->getInput("calculate_sum_score"));
+        $survey->setCalculateSumScore((bool) $form->getInput("calculate_sum_score"));
         $hasDatasets = \ilObjSurvey::_hasDatasets($survey->getSurveyId());
         if (!$hasDatasets) {
             $current = $survey->getAnonymize();

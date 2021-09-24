@@ -5,12 +5,21 @@ declare(strict_types = 1);
 
 namespace ILIAS\Survey\Mode;
 
+use ILIAS\Survey\InternalDomainService;
+use ILIAS\Survey\InternalUIService;
+use ILIAS\Survey\InternalService;
+
 /**
  * @author Alexander Killing <killing@leifos.de>
  */
 class ModeFactory
 {
     protected $providers;
+
+    /**
+     * @var InternalService
+     */
+    protected $service;
 
     /**
      * Constructor
@@ -25,10 +34,16 @@ class ModeFactory
         ];
     }
 
+    public function setInternalService(InternalService $service)
+    {
+        $this->service = $service;
+    }
+
     public function getModeById(int $id) : ModeProvider
     {
         foreach ($this->providers as $provider) {
             if ($provider->getId() == $id) {
+                $provider->setInternalService($this->service);
                 return $provider;
             }
         }

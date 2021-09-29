@@ -13,7 +13,7 @@ include_once("./Modules/ItemGroup/classes/class.ilObjItemGroup.php");
  * $Id$
  *
  * @ilCtrl_Calls ilObjItemGroupGUI: ilPermissionGUI
- * @ilCtrl_Calls ilObjItemGroupGUI: ilCommonActionDispatcherGUI, ilObjectCopyGUI
+ * @ilCtrl_Calls ilObjItemGroupGUI: ilCommonActionDispatcherGUI, ilObjectCopyGUI, ilObjectTranslationGUI
  * @ilCtrl_isCalledBy ilObjItemGroupGUI: ilRepositoryGUI, ilAdministrationGUI
  * @ingroup ModulesItemGroup
  */
@@ -111,6 +111,15 @@ class ilObjItemGroupGUI extends ilObject2GUI
                 $this->ctrl->forwardCommand($gui);
                 break;
 
+            case 'ilobjecttranslationgui':
+                $this->checkPermissionBool("write");
+                $this->prepareOutput();
+                $this->setSettingsSubTabs("settings_trans");
+                $transgui = new ilObjectTranslationGUI($this);
+                $transgui->setTitleDescrOnlyMode(false);
+                $this->ctrl->forwardCommand($transgui);
+                break;
+
             default:
                 $cmd = $this->ctrl->getCmd("listMaterials");
                 $this->prepareOutput();
@@ -183,6 +192,12 @@ class ilObjItemGroupGUI extends ilObject2GUI
         
         ilUtil::sendSuccess($this->lng->txt("object_added"), true);
         $ilCtrl->redirect($this, "listMaterials");
+    }
+
+    public function edit()
+    {
+        parent::edit();
+        $this->setSettingsSubTabs("general");
     }
 
     /**
@@ -295,6 +310,27 @@ class ilObjItemGroupGUI extends ilObject2GUI
             );
         }
     }
+
+    protected function setSettingsSubTabs($active_tab = "general")
+    {
+        $ilSetting = $this->settings;
+        $ilTabs = $this->tabs;
+
+        $this->tabs_gui->addSubTab(
+            "general",
+            $this->lng->txt("settings"),
+            $this->ctrl->getLinkTarget($this, "edit")
+        );
+
+        $this->tabs_gui->addSubTab(
+            "settings_trans",
+            $this->lng->txt("obj_multilinguality"),
+            $this->ctrl->getLinkTargetByClass("ilobjecttranslationgui", "")
+        );
+        $this->tabs_gui->activateTab("settings");
+        $this->tabs_gui->activateSubTab($active_tab);
+    }
+
 
 
     /**

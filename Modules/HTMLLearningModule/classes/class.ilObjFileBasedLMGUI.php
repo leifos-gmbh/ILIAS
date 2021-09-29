@@ -531,13 +531,14 @@ class ilObjFileBasedLMGUI extends ilObjectGUI
 
         // #9483
         if ($ilUser->getId() != ANONYMOUS_USER_ID) {
-            include_once "Services/Tracking/classes/class.ilLearningProgress.php";
             ilLearningProgress::_tracProgress(
                 $ilUser->getId(),
                 $this->object->getId(),
                 $this->object->getRefId(),
                 "htlm"
             );
+
+            ilLPStatusWrapper::_updateStatus($this->object->getId(), $ilUser->getId());
         }
 
         require_once("./Modules/HTMLLearningModule/classes/class.ilObjFileBasedLMAccess.php");

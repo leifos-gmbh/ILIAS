@@ -29,28 +29,28 @@ interface ilBasicSkillLevelRepository
      * @param int $a_id
      * @return array level data
      */
-    public function getLevelData(int $skill_id, int $a_id = 0) : array;
+    public function getLevelData(int $skill_id, int $a_id = 0) : ?array;
 
     /**
      * Lookup level title
      * @param int $a_id level id
      * @return string level title
      */
-    public function lookupLevelTitle(int $a_id) : string;
+    public function lookupLevelTitle(int $a_id) : ?string;
 
     /**
      * Lookup level description
      * @param int $a_id level id
      * @return string level description
      */
-    public function lookupLevelDescription(int $a_id) : string;
+    public function lookupLevelDescription(int $a_id) : ?string;
 
     /**
      * Lookup level skill id
      * @param int $a_id level id
      * @return int skill id
      */
-    public function lookupLevelSkillId(int $a_id) : int;
+    public function lookupLevelSkillId(int $a_id) : ?int;
 
     /**
      * Write level title

@@ -39,7 +39,7 @@ class ilSkillResourcesManager
      *
      * @return bool
      */
-    public function isLevelTooLow(array $a_levels, array $profile_levels, array $actual_levels)
+    public function isLevelTooLow(array $a_levels, array $profile_levels, array $actual_levels) : bool
     {
         $too_low = true;
 
@@ -63,7 +63,7 @@ class ilSkillResourcesManager
     /**
      * @return array
      */
-    public function getSuggestedResourcesForProfile()
+    public function getSuggestedResources() : array
     {
         $resources = $this->res->getResources();
         $imp_resources = array();

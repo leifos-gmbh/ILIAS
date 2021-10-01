@@ -10,6 +10,42 @@
  */
 class ilSkillLearningHistoryProvider extends ilAbstractLearningHistoryProvider implements ilLearningHistoryProviderInterface
 {
+    /**
+     * @var ilCtrl
+     */
+    protected $ctrl;
+
+    /**
+     * @var \ILIAS\UI\Factory
+     */
+    protected $ui_fac;
+
+    /**
+     * @var \ILIAS\UI\Renderer
+     */
+    protected $ui_ren;
+
+    /**
+     * Constructor
+     *
+     * @param                          $user_id
+     * @param ilLearningHistoryFactory $factory
+     * @param ilLanguage               $lng
+     * @param ilTemplate|null          $template
+     */
+    public function __construct(
+        $user_id,
+        ilLearningHistoryFactory $factory,
+        ilLanguage $lng,
+        ilTemplate $template = null
+    ) {
+        global $DIC;
+
+        parent::__construct($user_id, $factory, $lng, $template);
+        $this->ctrl = $DIC->ctrl();
+        $this->ui_fac = $DIC->ui()->factory();
+        $this->ui_ren = $DIC->ui()->renderer();
+    }
 
     /**
      * @inheritdoc
@@ -72,6 +108,26 @@ class ilSkillLearningHistoryProvider extends ilAbstractLearningHistoryProvider i
                 );
             }
         }
+
+        // profiles
+        $completions = ilSkillProfileCompletionRepository::getFulfilledEntriesForUser($this->getUserId());
+        if (is_array($completions)) {
+            foreach ($completions as $c) {
+                $this->ctrl->setParameterByClass("ilpersonalskillsgui", "profile_id", $c["profile_id"]);
+                $p_link = $this->ui_fac->link()->standard(
+                    ilSkillProfile::lookupTitle($c["profile_id"]),
+                    $this->ctrl->getLinkTargetByClass("ilpersonalskillsgui", "listassignedprofile")
+                );
+                $ts = new ilDateTime($c["date"], IL_CAL_DATETIME);
+                $text = str_replace(
+                    "$3$",
+                    $this->getEmphasizedTitle($this->ui_ren->render($p_link)),
+                    $lng->txt("skll_lhist_skill_profile_fulfilled")
+                );
+
+            }
+        }
+
         return $entries;
     }
 

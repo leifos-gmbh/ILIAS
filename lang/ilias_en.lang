@@ -16615,3 +16615,9 @@ content#:#cont_sur_block_format#:#Surrounding Section
 ui#:#datetime_required#:#Time/Date required
 ui#:#duration_end_must_not_be_earlier_than_start#:#Start must not be later than end.
 forum#:#sticky_threads_sorting#:#Sticky Threads Sorting
+skmg#:#skmg_custom_image_alt#:#Custom image for competence profile
+skmg#:#skmg_form_presentation#:#Presentation
+skll#:#skll_lhist_skill_profile_fulfilled#:#Competence Profile $3$ was fulfilled.
+skmg#:#skmg_skill_needs_self_eval#:#Please conduct a self-evaluation first to see your profile target level. Please click on "actions" for that.
+skmg#:#skmg_skill_needs_self_eval_box#:#Please note that you have not conducted a self-evaluation for at least one competence in this profile. You will not see the profile target level for the affected competences until a self-evaluation is done.
+skmg#:#skmg_recommended_learning_material#:#Recommended Learning Materials

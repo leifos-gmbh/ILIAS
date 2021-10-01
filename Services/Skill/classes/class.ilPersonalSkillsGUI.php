@@ -60,7 +60,7 @@ class ilPersonalSkillsGUI
     protected $tpl;
 
     /**
-     * @var ilLanguage
+     * @var ilTabsGUI
      */
     protected $tabs;
 
@@ -97,6 +97,16 @@ class ilPersonalSkillsGUI
     protected $list_mode = self::LIST_SELECTED;
 
     /**
+     * @var \ILIAS\ResourceStorage\Services
+     */
+    protected $storage;
+
+    /**
+     * @var \ILIAS\DI\HTTPServices
+     */
+    protected $request;
+
+    /**
      * Contructor
      *
      * @access public
@@ -117,6 +127,8 @@ class ilPersonalSkillsGUI
         $this->ui_fac = $DIC->ui()->factory();
         $this->ui_ren = $DIC->ui()->renderer();
         $this->ui = $DIC->ui();
+        $this->storage = $DIC->resourceStorage();
+        $this->request = $DIC->http()->request();
 
         $ilCtrl = $this->ctrl;
         $ilHelp = $this->help;
@@ -419,7 +431,7 @@ class ilPersonalSkillsGUI
     {
         switch ($this->list_mode) {
             case self::LIST_PROFILES:
-                $this->listAssignedProfile();
+                $this->listAllAssignedProfiles();
                 break;
 
             default:
@@ -856,7 +868,7 @@ class ilPersonalSkillsGUI
 
         $ilTabs->setBackTarget(
             $lng->txt("back"),
-            $ilCtrl->getLinkTarget($this, "render")
+            $ilCtrl->getLinkTarget($this, "listAssignedProfile")
         );
         
         $ilCtrl->saveParameter($this, "skill_id");
@@ -1057,7 +1069,7 @@ class ilPersonalSkillsGUI
 
         $ilTabs->setBackTarget(
             $lng->txt("back"),
-            $ilCtrl->getLinkTarget($this, "render")
+            $ilCtrl->getLinkTarget($this, "listAssignedProfile")
         );
         
         $ilCtrl->saveParameter($this, "skill_id");
@@ -1139,7 +1151,7 @@ class ilPersonalSkillsGUI
                 $ilCtrl->saveParameter($this, "tref_id");
                 $ilCtrl->saveParameter($this, "basic_skill_id");*/
         
-        $ilCtrl->redirect($this, "render");
+        $ilCtrl->redirect($this, "listAssignedProfile");
     }
     
     /**
@@ -1932,6 +1944,49 @@ class ilPersonalSkillsGUI
     }
 
     /**
+     * List all assigned profiles
+     */
+    public function listAllAssignedProfiles()
+    {
+        $this->setTabs("profile");
+
+        $prof_items = array();
+
+        foreach ($this->user_profiles as $p) {
+            $image_id = $p["image_id"];
+            if ($image_id) {
+                $identification = $this->storage->manage()->find($image_id);
+                $src = $this->storage->consume()->src($identification);
+                $image = $this->ui_fac->image()->responsive($src->getSrc(), $this->lng->txt("skmg_custom_image_alt"));
+            } else {
+                $image = $this->ui_fac->image()->responsive(
+                    "src/UI/examples/Image/HeaderIconLarge.svg",
+                    "Thumbnail Example"
+                );
+            }
+
+            $this->ctrl->setParameter($this, "profile_id", $p["id"]);
+            $link = $this->ui_fac->link()->standard(
+                $p["title"],
+                $this->ctrl->getLinkTarget($this, "listassignedprofile")
+            );
+            $this->ctrl->setParameter($this, "profile_id", "");
+
+            $prof_item = $this->ui_fac->item()->standard($link)
+                            ->withDescription($p["description"])
+                            ->withLeadImage($image);
+
+            $prof_items[] = $prof_item;
+        }
+
+        $prof_list = $this->ui_fac->panel()->listing()->standard("", array(
+            $this->ui_fac->item()->group("", $prof_items)
+        ));
+
+        $this->tpl->setContent($this->ui_ren->render($prof_list));
+    }
+
+    /**
      * List profile
      *
      * @param
@@ -1945,10 +2000,12 @@ class ilPersonalSkillsGUI
 
         $tpl = new ilTemplate("tpl.skill_filter.html", true, true, "Services/Skill");
 
-        $this->setTabs("profile");
-
-        $this->determineCurrentProfile();
-        $this->showProfileSelectorToolbar();
+        $this->tabs->clearTargets();
+        $this->tabs->setBackTarget(
+            $this->lng->txt("back"),
+            $ilCtrl->getLinkTarget($this, "listallassignedprofiles")
+        );
+        $this->setProfileId((int) $this->request->getQueryParams()["profile_id"]);
 
         $filter_toolbar = new ilToolbarGUI();
         $filter_toolbar->setFormAction($ilCtrl->getFormAction($this));

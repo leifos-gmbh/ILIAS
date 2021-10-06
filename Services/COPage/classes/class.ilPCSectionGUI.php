@@ -286,6 +286,16 @@ class ilPCSectionGUI extends ilPageContentGUI
             }
         }
 
+        // protection
+        if ($this->getPageConfig()->getSectionProtection() == ilPageConfig::SEC_PROTECT_EDITABLE) {
+            $cb = new ilCheckboxInputGUI($lng->txt("cont_sec_protected"), "protected");
+            $cb->setInfo($this->getPageConfig()->getSectionProtectionInfo());
+            if (!$a_insert) {
+                $cb->setChecked($this->content_obj->getProtected());
+            }
+            $form->addItem($cb);
+        }
+
         // save/cancel buttons
         if ($a_insert) {
             $form->addCommandButton("create_section", $lng->txt("save"));
@@ -379,6 +389,10 @@ class ilPCSectionGUI extends ilPageContentGUI
             }
         } else {
             $this->content_obj->setNoLink();
+        }
+
+        if ($this->getPageConfig()->getSectionProtection() == ilPageConfig::SEC_PROTECT_EDITABLE) {
+            $this->content_obj->setProtected($form->getInput("protected"));
         }
     }
 }

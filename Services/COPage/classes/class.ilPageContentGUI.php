@@ -32,6 +32,9 @@ class ilPageContentGUI
     public $updated;
     public $target_script;
     public $return_location;
+    /**
+     * @var ?ilPageConfig
+     */
     public $page_config = null;
 
     /**
@@ -132,7 +135,7 @@ class ilPageContentGUI
     /**
      * Get Page Config
      *
-     * @return	object	Page Config
+     * @return	?ilPageConfig
      */
     public function getPageConfig()
     {

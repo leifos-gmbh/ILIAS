@@ -11,6 +11,11 @@
  */
 abstract class ilPageConfig
 {
+    // section protection
+    public const SEC_PROTECT_NONE = 0;          // page does not support section protection
+    public const SEC_PROTECT_EDITABLE = 1;      // current use can edit protected sections
+    public const SEC_PROTECT_PROTECTED = 2;     // current use cannot edit protected sections
+
     /**
      * @var ilLanguage
      */
@@ -63,6 +68,16 @@ abstract class ilPageConfig
      * @var string
      */
     protected $page_obj_key = "";
+
+    /**
+     * @var int
+     */
+    protected $section_protection = self::SEC_PROTECT_NONE;
+
+    /**
+     * @var string
+     */
+    protected $section_protection_info;
     
     /**
      * Constructor
@@ -679,4 +694,25 @@ abstract class ilPageConfig
     {
         return $this->use_page_container;
     }
+
+    public function setSectionProtection(int $a_val) : void
+    {
+        $this->section_protection = $a_val;
+    }
+
+    public function getSectionProtection() : int
+    {
+        return $this->section_protection;
+    }
+
+    public function setSectionProtectionInfo(string $a_val) : void
+    {
+        $this->section_protection_info = $a_val;
+    }
+
+    public function getSectionProtectionInfo() : string
+    {
+        return $this->section_protection_info;
+    }
+
 }

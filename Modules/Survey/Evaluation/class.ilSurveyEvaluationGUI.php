@@ -96,7 +96,8 @@ class ilSurveyEvaluationGUI
         $this->log = ilLoggerFactory::getLogger("svy");
         $this->array_panels = array();
 
-        if ($this->object->get360Mode() || $this->object->getMode() == ilObjSurvey::MODE_SELF_EVAL) {
+        if ($this->object->get360Mode() || $this->object->getMode() == ilObjSurvey::MODE_SELF_EVAL
+            || $this->object->getMode() == ilObjSurvey::MODE_IND_FEEDB) {
             $this->determineAppraiseeId();
         }
 
@@ -159,11 +160,13 @@ class ilSurveyEvaluationGUI
             );
         }
 
-        $ilTabs->addSubTabTarget(
-            "svy_eval_cumulated",
-            $this->ctrl->getLinkTarget($this, "evaluation"),
-            array("evaluation", "checkEvaluationAccess")
-        );
+        if ($this->object->getMode() != ilObjSurvey::MODE_IND_FEEDB) {
+            $ilTabs->addSubTabTarget(
+                "svy_eval_cumulated",
+                $this->ctrl->getLinkTarget($this, "evaluation"),
+                array("evaluation", "checkEvaluationAccess")
+            );
+        }
 
         $ilTabs->addSubTabTarget(
             "svy_eval_detail",
@@ -216,7 +219,6 @@ class ilSurveyEvaluationGUI
     {
         $ilUser = $this->user;
         $rbacsystem = $this->rbacsystem;
-        
         $appr_id = "";
         
         // always start with current user
@@ -749,7 +751,17 @@ class ilSurveyEvaluationGUI
         
         return $modal->getHTML();
     }
-    
+
+    protected function openEvaluation()
+    {
+        $skmg_set = new ilSkillManagementSettings();
+        if ($this->object->getSkillService() && $skmg_set->isActivated()) {
+            $this->competenceEval();
+        } else {
+            $this->evaluation();
+        }
+    }
+
     public function evaluation($details = 0, $pdf = false, $return_pdf = false)
     {
         $ilToolbar = $this->toolbar;
@@ -1402,12 +1414,12 @@ class ilSurveyEvaluationGUI
         $ilTabs->activateTab("svy_results");
 
         $ilToolbar->setFormAction($this->ctrl->getFormAction($this, "competenceEval"));
-        
-        if ($this->object->get360Mode() || $survey->getMode() == ilObjSurvey::MODE_SELF_EVAL) {
+
+        if ($this->object->get360Mode() || $survey->getMode() == ilObjSurvey::MODE_SELF_EVAL ||
+            $survey->getMode() == ilObjSurvey::MODE_IND_FEEDB) {
             $appr_id = $this->getAppraiseeId();
             $this->addApprSelectionToToolbar();
         }
-        
         if ($appr_id == 0) {
             return;
         }
@@ -1495,7 +1507,8 @@ class ilSurveyEvaluationGUI
         } else { // must be all survey competences
             $pskills_gui = new ilPersonalSkillsGUI();
             #23743
-            if ($survey->getMode() != ilObjSurvey::MODE_SELF_EVAL) {
+            if ($survey->getMode() != ilObjSurvey::MODE_SELF_EVAL &&
+                $survey->getMode() != ilObjSurvey::MODE_IND_FEEDB) {
                 $pskills_gui->setGapAnalysisActualStatusModePerObject($survey->getId(), $lng->txt("skmg_eval_type_1"));
             }
             if ($survey->getFinishedIdForAppraiseeIdAndRaterId($appr_id, $appr_id) > 0) {

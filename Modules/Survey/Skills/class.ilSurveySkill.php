@@ -241,7 +241,7 @@ class ilSurveySkill
      * @param $a_appraisee_id int user id of appraisee
      * @return array array with lots of information
      */
-    public function determineSkillLevelsForAppraisee($a_appraisee_id, $a_self_eval = false)
+    public function determineSkillLevelsForAppraisee($a_appraisee_id, $a_self_eval = false, $rater_id = 0)
     {
         $skills = array();
 
@@ -261,8 +261,16 @@ class ilSurveySkill
                 );
         }
 
+        $finished_ids = [];
         if (!$a_self_eval) {
-            $finished_ids = $this->survey->getFinishedIdsForAppraiseeId($a_appraisee_id, true);
+            if ($rater_id > 0) {
+                $finished_id = $this->survey->getFinishedIdForAppraiseeIdAndRaterId($a_appraisee_id, $rater_id);
+                if ($finished_id > 0) {
+                    $finished_ids = array($finished_id);
+                }
+            } else {
+                $finished_ids = $this->survey->getFinishedIdsForAppraiseeId($a_appraisee_id, true);
+            }
         } else {
             $finished_id = $this->survey->getFinishedIdForAppraiseeIdAndRaterId($a_appraisee_id, $a_appraisee_id);
             if ($finished_id > 0) {
@@ -398,6 +406,31 @@ class ilSurveySkill
 
         // write self evaluation
         $this->writeAndAddSelfEvalSkills($user_id);
+    }
+
+    public function writeAndAddIndFeedbackSkills($rater_id, $appr_id) {
+        $new_levels = $this->determineSkillLevelsForAppraisee($appr_id, false, $rater_id);
+        foreach ($new_levels as $nl) {
+            if ($nl["new_level_id"] > 0) {
+                ilBasicSkill::writeUserSkillLevelStatus(
+                    $nl["new_level_id"],
+                    $appr_id,
+                    $this->survey->getRefId(),
+                    $nl["tref_id"],
+                    ilBasicSkill::ACHIEVED,
+                    true,
+                    false,
+                    "",
+                    $nl["next_level_perc"]
+                );
+
+                if ($nl["tref_id"] > 0) {
+                    ilPersonalSkill::addPersonalSkill($appr_id, $nl["tref_id"]);
+                } else {
+                    ilPersonalSkill::addPersonalSkill($appr_id, $nl["base_skill_id"]);
+                }
+            }
+        }
     }
 
     /**

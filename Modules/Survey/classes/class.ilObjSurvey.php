@@ -2675,7 +2675,7 @@ class ilObjSurvey extends ilObject
     * @param integer $user_id The database id of the user who finishes the survey
     * @access public
     */
-    public function finishSurvey($finished_id)
+    public function finishSurvey($finished_id, $appr_id = 0)
     {
         $ilDB = $this->db;
         
@@ -2691,6 +2691,14 @@ class ilObjSurvey extends ilObject
             $user = $this->getUserDataFromActiveId($finished_id);
             $sskill = new ilSurveySkill($this);
             $sskill->writeAndAddSelfEvalSkills($user['usr_id']);
+        }
+
+        // self eval writes skills on finishing
+        if ($this->getMode() == ilObjSurvey::MODE_IND_FEEDB) {
+            $user = $this->getUserDataFromActiveId($finished_id);
+            $sskill = new ilSurveySkill($this);
+            //$sskill->writeAndAddSelfEvalSkills($user['usr_id']);
+            $sskill->writeAndAddIndFeedbackSkills($user['usr_id'], $appr_id);
         }
 
         $this->checkTutorNotification();

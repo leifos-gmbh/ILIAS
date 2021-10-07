@@ -985,7 +985,7 @@ class ilSurveyExecutionGUI
         $ilUser = $this->user;
         
         if (!$this->preview) {
-            $this->object->finishSurvey($this->getCurrentRunId());
+            $this->object->finishSurvey($this->getCurrentRunId(), $this->requested_appr_id);
                         
             if ($ilUser->getId() != ANONYMOUS_USER_ID) {
                 ilLPStatusWrapper::_updateStatus($this->object->getId(), $ilUser->getId());

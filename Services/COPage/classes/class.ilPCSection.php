@@ -536,6 +536,9 @@ class ilPCSection extends ilPageContent
      */
     public function getModel()
     {
+        if ($this->sec_node->node_name() != "Section") {
+            return null;
+        }
         $model = new \stdClass();
         $model->protected = $this->getProtected();
 

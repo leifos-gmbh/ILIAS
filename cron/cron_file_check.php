@@ -43,8 +43,8 @@ class ilFileCheck
                 $this->logger->info('Ignoring empty file');
                 return;
             }
-            $this->logger->error('Cannot find version directory: ' . $version_dir);
-            $version--;
+            $this->logger->error('Cannot find version directory: ' . $version_dir . ' ' . $file_name);
+            $version++;
             $old_version_dir = $path . str_pad((string) (int) $version, 3, '0', STR_PAD_LEFT);
             if (is_dir($old_version_dir)) {
                 $this->logger->warning('Would rename: ' . $old_version_dir . ' ->  ' . $version_dir);

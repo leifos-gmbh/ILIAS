@@ -23,26 +23,34 @@ class ilFileCheck
         $query = 'select file_id, file_name, version from file_data';
         $res = $this->db->query($query);
         while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_ASSOC)) {
-            $this->validateFileRow($row);
+            $this->validateFileRow((int) $row['file_id'], (string) $row['file_name'], (int) $row['version']);
         }
     }
 
-    protected function validateFileRow($row)
+    protected function validateFileRow($file_id, $file_name, $version)
     {
         $path = ilUtil::getDataDir();
         $path .= '/ilFile/';
-        $path .= self::_createPathFromId($row['file_id'], 'file');
+        $path .= self::_createPathFromId($file_id, 'file');
         $path .= '/';
         $this->logger->debug('Validating file system path: ' . $path);
 
-        $version_dir = $path . str_pad((string) (int) $row['version'], 3, '0', STR_PAD_LEFT);
+        $version_dir = $path . str_pad((string) (int) $version, 3, '0', STR_PAD_LEFT);
         $this->logger->debug('Validating file version path: ' .  $version_dir);
 
         if (!is_dir($version_dir)) {
             $this->logger->error('Cannot find version directory: ' . $version_dir);
-            return;
+            $version--;
+            $old_version_dir = $path . str_pad((string) (int) $version, 3, '0', STR_PAD_LEFT);
+            if (is_dir($old_version_dir)) {
+                $this->logger->warning('Would rename: ' . $old_version_dir . ' ->  ' . $version_dir);
+                rename($old_version_dir, $version_dir);
+            } else {
+                $this->logger->error('Cannot find version directory: ' . $old_version_dir);
+                return;
+            }
         }
-        $file = $version_dir . '/' . $row['file_name'];
+        $file = $version_dir . '/' . $file_name;
         if (!is_file($file)) {
             $this->logger->error('Cannot find file: ' . $file);
             return;

@@ -39,6 +39,10 @@ class ilFileCheck
         $this->logger->debug('Validating file version path: ' .  $version_dir);
 
         if (!is_dir($version_dir)) {
+            if ($version == 0) {
+                $this->logger->info('Ignoring empty file');
+                return;
+            }
             $this->logger->error('Cannot find version directory: ' . $version_dir);
             $version--;
             $old_version_dir = $path . str_pad((string) (int) $version, 3, '0', STR_PAD_LEFT);

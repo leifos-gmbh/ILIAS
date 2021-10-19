@@ -257,7 +257,7 @@ class ilECSAppEventListener implements ilAppEventListener
                 try {
                     $part = ilParticipants::getInstance((int) $ref_id);
                     if ($obj_type === 'crs') {
-                    $part->add($user->getId(), ilCourseConstants::CRS_MEMBER);
+                        $part->add($user->getId(), ilCourseConstants::CRS_MEMBER);
                     } elseif ($obj_type === 'grp') {
                         $part->add($user->getId(), IL_GRP_MEMBER);
                     }

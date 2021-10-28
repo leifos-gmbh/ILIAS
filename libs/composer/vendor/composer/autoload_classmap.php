@@ -1983,7 +1983,6 @@ return array(
     'League\\MimeTypeDetection\\FinfoMimeTypeDetector' => $vendorDir . '/league/mime-type-detection/src/FinfoMimeTypeDetector.php',
     'League\\MimeTypeDetection\\GeneratedExtensionToMimeTypeMap' => $vendorDir . '/league/mime-type-detection/src/GeneratedExtensionToMimeTypeMap.php',
     'League\\MimeTypeDetection\\MimeTypeDetector' => $vendorDir . '/league/mime-type-detection/src/MimeTypeDetector.php',
-    'League\\MimeTypeDetection\\OverridingExtensionToMimeTypeMap' => $vendorDir . '/league/mime-type-detection/src/OverridingExtensionToMimeTypeMap.php',
     'LegacyPathHelperHelper' => $baseDir . '/Services/Certificate/classes/Helper/LegacyPathHelperHelper.php',
     'LibRIS\\ParseException' => $vendorDir . '/technosophos/LibRIS/src/LibRIS/ParseException.php',
     'LibRIS\\RISReader' => $vendorDir . '/technosophos/LibRIS/src/LibRIS/RISReader.php',

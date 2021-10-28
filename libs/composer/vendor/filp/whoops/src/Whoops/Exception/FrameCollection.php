@@ -178,12 +178,12 @@ class FrameCollection implements ArrayAccess, IteratorAggregate, Serializable, C
         $this->frames = unserialize($serializedFrames);
     }
 
-    public function __serialize()
+    public function __serialize(): array
     {
         return $this->frames;
     }
 
-    public function __unserialize(array $serializedFrames)
+    public function __unserialize(array $serializedFrames): void
     {
         $this->frames = $serializedFrames;
     }

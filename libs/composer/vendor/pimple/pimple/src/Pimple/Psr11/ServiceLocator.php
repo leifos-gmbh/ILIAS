@@ -68,7 +68,7 @@ class ServiceLocator implements ContainerInterface
     /**
      * {@inheritdoc}
      */
-    public function has(string $id): bool
+    public function has(string $id)
     {
         return isset($this->aliases[$id]) && isset($this->container[$this->aliases[$id]]);
     }

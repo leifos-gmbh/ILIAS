@@ -36,9 +36,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'PROPFIND'
 }
 // END WebDAV: Block WebDAV Requests from Microsoft WebDAV MiniRedir client.
 
+// begin-patch skyguide
+if(
+    !isset($_GET['cmd']) ||
+    strcmp($_GET['cmd'], 'force_login') !== 0
+) {
+    $target = (strlen($_GET['target']) ? ('?target='.$_GET['target']) : '?');
+    switch($_SERVER['SKY_SSO'])
+    {
+        // netscaler session
+        case '1':
+            header('Location: ./intern/index.php' . $target);
+            exit;
+
+        // kerberos session
+        default:
+            break;
+    }
+}
+// end-patch skyguide
 
 require_once("Services/Init/classes/class.ilInitialisation.php");
 ilInitialisation::initILIAS();
+
 
 $ilCtrl->initBaseClass("ilStartUpGUI");
 $ilCtrl->callBaseClass();

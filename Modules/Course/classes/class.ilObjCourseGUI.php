@@ -990,6 +990,29 @@ class ilObjCourseGUI extends ilContainerGUI
         $this->object->update();
         
         
+        // begin-patch skydoc
+        global $DIC;
+        $system = $DIC->rbac()->system();
+        if($system->checkAccess('read', \ilObjFileAccessSettings::lookupFileSettingsRefId())) {
+            include_once './Services/Object/classes/class.ilObjectServiceSettingsGUI.php';
+            ilObjectServiceSettingsGUI::updateServiceSettingsForm(
+                $this->object->getId(),
+                $form,
+                array(
+                    ilObjectServiceSettingsGUI::CALENDAR_VISIBILITY,
+                    ilObjectServiceSettingsGUI::USE_NEWS,
+                    ilObjectServiceSettingsGUI::AUTO_RATING_NEW_OBJECTS,
+                    ilObjectServiceSettingsGUI::TAG_CLOUD,
+                    ilObjectServiceSettingsGUI::CUSTOM_METADATA,
+                    ilObjectServiceSettingsGUI::BADGES,
+                    ilObjectServiceSettingsGUI::ORGU_POSITION_ACCESS,
+                    ilObjectServiceSettingsGUI::SKILLS,
+                    ilObjectServiceSettingsGUI::PL_SKYDOC
+                )
+            );
+        }
+        else {
+            include_once './Services/Object/classes/class.ilObjectServiceSettingsGUI.php';
         ilObjectServiceSettingsGUI::updateServiceSettingsForm(
             $this->object->getId(),
             $form,
@@ -1006,6 +1029,7 @@ class ilObjCourseGUI extends ilContainerGUI
                 ilObjectServiceSettingsGUI::EXTERNAL_MAIL_PREFIX
             )
         );
+        }
         
         require_once('Services/Tracking/classes/class.ilChangeEvent.php');
         global $DIC;
@@ -1463,6 +1487,28 @@ class ilObjCourseGUI extends ilContainerGUI
         $feat->setTitle($this->lng->txt('obj_features'));
         $form->addItem($feat);
 
+        // begin-patch skydoc
+        global $DIC;
+        $system = $DIC->rbac()->system();
+        if($system->checkAccess('read', \ilObjFileAccessSettings::lookupFileSettingsRefId())) {
+            include_once './Services/Object/classes/class.ilObjectServiceSettingsGUI.php';
+            ilObjectServiceSettingsGUI::initServiceSettingsForm(
+                $this->object->getId(),
+                $form,
+                array(
+                    ilObjectServiceSettingsGUI::CALENDAR_VISIBILITY,
+                    ilObjectServiceSettingsGUI::USE_NEWS,
+                    ilObjectServiceSettingsGUI::AUTO_RATING_NEW_OBJECTS,
+                    ilObjectServiceSettingsGUI::TAG_CLOUD,
+                    ilObjectServiceSettingsGUI::CUSTOM_METADATA,
+                    ilObjectServiceSettingsGUI::BADGES,
+                    ilObjectServiceSettingsGUI::ORGU_POSITION_ACCESS,
+                    ilObjectServiceSettingsGUI::SKILLS,
+                    ilObjectServiceSettingsGUI::PL_SKYDOC
+                )
+            );
+        }
+        else {
         include_once './Services/Object/classes/class.ilObjectServiceSettingsGUI.php';
         ilObjectServiceSettingsGUI::initServiceSettingsForm(
             $this->object->getId(),
@@ -1480,6 +1526,7 @@ class ilObjCourseGUI extends ilContainerGUI
                     ilObjectServiceSettingsGUI::EXTERNAL_MAIL_PREFIX
                 )
             );
+        }
 
         $mem = new ilCheckboxInputGUI($this->lng->txt('crs_show_members'), 'show_members');
         $mem->setChecked($this->object->getShowMembers());

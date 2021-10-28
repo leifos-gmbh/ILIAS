@@ -817,7 +817,24 @@ class ilObjCategoryGUI extends ilContainerGUI
         $sh->setTitle($this->lng->txt('obj_features'));
         $form->addItem($sh);
 
-        include_once './Services/Object/classes/class.ilObjectServiceSettingsGUI.php';
+        // begin-patch skydoc
+        global $DIC;
+        $system = $DIC->rbac()->system();
+        if($system->checkAccess('read', \ilObjFileAccessSettings::lookupFileSettingsRefId())) {
+            ilObjectServiceSettingsGUI::initServiceSettingsForm(
+                $this->object->getId(),
+                $form,
+                array(
+                    ilObjectServiceSettingsGUI::INFO_TAB_VISIBILITY,
+                    ilObjectServiceSettingsGUI::NEWS_VISIBILITY,
+                    ilObjectServiceSettingsGUI::TAXONOMIES,
+                    ilObjectServiceSettingsGUI::CUSTOM_METADATA,
+                    ilObjectServiceSettingsGUI::PL_SKYDOC
+                )
+            );
+
+        }
+        else {
         ilObjectServiceSettingsGUI::initServiceSettingsForm(
             $this->object->getId(),
             $form,
@@ -830,6 +847,8 @@ class ilObjCategoryGUI extends ilContainerGUI
                     ilObjectServiceSettingsGUI::FILTER
                 )
         );
+        }
+
 
         $form->addCommandButton("update", $this->lng->txt("save"));
 
@@ -888,6 +907,24 @@ class ilObjCategoryGUI extends ilContainerGUI
                 // END ChangeEvent: Record update
                 
                 // services
+                // begin-patch skydoc
+                global $DIC;
+                $system = $DIC->rbac()->system();
+                if ($system->checkAccess('read',ilObjFileAccessSettings::lookupFileSettingsRefId())) {
+                    ilObjectServiceSettingsGUI::updateServiceSettingsForm(
+                        $this->object->getId(),
+                        $form,
+                        array(
+                            ilObjectServiceSettingsGUI::INFO_TAB_VISIBILITY,
+                            ilObjectServiceSettingsGUI::NEWS_VISIBILITY,
+                            ilObjectServiceSettingsGUI::TAXONOMIES,
+                            ilObjectServiceSettingsGUI::CUSTOM_METADATA,
+                            \ilObjectServiceSettingsGUI::PL_SKYDOC
+                        )
+                    );
+
+                }
+                else {
                 include_once './Services/Object/classes/class.ilObjectServiceSettingsGUI.php';
                 ilObjectServiceSettingsGUI::updateServiceSettingsForm(
                     $this->object->getId(),
@@ -901,6 +938,8 @@ class ilObjCategoryGUI extends ilContainerGUI
                         ilObjectServiceSettingsGUI::FILTER
                     )
                 );
+                }
+
 
                 // block limit
                 if ((int) $form->getInput("block_limit") > 0) {

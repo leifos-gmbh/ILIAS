@@ -87,6 +87,41 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI
                 $perm_gui = new ilPermissionGUI($this);
                 $ret = &$this->ctrl->forwardCommand($perm_gui);
                 break;
+
+            case 'ilfmsettingsgui':
+                $this->tabs_gui->setTabActive('fm_settings_tab');
+                $fmg = new ilFMSettingsGUI($this);
+                $this->ctrl->forwardCommand($fmg);
+                break;
+
+            case 'ilwebdavmountinstructionsuploadgui':
+                $document_gui = new ilWebDAVMountInstructionsUploadGUI(
+                    $this->object,
+                    $this->tpl,
+                    $this->user,
+                    $this->ctrl,
+                    $this->lng,
+                    $DIC->rbac()->system(),
+                    $DIC['ilErr'],
+                    $DIC->logger()->root(),
+                    $this->toolbar,
+                    $DIC->http(),
+                    $DIC->ui()->factory(),
+                    $DIC->ui()->renderer(),
+                    $DIC->filesystem(),
+                    $DIC->upload(),
+                    new ilWebDAVMountInstructionsRepositoryImpl($DIC->database())
+                );
+                $this->tabs_gui->setTabActive('webdav');
+                $this->addWebDAVSubTabs();
+                $this->tabs_gui->setSubTabActive('webdav_upload_instructions');
+                $this->ctrl->forwardCommand($document_gui);
+                break;
+
+            case 'ilopentextconfiggui':
+                $this->forwardToOpenTextPlugin();
+                break;
+
             default:
                 if (!$cmd || $cmd == 'view') {
                     $cmd = self::CMD_EDIT_SETTINGS;
@@ -97,6 +132,17 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI
         }
 
         return true;
+    }
+
+    /**
+     * @throws ilCtrlException
+     */
+    protected function forwardToOpenTextPlugin()
+    {
+        $plugin = ilPlugin::getPluginObject(IL_COMP_SERVICE, "EventHandling", "evhk", "OpenText");
+
+        $config = new \ilOpenTextConfigGUI();
+        $this->ctrl->forwardCommand($config);
     }
 
 
@@ -120,6 +166,24 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI
                 array(self::CMD_EDIT_SETTINGS, "view")
             );
         }
+
+        // begin-patch skydoc
+        if ($rbacsystem->checkAccess('write', $this->object->getRefId())) {
+
+            $plugin = ilPlugin::getPluginObject(IL_COMP_SERVICE, "EventHandling", "evhk", "OpenText");
+            if (
+                $plugin instanceof \ilOpenTextPlugin &&
+                $plugin->isActive()
+            ) {
+                $this->tabs_gui->addTab(
+                    'skydoc',
+                    'Skydoc',
+                    $this->ctrl->getLinkTargetByClass(\ilOpenTextConfigGUI::class, '')
+                );
+            }
+        }
+
+
         if ($rbacsystem->checkAccess('edit_permission', $this->object->getRefId())) {
             $this->tabs_gui->addTarget("perm_settings", $this->ctrl->getLinkTargetByClass('ilpermissiongui', "perm"), array(), 'ilpermissiongui');
         }

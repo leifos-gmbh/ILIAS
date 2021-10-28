@@ -165,7 +165,21 @@ class ilLoggerFactory
             case 'root':
                 $logger = new Logger($loggerNamePrefix . 'root');
                 break;
-                
+
+            //begin-patch skyguide
+            case 'vira':
+                $logger        = new Logger(CLIENT_ID . '_' . $a_component_id);
+                $clamd_handler = new StreamHandler(
+                    $this->getSettings()->getLogDir() . '/clamd_' . $this->getSettings()->getLogFile(),
+                    true
+                );
+                $clamd_handler->setLevel($this->getSettings()->getLevelByComponent($a_component_id));
+                $line_formatter = new ilLineFormatter(static::DEFAULT_FORMAT, 'Y-m-d H:i:s.u', true, true);
+                $clamd_handler->setFormatter($line_formatter);
+                $logger->pushHandler($clamd_handler);
+                break;
+            //end-patch skyguide
+
             default:
                 $logger = new Logger($loggerNamePrefix . $a_component_id);
                 break;

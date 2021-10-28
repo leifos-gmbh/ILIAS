@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (c) 1998-2009 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 /**
@@ -7,11 +8,11 @@
  * @version       $Id$
  * @extends       ilVirusScanner
  */
-
 require_once "./Services/VirusScanner/classes/class.ilVirusScanner.php";
 
 class ilVirusScannerClamAV extends ilVirusScanner
 {
+
     const ADD_SCAN_PARAMS = '--no-summary -i';
 
     /**
@@ -137,6 +138,10 @@ class ilVirusScannerClamAV extends ilVirusScanner
         $perm = $currentPermission | 0640;
         chmod($a_filepath, $perm);
 
+        //begin-patch skyguide
+        $this->log->info('Scanning file: ' . $this->scanFilePath . ' original name: ' . $this->scanFileOrigName);
+        //end-patch skyguide
+
         // Call of antivir command
         $cmd = $this->buildScanCommand($a_filepath) . " 2>&1";
         exec($cmd, $out, $ret);
@@ -146,12 +151,46 @@ class ilVirusScannerClamAV extends ilVirusScanner
             chmod($a_filepath, $currentPermission);
         }
 
+        //begin-patch skyguide
+        if (strlen($this->scanResult)) {
+            $this->log->info('Scan result ... ');
+            $this->log->dump($this->scanResult, ilLogLevel::INFO);
+        }
+        //end-patch skyguide
+
         // sophie could be called
         if ($this->hasDetections($this->scanResult)) {
             $this->scanFileIsInfected = true;
-            $this->logScanResult();
+            //begin-patch skyguide
+			#$this->logScanResult();
+            if ($GLOBALS['ilUser'] instanceof ilObjUser) {
+                $this->log->error('File is infected: ' . $this->scanFilePath . ' uploaded by ' . $GLOBALS['ilUser']->getLogin());
+                $this->log->logStack();
+            } else {
+                $this->log->error('File is infected: ' . $this->scanFilePath . ' uploaded by unknown.');
+                $this->log->logStack();
+            }
+
+
+            $file = ILIAS_LOG_DIR.'/clamd_status_'.ILIAS_LOG_FILE;
+            if(!file_exists($file)) {
+                $status_file = fopen($file, "w");
+                fwrite($status_file, 1);
+                fclose($status_file);
+            }
+            //end-patch skyguide
             return $this->scanResult;
-        } else {
+		}
+		else
+		{
+            //begin-patch skyguide
+            if ($GLOBALS['ilUser'] instanceof ilObjUser) {
+                $this->log->info('File is clean: ' . $this->scanFilePath . ' uploaded by ' . $GLOBALS['ilUser']->getLogin());
+            } else {
+                $this->log->info('File is clean: ' . $this->scanFilePath . ' uploaded by unknown.');
+                $this->log->logStack();
+            }
+            //end-patch skyguide
             $this->scanFileIsInfected = false;
             return "";
         }

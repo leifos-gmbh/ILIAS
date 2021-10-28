@@ -32,7 +32,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => 'f334d3ef129d01a9704f3073d88b08ada7aad970',
+    'reference' => '6db350ef60ca25952cf253e42bba1f7242e99188',
     'name' => 'ilias/ilias',
   ),
   'versions' => 
@@ -143,7 +143,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => 'f334d3ef129d01a9704f3073d88b08ada7aad970',
+      'reference' => '6db350ef60ca25952cf253e42bba1f7242e99188',
     ),
     'imsglobal/lti' => 
     array (

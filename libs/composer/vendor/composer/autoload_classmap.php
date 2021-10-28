@@ -9948,7 +9948,6 @@ return array(
     'ilUserFilterGUI' => $baseDir . '/Services/Search/classes/class.ilUserFilterGUI.php',
     'ilUserForTagTableGUI' => $baseDir . '/Services/Tagging/classes/class.ilUserForTagTableGUI.php',
     'ilUserFormSettings' => $baseDir . '/Services/User/classes/class.ilUserFormSettings.php',
-    'ilUserImportException' => $baseDir . '/Services/User/exceptions/class.ilUserImportException.php',
     'ilUserImportParser' => $baseDir . '/Services/User/classes/class.ilUserImportParser.php',
     'ilUserImporter' => $baseDir . '/Services/User/classes/class.ilUserImporter.php',
     'ilUserInterfaceHookPlugin' => $baseDir . '/Services/UIComponent/classes/class.ilUserInterfaceHookPlugin.php',

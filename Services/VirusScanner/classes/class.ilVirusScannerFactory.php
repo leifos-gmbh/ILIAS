@@ -20,6 +20,11 @@ class ilVirusScannerFactory
                 $vs = new ilVirusScannerICapRemoteAvClient('', '');
             }
         } else {
+            //begin-patch skyguide
+            ilLoggerFactory::getLogger('vira')->debug('Called virus scanner factory for: ' . IL_VIRUS_SCANNER);
+            //end-patch skyguide
+		
+            // create global virus scanner class instance
             switch (IL_VIRUS_SCANNER) {
                 case "Sophos":
                     $vs = new ilVirusScannerSophos(IL_VIRUS_SCAN_COMMAND, IL_VIRUS_CLEAN_COMMAND);

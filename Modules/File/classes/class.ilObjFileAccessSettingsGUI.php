@@ -94,7 +94,7 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI
         }
 
         switch ($next_class) {
-            case'ilpermissiongui':
+            case 'ilpermissiongui':
                 $this->tabs_gui->setTabActive('perm_settings');
                 $perm_gui = new ilPermissionGUI($this);
                 $ret = &$this->ctrl->forwardCommand($perm_gui);
@@ -129,10 +129,6 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI
                 $this->tabs_gui->setSubTabActive('webdav_upload_instructions');
                 $this->ctrl->forwardCommand($document_gui);
                 break;
-	    
-	    case 'ilopentextconfiggui':
-                $this->forwardToOpenTextPlugin();
-                break;
 
             default:
                 if (!$cmd || $cmd == 'view') {
@@ -144,17 +140,6 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI
         }
 
         return true;
-    }
-
-    /**
-     * @throws ilCtrlException
-     */
-    protected function forwardToOpenTextPlugin()
-    {
-        $plugin = ilPlugin::getPluginObject(IL_COMP_SERVICE, "EventHandling", "evhk", "OpenText");
-
-        $config = new \ilOpenTextConfigGUI();
-        $this->ctrl->forwardCommand($config);
     }
 
 
@@ -201,24 +186,6 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI
 
             $this->tabs_gui->addTarget("disk_quota", $this->ctrl->getLinkTarget($this, "editDiskQuotaSettings"), array("editDiskQuota", "view"));
         }
-
-        // begin-patch skydoc
-        if ($rbacsystem->checkAccess('write', $this->object->getRefId())) {
-
-            $plugin = ilPlugin::getPluginObject(IL_COMP_SERVICE, "EventHandling", "evhk", "OpenText");
-            if (
-                $plugin instanceof \ilOpenTextPlugin &&
-                $plugin->isActive()
-            ) {
-                $this->tabs_gui->addTab(
-                    'skydoc',
-                    'Skydoc',
-                    $this->ctrl->getLinkTargetByClass(\ilOpenTextConfigGUI::class, '')
-                );
-            }
-        }
-
-
         if ($rbacsystem->checkAccess('edit_permission', $this->object->getRefId())) {
             $this->tabs_gui->addTarget("perm_settings", $this->ctrl->getLinkTargetByClass('ilpermissiongui', "perm"), array(), 'ilpermissiongui');
         }

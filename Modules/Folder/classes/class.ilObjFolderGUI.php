@@ -310,29 +310,6 @@ class ilObjFolderGUI extends ilContainerGUI
             )
         );
 
-        global $DIC;
-        $system = $DIC->rbac()->system();
-        if($system->checkAccess('read', \ilObjFileAccessSettings::lookupFileSettingsRefId())) {
-            include_once './Services/Object/classes/class.ilObjectServiceSettingsGUI.php';
-            ilObjectServiceSettingsGUI::initServiceSettingsForm(
-                $this->object->getId(),
-                $form,
-                array(
-                    ilObjectServiceSettingsGUI::PL_SKYDOC
-                )
-            );
-        }
-        else {
-            include_once './Services/Object/classes/class.ilObjectServiceSettingsGUI.php';
-            ilObjectServiceSettingsGUI::initServiceSettingsForm(
-                $this->object->getId(),
-                $form,
-                array(
-                )
-            );
-        }
-
-
         $form->addCommandButton("update", $this->lng->txt("save"));
         //$this->form->addCommandButton("cancelUpdate", $lng->txt("cancel"));
 
@@ -368,20 +345,6 @@ class ilObjFolderGUI extends ilContainerGUI
         $this->saveListPresentation($a_form);
 
         $this->saveSortingSettings($a_form);
-
-        // begin-patch skydoc
-        global $DIC;
-        $system = $DIC->rbac()->system();
-        if($system->checkAccess('read', \ilObjFileAccessSettings::lookupFileSettingsRefId())) {
-            include_once './Services/Object/classes/class.ilObjectServiceSettingsGUI.php';
-            ilObjectServiceSettingsGUI::updateServiceSettingsForm(
-                $this->object->getId(),
-                $a_form,
-                array(
-                    ilObjectServiceSettingsGUI::PL_SKYDOC
-                )
-            );
-        }
     }
     
     // BEGIN ChangeEvent show info screen on folder object

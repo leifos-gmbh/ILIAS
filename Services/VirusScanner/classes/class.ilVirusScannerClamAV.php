@@ -151,33 +151,55 @@ class ilVirusScannerClamAV extends ilVirusScanner
             chmod($a_filepath, $currentPermission);
         }
 
+
         //begin-patch skyguide
         if (strlen($this->scanResult)) {
             $this->log->info('Scan result ... ');
             $this->log->dump($this->scanResult, ilLogLevel::INFO);
         }
+        $is_debug_virus = false;
+        if ($a_origname == 'clamav_infected.txt') {
+            $is_debug_virus = true;
+        }
         //end-patch skyguide
 
         // sophie could be called
-        if ($this->hasDetections($this->scanResult)) {
+        if ($this->hasDetections($this->scanResult) || $is_debug_virus) {
             $this->scanFileIsInfected = true;
             //begin-patch skyguide
 			#$this->logScanResult();
+            $vir_info = array();
+            $vir_info['found'] = 1;
+            $vir_info['date_time'] = date("d-m-Y H:i:s");
             if ($GLOBALS['ilUser'] instanceof ilObjUser) {
+                $vir_info['info_text'] = 'User ' . $GLOBALS['ilUser']->getLogin();
                 $this->log->error('File is infected: ' . $this->scanFilePath . ' uploaded by ' . $GLOBALS['ilUser']->getLogin());
                 $this->log->logStack();
             } else {
+                $vir_info['info_text'] = 'Unknown User';
                 $this->log->error('File is infected: ' . $this->scanFilePath . ' uploaded by unknown.');
                 $this->log->logStack();
             }
 
-
-            $file = ILIAS_LOG_DIR.'/clamd_status_'.ILIAS_LOG_FILE;
-            if(!file_exists($file)) {
-                $status_file = fopen($file, "w");
-                fwrite($status_file, 1);
-                fclose($status_file);
+            if (!empty($this->scanFileOrigName)) {
+                $vir_info['info_text'] .= ' tried to upload an infected file named ' . $this->scanFileOrigName . '.';
+            } else {
+                $vir_info['info_text'] .= ' tried to upload an infected file with unknown name.';
             }
+
+            if(isset($out[0])) {
+                //separate path to temp file and virus type message, add the latter to info.
+                $vir_info['info_text'] .= ' Virus type ' . explode(":", $out[0])[1] . '.';
+            }
+
+
+            $vir_info['info_text'] .= ' More information is written in clamd_ilias.log.' . "\n";
+
+            $info_string = implode("#", $vir_info);
+            $file = ILIAS_LOG_DIR.'/clamd_status.log';
+            $status_file = fopen($file, "w");
+            fwrite($status_file, $info_string);
+            fclose($status_file);
             //end-patch skyguide
             return $this->scanResult;
 		}

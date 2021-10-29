@@ -66,6 +66,13 @@ class ilAuthProviderLDAP extends ilAuthProvider implements ilAuthProviderInterfa
                     $this->getCredentials()->getUsername(),
                     true
                 );
+                // begin patch: sky
+                if (!$query->checkGroupMembership(
+                    $this->getCredentials()->getUsername(),
+                    $users[$this->changeKeyCase($this->getCredentials()->getUsername())])
+                ) {
+                    $users = [];
+                }
             }
 
             if (!$users) {
@@ -79,15 +86,6 @@ class ilAuthProviderLDAP extends ilAuthProvider implements ilAuthProviderInterfa
             if (!array_key_exists($this->changeKeyCase($this->getCredentials()->getUsername()), $users)) {
                 $this->getLogger()->warning('Cannot find user: ' . $this->changeKeyCase($this->getCredentials()->getUsername()));
                 $this->handleAuthenticationFail($status, 'auth_err_ldap_exception');
-                return false;
-            }
-            
-            // check group membership
-            if (!$query->checkGroupMembership(
-                $this->getCredentials()->getUsername(),
-                $users[$this->changeKeyCase($this->getCredentials()->getUsername())]
-            )) {
-                $this->handleAuthenticationFail($status, 'err_wrong_login');
                 return false;
             }
         } catch (ilLDAPQueryException $e) {

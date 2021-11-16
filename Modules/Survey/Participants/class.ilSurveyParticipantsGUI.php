@@ -1245,9 +1245,42 @@ class ilSurveyParticipantsGUI
         }
         $this->ctrl->redirect($this->parent_gui, "infoScreen");
     }
-    
+
+    /**
+     * @param
+     * @return
+     */
+    protected function storeMailSent()
+    {
+        $ilUser = $this->user;
+        $appr_id = $this->handleRatersAccess();
+        $all_data = $this->object->getRatersData($appr_id);
+
+        $recs = json_decode(base64_decode($_GET["recipients"]));
+        foreach ($all_data as $rec_id => $rater) {
+            $sent = false;
+            if ($rater["login"] != "" && in_array($rater["login"], $recs) ||
+                $rater["email"] != "" && in_array($rater["email"], $recs)) {
+                $sent = true;
+            }
+            if ($sent) {
+                $this->object->set360RaterSent(
+                    $appr_id,
+                    (substr($rec_id, 0, 1) == "a") ? 0 : (int) substr($rec_id, 1),
+                    (substr($rec_id, 0, 1) == "u") ? 0 : (int) substr($rec_id, 1)
+                );
+            }
+        }
+        $this->ctrl->setParameter($this, "appr_id", $appr_id);
+        $this->ctrl->redirect($this, "editRaters");
+    }
+
     public function editRatersObject()
     {
+        if ($_GET["returned_from_mail"] == "1") {
+            $this->storeMailSent();
+        }
+
         $ilTabs = $this->tabs;
         $ilToolbar = $this->toolbar;
         $ilAccess = $this->access;
@@ -1580,7 +1613,9 @@ class ilSurveyParticipantsGUI
         $this->ctrl->redirectToURL(ilMailFormCall::getRedirectTarget(
             $this,
             'editRaters',
-            [],
+            [
+                'recipients' => base64_encode(json_encode($rec))
+            ],
             [
                 'type' => 'new'
             ],

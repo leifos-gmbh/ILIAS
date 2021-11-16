@@ -146,4 +146,23 @@ class AccessManager
         return false;
     }
 
+    /**
+     * Can access evaluation
+     * @return bool
+     */
+    public function canAppraiseesAccessEvaluation() : bool
+    {
+        $survey = $this->getSurvey();
+        $survey->read();
+        if (in_array($survey->get360Results(), [ilObjSurvey::RESULTS_360_OWN, ilObjSurvey::RESULTS_360_ALL]))
+        {
+
+        }
+
+        if (\ilObjSurveyAccess::_hasEvaluationAccess($survey->getId(), $this->user_id)) {
+            return true;
+        }
+        return false;
+    }
+
 }

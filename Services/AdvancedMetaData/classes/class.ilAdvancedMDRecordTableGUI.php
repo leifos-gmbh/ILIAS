@@ -88,6 +88,13 @@ class ilAdvancedMDRecordTableGUI extends ilTable2GUI
         $do_select = (!$a_set["readonly"] && !$a_set["local"]);
         foreach (ilAdvancedMDRecord::_getAssignableObjectTypes(true) as $obj_type) {
             $value = 0;
+
+            // workaround for hiding portfolio pages in portfolios, since they only get
+            // data from portfolio templates
+            if ($obj_type["obj_type"] == "prtf" && $obj_type["sub_type"] == "pfpg") {
+                continue;
+            }
+
             foreach ($a_set['obj_types'] as $t) {
                 if ($obj_type["obj_type"] == $t["obj_type"] &&
                     $obj_type["sub_type"] == $t["sub_type"]) {

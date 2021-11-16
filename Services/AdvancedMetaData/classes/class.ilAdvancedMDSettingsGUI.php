@@ -2016,7 +2016,6 @@ class ilAdvancedMDSettingsGUI
 
             $res[] = $tmp_arr;
         }
-        
         return $res;
     }
     

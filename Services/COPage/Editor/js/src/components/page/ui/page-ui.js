@@ -431,6 +431,7 @@ export default class PageUI {
         if (secModel && secModel.protected) {
           return true;
         }
+        curElement = curElement.parentNode;
       }
     } while (curElement && (curElement = curElement.closest("[data-cname='Section']")));
     return false;
@@ -713,7 +714,6 @@ export default class PageUI {
     const model = this.model;
 
     let content = this.model.getCurrentPCName();
-
     if (this.uiModel.components[this.model.getCurrentPCName()] &&
       this.uiModel.components[this.model.getCurrentPCName()].icon) {
       content = "<div class='copg-new-content-placeholder'>" + this.uiModel.components[this.model.getCurrentPCName()].icon +

@@ -672,24 +672,23 @@ class ilObjGroupGUI extends ilContainerGUI
             global $DIC;
             $system = $DIC->rbac()->system();
             if($system->checkAccess('read', \ilObjFileAccessSettings::lookupFileSettingsRefId())) {
-            ilObjectServiceSettingsGUI::updateServiceSettingsForm(
-                $this->object->getId(),
-                $form,
-                array(
-                    ilObjectServiceSettingsGUI::CALENDAR_CONFIGURATION,
-                    ilObjectServiceSettingsGUI::USE_NEWS,
-                    ilObjectServiceSettingsGUI::CUSTOM_METADATA,
-                    ilObjectServiceSettingsGUI::AUTO_RATING_NEW_OBJECTS,
-                    ilObjectServiceSettingsGUI::TAG_CLOUD,
-                    ilObjectServiceSettingsGUI::BADGES,
-                    ilObjectServiceSettingsGUI::SKILLS,
-                    ilObjectServiceSettingsGUI::ORGU_POSITION_ACCESS,
-                    ilObjectServiceSettingsGUI::EXTERNAL_MAIL_PREFIX
-                    ilObjectServiceSettingsGUI::PL_SKYDOC
+                ilObjectServiceSettingsGUI::updateServiceSettingsForm(
+                    $this->object->getId(),
+                    $form,
+                    array(
+                        ilObjectServiceSettingsGUI::CALENDAR_CONFIGURATION,
+                        ilObjectServiceSettingsGUI::USE_NEWS,
+                        ilObjectServiceSettingsGUI::CUSTOM_METADATA,
+                        ilObjectServiceSettingsGUI::AUTO_RATING_NEW_OBJECTS,
+                        ilObjectServiceSettingsGUI::TAG_CLOUD,
+                        ilObjectServiceSettingsGUI::BADGES,
+                        ilObjectServiceSettingsGUI::SKILLS,
+                        ilObjectServiceSettingsGUI::ORGU_POSITION_ACCESS,
+                        ilObjectServiceSettingsGUI::EXTERNAL_MAIL_PREFIX,
+                        ilObjectServiceSettingsGUI::PL_SKYDOC
                     )
                 );
-            }
-            else {
+            } else {
                 ilObjectServiceSettingsGUI::updateServiceSettingsForm(
                     $this->object->getId(),
                     $form,
@@ -703,8 +702,8 @@ class ilObjGroupGUI extends ilContainerGUI
                         ilObjectServiceSettingsGUI::SKILLS,
                         ilObjectServiceSettingsGUI::ORGU_POSITION_ACCESS,
                         ilObjectServiceSettingsGUI::EXTERNAL_MAIL_PREFIX
-                )
-            );
+                    )
+                );
 
             }
             // Save sorting

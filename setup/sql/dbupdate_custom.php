@@ -28,7 +28,6 @@
 ?>
 <#8>
 <?php
-// Create migration table
 if (!$ilDB->tableExists('prtf_role_assignment')) {
     $fields = [
         'role_id' => [
@@ -47,5 +46,27 @@ if (!$ilDB->tableExists('prtf_role_assignment')) {
 
     $ilDB->createTable('prtf_role_assignment', $fields);
     $ilDB->addPrimaryKey('prtf_role_assignment', ['role_id', 'template_ref_id']);
+}
+?>
+<#9>
+<?php
+if (!$ilDB->tableColumnExists('skl_user_skill_level', 'trigger_user_id')) {
+    $ilDB->addTableColumn('skl_user_skill_level', 'trigger_user_id', array(
+        'type' => 'text',
+        'notnull' => true,
+        'length' => 20,
+        'default' => "-"
+    ));
+}
+?>
+<#10>
+<?php
+if (!$ilDB->tableColumnExists('skl_user_has_level', 'trigger_user_id')) {
+    $ilDB->addTableColumn('skl_user_has_level', 'trigger_user_id', array(
+        'type' => 'text',
+        'notnull' => true,
+        'length' => 20,
+        'default' => "-"
+    ));
 }
 ?>

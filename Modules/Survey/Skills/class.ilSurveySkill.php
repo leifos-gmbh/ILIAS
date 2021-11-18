@@ -421,7 +421,8 @@ class ilSurveySkill
                     true,
                     false,
                     "",
-                    $nl["next_level_perc"]
+                    $nl["next_level_perc"],
+                    $rater_id
                 );
 
                 if ($nl["tref_id"] > 0) {

@@ -12,6 +12,10 @@ class ilPersonalSkillsGUI
 {
     const LIST_SELECTED = "";
     const LIST_PROFILES = "profiles";
+    /**
+     * @var array
+     */
+    protected $trigger_user_filter = [];
 
     protected $offline_mode;
     protected $skill_tree;
@@ -232,7 +236,24 @@ class ilPersonalSkillsGUI
     {
         $this->trigger_objects_filter = $trigger_objects_filter;
     }
-    
+
+    /**
+     * @return array
+     */
+    public function getTriggerUserFilter()
+    {
+        return $this->trigger_user_filter;
+    }
+
+    /**
+     * @param array $trigger_user_filter
+     */
+    public function setTriggerUserFilter($trigger_user_filter)
+    {
+        $this->trigger_user_filter = $trigger_user_filter;
+    }
+
+
     /**
      * Set intro text
      *
@@ -604,13 +625,15 @@ class ilPersonalSkillsGUI
                 $se_rendered = ($se_date == "")
                     ? true
                     : false;
-                    
                 // get all object triggered entries and render them
                 foreach ($skill->getAllHistoricLevelEntriesOfUser($bs["tref"], $user->getId(), ilBasicSkill::EVAL_BY_ALL) as $level_entry) {
                     if (count($this->getTriggerObjectsFilter()) && !in_array($level_entry['trigger_obj_id'], $this->getTriggerObjectsFilter())) {
                         continue;
                     }
-                    
+                    if (count($this->getTriggerUserFilter()) && !in_array($level_entry['trigger_user_id'], $this->getTriggerUserFilter())) {
+                        continue;
+                    }
+
                     // render the self evaluation at the correct position within the list of object triggered entries
                     if ($se_date > $level_entry["status_date"] && !$se_rendered) {
                         $se_rendered = true;

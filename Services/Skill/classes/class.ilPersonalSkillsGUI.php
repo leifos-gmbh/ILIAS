@@ -374,7 +374,12 @@ class ilPersonalSkillsGUI
         
 
         // determin standard command
-        $std_cmd = "listAllAssignedProfiles";
+        if (count($this->user_profiles) > 0) {
+            $std_cmd = "listAllAssignedProfiles";
+        }
+        else {
+            $std_cmd = "listSkills";
+        }
 
         $cmd = $ilCtrl->getCmd($std_cmd);
         

@@ -374,7 +374,7 @@ class ilPersonalSkillsGUI
         
 
         // determin standard command
-        $std_cmd = "listSkills";
+        $std_cmd = "listAllAssignedProfiles";
 
         $cmd = $ilCtrl->getCmd($std_cmd);
         
@@ -398,14 +398,6 @@ class ilPersonalSkillsGUI
         $lng = $this->lng;
         $ilTabs = $this->tabs;
 
-        // list skills
-        $ilCtrl->setParameter($this, "list_mode", self::LIST_SELECTED);
-        $ilTabs->addTab(
-            "list_skills",
-            $lng->txt("skmg_selected_skills"),
-            $ilCtrl->getLinkTarget($this, "render")
-        );
-
         if (count($this->user_profiles) > 0) {
             $ilCtrl->setParameter($this, "list_mode", self::LIST_PROFILES);
             $ilTabs->addTab(
@@ -414,6 +406,14 @@ class ilPersonalSkillsGUI
                 $ilCtrl->getLinkTarget($this, "render")
             );
         }
+
+        // list skills
+        $ilCtrl->setParameter($this, "list_mode", self::LIST_SELECTED);
+        $ilTabs->addTab(
+            "list_skills",
+            $lng->txt("skmg_selected_skills"),
+            $ilCtrl->getLinkTarget($this, "render")
+        );
 
         $ilCtrl->clearParameterByClass(get_class($this), "list_mode");
 

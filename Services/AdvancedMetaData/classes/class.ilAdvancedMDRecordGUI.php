@@ -342,7 +342,6 @@ class ilAdvancedMDRecordGUI
                 // switch active record to updated primary keys, e.g. after creation
                 $item["values"]->setActiveRecordPrimary($this->obj_id, $this->sub_type, $this->sub_id);
             }
-                    
             $item["values"]->write();
         }
         

@@ -1046,6 +1046,9 @@ class ilAdvancedMDRecord
             $a_fields_map[$definition->getFieldId()] = $new_def->getFieldId();
         }
 
+        $record_translation = ilAdvancedMDRecordTranslations::getInstanceByRecordId($this->getRecordId());
+        $record_translation->cloneRecord($new_obj->getRecordId());
+
         return $new_obj;
     }
         

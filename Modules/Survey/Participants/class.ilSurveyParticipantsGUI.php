@@ -1591,14 +1591,22 @@ class ilSurveyParticipantsGUI
             : ($_GET["rater_id"] != "" ? explode(";", $_GET["rater_id"]) : null);
 
         $rec = [];
+        $external_rater = false;
+        $rater_id = "";
         foreach ($raters as $id) {
             if (isset($all_data[$id])) {
                 if ($all_data[$id]["login"] != "") {
                     $rec[] = $all_data[$id]["login"];
                 } else if ($all_data[$id]["email"] != "") {
                     $rec[] = $all_data[$id]["email"];
+                    $external_rater = true;
+                    $rater_id = $all_data[$id]["user_id"];
                 }
             }
+        }
+        if ($external_rater && count($rec) > 1) {
+            ilUtil::sendFailure($this->lng->txt("svy_only_max_one_external_rater"), true);
+            $this->ctrl->redirect($this, "editRaters");
         }
 
         // $_POST["rtr_id"]
@@ -1607,6 +1615,8 @@ class ilSurveyParticipantsGUI
         $contextParameters = [
             'ref_id' => $this->object->getRefId(),
             'ts' => time(),
+            'appr_id' => $appr_id,
+            'rater_id' => $rater_id,
             ilMailFormCall::CONTEXT_KEY => "svy_rater_inv"
         ];
 

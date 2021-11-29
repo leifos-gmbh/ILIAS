@@ -112,6 +112,16 @@ class ilSurveyMailTemplateRaterInvitationContext extends ilMailTemplateContext
             'label' => $lng->txt('perma_link')
         );
 
+        $placeholders['svy_ext_rater_firstname'] = array(
+            'placeholder' => 'EXTERNAL_RATER_FIRSTNAME',
+            'label' => $lng->txt('svy_ext_rater_firstname')
+        );
+
+        $placeholders['svy_ext_rater_lastname'] = array(
+            'placeholder' => 'EXTERNAL_RATER_LASTNAME',
+            'label' => $lng->txt('svy_ext_rater_lastname')
+        );
+
         return $placeholders;
     }
 
@@ -129,13 +139,33 @@ class ilSurveyMailTemplateRaterInvitationContext extends ilMailTemplateContext
          */
         $ilObjDataCache = $this->obj_data_cache;
 
-        if ('svy_title' == $placeholder_id) {
-            return (string) $ilObjDataCache->lookupTitle($ilObjDataCache->lookupObjId($context_parameters['ref_id']));
-        } else {
-            if ('svy_link' == $placeholder_id) {
-                require_once './Services/Link/classes/class.ilLink.php';
-                return (string) ilLink::_getLink($context_parameters['ref_id'], 'svy');
+        $svy = new ilObjSurvey($context_parameters['ref_id']);
+        $raters = $svy->getRatersData($context_parameters['appr_id']);
+        $current_rater = null;
+        foreach ($raters as $rater) {
+            if ($rater["user_id"] == $context_parameters['rater_id']) {
+                $current_rater = $rater;
             }
+        }
+
+        switch ($placeholder_id) {
+            case 'svy_title':
+                return (string) $ilObjDataCache->lookupTitle($ilObjDataCache->lookupObjId($context_parameters['ref_id']));
+
+            case 'svy_link':
+                $svy = new ilObjSurvey($context_parameters['ref_id']);
+                $raters = $svy->getRatersData($context_parameters['appr_id']);
+                $href = ilLink::_getLink($context_parameters['ref_id'], 'svy');
+                if (isset($current_rater["href"]) && $current_rater["href"] != "") {
+                    $href = $current_rater["href"];
+                }
+                return $href;
+
+            case 'svy_ext_rater_firstname':
+                return $current_rater["firstname"] ?? "";
+
+            case 'svy_ext_rater_lastname':
+                return $current_rater["lastname"] ?? "";
         }
 
         return '';

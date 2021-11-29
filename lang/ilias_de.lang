@@ -14,6 +14,9 @@
 // to the corresponding mode!
 // Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
+survey#:#svy_ext_rater_firstname#:#Vorname eines externen Feedback-Gebers
+survey#:#svy_ext_rater_lastname#:#Nachname eines externen Feedback-Gebers
+survey#:#svy_only_max_one_external_rater#:#Bitte wählen Sie nur einen externen Feedback-Geber aus.
 survey#:#svy_select_rater#:#Feedbackgeber auswählen
 survey#:#svy_all_raters#:#Alle Feedbackgeber
 survey#:#svy_privacy_info#:#Persönliche Daten

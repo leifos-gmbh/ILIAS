@@ -926,7 +926,10 @@ class ilObjSurveyGUI extends ilObjectGUI
         
         // see ilObjSurveyAccess::_checkGoto()
         if (strlen($a_access_code)) {
-            $_SESSION["anonymous_id"][ilObject::_lookupObjId($a_target)] = $a_access_code;
+            $sess = $DIC->survey()->internal()->repo()
+                ->execution()->anonymousSession();
+            //$_SESSION["anonymous_id"][ilObject::_lookupObjId($a_target)] = $a_access_code;
+            $sess->setCode(ilObject::_lookupObjId($a_target), $a_access_code);
             $_GET["baseClass"] = "ilObjSurveyGUI";
             $_GET["cmd"] = "infoScreen";
             $_GET["ref_id"] = $a_target;

@@ -241,7 +241,7 @@ class ilSurveySkill
      * @param $a_appraisee_id int user id of appraisee
      * @return array array with lots of information
      */
-    public function determineSkillLevelsForAppraisee($a_appraisee_id, $a_self_eval = false, $rater_id = 0)
+    public function determineSkillLevelsForAppraisee($a_appraisee_id, $a_self_eval = false, $finished_id = 0)
     {
         $skills = array();
 
@@ -263,8 +263,7 @@ class ilSurveySkill
 
         $finished_ids = [];
         if (!$a_self_eval) {
-            if ($rater_id > 0) {
-                $finished_id = $this->survey->getFinishedIdForAppraiseeIdAndRaterId($a_appraisee_id, $rater_id);
+            if ($finished_id > 0) {
                 if ($finished_id > 0) {
                     $finished_ids = array($finished_id);
                 }
@@ -408,8 +407,8 @@ class ilSurveySkill
         $this->writeAndAddSelfEvalSkills($user_id);
     }
 
-    public function writeAndAddIndFeedbackSkills($rater_id, $appr_id) {
-        $new_levels = $this->determineSkillLevelsForAppraisee($appr_id, false, $rater_id);
+    public function writeAndAddIndFeedbackSkills($finished_id, $appr_id, $rater_id) {
+        $new_levels = $this->determineSkillLevelsForAppraisee($appr_id, false, $finished_id);
         foreach ($new_levels as $nl) {
             if ($nl["new_level_id"] > 0) {
                 ilBasicSkill::writeUserSkillLevelStatus(

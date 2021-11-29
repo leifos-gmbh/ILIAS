@@ -146,6 +146,19 @@ class AccessManager
         return false;
     }
 
+    public function isCodeInputAllowed() : bool
+    {
+        $survey = $this->getSurvey();
+        $participant_status = $this->domain_service
+            ->participants()
+            ->status($this->getSurvey(), $this->user_id);
+        if ($participant_status->isExternalRater() ||
+            $survey->getAnonymize() || !$survey->isAccessibleWithoutCode()) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Can access evaluation
      * @return bool

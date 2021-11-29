@@ -286,7 +286,7 @@ class UIModifier extends Mode\AbstractUIModifier
                     $participant = $this->getParticipantByActiveId($participants, $answer["active_id"]);
                     $part_caption = "";
                     if ($participant) {
-                        $part_caption = $participant["sortname"];
+                        $part_caption = $this->getCaptionForParticipant($participant);
                     }
                     $a_tpl->setCurrentBlock("grid_col_bl");
                     $a_tpl->setVariable("COL_CAPTION", $part_caption);
@@ -400,6 +400,13 @@ class UIModifier extends Mode\AbstractUIModifier
             }
         }
         return null;
+    }
+
+    protected function getCaptionForParticipant($part_array)
+    {
+
+
+        return $part_array["sortname"];
     }
 
 }

@@ -203,7 +203,7 @@ class ilSurveyExecutionGUI
         // see ilObjSurveyGUI::infoScreen()
         $anonymous_id = null;
         $anonymous_code = "";
-        if ($this->object->getAnonymize() || !$this->object->isAccessibleWithoutCode()) {
+        if ($this->access_manager->isCodeInputAllowed()) {
             $anonymous_code = $this->session_manager->getCode();
             $anonymous_id = $this->object->getAnonymousIdByCode($anonymous_code);
             if (!$anonymous_id) {

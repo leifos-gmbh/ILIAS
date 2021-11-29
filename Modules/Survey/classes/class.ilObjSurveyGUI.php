@@ -923,7 +923,7 @@ class ilObjSurveyGUI extends ilObjectGUI
         $ilAccess = $DIC->access();
         $lng = $DIC->language();
         $ctrl = $DIC->ctrl();
-        
+
         // see ilObjSurveyAccess::_checkGoto()
         if (strlen($a_access_code)) {
             $sess = $DIC->survey()->internal()->repo()
@@ -936,13 +936,13 @@ class ilObjSurveyGUI extends ilObjectGUI
             include("ilias.php");
             exit;
         }
-        
         if ($ilAccess->checkAccess("visible", "", $a_target) ||
             $ilAccess->checkAccess("read", "", $a_target)) {
             $am = $DIC->survey()->internal()->domain()->access($a_target, $DIC->user()->getId());
             if (/*!$am->canStartSurvey() &&*/ $am->canAccessEvaluation()) {
                 $ctrl->setParameterByClass("ilObjSurveyGUI", "ref_id", $a_target);
                 $ctrl->redirectByClass(["ilObjSurveyGUI", "ilSurveyEvaluationGUI"], "openEvaluation");
+                exit;
             }
 
             $_GET["baseClass"] = "ilObjSurveyGUI";

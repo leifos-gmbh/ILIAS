@@ -552,7 +552,6 @@ class ilObjSurvey extends ilObject
     public function &getSurveyParticipants($finished_ids = null, $force_non_anonymous = false, $include_invites = false)
     {
         $ilDB = $this->db;
-        
         $sql = "SELECT * FROM svy_finished" .
             " WHERE survey_fi = " . $ilDB->quote($this->getSurveyId(), "integer");
         if ($finished_ids) {
@@ -589,7 +588,6 @@ class ilObjSurvey extends ilObject
                 }
             }
         }
-
         return $participants;
     }
 
@@ -2695,10 +2693,29 @@ class ilObjSurvey extends ilObject
 
         // self eval writes skills on finishing
         if ($this->getMode() == ilObjSurvey::MODE_IND_FEEDB) {
-            $user = $this->getUserDataFromActiveId($finished_id);
+
+            // we use a rater id like "a27" for anonymous or
+            // "123" for non anonymous user
+            // @todo: move this e.g. to participant manager
+            $raters = $this->getRatersData($appr_id);
+            $run_manager = $this->survey_service
+                ->domain()
+                ->execution()
+                ->run($this, $this->user->getId());
+            $run = $run_manager->getById($finished_id);
+            $rater_id = "";
+            if ($run->getUserId() != 0 && $run->getUserId() != ANONYMOUS_USER_ID) {
+                $rater_id = $run->getUserId();
+            } else {
+                foreach ($raters as $id => $rater) {
+                    if ($rater["code"] == $run->getCode()) {
+                        $rater_id = $id;
+                    }
+                }
+            }
             $sskill = new ilSurveySkill($this);
             //$sskill->writeAndAddSelfEvalSkills($user['usr_id']);
-            $sskill->writeAndAddIndFeedbackSkills($user['usr_id'], $appr_id);
+            $sskill->writeAndAddIndFeedbackSkills($finished_id, $appr_id, $rater_id);
         }
 
         $this->checkTutorNotification();
@@ -3113,6 +3130,15 @@ class ilObjSurvey extends ilObject
                     $userdata["login"] = $user->getLogin();
                 }
             }
+            if ($row["user_fi"] == 0 || $row["user_fi"] == ANONYMOUS_USER_ID) {
+                $code = $this->code_manager->getByUserKey($row["anonymous_id"]);
+                if (!is_null($code) && $this->feature_config->usesAppraisees()) {
+                    $userdata["firstname"] = $code->getFirstName();
+                    $userdata["lastname"] = $code->getLastName();
+                    $userdata["sortname"] = $code->getLastName() . ", " . $code->getFirstName();
+                }
+            }
+
         }
         return $userdata;
     }

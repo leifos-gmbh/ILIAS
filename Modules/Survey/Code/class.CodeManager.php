@@ -213,4 +213,8 @@ class CodeManager
         return $this->code_repo->getByUserId($this->survey_id, $user_id);
     }
 
+    public function getByUserKey(string $user_key) : ?Code
+    {
+        return $this->code_repo->getByUserKey($this->survey_id, $user_key);
+    }
 }

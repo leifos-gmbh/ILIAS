@@ -82,6 +82,11 @@ class BlogHtmlExport
     protected $include_comments = false;
 
     /**
+     * @var \ILIAS\Style\Content\Object\ObjectFacade
+     */
+    protected $content_style_domain;
+
+    /**
      * constructor
      * @param \ilObjBlogGUI $blog_gui
      * @param string $exp_dir
@@ -110,6 +115,13 @@ class BlogHtmlExport
                 \ilHTMLExportViewLayoutProvider::HTML_EXPORT_RENDERING,
                 true
             );
+        }
+
+        $cs = $DIC->contentStyle();
+        if ($this->blog_gui->getIdType() == \ilObject2GUI::REPOSITORY_NODE_ID) {
+            $this->content_style_domain = $cs->domain()->styleForRefId($this->blog->getRefId());
+        } else {
+            $this->content_style_domain = $cs->domain()->styleForObjId($this->blog->getId());
         }
     }
 
@@ -143,7 +155,10 @@ class BlogHtmlExport
     {
         $this->initDirectories();
         $this->export_util->exportSystemStyle();
-        $this->export_util->exportCOPageFiles($this->blog->getStyleSheetId(), "blog");
+        $this->export_util->exportCOPageFiles(
+            $this->content_style_domain->getEffectiveStyleId(),
+            "blog"
+        );
 
         // export banner
         $this->exportBanner();
@@ -370,7 +385,7 @@ class BlogHtmlExport
         $location_stylesheet = \ilUtil::getStyleSheetLocation();
         $this->global_screen->layout()->meta()->addCss($location_stylesheet);
         $this->global_screen->layout()->meta()->addCss(
-            \ilObjStyleSheet::getContentStylePath($this->blog->getStyleSheetId())
+            \ilObjStyleSheet::getContentStylePath($this->content_style_domain->getEffectiveStyleId())
         );
         \ilPCQuestion::resetInitialState();
 

@@ -12,6 +12,16 @@
 class ilContainerStartObjectsContentGUI
 {
     /**
+     * @var \ILIAS\Style\Content\GUIService
+     */
+    protected $content_style_gui;
+
+    /**
+     * @var \ILIAS\Style\Content\Object\ObjectFacade
+     */
+    protected $content_style_domain;
+
+    /**
      * @var ilTemplate
      */
     protected $tpl;
@@ -56,6 +66,9 @@ class ilContainerStartObjectsContentGUI
             $a_parent_obj->getRefId(),
             $a_parent_obj->getId()
         );
+        $cs = $DIC->contentStyle();
+        $this->content_style_domain = $cs->domain()->styleForRefId($a_parent_obj->getRefId());
+        $this->content_style_gui = $cs->gui();
     }
     
     /**
@@ -122,14 +135,7 @@ class ilContainerStartObjectsContentGUI
             return;
         }
 
-        include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
-        $tpl->setVariable(
-            "LOCATION_CONTENT_STYLESHEET",
-            ilObjStyleSheet::getContentStylePath(ilObjStyleSheet::getEffectiveContentStyleId(
-                $this->parent_obj->getStyleSheetId(),
-                $this->parent_obj->getType()
-            ))
-        );
+        $this->content_style_gui->addCss($tpl, $this->parent_obj->getRefId());
         $tpl->setCurrentBlock("SyntaxStyle");
         $tpl->setVariable(
             "LOCATION_SYNTAX_STYLESHEET",
@@ -140,11 +146,7 @@ class ilContainerStartObjectsContentGUI
         include_once("./Services/Container/classes/class.ilContainerStartObjectsPageGUI.php");
         $page_gui = new ilContainerStartObjectsPageGUI($page_id);
         
-        include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
-        $page_gui->setStyleId(ilObjStyleSheet::getEffectiveContentStyleId(
-            $this->parent_obj->getStyleSheetId(),
-            $this->parent_obj->getType()
-        ));
+        $page_gui->setStyleId($this->content_style_domain->getEffectiveStyleId());
 
         $page_gui->setPresentationTitle("");
         $page_gui->setTemplateOutput(false);

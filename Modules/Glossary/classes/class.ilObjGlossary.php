@@ -31,6 +31,11 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
     protected $user;
 
     /**
+     * @var \ILIAS\Style\Content\Object\ObjectFacade
+     */
+    protected $content_style_service;
+
+    /**
     * Constructor
     * @access	public
     */
@@ -44,6 +49,10 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
         $this->user = $DIC->user();
         $this->type = "glo";
         parent::__construct($a_id, $a_call_by_reference);
+        $this->content_style_service = $DIC
+            ->contentStyle()
+            ->domain()
+            ->styleForRefId($this->getRefId());
     }
 
     /**
@@ -73,10 +82,6 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
         $this->setSnippetLength(200);
 
         $this->updateAutoGlossaries();
-
-        if (((int) $this->getStyleSheetId()) > 0) {
-            ilObjStyleSheet::writeStyleUsage($this->getId(), $this->getStyleSheetId());
-        }
     }
 
     /**
@@ -100,8 +105,6 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
         $this->setPresentationMode($gl_rec["pres_mode"]);
         $this->setSnippetLength($gl_rec["snippet_length"]);
         $this->setShowTaxonomy($gl_rec["show_tax"]);
-
-        $this->setStyleSheetId((int) ilObjStyleSheet::lookupObjectStyle($this->getId()));
 
         // read auto glossaries
         $set = $this->db->query(
@@ -310,23 +313,6 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
     }
     
     /**
-     * Get ID of assigned style sheet object
-     */
-    public function getStyleSheetId()
-    {
-        return $this->style_id;
-    }
-
-    /**
-     * Set ID of assigned style sheet object
-     */
-    public function setStyleSheetId($a_style_id)
-    {
-        $this->style_id = $a_style_id;
-    }
-
-
-    /**
      * Set show taxonomy
      *
      * @param bool $a_val show taxonomy
@@ -425,7 +411,6 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
                 'id' => array('integer', $this->getId())
             )
         );
-        ilObjStyleSheet::writeStyleUsage($this->getId(), $this->getStyleSheetId());
 
         $this->updateAutoGlossaries();
         parent::update();
@@ -941,13 +926,7 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
         $new_obj->update();
 
         // set/copy stylesheet
-        $style_id = $this->getStyleSheetId();
-        if ($style_id > 0 && !ilObjStyleSheet::_lookupStandard($style_id)) {
-            $style_obj = ilObjectFactory::getInstanceByObjId($style_id);
-            $new_id = $style_obj->ilClone();
-            $new_obj->setStyleSheetId($new_id);
-            $new_obj->update();
-        }
+        $this->content_style_service->cloneTo($new_obj->getId());
         
         // copy taxonomy
         if (($tax_id = $this->getTaxonomyId()) > 0) {

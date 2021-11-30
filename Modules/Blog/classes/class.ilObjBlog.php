@@ -9,6 +9,10 @@
  */
 class ilObjBlog extends ilObject2
 {
+    /**
+     * @var \ILIAS\Style\Content\Object\ObjectFacade
+     */
+    protected $content_style_service;
 
     /**
      * Constructor
@@ -19,6 +23,12 @@ class ilObjBlog extends ilObject2
 
         parent::__construct($a_id, $a_reference);
         $this->rbacreview = $DIC->rbac()->review();
+
+        $this->content_style_service = $DIC
+            ->contentStyle()
+            ->domain()
+            ->styleForObjId($this->getId());
+
     }
 
     protected $notes; // [bool]
@@ -85,8 +95,7 @@ class ilObjBlog extends ilObject2
         
         // #14661
         $this->setNotesStatus(ilNote::commentsActivated($this->id, 0, "blog"));
-        
-        $this->setStyleSheetId(ilObjStyleSheet::lookupObjectStyle($this->id));
+
     }
 
     protected function doCreate()
@@ -159,8 +168,6 @@ class ilObjBlog extends ilObject2
                         
             // #14661
             ilNote::activateComments($this->id, 0, "blog", $this->getNotesStatus());
-            
-            ilObjStyleSheet::writeStyleUsage($this->id, $this->getStyleSheetId());
         }
     }
 
@@ -191,13 +198,7 @@ class ilObjBlog extends ilObject2
         $new_obj->update();
         
         // set/copy stylesheet
-        $style_id = $this->getStyleSheetId();
-        if ($style_id > 0 && !ilObjStyleSheet::_lookupStandard($style_id)) {
-            $style_obj = ilObjectFactory::getInstanceByObjId($style_id);
-            $new_id = $style_obj->ilClone();
-            $new_obj->setStyleSheetId($new_id);
-            $new_obj->update();
-        }
+        $this->content_style_service->cloneTo($new_obj->getId());
     }
     
     /**
@@ -450,26 +451,6 @@ class ilObjBlog extends ilObject2
     public function setApproval($a_status)
     {
         $this->approval = (bool) $a_status;
-    }
-    
-    /**
-     * Get style sheet id
-     *
-     * @return bool
-     */
-    public function getStyleSheetId()
-    {
-        return (int) $this->style;
-    }
-
-    /**
-     * Set style sheet id
-     *
-     * @param int $a_style
-     */
-    public function setStyleSheetId($a_style)
-    {
-        $this->style = (int) $a_style;
     }
     
     public function hasAbstractShorten()

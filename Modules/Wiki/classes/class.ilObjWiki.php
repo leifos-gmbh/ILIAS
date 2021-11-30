@@ -20,6 +20,11 @@ include_once "./Services/AdvancedMetaData/interfaces/interface.ilAdvancedMetaDat
 class ilObjWiki extends ilObject implements ilAdvancedMetaDataSubItems
 {
     /**
+     * @var \ILIAS\Style\Content\DomainService
+     */
+    protected $content_style_service;
+
+    /**
      * @var ilObjUser
      */
     protected $user;
@@ -49,6 +54,10 @@ class ilObjWiki extends ilObject implements ilAdvancedMetaDataSubItems
         $this->type = "wiki";
         $this->setting = $DIC->settings();
         parent::__construct($a_id, $a_call_by_reference);
+
+        $this->content_style_service = $DIC
+            ->contentStyle()
+            ->domain();
     }
 
     /**
@@ -268,22 +277,6 @@ class ilObjWiki extends ilObject implements ilAdvancedMetaDataSubItems
     }
 
     /**
-    * get ID of assigned style sheet object
-    */
-    public function getStyleSheetId()
-    {
-        return $this->style_id;
-    }
-
-    /**
-    * set ID of assigned style sheet object
-    */
-    public function setStyleSheetId($a_style_id)
-    {
-        $this->style_id = $a_style_id;
-    }
-
-    /**
      * Set page toc
      *
      * @param	boolean	$a_val	page toc
@@ -384,11 +377,6 @@ class ilObjWiki extends ilObject implements ilAdvancedMetaDataSubItems
             $start_page->setTitle($this->getStartPage());
             $start_page->create();
         }
-
-        if (((int) $this->getStyleSheetId()) > 0) {
-            include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
-            ilObjStyleSheet::writeStyleUsage($this->getId(), $this->getStyleSheetId());
-        }
     }
 
     /**
@@ -434,9 +422,6 @@ class ilObjWiki extends ilObject implements ilAdvancedMetaDataSubItems
             $start_page->create();
         }
 
-        include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
-        ilObjStyleSheet::writeStyleUsage($this->getId(), $this->getStyleSheetId());
-
         return true;
     }
     
@@ -468,9 +453,6 @@ class ilObjWiki extends ilObject implements ilAdvancedMetaDataSubItems
         $this->setPageToc($rec["page_toc"]);
         $this->setEmptyPageTemplate($rec["empty_page_templ"]);
         $this->setLinkMetadataValues($rec["link_md_values"]);
-
-        include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
-        $this->setStyleSheetId((int) ilObjStyleSheet::lookupObjectStyle($this->getId()));
     }
 
 
@@ -948,15 +930,9 @@ class ilObjWiki extends ilObject implements ilAdvancedMetaDataSubItems
         $new_obj->setPageToc($this->getPageToc());
         $new_obj->update();
 
-        // set/copy stylesheet
-        include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
-        $style_id = $this->getStyleSheetId();
-        if ($style_id > 0 && !ilObjStyleSheet::_lookupStandard($style_id)) {
-            $style_obj = ilObjectFactory::getInstanceByObjId($style_id);
-            $new_id = $style_obj->ilClone();
-            $new_obj->setStyleSheetId($new_id);
-            $new_obj->update();
-        }
+        $this->content_style_service
+            ->styleForRefId($this->getRefId())
+            ->cloneTo($new_obj->getId());
 
         // copy content
         include_once("./Modules/Wiki/classes/class.ilWikiPage.php");

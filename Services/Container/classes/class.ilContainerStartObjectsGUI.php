@@ -13,6 +13,16 @@
 class ilContainerStartObjectsGUI
 {
     /**
+     * @var \ILIAS\Style\Content\GUIService
+     */
+    protected $content_style_gui;
+
+    /**
+     * @var \ILIAS\Style\Content\Object\ObjectFacade
+     */
+    protected $content_style_domain;
+
+    /**
      * @var ilCtrl
      */
     protected $ctrl;
@@ -75,6 +85,9 @@ class ilContainerStartObjectsGUI
         );
         
         $this->lng->loadLanguageModule("crs");
+        $cs = $DIC->contentStyle();
+        $this->content_style_domain = $cs->domain()->styleForRefId($a_parent_obj->getRefId());
+        $this->content_style_gui = $cs->gui();
     }
     
     public function executeCommand()
@@ -100,22 +113,18 @@ class ilContainerStartObjectsGUI
                     unset($new_page_object);
                 }
 
-                $this->tpl->setVariable(
-                    "LOCATION_CONTENT_STYLESHEET",
-                    ilObjStyleSheet::getContentStylePath(ilObjStyleSheet::getEffectiveContentStyleId(
-                        $this->object->getStyleSheetId(),
-                        $this->object->getType()
-                    ))
+                $this->content_style_gui->addCss(
+                    $this->tpl,
+                    $this->object->getRefId()
                 );
 
                 $this->ctrl->setReturnByClass("ilcontainerstartobjectspagegui", "edit");
                 include_once "Services/Container/classes/class.ilContainerStartObjectsPageGUI.php";
                 $pgui = new ilContainerStartObjectsPageGUI($this->object->getId());
-                include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
-                $pgui->setStyleId(ilObjStyleSheet::getEffectiveContentStyleId(
-                    $this->object->getStyleSheetId(),
-                    $this->object->getType()
-                ));
+
+                $pgui->setStyleId(
+                    $this->content_style_domain->getEffectiveStyleId()
+                );
 
                 $ret = $this->ctrl->forwardCommand($pgui);
                 if ($ret) {

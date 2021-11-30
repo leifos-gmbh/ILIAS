@@ -13,10 +13,25 @@
  */
 class ilBlogDataSet extends ilDataSet
 {
+    /**
+     * @var \ILIAS\Style\Content\DomainService
+     */
+    protected $content_style_domain;
+
     protected $current_blog;
     
     public static $style_map = array();
-    
+
+
+    public function __construct()
+    {
+        global $DIC;
+        parent::__construct();
+        $this->content_style_domain = $DIC
+            ->contentStyle()
+            ->domain();
+    }
+
     /**
      * Get supported versions
      */
@@ -234,10 +249,13 @@ class ilBlogDataSet extends ilDataSet
     public function getXmlRecord($a_entity, $a_version, $a_set)
     {
         if ($a_entity == "blog") {
+
+            $style = $this->content_style_domain->styleForObjId((int) $a_set["Id"]);
+
             $dir = ilObjBlog::initStorage($a_set["Id"]);
             $a_set["Dir"] = $dir;
             
-            $a_set["Style"] = ilObjStyleSheet::lookupObjectStyle($a_set["Id"]);
+            $a_set["Style"] = $style->getStyleId();
             
             // #14734
             $a_set["Notes"] = ilNote::commentsActivated($a_set["Id"], 0, "blog");

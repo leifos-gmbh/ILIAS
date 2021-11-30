@@ -21,6 +21,21 @@
 class ilLMPresentationGUI
 {
     /**
+     * @var \ILIAS\Style\Content\Object\ObjectFacade
+     */
+    protected $content_style_domain;
+
+    /**
+     * @var \ILIAS\Style\Content\GUIService
+     */
+    protected $content_style_gui;
+
+    /**
+     * @var \ILIAS\Style\Content\Service
+     */
+    protected $cs;
+
+    /**
      * @var ilObjUser
      */
     protected $user;
@@ -267,6 +282,8 @@ class ilLMPresentationGUI
             ];
             $DIC->globalScreen()->tool()->context()->current()->addAdditionalData(\ilLMGSToolProvider::LM_QUERY_PARAMS, $params);
         }
+
+        $this->cs = $DIC->contentStyle();
     }
 
     /**
@@ -317,6 +334,8 @@ class ilLMPresentationGUI
         $this->lm_tree = $this->service->getLMTree();
         $this->focus_id = $this->service->getPresentationStatus()->getFocusId();
         $this->ot = ilObjectTranslation::getInstance($this->lm->getId());
+        $this->content_style_gui = $this->cs->gui();
+        $this->content_style_domain = $this->cs->domain()->styleForRefId($this->lm->getRefId());
     }
 
     /**
@@ -1415,7 +1434,10 @@ class ilLMPresentationGUI
     {
         // content style
 
-        $this->tpl->addCss(ilObjStyleSheet::getContentStylePath($this->lm->getStyleSheetId()));
+        $this->content_style_gui->addCss(
+            $this->tpl,
+            $this->lm->getRefId()
+        );
         $this->tpl->addCss(ilObjStyleSheet::getSyntaxStylePath());
 
         /*
@@ -1596,10 +1618,9 @@ class ilLMPresentationGUI
      */
     public function basicPageGuiInit(\ilLMPageGUI $a_page_gui)
     {
-        $a_page_gui->setStyleId(ilObjStyleSheet::getEffectiveContentStyleId(
-            $this->lm->getStyleSheetId(),
-            "lm"
-        ));
+        $a_page_gui->setStyleId(
+            $this->content_style_domain->getEffectiveStyleId()
+        );
         if (!$this->offlineMode()) {
             $a_page_gui->setOutputMode("presentation");
             $this->fill_on_load_code = true;
@@ -2321,10 +2342,9 @@ class ilLMPresentationGUI
         if ($this->lm->getFooterPage() > 0 && !$this->lm->getHideHeaderFooterPrint()) {
             if (ilLMObject::_exists($this->lm->getFooterPage())) {
                 $page_object_gui = $this->getLMPageGUI($this->lm->getFooterPage());
-                $page_object_gui->setStyleId(ilObjStyleSheet::getEffectiveContentStyleId(
-                    $this->lm->getStyleSheetId(),
-                    "lm"
-                ));
+                $page_object_gui->setStyleId(
+                    $this->content_style_domain->getEffectiveStyleId()
+                );
 
     
                 // determine target frames for internal links
@@ -2340,10 +2360,9 @@ class ilLMPresentationGUI
         if ($this->lm->getHeaderPage() > 0 && !$this->lm->getHideHeaderFooterPrint()) {
             if (ilLMObject::_exists($this->lm->getHeaderPage())) {
                 $page_object_gui = $this->getLMPageGUI($this->lm->getHeaderPage());
-                $page_object_gui->setStyleId(ilObjStyleSheet::getEffectiveContentStyleId(
-                    $this->lm->getStyleSheetId(),
-                    "lm"
-                ));
+                $page_object_gui->setStyleId(
+                    $this->content_style_domain->getEffectiveStyleId()
+                );
 
     
                 // determine target frames for internal links
@@ -2459,10 +2478,9 @@ class ilLMPresentationGUI
                     $page_id = $node["obj_id"];
                     $page_object_gui = $this->getLMPageGUI($page_id);
                     $page_object = $page_object_gui->getPageObject();
-                    $page_object_gui->setStyleId(ilObjStyleSheet::getEffectiveContentStyleId(
-                        $this->lm->getStyleSheetId(),
-                        "lm"
-                    ));
+                    $page_object_gui->setStyleId(
+                        $this->content_style_domain->getEffectiveStyleId()
+                    );
 
 
                     // get lm page

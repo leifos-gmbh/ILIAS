@@ -10,6 +10,11 @@
 abstract class ilObjPortfolioBase extends ilObject2
 {
     /**
+     * @var \ILIAS\Style\Content\Object\ObjectFacade
+     */
+    protected $content_style_domain;
+
+    /**
      * @var \ilSetting
      */
     protected $setting;
@@ -25,6 +30,10 @@ abstract class ilObjPortfolioBase extends ilObject2
         $this->setting = $DIC->settings();
 
         $this->db = $DIC->database();
+        $this->content_style_domain = $DIC
+            ->contentStyle()
+            ->domain()
+            ->styleForObjId($this->getId());
     }
 
     protected $online; // [bool]
@@ -184,27 +193,6 @@ abstract class ilObjPortfolioBase extends ilObject2
         $this->img = (string) $a_value;
     }
     
-    /**
-     * Get style sheet id
-     *
-     * @return bool
-     */
-    public function getStyleSheetId()
-    {
-        return (int) $this->style;
-    }
-
-    /**
-     * Set style sheet id
-     *
-     * @param int $a_style
-     */
-    public function setStyleSheetId($a_style)
-    {
-        $this->style = (int) $a_style;
-    }
-    
-    
     //
     // CRUD
     //
@@ -225,8 +213,6 @@ abstract class ilObjPortfolioBase extends ilObject2
         
         // #14661
         $this->setPublicComments(ilNote::commentsActivated($this->id, 0, $this->getType()));
-        
-        $this->setStyleSheetId(ilObjStyleSheet::lookupObjectStyle($this->id));
         
         $this->doReadCustom($row);
     }
@@ -260,8 +246,6 @@ abstract class ilObjPortfolioBase extends ilObject2
         // #14661
         ilNote::activateComments($this->id, 0, $this->getType(), $this->hasPublicComments());
         
-        ilObjStyleSheet::writeStyleUsage($this->id, $this->getStyleSheetId());
-                
         $ilDB->update(
             "usr_portfolio",
             $fields,
@@ -406,6 +390,8 @@ abstract class ilObjPortfolioBase extends ilObject2
      */
     protected static function cloneBasics(ilObjPortfolioBase $a_source, ilObjPortfolioBase $a_target)
     {
+        global $DIC;
+
         // copy portfolio properties
         $a_target->setPublicComments($a_source->hasPublicComments());
         $a_target->setProfilePicture($a_source->hasProfilePicture());
@@ -419,14 +405,11 @@ abstract class ilObjPortfolioBase extends ilObject2
         $target_dir = $a_target->initStorage($a_target->getId());
         ilFSStoragePortfolio::_copyDirectory($source_dir, $target_dir);
         
-        // set/copy stylesheet
-        $style_id = $a_source->getStyleSheetId();
-        if ($style_id > 0 && !ilObjStyleSheet::_lookupStandard($style_id)) {
-            $style_obj = ilObjectFactory::getInstanceByObjId($style_id);
-            $new_id = $style_obj->ilClone();
-            $a_target->setStyleSheetId($new_id);
-            $a_target->update();
-        }
+        $content_style_domain = $DIC
+            ->contentStyle()
+            ->domain()
+            ->styleForObjId($a_source->getId());
+        $content_style_domain->cloneTo($a_target->getId());
     }
 
     /**

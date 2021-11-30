@@ -44,7 +44,7 @@ class ilLearningModuleKioskModeView extends ilKioskModeView
     /** @var \ilCtrl */
     protected $ctrl;
 
-    /** @var \ilTemplate */
+    /** @var \ilGlobalTemplateInterface */
     protected $mainTemplate;
 
     /** @var ServerRequestInterface */
@@ -272,16 +272,4 @@ class ilLearningModuleKioskModeView extends ilKioskModeView
         return $factory->legacy($content);
     }
 
-    /**
-     * Renders the content style of a ContentPage object into main template
-     */
-    protected function renderContentStyle()
-    {
-        $this->mainTemplate->addCss(\ilObjStyleSheet::getSyntaxStylePath());
-        $this->mainTemplate->addCss(
-            \ilObjStyleSheet::getContentStylePath(
-                $this->contentPageObject->getStyleSheetId()
-            )
-        );
-    }
 }

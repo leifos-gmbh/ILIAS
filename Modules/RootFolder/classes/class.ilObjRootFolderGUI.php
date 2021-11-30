@@ -9,7 +9,7 @@
  * @author Stefan Meyer <meyer@leifos.com>
  *
  * @ilCtrl_Calls ilObjRootFolderGUI: ilPermissionGUI, ilContainerPageGUI, ilContainerLinkListGUI
- * @ilCtrl_Calls ilObjRootFolderGUI: ilColumnGUI, ilObjectCopyGUI, ilObjStyleSheetGUI
+ * @ilCtrl_Calls ilObjRootFolderGUI: ilColumnGUI, ilObjectCopyGUI, ilObjectContentStyleSettingsGUI
  * @ilCtrl_Calls ilObjRootFolderGUI: ilCommonActionDispatcherGUI, ilObjectTranslationGUI
  * @ilCtrl_Calls ilObjRootFolderGUI: ilRepUtilGUI
  */
@@ -141,10 +141,9 @@ class ilObjRootFolderGUI extends ilContainerGUI
             case "ilcolumngui":
                 $this->checkPermission("read");
                 $this->prepareOutput();
-                include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
-                $this->tpl->setVariable(
-                    "LOCATION_CONTENT_STYLESHEET",
-                    ilObjStyleSheet::getContentStylePath($this->object->getStyleSheetId())
+                $this->content_style_gui->addCss(
+                    $this->tpl,
+                    $this->object->getRefId()
                 );
                 $this->renderObject();
                 break;
@@ -156,9 +155,17 @@ class ilObjRootFolderGUI extends ilContainerGUI
                 $cp->setType('root');
                 $this->ctrl->forwardCommand($cp);
                 break;
-                
-            case "ilobjstylesheetgui":
-                $this->forwardToStyleSheet();
+
+            case "ilobjectcontentstylesettingsgui":
+                $this->checkPermission("write");
+                $this->setTitleAndDescription();
+                $this->showContainerPageTabs();
+                $settings_gui = $this->content_style_gui
+                    ->objectSettingsGUIForRefId(
+                        null,
+                        $this->object->getRefId()
+                    );
+                $this->ctrl->forwardCommand($settings_gui);
                 break;
             
             case "ilcommonactiondispatchergui":
@@ -188,10 +195,9 @@ class ilObjRootFolderGUI extends ilContainerGUI
                     }
                 }
                 $this->prepareOutput();
-                include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
-                $this->tpl->setVariable(
-                    "LOCATION_CONTENT_STYLESHEET",
-                    ilObjStyleSheet::getContentStylePath($this->object->getStyleSheetId())
+                $this->content_style_gui->addCss(
+                    $this->tpl,
+                    $this->object->getRefId()
                 );
 
                 if (!$cmd) {

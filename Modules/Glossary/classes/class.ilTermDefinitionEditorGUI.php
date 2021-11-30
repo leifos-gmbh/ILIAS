@@ -27,6 +27,16 @@ class ilTermDefinitionEditorGUI
     public $term;
 
     /**
+     * @var \ILIAS\Style\Content\GUIService
+     */
+    protected $content_style_gui;
+
+    /**
+     * @var \ILIAS\Style\Content\Object\ObjectFacade
+     */
+    protected $content_style_domain;
+
+    /**
     * Constructor
     * @access	public
     */
@@ -50,6 +60,10 @@ class ilTermDefinitionEditorGUI
         $this->tabs_gui = $ilTabs;
 
         $this->ctrl->saveParameter($this, array("def"));
+
+        $cs = $DIC->contentStyle();
+        $this->content_style_gui = $cs->gui();
+        $this->content_style_domain = $cs->domain()->styleForRefId($this->glossary->getRefId());
     }
 
 
@@ -63,12 +77,18 @@ class ilTermDefinitionEditorGUI
         $cmd = $this->ctrl->getCmd();
 
         // content style
+        $this->content_style_gui->addCss(
+            $this->tpl,
+            $this->term_glossary->getRefId(),
+            $this->term_glossary->getId()
+        );
+        /*
         $this->tpl->setCurrentBlock("ContentStyle");
         $this->tpl->setVariable(
             "LOCATION_CONTENT_STYLESHEET",
             ilObjStyleSheet::getContentStylePath($this->term_glossary->getStyleSheetId())
         );
-        $this->tpl->parseCurrentBlock();
+        $this->tpl->parseCurrentBlock();*/
 
         // syntax style
         $this->tpl->setCurrentBlock("SyntaxStyle");
@@ -139,10 +159,8 @@ class ilTermDefinitionEditorGUI
                 $page_gui->setTemplateTargetVar("ADM_CONTENT");
                 $page_gui->setOutputMode("edit");
 
-                $page_gui->setStyleId(ilObjStyleSheet::getEffectiveContentStyleId(
-                    $this->term_glossary->getStyleSheetId(),
-                    "glo"
-                ));
+                $page_gui->setStyleId($this->content_style_domain->getEffectiveStyleId());
+
                 $page_gui->setLocator($gloss_loc);
                 $page_gui->setIntLinkReturn($this->ctrl->getLinkTargetByClass(
                     "ilobjglossarygui",

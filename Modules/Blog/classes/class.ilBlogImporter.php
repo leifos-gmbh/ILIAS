@@ -10,14 +10,25 @@
 class ilBlogImporter extends ilXmlImporter
 {
     protected $ds;
+
+    /**
+     * @var \ILIAS\Style\Content\DomainService
+     */
+    protected $content_style_domain;
     
     /**
      * Initialisation
      */
     public function init()
     {
+        /** @var \ILIAS\DI\Container $DIC */
+        global $DIC;
+
         $this->ds = new ilBlogDataSet();
         $this->ds->setDSPrefix("ds");
+        $this->content_style_domain = $DIC
+            ->contentStyle()
+            ->domain();
     }
 
     /**
@@ -56,7 +67,9 @@ class ilBlogImporter extends ilXmlImporter
         foreach ($sty_map as $old_sty_id => $new_sty_id) {
             if (is_array(ilBlogDataSet::$style_map[$old_sty_id])) {
                 foreach (ilBlogDataSet::$style_map[$old_sty_id] as $blog_id) {
-                    ilObjStyleSheet::writeStyleUsage($blog_id, $new_sty_id);
+                    $this->content_style_domain
+                        ->styleForObjId($blog_id)
+                        ->updateStyleId($new_sty_id);
                 }
             }
         }

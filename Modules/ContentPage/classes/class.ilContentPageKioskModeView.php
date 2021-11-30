@@ -17,6 +17,14 @@ class ilContentPageKioskModeView extends ilKioskModeView
 {
     const CMD_LP_TO_COMPLETED = 'lp_completed';
     const CMD_LP_TO_INCOMPLETE = 'lp_incomplete';
+    /**
+     * @var \ILIAS\Style\Content\Object\ObjectFacade
+     */
+    protected $content_style_domain;
+    /**
+     * @var \ILIAS\Style\Content\GUIService
+     */
+    protected $content_style_gui;
 
     /** @var ilObjContentPage */
     protected $contentPageObject;
@@ -61,6 +69,9 @@ class ilContentPageKioskModeView extends ilKioskModeView
         $this->httpRequest = $DIC->http()->request();
         $this->tabs = $DIC->tabs();
         $this->user = $DIC->user();
+        $cs = $DIC->contentStyle();
+        $this->content_style_gui = $cs->gui();
+        $this->content_style_domain = $cs->domain()->styleForRefId($object->getRefId());
     }
 
     /**
@@ -183,7 +194,8 @@ class ilContentPageKioskModeView extends ilKioskModeView
             $this->tabs,
             $this->lng,
             $this->contentPageObject,
-            $this->user
+            $this->user,
+            $this->content_style_domain
         );
         $forwarder->setPresentationMode(ilContentPagePageCommandForwarder::PRESENTATION_MODE_EMBEDDED_PRESENTATION);
 
@@ -203,10 +215,9 @@ class ilContentPageKioskModeView extends ilKioskModeView
     protected function renderContentStyle() : void
     {
         $this->mainTemplate->addCss(ilObjStyleSheet::getSyntaxStylePath());
-        $this->mainTemplate->addCss(
-            ilObjStyleSheet::getContentStylePath(
-                $this->contentPageObject->getStyleSheetId()
-            )
+        $this->content_style_gui->addCss(
+            $this->mainTemplate,
+            $this->contentPageObject->getRefId()
         );
     }
 }

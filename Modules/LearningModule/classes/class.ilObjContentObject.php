@@ -17,6 +17,11 @@
 class ilObjContentObject extends ilObject
 {
     /**
+     * @var \ILIAS\Style\Content\DomainService
+     */
+    protected $content_style_domain;
+
+    /**
      * @var ilObjUser
      */
     protected $user;
@@ -75,6 +80,8 @@ class ilObjContentObject extends ilObject
         $this->mob_ids = array();
         $this->file_ids = array();
         $this->q_ids = array();
+        $cs = $DIC->contentStyle();
+        $this->content_style_domain = $cs->domain();
     }
 
     /**
@@ -663,37 +670,6 @@ class ilObjContentObject extends ilObject
     }
 
     /**
-    * get ID of assigned style sheet object
-    */
-    public function getStyleSheetId()
-    {
-        return $this->style_id;
-    }
-
-    /**
-    * set ID of assigned style sheet object
-    */
-    public function setStyleSheetId($a_style_id)
-    {
-        $this->style_id = $a_style_id;
-    }
-
-    /**
-    * write ID of assigned style sheet object to db
-    */
-    public function writeStyleSheetId($a_style_id)
-    {
-        $ilDB = $this->db;
-
-        $q = "UPDATE content_object SET " .
-            " stylesheet = " . $ilDB->quote((int) $a_style_id, "integer") .
-            " WHERE id = " . $ilDB->quote($this->getId(), "integer");
-        $ilDB->manipulate($q);
-
-        $this->style_id = $a_style_id;
-    }
-
-    /**
      * Write header page
      *
      * @param int $a_lm_id learning module id
@@ -1146,7 +1122,6 @@ class ilObjContentObject extends ilObject
         $lm_set = $ilDB->query($q);
         $lm_rec = $ilDB->fetchAssoc($lm_set);
         $this->setLayout($lm_rec["default_layout"]);
-        $this->setStyleSheetId((int) $lm_rec["stylesheet"]);
         $this->setPageHeader($lm_rec["page_header"]);
         $this->setTOCMode($lm_rec["toc_mode"]);
         $this->setActiveTOC(ilUtil::yn2tf($lm_rec["toc_active"]));
@@ -1193,7 +1168,6 @@ class ilObjContentObject extends ilObject
         
         $q = "UPDATE content_object SET " .
             " default_layout = " . $ilDB->quote($this->getLayout(), "text") . ", " .
-            " stylesheet = " . $ilDB->quote($this->getStyleSheetId(), "integer") . "," .
             " page_header = " . $ilDB->quote($this->getPageHeader(), "text") . "," .
             " toc_mode = " . $ilDB->quote($this->getTOCMode(), "text") . "," .
             " toc_active = " . $ilDB->quote(ilUtil::tf2yn($this->isActiveTOC()), "text") . "," .
@@ -2494,6 +2468,7 @@ class ilObjContentObject extends ilObject
         $this->MDUpdateListener('General');
 
         // import style
+        /*
         $style_file = $a_directory . "/style.xml";
         $style_zip_file = $a_directory . "/style.zip";
         if (is_file($style_zip_file)) {	// try to import style.zip first
@@ -2504,7 +2479,7 @@ class ilObjContentObject extends ilObject
             $style = new ilObjStyleSheet();
             $style->import($style_file);
             $this->writeStyleSheetId($style->getId());
-        }
+        }*/
 
         //		// validate
         if ($a_validate) {
@@ -2574,15 +2549,9 @@ class ilObjContentObject extends ilObject
         $new_obj->createLMTree();
         
         // copy style
-        $style_id = $this->getStyleSheetId();
-        if ($style_id > 0 &&
-            !ilObjStyleSheet::_lookupStandard($style_id)) {
-            $style_obj = ilObjectFactory::getInstanceByObjId($style_id);
-            $new_id = $style_obj->ilClone();
-            $new_obj->setStyleSheetId($new_id);
-        } else {	// or just set the same standard style
-            $new_obj->setStyleSheetId($style_id);
-        }
+        $style = $this->content_style_domain->styleForObjId($this->getId());
+        $style->cloneTo($new_obj->getId());
+
         $new_obj->update();
         
         // copy content

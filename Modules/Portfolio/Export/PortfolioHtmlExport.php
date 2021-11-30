@@ -14,6 +14,11 @@ use ILIAS\Blog\Export\BlogHtmlExport;
 class PortfolioHtmlExport
 {
     /**
+     * @var \ILIAS\Style\Content\Object\ObjectFacade
+     */
+    protected $content_style_domain;
+
+    /**
      * @var \ilObjPortfolio
      */
     protected $portfolio;
@@ -103,6 +108,10 @@ class PortfolioHtmlExport
             \ilHTMLExportViewLayoutProvider::HTML_EXPORT_RENDERING,
             true
         );
+
+        $this->content_style_domain = $DIC
+            ->contentStyle()
+            ->domain()->styleForObjId($this->portfolio->getId());
     }
 
     /**
@@ -166,7 +175,7 @@ class PortfolioHtmlExport
 
         $this->export_util->exportSystemStyle();
         $this->export_util->exportCOPageFiles(
-            $this->portfolio->getStyleSheetId(),
+            $this->content_style_domain->getEffectiveStyleId(),
             $this->portfolio->getType()
         );
 
@@ -294,7 +303,9 @@ class PortfolioHtmlExport
         $location_stylesheet = \ilUtil::getStyleSheetLocation();
         $this->global_screen->layout()->meta()->addCss($location_stylesheet);
         $this->global_screen->layout()->meta()->addCss(
-            \ilObjStyleSheet::getContentStylePath($this->portfolio->getStyleSheetId())
+            \ilObjStyleSheet::getContentStylePath(
+                $this->content_style_domain->getEffectiveStyleId()
+            )
         );
         \ilPCQuestion::resetInitialState();
 

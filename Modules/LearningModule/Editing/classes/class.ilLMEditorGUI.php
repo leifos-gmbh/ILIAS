@@ -15,6 +15,11 @@
 class ilLMEditorGUI
 {
     /**
+     * @var \ILIAS\Style\Content\GUIService
+     */
+    protected $content_style_gui;
+
+    /**
      * @var ilCtrl
      */
     protected $ctrl;
@@ -127,6 +132,8 @@ class ilLMEditorGUI
         );
 
         $this->checkRequestParameters();
+        $cs = $DIC->contentStyle();
+        $this->content_style_gui = $cs->gui();
     }
     
     /**
@@ -234,12 +241,10 @@ class ilLMEditorGUI
         $this->tpl->loadStandardTemplate();
 
         // content style
-        $this->tpl->setCurrentBlock("ContentStyle");
-        $this->tpl->setVariable(
-            "LOCATION_CONTENT_STYLESHEET",
-            ilObjStyleSheet::getContentStylePath($this->lm_obj->getStyleSheetId())
+        $this->content_style_gui->addCss(
+            $this->tpl,
+            $this->lm_obj->getRefId()
         );
-        $this->tpl->parseCurrentBlock();
 
         // syntax style
         $this->tpl->setCurrentBlock("SyntaxStyle");

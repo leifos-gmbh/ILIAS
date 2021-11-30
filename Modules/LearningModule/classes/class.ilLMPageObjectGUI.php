@@ -17,6 +17,10 @@
 class ilLMPageObjectGUI extends ilLMObjectGUI
 {
     /**
+     * @var \ILIAS\Style\Content\DomainService
+     */
+    protected $content_style_domain;
+    /**
      * @var ilTabsGUI
      */
     protected $tabs;
@@ -44,6 +48,8 @@ class ilLMPageObjectGUI extends ilLMObjectGUI
         $this->settings = $DIC->settings();
         $this->lng = $DIC->language();
         parent::__construct($a_content_obj);
+        $cs = $DIC->contentStyle();
+        $this->content_style_domain = $cs->domain();
     }
 
 
@@ -120,10 +126,9 @@ class ilLMPageObjectGUI extends ilLMObjectGUI
                     $view_frame
                 );
 
-                $page_gui->setStyleId(ilObjStyleSheet::getEffectiveContentStyleId(
-                    $this->content_object->getStyleSheetId(),
-                    "lm"
-                ));
+                $page_gui->setStyleId($this->content_style_domain
+                    ->styleForRefId($this->content_object->getRefId())
+                    ->getEffectiveStyleId());
                 $page_gui->setTemplateTargetVar("ADM_CONTENT");
                 $page_gui->getPageObject()->buildDom();
                 $int_links = $page_gui->getPageObject()->getInternalLinks();

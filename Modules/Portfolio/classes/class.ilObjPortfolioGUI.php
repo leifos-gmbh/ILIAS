@@ -9,7 +9,7 @@
  *
  * @ilCtrl_Calls ilObjPortfolioGUI: ilPortfolioPageGUI, ilPageObjectGUI
  * @ilCtrl_Calls ilObjPortfolioGUI: ilWorkspaceAccessGUI, ilNoteGUI
- * @ilCtrl_Calls ilObjPortfolioGUI: ilObjStyleSheetGUI, ilPortfolioExerciseGUI
+ * @ilCtrl_Calls ilObjPortfolioGUI: ilObjectContentStyleSettingsGUI, ilPortfolioExerciseGUI
  */
 class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
 {
@@ -34,7 +34,7 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
      * @var ilPortfolioDeclarationOfAuthorship
      */
     protected $declaration_authorship;
-    
+
     public function __construct($a_id = 0)
     {
         global $DIC;
@@ -127,7 +127,8 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
             case "ilnotegui":
                 $this->preview();
                 break;
-            
+
+                /*
             case "ilobjstylesheetgui":
                 $this->ctrl->setReturn($this, "editStyleProperties");
                 $style_gui = new ilObjStyleSheetGUI("", $this->object->getStyleSheetId(), false, false);
@@ -150,8 +151,24 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
                     $this->object->update();
                     $this->ctrl->redirectByClass("ilobjstylesheetgui", "edit");
                 }
+                break;*/
+
+            case "ilobjectcontentstylesettingsgui":
+                $this->checkPermission("write");
+                $this->addLocator();
+                $this->setTabs();
+                $this->tabs_gui->activateTab("settings");
+                $this->setSettingsSubTabs("style");
+                $settings_gui = $this->content_style_service
+                    ->gui()
+                    ->objectSettingsGUIForObjId(
+                        null,
+                        $this->object->getId()
+                    );
+                $this->ctrl->forwardCommand($settings_gui);
                 break;
-                
+
+
             case "ilportfolioexercisegui":
                 $this->ctrl->setReturn($this, "view");
                 $gui = new ilPortfolioExerciseGUI($this->user_id, $this->object->getId());
@@ -1324,7 +1341,11 @@ class ilObjPortfolioGUI extends ilObjPortfolioBaseGUI
         $tpl->setBodyClass("ilPrtfPdfBody");
 
         $tpl->addCss(ilUtil::getStyleSheetLocation("filesystem"));
-        $tpl->addCss(ilObjStyleSheet::getContentStylePath($this->object->getStyleSheetId(), false));
+        $this->content_style_gui->addCss(
+            $tpl,
+            $this->object->getRefId(),
+            $this->object->getId()
+        );
         $tpl->addCss(ilObjStyleSheet::getContentPrintStyle());
         $tpl->addCss(ilObjStyleSheet::getSyntaxStylePath());
 

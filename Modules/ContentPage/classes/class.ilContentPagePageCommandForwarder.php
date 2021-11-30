@@ -42,6 +42,11 @@ class ilContentPagePageCommandForwarder implements ilContentPageObjectConstants
     protected $updateListeners = [];
 
     /**
+     * @var \ILIAS\Style\Content\Object\ObjectFacade
+     */
+    protected $content_style_domain;
+
+    /**
      * ilContentPagePageCommandForwarder constructor.
      * @param ServerRequestInterface $request
      * @param ilCtrl $ctrl
@@ -56,13 +61,15 @@ class ilContentPagePageCommandForwarder implements ilContentPageObjectConstants
         ilTabsGUI $tabs,
         ilLanguage $lng,
         ilObjContentPage $parentObject,
-        ilObjUser $actor
+        ilObjUser $actor,
+        \ILIAS\Style\Content\Object\ObjectFacade $content_style_domain
     ) {
         $this->ctrl = $ctrl;
         $this->tabs = $tabs;
         $this->lng = $lng;
         $this->parentObject = $parentObject;
         $this->actor = $actor;
+        $this->content_style_domain = $content_style_domain;
 
         $this->lng->loadLanguageModule('content');
 
@@ -105,10 +112,7 @@ class ilContentPagePageCommandForwarder implements ilContentPageObjectConstants
     {
         $pageObjectGUI = new ilContentPagePageGUI($this->parentObject->getId(), 0, $isEmbedded, $language);
         $pageObjectGUI->setStyleId(
-            ilObjStyleSheet::getEffectiveContentStyleId(
-                $this->parentObject->getStyleSheetId(),
-                $this->parentObject->getType()
-            )
+            $this->content_style_domain->getEffectiveStyleId()
         );
 
         $pageObjectGUI->obj->addUpdateListener($this->parentObject, 'update');
@@ -191,10 +195,7 @@ class ilContentPagePageCommandForwarder implements ilContentPageObjectConstants
         $pageObjectGUI->setEnabledTabs(false);
 
         $pageObjectGUI->setStyleId(
-            ilObjStyleSheet::getEffectiveContentStyleId(
-                $this->parentObject->getStyleSheetId(),
-                $this->parentObject->getType()
-            )
+            $this->content_style_domain->getEffectiveStyleId()
         );
 
         return $pageObjectGUI;
@@ -212,10 +213,7 @@ class ilContentPagePageCommandForwarder implements ilContentPageObjectConstants
         $pageObjectGUI->setEnabledTabs(false);
 
         $pageObjectGUI->setStyleId(
-            ilObjStyleSheet::getEffectiveContentStyleId(
-                $this->parentObject->getStyleSheetId(),
-                $this->parentObject->getType()
-            )
+            $this->content_style_domain->getEffectiveStyleId()
         );
 
         return $pageObjectGUI;

@@ -12,6 +12,11 @@ use ILIAS\User\Export\UserHtmlExport;/**
 class WikiHtmlExport
 {
     /**
+     * @var \ILIAS\Style\Content\Object\ObjectFacade
+     */
+    protected $content_style_domain;
+
+    /**
      * @var \ilDBInterface
      */
     protected $db;
@@ -93,6 +98,10 @@ class WikiHtmlExport
         $this->log = \ilLoggerFactory::getLogger('wiki');
         $this->global_screen = $DIC->globalScreen();
         $this->main_tpl = $DIC->ui()->mainTemplate();
+        $this->content_style_domain = $DIC
+            ->contentStyle()
+            ->domain()
+            ->styleForRefId($a_wiki->getRefId());
     }
     
     /**
@@ -167,13 +176,10 @@ class WikiHtmlExport
 
 
         $this->export_util->exportSystemStyle();
-        $this->export_util->exportCOPageFiles($this->wiki->getStyleSheetId(), "wiki");
-
+        $eff_style_id = $this->content_style_domain->getEffectiveStyleId();
+        $this->export_util->exportCOPageFiles($eff_style_id, "wiki");
         $this->co_page_html_export = new \ilCOPageHTMLExport($this->export_dir);
-        $this->co_page_html_export->setContentStyleId(\ilObjStyleSheet::getEffectiveContentStyleId(
-            $this->wiki->getStyleSheetId(),
-            "wiki"
-        ));
+        $this->co_page_html_export->setContentStyleId($eff_style_id);
 
         // export pages
         $this->log->debug("export pages");

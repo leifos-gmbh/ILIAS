@@ -331,6 +331,11 @@ class Container extends \Pimple\Container
         return $this['resource_storage'];
     }
 
+    public function contentStyle() : \ILIAS\Style\Content\Service
+    {
+        return new \ILIAS\Style\Content\Service($this);
+    }
+
 
     /**
      * Note: Only use isDependencyAvailable if strictly required. The need for this,

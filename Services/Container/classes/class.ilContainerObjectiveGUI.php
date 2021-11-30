@@ -19,6 +19,11 @@ class ilContainerObjectiveGUI extends ilContainerContentGUI
     private $logger = null;
 
     /**
+     * @var \ILIAS\Style\Content\Object\ObjectFacade
+     */
+    protected $content_style_domain;
+
+    /**
      * @var ilTabsGUI
      */
     protected $tabs;
@@ -67,6 +72,13 @@ class ilContainerObjectiveGUI extends ilContainerContentGUI
         
         $this->initDetails();
         $this->initTestAssignments();
+
+        // ak: note, also in ILIAS <= 7 this page did not
+        // use the container style, it could however, but this would be a conceptual change
+        $this->content_style_domain = $DIC
+            ->contentStyle()
+            ->domain()
+            ->styleForObjId(0);
     }
     
     /**
@@ -936,7 +948,9 @@ class ilContainerObjectiveGUI extends ilContainerContentGUI
                 $page_gui = new ilLOPageGUI($objective->getObjectiveId());
                 
                 include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
-                $page_gui->setStyleId(ilObjStyleSheet::getEffectiveContentStyleId(0));
+                $page_gui->setStyleId(
+                    $this->content_style_domain->getEffectiveStyleId()
+                );
                 $page_gui->setPresentationTitle("");
                 $page_gui->setTemplateOutput(false);
                 $page_gui->setHeader("");

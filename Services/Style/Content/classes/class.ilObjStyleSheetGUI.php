@@ -16,6 +16,11 @@ require_once "./Services/Style/Content/classes/class.ilObjStyleSheet.php";
 class ilObjStyleSheetGUI extends ilObjectGUI
 {
     /**
+     * @var \ILIAS\Style\Content\InternalService
+     */
+    protected $service;
+
+    /**
      * @var ilRbacSystem
      */
     protected $rbacsystem;
@@ -30,7 +35,7 @@ class ilObjStyleSheetGUI extends ilObjectGUI
      */
     protected $tabs;
 
-    /**addImage
+    /**
      * @var ilObjectDefinition
      */
     protected $obj_definition;
@@ -70,6 +75,10 @@ class ilObjStyleSheetGUI extends ilObjectGUI
             $this->super_type = ilObjStyleSheet::_getStyleSuperTypeForType($_GET["style_type"]);
         }
         $this->type = "sty";
+        $this->service = $DIC
+            ->contentStyle()
+            ->internal();
+
         parent::__construct($a_data, $a_id, $a_call_by_reference, false);
     }
 
@@ -91,13 +100,13 @@ class ilObjStyleSheetGUI extends ilObjectGUI
         $cmd = $this->ctrl->getCmd("edit");
         
         // #9440/#9489: prepareOutput will fail if not set properly
-        if (!$this->object) {
+        if (!$this->object || $cmd == "create") {
             $this->setCreationMode(true);
         }
 
-        $this->prepareOutput();
         switch ($next_class) {
             default:
+                $this->prepareOutput();
                 $cmd .= "Object";
                 $ret = $this->$cmd();
                 break;
@@ -1167,7 +1176,6 @@ class ilObjStyleSheetGUI extends ilObjectGUI
         $ilCtrl = $this->ctrl;
         $ilTabs = $this->tabs;
         $ilHelp = $this->help;
-        
         $ilHelp->setScreenIdComponent("sty");
         
         if ($ilCtrl->getCmd() == "editTagStyle") {

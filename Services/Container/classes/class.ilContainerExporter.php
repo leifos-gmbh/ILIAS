@@ -19,10 +19,18 @@ class ilContainerExporter extends ilXmlExporter
     private $writer = null;
 
     /**
+     * @var \ILIAS\Style\Content\DomainService
+     */
+    protected $content_style_domain;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
+        global $DIC;
+        $this->content_style_domain = $DIC->contentStyle()
+            ->domain();
     }
     
     /**
@@ -73,10 +81,9 @@ class ilContainerExporter extends ilXmlExporter
         // style
         $style_ids = array();
         foreach ($a_ids as $id) {
-            include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
-            $style_id = ilObjStyleSheet::lookupObjectStyle($id);
             // see #24888
-            $style_id = ilObjStyleSheet::getEffectiveContentStyleId($style_id);
+            $style = $this->content_style_domain->styleForObjId($id);
+            $style_id = $style->getEffectiveStyleId();
             if ($style_id > 0) {
                 $style_ids[] = $style_id;
             }

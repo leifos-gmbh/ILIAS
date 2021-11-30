@@ -12,6 +12,10 @@ namespace ILIAS\Glossary\Export;
 class GlossaryHtmlExport
 {
     /**
+     * @var \ILIAS\Style\Content\Object\ObjectFacade
+     */
+    protected $content_style;
+    /**
      * @var \ilObjGlossary
      */
     protected $glossary;
@@ -69,6 +73,10 @@ class GlossaryHtmlExport
         $this->glo_gui = new \ilGlossaryPresentationGUI("html", $this->target_dir);
 
         $this->global_screen->tool()->context()->current()->addAdditionalData(\ilHTMLExportViewLayoutProvider::HTML_EXPORT_RENDERING, true);
+        $this->content_style = $DIC
+            ->contentStyle()
+            ->domain()
+            ->styleForRefId($glo->getRefId());
     }
 
     /**
@@ -89,7 +97,7 @@ class GlossaryHtmlExport
     {
         $this->initDirectories();
         $this->export_util->exportSystemStyle();
-        $this->export_util->exportCOPageFiles($this->glossary->getStyleSheetId(), "glo");
+        $this->export_util->exportCOPageFiles($this->content_style->getEffectiveStyleId(), "glo");
 
         // export terms
         $this->exportHTMLGlossaryTerms();
@@ -146,9 +154,8 @@ class GlossaryHtmlExport
         $location_stylesheet = \ilUtil::getStyleSheetLocation();
         $this->global_screen->layout()->meta()->addCss($location_stylesheet);
         $this->global_screen->layout()->meta()->addCss(
-            \ilObjStyleSheet::getContentStylePath($this->glossary->getStyleSheetId())
+            \ilObjStyleSheet::getContentStylePath($this->content_style->getEffectiveStyleId())
         );
-
 
         //$this->addSupplyingExportFiles();
 

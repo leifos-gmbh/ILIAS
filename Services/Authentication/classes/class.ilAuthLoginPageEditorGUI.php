@@ -15,6 +15,11 @@ include_once './Services/Authentication/classes/class.ilAuthLoginPageEditorSetti
 class ilAuthLoginPageEditorGUI
 {
     /**
+     * @var \ILIAS\Style\Content\Object\ObjectFacade
+     */
+    protected $content_style_domain;
+
+    /**
      * @var $ctrl ilCtrl
      */
     protected $ctrl = null;
@@ -43,6 +48,9 @@ class ilAuthLoginPageEditorGUI
         $this->ref_id = $a_ref_id;
 
         $this->settings = ilAuthLoginPageEditorSettings::getInstance();
+        $this->content_style_domain = $DIC->contentStyle()
+            ->domain()
+            ->styleForRefId($a_ref_id);
     }
 
     /**
@@ -135,7 +143,7 @@ class ilAuthLoginPageEditorGUI
         //$page_gui->setLinkParams($this->ctrl->getUrlParameterString()); // todo
         //		$page_gui->setSourcecodeDownloadScript($this->ctrl->getLinkTarget($this, ""));
         $page_gui->setPresentationTitle("");
-        $page_gui->setStyleId(ilObjStyleSheet::getEffectiveContentStyleId(0));
+        $page_gui->setStyleId($this->content_style_domain->getEffectiveStyleId());
         $page_gui->setTemplateOutput(false);
         //$page_gui->setLocator($contObjLocator);
         $page_gui->setHeader("");

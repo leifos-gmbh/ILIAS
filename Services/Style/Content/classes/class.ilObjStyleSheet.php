@@ -661,6 +661,18 @@ class ilObjStyleSheet extends ilObject
         $ilDB->manipulate($q);
     }
 
+    public static function writeOwner($obj_id, $style_id)
+    {
+        global $DIC;
+
+        $ilDB = $DIC->database();
+
+        $q = "UPDATE style_data SET owner_obj = " .
+            $ilDB->quote((int) $obj_id, "integer") .
+            " WHERE id = " . $ilDB->quote($style_id, "integer");
+        $ilDB->manipulate($q);
+    }
+
     /**
     * Looup up to date
     */

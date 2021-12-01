@@ -215,7 +215,7 @@ class RunDBRepository
             " WHERE finished_id = " . $db->quote($run_id, "integer");
         $set = $db->query($sql);
         while ($row = $db->fetchAssoc($set)) {
-            return $this->data->run((int) $row["survey_fi"], (int) $row["user_id"])
+            return $this->data->run((int) $row["survey_fi"], (int) $row["user_fi"])
                 ->withId((int) $row["finished_id"])
                 ->withFinished((bool) $row["state"])
                 ->withCode((string) $row["anonymous_id"])

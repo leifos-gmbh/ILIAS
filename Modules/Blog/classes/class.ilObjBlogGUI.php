@@ -189,10 +189,12 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
         $ilCtrl->saveParameter($this, "prvm");
         $cs = $DIC->contentStyle();
         $this->content_style_gui = $cs->gui();
-        if ($this->id_type != self::REPOSITORY_NODE_ID) {
-            $this->content_style_domain = $cs->domain()->styleForObjId($this->object->getId());
-        } else {
-            $this->content_style_domain = $cs->domain()->styleForRefId($this->object->getRefId());
+        if (is_object($this->object)) {
+            if ($this->id_type != self::REPOSITORY_NODE_ID) {
+                $this->content_style_domain = $cs->domain()->styleForObjId($this->object->getId());
+            } else {
+                $this->content_style_domain = $cs->domain()->styleForRefId($this->object->getRefId());
+            }
         }
     }
 

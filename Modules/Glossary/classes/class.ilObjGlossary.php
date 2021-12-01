@@ -52,7 +52,7 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
         $this->content_style_service = $DIC
             ->contentStyle()
             ->domain()
-            ->styleForRefId($this->getRefId());
+            ->styleForRefId((int) $this->getRefId());
     }
 
     /**

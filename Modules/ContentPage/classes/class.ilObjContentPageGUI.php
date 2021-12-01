@@ -99,7 +99,9 @@ class ilObjContentPageGUI extends ilObject2GUI implements ilContentPageObjectCon
         );
         $cs = $DIC->contentStyle();
         $this->content_style_gui = $cs->gui();
-        $this->content_style_domain = $cs->domain()->styleForRefId($this->object->getRefId());
+        if (is_object($this->object)) {
+            $this->content_style_domain = $cs->domain()->styleForRefId($this->object->getRefId());
+        }
     }
 
     /**

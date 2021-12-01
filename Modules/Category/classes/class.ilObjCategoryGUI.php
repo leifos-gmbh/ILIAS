@@ -292,10 +292,12 @@ class ilObjCategoryGUI extends ilContainerGUI
                 }
 
                 $this->prepareOutput();
-                $this->content_style_gui->addCss(
-                    $this->tpl,
-                    $this->object->getRefId()
-                );
+                if (is_object($this->object)) {
+                    $this->content_style_gui->addCss(
+                        $this->tpl,
+                        $this->object->getRefId()
+                    );
+                }
 
                 if (!$cmd) {
                     $cmd = "render";

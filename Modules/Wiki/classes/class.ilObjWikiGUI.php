@@ -106,7 +106,9 @@ class ilObjWikiGUI extends ilObjectGUI
         $this->req_with_comments = (bool) $_GET["with_comments"];
         $cs = $DIC->contentStyle();
         $this->content_style_gui = $cs->gui();
-        $this->content_style_domain = $cs->domain()->styleForRefId($this->object->getRefId());
+        if (is_object($this->object)) {
+            $this->content_style_domain = $cs->domain()->styleForRefId($this->object->getRefId());
+        }
     }
     
     public function executeCommand()

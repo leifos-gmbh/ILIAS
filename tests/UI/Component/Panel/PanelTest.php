@@ -268,16 +268,16 @@ EOT;
 
         $expected_html = <<<EOT
 <div class="panel panel-sub panel-flex">
-	<div class="panel-heading ilBlockHeader clearfix">
-		<h3>Title</h3>
+	<div class="panel-heading ilBlockHeader">
+		<h4>Title</h4>
 	</div>
 	<div class="panel-body">
 		<div class="row">
 			<div class="col-sm-8"></div>
 			<div class="col-sm-4">
 				<div class="panel panel-secondary panel-flex">
-					<div class="panel-heading ilHeader clearfix">
-					    <h4 class="ilHeader">Legacy panel title</h4>
+					<div class="panel-heading ilHeader">
+					    <h4>Legacy panel title</h4>
                     </div>
                     <div class="panel-body">Legacy content</div>
 				</div>

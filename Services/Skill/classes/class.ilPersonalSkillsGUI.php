@@ -10,8 +10,8 @@
  */
 class ilPersonalSkillsGUI
 {
-    const LIST_SELECTED = "";
-    const LIST_PROFILES = "profiles";
+    const LIST_SELECTED = "selected";
+    const LIST_PROFILES = "";
 
     protected $offline_mode;
     protected $skill_tree;
@@ -97,7 +97,7 @@ class ilPersonalSkillsGUI
     /**
      * @var string
      */
-    protected $list_mode = self::LIST_SELECTED;
+    protected $list_mode = self::LIST_PROFILES;
 
     /**
      * @var \ILIAS\ResourceStorage\Services
@@ -371,18 +371,8 @@ class ilPersonalSkillsGUI
         $tpl = $this->tpl;
 
         $next_class = $ilCtrl->getNextClass($this);
-        
+        $cmd = $ilCtrl->getCmd("render");
 
-        // determin standard command
-        if (count($this->user_profiles) > 0) {
-            $std_cmd = "listAllAssignedProfiles";
-        }
-        else {
-            $std_cmd = "listSkills";
-        }
-
-        $cmd = $ilCtrl->getCmd($std_cmd);
-        
         //$tpl->setTitle($lng->txt("skills"));
         //$tpl->setTitleIcon(ilUtil::getImagePath("icon_skmg.svg"));
 
@@ -437,14 +427,10 @@ class ilPersonalSkillsGUI
      */
     protected function render()
     {
-        switch ($this->list_mode) {
-            case self::LIST_PROFILES:
-                $this->listAllAssignedProfiles();
-                break;
-
-            default:
-                $this->listSkills();
-                break;
+        if ($this->list_mode == self::LIST_SELECTED || !count($this->user_profiles) > 0) {
+            $this->listSkills();
+        } else {
+            $this->listAllAssignedProfiles();
         }
     }
 
@@ -885,10 +871,12 @@ class ilPersonalSkillsGUI
         $ilToolbar = $this->toolbar;
         $ilTabs = $this->tabs;
 
-
+        $cmd = ($this->list_mode == self::LIST_SELECTED || !count($this->user_profiles) > 0)
+            ? "render"
+            : "listAssignedProfile";
         $ilTabs->setBackTarget(
             $lng->txt("back"),
-            $ilCtrl->getLinkTarget($this, "listAssignedProfile")
+            $ilCtrl->getLinkTarget($this, $cmd)
         );
         
         $ilCtrl->saveParameter($this, "skill_id");
@@ -1086,10 +1074,12 @@ class ilPersonalSkillsGUI
         $ilToolbar = $this->toolbar;
         $ilTabs = $this->tabs;
 
-
+        $cmd = ($this->list_mode == self::LIST_SELECTED || !count($this->user_profiles) > 0)
+            ? "render"
+            : "listAssignedProfile";
         $ilTabs->setBackTarget(
             $lng->txt("back"),
-            $ilCtrl->getLinkTarget($this, "listAssignedProfile")
+            $ilCtrl->getLinkTarget($this, $cmd)
         );
         
         $ilCtrl->saveParameter($this, "skill_id");
@@ -1170,8 +1160,10 @@ class ilPersonalSkillsGUI
                 $ilCtrl->saveParameter($this, "level_id");
                 $ilCtrl->saveParameter($this, "tref_id");
                 $ilCtrl->saveParameter($this, "basic_skill_id");*/
-        
-        $ilCtrl->redirect($this, "listAssignedProfile");
+
+        $cmd = ($this->list_mode == self::LIST_SELECTED || !count($this->user_profiles) > 0)
+            ? "render" : "listAssignedProfile";
+        $ilCtrl->redirect($this, $cmd);
     }
     
     /**

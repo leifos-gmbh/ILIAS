@@ -29,6 +29,7 @@ class ilObjFileBasedLMListGUI extends ilObjectListGUI
         $this->info_screen_enabled = true;
         $this->type = "htlm";
         $this->gui_class_name = "ilobjfilebasedlmgui";
+        $this->enableLearningProgress(true);
         
         // general commands array
         include_once('Modules/HTMLLearningModule/classes/class.ilObjFileBasedLMAccess.php');
@@ -123,4 +124,21 @@ class ilObjFileBasedLMListGUI extends ilObjectListGUI
 
         return $props;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getInfoScreenStatus()
+    {
+        return ilObjContentObjectAccess::isInfoEnabled($this->obj_id);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function checkInfoPageOnAsynchronousRendering() : bool
+    {
+        return true;
+    }
+
 } // END class.ilObjCategoryGUI

@@ -871,7 +871,7 @@ class ilLPStatus
         $user_id = $ilUser->getId();
         
         $res = array();
-        
+
         include_once("Services/Tracking/classes/class.ilObjUserTracking.php");
         if ($ilUser->getId() != ANONYMOUS_USER_ID &&
             ilObjUserTracking::_enabledLearningProgress() &&
@@ -880,8 +880,9 @@ class ilLPStatus
             // -- validate
             
             // :TODO: we need the parent ref id, but this is awful
-            $a_obj_ids = self::validateLPForObjects($user_id, $a_obj_ids, (int) $_GET["ref_id"]);
-            
+            // this step removes all "not attempted" from the list, which we usually do not want
+            //$a_obj_ids = self::validateLPForObjects($user_id, $a_obj_ids, (int) $_GET["ref_id"]);
+
             // we are not handling the collections differently yet
             $coll_obj_ids = array();
             $a_obj_ids = self::checkLPModesForObjects($a_obj_ids, $coll_obj_ids);
@@ -906,7 +907,7 @@ class ilLPStatus
                     ];
             }
         }
-        
+
         self::$list_gui_cache = $res;
     }
     
@@ -921,5 +922,16 @@ class ilLPStatus
             return $image;
         }
         return self::$list_gui_cache[$a_obj_id];
+    }
+
+    /**
+     * @param int $a_obj_id
+     * @return bool
+     */
+    public static function hasListGUIStatus($a_obj_id) {
+        if (isset(self::$list_gui_cache[$a_obj_id])) {
+            return true;
+        }
+        return false;
     }
 }

@@ -533,16 +533,8 @@ class ilInfoScreenGUI
                         );
                 }
 
-                include_once 'Services/PermanentLink/classes/class.ilPermanentLinkGUI.php';
-                $pm = new ilPermanentLinkGUI($type, $ref_id);
-                $pm->setIncludePermanentLinkText(false);
-                $pm->setAlignCenter(false);
-                $this->addProperty(
-                    $lng->txt("perma_link"),
-                    $pm->getHTML(),
-                    ""
-                    );
-            
+                $this->tpl->setPermanentLink($type, $ref_id);
+
                 // links to resource
                 if ($ilAccess->checkAccess("write", "", $ref_id) ||
                     $ilAccess->checkAccess("edit_permissions", "", $ref_id)) {
@@ -574,40 +566,44 @@ class ilInfoScreenGUI
                 
                 
         // creation date
-        $this->addProperty(
-            $lng->txt("create_date"),
-            ilDatePresentation::formatDate(new ilDateTime($a_obj->getCreateDate(), IL_CAL_DATETIME))
-        );
+        if ($ilAccess->checkAccess("edit_permissions", "", $ref_id)) {
+            $this->addProperty(
+                $lng->txt("create_date"),
+                ilDatePresentation::formatDate(new ilDateTime($a_obj->getCreateDate(), IL_CAL_DATETIME))
+            );
 
-        // owner
-        if ($ilUser->getId() != ANONYMOUS_USER_ID and $a_obj->getOwner()) {
-            include_once './Services/Object/classes/class.ilObjectFactory.php';
-            include_once './Services/User/classes/class.ilObjUser.php';
-            
-            if (ilObjUser::userExists(array($a_obj->getOwner()))) {
-                $ownerObj = ilObjectFactory::getInstanceByObjId($a_obj->getOwner(), false);
-            } else {
-                $ownerObj = ilObjectFactory::getInstanceByObjId(6, false);
+            // owner
+            if ($ilUser->getId() != ANONYMOUS_USER_ID and $a_obj->getOwner()) {
+                include_once './Services/Object/classes/class.ilObjectFactory.php';
+                include_once './Services/User/classes/class.ilObjUser.php';
+
+                if (ilObjUser::userExists(array($a_obj->getOwner()))) {
+                    $ownerObj = ilObjectFactory::getInstanceByObjId($a_obj->getOwner(), false);
+                } else {
+                    $ownerObj = ilObjectFactory::getInstanceByObjId(6, false);
+                }
+
+                if (!is_object($ownerObj) || $ownerObj->getType() != "usr") {        // root user deleted
+                    $this->addProperty($lng->txt("owner"), $lng->txt("no_owner"));
+                } elseif ($ownerObj->hasPublicProfile()) {
+                    $ilCtrl->setParameterByClass("ilpublicuserprofilegui", "user_id", $ownerObj->getId());
+                    $this->addProperty($lng->txt("owner"), $ownerObj->getPublicName(),
+                        $ilCtrl->getLinkTargetByClass("ilpublicuserprofilegui", "getHTML"));
+                } else {
+                    $this->addProperty($lng->txt("owner"), $ownerObj->getPublicName());
+                }
             }
 
-            if (!is_object($ownerObj) || $ownerObj->getType() != "usr") {		// root user deleted
-                $this->addProperty($lng->txt("owner"), $lng->txt("no_owner"));
-            } elseif ($ownerObj->hasPublicProfile()) {
-                $ilCtrl->setParameterByClass("ilpublicuserprofilegui", "user_id", $ownerObj->getId());
-                $this->addProperty($lng->txt("owner"), $ownerObj->getPublicName(), $ilCtrl->getLinkTargetByClass("ilpublicuserprofilegui", "getHTML"));
-            } else {
-                $this->addProperty($lng->txt("owner"), $ownerObj->getPublicName());
+            // disk usage
+            if ($ilUser->getId() != ANONYMOUS_USER_ID &&
+                ilDiskQuotaActivationChecker::_isActive()) {
+                $size = $a_obj->getDiskUsage();
+                if ($size !== null) {
+                    $this->addProperty($lng->txt("disk_usage"), ilUtil::formatSize($size, 'long'));
+                }
             }
         }
 
-        // disk usage
-        if ($ilUser->getId() != ANONYMOUS_USER_ID &&
-            ilDiskQuotaActivationChecker::_isActive()) {
-            $size = $a_obj->getDiskUsage();
-            if ($size !== null) {
-                $this->addProperty($lng->txt("disk_usage"), ilUtil::formatSize($size, 'long'));
-            }
-        }
         // change event
         require_once 'Services/Tracking/classes/class.ilChangeEvent.php';
         if (ilChangeEvent::_isActive()) {
@@ -983,6 +979,8 @@ class ilInfoScreenGUI
 
     public function showLearningProgress($a_tpl)
     {
+        return;
+
         $ilUser = $this->user;
         $rbacsystem = $this->rbacsystem;
 
@@ -1017,85 +1015,7 @@ class ilInfoScreenGUI
         $a_tpl->parseCurrentBlock();
         // $a_tpl->touchBlock("row");
 
-        // status
-        $i_tpl = new ilTemplate("tpl.lp_edit_manual_info_page.html", true, true, "Services/Tracking");
-        $i_tpl->setVariable("INFO_EDITED", $this->lng->txt("trac_info_edited"));
-        $i_tpl->setVariable("SELECT_STATUS", ilUtil::formSelect(
-            (int) ilLPMarks::_hasCompleted(
-                $ilUser->getId(),
-                $this->getContextObjId()
-        ),
-            'lp_edit',
-            array(0 => $this->lng->txt('trac_not_completed'),
-                      1 => $this->lng->txt('trac_completed')),
-            false,
-            true
-        ));
-        $i_tpl->setVariable("TXT_SAVE", $this->lng->txt("save"));
-        $a_tpl->setCurrentBlock("pv");
-        $a_tpl->setVariable("TXT_PROPERTY_VALUE", $i_tpl->get());
-        $a_tpl->parseCurrentBlock();
-        $a_tpl->setCurrentBlock("property_row");
-        $a_tpl->setVariable("TXT_PROPERTY", $this->lng->txt('trac_status'));
-        $a_tpl->parseCurrentBlock();
-        // $a_tpl->touchBlock("row");
 
-
-        // More infos for lm's
-        if ($this->getContentObjType() == 'lm' ||
-            $this->getContentObjType() == 'htlm') {
-            $a_tpl->setCurrentBlock("pv");
-
-            include_once 'Services/Tracking/classes/class.ilLearningProgress.php';
-            $progress = ilLearningProgress::_getProgress($ilUser->getId(), $this->getContextObjId());
-            if ($progress['access_time']) {
-                $a_tpl->setVariable(
-                    "TXT_PROPERTY_VALUE",
-                    ilDatePresentation::formatDate(new ilDateTime($progress['access_time'], IL_CAL_UNIX))
-                );
-            } else {
-                $a_tpl->setVariable(
-                    "TXT_PROPERTY_VALUE",
-                    $this->lng->txt('trac_not_accessed')
-                );
-            }
-
-            $a_tpl->parseCurrentBlock();
-            $a_tpl->setCurrentBlock("property_row");
-            $a_tpl->setVariable("TXT_PROPERTY", $this->lng->txt('trac_last_access'));
-            $a_tpl->parseCurrentBlock();
-            // $a_tpl->touchBlock("row");
-
-            // tags of all users
-            $a_tpl->setCurrentBlock("pv");
-            $a_tpl->setVariable(
-                "TXT_PROPERTY_VALUE",
-                (int) $progress['visits']
-            );
-            $a_tpl->parseCurrentBlock();
-            $a_tpl->setCurrentBlock("property_row");
-            $a_tpl->setVariable("TXT_PROPERTY", $this->lng->txt('trac_visits'));
-            $a_tpl->parseCurrentBlock();
-            // $a_tpl->touchBlock("row");
-
-
-            if ($this->getContentObjType() == 'lm') {
-                // tags of all users
-                $a_tpl->setCurrentBlock("pv");
-                $a_tpl->setVariable(
-                    "TXT_PROPERTY_VALUE",
-                    ilDatePresentation::secondsToString($progress['spent_seconds'])
-                );
-                $a_tpl->parseCurrentBlock();
-                $a_tpl->setCurrentBlock("property_row");
-                $a_tpl->setVariable("TXT_PROPERTY", $this->lng->txt('trac_spent_time'));
-                $a_tpl->parseCurrentBlock();
-                // $a_tpl->touchBlock("row");
-            }
-        }
-        
-        // #10493
-        $a_tpl->touchBlock("row");
     }
 
     public function saveProgress($redirect = true)

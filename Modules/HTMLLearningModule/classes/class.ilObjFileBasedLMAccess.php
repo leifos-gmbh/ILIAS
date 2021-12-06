@@ -201,4 +201,18 @@ class ilObjFileBasedLMAccess extends ilObjectAccess
             self::$startfile[$rec["id"]] = $rec["startfile"] . "";
         }
     }
+
+    /**
+     * @param int $obj_id
+     * @return bool
+     */
+    static public function isInfoEnabled($obj_id)
+    {
+        return ilContainer::_lookupContainerSetting(
+            $obj_id,
+            ilObjectServiceSettingsGUI::INFO_TAB_VISIBILITY,
+            true
+        );
+    }
+
 }

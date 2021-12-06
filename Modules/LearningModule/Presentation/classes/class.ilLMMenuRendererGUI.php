@@ -220,7 +220,7 @@ class ilLMMenuRendererGUI
         }
 
         // info button
-        if ($this->export_format != "scorm" && !$this->offline) {
+        if ($this->lm->isInfoEnabled() && $this->export_format != "scorm" && !$this->offline) {
             if (!$this->offline) {
                 $ilCtrl->setParameterByClass("illmpresentationgui", "obj_id", $this->requested_obj_id);
                 $link = $this->ctrl->getLinkTargetByClass(
@@ -238,6 +238,17 @@ class ilLMMenuRendererGUI
                 "",
                 "",
                 $active["info"]
+            );
+        }
+
+        if (!$this->offline) {
+            $tabs_gui->$addcmd(
+                'learning_progress',
+                $this->ctrl->getLinkTargetByClass("illmpresentationgui", 'learningProgress'),
+                "",
+                "",
+                "",
+                $active["learning_progress"]
             );
         }
 

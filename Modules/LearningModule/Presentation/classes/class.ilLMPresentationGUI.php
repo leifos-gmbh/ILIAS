@@ -14,7 +14,7 @@
 * @ilCtrl_Calls ilLMPresentationGUI: ilNoteGUI, ilInfoScreenGUI
 * @ilCtrl_Calls ilLMPresentationGUI: ilLMPageGUI, ilGlossaryDefPageGUI, ilCommonActionDispatcherGUI
 * @ilCtrl_Calls ilLMPresentationGUI: ilLearningProgressGUI, ilAssGenFeedbackPageGUI
-* @ilCtrl_Calls ilLMPresentationGUI: ilRatingGUI
+* @ilCtrl_Calls ilLMPresentationGUI: ilRatingGUI, ilLearningProgressGUI
 *
 * @ingroup ModulesIliasLearningModule
 */
@@ -324,7 +324,19 @@ class ilLMPresentationGUI
             case "ilinfoscreengui":
                 $ret = $this->outputInfoScreen();
                 break;
-                
+
+            case "illearningprogressgui":
+                $this->initScreenHead($a_active_tab = "learning_progress");
+                $lp_gui = new ilLearningProgressGUI(
+                    ilLearningProgressGUI::LP_CONTEXT_REPOSITORY,
+                    $this->requested_ref_id,
+                    $this->user->getId()
+                );
+                $this->ctrl->forwardCommand($lp_gui);
+                $this->tpl->printToStdout();
+                break;
+
+
             case "ilcommonactiondispatchergui":
                 $gui = ilCommonActionDispatcherGUI::getInstanceFromAjaxCall();
                 $gui->enableCommentsSettings(false);
@@ -1847,6 +1859,10 @@ class ilLMPresentationGUI
         $this->outputInfoScreen();
     }
 
+    public function learningProgress() {
+        $this->ctrl->redirectByClass("illearningprogressgui", "");
+    }
+
     /**
     * info screen call from inside learning module
     */
@@ -1906,8 +1922,7 @@ class ilLMPresentationGUI
 
         $info = new ilInfoScreenGUI($this->lm_gui);
         $info->enablePrivateNotes();
-        $info->enableLearningProgress();
-
+        //$info->enableLearningProgress();
         $info->enableNews();
         if ($ilAccess->checkAccess("write", "", $this->requested_ref_id)) {
             $news_set = new ilSetting("news");

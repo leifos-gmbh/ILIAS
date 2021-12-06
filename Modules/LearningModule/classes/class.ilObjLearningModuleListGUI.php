@@ -28,6 +28,7 @@ class ilObjLearningModuleListGUI extends ilObjectListGUI
         $this->info_screen_enabled = true;
         $this->type = "lm";
         $this->gui_class_name = "ilobjlearningmodulegui";
+        $this->enableLearningProgress(true);
         
         // general commands array
         $this->commands = ilObjLearningModuleAccess::_getCommands();
@@ -69,6 +70,10 @@ class ilObjLearningModuleListGUI extends ilObjectListGUI
 
             case "view":
                 $cmd_link = "ilias.php?baseClass=ilLMPresentationGUI&amp;ref_id=" . $this->ref_id;
+                break;
+
+            case "learningProgress":
+                $cmd_link = "ilias.php?baseClass=ilLMPresentationGUI&amp;ref_id=" . $this->ref_id . "&amp;cmd=learningProgress";
                 break;
 
             case "edit":
@@ -167,4 +172,20 @@ class ilObjLearningModuleListGUI extends ilObjectListGUI
                 return "";
         }
     }
-} // END class.ilObjCategoryGUI
+
+    /**
+     * @inheritDoc
+     */
+    public function getInfoScreenStatus()
+    {
+        return ilObjContentObjectAccess::isInfoEnabled($this->obj_id);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function checkInfoPageOnAsynchronousRendering() : bool
+    {
+        return true;
+    }
+}

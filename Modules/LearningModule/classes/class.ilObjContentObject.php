@@ -2866,4 +2866,14 @@ class ilObjContentObject extends ilObject
 
         return $export_files;
     }
+
+    /**
+     * Is info enabled
+     * @return bool
+     */
+    public function isInfoEnabled()
+    {
+        return ilObjFileBasedLMAccess::isInfoEnabled($this->getId());
+    }
+
 }

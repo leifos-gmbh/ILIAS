@@ -215,4 +215,18 @@ class ilObjContentObjectAccess extends ilObjectAccess
             self::$lo_access[$rec["lm_id"]] = $rec["obj_id"];
         }
     }
+
+    /**
+     * @param int $obj_id
+     * @return bool
+     */
+    static public function isInfoEnabled($obj_id)
+    {
+        return ilContainer::_lookupContainerSetting(
+            $obj_id,
+            ilObjectServiceSettingsGUI::INFO_TAB_VISIBILITY,
+            true
+        );
+    }
+
 }

@@ -16274,3 +16274,5 @@ common#:#il_lti_learner#:#LTI Learner
 common#:#il_lti_instructor#:#LTI Instructor
 rbac#:#il_lti_global_role#:#LTI User
 common#:#actions_for#:#Actions for %s
+form#:#form_use_camera#:#Use Camera
+form#:#form_take_snapshot#:#Take Snapshot

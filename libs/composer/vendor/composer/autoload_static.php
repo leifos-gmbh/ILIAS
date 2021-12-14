@@ -51,7 +51,6 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
         'Z' => 
         array (
             'ZipStream\\' => 10,
-            'Zend\\HttpHandlerRunner\\' => 23,
         ),
         'W' => 
         array (
@@ -138,7 +137,6 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
         array (
             'Psr\\SimpleCache\\' => 16,
             'Psr\\Log\\' => 8,
-            'Psr\\Http\\Server\\' => 16,
             'Psr\\Http\\Message\\' => 17,
             'Psr\\Http\\Client\\' => 16,
             'Psr\\Container\\' => 14,
@@ -204,10 +202,6 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
         'ZipStream\\' => 
         array (
             0 => __DIR__ . '/..' . '/maennchen/zipstream-php/src',
-        ),
-        'Zend\\HttpHandlerRunner\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/zendframework/zend-httphandlerrunner/src',
         ),
         'Whoops\\' => 
         array (
@@ -492,10 +486,6 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
         'Psr\\Log\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
-        ),
-        'Psr\\Http\\Server\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/psr/http-server-handler/src',
         ),
         'Psr\\Http\\Message\\' => 
         array (
@@ -3231,7 +3221,6 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
         'Psr\\Http\\Message\\UploadedFileInterface' => __DIR__ . '/..' . '/psr/http-message/src/UploadedFileInterface.php',
         'Psr\\Http\\Message\\UriFactoryInterface' => __DIR__ . '/..' . '/psr/http-factory/src/UriFactoryInterface.php',
         'Psr\\Http\\Message\\UriInterface' => __DIR__ . '/..' . '/psr/http-message/src/UriInterface.php',
-        'Psr\\Http\\Server\\RequestHandlerInterface' => __DIR__ . '/..' . '/psr/http-server-handler/src/RequestHandlerInterface.php',
         'Psr\\Log\\AbstractLogger' => __DIR__ . '/..' . '/psr/log/Psr/Log/AbstractLogger.php',
         'Psr\\Log\\InvalidArgumentException' => __DIR__ . '/..' . '/psr/log/Psr/Log/InvalidArgumentException.php',
         'Psr\\Log\\LogLevel' => __DIR__ . '/..' . '/psr/log/Psr/Log/LogLevel.php',
@@ -5321,16 +5310,6 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
         'XapiProxy\\XapiProxyRequest' => __DIR__ . '/../../../..' . '/Modules/CmiXapi/classes/XapiProxy/XapiProxyRequest.php',
         'XapiProxy\\XapiProxyResponse' => __DIR__ . '/../../../..' . '/Modules/CmiXapi/classes/XapiProxy/XapiProxyResponse.php',
         'XapiProxy\\ilInitialisation' => __DIR__ . '/../../../..' . '/Modules/CmiXapi/classes/XapiProxy/DataService.php',
-        'Zend\\HttpHandlerRunner\\ConfigProvider' => __DIR__ . '/..' . '/zendframework/zend-httphandlerrunner/src/ConfigProvider.php',
-        'Zend\\HttpHandlerRunner\\Emitter\\EmitterInterface' => __DIR__ . '/..' . '/zendframework/zend-httphandlerrunner/src/Emitter/EmitterInterface.php',
-        'Zend\\HttpHandlerRunner\\Emitter\\EmitterStack' => __DIR__ . '/..' . '/zendframework/zend-httphandlerrunner/src/Emitter/EmitterStack.php',
-        'Zend\\HttpHandlerRunner\\Emitter\\SapiEmitter' => __DIR__ . '/..' . '/zendframework/zend-httphandlerrunner/src/Emitter/SapiEmitter.php',
-        'Zend\\HttpHandlerRunner\\Emitter\\SapiEmitterTrait' => __DIR__ . '/..' . '/zendframework/zend-httphandlerrunner/src/Emitter/SapiEmitterTrait.php',
-        'Zend\\HttpHandlerRunner\\Emitter\\SapiStreamEmitter' => __DIR__ . '/..' . '/zendframework/zend-httphandlerrunner/src/Emitter/SapiStreamEmitter.php',
-        'Zend\\HttpHandlerRunner\\Exception\\EmitterException' => __DIR__ . '/..' . '/zendframework/zend-httphandlerrunner/src/Exception/EmitterException.php',
-        'Zend\\HttpHandlerRunner\\Exception\\ExceptionInterface' => __DIR__ . '/..' . '/zendframework/zend-httphandlerrunner/src/Exception/ExceptionInterface.php',
-        'Zend\\HttpHandlerRunner\\Exception\\InvalidEmitterException' => __DIR__ . '/..' . '/zendframework/zend-httphandlerrunner/src/Exception/InvalidEmitterException.php',
-        'Zend\\HttpHandlerRunner\\RequestHandlerRunner' => __DIR__ . '/..' . '/zendframework/zend-httphandlerrunner/src/RequestHandlerRunner.php',
         'ZipStream\\Bigint' => __DIR__ . '/..' . '/maennchen/zipstream-php/src/Bigint.php',
         'ZipStream\\DeflateStream' => __DIR__ . '/..' . '/maennchen/zipstream-php/src/DeflateStream.php',
         'ZipStream\\Exception' => __DIR__ . '/..' . '/maennchen/zipstream-php/src/Exception.php',
@@ -9359,10 +9338,13 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
         'ilPDObjectsListRenderer' => __DIR__ . '/../../../..' . '/Services/Dashboard/ItemsBlock/classes/class.ilPDObjectsListRenderer.php',
         'ilPDObjectsRenderer' => __DIR__ . '/../../../..' . '/Services/Dashboard/ItemsBlock/interfaces/interface.ilPDObjectsRenderer.php',
         'ilPDObjectsTileRenderer' => __DIR__ . '/../../../..' . '/Services/Dashboard/ItemsBlock/classes/class.ilPDObjectsTileRenderer.php',
+        'ilPDSelectedItemBlockMembershipsDTO' => __DIR__ . '/../../../..' . '/Services/Dashboard/ItemsBlock/classes/class.ilPDSelectedItemBlockMembershipsDTO.php',
         'ilPDSelectedItemsBlockConstants' => __DIR__ . '/../../../..' . '/Services/Dashboard/ItemsBlock/interfaces/interface.ilPDSelectedItemsBlockConstants.php',
         'ilPDSelectedItemsBlockGUI' => __DIR__ . '/../../../..' . '/Services/Dashboard/ItemsBlock/classes/class.ilPDSelectedItemsBlockGUI.php',
         'ilPDSelectedItemsBlockGroup' => __DIR__ . '/../../../..' . '/Services/Dashboard/ItemsBlock/classes/class.ilPDSelectedItemsBlockGroup.php',
         'ilPDSelectedItemsBlockListGUIFactory' => __DIR__ . '/../../../..' . '/Services/Dashboard/ItemsBlock/classes/class.ilPDSelectedItemsBlockListGUIFactory.php',
+        'ilPDSelectedItemsBlockMembershipsObjectDatabaseRepository' => __DIR__ . '/../../../..' . '/Services/Dashboard/ItemsBlock/classes/class.ilPDSelectedItemsBlockMembershipsObjectDatabaseRepository.php',
+        'ilPDSelectedItemsBlockMembershipsObjectRepository' => __DIR__ . '/../../../..' . '/Services/Dashboard/ItemsBlock/interfaces/interface.ilPDSelectedItemsBlockMembershipsObjectRepository.php',
         'ilPDSelectedItemsBlockMembershipsProvider' => __DIR__ . '/../../../..' . '/Services/Dashboard/ItemsBlock/classes/class.ilPDSelectedItemsBlockMembershipsProvider.php',
         'ilPDSelectedItemsBlockMembershipsViewGUI' => __DIR__ . '/../../../..' . '/Services/Dashboard/ItemsBlock/classes/class.ilPDSelectedItemsBlockMembershipsViewGUI.php',
         'ilPDSelectedItemsBlockProvider' => __DIR__ . '/../../../..' . '/Services/Dashboard/ItemsBlock/interfaces/interface.ilPDSelectedItemsBlockProvider.php',

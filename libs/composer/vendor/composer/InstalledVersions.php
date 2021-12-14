@@ -32,7 +32,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => 'f186bf1e56ffab25f9ed770e4585325c0f069f11',
+    'reference' => '714784ba730f9b123c66d755fb061cce58bec913',
     'name' => 'ilias/ilias',
   ),
   'versions' => 
@@ -143,7 +143,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => 'f186bf1e56ffab25f9ed770e4585325c0f069f11',
+      'reference' => '714784ba730f9b123c66d755fb061cce58bec913',
     ),
     'imsglobal/lti' => 
     array (
@@ -354,15 +354,6 @@ private static $installed = array (
       array (
         0 => '1.0',
       ),
-    ),
-    'psr/http-server-handler' => 
-    array (
-      'pretty_version' => '1.0.1',
-      'version' => '1.0.1.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => 'aff2f80e33b7f026ec96bb42f63242dc50ffcae7',
     ),
     'psr/log' => 
     array (
@@ -1067,15 +1058,6 @@ private static $installed = array (
       array (
       ),
       'reference' => '8b261c9fc0481b4e9fa9d01c6ca70867b5d5e819',
-    ),
-    'zendframework/zend-httphandlerrunner' => 
-    array (
-      'pretty_version' => '1.1.0',
-      'version' => '1.1.0.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '75fb12751fe9d6e392cce1ee0d687dacae2db787',
     ),
   ),
 );

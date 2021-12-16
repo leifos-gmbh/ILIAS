@@ -199,7 +199,6 @@ class ObjectManager
         if ($style_id > 0 && \ilObject::_lookupType($style_id) == "sty") {
             return $style_id;
         }
-
         return 0;
     }
 

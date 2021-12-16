@@ -300,8 +300,7 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 
         $lng->loadLanguageModule("content");
         
-        include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
-        $this->tpl->addCss(ilObjStyleSheet::getContentStylePath($this->object->getStyleSheetId()));
+        $this->content_style_gui->addCss($this->tpl, $this->object->getRefId());
         // $this->tpl->setCurrentBlock("SyntaxStyle");
         $this->tpl->addCss(ilObjStyleSheet::getSyntaxStylePath());
         // $this->tpl->parseCurrentBlock();
@@ -423,12 +422,8 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
         }
         include_once("./Services/Container/classes/class.ilContainerPage.php");
         include_once("./Services/Container/classes/class.ilContainerPageGUI.php");
-        
-        include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
-        $this->tpl->setVariable(
-            "LOCATION_CONTENT_STYLESHEET",
-            ilObjStyleSheet::getContentStylePath($this->object->getStyleSheetId())
-        );
+
+        $this->content_style_gui->addCss($this->tpl, $this->object->getRefId());
         $this->tpl->setCurrentBlock("SyntaxStyle");
         $this->tpl->setVariable(
             "LOCATION_SYNTAX_STYLESHEET",
@@ -2826,7 +2821,9 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
         $ctrl = $this->ctrl;
         $tabs = $this->tabs;
         $page_gui = new ilContainerPageGUI($this->object->getId());
-        $style_id = $this->object->getStyleSheetId();
+        $style_id = $this->content_style_domain
+            ->styleForRefId($this->object->getRefId())
+            ->getEffectiveStyleId();
         if (ilObject::_lookupType($style_id) == "sty") {
             $page_gui->setStyleId($style_id);
         } else {

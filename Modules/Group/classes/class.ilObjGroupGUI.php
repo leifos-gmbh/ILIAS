@@ -14,7 +14,7 @@ include_once('./Modules/Group/classes/class.ilObjGroup.php');
  * @version    $Id$
  *
  * @ilCtrl_Calls ilObjGroupGUI: ilGroupRegistrationGUI, ilPermissionGUI, ilInfoScreenGUI, ilLearningProgressGUI
- * @ilCtrl_Calls ilObjGroupGUI: ilPublicUserProfileGUI, ilObjCourseGroupingGUI, ilObjStyleSheetGUI
+ * @ilCtrl_Calls ilObjGroupGUI: ilPublicUserProfileGUI, ilObjCourseGroupingGUI, ilObjectContentStyleSettingsGUI
  * @ilCtrl_Calls ilObjGroupGUI: ilCourseContentGUI, ilColumnGUI, ilContainerPageGUI, ilObjectCopyGUI
  * @ilCtrl_Calls ilObjGroupGUI: ilObjectCustomUserFieldsGUI, ilMemberAgreementGUI, ilExportGUI, ilMemberExportGUI
  * @ilCtrl_Calls ilObjGroupGUI: ilCommonActionDispatcherGUI, ilObjectServiceSettingsGUI, ilSessionOverviewGUI
@@ -197,8 +197,16 @@ class ilObjGroupGUI extends ilContainerGUI
                 $this->ctrl->forwardCommand($cp);
                 break;
 
-            case "ilobjstylesheetgui":
-                $this->forwardToStyleSheet();
+            case "ilobjectcontentstylesettingsgui":
+                $this->checkPermission("write");
+                $this->setTitleAndDescription();
+                $this->showContainerPageTabs();
+                $settings_gui = $this->content_style_gui
+                    ->objectSettingsGUIForRefId(
+                        null,
+                        $this->object->getRefId()
+                    );
+                $this->ctrl->forwardCommand($settings_gui);
                 break;
                 
             case 'ilobjectcustomuserfieldsgui':

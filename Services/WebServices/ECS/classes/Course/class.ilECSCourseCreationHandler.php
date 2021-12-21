@@ -18,6 +18,11 @@ class ilECSCourseCreationHandler
      */
     protected $log;
 
+    /**
+     * @var ilTree
+     */
+    protected $tree;
+
 
     private $server = null;
     private $mapping = null;
@@ -34,8 +39,10 @@ class ilECSCourseCreationHandler
      */
     public function __construct(ilECSSetting $server, $a_mid)
     {
+        global $DIC;
+
         $this->log = $GLOBALS['DIC']->logger()->wsrv();
-        
+        $this->tree = $DIC->repositoryTree();
         $this->server = $server;
         $this->mid = $a_mid;
         $this->mapping = ilECSNodeMappingSettings::getInstanceByServerMid($this->getServer()->getServerId(), $this->getMid());
@@ -122,7 +129,11 @@ class ilECSCourseCreationHandler
         $this->getCourseUrl()->setECSId($a_content_id);
         
         $this->refreshEContentIds($a_content_id, $course);
-        
+
+        // if the course object is already imported and deleted (in repository trash), synchronisation is not possible.
+        if ($this->checkDeletionStatus($a_content_id, $course)) {
+            return false;
+        }
         if ($this->getMapping()->isAttributeMappingEnabled()) {
             $this->log->debug('Handling advanced attribute mapping');
             return $this->doAttributeMapping($a_content_id, $course);
@@ -143,6 +154,22 @@ class ilECSCourseCreationHandler
         $this->log->info('Using course default category');
         $this->doSync($a_content_id, $course, ilObject::_lookupObjId($this->getMapping()->getDefaultCourseCategory()));
         return true;
+    }
+
+    protected function checkDeletionStatus(string $a_content_id, object $course) : bool
+    {
+        $course_id = $course->lectureID;
+        $obj_id = $this->getImportId($course_id);
+        if (!$obj_id) {
+            return false;
+        }
+        $refs = ilObject::_getAllReferences($obj_id);
+        $ref_id = end($refs);
+        if ($this->tree->isDeleted($ref_id)) {
+            $this->log->warning('Ignoring deleted course: ' . $course->title . ' with lectureID: ' . $course->lectureID);
+            return true;
+        }
+        return false;
     }
     
     /**

@@ -145,10 +145,6 @@ class ilVirusScannerClamAV extends ilVirusScanner
         exec($cmd, $out, $ret);
         $this->scanResult = implode("\n", $out);
 
-        if ($perm != $currentPermission) {
-            chmod($a_filepath, $currentPermission);
-        }
-
         //begin-patch skyguide
         if (strlen($this->scanResult)) {
             $this->log->info('Scan result ... ');

@@ -40,7 +40,7 @@ return array(
     'Symfony\\Component\\Console\\' => array($vendorDir . '/symfony/console'),
     'Symfony\\Component\\Config\\' => array($vendorDir . '/symfony/config'),
     'Slim\\' => array($vendorDir . '/slim/slim/Slim'),
-    'SimpleSAML\\modules\\yubikey\\' => array($vendorDir . '/simplesamlphp/simplesamlphp/modules/authYubikey/lib'),
+    'SimpleSAML\\modules\\yubikey\\' => array($vendorDir . '/simplesamlphp/simplesamlphp/modules/authYubiKey/lib'),
     'SimpleSAML\\modules\\discopower\\' => array($vendorDir . '/simplesamlphp/simplesamlphp/modules/discopower/lib'),
     'SimpleSAML\\TwigConfigurableI18n\\' => array($vendorDir . '/simplesamlphp/twig-configurable-i18n/src'),
     'SimpleSAML\\Module\\statistics\\' => array($vendorDir . '/simplesamlphp/simplesamlphp/modules/statistics/lib'),

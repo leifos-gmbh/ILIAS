@@ -79,13 +79,24 @@ class Renderer extends AbstractComponentRenderer
         $lead = $component->getLead();
         if ($lead != null) {
             if (is_string($lead)) {
+                $tpl->touchBlock("lead_width_default");
+                $tpl->touchBlock("content_width_default");
                 $tpl->setCurrentBlock("lead_text");
                 $tpl->setVariable("LEAD_TEXT", $lead);
                 $tpl->parseCurrentBlock();
             }
             if ($lead instanceof Component\Image\Image) {
+                $tpl->touchBlock("lead_width_default");
+                $tpl->touchBlock("content_width_default");
                 $tpl->setCurrentBlock("lead_image");
                 $tpl->setVariable("LEAD_IMAGE", $default_renderer->render($lead));
+                $tpl->parseCurrentBlock();
+            }
+            if ($lead instanceof Component\Audio\Audio) {
+                $tpl->touchBlock("lead_width_audio");
+                $tpl->touchBlock("content_width_audio");
+                $tpl->setCurrentBlock("lead_audio");
+                $tpl->setVariable("LEAD_AUDIO", $default_renderer->render($lead));
                 $tpl->parseCurrentBlock();
             }
             if ($lead instanceof Component\Symbol\Icon\Icon) {

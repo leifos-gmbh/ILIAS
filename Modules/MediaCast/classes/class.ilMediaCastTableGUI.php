@@ -22,7 +22,12 @@ class ilMediaCastTableGUI extends ilTable2GUI
 
     protected $downloadable = false;
     protected $edit_order;
-    
+
+    /**
+     * @var \ILIAS\DI\UIServices
+     */
+    protected $ui;
+
     public function __construct(
         $a_parent_obj,
         $a_parent_cmd = "",
@@ -36,6 +41,7 @@ class ilMediaCastTableGUI extends ilTable2GUI
         $this->access = $DIC->access();
         $ilCtrl = $DIC->ctrl();
         $lng = $DIC->language();
+        $this->ui = $DIC->ui();
         
         $this->edit_order = (bool) $a_edit_order;
         $this->presentation_mode = (bool) $a_presentation_mode;
@@ -78,6 +84,7 @@ class ilMediaCastTableGUI extends ilTable2GUI
         $lng = $this->lng;
         $ilCtrl = $this->ctrl;
         $ilAccess = $this->access;
+        $ui = $this->ui;
 
         include_once("./Services/MediaObjects/classes/class.ilObjMediaObject.php");
         
@@ -207,7 +214,15 @@ class ilMediaCastTableGUI extends ilTable2GUI
                 }
 
                 //$this->tpl->setVariable("PLAYER", $mpl->getMp3PlayerHtml());
-                $this->tpl->setVariable("PLAYER", $mpl->getPreviewHtml());
+                if ($med->getFormat() == "audio/mpeg") {
+                    $audio = $ui->factory()->audio(
+                        ilWACSignedPath::signFile($a_file),
+                        ""
+                    );
+                    $this->tpl->setVariable("PLAYER", $ui->renderer()->render($audio));
+                } else {
+                    $this->tpl->setVariable("PLAYER", $mpl->getPreviewHtml());
+                }
 
                 // edit link
                 $ilCtrl->setParameterByClass("ilobjmediacastgui", "item_id", $a_set["id"]);

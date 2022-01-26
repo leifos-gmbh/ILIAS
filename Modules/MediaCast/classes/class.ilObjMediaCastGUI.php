@@ -1,18 +1,15 @@
 <?php
 
-/* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
-
-require_once "./Services/Object/classes/class.ilObjectGUI.php";
+/* Copyright (c) 1998-2021 ILIAS open source, GPLv3, see LICENSE */
 
 /**
 * Class ilObjMediaCastGUI
 *
-* @author Alex Killing <alex.killing@gmx.de>
-* @version $Id$
+* @author Alexander Killing <killing@leifos.de>
 *
 * @ilCtrl_Calls ilObjMediaCastGUI: ilPermissionGUI, ilInfoScreenGUI, ilExportGUI
 * @ilCtrl_Calls ilObjMediaCastGUI: ilCommonActionDispatcherGUI, ilMediaCreationGUI
-* @ilCtrl_Calls ilObjMediaCastGUI: ilLearningProgressGUI, ilObjectCopyGUI
+* @ilCtrl_Calls ilObjMediaCastGUI: ilLearningProgressGUI, ilObjectCopyGUI, McstImageGalleryGUI, McstPodcastGUI
 * @ilCtrl_IsCalledBy ilObjMediaCastGUI: ilRepositoryGUI, ilAdministrationGUI
 */
 class ilObjMediaCastGUI extends ilObjectGUI
@@ -99,17 +96,32 @@ class ilObjMediaCastGUI extends ilObjectGUI
         $this->prepareOutput();
   
         switch ($next_class) {
-
             case "ilmediacreationgui":
                 $this->ctrl->setReturn($this, "listItems");
                 $ilTabs->activateTab("content");
                 $this->addContentSubTabs("manage");
-                $creation = new ilMediaCreationGUI([ilMediaCreationGUI::TYPE_ALL], function ($mob_id) {
+                $med_type = [];
+                switch ($this->object->getViewMode()) {
+                    case ilObjMediaCast::VIEW_VCAST:
+                        $med_type = [ilMediaCreationGUI::TYPE_VIDEO];
+                        break;
+                    case ilObjMediaCast::VIEW_IMG_GALLERY:
+                        $med_type = [ilMediaCreationGUI::TYPE_IMAGE];
+                        break;
+                    case ilObjMediaCast::VIEW_PODCAST:
+                        $med_type = [ilMediaCreationGUI::TYPE_AUDIO];
+                        break;
+                }
+                $creation = new ilMediaCreationGUI($med_type, function($mob_id) {
                     $this->afterUpload($mob_id);
                 }, function ($mob_id, $long_desc) {
                     $this->afterUrlSaving($mob_id, $long_desc);
                 }, function ($mob_ids) {
                     $this->afterPoolInsert($mob_ids);
+                }, function ($mob_id) {
+                    $this->finishSingleUpload($mob_id);
+                }, function ($mob_id) {
+                    $this->onMobUpdate($mob_id);
                 });
                 $creation->setAllSuffixes($this->purposeSuffixes["Standard"]);
                 $creation->setAllMimeTypes($this->mimeTypes);
@@ -164,7 +176,12 @@ class ilObjMediaCastGUI extends ilObjectGUI
                 $this->ctrl->forwardCommand($new_gui);
                 $this->tabs_gui->setTabActive('learning_progress');
                 break;
-        
+
+            case "mcstimagegallerygui":
+                $view = new \McstImageGalleryGUI($this->object, $this->tpl);
+                $this->ctrl->forwardCommand($view);
+                break;
+
             default:
                 if (!$cmd) {
                     $cmd = "infoScreen";
@@ -236,8 +253,17 @@ class ilObjMediaCastGUI extends ilObjectGUI
         $table_gui->setData($med_items);
         
         if ($ilAccess->checkAccess("write", "", $_GET["ref_id"]) && !$a_presentation_mode) {
-            $ilToolbar->addButton($lng->txt("add"), $this->ctrl->getLinkTargetByClass("ilMediaCreationGUI", ""));
-            
+            if (in_array($this->object->getViewMode(),
+                [
+                    ilObjMediaCast::VIEW_VCAST,
+                    ilObjMediaCast::VIEW_IMG_GALLERY,
+                    ilObjMediaCast::VIEW_PODCAST
+                ])) {
+                $ilToolbar->addButton($lng->txt("add"), $this->ctrl->getLinkTargetByClass("ilMediaCreationGUI", ""));
+            } else {
+                $ilToolbar->addButton($lng->txt("add"), $this->ctrl->getLinkTarget($this, "addCastItem"));
+            }
+
             $table_gui->addMultiCommand("confirmDeletionItems", $lng->txt("delete"));
             $table_gui->setSelectAllCheckbox("item_id");
         }
@@ -427,7 +453,37 @@ class ilObjMediaCastGUI extends ilObjectGUI
         $this->getCastItemValues();
         $tpl->setContent($this->form_gui->getHTML());
     }
-    
+
+    /**
+     * @param $mob_id
+     */
+    public function finishSingleUpload($mob_id) {
+        foreach ($this->object->getSortedItemsArray() as $item) {
+            if ($mob_id == $item["mob_id"]) {
+                $this->ctrl->setParameter($this, "item_id", $item["id"]);
+                $this->ctrl->redirect($this, "editCastItem");
+            }
+        }
+        $this->ctrl->redirect($this, "listItems");
+    }
+
+    /**
+     * On mob upate
+     * @param int $mob_id
+     */
+    protected function onMobUpdate(int $mob_id)
+    {
+        foreach ($this->object->getSortedItemsArray() as $item) {
+            if ($mob_id == $item["mob_id"]) {
+                $mob = new ilObjMediaObject($item["mob_id"]);
+                $mc_item = new ilNewsItem($item["id"]);
+                $mc_item->setTitle($mob->getTitle());
+                $mc_item->setContent($mob->getLongDescription());
+                $mc_item->update();
+            }
+        }
+    }
+
     /**
     * Init add cast item form.
     */
@@ -598,6 +654,7 @@ class ilObjMediaCastGUI extends ilObjectGUI
     */
     public function saveCastItemObject()
     {
+        return;
         $tpl = $this->tpl;
         $ilCtrl = $this->ctrl;
         $ilUser = $this->user;
@@ -639,7 +696,7 @@ class ilObjMediaCastGUI extends ilObjectGUI
             
             // determine duration for standard purpose
             $duration = $this->getDuration($file);
-            
+
             // handle other purposes
             foreach ($this->additionalPurposes as $purpose) {
                 // check if some purpose has been uploaded
@@ -691,28 +748,28 @@ class ilObjMediaCastGUI extends ilObjectGUI
     /**
      * get duration from form or from file analyzer
      *
-     * @param unknown_type $file
-     * @return unknown
+     * @param ilMediaItem $media_item
+     * @return string
      */
-    private function getDuration($file)
+    private function getDuration(ilMediaItem $media_item)
     {
         $duration = isset($this->form_gui)
             ? $this->form_gui->getInput("duration")
             : array("hh" => 0, "mm" => 0, "ss" => 0);
-        if ($duration["hh"] == 0 && $duration["mm"] == 0 && $duration["ss"] == 0 && is_file($file)) {
-            include_once("./Services/MediaObjects/classes/class.ilMediaAnalyzer.php");
-            $ana = new ilMediaAnalyzer();
-            $ana->setFile($file);
-            $ana->analyzeFile();
-            $dur = $ana->getPlaytimeString();
-            $dur = explode(":", $dur);
-            $duration["mm"] = $dur[0];
-            $duration["ss"] = $dur[1];
+
+        $duration_str = str_pad($duration["hh"], 2, "0", STR_PAD_LEFT) . ":" .
+            str_pad($duration["mm"], 2, "0", STR_PAD_LEFT) . ":" .
+            str_pad($duration["ss"], 2, "0", STR_PAD_LEFT);
+
+        if ($duration["hh"] == 0 && $duration["mm"] == 0 && $duration["ss"] == 0) {
+            $media_item->determineDuration();
+            $d = $media_item->getDuration();
+            if ($d > 0) {
+                $duration_str = $this->object->getPlaytimeForSeconds($d);
+            }
         }
-        $duration = str_pad($duration["hh"], 2, "0", STR_PAD_LEFT) . ":" .
-                    str_pad($duration["mm"], 2, "0", STR_PAD_LEFT) . ":" .
-                    str_pad($duration["ss"], 2, "0", STR_PAD_LEFT);
-        return $duration;
+
+        return $duration_str;
     }
     
     /**
@@ -739,6 +796,7 @@ class ilObjMediaCastGUI extends ilObjectGUI
     private function updateMediaItem($mob, &$mediaItem)
     {
         $purpose = $mediaItem->getPurpose();
+        $locationType = $mediaItem->getLocationType();
         $url_gui = $this->form_gui->getInput("url_" . $purpose);
         $file_gui = $this->form_gui->getInput("file_" . $purpose);
         if ($url_gui) {
@@ -793,7 +851,7 @@ class ilObjMediaCastGUI extends ilObjectGUI
                 $mob->setTitle($title);
             }
             if (isset($format)) {
-                $mob->setDescription($format);
+                //$mob->setDescription($format);
             }
         }
 
@@ -846,7 +904,7 @@ class ilObjMediaCastGUI extends ilObjectGUI
                 }
                 
                 if ($purpose == "Standard") {
-                    $duration = $this->getDuration($file);
+                    $duration = $this->getDuration($media_item);
                     $title = $this->form_gui->getInput("title") != "" ? $this->form_gui->getInput("title") : basename($file);
                     $description = $this->form_gui->getInput("description");
             
@@ -878,6 +936,13 @@ class ilObjMediaCastGUI extends ilObjectGUI
             $mc_item->setUserId($ilUser->getId());
             if (isset($duration)) {
                 $mc_item->setPlaytime($duration);
+                // begin patch videocast – Killing 3.12.2020
+                $dur_arr = explode(":", $duration);
+                $seconds = ((int) $dur_arr[0] * 60 * 60) + ((int) $dur_arr[1] * 60) + ((int) $dur_arr[2]);
+                $st_med = $mob->getMediaItem("Standard");
+                $st_med->setDuration($seconds);
+                $st_med->update();
+                // end patch videocast
             }
             $mc_item->setTitle($title);
             $mc_item->setContent($description);
@@ -983,15 +1048,23 @@ class ilObjMediaCastGUI extends ilObjectGUI
         $mob = new ilObjMediaObject($mob);
         $mob_dir = ilObjMediaObject::_getDirectory($mob->getId());
         $m_item = $mob->getMediaItem("Standard");
-        $file = $mob_dir . "/" . $m_item->getLocation();
-        $duration = $this->getDuration($file);
-        if ($duration != "00:00:00") {
-            $mc_item->setPlaytime($duration);
+
+        // begin patch videocast – Killing 3.12.2020
+        $success = false;
+
+        $m_item->determineDuration();
+        $dur = $m_item->getDuration();
+        if ($dur > 0) {
+            $mc_item->setPlaytime($this->object->getPlaytimeForSeconds($dur));
             $mc_item->update();
+            $success = true;
             ilUtil::sendSuccess($lng->txt("mcst_set_playtime"), true);
-        } else {
+        }
+
+        if (!$success) {
             ilUtil::sendFailure($lng->txt("mcst_unable_to_determin_playtime"), true);
         }
+        // end patch videocast
 
         $ilCtrl->redirect($this, "listItems");
     }
@@ -1243,10 +1316,6 @@ class ilObjMediaCastGUI extends ilObjectGUI
         $this->form_gui->addItem($sort);
         
         // view mode
-        $options = array(
-            ilObjMediaCast::VIEW_LIST => $lng->txt("mcst_list"),
-            ilObjMediaCast::VIEW_GALLERY => $lng->txt("mcst_gallery")
-            );
         $si = new ilRadioGroupInputGUI($this->lng->txt("mcst_viewmode"), "viewmode");
         $si->addOption(new ilRadioOption(
             $lng->txt("mcst_list"),
@@ -1256,12 +1325,45 @@ class ilObjMediaCastGUI extends ilObjectGUI
             $lng->txt("mcst_gallery"),
             ilObjMediaCast::VIEW_GALLERY
         ));
+        $si->addOption(new ilRadioOption(
+            $lng->txt("mcst_img_gallery"),
+            ilObjMediaCast::VIEW_IMG_GALLERY
+        ));
+        $si->addOption(new ilRadioOption(
+            $lng->txt("mcst_podcast"),
+            ilObjMediaCast::VIEW_PODCAST
+        ));
+        // begin patch videocast – Killing 22.07.2020
+        $si->addOption($vc_opt = new ilRadioOption(
+            $lng->txt("mcst_video_cast"),
+            ilObjMediaCast::VIEW_VCAST
+        ));
+        // end patch videocast – Killing 22.07.2020
 
         //		$si->setOptions($options);
         $si->setValue($this->object->getViewMode());
         $this->form_gui->addItem($si);
-        
-        
+
+        // begin patch videocast – Killing 22.07.2020
+        // autoplay
+        //
+        $options = array(
+            ilObjMediaCast::AUTOPLAY_NO => $lng->txt("mcst_no_autoplay"),
+            ilObjMediaCast::AUTOPLAY_ACT => $lng->txt("mcst_autoplay_active"),
+            ilObjMediaCast::AUTOPLAY_INACT => $lng->txt("mcst_autoplay_inactive")
+        );
+        $si = new ilSelectInputGUI($lng->txt("mcst_autoplay"), "autoplaymode");
+        $si->setOptions($options);
+        $si->setValue($this->object->getAutoplayMode());
+        $vc_opt->addSubItem($si);
+
+        // number of initial videos
+        $ti = new ilNumberInputGUI($lng->txt("mcst_nr_videos"), "nr_videos");
+        $ti->setValue($this->object->getNumberInitialVideos());
+        $ti->setSize(2);
+        $vc_opt->addSubItem($ti);
+        // end patch videocast – Killing 22.07.2020
+
         // Downloadable
         $downloadable = new ilCheckboxInputGUI($lng->txt("mcst_downloadable"), "downloadable");
         $downloadable->setChecked($this->object->getDownloadable());
@@ -1316,7 +1418,22 @@ class ilObjMediaCastGUI extends ilObjectGUI
             #$ch->addSubItem($incl_files);
             $this->form_gui->addItem($incl_files);
         }
-        
+
+        // begin patch videocast – Killing 22.07.2020
+        if (ilLearningProgressAccess::checkAccess($this->object->getRefId())) {
+            $sh = new ilFormSectionHeaderGUI();
+            $sh->setTitle($lng->txt("learning_progress"));
+            $this->form_gui->addItem($sh);
+
+            // Include new items automatically in learning progress
+            $auto_lp = new ilCheckboxInputGUI($lng->txt("mcst_new_items_det_lp"), "auto_det_lp");
+            $auto_lp->setChecked($this->object->getNewItemsInLearningProgress());
+            $auto_lp->setInfo($lng->txt("mcst_new_items_det_lp_info"));
+            $this->form_gui->addItem($auto_lp);
+        }
+        // end patch videocast – Killing 22.07.2020
+
+
         // Form action and save button
         $this->form_gui->addCommandButton("saveSettings", $lng->txt("save"));
         $this->form_gui->setFormAction($ilCtrl->getFormAction($this, "saveSettings"));
@@ -1345,6 +1462,11 @@ class ilObjMediaCastGUI extends ilObjectGUI
             $this->object->setDownloadable($this->form_gui->getInput("downloadable"));
             $this->object->setOrder($this->form_gui->getInput("order"));
             $this->object->setViewMode($this->form_gui->getInput("viewmode"));
+            // begin patch videocast – Killing 22.07.2020
+            $this->object->setAutoplayMode((int) $this->form_gui->getInput("autoplaymode"));
+            $this->object->setNumberInitialVideos((int) $this->form_gui->getInput("nr_videos"));
+            $this->object->setNewItemsInLearningProgress((int) $this->form_gui->getInput("auto_det_lp"));
+            // end patch videocast – Killing 22.07.2020
 
             // tile image
             $obj_service->commonSettings()->legacyForm($this->form_gui, $this->object)->saveTileImage();
@@ -1543,7 +1665,10 @@ class ilObjMediaCastGUI extends ilObjectGUI
     public function showContentObject()
     {
         $tpl = $this->tpl;
+        // begin patch videocast – Killing 22.07.2020
         $ilUser = $this->user;
+        $ilTabs = $this->tabs;
+        // end patch videocast – Killing 22.07.2020
         
         // need read events for parent for LP statistics
         require_once 'Services/Tracking/classes/class.ilChangeEvent.php';
@@ -1560,6 +1685,30 @@ class ilObjMediaCastGUI extends ilObjectGUI
 
         if ($this->object->getViewMode() == ilObjMediaCast::VIEW_GALLERY) {
             $this->showGallery();
+        } else if ($this->object->getViewMode() == ilObjMediaCast::VIEW_IMG_GALLERY) {
+            include_once("./Modules/MediaCast/Presentation/class.McstImageGalleryGUI.php");
+            $view = new \McstImageGalleryGUI($this->object, $this->tpl);
+            $this->tabs->activateTab("content");
+            $this->addContentSubTabs("content");
+            $tpl->setContent($this->ctrl->getHTML($view));
+        } else if ($this->object->getViewMode() == ilObjMediaCast::VIEW_PODCAST) {
+            include_once("./Modules/MediaCast/Presentation/class.McstPodcastGUI.php");
+            $view = new \McstPodcastGUI($this->object, $this->tpl);
+            $this->tabs->activateTab("content");
+            $this->addContentSubTabs("content");
+            $tpl->setContent($this->ctrl->getHTML($view));
+            // begin patch videocast – Killing 22.07.2020
+        } else if ($this->object->getViewMode() == ilObjMediaCast::VIEW_VCAST) {
+            $ilTabs->activateTab("content");
+            $this->addContentSubTabs("content");
+            include_once("./Modules/MediaCast/Presentation/class.VideoViewGUI.php");
+            $view = new \ILIAS\MediaCast\Presentation\VideoViewGUI($this->object, $tpl);
+            $view->setCompletedCallback($this->ctrl->getLinkTarget($this,
+            "handlePlayerCompletedEvent", "", true, false));
+            $view->setAutoplayCallback($this->ctrl->getLinkTarget($this,
+            "handleAutoplayTrigger", "", true, false));
+            $view->show();
+            // end patch videocast – Killing 22.07.2020
         } else {
             $this->listItemsObject(true);
         }
@@ -1735,20 +1884,10 @@ class ilObjMediaCastGUI extends ilObjectGUI
             if ($sec < 0) {
                 $sec = 0;
             }
-            if ($mob->getVideoPreviewPic() != "") {
-                $mob->removeAdditionalFile($mob->getVideoPreviewPic(true));
-            }
-            include_once("./Services/MediaObjects/classes/class.ilFFmpeg.php");
-            $med = $mob->getMediaItem("Standard");
-            $mob_file = ilObjMediaObject::_getDirectory($mob->getId()) . "/" . $med->getLocation();
-            $new_file = ilFFmpeg::extractImage(
-                $mob_file,
-                "mob_vpreview.png",
-                ilObjMediaObject::_getDirectory($mob->getId()),
-                $sec
-            );
+
+            $mob->generatePreviewPic(320, 240, $sec);
             
-            if ($new_file != "") {
+            if ($mob->getVideoPreviewPic() != "") {
                 ilUtil::sendInfo($this->lng->txt("mcst_image_extracted"), true);
             } else {
                 ilUtil::sendFailure($this->lng->txt("mcst_no_extraction_possible"), true);
@@ -1810,13 +1949,16 @@ class ilObjMediaCastGUI extends ilObjectGUI
      * After mob upload
      * @param $mob_id
      */
-    protected function afterUpload($mob_id)
-    {
-        $mob = new ilObjMediaObject($mob_id);
-        $med_item = $mob->getMediaItem("Standard");
-        $med_item->determineDuration();
+    protected function afterUpload($mob_ids) {
+        foreach ($mob_ids as $mob_id) {
+            /* went to ilMediaCreationGUI
+            $mob = new ilObjMediaObject($mob_id);
+            $med_item = $mob->getMediaItem("Standard");
+            $med_item->determineDuration();
+            $med_item->update();*/
+        }
 
-        $this->addMobsToCast([$mob_id]);
+        $this->addMobsToCast($mob_ids, "", false);
     }
 
     /**
@@ -1834,7 +1976,7 @@ class ilObjMediaCastGUI extends ilObjectGUI
      * @param array $mob_ids
      * @param string $long_desc
      */
-    protected function addMobsToCast($mob_ids, $long_desc = "")
+    protected function addMobsToCast($mob_ids, $long_desc = "", $redirect = true)
     {
         $ctrl = $this->ctrl;
         $user = $this->user;
@@ -1844,12 +1986,14 @@ class ilObjMediaCastGUI extends ilObjectGUI
             $item_ids[] = $this->object->addMobToCast($mob_id, $user->getId(), $long_desc);
         }
 
-        if (count($item_ids) == 1) {
-            $ctrl->setParameter($this, "item_id", $item_ids[0]);
-            $ctrl->setParameter($this, "pupose", "Standard");
-            $ctrl->redirect($this, "editCastItem");
+        if ($redirect) {
+            if (count($item_ids) == 1) {
+                $ctrl->setParameter($this, "item_id", $item_ids[0]);
+                $ctrl->redirect($this, "editCastItem");
+            }
+            $ctrl->redirect($this, "listItems");
         }
-        $ctrl->redirect($this, "listItems");
+
     }
 
 

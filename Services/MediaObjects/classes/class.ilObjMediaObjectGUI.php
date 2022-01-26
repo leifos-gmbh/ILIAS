@@ -772,11 +772,18 @@ class ilObjMediaObjectGUI extends ilObjectGUI
             $media_item->setFormat($format);
             $media_item->setLocation($location);
             $media_item->setLocationType("LocalFile");
+            $a_mob->generatePreviewPic(320, 240);
         } else {	// standard type: reference
             $format = ilObjMediaObject::getMimeType(ilUtil::stripSlashes($_POST["standard_reference"]), true);
             $media_item->setFormat($format);
             $media_item->setLocation(ilUtil::secureLink(ilUtil::stripSlashes($_POST["standard_reference"])));
             $media_item->setLocationType("Reference");
+
+            try {
+                $a_mob->getExternalMetadata();
+            } catch (Exception $e) {
+            }
+
         }
         $a_mob->setDescription($format);
 

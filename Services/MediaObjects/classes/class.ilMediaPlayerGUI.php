@@ -313,7 +313,9 @@ class ilMediaPlayerGUI
             if ($a_preview) {
                 $mp_tpl->setVariable("CLASS", "ilNoDisplay");
             }
-            $mp_tpl->setVariable("PV", $p["v"]);
+            // begin patch videocast – Killing 1.4.2021
+            $mp_tpl->setVariable("SRC", "https://www.youtube.com/embed/".$p["v"]);
+            // end patch videocast – Killing 1.4.2021
             $mp_tpl->setVariable("PLAYER_NR", $this->id . "_" . $this->current_nr);
             $mp_tpl->setVariable("TXT_PLAY", $lng->txt("mob_play"));
             $mp_tpl->setVariable("TITLE", $this->getTitle());
@@ -328,9 +330,53 @@ class ilMediaPlayerGUI
 
         // vimeo
         if (ilExternalMediaAnalyzer::isVimeo($this->getFile())) {
+            // begin patch videocast – Killing 1.4.2021
+            $mp_tpl = new ilTemplate("tpl.flv_player.html", true, true, "Services/MediaObjects");
+            if ($a_preview) {
+                if ($this->getDownloadLink() != "") {
+                    $mp_tpl->setCurrentBlock("ytdownload");
+                    $mp_tpl->setVariable("TXT_DOWNLOAD", $lng->txt("download"));
+                    $mp_tpl->setVariable("HREF_DOWNLOAD", $this->getDownloadLink());
+                    $mp_tpl->parseCurrentBlock();
+                }
+
+                $mp_tpl->setCurrentBlock("ytpreview");
+                if ($this->getVideoPreviewPic() != "") {
+                    $mp_tpl->setVariable("IMG_SRC", $this->getVideoPreviewPic());
+                } else {
+                    $mp_tpl->setVariable("IMG_SRC", ilUtil::getImagePath("mcst_preview.svg"));
+                }
+                $height = $this->getDisplayHeight();
+                $width = $this->getDisplayWidth();
+                $mp_tpl->setVariable("DISPLAY_HEIGHT", $height);
+                $mp_tpl->setVariable("DISPLAY_WIDTH", $width);
+                $mp_tpl->setVariable("IMG_ALT", $this->video_preview_pic_alt);
+                $mp_tpl->setVariable("PTITLE", $this->getTitle());
+                $mp_tpl->parseCurrentBlock();
+            }
+            $mp_tpl->setCurrentBlock("youtube");
+            if ($a_preview) {
+                $mp_tpl->setVariable("CLASS", "ilNoDisplay");
+            }
+            $mp_tpl->setVariable("SRC", $this->getFile()."?controls=0");
+            $mp_tpl->setVariable("PLAYER_NR", $this->id . "_" . $this->current_nr);
+            $mp_tpl->setVariable("TITLE", $this->getTitle());
+            $mp_tpl->setVariable("DESCRIPTION", $this->getDescription());
+            include_once("./Services/UIComponent/Glyph/classes/class.ilGlyphGUI.php");
+            if ($a_preview) {
+                $mp_tpl->setVariable("CLOSE", ilGlyphGUI::get(ilGlyphGUI::CLOSE));
+            }
+            $mp_tpl->parseCurrentBlock();
+            return $mp_tpl->get();
+
+
+/*
+
             $p = ilExternalMediaAnalyzer::extractVimeoParameters($this->getFile());
             $html = '<iframe src="//player.vimeo.com/video/' . $p["id"] . '" width="320" height="240" ' .
-                'frameborder="0"></iframe>';
+                'frameborder="0"></iframe>';*/
+
+            // end patch videocast – Killing 1.4.2021
 
             return $html;
         }
@@ -373,7 +419,6 @@ class ilMediaPlayerGUI
                 $mp_tpl->setVariable("PTITLE", $this->getTitle());
                 $mp_tpl->parseCurrentBlock();
             }
-
             $mp_tpl->setCurrentBlock("mejs_video");
 
             if ($a_preview) {
@@ -403,8 +448,7 @@ class ilMediaPlayerGUI
             if ($style != "") {
                 $mp_tpl->setVariable("STYLE", "style='$style'");
             }
-            //$mp_tpl->setVariable("DISPLAY_HEIGHT", $height);
-            //$mp_tpl->setVariable("DISPLAY_WIDTH", $width);
+            $mp_tpl->setVariable("FILE", $this->getFile());
             $mp_tpl->setVariable("PREVIEW_PIC", $this->getVideoPreviewPic());
             $mp_tpl->setVariable("TITLE", $this->getTitle());
             $mp_tpl->setVariable("DESCRIPTION", $this->getDescription());

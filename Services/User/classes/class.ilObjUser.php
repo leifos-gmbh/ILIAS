@@ -1277,6 +1277,20 @@ class ilObjUser extends ilObject
         }
     }
 
+    // begin patch videocast – Killing 22.07.2020
+    /**
+     * @param $a_keyword
+     * @return bool
+     */
+    public function existsPref($a_keyword)
+    {
+        if (array_key_exists($a_keyword, $this->prefs)) {
+            return true;
+        }
+        return false;
+    }
+    // end patch videocast – Killing 22.07.2020
+
     public static function _lookupPref($a_usr_id, $a_keyword)
     {
         global $DIC;

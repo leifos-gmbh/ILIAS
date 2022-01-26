@@ -13,7 +13,7 @@ class Standard extends Item implements C\Item\Standard
      */
     protected $color = null;
     /**
-     * @var null|string|\ILIAS\UI\Component\Image\Image
+     * @var null|string|\ILIAS\UI\Component\Image\Image|\ILIAS\UI\Component\Audio\Audio
      */
     protected $lead = null;
 
@@ -42,6 +42,16 @@ class Standard extends Item implements C\Item\Standard
     {
         $clone = clone $this;
         $clone->lead = $image;
+        return $clone;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function withLeadAudio(\ILIAS\UI\Component\Audio\Audio $audio) : C\Item\Item
+    {
+        $clone = clone $this;
+        $clone->lead = $audio;
         return $clone;
     }
 

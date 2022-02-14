@@ -7689,16 +7689,30 @@ ul.dropdown-menu > li > .btn:focus {
     white-space: nowrap;
   }
   .panel-secondary .il-item .il-item-description {
-    padding-top: 0;
+    padding-top: 3px;
     font-size: 11px;
   }
-  .panel-secondary .il-item .il-item-divider,
-  .panel-secondary .il-item .il-item-property-name,
+  .panel-secondary .il-item .il-item-divider {
+    padding-top: 6px;
+    margin-bottom: 6px;
+  }
+  .panel-secondary .il-item .il-item-property-name {
+    padding: 0;
+    width: 40%;
+    font-size: 11px;
+  }
   .panel-secondary .il-item .il-item-property-value {
-    display: none;
+    padding: 0;
+    width: 60%;
+    font-size: 11px;
   }
   .panel-secondary .il-item .row {
-    display: table-row;
+    display: block;
+    margin: 0;
+  }
+  .panel-secondary .il-item .row > .col-md-6 {
+    padding: 0;
+    width: 100%;
   }
   .panel-secondary .il-item .col-sm-3 {
     display: table-cell;
@@ -9242,6 +9256,10 @@ footer {
 .il-maincontrols-slate .btn-bulky.disengaged:after,
 .il-maincontrols-slate .link-bulky.disengaged:after {
   content: " \e606";
+}
+.il-maincontrols-slate .btn-bulky:focus,
+.il-maincontrols-slate .link-bulky:focus {
+  color: inherit;
 }
 .il-maincontrols-slate .btn-bulky:hover,
 .il-maincontrols-slate .link-bulky:hover,
@@ -16153,6 +16171,7 @@ th.ilSkillEntryHead {
 }
 .ilSkillCategoryDescription {
   margin: 0px 5px;
+  padding-bottom: 15px;
 }
 /* Modules/Poll */
 .ilPollDescription {

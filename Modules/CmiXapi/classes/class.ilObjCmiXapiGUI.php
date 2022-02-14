@@ -168,8 +168,8 @@ class ilObjCmiXapiGUI extends ilObject2GUI
             $newObject->setLrsTypeId($form->getInput('lrs_type_id'));
             $newObject->initLrsType();
             
-            $newObject->setUserIdent($newObject->getLrsType()->getUserIdent());
-            $newObject->setUserName($newObject->getLrsType()->getUserName());
+            $newObject->setPrivacyIdent($newObject->getLrsType()->getPrivacyIdent());
+            $newObject->setPrivacyName($newObject->getLrsType()->getPrivacyName());
             
             switch ($form->getInput('source_type')) {
                 case 'resource': // remote resource
@@ -289,22 +289,40 @@ class ilObjCmiXapiGUI extends ilObject2GUI
     {
         global $DIC; /* @var \ILIAS\DI\Container $DIC */
         $err = $DIC['ilErr']; /* @var ilErrorHandling $err */
-        
-        
-        if ($DIC->access()->checkAccess('read', '', $a_target)) {
-            ilObjectGUI::_gotoRepositoryNode($a_target, 'infoScreen');
-        } elseif ($DIC->access()->checkAccess('read', '', ROOT_FOLDER_ID)) {
+        $ctrl = $DIC->ctrl();
+        $request = $DIC->http()->request();
+        $access = $DIC->access();
+        $lng = $DIC->language();
+
+        $targetParameters = explode('_', $a_target);
+        $id = (int) $targetParameters[0];
+
+        if ($id <= 0) {
+            $err->raiseError($lng->txt('msg_no_perm_read'), $err->FATAL);
+        }
+
+        if ($access->checkAccess('read', '', $id)) {
+            $ctrl->setTargetScript('ilias.php');
+            $ctrl->initBaseClass(ilRepositoryGUI::class);
+            $ctrl->setParameterByClass(ilObjCmiXapiGUI::class, 'ref_id', $id);
+            if (isset($request->getQueryParams()['gotolp'])) {
+                $ctrl->setParameterByClass(ilObjCmiXapiGUI::class, 'gotolp', 1);
+            }
+            $ctrl->redirectByClass([ilRepositoryGUI::class, ilObjCmiXapiGUI::class]);
+        } elseif ($access->checkAccess('visible', '', $id)) {
+            ilObjectGUI::_gotoRepositoryNode($id, 'infoScreen');
+        } elseif ($access->checkAccess('read', '', ROOT_FOLDER_ID)) {
             ilUtil::sendInfo(
                 sprintf(
                     $DIC->language()->txt('msg_no_perm_read_item'),
-                    ilObject::_lookupTitle(ilObject::_lookupObjId($a_target))
+                    ilObject::_lookupTitle(ilObject::_lookupObjId($id))
                 ),
                 true
             );
 
             ilObjectGUI::_gotoRepositoryRoot();
         }
-        
+
         $err->raiseError($DIC->language()->txt("msg_no_perm_read_lm"), $err->FATAL);
     }
     
@@ -632,7 +650,7 @@ class ilObjCmiXapiGUI extends ilObject2GUI
         $info->addProperty($DIC->language()->txt('cmix_lrs_type'), $this->object->getLrsType()->getTitle());
 
         if ($this->object->isSourceTypeExternal()) {
-            $cmixUser = new ilCmiXapiUser($this->object->getId(), $DIC->user()->getId());
+            $cmixUser = new ilCmiXapiUser($this->object->getId(), $DIC->user()->getId(), $this->object->getPrivacyIdent());
             if ($cmixUser->getUsrIdent()) {
                 $info->addProperty(
                     $DIC->language()->txt("conf_user_registered_mail"),
@@ -641,13 +659,13 @@ class ilObjCmiXapiGUI extends ilObject2GUI
             }
         } else {
             $info->addProperty(
-                $DIC->language()->txt("conf_user_name"),
-                $DIC->language()->txt('conf_user_name_' . $this->object->getUserName())
+                $DIC->language()->txt("conf_privacy_name"),
+                $DIC->language()->txt('conf_privacy_name_' . self::getPrivacyNameString($this->object->getPrivacyName()))
             );
             
             $info->addProperty(
-                $DIC->language()->txt("conf_user_ident"),
-                $DIC->language()->txt('conf_user_ident_' . $this->object->getUserIdent())
+                $DIC->language()->txt("conf_privacy_ident"),
+                $DIC->language()->txt('conf_privacy_ident_' . self::getPrivacyIdentString($this->object->getPrivacyIdent()))
             );
         }
 
@@ -675,12 +693,16 @@ class ilObjCmiXapiGUI extends ilObject2GUI
         global $DIC; /* @var \ILIAS\DI\Container $DIC */
         
         if (!$this->object->getOfflineStatus() && $this->object->getLrsType()->isAvailable()) {
-            $cmixUserExists = ilCmiXapiUser::exists($this->object->getId(), $DIC->user()->getId());
+            // TODO : check if this is the correct query
+            // p.e. switched to another privacyIdent before: user exists but not with the new privacyIdent
+            // re_check for isSourceTypeExternal
+            //$cmixUserExists = ilCmiXapiUser::exists($this->object->getId(), $DIC->user()->getId());
             
             if ($this->object->isSourceTypeExternal()) {
+                $extCmiUserExists = ilCmiXapiUser::exists($this->object->getId(), $DIC->user()->getId());
                 $registerButton = ilLinkButton::getInstance();
                 
-                if ($cmixUserExists) {
+                if ($extCmiUserExists) {
                     $registerButton->setCaption('change_registration');
                 } else {
                     $registerButton->setPrimary(true);
@@ -708,9 +730,15 @@ class ilObjCmiXapiGUI extends ilObject2GUI
                 $DIC->toolbar()->addButtonInstance($launchButton);
             }
             
-            
-            if ($cmixUserExists) {
-                $cmixUser = new ilCmiXapiUser($this->object->getId(), $DIC->user()->getId());
+            /**
+             * beware: ilCmiXapiUser::exists($this->object->getId(),$DIC->user()->getId());
+             * this is not a valid query because if you switched privacyIdent mode before you will get 
+             * an existing user without launched data like proxySuccess
+             */
+            $cmiUserExists = ilCmiXapiUser::exists($this->object->getId(),$DIC->user()->getId(),$this->object->getPrivacyIdent());
+
+            if ($cmiUserExists) {
+                $cmixUser = new ilCmiXapiUser($this->object->getId(), $DIC->user()->getId(), $this->object->getPrivacyIdent());
                 
                 if ($this->isFetchXapiStatementsRequired($cmixUser)) {
                     $fetchButton = ilLinkButton::getInstance();
@@ -740,6 +768,7 @@ class ilObjCmiXapiGUI extends ilObject2GUI
     
     protected function isFetchXapiStatementsRequired(ilCmiXapiUser $cmixUser)
     {
+        global $DIC;
         if ($this->object->getLaunchMode() != ilObjCmiXapi::LAUNCH_MODE_NORMAL) {
             return false;
         }
@@ -779,7 +808,7 @@ class ilObjCmiXapiGUI extends ilObject2GUI
             throw new ilCmiXapiException('access denied!');
         }
         
-        $cmixUser = new ilCmiXapiUser($this->object->getId(), $DIC->user()->getId());
+        $cmixUser = new ilCmiXapiUser($this->object->getId(), $DIC->user()->getId(), $this->object->getPrivacyIdent());
         
         $fetchedUntil = $cmixUser->getFetchUntil();
         $now = new ilCmiXapiDateTime(time(), IL_CAL_UNIX);
@@ -836,5 +865,37 @@ class ilObjCmiXapiGUI extends ilObject2GUI
         ilLoggerFactory::getLogger($this->object->getType())->debug("use filter from ($start) until ($end)");
         
         return $filter;
+    }
+    
+    public static function getPrivacyIdentString(int $ident)
+    {
+        switch ($ident) {
+            case 0:
+                return "il_uuid_user_id";
+            case 1:
+                return "il_uuid_ext_account";
+            case 2:
+                return "il_uuid_login";
+            case 3:
+                return "real_email";
+            case 4:
+                return "il_uuid_random";
+        }
+        return '';
+    }
+
+    public static function getPrivacyNameString(int $ident)
+    {
+        switch ($ident) {
+            case 0:
+                return "none";
+            case 1:
+                return "firstname";
+            case 2:
+                return "lastname";
+            case 3:
+                return "fullname";
+        }
+        return '';
     }
 }

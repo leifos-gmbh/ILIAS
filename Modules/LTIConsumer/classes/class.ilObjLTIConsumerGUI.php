@@ -354,14 +354,33 @@ class ilObjLTIConsumerGUI extends ilObject2GUI
     {
         global $DIC; /* @var \ILIAS\DI\Container $DIC */
         $err = $DIC['ilErr']; /* @var ilErrorHandling $err */
-        
-        if ($DIC->access()->checkAccess('read', '', $a_target)) {
-            ilObjectGUI::_gotoRepositoryNode($a_target, 'infoScreen');
-        } elseif ($DIC->access()->checkAccess('read', '', ROOT_FOLDER_ID)) {
+        $ctrl = $DIC->ctrl();
+        $request = $DIC->http()->request();
+        $access = $DIC->access();
+        $lng = $DIC->language();
+
+        $targetParameters = explode('_', $a_target);
+        $id = (int) $targetParameters[0];
+
+        if ($id <= 0) {
+            $err->raiseError($lng->txt('msg_no_perm_read'), $err->FATAL);
+        }
+
+        if ($access->checkAccess('read', '', $id)) {
+            $ctrl->setTargetScript('ilias.php');
+            $ctrl->initBaseClass(ilRepositoryGUI::class);
+            $ctrl->setParameterByClass(ilObjLTIConsumerGUI::class, 'ref_id', $id);
+            if (isset($request->getQueryParams()['gotolp'])) {
+                $ctrl->setParameterByClass(ilObjLTIConsumerGUI::class, 'gotolp', 1);
+            }
+            $ctrl->redirectByClass([ilRepositoryGUI::class, ilObjLTIConsumerGUI::class]);
+        } elseif ($access->checkAccess('visible', '', $id)) {
+            ilObjectGUI::_gotoRepositoryNode($id, 'infoScreen');
+        } elseif ($access->checkAccess('read', '', ROOT_FOLDER_ID)) {
             ilUtil::sendInfo(
                 sprintf(
                     $DIC->language()->txt('msg_no_perm_read_item'),
-                    ilObject::_lookupTitle(ilObject::_lookupObjId($a_target))
+                    ilObject::_lookupTitle(ilObject::_lookupObjId($id))
                 ),
                 true
             );
@@ -713,13 +732,13 @@ class ilObjLTIConsumerGUI extends ilObject2GUI
         );
 
         $info->addProperty(
-            $DIC->language()->txt("conf_user_name"),
-            $DIC->language()->txt('conf_user_name_' . $this->object->getProvider()->getUserName())
+            $DIC->language()->txt("conf_privacy_name"),
+            $DIC->language()->txt('conf_privacy_name_' . ilObjCmiXapiGUI::getPrivacyNameString($this->object->getProvider()->getPrivacyName()))
         );
 
         $info->addProperty(
-            $DIC->language()->txt("conf_user_ident"),
-            $DIC->language()->txt('conf_user_ident_' . $this->object->getProvider()->getUserIdent())
+            $DIC->language()->txt("conf_privacy_ident"),
+            $DIC->language()->txt('conf_privacy_ident_' . ilObjCmiXapiGUI::getPrivacyIdentString($this->object->getProvider()->getPrivacyIdent()))
         );
         if ($this->object->getProvider()->isExternalProvider()) {
             $info->addProperty(
@@ -749,9 +768,13 @@ class ilObjLTIConsumerGUI extends ilObject2GUI
             return;
         }
         
-        $cmixUser = new ilCmiXapiUser($this->object->getId(), $this->user->getId());
-        $cmixUser->setUsrIdent(ilCmiXapiUser::getIdent($this->object->getProvider()->getUserIdent(), $DIC->user()));
-        $cmixUser->save();
+        $cmixUser = new ilCmiXapiUser($this->object->getId(), $this->user->getId(), $this->object->getProvider()->getPrivacyIdent());
+        $user_ident = $cmixUser->getUsrIdent();
+        if ($user_ident == '' || $user_ident == null) {
+			$user_ident = ilCmiXapiUser::getIdent($this->object->getProvider()->getPrivacyIdent(), $DIC->user());
+			$cmixUser->setUsrIdent($user_ident);
+			$cmixUser->save();
+		}
         
         include_once("./Modules/LTIConsumer/classes/class.ilLTIConsumerLaunch.php");
         $ilLTIConsumerLaunch = new ilLTIConsumerLaunch($this->object->getRefId());

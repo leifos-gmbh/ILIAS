@@ -23,12 +23,22 @@ class ilCmiXapiUser
      * @var int
      */
     protected $usrId;
+
+    /**
+     * @var int
+     */
+    protected $privacyIdent;
     
     /**
      * @var bool
      */
     protected $proxySuccess;
     
+    /**
+     * @var bool
+     */
+    protected $satisfied;
+
     /**
      * @var ilCmiXapiDateTime
      */
@@ -38,16 +48,25 @@ class ilCmiXapiUser
      * @var string
      */
     protected $usrIdent;
+
+    /**
+     * @var string
+     */
+    protected $registration;
+
     
-    public function __construct($objId = null, $usrId = null)
+    public function __construct($objId = null, $usrId = null, $privacyIdent = null)
     {
         $this->objId = $objId;
         $this->usrId = $usrId;
+        $this->privacyIdent = $privacyIdent;
         $this->proxySuccess = false;
+        $this->satisfied = false;
         $this->fetchUntil = new ilCmiXapiDateTime(0, IL_CAL_UNIX);
         $this->usrIdent = '';
+        $this->registration = '';
         
-        if ($objId !== null && $usrId !== null) {
+        if ($objId !== null && $usrId !== null && $privacyIdent !== null) {
             $this->load();
         }
     }
@@ -68,6 +87,22 @@ class ilCmiXapiUser
         $this->objId = $objId;
     }
     
+    /**
+     * @return int
+     */
+    public function getPrivacyIdent()
+    {
+        return $this->privacyIdent;
+    }
+    
+    /**
+     * @param int $privacyIdent
+     */
+    public function setPrivacyIdent($privacyIdent)
+    {
+        $this->privacyIdent = $privacyIdent;
+    }
+
     /**
      * @return int
      */
@@ -103,13 +138,29 @@ class ilCmiXapiUser
     /**
      * @return string
      */
+    public function getRegistration() : string
+    {
+        return $this->registration;
+    }
+
+    /**
+     * @param string
+     */
+    public function setRegistration(string $registration)
+    {
+        $this->registration = $registration;
+    }
+
+    /**
+     * @return string
+     */
     public static function getIliasUuid() : string
     {
         $setting = new ilSetting('cmix');
         $ilUuid = $setting->get('ilias_uuid');
         return $ilUuid;
     }
-    
+
     /**
      * @return bool
      */
@@ -126,6 +177,22 @@ class ilCmiXapiUser
         $this->proxySuccess = $proxySuccess;
     }
     
+    /**
+     * @param bool $satisfied
+     */
+    public function setSatisfied($satisfied)
+    {
+        $this->satisfied = $satisfied;
+    }
+
+    /**
+     * @return bool $satisfied
+     */
+    public function getSatisfied()
+    {
+        return $this->satisfied;
+    }
+
     /**
      * @return ilCmiXapiDateTime
      */
@@ -147,9 +214,9 @@ class ilCmiXapiUser
         global $DIC; /* @var \ILIAS\DI\Container $DIC */
         
         $res = $DIC->database()->queryF(
-            "SELECT * FROM cmix_users WHERE obj_id = %s AND usr_id = %s",
-            array('integer', 'integer'),
-            array($this->getObjId(), $this->getUsrId())
+            "SELECT * FROM cmix_users WHERE obj_id = %s AND usr_id = %s AND privacy_ident = %s",
+            array('integer', 'integer', 'integer'),
+            array($this->getObjId(), $this->getUsrId(), $this->getPrivacyIdent())
         );
         
         while ($row = $DIC->database()->fetchAssoc($res)) {
@@ -162,8 +229,11 @@ class ilCmiXapiUser
         $this->setObjId((int) $dbRow['obj_id']);
         $this->setUsrId((int) $dbRow['usr_id']);
         $this->setProxySuccess((bool) $dbRow['proxy_success']);
+        $this->setSatisfied((bool) $dbRow['satisfied']);
         $this->setFetchUntil(new ilCmiXapiDateTime($dbRow['fetched_until'], IL_CAL_DATETIME));
         $this->setUsrIdent((string) $dbRow['usr_ident']);
+        $this->setPrivacyIdent((int) $dbRow['privacy_ident']);
+        $this->setRegistration((string) $dbRow['registration']);
     }
     
     public function save()
@@ -174,12 +244,15 @@ class ilCmiXapiUser
             'cmix_users',
             array(
                 'obj_id' => array('integer', (int) $this->getObjId()),
-                'usr_id' => array('integer', (int) $this->getUsrId())
+                'usr_id' => array('integer', (int) $this->getUsrId()),
+                'privacy_ident' => array('integer', (int) $this->getPrivacyIdent())
             ),
             array(
                 'proxy_success' => array('integer', (int) $this->hasProxySuccess()),
                 'fetched_until' => array('timestamp', $this->getFetchUntil()->get(IL_CAL_DATETIME)),
-                'usr_ident' => array('text', $this->getUsrIdent())
+                'usr_ident' => array('text', $this->getUsrIdent()),
+                'registration' => array('text', $this->getRegistration()),
+                'satisfied' => array('integer', (int) $this->getSatisfied())
             )
         );
     }
@@ -190,7 +263,7 @@ class ilCmiXapiUser
         
         $res = $DIC->database()->queryF(
             "SELECT * FROM cmix_users WHERE obj_id = %s AND usr_ident = %s",
-            array('integer', 'integer'),
+            array('integer', 'text'),
             array($objId, $usrIdent)
         );
         
@@ -206,19 +279,21 @@ class ilCmiXapiUser
     /**
      * @param int $objId
      * @param int $usrId
+     * @param int $privacyIdent
      */
-    public static function saveProxySuccess($objId, $usrId)
+    public static function saveProxySuccess($objId, $usrId, $privacyIdent) //TODO
     {
         global $DIC; /* @var \ILIAS\DI\Container $DIC */
         
         $DIC->database()->update(
             'cmix_users',
             array(
-                'proxy_success' => array('integer', (int) true)
+                'proxy_success' => array('integer', 1)
             ),
             array(
                 'obj_id' => array('integer', (int) $objId),
-                'usr_id' => array('integer', (int) $usrId)
+                'usr_id' => array('integer', (int) $usrId),
+                'privacy_ident' => array('integer', (int) $privacyIdent)
             )
         );
     }
@@ -231,23 +306,23 @@ class ilCmiXapiUser
     public static function getIdent($userIdentMode, ilObjUser $user)
     {
         switch ($userIdentMode) {
-            case ilObjCmiXapi::USER_IDENT_IL_UUID_USER_ID:
+            case ilObjCmiXapi::PRIVACY_IDENT_IL_UUID_USER_ID:
                 
                 return self::buildPseudoEmail($user->getId(), self::getIliasUuid());
                 
-            case ilObjCmiXapi::USER_IDENT_IL_UUID_LOGIN:
+            case ilObjCmiXapi::PRIVACY_IDENT_IL_UUID_LOGIN:
                 
                 return self::buildPseudoEmail($user->getLogin(), self::getIliasUuid());
                 
-            case ilObjCmiXapi::USER_IDENT_IL_UUID_EXT_ACCOUNT:
+            case ilObjCmiXapi::PRIVACY_IDENT_IL_UUID_EXT_ACCOUNT:
                 
                 return self::buildPseudoEmail($user->getExternalAccount(), self::getIliasUuid());
                 
-            case ilObjCmiXapi::USER_IDENT_IL_UUID_RANDOM:
+            case ilObjCmiXapi::PRIVACY_IDENT_IL_UUID_RANDOM:
 
                 return self::buildPseudoEmail(self::getUserObjectUniqueId(), self::getIliasUuid());
 
-            case ilObjCmiXapi::USER_IDENT_REAL_EMAIL:
+            case ilObjCmiXapi::PRIVACY_IDENT_REAL_EMAIL:
                 
                 return $user->getEmail();
         }
@@ -263,23 +338,23 @@ class ilCmiXapiUser
     public static function getIdentAsId($userIdentMode, ilObjUser $user)
     {
         switch ($userIdentMode) {
-            case ilObjCmiXapi::USER_IDENT_IL_UUID_USER_ID:
+            case ilObjCmiXapi::PRIVACY_IDENT_IL_UUID_USER_ID:
                 
                 return $user->getId();
                 
-            case ilObjCmiXapi::USER_IDENT_IL_UUID_LOGIN:
+            case ilObjCmiXapi::PRIVACY_IDENT_IL_UUID_LOGIN:
                 
                 return $user->getLogin();
                 
-            case ilObjCmiXapi::USER_IDENT_IL_UUID_EXT_ACCOUNT:
+            case ilObjCmiXapi::PRIVACY_IDENT_IL_UUID_EXT_ACCOUNT:
                 
                 return $user->getExternalAccount();
                 
-            case ilObjCmiXapi::USER_IDENT_IL_UUID_RANDOM:
+            case ilObjCmiXapi::PRIVACY_IDENT_IL_UUID_RANDOM:
 
                 return self::getUserObjectUniqueId();
 
-            case ilObjCmiXapi::USER_IDENT_REAL_EMAIL:
+            case ilObjCmiXapi::PRIVACY_IDENT_REAL_EMAIL:
                 
                 return 'realemail' . $user->getId();
         }
@@ -305,29 +380,24 @@ class ilCmiXapiUser
     public static function getName($userNameMode, ilObjUser $user)
     {
         switch ($userNameMode) {
-            case ilObjCmiXapi::USER_NAME_FIRSTNAME:
-                
+            case ilObjCmiXapi::PRIVACY_NAME_FIRSTNAME:
                 $usrName = $user->getFirstname();
                 break;
             
-            case ilObjCmiXapi::USER_NAME_LASTNAME:
-                
+            case ilObjCmiXapi::PRIVACY_NAME_LASTNAME:
                 $usrName = $user->getUTitle() ? $user->getUTitle() . ' ' : '';
                 $usrName .= $user->getLastname();
                 break;
             
-            case ilObjCmiXapi::USER_NAME_FULLNAME:
-                
+            case ilObjCmiXapi::PRIVACY_NAME_FULLNAME:
                 $usrName = $user->getFullname();
                 break;
             
-            case ilObjCmiXapi::USER_NAME_NONE:
+            case ilObjCmiXapi::PRIVACY_NAME_NONE:
             default:
-                
                 $usrName = '-';
                 break;
         }
-        
         return $usrName;
     }
     
@@ -335,7 +405,7 @@ class ilCmiXapiUser
      * @param int $object
      * @return ilCmiXapiUser[]
      */
-    public static function getUsersForObject($objId) : array
+    public static function getUsersForObject($objId, $asUsrId = false) : array
     {
         global $DIC; /* @var \ILIAS\DI\Container $DIC */
         
@@ -347,32 +417,76 @@ class ilCmiXapiUser
         
         $users = [];
         
-        while ($row = $DIC->database()->fetchAssoc($res)) {
-            $cmixUser = new self();
-            $cmixUser->assignFromDbRow($row);
-            
-            $users[] = $cmixUser;
+        if ($asUsrId === false) 
+        {
+            while ($row = $DIC->database()->fetchAssoc($res)) 
+            {
+                $cmixUser = new self();
+                $cmixUser->assignFromDbRow($row);
+                
+                $users[] = $cmixUser;
+            }
         }
-        
+        else 
+        {
+            while ($row = $DIC->database()->fetchAssoc($res)) 
+            {
+                $users[] = $row['usr_id'];
+            }
+        }
         return $users;
     }
     
-    public static function exists($objId, $usrId)
+    /**
+     * @param int $objId
+     * @param int $usrId
+     * @return string[] $usrIdents
+     */
+    public static function getUserIdents($objId, $usrId) : array
     {
         global $DIC; /* @var \ILIAS\DI\Container $DIC */
         
-        $query = "SELECT count(*) cnt FROM cmix_users WHERE obj_id = %s AND usr_id = %s";
-
         $res = $DIC->database()->queryF(
-            $query,
-            array('integer', 'integer'),
-            array($objId, $usrId)
+            "SELECT usr_ident FROM cmix_users WHERE obj_id = %s AND usr_id = %s",
+            array('integer','integer'),
+            array($objId,$usrId)
         );
+        
+        $usrIdents = [];
+        while ($row = $DIC->database()->fetchAssoc($res)) 
+        {
+                $usrIdents[] = $row['usr_ident'];
+        }
+        return $usrIdents;
+    }
+
+    // $withIdent requires constructed object with privacyIdent!
+    public static function exists($objId, $usrId, $privacyIdent = 999)
+    {
+        global $DIC; /* @var \ILIAS\DI\Container $DIC */
+        if ($privacyIdent == 999)
+        {
+            $query = "SELECT count(*) cnt FROM cmix_users WHERE obj_id = %s AND usr_id = %s";
+            $res = $DIC->database()->queryF(
+                $query,
+                array('integer', 'integer'),
+                array($objId, $usrId)
+            );
+        }
+        else
+        {
+            $query = "SELECT count(*) cnt FROM cmix_users WHERE obj_id = %s AND usr_id = %s AND privacy_ident = %s";
+            $res = $DIC->database()->queryF(
+                $query,
+                array('integer', 'integer', 'integer'),
+                array($objId, $usrId, $privacyIdent)
+            );
+        }
         
         while ($row = $DIC->database()->fetchAssoc($res)) {
             return (bool) $row['cnt'];
         }
-        
+
         return false;
     }
     
@@ -447,29 +561,29 @@ class ilCmiXapiUser
      */
     public static function getUserObjectUniqueId( $length = 32 )
     {
-        $storedId = self::readUserObjectUniqueId();
-        if( (bool)strlen($storedId) ) {
-            return strstr($storedId,'@', true);
-        }
+        // $storedId = self::readUserObjectUniqueId();
+        // if( (bool)strlen($storedId) ) {
+            // return strstr($storedId,'@', true);
+        // }
 
-        $getId = function( $length ) {
-            $multiplier = floor($length/8) * 2;
-            $uid = str_shuffle(str_repeat(uniqid(), $multiplier));
+        // $getId = function( $length ) {
+            // $multiplier = floor($length/8) * 2;
+            // $uid = str_shuffle(str_repeat(uniqid(), $multiplier));
 
-            try {
-                $ident = bin2hex(random_bytes($length));
-            } catch (Exception $e) {
-                $ident = $uid;
-            }
+            // try {
+                // $ident = bin2hex(random_bytes($length));
+            // } catch (Exception $e) {
+                // $ident = $uid;
+            // }
 
-            $start = rand(0, strlen($ident) - $length - 1);
-            return substr($ident, $start, $length);
-        };
+            // $start = rand(0, strlen($ident) - $length - 1);
+            // return substr($ident, $start, $length);
+        // };
 
-        $id = $getId($length);
+        $id = self::getUUID($length);//$getId($length);
         $exists = self::userObjectUniqueIdExists($id);
         while( $exists ) {
-            $id = $getId($length);
+            $id = self::getUUID($length);//$getId($length);
             $exists = self::userObjectUniqueIdExists($id);
         }
 
@@ -477,17 +591,20 @@ class ilCmiXapiUser
 
     }
 
-    private static function readUserObjectUniqueId()
-    {
-        global $DIC; /** @var Container */
-        $obj_id = ilObject::_lookupObjId($_GET["ref_id"]);
+	public static function getUUID($length = 32 )
+	{
+		$multiplier = floor($length/8) * 2;
+		$uid = str_shuffle(str_repeat(uniqid(), $multiplier));
 
-        $query = "SELECT usr_ident FROM cmix_users".
-            " WHERE usr_id = " . $DIC->database()->quote($DIC->user()->getId(), 'integer') .
-            " AND obj_id = " . $DIC->database()->quote($obj_id, 'integer');
-        $result = $DIC->database()->query($query);
-        return is_array($row = $DIC->database()->fetchAssoc($result)) ? $row['usr_ident'] : '';
-    }
+		try {
+			$ident = bin2hex(random_bytes($length));
+		} catch (Exception $e) {
+			$ident = $uid;
+		}
+
+		$start = rand(0, strlen($ident) - $length - 1);
+		return substr($ident, $start, $length);
+	}
 
     private static function userObjectUniqueIdExists($id)
     {
@@ -498,10 +615,13 @@ class ilCmiXapiUser
         return (bool)$num = $DIC->database()->numRows($result);
     }
 
-    public static function getRegistration(ilObjCmiXapi $obj, ilObjUser $user)
+    public static function generateCMI5Registration($objId, $usrId)
+    {
+        return (new \Ramsey\Uuid\UuidFactory())->uuid3(self::getIliasUuid(),$objId . '-' . $usrId);
+    }
+
+    public static function generateRegistration(ilObjCmiXapi $obj, ilObjUser $user)
     {
         return (new \Ramsey\Uuid\UuidFactory())->uuid3(self::getIliasUuid(),$obj->getRefId() . '-' . $user->getId());
     }
-
-
 }

@@ -201,6 +201,7 @@ auth#:#auth_oidc_update_field_info#:#Automatisch aktualisieren
 auth#:#auth_oidc_role_mapping_table#:#Zuordnung von ILIAS-Rollen zu OpenID-Connect-Attributen
 auth#:#auth_oidc_update_role_info#:#Nur bei Erstanmeldung (automatische Synchronisierung) anwenden
 content#:#cont_lpe_openid_connect_login#:#OpenID-Connect-Login
+content#:#cont_lpe_saml_login#:#SAML-Login
 common#:#msg_wrong_filetypes#:#Erlaubte Dateiendungen:
 common#:#msg_to_many_files#:#Zu viele Dateien ausgewählt, erlaubte Anzahl Dateien:
 common#:#msg_no_files_selected#:#Keine Dateien ausgewählt
@@ -774,7 +775,7 @@ assessment#:#tst_nav_next_locks_current_answer_header#:#Navigieren zur nächsten
 assessment#:#tst_nav_next_locks_current_answer_confirm#:#Wenn Sie zur nächsten Frage navigieren wird die Antwort zur aktuellen Frage festgeschrieben und kann nicht nochmals verändert werden.
 assessment#:#tst_filter_question_type#:#Fragentyp
 assessment#:#tst_filter_question_type_enabled#:#Fragentyp Filter verwenden
-assessment#:#tst_filter_lifecycle_enabled#:#Lifecycle Filter verwenden
+assessment#:#tst_filter_lifecycle_enabled#:#Filter „Lebenszyklus“ verwenden
 assessment#:#tst_objectives_progress_header#:#Fortschritte in den Lernzielen
 assessment#:#tst_objective_progress_header#:#Fortschritt im Lernziel
 assessment#:#assClozeTest#:#Lückentextfrage
@@ -1500,7 +1501,9 @@ assessment#:#tst_finish_notification_no#:#Keine Benachrichtigung
 assessment#:#tst_finished#:#Beendet
 assessment#:#unfinished_passes#:#Unbeendeter Testdurchlauf
 assessment#:#finish_pass_for_user_confirmation#:#Wollen Sie den Test Durchlauf für den Teilnehmer "%s" wirklich beenden?
+assessment#:#finish_pass_for_user_in_processing_time#:#WARNUNG: die Bearbeitungszeit für diesen Benutzer ist noch nicht vorbei! Sie sollten den Testlauf nur bei zwingendem Grund (z.B. Ausschluss vom Test) beenden.
 assessment#:#finish_pass_for_all_users#:#Wollen Sie wirklich die Test Durchläufe für alle Benutzer beenden?
+assessment#:#finish_pass_for_all_users_in_processing_time#:#Sie können die Durchläufe aller Benutzer nicht gemeinsam beenden, da für mindestens einen Benutzer die Bearbeitungszeit noch nicht vorbei ist.
 assessment#:#finish_all_user_passes#:#Alle Testdurchläufe beenden
 assessment#:#finish_unfinished_passes#:#Beendet noch offene Testdurchläufe
 assessment#:#finish_unfinished_passes_desc#:#Testdurchläufe, welche noch nicht beendet wurden, wo aber entweder ein Ende konfiguriert ist, oder welche die Maximale Bearbietungsdauer überschritten haben, werden beendet.
@@ -1936,8 +1939,8 @@ assessment#:#tst_allowed_users_desc#:#ILIAS prüft die Anzahl der gleichzeitigen
 assessment#:#tst_allowed_users_time_gap_desc#:#Teilnehmer die im Ablauf der angegeben Sekunden keinen Klick im Test ausführen, werden als ‚inaktiv‘ eingestuft und aus dem Test entfernt.
 assessment#:#tst_nr_of_tries_desc#:#Maximale Anzahl der Testdurchläufe, die ein Teilnehmer absolvieren kann.
 assessment#:#saved_adjustment#:#Veränderung gespeichert.
-assessment#:#qst_lifecycle_filter_all#:#Alle Lifecycle
-assessment#:#qst_lifecycle#:#Lifecycle
+assessment#:#qst_lifecycle_filter_all#:#Alle Lebenszyklen
+assessment#:#qst_lifecycle#:#Lebenszyklus
 assessment#:#qst_lifecycle_draft#:#Entwurf
 assessment#:#qst_lifecycle_review#:#Überarbeitung notwendig
 assessment#:#qst_lifecycle_rejected#:#Abgelehnt
@@ -3791,6 +3794,7 @@ common#:#obj_cert_desc#:#Einstellungen für Zertifikate
 common#:#obj_chap#:#Kapitel
 common#:#obj_chta#:#Chat
 common#:#obj_chtr#:#Chatraum
+common#:#obj_chtr_duplicate#:#Chatraum kopieren
 common#:#obj_cmps#:#Plugins
 common#:#obj_cmps_desc#:#Allgemeine Einstellungen für Plugins
 common#:#obj_crs#:#Kurs
@@ -5875,7 +5879,7 @@ crs#:#event_unregister#:#Abmelden
 crs#:#event_unregistered#:#Sie wurden abgemeldet.
 crs#:#event_updated#:#Die Änderungen wurden gespeichert
 crs#:#events#:#Sitzungen
-crs#:#export_members#:#Teilnehmerexport
+crs#:#export_members#:#Export der Teilnehmendendaten
 crs#:#grouping_change_assignment#:#Zuordnungen ändern
 crs#:#sess_attendance_list#:#Teilnehmerliste
 crs#:#sess_gen_attendance_list#:#Liste erstellen
@@ -7930,11 +7934,11 @@ ps#:#ps_error_message_password_min3_because_chars_numbers_sc#:#Minimale Passwort
 ps#:#ps_export_admin#:#Administratoren
 ps#:#ps_export_confirm#:#Nutzungsvereinbarung für Kursmitglieder aktivieren
 ps#:#ps_export_confirm_group#:#Nutzungsvereinbarung für Gruppenmitglieder aktivieren
-ps#:#ps_export_course#:#Persönliche Daten in Kursen anzeigen und exportieren
+ps#:#ps_export_course#:#Export der Persönlichen Daten aus Kursen erlauben
 ps#:#ps_export_data#:#Daten des Persönlichen Profils
 ps#:#ps_export_excel#:#Starte Excel-Export
 ps#:#ps_export_files#:#Exportdateien
-ps#:#ps_export_groups#:#Persönliche Daten in Gruppen anzeigen und exportieren
+ps#:#ps_export_groups#:#Export der Persönlichen Daten aus Gruppen erlauben
 ps#:#ps_export_member#:#Teilnehmer
 ps#:#ps_export_settings#:#Einstellungen zum Export
 ps#:#ps_export_sub#:#Noch nicht freigeschaltete Benutzer
@@ -7988,13 +7992,13 @@ pwassist#:#pwassist_enter_email#:#Geben Sie eine E-Mail-Adresse ein, und klicken
 pwassist#:#pwassist_enter_username_and_email#:#Geben Sie einen Benutzernamen und die dazugehörende E-Mail-Adresse ein, und klicken Sie auf Abschicken. ILIAS sendet eine E-Mail an diese Adresse. Die E-Mail enthält eine Adresse zu einer Webseite, mit der Sie ein neues Passwort für das Benutzerkonto eingeben können. Falls Sie mit dieser Funktion Ihr Passwort nicht setzen können, benachrichtigen Sie bitte Ihre Kursleitung oder senden Sie ein E-Mail an %1$s.
 pwassist#:#pwassist_enter_username_and_new_password#:#Geben Sie den Benutzernamen, für den Sie Passwort-Unterstützung angefordert haben, und das zuzuweisende Passwort ein.
 pwassist#:#pwassist_login_not_match#:#Bitte geben Sie einen anderen Benutzernamen ein. Der Benutzername, den Sie eingegeben haben, stimmt nicht mit dem Benutzernamen überein, für den Sie Passwort-Unterstützung angefordert hatten.
-pwassist#:#pwassist_mail_body#:#Tragen Sie ein neues Passwort für Ihr Benutzerkonto ein: %1$s  Diese Nachricht wurde automatisch generiert von der ILIAS-Installation: %2$s  Sie (oder jemand mit der Adresse %3$s) hat Passwort-Unterstützung für den Benutzernamen "%4$s" angefordert.  Bitte prüfen Sie sorgfältig die nachfolgend aufgeführten Fälle, und handeln Sie wie vorgeschlagen:  -Sie haben die Passwort-Unterstützung auf dem Server versehentlich benutzt: Löschen Sie diese Mail.  -Sie sind sicher, dass Sie nie Passwort-Unterstützung für den angegebenen ILIAS-Server angefordert haben: Bitte nehmen Sie mit %5$s Kontakt auf.  - Sie haben um Passwort-Unterstützung angefragt. Bitte gehen Sie wie folgt vor:  1. Starten Sie Ihren Browser.  2. Geben Sie folgende Adresse in Ihrem Browser ein: %6$s  Wichtig: Die Adresse besteht aus einer einzigen Zeile. Wenn Sie die Adresse aufgetrennt in mehrere Zeilen sehen, dann hat Ihr E-Mail-Programm diese Zeilenumbrüche eingefügt.  3. Ihr Browser zeigt nun eine Seite an, mit der Sie ein neues Passwort an das Benutzerkonto zuweisen können.  Bitte beachten Sie: Aus Sicherheitsgründen können Sie diese drei Schritte nur exakt einmal und innerhalb einer begrenzten Zeit ausführen. Danach wird die Adresse ungültig, und Sie müssen die Passwort-Unterstützung auf dem ILIAS-Server erneut anfordern.
+pwassist#:#pwassist_mail_body#:#Tragen Sie ein neues Passwort ein für Ihr Benutzerkonto %1$s <br><br>Diese Nachricht wurde automatisch generiert von der ILIAS-Installation: %2$s <br><br>Sie (oder jemand mit der Adresse %3$s) hat Passwort-Unterstützung für den Benutzernamen "%4$s" angefordert. Bitte prüfen Sie sorgfältig die nachfolgend aufgeführten Fälle, und handeln Sie wie vorgeschlagen:<br><br>• Sie haben die Passwort-Unterstützung versehentlich benutzt: Löschen Sie diese Mail.<br><br>• Sie sind sicher, dass Sie nie Passwort-Unterstützung für den angegebenen ILIAS-Server angefordert haben: Bitte nehmen Sie mit %5$s Kontakt auf.<br><br>Sie haben um Passwort-Unterstützung angefragt. Bitte gehen Sie wie folgt vor:<br><br>1. Starten Sie Ihren Browser.<br>2. Geben Sie folgende Adresse in Ihrem Browser ein: %6$s  Wichtig: Die Adresse besteht aus einer einzigen Zeile. Wenn Sie die Adresse aufgetrennt in mehrere Zeilen sehen, dann hat Ihr E-Mail-Programm diese Zeilenumbrüche eingefügt.<br>3. Ihr Browser zeigt nun eine Seite an, mit der Sie ein neues Passwort an das Benutzerkonto zuweisen können.<br><br>Bitte beachten Sie: Aus Sicherheitsgründen können Sie diese drei Schritte nur exakt einmal und innerhalb einer begrenzten Zeit ausführen. Danach wird die Adresse ungültig, und Sie müssen die Passwort-Unterstützung auf dem ILIAS-Server erneut anfordern.
 pwassist#:#pwassist_mail_sent#:#ILIAS hat eine E-Mail an die Adresse %1$s versandt. Weitere Anweisungen finden Sie in dieser Mail.
 pwassist#:#pwassist_mail_sent_generic#:#ILIAS hat eine E-Mail an die hinterlegte Adresse versandt. Weitere Anweisungen finden Sie in dieser Mail.
 pwassist#:#pwassist_mail_subject#:#ILIAS-Passwort-Unterstützung
 pwassist#:#pwassist_password_assigned#:#Das Passwort ist erfolgreich dem Benutzernamen %1$s zugewiesen worden.
 pwassist#:#pwassist_session_expired#:#Bitte füllen Sie das Formular erneut aus. Die Zeit für die Durchführung der Passwort-Unterstützung ist abgelaufen. Dies kann passiert sein, weil Sie versucht haben, die Adresse, die Ihnen per E-Mail zugesandt wurde, mehr als einmal zu verwenden, oder weil zu viel Zeit verstrichen ist, seit die Adresse zu Ihnen gesandt wurde.
-pwassist#:#pwassist_username_mail_body#:#Dies sind die aktiven Benutzernamen, die ILIAS für die E-Mail-Adresse verfügbar hat: %s  Diese Mail ist automatisch generiert worden von der ILIAS-Installation: %s  Sie (oder jemand mit der Adresse %s) hat die Benutzernamenauflistung für die E-Mail-Adresse '%s' angefordert.  Bitte prüfen Sie sorgfältig die nachfolgend aufgeführten Fälle, und handeln Sie wie vorgeschlagen:  -Sie haben die Benutzernamen-Unterstützung auf dem Server versehentlich benutzt: Löschen Sie diese E-Mail.  -Sie sind sicher, dass Sie nie Benutzernamen-Unterstützung für den angegebenen ILIAS-Server angefordert haben: Bitte nehmen Sie mit %s Kontakt auf.  - Sie haben um Benutzernamen-Unterstützung angefragt. Bitte gehen Sie wie folgt vor:  1. Starten Sie Ihren Browser.  2. Geben Sie folgende Adresse in Ihrem Browser ein: %s  Wichtig: Die Adresse besteht aus einer einzigen Zeile. Wenn Sie die Adresse aufgetrennt in mehrere Zeilen sehen, dann hat Ihr E-Mail-Programm diese Zeilenumbrüche eingefügt.  3. Ihr Browser zeigt nun die Passwort-Unterstützungs-Seite an. Verwenden Sie diese Funktion, um sich zu einer Kombination aus Benutzernamen und E-Mail ein neues Passwort schicken zu lassen.
+pwassist#:#pwassist_username_mail_body#:#Dies sind die aktiven Benutzernamen, die in ILIAS dieser E-Mail-Adresse zugeordnet sind: %s  <br><br>Diese Mail ist automatisch generiert worden von der ILIAS-Installation: %s<br><br>Sie (oder jemand mit der Adresse %s) hat die Benutzernamenauflistung für die E-Mail-Adresse '%s' angefordert. Bitte prüfen Sie sorgfältig die nachfolgend aufgeführten Fälle, und handeln Sie wie vorgeschlagen:<br><br>• Sie haben die Benutzernamen-Unterstützung auf dem Server versehentlich benutzt: Löschen Sie diese E-Mail.<br><br>• Sie sind sicher, dass Sie nie Benutzernamen-Unterstützung für den angegebenen ILIAS-Server angefordert haben: Bitte nehmen Sie mit %s Kontakt auf.<br><br>• Sie haben um Benutzernamen-Unterstützung angefragt: Bitte gehen Sie wie folgt vor:<br>1. Starten Sie Ihren Browser.<br>2. Geben Sie folgende Adresse in Ihrem Browser ein: %s  <br>Wichtig: Die Adresse besteht aus einer einzigen Zeile. Wenn Sie die Adresse aufgetrennt in mehrere Zeilen sehen, dann hat Ihr E-Mail-Programm diese Zeilenumbrüche eingefügt.<br>3. Ihr Browser zeigt nun die Passwort-Unterstützungs-Seite an. Verwenden Sie diese Funktion, um sich zu einer Kombination aus Benutzernamen und E-Mail ein neues Passwort schicken zu lassen.
 pwassist#:#pwassist_disabled_no_access#:#Die Passwort-Unterstützung ist nicht aktiviert.  Bitte kontaktieren Sie einen System-Administrator für weitere Unterstützung: %s
 pwassist#:#unassist_disabled_no_access#:#Die Benutzernamen-Unterstützung ist nicht aktiviert. Bitte kontaktieren Sie einen System-Administrator für weitere Unterstützung: %s
 rating#:#rat_not_rated_yet#:#Noch nicht bewertet
@@ -8842,7 +8846,7 @@ style#:#sty_media_char#:#Medien
 style#:#sty_min_height#:#Minimale Höhe
 style#:#sty_move_lm_styles#:#Stylesheets der Lernmodule ändern
 style#:#sty_move_style#:#Stylesheet ändern
-style#:#sty_msg_characteristic_must_only_include#:#Der Titel des Styles muss mit einem Buchstaben beginnen und darf nur die folgenden Zeichen enthalten
+style#:#sty_msg_characteristic_must_only_include#:#Der Titel des Styles muss mit einem Buchstaben beginnen und darf keine Leerzeichen sondern nur die folgenden Zeichen enthalten:
 style#:#sty_msg_color_must_only_include#:#Der Farbname darf nur folgende Buchstaben/Zeichen enthalten
 style#:#sty_msg_input_must_be_numeric#:#Numerische Eingabe erforderlich.
 style#:#sty_name#:#Name
@@ -11629,6 +11633,8 @@ assessment#:#tolerance#:#Toleranz (%)
 assessment#:#result_units#:#Auswählbare Einheiten
 assessment#:#precision#:#Präzision
 assessment#:#err_range#:#Die obere Grenze muss größer als die untere Grenze sein.
+assessment#:#err_division#:#Dieser Wert muss kleiner als das Maximum sein.
+assessment#:#err_divider_too_big#:#Der Teiler einer der Variablen in dieser Frage ist zu gross.
 assessment#:#err_no_formula#:#Bitte geben Sie eine Formel zur Berechnung des Ergebnisses an.
 assessment#:#err_wrong_rating_advanced#:#Bitte stellen Sie sicher, dass die Summe der erweiterten Bewertungsoptionen genau 100 Prozent ergibt.
 assessment#:#rating_sign#:#Bewertung (Vorzeichen)
@@ -12375,7 +12381,7 @@ rbac#:#file_read_learning_progress#:#Benutzer kann Lernfortschritt anderer Benut
 rbac#:#mcst_read_learning_progress#:#Benutzer kann Lernfortschritt anderer Benutzer einsehen
 rbac#:#lso_read_learning_progress#:#Benutzer kann Lernfortschritt anderer Benutzer einsehen
 content#:#cont_progress_icons#:#Fortschritts-Icons
-content#:#cont_progress_icons_info#:#Zeigt Fortschritts-Icons anstatt der Kapitel- und Seiten-Icons im Inhaltsverzeichnis an. Fortschrittsinformationen werden von ILIAS ab Version 5.0 gespeichert.
+content#:#cont_progress_icons_info#:#Zeigt Fortschritts-Icons anstatt der Kapitel- und Seiten-Icons im Inhaltsverzeichnis an.
 content#:#cont_self_assessment#:#Selbsttests
 content#:#cont_tries#:#Antwortversuche
 content#:#cont_tries_reset_on_visit#:#Zurücksetzen bei Aufruf der Seite
@@ -13417,7 +13423,7 @@ awrn#:#awrn_hide_from_awareness#:#Mich nicht in „Wer ist online?“-Anzeige au
 awrn#:#awrn_hide_from_awareness_info#:#Die „Wer ist online?“-Anzeige erscheint oben im Kopf der Anwendung und listet ausgewählte Benutzer auf (z.B. Kontakte oder Mitglieder Ihrer Kurse).
 common#:#contact_sysadmin#:#Technische Betreuung kontaktieren
 common#:#report_accessibility_issue#:#Barriere melden
-common#:#report_accessibility_link#:#Gemeldeter Link:
+common#:#report_accessibility_link#:#Gemeldeter%20Link:
 common#:#accessibility_control_concept#:#Info Barrierefreiheit
 common#:#no_accessibility_control_concept_description#:#Aktuell wird in dieser Installation keine Info zur Barrierefreiheit angeboten. Bitte kontaktieren Sie die <a href="%1$s">Anlaufstelle für Barrierefreiheit</a> für weitere Informationen.
 common#:#mainbar_aria_label#:#Hauptleiste
@@ -16275,3 +16281,32 @@ prg#:#prgr_new#:#Create Study Programme Link###20 10 2021 new variable
 prg#:#prgr_edit_info#:#Please choose one Study Programme for creating a new link.###20 10 2021 new variable
 common#:#actions_for#:#Aktionen für %s
 news#:#news_date#:#Datum
+cmix#:#only_moveon_label#:#Nur Daten zum Lernerfolg speichern
+cmix#:#only_moveon_info#:#Mit dieser nur für den ILIAS-LRS-Proxy zur Verfügung stehenden Option werden nur Statements mit definierten Verben im Learning Record Store gespeichert (WhiteList). Dem Content wird mitgeteilt, dass die Statements gespeichert worden wären. Das sichert in der Regel die Ablauffähigkeit, sollte jedoch mit dem Content-Anbieter abgesprochen sein.
+cmix#:#achieved_label#:#Statements mit dem Verb 'achieved'
+cmix#:#achieved_info#:#Erfolgreich ein gewünschtes Ziel, Niveau oder Ergebnis durch Anstrengung, Geschicklichkeit oder Mut herbeiführen oder erreichen.
+cmix#:#answered_label#:#Statements mit dem Verb 'answered'
+cmix#:#answered_info#:#Auf eine Frage wurde geantwortet - wobei das Objekt im Allgemeinen eine Aktivität ist, die die Frage repräsentiert. Der Text der Antwort ist oft in der Antwort innerhalb des Ergebnisses enthalten.
+cmix#:#completed_label#:#Statements mit dem Verb 'completed'
+cmix#:#completed_info#:#Die Aktivität wurde normal beendet oder abgeschlossen.
+cmix#:#failed_label#:#Statements mit dem Verb 'failed'
+cmix#:#failed_info#:#Die Aktivität wurde nicht erfolgreich bestanden bis zu einem vorher festgelegten Grad an Zufriedenheit.
+cmix#:#initialized_label#:#Statements mit dem Verb 'initialized'
+cmix#:#initialized_info#:#Die Aktivität wurde erfolgreich begonnen.
+cmix#:#passed_label#:#Statements mit dem Verb 'passed'
+cmix#:#passed_info#:#Die Aktivität wurde bis zu einem vorher festgelegten Grad der Zufriedenheit erfolgreich bestanden.
+cmix#:#progressed_label#:#Statements mit dem Verb 'progressed'
+cmix#:#progressed_info#:#Bezeichnet einen Wert, der angibt, wie weit ein Akteur in einer Aktivität fortgeschritten ist oder sich durch eine Aktivität bewegt hat.
+cmix#:#satisfied_label#:#Statements mit dem Verb 'satisfied'
+cmix#:#satisfied_info#:#Zeigt an, dass die Kriterien des Objekts oder der Aktivität erfüllt wurden.
+cmix#:#terminated_label#:#Statements mit dem Verb 'terminated'
+cmix#:#terminated_info#:#Die Aktivität wurde erfolgreich beendet.
+cmix#:#hide_data_label#:#Daten schwärzen
+cmix#:#hide_data_info#:#Mit dieser nur für den ILIAS-LRS-Proxy zur Verfügung stehenden Option werden bestimmte Daten in Statements mit unkenntlich gemachten Werten im Learning Record Store gespeichert.
+cmix#:#timestamp_label#:#Zeitstempel 'timestamp'
+cmix#:#timestamp_info#:#Der timestamp kennzeichnet den Zeitpunkt einer durch das Statement gekennzeichneten Aktion. Der timestamp wird durch diese Option auf den Standardwert 01.01.1970 (1970-01-01T00:00:00.000Z) gesetzt. Bitte beachten Sie, dass ein Learning Record Store gegebenenfalls selbstständig einen Wert für das Speicherdatum (stored) setzt, der mit dem timestamp nahezu identisch sein kann.
+cmix#:#duration_label#:#Zeitdauer 'duration'
+cmix#:#duration_info#:#Die Zeitdauer kann z.B. für die Beantwortung einer Aufgabe erfasst werden. Die Zeitdauer 'duration' wird durch diese Option auf den Standardwert 0 Sekunden (PT00.000S) gesetzt.
+cmix#:#no_substatements_label#:#Substatements nicht speichern
+cmix#:#no_substatements_info#:#Mit dieser Option, die nur für den ILIAS LRS-Proxy zur Verfügung steht, kann die Speicherung von untergeordneten Statements unterdrückt werden. Dies kann z.B. die Beantwortung einzelner Aufgaben in einem Test beeinflussen. Dem Content wird mitgeteilt, dass die Statements gespeichert worden wären.
+exc#:#exc_fullscreen#:#Vollbild

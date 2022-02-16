@@ -15521,6 +15521,11 @@ div.ilBlogSideBlockNavigationSelection {
   min-height: 468px;
   padding-bottom: 20px;
 }
+@media only screen and (min-width: 768px) {
+  .ilToolbar .form-control[data-blog-input='posting-title']:not(:placeholder-shown) {
+    width: 250px;
+  }
+}
 /* Services/Skill */
 div.ilSkill {
   background: #f9f9f9;

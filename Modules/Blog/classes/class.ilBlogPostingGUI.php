@@ -149,7 +149,10 @@ class ilBlogPostingGUI extends ilPageObjectGUI
                     } elseif ($ilCtrl->getCmd() == "activatePageToList") {
                         ilUtil::sendSuccess($this->lng->txt("blog_new_posting_info"), true);
                     }
-                    $this->setPresentationTitle($posting->getTitle());
+
+                    if (!$this->showPageHeading()) {
+                        $this->setPresentationTitle($posting->getTitle());
+                    }
                     
                     $tpl->setTitle(ilObject::_lookupTitle($this->getBlogPosting()->getBlogId()) . ": " . // #15017
                         $posting->getTitle());
@@ -301,6 +304,9 @@ class ilBlogPostingGUI extends ilPageObjectGUI
     public function previewFullscreen()
     {
         $this->add_date = true;
+        if ($this->showPageHeading()) {
+            $this->setPresentationTitle("");
+        }
         return $this->preview("fullscreen");
     }
 
@@ -313,7 +319,7 @@ class ilBlogPostingGUI extends ilPageObjectGUI
     {
         $this->setTemplateOutput(false);
 
-        if (!$this->getAbstractOnly()) {
+        if (!$this->getAbstractOnly() && !$this->showPageHeading()) {
             if ($a_title != "") {
                 $this->setPresentationTitle($a_title);
             } else {
@@ -349,39 +355,56 @@ class ilBlogPostingGUI extends ilPageObjectGUI
     public function postOutputProcessing($a_output)
     {
         // #8626/#9370
-        if (($this->getOutputMode() == "preview" || $this->getOutputMode() == "offline")
-            && !$this->getAbstractOnly() && $this->add_date) {
-            $author = "";
-            if (!$this->isInWorkspace()) {
-                $authors = array();
-                $author_id = $this->getBlogPosting()->getAuthor();
-                if ($author_id) {
-                    $authors[] = ilUserUtil::getNamePresentation($author_id);
-                }
-                                
-                foreach (ilBlogPosting::getPageContributors("blp", $this->getBlogPosting()->getId()) as $editor) {
-                    if ($editor["user_id"] != $author_id) {
-                        $authors[] = ilUserUtil::getNamePresentation($editor["user_id"]);
-                    }
-                }
-                
-                if ($authors) {
-                    $author = implode(", ", $authors) . " - ";
-                }
-            }
-            
-            // prepend creation date
-            $rel = ilDatePresentation::useRelativeDates();
-            ilDatePresentation::setUseRelativeDates(false);
-            $prefix = "<div class=\"il_BlockInfo\" style=\"text-align:right\">" .
-                $author . ilDatePresentation::formatDate($this->getBlogPosting()->getCreated()) .
-                "</div>";
-            ilDatePresentation::setUseRelativeDates($rel);
-            
-            $a_output = $prefix . $a_output;
+        if ($this->showPageHeading()) {
+            $a_output = $this->getPageHeading() . $a_output;
         }
         
         return $a_output;
+    }
+
+    protected function showPageHeading() : bool
+    {
+        if (!$this->getAbstractOnly() && $this->add_date) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Get page heading
+     * see also https://docu.ilias.de/goto_docu_wiki_wpage_5793_1357.html
+     * the presentation heading has a defined layout, title is not from page content
+     */
+    protected function getPageHeading() : string
+    {
+        $author = "";
+        if (!$this->isInWorkspace()) {
+            $authors = array();
+            $author_id = $this->getBlogPosting()->getAuthor();
+            if ($author_id) {
+                $authors[] = ilUserUtil::getNamePresentation($author_id);
+            }
+
+            foreach (ilBlogPosting::getPageContributors("blp", $this->getBlogPosting()->getId()) as $editor) {
+                if ($editor["user_id"] != $author_id) {
+                    $authors[] = ilUserUtil::getNamePresentation($editor["user_id"]);
+                }
+            }
+
+            if ($authors) {
+                $author = implode(", ", $authors) . " - ";
+            }
+        }
+        $rel = ilDatePresentation::useRelativeDates();
+        ilDatePresentation::setUseRelativeDates(true);
+        $tpl = new ilTemplate("tpl.posting_head.html", true, true, "Modules/Blog");
+        $tpl->setVariable("TITLE", $this->getBlogPosting()->getTitle());
+        $tpl->setVariable("DATETIME",
+            $author . ilDatePresentation::formatDate($this->getBlogPosting()->getCreated())
+        );
+        ilDatePresentation::setUseRelativeDates($rel);
+        return $tpl->get();
     }
 
     /**

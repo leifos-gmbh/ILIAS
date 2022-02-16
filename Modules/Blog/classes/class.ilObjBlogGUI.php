@@ -1025,7 +1025,12 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
             $ilToolbar->setFormAction($ilCtrl->getFormAction($this, "createPosting"));
 
             $title = new ilTextInputGUI($lng->txt("title"), "title");
+            $title->setSize(30);
             $ilToolbar->addStickyItem($title, $lng->txt("title"));
+            $tpl->addOnLoadCode("
+                document.getElementById('title').setAttribute('data-blog-input', 'posting-title');
+                document.getElementById('title').setAttribute('placeholder', ' ');
+            ");
             
             $button = ilSubmitButton::getInstance();
             $button->setCaption("blog_add_posting");
@@ -1623,7 +1628,7 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
                 }
                 $wtpl->setCurrentBlock("permalink");
                 $wtpl->setVariable("URL_PERMALINK", $goto);
-                $wtpl->setVariable("TEXT_PERMALINK", $lng->txt("blog_permanent_link"));
+                $wtpl->setVariable("TEXT_PERMALINK", $lng->txt("link"));
                 $wtpl->parseCurrentBlock();
             }
                         
@@ -2001,6 +2006,12 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
         }
 
         $authors = array_unique($authors);
+
+        // filter out deleted users
+        $authors = array_filter($authors, function ($id) {
+            return ilObject::_lookupType($id) == "usr";
+        });
+
         if (sizeof($authors) > 1) {
             $list = array();
             foreach ($authors as $user_id) {
@@ -2009,7 +2020,20 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
                     $url = $ilCtrl->getLinkTarget($this, $a_list_cmd);
                     $ilCtrl->setParameter($this, "ath", "");
 
-                    $name = ilUserUtil::getNamePresentation($user_id, true);
+                    $base_name = ilUserUtil::getNamePresentation($user_id);
+                    if (substr($base_name, 0, 1) == "[") {
+                        $name = ilUserUtil::getNamePresentation($user_id, true);
+                    } else {
+                        $name = ilUserUtil::getNamePresentation(
+                            $user_id,
+                            true,
+                            false,
+                            "",
+                            false,
+                            true
+                        );
+                    }
+
                     $idx = trim(strip_tags($name)) . "///" . $user_id;  // #10934
                     $list[$idx] = array($name, $url);
                 }

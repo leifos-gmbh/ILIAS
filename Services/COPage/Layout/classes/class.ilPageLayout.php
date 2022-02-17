@@ -90,38 +90,6 @@ class ilPageLayout
     }
 
     /**
-     * Set style id
-     */
-    public function setStyleId($a_val)
-    {
-        $this->style_id = $a_val;
-    }
-
-    /**
-     * Get style id
-     */
-    public function getStyleId()
-    {
-        return $this->style_id;
-    }
-
-    /**
-     * Set special page
-     */
-    public function setSpecialPage($a_val)
-    {
-        $this->special_page = $a_val;
-    }
-
-    /**
-     * Get special page
-     */
-    public function getSpecialPage()
-    {
-        return $this->special_page;
-    }
-    
-    /**
      * Set modules
      */
     public function setModules(array $a_values = null)
@@ -188,8 +156,6 @@ class ilPageLayout
         $query = "UPDATE page_layout SET title=" . $ilDB->quote($this->title, "text") .
             ",description =" . $ilDB->quote($this->description, "text") .
             ",active =" . $ilDB->quote($this->active, "integer") .
-            ",style_id =" . $ilDB->quote($this->getStyleId(), "integer") .
-            ",special_page =" . $ilDB->quote((int) $this->getSpecialPage(), "integer") .
             ",mod_scorm =" . $ilDB->quote($mod_scorm, "integer") .
             ",mod_portfolio =" . $ilDB->quote($mod_portfolio, "integer") .
             ",mod_lm =" . $ilDB->quote($mod_lm, "integer") .
@@ -208,8 +174,6 @@ class ilPageLayout
         $result = $ilDB->query($query);
         $row = $ilDB->fetchAssoc($result);
         $this->title = $row['title'];
-        $this->setStyleId($row['style_id']);
-        $this->setSpecialPage($row['special_page']);
         $this->description = $row['description'];
         $this->active = $row['active'];
         
@@ -293,7 +257,7 @@ class ilPageLayout
 
         $ilDB = $DIC->database();
         $arr_layouts = array();
-        if ($active != 0) {
+        if ($a_active != 0) {
             $add = "WHERE (active=1)";
         }
         $query = "SELECT * FROM page_layout $add ORDER BY title ";
@@ -307,13 +271,13 @@ class ilPageLayout
     /**
      * Get layouts
      */
-    public static function getLayouts($a_active = false, $a_special_page = false, $a_module = null)
+    public static function getLayouts($a_active = false, $a_module = null)
     {
         global $DIC;
 
         $ilDB = $DIC->database();
         $arr_layouts = array();
-        $add = "WHERE special_page = " . $ilDB->quote($a_special_page, "integer");
+        $add = "";
         if ($a_active) {
             $add .= " AND (active = 1)";
         }
@@ -342,9 +306,9 @@ class ilPageLayout
     /**
      * Get active layouts
      */
-    public static function activeLayouts($a_special_page = false, $a_module = null)
+    public static function activeLayouts($a_module = null)
     {
-        return self::getLayouts(true, $a_special_page, $a_module);
+        return self::getLayouts(true, $a_module);
     }
     
     /**
@@ -374,7 +338,6 @@ class ilPageLayout
         $lng = $DIC->language();
         
         return array(
-            self::MODULE_SCORM => $lng->txt("style_page_layout_module_scorm"),
             self::MODULE_PORTFOLIO => $lng->txt("style_page_layout_module_portfolio"),
             self::MODULE_LM => $lng->txt("style_page_layout_module_learning_module")
         );

@@ -1060,6 +1060,7 @@ class ilPageObjectGUI
                 break;
             
             case "ileditclipboardgui":
+                $this->tabs_gui->activateTab("clipboard");
                 $clip_gui = new ilEditClipboardGUI();
                 $clip_gui->setPageBackTitle($this->page_back_title);
                 $ret = $this->ctrl->forwardCommand($clip_gui);
@@ -2637,6 +2638,7 @@ class ilPageObjectGUI
     public function preview()
     {
         $this->setOutputMode(self::PREVIEW);
+        $this->tabs_gui->activateTab("cont_preview");
         return $this->showPage();
     }
 
@@ -2902,6 +2904,7 @@ class ilPageObjectGUI
         if (!$this->getEnableEditing()) {
             return;
         }
+        $this->tabs_gui->activateTab("history");
         
         $this->tpl->addJavaScript("./Services/COPage/js/page_history.js");
         

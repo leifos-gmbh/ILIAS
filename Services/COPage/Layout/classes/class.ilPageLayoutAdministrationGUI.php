@@ -103,7 +103,9 @@ class ilPageLayoutAdministrationGUI
                 $layout_gui->setEditPreview(true);
                 $this->ctrl->saveParameter($this, "obj_id");
                 $ret = $this->ctrl->forwardCommand($layout_gui);
-                $this->tpl->setContent($ret);
+                if ($ret != "") {
+                    $this->tpl->setContent($ret);
+                }
                 break;
 
             default:
@@ -279,14 +281,6 @@ class ilPageLayoutAdministrationGUI
         $desc_input->setRows(3);
         $desc_input->setCols(37);
 
-        // special page?
-        $options = array(
-            "0" => $this->lng->txt("cont_layout_template"),
-            "1" => $this->lng->txt("cont_special_page"),
-        );
-        $si = new ilSelectInputGUI($this->lng->txt("type"), "special_page");
-        $si->setOptions($options);
-
         // modules
         $mods = new ilCheckboxGroupInputGUI($this->lng->txt("modules"), "module");
         // $mods->setRequired(true);
@@ -298,10 +292,6 @@ class ilPageLayoutAdministrationGUI
         $ttype_input = new ilSelectInputGUI($this->lng->txt("sty_based_on"), "pgl_template");
 
         $arr_templates = ilPageLayout::getLayouts();
-        $arr_templates1 = ilPageLayout::getLayouts(false, true);
-        foreach ($arr_templates1 as $v) {
-            $arr_templates[] = $v;
-        }
 
         $options = array();
         $options['-1'] = $this->lng->txt("none");
@@ -322,7 +312,6 @@ class ilPageLayoutAdministrationGUI
 
         $form_gui->addItem($title_input);
         $form_gui->addItem($desc_input);
-        $form_gui->addItem($si);
         $form_gui->addItem($mods);
         $form_gui->addItem($ttype_input);
 
@@ -347,16 +336,13 @@ class ilPageLayoutAdministrationGUI
         $pg_object = new ilPageLayout();
         $pg_object->setTitle($form_gui->getInput('pgl_title'));
         $pg_object->setDescription($form_gui->getInput('pgl_desc'));
-        $pg_object->setSpecialPage($form_gui->getInput('special_page'));
         $pg_object->setModules($form_gui->getInput('module'));
         $pg_object->update();
 
         include_once("./Services/COPage/Layout/classes/class.ilPageLayoutPage.php");
 
         //create Page
-        if (!is_object($pg_content)) {
-            $this->pg_content = new ilPageLayoutPage();
-        }
+        $this->pg_content = new ilPageLayoutPage();
 
         $this->pg_content->setId($pg_object->getId());
 
@@ -394,38 +380,6 @@ class ilPageLayoutAdministrationGUI
     }
 
     /**
-     * Save page layout types
-     */
-    public function savePageLayoutTypes()
-    {
-        $lng = $this->lng;
-        $ilCtrl = $this->ctrl;
-
-        include_once("./Services/COPage/Layout/classes/class.ilPageLayout.php");
-
-        if (is_array($_POST["type"])) {
-            foreach ($_POST["type"] as $id => $t) {
-                if ($id > 0) {
-                    $l = new ilPageLayout($id);
-                    $l->readObject();
-                    $l->setSpecialPage($t);
-                    if (is_array($_POST["module"][$id])) {
-                        $l->setModules(array_keys($_POST["module"][$id]));
-                    } else {
-                        $l->setModules();
-                    }
-                    $l->update();
-                }
-            }
-
-            ilUtil::sendSuccess($this->lng->txt("msg_obj_modified"));
-        }
-
-        $this->ctrl->redirect($this, "listLayouts");
-    }
-
-
-    /**
      * Export page layout template object
      */
     public function exportLayout()
@@ -444,8 +398,7 @@ class ilPageLayoutAdministrationGUI
             "Title",
             $tmpdir
         );
-
-        if ($succ["success"]) {
+        if (is_file($succ["directory"] . "/" . $succ["file"])) {
             ilUtil::deliverFile(
                 $succ["directory"] . "/" . $succ["file"],
                 $succ["file"],
@@ -459,7 +412,7 @@ class ilPageLayoutAdministrationGUI
             unlink($succ["directory"] . "/" . $succ["file"]);
         }
         if (is_dir($succ["directory"])) {
-            unlink($succ["directory"]);
+            //unlink($succ["directory"]);
         }
     }
 

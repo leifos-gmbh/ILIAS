@@ -50,8 +50,7 @@ class ilSCORM2004OrganizationHFormGUI extends ilHierarchyFormGUI
 
         include_once("./Services/COPage/Layout/classes/class.ilPageLayout.php");
         $page_layouts = (count(ilPageLayout::activeLayouts()) > 0);
-        $special_pages = (count(ilPageLayout::activeLayouts(true)) > 0);
-        
+
         $cmds = array();
         //echo "+".$a_depth."-";
         if (!$a_first_child) {		// drop area of node

@@ -44,7 +44,6 @@ class ilChapterHierarchyFormGUI extends ilHierarchyFormGUI
         $this->setCheckboxName("id");
 
         $this->page_layouts = ilPageLayout::activeLayouts(
-            false,
             ilPageLayout::MODULE_LM
         );
     }

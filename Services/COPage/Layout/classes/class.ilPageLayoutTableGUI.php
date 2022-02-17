@@ -13,6 +13,11 @@ include_once("Services/Table/classes/class.ilTable2GUI.php");
 class ilPageLayoutTableGUI extends ilTable2GUI
 {
     /**
+     * @var \ILIAS\DI\UIServices
+     */
+    protected $ui;
+
+    /**
      * @var ilCtrl
      */
     protected $ctrl;
@@ -25,6 +30,7 @@ class ilPageLayoutTableGUI extends ilTable2GUI
 
     public function __construct($a_parent_obj, $a_parent_cmd)
     {
+        /** @var \ILIAS\DI\Container $DIC */
         global $DIC;
 
         $this->ctrl = $DIC->ctrl();
@@ -33,6 +39,7 @@ class ilPageLayoutTableGUI extends ilTable2GUI
         $ilCtrl = $DIC->ctrl();
         $lng = $DIC->language();
         $rbacsystem = $DIC->rbac()->system();
+        $this->ui = $DIC->ui();
 
         $lng->loadLanguageModule("content");
         
@@ -43,8 +50,6 @@ class ilPageLayoutTableGUI extends ilTable2GUI
         $this->addColumn($lng->txt("thumbnail"));
         $this->addColumn($lng->txt("title"));
         $this->addColumn($lng->txt("description"));
-        $this->addColumn($lng->txt("obj_sty"));
-        $this->addColumn($lng->txt("type"));
         $this->addColumn($lng->txt("modules"));
         $this->addColumn($lng->txt("actions"));
         
@@ -53,7 +58,6 @@ class ilPageLayoutTableGUI extends ilTable2GUI
             $this->addMultiCommand("activate", $lng->txt("activate"));
             $this->addMultiCommand("deactivate", $lng->txt("deactivate"));
             $this->addMultiCommand("deletePgl", $lng->txt("delete"));
-            $this->addCommandButton("savePageLayoutTypes", $lng->txt("cont_save_types"));
         }
         
         $this->getPageLayouts();
@@ -66,16 +70,6 @@ class ilPageLayoutTableGUI extends ilTable2GUI
             "Services/COPage/Layout"
         );
         $this->setTitle($lng->txt("page_layouts"));
-        
-        //build form
-        /*
-        $opts = ilUtil::formSelect(12,"new_type",array($lng->txt("page_layout")));
-        $this->tpl->setCurrentBlock("add_object");
-        $this->tpl->setVariable("SELECT_OBJTYPE", $opts);
-        $this->tpl->setVariable("BTN_NAME", "createPgGUI");
-        $this->tpl->setVariable("TXT_ADD", $this->lng->txt("add"));
-        $this->tpl->parseCurrentBlock();
-        */
     }
     
     /**
@@ -95,19 +89,6 @@ class ilPageLayoutTableGUI extends ilTable2GUI
     {
         $lng = $this->lng;
         $ilCtrl = $this->ctrl;
-        
-        // action
-        $ilCtrl->setParameter($this->parent_obj, "layout_id", $a_set['layout_id']);
-
-        if ($this->parent_obj->checkPermission("sty_write_page_layout", false)) {
-            $this->tpl->setCurrentBlock("action");
-            $this->tpl->setVariable(
-                "HREF_ACTION",
-                $ilCtrl->getLinkTarget($this->parent_obj, "exportLayout")
-            );
-            $this->tpl->setVariable("TXT_ACTION", $lng->txt("export"));
-            $this->tpl->parseCurrentBlock();
-        }
 
         $ilCtrl->setParameter($this->parent_obj, "layout_id", "");
         
@@ -117,12 +98,9 @@ class ilPageLayoutTableGUI extends ilTable2GUI
             if (($mod_id == ilPageLayout::MODULE_SCORM && $a_set["mod_scorm"]) ||
                 ($mod_id == ilPageLayout::MODULE_PORTFOLIO && $a_set["mod_portfolio"]) ||
                 ($mod_id == ilPageLayout::MODULE_LM && $a_set["mod_lm"])) {
-                $this->tpl->setVariable("MOD_STATUS", " checked=\"checked\"");
+                $this->tpl->setVariable("MOD_NAME", $mod_caption);
+                $this->tpl->parseCurrentBlock();
             }
-            $this->tpl->setVariable("MODULE_ID", $mod_id);
-            $this->tpl->setVariable("LAYOUT_ID", $a_set["layout_id"]);
-            $this->tpl->setVariable("MOD_NAME", $mod_caption);
-            $this->tpl->parseCurrentBlock();
         }
         
         if ($a_set['active']) {
@@ -135,30 +113,29 @@ class ilPageLayoutTableGUI extends ilTable2GUI
         $this->tpl->setVariable("CHECKBOX_ID", $a_set['layout_id']);
         
         $ilCtrl->setParameter($this->parent_obj, "obj_id", $a_set['layout_id']);
+
         if ($this->parent_obj->checkPermission("sty_write_page_layout", false)) {
-            $this->tpl->setVariable("HREF_EDIT_PGLAYOUT", $ilCtrl->getLinkTarget($this->parent_obj, "editPg"));
+
+            $links[] = $this->ui->factory()->link()->standard(
+                $this->lng->txt("edit"),
+                $ilCtrl->getLinkTarget($this->parent_obj, "editPg")
+            );
+            $links[] = $this->ui->factory()->link()->standard(
+                $this->lng->txt("settings"),
+                $ilCtrl->getLinkTargetByClass("ilpagelayoutgui", "properties")
+            );
+            $links[] = $this->ui->factory()->link()->standard(
+                $this->lng->txt("export"),
+                $ilCtrl->getLinkTarget($this->parent_obj, "exportLayout")
+            );
+            $dd = $this->ui->factory()->dropdown()->standard($links);
+
+            $this->tpl->setVariable("ACTIONS",
+                $this->ui->renderer()->render($dd)
+            );
         }
         
         $pgl_obj = new ilPageLayout($a_set['layout_id']);
         $this->tpl->setVariable("VAL_PREVIEW_HTML", $pgl_obj->getPreview());
-
-        if ($a_set["style_id"] > 0) {
-            $this->tpl->setVariable(
-                "STYLE",
-                ilObject::_lookupTitle($a_set["style_id"])
-            );
-        }
-
-        $this->tpl->setVariable(
-            "TYPE",
-            ilUtil::formSelect(
-                $a_set["special_page"],
-                "type[" . $a_set["layout_id"] . "]",
-                array("0" => $lng->txt("cont_layout_template"),
-                    "1" => $lng->txt("cont_special_page")),
-                false,
-                true
-            )
-        );
     }
 }

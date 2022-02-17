@@ -2286,7 +2286,7 @@ class ilObjSCORM2004LearningModuleGUI extends ilObjSCORMLearningModuleGUI
         $ilCtrl = $this->ctrl;
         $lng = $this->lng;
 
-        $arr_templates = ilPageLayout::activeLayouts($a_special_page, ilPageLayout::MODULE_SCORM);
+        $arr_templates = ilPageLayout::activeLayouts(ilPageLayout::MODULE_SCORM);
 
         //$this->tpl->addBlockFile("ADM_CONTENT", "adm_content", "tpl.scormeditor_page_layout_chooser.html",
         //"Modules/Scorm2004");

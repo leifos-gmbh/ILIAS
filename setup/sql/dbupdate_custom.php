@@ -70,3 +70,36 @@ if (!$ilDB->tableColumnExists('skl_user_has_level', 'trigger_user_id')) {
     ));
 }
 ?>
+<#11>
+<?php
+$ilDB->update("page_layout", [
+    "title" => ["text", "Text page with accompanying media"]
+], [    // where
+        "title" => ["text", "1A Simple text page with accompanying media"]
+    ]
+);
+$ilDB->update("page_layout", [
+    "title" => ["text", "Text page with accompanying media and test"]
+], [    // where
+        "title" => ["text", "1C Text page with accompanying media and test"]
+    ]
+);
+$ilDB->update("page_layout", [
+    "title" => ["text", "Text page with accompanying media followed by test and text"]
+], [    // where
+        "title" => ["text", "1E Text page with accompanying media followed by test and text"]
+    ]
+);
+$ilDB->update("page_layout", [
+    "title" => ["text", "Media page with accompanying text and test"]
+], [    // where
+        "title" => ["text", "2C Simple media page with accompanying text and test"]
+    ]
+);
+$ilDB->update("page_layout", [
+    "title" => ["text", "Vertical component navigation page with media and text	"]
+], [    // where
+        "title" => ["text", "7C Vertical component navigation page with media and text"]
+    ]
+);
+?>

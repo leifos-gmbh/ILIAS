@@ -56,7 +56,7 @@ class ilPageLayoutGUI extends ilPageObjectGUI
         $tpl->setCurrentBlock("ContentStyle");
         $tpl->setVariable(
             "LOCATION_CONTENT_STYLESHEET",
-            ilObjStyleSheet::getContentStylePath($this->layout_object->getStyleId())
+            ilObjStyleSheet::getContentStylePath(0)
         );
         $tpl->parseCurrentBlock();
         
@@ -71,7 +71,6 @@ class ilPageLayoutGUI extends ilPageObjectGUI
         );
         $tpl->parseCurrentBlock();
         
-        $this->setStyleId($this->layout_object->getStyleId());
     }
 
     /**
@@ -118,7 +117,6 @@ die("ilPageLayoutGUI forward to ilpageobjectgui error.");
         if (!$a_form) {
             $a_form = $this->initForm($a_mode);
         }
-        
         $this->tpl->setContent($a_form->getHTML());
     }
     
@@ -162,26 +160,6 @@ die("ilPageLayoutGUI forward to ilpageobjectgui error.");
         $form_gui->addItem($desc_input);
         $form_gui->addItem($mods);
 
-        // style
-        $fixed_style = $ilSetting->get("fixed_content_style_id");
-        $style_id = $this->layout_object->getStyleId();
-
-        if ($fixed_style > 0) {
-            $st = new ilNonEditableValueGUI($lng->txt("cont_current_style"));
-            $st->setValue(ilObject::_lookupTitle($fixed_style) . " (" .
-                $this->lng->txt("global_fixed") . ")");
-            $form_gui->addItem($st);
-        } else {
-            include_once("./Services/Style/Content/classes/class.ilObjStyleSheet.php");
-            $st_styles = ilObjStyleSheet::_getStandardStyles(true, false);
-            $st_styles[0] = $this->lng->txt("default");
-            ksort($st_styles);
-            $style_sel = new ilSelectInputGUI($lng->txt("obj_sty"), "style_id");
-            $style_sel->setOptions($st_styles);
-            $style_sel->setValue($style_id);
-            $form_gui->addItem($style_sel);
-        }
-                        
         $form_gui->addCommandButton("updateProperties", $lng->txt($a_mode));
         
         return $form_gui;
@@ -202,7 +180,6 @@ die("ilPageLayoutGUI forward to ilpageobjectgui error.");
         
         $this->layout_object->setTitle($form->getInput('pgl_title'));
         $this->layout_object->setDescription($form->getInput('pgl_desc'));
-        $this->layout_object->setStyleId($form->getInput('style_id'));
         $this->layout_object->setModules($form->getInput('module'));
         $this->layout_object->update();
         
@@ -221,12 +198,9 @@ die("ilPageLayoutGUI forward to ilpageobjectgui error.");
         $lng = $this->lng;
 
         $ilCtrl->setParameterByClass("ilpagelayoutgui", "obj_id", $this->obj->getId());
-        $ilTabs->addTarget(
-            "properties",
-            $ilCtrl->getLinkTarget($this, "properties"),
-            array("properties","", ""),
-            "",
-            ""
+        $ilTabs->addTab("properties",
+            $this->lng->txt("settings"),
+            $ilCtrl->getLinkTarget($this, "properties")
         );
         $tpl->setTitleIcon(ilUtil::getImagePath("icon_pg.svg"));
         $tpl->setTitle($this->layout_object->getTitle());
@@ -245,7 +219,7 @@ die("ilPageLayoutGUI forward to ilpageobjectgui error.");
         $ui = $DIC->ui();
         $f = $ui->factory();
         $lng = $DIC->language();
-        $arr_templates = ilPageLayout::activeLayouts(false, $module);
+        $arr_templates = ilPageLayout::activeLayouts($module);
         if (count($arr_templates) == 0) {
             return null;
         }
@@ -262,4 +236,10 @@ die("ilPageLayoutGUI forward to ilpageobjectgui error.");
         $radio = $radio->withValue((int) $first);
         return $radio;
     }
+
+    public function finishEditing()
+    {
+        $this->ctrl->redirectByClass("ilpagelayoutadministrationgui", "listLayouts");
+    }
+
 }

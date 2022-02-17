@@ -1,0 +1,7 @@
+<!-- language file start -->
+ecs#:#ecs_outgoing_user_credentials#:#User Credentials
+ecs#:#ecs_outgoing_user_credentials_info#:#User Credentials for outgoing users.<br />Available wildcards: [LOGIN] or [EXTERNAL_ACCOUNT]<br />You can add prefixes or suffixes to the wildcard by appending them as text: [LOGIN]@myuni.whatever
+ecs#:#ecs_username_place_holder_err_mssing_placeholder#:#One of the placeholders "[LOGIN]" or "[EXTERNAL_ACCOUNT]" is mandatory.
+ecs#:#ecs_incoming_auth_local#:#Create Local ECS User Account
+ecs#:#ecs_incoming_auth_mode#:#Authentication Mode
+ecs#:#ecs_incoming_auth_mode_info#:#Please choose the authentication mode for incoming ECS user accounts.

@@ -248,6 +248,7 @@ abstract class ilRemoteObjectBase extends ilObject2
         global $DIC;
 
         $ilUser = $DIC['ilUser'];
+        $logger = $DIC->logger()->wsrv();
         
         
         include_once './Services/WebServices/ECS/classes/class.ilECSImport.php';
@@ -256,8 +257,8 @@ abstract class ilRemoteObjectBase extends ilObject2
         
         include_once('./Services/WebServices/ECS/classes/class.ilECSUser.php');
         $user = new ilECSUser($ilUser);
-        $ecs_user_data = $user->toGET();
-        $GLOBALS['DIC']['ilLog']->write(__METHOD__ . ': Using ecs user data ' . $ecs_user_data);
+        $ecs_user_data = $user->toGET(new ilECSParticipantSetting($server->getServerId(), $this->getMID()));
+        $logger->debug('Using ecs user data ' . $ecs_user_data);
         
         // check token mechanism enabled
         include_once './Services/WebServices/ECS/classes/class.ilECSParticipantSetting.php';
@@ -274,7 +275,7 @@ abstract class ilRemoteObjectBase extends ilObject2
         } else {
             $link = $this->getRemoteLink() . '?ecs_hash=' . $auth_hash . $ecs_user_data . '&' . $ecs_url_hash;
         }
-        $GLOBALS['DIC']['ilLog']->write(__METHOD__ . ': ECS full link: ' . $link);
+        $logger->debug('ECS full link: ' . $link);
         return $link;
     }
     

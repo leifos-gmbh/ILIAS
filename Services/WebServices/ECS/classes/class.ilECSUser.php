@@ -43,6 +43,8 @@ class ilECSUser
     public $institution;
     public $uid_hash;
 
+    protected $external_account = '';
+
     /**
      * Constructor
      * @param mixed ilObjUser or encoded json string
@@ -70,6 +72,11 @@ class ilECSUser
     public function getLogin()
     {
         return $this->login;
+    }
+
+    public function getExternalAccount() : string
+    {
+        return $this->external_account;
     }
     
     /**
@@ -141,7 +148,11 @@ class ilECSUser
         $this->lastname = $this->source->getLastname();
         $this->email = $this->source->getEmail();
         $this->institution = $this->source->getInstitution();
-        
+
+        if ($this->source instanceof ilObjUser) {
+            $this->external_account = (string) $this->source->getExternalAccount();
+        }
+
         $this->uid_hash = 'il_' . $ilSetting->get('inst_id', 0) . '_usr_' . $this->source->getId();
     }
     
@@ -203,9 +214,28 @@ class ilECSUser
      * @access public
      *
      */
-    public function toGET()
+    public function toGET(ilECSParticipantSetting $setting)
     {
-        return '&ecs_login=' . urlencode((string) $this->login) .
+        $login = '';
+        if (stristr($setting->getOutgoingUsernamePlaceholder(), ilECSParticipantSetting::LOGIN_PLACEHOLDER) !== false) {
+            $login = str_replace(
+                ilECSParticipantSetting::LOGIN_PLACEHOLDER,
+                $this->getLogin(),
+                $setting->getOutgoingUsernamePlaceholder()
+            );
+        }
+        if (
+            stristr($setting->getOutgoingUsernamePlaceholder(), ilECSParticipantSetting::EXTERNAL_ACCOUNT_PLACEHOLDER) !== false &&
+            strlen($this->getExternalAccount())
+        ) {
+            $login = str_replace(
+                ilECSParticipantSetting::EXTERNAL_ACCOUNT_PLACEHOLDER,
+                $this->getExternalAccount(),
+                $setting->getOutgoingUsernamePlaceholder()
+            );
+        }
+
+        return '&ecs_login=' . urlencode((string) $login) .
             '&ecs_firstname=' . urlencode((string) $this->firstname) .
             '&ecs_lastname=' . urlencode((string) $this->lastname) .
             '&ecs_email=' . urlencode((string) $this->email) .

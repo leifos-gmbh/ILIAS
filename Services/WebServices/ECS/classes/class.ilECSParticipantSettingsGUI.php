@@ -22,6 +22,7 @@ class ilECSParticipantSettingsGUI
     protected $lng;
     protected $ctrl;
     protected $tabs;
+    protected $global_settings;
     
 
     /**
@@ -37,7 +38,7 @@ class ilECSParticipantSettingsGUI
         $tpl = $DIC['tpl'];
         $ilCtrl = $DIC['ilCtrl'];
         $ilTabs = $DIC['ilTabs'];
-        
+
         $this->server_id = $a_server_id;
         $this->mid = $a_mid;
         
@@ -46,6 +47,7 @@ class ilECSParticipantSettingsGUI
         $this->lng->loadLanguageModule('ecs');
         $this->ctrl = $ilCtrl;
         $this->tabs = $ilTabs;
+        $this->global_settings = $DIC->settings();
 
         $this->initSettings();
         $this->initParticipant();
@@ -166,11 +168,24 @@ class ilECSParticipantSettingsGUI
             $this->getParticipant()->setExportTypes($form->getInput('export_types'));
             $this->getParticipant()->enableImport($form->getInput('import'));
             $this->getParticipant()->setImportTypes($form->getInput('import_types'));
+            $this->getParticipant()->setOutgoingUsernamePlaceholder($form->getInput('username_placeholder'));
             $this->getParticipant()->update();
-            
-            ilUtil::sendSuccess($this->getLang()->txt('settings_saved'), true);
-            $this->getCtrl()->redirect($this, 'settings');
-            return true;
+
+            // additional validation
+            $error_code = $this->getParticipant()->validate();
+            switch ($error_code) {
+                case ilECSParticipantSetting::ERR_MISSING_USERNAME_PLACEHOLDER:
+                    $form->getItemByPostVar('username_placeholder')->setAlert(
+                        $this->lng->txt('ecs_username_place_holder_err_mssing_placeholder')
+                    );
+                    break;
+                default:
+                    ilUtil::sendSuccess($this->getLang()->txt('settings_saved'), true);
+                    $this->getCtrl()->redirect($this, 'settings');
+                    return true;
+
+            }
+
         }
         $form->setValuesByPost();
         ilUtil::sendFailure($this->getLang()->txt('err_check_input'));
@@ -205,7 +220,17 @@ class ilECSParticipantSettingsGUI
         $export->setValue(1);
         $export->setChecked($this->getParticipant()->isExportEnabled());
         $form->addItem($export);
-        
+
+        // export user credentials
+        $username_placeholder = new ilTextInputGUI(
+            $this->getLang()->txt('ecs_outgoing_user_credentials'),
+            'username_placeholder'
+        );
+        $username_placeholder->setRequired(true);
+        $username_placeholder->setValue($this->getParticipant()->getOutgoingUsernamePlaceholder());
+        $username_placeholder->setInfo($this->lng->txt('ecs_outgoing_user_credentials_info'));
+        $export->addSubItem($username_placeholder);
+
         // Export types
         $obj_types = new ilCheckboxGroupInputGUI($this->getLang()->txt('ecs_export_types'), 'export_types');
         $obj_types->setValue($this->getParticipant()->getExportTypes());
@@ -223,8 +248,18 @@ class ilECSParticipantSettingsGUI
         $import->setValue(1);
         $import->setChecked($this->getParticipant()->isImportEnabled());
         $form->addItem($import);
-        
-        // Export types
+
+        $user_auth_mode = new ilSelectInputGUI(
+            $this->getLang()->txt('ecs_incoming_auth_mode'),
+            'incoming_auth_mode'
+        );
+        $user_auth_mode->setRequired(true);
+        $user_auth_mode->setOptions($this->parseAvailableAuthModes());
+        $user_auth_mode->setValue($this->getParticipant()->getIncomingAuthMode());
+        $user_auth_mode->setInfo($this->getLang()->txt('ecs_incoming_auth_mode_info'));
+        $import->addSubItem($user_auth_mode);
+
+        // import types
         $imp_types = new ilCheckboxGroupInputGUI($this->getLang()->txt('ecs_import_types'), 'import_types');
         $imp_types->setValue($this->getParticipant()->getImportTypes());
         
@@ -238,6 +273,23 @@ class ilECSParticipantSettingsGUI
         $form->addCommandButton('saveSettings', $this->getLang()->txt('save'));
         $form->addCommandButton('abort', $this->getLang()->txt('cancel'));
         return $form;
+    }
+
+    protected function parseAvailableAuthModes() : array
+    {
+        $options = [];
+        $options[ilECSParticipantSetting::DEFAULT_INCOMING_AUTH_MODE] = $this->getLang()->txt('ecs_incoming_auth_local');
+
+        if ($this->global_settings->get('shib_active', '0')) {
+            $options['shibboleth'] = $this->getLang()->txt('auth_shib');
+        }
+
+        foreach (ilLDAPServer::getServerIds() as $server_id)
+        {
+            $server = ilLDAPServer::getInstanceByServerId($server_id);
+            $options['ldap_' . $server->getServerId()] = $server->getName();
+        }
+        return $options;
     }
 
     

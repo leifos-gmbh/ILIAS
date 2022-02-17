@@ -39,6 +39,15 @@ class ilECSParticipantSetting
     const PERSON_LOGIN = 3;
     const PERSON_UID = 4;
 
+    public const LOGIN_PLACEHOLDER = '[LOGIN]';
+    public const EXTERNAL_ACCOUNT_PLACEHOLDER = '[EXTERNAL_ACCOUNT]';
+
+    public const DEFAULT_INCOMING_AUTH_MODE = 'local';
+
+    public const VALIDATION_OK = 0;
+    public const ERR_MISSING_USERNAME_PLACEHOLDER = 1;
+
+
     protected static $instances = array();
 
 
@@ -64,6 +73,8 @@ class ilECSParticipantSetting
 
     private $export_types = array();
     private $import_types = array();
+    private $username_placeholder = '[LOGIN]';
+    private $incoming_auth_mode = self::DEFAULT_INCOMING_AUTH_MODE;
 
     private $exists = false;
 
@@ -186,6 +197,26 @@ class ilECSParticipantSetting
     {
         return $this->export_types;
     }
+
+    public function getOutgoingUsernamePlaceholder() : string
+    {
+        return $this->username_placeholder;
+    }
+
+    public function setOutgoingUsernamePlaceholder(string $a_username_placeholder)
+    {
+        $this->username_placeholder = $a_username_placeholder;
+    }
+
+    public function setIncomingAuthMode(string $a_auth_mode) : void
+    {
+        $this->incoming_auth_mode = $a_auth_mode;
+    }
+
+    public function getIncomingAuthMode() : string
+    {
+        return $this->incoming_auth_mode;
+    }
     
     public function setImportTypes($a_types)
     {
@@ -210,6 +241,17 @@ class ilECSParticipantSetting
     private function exists()
     {
         return $this->exists;
+    }
+
+    public function validate() : int
+    {
+        if (
+            stristr($this->getOutgoingUsernamePlaceholder(), self::LOGIN_PLACEHOLDER) === false &&
+            stristr($this->getOutgoingUsernamePlaceholder(), self::EXTERNAL_ACCOUNT_PLACEHOLDER) === false
+        ) {
+            return self::ERR_MISSING_USERNAME_PLACEHOLDER;
+        }
+        return self::VALIDATION_OK;
     }
     
     /**
@@ -237,7 +279,9 @@ class ilECSParticipantSetting
             'token = ' . $ilDB->quote($this->isTokenEnabled(), 'integer') . ', ' .
             'dtoken = ' . $ilDB->quote($this->isDeprecatedTokenEnabled(), 'integer') . ', ' .
             'export_types = ' . $ilDB->quote(serialize($this->getExportTypes()), 'text') . ', ' .
-            'import_types = ' . $ilDB->quote(serialize($this->getImportTypes()), 'text') . ' ' .
+            'import_types = ' . $ilDB->quote(serialize($this->getImportTypes()), 'text') . ', ' .
+            'username_placeholder = ' . $ilDB->quote($this->getOutgoingUsernamePlaceholder(), ilDBConstants::T_TEXT) . ', ' .
+            'user_auth_mode = ' . $ilDB->quote($this->getIncomingAuthMode(), ilDBConstants::T_TEXT) . ' ' .
             'WHERE sid = ' . $ilDB->quote((int) $this->getServerId(), 'integer') . ' ' .
             'AND mid  = ' . $ilDB->quote((int) $this->getMid(), 'integer');
         $aff = $ilDB->manipulate($query);
@@ -251,7 +295,7 @@ class ilECSParticipantSetting
         $ilDB = $DIC['ilDB'];
 
         $query = 'INSERT INTO ecs_part_settings ' .
-            '(sid,mid,export,import,import_type,title,cname,token,dtoken,export_types, import_types) ' .
+            '(sid,mid,export,import,import_type,title,cname,token,dtoken,export_types, import_types, username_placeholder, user_auth_mode) ' .
             'VALUES( ' .
             $ilDB->quote($this->getServerId(), 'integer') . ', ' .
             $ilDB->quote($this->getMid(), 'integer') . ', ' .
@@ -263,7 +307,9 @@ class ilECSParticipantSetting
             $ilDB->quote($this->isTokenEnabled(), 'integer') . ', ' .
             $ilDB->quote($this->isDeprecatedTokenEnabled(), 'integer') . ', ' .
             $ilDB->quote(serialize($this->getExportTypes()), 'text') . ', ' .
-            $ilDB->quote(serialize($this->getImportTypes()), 'text') . ' ' .
+            $ilDB->quote(serialize($this->getImportTypes()), 'text') . ', ' .
+            $ilDB->quote($this->getOutgoingUsernamePlaceholder(), ilDBConstants::T_TEXT) . ', ' .
+            $ilDB->quote($this->getIncomingAuthMode(), ilDBConstants::T_TEXT) . ' ' .
             ')';
         $aff = $ilDB->manipulate($query);
         return true;
@@ -316,6 +362,8 @@ class ilECSParticipantSetting
             
             $this->setExportTypes((array) unserialize($row->export_types));
             $this->setImportTypes((array) unserialize($row->import_types));
+            $this->setOutgoingUsernamePlaceholder((string) $row->username_placeholder);
+            $this->setIncomingAuthMode((string) $row->user_auth_mode);
         }
         return true;
     }

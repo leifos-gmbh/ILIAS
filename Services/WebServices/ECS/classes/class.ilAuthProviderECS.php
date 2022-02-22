@@ -18,6 +18,8 @@ class ilAuthProviderECS extends ilAuthProvider implements ilAuthProviderInterfac
 
     protected $currentServer = null;
     protected $servers = null;
+
+    protected $lng;
     
     
     /**
@@ -26,8 +28,10 @@ class ilAuthProviderECS extends ilAuthProvider implements ilAuthProviderInterfac
      */
     public function __construct(\ilAuthCredentials $credentials)
     {
-        parent::__construct($credentials);
+        global $DIC;
 
+        parent::__construct($credentials);
+        $this->lng = $DIC->language();
         $this->initECSServices();
     }
     
@@ -105,18 +109,76 @@ class ilAuthProviderECS extends ilAuthProvider implements ilAuthProviderInterfac
         foreach ($this->getServerSettings()->getServers() as $server) {
             $this->setCurrentServer($server);
             if ($this->validateHash()) {
-                // handle successful authentication
-                $new_usr_id = $this->handleLogin();
-                $this->getLogger()->info('ECS authentication successful.');
-                $status->setStatus(ilAuthStatus::STATUS_AUTHENTICATED);
-                $status->setAuthenticatedUserId($new_usr_id);
-                return true;
+                return $this->handleLoginByAuthMode($status);
+
             }
         }
-
         $this->getLogger()->warning('Could not validate ecs hash for any active server.');
         $this->handleAuthenticationFail($status, 'err_wrong_login');
         return false;
+    }
+
+    /**
+     * Redirects to shibboleth login; to standard login page for LDAP based authentication or authenticates/creates
+     * a local account
+     */
+    protected function handleLoginByAuthMode(ilAuthStatus $status) : int
+    {
+        global $DIC;
+
+        $auth_session = $DIC['ilAuthSession'];
+
+        $part_settings = new ilECSParticipantSetting(
+            $this->getCurrentServer()->getServerId(),
+            $this->getMID()
+        );
+        if ($part_settings->getIncomingAuthMode() === 'local') {
+            // handle successful authentication
+            $new_usr_id = $this->handleLogin();
+            $this->getLogger()->info('ECS authentication successful.');
+            $status->setStatus(ilAuthStatus::STATUS_AUTHENTICATED);
+            $status->setAuthenticatedUserId($new_usr_id);
+            return true;
+        }
+        if ($this->resumeCurrentSession()) {
+            $this->getLogger()->debug('Continuing current user session');
+            $status->setStatus(ilAuthStatus::STATUS_AUTHENTICATED);
+            $status->setAuthenticatedUserId($DIC['ilAuthSession']->getUserId());
+            return true;
+        }
+        if (substr($part_settings->getIncomingAuthMode(),0,4) === 'ldap') {
+            $this->getLogger()->info('LDAP authentication required.');
+            ilSession::set('info', 'Meine LDAP Nachricht');
+            $DIC->ctrl()->redirectToURL('login.php?target=' . $_GET['target']);
+            return false;
+        }
+        if ($part_settings->getIncomingAuthMode() == 'shibboleth') {
+            $this->getLogger()->info('Redirect to login page for shibboleth authentication');
+            $DIC->ctrl()->redirectToURL('shib_login.php?target=' . $_GET['target']);
+        }
+    }
+
+    protected function resumeCurrentSession()
+    {
+        global $DIC;
+
+        $auth_session = $DIC['ilAuthSession'];
+        $session_user_id = $auth_session->getUserId();
+        if (!$session_user_id || $session_user_id == ANONYMOUS_USER_ID) {
+            $this->getLogger()->debug('No valid session found');
+            return false;
+        }
+        $session_ext_account = ilObjUser::_lookupExternalAccount($session_user_id);
+        $user = new ilECSUser($_GET);
+        $this->getLogger()->debug('ECS user name: ' . $user->getLogin());
+        $this->getLogger()->debug('Session external account: ' . $session_ext_account);
+        if (!$session_ext_account || strcmp($user->getLogin(), $session_ext_account) !== 0) {
+            $this->getLogger()->debug('No matching session found. Terminating current user session.');
+            $auth_session->logout();
+            $auth_session->setUserId(0);
+            return false;
+        }
+        return true;
     }
     
     

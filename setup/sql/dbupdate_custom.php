@@ -28,3 +28,25 @@ if (!$ilDB->tableColumnExists('ecs_part_settings', 'user_auth_mode')) {
     );
 }
 ?>
+<#3>
+<?php
+if (!$ilDB->tableExists('ecs_user_consent')) {
+    $ilDB->createTable('ecs_user_consent', [
+        'usr_id' => [
+            'type' => ilDBConstants::T_INTEGER,
+            'length' => 4,
+            'notnull' => true
+        ],
+        'mid' => [
+            'type' => ilDBConstants::T_INTEGER,
+            'length' => 4,
+            'notnull' => true,
+        ]
+    ]);
+    $ilDB->addPrimaryKey('ecs_user_consent', ['usr_id', 'mid']);
+}
+?>
+<#4>
+<?php
+//
+?>

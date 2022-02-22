@@ -48,9 +48,20 @@ abstract class ilRemoteObjectBaseGUI extends ilObject2GUI
                 $this->ctrl->forwardCommand($gui);
                 break;
 
+            case strtolower(ilECSUserConsentModalGUI::class):
+                $consent_gui = new ilECSUserConsentModalGUI(
+                    $this->user->getId(),
+                    $this->ref_id,
+                    $this->object->getMID(),
+                    $this->object
+                );
+                $this->ctrl->setReturn($this, 'call');
+                $this->ctrl->forwardCommand($consent_gui);
+                break;
+
             default:
                 if (!$cmd || $cmd == 'view') {
-                    $cmd = "editSettings";
+                    $cmd = "infoScreen";
                 }
                 $cmd .= "Object";
                 $this->$cmd();
@@ -156,7 +167,11 @@ abstract class ilRemoteObjectBaseGUI extends ilObject2GUI
         $ilErr = $DIC['ilErr'];
         $ilUser = $DIC['ilUser'];
         $ilTabs = $DIC['ilTabs'];
-        
+
+        $toolbar = $DIC->toolbar();
+        $this->ctrl->setReturn($this,'call');
+        $consent_gui = new ilECSUserConsentModalGUI($DIC->user()->getId(), $this->ref_id, $this->object->getMID(), $this->object, $this);
+        $consent_gui->addLinkToToolbar($toolbar);
         if (!$this->checkPermissionBool('visible')) {
             $ilErr->raiseError($this->lng->txt('msg_no_perm_read'), $ilErr->MESSAGE);
         }
@@ -165,22 +180,6 @@ abstract class ilRemoteObjectBaseGUI extends ilObject2GUI
 
         include_once("./Services/InfoScreen/classes/class.ilInfoScreenGUI.php");
         $info = new ilInfoScreenGUI($this);
-    
-        if ($ilUser->getId() == ANONYMOUS_USER_ID ||
-            $this->object->isLocalObject()) {
-            $info->addButton(
-                $this->lng->txt($this->getType() . '_call'),
-                $this->object->getRemoteLink(),
-                'target="_blank"'
-            );
-        } else {
-            $info->addButton(
-                $this->lng->txt($this->getType() . '_call'),
-                $this->ctrl->getLinkTarget($this, 'call'),
-                'target="_blank"'
-            );
-        }
-        
         $info->addSection($this->lng->txt('ecs_general_info'));
         $info->addProperty($this->lng->txt('title'), $this->object->getTitle());
         if (strlen($this->object->getOrganization())) {
@@ -192,7 +191,7 @@ abstract class ilRemoteObjectBaseGUI extends ilObject2GUI
         if (strlen($loc = $this->object->getLocalInformation())) {
             $info->addProperty($this->lng->txt('ecs_local_information'), $this->object->getLocalInformation());
         }
-        
+
         $this->addCustomInfoFields($info);
                 
         include_once('Services/AdvancedMetaData/classes/class.ilAdvancedMDRecordGUI.php');
@@ -206,7 +205,7 @@ abstract class ilRemoteObjectBaseGUI extends ilObject2GUI
         
         $this->ctrl->forwardCommand($info);
     }
-    
+
     /**
      * Add custom fields to info screen
      *

@@ -169,6 +169,7 @@ class ilECSParticipantSettingsGUI
             $this->getParticipant()->enableImport($form->getInput('import'));
             $this->getParticipant()->setImportTypes($form->getInput('import_types'));
             $this->getParticipant()->setOutgoingUsernamePlaceholder($form->getInput('username_placeholder'));
+            $this->getParticipant()->setIncomingAuthMode($form->getInput('incoming_auth_mode'));
             $this->getParticipant()->update();
 
             // additional validation

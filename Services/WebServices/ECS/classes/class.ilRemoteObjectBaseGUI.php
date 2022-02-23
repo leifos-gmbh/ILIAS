@@ -51,9 +51,7 @@ abstract class ilRemoteObjectBaseGUI extends ilObject2GUI
             case strtolower(ilECSUserConsentModalGUI::class):
                 $consent_gui = new ilECSUserConsentModalGUI(
                     $this->user->getId(),
-                    $this->ref_id,
-                    $this->object->getMID(),
-                    $this->object
+                    $this->ref_id
                 );
                 $this->ctrl->setReturn($this, 'call');
                 $this->ctrl->forwardCommand($consent_gui);
@@ -170,7 +168,7 @@ abstract class ilRemoteObjectBaseGUI extends ilObject2GUI
 
         $toolbar = $DIC->toolbar();
         $this->ctrl->setReturn($this,'call');
-        $consent_gui = new ilECSUserConsentModalGUI($DIC->user()->getId(), $this->ref_id, $this->object->getMID(), $this->object, $this);
+        $consent_gui = new ilECSUserConsentModalGUI($DIC->user()->getId(), $this->ref_id, $this);
         $consent_gui->addLinkToToolbar($toolbar);
         if (!$this->checkPermissionBool('visible')) {
             $ilErr->raiseError($this->lng->txt('msg_no_perm_read'), $ilErr->MESSAGE);

@@ -31,7 +31,7 @@ include_once "Services/Object/classes/class.ilObjectListGUI.php";
 *
 * @ingroup ModulesRemoteWiki
 */
-class ilObjRemoteWikiListGUI extends ilObjectListGUI
+class ilObjRemoteWikiListGUI extends ilRemoteObjectBaseListGUI
 {
     /**
      * Constructor

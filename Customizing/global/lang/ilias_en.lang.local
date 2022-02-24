@@ -1,0 +1,17 @@
+<!-- language file start -->
+ecs#:#ecs_outgoing_user_credentials#:#User Credentials
+ecs#:#ecs_outgoing_user_credentials_info#:#User Credentials for outgoing users.<br />Available wildcards: [LOGIN] or [EXTERNAL_ACCOUNT]<br />You can add prefixes or suffixes to the wildcard by appending them as text: [LOGIN]@myuni.whatever
+ecs#:#ecs_username_place_holder_err_mssing_placeholder#:#One of the placeholders "[LOGIN]" or "[EXTERNAL_ACCOUNT]" is mandatory.
+ecs#:#ecs_incoming_auth_local#:#Create Local ECS User Account
+ecs#:#ecs_incoming_auth_mode#:#Authentication Mode
+ecs#:#ecs_incoming_auth_mode_info#:#Please choose the authentication mode for incoming ECS user accounts.
+ecs#:#ecs_consent_modal_title#:#Notification about Transfer of User Data via ECS
+ecs#:#ecs_consent_required#:#Um auf den externen Inhalt zuzugreifen, ist es erforderlich, der Übermittlung Ihrer persönlichen Daten zuzustimmen.
+ecs#:#ecs_form_consent#:#Consent
+ecs#:#ecs_form_consent_option_title#:#I agree, that with proceeding, the following items of my user data will be tranferred and stored an the above stated platform:
+ecs#:#ecs_form_target_platform#:#Target Platform
+ecs#:#ecs_login#:#Login
+ecs#:#ecs_firstname#:#Vorname
+ecs#:#ecs_lastname#:#Nachname
+ecs#:#ecs_email#:#E-Mail
+ecs#:#ecs_institution#:#Institution

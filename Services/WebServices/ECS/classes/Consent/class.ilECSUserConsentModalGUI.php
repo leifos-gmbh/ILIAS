@@ -102,19 +102,6 @@ class ilECSUserConsentModalGUI
         return $this->consents->hasConsented($this->mid);
     }
 
-    public function executeCommand()
-    {
-        $cmd = $this->ctrl->getCmd(self::CMD_RENDER_MODAL);
-        //$cmd(); // no idea why this fails
-        switch ($cmd) {
-            case self::CMD_RENDER_MODAL:
-                $this->renderConsentModal();
-                break;
-            case self::CMD_SAVE_CONSENT:
-                $this->saveConsent();
-                break;
-        }
-    }
 
     protected function initMid() : void
     {
@@ -144,7 +131,7 @@ class ilECSUserConsentModalGUI
         if (
             $this->usr_id === ANONYMOUS_USER_ID ||
             $this->isLocalObject() ||
-            $this->consents->hasConsented($this->mid)
+            $this->hasConsented()
         ) {
             return '';
         }
@@ -160,7 +147,7 @@ class ilECSUserConsentModalGUI
         ) {
             return;
         }
-        if ($this->consents->hasConsented(1)) {
+        if ($this->hasConsented()) {
             $this->addRemoteLinkToToolbar($toolbar);
 
         } else {
@@ -223,17 +210,22 @@ class ilECSUserConsentModalGUI
 
         $submitted = (string) ($this->request->getParsedBody()['cmd'] ?? '');
         $valid = true;
+        $error_html = '';
         if (strcmp($submitted, 'submit') === 0) {
             if (!$this->saveConsent($form)) {
                 $form->setValuesByPost();
-                $form->getItemByPostVar('consent')->setAlert($this->lng->txt('ecs_consent_required'));
+                $error = $this->ui_factory->messageBox()->failure($this->lng->txt('ecs_consent_required'));
+                $error_html = $this->ui_renderer->render([$error]);
                 $valid = false;
             }
         }
 
         $modal = $this->ui_factory->modal()->roundtrip(
             $this->lng->txt('ecs_consent_modal_title'),
-            $this->ui_factory->legacy($form->getHTML())
+            $this->ui_factory->legacy(
+                $error_html .
+                $form->getHTML()
+            )
         )->withActionButtons([$agree]);
         if (!$valid) {
             $modal = $modal->withOnLoad($modal->getShowSignal());
@@ -275,9 +267,7 @@ class ilECSUserConsentModalGUI
     protected function initConsentForm()
     {
         $form = new ilPropertyFormGUI();
-        $form->setTableWidth('100%');
         $form->setId(uniqid('form'));
-        $form->setTarget('_top');
         $form->setFormAction('#');
 
         $title = new ilNonEditableValueGUI(

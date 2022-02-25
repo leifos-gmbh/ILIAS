@@ -7,6 +7,7 @@ use ILIAS\GlobalScreen\Scope\MainMenu\Collector\Handler\TypeHandler;
 use ILIAS\GlobalScreen\Scope\MainMenu\Factory\isItem;
 use ILIAS\GlobalScreen\Scope\MainMenu\Factory\isParent;
 use ILIAS\GlobalScreen\Scope\MainMenu\Factory\Item\Lost;
+use ILIAS\GlobalScreen\Scope\MainMenu\Factory\TopItem\TopLinkItem;
 use ILIAS\GlobalScreen\Scope\MainMenu\Factory\TopItem\TopParentItem;
 use ILIAS\MainMenu\Provider\CustomMainBarProvider;
 
@@ -49,11 +50,6 @@ class ilMMItemRepository
 
         foreach ($this->main_collector->getRawItems() as $top_item) {
             ilMMItemStorage::register($top_item);
-            if ($top_item instanceof isParent) {
-                foreach ($top_item->getChildren() as $child) {
-                    ilMMItemStorage::register($child);
-                }
-            }
         }
     }
 
@@ -69,6 +65,16 @@ class ilMMItemRepository
     public function getSingleItem(IdentificationInterface $identification) : isItem
     {
         return $this->main_collector->getSingleItemFromRaw($identification);
+    }
+
+    public function getSingleItemFromFilter(IdentificationInterface $identification) : isItem
+    {
+        return $this->main_collector->getSingleItemFromFilter($identification);
+    }
+
+    public function resolveIdentificationFromString(string $identification_string) : IdentificationInterface
+    {
+        return $this->services->identification()->fromSerializedIdentification($identification_string);
     }
 
     /**
@@ -94,8 +100,8 @@ class ilMMItemRepository
     public function getSubItemsForTable() : array
     {
         $r      = $this->db->query(
-            "SELECT sub_items.*, top_items.position AS parent_position 
-FROM il_mm_items AS sub_items 
+            "SELECT sub_items.*, top_items.position AS parent_position
+FROM il_mm_items AS sub_items
 LEFT JOIN il_mm_items AS top_items ON top_items.identification = sub_items.parent_identification
 WHERE sub_items.parent_identification != '' ORDER BY top_items.position, parent_identification, sub_items.position ASC"
         );
@@ -200,6 +206,9 @@ WHERE sub_items.parent_identification != '' ORDER BY top_items.position, parent_
                 continue;
             }
             if ($information->isChild()) {
+                if ($information->getType() === TopLinkItem::class) { // since these two types are identical (more or less), we truncate one
+                    continue;
+                }
                 $types[$information->getType()] = $information;
             }
         }

@@ -15,3 +15,4 @@ ecs#:#ecs_firstname#:#Vorname
 ecs#:#ecs_lastname#:#Nachname
 ecs#:#ecs_email#:#E-Mail
 ecs#:#ecs_institution#:#Institution
+ecs#:#ecs_login_success_ldap#:#Successfully approved the ecs release, please login with your credentials to verify your identity.

@@ -32,6 +32,7 @@ class ilAuthProviderECS extends ilAuthProvider implements ilAuthProviderInterfac
 
         parent::__construct($credentials);
         $this->lng = $DIC->language();
+        $this->lng->loadLanguageModule('ecs');
         $this->initECSServices();
     }
     
@@ -132,7 +133,7 @@ class ilAuthProviderECS extends ilAuthProvider implements ilAuthProviderInterfac
             $this->getCurrentServer()->getServerId(),
             $this->getMID()
         );
-        if ($part_settings->getIncomingAuthMode() === 'local') {
+        if ($part_settings->getIncomingAuthMode() === ilECSParticipantSetting::AUTH_MODE_LOCAL) {
             // handle successful authentication
             $new_usr_id = $this->handleLogin();
             $this->getLogger()->info('ECS authentication successful.');
@@ -146,9 +147,10 @@ class ilAuthProviderECS extends ilAuthProvider implements ilAuthProviderInterfac
             $status->setAuthenticatedUserId($DIC['ilAuthSession']->getUserId());
             return true;
         }
-        if (substr($part_settings->getIncomingAuthMode(),0,4) === 'ldap') {
+        if (substr($part_settings->getIncomingAuthMode(),0,4) === ilECSParticipantSetting::AUTH_MODE_LDAP) {
             $this->getLogger()->info('LDAP authentication required.');
-            ilSession::set('info', 'Meine LDAP Nachricht');
+            ilSession::set('success', $this->lng->txt('ecs_login_success_ldap'));
+            $this->getLogger()->log($this->lng->txt('ecs_login_success_ldap'));
             $DIC->ctrl()->redirectToURL('login.php?target=' . $_GET['target']);
             return false;
         }
@@ -166,6 +168,8 @@ class ilAuthProviderECS extends ilAuthProvider implements ilAuthProviderInterfac
         $session_user_id = $auth_session->getUserId();
         if (!$session_user_id || $session_user_id == ANONYMOUS_USER_ID) {
             $this->getLogger()->debug('No valid session found');
+            $auth_session->setAuthenticated(false, ANONYMOUS_USER_ID);
+            //$auth_session->setExpired(true);
             return false;
         }
         $session_ext_account = ilObjUser::_lookupExternalAccount($session_user_id);
@@ -174,8 +178,9 @@ class ilAuthProviderECS extends ilAuthProvider implements ilAuthProviderInterfac
         $this->getLogger()->debug('Session external account: ' . $session_ext_account);
         if (!$session_ext_account || strcmp($user->getLogin(), $session_ext_account) !== 0) {
             $this->getLogger()->debug('No matching session found. Terminating current user session.');
-            $auth_session->logout();
-            $auth_session->setUserId(0);
+            $auth_session->setUserId(ANONYMOUS_USER_ID);
+            $auth_session->setAuthenticated(false, ANONYMOUS_USER_ID);
+            //$auth_session->setExpired(true);
             return false;
         }
         return true;

@@ -42,7 +42,9 @@ class ilECSParticipantSetting
     public const LOGIN_PLACEHOLDER = '[LOGIN]';
     public const EXTERNAL_ACCOUNT_PLACEHOLDER = '[EXTERNAL_ACCOUNT]';
 
-    public const DEFAULT_INCOMING_AUTH_MODE = 'local';
+    public const DEFAULT_INCOMING_AUTH_MODE = self::AUTH_MODE_LOCAL;
+    public const AUTH_MODE_LOCAL = 'local';
+    public const AUTH_MODE_LDAP = 'ldap';
 
     public const VALIDATION_OK = 0;
     public const ERR_MISSING_USERNAME_PLACEHOLDER = 1;

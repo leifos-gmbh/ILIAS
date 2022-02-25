@@ -150,12 +150,13 @@ class ilAuthProviderECS extends ilAuthProvider implements ilAuthProviderInterfac
         if (substr($part_settings->getIncomingAuthMode(),0,4) === ilECSParticipantSetting::AUTH_MODE_LDAP) {
             $this->getLogger()->info('LDAP authentication required.');
             ilSession::set('success', $this->lng->txt('ecs_login_success_ldap'));
-            $this->getLogger()->log($this->lng->txt('ecs_login_success_ldap'));
+            $this->initRemoteUser();
             $DIC->ctrl()->redirectToURL('login.php?target=' . $_GET['target']);
             return false;
         }
         if ($part_settings->getIncomingAuthMode() == 'shibboleth') {
             $this->getLogger()->info('Redirect to login page for shibboleth authentication');
+            $this->initRemoteUser();
             $DIC->ctrl()->redirectToURL('shib_login.php?target=' . $_GET['target']);
         }
     }
@@ -164,12 +165,13 @@ class ilAuthProviderECS extends ilAuthProvider implements ilAuthProviderInterfac
     {
         global $DIC;
 
+        $admin = $DIC->rbac()->admin();
+
         $auth_session = $DIC['ilAuthSession'];
         $session_user_id = $auth_session->getUserId();
         if (!$session_user_id || $session_user_id == ANONYMOUS_USER_ID) {
             $this->getLogger()->debug('No valid session found');
             $auth_session->setAuthenticated(false, ANONYMOUS_USER_ID);
-            //$auth_session->setExpired(true);
             return false;
         }
         $session_ext_account = ilObjUser::_lookupExternalAccount($session_user_id);
@@ -178,10 +180,11 @@ class ilAuthProviderECS extends ilAuthProvider implements ilAuthProviderInterfac
         $this->getLogger()->debug('Session external account: ' . $session_ext_account);
         if (!$session_ext_account || strcmp($user->getLogin(), $session_ext_account) !== 0) {
             $this->getLogger()->debug('No matching session found. Terminating current user session.');
-            $auth_session->setUserId(ANONYMOUS_USER_ID);
             $auth_session->setAuthenticated(false, ANONYMOUS_USER_ID);
-            //$auth_session->setExpired(true);
             return false;
+        } else {
+            // assign to ECS global role
+            $admin->assignUser($this->getCurrentServer()->getGlobalRole(), $auth_session->getUserId());
         }
         return true;
     }
@@ -223,6 +226,16 @@ class ilAuthProviderECS extends ilAuthProvider implements ilAuthProviderInterfac
             $remote->create();
         }
         return ilObjUser::_lookupId($username);
+    }
+
+    public function initRemoteUser() : void
+    {
+        $user = new ilECSUser($_GET);
+        $remote = new ilECSRemoteUser();
+        $remote->setServerId($this->getCurrentServer()->getServerId());
+        $remote->setMid($this->getMID());
+        $remote->setRemoteUserId($user->getLogin());
+        $remote->create();
     }
     
     

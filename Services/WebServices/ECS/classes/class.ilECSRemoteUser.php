@@ -42,6 +42,26 @@ class ilECSRemoteUser
         }
         return null;
     }
+
+    /**
+     * @param string $a_ext_account
+     * @return ilECSRemoteUser[]
+     */
+    public static function lookupUsersByExternalAccount(string $a_ext_account) : array
+    {
+        global $DIC;
+
+        $db = $DIC->database();
+        $query = 'select eru_id from ecs_remote_user ' .
+            'where remote_usr_id = ' . $db->quote($a_ext_account, ilDBConstants::T_TEXT);
+        $res = $db->query($query);
+
+        $users = [];
+        while ($row = $res->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
+            $users[] = new ilECSRemoteUser((int) $row->eru_id);
+        }
+        return $users;
+    }
     
     /**
      * Check if entry exists for user
@@ -162,5 +182,16 @@ class ilECSRemoteUser
             $this->setUserId($row->usr_id);
             $this->setRemoteUserId($row->remote_usr_id);
         }
+    }
+
+    public function delete()
+    {
+        global $DIC;
+
+        $db = $DIC->database();
+
+        $query = 'delete from ecs_remote_user ' .
+            'where eru_id = ' . $db->quote($this->getId(), ilDBConstants::T_INTEGER);
+        $db->manipulate($query);
     }
 }

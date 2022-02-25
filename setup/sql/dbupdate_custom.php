@@ -50,3 +50,7 @@ if (!$ilDB->tableExists('ecs_user_consent')) {
 <?php
 //
 ?>
+<#5>
+<?php
+//
+?>

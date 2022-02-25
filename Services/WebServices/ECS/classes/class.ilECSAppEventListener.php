@@ -52,11 +52,20 @@ class ilECSAppEventListener implements ilAppEventListener
         $log->debug('Listening to event from: ' . $a_component . ' ' . $a_event);
         
         switch ($a_component) {
+
+            case 'Services/Authentication':
+                switch ($a_event) {
+                    case 'afterLogin':
+                        self::handleNewAccountCreation((string) $a_parameter['username']);
+                        break;
+                }
+
             case 'Services/User':
                 switch ($a_event) {
                     case 'afterCreate':
                         $user = $a_parameter['user_obj'];
                         self::handleMembership($user);
+                        self::handleNewAccountCreation($user);
                         break;
                 }
                 break;
@@ -224,6 +233,57 @@ class ilECSAppEventListener implements ilAppEventListener
         $import->save();
         
         return true;
+    }
+
+    protected static function handleNewAccountCreation(string $username)
+    {
+        global $DIC;
+
+        $logger = $DIC->logger()->wsrv();
+        $admin = $DIC->rbac()->admin();
+
+        $logger->debug('Handling login evvent.');
+
+        $user_id = ilObjUser::_loginExists($username);
+        if (!$user_id) {
+            $logger->warning('Invalid username given: ' . $username);
+        }
+        $user = ilObjectFactory::getInstanceByObjId($user_id);
+        if (!$user instanceof ilObjUser) {
+            $logger->warning('Invalid username given: ' . $username);
+        }
+
+        $users = ilECSRemoteUser::lookupUsersByExternalAccount($user->getExternalAccount());
+        $logger->dump($users);
+        foreach ($users as $remote) {
+            if (!$remote->getServerId()) {
+                $logger->warning('Found remote user without server id: ' . $user->getExternalAccount());
+                continue;
+            }
+            if (!$remote->getMid()) {
+                $logger->warning('Found remote user without mid id: ' . $user->getExternalAccount());
+                continue;
+            }
+            $part = ilECSParticipantSetting::getInstance((int) $remote->getServerId(), (int) $remote->getMid());
+            if (!$part instanceof ilECSParticipantSetting) {
+                $logger->warning('No valid ecs participant for server_id: ' .
+                    $remote->getServerId() . ' mid: ' . $remote->getMid()
+                );
+                continue;
+            }
+
+            $server = ilECSSetting::getInstanceByServerId($remote->getServerId());
+            if (!$server instanceof ilECSSetting) {
+                $logger->warning('No valid ecs server for server_id: ' . $remote->getServerId());
+                continue;
+            }
+            if (strcmp($part->getIncomingAuthMode(), $user->getAuthMode()) === 0) {
+                $logger->info('Assigning ' . $user->getExternalAccount() . ' to global ecs role');
+                $admin->assignUser($server->getGlobalRole(), $user->getId());
+                $remote->delete();
+            }
+
+        }
     }
     
     /**

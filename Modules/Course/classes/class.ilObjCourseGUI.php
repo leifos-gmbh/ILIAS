@@ -1729,11 +1729,13 @@ class ilObjCourseGUI extends ilContainerGUI
      */
     public function showPossibleSubObjects()
     {
-        if ($this->object->getViewMode() == ilContainer::VIEW_OBJECTIVE
-            && !$this->isActiveAdministrationPanel()) {
-            return false;
+        if (
+            $this->object->getViewMode() == ilContainer::VIEW_OBJECTIVE &&
+            !$this->isActiveAdministrationPanel()) {
+            return;
         }
-        parent::showPossibleSubObjects();
+        $gui = new ilObjectAddNewItemGUI($this->object->getRefId());
+        $gui->render();
     }
 
 
@@ -2488,6 +2490,7 @@ class ilObjCourseGUI extends ilContainerGUI
                 if ($ret != "") {
                     $this->tpl->setContent($ret);
                 }
+                $header_action = false;
                 break;
                 
             case "ilcontainerstartobjectspagegui":

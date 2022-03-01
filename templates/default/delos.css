@@ -7009,6 +7009,10 @@ button.close {
 .panel-secondary .panel-heading.ilHeader {
   padding: 6px 12px;
 }
+.panel-secondary .panel-heading.ilHeader h4 {
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
 .panel-secondary .panel-heading.ilHeader h2.ilHeader {
   font-size: 17px;
 }
@@ -7219,7 +7223,7 @@ button.close {
 }
 .il-upload-file-item.standard {
   background: white;
-  border: 1px solid #A8A8A8;
+  border: 1px solid #757575;
   -moz-border-radius: 0px;
   -webkit-border-radius: 0px;
   border-radius: 0px;
@@ -7243,7 +7247,7 @@ button.close {
 }
 .il-dropzone.standard {
   background: white;
-  border: 1px dashed #A8A8A8;
+  border: 1px dashed #757575;
   -moz-border-radius: 0px;
   -webkit-border-radius: 0px;
   border-radius: 0px;
@@ -7255,7 +7259,7 @@ button.close {
   border-radius: 0;
   font-size: 12px;
   border: 1px solid transparent;
-  color: #A8A8A8;
+  color: #757575;
   display: inline-block;
 }
 .il-dropzone.wrapper {
@@ -7264,21 +7268,21 @@ button.close {
 .il-dropzone.darkened-highlight {
   z-index: 1100;
   position: relative;
-  border: 1px dashed #A8A8A8;
+  border: 1px dashed #757575;
   -moz-border-radius: 0px;
   -webkit-border-radius: 0px;
   border-radius: 0px;
   background: #FFFFD6;
 }
 .il-dropzone.default-highlight {
-  border: 1px dashed #A8A8A8;
+  border: 1px dashed #757575;
   -moz-border-radius: 0px;
   -webkit-border-radius: 0px;
   border-radius: 0px;
   background: #FFFFD6;
 }
 .il-dropzone.drag-hover {
-  border: 1px dashed #8f8f8f;
+  border: 1px dashed #5b5b5b;
   -moz-border-radius: 0px;
   -webkit-border-radius: 0px;
   border-radius: 0px;
@@ -7849,6 +7853,16 @@ ul.dropdown-menu > li > .btn:focus {
 .il-viewcontrol-pagination .dropdown {
   display: inline;
 }
+.il-viewcontrol-pagination .btn {
+  vertical-align: top;
+}
+.il-viewcontrol-pagination .btn.engaged {
+  font-weight: 600;
+}
+.il-viewcontrol-pagination .dropdown-toggle {
+  padding-top: 0;
+  padding-bottom: 0;
+}
 .ilBlockContent .il-viewcontrol-section .btn.btn-default {
   background-color: transparent;
   border: 0;
@@ -7859,6 +7873,14 @@ ul.dropdown-menu > li > .btn:focus {
 .il-viewcontrol-mode .engaged {
   pointer-events: none;
   cursor: default;
+}
+.il-viewcontrol-pagination .btn + .btn,
+.il-viewcontrol-mode .btn + .btn {
+  border-left-color: #dddddd;
+}
+.il-viewcontrol-pagination .btn:not(:last-child):hover,
+.il-viewcontrol-mode .btn:not(:last-child):hover {
+  border-right-color: #dddddd;
 }
 .panel-secondary .il-viewcontrol-section .btn-default,
 .panel-secondary .il-viewcontrol-section .btn-default:active {
@@ -7884,10 +7906,10 @@ ul.dropdown-menu > li > .btn:focus {
   padding: 3px;
   padding-left: 100px;
 }
-.breadcrumb_wrapper .breadcrumb span.crumb {
+.breadcrumb_wrapper .breadcrumb span.crumb a {
   color: #4c6586;
 }
-.breadcrumb_wrapper .breadcrumb span.crumb:hover {
+.breadcrumb_wrapper .breadcrumb span.crumb a:hover {
   color: #3a4c65;
 }
 .breadcrumb_wrapper .breadcrumb > span + span:before {
@@ -8229,7 +8251,7 @@ ul.dropdown-menu > li > .btn:focus {
 .il-filter .input-group select {
   width: 100%;
   height: 25px;
-  border: 1px solid #A8A8A8;
+  border: 1px solid #757575;
   background-color: white;
 }
 .il-filter .leftaddon {
@@ -8281,9 +8303,6 @@ ul.dropdown-menu > li > .btn:focus {
 .il-filter-inputs-active {
   background-color: #f9f9f9;
   padding: 3px 8px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
 }
 .il-filter-inputs-active span {
   display: inline-block;
@@ -8292,6 +8311,10 @@ ul.dropdown-menu > li > .btn:focus {
   float: left;
   background-color: white;
   font-size: 0.8em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 90vw;
 }
 .il-filter-input-section {
   border-top: 1px solid #dddddd;
@@ -8348,7 +8371,7 @@ ul.dropdown-menu > li > .btn:focus {
 }
 .il-input-file .il-input-file-dropzone {
   background: white;
-  border: 1px dashed #A8A8A8;
+  border: 1px dashed #757575;
   -moz-border-radius: 0px;
   -webkit-border-radius: 0px;
   border-radius: 0px;
@@ -8365,7 +8388,7 @@ ul.dropdown-menu > li > .btn:focus {
   color: #757575;
 }
 .il-input-file .il-input-file-dropzone.dz-drag-hover {
-  border: 1px dashed #8f8f8f;
+  border: 1px dashed #5b5b5b;
   -moz-border-radius: 0px;
   -webkit-border-radius: 0px;
   border-radius: 0px;
@@ -8442,58 +8465,111 @@ ul.dropdown-menu > li > .btn:focus {
 .il-table-presentation-viewcontrols > div {
   padding: 6px;
 }
-.il-table-presentation-viewcontrols .btn-default:not(.disabled) {
+.il-table-presentation-viewcontrols .btn-default:not(.disabled):not(.engaged) {
   color: #4c6586;
   background-color: white;
   border-color: #4c6586;
 }
-.il-table-presentation-viewcontrols .btn-default:not(.disabled):focus,
-.il-table-presentation-viewcontrols .btn-default:not(.disabled).focus {
+.il-table-presentation-viewcontrols .btn-default:not(.disabled):not(.engaged):focus,
+.il-table-presentation-viewcontrols .btn-default:not(.disabled):not(.engaged).focus {
   color: #4c6586;
   background-color: #e6e6e6;
   border-color: #1e2835;
 }
-.il-table-presentation-viewcontrols .btn-default:not(.disabled):hover {
+.il-table-presentation-viewcontrols .btn-default:not(.disabled):not(.engaged):hover {
   color: #4c6586;
   background-color: #e6e6e6;
   border-color: #36485f;
 }
-.il-table-presentation-viewcontrols .btn-default:not(.disabled):active,
-.il-table-presentation-viewcontrols .btn-default:not(.disabled).active,
-.open > .dropdown-toggle.il-table-presentation-viewcontrols .btn-default:not(.disabled) {
+.il-table-presentation-viewcontrols .btn-default:not(.disabled):not(.engaged):active,
+.il-table-presentation-viewcontrols .btn-default:not(.disabled):not(.engaged).active,
+.open > .dropdown-toggle.il-table-presentation-viewcontrols .btn-default:not(.disabled):not(.engaged) {
   color: #4c6586;
   background-color: #e6e6e6;
   background-image: none;
   border-color: #36485f;
 }
-.il-table-presentation-viewcontrols .btn-default:not(.disabled):active:hover,
-.il-table-presentation-viewcontrols .btn-default:not(.disabled).active:hover,
-.open > .dropdown-toggle.il-table-presentation-viewcontrols .btn-default:not(.disabled):hover,
-.il-table-presentation-viewcontrols .btn-default:not(.disabled):active:focus,
-.il-table-presentation-viewcontrols .btn-default:not(.disabled).active:focus,
-.open > .dropdown-toggle.il-table-presentation-viewcontrols .btn-default:not(.disabled):focus,
-.il-table-presentation-viewcontrols .btn-default:not(.disabled):active.focus,
-.il-table-presentation-viewcontrols .btn-default:not(.disabled).active.focus,
-.open > .dropdown-toggle.il-table-presentation-viewcontrols .btn-default:not(.disabled).focus {
+.il-table-presentation-viewcontrols .btn-default:not(.disabled):not(.engaged):active:hover,
+.il-table-presentation-viewcontrols .btn-default:not(.disabled):not(.engaged).active:hover,
+.open > .dropdown-toggle.il-table-presentation-viewcontrols .btn-default:not(.disabled):not(.engaged):hover,
+.il-table-presentation-viewcontrols .btn-default:not(.disabled):not(.engaged):active:focus,
+.il-table-presentation-viewcontrols .btn-default:not(.disabled):not(.engaged).active:focus,
+.open > .dropdown-toggle.il-table-presentation-viewcontrols .btn-default:not(.disabled):not(.engaged):focus,
+.il-table-presentation-viewcontrols .btn-default:not(.disabled):not(.engaged):active.focus,
+.il-table-presentation-viewcontrols .btn-default:not(.disabled):not(.engaged).active.focus,
+.open > .dropdown-toggle.il-table-presentation-viewcontrols .btn-default:not(.disabled):not(.engaged).focus {
   color: #4c6586;
   background-color: #d4d4d4;
   border-color: #1e2835;
 }
-.il-table-presentation-viewcontrols .btn-default:not(.disabled).disabled:hover,
-.il-table-presentation-viewcontrols .btn-default:not(.disabled)[disabled]:hover,
-fieldset[disabled] .il-table-presentation-viewcontrols .btn-default:not(.disabled):hover,
-.il-table-presentation-viewcontrols .btn-default:not(.disabled).disabled:focus,
-.il-table-presentation-viewcontrols .btn-default:not(.disabled)[disabled]:focus,
-fieldset[disabled] .il-table-presentation-viewcontrols .btn-default:not(.disabled):focus,
-.il-table-presentation-viewcontrols .btn-default:not(.disabled).disabled.focus,
-.il-table-presentation-viewcontrols .btn-default:not(.disabled)[disabled].focus,
-fieldset[disabled] .il-table-presentation-viewcontrols .btn-default:not(.disabled).focus {
+.il-table-presentation-viewcontrols .btn-default:not(.disabled):not(.engaged).disabled:hover,
+.il-table-presentation-viewcontrols .btn-default:not(.disabled):not(.engaged)[disabled]:hover,
+fieldset[disabled] .il-table-presentation-viewcontrols .btn-default:not(.disabled):not(.engaged):hover,
+.il-table-presentation-viewcontrols .btn-default:not(.disabled):not(.engaged).disabled:focus,
+.il-table-presentation-viewcontrols .btn-default:not(.disabled):not(.engaged)[disabled]:focus,
+fieldset[disabled] .il-table-presentation-viewcontrols .btn-default:not(.disabled):not(.engaged):focus,
+.il-table-presentation-viewcontrols .btn-default:not(.disabled):not(.engaged).disabled.focus,
+.il-table-presentation-viewcontrols .btn-default:not(.disabled):not(.engaged)[disabled].focus,
+fieldset[disabled] .il-table-presentation-viewcontrols .btn-default:not(.disabled):not(.engaged).focus {
   background-color: white;
   border-color: #4c6586;
 }
-.il-table-presentation-viewcontrols .btn-default:not(.disabled) .badge {
+.il-table-presentation-viewcontrols .btn-default:not(.disabled):not(.engaged) .badge {
   color: white;
   background-color: #4c6586;
+}
+.il-table-presentation-viewcontrols .btn-default.engaged {
+  color: white;
+  background-color: #4c6586;
+  border-color: #4c6586;
+}
+.il-table-presentation-viewcontrols .btn-default.engaged:focus,
+.il-table-presentation-viewcontrols .btn-default.engaged.focus {
+  color: white;
+  background-color: #3a4c65;
+  border-color: #1e2835;
+}
+.il-table-presentation-viewcontrols .btn-default.engaged:hover {
+  color: white;
+  background-color: #3a4c65;
+  border-color: #36485f;
+}
+.il-table-presentation-viewcontrols .btn-default.engaged:active,
+.il-table-presentation-viewcontrols .btn-default.engaged.active,
+.open > .dropdown-toggle.il-table-presentation-viewcontrols .btn-default.engaged {
+  color: white;
+  background-color: #3a4c65;
+  background-image: none;
+  border-color: #36485f;
+}
+.il-table-presentation-viewcontrols .btn-default.engaged:active:hover,
+.il-table-presentation-viewcontrols .btn-default.engaged.active:hover,
+.open > .dropdown-toggle.il-table-presentation-viewcontrols .btn-default.engaged:hover,
+.il-table-presentation-viewcontrols .btn-default.engaged:active:focus,
+.il-table-presentation-viewcontrols .btn-default.engaged.active:focus,
+.open > .dropdown-toggle.il-table-presentation-viewcontrols .btn-default.engaged:focus,
+.il-table-presentation-viewcontrols .btn-default.engaged:active.focus,
+.il-table-presentation-viewcontrols .btn-default.engaged.active.focus,
+.open > .dropdown-toggle.il-table-presentation-viewcontrols .btn-default.engaged.focus {
+  color: white;
+  background-color: #2d3b4f;
+  border-color: #1e2835;
+}
+.il-table-presentation-viewcontrols .btn-default.engaged.disabled:hover,
+.il-table-presentation-viewcontrols .btn-default.engaged[disabled]:hover,
+fieldset[disabled] .il-table-presentation-viewcontrols .btn-default.engaged:hover,
+.il-table-presentation-viewcontrols .btn-default.engaged.disabled:focus,
+.il-table-presentation-viewcontrols .btn-default.engaged[disabled]:focus,
+fieldset[disabled] .il-table-presentation-viewcontrols .btn-default.engaged:focus,
+.il-table-presentation-viewcontrols .btn-default.engaged.disabled.focus,
+.il-table-presentation-viewcontrols .btn-default.engaged[disabled].focus,
+fieldset[disabled] .il-table-presentation-viewcontrols .btn-default.engaged.focus {
+  background-color: #4c6586;
+  border-color: #4c6586;
+}
+.il-table-presentation-viewcontrols .btn-default.engaged .badge {
+  color: #4c6586;
+  background-color: white;
 }
 .il-table-presentation-viewcontrols .il-viewcontrol-pagination {
   order: 1;
@@ -9695,6 +9771,19 @@ footer {
     min-width: 260px;
   }
 }
+.focus_hovered_engaged_slate_trigger_mixin {
+  background-color: white;
+  color: #2c2c2c;
+}
+.focus_hovered_engaged_slate_trigger_mixin .glyph {
+  color: #2c2c2c;
+}
+.focus_hovered_engaged_slate_trigger_mixin .icon {
+  filter: invert(50%);
+}
+.focus_hovered_engaged_slate_trigger_mixin .bulky-label {
+  color: #2c2c2c;
+}
 .il-maincontrols-mainbar .btn-bulky,
 .il-maincontrols-metabar .btn-bulky,
 .il-maincontrols-mainbar .il-link.link-bulky,
@@ -9763,35 +9852,36 @@ footer {
 .il-mainbar-triggers .il-link.link-bulky .icon {
   filter: invert(100%);
 }
-.il-mainbar-triggers .btn-bulky:hover,
-.il-mainbar-triggers .il-link.link-bulky:hover,
 .il-mainbar-triggers .btn-bulky.engaged,
-.il-mainbar-triggers .il-link.link-bulky.engaged,
+.il-mainbar-triggers .il-link.link-bulky.engaged {
+  background-color: white;
+  color: #2c2c2c;
+}
+.il-mainbar-triggers .btn-bulky.engaged .glyph,
+.il-mainbar-triggers .il-link.link-bulky.engaged .glyph {
+  color: #2c2c2c;
+}
+.il-mainbar-triggers .btn-bulky.engaged .icon,
+.il-mainbar-triggers .il-link.link-bulky.engaged .icon {
+  filter: invert(50%);
+}
+.il-mainbar-triggers .btn-bulky.engaged .bulky-label,
+.il-mainbar-triggers .il-link.link-bulky.engaged .bulky-label {
+  color: #2c2c2c;
+}
 .il-mainbar-triggers .btn-bulky:focus-visible,
 .il-mainbar-triggers .il-link.link-bulky:focus-visible {
   background-color: white;
   color: #2c2c2c;
 }
-.il-mainbar-triggers .btn-bulky:hover .glyph,
-.il-mainbar-triggers .il-link.link-bulky:hover .glyph,
-.il-mainbar-triggers .btn-bulky.engaged .glyph,
-.il-mainbar-triggers .il-link.link-bulky.engaged .glyph,
 .il-mainbar-triggers .btn-bulky:focus-visible .glyph,
 .il-mainbar-triggers .il-link.link-bulky:focus-visible .glyph {
   color: #2c2c2c;
 }
-.il-mainbar-triggers .btn-bulky:hover .icon,
-.il-mainbar-triggers .il-link.link-bulky:hover .icon,
-.il-mainbar-triggers .btn-bulky.engaged .icon,
-.il-mainbar-triggers .il-link.link-bulky.engaged .icon,
 .il-mainbar-triggers .btn-bulky:focus-visible .icon,
 .il-mainbar-triggers .il-link.link-bulky:focus-visible .icon {
   filter: invert(50%);
 }
-.il-mainbar-triggers .btn-bulky:hover .bulky-label,
-.il-mainbar-triggers .il-link.link-bulky:hover .bulky-label,
-.il-mainbar-triggers .btn-bulky.engaged .bulky-label,
-.il-mainbar-triggers .il-link.link-bulky.engaged .bulky-label,
 .il-mainbar-triggers .btn-bulky:focus-visible .bulky-label,
 .il-mainbar-triggers .il-link.link-bulky:focus-visible .bulky-label {
   color: #2c2c2c;
@@ -9799,6 +9889,20 @@ footer {
 .il-mainbar-triggers .btn-bulky:hover,
 .il-mainbar-triggers .il-link.link-bulky:hover {
   transition: all 0.15s ease-in;
+  background-color: white;
+  color: #2c2c2c;
+}
+.il-mainbar-triggers .btn-bulky:hover .glyph,
+.il-mainbar-triggers .il-link.link-bulky:hover .glyph {
+  color: #2c2c2c;
+}
+.il-mainbar-triggers .btn-bulky:hover .icon,
+.il-mainbar-triggers .il-link.link-bulky:hover .icon {
+  filter: invert(50%);
+}
+.il-mainbar-triggers .btn-bulky:hover .bulky-label,
+.il-mainbar-triggers .il-link.link-bulky:hover .bulky-label {
+  color: #2c2c2c;
 }
 .il-mainbar-triggers .btn-bulky .glyph,
 .il-mainbar-triggers .il-link.link-bulky .glyph {
@@ -9966,7 +10070,14 @@ footer {
   align-items: center;
 }
 .il-mainbar-close-slates .btn-bulky .bulky-label {
-  display: none;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
 }
 .il-mainbar-close-slates .btn-bulky .glyph:before {
   content: " \e605";
@@ -11925,7 +12036,7 @@ html.il-no-tiny-bg body#tinymce {
   width: 100%;
 }
 div.input {
-  border: 1px solid #A8A8A8;
+  border: 1px solid #757575;
   padding: 3px;
   text-decoration: none;
   font-size: 90%;
@@ -12804,6 +12915,9 @@ div.ilSideBarContent {
   /* prevent horizontal scrollbar */
   overflow-x: hidden;
 }
+.ui-autocomplete li.ui-menu-item {
+  cursor: pointer;
+}
 /* Icon Default */
 img.ilIcon {
   width: 32px;
@@ -12900,7 +13014,7 @@ select {
 .form-control {
   font-size: 12px;
   color: #161616;
-  border: 1px solid #A8A8A8;
+  border: 1px solid #757575;
 }
 .form-control[disabled],
 .form-control[readonly],
@@ -12925,6 +13039,9 @@ form.form-inline {
 .form-control:focus-visible {
   -webkit-box-shadow: none;
   box-shadow: none;
+  outline: 3px solid #0078D7;
+}
+.btn-file:focus-within {
   outline: 3px solid #0078D7;
 }
 textarea.form-control {
@@ -13146,7 +13263,7 @@ div.ilHFormFooter .ilFormCmds {
 }
 input:invalid {
   background-color: #ffebeb;
-  border-color: #d08080;
+  border-color: #d00;
 }
 .bootstrap-datetimepicker-widget {
   z-index: 2000;
@@ -13606,7 +13723,11 @@ button.copg-add.dropdown-toggle.btn:hover {
 button.copg-add.dropdown-toggle.btn .glyphicon-plus-sign,
 button.copg-add.dropdown-toggle.btn:focus .glyphicon-plus-sign,
 button.copg-add.dropdown-toggle.btn:hover .glyphicon-plus-sign,
-#copg-editor-help .glyphicon-plus-sign {
+#copg-editor-help .glyphicon-plus-sign,
+button.copg-add.dropdown-toggle.btn .il-copg-add-text,
+button.copg-add.dropdown-toggle.btn:focus .il-copg-add-text,
+button.copg-add.dropdown-toggle.btn:hover .il-copg-add-text,
+#copg-editor-help .il-copg-add-text {
   color: #4c6586;
   font-size: 18px;
 }
@@ -14215,6 +14336,9 @@ p#copg-auto-save {
 #ed_datatable th,
 #ed_datatable td {
   border: 1px solid #CCCCCC;
+}
+#ed_datatable th {
+  vertical-align: middle;
 }
 .copg-new-content-placeholder {
   text-align: center;
@@ -15723,7 +15847,7 @@ img.ilPollQuestionImage {
 }
 .ilPollQuestionResultBar {
   width: 100%;
-  border: 1px solid #A8A8A8;
+  border: 1px solid #757575;
   float: left;
   height: 18px;
 }
@@ -16396,8 +16520,7 @@ div.ilListItemSection {
   max-width: calc(100% - 40px);
 }
 div.ilContainerListItemOuterHighlight {
-  padding: 15px;
-  background-color: #ffffd9;
+  background-color: #e2e8ef;
   zoom: 1;
 }
 .ilCLI {
@@ -16993,12 +17116,18 @@ div#il_startup_logo img {
   border: 0 none;
   background-color: white;
 }
+.ilToolbar .navbar-toggle:focus-visible {
+  outline: 3px solid #0078D7;
+}
 .ilToolbar .ilToolbarItems {
   padding: 0;
 }
 .ilToolbar .form-control {
   width: auto;
   display: inline-block;
+  vertical-align: top;
+}
+.ilToolbar .input-group {
   vertical-align: top;
 }
 .ilToolbar input[type="file"] {
@@ -17216,7 +17345,7 @@ span.ilNewsRssIcon:hover {
   position: absolute;
   content: " ";
   width: 3px;
-  background-color: #A8A8A8;
+  background-color: #757575;
   left: 50%;
   margin-left: -1.5px;
 }
@@ -17713,7 +17842,7 @@ body.ilPrtfPdfBody .ilPCMyCoursesToggle img {
 }
 #awareness-content .media-body h4,
 #awareness-content .media-body p {
-  color: #7c7c7c;
+  color: #161616;
   font-size: 12px;
   padding: 5px 3px 0 3px;
   line-height: 1em;
@@ -17721,7 +17850,7 @@ body.ilPrtfPdfBody .ilPCMyCoursesToggle img {
 }
 #awareness-content .media-body h4 {
   padding-top: 0px;
-  color: #161616;
+  font-size: bold;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -17732,7 +17861,7 @@ body.ilPrtfPdfBody .ilPCMyCoursesToggle img {
   font-size: 12px;
 }
 #awareness-content .dropdown-menu a {
-  color: #7c7c7c;
+  color: #161616;
 }
 #awareness-content .dropdown-menu a:hover {
   color: #000000;
@@ -18521,6 +18650,10 @@ span.ilProfileBadge .modal .img-responsive {
 }
 .input-group.date .input-group-addon {
   cursor: pointer;
+  border: 1px solid #757575;
+}
+.input-group.date .input-group-addon:last-child {
+  border-left: 0;
 }
 .il-orgunit .multi_icons_wrapper {
   display: inline-block;
@@ -19048,7 +19181,7 @@ table.mceToolbar td {
   }
   pre,
   blockquote {
-    border: 1px solid #A8A8A8;
+    border: 1px solid #757575;
     page-break-inside: avoid;
   }
   thead {

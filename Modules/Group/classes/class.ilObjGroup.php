@@ -110,7 +110,7 @@ class ilObjGroup extends ilContainer implements ilMembershipRegistrationCodes
 
     private $view_mode = ilContainer::VIEW_DEFAULT;
     
-    private $mail_members = self::MAIL_ALLOWED_ALL;
+    private $mail_members = self::MAIL_ALLOWED_TUTORS;
     
     
     public $members_obj;

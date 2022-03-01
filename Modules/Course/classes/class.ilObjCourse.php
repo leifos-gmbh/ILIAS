@@ -70,7 +70,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
     private $reg_access_code_enabled = false;
     private $status_dt = null;
     
-    private $mail_members = ilCourseConstants::MAIL_ALLOWED_ALL;
+    private $mail_members = ilCourseConstants::MAIL_ALLOWED_TUTORS;
 
     /**
      * @var bool

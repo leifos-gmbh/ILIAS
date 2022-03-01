@@ -107,7 +107,7 @@ class ilObjCourse extends ilContainer implements ilMembershipRegistrationCodes
      * @access private
      *
      */
-    private $auto_notification = true;
+    private $auto_notification = false;
 
 
     /**

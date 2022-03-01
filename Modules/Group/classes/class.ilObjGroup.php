@@ -79,7 +79,7 @@ class ilObjGroup extends ilContainer implements ilMembershipRegistrationCodes
     /**
      * @var bool
      */
-    protected $auto_notification = true;
+    protected $auto_notification = false;
 
 
     /**

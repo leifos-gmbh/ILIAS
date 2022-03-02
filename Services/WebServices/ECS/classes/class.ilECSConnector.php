@@ -588,7 +588,7 @@ class ilECSConnector
             switch ($this->getServer()->getAuthType()) {
                 case ilECSSetting::AUTH_APACHE:
                     $this->curl->setOpt(CURLOPT_SSL_VERIFYPEER, 0);
-                    #$this->curl->setOpt(CURLOPT_SSL_VERIFYHOST,0);
+                    $this->curl->setOpt(CURLOPT_SSL_VERIFYHOST,0);
                     $this->curl->setOpt(CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
                     $this->curl->setOpt(
                         CURLOPT_USERPWD,

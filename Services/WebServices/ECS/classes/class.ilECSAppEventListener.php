@@ -65,7 +65,7 @@ class ilECSAppEventListener implements ilAppEventListener
                     case 'afterCreate':
                         $user = $a_parameter['user_obj'];
                         self::handleMembership($user);
-                        self::handleNewAccountCreation($user);
+                        self::handleNewAccountCreation($user->getLogin());
                         break;
                 }
                 break;

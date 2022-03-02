@@ -253,7 +253,7 @@ class ilECSAppEventListener implements ilAppEventListener
             $logger->warning('Invalid username given: ' . $username);
         }
 
-        $users = ilECSRemoteUser::lookupUsersByExternalAccount($user->getExternalAccount());
+        $users = ilECSRemoteUser::lookupUsersByExternalAccount((string) $user->getExternalAccount());
         $logger->dump($users);
         foreach ($users as $remote) {
             if (!$remote->getServerId()) {

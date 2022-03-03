@@ -16,3 +16,6 @@ ecs#:#ecs_lastname#:#Nachname
 ecs#:#ecs_email#:#E-Mail
 ecs#:#ecs_institution#:#Institution
 ecs#:#ecs_login_success_ldap#:#Successfully approved the ecs release, please login with your credentials to verify your identity.
+ecs#:#ecs_consent_reset_confirm_title#:#Reset User Consents
+ecs#:#ecs_consent_reset_confirm_title_info#:#Do really want to delete all consents? All users must aggree again to share their personal profile data before they can access ECS content.
+ecs#:#ecs_user_consents_deleted#:#Deleted all user consents.

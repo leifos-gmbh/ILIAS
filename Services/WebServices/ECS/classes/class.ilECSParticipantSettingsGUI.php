@@ -17,13 +17,24 @@ class ilECSParticipantSettingsGUI
     private $mid = 0;
     
     private $participant = null;
-    
+
+    /**
+     * @var \ILIAS\UI\Renderer
+     */
+    protected $ui_renderer;
+    /**
+     * @var \ILIAS\UI\Factory
+     */
+    protected $ui_factory;
+
     protected $tpl;
     protected $lng;
     protected $ctrl;
     protected $tabs;
+    protected $toolbar;
     protected $global_settings;
-    
+
+
 
     /**
      * Constructor
@@ -48,6 +59,9 @@ class ilECSParticipantSettingsGUI
         $this->ctrl = $ilCtrl;
         $this->tabs = $ilTabs;
         $this->global_settings = $DIC->settings();
+        $this->toolbar = $DIC->toolbar();
+        $this->ui_factory = $DIC->ui()->factory();
+        $this->ui_renderer = $DIC->ui()->renderer();
 
         $this->initSettings();
         $this->initParticipant();
@@ -118,8 +132,7 @@ class ilECSParticipantSettingsGUI
     {
         $this->getCtrl()->saveParameter($this, 'server_id');
         $this->getCtrl()->saveParameter($this, 'mid');
-        
-        
+
         $next_class = $this->ctrl->getNextClass($this);
         $cmd = $this->ctrl->getCmd('settings');
 
@@ -149,10 +162,41 @@ class ilECSParticipantSettingsGUI
      */
     protected function settings(ilPropertyFormGUI $form = null)
     {
+        $this->renderConsentToolbar();
+
         if (!$form instanceof ilPropertyFormGUI) {
             $form = $this->initFormSettings();
         }
         $this->getTemplate()->setContent($form->getHTML());
+    }
+
+    protected function renderConsentToolbar() : void
+    {
+        $consents = new ilECSParticipantConsents($this->getServerId(), $this->getMid());
+        if (!$consents->hasConsents()) {
+            return;
+        }
+
+        $confirm = $this->ui_factory->modal()->interruptive(
+            $this->lng->txt('ecs_consent_reset_confirm_title'),
+            $this->lng->txt('ecs_consent_reset_confirm_title_info'),
+            $this->ctrl->getLinkTarget($this, 'resetConsents')
+        );
+        $this->toolbar->addComponent($confirm);
+
+        $confirmation_trigger = $this->ui_factory->button()->standard(
+            $this->lng->txt('ecs_consent_reset_confirm_title'),
+            ''
+        )->withOnClick($confirm->getShowSignal());
+        $this->toolbar->addComponent($confirmation_trigger);
+    }
+
+    protected function resetConsents()
+    {
+        $consents = new ilECSParticipantConsents($this->getServerId(), $this->getMid());
+        $consents->delete();
+        ilUtil::sendSuccess($this->lng->txt('ecs_user_consents_deleted'), true);
+        $this->ctrl->redirect($this, 'settings');
     }
     
     /**

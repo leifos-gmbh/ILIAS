@@ -21,7 +21,7 @@ class ilPageObjectGUI
     const OFFLINE = "offline";
     const PRINTING = "print";
 
-    protected bool $enabled_href = true;
+    protected $enabled_href = true;
 
     /**
      * @var ilTemplate
@@ -1292,7 +1292,7 @@ class ilPageObjectGUI
         $lng = $this->lng;
         if ($this->getEnableEditing()) {
             $b = $ui->factory()->button()->standard(
-                $lng->txt("edit"),
+                $lng->txt("edit_page"),
                 $this->ctrl->getLinkTarget($this, "edit")
             );
             $this->toolbar->addComponent($b);

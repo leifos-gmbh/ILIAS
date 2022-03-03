@@ -19,3 +19,8 @@ ecs#:#ecs_login_success_ldap#:#Successfully approved the ecs release, please log
 ecs#:#ecs_consent_reset_confirm_title#:#Reset User Consents
 ecs#:#ecs_consent_reset_confirm_title_info#:#Do really want to delete all consents? All users must aggree again to share their personal profile data before they can access ECS content.
 ecs#:#ecs_user_consents_deleted#:#Deleted all user consents.
+ecs#:#ecs_export_allow_local#:#Allow Local Accounts
+ecs#:#ecs_export_allow_local_info#:#Only user accounts with the above chosen auth mode are supported. ECS authenticated local user accounts will not be created.
+ecs#:#ecs_outgoing_auth_mode#:#Restricted Auth Modes
+ecs#:#ecs_outgoing_auth_mode_no_restriction#:#No Restriction
+ecs#:#ecs_outgoing_auth_mode_info#:#Only user accounts with the chosen auth mode are allowed to acccess ECS content.

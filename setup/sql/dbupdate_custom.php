@@ -54,3 +54,34 @@ if (!$ilDB->tableExists('ecs_user_consent')) {
 <?php
 //
 ?>
+<#6>
+<?php
+if (!$ilDB->tableColumnExists('ecs_part_settings', 'incoming_local_accounts')) {
+    $ilDB->addTableColumn(
+        'ecs_part_settings',
+        'incoming_local_accounts',
+        [
+            'type' => ilDBConstants::T_INTEGER,
+            'notnull' => true,
+            'length' => 1,
+            'default' => 1
+        ]
+    );
+}
+?>
+
+<#7>
+<?php
+if (!$ilDB->tableColumnExists('ecs_part_settings', 'outgoing_auth_mode')) {
+    $ilDB->addTableColumn(
+        'ecs_part_settings',
+        'outgoing_auth_mode',
+        [
+            'type' => ilDBConstants::T_TEXT,
+            'notnull' => false,
+            'length' => 64,
+            'default' => ''
+        ]
+    );
+}
+?>

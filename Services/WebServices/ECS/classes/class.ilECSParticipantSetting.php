@@ -43,11 +43,14 @@ class ilECSParticipantSetting
     public const EXTERNAL_ACCOUNT_PLACEHOLDER = '[EXTERNAL_ACCOUNT]';
 
     public const DEFAULT_INCOMING_AUTH_MODE = self::AUTH_MODE_LOCAL;
+    public const DEFAULT_OUTGOING_AUTH_MODE = self::AUTH_MODE_NONE;
+    public const AUTH_MODE_NONE = '';
     public const AUTH_MODE_LOCAL = 'local';
     public const AUTH_MODE_LDAP = 'ldap';
 
     public const VALIDATION_OK = 0;
     public const ERR_MISSING_USERNAME_PLACEHOLDER = 1;
+    public const ERR_LOCAL_ACCOUNTS_DISABLED = 2;
 
 
     protected static $instances = array();
@@ -77,6 +80,8 @@ class ilECSParticipantSetting
     private $import_types = array();
     private $username_placeholder = '[LOGIN]';
     private $incoming_auth_mode = self::DEFAULT_INCOMING_AUTH_MODE;
+    private $incoming_local_accounts = true;
+    private $outgoing_auth_mode = self::DEFAULT_OUTGOING_AUTH_MODE;
 
     private $exists = false;
 
@@ -219,7 +224,32 @@ class ilECSParticipantSetting
     {
         return $this->incoming_auth_mode;
     }
-    
+
+    public function areIncomingLocalAccountsSupported() : bool
+    {
+        return $this->incoming_local_accounts;
+    }
+
+    public function enableIncomingLocalAccounts(bool $a_status)
+    {
+        $this->incoming_local_accounts = $a_status;
+    }
+
+    public function setOutgoingAuthMode(string $auth_mode) : void
+    {
+        $this->outgoing_auth_mode = $auth_mode;
+    }
+
+    public function getOutgoingAuthMode() : string
+    {
+        return $this->outgoing_auth_mode;
+    }
+
+    public function isOutgoingAuthModeRestricted() : bool
+    {
+        return $this->outgoing_auth_mode === self::AUTH_MODE_NONE;
+    }
+
     public function setImportTypes($a_types)
     {
         $this->import_types = $a_types;
@@ -283,7 +313,9 @@ class ilECSParticipantSetting
             'export_types = ' . $ilDB->quote(serialize($this->getExportTypes()), 'text') . ', ' .
             'import_types = ' . $ilDB->quote(serialize($this->getImportTypes()), 'text') . ', ' .
             'username_placeholder = ' . $ilDB->quote($this->getOutgoingUsernamePlaceholder(), ilDBConstants::T_TEXT) . ', ' .
-            'user_auth_mode = ' . $ilDB->quote($this->getIncomingAuthMode(), ilDBConstants::T_TEXT) . ' ' .
+            'user_auth_mode = ' . $ilDB->quote($this->getIncomingAuthMode(), ilDBConstants::T_TEXT) . ', ' .
+            'incoming_local_accounts = ' . $ilDB->quote($this->areIncomingLocalAccountsSupported(), ilDBConstants::T_INTEGER) . ', ' .
+            'outgoing_auth_mode = ' . $ilDB->quote($this->getOutgoingAuthMode(), ilDBConstants::T_TEXT) . ' ' .
             'WHERE sid = ' . $ilDB->quote((int) $this->getServerId(), 'integer') . ' ' .
             'AND mid  = ' . $ilDB->quote((int) $this->getMid(), 'integer');
         $aff = $ilDB->manipulate($query);
@@ -297,7 +329,7 @@ class ilECSParticipantSetting
         $ilDB = $DIC['ilDB'];
 
         $query = 'INSERT INTO ecs_part_settings ' .
-            '(sid,mid,export,import,import_type,title,cname,token,dtoken,export_types, import_types, username_placeholder, user_auth_mode) ' .
+            '(sid,mid,export,import,import_type,title,cname,token,dtoken,export_types, import_types, username_placeholder, user_auth_mode, incoming_local_accounts, outgoing_auth_mode) ' .
             'VALUES( ' .
             $ilDB->quote($this->getServerId(), 'integer') . ', ' .
             $ilDB->quote($this->getMid(), 'integer') . ', ' .
@@ -311,7 +343,9 @@ class ilECSParticipantSetting
             $ilDB->quote(serialize($this->getExportTypes()), 'text') . ', ' .
             $ilDB->quote(serialize($this->getImportTypes()), 'text') . ', ' .
             $ilDB->quote($this->getOutgoingUsernamePlaceholder(), ilDBConstants::T_TEXT) . ', ' .
-            $ilDB->quote($this->getIncomingAuthMode(), ilDBConstants::T_TEXT) . ' ' .
+            $ilDB->quote($this->getIncomingAuthMode(), ilDBConstants::T_TEXT) . ', ' .
+            $ilDB->quote($this->areIncomingLocalAccountsSupported(), ilDBConstants::T_INTEGER) . ', ' .
+            $ilDB->quote($this->getOutgoingAuthMode(), ilDBConstants::T_TEXT) . ' ' .
             ')';
         $aff = $ilDB->manipulate($query);
         return true;
@@ -366,6 +400,8 @@ class ilECSParticipantSetting
             $this->setImportTypes((array) unserialize($row->import_types));
             $this->setOutgoingUsernamePlaceholder((string) $row->username_placeholder);
             $this->setIncomingAuthMode((string) $row->user_auth_mode);
+            $this->enableIncomingLocalAccounts((bool) $row->incoming_local_accounts);
+            $this->setOutgoingAuthMode((string) $row->outgoing_auth_mode);
         }
         return true;
     }

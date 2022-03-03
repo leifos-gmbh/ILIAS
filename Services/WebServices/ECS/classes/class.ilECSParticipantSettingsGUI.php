@@ -214,7 +214,7 @@ class ilECSParticipantSettingsGUI
             $this->getParticipant()->setImportTypes($form->getInput('import_types'));
             $this->getParticipant()->setOutgoingUsernamePlaceholder($form->getInput('username_placeholder'));
             $this->getParticipant()->setIncomingAuthMode($form->getInput('incoming_auth_mode'));
-            $this->getParticipant()->update();
+            $this->getParticipant()->enableIncomingLocalAccounts((bool) $form->getInput('incoming_local_accounts'));
 
             // additional validation
             $error_code = $this->getParticipant()->validate();
@@ -225,6 +225,7 @@ class ilECSParticipantSettingsGUI
                     );
                     break;
                 default:
+                    $this->getParticipant()->update();
                     ilUtil::sendSuccess($this->getLang()->txt('settings_saved'), true);
                     $this->getCtrl()->redirect($this, 'settings');
                     return true;
@@ -281,6 +282,14 @@ class ilECSParticipantSettingsGUI
         $user_auth_mode->setInfo($this->getLang()->txt('ecs_incoming_auth_mode_info'));
         $export->addSubItem($user_auth_mode);
 
+        $allow_local_accounts = new ilCheckboxInputGUI(
+            $this->getLang()->txt('ecs_export_allow_local'),
+            'incoming_local_accounts'
+        );
+        $allow_local_accounts->setInfo($this->getLang()->txt('ecs_export_allow_local_info'));
+        $allow_local_accounts->setValue(1);
+        $allow_local_accounts->setChecked($this->getParticipant()->areIncomingLocalAccountsSupported());
+        $export->addSubItem($allow_local_accounts);
 
         include_once './Services/WebServices/ECS/classes/class.ilECSUtils.php';
         foreach (ilECSUtils::getPossibleReleaseTypes(true) as $type => $trans) {
@@ -305,6 +314,16 @@ class ilECSParticipantSettingsGUI
         $username_placeholder->setInfo($this->lng->txt('ecs_outgoing_user_credentials_info'));
         $import->addSubItem($username_placeholder);
 
+        // restrict outgoing authmode
+        $outgoing_authmode = new ilSelectInputGUI(
+            $this->getLang()->txt('ecs_outgoing_auth_mode'),
+            'outgoing_auth_mode'
+        );
+        $outgoing_authmode->setInfo($this->getLang()->txt('ecs_outgoing_auth_mode_info'));
+        $outgoing_authmode->setOptions($this->parseAvailableAuthModes(false));
+        $outgoing_authmode->setValue($this->getParticipant()->getOutgoingAuthMode());
+        $import->addSubItem($outgoing_authmode);
+
         // import types
         $imp_types = new ilCheckboxGroupInputGUI($this->getLang()->txt('ecs_import_types'), 'import_types');
         $imp_types->setValue($this->getParticipant()->getImportTypes());
@@ -321,9 +340,13 @@ class ilECSParticipantSettingsGUI
         return $form;
     }
 
-    protected function parseAvailableAuthModes() : array
+    protected function parseAvailableAuthModes($a_mode_incoming = true) : array
     {
         $options = [];
+
+        if (!$a_mode_incoming) {
+            $options[''] = $this->getLang()->txt('ecs_outgoing_auth_mode_no_restriction');
+        }
         $options[ilECSParticipantSetting::DEFAULT_INCOMING_AUTH_MODE] = $this->getLang()->txt('ecs_incoming_auth_local');
 
         if ($this->global_settings->get('shib_active', '0')) {

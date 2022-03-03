@@ -16601,3 +16601,9 @@ rep#:#rep_no_last_visited_mess#:#You did not visited any resources yet.
 content#:#cont_could_not_save_duplicate_pc_ids#:#Page could not be saved (duplicate PC IDs).
 dateplaner#:#cal_delete_recurrence_rule#:#Delete Series of Appoinments
 dateplaner#:#cal_recurrence_confirm_deletion#:#Please decide wether you want to delete single appointments or the complete series of appointments.
+lm#:#lm_est_reading_time#:#Estimated Reading Time
+lm#:#lm_est_reading_time_info#:#Allows the activation of an estimated reading time as property in the repository.
+blog#:#blog_est_reading_time#:#Estimated Reading Time
+blog#:#blog_est_reading_time_info#:#Allows the activation of an estimated reading for blog postings.
+copg#:#copg_est_reading_time#:#Estimated Reading Time
+copg#:#copg_x_minutes#:#%s minute(s)

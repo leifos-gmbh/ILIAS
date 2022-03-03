@@ -200,6 +200,9 @@ class ilObjContentObjectAccess extends ilObjectAccess
     {
         global $DIC;
 
+        $reading_time_manager = new \ILIAS\LearningModule\ReadingTime\ReadingTimeManager();
+        $reading_time_manager->loadData($a_obj_ids);
+
         $ilDB = $DIC->database();
         $ilUser = $DIC->user();
         

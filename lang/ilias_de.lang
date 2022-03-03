@@ -16601,3 +16601,5 @@ common#:#eyeopened#:#Eye Open - Click to reveal the input's contents###30 04 202
 content#:#cont_could_not_save_duplicate_pc_ids#:#Die Seite konnte leider nicht gespeichert werden. (Doppelte PC IDs)
 dateplaner#:#cal_delete_recurrence_rule#:#Terminserie löschen
 dateplaner#:#cal_recurrence_confirm_deletion#:#Bitte wählen Sie aus, ob Sie einzelne Termine oder aber die gesamte Terminserie löschen möchten.
+copg#:#copg_est_reading_time#:#Geschätzte Lesezeit
+copg#:#copg_x_minutes#:#%s Minute(n)

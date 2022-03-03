@@ -278,20 +278,22 @@ class ilPageLayout
         $ilDB = $DIC->database();
         $arr_layouts = array();
         $add = "";
+        $conc = " WHERE ";
         if ($a_active) {
-            $add .= " AND (active = 1)";
+            $add .= $conc . " (active = 1)";
+            $conc = " AND ";
         }
         switch ($a_module) {
             case self::MODULE_SCORM:
-                $add .= " AND mod_scorm = 1";
+                $add .= $conc ." mod_scorm = 1";
                 break;
             
             case self::MODULE_PORTFOLIO:
-                $add .= " AND mod_portfolio = 1";
+                $add .= $conc ." mod_portfolio = 1";
                 break;
 
             case self::MODULE_LM:
-                $add .= " AND mod_lm = 1";
+                $add .= $conc ." mod_lm = 1";
                 break;
         }
         $query = "SELECT layout_id FROM page_layout $add ORDER BY title ";

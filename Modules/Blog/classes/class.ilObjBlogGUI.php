@@ -17,6 +17,16 @@ use \ILIAS\DI\HTTPServices;
 class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 {
     /**
+     * @var \ILIAS\Blog\ReadingTime\BlogSettingsGUI
+     */
+    protected $reading_time_gui;
+
+    /**
+     * @var \ILIAS\Blog\ReadingTime\ReadingTimeManager
+     */
+    protected $reading_time_manager;
+
+    /**
      * @var ilHelpGUI
      */
     protected $help;
@@ -174,6 +184,7 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
             throw new ilException("Posting ID does not match blog.");
         }
 
+        $blog_id = 0;
         if ($this->object) {
             // gather postings by month
             $this->items = $this->buildPostingList($this->object->getId());
@@ -187,10 +198,13 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
             }
 
             $ilCtrl->setParameter($this, "bmn", $this->month);
+            $blog_id = $this->object->getId();
         }
         
         $lng->loadLanguageModule("blog");
         $ilCtrl->saveParameter($this, "prvm");
+        $this->reading_time_gui = new \ILIAS\Blog\ReadingTime\BlogSettingsGUI($blog_id);
+        $this->reading_time_manager = new \ILIAS\Blog\ReadingTime\ReadingTimeManager();
     }
 
     public function getType()
@@ -391,6 +405,8 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
                 $img->setImage($file);
             }
         }
+
+        $this->reading_time_gui->addSettingToForm($a_form);
         
         /* #15000
         $bg_color = new ilColorPickerInputGUI($lng->txt("blog_background_color"), "bg_color");
@@ -469,6 +485,7 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
         $a_values["abssl"] = $this->object->getAbstractShortenLength() ? $this->object->getAbstractShortenLength() : ilObjBlog::ABSTRACT_DEFAULT_SHORTEN_LENGTH;
         $a_values["absiw"] = $this->object->getAbstractImageWidth() ? $this->object->getAbstractImageWidth() : ilObjBlog::ABSTRACT_DEFAULT_IMAGE_WIDTH;
         $a_values["absih"] = $this->object->getAbstractImageHeight() ? $this->object->getAbstractImageHeight() : ilObjBlog::ABSTRACT_DEFAULT_IMAGE_HEIGHT;
+        $a_values = $this->reading_time_gui->addValueToArray($a_values);
     }
 
     protected function updateCustom(ilPropertyFormGUI $a_form)
@@ -498,6 +515,7 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
         $this->object->setNavModeListMonthsWithPostings($a_form->getInput("nav_list_mon_with_post"));
         $this->object->setNavModeListMonths($a_form->getInput("nav_list_mon"));
         $this->object->setOverviewPostings($a_form->getInput("ov_list_post_num"));
+        $this->reading_time_gui->saveSettingFromForm($a_form);
 
         $order = $a_form->getInput("order");
         foreach ($order as $idx => $value) {
@@ -1657,6 +1675,21 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
                 $wtpl->setVariable("DRAFT_TEXT", $lng->txt("blog_draft_text"));
                 $wtpl->parseCurrentBlock();
                 $wtpl->setVariable("DRAFT_CLASS", " ilBlogListItemDraft");
+            }
+
+            // reading time
+            $reading_time = $this->reading_time_manager->getReadingTime(
+                $this->object->getId(),
+                $item["id"]
+            );
+            if (!is_null($reading_time)) {
+                $this->lng->loadLanguageModule("copg");
+                $wtpl->setCurrentBlock("reading_time");
+                $wtpl->setVariable("READING_TIME",
+                    $this->lng->txt("copg_est_reading_time").": ".
+                    sprintf($this->lng->txt("copg_x_minutes"), $reading_time)
+                );
+                $wtpl->parseCurrentBlock();
             }
 
             $wtpl->setCurrentBlock("posting");

@@ -21,6 +21,11 @@
 class ilLMPresentationGUI
 {
     /**
+     * @var \ILIAS\LearningModule\ReadingTime\ReadingTimeManager
+     */
+    protected $reading_time_manager;
+
+    /**
      * @var ilObjUser
      */
     protected $user;
@@ -262,6 +267,7 @@ class ilLMPresentationGUI
             ];
             $DIC->globalScreen()->tool()->context()->current()->addAdditionalData(\ilLMGSToolProvider::LM_QUERY_PARAMS, $params);
         }
+        $this->reading_time_manager = new \ILIAS\LearningModule\ReadingTime\ReadingTimeManager();
     }
 
     /**
@@ -1987,6 +1993,16 @@ class ilLMPresentationGUI
         
         // show standard meta data section
         $info->addMetaDataSections($this->lm->getId(), 0, $this->lm->getType());
+
+        $this->lng->loadLanguageModule("copg");
+        $est_reading_time = $this->reading_time_manager->getReadingTime($this->lm->getId());
+        if (!is_null($est_reading_time)) {
+            $info->addProperty(
+                $this->lng->txt("copg_est_reading_time"),
+                sprintf($this->lng->txt("copg_x_minutes"), $est_reading_time)
+            );
+        }
+
 
         if ($this->offlineMode()) {
             $this->tpl->setContent($info->getHTML());

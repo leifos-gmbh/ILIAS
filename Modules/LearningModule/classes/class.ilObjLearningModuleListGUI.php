@@ -13,6 +13,11 @@
 class ilObjLearningModuleListGUI extends ilObjectListGUI
 {
     /**
+     * @var \ILIAS\LearningModule\ReadingTime\ReadingTimeManager
+     */
+    protected $reading_time_manager;
+
+    /**
     * initialisation
     *
     * this method should be overwritten by derived classes
@@ -28,9 +33,11 @@ class ilObjLearningModuleListGUI extends ilObjectListGUI
         $this->info_screen_enabled = true;
         $this->type = "lm";
         $this->gui_class_name = "ilobjlearningmodulegui";
+        $this->lng->loadLanguageModule("copg");
         
         // general commands array
         $this->commands = ilObjLearningModuleAccess::_getCommands();
+        $this->reading_time_manager = new \ILIAS\LearningModule\ReadingTime\ReadingTimeManager();
     }
 
     public function setChildId($a_child_id)
@@ -152,6 +159,15 @@ class ilObjLearningModuleListGUI extends ilObjectListGUI
         if ($rbacsystem->checkAccess('write', $this->ref_id)) {
             $props[] = array("alert" => false, "property" => $lng->txt("type"),
                 "value" => $lng->txt("lm"));
+        }
+
+        $est_reading_time = $this->reading_time_manager->getReadingTime($this->obj_id);
+        if (!is_null($est_reading_time)) {
+            $props[] = array(
+                "alert" => false,
+                "property" => $lng->txt("copg_est_reading_time"),
+                "value" => sprintf($lng->txt("copg_x_minutes"), $est_reading_time)
+            );
         }
 
         return $props;

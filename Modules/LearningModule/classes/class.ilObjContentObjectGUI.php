@@ -15,6 +15,11 @@
 class ilObjContentObjectGUI extends ilObjectGUI implements ilLinkCheckerGUIRowHandling
 {
     /**
+     * @var \ILIAS\LearningModule\ReadingTime\SettingsGUI
+     */
+    protected $reading_time_gui;
+
+    /**
      * @var ilTabsGUI
      */
     protected $tabs;
@@ -96,6 +101,11 @@ class ilObjContentObjectGUI extends ilObjectGUI implements ilLinkCheckerGUIRowHa
         $lng->loadLanguageModule("content");
         $lng->loadLanguageModule("obj");
         parent::__construct($a_data, $a_id, $a_call_by_reference, false);
+
+        $id = (isset($this->object))
+            ? $this->object->getId()
+            : 0;
+        $this->reading_time_gui = new \ILIAS\LearningModule\ReadingTime\SettingsGUI($id);
     }
 
     /**
@@ -500,6 +510,8 @@ class ilObjContentObjectGUI extends ilObjectGUI implements ilLinkCheckerGUIRowHa
         $progr_icons->setInfo($this->lng->txt("cont_progress_icons_info"));
         $this->form->addItem($progr_icons);
 
+        $this->reading_time_gui->addSettingToForm($this->form);
+
         // self assessment
         $section = new ilFormSectionHeaderGUI();
         $section->setTitle($this->lng->txt('cont_self_assessment'));
@@ -611,7 +623,7 @@ class ilObjContentObjectGUI extends ilObjectGUI implements ilLinkCheckerGUIRowHa
             $this->object->getId()
         );
 
-        $this->form->setValuesByArray($values);
+        $this->form->setValuesByArray($values, true);
     }
     
     /**
@@ -651,6 +663,7 @@ class ilObjContentObjectGUI extends ilObjectGUI implements ilLinkCheckerGUIRowHa
             $this->object->setRatingPages($_POST["rating_pages"]);
             $this->object->setDisableDefaultFeedback((int) $_POST["disable_def_feedback"]);
             $this->object->setProgressIcons((int) $_POST["progr_icons"]);
+            $this->reading_time_gui->saveSettingFromForm($this->form);
 
             $add_info = "";
             if ($_POST["restrict_forw_nav"] && !$_POST["store_tries"]) {

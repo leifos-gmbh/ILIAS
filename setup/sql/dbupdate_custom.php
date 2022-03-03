@@ -103,3 +103,48 @@ $ilDB->update("page_layout", [
     ]
 );
 ?>
+<#12>
+<?php
+if (!$ilDB->tableColumnExists('content_object', 'act_est_reading_time')) {
+    $ilDB->addTableColumn('content_object', 'act_est_reading_time', array(
+        'type' => 'integer',
+        'notnull' => true,
+        'length' => 1,
+        'default' => 0
+    ));
+}
+?>
+<#13>
+<?php
+if (!$ilDB->tableColumnExists('content_object', 'est_reading_time')) {
+    $ilDB->addTableColumn('content_object', 'est_reading_time', array(
+        'type' => 'integer',
+        'notnull' => true,
+        'length' => 4,
+        'default' => 0
+    ));
+}
+?>
+<#14>
+<?php
+if (!$ilDB->tableColumnExists('il_blog', 'act_est_reading_time')) {
+    $ilDB->addTableColumn('il_blog', 'act_est_reading_time', array(
+        'type' => 'integer',
+        'notnull' => true,
+        'length' => 1,
+        'default' => 0
+    ));
+}
+?>
+<#15>
+<?php
+if (!$ilDB->tableColumnExists('page_object', 'est_reading_time')) {
+    $ilDB->addTableColumn('page_object', 'est_reading_time', array(
+        'type' => 'integer',
+        'notnull' => true,
+        'length' => 4,
+        'default' => 0
+    ));
+}
+?>
+

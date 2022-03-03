@@ -129,7 +129,8 @@ class ilObjBlogAdministrationGUI extends ilObjectGUI
             $blga_set->set("banner_width", (int) $form->getInput("width"));
             $blga_set->set("banner_height", (int) $form->getInput("height"));
             $blga_set->set("mask", (bool) $form->getInput("mask"));
-            
+            $blga_set->set("est_reading_time", (bool) $form->getInput("est_reading_time"));
+
             ilUtil::sendSuccess($this->lng->txt("settings_saved"), true);
             $ilCtrl->redirect($this, "editSettings");
         }
@@ -189,6 +190,15 @@ class ilObjBlogAdministrationGUI extends ilObjectGUI
             $width->setValue(1370);
             $height->setValue(100);
         }
+
+        // Activate replace media object function
+        $cb_prop = new ilCheckboxInputGUI(
+            $lng->txt("blog_est_reading_time"),
+            "est_reading_time"
+        );
+        $cb_prop->setInfo($lng->txt("blog_est_reading_time_info"));
+        $cb_prop->setChecked($blga_set->get("est_reading_time"));
+        $form->addItem($cb_prop);
 
         /*
         $mask = new ilCheckboxInputGUI($lng->txt("blog_allow_html"), "mask");

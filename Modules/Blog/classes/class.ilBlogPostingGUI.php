@@ -13,6 +13,10 @@
 class ilBlogPostingGUI extends ilPageObjectGUI
 {
     /**
+     * @var \ILIAS\Blog\ReadingTime\ReadingTimeManager
+     */
+    protected $reading_time_manager;
+    /**
      * @var ilTabsGUI
      */
     protected $tabs;
@@ -118,6 +122,8 @@ class ilBlogPostingGUI extends ilPageObjectGUI
         $this->blpg = (int) $_GET["blpg"];
         $this->fetchall = (bool) $_GET["fetchall"];
         $this->term = ilUtil::stripSlashes($_GET["term"]);
+
+        $this->reading_time_manager = new \ILIAS\Blog\ReadingTime\ReadingTimeManager();
     }
 
     /**
@@ -399,6 +405,22 @@ class ilBlogPostingGUI extends ilPageObjectGUI
         $rel = ilDatePresentation::useRelativeDates();
         ilDatePresentation::setUseRelativeDates(true);
         $tpl = new ilTemplate("tpl.posting_head.html", true, true, "Modules/Blog");
+
+        // reading time
+        $reading_time = $this->reading_time_manager->getReadingTime(
+            $this->getBlogPosting()->getParentId(),
+            $this->getBlogPosting()->getId()
+        );
+        if (!is_null($reading_time)) {
+            $this->lng->loadLanguageModule("copg");
+            $tpl->setCurrentBlock("reading_time");
+            $tpl->setVariable("READING_TIME",
+                $this->lng->txt("copg_est_reading_time").": ".
+                sprintf($this->lng->txt("copg_x_minutes"), $reading_time)
+            );
+            $tpl->parseCurrentBlock();
+        }
+
         $tpl->setVariable("TITLE", $this->getBlogPosting()->getTitle());
         $tpl->setVariable("DATETIME",
             $author . ilDatePresentation::formatDate($this->getBlogPosting()->getCreated())

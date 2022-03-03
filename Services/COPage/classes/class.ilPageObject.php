@@ -40,6 +40,11 @@ define("IL_INSERT_CHILD", 2);
 abstract class ilPageObject
 {
     /**
+     * @var \ILIAS\COPage\ReadingTime\ReadingTimeManager
+     */
+    protected $reading_time_manager;
+
+    /**
      * @var ilObjectDefinition
      */
     protected $obj_definition;
@@ -133,6 +138,8 @@ abstract class ilPageObject
         $this->lng = $DIC->language();
         $this->tree = $DIC->repositoryTree();
         $this->log = ilLoggerFactory::getLogger('copg');
+
+        $this->reading_time_manager = new ILIAS\COPage\ReadingTime\ReadingTimeManager();
 
         $this->parent_type = $this->getParentType();
         $this->id = $a_id;
@@ -2628,6 +2635,9 @@ abstract class ilPageObject
             // save style usage
             $this->saveStyleUsage($a_domdoc);
 
+            // save estimated reading time
+            $this->reading_time_manager->saveTime($this);
+
             // pc classes hook
             include_once("./Services/COPage/classes/class.ilCOPagePCDef.php");
             $defs = ilCOPagePCDef::getPCDefinitions();
@@ -2887,6 +2897,8 @@ abstract class ilPageObject
                 $copg_logger->debug("ilPageObject: ... missing mob " . $mob_id . ".");
             }
         }
+
+        $this->__afterDelete();
     }
 
     /**
@@ -2903,6 +2915,15 @@ abstract class ilPageObject
             $cl = $def["pc_class"];
             call_user_func($def["pc_class"] . '::beforePageDelete', $this);
         }
+    }
+
+    final protected function __afterDelete() : void
+    {
+        $this->afterDelete();
+    }
+
+    protected function afterDelete() : void
+    {
     }
 
     /**

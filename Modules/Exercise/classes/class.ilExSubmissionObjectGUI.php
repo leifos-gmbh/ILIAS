@@ -649,7 +649,7 @@ class ilExSubmissionObjectGUI extends ilExSubmissionBaseGUI
                 $this->submission->deleteAllFiles();
 
                 $meta = array(
-                    "name" => $blog_id,
+                    "name" => $blog_id.".zip",
                     "tmp_name" => $file,
                     "size" => $size
                     );
@@ -660,7 +660,7 @@ class ilExSubmissionObjectGUI extends ilExSubmissionBaseGUI
                 $size = filesize($file);
                 if ($size) {
                     $meta = array(
-                        "name" => $blog_id . "print",
+                        "name" => $blog_id . "print.zip",
                         "tmp_name" => $file,
                         "size" => $size
                     );
@@ -699,7 +699,7 @@ class ilExSubmissionObjectGUI extends ilExSubmissionBaseGUI
                 $this->submission->deleteAllFiles();
 
                 $meta = array(
-                    "name" => $prtf_id,
+                    "name" => $prtf_id.".zip",
                     "tmp_name" => $file,
                     "size" => $size
                     );
@@ -711,7 +711,7 @@ class ilExSubmissionObjectGUI extends ilExSubmissionBaseGUI
                 $size = filesize($file);
                 if ($size) {
                     $meta = array(
-                        "name" => $prtf_id . "print",
+                        "name" => $prtf_id . "print.zip",
                         "tmp_name" => $file,
                         "size" => $size
                     );

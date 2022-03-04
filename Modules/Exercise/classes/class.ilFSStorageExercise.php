@@ -214,14 +214,12 @@ class ilFSStorageExercise extends ilFileSystemStorage
         // TODO:
         // CHECK UPLOAD LIMIT
 
-
         //
         $result = false;
         if (isset($a_http_post_file) && $a_http_post_file['size']) {
             $filename = $a_http_post_file['name'];
 
             $filename = ilFileUtils::getValidFilename($filename);
-
             // replace whitespaces with underscores
             $filename = preg_replace("/\s/", "_", $filename);
             // remove all special characters

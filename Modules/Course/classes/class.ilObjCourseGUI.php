@@ -2010,11 +2010,15 @@ class ilObjCourseGUI extends ilContainerGUI
     public function getTabs()
     {
         global $DIC;
-
         $ilUser = $DIC['ilUser'];
         $lng = $DIC['lng'];
         $ilHelp = $DIC['ilHelp'];
-        
+
+        $next_class = $this->ctrl->getNextClass($this);
+        if (strtolower($next_class) == "ilobjectcontentstylesettingsgui") {
+            return;
+        }
+
         $ilAccess = $GLOBALS['DIC']->access();
 
         $ilHelp->setScreenIdComponent("crs");

@@ -1089,7 +1089,12 @@ class ilObjGroupGUI extends ilContainerGUI
         $ilAccess = $DIC['ilAccess'];
         $lng = $DIC['lng'];
         $ilHelp = $DIC['ilHelp'];
-        
+
+        $next_class = $this->ctrl->getNextClass($this);
+        if (strtolower($next_class) == "ilobjectcontentstylesettingsgui") {
+            return;
+        }
+
         $ilHelp->setScreenIdComponent("grp");
 
         if ($ilAccess->checkAccess('read', '', $this->ref_id)) {

@@ -49,7 +49,7 @@
 				) AS resource_path
 
 				FROM file_data
-				JOIN il_resource ON il_resource.identification = file_data.rid
+				JOIN il_resource ON il_resource.rid = file_data.rid
 				WHERE
 				file_id IN (?) AND
 				file_data.rid IS NOT NULL

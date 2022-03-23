@@ -37,9 +37,9 @@ class RepoService
         return new ItemSessionRepository();
     }
 
-    public function view() : ViewSessionRepository
+    public function mode() : ModeSessionRepository
     {
-        return new ViewSessionRepository();
+        return new ModeSessionRepository();
     }
 
     public function block() : BlockSessionRepository

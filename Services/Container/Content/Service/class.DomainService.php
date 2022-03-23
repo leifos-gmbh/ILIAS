@@ -29,7 +29,17 @@ class DomainService
     protected InternalDomainService $domain_service;
 
     protected ItemSessionRepository $item_repo;
-    protected ViewSessionRepository $view_repo;
+    protected ModeSessionRepository $mode_repo;
+
+    /**
+     * @var array<int, ItemSetManager>
+     */
+    protected static array $flat_item_set_managers = [];
+
+    /**
+     * @var array<int, ItemSetManager>
+     */
+    protected static array $tree_item_set_managers = [];
 
     public function __construct(
         InternalRepoService $repo_service,
@@ -40,9 +50,12 @@ class DomainService
         $this->data_service = $data_service;
         $this->domain_service = $domain_service;
         $this->item_repo = $this->repo_service->content()->item();
-        $this->view_repo = $this->repo_service->content()->view();
+        $this->mode_repo = $this->repo_service->content()->mode();
     }
 
+    /**
+     * Controls item state (e.g. expanded)
+     */
     public function items(\ilContainer $container) : ItemManager
     {
         return new ItemManager(
@@ -51,10 +64,101 @@ class DomainService
         );
     }
 
-    public function view() : ViewManager
+    /**
+     * Manages item retrieval, filtering, grouping and sorting
+     */
+    public function itemPresentation(\ilContainer $container) : ItemPresentationManager
     {
-        return new ViewManager(
-            $this->view_repo
+        return new ItemPresentationManager(
+            $this->domain_service,
+            $container
+        );
+    }
+
+    /**
+     * Manages set of conatiner items (flat version)
+     */
+    public function itemSetFlat(int $ref_id) : ItemSetManager
+    {
+        if (!isset(self::$flat_item_set_managers[$ref_id])) {
+            self::$flat_item_set_managers[$ref_id] = new ItemSetManager(
+                $this->domain_service,
+                ItemSetManager::FLAT,
+                $ref_id
+            );
+        }
+        return self::$flat_item_set_managers[$ref_id];
+    }
+
+    /**
+     * Manages set of conatiner items (flat version)
+     */
+    public function itemSetTree(int $ref_id) : ItemSetManager
+    {
+        if (!isset(self::$tree_item_set_managers[$ref_id])) {
+            self::$tree_item_set_managers[$ref_id] = new ItemSetManager(
+                $this->domain_service,
+                ItemSetManager::TREE,
+                $ref_id
+            );
+        }
+        return self::$tree_item_set_managers[$ref_id];
+    }
+
+    public function view(\ilContainer $container) : ViewManager
+    {
+        $view_mode = $container->getViewMode();
+        if ($container->filteredSubtree()) {
+            $view_mode = \ilContainer::VIEW_SIMPLE;
+        }
+        switch ($view_mode) {
+            case \ilContainer::VIEW_SIMPLE:
+                $container_view = new SimpleContentViewManager(
+                    $this->data_service->content(),
+                    $this->domain_service,
+                    $container
+                );
+                break;
+
+            case \ilContainer::VIEW_OBJECTIVE:
+                $container_view = new ObjectiveViewManager(
+                    $this->data_service->content(),
+                    $this->domain_service,
+                    $container
+                );
+                break;
+
+            // all items in one block
+            case \ilContainer::VIEW_SESSIONS:
+            case \ilCourseConstants::IL_CRS_VIEW_TIMING: // not nice this workaround
+                $container_view = new SessionsViewManager(
+                    $this->data_service->content(),
+                    $this->domain_service,
+                    $container
+                );
+                break;
+
+            // all items in one block
+            case \ilContainer::VIEW_BY_TYPE:
+            default:
+                $container_view = new ByTypeViewManager(
+                    $this->data_service->content(),
+                    $this->domain_service,
+                    $container
+                );
+                break;
+        }
+
+        return $container_view;
+    }
+
+    /**
+     * Controls admin/content view state
+     */
+    public function mode() : ModeManager
+    {
+        return new ModeManager(
+            $this->mode_repo
         );
     }
 

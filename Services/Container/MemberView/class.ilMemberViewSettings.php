@@ -77,8 +77,8 @@ class ilMemberViewSettings
             ->internal()
             ->domain()
             ->content()
-            ->view()
-            ->setContentView();
+            ->mode()
+            ->setContentMode();
     }
 
     /**

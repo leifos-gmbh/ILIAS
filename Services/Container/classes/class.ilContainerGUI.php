@@ -18,7 +18,7 @@ use ILIAS\UI\Component\Input\Container\Filter\Standard;
 use ILIAS\DI\UIServices;
 use ILIAS\Repository\Clipboard\ClipboardManager;
 use ILIAS\Container\StandardGUIRequest;
-use ILIAS\Container\Content\ViewManager;
+use ILIAS\Container\Content\ModeManager;
 
 /**
  * Class ilContainerGUI
@@ -50,7 +50,7 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
     protected int $current_position = 0;
     protected ClipboardManager $clipboard;
     protected StandardGUIRequest $std_request;
-    protected ViewManager $view_manager;
+    protected ModeManager $mode_manager;
     protected ilComponentFactory $component_factory;
     protected \ILIAS\Style\Content\DomainService $content_style_domain;
 
@@ -105,12 +105,12 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
             ->gui()
             ->standardRequest();
         $this->requested_redirectSource = $this->std_request->getRedirectSource();
-        $this->view_manager = $DIC
+        $this->mode_manager = $DIC
             ->container()
             ->internal()
             ->domain()
             ->content()
-            ->view();
+            ->mode();
 
         $this->container_filter_service = new ilContainerFilterService();
         $this->initFilter();
@@ -907,13 +907,13 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 
     public function enableAdministrationPanelObject() : void
     {
-        $this->view_manager->setAdminView();
+        $this->mode_manager->setAdminMode();
         $this->ctrl->redirect($this, "render");
     }
 
     public function disableAdministrationPanelObject() : void
     {
-        $this->view_manager->setContentView();
+        $this->mode_manager->setContentMode();
         $this->ctrl->redirect($this, "render");
     }
 
@@ -922,7 +922,7 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
         $ilTabs = $this->tabs;
 
         $this->edit_order = true;
-        $this->view_manager->setContentView();
+        $this->mode_manager->setContentMode();
         $this->renderObject();
 
         $ilTabs->activateSubTab("ordering");
@@ -1845,13 +1845,13 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
     public function isActiveAdministrationPanel() : bool
     {
         // #10081
-        if ($this->view_manager->isAdminView() &&
+        if ($this->mode_manager->isAdminMode() &&
             $this->object->getRefId() &&
             !$this->rbacsystem->checkAccess("visible,read", $this->object->getRefId())) {
             return false;
         }
 
-        return $this->view_manager->isAdminView();
+        return $this->mode_manager->isAdminMode();
     }
 
     public function setColumnSettings(ilColumnGUI $column_gui) : void

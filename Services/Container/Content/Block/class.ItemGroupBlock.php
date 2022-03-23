@@ -1,35 +1,38 @@
-<?php declare(strict_types = 1);
+<?php
 
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
+ *
  * ILIAS is licensed with the GPL-3.0,
  * see https://www.gnu.org/licenses/gpl-3.0.en.html
  * You should have received a copy of said license along with the
  * source code, too.
+ *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
  * https://www.ilias.de
  * https://github.com/ILIAS-eLearning
- */
+ *
+ *********************************************************************/
 
-namespace ILIAS\Container;
+namespace ILIAS\Container\Content;
 
 /**
- * Repository internal data service
+ * A block that holds a single item group
  * @author Alexander Killing <killing@leifos.de>
  */
-class InternalDataService
+class ItemGroupBlock implements Block
 {
-    protected Content\DataService $content_service;
+    protected int $ref_id;
 
-    public function __construct()
+    public function __construct(int $ref_id)
     {
-        $this->content_service = new Content\DataService();
+        $this->ref_id = $ref_id;
     }
 
-    public function content() : Content\DataService
+    public function getRefId() : int
     {
-        return $this->content_service;
+        return $this->ref_id;
     }
 }

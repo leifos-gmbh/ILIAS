@@ -18,33 +18,33 @@ namespace ILIAS\Container\Content;
 /**
  * @author Alexander Killing <killing@leifos.de>
  */
-class ViewManager
+class ModeManager
 {
-    protected ViewSessionRepository $view_repo;
+    protected ModeSessionRepository $mode_repo;
 
     public function __construct(
-        ViewSessionRepository $view_repo
+        ModeSessionRepository $mode_repo
     ) {
-        $this->view_repo = $view_repo;
+        $this->mode_repo = $mode_repo;
     }
 
-    public function setAdminView() : void
+    public function setAdminMode() : void
     {
-        $this->view_repo->setAdminView();
+        $this->mode_repo->setAdminMode();
     }
 
-    public function setContentView() : void
+    public function setContentMode() : void
     {
-        $this->view_repo->setContentView();
+        $this->mode_repo->setContentMode();
     }
 
-    public function isAdminView() : bool
+    public function isAdminMode() : bool
     {
-        return $this->view_repo->isAdminView();
+        return $this->mode_repo->isAdminMode();
     }
 
-    public function isContentView() : bool
+    public function isContentMode() : bool
     {
-        return $this->view_repo->isContentView();
+        return $this->mode_repo->isContentMode();
     }
 }

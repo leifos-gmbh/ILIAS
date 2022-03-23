@@ -1,35 +1,27 @@
-<?php declare(strict_types = 1);
+<?php
 
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
+ *
  * ILIAS is licensed with the GPL-3.0,
  * see https://www.gnu.org/licenses/gpl-3.0.en.html
  * You should have received a copy of said license along with the
  * source code, too.
+ *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
  * https://www.ilias.de
  * https://github.com/ILIAS-eLearning
- */
+ *
+ *********************************************************************/
 
-namespace ILIAS\Container;
+namespace ILIAS\Container\Content;
 
 /**
- * Repository internal data service
+ * A block that holds all objectives and their items
  * @author Alexander Killing <killing@leifos.de>
  */
-class InternalDataService
+class ObjectiveBlock implements Block
 {
-    protected Content\DataService $content_service;
-
-    public function __construct()
-    {
-        $this->content_service = new Content\DataService();
-    }
-
-    public function content() : Content\DataService
-    {
-        return $this->content_service;
-    }
 }

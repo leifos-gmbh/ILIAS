@@ -13,7 +13,7 @@
  * https://github.com/ILIAS-eLearning
  */
 
-namespace ILIAS\Container\Content;
+namespace ILIAS\Container\Content\Filter;
 
 use ILIAS\Container\InternalDataService;
 
@@ -31,26 +31,18 @@ class RepoService
         $this->db = $db;
     }
 
-    public function item() : ItemSessionRepository
+    public function object() : ObjectDBRepo
     {
-        return new ItemSessionRepository();
+        return new ObjectDBRepo($this->db);
     }
 
-    public function mode() : ModeSessionRepository
+    public function member() : MemberDBRepo
     {
-        return new ModeSessionRepository();
+        return new MemberDBRepo($this->db);
     }
 
-    public function block() : BlockSessionRepository
+    public function metadata() : MetadataDBRepo
     {
-        return new BlockSessionRepository();
-    }
-
-    public function filter() : Filter\RepoService
-    {
-        return new Filter\RepoService(
-            $this->data,
-            $this->db
-        );
+        return new MetadataDBRepo($this->db);
     }
 }

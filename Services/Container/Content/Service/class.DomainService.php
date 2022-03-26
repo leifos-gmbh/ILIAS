@@ -18,6 +18,7 @@ namespace ILIAS\Container\Content;
 use ILIAS\Container\InternalRepoService;
 use ILIAS\Container\InternalDataService;
 use ILIAS\Container\InternalDomainService;
+use ILIAS\Container\Content\Filter\FilterManager;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
@@ -162,14 +163,20 @@ class DomainService
         );
     }
 
-    /*
-    public function access(int $ref_id, int $user_id) : Access\AccessManager
-    {
-        return new Access\AccessManager(
+    /**
+     * @param array[] $objects each array must contain the keys "obj_id" and "type"
+     */
+    public function filter(
+        array $objects,
+        ?\ilContainerUserFilter $container_user_filter,
+        bool $results_on_filter_only = false
+    ) : FilterManager {
+        return new FilterManager(
             $this,
-            $this->access,
-            $ref_id,
-            $user_id
+            $this->repo_service->content(),
+            $objects,
+            $container_user_filter,
+            $results_on_filter_only
         );
-    }*/
+    }
 }

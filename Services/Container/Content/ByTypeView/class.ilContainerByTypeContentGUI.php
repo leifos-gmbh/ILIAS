@@ -48,9 +48,8 @@ class ilContainerByTypeContentGUI extends ilContainerContentGUI
         }
         if ($a_item_id == $this->force_details) {
             return self::DETAILS_ALL;
-        } else {
-            return self::DETAILS_TITLE;
         }
+        return self::DETAILS_TITLE;
     }
 
     public function getMainContent() : string

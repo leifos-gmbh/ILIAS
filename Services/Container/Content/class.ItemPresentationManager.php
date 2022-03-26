@@ -22,6 +22,7 @@ use ILIAS\Container\InternalDomainService;
  */
 class ItemPresentationManager
 {
+    protected \ilContainerUserFilter $container_user_filter;
     protected ?array $type_grps = null;
     protected ?ItemSetManager $item_set = null;
     protected \ilContainer $container;
@@ -30,10 +31,12 @@ class ItemPresentationManager
 
     public function __construct(
         InternalDomainService $domain,
-        \ilContainer $container
+        \ilContainer $container,
+        \ilContainerUserFilter $container_user_filter
     ) {
         $this->container = $container;
         $this->domain = $domain;
+        $this->container_user_filter = $container_user_filter;
 
         // sequence from view manager
     }
@@ -66,13 +69,10 @@ class ItemPresentationManager
      */
     protected function filteredSubtree() : bool
     {
-        if ($this->isClassificationFilterActive() && in_array(
+        return $this->isClassificationFilterActive() && in_array(
             $this->container->getType(),
             ["grp", "crs"]
-        )) {
-            return true;
-        }
-        return false;
+        );
     }
 
     protected function init() : void

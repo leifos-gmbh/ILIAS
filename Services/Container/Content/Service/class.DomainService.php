@@ -106,6 +106,20 @@ class DomainService
         return self::$tree_item_set_managers[$ref_id];
     }
 
+    /**
+     * Manages set of conatiner items (single item version)
+     */
+    public function itemSetSingle(int $ref_id, int $single_ref_id) : ItemSetManager
+    {
+        return new ItemSetManager(
+            $this->domain_service,
+            ItemSetManager::SINGLE,
+            $ref_id,
+            null,
+            $single_ref_id
+        );
+    }
+
     public function view(\ilContainer $container) : ViewManager
     {
         $view_mode = $container->getViewMode();

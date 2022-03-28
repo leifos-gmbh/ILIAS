@@ -23,28 +23,50 @@ use ILIAS\Container\InternalDomainService;
  */
 class ItemSetManager
 {
-    const FLAT = 0;
-    const TREE = 1;
+    public const FLAT = 0;
+    public const TREE = 1;
+    public const SINGLE = 2;
+    protected bool $hiddenfilesfound = false;
+    protected string $parent_type;
+    protected int $parent_obj_id;
 
-    protected int $ref_id = 0;
+    protected int $parent_ref_id = 0;
+    protected int $single_ref_id = 0;
     protected InternalDomainService $domain;
     protected array $raw = [];
     protected int $mode = self::FLAT;
     protected \ilContainerUserFilter $user_filter;
 
     /**
-     * @param int $mode self::TREE|self::FLAT
+     * @param int $mode self::TREE|self::FLAT|self::SINGLE
      */
     public function __construct(
         InternalDomainService $domain,
         int $mode,
-        int $ref_id,
-        ?\ilContainerUserFilter $user_filter = null
+        int $parent_ref_id,
+        ?\ilContainerUserFilter $user_filter = null,
+        int $single_ref_id = 0,
+        bool $admin_mode = false
     ) {
-        $this->ref_id = $ref_id;
+        $this->parent_ref_id = $parent_ref_id;
+        $this->parent_obj_id = \ilObject::_lookupObjId($this->parent_ref_id);
+        $this->parent_type = \ilObject::_lookupType($this->parent_obj_id);
+
+        $this->single_ref_id = $single_ref_id;
         $this->domain = $domain;
         $this->mode = $mode;        // might be refactored as subclasses
         $this->init();
+        $this->admin_mode = $admin_mode;
+    }
+
+    public function setHiddenFilesFound(bool $a_hiddenfilesfound) : void
+    {
+        $this->hiddenfilesfound = $a_hiddenfilesfound;
+    }
+
+    public function getHiddenFilesFound() : bool
+    {
+        return $this->hiddenfilesfound;
     }
 
     /**
@@ -54,11 +76,15 @@ class ItemSetManager
     {
         $tree = $this->domain->repositoryTree();
         if ($this->mode === self::TREE) {
-            $this->raw = $tree->getSubTree($tree->getNodeData($this->ref_id));
+            $this->raw = $tree->getSubTree($tree->getNodeData($this->parent_ref_id));
+        } elseif ($this->mode === self::FLAT) {
+            $this->raw = $tree->getChilds($this->parent_ref_id, "title");
         } else {
-            $this->raw = $tree->getChilds($this->ref_id, "title");
+            $this->raw[] = $tree->getNodeData($this->single_ref_id);
         }
         $this->applyUserFilter();
+        $this->getCompleteDescriptions();
+        $this->applyClassificationFilter();
     }
 
     /**
@@ -70,6 +96,80 @@ class ItemSetManager
     }
 
     /**
+     * Apply standard filter
+     * @param
+     * @return
+     */
+    protected function groupItems()
+    {
+        $obj_definition = $this->domain->objectDefinition();
+        $classification_filter_active = $this->isClassificationFilterActive();
+        foreach ($this->raw as $key => $object) {
+
+            // hide object types in devmode
+            if ($object["type"] === "adm" || $object["type"] === "rolf" ||
+                $obj_definition->getDevMode($object["type"])) {
+                continue;
+            }
+
+            // remove inactive plugins
+            if ($obj_definition->isInactivePlugin($object["type"])) {
+                continue;
+            }
+
+            // BEGIN WebDAV: Don't display hidden Files, Folders and Categories
+            if (in_array($object['type'], array('file','fold','cat'))) {
+                if (\ilObjFileAccess::_isFileHidden($object['title'])) {
+                    $this->setHiddenFilesFound(true);
+                    if (!$a_admin_panel_enabled) {
+                        continue;
+                    }
+                }
+            }
+            // END WebDAV: Don't display hidden Files, Folders and Categories
+
+            // including event items!
+            if (!self::$data_preloaded) {
+                $preloader->addItem($object["obj_id"], $object["type"], $object["child"]);
+            }
+
+            // filter out items that are attached to an event
+            if (in_array($object['ref_id'], $event_items) && !$classification_filter_active) {
+                continue;
+            }
+
+            // filter side block items
+            if (!$a_include_side_block && $objDefinition->isSideBlock($object['type'])) {
+                continue;
+            }
+
+            $all_ref_ids[] = $object["child"];
+        }
+    }
+
+    /**
+     * @todo from ilContainer, remove there
+     */
+    public function isClassificationFilterActive() : bool
+    {
+        // apply container classification filters
+        $repo = new \ilClassificationSessionRepository($this->parent_ref_id);
+        foreach (\ilClassificationProvider::getValidProviders(
+            $this->parent_ref_id,
+            $this->parent_obj_id,
+            $this->parent_type
+        ) as $class_provider) {
+            $id = get_class($class_provider);
+            $current = $repo->getValueForProvider($id);
+            if ($current) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    /**
      * Apply container user filter on objects
      * @throws \ilException
      */
@@ -79,11 +179,84 @@ class ItemSetManager
             $this->raw,
             $this->user_filter,
             !\ilContainer::_lookupContainerSetting(
-                \ilObject::_lookupObjId($this->ref_id),
+                $this->parent_obj_id,
                 "filter_show_empty",
                 "0"
             )
         );
         $this->raw = $filter->apply();
+    }
+
+    /**
+     * From ilContainer @todo remove there
+     */
+    protected function getCompleteDescriptions() : void
+    {
+        $ilSetting = $this->domain->settings();
+        $ilObjDataCache = $this->domain->objectDataCache();
+
+        // using long descriptions?
+        $short_desc = $ilSetting->get("rep_shorten_description");
+        $short_desc_max_length = (int) $ilSetting->get("rep_shorten_description_length");
+        if (!$short_desc || $short_desc_max_length != \ilObject::DESC_LENGTH) {
+            // using (part of) shortened description
+            if ($short_desc && $short_desc_max_length && $short_desc_max_length < \ilObject::DESC_LENGTH) {
+                foreach ($this->raw as $key => $object) {
+                    $this->raw[$key]["description"] = \ilStr::shortenTextExtended(
+                        $object["description"],
+                        $short_desc_max_length,
+                        true
+                    );
+                }
+            }
+            // using (part of) long description
+            else {
+                $obj_ids = array();
+                foreach ($this->raw as $key => $object) {
+                    $obj_ids[] = $object["obj_id"];
+                }
+                if (count($obj_ids) > 0) {
+                    $long_desc = \ilObject::getLongDescriptions($obj_ids);
+                    foreach ($this->raw as $key => $object) {
+                        // #12166 - keep translation, ignore long description
+                        if ($ilObjDataCache->isTranslatedDescription((int) $object["obj_id"])) {
+                            $long_desc[$object["obj_id"]] = $object["description"];
+                        }
+                        if ($short_desc && $short_desc_max_length) {
+                            $long_desc[$object["obj_id"]] = \ilStr::shortenTextExtended(
+                                $long_desc[$object["obj_id"]],
+                                $short_desc_max_length,
+                                true
+                            );
+                        }
+                        $this->raw[$key]["description"] = $long_desc[$object["obj_id"]];
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * From ilContainer @todo remove there
+     */
+    protected function applyClassificationFilter() : void
+    {
+        // apply container classification filters
+        $repo = new \ilClassificationSessionRepository($this->parent_ref_id);
+        foreach (\ilClassificationProvider::getValidProviders(
+            $this->parent_ref_id,
+            $this->parent_obj_id,
+            $this->parent_type
+        ) as $class_provider) {
+            $id = get_class($class_provider);
+            $current = $repo->getValueForProvider($id);
+            if ($current) {
+                $class_provider->setSelection($current);
+                $filtered = $class_provider->getFilteredObjects();
+                $this->raw = array_filter($this->raw, static function ($i) use ($filtered) {
+                    return (is_array($filtered) && in_array($i["obj_id"], $filtered));
+                });
+            }
+        }
     }
 }

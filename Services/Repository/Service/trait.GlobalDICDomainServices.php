@@ -38,6 +38,7 @@ trait GlobalDICDomainServices
     protected LoggingServices $logger;
     protected \ilSetting $settings;
     protected \ilObjectDefinition $object_definition;
+    protected \ilObjectDataCache $obj_data_cache;
 
     protected function initDomainServices(\ILIAS\DI\Container $DIC)
     {
@@ -53,6 +54,7 @@ trait GlobalDICDomainServices
         $this->event = $DIC->event();
         $this->settings = $DIC->settings();
         $this->object_definition = $DIC["objDefinition"];
+        $this->obj_data_cache = $DIC["ilObjDataCache"];
     }
 
     public function repositoryTree() : \ilTree
@@ -113,5 +115,10 @@ trait GlobalDICDomainServices
     public function objectDefinition() : \ilObjectDefinition
     {
         return $this->object_definition;
+    }
+
+    public function objectDataCache() : \ilObjectDataCache
+    {
+        return $this->obj_data_cache;
     }
 }

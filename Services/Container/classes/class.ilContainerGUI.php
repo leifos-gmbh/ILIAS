@@ -1845,8 +1845,7 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
     public function isActiveAdministrationPanel() : bool
     {
         // #10081
-        if ($this->mode_manager->isAdminMode() &&
-            $this->object->getRefId() &&
+        if ($this->object->getRefId() &&
             !$this->rbacsystem->checkAccess("visible,read", $this->object->getRefId())) {
             return false;
         }

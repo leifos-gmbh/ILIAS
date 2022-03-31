@@ -23,6 +23,7 @@ abstract class ilContainerContentGUI
 
     public const VIEW_MODE_LIST = 0;
     public const VIEW_MODE_TILE = 1;
+    protected \ILIAS\Container\Content\ItemPresentationManager $item_presentation;
 
     protected \ilGlobalTemplateInterface $tpl;
     protected ilCtrl $ctrl;
@@ -48,9 +49,14 @@ abstract class ilContainerContentGUI
     protected StandardGUIRequest $request;
     protected ItemManager $item_manager;
     protected BlockSessionRepository $block_repo;
+    protected int $block_limit;
+    protected int $force_details;
+    protected ?ilContainerUserFilter $container_user_filter;
 
-    public function __construct(ilContainerGUI $container_gui_obj)
-    {
+    public function __construct(
+        ilContainerGUI $container_gui_obj,
+        ?ilContainerUserFilter $container_user_filter = null
+    ) {
         /** @var \ILIAS\DI\Container $DIC */
         global $DIC;
 
@@ -69,6 +75,7 @@ abstract class ilContainerContentGUI
         /** @var $obj ilContainer */
         $obj = $this->container_gui->getObject();
         $this->container_obj = $obj;
+        $this->container_user_filter = $container_user_filter;
 
         $tpl->addJavaScript("./Services/Container/js/Container.js");
 
@@ -100,16 +107,36 @@ abstract class ilContainerContentGUI
             ->repo()
             ->content()
             ->block();
+        $this->item_presentation = $DIC->container()
+            ->internal()
+            ->domain()
+            ->content()
+            ->itemPresentation(
+                $this->container_obj,
+                $this->container_user_filter
+            );
+
+        $this->initDetails();
+        $this->block_limit = (int) ilContainer::_lookupContainerSetting($container_gui_obj->getObject()->getId(), "block_limit");
     }
     
     protected function getViewMode() : int
     {
         return $this->view_mode;
     }
-    
+
     protected function getDetailsLevel(int $a_item_id) : int
     {
-        return $this->details_level;
+        if ($this->getContainerGUI()->isActiveAdministrationPanel()) {
+            return self::DETAILS_DEACTIVATED;
+        }
+        if ($this->item_manager->getExpanded($a_item_id) !== null) {
+            return $this->item_manager->getExpanded($a_item_id);
+        }
+        if ($a_item_id === $this->force_details) {
+            return self::DETAILS_ALL;
+        }
+        return self::DETAILS_TITLE;
     }
 
     public function getContainerObject() : ilContainer
@@ -246,11 +273,35 @@ abstract class ilContainerContentGUI
     }
 
     /**
-     * Get content HTML for main column, this one must be
+     * Get content HTML for main column, this one may be
      * overwritten in derived classes.
      */
-    abstract public function getMainContent() : string;
-    
+    public function getMainContent() : string
+    {
+        $ilAccess = $this->access;
+
+        $this->clearAdminCommandsDetermination();
+
+        $tpl = new ilTemplate(
+            "tpl.container_page.html",
+            true,
+            true,
+            "Services/Container"
+        );
+
+        // Show introduction, if repository is empty
+        if ($this->item_presentation->hasItems() &&
+            $this->getContainerObject()->getRefId() == ROOT_FOLDER_ID &&
+            $ilAccess->checkAccess("write", "", $this->getContainerObject()->getRefId())) {
+            $html = $this->getIntroduction();
+        } else {	// show item list otherwise
+            $html = $this->renderItemList();
+        }
+        $tpl->setVariable("CONTAINER_PAGE_CONTENT", $html);
+
+        return $tpl->get();
+    }
+
     /**
      * Init container renderer
      */
@@ -891,16 +942,6 @@ abstract class ilContainerContentGUI
                 // :TODO: show it multiple times?
                 $this->renderer->addItemToBlock($a_itgr["ref_id"], $item["type"], $item["child"], $html2, true);
             }
-        }
-    }
-
-    protected function handleSessionExpand() : void
-    {
-        $expand = $this->request->getExpand();
-        if ($expand > 0) {
-            $this->item_manager->setExpanded(abs($expand), self::DETAILS_ALL);
-        } elseif ($expand < 0) {
-            $this->item_manager->setExpanded(abs($expand), self::DETAILS_TITLE);
         }
     }
 }

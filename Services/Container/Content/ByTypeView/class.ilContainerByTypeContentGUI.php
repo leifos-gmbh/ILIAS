@@ -20,78 +20,11 @@
  */
 class ilContainerByTypeContentGUI extends ilContainerContentGUI
 {
-    protected bool $force_details;
-    protected int $block_limit;
-    protected ?ilContainerUserFilter $container_user_filter;
-    
-    public function __construct(
-        ilContainerGUI $container_gui_obj,
-        ilContainerUserFilter $container_user_filter = null
-    ) {
-        global $DIC;
-
-        $this->access = $DIC->access();
-        $this->user = $DIC->user();
-        parent::__construct($container_gui_obj);
-        $this->initDetails();
-        $this->block_limit = (int) ilContainer::_lookupContainerSetting($container_gui_obj->getObject()->getId(), "block_limit");
-        $this->container_user_filter = $container_user_filter;
-    }
-    
-    protected function getDetailsLevel(int $a_item_id) : int
-    {
-        if ($this->getContainerGUI()->isActiveAdministrationPanel()) {
-            return self::DETAILS_DEACTIVATED;
-        }
-        if ($this->item_manager->getExpanded($a_item_id) !== null) {
-            return $this->item_manager->getExpanded($a_item_id);
-        }
-        if ($a_item_id == $this->force_details) {
-            return self::DETAILS_ALL;
-        }
-        return self::DETAILS_TITLE;
-    }
-
-    public function getMainContent() : string
-    {
-        $ilAccess = $this->access;
-
-        $tpl = new ilTemplate(
-            "tpl.container_page.html",
-            true,
-            true,
-            "Services/Container"
-        );
-        
-        // get all sub items
-        $this->items = $this->getContainerObject()->getSubItems(
-            $this->getContainerGUI()->isActiveAdministrationPanel(),
-            false,
-            0,
-            $this->container_user_filter
-        );
-
-        //$this->items = $this->applyFilterToItems($this->items);
-
-        // Show introduction, if repository is empty
-        // @todo: maybe we move this
-        if ((!is_array($this->items) || count($this->items) == 0) &&
-            $this->getContainerObject()->getRefId() == ROOT_FOLDER_ID &&
-            $ilAccess->checkAccess("write", "", $this->getContainerObject()->getRefId())) {
-            $html = $this->getIntroduction();
-        } else {	// show item list otherwise
-            $html = $this->renderItemList();
-        }
-        $tpl->setVariable("CONTAINER_PAGE_CONTENT", $html);
-
-        return $tpl->get();
-    }
-    
     public function renderItemList() : string
     {
-        $this->clearAdminCommandsDetermination();
-    
         $this->initRenderer();
+
+        return $this->renderer->renderItemBlockSequence($this->item_presentation->getItemBlockSequence());
         
         // text/media page content
         $output_html = $this->getContainerGUI()->getContainerPageHTML();
@@ -136,18 +69,5 @@ class ilContainerByTypeContentGUI extends ilContainerContentGUI
         $output_html .= $this->renderer->getHTML();
         
         return $output_html;
-    }
-    
-    protected function initDetails() : void
-    {
-        $this->handleSessionExpand();
-
-        if ($this->getContainerObject()->getType() == 'crs') {
-            if ($session = ilSessionAppointment::lookupNextSessionByCourse($this->getContainerObject()->getRefId())) {
-                $this->force_details = $session;
-            } elseif ($session = ilSessionAppointment::lookupLastSessionByCourse($this->getContainerObject()->getRefId())) {
-                $this->force_details = $session;
-            }
-        }
     }
 }

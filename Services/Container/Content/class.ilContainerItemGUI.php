@@ -16,12 +16,18 @@
  *
  *********************************************************************/
 
-namespace ILIAS\Container\Content;
 
 /**
- * A block that holds session in a special presentation
+ *
  * @author Alexander Killing <killing@leifos.de>
  */
-class SessionBlock implements Block
+class ilContainerItemGUI
 {
+    /**
+     * Constructor
+     */
+    public function __construct(
+        \ilContainerGUI $container_gui
+    ) {
+    }
 }

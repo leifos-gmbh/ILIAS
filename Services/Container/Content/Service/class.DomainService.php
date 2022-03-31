@@ -19,12 +19,14 @@ use ILIAS\Container\InternalRepoService;
 use ILIAS\Container\InternalDataService;
 use ILIAS\Container\InternalDomainService;
 use ILIAS\Container\Content\Filter\FilterManager;
+use ILIAS\Container\Content\ItemBlock\ItemBlockSequenceGenerator;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
  */
 class DomainService
 {
+    protected \ILIAS\Repository\Clipboard\ClipboardManager $repo_clipboard;
     protected InternalRepoService $repo_service;
     protected InternalDataService $data_service;
     protected InternalDomainService $domain_service;
@@ -47,6 +49,14 @@ class DomainService
         InternalDataService $data_service,
         InternalDomainService $domain_service
     ) {
+        global $DIC;
+
+        $this->repo_clipboard = $DIC
+            ->repository()
+            ->internal()
+            ->domain()
+            ->clipboard();
+
         $this->repo_service = $repo_service;
         $this->data_service = $data_service;
         $this->domain_service = $domain_service;
@@ -61,18 +71,22 @@ class DomainService
     {
         return new ItemManager(
             $container,
-            $this->item_repo
+            $this->item_repo,
+            $this->mode_manager($container)
         );
     }
 
     /**
      * Manages item retrieval, filtering, grouping and sorting
      */
-    public function itemPresentation(\ilContainer $container) : ItemPresentationManager
-    {
+    public function itemPresentation(
+        \ilContainer $container,
+        ?\ilContainerUserFilter $container_user_filter
+    ) : ItemPresentationManager {
         return new ItemPresentationManager(
             $this->domain_service,
-            $container
+            $container,
+            $container_user_filter
         );
     }
 
@@ -170,10 +184,12 @@ class DomainService
     /**
      * Controls admin/content view state
      */
-    public function mode() : ModeManager
+    public function mode(\ilContainer $container) : ModeManager
     {
         return new ModeManager(
-            $this->mode_repo
+            $container,
+            $this->mode_repo,
+            $this->repo_clipboard
         );
     }
 
@@ -191,6 +207,20 @@ class DomainService
             $objects,
             $container_user_filter,
             $results_on_filter_only
+        );
+    }
+
+    public function itemBlockSequenceGenerator(
+        \ilContainer $container,
+        BlockSequence $block_sequence,
+        ItemSetManager $item_set_manager
+    ) : ItemBlockSequenceGenerator {
+        return new ItemBlockSequenceGenerator(
+            $this->data_service->content(),
+            $this->domain_service,
+            $container,
+            $block_sequence,
+            $item_set_manager
         );
     }
 }

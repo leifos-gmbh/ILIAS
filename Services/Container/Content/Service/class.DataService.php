@@ -15,6 +15,10 @@
 
 namespace ILIAS\Container\Content;
 
+use ILIAS\Container\Content\ItemBlock\ItemBlock;
+use ILIAS\Container\Content\ItemBlock\ItemBlockSequence;
+use ILIAS\Container\Content\ItemBlock\BlockItemsInfo;
+
 /**
  * @author Alexander Killing <killing@leifos.de>
  */
@@ -61,5 +65,27 @@ class DataService
     public function blockSequence(array $parts) : BlockSequence
     {
         return new BlockSequence($parts);
+    }
+
+    //
+    // Blocks with items
+    //
+
+    /**
+     * @param int[] $item_ref_ids
+     */
+    public function itemBlock(string $id, Block $block, array $item_ref_ids) : ItemBlock
+    {
+        return new ItemBlock($id, $block, $item_ref_ids);
+    }
+
+    public function itemBlockSequence(array $blocks) : ItemBlockSequence
+    {
+        return new ItemBlockSequence($blocks);
+    }
+
+    public function blockItemsInfo(array $ref_ids, bool $limit_exhausted) : BlockItemsInfo
+    {
+        return new BlockItemsInfo($ref_ids, $limit_exhausted);
     }
 }

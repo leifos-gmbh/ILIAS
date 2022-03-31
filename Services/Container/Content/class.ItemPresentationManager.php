@@ -16,12 +16,17 @@
 namespace ILIAS\Container\Content;
 
 use ILIAS\Container\InternalDomainService;
+use ILIAS\Container\Content\ItemBlock\ItemBlockSequence;
 
 /**
+ * High level business logic class. Orchestrates item set,
+ * view and block sequence generator.
+ *
  * @author Alexander Killing <killing@leifos.de>
  */
 class ItemPresentationManager
 {
+    protected ItemBlock\ItemBlockSequenceGenerator $sequence_generator;
     protected \ilContainerUserFilter $container_user_filter;
     protected ?array $type_grps = null;
     protected ?ItemSetManager $item_set = null;
@@ -81,60 +86,35 @@ class ItemPresentationManager
         if (!is_null($this->item_set)) {
             return;
         }
+
+        // get item set
         $ref_id = $this->container->getRefId();
         if ($this->filteredSubtree()) {
             $this->item_set = $this->domain->content()->itemSetTree($ref_id);
         } else {
             $this->item_set = $this->domain->content()->itemSetFlat($ref_id);
         }
+
+        // get view
+        $view = $this->domain->content()->view($this->container);
+
+        // get item block sequence generator
+        $this->sequence_generator = $this->domain->content()->itemBlockSequenceGenerator(
+            $this->container,
+            $view->getBlockSequence(),
+            $this->item_set
+        );
     }
 
-    /**
-     * Get grouped repository object types
-     * @todo from ilContainerContentGUI; remove
-     */
-    protected function getGroupedObjTypes() : array
+    public function hasItems() : bool
     {
-        $objDefinition = $this->domain->objectDefinition();
-
-        if (is_null($this->type_grps)) {
-            $this->type_grps =
-                $objDefinition->getGroupedRepositoryObjectTypes($this->container->getType());
-        }
-        return $this->type_grps;
+        $this->init();
+        return $this->item_set->hasItems();
     }
 
-    /**
-     * @todo determinePageEmbeddedBlocks from ilContainerContent GUI, remove
-     */
-    public function getPageEmbeddedBlocks(
-        string $a_container_page_html
-    ) : void {
-        $type_grps = $this->getGroupedObjTypes();
-
-        // iterate all types
-        foreach ($type_grps as $type => $v) {
-            // set template (overall or type specific)
-            if (is_int(strpos($a_container_page_html, "[list-" . $type . "]"))) {
-                $this->addEmbeddedBlock("type", $type);
-            }
-        }
-
-        // determine item groups
-        while (preg_match('~\[(item-group-([0-9]*))\]~i', $a_container_page_html, $found)) {
-            $this->addEmbeddedBlock("itgr", (int) $found[2]);
-
-            $html = ''; // This was never defined before
-            $a_container_page_html = preg_replace('~\[' . $found[1] . '\]~i', $html, $a_container_page_html);
-        }
-    }
-
-
-    /**
-     * Get all blocks in the correct order
-     */
-    protected function getBlocks() : \Iterator
+    public function getItemBlockSequence() : ItemBlockSequence
     {
-        //yield;
+        $this->init();
+        return $this->sequence_generator->getSequence();
     }
 }

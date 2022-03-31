@@ -20,12 +20,19 @@ namespace ILIAS\Container\Content;
  */
 class ModeManager
 {
+    protected bool $ordering_mode;
+    protected \ILIAS\Repository\Clipboard\ClipboardManager $clipboard;
     protected ModeSessionRepository $mode_repo;
+    protected \ilContainer $container;
 
     public function __construct(
-        ModeSessionRepository $mode_repo
+        \ilContainer $container,
+        ModeSessionRepository $mode_repo,
+        \ILIAS\Repository\Clipboard\ClipboardManager $clipboard
     ) {
+        $this->container = $container;
         $this->mode_repo = $mode_repo;
+        $this->clipboard = $clipboard;
     }
 
     public function setAdminMode() : void
@@ -38,6 +45,12 @@ class ModeManager
         $this->mode_repo->setContentMode();
     }
 
+    public function setOrderingMode() : void
+    {
+        $this->mode_repo->setContentMode();
+        $this->ordering_mode = true;
+    }
+
     public function isAdminMode() : bool
     {
         return $this->mode_repo->isAdminMode();
@@ -46,5 +59,26 @@ class ModeManager
     public function isContentMode() : bool
     {
         return $this->mode_repo->isContentMode();
+    }
+
+    public function isOrderingMode() : bool
+    {
+        return $this->ordering_mode;
+    }
+
+    public function showAdminCheckboxes() : bool
+    {
+        return ($this->isAdminMode() && !$this->clipboard->hasEntries());
+    }
+
+    public function isActiveItemOrdering() : bool
+    {
+        if ($this->isOrderingMode()) {
+            if ($this->container->getViewMode() == \ilContainer::VIEW_OBJECTIVE) {
+                return false;
+            }
+            return (\ilContainerSortingSettings::_lookupSortMode($this->container->getId()) === \ilContainer::SORT_MANUAL);
+        }
+        return false;
     }
 }

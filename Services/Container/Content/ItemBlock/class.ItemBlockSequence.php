@@ -16,12 +16,34 @@
  *
  *********************************************************************/
 
-namespace ILIAS\Container\Content;
+namespace ILIAS\Container\Content\ItemBlock;
+
+use ILIAS\Container\Content\Block;
 
 /**
- * A block that holds session in a special presentation
  * @author Alexander Killing <killing@leifos.de>
  */
-class SessionBlock implements Block
+class ItemBlockSequence
 {
+    /**
+     * @var ItemBlock[]
+     */
+    protected array $blocks = [];
+
+    /**
+     * @param ItemBlock[] $blocks
+     */
+    public function __construct(
+        array $blocks
+    ) {
+        $this->blocks = $blocks;
+    }
+
+    /**
+     * @return ItemBlock[]
+     */
+    public function getBlocks() : array
+    {
+        return $this->blocks;
+    }
 }

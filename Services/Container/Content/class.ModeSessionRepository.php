@@ -44,7 +44,7 @@ class ModeSessionRepository
     public function isAdminMode() : bool
     {
         if (ilSession::has(self::KEY)) {
-            return (ilSession::get(self::KEY) == self::VIEW_ADMIN);
+            return (ilSession::get(self::KEY) === self::VIEW_ADMIN);
         }
         return false;
     }

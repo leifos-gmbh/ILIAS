@@ -26,6 +26,7 @@ class ItemSetManager
     public const FLAT = 0;
     public const TREE = 1;
     public const SINGLE = 2;
+    protected bool $admin_mode;
     protected bool $hiddenfilesfound = false;
     protected string $parent_type;
     protected int $parent_obj_id;
@@ -34,6 +35,9 @@ class ItemSetManager
     protected int $single_ref_id = 0;
     protected InternalDomainService $domain;
     protected array $raw = [];
+    protected array $raw_by_type = [];
+    /** @var array<int,bool> */
+    protected array $rendered = [];
     protected int $mode = self::FLAT;
     protected \ilContainerUserFilter $user_filter;
 
@@ -55,8 +59,8 @@ class ItemSetManager
         $this->single_ref_id = $single_ref_id;
         $this->domain = $domain;
         $this->mode = $mode;        // might be refactored as subclasses
-        $this->init();
         $this->admin_mode = $admin_mode;
+        $this->init();
     }
 
     public function setHiddenFilesFound(bool $a_hiddenfilesfound) : void
@@ -90,20 +94,37 @@ class ItemSetManager
     /**
      * @todo from ilContainer, should be removed there
      */
-    public function gotItems() : bool
+    public function hasItems() : bool
     {
+        $this->init();
         return count($this->raw) > 0;
     }
 
+    public function getRefIdsOfType($type) : array
+    {
+        $this->init();
+        if (isset($this->raw_by_type[$type])) {
+            return array_map(static function ($item) {
+                return $item["child"];
+            }, $this->raw_by_type[$type]);
+        }
+        return [];
+    }
+
+    public function getAllRefIds() : array
+    {
+        $this->init();
+        return $this->raw_by_type["_all"];
+    }
+
     /**
-     * Apply standard filter
-     * @param
-     * @return
+     * Internally group all items
      */
-    protected function groupItems()
+    protected function groupItems() : void
     {
         $obj_definition = $this->domain->objectDefinition();
         $classification_filter_active = $this->isClassificationFilterActive();
+        $this->raw_by_type["_all"] = [];
         foreach ($this->raw as $key => $object) {
 
             // hide object types in devmode
@@ -121,30 +142,36 @@ class ItemSetManager
             if (in_array($object['type'], array('file','fold','cat'))) {
                 if (\ilObjFileAccess::_isFileHidden($object['title'])) {
                     $this->setHiddenFilesFound(true);
-                    if (!$a_admin_panel_enabled) {
+                    if (!$this->admin_mode) {
                         continue;
                     }
                 }
             }
             // END WebDAV: Don't display hidden Files, Folders and Categories
 
-            // including event items!
-            if (!self::$data_preloaded) {
-                $preloader->addItem($object["obj_id"], $object["type"], $object["child"]);
+            // group object type groups together (e.g. learning resources)
+            $type = $obj_definition->getGroupOfObj($object["type"]);
+            if ($type == "") {
+                $type = $object["type"];
             }
 
-            // filter out items that are attached to an event
-            if (in_array($object['ref_id'], $event_items) && !$classification_filter_active) {
-                continue;
-            }
+            // this will add activation properties
+            $this->addAdditionalSubItemInformation($object);
 
-            // filter side block items
-            if (!$a_include_side_block && $objDefinition->isSideBlock($object['type'])) {
-                continue;
-            }
+            $new_key = (int) $object["child"];
+            $this->rendered[$new_key] = false;
+            $this->raw_by_type[$type][$new_key] = $object;
 
-            $all_ref_ids[] = $object["child"];
+            $this->raw_by_type["_all"][$new_key] = $object;
+            if ($object["type"] !== "sess") {
+                $this->raw_by_type["_non_sess"][$new_key] = $object;
+            }
         }
+    }
+
+    protected function addAdditionalSubItemInformation(array &$object) : void
+    {
+        \ilObjectActivation::addAdditionalSubItemInformation($object);
     }
 
     /**

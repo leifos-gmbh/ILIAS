@@ -599,6 +599,9 @@ class ilContainer extends ilObject
         return false;
     }
 
+    /**
+     * @deprecated
+     */
     protected function getInitialSubitems() : array
     {
         $tree = $this->tree;
@@ -610,6 +613,9 @@ class ilContainer extends ilObject
         return $objects;
     }
 
+    /**
+     * @deprecated
+     */
     public function getSubItems(
         bool $a_admin_panel_enabled = false,
         bool $a_include_side_block = false,
@@ -746,8 +752,10 @@ class ilContainer extends ilObject
 
         return $this->items[(int) $a_admin_panel_enabled][(int) $a_include_side_block];
     }
-    
-    // Check whether we got any items
+
+    /**
+     * @deprecated
+     */
     public function gotItems() : bool
     {
         if (isset($this->items["_all"]) && is_array($this->items["_all"]) && count($this->items["_all"]) > 0) {

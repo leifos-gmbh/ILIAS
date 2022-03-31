@@ -20,38 +20,6 @@
  */
 class ilContainerSessionsContentGUI extends ilContainerContentGUI
 {
-    protected ilTabsGUI $tabs;
-    protected array $force_details = [];
-    
-    public function __construct(ilContainerGUI $container_gui_obj)
-    {
-        global $DIC;
-
-        $this->tabs = $DIC->tabs();
-        $this->user = $DIC->user();
-        $this->ctrl = $DIC->ctrl();
-        $lng = $DIC->language();
-        parent::__construct($container_gui_obj);
-        $this->lng = $lng;
-        $this->initDetails();
-    }
-
-
-    protected function getDetailsLevel(int $a_item_id) : int
-    {
-        if ($this->getContainerGUI()->isActiveAdministrationPanel()) {
-            return self::DETAILS_DEACTIVATED;
-        }
-        if ($this->item_manager->getExpanded($a_item_id) !== null) {
-            return $this->item_manager->getExpanded($a_item_id);
-        }
-        if (in_array($a_item_id, $this->force_details)) {
-            return self::DETAILS_ALL;
-        } else {
-            return self::DETAILS_TITLE;
-        }
-    }
-
     public function getMainContent() : string
     {
         // see bug #7452
@@ -200,17 +168,6 @@ class ilContainerSessionsContentGUI extends ilContainerContentGUI
         $tpl->setCurrentBlock('container_details_row');
         $tpl->setVariable('TXT_DETAILS', $this->lng->txt('details'));
         $tpl->parseCurrentBlock();
-    }
-    
-    protected function initDetails() : void
-    {
-        $this->handleSessionExpand();
-
-        if ($session = ilSessionAppointment::lookupNextSessionByCourse($this->getContainerObject()->getRefId())) {
-            $this->force_details = $session;
-        } elseif ($session = ilSessionAppointment::lookupLastSessionByCourse($this->getContainerObject()->getRefId())) {
-            $this->force_details = array($session);
-        }
     }
 
     public static function prepareSessionPresentationLimitation(

@@ -16,12 +16,32 @@
  *
  *********************************************************************/
 
-namespace ILIAS\Container\Content;
+namespace ILIAS\Container\Content\ItemBlock;
 
 /**
- * A block that holds session in a special presentation
+ *
  * @author Alexander Killing <killing@leifos.de>
  */
-class SessionBlock implements Block
+class BlockItemsInfo
 {
+    protected bool $limit_exhausted = false;
+    protected array $ref_ids = [];
+
+    public function __construct(
+        array $ref_ids,
+        bool $limit_exhausted
+    ) {
+        $this->ref_ids = $ref_ids;
+        $this->limit_exhausted = $limit_exhausted;
+    }
+
+    public function getRefIds() : array
+    {
+        return $this->ref_ids;
+    }
+
+    public function getLimitExhausted() : bool
+    {
+        return $this->limit_exhausted;
+    }
 }

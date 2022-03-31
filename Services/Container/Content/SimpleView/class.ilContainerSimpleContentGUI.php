@@ -99,19 +99,6 @@ class ilContainerSimpleContentGUI extends ilContainerContentGUI
         $a_tpl->setVariable("CONTAINER_PAGE_CONTENT", $output_html);
     }
 
-    protected function initDetails() : void
-    {
-        $this->handleSessionExpand();
-
-        if ($this->getContainerObject()->getType() == 'crs') {
-            if ($session = ilSessionAppointment::lookupNextSessionByCourse($this->getContainerObject()->getRefId())) {
-                $this->force_details = $session;
-            } elseif ($session = ilSessionAppointment::lookupLastSessionByCourse($this->getContainerObject()->getRefId())) {
-                $this->force_details = $session;
-            }
-        }
-    }
-
     protected function getDetailsLevel(int $a_item_id) : int
     {
         if ($this->getContainerGUI()->isActiveAdministrationPanel()) {

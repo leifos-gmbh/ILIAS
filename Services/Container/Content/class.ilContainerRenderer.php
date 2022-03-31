@@ -716,4 +716,45 @@ class ilContainerRenderer
             $a_tpl->parseCurrentBlock();
         }
     }
+
+    ///
+    /// Render Item Block Sequence
+    ///
+
+    /**
+     *
+     * @param
+     * @return
+     */
+    protected function renderItemBlockSequence(
+        \ILIAS\Container\Content\ItemBlock\ItemBlockSequence $sequence
+    ) : string {
+        $valid = false;
+
+        $block_tpl = $this->initBlockTemplate();
+
+        foreach ($sequence->getBlocks() as $block) {
+            if ($block->getBlock() instanceof \ILIAS\Container\Content\ItemGroupBlock) {
+                $this->addCustomBlock($block->getBlock()->getRefId(), "test");
+                if ($this->renderHelperCustomBlock($block_tpl, $block->getBlock()->getRefId())) {
+                    $this->addSeparatorRow($block_tpl);
+                    $valid = true;
+                }
+            }
+            if ($block->getBlock() instanceof \ILIAS\Container\Content\TypeBlock) {
+                $this->addTypeBlock($block->getBlock()->getType());
+                if ($this->renderHelperTypeBlock($block_tpl, $block->getBlock()->getType())) {
+                    $this->addSeparatorRow($block_tpl);
+                    $valid = true;
+                }
+            }
+        }
+
+        if ($valid) {
+            $this->renderDetails($block_tpl);
+
+            return $block_tpl->get();
+        }
+        return "";
+    }
 }

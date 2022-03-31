@@ -25,7 +25,7 @@ class PageManager
         $this->container = $container;
     }
 
-    protected function getHtml() : string
+    public function getHtml() : string
     {
         $settings = $this->domain_service->settings();
         $user = $this->domain_service->user();

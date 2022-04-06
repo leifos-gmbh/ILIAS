@@ -46,6 +46,8 @@ class ItemRenderer
     ) {
         $this->domain = $domain;    // setting and access (visible, read, write access)
         $this->gui = $gui;          // getting ilCtrl
+        /** @var \ilContainer $container */
+        $container = $container_gui->getObject();
         $this->view_mode = $view_mode;      // tile/list (of container)
         $this->container_gui = $container_gui;      // tile/list (of container)
         /** @var \ilContainer $container */
@@ -72,9 +74,10 @@ class ItemRenderer
         $ilCtrl = $this->gui->ctrl();
 
         // Pass type, obj_id and tree to checkAccess method to improve performance
+        /* deactivated, this should have been checked before
         if (!$ilAccess->checkAccess('visible', '', $a_item_data['ref_id'], $a_item_data['type'], $a_item_data['obj_id'], $a_item_data['tree'])) {
             return '';
-        }
+        }*/
 
         $view_mode = $this->view_mode;
         if ($item_group_list_presentation != "") {
@@ -141,7 +144,7 @@ class ItemRenderer
             $this->addItemDetails($item_list_gui, $a_item_data);
         }
 
-        // show subitems
+        // show subitems of sessions
         if ($a_item_data['type'] === 'sess' and (
                 $details_level !== \ilContainerContentGUI::DETAILS_TITLE or
                 $this->container_gui->isActiveAdministrationPanel() or
@@ -150,16 +153,16 @@ class ItemRenderer
         ) {
             $pos = 1;
 
-            $items = \ilObjectActivation::getItemsByEvent($a_item_data['obj_id']);
-            $items = \ilContainerSorting::_getInstance($this->container->getId())->sortSubItems('sess', $a_item_data['obj_id'], $items);
+            $items = \ilObjectActivation::getItemsByEvent((int) $a_item_data['obj_id']);
+            $items = \ilContainerSorting::_getInstance($this->container->getId())->sortSubItems('sess', (int) $a_item_data['obj_id'], $items);
             $items = \ilContainer::getCompleteDescriptions($items);
 
-            $item_readable = $ilAccess->checkAccess('read', '', $a_item_data['ref_id']);
+            $item_readable = $ilAccess->checkAccess('read', '', (int) $a_item_data['ref_id']);
 
             foreach ($items as $item) {
                 // TODO: this should be removed and be handled by if(strlen($sub_item_html))
                 // 	see mantis: 0003944
-                if (!$ilAccess->checkAccess('visible', '', $item['ref_id'])) {
+                if (!$ilAccess->checkAccess('visible', '', (int) $item['ref_id'])) {
                     continue;
                 }
 
@@ -194,13 +197,12 @@ class ItemRenderer
                 \ilObjectActivation::addListGUIActivationProperty($item_list_gui2, $item);
 
                 $sub_item_html = $item_list_gui2->getListItemHTML(
-                    $item['ref_id'],
-                    $item['obj_id'],
+                    (int) $item['ref_id'],
+                    (int) $item['obj_id'],
                     $item['title'],
                     $item['description']
                 );
 
-                $this->determineAdminCommands($item["ref_id"], $item_list_gui2->adminCommandsIncluded());
                 if (strlen($sub_item_html)) {
                     $item_list_gui->addSubItemHTML($sub_item_html);
                 }
@@ -225,19 +227,14 @@ class ItemRenderer
         \ilObjectActivation::addListGUIActivationProperty($item_list_gui, $a_item_data);
 
         $html = $item_list_gui->getListItemHTML(
-            $a_item_data['ref_id'],
-            $a_item_data['obj_id'],
-            $a_item_data['title'],
+            (int) $a_item_data['ref_id'],
+            (int) $a_item_data['obj_id'],
+            (string) $a_item_data['title'],
             (string) $a_item_data['description'],
             $asynch,
             false,
             $asynch_url
         );
-        $this->determineAdminCommands(
-            $a_item_data["ref_id"],
-            $item_list_gui->adminCommandsIncluded()
-        );
-
 
         return $html;
     }
@@ -251,13 +248,13 @@ class ItemRenderer
         $item_list_gui = $this->getItemGUI($a_item_data);
         $item_list_gui->setAjaxHash(\ilCommonActionDispatcherGUI::buildAjaxHash(
             \ilCommonActionDispatcherGUI::TYPE_REPOSITORY,
-            $a_item_data['ref_id'],
+            (int) $a_item_data['ref_id'],
             $a_item_data['type'],
             (int) $a_item_data['obj_id']
         ));
         $item_list_gui->initItem(
-            $a_item_data['ref_id'],
-            $a_item_data['obj_id'],
+            (int) $a_item_data['ref_id'],
+            (int) $a_item_data['obj_id'],
             $a_item_data['type'],
             $a_item_data['title'],
             $a_item_data['description']
@@ -266,7 +263,7 @@ class ItemRenderer
         // actions
         $item_list_gui->insertCommands();
         return $item_list_gui->getAsCard(
-            $a_item_data['ref_id'],
+            (int) $a_item_data['ref_id'],
             (int) $a_item_data['obj_id'],
             (string) $a_item_data['type'],
             (string) $a_item_data['title'],
@@ -274,7 +271,7 @@ class ItemRenderer
         );
     }
 
-    protected function getItemGUI(array $item_data) : \ilObjectListGUI
+    public function getItemGUI(array $item_data) : \ilObjectListGUI
     {
         // get item list gui object
         if (!isset($this->list_gui[$item_data["type"]])) {
@@ -301,11 +298,12 @@ class ItemRenderer
         }
 
         // show administration command buttons (or not)
+        /*
         if (!$this->container_gui->isActiveAdministrationPanel()) {
             //			$item_list_gui->enableDelete(false);
 //			$item_list_gui->enableLink(false);
 //			$item_list_gui->enableCut(false);
-        }
+        }*/
 
         // activate common social commands
         $item_list_gui->enableComments(true);

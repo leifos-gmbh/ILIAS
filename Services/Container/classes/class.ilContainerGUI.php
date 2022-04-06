@@ -29,6 +29,8 @@ use ILIAS\Container\Content\ModeManager;
  */
 class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 {
+    protected ?\ILIAS\Container\Content\ItemPresentationManager $item_presentation = null;
+    protected \ILIAS\Container\InternalDomainService $domain;
     protected ilTabsGUI $tabs;
     protected ilErrorHandling $error;
     protected ilObjectDefinition $obj_definition;
@@ -50,7 +52,7 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
     protected int $current_position = 0;
     protected ClipboardManager $clipboard;
     protected StandardGUIRequest $std_request;
-    protected ModeManager $mode_manager;
+    protected ?ModeManager $mode_manager = null;
     protected ilComponentFactory $component_factory;
     protected \ILIAS\Style\Content\DomainService $content_style_domain;
 
@@ -105,18 +107,38 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
             ->gui()
             ->standardRequest();
         $this->requested_redirectSource = $this->std_request->getRedirectSource();
-        $this->mode_manager = $DIC
-            ->container()
+        $this->domain = $DIC->container()
             ->internal()
-            ->domain()
-            ->content()
-            ->mode();
+            ->domain();
 
         $this->container_filter_service = new ilContainerFilterService();
         $this->initFilter();
         $cs = $DIC->contentStyle();
         $this->content_style_gui = $cs->gui();
         $this->content_style_domain = $cs->domain();
+    }
+
+    protected function getModeManager() : ModeManager
+    {
+        if (is_null($this->mode_manager)) {
+            $this->mode_manager = $this->domain
+                ->content()
+                ->mode($this->getObject());
+        }
+        return $this->mode_manager;
+    }
+
+    protected function getItemPresentation() : \ILIAS\Container\Content\ItemPresentationManager
+    {
+        if (is_null($this->item_presentation)) {
+            $this->item_presentation = $this->domain
+                ->content()
+                ->itemPresentation(
+                    $this->getObject(),
+                    $this->container_user_filter
+                );
+        }
+        return $this->item_presentation;
     }
 
     public function executeCommand() : void
@@ -339,23 +361,35 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
         switch ($view_mode) {
             // all items in one block
             case ilContainer::VIEW_SIMPLE:
-                $container_view = new ilContainerSimpleContentGUI($this);
+                $container_view = new ilContainerSimpleContentGUI(
+                    $this,
+                    $this->getItemPresentation()
+                );
                 break;
 
             case ilContainer::VIEW_OBJECTIVE:
-                $container_view = new ilContainerObjectiveGUI($this);
+                $container_view = new ilContainerObjectiveGUI(
+                    $this,
+                    $this->getItemPresentation()
+                );
                 break;
 
             // all items in one block
             case ilContainer::VIEW_SESSIONS:
             case ilCourseConstants::IL_CRS_VIEW_TIMING: // not nice this workaround
-                $container_view = new ilContainerSessionsContentGUI($this);
+                $container_view = new ilContainerSessionsContentGUI(
+                    $this,
+                    $this->getItemPresentation()
+                );
                 break;
 
             // all items in one block
             case ilContainer::VIEW_BY_TYPE:
             default:
-                $container_view = new ilContainerByTypeContentGUI($this, $this->container_user_filter);
+                $container_view = new ilContainerByTypeContentGUI(
+                    $this,
+                    $this->getItemPresentation()
+                );
                 break;
         }
         return $container_view;
@@ -380,8 +414,6 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
         }
 
         $container_view->setOutput();
-
-        $this->adminCommands = $container_view->adminCommands;
 
         // it is important not to show the subobjects/admin panel here, since
         // we will create nested forms in case, e.g. a news/calendar item is added
@@ -683,11 +715,6 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
         exit;
     }
 
-    public function clearAdminCommandsDetermination() : void
-    {
-        $this->adminCommands = false;
-    }
-
     public function addHeaderRow(
         ilTemplate $a_tpl,
         string $a_type,
@@ -840,17 +867,8 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
             }
         }
 
-        if ($ilUser->getId() != ANONYMOUS_USER_ID &&
-            (
-                $this->adminCommands ||
-                (is_object($this->object) &&
-                    ($this->rbacsystem->checkAccess("write", $this->object->getRefId())))
-                ||
-                (is_object($this->object) &&
-                    ($this->object->getHiddenFilesFound())) ||
-                $this->clipboard->hasEntries()
-            )
-        ) {
+        $item_presentation = $this->getItemPresentation();
+        if ($item_presentation->canManageItems()) {
             if ($this->isActiveAdministrationPanel()) {
                 $ilTabs->addSubTab("manage", $lng->txt("cntr_manage"), $ilCtrl->getLinkTarget($this, ""));
             } else {
@@ -861,11 +879,7 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
                 );
             }
         }
-        if ($ilUser->getId() != ANONYMOUS_USER_ID &&
-            is_object($this->object) &&
-            $this->rbacsystem->checkAccess("write", $this->object->getRefId()) /* &&
-            $this->object->getOrderType() == ilContainer::SORT_MANUAL */ // always on because of custom block order
-        ) {
+        if ($item_presentation->canOrderItems()) {
             $ilTabs->addSubTab("ordering", $lng->txt("cntr_ordering"), $ilCtrl->getLinkTarget($this, "editOrder"));
         }
     }
@@ -907,13 +921,13 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 
     public function enableAdministrationPanelObject() : void
     {
-        $this->mode_manager->setAdminMode();
+        $this->getModeManager()->setAdminMode();
         $this->ctrl->redirect($this, "render");
     }
 
     public function disableAdministrationPanelObject() : void
     {
-        $this->mode_manager->setContentMode();
+        $this->getModeManager()->setContentMode();
         $this->ctrl->redirect($this, "render");
     }
 
@@ -922,7 +936,7 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
         $ilTabs = $this->tabs;
 
         $this->edit_order = true;
-        $this->mode_manager->setContentMode();
+        $this->getModeManager()->setContentMode();
         $this->renderObject();
 
         $ilTabs->activateSubTab("ordering");
@@ -1850,7 +1864,7 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
             return false;
         }
 
-        return $this->mode_manager->isAdminMode();
+        return $this->getModeManager()->isAdminMode();
     }
 
     public function setColumnSettings(ilColumnGUI $column_gui) : void
@@ -1864,8 +1878,8 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
             $column_gui->setEnableMovement(true);
         }
 
-        $column_gui->setRepositoryItems(
-            $this->object->getSubItems($this->isActiveAdministrationPanel(), true)
+        $column_gui->setItemPresentationManager(
+            $this->item_presentation
         );
 
         //if ($ilAccess->checkAccess("write", "", $this->object->getRefId())

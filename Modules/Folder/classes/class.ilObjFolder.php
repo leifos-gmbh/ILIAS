@@ -58,7 +58,7 @@ class ilObjFolder extends ilContainer
     {
         $tree = $this->tree;
         
-        if (!is_object($this->folder_tree)) {
+        if (!isset($this->folder_tree)) {
             $this->folder_tree = &$tree;
         }
 

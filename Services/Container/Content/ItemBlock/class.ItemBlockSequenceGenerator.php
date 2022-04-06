@@ -32,6 +32,7 @@ use ILIAS\Container\InternalDomainService;
  */
 class ItemBlockSequenceGenerator
 {
+    protected Content\ModeManager $mode_manager;
     protected \ilAccessHandler $access;
     protected int $block_limit;
     protected DataService $data_service;
@@ -56,7 +57,9 @@ class ItemBlockSequenceGenerator
         $this->domain_service = $domain_service;
         $this->block_sequence = $block_sequence;
         $this->item_set_manager = $item_set_manager;
+        $this->container = $container;
         $this->block_limit = (int) \ilContainer::_lookupContainerSetting($container->getId(), "block_limit");
+        $this->mode_manager = $this->domain_service->content()->mode($container);
     }
 
     public function getSequence() : ItemBlockSequence
@@ -106,7 +109,6 @@ class ItemBlockSequenceGenerator
                 $sorted_blocks[] = $block;
                 $pos += 10;
             }
-
             $this->sequence = new ItemBlockSequence($sorted_blocks);
         }
         return $this->sequence;
@@ -165,6 +167,28 @@ class ItemBlockSequenceGenerator
                 yield $block;
             }
         }
+        // ObjectivesBlock
+        if ($part instanceof Content\ObjectivesBlock) {
+
+            // in admin mode, we do not include the objectives block
+            // -> all items will be presented in item group/other block
+            if (!$this->mode_manager->isAdminMode()) {
+                $objective_ids = \ilCourseObjective::_getObjectiveIds($this->container->getId(), true);
+                $ref_ids = [];
+                foreach ($objective_ids as $objective_id) {
+                    foreach (\ilObjectActivation::getItemsByObjective($objective_id) as $ref_id) {
+                        $ref_ids[] = $ref_id;
+                    }
+                }
+                yield $this->data_service->itemBlock(
+                    "lobj",
+                    $part,
+                    $ref_ids,
+                    false,
+                    $objective_ids
+                );
+            }
+        }
         // ItemGroupBlocks
         if ($part instanceof Content\ItemGroupBlocks) {
             foreach ($this->item_set_manager->getRefIdsOfType("itgr") as $item_group_ref_id) {
@@ -184,9 +208,12 @@ class ItemBlockSequenceGenerator
     {
         $exhausted = false;
         $accessible_ref_ids = [];
-        for (; !$exhausted && ($ref_id = current($ref_ids));) {
+        foreach ($ref_ids as $ref_id) {
+            if ($exhausted) {
+                break;
+            }
             if ($this->access->checkAccess('visible', '', $ref_id)) {
-                if (count($accessible_ref_ids) >= $this->block_limit) {
+                if ($this->block_limit > 0 && count($accessible_ref_ids) >= $this->block_limit) {
                     $exhausted = true;
                 } else {
                     $accessible_ref_ids[] = $ref_id;
@@ -231,15 +258,15 @@ class ItemBlockSequenceGenerator
     protected function getGroupedObjTypes() : \Iterator
     {
         foreach (\ilObjectDefinition::getGroupedRepositoryObjectTypes($this->container->getType())
-            as $type) {
-            yield $type;
+            as $key => $type) {
+            yield $key;
         }
     }
 
     protected function getItemGroupBlock(int $item_group_ref_id) : ?ItemBlock
     {
-        $ref_ids = array_map(function ($i) {
-            return $i["child"];
+        $ref_ids = array_map(static function ($i) {
+            return (int) $i["child"];
         }, \ilObjectActivation::getItemsByItemGroup($item_group_ref_id));
         $block_items = $this->determineBlockItems($ref_ids);
         if (count($block_items->getRefIds()) > 0) {

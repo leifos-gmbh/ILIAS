@@ -69,10 +69,14 @@ class DomainService
      */
     public function items(\ilContainer $container) : ItemManager
     {
+        // @todo get rid of $DIC/request call here -> move to gui
+        global $DIC;
+
         return new ItemManager(
             $container,
             $this->item_repo,
-            $this->mode_manager($container)
+            $this->mode($container),
+            $DIC->container()->internal()->gui()->standardRequest()
         );
     }
 
@@ -86,7 +90,8 @@ class DomainService
         return new ItemPresentationManager(
             $this->domain_service,
             $container,
-            $container_user_filter
+            $container_user_filter,
+            $this->repo_clipboard
         );
     }
 

@@ -39,7 +39,7 @@ class ItemSetManager
     /** @var array<int,bool> */
     protected array $rendered = [];
     protected int $mode = self::FLAT;
-    protected \ilContainerUserFilter $user_filter;
+    protected ?\ilContainerUserFilter $user_filter = null;
 
     /**
      * @param int $mode self::TREE|self::FLAT|self::SINGLE
@@ -55,6 +55,7 @@ class ItemSetManager
         $this->parent_ref_id = $parent_ref_id;
         $this->parent_obj_id = \ilObject::_lookupObjId($this->parent_ref_id);
         $this->parent_type = \ilObject::_lookupType($this->parent_obj_id);
+        $this->user_filter = $user_filter;
 
         $this->single_ref_id = $single_ref_id;
         $this->domain = $domain;
@@ -89,6 +90,7 @@ class ItemSetManager
         $this->applyUserFilter();
         $this->getCompleteDescriptions();
         $this->applyClassificationFilter();
+        $this->groupItems();
     }
 
     /**
@@ -100,12 +102,12 @@ class ItemSetManager
         return count($this->raw) > 0;
     }
 
-    public function getRefIdsOfType($type) : array
+    public function getRefIdsOfType(string $type) : array
     {
         $this->init();
         if (isset($this->raw_by_type[$type])) {
             return array_map(static function ($item) {
-                return $item["child"];
+                return (int) $item["child"];
             }, $this->raw_by_type[$type]);
         }
         return [];
@@ -114,7 +116,13 @@ class ItemSetManager
     public function getAllRefIds() : array
     {
         $this->init();
-        return $this->raw_by_type["_all"];
+        return array_keys($this->raw_by_type["_all"]);
+    }
+
+    public function getRawDataByRefId(int $ref_id) : ?array
+    {
+        $this->init();
+        return $this->raw_by_type["_all"][$ref_id] ?? null;
     }
 
     /**
@@ -202,6 +210,9 @@ class ItemSetManager
      */
     protected function applyUserFilter() : void
     {
+        if (is_null($this->user_filter)) {
+            return;
+        }
         $filter = $this->domain->content()->filter(
             $this->raw,
             $this->user_filter,

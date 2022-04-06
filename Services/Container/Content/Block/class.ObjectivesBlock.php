@@ -22,6 +22,6 @@ namespace ILIAS\Container\Content;
  * A block that holds all objectives and their items
  * @author Alexander Killing <killing@leifos.de>
  */
-class ObjectiveBlock implements Block
+class ObjectivesBlock implements Block
 {
 }

@@ -38,7 +38,6 @@ abstract class ilContainerContentGUI
     protected ilContainerRenderer $renderer;
     public ilContainerGUI $container_gui;
     public ilContainer $container_obj;
-    public bool $adminCommands = false;
     protected ilLogger $log;
     protected int $view_mode;
     protected array $embedded_block = [];
@@ -55,9 +54,8 @@ abstract class ilContainerContentGUI
 
     public function __construct(
         ilContainerGUI $container_gui_obj,
-        ?ilContainerUserFilter $container_user_filter = null
+        \ILIAS\Container\Content\ItemPresentationManager $item_presentation
     ) {
-        /** @var \ILIAS\DI\Container $DIC */
         global $DIC;
 
         $this->tpl = $DIC["tpl"];
@@ -75,7 +73,6 @@ abstract class ilContainerContentGUI
         /** @var $obj ilContainer */
         $obj = $this->container_gui->getObject();
         $this->container_obj = $obj;
-        $this->container_user_filter = $container_user_filter;
 
         $tpl->addJavaScript("./Services/Container/js/Container.js");
 
@@ -107,16 +104,8 @@ abstract class ilContainerContentGUI
             ->repo()
             ->content()
             ->block();
-        $this->item_presentation = $DIC->container()
-            ->internal()
-            ->domain()
-            ->content()
-            ->itemPresentation(
-                $this->container_obj,
-                $this->container_user_filter
-            );
+        $this->item_presentation = $item_presentation;
 
-        $this->initDetails();
         $this->block_limit = (int) ilContainer::_lookupContainerSetting($container_gui_obj->getObject()->getId(), "block_limit");
     }
     
@@ -280,17 +269,14 @@ abstract class ilContainerContentGUI
     {
         $ilAccess = $this->access;
 
-        $this->clearAdminCommandsDetermination();
-
         $tpl = new ilTemplate(
             "tpl.container_page.html",
             true,
             true,
             "Services/Container"
         );
-
         // Show introduction, if repository is empty
-        if ($this->item_presentation->hasItems() &&
+        if (!$this->item_presentation->hasItems() &&
             $this->getContainerObject()->getRefId() == ROOT_FOLDER_ID &&
             $ilAccess->checkAccess("write", "", $this->getContainerObject()->getRefId())) {
             $html = $this->getIntroduction();
@@ -310,6 +296,7 @@ abstract class ilContainerContentGUI
         $sorting = ilContainerSorting::_getInstance($this->getContainerObject()->getId());
         
         $this->renderer = new ilContainerRenderer(
+            $this->item_presentation,
             ($this->getContainerGUI()->isActiveAdministrationPanel() && !$this->clipboard->hasEntries()),
             $this->getContainerGUI()->isMultiDownloadEnabled(),
             $this->getContainerGUI()->isActiveOrdering() && (get_class($this) != "ilContainerObjectiveGUI") // no block sorting in objective view
@@ -355,28 +342,6 @@ abstract class ilContainerContentGUI
         }
 
         return $html;
-    }
-
-    protected function clearAdminCommandsDetermination() : void
-    {
-        $this->adminCommands = false;
-    }
-    
-    protected function determineAdminCommands(
-        int $a_ref_id,
-        bool $a_admin_com_included_in_list = false
-    ) : void {
-        $rbacsystem = $this->rbacsystem;
-        
-        if (!$this->adminCommands) {
-            if (!$this->getContainerGUI()->isActiveAdministrationPanel()) {
-                if ($rbacsystem->checkAccess("delete", $a_ref_id)) {
-                    $this->adminCommands = true;
-                }
-            } else {
-                $this->adminCommands = $a_admin_com_included_in_list;
-            }
-        }
     }
 
     protected function getItemGUI(array $item_data) : ilObjectListGUI
@@ -652,7 +617,6 @@ abstract class ilContainerContentGUI
                     $item['description']
                 );
                                         
-                $this->determineAdminCommands($item["ref_id"], $item_list_gui2->adminCommandsIncluded());
                 if (strlen($sub_item_html)) {
                     $item_list_gui->addSubItemHTML($sub_item_html);
                 }
@@ -685,11 +649,6 @@ abstract class ilContainerContentGUI
             false,
             $asynch_url
         );
-        $this->determineAdminCommands(
-            $a_item_data["ref_id"],
-            $item_list_gui->adminCommandsIncluded()
-        );
-            
             
         return $html;
     }

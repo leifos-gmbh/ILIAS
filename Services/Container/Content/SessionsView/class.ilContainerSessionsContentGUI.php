@@ -20,93 +20,47 @@
  */
 class ilContainerSessionsContentGUI extends ilContainerContentGUI
 {
-    public function getMainContent() : string
+    protected bool $session_link_next = false;
+    protected bool $session_link_prev = false;
+    protected bool $session_limitation_initialised = false;
+
+    protected function initRenderer() : void
     {
-        // see bug #7452
-        //		$ilTabs->setSubTabActive($this->getContainerObject()->getType().'_content');
-
-        $tpl = new ilTemplate(
-            "tpl.container_page.html",
-            true,
-            true,
-            "Services/Container"
-        );
-
-        $this->__showMaterials($tpl);
-            
-        return $tpl->get();
+        parent::initRenderer();
+        $this->renderer->setBlockPostfixClosure(function (string $type) {
+            $this->getBlockPostfix($type);
+        });
+        $this->renderer->setBlockPrefixClosure(function (string $type) {
+            $this->getBlockPrefix($type);
+        });
     }
 
-    public function __showMaterials(ilTemplate $a_tpl) : void
+    protected function getBlockPostfix(string $type) : string
     {
-        $lng = $this->lng;
+        if ($type === "sess") {
+            $this->initSessionPresentationLimitation();
+            if ($this->session_link_next) {
+                return (string) $this->renderSessionLimitLink(false);
+            }
+        }
+        return "";
+    }
 
-        $this->items = $this->getContainerObject()->getSubItems($this->getContainerGUI()->isActiveAdministrationPanel());
-        $this->clearAdminCommandsDetermination();
-        
+    protected function getBlockPrefix(string $type) : string
+    {
+        if ($type === "sess") {
+            $this->initSessionPresentationLimitation();
+            if ($this->session_link_prev) {
+                return (string) $this->renderSessionLimitLink(true);
+            }
+        }
+        return "";
+    }
+
+    public function renderItemList() : string
+    {
         $this->initRenderer();
-        
-        $output_html = $this->getContainerGUI()->getContainerPageHTML();
-        
-        // get embedded blocks
-        if ($output_html != "") {
-            $output_html = $this->insertPageEmbeddedBlocks($output_html);
-        }
-        
-        if (is_array($this->items["sess"]) ||
-            isset($this->items['sess_link']['prev']['value']) ||
-            isset($this->items['sess_link']['next']['value'])) {
-            $this->items['sess'] = ilArrayUtil::sortArray($this->items['sess'], 'start', 'asc', true, false);
-
-            $prefix = $postfix = "";
-            if (isset($this->items['sess_link']['prev']['value'])) {
-                $prefix = $this->renderSessionLimitLink(true);
-            }
-            if (isset($this->items['sess_link']['next']['value'])) {
-                $postfix = $this->renderSessionLimitLink(false);
-            }
-            
-            $this->renderer->addTypeBlock("sess", $prefix, $postfix);
-            $this->renderer->setBlockPosition("sess", 1);
-            
-            $position = 1;
-            
-            foreach ($this->items["sess"] as $item_data) {
-                if (!$this->renderer->hasItem($item_data["child"])) {
-                    $html = $this->renderItem($item_data, $position++, true);
-                    if ($html != "") {
-                        $this->renderer->addItemToBlock("sess", $item_data["type"], $item_data["child"], $html);
-                    }
-                }
-            }
-        }
-
-        $pos = $this->getItemGroupsHTML(1);
-        
-        if (is_array($this->items["_all"])) {
-            $this->renderer->addCustomBlock("_all", $lng->txt("content"));
-            $this->renderer->setBlockPosition("_all", ++$pos);
-                        
-            $position = 1;
-            
-            foreach ($this->items["_all"] as $item_data) {
-                // #14599
-                if ($item_data["type"] == "sess" || $item_data["type"] == "itgr") {
-                    continue;
-                }
-                
-                if (!$this->renderer->hasItem($item_data["child"])) {
-                    $html = $this->renderItem($item_data, $position++, true);
-                    if ($html != "") {
-                        $this->renderer->addItemToBlock("_all", $item_data["type"], $item_data["child"], $html);
-                    }
-                }
-            }
-        }
-
-        $output_html .= $this->renderer->getHTML();
-        
-        $a_tpl->setVariable("CONTAINER_PAGE_CONTENT", $output_html);
+        return $this->renderer->renderItemBlockSequence($this->item_presentation->getItemBlockSequence());
     }
 
     protected function renderSessionLimitLink(
@@ -153,31 +107,19 @@ class ilContainerSessionsContentGUI extends ilContainerContentGUI
         return $tpl->get();
     }
     
-    
-    public function addFooterRow(
-        ilTemplate $tpl
-    ) : void {
-        $ilCtrl = $this->ctrl;
 
-        $ilCtrl->setParameterByClass(
-            "ilrepositorygui",
-            "ref_id",
-            $this->request->getRefId()
-        );
-        
-        $tpl->setCurrentBlock('container_details_row');
-        $tpl->setVariable('TXT_DETAILS', $this->lng->txt('details'));
-        $tpl->parseCurrentBlock();
-    }
-
-    public static function prepareSessionPresentationLimitation(
-        array $items,
-        ilContainer $container,
-        bool $admin_panel_enabled = false,
-        bool $include_side_block = false
-    ) : array {
-        /** @var \ILIAS\DI\Container $DIC */
+    protected function initSessionPresentationLimitation() : void
+    {
         global $DIC;
+
+        if ($this->session_limitation_initialised) {
+            return;
+        }
+        $this->session_limitation_initialised = true;
+
+        $container = $this->container_obj;
+        $mode_manager = $DIC->container()->internal()->domain()->content()->mode($container);
+        $session_ref_ids = $this->item_presentation->getRefIdsOfType("sess");
 
         $user = $DIC->user();
         $access = $DIC->access();
@@ -188,22 +130,17 @@ class ilContainerSessionsContentGUI extends ilContainerContentGUI
             ->standardRequest();
 
         $limit_sessions = false;
-        if (
-            !$admin_panel_enabled &&
-            !$include_side_block &&
-            $items['sess'] &&
-            is_array($items['sess']) &&
-            (($container->getViewMode() == ilContainer::VIEW_SESSIONS) || ($container->getViewMode() == ilContainer::VIEW_INHERIT)) &&
-            $container->isSessionLimitEnabled()
-        ) {
+        if (!$mode_manager->isAdminMode() &&
+            count($session_ref_ids) > 0 &&
+            $container->isSessionLimitEnabled()) {
             $limit_sessions = true;
         }
 
-        if ($container->getViewMode() == ilContainer::VIEW_INHERIT) {
+        if ($container->getViewMode() === ilContainer::VIEW_INHERIT) {
             $parent = $tree->checkForParentType($container->getRefId(), 'crs');
             $crs = ilObjectFactory::getInstanceByRefId($parent, false);
             if (!$crs instanceof ilObjCourse) {
-                return $items;
+                return;
             }
 
             if (!$container->isSessionLimitEnabled()) {
@@ -217,9 +154,8 @@ class ilContainerSessionsContentGUI extends ilContainerContentGUI
         }
 
         if (!$limit_sessions) {
-            return  $items;
+            return;
         }
-
 
 
         // do session limit
@@ -236,13 +172,11 @@ class ilContainerSessionsContentGUI extends ilContainerContentGUI
             );
         }
 
-        $session_rbac_checked = [];
-        foreach ($items['sess'] as $session_tree_info) {
-            if ($access->checkAccess('visible', '', $session_tree_info['ref_id'])) {
-                $session_rbac_checked[] = $session_tree_info;
-            }
-        }
-        $sessions = ilArrayUtil::sortArray($session_rbac_checked, 'start', 'ASC', true, false);
+        $sessions = array_map(function ($ref_id) {
+            return $this->item_presentation->getRawDataByRefId($ref_id);
+        }, $session_ref_ids);
+
+        $sessions = ilArrayUtil::sortArray($sessions, 'start', 'ASC', true, false);
         //$sessions = ilUtil::sortArray($this->items['sess'],'start','ASC',true,false);
         $today = new ilDate(date('Ymd', time()), IL_CAL_DATE);
         $previous = $current = $next = array();
@@ -266,7 +200,7 @@ class ilContainerSessionsContentGUI extends ilContainerContentGUI
             if (!$user->getPref('crs_sess_show_prev_' . $container->getId())) {
                 array_shift($previous);
             }
-            $items['sess_link']['prev']['value'] = 1;
+            $this->session_link_prev = true;
         }
 
         $num_next_remove = max(
@@ -278,15 +212,7 @@ class ilContainerSessionsContentGUI extends ilContainerContentGUI
                 array_pop($next);
             }
             // @fixme
-            $items['sess_link']['next']['value'] = 1;
+            $this->session_link_next = true;
         }
-
-        $sessions = array_merge($previous, $current, $next);
-        $items['sess'] = $sessions;
-
-        // #15389 - see ilContainer::getSubItems()
-        $sort = ilContainerSorting::_getInstance($container->getId());
-        $items[(int) $admin_panel_enabled][(int) $include_side_block] = $sort->sortItems($items);
-        return $items;
     }
 }

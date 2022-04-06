@@ -25,6 +25,7 @@ use ILIAS\Container\Content\Block;
  */
 class ItemBlock
 {
+    protected array $objective_ids = [];
     protected bool $page_embedded = false;
     protected int $pos = 0;
     /**
@@ -39,12 +40,14 @@ class ItemBlock
         string $block_id,
         Block $block,
         array $item_ref_ids,
-        bool $limit_exhausted
+        bool $limit_exhausted,
+        array $objective_ids = []
     ) {
-        $this->block_id = "";
+        $this->block_id = $block_id;
         $this->block = $block;
         $this->item_ref_ids = $item_ref_ids;
         $this->limit_exhausted = $limit_exhausted;
+        $this->objective_ids = $objective_ids;
     }
     public function getId() : string
     {
@@ -67,6 +70,14 @@ class ItemBlock
     public function getItemRefIds() : array
     {
         return $this->item_ref_ids;
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getObjectiveIds() : array
+    {
+        return $this->objective_ids;
     }
 
     public function setPosition(int $pos) : void

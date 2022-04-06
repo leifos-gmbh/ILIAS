@@ -33,7 +33,6 @@ class ilContainerSimpleContentGUI extends ilContainerContentGUI
         $this->access = $DIC->access();
         $this->user = $DIC->user();
         parent::__construct($container_gui_obj);
-        $this->initDetails();
     }
 
     public function getMainContent() : string

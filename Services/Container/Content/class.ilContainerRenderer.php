@@ -21,6 +21,9 @@
 class ilContainerRenderer
 {
     protected const UNIQUE_SEPARATOR = "-";
+    protected \ILIAS\Containter\Content\ItemRenderer $objective_renderer;
+    protected \ILIAS\Containter\Content\ItemRenderer $item_renderer;
+    protected \ILIAS\Container\Content\ItemPresentationManager $item_presentation;
 
     protected ilLanguage $lng;
     protected ilSetting $settings;
@@ -54,8 +57,11 @@ class ilContainerRenderer
     protected int $view_mode;
     protected \ILIAS\DI\UIServices $ui;
     protected ilCtrl $ctrl;
+    protected ?Closure $block_prefix_closure = null;
+    protected ?Closure $block_postfix_closure = null;
 
     public function __construct(
+        \ILIAS\Container\Content\ItemPresentationManager $item_presentation,
         bool $a_enable_manage_select_all = false,
         bool $a_enable_multi_download = false,
         bool $a_active_block_ordering = false,
@@ -65,6 +71,7 @@ class ilContainerRenderer
     ) {
         global $DIC;
 
+        $this->item_presentation = $item_presentation;
         $this->lng = $DIC->language();
         $this->settings = $DIC->settings();
         $this->ui = $DIC->ui();
@@ -78,6 +85,34 @@ class ilContainerRenderer
         $obj = $container_gui_obj;
         $this->container_gui = $obj;
         $this->ctrl = $DIC->ctrl();
+
+        $this->item_renderer = $DIC->container()
+            ->internal()
+            ->gui()
+            ->content()
+            ->itemRenderer(
+                $this->container_gui,
+                $a_view_mode
+            );
+        $this->objective_renderer = $DIC->container()
+            ->internal()
+            ->gui()
+            ->content()
+            ->objectiveRenderer(
+                $this->container_gui,
+                $a_view_mode,
+                clone $this
+            );
+    }
+
+    public function setBlockPrefixClosure(Closure $f) : void
+    {
+        $this->block_prefix_closure = $f;
+    }
+
+    public function setBlockPostfixClosure(Closure $f) : void
+    {
+        $this->block_postfix_closure = $f;
     }
 
     protected function getViewMode() : int
@@ -249,7 +284,6 @@ class ilContainerRenderer
             
             // #18326
             $this->item_ids[$a_item_id] = true;
-            
             $this->block_items[$a_block_id][] = $uniq_id;
             return true;
         }
@@ -441,7 +475,6 @@ class ilContainerRenderer
         $ctrl = $this->ctrl;
         if (!in_array($a_block_id, $this->rendered_blocks)) {
             $this->rendered_blocks[] = $a_block_id;
-        
             $block_types = [];
             if (isset($this->block_items[$a_block_id]) && is_array($this->block_items[$a_block_id])) {
                 foreach ($this->block_items[$a_block_id] as $item_id) {
@@ -721,12 +754,12 @@ class ilContainerRenderer
     /// Render Item Block Sequence
     ///
 
-    /**
-     *
-     * @param
-     * @return
-     */
-    protected function renderItemBlockSequence(
+    public function getItemRenderer() : \ILIAS\Containter\Content\ItemRenderer
+    {
+        return $this->item_renderer;
+    }
+
+    public function renderItemBlockSequence(
         \ILIAS\Container\Content\ItemBlock\ItemBlockSequence $sequence
     ) : string {
         $valid = false;
@@ -734,16 +767,58 @@ class ilContainerRenderer
         $block_tpl = $this->initBlockTemplate();
 
         foreach ($sequence->getBlocks() as $block) {
+            $block_id = "";
             if ($block->getBlock() instanceof \ILIAS\Container\Content\ItemGroupBlock) {
-                $this->addCustomBlock($block->getBlock()->getRefId(), "test");
-                if ($this->renderHelperCustomBlock($block_tpl, $block->getBlock()->getRefId())) {
+                $block_id = (string) $block->getBlock()->getRefId();
+            }
+            if ($block->getBlock() instanceof \ILIAS\Container\Content\TypeBlock) {
+                $block_id = $block->getBlock()->getType();
+            }
+            if ($block->getBlock() instanceof \ILIAS\Container\Content\SessionBlock) {
+                $block_id = "sess";
+            }
+            if ($block->getBlock() instanceof \ILIAS\Container\Content\OtherBlock) {
+                $block_id = "_other";
+            }
+
+            $position = 1;
+
+            // (1) add block
+            if ($block->getBlock() instanceof \ILIAS\Container\Content\ItemGroupBlock) {
+                $this->addCustomBlock($block_id, "test");
+            }
+            if ($block->getBlock() instanceof \ILIAS\Container\Content\OtherBlock) {
+                $this->addCustomBlock($block_id, "other");
+            }
+            if ($block->getBlock() instanceof \ILIAS\Container\Content\TypeBlock ||
+                $block->getBlock() instanceof \ILIAS\Container\Content\SessionBlock) {
+                $this->addTypeBlock(
+                    $block_id,
+                    $this->getBlockPrefix($block_id),
+                    $this->getBlockPostfix($block_id)
+                );
+            }
+
+            // (2) render and add items
+            foreach ($block->getItemRefIds() as $ref_id) {
+                $item_data = $this->item_presentation->getRawDataByRefId($ref_id);
+                $html = $this->item_renderer->renderItem($item_data, $position++);
+                if ($html != "") {
+                    $this->addItemToBlock($block_id, $item_data["type"], $item_data["child"], $html);
+                }
+            }
+
+            // (3) render blocks
+            if ($block->getBlock() instanceof \ILIAS\Container\Content\ItemGroupBlock ||
+                $block->getBlock() instanceof \ILIAS\Container\Content\OtherBlock) {
+                if ($this->renderHelperCustomBlock($block_tpl, $block_id)) {
                     $this->addSeparatorRow($block_tpl);
                     $valid = true;
                 }
             }
-            if ($block->getBlock() instanceof \ILIAS\Container\Content\TypeBlock) {
-                $this->addTypeBlock($block->getBlock()->getType());
-                if ($this->renderHelperTypeBlock($block_tpl, $block->getBlock()->getType())) {
+            if ($block->getBlock() instanceof \ILIAS\Container\Content\TypeBlock ||
+                $block->getBlock() instanceof \ILIAS\Container\Content\SessionBlock) {
+                if ($this->renderHelperTypeBlock($block_tpl, $block_id)) {
                     $this->addSeparatorRow($block_tpl);
                     $valid = true;
                 }
@@ -754,6 +829,24 @@ class ilContainerRenderer
             $this->renderDetails($block_tpl);
 
             return $block_tpl->get();
+        }
+        return "";
+    }
+
+    protected function getBlockPrefix($block_id) : string
+    {
+        if ($this->block_prefix_closure instanceof Closure) {
+            $c = $this->block_prefix_closure;
+            return (string) $c($block_id);
+        }
+        return "";
+    }
+
+    protected function getBlockPostfix($block_id) : string
+    {
+        if ($this->block_postfix_closure instanceof Closure) {
+            $c = $this->block_postfix_closure;
+            return (string) $c($block_id);
         }
         return "";
     }

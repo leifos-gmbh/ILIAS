@@ -24,7 +24,9 @@ class ilContainerByTypeContentGUI extends ilContainerContentGUI
     {
         $this->initRenderer();
 
-        return $this->renderer->renderItemBlockSequence($this->item_presentation->getItemBlockSequence());
+        if (true) {
+            return $this->renderer->renderItemBlockSequence($this->item_presentation->getItemBlockSequence());
+        }
         
         // text/media page content
         $output_html = $this->getContainerGUI()->getContainerPageHTML();

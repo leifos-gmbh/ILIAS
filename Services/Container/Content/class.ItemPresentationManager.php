@@ -17,6 +17,7 @@ namespace ILIAS\Container\Content;
 
 use ILIAS\Container\InternalDomainService;
 use ILIAS\Container\Content\ItemBlock\ItemBlockSequence;
+use ILIAS\Repository\Clipboard\ClipboardManager;
 
 /**
  * High level business logic class. Orchestrates item set,
@@ -26,8 +27,11 @@ use ILIAS\Container\Content\ItemBlock\ItemBlockSequence;
  */
 class ItemPresentationManager
 {
+    protected ?bool $can_order = null;
+    protected ClipboardManager $repo_clipboard;
+    protected ?bool $can_manage = null;
     protected ItemBlock\ItemBlockSequenceGenerator $sequence_generator;
-    protected \ilContainerUserFilter $container_user_filter;
+    protected ?\ilContainerUserFilter $container_user_filter = null;
     protected ?array $type_grps = null;
     protected ?ItemSetManager $item_set = null;
     protected \ilContainer $container;
@@ -37,13 +41,61 @@ class ItemPresentationManager
     public function __construct(
         InternalDomainService $domain,
         \ilContainer $container,
-        \ilContainerUserFilter $container_user_filter
+        ?\ilContainerUserFilter $container_user_filter,
+        ClipboardManager $repo_clipboard
     ) {
         $this->container = $container;
         $this->domain = $domain;
         $this->container_user_filter = $container_user_filter;
+        $this->repo_clipboard = $repo_clipboard;
 
         // sequence from view manager
+    }
+
+    public function canManageItems() : bool
+    {
+        if (!is_null($this->can_manage)) {
+            return $this->can_manage;
+        }
+        $user = $this->domain->user();
+        $rbacsystem = $this->domain->rbac()->system();
+        if ($user->getId() === ANONYMOUS_USER_ID || !is_object($this->container)) {
+            return false;
+        }
+            
+        if ($rbacsystem->checkAccess("write", $this->container->getRefId()) ||
+            $this->container->getHiddenFilesFound() ||
+            $this->repo_clipboard->hasEntries()) {
+            $this->can_manage = true;
+            return true;
+        }
+        $this->init();
+        $this->can_manage = false;
+        foreach ($this->item_set->getAllRefIds() as $ref_id) {
+            if ($this->can_manage === true) {
+                break;
+            }
+            if ($rbacsystem->checkAccess("delete", $ref_id)) {
+                $this->can_manage = true;
+            }
+        }
+        return $this->can_manage;
+    }
+
+    public function canOrderItems() : bool
+    {
+        $user = $this->domain->user();
+        $rbacsystem = $this->domain->rbac()->system();
+
+        if (is_null($this->can_order)) {
+            $this->can_order = false;
+            if ($user->getId() !== ANONYMOUS_USER_ID &&
+                is_object($this->container) &&
+                $rbacsystem->checkAccess("write", $this->container->getRefId())) {
+                $this->can_order = true;
+            }
+        }
+        return $this->can_order;
     }
 
     /**
@@ -116,5 +168,17 @@ class ItemPresentationManager
     {
         $this->init();
         return $this->sequence_generator->getSequence();
+    }
+
+    public function getRawDataByRefId(int $ref_id) : ?array
+    {
+        $this->init();
+        return $this->item_set->getRawDataByRefId($ref_id);
+    }
+
+    public function getRefIdsOfType(string $type) : array
+    {
+        $this->init();
+        return $this->item_set->getRefIdsOfType($type);
     }
 }

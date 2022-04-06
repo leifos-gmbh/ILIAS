@@ -39,9 +39,9 @@ class DataService
         return new OtherBlock();
     }
 
-    public function objectiveBlock() : ObjectiveBlock
+    public function objectivesBlock() : ObjectivesBlock
     {
-        return new ObjectiveBlock();
+        return new ObjectivesBlock();
     }
 
     public function sessionBlock() : SessionBlock
@@ -49,14 +49,14 @@ class DataService
         return new SessionBlock();
     }
 
-    public function itemGroupBlock(int $ref_id) : itemGroupBlock
+    public function itemGroupBlock(int $ref_id) : ItemGroupBlock
     {
-        return new itemGroupBlock($ref_id);
+        return new ItemGroupBlock($ref_id);
     }
 
-    public function itemGroupBlocks() : itemGroupBlocks
+    public function itemGroupBlocks() : ItemGroupBlocks
     {
-        return new itemGroupBlocks();
+        return new ItemGroupBlocks();
     }
 
     /**
@@ -74,9 +74,14 @@ class DataService
     /**
      * @param int[] $item_ref_ids
      */
-    public function itemBlock(string $id, Block $block, array $item_ref_ids) : ItemBlock
-    {
-        return new ItemBlock($id, $block, $item_ref_ids);
+    public function itemBlock(
+        string $id,
+        Block $block,
+        array $item_ref_ids,
+        bool $exhausted,
+        array $objective_ids = []
+    ) : ItemBlock {
+        return new ItemBlock($id, $block, $item_ref_ids, $exhausted, $objective_ids);
     }
 
     public function itemBlockSequence(array $blocks) : ItemBlockSequence

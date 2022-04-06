@@ -14,6 +14,7 @@
  */
 
 use ILIAS\HTTP\Agent\AgentDetermination;
+use ILIAS\Container\Content\ItemPresentationManager;
 
 define("IL_COL_LEFT", "left");
 define("IL_COL_RIGHT", "right");
@@ -36,6 +37,7 @@ class ilColumnGUI
 {
     protected string $coltype;
     protected ilDashboardSidePanelSettingsRepository $dash_side_panel_settings;
+    protected ?ItemPresentationManager $item_presentation = null;
     protected \ILIAS\Block\StandardGUIRequest $request;
     protected ilCtrl $ctrl;
     protected ilLanguage $lng;
@@ -48,7 +50,6 @@ class ilColumnGUI
     protected string $type;
     protected bool $enableedit = false;
     protected bool $repositorymode = false;
-    protected array $repositoryitems = array();
     protected array $blocks = [];
     
     // all blocks that are repository objects
@@ -339,15 +340,15 @@ class ilColumnGUI
         $this->block_property = $a_block_properties;
     }
 
-    public function setRepositoryItems(
-        array $a_repositoryitems
+    public function setItemPresentationManager(
+        ItemPresentationManager $item_presentation
     ) : void {
-        $this->repositoryitems = $a_repositoryitems;
+        $this->item_presentation = $item_presentation;
     }
 
-    public function getRepositoryItems() : array
+    public function getItemPresentationManager() : ItemPresentationManager
     {
-        return $this->repositoryitems;
+        return $this->item_presentation;
     }
 
     public function executeCommand() : string
@@ -726,13 +727,14 @@ class ilColumnGUI
                 }
             }
         } else {	// get all subitems
-            $rep_items = $this->getRepositoryItems();
             foreach ($this->rep_block_types as $block_type) {
                 if ($this->isGloballyActivated($block_type)) {
                     if (!isset($rep_items[$block_type]) || !is_array($rep_items[$block_type])) {
                         continue;
                     }
-                    foreach ($rep_items[$block_type] as $item) {
+                    $item_ref_ids = $this->getItemPresentationManager()->getRefIdsOfType($block_type);
+                    foreach ($item_ref_ids as $item_ref_id) {
+                        $item = $this->getItemPresentationManager()->getRawDataByRefId($item_ref_id);
                         $costum_block = new ilCustomBlock();
                         $costum_block->setContextObjId($item["obj_id"]);
                         $costum_block->setContextObjType($block_type);

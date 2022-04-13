@@ -120,6 +120,25 @@ abstract class ilPageComponentPlugin extends ilPlugin
     ) : void {
     }
 
+    // begin patch videocast – Killing 22.07.2020
+
+    /**
+     * This function is called after repository (container) objects have been copied
+     *
+     * @param array $a_properties properties saved in the page, should be modified if neccessary
+     * @param array $mapping repository object mapping array
+     * @param int $source_ref_id ref id of source object
+     * @param string $a_plugin_version plugin version of the properties
+     */
+    public function afterRepositoryCopy(
+        array &$a_properties,
+        array $mapping,
+        int $source_ref_id,
+        string $a_plugin_version
+    ) {
+    }
+    // end patch videocast – Killing 22.07.2020
+
     /**
      * This function is called before the page content is deleted
      * @param array 	$a_properties		properties saved in the page (will be deleted afterwards)

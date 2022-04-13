@@ -948,6 +948,7 @@ class ilContainer extends ilObject
         $cwo = ilCopyWizardOptions::_getInstance($a_copy_id);
         $mapping = $cwo->getMappings();
 
+        // begin patch videocast – Killing 22.07.2020
         if (ilContainerPage::_exists("cont", $obj_id)) {
             $pg = new ilContainerPage($obj_id);
             $pg->handleRepositoryLinksOnCopy($mapping, $a_source_ref_id);
@@ -971,6 +972,7 @@ class ilContainer extends ilObject
                     if (ilPageObject::_exists($page_id['parent_type'], $page_id['id'], $page_id['lang'])) {
                         /** @var ilPageObject $page */
                         $page = ilPageObjectFactory::getInstance($page_id['parent_type'], $page_id['id'], 0, $page_id['lang']);
+                        // end patch videocast – Killing 22.07.2020
                         $page->handleRepositoryLinksOnCopy($mapping, $a_source_ref_id);
                         $page->update(true, true);
                     }

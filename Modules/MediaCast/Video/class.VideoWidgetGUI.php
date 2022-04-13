@@ -77,6 +77,8 @@ class VideoWidgetGUI
         $tpl = new \ilTemplate("tpl.wrapper.html", true, true, "Modules/MediaCast/Video");
         $tpl->setVariable("ID", $this->dom_wrapper_id);
         $tpl->setVariable("TPL", $video_tpl->get());
+        $f = $ui->factory();
+
         if ($this->getVideo() != "") {
             $tpl->setCurrentBlock("loadfile");
             $tpl->setVariable("FID", $this->dom_wrapper_id);
@@ -84,9 +86,16 @@ class VideoWidgetGUI
             $tpl->setVariable("FILE", $this->getVideo()->getResource());
             $tpl->setVariable("TITLE", $this->getVideo()->getTitle());
             $tpl->setVariable("DESCRIPTION", $this->getVideo()->getDescription());
+
         }
 
-        $f = $ui->factory();
+        $item = $f->item()->standard('<span data-elementtype="title"></span>')
+                  ->withDescription('<span data-elementtype="description-wrapper"><span data-elementtype="description"></span></span>');
+        $tpl->setVariable("ITEM",
+            $ui->renderer()->render($item));
+
+
+        /*
         $back = $f->button()->standard("<span class=\"glyphicon glyphicon-chevron-left \" aria-hidden=\"true\"></span>", "")
             ->withOnLoadCode(function ($id) {
                 return
@@ -96,15 +105,17 @@ class VideoWidgetGUI
               ->withOnLoadCode(function ($id) {
                   return
                       "$(\"#$id\").click(function() { il.VideoWidget.next(\"".$this->dom_wrapper_id."\"); return false;});";
-        });
+        });*/
 
+
+        /*
         $description_link = $f->button()->shy($this->lng->txt("mcst_show_description"), "")->withOnLoadCode(function ($id) {
             return
                 "$(\"#$id\").click(function() { $(document).find(\"[data-elementtype='description']\").removeClass('ilNoDisplay'); $(document).find(\"[data-elementtype='description-trigger']\").addClass('ilNoDisplay'); return false;});";
         });
-        $tpl->setVariable("DESCRIPTION_LINK", $ui->renderer()->render($description_link));
+        $tpl->setVariable("DESCRIPTION_LINK", $ui->renderer()->render($description_link));*/
 
-        $tpl->setVariable("VIEWCONTROL", $ui->renderer()->render([$back,$next]));
+        //$tpl->setVariable("VIEWCONTROL", $ui->renderer()->render([$back,$next]));
 
         /*
         $tpl->setCurrentBlock("autoplay");

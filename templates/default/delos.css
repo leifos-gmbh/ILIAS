@@ -18849,6 +18849,15 @@ span.ilProfileBadge .modal .img-responsive {
   font-size: 100%;
   margin-top: 0;
 }
+.il-mcst-side .row > .col-sm-3 {
+  width: 100%;
+}
+.il-mcst-side .row > .col-sm-3 img {
+  width: 100%;
+}
+.il-mcst-side .row > .col-sm-9 .il-item-title {
+  padding: 12px 0 6px;
+}
 .noMargin {
   margin: 0;
 }

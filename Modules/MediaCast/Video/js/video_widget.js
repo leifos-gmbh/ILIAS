@@ -60,10 +60,11 @@ il.VideoWidget = il.VideoWidget || {};
       if (description !== "") {
         $wrap.parent().find("[data-elementtype='description']").html(description);
         $wrap.parent().find("[data-elementtype='description-wrapper']").removeClass("ilNoDisplay");
-        $wrap.parent().find("[data-elementtype='description']").addClass("ilNoDisplay");
+        //$wrap.parent().find("[data-elementtype='description']").addClass("ilNoDisplay");
         $wrap.parent().find("[data-elementtype='description-trigger']").removeClass("ilNoDisplay");
       } else {
-        $wrap.parent().find("[data-elementtype='description-wrapper']").addClass("ilNoDisplay");
+        $wrap.parent().find("[data-elementtype='description']").html("");
+        //$wrap.parent().find("[data-elementtype='description-wrapper']").addClass("ilNoDisplay");
       }
     };
 

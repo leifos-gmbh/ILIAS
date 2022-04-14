@@ -202,7 +202,7 @@ class ilMediaCastTableGUI extends ilTable2GUI
 
                 //$this->tpl->setVariable("PLAYER", $mpl->getMp3PlayerHtml());
                 if ($med->getFormat() == "audio/mpeg") {
-                    $audio = $ui->factory()->audio(
+                    $audio = $ui->factory()->player()->audio(
                         ilWACSignedPath::signFile($a_file),
                         ""
                     );

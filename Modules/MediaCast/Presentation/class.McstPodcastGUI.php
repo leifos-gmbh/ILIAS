@@ -63,13 +63,13 @@ class McstPodcastGUI
                 $resource = $path_to_file;
             }
 
-            $audio = $f->audio(
+            $audio = $f->player()->audio(
                 $resource,
                 ""
             );
 
             $item = $f->item()->standard($mob->getTitle())
-                ->withLeadAudio($audio)
+                ->withAudioPlayer($audio)
                 ->withProperties([$this->lng->txt("mcst_duration") => $med_item["playtime"]])
                 ->withDescription($mob->getDescription());
 

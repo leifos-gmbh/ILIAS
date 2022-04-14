@@ -2062,7 +2062,6 @@ class ilObjMediaPoolGUI extends ilObject2GUI
         $ctrl = $this->ctrl;
         
         $this->checkPermission("write");
-q
         $media_items = ilMediaItem::getMediaItemsForUploadHash(
             $this->mep_request->getUploadHash()
         );

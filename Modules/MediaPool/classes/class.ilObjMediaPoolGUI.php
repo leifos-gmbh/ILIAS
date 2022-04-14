@@ -593,7 +593,6 @@ class ilObjMediaPoolGUI extends ilObject2GUI
                 $ilCtrl->getLinkTarget($this, "bulkUpload")
             );
 
-            // begin patch videocast – Killing 22.07.2020
             $move_ids = ilSession::get("mep_move_ids");
             if (is_array($move_ids) && count($move_ids) > 0) {
                 $ilToolbar->addSeparator();
@@ -602,7 +601,6 @@ class ilObjMediaPoolGUI extends ilObject2GUI
                     $ilCtrl->getLinkTarget($this, "paste")
                 );
             }
-            // end patch videocast – Killing 22.07.2020
         }
 
         $mep_table_gui = new ilMediaPoolTableGUI($this, "listMedia", $this->getMediaPool(), "mepitem_id");

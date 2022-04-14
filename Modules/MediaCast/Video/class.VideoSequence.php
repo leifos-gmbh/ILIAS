@@ -1,8 +1,20 @@
 <?php
 
-// begin patch (whole file) videocast – Killing 22.07.2020
-
-/* Copyright (c) 1998-2020 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 namespace ILIAS\MediaCast\Video;
 
@@ -12,32 +24,19 @@ namespace ILIAS\MediaCast\Video;
  */
 class VideoSequence
 {
-    /**
-     * @var \ilObjMediaCast
-     */
-    protected $media_cast;
+    protected \ilObjMediaCast $media_cast;
+    /** @var VideoItem[] */
+    protected array $videos;
 
-    /**
-     * @var VideoItem[]
-     */
-    protected $videos;
-
-    /**
-     * Constructor
-     */
     public function __construct(\ilObjMediaCast $cast)
     {
         $this->media_cast = $cast;
         $this->init();
     }
 
-    /**
-     * Init
-     */
-    protected function init()
+    protected function init() : void
     {
         $videos = [];
-        include_once("./Modules/MediaCast/Video/class.VideoItem.php");
         foreach ($this->media_cast->getSortedItemsArray() as $item) {
             $mob = new \ilObjMediaObject($item["mob_id"]);
             $med = $mob->getMediaItem("Standard");
@@ -83,19 +82,14 @@ class VideoSequence
     }
 
     /**
-     * Get videos
-     * @return array
+     * @return VideoItem[]
      */
-    public function getVideos()
+    public function getVideos() : array
     {
         return $this->videos;
     }
 
-    /**
-     * Get first
-     * @return VideoItem|null
-     */
-    public function getFirst()
+    public function getFirst() : ?VideoItem
     {
         if (count($this->videos) > 0) {
             return $this->videos[0];

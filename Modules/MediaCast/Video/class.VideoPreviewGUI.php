@@ -1,8 +1,20 @@
 <?php
 
-// begin patch (whole file) videocast – Killing 22.07.2020
-
-/* Copyright (c) 1998-2020 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 namespace ILIAS\MediaCast\Video;
 
@@ -12,35 +24,16 @@ namespace ILIAS\MediaCast\Video;
  */
 class VideoPreviewGUI
 {
-    /**
-     * @var \ILIAS\DI\UIServices
-     */
-    protected $ui;
+    protected \ILIAS\DI\UIServices $ui;
+    protected string $file = "";
+    protected string $onclick = "";
+    protected string $playing_time = "";
+    protected \ilLanguage $lng;
 
-    /**
-     * @var string
-     */
-    protected $file;
-
-    /**
-     * @var string
-     */
-    protected $onclick;
-
-    /**
-     * @var string
-     */
-    protected $playing_time;
-
-    /**
-     * @var \ilLanguage
-     */
-    protected $lng;
-
-    /**
-     * Constructor
-     */
-    public function __construct($file, $onclick, $playing_time)
+    public function __construct(
+        string $file,
+        string $onclick,
+        string $playing_time)
     {
         global $DIC;
 
@@ -50,14 +43,12 @@ class VideoPreviewGUI
         $this->playing_time = $playing_time;
         $this->lng = $DIC->language();
         $this->lng->loadLanguageModule("mcst");
-	}
+    }
 
     /**
-     * Render
-     * @return string
      * @throws \ilTemplateException
      */
-    public function render()
+    public function render() : string
     {
         $lng = $this->lng;
 
@@ -69,6 +60,6 @@ class VideoPreviewGUI
         $tpl->setVariable("WATCHED", $lng->txt("mcst_watched"));
 
         return $tpl->get();
-	}
+    }
 
 }

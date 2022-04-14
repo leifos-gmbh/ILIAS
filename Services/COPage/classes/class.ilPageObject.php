@@ -2192,9 +2192,7 @@ s     */
         $this->buildDom();
         $this->log->debug("Handle repository links...");
 
-        // begin patch videocast – Killing 22.07.2020
-        // pc classes hook, todo: move rest of function to this hook, too
-        include_once("./Services/COPage/classes/class.ilCOPagePCDef.php");
+        // pc classes hook, @todo: move rest of function to this hook, too
         $defs = ilCOPagePCDef::getPCDefinitions();
         foreach ($defs as $def) {
             ilCOPagePCDef::requirePCClassByName($def["name"]);
@@ -2202,7 +2200,6 @@ s     */
                 call_user_func($def["pc_class"] . '::afterRepositoryCopy', $this, $a_mapping, $a_source_ref_id);
             }
         }
-        // end patch videocast – Killing 22.07.2020
 
 
         // resolve normal internal links

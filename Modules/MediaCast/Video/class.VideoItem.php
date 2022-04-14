@@ -1,8 +1,20 @@
 <?php
 
-// begin patch (whole file) videocast – Killing 22.07.2020
-
-/* Copyright (c) 1998-2020 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 namespace ILIAS\MediaCast\Video;
 
@@ -11,51 +23,26 @@ namespace ILIAS\MediaCast\Video;
  */
 class VideoItem
 {
-    /**
-     * @var string
-     */
-    protected $title;
+    protected string $id = "";
+    protected string $title = "";
+    protected int $time = 0;
+    protected string $mime = "";
+    protected string $resource = "";
+    protected string $preview_pic = "";
+    protected string $description = "";
+    protected string $playing_time = "";
+    protected int $duration = 0;
 
-    /**
-     * @var int
-     */
-    protected $time;
-
-    /**
-     * @var string
-     */
-    protected $mime;
-
-    /**
-     * @var string
-     */
-    protected $resource;
-
-    /**
-     * @var string
-     */
-    protected $preview_pic;
-
-    /**
-     * @var string
-     */
-    protected $description;
-
-    /**
-     * @var string
-     */
-    protected $playing_time;
-
-    /**
-     * @var int
-     */
-    protected $duration;
-
-    /**
-     * Constructor
-     */
-    public function __construct($id, $title, $time, $mime, $resource, $preview_pic, $description = "",
-        $playing_time = "", $duration = 0)
+    public function __construct(
+        string $id,
+        string $title,
+        int $time,
+        string $mime,
+        string $resource,
+        string $preview_pic,
+        string $description = "",
+        string $playing_time = "",
+        int $duration = 0)
     {
         $this->id = $id;
         $this->title = $title;
@@ -71,83 +58,47 @@ class VideoItem
         $this->duration = $duration;
     }
 
-    /**
-     * Get id
-     * @return string
-     */
-    public function getId()
+    public function getId() : string
     {
         return $this->id;
     }
 
-    /**
-     * Get title
-     * @return string
-     */
-    public function getTitle()
+    public function getTitle() : string
     {
         return $this->title;
     }
 
-    /**
-     * Get description
-     * @return string
-     */
-    public function getDescription()
+    public function getDescription() : string
     {
         return $this->description;
     }
 
-    /**
-     * Get time
-     * @return int
-     */
-    public function getTime()
+    public function getTime() : int
     {
         return $this->time;
     }
 
-    /**
-     * Get mime
-     * @return string
-     */
-    public function getMime()
+    public function getMime() : string
     {
         return $this->mime;
     }
 
-    /**
-     * Get resource
-     * @return string
-     */
-    public function getResource()
+    public function getResource() : string
     {
         return $this->resource;
     }
 
-    /**
-     * Get preview pic
-     * @return string
-     */
-    public function getPreviewPic()
+    public function getPreviewPic() : string
     {
         return $this->preview_pic;
     }
 
-    /**
-     * Get playing time
-     * @return string
-     */
-    public function getPlayingTime()
+    public function getPlayingTime() : string
     {
         return $this->playing_time;
     }
 
-    /**
-     * Get duration
-     * @return int
-     */
-    public function getDuration()
+    public function getDuration() : int
     {
         return $this->duration;
     }

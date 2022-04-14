@@ -1521,7 +1521,6 @@ class ilObjMediaCastGUI extends ilObjectGUI
             $this->tabs->activateTab("content");
             $this->addContentSubTabs("content");
             $tpl->setContent($this->ctrl->getHTML($view));
-            // begin patch videocast – Killing 22.07.2020
         } else if ($this->object->getViewMode() == ilObjMediaCast::VIEW_VCAST) {
             $ilTabs->activateTab("content");
             $this->addContentSubTabs("content");

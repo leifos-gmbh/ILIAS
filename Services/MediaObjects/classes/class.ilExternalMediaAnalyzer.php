@@ -172,13 +172,7 @@ class ilExternalMediaAnalyzer
         return $par;
     }
 
-    // begin patch videocast – Killing 22.07.2020
-    /**
-     * Get vimeo metadata
-     * @param string
-     * @return array
-     */
-    public static function getVimeoMetadata($vid)
+    public static function getVimeoMetadata(string $vid) : array
     {
         $json_url = 'https://vimeo.com/api/oembed.json?url=https%3A//vimeo.com/'.$vid;
 
@@ -199,12 +193,7 @@ class ilExternalMediaAnalyzer
         return $r;
     }
 
-    /**
-     * Get vimeo metadata
-     * @param string
-     * @return array
-     */
-    public static function getYoutubeMetadata($vid)
+    public static function getYoutubeMetadata(string $vid) : array
     {
         $json_url = 'https://www.youtube.com/oembed?url=http%3A//youtube.com/watch%3Fv%3D'.$vid.'&format=json';
 
@@ -224,8 +213,6 @@ class ilExternalMediaAnalyzer
         }
         return $r;
     }
-
-    // end patch videocast – Killing 22.07.2020
 
     /**
      * Identify Google Document links

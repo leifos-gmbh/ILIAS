@@ -2842,7 +2842,6 @@
 			</xsl:if>
 		</xsl:when>
 
-		<!-- begin patch videocast – Killing 1.07.2021 -->
 		<xsl:when test = "$type = 'video/vimeo'">
 			<!-- info on video preload attribute: http://www.stevesouders.com/blog/2013/04/12/html5-video-preload/ -->
 			<!-- see #bug12622 -->
@@ -2857,7 +2856,6 @@
 				<xsl:attribute name="src"><xsl:value-of select="$data"/>?controls=0</xsl:attribute>
 			</video>
 		</xsl:when>
-		<!-- end patch videocast – Killing 1.07.2021 -->
 
 		<!-- svg -->
 		<xsl:when test="substring($type, 1, 9) = 'image/svg'">

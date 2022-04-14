@@ -1,8 +1,20 @@
 <?php
 
-// begin patch (whole file) videocast – Killing 22.07.2020
-
-/* Copyright (c) 1998-2020 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 namespace ILIAS\MediaCast\Presentation;
 
@@ -16,63 +28,19 @@ use ILIAS\UI\Implementation\Component\SignalGenerator;
  */
 class VideoViewGUI
 {
-    /**
-     * @var \ilToolbarGUI
-     */
-    protected $toolbar;
-    /**
-     * @var \ilGlobalTemplate
-     */
-    protected $main_tpl;
-    /**
-     * @var \ilObjMediaCast
-     */
-    protected $media_cast;
+    protected \ilToolbarGUI $toolbar;
+    protected \ilGlobalTemplate $main_tpl;
+    protected \ilObjMediaCast $media_cast;
+    protected \ilTemplate $tpl;
+    protected \ILIAS\DI\UIServices $ui;
+    protected \ilLanguage $lng;
+    protected \ilObjUser $user;
+    protected string $completed_callback = "";
+    protected string $autoplay_callback = "";
+    protected string $video_sequence;
+    protected string $video_wrapper_id = "mcst_video";
 
-    /**
-     * @var \ilTemplate
-     */
-    protected $tpl;
-
-    /**
-     * @var \ILIAS\DI\UIServices
-     */
-    protected $ui;
-
-    /**
-     * @var \ilLanguage
-     */
-    protected $lng;
-
-    /**
-     * @var \ilObjUser
-     */
-    protected $user;
-
-    /**
-     * @var string
-     */
-    protected $completed_callback = "";
-
-    /**
-     * @var string 
-     */
-    protected $autoplay_callback = "";
-
-    /**
-     * @var VideoSequence 
-     */
-    protected $video_sequence;
-
-    /**
-     * @var string
-     */
-    protected $video_wrapper_id = "mcst_video";
-
-    /**
-     * Constructor
-     */
-    public function __construct(\ilObjMediaCast $obj, $tpl = null)
+    public function __construct(\ilObjMediaCast $obj, \ilTemplate $tpl = null)
     {
         global $DIC;
 
@@ -80,52 +48,36 @@ class VideoViewGUI
         $this->lng = $DIC->language();
         $this->media_cast = $obj;
         $this->tpl = $tpl;
-        include_once("./Modules/MediaCast/Video/class.VideoSequence.php");
         $this->video_sequence = new VideoSequence($this->media_cast);
         $this->user = $DIC->user();
         $this->main_tpl = $DIC->ui()->mainTemplate();
         $this->toolbar = $DIC->toolbar();
     }
 
-    /**
-     *
-     * @param string
-     */
-    public function setCompletedCallback($completed_callback)
+    public function setCompletedCallback(string $completed_callback) : void
     {
         $this->completed_callback = $completed_callback;
     }
 
-    /**
-     *
-     * @param string
-     */
-    public function setAutoplayCallback($autoplay_callback)
+    public function setAutoplayCallback(string $autoplay_callback) : void
     {
         $this->autoplay_callback = $autoplay_callback;
     }
 
     /**
-     * Render Main column
-     * @return string
      * @throws \ilTemplateException
      */
-    public function renderMainColumn()
+    public function renderMainColumn() : string
     {
         if (count($this->video_sequence->getVideos()) == 0) {
             return "";
         }
 
-
-        include_once("./Modules/MediaCast/Video/class.VideoWidgetGUI.php");
         $widget = new VideoWidgetGUI($this->tpl, "mcst_video");
-        //$widget->setVideo($this->video_sequence->getFirst());
+
         return $widget->render();
     }
 
-    /**
-     * Render toolbar
-     */
     public function renderToolbar() : void
     {
         $toolbar = $this->toolbar;
@@ -181,10 +133,7 @@ class VideoViewGUI
         return $autoplay;
     }
 
-    /**
-     * Render side column
-     */
-    public function renderSideColumn()
+    public function renderSideColumn() : string
     {
 
         $mcst_settings = \ilMediaCastSettings::_getInstance();
@@ -193,7 +142,6 @@ class VideoViewGUI
 
         $lng = $this->lng;
         $tpl = new \ilTemplate("tpl.video_cast_side.html", true, true, "Modules/MediaCast/Presentation");
-        include_once("./Modules/MediaCast/Video/class.VideoPreviewGUI.php");
 
         $factory = $this->ui->factory();
         $renderer = $this->ui->renderer();
@@ -294,11 +242,9 @@ class VideoViewGUI
     }
 
     /**
-     * Render
-     * @return string
      * @throws \ilTemplateException
      */
-    public function render()
+    public function render() : string
     {
         // this is current only to include the resize mechanism when
         // the main menu is changed, so that the player is resized, too
@@ -318,10 +264,7 @@ class VideoViewGUI
         return $tpl->get();
     }
 
-    /**
-     * Render content into standard template
-     */
-    public function show()
+    public function show() : void
     {
         if (is_object($this->tpl)) {
             $this->renderToolbar();

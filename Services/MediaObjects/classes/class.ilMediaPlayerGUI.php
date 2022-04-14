@@ -243,9 +243,7 @@ class ilMediaPlayerGUI
             if ($a_preview) {
                 $mp_tpl->setVariable("CLASS", "ilNoDisplay");
             }
-            // begin patch videocast – Killing 1.4.2021
             $mp_tpl->setVariable("SRC", "https://www.youtube.com/embed/".$p["v"]);
-            // end patch videocast – Killing 1.4.2021
             $mp_tpl->setVariable("PLAYER_NR", $this->id . "_" . $this->current_nr);
             $mp_tpl->setVariable("TXT_PLAY", $lng->txt("mob_play"));
             $mp_tpl->setVariable("TITLE", $this->getTitle());

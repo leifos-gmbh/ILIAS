@@ -192,15 +192,10 @@ class ilPCPlugged extends ilPageContent
         }
     }
 
-    // begin patch videocast – Killing 22.07.2020
     /**
      * After repository (container) copy action
-     *
-     * @param ilPageObject $page
-     * @param array        $mapping
-     * @param int          $source_ref_id
      */
-    public static function afterRepositoryCopy(ilPageObject $page, array $mapping, int $source_ref_id)
+    public static function afterRepositoryCopy(ilPageObject $page, array $mapping, int $source_ref_id) : void
     {
         global $DIC;
         $ilPluginAdmin = $DIC['ilPluginAdmin'];
@@ -239,7 +234,6 @@ class ilPCPlugged extends ilPageContent
             }
         }
     }
-    // end patch videocast – Killing 22.07.2020
 
     /**
      * Handle deleted plugged content. This function must, e.g. delete

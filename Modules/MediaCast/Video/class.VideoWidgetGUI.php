@@ -1,8 +1,20 @@
 <?php
 
-// begin patch (whole file) videocast – Killing 22.07.2020
-
-/* Copyright (c) 1998-2020 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 namespace ILIAS\MediaCast\Video;
 
@@ -11,30 +23,14 @@ namespace ILIAS\MediaCast\Video;
  */
 class VideoWidgetGUI
 {
-    /**
-     * @var string
-     */
-    protected $dom_wrapper_id;
+    protected string $dom_wrapper_id;
+    protected \ILIAS\DI\UIServices $ui;
+    protected \ilLanguage $lng;
+    protected ?VideoItem $video;
 
-    /**
-     * @var \ILIAS\DI\UIServices
-     */
-    protected $ui;
-
-    /**
-     * @var \ilLanguage
-     */
-    protected $lng;
-
-    /**
-     * @var VideoItem|null
-     */
-    protected $video;
-
-    /**
-     * Constructor
-     */
-    public function __construct($main_tpl, $dom_wrapper_id)
+    public function __construct(
+        \ilGlobalTemplateInterface $main_tpl,
+        string $dom_wrapper_id)
     {
         global $DIC;
 
@@ -44,31 +40,20 @@ class VideoWidgetGUI
         $this->lng = $DIC->language();
     }
 
-    /**
-     * Set video
-     * @param VideoItem|null $a_val video
-     */
-    function setVideo(VideoItem $a_val = null)
+    function setVideo(?VideoItem $a_val = null) : void
     {
         $this->video = $a_val;
     }
 
-    /**
-     * Get video
-     * @return VideoItem|null video
-     */
-    function getVideo()
+    function getVideo() : ?VideoItem
     {
         return $this->video;
     }
 
-
     /**
-     * Render
-     * @return string
      * @throws \ilTemplateException
      */
-    public function render()
+    public function render() : string
     {
         $ui = $this->ui;
         $video_tpl = new \ilTemplate("tpl.widget.html", true, true, "Modules/MediaCast/Video");
@@ -79,7 +64,7 @@ class VideoWidgetGUI
         $tpl->setVariable("TPL", $video_tpl->get());
         $f = $ui->factory();
 
-        if ($this->getVideo() != "") {
+        if (!is_null($this->getVideo())) {
             $tpl->setCurrentBlock("loadfile");
             $tpl->setVariable("FID", $this->dom_wrapper_id);
             $video_tpl->setVariable("POSTER", $this->getVideo()->getPreviewPic());

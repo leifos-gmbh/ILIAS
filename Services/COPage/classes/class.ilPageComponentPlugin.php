@@ -120,8 +120,6 @@ abstract class ilPageComponentPlugin extends ilPlugin
     ) : void {
     }
 
-    // begin patch videocast – Killing 22.07.2020
-
     /**
      * This function is called after repository (container) objects have been copied
      *
@@ -135,9 +133,8 @@ abstract class ilPageComponentPlugin extends ilPlugin
         array $mapping,
         int $source_ref_id,
         string $a_plugin_version
-    ) {
+    ) : void {
     }
-    // end patch videocast – Killing 22.07.2020
 
     /**
      * This function is called before the page content is deleted

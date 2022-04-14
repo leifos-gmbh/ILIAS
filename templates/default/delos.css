@@ -19408,6 +19408,15 @@ div.ilc_Page.readonly textarea[disabled] {
 .ilc_question_SingleChoice .ilc_qanswer_Answer > div {
   vertical-align: top;
 }
+.il-mcst-side .row > .col-sm-3 {
+  width: 100%;
+}
+.il-mcst-side .row > .col-sm-3 img {
+  width: 100%;
+}
+.il-mcst-side .row > .col-sm-9 .il-item-title {
+  padding: 12px 0 6px;
+}
 .noMargin {
   margin: 0;
 }

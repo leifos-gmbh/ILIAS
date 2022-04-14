@@ -17,6 +17,14 @@ use ILIAS\UI\Implementation\Component\SignalGenerator;
 class VideoViewGUI
 {
     /**
+     * @var \ilToolbarGUI
+     */
+    protected $toolbar;
+    /**
+     * @var \ilGlobalTemplate
+     */
+    protected $main_tpl;
+    /**
      * @var \ilObjMediaCast
      */
     protected $media_cast;
@@ -57,6 +65,11 @@ class VideoViewGUI
     protected $video_sequence;
 
     /**
+     * @var string
+     */
+    protected $video_wrapper_id = "mcst_video";
+
+    /**
      * Constructor
      */
     public function __construct(\ilObjMediaCast $obj, $tpl = null)
@@ -70,6 +83,8 @@ class VideoViewGUI
         include_once("./Modules/MediaCast/Video/class.VideoSequence.php");
         $this->video_sequence = new VideoSequence($this->media_cast);
         $this->user = $DIC->user();
+        $this->main_tpl = $DIC->ui()->mainTemplate();
+        $this->toolbar = $DIC->toolbar();
     }
 
     /**
@@ -109,21 +124,72 @@ class VideoViewGUI
     }
 
     /**
-     * Render side column
-     * @param
-     * @return
+     * Render toolbar
      */
-    public function renderSideColumn()
+    public function renderToolbar() : void
     {
+        $toolbar = $this->toolbar;
+        $lng = $this->lng;
 
         $mcst_settings = \ilMediaCastSettings::_getInstance();
 
+        $autoplay = $this->getAutoplay();
+
+        $factory = $this->ui->factory();
+        $renderer = $this->ui->renderer();
+
+        $back = $factory->button()->standard("<span class=\"glyphicon glyphicon-chevron-left \" aria-hidden=\"true\"></span>", "")
+                  ->withOnLoadCode(function ($id) {
+                      return
+                          "$(\"#$id\").click(function() { il.VideoWidget.previous(\"".$this->video_wrapper_id."\"); return false;});";
+                  });
+        $next = $factory->button()->standard("<span class=\"glyphicon glyphicon-chevron-right \" aria-hidden=\"true\"></span>", "")
+                  ->withOnLoadCode(function ($id) {
+                      return
+                          "$(\"#$id\").click(function() { il.VideoWidget.next(\"".$this->video_wrapper_id."\"); return false;});";
+                  });
+
+        $toolbar->addComponent($back);
+        $toolbar->addComponent($next);
+
+        // autoplay
+        if ($this->media_cast->getAutoplayMode() != \ilObjMediaCast::AUTOPLAY_NO) {
+            $toolbar->addSeparator();
+            $s = new SignalGenerator();
+            $autoplay_on = $s->create();
+            $autoplay_off = $s->create();
+            $button = $factory->button()->toggle($lng->txt("mcst_autoplay"), $autoplay_on, $autoplay_off, $autoplay);
+            $toolbar->addComponent($button);
+            $this->main_tpl->addOnLoadCode("
+                $(document).on('" . $autoplay_on . "', function (event, signalData) {
+                    il.VideoPlaylist.autoplay('mcst_playlist', true);
+                });
+                $(document).on('" . $autoplay_off . "', function (event, signalData) {
+                    il.VideoPlaylist.autoplay('mcst_playlist', false);
+                });");
+        }
+    }
+
+    protected function getAutoplay() : bool
+    {
         $autoplay = ($this->user->existsPref("mcst_autoplay"))
             ? (bool) $this->user->getPref("mcst_autoplay")
             : ($this->media_cast->getAutoplayMode() == \ilObjMediaCast::AUTOPLAY_ACT);
         if ($this->media_cast->getAutoplayMode() == \ilObjMediaCast::AUTOPLAY_NO) {
             $autoplay = false;
         }
+        return $autoplay;
+    }
+
+    /**
+     * Render side column
+     */
+    public function renderSideColumn()
+    {
+
+        $mcst_settings = \ilMediaCastSettings::_getInstance();
+
+        $autoplay = $this->getAutoplay();
 
         $lng = $this->lng;
         $tpl = new \ilTemplate("tpl.video_cast_side.html", true, true, "Modules/MediaCast/Presentation");
@@ -132,26 +198,12 @@ class VideoViewGUI
         $factory = $this->ui->factory();
         $renderer = $this->ui->renderer();
 
-        // autoplay
-        if ($this->media_cast->getAutoplayMode() != \ilObjMediaCast::AUTOPLAY_NO) {
-            $s = new SignalGenerator();
-            $autoplay_on = $s->create();
-            $autoplay_off = $s->create();
-            $button = $factory->button()->toggle("", $autoplay_on, $autoplay_off, $autoplay);
-
-            $tpl->setCurrentBlock("autoplay");
-            $tpl->setVariable("TXT_AUTOPLAY", $this->lng->txt("mcst_autoplay"));
-            $tpl->setVariable("AUTOPLAY_ON", $autoplay_on->getId());
-            $tpl->setVariable("AUTOPLAY_OFF", $autoplay_off->getId());
-            $tpl->setVariable("TOGGLE",
-                $renderer->render([$button]));
-            $tpl->parseCurrentBlock();
-        }
-
-
         // items
         $items = [];
         $has_items = false;
+
+        $panel_items = [];
+
         foreach($this->video_sequence->getVideos() as $video) {
             $has_items = true;
             $preview = new VideoPreviewGUI($video->getPreviewPic(),
@@ -183,7 +235,16 @@ class VideoViewGUI
                 "completed" => $completed,
                 "duration" => $video->getDuration()
             ];
+            $panel_items[] = $factory->item()->standard($video->getTitle())
+                ->withLeadImage(
+                    $factory->image()->responsive($video->getPreviewPic(), $video->getTitle())
+                );
         }
+
+        $panel = $factory->panel()->secondary()->listing("Videos",
+            [$factory->item()->group("", $panel_items)]
+        );
+        $tpl->setVariable("PANEL", $renderer->render($panel));
 
         // previous items / next items links
         if ($has_items) {
@@ -245,6 +306,7 @@ class VideoViewGUI
         $tpl = new \ilTemplate("tpl.video_cast_layout.html", true, true, "Modules/MediaCast/Presentation");
         $side_column = $this->renderSideColumn();
 
+
         if ($side_column != "") {
             $tpl->setCurrentBlock("with_side_column");
             $tpl->setVariable("SIDE", $side_column);
@@ -262,7 +324,9 @@ class VideoViewGUI
     public function show()
     {
         if (is_object($this->tpl)) {
-            $this->tpl->setContent($this->render());
+            $this->renderToolbar();
+            $this->tpl->setContent($this->renderMainColumn());
+            $this->tpl->setRightContent($this->renderSideColumn());
         }
     }
 

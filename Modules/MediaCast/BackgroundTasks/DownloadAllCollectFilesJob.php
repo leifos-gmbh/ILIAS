@@ -1,6 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2021 ILIAS open source, GPLv3, see LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 namespace ILIAS\MediaCast\BackgroundTasks;
 
@@ -13,60 +27,20 @@ use ILIAS\BackgroundTasks\Implementation\Values\ScalarValues\IntegerValue;
 
 /**
  * Collect files for downloading all media items
- *
  * @author Alexander Killing <killing@leifos.de>
- *
  */
 class DownloadAllCollectFilesJob extends AbstractJob
 {
-    /**
-     * @var \ilLogger
-     */
-    private $logger = null;
+    private ?\ilLogger $logger = null;
+    protected int $user_id = 0;
+    protected int $mcst_id = 0;
+    protected int $mcst_ref_id = 0;
+    protected \ilLanguage $lng;
+    protected string $target_directory = "";
+    protected string $temp_dir = "";
+    protected string $sanitized_title = "";
+    protected \ilObjMediaCast $media_cast;
 
-    /**
-     * @var int
-     */
-    protected $user_id;
-
-    /**
-     * @var int
-     */
-    protected $mcst_id;
-
-    /**
-     * @var int
-     */
-    protected $mcst_ref_id;
-
-    /**
-     * @var \ilLanguage
-     */
-    protected $lng;
-
-    /**
-     * @var string
-     */
-    protected $target_directory;
-
-    /**
-     * @var string
-     */
-    protected $temp_dir;
-
-    /**
-     * @var string
-     */
-    protected $sanitized_title;
-
-    /**
-     * @var \ilObjMediaCast
-     */
-    protected $media_cast;
-
-    /**
-     * Constructor
-     */
     public function __construct()
     {
         global $DIC;
@@ -77,10 +51,7 @@ class DownloadAllCollectFilesJob extends AbstractJob
         $this->sanitized_title = "images";
     }
 
-    /**
-     * @return array
-     */
-    public function getInputTypes()
+    public function getInputTypes() : array
     {
         return
             [
@@ -89,48 +60,32 @@ class DownloadAllCollectFilesJob extends AbstractJob
             ];
     }
 
-    /**
-     * @return SingleType
-     */
-    public function getOutputType()
+    public function getOutputType() : \ILIAS\BackgroundTasks\Types\Type
     {
         return new SingleType(StringValue::class);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function isStateless()
+    public function isStateless() : bool
     {
         return true;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getExpectedTimeOfTaskInSeconds()
+    public function getExpectedTimeOfTaskInSeconds() : int
     {
         return 30;
     }
 
-    /**
-     * Run job
-     *
-     * @param array $input
-     * @param Observer $observer
-     * @return StringValue
-     */
-    public function run(array $input, Observer $observer)
+    public function run(array $input, Observer $observer) : StringValue
     {
         $this->user_id = $input[0]->getValue();
         $this->mcst_ref_id = $input[1]->getValue();
 
-        $this->logger->debug("Get Mediacast ".$this->mcst_ref_id);
+        $this->logger->debug("Get Mediacast " . $this->mcst_ref_id);
         $this->media_cast = new \ilObjMediaCast($this->mcst_ref_id);
 
         $target_dir = $this->createDirectory();
 
-        $this->logger->debug("Collect in ".$target_dir);
+        $this->logger->debug("Collect in " . $target_dir);
         $this->collectMediaFiles($target_dir);
         $this->logger->debug("Finished collecting.");
         
@@ -139,29 +94,20 @@ class DownloadAllCollectFilesJob extends AbstractJob
         return $out;
     }
 
-    /**
-     * Create directory
-     *
-     * @return string
-     */
-    protected function createDirectory()
+    protected function createDirectory() : string
     {
         // temp dir
-        $this->temp_dir = \ilUtil::ilTempnam();
+        $this->temp_dir = \ilFileUtils::ilTempnam();
 
         // target dir
         $path = $this->temp_dir . DIRECTORY_SEPARATOR;
         $this->target_directory = $path . $this->sanitized_title;
-        \ilUtil::makeDirParents($this->target_directory);
+        \ilFileUtils::makeDirParents($this->target_directory);
 
         return $this->target_directory;
     }
 
-
-    /**
-     * Collect media files
-     */
-    public function collectMediaFiles($target_dir)
+    public function collectMediaFiles(string $target_dir) : void
     {
         $cnt = 0;
         foreach ($this->media_cast->getSortedItemsArray() as $item) {
@@ -180,5 +126,4 @@ class DownloadAllCollectFilesJob extends AbstractJob
             }
         }
     }
-
 }

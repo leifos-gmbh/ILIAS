@@ -1,6 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2021 ILIAS open source, GPLv3, see LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * Image gallery GUI for mediacasts
@@ -9,44 +23,14 @@
  */
 class McstImageGalleryGUI
 {
-    /**
-     * @var \ilObjMediaCast
-     */
-    protected $media_cast;
+    protected \ilObjMediaCast $media_cast;
+    protected ilGlobalTemplateInterface $tpl;
+    protected \ILIAS\DI\UIServices $ui;
+    protected \ilLanguage $lng;
+    protected \ilObjUser $user;
+    protected \ilCtrl $ctrl;
+    protected \ilToolbarGUI $toolbar;
 
-    /**
-     * @var \ilTemplate
-     */
-    protected $tpl;
-
-    /**
-     * @var \ILIAS\DI\UIServices
-     */
-    protected $ui;
-
-    /**
-     * @var \ilLanguage
-     */
-    protected $lng;
-
-    /**
-     * @var \ilObjUser
-     */
-    protected $user;
-
-    /**
-     * @var \ilCtrl
-     */
-    protected $ctrl;
-
-    /**
-     * @var ilToolbarGUI
-     */
-    protected $toolbar;
-
-    /**
-     * Constructor
-     */
     public function __construct(\ilObjMediaCast $obj, $tpl = null)
     {
         global $DIC;
@@ -60,10 +44,7 @@ class McstImageGalleryGUI
         $this->toolbar = $DIC->toolbar();
     }
 
-    /**
-     * Execute command
-     */
-    function executeCommand()
+    public function executeCommand() : void
     {
         $ctrl = $this->ctrl;
 
@@ -78,12 +59,7 @@ class McstImageGalleryGUI
         }
     }
 
-    /**
-     * Get HTML
-     * @param
-     * @return
-     */
-    public function getHTML()
+    public function getHTML() : string
     {
         $f = $this->ui->factory();
         $renderer = $this->ui->renderer();
@@ -135,7 +111,7 @@ class McstImageGalleryGUI
             }
             $preview_resource = $resource;
             if ($mob->getVideoPreviewPic() != "") {
-                $preview_resource =ilWACSignedPath::signFile($mob->getVideoPreviewPic());
+                $preview_resource = ilWACSignedPath::signFile($mob->getVideoPreviewPic());
             }
 
 
@@ -153,7 +129,7 @@ class McstImageGalleryGUI
 
             $card_image = $preview_image->withAction($modal->getShowSignal());
             $card_image = $card_image->withAdditionalOnLoadCode(function ($id) use ($cnt) {
-                return "$('#$id').click(function(e) { document.querySelector('.modal-body .carousel [data-slide-to=\"".$cnt."\"]').click(); });";
+                return "$('#$id').click(function(e) { document.querySelector('.modal-body .carousel [data-slide-to=\"" . $cnt . "\"]').click(); });";
             });
             $cnt++;
 
@@ -190,13 +166,9 @@ class McstImageGalleryGUI
         return $renderer->render(array_merge([$deck], [$main_modal]));
     }
 
-    /**
-     * Download all
-     */
-    protected function downloadAll()
+    protected function downloadAll() : void
     {
         $user = $this->user;
-        include_once ("./Modules/MediaCast/BackgroundTasks/DownloadAllBackgroundTask.php");
         $download_task = new \ILIAS\MediaCast\BackgroundTasks\DownloadAllBackgroundTask(
             (int) $user->getId(),
             (int) $this->media_cast->getRefId(),
@@ -204,10 +176,13 @@ class McstImageGalleryGUI
         );
 
         if ($download_task->run()) {
-            ilUtil::sendSuccess($this->lng->txt('mcst_download_started_bg'), true);
+            $this->tpl->setOnScreenMessage(
+                'success',
+                $this->lng->txt('mcst_download_started_bg'),
+                true
+            );
         }
 
         $this->ctrl->redirectByClass("ilobjmediacastgui", "showContent");
     }
-
 }

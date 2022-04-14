@@ -1,6 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2021 ILIAS open source, GPLv3, see LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * Podcast GUI for mediacasts
@@ -9,40 +23,17 @@
  */
 class McstPodcastGUI
 {
-    /**
-     * @var ilCtrl
-     */
-    protected $ctrl;
-    /**
-     * @var \ilObjMediaCast
-     */
-    protected $media_cast;
+    protected ilCtrl $ctrl;
+    protected \ilObjMediaCast $media_cast;
+    protected ilGlobalTemplateInterface $tpl;
+    protected \ILIAS\DI\UIServices $ui;
+    protected \ilLanguage $lng;
+    protected \ilObjUser $user;
 
-    /**
-     * @var \ilTemplate
-     */
-    protected $tpl;
-
-    /**
-     * @var \ILIAS\DI\UIServices
-     */
-    protected $ui;
-
-    /**
-     * @var \ilLanguage
-     */
-    protected $lng;
-
-    /**
-     * @var \ilObjUser
-     */
-    protected $user;
-
-    /**
-     * Constructor
-     */
-    public function __construct(\ilObjMediaCast $obj, $tpl = null)
-    {
+    public function __construct(
+        \ilObjMediaCast $obj,
+        ilGlobalTemplateInterface $tpl = null
+    ) {
         global $DIC;
 
         $this->ui = $DIC->ui();
@@ -53,12 +44,7 @@ class McstPodcastGUI
         $this->ctrl = $DIC->ctrl();
     }
 
-    /**
-     * Get HTML
-     * @param
-     * @return
-     */
-    public function getHTML()
+    public function getHTML() : string
     {
         $f = $this->ui->factory();
         $renderer = $this->ui->renderer();
@@ -101,12 +87,13 @@ class McstPodcastGUI
             $items[] = $item;
         }
 
-        $list = $f->panel()->listing()->standard($this->lng->txt("mcst_audio_files"), [
+        $list = $f->panel()->listing()->standard(
+            $this->lng->txt("mcst_audio_files"),
+            [
             $f->item()->group("", $items)
             ]
         );
 
         return $renderer->render($list);
     }
-
 }

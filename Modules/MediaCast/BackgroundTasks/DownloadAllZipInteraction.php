@@ -1,6 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2021 ILIAS open source, GPLv3, see LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 namespace ILIAS\MediaCast\BackgroundTasks;
 
@@ -11,20 +25,18 @@ use ILIAS\BackgroundTasks\Implementation\Tasks\UserInteraction\UserInteractionOp
 use ILIAS\BackgroundTasks\Task\UserInteraction\Option;
 use ILIAS\BackgroundTasks\Bucket;
 use ILIAS\Filesystem\Util\LegacyPathHelper;
+use ILIAS\BackgroundTasks\Implementation\Values\AggregationValues\ListValue;
+use ILIAS\BackgroundTasks\Implementation\Values\ThunkValue;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
  */
 class DownloadAllZipInteraction extends AbstractUserInteraction
 {
-    const OPTION_DOWNLOAD = 'download';
-    const OPTION_CANCEL = 'cancel';
+    public const OPTION_DOWNLOAD = 'download';
+    public const OPTION_CANCEL = 'cancel';
 
-    /**
-     * @var \Monolog\Logger
-     */
-    private $logger = null;
-
+    private ?\ilLogger $logger = null;
 
     public function __construct()
     {
@@ -33,11 +45,7 @@ class DownloadAllZipInteraction extends AbstractUserInteraction
         $this->logger = $DIC->logger()->mcst();
     }
 
-
-    /**
-     * @inheritdoc
-     */
-    public function getInputTypes()
+    public function getInputTypes() : array
     {
         return [
             new SingleType(StringValue::class),
@@ -46,40 +54,28 @@ class DownloadAllZipInteraction extends AbstractUserInteraction
     }
 
 
-    /**
-     * @inheritDoc
-     */
-    public function getRemoveOption()
+    public function getRemoveOption() : UserInteractionOption
     {
         return new UserInteractionOption('remove', self::OPTION_CANCEL);
     }
 
-
-    /**
-     * @inheritDoc
-     */
-    public function getOutputType()
+    public function getOutputType() : SingleType
     {
         return new SingleType(StringValue::class);
     }
 
-
-    /**
-     * @inheritDoc
-     */
-    public function getOptions(array $input)
+    public function getOptions(array $input) : array
     {
         return [
             new UserInteractionOption('download', self::OPTION_DOWNLOAD)
         ];
     }
 
-
-    /**
-     * @inheritDoc
-     */
-    public function interaction(array $input, Option $user_selected_option, Bucket $bucket)
-    {
+    public function interaction(
+        array $input,
+        Option $user_selected_option,
+        Bucket $bucket
+    ) : \ILIAS\BackgroundTasks\Value {
         global $DIC;
         $download_name = $input[0]; //directory name.
         $zip_name = $input[1]; // zip job
@@ -100,7 +96,7 @@ class DownloadAllZipInteraction extends AbstractUserInteraction
                 $filesystem->deleteDir(dirname($path));
             }
 
-            return $input;
+            return new ThunkValue();
         }
 
         $this->logger->info("Delivering File.");
@@ -118,6 +114,6 @@ class DownloadAllZipInteraction extends AbstractUserInteraction
         //Zip name is just an string
         \ilFileDelivery::deliverFileAttached($download_name->getValue(), $zip_name);
 
-        return $input;
+        return new ThunkValue();
     }
 }

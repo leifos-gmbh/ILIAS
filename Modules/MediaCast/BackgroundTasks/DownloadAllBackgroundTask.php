@@ -1,8 +1,23 @@
 <?php
 
-/* Copyright (c) 1998-2021 ILIAS open source, GPLv3, see LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 namespace ILIAS\MediaCast\BackgroundTasks;
+
 use ILIAS\BackgroundTasks\Implementation\Bucket\BasicBucket;
 
 /**
@@ -12,49 +27,19 @@ use ILIAS\BackgroundTasks\Implementation\Bucket\BasicBucket;
  */
 class DownloadAllBackgroundTask
 {
-    /**
-     * @var int
-     */
-    protected $mcst_ref_id;
+    protected int $mcst_ref_id = 0;
+    protected int $mcst_id = 0;
+    protected ?int $user_id = null;
+    protected ?\ILIAS\BackgroundTasks\Task\TaskFactory $task_factory = null;
+    protected ?\ILIAS\BackgroundTasks\TaskManager $task_manager = null;
+    protected \ilLanguage $lng;
+    private ?\ilLogger $logger = null;
 
-    /**
-     * @var int
-     */
-    protected $mcst_id;
-
-    /**
-     * @var int|null
-     */
-    protected $user_id;
-
-    /**
-     * @var \ILIAS\BackgroundTasks\Task\TaskFactory
-     */
-    protected $task_factory = null;
-
-    /**
-     * @var \ILIAS\BackgroundTasks\TaskManager
-     */
-    protected $task_manager = null;
-
-    /**
-     * @var \ilLanguage
-     */
-    protected $lng;
-
-    /**
-     * @var
-     */
-    private $logger = null;
-
-    /**
-     * Constructor
-     * @param int $a_usr_id
-     * @param int $a_mcst_ref_id
-     * @param int $a_mcst_id
-     */
-    public function __construct($a_usr_id, $a_mcst_ref_id, $a_mcst_id)
-    {
+    public function __construct(
+        int $a_usr_id,
+        int $a_mcst_ref_id,
+        int $a_mcst_id
+    ) {
         global $DIC;
 
         $this->user_id = $a_usr_id;
@@ -66,7 +51,7 @@ class DownloadAllBackgroundTask
         $this->logger = $DIC->logger()->mcst();
     }
 
-    public function run()
+    public function run() : bool
     {
         $bucket = new BasicBucket();
         $bucket->setUserId($this->user_id);
@@ -89,7 +74,7 @@ class DownloadAllBackgroundTask
 
         $zip_job = $this->task_factory->createTask(DownloadAllZipJob::class, [$collect_data_job]);
 
-        $download_name = \ilUtil::getASCIIFilename(\ilObject::_lookupTitle($this->mcst_id));
+        $download_name = \ilFileUtils::getASCIIFilename(\ilObject::_lookupTitle($this->mcst_id));
         $bucket->setTitle($download_name);
 
         $this->logger->debug("* Create task 'download_interaction' using the following values:");

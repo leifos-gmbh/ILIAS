@@ -1,6 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2021 ILIAS open source, GPLv3, see LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 namespace ILIAS\MediaCast\BackgroundTasks;
 
@@ -10,16 +24,12 @@ use ILIAS\BackgroundTasks\Implementation\Values\ScalarValues\StringValue;
 
 /**
  * Zip media files
- *
  * @author Alexander Killing <killing@leifos.de>
  */
 class DownloadAllZipJob extends AbstractJob
 {
-    private $logger = null;
+    private ?\ilLogger $logger = null;
 
-    /**
-     * Construct
-     */
     public function __construct()
     {
         global $DIC;
@@ -27,10 +37,7 @@ class DownloadAllZipJob extends AbstractJob
         $this->logger = $DIC->logger()->mcst();
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getInputTypes()
+    public function getInputTypes() : array
     {
         return
             [
@@ -38,35 +45,26 @@ class DownloadAllZipJob extends AbstractJob
             ];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getOutputType()
+    public function getOutputType() : SingleType
     {
         return new SingleType(StringValue::class);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function isStateless()
+    public function isStateless() : bool
     {
         return true;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function run(array $input, \ILIAS\BackgroundTasks\Observer $observer)
+    public function run(array $input, \ILIAS\BackgroundTasks\Observer $observer) : StringValue
     {
         $tmpdir = $input[0]->getValue();
 
         $this->logger->debug("Zip $tmpdir into " . $tmpdir . '.zip');
 
-        \ilUtil::zip($tmpdir, $tmpdir . '.zip');
+        \ilFileUtils::zip($tmpdir, $tmpdir . '.zip');
 
         // delete temp directory
-        \ilUtil::delDir($tmpdir);
+        \ilFileUtils::delDir($tmpdir);
 
         $zip_file_name = new StringValue();
         $zip_file_name->setValue($tmpdir . '.zip');
@@ -76,10 +74,7 @@ class DownloadAllZipJob extends AbstractJob
         return $zip_file_name;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getExpectedTimeOfTaskInSeconds()
+    public function getExpectedTimeOfTaskInSeconds() : int
     {
         return 30;
     }

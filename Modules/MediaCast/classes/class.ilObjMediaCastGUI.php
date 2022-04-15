@@ -114,7 +114,7 @@ class ilObjMediaCastGUI extends ilObjectGUI
                         $med_type = [ilMediaCreationGUI::TYPE_AUDIO];
                         break;
                 }
-                $creation = new ilMediaCreationGUI($med_type, function($mob_id) {
+                $creation = new ilMediaCreationGUI($med_type, function ($mob_id) {
                     $this->afterUpload($mob_id);
                 }, function ($mob_id, $long_desc) {
                     $this->afterUrlSaving($mob_id, $long_desc);
@@ -385,7 +385,8 @@ class ilObjMediaCastGUI extends ilObjectGUI
         $tpl->setContent($this->form_gui->getHTML());
     }
 
-    public function finishSingleUpload(int $mob_id) : void {
+    public function finishSingleUpload(int $mob_id) : void
+    {
         foreach ($this->object->getSortedItemsArray() as $item) {
             if ($mob_id == $item["mob_id"]) {
                 $this->ctrl->setParameter($this, "item_id", $item["id"]);
@@ -1260,7 +1261,7 @@ class ilObjMediaCastGUI extends ilObjectGUI
             $public_feed = ilBlockSetting::_lookup("news", "public_feed", 0, $this->object->getId());
             $ch = new ilCheckboxInputGUI($lng->txt("news_public_feed"), "extra_feed");
             $ch->setInfo($lng->txt("news_public_feed_info"));
-            $ch->setChecked($public_feed);
+            $ch->setChecked((bool) $public_feed);
             $this->form_gui->addItem($ch);
             
             // keep minimal x number of items
@@ -1511,24 +1512,34 @@ class ilObjMediaCastGUI extends ilObjectGUI
 
         if ($this->object->getViewMode() == ilObjMediaCast::VIEW_GALLERY) {
             $this->showGallery();
-        } else if ($this->object->getViewMode() == ilObjMediaCast::VIEW_IMG_GALLERY) {
+        } elseif ($this->object->getViewMode() == ilObjMediaCast::VIEW_IMG_GALLERY) {
             $view = new \McstImageGalleryGUI($this->object, $this->tpl);
             $this->tabs->activateTab("content");
             $this->addContentSubTabs("content");
             $tpl->setContent($this->ctrl->getHTML($view));
-        } else if ($this->object->getViewMode() == ilObjMediaCast::VIEW_PODCAST) {
+        } elseif ($this->object->getViewMode() == ilObjMediaCast::VIEW_PODCAST) {
             $view = new \McstPodcastGUI($this->object, $this->tpl);
             $this->tabs->activateTab("content");
             $this->addContentSubTabs("content");
             $tpl->setContent($this->ctrl->getHTML($view));
-        } else if ($this->object->getViewMode() == ilObjMediaCast::VIEW_VCAST) {
+        } elseif ($this->object->getViewMode() == ilObjMediaCast::VIEW_VCAST) {
             $ilTabs->activateTab("content");
             $this->addContentSubTabs("content");
             $view = new \ILIAS\MediaCast\Presentation\VideoViewGUI($this->object, $tpl);
-            $view->setCompletedCallback($this->ctrl->getLinkTarget($this,
-            "handlePlayerCompletedEvent", "", true, false));
-            $view->setAutoplayCallback($this->ctrl->getLinkTarget($this,
-            "handleAutoplayTrigger", "", true, false));
+            $view->setCompletedCallback($this->ctrl->getLinkTarget(
+                $this,
+                "handlePlayerCompletedEvent",
+                "",
+                true,
+                false
+            ));
+            $view->setAutoplayCallback($this->ctrl->getLinkTarget(
+                $this,
+                "handleAutoplayTrigger",
+                "",
+                true,
+                false
+            ));
             $view->show();
         } else {
             $this->listItemsObject(true);
@@ -1687,7 +1698,8 @@ class ilObjMediaCastGUI extends ilObjectGUI
         exit;
     }
 
-    protected function afterUpload($mob_ids) : void {
+    protected function afterUpload($mob_ids) : void
+    {
         $this->addMobsToCast($mob_ids, "", false);
     }
 
@@ -1716,7 +1728,6 @@ class ilObjMediaCastGUI extends ilObjectGUI
             }
             $ctrl->redirect($this, "listItems");
         }
-
     }
 
     protected function afterPoolInsert(array $mob_ids) : void

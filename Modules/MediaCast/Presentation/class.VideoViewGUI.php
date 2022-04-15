@@ -29,18 +29,18 @@ use ILIAS\UI\Implementation\Component\SignalGenerator;
 class VideoViewGUI
 {
     protected \ilToolbarGUI $toolbar;
-    protected \ilGlobalTemplate $main_tpl;
+    protected \ilGlobalTemplateInterface $main_tpl;
     protected \ilObjMediaCast $media_cast;
-    protected \ilTemplate $tpl;
+    protected \ilGlobalTemplateInterface $tpl;
     protected \ILIAS\DI\UIServices $ui;
     protected \ilLanguage $lng;
     protected \ilObjUser $user;
     protected string $completed_callback = "";
     protected string $autoplay_callback = "";
-    protected string $video_sequence;
+    protected VideoSequence $video_sequence;
     protected string $video_wrapper_id = "mcst_video";
 
-    public function __construct(\ilObjMediaCast $obj, \ilTemplate $tpl = null)
+    public function __construct(\ilObjMediaCast $obj, \ilGlobalTemplateInterface $tpl = null)
     {
         global $DIC;
 
@@ -74,7 +74,7 @@ class VideoViewGUI
         }
 
         $widget = new VideoWidgetGUI($this->tpl, "mcst_video");
-
+        $widget->setVideo($this->video_sequence->getFirst());
         return $widget->render();
     }
 
@@ -93,12 +93,12 @@ class VideoViewGUI
         $back = $factory->button()->standard("<span class=\"glyphicon glyphicon-chevron-left \" aria-hidden=\"true\"></span>", "")
                   ->withOnLoadCode(function ($id) {
                       return
-                          "$(\"#$id\").click(function() { il.VideoWidget.previous(\"".$this->video_wrapper_id."\"); return false;});";
+                          "$(\"#$id\").click(function() { il.VideoWidget.previous(\"" . $this->video_wrapper_id . "\"); return false;});";
                   });
         $next = $factory->button()->standard("<span class=\"glyphicon glyphicon-chevron-right \" aria-hidden=\"true\"></span>", "")
                   ->withOnLoadCode(function ($id) {
                       return
-                          "$(\"#$id\").click(function() { il.VideoWidget.next(\"".$this->video_wrapper_id."\"); return false;});";
+                          "$(\"#$id\").click(function() { il.VideoWidget.next(\"" . $this->video_wrapper_id . "\"); return false;});";
                   });
 
         $toolbar->addComponent($back);
@@ -135,7 +135,6 @@ class VideoViewGUI
 
     public function renderSideColumn() : string
     {
-
         $mcst_settings = \ilMediaCastSettings::_getInstance();
 
         $autoplay = $this->getAutoplay();
@@ -152,11 +151,13 @@ class VideoViewGUI
 
         $panel_items = [];
 
-        foreach($this->video_sequence->getVideos() as $video) {
+        foreach ($this->video_sequence->getVideos() as $video) {
             $has_items = true;
-            $preview = new VideoPreviewGUI($video->getPreviewPic(),
-                "il.VideoPlaylist.loadItem('mcst_playlist', '".$video->getId()."', true);",
-                $video->getPlayingTime());
+            $preview = new VideoPreviewGUI(
+                $video->getPreviewPic(),
+                "il.VideoPlaylist.loadItem('mcst_playlist', '" . $video->getId() . "', true);",
+                $video->getPlayingTime()
+            );
             $completed = false;
 
             $re = \ilChangeEvent::_lookupReadEvents($video->getId(), $this->user->getId());
@@ -166,15 +167,16 @@ class VideoViewGUI
                 }
             }
 
-            $b = $factory->button()->shy($video->getTitle(), "")->withOnLoadCode(function ($id) use ($video){
+            $b = $factory->button()->shy($video->getTitle(), "")->withOnLoadCode(function ($id) use ($video) {
                 return
-                    "$(\"#$id\").click(function() { il.VideoPlaylist.loadItem('mcst_playlist', '".$video->getId()."', true); return false;});";
+                    "$(\"#$id\").click(function() { il.VideoPlaylist.loadItem('mcst_playlist', '" . $video->getId() . "', true); return false;});";
             });
 
             $items[] = [
                 "id" => $video->getId(),
                 "resource" => $video->getResource(),
                 "preview" => $preview->render(),
+                "preview_pic" => $video->getPreviewPic(),
                 "title" => $video->getTitle(),
                 "linked_title" => $renderer->renderAsync($b),
                 "mime" => $video->getMime(),
@@ -183,23 +185,27 @@ class VideoViewGUI
                 "completed" => $completed,
                 "duration" => $video->getDuration()
             ];
-            $panel_items[] = $factory->item()->standard($video->getTitle())
-                ->withLeadImage(
-                    $factory->image()->responsive($video->getPreviewPic(), $video->getTitle())
-                );
         }
 
-        $panel = $factory->panel()->secondary()->listing("Videos",
-            [$factory->item()->group("", $panel_items)]
+        $panel = $factory->panel()->secondary()->listing(
+            "Videos",
+            []
         );
-        $tpl->setVariable("PANEL", $renderer->render($panel));
+        $panel_html = $renderer->render($panel);
+        $panel_html = str_replace(
+            '<div class="panel-body">',
+            '<div class="panel-body"><div id="mcst_playlist"></div>',
+            $panel_html,
+        );
+
+        $tpl->setVariable("PANEL", $panel_html);
 
         // previous items / next items links
         if ($has_items) {
             $tpl->setVariable(
                 "PREV",
                 $renderer->render(
-                    $factory->button()->shy($lng->txt("mcst_prev_items"), "")->withOnLoadCode(
+                    $factory->button()->standard($lng->txt("mcst_prev_items"), "")->withOnLoadCode(
                         function ($id) {
                             return
                                 "$(\"#$id\").click(function() { il.VideoPlaylist.previousItems('mcst_playlist'); return false;});";
@@ -210,7 +216,7 @@ class VideoViewGUI
             $tpl->setVariable(
                 "NEXT",
                 $renderer->render(
-                    $factory->button()->shy($lng->txt("mcst_next_items"), "")->withOnLoadCode(
+                    $factory->button()->standard($lng->txt("mcst_next_items"), "")->withOnLoadCode(
                         function ($id) {
                             return
                                 "$(\"#$id\").click(function() { il.VideoPlaylist.nextItems('mcst_playlist'); return false;});";
@@ -223,12 +229,20 @@ class VideoViewGUI
             $item_tpl->setVariable("TITLE", " ");
             $item_content = str_replace("\n", "", $item_tpl->get());
 
+            $item = $factory->item()->standard("#video-title#")
+                    ->withLeadImage(
+                        $factory->image()->responsive("#img-src#", "#img-alt#")
+                    );
+
+            $item_content = $renderer->render($item);
+            $item_content = str_replace("\n", "", $item_content);
+
             $this->tpl->addOnLoadCode(
                 "il.VideoPlaylist.init('mcst_playlist', 'mcst_video', " . json_encode(
                     $items
                 ) . ", '$item_content', " . ($autoplay ? "true" : "false") . ", " .
                 (int) $this->media_cast->getNumberInitialVideos(
-                ) . ", '" . $this->completed_callback . "', '" . $this->autoplay_callback . "', ".((int) $mcst_settings->getVideoCompletionThreshold()).");"
+                ) . ", '" . $this->completed_callback . "', '" . $this->autoplay_callback . "', " . ((int) $mcst_settings->getVideoCompletionThreshold()) . ");"
             );
 
             if (count($items) === 1) {
@@ -272,5 +286,4 @@ class VideoViewGUI
             $this->tpl->setRightContent($this->renderSideColumn());
         }
     }
-
 }

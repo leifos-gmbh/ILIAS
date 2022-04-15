@@ -70,13 +70,15 @@ il.VideoWidget = il.VideoWidget || {};
 
     // load file into player and show it
     const loadFile = (wrapper_id, video_data, play, progress_cb) => {
+      console.log("-----loadFile");
+      console.log(wrapper_id);
       let content = t.widget[wrapper_id].tpl,
         $wrap = $("#" + wrapper_id);
       $wrap.html(
         content
       );
       const video_el = $("#" + wrapper_id + " video");
-
+console.log(video_el);
       // https://github.com/vimeo/player.js/issues/197
       // add ?controls=0 for vimeo
       video_el.attr("src", video_data.resource);
@@ -159,7 +161,7 @@ il.VideoPlaylist = il.VideoPlaylist || {};
      * @param item
      */
     const renderItem = (list_wrapper, $wrap, list, item, i, front) => {
-      let $tpl = $(list.tpl),
+      let tpl = list.tpl,
         id = item.id;
 
       /*if (item.mime === "video/vimeo") {
@@ -186,10 +188,22 @@ il.VideoPlaylist = il.VideoPlaylist || {};
           }
         });
       }*/
+      console.log("---item---");
+      console.log(item);
+      // preview_pic
+      //$tpl.find("[data-elementtype='title']").html(item.linked_title);
+      //$tpl.find("[data-elementtype='description']").html(item.description);
+      //$tpl.find("[data-elementtype='preview']").html(item.preview);
+
+      tpl = tpl.replace("#video-title#", item.title);
+      tpl = tpl.replace("#description#", item.description);
+      tpl = tpl.replace("#img-src#", item.preview_pic);
+      tpl = tpl.replace("#img-alt#", item.title);
+      $tpl = $(tpl);
       $tpl.attr("id", "med_" + id);
-      $tpl.find("[data-elementtype='title']").html(item.linked_title);
-      $tpl.find("[data-elementtype='description']").html(item.description);
-      $tpl.find("[data-elementtype='preview']").html(item.preview);
+      $tpl.on("click", () => {
+          il.VideoPlaylist.loadItem(list_wrapper, id, true);
+      });
       if (item.completed) {
         $tpl.addClass("mcst-completed-preview");
       }
@@ -371,10 +385,10 @@ il.VideoPlaylist = il.VideoPlaylist || {};
 
         $(".il-mcst-videocast *[data-elementtype='nav'] button:first").attr("disabled", !has_previous);
         $(".il-mcst-videocast *[data-elementtype='nav'] button:last").attr("disabled", !has_next);
-        $("#mcst-prev-items button").css("visibility", (has_previous_items ? "visible" : "hidden"));
-        $("#mcst-next-items button").css("visibility", (has_next_items ? "visible" : "hidden"));
+        $("#mcst-prev-items button").css("display", (has_previous_items ? "" : "none"));
+        $("#mcst-next-items button").css("display", (has_next_items ? "" : "none"));
 
-        $("#mcst_playlist > div.media").removeClass("mcst-current");
+        $("#mcst_playlist > div.mcst-current").removeClass("mcst-current");
         $("#med_" + current).addClass("mcst-current");
 
         first = false;

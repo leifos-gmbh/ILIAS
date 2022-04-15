@@ -26,26 +26,28 @@ class VideoWidgetGUI
     protected string $dom_wrapper_id;
     protected \ILIAS\DI\UIServices $ui;
     protected \ilLanguage $lng;
-    protected ?VideoItem $video;
+    protected ?VideoItem $video = null;
+    protected \ilGlobalTemplateInterface $main_tpl;
 
     public function __construct(
         \ilGlobalTemplateInterface $main_tpl,
-        string $dom_wrapper_id)
-    {
+        string $dom_wrapper_id
+    ) {
         global $DIC;
 
         $main_tpl->addJavaScript("Modules/MediaCast/Video/js/video_widget.js");
+        $this->main_tpl = $main_tpl;
         $this->dom_wrapper_id = $dom_wrapper_id;
         $this->ui = $DIC->ui();
         $this->lng = $DIC->language();
     }
 
-    function setVideo(?VideoItem $a_val = null) : void
+    public function setVideo(?VideoItem $a_val = null) : void
     {
         $this->video = $a_val;
     }
 
-    function getVideo() : ?VideoItem
+    public function getVideo() : ?VideoItem
     {
         return $this->video;
     }
@@ -60,24 +62,35 @@ class VideoWidgetGUI
         $video_tpl->setVariable("CLASS", " ");
 
         $tpl = new \ilTemplate("tpl.wrapper.html", true, true, "Modules/MediaCast/Video");
-        $tpl->setVariable("ID", $this->dom_wrapper_id);
-        $tpl->setVariable("TPL", $video_tpl->get());
         $f = $ui->factory();
 
-        if (!is_null($this->getVideo())) {
-            $tpl->setCurrentBlock("loadfile");
-            $tpl->setVariable("FID", $this->dom_wrapper_id);
-            $video_tpl->setVariable("POSTER", $this->getVideo()->getPreviewPic());
-            $tpl->setVariable("FILE", $this->getVideo()->getResource());
-            $tpl->setVariable("TITLE", $this->getVideo()->getTitle());
-            $tpl->setVariable("DESCRIPTION", $this->getVideo()->getDescription());
+        $tpl->setVariable("ID", $this->dom_wrapper_id);
+        $this->main_tpl->addOnLoadCode(
+            "il.VideoWidget.init('" . $this->dom_wrapper_id . "', '" . $video_tpl->get() . "');"
+        );
 
+        if (!is_null($this->getVideo())) {
+            $this->main_tpl->addOnLoadCode(
+                "il.VideoWidget.loadFile('" .
+                $this->dom_wrapper_id . "', '" .
+                $this->getVideo()->getResource() . "', false);"
+            );
         }
 
-        $item = $f->item()->standard('<span data-elementtype="title"></span>')
-                  ->withDescription('<span data-elementtype="description-wrapper"><span data-elementtype="description"></span></span>');
-        $tpl->setVariable("ITEM",
-            $ui->renderer()->render($item));
+        $item = $f->item()->standard('#title#')
+                  ->withDescription('#description#');
+        $item_html = $ui->renderer()->render($item);
+        $item_html = str_replace(
+            "#title#",
+            '<span data-elementtype="title"></span>',
+            $item_html
+        );
+        $item_html = str_replace(
+            "#description#",
+            '<span data-elementtype="description-wrapper"><span data-elementtype="description"></span></span>',
+            $item_html
+        );
+        $tpl->setVariable("ITEM", $item_html);
 
 
         /*
@@ -110,5 +123,4 @@ class VideoWidgetGUI
 
         return $tpl->get();
     }
-
 }

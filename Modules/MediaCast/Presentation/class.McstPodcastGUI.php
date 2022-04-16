@@ -73,6 +73,13 @@ class McstPodcastGUI
                 ->withProperties([$this->lng->txt("mcst_duration") => $med_item["playtime"]])
                 ->withDescription($mob->getDescription());
 
+            // $f->image()->responsive($mob->getVideoPreviewPic(), "")
+            if ($mob->getVideoPreviewPic() != "") {
+                $item = $item->withLeadImage(
+                    $f->image()->responsive($mob->getVideoPreviewPic(), "")
+                );
+            }
+
             if ($this->media_cast->getDownloadable()) {
                 $ctrl->setParameterByClass("ilobjmediacastgui", "item_id", $med_item["id"]);
                 $ctrl->setParameterByClass("ilobjmediacastgui", "purpose", "Standard");

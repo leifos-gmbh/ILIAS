@@ -739,7 +739,7 @@ class ilObjMediaCastGUI extends ilObjectGUI
         $format = ilObjMediaObject::getMimeType($mediaItem->getLocation(), ($locationType === "Reference"));
         $mediaItem->setFormat($format);
 
-        if (isset($file)) {
+        if ($file != "") {
             // get mime type, if not already set!
             if ($format === "") {
                 $format = ilObjMediaObject::getMimeType($file, ($locationType === "Reference"));
@@ -807,7 +807,7 @@ class ilObjMediaCastGUI extends ilObjectGUI
                 } else {
                     $file = $this->updateMediaItem($mob, $media_item);
                 }
-                
+
                 if ($purpose == "Standard") {
                     $duration = $this->getDuration($media_item);
                     $title = $this->form_gui->getInput("title") != "" ? $this->form_gui->getInput("title") : basename($file);

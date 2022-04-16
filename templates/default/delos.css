@@ -19430,6 +19430,39 @@ div.ilc_Page.readonly textarea[disabled] {
 #mcst-prev-items > button {
   margin-bottom: 20px;
 }
+#il-mcst-img-gallery .modal-dialog {
+  width: 100%;
+  margin: 0 auto;
+  height: 100%;
+}
+#il-mcst-img-gallery .modal-content {
+  min-height: 100%;
+  background-color: black;
+}
+#il-mcst-img-gallery .modal-content img {
+  margin: 30px auto 0 auto;
+}
+#il-mcst-img-gallery .modal-title {
+  color: white;
+}
+#il-mcst-img-gallery .carousel-caption {
+  display: none;
+}
+#il-mcst-img-gallery .modal-header {
+  border: 0;
+  text-align: center;
+}
+#il-mcst-img-gallery .carousel-indicators {
+  bottom: auto;
+  top: -20px;
+}
+#il-mcst-img-gallery .carousel-control .glyphicon {
+  top: -5px;
+}
+#il-mcst-img-gallery .carousel-control.right,
+#il-mcst-img-gallery .carousel-control.left {
+  background-image: none;
+}
 .noMargin {
   margin: 0;
 }

@@ -163,7 +163,7 @@ class McstImageGalleryGUI
         if (count($pages) == 0) {
             return "";
         }
-        return $renderer->render(array_merge([$deck], [$main_modal]));
+        return "<div id='il-mcst-img-gallery'>" . $renderer->render(array_merge([$deck], [$main_modal])) . "</div>";
     }
 
     protected function downloadAll() : void

@@ -320,7 +320,6 @@ class ilObjMediaObject extends ilObject
         
         // iterate all items
         $media_items = $this->getMediaItems();
-
         ilMediaItem::deleteAllItemsOfMob($this->getId());
 
         $j = 1;
@@ -1659,6 +1658,9 @@ class ilObjMediaObject extends ilObject
 
         if ($item->getLocationType() == "LocalFile") {
             if (is_int(strpos($item->getFormat(), "image/"))) {
+                $a_width = $a_height = 400;
+
+
                 $dir = ilObjMediaObject::_getDirectory($this->getId());
                 $file = $dir . "/" .
                     $item->getLocation();
@@ -1845,8 +1847,9 @@ class ilObjMediaObject extends ilObject
                 if ($ext == "") {
                     $ext = "jpg";
                 }
-                copy ($meta["thumbnail_url"],
-                    ilObjMediaObject::_getDirectory($this->getId())."/mob_vpreview.".
+                copy(
+                    $meta["thumbnail_url"],
+                    ilObjMediaObject::_getDirectory($this->getId()) . "/mob_vpreview." .
                     $ext
                 );
             }
@@ -1862,8 +1865,9 @@ class ilObjMediaObject extends ilObject
                 $st_item->setDuration((int) $meta["duration"]);
                 $url = parse_url($meta["thumbnail_url"]);
                 $file = basename($url["path"]);
-                copy ($meta["thumbnail_url"],
-                    ilObjMediaObject::_getDirectory($this->getId())."/mob_vpreview.".
+                copy(
+                    $meta["thumbnail_url"],
+                    ilObjMediaObject::_getDirectory($this->getId()) . "/mob_vpreview." .
                     pathinfo($file, PATHINFO_EXTENSION)
                 );
             }

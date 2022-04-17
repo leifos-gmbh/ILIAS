@@ -1190,7 +1190,6 @@ class ilMediaItem
                 $this->setDuration((int) $meta["duration"]);
             }
         } else {
-
             $file = ($this->getLocationType() == "Reference")
                 ? $this->getLocation()
                 : ilObjMediaObject::_getDirectory($this->getMobId()) . "/" . $this->getLocation();
@@ -1199,8 +1198,8 @@ class ilMediaItem
 
             if (substr($file, 0, 4) == "http") {
                 if ($fp_remote = fopen($file, 'rb')) {
-                    $tmpdir = ilUtil::ilTempnam();
-                    ilUtil::makeDir($tmpdir);
+                    $tmpdir = ilFileUtils::ilTempnam();
+                    ilFileUtils::makeDir($tmpdir);
                     $localtempfilename = tempnam($tmpdir, 'getID3');
                     if ($fp_local = fopen($localtempfilename, 'wb')) {
                         while ($buffer = fread($fp_remote, 8192)) {

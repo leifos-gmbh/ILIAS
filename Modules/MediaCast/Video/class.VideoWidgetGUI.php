@@ -58,15 +58,16 @@ class VideoWidgetGUI
     public function render() : string
     {
         $ui = $this->ui;
-        $video_tpl = new \ilTemplate("tpl.widget.html", true, true, "Modules/MediaCast/Video");
-        $video_tpl->setVariable("CLASS", " ");
+        $video = $ui->factory()->player()->video("")->withPoster("");
+        $video_tpl_html = $ui->renderer()->render($video);
+        $video_tpl_html = str_replace("\n", "", $video_tpl_html);
 
         $tpl = new \ilTemplate("tpl.wrapper.html", true, true, "Modules/MediaCast/Video");
         $f = $ui->factory();
 
         $tpl->setVariable("ID", $this->dom_wrapper_id);
         $this->main_tpl->addOnLoadCode(
-            "il.VideoWidget.init('" . $this->dom_wrapper_id . "', '" . $video_tpl->get() . "');"
+            "il.VideoWidget.init('" . $this->dom_wrapper_id . "', '" . $video_tpl_html . "');"
         );
 
         if (!is_null($this->getVideo())) {

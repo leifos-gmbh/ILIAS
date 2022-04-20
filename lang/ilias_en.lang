@@ -16773,3 +16773,5 @@ mob#:#mob_mime_type_not_allowed#:#The following mime types are not allowed at th
 mcst#:#mcst_new_items_det_lp#:#Add new items to learning progress
 mcst#:#mcst_new_items_det_lp_info#:#New items are automatically added to determine the overall learning progress.
 mcst#:#mcst_audio_files#:#Audio Files
+trac#:#trac_reference_ids_columns#:#Reference-Ids
+trac#:#trac_paths#:#Paths

@@ -14,10 +14,14 @@ class Factory implements \ILIAS\UI\Component\Chart\Factory
      * @var C\Chart\ProgressMeter\Factory
      */
     protected $progressmeter_factory;
+    protected C\Chart\Bar\Factory $bar_factory;
 
-    public function __construct(C\Chart\ProgressMeter\Factory $progressmeter_factory)
-    {
+    public function __construct(
+        C\Chart\ProgressMeter\Factory $progressmeter_factory,
+        C\Chart\Bar\Factory $bar_factory
+    ) {
         $this->progressmeter_factory = $progressmeter_factory;
+        $this->bar_factory = $bar_factory;
     }
 
     /**
@@ -34,5 +38,13 @@ class Factory implements \ILIAS\UI\Component\Chart\Factory
     public function progressMeter()
     {
         return $this->progressmeter_factory;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function bar() : C\Chart\Bar\Factory
+    {
+        return $this->bar_factory;
     }
 }

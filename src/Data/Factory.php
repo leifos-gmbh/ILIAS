@@ -22,6 +22,7 @@ class Factory
      * cache for color factory.
      */
     private $colorfactory;
+    private ?Dimension\Factory $dimensionfactory = null;
 
     /**
      * Get an ok result.
@@ -171,5 +172,21 @@ class Factory
     public function order(string $subject, $direction) : Order
     {
         return new Order($subject, $direction);
+    }
+
+    public function dimension() : Dimension\Factory
+    {
+        if (!$this->dimensionfactory) {
+            $this->dimensionfactory = new Dimension\Factory();
+        }
+        return $this->dimensionfactory;
+    }
+
+    /**
+     * @param array<string, Dimension\Dimension> $dimensions Dimensions with their names as keys
+     */
+    public function dataset(array $dimensions) : Chart\Dataset
+    {
+        return new Chart\Dataset($dimensions);
     }
 }

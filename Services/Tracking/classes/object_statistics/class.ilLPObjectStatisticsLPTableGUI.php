@@ -169,7 +169,7 @@ class ilLPObjectStatisticsLPTableGUI extends ilLPTableBaseGUI
         ];
         $columns['paths'] = [
             'field' => 'paths',
-            'txt' => $this->lng->txt('paths'),
+            'txt' => $this->lng->txt('trac_paths'),
             'default' => false,
             'optional' => true,
             'sortable' => false,

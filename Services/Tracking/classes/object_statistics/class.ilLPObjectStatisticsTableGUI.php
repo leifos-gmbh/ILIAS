@@ -18,21 +18,31 @@ class ilLPObjectStatisticsTableGUI extends ilLPTableBaseGUI
     public function __construct(
         ?object $a_parent_obj,
         string $a_parent_cmd,
-        ?array $a_preselect = null,
-        bool $a_load_items = true
+        ?array $a_preselect = null
     ) {
         $this->preselected = $a_preselect;
 
         $this->setId("lpobjstattbl");
         parent::__construct($a_parent_obj, $a_parent_cmd);
+    }
 
+    public function init() : void
+    {
         $this->setShowRowsSelector(true);
-        // $this->setLimit(ilSearchSettings::getInstance()->getMaxHits());
         $this->initFilter();
 
         $this->addColumn("", "", "1", true);
-        $this->addColumn($this->lng->txt("trac_title"), "title");
-        $this->addColumn($this->lng->txt("object_id"), "obj_id");
+        $this->addColumn($this->lng->txt("trac_title"), "title", '30%');
+
+        $all_columns = $this->getSelectableColumns();
+        foreach ($this->getSelectedColumns() as $col_name => $col_info) {
+            $column_definition = $all_columns[$col_name];
+            $this->addColumn(
+                $column_definition['txt'],
+                $column_definition['sortable'] ? $column_definition['field'] : '',
+                $column_definition['width']
+            );
+        }
         if (strpos($this->filter["yearmonth"], "-") === false) {
             foreach ($this->getMonthsYear(
                 $this->filter["yearmonth"]
@@ -52,7 +62,10 @@ class ilLPObjectStatisticsTableGUI extends ilLPTableBaseGUI
         $this->setFilterCommand("applyAccessFilter");
 
         $this->setFormAction(
-            $this->ctrl->getFormAction($a_parent_obj, $a_parent_cmd)
+            $this->ctrl->getFormAction(
+                $this->getParentObject(),
+                $this->getParentCmd()
+            )
         );
         $this->setRowTemplate(
             "tpl.lp_object_statistics_row.html", "Services/Tracking"
@@ -62,17 +75,45 @@ class ilLPObjectStatisticsTableGUI extends ilLPTableBaseGUI
         $this->setEnableTitle(true);
         $this->setDefaultOrderField("title");
         $this->setDefaultOrderDirection("asc");
-
         $this->setExportFormats(array(self::EXPORT_EXCEL, self::EXPORT_CSV));
+    }
 
-        if ($a_load_items) {
-            $this->getItems();
-        }
+    public function getSelectableColumns() : array
+    {
+        $columns = [];
+        $columns['obj_id'] = [
+            'field' => 'obj_id',
+            'txt' => $this->lng->txt('object_id'),
+            'default' => false,
+            'optional' => true,
+            'sortable' => true,
+            'width' => '5%'
+        ];
+        $columns['reference_ids'] = [
+            'field' => 'reference_ids',
+            'txt' => $this->lng->txt('trac_reference_ids_column'),
+            'default' => false,
+            'optional' => true,
+            'sortable' => true,
+            'width' => '5%'
+        ];
+        $columns['paths'] = [
+            'field' => 'paths',
+            'txt' => $this->lng->txt('paths'),
+            'default' => false,
+            'optional' => true,
+            'sortable' => false,
+            'width' => '25%'
+        ];
+        return $columns;
     }
 
     public function numericOrdering(string $a_field) : bool
     {
-        if ($a_field != "title") {
+        $alphabetic_ordering = [
+            'title'
+        ];
+        if (in_array($a_field, $alphabetic_ordering)) {
             return true;
         }
         return false;
@@ -167,6 +208,7 @@ class ilLPObjectStatisticsTableGUI extends ilLPTableBaseGUI
                 ) as $obj_id => $months) {
                     $data[$obj_id]["obj_id"] = $obj_id;
                     $data[$obj_id]["title"] = ilObject::_lookupTitle($obj_id);
+                    $data[$obj_id]['reference_ids'] = $this->findReferencesForObjId($obj_id);
 
                     foreach ($months as $month => $values) {
                         $idx = $yearmonth[0] . "-" . str_pad(
@@ -184,6 +226,7 @@ class ilLPObjectStatisticsTableGUI extends ilLPTableBaseGUI
                 ) as $obj_id => $days) {
                     $data[$obj_id]["obj_id"] = $obj_id;
                     $data[$obj_id]["title"] = ilObject::_lookupTitle($obj_id);
+                    $data[$obj_id]['reference_ids'] = $this->findReferencesForObjId($obj_id);
 
                     foreach ($days as $day => $values) {
                         $data[$obj_id]["day_" . $day] = (int) $values[$this->filter["measure"]];
@@ -197,10 +240,21 @@ class ilLPObjectStatisticsTableGUI extends ilLPTableBaseGUI
                 if (!isset($data[$obj_id])) {
                     $data[$obj_id]["obj_id"] = $obj_id;
                     $data[$obj_id]["title"] = ilObject::_lookupTitle($obj_id);
+                    $data[$obj_id]['reference_ids'] = $this->findReferencesForObjId($obj_id);
                 }
             }
         }
         $this->setData($data);
+    }
+
+    /**
+     * @return int[]
+     */
+    protected function findReferencesForObjId(int $a_obj_id) : array
+    {
+        $ref_ids = array_keys(ilObject::_getAllReferences($a_obj_id));
+        sort($ref_ids, SORT_NUMERIC);
+        return $ref_ids;
     }
 
     /**
@@ -246,6 +300,26 @@ class ilLPObjectStatisticsTableGUI extends ilLPTableBaseGUI
             $sum = $this->anonymizeValue((int) $a_set["total"]);
         }
         $this->tpl->setVariable("TOTAL", $sum);
+
+        // optional columns
+        if ($this->isColumnSelected('obj_id')) {
+            $this->tpl->setVariable('OBJ_ID_COL_VALUE', (string) $a_set['obj_id']);
+        }
+        if ($this->isColumnSelected('reference_ids')) {
+            $this->tpl->setVariable('REF_IDS', (string) implode(', ', $a_set['reference_ids']));
+        }
+        if ($this->isColumnSelected('paths')) {
+            $paths = [];
+            foreach ($a_set['reference_ids'] as $reference_id) {
+                $path_gui = new ilPathGUI();
+                $path_gui->enableTextOnly(false);
+                $path_gui->enableHideLeaf(false);
+                $path_gui->setUseImages(true);
+                $paths[] = $path_gui->getPath(ROOT_FOLDER_ID, $reference_id);
+            }
+            $this->tpl->setVariable('PATHS', implode('<br /> ', $paths));
+        }
+
     }
 
     public function getGraph(array $a_graph_items) : string

@@ -15,9 +15,10 @@ class ilObjUserTrackingGUI extends ilObjectGUI
     protected ilObjectDefinition $objectDefinition;
 
     public function __construct(
-        array $a_data,
+        $a_data,
         int $a_id,
-        bool $a_call_by_reference
+        bool $a_call_by_reference,
+        bool $prepare_output
     ) {
         global $DIC;
 
@@ -50,7 +51,7 @@ class ilObjUserTrackingGUI extends ilObjectGUI
                 break;
 
             case 'illpobjectstatisticsgui':
-                $this->tabs_gui->setTabActive('statistics');
+                $this->tabs_gui->activateTab('statistics');
                 $os_gui = new ilLPObjectStatisticsGUI(
                     ilLPObjectStatisticsGUI::LP_CONTEXT_ADMINISTRATION
                 );

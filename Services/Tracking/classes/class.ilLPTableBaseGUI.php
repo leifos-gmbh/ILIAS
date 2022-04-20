@@ -182,6 +182,18 @@ class ilLPTableBaseGUI extends ilTable2GUI
         return true;
     }
 
+    /**
+     * @return int[]
+     */
+    protected function findReferencesForObjId(int $a_obj_id) : array
+    {
+        $ref_ids = array_keys(ilObject::_getAllReferences($a_obj_id));
+        sort($ref_ids, SORT_NUMERIC);
+        return $ref_ids;
+    }
+
+
+
     protected function sendMail(
         array $a_user_ids,
         $a_parent_obj,
@@ -247,7 +259,7 @@ class ilLPTableBaseGUI extends ilTable2GUI
         ?array $preset_obj_ids = null,
         bool $a_check_lp_activation = true
     ) : array {
-        $query_parser = new ilQueryParser($filter["query"]);
+        $query_parser = new ilQueryParser($filter["query"] ?? '');
         $query_parser->setMinWordLength(0);
         $query_parser->setCombination(ilQueryParser::QP_COMBINATION_AND);
         $query_parser->parse();

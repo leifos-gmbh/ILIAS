@@ -28,7 +28,6 @@ class ilLPObjectStatisticsLPTableGUI extends ilLPTableBaseGUI
         ?object $a_parent_obj,
         string $a_parent_cmd,
         array $a_preselect = null,
-        bool $a_load_items = true,
         bool $a_is_chart = false,
         bool $a_is_details = false
     ) {
@@ -39,13 +38,23 @@ class ilLPObjectStatisticsLPTableGUI extends ilLPTableBaseGUI
         $this->setId("lpobjstatlptbl");
         parent::__construct($a_parent_obj, $a_parent_cmd);
 
+    }
+
+    public function init() : void
+    {
         if (!$this->is_details) {
             $this->setShowRowsSelector(true);
-            // $this->setLimit(ilSearchSettings::getInstance()->getMaxHits());
-
             $this->addColumn("", "", "1%", true);
             $this->addColumn($this->lng->txt("trac_title"), "title");
-            $this->addColumn($this->lng->txt("object_id"), "obj_id");
+            $all_columns = $this->getSelectableColumns();
+            foreach ($this->getSelectedColumns() as $col_name => $col_info) {
+                $column_definition = $all_columns[$col_name];
+                $this->addColumn(
+                    $column_definition['txt'],
+                    $column_definition['sortable'] ? $column_definition['field'] : '',
+                    $column_definition['width']
+                );
+            }
         } else {
             $this->setLimit(20);
 
@@ -106,7 +115,10 @@ class ilLPObjectStatisticsLPTableGUI extends ilLPTableBaseGUI
         }
 
         $this->setFormAction(
-            $this->ctrl->getFormAction($a_parent_obj, $a_parent_cmd)
+            $this->ctrl->getFormAction(
+                $this->getParentObject(),
+                $this->getParentCmd()
+            )
         );
         $this->setRowTemplate(
             "tpl.lp_object_statistics_lp_row.html", "Services/Tracking"
@@ -122,24 +134,62 @@ class ilLPObjectStatisticsLPTableGUI extends ilLPTableBaseGUI
                                   ilLPStatus::LP_STATUS_COMPLETED_NUM => "completed",
                                   ilLPStatus::LP_STATUS_FAILED_NUM => "failed"
         );
+    }
 
-        if ($a_load_items) {
-            if ($this->is_details) {
-                $this->getDetailItems($this->preselected[0]);
-            } else {
-                $this->initLearningProgressDetailsLayer();
-                $this->getItems();
-            }
+    public function loadItems() : void
+    {
+        if ($this->is_details) {
+            $this->getDetailItems($this->preselected[0]);
+        } else {
+            $this->initLearningProgressDetailsLayer();
+            $this->getItems();
         }
     }
+    public function getSelectableColumns() : array
+    {
+        if ($this->is_details) {
+            return [];
+        }
+        $columns = [];
+        $columns['obj_id'] = [
+            'field' => 'obj_id',
+            'txt' => $this->lng->txt('object_id'),
+            'default' => false,
+            'optional' => true,
+            'sortable' => true,
+            'width' => '5%'
+        ];
+        $columns['reference_ids'] = [
+            'field' => 'reference_ids',
+            'txt' => $this->lng->txt('trac_reference_ids_column'),
+            'default' => false,
+            'optional' => true,
+            'sortable' => true,
+            'width' => '5%'
+        ];
+        $columns['paths'] = [
+            'field' => 'paths',
+            'txt' => $this->lng->txt('paths'),
+            'default' => false,
+            'optional' => true,
+            'sortable' => false,
+            'width' => '25%'
+        ];
+        return $columns;
+    }
+
 
     public function numericOrdering(string $a_field) : bool
     {
-        if ($a_field != "title") {
+        $alphabetic_ordering = [
+            'title'
+        ];
+        if (in_array($a_field, $alphabetic_ordering)) {
             return true;
         }
         return false;
     }
+
 
     /**
      * Init filter
@@ -230,8 +280,8 @@ class ilLPObjectStatisticsLPTableGUI extends ilLPTableBaseGUI
                         $data[$obj_id]["title"] = ilObject::_lookupTitle(
                             $obj_id
                         );
+                        $data[$obj_id]['reference_ids'] = $this->findReferencesForObjId($obj_id);
                     }
-
                     $measure_type = substr($this->filter["measure"], -3);
                     $measure_field = substr($this->filter["measure"], 0, -4);
                     $value = $item[$measure_field . "_" . $measure_type];
@@ -273,6 +323,7 @@ class ilLPObjectStatisticsLPTableGUI extends ilLPTableBaseGUI
                         $data[$obj_id]["title"] = ilObject::_lookupTitle(
                             $obj_id
                         );
+                        $data[$obj_id]['reference_ids'] = $this->findReferencesForObjId($obj_id);
                         $this->initRow($data[$obj_id]);
                     }
 
@@ -310,10 +361,10 @@ class ilLPObjectStatisticsLPTableGUI extends ilLPTableBaseGUI
                 if (!isset($data[$obj_id])) {
                     $data[$obj_id]["obj_id"] = $obj_id;
                     $data[$obj_id]["title"] = ilObject::_lookupTitle($obj_id);
+                    $data[$obj_id]['reference_ids'] = $this->findReferencesForObjId($obj_id);
                 }
             }
         }
-
         $this->setData($data);
     }
 
@@ -413,6 +464,24 @@ class ilLPObjectStatisticsLPTableGUI extends ilLPTableBaseGUI
                 $this->ctrl->setParameter($this->parent_obj, "item_id", "");
             }
 
+            // optional columns before parsing outer "checkbox" block
+            if ($this->isColumnSelected('obj_id')) {
+                $this->tpl->setVariable('OBJ_ID_COL_VALUE', (string) $a_set['obj_id']);
+            }
+            if ($this->isColumnSelected('reference_ids')) {
+                $this->tpl->setVariable('REF_IDS', implode(', ', $a_set['reference_ids']));
+            }
+            if ($this->isColumnSelected('paths')) {
+                $paths = [];
+                foreach ($a_set['reference_ids'] as $reference_id) {
+                    $path_gui = new ilPathGUI();
+                    $path_gui->enableTextOnly(false);
+                    $path_gui->enableHideLeaf(false);
+                    $path_gui->setUseImages(true);
+                    $paths[] = $path_gui->getPath(ROOT_FOLDER_ID, $reference_id);
+                }
+                $this->tpl->setVariable('PATHS', implode('<br />', $paths));
+            }
             $this->tpl->setCurrentBlock("checkbox");
             $this->tpl->setVariable("OBJ_ID", $a_set["obj_id"]);
             $this->tpl->setVariable(

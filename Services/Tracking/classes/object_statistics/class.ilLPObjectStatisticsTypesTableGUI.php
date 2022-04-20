@@ -186,7 +186,7 @@ class ilLPObjectStatisticsTypesTableGUI extends ilLPTableBaseGUI
                 } else {
                     $data[$type]["title"] = $this->lng->txt("objs_" . $type);
                     $data[$type]["icon"] = ilObject::_getIcon(
-                        null, "tiny", $type
+                        0, "tiny", $type
                     );
                 }
 

@@ -1369,25 +1369,8 @@ class ilPersonalSkillsGUI
             $skills = $vtree->getOrderedNodeset($skills, "base_skill_id", "tref_id");
         }
 
-        // todo check if specific skills should be hidden
-        /*$sw_skills = [];
-        foreach ($skills as $sk) {
-            if (!in_array($sk["base_skill_id"] . ":" . $sk["tref_id"], $this->hidden_skills)) {
-                $sw_skills[] = $sk;
-            }
-        }*/
-
-        // output bar charts
-        $all_chart_html = $this->getBarChartHTML($skills);
-
-        if (!empty($all_chart_html)) {
-            $pan = ilPanelGUI::getInstance();
-            $pan->setPanelStyle(ilPanelGUI::PANEL_STYLE_PRIMARY);
-            $pan->setBody($all_chart_html);
-            $all_chart_html = $pan->getHTML();
-        }
-
         $stree = new ilSkillTree();
+        $bc_skills = [];
         $html = "";
 
         foreach ($skills as $s) {
@@ -1399,7 +1382,19 @@ class ilPersonalSkillsGUI
                     continue(2);
                 }
             }
+            $bc_skills[] = $s;
             $html .= $this->getSkillHTML($s["base_skill_id"], $user_id, false, $s["tref_id"]);
+        }
+
+
+        // output bar charts
+        $all_chart_html = $this->getBarChartHTML($bc_skills);
+
+        if (!empty($all_chart_html)) {
+            $pan = ilPanelGUI::getInstance();
+            $pan->setPanelStyle(ilPanelGUI::PANEL_STYLE_PRIMARY);
+            $pan->setBody($all_chart_html);
+            $all_chart_html = $pan->getHTML();
         }
 
         // list skills

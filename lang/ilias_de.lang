@@ -16803,5 +16803,5 @@ mob#:#mob_mime_type_not_allowed#:#Die folgenden Mime-Typen sind am Zielort nicht
 mcst#:#mcst_new_items_det_lp#:#Neue Einträge dem Lernfortschritt zuordnen
 mcst#:#mcst_new_items_det_lp_info#:#Neue Einträge werden automatisch zur Lernfortschrittsbestimmung hinzugefügt.
 mcst#:#mcst_audio_files#:#Audiodateien
-trac#:#trac_reference_ids_columns#:#Referenz-Ids
+trac#:#trac_reference_ids_column#:#Referenz-Ids
 trac#:#trac_paths#:#Pfade

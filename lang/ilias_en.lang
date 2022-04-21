@@ -4823,8 +4823,8 @@ common#:#obj_coms#:#Comments
 common#:#obj_coms_desc#:#Comments settings
 common#:#obj_copa#:#Content Page
 common#:#obj_cpad#:#Content Pages
-common#:#obj_cpad#_desc#:#Content Page Administration
 common#:#obj_cpad_desc#:#Content Page Administration
+common#:#obj_cpad#_desc#:#Content Page Administration
 common#:#obj_crs#:#Course
 common#:#obj_crs_duplicate#:#Copy Course
 common#:#obj_crsr#:#Course Link
@@ -10879,10 +10879,14 @@ mathjax#:#mathjax_test_expression_info_client#:#This expression will be rendered
 mathjax#:#mathjax_test_expression_info_server#:#This expression will be rendered on the server.
 mathjax#:#mathjax_test_expression#:#Test Expression
 mcst#:#mcst_add_new_item#:#Add New Mediacast Item
+mcst#:#mcst_audio_files#:#Audio Files
 mcst#:#mcst_audioportable_settings_info#:#Comma separated list of file suffixes
 mcst#:#mcst_audioportable_settings_title#:#File Extensions for Audio Format
 mcst#:#mcst_audioportable_title#:#Additional Audio File for Portable Devices
 mcst#:#mcst_automatic_detection#:#Automatic Detection
+mcst#:#mcst_autoplay_active#:#Autoplay (Default on)
+mcst#:#mcst_autoplay#:#Autoplay
+mcst#:#mcst_autoplay_inactive#:#Autoplay (Default off)
 mcst#:#mcst_clear_purpose_title#:#Delete
 mcst#:#mcst_converted_file#:#File has been converted.
 mcst#:#mcst_copy#:#Copy Mediacast
@@ -10891,9 +10895,11 @@ mcst#:#mcst_default_visibility#:#Default Access
 mcst#:#mcst_det_playtime#:#Determine Play Time
 mcst#:#mcst_downloadable#:#Download Links
 mcst#:#mcst_downloadable_info#:#If this option is enabled, links for downloading mediacast items are provided.
+mcst#:#mcst_download_all#:#Download All
 mcst#:#mcst_download_audioportable#:#Download Audio Portable
 mcst#:#mcst_download_cnt#:#Downloaded
 mcst#:#mcst_download_standard#:#Download
+mcst#:#mcst_download_started_bg#:#Download of files has started. Please check your background tasks in the top right corner.
 mcst#:#mcst_download_videoalternative#:#Download Alternative File
 mcst#:#mcst_download_videoportable#:#Download Video Portable
 mcst#:#mcst_duration_info#:#If no value is entered, ILIAS tries do determine the play time automatically.
@@ -10903,6 +10909,7 @@ mcst#:#mcst_edit_settings#:#MediaCast Settings
 mcst#:#mcst_extract_preview_image#:#Extract Preview Image
 mcst#:#mcst_gallery#:#Tiles
 mcst#:#mcst_image_extracted#:#Image has been extracted.
+mcst#:#mcst_img_gallery#:#Image Gallery
 mcst#:#mcst_import#:#Import Mediacast
 mcst#:#mcst_incl_files_in_rss#:#Include Media Files as Attachment
 mcst#:#mcst_incl_files_in_rss_info#:#If enabled, media files are includes as attachments in the RSS feed. Otherwise the feed just notifies subscribers about new items.
@@ -10917,9 +10924,14 @@ mcst#:#mcst_mimetype_info#:#Select mime type to control plugin used for playback
 mcst#:#mcst_mimetype#:#Mime Type
 mcst#:#mcst_mimetypes_info#:#Comma separated list of mime types
 mcst#:#mcst_mimetypes#:#Mime Types
+mcst#:#mcst_new_items_det_lp#:#Add new items to learning progress
+mcst#:#mcst_new_items_det_lp_info#:#New items are automatically added to determine the overall learning progress.
 mcst#:#mcst_news_item_visibility_info#:#Public news can be accessed without authentication outside of ILIAS via RSS. Please do not include any confidential information.
+mcst#:#mcst_next_items#:#Next Items
+mcst#:#mcst_no_autoplay#:#No Autoplay
 mcst#:#mcst_no_extraction_possible#:#Sorry, it was not able to extract an image from the file.
 mcst#:#mcst_nr_items#:#Number of Items
+mcst#:#mcst_nr_videos#:#Number of Initial Videos
 mcst#:#mcst_ordering_creation_date_asc#:#By Creation Date, Oldest Item on Top
 mcst#:#mcst_ordering_creation_date_desc#:#By Creation Date Newest Item on Top
 mcst#:#mcst_ordering_manual#:#Manual
@@ -10928,18 +10940,24 @@ mcst#:#mcst_ordering_title#:#Titles in Alphabetical Order
 mcst#:#mcst_play_cnt#:#Played
 mcst#:#mcst_play#:#Play
 mcst#:#mcst_play_time#:#Play Time
+mcst#:#mcst_podcast#:#Podcast
 mcst#:#mcst_preview_picture_info#:#Only supported by the following main media types:
 mcst#:#mcst_preview_picture#:#Preview Picture
+mcst#:#mcst_prev_items#:#Previous Items
 mcst#:#mcst_reference_info#:#Provide URL pointing to resource
 mcst#:#mcst_save_order#:#Save Order
 mcst#:#mcst_second#:#Second
 mcst#:#mcst_set_playtime#:#Playtime has been set.
 mcst#:#mcst_settings#:#Mediacast Settings
+mcst#:#mcst_show_description#:#Show Description
 mcst#:#mcst_standard_settings_info#:#Comma separated list of file suffixes
 mcst#:#mcst_standard_settings_title#:#File Extensions for Standard Format
 mcst#:#mcst_standard_title#:#Standard Media File
 mcst#:#mcst_unable_to_determin_playtime#:#Unable to determine playtime. Please set it manually be clicking on Edit.
 mcst#:#mcst_videoalternative_title#:#Alternative Video File (Use in Browser)
+mcst#:#mcst_video_cast#:#Videocast
+mcst#:#mcst_video_completion_threshold_info#:#Amount of video that triggers the completion status. Please note that the user may skip forward to reach this point.
+mcst#:#mcst_video_completion_threshold#:#Video Completion Threshold
 mcst#:#mcst_videoportable_settings_info#:#Comma separated list of file suffixes
 mcst#:#mcst_videoportable_settings_title#:#File Extensions for Video Format
 mcst#:#mcst_videoportable_title#:#Additional Video File for Portable Devices
@@ -10947,6 +10965,7 @@ mcst#:#mcst_viewmode#:#Presentation Mode
 mcst#:#mcst_visibility_info#:#Public items can be accessed via RSS without any authentication.
 mcst#:#mcst_visibility_public#:#Public
 mcst#:#mcst_visibility_users#:#Logged in Users
+mcst#:#mcst_watched#:#watched
 mcst#:#mcst_webfeed#:#RSS Web Feed
 membership#:#mem_error_preconditions#:#A registration is not possible, since minimum one setting prevents this.
 membership#:#mem_force_notification_mode_all#:#Notification activated for all members (changeable)
@@ -11776,6 +11795,7 @@ mob#:#mob_file_could_not_be_uploaded#:#File could not be uploaded.
 mob#:#mob_file#:#File
 mob#:#mob_general#:#General
 mob#:#mob_language#:#Language
+mob#:#mob_mime_type_not_allowed#:#The following mime types are not allowed at the destination.
 mob#:#mob_multi_srt_files#:#SRT Files
 mob#:#mob_no_fixed_size_map_editing#:#Please define a fixed size for your image before using map areas. If your image is scaled by content style or other CSS rules, your map areas will not fit anymore.
 mob#:#mob_object#:#Object
@@ -14621,6 +14641,7 @@ skmg#:#skmg_selected_skills#:#Selected Competences
 skmg#:#skmg_select_skill#:#Click on a competence to add it to your personal competences.
 skmg#:#skmg_select_skill_level_assign#:#Please select a competence.
 skmg#:#skmg_select_trigger#:#Select Trigger
+skmg#:#skmg_self_evaluation_byline#:#The self-evaluation will be excluded from target achievement. It is used for your guidance.
 skmg#:#skmg_self_evaluation#:#Self-Evaluation
 skmg#:#skmg_self_evaluations#:#Self-Evaluations
 skmg#:#skmg_settings#:#Competence Management Settings
@@ -14636,6 +14657,7 @@ skmg#:#skmg_skill_needs_self_eval_box#:#Please note that you have not conducted 
 skmg#:#skmg_skill_needs_self_eval#:#Please conduct a self-evaluation first to see your competence target. Please click on "Actions" for that.
 skmg#:#skmg_skill_no_needs_impr#:#Competence target achieved!
 skmg#:#skmg_skill_no_needs_impr_info#:#You achieved the target for this competence.
+skmg#:#skmg_skill_profile_comparison#:#Profile Comparison
 skmg#:#skmg_skill_profiles#:#Competence Profiles
 skmg#:#skmg_skills#:#Competences
 skmg#:#skmg_skill_template#:#Competence Template
@@ -16753,23 +16775,3 @@ wsp#:#wsp_type_scov#:#Certificate: SCORM
 wsp#:#wsp_type_tstv#:#Certificate: Test
 wsp#:#wsp_type_webr#:#Weblink
 wsp#:#wsp_type_wfld#:#Folder
-mcst#:#mcst_download_started_bg#:#Download of files has started. Please check your background tasks in the top right corner.
-mcst#:#mcst_download_all#:#Download All
-mcst#:#mcst_img_gallery#:#Image Gallery
-mcst#:#mcst_podcast#:#Podcast
-mcst#:#mcst_watched#:#watched
-mcst#:#mcst_video_completion_threshold#:#Video Completion Threshold
-mcst#:#mcst_video_completion_threshold_info#:#Amount of video that triggers the completion status. Please note that the user may skip forward to reach this point.
-mcst#:#mcst_prev_items#:#Previous Items
-mcst#:#mcst_next_items#:#Next Items
-mcst#:#mcst_autoplay#:#Autoplay
-mcst#:#mcst_video_cast#:#Videocast
-mcst#:#mcst_no_autoplay#:#No Autoplay
-mcst#:#mcst_autoplay_active#:#Autoplay (Default on)
-mcst#:#mcst_autoplay_inactive#:#Autoplay (Default off)
-mcst#:#mcst_nr_videos#:#Number of Initial Videos
-mcst#:#mcst_show_description#:#Show Description
-mob#:#mob_mime_type_not_allowed#:#The following mime types are not allowed at the destination.
-mcst#:#mcst_new_items_det_lp#:#Add new items to learning progress
-mcst#:#mcst_new_items_det_lp_info#:#New items are automatically added to determine the overall learning progress.
-mcst#:#mcst_audio_files#:#Audio Files

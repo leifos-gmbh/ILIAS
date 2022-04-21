@@ -132,7 +132,7 @@ class ilECSImport
         global $DIC;
 
         $ilDB = $DIC['ilDB'];
-        
+
         $query = 'SELECT * from ecs_import ' .
                 'WHERE server_id = ' . $ilDB->quote($a_server_id, 'integer') . ' ' .
                 'AND mid = ' . $ilDB->quote($a_mid, 'integer') . ' ' .
@@ -142,6 +142,28 @@ class ilECSImport
             return $row->econtent_id;
         }
         return 0;
+    }
+
+    /**
+     * @param int $server_id
+     * @param int $mid
+     * @param string $old_econtent_id
+     * @param string $new_econtent_id
+     */
+    public static function replaceEContentId($server_id, $mid, $old_econtent_id, $new_econtent_id)
+    {
+        global $DIC;
+
+        $logger = $DIC->logger()->wsrv();
+
+        $db = $DIC->database();
+        $query = 'UPDATE ecs_import ' .
+            'SET econtent_id = ' . $db->quote($new_econtent_id, ilDBConstants::T_TEXT) . ' ' .
+            'WHERE econtent_id = ' . $db->quote($old_econtent_id, ilDBConstants::T_TEXT) . ' ' .
+            'AND server_id = ' . $db->quote($server_id, ilDBConstants::T_INTEGER) . ' ' .
+            'AND mid = ' . $db->quote($mid, ilDBConstants::T_INTEGER);
+        $db->manipulate($query);
+        $logger->debug('Storing new econtenid with query: ' . $query);
     }
     
     /**

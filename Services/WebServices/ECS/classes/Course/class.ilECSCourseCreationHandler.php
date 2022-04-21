@@ -121,6 +121,7 @@ class ilECSCourseCreationHandler
         $this->setObjectCreated(false);
         $this->getCourseUrl()->setECSId($a_content_id);
         
+        $this->refreshEContentIds($a_content_id, $course);
         
         if ($this->getMapping()->isAttributeMappingEnabled()) {
             $this->log->debug('Handling advanced attribute mapping');
@@ -740,6 +741,28 @@ class ilECSCourseCreationHandler
             $this->getCourseUrl()->send($this->getServer(), $this->getMid());
         } else {
             $GLOBALS['DIC']['ilLog']->write(__METHOD__ . ': No courses groups created. Aborting');
+        }
+    }
+
+    /**
+     * @param $ecs_id
+     * @param $course_id
+     */
+    protected function refreshEContentIds($econtent_id, $course)
+    {
+        $stored_econtent_id = ilECSImport::lookupEContentIdByContentId(
+            $this->getServer()->getServerId(),
+            $this->mid,
+            $course->lectureID
+        );
+
+        if ($econtent_id != $stored_econtent_id) {
+            ilECSImport::replaceEContentId(
+                $this->getServer()->getServerId(),
+                $this->mid,
+                $stored_econtent_id,
+                $econtent_id
+            );
         }
     }
 }

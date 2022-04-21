@@ -15615,6 +15615,13 @@ th.ilSkillEntryHead {
 .ilSkillCategoryDescription {
   margin: 0px 5px;
 }
+.ilSkillEntriesHeader {
+  padding: 10px 5px 5px 5px;
+}
+.ilSkillEntriesHeader > .ilSkillEntriesHeaderByline {
+  font-size: 0.8em;
+  color: #808080;
+}
 /* Modules/Poll */
 .ilPollDescription {
   margin: 5px;

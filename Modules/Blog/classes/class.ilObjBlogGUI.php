@@ -2056,6 +2056,7 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
                     $base_name = ilUserUtil::getNamePresentation($user_id);
                     if (substr($base_name, 0, 1) == "[") {
                         $name = ilUserUtil::getNamePresentation($user_id, true);
+                        $sort = $name;
                     } else {
                         $name = ilUserUtil::getNamePresentation(
                             $user_id,
@@ -2063,11 +2064,14 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
                             false,
                             "",
                             false,
-                            true
+                            true,
+                            false
                         );
+                        $name_arr = ilObjUser::_lookupName($user_id);
+                        $sort = $name_arr["lastname"]." ".$name_arr["firstname"];
                     }
 
-                    $idx = trim(strip_tags($name)) . "///" . $user_id;  // #10934
+                    $idx = trim(strip_tags($sort)) . "///" . $user_id;  // #10934
                     $list[$idx] = array($name, $url);
                 }
             }

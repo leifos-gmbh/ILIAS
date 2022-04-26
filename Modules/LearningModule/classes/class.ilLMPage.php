@@ -71,12 +71,16 @@ class ilLMPage extends ilPageObject
         $notification->send();
 
         // update lm reading time
-        $this->lm_reading_time_manager->updateReadingTime($this->getParentId());
+        if ((int) $this->getParentId() > 0) {
+            $this->lm_reading_time_manager->updateReadingTime($this->getParentId());
+        }
     }
 
     protected function afterDelete() : void
     {
-        $this->lm_reading_time_manager->updateReadingTime($this->getParentId());
+        if ((int) $this->getParentId() > 0) {
+            $this->lm_reading_time_manager->updateReadingTime($this->getParentId());
+        }
     }
 
 

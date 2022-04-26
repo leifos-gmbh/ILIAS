@@ -343,15 +343,7 @@ class ilLPTableBaseGUI extends ilTable2GUI
         $repo->getExplorerGUI()->setTypeWhiteList($white_list);
         $this->addFilterItem($repo);
         $repo->readFromSession();
-        $filter['root'] = $repo->getValue();
-
-        $debug = new ilTextInputGUI(
-            'Area (Workaround)',
-            'root'
-        );
-        $this->addFilterItem($debug);
-        $debug->readFromSession();
-        $filter['area'] = $debug->getValue();
+        $filter['area'] = $repo->getValue();
         return $filter;
     }
 

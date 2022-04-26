@@ -172,6 +172,7 @@ class ilLPObjectStatisticsTableGUI extends ilLPTableBaseGUI
             $si->setValue(date("Y-m"));
         }
         $this->filter["yearmonth"] = $si->getValue();
+        $this->filter = $this->initRepositoryFilter($this->filter);
     }
 
     public function getItems() : void

@@ -250,6 +250,8 @@ class ilLPObjectStatisticsLPTableGUI extends ilLPTableBaseGUI
             $this->filter["measure"] = $si->getValue();
         }
 
+        $this->filter = $this->initRepositoryFilter($this->filter);
+
         if ($this->is_details) {
             $this->filters = array();
         }

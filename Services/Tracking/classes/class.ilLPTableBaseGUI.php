@@ -329,6 +329,32 @@ class ilLPTableBaseGUI extends ilTable2GUI
         return true;
     }
 
+    protected function initRepositoryFilter(array $filter) : array
+    {
+        $repo = new ilRepositorySelector2InputGUI(
+            $this->lng->txt('trac_filter_area'),
+            'effective_from', true);
+        $white_list = [];
+        foreach ($this->objDefinition->getAllRepositoryTypes() as $type) {
+            if ($this->objDefinition->isContainer($type)) {
+                $white_list[] = $type;
+            }
+        }
+        $repo->getExplorerGUI()->setTypeWhiteList($white_list);
+        $this->addFilterItem($repo);
+        $repo->readFromSession();
+        $filter['root'] = $repo->getValue();
+
+        $debug = new ilTextInputGUI(
+            'Area (Workaround)',
+            'root'
+        );
+        $this->addFilterItem($debug);
+        $debug->readFromSession();
+        $filter['area'] = $debug->getValue();
+        return $filter;
+    }
+
     /**
      * Init filter
      */

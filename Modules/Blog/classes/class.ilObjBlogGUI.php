@@ -1646,7 +1646,7 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
                 }
                 $wtpl->setCurrentBlock("permalink");
                 $wtpl->setVariable("URL_PERMALINK", $goto);
-                $wtpl->setVariable("TEXT_PERMALINK", $lng->txt("link"));
+                $wtpl->setVariable("TEXT_PERMALINK", $lng->txt("blog_link"));
                 $wtpl->parseCurrentBlock();
             }
                         
@@ -2047,6 +2047,8 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
 
         if (sizeof($authors) > 1) {
             $list = array();
+            // present authors according to
+            // https://docu.ilias.de/goto_docu_wiki_wpage_5793_1357.html
             foreach ($authors as $user_id) {
                 if ($user_id) {
                     $ilCtrl->setParameter($this, "ath", $user_id);

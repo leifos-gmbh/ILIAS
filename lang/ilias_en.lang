@@ -10665,7 +10665,7 @@ survey#:#svy_activation_limited_visibility_info#:#Outside the indicated period, 
 blog#:#blog_add_contributor#:#Add Contributor
 common#:#il_blog_contributor#:#Blog Author
 rbac#:#blog_contribute#:#User can create postings
-blog#:#blog_contribute_other_roles#:#In addition to the list of ‘Contributors’, users with one of the following roles can also add postings: %s
+blog#:#blog_contribute_other_roles#:#Additionally to Blog-Contributors users with the role %s can write postings. They are not listed in the table below, because they get the respective permission from an encompassing object.
 dcl#:#dcl_no_content_warning#:#Attention, the Data Collection is online but does not have content yet!
 dcl#:#dcl_visible#:#Visible for all users
 dcl#:#dcl_empty_detailed_view#:#Delete this detailed view
@@ -16602,8 +16602,9 @@ content#:#cont_could_not_save_duplicate_pc_ids#:#Page could not be saved (duplic
 dateplaner#:#cal_delete_recurrence_rule#:#Delete Series of Appoinments
 dateplaner#:#cal_recurrence_confirm_deletion#:#Please decide wether you want to delete single appointments or the complete series of appointments.
 lm#:#lm_est_reading_time#:#Estimated Reading Time
-lm#:#lm_est_reading_time_info#:#Allows the activation of an estimated reading time as property in the repository.
+lm#:#lm_est_reading_time_info#:#In Learning Modules in the repository the estimated reading time can be determined and displayed.
 blog#:#blog_est_reading_time#:#Estimated Reading Time
-blog#:#blog_est_reading_time_info#:#Allows the activation of an estimated reading for blog postings.
+blog#:#blog_est_reading_time_info#:#For Blogs in the repository reading time can be determined and displayed.
 copg#:#copg_est_reading_time#:#Estimated Reading Time
 copg#:#copg_x_minutes#:#%s minute(s)
+blog#:#blog_link#:#Link

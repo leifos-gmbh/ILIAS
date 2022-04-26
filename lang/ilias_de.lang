@@ -51,9 +51,9 @@ exc#:#exc_print_pdf#:#Drucken/PDF
 exp#:#exp_print_pdf_info#:#Um ein PDF zu erstellen, wählen Sie bitte anschließend in der Druckansicht "Als PDF speichern" als Ziel.
 exp#:#exp_show_print_view#:#Druckansicht anzeigen
 exp#:#exp_print_pdf#:#Drucken/PDF
-prtf#:#prtf_edit_data#:#Daten bearbeiten
-content#:#cont_ed_insert_amdfrm#:#Erweiterte Metadaten einfügen
-prtt#:#prtt_select_datasets#:#Datensätze auswählen
+prtf#:#prtf_edit_data#:#Felder ausfüllen
+content#:#cont_ed_insert_amdfrm#:#Formular einfügen
+prtt#:#prtt_select_datasets#:#Formulare auswählen
 prtt#:#prtt_pfpg#:#Portfolioseite
 meta#:#md_adv_field_list#:#Datenfelder
 meta#:#md_adv_record_lng_table#:#Sprachenverwaltung
@@ -10660,7 +10660,7 @@ survey#:#svy_activation_limited_visibility_info#:#Außerhalb des angegebenen Zei
 blog#:#blog_add_contributor#:#Mitwirkende hinzufügen
 common#:#il_blog_contributor#:#Blog-Autor
 rbac#:#blog_contribute#:#Benutzer darf Beiträge hinzufügen
-blog#:#blog_contribute_other_roles#:#Neben den eingetragenen 'Blog-Autoren' können auch Benutzer mit einer der folgenden Rollen Einträge hinzufügen: %s
+blog#:#blog_contribute_other_roles#:#Zusätzlich zu den Mitwirkenden können auch Personen mit der Rolle %s Beiträge in diesem Blog verfassen. Sie werden nicht in in der Tabelle aufgeführt, denn sie erhalten das entsprechende Recht durch ein  übergeordnetes Objekt.
 dcl#:#dcl_no_content_warning#:#Achtung, die Datensammlung ist bereits online, hat aber noch keinen Inhalt!
 dcl#:#dcl_visible#:#Für alle Benutzer sichtbar
 dcl#:#dcl_visible_desc#:#Benutzer haben Zugriff auf diese Tabelle.
@@ -11314,7 +11314,7 @@ crs#:#event_list_registered_only#:#Nur Angemeldete
 didactic#:#didactic_default_type#:#Standard
 mmbr#:#mmbr_info_delete_sure_unsubscribe#:#Wollen Sie wirklich die Mitgliedschaft für die folgenden Kurse und Gruppen beenden?
 pd#:#pd_remove_multiple#:#Mehrere Objekte entfernen
-survey#:#survey_360_mode_info#:#Für Peer-Reviews von Personen
+survey#:#survey_360_mode_info#:#Mehrere Personen evaluieren sich gegenseitig, Rückmeldungen zu einem Feedback-Nehmer werden zu einem Zeitpunkt aggregiert ausgewertet.
 blog#:#blog_draft_info_contributors#:#Dieser Beitrag ist als Entwurf nur für die Mitwirkenden sichtbar.
 assessment#:#tst_extratime_added#:#Die Bearbeitungszeit des Teilnehmers wurde um %s Minuten verlängert.
 assessment#:#tst_extratime_notavailable#:#Zeitverlängerungen können nur für Tests mit einem Durchlauf und einer vorgegebenen Bearbeitungszeit durchgeführt werden.
@@ -11552,7 +11552,7 @@ rbac#:#prtt_copy#:#Portfoliovorlage kopieren
 rbac#:#prtt_write#:#Portfoliovorlagen anlegen und Einstellungen der Portfoliovorlage bearbeiten
 rbac#:#prtt_delete#:#Portfoliovorlage löschen oder verschieben
 rbac#:#prtt_edit_permission#:#Rechteeinstellungen für Portfoliovorlage ändern
-prtt#:#prtt_activation_online_info#:#Wählen Sie diese Einstellung, um die Portfoliovorlage für Benutzer verfügbar zumachen.
+prtt#:#prtt_activation_online_info#:#Wählen Sie diese Einstellung, um die Portfoliovorlage für Benutzer verfügbar zu machen.
 prtt#:#prtt_activation_limited_visibility_info#:#Falls aktiv, ist die Portfoliovorlage auch außerhalb der Zugriffszeiten sichtbar.
 content#:#cont_profile_mode_template_inherit_info#:#Verwendet die Daten des Profils
 prtf#:#prtf_template_editor_placeholder_info#:#Dieser Platzhalter wird im Portfolio ersetzt.
@@ -15391,8 +15391,8 @@ common#:#lti_outcome#:#Benachrichtigung über LTI-Lernfortschritt
 ui#:#ui_chars_remaining#:#Verbleibende Buchstaben
 ui#:#ui_chars_min#:#Minimum:
 ui#:#ui_chars_max#:#Maximum:
-survey#:#svy_self_ev_mode#:#Nur Selbst-Evaluation
-survey#:#svy_self_ev_info#:#Für Selbst-Evaluation verwenden
+survey#:#svy_self_ev_mode#:#Selbst-Evaluation
+survey#:#svy_self_ev_info#:#Personen evaluieren sich selbst und schätzen sich ein.
 survey#:#svy_self_ev_access_results_none#:#Kein Zugriff auf Ergebnisse
 survey#:#svy_self_ev_access_results_own#:#Zugriff auf Selbst-Evaluationen
 survey#:#svy_self_ev_access_results_all#:#Zugriff auf Selbst-Evaluationen aller Teilnehmer
@@ -16603,3 +16603,8 @@ dateplaner#:#cal_delete_recurrence_rule#:#Terminserie löschen
 dateplaner#:#cal_recurrence_confirm_deletion#:#Bitte wählen Sie aus, ob Sie einzelne Termine oder aber die gesamte Terminserie löschen möchten.
 copg#:#copg_est_reading_time#:#Geschätzte Lesezeit
 copg#:#copg_x_minutes#:#%s Minute(n)
+blog#:#blog_link#:#Link
+blog#:#blog_est_reading_time#:#Geschätzte Lesedauer
+blog#:#blog_est_reading_time_info#:#In Blogs im Magazin kann eine geschätzte Lesezeit ermittelt und angezeigt werden.
+lm#:#lm_est_reading_time#:#Geschätzte Lesedauer
+lm#:#lm_est_reading_time_info#:#In Lernmodulen kann eine geschätzte Lesezeit ermittelt und angezeigt werden.

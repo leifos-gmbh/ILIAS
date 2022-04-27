@@ -24,3 +24,14 @@ ecs#:#ecs_export_allow_local_info#:#Only user accounts with the above chosen aut
 ecs#:#ecs_outgoing_auth_mode#:#Restricted Auth Modes
 ecs#:#ecs_outgoing_auth_mode_no_restriction#:#No Restriction
 ecs#:#ecs_outgoing_auth_mode_info#:#Only user accounts with the chosen auth mode are allowed to acccess ECS content.
+ecs#:#ecs_export_local_account#:#Lokale ECS-Konten
+ecs#:#ecs_export_local_account_info#:#Wenn aktiviert, werden für eingehende Personen lokale Konten erstellt, die direkt über den ECS-Server authentifiziert werden.
+ecs#:#ecs_export_auth_type#:#Extern authentifizierte Konten
+ecs#:#ecs_export_auth_type_info#:#Legen Sie das Verhalten fest, dass für Personen gelten soll, die über externe Authentifizierungsverfahren angemeldet werden sollen.
+ecs#:#ecs_export_auth_type_none#:#Kein besonderes Verhalten
+ecs#:#ecs_export_auth_type_shib#:#Weiterleitung zur Shibboleth-Anmeldemaske
+ecs#:#ecs_export_auth_type_ilias#:#Weiterleitung zur ILIAS-Anmeldeseite
+ecs#:#ecs_import_user_credentials_by_auth_mode#:#Einstellungen für ausgehende Benutzerkonten
+ecs#:#ecs_import_user_credentials_by_auth_mode_info#:#Legen Sie fest welche Benutzinformation beim Aufruf von ECS-Objekten übertragen werden sollen. Ist die Option "Alle anderen Anmeldearten" deaktiviert, so können ECS-Links nur von solchen Personen aufgerufen werden, deren Anmeldeart aktiviert ist.
+ecs#:#ecs_import_auth_mode#:#Anmeldeart:
+ecs#:#ecs_import_auth_type_default#:#Alle anderen Anmeldearten

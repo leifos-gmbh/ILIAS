@@ -85,3 +85,48 @@ if (!$ilDB->tableColumnExists('ecs_part_settings', 'outgoing_auth_mode')) {
     );
 }
 ?>
+<#8>
+<?php
+if (!$ilDB->tableColumnExists('ecs_part_settings', 'incoming_auth_type')) {
+    $ilDB->addTableColumn(
+        'ecs_part_settings',
+        'incoming_auth_type',
+        [
+            'type' => ilDBConstants::T_TEXT,
+            'notnull' => true,
+            'length' => 1,
+            'default' => 0
+        ]
+    );
+}
+?>
+<#9>
+<?php
+if (!$ilDB->tableColumnExists('ecs_part_settings', 'username_placeholders')) {
+    $ilDB->addTableColumn(
+        'ecs_part_settings',
+        'username_placeholders',
+        [
+            'type' => ilDBConstants::T_TEXT,
+            'notnull' => false,
+            'length' => 500,
+            'default' => null
+        ]
+    );
+}
+?>
+<#10>
+<?php
+if (!$ilDB->tableColumnExists('ecs_part_settings', 'outgoing_auth_modes')) {
+    $ilDB->addTableColumn(
+        'ecs_part_settings',
+        'outgoing_auth_modes',
+        [
+            'type' => ilDBConstants::T_TEXT,
+            'notnull' => false,
+            'length' => 500,
+            'default' => null
+        ]
+    );
+}
+?>

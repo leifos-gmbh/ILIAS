@@ -43,8 +43,8 @@ class ilECSUser
     public $institution;
     public $uid_hash;
 
-    protected $external_account = '';
-
+    protected string $external_account = '';
+    protected string $auth_mode = '';
     /**
      * Constructor
      * @param mixed ilObjUser or encoded json string
@@ -151,8 +151,8 @@ class ilECSUser
 
         if ($this->source instanceof ilObjUser) {
             $this->external_account = (string) $this->source->getExternalAccount();
+            $this->auth_mode = (string) $this->source->getAuthMode();
         }
-
         $this->uid_hash = 'il_' . $ilSetting->get('inst_id', 0) . '_usr_' . $this->source->getId();
     }
     
@@ -188,7 +188,7 @@ class ilECSUser
         $this->lastname = ilUtil::stripSlashes(urldecode($_GET['ecs_lastname']));
         $this->email = ilUtil::stripSlashes(urldecode($_GET['ecs_email']));
         $this->institution = ilUtil::stripSlashes(urldecode($_GET['ecs_institution']));
-        
+
         if ($_GET['ecs_uid_hash']) {
             $this->uid_hash = ilUtil::stripSlashes(urldecode($_GET['ecs_uid_hash']));
         } elseif ($_GET['ecs_uid']) {
@@ -217,22 +217,29 @@ class ilECSUser
     public function toGET(ilECSParticipantSetting $setting)
     {
         $login = '';
-        if (stristr($setting->getOutgoingUsernamePlaceholder(), ilECSParticipantSetting::LOGIN_PLACEHOLDER) !== false) {
-            $login = str_replace(
-                ilECSParticipantSetting::LOGIN_PLACEHOLDER,
-                $this->getLogin(),
-                $setting->getOutgoingUsernamePlaceholder()
-            );
-        }
-        if (
-            stristr($setting->getOutgoingUsernamePlaceholder(), ilECSParticipantSetting::EXTERNAL_ACCOUNT_PLACEHOLDER) !== false &&
-            strlen($this->getExternalAccount())
-        ) {
-            $login = str_replace(
-                ilECSParticipantSetting::EXTERNAL_ACCOUNT_PLACEHOLDER,
-                $this->getExternalAccount(),
-                $setting->getOutgoingUsernamePlaceholder()
-            );
+        $external_account_info = '';
+
+        // check for external auth mode
+        $external_auth_modes = $setting->getOutgoingExternalAuthModes();
+        if (in_array($this->auth_mode, $external_auth_modes)) {
+            $placeholder = $setting->getOutgoingUsernamePlaceholderByAuthMode($this->auth_mode);
+            if (stristr($placeholder, ilECSParticipantSetting::LOGIN_PLACEHOLDER) !== false) {
+                $login = str_replace(
+                    ilECSParticipantSetting::LOGIN_PLACEHOLDER,
+                    $this->getLogin(),
+                    $placeholder
+                );
+            }
+            if (stristr($placeholder, ilECSParticipantSetting::EXTERNAL_ACCOUNT_PLACEHOLDER) !== false) {
+                $login = str_replace(
+                    ilECSParticipantSetting::EXTERNAL_ACCOUNT_PLACEHOLDER,
+                    $this->getExternalAccount(),
+                    $placeholder
+                );
+            }
+            $external_account_info = '&ecs_external_account=1';
+        } else {
+            $login = $this->getLogin();
         }
 
         return '&ecs_login=' . urlencode((string) $login) .
@@ -240,7 +247,8 @@ class ilECSUser
             '&ecs_lastname=' . urlencode((string) $this->lastname) .
             '&ecs_email=' . urlencode((string) $this->email) .
             '&ecs_institution=' . urlencode((string) $this->institution) .
-            '&ecs_uid_hash=' . urlencode((string) $this->uid_hash);
+            '&ecs_uid_hash=' . urlencode((string) $this->uid_hash) .
+            $external_account_info;
         '&ecs_uid=' . urlencode((string) $this->uid_hash);
     }
     

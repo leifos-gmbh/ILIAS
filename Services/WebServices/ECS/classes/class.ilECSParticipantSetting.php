@@ -252,6 +252,16 @@ class ilECSParticipantSetting
         return $this->outgoing_auth_modes;
     }
 
+    public function getOutgoingExternalAuthModes()
+    {
+        return array_filter(
+            $this->getOutgoingAuthModes(),
+            static function (string $auth_mode) : bool  {
+                return $auth_mode !== self::OUTGOING_AUTH_MODE_DEFAULT;
+            }
+        );
+    }
+
     public function isOutgoingAuthModeEnabled(string $auth_mode) : bool
     {
         return (bool) ($this->getOutgoingAuthModes()[$auth_mode] ?? false);

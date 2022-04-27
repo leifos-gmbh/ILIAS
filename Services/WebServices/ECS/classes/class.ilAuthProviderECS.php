@@ -2,6 +2,9 @@
 
 /* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
 
+use ILIAS\Refinery\Factory as Refinery;
+use ILIAS\DI\HTTPServices as HTTPServices;
+
 include_once './Services/Authentication/classes/Provider/class.ilAuthProvider.php';
 include_once './Services/Authentication/interfaces/interface.ilAuthProviderInterface.php';
 
@@ -13,6 +16,8 @@ include_once './Services/Authentication/interfaces/interface.ilAuthProviderInter
  */
 class ilAuthProviderECS extends ilAuthProvider implements ilAuthProviderInterface
 {
+    private HTTPServices $http;
+    private Refinery $refinery;
     protected $mid = null;
     protected $abreviation = null;
 
@@ -20,8 +25,8 @@ class ilAuthProviderECS extends ilAuthProvider implements ilAuthProviderInterfac
     protected $servers = null;
 
     protected $lng;
-    
-    
+
+
     /**
      * Constructor
      * @param \ilAuthCredentials $credentials
@@ -34,6 +39,9 @@ class ilAuthProviderECS extends ilAuthProvider implements ilAuthProviderInterfac
         $this->lng = $DIC->language();
         $this->lng->loadLanguageModule('ecs');
         $this->initECSServices();
+
+        $this->http = $DIC->http();
+        $this->refinery = $DIC->refinery();
     }
     
     /**
@@ -129,35 +137,43 @@ class ilAuthProviderECS extends ilAuthProvider implements ilAuthProviderInterfac
 
         $auth_session = $DIC['ilAuthSession'];
 
+        $is_external_account = (bool) ($this->http->request()->getQueryParams()['ecs_external_account'] ?? false);
+
         $part_settings = new ilECSParticipantSetting(
             $this->getCurrentServer()->getServerId(),
             $this->getMID()
         );
-        if ($part_settings->getIncomingAuthType() === ilECSParticipantSetting::INCOMING_AUTH_TYPE_INACTIVE) {
-            // handle successful authentication
-            $new_usr_id = $this->handleLogin();
-            $this->getLogger()->info('ECS authentication successful.');
-            $status->setStatus(ilAuthStatus::STATUS_AUTHENTICATED);
-            $status->setAuthenticatedUserId($new_usr_id);
-            return true;
-        }
         if ($this->resumeCurrentSession()) {
             $this->getLogger()->debug('Continuing current user session');
             $status->setStatus(ilAuthStatus::STATUS_AUTHENTICATED);
             $status->setAuthenticatedUserId($DIC['ilAuthSession']->getUserId());
             return true;
         }
-        if ($part_settings->getIncomingAuthType() === ilECSParticipantSetting::INCOMING_AUTH_TYPE_LOGIN_PAGE) {
+        if (
+            $is_external_account &&
+            $part_settings->getIncomingAuthType() === ilECSParticipantSetting::INCOMING_AUTH_TYPE_LOGIN_PAGE
+        ) {
             $this->getLogger()->info('ILIAS login page authentication required.');
             ilSession::set('success', $this->lng->txt('ecs_login_success_ilias'));
             $this->initRemoteUser();
             $DIC->ctrl()->redirectToURL('login.php?target=' . $_GET['target']);
             return false;
         }
-        if ($part_settings->getIncomingAuthType() === ilECSParticipantSetting::INCOMING_AUTH_TYPE_SHIBBOLETH) {
+        if (
+            $is_external_account &&
+            $part_settings->getIncomingAuthType() === ilECSParticipantSetting::INCOMING_AUTH_TYPE_SHIBBOLETH
+        ) {
             $this->getLogger()->info('Redirect to shibboleth authentication');
             $this->initRemoteUser();
             $DIC->ctrl()->redirectToURL('shib_login.php?target=' . $_GET['target']);
+        }
+        if ($part_settings->areIncomingLocalAccountsSupported()) {
+            // handle successful authentication
+            $new_usr_id = $this->handleLogin();
+            $this->getLogger()->info('ECS authentication successful.');
+            $status->setStatus(ilAuthStatus::STATUS_AUTHENTICATED);
+            $status->setAuthenticatedUserId($new_usr_id);
+            return true;
         }
     }
 

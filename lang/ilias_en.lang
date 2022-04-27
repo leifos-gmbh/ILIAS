@@ -16746,3 +16746,4 @@ blog#:#blog_est_reading_time_info#:#For Blogs in the repository reading time can
 copg#:#copg_est_reading_time#:#Estimated Reading Time
 copg#:#copg_x_minutes#:#%s minute(s)
 blog#:#blog_link#:#Link
+wiki#:#wiki_sec_protect_info#:#Protected sections can only be edited by users having "Edit Settings" permission.

@@ -2,7 +2,6 @@
 
 /* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
 
-use ILIAS\Refinery\Factory as Refinery;
 use ILIAS\DI\HTTPServices as HTTPServices;
 
 include_once './Services/Authentication/classes/Provider/class.ilAuthProvider.php';
@@ -17,7 +16,6 @@ include_once './Services/Authentication/interfaces/interface.ilAuthProviderInter
 class ilAuthProviderECS extends ilAuthProvider implements ilAuthProviderInterface
 {
     private HTTPServices $http;
-    private Refinery $refinery;
     protected $mid = null;
     protected $abreviation = null;
 
@@ -41,7 +39,6 @@ class ilAuthProviderECS extends ilAuthProvider implements ilAuthProviderInterfac
         $this->initECSServices();
 
         $this->http = $DIC->http();
-        $this->refinery = $DIC->refinery();
     }
     
     /**

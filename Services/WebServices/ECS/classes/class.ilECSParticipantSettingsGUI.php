@@ -315,6 +315,7 @@ class ilECSParticipantSettingsGUI
 
         // Export types
         $obj_types = new ilCheckboxGroupInputGUI($this->getLang()->txt('ecs_export_types'), 'export_types');
+        $obj_types->setValue($this->getParticipant()->getExportTypes());
         include_once './Services/WebServices/ECS/classes/class.ilECSUtils.php';
         foreach (ilECSUtils::getPossibleReleaseTypes(true) as $type => $trans) {
             $obj_types->addOption(new ilCheckboxOption($trans, $type));

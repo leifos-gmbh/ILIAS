@@ -212,15 +212,24 @@ class ilECSParticipantSettingsGUI
             $this->getParticipant()->setExportTypes($form->getInput('export_types'));
             $this->getParticipant()->enableImport($form->getInput('import'));
             $this->getParticipant()->setImportTypes($form->getInput('import_types'));
-            $this->getParticipant()->setOutgoingUsernamePlaceholder($form->getInput('username_placeholder'));
-            $this->getParticipant()->setIncomingAuthMode($form->getInput('incoming_auth_mode'));
             $this->getParticipant()->enableIncomingLocalAccounts((bool) $form->getInput('incoming_local_accounts'));
+            $this->getParticipant()->setIncomingAuthType((int) $form->getInput('incoming_auth_type'));
+            $this->getParticipant()->setOutgoingAuthModes((array) $form->getInput('outgoing_auth_modes'));
+
+            // placeholders
+            $placeholders = [];
+            foreach ($this->parseAvailableAuthModes() as $authmode_name => $authmode_text) {
+                $placeholders[$authmode_name] = $form->getInput(
+                    'username_placeholder_' . $authmode_name
+                );
+            }
+            $this->getParticipant()->setOutgoingUsernamePlaceholders($placeholders);
 
             // additional validation
             $error_code = $this->getParticipant()->validate();
             switch ($error_code) {
                 case ilECSParticipantSetting::ERR_MISSING_USERNAME_PLACEHOLDER:
-                    $form->getItemByPostVar('username_placeholder')->setAlert(
+                    $form->getItemByPostVar('outgoing_auth_modes')->setAlert(
                         $this->lng->txt('ecs_username_place_holder_err_mssing_placeholder')
                     );
                     break;
@@ -261,42 +270,56 @@ class ilECSParticipantSettingsGUI
         $dtoken->setChecked($this->getParticipant()->isDeprecatedTokenEnabled());
         $form->addItem($dtoken);
         
-        // Export
+        // Export options
         $export = new ilCheckboxInputGUI($this->getLang()->txt('ecs_tbl_export'), 'export');
         $export->setValue(1);
         $export->setChecked($this->getParticipant()->isExportEnabled());
         $form->addItem($export);
 
+        $auth_types = new ilCheckboxInputGUI(
+            $this->lng->txt('ecs_export_local_account'),
+            'incoming_local_accounts'
+        );
+        $auth_types->setInfo($this->lng->txt('ecs_export_local_account_info'));
+        $auth_types->setChecked($this->getParticipant()->areIncomingLocalAccountsSupported());
+        $export->addSubItem($auth_types);
+
+        // radio group with login page and (optional) shibboleth option
+        $external_auth_type = new ilRadioGroupInputGUI(
+            $this->lng->txt('ecs_export_auth_type'),
+            'incoming_auth_type'
+        );
+        $external_auth_type->setInfo($this->lng->txt('ecs_export_auth_type_info'));
+        $external_auth_type->setValue($this->getParticipant()->getIncomingAuthType());
+        $external_auth_type->addOption(
+            new ilRadioOption(
+                $this->lng->txt('ecs_export_auth_type_ilias'),
+                ilECSParticipantSetting::INCOMING_AUTH_TYPE_LOGIN_PAGE
+            )
+        );
+        if ($this->isShibbolethActive()) {
+            $external_auth_type->addOption(
+                new ilRadioOption(
+                    $this->lng->txt('ecs_export_auth_type_shib'),
+                    ilECSParticipantSetting::INCOMING_AUTH_TYPE_SHIBBOLETH
+                )
+            );
+        }
+        $external_auth_type->addOption(
+            new ilRadioOption(
+                $this->lng->txt('ecs_export_auth_type_none'),
+                ilECSParticipantSetting::INCOMING_AUTH_TYPE_INACTIVE
+            )
+        );
+        $export->addSubItem($external_auth_type);
 
         // Export types
         $obj_types = new ilCheckboxGroupInputGUI($this->getLang()->txt('ecs_export_types'), 'export_types');
-        $obj_types->setValue($this->getParticipant()->getExportTypes());
-
-        $user_auth_mode = new ilSelectInputGUI(
-            $this->getLang()->txt('ecs_incoming_auth_mode'),
-            'incoming_auth_mode'
-        );
-        $user_auth_mode->setRequired(true);
-        $user_auth_mode->setOptions($this->parseAvailableAuthModes());
-        $user_auth_mode->setValue($this->getParticipant()->getIncomingAuthMode());
-        $user_auth_mode->setInfo($this->getLang()->txt('ecs_incoming_auth_mode_info'));
-        $export->addSubItem($user_auth_mode);
-
-        $allow_local_accounts = new ilCheckboxInputGUI(
-            $this->getLang()->txt('ecs_export_allow_local'),
-            'incoming_local_accounts'
-        );
-        $allow_local_accounts->setInfo($this->getLang()->txt('ecs_export_allow_local_info'));
-        $allow_local_accounts->setValue(1);
-        $allow_local_accounts->setChecked($this->getParticipant()->areIncomingLocalAccountsSupported());
-        $export->addSubItem($allow_local_accounts);
-
         include_once './Services/WebServices/ECS/classes/class.ilECSUtils.php';
         foreach (ilECSUtils::getPossibleReleaseTypes(true) as $type => $trans) {
             $obj_types->addOption(new ilCheckboxOption($trans, $type));
         }
         $export->addSubItem($obj_types);
-        
 
         // Import
         $import = new ilCheckboxInputGUI($this->getLang()->txt('ecs_tbl_import'), 'import');
@@ -304,25 +327,39 @@ class ilECSParticipantSettingsGUI
         $import->setChecked($this->getParticipant()->isImportEnabled());
         $form->addItem($import);
 
-        // export user credentials
-        $username_placeholder = new ilTextInputGUI(
-            $this->getLang()->txt('ecs_outgoing_user_credentials'),
-            'username_placeholder'
+        // user credentials by auth mode
+        $user_credentials = new ilCheckboxGroupInputGUI(
+            $this->lng->txt('ecs_import_user_credentials_by_auth_mode'),
+            'outgoing_auth_modes'
         );
-        $username_placeholder->setRequired(true);
-        $username_placeholder->setValue($this->getParticipant()->getOutgoingUsernamePlaceholder());
-        $username_placeholder->setInfo($this->lng->txt('ecs_outgoing_user_credentials_info'));
-        $import->addSubItem($username_placeholder);
-
-        // restrict outgoing authmode
-        $outgoing_authmode = new ilSelectInputGUI(
-            $this->getLang()->txt('ecs_outgoing_auth_mode'),
-            'outgoing_auth_mode'
+        $user_credentials->setInfo($this->lng->txt('ecs_import_user_credentials_by_auth_mode_info'));
+        $user_credentials->setValue($this->getParticipant()->getOutgoingAuthModes());
+        $import->addSubItem($user_credentials);
+        foreach ($this->parseAvailableAuthModes() as $option_name => $option_text)
+        {
+            $option = new ilCheckboxOption(
+                $this->lng->txt('ecs_import_auth_mode') . ' ' . $option_text,
+                $option_name
+            );
+            $user_credentials->addOption($option);
+            $username_placeholder = new ilTextInputGUI(
+                $this->getLang()->txt('ecs_outgoing_user_credentials'),
+                'username_placeholder_' . $option_name
+            );
+            $username_placeholder->setRequired(false);
+            $username_placeholder->setInfo($this->lng->txt('ecs_outgoing_user_credentials_info'));
+            $username_placeholder->setValue(
+                $this->getParticipant()->getOutgoingUsernamePlaceholderByAuthMode(
+                    $option_name
+                )
+            );
+            $option->addSubItem($username_placeholder);
+        }
+        $option = new ilCheckboxOption(
+            $this->lng->txt('ecs_import_auth_type_default'),
+            'default'
         );
-        $outgoing_authmode->setInfo($this->getLang()->txt('ecs_outgoing_auth_mode_info'));
-        $outgoing_authmode->setOptions($this->parseAvailableAuthModes(false));
-        $outgoing_authmode->setValue($this->getParticipant()->getOutgoingAuthMode());
-        $import->addSubItem($outgoing_authmode);
+        $user_credentials->addOption($option);
 
         // import types
         $imp_types = new ilCheckboxGroupInputGUI($this->getLang()->txt('ecs_import_types'), 'import_types');
@@ -343,22 +380,19 @@ class ilECSParticipantSettingsGUI
     protected function parseAvailableAuthModes($a_mode_incoming = true) : array
     {
         $options = [];
-
-        if (!$a_mode_incoming) {
-            $options[''] = $this->getLang()->txt('ecs_outgoing_auth_mode_no_restriction');
-        }
-        $options[ilECSParticipantSetting::DEFAULT_INCOMING_AUTH_MODE] = $this->getLang()->txt('ecs_incoming_auth_local');
-
-        if ($this->global_settings->get('shib_active', '0')) {
+        if ($this->isShibbolethActive()) {
             $options['shibboleth'] = $this->getLang()->txt('auth_shib');
         }
-
-        foreach (ilLDAPServer::getServerIds() as $server_id)
-        {
+        foreach (ilLDAPServer::getServerIds() as $server_id) {
             $server = ilLDAPServer::getInstanceByServerId($server_id);
             $options['ldap_' . $server->getServerId()] = $server->getName();
         }
         return $options;
+    }
+
+    protected function isShibbolethActive() : bool
+    {
+        return (bool) $this->global_settings->get('shib_active', '0');
     }
 
     

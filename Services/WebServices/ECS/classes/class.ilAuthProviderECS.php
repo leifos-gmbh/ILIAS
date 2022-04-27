@@ -133,7 +133,7 @@ class ilAuthProviderECS extends ilAuthProvider implements ilAuthProviderInterfac
             $this->getCurrentServer()->getServerId(),
             $this->getMID()
         );
-        if ($part_settings->getIncomingAuthMode() === ilECSParticipantSetting::AUTH_MODE_LOCAL) {
+        if ($part_settings->getIncomingAuthType() === ilECSParticipantSetting::INCOMING_AUTH_TYPE_INACTIVE) {
             // handle successful authentication
             $new_usr_id = $this->handleLogin();
             $this->getLogger()->info('ECS authentication successful.');
@@ -147,15 +147,15 @@ class ilAuthProviderECS extends ilAuthProvider implements ilAuthProviderInterfac
             $status->setAuthenticatedUserId($DIC['ilAuthSession']->getUserId());
             return true;
         }
-        if (substr($part_settings->getIncomingAuthMode(),0,4) === ilECSParticipantSetting::AUTH_MODE_LDAP) {
-            $this->getLogger()->info('LDAP authentication required.');
-            ilSession::set('success', $this->lng->txt('ecs_login_success_ldap'));
+        if ($part_settings->getIncomingAuthType() === ilECSParticipantSetting::INCOMING_AUTH_TYPE_LOGIN_PAGE) {
+            $this->getLogger()->info('ILIAS login page authentication required.');
+            ilSession::set('success', $this->lng->txt('ecs_login_success_ilias'));
             $this->initRemoteUser();
             $DIC->ctrl()->redirectToURL('login.php?target=' . $_GET['target']);
             return false;
         }
-        if ($part_settings->getIncomingAuthMode() == 'shibboleth') {
-            $this->getLogger()->info('Redirect to login page for shibboleth authentication');
+        if ($part_settings->getIncomingAuthType() === ilECSParticipantSetting::INCOMING_AUTH_TYPE_SHIBBOLETH) {
+            $this->getLogger()->info('Redirect to shibboleth authentication');
             $this->initRemoteUser();
             $DIC->ctrl()->redirectToURL('shib_login.php?target=' . $_GET['target']);
         }

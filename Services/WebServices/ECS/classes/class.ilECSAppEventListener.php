@@ -277,7 +277,7 @@ class ilECSAppEventListener implements ilAppEventListener
                 $logger->warning('No valid ecs server for server_id: ' . $remote->getServerId());
                 continue;
             }
-            if (strcmp($part->getIncomingAuthMode(), $user->getAuthMode()) === 0) {
+            if ($part->getIncomingAuthType() !== ilECSParticipantSetting::INCOMING_AUTH_TYPE_INACTIVE) {
                 $logger->info('Assigning ' . $user->getExternalAccount() . ' to global ecs role');
                 $admin->assignUser($server->getGlobalRole(), $user->getId());
                 $remote->delete();

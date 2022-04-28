@@ -116,7 +116,6 @@ class ilAuthProviderECS extends ilAuthProvider implements ilAuthProviderInterfac
             $this->setCurrentServer($server);
             if ($this->validateHash()) {
                 return $this->handleLoginByAuthMode($status);
-
             }
         }
         $this->getLogger()->warning('Could not validate ecs hash for any active server.');
@@ -128,7 +127,7 @@ class ilAuthProviderECS extends ilAuthProvider implements ilAuthProviderInterfac
      * Redirects to shibboleth login; to standard login page for LDAP based authentication or authenticates/creates
      * a local account
      */
-    protected function handleLoginByAuthMode(ilAuthStatus $status) : int
+    protected function handleLoginByAuthMode(ilAuthStatus $status) : bool
     {
         global $DIC;
 
@@ -172,6 +171,8 @@ class ilAuthProviderECS extends ilAuthProvider implements ilAuthProviderInterfac
             $status->setAuthenticatedUserId($new_usr_id);
             return true;
         }
+        $this->handleAuthenticationFail($status, 'err_wrong_login');
+        return false;
     }
 
     protected function resumeCurrentSession()

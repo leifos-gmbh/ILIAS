@@ -282,12 +282,24 @@ class ilCalendarAppointmentGUI
         
 
         if (ilCalendarSettings::_getInstance()->isUserNotificationEnabled()) {
-            $notu = new ilTextWizardInputGUI($this->lng->txt('cal_user_notification'), 'notu');
-            $notu->setInfo($this->lng->txt('cal_user_notification_info'));
-            $notu->setSize(20);
-            $notu->setMaxLength(64);
 
-            $values = array();
+            $ajax_url = $this->ctrl->getLinkTarget(
+                $this,
+                'doUserAutoComplete',
+                '',
+                true,
+                false
+            );
+
+            $notu = new ilTextInputGUI(
+                $this->lng->txt('cal_user_notification'),
+                'notu'
+            );
+            $notu->setMulti(true, true);
+            $notu->setInfo($this->lng->txt('cal_user_notification_info'));
+            $notu->setDataSource($ajax_url, ',');
+
+            $values = [];
             foreach ($this->notification->getRecipients() as $rcp) {
                 switch ($rcp['type']) {
                     case ilCalendarUserNotification::TYPE_USER:
@@ -299,11 +311,7 @@ class ilCalendarAppointmentGUI
                         break;
                 }
             }
-            if (count($values)) {
-                $notu->setValues($values);
-            } else {
-                $notu->setValues(array(''));
-            }
+            $notu->setValue($values);
             $this->form->addItem($notu);
         }
 
@@ -327,6 +335,43 @@ class ilCalendarAppointmentGUI
             $this->form->addItem($not);
         }
     }
+
+    /**
+     * Do auto completion
+     * @return void
+     */
+    protected function doUserAutoComplete()
+    {
+        // hide anonymout request
+        if ($GLOBALS['DIC']['ilUser']->getId() == ANONYMOUS_USER_ID) {
+            return ilJsonUtil::encode(new stdClass());
+            exit;
+        }
+        if (!isset($_GET['autoCompleteField'])) {
+            $a_fields = array('login','firstname','lastname','email');
+            $result_field = 'login';
+        } else {
+            $a_fields = array((string) $_GET['autoCompleteField']);
+            $result_field = (string) $_GET['autoCompleteField'];
+        }
+
+        include_once './Services/User/classes/class.ilUserAutoComplete.php';
+        $auto = new ilUserAutoComplete();
+        $auto->setPrivacyMode(ilUserAutoComplete::PRIVACY_MODE_IGNORE_USER_SETTING);
+
+        if (($_REQUEST['fetchall'])) {
+            $auto->setLimit(ilUserAutoComplete::MAX_ENTRIES);
+        }
+
+        $auto->setMoreLinkAvailable(true);
+        $auto->setSearchFields($a_fields);
+        $auto->setResultField($result_field);
+        $auto->enableFieldSearchableCheck(true);
+        $auto->setUserLimitations(false);
+        echo $auto->getList($_REQUEST['term']);
+        exit();
+    }
+
     
     
     /**
@@ -1091,9 +1136,14 @@ class ilCalendarAppointmentGUI
     protected function loadNotificationRecipients()
     {
         $this->notification->setRecipients(array());
-
-        foreach ((array) $_POST['notu'] as $rcp) {
+        $post_data = $_POST['notu'];
+        $map = [];
+        foreach ($post_data as $rcp) {
             $rcp = trim(ilUtil::stripSlashes($rcp));
+            if (in_array($rcp, $map)) {
+                continue;
+            }
+            $map[] = $rcp;
             $usr_id = ilObjUser::_loginExists($rcp);
 
             if (strlen($rcp) == 0) {
@@ -1573,31 +1623,5 @@ class ilCalendarAppointmentGUI
         $assignment = new ilCalendarCategoryAssignments($entry->getEntryId());
         $assignment = $assignment->getFirstAssignment();
         return new ilCalendarCategory($assignment);
-    }
-
-    /**
-     * Do auto completion
-     * @return void
-     */
-    protected function doUserAutoComplete()
-    {
-        if (!isset($_GET['autoCompleteField'])) {
-            $a_fields = array('login','firstname','lastname','email');
-        } else {
-            $a_fields = array((string) $_GET['autoCompleteField']);
-        }
-
-        include_once './Services/User/classes/class.ilUserAutoComplete.php';
-        $auto = new ilUserAutoComplete();
-        $auto->setSearchFields($a_fields);
-        $auto->enableFieldSearchableCheck(true);
-        $auto->setMoreLinkAvailable(true);
-
-        if (($_REQUEST['fetchall'])) {
-            $auto->setLimit(ilUserAutoComplete::MAX_ENTRIES);
-        }
-
-        echo $auto->getList($_REQUEST['query']);
-        exit();
     }
 }

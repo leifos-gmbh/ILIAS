@@ -52,7 +52,8 @@ class ADNProvider extends AbstractNotificationProvider implements NotificationPr
          * @var $adn  AdministrativeNotification
          */
         foreach (ilADNNotification::get() as $item) {
-            $adn = $this->notification_factory->administrative($i((string) $item->getId()))->withTitle($item->getTitle())->withSummary($item->getBody());
+            $adn = $this->notification_factory->administrative($i((string) $item->getId()))->withTitle($item->getTitle())->withSummary(
+                \ilUtil::makeClickable($item->getBody()));
             $adn = $this->handleDenotation($item, $adn);
 
             $is_visible = static function () : bool {

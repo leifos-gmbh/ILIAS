@@ -1,5 +1,4 @@
 <?php
-
 namespace enshrined\svgSanitize;
 
 use enshrined\svgSanitize\data\AllowedAttributes;
@@ -8,7 +7,6 @@ use enshrined\svgSanitize\data\AttributeInterface;
 use enshrined\svgSanitize\data\TagInterface;
 use enshrined\svgSanitize\data\XPath;
 use enshrined\svgSanitize\ElementReference\Resolver;
-use enshrined\svgSanitize\ElementReference\Subject;
 
 /**
  * Class Sanitizer
@@ -208,19 +206,14 @@ class Sanitizer
             return false;
         }
 
-        $this->removeDoctype();
-
         // Pre-process all identified elements
         $xPath = new XPath($this->xmlDocument);
         $this->elementReferenceResolver = new Resolver($xPath, $this->useNestingLimit);
         $this->elementReferenceResolver->collect();
         $elementsToRemove = $this->elementReferenceResolver->getElementsToRemove();
 
-        // Grab all the elements
-        $allElements = $this->xmlDocument->getElementsByTagName("*");
-
         // Start the cleaning proccess
-        $this->startClean($allElements, $elementsToRemove);
+        $this->startClean($this->xmlDocument->childNodes, $elementsToRemove);
 
         // Save cleaned XML to a variable
         if ($this->removeXMLTag) {
@@ -245,8 +238,12 @@ class Sanitizer
      */
     protected function setUpBefore()
     {
-        // Turn off the entity loader
-        $this->xmlLoaderValue = libxml_disable_entity_loader(true);
+        // This function has been deprecated in PHP 8.0 because in libxml 2.9.0, external entity loading is
+        // disabled by default, so this function is no longer needed to protect against XXE attacks.
+        if (\LIBXML_VERSION < 20900) {
+            // Turn off the entity loader
+            $this->xmlLoaderValue = libxml_disable_entity_loader(true);
+        }
 
         // Suppress the errors because we don't really have to worry about formation before cleansing
         libxml_use_internal_errors(true);
@@ -260,20 +257,11 @@ class Sanitizer
      */
     protected function resetAfter()
     {
-        // Reset the entity loader
-        libxml_disable_entity_loader($this->xmlLoaderValue);
-    }
-
-    /**
-     * Remove the XML Doctype
-     * It may be caught later on output but that seems to be buggy, so we need to make sure it's gone
-     */
-    protected function removeDoctype()
-    {
-        foreach ($this->xmlDocument->childNodes as $child) {
-            if ($child->nodeType === XML_DOCUMENT_TYPE_NODE) {
-                $child->parentNode->removeChild($child);
-            }
+        // This function has been deprecated in PHP 8.0 because in libxml 2.9.0, external entity loading is
+        // disabled by default, so this function is no longer needed to protect against XXE attacks.
+        if (\LIBXML_VERSION < 20900) {
+            // Reset the entity loader
+            libxml_disable_entity_loader($this->xmlLoaderValue);
         }
     }
 
@@ -308,33 +296,63 @@ class Sanitizer
                 continue;
             }
 
-            // If the tag isn't in the whitelist, remove it and continue with next iteration
-            if (!in_array(strtolower($currentElement->tagName), $this->allowedTags)) {
-                $currentElement->parentNode->removeChild($currentElement);
-                $this->xmlIssues[] = array(
-                    'message' => 'Suspicious tag \'' . $currentElement->tagName . '\'',
-                    'line' => $currentElement->getLineNo(),
-                );
-                continue;
-            }
-
-            $this->cleanHrefs($currentElement);
-
-            $this->cleanXlinkHrefs($currentElement);
-
-            $this->cleanAttributesOnWhitelist($currentElement);
-
-            if (strtolower($currentElement->tagName) === 'use') {
-                if ($this->isUseTagDirty($currentElement)
-                    || $this->isUseTagExceedingThreshold($currentElement)
-                ) {
+            if ($currentElement instanceof \DOMElement) {
+                // If the tag isn't in the whitelist, remove it and continue with next iteration
+                if (!in_array(strtolower($currentElement->tagName), $this->allowedTags)) {
                     $currentElement->parentNode->removeChild($currentElement);
                     $this->xmlIssues[] = array(
-                        'message' => 'Suspicious \'' . $currentElement->tagName . '\'',
+                        'message' => 'Suspicious tag \'' . $currentElement->tagName . '\'',
                         'line' => $currentElement->getLineNo(),
                     );
                     continue;
                 }
+
+                $this->cleanHrefs( $currentElement );
+
+                $this->cleanXlinkHrefs( $currentElement );
+
+                $this->cleanAttributesOnWhitelist($currentElement);
+
+                if (strtolower($currentElement->tagName) === 'use') {
+                    if ($this->isUseTagDirty($currentElement)
+                        || $this->isUseTagExceedingThreshold($currentElement)
+                    ) {
+                        $currentElement->parentNode->removeChild($currentElement);
+                        $this->xmlIssues[] = array(
+                            'message' => 'Suspicious \'' . $currentElement->tagName . '\'',
+                            'line' => $currentElement->getLineNo(),
+                        );
+                        continue;
+                    }
+                }
+
+                // Strip out font elements that will break out of foreign content.
+                if (strtolower($currentElement->tagName) === 'font') {
+                    $breaksOutOfForeignContent = false;
+                    for ($x = $currentElement->attributes->length - 1; $x >= 0; $x--) {
+                        // get attribute name
+                        $attrName = $currentElement->attributes->item( $x )->name;
+
+                        if (in_array(strtolower($attrName), ['face', 'color', 'size'])) {
+                            $breaksOutOfForeignContent = true;
+                        }
+                    }
+
+                    if ($breaksOutOfForeignContent) {
+                        $currentElement->parentNode->removeChild($currentElement);
+                        $this->xmlIssues[] = array(
+                            'message' => 'Suspicious tag \'' . $currentElement->tagName . '\'',
+                            'line' => $currentElement->getLineNo(),
+                        );
+                        continue;
+                    }
+                }
+            }
+
+            $this->cleanUnsafeNodes($currentElement);
+
+            if ($currentElement->hasChildNodes()) {
+                $this->startClean($currentElement->childNodes, $elementsToRemove);
             }
         }
     }
@@ -424,16 +442,21 @@ class Sanitizer
         }
     }
 
-/**
- * Only allow whitelisted starts to be within the href.
- *
- * This will stop scripts etc from being passed through, with or without attempting to hide bypasses.
- * This stops the need for us to use a complicated script regex.
- *
- * @param $value
- * @return bool
- */
+    /**
+     * Only allow whitelisted starts to be within the href.
+     *
+     * This will stop scripts etc from being passed through, with or without attempting to hide bypasses.
+     * This stops the need for us to use a complicated script regex.
+     *
+     * @param $value
+     * @return bool
+     */
     protected function isHrefSafeValue($value) {
+
+        // Allow empty values
+        if (empty($value)) {
+            return true;
+        }
 
         // Allow fragment identifiers.
         if ('#' === substr($value, 0, 1)) {
@@ -463,7 +486,7 @@ class Sanitizer
             'data:image/jpe', // JPEG
             'data:image/pjp', // PJPEG
         ))) {
-           return true;
+            return true;
         }
 
         // Allow known short data URIs.
@@ -613,5 +636,34 @@ class Sanitizer
     public function setUseNestingLimit($limit)
     {
         $this->useNestingLimit = (int) $limit;
+    }
+
+    /**
+     * Remove nodes that are either invalid or malformed.
+     *
+     * @param \DOMNode $currentElement The current element.
+     */
+    protected function cleanUnsafeNodes(\DOMNode $currentElement) {
+        // Replace CDATA node with encoded text node
+        if ($currentElement instanceof \DOMCdataSection) {
+            $textNode = $currentElement->ownerDocument->createTextNode($currentElement->nodeValue);
+            $currentElement->parentNode->replaceChild($textNode, $currentElement);
+        // If the element doesn't have a tagname, remove it and continue with next iteration
+        } elseif (!$currentElement instanceof \DOMElement && !$currentElement instanceof \DOMText) {
+            $currentElement->parentNode->removeChild($currentElement);
+            $this->xmlIssues[] = array(
+                'message' => 'Suspicious node \'' . $currentElement->nodeName . '\'',
+                'line' => $currentElement->getLineNo(),
+            );
+            return;
+        }
+
+        if ( $currentElement->childNodes && $currentElement->childNodes->length > 0 ) {
+            for ($j = $currentElement->childNodes->length - 1; $j >= 0; $j--) {
+                /** @var \DOMElement $childElement */
+                $childElement = $currentElement->childNodes->item($j);
+                $this->cleanUnsafeNodes($childElement);
+            }
+        }
     }
 }

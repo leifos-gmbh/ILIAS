@@ -32,7 +32,6 @@ class ilNoteGUI
     protected string $only;
     protected StandardGUIRequest $request;
     protected NotesManager $manager;
-    protected bool $enable_hiding = false;
     protected bool $targets_enabled = false;
     protected bool $multi_selection = false;
     protected bool $export_html = false;
@@ -146,7 +145,6 @@ class ilNoteGUI
         } else {
             $this->public_enabled = false;
         }
-        $this->enable_hiding = false;
         $this->targets_enabled = false;
         $this->multi_selection = false;
         $this->export_html = false;
@@ -204,11 +202,6 @@ class ilNoteGUI
         $this->public_deletion_enabled = $a_enable;
     }
 
-    public function enableHiding(bool $a_enable = true) : void
-    {
-        $this->enable_hiding = $a_enable;
-    }
-    
     // enable target objects
     public function enableTargets(bool $a_enable = true) : void
     {
@@ -372,7 +365,7 @@ class ilNoteGUI
             $this->manager->activateComments($this->rep_obj_id, true);
         }
         
-        $ilCtrl->redirectByClass("ilnotegui", "showNotes", "", $this->ajax);
+        $ilCtrl->redirectByClass("ilnotegui", "getNotesHTML", "", $this->ajax);
     }
 
     public function deactivateComments() : void
@@ -383,7 +376,7 @@ class ilNoteGUI
             $this->manager->activateComments($this->rep_obj_id, false);
         }
         
-        $ilCtrl->redirectByClass("ilnotegui", "showNotes", "", $this->ajax);
+        $ilCtrl->redirectByClass("ilnotegui", "getNotesHTML", "", $this->ajax);
     }
 
     public function getNoteListHTML(
@@ -400,9 +393,6 @@ class ilNoteGUI
             ? "private"
             : "public";
         
-        $user_setting_notes_public_all = "y";
-        $user_setting_notes_by_type = "y";
-
         $filter = null;
         if ($this->delete_note || $this->export_html || $this->print) {
             if ($this->requested_note_id > 0) {
@@ -417,7 +407,7 @@ class ilNoteGUI
             $order = false;
         }
 
-        $author_id = ($a_type === Note::PRIVATE || $user_setting_notes_public_all === "n")
+        $author_id = ($a_type === Note::PRIVATE)
             ? $ilUser->getId()
             : 0;
 
@@ -510,34 +500,8 @@ class ilNoteGUI
             $tpl->touchBlock("print_style");
         }
         
-        // show show/hide button for note list
-        if (count($notes) > 0 && $this->enable_hiding && !$this->delete_note
-            && !$this->export_html && !$this->print && !$this->edit_note_form
-            && !$this->add_note_form) {
-            // never individually hide for anonymous users
-            if ($ilUser->getId() !== ANONYMOUS_USER_ID) {
-                if ($a_type === Note::PUBLIC) {
-                    $txt = $lng->txt("notes_hide_comments");
-                } else {
-                    $txt = $lng->txt("hide_" . $suffix . "_notes");
-                }
-                $this->renderLink($tpl, "hide_notes", $txt, "hideNotes", "notes_top");
-
-                // show all public notes / my notes only switch
-                if ($a_type === Note::PUBLIC) {
-                    $this->renderLink(
-                        $tpl,
-                        "my_pub_notes",
-                        $lng->txt("notes_my_comments"),
-                        "showMyPublicNotes",
-                        "notes_top"
-                    );
-                }
-            }
-        }
-        
         // show add new note text area
-        if (!$this->edit_note_form && $user_setting_notes_by_type !== "n" &&
+        if (!$this->edit_note_form &&
             !$this->delete_note && !$this->hide_new_form && $ilUser->getId() !== ANONYMOUS_USER_ID) {
             if ($a_init_form) {
                 $this->initNoteForm("create", $a_type);
@@ -554,187 +518,185 @@ class ilNoteGUI
         }
         
         // list all notes
-        if ($user_setting_notes_by_type !== "n" || !$this->enable_hiding) {
-            $reldates = ilDatePresentation::useRelativeDates();
-            ilDatePresentation::setUseRelativeDates(false);
-            
-            if (!$this->only_latest && $this->enable_sorting && count($notes)) {
-                if ($this->manager->getSortAscending()) {
-                    $sort_txt = $lng->txt("notes_sort_desc");
-                    $sort_cmd = "listSortDesc";
-                } else {
-                    $sort_txt = $lng->txt("notes_sort_asc");
-                    $sort_cmd = "listSortAsc";
-                }
-                $this->renderLink($tpl, "sort_list", $sort_txt, $sort_cmd, $anch);
+        $reldates = ilDatePresentation::useRelativeDates();
+        ilDatePresentation::setUseRelativeDates(false);
+
+        if (!$this->only_latest && $this->enable_sorting && count($notes)) {
+            if ($this->manager->getSortAscending()) {
+                $sort_txt = $lng->txt("notes_sort_desc");
+                $sort_cmd = "listSortDesc";
+            } else {
+                $sort_txt = $lng->txt("notes_sort_asc");
+                $sort_cmd = "listSortAsc";
             }
-            
-            $notes_given = false;
-            foreach ($notes as $note) {
-                if ($this->only_latest && $notes_given) {
-                    continue;
+            $this->renderLink($tpl, "sort_list", $sort_txt, $sort_cmd, $anch);
+        }
+
+        $notes_given = false;
+        foreach ($notes as $note) {
+            if ($this->only_latest && $notes_given) {
+                continue;
+            }
+
+
+            if ($this->edit_note_form &&
+                ($a_type === $this->requested_note_type && $note->getId() === $this->requested_note_id)) {
+                if ($a_init_form) {
+                    $this->initNoteForm("edit", $a_type, $note);
+                }
+                $tpl->setCurrentBlock("edit_note_form");
+                //					$tpl->setVariable("EDIT_FORM", $this->form->getHTML());
+                $tpl->setVariable("EDIT_FORM", $this->form_tpl->get());
+            } else {
+                $cnt_col = 2;
+
+                // delete note stuff for all private notes
+                if (!$this->delete_note
+                    && !$this->export_html && !$this->print
+                    && !$this->edit_note_form && !$this->add_note_form && !$this->no_actions
+                    && $this->checkDeletion($note)) {
+                    $ilCtrl->setParameterByClass("ilnotegui", "note_id", $note->getId());
+                    $this->renderLink(
+                        $tpl,
+                        "delete_note",
+                        $lng->txt("delete"),
+                        "deleteNote",
+                        "note_" . $note->getId()
+                    );
                 }
 
+                // checkboxes in multiselection mode
+                if ($this->multi_selection && !$this->delete_note) {
+                    $tpl->setVariable("CHECKBOX_CLASS", "ilNotesCheckboxes");
+                    $tpl->setCurrentBlock("checkbox_col");
+                    $tpl->setVariable("CHK_NOTE", "note[]");
+                    $tpl->setVariable("CHK_NOTE_ID", $note->getId());
+                    $tpl->parseCurrentBlock();
+                    $cnt_col = 1;
+                }
 
-                if ($this->edit_note_form &&
-                    ($a_type === $this->requested_note_type && $note->getId() === $this->requested_note_id)) {
-                    if ($a_init_form) {
-                        $this->initNoteForm("edit", $a_type, $note);
-                    }
-                    $tpl->setCurrentBlock("edit_note_form");
-                    //					$tpl->setVariable("EDIT_FORM", $this->form->getHTML());
-                    $tpl->setVariable("EDIT_FORM", $this->form_tpl->get());
-                } else {
-                    $cnt_col = 2;
-                    
-                    // delete note stuff for all private notes
-                    if (!$this->delete_note
-                        && !$this->export_html && !$this->print
-                        && !$this->edit_note_form && !$this->add_note_form && !$this->no_actions
-                        && $this->checkDeletion($note)) {
+                // edit note stuff for all private notes
+                if ($this->checkEdit($note)) {
+                    if (!$this->delete_note && !$this->export_html && !$this->print
+                        && !$this->edit_note_form && !$this->add_note_form && !$this->no_actions) {
                         $ilCtrl->setParameterByClass("ilnotegui", "note_id", $note->getId());
                         $this->renderLink(
                             $tpl,
-                            "delete_note",
-                            $lng->txt("delete"),
-                            "deleteNote",
-                            "note_" . $note->getId()
+                            "edit_note",
+                            $lng->txt("edit"),
+                            "editNoteForm",
+                            "note_edit"
                         );
                     }
-                    
-                    // checkboxes in multiselection mode
-                    if ($this->multi_selection && !$this->delete_note) {
-                        $tpl->setVariable("CHECKBOX_CLASS", "ilNotesCheckboxes");
-                        $tpl->setCurrentBlock("checkbox_col");
-                        $tpl->setVariable("CHK_NOTE", "note[]");
-                        $tpl->setVariable("CHK_NOTE_ID", $note->getId());
-                        $tpl->parseCurrentBlock();
-                        $cnt_col = 1;
-                    }
-                    
-                    // edit note stuff for all private notes
-                    if ($this->checkEdit($note)) {
-                        if (!$this->delete_note && !$this->export_html && !$this->print
-                            && !$this->edit_note_form && !$this->add_note_form && !$this->no_actions) {
-                            $ilCtrl->setParameterByClass("ilnotegui", "note_id", $note->getId());
-                            $this->renderLink(
-                                $tpl,
-                                "edit_note",
-                                $lng->txt("edit"),
-                                "editNoteForm",
-                                "note_edit"
-                            );
-                        }
-                    }
-                    
-                    $tpl->setVariable("CNT_COL", $cnt_col);
-                    
-                    // output author account
-                    if ($a_type === Note::PUBLIC && ilObject::_exists($note->getAuthor())) {
-                        //$tpl->setCurrentBlock("author");
-                        //$tpl->setVariable("VAL_AUTHOR", ilObjUser::_lookupLogin($note->getAuthor()));
-                        //$tpl->parseCurrentBlock();
-                        $tpl->setCurrentBlock("user_img");
-                        $tpl->setVariable(
-                            "USR_IMG",
-                            ilObjUser::_getPersonalPicturePath($note->getAuthor(), "xsmall", false, false, $this->user_img_export_html)
-                        );
-                        $tpl->setVariable("USR_ALT", $lng->txt("user_image") . ": " .
-                            ilObjUser::_lookupLogin($note->getAuthor()));
-                        $tpl->parseCurrentBlock();
-                        $tpl->setVariable(
-                            "TXT_USR",
-                            ilUserUtil::getNamePresentation($note->getAuthor(), false, false) . " - "
-                        );
-                    }
-                    
-                    // last edited
-                    if ($note->getUpdateDate() !== null) {
-                        $tpl->setVariable("TXT_LAST_EDIT", $lng->txt("last_edited_on"));
-                        $tpl->setVariable(
-                            "DATE_LAST_EDIT",
-                            ilDatePresentation::formatDate(new ilDate($note->getUpdateDate(), IL_CAL_DATETIME))
-                        );
-                    } else {
-                        $tpl->setVariable(
-                            "VAL_DATE",
-                            ilDatePresentation::formatDate(new ilDate($note->getCreationDate(), IL_CAL_DATETIME))
-                        );
-                    }
-                    
-                    // hidden note ids for deletion
-                    if ($this->delete_note) {
-                        $tpl->setCurrentBlock("delete_ids");
-                        $tpl->setVariable("HID_NOTE", "note[]");
-                        $tpl->setVariable("HID_NOTE_ID", $note->getId());
-                        $tpl->parseCurrentBlock();
-                    }
+                }
 
-                    $tpl->setCurrentBlock("note");
-                    $text = (trim($note->getText()) !== "")
-                        ? nl2br($note->getText())
-                        : "<p class='subtitle'>" . $lng->txt("note_content_removed") . "</p>";
-                    $tpl->setVariable("NOTE_TEXT", $text);
-                    $tpl->setVariable("NOTE_ID", $note->getId());
+                $tpl->setVariable("CNT_COL", $cnt_col);
 
-                    // target objects
+                // output author account
+                if ($a_type === Note::PUBLIC && ilObject::_exists($note->getAuthor())) {
+                    //$tpl->setCurrentBlock("author");
+                    //$tpl->setVariable("VAL_AUTHOR", ilObjUser::_lookupLogin($note->getAuthor()));
+                    //$tpl->parseCurrentBlock();
+                    $tpl->setCurrentBlock("user_img");
                     $tpl->setVariable(
-                        "TARGET_OBJECTS",
-                        $this->renderTargets($note)
+                        "USR_IMG",
+                        ilObjUser::_getPersonalPicturePath($note->getAuthor(), "xsmall", false, false, $this->user_img_export_html)
+                    );
+                    $tpl->setVariable("USR_ALT", $lng->txt("user_image") . ": " .
+                        ilObjUser::_lookupLogin($note->getAuthor()));
+                    $tpl->parseCurrentBlock();
+                    $tpl->setVariable(
+                        "TXT_USR",
+                        ilUserUtil::getNamePresentation($note->getAuthor(), false, false) . " - "
                     );
                 }
-                $tpl->parseCurrentBlock();
-                $tpl->setCurrentBlock("note_row");
-                $tpl->parseCurrentBlock();
-                $notes_given = true;
-            }
-            
-            if (!$notes_given) {
-                $tpl->setCurrentBlock("no_notes");
-                if ($a_type === Note::PUBLIC && !$this->only_latest) {
-                    $tpl->setVariable("NO_NOTES", $lng->txt("notes_no_comments"));
+
+                // last edited
+                if ($note->getUpdateDate() !== null) {
+                    $tpl->setVariable("TXT_LAST_EDIT", $lng->txt("last_edited_on"));
+                    $tpl->setVariable(
+                        "DATE_LAST_EDIT",
+                        ilDatePresentation::formatDate(new ilDate($note->getUpdateDate(), IL_CAL_DATETIME))
+                    );
+                } else {
+                    $tpl->setVariable(
+                        "VAL_DATE",
+                        ilDatePresentation::formatDate(new ilDate($note->getCreationDate(), IL_CAL_DATETIME))
+                    );
                 }
-                $tpl->parseCurrentBlock();
-            }
-            
-            ilDatePresentation::setUseRelativeDates($reldates);
-            
-            // multiple items commands
-            if ($this->multi_selection && !$this->delete_note && !$this->edit_note_form
-                && count($notes) > 0) {
-                if ($a_type === Note::PRIVATE) {
-                    $tpl->setCurrentBlock("delete_cmd");
-                    $tpl->setVariable("TXT_DELETE_NOTES", $this->lng->txt("delete"));
+
+                // hidden note ids for deletion
+                if ($this->delete_note) {
+                    $tpl->setCurrentBlock("delete_ids");
+                    $tpl->setVariable("HID_NOTE", "note[]");
+                    $tpl->setVariable("HID_NOTE_ID", $note->getId());
                     $tpl->parseCurrentBlock();
                 }
-                
-                $tpl->setCurrentBlock("multiple_commands");
-                $tpl->setVariable("TXT_SELECT_ALL", $this->lng->txt("select_all"));
-                $tpl->setVariable("IMG_ARROW", ilUtil::getImagePath("arrow_downright.svg"));
-                $tpl->setVariable("ALT_ARROW", $this->lng->txt("actions"));
-                $tpl->setVariable("TXT_PRINT_NOTES", $this->lng->txt("print"));
-                $tpl->setVariable("TXT_EXPORT_NOTES", $this->lng->txt("exp_html"));
+
+                $tpl->setCurrentBlock("note");
+                $text = (trim($note->getText()) !== "")
+                    ? nl2br($note->getText())
+                    : "<p class='subtitle'>" . $lng->txt("note_content_removed") . "</p>";
+                $tpl->setVariable("NOTE_TEXT", $text);
+                $tpl->setVariable("NOTE_ID", $note->getId());
+
+                // target objects
+                $tpl->setVariable(
+                    "TARGET_OBJECTS",
+                    $this->renderTargets($note)
+                );
+            }
+            $tpl->parseCurrentBlock();
+            $tpl->setCurrentBlock("note_row");
+            $tpl->parseCurrentBlock();
+            $notes_given = true;
+        }
+
+        if (!$notes_given) {
+            $tpl->setCurrentBlock("no_notes");
+            if ($a_type === Note::PUBLIC && !$this->only_latest) {
+                $tpl->setVariable("NO_NOTES", $lng->txt("notes_no_comments"));
+            }
+            $tpl->parseCurrentBlock();
+        }
+
+        ilDatePresentation::setUseRelativeDates($reldates);
+
+        // multiple items commands
+        if ($this->multi_selection && !$this->delete_note && !$this->edit_note_form
+            && count($notes) > 0) {
+            if ($a_type === Note::PRIVATE) {
+                $tpl->setCurrentBlock("delete_cmd");
+                $tpl->setVariable("TXT_DELETE_NOTES", $this->lng->txt("delete"));
                 $tpl->parseCurrentBlock();
             }
 
-            // delete / cancel row
-            if ($this->delete_note) {
-                $tpl->setCurrentBlock("delete_cancel");
-                $tpl->setVariable("TXT_DEL_NOTES", $this->lng->txt("delete"));
-                $tpl->setVariable("TXT_CANCEL_DEL_NOTES", $this->lng->txt("cancel"));
-                $tpl->parseCurrentBlock();
-            }
-            
-            // print
-            if ($this->print) {
-                $tpl->touchBlock("print_js");
-                $tpl->setCurrentBlock("print_back");
-                $tpl->setVariable("LINK_BACK", $this->ctrl->getLinkTarget($this, "showNotes"));
-                $tpl->setVariable("TXT_BACK", $this->lng->txt("back"));
-                $tpl->parseCurrentBlock();
-            }
+            $tpl->setCurrentBlock("multiple_commands");
+            $tpl->setVariable("TXT_SELECT_ALL", $this->lng->txt("select_all"));
+            $tpl->setVariable("IMG_ARROW", ilUtil::getImagePath("arrow_downright.svg"));
+            $tpl->setVariable("ALT_ARROW", $this->lng->txt("actions"));
+            $tpl->setVariable("TXT_PRINT_NOTES", $this->lng->txt("print"));
+            $tpl->setVariable("TXT_EXPORT_NOTES", $this->lng->txt("exp_html"));
+            $tpl->parseCurrentBlock();
         }
-        
+
+        // delete / cancel row
+        if ($this->delete_note) {
+            $tpl->setCurrentBlock("delete_cancel");
+            $tpl->setVariable("TXT_DEL_NOTES", $this->lng->txt("delete"));
+            $tpl->setVariable("TXT_CANCEL_DEL_NOTES", $this->lng->txt("cancel"));
+            $tpl->parseCurrentBlock();
+        }
+
+        // print
+        if ($this->print) {
+            $tpl->touchBlock("print_js");
+            $tpl->setCurrentBlock("print_back");
+            $tpl->setVariable("LINK_BACK", $this->ctrl->getLinkTarget($this, "getNotesHTML"));
+            $tpl->setVariable("TXT_BACK", $this->lng->txt("back"));
+            $tpl->parseCurrentBlock();
+        }
+
         // message
         $mtxt = "";
         switch ($this->requested_note_mess !== "" ? $this->requested_note_mess : $this->note_mess) {
@@ -1108,13 +1070,6 @@ class ilNoteGUI
     public function addNoteForm(
         bool $a_init_form = true
     ) : string {
-        $ilUser = $this->user;
-        
-        $suffix = ($this->requested_note_type === Note::PRIVATE)
-            ? "private"
-            : "public";
-        $ilUser->setPref("notes_" . $suffix, "y");
-
         $this->add_note_form = true;
         return $this->getNotesHTML($a_init_form);
     }
@@ -1167,7 +1122,7 @@ class ilNoteGUI
 
             $ilCtrl->setParameter($this, "note_mess", "mod");
         }
-        $ilCtrl->redirect($this, "showNotes", "notes_top", $this->ajax);
+        $ilCtrl->redirect($this, "getNotesHTML", "notes_top", $this->ajax);
     }
 
     public function updateNote() : void
@@ -1189,7 +1144,7 @@ class ilNoteGUI
             );
             $ilCtrl->setParameter($this, "note_mess", "mod");
         }
-        $ilCtrl->redirect($this, "showNotes", "notes_top", $this->ajax);
+        $ilCtrl->redirect($this, "getNotesHTML", "notes_top", $this->ajax);
     }
     
     /**
@@ -1251,7 +1206,7 @@ class ilNoteGUI
         } else {
             $ilCtrl->setParameter($this, "note_mess", "ntdel");
         }
-        $ilCtrl->redirect($this, "showNotes", "notes_top", $this->ajax);
+        $ilCtrl->redirect($this, "getNotesHTML", "notes_top", $this->ajax);
     }
 
     /**
@@ -1279,54 +1234,6 @@ class ilNoteGUI
         $tpl->setVariable("CONTENT", $this->getNotesHTML());
         echo $tpl->get();
         exit;
-    }
-
-    public function showNotes() : string
-    {
-        $ilUser = $this->user;
-
-        $suffix = ($this->requested_note_type === Note::PRIVATE)
-            ? "private"
-            : "public";
-        $ilUser->writePref("notes_" . $suffix, "y");
-
-        return $this->getNotesHTML();
-    }
-    
-    public function hideNotes() : string
-    {
-        $ilUser = $this->user;
-
-        $suffix = ($this->requested_note_type === Note::PRIVATE)
-            ? "private"
-            : "public";
-        $ilUser->writePref("notes_" . $suffix, "n");
-
-        return $this->getNotesHTML();
-    }
-
-    /**
-     * show all public notes to user
-     */
-    public function showAllPublicNotes() : string
-    {
-        $ilUser = $this->user;
-        
-        $ilUser->writePref("notes_pub_all", "y");
-        
-        return $this->getNotesHTML();
-    }
-
-    /**
-     * show only public notes of user
-     */
-    public function showMyPublicNotes() : string
-    {
-        $ilUser = $this->user;
-        
-        $ilUser->writePref("notes_pub_all", "n");
-        
-        return $this->getNotesHTML();
     }
 
     /**

@@ -54,9 +54,26 @@ class InternalGUIService
         $lng = $this->domain_service->lng();
         $ctrl = $this->ctrl();
 
+        // temporary patch to make this work...
+        global $DIC;
+        $ref_id = $DIC->repository()->internal()->gui()->standardRequest()->getRefId();
+        $type = \ilObject::_lookupType($ref_id, true);
+        switch ($type) {
+            case "cat":
+                $path = ["ilrepositorygui", "ilobjcategorygui", "ilcommonactiondispatchergui", "ilnotegui"];
+                break;
+            case "root":
+                $path = ["ilrepositorygui", "ilobjrootfoldergui", "ilcommonactiondispatchergui", "ilnotegui"];
+                break;
+            case "lm":
+                $path = ["illearningmodulepresentationgui", "ilcommonactiondispatchergui", "ilnotegui"];
+                break;
+        }
+        // ...end patch
+
         if ($ajax_url === "") {
-            $ajax_url = $this->ctrl->getLinkTargetByClass(
-                array("ilcommonactiondispatchergui", "ilnotegui"),
+            $ajax_url = $this->ctrl()->getLinkTargetByClass(
+                $path,
                 "",
                 "",
                 true,

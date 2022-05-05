@@ -33,7 +33,6 @@ class ilNoteGUI
     protected StandardGUIRequest $request;
     protected NotesManager $manager;
     protected bool $targets_enabled = false;
-    protected bool $multi_selection = false;
     protected bool $export_html = false;
     protected bool $print = false;
     protected bool $comments_settings = false;
@@ -41,7 +40,6 @@ class ilNoteGUI
     protected bool $private_enabled;
     protected bool $edit_note_form;
     protected bool $add_note_form;
-    protected bool $anchor_jump;
     protected bool $ajax;
     protected bool $inc_sub;
     protected int $obj_id;
@@ -135,7 +133,6 @@ class ilNoteGUI
         $this->ctrl = $ilCtrl;
         $this->lng = $lng;
         
-        $this->anchor_jump = true;
         $this->add_note_form = false;
         $this->edit_note_form = false;
         $this->private_enabled = false;
@@ -146,7 +143,6 @@ class ilNoteGUI
             $this->public_enabled = false;
         }
         $this->targets_enabled = false;
-        $this->multi_selection = false;
         $this->export_html = false;
         $this->print = false;
         $this->comments_settings = false;
@@ -208,17 +204,6 @@ class ilNoteGUI
         $this->targets_enabled = $a_enable;
     }
 
-    // enable multi selection (checkboxes and commands)
-    public function enableMultiSelection(bool $a_enable = true) : void
-    {
-        $this->multi_selection = $a_enable;
-    }
-
-    public function enableAnchorJump(bool $a_enable = true) : void
-    {
-        $this->anchor_jump = $a_enable;
-    }
-    
     public function setRepositoryMode(bool $a_value) : void
     {
         $this->repository_mode = $a_value;
@@ -311,7 +296,7 @@ class ilNoteGUI
                         "comments_settings",
                         $lng->txt("notes_deactivate_comments"),
                         "deactivateComments",
-                        "notes_top"
+                        ""
                     );
                 }
                 $ntpl->setCurrentBlock("comments_settings2");
@@ -321,7 +306,7 @@ class ilNoteGUI
                     "comments_settings",
                     $lng->txt("notes_activate_comments"),
                     "activateComments",
-                    "notes_top"
+                    ""
                 );
                 $ntpl->setCurrentBlock("comments_settings2");
 
@@ -427,12 +412,6 @@ class ilNoteGUI
 
         $tpl = new ilTemplate("tpl.notes_list.html", true, true, "Services/Notes");
 
-        if ($this->ajax) {
-            $tpl->setCurrentBlock("close_img");
-            $tpl->setVariable("CLOSE_IMG", ilGlyphGUI::get(ilGlyphGUI::CLOSE));
-            $tpl->parseCurrentBlock();
-        }
-        
         // show counter if notes are hidden
         $cnt_str = (count($notes) > 0)
             ? " (" . count($notes) . ")"
@@ -477,9 +456,7 @@ class ilNoteGUI
             $tpl->setVariable("TXT_NOTES", $lng->txt("notes_public_comments") . $cnt_str);
             $ilCtrl->setParameterByClass("ilnotegui", "note_type", Note::PUBLIC);
         }
-        $anch = $this->anchor_jump
-            ? "notes_top"
-            : "";
+        $anch = "";
         if (!$this->only_latest && !$this->hide_new_form) {
             $tpl->setVariable("FORMACTION", $ilCtrl->getFormAction($this, "getNotesHTML", $anch));
             if ($this->ajax) {
@@ -496,10 +473,6 @@ class ilNoteGUI
         }
 
         
-        if ($this->export_html || $this->print) {
-            $tpl->touchBlock("print_style");
-        }
-        
         // show add new note text area
         if (!$this->edit_note_form &&
             !$this->delete_note && !$this->hide_new_form && $ilUser->getId() !== ANONYMOUS_USER_ID) {
@@ -508,12 +481,7 @@ class ilNoteGUI
             }
 
             $tpl->setCurrentBlock("edit_note_form");
-            //			$tpl->setVariable("EDIT_FORM", $this->form->getHTML());
             $tpl->setVariable("EDIT_FORM", $this->form_tpl->get());
-            $tpl->parseCurrentBlock();
-
-            $tpl->parseCurrentBlock();
-            $tpl->setCurrentBlock("note_row");
             $tpl->parseCurrentBlock();
         }
         
@@ -563,16 +531,6 @@ class ilNoteGUI
                         "deleteNote",
                         "note_" . $note->getId()
                     );
-                }
-
-                // checkboxes in multiselection mode
-                if ($this->multi_selection && !$this->delete_note) {
-                    $tpl->setVariable("CHECKBOX_CLASS", "ilNotesCheckboxes");
-                    $tpl->setCurrentBlock("checkbox_col");
-                    $tpl->setVariable("CHK_NOTE", "note[]");
-                    $tpl->setVariable("CHK_NOTE_ID", $note->getId());
-                    $tpl->parseCurrentBlock();
-                    $cnt_col = 1;
                 }
 
                 // edit note stuff for all private notes
@@ -662,38 +620,11 @@ class ilNoteGUI
 
         ilDatePresentation::setUseRelativeDates($reldates);
 
-        // multiple items commands
-        if ($this->multi_selection && !$this->delete_note && !$this->edit_note_form
-            && count($notes) > 0) {
-            if ($a_type === Note::PRIVATE) {
-                $tpl->setCurrentBlock("delete_cmd");
-                $tpl->setVariable("TXT_DELETE_NOTES", $this->lng->txt("delete"));
-                $tpl->parseCurrentBlock();
-            }
-
-            $tpl->setCurrentBlock("multiple_commands");
-            $tpl->setVariable("TXT_SELECT_ALL", $this->lng->txt("select_all"));
-            $tpl->setVariable("IMG_ARROW", ilUtil::getImagePath("arrow_downright.svg"));
-            $tpl->setVariable("ALT_ARROW", $this->lng->txt("actions"));
-            $tpl->setVariable("TXT_PRINT_NOTES", $this->lng->txt("print"));
-            $tpl->setVariable("TXT_EXPORT_NOTES", $this->lng->txt("exp_html"));
-            $tpl->parseCurrentBlock();
-        }
-
         // delete / cancel row
         if ($this->delete_note) {
             $tpl->setCurrentBlock("delete_cancel");
             $tpl->setVariable("TXT_DEL_NOTES", $this->lng->txt("delete"));
             $tpl->setVariable("TXT_CANCEL_DEL_NOTES", $this->lng->txt("cancel"));
-            $tpl->parseCurrentBlock();
-        }
-
-        // print
-        if ($this->print) {
-            $tpl->touchBlock("print_js");
-            $tpl->setCurrentBlock("print_back");
-            $tpl->setVariable("LINK_BACK", $this->ctrl->getLinkTarget($this, "getNotesHTML"));
-            $tpl->setVariable("TXT_BACK", $this->lng->txt("back"));
             $tpl->parseCurrentBlock();
         }
 
@@ -1122,7 +1053,7 @@ class ilNoteGUI
 
             $ilCtrl->setParameter($this, "note_mess", "mod");
         }
-        $ilCtrl->redirect($this, "getNotesHTML", "notes_top", $this->ajax);
+        $ilCtrl->redirect($this, "getNotesHTML", "", $this->ajax);
     }
 
     public function updateNote() : void
@@ -1144,7 +1075,7 @@ class ilNoteGUI
             );
             $ilCtrl->setParameter($this, "note_mess", "mod");
         }
-        $ilCtrl->redirect($this, "getNotesHTML", "notes_top", $this->ajax);
+        $ilCtrl->redirect($this, "getNotesHTML", "", $this->ajax);
     }
     
     /**
@@ -1206,7 +1137,7 @@ class ilNoteGUI
         } else {
             $ilCtrl->setParameter($this, "note_mess", "ntdel");
         }
-        $ilCtrl->redirect($this, "getNotesHTML", "notes_top", $this->ajax);
+        $ilCtrl->redirect($this, "getNotesHTML", "", $this->ajax);
     }
 
     /**
@@ -1217,7 +1148,6 @@ class ilNoteGUI
         $tpl = new ilGlobalTemplate("tpl.main.html", true, true);
 
         $this->export_html = true;
-        $this->multi_selection = false;
         $tpl->setVariable("CONTENT", $this->getNotesHTML());
         ilUtil::deliverData($tpl->get(), "notes.html");
     }
@@ -1230,7 +1160,6 @@ class ilNoteGUI
         $tpl = new ilTemplate("tpl.main.html", true, true);
 
         $this->print = true;
-        $this->multi_selection = false;
         $tpl->setVariable("CONTENT", $this->getNotesHTML());
         echo $tpl->get();
         exit;
@@ -1370,7 +1299,6 @@ class ilNoteGUI
             $tpl->setVariable("GLYPH", $r->render($comps));
             $tpl->setVariable("TXT_LATEST", $lng->txt("notes_latest_comment"));
         }
-
 
         $b = $f->button()->shy($lng->txt("notes_add_edit_comment"), "#")->withAdditionalOnLoadCode(function ($id) use ($hash, $update_url, $widget_el_id) {
             return "$(\"#$id\").click(function(event) { " . self::getListCommentsJSCall($hash, "ilNotes.updateWidget(\"" . $widget_el_id . "\",\"" . $update_url . "\");") . "});";

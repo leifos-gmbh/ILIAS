@@ -77,7 +77,7 @@ class StandardGUIRequest
 
     public function getOnly() : string
     {
-        return $this->str("only");
+        return $this->str("notes_only");
     }
 
     public function getNewsId() : int

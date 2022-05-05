@@ -28,7 +28,7 @@ class ilPDNotesGUI
     public const PRIVATE_NOTES = "privatenotes";
     protected NotesManager $notes_manager;
 
-    protected int $current_rel_obj;
+    protected ?int $current_rel_obj = null;
     protected StandardGUIRequest $request;
 
     protected ilCtrl $ctrl;
@@ -168,7 +168,17 @@ class ilPDNotesGUI
             }
             $first = false;
         }
-        if ($this->current_rel_obj > 0) {
+        $this->current_rel_obj = null;
+        if ($this->current_rel_obj === null) {
+            $notes_gui = new ilNoteGUI(
+                $rel_objs,
+                0,
+                "",
+                true,
+                0,
+                false
+            );
+        } elseif ($this->current_rel_obj > 0) {
             $notes_gui = new ilNoteGUI(
                 $this->current_rel_obj,
                 0,

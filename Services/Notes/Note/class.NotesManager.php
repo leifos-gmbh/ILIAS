@@ -137,6 +137,29 @@ class NotesManager
         );
     }
 
+    /**
+     * Get all notes related to a specific repository object
+     * @param array  $obj_ids
+     * @return Note[]
+     */
+    public function getNotesForRepositoryObjIds(
+        array $obj_ids,
+        int $type = Note::PRIVATE,
+        bool $incl_sub = false,
+        int $author = 0,
+        bool $ascending = false,
+        string $since = ""
+    ) : array {
+        return $this->db_repo->getNotesForObjIds(
+            $obj_ids,
+            $type,
+            $incl_sub,
+            $author,
+            $ascending,
+            $since
+        );
+    }
+
 
     public function getNrOfNotesForContext(
         Context $context,

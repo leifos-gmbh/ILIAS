@@ -66,7 +66,7 @@ class InternalGUIService
                 $path = ["ilrepositorygui", "ilobjrootfoldergui", "ilcommonactiondispatchergui", "ilnotegui"];
                 break;
             case "lm":
-                $path = ["illearningmodulepresentationgui", "ilcommonactiondispatchergui", "ilnotegui"];
+                $path = ["illmpresentationgui", "ilcommonactiondispatchergui", "ilnotegui"];
                 break;
         }
         // ...end patch

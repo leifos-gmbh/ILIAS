@@ -131,7 +131,8 @@ class NoteDBRepository
         bool $ascending = false,
         bool $count = false,
         string $since = "",
-        array $obj_ids = []
+        array $obj_ids = [],
+        string $search_text = ""
     ) : string {
         $db = $this->db;
 
@@ -159,10 +160,23 @@ class NoteDBRepository
             $sub_where .= " AND no_repository = " . $db->quote(!$context->getInRepository(), "integer");
         }
 
-        $fields = $count ? "count(*) cnt" : "*";
-        $query = "SELECT $fields FROM note WHERE " .
+        // search text
+        $join = "";
+        if ($search_text !== "") {
+            $sub_where .= " AND (" . $db->like("note_text", "text", "%" . $search_text . "%");
+            $join = " JOIN usr_data ud ON (author = ud.usr_id)";
+            $join .= " JOIN object_data od ON (rep_obj_id = od.obj_id)";
+            $sub_where .= " OR " . $db->like("ud.lastname", "text", "%" . $search_text . "%");
+            $sub_where .= " OR " . $db->like("ud.firstname", "text", "%" . $search_text . "%");
+            $sub_where .= " OR " . $db->like("ud.login", "text", "%" . $search_text . "%");
+            $sub_where .= " OR " . $db->like("od.title", "text", "%" . $search_text . "%");
+            $sub_where .= ")";
+        }
+
+        $fields = $count ? "count(*) cnt" : "note.*";
+        $query = "SELECT $fields FROM note $join WHERE " .
             $sub_where .
-            " AND type = " . $db->quote($type, "integer") .
+            " AND note.type = " . $db->quote($type, "integer") .
             $author_where .
             $news_where .
             " ORDER BY creation_date ";
@@ -181,7 +195,8 @@ class NoteDBRepository
         bool $incl_sub = false,
         int $author = 0,
         bool $ascending = false,
-        string $since = ""
+        string $since = "",
+        string $search_text = ""
     ) : array {
         $db = $this->db;
 
@@ -192,7 +207,9 @@ class NoteDBRepository
             $author,
             $ascending,
             false,
-            $since
+            $since,
+            [],
+            $search_text
         );
 
         $set = $db->query($query);
@@ -213,7 +230,8 @@ class NoteDBRepository
         bool $incl_sub = false,
         int $author = 0,
         bool $ascending = false,
-        string $since = ""
+        string $since = "",
+        string $search_text = ""
     ) : array {
         $db = $this->db;
 
@@ -225,7 +243,8 @@ class NoteDBRepository
             $ascending,
             false,
             $since,
-            $obj_ids
+            $obj_ids,
+            $search_text
         );
 
         $set = $db->query($query);

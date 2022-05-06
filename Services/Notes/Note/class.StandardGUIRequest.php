@@ -84,4 +84,9 @@ class StandardGUIRequest
     {
         return $this->int("news_id");
     }
+
+    public function getSortation() : string
+    {
+        return $this->str("sortation");
+    }
 }

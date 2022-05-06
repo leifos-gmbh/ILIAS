@@ -1,7 +1,20 @@
+<style type="text/css">
+    @media print {
+        div.il-filter {
+            display:none;
+        }
+        div.il-filter form.il-standard-form {
+            display:none;
+        }
+        main.il-layout-page-content {
+            overflow:hidden;
+        }
+    }
+</style>
 <div class="ilNotesHeader">
 <!-- BEGIN title --><h3 class="ilHeader"><span class="small">{TITLE}</span></h3><!-- END title -->
 </div>
-<div class="ilNotes" id="ilNotes">
+<div id="ilNotes">
 <form {ON_SUBMIT_FORM} {FORM_ID} action="{FORMACTION}" name="cmd" method="post">
 {MESS}
 {WIDGET_HEADER}
@@ -17,52 +30,5 @@
 <!-- END no_notes -->
 	<!-- BEGIN delete_ids --><input type="hidden" name="{HID_NOTE}" value="{HID_NOTE_ID}"/><!-- END delete_ids -->
 {NOTES_LIST}
-<table class="fullwidth_invisible {CHECKBOX_CLASS}" style="clear:both;">
-<!-- BEGIN note_row -->
-<!-- BEGIN note -->
-<tr>
-	<td class="ilNoteList">
-
-	<div class="ilComment">
-		<!-- BEGIN user_img --><div class="ilNotesUImage"><img alt="{USR_ALT}" title="{USR_ALT}" src="{USR_IMG}" /></div><!-- END user_img -->
-		<a id="note_{NOTE_ID}">{EXP_ICON}</a>
-		<span class="small light">{TXT_USR} {TXT_CREATED} {VAL_DATE} {TXT_LAST_EDIT} {DATE_LAST_EDIT}</span>
-		<!-- BEGIN author --><!-- END author -->  
-		<div class="ilNoteText">{VAL_SUBJECT} {NOTE_TEXT}</div>
-		{TARGET_OBJECTS}
-	</div>
-
-	<div class="il_ContainerItemCommands2" style="text-align:right; margin: 3px 0px;">
-		<!-- BEGIN delete_note -->
-		<a class="il_ContainerItemCommand2" {ON_CLICK_DELETE_NOTE} href="{LINK_DELETE_NOTE}">{TXT_DELETE_NOTE}</a>
-		<!-- END delete_note -->
-		<!-- BEGIN edit_note -->
-		<a class="il_ContainerItemCommand2" {ON_CLICK_EDIT_NOTE} href="{LINK_EDIT_NOTE}">{TXT_EDIT_NOTE}</a>
-		<!-- END edit_note -->
-	</div>
-	</td>
-</tr>
-<!-- END note -->
-<!-- END note_row -->
-<!-- BEGIN delete_cancel -->
-<tr>
-	<td>
-		<input type="submit" class="btn btn-default" name="cmd[confirmDelete]" value="{TXT_DEL_NOTES}" />
-		<input type="submit" class="btn btn-default" name="cmd[cancelDelete]" value="{TXT_CANCEL_DEL_NOTES}" />
-	</td>
-</tr>
-<!-- END delete_cancel -->
-</table>
 </form>
 </div>
-<!-- BEGIN print_js -->
-<script type="text/javascript" language="javascript1.2">
-<!--
-	// Do print the page
-	if (typeof(window.print) != 'undefined')
-	{
-		window.print();
-	}
-//-->
-</script>
-<!-- END print_js -->

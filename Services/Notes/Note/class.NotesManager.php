@@ -98,7 +98,8 @@ class NotesManager
         bool $incl_sub = false,
         int $author = 0,
         bool $ascending = false,
-        string $since = ""
+        string $since = "",
+        string $search_text = ""
     ) : array {
         return $this->db_repo->getNotesForContext(
             $context,
@@ -106,7 +107,8 @@ class NotesManager
             $incl_sub,
             $author,
             $ascending,
-            $since
+            $since,
+            $search_text
         );
     }
 
@@ -148,7 +150,8 @@ class NotesManager
         bool $incl_sub = false,
         int $author = 0,
         bool $ascending = false,
-        string $since = ""
+        string $since = "",
+        string $search_text = ""
     ) : array {
         return $this->db_repo->getNotesForObjIds(
             $obj_ids,
@@ -156,7 +159,8 @@ class NotesManager
             $incl_sub,
             $author,
             $ascending,
-            $since
+            $since,
+            $search_text
         );
     }
 

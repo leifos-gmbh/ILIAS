@@ -26,6 +26,10 @@ class ilPDNotesGUI
 {
     public const PUBLIC_COMMENTS = "publiccomments";
     public const PRIVATE_NOTES = "privatenotes";
+    protected string $search_text = "";
+    protected ?\ILIAS\Notes\FilterAdapterGUI $filter = null;
+    protected \ILIAS\Notes\InternalGUIService $gui;
+    protected \ILIAS\DI\UIServices $ui;
     protected NotesManager $notes_manager;
 
     protected ?int $current_rel_obj = null;
@@ -40,6 +44,7 @@ class ilPDNotesGUI
     protected ilToolbarGUI $toolbar;
     public ilGlobalTemplateInterface $tpl;
     public ilLanguage $lng;
+    protected ?array $related_objects = null;
 
     public function __construct()
     {
@@ -56,6 +61,7 @@ class ilPDNotesGUI
         $ilCtrl = $DIC->ctrl();
         $ilUser = $DIC->user();
         $ilHelp = $DIC["ilHelp"];
+        $this->ui = $DIC->ui();
 
         $this->request = $DIC->notes()
             ->internal()
@@ -72,6 +78,7 @@ class ilPDNotesGUI
         $this->ctrl = $ilCtrl;
 
         $this->notes_manager = $DIC->notes()->internal()->domain()->notes();
+        $this->gui = $DIC->notes()->internal()->gui();
 
         // link from ilPDNotesBlockGUI
         $rel_obj = $this->request->getRelatedObjId();
@@ -90,6 +97,14 @@ class ilPDNotesGUI
             $ilUser->writePref("pd_notes_mode", $mode);
             $ilUser->writePref("pd_notes_rel_obj" . $mode, $context->getObjId());
         }
+        $this->readFilter();
+    }
+
+    protected function readFilter() : void
+    {
+        $data = $this->getFilter()->getData();
+        $this->current_rel_obj = $data["object"] ? (int) $data["object"] :  null;
+        $this->search_text = $data["text"] ?? "";
     }
 
     public function executeCommand() : void
@@ -133,6 +148,16 @@ class ilPDNotesGUI
         $this->tpl->setTitle($t);
     }
 
+    protected function getRelatedObjects() : array
+    {
+        if (is_null($this->related_objects)) {
+            $this->related_objects = $this->notes_manager->getRelatedObjectsOfUser(
+                $this->getMode() === self::PRIVATE_NOTES ? Note::PRIVATE : Note::PUBLIC
+            );
+        }
+        return $this->related_objects;
+    }
+
     public function view() : void
     {
         $ilUser = $this->user;
@@ -141,9 +166,8 @@ class ilPDNotesGUI
         $ilAccess = $this->access;
         $ilToolbar = $this->toolbar;
 
-        $rel_objs = $this->notes_manager->getRelatedObjectsOfUser(
-            $this->getMode() === self::PRIVATE_NOTES ? Note::PRIVATE : Note::PUBLIC
-        );
+        $rel_objs = $this->getRelatedObjects();
+        $this->setToolbar();
 
         if ($this->getMode() === self::PRIVATE_NOTES) {
             $rel_objs = array_merge(
@@ -158,17 +182,6 @@ class ilPDNotesGUI
             $this->tpl->setOnScreenMessage('info', $lng->txt("msg_no_search_result"));
             return;
         }
-        $first = true;
-        foreach ($rel_objs as $id) {
-            if ($first) {	// take first one as default
-                $this->current_rel_obj = $id;
-            }
-            if ($id == $ilUser->getPref("pd_notes_rel_obj" . $this->getMode())) {
-                $this->current_rel_obj = $id;
-            }
-            $first = false;
-        }
-        $this->current_rel_obj = null;
         if ($this->current_rel_obj === null) {
             $notes_gui = new ilNoteGUI(
                 $rel_objs,
@@ -176,20 +189,31 @@ class ilPDNotesGUI
                 "",
                 true,
                 0,
-                false
+                false,
+                $this->search_text
             );
         } elseif ($this->current_rel_obj > 0) {
             $notes_gui = new ilNoteGUI(
-                $this->current_rel_obj,
+                [$this->current_rel_obj],
                 0,
-                ilObject::_lookupType($this->current_rel_obj),
+                "",
                 true,
                 0,
-                false
+                false,
+                $this->search_text
             );
         } else {
-            $notes_gui = new ilNoteGUI(0, $ilUser->getId(), "pd", false, 0, false);
+            $notes_gui = new ilNoteGUI(
+                0,
+                $ilUser->getId(),
+                "pd",
+                false,
+                0,
+                false,
+                $this->search_text
+            );
         }
+        $notes_gui->setHideNewForm(true);
         
         if ($this->getMode() === self::PRIVATE_NOTES) {
             $notes_gui->enablePrivateNotes(true);
@@ -219,35 +243,10 @@ class ilPDNotesGUI
         } else {
             $html = $notes_gui->getOnlyCommentsHTML();
         }
-        
-        if (count($rel_objs) > 1 ||
-            ($rel_objs[0] > 0)) {
-            $ilToolbar->setFormAction($this->ctrl->getFormAction($this));
 
-            $options = [];
-            foreach ($rel_objs as $obj_id) {
-                if ($obj_id > 0) {
-                    $type = ilObject::_lookupType($obj_id);
-                    $type_str = $lng->txt("obj_" . $type);
-                    $caption = $type_str . ": " . ilObject::_lookupTitle($obj_id);
-                } else {
-                    $caption = $lng->txt("note_without_object");
-                }
-                $options[$obj_id] = $caption;
-            }
-            
-            $rel = new ilSelectInputGUI($lng->txt("related_to"), "rel_obj");
-            $rel->setOptions($options);
-            $rel->setValue($this->current_rel_obj);
-            $ilToolbar->addStickyItem($rel);
+        $filter_html = $this->getFilter()->render();
 
-            $btn = ilSubmitButton::getInstance();
-            $btn->setCaption('change');
-            $btn->setCommand('changeRelatedObject');
-            $ilToolbar->addStickyItem($btn);
-        }
-        
-        $this->tpl->setContent($html);
+        $this->tpl->setContent($filter_html . $html);
     }
     
     public function changeRelatedObject() : void
@@ -297,50 +296,68 @@ class ilPDNotesGUI
         return self::PRIVATE_NOTES;
     }
 
-    /**
-     * @param
-     * @return
-     */
-    protected function getFilter()
+    protected function setSortation() : void
     {
-        //Step 0: Declare dependencies
-        global $DIC;
-        $ui = $DIC->ui()->factory();
-        $renderer = $DIC->ui()->renderer();
+        $this->notes_manager->setSortAscending($this->gui->standardRequest()->getSortation() === "asc");
+        $this->view();
+    }
 
-        //Step 1: Define some input fields to plug into the filter.
-        $title_input = $ui->input()->field()->text("Title");
-        $select = $ui->input()->field()->select("Selection", ["one" => "One", "two" => "Two", "three" => "Three"]);
-        $with_def = $ui->input()->field()->text("With Default")->withValue("Def.Value");
-        $init_hide = $ui->input()->field()->text("Hidden initially");
-        $number = $ui->input()->field()->numeric("Number");
-        $multi_select = $ui->input()->field()->multiSelect(
-            "Multi Selection",
-            ["one" => "Num One", "two" => "Num Two", "three" => "Num Three", "four" => "Num Four", "five" => "Num Five"]
+    protected function getFilter() : \ILIAS\Notes\FilterAdapterGUI
+    {
+        $gui = $this->gui;
+        $lng = $this->lng;
+        if (is_null($this->filter)) {
+            $options = [];
+            foreach ($this->getRelatedObjects() as $k) {
+                $options[$k] = ilObject::_lookupTitle($k);
+            }
+            $this->filter = $gui->filter("notes_filter", self::class, "view")
+                ->text("text", $lng->txt("notes_text"))
+                ->select("object", $lng->txt("notes_origin"), $options);
+        }
+        return $this->filter;
+    }
+
+    protected function setToolbar() : void
+    {
+        $ctrl = $this->ctrl;
+
+        // sortation
+        $c = $this->lng->txt("create_date") . ", ";
+        $options = [
+            'desc' => $c . $this->lng->txt("sorting_desc"),
+            'asc' => $c . $this->lng->txt("sorting_asc")
+        ];
+        $select_option = ($this->notes_manager->getSortAscending())
+            ? 'asc'
+            : 'desc';
+        $s = $this->ui->factory()->viewControl()->sortation($options)
+               ->withTargetURL($ctrl->getLinkTarget($this, "setSortation"), 'sortation')
+               ->withLabel($options[$select_option]);
+        $this->toolbar->addComponent($s);
+
+        // print selection
+        $pv = $this->gui->print();
+        $modal_elements = $pv->getModalElements(
+            $ctrl->getLinkTarget($this, "printSelection")
         );
+        $this->toolbar->addComponent($modal_elements->button);
+        $this->toolbar->addComponent($modal_elements->modal);
 
-        //Step 2: Define the filter and attach the inputs.
-        $action = $DIC->ctrl()->getLinkTargetByClass("ilsystemstyledocumentationgui", "entries", "", true);
-        $filter = $DIC->uiService()->filter()->standard(
-            "filter_ID",
-            $action,
-            [
-                "title" => $title_input,
-                "select" => $select,
-                "with_def" => $with_def,
-                "init_hide" => $init_hide,
-                "number" => $number,
-                "multi_select" => $multi_select
-            ],
-            [true, true, true, false, true, true],
-            true,
-            true
+        // export html
+        $b = $this->ui->factory()->button()->standard(
+            "Export",
+            $ctrl->getLinkTargetByClass("ilNoteGUI", "exportNotesHTML")
         );
+        $this->toolbar->addComponent($b);
+    }
 
-        //Step 3: Get filter data
-        $filter_data = $DIC->uiService()->filter()->getData($filter);
-
-        //Step 4: Render the filter
-        return $renderer->render($filter) . "Filter Data: " . print_r($filter_data, true);
+    /**
+     * @throws \ILIAS\HTTP\Response\Sender\ResponseSendingException
+     */
+    public function printSelection() : void
+    {
+        $pv = $this->gui->print();
+        $pv->sendForm();
     }
 }

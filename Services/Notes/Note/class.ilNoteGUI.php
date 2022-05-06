@@ -24,6 +24,7 @@ use ILIAS\Notes\Note;
  */
 class ilNoteGUI
 {
+    protected string $search_text;
     protected \ILIAS\Notes\AccessManager $notes_access;
     protected \ILIAS\Notes\InternalDataService $data;
     protected ilWorkspaceAccessHandler $wsp_access_handler;
@@ -92,7 +93,8 @@ class ilNoteGUI
         string $a_obj_type = "",
         bool $a_include_subobjects = false,
         int $a_news_id = 0,
-        bool $ajax = true
+        bool $ajax = true,
+        string $search_text = ""
     ) {
         global $DIC;
 
@@ -105,6 +107,7 @@ class ilNoteGUI
         $ilCtrl = $DIC->ctrl();
         $lng = $DIC->language();
         $this->log = ilLoggerFactory::getLogger('note');
+        $this->search_text = $search_text;
 
         $ns = $DIC->notes()->internal();
         $this->manager = $ns
@@ -167,6 +170,11 @@ class ilNoteGUI
         $this->default_command = $a_val;
     }
     
+    public function setHideNewForm(bool $a_val) : void
+    {
+        $this->hide_new_form = $a_val;
+    }
+
     public function getDefaultCommand() : string
     {
         return $this->default_command;
@@ -423,7 +431,9 @@ class ilNoteGUI
                 $a_type,
                 $this->inc_sub,
                 $author_id,
-                $ascending
+                $ascending,
+                "",
+                $this->search_text
             );
         } else {
             $notes = $this->manager->getNotesForRepositoryObjIds(
@@ -431,7 +441,9 @@ class ilNoteGUI
                 $a_type,
                 $this->inc_sub,
                 $author_id,
-                $ascending
+                $ascending,
+                "",
+                $this->search_text
             );
         }
 
@@ -549,7 +561,7 @@ class ilNoteGUI
             $texts[] = $this->getNoteText($note);
         }
 
-        $it_group_title = (is_array($this->rep_obj_id))
+        $it_group_title = (is_array($this->rep_obj_id) && $last_obj_id)
             ? ilObject::_lookupTitle($last_obj_id)
             : "";
         $item_groups[] = $f->item()->group($it_group_title, $items);
@@ -853,8 +865,6 @@ class ilNoteGUI
         $a_obj_type = $context->getType();
         $a_obj_id = $context->getSubObjId();
 
-        $target_tpl = new ilTemplate("tpl.note_target_object.html", true, true, "Services/Notes");
-
         if ($context->getObjId() > 0) {
 
             // get first visible reference
@@ -1084,19 +1094,6 @@ class ilNoteGUI
         ilUtil::deliverData($tpl->get(), "notes.html");
     }
     
-    /**
-     * notes print view screen
-     */
-    public function printNotes() : void
-    {
-        $tpl = new ilTemplate("tpl.main.html", true, true);
-
-        $this->print = true;
-        $tpl->setVariable("CONTENT", $this->getNotesHTML());
-        echo $tpl->get();
-        exit;
-    }
-
     /**
      * Get list notes js call
      */

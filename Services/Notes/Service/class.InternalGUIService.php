@@ -17,6 +17,7 @@ namespace ILIAS\Notes;
 
 use ILIAS\DI\Container;
 use ILIAS\Repository\GlobalDICGUIServices;
+use ILIAS\Export\PrintProcessGUI;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
@@ -68,6 +69,12 @@ class InternalGUIService
             case "lm":
                 $path = ["illmpresentationgui", "ilcommonactiondispatchergui", "ilnotegui"];
                 break;
+            case "wiki":
+                $path = ["ilwikihandlergui", "ilobjwikigui", "ilcommonactiondispatchergui", "ilnotegui"];
+                break;
+            default:    // not working
+                $path = ["ilcommonactiondispatchergui", "ilnotegui"];
+                break;
         }
         // ...end patch
 
@@ -89,5 +96,35 @@ class InternalGUIService
         \ilYuiUtil::initConnection($tpl);
         $tpl->addJavaScript("./Services/Notes/js/ilNotes.js");
         $tpl->addOnLoadCode("ilNotes.setAjaxUrl('" . $ajax_url . "');");
+    }
+
+    /**
+     * @param array|string $class_path
+     */
+    public function filter(
+        string $filter_id,
+        $class_path,
+        string $cmd,
+        bool $activated = true,
+        bool $expanded = true
+    ) : FilterAdapterGUI {
+        return new FilterAdapterGUI(
+            $filter_id,
+            $class_path,
+            $cmd,
+            $activated,
+            $expanded
+        );
+    }
+
+    public function print() : PrintProcessGUI
+    {
+        $provider = new PrintViewProvider();
+        return new PrintProcessGUI(
+            $provider,
+            $this->http(),
+            $this->ui(),
+            $this->domain_service->lng()
+        );
     }
 }

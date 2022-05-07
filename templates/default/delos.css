@@ -15206,7 +15206,7 @@ td > img[src$="icon_custom.svg"] {
 }
 /* Services/Notes */
 #notes_embedded_outer {
-  background-color: white;
+  /* background-color: @il-main-bg; */
 }
 #notes_embedded_outer .il_ContainerItemCommands {
   padding-top: 15px;

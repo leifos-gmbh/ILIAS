@@ -473,7 +473,7 @@ class ilNoteGUI
             $ilCtrl->setParameterByClass("ilnotegui", "note_type", Note::PUBLIC);
         }
         $anch = "";
-        if (!$this->only_latest && !$this->hide_new_form) {
+        if (!$this->only_latest) {
             $tpl->setVariable("FORMACTION", $ilCtrl->getFormAction($this, "getNotesHTML", $anch));
             if ($this->ajax) {
                 $os = "onsubmit = \"ilNotes.cmdAjaxForm(event, '" .

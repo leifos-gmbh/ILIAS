@@ -347,7 +347,7 @@ class ilDclDetailedViewGUI
     protected function renderComments($edit = false)
     {
         if (!$edit) {
-            return $this->notesGUI->getOnlyCommentsHtml();
+            return $this->notesGUI->getCommentsHtml();
         } else {
             return $this->notesGUI->editNoteForm();
         }

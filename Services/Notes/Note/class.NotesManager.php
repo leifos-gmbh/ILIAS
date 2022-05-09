@@ -259,7 +259,8 @@ class NotesManager
         $this->db_settings_repo->activateComments(
             $obj_id,
             0,
-            \ilObject::_lookupType($obj_id)
+            \ilObject::_lookupType($obj_id),
+            $a_activate
         );
     }
 

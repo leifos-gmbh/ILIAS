@@ -65,16 +65,17 @@ const ilNotes = {
     console.log($("#il_notes_modal").data("status"));
 
     if (comments) {
-      this.sendAjaxGetRequest({ cmd: "getOnlyCommentsHTML", cadh: this.hash },
+      this.sendAjaxGetRequest({ cmd: "getCommentsHTML", cadh: this.hash },
         { mode: 'list_notes' });
     } else {
-      this.sendAjaxGetRequest({ cmd: "getOnlyNotesHTML", cadh: this.hash },
+      this.sendAjaxGetRequest({ cmd: "getNotesHTML", cadh: this.hash },
         { mode: 'list_notes' });
     }
   },
 
   cmdAjaxLink: function (e, url) {
     console.log("cmdAjaxLink");
+    console.log(url);
     e.preventDefault();
     this.sendAjaxGetRequestToUrl(url, {}, { mode: 'cmd' });
   },
@@ -164,9 +165,11 @@ const ilNotes = {
             console.log("setting " + "#il_notes_modal .modal-body");
             $("#il_notes_modal").data("status", "");
             $("#il_notes_modal .modal-body").html(o.responseText);
+            ilNotes.init(document.getElementById("il_notes_modal"));
           } else {
             console.log("setting " + "#notes_embedded_outer");
             $("#notes_embedded_outer").html(o.responseText);
+            ilNotes.init(document.getElementById("notes_embedded_outer"));
           }
           $("#il_notes_modal .modal-header button").focus();
         }
@@ -197,5 +200,32 @@ const ilNotes = {
     console.log(id);
     console.log(url);
     il.Util.ajaxReplace(url, id);
+  },
+
+  init: function (node) {
+    if (node == null) {
+      node = document;
+    }
+
+    // edit form button
+    node.querySelectorAll("[data-note-el='edit-form-area']").forEach(area => {
+      const b = area.querySelector("button");
+      const f = area.querySelector("[data-note-el='edit-form'] form");
+      const fArea = area.querySelector("[data-note-el='edit-form']");
+      b.addEventListener("click", (event) => {
+        fArea.style.display = "";
+        event.target.style.display = 'none';
+      });
+      f.addEventListener("submit", (event) => {
+        event.preventDefault();
+        ilNotes.cmdAjaxForm(event, fArea.dataset.noteFormAction);
+      });
+    });
+
+    // edit form
   }
-};
+}
+
+$(() => {
+  ilNotes.init(null);
+});

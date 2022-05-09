@@ -16776,3 +16776,5 @@ wsp#:#wsp_type_webr#:#Weblink
 wsp#:#wsp_type_wfld#:#Ordner
 notes#:#notes_origin#:#Herkunft
 notes#:#notes_text#:#Text
+notes#:#notes_delete_note#:#Soll die folgende Notiz wirklich gelöscht werden?
+notes#:#notes_delete_comment#:#Soll der folgende Kommentar wirklich gelöscht werden?

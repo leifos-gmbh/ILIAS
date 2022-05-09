@@ -15,20 +15,17 @@
 <!-- BEGIN title --><h3 class="ilHeader"><span class="small">{TITLE}</span></h3><!-- END title -->
 </div>
 <div id="ilNotes">
-<!-- <form {ON_SUBMIT_FORM} {FORM_ID} action="{FORMACTION}" name="cmd" method="post"> -->
-{MESS}
-{WIDGET_HEADER}
-<!-- BEGIN edit_note_form -->
-<a id="note_edit"></a>
-{EDIT_FORM}
-<!-- END edit_note_form -->
-<!-- BEGIN sort_list -->
-<a {ON_CLICK_SORT_LIST} href="{LINK_SORT_LIST}" class="il_ContainerItemCommand2">{TXT_SORT_LIST}</a>
-<!-- END sort_list -->
-<!-- BEGIN no_notes -->
-<div class="small">{NO_NOTES}</div>
-<!-- END no_notes -->
-	<!-- BEGIN delete_ids --><input type="hidden" name="{HID_NOTE}" value="{HID_NOTE_ID}"/><!-- END delete_ids -->
-{NOTES_LIST}
-<!-- </form> -->
+    {MESS}
+    {WIDGET_HEADER}
+    <!-- BEGIN edit_note_form -->
+    <a id="note_edit"></a>
+    <div data-note-el="edit-form-area">
+        {EDIT_FORM_BUTTON}
+        <div data-note-form-action="{EDIT_FORM_ACTION}" data-note-el="edit-form" style="{EDIT_STYLE}">{EDIT_FORM}</div>
+    </div>
+    <!-- END edit_note_form -->
+    <!-- BEGIN no_notes -->
+    <div class="small">{NO_NOTES}</div>
+    <!-- END no_notes -->
+    {NOTES_LIST}
 </div>

@@ -15279,6 +15279,13 @@ div.ilNoteInput {
 .ilNotesCheckboxes .ilNoteList input[type="checkbox"] {
   position: absolute;
 }
+[data-note-el='edit-form-area'] > button {
+  margin-bottom: 9px;
+}
+.modal-body #ilNotes .panel h2,
+.modal-body #ilNotes .panel h3 {
+  display: none;
+}
 /* Modules/Blog */
 div.ilBlogList {
   padding: 10px;
@@ -19778,3 +19785,4 @@ table.mceToolbar td {
     content: "";
   }
 }
+/*# sourceMappingURL=delos.css.map */

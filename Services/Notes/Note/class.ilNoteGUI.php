@@ -24,6 +24,7 @@ use ILIAS\Notes\Note;
  */
 class ilNoteGUI
 {
+    protected \ILIAS\Notes\InternalGUIService $gui;
     protected string $search_text;
     protected \ILIAS\Notes\AccessManager $notes_access;
     protected \ILIAS\Notes\InternalDataService $data;
@@ -117,6 +118,7 @@ class ilNoteGUI
             ->gui()
             ->standardRequest();
         $this->data = $ns->data();
+        $this->gui = $ns->gui();
         $this->notes_access = $ns->domain()->noteAccess();
 
         $lng->loadLanguageModule("notes");
@@ -184,7 +186,6 @@ class ilNoteGUI
     {
         $cmd = $this->ctrl->getCmd($this->getDefaultCommand());
         $next_class = $this->ctrl->getNextClass($this);
-
         switch ($next_class) {
             default:
                 return $this->$cmd();
@@ -490,14 +491,18 @@ class ilNoteGUI
 
         
         // show add new note text area
-        if (!$this->edit_note_form &&
+        if (!$this->edit_note_form && !is_array($this->rep_obj_id) &&
             !$this->delete_note && !$this->hide_new_form && $ilUser->getId() !== ANONYMOUS_USER_ID) {
             if ($a_init_form) {
                 $this->initNoteForm("create", $a_type);
             }
 
             $tpl->setCurrentBlock("edit_note_form");
-            $tpl->setVariable("EDIT_FORM", $this->form_tpl->get());
+            //$tpl->setVariable("EDIT_FORM", $this->form_tpl->get());
+            $tpl->setVariable(
+                "EDIT_FORM",
+                $this->getNoteForm("create", $a_type)->render()
+            );
             $tpl->parseCurrentBlock();
         }
         
@@ -523,10 +528,14 @@ class ilNoteGUI
         if ($this->edit_note_form && $a_type === $this->requested_note_type) {
             $note = $this->manager->getById($this->requested_note_id);
             if ($a_init_form) {
-                $this->initNoteForm("edit", $a_type, $note);
+                //$this->initNoteForm("edit", $a_type, $note);
             }
-            $tpl->setCurrentBlock("edit_note_form");
-            $tpl->setVariable("EDIT_FORM", $this->form_tpl->get());
+            //$tpl->setCurrentBlock("edit_note_form");
+            //$tpl->setVariable("EDIT_FORM", $this->form_tpl->get());
+            $tpl->setVariable(
+                "EDIT_FORM",
+                $this->getNoteForm("create", $a_type, $note)->render()
+            );
             $tpl->parseCurrentBlock();
         }
 
@@ -561,7 +570,7 @@ class ilNoteGUI
             $texts[] = $this->getNoteText($note);
         }
 
-        $it_group_title = (is_array($this->rep_obj_id) && $last_obj_id)
+        $it_group_title = ($last_obj_id)
             ? ilObject::_lookupTitle($last_obj_id)
             : "";
         $item_groups[] = $f->item()->group($it_group_title, $items);
@@ -846,6 +855,29 @@ class ilNoteGUI
         }
     }
 
+    protected function getNoteForm(
+        string $mode,
+        int $type,
+        Note $note = null
+    ) : \ILIAS\Notes\FormAdapterGUI {
+        $label = ($type === Note::PUBLIC)
+            ? $this->lng->txt("comment")
+            : $this->lng->txt("note");
+
+        $cmd = ($mode === "create")
+            ? "addNote"
+            : "updateNote";
+
+        $value = ($note)
+            ? $note->getText()
+            : "";
+
+        $action = $this->ctrl->getFormAction($this, $cmd, "");
+        $form = $this->gui->form(self::class, $action)
+            ->textarea("note", $label, $value);
+        return $form;
+    }
+
     /**
      * show related objects as links
      */
@@ -970,10 +1002,15 @@ class ilNoteGUI
     {
         $ilUser = $this->user;
         $ilCtrl = $this->ctrl;
+
         $this->initNoteForm("create", $this->requested_note_type);
+        $text = $this->request->getNoteText();
+
+        $data = $this->getNoteForm("create", $this->requested_note_type)->getData();
+        $text = $data["note"] ?? "";
 
         //if ($this->form->checkInput())
-        if ($this->request->getNoteText() !== "") {
+        if ($text !== "" && !is_array($this->rep_obj_id)) {
             $context = $this->data->context(
                 $this->rep_obj_id,
                 $this->obj_id,
@@ -984,7 +1021,7 @@ class ilNoteGUI
             $note = $this->data->note(
                 0,
                 $context,
-                $this->request->getNoteText(),
+                $text,
                 $ilUser->getId(),
                 $this->requested_note_type
             );

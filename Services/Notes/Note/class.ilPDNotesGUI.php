@@ -194,9 +194,9 @@ class ilPDNotesGUI
             );
         } elseif ($this->current_rel_obj > 0) {
             $notes_gui = new ilNoteGUI(
-                [$this->current_rel_obj],
+                $this->current_rel_obj,
                 0,
-                "",
+                \ilObject::_lookupType($this->current_rel_obj),
                 true,
                 0,
                 false,
@@ -213,7 +213,7 @@ class ilPDNotesGUI
                 $this->search_text
             );
         }
-        $notes_gui->setHideNewForm(true);
+        //$notes_gui->setHideNewForm(true);
         
         if ($this->getMode() === self::PRIVATE_NOTES) {
             $notes_gui->enablePrivateNotes(true);

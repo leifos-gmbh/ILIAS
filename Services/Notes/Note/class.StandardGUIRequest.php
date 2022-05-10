@@ -89,4 +89,9 @@ class StandardGUIRequest
     {
         return $this->str("sortation");
     }
+
+    public function isFilterCommand() : bool
+    {
+        return ($this->str("cmdFilter") !== "");
+    }
 }

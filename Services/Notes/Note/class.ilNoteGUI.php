@@ -946,7 +946,7 @@ class ilNoteGUI
 
         $ntpl->setVariable("CONTENT", $content);
 
-        if ($ctrl->isAsynch()) {
+        if ($ctrl->isAsynch() && !$this->request->isFilterCommand()) {
             echo $ntpl->get();
             exit;
         }

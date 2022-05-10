@@ -15285,6 +15285,9 @@ div.ilNoteInput {
 .il-notes-section .panel h2 {
   display: none;
 }
+.il-notes-section .il-standard-form-header .il-standard-form-cmd {
+  visibility: hidden;
+}
 /* Modules/Blog */
 div.ilBlogList {
   padding: 10px;

@@ -966,7 +966,7 @@ class ilNoteGUI
             $this->lng->txt("delete"),
             "confirmDelete"
         );
-        $html = $this->renderComponents([$mess, $item, $b1, $b2]);
+        $html = $this->renderComponents([$mess, $item, $b2, $b1]);
         $html = str_replace($this->getNoteTextPlaceholder($note), $this->getNoteText($note), $html);
 
         return $this->renderContent($html);

@@ -948,6 +948,9 @@ class ilNoteGUI
 
     protected function deleteNote() : string
     {
+        $reldates = ilDatePresentation::useRelativeDates();
+        ilDatePresentation::setUseRelativeDates(false);
+
         $f = $this->ui->factory();
         $ctrl = $this->ctrl;
         $ctrl->setParameter($this, "note_id", $this->requested_note_id);
@@ -970,7 +973,14 @@ class ilNoteGUI
             $this->lng->txt("delete"),
             "confirmDelete"
         );
-        $html = $this->renderComponents([$mess, $item, $b2, $b1]);
+
+        $it_group_title = ($note->getContext()->getObjId() > 0)
+            ? ilObject::_lookupTitle($note->getContext()->getObjId())
+            : $this->lng->txt("note_without_object");
+        $item_groups = [$f->item()->group($it_group_title, [$item])];
+        $panel = $f->panel()->listing()->standard("", $item_groups);
+
+        $html = $this->renderComponents([$mess, $panel, $b2, $b1]);
         $html = str_replace($this->getNoteTextPlaceholder($note), $this->getNoteText($note), $html);
 
         return $this->renderContent($html);

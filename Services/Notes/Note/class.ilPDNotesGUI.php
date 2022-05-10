@@ -310,7 +310,13 @@ class ilPDNotesGUI
             foreach ($this->getRelatedObjects() as $k) {
                 $options[$k] = ilObject::_lookupTitle($k);
             }
-            $this->filter = $gui->filter("notes_filter_" . $this->note_type, self::class, "view")
+            $this->filter = $gui->filter(
+                "notes_filter_" . $this->note_type,
+                self::class,
+                "view",
+                false,
+                false
+            )
                 ->text("text", $lng->txt("notes_text"))
                 ->select("object", $lng->txt("notes_origin"), $options);
         }

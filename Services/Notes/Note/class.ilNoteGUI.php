@@ -436,6 +436,10 @@ class ilNoteGUI
                 $ilCtrl->getFormActionByClass("ilnotegui", "addNote", "", true)
             );
             $tpl->setVariable(
+                "TXT_CANCEL",
+                $this->lng->txt("cancel")
+            );
+            $tpl->setVariable(
                 "EDIT_FORM_BUTTON",
                 $this->renderComponents([$b])
             );
@@ -463,6 +467,10 @@ class ilNoteGUI
             $tpl->setVariable(
                 "CANCEL_FORM_ACTION",
                 $ilCtrl->getFormActionByClass("ilnotegui", "cancelUpdateNote", "", true)
+            );
+            $tpl->setVariable(
+                "TXT_CANCEL",
+                $this->lng->txt("cancel")
             );
             $tpl->setVariable(
                 "EDIT_FORM",

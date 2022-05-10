@@ -217,7 +217,7 @@ const ilNotes = {
       // clone cancel from submit button
       let cancelButton = submitButton.cloneNode(true);
       cancelButton = submitButton.parentNode.appendChild(cancelButton);
-      cancelButton.innerHTML = il.Language.txt("cancel");
+      cancelButton.innerHTML = fArea.dataset.noteFormCancelText;
       cancelButton.addEventListener("click", (event) => {
         event.preventDefault();
         if (fArea.dataset.noteFormCancelAction != "") {

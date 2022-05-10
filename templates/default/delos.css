@@ -15285,6 +15285,10 @@ div.ilNoteInput {
 .il-notes-section .panel h2 {
   display: none;
 }
+.il-notes-section .panel .dropdown-menu {
+  right: 0;
+  left: inherit;
+}
 .il-notes-section .il-standard-form-header .il-standard-form-cmd {
   visibility: hidden;
 }

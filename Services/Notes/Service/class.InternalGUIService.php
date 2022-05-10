@@ -90,7 +90,7 @@ class InternalGUIService
         $lng->loadLanguageModule("notes");
         \ilModalGUI::initJS($tpl);
 
-        $lng->toJS(array("private_notes", "notes_public_comments"), $tpl);
+        $lng->toJS(array("private_notes", "notes_public_comments", "cancel"), $tpl);
 
         \iljQueryUtil::initjQuery($tpl);
         \ilYuiUtil::initConnection($tpl);

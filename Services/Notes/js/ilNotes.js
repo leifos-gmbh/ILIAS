@@ -211,7 +211,24 @@ const ilNotes = {
     node.querySelectorAll("[data-note-el='edit-form-area']").forEach(area => {
       const b = area.querySelector("button");
       const f = area.querySelector("[data-note-el='edit-form'] form");
+      const submitButton = area.querySelector("[data-note-el='edit-form'] form .il-standard-form-footer button");
       const fArea = area.querySelector("[data-note-el='edit-form']");
+
+      // clone cancel from submit button
+      let cancelButton = submitButton.cloneNode(true);
+      cancelButton = submitButton.parentNode.appendChild(cancelButton);
+      cancelButton.innerHTML = il.Language.txt("cancel");
+      cancelButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        if (fArea.dataset.noteFormCancelAction != "") {
+          ilNotes.cmdAjaxLink(event, fArea.dataset.noteFormCancelAction);
+        } else {
+          fArea.style.display = 'none';
+          b.style.display = '';
+        }
+      });
+
+      // add listener to "add" comment/note button
       b.addEventListener("click", (event) => {
         fArea.style.display = "";
         event.target.style.display = 'none';

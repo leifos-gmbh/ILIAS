@@ -510,7 +510,10 @@ class ilNoteGUI
                 : $this->lng->txt("note_without_object");
             $item_groups = [$f->item()->group($it_group_title, [])];
             $panel = $f->panel()->listing()->standard("", $item_groups);
-            $mess = $f->messageBox()->info($lng->txt("notes_no_comments"));
+            $mess_txt = ($this->requested_note_type === Note::PRIVATE)
+                ? $lng->txt("notes_no_notes")
+                : $lng->txt("notes_no_comments");
+            $mess = $f->messageBox()->info($mess_txt);
             $html = $this->renderComponents([$panel, $mess]);
             $tpl->setVariable("NOTES_LIST", $html);
         }

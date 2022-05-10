@@ -479,7 +479,10 @@ class ilNoteGUI
 
             $current_obj_id = $note->getContext()->getObjId();
             if ($last_obj_id !== null && $current_obj_id !== $last_obj_id) {
-                $item_groups[] = $f->item()->group(ilObject::_lookupTitle($last_obj_id), $items);
+                $it_group_title = ($last_obj_id)
+                    ? ilObject::_lookupTitle($last_obj_id)
+                    : $this->lng->txt("note_without_object");
+                $item_groups[] = $f->item()->group($it_group_title, $items);
                 $items = [];
             }
             $last_obj_id = $current_obj_id;
@@ -493,7 +496,7 @@ class ilNoteGUI
 
         $it_group_title = ($last_obj_id)
             ? ilObject::_lookupTitle($last_obj_id)
-            : "";
+            : $this->lng->txt("note_without_object");
         $item_groups[] = $f->item()->group($it_group_title, $items);
 
         if ($notes_given) {
@@ -501,12 +504,15 @@ class ilNoteGUI
             $html = $this->renderComponents([$panel]);
             $html = str_replace($text_placeholders, $texts, $html);
             $tpl->setVariable("NOTES_LIST", $html);
-        } else {
-            $tpl->setCurrentBlock("no_notes");
-            if ($a_type === Note::PUBLIC && !$this->only_latest) {
-                $tpl->setVariable("NO_NOTES", $lng->txt("notes_no_comments"));
-            }
-            $tpl->parseCurrentBlock();
+        } elseif (!is_array($this->rep_obj_id)) {
+            $it_group_title = ($this->rep_obj_id > 0)
+                ? ilObject::_lookupTitle($this->rep_obj_id)
+                : $this->lng->txt("note_without_object");
+            $item_groups = [$f->item()->group($it_group_title, [])];
+            $panel = $f->panel()->listing()->standard("", $item_groups);
+            $mess = $f->messageBox()->info($lng->txt("notes_no_comments"));
+            $html = $this->renderComponents([$panel, $mess]);
+            $tpl->setVariable("NOTES_LIST", $html);
         }
 
         ilDatePresentation::setUseRelativeDates($reldates);

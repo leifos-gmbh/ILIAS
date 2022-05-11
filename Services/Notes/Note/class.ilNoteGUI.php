@@ -533,12 +533,24 @@ class ilNoteGUI
             $it_group_title = $this->getItemGroupTitle($this->rep_obj_id);
             $item_groups = [$f->item()->group($it_group_title, [])];
             $panel = $f->panel()->listing()->standard("", $item_groups);
-            $mess_txt = ($this->requested_note_type === Note::PRIVATE)
-                ? $lng->txt("notes_no_notes")
-                : $lng->txt("notes_no_comments");
+            if ($this->search_text === "") {
+                $mess_txt = ($this->requested_note_type === Note::PRIVATE)
+                    ? $lng->txt("notes_no_notes")
+                    : $lng->txt("notes_no_comments");
+            } else {
+                $mess_txt = ($this->requested_note_type === Note::PRIVATE)
+                    ? $lng->txt("notes_no_notes_found")
+                    : $lng->txt("notes_no_comments_found");
+            }
             $mess = $f->messageBox()->info($mess_txt);
             $html = $this->renderComponents([$panel, $mess]);
             $tpl->setVariable("NOTES_LIST", $html);
+        } elseif ($this->search_text !== "") {
+            $mess_txt = ($this->requested_note_type === Note::PRIVATE)
+                ? $lng->txt("notes_no_notes_found")
+                : $lng->txt("notes_no_comments_found");
+            $mess = $f->messageBox()->info($mess_txt);
+            $tpl->setVariable("NOTES_LIST", $this->renderComponents([$mess]));
         }
 
         ilDatePresentation::setUseRelativeDates($reldates);
@@ -597,7 +609,7 @@ class ilNoteGUI
     {
         if (!is_array($this->rep_obj_id) && !$this->getUseObjectTitleHeader()) {
             $it_group_title = ($this->requested_note_type === Note::PRIVATE)
-                ? $this->lng->txt("notes_notes")
+                ? $this->lng->txt("notes")
                 : $this->lng->txt("notes_comments");
         } else {
             $it_group_title = ($obj_id)

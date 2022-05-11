@@ -16780,3 +16780,5 @@ notes#:#notes_delete_note#:#Soll die folgende Notiz wirklich gelöscht werden?
 notes#:#notes_delete_comment#:#Soll der folgende Kommentar wirklich gelöscht werden?
 notes#:#notes_no_notes#:#Bisher wurde noch kein Notiz hinzugefügt.
 notes#:#notes_html_export#:#HTML Export
+notes#:#notes_no_notes_found#:#Es wurden keine Notizen gefunden, die den Suchkriterien entsprechen.
+notes#:#notes_no_comments_found#:#Es wurden keine Kommentare gefunden, die den Suchkriterien entsprechen.

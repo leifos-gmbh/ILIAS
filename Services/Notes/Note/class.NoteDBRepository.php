@@ -145,8 +145,8 @@ class NoteDBRepository
             : " " . $db->in("rep_obj_id", $obj_ids, false, "integer");
 
         $sub_where .= ($context && !$incl_sub)
-            ? " AND obj_id = " . $db->quote($context->getSubObjId(), "integer") .
-            " AND obj_type = " . $db->quote($context->getType(), "text")
+            ? " AND note.obj_id = " . $db->quote($context->getSubObjId(), "integer") .
+            " AND note.obj_type = " . $db->quote($context->getType(), "text")
             : "";
 
         if ($since !== "") {
@@ -165,7 +165,7 @@ class NoteDBRepository
         if ($search_text !== "") {
             $sub_where .= " AND (" . $db->like("note_text", "text", "%" . $search_text . "%");
             $join = " JOIN usr_data ud ON (author = ud.usr_id)";
-            $join .= " JOIN object_data od ON (rep_obj_id = od.obj_id)";
+            $join .= " LEFT JOIN object_data od ON (rep_obj_id = od.obj_id)";
             $sub_where .= " OR " . $db->like("ud.lastname", "text", "%" . $search_text . "%");
             $sub_where .= " OR " . $db->like("ud.firstname", "text", "%" . $search_text . "%");
             $sub_where .= " OR " . $db->like("ud.login", "text", "%" . $search_text . "%");
@@ -181,7 +181,6 @@ class NoteDBRepository
             $news_where .
             " ORDER BY creation_date ";
         $query .= ($ascending) ? "ASC" : "DESC";
-
         return $query;
     }
 

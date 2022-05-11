@@ -121,7 +121,7 @@ class NotesHtmlExport
         $tpl = $this->getInitialisedTemplate();
 
         $tpl->setTitle(($this->type === Note::PRIVATE)
-            ? $this->lng->txt("notes_notes")
+            ? $this->lng->txt("notes")
             : $this->lng->txt("notes_comments"));
 
         $this->writeExportFile("index.html", $tpl, $content);

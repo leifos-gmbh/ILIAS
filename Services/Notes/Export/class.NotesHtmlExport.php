@@ -16,6 +16,7 @@
 namespace ILIAS\Notes\Export;
 
 use ilFileUtils;
+use ILIAS\Notes\Note;
 
 /**
  * This exports the whole
@@ -25,6 +26,9 @@ use ilFileUtils;
 class NotesHtmlExport
 {
     protected static $export_key_set = false;
+    protected \ilLanguage $lng;
+    protected int $user_id;
+    protected int $type;
     /**
      * @var int[]
      */
@@ -36,13 +40,17 @@ class NotesHtmlExport
     protected \ILIAS\Services\Export\HTML\Util $export_util;
 
     public function __construct(
+        int $type,
         int $user_id,
         array $author_ids
     ) {
         global $DIC;
 
+        $this->type = $type;
         $this->author_ids = $author_ids;
         $this->user_id = $user_id;
+        $this->lng = $DIC->language();
+
         \ilExport::_createExportDirectory($user_id, "html_notes", "usr");
         $exp_dir = \ilExport::_getExportDirectory($user_id, "html_notes", "usr");
         $sub_dir = "user_notes";
@@ -111,6 +119,11 @@ class NotesHtmlExport
         string $content
     ) : void {
         $tpl = $this->getInitialisedTemplate();
+
+        $tpl->setTitle(($this->type === Note::PRIVATE)
+            ? $this->lng->txt("notes_notes")
+            : $this->lng->txt("notes_comments"));
+
         $this->writeExportFile("index.html", $tpl, $content);
     }
 

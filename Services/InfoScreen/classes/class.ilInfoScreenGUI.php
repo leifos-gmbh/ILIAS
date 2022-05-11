@@ -954,6 +954,7 @@ class ilInfoScreenGUI
             0,
             $this->gui_object->getObject()->getType()
         );
+        $notes_gui->setUseObjectTitleHeader(false);
         
         // global switch
         if ($ilSetting->get("disable_comments")) {

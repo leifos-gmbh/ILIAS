@@ -24,6 +24,10 @@ use ILIAS\Notes\Note;
  */
 class ilNoteGUI
 {
+    /**
+     * @var Note[]
+     */
+    protected ?array $notes = null;
     protected \ILIAS\Notes\InternalGUIService $gui;
     protected string $search_text;
     protected \ILIAS\Notes\AccessManager $notes_access;
@@ -77,6 +81,7 @@ class ilNoteGUI
     protected bool $delete_note = false;
     protected string $note_mess = "";
     protected array $item_list_gui = [];
+    protected bool $use_obj_title_header = true;
 
     /**
      * @param int|int[]    $a_rep_obj_id object id of repository object (0 for personal desktop)
@@ -164,7 +169,17 @@ class ilNoteGUI
         $this->requested_note_mess = $this->request->getNoteMess();
         $this->requested_news_id = $this->request->getNewsId();
     }
-    
+
+    public function setUseObjectTitleHeader(bool $a_val) : void
+    {
+        $this->use_obj_title_header = $a_val;
+    }
+
+    public function getUseObjectTitleHeader() : bool
+    {
+        return $this->use_obj_title_header;
+    }
+
     public function setDefaultCommand(string $a_val) : void
     {
         $this->default_command = $a_val;
@@ -324,65 +339,78 @@ class ilNoteGUI
         $ilCtrl->redirectByClass("ilnotegui", "getCommentsHTML", "", $this->ajax);
     }
 
+    /**
+     * @return Note[]
+     */
+    protected function getNotes(int $a_type) : array
+    {
+        if ($this->notes === null) {
+            $ilUser = $this->user;
+            $filter = null;
+            if ($this->export_html || $this->print) {
+                if ($this->requested_note_id > 0) {
+                    $filter = $this->requested_note_id;
+                } else {
+                    $filter = $this->request->getNoteText();
+                }
+            }
+
+            $ascending = $this->manager->getSortAscending();
+            if ($this->only_latest) {
+                $order = false;
+            }
+            $author_id = ($a_type === Note::PRIVATE)
+                ? $ilUser->getId()
+                : 0;
+
+            if (!is_array($this->rep_obj_id)) {
+                $notes = $this->manager->getNotesForContext(
+                    $this->data->context(
+                        $this->rep_obj_id,
+                        $this->obj_id,
+                        $this->obj_type,
+                        $this->news_id,
+                        $this->repository_mode
+                    ),
+                    $a_type,
+                    $this->inc_sub,
+                    $author_id,
+                    $ascending,
+                    "",
+                    $this->search_text
+                );
+            } else {
+                $notes = $this->manager->getNotesForRepositoryObjIds(
+                    $this->rep_obj_id,
+                    $a_type,
+                    $this->inc_sub,
+                    $author_id,
+                    $ascending,
+                    "",
+                    $this->search_text
+                );
+            }
+            $this->notes = $notes;
+        }
+        return $this->notes;
+    }
+
     public function getNoteListHTML(
         int $a_type = Note::PRIVATE,
         bool $a_init_form = true
     ) : string {
         $lng = $this->lng;
         $ilCtrl = $this->ctrl;
-        $ilUser = $this->user;
         $f = $this->ui->factory();
+        $ilUser = $this->user;
 
         $mtype = "";
 
         $suffix = ($a_type === Note::PRIVATE)
             ? "private"
             : "public";
-        
-        $filter = null;
-        if ($this->export_html || $this->print) {
-            if ($this->requested_note_id > 0) {
-                $filter = $this->requested_note_id;
-            } else {
-                $filter = $this->request->getNoteText();
-            }
-        }
 
-        $ascending = $this->manager->getSortAscending();
-        if ($this->only_latest) {
-            $order = false;
-        }
-        $author_id = ($a_type === Note::PRIVATE)
-            ? $ilUser->getId()
-            : 0;
-
-        if (!is_array($this->rep_obj_id)) {
-            $notes = $this->manager->getNotesForContext(
-                $this->data->context(
-                    $this->rep_obj_id,
-                    $this->obj_id,
-                    $this->obj_type,
-                    $this->news_id,
-                    $this->repository_mode
-                ),
-                $a_type,
-                $this->inc_sub,
-                $author_id,
-                $ascending,
-                "",
-                $this->search_text
-            );
-        } else {
-            $notes = $this->manager->getNotesForRepositoryObjIds(
-                $this->rep_obj_id,
-                $a_type,
-                $this->inc_sub,
-                $author_id,
-                $ascending,
-                "",
-                $this->search_text
-            );
-        }
+        $notes = $this->getNotes($a_type);
 
         $tpl = new ilTemplate("tpl.notes_list.html", true, true, "Services/Notes");
 
@@ -407,18 +435,7 @@ class ilNoteGUI
             $ilCtrl->setParameterByClass("ilnotegui", "note_type", Note::PUBLIC);
         }
         $anch = "";
-        /*
-        if (!$this->only_latest) {
-            $tpl->setVariable("FORMACTION", $ilCtrl->getFormAction($this, "getListHTML", $anch));
-            if ($this->ajax) {
-                $os = "onsubmit = \"ilNotes.cmdAjaxForm(event, '" .
-                    $ilCtrl->getFormActionByClass("ilnotegui", "", "", true) .
-                    "'); return false;\"";
-                $tpl->setVariable("ON_SUBMIT_FORM", $os);
-            }
-        }*/
 
-        
         // show add new note text area
         if (!$this->edit_note_form && !is_array($this->rep_obj_id) &&
             !$this->hide_new_form && $ilUser->getId() !== ANONYMOUS_USER_ID) {
@@ -491,9 +508,7 @@ class ilNoteGUI
 
             $current_obj_id = $note->getContext()->getObjId();
             if ($last_obj_id !== null && $current_obj_id !== $last_obj_id) {
-                $it_group_title = ($last_obj_id)
-                    ? ilObject::_lookupTitle($last_obj_id)
-                    : $this->lng->txt("note_without_object");
+                $it_group_title = $this->getItemGroupTitle($last_obj_id);
                 $item_groups[] = $f->item()->group($it_group_title, $items);
                 $items = [];
             }
@@ -506,9 +521,7 @@ class ilNoteGUI
             $texts[] = $this->getNoteText($note);
         }
 
-        $it_group_title = ($last_obj_id)
-            ? ilObject::_lookupTitle($last_obj_id)
-            : $this->lng->txt("note_without_object");
+        $it_group_title = $this->getItemGroupTitle((int) $last_obj_id);
         $item_groups[] = $f->item()->group($it_group_title, $items);
 
         if ($notes_given) {
@@ -517,9 +530,7 @@ class ilNoteGUI
             $html = str_replace($text_placeholders, $texts, $html);
             $tpl->setVariable("NOTES_LIST", $html);
         } elseif (!is_array($this->rep_obj_id)) {
-            $it_group_title = ($this->rep_obj_id > 0)
-                ? ilObject::_lookupTitle($this->rep_obj_id)
-                : $this->lng->txt("note_without_object");
+            $it_group_title = $this->getItemGroupTitle($this->rep_obj_id);
             $item_groups = [$f->item()->group($it_group_title, [])];
             $panel = $f->panel()->listing()->standard("", $item_groups);
             $mess_txt = ($this->requested_note_type === Note::PRIVATE)
@@ -580,6 +591,20 @@ class ilNoteGUI
         }
 
         return $tpl->get();
+    }
+
+    protected function getItemGroupTitle(int $obj_id = 0) : string
+    {
+        if (!is_array($this->rep_obj_id) && !$this->getUseObjectTitleHeader()) {
+            $it_group_title = ($this->requested_note_type === Note::PRIVATE)
+                ? $this->lng->txt("notes_notes")
+                : $this->lng->txt("notes_comments");
+        } else {
+            $it_group_title = ($obj_id)
+                ? ilObject::_lookupTitle($obj_id)
+                : $this->lng->txt("note_without_object");
+        }
+        return $it_group_title;
     }
 
     /**
@@ -982,9 +1007,7 @@ class ilNoteGUI
             "confirmDelete"
         );
 
-        $it_group_title = ($note->getContext()->getObjId() > 0)
-            ? ilObject::_lookupTitle($note->getContext()->getObjId())
-            : $this->lng->txt("note_without_object");
+        $it_group_title = $this->getItemGroupTitle($note->getContext()->getObjId());
         $item_groups = [$f->item()->group($it_group_title, [$item])];
         $panel = $f->panel()->listing()->standard("", $item_groups);
 
@@ -1031,7 +1054,14 @@ class ilNoteGUI
         //$tpl->setVariable("CONTENT", $this->getListHTML());
         //ilUtil::deliverData($tpl->get(), "notes.html");
 
-        $export = new \ILIAS\Notes\Export\NotesHtmlExport($this->user->getId(), []);
+        $authors = array_unique(array_map(function (Note $note) {
+            return $note->getAuthor();
+        }, $this->getNotes($this->requested_note_type)));
+        $export = new \ILIAS\Notes\Export\NotesHtmlExport(
+            $this->requested_note_type,
+            $this->user->getId(),
+            $authors
+        );
         $export->exportHTML($this->getListHTML());
     }
     

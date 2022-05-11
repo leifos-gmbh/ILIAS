@@ -948,6 +948,7 @@ class ilLMPresentationGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInt
             return "";
         }
         $notes_gui = new ilNoteGUI($this->lm->getId(), $this->getCurrentPageId(), "pg");
+        $notes_gui->setUseObjectTitleHeader(false);
 
         if ($ilAccess->checkAccess("write", "", $this->requested_ref_id) &&
             $ilSetting->get("comments_del_tutor", '1')) {

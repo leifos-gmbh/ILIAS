@@ -1028,8 +1028,11 @@ class ilNoteGUI
         $tpl = new ilGlobalTemplate("tpl.main.html", true, true);
 
         $this->export_html = true;
-        $tpl->setVariable("CONTENT", $this->getListHTML());
-        ilUtil::deliverData($tpl->get(), "notes.html");
+        //$tpl->setVariable("CONTENT", $this->getListHTML());
+        //ilUtil::deliverData($tpl->get(), "notes.html");
+
+        $export = new \ILIAS\Notes\Export\NotesHtmlExport($this->user->getId(), []);
+        $export->exportHTML($this->getListHTML());
     }
     
     /**

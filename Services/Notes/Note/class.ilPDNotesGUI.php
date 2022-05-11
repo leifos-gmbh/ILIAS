@@ -351,7 +351,7 @@ class ilPDNotesGUI
 
         // export html
         $b = $this->ui->factory()->button()->standard(
-            "Export",
+            $this->lng->txt("notes_html_export"),
             $ctrl->getLinkTargetByClass("ilNoteGUI", "exportNotesHTML")
         );
         $this->toolbar->addComponent($b);

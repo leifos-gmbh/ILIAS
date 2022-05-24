@@ -50,6 +50,7 @@ class ilSurveyEvaluationGUI
     protected ?int $appr_id = null;
     protected ?\ILIAS\Survey\Mode\UIModifier $ui_modifier = null;
     protected \ILIAS\Survey\Evaluation\EvaluationGUIRequest $request;
+    protected \ILIAS\Skill\Service\SkillProfileService $skill_profile_service;
     
     public function __construct(
         ilObjSurvey $a_object
@@ -107,6 +108,7 @@ class ilSurveyEvaluationGUI
                 $this->object->getRefId(),
                 $DIC->user()->getId()
             );
+        $this->skill_profile_service = $DIC->skills()->profile();
     }
     
     public function executeCommand() : string
@@ -1145,9 +1147,9 @@ class ilSurveyEvaluationGUI
 
         // get matching user competence profiles
         // -> add gap analysis to profile
-        $profiles = ilSkillProfile::getProfilesOfUser($appr_id);
+        $profiles = $this->skill_profile_service->getProfilesOfUser($appr_id);
         foreach ($profiles as $p) {
-            $prof = new ilSkillProfile($p["id"]);
+            $prof = $this->skill_profile_service->getById($p["id"]);
             $prof_levels = $prof->getSkillLevels();
             foreach ($prof_levels as $pl) {
                 if (isset($skills[$pl["base_skill_id"] . ":" . $pl["tref_id"]])) {

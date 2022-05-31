@@ -1,4 +1,16 @@
-/* Copyright (c) 1998-2021 ILIAS open source eLearning e.V., Extended GPL, see docs/LICENSE */
+* This file is part of ILIAS, a powerful learning management system
+* published by ILIAS open source e-Learning e.V.
+*
+* ILIAS is licensed with the GPL-3.0,
+* see https://www.gnu.org/licenses/gpl-3.0.en.html
+* You should have received a copy of said license along with the
+* source code, too.
+*
+* If this is not the case or you just want to try ILIAS, you'll find
+* us at:
+* https://www.ilias.de
+* https://github.com/ILIAS-eLearning
+*
 /**
 * ILIAS language file
 *
@@ -1388,7 +1400,9 @@ assessment#:#tst_finish_notification_desc#:#Sends an e-mail to the test owner fo
 assessment#:#tst_finished#:#Finished
 assessment#:#unfinished_passes#:#Unfinished Passes
 assessment#:#finish_pass_for_user_confirmation#:#Are you sure you want to finish this test pass for the participant "%s"?
+assessment#:#finish_pass_for_user_in_processing_time#:#WARNING: the processing time for this user is not over yet! You should only end the test run if there is a compelling reason (e.g. exclusion from the test).
 assessment#:#finish_pass_for_all_users#:#Are you sure you want to finish the test passes for all Users?
+assessment#:#finish_pass_for_all_users_in_processing_time#:#You cannot finish the passes of all users together, because for at least one user the processing time is not over yet.
 assessment#:#finish_all_user_passes#:#Finish all Test Passes
 assessment#:#finish_unfinished_passes#:#Finish Open Passes
 assessment#:#finish_unfinished_passes_desc#:#Passes which have a finishing time or a duration limit configured will be closed by this cron job.
@@ -1983,6 +1997,7 @@ common#:#withdraw_consent_header#:#Revoke acceptance to terms of service
 common#:#withdraw_consent_description_internal#:#Please log in again to complete the revocation process.
 common#:#withdraw_consent_description_external#:#Please return to your source installation and log in again to complete the revocation process.
 common#:#withdraw_consent#:#Withdraw Acceptance
+common#:#refuse_tos_acceptance#:#Refuse to Accept Terms of Service
 common#:#withdraw_consent_info_internal#:#If you confirm here, your account will be deleted.
 common#:#withdraw_consent_info_external#:#Please notify the administrator of your authentication system and inform them about your intention to revoke your acceptance to the terms of service.
 common#:#withdraw_consent_description#:#Withdraw your acceptance to the terms of service here
@@ -2293,10 +2308,10 @@ common#:#changed_to#:#changed to
 common#:#changing_loginname_not_possible_info#:#You changed your login name at last at %s. The next change can be performed at %s.
 common#:#chapter#:#Chapter
 common#:#characters#:#characters
-common#:#chat_enter_public_room_tooltip#:#Enter public chat.
-common#:#chat_enter_public_room#:#Public Chat
-common#:#chat_invite_public_room_tooltip#:#Invite to public chat.
-common#:#chat_invite_public_room#:#Public Chat
+common#:#chat_enter_public_room_tooltip#:#Enter public chat room
+common#:#chat_enter_public_room#:#Public Chat Room
+common#:#chat_invite_public_room_tooltip#:#Invite to public chat room
+common#:#chat_invite_public_room#:#Public Chat Room
 chatroom#:#chat_settings#:#Chat Settings
 chatroom#:#chat_use_osc#:#Using On-Screen-Chat
 chatroom#:#chat_not_use_osc#:#Not Using On-Screen-Chat
@@ -3788,8 +3803,8 @@ common#:#shib_email#:#Attribute for e-mail address
 common#:#shib_federation_name#:#Name of your Shibboleth federation
 common#:#shib_firstname#:#Attribute for first name
 common#:#shib_gender#:#Attribute for salutation (must be ‘n’, ‘m’ or ‘f’)
-common#:#shib_general_login_instructions#:#To log in via %s, please click on the login button and choose your organization of the following page.<br>If you have questions concerning this, please ask the
-common#:#shib_general_wayf_login_instructions#:#In case you are not associated with the given organizations and you need access to a course on this server, please contact the
+common#:#shib_general_login_instructions#:#To log in via %s, please click on the login button and choose your organization of the following page.<br>If you have questions concerning this, please ask the %s
+common#:#shib_general_wayf_login_instructions#:#In case you are not associated with the given organizations and you need access to a course on this server, please contact the %s
 common#:#shib_idp_list#:#Provide a list of Identity Providers to let the user choose from on the ILIAS login page.<br>On each line there must be a comma-separated tuple for <strong>providerID of IdP</strong> (see the Shibboleth metadata file) and <strong>Name of IdP</strong> as it shall be displayed in the drop-down list.<br>As an optional third parameter you can add the <strong>location of a Shibboleth session initiator</strong> that shall be used in case your ILIAS installation is part of a multi federation setup.
 common#:#shib_institution#:#Attribute for institution
 common#:#shib_invalid_home_organization#:#Please choose a valid organization!
@@ -4576,6 +4591,7 @@ content#:#cont_pc_hacc#:#Accordion (Horizontal)
 content#:#cont_pc_incl#:#Content Snippet
 content#:#cont_pc_list#:#Advanced List
 content#:#cont_pc_map#:#Map
+content#:#cont_pc_media#:#Image/Media
 content#:#cont_pc_mob#:#Media
 content#:#cont_pc_modified#:#Modified Content
 content#:#cont_pc_new#:#New Content
@@ -5122,7 +5138,7 @@ crs#:#event_unregistered#:#You have been unregistered.
 crs#:#event_updated#:#Saved Settings
 crs#:#event#:#Session
 crs#:#events#:#Sessions
-crs#:#export_members#:#Export Participants
+crs#:#export_members#:#Export Data of Participants
 crs#:#grouping_change_assignment#:#Change Assignment
 crs#:#sess_attendance_list#:#Attendance List
 crs#:#sess_gen_attendance_list#:#Generate List
@@ -6021,6 +6037,7 @@ mail#:#mail_nacc_admin_mail#:#Mail address of Administrator
 mail#:#mail_nacc_client_name#:#Client Name
 mail#:#mail_nacc_client_desc#:#Client Description
 mail#:#mail_nacc_ilias_url#:#URL of ILIAS system
+mail#:#mail_no_subject#:#No Subject available
 mail#:#mail_nacc_login#:#Login Account
 mail#:#mail_nacc_no_pw_block#:#This text block is only included, if the new user account has been created without a password.
 mail#:#mail_nacc_pw_block#:#This text block is only included, if the new user account has been created including a password.
@@ -6864,8 +6881,8 @@ ps#:#ps_error_message_password_min3_because_chars_numbers_sc#:#Minimum password 
 ps#:#ps_export_admin#:#Administrators
 ps#:#ps_export_confirm#:#User Confirmation when Entering Courses
 ps#:#ps_export_confirm_group#:#User Confirmation when Entering Groups
-ps#:#ps_export_course#:#Visibility of User Profile Data in Courses
-ps#:#ps_export_groups#:#Visibility of User Profile Data in Groups
+ps#:#ps_export_course#:#Allow export of user profile data in courses
+ps#:#ps_export_groups#:#Allow export of user profile data in groups
 ps#:#ps_export_data#:#Data Types of the Personal Profile
 ps#:#ps_export_files#:#Export Files
 ps#:#ps_export_member#:#Members
@@ -6918,13 +6935,13 @@ pwassist#:#pwassist_enter_email#:#Please enter an e-mail address and submit the 
 pwassist#:#pwassist_enter_username_and_email#:#Enter a username and the associated e-mail address in the fields shown below. ILIAS will send a message to that e-mail address. The message contains an address for a web page, where you can enter a new password for the user account. In case you are unable to assign a password to your user account using this form, contact your course administration or send an e-mail to %1$s.
 pwassist#:#pwassist_enter_username_and_new_password#:#Enter the username and the new password in the fields below.
 pwassist#:#pwassist_login_not_match#:#Please enter another username. The username you have entered does not match the username for which you had asked for password assistance.
-pwassist#:#pwassist_mail_body#:#Register a new password for your user account: \t%1$s  This message has been generated automatically by the ILIAS server \t%2$s  You (or someone at %3$s) has asked for password assistance for the user account "%4$s".  Please check carefully the conditions listed below, and proceed accordingly:  - If you have used the password assistance form on the ILIAS server by accident: Delete this mail.  - If you are certain, that you never asked for password assistance at this ILIAS server: Please contact %5$s.  - If you asked for password assistance, please proceed as follows:  1. Open your browser.  2. Enter the following address in your browser: \t%6$s  Important: The address is a single line. If you see this address split into multiple lines, then your e-mail program has inserted these line breaks.  3. On the web page shown by your browser, enter a new password for your user account.  Please note, that for security reasons, you can perform the three steps above only exactly once and for a limited time only. Afterwards the address becomes invalid, and you have to use the password assistance page on the ILIAS server again.
+pwassist#:#pwassist_mail_body#:#Register a new password for your user account: %1$s<br><br>This message has been generated automatically by the ILIAS server %2$s<br><br>You (or someone at %3$s) has asked for password assistance for the user account "%4$s". Please check carefully the conditions listed below and proceed accordingly:<br><br>• If you have used the password assistance form on the ILIAS server by accident: Delete this mail.<br><br>• If you are certain, that you never asked for password assistance at this ILIAS server: Please contact %5$s.<br><br>• If you asked for password assistance, please proceed as follows:<br>1. Open your browser.<br>2. Enter the following address in your browser: %6$s<br>Important: The address is a single line. If you see this address split into multiple lines, then your e-mail program has inserted these line breaks.<br>3. On the web page shown by your browser, enter a new password for your user account.<br><br>Please note, that for security reasons, you can perform the three steps above only exactly once and for a limited time only. Afterwards the address becomes invalid, and you have to use the password assistance page on the ILIAS server again.
 pwassist#:#pwassist_mail_sent#:#A message has been sent to %1$s. Please check your mail box.
 pwassist#:#pwassist_mail_sent_generic#:#A message has been sent to the email address defined in ILIAS. Please check your mail box.
 pwassist#:#pwassist_mail_subject#:#ILIAS Password Assistance
 pwassist#:#pwassist_password_assigned#:#The password has been successfully assigned to user "%1$s".
 pwassist#:#pwassist_session_expired#:#Please fill in this form again. Your password assistance session has expired. This may have happened, because you tried to use the link that has been sent by e-mail to you more than once, or because too much time has passed since the link has been sent to you.
-pwassist#:#pwassist_username_mail_body#:#These are the active username found for the given e-mail address: %s  This message has been created automatically by the following ILIAS Server: \t%s  You (or somebody with IP  %s) have requested support for forgotten user names for the e-mail address '%s'.  Please check the following and act as suggested::  -You have requested this e-mail by accident: Delete this e-mail.  -You are sure, that you never requested this e-mail: Please contact %s.  - If you requested this e-mail, please proceed as follows::  1. Start your internet browser.  2. Enter the following url: \t%s  Important: The address is a single line. If you see this address split into multiple lines, then your e-mail program has inserted these line breaks.  3. Your Browser now shows the Password-Service. Use this page together with one of the usernames and the according e-mail address to retrieve a new password.
+pwassist#:#pwassist_username_mail_body#:#These are the active username found for the given e-mail address: %s <br><br>This message has been created automatically by the following ILIAS Server: %s  <br><br>You (or somebody with IP  %s) have requested support for forgotten user names for the e-mail address '%s'. Please check the following and act as suggested:<br><br>• You have requested this e-mail by accident: Delete this e-mail.<br><br>• You are sure, that you never requested this e-mail: Please contact %s.<br><br>• If you requested this e-mail, please proceed as follows:<br>1. Start your internet browser.<br>2. Enter the following url: %s <br>Important: The address is a single line. If you see this address split into multiple lines, then your e-mail program has inserted these line breaks.<br>3. Your Browser now shows the Password-Service. Use this page together with one of the usernames and the according e-mail address to retrieve a new password.
 pwassist#:#pwassist_disabled_no_access#:#Password assistance is not enabled. Please contact the system administration for further assistance: %s
 pwassist#:#unassist_disabled_no_access#:#Username assistance is not enabled. Please contact the system administration for further assistance: %s
 rating#:#rating_your_rating#:#Your Rating
@@ -7372,7 +7389,7 @@ style#:#sty_media_char#:#Media
 style#:#sty_min_height#:#Minimum Height
 style#:#sty_move_lm_styles#:#Change Style of Learning Modules
 style#:#sty_move_style#:#Change Style
-style#:#sty_msg_characteristic_must_only_include#:#The title of style classes must start with a letter and only include the following characters:
+style#:#sty_msg_characteristic_must_only_include#:#The title of style classes must start with a letter, does not use spaces and only include the following characters:
 style#:#sty_msg_color_must_only_include#:#The color name may only include the following characters:
 style#:#sty_msg_input_must_be_numeric#:#Input must be numeric.
 style#:#sty_name#:#Name
@@ -8258,6 +8275,7 @@ dateplaner#:#cal_ch_deadline_info#:#Please define the number of hours until the 
 dateplaner#:#cal_ch_num_appointments_info#:#Please define the number of sequent appointments.
 dateplaner#:#cal_ch_personal_ch#:#Personal Consultation Hours
 dateplaner#:#cal_ch_ch#:#Consultation Hours
+dateplaner#:#cal_change_calendar_view#:#Change Calendar View
 ps#:#rbac_log_age#:#Keep Log Entries
 ps#:#rbac_log_age_info#:#Maximum age of log entries in month
 rbac#:#rbac_role_rights_copy#:#Copy Permissions
@@ -9362,6 +9380,7 @@ chatroom#:#kicked#:#You have been kicked from this chat room
 chatroom#:#unban#:#Unban
 chatroom_adm#:#settings_has_been_saved#:#Settings has been saved
 common#:#obj_chtr#:#Chat Room
+common#:#obj_chtr_duplicate#:#Copy Chat Room
 chatroom#:#unable_to_connect#:#The connection to the chat server could not be established.
 user#:#user_account_codes_add#:#Add Codes
 user#:#user_account_codes_export#:#Export Codes
@@ -9568,7 +9587,7 @@ skmg#:#skmg_create_skill_template_reference#:#Create Competence Template Referen
 skmg#:#skmg_create_skill_category#:#Create Competence Category
 skmg#:#skmg_description_info#:#The description comes from the template.
 common#:#notice#:#Notice
-common#:#public_room#:#Public room
+common#:#public_room#:#Public Chat Room
 chatroom#:#server_further_information#:#You can find further information about the server configuration in the <a href="%1$s" target="_blank">readme file</a>.
 chatroom#:#chtr_new#:#New Chat Room
 chatroom#:#chtr_add#:#Add Chat Room
@@ -10115,7 +10134,7 @@ tax#:#tax_target_within_nodes#:#The target must not be a sub-node of the selecte
 tax#:#tax_please_select_target#:#Please select the target.
 rep#:#rep_activation_availability#:#Availability
 rep#:#rep_activation_online#:#Online
-crs#:#crs_activation_online_info#:#Set the course online to make it visible and available for course members. If not, only course administrators and tutors will have access to it.
+crs#:#crs_activation_online_info#:#Set the course online to make it visible and available for course members. If not, only course administrators and roles with permission "Edit Settings" have access to it.
 rep#:#rep_activation_access#:#Access
 rep#:#rep_activation_limited_start#:#Start Time
 rep#:#rep_activation_limited_end#:#Finish Time
@@ -11711,6 +11730,8 @@ assessment#:#tolerance#:#Tolerance (%)
 assessment#:#result_units#:#Available Units
 assessment#:#precision#:#Precision
 assessment#:#err_range#:#The maximum range must be greater than the minimum range
+assessment#:#err_division#:#This value has to be smaller than the maximum range.
+assessment#:#err_divider_too_big#:#The divider of one of the variables in this question is too big.
 assessment#:#err_no_formula#:#You must enter a formula
 assessment#:#err_wrong_rating_advanced#:#Please make sure that the addition of the advanced rating settings equals to 100 percent
 assessment#:#rating_sign#:#Rate Sign
@@ -11830,8 +11851,8 @@ content#:#cont_current_lang#:#Current Language
 obj#:#obj_deactivate_content_lang#:#Deactivate Translation for Page Editing
 content#:#cont_edit_language_version#:#Edit Version
 content#:#cont_page_translation_does_not_exist#:#The translation page does not exist yet and will be created by copying the content of the current master page. Language of the translation page
-search#:#search_user_search_form#:#Search in Personal Profiles
-search#:#search_user_search_info_form#:#Data in personal profiles of users is indexed and can be used to search for users.
+search#:#search_user_search_form#:#Global User Search
+search#:#search_user_search_info_form#:#Users can be found in the global search. Furthermore, data in personal profiles of users is indexed if the Lucene fulltext search is enabled.
 adve#:#adve_blocking_mode#:#Edit Lock
 adve#:#adve_minutes#:#Minutes
 adve#:#adve_minutes_info#:#Minutes of inactivity before an edit lock expires and a page can be edited by another user.
@@ -12484,7 +12505,7 @@ rbac#:#file_read_learning_progress#:#User can view learning progress of other us
 rbac#:#mcst_read_learning_progress#:#User can view learning progress of other users
 rbac#:#lso_read_learning_progress#:#User can view learning progress of other users
 content#:#cont_progress_icons#:#Progress Icons
-content#:#cont_progress_icons_info#:#Show progress icons instead of chapter page icons in presentation mode. Please note that progress information is stored only with ILIAS 5.0 and higher.
+content#:#cont_progress_icons_info#:#Show progress icons instead of chapter page icons in presentation mode.
 content#:#cont_self_assessment#:#Self Assessment
 content#:#cont_tries#:#Question Behaviour
 content#:#cont_tries_reset_on_visit#:#Reset on Page Visit
@@ -13202,12 +13223,12 @@ blog#:#blog_contributors#:#Blog-Contributors
 meta#:#meta_obj_type_inactive#:#Dataset not Used
 meta#:#meta_obj_type_mandatory#:#Dataset always offered
 meta#:#meta_obj_type_optional#:#Dataset needs activation
-common#:#obj_tool_setting_custom_metadata#:#Custom Metadata
-common#:#obj_tool_setting_custom_metadata_info#:#If activated metadata can be configured.
+common#:#obj_tool_setting_custom_metadata#:#Manage Custom Metadata
+common#:#obj_tool_setting_custom_metadata_info#:#Custom Metadata sets can be managed in the "Metadata" tab.
 meta#:#meta_section#:#Section
 meta#:#meta_tab_lom#:#LOM
 meta#:#meta_tab_advmd#:#Custom Metadata
-meta#:#meta_tab_advmd_def#:#Custom Metadata Definition
+meta#:#meta_tab_advmd_def#:#Manage Custom Metadata Sets
 meta#:#meta_global#:#Global
 wiki#:#wiki_unhide_meta_adv_records#:#Show additional properties
 prtf#:#prtf_back_to_portfolio_owner#:#Edit Portfolio
@@ -13376,10 +13397,15 @@ buddysystem#:#buddy_bs_action_already_ignored#:#Action not possible. Already ign
 buddysystem#:#buddy_bs_action_already_unlinked#:#Action not possible. The contact state for user '%s' is already unlinked.
 buddysystem#:#buddy_bs_state_linked#:#Linked
 buddysystem#:#buddy_bs_state_linked_a#:#Linked
+buddysystem#:#buddy_bs_state_linked_p#:#Linked
+buddysystem#:#buddy_bs_state_unlinked#:#Unlinked
 buddysystem#:#buddy_bs_state_unlinked_a#:#Unlinked
+buddysystem#:#buddy_bs_state_unlinked_p#:#Unlinked
 buddysystem#:#buddy_bs_state_requested#:#Requested
 buddysystem#:#buddy_bs_state_requested_a#:#Requested
 buddysystem#:#buddy_bs_state_requested_p#:#Requested
+buddysystem#:#buddy_bs_state_requested_filter_a#:#Waiting for Reaction
+buddysystem#:#buddy_bs_state_requested_filter_p#:#Action Required
 buddysystem#:#buddy_bs_state_ignoredrequest#:#Ignored
 buddysystem#:#buddy_bs_state_ignored_request_a#:#Requested
 buddysystem#:#buddy_bs_state_ignored_request_p#:#Ignored
@@ -13453,7 +13479,7 @@ awrn#:#awrn_hide_from_awareness#:#Hide Me From ‘Who is online?’-Tool
 awrn#:#awrn_hide_from_awareness_info#:#The ‘Who is online?’-Tool is in the top bar and listing selected users (e.g. contacts or members of your courses).
 common#:#contact_sysadmin#:#Contact Technical Support
 common#:#report_accessibility_issue#:#Report Accessibility Issue
-common#:#report_accessibility_link#:#Reported Link:
+common#:#report_accessibility_link#:#Reported%20Link:
 common#:#accessibility_control_concept#:#Accessibility Control Concept
 common#:#no_accessibility_control_concept_description#:#There is currently no Accessibility Control Concept provided with this installation. Please contact the <a href="%1$s">Accessibility Point of Contact</a>.
 common#:#mainbar_aria_label#:#Mainbar
@@ -13810,7 +13836,7 @@ skmg#:#skmg_import_skills#:#Import
 skmg#:#skmg_input_file#:#Import File
 skmg#:#skmg_skill_in_use#:#This competence is used by users or content. Not all commands are available. Please keep in mind that any changes that are made will affect the existing usages.
 form#:#form_no_link#:#No Link
-copg#:#copg_sec_link_info#:#If you set a link on the whole section, please ensure that no other interactive elements are included within the section. Otherwise their behaviour may be erratically.
+copg#:#copg_sec_link_info#:#Select a target for linking the block. Attention: In this case, the content of the block must not contain any further links itself!
 logging#:#log_error_message#:#Sorry, an error occured. A logfile has been created which can be identified via the code "%s".
 logging#:#log_error_message_send_mail#:#Please send a mail to <a href="mailto:%s?subject=code: %s">%s</a>
 logging#:#log_error_folder#:#Path
@@ -14329,12 +14355,12 @@ chatroom#:#chtr_server_status#:#Server Status
 chatroom#:#chtr_ban_actor_tbl_head#:#locked by
 chatroom#:#chtr_ban_ts_tbl_head#:#Timestamp
 chatroom#:#chat_osc_head_grp_x_persons#:#%s Users
-common#:#chtr_import#:#Import Chatroom
+common#:#chtr_import#:#Import Chat Room
 usr#:#user_actions#:#User Actions
 usr#:#user_action#:#User Action
 buddysystem#:#buddy_handle_contact_request#:#Contact Request
 usr#:#user_actions_activation_info#:#Actions will only be listet for users, if the corresponding services are activated and all preconditions are given (e.g. permissions requirements).
-chatroom#:#chat_user_action_invite_public_room#:#Invite to Public Chatroom
+chatroom#:#chat_user_action_invite_public_room#:#Invite to Public Chat Room
 chatroom#:#chat_user_action_invite_osd#:#Invite to On-Screen Chat
 chatroom#:#chat_osc_no_conv#:#No conversations.
 chatroom#:#chat_osc_no_sub_directory#:#Sub-Directory
@@ -15411,7 +15437,7 @@ rbac#:#lso_participate#:#User can subscribe to a Learning Sequence
 rbac#:#lso_unparticipate#:#User can unsubscribe from a Learning Sequence
 rbac#:#lso_edit_learning_progress#:#User can edit learning progress settings
 rbac#:#mcst_edit_learning_progress#:#User can edit learning progress settings
-dateplaner#:#btn_ical#:#iCal
+dateplaner#:#btn_ical#:#Subscribe
 style#:#sty_type_code_block#:#Code (Block)
 style#:#sty_type_code_inline#:#Code (Inline)
 common#:#pagination_label_x_of_y#:#Page %1$d of %2$d
@@ -16084,8 +16110,8 @@ prg#:#modal_categories_title#:#Category to be monitored
 prg#:#category#:#Category
 common#:#obj_prgr#:#Link to Study Programme
 common#:#obj_prgrs#:#Links to Study Programmes
-prg#:#prgr_new#:#Create Study Programme Link
-prg#:#prgr_edit_info#:#Please choose one Study Programme for creating a new link.
+common#:#prgr_new#:#Create Study Programme Link
+common#:#prgr_edit_info#:#Please choose one Study Programme for creating a new link.
 prg#:#prgr_may_not_create_circular_reference#:#This Study Programme may not be linked here since the parent object is alredy linked within the target.
 prg#:#prg_validity_of_qualification_limit#:#Qualification Expiry
 prg#:#prg_validity_of_qualification_restart#:#Restart
@@ -16217,6 +16243,7 @@ prg#:#prg_additional_settings#:#Additional Features
 prg#:#prg_access_by_orgu#:#Access Control by Organisation Unit Positions
 prg#:#prg_access_by_orgu_byline#:#If enabled, additional access control rules can be defined by positions in organisational units.
 ui#:#ui_numeric_only#:#Please insert a whole number.
+ui#:#ui_tag_required#:#Please insert at least one tag.
 mmbr#:#mmbr_memberships#:#Memberships
 notes#:#note_without_object#:#Without reference
 prg#:#msg_fill_required#:#Please fill all required fields.
@@ -16537,6 +16564,7 @@ file#:#file_suffix_custom_white_info#:#These suffixes will be added to the defau
 file#:#file_suffix_overall_white#:#Overal Suffix Whitelist
 file#:#file_suffix_overall_white_info#:#Resulting overall list of accepted file suffixes.
 file#:#file_upload_info_file_with_critical_extension#:#The uploaded file contains a critical or unknown file ending. The file ending will be changed to .sec for every download. If necessary, contact your administrator.
+file#:#migrated#:#Status
 file#:#not_yet_migrated#:#This file object has not yet been migrated and no new versions can be created. Please contact the administrators of the platform.
 common#:#il_lti_learner#:#LTI Learner
 common#:#il_lti_instructor#:#LTI Instructor
@@ -16618,3 +16646,11 @@ ui#:#duration_end_must_not_be_earlier_than_start#:#Start must not be later than 
 forum#:#sticky_threads_sorting#:#Sticky Threads Sorting
 common#:#actions_for#:#Actions for %s
 forum#:#file_upload_option_allow_info#:#Files can be attached to posts in all forums.
+exc#:#exc_fullscreen#:#Fullscreen
+rating#:#rating_avg_rating#:#Average Rating
+rating#:#rating_personal_rating#:#Your Rating
+rating#:#rating_rate_x_of_5#:#Rate with %s of 5 stars
+rating#:#rating_open_dialog#:#Open rating dialog
+tagging#:#tagging_no_obj_for_tag#:#No Resources tagged with %s.
+rep#:#rep_favourites#:#Favourites
+rep#:#rep_favourites_info#:#Users can mark single repository items as favourites. Favourites lists can be activated and configured in the dashboard and menu settings.

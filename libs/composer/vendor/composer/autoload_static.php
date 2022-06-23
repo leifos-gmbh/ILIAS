@@ -8,30 +8,30 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
 {
     public static $files = array (
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
+        '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
-        '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
         '25072dd6e2470089de65ae7bf11d3109' => __DIR__ . '/..' . '/symfony/polyfill-php72/bootstrap.php',
-        '667aeda72477189d0494fecd327c3641' => __DIR__ . '/..' . '/symfony/var-dumper/Resources/functions/dump.php',
-        '23c18046f52bef3eea034657bafda50f' => __DIR__ . '/..' . '/symfony/polyfill-php81/bootstrap.php',
         '0d59ee240a4cd96ddbb4ff164fccea4d' => __DIR__ . '/..' . '/symfony/polyfill-php73/bootstrap.php',
         'e69f7f6ee287b969198c3c9d6777bd38' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/bootstrap.php',
         'f598d06aa772fa33d905e87be6398fb1' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/bootstrap.php',
+        '667aeda72477189d0494fecd327c3641' => __DIR__ . '/..' . '/symfony/var-dumper/Resources/functions/dump.php',
+        '23c18046f52bef3eea034657bafda50f' => __DIR__ . '/..' . '/symfony/polyfill-php81/bootstrap.php',
         '5abda994d126976858eb25d2546ee3c9' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/lib/_autoload_modules.php',
         '383eaff206634a77a1be54e64e6459c7' => __DIR__ . '/..' . '/sabre/uri/lib/functions.php',
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
         'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
+        'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
         '2b9d0f43f9552984cfa82fee95491826' => __DIR__ . '/..' . '/sabre/event/lib/coroutine.php',
         'd81bab31d3feb45bfe2f283ea3c8fdf7' => __DIR__ . '/..' . '/sabre/event/lib/Loop/functions.php',
         'a1cce3d26cc15c00fcd0b3354bd72c88' => __DIR__ . '/..' . '/sabre/event/lib/Promise/functions.php',
         '3569eecfeed3bcf0bad3c998a494ecb8' => __DIR__ . '/..' . '/sabre/xml/lib/Deserializer/functions.php',
         '93aa591bc4ca510c520999e34229ee79' => __DIR__ . '/..' . '/sabre/xml/lib/Serializer/functions.php',
-        'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         '2cffec82183ee1cea088009cef9a6fc3' => __DIR__ . '/..' . '/ezyang/htmlpurifier/library/HTMLPurifier.composer.php',
         '253c157292f75eb38082b5acb06f3f01' => __DIR__ . '/..' . '/nikic/fast-route/src/functions.php',
-        'ebdb698ed4152ae445614b69b5e4bb6a' => __DIR__ . '/..' . '/sabre/http/lib/functions.php',
         'decc78cc4436b1292c6c0d151b19445c' => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib/bootstrap.php',
+        'ebdb698ed4152ae445614b69b5e4bb6a' => __DIR__ . '/..' . '/sabre/http/lib/functions.php',
         'e39a8b23c42d4e1452234d762b03835a' => __DIR__ . '/..' . '/ramsey/uuid/src/functions.php',
     );
 
@@ -325,11 +325,11 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
         ),
         'SimpleSAML\\modules\\yubikey\\' => 
         array (
-            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/authYubiKey/lib',
+            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-authyubikey/lib',
         ),
         'SimpleSAML\\modules\\discopower\\' => 
         array (
-            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/discopower/lib',
+            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-discopower/lib',
         ),
         'SimpleSAML\\TwigConfigurableI18n\\' => 
         array (
@@ -337,95 +337,95 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
         ),
         'SimpleSAML\\Module\\statistics\\' => 
         array (
-            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/statistics/lib',
+            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-statistics/lib',
         ),
         'SimpleSAML\\Module\\sqlauth\\' => 
         array (
-            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/sqlauth/lib',
+            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-sqlauth/lib',
         ),
         'SimpleSAML\\Module\\smartattributes\\' => 
         array (
-            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/smartattributes/lib',
+            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-smartattributes/lib',
         ),
         'SimpleSAML\\Module\\sanitycheck\\' => 
         array (
-            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/sanitycheck/lib',
+            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-sanitycheck/lib',
         ),
         'SimpleSAML\\Module\\riak\\' => 
         array (
-            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/riak/lib',
+            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-riak/lib',
         ),
         'SimpleSAML\\Module\\radius\\' => 
         array (
-            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/radius/lib',
+            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-radius/lib',
         ),
         'SimpleSAML\\Module\\preprodwarning\\' => 
         array (
-            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/preprodwarning/lib',
+            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-preprodwarning/lib',
         ),
         'SimpleSAML\\Module\\oauth\\' => 
         array (
-            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/oauth/lib',
+            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-oauth/lib',
         ),
         'SimpleSAML\\Module\\negotiate\\' => 
         array (
-            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/negotiate/lib',
+            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-negotiate/lib',
         ),
         'SimpleSAML\\Module\\metarefresh\\' => 
         array (
-            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/metarefresh/lib',
+            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-metarefresh/lib',
         ),
         'SimpleSAML\\Module\\ldap\\' => 
         array (
-            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/ldap/lib',
+            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-ldap/lib',
         ),
         'SimpleSAML\\Module\\expirycheck\\' => 
         array (
-            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/expirycheck/lib',
+            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-expirycheck/lib',
         ),
         'SimpleSAML\\Module\\exampleattributeserver\\' => 
         array (
-            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/exampleattributeserver/lib',
+            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-exampleattributeserver/lib',
         ),
         'SimpleSAML\\Module\\consent\\' => 
         array (
-            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/consent/lib',
+            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-consent/lib',
         ),
         'SimpleSAML\\Module\\cdc\\' => 
         array (
-            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/cdc/lib',
+            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-cdc/lib',
         ),
         'SimpleSAML\\Module\\cas\\' => 
         array (
-            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/cas/lib',
+            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-cas/lib',
         ),
         'SimpleSAML\\Module\\authwindowslive\\' => 
         array (
-            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/authwindowslive/lib',
+            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-authwindowslive/lib',
         ),
         'SimpleSAML\\Module\\authtwitter\\' => 
         array (
-            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/authtwitter/lib',
+            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-authtwitter/lib',
         ),
         'SimpleSAML\\Module\\authorize\\' => 
         array (
-            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/authorize/lib',
+            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-authorize/lib',
         ),
         'SimpleSAML\\Module\\authfacebook\\' => 
         array (
-            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/authfacebook/lib',
+            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-authfacebook/lib',
         ),
         'SimpleSAML\\Module\\authcrypt\\' => 
         array (
-            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/authcrypt/lib',
+            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-authcrypt/lib',
         ),
         'SimpleSAML\\Module\\authX509\\' => 
         array (
-            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/authX509/lib',
+            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-authx509/lib',
         ),
         'SimpleSAML\\Module\\adfs\\' => 
         array (
-            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/modules/adfs/lib',
+            0 => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-adfs/lib',
         ),
         'SimpleSAML\\' => 
         array (
@@ -1688,6 +1688,7 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
         'ILIAS\\Modules\\OrgUnit\\ARHelper\\BaseCommands' => __DIR__ . '/../../../..' . '/Modules/OrgUnit/classes/ARHelper/BaseCommands.php',
         'ILIAS\\Modules\\OrgUnit\\ARHelper\\BaseForm' => __DIR__ . '/../../../..' . '/Modules/OrgUnit/classes/ARHelper/BaseForm.php',
         'ILIAS\\Modules\\OrgUnit\\ARHelper\\DIC' => __DIR__ . '/../../../..' . '/Modules/OrgUnit/classes/ARHelper/DIC.php',
+        'ILIAS\\Modules\\Test\\CanAccessFileUploadAnswer' => __DIR__ . '/../../../..' . '/Modules/Test/classes/CanAccessFileUploadAnswer.php',
         'ILIAS\\MyStaff\\Courses\\ShowUser\\ilMStShowUserCourses' => __DIR__ . '/../../../..' . '/Services/MyStaff/classes/ShowUser/Courses/class.ilMStShowUserCourses.php',
         'ILIAS\\MyStaff\\Courses\\ShowUser\\ilMStShowUserCoursesTableGUI' => __DIR__ . '/../../../..' . '/Services/MyStaff/classes/ShowUser/Courses/class.ilMStShowUserCoursesTableGUI.php',
         'ILIAS\\MyStaff\\ListCertificates\\ilMStListCertificates' => __DIR__ . '/../../../..' . '/Services/MyStaff/classes/ListCertificates/class.ilMStListCertificates.php',
@@ -2471,6 +2472,7 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
         'ILIAS\\UI\\Implementation\\Factory' => __DIR__ . '/../../../..' . '/src/UI/Implementation/Factory.php',
         'ILIAS\\UI\\Implementation\\Render\\AbstractComponentRenderer' => __DIR__ . '/../../../..' . '/src/UI/Implementation/Render/AbstractComponentRenderer.php',
         'ILIAS\\UI\\Implementation\\Render\\ComponentRenderer' => __DIR__ . '/../../../..' . '/src/UI/Implementation/Render/ComponentRenderer.php',
+        'ILIAS\\UI\\Implementation\\Render\\DecoratedRenderer' => __DIR__ . '/../../../..' . '/src/UI/Implementation/Render/DecoratedRenderer.php',
         'ILIAS\\UI\\Implementation\\Render\\DefaultRendererFactory' => __DIR__ . '/../../../..' . '/src/UI/Implementation/Render/DefaultRendererFactory.php',
         'ILIAS\\UI\\Implementation\\Render\\FSLoader' => __DIR__ . '/../../../..' . '/src/UI/Implementation/Render/FSLoader.php',
         'ILIAS\\UI\\Implementation\\Render\\ImagePathResolver' => __DIR__ . '/../../../..' . '/src/UI/Implementation/Render/ImagePathResolver.php',
@@ -3919,6 +3921,67 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
         'SimpleSAML\\Metadata\\Sources\\MDQ' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/lib/SimpleSAML/Metadata/Sources/MDQ.php',
         'SimpleSAML\\Module' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/lib/SimpleSAML/Module.php',
         'SimpleSAML\\Module\\ControllerResolver' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/lib/SimpleSAML/Module/ControllerResolver.php',
+        'SimpleSAML\\Module\\adfs\\AdfsController' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-adfs/lib/AdfsController.php',
+        'SimpleSAML\\Module\\adfs\\IdP\\ADFS' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-adfs/lib/IdP/ADFS.php',
+        'SimpleSAML\\Module\\adfs\\SAML2\\XML\\fed\\Constants' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-adfs/lib/SAML2/XML/fed/Constants.php',
+        'SimpleSAML\\Module\\adfs\\SAML2\\XML\\fed\\Endpoint' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-adfs/lib/SAML2/XML/fed/Endpoint.php',
+        'SimpleSAML\\Module\\adfs\\SAML2\\XML\\fed\\SecurityTokenServiceType' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-adfs/lib/SAML2/XML/fed/SecurityTokenServiceType.php',
+        'SimpleSAML\\Module\\adfs\\SAML2\\XML\\fed\\TokenTypesOffered' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-adfs/lib/SAML2/XML/fed/TokenTypesOffered.php',
+        'SimpleSAML\\Module\\authX509\\Auth\\Process\\ExpiryWarning' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-authx509/lib/Auth/Process/ExpiryWarning.php',
+        'SimpleSAML\\Module\\authX509\\Auth\\Source\\X509userCert' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-authx509/lib/Auth/Source/X509userCert.php',
+        'SimpleSAML\\Module\\authX509\\Controller\\ExpiryWarning' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-authx509/lib/Controller/ExpiryWarning.php',
+        'SimpleSAML\\Module\\authcrypt\\Auth\\Source\\Hash' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-authcrypt/lib/Auth/Source/Hash.php',
+        'SimpleSAML\\Module\\authcrypt\\Auth\\Source\\Htpasswd' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-authcrypt/lib/Auth/Source/Htpasswd.php',
+        'SimpleSAML\\Module\\authfacebook\\Auth\\Source\\Facebook' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-authfacebook/lib/Auth/Source/Facebook.php',
+        'SimpleSAML\\Module\\authfacebook\\Facebook' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-authfacebook/lib/Facebook.php',
+        'SimpleSAML\\Module\\authorize\\Auth\\Process\\Authorize' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-authorize/lib/Auth/Process/Authorize.php',
+        'SimpleSAML\\Module\\authtwitter\\Auth\\Source\\Twitter' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-authtwitter/lib/Auth/Source/Twitter.php',
+        'SimpleSAML\\Module\\authwindowslive\\Auth\\Source\\LiveID' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-authwindowslive/lib/Auth/Source/LiveID.php',
+        'SimpleSAML\\Module\\cas\\Auth\\Source\\CAS' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-cas/lib/Auth/Source/CAS.php',
+        'SimpleSAML\\Module\\cdc\\Client' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-cdc/lib/Client.php',
+        'SimpleSAML\\Module\\cdc\\Server' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-cdc/lib/Server.php',
+        'SimpleSAML\\Module\\consent\\Auth\\Process\\Consent' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-consent/lib/Auth/Process/Consent.php',
+        'SimpleSAML\\Module\\consent\\Consent\\Store\\Cookie' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-consent/lib/Consent/Store/Cookie.php',
+        'SimpleSAML\\Module\\consent\\Consent\\Store\\Database' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-consent/lib/Consent/Store/Database.php',
+        'SimpleSAML\\Module\\consent\\Logout' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-consent/lib/Logout.php',
+        'SimpleSAML\\Module\\consent\\Store' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-consent/lib/Store.php',
+        'SimpleSAML\\Module\\expirycheck\\Auth\\Process\\ExpiryDate' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-expirycheck/lib/Auth/Process/ExpiryDate.php',
+        'SimpleSAML\\Module\\ldap\\Auth\\Ldap' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-ldap/lib/Auth/Ldap.php',
+        'SimpleSAML\\Module\\ldap\\Auth\\Process\\AttributeAddFromLDAP' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-ldap/lib/Auth/Process/AttributeAddFromLDAP.php',
+        'SimpleSAML\\Module\\ldap\\Auth\\Process\\AttributeAddUsersGroups' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-ldap/lib/Auth/Process/AttributeAddUsersGroups.php',
+        'SimpleSAML\\Module\\ldap\\Auth\\Process\\BaseFilter' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-ldap/lib/Auth/Process/BaseFilter.php',
+        'SimpleSAML\\Module\\ldap\\Auth\\Source\\LDAP' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-ldap/lib/Auth/Source/LDAP.php',
+        'SimpleSAML\\Module\\ldap\\Auth\\Source\\LDAPMulti' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-ldap/lib/Auth/Source/LDAPMulti.php',
+        'SimpleSAML\\Module\\ldap\\ConfigHelper' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-ldap/lib/ConfigHelper.php',
+        'SimpleSAML\\Module\\metarefresh\\ARP' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-metarefresh/lib/ARP.php',
+        'SimpleSAML\\Module\\metarefresh\\MetaLoader' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-metarefresh/lib/MetaLoader.php',
+        'SimpleSAML\\Module\\negotiate\\Auth\\Source\\Negotiate' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-negotiate/lib/Auth/Source/Negotiate.php',
+        'SimpleSAML\\Module\\oauth\\Consumer' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-oauth/lib/Consumer.php',
+        'SimpleSAML\\Module\\oauth\\OAuthServer' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-oauth/lib/OAuthServer.php',
+        'SimpleSAML\\Module\\oauth\\OAuthStore' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-oauth/lib/OAuthStore.php',
+        'SimpleSAML\\Module\\oauth\\Registry' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-oauth/lib/Registry.php',
+        'SimpleSAML\\Module\\preprodwarning\\Auth\\Process\\Warning' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-preprodwarning/lib/Auth/Process/Warning.php',
+        'SimpleSAML\\Module\\preprodwarning\\Controller\\PreProdWarning' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-preprodwarning/lib/Controller/PreProdWarning.php',
+        'SimpleSAML\\Module\\radius\\Auth\\Source\\Radius' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-radius/lib/Auth/Source/Radius.php',
+        'SimpleSAML\\Module\\riak\\Store\\Riak' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-riak/lib/Store/Riak.php',
+        'SimpleSAML\\Module\\smartattributes\\Auth\\Process\\SmartID' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-smartattributes/lib/Auth/Process/SmartID.php',
+        'SimpleSAML\\Module\\smartattributes\\Auth\\Process\\SmartName' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-smartattributes/lib/Auth/Process/SmartName.php',
+        'SimpleSAML\\Module\\sqlauth\\Auth\\Source\\SQL' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-sqlauth/lib/Auth/Source/SQL.php',
+        'SimpleSAML\\Module\\statistics\\AccessCheck' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-statistics/lib/AccessCheck.php',
+        'SimpleSAML\\Module\\statistics\\Aggregator' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-statistics/lib/Aggregator.php',
+        'SimpleSAML\\Module\\statistics\\DateHandler' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-statistics/lib/DateHandler.php',
+        'SimpleSAML\\Module\\statistics\\DateHandlerMonth' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-statistics/lib/DateHandlerMonth.php',
+        'SimpleSAML\\Module\\statistics\\Graph\\GoogleCharts' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-statistics/lib/Graph/GoogleCharts.php',
+        'SimpleSAML\\Module\\statistics\\LogCleaner' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-statistics/lib/LogCleaner.php',
+        'SimpleSAML\\Module\\statistics\\LogParser' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-statistics/lib/LogParser.php',
+        'SimpleSAML\\Module\\statistics\\RatioDataset' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-statistics/lib/RatioDataset.php',
+        'SimpleSAML\\Module\\statistics\\Ruleset' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-statistics/lib/Ruleset.php',
+        'SimpleSAML\\Module\\statistics\\StatDataset' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-statistics/lib/StatDataset.php',
+        'SimpleSAML\\Module\\statistics\\StatisticsController' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-statistics/lib/StatisticsController.php',
+        'SimpleSAML\\Module\\statistics\\Statistics\\FieldPresentation\\Base' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-statistics/lib/Statistics/FieldPresentation/Base.php',
+        'SimpleSAML\\Module\\statistics\\Statistics\\FieldPresentation\\Entity' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-statistics/lib/Statistics/FieldPresentation/Entity.php',
+        'SimpleSAML\\Module\\statistics\\Statistics\\Rulesets\\BaseRule' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-statistics/lib/Statistics/Rulesets/BaseRule.php',
+        'SimpleSAML\\Module\\statistics\\Statistics\\Rulesets\\Ratio' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp-module-statistics/lib/Statistics/Rulesets/Ratio.php',
         'SimpleSAML\\Session' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/lib/SimpleSAML/Session.php',
         'SimpleSAML\\SessionHandler' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/lib/SimpleSAML/SessionHandler.php',
         'SimpleSAML\\SessionHandlerCookie' => __DIR__ . '/..' . '/simplesamlphp/simplesamlphp/lib/SimpleSAML/SessionHandlerCookie.php',
@@ -7904,7 +7967,7 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
         'ilContactUserActionProvider' => __DIR__ . '/../../../..' . '/Services/Contact/BuddySystem/classes/class.ilContactUserActionProvider.php',
         'ilContainer' => __DIR__ . '/../../../..' . '/Services/Container/classes/class.ilContainer.php',
         'ilContainerAccess' => __DIR__ . '/../../../..' . '/Services/Container/classes/class.ilContainerAccess.php',
-        'ilContainerBlockPropertiesStorage' => __DIR__ . '/../../../..' . '/Services/Container/classes/class.ilContainerBlockPropertiesStorage.php',
+        'ilContainerBlockPropertiesStorageGUI' => __DIR__ . '/../../../..' . '/Services/Container/classes/class.ilContainerBlockPropertiesStorageGUI.php',
         'ilContainerByTypeContentGUI' => __DIR__ . '/../../../..' . '/Services/Container/classes/class.ilContainerByTypeContentGUI.php',
         'ilContainerContentGUI' => __DIR__ . '/../../../..' . '/Services/Container/classes/class.ilContainerContentGUI.php',
         'ilContainerCustomIconConfiguration' => __DIR__ . '/../../../..' . '/Services/Object/Icon/classes/class.ilContainerCustomIconConfiguration.php',
@@ -8599,6 +8662,9 @@ class ComposerStaticInit7c0f6b50d4aeb02e0f5a4fd1a0fb5688
         'ilFAHImporterCronJob' => __DIR__ . '/../../../..' . '/Customizing/global/plugins/Services/Cron/CronHook/FAHImporter/classes/class.ilFAHImporterCronJob.php',
         'ilFAHImporterPlugin' => __DIR__ . '/../../../..' . '/Customizing/global/plugins/Services/Cron/CronHook/FAHImporter/classes/class.ilFAHImporterPlugin.php',
         'ilFAHImporterSettings' => __DIR__ . '/../../../..' . '/Customizing/global/plugins/Services/Cron/CronHook/FAHImporter/classes/class.ilFAHImporterSettings.php',
+        'ilFAHInvalidUser' => __DIR__ . '/../../../..' . '/Customizing/global/plugins/Services/Cron/CronHook/FAHImporter/classes/class.ilFAHInvalidUser.php',
+        'ilFAHInvalidUserTableGUI' => __DIR__ . '/../../../..' . '/Customizing/global/plugins/Services/Cron/CronHook/FAHImporter/classes/class.ilFAHInvalidUserTableGUI.php',
+        'ilFAHInvalidUsers' => __DIR__ . '/../../../..' . '/Customizing/global/plugins/Services/Cron/CronHook/FAHImporter/classes/class.ilFAHInvalidUsers.php',
         'ilFAHMapping' => __DIR__ . '/../../../..' . '/Customizing/global/plugins/Services/Cron/CronHook/FAHImporter/classes/class.ilFAHMapping.php',
         'ilFAHMappingTable' => __DIR__ . '/../../../..' . '/Customizing/global/plugins/Services/Cron/CronHook/FAHImporter/classes/class.ilFAHMappingTable.php',
         'ilFAHMappings' => __DIR__ . '/../../../..' . '/Customizing/global/plugins/Services/Cron/CronHook/FAHImporter/classes/class.ilFAHMappings.php',

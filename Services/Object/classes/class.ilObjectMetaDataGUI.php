@@ -298,7 +298,7 @@ class ilObjectMetaDataGUI
                 'grp',
                 "file",
                 "glo",
-                "glo:gdf",
+                "glo:term",
                 "svy",
                 "spl",
                 "tst",

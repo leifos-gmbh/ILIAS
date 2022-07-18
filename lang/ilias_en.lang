@@ -5990,7 +5990,6 @@ content#:#cont_act_number#:#Chapter Numeration
 content#:#cont_add_area#:#Add Area
 content#:#cont_add_cell#:#Add Column
 content#:#cont_add_change_comment#:#Add change comment
-content#:#cont_add_definition#:#Add Definition
 content#:#cont_added_cell#:#Column added
 content#:#cont_added_comment#:#Comment has been added to history.
 content#:#cont_added_tab#:#Panel added.
@@ -6254,7 +6253,6 @@ content#:#cont_ed_insert_vrfc#:#Insert Certificate
 content#:#cont_edit_base_image#:#Edit Background Image
 content#:#cont_edit_comp#:#Editing
 content#:#cont_edit_definition#:#Edit Definition
-content#:#cont_edit_definitions#:#Edit Definitions
 content#:#cont_ed_item_down#:#Move Item Down
 content#:#cont_ed_item_up#:#Move Item Up
 content#:#cont_edit_file_list_properties#:#Edit File List Properties

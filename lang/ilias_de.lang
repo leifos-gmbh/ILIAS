@@ -6010,7 +6010,6 @@ content#:#cont_act_number#:#Kapitelnummerierung
 content#:#cont_add_area#:#Bereich hinzufügen
 content#:#cont_add_cell#:#Spalte hinzufügen
 content#:#cont_add_change_comment#:#Überarbeitungskommentar hinzufügen
-content#:#cont_add_definition#:#Definition hinzufügen
 content#:#cont_added_cell#:#Spalte hinzugefügt
 content#:#cont_added_comment#:#Kommentar wurde im Verlauf aufgenommen
 content#:#cont_added_tab#:#Fach wurde hinzugefügt.
@@ -6276,7 +6275,6 @@ content#:#cont_ed_insert_vrfc#:#Zertifikat einfügen
 content#:#cont_edit_base_image#:#Ausgangsbild bearbeiten
 content#:#cont_edit_comp#:#Bearbeitungsmodus
 content#:#cont_edit_definition#:#Definition bearbeiten
-content#:#cont_edit_definitions#:#Definitionen bearbeiten
 content#:#cont_ed_item_down#:#Eintrag nach unten verschieben
 content#:#cont_ed_item_up#:#Eintrag nach oben verschieben
 content#:#cont_edit_file_list_properties#:#Eigenschaften der Dateilisten bearbeiten

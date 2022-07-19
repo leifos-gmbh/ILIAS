@@ -24,7 +24,8 @@
 class ilContainerRenderer
 {
     protected const UNIQUE_SEPARATOR = "-";
-    protected \ILIAS\Containter\Content\ItemRenderer $objective_renderer;
+    protected ilObjUser $user;
+    protected \ILIAS\Containter\Content\ObjectiveRenderer $objective_renderer;
     protected \ILIAS\Containter\Content\ItemRenderer $item_renderer;
     protected \ILIAS\Container\Content\ItemPresentationManager $item_presentation;
 
@@ -62,6 +63,7 @@ class ilContainerRenderer
     protected ilCtrl $ctrl;
     protected ?Closure $block_prefix_closure = null;
     protected ?Closure $block_postfix_closure = null;
+    protected \ILIAS\Container\Content\BlockSessionRepository $block_repo;
 
     public function __construct(
         \ILIAS\Container\Content\ItemPresentationManager $item_presentation,
@@ -88,6 +90,7 @@ class ilContainerRenderer
         $obj = $container_gui_obj;
         $this->container_gui = $obj;
         $this->ctrl = $DIC->ctrl();
+        $this->user = $DIC->user();
 
         $this->item_renderer = $DIC->container()
             ->internal()
@@ -106,6 +109,12 @@ class ilContainerRenderer
                 $a_view_mode,
                 clone $this
             );
+        $this->block_repo = $DIC
+            ->container()
+            ->internal()
+            ->repo()
+            ->content()
+            ->block();
     }
 
     public function setBlockPrefixClosure(Closure $f) : void
@@ -789,7 +798,7 @@ class ilContainerRenderer
 
             // (1) add block
             if ($block->getBlock() instanceof \ILIAS\Container\Content\ItemGroupBlock) {
-                $this->addCustomBlock($block_id, "test");
+                $this->addItemGroupBlock($block_id);
             }
             if ($block->getBlock() instanceof \ILIAS\Container\Content\OtherBlock) {
                 $this->addCustomBlock($block_id, "other");
@@ -835,6 +844,84 @@ class ilContainerRenderer
             return $block_tpl->get();
         }
         return "";
+    }
+
+    /**
+     * replaces ilContainerContentGUI::renderItemGroup
+     */
+    protected function addItemGroupBlock(string $block_id, int $block_pos = 0) : void
+    {
+        $item_data = $this->item_presentation->getRawDataByRefId((int) $block_id);
+        $item_list_gui = $this->item_renderer->getItemGUI($item_data);
+
+        $perm_ok = true;
+        /*
+        $ilAccess = $this->access;
+        $ilUser = $this->user;
+
+        // #16493
+        $perm_ok = ($ilAccess->checkAccess("visible", "", $item_data['ref_id']) &&
+            $ilAccess->checkAccess("read", "", $item_data['ref_id']));
+
+        $items = ilObjectActivation::getItemsByItemGroup($item_data['ref_id']);
+
+        // get all valid ids (this is filtered)
+        $all_ids = array_map(static function (array $i) : int {
+            return (int) $i["child"];
+        }, $this->items["_all"]);
+
+        // remove filtered items
+        $items = array_filter($items, static function (array $i) use ($all_ids) : bool {
+            return in_array($i["ref_id"], $all_ids);
+        });
+
+        // if no permission is given, set the items to "rendered" but
+        // do not display the whole block
+        if (!$perm_ok) {
+            foreach ($items as $item) {
+                $this->renderer->hideItem($item["child"]);
+            }
+            return;
+        }
+        */
+
+        $item_list_gui->enableNotes(false);
+        $item_list_gui->enableTags(false);
+        $item_list_gui->enableComments(false);
+        $item_list_gui->enableTimings(false);
+        $item_list_gui->getListItemHTML(
+            $item_data["ref_id"],
+            $item_data["obj_id"],
+            $item_data["title"],
+            $item_data["description"]
+        );
+        $commands_html = $item_list_gui->getCommandsHTML();
+
+        // determine behaviour
+        $item_group = new ilObjItemGroup($item_data["ref_id"]);
+        $beh = $item_group->getBehaviour();
+        $stored_val = $this->block_repo->getProperty(
+            "itgr_" . $item_data["ref_id"],
+            $this->user->getId(),
+            "opened"
+        );
+        if ($stored_val !== "" && $beh !== ilItemGroupBehaviour::ALWAYS_OPEN) {
+            $beh = ($stored_val === "1")
+                ? ilItemGroupBehaviour::EXPANDABLE_OPEN
+                : ilItemGroupBehaviour::EXPANDABLE_CLOSED;
+        }
+
+        $data = [
+            "behaviour" => $beh,
+            "store-url" => "./ilias.php?baseClass=ilcontainerblockpropertiesstoragegui&cmd=store" .
+                "&cont_block_id=itgr_" . $item_data['ref_id']
+        ];
+        if (ilObjItemGroup::lookupHideTitle($item_data["obj_id"]) &&
+            !$this->getContainerGUI()->isActiveAdministrationPanel()) {
+            $this->addCustomBlock($block_id, "", $commands_html, $data);
+        } else {
+            $this->addCustomBlock($block_id, $item_data["title"], $commands_html, $data);
+        }
     }
 
     protected function getBlockPrefix($block_id) : string

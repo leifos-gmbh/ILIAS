@@ -56,7 +56,7 @@ class GUIService
         \ilContainerGUI $container_gui,
         string $view_mode,      // TILE/LIST from ilContainerContentGUI
         \ilContainerRenderer $container_render
-    ) : ItemRenderer {
+    ) : ObjectiveRenderer {
         return new ObjectiveRenderer(
             $this->domain_service,
             $this->gui_service,

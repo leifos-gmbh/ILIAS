@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -16,23 +16,23 @@
  *
  *********************************************************************/
 
-namespace ILIAS\Container;
+namespace ILIAS\Container\Content;
 
 /**
- * Repository internal data service
+ * A single block containing items of a (grouped) repo type
  * @author Alexander Killing <killing@leifos.de>
  */
-class InternalDataService
+class TypeBlock implements Block
 {
-    protected Content\DataService $content_service;
+    protected string $type;
 
-    public function __construct()
+    public function __construct(string $type)
     {
-        $this->content_service = new Content\DataService();
+        $this->type = $type;
     }
 
-    public function content() : Content\DataService
+    public function getType() : string
     {
-        return $this->content_service;
+        return $this->type;
     }
 }

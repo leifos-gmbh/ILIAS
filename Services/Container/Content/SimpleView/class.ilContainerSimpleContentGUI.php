@@ -36,7 +36,6 @@ class ilContainerSimpleContentGUI extends ilContainerContentGUI
         $this->access = $DIC->access();
         $this->user = $DIC->user();
         parent::__construct($container_gui_obj);
-        $this->initDetails();
     }
 
     public function getMainContent() : string
@@ -100,19 +99,6 @@ class ilContainerSimpleContentGUI extends ilContainerContentGUI
         $output_html .= $this->renderer->getHTML();
         
         $a_tpl->setVariable("CONTAINER_PAGE_CONTENT", $output_html);
-    }
-
-    protected function initDetails() : void
-    {
-        $this->handleSessionExpand();
-
-        if ($this->getContainerObject()->getType() === 'crs') {
-            if ($session = ilSessionAppointment::lookupNextSessionByCourse($this->getContainerObject()->getRefId())) {
-                $this->force_details = (int) $session;
-            } elseif ($session = ilSessionAppointment::lookupLastSessionByCourse($this->getContainerObject()->getRefId())) {
-                $this->force_details = $session;
-            }
-        }
     }
 
     protected function getDetailsLevel(int $a_item_id) : int

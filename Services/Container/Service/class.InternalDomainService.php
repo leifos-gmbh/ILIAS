@@ -20,6 +20,7 @@ namespace ILIAS\Container;
 
 use ILIAS\DI;
 use ILIAS\Repository;
+use ILIAS\Container\Page\PageManager;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
@@ -28,6 +29,7 @@ class InternalDomainService
 {
     use Repository\GlobalDICDomainServices;
 
+    protected \ILIAS\Style\Content\DomainService $content_style_domain;
     protected InternalRepoService $repo_service;
     protected InternalDataService $data_service;
 
@@ -38,6 +40,7 @@ class InternalDomainService
     ) {
         $this->repo_service = $repo_service;
         $this->data_service = $data_service;
+        $this->content_style_domain = $DIC->contentStyle()->domain();
         $this->initDomainServices($DIC);
     }
 
@@ -50,14 +53,24 @@ class InternalDomainService
         );
     }
 
-    /*
-    public function access(int $ref_id, int $user_id) : Access\AccessManager
+    public function page(\ilContainer $container) : Page\PageManager
     {
-        return new Access\AccessManager(
+        return new PageManager(
             $this,
-            $this->access,
-            $ref_id,
-            $user_id
+            $this->content_style_domain,
+            $container
         );
-    }*/
+    }
+
+
+    /*
+        public function access(int $ref_id, int $user_id) : Access\AccessManager
+        {
+            return new Access\AccessManager(
+                $this,
+                $this->access,
+                $ref_id,
+                $user_id
+            );
+        }*/
 }

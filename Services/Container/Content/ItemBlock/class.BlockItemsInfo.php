@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -16,23 +16,32 @@
  *
  *********************************************************************/
 
-namespace ILIAS\Container;
+namespace ILIAS\Container\Content\ItemBlock;
 
 /**
- * Repository internal data service
+ *
  * @author Alexander Killing <killing@leifos.de>
  */
-class InternalDataService
+class BlockItemsInfo
 {
-    protected Content\DataService $content_service;
+    protected bool $limit_exhausted = false;
+    protected array $ref_ids = [];
 
-    public function __construct()
-    {
-        $this->content_service = new Content\DataService();
+    public function __construct(
+        array $ref_ids,
+        bool $limit_exhausted
+    ) {
+        $this->ref_ids = $ref_ids;
+        $this->limit_exhausted = $limit_exhausted;
     }
 
-    public function content() : Content\DataService
+    public function getRefIds() : array
     {
-        return $this->content_service;
+        return $this->ref_ids;
+    }
+
+    public function getLimitExhausted() : bool
+    {
+        return $this->limit_exhausted;
     }
 }

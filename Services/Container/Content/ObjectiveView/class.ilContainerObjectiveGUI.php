@@ -38,21 +38,17 @@ class ilContainerObjectiveGUI extends ilContainerContentGUI
     private ?ilLOTestAssignments $test_assignments = null;
     protected \ILIAS\Style\Content\Object\ObjectFacade $content_style_domain;
 
-    public function __construct(ilContainerGUI $a_container_gui)
-    {
+    public function __construct(
+        ilContainerGUI $container_gui_obj,
+        \ILIAS\Container\Content\ItemPresentationManager $item_presentation
+    ) {
         global $DIC;
 
         $this->tabs = $DIC->tabs();
-        $this->access = $DIC->access();
-        $this->user = $DIC->user();
-        $this->settings = $DIC->settings();
-        $this->ctrl = $DIC->ctrl();
         $this->toolbar = $DIC->toolbar();
-        $lng = $DIC->language();
         $this->logger = $DIC->logger()->crs();
         
-        $this->lng = $lng;
-        parent::__construct($a_container_gui);
+        parent::__construct($container_gui_obj, $item_presentation);
         
         $this->initTestAssignments();
 
@@ -115,13 +111,16 @@ class ilContainerObjectiveGUI extends ilContainerContentGUI
         $this->initRenderer();
     
         if (!$is_manage) {
+
+// render objectives
             $this->showObjectives($is_order);
                         
             // check for results
             $has_results = ilLOUserResults::hasResults($this->getContainerObject()->getId(), $ilUser->getId());
             
             $tst_obj_id = ilObject::_lookupObjId($this->loc_settings->getInitialTest());
-            
+
+            // render initial/qualified test
             if (
                 $this->loc_settings->getInitialTest() &&
                 $this->loc_settings->isGeneralInitialTestVisible() &&
@@ -135,9 +134,12 @@ class ilContainerObjectiveGUI extends ilContainerContentGUI
             ) {
                 $this->output_html .= $this->renderTest($this->loc_settings->getQualifiedTest(), 0, false);
             }
-            
+
+            // render other materials
             $this->showMaterials(self::MATERIALS_OTHER, false, !$is_order);
         } else {
+
+// render all materials
             $this->showMaterials(null, true);
         }
 
@@ -156,31 +158,12 @@ class ilContainerObjectiveGUI extends ilContainerContentGUI
         return $tpl->get();
     }
 
-    /**
-     * @deprecated  (?)
-     */
-    public function showStatus() : void
-    {
-        $ilUser = $this->user;
-        $lng = $this->lng;
-        
-        $status = ilCourseObjectiveResultCache::getStatus($ilUser->getId(), $this->getContainerObject()->getId());
-        if ($status === ilCourseObjectiveResult::IL_OBJECTIVE_STATUS_EMPTY) {
-            return;
-        }
-        $info_tpl = new ilTemplate('tpl.crs_objectives_view_info_table.html', true, true, 'Modules/Course');
-        $info_tpl->setVariable("INFO_STRING", $lng->txt('crs_objectives_info_' . $status));
 
-        $this->output_html .= $info_tpl->get();
-    }
-    
     public function showObjectives(bool $a_is_order = false) : void
     {
         $lng = $this->lng;
         $ilSetting = $this->settings;
         $tpl = $this->tpl;
-        
-        $this->clearAdminCommandsDetermination();
         
         // get embedded blocks
         $has_container_page = false;
@@ -331,8 +314,6 @@ class ilContainerObjectiveGUI extends ilContainerContentGUI
     ) : void {
         $lng = $this->lng;
 
-        $this->clearAdminCommandsDetermination();
-        
         if (is_array($this->items["_all"])) {
             $this->objective_map = $this->buildObjectiveMap();
             
@@ -428,7 +409,10 @@ class ilContainerObjectiveGUI extends ilContainerContentGUI
             }
         }
     }
-    
+
+    /**
+     * Stays in ContainergGUI, needed for addItemDetails
+     */
     protected function buildObjectiveMap() : array
     {
         $objective_map = [];
@@ -470,7 +454,10 @@ class ilContainerObjectiveGUI extends ilContainerContentGUI
         
         return $objective_map;
     }
-    
+
+    /**
+     * Stays in ContainergGUI, inject in renderer
+     */
     protected function addItemDetails(ilObjectListGUI $a_item_list_gui, array $a_item) : void
     {
         $lng = $this->lng;

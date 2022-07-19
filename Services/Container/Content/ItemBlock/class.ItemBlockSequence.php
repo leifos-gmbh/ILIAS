@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -16,23 +16,34 @@
  *
  *********************************************************************/
 
-namespace ILIAS\Container;
+namespace ILIAS\Container\Content\ItemBlock;
+
+use ILIAS\Container\Content\Block;
 
 /**
- * Repository internal data service
  * @author Alexander Killing <killing@leifos.de>
  */
-class InternalDataService
+class ItemBlockSequence
 {
-    protected Content\DataService $content_service;
+    /**
+     * @var ItemBlock[]
+     */
+    protected array $blocks = [];
 
-    public function __construct()
-    {
-        $this->content_service = new Content\DataService();
+    /**
+     * @param ItemBlock[] $blocks
+     */
+    public function __construct(
+        array $blocks
+    ) {
+        $this->blocks = $blocks;
     }
 
-    public function content() : Content\DataService
+    /**
+     * @return ItemBlock[]
+     */
+    public function getBlocks() : array
     {
-        return $this->content_service;
+        return $this->blocks;
     }
 }

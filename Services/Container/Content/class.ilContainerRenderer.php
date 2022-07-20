@@ -795,10 +795,12 @@ class ilContainerRenderer
             }
 
             $position = 1;
+            $pos_prefix = "";
 
             // (1) add block
             if ($block->getBlock() instanceof \ILIAS\Container\Content\ItemGroupBlock) {
                 $this->addItemGroupBlock($block_id);
+                $pos_prefix = "[itgr][" . \ilObject::_lookupObjId($block->getBlock()->getRefId()) . "]";
             }
             if ($block->getBlock() instanceof \ILIAS\Container\Content\OtherBlock) {
                 $this->addCustomBlock($block_id, "other");
@@ -815,7 +817,15 @@ class ilContainerRenderer
             // (2) render and add items
             foreach ($block->getItemRefIds() as $ref_id) {
                 $item_data = $this->item_presentation->getRawDataByRefId($ref_id);
-                $html = $this->item_renderer->renderItem($item_data, $position++);
+                $html = $this->item_renderer->renderItem(
+                    $item_data,
+                    $position++,
+                    false,
+                    $pos_prefix,
+                    "",
+                    \ILIAS\Containter\Content\ItemRenderer::CHECKBOX_NONE,
+                    $this->item_presentation->isActiveItemOrdering()
+                );
                 if ($html != "") {
                     $this->addItemToBlock($block_id, $item_data["type"], $item_data["child"], $html);
                 }

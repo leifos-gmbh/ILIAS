@@ -576,7 +576,7 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
                 $main_tpl->setPageFormAction($this->ctrl->getFormAction($this));
             }
         } elseif ($this->edit_order) {
-            if ($this->object->gotItems() && $ilAccess->checkAccess("write", "", $this->object->getRefId())) {
+            if ($this->getItemPresentation()->hasItems() && $ilAccess->checkAccess("write", "", $this->object->getRefId())) {
                 if ($this->isActiveOrdering()) {
                     // #11843
                     $main_tpl->setPageFormAction($this->ctrl->getFormAction($this));
@@ -937,7 +937,7 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
         $ilTabs = $this->tabs;
 
         $this->edit_order = true;
-        $this->getModeManager()->setContentMode();
+        $this->getModeManager()->setOrderingMode();
         $this->renderObject();
 
         $ilTabs->activateSubTab("ordering");
@@ -1875,12 +1875,6 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
     {
         $ilAccess = $this->access;
         parent::setColumnSettings($column_gui);
-
-        if ($ilAccess->checkAccess("write", "", $this->object->getRefId()) &&
-            $this->isActiveAdministrationPanel() &&
-            $this->allowBlocksMoving()) {
-            $column_gui->setEnableMovement(true);
-        }
 
         $column_gui->setItemPresentationManager(
             $this->item_presentation

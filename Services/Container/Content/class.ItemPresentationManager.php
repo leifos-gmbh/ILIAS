@@ -27,6 +27,7 @@ use ILIAS\Repository\Clipboard\ClipboardManager;
  */
 class ItemPresentationManager
 {
+    protected ModeManager $mode_manager;
     protected ?bool $can_order = null;
     protected ClipboardManager $repo_clipboard;
     protected ?bool $can_manage = null;
@@ -48,6 +49,7 @@ class ItemPresentationManager
         $this->domain = $domain;
         $this->container_user_filter = $container_user_filter;
         $this->repo_clipboard = $repo_clipboard;
+        $this->mode_manager = $domain->content()->mode($container);
 
         // sequence from view manager
     }
@@ -82,6 +84,9 @@ class ItemPresentationManager
         return $this->can_manage;
     }
 
+    /**
+     * Controls the ordering subtab
+     */
     public function canOrderItems() : bool
     {
         $user = $this->domain->user();
@@ -97,6 +102,18 @@ class ItemPresentationManager
         }
         return $this->can_order;
     }
+
+    /**
+     * Are we currently in ordering view and the items can be ordered?
+     */
+    public function isActiveItemOrdering() : bool
+    {
+        if ($this->mode_manager->isActiveItemOrdering()) {
+            return true;
+        }
+        return false;
+    }
+
 
     /**
      * @todo from ilContainer, should be removed there

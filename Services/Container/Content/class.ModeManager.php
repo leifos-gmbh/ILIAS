@@ -23,7 +23,7 @@ namespace ILIAS\Container\Content;
  */
 class ModeManager
 {
-    protected bool $ordering_mode;
+    protected bool $ordering_mode = false;
     protected \ILIAS\Repository\Clipboard\ClipboardManager $clipboard;
     protected ModeSessionRepository $mode_repo;
     protected \ilContainer $container;

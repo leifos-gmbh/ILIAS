@@ -17,9 +17,19 @@
 
 # Technical Documentation
 
+## Data
+
+- **Block**: An abstract block (no items) in the container: TypeBlock, SessionBlock, OtherBlock, ItemGroupBlock
+- **BlockSequencePart**: Abstract, partial sequence of blocks: TypeBlocks (all "by type" blocks), ItemGroupBlocks, ObjectivesBlocks
+- **BlockSequence**: An abstract (no items) sequence of all blocks in a container view.
+- **ItemBlock**: A concrete block filled with items (ref IDs). Holds information on items (ref id), block ID, embedded in page status, position, block limit exhausted status.
+- **ItemBlockSequence**: The concrete sequence of blocks in a container view, filled with items.
+
 ## Manager
 
 ### ByTypeViewManager implements ViewManager (and similar)
+
+This manager needs to be implemented by each container view that provides a separate grouping of items.
 
 - api
   - getBlockSequence() : BlockSequence
@@ -70,6 +80,7 @@
 
 ### (1) ilCategoryGUI extends ilContainerGUI (and similar classes)
 
+- initialises ModeManager
 - renderObject
   - getContentGUI() gets ilContainerContentGUI instance
   - -> ilContainerContentGUI::setOutput

@@ -36,6 +36,10 @@ class DomainService
 
     protected ItemSessionRepository $item_repo;
     protected ModeSessionRepository $mode_repo;
+    /**
+     * @var array<int, ModeManager>
+     */
+    protected static array $mode_managers = [];
 
     /**
      * @var array<int, ItemSetManager>
@@ -191,14 +195,21 @@ class DomainService
 
     /**
      * Controls admin/content view state
+     * Note: The node manager currently holds "state". E.g. the ilContainerGUI
+     * class sets e.g. the ordering mode early in the request.
+     * Thus internal manager array is not only caching for performance but also
+     * serves a singleton approach. This may be refactored in the future.
      */
     public function mode(\ilContainer $container) : ModeManager
     {
-        return new ModeManager(
-            $container,
-            $this->mode_repo,
-            $this->repo_clipboard
-        );
+        if (!isset(self::$mode_managers[$container->getId()])) {
+            self::$mode_managers[$container->getId()] = new ModeManager(
+                $container,
+                $this->mode_repo,
+                $this->repo_clipboard
+            );
+        }
+        return self::$mode_managers[$container->getId()];
     }
 
     /**

@@ -44,6 +44,10 @@ class ItemBlockSequenceGenerator
     protected bool $has_other_block = false;
     /** @var int[] */
     protected array $accumulated_ref_ids = [];
+    /** @var array<int, int[]> */
+    protected static array $item_group_ref_ids = [];
+    /** @var int[] */
+    protected array $all_item_group_item_ref_ids = [];
 
     public function __construct(
         DataService $data_service,
@@ -65,6 +69,7 @@ class ItemBlockSequenceGenerator
     public function getSequence() : ItemBlockSequence
     {
         if (is_null($this->sequence)) {
+            $this->preloadSessionandItemGroupItemData();
             $item_blocks = [];
             $sorted_blocks = [];
 
@@ -114,6 +119,38 @@ class ItemBlockSequenceGenerator
         return $this->sequence;
     }
 
+    protected function preloadSessionandItemGroupItemData() : void
+    {
+        foreach ($this->block_sequence->getParts() as $part) {
+            // SessionBlock
+            if ($part instanceof Content\SessionBlock) {
+                /*
+                $ref_ids = $this->item_set_manager->getRefIdsOfType("sess");
+                $block_items = $this->determineBlockItems($ref_ids);
+                if (count($block_items->getRefIds()) > 0) {
+                    yield $this->data_service->itemBlock(
+                        "sess",
+                        $this->data_service->sessionBlock(),
+                        $block_items->getRefIds(),
+                        $block_items->getLimitExhausted()
+                    );
+                }*/
+            }
+            // ItemGroupBlock
+            if ($part instanceof Content\ItemGroupBlock) {
+                $item_ref_ids = $this->getItemGroupItemRefIds($part->getRefId());
+                $this->all_item_group_item_ref_ids = array_unique(array_merge($this->all_item_group_item_ref_ids, $item_ref_ids));
+            }
+            // ItemGroupBlocks
+            if ($part instanceof Content\ItemGroupBlocks) {
+                foreach ($this->item_set_manager->getRefIdsOfType("itgr") as $item_group_ref_id) {
+                    $item_ref_ids = $this->getItemGroupItemRefIds($item_group_ref_id);
+                    $this->all_item_group_item_ref_ids = array_unique(array_merge($this->all_item_group_item_ref_ids, $item_ref_ids));
+                }
+            }
+        }
+    }
+
     /**
      * @return ItemBlock[]
      */
@@ -123,7 +160,7 @@ class ItemBlockSequenceGenerator
         if ($part instanceof Content\TypeBlocks) {
             foreach ($this->getGroupedObjTypes() as $type) {
                 $ref_ids = $this->item_set_manager->getRefIdsOfType($type);
-                $block_items = $this->determineBlockItems($ref_ids);
+                $block_items = $this->determineBlockItems($ref_ids, true);
                 if (count($block_items->getRefIds()) > 0) {
                     yield $this->data_service->itemBlock(
                         $type,
@@ -137,7 +174,7 @@ class ItemBlockSequenceGenerator
         // TypeBlock
         if ($part instanceof Content\TypeBlock) {
             $ref_ids = $this->item_set_manager->getRefIdsOfType($part->getType());
-            $block_items = $this->determineBlockItems($ref_ids);
+            $block_items = $this->determineBlockItems($ref_ids, true);
             if (count($block_items->getRefIds()) > 0) {
                 yield $this->data_service->itemBlock(
                     $part->getType(),
@@ -204,7 +241,7 @@ class ItemBlockSequenceGenerator
         }
     }
 
-    protected function determineBlockItems(array $ref_ids) : BlockItemsInfo
+    protected function determineBlockItems(array $ref_ids, $filter_session_and_item_group_items = false) : BlockItemsInfo
     {
         $exhausted = false;
         $accessible_ref_ids = [];
@@ -215,7 +252,7 @@ class ItemBlockSequenceGenerator
             if ($this->access->checkAccess('visible', '', $ref_id)) {
                 if ($this->block_limit > 0 && count($accessible_ref_ids) >= $this->block_limit) {
                     $exhausted = true;
-                } else {
+                } elseif (!$filter_session_and_item_group_items || !in_array($ref_id, $this->all_item_group_item_ref_ids)) {
                     $accessible_ref_ids[] = $ref_id;
                 }
             }
@@ -263,11 +300,19 @@ class ItemBlockSequenceGenerator
         }
     }
 
+    protected function getItemGroupItemRefIds(int $item_group_ref_id) : array
+    {
+        if (!isset(self::$item_group_ref_ids[$item_group_ref_id])) {
+            self::$item_group_ref_ids[$item_group_ref_id] = array_map(static function ($i) {
+                return (int) $i["child"];
+            }, \ilObjectActivation::getItemsByItemGroup($item_group_ref_id));
+        }
+        return self::$item_group_ref_ids[$item_group_ref_id];
+    }
+
     protected function getItemGroupBlock(int $item_group_ref_id) : ?ItemBlock
     {
-        $ref_ids = array_map(static function ($i) {
-            return (int) $i["child"];
-        }, \ilObjectActivation::getItemsByItemGroup($item_group_ref_id));
+        $ref_ids = $this->getItemGroupItemRefIds($item_group_ref_id);
         $block_items = $this->determineBlockItems($ref_ids);
         if (count($block_items->getRefIds()) > 0) {
             return $this->data_service->itemBlock(

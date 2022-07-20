@@ -1966,7 +1966,6 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 
         // Allow comma
         $positions = $this->std_request->getPositions();
-
         $sorting->savePost($positions);
         $this->tpl->setOnScreenMessage('success', $this->lng->txt('cntr_saved_sorting'), true);
         $this->ctrl->redirect($this, "editOrder");

@@ -159,9 +159,9 @@ class ItemPresentationManager
         // get item set
         $ref_id = $this->container->getRefId();
         if ($this->filteredSubtree()) {
-            $this->item_set = $this->domain->content()->itemSetTree($ref_id);
+            $this->item_set = $this->domain->content()->itemSetTree($ref_id, $this->container_user_filter);
         } else {
-            $this->item_set = $this->domain->content()->itemSetFlat($ref_id);
+            $this->item_set = $this->domain->content()->itemSetFlat($ref_id, $this->container_user_filter);
         }
 
         // get view

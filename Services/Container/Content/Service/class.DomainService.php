@@ -105,13 +105,16 @@ class DomainService
     /**
      * Manages set of conatiner items (flat version)
      */
-    public function itemSetFlat(int $ref_id) : ItemSetManager
-    {
+    public function itemSetFlat(
+        int $ref_id,
+        ?\ilContainerUserFilter $user_filter
+    ) : ItemSetManager {
         if (!isset(self::$flat_item_set_managers[$ref_id])) {
             self::$flat_item_set_managers[$ref_id] = new ItemSetManager(
                 $this->domain_service,
                 ItemSetManager::FLAT,
-                $ref_id
+                $ref_id,
+                $user_filter
             );
         }
         return self::$flat_item_set_managers[$ref_id];
@@ -120,13 +123,16 @@ class DomainService
     /**
      * Manages set of conatiner items (flat version)
      */
-    public function itemSetTree(int $ref_id) : ItemSetManager
-    {
+    public function itemSetTree(
+        int $ref_id,
+        ?\ilContainerUserFilter $user_filter
+    ) : ItemSetManager {
         if (!isset(self::$tree_item_set_managers[$ref_id])) {
             self::$tree_item_set_managers[$ref_id] = new ItemSetManager(
                 $this->domain_service,
                 ItemSetManager::TREE,
-                $ref_id
+                $ref_id,
+                $user_filter
             );
         }
         return self::$tree_item_set_managers[$ref_id];

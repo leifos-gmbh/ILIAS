@@ -37,7 +37,8 @@ This manager needs to be implemented by each container view that provides a sepa
 ### ItemBlockSequenceGenerator
 
 - uses ModeManager, ItemSetManager, ilContainer
-- determines ItemBlocks sequence including sorting, page embedded blocks and items per block
+- determines ItemBlocks sequence incl. page embedded blocks and items per block
+- determines block sorting, item sorting is mostly done in ItemSetManager, except for item group subitems (is done also here)
 - api
   - getSequence() : ItemBlockSequence
 
@@ -58,6 +59,7 @@ This manager needs to be implemented by each container view that provides a sepa
 - gets complete descriptions
 - applies classification filter
 - groups items (by grouped repo type)
+- applies sorting for all items (note that this does not work for item group subitems, these are sorted in ItemBlockSequenceGenerator)
 - api
   - getRefIdsOfType()
   - getAllRefIds()

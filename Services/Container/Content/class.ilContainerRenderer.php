@@ -455,10 +455,11 @@ class ilContainerRenderer
     protected function renderHelperCustomBlock(
         ilTemplate $a_block_tpl,
         $a_block_id,
-        bool $a_is_single = false
+        bool $a_is_single = false,
+        bool $is_exhausted = false
     ) : bool {
         if ($this->hasCustomBlock($a_block_id)) {
-            return $this->renderHelperGeneric($a_block_tpl, $a_block_id, $this->custom_blocks[$a_block_id], $a_is_single);
+            return $this->renderHelperGeneric($a_block_tpl, $a_block_id, $this->custom_blocks[$a_block_id], $a_is_single, $is_exhausted);
         }
         return false;
     }
@@ -466,12 +467,13 @@ class ilContainerRenderer
     protected function renderHelperTypeBlock(
         ilTemplate $a_block_tpl,
         string $a_type,
-        bool $a_is_single = false
+        bool $a_is_single = false,
+        bool $is_exhausted = false
     ) : bool {
         if ($this->hasTypeBlock($a_type)) {
             $block = $this->type_blocks[$a_type];
             $block["type"] = $a_type;
-            return $this->renderHelperGeneric($a_block_tpl, $a_type, $block, $a_is_single);
+            return $this->renderHelperGeneric($a_block_tpl, $a_type, $block, $a_is_single, $is_exhausted);
         }
         return false;
     }
@@ -483,7 +485,8 @@ class ilContainerRenderer
         ilTemplate $a_block_tpl,
         $a_block_id,
         array $a_block,
-        bool $a_is_single = false
+        bool $a_is_single = false,
+        bool $is_exhausted = false
     ) : bool {
         $ctrl = $this->ctrl;
         if (!in_array($a_block_id, $this->rendered_blocks)) {
@@ -581,7 +584,6 @@ class ilContainerRenderer
                             break;
                     }
 
-
                     $html = $renderer->render($deck);
                     $a_block_tpl->setCurrentBlock("tile_rows");
                     $a_block_tpl->setVariable("TILE_ROWS", $html);
@@ -589,7 +591,7 @@ class ilContainerRenderer
                 }
 
                 // show more
-                if (in_array($a_block_id, $this->show_more)) {
+                if ($is_exhausted) {
                     $a_block_tpl->setCurrentBlock("show_more");
 
                     $ctrl->setParameter($this->container_gui, "type", $a_block_id);
@@ -834,14 +836,14 @@ class ilContainerRenderer
             // (3) render blocks
             if ($block->getBlock() instanceof \ILIAS\Container\Content\ItemGroupBlock ||
                 $block->getBlock() instanceof \ILIAS\Container\Content\OtherBlock) {
-                if ($this->renderHelperCustomBlock($block_tpl, $block_id)) {
+                if ($this->renderHelperCustomBlock($block_tpl, $block_id, false, $block->getLimitExhausted())) {
                     $this->addSeparatorRow($block_tpl);
                     $valid = true;
                 }
             }
             if ($block->getBlock() instanceof \ILIAS\Container\Content\TypeBlock ||
                 $block->getBlock() instanceof \ILIAS\Container\Content\SessionBlock) {
-                if ($this->renderHelperTypeBlock($block_tpl, $block_id)) {
+                if ($this->renderHelperTypeBlock($block_tpl, $block_id, false, $block->getLimitExhausted())) {
                     $this->addSeparatorRow($block_tpl);
                     $valid = true;
                 }

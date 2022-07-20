@@ -303,9 +303,13 @@ class ItemBlockSequenceGenerator
     protected function getItemGroupItemRefIds(int $item_group_ref_id) : array
     {
         if (!isset(self::$item_group_ref_ids[$item_group_ref_id])) {
+            $items = \ilContainerSorting::_getInstance(
+                $this->container->getId()
+            )->sortSubItems('itgr', \ilObject::_lookupObjId($item_group_ref_id), \ilObjectActivation::getItemsByItemGroup($item_group_ref_id));
+
             self::$item_group_ref_ids[$item_group_ref_id] = array_map(static function ($i) {
                 return (int) $i["child"];
-            }, \ilObjectActivation::getItemsByItemGroup($item_group_ref_id));
+            }, $items);
         }
         return self::$item_group_ref_ids[$item_group_ref_id];
     }

@@ -90,6 +90,7 @@ class ItemSetManager
         $this->applyUserFilter();
         $this->getCompleteDescriptions();
         $this->applyClassificationFilter();
+        $this->applySorting();
         $this->groupItems();
     }
 
@@ -123,6 +124,14 @@ class ItemSetManager
     {
         $this->init();
         return $this->raw_by_type["_all"][$ref_id] ?? null;
+    }
+
+    protected function applySorting() : void
+    {
+        $sort = \ilContainerSorting::_getInstance($this->parent_obj_id);
+        $all = $sort->sortItems(["all" => $this->raw]);
+        $this->raw = $all["all"];
+        //$this->raw_by_type = $sort->sortItems($this->raw_by_type);
     }
 
     /**

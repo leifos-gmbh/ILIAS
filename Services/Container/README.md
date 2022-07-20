@@ -17,6 +17,55 @@
 
 # Technical Documentation
 
+## Manager
+
+### ByTypeViewManager implements ViewManager (and similar)
+
+- api
+  - getBlockSequence() : BlockSequence
+
+### ItemBlockSequenceGenerator
+
+- uses ModeManager, ItemSetManager, ilContainer
+- determines ItemBlocks sequence including sorting, page embedded blocks and items per block
+- api
+  - getSequence() : ItemBlockSequence
+
+### ModeManager
+
+- handles admin/content/ordering mode
+
+### ItemManager
+
+- uses ModeManager, ItemSessionRepository
+- handles expand state
+- handles details level
+
+### ItemSetManager
+
+- gets items from tree
+- applies user filter
+- gets complete descriptions
+- applies classification filter
+- groups items (by grouped repo type)
+- api
+  - getRefIdsOfType()
+  - getAllRefIds()
+  - getRawDataByRefId()
+  
+### ItemPresentationManager
+
+- uses ItemBlockSequenceGenerator, ItemSetManager
+- api
+  - canManageItems()
+  - canOrderItems()
+  - isClassificationFilterActive()
+  - filteredSubtree() (should a filtered subtree be displayed due to classification filter?)
+  - hasItems()
+  - getItemBlockSequence()
+  - getRawDataByRefId()
+  - getRefIdsOfType()
+
 ## Presentation Control Flow
 
 ### (1) ilCategoryGUI extends ilContainerGUI (and similar classes)

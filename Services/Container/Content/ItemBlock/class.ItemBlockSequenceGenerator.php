@@ -161,7 +161,7 @@ class ItemBlockSequenceGenerator
             foreach ($this->getGroupedObjTypes() as $type) {
                 $ref_ids = $this->item_set_manager->getRefIdsOfType($type);
                 $block_items = $this->determineBlockItems($ref_ids, true);
-                if (count($block_items->getRefIds()) > 0) {
+                if ($type !== "itgr" && count($block_items->getRefIds()) > 0) {
                     yield $this->data_service->itemBlock(
                         $type,
                         $this->data_service->typeBlock($type),
@@ -272,6 +272,9 @@ class ItemBlockSequenceGenerator
 
     protected function getOtherBlock() : ?ItemBlock
     {
+        if (!$this->has_other_block) {
+            return null;
+        }
         $remaining_ref_ids = array_filter(
             $this->item_set_manager->getAllRefIds(),
             fn ($i) => !isset($this->accumulated_ref_ids[$i])
@@ -342,8 +345,8 @@ class ItemBlockSequenceGenerator
         // iterate all types
         foreach ($type_grps as $type => $v) {
             // set template (overall or type specific)
-            if (is_int(strpos($container_page_html, "[list-" . $type . "]"))) {
-                $ids[] = $type;
+            if (is_int(strpos($container_page_html, "[list-" . $v . "]"))) {
+                $ids[] = $v;
             }
         }
 
@@ -355,6 +358,11 @@ class ItemBlockSequenceGenerator
         // determine item groups
         while (preg_match('~\[(item-group-([0-9]*))\]~i', $container_page_html, $found)) {
             $ids[] = $found[2];
+            $container_page_html = preg_replace(
+                '~\[' . $found[1] . '\]~i',
+                "",
+                $container_page_html
+            );
         }
         return $ids;
     }

@@ -253,7 +253,7 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
         $page_gui->setStyleId(
             $style->getEffectiveStyleId()
         );
-
+        $page_gui->setItemPresentationManager($this->getItemPresentation());
         $page_gui->setTemplateTargetVar("ADM_CONTENT");
         $page_gui->setFileDownloadLink("");
         //$page_gui->setLinkParams($this->ctrl->getUrlParameterString()); // todo

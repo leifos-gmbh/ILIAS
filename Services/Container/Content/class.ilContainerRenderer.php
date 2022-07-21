@@ -774,10 +774,17 @@ class ilContainerRenderer
         return $this->item_renderer;
     }
 
+    protected function renderContainerPage() : string
+    {
+        return $this->container_gui->getContainerPageHTML();
+    }
+
     public function renderItemBlockSequence(
         \ILIAS\Container\Content\ItemBlock\ItemBlockSequence $sequence
     ) : string {
         $valid = false;
+
+        $page_html = $this->renderContainerPage();
 
         $block_tpl = $this->initBlockTemplate();
 
@@ -834,18 +841,36 @@ class ilContainerRenderer
             }
 
             // (3) render blocks
-            if ($block->getBlock() instanceof \ILIAS\Container\Content\ItemGroupBlock ||
-                $block->getBlock() instanceof \ILIAS\Container\Content\OtherBlock) {
-                if ($this->renderHelperCustomBlock($block_tpl, $block_id, false, $block->getLimitExhausted())) {
-                    $this->addSeparatorRow($block_tpl);
+            if ($block->getPageEmbedded()) {
+                if ($block->getBlock() instanceof \ILIAS\Container\Content\TypeBlock) {
+                    $page_html = preg_replace(
+                        '~\[list-' . $block->getId() . '\]~i',
+                        $this->renderSingleTypeBlock($block->getId()),
+                        $page_html
+                    );
+                    $valid = true;
+                } elseif ($block->getBlock() instanceof \ILIAS\Container\Content\ItemGroupBlock) {
+                    $page_html = preg_replace(
+                        '~\[item-group-' . $block->getId() . '\]~i',
+                        $this->renderSingleCustomBlock((int) $block->getId()),
+                        $page_html
+                    );
                     $valid = true;
                 }
-            }
-            if ($block->getBlock() instanceof \ILIAS\Container\Content\TypeBlock ||
-                $block->getBlock() instanceof \ILIAS\Container\Content\SessionBlock) {
-                if ($this->renderHelperTypeBlock($block_tpl, $block_id, false, $block->getLimitExhausted())) {
-                    $this->addSeparatorRow($block_tpl);
-                    $valid = true;
+            } else {
+                if ($block->getBlock() instanceof \ILIAS\Container\Content\ItemGroupBlock ||
+                    $block->getBlock() instanceof \ILIAS\Container\Content\OtherBlock) {
+                    if ($this->renderHelperCustomBlock($block_tpl, $block_id, false, $block->getLimitExhausted())) {
+                        $this->addSeparatorRow($block_tpl);
+                        $valid = true;
+                    }
+                }
+                if ($block->getBlock() instanceof \ILIAS\Container\Content\TypeBlock ||
+                    $block->getBlock() instanceof \ILIAS\Container\Content\SessionBlock) {
+                    if ($this->renderHelperTypeBlock($block_tpl, $block_id, false, $block->getLimitExhausted())) {
+                        $this->addSeparatorRow($block_tpl);
+                        $valid = true;
+                    }
                 }
             }
         }
@@ -853,7 +878,7 @@ class ilContainerRenderer
         if ($valid) {
             $this->renderDetails($block_tpl);
 
-            return $block_tpl->get();
+            return $page_html . $block_tpl->get();
         }
         return "";
     }

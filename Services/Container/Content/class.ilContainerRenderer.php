@@ -856,7 +856,8 @@ class ilContainerRenderer
 
             // (3) render blocks
             if ($block->getPageEmbedded()) {
-                if ($block->getBlock() instanceof \ILIAS\Container\Content\TypeBlock) {
+                if ($block->getBlock() instanceof \ILIAS\Container\Content\TypeBlock ||
+                    $block->getBlock() instanceof \ILIAS\Container\Content\SessionBlock) {
                     $page_html = preg_replace(
                         '~\[list-' . $block->getId() . '\]~i',
                         $this->renderSingleTypeBlock($block->getId()),

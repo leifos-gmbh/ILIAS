@@ -112,7 +112,8 @@ class ItemBlockSequenceGenerator
                         }
                     }
                 } else {
-                    throw new \ilException("Missing item group data.");
+                    // e.g. deleted item group
+                    //throw new \ilException("Missing item group data.");
                 }
             }
 

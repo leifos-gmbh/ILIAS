@@ -141,7 +141,7 @@ class ItemPresentationManager
     /**
      * @todo from ilContainer, should be removed there
      */
-    protected function filteredSubtree() : bool
+    public function filteredSubtree() : bool
     {
         return $this->isClassificationFilterActive() && in_array(
             $this->container->getType(),

@@ -23,40 +23,10 @@
  */
 class ilContainerSimpleContentGUI extends ilContainerContentGUI
 {
-    protected ilTabsGUI $tabs;
-    protected int $force_details;
-    
-    public function __construct(
-        ilContainerGUI $container_gui_obj
-    ) {
-        global $DIC;
-
-        $this->lng = $DIC->language();
-        $this->tabs = $DIC->tabs();
-        $this->access = $DIC->access();
-        $this->user = $DIC->user();
-        parent::__construct($container_gui_obj);
-    }
-
-    public function getMainContent() : string
+    public function renderItemList() : string
     {
-        // see bug #7452
-        //		$ilTabs->setSubTabActive($this->getContainerObject()->getType().'_content');
-
-        $tpl = new ilTemplate(
-            "tpl.container_page.html",
-            true,
-            true,
-            "Services/Container"
-        );
-
-        // Feedback
-        // @todo
-        //		$this->__showFeedBack();
-
-        $this->showMaterials($tpl);
-            
-        return $tpl->get();
+        $this->initRenderer();
+        return $this->renderer->renderItemBlockSequence($this->item_presentation->getItemBlockSequence());
     }
 
     private function showMaterials(
@@ -99,20 +69,5 @@ class ilContainerSimpleContentGUI extends ilContainerContentGUI
         $output_html .= $this->renderer->getHTML();
         
         $a_tpl->setVariable("CONTAINER_PAGE_CONTENT", $output_html);
-    }
-
-    protected function getDetailsLevel(int $a_item_id) : int
-    {
-        if ($this->getContainerGUI()->isActiveAdministrationPanel()) {
-            return self::DETAILS_DEACTIVATED;
-        }
-        if ($this->item_manager->getExpanded($a_item_id) !== null) {
-            return $this->item_manager->getExpanded($a_item_id);
-        }
-        if ($a_item_id == $this->force_details) {
-            return self::DETAILS_ALL;
-        }
-
-        return self::DETAILS_TITLE;
     }
 }

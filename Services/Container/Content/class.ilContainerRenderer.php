@@ -790,11 +790,16 @@ class ilContainerRenderer
 
         foreach ($sequence->getBlocks() as $block) {
             $block_id = "";
+            $force_item_even_if_already_rendered = false;
             if ($block->getBlock() instanceof \ILIAS\Container\Content\ItemGroupBlock) {
                 $block_id = (string) $block->getBlock()->getRefId();
+                $force_item_even_if_already_rendered = true;
             }
             if ($block->getBlock() instanceof \ILIAS\Container\Content\TypeBlock) {
                 $block_id = $block->getBlock()->getType();
+                if ($block->getPageEmbedded()) {
+                    $force_item_even_if_already_rendered = true;
+                }
             }
             if ($block->getBlock() instanceof \ILIAS\Container\Content\SessionBlock) {
                 $block_id = "sess";
@@ -812,7 +817,10 @@ class ilContainerRenderer
                 $pos_prefix = "[itgr][" . \ilObject::_lookupObjId($block->getBlock()->getRefId()) . "]";
             }
             if ($block->getBlock() instanceof \ILIAS\Container\Content\OtherBlock) {
-                $this->addCustomBlock($block_id, "other");
+                $title = $this->item_presentation->filteredSubtree()
+                    ? $this->lng->txt("cont_found_objects")
+                    : $this->lng->txt("content");
+                $this->addCustomBlock($block_id, $title);
             }
             if ($block->getBlock() instanceof \ILIAS\Container\Content\TypeBlock ||
                 $block->getBlock() instanceof \ILIAS\Container\Content\SessionBlock) {
@@ -836,7 +844,13 @@ class ilContainerRenderer
                     $this->item_presentation->isActiveItemOrdering()
                 );
                 if ($html != "") {
-                    $this->addItemToBlock($block_id, $item_data["type"], $item_data["child"], $html);
+                    $this->addItemToBlock(
+                        $block_id,
+                        $item_data["type"],
+                        $item_data["child"],
+                        $html,
+                        $force_item_even_if_already_rendered
+                    );
                 }
             }
 
@@ -853,6 +867,13 @@ class ilContainerRenderer
                     $page_html = preg_replace(
                         '~\[item-group-' . $block->getId() . '\]~i',
                         $this->renderSingleCustomBlock((int) $block->getId()),
+                        $page_html
+                    );
+                    $valid = true;
+                } elseif ($block->getBlock() instanceof \ILIAS\Container\Content\OtherBlock) {
+                    $page_html = preg_replace(
+                        '~\[list-_other\]~i',
+                        $this->renderSingleCustomBlock($block->getId()),
                         $page_html
                     );
                     $valid = true;
@@ -877,7 +898,6 @@ class ilContainerRenderer
 
         if ($valid) {
             $this->renderDetails($block_tpl);
-
             return $page_html . $block_tpl->get();
         }
         return "";

@@ -93,6 +93,26 @@ class ItemBlockSequenceGenerator
                     $item_blocks[$id]->setPageEmbedded(true);
                     $sorted_blocks[] = $item_blocks[$id];
                     unset($item_blocks[$id]);
+                } elseif (!is_numeric($id)) {
+                    // add item blocks of page, even if originally not in the block set
+                    if ($id === "_other") {
+                        $this->has_other_block = true;
+                    } else {
+                        $ref_ids = $this->item_set_manager->getRefIdsOfType($id);
+                        $block_items = $this->determineBlockItems($ref_ids, true);
+                        if (count($block_items->getRefIds()) > 0) {
+                            $block = $this->data_service->itemBlock(
+                                $id,
+                                $this->data_service->typeBlock($id),
+                                $block_items->getRefIds(),
+                                $block_items->getLimitExhausted()
+                            );
+                            $block->setPageEmbedded(true);
+                            $sorted_blocks[] = $block;
+                        }
+                    }
+                } else {
+                    throw new \ilException("Missing item group data.");
                 }
             }
 
@@ -160,6 +180,7 @@ class ItemBlockSequenceGenerator
         if ($part instanceof Content\TypeBlocks) {
             foreach ($this->getGroupedObjTypes() as $type) {
                 $ref_ids = $this->item_set_manager->getRefIdsOfType($type);
+                $this->accumulateRefIds($ref_ids);
                 $block_items = $this->determineBlockItems($ref_ids, true);
                 if ($type !== "itgr" && count($block_items->getRefIds()) > 0) {
                     yield $this->data_service->itemBlock(
@@ -174,6 +195,7 @@ class ItemBlockSequenceGenerator
         // TypeBlock
         if ($part instanceof Content\TypeBlock) {
             $ref_ids = $this->item_set_manager->getRefIdsOfType($part->getType());
+            $this->accumulateRefIds($ref_ids);
             $block_items = $this->determineBlockItems($ref_ids, true);
             if (count($block_items->getRefIds()) > 0) {
                 yield $this->data_service->itemBlock(
@@ -187,6 +209,7 @@ class ItemBlockSequenceGenerator
         // SessionBlock
         if ($part instanceof Content\SessionBlock) {
             $ref_ids = $this->item_set_manager->getRefIdsOfType("sess");
+            $this->accumulateRefIds($ref_ids);
             $block_items = $this->determineBlockItems($ref_ids);
             if (count($block_items->getRefIds()) > 0) {
                 yield $this->data_service->itemBlock(
@@ -320,6 +343,7 @@ class ItemBlockSequenceGenerator
     protected function getItemGroupBlock(int $item_group_ref_id) : ?ItemBlock
     {
         $ref_ids = $this->getItemGroupItemRefIds($item_group_ref_id);
+        $this->accumulateRefIds($ref_ids);
         $block_items = $this->determineBlockItems($ref_ids);
         if (count($block_items->getRefIds()) > 0) {
             return $this->data_service->itemBlock(
@@ -354,7 +378,6 @@ class ItemBlockSequenceGenerator
         if (is_int(strpos($container_page_html, "[list-" . $type . "]"))) {
             $ids[] = $type;
         }
-
         // determine item groups
         while (preg_match('~\[(item-group-([0-9]*))\]~i', $container_page_html, $found)) {
             $ids[] = $found[2];

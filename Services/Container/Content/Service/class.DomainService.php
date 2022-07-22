@@ -160,7 +160,7 @@ class DomainService
         }
         switch ($view_mode) {
             case \ilContainer::VIEW_SIMPLE:
-                $container_view = new SimpleContentViewManager(
+                $container_view = new SimpleViewManager(
                     $this->data_service->content(),
                     $this->domain_service,
                     $container

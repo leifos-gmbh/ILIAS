@@ -553,6 +553,21 @@ class ilObjGlossaryGUI extends ilObjectGUI
         $pres_mode->addOption($op2);
         $this->form->addItem($pres_mode);
 
+        // flashcard training
+        $flash_train = new ilCheckboxInputGUI($this->lng->txt("flashcard_training"), "flash_train"); //Sprachvariable
+        //$flash_train->setValue("y");
+        $flash_train->setInfo($this->lng->txt("flashcard_training_info")); //Sprachvariable
+
+        //flashcard training mode
+        $flash_train_mode = new ilRadioGroupInputGUI($this->lng->txt("flashcard_training_mode"), "flash_train_mode"); //Sprachvariable
+        $flash_train_mode->setValue("terms");
+        $op1 = new ilRadioOption($this->lng->txt("terms_vs_defs"), "terms", $this->lng->txt("terms_vs_defs_info")); //Sprachvariable
+        $flash_train_mode->addOption($op1);
+        $op2 = new ilRadioOption($this->lng->txt("defs_vs_terms"), "defs", $this->lng->txt("defs_vs_terms_info")); //Sprachvariable
+        $flash_train_mode->addOption($op2);
+        $flash_train->addSubItem($flash_train_mode);
+        $this->form->addItem($flash_train);
+
         // show taxonomy
         $show_tax = null;
         $tax_ids = ilObjTaxonomy::getUsageOfObject($this->object->getId());

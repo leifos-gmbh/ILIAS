@@ -22,6 +22,7 @@
  */
 class ilPCResourcesGUI extends ilPageContentGUI
 {
+    protected \ILIAS\Container\InternalDomainService $container_domain;
     protected ilTree $rep_tree;
     protected ilObjectDefinition $obj_definition;
 
@@ -41,6 +42,9 @@ class ilPCResourcesGUI extends ilPageContentGUI
         $tree = $DIC->repositoryTree();
         
         $this->rep_tree = $tree;
+
+        $this->container_domain = $DIC->container()->internal()->domain();
+
         parent::__construct($a_pg_obj, $a_content_obj, $a_hier_id, $a_pc_id);
     }
 
@@ -88,6 +92,7 @@ class ilPCResourcesGUI extends ilPageContentGUI
         // count number of existing objects per type and collect item groups
         $ref_id = $this->requested_ref_id;
         $childs = $this->rep_tree->getChilds($ref_id);
+
         $type_counts = array();
         $item_groups = array();
         foreach ($childs as $c) {
@@ -102,22 +107,26 @@ class ilPCResourcesGUI extends ilPageContentGUI
             }
         }
         
-        if (count($item_groups) > 0) {
-            // radio group for type selection
-            $radg = new ilRadioGroupInputGUI($lng->txt("cont_resources"), "res_type");
-            if (!$a_insert && $this->content_obj->getMainType() == "ItemGroup") {
-                $radg->setValue("itgr");
-            } else {
-                $radg->setValue("by_type");
-            }
-            
-            $op_type = new ilRadioOption($lng->txt("cont_resources_of_type"), "by_type", "");
+        // radio group for type selection
+        $radg = new ilRadioGroupInputGUI($lng->txt("cont_resources"), "res_type");
+        if (!$a_insert && $this->content_obj->getMainType() == "ItemGroup") {
+            $radg->setValue("itgr");
+        } else {
+            $radg->setValue("by_type");
+        }
+
+
+        $op_type = new ilRadioOption($lng->txt("cont_resources_of_type"), "by_type", "");
+        if ($this->supportsTypeBlocks()) {
             $radg->addOption($op_type);
+        }
+
+        if ($this->supportsItemGroups() && count($item_groups) > 0) {
             $op_itemgroup = new ilRadioOption($lng->txt("obj_itgr"), "itgr", "");
             $radg->addOption($op_itemgroup);
-            $form->addItem($radg);
         }
-        
+        $form->addItem($radg);
+
         // type selection
         $type_prop = new ilSelectInputGUI(
             $this->lng->txt("cont_type"),
@@ -142,13 +151,9 @@ class ilPCResourcesGUI extends ilPageContentGUI
             ? ""
             : $this->content_obj->getResourceListType();
         $type_prop->setValue($selected);
-        if (count($item_groups) > 0) {
-            $op_type->addSubItem($type_prop);
-        } else {
-            $form->addItem($type_prop);
-        }
-        
-        if (count($item_groups) > 0) {
+        $op_type->addSubItem($type_prop);
+
+        if ($this->supportsItemGroups() && count($item_groups) > 0) {
             // item groups
             $options = $item_groups;
             $si = new ilSelectInputGUI($this->lng->txt("obj_itgr"), "itgr");
@@ -159,8 +164,18 @@ class ilPCResourcesGUI extends ilPageContentGUI
             $op_itemgroup->addSubItem($si);
         }
 
+        // learning objectives
+        if ($this->supportsObjectives()) {
+            $lng->loadLanguageModule("crs");
+            $op_lobj = new ilRadioOption($lng->txt("crs_objectives"), "_lobj", "");
+            $radg->addOption($op_lobj);
+            if ($this->content_obj->getResourceListType() === "_lobj") {
+                $radg->setValue("_lobj");
+            }
+        }
+
         // other
-        if (!is_null($radg)) {
+        if ($this->supportsOther()) {
             $op_other = new ilRadioOption($lng->txt("cont_other_resources"), "_other", "");
             $radg->addOption($op_other);
             if ($this->content_obj->getResourceListType() === "_other") {
@@ -180,6 +195,58 @@ class ilPCResourcesGUI extends ilPageContentGUI
         $tpl->setContent($html);
     }
 
+    /**
+     * @throws ilDatabaseException
+     * @throws ilObjectNotFoundException
+     */
+    protected function getContainerViewManager() : \ILIAS\Container\Content\ViewManager
+    {
+        $ref_id = $this->requested_ref_id;
+        $container = ilObjectFactory::getInstanceByRefId($ref_id);
+        $view_manager = $this->container_domain->content()->view($container);
+        return $view_manager;
+    }
+
+    protected function supportsItemGroups() : bool
+    {
+        foreach ($this->getContainerViewManager()->getBlockSequence()->getParts() as $part) {
+            if ($part instanceof \ILIAS\Container\Content\ItemGroupBlocks) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected function supportsOther() : bool
+    {
+        foreach ($this->getContainerViewManager()->getBlockSequence()->getParts() as $part) {
+            if ($part instanceof \ILIAS\Container\Content\OtherBlock) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected function supportsObjectives() : bool
+    {
+        foreach ($this->getContainerViewManager()->getBlockSequence()->getParts() as $part) {
+            if ($part instanceof \ILIAS\Container\Content\ObjectivesBlock) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected function supportsTypeBlocks() : bool
+    {
+        foreach ($this->getContainerViewManager()->getBlockSequence()->getParts() as $part) {
+            if ($part instanceof \ILIAS\Container\Content\TypeBlocks) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function create() : void
     {
         $this->content_obj = new ilPCResources($this->getPage());
@@ -187,7 +254,9 @@ class ilPCResourcesGUI extends ilPageContentGUI
 
         if ($this->request->getString("res_type") === "_other") {
             $this->content_obj->setResourceListType("_other");
-        } elseif ($this->request->getString("res_type") != "itgr") {
+        } elseif ($this->request->getString("res_type") === "_lobj") {
+            $this->content_obj->setResourceListType("_lobj");
+        } elseif ($this->request->getString("res_type") !== "itgr") {
             $this->content_obj->setResourceListType(
                 $this->request->getString("type")
             );
@@ -208,6 +277,8 @@ class ilPCResourcesGUI extends ilPageContentGUI
     {
         if ($this->request->getString("res_type") === "_other") {
             $this->content_obj->setResourceListType("_other");
+        } elseif ($this->request->getString("res_type") === "_lobj") {
+            $this->content_obj->setResourceListType("_lobj");
         } elseif ($this->request->getString("res_type") !== "itgr") {
             $this->content_obj->setResourceListType(
                 $this->request->getString("type")

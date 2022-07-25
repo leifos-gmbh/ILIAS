@@ -48,8 +48,13 @@ class ilGlossaryDBUpdateSteps implements ilDatabaseUpdateSteps
 
     public function step_2() : void
     {
-        //if ($this->db->tableExists("glossary_definition")) {
-        //    $this->db->dropTable("glossary_definition");
-        //}
+        if (!$this->db->tableColumnExists("glossary_definition", "migration")) {
+            $this->db->addTableColumn("glossary_definition", "migration", [
+                "type" => "integer",
+                "notnull" => true,
+                "length" => 4,
+                "default" => 0
+            ]);
+        }
     }
 }

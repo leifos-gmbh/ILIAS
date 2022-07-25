@@ -257,12 +257,22 @@ class ilPCResourcesGUI extends ilPageContentGUI
             $tpl = new ilTemplate("tpl.resource_block.html", true, true, "Services/COPage");
             $cnt = 0;
 
-            if (count($block->getItemRefIds()) > 0) {
+            if (!($block->getBlock() instanceof \ILIAS\Container\Content\ObjectivesBlock) &&
+                count($block->getItemRefIds()) > 0) {
                 foreach ($block->getItemRefIds() as $ref_id) {
                     $data = $item_presentation_manager->getRawDataByRefId($ref_id);
                     $tpl->setCurrentBlock("row");
                     $tpl->setVariable("IMG", ilUtil::img(ilObject::_getIcon((int) $data["obj_id"], "small")));
                     $tpl->setVariable("TITLE", $data["title"]);
+                    $tpl->parseCurrentBlock();
+                    $cnt++;
+                }
+            } elseif (count($block->getObjectiveIds()) > 0) {
+                foreach ($block->getObjectiveIds() as $objective_id) {
+                    $title = \ilCourseObjective::lookupObjectiveTitle($objective_id);
+                    $tpl->setCurrentBlock("row");
+                    $tpl->setVariable("IMG", ilUtil::img(ilUtil::getImagePath("icon_lobj.svg")));
+                    $tpl->setVariable("TITLE", $title);
                     $tpl->parseCurrentBlock();
                     $cnt++;
                 }
@@ -275,12 +285,20 @@ class ilPCResourcesGUI extends ilPageContentGUI
                 $type = $block->getId();
                 $tpl->setVariable("HEADER", $lng->txt("objs_" . $type));
                 $a_content = str_replace("[list-" . $type . "]", $tpl->get(), $a_content);
+            } elseif ($block->getBlock() instanceof \ILIAS\Container\Content\SessionBlock) {
+                $type = $block->getId();
+                $tpl->setVariable("HEADER", $lng->txt("objs_sess"));
+                $a_content = str_replace("[list-" . $type . "]", $tpl->get(), $a_content);
             } elseif ($block->getBlock() instanceof \ILIAS\Container\Content\ItemGroupBlock) {
                 $id = $block->getId();
                 $tpl->setVariable("HEADER", \ilObject::_lookupTitle(
                     \ilObject::_lookupObjId((int) $id)
                 ));
                 $a_content = str_replace("[item-group-" . $id . "]", $tpl->get(), $a_content);
+            } elseif ($block->getBlock() instanceof \ILIAS\Container\Content\ObjectivesBlock) {
+                $id = $block->getId();
+                $tpl->setVariable("HEADER", $lng->txt("crs_objectives"));
+                $a_content = str_replace("[list-_lobj]", $tpl->get(), $a_content);
             } elseif ($block->getBlock() instanceof \ILIAS\Container\Content\OtherBlock) {
                 $id = $block->getId();
                 $tpl->setVariable("HEADER", $lng->txt("cont_content"));

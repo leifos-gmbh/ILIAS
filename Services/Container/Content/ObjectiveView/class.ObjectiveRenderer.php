@@ -143,17 +143,19 @@ class ObjectiveRenderer
         return $this->output_html;
     }
 
+    public function getContent() : string
+    {
+        return $this->output_html;
+    }
 
     public function showObjectives(bool $a_is_order = false) : void
     {
         $lng = $this->domain->lng();
         $ilSetting = $this->domain->settings();
-
         // All objectives
         if (!count($objective_ids = \ilCourseObjective::_getObjectiveIds($this->container->getId(), true))) {
             return;
         }
-
         $this->objective_list_gui = new \ilCourseObjectiveListGUI();
         $this->objective_list_gui->setContainerObject($this->container_gui);
         if ($ilSetting->get("icon_position_in_lists") === "item_rows") {
@@ -192,7 +194,7 @@ class ObjectiveRenderer
                 $lur_data[$objective_id] = array("type" => \ilLOSettings::TYPE_TEST_INITIAL);
             }
 
-            if ($html = $this->renderObjective($objective_id, $has_lo_page, $acc, $lur_data[$objective_id])) {
+            if ($html = $this->renderObjective((int) $objective_id, $has_lo_page, $acc, $lur_data[$objective_id])) {
                 $this->renderer->addItemToBlock('lobj', 'lobj', $objective_id, $html);
             }
             $obj_cnt++;
@@ -477,21 +479,26 @@ class ObjectiveRenderer
                     }
 
                     $sub_item_html = $item_list_gui2->getListItemHTML(
-                        $item['ref_id'],
-                        $item['obj_id'],
+                        (int) $item['ref_id'],
+                        (int) $item['obj_id'],
                         $title,
                         $item['description']
                     );
 
                     // #13381 - use materials order
-                    $sort_key = str_pad($chapter['position'], 5, 0, STR_PAD_LEFT) . "_" . strtolower($title) . "_" . $chapter['lm_ass_id'];
+                    $sort_key = str_pad(
+                        (string) $chapter['position'],
+                        5,
+                        "0",
+                        STR_PAD_LEFT
+                    ) . "_" . strtolower($title) . "_" . $chapter['lm_ass_id'];
                     $sort_content[$sort_key] = $sub_item_html;
                 }
             }
 
             $this->rendered_items[$item['child']] = true;
 
-            if ($lm_ass_id = $objectives_lm_obj->isAssigned($item['ref_id'], true)) {
+            if ($lm_ass_id = $objectives_lm_obj->isAssigned((int) $item['ref_id'], true)) {
                 if ($is_order) {
                     $item_list_gui2->setPositionInputField(
                         "[lobj][" . $a_objective_id . "][" . $lm_ass_id . "]",
@@ -997,7 +1004,7 @@ class ObjectiveRenderer
         $summary = self::getObjectiveResultSummary(
             $this->loc_settings->worksWithInitialTest(),
             $a_objective->getObjectiveId(),
-            $a_lo_result
+            $a_lo_result ?? []
         );
         if (strlen($summary)) {
             $tpl->setCurrentBlock('objective_summary');

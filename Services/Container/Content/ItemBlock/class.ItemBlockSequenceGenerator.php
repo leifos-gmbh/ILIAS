@@ -230,19 +230,18 @@ class ItemBlockSequenceGenerator
         }
         // ObjectivesBlock
         if ($part instanceof Content\ObjectivesBlock) {
-
             // in admin mode, we do not include the objectives block
             // -> all items will be presented in item group/other block
             if (!$this->mode_manager->isAdminMode()) {
                 $objective_ids = \ilCourseObjective::_getObjectiveIds($this->container->getId(), true);
                 $ref_ids = [];
                 foreach ($objective_ids as $objective_id) {
-                    foreach (\ilObjectActivation::getItemsByObjective($objective_id) as $ref_id) {
-                        $ref_ids[] = $ref_id;
+                    foreach (\ilObjectActivation::getItemsByObjective((int) $objective_id) as $data) {
+                        $ref_ids[] = (int) $data["ref_id"];
                     }
                 }
                 yield $this->data_service->itemBlock(
-                    "lobj",
+                    "_lobj",
                     $part,
                     $ref_ids,
                     false,
@@ -376,6 +375,10 @@ class ItemBlockSequenceGenerator
         }
 
         $type = "_other";
+        if (is_int(strpos($container_page_html, "[list-" . $type . "]"))) {
+            $ids[] = $type;
+        }
+        $type = "_lobj";
         if (is_int(strpos($container_page_html, "[list-" . $type . "]"))) {
             $ids[] = $type;
         }

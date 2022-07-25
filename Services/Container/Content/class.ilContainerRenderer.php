@@ -807,6 +807,9 @@ class ilContainerRenderer
             if ($block->getBlock() instanceof \ILIAS\Container\Content\OtherBlock) {
                 $block_id = "_other";
             }
+            if ($block->getBlock() instanceof \ILIAS\Container\Content\ObjectivesBlock) {
+                $block_id = "_lobj";
+            }
 
             $position = 1;
             $pos_prefix = "";
@@ -878,6 +881,13 @@ class ilContainerRenderer
                         $page_html
                     );
                     $valid = true;
+                } elseif ($block->getBlock() instanceof \ILIAS\Container\Content\ObjectivesBlock) {
+                    $page_html = preg_replace(
+                        '~\[list-_lobj\]~i',
+                        $this->objective_renderer->renderObjectives(),
+                        $page_html
+                    );
+                    $valid = true;
                 }
             } else {
                 if ($block->getBlock() instanceof \ILIAS\Container\Content\ItemGroupBlock ||
@@ -893,6 +903,14 @@ class ilContainerRenderer
                         $this->addSeparatorRow($block_tpl);
                         $valid = true;
                     }
+                }
+                if ($block->getBlock() instanceof \ILIAS\Container\Content\ObjectivesBlock) {
+                    $this->objective_renderer->renderObjectives();
+                    $block_tpl->setVariable(
+                        "CONTENT",
+                        $this->objective_renderer->getContent()
+                    );
+                    $this->addSeparatorRow($block_tpl);
                 }
             }
         }

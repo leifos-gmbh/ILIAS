@@ -69,9 +69,10 @@ class ilContainerPage extends ilPageObject
             $pc_resources->setResourceListType("_other");
         } elseif ($block instanceof \ILIAS\Container\Content\SessionBlock) {
             $pc_resources->setResourceListType("sess");
+        } elseif ($block instanceof \ILIAS\Container\Content\ObjectivesBlock) {
+            $pc_resources->setResourceListType("_lobj");
         } else {
-            var_dump("unknown type " . get_class($block));
-            exit;
+            throw new ilException("unknown type " . get_class($block));
         }
         $this->update();
     }

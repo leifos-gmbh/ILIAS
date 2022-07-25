@@ -84,7 +84,7 @@ class ilContainerObjectiveGUI extends ilContainerContentGUI
         $ilCtrl = $this->ctrl;
         $has_results = false;
 
-        $tpl = new ilTemplate("tpl.container_page.html", true, true, "Services/Container");
+        //$tpl = new ilTemplate("tpl.container_page.html", true, true, "Services/Container");
 
         if ($ilAccess->checkAccess('write', '', $this->getContainerObject()->getRefId())) {
             // check for results
@@ -96,6 +96,8 @@ class ilContainerObjectiveGUI extends ilContainerContentGUI
                 );
             }
         }
+
+        return parent::getMainContent();
 
         // Feedback
         // @todo
@@ -156,6 +158,12 @@ class ilContainerObjectiveGUI extends ilContainerContentGUI
         $tpl->setVariable('CONTAINER_PAGE_CONTENT', $this->output_html);
         
         return $tpl->get();
+    }
+
+    public function renderItemList() : string
+    {
+        $this->initRenderer();
+        return $this->renderer->renderItemBlockSequence($this->item_presentation->getItemBlockSequence());
     }
 
 

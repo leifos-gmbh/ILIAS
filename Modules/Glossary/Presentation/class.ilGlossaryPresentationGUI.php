@@ -21,6 +21,7 @@ use ILIAS\Glossary\Presentation;
 /**
  * @author Alexander Killing <killing@leifos.de>
  * @ilCtrl_Calls ilGlossaryPresentationGUI: ilNoteGUI, ilInfoScreenGUI, ilPresentationListTableGUI, ilGlossaryDefPageGUI
+ * @ilCtrl_Calls ilGlossaryPresentationGUI: ilGlossaryFlashcardGUI
  */
 class ilGlossaryPresentationGUI implements ilCtrlBaseClassInterface
 {
@@ -56,6 +57,8 @@ class ilGlossaryPresentationGUI implements ilCtrlBaseClassInterface
     protected \ILIAS\Style\Content\Service $content_style_service;
     protected \ILIAS\Style\Content\GUIService $content_style_gui;
     protected \ILIAS\Style\Content\Object\ObjectFacade $content_style_domain;
+    protected \ILIAS\UI\Factory $ui_fac;
+    protected \ILIAS\UI\Renderer $ui_ren;
 
     public function __construct(
         string $export_format = "",
@@ -71,15 +74,13 @@ class ilGlossaryPresentationGUI implements ilCtrlBaseClassInterface
         $this->toolbar = $DIC->toolbar();
         $this->user = $DIC->user();
         $this->help = $DIC["ilHelp"];
-        $lng = $DIC->language();
-        $tpl = $DIC->ui()->mainTemplate();
-        $ilCtrl = $DIC->ctrl();
-        $ilTabs = $DIC->tabs();
+        $this->lng = $DIC->language();
+        $this->tpl = $DIC->ui()->mainTemplate();
+        $this->ctrl = $DIC->ctrl();
+        $this->tabs_gui = $DIC->tabs();
+        $this->ui_fac = $DIC->ui()->factory();
+        $this->ui_ren = $DIC->ui()->renderer();
 
-        $this->tabs_gui = $ilTabs;
-        $this->tpl = $tpl;
-        $this->lng = $lng;
-        $this->ctrl = $ilCtrl;
         $this->ctrl->saveParameter($this, array("ref_id", "letter", "tax_node"));
         $this->service = $DIC->glossary()
                        ->internal();
@@ -217,6 +218,11 @@ class ilGlossaryPresentationGUI implements ilCtrlBaseClassInterface
                 $this->ctrl->forwardCommand($page_gui);
                 break;
 
+            case "ilglossaryflashcardgui":
+                $flash_boxes = new ilGlossaryFlashcardGUI();
+                $this->ctrl->forwardCommand($flash_boxes);
+                break;
+
             default:
                 $this->$cmd();
                 break;
@@ -335,7 +341,12 @@ class ilGlossaryPresentationGUI implements ilCtrlBaseClassInterface
         $table = $this->getPresentationTable();
 
         if (!$this->offlineMode()) {
-            $tpl->setContent($ilCtrl->getHTML($table));
+            $flash_btn = $this->ui_fac->button()->standard(
+                $lng->txt("flashcard_training"), //Sprachvariable
+                $this->ctrl->getLinkTargetByClass('ilGlossaryFlashcardGUI', 'listBoxes')
+            );
+            $flash_btn_ren = $this->ui_ren->render($flash_btn);
+            $tpl->setContent($flash_btn_ren . $ilCtrl->getHTML($table));
         } else {
             $this->tpl->setVariable("ADM_CONTENT", $table->getHTML());
             return $this->tpl->printToString();

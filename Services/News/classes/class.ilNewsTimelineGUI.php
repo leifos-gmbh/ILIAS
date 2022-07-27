@@ -58,10 +58,10 @@ class ilNewsTimelineGUI
         $this->access = $DIC->access();
         $this->http = $DIC->http();
 
-        $this->std_request = new StandardGUIRequest(
-            $DIC->http(),
-            $DIC->refinery()
-        );
+        $this->std_request = $DIC->news()
+            ->internal()
+            ->gui()
+            ->standardRequest();
 
         $this->news_id = $this->std_request->getNewsId();
 
@@ -143,6 +143,11 @@ class ilNewsTimelineGUI
 
     public function show(ilPropertyFormGUI $form = null) : void
     {
+        $this->tpl->setContent($this->getHTML($form));
+    }
+
+    public function getHTML(ilPropertyFormGUI $form = null) : string
+    {
         // toolbar
         if ($this->access->checkAccess("news_add_news", "", $this->ref_id)) {
             $b = ilLinkButton::getInstance();
@@ -207,9 +212,11 @@ class ilNewsTimelineGUI
             $ttpl->setVariable("DELETE_MODAL", $this->getDeleteModal());
             $ttpl->setVariable("LOADER", ilUtil::getImagePath("loader.svg"));
             $this->tpl->setContent($ttpl->get());
+            $html = $ttpl->get();
         } else {
             $this->tpl->setOnScreenMessage('info', $this->lng->txt("news_timline_add_entries_info"));
             $this->tpl->setContent($this->getEditModal());
+            $html = $this->getEditModal();
         }
 
         $this->lng->toJS("create");
@@ -219,6 +226,7 @@ class ilNewsTimelineGUI
 
         $this->tpl->addJavaScript("./Services/News/js/News.js");
         ilMediaPlayerGUI::initJavascript($this->tpl);
+        return $html;
     }
 
     public function loadMore() : void

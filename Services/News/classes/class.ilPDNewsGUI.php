@@ -22,10 +22,11 @@ use ILIAS\News\StandardGUIRequest;
  * News on PD
  *
  * @author Alexander Killing <killing@leifos.de>
- * @ilCtrl_Calls ilPDNewsGUI:
+ * @ilCtrl_Calls ilPDNewsGUI: ilNewsTimelineGUI, ilCommonActionDispatcherGUI
  */
 class ilPDNewsGUI
 {
+    protected \ILIAS\News\InternalGUIService $gui;
     protected ilGlobalTemplateInterface $tpl;
     protected ilLanguage $lng;
     protected ilCtrl $ctrl;
@@ -47,10 +48,10 @@ class ilPDNewsGUI
 
         $ilHelp->setScreenIdComponent("news");
 
-        $this->std_request = new StandardGUIRequest(
-            $DIC->http(),
-            $DIC->refinery()
-        );
+        $this->std_request = $DIC->news()
+            ->internal()
+            ->gui()
+            ->standardRequest();
 
         // initiate variables
         $this->tpl = $tpl;
@@ -61,6 +62,9 @@ class ilPDNewsGUI
         
         $this->ctrl->saveParameter($this, "news_ref_id");
         $this->fav_manager = new ilFavouritesManager();
+        $this->gui = $DIC->news()
+            ->internal()
+            ->gui();
     }
 
     public function executeCommand() : bool
@@ -68,7 +72,17 @@ class ilPDNewsGUI
         $next_class = $this->ctrl->getNextClass();
 
         switch ($next_class) {
-                
+
+            case "ilnewstimelinegui":
+                $t = $this->gui->dashboard()->getTimelineGUI();
+                $this->ctrl->forwardCommand($t);
+                break;
+
+            case "ilcommonactiondispatchergui":
+                $gui = ilCommonActionDispatcherGUI::getInstanceFromAjaxCall();
+                $this->ctrl->forwardCommand($gui);
+                break;
+
             default:
                 $cmd = $this->ctrl->getCmd("view");
                 $this->displayHeader();
@@ -105,8 +119,7 @@ class ilPDNewsGUI
         $per = (ilSession::get("news_pd_news_per") != "")
             ? ilSession::get("news_pd_news_per")
             : ilNewsItem::_lookupUserPDPeriod($ilUser->getId());
-        $news_obj_ids = ilNewsItem::filterObjIdsPerNews($obj_ids, $per);
-        
+
         // related objects (contexts) of news
         $contexts[0] = $lng->txt("news_all_items");
         
@@ -159,8 +172,16 @@ class ilPDNewsGUI
         $pd_news_table = new ilPDNewsTableGUI($this, "view", $contexts, $sel_ref_id);
         $pd_news_table->setData($news_items);
         $pd_news_table->setNoEntriesText($lng->txt("news_no_news_items"));
-        
-        $tpl->setContent($pd_news_table->getHTML());
+
+        $filter = $this->gui->dashboard()->getFilter();
+        $t = $this->gui->dashboard()->getTimelineGUI();
+
+        $tpl->setContent(
+            $filter->render() .
+            $this->ctrl->getHTML($t)
+        );
+
+        // $pd_news_table->getHTML()
     }
     
     public function applyFilter() : void

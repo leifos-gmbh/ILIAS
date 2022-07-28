@@ -87,13 +87,8 @@ class DashboardNewsManager
         $default_per = \ilNewsItem::_lookupDefaultPDPeriod();
 
         $options = [
-            2 => sprintf($lng->txt("news_period_x_days"), 2),
             7 => $lng->txt("news_period_1_week"),
-            14 => sprintf($lng->txt("news_period_x_weeks"), 2),
             30 => $lng->txt("news_period_1_month"),
-            60 => sprintf($lng->txt("news_period_x_months"), 2),
-            120 => sprintf($lng->txt("news_period_x_months"), 4),
-            180 => sprintf($lng->txt("news_period_x_months"), 6),
             366 => $lng->txt("news_period_1_year")
         ];
 

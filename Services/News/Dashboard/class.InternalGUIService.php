@@ -46,11 +46,11 @@ class InternalGUIService
         $this->manager = $domain_service->dashboard();
     }
 
-    public function getFilter() : FilterAdapterGUI
+    public function getFilter($force_re_init = false) : FilterAdapterGUI
     {
         $gui = $this->gui;
         $lng = $this->domain->lng();
-        if (is_null($this->filter)) {
+        if (is_null($this->filter) || $force_re_init) {
             $per_options = $this->manager->getPeriodOptions();
             $context_options = $this->manager->getContextOptions();
 
@@ -66,9 +66,10 @@ class InternalGUIService
                     $lng->txt("news_time_period"),
                     $per_options,
                     true,
-                    (string) $this->manager->getDashboardNewsPeriod()
+                    (string) $this->manager->getDashboardNewsPeriod(),
+                    true
                 )
-                ->select("news_ref_id", $lng->txt("context"), $context_options);
+                ->select("news_ref_id", $lng->txt("context"), $context_options, true, null, true);
         }
         return $this->filter;
     }
@@ -78,6 +79,8 @@ class InternalGUIService
         $filter = $this->getFilter();
         $data = $filter->getData();
         $t = \ilNewsTimelineGUI::getInstance((int) ($data["news_ref_id"] ?? 0), true);
+        $t->setPeriod((int) ($data["news_per"] ?? 0));
+        $t->setEnableAddNews(false);
         $t->setUserEditAll(false);
         return $t;
     }

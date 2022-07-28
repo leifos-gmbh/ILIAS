@@ -499,7 +499,9 @@ class ilNewsItem
         bool $a_only_public = false,
         bool $a_prevent_aggregation = false,
         int $a_per = 0,
-        array &$a_cnt = []
+        array &$a_cnt = [],
+        bool $no_auto_generated = false,
+        array $excluded = []
     ) : array {
         global $DIC;
 
@@ -538,7 +540,6 @@ class ilNewsItem
                 }
             }
         }
-        
         $data = [];
 
         foreach ($ref_ids as $ref_id) {
@@ -570,9 +571,11 @@ class ilNewsItem
                 $per,
                 $a_prevent_aggregation,
                 false,
+                $no_auto_generated,
                 false,
-                false,
-                $a_user_id
+                $a_user_id,
+                0,
+                $excluded
             );
             
             // counter
@@ -584,7 +587,6 @@ class ilNewsItem
         }
 
         $data = ilArrayUtil::sortArray($data, "creation_date", "desc", false, true);
-
         return $data;
     }
     

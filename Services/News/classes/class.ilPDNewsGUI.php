@@ -17,6 +17,7 @@
  *********************************************************************/
 
 use ILIAS\News\StandardGUIRequest;
+use ILIAS\Repository\Filter\FilterAdapterGUI;
 
 /**
  * News on PD
@@ -26,6 +27,7 @@ use ILIAS\News\StandardGUIRequest;
  */
 class ilPDNewsGUI
 {
+    protected \ILIAS\News\Dashboard\DashboardSessionRepository $dash_news_repo;
     protected \ILIAS\News\InternalGUIService $gui;
     protected ilGlobalTemplateInterface $tpl;
     protected ilLanguage $lng;
@@ -65,6 +67,10 @@ class ilPDNewsGUI
         $this->gui = $DIC->news()
             ->internal()
             ->gui();
+        $this->dash_news_repo = $DIC->news()
+            ->internal()
+            ->repo()
+            ->dashboard();
     }
 
     public function executeCommand() : bool
@@ -100,111 +106,27 @@ class ilPDNewsGUI
 
     public function view() : void
     {
-        $ilUser = $this->user;
-        $lng = $this->lng;
-        $tpl = $this->tpl;
-
-        $ref_ids = [];
-        $obj_ids = [];
-        $pd_items = $this->fav_manager->getFavouritesOfUser($ilUser->getId());
-        foreach ($pd_items as $item) {
-            $ref_ids[] = (int) $item["ref_id"];
-            $obj_ids[] = (int) $item["obj_id"];
-        }
-        
-        $sel_ref_id = ($this->std_request->getNewsRefId() > 0)
-            ? $this->std_request->getNewsRefId()
-            : $ilUser->getPref("news_sel_ref_id");
-        
-        $per = (ilSession::get("news_pd_news_per") != "")
-            ? ilSession::get("news_pd_news_per")
-            : ilNewsItem::_lookupUserPDPeriod($ilUser->getId());
-
-        // related objects (contexts) of news
-        $contexts[0] = $lng->txt("news_all_items");
-        
-        $conts = [];
-        $sel_has_news = false;
-        foreach ($ref_ids as $ref_id) {
-            $obj_id = ilObject::_lookupObjId($ref_id);
-            $title = ilObject::_lookupTitle($obj_id);
-            
-            $conts[$ref_id] = $title;
-            if ((int) $sel_ref_id === $ref_id) {
-                $sel_has_news = true;
-            }
-        }
-        
-        $cnt = [];
-        $nitem = new ilNewsItem();
-        $news_items = ilNewsItem::_getNewsItemsOfUser(
-            $ilUser->getId(),
-            false,
-            true,
-            $per,
-            $cnt
-        );
-
-        // reset selected news ref id, if no news are given for id
-        if (!$sel_has_news) {
-            $sel_ref_id = "";
-        }
-        asort($conts);
-        foreach ($conts as $ref_id => $title) {
-            $contexts[$ref_id] = $title . " (" . (int) $cnt[$ref_id] . ")";
-        }
-        
-        
-        if ($sel_ref_id > 0) {
-            $obj_id = ilObject::_lookupObjId((int) $sel_ref_id);
-            $obj_type = ilObject::_lookupType($obj_id);
-            $nitem->setContextObjId($obj_id);
-            $nitem->setContextObjType($obj_type);
-            $news_items = $nitem->getNewsForRefId(
-                $sel_ref_id,
-                false,
-                false,
-                $per,
-                true
-            );
-        }
-                
-        $pd_news_table = new ilPDNewsTableGUI($this, "view", $contexts, $sel_ref_id);
-        $pd_news_table->setData($news_items);
-        $pd_news_table->setNoEntriesText($lng->txt("news_no_news_items"));
-
         $filter = $this->gui->dashboard()->getFilter();
+        $this->saveFilterValues($filter);
+        // we need to get the filte again, since the saving above influences
+        // the drop down (number of news per object displayed in parentheses dependeds on period)
+        $filter = $this->gui->dashboard()->getFilter(true);
         $t = $this->gui->dashboard()->getTimelineGUI();
 
-        $tpl->setContent(
+        $this->tpl->setContent(
             $filter->render() .
             $this->ctrl->getHTML($t)
         );
-
-        // $pd_news_table->getHTML()
     }
-    
-    public function applyFilter() : void
+
+    protected function saveFilterValues(FilterAdapterGUI $filter) : void
     {
-        $ilUser = $this->user;
-
-        $news_ref_id = $this->std_request->getNewsRefId();
-        $news_per = $this->std_request->getNewsPer();
-
-        $this->ctrl->setParameter($this, "news_ref_id", $news_ref_id);
-        $ilUser->writePref("news_sel_ref_id", (string) $news_ref_id);
-        if ($news_per > 0) {
-            ilSession::set("news_pd_news_per", $news_per);
+        $data = $filter->getData();
+        if (!is_null($data) && !is_null($data["news_ref_id"])) {
+            $this->user->writePref("news_sel_ref_id", (string) (int) $data["news_ref_id"]);
+        } else {
+            $this->user->writePref("news_sel_ref_id", "0");
         }
-        $this->ctrl->redirect($this, "view");
-    }
-
-    public function resetFilter() : void
-    {
-        $ilUser = $this->user;
-        $this->ctrl->setParameter($this, "news_ref_id", 0);
-        $ilUser->writePref("news_sel_ref_id", '0');
-        ilSession::clear("news_pd_news_per");
-        $this->ctrl->redirect($this, "view");
+        $this->dash_news_repo->setDashboardNewsPeriod((int) ($data["news_per"] ?? 0));
     }
 }

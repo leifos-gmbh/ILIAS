@@ -59,7 +59,7 @@ class FilterAdapterGUI
         $this->expanded = $expanded;
     }
 
-    public function text(string $key, string $title, bool $activated = true, ?string $value = null) : self
+    public function text(string $key, string $title, bool $activated = true, ?string $value = null, $required = false) : self
     {
         $field = $this->ui->factory()->input()->field()->text($title);
         if (!is_null($value)) {
@@ -73,7 +73,7 @@ class FilterAdapterGUI
         return $this;
     }
 
-    public function select(string $key, string $title, array $options, bool $activated = true, ?string $value = null) : self
+    public function select(string $key, string $title, array $options, bool $activated = true, ?string $value = null, $required = false) : self
     {
         $field = $this->ui->factory()->input()->field()->select($title, $options);
         if (!is_null($value)) {
@@ -82,13 +82,17 @@ class FilterAdapterGUI
         $this->addField(
             $key,
             $field,
-            $activated
+            $activated,
+            $required
         );
         return $this;
     }
 
-    protected function addField(string $key, FilterInput $field, bool $activated = true) : void
+    protected function addField(string $key, FilterInput $field, bool $activated = true, $required = false) : void
     {
+        if ($required) {
+            $field = $field->withRequired(true);
+        }
         $this->fields[$key] = $field;
         $this->field_activations[] = $activated;
         $this->filter = null;

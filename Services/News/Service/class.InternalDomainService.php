@@ -21,6 +21,7 @@ namespace ILIAS\News;
 use ILIAS\DI\Container;
 use ILIAS\Repository\GlobalDICDomainServices;
 use ILIAS\News\Dashboard\DashboardNewsManager;
+use ILIAS\News\Timeline\TimelineManager;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
@@ -45,6 +46,15 @@ class InternalDomainService
     public function dashboard() : DashboardNewsManager
     {
         return new DashboardNewsManager(
+            $this->data_service,
+            $this->repo_service,
+            $this
+        );
+    }
+
+    public function timeline() : TimelineManager
+    {
+        return new TimelineManager(
             $this->data_service,
             $this->repo_service,
             $this

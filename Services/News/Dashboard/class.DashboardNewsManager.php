@@ -32,6 +32,10 @@ class DashboardNewsManager
     protected InternalDataService $data;
     protected InternalDomainService $domain;
     protected \ilFavouritesManager $fav_manager;
+    /**
+     * @var ?int[]
+     */
+    protected static ?array $user_object_ref_ids = null;
 
     public function __construct(
         InternalDataService $data,
@@ -67,8 +71,6 @@ class DashboardNewsManager
 
         $options = [
             2 => sprintf($lng->txt("news_period_x_days"), 2),
-            3 => sprintf($lng->txt("news_period_x_days"), 3),
-            5 => sprintf($lng->txt("news_period_x_days"), 5),
             7 => $lng->txt("news_period_1_week"),
             14 => sprintf($lng->txt("news_period_x_weeks"), 2),
             30 => $lng->txt("news_period_1_month"),
@@ -78,6 +80,9 @@ class DashboardNewsManager
             366 => $lng->txt("news_period_1_year")
         ];
 
+        return $options;
+
+        /*
         $unset = [];
         foreach ($options as $k => $opt) {
             if (!$allow_shorter_periods && ($k < $default_per)) {
@@ -91,7 +96,7 @@ class DashboardNewsManager
             unset($options[$k]);
         }
 
-        return $options;
+        return $options;*/
     }
 
     /**
@@ -112,12 +117,7 @@ class DashboardNewsManager
             $cnt
         );
 
-
-        $fav_items = $this->fav_manager->getFavouritesOfUser($user->getId());
-        $ref_ids = [];
-        foreach ($fav_items as $item) {
-            $ref_ids[] = (int) $item["ref_id"];
-        }
+        $ref_ids = $this->getUserNewsObjectRefIds();
 
         // related objects (contexts) of news
         $contexts[0] = $lng->txt("news_all_items");
@@ -135,5 +135,76 @@ class DashboardNewsManager
         }
 
         return $contexts;
+    }
+
+    /**
+     * User news on the daashboard/news overview are presented for
+     * all favourites and all memberships of the user.
+     * @return int[]
+     */
+    protected function getUserNewsObjectRefIds() : array
+    {
+        if (is_null(self::$user_object_ref_ids)) {
+            $ref_ids = [];
+            $user = $this->domain->user();
+            $user_id = $user->getId();
+
+            // get all items of the personal desktop
+            $fav_items = $this->fav_manager->getFavouritesOfUser($user_id);
+            foreach ($fav_items as $item) {
+                if (!in_array($item["ref_id"], $ref_ids)) {
+                    $ref_ids[] = (int) $item["ref_id"];
+                }
+            }
+
+            // get all memberships
+            $crs_mbs = \ilParticipants::_getMembershipByType($user_id, ['crs']);
+            $grp_mbs = \ilParticipants::_getMembershipByType($user_id, ['grp']);
+            $items = array_merge($crs_mbs, $grp_mbs);
+            foreach ($items as $i) {
+                $item_references = \ilObject::_getAllReferences($i);
+                $ref_ids = array_unique(array_merge($ref_ids, $item_references));
+            }
+            self::$user_object_ref_ids = $ref_ids;
+        }
+        return self::$user_object_ref_ids;
+    }
+
+    protected function getNewsForOverview(
+        int $ref_id,
+        int $period,
+        bool $include_auto_entries,
+        int $items_per_load
+    ) : array {
+        $user = $this->domain->user();
+        $news_item = new \ilNewsItem();
+        //$news_item->setContextObjId($this->ctrl->getContextObjId());
+        //$news_item->setContextObjType($this->ctrl->getContextObjType());
+
+        if ($ref_id > 0) {
+            $news_data = $news_item->getNewsForRefId(
+                $ref_id,
+                false,
+                false,
+                $period,
+                true,
+                false,
+                !$include_auto_entries,
+                false,
+                null,
+                $items_per_load
+            );
+        } else {
+            $cnt = [];
+            $news_data = \ilNewsItem::_getNewsItemsOfUser(
+                $user->getId(),
+                false,
+                true,
+                $period,
+                $cnt,
+                !$include_auto_entries
+            );
+        }
+        return $news_data;
     }
 }

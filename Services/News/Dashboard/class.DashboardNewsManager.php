@@ -58,6 +58,23 @@ class DashboardNewsManager
         return $period;
     }
 
+    public function getDashboardSelectedRefId() : int
+    {
+        $user = $this->domain->user();
+        return (int) $user->getPref("news_sel_ref_id");
+    }
+
+    public function saveFilterData(?array $data) : void
+    {
+        $user = $this->domain->user();
+        if (!is_null($data) && !is_null($data["news_ref_id"])) {
+            $user->writePref("news_sel_ref_id", (string) (int) $data["news_ref_id"]);
+        } else {
+            $user->writePref("news_sel_ref_id", "0");
+        }
+        $this->session_repo->setDashboardNewsPeriod((int) ($data["news_per"] ?? 0));
+    }
+
     /**
      * @return array<int,string>
      */

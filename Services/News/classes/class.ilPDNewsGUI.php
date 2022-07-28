@@ -27,6 +27,7 @@ use ILIAS\Repository\Filter\FilterAdapterGUI;
  */
 class ilPDNewsGUI
 {
+    protected \ILIAS\News\Dashboard\DashboardNewsManager $dash_news_manager;
     protected \ILIAS\News\Dashboard\DashboardSessionRepository $dash_news_repo;
     protected \ILIAS\News\InternalGUIService $gui;
     protected ilGlobalTemplateInterface $tpl;
@@ -70,6 +71,10 @@ class ilPDNewsGUI
         $this->dash_news_repo = $DIC->news()
             ->internal()
             ->repo()
+            ->dashboard();
+        $this->dash_news_manager = $DIC->news()
+            ->internal()
+            ->domain()
             ->dashboard();
     }
 
@@ -121,12 +126,6 @@ class ilPDNewsGUI
 
     protected function saveFilterValues(FilterAdapterGUI $filter) : void
     {
-        $data = $filter->getData();
-        if (!is_null($data) && !is_null($data["news_ref_id"])) {
-            $this->user->writePref("news_sel_ref_id", (string) (int) $data["news_ref_id"]);
-        } else {
-            $this->user->writePref("news_sel_ref_id", "0");
-        }
-        $this->dash_news_repo->setDashboardNewsPeriod((int) ($data["news_per"] ?? 0));
+        $this->dash_news_manager->saveFilterData($filter->getData());
     }
 }

@@ -76,10 +76,18 @@ class InternalGUIService
 
     public function getTimelineGUI() : \ilNewsTimelineGUI
     {
-        $filter = $this->getFilter();
-        $data = $filter->getData();
-        $t = \ilNewsTimelineGUI::getInstance((int) ($data["news_ref_id"] ?? 0), true);
-        $t->setPeriod((int) ($data["news_per"] ?? 0));
+        $ctrl = $this->gui->ctrl();
+        if ($ctrl->isAsynch()) {
+            $period = $this->manager->getDashboardNewsPeriod();
+            $news_ref_id = $this->manager->getDashboardSelectedRefId();
+        } else {
+            $filter = $this->getFilter();
+            $data = $filter->getData();
+            $period = (int) ($data["news_per"] ?? 0);
+            $news_ref_id = (int) ($data["news_ref_id"] ?? 0);
+        }
+        $t = \ilNewsTimelineGUI::getInstance($news_ref_id, true);
+        $t->setPeriod($period);
         $t->setEnableAddNews(false);
         $t->setUserEditAll(false);
         return $t;

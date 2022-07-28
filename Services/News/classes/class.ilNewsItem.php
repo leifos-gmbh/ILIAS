@@ -501,12 +501,12 @@ class ilNewsItem
         int $a_per = 0,
         array &$a_cnt = [],
         bool $no_auto_generated = false,
-        array $excluded = []
+        array $excluded = [],
+        int $a_limit = 0
     ) : array {
         global $DIC;
 
         $ilAccess = $DIC->access();
-
         $fav_rep = new ilFavouritesDBRepository();
 
         $news_item = new ilNewsItem();
@@ -577,7 +577,7 @@ class ilNewsItem
                 0,
                 $excluded
             );
-            
+
             // counter
             if (!is_null($a_cnt)) {
                 $a_cnt[$ref_id] = count($news);
@@ -587,6 +587,10 @@ class ilNewsItem
         }
 
         $data = ilArrayUtil::sortArray($data, "creation_date", "desc", false, true);
+
+        if ($a_limit > 0) {
+            array_splice($data, $a_limit);
+        }
         return $data;
     }
     
@@ -657,7 +661,8 @@ class ilNewsItem
                 $a_time_period,
                 $a_prevent_aggregation,
                 $starting_date,
-                $a_no_auto_generated
+                $a_no_auto_generated,
+                $a_excluded
             );
         } elseif (($obj_type === "grp" || $obj_type === "crs") &&
             !$a_stopnesting) {
@@ -680,7 +685,10 @@ class ilNewsItem
                 $a_only_public,
                 $a_time_period,
                 $starting_date,
-                $a_no_auto_generated
+                $a_no_auto_generated,
+                false,
+                0,
+                $a_excluded
             );
             $unset = [];
             foreach ($news as $k => $v) {
@@ -909,7 +917,8 @@ class ilNewsItem
         int $a_time_period = 0,
         bool $a_prevent_aggregation = false,
         string $a_starting_date = "",
-        bool $a_no_auto_generated = false
+        bool $a_no_auto_generated = false,
+        array $a_excluded = []
     ) : array {
         $tree = $this->tree;
         $ilAccess = $this->access;
@@ -922,8 +931,11 @@ class ilNewsItem
             $a_time_period,
             true,
             false,
+            $a_no_auto_generated,
             false,
-            $a_no_auto_generated
+            null,
+            0,
+            $a_excluded
         );
         foreach ($data as $k => $v) {
             $data[$k]["ref_id"] = $a_ref_id;
@@ -963,7 +975,10 @@ class ilNewsItem
             $a_only_public,
             $a_time_period,
             $a_starting_date,
-            $a_no_auto_generated
+            $a_no_auto_generated,
+            null,
+            0,
+            $a_excluded
         );
         foreach ($news as $k => $v) {
             $news[$k]["ref_id"] = $ref_id[$v["context_obj_id"]];
@@ -1024,7 +1039,8 @@ class ilNewsItem
         string $a_starting_date = "",
         bool $a_no_auto_generated = false,
         bool $a_oldest_first = false,
-        int $a_limit = 0
+        int $a_limit = 0,
+        array $a_exclude = []
     ) : array {
         $ilDB = $this->db;
         $ilUser = $this->user;
@@ -1047,6 +1063,10 @@ class ilNewsItem
         if ($this->getContextSubObjId() > 0) {
             $and .= " AND context_sub_obj_id = " . $ilDB->quote($this->getContextSubObjId(), "integer") .
                 " AND context_sub_obj_type = " . $ilDB->quote($this->getContextSubObjType(), "text");
+        }
+
+        if (count($a_exclude) > 0) {
+            $and .= " AND " . $ilDB->in("id", $a_exclude, true, "integer") . " ";
         }
 
         $ordering = ($a_oldest_first)
@@ -1122,7 +1142,8 @@ class ilNewsItem
                     $a_starting_date,
                     $a_no_auto_generated,
                     $a_oldest_first,
-                    (int) $keep_rss_min
+                    (int) $keep_rss_min,
+                    $a_exclude
                 );
             }
         }

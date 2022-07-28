@@ -41,7 +41,7 @@ class ilNewsTimelineGUI
     protected ilToolbarGUI $toolbar;
     protected ilObjUser $user;
     protected ilAccessHandler $access;
-    protected static int $items_per_load = 10;
+    protected static int $items_per_load = 20;
     protected bool $user_edit_all = false;
     protected StandardGUIRequest $std_request;
     protected bool $enable_add_news = true;
@@ -271,6 +271,7 @@ class ilNewsTimelineGUI
         $news_item->setContextObjType($this->ctrl->getContextObjType());
 
         $excluded = $this->std_request->getRenderedNews();
+
         $this->readNewsData($excluded);
 
         $timeline = ilTimelineGUI::getInstance();

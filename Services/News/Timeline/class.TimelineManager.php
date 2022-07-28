@@ -77,7 +77,8 @@ class TimelineManager
                 $period,
                 $cnt,
                 !$include_auto_entries,
-                $excluded
+                $excluded,
+                $items_per_load
             );
         }
         return $news_data;

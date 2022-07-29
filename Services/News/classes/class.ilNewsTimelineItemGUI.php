@@ -219,7 +219,7 @@ class ilNewsTimelineItemGUI implements ilTimelineItemInt
             $img_tpl->setVariable("IMAGE", $image);
 
             $html = $img_tpl->get();
-        } elseif (in_array($mime, ["video/mp4"])) {
+        } elseif (in_array($mime, ["video/mp4", "video/youtube", "video/vimeo"])) {
             $video = $ui_factory->player()->video($media_path);
             $html = $ui_renderer->render($video);
         } elseif (in_array($mime, ["audio/mpeg"])) {

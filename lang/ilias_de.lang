@@ -314,7 +314,7 @@ forum#:#adm_autosave_ival#:#Speicherintervall
 forum#:#adm_autosave_drafts_desc#:#Wenn aktiviert, werden Entwürfe während des Editierens automatisch gespeichert.
 forum#:#frm_task_publishing_draft_title#:#Veröffentlichen des Entwurfs "%s"
 itgr#:#itgr_show_title#:#Titel anzeigen
-itgr#:#itgr_show_title_info#:#Der Titel des Objektblocks wird in der Präsentation für Lerner angezeigt.
+itgr#:#itgr_show_title_info#:#Der Titel des Objekteblocks wird in der Präsentation für Lerner angezeigt.
 itgr#:#itgr_behaviour#:#Verhalten
 itgr#:#itgr_behaviour_info#:#Das System merkt sich den Zustand (geöffnet/geschlossen) je Benutzer bis zur Abmeldung (Logout).
 itgr#:#itgr_always_open#:#Immer offen
@@ -775,7 +775,9 @@ assessment#:#assTextSubset#:#Begriffe benennen
 assessment#:#autosave_failed#:#Automatisches Speichern fehlgeschlagen!
 assessment#:#autosave_success#:#Automatisches Speichern erfolgreich durchgeführt...
 assessment#:#average_reached_points#:#Durchschnittlich erreichte Punktezahl
-assessment#:#backtocallingtest#:#Zurück zum aufrufenden Test
+assessment#:#backtocallingtest#:#Zurück zum Test
+assessment#:#backtocallingpage#:#Zurück zur Fragenseite
+assessment#:#backtocallingpool#:#Zurück zum Fragenpool
 assessment#:#assLongMenu#:#‘Long Menu’-Frage
 assessment#:#answers_text_box#:#Textfeld
 assessment#:#min_auto_complete#:#Autovervollständigung
@@ -860,9 +862,9 @@ assessment#:#delete_image_question#:#Möchten Sie das Bild wirklich entfernen?
 assessment#:#delete_user_data#:#Testdaten entfernen
 assessment#:#deleteSuggestedSolution#:#Inhalte zur Wiederholung entfernen
 assessment#:#description_maxchars#:#Wenn nichts eingegeben wird, ist die maximale Anzahl von Zeichen für diese Textantwort unbegrenzt.
-assessment#:#detail_ending_time_reached#:#Sie haben die längstmögliche Bearbeitungsdauer des Tests überschritten. Der Test konnte nur bis %s bearbeitet werden.
+assessment#:#detail_ending_time_reached#:#Sie haben die längstmögliche Bearbeitungsdauer des Tests überschritten. Der Test konnte nur bis %s Uhr bearbeitet werden.
 assessment#:#detail_max_processing_time_reached#:#Sie haben die maximale Bearbeitungsdauer des Tests überschritten. Sie dürfen den Test nicht weiter bearbeiten!
-assessment#:#detail_starting_time_not_reached#:#Der Test kann noch nicht bearbeitet werden. Eine Bearbeitung ist frühestens ab %s möglich.
+assessment#:#detail_starting_time_not_reached#:#Der Test kann noch nicht bearbeitet werden. Eine Bearbeitung ist frühestens ab %s Uhr möglich.
 assessment#:#detailed_evaluation#:#Detaillierte Statistik
 assessment#:#detailed_evaluation_for#:#Detaillierte Statistik für %s
 assessment#:#detailed_evaluation_missing_active_id#:#Sie müssen die detaillierte Statistik für einen bestimmten Teilnehmer aufrufen!
@@ -1152,6 +1154,7 @@ assessment#:#tst_msg_random_qsc_modified_add_new_rule#:#Die Konfiguration für d
 assessment#:#tst_msg_random_question_set_config_modified#:#Die Konfiguration für den Test mit zufälliger Fragenauswahl wurde erfolgreich geändert.
 assessment#:#tst_msg_random_question_set_synced#:#Die Fragen zur aktuellen Konfiguration des Tests mit zufälliger Fragenauswahl wurde erfolgreich synchronisiert.
 assessment#:#tst_btn_rebuild_random_question_stage#:#Synchronisiere Fragen aus den Pools
+assessment#:#tst_btn_reset_pool_sync#:#Bearbeiten/Synchronisation aufheben
 assessment#:#tst_msg_rand_quest_set_stage_pool_last_sync#:#Zeitpunkt der letzten Synchronisierung der Fragen aus den ausgewählten Fragenpools: %s
 assessment#:#tst_msg_rand_quest_set_pass_buildable#:#Ein Test mit zufälliger Fragenauswahl ist mit der aktuellen Konfiguration möglich.
 assessment#:#tst_msg_rand_quest_set_pass_not_buildable#:#<b>Mit der aktuellen Auswahl an Fragenpools und der Fragenanzahl kann kein Test mit zufälliger Fragenauswahl erzeugt werden.</b><br />
@@ -1164,6 +1167,8 @@ assessment#:#tst_msg_rand_quest_set_change_quest_amount_here#:#Sie können die F
 assessment#:#tst_wf_info_optional_question#:#Diese Frage gehört zu einem bereits bestandenen Lernziel.
 assessment#:#tst_wf_info_answer_adopted_from_prev_pass#:#Ihre Antwort aus einem früheren Versuch wurde übernommen.
 assessment#:#tst_wf_info_answer_not_adopted#:#Es wurde aus früheren Versuchen keine Antwort übernommen. Daher müssen Sie diese Frage bearbeiten, andernfalls wird sich Ihr Lernzielergebnis verschlechtern.
+assessment#:#tst_opening_period#:#Zugangszeiten
+assessment#:#tst_opening_period_desc#:#Interval, in dem Teilnehmer Zugriff auf den Test haben. <b>Wichtig</b>: Benutzen Sie diese Option <b>nicht</b> für E-Klausuren/Fernklausuren. Verwenden Sie stattdessen die Funktion „Bearbeitungsdauer begrenzen“, siehe unten. Nur dann wird der Test serverseitig beendet und die letzte Eingabe jedes Teilnehmers automatisch gespeichert.
 assessment#:#tst_optional_questions_confirmation_fixed_test#:#<b>Fragen zu bereits erfolgreich bearbeiteten Lernzielen sind in vorherigen Versuchen erfolgreich beantwortet worden.</b><br /><br />Sie wollen nun zu einer Frage wechseln, welche zu einem bereits bestandenen Lernziel gehört.<br />Sie können wählen:<br /><br />Wenn Sie fortfahren, können Sie die Fragen zu diesen Lernzielen erneut bearbeiten oder nur einsehen. Wenn Sie die aus früheren Versuchen übernommenen Antworten nicht verändern, können Sie Ihr Lernzielergebnis auch nicht verschlechtern.<br /><br />Wenn Sie die Fragen nicht erneut bearbeiten oder einsehen möchten, können Sie zurück gehen. Die Fragen werden in jedem Fall in der Auswertung berücksichtigt.
 assessment#:#tst_optional_questions_confirmation_non_fixed_test#:#<b>Fragen zu bereits erfolgreich bearbeiteten Lernzielen sind optional.</b><br /><br />Sie wollen nun zu einer Frage wechseln, welche zu einem bereits bestandenen Lernziel gehört.<br />Sie können wählen:<br /><br />Wenn Sie fortfahren, können Sie die Fragen zu diesen Lernzielen bearbeiten. Da für diesen Versuch aber neue Fragen ausgewählt wurden, wurden Ihre Antworten aus vorherigen Versuchen nicht übernommen. Sie können sich bei erneuter Bearbeitung der Fragen Ihr Lernzielergebnis auch verschlechtern.<br /><br />Wenn Sie die Fragen nicht erneut bearbeiten möchten können Sie zurück gehen. Die Fragen werden dann in der Auswertung nicht berücksichtigt.
 assessment#:#tst_tab_results_pass_oriented#:#Testergebnisse nach Versuchen
@@ -1467,7 +1472,7 @@ assessment#:#tst_finish_confirm_button#:#Ja, ich will den Test beenden
 assessment#:#tst_finish_confirm_cancel_button#:#Nein, ich will zur letzten Antwort zurückgehen
 assessment#:#tst_finish_confirmation_question#:#Sie sind dabei, diesen Test zu beenden und die maximale Anzahl erlaubter Testdurchläufe zu erreichen. Danach werden Sie nicht mehr in der Lage sein, den Test erneut aufzurufen, um Ihre Antworten zu ändern. Wollen Sie den Test wirklich beenden?
 assessment#:#tst_finish_notification#:#Benachrichtigung
-assessment#:#tst_finish_notification_desc#:#Pro Teilnehmer, der einen Test beendet, erhält der Besitzer des Tests eine E-Mail mit folgenden Informationen.
+assessment#:#tst_finish_notification_desc#:#Pro Teilnehmer, der einen Test beendet, erhält der Besitzer des Tests eine Mail mit folgenden Informationen.
 assessment#:#tst_finish_notification_advanced#:#Komplettes Testergebnis pro Benutzer
 assessment#:#tst_finish_notification_content#:#Inhalt der Benachrichtigung
 assessment#:#tst_finish_notification_simple#:#Nur Benutzername und Datum des Beendens
@@ -2438,7 +2443,7 @@ common#:#account_expires_subject#:#Benutzerzugang
 common#:#account#:#Mein Konto
 rbac#:#accs_edit_permission#:#Rechteeinstellungen der Einstellungen Barrierefreiheit ändern
 rbac#:#accs_read#:#Einstellungen Barrierefreiheit in Administration können gelesen werden
-rbac#:#accs_visible#:#Einstellungen Barrierefreiheit in Administration sind sichtbar  !! Recht wird nicht mehr genutzt !!
+rbac#:#accs_visible#:#Einstellungen Barrierefreiheit in Administration sind sichtbar
 rbac#:#accs_write#:#Einstellungen Barrierefreiheit in Administration können bearbeiten werden
 common#:#action#:#Aktion
 common#:#action_aborted#:#Aktion abgebrochen
@@ -2466,7 +2471,7 @@ common#:#additional_info#:#Zusätzliche Informationen
 common#:#address#:#Adresse
 rbac#:#adm_edit_permission#:#Rechteeinstellungen für die Allgemeinen Einstellungen der Administration ändern
 rbac#:#adm_read#:#Allgemeine Einstellungen der Administration können gelesen werden
-rbac#:#adm_visible#:#Allgemeine Einstellungen sind sichtbar !! Recht wird nicht mehr genutzt !!
+rbac#:#adm_visible#:#Allgemeine Einstellungen sind sichtbar
 rbac#:#adm_write#:#Allgemeine Einstellungen in Administration können bearbeiten werden
 common#:#admin_force_noti#:#Benachrichtigung aktiv
 common#:#administrate_users#:#Lokale Benutzerverwaltung
@@ -2705,6 +2710,7 @@ rbac#:#cert_read#:#Lesezugriff auf die Zertifikatsverwaltung
 rbac#:#cert_visible#:#Zertifikatsverwaltung ist sichtbar
 rbac#:#cert_write#:#Einstellungen der Zertifikatsverwaltung bearbeiten
 common#:#certificate#:#Zertifikat
+common#:#certificates#:#Zertifikate
 common#:#change#:#Ändern
 common#:#change_assignment#:#Zuweisung ändern
 rbac#:#change_existing_object_type_desc#:#Wenn aktiviert, werden auch die Rechte von bereits vorhandenen Objekten dieses Typs geändert. Ansonsten gilt die Rechteänderung nur für künftig erstellte Objekte.
@@ -2828,11 +2834,11 @@ common#:#cron_forum_notification_crob_desc#:#Wenn aktiviert, sendet ILIAS tägli
 common#:#cron_jobs#:#Cron-Jobs
 common#:#cron_lucene_index#:#Lucene-Suchindex aktualisieren
 common#:#cron_lucene_index_info#:#Wenn eingeschaltet, wird der Lucene-Suchindex aktualisiert. Bitte konfigurieren Sie vorher den Lucene-Server unter 'Administration » Suche'.
-common#:#cron_mail_notification#:#E-Mail-Benachrichtigungen für neue Nachrichten versenden
+common#:#cron_mail_notification#:#Externe E-Mail-Benachrichtigung über den Erhalt neuer Mails
 common#:#cron_mail_notification_cron#:#Regelmäßig per Cron-Job
-common#:#cron_mail_notification_desc#:#Wenn diese Option eingeschaltet ist, werden Benutzer über neue Mails benachrichtigt. Bitte aktivieren Sie vorher die Option '%s' um diese Funktion nutzen zu können.
-common#:#cron_mail_notification_message#:#Mail-Benachrichtigungen mit Inhalt versenden
-common#:#cron_mail_notification_message_info#:#Wenn diese Option eingeschaltet ist, werden die Mail-Benachrichtigungen mit dem Inhalt der Mails an die Benutzer versendet.
+common#:#cron_mail_notification_desc#:#ILIAS verschickt auf Wunsch E-Mail-Benachrichtigungen über neue Mails. Im Gegensatz zur sofortigen Weiterleitung aller Mails sammelt dieser Cronjob die Mails eines Tages und stellt diese als Paket zu. Bitte aktivieren Sie die Option '%s', um diese Funktion zu nutzen. Zusätzlich müssen die E-Mail-Benachrichtigungen für jedes ILIAS-Konto in den persönlichen Mail-Einstellungen aktiviert werden.
+common#:#cron_mail_notification_message#:#Mail-Inhalt als Teil der E-Mail-Benachrichtigung
+common#:#cron_mail_notification_message_info#:#E-Mail-Benachrichtigungen enthalten den kompletten Inhalt der in ILIAS erhaltenen Mails. So können diese ohne weitere Anmeldung gelesen werden.
 common#:#cron_mail_notification_never#:#Nie
 common#:#cronjob_last_start#:#Letzter Start des Cron-Jobs
 common#:#cronjob_last_start_unknown#:#Konnte nicht ermittelt werden
@@ -3737,7 +3743,7 @@ common#:#msg_user_last_role1#:#Die folgenden Benutzer sind nur dieser einen Roll
 common#:#msg_user_last_role2#:#Bitte löschen Sie die Benutzer oder weisen Sie ihnen einer anderen Rolle zu.
 common#:#msg_userassignment_changed#:#Benutzerzuweisung geändert
 common#:#msg_wrong_format#:#Der Wert, den Sie eingegeben haben, erfüllt nicht das vorgegebene Format.
-common#:#msg_bt_download_started#:#ILIAS erzeugt ein ZIP-Archiv mit allen zugehörigen Dateien. Sie können diese anschließend im Notification Center (Glocken-Symbol) oben rechts herunterladen.
+common#:#msg_bt_download_started#:#Ein ZIP-Archiv mit allen Download-Dateien wird jetzt im Hintergrund erstellt. Den Status Ihrer Hintergrundprozesse sehen Sie oben rechts in der Nachrichtenzentrale. Dort können Sie das ZIP-Archiv auch herunterladen.
 common#:#my_bms#:#Meine Bookmarks
 common#:#my_courses#:#Meine Kurse
 common#:#my_courses_groups#:#Meine Kurse und Gruppen
@@ -3770,7 +3776,7 @@ common#:#no_start_file#:#Keine Startdatei
 common#:#no_title#:#Kein Titel
 common#:#no_users_selected#:#Bitte wählen Sie mindestens einen Benutzer aus.
 common#:#no_xml_file_found_in_zip#:#Die XML-Datei konnte nicht innerhalb der ZIP-Datei gefunden werden:
-common#:#noc#:#Notification Center
+common#:#noc#:#Nachrichtenzentrale
 common#:#non_internal_local_roles_only#:#Lokale Rollen (nur selbsterstellte)
 common#:#none#:#Keine
 common#:#normal#:#Normal
@@ -3846,7 +3852,7 @@ common#:#obj_lngf_desc#:#Systemsprachen können hier verwaltet werden.
 common#:#obj_lrss#:#Lernmodule
 common#:#obj_lrss_desc#:#Lernmodule usw. konfigurieren.
 common#:#obj_mail#:#Mail
-common#:#obj_mail_desc#:#Globale Mailkonfiguration
+common#:#obj_mail_desc#:#Globale Mail-Einstellungen
 common#:#obj_mcst#:#Mediacast
 common#:#obj_mcts#:#Mediacast
 common#:#obj_mcts_desc#:#Allgemeine Einstellungen des Mediacasts
@@ -4125,7 +4131,7 @@ common#:#refresh_languages#:#Alle Sprachen aktualisieren
 common#:#refuse#:#Antrag ablehnen
 common#:#reg_account_confirmation_successful#:#Das Benutzerkonto wurde bestätigt und aktiviert.
 common#:#reg_mail_body_2_confirmation#:#Der Link wird nur für %s gültig sein, danach müssen Sie sich erneut registrieren.
-common#:#reg_mail_body_3_confirmation#:#Falls Sie diese E-Mail unerwartet erhalten haben, ist es möglich, dass eine andere Person Ihre E-Mail Adresse versehentlich oder vorsätzlich angegeben hat. In diesem Fall ignorieren Sie diese Mail bitte.
+common#:#reg_mail_body_3_confirmation#:#Falls Sie diese E-Mail unerwartet erhalten haben, ist es möglich, dass eine andere Person Ihre E-Mail-Adresse versehentlich oder vorsätzlich angegeben hat. In diesem Fall ignorieren Sie diese Mail bitte.
 common#:#reg_mail_body_forgot_password_info#:#Um ein neues Passwort für diesen Benutzerzugang zu beantragen nutzen Sie bitte die Funktion « Passwort vergessen? » auf der Login-Seite.
 common#:#reg_mail_body_salutation#:#Hallo
 common#:#reg_mail_body_text1#:#Willkommen auf der eLearning-Plattform ILIAS!
@@ -4575,7 +4581,7 @@ common#:#user_imported#:#Benutzerimport abgeschlossen.
 common#:#user_imported_with_warnings#:#Benutzerimport mit Warnungen abgeschlossen.
 common#:#user_language#:#Benutzersprache
 common#:#user_new_account_mail#:#Benachrichtigung über Neuanmeldung
-common#:#user_new_account_mail_desc#:#Diese Mail wird an Benutzer gesendet, die sich selbst registriert haben. Wurde der Account von einem Administrator angelegt, verschickt ILIAS nur dann eine Benachrichtigung, wenn beim Anlegen des Accounts die Option "Benutzer per Mail über Änderungen informieren" aktiviert wurde.
+common#:#user_new_account_mail_desc#:#Diese E-Mail wird nach dem Anlegen eines ILIAS-Kontos verschickt. Wurde das Konto von der technischen Leitung angelegt, verschickt ILIAS nur dann eine E-Mail, wenn beim Anlegen die Option „Benutzer per Mail über Änderungen informieren“ aktiviert wurde.
 common#:#user_not_found#:#Der Benutzer wurde nicht gefunden
 common#:#user_not_known#:#Bitte geben Sie einen gültigen Benutzernamen ein.
 common#:#user_profile_other#:#Weitere Informationen
@@ -4854,6 +4860,7 @@ content#:#cont_cp_question_diff_formats_info#:#Beachten Sie bitte, dass einige F
 content#:#cont_create_link#:#Link erzeugen
 content#:#cont_create_mob#:#Medienobjekt anlegen
 content#:#cont_credit_mode#:#Bewertung / Steuerung der Lerneraktivitäten
+content#:#cont_credit_mode_info#:#Dem Lernmodul wird über cmi.core.credit mitgeteilt, ob die erzielte Leistung (bestanden/nicht bestanden und Punktzahl) für die Bewertung erwünscht (credit) oder nicht erwünscht ist (no-credit). Es ist Aufgabe des Lernmoduls, diese Anweisung adäquat zu interpretieren.
 content#:#cont_credit_off#:#Ohne Bewertung
 content#:#cont_credit_on#:#Mit Bewertung (bestanden | nicht bestanden)
 content#:#cont_credits#:#Punkte
@@ -5553,7 +5560,7 @@ content#:#text_repr#:#Alternativtext
 content#:#text_repr_info#:#Wird verwendet, wenn die Grafik nicht angezeigt werden kann.
 crs#:#activation_times_not_valid#:#Die Zeitdauer für 'Verfügbarkeit' ist nicht gültig.
 crs#:#assigned#:#Zugeordnet
-crs#:#contact_email_not_valid#:#Die E-Mail Adresse ist nicht gültig.
+crs#:#contact_email_not_valid#:#Die E-Mail-Adresse ist nicht gültig.
 crs#:#crs_accept_subscriber#:#Aufnahme in Kurs "%s"
 crs#:#crs_accept_subscriber_body#:#Sie sind in den Kurs "%s" aufgenommen worden.
 crs#:#crs_access#:#Zugang
@@ -5590,7 +5597,7 @@ crs#:#crs_cancel_subscription_body2#:#Eventuell sind Teilnehmende in die Warteli
 crs#:#crs_contact#:#Kontakt
 crs#:#crs_contact_consultation#:#Sprechstunde
 crs#:#crs_contact_email#:#E-Mail
-crs#:#crs_contact_email_info#:#Sie können eine oder mehrere (durch Komma getrennt) E-Mail Adressen eingeben.
+crs#:#crs_contact_email_info#:#Sie können eine oder mehrere (durch Komma getrennte) E-Mail-Adressen eingeben.
 crs#:#crs_contact_name#:#Name
 crs#:#crs_contact_phone#:#Telefon
 crs#:#crs_contact_responsibility#:#Zuständigkeit
@@ -6572,7 +6579,7 @@ forum#:#forums_disable_notification#:#Benachrichtigung für dieses Thema beenden
 forum#:#forums_download_attachment#:#Datei herunterladen
 forum#:#forums_edit_post#:#Beitrag bearbeiten
 forum#:#forums_enable_notification#:#Benachrichtigung für dieses Thema starten
-forum#:#forums_info_censor_post#:#Sind Sie sicher, dass dieser Beitrag nicht mehr angezeigt werden soll?
+forum#:#forums_info_censor_post#:#Geben Sie eine Begründung für die Zensur an.
 forum#:#forums_info_censor2_post#:#Sind Sie sicher, dass die Zensur für diesen Beitrag aufgehoben werden soll?
 forum#:#forums_info_delete_post#:#Sind Sie sicher, dass dieser Beitrag inklusive aller darauf folgenden Beiträge gelöscht werden soll?
 forum#:#forums_mark_read#:#Alle auf gelesen setzen
@@ -7099,6 +7106,8 @@ mail#:#mail_email_usr_subject#:#Test-E-Mail „Benutzer-Mail”
 mail#:#mail_email_usr_body#:#Dies ist eine Test-E-Mail um den Versand einer von einem Benutzer initiierten E-Mail an externe E-Mail-Adressen zu testen.
 mail#:#mail_email_sys_subject#:#Test-E-Mail „System-Mail”
 mail#:#mail_email_sys_body#:#Dies ist eine Test-E-Mail um den Versand einer automatisch vom System initiierten E-Mail an externe E-Mail-Adressen zu testen.
+mail#:#mail_is_read#:#gelesen
+mail#:#mail_is_unread#:#ungelesen
 mcst#:#mcst_add_new_item#:#Neuen Mediacast-Beitrag hinzufügen
 mcst#:#mcst_audioportable_settings_info#:#Kommagetrennte Liste von Dateiendungen
 mcst#:#mcst_audioportable_settings_title#:#Dateiendungen für das Audio-Format
@@ -9185,7 +9194,7 @@ survey#:#import_error_opening_file#:#Fehler beim Öffnen der Importdatei!
 survey#:#import_from_file#:#Import von Benutzerdaten aus einer Datei
 survey#:#import_from_text#:#Import von Benutzerdaten aus einem Text
 survey#:#import_no_file_selected#:#Keine Datei ausgewählt!
-survey#:#import_question#:#Frage(n) importieren
+survey#:#import_question#:#Fragen importieren
 survey#:#import_wrong_file_type#:#Falscher Dateityp!
 survey#:#insert_after#:#Einfügen hinter
 survey#:#insert_before#:#Einfügen vor
@@ -9294,15 +9303,15 @@ survey#:#please_enter_mail_code#:#Bitte verwenden Sie den Platzhalter für den Z
 survey#:#please_enter_mail_url#:#Bitte verwenden Sie den Platzhalter für die URL [url].
 survey#:#please_select#:#-- bitte auswählen --
 survey#:#preview#:#Vorschau
-survey#:#qpl_confirm_delete_phrases#:#Sind Sie sicher, dass Sie die folgende(n) Phrase(n) löschen wollen?
-survey#:#qpl_confirm_delete_questions#:#Sind Sie sicher, dass Sie die folgende(n) Frage(n) löschen wollen?
+survey#:#qpl_confirm_delete_phrases#:#Sind Sie sicher, dass Sie die folgenden Fragen löschen wollen?
+survey#:#qpl_confirm_delete_questions#:#Sind Sie sicher, dass Sie die folgenden Fragen löschen wollen?
 survey#:#qpl_copy_select_none#:#Bitte wählen Sie mindestens eine Frage aus, die Sie kopieren wollen!
 survey#:#qpl_define_questionblock_select_missing#:#Bitte wählen Sie mindestens zwei Fragen aus, um einen Fragenblock zu definieren!
 survey#:#qpl_delete_phrase_select_none#:#Bitte wählen Sie mindestens eine Phrase aus, die Sie löschen wollen!
 survey#:#qpl_delete_select_none#:#Bitte wählen Sie mindestens eine Frage aus, um den Löschvorgang durchzuführen!
 survey#:#qpl_export_select_none#:#Bitte wählen Sie mindestens eine Frage aus, die Sie exportieren wollen!
-survey#:#qpl_phrases_deleted#:#Phrase(n) gelöscht.
-survey#:#qpl_questions_deleted#:#Frage(n) gelöscht.
+survey#:#qpl_phrases_deleted#:#Fragen gelöscht.
+survey#:#qpl_questions_deleted#:#Fragen gelöscht.
 survey#:#qpl_savephrase_empty#:#Bitte geben Sie einen Titel für die Phrase an!
 survey#:#qpl_savephrase_exists#:#Der Titel der Phrase existiert bereits! Bitte geben Sie einen anderen Titel an.
 survey#:#qpl_unfold_select_none#:#Bitte wählen Sie mindestens einen Fragenblock aus, um einen Fragenblock aufzulösen!
@@ -9319,14 +9328,14 @@ survey#:#questionblock_inserted#:#Fragenblock eingefügt
 survey#:#questionblocks#:#Fragenblöcke
 survey#:#questionblocks_inserted#:#Fragenblöcke eingefügt
 survey#:#questions#:#Fragen
-survey#:#questions_inserted#:#Frage(n) angefügt
-survey#:#questions_removed#:#Frage(n) und/oder Fragenblock entfernt!
+survey#:#questions_inserted#:#Fragen angefügt
+survey#:#questions_removed#:#Fragen und/oder Fragenblock entfernt!
 survey#:#questiontype#:#Fragetyp
 survey#:#ratio_absolute#:#Absolutskaliert
 survey#:#ratio_non_absolute#:#Verhältnisskaliert
 survey#:#recipients#:#Empfänger
 survey#:#remove_question#:#Entfernen
-survey#:#remove_questions#:#Sind Sie sicher, dass Sie die folgenden Frage(n) und/oder Fragenblöcke aus der Umfrage entfernen wollen?
+survey#:#remove_questions#:#Sind Sie sicher, dass Sie die folgenden Fragen und/oder Fragenblöcke aus der Umfrage entfernen wollen?
 survey#:#reset_filter#:#Filter zurücksetzen
 survey#:#results#:#Ergebnisse
 survey#:#resume_survey#:#Umfrage fortsetzen
@@ -9365,7 +9374,7 @@ survey#:#spl_move_select_none#:#Bitte wählen Sie mindestens eine Frage zum Vers
 survey#:#spl_online_property#:#Online
 survey#:#spl_online_property_description#:#Wenn der Fragenpool nicht online ist, kann er nicht in Umfragen verwendet werden.
 survey#:#spl_paste_no_objects#:#Es sind keine Fragen in der Zwischenablage vorhanden. Bitte nutzen Sie hierfür die Kopieren- oder Verschieben-Schaltflächen.
-survey#:#spl_paste_success#:#Frage(n) eingefügt
+survey#:#spl_paste_success#:#Fragen eingefügt
 survey#:#start_date#:#Startdatum
 survey#:#start_date_not_reached#:#Sie können die Umfrage erst starten, wenn das Startdatum erreicht ist!
 survey#:#start_survey#:#Umfrage beginnen
@@ -9379,7 +9388,7 @@ survey#:#survey_block_hidden#:#nicht sichtbar
 survey#:#survey_block_visible#:#sichtbar
 survey#:#survey_cancel_preview#:#Vorschau abbrechen
 survey#:#survey_cannot_preview_survey#:#Vorschau nicht verfügbar
-survey#:#survey_clipboard_notice#:#Es befinden sich Frage(n) in der Zwischenablage. Wählen Sie ein Ziel oder leeren Sie die Zwischenablage.
+survey#:#survey_clipboard_notice#:#Es befinden sich Fragen in der Zwischenablage. Wählen Sie ein Ziel oder leeren Sie die Zwischenablage.
 survey#:#survey_code#:#Zugangsschlüssel
 survey#:#survey_code_url#:#URL für direkten Zugriff
 survey#:#survey_code_url_name#:#URL <small>(Benutzen Sie die rechte Maustaste, um die URL zu kopieren)</small>
@@ -10535,7 +10544,7 @@ common#:#obj_wiki_duplicate#:#Wiki kopieren
 common#:#obj_sahs_duplicate#:#Lernmodule kopieren
 dcl#:#dcl_checked#:#Ausgewählt
 dcl#:#dcl_not_checked#:#Nicht ausgewählt
-dcl#:#dcl_noturl_exception#:#Bitte geben Sie einen Link (beginnend mit http:// oder www.) oder eine E-Mail Adresse ein.
+dcl#:#dcl_noturl_exception#:#Bitte geben Sie einen Link (beginnend mit http:// oder www.) oder eine E-Mail-Adresse ein.
 dcl#:#dcl_field_title_change_warning#:#Sie haben den Titel des Feldes geändert. Dadurch funktioniert der entsprechende Platzhalter in der Vorlage zur Einzelansicht nicht mehr. Sie müssen diesen noch manuell angepassen.
 dcl#:#dcl_field_title_unique#:#Es existiert bereits ein Feld mit diesem Titel. Titel muss eindeutig sein.
 dcl#:#dcl_table_title_unique#:#Es existiert bereits eine Tabelle mit diesem Titel. Titel muss eindeutig sein.
@@ -10657,7 +10666,7 @@ common#:#qpl_copy#:#Fragenpool für Tests kopieren
 mathjax#:#mathjax_enable_mathjax_info#:#Aktiviert die LaTeX-Unterstützung mit MathJax, um mathematische Formeln ausgeben zu können.
 mathjax#:#mathjax_enable_mathjax#:#MathJax aktivieren
 mathjax#:#mathjax_mathjax#:#MathJax
-mathjax#:#mathjax_path_to_mathjax_desc#:#Zum Beispiel: https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML oder eine URL zu Ihrer lokalen Installation.
+mathjax#:#mathjax_path_to_mathjax_desc#:#Zum Beispiel: https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML oder eine URL zu Ihrer lokalen Installation. ILIAS 6 und 7 unterstützt MathJax 2.7, noch nicht MathJax 3.
 mathjax#:#mathjax_path_to_mathjax#:#URL zu MathJax
 mathjax#:#mathjax_settings#:#MathJax-Einstellungen
 mathjax#:#mathjax_limiter#:#Trennzeichen
@@ -10820,7 +10829,7 @@ ecs#:#ecs_cmap_form_current_dir#:#Aktuelles Verzeichnis
 ecs#:#ecs_cmap_form_dir_relation#:#Verzeichnisbezug
 content#:#cont_custom_menu_entries#:#Erweiterte Menü-Einträge
 content#:#cont_anonymous_user_missing_perm#:#Nicht angemeldete Benutzer haben aktuell kein Zugriffsrecht auf dieses Lernmodul.
-rbac#:#itgr_visible#:#Objektblock ist sichtbar
+rbac#:#itgr_visible#:#Objekteblock ist sichtbar
 content#:#glo_term_must_belong_to_glo#:#Die Aktion kann nur für Begriffe ausgeführt werden, welche innerhalb dieses Glossares definiert wurden.
 common#:#edited_on#:#Bearbeitet am
 tos#:#tos_last_reset_date#:#Die Nutzungsvereinbarungen wurden zuletzt am %s zurückgesetzt. Setzen Sie die Nutzungsvereinbarungen nur zurück, wenn sich diese in der Zwischenzeit geändert haben und eine Zustimmung zu dieser geänderten Vereinbarung gewünscht ist.
@@ -11308,6 +11317,7 @@ ecs#:#ecs_cmap_att_module#:#Modul
 ecs#:#ecs_cmap_att_venue#:#Ort
 assessment#:#tst_man_scoring_by_part#:#Bewertung nach Teilnehmer
 assessment#:#tst_man_scoring_by_qst#:#Bewertung nach Frage
+assessment#:#tst_man_scoring_only_answered#:#Nur beantwortete
 assessment#:#tst_no_scorable_qst_available#:#Keine manuell bewertbare Frage verfügbar
 assessment#:#part_received_a_of_b_points#:#Der Teilnehmer hat %s von %s möglichen Punkten erreicht.
 assessment#:#answers_of#:#Antworten von:
@@ -11681,7 +11691,7 @@ assessment#:#tolerance#:#Toleranz (%)
 assessment#:#result_units#:#Auswählbare Einheiten
 assessment#:#precision#:#Präzision
 assessment#:#err_range#:#Die obere Grenze muss größer als die untere Grenze sein.
-assessment#:#err_division#:#Dieser Wert muss kleiner als das Maximum sein.
+assessment#:#err_division#:#Der von Ihnen gesetzte Wert macht es unmöglich einen gültigen Wert für die Variable zu generieren.
 assessment#:#err_divider_too_big#:#Der Teiler einer der Variablen in dieser Frage ist zu gross.
 assessment#:#err_no_formula#:#Bitte geben Sie eine Formel zur Berechnung des Ergebnisses an.
 assessment#:#err_wrong_rating_advanced#:#Bitte stellen Sie sicher, dass die Summe der erweiterten Bewertungsoptionen genau 100 Prozent ergibt.
@@ -12253,7 +12263,7 @@ assessment#:#fq_precision_info#:#Geben Sie hier die Anzahl der gewünschten Nach
 assessment#:#result_units_info#:#Die hier ausgewählten Einheiten werden dem Lernenden zur Antwort angeboten. Der Lernende muss sich hier für eine Einheit entscheiden.
 assessment#:#fq_no_restriction_info#:#Sowohl Dezimalzahlen als auch Brüche werden als Eingabe akzeptiert.
 assessment#:#additional_rating_info#:#Bitte beachten Sie, dass die hier angegebenen Werte in Prozent angegeben werden und sich diese auf 100 summieren müssen.
-assessment#:#intprecision_info#:#"Teilbar durch" hat nur Auswirkungen auf die Variablenerzeugung, wenn der Wert für die Präzision 0 beträgt. In diesem Fall legt "Teilbar durch" fest, durch welche ganze Zahl die erzeugte Variable teilbar sein muss. Ein Wert von 10 erzeugt also nur ganze Zahlen, die durch 10 teilbar sind, ein Wert von 5 erzeugt ganze Zahlen, die durch 5 teilbar sind usw. Bei einer Präzision von 0 ist "Teilbar durch" ein Pflichtfeld und muss eine positive, ganze Zahl enthalten. Voreingestellt ist der Werte 1 für beliebige ganze Zahlen.
+assessment#:#intprecision_info#:#"Teilbar durch" hat nur Auswirkungen auf die Variablenerzeugung, wenn der Wert für die Präzision 0 beträgt. In diesem Fall legt "Teilbar durch" fest, durch welche ganze Zahl die erzeugte Variable teilbar sein muss. Ein Wert von 10 erzeugt also nur ganze Zahlen, die durch 10 teilbar sind, ein Wert von 5 erzeugt ganze Zahlen, die durch 5 teilbar sind usw. Bei einer Präzision von 0 ist "Teilbar durch" ein Pflichtfeld und muss eine positive, ganze Zahl enthalten. Voreingestellt ist der Wert 1 für beliebige ganze Zahlen.
 assessment#:#tolerance_info#:#Die Toleranz legt eine erlaubte prozentuale Abweichung vom Ergebniswert fest. Bei einer Toleranz von 0 wird nur der exakte Ergebniswert als korrekt bewertet.
 assessment#:#result_unit_info#:#Bitte beachten Sie, dass die hier festgelegte Einheit auch innerhalb der "Auswählbaren Einheiten" selektiert werden muss.
 ecs#:#ecs_no_adv_md#:#Es sind keine Erweiterten Metadaten verfügbar. Daher kann keine Zuordnung vorgenommen werden.
@@ -13143,16 +13153,18 @@ forum#:#forums_notification_show_frm#:#Zum Forum gehen: %s
 forum#:#thread_deleted_by#:#folgendes Thema im Forum "%2$s" wurde von "%1$s" gelöscht:
 forum#:#content_deleted_thread#:#Inhalt des gelöschten Themas:
 forum#:#post_uncensored_by#:#für folgenden Beitrag wurde die Zensur von "%1$s" aufgehoben:
+forum#:#frm_noti_obj_crs#:#Kurs
+forum#:#frm_noti_obj_grp#:#Gruppe
 forum#:#frm_noti_message#:#Nachricht:
 forum#:#frm_noti_new_post#:#es wurde ein neuer Beitrag im Forum "%1$s" erstellt.
-forum#:#frm_noti_subject_new_post#:#Neuer Beitrag im Forum "%1$s" zum Thema "%2$s"
-forum#:#frm_noti_subject_del_thread#:#Thema "%2$s" im Forum "%1$s" gelöscht
-forum#:#frm_noti_subject_act_post#:#Beitrag im Forum "%1$s" zum Thema "%2$s" aktiviert
-forum#:#frm_noti_subject_answ_post#:#Beitrag im Forum "%1$s" zum Thema "%2$s" beantwortet
-forum#:#frm_noti_subject_upt_post#:#Beitrag im Forum "%1$s" zum Thema "%2$s" geändert
-forum#:#frm_noti_subject_cens_post#:#Beitrag im Forum "%1$s" zum Thema "%2$s" zensiert
-forum#:#frm_noti_subject_uncens_post#:#Zensur aufgehoben für einen Beitrag im Forum "%1$s" zum Thema "%2$s"
-forum#:#frm_noti_subject_del_post#:#Beitrag im Forum "%1$s" zum Thema "%2$s" gelöscht
+forum#:#frm_noti_subject_act_post#:#Beitrag im Forum "%1$s%2$s zum Thema "%3$s" aktiviert
+forum#:#frm_noti_subject_answ_post#:#Beitrag im Forum "%1$s%2$s zum Thema "%3$s" beantwortet
+forum#:#frm_noti_subject_cens_post#:#Beitrag im Forum "%1$s%2$s zum Thema "%3$s" zensiert
+forum#:#frm_noti_subject_del_post#:#Beitrag im Forum "%1$s"%2$s zum Thema "%3$s" gelöscht
+forum#:#frm_noti_subject_del_thread#:#Thema "%3$s" im Forum "%1$s"%2$s gelöscht
+forum#:#frm_noti_subject_new_post#:#Neuer Beitrag im Forum "%1$s"%2$s zum Thema "%3$s"
+forum#:#frm_noti_subject_uncens_post#:#Zensur aufgehoben für einen Beitrag im Forum "%1$s"%2$s zum Thema "%3$s"
+forum#:#frm_noti_subject_upt_post#:#Beitrag im Forum "%1$s"%2$s zum Thema "%3$s" geändert
 search#:#search_show_inactive_user#:#Inaktive Benutzer anzeigen
 search#:#search_show_inactive_user_info#:#In der Benutzersuche werden auch Benutzer angezeigt, deren Konto nicht aktiv ist.
 search#:#search_show_limited_user#:#Zeitlich begrenzte Benutzer anzeigen
@@ -13321,7 +13333,7 @@ mail#:#mail_template_no_valid_context#:#Der gewählte Kontext ist nicht gültig.
 mail#:#mail_template_client#:#Textvorlage
 mail#:#mail_template_client_info#:#Wählen Sie zwischen einer der verfügbaren Textvorlagen. Sie haben die Möglichkeit, die durch die Textvorlage angebotenen Platzhalter zu nutzen. Bei der Wahl einer Textvorlage werden Nachricht und Betreff in diesem Formular (falls in der Vorlage definiert) ersetzt.
 itgr#:#itgr_hide_title#:#Titel verbergen
-itgr#:#itgr_hide_title_info#:#Der Titel des Objektblocks wird in der Präsentation für Lerner nicht angezeigt.
+itgr#:#itgr_hide_title_info#:#Der Titel des Objekteblocks wird in der Präsentation für Lerner nicht angezeigt.
 content#:#cont_all_languages#:#Alle Sprachen
 mob#:#mob_upload_multi_srt#:#Hochladen als ZIP-Datei
 mob#:#mob_upload_multi_srt_howto#:#Die .zip-Datei / .zip-Archiv darf keine Unterverzeichnisse enthalten. Alle .srt-Dateien müssen auf oberster Ebene liegen, um erkannt zu werden. Die Dateinamen müssen enden mit "_&lt;SPRACHE&gt;.srt", wobei SPRACHE die entsprechende Sprachkennung ist (z. B. "en", "it" oder "de"). Der Rest des Dateinamens muss dem Namen der zugehörigen Videodatei entsprechen. Die Datei für englische Untertitel des Videos "my_video.mp4" heißt entsprechend "my_video_en.srt".
@@ -13400,9 +13412,15 @@ buddysystem#:#buddy_bs_action_already_ignored#:#Die Aktion ist nicht möglich, d
 buddysystem#:#buddy_bs_action_already_unlinked#:#Die Aktion ist nicht möglich. Jeglicher Kontakt zu Benutzer '%s' wurde bereits gelöst.
 buddysystem#:#buddy_bs_state_linked#:#Vernetzt
 buddysystem#:#buddy_bs_state_linked_a#:#Vernetzt
+buddysystem#:#buddy_bs_state_linked_p#:#Vernetzt
+buddysystem#:#buddy_bs_state_unlinked#:#Nicht vernetzt
 buddysystem#:#buddy_bs_state_unlinked_a#:#Nicht vernetzt
+buddysystem#:#buddy_bs_state_unlinked_p#:#Nicht vernetzt
+buddysystem#:#buddy_bs_state_requested_filter_a#:#Auf Reaktion wartend
+buddysystem#:#buddy_bs_state_requested_filter_p#:#Aktion erorderlich
 buddysystem#:#buddy_bs_state_requested#:#Angefragt
 buddysystem#:#buddy_bs_state_requested_a#:#Angefragt
+buddysystem#:#buddy_bs_state_requested_p#:#Angefragt
 buddysystem#:#buddy_bs_state_ignoredrequest#:#Ignoriert
 buddysystem#:#buddy_bs_state_ignored_request_a#:#Angefragt
 buddysystem#:#buddy_bs_state_ignored_request_p#:#Ignoriert
@@ -13476,7 +13494,8 @@ awrn#:#awrn_hide_from_awareness#:#Mich nicht in „Wer ist online?“-Anzeige au
 awrn#:#awrn_hide_from_awareness_info#:#Die „Wer ist online?“-Anzeige erscheint oben im Kopf der Anwendung und listet ausgewählte Benutzer auf (z.B. Kontakte oder Mitglieder Ihrer Kurse).
 common#:#contact_sysadmin#:#Technische Betreuung kontaktieren
 common#:#report_accessibility_issue#:#Barriere melden
-common#:#report_accessibility_link#:#Gemeldeter%20Link:
+common#:#report_accessibility_link#:#Gemeldeter Link:
+common#:#report_accessibility_link_mailto#:#Gemeldeter%20Link:
 common#:#accessibility_control_concept#:#Info Barrierefreiheit
 common#:#no_accessibility_control_concept_description#:#Aktuell wird in dieser Installation keine Info zur Barrierefreiheit angeboten. Bitte kontaktieren Sie die <a href="%1$s">Anlaufstelle für Barrierefreiheit</a> für weitere Informationen.
 common#:#mainbar_aria_label#:#Hauptleiste
@@ -13628,7 +13647,6 @@ maps#:#maps_geolocation_server#:#Server für Reverse Geolocation
 mail#:#orphaned_mail_subject#:#Benachrichtigung über verwaiste Mails
 mail#:#orphaned_mail_body#:#Es existieren veraltete oder verwaiste Mails in den folgenden Postfächern. Beachten Sie, dass diese Mails in kürze automatisch gelöscht werden.
 rbac#:#rbac_permissions#:#Rechte
-buddysystem#:#buddy_bs_state_requested_p#:#Angefragt
 common#:#obj_prgs#:#Studienprogramme
 forum#:#forums_thread_deleted#:#Das gewählte Thema einschließlich aller dazugehörigen Beiträge wurde gelöscht.
 forum#:#forums_threads_deleted#:#Die gewählten Themen einschließlich aller dazugehörigen Beiträge wurden gelöscht.
@@ -13903,7 +13921,7 @@ badge#:#badge_obi_activate_info#:#Benutzer Badges können aus ILIAS exportieren 
 badge#:#badge_obi_organisation#:#Organisation
 badge#:#badge_obi_organisation_info#:#Diese Angabe wird als Herausgeber des Badges angezeigt.
 badge#:#badge_obi_contact#:#Kontakt-E-Mail
-badge#:#badge_obi_contact_info#:#Diese E-Mail wird zwar nicht angezeigt, aber in das Badge eingebacken.
+badge#:#badge_obi_contact_info#:#Diese E-Mail-Adresse wird zwar nicht angezeigt, aber in das Badge eingebacken.
 badge#:#badge_obi_salt#:#Salt
 badge#:#badge_obi_salt_info#:#Geben Sie eine Kombination von Zahlen und Buchstaben ein, um Dritten später die Möglichkeit zu bieten, die Echtheit des Badges zu validieren. Bitte ändern Sie die Eingabe später nicht mehr.
 badge#:#badge_types#:#Typen
@@ -13990,6 +14008,7 @@ glo#:#glo_referenced_term#:#Verlinkte Begriffe
 glo#:#glo_term_reference#:#Begriffslink
 glo#:#glo_reference#:#Link
 glo#:#glo_selected_terms_have_been_copied#:#Die ausgewählten Begriffe wurden in die Zwischenablage kopiert. Bitte öffnen Sie das Zielglossar und klicken dann auf "Einfügen".
+glo#:#glo_please_select_other_glo#:#Bitte wählen Sie ein anderes Glossar aus.
 prg#:#prg_assign_date#:#Hinzugefügt am
 prg#:#prg_assigned_by#:#Hinzugefügt von
 survey#:#svy_mail_context_reminder_title#:#Umfrage: Teilnahme-Erinnerung
@@ -14186,8 +14205,8 @@ rbac#:#news_add_news#:#Neuigkeiten erstellen
 rbac#:#grp_news_add_news#:#Neuigkeiten erstellen und eigene Neuigkeiten bearbeiten
 news#:#news_timline_add_entries_info#:#Zurzeit sind noch keine Neuigkeiten vorhanden. Klicken Sie auf "Beitrag hinzufügen" um Neuigkeiten anzulegen.
 obj#:#obj_tool_setting_use_news#:#Neuigkeiten
-obj#:#obj_tool_setting_use_news_info#:#Nutzung des Blocks "Neuigkeiten" oder der Timeline für Neuigkeiten. Benutzer können Benachrichtigungen für Neuigkeiten aktivieren, sobald der Block oder die Timeline aktiv sind.
-obj#:#obj_tool_setting_use_news_open_settings#:#Einstellungen öffnen
+obj#:#obj_tool_setting_use_news_info#:#Nutzung des Blocks „Neuigkeiten“ oder der Timeline für Neuigkeiten. Benutzer können Benachrichtigungen für Neuigkeiten aktivieren, sobald der Block oder die Timeline aktiv sind.
+obj#:#obj_tool_setting_use_news_open_settings#:#Einstellungen für Block und Timeline öffnen
 cont#:#cont_news_settings#:#Neuigkeiten
 cont#:#cont_news_timeline_landing_page#:#Startseite
 cont#:#cont_news_timeline_landing_page_info#:#Timeline als Startseite
@@ -14859,7 +14878,7 @@ common#:#cron_users_without_login_del_create_date_thr#:#Schwellenwert
 common#:#cron_users_without_login_del_create_date_thr_info#:#Alle Benutzerkonten, deren Erstellung länger her ist als der hier definierte Schwellenwert, werden für eine Löschung berücksichtigt.
 common#:#user_never_logged_in#:#Benutzerzugänge ohne Anmeldung löschen
 common#:#user_never_logged_in_info#:#Accounts werden gelöscht, wenn sie sich noch nie in ILIAS angemeldet haben.
-dateplaner#:#cal_download_files_started#:#ILIAS erzeugt ein ZIP-Archiv mit allen zugehörigen Dateien. Sie können diese anschließend im Notification Center (Glocken-Symbol) oben rechts herunterladen.
+dateplaner#:#cal_download_files_started#:#Ein ZIP-Archiv mit allen Download-Dateien wird jetzt im Hintergrund erstellt. Den Status Ihrer Hintergrundprozesse sehen Sie oben rechts in der Nachrichtenzentrale. Dort können Sie das ZIP-Archiv auch herunterladen.
 common#:#usr_name_undisclosed#:#Nicht freigegeben
 common#:#obj_exc_duplicate#:#Übung kopieren
 meta#:#adt_error_max_length#:#Der eingegebene Text ist zu lang. Bitte geben Sie einen kürzeren Text ein.
@@ -15036,7 +15055,7 @@ mme#:#type_complex#:#Komplex
 mme#:#type_repository_link#:#Magazin-Link
 lhist#:#lhist_no_entries#:#Verfolgen Sie weiter Ihre Ziele! Lernen Sie heute etwas, um Ihren Lernverlauf zu erweitern.
 blog#:#blog_keyword_enter#:#Geben Sie ein Schlagwort ein und drücken Sie Enter.
-news#:#news_news_block#:#News Block
+news#:#news_news_block#:#Block „Neuigkeiten“
 sess#:#sess_filter_all_types#:#Alle Objekttypen
 sess#:#sess_filter_not_assigned#:#Nicht zugeordnet
 sess#:#sess_is_assigned#:#Zugeordnet
@@ -15210,6 +15229,10 @@ sess#:#sess_mail_all#:#Für alle Teilnehmer
 sess#:#sess_mail_all_info#:#Alle Teilnehmer können die Funktion "Mail an Teilnehmer" im Reiter Teilnehmer nutzen.
 sess#:#sess_contact#:#Kontakt
 sess#:#sess_mem_contacts#:#Tutorielle Betreuung
+sess#:#sess_warn_sess_type_changed#:#Sind Sie sicher, dass Sie die Sitzungsart ändern möchten? Die Rechteeinstellungen dieser Sitzung werden überschrieben und an die neue Art der Sitzung angepasst.
+sess#:#sess_info_new_sess_type#:#Neue Sitzungsart
+sess#:#il_sess_status_open#:#Offene Sitzung
+sess#:#sess_change_type#:#Sitzungsart ändern
 dateplaner#:#cal_calendar_subscription_modal_title#:#Kalender abonnieren
 sess#:#sess_members#:#Teilnehmer
 grp#:#grp_contact#:#Betreuung
@@ -15387,7 +15410,7 @@ cont#:#cont_list_presentation#:#Präsentationsansicht für Inhalte
 cont#:#cont_item_list#:#Liste
 cont#:#cont_tile_view#:#Kacheln
 obj#:#obj_tile_image#:#Kachelbild
-obj#:#obj_tile_image_info#:#Das Kachelbild wird genutzt, wenn im übergeordneten Container die Kachelansicht gewählt wurde.
+obj#:#obj_tile_image_info#:#Das Kachelbild wird genutzt, wenn im übergeordneten Container die Kachelansicht gewählt wurde. Um Performanzprobleme zu verhindern, laden Sie nur Bilder mit einer Auflösung von 72 dpi und einer Breite von weniger als 1000 px hoch. Ansonsten kommt es möglicherweise zu einem verzögerten Seitenaufbau.
 fold#:#fold_presentation#:#Darstellung
 validation#:#not_an_int#:#Wert vom Typ '%s' ist kein Integer.
 validation#:#not_a_string#:#Wert vom Typ '%s' ist kein String.
@@ -15430,7 +15453,7 @@ user#:#msg_spoint_not_modified#:#Die Startseite wurde nicht geändert.
 skll#:#skll_lhist_skill_self_eval#:#Status $4$ von $3$ ist selbst zugewiesen.
 skll#:#skll_lhist_skill_self_eval_in#:#Status $4$ von $3$ wurde selbst zugewiesen in $1$.
 blog#:#blog_download_submission#:#Kopie der Abgabe herunterladen
-exc#:#exc_down_files_started_bg#:#Das Download-Paket wird erstellt. Bitte überprüfen Sie ihre Hintergrundprozesse oben rechts in der Top-Bar.
+exc#:#exc_down_files_started_bg#:#Ein ZIP-Archiv mit allen Download-Dateien wird jetzt im Hintergrund erstellt. Den Status Ihrer Hintergrundprozesse sehen Sie oben rechts in der Nachrichtenzentrale. Dort können Sie das ZIP-Archiv auch herunterladen.
 lti#:#lti_cron_title#:#LTI Outcome Service
 lti#:#lti_cron_title_desc#:#Überträgt den Lernfortschritt von LTI-Benutzern an die aufrufende Plattform. Dieser Cron-Job wird nur in den Fällen benötigt, wenn der Lernfortschritt aufgrund von Einstellungsänderungen neu berechnet werden muss.
 crs#:#crs_timings_short_end#:#Enddatum
@@ -15766,13 +15789,15 @@ lti#:#lti_con_prov_category#:#Kategorie
 lti#:#lti_con_prov_category_info#:#Kategorie, um Einträge zu filtern, wenn ein LTI-Konsument-Objekt erstellt wird.
 lti#:#conf_privacy_ident#:#Benutzeridentifikation
 lti#:#conf_privacy_ident_info#:#Standard ist häufig die E-Mail-Adresse. Die eindeutige ILIAS-Plattform-ID lautet:
-lti#:#conf_privacy_ident_il_uuid_user_id#:#ILIAS-Benutzer-ID kombiniert mit einer eindeutigen ILIAS-Plattform-ID, die als E-Mail-Adresse formatiert ist.
-lti#:#conf_privacy_ident_il_uuid_user_id_info#:#Dies ist identisch mit jedem Aufruf, erlaubt aber keine direkte Rückschlüsse auf den ILIAS-Benutzer.
-lti#:#conf_privacy_ident_il_uuid_login#:#ILIAS-Login kombiniert mit einer eindeutigen ILIAS-Plattform-ID, die als E-Mail-Adresse formatiert ist.
-lti#:#conf_privacy_ident_il_uuid_login_info#:#Dies ist identisch mit jedem Aufruf, kann aber direkte Rückschlüsse auf den ILIAS-Benutzer zulassen.
-lti#:#conf_privacy_ident_il_uuid_ext_account#:#Externe Benutzer-ID kombiniert mit einer eindeutigen ILIAS-Plattform-ID, die als E-Mail-Adresse formatiert ist.
+lti#:#conf_privacy_ident_il_uuid_user_id#:#ILIAS-Benutzer-ID kombiniert mit einer eindeutigen ILIAS-Plattform-ID, die als E-Mail-Adresse formatiert ist
+lti#:#conf_privacy_ident_il_uuid_user_id_info#:#Sendet die interne numerische Benutzer-Id. Dies ist identisch mit jedem Aufruf, ermöglicht aber Rückschlüsse auf den ILIAS-Benutzer.
+lti#:#conf_privacy_ident_il_uuid_login#:#ILIAS-Login kombiniert mit einer eindeutigen ILIAS-Plattform-ID, die als E-Mail-Adresse formatiert ist
+lti#:#conf_privacy_ident_il_uuid_login_info#:#Sendet den Benutzernamen. Dies ist identisch mit jedem Aufruf, kann aber direkte Rückschlüsse auf den ILIAS-Benutzer zulassen.
+lti#:#conf_privacy_ident_il_uuid_ext_account#:#Externe Benutzer-ID kombiniert mit einer eindeutigen ILIAS-Plattform-ID, die als E-Mail-Adresse formatiert ist
 lti#:#conf_privacy_ident_il_uuid_ext_account_info#:#Dies ist identisch mit jedem Aufruf, kann aber direkte Rückschlüsse auf den Benutzer zulassen.
-lti#:#conf_privacy_ident_real_email#:#E-Mail Adresse
+lti#:#conf_privacy_ident_il_uuid_SHA256#:#Hash kombiniert mit einer eindeutigen ILIAS-Plattform-ID, die als E-Mail-Adresse formatiert ist
+lti#:#conf_privacy_ident_il_uuid_SHA256_info#:#Dies ist identisch mit jedem Aufruf, erlaubt aber keine direkten Rückschlüsse auf den ILIAS-Benutzer.
+lti#:#conf_privacy_ident_real_email#:#E-Mail-Adresse
 lti#:#conf_privacy_ident_real_email_info#:#Sendet die E-Mail-Adresse des Benutzers als Identifikation (Achtung: eine E-Mail-Adresse kann von mehreren Benutzern verwendet werden!)
 lti#:#conf_privacy_name#:#Benutzername
 lti#:#conf_privacy_name_info#:#Das Senden eines Benutzernamens ist in der Regel nicht erforderlich.
@@ -15871,7 +15896,7 @@ cmix#:#cmix_add_source_external_app#:#Nicht von ILIAS gestartete Ressource
 cmix#:#cmix_add_source_external_app_info#:#Verwenden Sie diese Option für separat gestartete Ressourcen wie z.B. Apps oder Simulationen. Benutzer müssen durch Angabe ihrer verwendeten E-Mail-Adresse dem Abruf der Daten zustimmen.
 cmix#:#create_registration#:#Registrieren Sie Ihre E-Mail-Adresse
 cmix#:#form_create_registration#:#Registrierung
-cmix#:#field_user_ident#:#E-Mail Adresse
+cmix#:#field_user_ident#:#E-Mail-Adresse
 cmix#:#field_user_ident_info#:#Geben Sie die E-Mail-Adresse ein, die in der externen Anwendung verwendet wird, um Sie zu identifizieren.
 cmix#:#btn_create_registration#:#Absenden
 cmix#:#registration_saved_successfully#:#Registrierung erfolgreich gespeichert
@@ -15958,14 +15983,16 @@ cmix#:#info_external_lrs#:#Bei einem externen Learning Record Store (LRS) wird d
 cmix#:#conf_privacy_ident#:#Benutzeridentifikation
 cmix#:#conf_privacy_ident_info#:#Standard ist häufig die E-Mail-Adresse. Die eindeutige ILIAS-Plattform-ID lautet:
 cmix#:#conf_privacy_ident_il_uuid_user_id#:#ILIAS-Benutzer-ID kombiniert mit einer eindeutigen ILIAS-Plattform-ID, die als E-Mail-Adresse formatiert ist
-cmix#:#conf_privacy_ident_il_uuid_user_id_info#:#Dies ist identisch mit jedem Aufruf, erlaubt aber keine direkte Rückschlüsse auf den ILIAS-Benutzer.
+cmix#:#conf_privacy_ident_il_uuid_user_id_info#:#Sendet die interne numerische Benutzer-Id. Dies ist identisch mit jedem Aufruf, ermöglicht aber Rückschlüsse auf den ILIAS-Benutzer.
 cmix#:#conf_privacy_ident_il_uuid_login#:#ILIAS-Login kombiniert mit einer eindeutigen ILIAS-Plattform-ID, die als E-Mail-Adresse formatiert ist
-cmix#:#conf_privacy_ident_il_uuid_login_info#:#Dies ist identisch mit jedem Aufruf, kann aber eine direkte Rückschlüsse auf den ILIAS-Benutzer zulassen.
+cmix#:#conf_privacy_ident_il_uuid_login_info#:#Sendet den Benutzernamen. Dies ist identisch mit jedem Aufruf, kann aber eine direkte Rückschlüsse auf den ILIAS-Benutzer zulassen.
 cmix#:#conf_privacy_ident_il_uuid_ext_account#:#Externe Benutzer-ID kombiniert mit einer eindeutigen ILIAS-Plattform-ID, die als E-Mail-Adresse formatiert ist
 cmix#:#conf_privacy_ident_il_uuid_ext_account_info#:#Dies ist identisch mit jedem Aufruf, kann aber eine direkte Rückschlüsse auf den Benutzer zulassen.
 cmix#:#conf_privacy_ident_il_uuid_random#:#Zufalls-ID kombiniert mit einer eindeutigen ILIAS-Plattform-ID, die als E-Mail-Adresse formatiert ist
 cmix#:#conf_privacy_ident_il_uuid_random_info#:#Pro ILIAS-Objekt und ILIAS-Benutzer wird eine Zufalls-ID erzeugt, die bei jedem Aufruf identisch bleibt. Rückschlüsse auf einen Benutzer sind sehr eingeschränkt, da Objekt-übergreifende Nutzerprofile praktisch nicht erstellt werden können.
-cmix#:#conf_privacy_ident_real_email#:#E-Mail Adresse
+cmix#:#conf_privacy_ident_il_uuid_SHA256#:#Hash kombiniert mit einer eindeutigen ILIAS-Plattform-ID, die als E-Mail-Adresse formatiert ist
+cmix#:#conf_privacy_ident_il_uuid_SHA256_info#:#Dies ist identisch mit jedem Aufruf, erlaubt aber keine direkten Rückschlüsse auf den ILIAS-Benutzer.
+cmix#:#conf_privacy_ident_real_email#:#E-Mail-Adresse
 cmix#:#conf_privacy_ident_real_email_info#:#Sendet die E-Mail-Adresse des Benutzers als Identifikation (Achtung: eine E-Mail-Adresse kann von mehreren Benutzern verwendet werden!)
 cmix#:#conf_privacy_name#:#Benutzername
 cmix#:#conf_privacy_name_info#:#Das Senden eines Benutzernamens ist in der Regel nicht erforderlich.
@@ -16650,3 +16677,12 @@ rating#:#rating_open_dialog#:#Bewertungsskala aufklappen
 tagging#:#tagging_no_obj_for_tag#:#Es sind keine Inhalte mit '%s' verschlagwortet.
 rep#:#rep_favourites#:#Favoriten
 rep#:#rep_favourites_info#:#Benutzer können einzelne Magazinobjekte als Favorit markieren. Favoritenlisten können in der Dashboard- und Hauptmenükonfiguration aktiviert werden.
+prtf#:#prtf_copy_pg#:#Seite kopieren
+prtf#:#prtf_copy_blog_pg#:#Blogseite kopieren
+assessment#:#question_is_part_of_running_test#:#Die Frage ist Teil eines laufenden Tests und darf nicht geändert werden.
+copg#:#copg_error_occured_modal#:#Es ist leider ein Fehler aufgetreten. Bitte drücken Sie "Seite neu laden" um zum zuletzt gespeicherten Inhalt zu gelangen.
+copg#:#copg_reload_page#:#Seite neu laden
+assessment#:#qst_use_nested_answers#:#Einrückung in Anworten verwenden
+assessment#:#qst_nested_nested_answers_on#:#Mit Einrückung
+assessment#:#qst_nested_nested_answers_off#:#Ohne Einrückung
+assessment#:#tab_nest_answers#:#Einrückung

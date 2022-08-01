@@ -1,8 +1,8 @@
--- MySQL dump 10.19  Distrib 10.3.31-MariaDB, for debian-linux-gnu (x86_64)
+-- MySQL dump 10.19  Distrib 10.3.34-MariaDB, for debian-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: ilias_release
 -- ------------------------------------------------------
--- Server version	10.3.31-MariaDB-0+deb10u1
+-- Server version	10.3.34-MariaDB-0+deb10u1
 
 --
 -- Table structure for table `acc_access_key`
@@ -663,7 +663,7 @@ CREATE TABLE `adv_mdf_definition` (
   `import_id` varchar(32) DEFAULT NULL,
   `position` int(11) NOT NULL DEFAULT 0,
   `field_type` tinyint(4) NOT NULL DEFAULT 0,
-  `field_values` varchar(4000) DEFAULT NULL,
+  `field_values` text DEFAULT NULL,
   `title` varchar(255) DEFAULT NULL,
   `description` varchar(2000) DEFAULT NULL,
   `searchable` tinyint(4) NOT NULL DEFAULT 0,
@@ -1143,7 +1143,8 @@ CREATE TABLE `booking_object` (
   `post_text` varchar(4000) DEFAULT NULL,
   `post_file` varchar(500) DEFAULT NULL,
   PRIMARY KEY (`booking_object_id`),
-  KEY `i1_idx` (`pool_id`)
+  KEY `i1_idx` (`pool_id`),
+  KEY `i2_idx` (`schedule_id`)
 ) ;
 
 --
@@ -1199,7 +1200,8 @@ CREATE TABLE `booking_reservation` (
   KEY `i1_idx` (`user_id`),
   KEY `i2_idx` (`object_id`),
   KEY `i3_idx` (`date_from`),
-  KEY `i4_idx` (`date_to`)
+  KEY `i4_idx` (`date_to`),
+  KEY `i5_idx` (`context_obj_id`)
 ) ;
 
 --
@@ -1250,7 +1252,8 @@ CREATE TABLE `booking_schedule` (
   `auto_break` int(11) DEFAULT NULL,
   `av_from` int(11) DEFAULT NULL,
   `av_to` int(11) DEFAULT NULL,
-  PRIMARY KEY (`booking_schedule_id`)
+  PRIMARY KEY (`booking_schedule_id`),
+  KEY `i1_idx` (`pool_id`)
 ) ;
 
 --
@@ -5007,7 +5010,8 @@ CREATE TABLE `exc_ass_file_order` (
   `assignment_id` int(11) NOT NULL DEFAULT 0,
   `filename` varchar(150) NOT NULL,
   `order_nr` int(11) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `i1_idx` (`assignment_id`)
 ) ;
 
 --
@@ -5119,7 +5123,9 @@ CREATE TABLE `exc_assignment` (
   `deadline_mode` tinyint(4) DEFAULT 0,
   `relative_deadline` int(11) DEFAULT 0,
   `rel_deadline_last_subm` int(11) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `i1_idx` (`exc_id`),
+  KEY `i2_idx` (`deadline_mode`,`exc_id`)
 ) ;
 
 --
@@ -5326,7 +5332,8 @@ CREATE TABLE `exc_members` (
   `feedback` tinyint(4) NOT NULL DEFAULT 0,
   `status` char(9) DEFAULT 'notgraded',
   PRIMARY KEY (`obj_id`,`usr_id`),
-  KEY `ob_idx` (`obj_id`)
+  KEY `ob_idx` (`obj_id`),
+  KEY `i1_idx` (`usr_id`)
 ) ;
 
 --
@@ -7986,7 +7993,8 @@ CREATE TABLE `il_exc_team` (
   `id` int(11) NOT NULL DEFAULT 0,
   `ass_id` int(11) NOT NULL DEFAULT 0,
   `user_id` int(11) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`ass_id`,`user_id`)
+  PRIMARY KEY (`ass_id`,`user_id`),
+  KEY `i1_idx` (`id`)
 ) ;
 
 --
@@ -14101,6 +14109,7 @@ CREATE TABLE `pg_amd_page_list` (
   `id` int(11) NOT NULL DEFAULT 0,
   `field_id` int(11) NOT NULL DEFAULT 0,
   `data` varchar(4000) DEFAULT NULL,
+  `sdata` longtext DEFAULT NULL,
   PRIMARY KEY (`id`,`field_id`)
 ) ;
 
@@ -14429,7 +14438,8 @@ CREATE TABLE `qpl_a_cloze` (
   `tstamp` int(11) NOT NULL DEFAULT 0,
   `gap_size` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`answer_id`),
-  KEY `i1_idx` (`question_fi`)
+  KEY `i1_idx` (`question_fi`),
+  KEY `i2_idx` (`gap_id`)
 ) ;
 
 --
@@ -14449,7 +14459,8 @@ CREATE TABLE `qpl_a_cloze_combi_res` (
   `points` double DEFAULT NULL,
   `best_solution` tinyint(4) DEFAULT NULL,
   `row_id` int(11) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`combination_id`,`question_fi`,`gap_fi`,`row_id`)
+  PRIMARY KEY (`combination_id`,`question_fi`,`gap_fi`,`row_id`),
+  KEY `i1_idx` (`gap_fi`,`question_fi`)
 ) ;
 
 --
@@ -14996,7 +15007,8 @@ CREATE TABLE `qpl_num_range` (
   `aorder` int(11) NOT NULL DEFAULT 0,
   `question_fi` int(11) NOT NULL DEFAULT 0,
   `tstamp` int(11) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`range_id`)
+  PRIMARY KEY (`range_id`),
+  KEY `i6_idx` (`question_fi`)
 ) ;
 
 --
@@ -15441,7 +15453,8 @@ CREATE TABLE `qpl_questions` (
   KEY `i1_idx` (`question_type_fi`),
   KEY `i2_idx` (`original_id`),
   KEY `i3_idx` (`obj_fi`),
-  KEY `i4_idx` (`title`)
+  KEY `i4_idx` (`title`),
+  KEY `i5_idx` (`owner`)
 ) ;
 
 --
@@ -20348,7 +20361,6 @@ INSERT INTO `settings` VALUES ('mobs','upload_dir','');
 INSERT INTO `settings` VALUES ('news','acc_cache_mins','10');
 INSERT INTO `settings` VALUES ('notifications','enable_mail','1');
 INSERT INTO `settings` VALUES ('notifications','enable_osd','1');
-INSERT INTO `settings` VALUES ('pd','enable_block_moving','1');
 INSERT INTO `settings` VALUES ('pd','user_activity_time','0');
 INSERT INTO `settings` VALUES ('preview','max_previews_per_object','5');
 INSERT INTO `settings` VALUES ('preview','preview_enabled','1');
@@ -20400,7 +20412,7 @@ INSERT INTO `settings` VALUES ('common','soap_connect_timeout','0');
 INSERT INTO `settings` VALUES ('common','rpc_server_host','');
 INSERT INTO `settings` VALUES ('common','rpc_server_port','0');
 INSERT INTO `settings` VALUES ('common','inst_id','0');
-INSERT INTO `settings` VALUES ('common','db_hotfixes_7','73');
+INSERT INTO `settings` VALUES ('common','db_hotfixes_7','90');
 INSERT INTO `settings` VALUES ('adve','autosave','30');
 INSERT INTO `settings` VALUES ('common','rep_favourites','1');
 
@@ -20982,7 +20994,8 @@ CREATE TABLE `style_template` (
   `name` varchar(30) NOT NULL DEFAULT '',
   `preview` varchar(4000) DEFAULT NULL,
   `temp_type` varchar(30) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `i1_idx` (`style_id`)
 ) ;
 
 --
@@ -25011,4 +25024,4 @@ CREATE TABLE `xmlvalue_seq` (
 
 
 
--- Dump completed on 2022-03-09 15:22:08
+-- Dump completed on 2022-06-29 18:47:52

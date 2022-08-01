@@ -228,7 +228,7 @@ class ilAdvancedSelectionListGUI implements ilToolbarItem
     */
     public function getAriaListTitle()
     {
-        return $this->aria_listtitle;
+        return strip_tags($this->aria_listtitle);
     }
 
     /**
@@ -897,6 +897,7 @@ class ilAdvancedSelectionListGUI implements ilToolbarItem
             case self::STYLE_LINK:
                 $tpl->setVariable("BTN_CLASS", "");
                 $tpl->setVariable("TAG", "a");
+                $tpl->touchBlock("href_link");
                 break;
         }
 

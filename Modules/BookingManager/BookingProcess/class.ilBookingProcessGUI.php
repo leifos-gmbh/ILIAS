@@ -165,9 +165,13 @@ class ilBookingProcessGUI
         }
 
         if ($this->pool->getScheduleType() === ilObjBookingPool::TYPE_FIX_SCHEDULE) {
-            $schedule = new ilBookingSchedule($obj->getScheduleId());
-
-            $tpl->setContent($this->renderSlots($schedule, array($obj->getId()), $obj->getTitle()));
+            if (true) {
+                $week_gui = new \ILIAS\BookingManager\BookingProcess\WeekGUI([$obj->getId()]);
+                $tpl->setContent($week_gui->getHTML());
+            } else {
+                $schedule = new ilBookingSchedule($obj->getScheduleId());
+                $tpl->setContent($this->renderSlots($schedule, array($obj->getId()), $obj->getTitle()));
+            }
         } else {
             $cgui = new ilConfirmationGUI();
             $cgui->setHeaderText($this->lng->txt("book_confirm_booking_no_schedule"));
@@ -355,7 +359,6 @@ class ilBookingProcessGUI
 
         $map = array('mo', 'tu', 'we', 'th', 'fr', 'sa', 'su');
         $definition = $schedule->getDefinition();
-
         $av_from = ($schedule->getAvailabilityFrom() && !$schedule->getAvailabilityFrom()->isNull())
             ? $schedule->getAvailabilityFrom()->get(IL_CAL_DATE)
             : null;
@@ -394,8 +397,8 @@ class ilBookingProcessGUI
             $slot_captions = array();
             foreach ($hours as $hour => $period) {
                 $dates[$hour][0] = $period;
-
                 $period = explode("-", $period);
+
 
                 // #13738
                 if ($user_settings->getTimeFormat() === ilCalendarSettings::TIME_FORMAT_12) {

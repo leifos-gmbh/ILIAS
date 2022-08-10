@@ -20,6 +20,8 @@ namespace ILIAS\BookingManager;
 
 use ILIAS\DI\Container;
 use ILIAS\Repository\GlobalDICDomainServices;
+use ILIAS\BookingManager\BookingProcess\BookingProcessManager;
+use ILIAS\BookingManager\Objects\ObjectsManager;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
@@ -28,6 +30,7 @@ class InternalDomainService
 {
     use GlobalDICDomainServices;
 
+    protected static array $object_manager = [];
     protected InternalRepoService $repo_service;
     protected InternalDataService $data_service;
 
@@ -59,5 +62,26 @@ class InternalDomainService
             $pool,
             $this->repo_service->preferenceBasedBooking()
         );
+    }
+
+    public function process() : BookingProcessManager
+    {
+        $user_id = $this->user()->getId();
+        $user_settings = \ilCalendarUserSettings::_getInstanceByUserId($user_id);
+        return new BookingProcessManager(
+        );
+    }
+
+    public function objects(int $pool_id) : ObjectsManager
+    {
+        if (!isset(self::$object_manager[$pool_id])) {
+            self::$object_manager[$pool_id] = new ObjectsManager(
+                $this->data_service,
+                $this->repo_service,
+                $this,
+                $pool_id
+            );
+        }
+        return self::$object_manager[$pool_id];
     }
 }

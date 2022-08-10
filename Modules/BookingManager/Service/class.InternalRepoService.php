@@ -19,6 +19,7 @@
 namespace ILIAS\BookingManager;
 
 use ILIAS\BookingManager\Reservation\ReservationTableSessionRepository;
+use ILIAS\BookingManager\Objects\ObjectsDBRepository;
 
 /**
  * Repository internal repo service
@@ -62,5 +63,12 @@ class InternalRepoService
     public function reservationTable() : ReservationTableSessionRepository
     {
         return new ReservationTableSessionRepository();
+    }
+
+    public function objects() : ObjectsDBRepository
+    {
+        return new ObjectsDBRepository(
+            $this->db
+        );
     }
 }

@@ -15,6 +15,10 @@ class StandardPageBuilder implements PageBuilder
      * @var \ILIAS\DI\UIServices
      */
     protected $ui;
+    /**
+     * @var \ILIAS\GlobalScreen\Scope\Layout\MetaContent\MetaContent
+     */
+    protected $meta;
 
 
     /**
@@ -24,6 +28,7 @@ class StandardPageBuilder implements PageBuilder
     {
         global $DIC;
         $this->ui = $DIC->ui();
+        $this->meta = $DIC->globalScreen()->layout()->meta();
     }
 
 
@@ -35,6 +40,7 @@ class StandardPageBuilder implements PageBuilder
     public function build(PagePartProvider $parts) : Page
     {
         $header_image = $parts->getLogo();
+        $responsive_header_image = $parts->getResponsiveLogo();
         $main_bar = $parts->getMainBar();
         $meta_bar = $parts->getMetaBar();
         $bread_crumbs = $parts->getBreadCrumbs();
@@ -43,7 +49,7 @@ class StandardPageBuilder implements PageBuilder
         $short_title = $parts->getShortTitle();
         $view_title = $parts->getViewTitle();
 
-        return $this->ui->factory()->layout()->page()->standard(
+        $page = $this->ui->factory()->layout()->page()->standard(
             [$parts->getContent()],
             $meta_bar,
             $main_bar,
@@ -54,5 +60,15 @@ class StandardPageBuilder implements PageBuilder
             $short_title,
             $view_title
         );
+        
+        foreach ($this->meta->getMetaData()->getItems() as $meta_datum) {
+            $page = $page->withAdditionalMetaDatum($meta_datum->getKey(), $meta_datum->getValue());
+        }
+        
+        if (null !== $responsive_header_image) {
+            $page = $page->withResponsiveLogo($responsive_header_image);
+        }
+
+        return $page;
     }
 }

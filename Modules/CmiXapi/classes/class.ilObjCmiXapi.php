@@ -140,7 +140,8 @@ class ilObjCmiXapi extends ilObject2
     const PRIVACY_IDENT_IL_UUID_LOGIN = 2;
     const PRIVACY_IDENT_REAL_EMAIL = 3;
     const PRIVACY_IDENT_IL_UUID_RANDOM = 4;
-    
+    const PRIVACY_IDENT_IL_UUID_SHA256 = 5;
+
     /**
      * @var string
      */
@@ -2102,6 +2103,7 @@ class ilObjCmiXapi extends ilObject2
             $activityId['$or'] = [];
             $activityId['$or'][] = ['statement.object.id' => $activityQuery];
             $activityId['$or'][] = ['statement.context.contextActivities.parent.id' => $activityQuery];
+            $activityId['$or'][] = ['statement.context.contextActivities.grouping.id' => $activityQuery];
         }
 
         $sessionId = array();

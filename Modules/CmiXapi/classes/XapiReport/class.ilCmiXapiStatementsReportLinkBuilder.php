@@ -101,12 +101,13 @@ class ilCmiXapiStatementsReportLinkBuilder extends ilCmiXapiAbstractReportLinkBu
             // $activityId['$or'][] = ['statement.object.id' => "{$this->filter->getActivityId()}"];
             $activityId['$or'][] = ['statement.object.id' => $activityQuery];
             $activityId['$or'][] = ['statement.context.contextActivities.parent.id' => $activityQuery];
+            $activityId['$or'][] = ['statement.context.contextActivities.grouping.id' => $activityQuery];
         }
 
         $actor = array();
         
         // mixed
-        if ($obj->isMixedContentType())
+        if ($obj instanceof ilObjCmiXapi && $obj->isMixedContentType())
         {
             if ($this->filter->getActor())
             {
@@ -132,7 +133,7 @@ class ilCmiXapiStatementsReportLinkBuilder extends ilCmiXapiAbstractReportLinkBu
                 }
             }
         }
-        elseif ($obj->getContentType() == ilObjCmiXapi::CONT_TYPE_CMI5) // new
+        elseif ($obj instanceof ilObjCmiXapi && $obj->getContentType() == ilObjCmiXapi::CONT_TYPE_CMI5)
         {
             if ($this->filter->getActor())
             {
@@ -179,26 +180,25 @@ class ilCmiXapiStatementsReportLinkBuilder extends ilCmiXapiAbstractReportLinkBu
     {
         $obj = $this->getObj();
         $actor = '';
-        if ($obj->getPrivacyName() != ilObjCmiXapi::PRIVACY_NAME_NONE)
-        {
-            $actor = 'statement.actor.name';
-        }
-        else {
-            if ($obj->getContentType() == ilObjCmiXapi::CONT_TYPE_CMI5)
-            {
-                if ($obj->getPublisherId() == '') // old
-                {
+        if ($obj instanceof ilObjLTIConsumer) {
+            if ($obj->getProvider()->getPrivacyName() != ilObjCmiXapi::PRIVACY_NAME_NONE) {
+                $actor = 'statement.actor.name';
+            }
+        } else {
+            if ($obj->getPrivacyName() != ilObjCmiXapi::PRIVACY_NAME_NONE) {
+                $actor = 'statement.actor.name';
+            } else {
+                if ($obj->getContentType() == ilObjCmiXapi::CONT_TYPE_CMI5) {
+                    if ($obj->getPublisherId() == '') // old
+                    {
+                        $actor = 'statement.actor.mbox';
+                    } else {
+                        $actor = 'statement.actor.account.name';
+                    }
+
+                } else {
                     $actor = 'statement.actor.mbox';
                 }
-                else
-                {
-                    $actor = 'statement.actor.account.name';
-                }
-                
-            }
-            else 
-            {
-                $actor = 'statement.actor.mbox';
             }
         }
         switch ($this->filter->getOrderField()) {

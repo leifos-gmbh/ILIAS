@@ -20,6 +20,7 @@ require_once('Modules/File/classes/class.ilFSStorageFile.php');
  */
 class ilObjFile extends ilObject2
 {
+    use ilObjFileSecureString;
     const MODE_FILELIST = "filelist";
     const MODE_OBJECT = "object";
     /**
@@ -333,7 +334,7 @@ class ilObjFile extends ilObject2
                     $this->doUpdate();
                 }
                 $a_name = $result->getName();
-                $this->setFileName($a_name);
+                $this->setFileName($this->secure($a_name));
 
                 $this->setVersion($this->getMaxVersion() + 1);
                 $this->setMaxVersion($this->getMaxVersion() + 1);
@@ -493,7 +494,7 @@ class ilObjFile extends ilObject2
         $r = $DIC->database()->queryF($q, ['integer'], [$this->getId()]);
         $row = $r->fetchObject();
 
-        $this->setFileName($row->file_name);
+        $this->setFileName($this->secure($row->file_name));
         $this->setFileType($row->file_type);
         $this->setFileSize($row->file_size);
         $this->setVersion($row->version ? $row->version : 1);
@@ -532,7 +533,7 @@ class ilObjFile extends ilObject2
         // update metadata with the current file version
         $meta_version_column = ['meta_version' => ['integer', (int) $this->getVersion()]];
         $DIC->database()->update('il_meta_lifecycle', $meta_version_column, [
-            'obj_id' => [
+            'rbac_id' => [
                 'integer',
                 $this->getId(),
             ],

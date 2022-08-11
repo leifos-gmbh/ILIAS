@@ -64,33 +64,49 @@ class WeekGridGUI
         $evening_aggr = $this->day_end;
         $hours = array();
         for ($i = $morning_aggr;$i <= $evening_aggr;$i++) {
+            $caption = "";
+            $start = sprintf('%02d:00', $i);
+            if ($morning_aggr > 0 && $i === $morning_aggr) {
+                $start = sprintf('%02d:00', 0);
+            }
+            $end = $start = sprintf('%02d:00', $i + 1);
+            if ($evening_aggr < 23 && $i === $evening_aggr) {
+                $end = sprintf('%02d:00', 23);
+            }
             switch ($this->time_format) {
-                case \ilCalendarSettings::TIME_FORMAT_24:
-                    $hours[$i] = "";
+                case \ilCalendarSettings::TIME_FORMAT_12:
                     if ($morning_aggr > 0 && $i === $morning_aggr) {
-                        $hours[$i] = sprintf('%02d:00', 0) . "-";
+                        $caption = date('h a', mktime(0, 0, 0, 1, 1, 2000)) . "-";
                     }
-                    $hours[$i] .= sprintf('%02d:00', $i);
+                    $caption .= date('h a', mktime($i, 0, 0, 1, 1, 2000));
                     if ($evening_aggr < 23 && $i === $evening_aggr) {
-                        $hours[$i] .= "-" . sprintf('%02d:00', 23);
+                        $caption .= "-" . date('h a', mktime(23, 0, 0, 1, 1, 2000));
                     }
                     break;
 
-                case \ilCalendarSettings::TIME_FORMAT_12:
+                default:
                     if ($morning_aggr > 0 && $i === $morning_aggr) {
-                        $hours[$i] = date('h a', mktime(0, 0, 0, 1, 1, 2000)) . "-";
+                        $caption = sprintf('%02d:00', 0) . "-";
                     }
-                    $hours[$i] .= date('h a', mktime($i, 0, 0, 1, 1, 2000));
+                    $caption .= sprintf('%02d:00', $i);
                     if ($evening_aggr < 23 && $i === $evening_aggr) {
-                        $hours[$i] .= "-" . date('h a', mktime(23, 0, 0, 1, 1, 2000));
+                        $caption .= "-" . sprintf('%02d:00', 23);
                     }
                     break;
             }
+            $hours[$i] = [
+                "caption" => $caption,
+                "start" => $start,
+                "end" => $end
+            ];
         }
 
         $week_start = $this->week_start;
-
+        var_dump($hours);
+        exit;
         /** @var \ilDateTime $date */
+        $cells = [];
+        $week = 0;
         foreach (\ilCalendarUtil::_buildWeekDayList($this->seed, $week_start)->get() as $date) {
             $date_info = $date->get(IL_CAL_FKT_GETDATE, '', 'UTC');
 
@@ -98,6 +114,10 @@ class WeekGridGUI
             $mytpl->setVariable('TXT_WEEKDAY', \ilCalendarUtil::_numericDayToString((int) $date_info['wday']));
             $mytpl->setVariable('TXT_DATE', $date_info['mday'] . ' ' . \ilCalendarUtil::_numericMonthToString($date_info['mon']));
             $mytpl->parseCurrentBlock();
+            foreach ($hours as $hour => $data) {
+                $cells[$week][$hour] = $data;
+            }
+            $week++;
         }
 
         var_dump($hours);

@@ -33,7 +33,25 @@ class WeekGUI
 
     public function getHTML() : string
     {
-        $week_widget = new WeekGridGUI();
+        $start1 = new \ilDateTime("2022-08-17 10:00:00", IL_CAL_DATETIME);
+        $end1 = new \ilDateTime("2022-08-17 11:00:00", IL_CAL_DATETIME);
+
+        $entry1 = new WeekGridEntry(
+            $start1->get(IL_CAL_UNIX),
+            $end1->get(IL_CAL_UNIX),
+            "Moin 1"
+        );
+
+        $start2 = new \ilDateTime("2022-08-19 12:00:00", IL_CAL_DATETIME);
+        $end2 = new \ilDateTime("2022-08-19 13:00:00", IL_CAL_DATETIME);
+
+        $entry2 = new WeekGridEntry(
+            $start2->get(IL_CAL_UNIX),
+            $end2->get(IL_CAL_UNIX),
+            "Moin 2"
+        );
+
+        $week_widget = new WeekGridGUI([$entry1, $entry2]);
         return $week_widget->render();
     }
 

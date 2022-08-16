@@ -20,6 +20,7 @@ namespace ILIAS\BookingManager\BookingProcess;
  */
 class WeekGridGUI
 {
+    protected string $form_action;
     protected int $week_start;
     protected \ilDate $seed;
     protected string $seed_str;
@@ -30,7 +31,11 @@ class WeekGridGUI
     protected string $title;
     protected array $entries;
 
-    public function __construct()
+    /**
+     * @param WeekGridEntry[] $entries
+     * @throws \ilDateTimeException
+     */
+    public function __construct(array $entries = [])
     {
         global $DIC;
 
@@ -45,6 +50,83 @@ class WeekGridGUI
             ? new \ilDate($this->seed_str, IL_CAL_DATE)
             : new \ilDate(time(), IL_CAL_UNIX);
         $this->week_start = \ilCalendarSettings::WEEK_START_MONDAY;
+        $this->entries = $entries;
+    }
+
+    protected function getHoursOfDay() : array
+    {
+        $hours = array();
+        for ($i = $this->day_start;$i <= $this->day_end;$i++) {
+            $caption = "";
+            $start = sprintf('%02d:00', $i);
+            if ($this->day_start > 0 && $i === $this->day_start) {
+                $start = sprintf('%02d:00', 0);
+                $end = sprintf('%02d:00', $i);
+            } else {
+                $end = sprintf('%02d:00', $i + 1);
+            }
+            if ($this->day_end < 23 && $i === $this->day_end) {
+                $end = sprintf('%02d:00', 23);
+            }
+            switch ($this->time_format) {
+                case \ilCalendarSettings::TIME_FORMAT_12:
+                    if ($this->day_start > 0 && $i === $this->day_start) {
+                        $caption = date('h a', mktime(0, 0, 0, 1, 1, 2000)) . "-";
+                    }
+                    $caption .= date('h a', mktime($i, 0, 0, 1, 1, 2000));
+                    if ($this->day_end < 23 && $i === $this->day_end) {
+                        $caption .= "-" . date('h a', mktime(23, 0, 0, 1, 1, 2000));
+                    }
+                    break;
+
+                default:
+                    if ($this->day_start > 0 && $i === $this->day_start) {
+                        $caption = sprintf('%02d:00', 0) . "-";
+                    }
+                    $caption .= sprintf('%02d:00', $i);
+                    if ($this->day_end < 23 && $i === $this->day_end) {
+                        $caption .= "-" . sprintf('%02d:00', 23);
+                    }
+                    break;
+            }
+            $hours[$i] = [
+                "caption" => $caption,
+                "start" => $start,
+                "end" => $end
+            ];
+        }
+        return $hours;
+    }
+
+    /**
+     * Build cell data
+     * @param
+     * @return
+     */
+    protected function buildCellData() : array
+    {
+        $morning_aggr = $this->day_start;
+        $evening_aggr = $this->day_end;
+        $hours = $this->getHoursOfDay();
+        $week_start = $this->week_start;
+        /** @var \ilDateTime $date */
+        $cells = [];
+        $week = 0;
+        foreach (\ilCalendarUtil::_buildWeekDayList($this->seed, $week_start)->get() as $date) {
+            foreach ($hours as $hour => $data) {
+                $start = new \ilDateTime($date->get(IL_CAL_DATE) . " " . $data["start"] . ":00", IL_CAL_DATETIME);
+                $end = new \ilDateTime($date->get(IL_CAL_DATE) . " " . $data["end"] . ":00", IL_CAL_DATETIME);
+                $data["start_ts"] = $start->get(IL_CAL_UNIX);
+                $data["end_ts"] = $end->get(IL_CAL_UNIX);
+                $data["entries"] = $this->getEntriesForCell($data["start_ts"], $data["end_ts"]);
+                $cells[$week][$hour] = $data;
+                // store how much slots are max. to be displayed in parallel per day
+                $cells[$week]["col_span"] = max(count($data["entries"]), $cells[$week]["max_parallel"] ?? 1);
+            }
+            $week++;
+        }
+
+        return $cells;
     }
 
     public function render() : string
@@ -56,80 +138,46 @@ class WeekGridGUI
             'Modules/BookingManager/BookingProcess'
         );
 
+        $cells = $this->buildCellData();
+
         $mytpl->setVariable('TXT_TITLE', $this->lng->txt('book_reservation_title'));
         $mytpl->setVariable('TXT_INFO', $this->lng->txt('book_reservation_fix_info'));
         $mytpl->setVariable('TXT_OBJECT', $this->title);
 
-        $morning_aggr = $this->day_start;
-        $evening_aggr = $this->day_end;
-        $hours = array();
-        for ($i = $morning_aggr;$i <= $evening_aggr;$i++) {
-            $caption = "";
-            $start = sprintf('%02d:00', $i);
-            if ($morning_aggr > 0 && $i === $morning_aggr) {
-                $start = sprintf('%02d:00', 0);
-            }
-            $end = $start = sprintf('%02d:00', $i + 1);
-            if ($evening_aggr < 23 && $i === $evening_aggr) {
-                $end = sprintf('%02d:00', 23);
-            }
-            switch ($this->time_format) {
-                case \ilCalendarSettings::TIME_FORMAT_12:
-                    if ($morning_aggr > 0 && $i === $morning_aggr) {
-                        $caption = date('h a', mktime(0, 0, 0, 1, 1, 2000)) . "-";
-                    }
-                    $caption .= date('h a', mktime($i, 0, 0, 1, 1, 2000));
-                    if ($evening_aggr < 23 && $i === $evening_aggr) {
-                        $caption .= "-" . date('h a', mktime(23, 0, 0, 1, 1, 2000));
-                    }
-                    break;
-
-                default:
-                    if ($morning_aggr > 0 && $i === $morning_aggr) {
-                        $caption = sprintf('%02d:00', 0) . "-";
-                    }
-                    $caption .= sprintf('%02d:00', $i);
-                    if ($evening_aggr < 23 && $i === $evening_aggr) {
-                        $caption .= "-" . sprintf('%02d:00', 23);
-                    }
-                    break;
-            }
-            $hours[$i] = [
-                "caption" => $caption,
-                "start" => $start,
-                "end" => $end
-            ];
-        }
-
-        $week_start = $this->week_start;
-        var_dump($hours);
-        exit;
-        /** @var \ilDateTime $date */
-        $cells = [];
-        $week = 0;
-        foreach (\ilCalendarUtil::_buildWeekDayList($this->seed, $week_start)->get() as $date) {
+        $day_of_week = 0;
+        foreach (\ilCalendarUtil::_buildWeekDayList($this->seed, $this->week_start)->get() as $date) {
             $date_info = $date->get(IL_CAL_FKT_GETDATE, '', 'UTC');
-
             $mytpl->setCurrentBlock('weekdays');
             $mytpl->setVariable('TXT_WEEKDAY', \ilCalendarUtil::_numericDayToString((int) $date_info['wday']));
+            $mytpl->setVariable('COL_SPAN', $cells[$day_of_week]["col_span"]);
+            $mytpl->setVariable('WIDTH', round(12 / (int) $cells[$day_of_week]["col_span"], 2));
             $mytpl->setVariable('TXT_DATE', $date_info['mday'] . ' ' . \ilCalendarUtil::_numericMonthToString($date_info['mon']));
             $mytpl->parseCurrentBlock();
-            foreach ($hours as $hour => $data) {
-                $cells[$week][$hour] = $data;
-            }
-            $week++;
+            $day_of_week++;
         }
 
-        var_dump($hours);
-        exit;
-        foreach ($hours as $hour => $days) {
-            $caption = $days;
+        $hours = $this->getHoursOfDay();
 
-            foreach (\ilCalendarUtil::_buildWeekDayList($this->seed, $week_start)->get() as $date) {
-                $this->renderCell($date, $hour);
-                $mytpl->setCurrentBlock('dates');
-                $mytpl->setVariable('CONTENT', '&nbsp;');
-                $mytpl->parseCurrentBlock();
+        foreach ($hours as $hour => $days) {
+            $caption = $days["caption"];
+            $day_of_week = 0;
+            foreach (\ilCalendarUtil::_buildWeekDayList($this->seed, $this->week_start)->get() as $date) {
+                $data = $cells[$day_of_week][$hour];
+                $total_tds = $cells[$day_of_week]["col_span"];
+                foreach ($data["entries"] as $e) {
+                    // starting in cell? show it
+                    /** @var WeekGridEntry $e */
+                    if ($e->getStart() >= $data["start_ts"] && $e->getStart() < $data["end_ts"]) {
+                        $total_tds--;
+                        $mytpl->setCurrentBlock('dates');
+                        $mytpl->setVariable('CONTENT', $e->getHTML());
+                        $row_span = max(1, ceil(($data["end_ts"] - $e->getEnd()) / 60) + 1);
+                        $mytpl->setVariable('ROW_SPAN', $row_span);
+                        $mytpl->parseCurrentBlock();
+                    }
+                }
+                $cell_html = $this->renderCell($cells[$day_of_week][$hour]);
+                $day_of_week++;
             }
 
             $mytpl->setCurrentBlock('slots');
@@ -137,5 +185,22 @@ class WeekGridGUI
             $mytpl->parseCurrentBlock();
         }
         return $mytpl->get();
+    }
+
+    /**
+     * All entries for a cell (not only starting ones, start could be in an earlier cell)
+     * @return WeekGridEntry[]
+     */
+    protected function getEntriesForCell(int $start_ts, int $end_ts) : array
+    {
+        return array_filter($this->entries, function ($e) use ($start_ts, $end_ts) {
+            /** @var WeekGridEntry $e */
+            return ($e->getStart() < $end_ts && $e->getEnd() > $start_ts);
+        });
+    }
+
+    protected function renderCell(array $data)
+    {
+        return "&nbsp;";
     }
 }

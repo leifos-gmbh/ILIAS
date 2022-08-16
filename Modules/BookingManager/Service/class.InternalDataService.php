@@ -20,6 +20,7 @@ namespace ILIAS\BookingManager;
 
 use ilBookingPreferences;
 use ilBookingPreferencesFactory;
+use ILIAS\BookingManager\BookingProcess\WeekGridEntry;
 
 /**
  * Repository internal data service
@@ -38,5 +39,17 @@ class InternalDataService
     public function preferences(array $preferences) : ilBookingPreferences
     {
         return $this->preferences_factory->preferences($preferences);
+    }
+
+    public function weekEntry(
+        int $start,
+        int $end,
+        string $html
+    ) : WeekGridEntry {
+        return new WeekGridEntry(
+            $start,
+            $end,
+            $html
+        );
     }
 }

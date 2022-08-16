@@ -35,17 +35,17 @@ class WeekGridEntry
         $this->html = $html;
     }
 
-    protected function getStart() : int
+    public function getStart() : int
     {
         return $this->start;
     }
 
-    protected function getEnd() : int
+    public function getEnd() : int
     {
         return $this->end;
     }
 
-    protected function getHTML() : string
+    public function getHTML() : string
     {
         return $this->html;
     }

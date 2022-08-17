@@ -22,6 +22,7 @@
  */
 class ilBookingProcessGUI
 {
+    protected \ILIAS\BookingManager\InternalGUIService $gui;
     protected array $raw_post_data;
     protected \ILIAS\BookingManager\StandardGUIRequest $book_request;
     protected ilObjBookingPool $pool;
@@ -73,6 +74,10 @@ class ilBookingProcessGUI
             ->gui()
             ->standardRequest();
 
+        $this->gui = $DIC->bookingManager()
+            ->internal()
+            ->gui();
+
         $this->rsv_ids = $this->book_request->getReservationIdsFromString();
 
         $this->raw_post_data = $DIC->http()->request()->getParsedBody();
@@ -94,7 +99,7 @@ class ilBookingProcessGUI
         $cmd = $ctrl->getCmd("show");
         switch ($next_class) {
             default:
-                if (in_array($cmd, array("book", "back",
+                if (in_array($cmd, array("book", "back", "week",
                     "assignParticipants",
                     "bookMultipleParticipants",
                     "saveMultipleBookings",
@@ -139,6 +144,49 @@ class ilBookingProcessGUI
     }
 
     //
+    // Step 0 / week view
+    //
+
+    /**
+     * First step in booking process
+     */
+    public function week() : void // ok
+    {
+        $tpl = $this->tpl;
+
+        //$this->tabs_gui->clearTargets();
+        //$this->tabs_gui->setBackTarget($this->lng->txt('book_back_to_list'), $this->ctrl->getLinkTarget($this, 'back'));
+
+        $this->setHelpId("week");
+
+        if ($this->user_id_to_book !== $this->user_id_assigner) {
+            $this->ctrl->setParameter($this, 'bkusr', $this->user_id_to_book);
+        }
+        $user_settings = ilCalendarUserSettings::_getInstanceByUserId($this->user->getId());
+
+        $week_gui = new \ILIAS\BookingManager\BookingProcess\WeekGUI(
+            $this,
+            "week",
+            ilBookingObject::getObjectsForPool($this->pool->getId()),
+            $this->seed ?? $this->sseed,
+            $user_settings->getWeekStart()
+        );
+        $tpl->setContent($week_gui->getHTML());
+
+        $bar = $this->gui->toolbar();
+        $list_link = $this->ctrl->getLinkTargetByClass("ilObjBookingPoolGUI", "render");
+        $week_link = $this->ctrl->getLinkTargetByClass("ilBookingProcessGUI", "week");
+        $mode_control = $this->gui->ui()->factory()->viewControl()->mode([
+            $this->lng->txt("book_list") => $list_link,
+            $this->lng->txt("book_week") => $week_link
+        ], $this->lng->txt("book_view"))->withActive($this->lng->txt("book_week"));
+        $bar->addComponent($mode_control);
+
+        $list_gui = new \ILIAS\BookingManager\BookingProcess\ObjectSelectionListGUI($this->pool->getId());
+        $tpl->setRightContent($list_gui->render());
+    }
+
+    //
     // Step 1
     //
 
@@ -164,9 +212,17 @@ class ilBookingProcessGUI
             $this->ctrl->setParameter($this, 'bkusr', $this->user_id_to_book);
         }
 
+        $user_settings = ilCalendarUserSettings::_getInstanceByUserId($this->user->getId());
+
         if ($this->pool->getScheduleType() === ilObjBookingPool::TYPE_FIX_SCHEDULE) {
             if (true) {
-                $week_gui = new \ILIAS\BookingManager\BookingProcess\WeekGUI([$obj->getId()]);
+                $week_gui = new \ILIAS\BookingManager\BookingProcess\WeekGUI(
+                    $this,
+                    "book",
+                    [$obj->getId()],
+                    $this->seed ?? $this->sseed,
+                    $user_settings->getWeekStart()
+                );
                 $tpl->setContent($week_gui->getHTML());
             } else {
                 $schedule = new ilBookingSchedule($obj->getScheduleId());

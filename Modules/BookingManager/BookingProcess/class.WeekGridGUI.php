@@ -35,21 +35,24 @@ class WeekGridGUI
      * @param WeekGridEntry[] $entries
      * @throws \ilDateTimeException
      */
-    public function __construct(array $entries = [])
-    {
+    public function __construct(
+        array $entries = [],
+        \ilDate $seed = null,
+        int $day_start = 8,
+        int $day_end = 19,
+        int $time_format = \ilCalendarSettings::TIME_FORMAT_24,
+        int $week_start = \ilCalendarSettings::WEEK_START_MONDAY
+    ) {
         global $DIC;
 
         $this->title = "Test";
         $this->form_action = "#";
         $this->lng = $DIC->language();
-        $this->day_start = 8;
-        $this->day_end = 19;
-        $this->time_format = \ilCalendarSettings::TIME_FORMAT_24;
-        $this->seed_str = "";
-        $this->seed = ($this->seed_str !== "")
-            ? new \ilDate($this->seed_str, IL_CAL_DATE)
-            : new \ilDate(time(), IL_CAL_UNIX);
-        $this->week_start = \ilCalendarSettings::WEEK_START_MONDAY;
+        $this->day_start = $day_start;
+        $this->day_end = $day_end;
+        $this->time_format = $time_format;
+        $this->seed = $seed ?? new \ilDate(time(), IL_CAL_UNIX);
+        $this->week_start = $week_start;
         $this->entries = $entries;
     }
 
@@ -121,11 +124,10 @@ class WeekGridGUI
                 $data["entries"] = $this->getEntriesForCell($data["start_ts"], $data["end_ts"]);
                 $cells[$week][$hour] = $data;
                 // store how much slots are max. to be displayed in parallel per day
-                $cells[$week]["col_span"] = max(count($data["entries"]), $cells[$week]["max_parallel"] ?? 1);
+                $cells[$week]["col_span"] = max(count($data["entries"]), $cells[$week]["col_span"] ?? 1);
             }
             $week++;
         }
-
         return $cells;
     }
 
@@ -150,7 +152,7 @@ class WeekGridGUI
             $mytpl->setCurrentBlock('weekdays');
             $mytpl->setVariable('TXT_WEEKDAY', \ilCalendarUtil::_numericDayToString((int) $date_info['wday']));
             $mytpl->setVariable('COL_SPAN', $cells[$day_of_week]["col_span"]);
-            $mytpl->setVariable('WIDTH', round(12 / (int) $cells[$day_of_week]["col_span"], 2));
+            $mytpl->setVariable('WIDTH', "12");
             $mytpl->setVariable('TXT_DATE', $date_info['mday'] . ' ' . \ilCalendarUtil::_numericMonthToString($date_info['mon']));
             $mytpl->parseCurrentBlock();
             $day_of_week++;
@@ -168,15 +170,20 @@ class WeekGridGUI
                     // starting in cell? show it
                     /** @var WeekGridEntry $e */
                     if ($e->getStart() >= $data["start_ts"] && $e->getStart() < $data["end_ts"]) {
-                        $total_tds--;
                         $mytpl->setCurrentBlock('dates');
                         $mytpl->setVariable('CONTENT', $e->getHTML());
-                        $row_span = max(1, ceil(($data["end_ts"] - $e->getEnd()) / 60) + 1);
+                        $row_span = max(1, ceil(($e->getEnd() - $data["end_ts"]) / 3600) + 1);
                         $mytpl->setVariable('ROW_SPAN', $row_span);
                         $mytpl->parseCurrentBlock();
                     }
+                    $total_tds--;
                 }
-                $cell_html = $this->renderCell($cells[$day_of_week][$hour]);
+                while ($total_tds > 0) {
+                    $mytpl->setCurrentBlock('dates');
+                    $mytpl->setVariable('CONTENT', "&nbsp;");
+                    $mytpl->parseCurrentBlock();
+                    $total_tds--;
+                }
                 $day_of_week++;
             }
 

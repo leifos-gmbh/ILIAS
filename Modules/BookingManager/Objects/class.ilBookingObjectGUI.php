@@ -22,6 +22,7 @@
  */
 class ilBookingObjectGUI
 {
+    protected \ILIAS\BookingManager\InternalGUIService $gui;
     protected \ILIAS\BookingManager\StandardGUIRequest $book_request;
     protected ilCtrl $ctrl;
     protected ilGlobalTemplateInterface $tpl;
@@ -68,7 +69,7 @@ class ilBookingObjectGUI
                                   ->internal()
                                   ->gui()
                                   ->standardRequest();
-
+        $this->gui = $DIC->bookingManager()->internal()->gui();
 
         $this->seed = $seed;
         $this->sseed = $sseed;
@@ -203,6 +204,16 @@ class ilBookingObjectGUI
         if ($this->isManagementActivated() && $ilAccess->checkAccess('write', '', $this->getPoolRefId())) {
             $bar = new ilToolbarGUI();
             $bar->addButton($lng->txt('book_add_object'), $ilCtrl->getLinkTarget($this, 'create'));
+            if ($this->hasPoolSchedule()) {
+                $bar->addSeparator();
+                $list_link = $this->ctrl->getLinkTarget($this, "");
+                $week_link = $this->ctrl->getLinkTargetByClass("ilBookingProcessGUI", "week");
+                $mode_control = $this->gui->ui()->factory()->viewControl()->mode([
+                   $this->lng->txt("book_list") => $list_link,
+                   $this->lng->txt("book_week") => $week_link
+                ], $this->lng->txt("book_view"));
+                $bar->addComponent($mode_control);
+            }
             $bar = $bar->getHTML();
         }
         

@@ -20,19 +20,56 @@ namespace ILIAS\BookingManager\BookingProcess;
  */
 class WeekGUI
 {
+    protected \ilCtrlInterface $ctrl;
+    protected string $parent_cmd;
+    protected object $parent_gui;
     /**
      * @var int[]
      */
     protected array $obj_ids = [];
+    protected int $week_start;
+    protected \ilDate $seed;
+    protected string $seed_str;
+    protected int $time_format;
+    protected int $day_end;
+    protected int $day_start;
+
 
     public function __construct(
-        array $obj_ids
+        object $parent_gui,
+        string $parent_cmd,
+        array $obj_ids,
+        string $seed_str = "",
+        int $week_start = \ilCalendarSettings::WEEK_START_MONDAY
     ) {
+        global $DIC;
+
+        $this->ctrl = $DIC->ctrl();
+        $this->parent_gui = $parent_gui;
+        $this->parent_cmd = $parent_cmd;
         $this->obj_ids = $obj_ids;
+        $this->day_start = 8;
+        $this->day_end = 19;
+        $this->time_format = \ilCalendarSettings::TIME_FORMAT_24;
+        $this->seed_str = $seed_str;
+        $this->seed = ($this->seed_str !== "")
+            ? new \ilDate($this->seed_str, IL_CAL_DATE)
+            : new \ilDate(time(), IL_CAL_UNIX);
+        $this->week_start = $week_start;
     }
 
     public function getHTML() : string
     {
+        $navigation = new \ilCalendarHeaderNavigationGUI(
+            $this->parent_gui,
+            $this->seed,
+            \ilDateTime::WEEK,
+            $this->parent_cmd
+        );
+        $navigation->getHTML();
+
+
+        /*
         $start1 = new \ilDateTime("2022-08-17 10:00:00", IL_CAL_DATETIME);
         $end1 = new \ilDateTime("2022-08-17 11:00:00", IL_CAL_DATETIME);
 
@@ -49,168 +86,133 @@ class WeekGUI
             $start2->get(IL_CAL_UNIX),
             $end2->get(IL_CAL_UNIX),
             "Moin 2"
-        );
+        );*/
 
-        $week_widget = new WeekGridGUI([$entry1, $entry2]);
+        $week_widget = new WeekGridGUI(
+            $this->getWeekGridEntries($this->obj_ids),
+            $this->seed,
+            $this->day_start,
+            $this->day_end,
+            $this->time_format,
+            $this->week_start
+        );
         return $week_widget->render();
     }
 
-    protected function renderSlots(
-        ilBookingSchedule $schedule,
-        array $object_ids,
-        string $title
-    ) : string {
-        $ilUser = $this->user;
+    protected function getWeekGridEntries(
+        array $object_ids
+    ) : array {
+        $week_grid_entries = [];
 
-        // fix
-        if (!$schedule->getRaster()) {
-            $mytpl = new ilTemplate('tpl.booking_reservation_fix.html', true, true, 'Modules/BookingManager');
+        foreach ($object_ids as $object_id) {
+            $obj = new \ilBookingObject($object_id);
+            $schedule = new \ilBookingSchedule($obj->getScheduleId());
+            $map = array('mo', 'tu', 'we', 'th', 'fr', 'sa', 'su');
+            $definition = $schedule->getDefinition();
+            $av_from = ($schedule->getAvailabilityFrom() && !$schedule->getAvailabilityFrom()->isNull())
+                ? $schedule->getAvailabilityFrom()->get(IL_CAL_DATE)
+                : null;
+            $av_to = ($schedule->getAvailabilityTo() && !$schedule->getAvailabilityTo()->isNull())
+                ? $schedule->getAvailabilityTo()->get(IL_CAL_DATE)
+                : null;
 
-            $mytpl->setVariable('FORM_ACTION', $this->ctrl->getFormAction($this));
-            $mytpl->setVariable('TXT_TITLE', $this->lng->txt('book_reservation_title'));
-            $mytpl->setVariable('TXT_INFO', $this->lng->txt('book_reservation_fix_info'));
-            $mytpl->setVariable('TXT_OBJECT', $title);
-            $mytpl->setVariable('TXT_CMD_BOOK', $this->lng->txt('book_confirm_booking'));
-            $mytpl->setVariable('TXT_CMD_CANCEL', $this->lng->txt('cancel'));
-
-            $user_settings = ilCalendarUserSettings::_getInstanceByUserId($ilUser->getId());
-
-            $morning_aggr = $user_settings->getDayStart();
-            $evening_aggr = $user_settings->getDayEnd();
-            $hours = array();
-            for ($i = $morning_aggr;$i <= $evening_aggr;$i++) {
-                switch ($user_settings->getTimeFormat()) {
-                    case ilCalendarSettings::TIME_FORMAT_24:
-                        $hours[$i] = "";
-                        if ($morning_aggr > 0 && $i === $morning_aggr) {
-                            $hours[$i] = sprintf('%02d:00', 0) . "-";
-                        }
-                        $hours[$i] .= sprintf('%02d:00', $i);
-                        if ($evening_aggr < 23 && $i === $evening_aggr) {
-                            $hours[$i] .= "-" . sprintf('%02d:00', 23);
-                        }
-                        break;
-
-                    case ilCalendarSettings::TIME_FORMAT_12:
-                        if ($morning_aggr > 0 && $i === $morning_aggr) {
-                            $hours[$i] = date('h a', mktime(0, 0, 0, 1, 1, 2000)) . "-";
-                        }
-                        $hours[$i] .= date('h a', mktime($i, 0, 0, 1, 1, 2000));
-                        if ($evening_aggr < 23 && $i === $evening_aggr) {
-                            $hours[$i] .= "-" . date('h a', mktime(23, 0, 0, 1, 1, 2000));
-                        }
-                        break;
-                }
-            }
-
-            if ($this->seed !== "") {
-                $find_first_open = false;
-                $seed = new ilDate($this->seed, IL_CAL_DATE);
-            } else {
-                $find_first_open = true;
-                $seed = ($this->sseed !== "")
-                    ? new ilDate($this->sseed, IL_CAL_DATE)
-                    : new ilDate(time(), IL_CAL_UNIX);
-            }
-
-            $week_start = $user_settings->getWeekStart();
-
-            $dates = array();
-            if (!$find_first_open) {
-                $this->buildDatesBySchedule($week_start, $hours, $schedule, $object_ids, $seed, $dates);
-            } else {
-
-                //loop for 1 week
-                $has_open_slot = $this->buildDatesBySchedule($week_start, $hours, $schedule, $object_ids, $seed, $dates);
-
-                // find first open slot
-                if (!$has_open_slot) {
-                    // 1 year is limit for search
-                    $limit = clone($seed);
-                    $limit->increment(ilDateTime::YEAR, 1);
-                    $limit = $limit->get(IL_CAL_UNIX);
-
-                    while (!$has_open_slot && $seed->get(IL_CAL_UNIX) < $limit) {
-                        $seed->increment(ilDateTime::WEEK, 1);
-
-                        $dates = array();
-                        $has_open_slot = $this->buildDatesBySchedule($week_start, $hours, $schedule, $object_ids, $seed, $dates);
-                    }
-                }
-            }
-
-            $navigation = new ilCalendarHeaderNavigationGUI($this, $seed, ilDateTime::WEEK, 'book');
-            $mytpl->setVariable('NAVIGATION', $navigation->getHTML());
-
-            /** @var ilDateTime $date */
-            foreach (ilCalendarUtil::_buildWeekDayList($seed, $week_start)->get() as $date) {
+            $has_open_slot = false;
+            /** @var \ilDateTime $date */
+            foreach (\ilCalendarUtil::_buildWeekDayList($this->seed, $this->week_start)->get() as $date) {
                 $date_info = $date->get(IL_CAL_FKT_GETDATE, '', 'UTC');
 
-                $mytpl->setCurrentBlock('weekdays');
-                $mytpl->setVariable('TXT_WEEKDAY', ilCalendarUtil::_numericDayToString((int) $date_info['wday']));
-                $mytpl->setVariable('TXT_DATE', $date_info['mday'] . ' ' . ilCalendarUtil::_numericMonthToString($date_info['mon']));
-                $mytpl->parseCurrentBlock();
-            }
+                #24045 and #24936
+                if ($av_from || $av_to) {
+                    $today = $date->get(IL_CAL_DATE);
 
-            $color = array();
-            $all = ilCalendarAppointmentColors::_getColorsByType('crs');
-            for ($loop = 0; $loop < 7; $loop++) {
-                $col = $all[$loop];
-                $fnt = ilCalendarUtil::calculateFontColor($col);
-                $color[$loop + 1] = 'border-bottom: 1px solid ' . $col . '; background-color: ' . $col . '; color: ' . $fnt;
-            }
-
-            $counter = 0;
-            foreach ($dates as $hour => $days) {
-                $caption = $days;
-                $caption = array_shift($caption);
-
-                for ($loop = 1; $loop < 8; $loop++) {
-                    if (!isset($days[$loop])) {
-                        $mytpl->setCurrentBlock('dates');
-                        $mytpl->setVariable('DUMMY', '&nbsp;');
-                    } elseif (isset($days[$loop]['captions'])) {
-                        foreach ($days[$loop]['captions'] as $slot_id => $slot_caption) {
-                            $mytpl->setCurrentBlock('choice');
-                            $mytpl->setVariable('TXT_DATE', $slot_caption);
-                            $mytpl->setVariable('VALUE_DATE', $slot_id);
-                            $mytpl->setVariable('DATE_COLOR', $color[$loop]);
-                            $mytpl->setVariable(
-                                'TXT_AVAILABLE',
-                                sprintf(
-                                    $this->lng->txt('book_reservation_available'),
-                                    $days[$loop]['available'][$slot_id]
-                                )
-                            );
-                            $mytpl->parseCurrentBlock();
-                        }
-
-                        $mytpl->setCurrentBlock('dates');
-                        $mytpl->setVariable('DUMMY', '');
-                    } elseif (isset($days[$loop]['in_slot'])) {
-                        $mytpl->setCurrentBlock('dates');
-                        $mytpl->setVariable('DATE_COLOR', $color[$loop]);
-                    } else {
-                        $mytpl->setCurrentBlock('dates');
-                        $mytpl->setVariable('DUMMY', '&nbsp;');
+                    if ($av_from && $av_from > $today) {
+                        continue;
                     }
-                    $mytpl->parseCurrentBlock();
+
+                    if ($av_to && $av_to < $today) {
+                        continue;
+                    }
                 }
 
-                $mytpl->setCurrentBlock('slots');
-                $mytpl->setVariable('TXT_HOUR', $caption);
-                if ($counter % 2) {
-                    $mytpl->setVariable('CSS_ROW', 'tblrow1');
-                } else {
-                    $mytpl->setVariable('CSS_ROW', 'tblrow2');
+                $slots = [];
+                if (isset($definition[$map[$date_info['isoday'] - 1]])) {
+                    foreach ($definition[$map[$date_info['isoday'] - 1]] as $slot) {
+                        $slot = explode('-', $slot);
+                        $slots[] = array('from' => str_replace(':', '', $slot[0]),
+                                         'to' => str_replace(':', '', $slot[1])
+                        );
+                    }
                 }
-                $mytpl->parseCurrentBlock();
 
-                $counter++;
+                foreach ($slots as $slot) {
+                    $slot_from = mktime(
+                        (int) substr($slot['from'], 0, 2),
+                        (int) substr($slot['from'], 2, 2),
+                        0,
+                        $date_info["mon"],
+                        $date_info["mday"],
+                        $date_info["year"]
+                    );
+                    $slot_to = mktime(
+                        (int) substr($slot['to'], 0, 2),
+                        (int) substr($slot['to'], 2, 2),
+                        0,
+                        $date_info["mon"],
+                        $date_info["mday"],
+                        $date_info["year"]
+                    );
+
+                    // always single object, we can sum up
+                    $nr_available = \ilBookingReservation::getAvailableObject(
+                        [$object_id],
+                        $slot_from,
+                        $slot_to - 1,
+                        false,
+                        true
+                    );
+
+                    // any objects available?
+                    if (!array_sum($nr_available)) {
+                        continue;
+                    }
+
+                    // check deadline
+                    if ($schedule->getDeadline() >= 0) {
+                        // 0-n hours before slots begins
+                        if ($slot_from < (time() + $schedule->getDeadline() * 60 * 60)) {
+                            continue;
+                        }
+                    } elseif ($slot_to < time()) {
+                        continue;
+                    }
+
+                    $from = \ilDatePresentation::formatDate(new \ilDateTime($slot_from, IL_CAL_UNIX));
+                    $from_a = explode(' ', $from);
+                    $from = array_pop($from_a);
+                    $to = \ilDatePresentation::formatDate(new \ilDateTime($slot_to, IL_CAL_UNIX));
+                    $to_a = explode(' ', $to);
+                    $to = array_pop($to_a);
+
+                    $this->ctrl->setParameterByClass("ilBookingProcessGUI", "date", $slot_from . "_" . $slot_to);
+                    $link = $this->ctrl->getLinkTargetByClass("ilBookingProcessGUI", "confirmedBooking");
+                    $this->ctrl->setParameterByClass("ilBookingProcessGUI", "date", null);
+                    $slot_gui = new SlotGUI(
+                        $link,
+                        $from,
+                        $to,
+                        $slot_from,
+                        $slot_to,
+                        $obj->getTitle(),
+                        array_sum($nr_available)
+                    );
+                    $week_grid_entries[] = new WeekGridEntry(
+                        $slot_from,
+                        $slot_to,
+                        $slot_gui->render()
+                    );
+                }
             }
-            return $mytpl->get();
         }
-
-        return "";
+        return $week_grid_entries;
     }
 }

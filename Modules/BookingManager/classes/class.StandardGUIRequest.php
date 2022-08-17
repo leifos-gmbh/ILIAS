@@ -126,7 +126,11 @@ class StandardGUIRequest
 
     public function getDates() : array
     {
-        return $this->strArray("date");
+        $dates = $this->strArray("date");
+        if (count($dates) === 0 && $this->str("date") !== "") {
+            return [$this->str("date")];
+        }
+        return $dates;
     }
 
     public function getRece() : string

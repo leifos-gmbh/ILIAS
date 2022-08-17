@@ -4,26 +4,24 @@
 <div class="small ilTextinfo">
 	{TXT_INFO}
 </div>
-<div class="ilTableOuter">
-	<table class="fullwidth">
-		<tr class="tblheader">
-			<th style="width:16%">&nbsp;</th>
+	<table class="il-cal-week">
+		<tr class="calheader">
+			<th style="width:7%" class="calheadertime">&nbsp;</th>
 			<!-- BEGIN weekdays -->
-			<th class="std" style="width:{WIDTH}%" colspan="{COL_SPAN}">{TXT_WEEKDAY}<br />{TXT_DATE}</th>
+			<th class="calstd" style="width:{WIDTH}%" colspan="{COL_SPAN}">{TXT_WEEKDAY}<br />{TXT_DATE}</th>
 			<!-- END weekdays -->
 		</tr>
 		<!-- BEGIN slots -->
-		<tr>
-			<td class="std">
+		<tr class="calstdtime">
+			<th class="calheadertime">
 				{TXT_HOUR}
-			</td>
+			</th>
 			<!-- BEGIN dates -->
-			<td class="std" rowspan="{ROW_SPAN}">
+			<td class="calempty_border" rowspan="{ROW_SPAN}" style="background-color: white; min-height:1px; height:1px;">
 				{CONTENT}
 			</td>
 			<!-- END dates -->
 		</tr>
 		<!-- END slots -->
 	</table>
-</div>
 

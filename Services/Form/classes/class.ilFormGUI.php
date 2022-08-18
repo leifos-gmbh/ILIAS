@@ -30,6 +30,7 @@ class ilFormGUI
     protected string $name = '';
     protected string $target = '';
     protected bool $prevent_double_submission = false;
+    protected bool $async_in_modal = false;
 
     public function setFormAction(string $a_formaction) : void
     {
@@ -121,6 +122,11 @@ class ilFormGUI
         return $this->prevent_double_submission;
     }
     
+    public function setAsyncInModal(bool $async) : void
+    {
+        $this->async_in_modal = $async;
+    }
+
     public function getHTML() : string
     {
         $tpl = new ilTemplate("tpl.form.html", true, true, "Services/Form");
@@ -138,6 +144,9 @@ class ilFormGUI
                 $opentpl->setCurrentBlock("form_name");
                 $opentpl->setVariable("FORM_NAME", $this->getName());
                 $opentpl->parseCurrentBlock();
+            }
+            if ($this->async_in_modal) {
+                $opentpl->setVariable("ASYNC_IN_MODAL", "1");
             }
             if ($this->getPreventDoubleSubmission()) {
                 $opentpl->setVariable("FORM_CLASS", "preventDoubleSubmission");

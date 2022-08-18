@@ -157,4 +157,14 @@ class StandardGUIRequest
     {
         return $this->int("rsv_id_" . $id);
     }
+
+    public function getReplaceSignal() : string
+    {
+        return $this->str("replaceSignal");
+    }
+
+    public function getReturnCmd() : string
+    {
+        return $this->str("returnCmd");
+    }
 }

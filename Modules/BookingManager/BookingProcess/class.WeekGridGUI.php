@@ -191,6 +191,7 @@ class WeekGridGUI
             $mytpl->setVariable('TXT_HOUR', $caption);
             $mytpl->parseCurrentBlock();
         }
+        \ilPropertyFormGUI::initJavascript();
         return $mytpl->get();
     }
 

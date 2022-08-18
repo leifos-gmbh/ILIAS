@@ -16,12 +16,15 @@
  *
  *********************************************************************/
 
+use \ILIAS\Filesystem\Stream\Streams;
+
 /**
  * Booking process ui class
  * @author Alexander Killing <killing@leifos.de>
  */
 class ilBookingProcessGUI
 {
+    protected \ILIAS\HTTP\Services $http;
     protected \ILIAS\BookingManager\InternalGUIService $gui;
     protected array $raw_post_data;
     protected \ILIAS\BookingManager\StandardGUIRequest $book_request;
@@ -50,7 +53,6 @@ class ilBookingProcessGUI
         string $sseed = "",
         int $context_obj_id = 0
     ) {
-        /** @var ILIAS\DI\Container $DIC */
         global $DIC;
 
         $this->ctrl = $DIC->ctrl();
@@ -60,6 +62,7 @@ class ilBookingProcessGUI
         $this->tabs_gui = $DIC->tabs();
         $this->user = $DIC->user();
         $this->help = $help;
+        $this->http = $DIC->http();
 
         $this->context_obj_id = $context_obj_id;
 
@@ -88,7 +91,8 @@ class ilBookingProcessGUI
         } else {
             $this->user_id_to_book = $this->user_id_assigner; // by default user books his own booking objects.
         }
-        $this->ctrl->saveParameter($this, ["bkusr"]);
+        $this->ctrl->saveParameter($this, ["bkusr", "returnCmd"]);
+        $this->ctrl->setParameter($this, "seed", $this->seed);
     }
 
     public function executeCommand() : void
@@ -158,6 +162,7 @@ class ilBookingProcessGUI
         //$this->tabs_gui->setBackTarget($this->lng->txt('book_back_to_list'), $this->ctrl->getLinkTarget($this, 'back'));
 
         $this->setHelpId("week");
+        $this->ctrl->setParameter($this, 'returnCmd', "week");
 
         if ($this->user_id_to_book !== $this->user_id_assigner) {
             $this->ctrl->setParameter($this, 'bkusr', $this->user_id_to_book);
@@ -207,6 +212,7 @@ class ilBookingProcessGUI
 
         $this->lng->loadLanguageModule("dateplaner");
         $this->ctrl->setParameter($this, 'object_id', $obj->getId());
+        $this->ctrl->setParameter($this, 'returnCmd', "book");
 
         if ($this->user_id_to_book !== $this->user_id_assigner) {
             $this->ctrl->setParameter($this, 'bkusr', $this->user_id_to_book);
@@ -778,7 +784,50 @@ class ilBookingProcessGUI
             $a_form = $this->initBookingNumbersForm($a_objects_counter, $a_group_id);
         }
 
-        $tpl->setContent($a_form->getHTML());
+        if ($this->ctrl->isAsynch()) {
+            $this->sendFormAsModal($a_form);
+        } else {
+            $tpl->setContent($a_form->getHTML());
+        }
+    }
+
+    /**
+     * @throws \ILIAS\HTTP\Response\Sender\ResponseSendingException
+     */
+    protected function sendFormAsModal(ilPropertyFormGUI $form) : void
+    {
+        $form->setShowTopButtons(false);
+        $buttons = $form->getCommandButtons();
+        $form->clearCommandButtons();
+        $form->addCommandButton($buttons[0]["cmd"], $buttons[0]["text"]);
+        $title = $form->getTitle();
+        $form->setTitle("");
+        $form->setAsyncInModal(true);
+        $output = $form->getHTML() . "<script>" . $form->getOnloadCode() . "</script>";
+        $this->sendAsModal($title, $output);
+    }
+
+    /**
+     * @throws \ILIAS\HTTP\Response\Sender\ResponseSendingException
+     */
+    protected function sendAsModal(string $title, string $output) : void
+    {
+        $f = $this->gui->ui()->factory();
+        $r = $this->gui->ui()->renderer();
+        $modal = $f->modal()->roundtrip($title, $f->legacy($output));
+        $this->send($r->renderAsync($modal));
+    }
+
+    /**
+     * @throws \ILIAS\HTTP\Response\Sender\ResponseSendingException
+     */
+    protected function send(string $output) : void
+    {
+        $this->http->saveResponse($this->http->response()->withBody(
+            Streams::ofString($output)
+        ));
+        $this->http->sendResponse();
+        $this->http->close();
     }
 
     /**
@@ -791,7 +840,7 @@ class ilBookingProcessGUI
         bool $a_reload = false
     ) : ilPropertyFormGUI {
         $form = new ilPropertyFormGUI();
-        $form->setFormAction($this->ctrl->getFormAction($this, "confirmedBooking"));
+        $form->setFormAction($this->ctrl->getFormAction($this, "confirmedBookingNumbers", "", $this->ctrl->isAsynch()));
         $form->setTitle($this->lng->txt("book_confirm_booking_schedule_number_of_objects"));
         $form->setDescription($this->lng->txt("book_confirm_booking_schedule_number_of_objects_info"));
 
@@ -1053,7 +1102,11 @@ class ilBookingProcessGUI
             }
             $this->ctrl->redirect($this, 'displayPostInfo');
         } else {
-            $this->back();
+            if ($this->ctrl->isAsynch()) {
+                $this->send("<script>window.location.href = '" . $this->ctrl->getLinkTarget($this, $this->book_request->getReturnCmd()) . "';</script>");
+            } else {
+                $this->back();
+            }
         }
     }
 

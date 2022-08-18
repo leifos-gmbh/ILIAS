@@ -48,6 +48,7 @@ class ilPropertyFormGUI extends ilFormGUI
     protected bool $force_top_buttons = false;
     protected HTTP\Services $http;
     protected ?Refinery\Factory $refinery = null;
+    protected string $onload_code = "il.Form.init();";
 
     protected ?ilGlobalTemplateInterface $global_tpl = null;
 
@@ -478,18 +479,25 @@ class ilPropertyFormGUI extends ilFormGUI
         $this->buttons = array();
     }
 
+    public static function initJavascript() : void
+    {
+        global $DIC;
+        $tpl = $DIC["tpl"];
+        ilYuiUtil::initEvent();
+        ilYuiUtil::initDom();
+        $tpl->addJavaScript("./Services/JavaScript/js/Basic.js");
+        $tpl->addJavaScript("Services/Form/js/Form.js");
+        $tpl->addJavascript("./Services/Form/js/ServiceFormMulti.js");
+    }
+
     public function getContent() : string
     {
         global $DIC;
         $lng = $this->lng;
         $tpl = $DIC["tpl"];
         $ilSetting = $this->settings;
-    
-        ilYuiUtil::initEvent();
-        ilYuiUtil::initDom();
 
-        $tpl->addJavaScript("./Services/JavaScript/js/Basic.js");
-        $tpl->addJavaScript("Services/Form/js/Form.js");
+        self::initJavascript();
 
         $this->tpl = new ilTemplate("tpl.property_form.html", true, true, "Services/Form");
 
@@ -614,10 +622,19 @@ class ilPropertyFormGUI extends ilFormGUI
             $this->tpl->touchBlock("std_table");
             $this->tpl->setVariable('STD_TABLE_WIDTH', $this->getTableWidth());
         }
-        
+
+        if ($this->onload_code !== "") {
+            $this->global_tpl->addOnLoadCode($this->onload_code);
+        }
+
         return $this->tpl->get();
     }
-    
+
+    public function getOnloadCode() : string
+    {
+        return $this->onload_code;
+    }
+
     protected function hideRequired(string $a_type) : bool
     {
         // #15818
@@ -640,8 +657,6 @@ class ilPropertyFormGUI extends ilFormGUI
         
         //if(method_exists($item, "getMulti") && $item->getMulti())
         if ($item instanceof ilMultiValuesItem && $item->getMulti()) {
-            $tpl->addJavascript("./Services/Form/js/ServiceFormMulti.js");
-
             $this->tpl->setCurrentBlock("multi_in");
             $this->tpl->setVariable("ID", $item->getFieldId());
             $this->tpl->parseCurrentBlock();
@@ -761,9 +776,7 @@ class ilPropertyFormGUI extends ilFormGUI
                 if ($item->hideSubForm() && is_object($sf)) {
                     if ($this->global_tpl) {
                         $dsfid = $item->getFieldId();
-                        $this->global_tpl->addOnloadCode(
-                            "il.Form.hideSubForm('subform_$dsfid');"
-                        );
+                        $this->onload_code .= "il.Form.hideSubForm('subform_$dsfid');";
                     }
                 }
             }

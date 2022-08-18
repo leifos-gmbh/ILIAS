@@ -54,9 +54,13 @@ class SlotGUI
         $ui = $DIC->ui();
         $tpl = new \ilTemplate("tpl.slot.html", true, true, "Modules/BookingManager/BookingProcess");
 
-        $link = $ui->factory()->link()->standard($this->title, $this->link);
+        $modal = $ui->factory()->modal()->roundtrip("Moin", $ui->factory()->legacy("Hallo World"));
+        $url = $this->link . '&replaceSignal=' . $modal->getReplaceSignal()->getId();
+        $modal = $modal->withAsyncRenderUrl($url);
+        $button = $ui->factory()->button()->shy($this->title, "#")
+            ->withOnClick($modal->getShowSignal());
 
-        $tpl->setVariable("OBJECT_LINK", $ui->renderer()->render($link));
+        $tpl->setVariable("OBJECT_LINK", $ui->renderer()->render([$button, $modal]));
         $tpl->setVariable("TIME", $this->from . "-" . $this->to);
         $tpl->setVariable("AVAILABILITY", "(" . $this->available . ") ");
 

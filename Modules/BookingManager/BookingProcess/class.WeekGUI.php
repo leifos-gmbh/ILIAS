@@ -194,8 +194,11 @@ class WeekGUI
                     $to = array_pop($to_a);
 
                     $this->ctrl->setParameterByClass("ilBookingProcessGUI", "date", $slot_from . "_" . $slot_to);
-                    $link = $this->ctrl->getLinkTargetByClass("ilBookingProcessGUI", "confirmedBooking");
+                    $this->ctrl->setParameterByClass("ilBookingProcessGUI", "object_id", $obj->getId());
+                    $this->ctrl->setParameterByClass("ilBookingProcessGUI", "seed", $this->seed_str);
+                    $link = $this->ctrl->getLinkTargetByClass("ilBookingProcessGUI", "confirmedBooking", "", true);
                     $this->ctrl->setParameterByClass("ilBookingProcessGUI", "date", null);
+                    $this->ctrl->setParameterByClass("ilBookingProcessGUI", "object_id", null);
                     $slot_gui = new SlotGUI(
                         $link,
                         $from,

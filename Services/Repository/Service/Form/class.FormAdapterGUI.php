@@ -24,7 +24,14 @@ use ILIAS\UI\Component\Input\Field\FormInput;
 class FormAdapterGUI
 {
     protected const DEFAULT_SECTION = "@internal_default_section";
+    protected const ASYNC_NONE = 0;
+    protected const ASYNC_MODAL = 1;
+    protected string $last_key = "";
+    protected \ILIAS\Refinery\Factory $refinery;
+
     protected string $title = "";
+
+
     /**
      * @var mixed|null
      */
@@ -40,6 +47,9 @@ class FormAdapterGUI
     protected string $cmd = self::DEFAULT_SECTION;
     protected ?Form\Standard $form = null;
     protected array $upload_handler = [];
+    protected int $async_mode = self::ASYNC_NONE;
+    protected \ilGlobalTemplateInterface $main_tpl;
+    protected static $initialised = false;
 
     /**
      * @param string|array $class_path
@@ -54,6 +64,31 @@ class FormAdapterGUI
         $this->ui = $DIC->ui();
         $this->ctrl = $DIC->ctrl();
         $this->http = $DIC->http();
+        $this->refinery = $DIC->refinery();
+        $this->main_tpl = $DIC->ui()->mainTemplate();
+        self::initJavascript();
+    }
+
+    public static function getOnLoadCode() : string
+    {
+        return "il.repository.ui.init()";
+    }
+
+    public static function initJavascript() : void
+    {
+        global $DIC;
+        if (!self::$initialised) {
+            $main_tpl = $DIC->ui()->mainTemplate();
+            $main_tpl->addJavaScript("./Services/Repository/js/repository.js");
+            $main_tpl->addOnLoadCode(self::getOnLoadCode());
+            self::$initialised = true;
+        }
+    }
+
+    public function asyncModal() : self
+    {
+        $this->async_mode = self::ASYNC_MODAL;
+        return $this;
     }
 
     public function getTitle() : string
@@ -106,6 +141,32 @@ class FormAdapterGUI
         return $this;
     }
 
+    public function number(
+        string $key,
+        string $title,
+        string $description = "",
+        ?int $value = null,
+        ?int $min_value = null,
+        ?int $max_value = null
+    ) : self {
+        $trans = [];
+        if (!is_null($min_value)) {
+            $trans[] = $this->refinery->int()->isGreaterThanOrEqual($min_value);
+        }
+        if (!is_null($max_value)) {
+            $trans[] = $this->refinery->int()->isLessThanOrEqual($max_value);
+        }
+        $field = $this->ui->factory()->input()->field()->numeric($title, $description);
+        if (count($trans) > 0) {
+            $field = $field->withAdditionalTransformation($this->refinery->logical()->parallel($trans));
+        }
+        if (!is_null($value)) {
+            $field = $field->withValue($value);
+        }
+        $this->addField($key, $field);
+        return $this;
+    }
+
     public function select(
         string $key,
         string $title,
@@ -121,6 +182,33 @@ class FormAdapterGUI
             $key,
             $field
         );
+        return $this;
+    }
+
+    public function radio(
+        string $key,
+        string $title,
+        string $description = "",
+        ?string $value = null
+    ) : self {
+        $field = $this->ui->factory()->input()->field()->radio($title, $description);
+        if (!is_null($value)) {
+            $field = $field->withOption($value, "");    // dummy to prevent exception, will be overwritten by radioOption
+            $field = $field->withValue($value);
+        }
+        $this->addField(
+            $key,
+            $field
+        );
+        return $this;
+    }
+
+    public function radioOption(string $value, string $title, string $description = "") : self
+    {
+        if ($field = $this->getLastField()) {
+            $field = $field->withOption($value, $title, $description);
+            $this->replaceLastField($field);
+        }
         return $this;
     }
 
@@ -173,7 +261,20 @@ class FormAdapterGUI
         }
         $this->section_of_field[$key] = $this->current_section;
         $this->fields[$this->current_section][$key] = $field;
+        $this->last_key = $key;
         $this->form = null;
+    }
+
+    protected function getLastField() : ?FormInput
+    {
+        return $this->fields[$this->current_section][$this->last_key] ?? null;
+    }
+
+    protected function replaceLastField(FormInput $field) : void
+    {
+        if ($this->last_key !== "") {
+            $this->fields[$this->current_section][$this->last_key] = $field;
+        }
     }
 
     protected function getForm() : Form\Standard
@@ -181,7 +282,8 @@ class FormAdapterGUI
         $ctrl = $this->ctrl;
 
         if (is_null($this->form)) {
-            $action = $ctrl->getLinkTargetByClass($this->class_path, $this->cmd);
+            $async = ($this->async_mode !== self::ASYNC_NONE);
+            $action = $ctrl->getLinkTargetByClass($this->class_path, $this->cmd, "", $async);
             $inputs = [];
             foreach ($this->sections as $sec_key => $section) {
                 if ($sec_key === self::DEFAULT_SECTION) {
@@ -234,6 +336,16 @@ class FormAdapterGUI
 
     public function render() : string
     {
-        return $this->ui->renderer()->render($this->getForm());
+        if ($this->async_mode === self::ASYNC_NONE && !$this->ctrl->isAsynch()) {
+            $html = $this->ui->renderer()->render($this->getForm());
+        } else {
+            $html = $this->ui->renderer()->renderAsync($this->getForm()) . "<script>" . $this->getOnLoadCode() . "</script>";
+        }
+        switch ($this->async_mode) {
+            case self::ASYNC_MODAL:
+                $html = str_replace("<form ", "<form data-rep-form-async='modal' ", $html);
+                break;
+        }
+        return $html;
     }
 }

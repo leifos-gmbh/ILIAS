@@ -133,6 +133,11 @@ class StandardGUIRequest
         return $dates;
     }
 
+    public function getDate() : string
+    {
+        return $this->str("date");
+    }
+
     public function getRece() : string
     {
         return $this->str("rece");

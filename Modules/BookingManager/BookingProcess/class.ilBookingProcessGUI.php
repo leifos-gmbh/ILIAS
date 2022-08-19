@@ -110,6 +110,7 @@ class ilBookingProcessGUI
                     "confirmedBooking",
                     "confirmBookingNumbers",
                     "confirmedBookingNumbers",
+                    "confirmedBookingNumbers2",
                     "displayPostInfo",
                     "deliverPostFile"
             ))) {
@@ -662,43 +663,28 @@ class ilBookingProcessGUI
                 }
             }
         } else {
-            $dates = $this->book_request->getDates();
-            if (count($dates) === 0) {
-                $this->tpl->setOnScreenMessage('failure', $this->lng->txt('select_one'));
-                $this->book();
-                return false;
-            }
+            $date = $this->book_request->getDate();
 
             // single object reservation(s)
             if ($this->book_obj_id > 0) {
                 $confirm = array();
-
                 $object_id = $this->book_obj_id;
                 $group_id = null;
-                if ($object_id) {
-                    $nr = ilBookingObject::getNrOfItemsForObjects(array($object_id));
-                    // needed for recurrence
-                    $f = new ilBookingReservationDBRepositoryFactory();
-                    $repo = $f->getRepo();
-                    $group_id = $repo->getNewGroupId();
-                    foreach ($dates as $date) {
-                        $fromto = explode('_', $date);
-                        $from = (int) $fromto[0];
-                        $to = (int) $fromto[1] - 1;
 
-                        $counter = ilBookingReservation::getAvailableObject(array($object_id), $from, $to, false, true);
-                        $counter = $counter[$object_id];
-                        if ($counter) {
-                            // needed for recurrence
-                            $confirm[$object_id . "_" . $from . "_" . ($to + 1)] = $counter;
-                        }
-                    }
-                }
+                $nr = ilBookingObject::getNrOfItemsForObjects(array($object_id));
+                // needed for recurrence
+                $f = new ilBookingReservationDBRepositoryFactory();
+                $repo = $f->getRepo();
+                $group_id = $repo->getNewGroupId();
 
-                if (count($confirm)) {
-                    $this->confirmBookingNumbers($confirm, $group_id);
-                    return false;
-                }
+                $fromto = explode('_', $date);
+                $from = (int) $fromto[0];
+                $to = (int) $fromto[1] - 1;
+
+                $counter = ilBookingReservation::getAvailableObject(array($object_id), $from, $to, false, true);
+                $counter = (int) $counter[$object_id];
+                $this->confirmBookingNumbers($from, $to, $counter, $group_id);
+                return false;
             }
         }
 
@@ -771,63 +757,28 @@ class ilBookingProcessGUI
     //
 
     public function confirmBookingNumbers(
-        array $a_objects_counter,
-        int $a_group_id,
-        ilPropertyFormGUI $a_form = null
+        int $from,
+        int $to,
+        int $counter,
+        int $group_id,
+        \ILIAS\Repository\Form\FormAdapterGUI $form = null
     ) : void {
         $tpl = $this->tpl;
 
         $this->tabs_gui->clearTargets();
         $this->tabs_gui->setBackTarget($this->lng->txt('book_back_to_list'), $this->ctrl->getLinkTarget($this, 'back'));
 
-        if (!$a_form) {
-            $a_form = $this->initBookingNumbersForm($a_objects_counter, $a_group_id);
+        if (!$form) {
+            $form = $this->initBookingNumbersForm2($from, $to, $counter, $group_id);
         }
-
-        if ($this->ctrl->isAsynch()) {
-            $this->sendFormAsModal($a_form);
-        } else {
-            $tpl->setContent($a_form->getHTML());
-        }
+        $this->gui->modal($this->getBookgingObjectTitle())
+            ->form($form)
+            ->send();
     }
 
-    /**
-     * @throws \ILIAS\HTTP\Response\Sender\ResponseSendingException
-     */
-    protected function sendFormAsModal(ilPropertyFormGUI $form) : void
+    protected function getBookgingObjectTitle() : string
     {
-        $form->setShowTopButtons(false);
-        $buttons = $form->getCommandButtons();
-        $form->clearCommandButtons();
-        $form->addCommandButton($buttons[0]["cmd"], $buttons[0]["text"]);
-        $title = $form->getTitle();
-        $form->setTitle("");
-        $form->setAsyncInModal(true);
-        $output = $form->getHTML() . "<script>" . $form->getOnloadCode() . "</script>";
-        $this->sendAsModal($title, $output);
-    }
-
-    /**
-     * @throws \ILIAS\HTTP\Response\Sender\ResponseSendingException
-     */
-    protected function sendAsModal(string $title, string $output) : void
-    {
-        $f = $this->gui->ui()->factory();
-        $r = $this->gui->ui()->renderer();
-        $modal = $f->modal()->roundtrip($title, $f->legacy($output));
-        $this->send($r->renderAsync($modal));
-    }
-
-    /**
-     * @throws \ILIAS\HTTP\Response\Sender\ResponseSendingException
-     */
-    protected function send(string $output) : void
-    {
-        $this->http->saveResponse($this->http->response()->withBody(
-            Streams::ofString($output)
-        ));
-        $this->http->sendResponse();
-        $this->http->close();
+        return (new ilBookingObject($this->book_obj_id))->getTitle();
     }
 
     /**
@@ -926,6 +877,174 @@ class ilBookingProcessGUI
         return $form;
     }
 
+    /**
+     * @throws ilCtrlException
+     * @throws ilDateTimeException
+     */
+    protected function initBookingNumbersForm2(
+        int $from,
+        int $to,
+        int $counter,
+        int $a_group_id,
+        bool $a_reload = false
+    ) : \ILIAS\Repository\Form\FormAdapterGUI {
+        if ($this->user_id_assigner !== $this->user_id_to_book) {
+            $this->ctrl->setParameterByClass(self::class, "bkusr", $this->user_id_to_book);
+        }
+
+        $period = ilDatePresentation::formatPeriod(
+            new ilDateTime($from, IL_CAL_UNIX),
+            new ilDateTime($to, IL_CAL_UNIX)
+        );
+
+        $form = $this->gui->form([self::class], "confirmedBookingNumbers2")
+            ->asyncModal()
+            ->section(
+                "props",
+                $this->lng->txt("book_confirm_booking_schedule_number_of_objects"),
+                $this->lng->txt("book_confirm_booking_schedule_number_of_objects_info")
+            )
+            ->number("nr", $period, "", null, 1, $counter)
+            ->radio("recurrence", $this->lng->txt("cal_recurrences"), "", "0")
+            ->radioOption("0", $this->lng->txt("book_no_recurrence"))
+            ->radioOption("1", $this->lng->txt("book_recurrence"));
+
+        return $form;
+    }
+
+    public function confirmedBookingNumber2() : void
+    {
+
+        //get the user who will get the booking.
+        if ($this->book_request->getBookedUser() > 0) {
+            $this->user_id_to_book = $this->book_request->getBookedUser();
+        }
+
+        // convert post data to initial form config
+        $counter = array();
+        $current_first = $obj_id = null;
+        foreach (array_keys($this->raw_post_data) as $id) {
+            // e.g.conf_nr__4_1660896000_1660899600_2
+            if (str_starts_with($id, "conf_nr__")) {
+                $id = explode("_", substr($id, 9));
+                // e.g. $counter["4_1660896000_1660899600"] = 2;
+                $counter[$id[0] . "_" . $id[1] . "_" . $id[2]] = (int) $id[3];
+                if (!$current_first) {
+                    $current_first = date("Y-m-d", $id[1]);
+                }
+            }
+        }
+
+        // recurrence
+
+        // checkInput() has not been called yet, so we have to improvise
+        $rece = $this->book_request->getRece();     // recurrence end
+        $recm = $this->book_request->getRecm();     // recurrence mode
+        $end = ilCalendarUtil::parseIncomingDate($rece, false);
+
+        if ((int) $recm > 0 && $end && $current_first) {
+            ksort($counter);
+            $end = $end->get(IL_CAL_DATE);
+            $cycle = (int) $recm * 7;
+            $cut = 0;
+            $org = $counter;
+            while ($cut < 1000 && $this->addDaysDate($current_first, $cycle) <= $end) {
+                $cut++;
+                $current_first = null;
+                foreach ($org as $item_id => $max) {
+                    $parts = explode("_", $item_id);
+                    $obj_id = $parts[0];
+
+                    $from = $this->addDaysStamp($parts[1], $cycle * $cut);
+                    $to = $this->addDaysStamp($parts[2], $cycle * $cut);
+
+                    $new_item_id = $obj_id . "_" . $from . "_" . $to;
+
+                    // form reload because of validation errors
+                    if (!isset($counter[$new_item_id]) && date("Y-m-d", $to) <= $end) {
+                        // get max available for added dates
+                        $new_max = ilBookingReservation::getAvailableObject(array($obj_id), $from, $to - 1, false, true);
+                        $new_max = (int) $new_max[$obj_id];
+
+                        $counter[$new_item_id] = $new_max;
+
+                        if (!$current_first) {
+                            $current_first = date("Y-m-d", $from);
+                        }
+
+                        // clone input
+                        throw new ilException("Booking process max invalid");
+                        //$_POST["conf_nr__" . $new_item_id . "_" . $new_max] = $_POST["conf_nr__" . $item_id . "_" . $max];
+                    }
+                }
+            }
+        }
+
+        $group_id = $this->book_request->getGroupId();
+
+        $form = $this->initBookingNumbersForm($counter, $group_id, true);
+        if ($form->checkInput()) {
+            $success = false;
+            $rsv_ids = array();
+            foreach ($counter as $id => $all_nr) {
+                $book_nr = $form->getInput("conf_nr__" . $id . "_" . $all_nr);
+                $parts = explode("_", $id);
+                $obj_id = $parts[0];
+                $from = $parts[1];
+                $to = $parts[2] - 1;
+
+                // get currently available slots
+                $counter = ilBookingReservation::getAvailableObject(array($obj_id), $from, $to, false, true);
+                $counter = $counter[$obj_id];
+                if ($counter) {
+                    // we can only book what is left
+                    $book_nr = min($book_nr, $counter);
+                    for ($loop = 0; $loop < $book_nr; $loop++) {
+                        $rsv_ids[] = $this->processBooking($obj_id, $from, $to, $group_id);
+                        $success = $obj_id;
+                    }
+                }
+            }
+            if ($success) {
+                $this->saveParticipant();
+                $this->handleBookingSuccess($success, $rsv_ids);
+            } else {
+                $this->tpl->setOnScreenMessage('failure', $this->lng->txt('book_reservation_failed'), true);
+                $this->back();
+            }
+        } else {
+            // ilDateTimeInputGUI does NOT add hidden values on disabled!
+
+            $rece_array = explode(".", $rece);
+
+            $rece_day = str_pad($rece_array[0], 2, "0", STR_PAD_LEFT);
+            $rece_month = str_pad($rece_array[1], 2, "0", STR_PAD_LEFT);
+            $rece_year = $rece_array[2];
+
+            // ilDateTimeInputGUI will choke on POST array format
+            //$_POST["rece"] = null;
+
+            $form->setValuesByPost();
+
+            $rece_date = new ilDate($rece_year . "-" . $rece_month . "-" . $rece_day, IL_CAL_DATE);
+
+            $rece = $form->getItemByPostVar("rece");
+            if ($rece !== null) {
+                $rece->setDate($rece_date);
+            }
+            $recm = $form->getItemByPostVar("recm");
+            if ($recm !== null) {
+                $recm->setHideSubForm($recm < 1);
+            }
+
+            $hidden_date = new ilHiddenInputGUI("rece");
+            $hidden_date->setValue($rece_date);
+            $form->addItem($hidden_date);
+
+            $this->confirmBookingNumbers($counter, $group_id, $form);
+        }
+    }
+
     public function confirmedBookingNumbers() : void
     {
 
@@ -938,8 +1057,10 @@ class ilBookingProcessGUI
         $counter = array();
         $current_first = $obj_id = null;
         foreach (array_keys($this->raw_post_data) as $id) {
+            // e.g.conf_nr__4_1660896000_1660899600_2
             if (str_starts_with($id, "conf_nr__")) {
                 $id = explode("_", substr($id, 9));
+                // e.g. $counter["4_1660896000_1660899600"] = 2;
                 $counter[$id[0] . "_" . $id[1] . "_" . $id[2]] = (int) $id[3];
                 if (!$current_first) {
                     $current_first = date("Y-m-d", $id[1]);
@@ -950,8 +1071,8 @@ class ilBookingProcessGUI
         // recurrence
 
         // checkInput() has not been called yet, so we have to improvise
-        $rece = $this->book_request->getRece();
-        $recm = $this->book_request->getRecm();
+        $rece = $this->book_request->getRece();     // recurrence end
+        $recm = $this->book_request->getRecm();     // recurrence mode
         $end = ilCalendarUtil::parseIncomingDate($rece, false);
 
         if ((int) $recm > 0 && $end && $current_first) {
@@ -1103,7 +1224,7 @@ class ilBookingProcessGUI
             $this->ctrl->redirect($this, 'displayPostInfo');
         } else {
             if ($this->ctrl->isAsynch()) {
-                $this->send("<script>window.location.href = '" . $this->ctrl->getLinkTarget($this, $this->book_request->getReturnCmd()) . "';</script>");
+                $this->gui->send("<script>window.location.href = '" . $this->ctrl->getLinkTarget($this, $this->book_request->getReturnCmd()) . "';</script>");
             } else {
                 $this->back();
             }

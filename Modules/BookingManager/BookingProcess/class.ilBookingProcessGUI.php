@@ -596,18 +596,11 @@ class ilBookingProcessGUI
         int $a_group_id,
         bool $a_reload = false
     ) : \ILIAS\Repository\Form\FormAdapterGUI {
-        if ($this->user_id_assigner !== $this->user_id_to_book) {
-            $this->ctrl->setParameterByClass(self::class, "bkusr", $this->user_id_to_book);
-        }
-
-        $this->ctrl->setParameterByClass(self::class, "slot", $from . "_" . $to);
         $counter = $this->getAvailableNr($this->book_request->getObjectId(), $from, $to);
-
         $period = ilDatePresentation::formatPeriod(
             new ilDateTime($from, IL_CAL_UNIX),
             new ilDateTime($to, IL_CAL_UNIX)
         );
-
         $form = $this->gui->form([self::class], "confirmedBookingNumbers2")
             ->asyncModal()
             ->section(
@@ -619,23 +612,14 @@ class ilBookingProcessGUI
             ->radio("recurrence", $this->lng->txt("cal_recurrences"), "", "0")
             ->radioOption("0", $this->lng->txt("book_no_recurrence"))
             ->radioOption("1", $this->lng->txt("book_recurrence"));
-
         return $form;
     }
 
-    protected function getRecurrenceForm(
-        int $nr
-    ) : \ILIAS\Repository\Form\FormAdapterGUI {
-        if ($this->user_id_assigner !== $this->user_id_to_book) {
-            $this->ctrl->setParameterByClass(self::class, "bkusr", $this->user_id_to_book);
-        }
-        $this->ctrl->setParameterByClass(self::class, "slot", $this->book_request->getSlot());
-        $this->ctrl->setParameterByClass(self::class, "object_id", $this->book_request->getObjectId());
-        $this->ctrl->setParameterByClass(self::class, "nr", $nr);
-
+    protected function getRecurrenceForm() : \ILIAS\Repository\Form\FormAdapterGUI
+    {
         $this->lng->loadLanguageModule("dateplaner");
         $today = new ilDate(time(), IL_CAL_UNIX);
-        $form = $this->gui->form([self::class], "confirmedBookingNumbers2")
+        $form = $this->gui->form([self::class], "confirmedBookingNumbers3")
             ->section(
                 "props",
                 $this->lng->txt("book_confirm_booking_schedule_number_of_objects"),
@@ -647,9 +631,8 @@ class ilBookingProcessGUI
             ->group("2", $this->lng->txt("r_14"))
             ->date("until2", $this->lng->txt("cal_repeat_until"), "", $today)
             ->group("4", $this->lng->txt("r_4_weeks"))
-            ->date("until3", $this->lng->txt("cal_repeat_until"), "", $today)
+            ->date("until4", $this->lng->txt("cal_repeat_until"), "", $today)
             ->end();
-
         return $form;
     }
 
@@ -665,6 +648,11 @@ class ilBookingProcessGUI
         $to = $slot_arr[1];
         $obj_id = $this->book_request->getObjectId();
 
+        if ($this->user_id_assigner !== $this->user_id_to_book) {
+            $this->ctrl->setParameterByClass(self::class, "bkusr", $this->user_id_to_book);
+        }
+        $this->ctrl->setParameterByClass(self::class, "slot", $slot);
+
         // form not valid -> show again
         $form = $this->initBookingNumbersForm2($from, $to, 0);
         if (!$form->isValid()) {
@@ -676,61 +664,52 @@ class ilBookingProcessGUI
         // recurrence? -> show recurrence form
         $recurrence = $form->getData("recurrence");
         if ($recurrence === "1") {
-            $form = $this->getRecurrenceForm((int) $form->getData("nr"));
+            $this->ctrl->setParameterByClass(self::class, "object_id", $this->book_request->getObjectId());
+            $this->ctrl->setParameterByClass(self::class, "nr", (int) $form->getData("nr"));
+            $form = $this->getRecurrenceForm();
             $this->gui->modal($this->getBookgingObjectTitle())
                       ->form($form)
                       ->send();
         }
+        $this->confirmedBookingNumbers3(false);
+    }
 
-        var_dump($recurrence);
-        exit;
-        return;
+    public function confirmedBookingNumbers3($incl_recurrence = true) : void
+    {
+        if ($incl_recurrence) {
+            $form = $this->getRecurrenceForm();
+            // recurrence form not valid -> show again
+            if (!$form->isValid()) {
+                $this->gui->modal($this->getBookgingObjectTitle())
+                          ->form($form)
+                          ->send();
+            }
+            $recurrence = (int) $form->getData("recurrence");   // 1, 2 or 4
+            $until = $form->getData("until" . $recurrence);
 
-        // convert post data to initial form config
-        $counter = array();
-        $current_first = date("Y-m-d", $from);
+            $from = $this->book_request->getSlotFrom();
 
-        // recurrence
+            // convert post data to initial form config
+            $current_first = date("Y-m-d", $from);
 
-        // checkInput() has not been called yet, so we have to improvise
-        $rece = $this->book_request->getRece();     // recurrence end
-        $recm = $this->book_request->getRecm();     // recurrence mode
-        $end = ilCalendarUtil::parseIncomingDate($rece, false);
-
-        if ((int) $recm > 0 && $end && $current_first) {
-            ksort($counter);
-            $end = $end->get(IL_CAL_DATE);
-            $cycle = (int) $recm * 7;
+            $end = $until->get(IL_CAL_DATE);
+            $cycle = $recurrence * 7;
             $cut = 0;
-            $org = $counter;
+            $obj_id = $this->book_request->getObjectId();
+            $from = $this->book_request->getSlotFrom();
+            $to = $this->book_request->getSlotTo();
             while ($cut < 1000 && $this->addDaysDate($current_first, $cycle) <= $end) {
                 $cut++;
                 $current_first = null;
+                foreach ($org as $item_id => $max) {
+                }
+
                 foreach ($org as $item_id => $max) {
                     $parts = explode("_", $item_id);
                     $obj_id = $parts[0];
 
                     $from = $this->addDaysStamp($parts[1], $cycle * $cut);
                     $to = $this->addDaysStamp($parts[2], $cycle * $cut);
-
-                    $new_item_id = $obj_id . "_" . $from . "_" . $to;
-
-                    // form reload because of validation errors
-                    if (!isset($counter[$new_item_id]) && date("Y-m-d", $to) <= $end) {
-                        // get max available for added dates
-                        $new_max = ilBookingReservation::getAvailableObject(array($obj_id), $from, $to - 1, false, true);
-                        $new_max = (int) $new_max[$obj_id];
-
-                        $counter[$new_item_id] = $new_max;
-
-                        if (!$current_first) {
-                            $current_first = date("Y-m-d", $from);
-                        }
-
-                        // clone input
-                        throw new ilException("Booking process max invalid");
-                        //$_POST["conf_nr__" . $new_item_id . "_" . $new_max] = $_POST["conf_nr__" . $item_id . "_" . $max];
-                    }
                 }
             }
         }

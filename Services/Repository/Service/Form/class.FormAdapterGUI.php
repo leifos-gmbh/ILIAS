@@ -215,6 +215,24 @@ class FormAdapterGUI
         return $this;
     }
 
+    /**
+     * @return null|\ilDate|\ilDateTime
+     */
+    protected function getDateTimeData(?string $value, $use_time = false)
+    {
+        $parsed = \ilCalendarUtil::parseDateString($value, $use_time);
+        if (is_object($parsed["date"])) {
+            return $parsed["date"];
+        } else {
+            // try generic format
+            $parsed = \ilCalendarUtil::parseDateString($value, $use_time, true);
+            if (is_object($parsed["date"])) {
+                return $parsed["date"];
+            }
+        }
+        return null;
+    }
+
     public function select(
         string $key,
         string $title,
@@ -376,12 +394,25 @@ class FormAdapterGUI
                     $this->current_group["key"]
                 ];
             }
+            $this->fields[$this->current_section][$this->current_switch["key"]][$this->current_group["key"]][$key] = $field;
         } else {
             $this->section_of_field[$key] = $this->current_section;
             $this->fields[$this->current_section][$key] = $field;
         }
         $this->last_key = $key;
         $this->form = null;
+    }
+
+    protected function getFieldForKey(string $key) : FormInput
+    {
+        if (!isset($this->section_of_field[$key])) {
+            throw new \ilException("Unknown Key: " . $key);
+        }
+        $section = $this->section_of_field[$key];
+        if (!is_array($section)) {
+            return $this->fields[$section][$key];
+        }
+        return $this->fields[$section[0]][$section[1]][$section[2]][$key];
     }
 
     protected function getLastField() : ?FormInput
@@ -469,7 +500,15 @@ class FormAdapterGUI
             $section_data = $this->raw_data[$sec[0]][$sec[1]][$sec[2]];
         }
 
-        return $section_data[$key] ?? null;
+        $value = $section_data[$key] ?? null;
+
+        $field = $this->getFieldForKey($key);
+        if ($field instanceof \ILIAS\UI\Component\Input\Field\DateTime) {
+            /** @var \ILIAS\UI\Component\Input\Field\DateTime $field */
+            $value = $this->getDateTimeData($value, $field->getUseTime());
+        }
+
+        return $value;
     }
 
     public function render() : string

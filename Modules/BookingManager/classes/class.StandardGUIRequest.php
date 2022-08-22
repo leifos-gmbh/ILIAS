@@ -178,6 +178,20 @@ class StandardGUIRequest
         return $this->str("slot");
     }
 
+    public function getSlotFrom() : int
+    {
+        $slot = $this->getSlot();
+        $parts = explode("_", $slot);
+        return (int) $parts[0];
+    }
+
+    public function getSlotTo() : int
+    {
+        $slot = $this->getSlot();
+        $parts = explode("_", $slot);
+        return (int) ($parts[1] ?? 0);
+    }
+
     public function getRecurrence() : string
     {
         return $this->str("recurrence");

@@ -132,7 +132,6 @@ class ilDatePresentation
         $sec = ($include_seconds)
             ? ":s"
             : "";
-
         switch ($ilUser->getTimeFormat()) {
             case ilCalendarSettings::TIME_FORMAT_24:
                 return $date_str . $sep . $date->get(IL_CAL_FKT_DATE, 'H:i' . $sec, $ilUser->getTimeZone());

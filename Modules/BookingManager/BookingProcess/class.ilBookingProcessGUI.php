@@ -222,19 +222,14 @@ class ilBookingProcessGUI
         $user_settings = ilCalendarUserSettings::_getInstanceByUserId($this->user->getId());
 
         if ($this->pool->getScheduleType() === ilObjBookingPool::TYPE_FIX_SCHEDULE) {
-            if (true) {
-                $week_gui = new \ILIAS\BookingManager\BookingProcess\WeekGUI(
-                    $this,
-                    "book",
-                    [$obj->getId()],
-                    $this->seed ?? $this->sseed,
-                    $user_settings->getWeekStart()
-                );
-                $tpl->setContent($week_gui->getHTML());
-            } else {
-                $schedule = new ilBookingSchedule($obj->getScheduleId());
-                $tpl->setContent($this->renderSlots($schedule, array($obj->getId()), $obj->getTitle()));
-            }
+            $week_gui = new \ILIAS\BookingManager\BookingProcess\WeekGUI(
+                $this,
+                "book",
+                [$obj->getId()],
+                $this->seed ?? $this->sseed,
+                $user_settings->getWeekStart()
+            );
+            $tpl->setContent($week_gui->getHTML());
         } else {
             $cgui = new ilConfirmationGUI();
             $cgui->setHeaderText($this->lng->txt("book_confirm_booking_no_schedule"));
@@ -249,299 +244,7 @@ class ilBookingProcessGUI
         }
     }
 
-    protected function renderSlots(
-        ilBookingSchedule $schedule,
-        array $object_ids,
-        string $title
-    ) : string {
-        $ilUser = $this->user;
 
-        // fix
-        if (!$schedule->getRaster()) {
-            $mytpl = new ilTemplate('tpl.booking_reservation_fix.html', true, true, 'Modules/BookingManager');
-
-            $mytpl->setVariable('FORM_ACTION', $this->ctrl->getFormAction($this));
-            $mytpl->setVariable('TXT_TITLE', $this->lng->txt('book_reservation_title'));
-            $mytpl->setVariable('TXT_INFO', $this->lng->txt('book_reservation_fix_info'));
-            $mytpl->setVariable('TXT_OBJECT', $title);
-            $mytpl->setVariable('TXT_CMD_BOOK', $this->lng->txt('book_confirm_booking'));
-            $mytpl->setVariable('TXT_CMD_CANCEL', $this->lng->txt('cancel'));
-
-            $user_settings = ilCalendarUserSettings::_getInstanceByUserId($ilUser->getId());
-
-            $morning_aggr = $user_settings->getDayStart();
-            $evening_aggr = $user_settings->getDayEnd();
-            $hours = array();
-            for ($i = $morning_aggr;$i <= $evening_aggr;$i++) {
-                switch ($user_settings->getTimeFormat()) {
-                    case ilCalendarSettings::TIME_FORMAT_24:
-                        $hours[$i] = "";
-                        if ($morning_aggr > 0 && $i === $morning_aggr) {
-                            $hours[$i] = sprintf('%02d:00', 0) . "-";
-                        }
-                        $hours[$i] .= sprintf('%02d:00', $i);
-                        if ($evening_aggr < 23 && $i === $evening_aggr) {
-                            $hours[$i] .= "-" . sprintf('%02d:00', 23);
-                        }
-                        break;
-
-                    case ilCalendarSettings::TIME_FORMAT_12:
-                        if ($morning_aggr > 0 && $i === $morning_aggr) {
-                            $hours[$i] = date('h a', mktime(0, 0, 0, 1, 1, 2000)) . "-";
-                        }
-                        $hours[$i] .= date('h a', mktime($i, 0, 0, 1, 1, 2000));
-                        if ($evening_aggr < 23 && $i === $evening_aggr) {
-                            $hours[$i] .= "-" . date('h a', mktime(23, 0, 0, 1, 1, 2000));
-                        }
-                        break;
-                }
-            }
-
-            if ($this->seed !== "") {
-                $find_first_open = false;
-                $seed = new ilDate($this->seed, IL_CAL_DATE);
-            } else {
-                $find_first_open = true;
-                $seed = ($this->sseed !== "")
-                    ? new ilDate($this->sseed, IL_CAL_DATE)
-                    : new ilDate(time(), IL_CAL_UNIX);
-            }
-
-            $week_start = $user_settings->getWeekStart();
-
-            $dates = array();
-            if (!$find_first_open) {
-                $this->buildDatesBySchedule($week_start, $hours, $schedule, $object_ids, $seed, $dates);
-            } else {
-
-                //loop for 1 week
-                $has_open_slot = $this->buildDatesBySchedule($week_start, $hours, $schedule, $object_ids, $seed, $dates);
-
-                // find first open slot
-                if (!$has_open_slot) {
-                    // 1 year is limit for search
-                    $limit = clone($seed);
-                    $limit->increment(ilDateTime::YEAR, 1);
-                    $limit = $limit->get(IL_CAL_UNIX);
-
-                    while (!$has_open_slot && $seed->get(IL_CAL_UNIX) < $limit) {
-                        $seed->increment(ilDateTime::WEEK, 1);
-
-                        $dates = array();
-                        $has_open_slot = $this->buildDatesBySchedule($week_start, $hours, $schedule, $object_ids, $seed, $dates);
-                    }
-                }
-            }
-
-            $navigation = new ilCalendarHeaderNavigationGUI($this, $seed, ilDateTime::WEEK, 'book');
-            $mytpl->setVariable('NAVIGATION', $navigation->getHTML());
-
-            /** @var ilDateTime $date */
-            foreach (ilCalendarUtil::_buildWeekDayList($seed, $week_start)->get() as $date) {
-                $date_info = $date->get(IL_CAL_FKT_GETDATE, '', 'UTC');
-
-                $mytpl->setCurrentBlock('weekdays');
-                $mytpl->setVariable('TXT_WEEKDAY', ilCalendarUtil::_numericDayToString((int) $date_info['wday']));
-                $mytpl->setVariable('TXT_DATE', $date_info['mday'] . ' ' . ilCalendarUtil::_numericMonthToString($date_info['mon']));
-                $mytpl->parseCurrentBlock();
-            }
-
-            $color = array();
-            $all = ilCalendarAppointmentColors::_getColorsByType('crs');
-            for ($loop = 0; $loop < 7; $loop++) {
-                $col = $all[$loop];
-                $fnt = ilCalendarUtil::calculateFontColor($col);
-                $color[$loop + 1] = 'border-bottom: 1px solid ' . $col . '; background-color: ' . $col . '; color: ' . $fnt;
-            }
-
-            $counter = 0;
-            foreach ($dates as $hour => $days) {
-                $caption = $days;
-                $caption = array_shift($caption);
-
-                for ($loop = 1; $loop < 8; $loop++) {
-                    if (!isset($days[$loop])) {
-                        $mytpl->setCurrentBlock('dates');
-                        $mytpl->setVariable('DUMMY', '&nbsp;');
-                    } elseif (isset($days[$loop]['captions'])) {
-                        foreach ($days[$loop]['captions'] as $slot_id => $slot_caption) {
-                            $mytpl->setCurrentBlock('choice');
-                            $mytpl->setVariable('TXT_DATE', $slot_caption);
-                            $mytpl->setVariable('VALUE_DATE', $slot_id);
-                            $mytpl->setVariable('DATE_COLOR', $color[$loop]);
-                            $mytpl->setVariable(
-                                'TXT_AVAILABLE',
-                                sprintf(
-                                    $this->lng->txt('book_reservation_available'),
-                                    $days[$loop]['available'][$slot_id]
-                                )
-                            );
-                            $mytpl->parseCurrentBlock();
-                        }
-
-                        $mytpl->setCurrentBlock('dates');
-                        $mytpl->setVariable('DUMMY', '');
-                    } elseif (isset($days[$loop]['in_slot'])) {
-                        $mytpl->setCurrentBlock('dates');
-                        $mytpl->setVariable('DATE_COLOR', $color[$loop]);
-                    } else {
-                        $mytpl->setCurrentBlock('dates');
-                        $mytpl->setVariable('DUMMY', '&nbsp;');
-                    }
-                    $mytpl->parseCurrentBlock();
-                }
-
-                $mytpl->setCurrentBlock('slots');
-                $mytpl->setVariable('TXT_HOUR', $caption);
-                if ($counter % 2) {
-                    $mytpl->setVariable('CSS_ROW', 'tblrow1');
-                } else {
-                    $mytpl->setVariable('CSS_ROW', 'tblrow2');
-                }
-                $mytpl->parseCurrentBlock();
-
-                $counter++;
-            }
-            return $mytpl->get();
-        }
-
-        return "";
-    }
-
-    protected function buildDatesBySchedule(
-        int $week_start,
-        array $hours,
-        ilBookingSchedule $schedule,
-        array $object_ids,
-        ilDate $seed,
-        array &$dates
-    ) : bool {
-        $ilUser = $this->user;
-
-        $user_settings = ilCalendarUserSettings::_getInstanceByUserId($ilUser->getId());
-
-        $map = array('mo', 'tu', 'we', 'th', 'fr', 'sa', 'su');
-        $definition = $schedule->getDefinition();
-        $av_from = ($schedule->getAvailabilityFrom() && !$schedule->getAvailabilityFrom()->isNull())
-            ? $schedule->getAvailabilityFrom()->get(IL_CAL_DATE)
-            : null;
-        $av_to = ($schedule->getAvailabilityTo() && !$schedule->getAvailabilityTo()->isNull())
-            ? $schedule->getAvailabilityTo()->get(IL_CAL_DATE)
-            : null;
-
-        $has_open_slot = false;
-        /** @var ilDateTime $date */
-        foreach (ilCalendarUtil::_buildWeekDayList($seed, $week_start)->get() as $date) {
-            $date_info = $date->get(IL_CAL_FKT_GETDATE, '', 'UTC');
-
-            #24045 and #24936
-            if ($av_from || $av_to) {
-                $today = $date->get(IL_CAL_DATE);
-
-                if ($av_from && $av_from > $today) {
-                    continue;
-                }
-
-                if ($av_to && $av_to < $today) {
-                    continue;
-                }
-            }
-
-            $slots = array();
-            if (isset($definition[$map[$date_info['isoday'] - 1]])) {
-                $slots = array();
-                foreach ($definition[$map[$date_info['isoday'] - 1]] as $slot) {
-                    $slot = explode('-', $slot);
-                    $slots[] = array('from' => str_replace(':', '', $slot[0]),
-                        'to' => str_replace(':', '', $slot[1]));
-                }
-            }
-
-            $slot_captions = array();
-            foreach ($hours as $hour => $period) {
-                $dates[$hour][0] = $period;
-                $period = explode("-", $period);
-
-
-                // #13738
-                if ($user_settings->getTimeFormat() === ilCalendarSettings::TIME_FORMAT_12) {
-                    $period[0] = date("H", strtotime($period[0]));
-                    if (count($period) === 2) {
-                        $period[1] = date("H", strtotime($period[1]));
-                    }
-                }
-
-                $period_from = (int) substr($period[0], 0, 2) . "00";
-                if (count($period) === 1) {
-                    $period_to = (int) substr($period[0], 0, 2) . "59";
-                } else {
-                    $period_to = (int) substr($period[1], 0, 2) . "59";
-                }
-
-                $column = $date_info['isoday'];
-                if (!$week_start) {
-                    if ($column < 7) {
-                        $column++;
-                    } else {
-                        $column = 1;
-                    }
-                }
-
-                if (count($slots)) {
-                    $in = false;
-                    foreach ($slots as $slot) {
-                        $slot_from = mktime(substr($slot['from'], 0, 2), substr($slot['from'], 2, 2), 0, $date_info["mon"], $date_info["mday"], $date_info["year"]);
-                        $slot_to = mktime(substr($slot['to'], 0, 2), substr($slot['to'], 2, 2), 0, $date_info["mon"], $date_info["mday"], $date_info["year"]);
-
-                        // always single object, we can sum up
-                        $nr_available = ilBookingReservation::getAvailableObject($object_ids, $slot_from, $slot_to - 1, false, true);
-
-                        // any objects available?
-                        if (!array_sum($nr_available)) {
-                            continue;
-                        }
-
-                        // check deadline
-                        if ($schedule->getDeadline() >= 0) {
-                            // 0-n hours before slots begins
-                            if ($slot_from < (time() + $schedule->getDeadline() * 60 * 60)) {
-                                continue;
-                            }
-                        } elseif ($slot_to < time()) {
-                            continue;
-                        }
-
-                        // is slot active in current hour?
-                        if ((int) $slot['from'] < $period_to && (int) $slot['to'] > $period_from) {
-                            $from = ilDatePresentation::formatDate(new ilDateTime($slot_from, IL_CAL_UNIX));
-                            $from_a = explode(' ', $from);
-                            $from = array_pop($from_a);
-                            $to = ilDatePresentation::formatDate(new ilDateTime($slot_to, IL_CAL_UNIX));
-                            $to_a = explode(' ', $to);
-                            $to = array_pop($to_a);
-
-                            // show caption (first hour) of slot
-                            $id = $slot_from . '_' . $slot_to;
-                            if (!in_array($id, $slot_captions)) {
-                                $dates[$hour][$column]['captions'][$id] = $from . '-' . $to;
-                                $dates[$hour][$column]['available'][$id] = array_sum($nr_available);
-                                $slot_captions[] = $id;
-                            }
-
-                            $in = true;
-                        }
-                    }
-                    // (any) active slot
-                    if ($in) {
-                        $has_open_slot = true;
-                        $dates[$hour][$column]['in_slot'] = true;
-                    }
-                }
-            }
-        }
-
-        return $has_open_slot;
-    }
 
     //
     // Step 1a)
@@ -681,9 +384,7 @@ class ilBookingProcessGUI
                 $from = (int) $fromto[0];
                 $to = (int) $fromto[1] - 1;
 
-                $counter = ilBookingReservation::getAvailableObject(array($object_id), $from, $to, false, true);
-                $counter = (int) $counter[$object_id];
-                $this->confirmBookingNumbers($from, $to, $counter, $group_id);
+                $this->confirmBookingNumbers($from, $to, $group_id);
                 return false;
             }
         }
@@ -696,6 +397,15 @@ class ilBookingProcessGUI
             $this->ctrl->redirect($this, 'book');
         }
         return true;
+    }
+
+    protected function getAvailableNr(
+        int $object_id,
+        int $from,
+        int $to
+    ) : int {
+        $counter = ilBookingReservation::getAvailableObject(array($object_id), $from, $to, false, true);
+        return (int) $counter[$object_id];
     }
 
     /**
@@ -759,7 +469,6 @@ class ilBookingProcessGUI
     public function confirmBookingNumbers(
         int $from,
         int $to,
-        int $counter,
         int $group_id,
         \ILIAS\Repository\Form\FormAdapterGUI $form = null
     ) : void {
@@ -769,7 +478,7 @@ class ilBookingProcessGUI
         $this->tabs_gui->setBackTarget($this->lng->txt('book_back_to_list'), $this->ctrl->getLinkTarget($this, 'back'));
 
         if (!$form) {
-            $form = $this->initBookingNumbersForm2($from, $to, $counter, $group_id);
+            $form = $this->initBookingNumbersForm2($from, $to, $group_id);
         }
         $this->gui->modal($this->getBookgingObjectTitle())
             ->form($form)
@@ -884,13 +593,15 @@ class ilBookingProcessGUI
     protected function initBookingNumbersForm2(
         int $from,
         int $to,
-        int $counter,
         int $a_group_id,
         bool $a_reload = false
     ) : \ILIAS\Repository\Form\FormAdapterGUI {
         if ($this->user_id_assigner !== $this->user_id_to_book) {
             $this->ctrl->setParameterByClass(self::class, "bkusr", $this->user_id_to_book);
         }
+
+        $this->ctrl->setParameterByClass(self::class, "slot", $from . "_" . $to);
+        $counter = $this->getAvailableNr($this->book_request->getObjectId(), $from, $to);
 
         $period = ilDatePresentation::formatPeriod(
             new ilDateTime($from, IL_CAL_UNIX),
@@ -904,7 +615,7 @@ class ilBookingProcessGUI
                 $this->lng->txt("book_confirm_booking_schedule_number_of_objects"),
                 $this->lng->txt("book_confirm_booking_schedule_number_of_objects_info")
             )
-            ->number("nr", $period, "", null, 1, $counter)
+            ->number("nr", $period, "", 1, 1, $counter)
             ->radio("recurrence", $this->lng->txt("cal_recurrences"), "", "0")
             ->radioOption("0", $this->lng->txt("book_no_recurrence"))
             ->radioOption("1", $this->lng->txt("book_recurrence"));
@@ -912,28 +623,72 @@ class ilBookingProcessGUI
         return $form;
     }
 
-    public function confirmedBookingNumber2() : void
-    {
+    protected function getRecurrenceForm(
+        int $nr
+    ) : \ILIAS\Repository\Form\FormAdapterGUI {
+        if ($this->user_id_assigner !== $this->user_id_to_book) {
+            $this->ctrl->setParameterByClass(self::class, "bkusr", $this->user_id_to_book);
+        }
+        $this->ctrl->setParameterByClass(self::class, "slot", $this->book_request->getSlot());
+        $this->ctrl->setParameterByClass(self::class, "object_id", $this->book_request->getObjectId());
+        $this->ctrl->setParameterByClass(self::class, "nr", $nr);
 
+        $this->lng->loadLanguageModule("dateplaner");
+        $today = new ilDate(time(), IL_CAL_UNIX);
+        $form = $this->gui->form([self::class], "confirmedBookingNumbers2")
+            ->section(
+                "props",
+                $this->lng->txt("book_confirm_booking_schedule_number_of_objects"),
+                $this->lng->txt("book_confirm_booking_schedule_number_of_objects_info")
+            )
+            ->switch("recurrence", $this->lng->txt("cal_recurrences"), "", "1")
+            ->group("1", $this->lng->txt("cal_weekly"))
+            ->date("until1", $this->lng->txt("cal_repeat_until"), "", $today)
+            ->group("2", $this->lng->txt("r_14"))
+            ->date("until2", $this->lng->txt("cal_repeat_until"), "", $today)
+            ->group("4", $this->lng->txt("r_4_weeks"))
+            ->date("until3", $this->lng->txt("cal_repeat_until"), "", $today)
+            ->end();
+
+        return $form;
+    }
+
+    public function confirmedBookingNumbers2() : void
+    {
         //get the user who will get the booking.
         if ($this->book_request->getBookedUser() > 0) {
             $this->user_id_to_book = $this->book_request->getBookedUser();
         }
+        $slot = $this->book_request->getSlot();
+        $slot_arr = explode("_", $slot);
+        $from = $slot_arr[0];
+        $to = $slot_arr[1];
+        $obj_id = $this->book_request->getObjectId();
+
+        // form not valid -> show again
+        $form = $this->initBookingNumbersForm2($from, $to, 0);
+        if (!$form->isValid()) {
+            $this->gui->modal($this->getBookgingObjectTitle())
+                      ->form($form)
+                      ->send();
+        }
+
+        // recurrence? -> show recurrence form
+        $recurrence = $form->getData("recurrence");
+        if ($recurrence === "1") {
+            $form = $this->getRecurrenceForm((int) $form->getData("nr"));
+            $this->gui->modal($this->getBookgingObjectTitle())
+                      ->form($form)
+                      ->send();
+        }
+
+        var_dump($recurrence);
+        exit;
+        return;
 
         // convert post data to initial form config
         $counter = array();
-        $current_first = $obj_id = null;
-        foreach (array_keys($this->raw_post_data) as $id) {
-            // e.g.conf_nr__4_1660896000_1660899600_2
-            if (str_starts_with($id, "conf_nr__")) {
-                $id = explode("_", substr($id, 9));
-                // e.g. $counter["4_1660896000_1660899600"] = 2;
-                $counter[$id[0] . "_" . $id[1] . "_" . $id[2]] = (int) $id[3];
-                if (!$current_first) {
-                    $current_first = date("Y-m-d", $id[1]);
-                }
-            }
-        }
+        $current_first = date("Y-m-d", $from);
 
         // recurrence
 
@@ -1044,6 +799,7 @@ class ilBookingProcessGUI
             $this->confirmBookingNumbers($counter, $group_id, $form);
         }
     }
+
 
     public function confirmedBookingNumbers() : void
     {

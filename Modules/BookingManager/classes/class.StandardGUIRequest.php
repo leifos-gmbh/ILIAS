@@ -172,4 +172,14 @@ class StandardGUIRequest
     {
         return $this->str("returnCmd");
     }
+
+    public function getSlot() : string
+    {
+        return $this->str("slot");
+    }
+
+    public function getRecurrence() : string
+    {
+        return $this->str("recurrence");
+    }
 }

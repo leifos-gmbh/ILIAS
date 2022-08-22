@@ -56,16 +56,25 @@ il.repository.ui = (function(il, $) {
         const modal = f.closest(".modal");
         sendAsync(f, modal);
       });
+      f.querySelectorAll(".il-standard-form-cmd").forEach(b => {
+        b.style.display='none';
+      });
       f.dataset.repFormInitialised = '1';
     });
   };
 
   const init = function() {
-    console.log("repository.js INIT");
     initForms();
   };
 
+  const submitModalForm = function(event) {
+    const f = event.target.closest(".modal").querySelector("form");
+    const modal = f.closest(".modal");
+    sendAsync(f, modal);
+  };
+
   return {
-    init: init
+    init: init,
+    submitModalForm: submitModalForm
   };
 }(il, $));

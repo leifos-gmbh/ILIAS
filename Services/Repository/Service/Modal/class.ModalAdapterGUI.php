@@ -30,6 +30,7 @@ class ModalAdapterGUI
     protected \ilCtrlInterface $ctrl;
     protected \ILIAS\DI\UIServices $ui;
     protected ?array $ui_content = null;
+    protected array $action_buttons = [];
 
     /**
      * @param string|array $class_path
@@ -71,7 +72,19 @@ class ModalAdapterGUI
 
     public function form(\ILIAS\Repository\Form\FormAdapterGUI $form) : self
     {
-        $this->form = $form;
+        if ($this->ctrl->isAsynch()) {
+            $this->form = $form->asyncModal();
+            $button = $this->ui->factory()->button()->standard(
+                $this->form->getSubmitCaption(),
+                "#"
+            )->withOnLoadCode(function ($id) {
+                return
+                    "$('#$id').click(function(event) { il.repository.ui.submitModalForm(event); return false;});";
+            });
+            $this->action_buttons[] = $button;
+        } else {
+            $this->form = $form;
+        }
         $this->ui_content = null;
         return $this;
     }
@@ -87,6 +100,9 @@ class ModalAdapterGUI
         }
         if (!is_null($this->ui_content)) {
             $modal = $this->ui->factory()->modal()->roundtrip($this->getTitle(), $this->ui_content);
+            if (count($this->action_buttons) > 0) {
+                $modal = $modal->withActionButtons($this->action_buttons);
+            }
         }
         $this->_send($this->ui->renderer()->renderAsync($modal));
     }

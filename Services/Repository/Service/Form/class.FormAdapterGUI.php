@@ -26,6 +26,9 @@ class FormAdapterGUI
     protected const DEFAULT_SECTION = "@internal_default_section";
     protected const ASYNC_NONE = 0;
     protected const ASYNC_MODAL = 1;
+    protected \ILIAS\Data\Factory $data;
+    protected \ilObjUser $user;
+    protected \ilLanguage $lng;
     protected string $last_key = "";
     protected \ILIAS\Refinery\Factory $refinery;
 
@@ -49,7 +52,9 @@ class FormAdapterGUI
     protected array $upload_handler = [];
     protected int $async_mode = self::ASYNC_NONE;
     protected \ilGlobalTemplateInterface $main_tpl;
-    protected static $initialised = false;
+    protected ?array $current_switch = null;
+    protected ?array $current_group = null;
+    protected static bool $initialised = false;
 
     /**
      * @param string|array $class_path
@@ -65,7 +70,10 @@ class FormAdapterGUI
         $this->ctrl = $DIC->ctrl();
         $this->http = $DIC->http();
         $this->refinery = $DIC->refinery();
+        $this->lng = $DIC->language();
         $this->main_tpl = $DIC->ui()->mainTemplate();
+        $this->user = $DIC->user();
+        $this->data = new \ILIAS\Data\Factory();
         self::initJavascript();
     }
 
@@ -77,10 +85,17 @@ class FormAdapterGUI
     public static function initJavascript() : void
     {
         global $DIC;
+        $f = $DIC->ui()->factory();
+        $r = $DIC->ui()->renderer();
         if (!self::$initialised) {
             $main_tpl = $DIC->ui()->mainTemplate();
             $main_tpl->addJavaScript("./Services/Repository/js/repository.js");
             $main_tpl->addOnLoadCode(self::getOnLoadCode());
+
+            // render dummy components to load the necessary .js needed for async processing
+            $d = [];
+            $d[] = $f->input()->field()->text("");
+            $r->render($d);
             self::$initialised = true;
         }
     }
@@ -167,6 +182,39 @@ class FormAdapterGUI
         return $this;
     }
 
+    public function date(
+        string $key,
+        string $title,
+        string $description = "",
+        ?\ilDate $value = null
+    ) : self {
+        $field = $this->ui->factory()->input()->field()->dateTime($title, $description);
+
+        switch ((int) $this->user->getDateFormat()) {
+            case \ilCalendarSettings::DATE_FORMAT_DMY:
+                $format = $this->data->dateFormat()->germanShort();
+                $dt_format = "d.m.Y";
+                break;
+            case \ilCalendarSettings::DATE_FORMAT_MDY:
+                $format = $this->data->dateFormat()->custom()->month()->slash()->day()->slash()->year();
+                $dt_format = "m/d/Y";
+                break;
+            default:
+                $format = $this->data->dateFormat()->standard();
+                $dt_format = "Y-m-d";
+                break;
+        }
+
+        $field = $field->withFormat($format);
+        if (!is_null($value)) {
+            $field = $field->withValue(
+                (new \DateTime($value->get(IL_CAL_DATE)))->format($dt_format)
+            );
+        }
+        $this->addField($key, $field);
+        return $this;
+    }
+
     public function select(
         string $key,
         string $title,
@@ -208,6 +256,66 @@ class FormAdapterGUI
         if ($field = $this->getLastField()) {
             $field = $field->withOption($value, $title, $description);
             $this->replaceLastField($field);
+        }
+        return $this;
+    }
+
+    public function switch(
+        string $key,
+        string $title,
+        string $description = "",
+        ?string $value = null
+    ) : self {
+        $this->current_switch = [
+            "key" => $key,
+            "title" => $title,
+            "description" => $description,
+            "value" => $value,
+            "groups" => []
+        ];
+        return $this;
+    }
+
+    public function group(string $key, string $title, string $description = "") : self
+    {
+        $this->endCurrentGroup();
+        $this->current_group = [
+            "key" => $key,
+            "title" => $title,
+            "description" => $description,
+            "fields" => []
+        ];
+        return $this;
+    }
+
+    protected function endCurrentGroup() : void
+    {
+        if (!is_null($this->current_group)) {
+            if (!is_null($this->current_switch)) {
+                $this->current_switch["groups"][$this->current_group["key"]] =
+                    $this->ui->factory()->input()->field()->group(
+                        $this->current_group["fields"],
+                        $this->current_group["title"]
+                    )->withByline($this->current_group["description"]);
+            }
+        }
+        $this->current_group = null;
+    }
+
+    public function end() : self
+    {
+        $this->endCurrentGroup();
+        if (!is_null($this->current_switch)) {
+            $field = $this->ui->factory()->input()->field()->switchableGroup(
+                $this->current_switch["groups"],
+                $this->current_switch["title"],
+                $this->current_switch["description"]
+            );
+            if (!is_null($this->current_switch["value"])) {
+                $field = $field->withValue($this->current_switch["value"]);
+            }
+            $this->addField($this->current_switch["key"], $field);
+            $this->current_switch = null;
         }
         return $this;
     }
@@ -259,8 +367,19 @@ class FormAdapterGUI
         if ($key === "") {
             throw new \ilException("Missing Input Key: " . $key);
         }
-        $this->section_of_field[$key] = $this->current_section;
-        $this->fields[$this->current_section][$key] = $field;
+        if (!is_null($this->current_group)) {
+            $this->current_group["fields"][$key] = $field;
+            if (!is_null($this->current_switch)) {
+                $this->section_of_field[$key] = [
+                    $this->current_section,
+                    $this->current_switch["key"],
+                    $this->current_group["key"]
+                ];
+            }
+        } else {
+            $this->section_of_field[$key] = $this->current_section;
+            $this->fields[$this->current_section][$key] = $field;
+        }
         $this->last_key = $key;
         $this->form = null;
     }
@@ -310,28 +429,47 @@ class FormAdapterGUI
         return $this->form;
     }
 
+    public function getSubmitCaption() : string
+    {
+        return $this->getForm()->getSubmitCaption() ?? $this->lng->txt("save");
+    }
+
+    protected function _getData() : void
+    {
+        if (is_null($this->raw_data)) {
+            $request = $this->http->request();
+            $this->form = $this->getForm()->withRequest($request);
+            $this->raw_data = $this->form->getData();
+        }
+    }
+
+    public function isValid() : bool
+    {
+        $this->_getData();
+        return !(is_null($this->raw_data));
+    }
+
     /**
      * @return mixed
      */
     public function getData(string $key)
     {
-        if (is_null($this->raw_data)) {
-            $request = $this->http->request();
-            $this->raw_data = $this->getForm()->withRequest($request)->getData();
-        }
+        $this->_getData();
 
         if (!isset($this->section_of_field[$key])) {
             throw new \ilException("Unknown Key: " . $key);
         }
 
-        $section_data = ($this->section_of_field[$key] === self::DEFAULT_SECTION)
-            ? $this->raw_data
-            : $this->raw_data[$this->section_of_field[$key]] ?? null;
-
-        if (!isset($section_data[$key])) {
-            return null;
+        if (!is_array($this->section_of_field[$key])) {
+            $section_data = ($this->section_of_field[$key] === self::DEFAULT_SECTION)
+                ? $this->raw_data
+                : $this->raw_data[$this->section_of_field[$key]] ?? null;
+        } else {
+            $sec = $this->section_of_field[$key];
+            $section_data = $this->raw_data[$sec[0]][$sec[1]][$sec[2]];
         }
-        return $section_data[$key];
+
+        return $section_data[$key] ?? null;
     }
 
     public function render() : string

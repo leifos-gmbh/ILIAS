@@ -24,6 +24,7 @@ use \ILIAS\Filesystem\Stream\Streams;
  */
 class ilBookingProcessGUI
 {
+    protected \ILIAS\BookingManager\BookingProcess\BookingProcessManager $process;
     protected \ILIAS\HTTP\Services $http;
     protected \ILIAS\BookingManager\InternalGUIService $gui;
     protected array $raw_post_data;
@@ -93,6 +94,8 @@ class ilBookingProcessGUI
         }
         $this->ctrl->saveParameter($this, ["bkusr", "returnCmd"]);
         $this->ctrl->setParameter($this, "seed", $this->seed);
+
+        $this->process = $DIC->bookingManager()->internal()->domain()->process();
     }
 
     public function executeCommand() : void
@@ -111,6 +114,7 @@ class ilBookingProcessGUI
                     "confirmBookingNumbers",
                     "confirmedBookingNumbers",
                     "confirmedBookingNumbers2",
+                    "confirmedBookingNumbers3",
                     "displayPostInfo",
                     "deliverPostFile"
             ))) {
@@ -643,9 +647,8 @@ class ilBookingProcessGUI
             $this->user_id_to_book = $this->book_request->getBookedUser();
         }
         $slot = $this->book_request->getSlot();
-        $slot_arr = explode("_", $slot);
-        $from = $slot_arr[0];
-        $to = $slot_arr[1];
+        $from = $this->book_request->getSlotFrom();
+        $to = $this->book_request->getSlotTo();
         $obj_id = $this->book_request->getObjectId();
 
         if ($this->user_id_assigner !== $this->user_id_to_book) {
@@ -676,6 +679,10 @@ class ilBookingProcessGUI
 
     public function confirmedBookingNumbers3($incl_recurrence = true) : void
     {
+        $obj_id = $this->book_request->getObjectId();
+        $from = $this->book_request->getSlotFrom();
+        $to = $this->book_request->getSlotTo();
+        $nr = $this->book_request->getNr();
         if ($incl_recurrence) {
             $form = $this->getRecurrenceForm();
             // recurrence form not valid -> show again
@@ -686,18 +693,15 @@ class ilBookingProcessGUI
             }
             $recurrence = (int) $form->getData("recurrence");   // 1, 2 or 4
             $until = $form->getData("until" . $recurrence);
+            $this->process->getRecurrenceMissingAvailability(
+                $obj_id,
+                $from,
+                $to,
+                $recurrence,
+                $nr,
+                $until
+            );
 
-            $from = $this->book_request->getSlotFrom();
-
-            // convert post data to initial form config
-            $current_first = date("Y-m-d", $from);
-
-            $end = $until->get(IL_CAL_DATE);
-            $cycle = $recurrence * 7;
-            $cut = 0;
-            $obj_id = $this->book_request->getObjectId();
-            $from = $this->book_request->getSlotFrom();
-            $to = $this->book_request->getSlotTo();
             while ($cut < 1000 && $this->addDaysDate($current_first, $cycle) <= $end) {
                 $cut++;
                 $current_first = null;

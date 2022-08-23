@@ -196,4 +196,9 @@ class StandardGUIRequest
     {
         return $this->str("recurrence");
     }
+
+    public function getNr() : int
+    {
+        return $this->int("nr");
+    }
 }

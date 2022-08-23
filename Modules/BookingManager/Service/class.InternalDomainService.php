@@ -66,10 +66,7 @@ class InternalDomainService
 
     public function process() : BookingProcessManager
     {
-        $user_id = $this->user()->getId();
-        $user_settings = \ilCalendarUserSettings::_getInstanceByUserId($user_id);
-        return new BookingProcessManager(
-        );
+        return new BookingProcessManager();
     }
 
     public function objects(int $pool_id) : ObjectsManager

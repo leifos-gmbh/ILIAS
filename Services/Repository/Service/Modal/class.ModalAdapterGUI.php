@@ -70,6 +70,27 @@ class ModalAdapterGUI
         return $this;
     }
 
+    public function button(string $text, string $url, bool $replace_modal = true) : self
+    {
+        $target = $replace_modal
+            ? "#"
+            : $url;
+
+        $button = $this->ui->factory()->button()->standard(
+            $text,
+            $target
+        );
+
+        if ($replace_modal) {
+            $button = $button->withOnLoadCode(function ($id) use ($url) {
+                return
+                    "$('#$id').click(function(event) { il.repository.ui.redirect('$url'); return false;});";
+            });
+        }
+        $this->action_buttons[] = $button;
+        return $this;
+    }
+
     public function form(\ILIAS\Repository\Form\FormAdapterGUI $form) : self
     {
         if ($this->ctrl->isAsynch()) {

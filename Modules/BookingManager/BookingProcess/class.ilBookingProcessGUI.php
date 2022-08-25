@@ -691,11 +691,11 @@ class ilBookingProcessGUI
                           ->form($form)
                           ->send();
             }
+
             $recurrence = (int) $form->getData("recurrence");   // 1, 2 or 4
             $until = $form->getData("until" . $recurrence);
 
-
-            $this->process->getRecurrenceMissingAvailability(
+            $missing = $this->process->getRecurrenceMissingAvailability(
                 $obj_id,
                 $from,
                 $to,
@@ -704,22 +704,21 @@ class ilBookingProcessGUI
                 $until
             );
 
-            while ($cut < 1000 && $this->addDaysDate($current_first, $cycle) <= $end) {
-                $cut++;
-                $current_first = null;
-                foreach ($org as $item_id => $max) {
-                }
-
-                foreach ($org as $item_id => $max) {
-                    $parts = explode("_", $item_id);
-                    $obj_id = $parts[0];
-
-                    $from = $this->addDaysStamp($parts[1], $cycle * $cut);
-                    $to = $this->addDaysStamp($parts[2], $cycle * $cut);
-                }
+            // anything missing? -> send missing message
+            if (count($missing) > 0) {
+                $html = $this->getMissingAvailabilityMessage($missing);
+                $this->ctrl->saveParameter($this, ["object_id", "slot", "nr"]);
+                $this->ctrl->setParameter($this, "recurrence", $recurrence);
+                $this->ctrl->setParameter($this, "until", $until->get(IL_CAL_DATE));
+                $link = $this->ctrl->getLinkTarget($this, "bookAvailableItems");
+                $this->gui->modal($this->getBookgingObjectTitle())
+                    ->legacy($html)
+                    ->send();
             }
+            $this->bookAvailableItems($recurrence, $until);
         }
 
+        return;
         $group_id = $this->book_request->getGroupId();
 
         $form = $this->initBookingNumbersForm($counter, $group_id, true);
@@ -785,6 +784,41 @@ class ilBookingProcessGUI
         }
     }
 
+    protected function getMissingAvailabilityMessage(array $missing) : string
+    {
+        $f = $this->gui->ui()->factory();
+        $box = $f->messageBox()->failure($this->lng->txt("book_missing_availability"));
+        $items = array_map(function ($i) {
+            return $i["from"] . " - " . $i["from"] . str_replace("$1", $i["from"], $this->lng->txt("book_missing_items"));
+        }, $missing);
+
+        $list = $f->listing()->unordered($items);
+        return $this->gui->ui()->renderer()->render([$box, $list]);
+    }
+
+    protected function bookAvailableItems(?int $recurrence, ?ilDateTime $until)
+    {
+        $obj_id = $this->book_request->getObjectId();
+        $from = $this->book_request->getSlotFrom();
+        $to = $this->book_request->getSlotTo();
+        $nr = $this->book_request->getNr();
+        if (is_null($recurrence)) {
+            $recurrence = (int) $this->book_request->getRecurrence();
+        }
+        if (is_null($until)) {
+            $until = new ilDate($this->book_request->getUntil(), IL_CAL_DATE);
+        }
+
+        /*
+        $booked = $this->process->bookAvailableObjects(
+            $obj_id,
+            $from,
+            $to,
+            $recurrence,
+            $nr,
+            $until
+        );*/
+    }
 
     public function confirmedBookingNumbers() : void
     {

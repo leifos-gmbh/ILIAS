@@ -693,6 +693,8 @@ class ilBookingProcessGUI
             }
             $recurrence = (int) $form->getData("recurrence");   // 1, 2 or 4
             $until = $form->getData("until" . $recurrence);
+
+
             $this->process->getRecurrenceMissingAvailability(
                 $obj_id,
                 $from,

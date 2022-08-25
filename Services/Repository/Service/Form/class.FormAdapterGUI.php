@@ -43,7 +43,8 @@ class FormAdapterGUI
     protected \ilCtrlInterface $ctrl;
     protected \ILIAS\DI\UIServices $ui;
     protected array $fields = [];
-    protected array $sections = [self::DEFAULT_SECTION => ["title" => "", "description" => ""]];
+    protected array $field_path = [];
+    protected array $sections = [self::DEFAULT_SECTION => ["title" => "", "description" => "", "fields" => []]];
     protected string $current_section = self::DEFAULT_SECTION;
     protected array $section_of_field = [];
     protected $class_path;
@@ -122,7 +123,8 @@ class FormAdapterGUI
 
         $this->sections[$key] = [
             "title" => $title,
-            "description" => $description
+            "description" => $description,
+            "fields" => []
         ];
         $this->current_section = $key;
         return $this;
@@ -218,19 +220,15 @@ class FormAdapterGUI
     /**
      * @return null|\ilDate|\ilDateTime
      */
-    protected function getDateTimeData(?string $value, $use_time = false)
+    protected function getDateTimeData(?\DateTimeImmutable $value, $use_time = false)
     {
-        $parsed = \ilCalendarUtil::parseDateString($value, $use_time);
-        if (is_object($parsed["date"])) {
-            return $parsed["date"];
-        } else {
-            // try generic format
-            $parsed = \ilCalendarUtil::parseDateString($value, $use_time, true);
-            if (is_object($parsed["date"])) {
-                return $parsed["date"];
-            }
+        if (is_null($value)) {
+            return null;
         }
-        return null;
+        if ($use_time) {
+            return new \ilDateTime($value->format("Y-m-d H:i:s"), IL_CAL_DATETIME);
+        }
+        return new \ilDate($value->format("Y-m-d"), IL_CAL_DATE);
     }
 
     public function select(
@@ -332,8 +330,9 @@ class FormAdapterGUI
             if (!is_null($this->current_switch["value"])) {
                 $field = $field->withValue($this->current_switch["value"]);
             }
-            $this->addField($this->current_switch["key"], $field);
+            $key = $this->current_switch["key"];
             $this->current_switch = null;
+            $this->addField($key, $field);
         }
         return $this;
     }
@@ -379,51 +378,53 @@ class FormAdapterGUI
 
     protected function addField(string $key, FormInput $field) : void
     {
-        if (isset($this->section_of_field[$key])) {
-            throw new \ilException("Duplicate Input Key: " . $key);
-        }
         if ($key === "") {
             throw new \ilException("Missing Input Key: " . $key);
+        }
+        if (isset($this->field[$key])) {
+            throw new \ilException("Duplicate Input Key: " . $key);
+        }
+        $field_path = [];
+        if ($this->current_section !== self::DEFAULT_SECTION) {
+            $field_path[] = $this->current_section;
         }
         if (!is_null($this->current_group)) {
             $this->current_group["fields"][$key] = $field;
             if (!is_null($this->current_switch)) {
-                $this->section_of_field[$key] = [
-                    $this->current_section,
-                    $this->current_switch["key"],
-                    $this->current_group["key"]
-                ];
+                $field_path[] = $this->current_switch["key"];
+                $field_path[] = 1;  // the value of subitems in SwitchableGroup are in the 1 key of the raw data
+                $field_path[] = $key;
             }
-            $this->fields[$this->current_section][$this->current_switch["key"]][$this->current_group["key"]][$key] = $field;
         } else {
-            $this->section_of_field[$key] = $this->current_section;
-            $this->fields[$this->current_section][$key] = $field;
+            $this->sections[$this->current_section]["fields"][] = $key;
+            $field_path[] = $key;
+            if ($field instanceof \ILIAS\UI\Component\Input\Field\SwitchableGroup) {
+                $field_path[] = 0;      // the value of the SwitchableGroup is in the 0 key of the raw data
+            }
         }
+        $this->fields[$key] = $field;
+        $this->field_path[$key] = $field_path;
         $this->last_key = $key;
         $this->form = null;
     }
 
     protected function getFieldForKey(string $key) : FormInput
     {
-        if (!isset($this->section_of_field[$key])) {
+        if (!isset($this->fields[$key])) {
             throw new \ilException("Unknown Key: " . $key);
         }
-        $section = $this->section_of_field[$key];
-        if (!is_array($section)) {
-            return $this->fields[$section][$key];
-        }
-        return $this->fields[$section[0]][$section[1]][$section[2]][$key];
+        return $this->fields[$key];
     }
 
     protected function getLastField() : ?FormInput
     {
-        return $this->fields[$this->current_section][$this->last_key] ?? null;
+        return $this->fields[$this->last_key] ?? null;
     }
 
     protected function replaceLastField(FormInput $field) : void
     {
         if ($this->last_key !== "") {
-            $this->fields[$this->current_section][$this->last_key] = $field;
+            $this->fields[$this->last_key] = $field;
         }
     }
 
@@ -437,19 +438,20 @@ class FormAdapterGUI
             $inputs = [];
             foreach ($this->sections as $sec_key => $section) {
                 if ($sec_key === self::DEFAULT_SECTION) {
-                    if (isset($this->fields[$sec_key])) {
-                        foreach ($this->fields[$sec_key] as $f_key => $field) {
-                            $inputs[$f_key] = $field;
-                        }
+                    foreach ($this->sections[$sec_key]["fields"] as $f_key) {
+                        $inputs[$f_key] = $this->getFieldForKey($f_key);
                     }
-                } else {
-                    if (isset($this->fields[$sec_key]) && count($this->fields[$sec_key]) > 0) {
-                        $inputs[$sec_key] = $this->ui->factory()->input()->field()->section(
-                            $this->fields[$sec_key],
-                            $section["title"],
-                            $section["description"]
-                        );
+                } elseif (count($this->sections[$sec_key]["fields"]) > 0) {
+                    $sec_inputs = [];
+                    foreach ($this->sections[$sec_key]["fields"] as $f_key) {
+                        $sec_inputs[$f_key] = $this->getFieldForKey($f_key);
                     }
+                    $inputs[$sec_key] = $this->ui->factory()->input()->field()->section(
+                        /*$this->fields[$sec_key]*/
+                        $sec_inputs,
+                        $section["title"],
+                        $section["description"]
+                    );
                 }
             }
             $this->form = $this->ui->factory()->input()->container()->form()->standard(
@@ -487,22 +489,20 @@ class FormAdapterGUI
     {
         $this->_getData();
 
-        if (!isset($this->section_of_field[$key])) {
+        if (!isset($this->fields[$key])) {
             throw new \ilException("Unknown Key: " . $key);
         }
 
-        if (!is_array($this->section_of_field[$key])) {
-            $section_data = ($this->section_of_field[$key] === self::DEFAULT_SECTION)
-                ? $this->raw_data
-                : $this->raw_data[$this->section_of_field[$key]] ?? null;
-        } else {
-            $sec = $this->section_of_field[$key];
-            $section_data = $this->raw_data[$sec[0]][$sec[1]][$sec[2]];
+        $value = $this->raw_data;
+        foreach ($this->field_path[$key] as $path_key) {
+            if (!isset($value[$path_key])) {
+                return null;
+            }
+            $value = $value[$path_key];
         }
 
-        $value = $section_data[$key] ?? null;
-
         $field = $this->getFieldForKey($key);
+        
         if ($field instanceof \ILIAS\UI\Component\Input\Field\DateTime) {
             /** @var \ILIAS\UI\Component\Input\Field\DateTime $field */
             $value = $this->getDateTimeData($value, $field->getUseTime());

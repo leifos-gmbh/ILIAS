@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 chdir(__DIR__);
 chdir('..');
@@ -33,5 +35,10 @@ try {
     $cron->logout();
 
     echo $e->getMessage() . "\n";
+
+    if (defined('DEVMODE') && DEVMODE) {
+        echo $e->getTraceAsString() . "\n";
+    }
+
     exit(1);
 }

@@ -1,20 +1,24 @@
-<?php declare(strict_types=1);
-/******************************************************************************
+<?php
+
+declare(strict_types=1);
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
+
 class ilSCORMExplorer extends ilExplorer
 {
-
     /**
      * id of root folder
      */
@@ -31,17 +35,17 @@ class ilSCORMExplorer extends ilExplorer
         $this->setOrderColumn("");
     }
 
-    public function getItem(int $a_node_id) : \ilSCORMItem
+    public function getItem(int $a_node_id): \ilSCORMItem
     {
         return new ilSCORMItem($a_node_id);
     }
 
-    public function getIconImagePathPrefix() : string
+    public function getIconImagePathPrefix(): string
     {
         return "scorm/";
     }
 
-    public function getNodesToSkip() : int
+    public function getNodesToSkip(): int
     {
         return 2;
     }
@@ -50,7 +54,7 @@ class ilSCORMExplorer extends ilExplorer
      * overwritten method from base class
      * @throws ilTemplateException
      */
-    public function formatHeader(ilTemplate $tpl, $a_obj_id, array $a_option) : void //Missing typehint because ilExplorer
+    public function formatHeader(ilTemplate $tpl, $a_obj_id, array $a_option): void //Missing typehint because ilExplorer
     {
         global $DIC;
         $lng = $DIC->language();
@@ -69,7 +73,7 @@ class ilSCORMExplorer extends ilExplorer
     /**
      * Creates Get Parameter
      */
-    public function createTarget(string $a_type, $a_node_id, bool $a_highlighted_subtree = false, bool $a_append_anch = true) : string //Missing typehint because ilExplorer
+    public function createTarget(string $a_type, $a_node_id, bool $a_highlighted_subtree = false, bool $a_append_anch = true): string //Missing typehint because ilExplorer
     {
         // SET expand parameter:
         //     positive if object is expanded
@@ -81,16 +85,17 @@ class ilSCORMExplorer extends ilExplorer
         return $_SERVER["PATH_INFO"] . "?cmd=explorer&ref_id=" . $this->slm_obj->getRefId() . "&scexpand=" . $a_node_id; //ToDo $_SERVER?
     }
 
-    public function setOutput($a_parent_id, int $a_depth = 1, int $a_obj_id = 0, $a_highlighted_subtree = false) : void
+    public function setOutput($a_parent_id, int $a_depth = 1, int $a_obj_id = 0, $a_highlighted_subtree = false): void
 //    public function setOutput(int $a_parent_id, int $a_depth = 1, int $a_obj_id = 0, bool $a_highlighted_subtree = false) : void
     {
         $this->format_options = $this->createOutputArray($a_parent_id);
     }
 
     /**
-     * recursive creating of outputs
-     */
-    protected function createOutputArray(int $a_parent_id, array $options = array()) : array
+                 * recursive creating of outputs
+                 * @return mixed[]
+                 */
+    protected function createOutputArray(int $a_parent_id, array $options = array()): array
     {
         global $ilErr;
         $types_do_not_display = array("sos", "sma");
@@ -129,7 +134,7 @@ class ilSCORMExplorer extends ilExplorer
         return $options;
     }
 
-    public function isVisible($a_ref_id, string $a_type) : bool //Typehint not possible now - see ilExplorer
+    public function isVisible($a_ref_id, string $a_type): bool //Typehint not possible now - see ilExplorer
     {
         return $a_type !== "sre";
     }
@@ -138,7 +143,7 @@ class ilSCORMExplorer extends ilExplorer
      * Creates output template
      * @throws ilTemplateException
      */
-    public function getOutput(bool $jsApi = false) : string
+    public function getOutput(bool $jsApi = false): string
     {
         return $this->createOutput($this->format_options, $jsApi)->get();
     }
@@ -147,19 +152,19 @@ class ilSCORMExplorer extends ilExplorer
      * recursive creation of output templates
      * @throws ilTemplateException
      */
-    public function createOutput(array $option, bool $jsApi) : \ilTemplate
+    public function createOutput(array $option, bool $jsApi): \ilTemplate
     {
         global $DIC;
         $ilBench = $DIC['ilBench'];
 
-        if ($option["visible"]) {
+        if (isset($option["visible"]) && $option["visible"] == true) {
             $tpl = new ilTemplate("tpl.sahs_tree_ul.html", true, true, "Modules/ScormAicc");
             $tpl = $this->insertObject($option, $tpl, $jsApi);
         } else {
             $tpl = new ilTemplate("tpl.sahs_tree_free.html", true, true, "Modules/ScormAicc");
         }
 
-        if (is_array($option["childs"]) && count($option["childs"])) {
+        if (isset($option["childs"]) && is_array($option["childs"]) && count($option["childs"]) > 0) {
             foreach ($option["childs"] as $key => $ch_option) {
                 $tpl->setCurrentBlock("childs");
                 $tpl->setVariable("CHILDS", $this->createOutput($ch_option, $jsApi)->get());
@@ -173,7 +178,7 @@ class ilSCORMExplorer extends ilExplorer
     /**
      * can i click on the module name
      */
-    public function isClickable(string $type, int $ref_id = 0) : bool
+    public function isClickable(string $type, int $ref_id = 0): bool
     {
         if ($type !== "sit") {
             return false;
@@ -187,31 +192,32 @@ class ilSCORMExplorer extends ilExplorer
      * insert the option data in $tpl
      * @throws ilTemplateException
      */
-    protected function insertObject(array $option, ilTemplate $tpl, bool $jsApi) : \ilTemplate
+    protected function insertObject(array $option, ilTemplate $tpl, bool $jsApi): \ilTemplate
     {
         global $ilErr;
         if (!is_array($option) || !isset($option["id"])) {
             $ilErr->raiseError(get_class($this) . "::insertObject(): Missing parameter or wrong datatype! " .
                                     "options:" . var_dump($option), $ilErr->error_obj->WARNING);
         }
+        $clickable = false;
+        if ($option["c_type"] == "sit") {
+            //get scorm item
+            $sc_object = new ilSCORMItem((int) $option["id"]);
+            $id_ref = $sc_object->getIdentifierRef();
 
-        //get scorm item
-        $sc_object = new ilSCORMItem((int) $option["id"]);
-        $id_ref = $sc_object->getIdentifierRef();
+            //get scorm resource ref id
+            $sc_res_id = ilSCORMResource::_lookupIdByIdRef($id_ref, $sc_object->getSLMId());
 
-        //get scorm resource ref id
-        $sc_res_id = ilSCORMResource::_lookupIdByIdRef($id_ref, $sc_object->getSLMId());
+            //get scorm type
+            $scormtype = strtolower(ilSCORMResource::_lookupScormType($sc_res_id));
 
-        //get scorm type
-        $scormtype = strtolower(ilSCORMResource::_lookupScormType($sc_res_id));
+            //is scorm clickabke
+            $clickable = $this->isClickable($option["c_type"], (int) $option["id"]);
 
-        //is scorm clickabke
-        $clickable = $this->isClickable($option["c_type"], $option["id"]);
-
-        if ($this->output_icons && $clickable) {
-            $this->getOutputIcons($tpl, $option, $option["id"], $scormtype);
+            if ($this->output_icons && $clickable) {
+                $this->getOutputIcons($tpl, $option, (int) $option["id"], $scormtype);
+            }
         }
-
         if ($clickable) {	// output link
             $tpl->setCurrentBlock("link");
             $frame_target = $this->buildFrameTarget($option["c_type"], $option["id"], $option["obj_id"]);
@@ -243,7 +249,7 @@ class ilSCORMExplorer extends ilExplorer
      * tpl is filled with option state
      * @throws ilTemplateException
      */
-    public function getOutputIcons(\ilTemplate $tpl, array $a_option, int $a_node_id, string $scormtype = "sco") : void
+    public function getOutputIcons(\ilTemplate $tpl, array $a_option, int $a_node_id, string $scormtype = "sco"): void
     {
         global $DIC;
         $lng = $DIC->language();
@@ -264,7 +270,7 @@ class ilSCORMExplorer extends ilExplorer
         );
 
         // status
-        $status = ($trdata["cmi.core.lesson_status"] == "")
+        $status = !isset($trdata["cmi.core.lesson_status"])
                 ? "not attempted"
                 : $trdata["cmi.core.lesson_status"];
 
@@ -282,18 +288,18 @@ class ilSCORMExplorer extends ilExplorer
         } elseif ($statusChar === "r") {
             $status = "running";
         }
-            
+
         $alt = $lng->txt("cont_status") . ": " .
                 $lng->txt("cont_sc_stat_" . str_replace(" ", "_", $status));
 
         // score
-        if ($trdata["cmi.core.score.raw"] != "") {
+        if (isset($trdata["cmi.core.score.raw"])) {
             $alt .= ", " . $lng->txt("cont_credits") .
                 ": " . $trdata["cmi.core.score.raw"];
         }
 
         // total time
-        if ($trdata["cmi.core.total_time"] != "" &&
+        if (isset($trdata["cmi.core.total_time"]) &&
                 $trdata["cmi.core.total_time"] !== "0000:00:00.00") {
             $alt .= ", " . $lng->txt("cont_total_time") .
                 ": " . $trdata["cmi.core.total_time"];

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -33,16 +35,16 @@ class ilObjIndividualAssessment extends ilObject
     protected ilAccessHandler $il_access_handler;
     protected ?Pimple\Container $dic = null;
 
-    protected ilIndividualAssessmentInfoSettings $info_settings;
-    protected ilIndividualAssessmentFileStorage $file_storage;
+    protected ?ilIndividualAssessmentInfoSettings $info_settings = null;
+    protected ?ilIndividualAssessmentFileStorage $file_storage = null;
 
-    public function __construct(int $a_id = 0, bool $a_call_by_reference = true)
+    public function __construct(int $id = 0, bool $call_by_reference = true)
     {
         global $DIC;
         $this->type = 'iass';
         $this->il_access_handler = $DIC["ilAccess"];
 
-        parent::__construct($a_id, $a_call_by_reference);
+        parent::__construct($id, $call_by_reference);
 
         $this->settings_storage = new ilIndividualAssessmentSettingsStorageDB($DIC['ilDB']);
         $this->members_storage = new ilIndividualAssessmentMembersStorageDB($DIC['ilDB']);
@@ -58,7 +60,7 @@ class ilObjIndividualAssessment extends ilObject
     /**
      * @inheritdoc
      */
-    public function create() : int
+    public function create(): int
     {
         $id = parent::create();
         $this->settings = new ilIndividualAssessmentSettings(
@@ -77,7 +79,7 @@ class ilObjIndividualAssessment extends ilObject
     /**
      * @inheritdoc
      */
-    public function read() : void
+    public function read(): void
     {
         parent::read();
         global $DIC;
@@ -86,7 +88,7 @@ class ilObjIndividualAssessment extends ilObject
         $this->info_settings = $settings_storage->loadInfoSettings($this);
     }
 
-    public function getSettings() : ilIndividualAssessmentSettings
+    public function getSettings(): ilIndividualAssessmentSettings
     {
         if (!$this->settings) {
             $this->settings = $this->settings_storage->loadSettings($this);
@@ -97,14 +99,14 @@ class ilObjIndividualAssessment extends ilObject
     /**
      * Set the settings
      */
-    public function setSettings(ilIndividualAssessmentSettings $settings) : void
+    public function setSettings(ilIndividualAssessmentSettings $settings): void
     {
         $this->settings = $settings;
         $this->setTitle($settings->getTitle());
         $this->setDescription($settings->getDescription());
     }
 
-    public function getInfoSettings() : ilIndividualAssessmentInfoSettings
+    public function getInfoSettings(): ilIndividualAssessmentInfoSettings
     {
         if (!$this->info_settings) {
             $this->info_settings = $this->settings_storage->loadInfoSettings($this);
@@ -115,7 +117,7 @@ class ilObjIndividualAssessment extends ilObject
     /**
      * Set info settings
      */
-    public function setInfoSettings(ilIndividualAssessmentInfoSettings $info) : void
+    public function setInfoSettings(ilIndividualAssessmentInfoSettings $info): void
     {
         $this->info_settings = $info;
     }
@@ -123,7 +125,7 @@ class ilObjIndividualAssessment extends ilObject
     /**
      * Get the members object associated with this.
      */
-    public function loadMembers() : ilIndividualAssessmentMembers
+    public function loadMembers(): ilIndividualAssessmentMembers
     {
         return $this->members_storage->loadMembers($this);
     }
@@ -133,7 +135,7 @@ class ilObjIndividualAssessment extends ilObject
      *
      * @return	ilIndividualAssessmentMember[]
      */
-    public function loadMembersAsSingleObjects(string $filter = null, string $sort = null) : array
+    public function loadMembersAsSingleObjects(string $filter = null, string $sort = null): array
     {
         return $this->members_storage->loadMembersAsSingleObjects($this, $filter, $sort);
     }
@@ -141,7 +143,7 @@ class ilObjIndividualAssessment extends ilObject
     /**
      * Get the members object associated with this and visible by the current user.
      */
-    public function loadVisibleMembers() : ilIndividualAssessmentMembers
+    public function loadVisibleMembers(): ilIndividualAssessmentMembers
     {
         return $this->members_storage->loadMembers($this)
                 ->withAccessHandling($this->il_access_handler);
@@ -150,7 +152,7 @@ class ilObjIndividualAssessment extends ilObject
     /**
      * Update the members object associated with this.
      */
-    public function updateMembers(ilIndividualAssessmentMembers $members) : void
+    public function updateMembers(ilIndividualAssessmentMembers $members): void
     {
         $members->updateStorageAndRBAC($this->members_storage, $this->access_handler);
     }
@@ -158,7 +160,7 @@ class ilObjIndividualAssessment extends ilObject
     /**
      * @inheritdoc
      */
-    public function delete() : bool
+    public function delete(): bool
     {
         $this->settings_storage->deleteSettings($this);
         $this->members_storage->deleteMembers($this);
@@ -168,22 +170,22 @@ class ilObjIndividualAssessment extends ilObject
     /**
      * @inheritdoc
      */
-    public function update() : bool
+    public function update(): bool
     {
         parent::update();
         $this->settings_storage->updateSettings($this->settings);
         return true;
     }
 
-    public function updateInfo() : void
+    public function updateInfo(): void
     {
-        $this->settings_storage->updateInfoSettings($this->info_settings);
+        $this->settings_storage->updateInfoSettings($this->getInfoSettings());
     }
 
     /**
      * Get the member storage object used by this.
      */
-    public function membersStorage() : ilIndividualAssessmentMembersStorage
+    public function membersStorage(): ilIndividualAssessmentMembersStorage
     {
         return $this->members_storage;
     }
@@ -191,7 +193,7 @@ class ilObjIndividualAssessment extends ilObject
     /**
      * @inheritdoc
      */
-    public function initDefaultRoles() : void
+    public function initDefaultRoles(): void
     {
         $this->access_handler->initDefaultRolesForObject($this);
     }
@@ -199,7 +201,7 @@ class ilObjIndividualAssessment extends ilObject
     /**
      * Get the access handler of this.
      */
-    public function accessHandler() : IndividualAssessmentAccessHandler
+    public function accessHandler(): IndividualAssessmentAccessHandler
     {
         return $this->access_handler;
     }
@@ -207,9 +209,9 @@ class ilObjIndividualAssessment extends ilObject
     /**
      * @inheritdoc
      */
-    public function cloneObject(int $target_id, int $copy_id = 0, bool $omit_tree = false) : ?ilObject
+    public function cloneObject(int $target_id, int $copy_id = 0, bool $omit_tree = false): ?ilObject
     {
-        $new_obj = parent::cloneObject($a_target_id, $a_copy_id, $a_omit_tree);
+        $new_obj = parent::cloneObject($target_id, $copy_id, $omit_tree);
         $settings = $this->getSettings();
         $info_settings = $this->getInfoSettings();
         $new_settings = new ilIndividualAssessmentSettings(
@@ -248,7 +250,7 @@ class ilObjIndividualAssessment extends ilObject
     /**
      * Get the file storage system
      */
-    public function getFileStorage() : ilIndividualAssessmentFileStorage
+    public function getFileStorage(): ilIndividualAssessmentFileStorage
     {
         if ($this->file_storage === null) {
             $this->file_storage = ilIndividualAssessmentFileStorage::getInstance($this->getId());
@@ -259,7 +261,7 @@ class ilObjIndividualAssessment extends ilObject
     /**
      * Check whether the LP is activated for current object.
      */
-    public function isActiveLP() : bool
+    public function isActiveLP(): bool
     {
         if ($this->lp_active === null) {
             $this->lp_active = ilIndividualAssessmentLPInterface::isActiveLP($this->getId());
@@ -278,7 +280,7 @@ class ilObjIndividualAssessment extends ilObject
      *
      * @return int the obj_id or 0 if root is reached
      */
-    public function getParentContainerIdByType(int $id, array $types) : int
+    public function getParentContainerIdByType(int $id, array $types): int
     {
         global $DIC;
 
@@ -294,7 +296,7 @@ class ilObjIndividualAssessment extends ilObject
         return 0;
     }
 
-    protected function getDic() : Pimple\Container
+    protected function getDic(): Pimple\Container
     {
         if (is_null($this->dic)) {
             global $DIC;
@@ -306,12 +308,12 @@ class ilObjIndividualAssessment extends ilObject
         return $this->dic;
     }
 
-    public function getMembersGUI() : ilIndividualAssessmentMembersGUI
+    public function getMembersGUI(): ilIndividualAssessmentMembersGUI
     {
         return $this->getDic()['ilIndividualAssessmentMembersGUI'];
     }
 
-    public function getSettingsGUI() : ilIndividualAssessmentSettingsGUI
+    public function getSettingsGUI(): ilIndividualAssessmentSettingsGUI
     {
         return $this->getDic()['ilIndividualAssessmentSettingsGUI'];
     }

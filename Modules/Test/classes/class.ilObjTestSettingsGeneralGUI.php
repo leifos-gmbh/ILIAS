@@ -33,85 +33,60 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
     /**
      * command constants
      */
-    const CMD_SHOW_FORM = 'showForm';
-    const CMD_SAVE_FORM = 'saveForm';
-    const CMD_CONFIRMED_SAVE_FORM = 'confirmedSaveForm';
-    const CMD_SHOW_RESET_TPL_CONFIRM = 'showResetTemplateConfirmation';
-    const CMD_CONFIRMED_RESET_TPL = 'confirmedResetTemplate';
-    
-    const ANSWER_FIXATION_NONE = 'none';
-    const ANSWER_FIXATION_ON_INSTANT_FEEDBACK = 'instant_feedback';
-    const ANSWER_FIXATION_ON_FOLLOWUP_QUESTION = 'followup_question';
-    const ANSWER_FIXATION_ON_IFB_OR_FUQST = 'ifb_or_fuqst';
-    
-    const INSTANT_FEEDBACK_TRIGGER_MANUAL = 0;
-    const INSTANT_FEEDBACK_TRIGGER_FORCED = 1;
+    public const CMD_SHOW_FORM = 'showForm';
+    public const CMD_SAVE_FORM = 'saveForm';
+    public const CMD_CONFIRMED_SAVE_FORM = 'confirmedSaveForm';
+    public const CMD_SHOW_RESET_TPL_CONFIRM = 'showResetTemplateConfirmation';
+    public const CMD_CONFIRMED_RESET_TPL = 'confirmedResetTemplate';
 
-    /** @var ilCtrl $ctrl */
-    protected $ctrl = null;
+    public const ANSWER_FIXATION_NONE = 'none';
+    public const ANSWER_FIXATION_ON_INSTANT_FEEDBACK = 'instant_feedback';
+    public const ANSWER_FIXATION_ON_FOLLOWUP_QUESTION = 'followup_question';
+    public const ANSWER_FIXATION_ON_IFB_OR_FUQST = 'ifb_or_fuqst';
 
-    /** @var ilAccessHandler $access */
-    protected $access = null;
+    public const INSTANT_FEEDBACK_TRIGGER_MANUAL = 0;
+    public const INSTANT_FEEDBACK_TRIGGER_FORCED = 1;
 
-    /** @var ilLanguage $lng */
-    protected $lng = null;
+    protected ilCtrlInterface $ctrl;
+    protected ilAccessHandler $access;
+    protected ilLanguage $lng;
+    protected ilGlobalTemplateInterface $tpl;
+    protected ilTree $tree;
+    protected ilDBInterface $db;
+    protected ilComponentRepository $component_repository;
+    protected ilObjUser $activeUser;
+    protected ilObjTestGUI $testGUI;
+    private ilTestQuestionSetConfigFactory $testQuestionSetConfigFactory;
 
-    /** @var ilGlobalTemplateInterface $tpl */
-    protected $tpl = null;
-
-    /** @var ilTree $tree */
-    protected $tree = null;
-
-    /** @var ilDBInterface $db */
-    protected $db = null;
-
-    /** @var ilPluginAdmin $pluginAdmin */
-    protected $pluginAdmin = null;
-
-    /** @var ilObjUser $activeUser */
-    protected $activeUser = null;
-
-    /** @var ilObjTestGUI $testGUI */
-    protected $testGUI = null;
-
-    /** @var ilTestQuestionSetConfigFactory $testQuestionSetConfigFactory Factory for question set config. */
-    private $testQuestionSetConfigFactory = null;
-
-    /**
-     * Constructor
-     *
-     * @param ilCtrl          $ctrl
-     * @param ilAccessHandler $access
-     * @param ilLanguage      $lng
-     * @param ilTemplate      $tpl
-     * @param ilDBInterface   $db
-     * @param ilObjTestGUI    $testGUI
-     */
     public function __construct(
-        ilCtrl $ctrl,
+        ilCtrlInterface $ctrl,
         ilAccessHandler $access,
         ilLanguage $lng,
         ilTree $tree,
         ilDBInterface $db,
-        ilPluginAdmin $pluginAdmin,
+        ilComponentRepository $component_repository,
         ilObjUser $activeUser,
         ilObjTestGUI $testGUI
     ) {
         global $DIC; /* @var ILIAS\DI\Container $DIC */
-        
+
         $this->ctrl = $ctrl;
         $this->access = $access;
         $this->lng = $lng;
         $this->tpl = $DIC->ui()->mainTemplate();
         $this->tree = $tree;
         $this->db = $db;
-        $this->pluginAdmin = $pluginAdmin;
+        $this->component_repository = $component_repository;
         $this->activeUser = $activeUser;
 
         $this->testGUI = $testGUI;
 
-        require_once 'Modules/Test/classes/class.ilTestQuestionSetConfigFactory.php';
-        $this->testQuestionSetConfigFactory = new ilTestQuestionSetConfigFactory($this->tree, $this->db, $this->pluginAdmin, $testGUI->getTestObject());
+        $this->testQuestionSetConfigFactory = new ilTestQuestionSetConfigFactory(
+            $this->tree,
+            $this->db,
+            $this->component_repository,
+            $testGUI->getTestObject()
+        );
 
         parent::__construct($testGUI->getTestObject());
     }
@@ -122,14 +97,14 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
     public function executeCommand()
     {
         global $DIC; /* @var ILIAS\DI\Container $DIC */
-        
+
         // allow only write access
 
         if (!$this->access->checkAccess("write", "", $this->testGUI->getRefId())) {
             $this->tpl->setOnScreenMessage('info', $this->lng->txt("cannot_edit_test"), true);
             $this->ctrl->redirect($this->testGUI, "infoScreen");
         }
-        
+
         $DIC->tabs()->activateTab(ilTestTabsManager::TAB_ID_SETTINGS);
 
         // process command
@@ -146,7 +121,7 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
     private function showFormCmd(ilPropertyFormGUI $form = null)
     {
         $this->tpl->addJavascript("./Services/JavaScript/js/Basic.js");
-        
+
         if ($this->testOBJ->isDynamicTest()) {
             $this->tpl->setOnScreenMessage('info', $this->lng->txt("ctm_cannot_be_changed"));
             return;
@@ -181,15 +156,15 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
         $this->tpl->setContent($this->ctrl->getHTML($confirmation));
     }
 
-    protected function getSettingsTemplateMessageHTML() : string
+    protected function getSettingsTemplateMessageHTML(): string
     {
         if ($this->settingsTemplate) {
             $title = $this->settingsTemplate->getTitle();
-            
+
             if ($this->settingsTemplate->getAutoGenerated()) {
                 $title = $this->lng->txt($title);
             }
-            
+
             global $DIC;
             $tpl = $DIC['tpl'];
 
@@ -220,7 +195,7 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
         $form = $this->buildForm();
 
         // form validation and initialisation
-        
+
         if ($isConfirmedSave) {
             // since confirmation does only pickup POST and no FILES
             // mocking the tile image file upload field is neccessary
@@ -257,7 +232,7 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
             $this->showFormCmd($form);
             return;
         }
-        
+
         // return to form when online is to be set, but no questions are configured
 
         $currentQuestionSetConfig = $this->testQuestionSetConfigFactory->getQuestionSetConfig();
@@ -270,51 +245,51 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
             $this->showFormCmd($form);
             return;
         }
-        
+
         // avoid settings conflict "ctm" and "do not show question titles"
-        
+
         $qstSetSetting = $form->getItemByPostVar('question_set_type');
         $qTitleSetting = $form->getItemByPostVar('title_output');
-        
+
         // avoid settings conflict "obligate questions" and "freeze answer"
-        
+
         $obligationsSetting = $form->getItemByPostVar('obligations_enabled');
         $answerFixationSetting = $form->getItemByPostVar('answer_fixation_handling');
-        
+
         if ($obligationsSetting->getChecked() && $answerFixationSetting->getValue() != self::ANSWER_FIXATION_NONE) {
             $obligationsSetting->setAlert($this->lng->txt('tst_conflicting_setting'));
             $answerFixationSetting->setAlert($this->lng->txt('tst_conflicting_setting'));
-            
+
             $this->tpl->setOnScreenMessage('failure', $this->lng->txt('tst_settings_conflict_message'));
             $this->showFormCmd($form);
             return;
         }
-        
+
         // avoid settings conflict "freeze answer on followup question" and "question postponing"
-        
+
         $postponeSetting = $form->getItemByPostVar('postpone');
         $answerFixationSetting = $form->getItemByPostVar('answer_fixation_handling');
         $conflictModes = array(self::ANSWER_FIXATION_ON_FOLLOWUP_QUESTION, self::ANSWER_FIXATION_ON_IFB_OR_FUQST);
-        
+
         if ($postponeSetting->getValue() && in_array($answerFixationSetting->getValue(), $conflictModes)) {
             $postponeSetting->setAlert($this->lng->txt('tst_conflicting_setting'));
             $answerFixationSetting->setAlert($this->lng->txt('tst_conflicting_setting'));
-            
+
             $this->tpl->setOnScreenMessage('failure', $this->lng->txt('tst_settings_conflict_message'));
             $this->showFormCmd($form);
             return;
         }
-        
+
         // avoid settings conflict "freeze answer on followup question" and "question shuffling"
-        
+
         $shuffleSetting = $form->getItemByPostVar('chb_shuffle_questions');
         $answerFixationSetting = $form->getItemByPostVar('answer_fixation_handling');
         $conflictModes = array(self::ANSWER_FIXATION_ON_FOLLOWUP_QUESTION, self::ANSWER_FIXATION_ON_IFB_OR_FUQST);
-        
+
         if ($shuffleSetting->getChecked() && in_array($answerFixationSetting->getValue(), $conflictModes)) {
             $shuffleSetting->setAlert($this->lng->txt('tst_conflicting_setting'));
             $answerFixationSetting->setAlert($this->lng->txt('tst_conflicting_setting'));
-            
+
             $this->tpl->setOnScreenMessage('failure', $this->lng->txt('tst_settings_conflict_message'));
             $this->showFormCmd($form);
             return;
@@ -377,7 +352,26 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
         if ($newQuestionSetType != ilObjTest::QUESTION_SET_TYPE_FIXED) {
             $form->getItemByPostVar('chb_use_previous_answers')->setChecked(false);
         }
-        
+
+        $ending_time = $form->getItemByPostVar('ending_time')->getDate();
+        $starting_time = $form->getItemByPostVar('starting_time')->getDate();
+        if (
+            $ending_time instanceof ilDateTime &&
+            (
+                (
+                    $starting_time instanceof ilDateTime &&
+                    (int) $ending_time->getUnixTime() < (int) $this->testOBJ->getStartingTime()
+                )
+                ||
+                (int) $ending_time->getUnixTime() < (int) $this->testOBJ->getStartingTime()
+            )
+        ) {
+            $this->tpl->setOnScreenMessage('failure', $this->lng->txt("tst_ending_time_before_starting_time"), true);
+            $starting_time = $form->getItemByPostVar('starting_time')->setDate(new ilDateTime($this->testOBJ->getStartingTime(), IL_CAL_UNIX));
+            $this->showFormCmd($form);
+            return;
+        }
+
         // perform saving the form data
 
         $this->performSaveForm($form);
@@ -433,7 +427,7 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
         $this->ctrl->redirect($this, self::CMD_SHOW_FORM);
     }
 
-    private function isSkillServiceSettingToBeAdjusted(ilPropertyFormGUI $form) : bool
+    private function isSkillServiceSettingToBeAdjusted(ilPropertyFormGUI $form): bool
     {
         if (!($form->getItemByPostVar('skill_service') instanceof ilFormPropertyGUI)) {
             return false;
@@ -450,7 +444,7 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
         return true;
     }
 
-    private function isCharSelectorPropertyRequired() : bool
+    private function isCharSelectorPropertyRequired(): bool
     {
         global $DIC;
         $ilSetting = $DIC['ilSetting'];
@@ -459,7 +453,7 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
     }
 
 
-    private function buildForm() : ilPropertyFormGUI
+    private function buildForm(): ilPropertyFormGUI
     {
         require_once 'Services/Form/classes/class.ilPropertyFormGUI.php';
         $form = new ilPropertyFormGUI();
@@ -482,27 +476,27 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
         include_once 'Modules/Test/classes/class.ilECSTestSettings.php';
         $ecs = new ilECSTestSettings($this->testOBJ);
         $ecs->addSettingsToForm($form, 'tst');
-        
+
         // additional features
-        
+
         $orgunitServiceActive = ilOrgUnitGlobalSettings::getInstance()->getObjectPositionSettingsByType(
             $this->testOBJ->getType()
         )->isActive();
 
         $skillServiceActive = ilObjTest::isSkillManagementGloballyActivated();
-        
-        
+
+
         if ($orgunitServiceActive || $skillServiceActive) {
             $otherHead = new ilFormSectionHeaderGUI();
             $otherHead->setTitle($this->lng->txt('obj_features'));
             $form->addItem($otherHead);
         }
-        
+
         require_once 'Services/Object/classes/class.ilObjectServiceSettingsGUI.php';
         ilObjectServiceSettingsGUI::initServiceSettingsForm($this->testOBJ->getId(), $form, array(
                 ilObjectServiceSettingsGUI::ORGU_POSITION_ACCESS
         ));
-        
+
         // skill service activation for FIXED tests only
         if ($skillServiceActive) {
             $skillService = new ilCheckboxInputGUI($this->lng->txt('tst_activate_skill_service'), 'skill_service');
@@ -538,7 +532,7 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
                 $this->testOBJ->setSkillServiceEnabled($form->getItemByPostVar('skill_service')->getChecked());
             }
         }
-        
+
         require_once 'Services/Object/classes/class.ilObjectServiceSettingsGUI.php';
         ilObjectServiceSettingsGUI::updateServiceSettingsForm($this->testOBJ->getId(), $form, array(
             ilObjectServiceSettingsGUI::ORGU_POSITION_ACCESS
@@ -593,7 +587,7 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
             }
         }
         $form->addItem($desc);
-        
+
         $question_set_type = new ilRadioGroupInputGUI($this->lng->txt('test_question_set_type'), 'question_set_type');
 
         $fixed = new ilRadioOption($this->lng->txt('test_question_set_type_fixed'), ilObjTest::QUESTION_SET_TYPE_FIXED);
@@ -627,15 +621,15 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
     {
         $md_obj = new ilMD($this->testOBJ->getId(), 0, "tst");
         $md_section = $md_obj->getGeneral();
-        
+
         if ($md_section === null) {
             $md_section = $md_obj->addGeneral();
             $md_section->save();
         }
-        
+
         $md_section->setTitle(ilUtil::stripSlashes($form->getItemByPostVar('title')->getValue()));
         $md_section->update();
-        
+
         $md_desc_ids = $md_section->getDescriptionIds();
         if ($md_desc_ids) {
             $md_desc = $md_section->getDescription(array_pop($md_desc_ids));
@@ -646,7 +640,7 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
             $md_desc->setDescription(ilUtil::stripSlashes($form->getItemByPostVar('description')->getValue()));
             $md_desc->save();
         }
-        
+
         $this->testOBJ->setTitle(ilUtil::stripSlashes($form->getItemByPostVar('title')->getValue()));
         $this->testOBJ->setDescription(ilUtil::stripSlashes($form->getItemByPostVar('description')->getValue()));
         $this->testOBJ->setOfflineStatus(!$form->getItemByPostVar('online')->getChecked());
@@ -737,28 +731,28 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
             $this->testOBJ->setActivationLimited(false);
         }
     }
-    
+
     /**
      * @param ilPropertyFormGUI $form
      */
     protected function addPresentationProperties(ilPropertyFormGUI $form)
     {
         global $DIC; /* @var ILIAS\DI\Container $DIC */
-        
+
         $section = new ilFormSectionHeaderGUI();
         $section->setTitle($this->lng->txt('tst_presentation_settings_section'));
         $form->addItem($section);
-        
+
         $DIC->object()->commonSettings()->legacyForm($form, $this->testOBJ)->addTileImage();
     }
-    
+
     /**
      * @param ilPropertyFormGUI $form
      */
     protected function savePresentationProperties(ilPropertyFormGUI $form)
     {
         global $DIC; /* @var ILIAS\DI\Container $DIC */
-        
+
         $DIC->object()->commonSettings()->legacyForm($form, $this->testOBJ)->saveTileImage();
     }
 
@@ -819,25 +813,37 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
     /**
      * @param ilPropertyFormGUI $form
      */
-    private function addTestAccessProperties(ilPropertyFormGUI $form) : ilFormSectionHeaderGUI
+    private function addTestAccessProperties(ilPropertyFormGUI $form): ilFormSectionHeaderGUI
     {
         $header = new ilFormSectionHeaderGUI();
         $header->setTitle($this->lng->txt("tst_settings_header_execution"));
         $form->addItem($header);
 
-        $opening_period = new ilDateDurationInputGUI($this->lng->txt("tst_opening_period"), "opening_period");
-        $opening_period->setShowTime(true);
-        $opening_period->setStart(new ilDateTime($this->testOBJ->getStartingTime(), IL_CAL_UNIX));
-        $opening_period->setEnd(new ilDateTime($this->testOBJ->getEndingTime(), IL_CAL_UNIX));
-        $opening_period->setStartText($this->lng->txt('tst_starting_time'));
-        $opening_period->setEndText($this->lng->txt('tst_ending_time'));
-        $opening_period->setInfo($this->lng->txt('tst_opening_period_desc'));
-        $opening_period->setAllowOpenIntervals(true);
+        // starting time
+        $startingtime = new ilDateTimeInputGUI($this->lng->txt("tst_starting_time"), 'starting_time');
+        $startingtime->setInfo($this->lng->txt("tst_starting_time_desc"));
+        $startingtime->setShowTime(true);
+        if ((int) $this->testOBJ->getStartingTime() !== 0) {
+            $startingtime->setDate(new ilDateTime($this->testOBJ->getStartingTime(), IL_CAL_UNIX));
+        } else {
+            $startingtime->setDate(null);
+        }
+        $form->addItem($startingtime);
         if ($this->testOBJ->participantDataExist()) {
-            $opening_period->setDisabled(true);
+            $startingtime->setDisabled(true);
         }
 
-        $form->addItem($opening_period);
+        // ending time
+        $endingtime = new ilDateTimeInputGUI($this->lng->txt("tst_ending_time"), 'ending_time');
+        $endingtime->setInfo($this->lng->txt("tst_ending_time_desc"));
+        $endingtime->setShowTime(true);
+        if ((int) $this->testOBJ->getEndingTime() !== 0) {
+            $endingtime->setDate(new ilDateTime($this->testOBJ->getEndingTime(), IL_CAL_UNIX));
+        } else {
+            $endingtime->setDate(null);
+        }
+        $form->addItem($endingtime);
+
 
         // test password
         $pwEnabled = new ilCheckboxInputGUI($this->lng->txt('tst_password'), 'password_enabled');
@@ -894,21 +900,25 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
     private function saveTestAccessProperties(ilPropertyFormGUI $form)
     {
         if (!$this->testOBJ->participantDataExist()) {
-            $opening_period = $form->getItemByPostVar('opening_period');
-            if ($opening_period && $opening_period->getStart()) {
-                $this->testOBJ->setStartingTime($opening_period->getStart()->get(IL_CAL_UNIX));
+            // starting time
+            $starting_time = $form->getItemByPostVar('starting_time')->getDate();
+            if ($starting_time instanceof ilDateTime) {
+                $this->testOBJ->setStartingTime($starting_time->getUnixtime());
                 $this->testOBJ->setStartingTimeEnabled(true);
             } else {
                 $this->testOBJ->setStartingTime(null);
                 $this->testOBJ->setStartingTimeEnabled(false);
             }
-            if ($opening_period && $opening_period->getEnd()) {
-                $this->testOBJ->setEndingTime($opening_period->getEnd()->get(IL_CAL_UNIX));
-                $this->testOBJ->setEndingTimeEnabled(true);
-            } else {
-                $this->testOBJ->setEndingTime(null);
-                $this->testOBJ->setEndingTimeEnabled(false);
-            }
+        }
+
+        // ending time
+        $ending_time = $form->getItemByPostVar('ending_time')->getDate();
+        if ($ending_time instanceof ilDateTime) {
+            $this->testOBJ->setEndingTime($ending_time->getUnixtime());
+            $this->testOBJ->setEndingTimeEnabled(true);
+        } else {
+            $this->testOBJ->setEndingTime(null);
+            $this->testOBJ->setEndingTimeEnabled(false);
         }
 
         if ($this->formPropertyExists($form, 'password_enabled')) {
@@ -980,12 +990,12 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
 
         // pass_waiting
         $duration = new ilDurationInputGUI($this->lng->txt("tst_pass_waiting_time"), "pass_waiting");
-        
+
         $duration->setShowMonths(true);
         $duration->setShowDays(true);
         $duration->setShowHours(true);
         $duration->setShowMinutes(true);
-        
+
         $pw_time_array = explode(':', $this->testOBJ->getPassWaiting());
         $duration->setMonths($pw_time_array[0]);
         $duration->setDays($pw_time_array[1]);
@@ -993,9 +1003,9 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
         $duration->setMinutes($pw_time_array[3]);
         $duration->setRequired(false);
         $pass_waiting_enabled->addSubItem($duration);
-        
+
         $form->addItem($pass_waiting_enabled);
-        
+
         // enable max. processing time
         $processing = new ilCheckboxInputGUI($this->lng->txt("tst_processing_time"), "chb_processing_time");
         $processing->setInfo($this->lng->txt("tst_processing_time_desc"));
@@ -1031,7 +1041,7 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
             $processing->setDisabled(true);
             $processingtime->setDisabled(true);
             $resetprocessing->setDisabled(true);
-            
+
             $duration->setDisabled(true);
             $pass_waiting_enabled->setDisabled(true);
         }
@@ -1089,7 +1099,7 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
             if ($form->getItemByPostVar('pass_waiting_enabled') instanceof ilFormPropertyGUI) {
                 if ($form->getItemByPostVar('pass_waiting_enabled')->getChecked()) {
                     $pass_waiting_values = $form->getItemByPostVar('pass_waiting');
-                    
+
                     $pass_waiting_duration[] = sprintf("%'.02d", $pass_waiting_values->getMonths());
                     $pass_waiting_duration[] = sprintf("%'.03d", $pass_waiting_values->getDays());
                     $pass_waiting_duration[] = sprintf("%'.02d", $pass_waiting_values->getHours());
@@ -1102,7 +1112,7 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
                     $this->testOBJ->setPassWaiting("00:000:00:00:00");
                 }
             }
-            
+
             $this->testOBJ->setEnableProcessingTime($form->getItemByPostVar('chb_processing_time')->getChecked());
             if ($this->testOBJ->getEnableProcessingTime()) {
                 $this->testOBJ->setProcessingTimeByMinutes($form->getItemByPostVar('processing_time')->getValue());
@@ -1229,7 +1239,7 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
         $instant_feedback_trigger->addOption($ifbTriggerOpt);
         $instant_feedback_trigger->setValue((string) $this->testOBJ->isForceInstantFeedbackEnabled());
         $instant_feedback_enabled->addSubItem($instant_feedback_trigger);
-        
+
         $answerFixation = new ilRadioGroupInputGUI(
             $this->lng->txt('tst_answer_fixation_handling'),
             'answer_fixation_handling'
@@ -1260,7 +1270,7 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
         $answerFixation->addOption($radioOption);
         $answerFixation->setValue($this->getAnswerFixationSettingsAsFormValue());
         $form->addItem($answerFixation);
-        
+
         // enable obligations
         $checkBoxEnableObligations = new ilCheckboxInputGUI($this->lng->txt('tst_setting_enable_obligations_label'), 'obligations_enabled');
         $checkBoxEnableObligations->setChecked($this->testOBJ->areObligationsEnabled());
@@ -1276,7 +1286,7 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
             $char_selector->addFormProperties($form);
             $char_selector->setFormValues($form);
         }
-        
+
         if ($this->testOBJ->participantDataExist()) {
             $checkBoxOfferHints->setDisabled(true);
             $instant_feedback_enabled->setDisabled(true);
@@ -1304,7 +1314,7 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
         if ($form->getItemByPostVar('chb_shuffle_questions') instanceof ilFormPropertyGUI) {
             $this->testOBJ->setShuffleQuestions($form->getItemByPostVar('chb_shuffle_questions')->getChecked());
         }
-        
+
         if (!$this->testOBJ->participantDataExist() && $this->formPropertyExists($form, 'offer_hints')) {
             $this->testOBJ->setOfferingQuestionHintsEnabled($form->getItemByPostVar('offer_hints')->getChecked());
         }
@@ -1572,7 +1582,7 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
             $this->testOBJ->setMailNotificationType(false);
         }
     }
-    
+
     protected function setAnswerFixationSettingsByFormValue($formValue)
     {
         switch ($formValue) {
@@ -1594,21 +1604,21 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
                 break;
         }
     }
-    
-    protected function getAnswerFixationSettingsAsFormValue() : string
+
+    protected function getAnswerFixationSettingsAsFormValue(): string
     {
         if ($this->testOBJ->isInstantFeedbackAnswerFixationEnabled() && $this->testOBJ->isFollowupQuestionAnswerFixationEnabled()) {
             return self::ANSWER_FIXATION_ON_IFB_OR_FUQST;
         }
-        
+
         if ($this->testOBJ->isFollowupQuestionAnswerFixationEnabled()) {
             return self::ANSWER_FIXATION_ON_FOLLOWUP_QUESTION;
         }
-        
+
         if ($this->testOBJ->isInstantFeedbackAnswerFixationEnabled()) {
             return self::ANSWER_FIXATION_ON_INSTANT_FEEDBACK;
         }
-        
+
         return self::ANSWER_FIXATION_NONE;
     }
 }

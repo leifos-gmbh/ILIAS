@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -29,14 +31,24 @@ class UploadLimitResolver
         $this->default_upload_size_limit = $default_upload_size_limit;
     }
 
-    public function checkUploadLimit(int $size_in_bytes) : void
+    public function min(int $size_in_bytes): int
+    {
+        return min($this->default_upload_size_limit, $size_in_bytes);
+    }
+
+    public function max(int $size_in_bytes): int
+    {
+        return max($this->default_upload_size_limit, $size_in_bytes);
+    }
+
+    public function checkUploadLimit(int $size_in_bytes): void
     {
         if ($size_in_bytes > $this->default_upload_size_limit) {
             throw new \InvalidArgumentException("File size exceeds $this->default_upload_size_limit bytest.");
         }
     }
 
-    public function getUploadLimit() : int
+    public function getUploadLimit(): int
     {
         return $this->default_upload_size_limit;
     }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -40,13 +42,13 @@ class ilWebResourceImporter extends ilXmlImporter
         string $a_id,
         string $a_xml,
         ilImportMapping $a_mapping
-    ) : void {
+    ): void {
         if ($new_id = $a_mapping->getMapping(
             'Services/Container',
             'objs',
             $a_id
         )) {
-            $this->link = ilObjectFactory::getInstanceByObjId($new_id, false);
+            $this->link = ilObjectFactory::getInstanceByObjId((int) $new_id, false);
             if (!$this->link instanceof ilObjLinkResource) {
                 throw new ilObjectNotFoundException(
                     'Invalid id given ' . $a_id

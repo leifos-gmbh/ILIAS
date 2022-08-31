@@ -1,18 +1,23 @@
-<?php declare(strict_types=1);
+<?php
 
-/******************************************************************************
+declare(strict_types=1);
+
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
+
 /**
  * Class ilCmiXapiLaunchGUI
  *
@@ -24,10 +29,10 @@
  */
 class ilCmiXapiLaunchGUI
 {
-    const XAPI_PROXY_ENDPOINT = 'Modules/CmiXapi/xapiproxy.php';
-    
+    public const XAPI_PROXY_ENDPOINT = 'Modules/CmiXapi/xapiproxy.php';
+
     protected ilObjCmiXapi $object;
-    
+
     protected ilCmiXapiUser $cmixUser;
 
     protected bool $plugin = false;
@@ -35,21 +40,21 @@ class ilCmiXapiLaunchGUI
     private ilObjUser $user;
 
     private ilCtrlInterface $ctrl;
-    
+
     public function __construct(ilObjCmiXapi $object)
     {
         $this->object = $object;
     }
-    
-    public function executeCommand() : void
+
+    public function executeCommand(): void
     {
         global $DIC;
         $this->user = $DIC->user();
         $this->ctrl = $DIC->ctrl();
         $this->launchCmd();
     }
-    
-    protected function launchCmd() : void
+
+    protected function launchCmd(): void
     {
         $this->initCmixUser();
         $token = $this->getValidToken();
@@ -60,8 +65,8 @@ class ilCmiXapiLaunchGUI
         $launchLink = $this->buildLaunchLink($token);
         $this->ctrl->redirectToURL($launchLink);
     }
-    
-    protected function buildLaunchLink(string $token) : string
+
+    protected function buildLaunchLink(string $token): string
     {
         $launchLink = "";
 
@@ -80,27 +85,27 @@ class ilCmiXapiLaunchGUI
                 $launchLink .= DIRECTORY_SEPARATOR . $this->object->getLaunchUrl();
             }
         }
-        
+
         foreach ($this->getLaunchParameters($token) as $paramName => $paramValue) {
             $launchLink = ilUtil::appendUrlParameterString($launchLink, "{$paramName}={$paramValue}");
         }
-        
+
         return $launchLink;
     }
 
     /**
      * @return array<string, mixed>
      */
-    protected function getLaunchParameters(string $token) : array
+    protected function getLaunchParameters(string $token): array
     {
         $params = [];
-        
+
         if ($this->object->isBypassProxyEnabled()) {
             $params['endpoint'] = urlencode(rtrim($this->object->getLrsType()->getLrsEndpoint(), '/') . '/');
         } else {
             $params['endpoint'] = urlencode(rtrim(ILIAS_HTTP_PATH . '/' . self::XAPI_PROXY_ENDPOINT, '/') . '/');
         }
-        
+
         if ($this->object->isAuthFetchUrlEnabled()) {
             $params['fetch'] = urlencode($this->getAuthTokenFetchLink());
         } else {
@@ -112,7 +117,7 @@ class ilCmiXapiLaunchGUI
                 ));
             }
         }
-        
+
         $params['activity_id'] = urlencode($this->object->getActivityId());
         $params['activityId'] = urlencode($this->object->getActivityId());
         $params['actor'] = urlencode(json_encode($this->object->getStatementActor($this->cmixUser)));
@@ -132,21 +137,21 @@ class ilCmiXapiLaunchGUI
     /**
      * @throws ilCmiXapiException
      */
-    protected function getAuthTokenFetchLink() : string
+    protected function getAuthTokenFetchLink(): string
     {
         $link = implode('/', [
             ILIAS_HTTP_PATH, 'Modules', 'CmiXapi', 'xapitoken.php'
         ]);
-        
+
         $param = $this->buildAuthTokenFetchParam();
-        
+
         return iLUtil::appendUrlParameterString($link, "param={$param}");
     }
 
     /**
      * @throws ilCmiXapiException
      */
-    protected function buildAuthTokenFetchParam() : string
+    protected function buildAuthTokenFetchParam(): string
     {
         $params = [
             session_name() => session_id(),
@@ -154,7 +159,7 @@ class ilCmiXapiLaunchGUI
             'ref_id' => $this->object->getRefId(),
             'ilClientId' => CLIENT_ID
         ];
-        
+
         $encryptionKey = ilCmiXapiAuthToken::getWacSalt();
         return urlencode(base64_encode(openssl_encrypt(
             json_encode($params),
@@ -165,7 +170,7 @@ class ilCmiXapiLaunchGUI
         )));
     }
 
-    protected function getValidToken() : string
+    protected function getValidToken(): string
     {
         $token = ilCmiXapiAuthToken::fillToken(
             $this->user->getId(),
@@ -176,7 +181,7 @@ class ilCmiXapiLaunchGUI
         return $token;
     }
 
-    protected function initCmixUser() : void
+    protected function initCmixUser(): void
     {
         $this->cmixUser = new ilCmiXapiUser($this->object->getId(), $this->user->getId(), $this->object->getPrivacyIdent());
         $user_ident = $this->cmixUser->getUsrIdent();
@@ -195,7 +200,7 @@ class ilCmiXapiLaunchGUI
     /**
      * @return array<string, string>
      */
-    protected function getCmi5LearnerPreferences() : array
+    protected function getCmi5LearnerPreferences(): array
     {
         $language = $this->user->getLanguage();
         $audio = "on";
@@ -213,7 +218,7 @@ class ilCmiXapiLaunchGUI
      * @throws ilCmiXapiException
      * @throws ilDateTimeException
      */
-    protected function CMI5preLaunch(string $token) : array
+    protected function CMI5preLaunch(string $token): array
     {
         $duration = '';
         $lrsType = $this->object->getLrsType();
@@ -227,22 +232,22 @@ class ilCmiXapiLaunchGUI
             'Content-Type' => 'application/json;charset=utf-8',
             'Cache-Control' => 'no-cache, no-store, must-revalidate'
         ];
-        
+
         $registration = $this->cmixUser->getRegistration();
         // for old CMI5 Content after switch commit but before cmi5 bugfix
         if ($registration == '') {
             $registration = ilCmiXapiUser::generateRegistration($this->object, $this->user);
         }
-        
+
         $activityId = $this->object->getActivityId();
-        
+
         // profile
         $profileParams = [];
         $defaultAgentProfileUrl = $defaultLrs . "/agents/profile";
         $profileParams['agent'] = json_encode($this->object->getStatementActor($this->cmixUser));
         $profileParams['profileId'] = 'cmi5LearnerPreferences';
         $defaultProfileUrl = $defaultAgentProfileUrl . '?' . ilCmiXapiAbstractRequest::buildQuery($profileParams);
-        
+
         // launchData
         $launchDataParams = [];
         $defaultStateUrl = $defaultLrs . "/activities/state";
@@ -300,14 +305,14 @@ class ilCmiXapiLaunchGUI
         $tokenObject->setCmi5SessionData(json_encode($sessionData));
         $tokenObject->update();
         $defaultStatementsUrl = $defaultLrs . "/statements";
-        
+
         // launchedStatement
         $launchData = json_encode($this->object->getLaunchData($this->cmixUser, $lang));
         $launchedStatement = $this->object->getLaunchedStatement($this->cmixUser);
         $launchedStatementParams = [];
         $launchedStatementParams['statementId'] = $launchedStatement['id'];
         $defaultLaunchedStatementUrl = $defaultStatementsUrl . '?' . ilCmiXapiAbstractRequest::buildQuery($launchedStatementParams);
-        
+
         // abandonedStatement
         if ($abandoned) {
             $abandonedStatement = $this->object->getAbandonedStatement($oldSession, $duration, $this->cmixUser);
@@ -387,7 +392,7 @@ class ilCmiXapiLaunchGUI
     /**
      * @return ilLogger
      */
-    private function log() : ilLogger
+    private function log(): ilLogger
     {
         if ($this->plugin) {
             global $log;

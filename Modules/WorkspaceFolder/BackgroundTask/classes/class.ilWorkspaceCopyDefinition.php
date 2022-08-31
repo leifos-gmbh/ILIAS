@@ -18,6 +18,7 @@
 
 use ILIAS\BackgroundTasks\Implementation\Values\AbstractValue;
 use ILIAS\BackgroundTasks\Value;
+use ILIAS\BackgroundTasks\Implementation\Values\ScalarValues\BooleanValue;
 
 /**
  * Copy definition for workspace folders
@@ -37,9 +38,9 @@ class ilWorkspaceCopyDefinition extends AbstractValue
     private array $object_wsp_ids = [];
     private int $num_files = 0;
     private int $sum_file_sizes = 0;
-    private bool $adheres_to_limit = false;
+    private ?BooleanValue $adheres_to_limit = null;
 
-    public function getCopyDefinitions() : array
+    public function getCopyDefinitions(): array
     {
         return $this->copy_definitions;
     }
@@ -48,12 +49,12 @@ class ilWorkspaceCopyDefinition extends AbstractValue
      * Set copy definitions
      * @param string[] $a_definitions
      */
-    public function setCopyDefinitions(array $a_definitions) : void
+    public function setCopyDefinitions(array $a_definitions): void
     {
         $this->copy_definitions = $a_definitions;
     }
 
-    public function getTempDir() : string
+    public function getTempDir(): string
     {
         return $this->temp_dir;
     }
@@ -61,7 +62,7 @@ class ilWorkspaceCopyDefinition extends AbstractValue
     /**
      * Set directory name located in /temp/ directory.
      */
-    public function setTempDir(string $temp_dir) : void
+    public function setTempDir(string $temp_dir): void
     {
         $this->temp_dir = $temp_dir;
     }
@@ -69,7 +70,7 @@ class ilWorkspaceCopyDefinition extends AbstractValue
     /**
      * @return string[]
      */
-    public function getObjectWspIds() : array
+    public function getObjectWspIds(): array
     {
         return $this->object_wsp_ids;
     }
@@ -77,7 +78,7 @@ class ilWorkspaceCopyDefinition extends AbstractValue
     public function setObjectWspIds(
         array $object_wps_ids,
         bool $append = false
-    ) : void {
+    ): void {
         if ($append) {
             $this->object_wsp_ids = array_merge($this->object_wsp_ids, $object_wps_ids);
         } else {
@@ -85,37 +86,37 @@ class ilWorkspaceCopyDefinition extends AbstractValue
         }
     }
 
-    public function getNumFiles() : int
+    public function getNumFiles(): int
     {
         return $this->num_files;
     }
 
-    public function setNumFiles(int $num_files) : void
+    public function setNumFiles(int $num_files): void
     {
         $this->num_files = $num_files;
     }
 
-    public function getSumFileSizes() : int
+    public function getSumFileSizes(): int
     {
         return $this->sum_file_sizes;
     }
 
-    public function setSumFileSizes(int $sum_file_sizes) : void
+    public function setSumFileSizes(int $sum_file_sizes): void
     {
         $this->sum_file_sizes = $sum_file_sizes;
     }
 
-    public function getAdheresToLimit() : bool
+    public function getAdheresToLimit(): BooleanValue
     {
         return $this->adheres_to_limit;
     }
 
-    public function setAdheresToLimit(bool $adheres_to_limit) : void
+    public function setAdheresToLimit(BooleanValue $adheres_to_limit): void
     {
         $this->adheres_to_limit = $adheres_to_limit;
     }
 
-    public function addCopyDefinition(string $a_source, string $a_target) : void
+    public function addCopyDefinition(string $a_source, string $a_target): void
     {
         $this->copy_definitions[] =
             [
@@ -124,17 +125,17 @@ class ilWorkspaceCopyDefinition extends AbstractValue
             ];
     }
 
-    public function equals(Value $other) : bool
+    public function equals(Value $other): bool
     {
         return strcmp($this->getHash(), $other->getHash());
     }
 
-    public function getHash() : string
+    public function getHash(): string
     {
         return md5($this->serialize());
     }
 
-    public function serialize() : string
+    public function serialize(): string
     {
         return serialize(
             [
@@ -152,7 +153,7 @@ class ilWorkspaceCopyDefinition extends AbstractValue
      * Set value
      * @param $value
      */
-    public function setValue($value) : void
+    public function setValue($value): void
     {
         $this->copy_definitions = $value;
     }

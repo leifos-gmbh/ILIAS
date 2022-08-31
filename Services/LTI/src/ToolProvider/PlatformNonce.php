@@ -1,20 +1,23 @@
 <?php
 
-namespace ILIAS\LTI\ToolProvider;
-
-/******************************************************************************
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
+
+namespace ILIAS\LTI\ToolProvider;
+
 /**
  * Class to represent a platform nonce
  *
@@ -24,11 +27,10 @@ namespace ILIAS\LTI\ToolProvider;
  */
 class PlatformNonce
 {
-
     /**
      * Maximum age nonce values will be retained for (in minutes).
      */
-    const MAX_NONCE_AGE = 30;  // in minutes
+    public const MAX_NONCE_AGE = 30;  // in minutes
 
     /**
      * Maximum length which can be stored.
@@ -77,7 +79,7 @@ class PlatformNonce
      *
      * @return bool    True if the nonce value was successfully loaded
      */
-    public function load() : bool
+    public function load(): bool
     {
         return $this->platform->getDataConnector()->loadPlatformNonce($this);
     }
@@ -87,7 +89,7 @@ class PlatformNonce
      *
      * @return bool    True if the nonce value was successfully saved
      */
-    public function save() : bool
+    public function save(): bool
     {
         return $this->platform->getDataConnector()->savePlatformNonce($this);
     }
@@ -97,7 +99,7 @@ class PlatformNonce
      *
      * @return bool    True if the nonce value was successfully deleted
      */
-    public function delete() : bool
+    public function delete(): bool
     {
         return $this->platform->getDataConnector()->deletePlatformNonce($this);
     }
@@ -107,7 +109,7 @@ class PlatformNonce
      *
      * @return Platform  Platform for this nonce
      */
-    public function getPlatform() : ?Platform
+    public function getPlatform(): ?Platform
     {
         return $this->platform;
     }
@@ -117,7 +119,7 @@ class PlatformNonce
      *
      * @return string Outcome value
      */
-    public function getValue() : ?string
+    public function getValue(): ?string
     {
         return $this->value;
     }

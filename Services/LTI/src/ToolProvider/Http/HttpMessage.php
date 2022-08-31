@@ -1,22 +1,24 @@
 <?php
 
-namespace ILIAS\LTI\ToolProvider\Http;
-
-use ILIAS\LTI\ToolProvider\Util;
-
-/******************************************************************************
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
+
+namespace ILIAS\LTI\ToolProvider\Http;
+
+use ILIAS\LTI\ToolProvider\Util;
 
 /**
  * Class to represent an HTTP message request
@@ -27,7 +29,6 @@ use ILIAS\LTI\ToolProvider\Util;
  */
 class HttpMessage
 {
-
     /**
      * True if message was processed successfully.
      *
@@ -106,7 +107,7 @@ class HttpMessage
      *
      * @var ClientInterface $httpClient
      */
-    private static ClientInterface $httpClient;
+    private static ?ClientInterface $httpClient = null; //changed ...= null
 
     /**
      * Class constructor.
@@ -134,7 +135,7 @@ class HttpMessage
      *
      * @return string|null Request URL  //UK: Changed from string to string|null
      */
-    public function getUrl() : ?string
+    public function getUrl(): ?string
     {
         return $this->url;
     }
@@ -144,7 +145,7 @@ class HttpMessage
      *
      * @return string|null Message method  //UK: Changed from string to string|null
      */
-    public function getMethod() : ?string
+    public function getMethod(): ?string
     {
         return $this->method;
     }
@@ -186,7 +187,7 @@ class HttpMessage
      *
      * @return bool    True if the request was successful
      */
-    public function send() : bool
+    public function send(): bool
     {
         $client = self::getHttpClient();
         $this->relativeLinks = array();
@@ -237,7 +238,7 @@ class HttpMessage
      * @param string $rel
      * @return bool  True if it exists
      */
-    public function hasRelativeLink(string $rel) : bool
+    public function hasRelativeLink(string $rel): bool
     {
         return array_key_exists($rel, $this->relativeLinks);
     }
@@ -247,7 +248,7 @@ class HttpMessage
      * @param string $rel
      * @return string|null  The URL associated with the relative link, null if it is not defined
      */
-    public function getRelativeLink(string $rel) : ?string
+    public function getRelativeLink(string $rel): ?string
     {
         $url = null;
         if ($this->hasRelativeLink($rel)) {
@@ -262,7 +263,7 @@ class HttpMessage
      *
      * @return array  Associative array of relative links
      */
-    public function getRelativeLinks() : array
+    public function getRelativeLinks(): array
     {
         return $this->relativeLinks;
     }

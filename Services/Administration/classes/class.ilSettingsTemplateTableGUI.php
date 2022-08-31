@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -76,15 +78,15 @@ class ilSettingsTemplateTableGUI extends ilTable2GUI
         }
     }
 
-    protected function fillRow(array $a_set) : void
+    protected function fillRow(array $a_set): void
     {
         $lng = $this->lng;
         $ilCtrl = $this->ctrl;
 
         $ilCtrl->setParameter($this->parent_obj, "templ_id", $a_set["id"]);
         $this->tpl->setVariable("VAL_ID", $a_set["id"]);
-        $this->tpl->setVariable("VAL_TITLE", ilSettingsTemplate::translate($a_set["title"]));
-        $this->tpl->setVariable("VAL_DESCRIPTION", ilSettingsTemplate::translate($a_set["description"]));
+        $this->tpl->setVariable("VAL_TITLE", ilSettingsTemplate::translate($a_set["title"] ?? ''));
+        $this->tpl->setVariable("VAL_DESCRIPTION", ilSettingsTemplate::translate($a_set["description"] ?? ''));
         if ($this->rbacsystem->checkAccess('write', $this->request->getRefId())) {
             $this->tpl->setVariable("TXT_EDIT", $lng->txt("edit"));
             $this->tpl->setVariable(

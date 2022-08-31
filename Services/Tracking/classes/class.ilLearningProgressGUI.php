@@ -1,4 +1,6 @@
-<?php declare(strict_types=0);
+<?php
+
+declare(strict_types=0);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -125,7 +127,7 @@ class ilLearningProgressGUI extends ilLearningProgressBaseGUI
         $this->__buildFooter();
     }
 
-    public function __setCmdClass(string $a_class) : void
+    public function __setCmdClass(string $a_class): void
     {
         // If cmd class == 'illearningprogressgui' the cmd class is set to the the new forwarded class
         // otherwise e.g illplistofprogressgui tries to forward (back) to illearningprogressgui.
@@ -134,7 +136,7 @@ class ilLearningProgressGUI extends ilLearningProgressBaseGUI
         }
     }
 
-    public function __getNextClass() : string
+    public function __getNextClass(): string
     {
         // #9857
         if (!ilObjUserTracking::_enabledLearningProgress()) {
@@ -184,10 +186,10 @@ class ilLearningProgressGUI extends ilLearningProgressBaseGUI
                     return 'illplistofobjectsgui';
                 }
                 if (
-                ilLearningProgressAccess::checkPermission(
-                    'edit_learning_progress',
-                    $this->getRefId()
-                )) {
+                    ilLearningProgressAccess::checkPermission(
+                        'edit_learning_progress',
+                        $this->getRefId()
+                    )) {
                     return 'illplistofsettingsgui';
                 }
                 return 'illplistofprogressgui';
@@ -232,7 +234,7 @@ class ilLearningProgressGUI extends ilLearningProgressBaseGUI
                 // should not happen
                 ilUtil::redirect("ilias.php?baseClass=ilDashboardGUI");
 
-            // no break
+                // no break
             case self::LP_CONTEXT_USER_FOLDER:
             case self::LP_CONTEXT_ORG_UNIT:
                 if (ilObjUserTracking::_enabledUserRelatedData()) {
@@ -246,21 +248,21 @@ class ilLearningProgressGUI extends ilLearningProgressBaseGUI
     /**
      * Show progress screen for "edit manual"
      */
-    protected function editManual() : void
+    protected function editManual(): void
     {
         if (ilLearningProgressAccess::checkAccess($this->getRefId())) {
             $olp = ilObjectLP::getInstance(
                 ilObject::_lookupObjId($this->getRefId())
             );
             if ($olp->getCurrentMode(
-                ) == ilLPObjSettings::LP_MODE_COLLECTION_MANUAL) {
+            ) == ilLPObjSettings::LP_MODE_COLLECTION_MANUAL) {
                 $form = $this->initCollectionManualForm();
                 $this->tpl->setContent($form->getHTML());
             }
         }
     }
 
-    protected function initCollectionManualForm() : ilPropertyFormGUI
+    protected function initCollectionManualForm(): ilPropertyFormGUI
     {
         $form = new ilPropertyFormGUI();
         $form->setFormAction($this->ctrl->getFormAction($this, "updatemanual"));
@@ -298,6 +300,8 @@ class ilLearningProgressGUI extends ilLearningProgressBaseGUI
         );
         $lp_data = $class::_getObjectStatus($this->getObjId(), $this->usr_id);
 
+        $icons = ilLPStatusIcons::getInstance(ilLPStatusIcons::ICON_VARIANT_LONG);
+
         $grp = new ilCheckboxGroupInputGUI($subitem_title, "sids");
         $grp->setInfo($subitem_info);
         $form->addItem($grp);
@@ -326,9 +330,7 @@ class ilLearningProgressGUI extends ilLearningProgressBaseGUI
                 }
             }
 
-            $path = ilLearningProgressBaseGUI::_getImagePathForStatus($status);
-            $text = ilLearningProgressBaseGUI::_getStatusText($status);
-            $icon = ilUtil::img($path, $text);
+            $icon = $icons->renderIconForStatus($status);
 
             $opt = new ilCheckboxOption(
                 $icon . " " . $possible_items[$item_id]["title"],
@@ -349,14 +351,14 @@ class ilLearningProgressGUI extends ilLearningProgressBaseGUI
         return $form;
     }
 
-    protected function updateManual() : void
+    protected function updateManual(): void
     {
         if (ilLearningProgressAccess::checkAccess($this->getRefId())) {
             $olp = ilObjectLP::getInstance(
                 ilObject::_lookupObjId($this->getRefId())
             );
             if ($olp->getCurrentMode(
-                ) == ilLPObjSettings::LP_MODE_COLLECTION_MANUAL) {
+            ) == ilLPObjSettings::LP_MODE_COLLECTION_MANUAL) {
                 $form = $this->initCollectionManualForm();
                 if ($form->checkInput()) {
                     $class = ilLPStatusFactory::_getClassById(
@@ -410,6 +412,8 @@ class ilLearningProgressGUI extends ilLearningProgressBaseGUI
         );
         $info = $class::_getStatusInfo($this->getObjId(), true);
 
+        $icons = ilLPStatusIcons::getInstance(ilLPStatusIcons::ICON_VARIANT_LONG);
+
         foreach ($coll_items as $item_id) {
             // #16599 - deleted items should not be displayed
             if (!array_key_exists($item_id, $possible_items)) {
@@ -430,9 +434,7 @@ class ilLearningProgressGUI extends ilLearningProgressBaseGUI
                 )) {
                 $status = ilLPStatus::LP_STATUS_IN_PROGRESS_NUM;
             }
-            $path = ilLearningProgressBaseGUI::_getImagePathForStatus($status);
-            $text = ilLearningProgressBaseGUI::_getStatusText($status);
-            $field->setHtml(ilUtil::img($path, $text));
+            $field->setHtml($icons->renderIconForStatus($status));
 
             // stats
             $spent = 0;

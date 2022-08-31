@@ -1,18 +1,23 @@
-<?php declare(strict_types=1);
+<?php
 
-/******************************************************************************
+declare(strict_types=1);
+
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
+
 //require_once "Services/MetaData/classes/class.ilMDLanguageItem.php";
 /** @defgroup ModulesScormAicc Modules/ScormAicc
  */
@@ -51,7 +56,7 @@ class ilObjSAHSLearningModule extends ilObject
     private int $open_mode;
     private int $width;
     private int $height;
-    private ?int $mastery_score;
+    private ?int $mastery_score = null;
     private int $id_setting;
     private int $name_setting;
     private string $sub_type;
@@ -70,7 +75,7 @@ class ilObjSAHSLearningModule extends ilObject
     * @param	integer	reference_id or object_id
     * @param	boolean	treat the id as reference_id (true) or object_id (false)
     */
-    public function __construct($a_id = 0, $a_call_by_reference = true)
+    public function __construct(int $a_id = 0, bool $a_call_by_reference = true)
     {
         $this->type = "sahs";
         parent::__construct($a_id, $a_call_by_reference);
@@ -79,7 +84,7 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * create file based lm
      */
-    public function create(bool $upload = false) : int
+    public function create(bool $upload = false): int
     {
         global $DIC;
         $ilDB = $DIC->database();
@@ -108,11 +113,11 @@ class ilObjSAHSLearningModule extends ilObject
      * @throws ilObjectNotFoundException
      * @throws ilObjectTypeMismatchException
      */
-    public function read() : void
+    public function read(): void
     {
         global $DIC;
         $ilDB = $DIC->database();
-        
+
         parent::read();
 
         $lm_set = $ilDB->queryF(
@@ -120,7 +125,7 @@ class ilObjSAHSLearningModule extends ilObject
             array('integer'),
             array($this->getId())
         );
-        
+
         while ($lm_rec = $ilDB->fetchAssoc($lm_set)) {
             $this->setAutoReviewChar($lm_rec["auto_review"]);
             $this->setAPIAdapterName($lm_rec["api_adapter"]);
@@ -168,12 +173,12 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * Get affective localization
      */
-    public static function getAffectiveLocalization(int $a_id) : string
+    public static function getAffectiveLocalization(int $a_id): string
     {
         global $DIC;
         $ilDB = $DIC->database();
         $lng = $DIC->language();
-        
+
         $lm_set = $ilDB->queryF(
             'SELECT localization FROM sahs_lm WHERE id = %s',
             array('integer'),
@@ -190,7 +195,7 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * lookup subtype id (scorm, )
      */
-    public static function _lookupSubType(int $a_obj_id) : string
+    public static function _lookupSubType(int $a_obj_id): string
     {
         global $DIC;
         $ilDB = $DIC->database();
@@ -201,7 +206,7 @@ class ilObjSAHSLearningModule extends ilObject
             array($a_obj_id)
         );
         $obj_rec = $ilDB->fetchAssoc($obj_set);
-        
+
         return $obj_rec["c_type"];
     }
 
@@ -215,7 +220,7 @@ class ilObjSAHSLearningModule extends ilObject
 //        $this->editable = $a_editable;
 //    }
 
-    public function getEditable() : bool
+    public function getEditable(): bool
     {
         return false;
     }
@@ -223,22 +228,22 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * Set default tries for questions
      */
-    public function setTries(int $a_tries) : void
+    public function setTries(int $a_tries): void
     {
         $this->tries = $a_tries;
     }
 
-    public function getTries() : int
+    public function getTries(): int
     {
         return $this->tries;
     }
 
-    public function setLocalization(string $a_val) : void
+    public function setLocalization(string $a_val): void
     {
         $this->localization = $a_val;
     }
 
-    public function getLocalization() : string
+    public function getLocalization(): string
     {
         return $this->localization;
     }
@@ -246,7 +251,7 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * obsolet?
      */
-    public static function _getTries(int $a_id) : int
+    public static function _getTries(int $a_id): int
     {
         global $DIC;
         $ilDB = $DIC->database();
@@ -257,7 +262,7 @@ class ilObjSAHSLearningModule extends ilObject
             array($a_id)
         );
         $lm_rec = $ilDB->fetchAssoc($lm_set);
-            
+
         return (int) $lm_rec['question_tries'];
     }
 
@@ -266,7 +271,7 @@ class ilObjSAHSLearningModule extends ilObject
     *
     * @return integer the disk usage in bytes
     */
-    public function getDiskUsage() : int
+    public function getDiskUsage(): int
     {
         return ilObjSAHSLearningModuleAccess::_lookupDiskUsage($this->id);
     }
@@ -276,7 +281,7 @@ class ilObjSAHSLearningModule extends ilObject
     * creates data directory for package files
     * ("./data/lm_data/lm_<id>")
     */
-    public function createDataDirectory() : void
+    public function createDataDirectory(): void
     {
         $lm_data_dir = ilFileUtils::getWebspaceDir() . "/lm_data";
         ilFileUtils::makeDir($lm_data_dir);
@@ -286,7 +291,7 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * get data directory of lm
      */
-    public function getDataDirectory(?string $mode = "filesystem") : string
+    public function getDataDirectory(?string $mode = "filesystem"): string
     {
         $lm_data_dir = ilFileUtils::getWebspaceDir($mode) . "/lm_data";
         return $lm_data_dir . "/lm_" . $this->getId();
@@ -295,7 +300,7 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * get api adapter name
      */
-    public function getAPIAdapterName() : string
+    public function getAPIAdapterName(): string
     {
         return $this->api_adapter;
     }
@@ -303,7 +308,7 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * set api adapter name
      */
-    public function setAPIAdapterName(string $a_api) : void
+    public function setAPIAdapterName(string $a_api): void
     {
         $this->api_adapter = $a_api;
     }
@@ -312,7 +317,7 @@ class ilObjSAHSLearningModule extends ilObject
      * get api functions prefix
      * @return string
      */
-    public function getAPIFunctionsPrefix() : string
+    public function getAPIFunctionsPrefix(): string
     {
         return $this->api_func_prefix;
     }
@@ -320,7 +325,7 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * set api functions prefix
      */
-    public function setAPIFunctionsPrefix(string $a_prefix) : void
+    public function setAPIFunctionsPrefix(string $a_prefix): void
     {
         $this->api_func_prefix = $a_prefix;
     }
@@ -328,7 +333,7 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * get credit mode
      */
-    public function getCreditMode() : string
+    public function getCreditMode(): string
     {
         return $this->credit_mode;
     }
@@ -336,7 +341,7 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * set credit mode
      */
-    public function setCreditMode(string $a_credit_mode) : void
+    public function setCreditMode(string $a_credit_mode): void
     {
         $this->credit_mode = $a_credit_mode;
     }
@@ -344,7 +349,7 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * set default lesson mode
      */
-    public function setDefaultLessonMode(string $a_lesson_mode) : void
+    public function setDefaultLessonMode(string $a_lesson_mode): void
     {
         $this->lesson_mode = $a_lesson_mode;
     }
@@ -352,7 +357,7 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * get default lesson mode
      */
-    public function getDefaultLessonMode() : string
+    public function getDefaultLessonMode(): string
     {
         global $DIC;
         if ($DIC->user()->getId() == 13) {
@@ -364,7 +369,7 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * get ID of assigned style sheet object
      */
-    public function getStyleSheetId() : int
+    public function getStyleSheetId(): int
     {
         return $this->style_id;
     }
@@ -372,7 +377,7 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * set ID of assigned style sheet object
      */
-    public function setStyleSheetId(int $a_style_id) : void
+    public function setStyleSheetId(int $a_style_id): void
     {
         $this->style_id = $a_style_id;
     }
@@ -380,7 +385,7 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * set auto review as true/false for SCORM 1.2
      */
-    public function setAutoReview(bool $a_auto_review) : void
+    public function setAutoReview(bool $a_auto_review): void
     {
         $this->auto_review = ilUtil::tf2yn($a_auto_review);
     }
@@ -388,7 +393,7 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * get auto review as true/false for SCORM 1.2
      */
-    public function getAutoReview() : bool
+    public function getAutoReview(): bool
     {
         return ilUtil::yn2tf($this->auto_review);
     }
@@ -396,7 +401,7 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * set auto review as Char for SCORM 2004
      */
-    public function setAutoReviewChar(string $a_auto_review) : void
+    public function setAutoReviewChar(string $a_auto_review): void
     {
         $this->auto_review = $a_auto_review;
     }
@@ -404,47 +409,47 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * get auto review as Char for SCORM 2004
      */
-    public function getAutoReviewChar() : string
+    public function getAutoReviewChar(): string
     {
         return $this->auto_review;
     }
 
-    public function getMaxAttempt() : int
+    public function getMaxAttempt(): int
     {
         return $this->max_attempt;
     }
 
-    public function setMaxAttempt(int $a_max_attempt) : void
+    public function setMaxAttempt(int $a_max_attempt): void
     {
         $this->max_attempt = $a_max_attempt;
     }
 
-    public function getModuleVersion() : int
+    public function getModuleVersion(): int
     {
         return $this->module_version;
     }
 
-    public function getAssignedGlossary() : int
+    public function getAssignedGlossary(): int
     {
         return $this->assigned_glossary;
     }
 
-    public function setAssignedGlossary(int $a_assigned_glossary) : void
+    public function setAssignedGlossary(int $a_assigned_glossary): void
     {
         $this->assigned_glossary = $a_assigned_glossary;
     }
 
-    public function setModuleVersion(int $a_module_version) : void
+    public function setModuleVersion(int $a_module_version): void
     {
         $this->module_version = $a_module_version;
     }
 
-    public function getSession() : bool
+    public function getSession(): bool
     {
         return $this->session;
     }
 
-    public function setSession(bool $a_session) : void
+    public function setSession(bool $a_session): void
     {
         $this->session = $a_session;
     }
@@ -452,7 +457,7 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * disable menu
      */
-    public function getNoMenu() : bool
+    public function getNoMenu(): bool
     {
         return $this->no_menu;
     }
@@ -460,7 +465,7 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * disable menu
      */
-    public function setNoMenu(bool $a_no_menu) : void
+    public function setNoMenu(bool $a_no_menu): void
     {
         $this->no_menu = $a_no_menu;
     }
@@ -468,7 +473,7 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * hide navigation tree
      */
-    public function getHideNavig() : bool
+    public function getHideNavig(): bool
     {
         return $this->hide_navig;
     }
@@ -476,7 +481,7 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * disable menu
      */
-    public function setHideNavig(bool $a_hide_navig) : void
+    public function setHideNavig(bool $a_hide_navig): void
     {
         $this->hide_navig = $a_hide_navig;
     }
@@ -484,7 +489,7 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * BrowserCacheDisabled for SCORM 2004 / ENABLE_JS_DEBUG
      */
-    public function getCacheDeactivated() : bool
+    public function getCacheDeactivated(): bool
     {
         global $DIC;
         $ilSetting = $DIC->settings();
@@ -495,7 +500,7 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * sessionDisabled for SCORM 2004
      */
-    public function getSessionDeactivated() : bool
+    public function getSessionDeactivated(): bool
     {
         global $DIC;
         $ilSetting = $DIC->settings();
@@ -506,7 +511,7 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * debugActivated
      */
-    public function getDebugActivated() : bool
+    public function getDebugActivated(): bool
     {
         global $DIC;
         $ilSetting = $DIC->settings();
@@ -517,12 +522,12 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * force Internet Explorer to render again after some Milliseconds - useful for learning Modules with a lot of iframes or frames and IE >=10
      */
-    public function getIe_force_render() : bool
+    public function getIe_force_render(): bool
     {
         return $this->ie_force_render;
     }
 
-    public function setIe_force_render(bool $a_ie_force_render) : void
+    public function setIe_force_render(bool $a_ie_force_render): void
     {
         $this->ie_force_render = $a_ie_force_render;
     }
@@ -530,72 +535,72 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * SCORM 2004 4th edition features
      */
-    public function getFourth_Edition() : bool
+    public function getFourth_Edition(): bool
     {
         return $this->fourth_edition;
     }
 
-    public function setFourth_edition(bool $a_fourth_edition) : void
+    public function setFourth_edition(bool $a_fourth_edition): void
     {
         $this->fourth_edition = $a_fourth_edition;
     }
 
-    public function getSequencing() : bool
+    public function getSequencing(): bool
     {
         return $this->sequencing;
     }
 
-    public function setSequencing(bool $a_sequencing) : void
+    public function setSequencing(bool $a_sequencing): void
     {
         $this->sequencing = $a_sequencing;
     }
 
-    public function getInteractions() : bool
+    public function getInteractions(): bool
     {
         return $this->interactions;
     }
 
-    public function setInteractions(bool $a_interactions) : void
+    public function setInteractions(bool $a_interactions): void
     {
         $this->interactions = $a_interactions;
     }
 
-    public function getObjectives() : bool
+    public function getObjectives(): bool
     {
         return $this->objectives;
     }
 
-    public function setObjectives(bool $a_objectives) : void
+    public function setObjectives(bool $a_objectives): void
     {
         $this->objectives = $a_objectives;
     }
 
-    public function getComments() : bool
+    public function getComments(): bool
     {
         return $this->comments;
     }
 
-    public function setComments(bool $a_comments) : void
+    public function setComments(bool $a_comments): void
     {
         $this->comments = $a_comments;
     }
 
-    public function getTime_from_lms() : bool
+    public function getTime_from_lms(): bool
     {
         return $this->time_from_lms;
     }
 
-    public function setTime_from_lms(bool $a_time_from_lms) : void
+    public function setTime_from_lms(bool $a_time_from_lms): void
     {
         $this->time_from_lms = $a_time_from_lms;
     }
 
-    public function getCheck_values() : bool
+    public function getCheck_values(): bool
     {
         return $this->check_values;
     }
 
-    public function setCheck_values(bool $a_check_values) : void
+    public function setCheck_values(bool $a_check_values): void
     {
         $this->check_values = $a_check_values;
     }
@@ -613,16 +618,16 @@ class ilObjSAHSLearningModule extends ilObject
 //        $this->offline_mode = $a_offline_mode;
 //    }
 
-    public function getDebug() : bool
+    public function getDebug(): bool
     {
         return $this->debug;
     }
 
-    public function setDebug(bool $a_debug) : void
+    public function setDebug(bool $a_debug): void
     {
         $this->debug = $a_debug;
     }
-    
+
 //    /**
 //    * debug pw
 //    */
@@ -639,27 +644,27 @@ class ilObjSAHSLearningModule extends ilObject
 //        $this->debug_pw = $a_debug_pw;
 //    }
 
-    public function setAutoContinue(bool $a_auto_continue) : void
+    public function setAutoContinue(bool $a_auto_continue): void
     {
         $this->auto_continue = $a_auto_continue;
     }
 
-    public function getAutoContinue() : bool
+    public function getAutoContinue(): bool
     {
         return $this->auto_continue;
     }
 
-    public function getAuto_last_visited() : bool
+    public function getAuto_last_visited(): bool
     {
         return $this->auto_last_visited;
     }
 
-    public function setAuto_last_visited(bool $a_auto_last_visited) : void
+    public function setAuto_last_visited(bool $a_auto_last_visited): void
     {
         $this->auto_last_visited = $a_auto_last_visited;
     }
 
-    
+
 //    /**
 //     * Set sequencing expert mode
 //     *
@@ -680,12 +685,12 @@ class ilObjSAHSLearningModule extends ilObject
 //        return $this->seq_exp_mode;
 //    }
 
-    public function setAutoSuspend(bool $a_auto_suspend) : void
+    public function setAutoSuspend(bool $a_auto_suspend): void
     {
         $this->auto_suspend = $a_auto_suspend;
     }
 
-    public function getAutoSuspend() : bool
+    public function getAutoSuspend(): bool
     {
         return $this->auto_suspend;
     }
@@ -700,50 +705,50 @@ class ilObjSAHSLearningModule extends ilObject
      * 5: in new Window without specified width and height
      * 6: in new Window with specified width and height
      */
-    public function getOpenMode() : int
+    public function getOpenMode(): int
     {
         return $this->open_mode;
     }
 
-    public function setOpenMode(int $a_open_mode) : void
+    public function setOpenMode(int $a_open_mode): void
     {
         $this->open_mode = $a_open_mode;
     }
 
-    public function getWidth() : int
+    public function getWidth(): int
     {
         return $this->width;
     }
 
-    public function setWidth(int $a_width) : void
+    public function setWidth(int $a_width): void
     {
         $this->width = $a_width;
     }
 
-    public function getHeight() : int
+    public function getHeight(): int
     {
         return $this->height;
     }
 
-    public function setHeight(int $a_height) : void
+    public function setHeight(int $a_height): void
     {
         $this->height = $a_height;
     }
 
-    public function getMasteryScore() : ?int
+    public function getMasteryScore(): ?int
     {
         return $this->mastery_score;
     }
 
-    public function setMasteryScore(?int $a_mastery_score) : void
+    public function setMasteryScore(?int $a_mastery_score): void
     {
         $this->mastery_score = $a_mastery_score;
     }
-    
+
     /**
     * check mastery_score / min_normalized_measure of SCOs (SCORM 1.2) / objectives (SCORM 2004)
     */
-    public function checkMasteryScoreValues() : void
+    public function checkMasteryScoreValues(): void
     {
         global $DIC;
         $ilDB = $DIC->database();
@@ -775,39 +780,39 @@ class ilObjSAHSLearningModule extends ilObject
         $this->mastery_score_values = $s_result;
     }
 
-    public function getMasteryScoreValues() : string
+    public function getMasteryScoreValues(): string
     {
         return $this->mastery_score_values;
     }
 
-    public function getIdSetting() : int
+    public function getIdSetting(): int
     {
         return $this->id_setting;
     }
 
-    public function setIdSetting(int $a_id_setting) : void
+    public function setIdSetting(int $a_id_setting): void
     {
         $this->id_setting = $a_id_setting;
     }
 
-    public function getNameSetting() : int
+    public function getNameSetting(): int
     {
         return $this->name_setting;
     }
 
-    public function setNameSetting(int $a_name_setting) : void
+    public function setNameSetting(int $a_name_setting): void
     {
         $this->name_setting = $a_name_setting;
     }
 
-    public function update() : bool
+    public function update(): bool
     {
         global $DIC;
         $ilDB = $DIC->database();
 
         $this->updateMetaData();
         parent::update();
-        
+
         $s_mastery_score = $this->getMasteryScore();
         if ($s_mastery_score == "") {
             $s_mastery_score = null;
@@ -933,11 +938,11 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * Get SCORM modules that assign a certain glossary
      */
-    public static function getScormModulesForGlossary(int $a_glo_id) : array
+    public static function getScormModulesForGlossary(int $a_glo_id): array
     {
         global $DIC;
         $ilDB = $DIC->database();
-    
+
         $set = $ilDB->query("SELECT DISTINCT id FROM sahs_lm WHERE " .
             " glossary = " . $ilDB->quote($a_glo_id, "integer"));
         $sms = array();
@@ -952,11 +957,11 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * Get SCORM modules that assign a certain glossary
      */
-    public static function lookupAssignedGlossary(int $a_slm_id) : int
+    public static function lookupAssignedGlossary(int $a_slm_id): int
     {
         global $DIC;
         $ilDB = $DIC->database();
-    
+
         $set = $ilDB->query("SELECT DISTINCT glossary FROM sahs_lm WHERE " .
             " id = " . $ilDB->quote($a_slm_id, "integer"));
         $rec = $ilDB->fetchAssoc($set);
@@ -967,12 +972,12 @@ class ilObjSAHSLearningModule extends ilObject
         return 0;
     }
 
-    public function setSubType(string $a_sub_type) : void
+    public function setSubType(string $a_sub_type): void
     {
         $this->sub_type = $a_sub_type;
     }
 
-    public function getSubType() : string
+    public function getSubType(): string
     {
         return $this->sub_type;
     }
@@ -987,7 +992,7 @@ class ilObjSAHSLearningModule extends ilObject
     *
     * @return	boolean	true if all object data were removed; false if only a references were removed
     */
-    public function delete() : bool
+    public function delete(): bool
     {
         global $DIC;
         $ilDB = $DIC->database();
@@ -997,7 +1002,7 @@ class ilObjSAHSLearningModule extends ilObject
         if (!parent::delete()) {
             return false;
         }
- 
+
         // delete meta data of scorm content object
         $this->deleteMetaData();
 
@@ -1010,9 +1015,9 @@ class ilObjSAHSLearningModule extends ilObject
             array('integer'),
             array($this->getId())
         );
-        
+
         $ilLog->write("SAHS Delete(SAHSLM), Subtype: " . $this->getSubType());
-        
+
         if ($this->getSubType() === "scorm") {
             $sc_tree = new ilSCORMTree($this->getId());
             $r_id = $sc_tree->readRootId();
@@ -1038,7 +1043,7 @@ class ilObjSAHSLearningModule extends ilObject
                 array('integer'),
                 array($this->getId())
             );
-            
+
             while ($row = $ilDB->fetchAssoc($res)) {
                 $obj_id = $row['obj_id'];
                 $ilDB->manipulateF(
@@ -1048,7 +1053,7 @@ class ilObjSAHSLearningModule extends ilObject
                     array($obj_id)
                 );
             }
-            
+
             $res = $ilDB->queryF(
                 '
 				SELECT aicc_object.obj_id FROM aicc_object, aicc_course
@@ -1057,7 +1062,7 @@ class ilObjSAHSLearningModule extends ilObject
                 array('integer'),
                 array($this->getId())
             );
-            
+
             while ($row = $ilDB->fetchAssoc($res)) {
                 $obj_id = $row['obj_id'];
                 $ilDB->manipulateF(
@@ -1103,7 +1108,7 @@ class ilObjSAHSLearningModule extends ilObject
      * This is called by the certificate generator if [SCORM_POINTS] is
      * inserted.
      */
-    public function getPointsInPercent() : ?float
+    public function getPointsInPercent(): ?float
     {
         global $DIC;
         $ilUser = $DIC->user();
@@ -1124,11 +1129,11 @@ class ilObjSAHSLearningModule extends ilObject
      * This is called by the certificate generator if [SCORM_POINTS_MAX] is
      * inserted.
      */
-    public function getMaxPoints() : ?float
+    public function getMaxPoints(): ?float
     {
         global $DIC;
         $ilUser = $DIC->user();
-        
+
         if (strcmp($this->getSubType(), 'scorm2004') == 0) {
             $res = ilObjSCORM2004LearningModule::_getMaxScoreForUser($this->getId(), $ilUser->getId());
             return $res;
@@ -1146,7 +1151,7 @@ class ilObjSAHSLearningModule extends ilObject
      * @throws \ILIAS\Filesystem\Exception\FileNotFoundException
      * @throws \ILIAS\Filesystem\Exception\IOException
      */
-    public function populateByDirectoy(string $a_dir, string $a_filename = "") : void
+    public function populateByDirectoy(string $a_dir, string $a_filename = ""): void
     {
         /*preg_match("/.*sahs_([0-9]*)\.zip/", $a_filename, $match);
         if (is_dir($a_dir."/sahs_".$match[1]))
@@ -1164,7 +1169,7 @@ class ilObjSAHSLearningModule extends ilObject
      * @throws \ILIAS\Filesystem\Exception\IOException
      * @throws ilSaxParserException
      */
-    public function cloneObject(int $a_target_id, int $a_copy_id = 0, bool $a_omit_tree = false) : ?ilObject
+    public function cloneObject(int $a_target_id, int $a_copy_id = 0, bool $a_omit_tree = false): ?ilObject
     {
         global $DIC;
         $ilDB = $DIC->database();
@@ -1271,7 +1276,7 @@ class ilObjSAHSLearningModule extends ilObject
         }
         return $new_obj;
     }
-    
+
 //    public function zipLmForOfflineMode()
 //    {
 //        $lmDir = ilUtil::getWebspaceDir("filesystem") . "/lm_data/lm_" . $this->getId();
@@ -1282,7 +1287,7 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * Get cmi.core.student_id / cmi.learner_id for API
      */
-    public function getApiStudentId() : string
+    public function getApiStudentId(): string
     {
         global $DIC;
         $usr = $DIC->user();
@@ -1303,7 +1308,7 @@ class ilObjSAHSLearningModule extends ilObject
      * Get cmi.core.student_name / cmi.learner_name for API
      * note: 'lastname, firstname' is required for SCORM 1.2; 9 = no name to hide student_name for external content
      */
-    public function getApiStudentName() : string
+    public function getApiStudentName(): string
     {
         global $DIC;
         $lng = $DIC->language();
@@ -1350,7 +1355,7 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * get button for view
      */
-    public function getViewButton() : ilLinkButton
+    public function getViewButton(): ilLinkButton
     {
         $setUrl = "ilias.php?baseClass=ilSAHSPresentationGUI&amp;ref_id=" . $this->getRefID();
         // $setUrl = $this->getLinkTargetByClass("ilsahspresentationgui", "")."&amp;ref_id=".$this->getRefID();

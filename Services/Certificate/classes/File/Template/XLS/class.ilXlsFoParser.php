@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -21,8 +23,6 @@
  */
 class ilXlsFoParser
 {
-    private ilSetting $settings;
-    private ilPageFormats $pageFormats;
     private ilXMLChecker $xmlChecker;
     private ilCertificateUtilHelper $utilHelper;
     private ilCertificateXlstProcess $xlstProcess;
@@ -30,17 +30,14 @@ class ilXlsFoParser
     private ilCertificateXlsFileLoader $certificateXlsFileLoader;
 
     public function __construct(
-        ilSetting $settings,
-        ilPageFormats $pageFormats,
+        private ilSetting $settings,
+        private ilPageFormats $pageFormats,
         ?ilXMLChecker $xmlChecker = null,
         ?ilCertificateUtilHelper $utilHelper = null,
         ?ilCertificateXlstProcess $xlstProcess = null,
         ?ilLanguage $language = null,
         ?ilCertificateXlsFileLoader $certificateXlsFileLoader = null
     ) {
-        $this->settings = $settings;
-        $this->pageFormats = $pageFormats;
-
         if (null === $xmlChecker) {
             $xmlChecker = new ilXMLChecker(new ILIAS\Data\Factory());
         }
@@ -69,11 +66,9 @@ class ilXlsFoParser
     }
 
     /**
-     * @param array $formData
-     * @return string
      * @throws Exception
      */
-    public function parse(array $formData) : string
+    public function parse(array $formData): string
     {
         $content = "<html><body>" . $formData['certificate_text'] . "</body></html>";
         $content = preg_replace("/<p>(&nbsp;){1,}<\\/p>/", "<p></p>", $content);
@@ -127,7 +122,7 @@ class ilXlsFoParser
         return $this->xlstProcess->process($args, $params);
     }
 
-    private function formatNumberString(string $a_number) : string
+    private function formatNumberString(string $a_number): string
     {
         return str_replace(',', '.', $a_number);
     }

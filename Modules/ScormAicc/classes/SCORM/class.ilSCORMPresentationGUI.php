@@ -1,18 +1,23 @@
-<?php declare(strict_types=1);
+<?php
 
-/******************************************************************************
+declare(strict_types=1);
+
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
+
 /**
 * Class ilSCORMPresentationGUI
 *
@@ -50,7 +55,7 @@ class ilSCORMPresentationGUI
      * execute command
      * @throws ilCtrlException
      */
-    public function executeCommand() : void
+    public function executeCommand(): void
     {
         global $DIC;
         $ilAccess = $DIC->access();
@@ -73,7 +78,10 @@ class ilSCORMPresentationGUI
 //        }
     }
 
-    public function attrib2arr(?array $a_attributes) : array
+    /**
+     * @return mixed[]
+     */
+    public function attrib2arr(?array $a_attributes): array
     {
         $attr = array();
 
@@ -83,7 +91,7 @@ class ilSCORMPresentationGUI
         foreach ($a_attributes as $attribute) {
             $attr[$attribute->name()] = $attribute->value();
         }
-    
+
         return $attr;
     }
 
@@ -92,13 +100,13 @@ class ilSCORMPresentationGUI
      * without the table of contents explorer frame on the left.
      * @throws ilCtrlException
      */
-    public function frameset() : void
+    public function frameset(): void
     {
         global $DIC;
         $lng = $DIC->language();
         $javascriptAPI = true;
         $items = ilSCORMObject::_lookupPresentableItems($this->slm->getId());
-        
+
         //check for max_attempts and raise error if max_attempts is exceeded
 //        if ($this->get_max_attempts() != 0) {
 //            if ($this->get_actual_attempts() >= $this->get_max_attempts()) {
@@ -107,7 +115,7 @@ class ilSCORMPresentationGUI
 //                exit;
 //            }
 //        }
-    
+
         $this->increase_attemptAndsave_module_version();
         ilWACSignedPath::signFolderOfStartFile($this->slm->getDataDirectory() . '/imsmanifest.xml');
 
@@ -116,14 +124,14 @@ class ilSCORMPresentationGUI
             $this->ctrl->setParameter($this, "expand", "1");
             $this->ctrl->setParameter($this, "jsApi", "1");
             $exp_link = $this->ctrl->getLinkTarget($this, "explorer");
-            
+
             // should be able to grep templates
             if ($debug) {
                 $this->tpl = new ilGlobalTemplate("tpl.sahs_pres_frameset_js_debug.html", false, false, "Modules/ScormAicc");
             } else {
                 $this->tpl = new ilGlobalTemplate("tpl.sahs_pres_frameset_js.html", false, false, "Modules/ScormAicc");
             }
-                            
+
             $this->tpl->setVariable("EXPLORER_LINK", $exp_link);
             $pres_link = $this->ctrl->getLinkTarget($this, "contentSelect");
             $this->tpl->setVariable("PRESENTATION_LINK", $pres_link);
@@ -140,7 +148,7 @@ class ilSCORMPresentationGUI
         $this->tpl->setVariable("API_LINK", $api_link);
         $this->tpl->printToStdout("DEFAULT", false, true);
 
-        
+
         exit;
     }
 
@@ -155,7 +163,7 @@ class ilSCORMPresentationGUI
     /**
      * Get number of actual attempts for the user
      */
-    public function get_actual_attempts() : int
+    public function get_actual_attempts(): int
     {
         global $DIC;
         $ilDB = $DIC->database();
@@ -186,7 +194,7 @@ class ilSCORMPresentationGUI
     // array($ilUser->getId(),0,'package_attempts',$this->slm->getId())
     // );
     // $val_rec = $ilDB->fetchAssoc($val_set);
-        
+
     // $val_rec["rvalue"] = str_replace("\r\n", "\n", $val_rec["rvalue"]);
     // if ($val_rec["rvalue"] == null) {
     // $val_rec["rvalue"]=0;
@@ -194,7 +202,7 @@ class ilSCORMPresentationGUI
 
     // return $val_rec["rvalue"];
     // }
-    
+
     /**
     * Increases attempts by one for this package
     */
@@ -202,7 +210,7 @@ class ilSCORMPresentationGUI
     // global $DIC;
     // $ilDB = $DIC->database();
     // $ilUser = $DIC->user();
-        
+
     // //get existing account - sco id is always 0
     // $val_set = $ilDB->queryF('
     // SELECT * FROM scorm_tracking
@@ -215,7 +223,7 @@ class ilSCORMPresentationGUI
     // );
 
     // $val_rec = $ilDB->fetchAssoc($val_set);
-        
+
     // $val_rec["rvalue"] = str_replace("\r\n", "\n", $val_rec["rvalue"]);
     // if ($val_rec["rvalue"] == null) {
     // $val_rec["rvalue"]=0;
@@ -249,7 +257,7 @@ class ilSCORMPresentationGUI
     // 'c_timestamp'	=> array('timestamp', ilUtil::now())
     // ));
     // }
-        
+
     // include_once("./Services/Tracking/classes/class.ilLPStatusWrapper.php");
     // ilLPStatusWrapper::_updateStatus($this->slm->getId(), $ilUser->getId());
 
@@ -258,7 +266,7 @@ class ilSCORMPresentationGUI
     /**
      * Increases attempts by one and saves module_version for this package
      */
-    public function increase_attemptAndsave_module_version() : void
+    public function increase_attemptAndsave_module_version(): void
     {
         global $DIC;
         $ilDB = $DIC->database();
@@ -269,7 +277,7 @@ class ilSCORMPresentationGUI
             array($this->slm->getId(),$ilUser->getId())
         );
         $val_rec = $ilDB->fetchAssoc($res);
-        if ($val_rec["cnt"] == 0) { //offline_mode could be inserted
+        if (!is_array($val_rec)) {
             $attempts = 1;
             $ilDB->manipulateF(
                 'INSERT INTO sahs_user (obj_id,user_id,package_attempts,module_version,last_access) VALUES(%s,%s,%s,%s,%s)',
@@ -309,7 +317,7 @@ class ilSCORMPresentationGUI
     // array($ilUser->getId(),0,'module_version',$this->slm->getId())
 
     // );
-        
+
     // if($ilDB->numRows($val_set) > 0)
     // {
     // $ilDB->update('scorm_tracking',
@@ -336,10 +344,10 @@ class ilSCORMPresentationGUI
     // 'c_timestamp'	=> array('timestamp', ilUtil::now())
     // ));
     // }
-        
+
     // include_once("./Services/Tracking/classes/class.ilLPStatusWrapper.php");
     // ilLPStatusWrapper::_updateStatus($this->slm->getId(), $ilUser->getId());
-        
+
     // }
 
     /**
@@ -347,20 +355,20 @@ class ilSCORMPresentationGUI
      * @throws ilCtrlException
      * @throws ilTemplateException
      */
-    public function explorer(string $a_target = "sahs_content") : void
+    public function explorer(string $a_target = "sahs_content"): void
     {
         global $DIC;
         $ilBench = $DIC['ilBench'];
         $ilLog = ilLoggerFactory::getLogger('sahs');
 
         $ilBench->start("SCORMExplorer", "initExplorer");
-        
+
         $this->tpl = new ilGlobalTemplate("tpl.sahs_exp_main.html", true, true, "Modules/ScormAicc");
 //        $this->tpl = new ilTemplate("tpl.sahs_exp_main.html", true, true, "Modules/ScormAicc");
         $exp = new ilSCORMExplorer($this->ctrl->getLinkTarget($this, "view"), $this->slm);
         $exp->setTargetGet("obj_id");
         $exp->setFrameTarget($a_target);
-        
+
         //$exp->setFiltered(true);
         $jsApi = true;
 
@@ -373,7 +381,7 @@ class ilSCORMPresentationGUI
             $expanded = $mtree->readRootId();
         }
         $exp->setExpand($expanded);
-        
+
         $exp->forceExpandAll(true, false);
         $ilBench->stop("SCORMExplorer", "initExplorer");
 
@@ -412,7 +420,7 @@ class ilSCORMPresentationGUI
     /**
     * SCORM content screen
     */
-    public function view() : void
+    public function view(): void
     {
         global $DIC;
         $objId = $DIC->http()->wrapper()->query()->retrieve('obj_id', $DIC->refinery()->kindlyTo()->int());
@@ -426,7 +434,7 @@ class ilSCORMPresentationGUI
         $this->tpl->printToStdout('DEFAULT', false);
     }
 
-    public function contentSelect() : void
+    public function contentSelect(): void
     {
         global $DIC;
         $lng = $DIC->language();
@@ -435,11 +443,11 @@ class ilSCORMPresentationGUI
         $this->tpl->setVariable('TXT_SPECIALPAGE', $lng->txt("seq_toc"));
         $this->tpl->printToStdout("DEFAULT", false);
     }
-    
+
     /**
      * SCORM Data for Javascript-API
      */
-    public function apiInitData() : void
+    public function apiInitData(): void
     {
         global $DIC;
 
@@ -475,7 +483,7 @@ class ilSCORMPresentationGUI
         }
     }
 
-    public function pingSession() : bool
+    public function pingSession(): bool
     {
         ilWACSignedPath::signFolderOfStartFile($this->slm->getDataDirectory() . '/imsmanifest.xml');
         return true;
@@ -485,7 +493,7 @@ class ilSCORMPresentationGUI
      * Download the certificate for the active user
      * @throws ilCtrlException
      */
-    public function downloadCertificate() : void
+    public function downloadCertificate(): void
     {
         global $DIC;
 
@@ -498,13 +506,10 @@ class ilSCORMPresentationGUI
         $certValidator = new ilCertificateDownloadValidator();
         $allowed = $certValidator->isCertificateDownloadable($ilUser->getId(), $obj_id);
         if ($allowed) {
-            $certificateLogger = $DIC->logger()->root();
-
             $ilUserCertificateRepository = new ilUserCertificateRepository();
-            $pdfGenerator = new ilPdfGenerator($ilUserCertificateRepository, $certificateLogger);
+            $pdfGenerator = new ilPdfGenerator($ilUserCertificateRepository);
 
             $pdfAction = new ilCertificatePdfAction(
-                $certificateLogger,
                 $pdfGenerator,
                 new ilCertificateUtilHelper(),
                 $this->lng->txt('error_creating_certificate_pdf')

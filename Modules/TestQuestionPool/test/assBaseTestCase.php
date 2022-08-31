@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (c) 1998-2018 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 use PHPUnit\Framework\TestCase;
@@ -16,7 +17,7 @@ abstract class assBaseTestCase extends TestCase
     /**
      * @inheritdoc
      */
-    protected function setUp() : void
+    protected function setUp(): void
     {
         global $DIC;
 
@@ -53,12 +54,20 @@ abstract class assBaseTestCase extends TestCase
         $dbMock = $this->createMock(ilDBInterface::class);
         $this->setGlobalVariable('ilDB', $dbMock);
 
+        $treeMock = $this->createMock(ilTree::class);
+        $this->setGlobalVariable('tree', $treeMock);
+
+        $repository_mock = $this->createMock(ilComponentRepository::class);
+        $this->setGlobalVariable('component.repository', $repository_mock);
+
         $this->setGlobalVariable('http', $this->getMockBuilder(ILIAS\HTTP\Services::class)->disableOriginalConstructor()->getMock());
+
+        $this->setGlobalVariable('upload', $this->createMock(ILIAS\FileUpload\FileUpload::class));
 
         parent::setUp();
     }
 
-    protected function tearDown() : void
+    protected function tearDown(): void
     {
         global $DIC;
 
@@ -71,7 +80,7 @@ abstract class assBaseTestCase extends TestCase
      * @param string $name
      * @param mixed $value
      */
-    protected function setGlobalVariable(string $name, $value) : void
+    protected function setGlobalVariable(string $name, $value): void
     {
         global $DIC;
 

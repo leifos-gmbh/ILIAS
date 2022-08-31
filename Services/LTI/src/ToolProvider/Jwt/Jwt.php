@@ -1,21 +1,25 @@
 <?php
+
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
+
 namespace ILIAS\LTI\ToolProvider\Jwt;
 
 use ILIAS\LTI\ToolProvider\Util;
 
-/******************************************************************************
- *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
- *
- * If this is not the case or you just want to try ILIAS, you'll find
- * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
- *
- *****************************************************************************/
 /**
  * Class to represent an HTTP message request
  *
@@ -25,7 +29,6 @@ use ILIAS\LTI\ToolProvider\Util;
  */
 class Jwt
 {
-
     /**
      * Life (in seconds) of an issued JWT (default is 1 minute).
      *
@@ -52,7 +55,7 @@ class Jwt
      *
      * @var ClientInterface $jwtClient
      */
-    private static ClientInterface $jwtClient;
+    private static ?ClientInterface $jwtClient = null; //changed ... = null
 
     /**
      * Class constructor.
@@ -81,11 +84,10 @@ class Jwt
      */
     public static function getJwtClient()
     {
-        if (!self::$jwtClient) {
+        if (empty(self::$jwtClient)) { //changed
             self::$jwtClient = new FirebaseClient();
             Util::logDebug('JwtClient set to \'' . get_class(self::$jwtClient) . '\'');
         }
-
         return self::$jwtClient;
     }
 }

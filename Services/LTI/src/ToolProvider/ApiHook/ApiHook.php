@@ -1,20 +1,22 @@
 <?php
 
-namespace ILIAS\LTI\ToolProvider\ApiHook;
-
-/******************************************************************************
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
+
+namespace ILIAS\LTI\ToolProvider\ApiHook;
 
 /**
  * Trait to handle API hook registrations
@@ -25,7 +27,6 @@ namespace ILIAS\LTI\ToolProvider\ApiHook;
  */
 trait ApiHook
 {
-
     /**
      * User Id hook name.
      */
@@ -96,7 +97,7 @@ trait ApiHook
      * @param string $familyCode Family code for current platform
      * @return bool    True if the API hook is registered
      */
-    private static function hasApiHook(string $hookName, string $familyCode) : bool
+    private static function hasApiHook(string $hookName, string $familyCode): bool
     {
         $class = self::class;
         return isset(self::$API_HOOKS["{$class}-{$hookName}-{$familyCode}"]);
@@ -111,7 +112,7 @@ trait ApiHook
      * @param \ILIAS\LTI\ToolProvider\Platform|\ILIAS\LTI\ToolProvider\Context|\ILIAS\LTI\ToolProvider\ResourceLink|\ILIAS\LTI\ToolProvider\Tool $sourceObject Source object for which hook is to be used
      * @return bool    True if the API hook is registered and configured
      */
-    private static function hasConfiguredApiHook(string $hookName, string $familyCode, $sourceObject) : bool
+    private static function hasConfiguredApiHook(string $hookName, string $familyCode, $sourceObject): bool
     {
         $ok = false;
         $class = self::class;

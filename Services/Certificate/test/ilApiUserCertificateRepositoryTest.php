@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -25,23 +27,18 @@ class ilApiUserCertificateRepositoryTest extends ilCertificateBaseTestCase
 {
     /** @var MockObject&ilDBInterface */
     private $database;
-    /** @var MockObject&ilLogger */
-    private $logger;
     /** @var MockObject&ilCtrlInterface */
     private $controller;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->database = $this->createMock(ilDBInterface::class);
         $this->controller = $this->createMock(ilCtrlInterface::class);
-        $this->logger = $this->getMockBuilder(ilLogger::class)
-                         ->disableOriginalConstructor()
-                         ->getMock();
     }
 
-    public function testGetUserData() : void
+    public function testGetUserData(): void
     {
-        $filter = new \Certificate\API\Filter\UserDataFilter();
+        $filter = new \ILIAS\Certificate\API\Filter\UserDataFilter();
 
         $this->database
             ->method('fetchAssoc')
@@ -52,7 +49,7 @@ class ilApiUserCertificateRepositoryTest extends ilCertificateBaseTestCase
                     'obj_id' => 100,
                     'ref_id' => 5000,
                     'acquired_timestamp' => 1234567890,
-                    'user_id' => 2000,
+                    'usr_id' => 2000,
                     'firstname' => 'ilyas',
                     'lastname' => 'homer',
                     'login' => 'breakdanceMcFunkyPants',
@@ -65,7 +62,7 @@ class ilApiUserCertificateRepositoryTest extends ilCertificateBaseTestCase
                     'obj_id' => 100,
                     'ref_id' => 6000,
                     'acquired_timestamp' => 1234567890,
-                    'user_id' => 2000,
+                    'usr_id' => 2000,
                     'firstname' => 'ilyas',
                     'lastname' => 'homer',
                     'login' => 'breakdanceMcFunkyPants',
@@ -76,17 +73,16 @@ class ilApiUserCertificateRepositoryTest extends ilCertificateBaseTestCase
 
         $this->controller->method('getLinkTargetByClass')->willReturn('somewhere.php?goto=4');
 
-        $repository = new \Certificate\API\Repository\UserDataRepository(
+        $repository = new \ILIAS\Certificate\API\Repository\UserDataRepository(
             $this->database,
-            $this->logger,
             $this->controller,
             'no title given'
         );
 
-        /** @var array<int, \Certificate\API\Data\UserCertificateDto> $userData */
+        /** @var array<int, \ILIAS\Certificate\API\Data\UserCertificateDto> $userData */
         $userData = $repository->getUserData($filter, ['something']);
 
-        /** @var \Certificate\API\Data\UserCertificateDto $object */
+        /** @var \ILIAS\Certificate\API\Data\UserCertificateDto $object */
         $object = $userData[5];
         $this->assertSame('test', $object->getObjectTitle());
         $this->assertSame(5, $object->getCertificateId());

@@ -1,25 +1,22 @@
-<?php declare(strict_types=1);
-/*
-    +-----------------------------------------------------------------------------+
-    | ILIAS open source                                                           |
-    +-----------------------------------------------------------------------------+
-    | Copyright (c) 1998-2001 ILIAS open source, University of Cologne            |
-    |                                                                             |
-    | This program is free software; you can redistribute it and/or               |
-    | modify it under the terms of the GNU General Public License                 |
-    | as published by the Free Software Foundation; either version 2              |
-    | of the License, or (at your option) any later version.                      |
-    |                                                                             |
-    | This program is distributed in the hope that it will be useful,             |
-    | but WITHOUT ANY WARRANTY; without even the implied warranty of              |
-    | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the               |
-    | GNU General Public License for more details.                                |
-    |                                                                             |
-    | You should have received a copy of the GNU General Public License           |
-    | along with this program; if not, write to the Free Software                 |
-    | Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. |
-    +-----------------------------------------------------------------------------+
-*/
+<?php
+
+declare(strict_types=1);
+
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * Meta Data class
@@ -29,30 +26,29 @@
  */
 class ilMD extends ilMDBase
 {
-    public function read() : bool
+    public function read(): bool
     {
         return true;
     }
-    
-    public function getGeneral() : ?ilMDGeneral
+
+    public function getGeneral(): ?ilMDGeneral
     {
         if ($id = ilMDGeneral::_getId($this->getRBACId(), $this->getObjId())) {
             $gen = new ilMDGeneral();
             $gen->setMetaId($id);
-
             return $gen;
         }
         return null;
     }
 
-    public function addGeneral() : ?ilMDGeneral
+    public function addGeneral(): ?ilMDGeneral
     {
         $gen = new ilMDGeneral($this->getRBACId(), $this->getObjId(), $this->getObjType());
 
         return $gen;
     }
 
-    public function getLifecycle() : ?ilMDLifecycle
+    public function getLifecycle(): ?ilMDLifecycle
     {
         if ($id = ilMDLifecycle::_getId($this->getRBACId(), $this->getObjId())) {
             $lif = new ilMDLifecycle();
@@ -63,14 +59,14 @@ class ilMD extends ilMDBase
         return null;
     }
 
-    public function addLifecycle() : ilMDLifecycle
+    public function addLifecycle(): ilMDLifecycle
     {
         $lif = new ilMDLifecycle($this->getRBACId(), $this->getObjId(), $this->getObjType());
 
         return $lif;
     }
 
-    public function getMetaMetadata() : ?ilMDMetaMetadata
+    public function getMetaMetadata(): ?ilMDMetaMetadata
     {
         if ($id = ilMDMetaMetadata::_getId($this->getRBACId(), $this->getObjId())) {
             $met = new ilMDMetaMetadata();
@@ -81,14 +77,14 @@ class ilMD extends ilMDBase
         return null;
     }
 
-    public function addMetaMetadata() : ilMDMetaMetadata
+    public function addMetaMetadata(): ilMDMetaMetadata
     {
         $met = new ilMDMetaMetadata($this->getRBACId(), $this->getObjId(), $this->getObjType());
 
         return $met;
     }
 
-    public function getTechnical() : ?ilMDTechnical
+    public function getTechnical(): ?ilMDTechnical
     {
         if ($id = ilMDTechnical::_getId($this->getRBACId(), $this->getObjId())) {
             $tec = new ilMDTechnical();
@@ -99,14 +95,14 @@ class ilMD extends ilMDBase
         return null;
     }
 
-    public function addTechnical() : ilMDTechnical
+    public function addTechnical(): ilMDTechnical
     {
         $tec = new ilMDTechnical($this->getRBACId(), $this->getObjId(), $this->getObjType());
 
         return $tec;
     }
 
-    public function getEducational() : ?ilMDEducational
+    public function getEducational(): ?ilMDEducational
     {
         if ($id = ilMDEducational::_getId($this->getRBACId(), $this->getObjId())) {
             $edu = new ilMDEducational();
@@ -117,14 +113,14 @@ class ilMD extends ilMDBase
         return null;
     }
 
-    public function addEducational() : ilMDEducational
+    public function addEducational(): ilMDEducational
     {
         $edu = new ilMDEducational($this->getRBACId(), $this->getObjId(), $this->getObjType());
 
         return $edu;
     }
 
-    public function getRights() : ?ilMDRights
+    public function getRights(): ?ilMDRights
     {
         if ($id = ilMDRights::_getId($this->getRBACId(), $this->getObjId())) {
             $rig = new ilMDRights();
@@ -135,7 +131,7 @@ class ilMD extends ilMDBase
         return null;
     }
 
-    public function addRights() : ilMDRights
+    public function addRights(): ilMDRights
     {
         $rig = new ilMDRights($this->getRBACId(), $this->getObjId(), $this->getObjType());
 
@@ -145,12 +141,12 @@ class ilMD extends ilMDBase
     /**
      * @return int[]
      */
-    public function getRelationIds() : array
+    public function getRelationIds(): array
     {
         return ilMDRelation::_getIds($this->getRBACId(), $this->getObjId());
     }
 
-    public function getRelation(int $a_relation_id) : ?ilMDRelation
+    public function getRelation(int $a_relation_id): ?ilMDRelation
     {
         if (!$a_relation_id) {
             return null;
@@ -162,7 +158,7 @@ class ilMD extends ilMDBase
         return $rel;
     }
 
-    public function addRelation() : ilMDRelation
+    public function addRelation(): ilMDRelation
     {
         $rel = new ilMDRelation($this->getRBACId(), $this->getObjId(), $this->getObjType());
 
@@ -172,12 +168,12 @@ class ilMD extends ilMDBase
     /**
      * @return int[]
      */
-    public function getAnnotationIds() : array
+    public function getAnnotationIds(): array
     {
         return ilMDAnnotation::_getIds($this->getRBACId(), $this->getObjId());
     }
 
-    public function getAnnotation(int $a_annotation_id) : ?ilMDAnnotation
+    public function getAnnotation(int $a_annotation_id): ?ilMDAnnotation
     {
         if (!$a_annotation_id) {
             return null;
@@ -189,7 +185,7 @@ class ilMD extends ilMDBase
         return $ann;
     }
 
-    public function addAnnotation() : ilMDAnnotation
+    public function addAnnotation(): ilMDAnnotation
     {
         $ann = new ilMDAnnotation($this->getRBACId(), $this->getObjId(), $this->getObjType());
 
@@ -199,12 +195,12 @@ class ilMD extends ilMDBase
     /**
      * @return int[]
      */
-    public function getClassificationIds() : array
+    public function getClassificationIds(): array
     {
         return ilMDClassification::_getIds($this->getRBACId(), $this->getObjId());
     }
 
-    public function getClassification(int $a_classification_id) : ?ilMDClassification
+    public function getClassification(int $a_classification_id): ?ilMDClassification
     {
         if (!$a_classification_id) {
             return null;
@@ -216,14 +212,14 @@ class ilMD extends ilMDBase
         return $cla;
     }
 
-    public function addClassification() : ilMDClassification
+    public function addClassification(): ilMDClassification
     {
         $cla = new ilMDClassification($this->getRBACId(), $this->getObjId(), $this->getObjType());
 
         return $cla;
     }
 
-    public function toXML(ilXmlWriter $writer) : void
+    public function toXML(ilXmlWriter $writer): void
     {
         $writer->xmlStartTag('MetaData');
 
@@ -289,7 +285,7 @@ class ilMD extends ilMDBase
         $writer->xmlEndTag('MetaData');
     }
 
-    public function cloneMD(int $a_rbac_id, int $a_obj_id, string $a_obj_type) : ilMD
+    public function cloneMD(int $a_rbac_id, int $a_obj_id, string $a_obj_type): ilMD
     {
         // this method makes an xml export of the original meta data set
         // and uses this xml string to clone the object
@@ -316,7 +312,7 @@ class ilMD extends ilMDBase
         return $mdxmlcopier->getMDObject();
     }
 
-    public function deleteAll() : bool
+    public function deleteAll(): bool
     {
         $tables = [
             'il_meta_annotation',

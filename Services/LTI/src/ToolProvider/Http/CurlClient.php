@@ -1,19 +1,22 @@
 <?php
-namespace ILIAS\LTI\ToolProvider\Http;
 
-/******************************************************************************
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
+
+namespace ILIAS\LTI\ToolProvider\Http;
 
 /**
  * Class to implement the HTTP message interface using the Curl library
@@ -24,7 +27,6 @@ namespace ILIAS\LTI\ToolProvider\Http;
  */
 class CurlClient implements ClientInterface
 {
-
     /**
      * Send the request to the target URL.
      *
@@ -32,7 +34,7 @@ class CurlClient implements ClientInterface
      *
      * @return bool True if the request was successful
      */
-    public function send(HttpMessage $message) : bool
+    public function send(HttpMessage $message): bool
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);

@@ -1,18 +1,23 @@
-<?php declare(strict_types=1);
+<?php
 
-/******************************************************************************
+declare(strict_types=1);
+
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
+
 class ilScormAiccDataSet extends ilDataSet
 {
     private string $db_table;
@@ -69,16 +74,19 @@ class ilScormAiccDataSet extends ilDataSet
         }
     }
 
+    /**
+     * @return mixed[]
+     */
     protected function getDependencies(
         string $a_entity,
         string $a_version,
         ?array $a_rec = null,
         ?array $a_ids = null
-    ) : array {
+    ): array {
         return [];
     }
 
-    public function writeData(string $a_entity, string $a_version, int $a_id, array $data) : void
+    public function writeData(string $a_entity, string $a_version, int $a_id, array $data): void
     {
         global $DIC;
         $ilDB = $DIC->database();
@@ -90,22 +98,24 @@ class ilScormAiccDataSet extends ilDataSet
                     continue;
                 }
                 //fix localization and mastery_score
-                if ($key === "MasteryScore" && $data[$key][0] == 0) {
+                if ($key === "MasteryScore" && isset($data[$key][0]) && $data[$key][0] == 0) {
                     continue;
                 }
-                if ($key === "Localization" && $data[$key][0] == "") {
+                if ($key === "Localization" && isset($data[$key][0]) && $data[$key][0] == "") {
                     continue;
                 }
                 //end fix
-                if (isset($data[$key])) {
+                if (isset($data[$key]) && is_array($data[$key])) {
                     if (count($data[$key]) > 0) {
                         $columns [$value["db_col"]] = [$value["db_type"], $data[$key][0]];
                     }
                 }
             }
-            if (count($columns) > 0) {
-                $conditions ["id"] = ["integer", $a_id];
-                $ilDB->update($this->db_table, $columns, $conditions);
+            if (is_array($columns)) {
+                if (count($columns) > 0) {
+                    $conditions ["id"] = ["integer", $a_id];
+                    $ilDB->update($this->db_table, $columns, $conditions);
+                }
             }
 
             //setting title and description in table object_data
@@ -115,15 +125,17 @@ class ilScormAiccDataSet extends ilDataSet
                 "Description" => ["db_col" => "description", "db_type" => "text"]
             ];
             foreach ($od_properties as $key => $value) {
-                if (isset($data[$key])) {
+                if (isset($data[$key]) && is_array($data[$key])) {
                     if (count($data[$key]) > 0) {
                         $od_columns [$value["db_col"]] = [$value["db_type"], $data[$key][0]];
                     }
                 }
 
-                if (count($od_columns) > 0) {
-                    $od_conditions ["obj_id"] = ["integer", $a_id];
-                    $ilDB->update("object_data", $od_columns, $od_conditions);
+                if (isset($od_columns) && is_array($od_columns)) {
+                    if (count($od_columns) > 0) {
+                        $od_conditions ["obj_id"] = ["integer", $a_id];
+                        $ilDB->update("object_data", $od_columns, $od_conditions);
+                    }
                 }
             }
         } else {
@@ -141,7 +153,7 @@ class ilScormAiccDataSet extends ilDataSet
         string $a_field = "",
         bool $a_omit_header = false,
         bool $a_omit_types = false
-    ) : string {
+    ): string {
         $GLOBALS['DIC']["ilLog"]->write(json_encode($this->getTypes("sahs", "5.1.0"), JSON_PRETTY_PRINT));
 
         $this->dircnt = 1;
@@ -256,7 +268,7 @@ class ilScormAiccDataSet extends ilDataSet
      * @param string $a_version version number
      * @return array types array
      */
-    protected function getTypes(string $a_entity, string $a_version) : array
+    protected function getTypes(string $a_entity, string $a_version): array
     {
         if ($a_entity === "sahs") {
             switch ($a_version) {
@@ -271,7 +283,7 @@ class ilScormAiccDataSet extends ilDataSet
         return [];
     }
 
-    public function readData(string $a_entity, string $a_version, array $a_ids) : void
+    public function readData(string $a_entity, string $a_version, array $a_ids): void
     {
         global $DIC;
         $ilDB = $DIC->database();
@@ -302,7 +314,7 @@ class ilScormAiccDataSet extends ilDataSet
     /**
      * retrieve element name by database column name
      */
-    public function getElementNameByDbColumn(string $db_col_name) : string
+    public function getElementNameByDbColumn(string $db_col_name): string
     {
         if ($db_col_name === "title") {
             return "Title";
@@ -313,7 +325,7 @@ class ilScormAiccDataSet extends ilDataSet
         return $this->element_db_mapping[$db_col_name];
     }
 
-    public function buildMetaData(int $id) : string
+    public function buildMetaData(int $id): string
     {
         $md2xml = new ilMD2XML($id, $id, "sahs");
         $md2xml->startExport();
@@ -323,7 +335,7 @@ class ilScormAiccDataSet extends ilDataSet
     /**
      * Get xml namespace
      */
-    public function getXmlNamespace(string $a_entity, string $a_schema_version) : string
+    public function getXmlNamespace(string $a_entity, string $a_schema_version): string
     {
         return "http://www.ilias.de/xml/Modules/ScormAicc/" . $a_entity;
     }
@@ -331,7 +343,7 @@ class ilScormAiccDataSet extends ilDataSet
     /**
      * @return string[]
      */
-    public function getSupportedVersions() : array
+    public function getSupportedVersions(): array
     {
         return ["5.1.0"];
     }

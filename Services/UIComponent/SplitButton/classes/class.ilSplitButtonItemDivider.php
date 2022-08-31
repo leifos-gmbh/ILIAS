@@ -19,10 +19,12 @@
 /**
  * Class ilSplitButtonItemDivider
  * @author Michael Jansen <mjansen@databay.de>
+ *
+ * @deprecated 11
  */
 class ilSplitButtonItemDivider implements ilSplitButtonSeparatorMenuItem
 {
-    public function getContent() : string
+    public function getContent(): string
     {
         return '';
     }

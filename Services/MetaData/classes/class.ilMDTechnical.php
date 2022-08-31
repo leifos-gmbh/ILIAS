@@ -1,25 +1,22 @@
-<?php declare(strict_types=1);
-/*
-    +-----------------------------------------------------------------------------+
-    | ILIAS open source                                                           |
-    +-----------------------------------------------------------------------------+
-    | Copyright (c) 1998-2001 ILIAS open source, University of Cologne            |
-    |                                                                             |
-    | This program is free software; you can redistribute it and/or               |
-    | modify it under the terms of the GNU General Public License                 |
-    | as published by the Free Software Foundation; either version 2              |
-    | of the License, or (at your option) any later version.                      |
-    |                                                                             |
-    | This program is distributed in the hope that it will be useful,             |
-    | but WITHOUT ANY WARRANTY; without even the implied warranty of              |
-    | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the               |
-    | GNU General Public License for more details.                                |
-    |                                                                             |
-    | You should have received a copy of the GNU General Public License           |
-    | along with this program; if not, write to the Free Software                 |
-    | Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. |
-    +-----------------------------------------------------------------------------+
-*/
+<?php
+
+declare(strict_types=1);
+
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * Meta Data class (element technical)
@@ -38,7 +35,7 @@ class ilMDTechnical extends ilMDBase
     /**
      * @return array<string, string>
      */
-    public function getPossibleSubelements() : array
+    public function getPossibleSubelements(): array
     {
         $subs['Format'] = 'meta_format';
         $subs['Location'] = 'meta_location';
@@ -57,12 +54,12 @@ class ilMDTechnical extends ilMDBase
     /**
      * @return int[]
      */
-    public function getFormatIds() : array
+    public function getFormatIds(): array
     {
         return ilMDFormat::_getIds($this->getRBACId(), $this->getObjId());
     }
 
-    public function getFormat(int $a_format_id) : ?ilMDFormat
+    public function getFormat(int $a_format_id): ?ilMDFormat
     {
         if (!$a_format_id) {
             return null;
@@ -73,7 +70,7 @@ class ilMDTechnical extends ilMDBase
         return $for;
     }
 
-    public function addFormat() : ilMDFormat
+    public function addFormat(): ilMDFormat
     {
         $for = new ilMDFormat($this->getRBACId(), $this->getObjId(), $this->getObjType());
 
@@ -83,12 +80,12 @@ class ilMDTechnical extends ilMDBase
     /**
      * @return int[]
      */
-    public function getLocationIds() : array
+    public function getLocationIds(): array
     {
         return ilMDLocation::_getIds($this->getRBACId(), $this->getObjId(), $this->getMetaId(), 'meta_technical');
     }
 
-    public function getLocation(int $a_location_id) : ?ilMDLocation
+    public function getLocation(int $a_location_id): ?ilMDLocation
     {
         if (!$a_location_id) {
             return null;
@@ -99,7 +96,7 @@ class ilMDTechnical extends ilMDBase
         return $loc;
     }
 
-    public function addLocation() : ilMDLocation
+    public function addLocation(): ilMDLocation
     {
         $loc = new ilMDLocation($this->getRBACId(), $this->getObjId(), $this->getObjType());
         $loc->setParentId($this->getMetaId());
@@ -111,12 +108,12 @@ class ilMDTechnical extends ilMDBase
     /**
      * @return int[]
      */
-    public function getRequirementIds() : array
+    public function getRequirementIds(): array
     {
         return ilMDRequirement::_getIds($this->getRBACId(), $this->getObjId(), $this->getMetaId(), 'meta_technical');
     }
 
-    public function getRequirement(int $a_requirement_id) : ?ilMDRequirement
+    public function getRequirement(int $a_requirement_id): ?ilMDRequirement
     {
         if (!$a_requirement_id) {
             return null;
@@ -127,7 +124,7 @@ class ilMDTechnical extends ilMDBase
         return $rec;
     }
 
-    public function addRequirement() : ilMDRequirement
+    public function addRequirement(): ilMDRequirement
     {
         $rec = new ilMDRequirement($this->getRBACId(), $this->getObjId(), $this->getObjType());
         $rec->setParentId($this->getMetaId());
@@ -139,12 +136,12 @@ class ilMDTechnical extends ilMDBase
     /**
      * @return int[]
      */
-    public function getOrCompositeIds() : array
+    public function getOrCompositeIds(): array
     {
         return ilMDOrComposite::_getIds($this->getRBACId(), $this->getObjId(), $this->getMetaId(), 'meta_technical');
     }
 
-    public function getOrComposite(int $a_or_composite_id) : ?ilMDOrComposite
+    public function getOrComposite(int $a_or_composite_id): ?ilMDOrComposite
     {
         if (!$a_or_composite_id) {
             return null;
@@ -157,7 +154,7 @@ class ilMDTechnical extends ilMDBase
         return $orc;
     }
 
-    public function addOrComposite() : ilMDOrComposite
+    public function addOrComposite(): ilMDOrComposite
     {
         $orc = new ilMDOrComposite($this->getRBACId(), $this->getObjId(), $this->getObjType());
         $orc->setParentId($this->getMetaId());
@@ -167,79 +164,79 @@ class ilMDTechnical extends ilMDBase
     }
 
     // SET/GET
-    public function setSize(string $a_size) : void
+    public function setSize(string $a_size): void
     {
         $this->size = $a_size;
     }
 
-    public function getSize() : string
+    public function getSize(): string
     {
         return $this->size;
     }
 
-    public function setInstallationRemarks(string $a_val) : void
+    public function setInstallationRemarks(string $a_val): void
     {
         $this->installation_remarks = $a_val;
     }
 
-    public function getInstallationRemarks() : string
+    public function getInstallationRemarks(): string
     {
         return $this->installation_remarks;
     }
 
-    public function setInstallationRemarksLanguage(ilMDLanguageItem $lng_obj) : void
+    public function setInstallationRemarksLanguage(ilMDLanguageItem $lng_obj): void
     {
         $this->installation_remarks_language = $lng_obj;
     }
 
-    public function getInstallationRemarksLanguage() : ?ilMDLanguageItem
+    public function getInstallationRemarksLanguage(): ?ilMDLanguageItem
     {
         return is_object($this->installation_remarks_language) ? $this->installation_remarks_language : null;
     }
 
-    public function getInstallationRemarksLanguageCode() : string
+    public function getInstallationRemarksLanguageCode(): string
     {
         return is_object($this->installation_remarks_language) ? $this->installation_remarks_language->getLanguageCode() : '';
     }
 
-    public function setOtherPlatformRequirements(string $a_val) : void
+    public function setOtherPlatformRequirements(string $a_val): void
     {
         $this->other_platform_requirements = $a_val;
     }
 
-    public function getOtherPlatformRequirements() : string
+    public function getOtherPlatformRequirements(): string
     {
         return $this->other_platform_requirements;
     }
 
-    public function setOtherPlatformRequirementsLanguage(ilMDLanguageItem $lng_obj) : void
+    public function setOtherPlatformRequirementsLanguage(ilMDLanguageItem $lng_obj): void
     {
         $this->other_platform_requirements_language = $lng_obj;
     }
 
-    public function getOtherPlatformRequirementsLanguage() : ?ilMDLanguageItem
+    public function getOtherPlatformRequirementsLanguage(): ?ilMDLanguageItem
     {
         return is_object($this->other_platform_requirements_language) ? $this->other_platform_requirements_language : null;
     }
 
-    public function getOtherPlatformRequirementsLanguageCode() : string
+    public function getOtherPlatformRequirementsLanguageCode(): string
     {
         return is_object($this->other_platform_requirements_language)
             ? $this->other_platform_requirements_language->getLanguageCode()
             : '';
     }
 
-    public function setDuration(string $a_val) : void
+    public function setDuration(string $a_val): void
     {
         $this->duration = $a_val;
     }
 
-    public function getDuration() : string
+    public function getDuration(): string
     {
         return $this->duration;
     }
 
-    public function save() : int
+    public function save(): int
     {
         $fields = $this->__getFields();
         $fields['meta_technical_id'] = array('integer', $next_id = $this->db->nextId('il_meta_technical'));
@@ -251,7 +248,7 @@ class ilMDTechnical extends ilMDBase
         return 0;
     }
 
-    public function update() : bool
+    public function update(): bool
     {
         return $this->getMetaId() && $this->db->update(
             'il_meta_technical',
@@ -260,7 +257,7 @@ class ilMDTechnical extends ilMDBase
         );
     }
 
-    public function delete() : bool
+    public function delete(): bool
     {
         if ($this->getMetaId()) {
             $query = "DELETE FROM il_meta_technical " .
@@ -293,7 +290,7 @@ class ilMDTechnical extends ilMDBase
     /**
      * @return array<string, array<string, mixed>>
      */
-    public function __getFields() : array
+    public function __getFields(): array
     {
         return array(
             'rbac_id' => array('integer', $this->getRBACId()),
@@ -308,7 +305,7 @@ class ilMDTechnical extends ilMDBase
         );
     }
 
-    public function read() : bool
+    public function read(): bool
     {
         if ($this->getMetaId()) {
             $query = "SELECT * FROM il_meta_technical " .
@@ -320,18 +317,18 @@ class ilMDTechnical extends ilMDBase
                 $this->setObjId((int) $row->obj_id);
                 $this->setObjType($row->obj_type);
                 $this->setSize($row->t_size);
-                $this->setInstallationRemarks($row->ir);
+                $this->setInstallationRemarks($row->ir ?? '');
                 $this->setInstallationRemarksLanguage(new ilMDLanguageItem($row->ir_language));
-                $this->setOtherPlatformRequirements($row->opr);
+                $this->setOtherPlatformRequirements($row->opr ?? '');
                 $this->setOtherPlatformRequirementsLanguage(new ilMDLanguageItem($row->opr_language));
-                $this->setDuration($row->duration);
+                $this->setDuration($row->duration ?? '');
             }
             return true;
         }
         return false;
     }
 
-    public function toXML(ilXmlWriter $writer) : void
+    public function toXML(ilXmlWriter $writer): void
     {
         $writer->xmlStartTag('Technical');
 
@@ -393,7 +390,7 @@ class ilMDTechnical extends ilMDBase
         $writer->xmlEndTag('Technical');
     }
 
-    public static function _getId(int $a_rbac_id, int $a_obj_id) : int
+    public static function _getId(int $a_rbac_id, int $a_obj_id): int
     {
         global $DIC;
 

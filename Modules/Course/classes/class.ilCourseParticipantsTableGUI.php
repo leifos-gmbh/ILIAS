@@ -1,4 +1,6 @@
-<?php declare(strict_types=0);
+<?php
+
+declare(strict_types=0);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -15,7 +17,7 @@
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
- 
+
 /**
  * @author  Stefan Meyer <smeyer.ilias@gmx.de>
  * @ingroup ModulesCourse
@@ -134,7 +136,7 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
         $this->addCommandButton('updateParticipantsStatus', $this->lng->txt('save'));
     }
 
-    protected function fillRow(array $a_set) : void
+    protected function fillRow(array $a_set): void
     {
         $this->tpl->setVariable('VAL_ID', $a_set['usr_id']);
         $this->tpl->setVariable('VAL_NAME', $a_set['lastname'] . ', ' . $a_set['firstname']);
@@ -237,27 +239,12 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
         }
         if ($this->show_learning_progress) {
             $this->tpl->setCurrentBlock('lp');
-            switch ($a_set['progress']) {
-                case ilLPStatus::LP_STATUS_COMPLETED:
-                    $this->tpl->setVariable('LP_STATUS_ALT', $this->lng->txt($a_set['progress']));
-                    $this->tpl->setVariable('LP_STATUS_PATH', ilUtil::getImagePath('scorm/complete.svg'));
-                    break;
+            $icons = ilLPStatusIcons::getInstance(ilLPStatusIcons::ICON_VARIANT_LONG);
+            $icon_rendered = $icons->renderIconForStatus($icons->lookupNumStatus($a_set['progress']));
 
-                case ilLPStatus::LP_STATUS_IN_PROGRESS:
-                    $this->tpl->setVariable('LP_STATUS_ALT', $this->lng->txt($a_set['progress']));
-                    $this->tpl->setVariable('LP_STATUS_PATH', ilUtil::getImagePath('scorm/incomplete.svg'));
-                    break;
+            $this->tpl->setVariable('LP_STATUS_ALT', $this->lng->txt($a_set['progress']));
+            $this->tpl->setVariable('LP_STATUS_ICON', $icon_rendered);
 
-                case ilLPStatus::LP_STATUS_NOT_ATTEMPTED:
-                    $this->tpl->setVariable('LP_STATUS_ALT', $this->lng->txt($a_set['progress']));
-                    $this->tpl->setVariable('LP_STATUS_PATH', ilUtil::getImagePath('scorm/not_attempted.svg'));
-                    break;
-
-                case ilLPStatus::LP_STATUS_FAILED:
-                    $this->tpl->setVariable('LP_STATUS_ALT', $this->lng->txt($a_set['progress']));
-                    $this->tpl->setVariable('LP_STATUS_PATH', ilUtil::getImagePath('scorm/failed.svg'));
-                    break;
-            }
             $this->tpl->parseCurrentBlock();
         }
 
@@ -329,7 +316,7 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
         }
     }
 
-    public function parse() : void
+    public function parse(): void
     {
         $this->determineOffsetAndOrder(true);
 
@@ -391,7 +378,7 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
         $usr_ids = array();
         $local_roles = $this->getParentObject()->getLocalRoles();
         foreach ((array) $usr_data['set'] as $user) {
-            if ($this->current_filter['roles']) {
+            if ($this->current_filter['roles'] ?? false) {
                 if (!$this->rbacReview->isAssigned($user['usr_id'], $this->current_filter['roles'])) {
                     continue;
                 }

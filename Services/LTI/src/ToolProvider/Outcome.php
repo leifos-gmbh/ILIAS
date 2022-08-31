@@ -1,20 +1,23 @@
 <?php
 
-namespace ILIAS\LTI\ToolProvider;
-
-/******************************************************************************
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
+
+namespace ILIAS\LTI\ToolProvider;
+
 /**
  * Class to represent an outcome
  *
@@ -24,11 +27,10 @@ namespace ILIAS\LTI\ToolProvider;
  */
 class Outcome
 {
-
     /**
      * Allowed values for Activity Progress.
      */
-    const ALLOWED_ACTIVITY_PROGRESS = array(
+    public const ALLOWED_ACTIVITY_PROGRESS = array(
         'Initialized',
         'Started',
         'InProgress',
@@ -39,7 +41,7 @@ class Outcome
     /**
      * Allowed values for Grading Progress.
      */
-    const ALLOWED_GRADING_PROGRESS = array(
+    public const ALLOWED_GRADING_PROGRESS = array(
         'FullyGraded',
         'Pending',
         'PendingManual',
@@ -153,7 +155,7 @@ class Outcome
      *
      * @return string Outcome value
      */
-    public function getValue() : ?string
+    public function getValue(): ?string
     {
         return $this->value;
     }
@@ -172,7 +174,7 @@ class Outcome
      *
      * @return int|null Points possible value
      */
-    public function getPointsPossible() : ?int
+    public function getPointsPossible(): ?int
     {
         return $this->pointsPossible;
     }

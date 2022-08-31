@@ -32,7 +32,7 @@ class ilLMTracker
 
     protected ilDBInterface $db;
     protected ilLanguage $lng;
-    protected ilPluginAdmin $plugin_admin;
+    protected ilComponentRepository $component_repository;
     protected ilObjUser $user;
     protected int $lm_ref_id;
     protected int $lm_obj_id;
@@ -60,9 +60,9 @@ class ilLMTracker
 
         $this->db = $DIC->database();
         $this->lng = $DIC->language();
-        $this->plugin_admin = $DIC["ilPluginAdmin"];
         $this->user = $DIC->user();
         $this->user_id = $a_user_id;
+        $this->component_repository = $DIC['component.repository'];
 
         if ($a_by_obj_id) {
             $this->lm_ref_id = 0;
@@ -78,7 +78,7 @@ class ilLMTracker
     public static function getInstance(
         int $a_ref_id,
         int $a_user_id = 0
-    ) : self {
+    ): self {
         global $DIC;
 
         $ilUser = $DIC->user();
@@ -96,7 +96,7 @@ class ilLMTracker
     public static function getInstanceByObjId(
         int $a_obj_id,
         int $a_user_id = 0
-    ) : self {
+    ): self {
         global $DIC;
 
         $ilUser = $DIC->user();
@@ -121,7 +121,7 @@ class ilLMTracker
     public function trackAccess(
         int $a_page_id,
         int $user_id
-    ) : void {
+    ): void {
         if ($user_id == ANONYMOUS_USER_ID) {
             ilChangeEvent::_recordReadEvent("lm", $this->lm_ref_id, $this->lm_obj_id, $user_id);
             return;
@@ -163,7 +163,7 @@ class ilLMTracker
         int $usr_id,
         int $lm_id,
         int $obj_id
-    ) : void {
+    ): void {
         $title = "";
         $db = $this->db;
         $db->replace(
@@ -182,7 +182,7 @@ class ilLMTracker
 
     protected function trackPageAndChapterAccess(
         int $a_page_id
-    ) : void {
+    ): void {
         $ilDB = $this->db;
 
         $now = time();
@@ -228,7 +228,7 @@ class ilLMTracker
             if (!$this->lm_tree->isInTree($pg_id)) {
                 return;
             }
-            
+
             $time_diff = $read_diff = 0;
 
             // spent_seconds or read_count ?
@@ -287,11 +287,11 @@ class ilLMTracker
 
     public function setCurrentPage(
         int $a_val
-    ) : void {
+    ): void {
         $this->current_page_id = $a_val;
     }
 
-    public function getCurrentPage() : int
+    public function getCurrentPage(): int
     {
         return $this->current_page_id;
     }
@@ -299,7 +299,7 @@ class ilLMTracker
     /**
      * Load LM tracking data. Loaded when needed.
      */
-    protected function loadLMTrackingData() : void
+    protected function loadLMTrackingData(): void
     {
         $ilDB = $this->db;
 
@@ -360,7 +360,7 @@ class ilLMTracker
      * Have all questions been answered correctly (and questions exist)?
      * @return bool true, if learning module contains any question and all questions (in the chapter structure) have been answered correctly
      */
-    public function getAllQuestionsCorrect() : bool
+    public function getAllQuestionsCorrect(): bool
     {
         $this->loadLMTrackingData();
         if (count($this->all_questions) > 0 && !$this->has_incorrect_answers) {
@@ -378,7 +378,7 @@ class ilLMTracker
         int $a_obj_id,
         bool &$a_has_pred_incorrect_answers,
         bool &$a_has_pred_incorrect_not_unlocked_answers
-    ) : int {
+    ): int {
         $status = ilLMTracker::NOT_ATTEMPTED;
 
         if (isset($this->tree_arr["nodes"][$a_obj_id])) {
@@ -483,24 +483,26 @@ class ilLMTracker
     public function getIconForLMObject(
         array $a_node,
         int $a_highlighted_node = 0
-    ) : string {
+    ): string {
         $this->loadLMTrackingData();
+        $icons = ilLPStatusIcons::getInstance(ilLPStatusIcons::ICON_VARIANT_SHORT);
+
         if ($a_node["child"] == $a_highlighted_node) {
-            return ilUtil::getImagePath('scorm/running.svg');
+            return $icons->getImagePathRunning();
         }
         if (isset($this->tree_arr["nodes"][$a_node["child"]])) {
             switch ($this->tree_arr["nodes"][$a_node["child"]]["status"]) {
                 case ilLMTracker::IN_PROGRESS:
-                    return ilUtil::getImagePath('scorm/incomplete.svg');
+                    return $icons->getImagePathInProgress();
 
                 case ilLMTracker::FAILED:
-                    return ilUtil::getImagePath('scorm/failed.svg');
+                    return $icons->getImagePathFailed();
 
                 case ilLMTracker::COMPLETED:
-                    return ilUtil::getImagePath('scorm/completed.svg');
+                    return $icons->getImagePathCompleted();
             }
         }
-        return ilUtil::getImagePath('scorm/not_attempted.svg');
+        return $icons->getImagePathNotAttempted();
     }
 
     /**
@@ -527,11 +529,11 @@ class ilLMTracker
     //// Blocked Users
     ////
 
-    public function getBlockedUsersInformation() : array
+    public function getBlockedUsersInformation(): array
     {
         $ilDB = $this->db;
         $lng = $this->lng;
-        $ilPluginAdmin = $this->plugin_admin;
+        $component_repository = $this->component_repository;
 
         $blocked_users = array();
 
@@ -546,7 +548,7 @@ class ilLMTracker
             $page_for_question[$quest["question_id"]] = $quest["page_id"];
         }
         // get question information
-        $qlist = new ilAssQuestionList($ilDB, $lng, $ilPluginAdmin);
+        $qlist = new ilAssQuestionList($ilDB, $lng, $component_repository);
         $qlist->setParentObjId(0);
         $qlist->setJoinObjectData(false);
         $qlist->addFieldFilter("question_id", $this->all_questions);
@@ -575,7 +577,7 @@ class ilLMTracker
      */
     public static function _isNodeVisible(
         array $a_node
-    ) : bool {
+    ): bool {
         if ($a_node["type"] != "pg") {
             return true;
         }

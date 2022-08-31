@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -42,9 +44,9 @@ class ilCertificateDownloadValidator
         $this->activeValidator = $activeValidator;
     }
 
-    public function isCertificateDownloadable(int $userId, int $objId) : bool
+    public function isCertificateDownloadable(int $userId, int $objId): bool
     {
-        if (false === $this->activeValidator->validate()) {
+        if (!$this->activeValidator->validate()) {
             return false;
         }
 

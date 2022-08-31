@@ -1,16 +1,22 @@
 <?php
 
-namespace ILIAS\LTI\ToolProvider;
-
-/******************************************************************************
- * This file is part of ILIAS, a powerful learning management system.
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
- *****************************************************************************/
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
+
+namespace ILIAS\LTI\ToolProvider;
 
 /**
  * Class to represent an assessment control action
@@ -21,31 +27,30 @@ namespace ILIAS\LTI\ToolProvider;
  */
 class AssessmentControlAction
 {
+    /**
+     * Pause action.
+     */
+    public const ACTION_PAUSE = 'pause';
 
     /**
      * Pause action.
      */
-    const ACTION_PAUSE = 'pause';
+    public const ACTION_RESUME = 'resume';
 
     /**
      * Pause action.
      */
-    const ACTION_RESUME = 'resume';
+    public const ACTION_TERMINATE = 'terminate';
 
     /**
      * Pause action.
      */
-    const ACTION_TERMINATE = 'terminate';
+    public const ACTION_UPDATE = 'update';
 
     /**
      * Pause action.
      */
-    const ACTION_UPDATE = 'update';
-
-    /**
-     * Pause action.
-     */
-    const ACTION_FLAG = 'flag';
+    public const ACTION_FLAG = 'flag';
 
     /**
      * Extra time.
@@ -107,7 +112,7 @@ class AssessmentControlAction
      *
      * @return string Action value
      */
-    public function getAction() : ?string
+    public function getAction(): ?string
     {
         return $this->action;
     }
@@ -117,7 +122,7 @@ class AssessmentControlAction
      *
      * @return int Incident date value  //UK: changed DateTime to int
      */
-    public function getDate() : ?int
+    public function getDate(): ?int
     {
         return $this->date;
     }
@@ -127,7 +132,7 @@ class AssessmentControlAction
      *
      * @return float Severity value
      */
-    public function getSeverity() : ?float
+    public function getSeverity(): ?float
     {
         return $this->severity;
     }

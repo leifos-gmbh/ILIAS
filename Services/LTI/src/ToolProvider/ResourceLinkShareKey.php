@@ -1,22 +1,24 @@
 <?php
 
-namespace ILIAS\LTI\ToolProvider;
-
-use ILIAS\LTI\ToolProvider\DataConnector\DataConnector;
-
-/******************************************************************************
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
+
+namespace ILIAS\LTI\ToolProvider;
+
+use ILIAS\LTI\ToolProvider\DataConnector\DataConnector;
 
 /**
  * Class to represent a platform resource link share key
@@ -27,26 +29,25 @@ use ILIAS\LTI\ToolProvider\DataConnector\DataConnector;
  */
 class ResourceLinkShareKey
 {
-
     /**
      * Maximum permitted life for a share key value.
      */
-    const MAX_SHARE_KEY_LIFE = 168;  // in hours (1 week)
+    public const MAX_SHARE_KEY_LIFE = 168;  // in hours (1 week)
 
     /**
      * Default life for a share key value.
      */
-    const DEFAULT_SHARE_KEY_LIFE = 24;  // in hours
+    public const DEFAULT_SHARE_KEY_LIFE = 24;  // in hours
 
     /**
      * Minimum length for a share key value.
      */
-    const MIN_SHARE_KEY_LENGTH = 5;
+    public const MIN_SHARE_KEY_LENGTH = 5;
 
     /**
      * Maximum length for a share key value.
      */
-    const MAX_SHARE_KEY_LENGTH = 32;
+    public const MAX_SHARE_KEY_LENGTH = 32;
 
     /**
      * ID for resource link being shared.
@@ -140,7 +141,7 @@ class ResourceLinkShareKey
      *
      * @return bool    True if the share key was successfully saved
      */
-    public function save() : bool
+    public function save(): bool
     {
         if (empty($this->life)) {
             $this->life = self::DEFAULT_SHARE_KEY_LIFE;
@@ -165,7 +166,7 @@ class ResourceLinkShareKey
      *
      * @return bool    True if the share key was successfully deleted
      */
-    public function delete() : bool
+    public function delete(): bool
     {
         return $this->dataConnector->deleteResourceLinkShareKey($this);
     }
@@ -175,7 +176,7 @@ class ResourceLinkShareKey
      *
      * @return string Share key value
      */
-    public function getId() : ?string
+    public function getId(): ?string
     {
         return $this->id;
     }

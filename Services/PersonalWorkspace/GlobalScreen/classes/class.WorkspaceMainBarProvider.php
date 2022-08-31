@@ -28,11 +28,10 @@ use ILIAS\MainMenu\Provider\StandardTopItemsProvider;
  */
 class WorkspaceMainBarProvider extends AbstractStaticMainMenuProvider
 {
-
     /**
      * @inheritDoc
      */
-    public function getStaticTopItems() : array
+    public function getStaticTopItems(): array
     {
         return [];
     }
@@ -41,13 +40,12 @@ class WorkspaceMainBarProvider extends AbstractStaticMainMenuProvider
     /**
      * @inheritDoc
      */
-    public function getStaticSubItems() : array
+    public function getStaticSubItems(): array
     {
         $dic = $this->dic;
 
         $title = $this->dic->language()->txt("mm_personal_and_shared_r");
         $icon = $this->dic->ui()->factory()->symbol()->icon()->standard("fold", $title);
-
         return [
             $this->mainmenu->link($this->if->identifier('mm_pd_wsp'))
                 ->withTitle($title)

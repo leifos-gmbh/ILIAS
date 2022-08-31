@@ -1,18 +1,23 @@
-<?php declare(strict_types=1);
+<?php
 
-/******************************************************************************
+declare(strict_types=1);
+
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
+
 /**
  * Class ilObjContentObjectAccess
  * @author  Alex Killing <alex.killing@gmx.de>
@@ -21,12 +26,11 @@
  */
 class ilObjSAHSLearningModuleAccess extends ilObjectAccess implements ilConditionHandling
 {
-
     /**
      * Get possible conditions operaditors
      * @return string[]
      */
-    public static function getConditionOperators() : array
+    public static function getConditionOperators(): array
     {
         return array(
             ilConditionHandler::OPERATOR_FINISHED,
@@ -39,9 +43,8 @@ class ilObjSAHSLearningModuleAccess extends ilObjectAccess implements ilConditio
         string $a_operator,
         string $a_value,
         int $a_usr_id
-    ) : bool {
+    ): bool {
         switch ($a_operator) {
-
             case ilConditionHandler::OPERATOR_FAILED:
                 return ilLPStatus::_lookupStatus($a_trigger_obj_id, $a_usr_id) == ilLPStatus::LP_STATUS_FAILED_NUM;
                 break;
@@ -49,7 +52,6 @@ class ilObjSAHSLearningModuleAccess extends ilObjectAccess implements ilConditio
             case ilConditionHandler::OPERATOR_FINISHED:
             default:
                 return ilLPStatus::_hasUserCompleted($a_trigger_obj_id, $a_usr_id);
-
         }
     }
 
@@ -64,7 +66,7 @@ class ilObjSAHSLearningModuleAccess extends ilObjectAccess implements ilConditio
      *    );
      * @return array<int, array>
      */
-    public static function _getCommands(int $a_obj_id = null) : array
+    public static function _getCommands(int $a_obj_id = null): array
     {
         $commands = array(
             array("permission" => "read", "cmd" => "view", "lang_var" => "show", "default" => true),
@@ -77,7 +79,7 @@ class ilObjSAHSLearningModuleAccess extends ilObjectAccess implements ilConditio
     /**
      * check whether goto script will succeed
      */
-    public static function _checkGoto(string $target) : bool
+    public static function _checkGoto(string $target): bool
     {
         global $DIC;
         $ilAccess = $DIC->access();
@@ -121,7 +123,7 @@ class ilObjSAHSLearningModuleAccess extends ilObjectAccess implements ilConditio
      * with the specified object id.
      * @param int object id of a file object.
      */
-    public static function _lookupDiskUsage(int $a_id) : int
+    public static function _lookupDiskUsage(int $a_id): int
     {
         $lm_data_dir = ilFileUtils::getWebspaceDir('filesystem') . "/lm_data";
         $lm_dir = $lm_data_dir . DIRECTORY_SEPARATOR . "lm_" . $a_id;

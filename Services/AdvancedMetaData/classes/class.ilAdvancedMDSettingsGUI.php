@@ -1,6 +1,22 @@
-<?php declare(strict_types=1);
+<?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
+declare(strict_types=1);
+
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 use ILIAS\UI\Factory as UIFactory;
 use ILIAS\Refinery\Factory as RefineryFactory;
@@ -91,7 +107,7 @@ class ilAdvancedMDSettingsGUI
         $this->permissions = ilAdvancedMDPermissionHelper::getInstance($DIC->user()->getId(), $this->ref_id);
     }
 
-    protected function getRecordIdFromQuery() : ?int
+    protected function getRecordIdFromQuery(): ?int
     {
         if ($this->http->wrapper()->query()->has('record_id')) {
             return $this->http->wrapper()->query()->retrieve(
@@ -102,12 +118,12 @@ class ilAdvancedMDSettingsGUI
         return null;
     }
 
-    protected function getRecordIdsFromPost() : SplFixedArray
+    protected function getRecordIdsFromPost(): SplFixedArray
     {
-        if ($this->http->wrapper()->post()->has('field_id')) {
+        if ($this->http->wrapper()->post()->has('record_id')) {
             return SplFixedArray::fromArray(
                 $this->http->wrapper()->post()->retrieve(
-                    'field_id',
+                    'record_id',
                     $this->refinery->kindlyTo()->listOf(
                         $this->refinery->kindlyTo()->int()
                     )
@@ -117,7 +133,7 @@ class ilAdvancedMDSettingsGUI
         return new SplFixedArray(0);
     }
 
-    protected function getFieldIdFromQuery() : ?int
+    protected function getFieldIdFromQuery(): ?int
     {
         if ($this->http->wrapper()->query()->has('field_id')) {
             return $this->http->wrapper()->query()->retrieve(
@@ -128,7 +144,7 @@ class ilAdvancedMDSettingsGUI
         return null;
     }
 
-    protected function getFieldIdsFromPost() : SplFixedArray
+    protected function getFieldIdsFromPost(): SplFixedArray
     {
         if ($this->http->wrapper()->post()->has('field_id')) {
             return SplFixedArray::fromArray(
@@ -143,7 +159,7 @@ class ilAdvancedMDSettingsGUI
         return new SplFixedArray(0);
     }
 
-    protected function getFileIdsFromPost() : SplFixedArray
+    protected function getFileIdsFromPost(): SplFixedArray
     {
         if ($this->http->wrapper()->post()->has('file_id')) {
             return SplFixedArray::fromArray(
@@ -158,7 +174,7 @@ class ilAdvancedMDSettingsGUI
         return new SplFixedArray(0);
     }
 
-    protected function getFieldTypeFromQuery() : ?int
+    protected function getFieldTypeFromQuery(): ?int
     {
         if ($this->http->wrapper()->query()->has('ftype')) {
             return $this->http->wrapper()->query()->retrieve(
@@ -169,7 +185,7 @@ class ilAdvancedMDSettingsGUI
         return null;
     }
 
-    protected function getFieldTypeFromPost() : ?int
+    protected function getFieldTypeFromPost(): ?int
     {
         if ($this->http->wrapper()->post()->has('ftype')) {
             return $this->http->wrapper()->post()->retrieve(
@@ -180,7 +196,7 @@ class ilAdvancedMDSettingsGUI
         return null;
     }
 
-    protected function getOidFromQuery() : ?int
+    protected function getOidFromQuery(): ?int
     {
         if ($this->http->wrapper()->query()->has('oid')) {
             return $this->http->wrapper()->query()->retrieve(
@@ -194,7 +210,7 @@ class ilAdvancedMDSettingsGUI
     /**
      * @return array<string, float>
      */
-    protected function getPositionsFromPost() : array
+    protected function getPositionsFromPost(): array
     {
         if ($this->http->wrapper()->post()->has('position')) {
             return $this->http->wrapper()->post()->retrieve(
@@ -210,7 +226,7 @@ class ilAdvancedMDSettingsGUI
     /**
      * @return ilAdvancedMDPermissionHelper
      */
-    protected function getPermissions() : ilAdvancedMDPermissionHelper
+    protected function getPermissions(): ilAdvancedMDPermissionHelper
     {
         return $this->permissions;
     }
@@ -223,7 +239,7 @@ class ilAdvancedMDSettingsGUI
         int $ref_id,
         ?string $obj_type,
         $sub_type
-    ) : void {
+    ): void {
         if ($context === self::CONTEXT_ADMINISTRATION) {
             $this->ref_id = $ref_id;
             $this->obj_id = null;
@@ -237,12 +253,11 @@ class ilAdvancedMDSettingsGUI
         }
     }
 
-    public function executeCommand() : void
+    public function executeCommand(): void
     {
         $next_class = $this->ctrl->getNextClass($this);
         $cmd = $this->ctrl->getCmd();
         switch ($next_class) {
-
             case strtolower(ilAdvancedMDRecordTranslationGUI::class):
                 $record = $this->initRecordObject();
                 $this->setRecordSubTabs(1, true);
@@ -266,7 +281,7 @@ class ilAdvancedMDSettingsGUI
         }
     }
 
-    public function showRecords() : void
+    public function showRecords(): void
     {
         global $DIC;
 
@@ -277,7 +292,7 @@ class ilAdvancedMDSettingsGUI
 
         $perm = $this->getPermissions()->hasPermissions(
             ilAdvancedMDPermissionHelper::CONTEXT_MD,
-            $this->ref_id,
+            (string) $this->ref_id,
             array(
                 ilAdvancedMDPermissionHelper::ACTION_MD_CREATE_RECORD,
                 ilAdvancedMDPermissionHelper::ACTION_MD_IMPORT_RECORDS
@@ -327,7 +342,7 @@ class ilAdvancedMDSettingsGUI
         $DIC->ui()->mainTemplate()->setContent($table_gui->getHTML());
     }
 
-    protected function showPresentation() : void
+    protected function showPresentation(): void
     {
         $this->setSubTabs($this->context);
         $form = $this->initFormSubstitutions();
@@ -343,7 +358,7 @@ class ilAdvancedMDSettingsGUI
      * Update substitution
      * @access public
      */
-    public function updateSubstitutions() : void
+    public function updateSubstitutions(): void
     {
         global $DIC;
 
@@ -369,7 +384,7 @@ class ilAdvancedMDSettingsGUI
             if (in_array($obj_type, $this->permissions->getAllowedObjectTypes())) {
                 $perm = $this->getPermissions()->hasPermissions(
                     ilAdvancedMDPermissionHelper::CONTEXT_SUBSTITUTION,
-                    0,
+                    "0",
                     array(
                         ilAdvancedMDPermissionHelper::ACTION_SUBSTITUTION_SHOW_DESCRIPTION
                         ,
@@ -412,20 +427,20 @@ class ilAdvancedMDSettingsGUI
                 $old = $old_sub[$field_id];
 
                 $perm_def = $this->getSubstitutionFieldPermissions($obj_type, $field_id);
-                if ($perm_def["show"]) {
+                if ($perm_def["show"] ?? false) {
                     $active = (bool) $form->getInput('show_' . $obj_type . '_' . $field_id);
                 } else {
-                    $active = $old["active"];
+                    $active = $old["active"] ?? false;
                 }
                 if ($active) {
                     $new_sub[$field_id] = $old;
                     if ($perm[ilAdvancedMDPermissionHelper::ACTION_SUBSTITUTION_FIELD_POSITIONS]) {
                         $new_sub[$field_id]['pos'] = (int) $form->getInput('position_' . $obj_type . '_' . $field_id);
                     }
-                    if ($perm_def["bold"]) {
+                    if ($perm_def["bold"] ?? false) {
                         $new_sub[$field_id]['bold'] = (bool) $form->getInput('bold_' . $obj_type . '_' . $field_id);
                     }
-                    if ($perm_def["newline"]) {
+                    if ($perm_def["newline"] ?? false) {
                         $new_sub[$field_id]['newline'] = (bool) $form->getInput('newline_' . $obj_type . '_' . $field_id);
                     }
                 }
@@ -448,7 +463,7 @@ class ilAdvancedMDSettingsGUI
      * Export records
      * @access public
      */
-    public function exportRecords() : void
+    public function exportRecords(): void
     {
         $record_ids = $this->getRecordIdsFromPost();
         if (!count($record_ids)) {
@@ -462,7 +477,7 @@ class ilAdvancedMDSettingsGUI
         foreach ($record_ids as $record_id) {
             if (!$this->getPermissions()->hasPermission(
                 ilAdvancedMDPermissionHelper::CONTEXT_RECORD,
-                $record_id,
+                (string) $record_id,
                 ilAdvancedMDPermissionHelper::ACTION_RECORD_EXPORT
             )) {
                 $record = ilAdvancedMDRecord::_getInstanceByRecordId($record_id);
@@ -489,7 +504,7 @@ class ilAdvancedMDSettingsGUI
     /**
      * Show export files
      */
-    protected function showFiles() : void
+    protected function showFiles(): void
     {
         $this->setSubTabs($this->context);
         $this->tabs_gui->setSubTabActive('md_adv_file_list');
@@ -517,7 +532,7 @@ class ilAdvancedMDSettingsGUI
      * @access public
      * @param
      */
-    public function downloadFile() : void
+    public function downloadFile(): void
     {
         $file_ids = $this->getFileIdsFromPost();
         if (count($file_ids) !== 1) {
@@ -536,7 +551,7 @@ class ilAdvancedMDSettingsGUI
      * confirm delete files
      * @access public
      */
-    public function confirmDeleteFiles() : void
+    public function confirmDeleteFiles(): void
     {
         $file_ids = $this->getFileIdsFromPost();
         if (count($file_ids) !== 1) {
@@ -575,7 +590,7 @@ class ilAdvancedMDSettingsGUI
      * @access public
      * @param
      */
-    public function deleteFiles() : void
+    public function deleteFiles(): void
     {
         $file_ids = $this->getFileIdsFromPost();
         if (count($file_ids) === 0) {
@@ -603,7 +618,7 @@ class ilAdvancedMDSettingsGUI
      * Confirm delete
      * @access public
      */
-    public function confirmDeleteRecords() : void
+    public function confirmDeleteRecords(): void
     {
         $this->initRecordObject();
         $this->setRecordSubTabs();
@@ -635,7 +650,7 @@ class ilAdvancedMDSettingsGUI
      * Permanently delete records
      * @access public
      */
-    public function deleteRecords() : void
+    public function deleteRecords(): void
     {
         $record_ids = $this->getRecordIdsFromPost();
         if (!count($record_ids)) {
@@ -657,7 +672,7 @@ class ilAdvancedMDSettingsGUI
 
             if (!$this->getPermissions()->hasPermission(
                 ilAdvancedMDPermissionHelper::CONTEXT_RECORD,
-                $record_id,
+                (string) $record_id,
                 ilAdvancedMDPermissionHelper::ACTION_RECORD_DELETE
             )) {
                 $record = ilAdvancedMDRecord::_getInstanceByRecordId($record_id);
@@ -682,7 +697,7 @@ class ilAdvancedMDSettingsGUI
      * @access public
      * @param
      */
-    public function updateRecords() : void
+    public function updateRecords(): void
     {
         // sort positions and renumber
         $positions = $this->getPositionsFromPost();
@@ -702,7 +717,7 @@ class ilAdvancedMDSettingsGUI
         foreach ($this->getParsedRecordObjects() as $item) {
             $perm = $this->getPermissions()->hasPermissions(
                 ilAdvancedMDPermissionHelper::CONTEXT_RECORD,
-                $item['id'],
+                (string) $item['id'],
                 array(
                     ilAdvancedMDPermissionHelper::ACTION_RECORD_TOGGLE_ACTIVATION
                     ,
@@ -754,7 +769,7 @@ class ilAdvancedMDSettingsGUI
                 // global, optional record
                 if ($item['readonly'] &&
                     $item['optional'] &&
-                    $post_active[$item['id']] ?? false) {
+                    ($post_active[$item['id']] ?? false)) {
                     $selected_global[] = $item['id'];
                 } elseif ($item['local']) {
                     $record_obj = ilAdvancedMDRecord::_getInstanceByRecordId($item['id']);
@@ -777,7 +792,7 @@ class ilAdvancedMDSettingsGUI
         $this->ctrl->redirect($this, "showRecords");
     }
 
-    public function confirmDeleteFields() : void
+    public function confirmDeleteFields(): void
     {
         $field_ids = $this->getFieldIdsFromPost();
         if (!count($field_ids)) {
@@ -800,12 +815,12 @@ class ilAdvancedMDSettingsGUI
         // add items to delete
         foreach ($field_ids as $field_id) {
             $field = ilAdvancedMDFieldDefinition::getInstance($field_id);
-            $c_gui->addItem("field_id[]", $field_id, $field->getTitle() ?: 'No Title');
+            $c_gui->addItem("field_id[]", (string) $field_id, $field->getTitle() ?: 'No Title');
         }
         $this->tpl->setContent($c_gui->getHTML());
     }
 
-    public function deleteFields() : void
+    public function deleteFields(): void
     {
         $this->ctrl->saveParameter($this, 'record_id');
 
@@ -821,7 +836,7 @@ class ilAdvancedMDSettingsGUI
         foreach ($field_ids as $field_id) {
             if (!$this->getPermissions()->hasPermission(
                 ilAdvancedMDPermissionHelper::CONTEXT_FIELD,
-                $field_id,
+                (string) $field_id,
                 ilAdvancedMDPermissionHelper::ACTION_FIELD_DELETE
             )) {
                 $field = ilAdvancedMDFieldDefinition::getInstance($field_id);
@@ -841,7 +856,7 @@ class ilAdvancedMDSettingsGUI
         $this->ctrl->redirect($this, "editFields");
     }
 
-    public function editRecord(ilPropertyFormGUI $form = null) : void
+    public function editRecord(ilPropertyFormGUI $form = null): void
     {
         $record_id = $this->getRecordIdFromQuery();
         if (!$record_id) {
@@ -859,7 +874,7 @@ class ilAdvancedMDSettingsGUI
         $this->tpl->setContent($this->form->getHTML());
     }
 
-    protected function editFields() : void
+    protected function editFields(): void
     {
         global $DIC;
 
@@ -875,7 +890,7 @@ class ilAdvancedMDSettingsGUI
 
         $perm = $this->getPermissions()->hasPermissions(
             ilAdvancedMDPermissionHelper::CONTEXT_RECORD,
-            $this->record->getRecordId(),
+            (string) $this->record->getRecordId(),
             array(
                 ilAdvancedMDPermissionHelper::ACTION_RECORD_CREATE_FIELD
                 ,
@@ -946,7 +961,7 @@ class ilAdvancedMDSettingsGUI
      * Update fields
      * @access public
      */
-    public function updateFields() : void
+    public function updateFields(): void
     {
         $this->ctrl->saveParameter($this, 'record_id');
         $positions = $this->getPositionsFromPost();
@@ -962,7 +977,7 @@ class ilAdvancedMDSettingsGUI
 
         if ($this->getPermissions()->hasPermission(
             ilAdvancedMDPermissionHelper::CONTEXT_RECORD,
-            $record_id,
+            (string) $record_id,
             ilAdvancedMDPermissionHelper::ACTION_RECORD_FIELD_POSITIONS
         )) {
             $positions_flipped = array_flip(array_keys($positions));
@@ -975,7 +990,7 @@ class ilAdvancedMDSettingsGUI
         foreach ($fields as $field) {
             if ($this->getPermissions()->hasPermission(
                 ilAdvancedMDPermissionHelper::CONTEXT_FIELD,
-                $field->getFieldId(),
+                (string) $field->getFieldId(),
                 ilAdvancedMDPermissionHelper::ACTION_FIELD_EDIT_PROPERTY,
                 ilAdvancedMDPermissionHelper::SUBACTION_FIELD_SEARCHABLE
             )) {
@@ -998,7 +1013,7 @@ class ilAdvancedMDSettingsGUI
      * @access public
      * @param
      */
-    public function updateRecord() : void
+    public function updateRecord(): void
     {
         $record_id = $this->getRecordIdFromQuery();
         if (!$record_id) {
@@ -1035,7 +1050,7 @@ class ilAdvancedMDSettingsGUI
      * @access public
      * @param
      */
-    public function createRecord(ilPropertyFormGUI $form = null) : void
+    public function createRecord(ilPropertyFormGUI $form = null): void
     {
         $this->initRecordObject();
         $this->setRecordSubTabs();
@@ -1045,7 +1060,7 @@ class ilAdvancedMDSettingsGUI
         $this->tpl->setContent($this->form->getHTML());
     }
 
-    protected function importRecords() : void
+    protected function importRecords(): void
     {
         $this->initRecordObject();
         $this->setRecordSubTabs();
@@ -1058,7 +1073,7 @@ class ilAdvancedMDSettingsGUI
     /**
      * Set subtabs for record editing/creation
      */
-    protected function setRecordSubTabs(int $level = 1, bool $show_settings = false) : void
+    protected function setRecordSubTabs(int $level = 1, bool $show_settings = false): void
     {
         $this->tabs_gui->clearTargets();
         $this->tabs_gui->clearSubTabs();
@@ -1103,7 +1118,7 @@ class ilAdvancedMDSettingsGUI
         }
     }
 
-    protected function initImportForm() : void
+    protected function initImportForm(): void
     {
         if (is_object($this->import_form)) {
             return;
@@ -1124,7 +1139,7 @@ class ilAdvancedMDSettingsGUI
         $this->import_form->addCommandButton('showRecords', $this->lng->txt('cancel'));
     }
 
-    public function importRecord() : void
+    public function importRecord(): void
     {
         $this->initImportForm();
         if (!$this->import_form->checkInput()) {
@@ -1170,7 +1185,7 @@ class ilAdvancedMDSettingsGUI
      * @access public
      * @param
      */
-    public function saveRecord() : void
+    public function saveRecord(): void
     {
         $this->initRecordObject();
         $form = $this->initForm('create');
@@ -1209,7 +1224,7 @@ class ilAdvancedMDSettingsGUI
      * Edit field
      * @access public
      */
-    public function editField(ilPropertyFormGUI $a_form = null) : void
+    public function editField(ilPropertyFormGUI $a_form = null): void
     {
         $record_id = $this->getRecordIdFromQuery();
         $field_id = $this->getFieldIdFromQuery();
@@ -1240,7 +1255,7 @@ class ilAdvancedMDSettingsGUI
      * Update field
      * @access public
      */
-    public function updateField() : void
+    public function updateField(): void
     {
         $record_id = $this->getRecordIdFromQuery();
         $field_id = $this->getFieldIdFromQuery();
@@ -1288,7 +1303,7 @@ class ilAdvancedMDSettingsGUI
      * Show field type selection
      * @access public
      */
-    public function createField(ilPropertyFormGUI $a_form = null) : void
+    public function createField(ilPropertyFormGUI $a_form = null): void
     {
         $record_id = $this->getRecordIdFromQuery();
         $field_type = $this->getFieldTypeFromPost();
@@ -1310,7 +1325,7 @@ class ilAdvancedMDSettingsGUI
         $this->tpl->setContent($a_form->getHTML());
     }
 
-    public function saveField() : void
+    public function saveField(): void
     {
         $record_id = $this->getRecordIdFromQuery();
         $ftype = $this->getFieldTypeFromQuery();
@@ -1347,7 +1362,7 @@ class ilAdvancedMDSettingsGUI
         $this->createField($form);
     }
 
-    protected function initFieldForm(ilAdvancedMDFieldDefinition $a_definition) : ilPropertyFormGUI
+    protected function initFieldForm(ilAdvancedMDFieldDefinition $a_definition): ilPropertyFormGUI
     {
         $is_creation_mode = $a_definition->getFieldId() ? false : true;
 
@@ -1381,14 +1396,14 @@ class ilAdvancedMDSettingsGUI
         return $form;
     }
 
-    protected function initForm($a_mode) : ilPropertyFormGUI
+    protected function initForm($a_mode): ilPropertyFormGUI
     {
         if ($this->form instanceof ilPropertyFormGUI) {
             return $this->form;
         }
         $perm = $this->getPermissions()->hasPermissions(
             ilAdvancedMDPermissionHelper::CONTEXT_RECORD,
-            $this->record->getRecordId(),
+            (string) $this->record->getRecordId(),
             array(
                 array(ilAdvancedMDPermissionHelper::ACTION_RECORD_EDIT_PROPERTY,
                       ilAdvancedMDPermissionHelper::SUBACTION_RECORD_TITLE
@@ -1537,8 +1552,8 @@ class ilAdvancedMDSettingsGUI
                 $this->form->setTitle($this->lng->txt('md_adv_create_record'));
                 $this->form->addCommandButton('saveRecord', $this->lng->txt('add'));
                 $this->form->addCommandButton('showRecords', $this->lng->txt('cancel'));
+                break;
 
-                // no break
             case 'edit':
                 $this->form->setTitle($this->lng->txt('md_adv_edit_record'));
                 $this->form->addCommandButton('updateRecord', $this->lng->txt('save'));
@@ -1547,12 +1562,12 @@ class ilAdvancedMDSettingsGUI
         return $this->form;
     }
 
-    protected function getSubstitutionFieldPermissions(string $a_obj_type, int $a_field_id) : array
+    protected function getSubstitutionFieldPermissions(string $a_obj_type, int $a_field_id): array
     {
         if ($a_obj_type == "crs") {
             $perm = $this->getPermissions()->hasPermissions(
                 ilAdvancedMDPermissionHelper::CONTEXT_SUBSTITUTION_COURSE,
-                $a_field_id,
+                (string) $a_field_id,
                 array(
                     ilAdvancedMDPermissionHelper::ACTION_SUBSTITUTION_COURSE_SHOW_FIELD
                     ,
@@ -1575,7 +1590,7 @@ class ilAdvancedMDSettingsGUI
         } elseif ($a_obj_type == "cat") {
             $perm = $this->getPermissions()->hasPermissions(
                 ilAdvancedMDPermissionHelper::CONTEXT_SUBSTITUTION_CATEGORY,
-                $a_field_id,
+                (string) $a_field_id,
                 array(
                     ilAdvancedMDPermissionHelper::ACTION_SUBSTITUTION_CATEGORY_SHOW_FIELD
                     ,
@@ -1598,7 +1613,7 @@ class ilAdvancedMDSettingsGUI
         } elseif ($a_obj_type == "sess") {
             $perm = $this->getPermissions()->hasPermissions(
                 ilAdvancedMDPermissionHelper::CONTEXT_SUBSTITUTION_SESSION,
-                $a_field_id,
+                (string) $a_field_id,
                 array(
                     ilAdvancedMDPermissionHelper::ACTION_SUBSTITUTION_SESSION_SHOW_FIELD
                     ,
@@ -1621,7 +1636,7 @@ class ilAdvancedMDSettingsGUI
         } elseif ($a_obj_type == "grp") {
             $perm = $this->getPermissions()->hasPermissions(
                 ilAdvancedMDPermissionHelper::CONTEXT_SUBSTITUTION_GROUP,
-                $a_field_id,
+                (string) $a_field_id,
                 array(
                     ilAdvancedMDPermissionHelper::ACTION_SUBSTITUTION_GROUP_SHOW_FIELD
                     ,
@@ -1644,7 +1659,7 @@ class ilAdvancedMDSettingsGUI
         } elseif ($a_obj_type == "iass") {
             $perm = $this->getPermissions()->hasPermissions(
                 ilAdvancedMDPermissionHelper::CONTEXT_SUBSTITUTION_IASS,
-                $a_field_id,
+                (string) $a_field_id,
                 array(
                     ilAdvancedMDPermissionHelper::ACTION_SUBSTITUTION_IASS_SHOW_FIELD
                     ,
@@ -1667,7 +1682,7 @@ class ilAdvancedMDSettingsGUI
         } elseif ($a_obj_type == "exc") {
             $perm = $this->getPermissions()->hasPermissions(
                 ilAdvancedMDPermissionHelper::CONTEXT_SUBSTITUTION_EXERCISE,
-                $a_field_id,
+                (string) $a_field_id,
                 array(
                     ilAdvancedMDPermissionHelper::ACTION_SUBSTITUTION_EXERCISE_SHOW_FIELD
                     ,
@@ -1695,7 +1710,7 @@ class ilAdvancedMDSettingsGUI
      * init form table 'substitutions'
      * @access protected
      */
-    protected function initFormSubstitutions() : ?ilPropertyFormGUI
+    protected function initFormSubstitutions(): ?ilPropertyFormGUI
     {
         global $DIC;
 
@@ -1716,7 +1731,7 @@ class ilAdvancedMDSettingsGUI
             if (in_array($obj_type, $this->permissions->getAllowedObjectTypes())) {
                 $perm = $this->getPermissions()->hasPermissions(
                     ilAdvancedMDPermissionHelper::CONTEXT_SUBSTITUTION,
-                    $obj_type,
+                    (string) $obj_type,
                     array(
                         ilAdvancedMDPermissionHelper::ACTION_SUBSTITUTION_SHOW_DESCRIPTION
                         ,
@@ -1829,13 +1844,13 @@ class ilAdvancedMDSettingsGUI
         return $this->form;
     }
 
-    protected function loadRecordFormData(ilPropertyFormGUI $form) : ilAdvancedMDRecord
+    protected function loadRecordFormData(ilPropertyFormGUI $form): ilAdvancedMDRecord
     {
         $translations = ilAdvancedMDRecordTranslations::getInstanceByRecordId($this->record->getRecordId());
 
         $perm = $this->getPermissions()->hasPermissions(
             ilAdvancedMDPermissionHelper::CONTEXT_RECORD,
-            $this->record->getRecordId(),
+            (string) $this->record->getRecordId(),
             array(
                 array(ilAdvancedMDPermissionHelper::ACTION_RECORD_EDIT_PROPERTY,
                       ilAdvancedMDPermissionHelper::SUBACTION_RECORD_TITLE
@@ -1913,7 +1928,7 @@ class ilAdvancedMDSettingsGUI
     /**
      * @todo get rid of $this->obj_id switch
      */
-    protected function initRecordObject() : ilAdvancedMDRecord
+    protected function initRecordObject(): ilAdvancedMDRecord
     {
         if (!$this->record instanceof ilAdvancedMDRecord) {
             $record_id = $this->getRecordIdFromQuery();
@@ -1932,7 +1947,7 @@ class ilAdvancedMDSettingsGUI
      * Set sub tabs
      * @access protected
      */
-    protected function setSubTabs(int $context) : void
+    protected function setSubTabs(int $context): void
     {
         if ($context == self::CONTEXT_OBJECT) {
             return;
@@ -1967,7 +1982,7 @@ class ilAdvancedMDSettingsGUI
      * @todo get rid of this (used in ilAdvancedMDRecordTableGUI) and the parsing there. Also get rid of the usage in
      *       ilAvancedMDSettingsGUI::updateRecords
      */
-    protected function getParsedRecordObjects() : array
+    protected function getParsedRecordObjects(): array
     {
         $res = [];
 
@@ -2008,10 +2023,10 @@ class ilAdvancedMDSettingsGUI
                 }
                 // scope needs to match in object context
                 if (
-                ilAdvancedMDRecord::isFilteredByScope(
-                    $this->ref_id,
-                    $record->getScopes()
-                )
+                    ilAdvancedMDRecord::isFilteredByScope(
+                        $this->ref_id,
+                        $record->getScopes()
+                    )
                 ) {
                     continue;
                 }
@@ -2035,7 +2050,7 @@ class ilAdvancedMDSettingsGUI
 
             $tmp_arr['perm'] = $this->permissions->hasPermissions(
                 ilAdvancedMDPermissionHelper::CONTEXT_RECORD,
-                $record->getRecordId(),
+                (string) $record->getRecordId(),
                 array(
                     ilAdvancedMDPermissionHelper::ACTION_RECORD_EDIT
                     ,
@@ -2086,7 +2101,7 @@ class ilAdvancedMDSettingsGUI
     // complex options
     //
 
-    public function editComplexOption(ilPropertyFormGUI $a_form = null) : void
+    public function editComplexOption(ilPropertyFormGUI $a_form = null): void
     {
         $field_id = $this->getFieldIdFromQuery();
         if (!$field_id) {
@@ -2106,7 +2121,7 @@ class ilAdvancedMDSettingsGUI
         $this->tpl->setContent($a_form->getHTML());
     }
 
-    protected function initComplexOptionForm(ilAdvancedMDFieldDefinition $a_def) : ilPropertyFormGUI
+    protected function initComplexOptionForm(ilAdvancedMDFieldDefinition $a_def): ilPropertyFormGUI
     {
         $this->ctrl->saveParameter($this, "record_id");
         $this->ctrl->saveParameter($this, "field_id");
@@ -2125,7 +2140,7 @@ class ilAdvancedMDSettingsGUI
         return $form;
     }
 
-    public function updateComplexOption() : void
+    public function updateComplexOption(): void
     {
         $field_id = $this->getFieldIdFromQuery();
         $field_definition = ilAdvancedMDFieldDefinition::getInstance($field_id);
@@ -2143,7 +2158,7 @@ class ilAdvancedMDSettingsGUI
         $this->ctrl->redirect($this, "editField");
     }
 
-    protected function initLanguage(int $record_id) : void
+    protected function initLanguage(int $record_id): void
     {
         $translations = ilAdvancedMDRecordTranslations::getInstanceByRecordId($record_id);
         // read active language
@@ -2157,7 +2172,7 @@ class ilAdvancedMDSettingsGUI
         $this->active_language = $active;
     }
 
-    protected function showLanguageSwitch(int $record_id, string $target) : void
+    protected function showLanguageSwitch(int $record_id, string $target): void
     {
         $translations = ilAdvancedMDRecordTranslations::getInstanceByRecordId($record_id);
 

@@ -15,7 +15,7 @@
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
- 
+
 /**
  * File System Explorer GUI class
  *
@@ -32,7 +32,7 @@ class ilExAssignmentFileSystemGUI extends ilFileSystemGUI
      */
     protected array $requested_file;
 
-    public function __construct(string $a_main_directory)
+    public function __construct(string $main_relative_directory)
     {
         /** @var \ILIAS\DI\Container $DIC */
         global $DIC;
@@ -45,13 +45,13 @@ class ilExAssignmentFileSystemGUI extends ilFileSystemGUI
         $this->requested_file = $request->getFiles();
 
         $this->ctrl = $DIC->ctrl();
-        parent::__construct($a_main_directory);
+        parent::__construct($main_relative_directory);
     }
 
     public function getTable(
         string $a_dir,
         string $a_subdir
-    ) : ilExAssignmentFileSystemTableGUI {
+    ): ilExAssignmentFileSystemTableGUI {
         return new ilExAssignmentFileSystemTableGUI(
             $this,
             "listFiles",
@@ -66,7 +66,7 @@ class ilExAssignmentFileSystemGUI extends ilFileSystemGUI
     }
 
 
-    public function uploadFile() : void
+    public function uploadFile(): void
     {
         $filename = ilUtil::stripSlashes($_FILES["new_file"]["name"]);
 
@@ -74,7 +74,7 @@ class ilExAssignmentFileSystemGUI extends ilFileSystemGUI
         parent::uploadFile();
     }
 
-    public function saveFilesOrder() : void
+    public function saveFilesOrder(): void
     {
         $ilCtrl = $this->ctrl;
 
@@ -84,7 +84,7 @@ class ilExAssignmentFileSystemGUI extends ilFileSystemGUI
         }
     }
 
-    public function deleteFile() : void
+    public function deleteFile(): void
     {
         if ($this->requested_ass_id > 0) {
             ilExAssignment::instructionFileDeleteOrder($this->requested_ass_id, $this->requested_file);
@@ -96,7 +96,7 @@ class ilExAssignmentFileSystemGUI extends ilFileSystemGUI
     /**
      * Rename File name
      */
-    public function renameFile() : void
+    public function renameFile(): void
     {
         if ($this->requested_ass_id > 0) {
             $new_name = str_replace("..", "", ilUtil::stripSlashes($this->requested_new_name));

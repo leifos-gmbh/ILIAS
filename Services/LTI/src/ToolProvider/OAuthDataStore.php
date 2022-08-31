@@ -1,5 +1,21 @@
 <?php
 
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
+
 namespace ILIAS\LTI\ToolProvider;
 
 use ILIAS\LTIOAuth;
@@ -7,19 +23,6 @@ use ILIAS\LTIOAuth\OAuthConsumer;
 use ILIAS\LTIOAuth\OAuthToken;
 use ILIAS\LTIOAuth\OAuthException;
 
-/******************************************************************************
- *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
- *
- * If this is not the case or you just want to try ILIAS, you'll find
- * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
- *
- *****************************************************************************/
 /**
  * Class to represent an OAuth datastore
  *
@@ -29,7 +32,6 @@ use ILIAS\LTIOAuth\OAuthException;
  */
 class OAuthDataStore extends LTIOAuth\OAuthDataStore
 {
-
     /**
      * System object.
      *
@@ -52,7 +54,7 @@ class OAuthDataStore extends LTIOAuth\OAuthDataStore
      * @param string $consumerKey Consumer key value
      * @return OAuthConsumer OAuthConsumer object
      */
-    public function lookup_consumer(string $consumerKey) : OAuthConsumer
+    public function lookup_consumer(string $consumerKey): OAuthConsumer
     {
         $key = $this->system->getKey();
         $secret = '';
@@ -79,7 +81,7 @@ class OAuthDataStore extends LTIOAuth\OAuthDataStore
      * @param string $token     Token value
      * @return OAuthToken OAuthToken object
      */
-    public function lookup_token(OAuthConsumer $consumer, string $tokenType, string $token) : OAuthToken
+    public function lookup_token(OAuthConsumer $consumer, string $tokenType, string $token): OAuthToken
     {
         return new OAuthToken($consumer, '');
     }
@@ -92,7 +94,7 @@ class OAuthDataStore extends LTIOAuth\OAuthDataStore
      * @param int             $timestamp Date/time of request //UK: removed string
      * @return bool    True if the nonce value already exists
      */
-    public function lookup_nonce(OAuthConsumer $consumer, ?OAuthToken $token, string $value, int $timestamp) : bool
+    public function lookup_nonce(OAuthConsumer $consumer, ?OAuthToken $token, string $value, int $timestamp): bool
     {
         if ($this->system instanceof Platform) {
             $platform = $this->system;
@@ -117,7 +119,7 @@ class OAuthDataStore extends LTIOAuth\OAuthDataStore
      * @param mixed        $callback Callback URL //UK: removed string CHECK
      * @return string Null value
      */
-    public function new_request_token(OAuthConsumer $consumer, $callback = null) : ?string
+    public function new_request_token(OAuthConsumer $consumer, $callback = null): ?string
     {
         return null;
     }
@@ -129,7 +131,7 @@ class OAuthDataStore extends LTIOAuth\OAuthDataStore
      * @param string        $verifier Verification code
      * @return string Null value
      */
-    public function new_access_token(OAuthToken $token, OAuthConsumer $consumer, $verifier = null) : ?string
+    public function new_access_token(OAuthToken $token, OAuthConsumer $consumer, $verifier = null): ?string
     {
         return null;
     }

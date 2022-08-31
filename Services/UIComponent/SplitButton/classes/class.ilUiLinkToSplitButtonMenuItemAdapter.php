@@ -22,6 +22,8 @@ use ILIAS\UI\Renderer;
 /**
  * Class ilUiLinkToSplitButtonMenuItemAdapter
  * @author Michael Jansen <mjansen@databay.de>
+ *
+ * @deprecated 11
  */
 class ilUiLinkToSplitButtonMenuItemAdapter implements ilSplitButtonMenuItem
 {
@@ -34,7 +36,7 @@ class ilUiLinkToSplitButtonMenuItemAdapter implements ilSplitButtonMenuItem
         $this->renderer = $renderer;
     }
 
-    public function getContent() : string
+    public function getContent(): string
     {
         return $this->renderer->render([$this->link]);
     }

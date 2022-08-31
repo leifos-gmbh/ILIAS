@@ -31,12 +31,11 @@
  */
 class ilLegacyFormElementsUtil
 {
-
     /**
      * @param string|int $a_str
      * @deprecated
      */
-    public static function prepareFormOutput($a_str, bool $a_strip = false) : string
+    public static function prepareFormOutput($a_str, bool $a_strip = false): string
     {
         if ($a_strip) {
             $a_str = ilUtil::stripSlashes($a_str);
@@ -58,7 +57,7 @@ class ilLegacyFormElementsUtil
      *
      * @deprecated
      */
-    public static function period2String(ilDateTime $a_from, $a_to = null) : string
+    public static function period2String(ilDateTime $a_from, $a_to = null): string
     {
         global $DIC;
 
@@ -177,7 +176,7 @@ class ilLegacyFormElementsUtil
         int $second = 0,
         bool $a_use_default = true,
         array $a_further_options = []
-    ) : string {
+    ): string {
         global $DIC;
 
         $lng = $DIC->language();
@@ -240,7 +239,7 @@ class ilLegacyFormElementsUtil
             $sel_second .= "</select>\n";
             $sel_second = preg_replace("/(value\=\"$second\")/", "$1 selected=\"selected\"", $sel_second);
         }
-        $timeformat = $lng->text["lang_timeformat"];
+        $timeformat = ($lng->text["lang_timeformat"] ?? '');
         if (strlen($timeformat) == 0) {
             $timeformat = "H:i:s";
         }
@@ -264,7 +263,7 @@ class ilLegacyFormElementsUtil
         string $varname,
         string $value,
         bool $disabled = false
-    ) : string {
+    ): string {
         $str = "<input type=\"checkbox\" name=\"" . $varname . "\"";
 
         if ($checked === true) {
@@ -324,7 +323,7 @@ class ilLegacyFormElementsUtil
         string $style_class = "",
         array $attribs = [],
         bool $disabled = false
-    ) : string {
+    ): string {
         global $DIC;
 
         $lng = $DIC->language();
@@ -403,7 +402,7 @@ class ilLegacyFormElementsUtil
         string $value,
         string $onclick = null,
         bool $disabled = false
-    ) : string {
+    ): string {
         $str = '<input ';
 
         if ($onclick !== null) {

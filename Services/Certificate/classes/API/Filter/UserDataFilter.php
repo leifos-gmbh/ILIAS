@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -16,7 +18,7 @@
  *
  *********************************************************************/
 
-namespace Certificate\API\Filter;
+namespace ILIAS\Certificate\API\Filter;
 
 /**
  * @author  Niels Theen <ntheen@databay.de>
@@ -48,16 +50,12 @@ class UserDataFilter
     private ?int $limitCount = null;
     private bool $shouldIncludeDeletedObjects = true;
 
-    public function __construct()
-    {
-    }
-
     /**
      * @param int[] $usrIds
      */
-    private function ensureValidUniqueUsrIds(array $usrIds) : void
+    private function ensureValidUniqueUsrIds(array $usrIds): void
     {
-        array_walk($usrIds, static function (int $usrId) : void {
+        array_walk($usrIds, static function (int $usrId): void {
             // Do nothing, use this for type safety of array values
         });
     }
@@ -65,14 +63,14 @@ class UserDataFilter
     /**
      * @param int[] $objIds
      */
-    private function ensureValidUniqueObjIds(array $objIds) : void
+    private function ensureValidUniqueObjIds(array $objIds): void
     {
-        array_walk($objIds, static function (int $objId) : void {
+        array_walk($objIds, static function (int $objId): void {
             // Do nothing, use this for type safety of array values
         });
     }
 
-    public function withObjectTitle(?string $title) : self
+    public function withObjectTitle(?string $title): self
     {
         $clone = clone $this;
         $clone->objectTitle = $title;
@@ -80,7 +78,7 @@ class UserDataFilter
         return $clone;
     }
 
-    public function withUserFirstName(?string $firstName) : self
+    public function withUserFirstName(?string $firstName): self
     {
         $clone = clone $this;
         $clone->userFirstName = $firstName;
@@ -88,7 +86,7 @@ class UserDataFilter
         return $clone;
     }
 
-    public function withUserLastName(?string $lastName) : self
+    public function withUserLastName(?string $lastName): self
     {
         $clone = clone $this;
         $clone->userLastName = $lastName;
@@ -96,7 +94,7 @@ class UserDataFilter
         return $clone;
     }
 
-    public function withUserLogin(?string $login) : self
+    public function withUserLogin(?string $login): self
     {
         $clone = clone $this;
         $clone->userLogin = $login;
@@ -104,7 +102,7 @@ class UserDataFilter
         return $clone;
     }
 
-    public function withUserEmailAddress(?string $emailAddress) : self
+    public function withUserEmailAddress(?string $emailAddress): self
     {
         $clone = clone $this;
         $clone->userEmail = $emailAddress;
@@ -112,7 +110,7 @@ class UserDataFilter
         return $clone;
     }
 
-    public function withIssuedBeforeTimestamp(?int $timestamp) : self
+    public function withIssuedBeforeTimestamp(?int $timestamp): self
     {
         $clone = clone $this;
         $clone->issuedBeforeTimestamp = $timestamp;
@@ -120,7 +118,7 @@ class UserDataFilter
         return $clone;
     }
 
-    public function withIssuedAfterTimestamp(?int $timestamp) : self
+    public function withIssuedAfterTimestamp(?int $timestamp): self
     {
         $clone = clone $this;
         $clone->issuedAfterTimestamp = $timestamp;
@@ -128,7 +126,7 @@ class UserDataFilter
         return $clone;
     }
 
-    public function withOnlyCertActive(bool $status) : self
+    public function withOnlyCertActive(bool $status): self
     {
         $clone = clone $this;
         $clone->onlyCertActive = $status;
@@ -140,7 +138,7 @@ class UserDataFilter
      * @param int[] $usrIds
      * @return $this
      */
-    public function withUserIds(array $usrIds) : self
+    public function withUserIds(array $usrIds): self
     {
         $this->ensureValidUniqueUsrIds($usrIds);
 
@@ -154,7 +152,7 @@ class UserDataFilter
      * @param int[] $usrIds
      * @return $this
      */
-    public function withAdditionalUserIds(array $usrIds) : self
+    public function withAdditionalUserIds(array $usrIds): self
     {
         $this->ensureValidUniqueUsrIds($usrIds);
 
@@ -168,7 +166,7 @@ class UserDataFilter
      * @param int[] $objIds
      * @return $this
      */
-    public function withObjIds(array $objIds) : self
+    public function withObjIds(array $objIds): self
     {
         $this->ensureValidUniqueObjIds($objIds);
 
@@ -182,7 +180,7 @@ class UserDataFilter
      * @param int[] $objIds
      * @return $this
      */
-    public function withAdditionalObjIds(array $objIds) : self
+    public function withAdditionalObjIds(array $objIds): self
     {
         $this->ensureValidUniqueObjIds($objIds);
 
@@ -192,42 +190,42 @@ class UserDataFilter
         return $clone;
     }
 
-    public function getObjectTitle() : ?string
+    public function getObjectTitle(): ?string
     {
         return $this->objectTitle;
     }
 
-    public function getIssuedBeforeTimestamp() : ?int
+    public function getIssuedBeforeTimestamp(): ?int
     {
         return $this->issuedBeforeTimestamp;
     }
 
-    public function getIssuedAfterTimestamp() : ?int
+    public function getIssuedAfterTimestamp(): ?int
     {
         return $this->issuedAfterTimestamp;
     }
 
-    public function isOnlyCertActive() : bool
+    public function isOnlyCertActive(): bool
     {
         return $this->onlyCertActive;
     }
 
-    public function getUserFirstName() : ?string
+    public function getUserFirstName(): ?string
     {
         return $this->userFirstName;
     }
 
-    public function getUserLastName() : ?string
+    public function getUserLastName(): ?string
     {
         return $this->userLastName;
     }
 
-    public function getUserLogin() : ?string
+    public function getUserLogin(): ?string
     {
         return $this->userLogin;
     }
 
-    public function getUserEmail() : ?string
+    public function getUserEmail(): ?string
     {
         return $this->userEmail;
     }
@@ -235,7 +233,7 @@ class UserDataFilter
     /**
      * @return int[]
      */
-    public function getUserIds() : array
+    public function getUserIds(): array
     {
         return $this->userIds;
     }
@@ -243,12 +241,12 @@ class UserDataFilter
     /**
      * @return int[]
      */
-    public function getObjIds() : array
+    public function getObjIds(): array
     {
         return $this->objIds;
     }
 
-    public function withSortedLastNames(int $direction = self::SORT_DIRECTION_ASC) : self
+    public function withSortedLastNames(int $direction = self::SORT_DIRECTION_ASC): self
     {
         $clone = clone $this;
         $clone->sorts[] = [self::SORT_FIELD_USR_LASTNAME, $direction];
@@ -256,7 +254,7 @@ class UserDataFilter
         return $clone;
     }
 
-    public function withSortedFirstNames(int $direction = self::SORT_DIRECTION_ASC) : self
+    public function withSortedFirstNames(int $direction = self::SORT_DIRECTION_ASC): self
     {
         $clone = clone $this;
         $clone->sorts[] = [self::SORT_FIELD_USR_FIRSTNAME, $direction];
@@ -264,7 +262,7 @@ class UserDataFilter
         return $clone;
     }
 
-    public function withSortedObjectTitles(int $direction = self::SORT_DIRECTION_ASC) : self
+    public function withSortedObjectTitles(int $direction = self::SORT_DIRECTION_ASC): self
     {
         $clone = clone $this;
         $clone->sorts[] = [self::SORT_FIELD_OBJ_TITLE, $direction];
@@ -272,7 +270,7 @@ class UserDataFilter
         return $clone;
     }
 
-    public function withSortedLogins(int $direction = self::SORT_DIRECTION_ASC) : self
+    public function withSortedLogins(int $direction = self::SORT_DIRECTION_ASC): self
     {
         $clone = clone $this;
         $clone->sorts[] = [self::SORT_FIELD_USR_LOGIN, $direction];
@@ -280,7 +278,7 @@ class UserDataFilter
         return $clone;
     }
 
-    public function withSortedIssuedOnTimestamps(int $direction = self::SORT_DIRECTION_ASC) : self
+    public function withSortedIssuedOnTimestamps(int $direction = self::SORT_DIRECTION_ASC): self
     {
         $clone = clone $this;
         $clone->sorts[] = [self::SORT_FIELD_ISSUE_TIMESTAMP, $direction];
@@ -288,36 +286,36 @@ class UserDataFilter
         return $clone;
     }
 
-    public function getSorts() : array
+    public function getSorts(): array
     {
         return $this->sorts;
     }
 
-    public function withLimitOffset(?int $limitOffset) : self
+    public function withLimitOffset(?int $limitOffset): self
     {
         $clone = clone $this;
         $clone->limitOffset = $limitOffset;
         return $clone;
     }
 
-    public function getLimitOffset() : ?int
+    public function getLimitOffset(): ?int
     {
         return $this->limitOffset;
     }
 
-    public function withLimitCount(?int $limitCount) : self
+    public function withLimitCount(?int $limitCount): self
     {
         $clone = clone $this;
         $clone->limitCount = $limitCount;
         return $clone;
     }
 
-    public function getLimitCount() : ?int
+    public function getLimitCount(): ?int
     {
         return $this->limitCount;
     }
 
-    public function withShouldIncludeDeletedObjects() : self
+    public function withShouldIncludeDeletedObjects(): self
     {
         $clone = clone $this;
         $clone->shouldIncludeDeletedObjects = true;
@@ -325,7 +323,7 @@ class UserDataFilter
         return $clone;
     }
 
-    public function withoutShouldIncludeDeletedObjects() : self
+    public function withoutShouldIncludeDeletedObjects(): self
     {
         $clone = clone $this;
         $clone->shouldIncludeDeletedObjects = false;
@@ -333,7 +331,7 @@ class UserDataFilter
         return $clone;
     }
 
-    public function shouldIncludeDeletedObjects() : bool
+    public function shouldIncludeDeletedObjects(): bool
     {
         return $this->shouldIncludeDeletedObjects;
     }

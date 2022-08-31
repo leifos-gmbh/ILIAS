@@ -1,24 +1,26 @@
 <?php
 
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
+
 namespace ILIAS\LTI\ToolProvider\Service;
 
 use ILIAS\LTI\ToolProvider\Platform;
 use ILIAS\LTI\ToolProvider\Context;
 use ILIAS\LTI\ToolProvider\ResourceLink;
-
-/******************************************************************************
- *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
- *
- * If this is not the case or you just want to try ILIAS, you'll find
- * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
- *
- *****************************************************************************/
 
 /**
  * Class to implement the Tool Settings service
@@ -29,21 +31,20 @@ use ILIAS\LTI\ToolProvider\ResourceLink;
  */
 class ToolSettings extends Service
 {
-
     /**
      * Settings at current level mode.
      */
-    const MODE_CURRENT_LEVEL = 1;
+    public const MODE_CURRENT_LEVEL = 1;
 
     /**
      * Settings at all levels mode.
      */
-    const MODE_ALL_LEVELS = 2;
+    public const MODE_ALL_LEVELS = 2;
 
     /**
      * Settings with distinct names at all levels mode.
      */
-    const MODE_DISTINCT_NAMES = 3;
+    public const MODE_DISTINCT_NAMES = 3;
 
     /**
      * Access scope.
@@ -132,7 +133,7 @@ class ToolSettings extends Service
      * @param array $settings An associative array of settings (optional, default is null)
      * @return bool True if request was successful
      */
-    public function set(array $settings) : bool
+    public function set(array $settings): bool
     {
         if (!$this->simple) {
             if (is_a($this->source, 'Platform')) {

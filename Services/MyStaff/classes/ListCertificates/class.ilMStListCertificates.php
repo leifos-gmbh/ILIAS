@@ -19,9 +19,9 @@ declare(strict_types=1);
 
 namespace ILIAS\MyStaff\ListCertificates;
 
-use Certificate\API\Data\UserCertificateDto;
-use Certificate\API\Filter\UserDataFilter;
-use Certificate\API\UserCertificateAPI;
+use ILIAS\Certificate\API\Data\UserCertificateDto;
+use ILIAS\Certificate\API\Filter\UserDataFilter;
+use ILIAS\Certificate\API\UserCertificateAPI;
 use ILIAS\DI\Container;
 use ILIAS\MyStaff\ilMyStaffAccess;
 use ilMStListCertificatesGUI;
@@ -48,7 +48,7 @@ class ilMStListCertificates
     /**
      * @return UserCertificateDto[]
      */
-    final public function getData(array $options = array()) : array
+    final public function getData(array $options = array()): array
     {
         //Permission Filter
         $operation_access = ilOrgUnitOperation::OP_VIEW_CERTIFICATES;

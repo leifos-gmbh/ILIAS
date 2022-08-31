@@ -1,5 +1,20 @@
 <?php
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
+
 
 /**
 * Class ilTestEvaluationData
@@ -87,7 +102,7 @@ class ilTestEvaluationData
         }
     }
 
-    public function getAccessFilteredParticipantList() : ?ilTestParticipantList
+    public function getAccessFilteredParticipantList(): ?ilTestParticipantList
     {
         return $this->accessFilteredParticipantList;
     }
@@ -100,7 +115,7 @@ class ilTestEvaluationData
         $this->accessFilteredParticipantList = $accessFilteredParticipantList;
     }
 
-    protected function checkParticipantAccess($activeId) : bool
+    protected function checkParticipantAccess($activeId): bool
     {
         if ($this->getAccessFilteredParticipantList() === null) {
             return true;
@@ -109,7 +124,7 @@ class ilTestEvaluationData
         return $this->getAccessFilteredParticipantList()->isActiveIdInList($activeId);
     }
 
-    protected function loadRows() : array
+    protected function loadRows(): array
     {
         global $DIC; /* @var ILIAS\DI\Container $DIC */
 
@@ -120,7 +135,8 @@ class ilTestEvaluationData
 							usr_data.title,
 							usr_data.login,
 							tst_pass_result.*,
-							tst_active.submitted
+							tst_active.submitted,
+							tst_active.last_finished_pass
 			FROM			tst_pass_result, tst_active
 			LEFT JOIN		usr_data
 			ON				tst_active.user_fi = usr_data.usr_id
@@ -180,6 +196,8 @@ class ilTestEvaluationData
                 $this->getParticipant($row["active_fi"])->setUserID($row["usr_id"]);
 
                 $this->getParticipant($row["active_fi"])->setSubmitted($row['submitted']);
+
+                $this->getParticipant($row["active_fi"])->setLastFinishedPass($row['last_finished_pass']);
             }
 
             if (!is_object($this->getParticipant($row["active_fi"])->getPass($row["pass"]))) {
@@ -209,7 +227,7 @@ class ilTestEvaluationData
         }
     }
 
-    public function getTest() : ilObjTest
+    public function getTest(): ilObjTest
     {
         return $this->test;
     }
@@ -224,7 +242,7 @@ class ilTestEvaluationData
         $this->datasets = $datasets;
     }
 
-    public function getDatasets() : int
+    public function getDatasets(): int
     {
         return $this->datasets;
     }
@@ -234,7 +252,7 @@ class ilTestEvaluationData
         $this->questionTitles[$question_id] = $question_title;
     }
 
-    public function getQuestionTitles() : array
+    public function getQuestionTitles(): array
     {
         return $this->questionTitles;
     }
@@ -254,7 +272,7 @@ class ilTestEvaluationData
         $this->statistics = new ilTestStatistics($this);
     }
 
-    public function getTotalFinishedParticipants() : int
+    public function getTotalFinishedParticipants(): int
     {
         $finishedParticipants = 0;
 
@@ -269,7 +287,7 @@ class ilTestEvaluationData
         return $finishedParticipants;
     }
 
-    public function getParticipants() : array
+    public function getParticipants(): array
     {
         if (is_array($this->arrFilter) && count($this->arrFilter) > 0) {
             $filteredParticipants = array();
@@ -370,12 +388,12 @@ class ilTestEvaluationData
      * @param integer $active_id
      * @return ilTestEvaluationUserData
      */
-    public function getParticipant($active_id) : ilTestEvaluationUserData
+    public function getParticipant($active_id): ilTestEvaluationUserData
     {
         return $this->participants[$active_id];
     }
 
-    public function participantExists($active_id) : bool
+    public function participantExists($active_id): bool
     {
         return array_key_exists($active_id, $this->participants);
     }
@@ -385,12 +403,12 @@ class ilTestEvaluationData
         unset($this->participants[$active_id]);
     }
 
-    public function getStatistics() : object
+    public function getStatistics(): object
     {
         return $this->statistics;
     }
 
-    public function getParticipantIds() : array
+    public function getParticipantIds(): array
     {
         return array_keys($this->participants);
     }

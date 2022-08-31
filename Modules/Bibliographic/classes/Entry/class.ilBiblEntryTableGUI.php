@@ -26,7 +26,6 @@
  */
 class ilBiblEntryTableGUI extends ilTable2GUI
 {
-    use \ILIAS\Modules\OrgUnit\ARHelper\DIC;
     /**
      * @var \ilBiblFieldFilterInterface[]
      */
@@ -43,7 +42,7 @@ class ilBiblEntryTableGUI extends ilTable2GUI
         $this->setId('tbl_bibl_overview_' . $facade->iliasRefId());
         $this->setPrefix('tbl_bibl_overview_' . $facade->iliasRefId());
         $this->setFormName('tbl_bibl_overview_' . $facade->iliasRefId());
-        parent::__construct($a_parent_obj);
+        parent::__construct($a_parent_obj, ilObjBibliographicGUI::CMD_VIEW);
         $this->parent_obj = $a_parent_obj;
 
         //Number of records
@@ -51,28 +50,30 @@ class ilBiblEntryTableGUI extends ilTable2GUI
         $this->setShowRowsSelector(true);
 
         $this->setEnableHeader(false);
-        $this->setFormAction($this->ctrl()->getFormAction($a_parent_obj));
+        $this->setFormAction($this->ctrl->getFormAction($a_parent_obj));
         $this->setRowTemplate('tpl.bibliographic_record_table_row.html', 'Modules/Bibliographic');
         // enable sorting by alphabet -- therefore an unvisible column 'content' is added to the table, and the array-key 'content' is also delivered in setData
-        $this->addColumn($this->lng()->txt('a'), 'content', 'auto');
+        $this->addColumn($this->lng->txt('a'), 'content', 'auto');
         $this->initFilter();
-        $this->initData();
         $this->setOrderField('content');
+        $this->setExternalSorting(true);
+        $this->initData();
         $this->setDefaultOrderField('content');
     }
 
 
-    public function initFilter() : void
+    public function initFilter(): void
     {
-        $available_fields_for_object = $this->facade->fieldFactory()->getAvailableFieldsForObjId($this->facade->iliasObjId());
+        $available_field_ids_for_object = array_map(function (ilBiblField $field) {
+            return $field->getId();
+        }, $this->facade->fieldFactory()->getAvailableFieldsForObjId($this->facade->iliasObjId()));
 
-        foreach ($available_fields_for_object as $available_field) {
-            $filter = $this->facade->filterFactory()->findByFieldId($available_field->getId());
-            if (!empty($filter)) {
-                $filter_presentation = new ilBiblFieldFilterPresentationGUI($filter, $this->facade);
+        foreach ($this->facade->filterFactory()->getAllForObjectId($this->facade->iliasObjId()) as $item) {
+            if (in_array($item->getFieldId(), $available_field_ids_for_object)) {
+                $filter_presentation = new ilBiblFieldFilterPresentationGUI($item, $this->facade);
                 $field = $filter_presentation->getFilterItem();
                 $this->addAndReadFilterItem($field);
-                $this->filter_objects[$field->getPostVar()] = $filter;
+                $this->filter_objects[$field->getPostVar()] = $item;
             }
         }
     }
@@ -81,7 +82,7 @@ class ilBiblEntryTableGUI extends ilTable2GUI
     /**
      * @param $field
      */
-    protected function addAndReadFilterItem(ilTableFilterItem $field) : void
+    protected function addAndReadFilterItem(ilTableFilterItem $field): void
     {
         $this->addFilterItem($field);
         $field->readFromSession();
@@ -94,12 +95,13 @@ class ilBiblEntryTableGUI extends ilTable2GUI
     }
 
 
-    public function fillRow(array $a_set) : void
+    public function fillRow(array $a_set): void
     {
-        $ilBiblEntry = $this->facade->entryFactory()->findByIdAndTypeString($a_set['entry_id'], $a_set['entry_type']);
-        //TODO instanciate presentation gui class
-        $ilBiblOverviewGUI = new ilBiblEntryTablePresentationGUI($ilBiblEntry, $this->facade);
-        $this->tpl->setVariable('SINGLE_ENTRY', $ilBiblOverviewGUI->getHtml());
+        $ilBiblOverviewGUI = $a_set['overview_gui'];
+        $this->tpl->setVariable(
+            'SINGLE_ENTRY',
+            $ilBiblOverviewGUI->getHtml()
+        );
         //Detail-Link
         $this->ctrl->setParameter($this->parent_obj, ilObjBibliographicGUI::P_ENTRY_ID, $a_set['entry_id']);
         $this->tpl->setVariable('DETAIL_LINK', $this->ctrl->getLinkTarget($this->parent_obj, 'showDetails'));
@@ -109,7 +111,7 @@ class ilBiblEntryTableGUI extends ilTable2GUI
         foreach ($libraries as $library) {
             if ($library->getShowInList()) {
                 $presentation = new ilBiblLibraryPresentationGUI($library, $this->facade);
-                $arr_library_link[] = $presentation->getButton($this->facade, $ilBiblEntry);
+                $arr_library_link[] = $presentation->getButton($this->facade, $ilBiblOverviewGUI->getEntry());
             }
         }
         if ($arr_library_link !== []) {
@@ -118,7 +120,7 @@ class ilBiblEntryTableGUI extends ilTable2GUI
     }
 
 
-    protected function initData() : void
+    protected function initData(): void
     {
         $query = new ilBiblTableQueryInfo();
         /**
@@ -149,16 +151,23 @@ class ilBiblEntryTableGUI extends ilTable2GUI
             $query->addFilter($filter_info);
         }
 
-        $entries = array();
+        $entries = [];
         $object_id = $this->facade->iliasObjId();
         foreach (
             $this->facade->entryFactory()
                 ->filterEntryIdsForTableAsArray($object_id, $query) as $entry
         ) {
-            $ilBibliographicEntry = $this->facade->entryFactory()->findByIdAndTypeString($entry['entry_id'], $entry['entry_type']);
-            $entry['content'] = strip_tags($ilBibliographicEntry->getOverview());
+            /** @var $bibl_entry ilBiblEntry */
+            $bibl_entry = $this->facade->entryFactory()->findByIdAndTypeString($entry['entry_id'], $entry['entry_type']);
+            $overview_gui = new ilBiblEntryTablePresentationGUI($bibl_entry, $this->facade);
+            $entry['content'] = strip_tags($overview_gui->getHtml());
+            $entry['overview_gui'] = $overview_gui;
             $entries[] = $entry;
         }
+
+        usort($entries, function ($a, $b) {
+            return strcmp($a['content'], $b['content']);
+        });
 
         $this->setData($entries);
     }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -15,17 +17,18 @@
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
- 
+
 require_once(__DIR__ . "/../../../Base.php");
 
 use ILIAS\Data;
 use ILIAS\Refinery\Factory as Refinery;
 use ILIAS\UI\Implementation\Component as I;
+use ILIAS\UI\Implementation\Component\Input\InputData;
 use ILIAS\UI\Implementation\Component\SignalGenerator;
 
 class SelectForTest extends ILIAS\UI\Implementation\Component\Input\Field\Select
 {
-    public function _isClientSideValueOk($value) : bool
+    public function _isClientSideValueOk($value): bool
     {
         return $this->isClientSideValueOk($value);
     }
@@ -35,12 +38,12 @@ class SelectInputTest extends ILIAS_UI_TestBase
 {
     protected DefNamesource $name_source;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         $this->name_source = new DefNamesource();
     }
 
-    protected function buildFactory() : I\Input\Field\Factory
+    protected function buildFactory(): I\Input\Field\Factory
     {
         $df = new Data\Factory();
         $language = $this->createMock(ilLanguage::class);
@@ -53,7 +56,7 @@ class SelectInputTest extends ILIAS_UI_TestBase
         );
     }
 
-    public function testOnlyValuesFromOptionsAreAcceptableClientSideValues() : void
+    public function testOnlyValuesFromOptionsAreAcceptableClientSideValues(): void
     {
         $options = ["one" => "Eins", "two" => "Zwei", "three" => "Drei"];
         $select = new SelectForTest(
@@ -70,7 +73,7 @@ class SelectInputTest extends ILIAS_UI_TestBase
         $this->assertFalse($select->_isClientSideValueOk("four"));
     }
 
-    public function testEmptyStringIsAcceptableClientSideValueIfSelectIsNotRequired() : void
+    public function testEmptyStringIsAcceptableClientSideValueIfSelectIsNotRequired(): void
     {
         $options = [];
         $select = new SelectForTest(
@@ -84,7 +87,29 @@ class SelectInputTest extends ILIAS_UI_TestBase
         $this->assertTrue($select->_isClientSideValueOk(""));
     }
 
-    public function testEmptyStringIsAnAcceptableClientSideValueEvenIfSelectIsRequired() : void
+    public function testEmptyStringCreatesErrorIfSelectIsRequired(): void
+    {
+        $options = [];
+        $select = $this->buildFactory()->select(
+            "",
+            $options,
+            ""
+        )
+        ->withRequired(true)
+        ->withNameFrom($this->name_source);
+
+        $data = $this->createMock(InputData::class);
+        $data->expects($this->once())
+            ->method("getOr")
+            ->willReturn(null);
+        $select = $select->withInput(
+            $data
+        );
+
+        $this->assertNotEquals(null, $select->getError());
+    }
+
+    public function testEmptyStringIsAnAcceptableClientSideValueEvenIfSelectIsRequired(): void
     {
         $options = [];
         $select = (new SelectForTest(
@@ -98,7 +123,7 @@ class SelectInputTest extends ILIAS_UI_TestBase
         $this->assertTrue($select->_isClientSideValueOk(""));
     }
 
-    public function test_render() : void
+    public function test_render(): void
     {
         $f = $this->buildFactory();
         $label = "label";
@@ -127,7 +152,7 @@ class SelectInputTest extends ILIAS_UI_TestBase
     }
 
 
-    public function test_render_value() : void
+    public function test_render_value(): void
     {
         $f = $this->buildFactory();
         $label = "label";
@@ -155,7 +180,7 @@ class SelectInputTest extends ILIAS_UI_TestBase
         $this->assertEquals($expected, $html);
     }
 
-    public function test_render_disabled() : void
+    public function test_render_disabled(): void
     {
         $f = $this->buildFactory();
         $label = "label";

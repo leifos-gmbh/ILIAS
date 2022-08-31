@@ -131,6 +131,12 @@ with the il- variable set here.
 @il-line-height-base:		1.428571429;
 @il-line-height-computed:    unit(floor(((unit(@il-font-size-base)/@il-pixel-to-rem) * @il-line-height-base)),px); // ~20px
 
+//** Used to lighten text, e.g. workflow steps.
+@il-font-weight-light:    300;
+//** Default font weight.
+@il-font-weight-base:    400;
+//** Used to indicate headings.
+@il-font-weight-bold:    600;
 
 //== Base Padding and Border
 //
@@ -147,7 +153,10 @@ with the il- variable set here.
 @il-padding-xlarge-horizontal: 15px;
 
 @il-padding-xxlarge-vertical: 12px;
+@il-padding-xxlarge-horizontal: 15px;
+
 @il-padding-xxxlarge-vertical: 15px;
+@il-padding-xxxlarge-horizontal: 18px;
 
 @il-padding-small-vertical: 3px;
 @il-padding-small-horizontal: 6px;
@@ -166,7 +175,10 @@ with the il- variable set here.
 @il-margin-xlarge-horizontal: @il-padding-xlarge-horizontal;
 
 @il-margin-xxlarge-vertical: @il-padding-xxlarge-vertical;
+@il-margin-xxlarge-horizontal: @il-padding-xxlarge-horizontal;
+
 @il-margin-xxxlarge-vertical: @il-padding-xxxlarge-vertical;
+@il-margin-xxxlarge-horizontal: @il-padding-xxxlarge-horizontal;
 
 @il-margin-small-vertical: @il-padding-small-vertical;
 @il-margin-small-horizontal: @il-padding-small-horizontal;
@@ -211,7 +223,7 @@ with the il- variable set here.
 @il-standard-page-breadcrumbs-color: @il-link-color;
 @il-standard-page-breadcrumbs-active-color: @il-link-hover-color;
 @il-standard-page-breadcrumbs-divider-color: @il-neutral-light-color;
-@il-standard-page-breadcrumbs-font-weight: 600;
+@il-standard-page-breadcrumbs-font-weight: @il-font-weight-bold;
 @il-standard-page-breadcrumbs-seperator: " \e606";
 
 //** mainbar
@@ -249,12 +261,13 @@ with the il- variable set here.
 @il-slate-bulky-bg-color: @il-main-darker-bg;
 @il-slate-bulky-level2-bg-color: @il-main-dark-bg;
 @il-slate-bulky-bg-color-engaged: fade(@il-main-color, 30%);
-@il-slate-content-padding: 10px;
-@il-slate-tree-padding: 4px 0;
-@il-slate-bulky-padding: 10px 40px 15px 10px;
-@il-slate-bulky-link-padding: 10px 10px 15px 10px;
+@il-slate-content-padding: @il-padding-base-horizontal;
+@il-slate-tree-padding: @il-padding-small-vertical 0;
+@il-slate-bulky-padding-vertical: @il-padding-xxxlarge-vertical;
+@il-slate-bulky-padding: @il-slate-bulky-padding-vertical 40px @il-slate-bulky-padding-vertical @il-padding-base-horizontal;
+@il-slate-bulky-link-padding: @il-slate-bulky-padding-vertical @il-padding-base-horizontal @il-slate-bulky-padding-vertical @il-padding-base-horizontal;
 @il-slate-bulky-glyph-size: 1.0625rem;
-@il-slate-bulky-glyph-margin-right: 5px;
+@il-slate-bulky-glyph-margin-right: @il-margin-small-horizontal;
 @il-slate-bulky-label-size: 0.9375rem;
 @il-slate-bulky-icon-size: 1.0625rem;
 @il-slate-content-spacing: 2px;
@@ -338,12 +351,14 @@ with the il- variable set here.
 @il-btn-tag-bg-relevance-middle: desaturate(@il-btn-tag-bg, 40%);
 @il-btn-tag-bg-relevance-high: desaturate(@il-btn-tag-bg, 20%);
 @il-btn-tag-bg-relevance-veryhigh: @il-btn-tag-bg;
+@il-btn-tag-bg-highlighted: @il-warning-color;
 //** Foreground colors for tags; usually black/white depending on the background color
 @il-btn-tag-fg-relevance-verylow: contrast(desaturate(@il-btn-tag-bg, 80%));
 @il-btn-tag-fg-relevance-low: contrast(desaturate(@il-btn-tag-bg, 60%));
 @il-btn-tag-fg-relevance-middle: contrast(desaturate(@il-btn-tag-bg, 40%));
 @il-btn-tag-fg-relevance-high: contrast(desaturate(@il-btn-tag-bg, 20%));
 @il-btn-tag-fg-relevance-veryhigh: contrast(@il-btn-tag-bg);
+@il-btn-tag-fg-highlighted: white;
 //** Border radius of tags
 @il-btn-tag-border-radius: 3px;
 //** margin of tags
@@ -376,7 +391,7 @@ with the il- variable set here.
 @il-btn-toggle-label-position-top:3px;
 @il-btn-toggle-label-on-position-left: 9px;
 @il-btn-toggle-label-off-position-left: 24px;
-@il-btn-toggle-label-font-weight: 600;
+@il-btn-toggle-label-font-weight: @il-font-weight-bold;
 @il-btn-toggle-label-font-size: @il-font-size-small;
 @il-btn-toggle-label-on-color: @il-main-bg;
 
@@ -443,7 +458,7 @@ with the il- variable set here.
 //## Variables used to style the ILIAS Standard Filter
 
 //** Filter Bar
-@il-standard-filter-bar-btn-font-size: @il-font-size-large;
+@il-standard-filter-bar-btn-font-size: @il-font-size-base;
 @il-standard-filter-bar-glyph-padding-right: 0.3em;
 @il-standard-filter-bar-toggle-padding-left: 10px;
 
@@ -516,7 +531,7 @@ with the il- variable set here.
 //== Toolbar
 //
 //##
-@il-toolbar-margin: @il-margin-xlarge-horizontal; 
+@il-toolbar-margin: @il-margin-xlarge-horizontal;
 @il-toolbar-bg: @il-main-dark-bg;
 @il-toolbar-height: 40px;
 @il-toolbar-border: 1px solid @il-main-border-color;
@@ -524,8 +539,9 @@ with the il- variable set here.
 //== Postings
 //
 //##
-@il-posting-by-moderator-bg: #ff9;
-@il-posting-needs-moderation-bg: #ffe4e4;
+@il-posting-left-border-width: @il-padding-small-horizontal;
+@il-posting-by-moderator-bg: @il-extended-color-1;
+@il-posting-needs-moderation-bg: @il-extended-color-6;
 
 //== Glyph
 //
@@ -749,7 +765,7 @@ with the il- variable set here.
 @il-avatar-letter-border-color-contrast-lighten: 40%;
 @il-avatar-letter-border-color-contrast-darken: 20%;
 //** change the abbreviations font weight
-@il-avatar-letter-abbreviation-font-weight: lighter;
+@il-avatar-letter-abbreviation-font-weight: @il-font-weight-light;
 //** change the abbreviations font transform
 @il-avatar-letter-abbreviation-font-transform: inherit;
 //** all variants of letter avatar background colors (MUST be 26), note for a11y reason, they must be in contrast 3x1 to white (foreground color)
@@ -761,7 +777,7 @@ with the il- variable set here.
 //##
 /** headline text transform **/
 @il-standard-page-system-info-headline-transform: uppercase;
-@il-standard-page-system-info-headline-font-weight: bold;
+@il-standard-page-system-info-headline-font-weight: @il-font-weight-bold;
 /** inline shadow of a message container **/
 @il-standard-page-system-info-shadow: inset 0px -10px 4px -10px rgba(0, 0, 0, 0.25);
 /** border configuration, the color is automatically computed from the three color variants **/
@@ -855,7 +871,7 @@ with the il- variable set here.
 //== Drilldown Menu
 //
 //##
-@il-drilldown-item-height: 48px;
+@il-drilldown-item-height: 2 * @il-slate-bulky-padding-vertical + @il-line-height-computed;
 
 //== Toast
 //
@@ -870,3 +886,15 @@ with the il- variable set here.
 @il-toast-shadow: 3px 9px 9px 0 rgb(0 0 0 / 0.3);
 //== Player
 @il-player-audio-width: 100%;
+
+//== Test Assessment
+@il-test-shortlist-min-width: 200px;
+
+@il-test-padding-large-vertical: @padding-large-vertical;
+@il-test-padding-large-horizontal: @padding-large-horizontal;
+
+@il-test-margin-large-vertical: @padding-large-vertical;
+@il-test-margin-large-horizontal: @padding-large-horizontal;
+
+@il-test-working-time-font-size: @il-font-size-large;
+@il-test-working-time-font-weight: @il-font-weight-bold;

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -23,20 +25,17 @@
  */
 class ilCertificateTemplateDatabaseRepository implements ilCertificateTemplateRepository
 {
-    private ilDBInterface $database;
     private ilLogger $logger;
     private ilObjectDataCache $objectDataCache;
 
     public function __construct(
-        ilDBInterface $database,
+        private ilDBInterface $database,
         ?ilLogger $logger = null,
         ?ilObjectDataCache $objectDataCache = null
     ) {
-        $this->database = $database;
-
         if (null === $logger) {
             global $DIC;
-            $logger = $logger = $DIC->logger()->cert();
+            $logger = $DIC->logger()->cert();
         }
         $this->logger = $logger;
 
@@ -47,7 +46,7 @@ class ilCertificateTemplateDatabaseRepository implements ilCertificateTemplateRe
         $this->objectDataCache = $objectDataCache;
     }
 
-    public function save(ilCertificateTemplate $certificateTemplate) : void
+    public function save(ilCertificateTemplate $certificateTemplate): void
     {
         $this->logger->debug('START - Save new certificate template');
 
@@ -67,9 +66,9 @@ class ilCertificateTemplateDatabaseRepository implements ilCertificateTemplateRe
             'version' => ['integer', $certificateTemplate->getVersion()],
             'ilias_version' => ['text', $certificateTemplate->getIliasVersion()],
             'created_timestamp' => ['integer', $certificateTemplate->getCreatedTimestamp()],
-            'currently_active' => ['integer', (integer) $certificateTemplate->isCurrentlyActive()],
+            'currently_active' => ['integer', (int) $certificateTemplate->isCurrentlyActive()],
             'background_image_path' => ['text', $certificateTemplate->getBackgroundImagePath()],
-            'deleted' => ['integer', (integer) $certificateTemplate->isDeleted()],
+            'deleted' => ['integer', (int) $certificateTemplate->isDeleted()],
             'thumbnail_image_path' => ['text', $certificateTemplate->getThumbnailImagePath()]
         ];
 
@@ -81,7 +80,7 @@ class ilCertificateTemplateDatabaseRepository implements ilCertificateTemplateRe
         ));
     }
 
-    public function updateActivity(ilCertificateTemplate $certificateTemplate, bool $currentlyActive) : int
+    public function updateActivity(ilCertificateTemplate $certificateTemplate, bool $currentlyActive): int
     {
         $sql = 'UPDATE il_cert_template SET currently_active = ' . $this->database->quote($currentlyActive, 'integer') .
             ' WHERE id = ' . $this->database->quote($certificateTemplate->getId(), 'integer');
@@ -90,11 +89,9 @@ class ilCertificateTemplateDatabaseRepository implements ilCertificateTemplateRe
     }
 
     /**
-     * @param int $templateId
-     * @return ilCertificateTemplate
      * @throws ilException
      */
-    public function fetchTemplate(int $templateId) : ilCertificateTemplate
+    public function fetchTemplate(int $templateId): ilCertificateTemplate
     {
         $this->logger->debug(sprintf('START - Fetch certificate template with id: "%s"', $templateId));
 
@@ -114,10 +111,9 @@ ORDER BY version ASC';
     }
 
     /**
-     * @param int $objId
      * @return ilCertificateTemplate[]
      */
-    public function fetchCertificateTemplatesByObjId(int $objId) : array
+    public function fetchCertificateTemplatesByObjId(int $objId): array
     {
         $this->logger->debug(sprintf('START - Fetch multiple certificate templates for object: "%s"', $objId));
 
@@ -145,7 +141,7 @@ ORDER BY version ASC';
         return $result;
     }
 
-    public function fetchCurrentlyUsedCertificate(int $objId) : ilCertificateTemplate
+    public function fetchCurrentlyUsedCertificate(int $objId): ilCertificateTemplate
     {
         $this->logger->debug(sprintf('START - Fetch currently active certificate template for object: "%s"', $objId));
 
@@ -184,11 +180,9 @@ ORDER BY id DESC
     }
 
     /**
-     * @param int $objId
-     * @return ilCertificateTemplate
      * @throws ilException
      */
-    public function fetchCurrentlyActiveCertificate(int $objId) : ilCertificateTemplate
+    public function fetchCurrentlyActiveCertificate(int $objId): ilCertificateTemplate
     {
         $this->logger->debug(sprintf('START - Fetch currently active certificate template for object: "%s"', $objId));
 
@@ -210,7 +204,7 @@ AND currently_active = 1
         throw new ilException((sprintf('NO active certificate template found for: "%s"', $objId)));
     }
 
-    public function fetchPreviousCertificate(int $objId) : ilCertificateTemplate
+    public function fetchPreviousCertificate(int $objId): ilCertificateTemplate
     {
         $this->logger->debug(sprintf('START - Fetch previous active certificate template for object: "%s"', $objId));
 
@@ -243,7 +237,7 @@ AND currently_active = 1
         return $resultTemplate;
     }
 
-    public function deleteTemplate(int $templateId, int $objectId) : void
+    public function deleteTemplate(int $templateId, int $objectId): void
     {
         $this->logger->debug(sprintf(
             'START - Set deleted flag for certificate template("%s") for object: "%s"',
@@ -266,7 +260,7 @@ AND obj_id = ' . $this->database->quote($objectId, 'integer');
         ));
     }
 
-    public function activatePreviousCertificate(int $objId) : ilCertificateTemplate
+    public function activatePreviousCertificate(int $objId): ilCertificateTemplate
     {
         $this->logger->debug(sprintf('START - Activate previous certificate template for object: "%s"', $objId));
 
@@ -295,11 +289,11 @@ WHERE id = ' . $this->database->quote($previousCertificate->getId(), 'integer');
 
     public function fetchActiveCertificateTemplatesForCoursesWithDisabledLearningProgress(
         bool $isGlobalLpEnabled
-    ) : array {
+    ): array {
         $this->logger->debug(
             'START - Fetch all active course certificate templates with disabled learning progress: "%s"'
         );
-        
+
         $joinLpSettings = '';
         $whereLpSettings = '';
         if ($isGlobalLpEnabled) {
@@ -344,11 +338,9 @@ WHERE id = ' . $this->database->quote($previousCertificate->getId(), 'integer');
     }
 
     /**
-     * @param int $objId
-     * @return ilCertificateTemplate
      * @throws ilException
      */
-    public function fetchFirstCreatedTemplate(int $objId) : ilCertificateTemplate
+    public function fetchFirstCreatedTemplate(int $objId): ilCertificateTemplate
     {
         $this->logger->debug(sprintf('START - Fetch first create certificate template for object: "%s"', $objId));
 
@@ -369,7 +361,7 @@ ORDER BY id ASC ';
         throw new ilException('No matching template found. MAY missing DBUpdate. Please check if the correct version is installed.');
     }
 
-    private function deactivatePreviousTemplates(int $objId) : void
+    private function deactivatePreviousTemplates(int $objId): void
     {
         $this->logger->debug(sprintf('START - Deactivate previous certificate template for object: "%s"', $objId));
 
@@ -385,9 +377,8 @@ WHERE obj_id = ' . $this->database->quote($objId, 'integer');
 
     /**
      * @param array<string, mixed> $row
-     * @return ilCertificateTemplate
      */
-    private function createCertificateTemplate(array $row) : ilCertificateTemplate
+    private function createCertificateTemplate(array $row): ilCertificateTemplate
     {
         return new ilCertificateTemplate(
             (int) $row['obj_id'],

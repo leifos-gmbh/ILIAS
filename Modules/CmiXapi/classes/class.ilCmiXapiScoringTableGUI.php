@@ -1,18 +1,22 @@
-<?php declare(strict_types=1);
+<?php
 
-/******************************************************************************
+declare(strict_types=1);
+
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
 
 /**
  * Class ilCmiXapiScoringTableGUI
@@ -25,12 +29,12 @@
  */
 class ilCmiXapiScoringTableGUI extends ilTable2GUI
 {
-    const TABLE_ID = 'cmix_scoring_table_';
-    
+    public const TABLE_ID = 'cmix_scoring_table_';
+
     protected bool $isMultiActorReport;
 
     private \ilCmiXapiScoringGUI $_parent;
-    
+
     private bool $hasOutcomeAccess;
 
     private \ILIAS\DI\Container $dic;
@@ -51,7 +55,7 @@ class ilCmiXapiScoringTableGUI extends ilTable2GUI
         $this->dic = $DIC;
 
         $this->isMultiActorReport = $isMultiActorReport;
-        
+
         $this->setId(self::TABLE_ID . $tableId);
         parent::__construct($a_parent_obj, $a_parent_cmd);
         $this->_parent = $a_parent_obj;
@@ -76,11 +80,11 @@ class ilCmiXapiScoringTableGUI extends ilTable2GUI
         $this->resetOffset();
         $this->setDefaultOrderField('rank');
         $this->setDefaultOrderDirection('asc');
-        
+
         $this->hasOutcomeAccess = $hasOutcomeAccess;
     }
 
-    protected function initColumns() : void
+    protected function initColumns(): void
     {
         $this->addColumn($this->language->txt('toplist_col_rank'));
         $this->addColumn($this->language->txt('toplist_col_participant'));
@@ -101,7 +105,7 @@ class ilCmiXapiScoringTableGUI extends ilTable2GUI
         $this->setLimit($this->_parent->object->getHighscoreTopNum());
     }
 
-    protected function fillRow(array $a_set) : void
+    protected function fillRow(array $a_set): void
     {
         $this->tpl->setVariable('SCORE_RANK', $a_set['rank']);
 
@@ -136,15 +140,15 @@ class ilCmiXapiScoringTableGUI extends ilTable2GUI
      * @throws ilDatabaseException
      * @throws ilObjectNotFoundException
      */
-    protected function getUsername(array $data) : string
+    protected function getUsername(array $data): string
     {
         if ($this->hasOutcomeAccess) {
             $user = ilObjectFactory::getInstanceByObjId($data['ilias_user_id'], false);
-            
+
             if ($user) {
                 return $user->getFullname();
             }
-            
+
             return $this->language->txt('deleted_user');
         }
         return "";

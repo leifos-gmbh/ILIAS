@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -31,7 +33,10 @@ class ilFormFieldParser
         $this->xlstProcess = $xlstProcess;
     }
 
-    public function fetchDefaultFormFields(string $content) : array
+    /**
+     * @return array{pageformat: string, pagewidth: mixed, pageheight: mixed, margin_body_top: mixed, margin_body_right: mixed, margin_body_bottom: mixed, margin_body_left: mixed, certificate_text: string}
+     */
+    public function fetchDefaultFormFields(string $content): array
     {
         $pagewidth = "21cm";
         if (preg_match("/page-width\=\"([^\"]+)\"/", $content, $matches)) {

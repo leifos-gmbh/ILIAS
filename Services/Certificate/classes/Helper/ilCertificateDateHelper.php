@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -23,10 +25,8 @@ class ilCertificateDateHelper
 {
     /**
      * @param string|int $date
-     * @param ?int       $dateFormat
-     * @return string
      */
-    public function formatDate($date, ?int $dateFormat = null) : string
+    public function formatDate($date, ?int $dateFormat = null): string
     {
         if (null === $dateFormat) {
             $dateFormat = IL_CAL_DATETIME;
@@ -44,11 +44,9 @@ class ilCertificateDateHelper
 
     /**
      * @param string|int $dateTime
-     * @param ?int       $dateFormat
-     * @return string
      * @throws ilDateTimeException
      */
-    public function formatDateTime($dateTime, ?int $dateFormat = null) : string
+    public function formatDateTime($dateTime, ?int $dateFormat = null): string
     {
         if (null === $dateFormat) {
             $dateFormat = IL_CAL_DATETIME;

@@ -27,11 +27,11 @@ require_once 'Services/Table/classes/class.ilTable2GUI.php';
  */
 class ilTestManScoringParticipantsBySelectedQuestionAndPassTableGUI extends ilTable2GUI
 {
-    const PARENT_DEFAULT_CMD = 'showManScoringByQuestionParticipantsTable';
-    const PARENT_APPLY_FILTER_CMD = 'applyManScoringByQuestionFilter';
-    const PARENT_RESET_FILTER_CMD = 'resetManScoringByQuestionFilter';
-    const PARENT_SAVE_SCORING_CMD = 'saveManScoringByQuestion';
-    
+    public const PARENT_DEFAULT_CMD = 'showManScoringByQuestionParticipantsTable';
+    public const PARENT_APPLY_FILTER_CMD = 'applyManScoringByQuestionFilter';
+    public const PARENT_RESET_FILTER_CMD = 'resetManScoringByQuestionFilter';
+    public const PARENT_SAVE_SCORING_CMD = 'saveManScoringByQuestion';
+
     private ?float $curQuestionMaxPoints = null;
 
     protected bool $first_row_rendered = false;
@@ -60,7 +60,7 @@ class ilTestManScoringParticipantsBySelectedQuestionAndPassTableGUI extends ilTa
         $this->initFilter();
     }
 
-    private function initColumns() : void
+    private function initColumns(): void
     {
         $this->addColumn($this->lng->txt('name'), 'name');
         $this->addColumn($this->lng->txt('tst_reached_points'), 'reached_points');
@@ -72,7 +72,7 @@ class ilTestManScoringParticipantsBySelectedQuestionAndPassTableGUI extends ilTa
         $this->addColumn('', '');
     }
 
-    private function initOrdering() : void
+    private function initOrdering(): void
     {
         $this->enable('sort');
 
@@ -80,7 +80,7 @@ class ilTestManScoringParticipantsBySelectedQuestionAndPassTableGUI extends ilTa
         $this->setDefaultOrderDirection("asc");
     }
 
-    public function initFilter() : void
+    public function initFilter(): void
     {
         $this->setDisableFilterHiding(true);
 
@@ -104,7 +104,7 @@ class ilTestManScoringParticipantsBySelectedQuestionAndPassTableGUI extends ilTa
                 } else {
                     $maxpoints = ' (' . $maxpoints . ' ' . $this->lng->txt('points') . ')';
                 }
-                
+
                 $select_questions[$data["question_id"]] = $data['title'] . $maxpoints . ' [' . $this->lng->txt('question_id_short') . ': ' . $data["question_id"] . ']';
             }
         }
@@ -148,7 +148,7 @@ class ilTestManScoringParticipantsBySelectedQuestionAndPassTableGUI extends ilTa
         $this->filter['finalize_evaluation'] = $correction->getValue();
     }
 
-    public function fillRow(array $a_set) : void
+    public function fillRow(array $a_set): void
     {
         global $DIC;
         $ilCtrl = $DIC->ctrl();
@@ -173,20 +173,20 @@ class ilTestManScoringParticipantsBySelectedQuestionAndPassTableGUI extends ilTa
 
         $this->tpl->setVariable('VAL_REACHED_POINTS', $a_set['reached_points']);
         $this->tpl->setVariable('VAL_MAX_POINTS', $a_set['maximum_points']);
-        $finalized = (isset($row['finalized_evaluation']) && $a_set['finalized_evaluation'] == 1);
+        $finalized = isset($row['finalized_evaluation']) && ((int) $a_set['finalized_evaluation']) === 1;
         $this->tpl->setVariable(
             'VAL_EVALUATED',
-            ($finalized) ? $this->lng->txt('yes') : $this->lng->txt('no')
+            $finalized ? $this->lng->txt('yes') : $this->lng->txt('no')
         );
         $fin_usr_id = $a_set['finalized_by_usr_id'] ?? null;
 
-        $this->tpl->setVariable('VAL_MODAL_CORRECTION', $a_set['feedback']);
+        $this->tpl->setVariable('VAL_MODAL_CORRECTION', $a_set['feedback'] ?? '');
         if (is_numeric($fin_usr_id) && $fin_usr_id > 0) {
             $this->tpl->setVariable('VAL_FINALIZED_BY', ilObjUser::_lookupFullname($fin_usr_id));
         }
-        $fin_timestamp = $a_set['finalized_tstamp'];
+        $fin_timestamp = $a_set['finalized_tstamp'] ?? 0;
         if ($fin_timestamp > 0) {
-            $time = new ilDateTime($fin_timestamp, 3);
+            $time = new ilDateTime($fin_timestamp, IL_CAL_UNIX);
             $this->tpl->setVariable('VAL_FINALIZED_ON', \ilDatePresentation::formatDate($time));
         }
 
@@ -210,13 +210,13 @@ class ilTestManScoringParticipantsBySelectedQuestionAndPassTableGUI extends ilTa
         $this->tpl->setVariable('VAL_TXT_ANSWER', $this->lng->txt('tst_eval_show_answer'));
         $this->tpl->setVariable('ANSWER_TITLE', $this->lng->txt('answer_of') . ': ' . $a_set['name']);
     }
-    
-    public function getCurQuestionMaxPoints() : ?float
+
+    public function getCurQuestionMaxPoints(): ?float
     {
         return $this->curQuestionMaxPoints;
     }
 
-    public function setCurQuestionMaxPoints(float $curQuestionMaxPoints) : void
+    public function setCurQuestionMaxPoints(float $curQuestionMaxPoints): void
     {
         $this->curQuestionMaxPoints = $curQuestionMaxPoints;
     }

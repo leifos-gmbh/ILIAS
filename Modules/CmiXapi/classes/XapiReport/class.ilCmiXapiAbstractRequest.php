@@ -1,18 +1,23 @@
-<?php declare(strict_types=1);
+<?php
 
-/******************************************************************************
+declare(strict_types=1);
+
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
+
 /**
  * Class ilCmiXapiAbstractRequest
  *
@@ -34,8 +39,8 @@ abstract class ilCmiXapiAbstractRequest
     {
         $this->basicAuth = $basicAuth;
     }
-    
-    protected function sendRequest(string $url) : string
+
+    protected function sendRequest(string $url): string
     {
         $client = new GuzzleHttp\Client();
         $req_opts = array(
@@ -54,7 +59,7 @@ abstract class ilCmiXapiAbstractRequest
             $promises['default'] = $client->sendAsync($request, $req_opts);
             $responses = GuzzleHttp\Promise\settle($promises)->wait();
             self::checkResponse($responses['default'], $body);
-            return $body;
+            return (string) $body;
         } catch (Exception $e) {
             ilObjCmiXapi::log()->error($e->getMessage());
             throw new Exception("LRS Connection Problems", $e->getCode(), $e);
@@ -62,7 +67,7 @@ abstract class ilCmiXapiAbstractRequest
     }
 
     //todo body?
-    public static function checkResponse(array $response, &$body, array $allowedStatus = [200, 204]) : bool
+    public static function checkResponse(array $response, &$body, array $allowedStatus = [200, 204]): bool
     {
         if ($response['state'] == 'fulfilled') {
             $status = $response['value']->getStatusCode();
@@ -84,7 +89,7 @@ abstract class ilCmiXapiAbstractRequest
     }
 
     //todo
-    public static function buildQuery(array $params, $encoding = PHP_QUERY_RFC3986) : string
+    public static function buildQuery(array $params, $encoding = PHP_QUERY_RFC3986): string
     {
         if ($params === []) {
             return '';

@@ -1,18 +1,23 @@
-<?php declare(strict_types=1);
+<?php
 
-/******************************************************************************
+declare(strict_types=1);
+
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
+
 /**
  * Class ilCmiXapiExporter
  *
@@ -24,8 +29,8 @@
  */
 class ilCmiXapiExporter extends ilXmlExporter
 {
-    const ENTITY = 'cmix';
-    const SCHEMA_VERSION = '5.1.0';
+    public const ENTITY = 'cmix';
+    public const SCHEMA_VERSION = '5.1.0';
 
 //    private $main_object = null;
     private ?ilCmiXapiDataSet $_dataset = null;
@@ -45,14 +50,14 @@ class ilCmiXapiExporter extends ilXmlExporter
         */
     }
 
-    public function init() : void
+    public function init(): void
     {
     }
 
     /**
      * Get xml representation
      */
-    public function getXmlRepresentation(string $a_entity, string $a_schema_version, string $a_id) : string
+    public function getXmlRepresentation(string $a_entity, string $a_schema_version, string $a_id): string
     {
         return $this->_dataset->getCmiXapiXmlRepresentation($a_entity, $a_schema_version, [$a_id], "", true, true);
     }
@@ -60,7 +65,7 @@ class ilCmiXapiExporter extends ilXmlExporter
     /**
      * @return array<string, array<string, string|bool>>
      */
-    public function getValidSchemaVersions(string $a_entity) : array
+    public function getValidSchemaVersions(string $a_entity): array
     {
         return array(
             "5.1.0" => array(

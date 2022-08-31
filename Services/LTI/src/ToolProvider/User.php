@@ -1,22 +1,24 @@
 <?php
 
-namespace ILIAS\LTI\ToolProvider;
-
-use ILIAS\LTI\ToolProvider\DataConnector\DataConnector;
-
-/******************************************************************************
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
+
+namespace ILIAS\LTI\ToolProvider;
+
+use ILIAS\LTI\ToolProvider\DataConnector\DataConnector;
 
 /**
  * Class to represent a platform user
@@ -27,7 +29,6 @@ use ILIAS\LTI\ToolProvider\DataConnector\DataConnector;
  */
 class User
 {
-
     /**
      * User's first name.
      *
@@ -205,7 +206,7 @@ class User
      *
      * @return bool    True if the user has a role of administrator
      */
-    public function isAdmin() : bool
+    public function isAdmin(): bool
     {
         return $this->hasRole('Administrator') || $this->hasRole('urn:lti:sysrole:ims/lis/SysAdmin') ||
             $this->hasRole('urn:lti:sysrole:ims/lis/Administrator') || $this->hasRole('urn:lti:instrole:ims/lis/Administrator');
@@ -216,7 +217,7 @@ class User
      *
      * @return bool    True if the user has a role of instructor, contentdeveloper or teachingassistant
      */
-    public function isStaff() : bool
+    public function isStaff(): bool
     {
         return ($this->hasRole('Instructor') || $this->hasRole('ContentDeveloper') || $this->hasRole('TeachingAssistant'));
     }
@@ -226,7 +227,7 @@ class User
      *
      * @return bool    True if the user has a role of learner
      */
-    public function isLearner() : bool
+    public function isLearner(): bool
     {
         return $this->hasRole('Learner');
     }
@@ -240,7 +241,7 @@ class User
      * @param string $role Name of role
      * @return bool    True if the user has the specified role
      */
-    private function hasRole(string $role) : bool
+    private function hasRole(string $role): bool
     {
         $ok = in_array($role, $this->roles);
         if (!$ok && (strpos($role, 'urn:') !== 0) && (strpos($role, 'http://') !== 0) && (strpos($role, 'https://') !== 0)) {

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -15,8 +17,6 @@
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
-
-/* Copyright (c) 2021 - Daniel Weise <daniel.weise@concepts-and-training.de> - Extended GPL, see LICENSE */
 
 use ILIAS\Setup;
 use ILIAS\Setup\Environment;
@@ -44,22 +44,22 @@ class ilTreeAdminNodeAddedObjective implements Setup\Objective
         $this->title = $title;
     }
 
-    public function getHash() : string
+    public function getHash(): string
     {
         return hash("sha256", self::class);
     }
 
-    public function getLabel() : string
+    public function getLabel(): string
     {
         return "Add new admin node to tree (type=$this->type;title=$this->title)";
     }
 
-    public function isNotable() : bool
+    public function isNotable(): bool
     {
         return true;
     }
 
-    public function getPreconditions(Environment $environment) : array
+    public function getPreconditions(Environment $environment): array
     {
         return [
             new ilIniFilesLoadedObjective(),
@@ -67,16 +67,21 @@ class ilTreeAdminNodeAddedObjective implements Setup\Objective
         ];
     }
 
-    public function achieve(Environment $environment) : Environment
+    public function achieve(Environment $environment): Environment
     {
+        global $DIC;
         $client_ini = $environment->getResource(Setup\Environment::RESOURCE_CLIENT_INI);
         $db = $environment->getResource(Environment::RESOURCE_DATABASE);
+        $DIC['ilDB'] = $DIC['ilDB'] ?? $db;
 
         if (!defined("ROOT_FOLDER_ID")) {
             define("ROOT_FOLDER_ID", (int) $client_ini->readVariable("system", "ROOT_FOLDER_ID"));
         }
         if (!defined("SYSTEM_FOLDER_ID")) {
             define("SYSTEM_FOLDER_ID", $client_ini->readVariable("system", "SYSTEM_FOLDER_ID"));
+        }
+        if (!defined("ILIAS_LOG_ENABLED")) {
+            define("ILIAS_LOG_ENABLED", false);
         }
 
         $obj_type_id = $db->nextId("object_data");
@@ -110,8 +115,12 @@ class ilTreeAdminNodeAddedObjective implements Setup\Objective
         ];
         $db->insert("object_reference", $values);
 
-        $tree = new ilTree(ROOT_FOLDER_ID);
-        $tree->insertNode($ref_id, SYSTEM_FOLDER_ID);
+        $tree = new ilTree(
+            ROOT_FOLDER_ID,
+            0,
+            $db
+        );
+        $tree->insertNode((int) $ref_id, (int) SYSTEM_FOLDER_ID);
 
         foreach ($this->rbac_ops as $ops_id) {
             if (ilRbacReview::_isRBACOperation($obj_type_id, $ops_id)) {
@@ -123,11 +132,10 @@ class ilTreeAdminNodeAddedObjective implements Setup\Objective
             ];
             $db->insert("rbac_ta", $values);
         }
-
         return $environment;
     }
 
-    public function isApplicable(Environment $environment) : bool
+    public function isApplicable(Environment $environment): bool
     {
         $db = $environment->getResource(Environment::RESOURCE_DATABASE);
         return !((bool) ilObject::_getObjectTypeIdByTitle($this->type, $db));

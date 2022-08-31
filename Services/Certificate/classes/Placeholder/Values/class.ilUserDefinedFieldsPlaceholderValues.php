@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -52,15 +54,12 @@ class ilUserDefinedFieldsPlaceholderValues implements ilCertificatePlaceholderVa
      * ilInvalidCertificateException MUST be thrown if the
      * data could not be determined or the user did NOT
      * achieve the certificate.
-     * @param int $userId
-     * @param int $objId
-     * @return array - [PLACEHOLDER] => 'actual value'
      * @throws ilInvalidCertificateException
      * @throws ilException
      */
-    public function getPlaceholderValues(int $userId, int $objId) : array
+    public function getPlaceholderValues(int $userId, int $objId): array
     {
-        /** @var ilObjUser $user */
+        /** @var ilObjUser|null $user */
         $user = $this->objectHelper->getInstanceByObjId($userId);
         if (!$user instanceof ilObjUser) {
             throw new ilException('The entered id: ' . $userId . ' is not an user object');
@@ -91,11 +90,8 @@ class ilUserDefinedFieldsPlaceholderValues implements ilCertificatePlaceholderVa
      * This method is different then the 'getPlaceholderValues' method, this
      * method is used to create a placeholder value array containing dummy values
      * that is used to create a preview certificate.
-     * @param int $userId
-     * @param int $objId
-     * @return array - [PLACEHOLDER] => 'dummy value'
      */
-    public function getPlaceholderValuesForPreview(int $userId, int $objId) : array
+    public function getPlaceholderValuesForPreview(int $userId, int $objId): array
     {
         $userDefinedFields = $this->userDefinedFieldsObject->getDefinitions();
 

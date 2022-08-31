@@ -1,48 +1,51 @@
 <?php
+
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
+
 namespace ILIAS\LTI\ToolProvider;
 
 use ILIAS\LTIOAuth;
 
-/******************************************************************************
- *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
- *
- * If this is not the case or you just want to try ILIAS, you'll find
- * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
- *
- *****************************************************************************/
 final class Util
 {
-
     /**
      * LTI version 1 for messages.
      */
-    const LTI_VERSION1 = 'LTI-1p0';
+    public const LTI_VERSION1 = 'LTI-1p0';
 
     /**
      * LTI version 1.3 for messages.
      */
-    const LTI_VERSION1P3 = '1.3.0';
+    public const LTI_VERSION1P3 = '1.3.0';
 
     /**
      * LTI version 2 for messages.
      */
-    const LTI_VERSION2 = 'LTI-2p0';
+    public const LTI_VERSION2 = 'LTI-2p0';
 
     /**
      * Prefix for standard JWT message claims.
      */
-    const JWT_CLAIM_PREFIX = 'https://purl.imsglobal.org/spec/lti';
+    public const JWT_CLAIM_PREFIX = 'https://purl.imsglobal.org/spec/lti';
 
     /**
      * Mapping for standard message types.
      */
-    const MESSAGE_TYPE_MAPPING = array(
+    public const MESSAGE_TYPE_MAPPING = array(
         'basic-lti-launch-request' => 'LtiResourceLinkRequest',
         'ContentItemSelectionRequest' => 'LtiDeepLinkingRequest',
         'ContentItemSelection' => 'LtiDeepLinkingResponse',
@@ -52,7 +55,7 @@ final class Util
     /**
      * Mapping for standard message parameters to JWT claim.
      */
-    const JWT_CLAIM_MAPPING = array(
+    public const JWT_CLAIM_MAPPING = array(
         'accept_types' => array('suffix' => 'dl', 'group' => 'deep_linking_settings', 'claim' => 'accept_types', 'isArray' => true),
         'accept_copy_advice' => array('suffix' => 'dl', 'group' => 'deep_linking_settings', 'claim' => 'copyAdvice', 'isBoolean' => true),
         'accept_media_types' => array('suffix' => 'dl', 'group' => 'deep_linking_settings', 'claim' => 'accept_media_types'),
@@ -135,22 +138,22 @@ final class Util
     /**
      * No logging.
      */
-    const LOGLEVEL_NONE = 0;
+    public const LOGLEVEL_NONE = 0;
 
     /**
      * Log errors only.
      */
-    const LOGLEVEL_ERROR = 1;
+    public const LOGLEVEL_ERROR = 1;
 
     /**
      * Log error and information messages.
      */
-    const LOGLEVEL_INFO = 2;
+    public const LOGLEVEL_INFO = 2;
 
     /**
      * Log all messages.
      */
-    const LOGLEVEL_DEBUG = 3;
+    public const LOGLEVEL_DEBUG = 3;
 
     /**
      * Permitted LTI versions for messages.
@@ -190,7 +193,7 @@ final class Util
      *
      * @return bool
      */
-    public static function isLtiMessage() : bool
+    public static function isLtiMessage(): bool
     {
 //        $isLti = ($_SERVER['REQUEST_METHOD'] === 'POST') &&
 //            (!empty($_POST['lti_message_type']) || !empty($_POST['id_token']) || !empty($_POST['JWT']) ||
@@ -216,21 +219,112 @@ final class Util
     /**
      * Return GET and POST request parameters (POST parameters take precedence)
      *
-     * @return array
+     * @return array|null
      */
-    public static function getRequestParameters() : ?array
+    public static function getRequestParameters(): ?array
     {
         if (is_null(self::$requestParameters)) {
 //            special for ILIAS instead of
 //            self::$requestParameters = array_merge($_GET, $_POST);
-            self::$requestParameters = array_merge(
-                //Argument 1 passed to Symfony\Component\HttpFoundation\Request::createRequestFromFactory() must be of the type array, object given
-                (array) \Symfony\Component\HttpFoundation\Request::createFromGlobals()->query->all(),
-                (array) \Symfony\Component\HttpFoundation\Request::createFromGlobals()->request->all()
+//            also not possible
+//            self::$requestParameters = array_merge(
+//                //Argument 1 passed to Symfony\Component\HttpFoundation\Request::createRequestFromFactory() must be of the type array, object given
+//                (array) \Symfony\Component\HttpFoundation\Request::createFromGlobals()->query->all(),
+//                (array) \Symfony\Component\HttpFoundation\Request::createFromGlobals()->request->all()
 //                (array) $_GET, (array) $_POST
-            );
-        }
+//            );
+            global $DIC;
+            $post = $DIC->http()->wrapper()->post();
+            $query = $DIC->http()->wrapper()->query();
+            $refinery = $DIC->refinery()->kindlyTo()->string();
 
+            $divAr = ['accept_copy_advice',
+                          'accept_media_types',
+                          'accept_multiple',
+                          'accept_presentation_document_targets',
+                          'accept_types',
+                          'accept_unsigned',
+                          'auto_create',
+                          'can_confirm',
+                          'client_id',
+                          'content_item_return_url',
+                          'context_id',
+                          'context_title',
+                          'context_type',
+                          'custom_ap_attempt_number',
+                          'custom_content_item_id',
+                          'custom_share_key',
+                          'custom_tc_profile_url',
+                          'custom_user_username',
+                          'custom_username',
+                          'deployment_id',
+                          'ext_launch_presentation_css_url',
+                          'ext_lms',
+                          'ext_user_username',
+                          'ext_username',
+                          'iss',
+                          'launch_presentation_css_url',
+                          'launch_presentation_document_target',
+                          'launch_presentation_height',
+                          'launch_presentation_return_url',
+                          'launch_presentation_width',
+                          'lis_person_contact_email_primary',
+                          'lis_person_name_family',
+                          'lis_person_name_full',
+                          'lis_person_name_given',
+                          'lis_person_sourcedid',
+                          'login_hint',
+                          'lti_deployment_id',
+                          'lti_message_hint',
+                          'lti_message_type',
+                          'lti_version',
+                          'oauth_consumer_key',
+                          'oauth_signature_method',
+                          'openid_configuration',
+                          'platform_state',
+                          'reg_key',
+                          'reg_password',
+                          'registration_token',
+                          'relaunch_url',
+                          'resource_link_id',
+                          'resource_link_title',
+                          'roles',
+                          'target_link_uri',
+                          'tc_profile_url',
+                          'tool_consumer_info_product_family_code',
+                          'tool_consumer_info_version',
+                          'tool_consumer_instance_guid',
+                          'tool_consumer_instance_name',
+                          'user_id',
+                          'user_image'
+            ];
+            $LTI_CONSUMER_SETTING_NAMES = ['custom_tc_profile_url', 'custom_system_setting_url', 'custom_oauth2_access_token_url'];
+            $LTI_CONTEXT_SETTING_NAMES = ['custom_context_setting_url',
+                                               'ext_ims_lis_memberships_id', 'ext_ims_lis_memberships_url',
+                                               'custom_context_memberships_url', 'custom_context_memberships_v2_url',
+                                               'custom_context_group_sets_url', 'custom_context_groups_url',
+                                               'custom_lineitems_url', 'custom_ags_scopes'
+            ];
+            $LTI_RESOURCE_LINK_SETTING_NAMES = ['lis_result_sourcedid', 'lis_outcome_service_url',
+                                                     'ext_ims_lis_basic_outcome_url', 'ext_ims_lis_resultvalue_sourcedids', 'ext_outcome_data_values_accepted',
+                                                     'ext_ims_lis_memberships_id', 'ext_ims_lis_memberships_url',
+                                                     'ext_ims_lti_tool_setting', 'ext_ims_lti_tool_setting_id', 'ext_ims_lti_tool_setting_url',
+                                                     'custom_link_setting_url', 'custom_link_memberships_url',
+                                                     'custom_lineitems_url', 'custom_lineitem_url', 'custom_ags_scopes',
+                                                     'custom_ap_acs_url'
+            ];
+
+            $requestAr = array_merge($divAr, $LTI_CONSUMER_SETTING_NAMES, $LTI_CONTEXT_SETTING_NAMES, $LTI_RESOURCE_LINK_SETTING_NAMES);
+
+            foreach ($requestAr as $param) {
+                if ($query->has($param)) {
+                    self::$requestParameters[$param] = $query->retrieve($param, $refinery);
+                }
+                if ($post->has($param)) {
+                    self::$requestParameters[$param] = $post->retrieve($param, $refinery);
+                }
+            }
+        }
         return self::$requestParameters;
     }
 
@@ -369,7 +463,7 @@ final class Util
      * @param string $target Name of target (optional)
      * @return string
      */
-    public static function sendForm(string $url, array $params, string $target = '') : string
+    public static function sendForm(string $url, array $params, string $target = ''): string
     {
         self::logForm($url, $params, 'POST');
         $page = <<< EOD
@@ -426,7 +520,7 @@ EOD;
      * @param array  $params Array of form parameters
      * @return string
      */
-    public static function redirect(string $url, array $params) : string
+    public static function redirect(string $url, array $params): string
     {
         if (!empty($params)) {
             if (strpos($url, '?') === false) {
@@ -461,7 +555,7 @@ EOD;
      * @param int $length Length of string to be generated (optional, default is 8 characters)
      * @return string Random string
      */
-    public static function getRandomString(int $length = 8) : string
+    public static function getRandomString(int $length = 8): string
     {
         $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
@@ -480,7 +574,7 @@ EOD;
      * @param string $html HTML string to be stripped
      * @return string
      */
-    public static function stripHtml(string $html) : string
+    public static function stripHtml(string $html): string
     {
         $html = strip_tags($html);
         $html = html_entity_decode($html, ENT_QUOTES | ENT_HTML401);
@@ -493,7 +587,7 @@ EOD;
      * @param object $obj Object to be cloned
      * @return object
      */
-    public static function cloneObject(object $obj) : object
+    public static function cloneObject(object $obj): object
     {
         $clone = clone $obj;
         $objVars = get_object_vars($clone);
@@ -511,5 +605,11 @@ EOD;
         }
 
         return $clone;
+    }
+
+
+    public static function logtxt(string $msg)
+    {
+        file_put_contents("log.txt", $msg . "\n", FILE_APPEND);
     }
 }

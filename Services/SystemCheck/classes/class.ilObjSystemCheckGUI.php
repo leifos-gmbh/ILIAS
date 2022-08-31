@@ -1,6 +1,21 @@
-<?php declare(strict_types=1);
+<?php
 
-/* Copyright (c) 1998-2012 ILIAS open source, Extended GPL, see docs/LICENSE */
+declare(strict_types=1);
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 use ILIAS\HTTP\GlobalHttpState;
 use ILIAS\Refinery\Factory;
@@ -28,7 +43,7 @@ class ilObjSystemCheckGUI extends ilObjectGUI
         $this->lng->loadLanguageModule('sysc');
     }
 
-    protected function getGrpIdFromRequest() : int
+    protected function getGrpIdFromRequest(): int
     {
         if ($this->http->wrapper()->query()->has('grp_id')) {
             return $this->http->wrapper()->query()->retrieve(
@@ -39,7 +54,7 @@ class ilObjSystemCheckGUI extends ilObjectGUI
         return 0;
     }
 
-    protected function getTaskIdFromRequest() : int
+    protected function getTaskIdFromRequest(): int
     {
         if ($this->http->wrapper()->query()->has('task_id')) {
             return $this->http->wrapper()->query()->retrieve(
@@ -50,12 +65,12 @@ class ilObjSystemCheckGUI extends ilObjectGUI
         return 0;
     }
 
-    public function getLang() : ilLanguage
+    public function getLang(): ilLanguage
     {
         return $this->lng;
     }
 
-    public function executeCommand() : void
+    public function executeCommand(): void
     {
         $next_class = $this->ctrl->getNextClass($this);
         $cmd = $this->ctrl->getCmd();
@@ -105,11 +120,10 @@ class ilObjSystemCheckGUI extends ilObjectGUI
                 $handler = ilSCComponentTaskFactory::getComponentTask($this->getTaskIdFromRequest());
                 $this->ctrl->forwardCommand($handler);
                 break;
-
         }
     }
 
-    public function getAdminTabs() : void
+    public function getAdminTabs(): void
     {
         if ($this->rbac_system->checkAccess('read', $this->object->getRefId())) {
             $this->tabs_gui->addTarget('overview', $this->ctrl->getLinkTarget($this, 'overview'));
@@ -119,7 +133,7 @@ class ilObjSystemCheckGUI extends ilObjectGUI
         }
     }
 
-    protected function overview() : bool
+    protected function overview(): bool
     {
         $this->getLang()->loadLanguageModule('sysc');
 
@@ -133,7 +147,7 @@ class ilObjSystemCheckGUI extends ilObjectGUI
         return true;
     }
 
-    protected function showGroup() : bool
+    protected function showGroup(): bool
     {
         $this->setSubTabs(self::SECTION_GROUP, '');
 
@@ -147,7 +161,7 @@ class ilObjSystemCheckGUI extends ilObjectGUI
         return true;
     }
 
-    protected function trash(ilPropertyFormGUI $form = null) : void
+    protected function trash(ilPropertyFormGUI $form = null): void
     {
         $this->setSubTabs(self::SECTION_MAIN, 'trash');
         if (!$form instanceof ilPropertyFormGUI) {
@@ -156,7 +170,7 @@ class ilObjSystemCheckGUI extends ilObjectGUI
         $this->tpl->setContent($form->getHTML());
     }
 
-    protected function initFormTrash() : ilPropertyFormGUI
+    protected function initFormTrash(): ilPropertyFormGUI
     {
         $form = new ilPropertyFormGUI();
         $form->setFormAction($this->ctrl->getFormAction($this));
@@ -215,7 +229,7 @@ class ilObjSystemCheckGUI extends ilObjectGUI
         return $form;
     }
 
-    protected function handleTrashAction() : bool
+    protected function handleTrashAction(): bool
     {
         $form = $this->initFormTrash();
         if ($form->checkInput()) {
@@ -245,7 +259,7 @@ class ilObjSystemCheckGUI extends ilObjectGUI
         return false;
     }
 
-    protected function setSubTabs(string $a_section, string $a_active) : void
+    protected function setSubTabs(string $a_section, string $a_active): void
     {
         switch ($a_section) {
             case self::SECTION_MAIN:

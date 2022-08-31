@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -21,7 +23,7 @@
  */
 class ilCertificateCloneActionTest extends ilCertificateBaseTestCase
 {
-    public function testCloneCertificate() : void
+    public function testCloneCertificate(): void
     {
         $database = $this->createMock(ilDBInterface::class);
 
@@ -31,8 +33,8 @@ class ilCertificateCloneActionTest extends ilCertificateBaseTestCase
 
         $database
             ->expects($this->once())
-            ->method('numRows')
-            ->willReturn(1);
+            ->method('fetchAssoc')
+            ->willReturn(['1' => '1']);
 
         $database
             ->expects($this->once())
@@ -104,10 +106,6 @@ class ilCertificateCloneActionTest extends ilCertificateBaseTestCase
             ->expects($this->exactly(7))
             ->method('copy');
 
-        $logger = $this->getMockBuilder(ilLogger::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $objectHelper = $this->getMockBuilder(ilCertificateObjectHelper::class)
             ->getMock();
 
@@ -119,7 +117,6 @@ class ilCertificateCloneActionTest extends ilCertificateBaseTestCase
             new ilCertificatePathFactory(),
             $templateRepository,
             $fileSystem,
-            $logger,
             $objectHelper,
             'some/web/directory',
             '/certificates/default/background.jpg'

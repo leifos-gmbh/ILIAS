@@ -43,7 +43,7 @@ class ilMatchingWizardInputGUI extends ilTextInputGUI
     {
         global $DIC;
         $lng = $DIC['lng'];
-        
+
         parent::__construct($a_title, $a_postvar);
         $this->setSuffixes(array("jpg", "jpeg", "png", "gif"));
         $this->setSize('40');
@@ -51,13 +51,13 @@ class ilMatchingWizardInputGUI extends ilTextInputGUI
         $this->text_name = $lng->txt('answer_text');
         $this->image_name = $lng->txt('answer_image');
     }
-    
+
     /**
     * Set Accepted Suffixes.
     *
     * @param	array	$a_suffixes	Accepted Suffixes
     */
-    public function setSuffixes($a_suffixes) : void
+    public function setSuffixes($a_suffixes): void
     {
         $this->suffixes = $a_suffixes;
     }
@@ -67,17 +67,17 @@ class ilMatchingWizardInputGUI extends ilTextInputGUI
     *
     * @return	array	Accepted Suffixes
     */
-    public function getSuffixes() : array
+    public function getSuffixes(): array
     {
         return $this->suffixes;
     }
-    
+
     /**
     * Set hide images.
     *
     * @param	bool	$a_hide	Hide images
     */
-    public function setHideImages($a_hide) : void
+    public function setHideImages($a_hide): void
     {
         $this->hideImages = $a_hide;
     }
@@ -87,7 +87,7 @@ class ilMatchingWizardInputGUI extends ilTextInputGUI
     *
     * @param	array	$a_value	Value
     */
-    public function setValues($a_values) : void
+    public function setValues($a_values): void
     {
         $this->values = $a_values;
     }
@@ -97,27 +97,27 @@ class ilMatchingWizardInputGUI extends ilTextInputGUI
     *
     * @return	array	Values
     */
-    public function getValues() : array
+    public function getValues(): array
     {
         return $this->values;
     }
 
-    public function setTextName($a_value) : void
+    public function setTextName($a_value): void
     {
         $this->text_name = $a_value;
     }
-    
-    public function setImageName($a_value) : void
+
+    public function setImageName($a_value): void
     {
         $this->image_name = $a_value;
     }
-    
+
     /**
     * Set question object
     *
     * @param	object	$a_value	test object
     */
-    public function setQuestionObject($a_value) : void
+    public function setQuestionObject($a_value): void
     {
         $this->qstObject = &$a_value;
     }
@@ -127,7 +127,7 @@ class ilMatchingWizardInputGUI extends ilTextInputGUI
     *
     * @return	object	Value
     */
-    public function getQuestionObject() : ?object
+    public function getQuestionObject(): ?object
     {
         return $this->qstObject;
     }
@@ -137,7 +137,7 @@ class ilMatchingWizardInputGUI extends ilTextInputGUI
     *
     * @param	boolean	$a_allow_move Allow move
     */
-    public function setAllowMove($a_allow_move) : void
+    public function setAllowMove($a_allow_move): void
     {
         $this->allowMove = $a_allow_move;
     }
@@ -147,31 +147,22 @@ class ilMatchingWizardInputGUI extends ilTextInputGUI
     *
     * @return	boolean	Allow move
     */
-    public function getAllowMove() : bool
+    public function getAllowMove(): bool
     {
         return $this->allowMove;
     }
 
-    public function setValue($a_value) : void
+    public function setValue($a_value): void
     {
         $this->values = array();
         if (is_array($a_value)) {
             if (is_array($a_value['answer'])) {
                 foreach ($a_value['answer'] as $index => $value) {
-                    include_once "./Modules/TestQuestionPool/classes/class.assAnswerMatchingTerm.php";
-                    if (isset($a_value['imagename'])) {
-                        $answer = new assAnswerMatchingTerm(
-                            $value,
-                            $a_value['imagename'][$index],
-                            $a_value['identifier'][$index]
-                        );
-                    } else {
-                        $answer = new assAnswerMatchingTerm(
-                            $value,
-                            '',
-                            $a_value['identifier'][$index]
-                        );
-                    }
+                    $answer = new assAnswerMatchingTerm(
+                        $value,
+                        $a_value['imagename'][$index] ?? '',
+                        $a_value['identifier'][$index] ?? ''
+                    );
                     array_push($this->values, $answer);
                 }
             }
@@ -182,7 +173,7 @@ class ilMatchingWizardInputGUI extends ilTextInputGUI
     * Check input, strip slashes etc. set alert, if input is not ok.
     * @return	boolean		Input ok, true/false
     */
-    public function checkInput() : bool
+    public function checkInput(): bool
     {
         global $DIC;
         $lng = $DIC['lng'];
@@ -200,12 +191,17 @@ class ilMatchingWizardInputGUI extends ilTextInputGUI
             // check answers
             if (is_array($foundvalues['answer'])) {
                 foreach ($foundvalues['answer'] as $aidx => $answervalue) {
-                    if (((strlen($answervalue)) == 0) && (array_key_exists('imagename', $foundvalues) && strlen($foundvalues['imagename'][$aidx]) == 0)) {
+                    if ($answervalue === '' && (
+                        (!isset($foundvalues['imagename'][$aidx]) || $foundvalues['imagename'][$aidx] === '') &&
+                        !isset($_FILES[$this->getPostVar()]['tmp_name']['image'][$aidx])
+                    )) {
+                        // If there is to text answer, no already staged image, and no uploaded image ...
                         $this->setAlert($lng->txt("msg_input_is_required"));
                         return false;
                     }
                 }
             }
+
             if (!$this->hideImages) {
                 if (is_array($_FILES[$this->getPostVar()]['error']['image'])) {
                     foreach ($_FILES[$this->getPostVar()]['error']['image'] as $index => $error) {
@@ -225,11 +221,10 @@ class ilMatchingWizardInputGUI extends ilTextInputGUI
 
                                 case UPLOAD_ERR_NO_FILE:
                                     if ($this->getRequired()) {
-                                        if (isset($foundvalues['imagename'])) {
-                                            if ((!strlen($foundvalues['imagename'][$index])) && (!strlen($foundvalues['answer'][$index]))) {
-                                                $this->setAlert($lng->txt("form_msg_file_no_upload"));
-                                                return false;
-                                            }
+                                        if ((!isset($foundvalues['imagename'][$index]) || $foundvalues['imagename'][$index] === '') &&
+                                            (!isset($foundvalues['answer'][$index]) && $foundvalues['answer'][$index] === '')) {
+                                            $this->setAlert($lng->txt("form_msg_file_no_upload"));
+                                            return false;
                                         }
                                     }
                                     break;
@@ -269,7 +264,7 @@ class ilMatchingWizardInputGUI extends ilTextInputGUI
                                 $this->setAlert($lng->txt("form_msg_file_virus_found") . "<br />" . $vir[1]);
                                 return false;
                             }
-                            
+
                             if (!in_array(strtolower($suffix), $this->getSuffixes())) {
                                 $this->setAlert($lng->txt("form_msg_file_wrong_file_type"));
                                 return false;
@@ -286,11 +281,11 @@ class ilMatchingWizardInputGUI extends ilTextInputGUI
     * Insert property html
     * @return	void	Size
     */
-    public function insert(ilTemplate $a_tpl) : void
+    public function insert(ilTemplate $a_tpl): void
     {
         global $DIC;
         $lng = $DIC['lng'];
-        
+
         $tpl = new ilTemplate("tpl.prop_matchingwizardinput.html", true, true, "Modules/TestQuestionPool");
         $i = 0;
         foreach ($this->values as $value) {

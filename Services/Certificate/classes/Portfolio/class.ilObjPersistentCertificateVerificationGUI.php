@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -48,13 +50,10 @@ class ilObjPersistentCertificateVerificationGUI
     }
 
     /**
-     * @param ilPortfolioPage $a_page
-     * @param int             $objectId
-     * @param int             $userId
      * @throws ilException
      * @throws ilFileUtilsException
      */
-    public function downloadFromPortfolioPage(ilPortfolioPage $a_page, int $objectId, int $userId) : void
+    public function downloadFromPortfolioPage(ilPortfolioPage $a_page, int $objectId, int $userId): void
     {
         if (ilPCVerification::isInPortfolioPage($a_page, 'crta', $objectId)) {
             $this->fileService->deliverCertificate($userId, $objectId);

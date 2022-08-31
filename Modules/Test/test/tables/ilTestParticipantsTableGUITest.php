@@ -1,6 +1,22 @@
-<?php declare(strict_types=1);
+<?php
 
-/* Copyright (c) 1998-2020 ILIAS open source, Extended GPL, see docs/LICENSE */
+declare(strict_types=1);
+
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * Class ilTestParticipantsTableGUITest
@@ -11,7 +27,7 @@ class ilTestParticipantsTableGUITest extends ilTestBaseTestCase
     private ilTestParticipantsTableGUI $tableGui;
     private ilTestParticipantsGUI $parentObj_mock;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -30,7 +46,6 @@ class ilTestParticipantsTableGUITest extends ilTestBaseTestCase
         $component_factory = $this->createMock(ilComponentFactory::class);
         $component_factory->method("getActivePluginsInSlot")->willReturn(new ArrayIterator());
         $this->setGlobalVariable("component.factory", $component_factory);
-        $this->setGlobalVariable("ilPluginAdmin", new ilPluginAdmin($this->createMock(ilComponentRepository::class)));
         $this->setGlobalVariable("ilDB", $this->createMock(ilDBInterface::class));
 
         $this->parentObj_mock = $this->createMock(ilTestParticipantsGUI::class);
@@ -45,12 +60,12 @@ class ilTestParticipantsTableGUITest extends ilTestBaseTestCase
         $this->tableGui = new ilTestParticipantsTableGUI($this->parentObj_mock, "");
     }
 
-    public function test_instantiateObject_shouldReturnInstance() : void
+    public function test_instantiateObject_shouldReturnInstance(): void
     {
         $this->assertInstanceOf(ilTestParticipantsTableGUI::class, $this->tableGui);
     }
 
-    public function testManageResultsCommandsEnabled() : void
+    public function testManageResultsCommandsEnabled(): void
     {
         $this->assertIsBool($this->tableGui->isManageResultsCommandsEnabled());
         $this->tableGui->setManageResultsCommandsEnabled(false);
@@ -59,7 +74,7 @@ class ilTestParticipantsTableGUITest extends ilTestBaseTestCase
         $this->assertTrue($this->tableGui->isManageResultsCommandsEnabled());
     }
 
-    public function testManageInviteesCommandsEnabled() : void
+    public function testManageInviteesCommandsEnabled(): void
     {
         $this->assertIsBool($this->tableGui->isManageInviteesCommandsEnabled());
         $this->tableGui->setManageInviteesCommandsEnabled(false);
@@ -68,19 +83,19 @@ class ilTestParticipantsTableGUITest extends ilTestBaseTestCase
         $this->assertTrue($this->tableGui->isManageInviteesCommandsEnabled());
     }
 
-    public function testRowKeyDataField() : void
+    public function testRowKeyDataField(): void
     {
         $this->tableGui->setRowKeyDataField("test");
         $this->assertEquals("test", $this->tableGui->getRowKeyDataField());
     }
 
-    public function testAnonymity() : void
+    public function testAnonymity(): void
     {
         $this->tableGui->setAnonymity("test");
         $this->assertEquals("test", $this->tableGui->getAnonymity());
     }
 
-    public function testParticipantHasSolutionsFilterEnabled() : void
+    public function testParticipantHasSolutionsFilterEnabled(): void
     {
         $this->assertIsBool($this->tableGui->isParticipantHasSolutionsFilterEnabled());
         $this->tableGui->setParticipantHasSolutionsFilterEnabled(false);
@@ -89,7 +104,7 @@ class ilTestParticipantsTableGUITest extends ilTestBaseTestCase
         $this->assertTrue($this->tableGui->isParticipantHasSolutionsFilterEnabled());
     }
 
-    public function testNumericOrdering() : void
+    public function testNumericOrdering(): void
     {
         $this->assertTrue($this->tableGui->numericOrdering("access"));
         $this->assertTrue($this->tableGui->numericOrdering("tries"));

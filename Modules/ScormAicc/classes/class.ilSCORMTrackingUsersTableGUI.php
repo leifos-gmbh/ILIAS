@@ -1,17 +1,22 @@
-<?php declare(strict_types=1);
-/******************************************************************************
+<?php
+
+declare(strict_types=1);
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
+
 /**
  * Description of class
  *
@@ -32,7 +37,7 @@ class ilSCORMTrackingUsersTableGUI extends ilTable2GUI
         $this->initFilter();
     }
 
-    public function getObjId() : int
+    public function getObjId(): int
     {
         return $this->obj_id;
     }
@@ -41,14 +46,14 @@ class ilSCORMTrackingUsersTableGUI extends ilTable2GUI
      * Parse table content
      * @throws ilDateTimeException
      */
-    public function parse() : void
+    public function parse(): void
     {
         $this->initTable();
 
         $users = $this->getParentObject()->object->getTrackedUsers((string) $this->filter['lastname']);
         $attempts = $this->getParentObject()->object->getAttemptsForUsers();
         $versions = $this->getParentObject()->object->getModuleVersionForUsers();
-        
+
         $data = array();
         foreach ($users as $user) {
             $tmp = array();
@@ -79,7 +84,7 @@ class ilSCORMTrackingUsersTableGUI extends ilTable2GUI
     /**
      * @throws Exception
      */
-    public function initFilter() : void
+    public function initFilter(): void
     {
         $item = $this->addFilterItemByMetaType("lastname", ilTable2GUI::FILTER_TEXT);
         if ($item !== null) {
@@ -90,7 +95,7 @@ class ilSCORMTrackingUsersTableGUI extends ilTable2GUI
     /**
      * Fill row template
      */
-    protected function fillRow(array $a_set) : void
+    protected function fillRow(array $a_set): void
     {
         global $DIC;
         $ilCtrl = $DIC->ctrl();
@@ -106,7 +111,7 @@ class ilSCORMTrackingUsersTableGUI extends ilTable2GUI
         $this->tpl->setVariable('VAL_VERSION', (string) $a_set['version']);
     }
 
-    protected function initTable() : void
+    protected function initTable(): void
     {
         global $DIC;
         $ilCtrl = $DIC->ctrl();

@@ -55,7 +55,7 @@ class ilBookingScheduleGUI
         $this->schedule_id = $this->book_request->getScheduleId();
     }
 
-    public function executeCommand() : void
+    public function executeCommand(): void
     {
         $ilCtrl = $this->ctrl;
 
@@ -73,7 +73,7 @@ class ilBookingScheduleGUI
      * Render list of booking schedules
      * uses ilBookingSchedulesTableGUI
      */
-    public function render() : void
+    public function render(): void
     {
         $tpl = $this->tpl;
         $lng = $this->lng;
@@ -90,19 +90,19 @@ class ilBookingScheduleGUI
                     $this->tpl->setOnScreenMessage('info', $lng->txt("book_type_warning"));
                 }
             }
-            
+
             $bar = new ilToolbarGUI();
             $bar->addButton($lng->txt('book_add_schedule'), $ilCtrl->getLinkTarget($this, 'create'));
             $bar = $bar->getHTML();
         }
-        
+
         $tpl->setContent($bar . $table->getHTML());
     }
 
     /**
      * Render creation form
      */
-    public function create() : void
+    public function create(): void
     {
         $tpl = $this->tpl;
         $ilCtrl = $this->ctrl;
@@ -123,7 +123,7 @@ class ilBookingScheduleGUI
     /**
      * Render edit form
      */
-    public function edit() : void
+    public function edit(): void
     {
         $tpl = $this->tpl;
         $ilCtrl = $this->ctrl;
@@ -147,7 +147,7 @@ class ilBookingScheduleGUI
     public function initForm(
         string $a_mode = "create",
         ?int $id = null
-    ) : ilPropertyFormGUI {
+    ): ilPropertyFormGUI {
         $lng = $this->lng;
         $ilCtrl = $this->ctrl;
 
@@ -186,26 +186,26 @@ class ilBookingScheduleGUI
 
         $deadline_slot = new ilRadioOption($lng->txt("book_deadline_slot_end"), "slot_end");
         $deadline_opts->addOption($deadline_slot);
-        
+
         if ($a_mode === "edit") {
             $schedule = new ilBookingSchedule($id);
         }
-        
+
         $av = new ilFormSectionHeaderGUI();
         $av->setTitle($lng->txt("obj_activation_list_gui"));
         $form_gui->addItem($av);
-                
+
         // #18221
         $lng->loadLanguageModule('rep');
-        
+
         $from = new ilDateTimeInputGUI($lng->txt("rep_activation_limited_start"), "from");
         $from->setShowTime(true);
         $form_gui->addItem($from);
-        
+
         $to = new ilDateTimeInputGUI($lng->txt("rep_activation_limited_end"), "to");
         $to->setShowTime(true);
         $form_gui->addItem($to);
-    
+
         if ($a_mode === "edit") {
             $form_gui->setTitle($lng->txt("book_edit_schedule"));
 
@@ -217,7 +217,7 @@ class ilBookingScheduleGUI
             $title->setValue($schedule->getTitle());
             $from->setDate($schedule->getAvailabilityFrom());
             $to->setDate($schedule->getAvailabilityTo());
-            
+
             if ($schedule->getDeadline() === 0) {
                 $deadline_opts->setValue("slot_start");
             } elseif ($schedule->getDeadline() > 0) {
@@ -241,7 +241,7 @@ class ilBookingScheduleGUI
         return $form_gui;
     }
 
-    public function save() : void
+    public function save(): void
     {
         $tpl = $this->tpl;
         $lng = $this->lng;
@@ -256,12 +256,11 @@ class ilBookingScheduleGUI
             $this->render();
         } else {
             $form->setValuesByPost();
-            $this->setDefinitionFromPost($form);
             $tpl->setContent($form->getHTML());
         }
     }
 
-    public function update() : void
+    public function update(): void
     {
         $tpl = $this->tpl;
         $lng = $this->lng;
@@ -276,38 +275,7 @@ class ilBookingScheduleGUI
             $this->render();
         } else {
             $form->setValuesByPost();
-            $this->setDefinitionFromPost($form);
             $tpl->setContent($form->getHTML());
-        }
-    }
-
-    /**
-     * Reload definition values from post data
-     * @param ilPropertyFormGUI $form
-     */
-    protected function setDefinitionFromPost(
-        ilPropertyFormGUI $form
-    ) : void {
-        $days = (array) $form->getInput("days");
-        if ($days) {
-            $days_fields = [];
-            $days_group = $form->getItemByPostVar("days");
-            if ($days_group) {
-                foreach ($days_group->getOptions() as $option) {
-                    $days_fields[$option->getValue()] = $option;
-                }
-            }
-
-            foreach ($days as $day) {
-                $slot = $form->getInput($day . "_slot");
-                $subs = $days_fields[$day]->getSubItems();
-                if ($slot[0]) {
-                    $subs[0]->setValue($slot[0]);
-                }
-                if ($slot[1]) {
-                    $subs[1]->setValue($slot[1]);
-                }
-            }
         }
     }
 
@@ -317,12 +285,12 @@ class ilBookingScheduleGUI
     protected function formToObject(
         ilPropertyFormGUI $form,
         ilBookingSchedule $schedule
-    ) : void {
+    ): void {
         $ilObjDataCache = $this->obj_data_cache;
-        
+
         $schedule->setTitle($form->getInput("title"));
         $schedule->setPoolId($ilObjDataCache->lookupObjId($this->ref_id));
-        
+
         $from = $form->getItemByPostVar("from");
         if ($from !== null) {
             $schedule->setAvailabilityFrom($from->getDate());
@@ -337,11 +305,11 @@ class ilBookingScheduleGUI
             case "slot_start":
                 $schedule->setDeadline(0);
                 break;
-            
+
             case "hours":
                 $schedule->setDeadline($form->getInput("deadline"));
                 break;
-            
+
             case "slot_end":
                 $schedule->setDeadline(-1);
                 break;
@@ -371,7 +339,7 @@ class ilBookingScheduleGUI
     /**
      * Confirm delete
      */
-    public function confirmDelete() : void
+    public function confirmDelete(): void
     {
         $ilCtrl = $this->ctrl;
         $lng = $this->lng;
@@ -396,7 +364,7 @@ class ilBookingScheduleGUI
     /**
      * Delete schedule
      */
-    public function delete() : void
+    public function delete(): void
     {
         $ilCtrl = $this->ctrl;
         $lng = $this->lng;

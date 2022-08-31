@@ -1,18 +1,23 @@
-<?php declare(strict_types=1);
+<?php
 
-/******************************************************************************
+declare(strict_types=1);
+
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
+
 /**
  * Handles scorm mail placeholders
  *
@@ -23,12 +28,12 @@ class ilScormMailTemplateLPContext extends ilMailTemplateContext
 {
     public const ID = 'sahs_context_lp';
 
-    public function getId() : string
+    public function getId(): string
     {
         return self::ID;
     }
 
-    public function getTitle() : string
+    public function getTitle(): string
     {
         global $DIC;
         $lng = $DIC->language();
@@ -38,7 +43,7 @@ class ilScormMailTemplateLPContext extends ilMailTemplateContext
         return $lng->txt('sahs_mail_context_lp');
     }
 
-    public function getDescription() : string
+    public function getDescription(): string
     {
         global $DIC;
         $lng = $DIC->language();
@@ -50,8 +55,9 @@ class ilScormMailTemplateLPContext extends ilMailTemplateContext
 
     /**
      * Return an array of placeholders
+     * @return array<string, mixed[]>
      */
-    public function getSpecificPlaceholders() : array
+    public function getSpecificPlaceholders(): array
     {
         /**
          * @var $lng ilLanguage
@@ -124,7 +130,7 @@ class ilScormMailTemplateLPContext extends ilMailTemplateContext
         array $context_parameters,
         ?ilObjUser $recipient = null,
         bool $html_markup = false
-    ) : string {
+    ): string {
         /**
          * @var $ilObjDataCache ilObjectDataCache
          */

@@ -1,18 +1,23 @@
-<?php declare(strict_types=1);
+<?php
 
-/******************************************************************************
+declare(strict_types=1);
+
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
+
 /**
 * Class ilSAHSPresentationGUI
 *
@@ -52,7 +57,7 @@ class ilSAHSPresentationGUI implements ilCtrlBaseClassInterface
     /**
      * @throws ilCtrlException
      */
-    public function executeCommand() : void
+    public function executeCommand(): void
     {
         global $DIC;
         $lng = $DIC->language();
@@ -64,7 +69,7 @@ class ilSAHSPresentationGUI implements ilCtrlBaseClassInterface
 
         $lng->loadLanguageModule("content");
         $obj_id = ilObject::_lookupObjectId($this->refId);
-        
+
         // add entry to navigation history
         if ($ilAccess->checkAccess("read", "", $this->refId)) {
             $ilNavigationHistory->addItem(
@@ -76,14 +81,14 @@ class ilSAHSPresentationGUI implements ilCtrlBaseClassInterface
 
         $next_class = $this->ctrl->getNextClass($this);
         $cmd = $this->ctrl->getCmd();
-        
+
         $type = ilObjSAHSLearningModule::_lookupSubType($obj_id);
 
         if ($cmd === "downloadCertificate") {
             $scorm_gui = new ilSCORMPresentationGUI();
             $ret = $this->ctrl->forwardCommand($scorm_gui);
         }
-        
+
         $this->slm_gui = new ilObjSCORMLearningModuleGUI("", $this->refId, true, false);
 
         if ($next_class !== "ilinfoscreengui" &&
@@ -96,7 +101,7 @@ class ilSAHSPresentationGUI implements ilCtrlBaseClassInterface
                     $this->ctrl->setCmdClass("ilscorm13playergui");
                     $this->slm_gui = new ilObjSCORMLearningModuleGUI("", $this->refId, true, false);
                     break;
-                        
+
                 case "scorm":
                     $this->ctrl->setCmdClass("ilscormpresentationgui");
                     $this->slm_gui = new ilObjSCORMLearningModuleGUI("", $this->refId, true, false);
@@ -114,7 +119,7 @@ class ilSAHSPresentationGUI implements ilCtrlBaseClassInterface
                 $scorm_gui = new ilSCORM13PlayerGUI();
                 $ret = $this->ctrl->forwardCommand($scorm_gui);
                 break;
-                
+
             case "ilscormpresentationgui":
                 $scorm_gui = new ilSCORMPresentationGUI();
                 $ret = $this->ctrl->forwardCommand($scorm_gui);
@@ -141,7 +146,7 @@ class ilSAHSPresentationGUI implements ilCtrlBaseClassInterface
                 $this->tpl->printToStdout();
                 break;
 
-                default:
+            default:
                 $this->$cmd();
         }
     }
@@ -198,7 +203,7 @@ class ilSAHSPresentationGUI implements ilCtrlBaseClassInterface
 //        $this->tpl->printToStdout();
 //    }
 
-    public function view() : void
+    public function view(): void
     {
         $sc_gui_object = ilSCORMObjectGUI::getInstance($this->refId);
 
@@ -216,7 +221,7 @@ class ilSAHSPresentationGUI implements ilCtrlBaseClassInterface
      * works through ilCtrl in the future this may be changed
      * @throws ilCtrlException
      */
-    public function infoScreen() : void
+    public function infoScreen(): void
     {
         $this->ctrl->setCmd("showSummary");
         $this->ctrl->setCmdClass("ilinfoscreengui");
@@ -226,7 +231,7 @@ class ilSAHSPresentationGUI implements ilCtrlBaseClassInterface
     /**
      * @throws ilCtrlException
      */
-    public function setInfoTabs(string $a_active) : void
+    public function setInfoTabs(string $a_active): void
     {
         global $DIC;
 
@@ -289,7 +294,7 @@ class ilSAHSPresentationGUI implements ilCtrlBaseClassInterface
      * info screen
      * @throws ilCtrlException
      */
-    public function outputInfoScreen() : void
+    public function outputInfoScreen(): void
     {
         global $DIC;
         $ilAccess = $DIC->access();

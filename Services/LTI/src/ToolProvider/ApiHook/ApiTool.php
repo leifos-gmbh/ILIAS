@@ -1,20 +1,22 @@
 <?php
 
-namespace ILIAS\LTI\ToolProvider\ApiHook;
-
-/******************************************************************************
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
+
+namespace ILIAS\LTI\ToolProvider\ApiHook;
 
 /**
  * Class to implement tool specific functions for LTI messages
@@ -25,7 +27,6 @@ namespace ILIAS\LTI\ToolProvider\ApiHook;
  */
 class ApiTool
 {
-
     /**
      * Tool object.
      *
@@ -45,7 +46,7 @@ class ApiTool
     /**
      * Check if the API hook has been configured.
      */
-    public function isConfigured() : bool
+    public function isConfigured(): bool
     {
         return true;
     }
@@ -55,7 +56,7 @@ class ApiTool
      *
      * @return string User ID value, or empty string if not available.
      */
-    public function getUserId() : string
+    public function getUserId(): string
     {
         return '';
     }
@@ -65,7 +66,7 @@ class ApiTool
      *
      * @return string Context ID value, or empty string if not available.
      */
-    public function getContextId() : string
+    public function getContextId(): string
     {
         return '';
     }

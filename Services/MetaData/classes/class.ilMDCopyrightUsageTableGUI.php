@@ -1,6 +1,22 @@
-<?php declare(strict_types=1);
+<?php
 
-/* Copyright (c) 1998-2018 ILIAS open source, Extended GPL, see docs/LICENSE */
+declare(strict_types=1);
+
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 use ILIAS\UI\Factory;
 use ILIAS\UI\Renderer;
@@ -37,7 +53,7 @@ class ilMDCopyrightUsageTableGUI extends ilTable2GUI
         $this->setId("mdcopusage" . $this->copyright_id);
     }
 
-    public function init() : void
+    public function init(): void
     {
         $md_entry = new ilMDCopyrightSelectionEntry($this->copyright_id);
         $this->setTitle($md_entry->getTitle());
@@ -57,13 +73,13 @@ class ilMDCopyrightUsageTableGUI extends ilTable2GUI
         $this->initFilter();
     }
 
-    public function parse() : void
+    public function parse(): void
     {
         $data = $this->collectData($this->getCurrentFilter());
         $this->setData($data);
     }
 
-    public function initFilter() : void
+    public function initFilter(): void
     {
         $title = $this->addFilterItemByMetaType(
             "title",
@@ -86,7 +102,7 @@ class ilMDCopyrightUsageTableGUI extends ilTable2GUI
     /**
      * @return string[]
      */
-    protected function getCurrentFilter() : array
+    protected function getCurrentFilter(): array
     {
         $filter = array();
         if ($this->filter["title"]) {
@@ -99,7 +115,7 @@ class ilMDCopyrightUsageTableGUI extends ilTable2GUI
         return $filter;
     }
 
-    protected function fillRow(array $a_set) : void
+    protected function fillRow(array $a_set): void
     {
         $icon = $this->ui_factory->symbol()->icon()->standard(
             $a_set['type'],
@@ -142,7 +158,7 @@ class ilMDCopyrightUsageTableGUI extends ilTable2GUI
      * @return array<string, mixed>
      * @noinspection PhpParamsInspection
      */
-    public function collectData(array $filters) : array
+    public function collectData(array $filters): array
     {
         $db_data = $this->getDataFromDB();
 
@@ -173,7 +189,7 @@ class ilMDCopyrightUsageTableGUI extends ilTable2GUI
     /**
      * @return string[]
      */
-    public function getObjTypesAvailable() : array
+    public function getObjTypesAvailable(): array
     {
         $query = "SELECT DISTINCT obj_type FROM il_meta_rights " .
             "WHERE description = " . $this->db->quote(
@@ -192,7 +208,7 @@ class ilMDCopyrightUsageTableGUI extends ilTable2GUI
     /**
      * @return array<string, mixed>
      */
-    public function getDataFromDB() : array
+    public function getDataFromDB(): array
     {
         $query = "SELECT rbac_id, obj_id, obj_type FROM il_meta_rights " .
             "WHERE description = " . $this->db->quote(
@@ -213,15 +229,16 @@ class ilMDCopyrightUsageTableGUI extends ilTable2GUI
         return $data;
     }
 
-    public function getCountSubItemsFromDB(int $a_rbac_id) : int
+    public function getCountSubItemsFromDB(int $a_rbac_id): int
     {
         $query = "SELECT count(rbac_id) total FROM il_meta_rights " .
             "WHERE rbac_id = " . $this->db->quote($a_rbac_id, ilDBConstants::T_INTEGER) .
-            " AND rbac_id <> obj_id";
+            " AND rbac_id != obj_id";
 
         $result = $this->db->query($query);
-        $row = $this->db->fetchAssoc($result);
-
-        return $row['total'];
+        while ($row = $result->fetchRow(ilDBConstants::FETCHMODE_OBJECT)) {
+            return (int) $row->total;
+        }
+        return 0;
     }
 }

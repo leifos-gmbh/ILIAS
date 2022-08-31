@@ -22,44 +22,97 @@ class InternalRequestService
     use BaseGUIRequest;
 
     protected \ILIAS\HTTP\Services $http;
-    protected array $params;
+    protected \ILIAS\FileUpload\FileUpload $upload;
 
     public function __construct(
         \ILIAS\HTTP\Services $http,
-        \ILIAS\Refinery\Factory $refinery
+        \ILIAS\Refinery\Factory $refinery,
+        \ILIAS\FileUpload\FileUpload $upload
     ) {
         $this->initRequest(
             $http,
             $refinery
         );
+        $this->upload = $upload;
     }
 
-    public function isset(string $key) : bool
+    /**
+     * @return \ILIAS\FileUpload\DTO\UploadResult[]
+     */
+    public function getProcessedUploads(): array
+    {
+        $uploads = [];
+        if ($this->upload->hasUploads()) {
+            if (!$this->upload->hasBeenProcessed()) {
+                $this->upload->process();
+            }
+            $uploads = $this->upload->getResults();
+        }
+
+        return $uploads;
+    }
+
+    /**
+     * @param string[] $http_names An array of keys used as structure for the HTTP name (e.g. ['terms', 'image'] for $_FILES['terms']['image'])
+     * @param int $index
+     * @return string|null
+     */
+    public function getUploadFilename(array $http_names, int $index): ?string
+    {
+        $uploaded_files = $this->http->request()->getUploadedFiles();
+
+        while (($current_key = array_shift($http_names)) !== null) {
+            if (!isset($uploaded_files[$current_key])) {
+                return null;
+            }
+
+            $uploaded_files = $uploaded_files[$current_key];
+
+            if (isset($uploaded_files[$index]) && $http_names === []) {
+                /** @var \GuzzleHttp\Psr7\UploadedFile $file */
+                $file = $uploaded_files[$index];
+                $c = \Closure::bind(static function (\GuzzleHttp\Psr7\UploadedFile $file): ?string {
+                    return $file->file ?? null;
+                }, null, $file);
+
+                return $c($file);
+            }
+        }
+
+        return null;
+    }
+
+    public function upload(): \ILIAS\FileUpload\FileUpload
+    {
+        return $this->upload;
+    }
+
+    public function isset(string $key): bool
     {
         return $this->raw($key) !== null;
     }
-    public function hasRefId() : int
+    public function hasRefId(): int
     {
         return $this->raw('ref_id') !== null;
     }
 
-    public function getRefId() : int
+    public function getRefId(): int
     {
         return $this->int("ref_id");
     }
 
-    public function hasQuestionId() : bool
+    public function hasQuestionId(): bool
     {
         return $this->raw('q_id') !== null;
     }
 
-    public function getQuestionId() : int
+    public function getQuestionId(): int
     {
         return $this->int('q_id');
     }
 
     /** @return string[] */
-    public function getIds() : array
+    public function getIds(): array
     {
         return $this->strArray("id");
     }
@@ -76,5 +129,21 @@ class InternalRequestService
     public function getParsedBody()
     {
         return $this->http->request()->getParsedBody();
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getUnitIds(): array
+    {
+        return $this->intArray("unit_ids");
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getUnitCategoryIds(): array
+    {
+        return $this->intArray("category_ids");
     }
 }

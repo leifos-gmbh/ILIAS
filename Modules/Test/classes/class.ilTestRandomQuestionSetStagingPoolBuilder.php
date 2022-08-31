@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 require_once 'Modules/TestQuestionPool/classes/class.ilQuestionPoolTaxonomiesDuplicator.php';
@@ -100,7 +101,7 @@ class ilTestRandomQuestionSetStagingPoolBuilder
         }
     }
 
-    private function stageQuestionsFromSourcePool($sourcePoolId) : array
+    private function stageQuestionsFromSourcePool($sourcePoolId): array
     {
         $questionIdMapping = array();
 
@@ -215,7 +216,7 @@ class ilTestRandomQuestionSetStagingPoolBuilder
             }
             if (!isset($questionIdMappingPerPool[$sourcePoolId][ $row['question_id'] ])) {
                 $question = assQuestion::_instantiateQuestion($row['question_id']);
-                $duplicateId = $question->duplicate(true, null, null, null, $this->testOBJ->getId());
+                $duplicateId = $question->duplicate(true, '', '', '', $this->testOBJ->getId());
 
                 $nextId = $this->db->nextId('tst_rnd_cpy');
                 $this->db->insert('tst_rnd_cpy', array(
@@ -233,7 +234,7 @@ class ilTestRandomQuestionSetStagingPoolBuilder
     }
     // fau.
 
-    private function mirrorSourcePoolTaxonomies($sourcePoolId, $questionIdMapping) : ilQuestionPoolDuplicatedTaxonomiesKeysMap
+    private function mirrorSourcePoolTaxonomies($sourcePoolId, $questionIdMapping): ilQuestionPoolDuplicatedTaxonomiesKeysMap
     {
         $duplicator = new ilQuestionPoolTaxonomiesDuplicator();
 

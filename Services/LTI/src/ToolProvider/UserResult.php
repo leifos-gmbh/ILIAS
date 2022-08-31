@@ -1,22 +1,24 @@
 <?php
 
-namespace ILIAS\LTI\ToolProvider;
-
-use ILIAS\LTI\ToolProvider\DataConnector\DataConnector;
-
-/******************************************************************************
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
+
+namespace ILIAS\LTI\ToolProvider;
+
+use ILIAS\LTI\ToolProvider\DataConnector\DataConnector;
 
 /**
  * Class to represent a platform user
@@ -27,7 +29,6 @@ use ILIAS\LTI\ToolProvider\DataConnector\DataConnector;
  */
 class UserResult extends User
 {
-
     /**
      * UserResult's result sourcedid.
      *
@@ -101,7 +102,7 @@ class UserResult extends User
      *
      * @return bool    True if the user object was successfully saved
      */
-    public function save() : bool
+    public function save(): bool
     {
         if (!is_null($this->resourceLinkId)) {
             $ok = $this->getDataConnector()->saveUserResult($this);
@@ -117,7 +118,7 @@ class UserResult extends User
      *
      * @return bool    True if the user object was successfully deleted
      */
-    public function delete() : bool
+    public function delete(): bool
     {
         $ok = $this->getDataConnector()->deleteUserResult($this);
 
@@ -129,7 +130,7 @@ class UserResult extends User
      *
      * @return ResourceLink Resource link object
      */
-    public function getResourceLink() : ?ResourceLink
+    public function getResourceLink(): ?ResourceLink
     {
         if (is_null($this->resourceLink) && !is_null($this->resourceLinkId)) {
             $this->resourceLink = ResourceLink::fromRecordId($this->resourceLinkId, $this->getDataConnector());
@@ -152,7 +153,7 @@ class UserResult extends User
      *
      * @return int Record ID of user
      */
-    public function getRecordId() : ?int
+    public function getRecordId(): ?int
     {
         return $this->id;
     }
@@ -201,7 +202,7 @@ class UserResult extends User
      * @param Platform|null $platform Platform for user (optional)
      * @return string UserResult ID value
      */
-    public function getId(int $idScope = null, Platform $platform = null) : string
+    public function getId(int $idScope = null, Platform $platform = null): string
     {
         $key = '';
         if (is_null($platform) && !is_null($this->getResourceLink())) {
@@ -246,7 +247,7 @@ class UserResult extends User
      * @param DataConnector $dataConnector Database connection object
      * @return UserResult  UserResult object
      */
-    public static function fromRecordId(int $id, DataConnector $dataConnector) : UserResult
+    public static function fromRecordId(int $id, DataConnector $dataConnector): UserResult
     {
         $userresult = new UserResult();
         $userresult->dataConnector = $dataConnector;
@@ -261,7 +262,7 @@ class UserResult extends User
      * @param string       $ltiUserId    UserResult ID value
      * @return UserResult UserResult object
      */
-    public static function fromResourceLink(ResourceLink $resourceLink, string $ltiUserId) : UserResult
+    public static function fromResourceLink(ResourceLink $resourceLink, string $ltiUserId): UserResult
     {
         $userresult = new UserResult();
         $userresult->resourceLink = $resourceLink;
@@ -286,7 +287,7 @@ class UserResult extends User
      * @param int|null $id Record ID of user (optional, default is null)
      * @return bool    True if the user object was successfully loaded
      */
-    private function load(int $id = null) : bool
+    private function load(int $id = null): bool
     {
         $this->initialize();
         $this->id = $id;

@@ -1,22 +1,24 @@
 <?php
 
-namespace ILIAS\LTI\ToolProvider\Service;
-
-use ILIAS\LTI\ToolProvider;
-
-/******************************************************************************
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
+
+namespace ILIAS\LTI\ToolProvider\Service;
+
+use ILIAS\LTI\ToolProvider;
 
 /**
  * Class to implement the Score service
@@ -27,7 +29,6 @@ use ILIAS\LTI\ToolProvider;
  */
 class Score extends AssignmentGrade
 {
-
     /**
      * Access scope.
      */
@@ -51,7 +52,7 @@ class Score extends AssignmentGrade
      * @param ToolProvider\User    $user       User object
      * @return bool  True if successful, otherwise false
      */
-    public function submit(ToolProvider\Outcome $ltiOutcome, ToolProvider\User $user) : bool
+    public function submit(ToolProvider\Outcome $ltiOutcome, ToolProvider\User $user): bool
     {
         $score = $ltiOutcome->getValue();
         if (!is_null($score)) {

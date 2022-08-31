@@ -41,6 +41,7 @@
 
   .il-standard-form-header h2, .il-section-input-header h2{
     font-size: @il-standard-form-header-font-size;
+    font-weight: @il-font-weight-bold;
     padding-top: 2*@il-padding-large-vertical;
     padding-bottom: @il-padding-small-vertical;
 
@@ -79,7 +80,7 @@
 .input-group-addon {
 	padding: 3px 8px;
 	font-size: @il-font-size-base;
-	font-weight: 400;
+	font-weight: @il-font-weight-base;
 	line-height: 1;
 	color: @il-text-color;
 	text-align: center;
@@ -232,8 +233,12 @@ select.form-control {
   vertical-align: top;
 }
 
+.radio .help-block {
+  padding-left: @il-padding-xxlarge-horizontal;
+}
+
 label {
-  font-weight: normal;
+  font-weight: @il-font-weight-base;
 }
 
 td.form-inline > div.form-group {

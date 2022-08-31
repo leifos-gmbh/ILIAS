@@ -1,18 +1,23 @@
-<?php declare(strict_types=1);
+<?php
 
-/******************************************************************************
+declare(strict_types=1);
+
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
+
 /**
  * Class ilObjSCORMTracking
  * @author  Alex Killing <alex.killing@gmx.de>
@@ -20,7 +25,7 @@
  */
 class ilObjSCORMTracking
 {
-    public static function storeJsApi() : void
+    public static function storeJsApi(): void
     {
         global $DIC;
         $obj_id = $DIC->http()->wrapper()->query()->retrieve('package_id', $DIC->refinery()->kindlyTo()->int());
@@ -45,7 +50,7 @@ class ilObjSCORMTracking
         }
     }
 
-    public static function storeJsApiCmi(int $user_id, int $obj_id, object $data) : bool
+    public static function storeJsApiCmi(int $user_id, int $obj_id, object $data): bool
     {
         global $DIC;
         $ilLog = ilLoggerFactory::getLogger('sahs');
@@ -145,7 +150,7 @@ class ilObjSCORMTracking
         return true;
     }
 
-    public static function syncGlobalStatus(int $userId, int $packageId, int $refId, object $data, ?int $new_global_status) : bool
+    public static function syncGlobalStatus(int $userId, int $packageId, int $refId, object $data, ?int $new_global_status): bool
     {
         global $DIC;
         $ilDB = $DIC->database();
@@ -210,7 +215,7 @@ class ilObjSCORMTracking
         return true;
     }
 
-    public static function _insertTrackData(int $a_sahs_id, string $a_lval, string $a_rval, int $a_obj_id) : void
+    public static function _insertTrackData(int $a_sahs_id, string $a_lval, string $a_rval, int $a_obj_id): void
     {
         global $DIC;
         $ilDB = $DIC->database();
@@ -231,11 +236,11 @@ class ilObjSCORMTracking
     }
 
     //erase later see ilSCORM2004StoreData
-
     /**
      * like necessary because of Oracle
+     * @return mixed[]
      */
-    public static function _getCompleted(object $scorm_item_id, int $a_obj_id) : array
+    public static function _getCompleted(object $scorm_item_id, int $a_obj_id): array
     {
         global $DIC;
         $ilDB = $DIC->database();
@@ -280,7 +285,7 @@ class ilObjSCORMTracking
         return $user_ids;
     }
 
-    public static function _getCollectionStatus(?array $a_scos, int $a_obj_id, int $a_user_id) : string
+    public static function _getCollectionStatus(?array $a_scos, int $a_obj_id, int $a_user_id): string
     {
         global $DIC;
         $ilDB = $DIC->database();
@@ -325,7 +330,7 @@ class ilObjSCORMTracking
         return $status;
     }
 
-    public static function _countCompleted(?array $a_scos, int $a_obj_id, int $a_user_id) : int
+    public static function _countCompleted(?array $a_scos, int $a_obj_id, int $a_user_id): int
     {
         global $DIC;
         $ilDB = $DIC->database();
@@ -357,7 +362,7 @@ class ilObjSCORMTracking
      * Lookup last acccess time for all users of a scorm module
      * @return array<int|string, mixed>
      */
-    public static function lookupLastAccessTimes(int $a_obj_id) : array
+    public static function lookupLastAccessTimes(int $a_obj_id): array
     {
         global $DIC;
         $ilDB = $DIC->database();
@@ -377,8 +382,9 @@ class ilObjSCORMTracking
 
     /**
      * Get all tracked users
+     * @return mixed[]
      */
-    public static function _getTrackedUsers(int $a_obj_id) : array
+    public static function _getTrackedUsers(int $a_obj_id): array
     {
         global $DIC;
         $ilDB = $DIC->database();
@@ -401,8 +407,9 @@ class ilObjSCORMTracking
 
     /**
      * like necessary because of Oracle
+     * @return mixed[]
      */
-    public static function _getFailed(object $scorm_item_id, int $a_obj_id) : array
+    public static function _getFailed(object $scorm_item_id, int $a_obj_id): array
     {
         global $DIC;
         $ilDB = $DIC->database();
@@ -442,8 +449,9 @@ class ilObjSCORMTracking
 
     /**
      * Get users who have status completed or passed.
+     * @return array<int|string, mixed>
      */
-    public static function _getCountCompletedPerUser(array $a_scorm_item_ids, int $a_obj_id) : array
+    public static function _getCountCompletedPerUser(array $a_scorm_item_ids, int $a_obj_id): array
     {
         global $DIC;
         $ilDB = $DIC->database();
@@ -470,11 +478,11 @@ class ilObjSCORMTracking
         return $users;
     }
     //not correct because of assets!
-
     /**
      * Get info about
+     * @return array<string, mixed[]>
      */
-    public static function _getProgressInfo(array $sco_item_ids, int $a_obj_id) : array
+    public static function _getProgressInfo(array $sco_item_ids, int $a_obj_id): array
     {
         global $DIC;
         $ilDB = $DIC->database();
@@ -516,8 +524,9 @@ class ilObjSCORMTracking
 
     /**
      * @param array|int  $scorm_item_id
+     * @return array<int|string, mixed[]>
      */
-    public static function _getInProgress($scorm_item_id, int $a_obj_id, ?array $a_blocked_user_ids = null) : array
+    public static function _getInProgress($scorm_item_id, int $a_obj_id, ?array $a_blocked_user_ids = null): array
     {
         global $DIC;
         $ilDB = $DIC->database();
@@ -556,7 +565,7 @@ class ilObjSCORMTracking
         return $in_progress;
     }
 
-    public static function scorm12PlayerUnload() : void
+    public static function scorm12PlayerUnload(): void
     {
         global $DIC;
         $ilDB = $DIC->database();
@@ -590,7 +599,7 @@ class ilObjSCORMTracking
         print("");
     }
 
-    public static function checkIfAllowed(int $packageId, int $userId, int $hash) : void
+    public static function checkIfAllowed(int $packageId, int $userId, int $hash): void
     {
         global $DIC;
         $ilDB = $DIC->database();
@@ -609,7 +618,7 @@ class ilObjSCORMTracking
         }
     }
 
-    public static function _syncReadEvent(int $a_obj_id, int $a_user_id, string $a_type, int $a_ref_id) : void
+    public static function _syncReadEvent(int $a_obj_id, int $a_user_id, string $a_type, int $a_ref_id): void
     {
         global $DIC;
         $ilDB = $DIC->database();

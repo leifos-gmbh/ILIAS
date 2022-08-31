@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -25,15 +27,12 @@ use ILIAS\Filesystem\Exception\FileNotFoundException;
  */
 class ilCertificateSettingsTestFormRepository implements ilCertificateFormRepository
 {
-    private ilCertificateSettingsFormRepository $settingsFromFactory;
-    private ilLanguage $language;
-    private ilObjTest $testObject;
+    private ilCertificateSettingsFormRepository $settingsFormFactory;
 
     public function __construct(
         int $objectId,
         string $certificatePath,
         bool $hasAdditionalElements,
-        ilObjTest $testObject,
         ilLanguage $language,
         ilCtrlInterface $ctrl,
         ilAccess $access,
@@ -41,9 +40,6 @@ class ilCertificateSettingsTestFormRepository implements ilCertificateFormReposi
         ilCertificatePlaceholderDescription $placeholderDescriptionObject,
         ?ilCertificateSettingsFormRepository $settingsFormRepository = null
     ) {
-        $this->testObject = $testObject;
-        $this->language = $language;
-
         if (null === $settingsFormRepository) {
             $settingsFormRepository = new ilCertificateSettingsFormRepository(
                 $objectId,
@@ -56,12 +52,10 @@ class ilCertificateSettingsTestFormRepository implements ilCertificateFormReposi
                 $placeholderDescriptionObject
             );
         }
-        $this->settingsFromFactory = $settingsFormRepository;
+        $this->settingsFormFactory = $settingsFormRepository;
     }
 
     /**
-     * @param ilCertificateGUI $certificateGUI
-     * @return ilPropertyFormGUI
      * @throws FileAlreadyExistsException
      * @throws FileNotFoundException
      * @throws IOException
@@ -69,17 +63,20 @@ class ilCertificateSettingsTestFormRepository implements ilCertificateFormReposi
      * @throws ilException
      * @throws ilWACException
      */
-    public function createForm(ilCertificateGUI $certificateGUI) : ilPropertyFormGUI
+    public function createForm(ilCertificateGUI $certificateGUI): ilPropertyFormGUI
     {
-        return $this->settingsFromFactory->createForm($certificateGUI);
+        return $this->settingsFormFactory->createForm($certificateGUI);
     }
 
-    public function save(array $formFields) : void
+    public function save(array $formFields): void
     {
     }
 
-    public function fetchFormFieldData(string $content) : array
+    /**
+     * @return array{pageformat: string, pagewidth: mixed, pageheight: mixed, margin_body_top: mixed, margin_body_right: mixed, margin_body_bottom: mixed, margin_body_left: mixed, certificate_text: string}
+     */
+    public function fetchFormFieldData(string $content): array
     {
-        return $this->settingsFromFactory->fetchFormFieldData($content);
+        return $this->settingsFormFactory->fetchFormFieldData($content);
     }
 }

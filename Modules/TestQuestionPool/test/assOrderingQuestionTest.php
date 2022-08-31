@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 /**
@@ -12,7 +13,7 @@ class assOrderingQuestionTest extends assBaseTestCase
 {
     protected $backupGlobals = false;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -35,7 +36,7 @@ class assOrderingQuestionTest extends assBaseTestCase
         $this->setGlobalVariable('ilDB', $this->getDatabaseMock());
     }
 
-    public function test_instantiateObject_shouldReturnInstance() : void
+    public function test_instantiateObject_shouldReturnInstance(): void
     {
         // Arrange
         require_once './Modules/TestQuestionPool/classes/class.assOrderingQuestion.php';
@@ -44,5 +45,63 @@ class assOrderingQuestionTest extends assBaseTestCase
         $instance = new assOrderingQuestion();
 
         $this->assertInstanceOf('assOrderingQuestion', $instance);
+    }
+
+    public function testOrderingElementListDefaults(): ilAssOrderingElementList
+    {
+        $question_id = 7;
+        $list = new ilAssOrderingElementList($question_id);
+        $this->assertInstanceOf('ilAssOrderingElementList', $list);
+        $this->assertEquals($question_id, $list->getQuestionId());
+        $this->assertEquals([], $list->getElements());
+        return $list;
+    }
+
+    /**
+     * @depends testOrderingElementListDefaults
+     */
+    public function testOrderingElementListMutation(ilAssOrderingElementList $list)
+    {
+        $original = $list;
+        $this->assertNotEquals($original, $list->withElements([]));
+    }
+
+    public function testOrderingElementDefaults(): ilAssOrderingElement
+    {
+        $element_id = 12;
+        $element = new ilAssOrderingElement($element_id);
+        $this->assertInstanceOf('ilAssOrderingElement', $element);
+        $this->assertEquals($element_id, $element->getId());
+        return $element;
+    }
+
+    /**
+     * @depends testOrderingElementDefaults
+     */
+    public function testOrderingElementMutation(ilAssOrderingElement $element)
+    {
+        $original = $element;
+        $val = 21;
+
+        $element = $original->withRandomIdentifier($val);
+        $this->assertNotEquals($original, $element);
+        $this->assertEquals($val, $element->getRandomIdentifier());
+
+        $element = $original->withSolutionIdentifier($val);
+        $this->assertNotEquals($original, $element);
+        $this->assertEquals($val, $element->getSolutionIdentifier());
+
+        $element = $original->withPosition($val);
+        $this->assertNotEquals($original, $element);
+        $this->assertEquals($val, $element->getPosition());
+
+        $element = $original->withIndentation($val);
+        $this->assertNotEquals($original, $element);
+        $this->assertEquals($val, $element->getIndentation());
+
+        $val = 'some string';
+        $element = $original->withContent($val);
+        $this->assertNotEquals($original, $element);
+        $this->assertEquals($val, $element->getContent());
     }
 }

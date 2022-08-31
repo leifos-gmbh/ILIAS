@@ -1,17 +1,22 @@
-<?php declare(strict_types=1);
-/******************************************************************************
+<?php
+
+declare(strict_types=1);
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
+
 /**
 * SCORM Organizations
 *
@@ -40,21 +45,21 @@ class ilSCORMOrganizations extends ilSCORMObject
         $this->setType("sos");
     }
 
-    public function getDefaultOrganization() : string
+    public function getDefaultOrganization(): string
     {
         return $this->default_organization;
     }
 
-    public function setDefaultOrganization(string $a_def_org) : void
+    public function setDefaultOrganization(string $a_def_org): void
     {
         $this->default_organization = $a_def_org;
     }
 
-    public function read() : void
+    public function read(): void
     {
         global $DIC;
         $ilDB = $DIC->database();
-        
+
         parent::read();
 
         $obj_set = $ilDB->queryF(
@@ -66,11 +71,11 @@ class ilSCORMOrganizations extends ilSCORMObject
         $this->setDefaultOrganization($obj_rec["default_organization"]);
     }
 
-    public function create() : void
+    public function create(): void
     {
         global $DIC;
         $ilDB = $DIC->database();
-        
+
         parent::create();
 
         $ilDB->manipulateF(
@@ -81,11 +86,11 @@ class ilSCORMOrganizations extends ilSCORMObject
         );
     }
 
-    public function update() : void
+    public function update(): void
     {
         global $DIC;
         $ilDB = $DIC->database();
-        
+
         parent::update();
 
         $ilDB->manipulateF(
@@ -98,7 +103,7 @@ class ilSCORMOrganizations extends ilSCORMObject
         );
     }
 
-    public function delete() : void
+    public function delete(): void
     {
         global $DIC;
         $ilDB = $DIC->database();

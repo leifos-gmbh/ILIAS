@@ -1,17 +1,22 @@
-<?php declare(strict_types=1);
-/******************************************************************************
+<?php
+
+declare(strict_types=1);
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
+
 /**
 * Parent object for SCORM GUI objects
 *
@@ -22,7 +27,6 @@
 */
 class ilSCORMObjectGUI
 {
-
     /**
      * @var ilSCORMManifest|ilSCORMItem|ilSCORMOrganization|ilSCORMOrganizations
      */
@@ -71,13 +75,13 @@ class ilSCORMObjectGUI
                 return $srs_gui;
 
             default:
-                case "sre":					// resource
+            case "sre":					// resource
                 $sre_gui = new ilSCORMResourceGUI($a_id);
                 return $sre_gui;
         }
     }
 
-    public function displayParameter(string $a_name, string $a_value) : void
+    public function displayParameter(string $a_name, string $a_value): void
     {
         $this->tpl->setCurrentBlock("parameter");
         $this->tpl->setVariable("TXT_PARAMETER_NAME", $a_name);

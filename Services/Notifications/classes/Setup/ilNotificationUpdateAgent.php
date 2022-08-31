@@ -1,4 +1,6 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -19,54 +21,51 @@
 use ILIAS\Setup;
 use ILIAS\Refinery;
 use ILIAS\Setup\Environment;
+use ILIAS\Setup\Objective\ObjectiveWithPreconditions;
 
 class ilNotificationUpdateAgent implements Setup\Agent
 {
     use Setup\Agent\HasNoNamedObjective;
 
-    public function hasConfig() : bool
+    public function hasConfig(): bool
     {
         return false;
     }
 
-    public function getArrayToConfigTransformation() : Refinery\Transformation
+    public function getArrayToConfigTransformation(): Refinery\Transformation
     {
         throw new LogicException('Agent has no config.');
     }
 
-    public function getInstallObjective(Setup\Config $config = null) : Setup\Objective
+    public function getInstallObjective(Setup\Config $config = null): Setup\Objective
     {
         return new Setup\Objective\NullObjective();
     }
 
-    public function getUpdateObjective(Setup\Config $config = null) : Setup\Objective
+    public function getUpdateObjective(Setup\Config $config = null): Setup\Objective
     {
-        return new class(new ilNotificationUpdateSteps()) extends ilDatabaseUpdateStepsExecutedObjective {
-            public function getPreconditions(Environment $environment) : array
-            {
-                $preconditions = parent::getPreconditions($environment);
-                
-                $preconditions[] = new ilTreeAdminNodeAddedObjective(
-                    'nota',
-                    'Notification Service Administration Object'
-                );
-
-                return $preconditions;
-            }
-        };
+        return new ObjectiveWithPreconditions(
+            new ilDatabaseUpdateStepsExecutedObjective(
+                new ilNotificationUpdateSteps()
+            ),
+            new ilTreeAdminNodeAddedObjective(
+                'nota',
+                'Notification Service Administration Object'
+            )
+        );
     }
 
-    public function getBuildArtifactObjective() : Setup\Objective
+    public function getBuildArtifactObjective(): Setup\Objective
     {
         return new Setup\Objective\NullObjective();
     }
 
-    public function getStatusObjective(Setup\Metrics\Storage $storage) : Setup\Objective
+    public function getStatusObjective(Setup\Metrics\Storage $storage): Setup\Objective
     {
         return new Setup\Objective\NullObjective();
     }
 
-    public function getMigrations() : array
+    public function getMigrations(): array
     {
         return [];
     }

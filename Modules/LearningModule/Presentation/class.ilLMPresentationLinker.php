@@ -78,7 +78,7 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
 
     public function setOffline(
         bool $offline = true
-    ) : void {
+    ): void {
         $this->offline = $offline;
     }
 
@@ -93,7 +93,7 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
         string $a_back_link = "append",
         string $a_anchor = "",
         string $a_srcstring = ""
-    ) : string {
+    ): string {
         if ($a_cmd == "") {
             $a_cmd = "layout";
         }
@@ -201,7 +201,7 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
                         false,
                         true
                     );
-//					$link = str_replace("&", "&amp;", $link);
+                    //					$link = str_replace("&", "&amp;", $link);
 
                     $this->ctrl->setParameterByClass(self::TARGET_GUI, "frame", null);
                     $this->ctrl->setParameterByClass(self::TARGET_GUI, "obj_id", null);
@@ -217,7 +217,6 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
             }
 
             switch ($a_cmd) {
-
                 case "fullscreen":
                     $link = "fullscreen.html";		// id is handled by xslt
                     break;
@@ -267,7 +266,7 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
         return $link;
     }
 
-    public function getLayoutLinkTargets() : array
+    public function getLayoutLinkTargets(): array
     {
         $targets = [
             "New" => [
@@ -291,7 +290,7 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
     /**
      * Get XMl for Link Targets
      */
-    public function getLinkTargetsXML() : string
+    public function getLinkTargetsXML(): string
     {
         $link_info = "<LinkTargets>";
         foreach ($this->getLayoutLinkTargets() as $k => $t) {
@@ -306,7 +305,7 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
      */
     public function getLinkXML(
         array $int_links
-    ) : string {
+    ): string {
         $ilCtrl = $this->ctrl;
 
         $a_layoutframes = $this->getLayoutLinkTargets();
@@ -416,6 +415,7 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
                         } else {
                             $this->ctrl->setParameterByClass("illmpagegui", "ref_id", $this->lm->getRefId());
                             $this->ctrl->setParameterByClass("illmpagegui", "mob_id", $target_id);
+                            $this->ctrl->setParameterByClass(self::TARGET_GUI, "obj_id", $this->current_page);
                             $href = $this->ctrl->getLinkTargetByClass(
                                 "illmpagegui",
                                 "displayMedia",
@@ -424,6 +424,7 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
                                 true
                             );
                             $this->ctrl->setParameterByClass("illmpagegui", "mob_id", "");
+                            $ilCtrl->setParameterByClass(self::TARGET_GUI, "obj_id", $this->obj_id);
                         }
                         break;
 
@@ -498,7 +499,6 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
                             $lcontent = ilUserUtil::getNamePresentation($target_id, false, false);
                         }
                         break;
-
                 }
 
                 $anc_par = 'Anchor="' . $anc . '"';
@@ -516,7 +516,7 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
         return $link_info;
     }
 
-    public function getFullscreenLink() : string
+    public function getFullscreenLink(): string
     {
         return $this->getLink("fullscreen");
     }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -16,11 +18,11 @@
  *
  *********************************************************************/
 
-namespace Certificate\API;
+namespace ILIAS\Certificate\API;
 
-use Certificate\API\Data\UserCertificateDto;
-use Certificate\API\Filter\UserDataFilter;
-use Certificate\API\Repository\UserDataRepository;
+use ILIAS\Certificate\API\Data\UserCertificateDto;
+use ILIAS\Certificate\API\Filter\UserDataFilter;
+use ILIAS\Certificate\API\Repository\UserDataRepository;
 
 /**
  * @author  Niels Theen <ntheen@databay.de>
@@ -36,7 +38,6 @@ class UserCertificateAPI
 
             $userCertificateRepository = new UserDataRepository(
                 $DIC->database(),
-                $DIC->logger()->cert(),
                 $DIC->ctrl()
             );
         }
@@ -44,18 +45,17 @@ class UserCertificateAPI
     }
 
     /**
-     * @param UserDataFilter $filter
      * @param string[] $ilCtrlStack An array of ilCtrl-enabled GUI class names that are used to create the link,
      *                              if this is an empty array (default) no link
      *                              will be generated
      * @return array<int, UserCertificateDto>
      */
-    public function getUserCertificateData(UserDataFilter $filter, array $ilCtrlStack = []) : array
+    public function getUserCertificateData(UserDataFilter $filter, array $ilCtrlStack = []): array
     {
         return $this->userCertificateRepository->getUserData($filter, $ilCtrlStack);
     }
 
-    public function getUserCertificateDataMaxCount(UserDataFilter $filter) : int
+    public function getUserCertificateDataMaxCount(UserDataFilter $filter): int
     {
         return $this->userCertificateRepository->getUserCertificateDataMaxCount($filter);
     }

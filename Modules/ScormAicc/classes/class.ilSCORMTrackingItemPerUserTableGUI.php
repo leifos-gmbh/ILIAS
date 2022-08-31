@@ -1,17 +1,22 @@
-<?php declare(strict_types=1);
-/******************************************************************************
+<?php
+
+declare(strict_types=1);
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
+
 /**
  * Description of class
  *
@@ -32,7 +37,7 @@ class ilSCORMTrackingItemPerUserTableGUI extends ilTable2GUI
         parent::__construct($a_parent_obj, $a_parent_cmd);
     }
 
-    public function getObjId() : int
+    public function getObjId(): int
     {
         return $this->obj_id;
     }
@@ -40,17 +45,17 @@ class ilSCORMTrackingItemPerUserTableGUI extends ilTable2GUI
     /**
      * Set current user id
      */
-    public function setUserId(int $a_usr_id) : void
+    public function setUserId(int $a_usr_id): void
     {
         $this->user_id = $a_usr_id;
     }
 
-    public function getUserId() : int
+    public function getUserId(): int
     {
         return $this->user_id;
     }
 
-    public function setScoId(int $a_sco_id) : void
+    public function setScoId(int $a_sco_id): void
     {
         $this->sco = new ilSCORMItem($a_sco_id);
     }
@@ -58,7 +63,7 @@ class ilSCORMTrackingItemPerUserTableGUI extends ilTable2GUI
     /**
      * Get SCORM item
      */
-    public function getSco() : ?ilSCORMItem
+    public function getSco(): ?ilSCORMItem
     {
         return $this->sco;
     }
@@ -66,7 +71,7 @@ class ilSCORMTrackingItemPerUserTableGUI extends ilTable2GUI
     /**
      * Parse table content
      */
-    public function parse() : void
+    public function parse(): void
     {
         $this->initTable();
 
@@ -88,7 +93,7 @@ class ilSCORMTrackingItemPerUserTableGUI extends ilTable2GUI
     /**
      * Fill row template
      */
-    protected function fillRow(array $a_set) : void
+    protected function fillRow(array $a_set): void
     {
         global $DIC;
         $ilCtrl = $DIC->ctrl();
@@ -97,7 +102,7 @@ class ilSCORMTrackingItemPerUserTableGUI extends ilTable2GUI
         $this->tpl->setVariable('VAL', $a_set['rvalue']);
     }
 
-    protected function initTable() : void
+    protected function initTable(): void
     {
         global $DIC;
         $ilCtrl = $DIC->ctrl();

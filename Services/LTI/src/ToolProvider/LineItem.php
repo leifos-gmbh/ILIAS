@@ -1,18 +1,25 @@
 <?php
 
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
+
 namespace ILIAS\LTI\ToolProvider;
 
 use ILIAS\LTI\ToolProvider\Service;
 
-/******************************************************************************
- * This file is part of ILIAS, a powerful learning management system.
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
- * If this is not the case or you just want to try ILIAS, you'll find
- * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
- *****************************************************************************/
 /**
  * Class to represent a line item
  *
@@ -22,7 +29,6 @@ use ILIAS\LTI\ToolProvider\Service;
  */
 class LineItem
 {
-
     /**
      * Label value.
      *
@@ -104,7 +110,7 @@ class LineItem
      *
      * @return Platform  Platform object for this line item.
      */
-    public function getPlatform() : ?Platform
+    public function getPlatform(): ?Platform
     {
         return $this->platform;
     }
@@ -114,7 +120,7 @@ class LineItem
      *
      * @return bool  True if successful
      */
-    public function save() : bool
+    public function save(): bool
     {
         $service = new Service\LineItem($this->platform, $this->endpoint);
         return $service->saveLineItem($this);
@@ -125,7 +131,7 @@ class LineItem
      *
      * @return bool  True if successful
      */
-    public function delete() : bool
+    public function delete(): bool
     {
         $service = new Service\LineItem($this->platform, $this->endpoint);
         return $service->deleteLineItem($this);
@@ -159,7 +165,7 @@ class LineItem
      * @param User    $user       User object
      * @return bool  True if successful
      */
-    public function submitOutcome(Outcome $ltiOutcome, User $user) : bool
+    public function submitOutcome(Outcome $ltiOutcome, User $user): bool
     {
         $scoreService = new Service\Score($this->platform, $this->endpoint);
         return $scoreService->submit($ltiOutcome, $user);
@@ -170,7 +176,7 @@ class LineItem
      * @param User $user User object
      * @return bool  True if successful, otherwise false
      */
-    public function deleteOutcome(User $user) : bool
+    public function deleteOutcome(User $user): bool
     {
         $ltiOutcome = new Outcome();
         $scoreService = new Service\Score($this->platform, $this->endpoint);

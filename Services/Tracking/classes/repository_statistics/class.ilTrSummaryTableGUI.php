@@ -1,5 +1,22 @@
-<?php declare(strict_types=0);
-/* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
+<?php
+
+declare(strict_types=0);
+
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * @author       Jörg Lützenkirchen <luetzenkirchen@leifos.com>
@@ -82,7 +99,7 @@ class ilTrSummaryTableGUI extends ilLPTableBaseGUI
         $this->getItems($a_parent_obj->getObjId(), $a_ref_id);
     }
 
-    public function getSelectableColumns() : array
+    public function getSelectableColumns(): array
     {
         $lng_map = array("user_total" => "users",
                          "first_access_min" => "trac_first_access",
@@ -208,7 +225,7 @@ class ilTrSummaryTableGUI extends ilLPTableBaseGUI
         return $columns;
     }
 
-    public function initFilter() : void
+    public function initFilter(): void
     {
         if ($this->is_root) {
             parent::initBaseFilter(true, false);
@@ -405,7 +422,7 @@ class ilTrSummaryTableGUI extends ilLPTableBaseGUI
         $this->filter["registration"] = $item->getDate();
     }
 
-    public function getSelCountryCodes() : array
+    public function getSelCountryCodes(): array
     {
         $options = array();
         foreach (ilCountry::getCountryCodes() as $c) {
@@ -418,7 +435,7 @@ class ilTrSummaryTableGUI extends ilLPTableBaseGUI
     /**
      * Build summary item rows for given object and filter(s
      */
-    public function getItems(int $a_object_id, int $a_ref_id) : void
+    public function getItems(int $a_object_id, int $a_ref_id): void
     {
         // show only selected subobjects for lp mode
         $preselected_obj_ids = $filter = null;
@@ -474,10 +491,9 @@ class ilTrSummaryTableGUI extends ilLPTableBaseGUI
                               ilLPStatus::LP_STATUS_FAILED_NUM
         );
         $status_map = array();
+        $status_icons = ilLPStatusIcons::getInstance(ilLPStatusIcons::ICON_VARIANT_SHORT);
         foreach ($valid_status as $status) {
-            $path = ilLearningProgressBaseGUI::_getImagePathForStatus($status);
-            $text = ilLearningProgressBaseGUI::_getStatusText($status);
-            $status_map[$status] = ilUtil::img($path, $text);
+            $status_map[$status] = $status_icons->renderIconForStatus($status);
         }
 
         // language map
@@ -573,7 +589,8 @@ class ilTrSummaryTableGUI extends ilLPTableBaseGUI
                     $status_code,
                     $valid_status
                 )) {
-                    $result["status"][ilLPStatus::LP_STATUS_NOT_ATTEMPTED_NUM] += $status_counter;
+                    $result['status'][ilLPStatus::LP_STATUS_NOT_ATTEMPTED_NUM] =
+                        $result['status'][ilLPStatus::LP_STATUS_NOT_ATTEMPTED_NUM] ?? 0 + $status_counter;
                     unset($result["status"][$status_code]);
                 }
             }
@@ -600,7 +617,7 @@ class ilTrSummaryTableGUI extends ilLPTableBaseGUI
         int $overall = 0,
         array $value_map = null,
         $limit = 3
-    ) : array {
+    ): array {
         if (!$overall) {
             return [];
         }
@@ -672,7 +689,7 @@ class ilTrSummaryTableGUI extends ilLPTableBaseGUI
         $data = null,
         int $overall = 0,
         array $value_map = null
-    ) : array {
+    ): array {
         $result = array();
         foreach ($value_map as $id => $caption) {
             $count = 0;
@@ -695,7 +712,7 @@ class ilTrSummaryTableGUI extends ilLPTableBaseGUI
         string $id,
         ?string $value,
         string $type
-    ) : string {
+    ): string {
         // get rid of aggregation
         $pos = strrpos($id, "_");
         if ($pos !== false) {
@@ -762,7 +779,7 @@ class ilTrSummaryTableGUI extends ilLPTableBaseGUI
     /**
      * Fill table row
      */
-    protected function fillRow(array $a_set) : void
+    protected function fillRow(array $a_set): void
     {
         $this->tpl->setVariable(
             "ICON",
@@ -808,7 +825,7 @@ class ilTrSummaryTableGUI extends ilLPTableBaseGUI
                         break;
                     }
 
-                // no break
+                    // no break
                 default:
                     $value = $this->parseValue($c, $a_set[$c], $a_set["type"]);
                     $this->tpl->setVariable(strtoupper($c), $value);
@@ -901,7 +918,7 @@ class ilTrSummaryTableGUI extends ilLPTableBaseGUI
         }
     }
 
-    protected function renderPercentages(string $id, array $data) : void
+    protected function renderPercentages(string $id, array $data): void
     {
         if ($data) {
             foreach ($data as $item) {
@@ -916,7 +933,7 @@ class ilTrSummaryTableGUI extends ilLPTableBaseGUI
         }
     }
 
-    protected function isArrayColumn(string $a_name) : bool
+    protected function isArrayColumn(string $a_name): bool
     {
         if (in_array(
             $a_name,
@@ -934,7 +951,7 @@ class ilTrSummaryTableGUI extends ilLPTableBaseGUI
         return false;
     }
 
-    public function numericOrdering(string $a_field) : bool
+    public function numericOrdering(string $a_field): bool
     {
         $pos = strrpos($a_field, "_");
         if ($pos !== false) {
@@ -949,7 +966,7 @@ class ilTrSummaryTableGUI extends ilLPTableBaseGUI
         return false;
     }
 
-    protected function fillHeaderExcel(ilExcel $a_excel, int &$a_row) : void
+    protected function fillHeaderExcel(ilExcel $a_excel, int &$a_row): void
     {
         $a_excel->setCell($a_row, 0, $this->lng->txt("title"));
 
@@ -1032,7 +1049,7 @@ class ilTrSummaryTableGUI extends ilLPTableBaseGUI
         ilExcel $a_excel,
         int &$a_row,
         array $a_set
-    ) : void {
+    ): void {
         $a_excel->setCell($a_row, 0, $a_set["title"]);
 
         $cnt = 1;
@@ -1081,7 +1098,7 @@ class ilTrSummaryTableGUI extends ilLPTableBaseGUI
         }
     }
 
-    protected function fillHeaderCSV(ilCSVWriter $a_csv) : void
+    protected function fillHeaderCSV(ilCSVWriter $a_csv): void
     {
         $a_csv->addColumn($this->lng->txt("title"));
 
@@ -1142,7 +1159,7 @@ class ilTrSummaryTableGUI extends ilLPTableBaseGUI
         $a_csv->addRow();
     }
 
-    protected function fillRowCSV(ilCSVWriter $a_csv, array $a_set) : void
+    protected function fillRowCSV(ilCSVWriter $a_csv, array $a_set): void
     {
         $a_csv->addColumn($a_set["title"]);
 

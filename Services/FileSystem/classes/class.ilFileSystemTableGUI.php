@@ -1,17 +1,19 @@
 <?php
-/******************************************************************************
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
 
 use ILIAS\FileUpload\MimeType;
 
@@ -28,12 +30,13 @@ class ilFileSystemTableGUI extends ilTable2GUI
     protected string $cur_subdir = '';
     protected ?bool $post_dir_path = null;
     protected array $file_labels = [];
+    protected ilFileSystemGUI $filesystem_gui;
 
     /**
      * Constructor
      */
     public function __construct(
-        object $a_parent_obj,
+        ilFileSystemGUI $a_parent_obj,
         string $a_parent_cmd,
         string $a_cur_dir,
         string $a_cur_subdir,
@@ -55,13 +58,14 @@ class ilFileSystemTableGUI extends ilTable2GUI
         $this->label_header = $a_label_header;
         $this->file_labels = $a_file_labels;
         $this->post_dir_path = $a_post_dir_path;
+        $this->filesystem_gui = $a_parent_obj;
 
         parent::__construct($a_parent_obj, $a_parent_cmd);
         $this->setTitle($this->lng->txt("cont_files") . " " . $this->cur_subdir);
 
         $this->has_multi = false;
 
-        foreach ($a_commands as $i => $command) {
+        foreach ((array) $a_commands as $i => $command) {
             if (!($command["single"] ?? false)) {
                 // does also handle internal commands
                 $this->addMultiCommand("extCommand_" . $i, $command["name"]);
@@ -89,7 +93,7 @@ class ilFileSystemTableGUI extends ilTable2GUI
         $this->setEnableTitle(true);
     }
 
-    public function numericOrdering(string $a_field) : bool
+    public function numericOrdering(string $a_field): bool
     {
         if ($a_field == "size") {
             return true;
@@ -97,7 +101,7 @@ class ilFileSystemTableGUI extends ilTable2GUI
         return false;
     }
 
-    protected function prepareOutput() : void
+    protected function prepareOutput(): void
     {
         $this->determineOffsetAndOrder(true);
         $this->setData($this->getEntries());
@@ -106,10 +110,25 @@ class ilFileSystemTableGUI extends ilTable2GUI
     /**
      * @return array<int, array<string, mixed>>
      */
-    public function getEntries() : array
+    public function getEntries(): array
     {
-        if (is_dir($this->cur_dir)) {
-            $entries = ilFileUtils::getDir($this->cur_dir);
+        global $DIC;
+
+        if ($DIC->filesystem()->storage()->has($this->cur_dir)) {
+            $entries = [];
+            foreach ($DIC->filesystem()->storage()->listContents($this->cur_dir) as $i => $content) {
+                $basename = basename($content->getPath());
+                $entries[$basename] = [
+//                    'order_val' => $i,
+//                    'order_id' => $i,
+                    'entry' => $basename,
+                    'type' => $content->isDir() ? 'dir' : 'file',
+                    'subdir' => '',
+                    'size' => $content->isFile() ? $DIC->filesystem()->storage()->getSize($content->getPath(), 1)->inBytes() : 0
+                ];
+            }
+
+        //$entries = ilFileUtils::getDir('/var/iliasdata/ilias/default/' . $this->cur_dir);
         } else {
             $entries = array(array("type" => "dir", "entry" => ".."));
         }
@@ -143,7 +162,7 @@ class ilFileSystemTableGUI extends ilTable2GUI
         return $items;
     }
 
-    public function addColumns() : void
+    public function addColumns(): void
     {
         if ($this->has_multi) {
             $this->setSelectAllCheckbox("file[]");
@@ -163,7 +182,7 @@ class ilFileSystemTableGUI extends ilTable2GUI
         }
     }
 
-    private function isDoubleDotDirectory(array $entry) : bool
+    private function isDoubleDotDirectory(array $entry): bool
     {
         return $entry['entry'] === '..';
     }
@@ -171,7 +190,7 @@ class ilFileSystemTableGUI extends ilTable2GUI
     /**
      * Fill table row
      */
-    protected function fillRow(array $a_set) : void
+    protected function fillRow(array $a_set): void
     {
         $hash = $this->post_dir_path
             ? md5($a_set["file"])

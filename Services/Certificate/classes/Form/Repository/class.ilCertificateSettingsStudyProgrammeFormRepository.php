@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -22,10 +24,7 @@ use ILIAS\Filesystem\Exception\FileNotFoundException;
 
 class ilCertificateSettingsStudyProgrammeFormRepository implements ilCertificateFormRepository
 {
-    private ilLanguage $language;
     private ilCertificateSettingsFormRepository $settingsFormRepository;
-    private ilObject $object;
-    private ilSetting $setting;
 
     public function __construct(
         ilObject $object,
@@ -36,12 +35,8 @@ class ilCertificateSettingsStudyProgrammeFormRepository implements ilCertificate
         ilAccess $access,
         ilToolbarGUI $toolbar,
         ilCertificatePlaceholderDescription $placeholderDescriptionObject,
-        ?ilCertificateSettingsFormRepository $settingsFormRepository = null,
-        ?ilSetting $setting = null
+        ?ilCertificateSettingsFormRepository $settingsFormRepository = null
     ) {
-        $this->object = $object;
-        $this->language = $language;
-
         if (null === $settingsFormRepository) {
             $settingsFormRepository = new ilCertificateSettingsFormRepository(
                 $object->getId(),
@@ -56,15 +51,9 @@ class ilCertificateSettingsStudyProgrammeFormRepository implements ilCertificate
         }
 
         $this->settingsFormRepository = $settingsFormRepository;
-        if (null === $setting) {
-            $setting = new ilSetting('prg');
-        }
-        $this->setting = $setting;
     }
 
     /**
-     * @param ilCertificateGUI $certificateGUI
-     * @return ilPropertyFormGUI
      * @throws FileAlreadyExistsException
      * @throws FileNotFoundException
      * @throws IOException
@@ -72,16 +61,19 @@ class ilCertificateSettingsStudyProgrammeFormRepository implements ilCertificate
      * @throws ilException
      * @throws ilWACException
      */
-    public function createForm(ilCertificateGUI $certificateGUI) : ilPropertyFormGUI
+    public function createForm(ilCertificateGUI $certificateGUI): ilPropertyFormGUI
     {
         return $this->settingsFormRepository->createForm($certificateGUI);
     }
 
-    public function save(array $formFields) : void
+    public function save(array $formFields): void
     {
     }
 
-    public function fetchFormFieldData(string $content) : array
+    /**
+     * @return array{pageformat: string, pagewidth: mixed, pageheight: mixed, margin_body_top: mixed, margin_body_right: mixed, margin_body_bottom: mixed, margin_body_left: mixed, certificate_text: string}
+     */
+    public function fetchFormFieldData(string $content): array
     {
         return $this->settingsFormRepository->fetchFormFieldData($content);
     }

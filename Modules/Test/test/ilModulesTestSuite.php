@@ -23,14 +23,10 @@ require_once __DIR__ . "/ilTestBaseTestCase.php";
 
 class ilModulesTestSuite extends TestSuite
 {
-    public static function suite() : ilModulesTestSuite
+    public static function suite(): ilModulesTestSuite
     {
         if (!defined("ILIAS_HTTP_PATH")) {
             define("ILIAS_HTTP_PATH", "http://localhost");
-        }
-
-        if (!defined("DEBUG")) {
-            define("DEBUG", false);
         }
 
         if (!defined("ILIAS_LOG_ENABLED")) {
@@ -95,7 +91,7 @@ class ilModulesTestSuite extends TestSuite
         return $suite;
     }
 
-    private static function addClass(self $suite, string $className) : bool
+    private static function addClass(self $suite, string $className): bool
     {
         if (!class_exists($className)) {
             return false;

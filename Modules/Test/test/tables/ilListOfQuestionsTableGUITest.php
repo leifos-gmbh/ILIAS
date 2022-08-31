@@ -1,6 +1,22 @@
-<?php declare(strict_types=1);
+<?php
 
-/* Copyright (c) 1998-2020 ILIAS open source, Extended GPL, see docs/LICENSE */
+declare(strict_types=1);
+
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * Class ilListOfQuestionsTableGUITest
@@ -11,7 +27,7 @@ class ilListOfQuestionsTableGUITest extends ilTestBaseTestCase
     private ilListOfQuestionsTableGUI $tableGui;
     private ilObjTestGUI $parentObj_mock;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -30,7 +46,6 @@ class ilListOfQuestionsTableGUITest extends ilTestBaseTestCase
         $component_factory = $this->createMock(ilComponentFactory::class);
         $component_factory->method("getActivePluginsInSlot")->willReturn(new ArrayIterator());
         $this->setGlobalVariable("component.factory", $component_factory);
-        $this->setGlobalVariable("ilPluginAdmin", new ilPluginAdmin($this->createMock(ilComponentRepository::class)));
         $this->setGlobalVariable("ilDB", $this->createMock(ilDBInterface::class));
 
         $this->parentObj_mock = $this->getMockBuilder(ilObjTestGUI::class)->disableOriginalConstructor()->onlyMethods(array('getObject'))->getMock();
@@ -38,12 +53,12 @@ class ilListOfQuestionsTableGUITest extends ilTestBaseTestCase
         $this->tableGui = new ilListOfQuestionsTableGUI($this->parentObj_mock, "");
     }
 
-    public function test_instantiateObject_shouldReturnInstance() : void
+    public function test_instantiateObject_shouldReturnInstance(): void
     {
         $this->assertInstanceOf(ilListOfQuestionsTableGUI::class, $this->tableGui);
     }
 
-    public function testShowPointsEnabled() : void
+    public function testShowPointsEnabled(): void
     {
         $this->assertIsBool($this->tableGui->isShowPointsEnabled());
         $this->tableGui->setShowPointsEnabled(true);
@@ -53,7 +68,7 @@ class ilListOfQuestionsTableGUITest extends ilTestBaseTestCase
         $this->assertFalse($this->tableGui->isShowPointsEnabled());
     }
 
-    public function testShowMarkerEnabled() : void
+    public function testShowMarkerEnabled(): void
     {
         $this->assertIsBool($this->tableGui->isShowMarkerEnabled());
         $this->tableGui->setShowMarkerEnabled(true);
@@ -63,7 +78,7 @@ class ilListOfQuestionsTableGUITest extends ilTestBaseTestCase
         $this->assertFalse($this->tableGui->isShowMarkerEnabled());
     }
 
-    public function testShowObligationsEnabled() : void
+    public function testShowObligationsEnabled(): void
     {
         $this->assertIsBool($this->tableGui->isShowObligationsEnabled());
         $this->tableGui->setShowObligationsEnabled(true);
@@ -73,7 +88,7 @@ class ilListOfQuestionsTableGUITest extends ilTestBaseTestCase
         $this->assertFalse($this->tableGui->isShowObligationsEnabled());
     }
 
-    public function testObligationsFilterEnabled() : void
+    public function testObligationsFilterEnabled(): void
     {
         $this->assertIsBool($this->tableGui->isObligationsFilterEnabled());
         $this->tableGui->setObligationsFilterEnabled(true);
@@ -83,7 +98,7 @@ class ilListOfQuestionsTableGUITest extends ilTestBaseTestCase
         $this->assertFalse($this->tableGui->isObligationsFilterEnabled());
     }
 
-    public function testObligationsNotAnswered() : void
+    public function testObligationsNotAnswered(): void
     {
         $this->assertIsBool($this->tableGui->areObligationsNotAnswered());
         $this->tableGui->setObligationsNotAnswered(true);
@@ -93,7 +108,7 @@ class ilListOfQuestionsTableGUITest extends ilTestBaseTestCase
         $this->assertFalse($this->tableGui->areObligationsNotAnswered());
     }
 
-    public function testFinishTestButtonEnabled() : void
+    public function testFinishTestButtonEnabled(): void
     {
         $this->assertIsBool($this->tableGui->isFinishTestButtonEnabled());
         $this->tableGui->setFinishTestButtonEnabled(true);

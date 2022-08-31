@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -16,44 +18,32 @@
  *
  *********************************************************************/
 
-namespace Certificate\API\Repository;
+namespace ILIAS\Certificate\API\Repository;
 
-use Certificate\API\Data\UserCertificateDto;
-use Certificate\API\Filter\UserDataFilter;
+use ILIAS\Certificate\API\Data\UserCertificateDto;
+use ILIAS\Certificate\API\Filter\UserDataFilter;
 use ilCtrlInterface;
 use ilDBConstants;
 use ilUserCertificateApiGUI;
 use ilDBInterface;
-use ilLogger;
 
 /**
  * @author  Niels Theen <ntheen@databay.de>
  */
 class UserDataRepository
 {
-    private ilDBInterface $database;
-    private ilLogger $logger;
     private string $defaultTitle;
-    private ilCtrlInterface $ctrl;
 
     /**
-     * @param ilDBInterface   $database
-     * @param ilLogger        $logger
-     * @param ilCtrlInterface $ctrl
      * @param string|null     $defaultTitle The default title is use if the title of an repository object could not be
      *                                    determined. This could be the case if the object is deleted from system and
      *                                    mechanisms to store the title of deleted objects (table: object_data_del) failed.
      */
     public function __construct(
-        ilDBInterface $database,
-        ilLogger $logger,
-        ilCtrlInterface $ctrl,
+        private ilDBInterface $database,
+        private ilCtrlInterface $ctrl,
         ?string $defaultTitle = null
     ) {
-        $this->database = $database;
-        $this->logger = $logger;
-        $this->ctrl = $ctrl;
-
         if (null === $defaultTitle) {
             global $DIC;
             $defaultTitle = $DIC->language()->txt('certificate_no_object_title');
@@ -62,16 +52,15 @@ class UserDataRepository
     }
 
     /**
-     * @param UserDataFilter $filter
      * @param string[] $ilCtrlStack
      * @return array<int, UserCertificateDto>
      */
-    public function getUserData(UserDataFilter $filter, array $ilCtrlStack) : array
+    public function getUserData(UserDataFilter $filter, array $ilCtrlStack): array
     {
         $sql = 'SELECT
     cert.pattern_certificate_id,
     cert.obj_id,
-    cert.user_id,
+    cert.usr_id,
     cert.user_name,
     cert.acquired_timestamp,
     cert.currently_active,
@@ -110,7 +99,7 @@ FROM
                 $row['title'] ?? $this->defaultTitle,
                 (int) $row['obj_id'],
                 (int) $row['acquired_timestamp'],
-                (int) $row['user_id'],
+                (int) $row['usr_id'],
                 $row['firstname'],
                 $row['lastname'],
                 $row['login'],
@@ -130,7 +119,7 @@ FROM
         return $result;
     }
 
-    public function getUserCertificateDataMaxCount(UserDataFilter $filter) : int
+    public function getUserCertificateDataMaxCount(UserDataFilter $filter): int
     {
         $sql = 'SELECT
     COUNT(id) AS count
@@ -142,18 +131,13 @@ FROM
         return (int) $this->database->fetchAssoc($query)["count"];
     }
 
-    /**
-     * @param UserDataFilter $filter
-     * @param bool           $max_count_only
-     * @return string
-     */
-    private function getQuery(UserDataFilter $filter, bool $max_count_only = false) : string
+    private function getQuery(UserDataFilter $filter, bool $max_count_only = false): string
     {
         $sql = '(
 SELECT 
   il_cert_user_cert.pattern_certificate_id,
   il_cert_user_cert.obj_id,
-  il_cert_user_cert.user_id,
+  il_cert_user_cert.usr_id,
   il_cert_user_cert.user_name,
   il_cert_user_cert.acquired_timestamp,
   il_cert_user_cert.currently_active,
@@ -170,7 +154,7 @@ UNION
 SELECT 
   il_cert_user_cert.pattern_certificate_id,
   il_cert_user_cert.obj_id,
-  il_cert_user_cert.user_id,
+  il_cert_user_cert.usr_id,
   il_cert_user_cert.user_name,
   il_cert_user_cert.acquired_timestamp,
   il_cert_user_cert.currently_active,
@@ -186,7 +170,7 @@ WHERE object_reference.deleted IS NULL';
 
         $sql .= '
 ) AS cert
-INNER JOIN usr_data ON usr_data.usr_id = cert.user_id
+INNER JOIN usr_data ON usr_data.usr_id = cert.usr_id
 ' . $this->createWhereCondition($filter);
 
         if (!$max_count_only) {
@@ -196,7 +180,7 @@ INNER JOIN usr_data ON usr_data.usr_id = cert.user_id
         return $sql;
     }
 
-    private function createOrderByClause(UserDataFilter $filter) : string
+    private function createOrderByClause(UserDataFilter $filter): string
     {
         $sorts = $filter->getSorts();
 
@@ -240,16 +224,14 @@ INNER JOIN usr_data ON usr_data.usr_id = cert.user_id
 
     /**
      * Creating the additional where condition based on the filter object
-     * @param UserDataFilter $filter
-     * @return string
      */
-    private function createWhereCondition(UserDataFilter $filter) : string
+    private function createWhereCondition(UserDataFilter $filter): string
     {
         $wheres = [];
 
         $userIds = $filter->getUserIds();
         if (!empty($userIds)) {
-            $wheres[] = $this->database->in('cert.user_id', $userIds, false, ilDBConstants::T_INTEGER);
+            $wheres[] = $this->database->in('cert.usr_id', $userIds, false, ilDBConstants::T_INTEGER);
         }
 
         $objIds = $filter->getObjIds();
@@ -301,7 +283,7 @@ INNER JOIN usr_data ON usr_data.usr_id = cert.user_id
         }
 
         $onlyCertActive = $filter->isOnlyCertActive();
-        if ($onlyCertActive === true) {
+        if ($onlyCertActive) {
             $wheres[] = 'cert.currently_active = ' . $this->database->quote(1, ilDBConstants::T_INTEGER);
         }
 

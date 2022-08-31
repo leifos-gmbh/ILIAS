@@ -1,19 +1,23 @@
 <?php
-namespace ILIAS\LTI\ToolProvider\Content;
 
-/******************************************************************************
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
+
+namespace ILIAS\LTI\ToolProvider\Content;
+
 /**
  * Class to represent a content-item image object
  *
@@ -23,7 +27,6 @@ namespace ILIAS\LTI\ToolProvider\Content;
  */
 class Image
 {
-
     /**
      * URL of image.
      *
@@ -63,7 +66,7 @@ class Image
      *
      * @return object
      */
-    public function toJsonldObject() : object
+    public function toJsonldObject(): object
     {
         $image = new \stdClass();
         $image->{'@id'} = $this->url;
@@ -82,7 +85,7 @@ class Image
      *
      * @return string
      */
-    public function toJsonObject() : string
+    public function toJsonObject(): string
     {
         $image = new \stdClass();
         $image->url = $this->url;
@@ -101,7 +104,7 @@ class Image
      * @param object $item A JSON or JSON-LD object representing a content-item
      * @return Image|null  The Image object
      */
-    public static function fromJsonObject(object $item) : ?Image
+    public static function fromJsonObject(object $item): ?Image
     {
         $obj = null;
         $width = null;

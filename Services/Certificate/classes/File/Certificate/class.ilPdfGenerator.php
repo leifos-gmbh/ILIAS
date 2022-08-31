@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -21,22 +23,16 @@
  */
 class ilPdfGenerator
 {
-    private ilUserCertificateRepository $certificateRepository;
-    private ilLogger $logger;
     private ilCertificateRpcClientFactoryHelper $rpcHelper;
     private ilCertificatePdfFileNameFactory $pdfFilenameFactory;
 
     public function __construct(
-        ilUserCertificateRepository $userCertificateRepository,
-        ilLogger $logger,
+        private ilUserCertificateRepository $certificateRepository,
         ?ilCertificateRpcClientFactoryHelper $rpcHelper = null,
         ?ilCertificatePdfFileNameFactory $pdfFileNameFactory = null,
         ?ilLanguage $lng = null
     ) {
         global $DIC;
-
-        $this->certificateRepository = $userCertificateRepository;
-        $this->logger = $logger;
 
         if (null === $rpcHelper) {
             $rpcHelper = new ilCertificateRpcClientFactoryHelper();
@@ -54,11 +50,9 @@ class ilPdfGenerator
     }
 
     /**
-     * @param int $userCertificateId
-     * @return string
      * @throws ilException
      */
-    public function generate(int $userCertificateId) : string
+    public function generate(int $userCertificateId): string
     {
         $certificate = $this->certificateRepository->fetchCertificate($userCertificateId);
 
@@ -66,12 +60,9 @@ class ilPdfGenerator
     }
 
     /**
-     * @param int $userId
-     * @param int $objId
-     * @return string
      * @throws ilException
      */
-    public function generateCurrentActiveCertificate(int $userId, int $objId) : string
+    public function generateCurrentActiveCertificate(int $userId, int $objId): string
     {
         $certificate = $this->certificateRepository->fetchActiveCertificate($userId, $objId);
 
@@ -79,26 +70,23 @@ class ilPdfGenerator
     }
 
     /**
-     * @param int $userId
-     * @param int $objId
-     * @return string
      * @throws ilDatabaseException
      * @throws ilException
      * @throws ilObjectNotFoundException
      */
-    public function generateFileName(int $userId, int $objId) : string
+    public function generateFileName(int $userId, int $objId): string
     {
         $certificate = $this->certificateRepository->fetchActiveCertificateForPresentation($userId, $objId);
 
         $user = ilObjectFactory::getInstanceByObjId($userId);
         if (!$user instanceof ilObjUser) {
-            throw new ilException(sprintf('The user_id "%s" does NOT reference a user', $userId));
+            throw new ilException(sprintf('The usr_id "%s" does NOT reference a user', $userId));
         }
 
         return $this->pdfFilenameFactory->create($certificate);
     }
 
-    private function createPDFScalar(ilUserCertificate $certificate) : string
+    private function createPDFScalar(ilUserCertificate $certificate): string
     {
         $certificateContent = $certificate->getCertificateContent();
 

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -28,7 +30,7 @@ use ILIAS\FileUpload\FileUpload;
  */
 class ilCertificateBackgroundImageUploadTest extends ilCertificateBaseTestCase
 {
-    public function testFileCanBeUploaded() : void
+    public function testFileCanBeUploaded(): void
     {
         $fileUpload = $this->getMockBuilder(FileUpload::class)
             ->getMock();
@@ -58,10 +60,6 @@ class ilCertificateBackgroundImageUploadTest extends ilCertificateBaseTestCase
             ->method('moveOneFileTo');
 
         $language = $this->getMockBuilder(ilLanguage::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $logger = $this->getMockBuilder(ilLogger::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -96,13 +94,12 @@ class ilCertificateBackgroundImageUploadTest extends ilCertificateBaseTestCase
             $fileUpload,
             'certifcate/path/to/some/where',
             $language,
-            $logger,
+            'Some Root Directory',
+            'someclient',
             $fileSystem,
             $utilHelper,
             $fileUtilsHelper,
             $legacyPathHelper,
-            'Some Root Directory',
-            'someclient',
             $fileSystem
         );
 
@@ -112,7 +109,7 @@ class ilCertificateBackgroundImageUploadTest extends ilCertificateBaseTestCase
     /**
      * This test ensures the workaround for https://mantis.ilias.de/view.php?id=28219 works as expected
      */
-    public function testPendingFilesCanBeUploaded() : void
+    public function testPendingFilesCanBeUploaded(): void
     {
         $fileUpload = $this->getMockBuilder(FileUpload::class)
             ->getMock();
@@ -142,10 +139,6 @@ class ilCertificateBackgroundImageUploadTest extends ilCertificateBaseTestCase
             ->method('moveOneFileTo');
 
         $language = $this->getMockBuilder(ilLanguage::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $logger = $this->getMockBuilder(ilLogger::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -189,13 +182,12 @@ class ilCertificateBackgroundImageUploadTest extends ilCertificateBaseTestCase
             $fileUpload,
             'certifcate/path/to/some/where',
             $language,
-            $logger,
+            'Some Root Directory',
+            'someclient',
             $fileSystem,
             $utilHelper,
             $fileUtilsHelper,
             $legacyPathHelper,
-            'Some Root Directory',
-            'someclient',
             $tmp_file_system
         );
 

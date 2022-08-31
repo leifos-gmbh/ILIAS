@@ -1,22 +1,24 @@
 <?php
 
-namespace ILIAS\LTI\ToolProvider\Service;
-
-use ILIAS\LTI\ToolProvider\Context;
-
-/******************************************************************************
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
+
+namespace ILIAS\LTI\ToolProvider\Service;
+
+use ILIAS\LTI\ToolProvider\Context;
 
 /**
  * Class to implement the Course Groups service
@@ -27,16 +29,15 @@ use ILIAS\LTI\ToolProvider\Context;
  */
 class Groups extends Service
 {
-
     /**
      * Media type for course group sets service.
      */
-    const MEDIA_TYPE_COURSE_GROUP_SETS = 'application/vnd.ims.lti-gs.v1.contextgroupsetcontainer+json';
+    public const MEDIA_TYPE_COURSE_GROUP_SETS = 'application/vnd.ims.lti-gs.v1.contextgroupsetcontainer+json';
 
     /**
      * Media type for course groups service.
      */
-    const MEDIA_TYPE_COURSE_GROUPS = 'application/vnd.ims.lti-gs.v1.contextgroupcontainer+json';
+    public const MEDIA_TYPE_COURSE_GROUPS = 'application/vnd.ims.lti-gs.v1.contextgroupcontainer+json';
 
     /**
      * Access scope.
@@ -115,7 +116,7 @@ class Groups extends Service
      * @param int|null  $limit        Limit on the number of objects to be returned in each request, null for service default (optional)
      * @return bool     True if the operation was successful
      */
-    public function get(bool $allowNonSets = false, \ILIAS\LTI\ToolProvider\User $user = null, int $limit = null) : bool
+    public function get(bool $allowNonSets = false, \ILIAS\LTI\ToolProvider\User $user = null, int $limit = null): bool
     {
         $ok = $this->getGroupSets($limit);
         if ($ok) {
@@ -134,7 +135,7 @@ class Groups extends Service
      * @param int|null $limit Limit on the number of course group sets to be returned in each request, null for service default (optional)
      * @return bool     True if the operation was successful
      */
-    public function getGroupSets(int $limit = null) : bool
+    public function getGroupSets(int $limit = null): bool
     {
         $this->endpoint = $this->groupSetsEndpoint;
         $ok = !empty($this->endpoint);
@@ -187,7 +188,7 @@ class Groups extends Service
      * @param int|null  $limit        Limit on the number of course groups to be returned in each request, null for service default (optional)
      * @return bool     True if the operation was successful
      */
-    public function getGroups(bool $allowNonSets = false, \ILIAS\LTI\ToolProvider\User $user = null, int $limit = null) : bool
+    public function getGroups(bool $allowNonSets = false, \ILIAS\LTI\ToolProvider\User $user = null, int $limit = null): bool
     {
         $this->endpoint = $this->groupsEndpoint;
         $ok = !empty($this->endpoint);

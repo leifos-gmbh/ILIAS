@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -15,7 +17,7 @@
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
- 
+
 namespace ILIAS\Setup\CLI;
 
 use ILIAS\Setup\Objective;
@@ -32,12 +34,21 @@ trait ObjectiveHelper
         Objective $objective,
         Environment $environment,
         IOWrapper $io = null
-    ) : Environment {
+    ): Environment {
         $iterator = new ObjectiveIterator($environment, $objective);
+        $current = null;
+
+        register_shutdown_function(static function () use (&$current) {
+            if (null !== $current) {
+                throw new \RuntimeException("Objective '{$current->getLabel()}' failed because it halted the program.");
+            }
+        });
 
         while ($iterator->valid()) {
             $current = $iterator->current();
             if (!$current->isApplicable($environment)) {
+                // reset objective to mark it as processed without halting the program.
+                $current = null;
                 $iterator->next();
                 continue;
             }
@@ -62,6 +73,9 @@ trait ObjectiveHelper
                     }
                     $io->error($message);
                 }
+            } finally {
+                // reset objective to mark it as processed without halting the program.
+                $current = null;
             }
             $iterator->next();
         }

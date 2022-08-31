@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -24,7 +23,9 @@ class ilRoleAssignmentTableGUI extends ilTable2GUI
 {
     protected ilPathGUI $path_gui;
     protected array $filter; // Missing array type.
-    
+
+    protected ilObjectDefinition $objectDefinition;
+
     public function __construct(
         object $a_parent_obj,
         string $a_parent_cmd
@@ -34,6 +35,8 @@ class ilRoleAssignmentTableGUI extends ilTable2GUI
         $ilCtrl = $DIC['ilCtrl'];
         $lng = $DIC['lng'];
         $rbacsystem = $DIC['rbacsystem'];
+        $this->objectDefinition = $DIC['objDefinition'];
+
 
         $lng->loadLanguageModule('rbac');
         $this->setId("usrroleass");
@@ -65,17 +68,17 @@ class ilRoleAssignmentTableGUI extends ilTable2GUI
         $this->getPathGUI()->enableHideLeaf(false);
     }
 
-    public function getPathGUI() : ilPathGUI
+    public function getPathGUI(): ilPathGUI
     {
         return $this->path_gui;
     }
-    
-    public function initFilter() : void
+
+    public function initFilter(): void
     {
         global $DIC;
 
         $lng = $DIC['lng'];
-        
+
         // roles
         $option[0] = $lng->txt('assigned_roles');
         $option[1] = $lng->txt('all_roles');
@@ -90,8 +93,8 @@ class ilRoleAssignmentTableGUI extends ilTable2GUI
         $si->readFromSession();
         $this->filter["role_filter"] = $si->getValue();
     }
-    
-    protected function fillRow(array $a_set) : void // Missing array type.
+
+    protected function fillRow(array $a_set): void // Missing array type.
     {
         global $DIC;
 
@@ -112,7 +115,7 @@ class ilRoleAssignmentTableGUI extends ilTable2GUI
         $this->tpl->setVariable('PATH', $a_set['path']);
     }
 
-    public function parse(int $usr_id) : void
+    public function parse(int $usr_id): void
     {
         global $DIC;
 
@@ -218,23 +221,32 @@ class ilRoleAssignmentTableGUI extends ilTable2GUI
         $this->setData($records);
     }
 
-    protected function getTitleForReference(int $ref_id) : string
+    protected function getTitleForReference(int $ref_id): string
     {
         $type = ilObject::_lookupType($ref_id, true);
         $obj_id = ilObject::_lookupObjId($ref_id);
         $title = ilObject::_lookupTitle($obj_id);
 
-        $list = ilObjectListGUIFactory::_getListGUIByType($type);
-        $list->initItem(
-            $ref_id,
-            $obj_id,
-            $type,
-            $title
-        );
+        if ($this->objectDefinition->isAdministrationObject($type)) {
+            return $this->lng->txt('obj_' . $type);
+        }
 
-        ilDatePresentation::setUseRelativeDates(false);
-        $title = $list->getTitle();
-        ilDatePresentation::resetToDefaults();
+        try {
+            $list = ilObjectListGUIFactory::_getListGUIByType($type);
+            $list->initItem(
+                $ref_id,
+                $obj_id,
+                $type,
+                $title
+            );
+
+            ilDatePresentation::setUseRelativeDates(false);
+            $title = $list->getTitle();
+            ilDatePresentation::resetToDefaults();
+            return $title;
+        } catch (ilObjectException $e) {
+            // could be an administration object
+        }
         return $title;
     }
 }

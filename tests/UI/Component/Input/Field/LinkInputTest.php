@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -15,7 +17,7 @@
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
- 
+
 require_once(__DIR__ . "/../../../../../libs/composer/vendor/autoload.php");
 require_once(__DIR__ . "/../../../Base.php");
 require_once(__DIR__ . "/InputTest.php");
@@ -24,17 +26,19 @@ use ILIAS\UI\Implementation\Component\SignalGenerator;
 use ILIAS\UI\Component\Input\Field;
 use ILIAS\Data;
 use ILIAS\UI\Implementation\Component\Input\Field\Factory;
+use ILIAS\UI\Implementation\Component\Input\NameSource;
+use ILIAS\UI\Implementation\Component\Input\InputData;
 
 class LinkInputTest extends ILIAS_UI_TestBase
 {
     private DefNamesource $name_source;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         $this->name_source = new DefNamesource();
     }
 
-    protected function buildFactory() : Factory
+    protected function buildFactory(): Factory
     {
         $data_factory = new Data\Factory();
         $language = $this->createMock(ilLanguage::class);
@@ -50,7 +54,7 @@ class LinkInputTest extends ILIAS_UI_TestBase
         );
     }
 
-    public function test_implements_factory_interface() : void
+    public function test_implements_factory_interface(): void
     {
         $factory = $this->buildFactory();
         $url = $factory->link("Test Label", "Test Byline");
@@ -58,7 +62,7 @@ class LinkInputTest extends ILIAS_UI_TestBase
         $this->assertInstanceOf(Field\Link::class, $url);
     }
 
-    public function test_rendering() : void
+    public function test_rendering(): void
     {
         $factory = $this->buildFactory();
         $renderer = $this->getDefaultRenderer();
@@ -85,5 +89,30 @@ class LinkInputTest extends ILIAS_UI_TestBase
             $this->brutallyTrimHTML($expected),
             $this->brutallyTrimHTML($html)
         );
+    }
+
+    public function test_produces_null_when_no_data_exists(): void
+    {
+        $f = $this->buildFactory();
+        $input = $f->link("", "")
+            ->withNameFrom(new class () implements NameSource {
+                public function getNewName(): string
+                {
+                    return "name";
+                }
+            });
+        $input = $input->withInput(new class () implements InputData {
+            public function getOr($_, $default): string
+            {
+                return "";
+            }
+            public function get($_): string
+            {
+                return "";
+            }
+        });
+        $result = $input->getContent();
+
+        $this->assertNull($result->value());
     }
 }

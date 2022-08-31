@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -16,6 +16,10 @@
  *
  *********************************************************************/
 
+use ILIAS\UI;
+use ILIAS\Glossary\Presentation;
+use ILIAS\Glossary\Flashcard;
+
 /**
  * GUI class for glossary flashcards
  * @author Thomas Famula <famula@leifos.de>
@@ -27,9 +31,10 @@ class ilGlossaryFlashcardGUI
     protected ilLanguage $lng;
     protected ilGlobalTemplateInterface $tpl;
     protected ilTabsGUI $tabs_gui;
-    protected \ILIAS\UI\Factory $ui_fac;
-    protected \ILIAS\UI\Renderer $ui_ren;
-    protected \ILIAS\Glossary\Presentation\PresentationGUIRequest $request;
+    protected UI\Factory $ui_fac;
+    protected UI\Renderer $ui_ren;
+    protected Presentation\PresentationGUIRequest $request;
+    protected Flashcard\FlashcardManager $manager;
 
     public function __construct()
     {
@@ -42,26 +47,13 @@ class ilGlossaryFlashcardGUI
         $this->ui_fac = $DIC->ui()->factory();
         $this->ui_ren = $DIC->ui()->renderer();
 
-        //$this->ctrl->saveParameter($this, array("term_id"));
-
         $this->request = $DIC->glossary()
                              ->internal()
                              ->gui()
                              ->presentation()
                              ->request();
-
-        //$this->ref_id = $this->request->getRefId();
-
-        /*
-        if ($a_id != 0) {
-            $this->term = new ilGlossaryTerm($a_id);
-            if (ilObject::_lookupObjectId($this->ref_id) == ilGlossaryTerm::_lookGlossaryID($a_id)) {
-                $this->term_glossary = new ilObjGlossary($this->ref_id, true);
-            } else {
-                $this->term_glossary = new ilObjGlossary(ilGlossaryTerm::_lookGlossaryID($a_id), false);
-            }
-        }
-        */
+        $gs = $DIC->glossary()->internal();
+        $this->manager = $gs->domain()->flashcard($this->request->getRefId());
     }
 
     public function executeCommand() : void
@@ -92,14 +84,14 @@ class ilGlossaryFlashcardGUI
         $flashcard_tpl = new ilTemplate("tpl.flashcard_overview.html", true, true, "Modules/Glossary");
 
         $reset_btn = $this->ui_fac->button()->standard(
-            $this->lng->txt("reset_all_boxes"), //Sprachvariable
+            $this->lng->txt("reset_all_boxes"),
             $this->ctrl->getLinkTarget($this, "confirmResetBoxes")
         );
         $flashcard_tpl->setVariable("RESET_BUTTON", $this->ui_ren->render($reset_btn));
 
         $intro_box = $this->ui_fac->panel()->standard(
-            $this->lng->txt("introduction"), //Sprachvariable
-            $this->ui_fac->legacy($this->lng->txt("flashcards_intro")) //Sprachvariable
+            $this->lng->txt("introduction"),
+            $this->ui_fac->legacy($this->lng->txt("flashcards_intro"))
         );
         $flashcard_tpl->setVariable("INTRO_BOX", $this->ui_ren->render($intro_box));
 
@@ -110,7 +102,7 @@ class ilGlossaryFlashcardGUI
         }
 
         $boxes_pnl = $this->ui_fac->panel()->listing()->standard(
-            $this->lng->txt("boxes"), //Sprachvariable
+            $this->lng->txt("boxes"),
             [$this->ui_fac->item()->group("", $boxes)]
         );
         $flashcard_tpl->setVariable("BOXES", $this->ui_ren->render($boxes_pnl));
@@ -120,18 +112,27 @@ class ilGlossaryFlashcardGUI
 
     protected function getItemBox(int $nr) : \ILIAS\UI\Component\Item\Item
     {
-        $box = $this->ui_fac->item()->standard($this->lng->txt("box") . $nr) //Sprachvariable
-            ->withProperties([
-                $this->lng->txt("items") => "0", //Sprachvariable
-                $this->lng->txt("box_last_presented") => "X days ago / never" //Sprachvariable
+        $item_cnt = $this->manager->getItemsForBoxCount($nr);
+        $last_access = $this->manager->getLastAccessForBoxInDaysText($nr);
+        $box = $this->ui_fac->item()->standard($this->lng->txt("box") . " " . $nr);
+        if ($nr === Flashcard\FlashcardBox::LAST_BOX) {
+            $box = $box->withProperties([
+                $this->lng->txt("flashcards") => (string) $item_cnt
             ]);
+        } else {
+            $box = $box->withProperties([
+                $this->lng->txt("flashcards") => (string) $item_cnt,
+                $this->lng->txt("box_last_presented") => $last_access
+            ]);
+        }
 
-        if ($this->isBoxFilled()) {
+        if (($this->manager->getUserTermIdsForBox($nr) || $nr === Flashcard\FlashcardBox::FIRST_BOX)
+            && $nr !== Flashcard\FlashcardBox::LAST_BOX) {
             $this->ctrl->setParameterByClass("ilglossaryflashcardboxgui", "box_id", $nr);
 
             $action = $this->ui_fac->dropdown()->standard([
                 $this->ui_fac->button()->shy(
-                    $this->lng->txt("start_box"), //Sprachvariable
+                    $this->lng->txt("start_box"),
                     $this->ctrl->getLinkTargetByClass('ilGlossaryFlashcardBoxGUI', 'show')
                 ),
             ]);
@@ -142,19 +143,19 @@ class ilGlossaryFlashcardGUI
         return $box;
     }
 
-    protected function isBoxFilled() : bool // Funktion verschieben in Manager(?) Klasse
-    {
-        return true;
-    }
-
     public function confirmResetBoxes() : void
     {
-        $cgui = new ilConfirmationGUI();
-        $cgui->setFormAction($this->ctrl->getFormAction($this));
-        $cgui->setHeaderText($this->lng->txt("Hier rein klappt"));
-        $cgui->setCancel($this->lng->txt("no"), "cancelResetBoxes");
-        $cgui->setConfirm($this->lng->txt("yes"), "resetBoxes");
-        $this->tpl->setContent($cgui->getHTML());
+        $yes_button = $this->ui_fac->button()->standard(
+            $this->lng->txt("yes"),
+            $this->ctrl->getLinkTarget($this, "resetBoxes")
+        );
+        $no_button = $this->ui_fac->button()->standard(
+            $this->lng->txt("no"),
+            $this->ctrl->getLinkTarget($this, "cancelResetBoxes")
+        );
+        $cbox = $this->ui_fac->messageBox()->confirmation($this->lng->txt("boxes_really_reset"))
+                             ->withButtons([$yes_button, $no_button]);
+        $this->tpl->setContent($this->ui_ren->render($cbox));
     }
 
     public function cancelResetBoxes() : void
@@ -164,7 +165,7 @@ class ilGlossaryFlashcardGUI
 
     public function resetBoxes() : void
     {
-        // hier übernimmt die Manager Klasse für die Flashcards das Reset
+        $this->manager->resetEntries();
         $this->tpl->setOnScreenMessage('success', $this->lng->txt("boxes_reset"), true);
         $this->ctrl->redirect($this, "listBoxes");
     }

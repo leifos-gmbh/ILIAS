@@ -93,10 +93,11 @@ final class ilGlossaryDefinitionMigration implements Setup\Migration
             $tmp["glo_term_id"] = $rec["glo_term_id"];
         }
 
-        $set = $this->db->query("SELECT * FROM glossary_definition");
+        $set = $this->db->query("SELECT * FROM glossary_definition WHERE migration = " . $this->db->quote("0", "integer"));
         while ($rec = $this->db->fetchAssoc($set)) {
             // merge glossary_term and glossary_definition table
-            $this->log("Add short text and short text dirty to glossary term with id: " . $rec["term_id"]);
+            $this->log("Add short text ('" . $rec["short_text"] . "') and short text dirty ('" .
+                $rec["short_text_dirty"] . "') to glossary term with id: " . $rec["term_id"]);
             $this->db->manipulate(
                 "UPDATE glossary_term SET " .
                 " short_text = " . $this->db->quote($rec["short_text"], "text") . ", " .
@@ -111,6 +112,12 @@ final class ilGlossaryDefinitionMigration implements Setup\Migration
                 " parent_type = " . $this->db->quote("term", "text") .
                 " WHERE parent_type = " . $this->db->quote("gdf", "text") .
                 " AND page_id = " . $this->db->quote($rec["id"], "integer")
+            );
+            // set migration marker to 1 when it's done
+            $this->db->manipulate(
+                "UPDATE glossary_definition SET " .
+                " migration = " . $this->db->quote("1", "integer") .
+                " WHERE id = " . $this->db->quote($rec["id"], "integer")
             );
         }
 
@@ -136,8 +143,38 @@ final class ilGlossaryDefinitionMigration implements Setup\Migration
 
     public function getRemainingAmountOfSteps() : int
     {
-        // TODO: Implement getRemainingAmountOfSteps() method.
+        $set = $this->db->query(
+            "SELECT glossary_definition.id AS glo_def_id, glossary_definition.term_id AS glo_def_term_id, " .
+            " glossary_definition.short_text, glossary_definition.short_text_dirty, " .
+            " glossary_term.id AS glo_term_id, glossary_term.glo_id, glossary_term.term, glossary_term.language, " .
+            " glossary_term.create_date, glossary_term.last_update " .
+            " FROM glossary_definition JOIN glossary_term " .
+            " WHERE glossary_definition.term_id = glossary_term.id " .
+            " ORDER BY glossary_term.glo_id, glossary_term.id, glossary_definition.id"
+        );
+        $tmp = [];
+        while ($rec = $this->db->fetchAssoc($set)) {
+            // check if there are multiple definitions for a term
+            if (!empty($tmp)
+                && $tmp["glo_id"] == $rec["glo_id"]
+                && $tmp["glo_term_id"] == $rec["glo_term_id"]
+            ) {
+                return 1;
+            }
+            $tmp["glo_id"] = $rec["glo_id"];
+            $tmp["glo_term_id"] = $rec["glo_term_id"];
+        }
 
-        return 1;
+        $set = $this->db->query("SELECT * FROM glossary_definition WHERE migration = " . $this->db->quote("0", "integer"));
+        if ($rec = $this->db->fetchAssoc($set)) {
+            return 1;
+        }
+
+        $set = $this->db->query("SELECT parent_type FROM copg_pobj_def WHERE parent_type = " . $this->db->quote("gdf", "text"));
+        if ($rec = $this->db->fetchAssoc($set)) {
+            return 1;
+        }
+
+        return 0;
     }
 }

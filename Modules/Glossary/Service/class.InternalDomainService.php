@@ -20,7 +20,9 @@ namespace ILIAS\Glossary;
 
 use ILIAS\DI\Container;
 use ILIAS\Glossary\Term\TermManager;
+use ILIAS\Glossary\Flashcard\FlashcardManager;
 use ILIAS\Repository\GlobalDICDomainServices;
+use ILIAS\Glossary\Flashcard\FlashcardShuffleManager;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
@@ -64,5 +66,23 @@ class InternalDomainService
             $glossary,
             $user_id
         );
+    }
+
+    public function flashcard(int $glo_ref_id = 0, int $user_id = 0) : FlashcardManager
+    {
+        if ($user_id == 0) {
+            $user_id = $this->user()->getId();
+        }
+        return new FlashcardManager(
+            $this,
+            $this->repo_service,
+            $glo_ref_id,
+            $user_id
+        );
+    }
+
+    public function flashcardShuffle() : FlashcardShuffleManager
+    {
+        return new FlashcardShuffleManager();
     }
 }

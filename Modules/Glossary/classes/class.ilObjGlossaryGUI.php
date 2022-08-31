@@ -554,19 +554,19 @@ class ilObjGlossaryGUI extends ilObjectGUI
         $this->form->addItem($pres_mode);
 
         // flashcard training
-        $flash_train = new ilCheckboxInputGUI($this->lng->txt("flashcard_training"), "flash_train"); //Sprachvariable
-        //$flash_train->setValue("y");
-        $flash_train->setInfo($this->lng->txt("flashcard_training_info")); //Sprachvariable
+        $flash_active = new ilCheckboxInputGUI($this->lng->txt("flashcard_training"), "flash_active");
+        $flash_active->setValue("y");
+        $flash_active->setInfo($this->lng->txt("flashcard_training_info"));
 
         //flashcard training mode
-        $flash_train_mode = new ilRadioGroupInputGUI($this->lng->txt("flashcard_training_mode"), "flash_train_mode"); //Sprachvariable
-        $flash_train_mode->setValue("terms");
-        $op1 = new ilRadioOption($this->lng->txt("terms_vs_defs"), "terms", $this->lng->txt("terms_vs_defs_info")); //Sprachvariable
-        $flash_train_mode->addOption($op1);
-        $op2 = new ilRadioOption($this->lng->txt("defs_vs_terms"), "defs", $this->lng->txt("defs_vs_terms_info")); //Sprachvariable
-        $flash_train_mode->addOption($op2);
-        $flash_train->addSubItem($flash_train_mode);
-        $this->form->addItem($flash_train);
+        $flash_mode = new ilRadioGroupInputGUI($this->lng->txt("mode"), "flash_mode");
+        //$flash_mode->setValue("term");
+        $op1 = new ilRadioOption($this->lng->txt("term_vs_def"), "term", $this->lng->txt("term_vs_def_info"));
+        $flash_mode->addOption($op1);
+        $op2 = new ilRadioOption($this->lng->txt("def_vs_term"), "def", $this->lng->txt("def_vs_term_info"));
+        $flash_mode->addOption($op2);
+        $flash_active->addSubItem($flash_mode);
+        $this->form->addItem($flash_active);
 
         // show taxonomy
         $show_tax = null;
@@ -602,6 +602,8 @@ class ilObjGlossaryGUI extends ilObjectGUI
             }
             
             $down->setChecked($this->object->isActiveDownloads());
+            $flash_active->setChecked($this->object->isActiveFlashcards());
+            $flash_mode->setValue($this->object->getFlashcardsMode());
             
             // additional features
             $feat = new ilFormSectionHeaderGUI();
@@ -652,6 +654,8 @@ class ilObjGlossaryGUI extends ilObjectGUI
             $this->object->setPresentationMode($this->form->getInput("pres_mode"));
             $this->object->setSnippetLength($this->form->getInput("snippet_length"));
             $this->object->setShowTaxonomy($this->form->getInput("show_tax"));
+            $this->object->setActiveFlashcards(ilUtil::yn2tf($this->form->getInput("flash_active")));
+            $this->object->setFlashcardsMode($this->form->getInput("flash_mode"));
             $this->object->update();
 
             // tile image

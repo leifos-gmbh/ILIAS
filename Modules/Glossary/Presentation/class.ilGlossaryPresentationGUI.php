@@ -340,12 +340,15 @@ class ilGlossaryPresentationGUI implements ilCtrlBaseClassInterface
 
         $table = $this->getPresentationTable();
 
-        if (!$this->offlineMode()) {
+        $flash_btn_ren = "";
+        if ($this->glossary->isActiveFlashcards()) {
             $flash_btn = $this->ui_fac->button()->standard(
-                $lng->txt("flashcard_training"), //Sprachvariable
+                $lng->txt("start_flashcard_training"),
                 $this->ctrl->getLinkTargetByClass('ilGlossaryFlashcardGUI', 'listBoxes')
             );
             $flash_btn_ren = $this->ui_ren->render($flash_btn);
+        }
+        if (!$this->offlineMode()) {
             $tpl->setContent($flash_btn_ren . $ilCtrl->getHTML($table));
         } else {
             $this->tpl->setVariable("ADM_CONTENT", $table->getHTML());

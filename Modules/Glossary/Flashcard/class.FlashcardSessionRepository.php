@@ -1,4 +1,6 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -29,7 +31,7 @@ class FlashcardSessionRepository
     {
     }
 
-    public function setInitialTerms(int $glo_id, int $user_id, int $box_nr, array $initial_terms) : void
+    public function setInitialTerms(int $glo_id, int $user_id, int $box_nr, array $initial_terms): void
     {
         $key = self::KEY_BASE . $glo_id . "_" . $user_id . "_" . $box_nr . "_initial_terms";
         \ilSession::set($key, $initial_terms);
@@ -38,7 +40,7 @@ class FlashcardSessionRepository
     /**
      * @return int[]
      */
-    public function getInitialTerms(int $glo_id, int $user_id, int $box_nr) : array
+    public function getInitialTerms(int $glo_id, int $user_id, int $box_nr): array
     {
         $key = self::KEY_BASE . $glo_id . "_" . $user_id . "_" . $box_nr . "_initial_terms";
         if (\ilSession::has($key)) {
@@ -47,7 +49,7 @@ class FlashcardSessionRepository
         return [];
     }
 
-    public function setTerms(int $glo_id, int $user_id, int $box_nr, array $terms) : void
+    public function setTerms(int $glo_id, int $user_id, int $box_nr, array $terms): void
     {
         $key = self::KEY_BASE . $glo_id . "_" . $user_id . "_" . $box_nr . "_terms";
         \ilSession::set($key, $terms);
@@ -56,7 +58,7 @@ class FlashcardSessionRepository
     /**
      * @return int[]
      */
-    public function getTerms(int $glo_id, int $user_id, int $box_nr) : array
+    public function getTerms(int $glo_id, int $user_id, int $box_nr): array
     {
         $key = self::KEY_BASE . $glo_id . "_" . $user_id . "_" . $box_nr . "_terms";
         if (\ilSession::has($key)) {

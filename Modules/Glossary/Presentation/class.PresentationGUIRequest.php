@@ -83,7 +83,7 @@ class PresentationGUIRequest
         return $this->str("letter");
     }
 
-    public function getBoxId() : int
+    public function getBoxId(): int
     {
         return $this->int("box_id");
     }

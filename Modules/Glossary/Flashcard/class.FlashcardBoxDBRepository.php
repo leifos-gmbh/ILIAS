@@ -1,4 +1,6 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -35,7 +37,7 @@ class FlashcardBoxDBRepository
         int $box_nr,
         int $user_id,
         int $glo_id
-    ) : array {
+    ): array {
         $set = $this->db->queryF(
             "SELECT * FROM glo_flashcard_box " .
             " WHERE box_nr = %s AND user_id = %s AND glo_id = %s ",
@@ -61,7 +63,7 @@ class FlashcardBoxDBRepository
         int $user_id,
         int $glo_id,
         string $date
-    ) : void {
+    ): void {
         $this->db->replace(
             "glo_flashcard_box",
             [
@@ -78,7 +80,7 @@ class FlashcardBoxDBRepository
     public function deleteEntries(
         int $glo_id,
         int $user_id
-    ) : void {
+    ): void {
         $q = "DELETE FROM glo_flashcard_box " .
             " WHERE glo_id = " . $this->db->quote($glo_id, "integer") .
             " AND user_id = " . $this->db->quote($user_id, "integer");
@@ -87,7 +89,7 @@ class FlashcardBoxDBRepository
 
     public function deleteAllUserEntries(
         int $user_id
-    ) : void {
+    ): void {
         $q = "DELETE FROM glo_flashcard_box " .
             " WHERE user_id = " . $this->db->quote($user_id, "integer");
         $this->db->manipulate($q);
@@ -95,7 +97,7 @@ class FlashcardBoxDBRepository
 
     public function deleteAllGlossaryEntries(
         int $glo_id
-    ) : void {
+    ): void {
         $q = "DELETE FROM glo_flashcard_box " .
             " WHERE glo_id = " . $this->db->quote($glo_id, "integer");
         $this->db->manipulate($q);

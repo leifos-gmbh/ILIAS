@@ -8,6 +8,7 @@ $baseDir = dirname(dirname(dirname($vendorDir)));
 return array(
     'Twig_Extensions_' => array($vendorDir . '/twig/extensions/lib'),
     'Twig_' => array($vendorDir . '/twig/twig/lib'),
+    'SimpleSamlPhp\\Composer' => array($vendorDir . '/simplesamlphp/composer-module-installer/src'),
     'Pimple' => array($vendorDir . '/pimple/pimple/src'),
     'LibRIS' => array($vendorDir . '/technosophos/libris/src'),
     'HTMLPurifier' => array($vendorDir . '/ezyang/htmlpurifier/library'),

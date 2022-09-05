@@ -175,11 +175,11 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI
                 $plugin instanceof \ilOpenTextPlugin &&
                 $plugin->isActive()
             ) {
-                $this->tabs_gui->addTab(
-                    'skydoc',
-                    'Skydoc',
-                    $this->ctrl->getLinkTargetByClass(\ilOpenTextConfigGUI::class, '')
-                );
+                #$this->tabs_gui->addTab(
+                #    'skydoc',
+                #    'Skydoc',
+                #    $this->ctrl->getLinkTargetByClass(\ilOpenTextConfigGUI::class, '')
+                #);
             }
         }
 

@@ -1600,3 +1600,17 @@ if (!$ilDB->indexExistsByFields('qpl_num_range', array('question_fi'))) {
     $ilDB->addIndex('qpl_num_range', array('question_fi'), 'i6');
 }
 ?>
+<#90>
+<?php
+// Add new index
+if (!$ilDB->indexExistsByFields('style_template', ['style_id'])) {
+    $ilDB->addIndex('style_template', ['style_id'], 'i1');
+}
+?>
+<#91>
+<?php
+if ($ilDB->uniqueConstraintExists('cmix_token', array('obj_id', 'usr_id'))) {
+    $ilDB->dropUniqueConstraintByFields('cmix_token', array('obj_id', 'usr_id'));
+}
+$ilDB->addUniqueConstraint('cmix_token', array('obj_id', 'usr_id', 'ref_id'), 'c1');
+?>

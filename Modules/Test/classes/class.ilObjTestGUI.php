@@ -748,6 +748,7 @@ class ilObjTestGUI extends ilObjectGUI
                 if (!$ilAccess->checkAccess("read", "", $_GET["ref_id"]) && !$ilAccess->checkAccess("visible", "", $_GET["ref_id"])) {
                     $ilias->raiseError($this->lng->txt("permission_denied"), $ilias->error_obj->MESSAGE);
                 }
+                $this->prepareOutput();
                 require_once "Services/Object/classes/class.ilCommonActionDispatcherGUI.php";
                 $gui = ilCommonActionDispatcherGUI::getInstanceFromAjaxCall();
                 $this->ctrl->forwardCommand($gui);
@@ -968,7 +969,7 @@ class ilObjTestGUI extends ilObjectGUI
     {
         switch ($this->object->getQuestionSetType()) {
             case ilObjTest::QUESTION_SET_TYPE_FIXED:
-                $this->ctrl->redirectByClass('ilTestExpressPageObjectGUI', 'showPage');
+                $this->ctrl->redirectByClass('ilObjTestGUI', 'questions');
 
                 // no break
             case ilObjTest::QUESTION_SET_TYPE_RANDOM:
@@ -1644,15 +1645,16 @@ class ilObjTestGUI extends ilObjectGUI
     /**
     * Called when a new question should be created from a test after confirmation
     *
-    * Called when a new question should be created from a test after confirmation
-    *
     * @access	public
     */
     public function executeCreateQuestionObject()
     {
         $qpl_ref_id = $_REQUEST["sel_qpl"];
-
-        $qpl_mode = $_REQUEST['usage'];
+        
+        $qpl_mode = 1;
+        if (array_key_exists('usage', $_REQUEST) && is_numeric($_REQUEST['usage'])) {
+            $qpl_mode = $_REQUEST['usage'];
+        }
         
         if (isset($_REQUEST['qtype'])) {
             include_once 'Modules/TestQuestionPool/classes/class.ilObjQuestionPool.php';
@@ -1660,9 +1662,9 @@ class ilObjTestGUI extends ilObjectGUI
         } elseif (isset($_REQUEST['sel_question_types'])) {
             $sel_question_types = $_REQUEST["sel_question_types"];
         }
-
-        if (!$qpl_mode || ($qpl_mode == 2 && strcmp($_REQUEST["txt_qpl"], "") == 0) || ($qpl_mode == 3 && strcmp($qpl_ref_id, "") == 0)) {
-            //if ((strcmp($_REQUEST["txt_qpl"], "") == 0) && (strcmp($qpl_ref_id, "") == 0))
+        
+        if (($qpl_mode == 2 && strcmp($_REQUEST["txt_qpl"], "") == 0) ||
+            ($qpl_mode == 3 && strcmp($qpl_ref_id, "") == 0)) {
             // Mantis #14890
             $_REQUEST['sel_question_types'] = $sel_question_types;
             ilUtil::sendInfo($this->lng->txt("questionpool_not_entered"));
@@ -1676,10 +1678,9 @@ class ilObjTestGUI extends ilObjectGUI
             } elseif ($qpl_mode == 1) {
                 $qpl_ref_id = $_GET["ref_id"];
             }
-
-            include_once "./Modules/TestQuestionPool/classes/class.ilObjQuestionPoolGUI.php";
+            
             $baselink = "ilias.php?baseClass=ilObjQuestionPoolGUI&ref_id=" . $qpl_ref_id . "&cmd=createQuestionForTest&test_ref_id=" . $_GET["ref_id"] . "&calling_test=" . $_GET["ref_id"] . "&sel_question_types=" . $sel_question_types;
-
+            
             if (isset($_REQUEST['prev_qid'])) {
                 $baselink .= '&prev_qid=' . $_REQUEST['prev_qid'];
             } elseif (isset($_REQUEST['position'])) {
@@ -1698,7 +1699,6 @@ class ilObjTestGUI extends ilObjectGUI
                 );
             }
             
-            #var_dump($_REQUEST['prev_qid']);
             ilUtil::redirect($baselink);
             
             exit();
@@ -2892,32 +2892,22 @@ class ilObjTestGUI extends ilObjectGUI
             $info->addProperty($this->lng->txt("author"), $this->object->getAuthor());
             $info->addProperty($this->lng->txt("title"), $this->object->getTitle());
         }
-        if (!$this->object->getOfflineStatus() && $this->object->isComplete($this->testQuestionSetConfigFactory->getQuestionSetConfig())) {
-            // note smeyer: $online_access is not defined here
-            if ((!$this->object->getFixedParticipants() || $online_access) && $ilAccess->checkAccess("read", "", $this->ref_id)) {
-                if ($this->object->getShowInfo() || !$this->object->getForceJS()) {
-                    // use javascript
-                    $checked_javascript = false;
-                    if ($this->object->getJavaScriptOutput()) {
-                        $checked_javascript = true;
-                    }
+        if (!$this->object->getOfflineStatus() &&
+            $this->object->isComplete($this->testQuestionSetConfigFactory->getQuestionSetConfig()) &&
+            $ilAccess->checkAccess("read", "", $this->ref_id) &&
+            !$this->object->isRandomTest() &&
+            !$this->getObjectiveOrientedContainer()->isObjectiveOrientedPresentationRequired() &&
+            $this->object->getNrOfTries() != 1) {
+            if ($this->object->getUsePreviousAnswers() == 0) {
+                if ($this->object->getShowInfo()) {
+                    $info->addProperty($this->lng->txt("tst_use_previous_answers"), $this->lng->txt("tst_dont_use_previous_answers"));
                 }
-                // hide previous results
-                if (!$this->object->isRandomTest() && !$this->getObjectiveOrientedContainer()->isObjectiveOrientedPresentationRequired()) {
-                    if ($this->object->getNrOfTries() != 1) {
-                        if ($this->object->getUsePreviousAnswers() == 0) {
-                            if ($this->object->getShowInfo()) {
-                                $info->addProperty($this->lng->txt("tst_use_previous_answers"), $this->lng->txt("tst_dont_use_previous_answers"));
-                            }
-                        } else {
-                            $use_previous_answers = false;
-                            if ($ilUser->prefs["tst_use_previous_answers"]) {
-                                $checked_previous_answers = true;
-                            }
-                            $info->addPropertyCheckbox($this->lng->txt("tst_use_previous_answers"), "chb_use_previous_answers", 1, $this->lng->txt("tst_use_previous_answers_user"), $checked_previous_answers);
-                        }
-                    }
+            } else {
+                $checked_previous_answers = false;
+                if ($ilUser->prefs["tst_use_previous_answers"]) {
+                    $checked_previous_answers = true;
                 }
+                $info->addPropertyCheckbox($this->lng->txt("tst_use_previous_answers"), "chb_use_previous_answers", 1, $this->lng->txt("tst_use_previous_answers_user"), $checked_previous_answers);
             }
         }
 

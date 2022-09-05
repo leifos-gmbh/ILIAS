@@ -187,37 +187,37 @@ class ilGlossaryTerm
         return $this->import_id;
     }
 
-    public function setShortText(string $a_text) : void
+    public function setShortText(string $a_text): void
     {
         $this->short_text = $this->shortenShortText($a_text);
     }
 
-    public function getShortText() : string
+    public function getShortText(): string
     {
         return $this->short_text;
     }
 
-    public function setShortTextDirty(int $a_val) : void
+    public function setShortTextDirty(int $a_val): void
     {
         $this->short_text_dirty = $a_val;
     }
 
-    public function getShortTextDirty() : int
+    public function getShortTextDirty(): int
     {
         return $this->short_text_dirty;
     }
 
-    public function assignPageObject(ilGlossaryDefPage $a_page_object) : void
+    public function assignPageObject(ilGlossaryDefPage $a_page_object): void
     {
         $this->page_object = $a_page_object;
     }
 
-    public function getPageObject() : ilGlossaryDefPage
+    public function getPageObject(): ilGlossaryDefPage
     {
         return $this->page_object;
     }
 
-    public function create(bool $a_omit_page_creation = false) : void
+    public function create(bool $a_omit_page_creation = false): void
     {
         $ilDB = $this->db;
 
@@ -281,7 +281,7 @@ class ilGlossaryTerm
     /**
      * Shorten short text
      */
-    public function shortenShortText(string $text) : string
+    public function shortenShortText(string $text): string
     {
         $a_length = 196;
 
@@ -316,7 +316,7 @@ class ilGlossaryTerm
         return $short;
     }
 
-    public function updateShortText() : void
+    public function updateShortText(): void
     {
         $this->page_object->buildDom();
         $text = $this->page_object->getFirstParagraphText();
@@ -331,7 +331,7 @@ class ilGlossaryTerm
      * Set all short texts of glossary dirty
      * (e.g. if length is changed in settings)
      */
-    public static function setShortTextsDirty(int $a_glo_id) : void
+    public static function setShortTextsDirty(int $a_glo_id): void
     {
         global $DIC;
 
@@ -351,7 +351,7 @@ class ilGlossaryTerm
     /**
      * Set short texts dirty (for all glossaries)
      */
-    public static function setShortTextsDirtyGlobally() : void
+    public static function setShortTextsDirtyGlobally(): void
     {
         global $DIC;
 
@@ -417,7 +417,7 @@ class ilGlossaryTerm
     /**
      * get definition short text
      */
-    public static function _lookShortText(int $term_id) : string
+    public static function _lookShortText(int $term_id): string
     {
         global $DIC;
 
@@ -434,7 +434,7 @@ class ilGlossaryTerm
     /**
      * get definition short text dirty
      */
-    public static function _lookShortTextDirty(int $term_id) : int
+    public static function _lookShortTextDirty(int $term_id): int
     {
         global $DIC;
 

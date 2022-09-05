@@ -49,17 +49,17 @@ class InternalRepoService implements InternalRepoServiceInterface
         return new Term\TermSessionRepository();
     }
 
-    public function flashcardTerm() : Flashcard\FlashcardTermDBRepository
+    public function flashcardTerm(): Flashcard\FlashcardTermDBRepository
     {
         return new Flashcard\FlashcardTermDBRepository($this->db);
     }
 
-    public function flashcardBox() : Flashcard\FlashcardBoxDBRepository
+    public function flashcardBox(): Flashcard\FlashcardBoxDBRepository
     {
         return new Flashcard\FlashcardBoxDBRepository($this->db);
     }
 
-    public function flashcardSession() : Flashcard\FlashcardSessionRepository
+    public function flashcardSession(): Flashcard\FlashcardSessionRepository
     {
         return new Flashcard\FlashcardSessionRepository();
     }

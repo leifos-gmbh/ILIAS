@@ -1,4 +1,6 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -33,7 +35,7 @@ class ilGlossaryObjDeletionHandler
         $this->domain_service = $DIC->glossary()->internal()->domain();
     }
 
-    public function processObjectDeletion(int $obj_id, string $obj_type) : void
+    public function processObjectDeletion(int $obj_id, string $obj_type): void
     {
         if ($obj_type == "usr" && ilObject::_lookupType($obj_id) == "usr") {
             $flashcard_manager = $this->domain_service->flashcard(0, $obj_id);
@@ -45,7 +47,7 @@ class ilGlossaryObjDeletionHandler
         }
     }
 
-    public function processTermDeletion(int $term_id) : void
+    public function processTermDeletion(int $term_id): void
     {
         $flashcard_manager = $this->domain_service->flashcard();
         $flashcard_manager->deleteAllTermEntries($term_id);

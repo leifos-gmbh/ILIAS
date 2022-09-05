@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -64,7 +66,7 @@ class ilGlossaryFlashcardBoxGUI
         $this->glossary = new ilObjGlossary($this->request->getRefId());
     }
 
-    public function executeCommand() : void
+    public function executeCommand(): void
     {
         $next_class = $this->ctrl->getNextClass($this);
         $cmd = $this->ctrl->getCmd();
@@ -77,7 +79,7 @@ class ilGlossaryFlashcardBoxGUI
         }
     }
 
-    public function show() : void
+    public function show(): void
     {
         if ($this->box_nr === Flashcard\FlashcardBox::FIRST_BOX) {
             $cnt_all = count($this->manager->getUserTermIdsForBox($this->box_nr))
@@ -123,17 +125,17 @@ class ilGlossaryFlashcardBoxGUI
         }
     }
 
-    public function showAllItems() : void
+    public function showAllItems(): void
     {
         $this->showItems(true);
     }
 
-    public function showRemainingItems() : void
+    public function showRemainingItems(): void
     {
         $this->showItems(false);
     }
 
-    public function showItems(bool $all) : void
+    public function showItems(bool $all): void
     {
         if ($all) {
             $terms = $this->manager->getUserTermIdsForBox($this->box_nr);
@@ -150,7 +152,7 @@ class ilGlossaryFlashcardBoxGUI
         $this->ctrl->redirect($this, "showHidden");
     }
 
-    public function showHidden() : void
+    public function showHidden(): void
     {
         $this->tpl->setDescription($this->lng->txt("box") . " " . $this->box_nr);
 
@@ -194,7 +196,7 @@ class ilGlossaryFlashcardBoxGUI
         $this->tpl->setContent($html);
     }
 
-    public function showRevealed() : void
+    public function showRevealed(): void
     {
         $this->tpl->setDescription($this->lng->txt("box") . " " . $this->box_nr);
 
@@ -225,17 +227,17 @@ class ilGlossaryFlashcardBoxGUI
         $this->tpl->setContent($html);
     }
 
-    public function answerCorrectly() : void
+    public function answerCorrectly(): void
     {
         $this->answer(true);
     }
 
-    public function answerInCorrectly() : void
+    public function answerInCorrectly(): void
     {
         $this->answer(false);
     }
 
-    public function answer(bool $correct) : void
+    public function answer(bool $correct): void
     {
         $this->manager->createOrUpdateUserTermEntry($this->current_term_id, $correct);
         array_shift($this->terms_in_box);
@@ -247,13 +249,13 @@ class ilGlossaryFlashcardBoxGUI
         $this->ctrl->redirectByClass("ilglossaryflashcardgui", "listBoxes", "finished");
     }
 
-    protected function getTermText() : string
+    protected function getTermText(): string
     {
         $text = ilGlossaryTerm::_lookGlossaryTerm($this->current_term_id);
         return $text;
     }
 
-    protected function getDefinitionPage() : string
+    protected function getDefinitionPage(): string
     {
         $page_gui = new ilGlossaryDefPageGUI($this->current_term_id);
         return $page_gui->showPage();

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -56,7 +58,7 @@ class ilGlossaryFlashcardGUI
         $this->manager = $gs->domain()->flashcard($this->request->getRefId());
     }
 
-    public function executeCommand() : void
+    public function executeCommand(): void
     {
         $next_class = $this->ctrl->getNextClass($this);
         $cmd = $this->ctrl->getCmd();
@@ -74,7 +76,7 @@ class ilGlossaryFlashcardGUI
         }
     }
 
-    public function listBoxes() : void
+    public function listBoxes(): void
     {
         $this->tabs_gui->setBackTarget(
             $this->lng->txt("back"),
@@ -110,7 +112,7 @@ class ilGlossaryFlashcardGUI
         $this->tpl->setContent($flashcard_tpl->get());
     }
 
-    protected function getItemBox(int $nr) : \ILIAS\UI\Component\Item\Item
+    protected function getItemBox(int $nr): \ILIAS\UI\Component\Item\Item
     {
         $item_cnt = $this->manager->getItemsForBoxCount($nr);
         $last_access = $this->manager->getLastAccessForBoxInDaysText($nr);
@@ -143,7 +145,7 @@ class ilGlossaryFlashcardGUI
         return $box;
     }
 
-    public function confirmResetBoxes() : void
+    public function confirmResetBoxes(): void
     {
         $yes_button = $this->ui_fac->button()->standard(
             $this->lng->txt("yes"),
@@ -158,12 +160,12 @@ class ilGlossaryFlashcardGUI
         $this->tpl->setContent($this->ui_ren->render($cbox));
     }
 
-    public function cancelResetBoxes() : void
+    public function cancelResetBoxes(): void
     {
         $this->ctrl->redirect($this, "listBoxes");
     }
 
-    public function resetBoxes() : void
+    public function resetBoxes(): void
     {
         $this->manager->resetEntries();
         $this->tpl->setOnScreenMessage('success', $this->lng->txt("boxes_reset"), true);

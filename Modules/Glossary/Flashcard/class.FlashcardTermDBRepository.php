@@ -1,4 +1,6 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -35,7 +37,7 @@ class FlashcardTermDBRepository
         int $box_nr,
         int $user_id,
         int $glo_id
-    ) : array {
+    ): array {
         $set = $this->db->queryF(
             "SELECT * FROM glo_flashcard_term " .
             " WHERE box_nr = %s AND user_id = %s AND glo_id = %s " .
@@ -61,7 +63,7 @@ class FlashcardTermDBRepository
     public function getAllUserEntries(
         int $user_id,
         int $glo_id
-    ) : array {
+    ): array {
         $set = $this->db->queryF(
             "SELECT * FROM glo_flashcard_term " .
             " WHERE user_id = %s AND glo_id = %s " .
@@ -88,7 +90,7 @@ class FlashcardTermDBRepository
         int $term_id,
         int $user_id,
         int $glo_id
-    ) : int {
+    ): int {
         $set = $this->db->queryF(
             "SELECT box_nr FROM glo_flashcard_term " .
             " WHERE term_id = %s AND user_id = %s AND glo_id = %s ",
@@ -109,7 +111,7 @@ class FlashcardTermDBRepository
         int $glo_id,
         int $box_nr,
         string $date
-    ) : void {
+    ): void {
         $this->db->insert("glo_flashcard_term", [
             "term_id" => ["integer", $term_id],
             "user_id" => ["integer", $user_id],
@@ -125,7 +127,7 @@ class FlashcardTermDBRepository
         int $glo_id,
         int $box_nr,
         string $date
-    ) : void {
+    ): void {
         $this->db->update("glo_flashcard_term", [
             "last_access" => ["date", $date],
             "box_nr" => ["integer", $box_nr]
@@ -139,7 +141,7 @@ class FlashcardTermDBRepository
     public function deleteEntries(
         int $glo_id,
         int $user_id
-    ) : void {
+    ): void {
         $q = "DELETE FROM glo_flashcard_term " .
             " WHERE glo_id = " . $this->db->quote($glo_id, "integer") .
             " AND user_id = " . $this->db->quote($user_id, "integer");
@@ -148,7 +150,7 @@ class FlashcardTermDBRepository
 
     public function deleteAllUserEntries(
         int $user_id
-    ) : void {
+    ): void {
         $q = "DELETE FROM glo_flashcard_term " .
             " WHERE user_id = " . $this->db->quote($user_id, "integer");
         $this->db->manipulate($q);
@@ -156,7 +158,7 @@ class FlashcardTermDBRepository
 
     public function deleteAllGlossaryEntries(
         int $glo_id
-    ) : void {
+    ): void {
         $q = "DELETE FROM glo_flashcard_term " .
             " WHERE glo_id = " . $this->db->quote($glo_id, "integer");
         $this->db->manipulate($q);
@@ -164,7 +166,7 @@ class FlashcardTermDBRepository
 
     public function deleteAllTermEntries(
         int $term_id
-    ) : void {
+    ): void {
         $q = "DELETE FROM glo_flashcard_term " .
             " WHERE term_id = " . $this->db->quote($term_id, "integer");
         $this->db->manipulate($q);

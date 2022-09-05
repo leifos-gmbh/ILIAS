@@ -1,4 +1,6 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -23,11 +25,11 @@ namespace ILIAS\Glossary;
  */
 interface InternalRepoServiceInterface
 {
-    public function termSession() : Term\TermSessionRepository;
+    public function termSession(): Term\TermSessionRepository;
 
-    public function flashcardTerm() : Flashcard\FlashcardTermDBRepository;
+    public function flashcardTerm(): Flashcard\FlashcardTermDBRepository;
 
-    public function flashcardBox() : Flashcard\FlashcardBoxDBRepository;
+    public function flashcardBox(): Flashcard\FlashcardBoxDBRepository;
 
-    public function flashcardSession() : Flashcard\FlashcardSessionRepository;
+    public function flashcardSession(): Flashcard\FlashcardSessionRepository;
 }

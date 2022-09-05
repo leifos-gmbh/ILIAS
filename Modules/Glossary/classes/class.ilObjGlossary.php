@@ -252,22 +252,22 @@ class ilObjGlossary extends ilObject implements ilAdvancedMetaDataSubItems
         return $this->show_tax;
     }
 
-    public function setActiveFlashcards(bool $a_flash) : void
+    public function setActiveFlashcards(bool $a_flash): void
     {
         $this->flashcards_active = $a_flash;
     }
 
-    public function isActiveFlashcards() : bool
+    public function isActiveFlashcards(): bool
     {
         return $this->flashcards_active;
     }
 
-    public function setFlashcardsMode(string $a_flash) : void
+    public function setFlashcardsMode(string $a_flash): void
     {
         $this->flashcards_mode = $a_flash;
     }
 
-    public function getFlashcardsMode() : string
+    public function getFlashcardsMode(): string
     {
         return $this->flashcards_mode;
     }

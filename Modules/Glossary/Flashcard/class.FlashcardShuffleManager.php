@@ -1,4 +1,6 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -32,14 +34,14 @@ class FlashcardShuffleManager
 
     public function shuffleEntries(
         array $box_entries
-    ) : array {
+    ): array {
         shuffle($box_entries);
         return $box_entries;
     }
 
     public function shuffleEntriesWithEqualDay(
         array $box_entries
-    ) : array {
+    ): array {
         $tmp_entries = [];
         $tmp_day = "";
         $i = 0;

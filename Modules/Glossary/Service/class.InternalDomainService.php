@@ -70,7 +70,7 @@ class InternalDomainService
         );
     }
 
-    public function flashcard(int $glo_ref_id = 0, int $user_id = 0) : FlashcardManager
+    public function flashcard(int $glo_ref_id = 0, int $user_id = 0): FlashcardManager
     {
         if ($user_id == 0) {
             $user_id = $this->user()->getId();
@@ -83,7 +83,7 @@ class InternalDomainService
         );
     }
 
-    public function flashcardShuffle() : FlashcardShuffleManager
+    public function flashcardShuffle(): FlashcardShuffleManager
     {
         return new FlashcardShuffleManager();
     }

@@ -1,4 +1,6 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -63,7 +65,7 @@ class FlashcardManager
     public function setSessionInitialTerms(
         int $box_nr,
         array $initial_terms
-    ) : void {
+    ): void {
         $this->session_repo->setInitialTerms($this->glo_id, $this->user_id, $box_nr, $initial_terms);
     }
 
@@ -72,14 +74,14 @@ class FlashcardManager
      */
     public function getSessionInitialTerms(
         int $box_nr
-    ) : array {
+    ): array {
         return $this->session_repo->getInitialTerms($this->glo_id, $this->user_id, $box_nr);
     }
 
     public function setSessionTerms(
         int $box_nr,
         array $terms
-    ) : void {
+    ): void {
         $this->session_repo->setTerms($this->glo_id, $this->user_id, $box_nr, $terms);
     }
 
@@ -88,14 +90,14 @@ class FlashcardManager
      */
     public function getSessionTerms(
         int $box_nr
-    ) : array {
+    ): array {
         return $this->session_repo->getTerms($this->glo_id, $this->user_id, $box_nr);
     }
 
     /**
      * @return int[]
      */
-    public function getAllTermsWithoutEntry() : array
+    public function getAllTermsWithoutEntry(): array
     {
         $all_glossary_terms = $this->glossary->getTermList(
             "",
@@ -125,7 +127,7 @@ class FlashcardManager
     /**
      * @return int[]
      */
-    public function getAllUserTermIds() : array
+    public function getAllUserTermIds(): array
     {
         $entries = $this->term_db_repo->getAllUserEntries($this->user_id, $this->glo_id);
         $term_ids = [];
@@ -141,7 +143,7 @@ class FlashcardManager
      */
     public function getUserTermIdsForBox(
         int $box_nr
-    ) : array {
+    ): array {
         $entries = $this->term_db_repo->getUserEntriesForBox($box_nr, $this->user_id, $this->glo_id);
         $entries = $this->shuffle_manager->shuffleEntriesWithEqualDay($entries);
         $term_ids = [];
@@ -157,7 +159,7 @@ class FlashcardManager
      */
     public function getNonTodayUserTermIdsForBox(
         int $box_nr
-    ) : array {
+    ): array {
         $entries = $this->term_db_repo->getUserEntriesForBox($box_nr, $this->user_id, $this->glo_id);
         $entries = $this->shuffle_manager->shuffleEntriesWithEqualDay($entries);
         $non_recent_term_ids = [];
@@ -177,7 +179,7 @@ class FlashcardManager
      */
     public function getTodayUserTermIdsForBox(
         int $box_nr
-    ) : array {
+    ): array {
         $entries = $this->term_db_repo->getUserEntriesForBox($box_nr, $this->user_id, $this->glo_id);
         $recent_term_ids = [];
         foreach ($entries as $entry) {
@@ -194,7 +196,7 @@ class FlashcardManager
 
     public function getItemsForBoxCount(
         int $box_nr
-    ) : int {
+    ): int {
         if ($box_nr === FlashcardBox::FIRST_BOX) {
             $items_without_box = count($this->getAllTermsWithoutEntry());
             $items_in_box = count($this->getUserTermIdsForBox($box_nr));
@@ -208,7 +210,7 @@ class FlashcardManager
 
     public function getLastAccessForBoxInDate(
         int $box_nr
-    ) : ?string {
+    ): ?string {
         $entry = $this->box_db_repo->getEntry($box_nr, $this->user_id, $this->glo_id);
         $date = $entry["last_access"] ?? null;
 
@@ -217,7 +219,7 @@ class FlashcardManager
 
     public function getLastAccessForBoxInDaysText(
         int $box_nr
-    ) : string {
+    ): string {
         $lng = $this->domain->lng();
         $date_str = $this->getLastAccessForBoxInDate($box_nr);
         if (!$date_str) {
@@ -238,14 +240,14 @@ class FlashcardManager
 
     public function getBoxNr(
         int $term_id
-    ) : int {
+    ): int {
         return $this->term_db_repo->getBoxNr($term_id, $this->user_id, $this->glo_id);
     }
 
     public function getBoxProgress(
         array $current_terms,
         array $all_terms
-    ) : int {
+    ): int {
         $shown_terms_cnt = count($all_terms) - count($current_terms);
         $progress = (int) round((($shown_terms_cnt + 1) / count($all_terms)) * 100);
 
@@ -254,7 +256,7 @@ class FlashcardManager
 
     public function createOrUpdateBoxAccessEntry(
         int $box_nr
-    ) : void {
+    ): void {
         $now = $this->clock->now()->format("Y-m-d H:i:s");
         $this->box_db_repo->createOrUpdateEntry($box_nr, $this->user_id, $this->glo_id, $now);
     }
@@ -262,7 +264,7 @@ class FlashcardManager
     public function createOrUpdateUserTermEntry(
         int $term_id,
         bool $correct
-    ) : void {
+    ): void {
         $box_nr = $this->getBoxNr($term_id);
         $now = $this->clock->now()->format("Y-m-d H:i:s");
 
@@ -275,19 +277,19 @@ class FlashcardManager
         }
     }
 
-    public function resetEntries() : void
+    public function resetEntries(): void
     {
         $this->term_db_repo->deleteEntries($this->glo_id, $this->user_id);
         $this->box_db_repo->deleteEntries($this->glo_id, $this->user_id);
     }
 
-    public function deleteAllUserEntries() : void
+    public function deleteAllUserEntries(): void
     {
         $this->term_db_repo->deleteAllUserEntries($this->user_id);
         $this->box_db_repo->deleteAllUserEntries($this->user_id);
     }
 
-    public function deleteAllGlossaryEntries() : void
+    public function deleteAllGlossaryEntries(): void
     {
         if ($this->glo_id === 0) {
             throw new \ilGlossaryException("No glossary id given in FlashcardManager.");
@@ -298,7 +300,7 @@ class FlashcardManager
 
     public function deleteAllTermEntries(
         int $term_id
-    ) : void {
+    ): void {
         $this->term_db_repo->deleteAllTermEntries($term_id);
     }
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -28,17 +30,17 @@ final class ilGlossaryDefinitionMigration implements Setup\Migration
 {
     protected ilDBInterface $db;
 
-    public function getLabel() : string
+    public function getLabel(): string
     {
         return "Migration of glossary definitions after abolition of multiple definitions";
     }
 
-    public function getDefaultAmountOfStepsPerRun() : int
+    public function getDefaultAmountOfStepsPerRun(): int
     {
         return Migration::INFINITE;
     }
 
-    public function getPreconditions(Environment $environment) : array
+    public function getPreconditions(Environment $environment): array
     {
         return [
             new ilIniFilesLoadedObjective(),
@@ -47,12 +49,12 @@ final class ilGlossaryDefinitionMigration implements Setup\Migration
         ];
     }
 
-    public function prepare(Environment $environment) : void
+    public function prepare(Environment $environment): void
     {
         $this->db = $environment->getResource(Environment::RESOURCE_DATABASE);
     }
 
-    public function step(Environment $environment) : void
+    public function step(Environment $environment): void
     {
         $set = $this->db->query(
             "SELECT glossary_definition.id AS glo_def_id, glossary_definition.term_id AS glo_def_term_id, " .
@@ -130,18 +132,18 @@ final class ilGlossaryDefinitionMigration implements Setup\Migration
         );
     }
 
-    protected function log(string $str) : void
+    protected function log(string $str): void
     {
         echo "\n" . $str;
     }
 
-    protected function manipulate(string $query) : void
+    protected function manipulate(string $query): void
     {
         $this->db->manipulate($query);
         $this->log($query);
     }
 
-    public function getRemainingAmountOfSteps() : int
+    public function getRemainingAmountOfSteps(): int
     {
         $set = $this->db->query(
             "SELECT glossary_definition.id AS glo_def_id, glossary_definition.term_id AS glo_def_term_id, " .

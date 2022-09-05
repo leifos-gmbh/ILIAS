@@ -1,4 +1,6 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -21,12 +23,12 @@ class ilGlossaryDBUpdateSteps implements ilDatabaseUpdateSteps
 {
     protected \ilDBInterface $db;
 
-    public function prepare(\ilDBInterface $db) : void
+    public function prepare(\ilDBInterface $db): void
     {
         $this->db = $db;
     }
 
-    public function step_1() : void
+    public function step_1(): void
     {
         if (!$this->db->tableColumnExists("glossary_term", "short_text")) {
             $this->db->addTableColumn("glossary_term", "short_text", [
@@ -46,7 +48,7 @@ class ilGlossaryDBUpdateSteps implements ilDatabaseUpdateSteps
         }
     }
 
-    public function step_2() : void
+    public function step_2(): void
     {
         if (!$this->db->tableColumnExists("glossary_definition", "migration")) {
             $this->db->addTableColumn("glossary_definition", "migration", [
@@ -58,7 +60,7 @@ class ilGlossaryDBUpdateSteps implements ilDatabaseUpdateSteps
         }
     }
 
-    public function step_3() : void
+    public function step_3(): void
     {
         if (!$this->db->tableExists('glo_flashcard_term')) {
             $fields = [
@@ -96,7 +98,7 @@ class ilGlossaryDBUpdateSteps implements ilDatabaseUpdateSteps
         }
     }
 
-    public function step_4() : void
+    public function step_4(): void
     {
         if (!$this->db->tableExists('glo_flashcard_box')) {
             $fields = [
@@ -128,7 +130,7 @@ class ilGlossaryDBUpdateSteps implements ilDatabaseUpdateSteps
         }
     }
 
-    public function step_5() : void
+    public function step_5(): void
     {
         if (!$this->db->tableColumnExists("glossary", "flash_active")) {
             $this->db->addTableColumn("glossary", "flash_active", [

@@ -1313,7 +1313,7 @@ class ilStartUpGUI
             $lng->txt("logout_text") . $tosWithdrawalGui->getWithdrawalTextForLogoutScreen($this->httpRequest)
         );
         $tpl->setVariable("TXT_LOGIN", $lng->txt("login_to_ilias"));
-        $tpl->setVariable("CLIENT_ID", "?client_id=" . $client_id . "&cmd=force_login&lang=" . $lng->getLangKey());
+        $tpl->setVariable("CLIENT_ID", "?client_id=" . $client_id . "&lang=" . $lng->getLangKey());
 
         self::printToGlobalTemplate($tpl);
     }

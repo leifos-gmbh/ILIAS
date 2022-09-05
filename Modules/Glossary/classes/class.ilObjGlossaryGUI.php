@@ -560,7 +560,6 @@ class ilObjGlossaryGUI extends ilObjectGUI
 
         //flashcard training mode
         $flash_mode = new ilRadioGroupInputGUI($this->lng->txt("mode"), "flash_mode");
-        //$flash_mode->setValue("term");
         $op1 = new ilRadioOption($this->lng->txt("term_vs_def"), "term", $this->lng->txt("term_vs_def_info"));
         $flash_mode->addOption($op1);
         $op2 = new ilRadioOption($this->lng->txt("def_vs_term"), "def", $this->lng->txt("def_vs_term_info"));

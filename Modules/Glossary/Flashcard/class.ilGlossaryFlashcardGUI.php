@@ -126,8 +126,8 @@ class ilGlossaryFlashcardGUI
             ]);
         }
 
-        if (($this->manager->getUserTermIdsForBox($nr) || $nr === Flashcard\FlashcardBox::FIRST_BOX)
-            && $nr !== Flashcard\FlashcardBox::LAST_BOX) {
+        if (($this->manager->getUserTermIdsForBox($nr) && $nr !== Flashcard\FlashcardBox::LAST_BOX)
+            || ($this->manager->getAllTermsWithoutEntry() && $nr === Flashcard\FlashcardBox::FIRST_BOX)) {
             $this->ctrl->setParameterByClass("ilglossaryflashcardboxgui", "box_id", $nr);
 
             $action = $this->ui_fac->dropdown()->standard([

@@ -27,5 +27,6 @@
 	<events>
 		<event type="listen" id="Services/Object" />
 		<event type="raise" id="deleteTerm" />
+		<event type="listen" id="Modules/Glossary" />
 	</events>
 </module>

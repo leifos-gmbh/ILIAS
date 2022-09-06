@@ -15,13 +15,27 @@
 
 namespace ILIAS\BookingManager\BookingProcess;
 
+use ILIAS\BookingManager\InternalDataService;
+use ILIAS\BookingManager\InternalRepoService;
+use ILIAS\BookingManager\InternalDomainService;
+
 /**
  * @author Alexander Killing <killing@leifos.de>
  */
 class BookingProcessManager
 {
-    public function __construct()
-    {
+    protected InternalDataService $data;
+    protected InternalRepoService $repo;
+    protected InternalDomainService $domain;
+
+    public function __construct(
+        InternalDataService $data,
+        InternalRepoService $repo,
+        InternalDomainService $domain
+    ) {
+        $this->data = $data;
+        $this->repo = $repo;
+        $this->domain = $domain;
     }
 
     /**
@@ -83,10 +97,54 @@ class BookingProcessManager
         );
     }
 
+    public function bookAvailableObjects(
+        int $obj_id,
+        int $user_to_book,
+        int $assigner_id,
+        int $context_obj_id,
+        int $from,
+        int $to,
+        int $recurrence,
+        int $nr,
+        \ilDateTime $until
+    ) : array {
+        $reservation_repo = $this->repo->reservation();
+
+        $rsv_ids = [];
+
+        $end = $until->get(IL_CAL_UNIX);
+        $cut = 0;
+        $cycle = $recurrence * 7;
+        $booked_out_slots = [];
+        $check_slot_from = $from;
+        $group_id = $reservation_repo->getNewGroupId();
+        while ($cut < 1000 && $check_slot_from <= $end) {
+            $check_slot_from = $this->addDaysStamp($from, $cycle * $cut);
+            $check_slot_to = $this->addDaysStamp($from, $cycle * $cut);
+            $available = \ilBookingReservation::getAvailableObject(array($obj_id), $check_slot_from, $check_slot_to, false, true);
+            $available = $available[$obj_id];
+            $book_nr = min($nr, $available);
+            for ($loop = 0; $loop < $book_nr; $loop++) {
+                $rsv_ids[] = $this->bookSingle(
+                    $obj_id,
+                    $user_to_book,
+                    $assigner_id,
+                    $context_obj_id,
+                    $from,
+                    $to,
+                    $group_id
+                );
+                $success = $obj_id;
+            }
+            $cut++;
+        }
+        return $rsv_ids;
+    }
+
     /**
      * Book object for date
      * @return int reservation id
-     * @throws ilDateTimeException
+     * @throws \ilDateTimeException
      */
     public function bookSingle(
         int $object_id,
@@ -97,6 +155,8 @@ class BookingProcessManager
         int $a_to = null,
         int $a_group_id = null
     ) : int {
+        $lng = $this->domain->lng();
+
         $reservation = new \ilBookingReservation();
         $reservation->setObjectId($object_id);
         $reservation->setUserId($user_to_book);
@@ -108,19 +168,24 @@ class BookingProcessManager
         $reservation->save();
 
         if ($a_from) {
-            $this->lng->loadLanguageModule('dateplaner');
-            $def_cat = ilCalendarUtil::initDefaultCalendarByType(ilCalendarCategory::TYPE_BOOK, $this->user_id_to_book, $this->lng->txt('cal_ch_personal_book'), true);
+            $lng->loadLanguageModule('dateplaner');
+            $def_cat = \ilCalendarUtil::initDefaultCalendarByType(
+                \ilCalendarCategory::TYPE_BOOK,
+                $user_to_book,
+                $lng->txt('cal_ch_personal_book'),
+                true
+            );
 
-            $object = new ilBookingObject($a_object_id);
+            $object = new \ilBookingObject($object_id);
 
-            $entry = new ilCalendarEntry();
-            $entry->setStart(new ilDateTime($a_from, IL_CAL_UNIX));
-            $entry->setEnd(new ilDateTime($a_to, IL_CAL_UNIX));
-            $entry->setTitle($this->lng->txt('book_cal_entry') . ' ' . $object->getTitle());
+            $entry = new \ilCalendarEntry();
+            $entry->setStart(new \ilDateTime($a_from, IL_CAL_UNIX));
+            $entry->setEnd(new \ilDateTime($a_to, IL_CAL_UNIX));
+            $entry->setTitle($lng->txt('book_cal_entry') . ' ' . $object->getTitle());
             $entry->setContextId($reservation->getId());
             $entry->save();
 
-            $assignment = new ilCalendarCategoryAssignments($entry->getEntryId());
+            $assignment = new \ilCalendarCategoryAssignments($entry->getEntryId());
             if ($def_cat !== null) {
                 $assignment->addAssignment($def_cat->getCategoryID());
             }

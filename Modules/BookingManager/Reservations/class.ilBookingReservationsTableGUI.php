@@ -24,6 +24,7 @@ use ILIAS\BookingManager\Reservation\ReservationTableSessionRepository;
  */
 class ilBookingReservationsTableGUI extends ilTable2GUI
 {
+    protected \ILIAS\BookingManager\Reservations\ReservationDBRepository $reservation_repo;
     protected ReservationTableSessionRepository $table_repo;
     protected ilObjUser $user;
     protected ilAccessHandler $access;
@@ -62,6 +63,10 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
         $lng = $DIC->language();
         $ilUser = $DIC->user();
         $this->tree = $DIC->repositoryTree();
+        $this->reservation_repo = $DIC->bookingManager()
+            ->internal()
+            ->repo()
+            ->reservation();
 
         $this->context_obj_ids = $context_obj_ids;
         $this->pool_id = $a_pool_id;
@@ -452,8 +457,7 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
             $filter["user_id"] = $ilUser->getId();
         }
 
-        $f = new ilBookingReservationDBRepositoryFactory();
-        $repo = $f->getRepo();
+        $repo = $this->reservation_repo;
         $data = $repo->getListByDate($this->has_schedule, $ids, $filter);
         
         if ($this->advmd) {

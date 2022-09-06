@@ -66,7 +66,11 @@ class InternalDomainService
 
     public function process() : BookingProcessManager
     {
-        return new BookingProcessManager();
+        return new BookingProcessManager(
+            $this->data_service,
+            $this->repo_service,
+            $this
+        );
     }
 
     public function objects(int $pool_id) : ObjectsManager

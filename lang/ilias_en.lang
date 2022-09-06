@@ -16920,3 +16920,9 @@ wsp#:#wsp_type_scov#:#Certificate: SCORM
 wsp#:#wsp_type_tstv#:#Certificate: Test
 wsp#:#wsp_type_webr#:#Weblink
 wsp#:#wsp_type_wfld#:#Folder
+book#:#book_no_recurrence#:#Book only this date
+book#:#book_book_recurrence#:#Book multiple dates
+book#:#book_recurrence#:#Recurrence
+book#:#book_missing_availability#:#It was not possible to book all items on all dates.
+book#:#book_missing_items#:#$1 missing item(s).
+book#:#book_book_available#:#Book Available Dates

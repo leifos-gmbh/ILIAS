@@ -201,4 +201,9 @@ class StandardGUIRequest
     {
         return $this->int("nr");
     }
+
+    public function getUntil() : int
+    {
+        return $this->int("until");
+    }
 }

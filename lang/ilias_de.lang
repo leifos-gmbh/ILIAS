@@ -16920,3 +16920,9 @@ wsp#:#wsp_type_scov#:#Zertifikat: SCORM
 wsp#:#wsp_type_tstv#:#Zertifikat: Test
 wsp#:#wsp_type_webr#:#Weblink
 wsp#:#wsp_type_wfld#:#Ordner
+book#:#book_no_recurrence#:#nur diesen Termin buchen
+book#:#book_book_recurrence#:#Wiederholungen buchen
+book#:#book_recurrence#:#Wiederholung
+book#:#book_missing_availability#:#Es können leider nicht alle Termine gebucht werden.
+book#:#book_missing_items#:#Es fehlen $1.
+book#:#book_book_available#:#Verfügbare Termine buchen

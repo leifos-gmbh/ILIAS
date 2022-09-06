@@ -24,6 +24,7 @@ use \ILIAS\Filesystem\Stream\Streams;
  */
 class ilBookingProcessGUI
 {
+    protected \ILIAS\BookingManager\InternalRepoService $repo;
     protected \ILIAS\BookingManager\BookingProcess\BookingProcessManager $process;
     protected \ILIAS\HTTP\Services $http;
     protected \ILIAS\BookingManager\InternalGUIService $gui;
@@ -82,6 +83,10 @@ class ilBookingProcessGUI
             ->internal()
             ->gui();
 
+        $this->repo = $DIC->bookingManager()
+                         ->internal()
+                         ->repo();
+
         $this->rsv_ids = $this->book_request->getReservationIdsFromString();
 
         $this->raw_post_data = $DIC->http()->request()->getParsedBody();
@@ -116,6 +121,7 @@ class ilBookingProcessGUI
                     "confirmedBookingNumbers2",
                     "confirmedBookingNumbers3",
                     "displayPostInfo",
+                    "bookAvailableItems",
                     "deliverPostFile"
             ))) {
                     $this->$cmd();
@@ -370,7 +376,7 @@ class ilBookingProcessGUI
                 }
             }
         } else {
-            $date = $this->book_request->getDate();
+            $date = $this->book_request->getSlot();
 
             // single object reservation(s)
             if ($this->book_obj_id > 0) {
@@ -380,8 +386,7 @@ class ilBookingProcessGUI
 
                 $nr = ilBookingObject::getNrOfItemsForObjects(array($object_id));
                 // needed for recurrence
-                $f = new ilBookingReservationDBRepositoryFactory();
-                $repo = $f->getRepo();
+                $repo = $this->repo->reservation();
                 $group_id = $repo->getNewGroupId();
 
                 $fromto = explode('_', $date);
@@ -605,6 +610,7 @@ class ilBookingProcessGUI
             new ilDateTime($from, IL_CAL_UNIX),
             new ilDateTime($to, IL_CAL_UNIX)
         );
+        $this->ctrl->setParameter($this, "slot", $from . "_" . $to);
         $form = $this->gui->form([self::class], "confirmedBookingNumbers2")
             ->asyncModal()
             ->section(
@@ -613,9 +619,9 @@ class ilBookingProcessGUI
                 $this->lng->txt("book_confirm_booking_schedule_number_of_objects_info")
             )
             ->number("nr", $period, "", 1, 1, $counter)
-            ->radio("recurrence", $this->lng->txt("cal_recurrences"), "", "0")
+            ->radio("recurrence", $this->lng->txt("book_recurrence"), "", "0")
             ->radioOption("0", $this->lng->txt("book_no_recurrence"))
-            ->radioOption("1", $this->lng->txt("book_recurrence"));
+            ->radioOption("1", $this->lng->txt("book_book_recurrence"));
         return $form;
     }
 
@@ -713,6 +719,17 @@ class ilBookingProcessGUI
                 $link = $this->ctrl->getLinkTarget($this, "bookAvailableItems");
                 $this->gui->modal($this->getBookgingObjectTitle())
                     ->legacy($html)
+                    ->button(
+                        $this->lng->txt("book_book_available"),
+                        $this->getBookAvailableTarget(
+                            $obj_id,
+                            $this->book_request->getSlot(),
+                            $recurrence,
+                            $nr,
+                            $until->get(IL_CAL_UNIX)
+                        ),
+                        false
+                    )
                     ->send();
             }
             $this->bookAvailableItems($recurrence, $until);
@@ -789,14 +806,16 @@ class ilBookingProcessGUI
         $f = $this->gui->ui()->factory();
         $box = $f->messageBox()->failure($this->lng->txt("book_missing_availability"));
         $items = array_map(function ($i) {
-            return $i["from"] . " - " . $i["from"] . str_replace("$1", $i["from"], $this->lng->txt("book_missing_items"));
+            $from = ilDatePresentation::formatDate(new ilDateTime($i["from"], IL_CAL_UNIX));
+            $to = ilDatePresentation::formatDate(new ilDateTime($i["to"], IL_CAL_UNIX));
+            return $from . " - " . $to . " : " . str_replace("$1", $i["missing"], $this->lng->txt("book_missing_items"));
         }, $missing);
 
         $list = $f->listing()->unordered($items);
         return $this->gui->ui()->renderer()->render([$box, $list]);
     }
 
-    protected function bookAvailableItems(?int $recurrence, ?ilDateTime $until)
+    protected function bookAvailableItems(?int $recurrence = null, ?ilDateTime $until = null) : void
     {
         $obj_id = $this->book_request->getObjectId();
         $from = $this->book_request->getSlotFrom();
@@ -806,18 +825,42 @@ class ilBookingProcessGUI
             $recurrence = (int) $this->book_request->getRecurrence();
         }
         if (is_null($until)) {
-            $until = new ilDate($this->book_request->getUntil(), IL_CAL_DATE);
+            $until = new ilDateTime($this->book_request->getUntil(), IL_CAL_UNIX);
         }
 
-        /*
         $booked = $this->process->bookAvailableObjects(
             $obj_id,
+            $this->user_id_to_book,
+            $this->user_id_assigner,
+            $this->context_obj_id,
             $from,
             $to,
             $recurrence,
             $nr,
             $until
-        );*/
+        );
+        if (count($booked) > 0) {
+            $this->saveParticipant();
+            $this->handleBookingSuccess($obj_id, $booked);
+        } else {
+            $this->tpl->setOnScreenMessage('failure', $this->lng->txt('book_reservation_failed'), true);
+            $this->back();
+        }
+    }
+
+    protected function getBookAvailableTarget(
+        int $obj_id,
+        string $slot,
+        int $recurrence,
+        int $nr,
+        int $until
+    ) : string {
+        $this->ctrl->setParameter($this, "obj_id", $obj_id);
+        $this->ctrl->setParameter($this, "slot", $slot);
+        $this->ctrl->setParameter($this, "recurrence", $recurrence);
+        $this->ctrl->setParameter($this, "nr", $nr);
+        $this->ctrl->setParameter($this, "until", $until);
+        return $this->ctrl->getLinkTarget($this, "bookAvailableItems");
     }
 
     public function confirmedBookingNumbers() : void

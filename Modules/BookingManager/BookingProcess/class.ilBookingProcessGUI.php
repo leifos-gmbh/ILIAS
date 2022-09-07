@@ -122,7 +122,8 @@ class ilBookingProcessGUI
                     "confirmedBookingNumbers3",
                     "displayPostInfo",
                     "bookAvailableItems",
-                    "deliverPostFile"
+                    "deliverPostFile",
+                    "redirectToList"
             ))) {
                     $this->$cmd();
                 }
@@ -208,7 +209,9 @@ class ilBookingProcessGUI
 
 
     /**
-     * First step in booking process
+     * Triggered from object list
+     * week view for booking a single object /
+     * confirmation for
      */
     public function book() : void // ok
     {
@@ -259,7 +262,7 @@ class ilBookingProcessGUI
     //
     // Step 1a)
     //
-    // Assign multiple participants (starting from participants screen) (no, from object screen!)
+    // Assign participant to an object (starting from object screen!)
     //
 
     // Table to assign participants to an object.
@@ -299,14 +302,13 @@ class ilBookingProcessGUI
         $available = ilBookingReservation::numAvailableFromObjectNoSchedule($this->book_obj_id);
         if (count($participants) > $available) {
             $obj = new ilBookingObject($this->book_obj_id);
-            $conf->setHeaderText(
-                sprintf(
-                    $this->lng->txt('book_limit_objects_available'),
-                    count($participants),
-                    $obj->getTitle(),
-                    $available
-                )
-            );
+            $this->tpl->setOnScreenMessage("failure", sprintf(
+                $this->lng->txt('book_limit_objects_available'),
+                count($participants),
+                $obj->getTitle(),
+                $available
+            ), true);
+            $this->ctrl->redirect($this, "redirectToList");
         } else {
             $conf->setHeaderText($this->lng->txt('book_confirm_booking_no_schedule'));
             $conf->addHiddenItem("object_id", $this->book_obj_id);
@@ -503,6 +505,7 @@ class ilBookingProcessGUI
      * @throws ilCtrlException
      * @throws ilDateTimeException
      */
+    /*
     protected function initBookingNumbersForm(
         array $a_objects_counter,
         int $a_group_id,
@@ -529,7 +532,7 @@ class ilBookingProcessGUI
                 $section = true;
             }
 
-            $period = /* $this->lng->txt("book_period").": ". */
+            $period =
                 ilDatePresentation::formatPeriod(
                     new ilDateTime($id[1], IL_CAL_UNIX),
                     new ilDateTime($id[2], IL_CAL_UNIX)
@@ -593,7 +596,7 @@ class ilBookingProcessGUI
         $form->addCommandButton("back", $this->lng->txt("cancel"));
 
         return $form;
-    }
+    }*/
 
     /**
      * @throws ilCtrlException
@@ -711,93 +714,28 @@ class ilBookingProcessGUI
             );
 
             // anything missing? -> send missing message
+            $this->ctrl->saveParameter($this, ["object_id", "slot", "nr"]);
+            $this->ctrl->setParameter($this, "recurrence", $recurrence);
+            $this->ctrl->setParameter($this, "until", $until->get(IL_CAL_DATE));
+            $book_available_target = $this->getBookAvailableTarget(
+                $obj_id,
+                $this->book_request->getSlot(),
+                $recurrence,
+                $nr,
+                $until->get(IL_CAL_UNIX)
+            );
             if (count($missing) > 0) {
                 $html = $this->getMissingAvailabilityMessage($missing);
-                $this->ctrl->saveParameter($this, ["object_id", "slot", "nr"]);
-                $this->ctrl->setParameter($this, "recurrence", $recurrence);
-                $this->ctrl->setParameter($this, "until", $until->get(IL_CAL_DATE));
-                $link = $this->ctrl->getLinkTarget($this, "bookAvailableItems");
                 $this->gui->modal($this->getBookgingObjectTitle())
                     ->legacy($html)
                     ->button(
                         $this->lng->txt("book_book_available"),
-                        $this->getBookAvailableTarget(
-                            $obj_id,
-                            $this->book_request->getSlot(),
-                            $recurrence,
-                            $nr,
-                            $until->get(IL_CAL_UNIX)
-                        ),
+                        $book_available_target,
                         false
                     )
                     ->send();
             }
-            $this->bookAvailableItems($recurrence, $until);
-        }
-
-        return;
-        $group_id = $this->book_request->getGroupId();
-
-        $form = $this->initBookingNumbersForm($counter, $group_id, true);
-        if ($form->checkInput()) {
-            $success = false;
-            $rsv_ids = array();
-            foreach ($counter as $id => $all_nr) {
-                $book_nr = $form->getInput("conf_nr__" . $id . "_" . $all_nr);
-                $parts = explode("_", $id);
-                $obj_id = $parts[0];
-                $from = $parts[1];
-                $to = $parts[2] - 1;
-
-                // get currently available slots
-                $counter = ilBookingReservation::getAvailableObject(array($obj_id), $from, $to, false, true);
-                $counter = $counter[$obj_id];
-                if ($counter) {
-                    // we can only book what is left
-                    $book_nr = min($book_nr, $counter);
-                    for ($loop = 0; $loop < $book_nr; $loop++) {
-                        $rsv_ids[] = $this->processBooking($obj_id, $from, $to, $group_id);
-                        $success = $obj_id;
-                    }
-                }
-            }
-            if ($success) {
-                $this->saveParticipant();
-                $this->handleBookingSuccess($success, $rsv_ids);
-            } else {
-                $this->tpl->setOnScreenMessage('failure', $this->lng->txt('book_reservation_failed'), true);
-                $this->back();
-            }
-        } else {
-            // ilDateTimeInputGUI does NOT add hidden values on disabled!
-
-            $rece_array = explode(".", $rece);
-
-            $rece_day = str_pad($rece_array[0], 2, "0", STR_PAD_LEFT);
-            $rece_month = str_pad($rece_array[1], 2, "0", STR_PAD_LEFT);
-            $rece_year = $rece_array[2];
-
-            // ilDateTimeInputGUI will choke on POST array format
-            //$_POST["rece"] = null;
-
-            $form->setValuesByPost();
-
-            $rece_date = new ilDate($rece_year . "-" . $rece_month . "-" . $rece_day, IL_CAL_DATE);
-
-            $rece = $form->getItemByPostVar("rece");
-            if ($rece !== null) {
-                $rece->setDate($rece_date);
-            }
-            $recm = $form->getItemByPostVar("recm");
-            if ($recm !== null) {
-                $recm->setHideSubForm($recm < 1);
-            }
-
-            $hidden_date = new ilHiddenInputGUI("rece");
-            $hidden_date->setValue($rece_date);
-            $form->addItem($hidden_date);
-
-            $this->confirmBookingNumbers($counter, $group_id, $form);
+            $this->gui->send("<script>window.location.href = '" . $book_available_target . "';</script>");
         }
     }
 
@@ -863,6 +801,7 @@ class ilBookingProcessGUI
         return $this->ctrl->getLinkTarget($this, "bookAvailableItems");
     }
 
+    /*
     public function confirmedBookingNumbers() : void
     {
 
@@ -994,8 +933,9 @@ class ilBookingProcessGUI
 
             $this->confirmBookingNumbers($counter, $group_id, $form);
         }
-    }
+    }*/
 
+    /*
     protected function addDaysDate(
         string $a_date,
         int $a_days
@@ -1018,7 +958,7 @@ class ilBookingProcessGUI
             $date["mday"] + $a_days,
             $date["year"]
         );
-    }
+    }*/
 
     //
     // Step 3: Display post success info
@@ -1072,6 +1012,7 @@ class ilBookingProcessGUI
                 $from = $obj->getFrom();
                 $to = $obj->getTo();
                 if ($from > time()) {
+                    $tmp[$from . "-" . $to] = $tmp[$from . "-" . $to] ?? 0;
                     $tmp[$from . "-" . $to]++;
                 }
             }

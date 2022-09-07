@@ -60,7 +60,6 @@ class BookingProcessManager
             $check_slot_to = $this->addDaysStamp($slot_to, $cycle * $cut);
             $available = \ilBookingReservation::getAvailableObject(array($obj_id), $check_slot_from, $check_slot_to, false, true);
             $available = $available[$obj_id];
-            $available = 0;
             if ($available < $requested_nr) {
                 $booked_out_slots[] = [
                     "from" => $check_slot_from,
@@ -130,8 +129,8 @@ class BookingProcessManager
                     $user_to_book,
                     $assigner_id,
                     $context_obj_id,
-                    $from,
-                    $to,
+                    $check_slot_from,
+                    $check_slot_to,
                     $group_id
                 );
                 $success = $obj_id;

@@ -85,4 +85,23 @@ class InternalDomainService
         }
         return self::$object_manager[$pool_id];
     }
+
+    public function reservations() : Reservations\ReservationManager
+    {
+        return new Reservations\ReservationManager(
+            $this->data_service,
+            $this->repo_service,
+            $this
+        );
+    }
+
+    public function participants() : Participants\ParticipantsManager
+    {
+        return new Participants\ParticipantsManager(
+            $this->data_service,
+            $this->repo_service,
+            $this
+        );
+    }
+
 }

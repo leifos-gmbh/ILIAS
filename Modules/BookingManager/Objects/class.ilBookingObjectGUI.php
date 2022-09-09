@@ -18,7 +18,7 @@
 
 /**
  * @author Jörg Lützenkirchen <luetzenkirchen@leifos.com>
- * @ilCtrl_Calls ilBookingObjectGUI: ilPropertyFormGUI, ilBookingProcessGUI
+ * @ilCtrl_Calls ilBookingObjectGUI: ilPropertyFormGUI, ilBookingProcessWithScheduleGUI, ilBookingProcessWithoutScheduleGUI
  */
 class ilBookingObjectGUI
 {
@@ -150,7 +150,7 @@ class ilBookingObjectGUI
                 $this->ctrl->forwardCommand($form);
                 break;
 
-            case "ilbookingprocessgui":
+            case "ilbookingprocesswithschedulegui":
                 if (!$this->pool_uses_preferences) {
                     $ilCtrl->setReturn($this, "render");
                 } else {
@@ -158,12 +158,26 @@ class ilBookingObjectGUI
                 }
                 /** @var ilObjBookingPool $pool */
                 $pool = $this->pool_gui->getObject();
-                $process_gui = new ilBookingProcessGUI(
+                $process_gui = $this->gui->process()->ilBookingProcessWithScheduleGUI(
                     $pool,
                     $this->object_id,
-                    $this->help,
-                    $this->seed,
-                    $this->sseed,
+                    $this->context_obj_id,
+                    $this->seed ?? $this->sseed
+                );
+                $this->ctrl->forwardCommand($process_gui);
+                break;
+
+            case "ilbookingprocesswithoutschedulegui":
+                if (!$this->pool_uses_preferences) {
+                    $ilCtrl->setReturn($this, "render");
+                } else {
+                    $ilCtrl->setReturn($this, "returnToPreferences");
+                }
+                /** @var ilObjBookingPool $pool */
+                $pool = $this->pool_gui->getObject();
+                $process_gui = $this->gui->process()->ilBookingProcessWithoutScheduleGUI(
+                    $pool,
+                    $this->object_id,
                     $this->context_obj_id
                 );
                 $this->ctrl->forwardCommand($process_gui);
@@ -207,7 +221,7 @@ class ilBookingObjectGUI
             if ($this->hasPoolSchedule()) {
                 $bar->addSeparator();
                 $list_link = $this->ctrl->getLinkTarget($this, "");
-                $week_link = $this->ctrl->getLinkTargetByClass("ilBookingProcessGUI", "week");
+                $week_link = $this->ctrl->getLinkTargetByClass("ilBookingProcessWithScheduleGUI", "week");
                 $mode_control = $this->gui->ui()->factory()->viewControl()->mode([
                    $this->lng->txt("book_list") => $list_link,
                    $this->lng->txt("book_week") => $week_link

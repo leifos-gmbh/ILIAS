@@ -156,6 +156,11 @@ class BookingProcessManager
     ) : int {
         $lng = $this->domain->lng();
 
+        // add user to participants, if not existing
+        $pool_id = \ilBookingObject::lookupPoolId($object_id);
+        $this->domain->participants()->createIfNotExisting($user_to_book, $pool_id);
+
+        // create new reservation
         $reservation = new \ilBookingReservation();
         $reservation->setObjectId($object_id);
         $reservation->setUserId($user_to_book);
@@ -166,6 +171,7 @@ class BookingProcessManager
         $reservation->setContextObjId($context_obj_id);
         $reservation->save();
 
+        // create calendar entry
         if ($a_from) {
             $lng->loadLanguageModule('dateplaner');
             $def_cat = \ilCalendarUtil::initDefaultCalendarByType(

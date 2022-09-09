@@ -50,6 +50,20 @@ class InternalGUIService
         );
     }
 
+    public function process() : BookingProcess\GUIService
+    {
+        return new BookingProcess\GUIService(
+            $this->data_service,
+            $this->domain_service,
+            $this
+        );
+    }
+
+    public function bookingHelp(\ilObjBookingPool $pool) : \ilBookingHelpAdapter
+    {
+        return new \ilBookingHelpAdapter($pool, $this->help());
+    }
+
     public function standardRequest() : StandardGUIRequest
     {
         return new StandardGUIRequest(

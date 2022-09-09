@@ -20,6 +20,7 @@ namespace ILIAS\BookingManager\BookingProcess;
  */
 class WeekGUI
 {
+    protected const PROCESS_CLASS = \ilBookingProcessWithScheduleGUI::class;
     protected \ilCtrlInterface $ctrl;
     protected string $parent_cmd;
     protected object $parent_gui;
@@ -193,12 +194,12 @@ class WeekGUI
                     $to_a = explode(' ', $to);
                     $to = array_pop($to_a);
 
-                    $this->ctrl->setParameterByClass("ilBookingProcessGUI", "slot", $slot_from . "_" . $slot_to);
-                    $this->ctrl->setParameterByClass("ilBookingProcessGUI", "object_id", $obj->getId());
-                    $this->ctrl->setParameterByClass("ilBookingProcessGUI", "seed", $this->seed_str);
-                    $link = $this->ctrl->getLinkTargetByClass("ilBookingProcessGUI", "confirmedBooking", "", true);
-                    $this->ctrl->setParameterByClass("ilBookingProcessGUI", "slot", null);
-                    $this->ctrl->setParameterByClass("ilBookingProcessGUI", "object_id", null);
+                    $this->ctrl->setParameterByClass(self::PROCESS_CLASS, "slot", $slot_from . "_" . $slot_to);
+                    $this->ctrl->setParameterByClass(self::PROCESS_CLASS, "object_id", $obj->getId());
+                    $this->ctrl->setParameterByClass(self::PROCESS_CLASS, "seed", $this->seed_str);
+                    $link = $this->ctrl->getLinkTargetByClass(self::PROCESS_CLASS, "confirmedBooking", "", true);
+                    $this->ctrl->setParameterByClass(self::PROCESS_CLASS, "slot", null);
+                    $this->ctrl->setParameterByClass(self::PROCESS_CLASS, "object_id", null);
                     $slot_gui = new SlotGUI(
                         $link,
                         $from,

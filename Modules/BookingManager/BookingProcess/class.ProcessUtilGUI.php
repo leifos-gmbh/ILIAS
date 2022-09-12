@@ -222,7 +222,7 @@ class ProcessUtilGUI
         }
 
         $mytpl->setVariable("TXT_SUBMIT", $lng->txt('ok'));
-        $mytpl->setVariable("URL_SUBMIT", $ctrl->getLinkTarget($this, "back"));
+        $mytpl->setVariable("URL_SUBMIT", $ctrl->getLinkTarget($this->parent_gui, "back"));
 
         $main_tpl->setContent($mytpl->get());
     }

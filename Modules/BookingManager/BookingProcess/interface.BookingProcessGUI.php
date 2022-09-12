@@ -22,4 +22,6 @@ interface BookingProcessGUI
     public function assignParticipants() : void;
 
     public function displayPostInfo() : void;
+
+    public function back() : void;
 }

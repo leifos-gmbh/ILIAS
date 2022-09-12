@@ -197,7 +197,7 @@ class WeekGUI
                     $this->ctrl->setParameterByClass(self::PROCESS_CLASS, "slot", $slot_from . "_" . $slot_to);
                     $this->ctrl->setParameterByClass(self::PROCESS_CLASS, "object_id", $obj->getId());
                     $this->ctrl->setParameterByClass(self::PROCESS_CLASS, "seed", $this->seed_str);
-                    $link = $this->ctrl->getLinkTargetByClass(self::PROCESS_CLASS, "confirmedBooking", "", true);
+                    $link = $this->ctrl->getLinkTargetByClass(self::PROCESS_CLASS, "showNumberForm", "", true);
                     $this->ctrl->setParameterByClass(self::PROCESS_CLASS, "slot", null);
                     $this->ctrl->setParameterByClass(self::PROCESS_CLASS, "object_id", null);
                     $slot_gui = new SlotGUI(

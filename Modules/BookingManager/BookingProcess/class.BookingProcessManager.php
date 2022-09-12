@@ -105,21 +105,27 @@ class BookingProcessManager
         int $to,
         int $recurrence,
         int $nr,
-        \ilDateTime $until
+        ?\ilDateTime $until
     ) : array {
         $reservation_repo = $this->repo->reservation();
 
         $rsv_ids = [];
 
-        $end = $until->get(IL_CAL_UNIX);
-        $cut = 0;
-        $cycle = $recurrence * 7;
+        if (is_null($until)) {
+            $end = $from;
+            $cut = 999;     // only one iteration
+            $cycle = 0;     // no recurrence
+        } else {
+            $end = $until->get(IL_CAL_UNIX);
+            $cut = 0;
+            $cycle = $recurrence * 7;
+        }
         $booked_out_slots = [];
         $check_slot_from = $from;
         $group_id = $reservation_repo->getNewGroupId();
         while ($cut < 1000 && $check_slot_from <= $end) {
             $check_slot_from = $this->addDaysStamp($from, $cycle * $cut);
-            $check_slot_to = $this->addDaysStamp($from, $cycle * $cut);
+            $check_slot_to = $this->addDaysStamp($to, $cycle * $cut);
             $available = \ilBookingReservation::getAvailableObject(array($obj_id), $check_slot_from, $check_slot_to, false, true);
             $available = $available[$obj_id];
             $book_nr = min($nr, $available);

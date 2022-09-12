@@ -119,11 +119,9 @@ class ilBookingProcessWithScheduleGUI implements \ILIAS\BookingManager\BookingPr
                     "assignParticipants",
                     "bookMultipleParticipants",
                     "saveMultipleBookings",
-                    "confirmedBooking",
-                    "confirmBookingNumbers",
-                    "confirmedBookingNumbers",
-                    "confirmedBookingNumbers2",
-                    "confirmedBookingNumbers3",
+                    "showNumberForm",
+                    "processNumberForm",
+                    "checkAvailability",
                     "displayPostInfo",
                     "bookAvailableItems",
                     "deliverPostFile",
@@ -226,47 +224,17 @@ class ilBookingProcessWithScheduleGUI implements \ILIAS\BookingManager\BookingPr
         $this->util_gui->assignParticipants($this->book_obj_id);
     }
 
-    public function confirmedBooking() : bool
+    public function showNumberForm() : void
     {
-        $success = false;
-        $rsv_ids = array();
-
-        $date = $this->book_request->getSlot();
-
-        $confirm = array();
         $object_id = $this->book_obj_id;
-        $group_id = null;
-
-        $nr = ilBookingObject::getNrOfItemsForObjects(array($object_id));
-        // needed for recurrence
-        $repo = $this->repo->reservation();
-        $group_id = $repo->getNewGroupId();
-
-        $fromto = explode('_', $date);
-        $from = (int) $fromto[0];
-        $to = (int) $fromto[1] - 1;
-
-        $this->confirmBookingNumbers($from, $to, $group_id);
-    }
-
-    //
-    // Confirm booking numbers
-    //
-
-    public function confirmBookingNumbers(
-        int $from,
-        int $to,
-        int $group_id,
-        \ILIAS\Repository\Form\FormAdapterGUI $form = null
-    ) : void {
-        $tpl = $this->tpl;
-
+        $from = $this->book_request->getSlotFrom();
+        $to = $this->book_request->getSlotTo() - 1;
         $this->tabs_gui->clearTargets();
-        $this->tabs_gui->setBackTarget($this->lng->txt('book_back_to_list'), $this->ctrl->getLinkTarget($this, 'back'));
-
-        if (!$form) {
-            $form = $this->initBookingNumbersForm2($from, $to, $group_id);
-        }
+        $this->tabs_gui->setBackTarget(
+            $this->lng->txt('book_back_to_list'),
+            $this->ctrl->getLinkTarget($this, 'back')
+        );
+        $form = $this->getNumberForm($from, $to);
         $this->gui->modal($this->getBookgingObjectTitle())
             ->form($form)
             ->send();
@@ -282,11 +250,9 @@ class ilBookingProcessWithScheduleGUI implements \ILIAS\BookingManager\BookingPr
      * @throws ilCtrlException
      * @throws ilDateTimeException
      */
-    protected function initBookingNumbersForm2(
+    protected function getNumberForm(
         int $from,
-        int $to,
-        int $a_group_id,
-        bool $a_reload = false
+        int $to
     ) : \ILIAS\Repository\Form\FormAdapterGUI {
         $counter = $this->reservation->getAvailableNr($this->book_request->getObjectId(), $from, $to);
         $period = ilDatePresentation::formatPeriod(
@@ -294,7 +260,7 @@ class ilBookingProcessWithScheduleGUI implements \ILIAS\BookingManager\BookingPr
             new ilDateTime($to, IL_CAL_UNIX)
         );
         $this->ctrl->setParameter($this, "slot", $from . "_" . $to);
-        $form = $this->gui->form([self::class], "confirmedBookingNumbers2")
+        $form = $this->gui->form([self::class], "processNumberForm")
             ->asyncModal()
             ->section(
                 "props",
@@ -308,28 +274,7 @@ class ilBookingProcessWithScheduleGUI implements \ILIAS\BookingManager\BookingPr
         return $form;
     }
 
-    protected function getRecurrenceForm() : \ILIAS\Repository\Form\FormAdapterGUI
-    {
-        $this->lng->loadLanguageModule("dateplaner");
-        $today = new ilDate(time(), IL_CAL_UNIX);
-        $form = $this->gui->form([self::class], "confirmedBookingNumbers3")
-            ->section(
-                "props",
-                $this->lng->txt("book_confirm_booking_schedule_number_of_objects"),
-                $this->lng->txt("book_confirm_booking_schedule_number_of_objects_info")
-            )
-            ->switch("recurrence", $this->lng->txt("cal_recurrences"), "", "1")
-            ->group("1", $this->lng->txt("cal_weekly"))
-            ->date("until1", $this->lng->txt("cal_repeat_until"), "", $today)
-            ->group("2", $this->lng->txt("r_14"))
-            ->date("until2", $this->lng->txt("cal_repeat_until"), "", $today)
-            ->group("4", $this->lng->txt("r_4_weeks"))
-            ->date("until4", $this->lng->txt("cal_repeat_until"), "", $today)
-            ->end();
-        return $form;
-    }
-
-    public function confirmedBookingNumbers2() : void
+    public function processNumberForm() : void
     {
         //get the user who will get the booking.
         if ($this->book_request->getBookedUser() > 0) {
@@ -346,7 +291,7 @@ class ilBookingProcessWithScheduleGUI implements \ILIAS\BookingManager\BookingPr
         $this->ctrl->setParameterByClass(self::class, "slot", $slot);
 
         // form not valid -> show again
-        $form = $this->initBookingNumbersForm2($from, $to, 0);
+        $form = $this->getNumberForm($from, $to);
         if (!$form->isValid()) {
             $this->gui->modal($this->getBookgingObjectTitle())
                       ->form($form)
@@ -363,15 +308,44 @@ class ilBookingProcessWithScheduleGUI implements \ILIAS\BookingManager\BookingPr
                       ->form($form)
                       ->send();
         }
-        $this->confirmedBookingNumbers3(false);
+        $this->checkAvailability(
+            false,
+            $form->getData("nr")
+        );
     }
 
-    public function confirmedBookingNumbers3($incl_recurrence = true) : void
+
+    protected function getRecurrenceForm() : \ILIAS\Repository\Form\FormAdapterGUI
+    {
+        $this->lng->loadLanguageModule("dateplaner");
+        $today = new ilDate(time(), IL_CAL_UNIX);
+        $form = $this->gui->form([self::class], "checkAvailability")
+                          ->section(
+                              "props",
+                              $this->lng->txt("book_confirm_booking_schedule_number_of_objects"),
+                              $this->lng->txt("book_confirm_booking_schedule_number_of_objects_info")
+                          )
+                          ->switch("recurrence", $this->lng->txt("cal_recurrences"), "", "1")
+                          ->group("1", $this->lng->txt("cal_weekly"))
+                          ->date("until1", $this->lng->txt("cal_repeat_until"), "", $today)
+                          ->group("2", $this->lng->txt("r_14"))
+                          ->date("until2", $this->lng->txt("cal_repeat_until"), "", $today)
+                          ->group("4", $this->lng->txt("r_4_weeks"))
+                          ->date("until4", $this->lng->txt("cal_repeat_until"), "", $today)
+                          ->end();
+        return $form;
+    }
+
+    public function checkAvailability(bool $incl_recurrence = true, int $nr = 0) : void
     {
         $obj_id = $this->book_request->getObjectId();
         $from = $this->book_request->getSlotFrom();
         $to = $this->book_request->getSlotTo();
-        $nr = $this->book_request->getNr();
+        if ($nr === 0) {
+            $nr = $this->book_request->getNr();
+        }
+        $recurrence = 0;
+        $until_ts = 0;
         if ($incl_recurrence) {
             $form = $this->getRecurrenceForm();
             // recurrence form not valid -> show again
@@ -383,6 +357,21 @@ class ilBookingProcessWithScheduleGUI implements \ILIAS\BookingManager\BookingPr
 
             $recurrence = (int) $form->getData("recurrence");   // 1, 2 or 4
             $until = $form->getData("until" . $recurrence);
+            $until_ts = $until->get(IL_CAL_UNIX);
+        }
+
+        $this->ctrl->saveParameter($this, ["object_id", "slot", "nr"]);
+        $this->ctrl->setParameter($this, "recurrence", $recurrence);
+        $this->ctrl->setParameter($this, "until", $until_ts);
+        $book_available_target = $this->getBookAvailableTarget(
+            $obj_id,
+            $this->book_request->getSlot(),
+            $recurrence,
+            $nr,
+            $until_ts
+        );
+
+        if ($incl_recurrence) {
 
             $missing = $this->process->getRecurrenceMissingAvailability(
                 $obj_id,
@@ -394,16 +383,6 @@ class ilBookingProcessWithScheduleGUI implements \ILIAS\BookingManager\BookingPr
             );
 
             // anything missing? -> send missing message
-            $this->ctrl->saveParameter($this, ["object_id", "slot", "nr"]);
-            $this->ctrl->setParameter($this, "recurrence", $recurrence);
-            $this->ctrl->setParameter($this, "until", $until->get(IL_CAL_DATE));
-            $book_available_target = $this->getBookAvailableTarget(
-                $obj_id,
-                $this->book_request->getSlot(),
-                $recurrence,
-                $nr,
-                $until->get(IL_CAL_UNIX)
-            );
             if (count($missing) > 0) {
                 $html = $this->getMissingAvailabilityMessage($missing);
                 $this->gui->modal($this->getBookgingObjectTitle())
@@ -415,8 +394,8 @@ class ilBookingProcessWithScheduleGUI implements \ILIAS\BookingManager\BookingPr
                     )
                     ->send();
             }
-            $this->gui->send("<script>window.location.href = '" . $book_available_target . "';</script>");
         }
+        $this->gui->send("<script>window.location.href = '" . $book_available_target . "';</script>");
     }
 
     protected function getMissingAvailabilityMessage(array $missing) : string
@@ -443,7 +422,9 @@ class ilBookingProcessWithScheduleGUI implements \ILIAS\BookingManager\BookingPr
             $recurrence = (int) $this->book_request->getRecurrence();
         }
         if (is_null($until)) {
-            $until = new ilDateTime($this->book_request->getUntil(), IL_CAL_UNIX);
+            if ($this->book_request->getUntil() > 0) {
+                $until = new ilDateTime($this->book_request->getUntil(), IL_CAL_UNIX);
+            }
         }
 
         $booked = $this->process->bookAvailableObjects(
@@ -495,5 +476,10 @@ class ilBookingProcessWithScheduleGUI implements \ILIAS\BookingManager\BookingPr
             $this->book_obj_id,
             $this->user_id_assigner
         );
+    }
+
+    public function back() : void
+    {
+        $this->util_gui->back();
     }
 }

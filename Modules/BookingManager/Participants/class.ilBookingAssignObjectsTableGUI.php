@@ -112,7 +112,7 @@ class ilBookingAssignObjectsTableGUI extends ilTable2GUI
                     'title' => $item['title'],
                     'description' => $item['description'],
                     'nr_items' => ilBookingReservation::numAvailableFromObjectNoSchedule($item['booking_object_id']) . '/' . $item['nr_items'],
-                    'url_assign' => $this->ctrl->getLinkTargetByClass(["ilbookingobjectgui", "ilbookingprocessgui"], 'book')
+                    'url_assign' => $this->ctrl->getLinkTargetByClass(["ilbookingobjectgui", $this->process_class], 'book')
                 );
                 $this->ctrl->setParameterByClass('ilbookingobjectgui', 'bkusr', '');
                 $this->ctrl->setParameterByClass('ilbookingobjectgui', 'object_id', '');

@@ -111,17 +111,14 @@ class ilBookingProcessWithoutScheduleGUI implements \ILIAS\BookingManager\Bookin
         $cmd = $ctrl->getCmd("show");
         switch ($next_class) {
             default:
-                if (in_array($cmd, array("book", "back", "week",
+                if (in_array($cmd, array(
+                    "book",
+                    "back",
                     "assignParticipants",
                     "bookMultipleParticipants",
                     "saveMultipleBookings",
                     "confirmedBooking",
-                    "confirmBookingNumbers",
-                    "confirmedBookingNumbers",
-                    "confirmedBookingNumbers2",
-                    "confirmedBookingNumbers3",
                     "displayPostInfo",
-                    "bookAvailableItems",
                     "deliverPostFile",
                     "redirectToParticipantsList"
             ))) {
@@ -313,5 +310,10 @@ class ilBookingProcessWithoutScheduleGUI implements \ILIAS\BookingManager\Bookin
             $this->book_obj_id,
             $this->user_id_assigner
         );
+    }
+
+    public function back() : void
+    {
+        $this->util_gui->back();
     }
 }

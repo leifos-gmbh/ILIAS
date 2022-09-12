@@ -20,32 +20,57 @@ namespace ILIAS\BookingManager\BookingProcess;
  */
 class ObjectSelectionListGUI
 {
+    protected \ILIAS\BookingManager\Objects\ObjectsManager $object_manager;
+    protected ObjectSelectionManager $object_selection;
     protected \ilLanguage $lng;
     protected \ILIAS\DI\UIServices $ui;
     protected string $form_action;
 
     public function __construct(
-        int $pool_id
+        int $pool_id,
+        string $form_action
     ) {
         global $DIC;
 
         $this->ui = $DIC->ui();
-        $this->pool_id = $pool_id;
         $this->lng = $DIC->language();
-        $this->form_action = "#";
+        $this->object_manager = $DIC->bookingManager()->internal()->domain()
+            ->objects($pool_id);
+        $this->form_action = $form_action;
+        $this->object_selection = $DIC->bookingManager()->internal()->domain()
+            ->objectSelection($pool_id);
     }
 
     public function render() : string
     {
         $tpl = new \ilTemplate("tpl.obj_selection.html", true, true, "Modules/BookingManager/BookingProcess");
 
-        foreach (\ilBookingObject::getObjectsForPool($this->pool_id) as $obj_id) {
-            $obj = new \ilBookingObject($obj_id);
+        $selected = $this->object_selection->getSelectedObjects();
+
+        foreach ($this->object_manager->getObjectTitles() as $id => $title) {
             $tpl->setCurrentBlock("item");
-            $tpl->setVariable("ID", $obj->getId());
-            $tpl->setVariable("TITLE", $obj->getTitle());
+            if (in_array($id, $selected)) {
+                $tpl->setVariable("CHECKED", "checked='checked'");
+            }
+            $tpl->setVariable("ID", $id);
+            $tpl->setVariable("COLOR_NR", $this->object_manager->getColorNrForObject($id));
+            $tpl->setVariable("TITLE", $title);
             $tpl->parseCurrentBlock();
         }
+
+        $tpl->setVariable("FORM_ACTION", $this->form_action);
+        $submit_button = $this->ui->factory()->button()->standard(
+            $this->lng->txt("update"),
+            "#"
+        )->withAdditionalOnLoadCode(function ($id) {
+            return <<<EOT
+            const book_submit_btn = document.getElementById('$id');
+            book_submit_btn.addEventListener("click", (event) => {
+                book_submit_btn.closest('form').submit(); return false;
+            });
+EOT;
+        });
+        $tpl->setVariable("BUTTON", $this->ui->renderer()->render($submit_button));
 
         $p = $this->ui->factory()->panel()->secondary()->legacy(
             $this->lng->txt("book_object_selection"),

@@ -16928,3 +16928,5 @@ wsp#:#wsp_type_webr#:#Weblink
 wsp#:#wsp_type_wfld#:#Folder
 book#:#book_list#:#List
 book#:#book_week#:#Week
+book#:#book_object_selection#:#Object Selection
+book#:#book_obj_select#:#Select

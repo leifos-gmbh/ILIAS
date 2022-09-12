@@ -21,6 +21,7 @@ namespace ILIAS\BookingManager\BookingProcess;
 class WeekGUI
 {
     protected const PROCESS_CLASS = \ilBookingProcessWithScheduleGUI::class;
+    protected \ILIAS\BookingManager\Objects\ObjectsManager $object_manager;
     protected \ilCtrlInterface $ctrl;
     protected string $parent_cmd;
     protected object $parent_gui;
@@ -40,6 +41,7 @@ class WeekGUI
         object $parent_gui,
         string $parent_cmd,
         array $obj_ids,
+        int $pool_id,
         string $seed_str = "",
         int $week_start = \ilCalendarSettings::WEEK_START_MONDAY
     ) {
@@ -57,6 +59,8 @@ class WeekGUI
             ? new \ilDate($this->seed_str, IL_CAL_DATE)
             : new \ilDate(time(), IL_CAL_UNIX);
         $this->week_start = $week_start;
+        $this->object_manager = $DIC->bookingManager()->internal()
+            ->domain()->objects($pool_id);
     }
 
     public function getHTML() : string
@@ -207,7 +211,8 @@ class WeekGUI
                         $slot_from,
                         $slot_to,
                         $obj->getTitle(),
-                        array_sum($nr_available)
+                        array_sum($nr_available),
+                        $this->object_manager->getColorNrForObject($obj->getId())
                     );
                     $week_grid_entries[] = new WeekGridEntry(
                         $slot_from,

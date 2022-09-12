@@ -104,4 +104,14 @@ class InternalDomainService
         );
     }
 
+    public function objectSelection(int $pool_id) : BookingProcess\ObjectSelectionManager
+    {
+        return new BookingProcess\ObjectSelectionManager(
+            $this->data_service,
+            $this->repo_service,
+            $this,
+            $pool_id
+        );
+    }
+
 }

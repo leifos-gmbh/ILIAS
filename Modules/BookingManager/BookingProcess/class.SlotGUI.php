@@ -22,6 +22,7 @@ use ILIAS\BookingManager\getObjectSettingsCommand;
  */
 class SlotGUI
 {
+    protected int $color_nr;
     protected $from;
     protected string $to;
     protected int $from_ts;
@@ -37,7 +38,8 @@ class SlotGUI
         int $from_ts,
         int $to_ts,
         string $title,
-        int $available
+        int $available,
+        int $color_nr
     ) {
         $this->from = $from;
         $this->to = $to;
@@ -46,6 +48,7 @@ class SlotGUI
         $this->title = $title;
         $this->available = $available;
         $this->link = $link;
+        $this->color_nr = $color_nr;
     }
 
     public function render() : string
@@ -62,6 +65,7 @@ class SlotGUI
 
         $tpl->setVariable("OBJECT_LINK", $ui->renderer()->render([$button, $modal]));
         $tpl->setVariable("TIME", $this->from . "-" . $this->to);
+        $tpl->setVariable("COLOR_NR", $this->color_nr);
         $tpl->setVariable("AVAILABILITY", "(" . $this->available . ") ");
 
         return $tpl->get();

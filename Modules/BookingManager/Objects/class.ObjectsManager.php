@@ -24,6 +24,7 @@ use ILIAS\BookingManager\InternalDomainService;
  */
 class ObjectsManager
 {
+    protected int $pool_id;
     protected ObjectsDBRepository $object_repo;
     protected InternalRepoService $repo;
     protected InternalDataService $data;
@@ -37,10 +38,33 @@ class ObjectsManager
     ) {
         $this->object_repo = $repo->objects();
         $this->object_repo->loadDataOfPool($pool_id);
+        $this->pool_id = $pool_id;
     }
 
     public function getNrOfItemsForObject(int $book_obj_id) : int
     {
         return $this->object_repo->getNrOfItemsForObject($book_obj_id);
     }
+
+    public function getObjectTitles() : array
+    {
+        $titles = [];
+        foreach ($this->object_repo->getObjectDataForPool($this->pool_id) as $d) {
+            $titles[$d["booking_object_id"]] = $d["title"];
+        }
+        return $titles;
+    }
+
+    public function getObjectIds() : array
+    {
+        return array_map(static function ($d) {
+            return (int) $d["booking_object_id"];
+        }, $this->object_repo->getObjectDataForPool($this->pool_id));
+    }
+
+    public function getColorNrForObject(int $book_obj_id) : int
+    {
+        return $this->object_repo->getColorNrForObject($book_obj_id);
+    }
+
 }

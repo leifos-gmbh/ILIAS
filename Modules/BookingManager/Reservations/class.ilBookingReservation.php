@@ -368,8 +368,10 @@ class ilBookingReservation
     ) : int {
         global $DIC;
         $ilDB = $DIC->database();
+        $object_manager = $DIC->bookingManager()->internal()->domain()
+            ->objects($a_pool_id);
 
-        $booking_pool_objects = ilBookingObject::getObjectsForPool($a_pool_id);
+        $booking_pool_objects = $object_manager->getObjectIds();
 
         $query = "SELECT count(user_id) total" .
             " FROM booking_reservation" .

@@ -206,4 +206,10 @@ class StandardGUIRequest
     {
         return $this->int("until");
     }
+
+    public function getObjectIds() : array
+    {
+        return $this->intArray("object_id");
+    }
+
 }

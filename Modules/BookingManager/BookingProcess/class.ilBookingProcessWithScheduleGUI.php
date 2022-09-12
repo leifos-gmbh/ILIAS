@@ -24,6 +24,8 @@ use \ILIAS\Filesystem\Stream\Streams;
  */
 class ilBookingProcessWithScheduleGUI implements \ILIAS\BookingManager\BookingProcess\BookingProcessGUI
 {
+    protected \ILIAS\BookingManager\BookingProcess\ObjectSelectionManager $object_selection;
+    protected \ILIAS\BookingManager\Objects\ObjectsManager $object_manager;
     protected \ILIAS\BookingManager\Reservations\ReservationManager $reservation;
     protected \ILIAS\BookingManager\BookingProcess\ProcessUtilGUI $util_gui;
     protected \ILIAS\BookingManager\InternalRepoService $repo;
@@ -85,6 +87,10 @@ class ilBookingProcessWithScheduleGUI implements \ILIAS\BookingManager\BookingPr
         $this->repo = $DIC->bookingManager()
                          ->internal()
                          ->repo();
+        $this->object_manager = $DIC->bookingManager()->internal()
+            ->domain()->objects($pool->getId());
+        $this->object_selection = $DIC->bookingManager()->internal()
+            ->domain()->objectSelection($pool->getId());
 
         $this->rsv_ids = $this->book_request->getReservationIdsFromString();
 
@@ -125,6 +131,7 @@ class ilBookingProcessWithScheduleGUI implements \ILIAS\BookingManager\BookingPr
                     "displayPostInfo",
                     "bookAvailableItems",
                     "deliverPostFile",
+                    "selectObjects",
                     "redirectToParticipantsList"
             ))) {
                     $this->$cmd();
@@ -158,7 +165,8 @@ class ilBookingProcessWithScheduleGUI implements \ILIAS\BookingManager\BookingPr
         $week_gui = new \ILIAS\BookingManager\BookingProcess\WeekGUI(
             $this,
             "week",
-            ilBookingObject::getObjectsForPool($this->pool->getId()),
+            $this->object_manager->getObjectIds(),
+            $this->pool->getId(),
             $this->seed,
             $user_settings->getWeekStart()
         );
@@ -173,9 +181,20 @@ class ilBookingProcessWithScheduleGUI implements \ILIAS\BookingManager\BookingPr
         ], $this->lng->txt("book_view"))->withActive($this->lng->txt("book_week"));
         $bar->addComponent($mode_control);
 
-        $list_gui = new \ILIAS\BookingManager\BookingProcess\ObjectSelectionListGUI($this->pool->getId());
+        $list_gui = new \ILIAS\BookingManager\BookingProcess\ObjectSelectionListGUI(
+            $this->pool->getId(),
+            $this->ctrl->getFormAction($this, "selectObjects")
+        );
         $tpl->setRightContent($list_gui->render());
     }
+
+    protected function selectObjects() : void
+    {
+        $obj_ids = $this->book_request->getObjectIds();
+        $this->object_selection->setSelectedObjects($obj_ids);
+        $this->ctrl->redirect($this, "week");
+    }
+
 
     //
     // Step 1
@@ -212,6 +231,7 @@ class ilBookingProcessWithScheduleGUI implements \ILIAS\BookingManager\BookingPr
             $this,
             "book",
             [$obj->getId()],
+            $this->pool->getId(),
             $this->seed,
             $user_settings->getWeekStart()
         );

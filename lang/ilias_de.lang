@@ -16928,3 +16928,5 @@ wsp#:#wsp_type_webr#:#Weblink
 wsp#:#wsp_type_wfld#:#Ordner
 book#:#book_list#:#Liste
 book#:#book_week#:#Wochenansicht
+book#:#book_object_selection#:#Objektauswahl
+book#:#book_obj_select#:#Auswählen

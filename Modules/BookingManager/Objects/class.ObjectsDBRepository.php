@@ -24,8 +24,12 @@ namespace ILIAS\BookingManager\Objects;
  */
 class ObjectsDBRepository
 {
+    protected const NR_OF_COLORS = 9;
+    protected static $color_number = [];
+    protected static $pool_objects = [];
     protected \ilDBInterface $db;
     protected static array $raw_data = [];
+    protected static array $pool_loaded = [];
 
     public function __construct(
         \ilDBInterface $db
@@ -37,15 +41,25 @@ class ObjectsDBRepository
     {
         $db = $this->db;
 
+        if (isset(self::$pool_loaded[$pool_id]) && self::$pool_loaded[$pool_id]) {
+            return;
+        }
+
         $set = $db->queryF(
-            "SELECT * FROM booking_object_id " .
-            " WHERE pool_id = %s ",
+            "SELECT * FROM booking_object " .
+            " WHERE pool_id = %s ORDER BY title ASC, booking_object_id ASC",
             ["integer"],
             [$pool_id]
         );
+        self::$pool_objects[$pool_id] = [];
+        $cnt = 0;
         while ($rec = $db->fetchAssoc($set)) {
             self::$raw_data[$rec["booking_object_id"]] = $rec;
+            self::$color_number[$rec["booking_object_id"]] = ($cnt % self::NR_OF_COLORS) + 1;
+            self::$pool_objects[$pool_id][] = $rec;
+            $cnt++;
         }
+        self::$pool_loaded[$pool_id] = true;
     }
 
     public function getNrOfItemsForObject(int $book_obj_id) : int
@@ -55,4 +69,20 @@ class ObjectsDBRepository
         }
         return (int) self::$raw_data[$book_obj_id]["nr_of_items"];
     }
+
+    public function getColorNrForObject(int $book_obj_id) : int
+    {
+        if (!isset(self::$raw_data[$book_obj_id])) {
+            throw new \ilBookingPoolException("Data for booking object $book_obj_id not loaded.");
+        }
+        return (int) self::$color_number[$book_obj_id];
+    }
+
+    public function getObjectDataForPool(
+        int $pool_id
+    ) : array {
+        $this->loadDataOfPool($pool_id);
+        return self::$pool_objects[$pool_id] ?? [];
+    }
+
 }

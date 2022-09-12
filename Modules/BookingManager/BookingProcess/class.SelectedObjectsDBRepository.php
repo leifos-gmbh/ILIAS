@@ -31,14 +31,15 @@ class SelectedObjectsDBRepository
         $this->db = $db;
     }
 
-    public function getSelectedObjects(int $user_id) : array
+    public function getSelectedObjects(int $pool_id, int $user_id) : array
     {
         $db = $this->db;
         $set = $db->queryF(
             "SELECT * FROM book_sel_object " .
-            " WHERE user_id = %s ",
-            ["integer"],
-            [$user_id]
+            " WHERE user_id = %s ".
+            " AND pool_id = %s ",
+            ["integer", "integer"],
+            [$user_id, $pool_id]
         );
         $obj_ids = [];
         while ($rec = $db->fetchAssoc($set)) {
@@ -47,26 +48,28 @@ class SelectedObjectsDBRepository
         return $obj_ids;
     }
 
-    public function setSelectedObjects(int $user_id, array $obj_ids) : void
+    public function setSelectedObjects(int $pool_id, int $user_id, array $obj_ids) : void
     {
         $db = $this->db;
-        $this->deleteSelectedObjects($user_id);
+        $this->deleteSelectedObjects($pool_id, $user_id);
         foreach ($obj_ids as $obj_id) {
             $db->insert("book_sel_object", [
                 "user_id" => ["integer", $user_id],
+                "pool_id" => ["integer", $pool_id],
                 "object_id" => ["integer", $obj_id]
             ]);
         }
     }
 
-    protected function deleteSelectedObjects(int $user_id) : void
+    protected function deleteSelectedObjects(int $pool_id, int $user_id) : void
     {
         $db = $this->db;
         $db->manipulateF(
             "DELETE FROM book_sel_object WHERE " .
-            " user_id = %s",
-            ["integer"],
-            [$user_id]
+            " user_id = %s".
+            " AND pool_id = %s",
+            ["integer", "integer"],
+            [$user_id, $pool_id]
         );
     }
 }

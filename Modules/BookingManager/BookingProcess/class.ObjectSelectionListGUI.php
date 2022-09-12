@@ -46,7 +46,6 @@ class ObjectSelectionListGUI
         $tpl = new \ilTemplate("tpl.obj_selection.html", true, true, "Modules/BookingManager/BookingProcess");
 
         $selected = $this->object_selection->getSelectedObjects();
-
         foreach ($this->object_manager->getObjectTitles() as $id => $title) {
             $tpl->setCurrentBlock("item");
             if (in_array($id, $selected)) {
@@ -60,7 +59,7 @@ class ObjectSelectionListGUI
 
         $tpl->setVariable("FORM_ACTION", $this->form_action);
         $submit_button = $this->ui->factory()->button()->standard(
-            $this->lng->txt("update"),
+            $this->lng->txt("book_refresh"),
             "#"
         )->withAdditionalOnLoadCode(function ($id) {
             return <<<EOT

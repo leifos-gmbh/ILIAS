@@ -74,4 +74,16 @@ class ilBookingManagerDBUpdateSteps implements \ilDatabaseUpdateSteps
         }
     }
 
+    public function step_5() : void
+    {
+        $db = $this->db;
+        if (!$db->tableColumnExists("book_sel_object", "pool_id")) {
+            $db->addTableColumn("book_sel_object", "pool_id", [
+                "type" => "integer",
+                "notnull" => true,
+                "length" => 4,
+                "default" => 0
+            ]);
+        }
+    }
 }

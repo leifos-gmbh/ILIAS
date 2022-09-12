@@ -36,7 +36,6 @@ class WeekGUI
     protected int $day_end;
     protected int $day_start;
 
-
     public function __construct(
         object $parent_gui,
         string $parent_cmd,

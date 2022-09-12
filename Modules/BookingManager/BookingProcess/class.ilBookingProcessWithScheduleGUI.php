@@ -165,7 +165,7 @@ class ilBookingProcessWithScheduleGUI implements \ILIAS\BookingManager\BookingPr
         $week_gui = new \ILIAS\BookingManager\BookingProcess\WeekGUI(
             $this,
             "week",
-            $this->object_manager->getObjectIds(),
+            $this->object_selection->getSelectedObjects(),
             $this->pool->getId(),
             $this->seed,
             $user_settings->getWeekStart()

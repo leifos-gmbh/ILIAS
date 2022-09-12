@@ -24,6 +24,7 @@ use ILIAS\BookingManager\InternalDomainService;
  */
 class ObjectSelectionManager
 {
+    protected int $pool_id;
     protected \ILIAS\BookingManager\Objects\ObjectsManager $object_manager;
     protected InternalDataService $data;
     protected InternalRepoService $repo;
@@ -39,6 +40,7 @@ class ObjectSelectionManager
         $this->repo = $repo;
         $this->domain = $domain;
         $this->object_manager = $domain->objects($pool_id);
+        $this->pool_id = $pool_id;
     }
 
     public function getSelectedObjects(int $user_id = 0) : array
@@ -48,7 +50,7 @@ class ObjectSelectionManager
         }
         $valid_obj_ids = $this->object_manager->getObjectIds();
         return array_filter(
-            $this->repo->objectSelection()->getSelectedObjects($user_id),
+            $this->repo->objectSelection()->getSelectedObjects($this->pool_id, $user_id),
             static function ($id) use ($valid_obj_ids) {
                 return in_array($id, $valid_obj_ids, true);
             }
@@ -68,6 +70,7 @@ class ObjectSelectionManager
             }
         );
         $this->repo->objectSelection()->setSelectedObjects(
+            $this->pool_id,
             $user_id,
             $obj_ids
         );

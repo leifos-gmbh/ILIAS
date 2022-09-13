@@ -59,6 +59,7 @@ class WeekGridGUI
     protected function getHoursOfDay() : array
     {
         $hours = array();
+        $sep = "<br>-<br>";
         for ($i = $this->day_start;$i <= $this->day_end;$i++) {
             $caption = "";
             $start = sprintf('%02d:00', $i);
@@ -74,21 +75,21 @@ class WeekGridGUI
             switch ($this->time_format) {
                 case \ilCalendarSettings::TIME_FORMAT_12:
                     if ($this->day_start > 0 && $i === $this->day_start) {
-                        $caption = date('h a', mktime(0, 0, 0, 1, 1, 2000)) . "-";
+                        $caption = date('h a', mktime(0, 0, 0, 1, 1, 2000)) . $sep;
                     }
                     $caption .= date('h a', mktime($i, 0, 0, 1, 1, 2000));
                     if ($this->day_end < 23 && $i === $this->day_end) {
-                        $caption .= "-" . date('h a', mktime(23, 0, 0, 1, 1, 2000));
+                        $caption .= $sep . date('h a', mktime(23, 0, 0, 1, 1, 2000));
                     }
                     break;
 
                 default:
                     if ($this->day_start > 0 && $i === $this->day_start) {
-                        $caption = sprintf('%02d:00', 0) . "-";
+                        $caption = sprintf('%02d:00', 0) . $sep;
                     }
                     $caption .= sprintf('%02d:00', $i);
                     if ($this->day_end < 23 && $i === $this->day_end) {
-                        $caption .= "-" . sprintf('%02d:00', 23);
+                        $caption .= $sep . sprintf('%02d:00', 23);
                     }
                     break;
             }
@@ -151,7 +152,7 @@ class WeekGridGUI
             \ilDatePresentation::formatDate($end));
 
         $mytpl->setVariable('TXT_TITLE', $this->lng->txt('book_reservation_title'));
-        //$mytpl->setVariable('TXT_INFO', $this->lng->txt('book_reservation_fix_info'));
+        $mytpl->setVariable('TIME', $this->lng->txt('time'));
 
 
         $day_of_week = 0;

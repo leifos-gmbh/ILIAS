@@ -142,12 +142,21 @@ class WeekGridGUI
 
         $cells = $this->buildCellData();
 
+
+        $weekday_list = \ilCalendarUtil::_buildWeekDayList($this->seed, $this->week_start)->get();
+        $start = current($weekday_list);
+        $end = end($weekday_list);
+        $mytpl->setVariable("TXT_OBJECT", $this->lng->txt('week') . ' ' . $this->seed->get(IL_CAL_FKT_DATE, 'W') .
+            ", " . \ilDatePresentation::formatDate($start) . " - " .
+            \ilDatePresentation::formatDate($end));
+
         $mytpl->setVariable('TXT_TITLE', $this->lng->txt('book_reservation_title'));
-        $mytpl->setVariable('TXT_INFO', $this->lng->txt('book_reservation_fix_info'));
-        $mytpl->setVariable('TXT_OBJECT', $this->title);
+        //$mytpl->setVariable('TXT_INFO', $this->lng->txt('book_reservation_fix_info'));
+
 
         $day_of_week = 0;
-        foreach (\ilCalendarUtil::_buildWeekDayList($this->seed, $this->week_start)->get() as $date) {
+        reset($weekday_list);
+        foreach ($weekday_list as $date) {
             $date_info = $date->get(IL_CAL_FKT_GETDATE, '', 'UTC');
             $mytpl->setCurrentBlock('weekdays');
             $mytpl->setVariable('TXT_WEEKDAY', \ilCalendarUtil::_numericDayToString((int) $date_info['wday']));

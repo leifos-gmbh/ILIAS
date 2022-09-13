@@ -311,49 +311,6 @@ class ilBookingSchedule
         return true;
     }
 
-    /**
-     * Check if given pool has any defined schedules
-     */
-    public static function hasExistingSchedules(int $a_pool_id) : bool
-    {
-        global $DIC;
-
-        $ilDB = $DIC->database();
-
-        $set = $ilDB->query("SELECT booking_schedule_id" .
-            " FROM booking_schedule" .
-            " WHERE pool_id = " . $ilDB->quote($a_pool_id, 'integer'));
-        return (bool) $ilDB->numRows($set);
-    }
-
-    /**
-     * Get list of booking objects for given pool
-     */
-    public static function getList(int $a_pool_id) : array
-    {
-        global $DIC;
-
-        $ilDB = $DIC->database();
-
-        $set = $ilDB->query('SELECT s.booking_schedule_id,s.title,' .
-            'MAX(o.schedule_id) AS object_has_schedule' .
-            ' FROM booking_schedule s' .
-            ' LEFT JOIN booking_object o ON (s.booking_schedule_id = o.schedule_id)' .
-            ' WHERE s.pool_id = ' . $ilDB->quote($a_pool_id, 'integer') .
-            ' GROUP BY s.booking_schedule_id,s.title' .
-            ' ORDER BY s.title');
-        $res = array();
-        while ($row = $ilDB->fetchAssoc($set)) {
-            if (!$row['object_has_schedule']) {
-                $row['is_used'] = false;
-            } else {
-                $row['is_used'] = true;
-            }
-            $res[] = $row;
-        }
-        return $res;
-    }
-
     public function delete() : int
     {
         $ilDB = $this->db;

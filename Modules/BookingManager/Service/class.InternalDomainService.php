@@ -22,6 +22,7 @@ use ILIAS\DI\Container;
 use ILIAS\Repository\GlobalDICDomainServices;
 use ILIAS\BookingManager\BookingProcess\BookingProcessManager;
 use ILIAS\BookingManager\Objects\ObjectsManager;
+use ILIAS\BookingManager\Schedule\ScheduleManager;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
@@ -30,7 +31,14 @@ class InternalDomainService
 {
     use GlobalDICDomainServices;
 
+    /**
+     * @var ObjectsManager[]
+     */
     protected static array $object_manager = [];
+    /**
+     * @var ScheduleManager[]
+     */
+    protected static array $schedule_manager = [];
     protected InternalRepoService $repo_service;
     protected InternalDataService $data_service;
 
@@ -84,6 +92,19 @@ class InternalDomainService
             );
         }
         return self::$object_manager[$pool_id];
+    }
+
+    public function schedules(int $pool_id) : ScheduleManager
+    {
+        if (!isset(self::$schedule_manager[$pool_id])) {
+            self::$schedule_manager[$pool_id] = new ScheduleManager(
+                $this->data_service,
+                $this->repo_service,
+                $this,
+                $pool_id
+            );
+        }
+        return self::$schedule_manager[$pool_id];
     }
 
     public function reservations() : Reservations\ReservationManager

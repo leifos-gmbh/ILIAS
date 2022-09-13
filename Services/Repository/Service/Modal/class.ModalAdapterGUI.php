@@ -128,14 +128,31 @@ class ModalAdapterGUI
         $this->_send($this->ui->renderer()->renderAsync($modal));
     }
 
-    public function renderAsyncButton(string $button_title, string $url) : string
+    public function renderAsyncTriggerButton(string $button_title, string $url, $shy = true) : string
+    {
+        $ui = $this->ui;
+        $components = $this->getAsyncTriggerButtonComponents(
+            $button_title,
+            $url,
+            $shy
+        );
+        return $ui->renderer()->render($components);
+    }
+
+    public function getAsyncTriggerButtonComponents(string $button_title, string $url, $shy = true) : array
     {
         $ui = $this->ui;
         $modal = $ui->factory()->modal()->roundtrip("", $ui->factory()->legacy(""));
         $url .= '&replaceSignal=' . $modal->getReplaceSignal()->getId();
         $modal = $modal->withAsyncRenderUrl($url);
-        $button = $ui->factory()->button()->shy($this->title, "#")
-                     ->withOnClick($modal->getShowSignal());
-        return $ui->renderer()->render([$button, $modal]);
+        if ($shy) {
+            $button = $ui->factory()->button()->shy($this->title, "#")
+                         ->withOnClick($modal->getShowSignal());
+        } else {
+            $button = $ui->factory()->button()->default($this->title, "#")
+                         ->withOnClick($modal->getShowSignal());
+        }
+        return [$button, $modal];
     }
+
 }

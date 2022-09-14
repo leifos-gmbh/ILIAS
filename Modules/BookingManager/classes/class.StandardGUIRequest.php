@@ -212,4 +212,9 @@ class StandardGUIRequest
         return $this->intArray("object_id");
     }
 
+    public function getBulkCreationData() : string
+    {
+        return $this->str("data");
+    }
+
 }

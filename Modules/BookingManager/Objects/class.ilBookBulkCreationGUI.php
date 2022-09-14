@@ -39,7 +39,7 @@ class ilBookBulkCreationGUI
 
     public function executeCommand() : void
     {
-        $ctrl = $this->ctrl;
+        $ctrl = $this->gui->ctrl();
 
         $next_class = $ctrl->getNextClass($this);
         $cmd = $ctrl->getCmd("showCreationForm");
@@ -48,7 +48,8 @@ class ilBookBulkCreationGUI
             default:
                 if (in_array($cmd, [
                     "showCreationForm",
-                    "showConfirmationScreen"
+                    "showConfirmationScreen",
+                    "cancelCreation"
                 ])) {
                     $this->$cmd();
                 }
@@ -59,11 +60,17 @@ class ilBookBulkCreationGUI
     {
         $lng = $this->domain->lng();
         $ctrl = $this->gui->ctrl();
-        $button = $this->gui->modal($lng->txt("book_bulk_creation"))
-                            ->getAsyncTriggerButtonComponents(
-                                $lng->txt("book_bulk_creation"),
-                                $ctrl->getLinkTarget($this, "showCreationForm", "", true)
-                            );
+        $components = $this
+            ->gui
+            ->modal($lng->txt("book_bulk_creation"))
+            ->getAsyncTriggerButtonComponents(
+                $lng->txt("book_bulk_creation"),
+                $ctrl->getLinkTarget($this, "showCreationForm", "", true),
+                false
+            );
+        foreach ($components as $c) {
+            $toolbar->addComponent($c);
+        }
     }
 
     protected function showCreationForm() : void
@@ -78,18 +85,22 @@ class ilBookBulkCreationGUI
     {
         $lng = $this->domain->lng();
         $schedule_manager = $this->domain->schedules($this->pool->getId());
-        return $this->gui->form(self::class, "showConfirmationScreen")
-                         ->section("creation", $lng->txt("book_bulk_data"))
-                         ->textarea(
-                             "data",
-                             $lng->txt("book_title_description_nr"),
-                             $lng->txt("book_title_description_nr_info"),
-                         )
-                         ->select(
-                             "schedule",
-                             $lng->txt("book_schedule"),
-                             $schedule_manager->getScheduleList()
-                         );
+        return $this
+            ->gui
+            ->form(self::class, "showConfirmationScreen")
+            ->section("creation", $lng->txt("book_bulk_data"))
+            ->textarea(
+                "data",
+                $lng->txt("book_title_description_nr"),
+                $lng->txt("book_title_description_nr_info"),
+            )
+            ->required()
+            ->select(
+                "schedule",
+                $lng->txt("book_schedule"),
+                $schedule_manager->getScheduleList()
+            )
+            ->required();
     }
 
     protected function showConfirmationScreen() : void
@@ -109,7 +120,54 @@ class ilBookBulkCreationGUI
 
     protected function renderConfirmation(string $data) : string
     {
-        return "Confirmation";
+        $lng = $this->domain->lng();
+        $ctrl = $this->gui->ctrl();
+
+        $f = $this->gui->ui()->factory();
+        $r = $this->gui->ui()->renderer();
+        $button1 = $f->button()->standard(
+            $lng->txt("book_create_objects"),
+            "#"
+        )->withAdditionalOnLoadCode(static function (string $id) {
+            return <<<EOT
+            const book_bulk_button = document.getElementById("$id");
+            book_bulk_button.addEventListener("click", (event) => {
+                book_bulk_button.closest(".modal").querySelector("form").submit();
+            });
+EOT;
+        });
+        $button2 = $f->button()->standard(
+            $lng->txt("cancel"),
+            $ctrl->getLinkTarget($this, "cancelCreation")
+        );
+
+        $mbox = $f->messageBox()->confirmation(
+            $lng->txt("book_bulk_confirmation")
+        )->withButtons([$button1]);
+
+        $table = new ilBookingBulkCreationTableGUI(
+            $this,
+            "renderConfirmation",
+            $data,
+            $this->pool->getId()
+        );
+
+        return $r->render($mbox) .
+            $table->getHTML();
+    }
+
+    protected function createObjects() : void
+    {
+        $request = $this->gui->standardRequest();
+        $data = $request->getBulkCreationData();
+        var_dump($data);
+        exit;
+    }
+
+    protected function cancelCreation() : void
+    {
+        $ctrl = $this->gui->ctrl();
+        $ctrl->returnToParent($this);
     }
 
 }

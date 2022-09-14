@@ -149,7 +149,7 @@ class ModalAdapterGUI
             $button = $ui->factory()->button()->shy($this->title, "#")
                          ->withOnClick($modal->getShowSignal());
         } else {
-            $button = $ui->factory()->button()->default($this->title, "#")
+            $button = $ui->factory()->button()->standard($this->title, "#")
                          ->withOnClick($modal->getShowSignal());
         }
         return [$button, $modal];

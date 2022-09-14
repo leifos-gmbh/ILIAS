@@ -201,6 +201,7 @@ class ilBookingObjectGUI
                 break;
 
             case strtolower(ilBookBulkCreationGUI::class):
+                $this->ctrl->setReturn($this, "");
                 $this->ctrl->forwardCommand($this->bulk_creation_gui);
                 break;
 

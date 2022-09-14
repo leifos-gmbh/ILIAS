@@ -144,6 +144,15 @@ class FormAdapterGUI
         return $this;
     }
 
+    public function required() : self
+    {
+        if ($field = $this->getLastField()) {
+            $field = $field->withRequired(true);
+            $this->replaceLastField($field);
+        }
+        return $this;
+    }
+
     public function textarea(
         string $key,
         string $title,

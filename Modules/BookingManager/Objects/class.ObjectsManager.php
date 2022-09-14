@@ -67,4 +67,22 @@ class ObjectsManager
         return $this->object_repo->getColorNrForObject($book_obj_id);
     }
 
+    public function getDataArrayFromInputString(string $input) : array
+    {
+        $rows = explode("\n", $input);
+        $data = [];
+        foreach ($rows as $row) {
+            $cells = explode(";", $input);
+            if (count($cells) === 1) {
+                $cells = explode("\t", $input);
+            }
+            $data[] = [
+                "title" => trim($cells[0] ?? ""),
+                "description" => trim($cells[1] ?? ""),
+                "nr" => trim($cells[2] ?? ""),
+            ];
+        }
+        return $data;
+    }
+
 }

@@ -46,6 +46,8 @@ class GUIService
     ) : \ilBookBulkCreationGUI
     {
         return new \ilBookBulkCreationGUI(
+            $this->domain_service,
+            $this->gui_service,
             $pool
         );
     }

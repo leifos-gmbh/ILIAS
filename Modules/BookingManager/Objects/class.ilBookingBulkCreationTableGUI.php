@@ -3,17 +3,14 @@
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
- *
  * ILIAS is licensed with the GPL-3.0,
  * see https://www.gnu.org/licenses/gpl-3.0.en.html
  * You should have received a copy of said license along with the
  * source code, too.
- *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
  * https://www.ilias.de
  * https://github.com/ILIAS-eLearning
- *
  *********************************************************************/
 
 /**
@@ -26,26 +23,26 @@ class ilBookingBulkCreationTableGUI extends ilTable2GUI
         string $a_parent_cmd,
         string $raw_data,
         int $pool_id
-    )
-    {
+    ) {
         global $DIC;
 
         $this->setId("bulk_creation");
         parent::__construct($a_parent_obj, $a_parent_cmd);
         $objects_manager = $DIC->bookingManager()
-            ->internal()
-            ->domain()
-            ->objects($pool_id);
+                               ->internal()
+                               ->domain()
+                               ->objects($pool_id);
 
         $ctrl = $DIC->ctrl();
-        $lng = $DIC->lng();
+        $lng = $DIC->language();
+        $this->setMaxCount(9999);
 
         $this->setTitle($lng->txt("book_booking_objects"));
         $this->setData($objects_manager->getDataArrayFromInputString($raw_data));
 
         $this->addColumn($this->lng->txt("title"));
         $this->addColumn($this->lng->txt("description"));
-        $this->addColumn($this->lng->txt("book_nr_objects"));
+        $this->addColumn($this->lng->txt("booking_nr_of_items"));
 
         $this->setFormAction($ctrl->getFormAction($a_parent_obj, "createObjects"));
         $this->setRowTemplate(

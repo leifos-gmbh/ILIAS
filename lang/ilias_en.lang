@@ -16932,3 +16932,8 @@ book#:#book_object_selection#:#Object Selection
 book#:#book_obj_select#:#Select
 book#:#book_refresh#:#Refresh
 book#:#book_bulk_creation#:#Bulk Creation
+book#:#book_create_objects#:#Create Objects
+book#:#book_bulk_data#:#Object Data
+book#:#book_title_description_nr#:#Title; Description; Number of Objects
+book#:#book_title_description_nr_info#:#Enter title, description and number of objects separated by semicolon or TAB character. Use one line per object. Pasting a three column table via clipboard from a spreadsheet application should usually work.
+book#:#book_bulk_confirmation#:#Please check, if all values are listed correctly.

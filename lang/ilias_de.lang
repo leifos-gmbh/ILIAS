@@ -16931,3 +16931,8 @@ book#:#book_week#:#Wochenansicht
 book#:#book_object_selection#:#Objektauswahl
 book#:#book_refresh#:#Aktualisieren
 book#:#book_bulk_creation#:#Massenerstellung
+book#:#book_create_objects#:#Objekte erstellen
+book#:#book_bulk_data#:#Objektdaten
+book#:#book_title_description_nr#:#Titel; Beschreibung; Anzahl
+book#:#book_title_description_nr_info#:#Geben Sie bitte Titel, Beschreibung und Anzahl getrennt durch ein Semikolon oder TAB ein. Nutzen Sie einen Zeile je Objekt. Sie können alternativ eine dreispaltige Tabelle aus einer Tabellenkalkulation mittels Zwischenablage in das Eingabefeld einfügen.
+book#:#book_bulk_confirmation#:#Bitte überprüfen Sie die angegebenen Werte.

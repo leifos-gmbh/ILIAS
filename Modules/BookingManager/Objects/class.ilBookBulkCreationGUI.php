@@ -21,6 +21,7 @@ use ILIAS\BookingManager\InternalGUIService;
  */
 class ilBookBulkCreationGUI
 {
+    protected \ILIAS\BookingManager\Objects\ObjectsManager $objects_manager;
     protected ilObjBookingPool $pool;
     protected InternalDomainService $domain;
     protected InternalGUIService $gui;
@@ -35,6 +36,9 @@ class ilBookBulkCreationGUI
         $this->gui = $gui;
         $lng = $domain->lng();
         $lng->loadLanguageModule("book");
+        $this->objects_manager = $domain
+            ->objects($pool->getId());
+
     }
 
     public function executeCommand() : void
@@ -49,7 +53,8 @@ class ilBookBulkCreationGUI
                 if (in_array($cmd, [
                     "showCreationForm",
                     "showConfirmationScreen",
-                    "cancelCreation"
+                    "cancelCreation",
+                    "createObjects"
                 ])) {
                     $this->$cmd();
                 }
@@ -76,18 +81,21 @@ class ilBookBulkCreationGUI
     protected function showCreationForm() : void
     {
         $lng = $this->domain->lng();
-        $this->gui->modal($lng->txt("book_bulk_creation"))
-                  ->form($this->getCreationForm())
-                  ->send();
+        $this->gui
+            ->modal($lng->txt("book_bulk_creation"))
+            ->form($this->getCreationForm())
+            ->send();
     }
 
     protected function getCreationForm() : \ILIAS\Repository\Form\FormAdapterGUI
     {
         $lng = $this->domain->lng();
         $schedule_manager = $this->domain->schedules($this->pool->getId());
+        $schedules = $schedule_manager->getScheduleList();
         return $this
             ->gui
             ->form(self::class, "showConfirmationScreen")
+            ->asyncModal()
             ->section("creation", $lng->txt("book_bulk_data"))
             ->textarea(
                 "data",
@@ -96,9 +104,11 @@ class ilBookBulkCreationGUI
             )
             ->required()
             ->select(
-                "schedule",
+                "schedule_id",
                 $lng->txt("book_schedule"),
-                $schedule_manager->getScheduleList()
+                $schedules,
+                "",
+                (string) array_key_first($schedules)
             )
             ->required();
     }
@@ -114,11 +124,14 @@ class ilBookBulkCreationGUI
         }
 
         $this->gui->modal($lng->txt("book_bulk_creation"))
-                  ->legacy($this->renderConfirmation($form->getData("data")))
+                  ->legacy($this->renderConfirmation(
+                      $form->getData("data"),
+                      (int) $form->getData("schedule_id")
+                  ))
                   ->send();
     }
 
-    protected function renderConfirmation(string $data) : string
+    protected function renderConfirmation(string $data, int $schedule_id) : string
     {
         $lng = $this->domain->lng();
         $ctrl = $this->gui->ctrl();
@@ -145,6 +158,7 @@ EOT;
             $lng->txt("book_bulk_confirmation")
         )->withButtons([$button1]);
 
+        $ctrl->setParameter($this, "schedule_id", $schedule_id);
         $table = new ilBookingBulkCreationTableGUI(
             $this,
             "renderConfirmation",
@@ -158,10 +172,15 @@ EOT;
 
     protected function createObjects() : void
     {
+        $main_tpl = $this->gui->mainTemplate();
+        $ctrl = $this->gui->ctrl();
+        $lng = $this->domain->lng();
         $request = $this->gui->standardRequest();
+
         $data = $request->getBulkCreationData();
-        var_dump($data);
-        exit;
+        $arr = $this->objects_manager->createObjectsFromBulkInputString($data, $request->getScheduleId());
+        $main_tpl->setOnScreenMessage("success", $lng->txt("msg_obj_modified"), true);
+        $ctrl->returnToParent($this);
     }
 
     protected function cancelCreation() : void

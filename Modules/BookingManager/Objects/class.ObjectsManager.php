@@ -72,9 +72,9 @@ class ObjectsManager
         $rows = explode("\n", $input);
         $data = [];
         foreach ($rows as $row) {
-            $cells = explode(";", $input);
+            $cells = explode(";", $row);
             if (count($cells) === 1) {
-                $cells = explode("\t", $input);
+                $cells = explode("\t", $row);
             }
             $data[] = [
                 "title" => trim($cells[0] ?? ""),
@@ -83,6 +83,19 @@ class ObjectsManager
             ];
         }
         return $data;
+    }
+
+    public function createObjectsFromBulkInputString(string $input, int $schedule_id) : void
+    {
+        foreach ($this->getDataArrayFromInputString($input) as $data) {
+            $object = new \ilBookingObject();
+            $object->setTitle($data["title"]);
+            $object->setDescription($data["description"]);
+            $object->setNrOfItems((int) $data["nr"]);
+            $object->setPoolId($this->pool_id);
+            $object->setScheduleId($schedule_id);
+            $object->save();
+        }
     }
 
 }

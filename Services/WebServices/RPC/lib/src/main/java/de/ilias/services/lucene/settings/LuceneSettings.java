@@ -22,18 +22,17 @@
 
 package de.ilias.services.lucene.settings;
 
+import de.ilias.services.db.DBFactory;
+import de.ilias.services.settings.LocalSettings;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
 import java.util.HashMap;
-
-import org.apache.logging.log4j.LogManager;
-
-import de.ilias.services.db.DBFactory;
-import de.ilias.services.settings.LocalSettings;
-import org.apache.logging.log4j.Logger;
 
 /**
  * 
@@ -47,7 +46,7 @@ public class LuceneSettings {
 	public static final int OPERATOR_OR = 2;
 	
 	protected static Logger logger = LogManager.getLogger(LuceneSettings.class);
-	private static HashMap<String, LuceneSettings> instances = new HashMap<String, LuceneSettings>();
+	private static final HashMap<String, LuceneSettings> instances = new HashMap<String, LuceneSettings>();
 	
 	
 	private int fragmentSize = 30;
@@ -142,7 +141,7 @@ public class LuceneSettings {
 	
 	public boolean isPrefixWildcardQueryEnabled()
 	{
-		return this.prefixWildcard > 0 ? true : false;
+		return this.prefixWildcard > 0;
 	}
 	
 	public void enablePrefixWildcardQuery(int stat) {

@@ -58,17 +58,17 @@ import org.apache.lucene.search.highlight.InvalidTokenOffsetsException;
  */
 public class HitHighlighter {
 
-	private static int FRAGMENT_TITLE_SIZE = 10000;
-	private static String HIGHLIGHT_SEPARATOR = "...";
+	private static final int FRAGMENT_TITLE_SIZE = 10000;
+	private static final String HIGHLIGHT_SEPARATOR = "...";
 	
-	private static String HIGHLIGHT_BEGIN_TAG = "<span class=\"ilSearchHighlight\">";
-	private static String HIGHLIGHT_END_TAG = "</span>";
+	private static final String HIGHLIGHT_BEGIN_TAG = "<span class=\"ilSearchHighlight\">";
+	private static final String HIGHLIGHT_END_TAG = "</span>";
 	
 	protected static Logger logger = LogManager.getLogger(HitHighlighter.class);
 	
 	private IndexSearcher searcher;
-	private Query query;
-	private ScoreDoc[] hits;
+	private final Query query;
+	private final ScoreDoc[] hits;
 	
 	private Highlighter highlighter;
 	private Highlighter titleHighlighter;
@@ -228,9 +228,8 @@ public class HitHighlighter {
 		
 		// init searcher
 		searcher = SearchHolder.getInstance().getSearcher();
-		
-		return;
-	}
+
+    }
 
 	/**
 	 * @return

@@ -38,7 +38,7 @@ import org.apache.logging.log4j.Logger;
 public class ObjectDefinitions {
 
 	protected static Logger logger = LogManager.getLogger(ObjectDefinitions.class);
-	private static HashMap<File, ObjectDefinitions> instances = new HashMap<File, ObjectDefinitions>();
+	private static final HashMap<File, ObjectDefinitions> instances = new HashMap<File, ObjectDefinitions>();
 	
 	private File absolutePath;
 	private Vector<ObjectDefinition> definitions = new Vector<ObjectDefinition>();

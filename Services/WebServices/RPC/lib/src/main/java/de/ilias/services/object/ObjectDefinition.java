@@ -51,7 +51,7 @@ public class ObjectDefinition implements DocumentHandler {
 	
 	private String type;
 	private String indexType = "full";
-	private Vector<DocumentDefinition> documents = new Vector<DocumentDefinition>();
+	private final Vector<DocumentDefinition> documents = new Vector<DocumentDefinition>();
 	
 	/**
 	 * 
@@ -129,7 +129,6 @@ public class ObjectDefinition implements DocumentHandler {
 		while((index = documents.indexOf(doc)) != -1) {
 			documents.remove(index);
 		}
-		return;
 	}
 
 	/* (non-Javadoc)

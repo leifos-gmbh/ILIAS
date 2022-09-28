@@ -22,22 +22,20 @@
 
 package de.ilias.services.lucene.index;
 
-import de.ilias.services.lucene.settings.LuceneSettings;
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.logging.Level;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.IndexWriter;
 import de.ilias.services.settings.ClientSettings;
 import de.ilias.services.settings.ConfigurationException;
 import de.ilias.services.settings.LocalSettings;
 import de.ilias.services.settings.ServerSettings;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
 
 /**
  * Capsulates the interaction between IndexReader and IndexWriter
@@ -52,8 +50,8 @@ public class IndexHolder {
 	
 	public static final int MAX_NUM_SEGMENTS = 100;
 	
-	private static HashMap<String, IndexHolder> instances = new HashMap<String, IndexHolder>();
-	private ClientSettings settings;
+	private static final HashMap<String, IndexHolder> instances = new HashMap<String, IndexHolder>();
+	private final ClientSettings settings;
 	private IndexWriter writer;
 	
 	
@@ -144,7 +142,7 @@ public class IndexHolder {
 		
 		for(Object key : instances.keySet()) {
 			try {
-				logger.info("Closing writer: " + (String) key);
+				logger.info("Closing writer: " + key);
 				IndexHolder holder = instances.get((String) key);
 				IndexDirectoryFactory.getDirectory(ClientSettings.getInstance((String) key).getIndexPath()).close();
 				holder.close();

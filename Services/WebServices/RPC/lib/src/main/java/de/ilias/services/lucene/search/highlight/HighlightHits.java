@@ -42,7 +42,7 @@ public class HighlightHits implements ResultExport {
 
 	protected static Logger logger = LogManager.getLogger(HighlightHits.class);
 	
-	private HashMap<Integer, HighlightObject> objects = new HashMap<Integer, HighlightObject>();
+	private final HashMap<Integer, HighlightObject> objects = new HashMap<Integer, HighlightObject>();
 	
 	private double maxScore = 0;
 	

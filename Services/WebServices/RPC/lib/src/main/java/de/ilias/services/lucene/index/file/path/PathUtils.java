@@ -91,7 +91,7 @@ public class PathUtils {
 		}
 		fullPath.append(name);
 		fullPath.append('_');
-		fullPath.append(String.valueOf(objId));
+		fullPath.append(objId);
 		fullPath.append(System.getProperty("file.separator"));
 		
 		return fullPath.toString();
@@ -108,18 +108,18 @@ public class PathUtils {
 		
 		if(version < 10) {
 			directoryName.append("00");
-			directoryName.append(String.valueOf(version));
+			directoryName.append(version);
 			return directoryName.toString();
 		}
 		else if(version < 100) {
 			directoryName.append("0");
-			directoryName.append(String.valueOf(version));
+			directoryName.append(version);
 			return directoryName.toString();
 			
 		}
 		else
 		{
-			directoryName.append(String.valueOf(version));
+			directoryName.append(version);
 			return directoryName.toString();
 		}
 	}

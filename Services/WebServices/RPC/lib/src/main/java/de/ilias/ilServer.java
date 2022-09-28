@@ -22,24 +22,19 @@
 
 package de.ilias;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Vector;
-
+import de.ilias.services.rpc.RPCServer;
+import de.ilias.services.settings.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 import org.apache.xmlrpc.client.XmlRpcCommonsTransportFactory;
 
-import de.ilias.services.rpc.RPCServer;
-import de.ilias.services.settings.ClientSettings;
-import de.ilias.services.settings.ConfigurationException;
-import de.ilias.services.settings.IniFileParser;
-import de.ilias.services.settings.LogConfigParser;
-import de.ilias.services.settings.ServerSettings;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Vector;
 
 
 /**
@@ -50,9 +45,9 @@ import org.apache.logging.log4j.Logger;
  */
 public class ilServer {
 
-	private String version = "4.4.0.1";
+	private final String version = "4.4.0.1";
 	
-	private String[] arguments;
+	private final String[] arguments;
 	private String command;
 	
 	private static Logger logger = null;

@@ -117,10 +117,10 @@ public class FileObjectPathCreator implements PathCreator {
 				return file;
 			}
 			if(!file.exists()) {
-				throw new PathCreatorException("Cannot find file: " + fullPath.toString());
+				throw new PathCreatorException("Cannot find file: " + fullPath);
 			}
 			if(!file.canRead()) {
-				throw new PathCreatorException("Cannot read file: " + fullPath.toString());
+				throw new PathCreatorException("Cannot read file: " + fullPath);
 			}
 			return null;
 		} 

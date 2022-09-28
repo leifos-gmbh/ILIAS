@@ -75,7 +75,6 @@ public class FileDataSource extends DataSource {
 				((FieldDefinition) field).writeDocument(handler.getContent(file, extension));
 			}
 			logger.debug("File path is: " + file.getAbsolutePath());
-			return;
 		}
 		catch (PathCreatorException e) {
 			if(file != null)

@@ -23,41 +23,24 @@
 package de.ilias.services.transformation;
 
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
-import java.net.URL;
-
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.sax.SAXResult;
-import javax.xml.transform.stream.StreamSource;
-import org.apache.avalon.framework.configuration.Configuration;
-import org.apache.avalon.framework.configuration.ConfigurationException;
-import org.apache.avalon.framework.configuration.DefaultConfigurationBuilder;
-
-import org.apache.fop.apps.FOUserAgent;
-import org.apache.fop.apps.Fop;
-import org.apache.fop.apps.FopFactory;
-import org.apache.fop.apps.FormattingResults;
-import org.apache.fop.apps.MimeConstants;
-import org.apache.fop.apps.PageSequenceResults;
+import org.apache.fop.apps.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
+
+import javax.xml.transform.*;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.stream.StreamSource;
+import java.io.*;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 public class FO2PDF {
     
     private static FO2PDF instance = null;
 	
-	private Logger logger = LogManager.getLogger(this.getClass().getName());
+	private final Logger logger = LogManager.getLogger(this.getClass().getName());
     private String foString = null;
     private byte[] pdfByteArray = null;
 	private FopFactory fopFactory = null;
@@ -73,26 +56,13 @@ public class FO2PDF {
 			URL fopConfigUrl = getClass().getResource("/de/ilias/config/fopConfig.xml");
 			logger.info("Using config uri: " + fopConfigUrl.toURI());
 				
-			// load custom config
-			DefaultConfigurationBuilder config = new DefaultConfigurationBuilder();
-			Configuration cfg = config.build(fopConfigUrl.toURI().toString());
-				
-			fopFactory = FopFactory.newInstance();
-			fopFactory.setUserConfig(cfg);
+			fopFactory = FopFactory.newInstance(fopConfigUrl.toURI());
 			fopFactory.getFontManager().deleteCache();
-			fopFactory.getFontManager().useCache();
-			
+
 		} 
 		catch (SAXException ex) {
 			logger.error("Cannot load fop configuration:" + ex);
-		} 
-		catch (IOException ex) {
-			logger.error("Cannot load fop configuration:" + ex);
-		} 
-		catch (ConfigurationException ex) {
-			logger.error("Cannot load fop configuration:" + ex);
-		} 
-		catch (URISyntaxException ex) {
+		} catch (URISyntaxException ex) {
 			logger.error("Cannot load fop configuration:" + ex);
 		}
         
@@ -202,6 +172,6 @@ public class FO2PDF {
     
     private InputStream getFoInputStream() throws UnsupportedEncodingException { 
         
-        return new ByteArrayInputStream(getFoString().getBytes("utf8"));
+        return new ByteArrayInputStream(getFoString().getBytes(StandardCharsets.UTF_8));
     }
 }

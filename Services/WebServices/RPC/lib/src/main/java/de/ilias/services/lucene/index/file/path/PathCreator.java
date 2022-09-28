@@ -38,7 +38,7 @@ import org.apache.logging.log4j.Logger;
  */
 public interface PathCreator {
 
-	public static Logger logger = LogManager.getLogger(PathCreator.class);
+	Logger logger = LogManager.getLogger(PathCreator.class);
 	
 	
 	/**
@@ -48,7 +48,7 @@ public interface PathCreator {
 	 * @return
 	 * @throws PathCreatorException
 	 */
-	public File buildFile(CommandQueueElement el, ResultSet res) throws PathCreatorException;
+    File buildFile(CommandQueueElement el, ResultSet res) throws PathCreatorException;
 
 	/**
 	 * Build absolute file path
@@ -56,7 +56,7 @@ public interface PathCreator {
 	 * @return
 	 * @throws PathCreatorException
 	 */
-	public File buildFile(CommandQueueElement el) throws PathCreatorException;
+    File buildFile(CommandQueueElement el) throws PathCreatorException;
 	
 	
 	/**
@@ -65,5 +65,5 @@ public interface PathCreator {
 	 * @param res
 	 * @return String
 	 */
-	public String getExtension(CommandQueueElement el, ResultSet res);
+    String getExtension(CommandQueueElement el, ResultSet res);
 }

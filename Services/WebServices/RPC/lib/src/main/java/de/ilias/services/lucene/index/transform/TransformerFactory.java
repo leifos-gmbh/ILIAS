@@ -39,7 +39,7 @@ public class TransformerFactory {
 
 	protected static Logger logger = LogManager.getLogger(Transformer.class);
 	
-	private static HashMap<String, ContentTransformer> map = new HashMap<String, ContentTransformer>();
+	private static final HashMap<String, ContentTransformer> map = new HashMap<String, ContentTransformer>();
 	
 	public static ContentTransformer factory(String name) {
 		

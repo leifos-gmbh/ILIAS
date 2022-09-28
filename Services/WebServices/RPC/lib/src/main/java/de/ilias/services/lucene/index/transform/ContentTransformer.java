@@ -35,7 +35,7 @@ import org.apache.logging.log4j.Logger;
  */
 public interface ContentTransformer {
 
-	public static Logger logger = LogManager.getLogger(ContentTransformer.class);
+	Logger logger = LogManager.getLogger(ContentTransformer.class);
 	
 	/**
 	 * String which will be filtered
@@ -43,5 +43,5 @@ public interface ContentTransformer {
 	 * @param content
 	 * @return
 	 */
-	public String transform(String content);
+    String transform(String content);
 }

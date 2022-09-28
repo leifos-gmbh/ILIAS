@@ -22,22 +22,15 @@
 
 package de.ilias.services.db;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.HashMap;
-
-
-import org.apache.logging.log4j.LogManager;
-
 import de.ilias.services.settings.ClientSettings;
 import de.ilias.services.settings.ConfigurationException;
 import de.ilias.services.settings.LocalSettings;
 import de.ilias.services.settings.ServerSettings;
-import oracle.jdbc.OraclePreparedStatement;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.sql.*;
+import java.util.HashMap;
 
 /**
  * A thread local singleton for db connections
@@ -47,11 +40,11 @@ import org.apache.logging.log4j.Logger;
  */
 public class DBFactory {
 
-	private static Logger logger = LogManager.getLogger(DBFactory.class);
+	private static final Logger logger = LogManager.getLogger(DBFactory.class);
 	
-	private static String MARIA_DB_CONNECTOR = "jdbc:mariadb://";
+	private static final String MARIA_DB_CONNECTOR = "jdbc:mariadb://";
 	
-	private static ThreadLocal<HashMap<String, PreparedStatement>> ps = new ThreadLocal<HashMap<String,PreparedStatement>>() {
+	private static final ThreadLocal<HashMap<String, PreparedStatement>> ps = new ThreadLocal<HashMap<String,PreparedStatement>>() {
 		protected HashMap<String, PreparedStatement> initialValue() {
 			
 			return new HashMap<String, PreparedStatement>();
@@ -62,7 +55,7 @@ public class DBFactory {
 		}
 	};
 	
-	private static ThreadLocal<Connection> connection = new ThreadLocal<Connection>() {
+	private static final ThreadLocal<Connection> connection = new ThreadLocal<Connection>() {
 
 		protected Connection initialValue() {
 			try {
@@ -88,37 +81,6 @@ public class DBFactory {
 						client.getDbPass()
 					);
 				}
-				// Oracle
-				else if(client.getDbType().equalsIgnoreCase("oracle")) {
-					
-					logger.info("Loading Oracle driver...");
-					Class.forName("oracle.jdbc.driver.OracleDriver");
-					
-					if(client.getDbName().length() == 0) {
-						
-						String url = "jdbc:oracle:thin:" + client.getDbUser() + "/" + client.getDbPass() + "@" + client.getDbHost();
-						String log = "jdbc:oracle:thin:" + client.getDbUser() + "/" + "******" + "@" + client.getDbHost();
-						logger.info("Using tnsname.ora: " + log);
-						
-						try {
-							System.setProperty("oracle.net.tns_admin",server.lookupTnsAdmin());
-						}
-						catch(SecurityException e) {
-							logger.error("Cannot connect to database: " + e);
-							return null;
-						}
-						catch(NullPointerException e) {
-							logger.error("No TNS_ADMIN given: " + e);
-							return null;
-						}
-						return DriverManager.getConnection(url);
-					}
-					
-					logger.info("Using URL: " +
-							client.getDbUrl()
-					);
-					return DriverManager.getConnection(client.getDbUrl());
-				}
 				else {
 					logger.error("Unsupported db type given." + client.getDbType());
 					throw new ConfigurationException("Unsupported db type given." + client.getDbType());
@@ -129,11 +91,6 @@ public class DBFactory {
 			} 
 			catch (ConfigurationException e) {
 				logger.error("Cannot connect to database: " + e);
-			} 
-			catch (ClassNotFoundException e) {
-				// no oracle driver!
-				logger.error(e);
-				logger.error("Could not load the JDBC driver.");
 			}
 			return null;
 		}
@@ -161,7 +118,7 @@ public class DBFactory {
 	public static Connection factory() throws SQLException {
 		
 		logger.debug("====================================== Used cached DB connector.");
-		return (Connection) connection.get();
+		return connection.get();
 	}
 	
 	public static void init() {
@@ -226,7 +183,7 @@ public class DBFactory {
 					// Close connection
 				}
 				catch (SQLException e) {
-					logger.warn("Cannot close prepared statement: " + pst.toString());
+					logger.warn("Cannot close prepared statement: " + pst);
 					logger.warn(e);
 				}
 				catch (Throwable t) {
@@ -261,24 +218,18 @@ public class DBFactory {
 		
 		ClientSettings client;
 		try {
-			
 			client = ClientSettings.getInstance(LocalSettings.getClientKey());
 			if(client.getDbType().equals("mysql")) {
 				
 				ps.setString(index, str);
 				return ps;
 			}
-			else {
-				
-				((OraclePreparedStatement) ps).setFixedCHAR(index, str);
-				return (PreparedStatement) ps;
-			}
 		}
 		catch (ConfigurationException e) {
 			// shouldn't happen here
 			logger.error(e);
 		}
-		return (PreparedStatement) ps;
+		return ps;
 	}
 	
 	/**

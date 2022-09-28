@@ -72,19 +72,19 @@ public class FileObjectPathCreator7  implements PathCreator
 			fullPath.append(res.getString("resource_path"));
 			versionPath.append(fullPath);
 			versionPath.append(System.getProperty("file.separator"));
-			versionPath.append(String.valueOf(versionCode));
+			versionPath.append(versionCode);
 			versionPath.append(System.getProperty("file.separator"));
 			versionPath.append(BIN_NAME);
 			
-			logger.info("Detected file object path is: " + versionPath.toString());
+			logger.info("Detected file object path is: " + versionPath);
 
 			file = new File(versionPath.toString());
 			if (!file.exists()) {
-			  throw new PathCreatorException("Cannot find file: " + fullPath.toString());
+			  throw new PathCreatorException("Cannot find file: " + fullPath);
 			}
 
 			if (!file.canRead()) {
-			  throw new PathCreatorException("Cannot read file: " + fullPath.toString());
+			  throw new PathCreatorException("Cannot read file: " + fullPath);
 			}
 
 			return file;
@@ -110,9 +110,9 @@ public class FileObjectPathCreator7  implements PathCreator
 			String fileName = res.getString("file_name");
 	        int dotIndex = fileName.lastIndexOf(".");
 	        if((dotIndex > 0) && (dotIndex < fileName.length())) {
-	            extension.append(fileName.substring(dotIndex + 1, fileName.length()));
+	            extension.append(fileName.substring(dotIndex + 1));
 			}
-			logger.info("Extraced extension: " + extension.toString() + " from file name: " + fileName);
+			logger.info("Extraced extension: " + extension + " from file name: " + fileName);
 
 		} catch (SQLException ex) {
 			logger.error(ex.toString());

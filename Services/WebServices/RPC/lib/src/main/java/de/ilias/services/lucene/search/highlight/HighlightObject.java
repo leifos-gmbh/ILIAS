@@ -23,13 +23,13 @@
 package de.ilias.services.lucene.search.highlight;
 
 
+import de.ilias.services.lucene.search.ResultExport;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom.Element;
 
-import de.ilias.services.lucene.search.ResultExport;
 import java.util.Comparator;
 import java.util.TreeMap;
-import org.apache.logging.log4j.Logger;
 
 /**
  * 
@@ -41,7 +41,7 @@ public class HighlightObject implements ResultExport, Comparator {
 
 	protected static Logger logger = LogManager.getLogger(HighlightObject.class);
 	
-	private TreeMap<Integer, HighlightItem> items = new TreeMap<Integer, HighlightItem>();
+	private final TreeMap<Integer, HighlightItem> items = new TreeMap<Integer, HighlightItem>();
 	private TreeMap<Integer, HighlightItem> sortedItems = new TreeMap<Integer, HighlightItem>();
 	
 	private int objId;

@@ -46,7 +46,7 @@ public class QueryRewriter {
 	protected static Logger logger = LogManager.getLogger(QueryRewriter.class);
 	
 	private String query;
-	private StringBuffer rewritten;
+	private final StringBuffer rewritten;
 	private int mode;
 	private Vector<Integer> objIds = new Vector<Integer>();
 	
@@ -106,7 +106,7 @@ public class QueryRewriter {
 		}
 		rewritten.append(" ) AND docType:separated)");
 
-		logger.debug("Searching for: " + rewritten.toString());
+		logger.debug("Searching for: " + rewritten);
 		return rewritten.toString();
 	}
 	
@@ -129,7 +129,7 @@ public class QueryRewriter {
 		}
 		rewritten.append(") AND docType:separated) ");
 		
-		logger.debug("Searching for: " + rewritten.toString());
+		logger.debug("Searching for: " + rewritten);
 		return rewritten.toString();
 	}
 
@@ -143,7 +143,7 @@ public class QueryRewriter {
 		rewritten.append(")");
 		rewritten.append(" AND +docType:combined");
 		
-		logger.debug("Searching for: " + rewritten.toString());
+		logger.debug("Searching for: " + rewritten);
 		return rewritten.toString();
 	}
 	
@@ -158,7 +158,7 @@ public class QueryRewriter {
 		rewritten.append(")");
 		rewritten.append(" AND type:usr");
 		
-		logger.info("Searching for:" + rewritten.toString());
+		logger.info("Searching for:" + rewritten);
 		return rewritten.toString();
 	}
 

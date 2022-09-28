@@ -40,7 +40,7 @@ public class PageObjectHandler extends DefaultHandler {
 
 	protected Logger logger = LogManager.getLogger(PageObjectHandler.class);
 	
-	private StringBuffer buffer = new StringBuffer();
+	private final StringBuffer buffer = new StringBuffer();
 	private boolean isContent = false;
 	
 	public void endDocument() {
@@ -91,7 +91,7 @@ public class PageObjectHandler extends DefaultHandler {
 	/**
 	 * 
 	 */
-    public void characters (char ch[], int start, int length)
+    public void characters (char[] ch, int start, int length)
 	throws SAXException
     {
     	if(!isContent) {

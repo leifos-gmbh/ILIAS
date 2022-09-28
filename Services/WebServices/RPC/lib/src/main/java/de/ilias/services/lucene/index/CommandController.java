@@ -52,7 +52,7 @@ import org.apache.lucene.index.IndexWriter;
  */
 public class CommandController {
 
-	private static ThreadLocal<CommandController> instance = new ThreadLocal<CommandController>() {
+	private static final ThreadLocal<CommandController> instance = new ThreadLocal<CommandController>() {
 		
 		/**
 		 *  Init value 
@@ -75,8 +75,8 @@ public class CommandController {
 	
 	private Vector<Integer> finished = new Vector<Integer>();
 	private CommandQueue queue;
-	private ObjectDefinitions objDefinitions;
-	private IndexHolder holder;
+	private final ObjectDefinitions objDefinitions;
+	private final IndexHolder holder;
 	
 	/**
 	 * @throws SQLException 
@@ -370,7 +370,7 @@ public class CommandController {
 	 */
 	private void deleteDocument(CommandQueueElement el) throws CorruptIndexException, IOException {
 
-		logger.debug("Deleteing document with objId: " + String.valueOf(el.getObjId()));
+		logger.debug("Deleteing document with objId: " + el.getObjId());
 		holder.getWriter().deleteDocuments(new Term("objId",String.valueOf(el.getObjId())));
 	}
 

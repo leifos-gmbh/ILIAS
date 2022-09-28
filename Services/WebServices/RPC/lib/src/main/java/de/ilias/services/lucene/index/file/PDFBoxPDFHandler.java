@@ -51,7 +51,7 @@ public class PDFBoxPDFHandler implements FileHandler {
 
 		PDDocument pddo = null;
 		PDFTextStripper stripper = null;
-		String str = new String("");
+		String str = "";
 		
 		try {
 
@@ -81,8 +81,7 @@ public class PDFBoxPDFHandler implements FileHandler {
 					pddo.close();
 			}
 			catch (IOException e) {
-				;
-			}
+            }
 		}
 		return str;
 	}

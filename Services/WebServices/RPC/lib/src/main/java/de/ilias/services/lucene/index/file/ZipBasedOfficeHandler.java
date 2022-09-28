@@ -68,7 +68,7 @@ public abstract class ZipBasedOfficeHandler {
 				
 				if(entry.getName().equalsIgnoreCase(getContentFileName())) {
 					int count;
-					byte data[] = new byte[BUFFER];
+					byte[] data = new byte[BUFFER];
 					while((count = zip.read(data,0,BUFFER)) != -1) {
 						bout.write(data, 0, count);
 					}

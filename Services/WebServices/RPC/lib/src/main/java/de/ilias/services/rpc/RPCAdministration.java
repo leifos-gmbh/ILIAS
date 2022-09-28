@@ -43,7 +43,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class RPCAdministration {
 
-	private Logger logger = LogManager.getLogger(this.getClass().getName());
+	private final Logger logger = LogManager.getLogger(this.getClass().getName());
 
 	
 	/**

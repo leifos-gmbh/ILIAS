@@ -33,9 +33,9 @@ public class ilServerStatus {
 	public static final String STOPPED = "Stopped";
 	public static final String INDEXING = "Indexing";
 	
-	private static Logger logger = LogManager.getLogger(ilServerStatus.class);
+	private static final Logger logger = LogManager.getLogger(ilServerStatus.class);
 	
-	private static HashMap<String, Boolean> indexer = new HashMap<String, Boolean>();
+	private static final HashMap<String, Boolean> indexer = new HashMap<String, Boolean>();
 	private static boolean active = false;
 
 	
@@ -75,11 +75,8 @@ public class ilServerStatus {
 	 * @param clientKey
 	 */
 	public static void removeIndexer(String clientKey) {
-		
-		if(indexer.containsKey(clientKey)) {
-			
-			indexer.remove(clientKey);
-		}
+
+        indexer.remove(clientKey);
 	}
 	
 	/**

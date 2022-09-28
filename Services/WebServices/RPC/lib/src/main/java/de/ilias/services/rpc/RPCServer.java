@@ -47,7 +47,7 @@ import org.apache.logging.log4j.Logger;
 public class RPCServer {
 	
 	private static RPCServer instance = null;
-	private Logger logger = LogManager.getLogger(this.getClass().getName());
+	private final Logger logger = LogManager.getLogger(this.getClass().getName());
 
 	private WebServer server;
 	private InetAddress host = null;
@@ -142,8 +142,7 @@ public class RPCServer {
 		config.setKeepAliveEnabled(true);
 		config.setEncoding("UTF8");
 		// nothing to do in the moment.
-		
-		return;
+
 	}
 	
 	/**

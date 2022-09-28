@@ -25,16 +25,15 @@ package de.ilias.services.lucene.index.file;
 
 import de.ilias.services.settings.ConfigurationException;
 import de.ilias.services.settings.ServerSettings;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.poi.POITextExtractor;
+import org.apache.poi.extractor.OLE2ExtractorFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.poi.POITextExtractor;
-import org.apache.poi.extractor.ExtractorFactory;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 
 /**
  * 
@@ -76,7 +75,7 @@ public class ExtensionFileHandler {
 			if ((extension.length() == 0)
 				&& (dotIndex > 0)
 				&& (dotIndex < fname.length())) {
-				extension = fname.substring(dotIndex + 1, fname.length());
+				extension = fname.substring(dotIndex + 1);
 			}
 			if (extension.equalsIgnoreCase("")) {
 				logger.warn("no valid extension found for: " + file.getName());
@@ -111,10 +110,6 @@ public class ExtensionFileHandler {
 				return getOpenOfficeDocument(file);
 			}
 			if (extension.equalsIgnoreCase("stw")) {
-				logger.info("Using getOpenOfficeDocument() for " + file.getName());
-				return getOpenOfficeDocument(file);
-			}
-			if (extension.equalsIgnoreCase("sxw")) {
 				logger.info("Using getOpenOfficeDocument() for " + file.getName());
 				return getOpenOfficeDocument(file);
 			}
@@ -178,8 +173,8 @@ public class ExtensionFileHandler {
     	try {
     		StringBuilder content = new StringBuilder();
     		POITextExtractor extractor = null;
-    		
-    		extractor = ExtractorFactory.createExtractor(fis = new FileInputStream(file));
+
+    		extractor = OLE2ExtractorFactory.createExtractor(fis = new FileInputStream(file));
     		content.append(extractor.getText());
 
     		if(content.length() > 0) {
@@ -190,10 +185,6 @@ public class ExtensionFileHandler {
     		}
     		//logger.debug("Parsed content is: " + content.toString());
     		return content.toString();
-    	}
-    	catch (InvalidFormatException e) {
-    		logger.info("File is not a compatible POI file.");
-        	logger.info("Current file is: " + file.getAbsolutePath());
     	}
     	catch(IllegalArgumentException e) {
     		logger.info("No handler found.");
@@ -227,7 +218,7 @@ public class ExtensionFileHandler {
     private String getTextDocument(File file) throws FileHandlerException {
         
         FileInputStream fis = null;
-    	FileHandler doch = (FileHandler) new PlainTextHandler();
+    	FileHandler doch = new PlainTextHandler();
         
         try {
             return doch.getContent(fis = new FileInputStream(file.getAbsolutePath()));
@@ -259,7 +250,7 @@ public class ExtensionFileHandler {
      */
 	private String getPDFDocument(File file) throws FileHandlerException {
         
-    	FileHandler doch = (FileHandler) new PDFBoxPDFHandler();
+    	FileHandler doch = new PDFBoxPDFHandler();
     	FileInputStream fis = null;
         logger.debug("Start PDFBoxPDFHandler...");
 
@@ -296,7 +287,7 @@ public class ExtensionFileHandler {
     private String getHTMLDocument(File file) throws FileHandlerException {
         
     	FileInputStream fis = null;
-        FileHandler doch = (FileHandler) new JTidyHTMLHandler();
+        FileHandler doch = new JTidyHTMLHandler();
         
         try {
             return doch.getContent(fis = new FileInputStream(file.getAbsolutePath()));
@@ -324,7 +315,7 @@ public class ExtensionFileHandler {
 	private String getOpenOfficeDocument(File file) throws FileHandlerException {
 
 		FileInputStream fis = null;
-		FileHandler doch = (FileHandler) new OpenOfficeDefaultHandler();
+		FileHandler doch = new OpenOfficeDefaultHandler();
 		
 		try {
 			return doch.getContent(fis = new FileInputStream(file.getAbsolutePath()));
@@ -376,7 +367,7 @@ public class ExtensionFileHandler {
 	private String getRTFDocument(File file) throws FileHandlerException {
 		
 		FileInputStream fis = null;
-		FileHandler doch = (FileHandler) new RTFHandler();
+		FileHandler doch = new RTFHandler();
 		
 		try {
 			return doch.getContent(fis = new FileInputStream(file.getAbsolutePath()));

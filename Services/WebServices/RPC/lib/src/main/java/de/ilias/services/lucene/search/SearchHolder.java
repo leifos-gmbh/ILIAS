@@ -51,7 +51,7 @@ public class SearchHolder {
 	
 	protected static Logger logger = LogManager.getLogger(IndexHolder.class);
 	
-	private static HashMap<String, SearchHolder> instances = new HashMap<String, SearchHolder>();
+	private static final HashMap<String, SearchHolder> instances = new HashMap<String, SearchHolder>();
 	
 	private IndexSearcher searcher = null;
 

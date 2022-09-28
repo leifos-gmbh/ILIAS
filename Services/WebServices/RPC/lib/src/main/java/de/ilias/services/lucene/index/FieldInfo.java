@@ -40,8 +40,8 @@ public class FieldInfo {
 	
 	protected static Logger logger = LogManager.getLogger(FieldInfo.class);
 	
-	private static HashMap<String, FieldInfo> instances = new HashMap<String, FieldInfo>();
-	private Vector<String> fields = new Vector<String>();
+	private static final HashMap<String, FieldInfo> instances = new HashMap<String, FieldInfo>();
+	private final Vector<String> fields = new Vector<String>();
 	
 	/**
 	 * 
@@ -84,8 +84,7 @@ public class FieldInfo {
 		if(!fields.contains(field)) {
 			fields.add(field);
 		}
-		return;
-	}
+    }
 	
 	/**
 	 * Get fields as Vector

@@ -136,11 +136,9 @@ public class ParameterDefinition {
 	@Override
 	public String toString() {
 
-		StringBuffer out = new StringBuffer();
-		
-		out.append("Parameter " + format + " " + type + " " + value);
-		out.append("\n");
-		return out.toString();
+        String out = "Parameter " + format + " " + type + " " + value +
+                "\n";
+		return out;
 	}
 
 	/**

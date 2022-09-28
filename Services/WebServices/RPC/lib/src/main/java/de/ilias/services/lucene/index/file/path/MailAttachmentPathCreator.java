@@ -37,15 +37,15 @@ public class MailAttachmentPathCreator implements PathCreator {
 			fullPath.append("mail");
 			fullPath.append(System.getProperty("file.separator"));
 			
-			fullPath.append(String.valueOf(DBFactory.getString(res, "path")));
+			fullPath.append(DBFactory.getString(res, "path"));
 
-			logger.info("Try to read from path: " + fullPath.toString());
+			logger.info("Try to read from path: " + fullPath);
 			
 			file = new File(fullPath.toString());
 			if(file.exists() && file.canRead()) {
 				return file;
 			}
-			throw new PathCreatorException("Cannot access directory: " + fullPath.toString());
+			throw new PathCreatorException("Cannot access directory: " + fullPath);
 		}
 		catch (ConfigurationException e) {
 			throw new PathCreatorException(e);

@@ -93,7 +93,7 @@ public class DirectoryDataSource extends FileDataSource {
 			for(Object field : getFields()) {
 				((FieldDefinition) field).writeDocument(content.toString());
 			}
-			logger.debug("Content is : " + content.toString());
+			logger.debug("Content is : " + content);
 		}
 		catch (PathCreatorException e) {
 			throw new DocumentHandlerException(e);
@@ -119,10 +119,7 @@ public class DirectoryDataSource extends FileDataSource {
 						public boolean accept(File path) {
 							
 							if(path.isDirectory()) {
-								if(!path.getName().equals(".svn")) {
-									return true;
-								}
-								return false;
+								return !path.getName().equals(".svn");
 							}
 							else
 							{

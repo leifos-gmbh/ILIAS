@@ -40,7 +40,7 @@ public class DocumentHolder {
 
 	protected static Logger logger = LogManager.getLogger(DocumentHolder.class);
 	
-	private static ThreadLocal<DocumentHolder> thDocumentHolder = new ThreadLocal<DocumentHolder>() {
+	private static final ThreadLocal<DocumentHolder> thDocumentHolder = new ThreadLocal<DocumentHolder>() {
 
 		/**
 		 * init document holder
@@ -134,6 +134,5 @@ public class DocumentHolder {
 				getGlobalDocument().add(new StringField(name, value, store));
 			}
 		}
-		return;
-	}
+    }
 }

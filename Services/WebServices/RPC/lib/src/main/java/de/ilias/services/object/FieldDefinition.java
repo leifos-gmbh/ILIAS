@@ -209,7 +209,7 @@ public class FieldDefinition {
 	 */
 	public String parseName(ResultSet res) throws SQLException {
 		
-		if(isDynamic == false) {
+		if(!isDynamic) {
 			return getName();
 		}
 		if(res != null) {
@@ -348,8 +348,7 @@ public class FieldDefinition {
 				}
 				DocumentHolder.factory().add(fieldName, purged, isGlobal(), store, indexed);
 			}
-			return;
-		}
+        }
 		catch(NullPointerException e) {
 			logger.error("Caught NullPointerException: " + e.getMessage());
 		}

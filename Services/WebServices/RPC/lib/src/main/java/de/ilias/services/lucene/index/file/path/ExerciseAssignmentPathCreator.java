@@ -42,15 +42,15 @@ public class ExerciseAssignmentPathCreator implements PathCreator {
 			fullPath.append("ilExercise");
 			fullPath.append(System.getProperty("file.separator"));
 			fullPath.append(PathUtils.buildSplittedPathFromId(objId,"exc"));
-			fullPath.append("ass_" + String.valueOf(DBFactory.getInt(res, "id")));
+			fullPath.append("ass_" + DBFactory.getInt(res, "id"));
 			
-			logger.info("Try to read from path: " + fullPath.toString());
+			logger.info("Try to read from path: " + fullPath);
 			
 			file = new File(fullPath.toString());
 			if(file.exists() && file.canRead()) {
 				return file;
 			}
-			throw new PathCreatorException("Cannot access directory: " + fullPath.toString());
+			throw new PathCreatorException("Cannot access directory: " + fullPath);
 		}
 		catch (ConfigurationException e) {
 			throw new PathCreatorException(e);

@@ -41,8 +41,7 @@ public final class RPCDebug {
 	 */
 	public void ping() {
 
-		return;
-	}
+    }
 
 	/**
 	 * @return 

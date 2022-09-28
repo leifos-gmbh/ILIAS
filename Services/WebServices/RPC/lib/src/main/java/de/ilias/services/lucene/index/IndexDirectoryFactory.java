@@ -34,7 +34,7 @@ public class IndexDirectoryFactory {
 			return NIOFSDirectory.open(indexPath.toPath());
 		}
 		catch(IOException e) {
-			logger.warn("Cannot create path for file: " + indexPath.toString());
+			logger.warn("Cannot create path for file: " + indexPath);
 			throw e;
 		}
 	}

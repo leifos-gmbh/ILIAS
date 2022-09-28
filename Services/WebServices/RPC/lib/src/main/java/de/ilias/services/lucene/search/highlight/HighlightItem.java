@@ -42,7 +42,7 @@ public class HighlightItem implements ResultExport {
 	
 	private int subId;
 	private double absoluteScore = 0;
-	private Vector<HighlightField> fields = new Vector<HighlightField>();
+	private final Vector<HighlightField> fields = new Vector<HighlightField>();
 	
 
 	/**

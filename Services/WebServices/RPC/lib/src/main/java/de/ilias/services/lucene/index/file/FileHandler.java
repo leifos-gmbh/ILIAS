@@ -40,12 +40,12 @@ public interface FileHandler {
 	 * @throws FileHandlerException
 	 * @throws IOException 
 	 */
-	public String getContent(InputStream is) throws FileHandlerException, IOException;
+    String getContent(InputStream is) throws FileHandlerException, IOException;
 	
 	/**
 	 * 
 	 * @param is
 	 * @return
 	 */
-	public InputStream transformStream(InputStream is);
+    InputStream transformStream(InputStream is);
 }

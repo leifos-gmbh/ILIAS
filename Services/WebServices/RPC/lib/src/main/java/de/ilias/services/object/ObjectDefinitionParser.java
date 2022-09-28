@@ -62,8 +62,8 @@ public class ObjectDefinitionParser {
 
 	protected Logger logger = LogManager.getLogger(ObjectDefinitionParser.class);
 	private Vector<File> objectPropertyFiles = new Vector<File>();
-	private ClientSettings settings;
-	private ObjectDefinitions definitions;
+	private final ClientSettings settings;
+	private final ObjectDefinitions definitions;
 	
 	/**
 	 * @throws ConfigurationException 

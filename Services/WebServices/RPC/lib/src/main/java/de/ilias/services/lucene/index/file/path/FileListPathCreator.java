@@ -116,10 +116,10 @@ public class FileListPathCreator implements PathCreator {
 				return file;
 			}
 			if(!file.exists()) {
-				throw new PathCreatorException("Cannot find file: " + fullPath.toString());
+				throw new PathCreatorException("Cannot find file: " + fullPath);
 			}
 			if(!file.canRead()) {
-				throw new PathCreatorException("Cannot read file: " + fullPath.toString());
+				throw new PathCreatorException("Cannot read file: " + fullPath);
 			}
 			return null;
 		} 
@@ -150,7 +150,7 @@ public class FileListPathCreator implements PathCreator {
 			String fileName = res.getString("file_name");
 	        int dotIndex = fileName.lastIndexOf(".");
 	        if((dotIndex > 0) && (dotIndex < fileName.length())) {
-	            extension.append(fileName.substring(dotIndex + 1, fileName.length()));
+	            extension.append(fileName.substring(dotIndex + 1));
 			}
 
 		} catch (SQLException ex) {

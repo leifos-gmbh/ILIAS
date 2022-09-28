@@ -42,7 +42,7 @@ public class SearchHits implements ResultExport {
 	private int totalHits = 0;
 	private int limit = 0;
 	private double maxScore = 0.0;
-	private Vector<SearchObject> objects = new Vector<SearchObject>();
+	private final Vector<SearchObject> objects = new Vector<SearchObject>();
 
 	/**
 	 *  

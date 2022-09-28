@@ -53,7 +53,7 @@ public class CommandQueue {
 	protected Logger logger = LogManager.getLogger(CommandQueue.class);
 	
 	private Connection db = null;
-	private Vector<CommandQueueElement> elements = new Vector<CommandQueueElement>();
+	private final Vector<CommandQueueElement> elements = new Vector<CommandQueueElement>();
 	private int currentIndex = 0;
 	
 	/**
@@ -73,7 +73,7 @@ public class CommandQueue {
 	 */
 	public void setFinished(CommandQueueElement el) throws SQLException, IllegalArgumentException {
 		
-		if(getElements().removeElement(el) == false) {
+		if(!getElements().removeElement(el)) {
 			throw new IllegalArgumentException("Cannot find element!");
 		}
 		
@@ -291,13 +291,13 @@ public class CommandQueue {
 			ResultSet res = null;
 			PreparedStatement sta = null;
 			
-			if(objType.equalsIgnoreCase("help") == true) {
+			if(objType.equalsIgnoreCase("help")) {
 				
 				sta = DBFactory.getPreparedStatement(
 					"SELECT lm_id obj_id FROM help_module "
 				);
 			}
-			else if(objType.equalsIgnoreCase("usr") != true) 
+			else if(!objType.equalsIgnoreCase("usr"))
 			{
 				sta = DBFactory.getPreparedStatement(
 					"SELECT DISTINCT(oda.obj_id) FROM object_data oda JOIN object_reference ore ON oda.obj_id = ore.obj_id " +

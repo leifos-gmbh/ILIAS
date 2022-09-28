@@ -41,14 +41,14 @@ import org.apache.logging.log4j.Logger;
 public class ObjectDefinitionReader {
 
 	
-	private static Logger logger = LogManager.getLogger(ObjectDefinitionReader.class);
-	private static HashMap<File, ObjectDefinitionReader> instances = new HashMap<File, ObjectDefinitionReader>();
+	private static final Logger logger = LogManager.getLogger(ObjectDefinitionReader.class);
+	private static final HashMap<File, ObjectDefinitionReader> instances = new HashMap<File, ObjectDefinitionReader>();
 	
 	public static final String objectPropertyName = "LuceneObjectDefinition.xml";
 	public static final String pluginPath = "Customizing/global/plugins";
 
 
-	private Vector<File> objectPropertyFiles = new Vector<File>();
+	private final Vector<File> objectPropertyFiles = new Vector<File>();
 	
 
 	File absolutePath;
@@ -144,12 +144,9 @@ public class ObjectDefinitionReader {
 					public boolean accept(File path) {
 						
 						if(path.isDirectory()) {
-							if(!path.getName().equals(".svn")) {
-								//logger.debug("Found new directory: " + path.getAbsolutePath());
-								return true;
-							}
-							return false;
-						}
+                            //logger.debug("Found new directory: " + path.getAbsolutePath());
+                            return !path.getName().equals(".svn");
+                        }
 						//logger.debug(path.getName() + " <-> " + objectPropertyName);
 						if(path.getName().equalsIgnoreCase(objectPropertyName)) {
 							logger.info("Found: " + path.getAbsolutePath());

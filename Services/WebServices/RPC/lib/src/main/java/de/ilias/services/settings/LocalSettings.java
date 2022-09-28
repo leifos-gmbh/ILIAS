@@ -36,7 +36,7 @@ public class LocalSettings {
 
 	protected static Logger logger = LogManager.getLogger(LocalSettings.class);
 
-	private static ThreadLocal<String> clientKey = new ThreadLocal<String>() {
+	private static final ThreadLocal<String> clientKey = new ThreadLocal<String>() {
 		public String initialValue() {
 			return "";
 		}
@@ -62,6 +62,6 @@ public class LocalSettings {
 	 * @return
 	 */
 	public static String getClientKey() {
-		return (String) clientKey.get();
+		return clientKey.get();
 	}
 }

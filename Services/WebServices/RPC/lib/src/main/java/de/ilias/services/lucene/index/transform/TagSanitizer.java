@@ -37,6 +37,6 @@ public class TagSanitizer implements ContentTransformer
 	 */
 	public String transform(String content) {
 
-		return content.toString().replaceAll("\\<.*?>","");
+		return content.replaceAll("\\<.*?>","");
 	}
 }

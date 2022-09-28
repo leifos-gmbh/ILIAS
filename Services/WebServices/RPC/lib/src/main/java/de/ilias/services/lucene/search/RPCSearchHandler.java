@@ -132,7 +132,7 @@ public class RPCSearchHandler {
 
 			
 			for(Object f : fieldInfo.getFields()) {
-				logger.info(((String) f).toString());
+				logger.info(((String) f));
 			}
 			TopScoreDocCollector collector = TopScoreDocCollector.create(1000);
 			long s_start = new java.util.Date().getTime();
@@ -190,7 +190,7 @@ public class RPCSearchHandler {
 			// Store duration of request
 			long start = new java.util.Date().getTime();
 			
-			fieldInfo = (FieldInfoUser) FieldInfoUser.getInstance(LocalSettings.getClientKey());
+			fieldInfo = FieldInfoUser.getInstance(LocalSettings.getClientKey());
 			luceneSettings = LuceneSettings.getInstance();
 			
 			// Rewrite query
@@ -316,7 +316,7 @@ public class RPCSearchHandler {
 					)
 			);
 
-			logger.info("What occurs" + occurs.toString());
+			logger.info("What occurs" + occurs);
 			logger.info("Rewritten query is: " + query.toString());
 			
 			TopScoreDocCollector collector = TopScoreDocCollector.create(1000);

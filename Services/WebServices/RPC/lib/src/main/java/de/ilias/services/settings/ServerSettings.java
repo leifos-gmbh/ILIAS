@@ -25,10 +25,13 @@ package de.ilias.services.settings;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.Filter;
-import org.apache.logging.log4j.core.config.Configurator;
-import org.apache.logging.log4j.core.config.builder.api.*;
-import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.appender.RollingFileAppender;
+import org.apache.logging.log4j.core.appender.rolling.DefaultRolloverStrategy;
+import org.apache.logging.log4j.core.appender.rolling.SizeBasedTriggeringPolicy;
+import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.LoggerConfig;
+import org.apache.logging.log4j.core.layout.PatternLayout;
 
 import java.io.File;
 import java.io.IOException;
@@ -252,69 +255,42 @@ public class ServerSettings {
 		}
 	}
 	
-	/**
-	 * @throws ConfigurationException 
-	 * 
-	 */
-	public void initLogManager() {
-		
-		
-		ConfigurationBuilder<BuiltConfiguration> builder;
-		builder = ConfigurationBuilderFactory.newConfigurationBuilder();
-		builder.setStatusLevel(this.getLogLevel());
-		
-		LayoutComponentBuilder layout = builder.newLayout("PatternLayout")
-			.addAttribute("pattern", "%d{ISO8601} %-5p %t (%F:%L) - %m%n");
-		
-		ComponentBuilder component = builder.newComponent("Policies")
-			.addComponent(
-				builder.newComponent("CronTriggeringPolicy")
-					.addAttribute("schedule", "0 0 0 * * ?")
-			)
-			.addComponent(
-				builder.newComponent("SizeBasedTriggeringPolicy")
-					.addAttribute("size", "100M"
-			)
-		);
-		
-		// Turn console off FATAL
-		AppenderComponentBuilder consoleAppender = builder.newAppender("console", "Console");
-		FilterComponentBuilder treshold = builder.newFilter(
-			"ThresholdFilter",
-			Filter.Result.ACCEPT,
-			Filter.Result.DENY
-		)
-			.addAttribute("level", Level.ERROR);
-		consoleAppender
-			.add(layout)
-			.add(treshold);
-			
-		builder.add(consoleAppender);
-		
-		AppenderComponentBuilder rollingAppender = builder.newAppender("rolling", "RollingFile")
-			.addAttribute("fileName", this.getLogFile().getAbsolutePath())
-			.addAttribute("filePattern", this.getLogFile().getAbsolutePath() + ".%i")
-			.add(layout)
-			.addComponent(component);
-		
-		builder.add(rollingAppender);
-		builder.add(builder.newLogger("de.ilias", this.logLevel)
-			.add(builder.newAppenderRef("rolling"))
-			.add(builder.newAppenderRef("console"))
-			.addAttribute("additivity", false)
-		);
-		builder.add(builder.newLogger("org.apache", Level.FATAL)
-			.add(builder.newAppenderRef("rolling"))
-			.add(builder.newAppenderRef("console"))
-			.addAttribute("additivity", false)
-		);
-		builder.add(builder.newRootLogger(Level.ERROR)
-			.add(builder.newAppenderRef("rolling"))
-			.add(builder.newAppenderRef("console"))
-		);
-		Configurator.initialize(builder.build());
-		ServerSettings.logger = LogManager.getLogger(ServerSettings.class);
-					
+	public void initLogManager()
+	{
+		LoggerContext context = (LoggerContext) LogManager.getContext(false);
+		Configuration config = context.getConfiguration();
+		// keep ERROR from properties
+		LoggerConfig rootConfig = config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME);
+		// set to ilServer.ini level
+		LoggerConfig iliasConfig = config.getLoggerConfig("de.ilias");
+		iliasConfig.setLevel(getLogLevel());
+
+		// new rolling file appender
+		PatternLayout fileLayout = PatternLayout.newBuilder()
+				.withConfiguration(config)
+				.withPattern("%d{ISO8601} %-5p %t (%F:%L) - %m%n")
+				.build();
+
+		DefaultRolloverStrategy strategy = DefaultRolloverStrategy.newBuilder()
+				.withMax("7")
+				.withMin("1")
+				.withFileIndex("max")
+				.withConfig(config)
+				.build();
+
+		RollingFileAppender file = RollingFileAppender.newBuilder()
+				.setName("RollingFile")
+				.withFileName(getLogFile().getAbsolutePath())
+				.withFilePattern(getLogFile().getName() + "%d")
+				.withStrategy(strategy)
+				.withPolicy(SizeBasedTriggeringPolicy.createPolicy("100MB"))
+				.setConfiguration(config)
+				.setLayout(fileLayout).build();
+		file.start();
+		config.addAppender(file);
+		rootConfig.addAppender(file, getLogLevel(), null);
+		iliasConfig.addAppender(file, getLogLevel(), null);
+		context.updateLoggers();
 	}
 
 	/**

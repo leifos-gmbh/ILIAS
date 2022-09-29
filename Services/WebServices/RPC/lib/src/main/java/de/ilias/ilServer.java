@@ -23,7 +23,10 @@
 package de.ilias;
 
 import de.ilias.services.rpc.RPCServer;
-import de.ilias.services.settings.*;
+import de.ilias.services.settings.ClientSettings;
+import de.ilias.services.settings.ConfigurationException;
+import de.ilias.services.settings.IniFileParser;
+import de.ilias.services.settings.ServerSettings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcException;
@@ -38,76 +41,39 @@ import java.util.Vector;
 
 
 /**
- * 
+ * Main class
  *
  * @author Stefan Meyer <smeyer.ilias@gmx.de>
- * @version $Id$
  */
 public class ilServer {
 
+	private static final Logger logger = LogManager.getLogger(ilServer.class);
 	private final String version = "4.4.0.1";
 	
 	private final String[] arguments;
 	private String command;
 	
-	private static Logger logger = null;
-	
-	/**
-	 * @param args
-	 */
+
 	public ilServer(String[] args) {
 
 		arguments = args;
 	}
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		
+	public static void main(String[] args)
+	{
 		ilServer server = null;
 		server = new ilServer(args);
 		boolean success = server.handleRequest();
 		System.exit(success ? 0 : 1);
 	}
-	
-	
-	private boolean initLogging()
-	{
-		LogConfigParser parser;
-		ServerSettings settings;
-		parser = new LogConfigParser();
-		try {
-			parser.parse(arguments[0]);
-			settings = ServerSettings.getInstance();
-			settings.setLogFile(parser.getLogFile());
-			settings.setLogLevel(parser.getLogLevel());
-			settings.initLogManager();
-			// init after configuration
-			logger = LogManager.getLogger(ilServer.class);
-			return true;
-			
-		} catch (ConfigurationException | IOException ex) {
-			System.err.println("Failed to initialize logging: "  + ex.getMessage());
-		}
-		return false;
-	}
-	
 
-	/**
-	 * @return success status
-	 */
-	private boolean handleRequest() {
-		
+	private boolean handleRequest()
+	{
 		if(arguments.length < 1) {
-			System.err.println(this.getUsage());
+			logger.error(this.getUsage());
 			return false;
 		}
-		
-		if(!this.initLogging()) {
-			return false;
-		}
-		
+
 		if(arguments.length == 1) {
 			command = arguments[0];
 			if(command.compareTo("version") == 0) {
@@ -125,28 +91,28 @@ public class ilServer {
 		}
 		else if(command.compareTo("stop") == 0) {
 			if(arguments.length != 2) {
-				logger.error("Usage: java -jar ilServer.jar PATH_TO_SERVER_INI stop");
+				System.err.println("Usage: java -jar ilServer.jar PATH_TO_SERVER_INI stop");
 				return false;
 			}
 			return stopServer();
 		}
 		else if(command.compareTo("createIndex") == 0) {
 			if(arguments.length != 3) {
-				logger.error("Usage java -jar ilServer.jar PATH_TO_SERVER_INI createIndex CLIENT_KEY");
+				System.err.println("Usage java -jar ilServer.jar PATH_TO_SERVER_INI createIndex CLIENT_KEY");
 				return false;
 			}
 			return createIndexer();
 		}
 		else if(command.compareTo("updateIndex") == 0) {
 			if(arguments.length < 3) {
-				logger.error("Usage java -jar ilServer.jar PATH_TO_SERVER_INI updateIndex CLIENT_KEY");
+				System.err.println("Usage java -jar ilServer.jar PATH_TO_SERVER_INI updateIndex CLIENT_KEY");
 				return false;
 			}
 			return updateIndexer();
 		}
 		else if(command.compareTo("search") == 0) {
 			if(arguments.length != 4) {
-				logger.error("Usage java -jar ilServer.jar PATH_TO_SERVER_INI CLIENT_KEY search QUERY_STRING");
+				System.err.println("Usage java -jar ilServer.jar PATH_TO_SERVER_INI CLIENT_KEY search QUERY_STRING");
 				return false;
 			}
 			return startSearch();
@@ -154,21 +120,17 @@ public class ilServer {
 		}
 		else if(command.compareTo("status") == 0) {
 			if(arguments.length != 2) {
-				logger.error("Usage java -jar ilServer.jar PATH_TO_SERVER_INI status");
+				System.err.println("Usage java -jar ilServer.jar PATH_TO_SERVER_INI status");
 				return false;
 			}
 			return getStatus();
 		}
 		else {
-			logger.error(getUsage());
+			System.err.println(getUsage());
 			return false;
 		}
 	}
 
-	/**
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
 	private boolean createIndexer() {
 
 		XmlRpcClient client;
@@ -187,26 +149,20 @@ public class ilServer {
 			params.add(arguments[2]);
 			params.add(false);
 			client.execute("RPCIndexHandler.index",params);
-			return true;
-		} 
+			logger.info("Finished indexing");
+		}
 		catch (Exception e) {
-			System.err.println(e);
-			logger.fatal(e.getMessage());
+			logger.error(e.getMessage());
 			System.exit(1);
 		}
 		return false;
 	}
 
-	/**
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
 	private boolean updateIndexer() {
 
 		XmlRpcClient client;
 		IniFileParser parser;
-		
-		
+
 		try {
 			parser = new IniFileParser();
 			parser.parseServerSettings(arguments[0],true);
@@ -220,11 +176,11 @@ public class ilServer {
 			params.add(arguments[2]);
 			params.add(true);
 			client.execute("RPCIndexHandler.index",params);
+			logger.info("Finished indexing");
 			return true;
 		} 
 		catch (Exception e) {
-			System.err.println(e);
-			logger.fatal(e.getMessage());
+			logger.error(e.getMessage());
 			System.exit(1);
 		}
 		return false;
@@ -258,8 +214,7 @@ public class ilServer {
 			return true;
 		} 
 		catch (Exception e) {
-			System.err.println(e);
-			logger.fatal(e.getMessage());
+			logger.error(e.getMessage());
 			System.exit(1);
 		}
 		return false;
@@ -276,12 +231,13 @@ public class ilServer {
 		XmlRpcClient client;
 		IniFileParser parser;
 		String status;
-		
 		try {
 
 			parser = new IniFileParser();
 			parser.parseServerSettings(arguments[0],true);
-			
+			settings = ServerSettings.getInstance();
+			settings.initLogManager();
+
 			client = initRpcClient();
 			
 			// Check if server is already running
@@ -294,10 +250,9 @@ public class ilServer {
 				logger.info("No server running. Starting new instance...");
 			}
 			
-			settings = ServerSettings.getInstance();
-			logger.info("New rpc server");
+			logger.info("Listening on {}:{}", settings.getHost(), settings.getPort());
 			rpc = RPCServer.getInstance(settings.getHost(),settings.getPort());
-			logger.info("Server start");
+			logger.info("Server started");
 			rpc.start();
 			
 			client = initRpcClient();
@@ -357,6 +312,7 @@ public class ilServer {
 			client = initRpcClient();
 			logger.debug("Client execute");
 			client.execute("RPCAdministration.stop",new Vector());
+			logger.info("Server stopped");
 			return true;
 		} 
 		catch (ConfigurationException e) {
@@ -371,7 +327,6 @@ public class ilServer {
 		return false;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private boolean getStatus() {
 		
 		XmlRpcClient client;

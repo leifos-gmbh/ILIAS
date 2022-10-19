@@ -101,6 +101,7 @@ class InternalGUIService
         $tpl->addOnLoadCode("ilNotes.setAjaxUrl('" . $ajax_url . "');");
     }
 
+
     /**
      * @param array|string $class_path
      */

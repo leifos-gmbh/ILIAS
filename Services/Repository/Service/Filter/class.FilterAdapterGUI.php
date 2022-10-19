@@ -18,7 +18,7 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
-namespace ILIAS\Notes;
+namespace ILIAS\Repository\Filter;
 
 use ILIAS\UI\Component\Input\Container\Filter;
 use ILIAS\UI\Component\Input\Field\FilterInput;
@@ -64,21 +64,29 @@ class FilterAdapterGUI
         $this->expanded = $expanded;
     }
 
-    public function text(string $key, string $title, bool $activated = true): self
+    public function text(string $key, string $title, bool $activated = true, ?string $value = null): self
     {
+        $field = $this->ui->factory()->input()->field()->text($title);
+        if (!is_null($value)) {
+            $field = $field->withValue($value);
+        }
         $this->addField(
             $key,
-            $this->ui->factory()->input()->field()->text($title),
+            $field,
             $activated
         );
         return $this;
     }
 
-    public function select(string $key, string $title, array $options, bool $activated = true): self
+    public function select(string $key, string $title, array $options, bool $activated = true, ?string $value = null): self
     {
+        $field = $this->ui->factory()->input()->field()->select($title, $options);
+        if (!is_null($value)) {
+            $field = $field->withValue($value);
+        }
         $this->addField(
             $key,
-            $this->ui->factory()->input()->field()->select($title, $options),
+            $field,
             $activated
         );
         return $this;

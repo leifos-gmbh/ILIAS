@@ -50,10 +50,10 @@ class ilNewsTimelineItemGUI implements ilTimelineItemInt
         $this->obj_def = $DIC["objDefinition"];
         $this->news_item_ref_id = $a_news_ref_id;
 
-        $this->std_request = new StandardGUIRequest(
-            $DIC->http(),
-            $DIC->refinery()
-        );
+        $this->std_request = $DIC->news()
+            ->internal()
+            ->gui()
+            ->standardRequest();
         $this->ref_id = $this->std_request->getRefId();
     }
 

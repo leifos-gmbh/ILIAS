@@ -61,10 +61,10 @@ class ilNewsForContextBlockGUI extends ilBlockGUI
         $this->settings = $DIC->settings();
         $this->tabs = $DIC->tabs();
         $this->obj_definition = $DIC["objDefinition"];
-        $this->std_request = new StandardGUIRequest(
-            $DIC->http(),
-            $DIC->refinery()
-        );
+        $this->std_request = $DIC->news()
+            ->internal()
+            ->gui()
+            ->standardRequest();
 
         $ilCtrl = $DIC->ctrl();
         $lng = $DIC->language();
@@ -1051,10 +1051,10 @@ class ilNewsForContextBlockGUI extends ilBlockGUI
     {
         global $DIC;
 
-        $std_request = new StandardGUIRequest(
-            $DIC->http(),
-            $DIC->refinery()
-        );
+        $std_request = $DIC->news()
+            ->internal()
+            ->gui()
+            ->standardRequest();
 
         $lng = $DIC->language();
         $block_id = $DIC->ctrl()->getContextObjId();

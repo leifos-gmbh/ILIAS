@@ -24,10 +24,8 @@
 *
 * @ingroup ModulesTest
 */
-
 class ilTestQuestionsTableGUI extends ilTable2GUI
 {
-    protected bool $questionTitleLinksEnabled = false;
     protected bool $questionRemoveRowButtonEnabled = false;
     protected bool $questionManagingEnabled = false;
     protected bool $positionInsertCommandsEnabled = false;
@@ -100,7 +98,7 @@ class ilTestQuestionsTableGUI extends ilTable2GUI
         }
 
         if ($this->isQuestionPositioningEnabled()) {
-            $this->addColumn('', 'f', '1%');
+            $this->addColumn($this->lng->txt('order'), 'f', '1%');
         }
 
         if ($this->isColumnSelected('qid')) {
@@ -132,9 +130,7 @@ class ilTestQuestionsTableGUI extends ilTable2GUI
 
         $this->addColumn($this->lng->txt('qpl'), 'qpl', '');
 
-        if ($this->isQuestionRemoveRowButtonEnabled()) {
-            $this->addColumn('', '', '1%');
-        }
+        $this->addColumn($this->lng->txt('actions'), '', '1%');
     }
 
     protected function initCommands(): void
@@ -177,11 +173,7 @@ class ilTestQuestionsTableGUI extends ilTable2GUI
             $this->tpl->setVariable("QUESTION_ID_PRESENTATION", $a_set['question_id']);
         }
 
-        if ($this->isQuestionTitleLinksEnabled()) {
-            $this->tpl->setVariable("QUESTION_TITLE", $this->buildQuestionTitleLink($a_set));
-        } else {
-            $this->tpl->setVariable("QUESTION_TITLE", $a_set["title"]);
-        }
+        $this->tpl->setVariable("QUESTION_TITLE", $this->buildQuestionTitleLink($a_set));
 
         if (!$a_set['complete']) {
             $warning_icon = $this->factory->symbol()->icon()->custom(
@@ -449,16 +441,6 @@ class ilTestQuestionsTableGUI extends ilTable2GUI
     public function setTotalWorkingTime(string $totalWorkingTime): void
     {
         $this->totalWorkingTime = $totalWorkingTime;
-    }
-
-    public function isQuestionTitleLinksEnabled(): bool
-    {
-        return $this->questionTitleLinksEnabled;
-    }
-
-    public function setQuestionTitleLinksEnabled(bool $questionTitleLinksEnabled): void
-    {
-        $this->questionTitleLinksEnabled = $questionTitleLinksEnabled;
     }
 
     public function isQuestionRemoveRowButtonEnabled(): bool

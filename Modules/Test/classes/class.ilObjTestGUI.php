@@ -127,7 +127,6 @@ class ilObjTestGUI extends ilObjectGUI implements ilCtrlBaseClassInterface
             $tabsManager->setTestOBJ($this->object);
             $tabsManager->setTestSession($this->testSessionFactory->getSession());
             $tabsManager->setTestQuestionSetConfig($this->testQuestionSetConfigFactory->getQuestionSetConfig());
-            $tabsManager->initSettingsTemplate();
             if ($this->object->isDynamicTest()) {
                 $hidden_tabs = $tabsManager->getHiddenTabs();
                 $tabsManager->setHiddenTabs(array_merge($hidden_tabs, ['manscoring', 'scoringadjust']));
@@ -1045,13 +1044,6 @@ class ilObjTestGUI extends ilObjectGUI implements ilCtrlBaseClassInterface
                     $this->lng->txt("tst_default_settings"));
             }
         }
-        $templates = ilSettingsTemplate::getAllSettingsTemplates("tst");
-        if ($templates) {
-            foreach ($templates as $item) {
-                $options["tsttpl_" . $item["id"]] = array($item["title"],
-                    nl2br(trim($item["description"])));
-            }
-        }
     }
 
     /**
@@ -1069,15 +1061,6 @@ class ilObjTestGUI extends ilObjectGUI implements ilCtrlBaseClassInterface
 
         $template_id = $this->getDidacticTemplateVar("tsttpl");
         if ($template_id) {
-            $template = new ilSettingsTemplate($template_id, ilObjAssessmentFolderGUI::getSettingsTemplateConfig());
-
-            $template_settings = $template->getSettings();
-            if ($template_settings) {
-                /** @var ilObjTest $obj */
-                $obj = $new_object;
-                $this->applyTemplate($template_settings, $obj);
-            }
-
             $new_object->setTemplate($template_id);
         }
 
@@ -1632,22 +1615,26 @@ class ilObjTestGUI extends ilObjectGUI implements ilCtrlBaseClassInterface
         if (ilObjAssessmentFolder::isAdditionalQuestionContentEditingModePageObjectEnabled()) {
             $ri = new ilRadioGroupInputGUI($lng->txt("tst_add_quest_cont_edit_mode"), "add_quest_cont_edit_mode");
 
-            $ri->addOption(new ilRadioOption(
-                $lng->txt('tst_add_quest_cont_edit_mode_default'),
-                assQuestion::ADDITIONAL_CONTENT_EDITING_MODE_DEFAULT
-            ));
+            $option_ipe = new ilRadioOption(
+                $lng->txt('tst_add_quest_cont_edit_mode_IPE'),
+                assQuestion::ADDITIONAL_CONTENT_EDITING_MODE_IPE
+            );
+            $option_ipe->setInfo($lng->txt('tst_add_quest_cont_edit_mode_IPE_info'));
+            $ri->addOption($option_ipe);
 
-            $ri->addOption(new ilRadioOption(
-                $lng->txt('tst_add_quest_cont_edit_mode_page_object'),
-                assQuestion::ADDITIONAL_CONTENT_EDITING_MODE_PAGE_OBJECT
-            ));
+            $option_rte = new ilRadioOption(
+                $lng->txt('tst_add_quest_cont_edit_mode_RTE'),
+                assQuestion::ADDITIONAL_CONTENT_EDITING_MODE_RTE
+            );
+            $option_rte->setInfo($lng->txt('tst_add_quest_cont_edit_mode_RTE_info'));
+            $ri->addOption($option_rte);
 
-            $ri->setValue(assQuestion::ADDITIONAL_CONTENT_EDITING_MODE_DEFAULT);
+            $ri->setValue(assQuestion::ADDITIONAL_CONTENT_EDITING_MODE_RTE);
 
             $form->addItem($ri, true);
         } else {
             $hi = new ilHiddenInputGUI("question_content_editing_type");
-            $hi->setValue(assQuestion::ADDITIONAL_CONTENT_EDITING_MODE_DEFAULT);
+            $hi->setValue(assQuestion::ADDITIONAL_CONTENT_EDITING_MODE_RTE);
             $form->addItem($hi, true);
         }
 
@@ -1836,10 +1823,9 @@ class ilObjTestGUI extends ilObjectGUI implements ilCtrlBaseClassInterface
     */
     public function moveQuestionsObject()
     {
-        $selected_questions = null;
-        $selected_questions = $_POST['q_id'];
-        if ($selected_questions === null && is_numeric($_GET['q_id'])) {
-            $selected_questions = [$_GET['q_id']];
+        $selected_questions = $this->testrequest->getQuestionId();
+        if ($selected_questions === null && is_numeric($this->testrequest->getQuestionId())) {
+            $selected_questions = [$this->testrequest->getQuestionId()];
         }
         if (is_array($selected_questions)) {
             ilSession::set('tst_qst_move_' . $this->object->getTestId(), $selected_questions);
@@ -1977,22 +1963,26 @@ class ilObjTestGUI extends ilObjectGUI implements ilCtrlBaseClassInterface
 
             $ri = new ilRadioGroupInputGUI($lng->txt("tst_add_quest_cont_edit_mode"), "add_quest_cont_edit_mode");
 
-            $ri->addOption(new ilRadioOption(
-                $lng->txt('tst_add_quest_cont_edit_mode_page_object'),
-                assQuestion::ADDITIONAL_CONTENT_EDITING_MODE_PAGE_OBJECT
-            ));
+            $option_ipe = new ilRadioOption(
+                $lng->txt('tst_add_quest_cont_edit_mode_IPE'),
+                assQuestion::ADDITIONAL_CONTENT_EDITING_MODE_IPE
+            );
+            $option_ipe->setInfo($lng->txt('tst_add_quest_cont_edit_mode_IPE_info'));
+            $ri->addOption($option_ipe);
 
-            $ri->addOption(new ilRadioOption(
-                $lng->txt('tst_add_quest_cont_edit_mode_default'),
-                assQuestion::ADDITIONAL_CONTENT_EDITING_MODE_DEFAULT
-            ));
+            $option_rte = new ilRadioOption(
+                $lng->txt('tst_add_quest_cont_edit_mode_RTE'),
+                assQuestion::ADDITIONAL_CONTENT_EDITING_MODE_RTE
+            );
+            $option_rte->setInfo($lng->txt('tst_add_quest_cont_edit_mode_RTE_info'));
+            $ri->addOption($option_rte);
 
-            $ri->setValue(assQuestion::ADDITIONAL_CONTENT_EDITING_MODE_PAGE_OBJECT);
+            $ri->setValue(assQuestion::ADDITIONAL_CONTENT_EDITING_MODE_IPE);
 
             $form->addItem($ri, true);
         } else {
             $hi = new ilHiddenInputGUI("question_content_editing_type");
-            $hi->setValue(assQuestion::ADDITIONAL_CONTENT_EDITING_MODE_DEFAULT);
+            $hi->setValue(assQuestion::ADDITIONAL_CONTENT_EDITING_MODE_RTE);
             $form->addItem($hi, true);
         }
 
@@ -2134,7 +2124,6 @@ class ilObjTestGUI extends ilObjectGUI implements ilCtrlBaseClassInterface
             && count(ilSession::get('tst_qst_move_' . $this->object->getTestId()))
         );
 
-        $table_gui->setQuestionTitleLinksEnabled(!$total);
         $table_gui->setQuestionPositioningEnabled(!$total);
         $table_gui->setQuestionManagingEnabled(!$total);
         $table_gui->setObligatoryQuestionsHandlingEnabled($this->object->areObligationsEnabled());
@@ -2637,27 +2626,13 @@ class ilObjTestGUI extends ilObjectGUI implements ilCtrlBaseClassInterface
     */
     public function infoScreen($session_lock = "")
     {
-        global $DIC; /* @var ILIAS\DI\Container $DIC */
-        /**
-         * @var $ilAccess  ilAccessHandler
-         * @var $ilUser    ilObjUser
-         * @var $ilToolbar ilToolbarGUI
-         */
+        /* @var ILIAS\DI\Container $DIC */
         global $DIC;
         $ilAccess = $DIC['ilAccess'];
         $ilUser = $DIC['ilUser'];
         $ilToolbar = $DIC['ilToolbar'];
 
-        if ($this->testrequest->raw('createRandomSolutions')) {
-            global $DIC;
-            $ilCtrl = $DIC['ilCtrl'];
-
-            $this->object->createRandomSolutions($this->testrequest->raw('createRandomSolutions'));
-
-            $ilCtrl->redirect($this);
-        }
-
-        if (!$ilAccess->checkAccess("visible", "", $this->ref_id) && !$ilAccess->checkAccess("read", "", $this->testrequest->getRefId())) {
+        if (!$ilAccess->checkAccess("visible", "", $this->ref_id) && !$ilAccess->checkAccess("read", "", $_GET["ref_id"])) {
             $this->ilias->raiseError($this->lng->txt("msg_no_perm_read"), $this->ilias->error_obj->MESSAGE);
         }
 
@@ -2701,32 +2676,22 @@ class ilObjTestGUI extends ilObjectGUI implements ilCtrlBaseClassInterface
             $info->addProperty($this->lng->txt("author"), $this->object->getAuthor());
             $info->addProperty($this->lng->txt("title"), $this->object->getTitle());
         }
-        if (!$this->object->getOfflineStatus() && $this->object->isComplete($this->testQuestionSetConfigFactory->getQuestionSetConfig())) {
-            if ((!$this->object->getFixedParticipants() || false) && $ilAccess->checkAccess("read", "", $this->ref_id)) {
-                if ($this->object->getShowInfo() || !$this->object->getForceJS()) {
-                    // use javascript
-                    $checked_javascript = false;
-                    if ($this->object->getJavaScriptOutput()) {
-                        $checked_javascript = true;
-                    }
+        if (!$this->object->getOfflineStatus() &&
+            $this->object->isComplete($this->testQuestionSetConfigFactory->getQuestionSetConfig()) &&
+            $ilAccess->checkAccess("read", "", $this->ref_id) &&
+            !$this->object->isRandomTest() &&
+            !$this->getObjectiveOrientedContainer()->isObjectiveOrientedPresentationRequired() &&
+            $this->object->getNrOfTries() != 1) {
+            if ($this->object->getUsePreviousAnswers() == 0) {
+                if ($this->object->getShowInfo()) {
+                    $info->addProperty($this->lng->txt("tst_use_previous_answers"), $this->lng->txt("tst_dont_use_previous_answers"));
                 }
-                // hide previous results
-                if (!$this->object->isRandomTest() && !$this->getObjectiveOrientedContainer()->isObjectiveOrientedPresentationRequired()) {
-                    if ($this->object->getNrOfTries() != 1) {
-                        if ($this->object->getUsePreviousAnswers() == 0) {
-                            if ($this->object->getShowInfo()) {
-                                $info->addProperty($this->lng->txt("tst_use_previous_answers"), $this->lng->txt("tst_dont_use_previous_answers"));
-                            }
-                        } else {
-                            $use_previous_answers = false;
-                            $checked_previous_answers = false;
-                            if (isset($ilUser->prefs["tst_use_previous_answers"]) && $ilUser->prefs["tst_use_previous_answers"]) {
-                                $checked_previous_answers = true;
-                            }
-                            $info->addPropertyCheckbox($this->lng->txt("tst_use_previous_answers"), "chb_use_previous_answers", 1, $this->lng->txt("tst_use_previous_answers_user"), $checked_previous_answers);
-                        }
-                    }
+            } else {
+                $checked_previous_answers = false;
+                if ($ilUser->getPref("tst_use_previous_answers")) {
+                    $checked_previous_answers = true;
                 }
+                $info->addPropertyCheckbox($this->lng->txt("tst_use_previous_answers"), "chb_use_previous_answers", 1, $this->lng->txt("tst_use_previous_answers_user"), $checked_previous_answers);
             }
         }
 
@@ -3431,7 +3396,7 @@ class ilObjTestGUI extends ilObjectGUI implements ilCtrlBaseClassInterface
             'enable_archiving' => 'setEnableArchiving'
         );
 
-        if (!$templateData['results_presentation']['value']) {
+        if (isset($templateData['results_presentation']['value'])) {
             $templateData['results_presentation']['value'] = array();
         }
 
@@ -3662,12 +3627,23 @@ class ilObjTestGUI extends ilObjectGUI implements ilCtrlBaseClassInterface
 
     protected function determineObjectiveOrientedContainer()
     {
-        $containerObjId = (int) ilLOSettings::isObjectiveTest($this->ref_id);
+        if (!ilLOSettings::isObjectiveTest($this->ref_id)) {
+            return;
+        }
 
-        $containerRefId = current(ilObject::_getAllReferences($containerObjId));
+        $path = $this->tree->getPathFull($this->ref_id);
 
-        $this->objectiveOrientedContainer->setObjId($containerObjId);
-        $this->objectiveOrientedContainer->setRefId($containerRefId);
+        while ($parent = array_pop($path)) {
+            if ($parent['type'] === 'crs') {
+                $container_ref_id = $parent['ref_id'];
+                break;
+            }
+        }
+
+        $container_obj_id = ilObject2::_lookupObjId($container_ref_id);
+
+        $this->objectiveOrientedContainer->setObjId($container_obj_id);
+        $this->objectiveOrientedContainer->setRefId($container_ref_id);
     }
 
     protected function getObjectiveOrientedContainer(): ilTestObjectiveOrientedContainer

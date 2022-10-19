@@ -12,7 +12,8 @@
  * us at:
  * https://www.ilias.de
  * https://github.com/ILIAS-eLearning
- */
+ *
+ *********************************************************************/
 
 require_once './Modules/Test/classes/inc.AssessmentConstants.php';
 
@@ -103,7 +104,7 @@ class assMatchingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
                 // postpone further analysis, eventually involving T&A TechSquad (see also remark in assMatchingQuestionGUI
                 $this->object->addTerm(
                     new assAnswerMatchingTerm(
-                        ilUtil::stripSlashes($answer),
+                        ilUtil::stripSlashes(htmlentities($answer)),
                         $filename,
                         $terms_identifiers[$index] ?? ''
                     )
@@ -135,7 +136,7 @@ class assMatchingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 
                 $this->object->addDefinition(
                     new assAnswerMatchingDefinition(
-                        ilUtil::stripSlashes($answer),
+                        ilUtil::stripSlashes(htmlentities($answer)),
                         $filename,
                         $definitions_identifiers[$index] ?? ''
                     )
@@ -164,8 +165,10 @@ class assMatchingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
     {
         if (!$this->object->getSelfAssessmentEditingMode()) {
             $this->object->setShuffle($_POST["shuffle"]);
+            $this->object->setShuffleMode($_POST["shuffle"]);
         } else {
             $this->object->setShuffle(1);
+            $this->object->setShuffleMode(1);
         }
         $this->object->setThumbGeometry($_POST["thumb_geometry"]);
         $this->object->setMatchingMode($_POST['matching_mode']);
@@ -336,6 +339,11 @@ class assMatchingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
             $definitions->setHideImages(true);
         }
 
+        $stripHtmlEntitesFromValues = function (assAnswerMatchingTerm $value) {
+            $value->__set('text', html_entity_decode($value->__get('text')));
+            return $value;
+        };
+
         $definitions->setRequired(true);
         $definitions->setQuestionObject($this->object);
         $definitions->setTextName($this->lng->txt('definition_text'));
@@ -344,7 +352,7 @@ class assMatchingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
         if (!count($this->object->getDefinitions())) {
             $this->object->addDefinition(new assAnswerMatchingDefinition());
         }
-        $definitionvalues = $this->object->getDefinitions();
+        $definitionvalues = array_map($stripHtmlEntitesFromValues, $this->object->getDefinitions());
         $definitions->setValues($definitionvalues);
         if ($this->isDefImgUploadCommand()) {
             $definitions->checkInput();
@@ -368,7 +376,7 @@ class assMatchingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
             // analysis, eventually involving T&A TechSquad
             $this->object->addTerm(new assAnswerMatchingTerm());
         }
-        $termvalues = $this->object->getTerms();
+        $termvalues = array_map($stripHtmlEntitesFromValues, $this->object->getTerms());
         $terms->setValues($termvalues);
         if ($this->isTermImgUploadCommand()) {
             $terms->checkInput();
@@ -409,7 +417,7 @@ class assMatchingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
                 3 => $this->lng->txt("matching_shuffle_definitions")
             );
             $shuffle->setOptions($shuffle_options);
-            $shuffle->setValue($this->object->getShuffle() != null ? $this->object->getShuffle() : 1);
+            $shuffle->setValue($this->object->getShuffleMode());
             $shuffle->setRequired(false);
             $form->addItem($shuffle);
 
@@ -672,7 +680,7 @@ class assMatchingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
         // shuffle output
         $terms = $this->object->getTerms();
         $definitions = $this->object->getDefinitions();
-        switch ($this->object->getShuffle()) {
+        switch ($this->object->getShuffleMode()) {
             case 1:
                 $terms = $this->object->getShuffler()->transform($terms);
                 $definitions = $this->object->getShuffler()->transform($definitions);
@@ -832,14 +840,6 @@ class assMatchingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 
         $solutions = array();
         if ($active_id) {
-            // hey: prevPassSolutions - obsolete due to central check
-            #$solutions = NULL;
-            #include_once "./Modules/Test/classes/class.ilObjTest.php";
-            #if (!ilObjTest::_getUsePreviousAnswers($active_id, true))
-            #{
-            #	if (is_null($pass)) $pass = ilObjTest::_getPass($active_id);
-            #}
-            // hey.
             if (is_array($user_post_solution)) {
                 foreach ($user_post_solution['matching'][$this->object->getId()] as $definition => $term) {
                     array_push($solutions, array("value1" => $term, "value2" => $definition));
@@ -865,7 +865,7 @@ class assMatchingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 
         $terms = $this->object->getTerms();
         $definitions = $this->object->getDefinitions();
-        switch ($this->object->getShuffle()) {
+        switch ($this->object->getShuffleMode()) {
             case 1:
                 $terms = $this->object->getShuffler()->transform($terms);
                 if (count($solutions)) {

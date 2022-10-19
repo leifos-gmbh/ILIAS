@@ -1079,14 +1079,21 @@ class ilObjWikiGUI extends ilObjectGUI
                 ilWikiUtil::makeUrlTitle($a_page)
             );
             $ctrl->setParameterByClass(
-                "ilobjwikigui",
+                "ilwikihandlergui",
                 "ref_id",
                 $a_target
             );
-            $ctrl->redirectByClass(
-                ["ilwikihandlergui", "ilobjwikigui"],
-                "viewPage"
-            );
+            if ($a_page != "") {
+                $ctrl->redirectByClass(
+                    ["ilwikihandlergui", "ilobjwikigui"],
+                    "viewPage"
+                );
+            } else {
+                $ctrl->redirectByClass(
+                    ["ilwikihandlergui"],
+                    "view"
+                );
+            }
         } elseif ($ilAccess->checkAccess("visible", "", $a_target)) {
             ilObjectGUI::_gotoRepositoryNode($a_target, "infoScreen");
         } elseif ($ilAccess->checkAccess("read", "", ROOT_FOLDER_ID)) {
@@ -1430,17 +1437,19 @@ class ilObjWikiGUI extends ilObjectGUI
         elseif ($this->edit_request->getWikiPageId()) {
             $page_ids = array($this->edit_request->getWikiPageId());
         }
-
         return $page_ids;
     }
 
-    public function getPrintView(): \ILIAS\Export\PrintProcessGUI
+    public function getPrintView(bool $export = false): \ILIAS\Export\PrintProcessGUI
     {
+        $page_ids = $export
+            ? null
+            : $this->getPrintPageIds();
         $provider = new \ILIAS\Wiki\WikiPrintViewProviderGUI(
             $this->lng,
             $this->ctrl,
             $this->object->getRefId(),
-            $this->getPrintPageIds()
+            $page_ids
         );
 
         return new \ILIAS\Export\PrintProcessGUI(

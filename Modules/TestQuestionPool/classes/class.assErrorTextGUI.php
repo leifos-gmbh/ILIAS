@@ -12,7 +12,8 @@
  * us at:
  * https://www.ilias.de
  * https://github.com/ILIAS-eLearning
- */
+ *
+ *********************************************************************/
 
 require_once './Modules/Test/classes/inc.AssessmentConstants.php';
 
@@ -77,7 +78,7 @@ class assErrorTextGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
                 $this->object->addErrorData(
                     $val,
                     $errordata['value'][$idx],
-                    $errordata['points'][$idx]
+                    (float) $errordata['points'][$idx]
                 );
             }
         }
@@ -348,13 +349,6 @@ class assErrorTextGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
         // generate the question output
         $template = new ilTemplate("tpl.il_as_qpl_errortext_output.html", true, true, "Modules/TestQuestionPool");
         if ($active_id) {
-            // hey: prevPassSolutions - obsolete due to central check
-            #$solutions = NULL;
-            #include_once "./Modules/Test/classes/class.ilObjTest.php";
-            #if (!ilObjTest::_getUsePreviousAnswers($active_id, true))
-            #{
-            #	if (is_null($pass)) $pass = ilObjTest::_getPass($active_id);
-            #}
             $solutions = $this->object->getTestOutputSolutions($active_id, $pass);
             // hey.
         }

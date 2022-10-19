@@ -81,7 +81,6 @@ adm#:#adm_support_contacts_info#:#Technical support contacts accessible via link
 administration#:#adm_achievements#:#Achievements
 administration#:#adm_activate_db_benchmark#:#Activate Benchmarking
 administration#:#adm_activate_db_benchmark_desc#:#Benchmarking will be automatically disabled after one request.
-administration#:#adm_add_settings_template#:#Add Template
 administration#:#adm_adm_role_protect#:#Protect Administrator Role
 administration#:#adm_adm_role_protect_info#:#Only allow administrators to assign or remove users from the role of administrator.
 administration#:#adm_auth_login#:#Authentication Login
@@ -94,7 +93,6 @@ administration#:#adm_db_bench_sorted_by_sql#:#Sorted by SQL
 administration#:#adm_db_benchmark#:#DB Benchmark
 administration#:#adm_db_benchmark_user#:#User Account Name
 administration#:#adm_db_benchmark_user_desc#:#Measurements will be made for this user only. The username entered should not belong to the user initiating the benchmarking.
-administration#:#adm_edit_settings_template#:#Edit Template
 administration#:#adm_extending_ilias#:#Extending ILIAS
 administration#:#adm_external_setting_edit#:#Edit Settings
 administration#:#adm_hide#:#Hide in Settings Form
@@ -128,11 +126,9 @@ administration#:#adm_rep_tree_only_cntr_info#:#Only categories, courses and grou
 administration#:#adm_rep_tree_presentation#:#Repository Tree Presentation
 administration#:#adm_repository_and_objects#:#Repository and Objects
 administration#:#adm_search_and_find#:#Search and Find
-administration#:#adm_settings_templates#:#Settings Templates
 administration#:#adm_show_comments_tagging_in_lists#:#Show Number of Notes, Comments and Tags in Object Lists
 administration#:#adm_show_comments_tagging_in_lists_tags#:#Display tags instead of number
 administration#:#adm_sql#:#SQL
-administration#:#adm_sure_delete_settings_template#:#Do you really want to delete the following templates?
 administration#:#adm_table#:#Table
 administration#:#adm_time#:#Time
 administration#:#adm_user_administration#:#Users and Roles
@@ -472,7 +468,6 @@ assessment#:#add_imagemap#:#Import Image Map
 assessment#:#add_poly#:#Add polygon area
 assessment#:#add_rect#:#Add rectangle area
 assessment#:#additional_rating_info#:#Please note that the values given here are expressed as percentages and these must add up to 100.
-assessment#:#adm_settings_templates#:#Settings Templates
 assessment#:#advanced_rating#:#Advanced Rating
 assessment#:#advanced_rating_info#:#The advanced rating is only available if a unit is assigned to the result. Further rating settings are displayed after saving the specified units.
 assessment#:#all_available_question_pools#:#All available question pools
@@ -892,6 +887,7 @@ assessment#:#log_wrong_test_password_entered#:#Participant entered wrong test pa
 assessment#:#longmenu#:#Longmenu
 assessment#:#longmenu_text#:#Long Menu Text
 assessment#:#mailnottype#:#Send notification even if a user finishes a test pass
+assessment#:#mailnottype_desc#:#Notify the owner of the test <strong>even if</strong> the number of test attempts has not been limited.
 assessment#:#maintenance#:#Maintenance
 assessment#:#manscoring#:#Manual Scoring
 assessment#:#manscoring_done#:#Scored Participants
@@ -972,6 +968,7 @@ assessment#:#oq_btn_use_order_pictures#:#Use answer pictures
 assessment#:#oq_btn_use_order_terms#:#Use answer terms
 assessment#:#oq_header_ordering_elements#:#Ordering Elements
 assessment#:#or#:#or
+assessment#:#order#:#Order
 assessment#:#ordering_answer_sequence_info#:#The answer sequence you define here will be taken as the correct solution sequence.
 assessment#:#ordertext#:#Ordering Text
 assessment#:#ordertext_info#:#Please enter the text that should be ordered horizontally. The ordering text will be separated by the whitespace signs in the text. If you need a different separation, you may use the separator %s to separate your text units.
@@ -1251,9 +1248,9 @@ assessment#:#test_next_question#:#Next Question
 assessment#:#test_prev_question#:#Previous Question
 assessment#:#test_question_set_type#:#Selection of Test Questions
 assessment#:#test_question_set_type_fixed#:#Use of a fixed set of questions
-assessment#:#test_question_set_type_fixed_info#:#All testees see the same questions.<br>You can create questions directly in the test as well as reuse questions from a Question Pool. If you create new questions you can decide to save them in a Question Pool.
+assessment#:#test_question_set_type_fixed_info#:#All participants get the same questions.<br>You can create questions directly in the test as well as reuse questions from a question pool. If you create new questions you can decide to save them in a question pool.
 assessment#:#test_question_set_type_random#:#Use of a random set of questions
-assessment#:#test_question_set_type_random_info#:#Every testee will see an individually generated set of questions. The questions are drawn from one or more Question Pools.
+assessment#:#test_question_set_type_random_info#:#Every participant will see an individually generated set of questions. The questions are randomly selected from one or more question pools.
 assessment#:#test_results#:#Summary Test Results
 assessment#:#test_scoring#:#Scoring Options
 assessment#:#test_template_reset#:#The template has been removed.
@@ -1293,10 +1290,10 @@ assessment#:#tst_activate_skill_service_desc#:#Supports the assignment of questi
 assessment#:#tst_activation_limited_visibility_info#:#Before and after the indicated period it is only the test's title that will be displayed. The participants cannot take the test. Further access, including to tests already in progress, will be prevented at the end of the period.
 assessment#:#tst_activation_online_info#:#If online, participants can take the test.
 assessment#:#tst_add_quest_cont_edit_mode#:#Editor
+assessment#:#tst_add_quest_cont_edit_mode_IPE#:#Use plain text for questions and answers and ILIAS page editor for feedback and hints
 assessment#:#tst_add_quest_cont_edit_mode_IPE_info#:#No formatting of text in question and answers. No use of LaTex either. But feedback and hints can be reused when question is embedded in ILIAS learning module.
+assessment#:#tst_add_quest_cont_edit_mode_RTE#:#Use Rich-Text-Editor (TinyMCE) for editing questions and answers, feedbacks and hints
 assessment#:#tst_add_quest_cont_edit_mode_RTE_info#:#Allows text formatting of questions, answers, feedbacks and hints. But feedback and hints cannot be reused when question is embedded in ILIAS learning module.
-assessment#:#tst_add_quest_cont_edit_mode_default#:#Use Rich-Text-Editor (TinyMCE) for editing questions and answers, feedbacks and hints
-assessment#:#tst_add_quest_cont_edit_mode_page_object#:#Use plain text for questions and answers and ILIAS page editor for feedback and hints
 assessment#:#tst_addit_passes_blocked_after_passed_msg#:#You have passed the test. The test cannot be started again.
 assessment#:#tst_all_test_competences#:#All Test Competence
 assessment#:#tst_all_user_data_deleted#:#All user data of this test has been removed!
@@ -2613,14 +2610,17 @@ buddysystem#:#buddy_enable_info#:#If enabled, users are allowed to contact each 
 buddysystem#:#buddy_handle_contact_request#:#Contact Request
 buddysystem#:#buddy_noti_cr_profile_not_published#:#Profile not published
 buddysystem#:#buddy_notification_contact_request#:#Contact Request
+buddysystem#:#buddy_notification_contact_request_ignore#:#Ignore Request
 buddysystem#:#buddy_notification_contact_request_ignore_osd#:#Ignore Request
+buddysystem#:#buddy_notification_contact_request_link#:#Approve Request
 buddysystem#:#buddy_notification_contact_request_link_osd#:#Approve Request
-buddysystem#:#buddy_notification_contact_request_long#:#[SALUTATION], "[REQUESTING_USER]" wants to add you to his friends list.
+buddysystem#:#buddy_notification_contact_request_long#:#[SALUTATION][BR][BR]"[REQUESTING_USER]" wants to add you to his friends list.[BR][BR]Personal Profile Link: [PERSONAL_PROFILE_LINK][BR][BR][APPROVE_REQUEST_TXT] [APPROVE_REQUEST][BR][IGNORE_REQUEST_TXT] [IGNORE_REQUEST]
 buddysystem#:#buddy_notification_contact_request_short#:#The user "[REQUESTING_USER]" wants to add you to his friends list.
 buddysystem#:#buddy_relation_requested#:#A request has been sent to the user.
 buddysystem#:#buddy_request_approved#:#You successfully approved the contact.
 buddysystem#:#buddy_request_ignored#:#You ignored the user.
 buddysystem#:#buddy_tbl_filter_state#:#Status
+buddysystem#:#buddy_tbl_state_actions_col_label#:#State / Action
 buddysystem#:#buddy_tbl_title_relations#:#Relations to Other Users
 buddysystem#:#buddy_use_osd#:#Popup Contact Requests
 buddysystem#:#buddy_use_osd_info#:#Display a popup to indicate a user wants to add you to his friends lists.
@@ -2806,7 +2806,7 @@ chatroom#:#chat_https_cert_info#:#Please define an absolute server path to the S
 chatroom#:#chat_https_dhparam_info#:#Please define an absolute server path to a file (e.g.: /etc/ssl/private/dhparam.pem), used for the negotiation of Diffie Hellman parameters (e.g. generated via: openssl dhparam -out /etc/ssl/private/dhparam.pem 2048 ).
 chatroom#:#chat_https_key_info#:#Please define an absolute server path to the private key file (e.g..: /etc/ssl/private/server.key).
 chatroom#:#chat_invitation#:#"[INVITER_NAME]" invites you into chat room "[ROOM_NAME]"
-chatroom#:#chat_invitation_long#:#[SALUTATION] You have been invited to a chat room: Chat Room Title: [ROOM_NAME] Invited by: [INVITER_NAME] To join the chat room, please follow the given link.
+chatroom#:#chat_invitation_long#:#[SALUTATION][BR][BR]You have been invited to a chat room:[BR]Chat Room Title: [ROOM_NAME][BR]Invited by: [INVITER_NAME][BR]URL: [LINK][BR][BR]To join the chat room, please follow the given URL.
 chatroom#:#chat_invitation_nc_inv_x#:#You have %s chat invitations.
 chatroom#:#chat_invitation_nc_no_inv#:#You have no chat invitations.
 chatroom#:#chat_invitation_short#:#Please click the link to enter the chat room.
@@ -2836,6 +2836,7 @@ chatroom#:#chat_osc_emoticons#:#Emoticons
 chatroom#:#chat_osc_head_grp_x_persons#:#%s Users
 chatroom#:#chat_osc_invite_to_conversation#:#Add to Conversation
 chatroom#:#chat_osc_leave_grp_conv#:#Leave Conversation
+chatroom#:#chat_osc_minimize#:#Minimize
 chatroom#:#chat_osc_nc_conv_x_p#:#You have %s hidden conversations.
 chatroom#:#chat_osc_nc_conv_x_s#:#You have one hidden conversation.
 chatroom#:#chat_osc_nc_no_conv#:#No Conversations available
@@ -3785,6 +3786,7 @@ common#:#crsr#:#Course Link
 common#:#crsr_add#:#Add Course Link
 common#:#crsr_edit_info#:#Please choose one course for creating a new link.
 common#:#crsr_new#:#Create Course Link
+common#:#crsr_settings#:#Course Link Settings
 common#:#csv_export#:#CSV-Export
 common#:#current_ip#:#Current IP:
 common#:#current_ip_alert#:#Notice: if you enter a wrong ip you won't be able to access the system with this profile anymore.
@@ -3803,7 +3805,6 @@ common#:#day#:#Day
 common#:#days#:#Days
 common#:#db_host#:#Database Host
 common#:#db_name#:#Database Name
-common#:#db_need_hotfix#:#Hotfix available. Please open <a href="./setup/setup.php">»Setup</a>!
 common#:#db_need_update#:#Database needs an update!
 common#:#db_pass#:#Database Password
 common#:#db_type#:#Database Type
@@ -4098,7 +4099,7 @@ common#:#forums_last_post#:#Latest Article
 common#:#forums_new_articles#:#New Articles
 common#:#forums_notification_settings#:#Forums Notification Settings
 common#:#forums_threads#:#Threads
-common#:#forums_use_alias#:#You may use a pseudonym for your posting. If you leave this field blank, your posting will be marked as written by ‘Anonymous’.
+common#:#forums_use_alias#:#You may use a pseudonym for your posting. If you leave this field blank, your posting will be marked as written by ‘%s’.
 common#:#forums_your_name#:#Your Name
 common#:#frm#:#Forum
 common#:#frm_add#:#Add Forum
@@ -4242,9 +4243,7 @@ common#:#ignore_on_conflict#:#Ignore on conflict
 common#:#ignore_required_fields#:#Ignore required fields
 common#:#ignore_required_fields_info#:#If activated, you can submit this form without filling out all mandatory fields. The new user has to add the missing information on the personal profile after the next login.
 common#:#il_astpl_loc_initial#:#Initial Test
-common#:#il_astpl_loc_initial_desc#:#Settings template for initial tests of learning objective oriented courses
 common#:#il_astpl_loc_qualified#:#Qualifying Test
-common#:#il_astpl_loc_qualified_desc#:#Settings template for qualifying tests of learning objective oriented courses
 common#:#il_blog_contributor#:#Blog Author
 common#:#il_blog_editor#:#Blog Editor
 common#:#il_chat_moderator#:#Chat Moderator
@@ -4343,7 +4342,7 @@ common#:#itgr_add#:#Add Item Group
 common#:#itgr_new#:#New Item Group
 common#:#java_server#:#Java-Server
 common#:#java_server_host#:#Host
-common#:#java_server_info#:#If activated, it is possible to search in PDF, HTML files and HTML-Learning modules
+common#:#java_server_info#:#If activated, it is possible to search in PDF, HTML files and HTML-Learning modules###Needs to be adapted to new content of German lang file.
 common#:#java_server_port#:#Port
 common#:#java_server_readme#:#Setup information
 common#:#join#:#Join
@@ -4798,8 +4797,8 @@ common#:#obj_chta#:#Chat Room
 common#:#obj_chtr#:#Chat Room
 common#:#obj_chtr_duplicate#:#Copy Chat Room
 common#:#obj_cld#:#Cloud Object
-common#:#obj_cmis#:#xAPI/cmi5
-common#:#obj_cmis_desc#:#Learning Record Store Types Configuration
+common#:#obj_cmis#:#LRS
+common#:#obj_cmis_desc#:#Configure the Types of Learning Record Stores
 common#:#obj_cmix#:#xAPI/cmi5
 common#:#obj_cmps#:#Plugins
 common#:#obj_cmps_desc#:#General settings for Plugins
@@ -5240,6 +5239,7 @@ common#:#prg_wizard_page#:#Copy Study Program (Step 2/2)
 common#:#prgr_add#:#Add Study Programme Link
 common#:#prgr_edit_info#:#Please choose one Study Programme for creating a new link.
 common#:#prgr_new#:#Create Study Programme Link
+common#:#prgr_settings#:#Settings of Study Programme Link
 common#:#print#:#Print
 common#:#print_view#:#Print View
 common#:#private_notes#:#Private Notes
@@ -5664,6 +5664,7 @@ common#:#toggle_dropdown#:#Toggle Dropdown
 common#:#toggle_off#:#OFF### Don't translate this label to prevent rendering problems of the related Toggle Button!
 common#:#toggle_on#:#ON### Don't translate this label to prevent rendering problems of the related Toggle Button!
 common#:#tomorrow#:#Tomorrow
+common#:#toolbar_more_actions#:#More Actions
 common#:#tools#:#Tools
 common#:#top_of_page#:#Top of page
 common#:#total#:#Total
@@ -7328,7 +7329,6 @@ crs#:#crs_contact_phone#:#Telephone
 crs#:#crs_contact_responsibility#:#Responsibility
 crs#:#crs_content#:#Course Content
 crs#:#crs_copy#:#Copy Course
-crs#:#crs_count_members#:#Number of members
 crs#:#crs_course_group_notification_link#:#Link:
 crs#:#crs_course_period_not_valid#:#The period is not valid.
 crs#:#crs_course_status_of_users#:#Passing the Course
@@ -7854,6 +7854,7 @@ crs#:#mem_cron_min_members_intro#:#The following courses and groups do not meet 
 crs#:#mem_cron_min_members_reason#:#You receive this message because you have activated the notification in the members-tab.
 crs#:#mem_cron_min_members_subject#:#Course/Group: Minimum Members Check
 crs#:#mem_cron_min_members_task#:#Please inform the participants if the course will not take place because of not enough attendants. Adjust the settings afterwards.
+crs#:#obj_count_members#:#Number of members
 crs#:#sess_attendance_list#:#Attendance List
 crs#:#sess_gen_attendance_list#:#Generate List
 crs#:#sess_join_info#:#Please click Attend if you want to take part at this session.
@@ -9409,6 +9410,8 @@ export#:#export_resource#:#Resource
 export#:#export_save_selection#:#Start Export
 export#:#export_select_resources#:#Select Resources
 export#:#no_file#:#No file
+file#:#action_download#:#Enable Direct Download
+file#:#action_show#:#Redirect User to the Info Page
 file#:#file_copy#:#Copy File
 file#:#file_download#:#Download File
 file#:#file_import#:#Import File
@@ -9424,13 +9427,14 @@ file#:#file_suffix_default_white#:#Default Suffix Whitelist
 file#:#file_suffix_default_white_info#:#Default list of accepted file suffixes.
 file#:#file_suffix_overall_white#:#Overal Suffix Whitelist
 file#:#file_suffix_overall_white_info#:#Resulting overall list of accepted file suffixes.
-file#:#file_upload_info_file_with_critical_extension#:#The uploaded file contains a critical or unknown file ending. The file ending will be changed to .sec for every download. If necessary, contact your administrator.
+file#:#file_upload_info_file_with_critical_extension#:#At least one uploaded file contains a critical or unknown file ending. The file ending will be changed to .sec for every download. If necessary, contact your administrator. Filename(s): %s
 file#:#file_uploaded_by#:#Version uploaded by
 file#:#general_upload_error_occured#:#An unexpected error occured during upload.
 file#:#generate_sanitize_report#:#Report about inaccessible files
 file#:#migrated#:#Status
 file#:#msg_unzip_success#:#Archive has been successfully unziped.
 file#:#not_yet_migrated#:#This file object has not yet been migrated and no new versions can be created. Please contact the administrators of the platform.
+file#:#on_click_action#:#Action on Click on Title
 file#:#replace_file_info#:#All previous file versions will be deleted.
 file#:#resource_id#:#Resource ID
 file#:#storage_id#:#Storage ID
@@ -9597,6 +9601,8 @@ forum#:#frm_action_not_possible_parent_deleted#:#Action not possible, the parent
 forum#:#frm_action_not_possible_thr_closed#:#Action not possible, the thread has been closed.
 forum#:#frm_action_not_possible_thr_deleted#:#Action not possible, the thread has been deleted.
 forum#:#frm_activation_online_info#:#Set the forum online to make it visible and available to other users. If not, only administrators will have access to it.
+forum#:#frm_all_postings_stats#:#All
+forum#:#frm_all_threads#:#All Threads
 forum#:#frm_anonymous_posting#:#Posting with pseudonym
 forum#:#frm_anonymous_posting_desc#:#If enabled, registered users can post to this forum only by using a pseudonym or without name. If the option "Mark moderators posts" is also enabled, moderators can not use a pseudonym.
 forum#:#frm_at_least_one_moderator#:#There has to be at least one moderator.
@@ -9631,7 +9637,7 @@ forum#:#frm_noti_subject_act_post#:#Posting activated in forum "%1$s"%2$s, threa
 forum#:#frm_noti_subject_answ_post#:#Posting answered in forum "%1$s"%2$s, thread "%3$s"
 forum#:#frm_noti_subject_cens_post#:#Posting censored in forum "%1$s"%2$s, thread "%3$s"
 forum#:#frm_noti_subject_del_post#:#Posting deleted in forum "%1$s"%2$s, thread "%3$s"
-forum#:#frm_noti_subject_del_thread#:#Thread "%4$s" deleted in forum "%1$s"%3$s
+forum#:#frm_noti_subject_del_thread#:#Thread "%3$s" deleted in forum "%1$s"%2$s
 forum#:#frm_noti_subject_new_post#:#New posting in forum "%1$s"%2$s, thread "%3$s"
 forum#:#frm_noti_subject_uncens_post#:#Posting uncensored in forum "%1$s"%2$s, thread "%3$s"
 forum#:#frm_noti_subject_upt_post#:#Posting modified in forum "%1$s"%2$s, thread "%3$s"
@@ -9935,6 +9941,7 @@ help#:#help_modules#:#Help Packages
 help#:#help_no_content#:#There is no help content available for the current screen. You may use the search tool.
 help#:#help_open_online_help#:#Open Online Help
 help#:#help_search_label#:#Search Help
+help#:#help_select_a_file#:#Please select a file.
 help#:#help_set_mode#:#Set Mode
 help#:#help_sure_delete_help_modules#:#Are you sure that these packages should be deleted?
 help#:#help_toggle_tooltips#:#Help Tooltips
@@ -10010,7 +10017,6 @@ iass#:#iass_remove_user_qst#:#Should the examinee really be removed?
 iass#:#iass_responsibility#:#Responsibility
 iass#:#iass_save_amend#:#Save Amended Record
 iass#:#iass_settings_saved#:#Settings saved.
-iass#:#iass_sort#:#Sortation
 iass#:#iass_sort_changetime_asc#:#Last Change ascending
 iass#:#iass_sort_changetime_desc#:#Last Change descending
 iass#:#iass_sort_examiner_login_asc#:#Examiner ascending
@@ -10696,7 +10702,6 @@ mail#:#first_email_missing_info#:#Selection not possible because no e-mail addre
 mail#:#forward#:#Forward
 mail#:#goto_invitation_chat#:#Open Chat Room
 mail#:#invite_to_chat#:#Invite to Chat
-mail#:#linebreak#:#Line Break
 mail#:#link_check_affected_links#:#Affected Links
 mail#:#link_check_introduction#:#the following weblinks are invalid:
 mail#:#link_check_perma_link#:#Permanent Link
@@ -10708,7 +10713,7 @@ mail#:#mail_add_subfolder#:#Add Sub-folder
 mail#:#mail_add_subject#:#Please enter a subject
 mail#:#mail_allow_external#:#External E-Mails
 mail#:#mail_allow_external_info#:#If disabled, the delivery of external e-mails (via SMTP) is globally disabled.
-mail#:#mail_assign_entry_to_mailing_list#:#Assign an Entry of Your Contacts to Mailing List
+mail#:#mail_assign_entry_to_mailing_list#:#Assign an Entry of Your Contacts to Mailing List "%s"
 mail#:#mail_attachment_file_not_exist#:#At least one of the following attachments does not exist: %1$s
 mail#:#mail_attachments#:#Attachments
 mail#:#mail_auto_generated_info#:#This mail was automatically sent to you by the ILIAS installation %s, %s
@@ -10772,6 +10777,7 @@ mail#:#mail_folder_deleted#:#The folder has been deleted
 mail#:#mail_folder_exists#:#A folder already exists with this name
 mail#:#mail_folder_name_changed#:#The folder has been renamed
 mail#:#mail_following_rcp_not_valid#:#The following recipients are not valid:
+mail#:#mail_form_placeholders_label#:#Available Placeholders
 mail#:#mail_generic_rcp_error#:#An error occured while validating the recipients: %1$s
 mail#:#mail_global_reply_to_addr#:#Reply-To
 mail#:#mail_global_reply_to_addr_info#:#Please enter the desired 'Reply-To' address.
@@ -10797,7 +10803,7 @@ mail#:#mail_max_size_attachments_total#:#Please enter the maximum file size allo
 mail#:#mail_max_size_attachments_total_error#:#The allowed attachment size is:
 mail#:#mail_maxsize_attachment_error#:#The upload limit is:
 mail#:#mail_member_notification#:#Participant Notification
-mail#:#mail_members_of_mailing_list#:#Members of Mailing List
+mail#:#mail_members_of_mailing_list#:#Members of Mailing List "%s"
 mail#:#mail_members_search_continue#:#Continue
 mail#:#mail_message_send#:#Message sent
 mail#:#mail_move_error#:#Error moving mail
@@ -10837,7 +10843,7 @@ mail#:#mail_orphaned_mails#:#Delete old or orphaned mails
 mail#:#mail_orphaned_mails_desc#:#Delete old or orphaned mails
 mail#:#mail_recipient_not_found#:#%1$s (could not find a valid recipient)
 mail#:#mail_rename_folder#:#Rename Folder
-mail#:#mail_roles#:#to users with the following local roles
+mail#:#mail_roles#:#Users with the following local roles
 mail#:#mail_s#:#Mail(s)
 mail#:#mail_salutation_anonymous#:#Hello
 mail#:#mail_salutation_f#:#Dear Mrs.
@@ -10848,8 +10854,8 @@ mail#:#mail_salutation_male#:#Output for placeholder [MAIL_SALUTATION], if salut
 mail#:#mail_salutation_n#:#Hello
 mail#:#mail_saved#:#The message has been saved
 mail#:#mail_second_email#:#Second E-Mail Address
-mail#:#mail_sel_label#:#Choose the Recipients
-mail#:#mail_sel_users#:#Send Mail to Selected Users
+mail#:#mail_sel_label#:#Send mail to
+mail#:#mail_sel_users#:#Selected users
 mail#:#mail_select_attachment#:#Please select an attachment for download.
 mail#:#mail_select_course#:#Please select at least one course.
 mail#:#mail_select_group#:#Please select at least one group.
@@ -11143,12 +11149,12 @@ mep#:#mobs_black_list_file_types#:#Forbidden File Types
 mep#:#mobs_black_list_file_types_info#:#Enter a comma separated list of file suffixes. This list will restrict the set of allowed file types. Usually you need this if the former list is empty (all file types are allowed).
 mep#:#mobs_restrict_file_types#:#Allowed File Types
 mep#:#mobs_restrict_file_types_info#:#Enter a comma separated list of file suffixes (e.g. jpg,gif) that are allowed to be uploaded into media objects. If no value is entered, all file types are allowed.
-meta#:#adt_error_max_length#:#Please enter a shorter text.
-meta#:#md_adn_int_error_no_default#:#Please select on activated language as "Default-Language".
+meta#:#adt_error_max_length#:#The text you have entered is too long. Please enter a shorter text.
+meta#:#md_adn_int_error_no_default#:#Please select an activated language as your "Default-Language".
 meta#:#md_adv_active#:#Active
 meta#:#md_adv_added_new_record#:#A new data set has been added.
 meta#:#md_adv_col_presentation_ordering#:#Position
-meta#:#md_adv_confirm_definition#:#Please confirm the new definition settings.
+meta#:#md_adv_confirm_definition#:#Please confirm the new settings.
 meta#:#md_adv_confirm_definition_select_option#:#Deleted Option
 meta#:#md_adv_confirm_definition_select_option_all#:#Handle all existing entries the same
 meta#:#md_adv_confirm_definition_select_option_all_action#:#New Value
@@ -11158,12 +11164,12 @@ meta#:#md_adv_confirm_definition_select_option_single#:#Decide for each existing
 meta#:#md_adv_confirm_definition_select_section#:#Migration of the deleted options
 meta#:#md_adv_create_field#:#New Field
 meta#:#md_adv_create_record#:#New Data Set
-meta#:#md_adv_delete_fields_sure#:#Do you really want to delete the following field definitions?
-meta#:#md_adv_delete_files_sure#:#Do you really want to delete the following export  files?
-meta#:#md_adv_delete_record_sure#:#Do really want to delete the following data sets?
-meta#:#md_adv_deleted_fields#:#The fields have been deleted.
-meta#:#md_adv_deleted_files#:#Deleted export files.
-meta#:#md_adv_deleted_records#:#Data set deleted.
+meta#:#md_adv_delete_fields_sure#:#Are you sure you want to delete the following field(s)?
+meta#:#md_adv_delete_files_sure#:#Are you sure you want to delete the following export file(s)?
+meta#:#md_adv_delete_record_sure#:#Are you sure you want to delete the following data set(s)?
+meta#:#md_adv_deleted_fields#:#Field(s) successfully deleted.
+meta#:#md_adv_deleted_files#:#File(s) successfully deleted.
+meta#:#md_adv_deleted_records#:#Data set(s) successfully deleted.
 meta#:#md_adv_desc_show#:#Show Description
 meta#:#md_adv_edit_complex_option#:#Edit Option Properties
 meta#:#md_adv_edit_field#:#Edit Field
@@ -11179,54 +11185,54 @@ meta#:#md_adv_import_record#:#Import Metadata Set
 meta#:#md_adv_int_current#:#Current Language:
 meta#:#md_adv_int_default#:#Default Language:
 meta#:#md_adv_int_translation_info#:#Translation:
-meta#:#md_adv_no_fields#:#No Fields Defined
-meta#:#md_adv_number_decimals#:#Decimals
+meta#:#md_adv_no_fields#:#This data set does not yet have any fields
+meta#:#md_adv_number_decimals#:#Decimal Places
 meta#:#md_adv_number_max#:#Maximum Value
 meta#:#md_adv_number_min#:#Minimum Value
 meta#:#md_adv_number_suffix#:#Suffix
-meta#:#md_adv_presentation#:#Presentation
+meta#:#md_adv_presentation#:#Display Options
 meta#:#md_adv_record_activate_languages#:#Activate Languages
-meta#:#md_adv_record_list#:#Datasets
-meta#:#md_adv_record_lng_table#:#Language Managment
+meta#:#md_adv_record_list#:#Data Sets
+meta#:#md_adv_record_lng_table#:#Language Management
 meta#:#md_adv_record_lng_table_active#:#Active
 meta#:#md_adv_record_lng_table_default#:#Default
 meta#:#md_adv_record_lng_table_inst#:#Installed
 meta#:#md_adv_record_lng_table_lng#:#Language
-meta#:#md_adv_records#:#Included Data Sets
-meta#:#md_adv_records_exported#:#A new export file has been created.
+meta#:#md_adv_records#:#Data Sets
+meta#:#md_adv_records_exported#:#New export file(s) successfully created.
 meta#:#md_adv_scope#:#Scope
 meta#:#md_adv_scope_list_header#:#Limited to:
 meta#:#md_adv_searchable#:#Searchable
-meta#:#md_adv_select_one_file#:#Please choose one file.
+meta#:#md_adv_select_one_file#:#Please select only one file.
 meta#:#md_adv_show#:#Show
-meta#:#md_adv_substitution_table#:#Presentation in the Repository
+meta#:#md_adv_substitution_table#:#Display Options for Custom Metadata in the Repository
 meta#:#md_adv_text_max_length#:#Maximum Length
 meta#:#md_adv_text_multi#:#Multiline
 meta#:#md_advanced#:#Custom Metadata
 meta#:#md_aria_language_selection#:#Language Selection
 meta#:#md_copyright#:#Copyright
-meta#:#md_copyright_add#:#Add Copyright Default
-meta#:#md_copyright_edit#:#Edit Copyright Default
-meta#:#md_copyright_enable_info#:#Choose this option to offer a selection of predefined copyrights.
+meta#:#md_copyright_add#:#Add New Copyright
+meta#:#md_copyright_edit#:#Edit Copyright
+meta#:#md_copyright_enable_info#:#Add a copyright section to the LOM Metadata of Objects, including a selection of selectable predefined copyrights.
 meta#:#md_copyright_enabled#:#Enable Copyright Selection
 meta#:#md_copyright_preview#:#Copyright (Preview)
-meta#:#md_copyright_selection#:#Copyright Defaults
+meta#:#md_copyright_selection#:#Available Copyrights
 meta#:#md_copyright_settings#:#Copyright Settings
 meta#:#md_copyright_value#:#Copyright
-meta#:#md_copyrights_deleted#:#Deleted Copyright
+meta#:#md_copyrights_deleted#:#Copyright deleted.
 meta#:#md_days#:#Days:
-meta#:#md_delete_cp_sure#:#Do you really want to delete the following entries ?
+meta#:#md_delete_cp_sure#:#Are you sure you want to delete the following entries?
 meta#:#md_delimiter#:#Delimiter
-meta#:#md_delimiter_info#:#The delimiter is used in the quick editing screen for keywords and authors separation. Default is ‘,’.
+meta#:#md_delimiter_info#:#The delimiter is used in the quick editing screen to separate multiple keywords and/or authors. Default is ‘,’.
 meta#:#md_fields#:#Fields
 meta#:#md_general_settings#:#General Settings
-meta#:#md_months#:#Month:
+meta#:#md_months#:#Months:
 meta#:#md_obj_types#:#Assigned Objects
 meta#:#md_record_export_table#:#Export Files
 meta#:#md_record_list_table#:#Custom Metadata Sets
 meta#:#md_separated_by#:#Separated by %s
 meta#:#md_time#:#Time:
-meta#:#md_used#:#Usage
+meta#:#md_used#:#Current Number of Usages
 meta#:#meta_accessibility_restrictions#:#Accessibility Restrictions
 meta#:#meta_active#:#Active
 meta#:#meta_add#:#Add
@@ -11252,7 +11258,7 @@ meta#:#meta_c_AU#:#Australia
 meta#:#meta_c_AW#:#Aruba
 meta#:#meta_c_AX#:#Åland Islands
 meta#:#meta_c_AZ#:#Azerbaijan
-meta#:#meta_c_BA#:#Bosnia And Herzegowina
+meta#:#meta_c_BA#:#Bosnia and Herzegovina
 meta#:#meta_c_BB#:#Barbados
 meta#:#meta_c_BD#:#Bangladesh
 meta#:#meta_c_BE#:#Belgium
@@ -11312,7 +11318,7 @@ meta#:#meta_c_FX#:#France, Metropolitan
 meta#:#meta_c_GA#:#Gabon
 meta#:#meta_c_GB#:#United Kingdom
 meta#:#meta_c_GD#:#Grenada
-meta#:#meta_c_GE#:#Giorgia
+meta#:#meta_c_GE#:#Georgia
 meta#:#meta_c_GF#:#French Guiana
 meta#:#meta_c_GG#:#Guernsey
 meta#:#meta_c_GH#:#Ghana
@@ -11329,7 +11335,7 @@ meta#:#meta_c_GU#:#Guam
 meta#:#meta_c_GW#:#Guinea-Bissau
 meta#:#meta_c_GY#:#Guyana
 meta#:#meta_c_HK#:#Hong Kong
-meta#:#meta_c_HM#:#Heard And Nc Donald Islands
+meta#:#meta_c_HM#:#Heard and McDonald Islands
 meta#:#meta_c_HN#:#Honduras
 meta#:#meta_c_HR#:#Croatia
 meta#:#meta_c_HT#:#Haiti
@@ -11353,13 +11359,13 @@ meta#:#meta_c_KG#:#Kyrgyzstan
 meta#:#meta_c_KH#:#Cambodia
 meta#:#meta_c_KI#:#Kiribati
 meta#:#meta_c_KM#:#Comoros
-meta#:#meta_c_KN#:#Saint Kitts And Nevis
+meta#:#meta_c_KN#:#Saint Kitts and Nevis
 meta#:#meta_c_KP#:#North Korea (People's Republic Of Korea)
 meta#:#meta_c_KR#:#South Korea (Republic Of Korea)
 meta#:#meta_c_KW#:#Kuwait
 meta#:#meta_c_KY#:#Cayman Islands
 meta#:#meta_c_KZ#:#Kazakhstan
-meta#:#meta_c_LA#:#Lao People's Republic
+meta#:#meta_c_LA#:#Lao People's Democratic Republic
 meta#:#meta_c_LB#:#Lebanon
 meta#:#meta_c_LC#:#Saint Lucia
 meta#:#meta_c_LI#:#Liechtenstein
@@ -11369,15 +11375,15 @@ meta#:#meta_c_LS#:#Lesotho
 meta#:#meta_c_LT#:#Lithuania
 meta#:#meta_c_LU#:#Luxembourg
 meta#:#meta_c_LV#:#Latvia
-meta#:#meta_c_LY#:#Libyan Arab Jamahiriya
+meta#:#meta_c_LY#:#Libya
 meta#:#meta_c_MA#:#Morocco
 meta#:#meta_c_MC#:#Monaco
 meta#:#meta_c_MD#:#Moldova
 meta#:#meta_c_ME#:#Montenegro
-meta#:#meta_c_MF#:#Saint Martin (French part)
+meta#:#meta_c_MF#:#Saint Martin (French Part)
 meta#:#meta_c_MG#:#Madagascar
 meta#:#meta_c_MH#:#Marshall Islands
-meta#:#meta_c_MK#:#Macedonia
+meta#:#meta_c_MK#:#North Macedonia
 meta#:#meta_c_ML#:#Mali
 meta#:#meta_c_MM#:#Myanmar
 meta#:#meta_c_MN#:#Mongolia
@@ -11413,8 +11419,8 @@ meta#:#meta_c_PG#:#Papua New Guinea
 meta#:#meta_c_PH#:#Philippines
 meta#:#meta_c_PK#:#Pakistan
 meta#:#meta_c_PL#:#Poland
-meta#:#meta_c_PM#:#St. Pierre And Miquelon
-meta#:#meta_c_PN#:#Pitcairn
+meta#:#meta_c_PM#:#St. Pierre and Miquelon
+meta#:#meta_c_PN#:#Pitcairn Islands
 meta#:#meta_c_PR#:#Puerto Rico
 meta#:#meta_c_PS#:#Palestinian Territories (Occupied)
 meta#:#meta_c_PT#:#Portugal
@@ -11434,14 +11440,14 @@ meta#:#meta_c_SE#:#Sweden
 meta#:#meta_c_SG#:#Singapore
 meta#:#meta_c_SH#:#St. Helena
 meta#:#meta_c_SI#:#Slovenia
-meta#:#meta_c_SJ#:#Svalbard And Jan Mayen Islands
+meta#:#meta_c_SJ#:#Svalbard and Jan Mayen Islands
 meta#:#meta_c_SK#:#Slovakia
-meta#:#meta_c_SL#:#Siearra Leone
+meta#:#meta_c_SL#:#Sierra Leone
 meta#:#meta_c_SM#:#San Marino
 meta#:#meta_c_SN#:#Senegal
 meta#:#meta_c_SO#:#Somalia
 meta#:#meta_c_SR#:#Suriname
-meta#:#meta_c_ST#:#Sao Tome And Principe
+meta#:#meta_c_ST#:#Sao Tomé and Principe
 meta#:#meta_c_SV#:#El Salvador
 meta#:#meta_c_SY#:#Syrian Arab Republic
 meta#:#meta_c_SZ#:#Swaziland
@@ -11457,7 +11463,7 @@ meta#:#meta_c_TM#:#Turkmenistan
 meta#:#meta_c_TN#:#Tunisia
 meta#:#meta_c_TO#:#Tonga
 meta#:#meta_c_TR#:#Turkey
-meta#:#meta_c_TT#:#Trinidad And Tobago
+meta#:#meta_c_TT#:#Trinidad and Tobago
 meta#:#meta_c_TV#:#Tuvalu
 meta#:#meta_c_TW#:#Taiwan
 meta#:#meta_c_TZ#:#Tanzania
@@ -11472,9 +11478,9 @@ meta#:#meta_c_VC#:#Saint Vincent And The Grenadines
 meta#:#meta_c_VE#:#Venezuela
 meta#:#meta_c_VG#:#Virgin Islands (British)
 meta#:#meta_c_VI#:#Virgin Islands (US)
-meta#:#meta_c_VN#:#Viet Nam
+meta#:#meta_c_VN#:#Vietnam
 meta#:#meta_c_VU#:#Vanuatu
-meta#:#meta_c_WF#:#Wallis And Futuna Islands
+meta#:#meta_c_WF#:#Wallis and Futuna Islands
 meta#:#meta_c_WS#:#Samoa
 meta#:#meta_c_XK#:#Kosovo
 meta#:#meta_c_YE#:#Yemen
@@ -11482,19 +11488,19 @@ meta#:#meta_c_YT#:#Mayotte
 meta#:#meta_c_ZA#:#South Africa
 meta#:#meta_c_ZM#:#Zambia
 meta#:#meta_c_ZW#:#Zimbabwe
-meta#:#meta_catalog#:#Catalog
+meta#:#meta_catalog#:#Catalogue
 meta#:#meta_classification#:#Classification
 meta#:#meta_collection#:#Collection
 meta#:#meta_competency#:#Competency
-meta#:#meta_contentprovider#:#Content provider
+meta#:#meta_contentprovider#:#Content Provider
 meta#:#meta_context#:#Context
 meta#:#meta_contribute#:#Contribute
 meta#:#meta_copyright#:#Copyright
 meta#:#meta_copyright_and_other_restrictions#:#Copyright and Other Restrictions
-meta#:#meta_copyright_change_info#:#You are going to change the licence assigned to this content. This should only be done in accordance with the copyright owner. Please continue only if the new licence is not more restrictive than the one used before.
-meta#:#meta_copyright_change_warning_title#:#Modification of Copyright Settings
+meta#:#meta_copyright_change_info#:#You are about to change the copyright licence assigned to this content. This should only be done with the permission of the copyright holder. Please continue only if the new licence is not more restrictive than the one used before.
+meta#:#meta_copyright_change_warning_title#:#Changing a Copyright
 meta#:#meta_copyright_in_use#:#In use
-meta#:#meta_copyright_outdated#:#Outdated
+meta#:#meta_copyright_outdated#:#Outdated / No longer in use
 meta#:#meta_copyright_show_usages#:#Show Usages
 meta#:#meta_copyright_status#:#Status
 meta#:#meta_copyright_sub_items#:#Sub Items
@@ -11518,47 +11524,47 @@ meta#:#meta_education#:#Education
 meta#:#meta_educational#:#Educational
 meta#:#meta_educational_level#:#Educational Level
 meta#:#meta_educational_objective#:#Educational Objective
-meta#:#meta_educationalvalidator#:#Educational validator
+meta#:#meta_educationalvalidator#:#Educational Validation
 meta#:#meta_entity#:#Entity
 meta#:#meta_entry#:#Entry
 meta#:#meta_exam#:#Exam
 meta#:#meta_exercise#:#Exercise
 meta#:#meta_experiment#:#Experiment
-meta#:#meta_expositive#:#Expositive
-meta#:#meta_figure#:#Figure
-meta#:#meta_final#:#Final
+meta#:#meta_expositive#:#Expository
+meta#:#meta_figure#:#Image / Illustration
+meta#:#meta_final#:#Final Version
 meta#:#meta_format#:#Format
 meta#:#meta_general#:#General
 meta#:#meta_global#:#Global
 meta#:#meta_graph#:#Graph
-meta#:#meta_graphicaldesigner#:#Graphical designer
-meta#:#meta_has_format#:#Has Format
-meta#:#meta_has_part#:#Has Part
+meta#:#meta_graphicaldesigner#:#Graphic Design
+meta#:#meta_has_format#:#Has format …
+meta#:#meta_has_part#:#Has part …
 meta#:#meta_has_version#:#Has Version
 meta#:#meta_hierarchical#:#Hierarchical
 meta#:#meta_high#:#High
 meta#:#meta_higher_education#:#Higher Education
-meta#:#meta_id#:#Id
+meta#:#meta_id#:#ID
 meta#:#meta_idea#:#Idea
 meta#:#meta_identifier#:#Identifier
 meta#:#meta_index#:#Index
-meta#:#meta_info_only_repository_objects#:#Only repository objects are listed below (and no media objects or LM pages).
-meta#:#meta_info_tlt_not_valid#:#The current value is not valid. Therefore it can not be used other sections, e.g for learning progress statistics. Please insert atypical learning time in hours and/or minutes.
+meta#:#meta_info_only_repository_objects#:#Only repository objects are listed below (but not media objects or learning module pages).
+meta#:#meta_info_tlt_not_valid#:#The current value is not valid. Therefore it can not be used in other sections, such as learning progress statistics. Please insert a typical learning time in hours and/or minutes.
 meta#:#meta_initiator#:#Initiator
-meta#:#meta_installation_remarks#:#Installation Remarks
-meta#:#meta_instructionaldesigner#:#Instructional designer
+meta#:#meta_installation_remarks#:#Installation Notes
+meta#:#meta_instructionaldesigner#:#Instructional Design
 meta#:#meta_intended_end_user_role#:#Intended End User Role
 meta#:#meta_interactivity_level#:#Interactivity Level
 meta#:#meta_interactivity_type#:#Interactivity Type
-meta#:#meta_is_based_on#:#Is Based On
-meta#:#meta_is_basis_for#:#Is Basis For
-meta#:#meta_is_format_of#:#Is Format Of
-meta#:#meta_is_part_of#:#Is Part Of
-meta#:#meta_is_referenced_by#:#Is Referenced By
-meta#:#meta_is_required_by#:#Is Required By
-meta#:#meta_is_version_of#:#Is Version Of
+meta#:#meta_is_based_on#:#Is based on …
+meta#:#meta_is_basis_for#:#Is basis for …
+meta#:#meta_is_format_of#:#Is format of …
+meta#:#meta_is_part_of#:#Is part of …
+meta#:#meta_is_referenced_by#:#Is referenced by
+meta#:#meta_is_required_by#:#Is required by
+meta#:#meta_is_version_of#:#Is version of
 meta#:#meta_keyword#:#Keyword
-meta#:#meta_kind#:#Kind
+meta#:#meta_kind#:#Type
 meta#:#meta_l_aa#:#Afar
 meta#:#meta_l_ab#:#Abkhazian
 meta#:#meta_l_af#:#Afrikaans
@@ -11568,7 +11574,7 @@ meta#:#meta_l_as#:#Assamese
 meta#:#meta_l_ay#:#Aymara
 meta#:#meta_l_az#:#Azerbaijani
 meta#:#meta_l_ba#:#Bashkir
-meta#:#meta_l_be#:#Byelorussian
+meta#:#meta_l_be#:#Belarusian
 meta#:#meta_l_bg#:#Bulgarian
 meta#:#meta_l_bh#:#Bihari
 meta#:#meta_l_bi#:#Bislama
@@ -11588,14 +11594,14 @@ meta#:#meta_l_eo#:#Esperanto
 meta#:#meta_l_es#:#Spanish
 meta#:#meta_l_et#:#Estonian
 meta#:#meta_l_eu#:#Basque
-meta#:#meta_l_fa#:#Persian (farsi)
+meta#:#meta_l_fa#:#Persian (Farsi)
 meta#:#meta_l_fi#:#Finnish
-meta#:#meta_l_fj#:#Fiji
+meta#:#meta_l_fj#:#Fijian
 meta#:#meta_l_fo#:#Faroese
 meta#:#meta_l_fr#:#French
 meta#:#meta_l_fy#:#Frisian
 meta#:#meta_l_ga#:#Irish
-meta#:#meta_l_gd#:#Scots gaelic
+meta#:#meta_l_gd#:#Scots Gaelic
 meta#:#meta_l_gl#:#Galician
 meta#:#meta_l_gn#:#Guarani
 meta#:#meta_l_gu#:#Gujarati
@@ -11622,44 +11628,44 @@ meta#:#meta_l_kn#:#Kannada
 meta#:#meta_l_ko#:#Korean
 meta#:#meta_l_ks#:#Kashmiri
 meta#:#meta_l_ku#:#Kurdish
-meta#:#meta_l_ky#:#Kirghiz
+meta#:#meta_l_ky#:#Kyrgyz
 meta#:#meta_l_la#:#Latin
 meta#:#meta_l_ln#:#Lingala
 meta#:#meta_l_lo#:#Laothian
 meta#:#meta_l_lt#:#Lithuanian
-meta#:#meta_l_lv#:#Latvian;lettish
+meta#:#meta_l_lv#:#Latvian;Lettish
 meta#:#meta_l_mg#:#Malagasy
 meta#:#meta_l_mi#:#Maori
 meta#:#meta_l_mk#:#Macedonian
 meta#:#meta_l_ml#:#Malayalam
 meta#:#meta_l_mn#:#Mongolian
-meta#:#meta_l_mo#:#Moldavian
+meta#:#meta_l_mo#:#Moldovan
 meta#:#meta_l_mr#:#Marathi
 meta#:#meta_l_ms#:#Malay
 meta#:#meta_l_mt#:#Maltese
 meta#:#meta_l_my#:#Burmese
-meta#:#meta_l_na#:#Nauru
+meta#:#meta_l_na#:#Nauruan
 meta#:#meta_l_ne#:#Nepali
 meta#:#meta_l_nl#:#Dutch
 meta#:#meta_l_no#:#Norwegian
 meta#:#meta_l_oc#:#Occitan
-meta#:#meta_l_om#:#Afan (oromo)
-meta#:#meta_l_or#:#Oriya
+meta#:#meta_l_om#:#Oromo; Afaan Oromoo
+meta#:#meta_l_or#:#Odia
 meta#:#meta_l_pa#:#Punjabi
 meta#:#meta_l_pl#:#Polish
 meta#:#meta_l_ps#:#Pashto; Pushto
 meta#:#meta_l_pt#:#Portuguese
 meta#:#meta_l_qu#:#Quechua
 meta#:#meta_l_rm#:#Rhaeto-romance
-meta#:#meta_l_rn#:#Kurundi
+meta#:#meta_l_rn#:#Kirundi
 meta#:#meta_l_ro#:#Romanian
 meta#:#meta_l_ru#:#Russian
 meta#:#meta_l_rw#:#Kinyarwanda
 meta#:#meta_l_sa#:#Sanskrit
 meta#:#meta_l_sd#:#Sindhi
 meta#:#meta_l_sg#:#Sangho
-meta#:#meta_l_sh#:#Serbo-croatian
-meta#:#meta_l_si#:#Singhalese
+meta#:#meta_l_sh#:#Serbo-Croatian
+meta#:#meta_l_si#:#Sinhala
 meta#:#meta_l_sk#:#Slovak
 meta#:#meta_l_sl#:#Slovenian
 meta#:#meta_l_sm#:#Samoan
@@ -11671,7 +11677,7 @@ meta#:#meta_l_ss#:#Siswati
 meta#:#meta_l_st#:#Sesotho
 meta#:#meta_l_su#:#Sundanese
 meta#:#meta_l_sv#:#Swedish
-meta#:#meta_l_sw#:#Swahili
+meta#:#meta_l_sw#:#Swahili; Kiswahili
 meta#:#meta_l_ta#:#Tamil
 meta#:#meta_l_te#:#Telugu
 meta#:#meta_l_tg#:#Tajik
@@ -11680,17 +11686,17 @@ meta#:#meta_l_ti#:#Tigrinya
 meta#:#meta_l_tk#:#Turkmen
 meta#:#meta_l_tl#:#Tagalog
 meta#:#meta_l_tn#:#Setswana
-meta#:#meta_l_to#:#Tonga
+meta#:#meta_l_to#:#Tongan
 meta#:#meta_l_tr#:#Turkish
 meta#:#meta_l_ts#:#Tsonga
 meta#:#meta_l_tt#:#Tatar
 meta#:#meta_l_tw#:#Twi
-meta#:#meta_l_ug#:#Uigur
+meta#:#meta_l_ug#:#Uyghur
 meta#:#meta_l_uk#:#Ukrainian
 meta#:#meta_l_ur#:#Urdu
 meta#:#meta_l_uz#:#Uzbek
 meta#:#meta_l_vi#:#Vietnamese
-meta#:#meta_l_vo#:#Volapuk
+meta#:#meta_l_vo#:#Volapük
 meta#:#meta_l_wo#:#Wolof
 meta#:#meta_l_xh#:#Xhosa
 meta#:#meta_l_yi#:#Yiddish
@@ -11916,6 +11922,7 @@ mob#:#mob_no_fixed_size_map_editing#:#Please define a fixed size for your image 
 mob#:#mob_object#:#Object
 mob#:#mob_really_delete_srt#:#Do you really want to delete the following srt files?
 mob#:#mob_srt_files_deleted#:#Subtitle files have been deleted.
+mob#:#mob_srt_not_allowed#:#Files with a .srt suffix are currently not allowed to be uploaded. If you would like to use srt files, contact your system administrator.
 mob#:#mob_subtitle_file#:#Subtitle File
 mob#:#mob_subtitle_files#:#Subtitle Files
 mob#:#mob_subtitles#:#Subtitles
@@ -12232,7 +12239,7 @@ orgu#:#orgu_already_deleted#:#The object was already deleted.
 orgu#:#orgu_enable_my_staff#:#Enable ‘Staff’
 orgu#:#orgu_enable_my_staff_info#:#Shows learning progress of own employees.
 orgu#:#orgu_global_set_form#:#Global Organisational Unit Settings
-orgu#:#orgu_global_set_positions#:#Show User Data according to Organisational Unit Positions
+orgu#:#orgu_global_set_positions#:#Enable Positions per Object Type
 orgu#:#orgu_global_set_positions_type_active#:#Positions in
 orgu#:#orgu_global_set_type_changeable#:#Changeable
 orgu#:#orgu_global_set_type_changeable_no#:#Setting is not changeable
@@ -12894,8 +12901,8 @@ ps#:#ps_error_message_password_min1_because_chars#:#Minimum password size may no
 ps#:#ps_error_message_password_min2_because_chars_numbers#:#Minimum password size may not be less than %s if password have to contain characters and numbers.
 ps#:#ps_error_message_password_min3_because_chars_numbers_sc#:#Minimum password size may not be less than %s if password have to contain characters, numbers and special characters.
 ps#:#ps_export_admin#:#Administrators
-ps#:#ps_export_confirm#:#User Confirmation when Entering Courses
-ps#:#ps_export_confirm_group#:#User Confirmation when Entering Groups
+ps#:#ps_export_confirm#:#User Confirmation when Entering Courses###Needs improvement!
+ps#:#ps_export_confirm_group#:#User Confirmation when Entering Groups###Needs improvement!
 ps#:#ps_export_course#:#Allow export of user profile data in courses
 ps#:#ps_export_data#:#Data Types of the Personal Profile
 ps#:#ps_export_excel#:#Start Excel Export
@@ -14022,7 +14029,8 @@ rep#:#rep_add_new_def_grp_templates#:#Templates
 rep#:#rep_add_to_favourites#:#Add to Favourites
 rep#:#rep_added_rec_content#:#Recommended content has been added.
 rep#:#rep_added_to_favourites#:#The item has been added to your favourites.
-rep#:#rep_breadcr_crs#:#Breadcrumb Starts With Course
+rep#:#rep_allowed_types#:#Allowed Types
+rep#:#rep_breadcr_crs#:#Breadcrumb starts with course
 rep#:#rep_breadcr_crs_overwrite#:#Setting is changeable on course level
 rep#:#rep_breadcr_crs_overwrite_not#:#Setting is not changeable on course level
 rep#:#rep_breadcr_crs_overwrite_settings#:#Allow Exceptions
@@ -14451,7 +14459,7 @@ search#:#lucene_settings_title#:#Lucene Settings
 search#:#lucene_show_relevance#:#Show Relevance
 search#:#lucene_show_relevance_info#:#Search results are sorted by their relevance. If activated, the relevance is shown as additional information for each search result.
 search#:#lucene_show_sub_relevance#:#Show Sub-Item Relevance
-search#:#lucene_size_frag_info#:#Please choose the maximum size of highlighted text fragments.
+search#:#lucene_size_frag_info#:#Please choose the maximum size of highlighted text fragments. To do this, enter the number of characters including spaces.
 search#:#lucene_size_fragments#:#Size of Text Fragments
 search#:#lucene_tbl_create_ini#:#Create Java-Server Ini-File
 search#:#search_add_members_from_container_crs#:#Add Users of Current Course
@@ -14477,6 +14485,7 @@ search#:#search_direct#:#Direct search
 search#:#search_err_user_not_exist#:#A user with that login name does not exist.
 search#:#search_fast_info#:#Search for titles, descriptions and keywords in all object types
 search#:#search_field#:#Search Input Field
+search#:#search_field_perform#:#Perform Search
 search#:#search_filter_by_type#:#Filter by Type
 search#:#search_filter_cd#:#Filter by Creation Date
 search#:#search_for_crs_members#:#Search for Courses
@@ -14488,7 +14497,7 @@ search#:#search_grp_title#:#Group Name
 search#:#search_hide_adv_search#:#Hide Advanced Search
 search#:#search_item_filter_form#:#Search by Type
 search#:#search_item_filter_form_info#:#Search can be restricted to the chosen object types.
-search#:#search_like_info#:#Choose this option to get best results.
+search#:#search_like_info#:#Choose this option to get best results.###Needs to be adapted to new content of German lang file.
 search#:#search_limit_reached#:#Your search produced more than %s hits. You can restrict the search terms to receive more detailed results.
 search#:#search_lom#:#LOM Metadata
 search#:#search_lucene#:#Lucene search
@@ -15732,6 +15741,7 @@ survey#:#survey_edit_heading#:#Edit Heading
 survey#:#survey_edit_settings#:#Edit Settings
 survey#:#survey_error_insert_incomplete_question#:#You tried to add an incomplete question to the survey! The question was not added.
 survey#:#survey_execution_exit#:#Back to repository
+survey#:#survey_execution_exit_360#:#Back
 survey#:#survey_execution_sure_finish#:#Are you sure you want to finish the survey? You will not be able to edit your answers afterwards.
 survey#:#survey_existing_pool#:#Use existing question pool
 survey#:#survey_finish#:#Finish Survey
@@ -15769,7 +15779,6 @@ survey#:#survey_pool_selection#:#Pool Selection
 survey#:#survey_prev_question#:#Previous Page
 survey#:#survey_previous#:#<< Previous
 survey#:#survey_question_editor#:#List View
-survey#:#survey_question_editor_settings_template#:#List View (in Tab ‘Questions’)
 survey#:#survey_question_obligatory#:#This question is compulsory. You must answer the question!
 survey#:#survey_question_pool#:#Question Pool
 survey#:#survey_question_pool_title#:#Pool Title
@@ -15947,7 +15956,6 @@ survey#:#svy_settings_section_before_start#:#Information before start of survey
 survey#:#svy_settings_section_finishing#:#Finishing the survey
 survey#:#svy_settings_section_question_behaviour#:#Administering the survey: Behaviour of question
 survey#:#svy_settings_section_reminders#:#Reminders
-survey#:#svy_settings_template#:#Template
 survey#:#svy_show_questiontitles#:#Show Question Title
 survey#:#svy_skl_comp_assignm_not_supported#:#Competence assignment is not supported for this question type.
 survey#:#svy_sum_score#:#Sum Score
@@ -15982,6 +15990,7 @@ svy#:#svy_codes#:#Access Codes
 svy#:#svy_current_page#:#Current Page
 svy#:#svy_finish_survey#:#Finish survey '%1'
 svy#:#svy_invite_participants#:#Invite Participants
+svy#:#svy_link_to_svy#:#Link to Survey
 svy#:#svy_part_overview#:#Overview
 svy#:#svy_print_selection#:#Print View Selection
 svy#:#svy_remove_all_participants#:#Remove all Participants
@@ -15999,6 +16008,7 @@ svy#:#svy_user_added_360_appraisee_mail#:#You have been added to the survey as a
 svy#:#svy_user_added_360_rater#:#360° Survey '%1'
 svy#:#svy_user_added_360_rater_mail#:#You have been added as a rater to the survey.
 svy#:#svy_user_added_360_rater_reminder_mail#:#Please finish to rate the following appraisees:
+svy#:#svy_user_not_found#:#User not found.
 svy#:#svy_users_invited#:#Users have been invited.
 sysc#:#sysc_action_list_tree#:#Create Repository Tree Dump
 sysc#:#sysc_action_repair#:#Repair
@@ -16109,6 +16119,8 @@ tbl#:#tbl_template_created#:#The current view has been saved.
 tbl#:#tbl_template_delete#:#Delete Saved View
 tbl#:#tbl_template_deleted#:#The saved view has been deleted.
 tbl#:#tbl_templates#:#View
+tos#:#deleteDocument#:#Delete
+tos#:#detachCriterionAssignment#:#Delete
 tos#:#tos_acceptance_history#:#Acceptance History
 tos#:#tos_account_reg_not_possible#:#Self-registration is currently not possible because there is no Terms of Service agreement available. Please contact your <a href="%1$s">system administrator</a> for further information.
 tos#:#tos_add_document_btn_label#:#Add Document
@@ -16278,7 +16290,7 @@ trac#:#trac_lp_learner_access#:#View Own Learning Progress
 trac#:#trac_lp_learner_access_info#:#If active, users can access their own learning progress status.
 trac#:#trac_lp_list_gui#:#Dashboard, Repository, Search
 trac#:#trac_lp_list_gui_info#:#If activated, the learning progress status is included in objects lists.
-trac#:#trac_lp_settings_info_parent_container#:#Learning Progress of Atop Container Objects
+trac#:#trac_lp_settings_info_parent_container#:#Learning Progress of Parent Container Objects
 trac#:#trac_lp_settings_info_parent_legend#:#The learning progress status of this object is influenced by "%s".
 trac#:#trac_manual_display#:#Display in Learning Progress
 trac#:#trac_manual_is_displayed#:#Is Displayed

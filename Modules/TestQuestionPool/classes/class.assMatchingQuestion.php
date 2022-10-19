@@ -1,16 +1,25 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 use ILIAS\Refinery\Random\Group as RandomGroup;
 use ILIAS\Refinery\Random\Seed\RandomSeed;
 
-require_once './Modules/TestQuestionPool/classes/class.assQuestion.php';
 require_once './Modules/Test/classes/inc.AssessmentConstants.php';
-require_once './Modules/TestQuestionPool/interfaces/interface.ilObjQuestionScoringAdjustable.php';
-require_once './Modules/TestQuestionPool/interfaces/interface.ilObjAnswerScoringAdjustable.php';
-require_once './Modules/TestQuestionPool/interfaces/interface.iQuestionCondition.php';
-require_once './Modules/TestQuestionPool/classes/class.ilUserQuestionResult.php';
 
 /**
  * Class for matching questions
@@ -27,6 +36,8 @@ require_once './Modules/TestQuestionPool/classes/class.ilUserQuestionResult.php'
  */
 class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdjustable, ilObjAnswerScoringAdjustable, iQuestionCondition
 {
+    private int $shufflemode = 0;
+
     /**
     * The possible matching pairs of the matching question
     *
@@ -102,6 +113,16 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
         $this->terms = array();
         $this->definitions = array();
         $this->randomGroup = $DIC->refinery()->random();
+    }
+
+    public function getShuffleMode(): int
+    {
+        return $this->shufflemode;
+    }
+
+    public function setShuffleMode(int $shuffle)
+    {
+        $this->shufflemode = $shuffle;
     }
 
     /**
@@ -227,7 +248,7 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
 
         $ilDB->insert($this->getAdditionalTableName(), array(
             'question_fi' => array('integer', $this->getId()),
-            'shuffle' => array('text', $this->shuffle),
+            'shuffle' => array('text', $this->getShuffleMode()),
             'matching_type' => array('text', $this->matching_type),
             'thumb_geometry' => array('integer', $this->getThumbGeometry()),
             'matching_mode' => array('text', $this->getMatchingMode())
@@ -274,7 +295,8 @@ class assMatchingQuestion extends assQuestion implements ilObjQuestionScoringAdj
             include_once("./Services/RTE/classes/class.ilRTE.php");
             $this->setQuestion(ilRTE::_replaceMediaObjectImageSrc((string) $data["question_text"], 1));
             $this->setThumbGeometry($data["thumb_geometry"]);
-            $this->setShuffle((bool) $data["shuffle"]);
+            $this->setShuffle($data["shuffle"] != '0');
+            $this->setShuffleMode((int)$data['shuffle']);
             $this->setMatchingMode($data['matching_mode'] === null ? self::MATCHING_MODE_1_ON_1 : $data['matching_mode']);
             $this->setEstimatedWorkingTime(substr($data["working_time"], 0, 2), substr($data["working_time"], 3, 2), substr($data["working_time"], 6, 2));
 

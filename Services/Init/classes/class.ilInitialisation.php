@@ -39,6 +39,7 @@ use ILIAS\ResourceStorage\Information\Repository\InformationDBRepository;
 use ILIAS\ResourceStorage\Stakeholder\Repository\StakeholderDBRepository;
 use ILIAS\ResourceStorage\Preloader\DBRepositoryPreloader;
 use ILIAS\Filesystem\Definitions\SuffixDefinitions;
+use ILIAS\ResourceStorage\Resource\Repository\CollectionDBRepository;
 
 require_once("libs/composer/vendor/autoload.php");
 
@@ -53,9 +54,24 @@ if (null === $DIC) {
     $DIC = new Container();
 }
 
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
+
 /** @defgroup ServicesInit Services/Init
  */
-
 /**
  * ILIAS Initialisation Utility Class
  * perform basic setup: init database handler, load configuration file,
@@ -225,6 +241,7 @@ class ilInitialisation
         $DIC['resource_storage'] = static function (Container $c): \ILIAS\ResourceStorage\Services {
             $revision_repository = new RevisionDBRepository($c->database());
             $resource_repository = new ResourceDBRepository($c->database());
+            $collection_repository = new CollectionDBRepository($c->database());
             $information_repository = new InformationDBRepository($c->database());
             $stakeholder_repository = new StakeholderDBRepository($c->database());
             return new \ILIAS\ResourceStorage\Services(
@@ -234,6 +251,7 @@ class ilInitialisation
                 ]),
                 $revision_repository,
                 $resource_repository,
+                $collection_repository,
                 $information_repository,
                 $stakeholder_repository,
                 new LockHandlerilDB($c->database()),
@@ -376,7 +394,6 @@ class ilInitialisation
             $fileUploadImpl->register(new FilenameSanitizerPreProcessor());
             $fileUploadImpl->register(
                 new ilFileServicesPreProcessor(
-                    $c->rbac()->system(),
                     $c->fileServiceSettings(),
                     $c->language()->txt("msg_info_blacklisted")
                 )
@@ -504,7 +521,12 @@ class ilInitialisation
             self::abortAndDie("Fatal Error: ilInitialisation::initClientIniFile called without CLIENT_ID.");
         }
 
-        $ini_file = "./" . ILIAS_WEB_DIR . "/" . CLIENT_ID . "/client.ini.php";
+        $ini_file = "/client.ini.php";
+        if (defined('CLIENT_WEB_DIR')) {
+            $ini_file = CLIENT_WEB_DIR.$ini_file;
+        } else {
+            $ini_file = "./" . ILIAS_WEB_DIR . "/" . CLIENT_ID . "/client.ini.php";
+        }
 
         // get settings from ini file
         $ilClientIniFile = new ilIniFile($ini_file);

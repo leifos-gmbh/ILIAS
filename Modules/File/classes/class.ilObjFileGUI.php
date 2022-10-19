@@ -345,7 +345,9 @@ class ilObjFileGUI extends ilObject2GUI
                         ilObjFileProcessorInterface::OPTION_FILENAME => $this->ui->factory()->input()->field()->text($this->lng->txt('title')),
                         ilObjFileProcessorInterface::OPTION_DESCRIPTION => $this->ui->factory()->input()->field()->textarea($this->lng->txt('description')),
                     ])
-                )->withMaxFiles(self::UPLOAD_MAX_FILES)->withMaxFileSize((int) ilFileUtils::getUploadSizeLimitBytes()),
+                )->withMaxFiles(self::UPLOAD_MAX_FILES)
+                 ->withMaxFileSize((int) ilFileUtils::getUploadSizeLimitBytes())
+                 ->withRequired(true),
             ]
         )->withSubmitCaption($this->lng->txt('upload_files'));
     }
@@ -371,19 +373,16 @@ class ilObjFileGUI extends ilObject2GUI
         }
 
         if (empty($files)) {
-            $this->tpl->setContent(
-                $this->ui->renderer()->render(
-                    $this->ui->factory()->messageBox()->failure($this->lng->txt('upload_failure'))
-                )
-            );
-
+            $form = $this->initUploadForm()->withRequest($this->request);
+            $this->tpl->setContent($this->ui->renderer()->render($form));
             return;
         }
 
         $processor = new ilObjFileProcessor(
             $this->stakeholder,
             $this,
-            $this->storage
+            $this->storage,
+            $this->file_service_settings
         );
 
         $errors = false;
@@ -412,6 +411,17 @@ class ilObjFileGUI extends ilObject2GUI
             );
         }
 
+        if ($processor->getInvalidFileNames() !== []) {
+            $this->ui->mainTemplate()->setOnScreenMessage(
+                'info',
+                sprintf(
+                    $this->lng->txt('file_upload_info_file_with_critical_extension'),
+                    implode(', ', $processor->getInvalidFileNames())
+                ),
+                true
+            );
+        }
+
         switch ($this->id_type) {
             case self::WORKSPACE_NODE_ID:
                 $link = $this->ctrl->getLinkTargetByClass(ilObjWorkspaceRootFolderGUI::class);
@@ -425,6 +435,14 @@ class ilObjFileGUI extends ilObject2GUI
         $this->ctrl->redirectToURL($link);
     }
 
+    public function putObjectInTree(ilObject $obj, int $parent_node_id = null): void
+    {
+        // this is needed to support multi fileuploads in personal and shared resources
+        $backup_node_id = $this->node_id;
+        parent::putObjectInTree($obj, $parent_node_id);
+        $this->node_id = $backup_node_id;
+    }
+
     /**
      * updates object entry in object_data
      */
@@ -433,7 +451,7 @@ class ilObjFileGUI extends ilObject2GUI
         global $DIC;
         $ilTabs = $DIC['ilTabs'];
 
-        $form = $this->initPropertiesForm();
+        $form = $this->initPropertiesForm(self::CMD_EDIT);
         if (!$form->checkInput()) {
             $ilTabs->activateTab("settings");
             $form->setValuesByPost();
@@ -453,7 +471,7 @@ class ilObjFileGUI extends ilObject2GUI
         $this->object->setTitle($title);
         $this->object->setDescription($form->getInput('description'));
         $this->object->setRating($form->getInput('rating'));
-
+        $this->object->setOnclickMode((int) $form->getInput('on_click_action'));
         $this->object->update();
         $this->obj_service->commonSettings()->legacyForm($form, $this->object)->saveTileImage();
 
@@ -492,6 +510,7 @@ class ilObjFileGUI extends ilObject2GUI
         $val['title'] = $this->object->getTitle();
         $val['description'] = $this->object->getLongDescription();
         $val['rating'] = $this->object->hasRating();
+        $val['on_click_action'] = (string) $this->object->getOnClickMode();
         $form->setValuesByArray($val);
         $ecs = new ilECSFileSettings($this->object);
         $ecs->addSettingsToForm($form, ilObjFile::OBJECT_TYPE);
@@ -527,6 +546,18 @@ class ilObjFileGUI extends ilObject2GUI
             $rate->setInfo($this->lng->txt('rating_activate_rating_info'));
             $form->addItem($rate);
         }
+
+        $on_click_action = new ilRadioGroupInputGUI($this->lng->txt('on_click_action'), 'on_click_action');
+        $on_click_action->addOption(
+            new ilRadioOption(
+                $this->lng->txt('action_download'),
+                (string) ilObjFile::CLICK_MODE_DOWNLOAD
+            )
+        );
+        $on_click_action->addOption(
+            new ilRadioOption($this->lng->txt('action_show'), (string) ilObjFile::CLICK_MODE_INFOPAGE)
+        );
+        $form->addItem($on_click_action);
 
         $presentationHeader = new ilFormSectionHeaderGUI();
         $presentationHeader->setTitle($this->lng->txt('settings_presentation_header'));
@@ -638,6 +669,10 @@ class ilObjFileGUI extends ilObject2GUI
                 $info->setBlockProperty("news", "public_notifications_option", true);
             }
         }
+
+        $record_gui = new ilAdvancedMDRecordGUI(ilAdvancedMDRecordGUI::MODE_INFO, 'file', $this->object->getId());
+        $record_gui->setInfoObject($info);
+        $record_gui->parse();
 
         // standard meta data
         $info->addMetaDataSections($this->object->getId(), 0, $this->object->getType());

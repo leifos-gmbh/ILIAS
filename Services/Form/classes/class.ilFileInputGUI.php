@@ -162,7 +162,7 @@ class ilFileInputGUI extends ilSubEnabledFormPropertyGUI implements ilToolbarIte
 
         // if no information is received, something went wrong
         // this is e.g. the case, if the post_max_size has been exceeded
-        if (!is_array($_FILES[$this->getPostVar()])) {
+        if (!isset($_FILES[$this->getPostVar()]) || !is_array($_FILES[$this->getPostVar()])) {
             $this->setAlert($lng->txt("form_msg_file_size_exceeds"));
             return false;
         }
@@ -237,6 +237,12 @@ class ilFileInputGUI extends ilSubEnabledFormPropertyGUI implements ilToolbarIte
                 return false;
             }
         }
+
+        $file_name = $this->str('file_name');
+        if ($file_name === "") {
+            $file_name = $_FILES[$this->getPostVar()]["name"];
+        }
+        $this->setFilename($file_name);
 
         return true;
     }

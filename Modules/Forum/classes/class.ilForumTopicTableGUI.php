@@ -267,7 +267,7 @@ class ilForumTopicTableGUI extends ilTable2GUI
             if ($num_unread > 0) {
                 $topicStats .= '<br /><span class="ilAlert ilWhiteSpaceNowrap">' . $this->lng->txt('unread') . ': ' . $num_unread . '</span>';
             }
-            if ($num_new > 0 && $this->getOverviewSetting() === 0) {
+            if ($num_new > 0 && $this->getOverviewSetting() === ilForumProperties::FORUM_OVERVIEW_WITH_NEW_POSTS) {
                 $topicStats .= '<br /><span class="ilAlert ilWhiteSpaceNowrap">' . $this->lng->txt('new') . ': ' . $num_new . '</span>';
             }
         }
@@ -278,7 +278,7 @@ class ilForumTopicTableGUI extends ilTable2GUI
             $draft_statistics = ilForumPostDraft::getDraftsStatisticsByRefId($this->getRefId());
             $this->tpl->setVariable(
                 'VAL_DRAFTS',
-                (int) isset($draft_statistics[$thread->getId()]) ? $draft_statistics[$thread->getId()] : 0
+                (int) isset($draft_statistics[$thread->getId()]) !== 0 ? $draft_statistics[$thread->getId()] : 0
             );
         }
 
@@ -340,7 +340,7 @@ class ilForumTopicTableGUI extends ilTable2GUI
             $this->getLimit(),
             $this->getOffset()
         );
-        if (!count($data['items']) && $this->getOffset() > 0) {
+        if ($data['items'] === [] && $this->getOffset() > 0) {
             $this->resetOffset();
             $data = $this->getMapper()->getAllThreads(
                 $this->topicData->getTopPk(),

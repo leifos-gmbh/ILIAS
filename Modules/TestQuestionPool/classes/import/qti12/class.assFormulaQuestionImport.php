@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -14,8 +15,6 @@
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
-
-include_once "./Modules/TestQuestionPool/classes/import/qti12/class.assQuestionImport.php";
 
 /**
 * Class for formula question imports
@@ -81,6 +80,9 @@ class assFormulaQuestionImport extends assQuestionImport
                     $resObj = new assFormulaQuestionResult($result, $data["rangemin"], $data["rangemax"], $data["tolerance"], $unit, $data["formula"], $data["points"], $data["precision"], true);
                 } else {
                     $resObj = new assFormulaQuestionResult($result, $data["rangemin"], $data["rangemax"], $data["tolerance"], $unit, $data["formula"], $data["points"], $data["precision"], false, $data["rating"]["sign"], $data["rating"]["value"], $data["rating"]["unit"]);
+                }
+                if (array_key_exists('resulttype', $data)) {
+                    $resObj->setResultType($data["resulttype"]);
                 }
                 $this->object->addResult($resObj);
                 if (is_array($data["resultunits"])) {

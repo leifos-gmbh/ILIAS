@@ -541,22 +541,20 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
     {
         global $DIC;
         $ilUser = $DIC['ilUser'];
-
-        if ($_POST["chb_javascript"]) {
-            $ilUser->writePref("tst_javascript", 1);
-        } else {
-            $ilUser->writePref("tst_javascript", 0);
+        $post_array = $_POST;
+        if (! is_array($post_array)) {
+            $request = $DIC->http()->request();
+            $post_array = $request->getParsedBody();
         }
 
-        // hide previous results
-        if ($this->object->getNrOfTries() != 1) {
-            if ($this->object->getUsePreviousAnswers() == 1) {
-                if ($_POST["chb_use_previous_answers"]) {
-                    $ilUser->writePref("tst_use_previous_answers", 1);
-                } else {
-                    $ilUser->writePref("tst_use_previous_answers", 0);
-                }
-            }
+        $tst_javascript = array_key_exists("chb_javascript", $post_array) ? 1 : 0;
+        $ilUser->writePref("tst_javascript", $tst_javascript);
+
+        if ($this->object->getNrOfTries() != 1
+            && $this->object->getUsePreviousAnswers() == 1
+        ) {
+            $chb_use_previous_answers = array_key_exists("chb_use_previous_answers", $post_array) ? 1 : 0;
+            $ilUser->writePref("tst_use_previous_answers", $chb_use_previous_answers);
         }
     }
 
@@ -1313,7 +1311,7 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
     {
         require_once './Modules/Test/classes/class.ilObjTest.php';
 
-        if (ilObjTest::_getUsePreviousAnswers($this->testSession->getActiveId(), true)) {
+        if ($this->object->isPreviousSolutionReuseEnabled($this->testSession->getActiveId())) {
             $currentSolutionAvailable = $questionGui->object->authorizedOrIntermediateSolutionExists(
                 $this->testSession->getActiveId(),
                 $this->testSession->getPass()

@@ -15,6 +15,7 @@
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
 require_once './Modules/Test/classes/inc.AssessmentConstants.php';
 
 class assLongMenu extends assQuestion implements ilObjQuestionScoringAdjustable
@@ -175,12 +176,12 @@ class assLongMenu extends assQuestion implements ilObjQuestionScoringAdjustable
         return false;
     }
 
-    public function saveToDb($original_id = ""): void
+    public function saveToDb(): void
     {
-        $this->saveQuestionDataToDb($original_id);
+        $this->saveQuestionDataToDb(-1);
         $this->saveAdditionalQuestionDataToDb();
         $this->saveAnswerSpecificDataToDb();
-        parent::saveToDb($original_id);
+        parent::saveToDb();
     }
 
     /**
@@ -249,7 +250,7 @@ class assLongMenu extends assQuestion implements ilObjQuestionScoringAdjustable
         $points = $this->getCorrectAnswers();
         if ($points) {
             foreach ($points as $add) {
-                $sum += $add[1];
+                $sum += (float) $add[1];
             }
         }
         return $sum;
@@ -299,13 +300,13 @@ class assLongMenu extends assQuestion implements ilObjQuestionScoringAdjustable
                         'position' => array('integer', (int) $position)
                         ),
                     array(
-                                'answer_text' => array('text', $answer),
-                                'points' => array('float', $gap[1]),
-                                'type' => array('integer', (int) $type)
+                        'answer_text' => array('text', $answer),
+                        'points' => array('float', (float) $gap[1]),
+                        'type' => array('integer', (int) $type)
                         )
                 );
             }
-            $points += $gap[1];
+            $points += (float) $gap[1];
         }
         $this->setPoints($points);
     }
@@ -449,7 +450,7 @@ class assLongMenu extends assQuestion implements ilObjQuestionScoringAdjustable
                 $correct_answers[$data['gap_number']] .= ' ' . $this->lng->txt("or") . ' ';
                 $correct_answers[$data['gap_number']] .= rtrim($data['answer_text']);
             } else {
-                $correct_answers[$data['gap_number']] .= rtrim($data['answer_text']);
+                $correct_answers[$data['gap_number']] = rtrim($data['answer_text']);
             }
         }
         return $correct_answers;
@@ -750,11 +751,8 @@ class assLongMenu extends assQuestion implements ilObjQuestionScoringAdjustable
 
     protected function savePreviewData(ilAssQuestionPreviewSession $previewSession): void
     {
-        if (array_key_exists('answer', $_POST)) {
-            $previewSession->setParticipantsSolution($_POST['answer']);
-        } else {
-            $previewSession->setParticipantsSolution(null);
-        }
+        $answer = $_POST['answer'] ?? null;
+        $previewSession->setParticipantsSolution($answer);
     }
 
     /**

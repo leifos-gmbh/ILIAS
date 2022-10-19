@@ -19,6 +19,7 @@
 use ILIAS\Refinery\Transformation;
 use ILIAS\TA\Questions\assQuestionSuggestedSolution;
 use ILIAS\TA\Questions\assQuestionSuggestedSolutionsDatabaseRepository;
+use ILIAS\DI\Container;
 
 require_once './Modules/Test/classes/inc.AssessmentConstants.php';
 
@@ -53,6 +54,7 @@ abstract class assQuestion
         self::IMG_MIME_TYPE_PNG => array('binary'),
         self::IMG_MIME_TYPE_GIF => array('binary')
     );
+
 
     protected ILIAS\DI\LoggingServices $ilLog;
 
@@ -109,6 +111,8 @@ abstract class assQuestion
 
     protected ilDBInterface $db;
 
+    protected Container $dic;
+
     /**
      * Contains the output type of a question
      */
@@ -139,8 +143,8 @@ abstract class assQuestion
 
     protected ?string $external_id = null;
 
-    public const ADDITIONAL_CONTENT_EDITING_MODE_DEFAULT = 'default';
-    public const ADDITIONAL_CONTENT_EDITING_MODE_PAGE_OBJECT = 'pageobject';
+    public const ADDITIONAL_CONTENT_EDITING_MODE_RTE = 'default';
+    public const ADDITIONAL_CONTENT_EDITING_MODE_IPE = 'pageobject';
 
     private string $additionalContentEditingMode = '';
 
@@ -190,6 +194,7 @@ abstract class assQuestion
         string $question = ""
     ) {
         global $DIC;
+        $this->dic = $DIC;
         $ilias = $DIC['ilias'];
         $lng = $DIC['lng'];
         $tpl = $DIC['tpl'];
@@ -2346,11 +2351,14 @@ abstract class assQuestion
         $this->syncHints();
     }
 
-    public function createRandomSolution(int $test_id, int $user_id): void
-    {
-    }
-
-    public function _questionExists(int $question_id): bool
+    /**
+    * Returns true if the question already exists in the database
+    *
+    * @param integer $question_id The database id of the question
+    * @result boolean True, if the question exists, otherwise False
+    * @access public
+    */
+    public function _questionExists($question_id)
     {
         if ($question_id < 1) {
             return false;
@@ -3340,7 +3348,7 @@ abstract class assQuestion
 
     public function isAdditionalContentEditingModePageObject(): bool
     {
-        return $this->getAdditionalContentEditingMode() == assQuestion::ADDITIONAL_CONTENT_EDITING_MODE_PAGE_OBJECT;
+        return $this->getAdditionalContentEditingMode() == assQuestion::ADDITIONAL_CONTENT_EDITING_MODE_IPE;
     }
 
     public function isValidAdditionalContentEditingMode(string $additionalContentEditingMode): bool
@@ -3355,8 +3363,8 @@ abstract class assQuestion
     public function getValidAdditionalContentEditingModes(): array
     {
         return array(
-            self::ADDITIONAL_CONTENT_EDITING_MODE_DEFAULT,
-            self::ADDITIONAL_CONTENT_EDITING_MODE_PAGE_OBJECT
+            self::ADDITIONAL_CONTENT_EDITING_MODE_RTE,
+            self::ADDITIONAL_CONTENT_EDITING_MODE_IPE
         );
     }
 
@@ -3662,7 +3670,7 @@ abstract class assQuestion
             if ($considerDummyRecordCreation) {
                 // create an additional dummy record to indicate the existence of an intermediate solution
                 // even if all entries are deleted from the intermediate solution later
-                $this->saveCurrentSolution($activeId, $passIndex, null, null, false, null);
+                $this->saveCurrentSolution($activeId, $passIndex, null, null, false);
             }
         }
     }

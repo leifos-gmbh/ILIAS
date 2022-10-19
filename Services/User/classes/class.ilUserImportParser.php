@@ -464,7 +464,7 @@ class ilUserImportParser extends ilSaxParser
                     $ilias->ini->readVariable("layout", "style")
                 );
 
-                $this->userObj->setLanguage($a_attribs["Language"]);
+                $this->userObj->setLanguage($a_attribs["Language"] ?? '');
                 $this->userObj->setImportId($a_attribs["Id"]);
                 $this->action = (is_null($a_attribs["Action"])) ? "Insert" : $a_attribs["Action"];
                 $this->currPassword = null;
@@ -588,7 +588,7 @@ class ilUserImportParser extends ilSaxParser
             case "User":
                 $this->userCount++;
                 $this->userObj = new ilObjUser();
-                $this->userObj->setLanguage($a_attribs["Language"]);
+                $this->userObj->setLanguage($a_attribs["Language"] ?? '');
                 $this->userObj->setImportId($a_attribs["Id"]);
                 $this->currentPrefKey = null;
                 // if we have an object id, store it
@@ -2290,7 +2290,6 @@ class ilUserImportParser extends ilSaxParser
         ) {
             $mailOptions = new ilMailOptions($usr_id);
 
-            $mailOptions->setLinebreak(array_key_exists("mail_linebreak", $this->prefs) ? $this->prefs["mail_linebreak"] : $mailOptions->getLinebreak());
             $mailOptions->setSignature(array_key_exists("mail_signature", $this->prefs) ? $this->prefs["mail_signature"] : $mailOptions->getSignature());
             $mailOptions->setIncomingType(array_key_exists("mail_incoming_type", $this->prefs) ? $this->prefs["mail_incoming_type"] : $mailOptions->getIncomingType());
             $mailOptions->updateOptions();

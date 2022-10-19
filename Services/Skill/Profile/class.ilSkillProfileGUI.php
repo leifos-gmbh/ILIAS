@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -339,7 +341,7 @@ class ilSkillProfileGUI
                 // set values
                 $ti = $ti->withValue($this->profile->getTitle());
                 $desc = $desc->withValue($this->profile->getDescription());
-                $img = $img->withValue([$this->profile->getImageId()]);
+                $img = $this->profile->getImageId() ? $img->withValue([$this->profile->getImageId()]) : $img;
 
                 $sec_des = $lng->txt("skmg_edit_profile");
                 $form_action = $ilCtrl->getFormAction($this, "update");
@@ -491,7 +493,7 @@ class ilSkillProfileGUI
             $cgui->setConfirm($lng->txt("delete"), "deleteProfiles");
 
             foreach ($this->requested_profile_ids as $i) {
-                $cgui->addItem("id[]", $i, $this->profile_manager->lookupTitle($i));
+                $cgui->addItem("id[]", (string) $i, $this->profile_manager->lookupTitle($i));
             }
 
             $tpl->setContent($cgui->getHTML());
@@ -724,8 +726,8 @@ class ilSkillProfileGUI
                 $cgui->addItem(
                     "ass_id[]",
                     $i,
-                    ilBasicSkill::_lookupTitle($id_arr[0]) . ": " .
-                    ilBasicSkill::lookupLevelTitle($id_arr[2])
+                    ilBasicSkill::_lookupTitle((int) $id_arr[0]) . ": " .
+                    ilBasicSkill::lookupLevelTitle((int) $id_arr[2])
                 );
             }
 
@@ -903,7 +905,7 @@ class ilSkillProfileGUI
                         $usr_name = ilUserUtil::getNamePresentation($i);
                         $cgui->addItem(
                             "id[]",
-                            $i,
+                            (string) $i,
                             $usr_name
                         );
                         break;
@@ -912,7 +914,7 @@ class ilSkillProfileGUI
                         $role_name = ilObjRole::_lookupTitle($i);
                         $cgui->addItem(
                             "id[]",
-                            $i,
+                            (string) $i,
                             $role_name
                         );
                         break;

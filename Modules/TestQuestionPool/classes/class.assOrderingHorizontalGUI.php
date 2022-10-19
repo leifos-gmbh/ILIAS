@@ -12,7 +12,8 @@
  * us at:
  * https://www.ilias.de
  * https://github.com/ILIAS-eLearning
- */
+ *
+ *********************************************************************/
 
 require_once './Modules/Test/classes/inc.AssessmentConstants.php';
 
@@ -243,6 +244,7 @@ class assOrderingHorizontalGUI extends assQuestionGUI implements ilGuiQuestionSc
         return $solutionoutput;
     }
 
+
     public function getPreview($show_question_only = false, $showInlineFeedback = false): string
     {
         if (is_object($this->getPreviewSession()) && strlen((string) $this->getPreviewSession()->getParticipantsSolution())) {
@@ -253,6 +255,17 @@ class assOrderingHorizontalGUI extends assQuestionGUI implements ilGuiQuestionSc
         }
 
         $template = new ilTemplate("tpl.il_as_qpl_orderinghorizontal_preview.html", true, true, "Modules/TestQuestionPool");
+        $js = <<<JS
+    
+        $('#horizontal_{QUESTION_ID}').ilHorizontalOrderingQuestion({
+            result_value_selector  : '.ilOrderingValue',
+            result_separator       : '{::}'
+        });
+    
+JS;
+        $js = str_replace('{QUESTION_ID}', $this->object->getId(), $js);
+        $this->tpl->addOnLoadCode($js);
+
         foreach ($elements as $id => $element) {
             $template->setCurrentBlock("element");
             $template->setVariable("ELEMENT_ID", "e_" . $this->object->getId() . "_$id");
@@ -288,16 +301,23 @@ class assOrderingHorizontalGUI extends assQuestionGUI implements ilGuiQuestionSc
     {
         // generate the question output
         $template = new ilTemplate("tpl.il_as_qpl_orderinghorizontal_output.html", true, true, "Modules/TestQuestionPool");
+        $js = <<<JS
+    $().ready(function() {
+        if (typeof $.fn.ilHorizontalOrderingQuestion != 'undefined') {
+            $('#horizontal_{QUESTION_ID}').ilHorizontalOrderingQuestion({
+                result_value_selector: '.ilOrderingValue',
+                result_separator: '{::}'
+            });
+        }
+    });
+JS;
+        $js = str_replace('{QUESTION_ID}', $this->object->getId(), $js);
+        $this->tpl->addOnLoadCode($js);
+
+
         $elements = $this->object->getRandomOrderingElements();
 
         if ($active_id) {
-            // hey: prevPassSolutions - obsolete due to central check
-            #$solutions = NULL;
-            #include_once "./Modules/Test/classes/class.ilObjTest.php";
-            #if (!ilObjTest::_getUsePreviousAnswers($active_id, true))
-            #{
-            #	if (is_null($pass)) $pass = ilObjTest::_getPass($active_id);
-            #}
             $solutions = $this->object->getTestOutputSolutions($active_id, $pass);
             // hey.
             if (is_array($solutions) && count($solutions) == 1) {
@@ -404,7 +424,7 @@ class assOrderingHorizontalGUI extends assQuestionGUI implements ilGuiQuestionSc
     {
         $this->object->setTextSize($_POST["textsize"]);
         $this->object->setOrderText($_POST["ordertext"]);
-        $this->object->setPoints($_POST["points"]);
+        $this->object->setPoints((float)$_POST["points"]);
     }
 
     /**

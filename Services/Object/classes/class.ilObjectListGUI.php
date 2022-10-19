@@ -1417,7 +1417,7 @@ class ilObjectListGUI
                 //BEGIN WebDAV: Support hidden property names.
                 if (
                     isset($prop["property"]) &&
-                    (isset($prop['propertyNameVisible']) && $prop['propertyNameVisible'] !== false) &&
+                    (($prop['propertyNameVisible'] ?? null) !== false) &&
                     $prop["property"] != ""
                 ) {
                     //END WebDAV: Support hidden property names.
@@ -1928,7 +1928,7 @@ class ilObjectListGUI
     public function insertTimingsCommand(): void
     {
         if (
-            $this->std_cmd_only ||
+            $this->std_cmd_only || is_null($this->container_obj) ||
             !method_exists($this->container_obj, "getObject") ||
             !is_object($this->container_obj->getObject())
         ) {
@@ -3264,7 +3264,7 @@ class ilObjectListGUI
 
         // workaround for scorm
         $modified_link =
-            $this->modifySAHSlaunch($def_cmd_link, $def_cmd_frame);
+            $this->modifySAHSlaunch($def_cmd_link, $def_cmd_frame)[0];
 
         $image = $this->ui->factory()
                           ->image()

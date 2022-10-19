@@ -196,7 +196,7 @@ class ilCalendarCategoryGUI
             $category = new ilCalendarCategory(0);
             $category->setTitle($form->getInput('title'));
             $category->setColor('#' . $form->getInput('color'));
-            $category->setLocationType($form->getInput('type_rl'));
+            $category->setLocationType((int) $form->getInput('type_rl'));
             $category->setRemoteUrl($form->getInput('remote_url'));
             $category->setRemoteUser($form->getInput('remote_user'));
             $category->setRemotePass($form->getInput('remote_pass'));
@@ -364,7 +364,7 @@ class ilCalendarCategoryGUI
     protected function delete(): void
     {
         $category_ids = [];
-        if (!$this->http->wrapper()->post()->has('category_id')) {
+        if ($this->http->wrapper()->post()->has('category_id')) {
             $category_ids = $this->http->wrapper()->post()->retrieve(
                 'category_id',
                 $this->refinery->kindlyTo()->dictOf(
@@ -375,7 +375,7 @@ class ilCalendarCategoryGUI
 
         if (!count($category_ids)) {
             $this->tpl->setOnScreenMessage('failure', $this->lng->txt('select_one'), true);
-            $this->manage();
+            $this->ctrl->redirect($this, 'manage');
         }
 
         foreach ($category_ids as $cat_id) {
@@ -485,7 +485,7 @@ class ilCalendarCategoryGUI
         $query = '';
         $type = '';
         if ($this->http->wrapper()->post()->has('query')) {
-            $query = $this->http->wrapper()->query()->retrieve(
+            $query = $this->http->wrapper()->post()->retrieve(
                 'query',
                 $this->refinery->kindlyTo()->string()
             );
@@ -577,7 +577,7 @@ class ilCalendarCategoryGUI
             $this->ctrl->returnToParent($this);
         }
         $user_ids = [];
-        if (!$this->http->wrapper()->post()->has('user_ids')) {
+        if ($this->http->wrapper()->post()->has('user_ids')) {
             $user_ids = $this->http->wrapper()->post()->retrieve(
                 'user_ids',
                 $this->refinery->kindlyTo()->dictOf(
@@ -622,7 +622,7 @@ class ilCalendarCategoryGUI
         }
 
         $role_ids = [];
-        if (!$this->http->wrapper()->post()->has('role_ids')) {
+        if ($this->http->wrapper()->post()->has('role_ids')) {
             $role_ids = $this->http->wrapper()->post()->retrieve(
                 'role_ids',
                 $this->refinery->kindlyTo()->dictOf(
@@ -719,7 +719,7 @@ class ilCalendarCategoryGUI
 
         $query = '';
         if ($this->http->wrapper()->post()->has('query')) {
-            $query = $this->http->wrapper()->query()->retrieve(
+            $query = $this->http->wrapper()->post()->retrieve(
                 'query',
                 $this->refinery->kindlyTo()->string()
             );

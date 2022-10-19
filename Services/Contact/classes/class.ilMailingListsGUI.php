@@ -159,10 +159,10 @@ class ilMailingListsGUI
             }
 
             if ($counter !== 0) {
-                $this->tpl->setOnScreenMessage('info', $this->lng->txt('mail_deleted_entry'));
+                $this->tpl->setOnScreenMessage('success', $this->lng->txt('mail_deleted_entry'));
             }
         } else {
-            $this->tpl->setOnScreenMessage('info', $this->lng->txt('mail_delete_error'));
+            $this->tpl->setOnScreenMessage('failure', $this->lng->txt('mail_delete_error'));
         }
 
         $this->showMailingLists();
@@ -189,20 +189,16 @@ class ilMailingListsGUI
         }
 
         $mail_data = $this->umail->getSavedData();
-        if (!is_array($mail_data)) {
-            $this->umail->savePostData($this->user->getId(), [], '', '', '', '', '', false);
-        }
-
         $lists = [];
         foreach ($ml_ids as $id) {
             if ($this->mlists->isOwner($id, $this->user->getId()) &&
                 !$this->umail->existsRecipient('#il_ml_' . $id, (string) $mail_data['rcp_to'])) {
-                $lists[] = '#il_ml_' . $id;
+                $lists['#il_ml_' . $id] = '#il_ml_' . $id;
             }
         }
 
         if ($lists !== []) {
-            $mail_data = $this->umail->appendSearchResult($lists, 'to');
+            $mail_data = $this->umail->appendSearchResult(array_values($lists), 'to');
             $this->umail->savePostData(
                 (int) $mail_data['user_id'],
                 $mail_data['attachments'],
@@ -343,16 +339,13 @@ class ilMailingListsGUI
             if ($this->mlists->getCurrentMailingList()->getId() !== 0) {
                 $this->mlists->getCurrentMailingList()->setChangedate(date('Y-m-d H:i:s'));
                 $this->mlists->getCurrentMailingList()->update();
-                $this->tpl->setOnScreenMessage('success', $this->lng->txt('saved_successfully'));
             } else {
                 $this->mlists->getCurrentMailingList()->setCreatedate(date('Y-m-d H:i:s'));
                 $this->mlists->getCurrentMailingList()->insert();
-                $this->ctrl->setParameter($this, 'ml_id', $this->mlists->getCurrentMailingList()->getId());
-                $this->form_gui->setFormAction($this->ctrl->getFormAction($this, 'saveForm'));
-
-                $this->ctrl->setParameter($this, 'ml_id', $this->mlists->getCurrentMailingList()->getId());
-                $this->ctrl->redirect($this, 'showMembersList');
             }
+
+            $this->tpl->setOnScreenMessage('success', $this->lng->txt('saved_successfully'), true);
+            $this->ctrl->redirect($this, 'showMailingLists');
         }
 
         $this->tpl->setTitle($this->lng->txt('mail_addressbook'));
@@ -561,9 +554,9 @@ class ilMailingListsGUI
                     $this->mlists->getCurrentMailingList()->deleteEntry($id);
                 }
             }
-            $this->tpl->setOnScreenMessage('info', $this->lng->txt('mail_deleted_entry'));
+            $this->tpl->setOnScreenMessage('success', $this->lng->txt('mail_deleted_entry'));
         } else {
-            $this->tpl->setOnScreenMessage('info', $this->lng->txt('mail_delete_error'));
+            $this->tpl->setOnScreenMessage('failure', $this->lng->txt('mail_delete_error'));
         }
 
         $this->showMembersList();
@@ -577,7 +570,7 @@ class ilMailingListsGUI
         $form = new ilPropertyFormGUI();
         $this->ctrl->setParameter($this, 'ml_id', $this->mlists->getCurrentMailingList()->getId());
         $form->setFormAction($this->ctrl->getFormAction($this, 'saveAssignmentForm'));
-        $form->setTitle($this->lng->txt('mail_assign_entry_to_mailing_list') . ' ' . $this->mlists->getCurrentMailingList()->getTitle());
+        $form->setTitle(sprintf($this->lng->txt('mail_assign_entry_to_mailing_list'), $this->mlists->getCurrentMailingList()->getTitle()));
 
         $options = [];
         $options[''] = $this->lng->txt('please_select');
@@ -645,7 +638,7 @@ class ilMailingListsGUI
             $this->mlists->getCurrentMailingList()->assignUser(
                 $this->http->wrapper()->post()->retrieve('usr_id', $this->refinery->kindlyTo()->int())
             );
-            $this->tpl->setOnScreenMessage('info', $this->lng->txt('saved_successfully'));
+            $this->tpl->setOnScreenMessage('success', $this->lng->txt('saved_successfully'));
             $this->showMembersList();
             return true;
         }

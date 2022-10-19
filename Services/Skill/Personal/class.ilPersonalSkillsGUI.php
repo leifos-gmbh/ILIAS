@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -458,6 +460,7 @@ class ilPersonalSkillsGUI
     protected function applyFilter(): void
     {
         $this->getFilter()->save();
+        $this->ctrl->setParameter($this, "list_mode", self::LIST_SELECTED);
         $this->ctrl->redirect($this, "listSkills");
     }
 
@@ -534,8 +537,8 @@ class ilPersonalSkillsGUI
         $b_skills = $vtree->getSubTreeForCSkillId($skill_id . ":" . $tref_id, true);
 
         foreach ($b_skills as $bs) {
-            $bs["id"] = $bs["skill_id"];
-            $bs["tref"] = $bs["tref_id"];
+            $bs["id"] = (int) $bs["skill_id"];
+            $bs["tref"] = (int) $bs["tref_id"];
 
             $path = $this->tree_service->getSkillTreePath($bs["id"], $bs["tref"]);
 
@@ -818,6 +821,7 @@ class ilPersonalSkillsGUI
         ilPersonalSkill::addPersonalSkill($ilUser->getId(), $this->requested_node_id);
 
         $this->tpl->setOnScreenMessage('success', $lng->txt("msg_object_modified"));
+        $ilCtrl->setParameter($this, "list_mode", self::LIST_SELECTED);
         $ilCtrl->redirect($this, "listSkills");
     }
 
@@ -832,6 +836,7 @@ class ilPersonalSkillsGUI
         }
         if (empty($this->requested_skill_ids)) {
             $this->tpl->setOnScreenMessage('info', $lng->txt("no_checkbox"), true);
+            $ilCtrl->setParameter($this, "list_mode", self::LIST_SELECTED);
             $ilCtrl->redirect($this, "listSkills");
         } else {
             $cgui = new ilConfirmationGUI();
@@ -841,7 +846,7 @@ class ilPersonalSkillsGUI
             $cgui->setConfirm($lng->txt("remove"), "removeSkills");
 
             foreach ($this->requested_skill_ids as $i) {
-                $cgui->addItem("id[]", $i, ilSkillTreeNode::_lookupTitle($i));
+                $cgui->addItem("id[]", (string) $i, ilSkillTreeNode::_lookupTitle($i));
             }
 
             $tpl->setContent($cgui->getHTML());
@@ -861,6 +866,7 @@ class ilPersonalSkillsGUI
         }
 
         $this->tpl->setOnScreenMessage('success', $lng->txt("msg_object_modified"));
+        $ilCtrl->setParameter($this, "list_mode", self::LIST_SELECTED);
         $ilCtrl->redirect($this, "listSkills");
     }
 
@@ -909,8 +915,7 @@ class ilPersonalSkillsGUI
 
         $options = [];
         foreach ($bs as $b) {
-            //$options[$b["id"]] = ilSkillTreeNode::_lookupTitle($b["id"]);
-            $options[$b["skill_id"]] = ilSkillTreeNode::_lookupTitle($b["skill_id"]);
+            $options[$b["skill_id"]] = ilSkillTreeNode::_lookupTitle((int) $b["skill_id"]);
         }
 
         $cur_basic_skill_id = ($this->requested_basic_skill_id > 0)
@@ -981,7 +986,7 @@ class ilPersonalSkillsGUI
         $exp = new ilWorkspaceExplorerGUI($ilUser->getId(), $this, "assignMaterial", $this, "");
         $exp->setTypeWhiteList(array("blog", "wsrt", "wfld", "file", "tstv", "excv"));
         $exp->setSelectableTypes(array("file", "tstv", "excv"));
-        $exp->setSelectMode("wsp_id", true);
+        $exp->setSelectMode("wsp_ids", true);
         if ($exp->handleCommand()) {
             return;
         }
@@ -1096,7 +1101,7 @@ class ilPersonalSkillsGUI
 
         $options = [];
         foreach ($bs as $b) {
-            $options[$b["skill_id"]] = ilSkillTreeNode::_lookupTitle($b["skill_id"]);
+            $options[$b["skill_id"]] = ilSkillTreeNode::_lookupTitle((int) $b["skill_id"]);
         }
 
         $cur_basic_skill_id = ($this->requested_basic_skill_id > 0)
@@ -1287,9 +1292,9 @@ class ilPersonalSkillsGUI
 
             foreach ($this->profile_levels as $l) {
                 $skills[] = array(
-                    "base_skill_id" => $l["base_skill_id"],
-                    "tref_id" => $l["tref_id"],
-                    "level_id" => $l["level_id"]
+                    "base_skill_id" => (int) $l["base_skill_id"],
+                    "tref_id" => (int) $l["tref_id"],
+                    "level_id" => (int) $l["level_id"]
                 );
             }
         } elseif (is_array($a_skills)) {
@@ -1543,7 +1548,7 @@ class ilPersonalSkillsGUI
             $mat_cnt = ilPersonalSkill::countAssignedMaterial(
                 $a_user_id,
                 $a_tref_id,
-                $v["id"]
+                (int) $v["id"]
             );
             if ($mat_cnt > 0) {
                 $got_mat = true;
@@ -1559,7 +1564,7 @@ class ilPersonalSkillsGUI
             foreach (ilPersonalSkill::getAssignedMaterial(
                 $a_user_id,
                 $a_tref_id,
-                $v["id"]
+                (int) $v["id"]
             ) as $item) {
                 $tpl->setCurrentBlock("material");
                 $mat_data = $this->getMaterialInfo($item["wsp_id"], $a_user_id);
@@ -2179,9 +2184,9 @@ class ilPersonalSkillsGUI
 
             foreach ($this->profile_levels as $l) {
                 $skills[] = array(
-                    "base_skill_id" => $l["base_skill_id"],
-                    "tref_id" => $l["tref_id"],
-                    "level_id" => $l["level_id"]
+                    "base_skill_id" => (int) $l["base_skill_id"],
+                    "tref_id" => (int) $l["tref_id"],
+                    "level_id" => (int) $l["level_id"]
                 );
             }
         }

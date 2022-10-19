@@ -1,6 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * Class ilTestArchiver
@@ -667,6 +681,9 @@ class ilTestArchiver
         if (@file_exists($data_index_file)) {
             $lines = explode("\n", file_get_contents($data_index_file));
             foreach ($lines as $line) {
+                if (strlen($line) === 0) {
+                    continue;
+                }
                 $line_items = explode('|', $line);
                 $line_data['identifier'] = $line_items[0] . '|' . $line_items[1];
                 $line_data['yyyy'] = $line_items[2];

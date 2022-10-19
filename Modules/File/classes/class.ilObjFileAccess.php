@@ -17,6 +17,7 @@
  *********************************************************************/
 
 use ILIAS\DI\Container;
+use ILIAS\FileUpload\MimeType;
 
 /**
  * Access class for file objects.
@@ -130,6 +131,26 @@ class ilObjFileAccess extends ilObjectAccess implements ilWACCheckingClass
         return $ilAccess->checkAccess("visible", "", $t_arr[1])
             || $ilAccess->checkAccess("read", "", $t_arr[1]);
     }
+
+    public static function _shouldDownloadDirectly(int $obj_id): bool
+    {
+        global $DIC;
+
+        $result = $DIC->database()->fetchAssoc(
+            $DIC->database()->queryF(
+                "SELECT on_click_mode FROM file_data WHERE file_id = %s;",
+                ['integer'],
+                [$obj_id]
+            )
+        );
+
+        if (empty($result)) {
+            return false;
+        }
+
+        return (((int) $result['on_click_mode']) === ilObjFile::CLICK_MODE_DOWNLOAD);
+    }
+
 
     /**
      * @param int $a_id
@@ -342,6 +363,18 @@ class ilObjFileAccess extends ilObjectAccess implements ilWACCheckingClass
         if (isset(self::$preload_list_gui_data[$a_obj_id])) {
             return self::$preload_list_gui_data[$a_obj_id];
         }
-        return [];
+        self::_preloadData([$a_obj_id], []);
+        return self::$preload_list_gui_data[$a_obj_id] ?? [];
+    }
+
+    public static function isZIP(?string $type): bool
+    {
+        return in_array(
+            $type ?? '',
+            [
+                MimeType::APPLICATION__ZIP,
+                MimeType::APPLICATION__X_ZIP_COMPRESSED
+            ]
+        );
     }
 }

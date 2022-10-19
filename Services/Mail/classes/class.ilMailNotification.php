@@ -36,7 +36,7 @@ abstract class ilMailNotification
     protected array $lang_modules = [];
     protected array $recipients = [];
     protected int $ref_id;
-    protected int $obj_id;
+    protected int $obj_id = 0;
     protected string $obj_type;
     protected array $additional_info = [];
     protected ilWorkspaceTree $wsp_tree;
@@ -227,7 +227,7 @@ abstract class ilMailNotification
         $recipients = [];
         foreach ($a_rcp as $rcp) {
             if ($a_parse_recipients) {
-                $recipients[] = ilObjUser::_lookupLogin($rcp);
+                $recipients[] = ilObjUser::_lookupLogin((int) $rcp);
             } else {
                 $recipients[] = $rcp;
             }

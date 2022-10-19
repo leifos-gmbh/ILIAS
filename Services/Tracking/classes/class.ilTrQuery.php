@@ -338,7 +338,6 @@ class ilTrQuery
             $udf_order = $a_order_field;
             $a_order_field = null;
         }
-
         $result = self::executeQueries(
             $queries,
             $a_order_field,
@@ -975,9 +974,9 @@ class ilTrQuery
                 $members = $member_obj->getMembers();
                 break;
 
-                /* Mantis 19296: Individual Assessment can be subtype of crs.
-                  * But for LP view only his own members should be displayed.
-                  * We need to return the members without checking the parent path. */
+            /* Mantis 19296: Individual Assessment can be subtype of crs.
+              * But for LP view only his own members should be displayed.
+              * We need to return the members without checking the parent path. */
             case "iass":
                 $members_read = true;
                 $iass = new ilObjIndividualAssessment($obj_id, false);
@@ -1134,9 +1133,9 @@ class ilTrQuery
                                 " OR ut_lp_marks.status IS NULL)";
                             break;
                         }
-                        // fallthrough
+                    // fallthrough
 
-                        // no break
+                    // no break
                     case "mark":
                         $where[] = "ut_lp_marks." . $id . " = " . $ilDB->quote(
                             $value,
@@ -1182,7 +1181,7 @@ class ilTrQuery
                         );
                         break;
 
-                        // timestamp
+                    // timestamp
                     case "last_access":
                         if (isset($value["from"])) {
                             $value["from"] = substr(
@@ -1210,9 +1209,9 @@ class ilTrQuery
                             );
                             $value["to"] = $value["to"]->get(IL_CAL_UNIX);
                         }
-                        // fallthrough
+                    // fallthrough
 
-                        // no break
+                    // no break
                     case 'status_changed':
                         // fallthrough
 
@@ -1220,9 +1219,9 @@ class ilTrQuery
                         if ($id == "registration") {
                             $id = "create_date";
                         }
-                        // fallthrough
+                    // fallthrough
 
-                        // no break
+                    // no break
                     case "create_date":
                     case "first_access":
                     case "birthday":
@@ -1280,13 +1279,13 @@ class ilTrQuery
 
                     case "spent_seconds":
                         if (!$a_aggregate) {
-                            if (isset($value["from"])) {
+                            if (isset($value["from"]) && $value["from"] > 0) {
                                 $where[] = "(read_event." . $id . "+read_event.childs_" . $id . ") >= " . $ilDB->quote(
                                     $value["from"],
                                     "integer"
                                 );
                             }
-                            if (isset($value["to"])) {
+                            if (isset($value["to"]) && $value["to"] > 0) {
                                 $where[] = "((read_event." . $id . "+read_event.childs_" . $id . ") <= " . $ilDB->quote(
                                     $value["to"],
                                     "integer"
@@ -1294,13 +1293,13 @@ class ilTrQuery
                                     " OR (read_event." . $id . "+read_event.childs_" . $id . ") IS NULL)";
                             }
                         } else {
-                            if (isset($value["from"])) {
+                            if (isset($value["from"]) && $value["from"] > 0) {
                                 $having[] = "ROUND(AVG(read_event." . $id . "+read_event.childs_" . $id . ")) >= " . $ilDB->quote(
                                     $value["from"],
                                     "integer"
                                 );
                             }
-                            if (isset($value["to"])) {
+                            if (isset($value["to"]) && $value["to"] > 0) {
                                 $having[] = "ROUND(AVG(read_event." . $id . "+read_event.childs_" . $id . ")) <= " . $ilDB->quote(
                                     $value["to"],
                                     "integer"
@@ -1563,14 +1562,12 @@ class ilTrQuery
         global $DIC;
 
         $ilDB = $DIC->database();
-
         $cnt = 0;
         $subqueries = array();
         foreach ($queries as $item) {
             // ugly "having" hack because of summary view
-            ilLoggerFactory::getLogger('root')->dump($item);
-            $item['fields'] = str_replace("[[--HAVING", "HAVING", $item['fields']);
-            $item['fields'] = str_replace("HAVING--]]", "", $item['fields']);
+            $item['query'] = str_replace("[[--HAVING", "HAVING", $item['query']);
+            $item['query'] = str_replace("HAVING--]]", "", $item['query']);
 
             if (!isset($item["count"])) {
                 $count_field = $item["fields"];
@@ -1615,7 +1612,6 @@ class ilTrQuery
             $offset = $a_offset;
             $limit = $a_limit;
             $ilDB->setLimit($limit, $offset);
-
             $set = $ilDB->query($query);
             while ($rec = $ilDB->fetchAssoc($set)) {
                 $result[] = $rec;
@@ -1644,7 +1640,6 @@ class ilTrQuery
         ?int $a_check_agreement = null
     ): array {
         global $DIC;
-
         $ilDB = $DIC->database();
 
         $result = array("cnt" => 0, "set" => null);
@@ -1710,17 +1705,17 @@ class ilTrQuery
                 if ($raw["cnt"]) {
                     // convert to final structure
                     foreach ($raw["set"] as $row) {
-                        $result["set"][(int) $row["usr_id"]]["login"] = $row["login"];
-                        $result["set"][(int) $row["usr_id"]]["usr_id"] = (int) $row["usr_id"];
+                        $result["set"][(int) $row["usr_id"]]["login"] = ($row["login"] ?? '');
+                        $result["set"][(int) $row["usr_id"]]["usr_id"] = (int) ($row["usr_id"] ?? 0);
 
                         // #14953
-                        $result["set"][(int) $row["usr_id"]]["obj_" . $obj_id] = (int) $row["status"];
-                        $result["set"][(int) $row["usr_id"]]["obj_" . $obj_id . "_perc"] = (int) $row["percentage"];
+                        $result["set"][(int) $row["usr_id"]]["obj_" . $obj_id] = (int) ($row["status"] ?? 0);
+                        $result["set"][(int) $row["usr_id"]]["obj_" . $obj_id . "_perc"] = (int) ($row["percentage"] ?? 0);
                         if ($obj_id == $parent_obj_id) {
-                            $result["set"][(int) $row["usr_id"]]["status_changed"] = (int) $row["status_changed"];
-                            $result["set"][(int) $row["usr_id"]]["last_access"] = (int) $row["last_access"];
-                            $result["set"][(int) $row["usr_id"]]["spent_seconds"] = (int) $row["spent_seconds"];
-                            $result["set"][(int) $row["usr_id"]]["read_count"] = (int) $row["read_count"];
+                            $result["set"][(int) $row["usr_id"]]["status_changed"] = (int) ($row["status_changed"] ?? 0);
+                            $result["set"][(int) $row["usr_id"]]["last_access"] = (int) ($row["last_access"] ?? 0);
+                            $result["set"][(int) $row["usr_id"]]["spent_seconds"] = (int) ($row["spent_seconds"] ?? 0);
+                            $result["set"][(int) $row["usr_id"]]["read_count"] = (int) ($row["read_count"] ?? 0);
                         }
 
                         // @todo int cast?
@@ -1875,6 +1870,9 @@ class ilTrQuery
         $sql .= " GROUP BY obj_id," . $column;
         $set = $ilDB->query($sql);
         while ($row = $ilDB->fetchAssoc($set)) {
+            if (!isset($res[(int) $row["obj_id"]][$row[$column]]["users"])) {
+                $res[(int) $row["obj_id"]][$row[$column]]["users"] = 0;
+            }
             $res[(int) $row["obj_id"]][$row[$column]]["users"] += (int) $row["counter"];
         }
 
@@ -1899,7 +1897,7 @@ class ilTrQuery
         // repository
         $tree = new ilTree(1);
         $sql = "SELECT " . $tree->getObjectDataTable(
-        ) . ".obj_id," . $tree->getObjectDataTable() . ".type," .
+            ) . ".obj_id," . $tree->getObjectDataTable() . ".type," .
             $tree->getTreeTable() . "." . $tree->getTreePk(
             ) . "," . $tree->getTableReference() . ".ref_id" .
             " FROM " . $tree->getTreeTable() .

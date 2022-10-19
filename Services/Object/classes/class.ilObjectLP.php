@@ -47,7 +47,11 @@ class ilObjectLP
         $this->obj_id = $obj_id;
     }
 
-    public static function getInstance(int $obj_id): ilObjectLP
+    /**
+     * @param int $obj_id
+     * @return ilObjectLP|mixed
+     */
+    public static function getInstance(int $obj_id)
     {
         static $instances = array();
 
@@ -69,7 +73,6 @@ class ilObjectLP
     {
         global $DIC;
         $objDefinition = $DIC["objDefinition"];
-
         if (self::isSupportedObjectType($type)) {
             switch ($type) {
                 // container
@@ -117,10 +120,9 @@ class ilObjectLP
                     return ilLTIConsumerLP::class;
                 case 'frm':
                     return ilForumLP::class;
-
-                    // plugin
-                case $objDefinition->isPluginTypeName($type):
-                    return "ilPluginLP";
+            }
+            if ($objDefinition->isPluginTypeName($type)) {
+                return "ilPluginLP";
             }
         }
         return "";
@@ -481,7 +483,7 @@ class ilObjectLP
                         foreach ($ref_ids as $ref_id) {
                             if ($tree->isGrandChild($path_ref_id, $ref_id)) {
                                 $found[$obj_id][] = $ref_id;
-                                if ($chk[$path_ob_id]) {
+                                if ($chk[$path_ob_id] ?? false) {
                                     $res[$obj_id] = true;
                                 }
                                 break;

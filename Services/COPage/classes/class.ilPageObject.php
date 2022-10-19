@@ -99,7 +99,7 @@ abstract class ilPageObject
     protected ?string $activationstart = null;      // IL_CAL_DATETIME format
     protected ?string $activationend = null;        // IL_CAL_DATETIME format
     protected \ILIAS\COPage\ReadingTime\ReadingTimeManager $reading_time_manager;
-    protected $concrete_lang;
+    protected $concrete_lang = "";
 
     final public function __construct(
         int $a_id = 0,
@@ -279,7 +279,10 @@ abstract class ilPageObject
                 " AND parent_type=" . $this->db->quote($this->getParentType(), "text") .
                 " AND lang = " . $this->db->quote($this->getLanguage(), "text");
             $pg_set = $this->db->query($query);
-            $this->page_record = $this->db->fetchAssoc($pg_set);
+            if (!$this->page_record = $this->db->fetchAssoc($pg_set)) {
+                throw new ilCOPageNotFoundException("Error: Page " . $this->id . " is not in database" .
+                    " (parent type " . $this->getParentType() . ", lang: " . $this->getLanguage() . ").");
+            }
             $this->setActive($this->page_record["active"]);
             $this->setActivationStart($this->page_record["activation_start"]);
             $this->setActivationEnd($this->page_record["activation_end"]);
@@ -1082,7 +1085,11 @@ s     */
 
             if (!($inst_id > 0)) {
                 if ($q_id > 0) {
-                    $question = assQuestion::_instantiateQuestion($q_id);
+                    $question = null;
+                    try {
+                        $question = assQuestion::_instantiateQuestion($q_id);
+                    } catch (Exception $e) {
+                    }
                     // check due to #16557
                     if (is_object($question) && $question->isComplete()) {
                         // check if page for question exists
@@ -1874,7 +1881,7 @@ s     */
             $new_id = "";
             $import_id = "";
             // get the new id from the current mapping
-            if ($a_mapping[$old_id] > 0) {
+            if (($a_mapping[$old_id] ?? 0) > 0) {
                 $new_id = $a_mapping[$old_id];
                 if ($a_reuse_existing_by_import) {
                     // this should work, if the lm has been imported in a translation installation and re-exported
@@ -2004,7 +2011,7 @@ s     */
             $target = $res->nodeset[$i]->get_attribute("Target");
             $type = $res->nodeset[$i]->get_attribute("Type");
             $obj_id = ilInternalLink::_extractObjIdOfTarget($target);
-            if ($a_from_to[$obj_id] > 0 && is_int(strpos($target, "__"))) {
+            if (($a_from_to[$obj_id] ?? 0) > 0 && is_int(strpos($target, "__"))) {
                 if ($type == "PageObject" && ilLMObject::_lookupType($a_from_to[$obj_id]) == "pg") {
                     $res->nodeset[$i]->set_attribute("Target", "il__pg_" . $a_from_to[$obj_id]);
                     $changed = true;
@@ -2214,7 +2221,7 @@ s     */
         // pc classes hook, @todo: move rest of function to this hook, too
         $defs = ilCOPagePCDef::getPCDefinitions();
         foreach ($defs as $def) {
-            ilCOPagePCDef::requirePCClassByName($def["name"]);
+            //ilCOPagePCDef::requirePCClassByName($def["name"]);
             if (method_exists($def["pc_class"], 'afterRepositoryCopy')) {
                 call_user_func($def["pc_class"] . '::afterRepositoryCopy', $this, $a_mapping, $a_source_ref_id);
             }
@@ -3052,8 +3059,8 @@ s     */
 
             // @todo 1: hook
             // do not delete question nodes in assessment pages
-            if (!$this->checkForTag("Question", $a_hid[0], (string) $a_hid[1]) || $a_self_ass) {
-                $curr_node = $this->getContentNode((string) $a_hid[0], (string) $a_hid[1]);
+            if (!$this->checkForTag("Question", $a_hid[0], (string) ($a_hid[1] ?? "")) || $a_self_ass) {
+                $curr_node = $this->getContentNode((string) $a_hid[0], (string) ($a_hid[1] ?? ""));
                 if (is_object($curr_node)) {
                     $parent_node = $curr_node->parent_node();
                     if ($parent_node->node_name() != "TableRow") {

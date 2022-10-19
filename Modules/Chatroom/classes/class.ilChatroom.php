@@ -21,6 +21,7 @@ declare(strict_types=1);
 use ILIAS\Notifications\Model\ilNotificationConfig;
 use ILIAS\Notifications\Model\ilNotificationLink;
 use ILIAS\Notifications\Model\ilNotificationParameter;
+use ILIAS\Chatroom\GlobalScreen\ChatInvitationNotificationProvider;
 
 /**
  * Class ilChatroom
@@ -843,16 +844,15 @@ class ilChatroom
         string $invitationLink = ''
     ): void {
         $links = [];
-        if ($invitationLink === '') {
-            if ($gui) {
-                $links[] = new ilNotificationLink(
-                    new ilNotificationParameter('chat_join', [], 'chatroom'),
-                    $this->getChatURL($gui, $subScope)
-                );
-            }
-        } else {
-            $links[] = new ilNotificationLink(new ilNotificationParameter('chat_join', [], 'chatroom'), $invitationLink);
+
+        if ($gui && $invitationLink === '') {
+            $invitationLink = $this->getChatURL($gui, $subScope);
         }
+
+        $links[] = new ilNotificationLink(
+            new ilNotificationParameter('chat_join', [], 'chatroom'),
+            $invitationLink
+        );
 
         if ($recipient_id > 0 && ANONYMOUS_USER_ID !== $recipient_id) {
             if (is_numeric($sender) && $sender > 0) {
@@ -876,16 +876,18 @@ class ilChatroom
             $userLang = ilLanguageFactory::_getLanguageOfUser($recipient_id);
             $userLang->loadLanguageModule('mail');
             $bodyParams = [
+                'link' => $invitationLink,
                 'inviter_name' => $public_name,
                 'room_name' => $this->getTitle(),
-                'salutation' => ilMail::getSalutation($recipient_id, $userLang)
+                'salutation' => ilMail::getSalutation($recipient_id, $userLang),
+                'BR' => "\n",
             ];
 
             if ($subScope) {
                 $bodyParams['room_name'] .= ' - ' . self::lookupPrivateRoomTitle($subScope);
             }
 
-            $notification = new ilNotificationConfig('chat_invitation');
+            $notification = new ilNotificationConfig(ChatInvitationNotificationProvider::NOTIFICATION_TYPE);
             $notification->setTitleVar('chat_invitation', $bodyParams, 'chatroom');
             $notification->setShortDescriptionVar('chat_invitation_short', $bodyParams, 'chatroom');
             $notification->setLongDescriptionVar('chat_invitation_long', $bodyParams, 'chatroom');
@@ -1269,21 +1271,23 @@ class ilChatroom
             }
         }
 
-        $rset = $DIC->database()->queryF(
-            'SELECT *
-			FROM ' . self::$historyTable . '
-			WHERE room_id = %s
-			AND sub_room = 0
-			AND ' . $DIC->database()->like('message', 'text', '%%"type":"notice"%%') . '
-			AND timestamp <= %s AND timestamp >= %s
-			ORDER BY timestamp DESC',
-            ['integer', 'integer', 'integer'],
-            [$this->roomId, $results[0]->timestamp, $results[$result_count - 1]->timestamp]
-        );
+        if ($results !== []) {
+            $rset = $DIC->database()->queryF(
+                'SELECT *
+                FROM ' . self::$historyTable . '
+                WHERE room_id = %s
+                AND sub_room = 0
+                AND ' . $DIC->database()->like('message', 'text', '%%"type":"notice"%%') . '
+                AND timestamp <= %s AND timestamp >= %s
+                ORDER BY timestamp DESC',
+                ['integer', 'integer', 'integer'],
+                [$this->roomId, $results[0]->timestamp, $results[$result_count - 1]->timestamp]
+            );
 
-        while (($row = $DIC->database()->fetchAssoc($rset))) {
-            $tmp = json_decode($row['message'], false, 512, JSON_THROW_ON_ERROR);
-            $results[] = $tmp;
+            while (($row = $DIC->database()->fetchAssoc($rset))) {
+                $tmp = json_decode($row['message'], false, 512, JSON_THROW_ON_ERROR);
+                $results[] = $tmp;
+            }
         }
 
         usort($results, static function (stdClass $a, stdClass $b): int {

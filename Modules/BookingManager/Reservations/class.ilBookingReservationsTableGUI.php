@@ -424,7 +424,6 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
 
             $filter["past"] = (bool) $this->filter["past"];
         }
-
         return $filter;
     }
 
@@ -595,7 +594,7 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
 
         if ($this->has_items_with_host_context) {
             $this->tpl->setCurrentBlock("context");
-            $this->tpl->setVariable("VALUE_CONTEXT_TITLE", $a_set["context_obj_title"] . " ");
+            $this->tpl->setVariable("VALUE_CONTEXT_TITLE", ($a_set["context_obj_title"] ?? "") . " ");
             $this->tpl->parseCurrentBlock();
         }
 

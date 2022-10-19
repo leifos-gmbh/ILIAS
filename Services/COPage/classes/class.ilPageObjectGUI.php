@@ -44,13 +44,13 @@ class ilPageObjectGUI
     protected int $requested_old_nr;
     protected EditGUIRequest $request;
     protected EditSessionRepository $edit_repo;
-    protected string $exp_target_script;
-    protected string $exp_id;
-    protected string $exp_frame;
-    protected string $act_meth;
+    protected string $exp_target_script = "";
+    protected string $exp_id = "";
+    protected string $exp_frame = "";
+    protected string $act_meth = "";
     protected object $act_obj;
-    public string $page_back_title;
-    protected int $notes_parent_id;
+    public string $page_back_title = "";
+    protected int $notes_parent_id = 0;
     protected ilPropertyFormGUI $form;
     protected int $styleid = 0;
     protected bool $enabledpagefocus;
@@ -129,6 +129,7 @@ class ilPageObjectGUI
     protected ?string $adv_type = null;
     protected ?string $adv_subtype = null;
     protected string $concrete_lang = "";
+    protected string $profile_back_url = "";
 
     protected ilComponentFactory $component_factory;
 
@@ -197,7 +198,7 @@ class ilPageObjectGUI
         $this->initPageObject();
         $this->setPageConfig($this->getPageObject()->getPageConfig());
 
-        $this->page_linker = new ilPageLinker(get_class($this), false, $this->getProfileBackUrl());
+        $this->page_linker = new ilPageLinker(get_class($this));
 
         $this->output2template = true;
 
@@ -1389,7 +1390,7 @@ class ilPageObjectGUI
                 $par = $this->obj->getParagraphForPCID($this->abstract_pcid);
                 $content = "<dummy><PageObject><PageContent><Paragraph Characteristic='" . $par->getCharacteristic() . "'>" .
                     $par->getText() . $link_xml .
-                    "</Paragraph></PageContent></PageObject></dummy>";
+                    "</Paragraph></PageContent></PageObject>" . $this->obj->getMultimediaXML() . "</dummy>";
             }
         } else {
             $content = $this->obj->getXMLFromDom(
@@ -1410,7 +1411,6 @@ class ilPageObjectGUI
 
         // get title
         $pg_title = $this->getPresentationTitle();
-
         $col_path = '';
         $row_path = '';
         $cell_path = '';
@@ -1642,6 +1642,7 @@ class ilPageObjectGUI
                 $pc_obj->setSourcecodeDownloadScript($this->determineSourcecodeDownloadScript());
                 $pc_obj->setFileDownloadLink($this->determineFileDownloadLink());
                 $pc_obj->setFullscreenLink($this->determineFullscreenLink());
+                $pc_obj->setProfileBackUrl($this->getProfileBackUrl());
 
                 // post xsl page content modification by pc elements
                 $output = $pc_obj->modifyPageContentPostXsl($output, $this->getOutputMode(), $this->getAbstractOnly());
@@ -1993,6 +1994,7 @@ class ilPageObjectGUI
 
     public function setDefaultLinkXml(): void
     {
+        $this->page_linker->setProfileBackUrl($this->getProfileBackUrl());
         $this->page_linker->setOffline($this->getOutputMode() == self::OFFLINE);
         $this->setLinkXml($this->page_linker->getLinkXML($this->getPageObject()->getInternalLinks()));
     }
@@ -2006,8 +2008,20 @@ class ilPageObjectGUI
 
     public function getProfileBackUrl(): string
     {
+        if ($this->profile_back_url != "") {
+            return $this->profile_back_url;
+        }
+        if ($this->getOutputMode() === self::OFFLINE) {
+            return "";
+        }
         return $this->ctrl->getLinkTargetByClass(strtolower(get_class($this)), "preview");
     }
+
+    public function setProfileBackUrl(string $url): void
+    {
+        $this->profile_back_url = $url;
+    }
+
 
     public function downloadFile(): void
     {
@@ -2602,6 +2616,9 @@ class ilPageObjectGUI
 
     public function getTabs(string $a_activate = ""): void
     {
+        if (in_array($this->getOutputMode(), [self::OFFLINE])) {
+            return;
+        }
         $this->setScreenIdComponent();
 
         if (!$this->getEnabledTabs()) {
@@ -2736,6 +2753,8 @@ class ilPageObjectGUI
     */
     public function editActivation(): void
     {
+        $this->setBackToEditTabs();
+
         $atpl = new ilTemplate("tpl.page_activation.php", true, true, "Services/COPage");
         $this->initActivationForm();
         $this->getActivationFormValues();
@@ -3022,7 +3041,7 @@ class ilPageObjectGUI
      */
     public function editMasterLanguage(): void
     {
-        $this->ctrl->setParameter($this, "transl", "");
+        $this->ctrl->setParameter($this, "transl", "-");
         $this->ctrl->redirect($this, "edit");
     }
 

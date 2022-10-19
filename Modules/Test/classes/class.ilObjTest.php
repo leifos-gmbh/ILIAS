@@ -15,6 +15,8 @@
  *
  *********************************************************************/
 
+use ILIAS\Test\TestManScoringDoneHelper;
+
 require_once 'Modules/Test/classes/inc.AssessmentConstants.php';
 
 /**
@@ -49,6 +51,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
     private array $mob_ids;
     private array $file_ids;
     private bool $online;
+    private \ILIAS\Test\InternalRequestService $testrequest;
     protected int $_kiosk;
     public int $test_id;
     public int $invitation = INVITATION_OFF;
@@ -290,6 +293,8 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
     protected $pass_waiting = "00:000:00:00:00";
     #endregion
 
+    private TestManScoringDoneHelper $testManScoringDoneHelper;
+
     /**
      * Constructor
      *
@@ -302,6 +307,8 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
         $ilUser = $DIC['ilUser'];
         $lng = $DIC['lng'];
         $this->type = "tst";
+        $this->testrequest = $DIC->test()->internal()->request();
+        $this->testManScoringDoneHelper = new TestManScoringDoneHelper();
 
         $lng->loadLanguageModule("assessment");
         // Defaults:
@@ -2295,50 +2302,25 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
         return 0;
     }
 
-    // hey: prevPassSolutions - serious (nonstatic) identifier, for use in high level controller gui
-    public function isPreviousSolutionReuseEnabled($activeId): int
+    public function isPreviousSolutionReuseEnabled($active_id): bool
     {
-        // checks if allowed in general and if enabled by participant
-        return self::_getUsePreviousAnswers($activeId, true);
-    }
-    // hey.
-
-    /**
-    * Returns if the previous results should be hidden for a learner
-    *
-    * @param integer $test_id The test id
-    * @param boolean $use_active_user_setting If true, the tst_use_previous_answers- of the active user should be used as well
-    * @return integer 1 if the previous results should be hidden, 0 otherwise
-    * @access public
-    * @see $use_previous_answers
-    */
-    public static function _getUsePreviousAnswers($active_id, $user_active_user_setting = false): int
-    {
-        global $DIC;
-        $ilDB = $DIC['ilDB'];
-        $ilUser = $DIC['ilUser'];
-
-        $use_previous_answers = 1;
-
-        $result = $ilDB->queryF(
+        $result = $this->db->queryF(
             "SELECT tst_tests.use_previous_answers FROM tst_tests, tst_active WHERE tst_tests.test_id = tst_active.test_fi AND tst_active.active_id = %s",
             array("integer"),
             array($active_id)
         );
         if ($result->numRows()) {
-            $row = $ilDB->fetchAssoc($result);
-            $use_previous_answers = $row["use_previous_answers"];
+            $row = $this->db->fetchAssoc($result);
+            $test_allows_reuse = $row["use_previous_answers"];
         }
 
-        if ($use_previous_answers == 1) {
-            if ($user_active_user_setting) {
-                $res = $ilUser->getPref("tst_use_previous_answers");
-                if ($res !== false) {
-                    $use_previous_answers = $res;
-                }
+        if ($test_allows_reuse === '1') {
+            $res = $this->user->getPref("tst_use_previous_answers");
+            if ($res === '1') {
+                return true;
             }
         }
-        return $use_previous_answers;
+        return false;
     }
 
     /**
@@ -4024,7 +4006,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
                     $login = $this->lng->txt("unknown");
                 } else {
                     $login = $row["login"];
-                    if ($row["user_fi"] == ANONYMOUS_USER_ID) {
+                    if ($row["usr_id"] == ANONYMOUS_USER_ID) {
                         $name = $this->lng->txt("anonymous");
                         $fullname = $this->lng->txt("anonymous");
                     } else {
@@ -7031,9 +7013,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
                         //}
                         //else
                         //{
-                        $assessmentSetting = new ilSetting("assessment");
-                        $manscoring_done = $assessmentSetting->get("manscoring_done_" . $active_id);
-                        if ($manscoring_done) {
+                        if ($this->testManScoringDoneHelper->isDone((int) $active_id)) {
                             $filtered_participants[$active_id] = $participant;
                         }
                         //}
@@ -7047,9 +7027,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
                         //}
                         //if ($found == 0)
                         //{
-                        $assessmentSetting = new ilSetting("assessment");
-                        $manscoring_done = $assessmentSetting->get("manscoring_done_" . $active_id);
-                        if (!$manscoring_done) {
+                        if (!$this->testManScoringDoneHelper->isDone((int) $active_id)) {
                             $filtered_participants[$active_id] = $participant;
                         }
                         //}
@@ -9388,7 +9366,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
         $feedback = "";
         $row = self::getSingleManualFeedback((int) $active_id, (int) $question_id, (int) $pass);
 
-        if ($row !== [] && ($row['finalized_evaluation'] || \ilTestService::isManScoringDone($active_id))) {
+        if ($row !== [] && ($row['finalized_evaluation'] || \ilTestService::isManScoringDone((int) $active_id))) {
             $feedback = $row['feedback'] ?? '';
         }
 
@@ -9513,7 +9491,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
         }
 
         if ($finalized === true || ($feedback_old !== [] && (int) $feedback_old['finalized_evaluation'] === 1)) {
-            if (!array_key_exists('evaluated', $_POST)) {
+            if (!array_key_exists('evaluated', $this->testrequest->getParsedBody())) {
                 $update_default['finalized_evaluation'] = ['integer', 0];
                 $update_default['finalized_by_usr_id'] = ['integer', 0];
                 $update_default['finalized_tstamp'] = ['integer', 0];
@@ -9656,7 +9634,7 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
             array($a_q_id)
         );
         $rec = $ilDB->fetchAssoc($result);
-        return $rec["obj_id"];
+        return $rec["obj_id"] ?? null;
     }
 
     /**
@@ -9897,72 +9875,6 @@ class ilObjTest extends ilObject implements ilMarkSchemaAware, ilEctsGradesEnabl
             $fd->unlinkFiles($file_names);
             unset($fd);
             @unlink($file);
-        }
-    }
-
-    public function createRandomSolutions($number)
-    {
-        global $DIC;
-        $ilDB = $DIC['ilDB'];
-
-        // 1. get a user
-        $query = "SELECT usr_id FROM usr_data";
-        $result = $ilDB->query($query);
-        while ($data = $ilDB->fetchAssoc($result)) {
-            $activequery = sprintf(
-                "SELECT user_fi FROM tst_active WHERE test_fi = %s AND user_fi = %s",
-                $ilDB->quote($this->getTestId()),
-                $ilDB->quote($data['usr_id'])
-            );
-            $activeresult = $ilDB->query($activequery);
-            if ($activeresult->numRows() == 0) {
-                $user_id = $data['usr_id'];
-                if ($user_id != 13) {
-                    include_once "./Modules/Test/classes/class.ilTestSession.php";
-                    $testSession = new ilTestSession();
-                    $testSession->setRefId($this->getRefId());
-                    $testSession->setTestId($this->getTestId());
-                    $testSession->setUserId($user_id);
-                    $testSession->saveToDb();
-                    $passes = ($this->getNrOfTries()) ? $this->getNrOfTries() : 10;
-                    $random = new \ilRandom();
-                    $nr_of_passes = $random->int(1, $passes);
-                    $active_id = $testSession->getActiveId();
-                    for ($pass = 0; $pass < $nr_of_passes; $pass++) {
-                        include_once "./Modules/Test/classes/class.ilTestSequence.php";
-                        $testSequence = new ilTestSequence($active_id, $pass, $this->isRandomTest());
-                        $testSequence->loadFromDb();
-                        $testSequence->loadQuestions();
-                        if (!$testSequence->hasSequence()) {
-                            $testSequence->createNewSequence($this->getQuestionCount(), false);
-                            $testSequence->saveToDb();
-                        }
-                        for ($seq = 1, $seqMax = count($this->questions); $seq <= $seqMax; $seq++) {
-                            $question_id = $testSequence->getQuestionForSequence($seq);
-                            $objQuestion = ilObjTest::_instanciateQuestion($question_id);
-                            $assSettings = new ilSetting('assessment');
-                            require_once 'Modules/TestQuestionPool/classes/class.ilAssQuestionProcessLockerFactory.php';
-                            $processLockerFactory = new ilAssQuestionProcessLockerFactory($assSettings, $ilDB);
-                            $processLockerFactory->setQuestionId($objQuestion->getId());
-                            $processLockerFactory->setUserId($testSession->getUserId());
-                            include_once("./Modules/Test/classes/class.ilObjAssessmentFolder.php");
-                            $processLockerFactory->setAssessmentLogEnabled(ilObjAssessmentFolder::_enabledAssessmentLogging());
-                            $objQuestion->setProcessLocker($processLockerFactory->getLocker());
-                            $objQuestion->createRandomSolution($testSession->getActiveId(), $pass);
-                        }
-                        $testSession->increasePass();
-                        $testSession->setLastSequence(0);
-                        $testSession->setLastFinishedPass($pass);
-                        $testSession->setSubmitted(1);
-                        $testSession->setSubmittedTimestamp(date('Y-m-d H:i:s'));
-                        $testSession->saveToDb();
-                    }
-                    $number--;
-                    if ($number == 0) {
-                        return;
-                    }
-                }
-            }
         }
     }
 

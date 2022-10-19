@@ -306,14 +306,14 @@ class ilSurveySkill
             $previous = 0;
             $previous_t = 0;
             foreach ($skills[$k]["level_data"] as $l) {
-                $t = $thresholds[$l["id"]][$s["tref_id"]];
+                $t = $thresholds[$l["id"]][$s["tref_id"]] ?? 0;
                 if ($t > 0 && $mean_sum >= $t) {
                     $skills[$k]["new_level"] = $l["title"];
                     $skills[$k]["new_level_id"] = $l["id"];
                     $skills[$k]["next_level_perc"] = 0;
                 } elseif ($t > 0 && $mean_sum < $t) {
                     // first unfulfilled level
-                    if ($previous == $skills[$k]["new_level_id"] && !isset($skills[$k]["next_level_perc"])) {
+                    if ($previous == ($skills[$k]["new_level_id"] ?? null) && !isset($skills[$k]["next_level_perc"])) {
                         $skills[$k]["next_level_perc"] = 1 / ($t - $previous_t) * ($mean_sum - $previous_t);
                     }
                 }
@@ -340,7 +340,7 @@ class ilSurveySkill
             }
             $cats = $q->getCategories();
             $max_scale = 0;
-            for ($i = 0; $i <= $cats->getCategoryCount(); $i++) {
+            for ($i = 0; $i < $cats->getCategoryCount(); $i++) {
                 $c = $cats->getCategory($i);
                 $n = $c->neutral;
                 $s = $c->scale;
@@ -365,12 +365,12 @@ class ilSurveySkill
         // write raters evaluation
         $new_levels = $this->determineSkillLevelsForAppraisee($user_id);
         foreach ($new_levels as $nl) {
-            if ($nl["new_level_id"] > 0) {
+            if (($nl["new_level_id"] ?? 0) > 0) {
                 ilBasicSkill::writeUserSkillLevelStatus(
-                    $nl["new_level_id"],
+                    (int) $nl["new_level_id"],
                     $user_id,
                     $this->survey->getRefId(),
-                    $nl["tref_id"],
+                    (int) $nl["tref_id"],
                     ilBasicSkill::ACHIEVED,
                     true,
                     false,
@@ -378,10 +378,10 @@ class ilSurveySkill
                     $nl["next_level_perc"]
                 );
 
-                if ($nl["tref_id"] > 0) {
-                    ilPersonalSkill::addPersonalSkill($user_id, $nl["tref_id"]);
+                if (($nl["tref_id"] ?? 0) > 0) {
+                    ilPersonalSkill::addPersonalSkill($user_id, (int) $nl["tref_id"]);
                 } else {
-                    ilPersonalSkill::addPersonalSkill($user_id, $nl["base_skill_id"]);
+                    ilPersonalSkill::addPersonalSkill($user_id, (int) $nl["base_skill_id"]);
                 }
             }
         }
@@ -400,24 +400,24 @@ class ilSurveySkill
     ): void {
         $new_levels = $this->determineSkillLevelsForAppraisee($appr_id, false, $finished_id);
         foreach ($new_levels as $nl) {
-            if ($nl["new_level_id"] > 0) {
+            if (($nl["new_level_id"] ?? 0) > 0) {
                 ilBasicSkill::writeUserSkillLevelStatus(
-                    $nl["new_level_id"],
+                    (int) $nl["new_level_id"],
                     $appr_id,
                     $this->survey->getRefId(),
-                    $nl["tref_id"],
+                    (int) $nl["tref_id"],
                     ilBasicSkill::ACHIEVED,
                     true,
                     false,
                     "",
                     $nl["next_level_perc"],
-                    $rater_id
+                    (int) $rater_id
                 );
 
-                if ($nl["tref_id"] > 0) {
-                    ilPersonalSkill::addPersonalSkill($appr_id, $nl["tref_id"]);
+                if (($nl["tref_id"] ?? 0) > 0) {
+                    ilPersonalSkill::addPersonalSkill($appr_id, (int) $nl["tref_id"]);
                 } else {
-                    ilPersonalSkill::addPersonalSkill($appr_id, $nl["base_skill_id"]);
+                    ilPersonalSkill::addPersonalSkill($appr_id, (int) $nl["base_skill_id"]);
                 }
             }
         }
@@ -432,12 +432,12 @@ class ilSurveySkill
         if ($user_id > 0 && in_array($this->survey->getMode(), [ilObjSurvey::MODE_SELF_EVAL, ilObjSurvey::MODE_360], true)) {
             $new_levels = $this->determineSkillLevelsForAppraisee($user_id, true);
             foreach ($new_levels as $nl) {
-                if ($nl["new_level_id"] > 0) {
+                if (($nl["new_level_id"] ?? 0) > 0) {
                     ilBasicSkill::writeUserSkillLevelStatus(
-                        $nl["new_level_id"],
+                        (int) $nl["new_level_id"],
                         $user_id,
                         $this->survey->getRefId(),
-                        $nl["tref_id"],
+                        (int) $nl["tref_id"],
                         ilBasicSkill::ACHIEVED,
                         true,
                         1,
@@ -445,10 +445,10 @@ class ilSurveySkill
                         $nl["next_level_perc"]
                     );
 
-                    if ($nl["tref_id"] > 0) {
-                        ilPersonalSkill::addPersonalSkill($user_id, $nl["tref_id"]);
+                    if (($nl["tref_id"] ?? 0) > 0) {
+                        ilPersonalSkill::addPersonalSkill($user_id, (int) $nl["tref_id"]);
                     } else {
-                        ilPersonalSkill::addPersonalSkill($user_id, $nl["base_skill_id"]);
+                        ilPersonalSkill::addPersonalSkill($user_id, (int) $nl["base_skill_id"]);
                     }
                 }
             }

@@ -641,7 +641,7 @@ class ilAdvancedMDSettingsGUI
         // add items to delete
         foreach ($record_ids as $record_id) {
             $record = ilAdvancedMDRecord::_getInstanceByRecordId($record_id);
-            $c_gui->addItem("record_id[]", $record_id, $record->getTitle() ?: 'No Title');
+            $c_gui->addItem("record_id[]", (string) $record_id, $record->getTitle() ?: 'No Title');
         }
         $this->tpl->setContent($c_gui->getHTML());
     }
@@ -1197,13 +1197,17 @@ class ilAdvancedMDSettingsGUI
 
         $record = $this->loadRecordFormData($form);
         if ($this->obj_type) {
-            $this->record->setAssignedObjectTypes(array(
-                array(
+            $sub_types = (!is_array($this->sub_type))
+                ? [$this->sub_type]
+                : $this->sub_type;
+            $assigned_object_types = array_map(function ($sub_type) {
+                return [
                     "obj_type" => $this->obj_type,
-                    "sub_type" => $this->sub_type,
+                    "sub_type" => $sub_type,
                     "optional" => false
-                )
-            ));
+                ];
+            }, $sub_types);
+            $this->record->setAssignedObjectTypes($assigned_object_types);
         }
 
         $record->setDefaultLanguage($this->lng->getDefaultLanguage());
@@ -1307,11 +1311,13 @@ class ilAdvancedMDSettingsGUI
     {
         $record_id = $this->getRecordIdFromQuery();
         $field_type = $this->getFieldTypeFromPost();
+        if (!$field_type) {
+            $field_type = $this->getFieldTypeFromQuery();
+        }
 
         $this->initRecordObject();
         $this->ctrl->setParameter($this, 'ftype', $field_type);
         $this->setRecordSubTabs(2);
-
         if (!$record_id || !$field_type) {
             $this->editFields();
             return;
@@ -1701,6 +1707,29 @@ class ilAdvancedMDSettingsGUI
                 "bold" => $perm[ilAdvancedMDPermissionHelper::ACTION_SUBSTITUTION_EXERCISE_EDIT_FIELD_PROPERTY][ilAdvancedMDPermissionHelper::SUBACTION_SUBSTITUTION_BOLD]
                 ,
                 "newline" => $perm[ilAdvancedMDPermissionHelper::ACTION_SUBSTITUTION_EXERCISE_EDIT_FIELD_PROPERTY][ilAdvancedMDPermissionHelper::SUBACTION_SUBSTITUTION_NEWLINE]
+            );
+        } elseif ($a_obj_type == "file") {
+            $perm = $this->getPermissions()->hasPermissions(
+                ilAdvancedMDPermissionHelper::CONTEXT_SUBSTITUTION_FILE,
+                (string) $a_field_id,
+                array(
+                    ilAdvancedMDPermissionHelper::ACTION_SUBSTITUTION_FILE_SHOW_FIELD
+                    ,
+                    array(ilAdvancedMDPermissionHelper::ACTION_SUBSTITUTION_FILE_EDIT_FIELD_PROPERTY,
+                          ilAdvancedMDPermissionHelper::SUBACTION_SUBSTITUTION_BOLD
+                    )
+                    ,
+                    array(ilAdvancedMDPermissionHelper::ACTION_SUBSTITUTION_FILE_EDIT_FIELD_PROPERTY,
+                          ilAdvancedMDPermissionHelper::SUBACTION_SUBSTITUTION_NEWLINE
+                    )
+                )
+            );
+            return array(
+                "show" => $perm[ilAdvancedMDPermissionHelper::ACTION_SUBSTITUTION_FILE_SHOW_FIELD]
+                ,
+                "bold" => $perm[ilAdvancedMDPermissionHelper::ACTION_SUBSTITUTION_FILE_EDIT_FIELD_PROPERTY][ilAdvancedMDPermissionHelper::SUBACTION_SUBSTITUTION_BOLD]
+                ,
+                "newline" => $perm[ilAdvancedMDPermissionHelper::ACTION_SUBSTITUTION_FILE_EDIT_FIELD_PROPERTY][ilAdvancedMDPermissionHelper::SUBACTION_SUBSTITUTION_NEWLINE]
             );
         }
         return [];

@@ -36,7 +36,7 @@ class ilMail
     public int $user_id;
     protected string $table_mail;
     protected string $table_mail_saved;
-    /** @var string[]|null */
+    /** @var array<string, mixed>|null */
     protected ?array $mail_data = [];
     protected bool $save_in_sentbox;
     protected bool $appendInstallationSignature = false;
@@ -490,7 +490,6 @@ class ilMail
         if ($usePlaceholders) {
             $message = $this->replacePlaceholders($message, $usrId);
         }
-        $message = $this->formatLinebreakMessage($message);
         $message = str_ireplace(["<br />", "<br>", "<br/>"], "\n", $message);
 
         $nextId = $this->db->nextId($this->table_mail);
@@ -653,6 +652,16 @@ class ilMail
 
             $canReadInternalMails = !$user->hasToAcceptTermsOfService() && $user->checkTimeLimit();
 
+            if ($this->isSystemMail() && !$canReadInternalMails) {
+                $this->logger->debug(sprintf(
+                    "Skipped recipient with id %s (Accepted User Agreement:%s|Expired Account:%s)",
+                    $usrId,
+                    var_export(!$user->hasToAcceptTermsOfService(), true),
+                    var_export(!$user->checkTimeLimit(), true)
+                ));
+                continue;
+            }
+
             $individualMessage = $message;
             if ($usePlaceholders) {
                 $individualMessage = $this->replacePlaceholders($message, $user->getId());
@@ -756,7 +765,7 @@ class ilMail
                 '',
                 '',
                 $subject,
-                $this->formatLinebreakMessage($message),
+                $message,
                 $attachments
             );
         } elseif (count($usrIdToExternalEmailAddressesMap) > 1) {
@@ -771,7 +780,7 @@ class ilMail
                         '',
                         '',
                         $subject,
-                        $this->formatLinebreakMessage($usrIdToMessageMap[$usrId]),
+                        $usrIdToMessageMap[$usrId],
                         $attachments
                     );
                 }
@@ -798,7 +807,7 @@ class ilMail
                             '',
                             $remainingAddresses,
                             $subject,
-                            $this->formatLinebreakMessage($message),
+                            $message,
                             $attachments
                         );
 
@@ -815,7 +824,7 @@ class ilMail
                         '',
                         $remainingAddresses,
                         $subject,
-                        $this->formatLinebreakMessage($message),
+                        $message,
                         $attachments
                     );
                 }
@@ -928,7 +937,7 @@ class ilMail
         return true;
     }
 
-    public function getSavedData(): ?array
+    public function getSavedData(): array
     {
         $res = $this->db->queryF(
             "SELECT * FROM $this->table_mail_saved WHERE user_id = %s",
@@ -937,6 +946,9 @@ class ilMail
         );
 
         $this->mail_data = $this->fetchMailData($this->db->fetchAssoc($res));
+        if (!is_array($this->mail_data)) {
+            $this->savePostData($this->user_id, [], '', '', '', '', '', false);
+        }
 
         return $this->mail_data;
     }
@@ -1093,11 +1105,9 @@ class ilMail
                 $externalMailRecipientsCc,
                 $externalMailRecipientsBcc,
                 $subject,
-                $this->formatLinebreakMessage(
-                    $usePlaceholders ?
-                        $this->replacePlaceholders($message, 0, false) :
-                        $message
-                ),
+                $usePlaceholders ?
+                            $this->replacePlaceholders($message, 0, false) :
+                            $message,
                 $attachments
             );
         } else {

@@ -13,7 +13,8 @@
  * us at:
  * https://www.ilias.de
  * https://github.com/ILIAS-eLearning
- */
+ *
+ *********************************************************************/
 
 require_once './Modules/Test/classes/inc.AssessmentConstants.php';
 
@@ -458,14 +459,6 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
         // get the solution of the user for the active pass or from the last pass if allowed
         $user_solution = "";
         if ($active_id) {
-            // hey: prevPassSolutions - obsolete due to central check
-            #$solutions = NULL;
-            #include_once "./Modules/Test/classes/class.ilObjTest.php";
-            #if (!ilObjTest::_getUsePreviousAnswers($active_id, true))
-            #{
-            #	if (is_null($pass)) $pass = ilObjTest::_getPass($active_id);
-            #}
-            // hey.
             $solutions = $this->object->getTestOutputSolutions($active_id, $pass);
             foreach ($solutions as $idx => $solution_value) {
                 $user_solution = $solution_value["value1"];
@@ -658,7 +651,7 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
         $this->object->flushAnswers();
         if ($this->object->isSingleline()) {
             foreach ($_POST['choice']['answer'] as $index => $answertext) {
-                $answertext = ilUtil::secureString($answertext);
+                $answertext = ilUtil::secureString(htmlentities($answertext));
 
                 $picturefile = $_POST['choice']['imagename'][$index] ?? '';
                 $file_org_name = $_FILES['choice']['name']['image'][$index] ?? '';
@@ -704,7 +697,13 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
         if ($this->object->getAnswerCount() == 0) {
             $this->object->addAnswer("", 0, 0);
         }
-        $choices->setValues($this->object->getAnswers());
+        $choices->setValues(array_map(
+            function (ASS_AnswerBinaryStateImage $value) {
+                $value->setAnswerText(html_entity_decode($value->getAnswerText()));
+                return $value;
+            },
+            $this->object->getAnswers()
+        ));
         $form->addItem($choices);
         return $form;
     }

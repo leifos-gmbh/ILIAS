@@ -229,7 +229,7 @@ class ilRepositoryGUI
                 $this->http->request()->getServerParams()['SERVER_NAME']
             )
         ) {
-            $this->ctrl->redirectToURL('./login.php?cmd=force_login');
+            $this->ctrl->redirectToURL('./login.php');
         }
 
         $this->tool_context->claim()->repository();

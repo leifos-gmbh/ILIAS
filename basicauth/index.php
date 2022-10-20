@@ -16,6 +16,6 @@ ilInitialisation::initILIAS();
 
 // authentication is done here ->
 $ilCtrl->initBaseClass("ilStartUpGUI");
-$ilCtrl->setCmd('showLoginPage');
+$ilCtrl->setCmd('doStandardAuthentication');
 $ilCtrl->setTargetScript("ilias.php");
 $ilCtrl->callBaseClass();

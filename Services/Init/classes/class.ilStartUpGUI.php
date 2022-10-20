@@ -190,8 +190,8 @@ class ilStartUpGUI
          * @var ilAuthSession
          */
         if ($auth_session->isValid()) {
-            $this->logger->debug('Valid session -> redirect to starting page');
-            return ilInitialisation::redirectToStartingPage();
+            #$this->logger->debug('Valid session -> redirect to starting page');
+            #return ilInitialisation::redirectToStartingPage();
         }
         $this->logger->debug('No valid session -> show login');
         $this->showLoginPage();

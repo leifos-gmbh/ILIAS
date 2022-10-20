@@ -235,10 +235,14 @@ class ilStartUpGUI
             $credentials = new ilAuthFrontendCredentials();
             $provider = $pl->getProvider($credentials, '');
             if ($provider instanceof ilAuthProviderInterface) {
+                ilLoggerFactory::getLogger('auth')->info('Trying netscaler authentcation...');
                 $status = ilAuthStatus::getInstance();
-                #$provider->doAuthentication($status);
+                $provider->doAuthentication($status);
                 if ($status->getStatus() === ilAuthStatus::STATUS_AUTHENTICATED) {
+                    ilLoggerFactory::getLogger('auth')->info('netscaler authentication successful');
                     ilInitialisation::redirectToStartingPage();
+                } else {
+                    ilLoggerFactory::getLogger('auth')->info('netscaler authentication failed');
                 }
             }
         }

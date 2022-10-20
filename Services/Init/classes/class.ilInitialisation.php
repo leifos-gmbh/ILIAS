@@ -2042,8 +2042,9 @@ class ilInitialisation
 
         // fallback, should never happen
         if ($ilUser->getId() == ANONYMOUS_USER_ID) {
-            ilInitialisation::goToPublicSection();
-            return true;
+            if (ilPublicSectionSettings::getInstance()->isEnabledForDomain($_SERVER['SERVER_NAME'])) {
+                return ilInitialisation::goToPublicSection();
+            }
         }
 
         // for password change and incomplete profile

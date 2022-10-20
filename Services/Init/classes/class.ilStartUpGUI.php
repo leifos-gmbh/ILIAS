@@ -232,6 +232,9 @@ class ilStartUpGUI
 
         // try netscaler auth
         foreach (ilAuthUtils::getAuthPlugins() as $pl) {
+            if (($this->httpRequest->getServerParams()['SKY_SSO'] ?? 2) == 2) {
+                continue;
+            }
             $credentials = new ilAuthFrontendCredentials();
             $provider = $pl->getProvider($credentials, '');
             if ($provider instanceof ilAuthProviderInterface) {

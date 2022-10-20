@@ -57,6 +57,10 @@ class ilAuthFrontendCredentialsApache extends ilAuthFrontendCredentials implemen
             return false;
         }
 
+        // begin-patch sky_sso
+        if (($this->httpRequest->getServerParams()['SKY_SSO'] ?? 1) == 1) {
+            return false;
+        }
         if (
             !\ilContext::supportsRedirects() ||
             isset($this->httpRequest->getQueryParams()['passed_sso']) ||

@@ -230,6 +230,19 @@ class ilStartUpGUI
         $frontend = new ilAuthFrontendCredentialsApache($this->httpRequest, $this->ctrl);
         $frontend->tryAuthenticationOnLoginPage();
 
+        // try netscaler auth
+        foreach (ilAuthUtils::getAuthPlugins() as $pl) {
+            $credentials = new ilAuthFrontendCredentials();
+            $provider = $pl->getProvider($credentials, '');
+            if ($provider instanceof ilAuthProviderInterface) {
+                $status = ilAuthStatus::getInstance();
+                #$provider->doAuthentication($status);
+                if ($status->getStatus() === ilAuthStatus::STATUS_AUTHENTICATED) {
+                    ilInitialisation::redirectToStartingPage();
+                }
+            }
+        }
+
         // Instantiate login template
         $tpl = self::initStartUpTemplate("tpl.login.html");
 

@@ -211,13 +211,16 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
         global $DIC;
         $values = $DIC->http()->request()->getParsedBody();
         if (!isset($values['kiosk_options'])) {
-            $values['kiosk_options'] = array();
+            $values['kiosk_options'] = [];
         }
         if (!isset($values['instant_feedback_contents'])) {
-            $values['instant_feedback_contents'] = array();
+            $values['instant_feedback_contents'] = [];
         }
         if (!isset($values['list_of_questions_options'])) {
-            $values['list_of_questions_options'] = array();
+            $values['list_of_questions_options'] = [];
+        }
+        if (!isset($values['pass_waiting'])) {
+            $values['pass_waiting'] = [];
         }
 
         $form->setValuesByArray($values);
@@ -597,6 +600,9 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
         $random = new ilRadioOption($this->lng->txt('test_question_set_type_random'), ilObjTest::QUESTION_SET_TYPE_RANDOM);
         $random->setInfo($this->lng->txt('test_question_set_type_random_info'));
         $question_set_type->addOption($random);
+        if ($this->testOBJ->participantDataExist()) {
+            $question_set_type->setDisabled(true);
+        }
 
         $question_set_type->setValue($this->testOBJ->getQuestionSetType());
         $form->addItem($question_set_type);
@@ -1542,6 +1548,7 @@ class ilObjTestSettingsGeneralGUI extends ilTestSettingsGUI
         $mailnottype = new ilCheckboxInputGUI('', "mailnottype");
         $mailnottype->setValue(1);
         $mailnottype->setOptionTitle($this->lng->txt("mailnottype"));
+        $mailnottype->setInfo($this->lng->txt("mailnottype_desc"));
         $mailnottype->setChecked($this->testOBJ->getMailNotificationType());
         $mailnotification->addSubItem($mailnottype);
     }

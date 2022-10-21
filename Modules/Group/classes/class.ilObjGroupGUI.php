@@ -246,7 +246,6 @@ class ilObjGroupGUI extends ilContainerGUI
 
                 $this->checkPermission("write");
                 $this->setTitleAndDescription();
-                $this->showContainerPageTabs();
                 $settings_gui = $DIC->contentStyle()->gui()
                     ->objectSettingsGUIForRefId(
                         null,
@@ -484,7 +483,7 @@ class ilObjGroupGUI extends ilContainerGUI
      * @access public
      * @see ilGroupAddToGroupActionGUI
      */
-    public function afterSave(ilObject $new_object): void
+    public function afterSave(ilObject $new_object, bool $redirect = true): void
     {
         $new_object->setRegistrationType(
             ilGroupConstants::GRP_REGISTRATION_DIRECT
@@ -513,8 +512,10 @@ class ilObjGroupGUI extends ilContainerGUI
         $members_obj->updateContact($this->user->getId(), true);
 
         $this->tpl->setOnScreenMessage('success', $this->lng->txt("object_added"), true);
-        $this->ctrl->setParameter($this, "ref_id", $new_object->getRefId());
-        $this->ctrl->redirect($this, 'edit');
+        if ($redirect) {
+            $this->ctrl->setParameter($this, "ref_id", $new_object->getRefId());
+            $this->ctrl->redirect($this, 'edit');
+        }
     }
 
     /**
@@ -939,7 +940,7 @@ class ilObjGroupGUI extends ilContainerGUI
             }
 
             if ($privacy->enabledGroupAccessTimes()) {
-                if (isset($progress[$usr_id]['ts']) and ($progress[$usr_id]['ts'] ?? false)) {
+                if (isset($progress[$usr_id]['ts']) && ($progress[$usr_id]['ts'] ?? false)) {
                     $tmp_data['access_time'] = ilDatePresentation::formatDate(
                         $tmp_date = new ilDateTime($progress[$usr_id]['ts'], IL_CAL_UNIX)
                     );
@@ -951,9 +952,8 @@ class ilObjGroupGUI extends ilContainerGUI
             }
             $tmp_data['prtf'] = [];
             if ($do_prtf) {
-                $tmp_data['prtf'] = $all_prtf[$usr_id];
+                $tmp_data['prtf'] = ($all_prtf[$usr_id] ?? []);
             }
-
             $members[$usr_id] = $tmp_data;
         }
         return $members;

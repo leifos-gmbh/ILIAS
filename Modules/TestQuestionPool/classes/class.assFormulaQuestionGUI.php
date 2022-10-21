@@ -29,6 +29,8 @@ include_once "./Modules/Test/classes/inc.AssessmentConstants.php";
  */
 class assFormulaQuestionGUI extends assQuestionGUI
 {
+    protected const HAS_SPECIAL_QUESTION_COMMANDS = true;
+
     /**
      * assFormulaQuestionGUI constructor
      * The constructor takes possible arguments an creates an instance of the assFormulaQuestionGUI object.
@@ -49,24 +51,19 @@ class assFormulaQuestionGUI extends assQuestionGUI
         $ilTabs->addTarget('units', $this->ctrl->getLinkTargetByClass('ilLocalUnitConfigurationGUI', ''), '', 'illocalunitconfigurationgui');
     }
 
-    public function getCommand($cmd)
+    protected function callSpecialQuestionCommands(string $cmd): void
     {
-        if (preg_match("/suggestrange_(.*?)/", $cmd, $matches)) {
-            $cmd = "suggestRange";
+        if (preg_match('/suggestrange_(\$r\d+)/', $cmd, $matches)) {
+            $this->suggestRange($matches[1]);
         }
-        return $cmd;
     }
 
-    /**
-     * Suggest a range for a result
-     * @access public
-     */
-    public function suggestRange(): void
+    public function suggestRange(string $suggest_range_for_result): void
     {
         if ($this->writePostData()) {
             $this->tpl->setOnScreenMessage('info', $this->getErrorMessage());
         }
-        $this->editQuestion();
+        $this->editQuestion(false, $suggest_range_for_result);
     }
 
     /**
@@ -211,11 +208,9 @@ class assFormulaQuestionGUI extends assQuestionGUI
     }
 
     /**
-     * Creates an output of the edit form for the question
      * @param bool $checkonly
-     * @return bool
      */
-    public function editQuestion($checkonly = false): bool
+    public function editQuestion($checkonly = false, string $suggest_range_for_result = ''): bool
     {
         $save = $this->isSaveCommand();
 
@@ -352,13 +347,11 @@ class assFormulaQuestionGUI extends assQuestionGUI
                 $formula->setSuffix(' = ' . $result->getResult());
 
                 if (
-                    preg_match("/suggestrange_(.*)/", $this->ctrl->getCmd(), $matches) &&
-                    strcmp($matches[1], $result->getResult()) == 0
+                    $suggest_range_for_result !== '' &&
+                    strcmp($suggest_range_for_result, $result->getResult()) == 0 &&
+                    strlen($result->substituteFormula($variables, $results))
                 ) {
-                    // suggest a range for the result
-                    if (strlen($result->substituteFormula($variables, $results))) {
-                        $result->suggestRange($variables, $results);
-                    }
+                    $result->suggestRange($variables, $results);
                 }
 
                 $range_min = new ilNumberInputGUI($this->lng->txt('range_min'), 'range_min_' . $result->getResult());
@@ -874,13 +867,6 @@ class assFormulaQuestionGUI extends assQuestionGUI
         // get the solution of the user for the active pass or from the last pass if allowed
         $user_solution = array();
         if (($active_id > 0) && (!$show_correct_solution)) {
-            $solutions = array();
-            include_once "./Modules/Test/classes/class.ilObjTest.php";
-            if (!ilObjTest::_getUsePreviousAnswers($active_id, true)) {
-                if (is_null($pass)) {
-                    $pass = ilObjTest::_getPass($active_id);
-                }
-            }
             $user_solution["active_id"] = $active_id;
             $user_solution["pass"] = $pass;
             $solutions = $this->object->getSolutionValues($active_id, $pass);
@@ -900,13 +886,6 @@ class assFormulaQuestionGUI extends assQuestionGUI
                 }
             }
         } elseif ($active_id) {
-            $solutions = null;
-            include_once "./Modules/Test/classes/class.ilObjTest.php";
-            if (!ilObjTest::_getUsePreviousAnswers($active_id, true)) {
-                if (is_null($pass)) {
-                    $pass = ilObjTest::_getPass($active_id);
-                }
-            }
             $user_solution = $this->object->getBestSolution($this->object->getSolutionValues($active_id, $pass));
         } elseif (is_object($this->getPreviewSession())) {
             $solutionValues = array();
@@ -969,7 +948,7 @@ class assFormulaQuestionGUI extends assQuestionGUI
                     $user_solution[$matches[1]]["unit"] = $val2;
                 }
 
-                if (preg_match("/^(\\\$r\\d+)/", $val1, $matches) && $user_solution[$matches[1]]["result_type"] == 0) {
+                if (preg_match("/^(\\\$r\\d+)/", $val1, $matches) && !isset($user_solution[$matches[1]]["result_type"])) {
                     $user_solution[$matches[1]]["result_type"] = assFormulaQuestionResult::getResultTypeByQstId($this->object->getId(), $val1);
                 }
             }
@@ -985,7 +964,7 @@ class assFormulaQuestionGUI extends assQuestionGUI
 
         $template = new ilTemplate("tpl.il_as_qpl_formulaquestion_output.html", true, true, 'Modules/TestQuestionPool');
         if (is_object($this->getPreviewSession())) {
-            $questiontext = $this->object->substituteVariables($user_solution, false, false, false);
+            $questiontext = $this->object->substituteVariables($user_solution);
         } else {
             $questiontext = $this->object->substituteVariables(array());
         }
@@ -1032,8 +1011,7 @@ class assFormulaQuestionGUI extends assQuestionGUI
                     }
                     $user_solution[$matches[1]]["unit"] = $solution_value["value2"];
                 }
-
-                if (preg_match("/^(\\\$r\\d+)/", $solution_value["value1"], $matches) && $user_solution[$matches[1]]["result_type"] == 0) {
+                if (preg_match("/^(\\\$r\\d+)/", $solution_value["value1"], $matches) && !isset($user_solution[$matches[1]]["result_type"])) {
                     $user_solution[$matches[1]]["result_type"] = assFormulaQuestionResult::getResultTypeByQstId($this->object->getId(), $solution_value["value1"]);
                 }
             }

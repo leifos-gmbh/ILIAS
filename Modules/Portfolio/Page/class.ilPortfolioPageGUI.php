@@ -20,7 +20,7 @@
  * Portfolio page gui class
  * @author Jörg Lützenkirchen <luetzenkirchen@leifos.com>
  * @ilCtrl_Calls ilPortfolioPageGUI: ilPageEditorGUI, ilEditClipboardGUI, ilMediaPoolTargetSelector
- * @ilCtrl_Calls ilPortfolioPageGUI: ilPageObjectGUI, ilObjBlogGUI, ilBlogPostingGUI
+ * @ilCtrl_Calls ilPortfolioPageGUI: ilPageObjectGUI, ilObjBlogGUI, ilBlogPostingGUI, ilPublicUserProfileGUI
  * @ilCtrl_Calls ilPortfolioPageGUI: ilCalendarMonthGUI, ilConsultationHoursGUI, ilLearningHistoryGUI
  */
 class ilPortfolioPageGUI extends ilPageObjectGUI
@@ -128,6 +128,7 @@ class ilPortfolioPageGUI extends ilPageObjectGUI
                 return (string) $ilCtrl->forwardCommand($blog_gui);
 
             case "ilcalendarmonthgui":
+                $this->ctrl->saveParameter($this, "chuid");
                 // booking action
                 if ($cmd && $cmd !== "preview") {
                     $categories = ilCalendarCategories::_getInstance();
@@ -136,7 +137,7 @@ class ilPortfolioPageGUI extends ilPageObjectGUI
                         if ($chuid > 0) {
                             $categories->setCHUserId($chuid);
                         }
-                        $categories->initialize(ilCalendarCategories::MODE_PORTFOLIO_CONSULTATION, null, true);
+                        $categories->initialize(ilCalendarCategories::MODE_PORTFOLIO_CONSULTATION, 0, true);
                     }
 
                     $req_seed = $this->port_request->getCalendarSeed();
@@ -151,7 +152,7 @@ class ilPortfolioPageGUI extends ilPageObjectGUI
                 }
 
                 // calendar month navigation
-                $ilCtrl->setParameter($this, "cmd", "preview");
+                //$ilCtrl->setParameter($this, "cmd", "preview");
                 return (string) self::EMBEDDED_NO_OUTPUT;
             default:
                 $this->setPresentationTitle($this->getPageObject()->getTitle());
@@ -586,7 +587,6 @@ class ilPortfolioPageGUI extends ilPageObjectGUI
     ): string {
         // not used
         // $user_id = $this->getPageContentUserId($a_user_id);
-
         if ($a_mode === "auto") {
             $mode = $this->lng->txt("cont_cach_mode_automatic");
             $groups = null;
@@ -614,7 +614,6 @@ class ilPortfolioPageGUI extends ilPageObjectGUI
         ?array $a_group_ids = null
     ): string {
         $ilUser = $this->user;
-
         if ($this->getOutputMode() === "preview") {
             return $this->renderConsultationHoursTeaser($a_user_id, $a_mode, $a_group_ids);
         }
@@ -630,15 +629,15 @@ class ilPortfolioPageGUI extends ilPageObjectGUI
         $user_id = $this->getPageContentUserId($a_user_id);
 
         // only if not owner
+        $bkid = 0;
         if ($ilUser->getId() !== $user_id) {
-            //$_GET["bkid"] = $user_id;
-            throw new ilException('Setting $_GET["bkid"] not supported.');
+            $bkid = $user_id;
         }
+        $this->ctrl->setParameter($this, "chuid", $user_id);
 
         if ($a_mode !== "manual") {
             $a_group_ids = null;
         }
-
         ilCalendarCategories::_getInstance()->setCHUserId($user_id);
         ilCalendarCategories::_getInstance()->initialize(ilCalendarCategories::MODE_PORTFOLIO_CONSULTATION, 0, true);
 
@@ -650,6 +649,9 @@ class ilPortfolioPageGUI extends ilPageObjectGUI
         }
 
         $month_gui = new ilCalendarMonthGUI($seed);
+        if ($bkid > 0) {
+            $month_gui->setBkId($bkid);
+        }
         $month_gui->setConsulationHoursUserId($user_id);
 
         // custom schedule filter: handle booking group ids
@@ -1123,6 +1125,7 @@ class ilPortfolioPageGUI extends ilPageObjectGUI
                         $html = "<a href='" . $href . "'>" . $html . "</a>";
                         break;
 
+                        /* see #34170, may need a different change, keep code to monitor
                     case "Verification":
                         $ilCtrl->setParameterByClass("ilPCVerificationGUI", "prt_id", $this->port_request->getPortfolioId());
                         $ilCtrl->setParameterByClass("ilPCVerificationGUI", "ppage", $this->getId());
@@ -1132,6 +1135,7 @@ class ilPortfolioPageGUI extends ilPageObjectGUI
                         $href = $ilCtrl->getLinkTargetByClass(array("ilPortfolioPageGUI", "ilPageEditorGUI", "ilPCPlaceHolderGUI", "ilPCVerificationGUI"), "insert");
                         $html = "<a href='" . $href . "'>" . $html . "</a>";
                         break;
+                        */
                 }
             }
 

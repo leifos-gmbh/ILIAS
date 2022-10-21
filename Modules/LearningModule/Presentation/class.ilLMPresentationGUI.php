@@ -340,11 +340,12 @@ class ilLMPresentationGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInt
             case "illearningprogressgui":
                 $this->initScreenHead("learning_progress");
                 $new_gui = new ilLearningProgressGUI(
-                    ilLearningProgressGUI::LP_CONTEXT_REPOSITORY,
+                    ilLearningProgressBaseGUI::LP_CONTEXT_REPOSITORY,
                     $this->requested_ref_id,
                     $ilUser->getId()
                 );
                 $this->ctrl->forwardCommand($new_gui);
+                $this->tpl->printToStdout();
                 break;
 
             case "ilratinggui":
@@ -857,7 +858,8 @@ class ilLMPresentationGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInt
                 true,
                 $this->lng->txt("lm_rating"),
                 false,
-                array("ilcommonactiondispatchergui", "ilratinggui")
+                array("ilcommonactiondispatchergui", "ilratinggui"),
+                true
             );
         }
 
@@ -1048,7 +1050,7 @@ class ilLMPresentationGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInt
         } else {        // lonely page
             $ilLocator->addItem(
                 $this->getLMPresentationTitle(),
-                $this->linker->getLink("layout", "", $this->requested_frame)
+                $this->linker->getLink("layout", 0, $this->requested_frame)
             );
 
             $lm_obj = ilLMObjectFactory::getInstance($this->lm, $a_id);
@@ -1162,8 +1164,7 @@ class ilLMPresentationGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInt
     public function updatePageRating(): void
     {
         $ilUser = $this->user;
-
-        $pg_id = $this->requested_pg_id;
+        $pg_id = $this->getCurrentPageId();
         if (!$this->ctrl->isAsynch() || !$pg_id) {
             exit();
         }
@@ -1586,7 +1587,7 @@ class ilLMPresentationGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInt
             );
         }
 
-        $f = $this->form->getHTML();
+        $f = $this->form->getHTMLAsync();
 
         $tpl->setVariable("ITEM_SELECTION", $f);
 

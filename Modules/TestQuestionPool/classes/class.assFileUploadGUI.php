@@ -75,7 +75,7 @@ class assFileUploadGUI extends assQuestionGUI implements ilGuiQuestionScoringAdj
 
     public function writeQuestionSpecificPostData(ilPropertyFormGUI $form): void
     {
-        $this->object->setPoints($_POST["points"]);
+        $this->object->setPoints((float)$_POST["points"]);
         $this->object->setMaxSize(($_POST['maxsize'] ?? null) ? (int) $_POST['maxsize'] : null);
         $this->object->setAllowedExtensions($_POST["allowedextensions"]);
         $this->object->setCompletionBySubmission($_POST['completion_by_submission'] == 1 ? true : false);
@@ -235,13 +235,6 @@ class assFileUploadGUI extends assQuestionGUI implements ilGuiQuestionScoringAdj
         $solutionvalue = "";
         if (($active_id > 0) && (!$show_correct_solution)) {
             $solutions = $this->object->getSolutionValues($active_id, $pass);
-            include_once "./Modules/Test/classes/class.ilObjTest.php";
-            if (!ilObjTest::_getUsePreviousAnswers($active_id, true)) {
-                if (is_null($pass)) {
-                    $pass = ilObjTest::_getPass($active_id);
-                }
-            }
-            $solutions = $this->object->getSolutionValues($active_id, $pass);
 
             $files = ($show_manual_scoring) ? $this->object->getUploadedFilesForWeb($active_id, $pass) : $this->object->getUploadedFiles($active_id, $pass);
             include_once "./Modules/TestQuestionPool/classes/tables/class.assFileUploadFileTableGUI.php";
@@ -384,13 +377,6 @@ class assFileUploadGUI extends assQuestionGUI implements ilGuiQuestionScoringAdj
         $template = new ilTemplate("tpl.il_as_qpl_fileupload_output.html", true, true, "Modules/TestQuestionPool");
 
         if ($active_id) {
-            // hey: prevPassSolutions - obsolete due to central check
-            #$solutions = NULL;
-            #include_once "./Modules/Test/classes/class.ilObjTest.php";
-            #if (!ilObjTest::_getUsePreviousAnswers($active_id, true))
-            #{
-            #	if (is_null($pass)) $pass = ilObjTest::_getPass($active_id);
-            #}
             $files = $this->object->getTestOutputSolutions($active_id, $pass);
             // hey.
             include_once "./Modules/TestQuestionPool/classes/tables/class.assFileUploadFileTableGUI.php";

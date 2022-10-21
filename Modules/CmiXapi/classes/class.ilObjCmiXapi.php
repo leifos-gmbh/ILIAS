@@ -98,6 +98,8 @@ class ilObjCmiXapi extends ilObject2
     public const PRIVACY_IDENT_IL_UUID_LOGIN = 2;
     public const PRIVACY_IDENT_REAL_EMAIL = 3;
     public const PRIVACY_IDENT_IL_UUID_RANDOM = 4;
+    public const PRIVACY_IDENT_IL_UUID_SHA256 = 5;
+    public const PRIVACY_IDENT_IL_UUID_SHA256URL = 6;
 
     protected int $userName;
     public const PRIVACY_NAME_NONE = 0;
@@ -1298,7 +1300,7 @@ class ilObjCmiXapi extends ilObject2
 
         //delete results
         $query = "DELETE FROM " . self::DB_RESULTS_TABLE_NAME .
-                "WHERE obj_id = " . $this->database->quote($this->getId(), 'integer') . " ";
+                " WHERE obj_id = " . $this->database->quote($this->getId(), 'integer');
         $this->database->manipulate($query);
 
         // TODO check xapidel

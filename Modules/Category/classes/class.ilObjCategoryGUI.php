@@ -199,7 +199,7 @@ class ilObjCategoryGUI extends ilContainerGUI
             case "ilobjectcontentstylesettingsgui":
                 $this->checkPermission("write");
                 $this->setTitleAndDescription();
-                $this->showContainerPageTabs();
+                //$this->showContainerPageTabs();
                 $settings_gui = $this->content_style_gui
                     ->objectSettingsGUIForRefId(
                         null,
@@ -352,7 +352,7 @@ class ilObjCategoryGUI extends ilContainerGUI
                     foreach ($tax as $tax_id => $tax_item) {
                         $option = new ilCheckboxOption(
                             $tax_item["title"],
-                            $tax_id,
+                            (string) $tax_id,
                             ilObject::_lookupDescription($tax_id)
                         );
 

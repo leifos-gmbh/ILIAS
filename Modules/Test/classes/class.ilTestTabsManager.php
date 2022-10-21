@@ -1,6 +1,20 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * @author		Björn Heyser <bheyser@databay.de>
@@ -645,7 +659,7 @@ class ilTestTabsManager
 
         // NEW CORRECTIONS TAB
         $setting = new ilSetting('assessment');
-        $scoring_adjust_active = (bool) $setting->get('assessment_adjustments_enabled', false);
+        $scoring_adjust_active = (bool) $setting->get('assessment_adjustments_enabled', '0');
         if ($this->isWriteAccessGranted() && $scoring_adjust_active && !$this->isHiddenTab(self::TAB_ID_CORRECTION)) {
             $this->tabs->addTab(
                 self::TAB_ID_CORRECTION,
@@ -897,17 +911,16 @@ class ilTestTabsManager
                 array("", "ilobjtestgui", "ilcertificategui")
             );
         }
-        /* TODO: PHP8 RETRY WHEN LTI IS DONE
-         $lti_settings = new ilLTIProviderObjectSettingGUI($this->testOBJ->getRefId());
-         if ($lti_settings->hasSettingsAccess()) {
-             $this->tabs->addSubTabTarget(
-                 'lti_provider',
-                 $DIC->ctrl()->getLinkTargetByClass(ilLTIProviderObjectSettingGUI::class),
-                 '',
-                 [ilLTIProviderObjectSettingGUI::class]
-             );
-         }
-        */
+
+        $lti_settings = new ilLTIProviderObjectSettingGUI($this->testOBJ->getRefId());
+        if ($lti_settings->hasSettingsAccess()) {
+            $this->tabs->addSubTabTarget(
+                'lti_provider',
+                $DIC->ctrl()->getLinkTargetByClass(ilLTIProviderObjectSettingGUI::class),
+                '',
+                [ilLTIProviderObjectSettingGUI::class]
+            );
+        }
     }
 
     /**

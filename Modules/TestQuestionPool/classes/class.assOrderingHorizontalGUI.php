@@ -12,7 +12,8 @@
  * us at:
  * https://www.ilias.de
  * https://github.com/ILIAS-eLearning
- */
+ *
+ *********************************************************************/
 
 require_once './Modules/Test/classes/inc.AssessmentConstants.php';
 
@@ -317,13 +318,6 @@ JS;
         $elements = $this->object->getRandomOrderingElements();
 
         if ($active_id) {
-            // hey: prevPassSolutions - obsolete due to central check
-            #$solutions = NULL;
-            #include_once "./Modules/Test/classes/class.ilObjTest.php";
-            #if (!ilObjTest::_getUsePreviousAnswers($active_id, true))
-            #{
-            #	if (is_null($pass)) $pass = ilObjTest::_getPass($active_id);
-            #}
             $solutions = $this->object->getTestOutputSolutions($active_id, $pass);
             // hey.
             if (is_array($solutions) && count($solutions) == 1) {
@@ -430,7 +424,7 @@ JS;
     {
         $this->object->setTextSize($_POST["textsize"]);
         $this->object->setOrderText($_POST["ordertext"]);
-        $this->object->setPoints($_POST["points"]);
+        $this->object->setPoints((float)$_POST["points"]);
     }
 
     /**

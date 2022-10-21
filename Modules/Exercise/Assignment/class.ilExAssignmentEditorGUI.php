@@ -268,11 +268,12 @@ class ilExAssignmentEditorGUI
                 // Creation options
                 $rd_creation_method = new ilRadioGroupInputGUI($lng->txt("exc_team_creation"), "team_creation");
                 $rd_creation_method->setRequired(true);
+                $rd_creation_method->setValue("0");
 
                 //manual
                 $rd_creation_manual = new ilRadioOption(
                     $lng->txt("exc_team_by_tutors_manual"),
-                    0,
+                    "0",
                     $lng->txt("exc_team_by_tutors_manual_info")
                 );
                 $rd_creation_method->addOption($rd_creation_manual);
@@ -284,7 +285,7 @@ class ilExAssignmentEditorGUI
                 }
                 $rd_creation_random = new ilRadioOption(
                     $lng->txt("exc_team_by_random"),
-                    ilExAssignment::TEAMS_FORMED_BY_RANDOM,
+                    (string) ilExAssignment::TEAMS_FORMED_BY_RANDOM,
                     $lng->txt("exc_team_by_random_info") . "<br>" . $lng->txt("exc_total_members") . ": " . $this->getExerciseTotalMembers() . $add_info
                 );
                 $rd_creation_method->addOption($rd_creation_random);
@@ -879,11 +880,9 @@ class ilExAssignmentEditorGUI
         }
 
         // add global feedback file?
-        if (isset($a_input["fb"])) {
-            if (is_array($a_input["fb_file"])) {
-                $a_ass->handleGlobalFeedbackFileUpload($a_input["fb_file"]);
-                $a_ass->update();
-            }
+        if (isset($a_input["fb"], $a_input["fb_file"])) {
+            $a_ass->handleGlobalFeedbackFileUpload($a_input["fb_file"]);
+            $a_ass->update();
         }
         $this->importFormToAssignmentReminders($a_input, $a_ass->getId());
     }
@@ -1013,6 +1012,7 @@ class ilExAssignmentEditorGUI
 
         if ($this->assignment->getAssignmentType()->usesTeams()) {
             $values["team_creator"] = (string) (int) $this->assignment->getTeamTutor();
+            $values["team_creation"] = "0";
         }
 
         if ($this->assignment->getFeedbackDateCustom()) {

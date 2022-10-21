@@ -61,9 +61,7 @@ class ilLTIConsumerContentGUI
         if ($this->object->getProvider()->getAvailability() == ilLTIConsumeProvider::AVAILABILITY_NONE) {
             throw new ilLtiConsumerException('access denied!');
         }
-
         $command = $DIC->ctrl()->getCmd(self::CMD_LAUNCH);
-
         $this->{$command}();
     }
 
@@ -466,7 +464,6 @@ class ilLTIConsumerContentGUI
         if (!in_array($redirecturi, $uris)) {
             $ok = false;
             $error = 'invalid_request';
-            //throw new moodle_exception('invalidrequest', 'error');
         }
 
         if ($ok) {
@@ -495,7 +492,9 @@ class ilLTIConsumerContentGUI
     }
 
     // TODO: request_wrapper?
+
     /**
+     * @param string $key
      * @param mixed  $default
      * @return mixed|null
      */

@@ -1,14 +1,22 @@
 <?php
 
-/* Copyright (c) 1998-2013 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
-include_once "./Modules/TestQuestionPool/classes/class.assQuestion.php";
-include_once "./Modules/TestQuestionPool/classes/class.assFormulaQuestionResult.php";
-include_once "./Modules/TestQuestionPool/classes/class.assFormulaQuestionVariable.php";
-include_once "./Modules/TestQuestionPool/classes/class.ilUnitConfigurationRepository.php";
 include_once "./Modules/Test/classes/inc.AssessmentConstants.php";
-include_once "./Modules/TestQuestionPool/interfaces/interface.iQuestionCondition.php";
-require_once './Modules/TestQuestionPool/classes/class.ilUserQuestionResult.php';
 
 /**
  * Class for single choice questions
@@ -100,7 +108,8 @@ class assFormulaQuestion extends assQuestion implements iQuestionCondition
     public function addResultUnit($result, $unit): void
     {
         if (is_object($result) && is_object($unit)) {
-            if (!is_array($this->resultunits[$result->getResult()])) {
+            if (!array_key_exists($result->getResult(), $this->resultunits) ||
+                !is_array($this->resultunits[$result->getResult()])) {
                 $this->resultunits[$result->getResult()] = array();
             }
             $this->resultunits[$result->getResult()][$unit->getId()] = $unit;
@@ -284,67 +293,26 @@ class assFormulaQuestion extends assQuestion implements iQuestionCondition
                 ) {
                     $is_frac = true;
                 }
-                if (is_array($userdata) && isset($userdata[$result])) {
-                    if (is_array($userdata[$result])) {
-                        if (false && $forsolution && $result_output) { // fix for mantis #25956
-                            $value_org = $resObj->calculateFormula($this->getVariables(), $this->getResults(), parent::getId());
-                            $value = sprintf("%." . $resObj->getPrecision() . "f", $value_org);
-                            if ($is_frac) {
-                                $value = assFormulaQuestionResult::convertDecimalToCoprimeFraction($value_org);
-                                if (is_array($value)) {
-                                    $frac_helper = $value[1];
-                                    $value = $value[0];
-                                }
-                            }
-                        } else {
-                            if ($forsolution) {
-                                $value = $userdata[$result]["value"];
-                            } else {
-                                $value = ' value="' . $userdata[$result]["value"] . '"';
-                            }
-                        }
-                    }
-                } else {
-                    if ($forsolution) {
-                        $value = $resObj->calculateFormula($this->getVariables(), $this->getResults(), parent::getId());
-                        $value = sprintf("%." . $resObj->getPrecision() . "f", $value);
-
-                        if ($is_frac) {
-                            $value = assFormulaQuestionResult::convertDecimalToCoprimeFraction($value);
-                            if (is_array($value)) {
-                                $frac_helper = $value[1];
-                                $value = $value[0];
-                            }
-                            $value = ' value="' . $value . '"';
-                        }
-                    } else {
-                        // Precision fix for Preview by tjoussen
-                        // If all default values are set, this function is called in getPreview
-                        $use_precision = !($userdata == null && $graphicalOutput == false && $forsolution == false && $result_output == false);
-
-                        $val = $resObj->calculateFormula($this->getVariables(), $this->getResults(), parent::getId(), $use_precision);
-
-                        if ($resObj->getResultType() == assFormulaQuestionResult::RESULT_FRAC
-                            || $resObj->getResultType() == assFormulaQuestionResult::RESULT_CO_FRAC) {
-                            $val = $resObj->convertDecimalToCoprimeFraction($val);
-                            if (is_array($val)) {
-                                $frac_helper = $val[1];
-                                $val = $val[0];
-                            }
-                        } else {
-                            $val = sprintf("%." . $resObj->getPrecision() . "f", $val);
-                            $val = (strlen($val) > 8) ? strtoupper(sprintf("%e", $val)) : $val;
-                        }
-                        $value = ' value="' . $val . '"';
-                    }
-                }
-
                 if ($forsolution) {
+                    $value = $resObj->calculateFormula($this->getVariables(), $this->getResults(), parent::getId());
+                    $value = sprintf("%." . $resObj->getPrecision() . "f", $value);
+
+                    if ($is_frac) {
+                        $value = assFormulaQuestionResult::convertDecimalToCoprimeFraction($value);
+                        if (is_array($value)) {
+                            $frac_helper = $value[1];
+                            $value = $value[0];
+                        }
+                        $value = ' value="' . $value . '"';
+                    }
+
                     $input = '<span class="ilc_qinput_TextInput solutionbox">' . ilLegacyFormElementsUtil::prepareFormOutput(
                         $value
                     ) . '</span>';
+                } elseif (is_array($userdata) && isset($userdata[$result])) {
+                    $input = $this->generateResultInputHtml($result, $userdata[$result]["value"]);
                 } else {
-                    $input = '<input class="ilc_qinput_TextInput" type="text" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" name="result_' . $result . '"' . $value . ' />';
+                    $input = $this->generateResultInputHTML($result, '');
                 }
 
                 $units = "";
@@ -366,7 +334,9 @@ class assFormulaQuestion extends assQuestion implements iQuestionCondition
                         $units .= '<option value="-1">' . $this->lng->txt("select_unit") . '</option>';
                         foreach ($this->getResultUnits($resObj) as $unit) {
                             $units .= '<option value="' . $unit->getId() . '"';
-                            if ((is_array($userdata[$result])) && (strlen($userdata[$result]["unit"]))) {
+                            if (array_key_exists($result, $userdata) &&
+                                is_array($userdata[$result]) &&
+                                array_key_exists('unit', $userdata[$result])) {
                                 if ($userdata[$result]["unit"] == $unit->getId()) {
                                     $units .= ' selected="selected"';
                                 }
@@ -385,7 +355,10 @@ class assFormulaQuestion extends assQuestion implements iQuestionCondition
                     case assFormulaQuestionResult::RESULT_FRAC:
                         if (strlen($frac_helper)) {
                             $units .= ' &asymp; ' . $frac_helper . ', ';
-                        } elseif (is_array($userdata) && isset($userdata[$result]) && strlen($userdata[$result]["frac_helper"])) {
+                        } elseif (is_array($userdata) &&
+                            array_key_exists($result, $userdata) &&
+                            array_key_exists('frac_helper', $userdata[$result]) &&
+                            is_string($userdata[$result]["frac_helper"])) {
                             if (!preg_match('-/-', $value)) {
                                 $units .= ' &asymp; ' . $userdata[$result]["frac_helper"] . ', ';
                             }
@@ -409,8 +382,10 @@ class assFormulaQuestion extends assQuestion implements iQuestionCondition
                 if ($graphicalOutput) {
                     $resunit = null;
                     $user_value = '';
-                    if (is_array($userdata) && is_array($userdata[$result])) {
-                        if ($userdata[$result]["unit"] > 0) {
+                    if (is_array($userdata) &&
+                        array_key_exists($result, $userdata) &&
+                        is_array($userdata[$result])) {
+                        if (array_key_exists('unit', $userdata[$result]) && $userdata[$result]["unit"] > 0) {
                             $resunit = $this->getUnitrepository()->getUnit($userdata[$result]["unit"]);
                         }
 
@@ -438,10 +413,22 @@ class assFormulaQuestion extends assQuestion implements iQuestionCondition
                 if ($result_output) {
                     $template = new ilTemplate("tpl.il_as_qpl_formulaquestion_output_solution_result.html", true, true, 'Modules/TestQuestionPool');
 
-                    if (is_array($userdata)) {
-                        $found = $resObj->getResultInfo($this->getVariables(), $this->getResults(), $userdata[$resObj->getResult()]["value"], $userdata[$resObj->getResult()]["unit"], $this->getUnitrepository()->getUnits());
+                    if (is_array($userdata) && array_key_exists($resObj->getResult(), $userdata)) {
+                        $found = $resObj->getResultInfo(
+                            $this->getVariables(),
+                            $this->getResults(),
+                            $userdata[$resObj->getResult()]["value"],
+                            $userdata[$resObj->getResult()]["unit"] ?? null,
+                            $this->getUnitrepository()->getUnits()
+                        );
                     } else {
-                        $found = $resObj->getResultInfo($this->getVariables(), $this->getResults(), $resObj->calculateFormula($this->getVariables(), $this->getResults(), parent::getId()), is_object($resObj->getUnit()) ? $resObj->getUnit()->getId() : null, $this->getUnitrepository()->getUnits());
+                        $found = $resObj->getResultInfo(
+                            $this->getVariables(),
+                            $this->getResults(),
+                            $resObj->calculateFormula($this->getVariables(), $this->getResults(), parent::getId()),
+                            is_object($resObj->getUnit()) ? $resObj->getUnit()->getId() : null,
+                            $this->getUnitrepository()->getUnits()
+                        );
                     }
                     $resulttext = "(";
                     if ($resObj->getRatingSimple()) {
@@ -465,6 +452,15 @@ class assFormulaQuestion extends assQuestion implements iQuestionCondition
             }
         }
         return $text;
+    }
+
+    protected function generateResultInputHTML(string $result_key, string $result_value): string
+    {
+        $input = '<input class="ilc_qinput_TextInput" type="text"';
+        $input .= 'spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"';
+        $input .= 'name="result_' . $result_key . '"';
+        $input .= ' value="' . $result_value . '"/>';
+        return $input;
     }
 
     /**
@@ -875,7 +871,13 @@ class assFormulaQuestion extends assQuestion implements iQuestionCondition
         $points = 0;
         foreach ($this->getResults() as $result) {
             //vd($user_solution[$result->getResult()]["value"]);
-            $points += $result->getReachedPoints($this->getVariables(), $this->getResults(), $user_solution[$result->getResult()]["value"], $user_solution[$result->getResult()]["unit"], $this->unitrepository->getUnits());
+            $points += $result->getReachedPoints(
+                $this->getVariables(),
+                $this->getResults(),
+                $user_solution[$result->getResult()]["value"] ?? '',
+                $user_solution[$result->getResult()]["unit"] ?? '',
+                $this->unitrepository->getUnits()
+            );
         }
 
         return $points;
@@ -1263,7 +1265,9 @@ class assFormulaQuestion extends assQuestion implements iQuestionCondition
                 $available_units = $result->getAvailableResultUnits(parent::getId());
                 $result_name = $result->getResult();
 
-                if ($available_units[$result_name] != null) {
+                $check_unit = false;
+                if (array_key_exists($result_name, $available_units) &&
+                    $available_units[$result_name] !== null) {
                     $check_unit = in_array($user_solution[$result_name]['unit'], $available_units[$result_name]);
                 }
 
@@ -1329,27 +1333,39 @@ class assFormulaQuestion extends assQuestion implements iQuestionCondition
      */
     protected function getSolutionSubmit(): array
     {
-        $solutionSubmit = array();
-        foreach ($_POST as $k => $v) {
-            if (preg_match("/^result_(\\\$r\\d+)$/", $k)) {
-                $solutionSubmit[$k] = $v;
-            } elseif (preg_match("/^result_(\\\$r\\d+)_unit$/", $k)) {
-                $solutionSubmit[$k] = $v;
+        $solutionSubmit = [];
+
+        $post = $this->dic->http()->wrapper()->post();
+
+        foreach ($this->getResults() as $index => $a) {
+            $key = "result_$index";
+            if (
+                $post->has($key)
+                ||
+               $post->has($key . "_unit")
+            ) {
+                $value =$post->retrieve(
+                    $key,
+                    $this->dic->refinery()->kindlyTo()->string()
+                );
+
+                $solutionSubmit[$key] = $value;
             }
         }
+
         return $solutionSubmit;
     }
 
     public function validateSolutionSubmit(): bool
     {
         foreach ($this->getSolutionSubmit() as $key => $value) {
-            if (preg_match("/^result_(\\\$r\\d+)$/", $key)) {
-                if (strlen($value) && !$this->isValidSolutionResultValue($value)) {
-                    $this->tpl->setOnScreenMessage('failure', $this->lng->txt("err_no_numeric_value"), true);
-                    return false;
-                }
-            } elseif (preg_match("/^result_(\\\$r\\d+)_unit$/", $key)) {
-                continue;
+            if ($value && !$this->isValidSolutionResultValue($value)) {
+                $this->tpl->setOnScreenMessage(
+                    'failure',
+                    $this->lng->txt("err_no_numeric_value"),
+                    true
+                );
+                return false;
             }
         }
 

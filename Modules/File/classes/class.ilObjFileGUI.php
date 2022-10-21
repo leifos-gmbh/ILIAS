@@ -345,7 +345,9 @@ class ilObjFileGUI extends ilObject2GUI
                         ilObjFileProcessorInterface::OPTION_FILENAME => $this->ui->factory()->input()->field()->text($this->lng->txt('title')),
                         ilObjFileProcessorInterface::OPTION_DESCRIPTION => $this->ui->factory()->input()->field()->textarea($this->lng->txt('description')),
                     ])
-                )->withMaxFiles(self::UPLOAD_MAX_FILES)->withMaxFileSize((int) ilFileUtils::getUploadSizeLimitBytes()),
+                )->withMaxFiles(self::UPLOAD_MAX_FILES)
+                 ->withMaxFileSize((int) ilFileUtils::getUploadSizeLimitBytes())
+                 ->withRequired(true),
             ]
         )->withSubmitCaption($this->lng->txt('upload_files'));
     }
@@ -371,19 +373,16 @@ class ilObjFileGUI extends ilObject2GUI
         }
 
         if (empty($files)) {
-            $this->tpl->setContent(
-                $this->ui->renderer()->render(
-                    $this->ui->factory()->messageBox()->failure($this->lng->txt('upload_failure'))
-                )
-            );
-
+            $form = $this->initUploadForm()->withRequest($this->request);
+            $this->tpl->setContent($this->ui->renderer()->render($form));
             return;
         }
 
         $processor = new ilObjFileProcessor(
             $this->stakeholder,
             $this,
-            $this->storage
+            $this->storage,
+            $this->file_service_settings
         );
 
         $errors = false;
@@ -412,6 +411,17 @@ class ilObjFileGUI extends ilObject2GUI
             );
         }
 
+        if ($processor->getInvalidFileNames() !== []) {
+            $this->ui->mainTemplate()->setOnScreenMessage(
+                'info',
+                sprintf(
+                    $this->lng->txt('file_upload_info_file_with_critical_extension'),
+                    implode(', ', $processor->getInvalidFileNames())
+                ),
+                true
+            );
+        }
+
         switch ($this->id_type) {
             case self::WORKSPACE_NODE_ID:
                 $link = $this->ctrl->getLinkTargetByClass(ilObjWorkspaceRootFolderGUI::class);
@@ -423,6 +433,14 @@ class ilObjFileGUI extends ilObject2GUI
         }
 
         $this->ctrl->redirectToURL($link);
+    }
+
+    public function putObjectInTree(ilObject $obj, int $parent_node_id = null): void
+    {
+        // this is needed to support multi fileuploads in personal and shared resources
+        $backup_node_id = $this->node_id;
+        parent::putObjectInTree($obj, $parent_node_id);
+        $this->node_id = $backup_node_id;
     }
 
     /**

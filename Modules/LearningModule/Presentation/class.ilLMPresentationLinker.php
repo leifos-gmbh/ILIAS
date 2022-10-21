@@ -83,7 +83,7 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
         $this->offline = $offline;
     }
 
-    public function setProfileBackUrl(string $url) : void
+    public function setProfileBackUrl(string $url): void
     {
         $this->profile_back_url = $url;
     }
@@ -282,12 +282,14 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
                 "OnClick" => ""],
             "FAQ" => [
                 "Type" => "FAQ",
+                "Frame" => "faq",
                 "OnClick" => "return il.LearningModule.showContentFrame(event, 'faq');"],
             "Glossary" => [
                 "Type" => "Glossary",
                 "OnClick" => "return il.LearningModule.showContentFrame(event, 'glossary');"],
             "Media" => [
                 "Type" => "Media",
+                "Frame" => "media",
                 "OnClick" => "return il.LearningModule.showContentFrame(event, 'media');"]
         ];
 
@@ -314,7 +316,6 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
         array $int_links
     ): string {
         $ilCtrl = $this->ctrl;
-
         $a_layoutframes = $this->getLayoutLinkTargets();
 
         // Determine whether the view of a learning resource should
@@ -359,7 +360,8 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
                                 $ltarget = "_parent";
                             }
                             $cmd = "layout";
-                            if ($nframe != "") {
+                            // page command is for displaying in the slate
+                            if ($nframe != "" && $nframe != "_blank") {
                                 $cmd = "page";
                             }
                             $href =
@@ -407,7 +409,7 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
                             ? $this->frame
                             : $ltarget;
                         $href =
-                            $this->getLink($a_cmd = "glossary", $target_id, $nframe, $type);
+                            $this->getLink($a_cmd = "glossary", (int) $target_id, $nframe, $type);
                         break;
 
                     case "MediaObject":
@@ -436,8 +438,8 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
                         break;
 
                     case "RepositoryItem":
-                        $obj_type = ilObject::_lookupType($target_id, true);
-                        $obj_id = ilObject::_lookupObjId($target_id);
+                        $obj_type = ilObject::_lookupType((int) $target_id, true);
+                        $obj_id = ilObject::_lookupObjId((int) $target_id);
                         if (!$this->offline) {
                             $href = "./goto.php?target=" . $obj_type . "_" . $target_id;
                         } else {
@@ -473,7 +475,7 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
                         break;
 
                     case "User":
-                        $obj_type = ilObject::_lookupType($target_id);
+                        $obj_type = ilObject::_lookupType((int) $target_id);
                         if ($obj_type == "usr") {
                             if (!$this->embed_mode) {
                                 $this->ctrl->setParameterByClass(self::TARGET_GUI, "obj_id", $this->current_page);
@@ -520,7 +522,6 @@ class ilLMPresentationLinker implements \ILIAS\COPage\PageLinker
         $link_info .= "</IntLinkInfos>";
 
         $link_info .= $this->getLinkTargetsXML();
-
         return $link_info;
     }
 

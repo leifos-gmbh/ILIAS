@@ -939,8 +939,8 @@ class ilExAssignment
             $old_web_storage = new ilFSWebStorageExercise($a_old_exc_id, $d->getId());
             $new_web_storage = new ilFSWebStorageExercise($a_new_exc_id, $new_ass->getId());
             $new_web_storage->create();
-            if (is_dir($old_web_storage->getPath())) {
-                ilFileUtils::rCopy($old_web_storage->getPath(), $new_web_storage->getPath());
+            if (is_dir($old_web_storage->getAbsolutePath())) {
+                ilFileUtils::rCopy($old_web_storage->getAbsolutePath(), $new_web_storage->getAbsolutePath());
             }
             $order = $d->getInstructionFilesOrder();
             foreach ($order as $file) {
@@ -1213,7 +1213,7 @@ class ilExAssignment
     public function getExerciseMemberAssignmentData(
         int $a_user_id,
         string $a_grade = ""
-    ): array {
+    ): ?array {
         global $DIC;
         $ilDB = $DIC->database();
 
@@ -1229,7 +1229,7 @@ class ilExAssignment
 
         $set = $ilDB->query($q);
 
-        $data = [];
+        $data = null;
         while ($rec = $ilDB->fetchAssoc($set)) {
             $sub = new ilExSubmission($this, $a_user_id);
 

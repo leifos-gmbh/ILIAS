@@ -1,18 +1,22 @@
 <?php
 
 declare(strict_types=1);
+
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
+ *
  * ILIAS is licensed with the GPL-3.0,
  * see https://www.gnu.org/licenses/gpl-3.0.en.html
  * You should have received a copy of said license along with the
  * source code, too.
+ *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
  * https://www.ilias.de
  * https://github.com/ILIAS-eLearning
- */
+ *
+ *********************************************************************/
 
 /**
  * Class ilRegistrationSettingsGUI
@@ -398,9 +402,7 @@ class ilRegistrationSettingsGUI
             }
             foreach ($this->rbacreview->getGlobalRoles() as $role) {
                 if ($role_obj = ilObjectFactory::getInstanceByObjId($role, false)) {
-                    $role_obj->setAllowRegister(
-                        (int) $roles[$role] === 1
-                    );
+                    $role_obj->setAllowRegister(isset($roles[$role]) && (int) $roles[$role] === 1);
                     $role_obj->update();
                 }
             }
@@ -863,7 +865,7 @@ class ilRegistrationSettingsGUI
         $valid = $this->form_gui->checkInput();
         if ($valid) {
             $number = $this->form_gui->getInput('reg_codes_number');
-            $role = $this->form_gui->getInput('reg_codes_role');
+            $role = (int) $this->form_gui->getInput('reg_codes_role');
             $local = $this->form_gui->getInput("reg_codes_local");
 
             if (is_array($local)) {
@@ -898,11 +900,11 @@ class ilRegistrationSettingsGUI
                     if (!array_sum($date)) {
                         $valid = false;
                     } else {
-                        $date = [
+                        $date = serialize([
                             "d" => $date["dd"],
                             "m" => $date["MM"] % 12,
                             "y" => floor($date["MM"] / 12)
-                        ];
+                        ]);
                     }
                     break;
 
@@ -1014,7 +1016,7 @@ class ilRegistrationSettingsGUI
 
         $codes = ilRegistrationCode::getCodesForExport(
             $utab->filter["code"],
-            $utab->filter["role"],
+            $utab->filter["role"] ? (int)$utab->filter["role"] : null,
             $utab->filter["generated"],
             $utab->filter["alimit"]
         );

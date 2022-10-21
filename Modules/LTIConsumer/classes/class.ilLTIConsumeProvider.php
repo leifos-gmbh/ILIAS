@@ -66,6 +66,7 @@ class ilLTIConsumeProvider
      * @var ilImageFileInputGUI|null
      */
     protected ?ilImageFileInputGUI $providerIconUploadInput = null;
+    protected ?array $providerIconUploadFileData = null;
 
     public const CATEGORY_ASSESSMENT = 'assessment';
     public const CATEGORY_FEEDBACK = 'feedback';
@@ -96,6 +97,8 @@ class ilLTIConsumeProvider
     public const PRIVACY_IDENT_IL_UUID_EXT_ACCOUNT = 1;
     public const PRIVACY_IDENT_IL_UUID_LOGIN = 2;
     public const PRIVACY_IDENT_REAL_EMAIL = 3;
+    public const PRIVACY_IDENT_IL_UUID_SHA256 = 5;
+    public const PRIVACY_IDENT_IL_UUID_SHA256URL = 6;
     protected int $privacy_ident = self::PRIVACY_IDENT_IL_UUID_USER_ID;
 
     public const PRIVACY_NAME_NONE = 0;
@@ -335,6 +338,16 @@ class ilLTIConsumeProvider
     public function setProviderIconUploadInput(ilFormPropertyGUI $providerIconUploadInput): void
     {
         $this->providerIconUploadInput = $providerIconUploadInput;
+    }
+
+    public function getProviderIconUploadFileData(): array
+    {
+        return $this->providerIconUploadFileData;
+    }
+
+    public function setProviderIconUploadFileData(array $providerIconUploadFileData): void
+    {
+        $this->providerIconUploadFileData = $providerIconUploadFileData;
     }
 
     /**
@@ -672,7 +685,7 @@ class ilLTIConsumeProvider
     {
         if ($this->client_id == '') {
             //ohne Sonderzeichen
-            $this->client_id = ILIAS\LTI\ToolProvider\Util::getRandomString(15);
+            $this->client_id = ilObjLTIConsumer::getNewClientId();
         }
         return $this->client_id;
     }
@@ -792,54 +805,102 @@ class ilLTIConsumeProvider
     {
         foreach ($dbRow as $field => $value) {
             switch ($field) {
-                case 'id': $this->setId((int) $value); break;
-                case 'title': $this->setTitle($value); break;
-                case 'description': $this->setDescription($value); break;
-                case 'availability': $this->setAvailability((int) $value); break;
-                case 'remarks': $this->setRemarks($value); break;
-                case 'time_to_delete': $this->setTimeToDelete((int) $value); break;
-                case 'log_level': $this->setLogLevel((int) $value); break;
-                case 'provider_url': $this->setProviderUrl($value); break;
-                case 'provider_key': $this->setProviderKey($value); break;
-                case 'provider_secret': $this->setProviderSecret($value); break;
-                case 'provider_key_customizable': $this->setProviderKeyCustomizable((bool) $value); break;
-                case 'provider_icon': $this->setProviderIconFilename($value); break;
-                case 'category': $this->setCategory($value); break;
-                case 'provider_xml': $this->setProviderXml($value); break;
-                case 'external_provider': $this->setIsExternalProvider((bool) $value); break;
-                case 'launch_method': $this->setLaunchMethod($value); break;
-                case 'has_outcome': $this->setHasOutcome((bool) $value); break;
-                case 'mastery_score': $this->setMasteryScore((float) $value); break;
-                case 'keep_lp': $this->setKeepLp((bool) $value); break;
-                case 'privacy_ident': $this->setPrivacyIdent((int) $value); break;
-                case 'privacy_name': $this->setPrivacyName((int) $value); break;
-                case 'inc_usr_pic': $this->setIncludeUserPicture((bool) $value); break;
-                case 'privacy_comment_default': $this->setPrivacyCommentDefault($value); break;
-                case 'always_learner': $this->setAlwaysLearner((bool) $value); break;
-                case 'use_provider_id': $this->setUseProviderId((bool) $value); break;
-                case 'use_xapi': $this->setUseXapi((bool) $value); break;
-                case 'xapi_launch_url': $this->setXapiLaunchUrl((string) $value); break;
-                case 'xapi_launch_key': $this->setXapiLaunchKey((string) $value); break;
-                case 'xapi_launch_secret': $this->setXapiLaunchSecret((string) $value); break;
-                case 'xapi_activity_id': $this->setXapiActivityId((string) $value); break;
-                case 'custom_params': $this->setCustomParams((string) $value); break;
-                case 'keywords': $this->setKeywords((string) $value); break;
-                case 'creator': $this->setCreator((int) $value); break;
-                case 'accepted_by': $this->setAcceptedBy((int) $value); break;
-                case 'global': $this->setIsGlobal((bool) $value); break;
-                case 'instructor_send_name': $this->setInstructorSendName((bool) $value); break;
-                case 'instructor_send_email': $this->setInstructorSendEmail((bool) $value); break;
-                case 'client_id': $this->setClientId((string) $value); break;
-                case 'enabled_capability': $this->setEnabledCapability((string) $value); break;
-                case 'key_type': $this->setKeyType((string) $value); break;
-                case 'public_key': $this->setPublicKey((string) $value); break;
-                case 'public_keyset': $this->setPublicKeyset((string) $value); break;
-                case 'initiate_login': $this->setInitiateLogin((string) $value); break;
-                case 'redirection_uris': $this->setRedirectionUris((string) $value); break;
-                case 'content_item': $this->setContentItem((bool) $value); break;
-                case 'content_item_url': $this->setContentItemUrl((string) $value); break;
-                case 'grade_synchronization': $this->setGradeSynchronization((bool) $value); break;
-                case 'lti_version': $this->setLtiVersion((string) $value); break;
+                case 'id': $this->setId((int) $value);
+                    break;
+                case 'title': $this->setTitle($value);
+                    break;
+                case 'description': $this->setDescription($value);
+                    break;
+                case 'availability': $this->setAvailability((int) $value);
+                    break;
+                case 'remarks': $this->setRemarks($value);
+                    break;
+                case 'time_to_delete': $this->setTimeToDelete((int) $value);
+                    break;
+                case 'log_level': $this->setLogLevel((int) $value);
+                    break;
+                case 'provider_url': $this->setProviderUrl($value);
+                    break;
+                case 'provider_key': $this->setProviderKey($value);
+                    break;
+                case 'provider_secret': $this->setProviderSecret($value);
+                    break;
+                case 'provider_key_customizable': $this->setProviderKeyCustomizable((bool) $value);
+                    break;
+                case 'provider_icon': $this->setProviderIconFilename($value);
+                    break;
+                case 'category': $this->setCategory($value);
+                    break;
+                case 'provider_xml': $this->setProviderXml($value);
+                    break;
+                case 'external_provider': $this->setIsExternalProvider((bool) $value);
+                    break;
+                case 'launch_method': $this->setLaunchMethod($value);
+                    break;
+                case 'has_outcome': $this->setHasOutcome((bool) $value);
+                    break;
+                case 'mastery_score': $this->setMasteryScore((float) $value);
+                    break;
+                case 'keep_lp': $this->setKeepLp((bool) $value);
+                    break;
+                case 'privacy_ident': $this->setPrivacyIdent((int) $value);
+                    break;
+                case 'privacy_name': $this->setPrivacyName((int) $value);
+                    break;
+                case 'inc_usr_pic': $this->setIncludeUserPicture((bool) $value);
+                    break;
+                case 'privacy_comment_default': $this->setPrivacyCommentDefault($value);
+                    break;
+                case 'always_learner': $this->setAlwaysLearner((bool) $value);
+                    break;
+                case 'use_provider_id': $this->setUseProviderId((bool) $value);
+                    break;
+                case 'use_xapi': $this->setUseXapi((bool) $value);
+                    break;
+                case 'xapi_launch_url': $this->setXapiLaunchUrl((string) $value);
+                    break;
+                case 'xapi_launch_key': $this->setXapiLaunchKey((string) $value);
+                    break;
+                case 'xapi_launch_secret': $this->setXapiLaunchSecret((string) $value);
+                    break;
+                case 'xapi_activity_id': $this->setXapiActivityId((string) $value);
+                    break;
+                case 'custom_params': $this->setCustomParams((string) $value);
+                    break;
+                case 'keywords': $this->setKeywords((string) $value);
+                    break;
+                case 'creator': $this->setCreator((int) $value);
+                    break;
+                case 'accepted_by': $this->setAcceptedBy((int) $value);
+                    break;
+                case 'global': $this->setIsGlobal((bool) $value);
+                    break;
+                case 'instructor_send_name': $this->setInstructorSendName((bool) $value);
+                    break;
+                case 'instructor_send_email': $this->setInstructorSendEmail((bool) $value);
+                    break;
+                case 'client_id': $this->setClientId((string) $value);
+                    break;
+                case 'enabled_capability': $this->setEnabledCapability((string) $value);
+                    break;
+                case 'key_type': $this->setKeyType((string) $value);
+                    break;
+                case 'public_key': $this->setPublicKey((string) $value);
+                    break;
+                case 'public_keyset': $this->setPublicKeyset((string) $value);
+                    break;
+                case 'initiate_login': $this->setInitiateLogin((string) $value);
+                    break;
+                case 'redirection_uris': $this->setRedirectionUris((string) $value);
+                    break;
+                case 'content_item': $this->setContentItem((bool) $value);
+                    break;
+                case 'content_item_url': $this->setContentItemUrl((string) $value);
+                    break;
+                case 'grade_synchronization': $this->setGradeSynchronization((bool) $value);
+                    break;
+                case 'lti_version': $this->setLtiVersion((string) $value);
+                    break;
             }
         }
 
@@ -863,6 +924,22 @@ class ilLTIConsumeProvider
     }
 
     /**
+     * @throws IOException
+     */
+    public static function getProviderIdFromClientId(string $clientId): int
+    {
+        global $DIC; /* @var \ILIAS\DI\Container $DIC */
+
+        $query = "SELECT * FROM lti_ext_provider WHERE client_id = %s";
+        $res = $DIC->database()->queryF($query, array('integer'), array($clientId));
+        $id = 0;
+        while ($row = $DIC->database()->fetchAssoc($res)) {
+            $id = (int) $row['id'];
+        }
+        return $id;
+    }
+
+    /**
      * @throws \ILIAS\FileUpload\Exception\IllegalStateException
      * @throws \ILIAS\Filesystem\Exception\FileNotFoundException
      * @throws IOException
@@ -871,7 +948,7 @@ class ilLTIConsumeProvider
     {
         if ($this->getId() !== 0) {
             if ($this->hasProviderIconUploadInput()) {
-                $this->getProviderIcon()->handleUploadInputSubission($this->getProviderIconUploadInput());
+                $this->getProviderIcon()->handleUploadInputSubission($this->getProviderIconUploadInput(), $this->getProviderIconUploadFileData());
                 $this->setProviderIconFilename($this->getProviderIcon()->getFilename());
             }
 
@@ -882,7 +959,7 @@ class ilLTIConsumeProvider
             if ($this->hasProviderIconUploadInput()) {
                 $this->setProviderIcon(new ilLTIConsumeProviderIcon($this->getId()));
 
-                $this->getProviderIcon()->handleUploadInputSubission($this->getProviderIconUploadInput());
+                $this->getProviderIcon()->handleUploadInputSubission($this->getProviderIconUploadInput(), $this->getProviderIconUploadFileData());
                 $this->setProviderIconFilename($this->getProviderIcon()->getFilename());
 
                 $this->update();
@@ -984,4 +1061,24 @@ class ilLTIConsumeProvider
     {
         return $this->isGlobal() && (bool) $this->getCreator();
     }
+
+    // public function getPlattformId(): string
+    // {
+        // return ILIAS_HTTP_PATH;
+    // }
+
+    // public function getAuthenticationRequestUrl(): string
+    // {
+        // return ILIAS_HTTP_PATH . "/Modules/LTIConsumer/ltiauth.php";
+    // }
+
+    // public function getAccessTokenUrl(): string
+    // {
+        // return ILIAS_HTTP_PATH . "/Modules/LTIConsumer/ltitoken.php";
+    // }
+
+    // public function getPublicKeysetUrl(): string
+    // {
+        // return ILIAS_HTTP_PATH . "/Modules/LTIConsumer/lticerts.php";
+    // }
 }

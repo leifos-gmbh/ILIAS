@@ -720,9 +720,11 @@ class ilPCParagraph extends ilPageContent
         $slash_chars = '/[]?';
 
         if ($ok) {
+            $replace_str = addcslashes($start_tag, $slash_chars);
+            $replace_str = str_replace("+", "\\+", $replace_str);
             // replace start tag
             $text = preg_replace(
-                '/' . addcslashes($start_tag, $slash_chars) . '/i',
+                '/' . $replace_str . '/i',
                 "<" . $xml_tag_name . $attrib_str . $short . ">",
                 $text,
                 1
@@ -1176,7 +1178,7 @@ class ilPCParagraph extends ilPageContent
             $target = explode("_", $attribs["Target"]);
             $target_id = $target[count($target) - 1];
             $inst_str = (!is_int(strpos($attribs["Target"], "__")))
-                ? $inst_str = "inst=\"" . $target[1] . "\" "
+                ? $inst_str = "inst=\"" . ($target[1] ?? '') . "\" "
                 : $inst_str = "";
             switch ($attribs["Type"]) {
                 case "PageObject":
@@ -1227,7 +1229,7 @@ class ilPCParagraph extends ilPageContent
                     if ($inst_str == "") {
                         $target_type = ilObject::_lookupType($target_id, true);
                     } else {
-                        $rtype = $target[count($target) - 2];
+                        $rtype = ($target[count($target) - 2] ?? "");
                         $target_type = $rtype;
                     }
                     $a_text = preg_replace('~<IntLink' . $found[1] . '>~i', "[iln " . $inst_str . "$target_type=\"" . $target_id . "\"" . $tframestr . "]", $a_text);

@@ -458,7 +458,7 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 
         $lng->loadLanguageModule('cntr');
 
-        if (ilSession::get("clipboard")) {
+        if ($this->clipboard->hasEntries()) {
             // #11545
             $main_tpl->setPageFormAction($this->ctrl->getFormAction($this));
 
@@ -1682,7 +1682,9 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 
         // to prevent multiple actions via back/reload button
         $ref_ids = $this->clipboard->getRefIds();
-        $this->clipboard->clear();
+
+        // save cmd for correct message output after clearing the clipboard
+        $last_cmd = $this->clipboard->getCmd();
 
         // BEGIN WebDAV: Support a copy command in the repository
         // process COPY command
@@ -1767,8 +1769,6 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
             $ilLog->write("ilObjectGUI::pasteObject(), link finished");
         } // END LINK
 
-        // save cmd for correct message output after clearing the clipboard
-        $last_cmd = $this->clipboard->getCmd();
 
         // clear clipboard
         $this->clearObject();

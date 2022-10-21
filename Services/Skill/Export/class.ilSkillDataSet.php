@@ -355,7 +355,7 @@ class ilSkillDataSet extends ilDataSet
                                     "SelfEval" => $s["self_eval"],
                                     "OrderNr" => $s["order_nr"],
                                     "Status" => $s["status"],
-                                    "TemplateId" => (int) $rec["templ_id"]
+                                    "TemplateId" => (int) ($rec["templ_id"] ?? 0)
                                 );
                         }
                     }
@@ -523,7 +523,7 @@ class ilSkillDataSet extends ilDataSet
                 return $deps;
 
             case "skee":
-                if (is_null($a_rec["Id"])) {
+                if (!isset($a_rec["Id"]) || is_null($a_rec["Id"])) {
                     return [];
                 }
                 $skill_tree = $this->skill_tree_factory->getTreeById($a_rec["Id"]);

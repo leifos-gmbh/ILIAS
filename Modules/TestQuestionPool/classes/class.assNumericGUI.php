@@ -12,7 +12,8 @@
  * us at:
  * https://www.ilias.de
  * https://github.com/ILIAS-eLearning
- */
+ *
+ *********************************************************************/
 
 require_once './Modules/Test/classes/inc.AssessmentConstants.php';
 
@@ -292,15 +293,7 @@ class assNumericGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjust
                 array('value1' => $use_post_solutions['numeric_result'])
             );
         } elseif ($active_id) {
-
-            // hey: prevPassSolutions - obsolete due to central check
-            #include_once "./Modules/Test/classes/class.ilObjTest.php";
-            #if (!ilObjTest::_getUsePreviousAnswers($active_id, true))
-            #{
-            #	if (is_null($pass)) $pass = ilObjTest::_getPass($active_id);
-            #}
             $solutions = $this->object->getTestOutputSolutions($active_id, $pass);
-            // hey.
         }
 
         // generate the question output
@@ -339,7 +332,7 @@ class assNumericGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjust
     {
         $this->object->setLowerLimit($_POST['lowerlimit']);
         $this->object->setUpperLimit($_POST['upperlimit']);
-        $this->object->setPoints($_POST['points']);
+        $this->object->setPoints((float)$_POST['points']);
     }
 
     public function populateQuestionSpecificFormPart(\ilPropertyFormGUI $form): ilPropertyFormGUI

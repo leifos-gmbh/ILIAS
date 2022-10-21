@@ -679,6 +679,16 @@ class ilMail
 
             $canReadInternalMails = !$user->hasToAcceptTermsOfService() && $user->checkTimeLimit();
 
+            if ($this->isSystemMail() && !$canReadInternalMails) {
+                $this->logger->debug(sprintf(
+                    "Skipped recipient with id %s (Accepted User Agreement:%s|Expired Account:%s)",
+                    $usrId,
+                    var_export(!$user->hasToAcceptTermsOfService(), true),
+                    var_export(!$user->checkTimeLimit(), true)
+                ));
+                continue;
+            }
+
             $individualMessage = $message;
             if ($usePlaceholders) {
                 $individualMessage = $this->replacePlaceholders($message, $user->getId());
@@ -972,7 +982,7 @@ class ilMail
         return true;
     }
 
-    public function getSavedData(): ?array
+    public function getSavedData(): array
     {
         $res = $this->db->queryF(
             "SELECT * FROM $this->table_mail_saved WHERE user_id = %s",
@@ -981,6 +991,9 @@ class ilMail
         );
 
         $this->mail_data = $this->fetchMailData($this->db->fetchAssoc($res));
+        if (!is_array($this->mail_data)) {
+            $this->savePostData($this->user_id, [], '', '', '', '', '', false);
+        }
 
         return $this->mail_data;
     }

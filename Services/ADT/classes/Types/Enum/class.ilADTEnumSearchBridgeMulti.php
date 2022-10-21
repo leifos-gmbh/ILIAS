@@ -48,6 +48,9 @@ class ilADTEnumSearchBridgeMulti extends ilADTSearchBridgeMulti
     {
         $value = $this->readFilter();
         if ($value !== null) {
+            if (is_string($value)) {
+                $value = [$value];
+            }
             $this->getADT()->setSelections($value);
         }
     }
@@ -65,7 +68,7 @@ class ilADTEnumSearchBridgeMulti extends ilADTSearchBridgeMulti
         $cbox->setValue($this->getADT()->getSelections());
 
         foreach ($options as $value => $caption) {
-            $option = new ilCheckboxOption($caption, $value);
+            $option = new ilCheckboxOption($caption, (string) $value);
             $cbox->addOption($option);
         }
 

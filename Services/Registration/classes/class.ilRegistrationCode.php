@@ -1,18 +1,23 @@
 <?php
 
 declare(strict_types=1);
+
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
+ *
  * ILIAS is licensed with the GPL-3.0,
  * see https://www.gnu.org/licenses/gpl-3.0.en.html
  * You should have received a copy of said license along with the
  * source code, too.
+ *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
  * https://www.ilias.de
  * https://github.com/ILIAS-eLearning
- */
+ *
+ *********************************************************************/
+
 
 /**
  * Class ilRegistrationCode
@@ -28,8 +33,8 @@ class ilRegistrationCode
         int $role,
         int $stamp,
         array $local_roles,
-        string $limit,
-        array $limit_date,
+        ?string $limit,
+        ?string $limit_date,
         bool $reg_type,
         bool $ext_type
     ): int {
@@ -49,10 +54,6 @@ class ilRegistrationCode
                 [$code]
             );
             $found = (bool) $ilDB->numRows($chk);
-        }
-
-        if ($limit === "relative") {
-            $limit_date = serialize($limit_date); //TODO-PHP8-REVIEW please don't override variables with different types
         }
 
         $data = [
@@ -176,9 +177,9 @@ class ilRegistrationCode
         return $result;
     }
 
-    protected static function filterToSQL(
+    private static function filterToSQL(
         string $filter_code,
-        int $filter_role,
+        ?int $filter_role,
         string $filter_generated,
         string $filter_access_limitation
     ): string {
@@ -208,7 +209,7 @@ class ilRegistrationCode
 
     public static function getCodesForExport(
         string $filter_code,
-        int $filter_role,
+        ?int $filter_role,
         string $filter_generated,
         string $filter_access_limitation
     ): array {

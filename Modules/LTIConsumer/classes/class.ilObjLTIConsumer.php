@@ -23,6 +23,7 @@ declare(strict_types=1);
  *
  * @author      Uwe Kohnle <kohnle@internetlehrer-gmbh.de>
  * @author      Björn Heyser <info@bjoernheyser.de>
+ * @author      Stefan Schneider <eqsoft4@gmail.com>
  *
  * @package     Modules/LTIConsumer
  */
@@ -58,6 +59,8 @@ class ilObjLTIConsumer extends ilObject2
 
     protected string $customLaunchSecret = '';
 
+    protected string $customParams = '';
+
     protected ?int $ref_id = 0;
 
     //Highscore
@@ -80,6 +83,15 @@ class ilObjLTIConsumer extends ilObject2
     public const HIGHSCORE_SHOW_ALL_TABLES = 1;
     public const HIGHSCORE_SHOW_TOP_TABLE = 2;
     public const HIGHSCORE_SHOW_OWN_TABLE = 3;
+
+    public const LTI_JWT_CLAIM_PREFIX = 'https://purl.imsglobal.org/spec/lti';
+    public const LTI_1_3_KID = 'lti_1_3_kid';
+    public const LTI_1_3_PRIVATE_KEY = 'lti_1_3_privatekey';
+    public const ERROR_OPEN_SSL_CONF = 'error openssl config invalid';
+    public const OPENSSL_KEYTYPE_RSA = '';
+
+    public const REG_TOKEN_OP_NEW_REG = 'reg';
+    public const REG_TOKEN_OP_UPDATE_REG = 'reg-update';
 
     /**
      * ilObjLTIConsumer constructor.
@@ -219,6 +231,16 @@ class ilObjLTIConsumer extends ilObject2
         $this->customLaunchSecret = $customLaunchSecret;
     }
 
+    public function getCustomParams(): string
+    {
+        return $this->customParams;
+    }
+
+    public function setCustomParams(string $customParams): void
+    {
+        $this->customParams = $customParams;
+    }
+
     public function getLaunchKey(): string
     {
         if ($this->getProvider()->isProviderKeyCustomizable()) {
@@ -279,11 +301,11 @@ class ilObjLTIConsumer extends ilObject2
     /**
      * @return string[]
      */
-    private function getCustomParams(): array
+    public function getCustomParamsArray(): array
     {
         $paramsAsArray = [];
 
-        $params = $this->getProvider()->getCustomParams();
+        $params = $this->getCustomParams();
         // allows   foo=bar;foo2=baz2; foo3=baz3
         $params = preg_split('/; ?/', $params);
 
@@ -299,6 +321,28 @@ class ilObjLTIConsumer extends ilObject2
         return $paramsAsArray;
     }
 
+    /**
+     * @return string[]
+     */
+    public static function getProviderCustomParamsArray(ilLTIConsumeProvider $provider): array
+    {
+        $paramsAsArray = [];
+
+        $params = $provider->getCustomParams();
+        // allows   foo=bar;foo2=baz2; foo3=baz3
+        $params = preg_split('/; ?/', $params);
+
+        foreach ($params as $param) {
+            $param = explode('=', $param);
+            // empty field, duplicate/leading/trailing semicolon?
+            if ($param[0] != '') {
+                $value = isset($param[1]) ? $param[1] : '';
+                $paramsAsArray[$param[0]] = $value;
+            }
+        }
+
+        return $paramsAsArray;
+    }
 
     protected function doRead(): void
     {
@@ -322,6 +366,7 @@ class ilObjLTIConsumer extends ilObject2
 
             $this->setCustomLaunchKey((string) $row['launch_key']);
             $this->setCustomLaunchSecret((string) $row['launch_secret']);
+            $this->setCustomParams((string) $row['custom_params']);
 
             $this->setUseXapi((bool) $row['use_xapi']);
             $this->setCustomActivityId((string) $row['activity_id']);
@@ -356,6 +401,7 @@ class ilObjLTIConsumer extends ilObject2
             'launch_method' => ['text', $this->getLaunchMethod()],
             'launch_key' => ['text', $this->getCustomLaunchKey()],
             'launch_secret' => ['text', $this->getCustomLaunchSecret()],
+            'custom_params' => ['text', $this->getCustomParams()],
             'use_xapi' => ['integer',$this->getUseXapi()],
             'activity_id' => ['text',$this->getCustomActivityId()],
             'show_statements' => ['integer',$this->isStatementsReportEnabled()],
@@ -380,9 +426,9 @@ class ilObjLTIConsumer extends ilObject2
                 case ilObjectActivation::TIMINGS_ACTIVATION:
                     $this->setActivationLimited(true);
 
-$this->setActivationStartingTime($activation["timing_start"]);
+                    $this->setActivationStartingTime($activation["timing_start"]);
 
-$this->setActivationEndingTime($activation["timing_end"]);
+                    $this->setActivationEndingTime($activation["timing_end"]);
                     $this->setActivationVisibility($activation["visible"]);
                     break;
 
@@ -654,7 +700,11 @@ $this->setActivationEndingTime($activation["timing_end"]);
 
         ilLTIConsumerResult::getByKeys($this->getId(), $DIC->user()->getId(), true);
 
-        $custom_params = $this->getCustomParams();
+        //ToDo: Check!
+        $provider_custom_params = self::getProviderCustomParamsArray($this->getProvider());
+        $custom_params = $this->getCustomParamsArray();
+        $merged_params = array_merge($provider_custom_params, $custom_params);
+
         $toolConsumerInstanceGuid = CLIENT_ID . ".";
         $parseIliasUrl = parse_url(ILIAS_HTTP_PATH);
         if (array_key_exists("path", $parseIliasUrl)) {
@@ -704,7 +754,7 @@ $this->setActivationEndingTime($activation["timing_end"]);
             "http_method" => "POST",
             "sign_method" => "HMAC_SHA1",
             "token" => null,
-            "data" => ($launch_vars + $custom_params)
+            "data" => ($launch_vars + $merged_params)
         ];
 
         return ilLTIConsumerLaunch::signOAuth($OAuthParams);
@@ -765,7 +815,6 @@ $this->setActivationEndingTime($activation["timing_end"]);
 
         ilLTIConsumerResult::getByKeys($this->getId(), $DIC->user()->getId(), true);
 
-        $custom_params = $this->getCustomParams();
         $toolConsumerInstanceGuid = CLIENT_ID . ".";
         $parseIliasUrl = parse_url(ILIAS_HTTP_PATH);
         if (array_key_exists("path", $parseIliasUrl)) {
@@ -807,13 +856,441 @@ $this->setActivationEndingTime($activation["timing_end"]);
             "role_scope_mentor" => ""
         ];
 
-        $ltilib = new lti13lib();
+        $provider_custom_params = self::getProviderCustomParamsArray($this->getProvider());
+        $custom_params = $this->getCustomParamsArray();
+        $merged_params = array_merge($provider_custom_params, $custom_params);
+        foreach ($merged_params as $key => $value) {
+            $launch_vars['custom_' . $key] = $value;
+        }
 
-        if (!empty($ltilib->verifyPrivateKey())) {
+        if (!empty(self::verifyPrivateKey())) {
             $DIC->ui()->mainTemplate()->setOnScreenMessage('failure', 'ERROR_OPEN_SSL_CONF', true);
             return null;
         }
+        return self::LTISignJWT($launch_vars, $endpoint, $clientId, $deploymentId, $nonce);
+    }
 
-        return $ltilib->LTISignJWT($launch_vars, $endpoint, $clientId, $deploymentId, $nonce);
+    /**
+     * @throws ilWACException
+     */
+
+    // ToDo:
+
+    public static function buildContentSelectionParameters(ilLTIConsumeProvider $provider, int $refId, string $returnUrl, string $nonce): ?array
+    {
+        global $DIC;
+
+        $clientId = $provider->getClientId();
+        $deploymentId = $provider->getId();
+        $ilLTIConsumerLaunch = new ilLTIConsumerLaunch($refId);
+        $context = $ilLTIConsumerLaunch->getContext();
+        $contextType = $ilLTIConsumerLaunch::getLTIContextType($context["type"]);
+        $contextId = $context["id"];
+        $contextTitle = $context["title"];
+
+        $roles = "Instructor";
+        $usrImage = '';
+        if ($provider->getIncludeUserPicture()) {
+            $usrImage = ILIAS_HTTP_PATH . "/" . $DIC->user()->getPersonalPicturePath("small");
+        }
+        $documentTarget = "window";
+        if ($provider->getLaunchMethod() == self::LAUNCH_METHOD_EMBEDDED) {
+            $documentTarget = "iframe";
+        }
+        $nameGiven = '-';
+        $nameFamily = '-';
+        $nameFull = '-';
+        switch ($provider->getPrivacyName()) {
+            case ilLTIConsumeProvider::PRIVACY_NAME_FIRSTNAME:
+                $nameGiven = $DIC->user()->getFirstname();
+                $nameFull = $DIC->user()->getFirstname();
+                break;
+            case ilLTIConsumeProvider::PRIVACY_NAME_LASTNAME:
+                $usrName = $DIC->user()->getUTitle() ? $DIC->user()->getUTitle() . ' ' : '';
+                $usrName .= $DIC->user()->getLastname();
+                $nameFamily = $usrName;
+                $nameFull = $usrName;
+                break;
+            case ilLTIConsumeProvider::PRIVACY_NAME_FULLNAME:
+                $nameGiven = $DIC->user()->getFirstname();
+                $nameFamily = $DIC->user()->getLastname();
+                $nameFull = $DIC->user()->getFullname();
+                break;
+        }
+
+        $userIdLTI = ilCmiXapiUser::getIdentAsId($provider->getPrivacyIdent(), $DIC->user());
+        $emailPrimary = ilCmiXapiUser::getIdent($provider->getPrivacyIdent(), $DIC->user());
+        $toolConsumerInstanceGuid = CLIENT_ID . ".";
+        $parseIliasUrl = parse_url(ILIAS_HTTP_PATH);
+        if (array_key_exists("path", $parseIliasUrl)) {
+            $toolConsumerInstanceGuid .= implode(".", array_reverse(explode("/", $parseIliasUrl["path"])));
+        }
+        $toolConsumerInstanceGuid .= $parseIliasUrl["host"];
+
+        $content_select_vars = [
+            "lti_message_type" => "ContentItemSelectionRequest",
+            "lti_version" => "1.3.0",
+            "user_id" => (string) $userIdLTI,
+            "user_image" => $usrImage,
+            "roles" => $roles,
+            "lis_person_name_given" => $nameGiven,
+            "lis_person_name_family" => $nameFamily,
+            "lis_person_name_full" => $nameFull,
+            "lis_person_contact_email_primary" => $emailPrimary,
+            "context_id" => (string) $contextId,
+            "context_type" => $contextType,
+            "context_title" => $contextTitle,
+            "context_label" => $contextType . " " . $contextId,
+            "launch_presentation_locale" => $DIC->language()->getLangKey(),
+            "launch_presentation_document_target" => $documentTarget,
+            "launch_presentation_width" => "",//recommended
+            "launch_presentation_height" => "",//recommended
+            "tool_consumer_instance_guid" => $toolConsumerInstanceGuid,
+            "tool_consumer_instance_name" => $DIC->settings()->get("short_inst_name") ? $DIC->settings()->get("short_inst_name") : CLIENT_ID,
+            "tool_consumer_instance_description" => ilObjSystemFolder::_getHeaderTitle(),
+            "tool_consumer_instance_url" => ilLink::_getLink(ROOT_FOLDER_ID, "root"),//ToDo? "https://vb52p70.example.com/release_5-3/goto.php?target=root_1&client_id=inno",
+            "tool_consumer_instance_contact_email" => $DIC->settings()->get("admin_email"),
+            "tool_consumer_info_product_family_code" => "ilias",
+            "tool_consumer_info_version" => ILIAS_VERSION,
+            "content_item_return_url" => $returnUrl,
+            "accept_types" => "ltiResourceLink",
+            "accept_presentation_document_targets" => "iframe,window,embed",
+            "accept_multiple" => true,
+            "auto_create" => true,
+        ];
+        $provider_custom_params = self::getProviderCustomParamsArray($provider);
+        foreach ($provider_custom_params as $key => $value) {
+            $content_select_vars['custom_' . $key] = $value;
+        }
+
+        if (!empty(self::verifyPrivateKey())) {
+            $DIC->ui()->mainTemplate()->setOnScreenMessage('failure', 'ERROR_OPEN_SSL_CONF', true);
+            return null;
+        }
+        return self::LTISignJWT($content_select_vars, '', $clientId, $deploymentId, $nonce);
+    }
+
+    public static function LTISignJWT(array $parms, string $endpoint, string $oAuthConsumerKey, $typeId = 0, string $nonce = ''): array
+    {
+        if (empty($typeId)) {
+            $typeId = 0;
+        }
+        $messageTypeMapping = ILIAS\LTI\ToolProvider\Util::MESSAGE_TYPE_MAPPING;
+        if (isset($parms['lti_message_type']) && array_key_exists($parms['lti_message_type'], $messageTypeMapping)) {
+            $parms['lti_message_type'] = $messageTypeMapping[$parms['lti_message_type']];
+        }
+        if (isset($parms['roles'])) {
+            $roles = explode(',', $parms['roles']);
+            $newRoles = array();
+            foreach ($roles as $role) {
+                if (strpos($role, 'urn:lti:role:ims/lis/') === 0) {
+                    $role = 'http://purl.imsglobal.org/vocab/lis/v2/membership#' . substr($role, 21);
+                } elseif (strpos($role, 'urn:lti:instrole:ims/lis/') === 0) {
+                    $role = 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#' . substr($role, 25);
+                } elseif (strpos($role, 'urn:lti:sysrole:ims/lis/') === 0) {
+                    $role = 'http://purl.imsglobal.org/vocab/lis/v2/system/person#' . substr($role, 24);
+                } elseif ((strpos($role, '://') === false) && (strpos($role, 'urn:') !== 0)) {
+                    $role = "http://purl.imsglobal.org/vocab/lis/v2/membership#{$role}";
+                }
+                $newRoles[] = $role;
+            }
+            $parms['roles'] = implode(',', $newRoles);
+        }
+        $now = time();
+        if (empty($nonce)) {
+            $nonce = bin2hex(openssl_random_pseudo_bytes(10));
+        }
+        $claimMapping = ILIAS\LTI\ToolProvider\Util::JWT_CLAIM_MAPPING;
+        $payLoad = array(
+            'nonce' => $nonce,
+            'iat' => $now,
+            'exp' => $now + 60,
+        );
+        $payLoad['iss'] = ILIAS_HTTP_PATH; // TODO!!
+        $payLoad['aud'] = $oAuthConsumerKey;
+        $payLoad[self::LTI_JWT_CLAIM_PREFIX . '/claim/deployment_id'] = strval($typeId);
+        if (!empty($endpoint)) {  // only for launch request
+            $payLoad[self::LTI_JWT_CLAIM_PREFIX . '/claim/target_link_uri'] = $endpoint;
+        }
+
+        foreach ($parms as $key => $value) {
+            $claim = self::LTI_JWT_CLAIM_PREFIX;
+            if (array_key_exists($key, $claimMapping)) {
+                $mapping = $claimMapping[$key];
+
+                if (isset($mapping['isArray']) && $mapping['isArray']) {
+                    $value = explode(',', $value);
+                    sort($value);
+                } elseif (isset($mapping['isBoolean'])) {
+                    $value = $mapping['isBoolean'];
+                }
+                if (!empty($mapping['suffix'])) {
+                    $claim .= "-{$mapping['suffix']}";
+                }
+                $claim .= '/claim/';
+                if (is_null($mapping['group'])) {
+                    $payLoad[$mapping['claim']] = $value;
+                } elseif (empty($mapping['group'])) {
+                    $payLoad["{$claim}{$mapping['claim']}"] = $value;
+                } else {
+                    $claim .= $mapping['group'];
+                    $payLoad[$claim][$mapping['claim']] = $value;
+                }
+            } elseif (strpos($key, 'custom_') === 0) {
+                $payLoad["{$claim}/claim/custom"][substr($key, 7)] = $value;
+            } elseif (strpos($key, 'ext_') === 0) {
+                $payLoad["{$claim}/claim/ext"][substr($key, 4)] = $value;
+            }
+        }
+        if (!empty(self::verifyPrivateKey())) {
+            throw new DomainException(self::ERROR_OPEN_SSL_CONF);
+        }
+        $privateKey = self::getPrivateKey();
+        $jwt = Firebase\JWT\JWT::encode($payLoad, $privateKey['key'], 'RS256', $privateKey['kid']);
+        $newParms = array();
+        $newParms['id_token'] = $jwt;
+        return $newParms;
+    }
+
+    public static function getPrivateKey(): array
+    {
+        global $ilSetting;
+        $privatekey = $ilSetting->get(self::LTI_1_3_PRIVATE_KEY);
+        $kid = $ilSetting->get(self::LTI_1_3_KID);
+        return [
+            "key" => $privatekey,
+            "kid" => $kid
+        ];
+    }
+
+    public static function verifyPrivateKey(): string
+    {
+        global $ilSetting;
+        $key = $ilSetting->get(self::LTI_1_3_PRIVATE_KEY);
+
+        if (empty($key)) {
+            $kid = bin2hex(openssl_random_pseudo_bytes(10));
+            $ilSetting->set(self::LTI_1_3_KID, $kid);
+            $config = array(
+                "digest_alg" => "sha256",
+                "private_key_bits" => 2048,
+                "private_key_type" => self::OPENSSL_KEYTYPE_RSA
+            );
+            $res = openssl_pkey_new($config);
+            openssl_pkey_export($res, $privatekey);
+            if (!empty($privatekey)) {
+                $ilSetting->set(self::LTI_1_3_PRIVATE_KEY, $privatekey);
+            } else {
+                return self::ERROR_OPEN_SSL_CONF;
+            }
+        }
+        return '';
+    }
+
+    public static function getPublicKey(): string
+    {
+        $publicKey = null;
+        $privateKey = self::getPrivateKey();
+        $res = openssl_pkey_get_private($privateKey['key']);
+        if ($res !== false) {
+            $details = openssl_pkey_get_details($res);
+            $publicKey = $details['key'];
+        }
+        return $publicKey;
+    }
+
+    public static function getJwks(): array
+    {
+        $jwks = ['keys' => []];
+
+        $privatekey = self::getPrivateKey();
+        $res = openssl_pkey_get_private($privatekey['key']);
+        $details = openssl_pkey_get_details($res);
+
+        $jwk = [];
+        $jwk['kty'] = 'RSA';
+        $jwk['alg'] = 'RS256';
+        $jwk['kid'] = $privatekey['kid'];
+        $jwk['e'] = rtrim(strtr(base64_encode($details['rsa']['e']), '+/', '-_'), '=');
+        $jwk['n'] = rtrim(strtr(base64_encode($details['rsa']['n']), '+/', '-_'), '=');
+        $jwk['use'] = 'sig';
+
+        $jwks['keys'][] = $jwk;
+        return $jwks;
+    }
+
+    public static function getIliasHttpPath(): string
+    {
+        global $DIC;
+
+        if ($DIC['https']->isDetected()) {
+            $protocol = 'https://';
+        } else {
+            $protocol = 'http://';
+        }
+        $host = $_SERVER['HTTP_HOST'];
+
+        $rq_uri = strip_tags($_SERVER['REQUEST_URI']);
+
+        // security fix: this failed, if the URI contained "?" and following "/"
+        // -> we remove everything after "?"
+        if (is_int($pos = strpos($rq_uri, "?"))) {
+            $rq_uri = substr($rq_uri, 0, $pos);
+        }
+
+        $path = pathinfo($rq_uri);
+        if (isset($path['extension']) && $path['extension'] !== '') {
+            $uri = dirname($rq_uri);
+        } else {
+            $uri = $rq_uri;
+        }
+        $uri = str_replace("Modules/LTIConsumer", "", $uri);
+        $iliasHttpPath = ilContext::modifyHttpPath(implode('', [$protocol, $host, $uri]));
+        $f = new \ILIAS\Data\Factory();
+        $uri = $f->uri(rtrim($iliasHttpPath, "/"));
+        return $uri->getBaseURI();
+    }
+
+    public static function getPlattformId(): string
+    {
+        return self::getIliasHttpPath();
+    }
+
+    public static function getAuthenticationRequestUrl(): string
+    {
+        return self::getIliasHttpPath() . "/Modules/LTIConsumer/ltiauth.php";
+    }
+
+    public static function getAccessTokenUrl(): string
+    {
+        return self::getIliasHttpPath() . "/Modules/LTIConsumer/ltitoken.php";
+    }
+
+    public static function getPublicKeysetUrl(): string
+    {
+        return self::getIliasHttpPath() . "/Modules/LTIConsumer/lticerts.php";
+    }
+
+    public static function getRegistrationUrl(): string
+    {
+        return self::getIliasHttpPath() . "/Modules/LTIConsumer/ltiregistration.php";
+    }
+
+    public static function getRegistrationStartUrl(): string
+    {
+        return self::getIliasHttpPath() . "/Modules/LTIConsumer/ltiregstart.php";
+    }
+
+    public static function getRegistrationEndUrl(): string
+    {
+        return self::getIliasHttpPath() . "/Modules/LTIConsumer/ltiregend.php";
+    }
+
+    public static function getOpenidConfigUrl(): string
+    {
+        return self::getIliasHttpPath() . "/Modules/LTIConsumer/lticonfig.php";
+    }
+
+    public static function getOpenidConfig(): array
+    {
+        return [
+            "issuer" => self::getPlattformId(),
+            "authorization_endpoint" => self::getAuthenticationRequestUrl(),
+            "token_endpoint" => self::getAccessTokenUrl(),
+            "token_endpoint_auth_methods_supported" => ["private_key_jwt"],
+            "token_endpoint_auth_signing_alg_values_supported" => ["RS256"],
+            "jwks_uri" => self::getPublicKeysetUrl(),
+            "registration_endpoint" => self::getRegistrationUrl(),
+            "scopes_supported" => ["openid"],
+            "response_types_supported" => ["id_token"],
+            "subject_types_supported" => ["public", "pairwise"],
+            "id_token_signing_alg_values_supported" => ["RS256"],
+            "claims_supported" => ["iss", "aud"],
+            "https://purl.imsglobal.org/spec/lti-platform-configuration" => [
+                "product_family_code" => "ilias.de",
+                "version" => ILIAS_VERSION,
+                "messages_supported" => [
+                    [
+                        "type" => "LtiResourceLinkRequest",
+                        "placements" => [
+                        ]
+                    ],
+                    [
+                        "type" => "LtiDeepLinkingRequest",
+                        "placements" => [
+                        ]
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    public static function registerClient(array $data, object $tokenObj): array
+    {
+        // first analyse tool_config and filter only accepted params
+        // append client_id (required) and deployment_id(=provider_id in ILIAS) (optional) to tool_config response
+        global $DIC;
+        $reponseData = $data;
+        $provider = new ilLTIConsumeProvider();
+        $toolConfig = $data['https://purl.imsglobal.org/spec/lti-tool-configuration'];
+        $provider->setTitle($data['client_name']);
+        $provider->setProviderUrl($toolConfig['target_link_uri']);
+        $provider->setInitiateLogin($data['initiate_login_uri']);
+        $provider->setRedirectionUris(implode(",", $data['redirect_uris']));
+        if (isset($data['jwks_uri'])) {
+            $provider->setPublicKeyset($data['jwks_uri']);
+        }
+        foreach ($toolConfig['messages'] as $message) {
+            if (isset($message['type']) && $message['type'] === 'LtiDeepLinkingRequest') {
+                $provider->setContentItemUrl($message['target_link_uri']);
+            }
+        }
+        /*
+        if (isset($data['logo_uri'])) { // needs to be uploaded and then assign filepath
+            $provider->setProviderIconFilename($data['logo_uri']);
+        }
+        */
+        $provider->setKeyType('JWK_KEYSET');
+        $provider->setLtiVersion('1.3.0');
+        $provider->setClientId((string)$tokenObj->aud); //client_id
+        $provider->setCreator((int)$tokenObj->sub); // user_id
+        $provider->setAvailability(ilLTIConsumeProvider::AVAILABILITY_CREATE);
+        $provider->setIsGlobal(false);
+        $provider->insert();
+        $reponseData['client_id'] = $tokenObj->aud;
+        $reponseData['https://purl.imsglobal.org/spec/lti-tool-configuration']['deployment_id'] = $provider->getId();
+        return $reponseData;
+    }
+
+    public static function getNewClientId(): string
+    {
+        return ILIAS\LTI\ToolProvider\Util::getRandomString(15);
+    }
+
+    public static function sendResponseError(int $code, string $message): void
+    {
+        global $DIC;
+        try {
+            $DIC->http()->saveResponse(
+                $DIC->http()->response()
+                    ->withStatus($code)
+                    ->withBody(\ILIAS\Filesystem\Stream\Streams::ofString($message))
+            );
+            $DIC->http()->sendResponse();
+            $DIC->http()->close();
+        } catch (Exception $e) {
+            $DIC->http()->close();
+        }
+    }
+
+    public static function sendResponseJson(array $obj): void
+    {
+        try {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode($obj, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+        } catch (Exception $e) {
+            self::sendResponseError(500, "error in sendResponseJson");
+            $DIC->http()->close();
+        }
     }
 }

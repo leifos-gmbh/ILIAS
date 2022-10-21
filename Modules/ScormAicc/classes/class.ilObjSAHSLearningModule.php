@@ -127,12 +127,12 @@ class ilObjSAHSLearningModule extends ilObject
         );
 
         while ($lm_rec = $ilDB->fetchAssoc($lm_set)) {
-            $this->setAutoReviewChar($lm_rec["auto_review"]);
-            $this->setAPIAdapterName($lm_rec["api_adapter"]);
-            $this->setDefaultLessonMode($lm_rec["default_lesson_mode"]);
-            $this->setAPIFunctionsPrefix($lm_rec["api_func_prefix"]);
-            $this->setCreditMode($lm_rec["credit"]);
-            $this->setSubType($lm_rec["c_type"]);
+            $this->setAutoReviewChar((string) $lm_rec["auto_review"]);
+            $this->setAPIAdapterName((string) $lm_rec["api_adapter"]);
+            $this->setDefaultLessonMode((string) $lm_rec["default_lesson_mode"]);
+            $this->setAPIFunctionsPrefix((string) $lm_rec["api_func_prefix"]);
+            $this->setCreditMode((string) $lm_rec["credit"]);
+            $this->setSubType((string) $lm_rec["c_type"]);
 //            $this->setEditable(false);
             $this->setStyleSheetId((int) $lm_rec["stylesheet"]);
             $this->setMaxAttempt((int) $lm_rec["max_attempt"]);
@@ -161,7 +161,7 @@ class ilObjSAHSLearningModule extends ilObject
 //            $this->setOfflineMode(ilUtil::yn2tf($lm_rec["offline_mode"]));
             $this->setAutoSuspend(ilUtil::yn2tf($lm_rec["auto_suspend"]));
             $this->setIe_force_render(ilUtil::yn2tf($lm_rec["ie_force_render"]));
-            $this->setMasteryScore($lm_rec["mastery_score"]);
+            $this->setMasteryScore((int) $lm_rec["mastery_score"]);
             $this->setIdSetting((int) $lm_rec["id_setting"]);
             $this->setNameSetting((int) $lm_rec["name_setting"]);
             if (ilObject::_lookupType($this->getStyleSheetId()) !== "sty") {
@@ -401,9 +401,13 @@ class ilObjSAHSLearningModule extends ilObject
     /**
      * set auto review as Char for SCORM 2004
      */
-    public function setAutoReviewChar(string $a_auto_review): void
+    public function setAutoReviewChar(?string $a_auto_review): void
     {
-        $this->auto_review = $a_auto_review;
+        if ($a_auto_review == null) {
+            $this->auto_review = 'n';
+        } else {
+            $this->auto_review = $a_auto_review;
+        }
     }
 
     /**

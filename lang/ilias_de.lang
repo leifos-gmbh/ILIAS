@@ -16963,3 +16963,31 @@ wsp#:#wsp_type_scov#:#Zertifikat: SCORM
 wsp#:#wsp_type_tstv#:#Zertifikat: Test
 wsp#:#wsp_type_webr#:#Weblink
 wsp#:#wsp_type_wfld#:#Ordner
+glo#:#answered_correctly#:#Wusste ich
+glo#:#answered_not_correctly#:#Wusste ich nicht
+glo#:#box#:#Fach
+glo#:#box_completed#:#Sie haben das Fach abgeschlossen.
+glo#:#box_last_presented#:#Fach zuletzt angezeigt
+glo#:#boxes#:#Fächer
+glo#:#boxes_really_reset#:#Möchten Sie wirklich alle Fächer zurücksetzen? Alle Lernkarten werden in das erste Fach verschoben.
+glo#:#boxes_reset#:#Die Fächer wurden erfolgreich zurückgesetzt.
+glo#:#days_ago#:#vor %s Tagen
+glo#:#def_vs_term#:#Definition vs. Begriff
+glo#:#def_vs_term_info#:#Zeige zuerst eine Definition, der Lernende muss den Begriff erraten.
+glo#:#introduction#:#Einleitung
+glo#:#flashcard_training#:#Lernkarten Training
+glo#:#flashcard_training_info#:#Bietet eine Präsentation in Form von Lernkarten, die es dem Benutzer ermöglicht, die Begriffe/Definitionen einzeln zu trainieren.
+glo#:#flashcards#:#Lernkarten
+glo#:#flashcards_from_today_confirmation#:#Das Fach beinhaltet %s Lernkarten, die Ihnen heute bereits angezeigt wurden. Möchten Sie nur die verbleibenden %s Lernkarten einbeziehen oder alle %s Lernkarten?
+glo#:#flashcards_from_today_only_info#:#Das Fach beinhaltet ausschließlich Lernkarten, die Ihnen heute bereits angezeigt wurden. Bitte bestätigen Sie, dass Ihnen diese %s Lernkarten nochmal angezeigt werden.
+glo#:#flashcards_intro#:#Sie sollen jede Lernkarte viermal hintereinander erinnern.<br />Am Anfang befinden sich alle Lernkarten in Fach 1.<br />Lernkarten, die Sie mit "Wusste ich" bewerten, werden in das nächste Fach befördert.<br />Lernkarten, die Sie mit "Wusste ich nicht" bewerten, kommen zurück in das erste Fach.<br />Fangen Sie an, indem Sie ein Fach auswählen. Dann werden die Lernkarten angezeigt.
+glo#:#mode#:#Modus
+glo#:#quit_box#:#Fach verlassen
+glo#:#reset_all_boxes#:#Alle Fächer zurücksetzen
+glo#:#show_definition#:#Definition zeigen
+glo#:#show_term#:#Begriff zeigen
+glo#:#start_box#:#Fach starten
+glo#:#term_vs_def#:#Begriff vs. Definition
+glo#:#term_vs_def_info#:#Zeige zuerst einen Begriff, der Lernende muss die Definition erraten.
+glo#:#use_all_flashcards#:#Alle Lernkarten nutzen (%s)
+glo#:#use_remaining_flashcards#:#Verbleibende Lernkarten nutzen (%s)

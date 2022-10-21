@@ -16959,3 +16959,31 @@ wsp#:#wsp_type_scov#:#Certificate: SCORM
 wsp#:#wsp_type_tstv#:#Certificate: Test
 wsp#:#wsp_type_webr#:#Weblink
 wsp#:#wsp_type_wfld#:#Folder
+glo#:#answered_correctly#:#I got it right
+glo#:#answered_not_correctly#:#I was wrong
+glo#:#box#:#Box
+glo#:#box_completed#:#You have completed the box.
+glo#:#box_last_presented#:#Box Last Presented
+glo#:#boxes#:#Boxes
+glo#:#boxes_really_reset#:#Do you really want to reset all boxes? All flashcards will be moved to the first box.
+glo#:#boxes_reset#:#The boxes have been reset successfully.
+glo#:#days_ago#:#%s days ago
+glo#:#def_vs_term#:#Definition vs. Term
+glo#:#def_vs_term_info#:#Show a definition first, the learner has to guess the term.
+glo#:#introduction#:#Introduction
+glo#:#flashcard_training#:#Flashcard Training
+glo#:#flashcard_training_info#:#Offers a presentation as flashcards allowing the user to train the terms/definitions one by one.
+glo#:#flashcards#:#Flashcards
+glo#:#flashcards_from_today_confirmation#:#The box contains %s flashcards already presented today. Do you want to include only the remaining %s flashcards or all %s flashcards?
+glo#:#flashcards_from_today_only_info#:#The box contains only flashcards already presented today. Please confirm that these %s flashcards will be shown to you again.
+glo#:#flashcards_intro#:#Your goal is to correctly remember each flashcard four times in a row.<br />To begin with, all of the flashcards are in box 1.<br />Flagging a flashcard as "I got it right" will advance it to the next box.<br />Flagging a flashcard as "I was wrong" will return the card to the first box.<br />To start, select a box. This will reveal the flashcards.
+glo#:#mode#:#Mode
+glo#:#quit_box#:#Quit Box
+glo#:#reset_all_boxes#:#Reset All Boxes
+glo#:#show_definition#:#Show Definition
+glo#:#show_term#:#Show Term
+glo#:#start_box#:#Start Box
+glo#:#term_vs_def#:#Term vs. Definition
+glo#:#term_vs_def_info#:#Show a term first, the learner has to guess the definition.
+glo#:#use_all_flashcards#:#Use All Flashcards (%s)
+glo#:#use_remaining_flashcards#:#Use Remaining Flashcards (%s)

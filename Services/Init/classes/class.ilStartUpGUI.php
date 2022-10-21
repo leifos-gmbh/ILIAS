@@ -240,8 +240,16 @@ class ilStartUpGUI
             if ($provider instanceof ilAuthProviderInterface) {
                 ilLoggerFactory::getLogger('auth')->info('Trying netscaler authentcation...');
                 $status = ilAuthStatus::getInstance();
-                $provider->doAuthentication($status);
-                if ($status->getStatus() === ilAuthStatus::STATUS_AUTHENTICATED) {
+                $frontend_factory = new ilAuthFrontendFactory();
+                $frontend_factory->setContext(ilAuthFrontendFactory::CONTEXT_STANDARD_FORM);
+                $frontend = $frontend_factory->getFrontend(
+                    $GLOBALS['DIC']['ilAuthSession'],
+                    $status,
+                    $credentials,
+                    [$provider]
+                );
+
+                if ($frontend->authenticate() === true) {
                     ilLoggerFactory::getLogger('auth')->info('netscaler authentication successful');
                     ilInitialisation::redirectToStartingPage();
                 } else {

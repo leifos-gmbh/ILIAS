@@ -78,11 +78,6 @@ class ilGlossaryFlashcardGUI
 
     public function listBoxes(): void
     {
-        $this->tabs_gui->setBackTarget(
-            $this->lng->txt("back"),
-            $this->ctrl->getLinkTargetByClass("ilglossarypresentationgui", "listTerms")
-        );
-
         $flashcard_tpl = new ilTemplate("tpl.flashcard_overview.html", true, true, "Modules/Glossary");
 
         $reset_btn = $this->ui_fac->button()->standard(
@@ -116,7 +111,19 @@ class ilGlossaryFlashcardGUI
     {
         $item_cnt = $this->manager->getItemsForBoxCount($nr);
         $last_access = $this->manager->getLastAccessForBoxInDaysText($nr);
-        $box = $this->ui_fac->item()->standard($this->lng->txt("box") . " " . $nr);
+
+        if (($this->manager->getUserTermIdsForBox($nr) && $nr !== Flashcard\FlashcardBox::LAST_BOX)
+            || ($this->manager->getAllTermsWithoutEntry() && $nr === Flashcard\FlashcardBox::FIRST_BOX)) {
+            $this->ctrl->setParameterByClass("ilglossaryflashcardboxgui", "box_id", $nr);
+            $title = $this->ui_fac->link()->standard(
+                $this->lng->txt("box") . " " . $nr,
+                $this->ctrl->getLinkTargetByClass('ilglossaryflashcardboxgui', 'show')
+            );
+        } else {
+            $title = $this->lng->txt("box") . " " . $nr;
+        }
+
+        $box = $this->ui_fac->item()->standard($title);
         if ($nr === Flashcard\FlashcardBox::LAST_BOX) {
             $box = $box->withProperties([
                 $this->lng->txt("flashcards") => (string) $item_cnt
@@ -126,20 +133,6 @@ class ilGlossaryFlashcardGUI
                 $this->lng->txt("flashcards") => (string) $item_cnt,
                 $this->lng->txt("box_last_presented") => $last_access
             ]);
-        }
-
-        if (($this->manager->getUserTermIdsForBox($nr) && $nr !== Flashcard\FlashcardBox::LAST_BOX)
-            || ($this->manager->getAllTermsWithoutEntry() && $nr === Flashcard\FlashcardBox::FIRST_BOX)) {
-            $this->ctrl->setParameterByClass("ilglossaryflashcardboxgui", "box_id", $nr);
-
-            $action = $this->ui_fac->dropdown()->standard([
-                $this->ui_fac->button()->shy(
-                    $this->lng->txt("start_box"),
-                    $this->ctrl->getLinkTargetByClass('ilGlossaryFlashcardBoxGUI', 'show')
-                ),
-            ]);
-
-            $box = $box->withActions($action);
         }
 
         return $box;
@@ -162,13 +155,13 @@ class ilGlossaryFlashcardGUI
 
     public function cancelResetBoxes(): void
     {
-        $this->ctrl->redirect($this, "listBoxes");
+        $this->ctrl->redirectByClass("ilglossarypresentationgui", "showFlashcards");
     }
 
     public function resetBoxes(): void
     {
         $this->manager->resetEntries();
         $this->tpl->setOnScreenMessage('success', $this->lng->txt("boxes_reset"), true);
-        $this->ctrl->redirect($this, "listBoxes");
+        $this->ctrl->redirectByClass("ilglossarypresentationgui", "showFlashcards");
     }
 }

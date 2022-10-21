@@ -21,7 +21,7 @@ use ILIAS\Glossary\Presentation;
 /**
  * @author Alexander Killing <killing@leifos.de>
  * @ilCtrl_Calls ilGlossaryPresentationGUI: ilNoteGUI, ilInfoScreenGUI, ilPresentationListTableGUI, ilGlossaryDefPageGUI
- * @ilCtrl_Calls ilGlossaryPresentationGUI: ilGlossaryFlashcardGUI
+ * @ilCtrl_Calls ilGlossaryPresentationGUI: ilGlossaryFlashcardGUI, ilGlossaryFlashcardBoxGUI
  */
 class ilGlossaryPresentationGUI implements ilCtrlBaseClassInterface
 {
@@ -184,7 +184,11 @@ class ilGlossaryPresentationGUI implements ilCtrlBaseClassInterface
         $lng->loadLanguageModule("content");
 
         $next_class = $this->ctrl->getNextClass($this);
-        $cmd = $this->ctrl->getCmd("listTerms");
+        if ($this->glossary->isActiveFlashcards()) {
+            $cmd = $this->ctrl->getCmd("showFlashcards");
+        } else {
+            $cmd = $this->ctrl->getCmd("listTerms");
+        }
 
         // check write permission
         if (!$ilAccess->checkAccess("read", "", $this->requested_ref_id) &&
@@ -219,8 +223,13 @@ class ilGlossaryPresentationGUI implements ilCtrlBaseClassInterface
                 break;
 
             case "ilglossaryflashcardgui":
-                $flash_boxes = new ilGlossaryFlashcardGUI();
-                $this->ctrl->forwardCommand($flash_boxes);
+                $flash_gui = new ilGlossaryFlashcardGUI();
+                $this->ctrl->forwardCommand($flash_gui);
+                break;
+
+            case "ilglossaryflashcardboxgui":
+                $flash_box_gui = new ilGlossaryFlashcardBoxGUI();
+                $this->ctrl->forwardCommand($flash_box_gui);
                 break;
 
             default:
@@ -340,16 +349,8 @@ class ilGlossaryPresentationGUI implements ilCtrlBaseClassInterface
 
         $table = $this->getPresentationTable();
 
-        $flash_btn_ren = "";
-        if ($this->glossary->isActiveFlashcards()) {
-            $flash_btn = $this->ui_fac->button()->standard(
-                $lng->txt("start_flashcard_training"),
-                $this->ctrl->getLinkTargetByClass('ilGlossaryFlashcardGUI', 'listBoxes')
-            );
-            $flash_btn_ren = $this->ui_ren->render($flash_btn);
-        }
         if (!$this->offlineMode()) {
-            $tpl->setContent($flash_btn_ren . $ilCtrl->getHTML($table));
+            $tpl->setContent($ilCtrl->getHTML($table));
         } else {
             $this->tpl->setVariable("ADM_CONTENT", $table->getHTML());
             return $this->tpl->printToString();
@@ -1042,6 +1043,13 @@ class ilGlossaryPresentationGUI implements ilCtrlBaseClassInterface
         if (!$this->offlineMode()) {
             if ($this->ctrl->getCmd() != "listDefinitions") {
                 if ($ilAccess->checkAccess("read", "", $this->requested_ref_id)) {
+                    if ($this->glossary->isActiveFlashcards()) {
+                        $this->tabs_gui->addTab(
+                            "flashcards",
+                            $lng->txt("flashcards"),
+                            $ilCtrl->getLinkTarget($this, "showFlashcards")
+                        );
+                    }
                     $this->tabs_gui->addTab(
                         "terms",
                         $lng->txt("cont_terms"),
@@ -1197,5 +1205,15 @@ class ilGlossaryPresentationGUI implements ilCtrlBaseClassInterface
                 }*/
             }
         }
+    }
+
+    public function showFlashcards(): void
+    {
+        $ilTabs = $this->tabs_gui;
+
+        $this->setTabs();
+        $ilTabs->activateTab("flashcards");
+        $flashcards = new ilGlossaryFlashcardGUI();
+        $flashcards->listBoxes();
     }
 }

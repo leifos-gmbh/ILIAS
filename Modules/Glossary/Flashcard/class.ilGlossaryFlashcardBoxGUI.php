@@ -186,7 +186,7 @@ class ilGlossaryFlashcardBoxGUI
 
         $btn_quit = $this->ui_fac->button()->standard(
             $this->lng->txt("quit_box"),
-            $this->ctrl->getLinkTargetByClass("ilglossaryflashcardgui", "listBoxes")
+            $this->ctrl->getLinkTargetByClass("ilglossarypresentationgui", "showFlashcards")
         );
 
         $html = $progress_bar->render()
@@ -246,7 +246,7 @@ class ilGlossaryFlashcardBoxGUI
             $this->ctrl->redirect($this, "showHidden");
         }
         $this->tpl->setOnScreenMessage("success", $this->lng->txt("box_completed"), true);
-        $this->ctrl->redirectByClass("ilglossaryflashcardgui", "listBoxes", "finished");
+        $this->ctrl->redirectByClass("ilglossarypresentationgui", "showFlashcards");
     }
 
     protected function getTermText(): string

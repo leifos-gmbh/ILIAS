@@ -1,30 +1,32 @@
+/* Copyright (c) 1998-2020 ILIAS open source eLearning e.V., Extended GPL, see docs/LICENSE */
+/**
+* This file is part of ILIAS, a powerful learning management system
+* published by ILIAS open source e-Learning e.V.
 *
+* ILIAS is licensed with the GPL-3.0,
+* see https://www.gnu.org/licenses/gpl-3.0.en.html
+* You should have received a copy of said license along with the
+* source code, too.
 *
+* If this is not the case or you just want to try ILIAS, you'll find
+* us at:
+* https://www.ilias.de
+* https://github.com/ILIAS-eLearning
 *
+/**
+* ILIAS language file
 *
-* @author 		Matthias Kunkel <mkunkel@me.com>
 * @module		language file English
 * @modulegroup	language
+* @author 		Matthias Kunkel <mkunkel@me.com>
 * @version		$Id$
-* ILIAS is licensed with the GPL-3.0,
-* ILIAS language file
-* If this is not the case or you just want to try ILIAS, you'll find
-* This file is part of ILIAS, a powerful learning management system
-* You should have received a copy of said license along with the
-* https://github.com/ILIAS-eLearning
-* https://www.ilias.de
-* published by ILIAS open source e-Learning e.V.
-* see https://www.gnu.org/licenses/gpl-3.0.en.html
-* source code, too.
-* us at:
 */
-/**
-// Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
-// NOTICE: Character coding of all ILIAS lang files is UTF-8! Please set your editor
 // The language file starts beyond the HTML-comment below. DO NOT modify this line!
 // To edit your language file with a spreadsheet (i.e. Excel or StarCalc) remove all lines
 // from the first line to the HTML-comment. After editing paste the lines in place again.
+// NOTICE: Character coding of all ILIAS lang files is UTF-8! Please set your editor
 // to the corresponding mode!
+// Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
 acc#:#acc_access_key#:#Access Key
 acc#:#acc_access_keys#:#Access Keys
@@ -904,6 +906,7 @@ assessment#:#log_wrong_test_password_entered#:#Participant entered wrong test pa
 assessment#:#longmenu#:#Longmenu
 assessment#:#longmenu_text#:#Long Menu Text
 assessment#:#mailnottype#:#Send notification even if a user finishes a test pass
+assessment#:#mailnottype_desc#:#Notify the owner of the test <strong>even if</strong> the number of test attempts has not been limited.
 assessment#:#maintenance#:#Maintenance
 assessment#:#manscoring#:#Manual Scoring
 assessment#:#manscoring_done#:#Scored Participants
@@ -984,6 +987,7 @@ assessment#:#oq_btn_use_order_pictures#:#Use answer pictures
 assessment#:#oq_btn_use_order_terms#:#Use answer terms
 assessment#:#oq_header_ordering_elements#:#Ordering Elements
 assessment#:#or#:#or
+assessment#:#order#:#Order
 assessment#:#ordering_answer_sequence_info#:#The answer sequence you define here will be taken as the correct solution sequence.
 assessment#:#ordertext#:#Ordering Text
 assessment#:#ordertext_info#:#Please enter the text that should be ordered horizontally. The ordering text will be separated by the whitespace signs in the text. If you need a different separation, you may use the separator %s to separate your text units.
@@ -1305,10 +1309,10 @@ assessment#:#tst_activate_skill_service_desc#:#Supports the assignment of questi
 assessment#:#tst_activation_limited_visibility_info#:#Before and after the indicated period it is only the test's title that will be displayed. The participants cannot take the test. Further access, including to tests already in progress, will be prevented at the end of the period.
 assessment#:#tst_activation_online_info#:#If online, participants can take the test.
 assessment#:#tst_add_quest_cont_edit_mode#:#Editor
+assessment#:#tst_add_quest_cont_edit_mode_IPE#:#Use plain text for questions and answers and ILIAS page editor for feedback and hints
 assessment#:#tst_add_quest_cont_edit_mode_IPE_info#:#No formatting of text in question and answers. No use of LaTex either. But feedback and hints can be reused when question is embedded in ILIAS learning module.
+assessment#:#tst_add_quest_cont_edit_mode_RTE#:#Use Rich-Text-Editor (TinyMCE) for editing questions and answers, feedbacks and hints
 assessment#:#tst_add_quest_cont_edit_mode_RTE_info#:#Allows text formatting of questions, answers, feedbacks and hints. But feedback and hints cannot be reused when question is embedded in ILIAS learning module.
-assessment#:#tst_add_quest_cont_edit_mode_default#:#Use Rich-Text-Editor (TinyMCE) for editing questions and answers, feedbacks and hints
-assessment#:#tst_add_quest_cont_edit_mode_page_object#:#Use plain text for questions and answers and ILIAS page editor for feedback and hints
 assessment#:#tst_addit_passes_blocked_after_passed_msg#:#You have passed the test. The test cannot be started again.
 assessment#:#tst_all_test_competences#:#All Test Competence
 assessment#:#tst_all_user_data_deleted#:#All user data of this test has been removed!
@@ -1721,6 +1725,7 @@ assessment#:#tst_question_hints_ordering_clipboard_resetted#:#The ordering clipb
 assessment#:#tst_question_hints_paste_after_success_msg#:#The hint %s has been pasted after hint %s successfully.
 assessment#:#tst_question_hints_paste_before_success_msg#:#The hint %s has been pasted before hint %s successfully.
 assessment#:#tst_question_hints_request_confirmation#:#Do you really want to request hint %s? For this hint %s point(s) will be deducted.
+assessment#:#tst_question_hints_request_confirmation_no_deduction#:#No points will be deducted for this hint.
 assessment#:#tst_question_hints_requested_hint_count_header#:#Requested Hints
 assessment#:#tst_question_hints_save_order_success_msg#:#The order of hint was saved successfully.
 assessment#:#tst_question_hints_tab#:#Hints
@@ -3152,14 +3157,16 @@ cmix#:#conf_own_window#:#Own Window
 cmix#:#conf_own_window_info#:#The content is opened in the same window and replaces the ILIAS Screen. When leaving the content the user returns to ILIAS.
 cmix#:#conf_privacy_comment_default#:#Indication to user
 cmix#:#conf_privacy_ident#:#User identification
-cmix#:#conf_privacy_ident_il_uuid_SHA256#:#Hash combined with a unique ILIAS platform id formatted as an E-Mail address
-cmix#:#conf_privacy_ident_il_uuid_SHA256_info#:#This is identical to each call, but does not permit any direct conclusions about the ILIAS user.
 cmix#:#conf_privacy_ident_il_uuid_ext_account#:#External User Id combined with a unique ILIAS platform id formatted as an E-Mail address
 cmix#:#conf_privacy_ident_il_uuid_ext_account_info#:#This is identical to each call, but may allow a direct conclusion about the user.
-cmix#:#conf_privacy_ident_il_uuid_login#:#ILIAS Login combined with a unique ILIAS platform id formatted as an E-Mail address
+cmix#:#conf_privacy_ident_il_uuid_login#:#ILIAS Login as E-Mail address, if necessary combined with a unique ILIAS platform id
 cmix#:#conf_privacy_ident_il_uuid_login_info#:#Sends the login name. This is identical to each call, but may allow a direct conclusion about the ILIAS user.
 cmix#:#conf_privacy_ident_il_uuid_random#:#Random ID combined with a unique ILIAS platform ID formatted as an E-Mail address
 cmix#:#conf_privacy_ident_il_uuid_random_info#:#For each ILIAS object and ILIAS user a random ID is generated which remains identical for each call. Conclusions about a user are very limited because it is practically impossible to create user profiles across objects.
+cmix#:#conf_privacy_ident_il_uuid_sha256#:#Hash combined with a unique ILIAS platform id formatted as an E-Mail address
+cmix#:#conf_privacy_ident_il_uuid_sha256_info#:#This is identical to each call, but does not permit any direct conclusions about the ILIAS user.
+cmix#:#conf_privacy_ident_il_uuid_sha256url#:#Hash combined with the ILIAS Domain formatted as an E-Mail address
+cmix#:#conf_privacy_ident_il_uuid_sha256url_info#:#This is identical to each call, with with a maximum of 80 characters significantly shorter than the variant with the ILIAS platform ID and allows only very limited conclusions about the ILIAS user.
 cmix#:#conf_privacy_ident_il_uuid_user_id#:#ILIAS user id combined with a unique ILIAS platform id formatted as an E-Mail address
 cmix#:#conf_privacy_ident_il_uuid_user_id_info#:#Sends the internal numeric user id. This is identical to each call, but may allow conclusions about the ILIAS user.
 cmix#:#conf_privacy_ident_info#:#Standard is frequently the E-Mail address. The unique ILIAS platform id is:
@@ -5992,6 +5999,7 @@ cont#:#cont_skill_do_not_set#:#Do not set
 cont#:#cont_skill_members#:#Members
 cont#:#cont_skill_no_profile_selected#:#Please select a profile.
 cont#:#cont_skill_no_skill#:#No value (Reset)
+cont#:#cont_skill_no_skills_selected#:#No competences have been selected yet. Please add at least one competence first under "Competence Selection".
 cont#:#cont_skill_profile#:#Profile
 cont#:#cont_skill_profiles#:#Assigned Profiles of Members
 cont#:#cont_skill_publish#:#Publish
@@ -6566,17 +6574,17 @@ content#:#cont_list_outdent#:#Outdent List
 content#:#cont_list_properties#:#List Properties
 content#:#cont_lists#:#Lists
 content#:#cont_lk_chapter#:#Chapter
-content#:#cont_lk_chapter_new#:#Chapter (New Frame)
+content#:#cont_lk_chapter_new#:#Chapter in New Tab
 content#:#cont_lk_file#:#File/Document
-content#:#cont_lk_media_faq#:#Media (FAQ Frame)
+content#:#cont_lk_media_faq#:#Media in FAQ Tool
 content#:#cont_lk_media_inline#:#Media (Inline)
-content#:#cont_lk_media_media#:#Media (Media Frame)
-content#:#cont_lk_media_new#:#Media (New Frame)
+content#:#cont_lk_media_media#:#Media in Media Tool
+content#:#cont_lk_media_new#:#Media in New Tab
 content#:#cont_lk_page#:#Page
-content#:#cont_lk_page_faq#:#Page (FAQ Frame)
-content#:#cont_lk_page_new#:#Page (New Frame)
+content#:#cont_lk_page_faq#:#Page in FAQ Tool
+content#:#cont_lk_page_new#:#Page in New Tab
 content#:#cont_lk_term#:#Glossary Term
-content#:#cont_lk_term_new#:#Glossary Term (New Frame)
+content#:#cont_lk_term_new#:#Glossary Term in New Tab
 content#:#cont_lm_comments_desc#:#Allow users to share comments on every page of the learning module.
 content#:#cont_lm_default_layout#:#Default Layout of Learning Module
 content#:#cont_lm_mail_permanent_link#:#Click on the following link to access the learning module:
@@ -9609,7 +9617,7 @@ forum#:#frm_noti_subject_act_post#:#Posting activated in forum "%1$s"%2$s%, thre
 forum#:#frm_noti_subject_answ_post#:#Posting answered in forum "%1$s"%2$s, thread "%3$s"
 forum#:#frm_noti_subject_cens_post#:#Posting censored in forum "%1$s"%2$s, thread "%3$s"
 forum#:#frm_noti_subject_del_post#:#Posting deleted in forum "%1$s"%2$s, thread "%3$s"
-forum#:#frm_noti_subject_del_thread#:#Thread "%4$s" deleted in forum "%1$s"%3$s
+forum#:#frm_noti_subject_del_thread#:#Thread "%3$s" deleted in forum "%1$s"%2$s
 forum#:#frm_noti_subject_new_post#:#New posting in forum "%1$s"%2$s, thread "%3$s"
 forum#:#frm_noti_subject_uncens_post#:#Posting uncensored in forum "%1$s"%2$s, thread "%3$s"
 forum#:#frm_noti_subject_upt_post#:#Posting modified in forum "%1$s"%2$s, thread "%3$s"
@@ -10359,12 +10367,14 @@ lti#:#activity_id#:#Activity ID
 lti#:#activity_id_info#:#This Activity ID is used by the LTI Provider to identify Statements.
 lti#:#auth_lti#:#LTI Auth
 lti#:#conf_privacy_ident#:#User identification
-lti#:#conf_privacy_ident_il_uuid_SHA256#:#Hash combined with a unique ILIAS platform id formatted as an E-Mail address
-lti#:#conf_privacy_ident_il_uuid_SHA256_info#:#This is identical to each call, but does not permit any direct conclusions about the ILIAS user.
 lti#:#conf_privacy_ident_il_uuid_ext_account#:#External User Id combined with a unique ILIAS platform id formatted as an E-Mail address
 lti#:#conf_privacy_ident_il_uuid_ext_account_info#:#This is identical to each call, but may allow a direct conclusion about the user.
-lti#:#conf_privacy_ident_il_uuid_login#:#ILIAS Login combined with a unique ILIAS platform id formatted as an E-Mail address
+lti#:#conf_privacy_ident_il_uuid_login#:#ILIAS Login as E-Mail address, if necessary combined with a unique ILIAS platform id
 lti#:#conf_privacy_ident_il_uuid_login_info#:#Sends the login name. This is identical to each call, but may allow a direct conclusion about the ILIAS user.
+lti#:#conf_privacy_ident_il_uuid_sha256#:#Hash combined with a unique ILIAS platform id formatted as an E-Mail address
+lti#:#conf_privacy_ident_il_uuid_sha256_info#:#This is identical to each call, but does not permit any direct conclusions about the ILIAS user.
+lti#:#conf_privacy_ident_il_uuid_sha256url#:#Hash combined with the ILIAS Domain formatted as an E-Mail address
+lti#:#conf_privacy_ident_il_uuid_sha256url_info#:#This is identical to each call, with a maximum of 80 characters significantly shorter than the variant with the ILIAS platform ID and allows only very limited conclusions about the ILIAS user.
 lti#:#conf_privacy_ident_il_uuid_user_id#:#ILIAS user id combined with a unique ILIAS platform id formatted as an E-Mail address
 lti#:#conf_privacy_ident_il_uuid_user_id_info#:#Sends the internal numeric user id. This is identical to each call, but may allow conclusions about the ILIAS user.
 lti#:#conf_privacy_ident_info#:#Standard is frequently the email address. The unique ILIAS platform id is:
@@ -10861,7 +10871,7 @@ mathjax#:#mathjax_limiter#:#Inline Delimiters
 mathjax#:#mathjax_limiter_info#:#Select the inline delimiters as they are configured in your MathJax installation.
 mathjax#:#mathjax_mathjax#:#MathJax
 mathjax#:#mathjax_path_to_mathjax#:#URL to MathJax
-mathjax#:#mathjax_path_to_mathjax_desc#:#E.g. https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML or a URL to your local installation. ILIAS 6 and 7 supports MathJax 2.7, not yet MathJax 3.
+mathjax#:#mathjax_path_to_mathjax_desc#:#E.g. https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML,Safe or a URL to your local installation. ILIAS 6 and 7 supports MathJax 2.7, not yet MathJax 3. Please note the attached 'Safe'. Otherwise ILIAS becomes vulnerable to XSS attacks via MathJax code with JavaScript.
 mathjax#:#mathjax_server_address#:#Server Address
 mathjax#:#mathjax_server_address_info#:#E.g. http://localhost:8003
 mathjax#:#mathjax_server_cache_cleared#:#The MathJax cache was cleared.
@@ -14571,6 +14581,7 @@ skmg#:#skmg_new_sktr#:#New Competence Template Reference
 skmg#:#skmg_next_step#:#Next Step
 skmg#:#skmg_no_nodes_selectable#:#Currently there are no competences selectable.
 skmg#:#skmg_no_skills#:#No Competences
+skmg#:#skmg_no_skills_selected_info#:#You have not selected or fulfilled any competences yet. Click on the "Add Competence"-button to select a competence. You can add any number of competences. If you fulfill competences by editing learning materials, they will be automatically listed here.
 skmg#:#skmg_no_trigger#:#No Trigger
 skmg#:#skmg_nr#:#Nr
 skmg#:#skmg_number#:#Number
@@ -14613,6 +14624,8 @@ skmg#:#skmg_skill_levels#:#Competence Levels
 skmg#:#skmg_skill_management_deactivated#:#Competence Management is currently deactivated.
 skmg#:#skmg_skill_needs_impr_no_res#:#You need to improve this competence. Unfortunately there are currently no learning resources available providing learning material aligned to your target competence level.
 skmg#:#skmg_skill_needs_impr_res#:#You need to improve this competence. The following resources provide learning material aligned to your target competence level.
+skmg#:#skmg_skill_needs_self_eval#:#Please conduct a self-evaluation first to see your competence target.
+skmg#:#skmg_skill_needs_self_eval_box#:#Please note that you have not conducted a self-evaluation for at least one competence in this profile. You will not see the competence target for the affected competences until a self-evaluation is done.
 skmg#:#skmg_skill_no_needs_impr#:#Your competence level is sufficient for the selected profile.
 skmg#:#skmg_skill_profiles#:#Competence Profiles
 skmg#:#skmg_skill_template#:#Competence Template

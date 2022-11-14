@@ -1,30 +1,32 @@
+/* Copyright (c) 1998-2020 ILIAS open source eLearning e.V., Extended GPL, see docs/LICENSE */
+/**
+* This file is part of ILIAS, a powerful learning management system
+* published by ILIAS open source e-Learning e.V.
 *
+* ILIAS is licensed with the GPL-3.0,
+* see https://www.gnu.org/licenses/gpl-3.0.en.html
+* You should have received a copy of said license along with the
+* source code, too.
 *
+* If this is not the case or you just want to try ILIAS, you'll find
+* us at:
+* https://www.ilias.de
+* https://github.com/ILIAS-eLearning
 *
+/**
+* ILIAS language file
 *
-* @author	Kiss-Kálmán Dániel <kisskalmandaniel@gmail.com>
 * @module	language file Hungarian
 * @modulegroup	language
+* @author	Kiss-Kálmán Dániel <kisskalmandaniel@gmail.com>
 * @version	7.x 2022-03-15
-* ILIAS is licensed with the GPL-3.0,
-* ILIAS language file
-* If this is not the case or you just want to try ILIAS, you'll find
-* This file is part of ILIAS, a powerful learning management system
-* You should have received a copy of said license along with the
-* https://github.com/ILIAS-eLearning
-* https://www.ilias.de
-* published by ILIAS open source e-Learning e.V.
-* see https://www.gnu.org/licenses/gpl-3.0.en.html
-* source code, too.
-* us at:
 */
-/**
-// Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
-// NOTICE: Character coding of all ILIAS lang files is UTF-8! Please set your editor
 // The language file starts beyond the HTML-comment below. DO NOT modify this line!
 // To edit your language file with a spreadsheet (i.e. Excel or StarCalc) remove all lines
 // from the first line to the HTML-comment. After editing paste the lines in place again.
+// NOTICE: Character coding of all ILIAS lang files is UTF-8! Please set your editor
 // to the corresponding mode!
+// Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
 acc#:#acc_access_key#:#Gyorsbillentyű
 acc#:#acc_access_keys#:#Gyorsbillentyűk
@@ -392,6 +394,9 @@ adn#:#msg_permanent#:#Megjelenítés
 adn#:#msg_permanent_info#:#Megadható, hogy az értesítés állandó vagy ideiglenes legyen-e.
 adn#:#msg_permanent_no#:#Ideiglenesen
 adn#:#msg_permanent_yes#:#Állandóan
+adn#:#msg_presentation#:#Presentation###31 08 2022 new variable
+adn#:#msg_show_to_all_roles#:#Show to all roles###31 08 2022 new variable
+adn#:#msg_show_to_all_roles_info#:#All users even when not logged-in will see notification.###31 08 2022 new variable
 adn#:#msg_success_created#:#Az értesítést sikeresen létrehozta
 adn#:#msg_success_deleted#:#Az értesítést sikeresen törölte
 adn#:#msg_success_reset#:#Az értesítést sikeresen reszetelte
@@ -901,6 +906,7 @@ assessment#:#log_wrong_test_password_entered#:#A résztvevő rossz jelszót adot
 assessment#:#longmenu#:#Étlap
 assessment#:#longmenu_text#:#'Étlap'-szöveg
 assessment#:#mailnottype#:#Akkor is küldjön értesítést, amikor egy felhasználó a teszt egy lépését fejezi be.
+assessment#:#mailnottype_desc#:#Notify the owner of the test <strong>even if</strong> the number of test attempts has not been limited.###09 11 2022 new variable
 assessment#:#maintenance#:#Karbantartás
 assessment#:#manscoring#:#Manuális pontozás
 assessment#:#manscoring_done#:#Pontozott résztvevők
@@ -981,6 +987,7 @@ assessment#:#oq_btn_use_order_pictures#:#Rendezze a képeket
 assessment#:#oq_btn_use_order_terms#:#Rendezze a kifejezéseket
 assessment#:#oq_header_ordering_elements#:#Elemek rendezése
 assessment#:#or#:#vagy
+assessment#:#order#:#Order###09 11 2022 new variable
 assessment#:#ordering_answer_sequence_info#:#Az itt megadott válaszsorozat a helyes megoldások sorozataként kerül felhasználásra.
 assessment#:#ordertext#:#Sorrendbe rakó szöveg
 assessment#:#ordertext_info#:#Adja meg a vízszintesen sorba rakandó szöveget. A rendezendő szövegegységek nem látható (fehér) karakterekkel lesznek elválasztva. Ha más elválasztójelre van szüksége, használhatja a %s elválasztójelet szövegegységeinek elkülönítésére.
@@ -1302,10 +1309,10 @@ assessment#:#tst_activate_skill_service_desc#:#Kérdések kompetenciákhoz rende
 assessment#:#tst_activation_limited_visibility_info#:#Az adott időszakon kívül csak a teszt címe látható. Ilyenkor a résztvevők nem tudják kitölteni a tesztet.
 assessment#:#tst_activation_online_info#:#Ha online, a résztvevők kitölthetik a tesztet.
 assessment#:#tst_add_quest_cont_edit_mode#:#Szerkesztő
+assessment#:#tst_add_quest_cont_edit_mode_IPE#:#Egyszerű szöveg használata kérdések és válaszok, ILIAS-lapszerkesztő használata visszajelzések és tippek szerkesztéséhez.
 assessment#:#tst_add_quest_cont_edit_mode_IPE_info#:#A kérdések és a válaszok nem formázható szövegek. LaTex sem használható. Viszont a visszajelzések és a tippek újra felhasználhatóak, ha kérdés beágyazott az ILIAS-tananyagban.
+assessment#:#tst_add_quest_cont_edit_mode_RTE#:#Rich Text szerkesztő (TinyMCE) használata kérdések és válaszok, illetve visszajelzések és tippek szerkesztéséhez
 assessment#:#tst_add_quest_cont_edit_mode_RTE_info#:#A kérdések, a válaszok, a visszajelzések és a tippek formázható szövegek. Viszont a visszajelzések és a tippek nem használhatóak fel újra, ha kérdés beágyazott az ILIAS-tananyagban.
-assessment#:#tst_add_quest_cont_edit_mode_default#:#Rich Text szerkesztő (TinyMCE) használata kérdések és válaszok, illetve visszajelzések és tippek szerkesztéséhez
-assessment#:#tst_add_quest_cont_edit_mode_page_object#:#Egyszerű szöveg használata kérdések és válaszok, ILIAS-lapszerkesztő használata visszajelzések és tippek szerkesztéséhez.
 assessment#:#tst_addit_passes_blocked_after_passed_msg#:#A tesztet sikeresen kitöltötte, több kitöltést nem indíthat el.
 assessment#:#tst_all_test_competences#:#Összes tesztkompetencia
 assessment#:#tst_all_user_data_deleted#:#Ennek a tesztnek minden felhasználói adatát sikeresen eltávolította.
@@ -1409,6 +1416,7 @@ assessment#:#tst_dynamic_question_set_source_questionpool_summary_string#:#%s (�
 assessment#:#tst_edit_competence_assign#:#Összerendelési tulajdonságok módosítása
 assessment#:#tst_edit_scoring#:#Pontozás módosítása
 assessment#:#tst_ending_time#:#Záró időpont
+assessment#:#tst_ending_time_before_starting_time#:#Please enter a date for the end of the test that is after the start date.###31 08 2022 new variable
 assessment#:#tst_ending_time_desc#:#Az az időpont, amikor az ILIAS lezárja a tesztet, a résztvevők választ adni utána már nem tudnak.
 assessment#:#tst_enter_questionpool#:#Adja meg annak a kérdéssornak a nevét, amelybe menteni szeretné az új kérdést.
 assessment#:#tst_eval_question_points#:#Eredményes teljesítéshez kérdéseredmények %s
@@ -1625,8 +1633,6 @@ assessment#:#tst_objective_oriented_test_pass_without_questions#:#'%s' teszt ind
 assessment#:#tst_objective_progress_header#:#Tanulási célkitűzés folyamata
 assessment#:#tst_objectives_progress_header#:#Tanulási célkitűzések folyamata
 assessment#:#tst_old_style_rnd_quest_set_broken#:#Ez a véletlen teszt nem helyreállítható állapotban van, mert egy vagy több kérdésgyűjteményét törölték. Ezt a tesztet nem tölthetik ki többé.
-assessment#:#tst_opening_period#:#Access times###29 07 2022 new variable
-assessment#:#tst_opening_period_desc#:#Interval in which Users have access to the test. <b>Important</b>: Do <b>not</b> use this option for e-exams/distance exams. Instead, use the function "Limit processing time", see below. Only then will the test be ended on the server side and each participant's last entry automatically saved as an authorised answer.###29 07 2022 new variable
 assessment#:#tst_optional_questions_confirmation_fixed_test#:#<b>A már teljesített tanulási célokhoz tartozó kérdést korábban már megválaszolta.</b><br /><br />Olyan kérdésre navigál, melyet már teljesített tanulási célhoz tartozik.<br />Választhat:<br /><br />Ha folytatja, tovább dolgozhat vagy egyszerűen csak megtekintheti ezeket a kérdéseket. Ha megváltoztatja korábbi kitöltéseiből elfogadott válaszait, leronthatja tanulási céljának eredményét.<br /><br />Ha nem kíván sem tovább dolgozni sem megnézni ezeket a kérdéseket, menjen vissza. A kérdéseket minden esetben figyelembe vesszük a kiértékelésnél.
 assessment#:#tst_optional_questions_confirmation_non_fixed_test#:#<b>A már teljesített tanulási célokhoz tartozó kérdés megválaszolása nem kötelező.</b><br /><br />Olyan kérdésre navigál, melyet már teljesített tanulási célhoz tartozik.<br />Választhat:<br /><br />Ha folytatja, tovább dolgozhat ezeken a kérdéseken. Válaszait korábbi próbálkozásaiból nem fogadjuk el, mert új véletlen kérdéseket választunk ehhez a próbálkozáshoz, így le is ronthatja tanulási céljának eredményét.<br /><br />Ha nem kíván tovább dolgozni a kérdéseken, menjen vissza. Ebben az esetben a kérdéseket nem vesszük figyelembe a kiértékelésnél.
 assessment#:#tst_participant#:#Résztvevő
@@ -1719,6 +1725,7 @@ assessment#:#tst_question_hints_ordering_clipboard_resetted#:#A vágólaprendez�
 assessment#:#tst_question_hints_paste_after_success_msg#:#%s segítséget sikeresen beszúrta %s segítség mögé.
 assessment#:#tst_question_hints_paste_before_success_msg#:#%s segítséget sikeresen beszúrta %s segítség elé.
 assessment#:#tst_question_hints_request_confirmation#:#Biztos, hogy megtekinti a(z) %s segítséget? Ez %s pont levonással jár!
+assessment#:#tst_question_hints_request_confirmation_no_deduction#:#No points will be deducted for this hint.###09 11 2022 new variable
 assessment#:#tst_question_hints_requested_hint_count_header#:#Kért segítségek
 assessment#:#tst_question_hints_save_order_success_msg#:#A segítségek sorrendjét sikeresen mentette.
 assessment#:#tst_question_hints_tab#:#Segítségek
@@ -1922,11 +1929,15 @@ assessment#:#tst_tab_results_objective_oriented#:#Végeredmények tanulási cél
 assessment#:#tst_tab_results_pass_oriented#:#Végeredmények próbálkozások szerint
 assessment#:#tst_tbl_col_answered_questions#:#Megválaszolt kérdések
 assessment#:#tst_tbl_col_final_mark#:#Érdemjegy
+assessment#:#tst_tbl_col_finished_passes#:#Finished Passes###31 08 2022 new variable
+assessment#:#tst_tbl_col_finished_passes_num_of#:#%s of %s###31 08 2022 new variable
+assessment#:#tst_tbl_col_last_scored_access#:#Last Scored Access###31 08 2022 new variable
 assessment#:#tst_tbl_col_pass_finished#:#Befejezte a kitöltést
 assessment#:#tst_tbl_col_passed_status#:#Értékelés
 assessment#:#tst_tbl_col_percent_result#:#Elért százalék
 assessment#:#tst_tbl_col_reached_points#:#Elért pontszám
 assessment#:#tst_tbl_col_scored_pass#:#Elért pontszám
+assessment#:#tst_tbl_col_started_passes#:#Started Passes###31 08 2022 new variable
 assessment#:#tst_tbl_invited_users#:#Manuálisan kiválasztott résztvevők
 assessment#:#tst_tbl_participants#:#Résztevők
 assessment#:#tst_tbl_results_grades#:#Eredmények és érdemjegyek
@@ -3146,14 +3157,16 @@ cmix#:#conf_own_window#:#Egy ablak
 cmix#:#conf_own_window_info#:#A tartalom ugyanabban az ablakban nyílik meg, lecserélve az ILIAS képernyőjét. A tartalom elhagyásakor a felhasználó visszatér az ILIAS-ba.
 cmix#:#conf_privacy_comment_default#:#Jelzés a felhasználó felé
 cmix#:#conf_privacy_ident#:#Felhasználó azonosítása
-cmix#:#conf_privacy_ident_il_uuid_SHA256#:#Hash combined with a unique ILIAS platform id formatted as an E-Mail address###29 07 2022 new variable
-cmix#:#conf_privacy_ident_il_uuid_SHA256_info#:#This is identical to each call, but does not permit any direct conclusions about the ILIAS user.###29 07 2022 new variable
 cmix#:#conf_privacy_ident_il_uuid_ext_account#:#A külső user id és az egyedi ILIAS platform id e-mail cím formátumban.
 cmix#:#conf_privacy_ident_il_uuid_ext_account_info#:#Ez azonosítja az összes hívást, de esetleg következtetni enged a felhasználóra.
 cmix#:#conf_privacy_ident_il_uuid_login#:#Az ILIAS felhasználónév és az egyedi ILIAS platform id e-mail cím formátumban.
 cmix#:#conf_privacy_ident_il_uuid_login_info#:#Ez azonosítja az összes hívást, de esetleg következtetni enged az ILIAS felhasználóra.
 cmix#:#conf_privacy_ident_il_uuid_random#:#Véletlen id és az egyedi ILIAS platform id e-mail cím formátumban.
 cmix#:#conf_privacy_ident_il_uuid_random_info#:#Az összes ILIAS objektum és az összes ILIAS felhasználó számára egy véletlen azonosítót generálunk minden híváskor, így a felhasználóval kapcsolatos következtetések nagyon korlátozottak lesznek, mert gyakorlatilag lehetetlen objektumokra hivatkozó felhasználói profilokat létrehozni.
+cmix#:#conf_privacy_ident_il_uuid_sha256#:#Hash combined with a unique ILIAS platform id formatted as an E-Mail address###26 09 2022 new variable
+cmix#:#conf_privacy_ident_il_uuid_sha256_info#:#This is identical to each call, but does not permit any direct conclusions about the ILIAS user.###26 09 2022 new variable
+cmix#:#conf_privacy_ident_il_uuid_sha256url#:#Hash combined with the ILIAS Domain formatted as an E-Mail address###26 09 2022 new variable
+cmix#:#conf_privacy_ident_il_uuid_sha256url_info#:#This is identical to each call, with with a maximum of 80 characters significantly shorter than the variant with the ILIAS platform ID and allows only very limited conclusions about the ILIAS user.###26 09 2022 new variable
 cmix#:#conf_privacy_ident_il_uuid_user_id#:#Az ILIAS user id és az egyedi ILIAS platform id e-mail cím formátumban.
 cmix#:#conf_privacy_ident_il_uuid_user_id_info#:#Ez azonosítja az összes hívást, de nem enged következtetni az ILIAS felhasználóra.
 cmix#:#conf_privacy_ident_info#:#A leggyakrabban használat az e-mail cím. Az egyedi ILIAS platform id:
@@ -5986,6 +5999,7 @@ cont#:#cont_skill_do_not_set#:#Nem állít be
 cont#:#cont_skill_members#:#Tagok
 cont#:#cont_skill_no_profile_selected#:#Kérem, válasszon egy profilt.
 cont#:#cont_skill_no_skill#:#Nincs érték (reszet)
+cont#:#cont_skill_no_skills_selected#:#No competences have been selected yet. Please add at least one competence first under "Competence Selection".###09 11 2022 new variable
 cont#:#cont_skill_profile#:#Profil
 cont#:#cont_skill_profiles#:#Tagok profiljai
 cont#:#cont_skill_publish#:#Közzététel
@@ -10353,12 +10367,14 @@ lti#:#activity_id#:#Aktivitás-ID
 lti#:#activity_id_info#:#This Activity ID is used by the LTI Kiszolgáló to identify Statements.
 lti#:#auth_lti#:#LTI-hitelesítés
 lti#:#conf_privacy_ident#:#Felhasználói azonosítás
-lti#:#conf_privacy_ident_il_uuid_SHA256#:#Hash combined with a unique ILIAS platform id formatted as an E-Mail address###29 07 2022 new variable
-lti#:#conf_privacy_ident_il_uuid_SHA256_info#:#This is identical to each call, but does not permit any direct conclusions about the ILIAS user.###29 07 2022 new variable
 lti#:#conf_privacy_ident_il_uuid_ext_account#:#A külső user id és az egyedi ILIAS platform id e-mail cím formátumban.
 lti#:#conf_privacy_ident_il_uuid_ext_account_info#:#Ez azonosítja az összes hívást, de esetleg következtetni enged a felhasználóra.
 lti#:#conf_privacy_ident_il_uuid_login#:#Az ILIAS felhasználónév és az egyedi ILIAS platform id e-mail cím formátumban.
 lti#:#conf_privacy_ident_il_uuid_login_info#:#Ez azonosítja az összes hívást, de esetleg következtetni enged az ILIAS felhasználóra.
+lti#:#conf_privacy_ident_il_uuid_sha256#:#Hash combined with a unique ILIAS platform id formatted as an E-Mail address###26 09 2022 new variable
+lti#:#conf_privacy_ident_il_uuid_sha256_info#:#This is identical to each call, but does not permit any direct conclusions about the ILIAS user.###26 09 2022 new variable
+lti#:#conf_privacy_ident_il_uuid_sha256url#:#Hash combined with the ILIAS Domain formatted as an E-Mail address###26 09 2022 new variable
+lti#:#conf_privacy_ident_il_uuid_sha256url_info#:#This is identical to each call, with a maximum of 80 characters significantly shorter than the variant with the ILIAS platform ID and allows only very limited conclusions about the ILIAS user.###26 09 2022 new variable
 lti#:#conf_privacy_ident_il_uuid_user_id#:#Az ILIAS user id és az egyedi ILIAS platform id e-mail cím formátumban.
 lti#:#conf_privacy_ident_il_uuid_user_id_info#:#Ez azonosítja az összes hívást, de nem enged következtetni az ILIAS felhasználóra.
 lti#:#conf_privacy_ident_info#:#A standard gyakran az e-mail cím. Az egyedi ILIAS platformazonosítója:
@@ -14519,6 +14535,7 @@ skmg#:#skmg_cert_skill_trigger_title#:#Kompetenciatrigger címe
 skmg#:#skmg_confirm_level_resources_removal#:#Biztos, hogy törli az alábbi erőforrásokat a kompetenciaszintből?
 skmg#:#skmg_confirm_remove_level_ass#:#Biztos, hogy törli az alábbi kompetenciaszinteket a profilból?
 skmg#:#skmg_confirm_user_removal#:#Biztos, hogy törli az alábbi felhasználókat ebből a profilból?
+skmg#:#skmg_cont_profiles_info#:#In this view, you can select the competence profiles with competence entries, which are related to the currently open object (course/group). To get to the global view with all competence profiles you are assigned to and all competence entries, click on the link below.###31 08 2022 new variable
 skmg#:#skmg_context_global#:#Globális
 skmg#:#skmg_context_local#:#Helyi
 skmg#:#skmg_create_sctp#:#Sablonkategória létrehozása
@@ -14564,9 +14581,11 @@ skmg#:#skmg_new_sktr#:#Új kompetenciasablon-hivatkozás
 skmg#:#skmg_next_step#:#Következő lépés
 skmg#:#skmg_no_nodes_selectable#:#Jelenleg nincsenek választható kompetenciák.
 skmg#:#skmg_no_skills#:#Nincsenek kompetenciák
+skmg#:#skmg_no_skills_selected_info#:#You have not selected or fulfilled any competences yet. Click on the "Add Competence"-button to select a competence. You can add any number of competences. If you fulfill competences by editing learning materials, they will be automatically listed here.###09 11 2022 new variable
 skmg#:#skmg_no_trigger#:#Nincs trigger
 skmg#:#skmg_nr#:#Sorszám
 skmg#:#skmg_number#:#Szám
+skmg#:#skmg_open_all_assigned_profiles#:#Open All Assigned Competence Profiles###31 08 2022 new variable
 skmg#:#skmg_order#:#Sorrend
 skmg#:#skmg_order_nr#:#Sorszám
 skmg#:#skmg_order_nr_info#:#Kompetencia pozíciója a kompetenciák felsorolásában.
@@ -14605,6 +14624,8 @@ skmg#:#skmg_skill_levels#:#Kompetenciaszintek
 skmg#:#skmg_skill_management_deactivated#:#A kompetenciamenedzsment jelenleg ki van kapcsolva.
 skmg#:#skmg_skill_needs_impr_no_res#:#Szükséges fejlesztenie ezt a kompetenciát. Sajnos jelenleg nincs olyan erőforrás, melyet tananyagként segítene a kívánt kompetenciaszint eléréséhez.
 skmg#:#skmg_skill_needs_impr_res#:#Szükséges fejlesztenie ezt a kompetenciát. Az alábbi erőforrások biztosítanak tananyagot a kívánt kompetenciaszint eléréséhez.
+skmg#:#skmg_skill_needs_self_eval#:#Please conduct a self-evaluation first to see your competence target.###09 11 2022 new variable
+skmg#:#skmg_skill_needs_self_eval_box#:#Please note that you have not conducted a self-evaluation for at least one competence in this profile. You will not see the competence target for the affected competences until a self-evaluation is done.###09 11 2022 new variable
 skmg#:#skmg_skill_no_needs_impr#:#A kompetencia szintje elegendő a kiválasztott profilhoz.
 skmg#:#skmg_skill_profiles#:#Kompetenciaprofilok
 skmg#:#skmg_skill_template#:#Kompetenciasablon
@@ -16220,6 +16241,7 @@ ui#:#ui_chars_max#:#Maximum:
 ui#:#ui_chars_min#:#Minimum:
 ui#:#ui_chars_remaining#:#Fennmaradó karakterek száma:
 ui#:#ui_error_in_group#:#Ebben a részben van néhány hiba.
+ui#:#ui_file_input_invalid_size#:#File exceeds the maximum size of %s MiB.###31 08 2022 new variable
 ui#:#ui_numeric_only#:#Egész számot adjon meg.
 ui#:#ui_tag_required#:#Please insert at least one tag.###27 04 2022 new variable
 user#:#all_roles_has_starting_point#:#Az összes szabálynak van kiindulási pontja

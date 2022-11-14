@@ -1166,7 +1166,7 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
         
         $lng = $DIC->language();
         $toolbar = $DIC->toolbar();
-        
+
         if (!$this->checkPermissionBool("read")) {
             ilUtil::sendInfo($lng->txt("no_permission"));
             return;
@@ -1230,7 +1230,6 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
         $owner = $this->object->getOwner();
         
         $ilTabs->clearTargets();
-        $ilLocator->clearItems();
         $tpl->setLocator();
         
         $back_caption = "";
@@ -1362,9 +1361,6 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
         $a_tpl->setTitleIcon($ppic);
         $a_tpl->setTitle($this->object->getTitle());
         $a_tpl->setDescription($name);
-        
-        // to get rid of locator in repository preview
-        $a_tpl->setVariable("LOCATOR", "");
     }
     
     /**
@@ -2486,6 +2482,9 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
         }
 
         $lg = parent::initHeaderAction($sub_type, $sub_id);
+        if (!$lg) {
+            return null;
+        }
         $lg->enableComments(false);
         $lg->enableNotes(false);
 
@@ -2699,7 +2698,7 @@ class ilObjBlogGUI extends ilObject2GUI implements ilDesktopItemHandling
         $ilLocator = $this->locator;
         
         if (is_object($this->object)) {
-            $ilLocator->addItem($this->object->getTitle(), $this->ctrl->getLinkTarget($this, ""), "", $this->node_id);
+            $ilLocator->addItem($this->object->getTitle(), $this->ctrl->getLinkTarget($this, "preview"), "", $this->node_id);
         }
     }
     

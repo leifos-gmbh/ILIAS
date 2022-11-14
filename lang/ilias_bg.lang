@@ -1,29 +1,18 @@
+/* Copyright (c) 1998-2020 ILIAS open source eLearning e.V., Extended GPL, see docs/LICENSE */
+/**
+* ILIAS language file
 *
-*
-*
-*
-* @author			Lyubomir Bistrekov <lyubo@bistrekov.com>
 * @module			language file Bulgarian
 * @modulegroup		language
+* @author			Lyubomir Bistrekov <lyubo@bistrekov.com>
 * @version			$Id$
-* ILIAS is licensed with the GPL-3.0,
-* ILIAS language file (All entries)
-* If this is not the case or you just want to try ILIAS, you'll find
-* You should have received a copy of said license along with the
-* https://github.com/ILIAS-eLearning
-* https://www.ilias.de
-* published by ILIAS open source e-Learning e.V.
-* see https://www.gnu.org/licenses/gpl-3.0.en.html
-* source code, too.
-* us at:
 */
-/**
-// Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
-// NOTICE: Character coding of all ILIAS lang files is UTF-8! Please set your editor
 // The language file starts beyond the HTML-comment below. DO NOT modify this line!
 // To edit your language file with a spreadsheet (i.e. Excel or StarCalc) remove all lines
 // from the first line to the HTML-comment. After editing paste the lines in place again.
-// to the corresponding mode! 
+//  NOTICE: Character coding of all ILIAS lang files is UTF-8! Please set your editor
+// to the corresponding mode!
+// Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
 acc#:#acc_access_key#:#Ключ за достъп
 acc#:#acc_access_keys#:#Ключове за достъп
@@ -391,6 +380,9 @@ adn#:#msg_permanent#:#Показване###22 06 2022 new variable
 adn#:#msg_permanent_info#:#Показване на съобщенията постоянно или временно###22 06 2022 new variable
 adn#:#msg_permanent_no#:#Показва се временно###22 06 2022 new variable
 adn#:#msg_permanent_yes#:#Показва се постоянно###22 06 2022 new variable
+adn#:#msg_presentation#:#Presentation###31 08 2022 new variable
+adn#:#msg_show_to_all_roles#:#Show to all roles###31 08 2022 new variable
+adn#:#msg_show_to_all_roles_info#:#All users even when not logged-in will see notification.###31 08 2022 new variable
 adn#:#msg_success_created#:#Съобщението е създадено###22 06 2022 new variable
 adn#:#msg_success_deleted#:#Съобщението е успешно изтрито###22 06 2022 new variable
 adn#:#msg_success_reset#:#Изчистване на съобщенията###22 06 2022 new variable
@@ -472,7 +464,6 @@ adve#:#char_selector_msg_blocks_or_custom_needed#:#Когато активира
 adve#:#char_selector_test#:#Селектор за символите на Unicode (TODO)
 adve#:#char_selector_unicode_all#:#Всички блокове на Уникод
 adve#:#char_selector_user#:#Селектор за символите на Unicode (TODO)
-assesCorrection of Pointssment#:#tst_imap_qst_mode_mc#:#Множествен избор
 assessment#:#action#:#Действие###22 06 2022 new variable
 assessment#:#addSuggestedSolution#:#Добавяне на предложено решение
 assessment#:#add_answers#:#Add Antworten 
@@ -901,6 +892,7 @@ assessment#:#log_wrong_test_password_entered#:#Участникът е въве�
 assessment#:#longmenu#:#Longmenu
 assessment#:#longmenu_text#:#Дълъг текст на менюто
 assessment#:#mailnottype#:#Изпращане на известие, дори когато потребителят завърши теста
+assessment#:#mailnottype_desc#:#Notify the owner of the test <strong>even if</strong> the number of test attempts has not been limited.###09 11 2022 new variable
 assessment#:#maintenance#:#Поддръжка###22 06 2022 new variable
 assessment#:#manscoring#:#Мануално точкуване
 assessment#:#manscoring_done#:#Оценени участници
@@ -981,6 +973,7 @@ assessment#:#oq_btn_use_order_pictures#:#Използвайте картинки
 assessment#:#oq_btn_use_order_terms#:#Използвайте термините за отговор
 assessment#:#oq_header_ordering_elements#:#Елементи за подреждане
 assessment#:#or#:#или###22 06 2022 new variable
+assessment#:#order#:#Order###09 11 2022 new variable
 assessment#:#ordering_answer_sequence_info#:#Последователността на отговорите, която сте определили тук, ще бъде приета за правилната последователност на решенията.
 assessment#:#ordertext#:#Организиращ текст
 assessment#:#ordertext_info#:#Въведете текста, който трябва да бъде подреден хоризонтално. Текстът за нареждане ще бъде отделен от белите знаци в текста. Ако се нуждаете от различно разделяне, можете да използвате разделителя %s, за да разделите текстовите единици.
@@ -1111,8 +1104,11 @@ assessment#:#qst_lifecycle_outdated#:#Остарял
 assessment#:#qst_lifecycle_rejected#:#Отхвърлено
 assessment#:#qst_lifecycle_review#:#Трябва да се прегледа
 assessment#:#qst_lifecycle_sharable#:#Споделяеми
+assessment#:#qst_nested_nested_answers_off#:#No indents, just order###31 08 2022 new variable
+assessment#:#qst_nested_nested_answers_on#:#Use indents in anwers###31 08 2022 new variable
 assessment#:#qst_nr_of_tries#:#Брой опити
 assessment#:#qst_preview_reset_msg#:#Прегледът е нулиран.
+assessment#:#qst_use_nested_answers#:#Nested answers###31 08 2022 new variable
 assessment#:#que_contains_unused_var#:# Текстът на въпроса съдържа променлива, която не е използвана в нито една формула на резултата!
 assessment#:#question_browse_area_info#:#Моля, изберете обект, от който искате да импортирате въпроси.
 assessment#:#question_cumulated_statistics#:#Статистика на натрупаните въпроси
@@ -1239,6 +1235,7 @@ assessment#:#suggest_range#:#Предлагане на обхват
 assessment#:#suggestedSolutionType#:#Предложен тип решение
 assessment#:#suggested_solution#:#Съдържание за рекапитулация
 assessment#:#suggested_solution_added_successfully#:#Успешно настроихте предложено решение!
+assessment#:#tab_nest_answers#:#Nesting###31 08 2022 new variable
 assessment#:#term#:#Термин
 assessment#:#term_image#:#Изображение на термина
 assessment#:#term_text#:#Текст на термина
@@ -1298,10 +1295,10 @@ assessment#:#tst_activate_skill_service_desc#:#Ще се появи нов ра�
 assessment#:#tst_activation_limited_visibility_info#:#Ако е избрано, тестът е видим дори извън дадената наличност.
 assessment#:#tst_activation_online_info#:#Ако е офлайн, само администраторите могат да виждат и редактират теста.
 assessment#:#tst_add_quest_cont_edit_mode#:#Режим за редактиране на допълнително съдържание на въпроса
+assessment#:#tst_add_quest_cont_edit_mode_IPE#:#Допълнително редактиране на съдържание с редактора на обекти на страници
 assessment#:#tst_add_quest_cont_edit_mode_IPE_info#:#Не се форматира текстът във въпросите и отговорите. Не се използва и LaTex. Но обратната връзка и подсказките могат да се използват повторно, когато въпросът е вграден в учебния модул на ILIAS.
+assessment#:#tst_add_quest_cont_edit_mode_RTE#:#Режим на редактиране по подразбиране за допълнително съдържание на въпроса
 assessment#:#tst_add_quest_cont_edit_mode_RTE_info#:#Позволява форматиране на текста на въпросите, отговорите, отзивите и подсказките. Но обратната връзка и подсказките не могат да се използват повторно, когато въпросът е вграден в учебния модул на ILIAS.
-assessment#:#tst_add_quest_cont_edit_mode_default#:#Режим на редактиране по подразбиране за допълнително съдържание на въпроса
-assessment#:#tst_add_quest_cont_edit_mode_page_object#:#Допълнително редактиране на съдържание с редактора на обекти на страници
 assessment#:#tst_addit_passes_blocked_after_passed_msg#:#Издържахте теста. Тестът не може да бъде стартиран отново.
 assessment#:#tst_all_test_competences#:#Всички тестови компетентности
 assessment#:#tst_all_user_data_deleted#:#Всички потребителски данни за този тест бяха изтрити!
@@ -1346,6 +1343,7 @@ assessment#:#tst_browse_for_qpl_questions#:#Add from Pool
 assessment#:#tst_browse_for_tst_questions#:#Добавяне от друг тест
 assessment#:#tst_btn_hide_best_solutions#:#Скриване на най-добрите решения
 assessment#:#tst_btn_rebuild_random_question_stage#:#Синхронизиране на въпроси от басейна
+assessment#:#tst_btn_reset_pool_sync#:#Edit/Cancel Synchronisation###31 08 2022 new variable
 assessment#:#tst_btn_show_best_solutions#:#Показване на най-добрите решения
 assessment#:#tst_cannot_online_due_to_switched_quest_set_type_setting#:#Тестът не може да бъде зададен като онлайн, тъй като настройката на режима на теста е променена. Трябва да зададете режим на теста, свързан с конфигурацията на въпросите, преди тестът да бъде зададен като онлайн.
 assessment#:#tst_change_dyn_test_question_selection#:#Промяна на текущия избор на въпроси
@@ -1404,6 +1402,7 @@ assessment#:#tst_dynamic_question_set_source_questionpool_summary_string#:#%s (P
 assessment#:#tst_edit_competence_assign#:#Редактиране на свойствата на заданието
 assessment#:#tst_edit_scoring#:#Изменение на оценката
 assessment#:#tst_ending_time#:#Финален момент
+assessment#:#tst_ending_time_before_starting_time#:#Please enter a date for the end of the test that is after the start date.###31 08 2022 new variable
 assessment#:#tst_ending_time_desc#:# Точка от време, в която тестът ще приключи: Участниците не могат повече да отговарят на въпроси, тестът е завършен от ILIAS.
 assessment#:#tst_enter_questionpool#:#Моля, въведете име на набор от въпроси, където новият въпрос ще бъде съхранен
 assessment#:#tst_eval_question_points#:#Резултати от тестовете за преминаване на %s
@@ -1474,6 +1473,7 @@ assessment#:#tst_highscore_top_table_description#:#Контролира дали
 assessment#:#tst_highscore_wtime#:#Покажете работното време
 assessment#:#tst_highscore_wtime_description#:#Контролира дали да се показва колона с работното време на тестовете.
 assessment#:#tst_imap_qst_mode#:#Режим
+assessment#:#tst_imap_qst_mode_mc#:#Multiple Choice###31 08 2022 new variable
 assessment#:#tst_imap_qst_mode_sc#:#Единичен избор
 assessment#:#tst_import_non_ilias_zip#:#Грешка: Името на качения файл за внос не отговаря на очаквания формат.
 assessment#:#tst_import_verify_found_questions#:#ILIAS откри следните въпроси във файла за импортиране на тестове. Моля, изберете въпросите, които искате да импортирате с този тест.
@@ -1711,6 +1711,7 @@ assessment#:#tst_question_hints_ordering_clipboard_resetted#:#Клипбордъ
 assessment#:#tst_question_hints_paste_after_success_msg#:#Намекът %s е вмъкнат успешно след намек %s.
 assessment#:#tst_question_hints_paste_before_success_msg#:#Намекът %s е вмъкнат успешно преди намека %s.
 assessment#:#tst_question_hints_request_confirmation#:# Наистина ли искате да поискате подсказка %s? За този намек ще бъде отнета %s точка(и).
+assessment#:#tst_question_hints_request_confirmation_no_deduction#:#No points will be deducted for this hint.###09 11 2022 new variable
 assessment#:#tst_question_hints_requested_hint_count_header#:#Поискани подсказки
 assessment#:#tst_question_hints_save_order_success_msg#:#Поредността на подсказката е запазена успешно.
 assessment#:#tst_question_hints_tab#:#Насоки
@@ -1914,11 +1915,15 @@ assessment#:#tst_tab_results_objective_oriented#:#Резултати по цел
 assessment#:#tst_tab_results_pass_oriented#:#Резултати по опити
 assessment#:#tst_tbl_col_answered_questions#:#Отговорени въпроси
 assessment#:#tst_tbl_col_final_mark#:#Отметка###22 06 2022 new variable
+assessment#:#tst_tbl_col_finished_passes#:#Finished Passes###31 08 2022 new variable
+assessment#:#tst_tbl_col_finished_passes_num_of#:#%s of %s###31 08 2022 new variable
+assessment#:#tst_tbl_col_last_scored_access#:#Last Scored Access###31 08 2022 new variable
 assessment#:#tst_tbl_col_pass_finished#:#Pass Finished
 assessment#:#tst_tbl_col_passed_status#:#Оценяване
 assessment#:#tst_tbl_col_percent_result#:#Перцентът е решен
 assessment#:#tst_tbl_col_reached_points#:#Достигнати точки
 assessment#:#tst_tbl_col_scored_pass#:#Scored Pass
+assessment#:#tst_tbl_col_started_passes#:#Started Passes###31 08 2022 new variable
 assessment#:#tst_tbl_invited_users#:#Манюално избрани участници
 assessment#:#tst_tbl_participants#:#Участници
 assessment#:#tst_tbl_results_grades#:#Резултати и оценки
@@ -3144,6 +3149,10 @@ cmix#:#conf_privacy_ident_il_uuid_login#:#ILIAS Вход, комбиниран �
 cmix#:#conf_privacy_ident_il_uuid_login_info#:#Това е идентично за всяко повикване, но може да позволи директно заключение за потребителя на ILIAS.###08 12 2021 new variable
 cmix#:#conf_privacy_ident_il_uuid_random#:#Разумен идентификатор, комбиниран с уникален идентификатор на платформата ILIAS, форматиран като имейл адрес###08 12 2021 new variable
 cmix#:#conf_privacy_ident_il_uuid_random_info#:#За всеки обект на ILIAS и потребител на ILIAS се генерира случаен идентификатор, който остава идентичен за всяко повикване. Изводите за даден потребител са много ограничени, тъй като е практически невъзможно да се създадат потребителски профили за всички обекти.###08 12 2021 new variable
+cmix#:#conf_privacy_ident_il_uuid_sha256#:#Hash combined with a unique ILIAS platform id formatted as an E-Mail address###26 09 2022 new variable
+cmix#:#conf_privacy_ident_il_uuid_sha256_info#:#This is identical to each call, but does not permit any direct conclusions about the ILIAS user.###26 09 2022 new variable
+cmix#:#conf_privacy_ident_il_uuid_sha256url#:#Hash combined with the ILIAS Domain formatted as an E-Mail address###26 09 2022 new variable
+cmix#:#conf_privacy_ident_il_uuid_sha256url_info#:#This is identical to each call, with with a maximum of 80 characters significantly shorter than the variant with the ILIAS platform ID and allows only very limited conclusions about the ILIAS user.###26 09 2022 new variable
 cmix#:#conf_privacy_ident_il_uuid_user_id#:#Идентификатор на потребителя на ILIAS, комбиниран с уникален идентификатор на платформата ILIAS, форматиран като имейл адрес####08 12 2021 new variable
 cmix#:#conf_privacy_ident_il_uuid_user_id_info#:#Това е идентично за всяко повикване, но не позволява директно заключение за потребителя на ILIAS.###08 12 2021 new variable
 cmix#:#conf_privacy_ident_info#:#Стандартно често е имейл адресът. Уникалният идентификатор на платформата ILIAS е:###08 12 2021 new variable
@@ -5976,6 +5985,7 @@ cont#:#cont_skill_do_not_set#:#Не задавайте
 cont#:#cont_skill_members#:#Членове
 cont#:#cont_skill_no_profile_selected#:#Моля, изберете профил.###22 06 2022 new variable
 cont#:#cont_skill_no_skill#:#Няма стойност (нулиране)
+cont#:#cont_skill_no_skills_selected#:#No competences have been selected yet. Please add at least one competence first under "Competence Selection".###09 11 2022 new variable
 cont#:#cont_skill_profile#:#Профил###22 06 2022 new variable
 cont#:#cont_skill_profiles#:#Присвоени профили на членовете###22 06 2022 new variable
 cont#:#cont_skill_publish#:#Publish
@@ -6198,6 +6208,7 @@ content#:#cont_cp_question_diff_formats_info#:#Моля, имайте предв
 content#:#cont_create_link#:#Създаване на връзка
 content#:#cont_create_mob#:#Създаване а медиен обект
 content#:#cont_credit_mode#:#Кредитен режим (за 'нормален' режим на уроците)
+content#:#cont_credit_mode_info#:#The Learning Module is informed via cmi.core.credit whether the achieved Performance (pass/fail and score) is desired (credit) or not desired (no-credit) for the Assessment. It is the responsibility of the Learning Module to interpret this Instruction adequately.###31 08 2022 new variable
 content#:#cont_credit_off#:#Няма кредит
 content#:#cont_credit_on#:#С оценка (успешно | неуспешно)###22 06 2022 new variable
 content#:#cont_credits#:#Кредити###22 06 2022 new variable
@@ -9586,6 +9597,8 @@ forum#:#frm_moderators_select_one#:#Моля, изберете един потр
 forum#:#frm_move_invalid_file_type#:#В нишката "%s" е прикачен неподдържан тип файл. Премахнете файла или се свържете с администратора на системата, за да добавите този тип файл в белия списък на типовете файлове.
 forum#:#frm_noti_message#:#Съобщение:
 forum#:#frm_noti_new_post#:#във форум "%1$s" е създадена нова публикация.
+forum#:#frm_noti_obj_crs#:#course###31 08 2022 new variable
+forum#:#frm_noti_obj_grp#:#group###31 08 2022 new variable
 forum#:#frm_noti_subject_act_post#:#Постингът е активиран във форум "%1$s", тема "%2$s"
 forum#:#frm_noti_subject_answ_post#:#Отговорът на публикацията е във форум "%1$s", тема "%2$s"
 forum#:#frm_noti_subject_cens_post#:#Постингът е цензуриран във форум "%1$s", тема "%2$s"
@@ -10344,6 +10357,10 @@ lti#:#conf_privacy_ident_il_uuid_ext_account#:#Идентификатор на �
 lti#:#conf_privacy_ident_il_uuid_ext_account_info#:#Това е идентично за всяко повикване, но може да позволи директно заключение за потребителя.###08 12 2021 new variable
 lti#:#conf_privacy_ident_il_uuid_login#:#ILIAS Вход в комбинация с уникален идентификатор на платформата ILIAS, оформен като имейл адрес.###08 12 2021 new variable
 lti#:#conf_privacy_ident_il_uuid_login_info#:#Това е идентично за всяко повикване, но може да позволи директно заключение за потребителя на ILIAS.###08 12 2021 new variable
+lti#:#conf_privacy_ident_il_uuid_sha256#:#Hash combined with a unique ILIAS platform id formatted as an E-Mail address###26 09 2022 new variable
+lti#:#conf_privacy_ident_il_uuid_sha256_info#:#This is identical to each call, but does not permit any direct conclusions about the ILIAS user.###26 09 2022 new variable
+lti#:#conf_privacy_ident_il_uuid_sha256url#:#Hash combined with the ILIAS Domain formatted as an E-Mail address###26 09 2022 new variable
+lti#:#conf_privacy_ident_il_uuid_sha256url_info#:#This is identical to each call, with a maximum of 80 characters significantly shorter than the variant with the ILIAS platform ID and allows only very limited conclusions about the ILIAS user.###26 09 2022 new variable
 lti#:#conf_privacy_ident_il_uuid_user_id#:#Идентификатор на потребителя на ILIAS, комбиниран с уникален идентификатор на платформата ILIAS, оформен като имейл адрес.###08 12 2021 new variable
 lti#:#conf_privacy_ident_il_uuid_user_id_info#:#Това е идентично за всяко повикване, но не позволява директно заключение за потребителя на ILIAS.###08 12 2021 new variable
 lti#:#conf_privacy_ident_info#:#Стандартно често е имейл адресът. Уникалният идентификатор на платформата ILIAS е:###08 12 2021 new variable
@@ -14339,6 +14356,7 @@ search#:#search_users#:#Издирване на потребител
 search#:#select_orgu#:#Изберете организационни единици
 search#:#until#:#до###22 06 2022 new variable
 sess#:#il_sess_participant#:#Участници в сесията
+sess#:#il_sess_status_open#:#Open Session###31 08 2022 new variable
 sess#:#mail_sess_roles#:#Изпращане на поща до ролите на сесията
 sess#:#notification#:#Notification
 sess#:#objs_crs_role#:#Роли на курса
@@ -14347,11 +14365,13 @@ sess#:#send_mail_participants#:#Всички участници в сесият�
 sess#:#sess_accept_request#:#Приемане на участие
 sess#:#sess_assign#:#Assign
 sess#:#sess_bt_refuse#:#Не мога да участвам
+sess#:#sess_change_type#:#Change Session Type###31 08 2022 new variable
 sess#:#sess_contact#:#Contact
 sess#:#sess_copy#:#Копиране на сесия
 sess#:#sess_filter_all_types#:#Всички типове
 sess#:#sess_filter_not_assigned#:#Not Assigned
 sess#:#sess_import#:#Import Session
+sess#:#sess_info_new_sess_type#:#New Session Type###31 08 2022 new variable
 sess#:#sess_is_assigned#:#is Assigned
 sess#:#sess_list_reg_limit_places#:#Свободни места
 sess#:#sess_lp_preset#:#Активиране на напредъка в обучението
@@ -14426,6 +14446,7 @@ sess#:#sess_title#:#Заглавие на сесията
 sess#:#sess_users_added#:#Регистрирани избрани потребители за сесията.
 sess#:#sess_users_already_assigned#:#Потребителят вече е регистриран за тази сесия.
 sess#:#sess_users_removed_from_list#:#Избраните потребители са премахнати от списъка на чакащите.
+sess#:#sess_warn_sess_type_changed#:#Do you really want to change the session type? All permission settings will be reset.###31 08 2022 new variable
 shib#:#shib_activate_new#:#Нови сметки с одобрение
 shib#:#shib_activate_new_info#:#Ако е маркирано, всяко създаване на нов акаунт трябва да бъде одобрено от администратор.
 shib#:#shib_add_missing#:#Придаване на липсващи роли
@@ -14500,6 +14521,7 @@ skmg#:#skmg_cert_skill_trigger_title#:#Заглавие на тригера на
 skmg#:#skmg_confirm_level_resources_removal#:# Наистина ли искате да премахнете следните ресурси от нивото на компетентност?
 skmg#:#skmg_confirm_remove_level_ass#:#Имате ли наистина желание да премахнете следните нива на компетентност от профила?
 skmg#:#skmg_confirm_user_removal#:#Истина ли искате да премахнете следните потребители от този профил?
+skmg#:#skmg_cont_profiles_info#:#In this view, you can select the competence profiles with competence entries, which are related to the currently open object (course/group). To get to the global view with all competence profiles you are assigned to and all competence entries, click on the link below.###31 08 2022 new variable
 skmg#:#skmg_context_global#:#Глобален###22 06 2022 new variable
 skmg#:#skmg_context_local#:#Местен###22 06 2022 new variable
 skmg#:#skmg_create_sctp#:#Създаване на категория на шаблона
@@ -14545,9 +14567,11 @@ skmg#:#skmg_new_sktr#:#Справка за шаблона на новото ум
 skmg#:#skmg_next_step#:#Следваща стъпка
 skmg#:#skmg_no_nodes_selectable#:#Понастоящем няма избираеми компетенции.
 skmg#:#skmg_no_skills#:#Няма умения
+skmg#:#skmg_no_skills_selected_info#:#You have not selected or fulfilled any competences yet. Click on the "Add Competence"-button to select a competence. You can add any number of competences. If you fulfill competences by editing learning materials, they will be automatically listed here.###09 11 2022 new variable
 skmg#:#skmg_no_trigger#:#No Trigger
 skmg#:#skmg_nr#:#Nr
 skmg#:#skmg_number#:#Number
+skmg#:#skmg_open_all_assigned_profiles#:#Open All Assigned Competence Profiles###31 08 2022 new variable
 skmg#:#skmg_order#:#Order
 skmg#:#skmg_order_nr#:#номер на поръчката
 skmg#:#skmg_order_nr_info#:#Поставя компетентността в списъка с компетентности.
@@ -14586,6 +14610,8 @@ skmg#:#skmg_skill_levels#:#Нива на умения
 skmg#:#skmg_skill_management_deactivated#:#Управлението на уменията в момента е деактивирано.
 skmg#:#skmg_skill_needs_impr_no_res#:# Трябва да подобрите тази компетентност. За съжаление в момента няма налични учебни ресурси, които да предоставят учебни материали, съответстващи на целевото ви ниво на компетентност.
 skmg#:#skmg_skill_needs_impr_res#:#Трябва да подобрите тази компетентност. Следните ресурси предоставят учебни материали, съобразени с целевото ви ниво на компетентност.
+skmg#:#skmg_skill_needs_self_eval#:#Please conduct a self-evaluation first to see your competence target.###09 11 2022 new variable
+skmg#:#skmg_skill_needs_self_eval_box#:#Please note that you have not conducted a self-evaluation for at least one competence in this profile. You will not see the competence target for the affected competences until a self-evaluation is done.###09 11 2022 new variable
 skmg#:#skmg_skill_no_needs_impr#:#Равнището ви на компетентност е достатъчно за избрания профил.
 skmg#:#skmg_skill_profiles#:#Profiles
 skmg#:#skmg_skill_template#:#Шаблон на уменията
@@ -15706,8 +15732,8 @@ survey#:#svy_results_view_own_info#:#След приключване на про
 survey#:#svy_save_sync#:#Запазване и синхронизиране на копия на въпроси
 survey#:#svy_search_users#:#Издирване на участници
 survey#:#svy_selected_user_data_deleted#:#Данните от проучването на избрания(те) потребител(и) бяха успешно изтрити
-survey#:#svy_self_ev_access_resgit addults_none#:#Няма достъп до резултатите
 survey#:#svy_self_ev_access_results_all#:#Достъп до самооценките на всички участници
+survey#:#svy_self_ev_access_results_none#:#No Access to Results###31 08 2022 new variable
 survey#:#svy_self_ev_access_results_own#:#Достъп до собствените самооценки
 survey#:#svy_self_ev_info#:#Използвайте за самооценка.
 survey#:#svy_self_ev_mode#:# Само за самооценка
@@ -16201,6 +16227,7 @@ ui#:#ui_chars_max#:#Максимум:
 ui#:#ui_chars_min#:#Минимално:
 ui#:#ui_chars_remaining#:#Останали символи:
 ui#:#ui_error_in_group#:#В тази част има някаква грешка.
+ui#:#ui_file_input_invalid_size#:#File exceeds the maximum size of %s MiB.###31 08 2022 new variable
 ui#:#ui_numeric_only#:#Внесете цяло число.
 ui#:#ui_tag_required#:#Моля, вмъкнете поне един етикет.###22 06 2022 new variable
 user#:#all_roles_has_starting_point#:#Всички роли имат начални точки
@@ -16666,4 +16693,3 @@ wsp#:#wsp_type_scov#:#Сертификат: SCORM
 wsp#:#wsp_type_tstv#:#Верификация: Тест
 wsp#:#wsp_type_webr#:#Weblink
 wsp#:#wsp_type_wfld#:#Папка
-﻿* This file is part of ILIAS, a powerful learning management system

@@ -1,18 +1,18 @@
-*
-* @author		    Ivica Ljoljo, ivica.ljoljo@hr.ovb.eu
-* @module			language file Croatian
-* @modulegroup		language
-* @version			$Id$
-* ILIAS language file (All entries)
-*/
 /* Copyright (c) 1998-2021 ILIAS open source e-Learing e.V., GPL3, see docs/LICENSE */
 /**
-// Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
-// NOTICE: Character coding of all ILIAS lang files is UTF-8! Please set your editor
+* ILIAS language file (All entries)
+*
+* @module			language file Croatian
+* @modulegroup		language
+* @author		    Ivica Ljoljo, ivica.ljoljo@hr.ovb.eu
+* @version			$Id$
+*/
 // The language file starts beyond the HTML-comment below. DO NOT modify this line!
 // To edit your language file with a spreadsheet (i.e. Excel or StarCalc) remove all lines
 // from the first line to the HTML-comment. After editing paste the lines in place again.
+// NOTICE: Character coding of all ILIAS lang files is UTF-8! Please set your editor
 // to the corresponding mode!
+// Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
 acc#:#acc_access_key#:#Access Key
 acc#:#acc_access_keys#:#Access Keys
@@ -380,6 +380,9 @@ adn#:#msg_permanent#:#Display###04 06 2021 new variable
 adn#:#msg_permanent_info#:#Display Notifications permanently or temporarily###04 06 2021 new variable
 adn#:#msg_permanent_no#:#Show Temporarily###04 06 2021 new variable
 adn#:#msg_permanent_yes#:#Show Permanently###04 06 2021 new variable
+adn#:#msg_presentation#:#Presentation###31 08 2022 new variable
+adn#:#msg_show_to_all_roles#:#Show to all roles###31 08 2022 new variable
+adn#:#msg_show_to_all_roles_info#:#All users even when not logged-in will see notification.###31 08 2022 new variable
 adn#:#msg_success_created#:#Notification created###04 06 2021 new variable
 adn#:#msg_success_deleted#:#Notification sucessfully deleted###04 06 2021 new variable
 adn#:#msg_success_reset#:#Notification reset###04 06 2021 new variable
@@ -889,6 +892,7 @@ assessment#:#log_wrong_test_password_entered#:#Sudionik je unio pogrešnu lozink
 assessment#:#longmenu#:#Dugi izbornik
 assessment#:#longmenu_text#:#Tekst dugog izbornika
 assessment#:#mailnottype#:#Pošalji obavijest čak i ako korisnik završi pojedini prolaz testa
+assessment#:#mailnottype_desc#:#Notify the owner of the test <strong>even if</strong> the number of test attempts has not been limited.###09 11 2022 new variable
 assessment#:#maintenance#:#Održavanje
 assessment#:#manscoring#:#Ručno bodovanje
 assessment#:#manscoring_done#:#Sudionici koji su već bodovani
@@ -969,6 +973,7 @@ assessment#:#oq_btn_use_order_pictures#:#Koristi odgovor sa slikama
 assessment#:#oq_btn_use_order_terms#:#Koristi odgovor s pojmovima
 assessment#:#oq_header_ordering_elements#:#Elementi za raspoređivanje
 assessment#:#or#:#ili
+assessment#:#order#:#Order###09 11 2022 new variable
 assessment#:#ordering_answer_sequence_info#:#Slijed odgovora koji ovdje definirate uzet će se kao ispravan redoslijed rješenja.
 assessment#:#ordertext#:#Tekst za raspoređivanje
 assessment#:#ordertext_info#:#Unesite tekst koji treba rasporediti vodoravno. Tekst koji treba rasporediti bit će odvojen razmaknicama u tekstu. Ako trebate drugačiji odvajanje, za razdvajanje tekstualnih jedinica umjesto razmaknica možete koristiti separator%s.
@@ -1290,10 +1295,10 @@ assessment#:#tst_activate_skill_service_desc#:#Podržava raspoređivanje pitanja
 assessment#:#tst_activation_limited_visibility_info#:#Prije i nakon navedenog razdoblja prikazuje se samo naziv testa. A sudionici ne mogu ispunjavati test.
 assessment#:#tst_activation_online_info#:#Sudionici mogu ispunjavati test samo ako je on stavljen na mrežu (online).
 assessment#:#tst_add_quest_cont_edit_mode#:#Urednik za povratne informacije i savjete
+assessment#:#tst_add_quest_cont_edit_mode_IPE#:#Za uređivanje povratnih informacija i savjeta koristite urednika stranica aplikacije ILIAS
 assessment#:#tst_add_quest_cont_edit_mode_IPE_info#:#No formatting of text in question and answers. No use of LaTex either. But feedback and hints can be reused when question is embedded in ILIAS learning module.###04 06 2021 new variable
+assessment#:#tst_add_quest_cont_edit_mode_RTE#:#Za uređivanje povratnih informacija i savjeta koristite urednika rich-text
 assessment#:#tst_add_quest_cont_edit_mode_RTE_info#:#Allows text formatting of questions, answers, feedbacks and hints. But feedback and hints cannot be reused when question is embedded in ILIAS learning module.###04 06 2021 new variable
-assessment#:#tst_add_quest_cont_edit_mode_default#:#Za uređivanje povratnih informacija i savjeta koristite urednika rich-text
-assessment#:#tst_add_quest_cont_edit_mode_page_object#:#Za uređivanje povratnih informacija i savjeta koristite urednika stranica aplikacije ILIAS
 assessment#:#tst_addit_passes_blocked_after_passed_msg#:#You have passed the test. The test cannot be started again.###04 06 2021 new variable
 assessment#:#tst_all_test_competences#:#Sva kompetencije testa
 assessment#:#tst_all_user_data_deleted#:#Svi korisnički podaci ovog testa su uklonjeni!
@@ -1397,6 +1402,7 @@ assessment#:#tst_dynamic_question_set_source_questionpool_summary_string#:#%s (S
 assessment#:#tst_edit_competence_assign#:#Obradi karakteristike dodjele
 assessment#:#tst_edit_scoring#:#Uredi ocjenjivanje
 assessment#:#tst_ending_time#:#Vrijeme dovršetka
+assessment#:#tst_ending_time_before_starting_time#:#Please enter a date for the end of the test that is after the start date.###31 08 2022 new variable
 assessment#:#tst_ending_time_desc#:#Trenutak kada će se test završiti: Sudionici od ovoga trenutka više ne mogu odgovarati na pitanja. Ilias je završio test.
 assessment#:#tst_enter_questionpool#:#Molimo unesite naziv bazena pitanja u kojem će se pohraniti novo pitanje
 assessment#:#tst_eval_question_points#:#Rezultati pitanja za prolaz testa %s
@@ -1613,8 +1619,6 @@ assessment#:#tst_objective_oriented_test_pass_without_questions#:#Započeti prol
 assessment#:#tst_objective_progress_header#:#Napredak kod cilja učenja
 assessment#:#tst_objectives_progress_header#:#Napredak u ciljevima učenja
 assessment#:#tst_old_style_rnd_quest_set_broken#:#Ovaj je slučajni test u nepopravljivu stanju, jer su jedan ili više povezanih bazena pitanja izbrisani. Zbog toga sudionici ne mogu dalje ispunjavati test.
-assessment#:#tst_opening_period#:#Access times###29 07 2022 new variable
-assessment#:#tst_opening_period_desc#:#Interval in which Users have access to the test. <b>Important</b>: Do <b>not</b> use this option for e-exams/distance exams. Instead, use the function "Limit processing time", see below. Only then will the test be ended on the server side and each participant's last entry automatically saved as an authorised answer.###29 07 2022 new variable
 assessment#:#tst_optional_questions_confirmation_fixed_test#:#<b>Pitanja vezana za već uspješno obrađene ciljeve učenja su već uspješno rješena u prethodnim pokušajima.</b><br /><br /> Vi želite prijeći na pitanje, koje se odnosi na već usvojen cilj učenja.<br /> Možete odabrati:<br /><br /> Ako nastavite, možete ponovno obraditi pitanja vezana za te ciljeve učenja ili ih samo pregledati. Ako promijenite svoje odgovore iz prethodnih pokušaja, možete pogoršati i svoj rezultat cilja učenja.<br /><br /> Ako ne želite ponovno obraditi ili pregledati ova pitanja, možete se vratiti. Pitanja će se u svakom slučaju uzeti u obzir u procjeni.
 assessment#:#tst_optional_questions_confirmation_non_fixed_test#:#<b>Pitanja vezana za već uspješno obrađene ciljeve učenja su opcionalna.</b><br /><br /> Vi želite prijeći na pitanje, koje se odnosi na već usvojen cilj učenja.<br /> Možete odabrati:<br /><br /> Ako nastavite, možete obraditi pitanja vezana za te ciljeve učenja. Vaši odgovori iz prethodnih pokušaja nisu preuzeti, jer su za ovaj pokušaj odabrana nova pitanja. U slučaju ponovne obrade pitanja možete i pogoršati svoj rezultat cilja učenja.<br /><br /> Ako ne želite ponovno obraditi ova pitanja, možete se vratiti. U tom slučaju ta se pitanja neće uzeti u obzir u procjeni.
 assessment#:#tst_participant#:#Sudionik
@@ -1707,6 +1711,7 @@ assessment#:#tst_question_hints_ordering_clipboard_resetted#:#Međuspremnik za r
 assessment#:#tst_question_hints_paste_after_success_msg#:#Savjet %s je uspješno dodan iza savjeta %s.
 assessment#:#tst_question_hints_paste_before_success_msg#:#Savjet %s je uspješno dodan ispred savjeta %s.
 assessment#:#tst_question_hints_request_confirmation#:#Želite li zaista zatražiti savjet %s? Za taj savjet odbit će se %s bodova.
+assessment#:#tst_question_hints_request_confirmation_no_deduction#:#No points will be deducted for this hint.###09 11 2022 new variable
 assessment#:#tst_question_hints_requested_hint_count_header#:#Zatraženi savjeti za rješenje
 assessment#:#tst_question_hints_save_order_success_msg#:#Redoslijed savjet je uspješno spremljen.
 assessment#:#tst_question_hints_tab#:#Savjeti (hints)
@@ -1910,11 +1915,15 @@ assessment#:#tst_tab_results_objective_oriented#:#Rezultati testa po ciljevima u
 assessment#:#tst_tab_results_pass_oriented#:#Rezultati testa po pokušajima
 assessment#:#tst_tbl_col_answered_questions#:#Pitanja na koja je odgovoreno
 assessment#:#tst_tbl_col_final_mark#:#Ocjena
+assessment#:#tst_tbl_col_finished_passes#:#Finished Passes###31 08 2022 new variable
+assessment#:#tst_tbl_col_finished_passes_num_of#:#%s of %s###31 08 2022 new variable
+assessment#:#tst_tbl_col_last_scored_access#:#Last Scored Access###31 08 2022 new variable
 assessment#:#tst_tbl_col_pass_finished#:#Prolaz završen
 assessment#:#tst_tbl_col_passed_status#:#Ocjenjivanje
 assessment#:#tst_tbl_col_percent_result#:#Riješeni postotak
 assessment#:#tst_tbl_col_reached_points#:#Postignuti bodovi
 assessment#:#tst_tbl_col_scored_pass#:#Ocijenjen prolaz
+assessment#:#tst_tbl_col_started_passes#:#Started Passes###31 08 2022 new variable
 assessment#:#tst_tbl_invited_users#:#Ručno odabrani sudionici
 assessment#:#tst_tbl_participants#:#Sudionici
 assessment#:#tst_tbl_results_grades#:#Rezultati i ocjene
@@ -3134,14 +3143,16 @@ cmix#:#conf_own_window#:#Own Window###04 06 2021 new variable
 cmix#:#conf_own_window_info#:#The content is opened in the same window and replaces the ILIAS Screen. When leaving the content the user returns to ILIAS.###04 06 2021 new variable
 cmix#:#conf_privacy_comment_default#:#Indication to user###04 06 2021 new variable
 cmix#:#conf_privacy_ident#:#User identification###04 06 2021 new variable
-cmix#:#conf_privacy_ident_il_uuid_SHA256#:#Hash combined with a unique ILIAS platform id formatted as an E-Mail address###29 07 2022 new variable
-cmix#:#conf_privacy_ident_il_uuid_SHA256_info#:#This is identical to each call, but does not permit any direct conclusions about the ILIAS user.###29 07 2022 new variable
 cmix#:#conf_privacy_ident_il_uuid_ext_account#:#External User Id combined with a unique ILIAS platform id formatted as an E-Mail adress###04 06 2021 new variable
 cmix#:#conf_privacy_ident_il_uuid_ext_account_info#:#This is identical to each call, but may allow a direct conclusion about the user.###04 06 2021 new variable
 cmix#:#conf_privacy_ident_il_uuid_login#:#ILIAS Login combined with a unique ILIAS platform id formatted as an E-Mail adress###04 06 2021 new variable
 cmix#:#conf_privacy_ident_il_uuid_login_info#:#This is identical to each call, but may allow a direct conclusion about the ILIAS user.###04 06 2021 new variable
 cmix#:#conf_privacy_ident_il_uuid_random#:#Random ID combined with a unique ILIAS platform ID formatted as an E-Mail address###04 06 2021 new variable
 cmix#:#conf_privacy_ident_il_uuid_random_info#:#For each ILIAS object and ILIAS user a random ID is generated which remains identical for each call. Conclusions about a user are very limited because it is practically impossible to create user profiles across objects.###04 06 2021 new variable
+cmix#:#conf_privacy_ident_il_uuid_sha256#:#Hash combined with a unique ILIAS platform id formatted as an E-Mail address###26 09 2022 new variable
+cmix#:#conf_privacy_ident_il_uuid_sha256_info#:#This is identical to each call, but does not permit any direct conclusions about the ILIAS user.###26 09 2022 new variable
+cmix#:#conf_privacy_ident_il_uuid_sha256url#:#Hash combined with the ILIAS Domain formatted as an E-Mail address###26 09 2022 new variable
+cmix#:#conf_privacy_ident_il_uuid_sha256url_info#:#This is identical to each call, with with a maximum of 80 characters significantly shorter than the variant with the ILIAS platform ID and allows only very limited conclusions about the ILIAS user.###26 09 2022 new variable
 cmix#:#conf_privacy_ident_il_uuid_user_id#:#ILIAS user id combined with a unique ILIAS platform id formatted as an E-Mail adress###04 06 2021 new variable
 cmix#:#conf_privacy_ident_il_uuid_user_id_info#:#This is identical to each call, but doesn't allow a direct conclusion about the ILIAS user.###04 06 2021 new variable
 cmix#:#conf_privacy_ident_info#:#Standard is frequently the email address. The unique ILIAS platform id is:###04 06 2021 new variable
@@ -5974,6 +5985,7 @@ cont#:#cont_skill_do_not_set#:#Ne postavljaj
 cont#:#cont_skill_members#:#Članovi
 cont#:#cont_skill_no_profile_selected#:#Please select a profile.###04 06 2021 new variable
 cont#:#cont_skill_no_skill#:#Nema vrijednosti (resetiraj)
+cont#:#cont_skill_no_skills_selected#:#No competences have been selected yet. Please add at least one competence first under "Competence Selection".###09 11 2022 new variable
 cont#:#cont_skill_profile#:#Profile###04 06 2021 new variable
 cont#:#cont_skill_profiles#:#Assigned Profiles of Members###04 06 2021 new variable
 cont#:#cont_skill_publish#:#Objavi
@@ -10341,12 +10353,14 @@ lti#:#activity_id#:#Activity ID###04 06 2021 new variable
 lti#:#activity_id_info#:#This Activity ID is used by the LTI Provider to identify Statements.###04 06 2021 new variable
 lti#:#auth_lti#:#LTI Auth
 lti#:#conf_privacy_ident#:#User identification###04 06 2021 new variable
-lti#:#conf_privacy_ident_il_uuid_SHA256#:#Hash combined with a unique ILIAS platform id formatted as an E-Mail address###29 07 2022 new variable
-lti#:#conf_privacy_ident_il_uuid_SHA256_info#:#This is identical to each call, but does not permit any direct conclusions about the ILIAS user.###29 07 2022 new variable
 lti#:#conf_privacy_ident_il_uuid_ext_account#:#External User Id combined with a unique ILIAS platform id formated as an email adress.###04 06 2021 new variable
 lti#:#conf_privacy_ident_il_uuid_ext_account_info#:#This is identical to each call, but may allow a direct conclusion about the user.###04 06 2021 new variable
 lti#:#conf_privacy_ident_il_uuid_login#:#ILIAS Login combined with a unique ILIAS platform id formated as an email adress.###04 06 2021 new variable
 lti#:#conf_privacy_ident_il_uuid_login_info#:#This is identical to each call, but may allow a direct conclusion about the ILIAS user.###04 06 2021 new variable
+lti#:#conf_privacy_ident_il_uuid_sha256#:#Hash combined with a unique ILIAS platform id formatted as an E-Mail address###26 09 2022 new variable
+lti#:#conf_privacy_ident_il_uuid_sha256_info#:#This is identical to each call, but does not permit any direct conclusions about the ILIAS user.###26 09 2022 new variable
+lti#:#conf_privacy_ident_il_uuid_sha256url#:#Hash combined with the ILIAS Domain formatted as an E-Mail address###26 09 2022 new variable
+lti#:#conf_privacy_ident_il_uuid_sha256url_info#:#This is identical to each call, with a maximum of 80 characters significantly shorter than the variant with the ILIAS platform ID and allows only very limited conclusions about the ILIAS user.###26 09 2022 new variable
 lti#:#conf_privacy_ident_il_uuid_user_id#:#ILIAS user id combined with a unique ILIAS platform id formated as an email adress.###04 06 2021 new variable
 lti#:#conf_privacy_ident_il_uuid_user_id_info#:#This is identical to each call, but doesn't allow a direct conclusion about the ILIAS user.###04 06 2021 new variable
 lti#:#conf_privacy_ident_info#:#Standard is frequently the email address. The unique ILIAS platform id is:###04 06 2021 new variable
@@ -14507,6 +14521,7 @@ skmg#:#skmg_cert_skill_trigger_title#:#Competence Trigger Title
 skmg#:#skmg_confirm_level_resources_removal#:#Do you really want to remove the following resources from the competence level?
 skmg#:#skmg_confirm_remove_level_ass#:#So you really want to remove the following competence levels from the profile?
 skmg#:#skmg_confirm_user_removal#:#Do you really want to remove the following users from this profile?
+skmg#:#skmg_cont_profiles_info#:#In this view, you can select the competence profiles with competence entries, which are related to the currently open object (course/group). To get to the global view with all competence profiles you are assigned to and all competence entries, click on the link below.###31 08 2022 new variable
 skmg#:#skmg_context_global#:#Global###04 06 2021 new variable
 skmg#:#skmg_context_local#:#Local###04 06 2021 new variable
 skmg#:#skmg_create_sctp#:#Create Template Category
@@ -14552,9 +14567,11 @@ skmg#:#skmg_new_sktr#:#New Competence Template Reference
 skmg#:#skmg_next_step#:#Next Step
 skmg#:#skmg_no_nodes_selectable#:#Currently there are no competences selectable.
 skmg#:#skmg_no_skills#:#No Competences
+skmg#:#skmg_no_skills_selected_info#:#You have not selected or fulfilled any competences yet. Click on the "Add Competence"-button to select a competence. You can add any number of competences. If you fulfill competences by editing learning materials, they will be automatically listed here.###09 11 2022 new variable
 skmg#:#skmg_no_trigger#:#No Trigger
 skmg#:#skmg_nr#:#Nr
 skmg#:#skmg_number#:#Number
+skmg#:#skmg_open_all_assigned_profiles#:#Open All Assigned Competence Profiles###31 08 2022 new variable
 skmg#:#skmg_order#:#Order
 skmg#:#skmg_order_nr#:#Order Number
 skmg#:#skmg_order_nr_info#:#Positions competence in the list of competences.
@@ -14593,6 +14610,8 @@ skmg#:#skmg_skill_levels#:#Competence Levels
 skmg#:#skmg_skill_management_deactivated#:#Competence Management is currently deactivated.
 skmg#:#skmg_skill_needs_impr_no_res#:#You need to improve this competence. Unfortunately there are currently no learning resources available providing learning material aligned to your target competence level.
 skmg#:#skmg_skill_needs_impr_res#:#You need to improve this competence. The following resources provide learning material aligned to your target competence level.
+skmg#:#skmg_skill_needs_self_eval#:#Please conduct a self-evaluation first to see your competence target.###09 11 2022 new variable
+skmg#:#skmg_skill_needs_self_eval_box#:#Please note that you have not conducted a self-evaluation for at least one competence in this profile. You will not see the competence target for the affected competences until a self-evaluation is done.###09 11 2022 new variable
 skmg#:#skmg_skill_no_needs_impr#:#Your competence level is sufficient for the selected profile.
 skmg#:#skmg_skill_profiles#:#Profiles
 skmg#:#skmg_skill_template#:#Competence Template
@@ -16208,6 +16227,7 @@ ui#:#ui_chars_max#:#Maksimum:
 ui#:#ui_chars_min#:#Minimum:
 ui#:#ui_chars_remaining#:#Preostali znakovi:
 ui#:#ui_error_in_group#:#There is some error in this part.###04 06 2021 new variable
+ui#:#ui_file_input_invalid_size#:#File exceeds the maximum size of %s MiB.###31 08 2022 new variable
 ui#:#ui_numeric_only#:#Please insert a whole number.###04 06 2021 new variable
 ui#:#ui_tag_required#:#Please insert at least one tag.###27 04 2022 new variable
 user#:#all_roles_has_starting_point#:#All the roles have starting points###04 06 2021 new variable

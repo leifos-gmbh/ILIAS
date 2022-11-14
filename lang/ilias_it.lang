@@ -1,30 +1,32 @@
+/* Copyright (c) 1998-2020 ILIAS open source eLearning e.V., Extended GPL, see docs/LICENSE */
+/**
+* This file is part of ILIAS, a powerful learning management system
+* published by ILIAS open source e-Learning e.V.
 *
+* ILIAS is licensed with the GPL-3.0,
+* see https://www.gnu.org/licenses/gpl-3.0.en.html
+* You should have received a copy of said license along with the
+* source code, too.
 *
+* If this is not the case or you just want to try ILIAS, you'll find
+* us at:
+* https://www.ilias.de
+* https://github.com/ILIAS-eLearning
 *
+/**
+* ILIAS language file
 *
-* @author			OC Open Consulting srl <info@oc-group.eu>
 * @module			language file Italian
 * @modulegroup		language
+* @author			OC Open Consulting srl <info@oc-group.eu>
 * @version			$Id$
-* ILIAS is licensed with the GPL-3.0,
-* ILIAS language file
-* If this is not the case or you just want to try ILIAS, you'll find
-* This file is part of ILIAS, a powerful learning management system
-* You should have received a copy of said license along with the
-* https://github.com/ILIAS-eLearning
-* https://www.ilias.de
-* published by ILIAS open source e-Learning e.V.
-* see https://www.gnu.org/licenses/gpl-3.0.en.html
-* source code, too.
-* us at:
 */
-/**
-// Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
-// NOTICE: Character coding of all ILIAS lang files is UTF-8! Please set your editor
 // The language file starts beyond the HTML-comment below. DO NOT modify this line!
 // To edit your language file with a spreadsheet (i.e. Excel or StarCalc) remove all lines
 // from the first line to the HTML-comment. After editing paste the lines in place again.
+// NOTICE: Character coding of all ILIAS lang files is UTF-8! Please set your editor
 // to the corresponding mode!
+// Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
 acc#:#acc_access_key#:#Chiave di accesso
 acc#:#acc_access_keys#:#Chiavi di accesso
@@ -392,6 +394,9 @@ adn#:#msg_permanent#:#Visualizza
 adn#:#msg_permanent_info#:#Visualizza notifiche in modo permanente o temporaneo
 adn#:#msg_permanent_no#:#Mostra temporaneamente
 adn#:#msg_permanent_yes#:#Mostra permanentemente
+adn#:#msg_presentation#:#Presentation###31 08 2022 new variable
+adn#:#msg_show_to_all_roles#:#Show to all roles###31 08 2022 new variable
+adn#:#msg_show_to_all_roles_info#:#All users even when not logged-in will see notification.###31 08 2022 new variable
 adn#:#msg_success_created#:#Notifica creata
 adn#:#msg_success_deleted#:#Notifica cancellata
 adn#:#msg_success_reset#:#Notifica resettata
@@ -901,6 +906,7 @@ assessment#:#log_wrong_test_password_entered#:#Il partecipante ha inserito una p
 assessment#:#longmenu#:#Menù esteso
 assessment#:#longmenu_text#:#Testo menu esteso
 assessment#:#mailnottype#:#Inviare la notifica anche quando un utente termina un passaggio di prova
+assessment#:#mailnottype_desc#:#Notify the owner of the test <strong>even if</strong> the number of test attempts has not been limited.###09 11 2022 new variable
 assessment#:#maintenance#:#Manutenzione
 assessment#:#manscoring#:#Punteggio manuale
 assessment#:#manscoring_done#:#Partecipanti Valutati
@@ -981,6 +987,7 @@ assessment#:#oq_btn_use_order_pictures#:#Utilizza le immagini di risposta
 assessment#:#oq_btn_use_order_terms#:#Utilizza i termini di risposta
 assessment#:#oq_header_ordering_elements#:#Ordine degli elementi
 assessment#:#or#:#o
+assessment#:#order#:#Order###09 11 2022 new variable
 assessment#:#ordering_answer_sequence_info#:#La sequenza di risposte che definisci qui sara' presa come sequenza di risposte corrette.
 assessment#:#ordertext#:#Ordinando il testo
 assessment#:#ordertext_info#:#Per favore, inserisci il testo che dovrebbe essere ordinato orizzontalmente. Il testo ordinato sarà separato da spazi vuoti. Se c'e' bisogno di una differente spaziatura, si può usare il separatore %s per separare il testo.<br />
@@ -1302,10 +1309,10 @@ assessment#:#tst_activate_skill_service_desc#:#Verrà visualizzata una nuova sch
 assessment#:#tst_activation_limited_visibility_info#:#Se scelto, il test è visibile anche all'esterno della disponibilità data.
 assessment#:#tst_activation_online_info#:#Se non in linea, solo gli amministratori possono visualizzare e modificare il test.
 assessment#:#tst_add_quest_cont_edit_mode#:#Editor per feedback e suggerimenti sulla soluzione
+assessment#:#tst_add_quest_cont_edit_mode_IPE#:#Modifica del contenuto aggiuntivo con l'editor degli oggetti di pagina
 assessment#:#tst_add_quest_cont_edit_mode_IPE_info#:#Nessuna formattazione del testo in domanda e risposte. Nessun uso di LaTex. Feedback e suggerimenti possono essere riutilizzati quando la domanda è incorporata nel modulo ILIAS.
+assessment#:#tst_add_quest_cont_edit_mode_RTE#:#Modalità di modifica predefinita per contenuti di domande aggiuntive
 assessment#:#tst_add_quest_cont_edit_mode_RTE_info#:#Consente la formattazione del testo di domande, risposte, feedback e suggerimenti. Feedback e suggerimenti non possono essere riutilizzati quando la domanda è incorporata nel modulo ILIAS.
-assessment#:#tst_add_quest_cont_edit_mode_default#:#Modalità di modifica predefinita per contenuti di domande aggiuntive
-assessment#:#tst_add_quest_cont_edit_mode_page_object#:#Modifica del contenuto aggiuntivo con l'editor degli oggetti di pagina
 assessment#:#tst_addit_passes_blocked_after_passed_msg#:#Hai superato il test. Il test non può essere riavviato.
 assessment#:#tst_all_test_competences#:#Tutte le competenze di test
 assessment#:#tst_all_user_data_deleted#:#Tutti i dati dei partecipanti a questo test sono stati cancellati!
@@ -1409,6 +1416,7 @@ assessment#:#tst_dynamic_question_set_source_questionpool_summary_string#:#%s (P
 assessment#:#tst_edit_competence_assign#:#Modifica delle proprietà di assegnazione
 assessment#:#tst_edit_scoring#:#Modifica il punteggio
 assessment#:#tst_ending_time#:#Ora di fine
+assessment#:#tst_ending_time_before_starting_time#:#Please enter a date for the end of the test that is after the start date.###31 08 2022 new variable
 assessment#:#tst_ending_time_desc#:#Punto nel tempo durante il quale il test terminerà: I partecipanti non possono più rispondere alle domande, il test è terminato da ILIAS.
 assessment#:#tst_enter_questionpool#:#Per favore inserisci il nome della raccolta di domande nella quale verra' inserita la domanda
 assessment#:#tst_eval_question_points#:#Risultati per test %s
@@ -1625,8 +1633,6 @@ assessment#:#tst_objective_oriented_test_pass_without_questions#:#Il passaggio a
 assessment#:#tst_objective_progress_header#:#Progresso dell’obiettivo di apprendimento
 assessment#:#tst_objectives_progress_header#:#Progresso degli obiettivi di apprendimento
 assessment#:#tst_old_style_rnd_quest_set_broken#:#Questo test casuale è in uno stato irreparabile perché una o più raccolte di domande sono state eliminate. Pertanto i partecipanti non possono più effettuare i test.
-assessment#:#tst_opening_period#:#Access times###29 07 2022 new variable
-assessment#:#tst_opening_period_desc#:#Interval in which Users have access to the test. <b>Important</b>: Do <b>not</b> use this option for e-exams/distance exams. Instead, use the function "Limit processing time", see below. Only then will the test be ended on the server side and each participant's last entry automatically saved as an authorised answer.###29 07 2022 new variable
 assessment#:#tst_optional_questions_confirmation_fixed_test#:#<b> Alle domande relative agli obiettivi di apprendimento già superati è stata data risposta in passaggi precedenti. </b> <br /> <br /> Si desidera passare a una domanda relativa ad un obiettivo di apprendimento già superato. <br /> Tu puoi scegliere: <br /> <br /> Procedi, puoi lavorare o semplicemente rivedere queste domande. Se modifichi le risposte che sono state adottate dai passaggi precedenti, puoi anche peggiorare il risultato dell'obiettivo di apprendimento. <br /> <br /> Se decidi di non lavorare o rivedere queste domande, puoi tornare indietro. Le domande saranno prese in considerazione nella valutazione in ogni caso.
 assessment#:#tst_optional_questions_confirmation_non_fixed_test#:#<b> La domanda relativa agli obiettivi di apprendimento già superati è facoltativa. </b> <br /> <br /> Desideri passare a una domanda relativa a un obiettivo di apprendimento già superato. <br /> Puoi scegliere: <br /> <br /> se procedi, puoi lavorare su queste domande. Le tue risposte da precedenti tentativi non sono state adottate, poiché per questo tentativo sono state selezionate nuove domande casuali. Lavorando su queste domande puoi anche peggiorare il risultato del tuo obiettivo di apprendimento. <br /> <br /> Se decidi di non lavorare su queste domande, puoi tornare indietro. In questo caso queste domande non saranno prese in considerazione nella valutazione.
 assessment#:#tst_participant#:#Participante
@@ -1719,6 +1725,7 @@ assessment#:#tst_question_hints_ordering_clipboard_resetted#:#Gli appunti di ord
 assessment#:#tst_question_hints_paste_after_success_msg#:#Il suggerimento %s è stato correttamente posizionato dopo il suggerimento %s.
 assessment#:#tst_question_hints_paste_before_success_msg#:#Il suggerimento %s è stato correttamente posizionato prima del suggerimento %s.
 assessment#:#tst_question_hints_request_confirmation#:#Vuoi davvero richiedere il suggerimento %s? Per questo suggerimento verranno scalati %s punti.
+assessment#:#tst_question_hints_request_confirmation_no_deduction#:#No points will be deducted for this hint.###09 11 2022 new variable
 assessment#:#tst_question_hints_requested_hint_count_header#:#Suggerimenti richiesti
 assessment#:#tst_question_hints_save_order_success_msg#:#L'ordine dei suggerimenti è stato salvato con successo.
 assessment#:#tst_question_hints_tab#:#Suggerimenti
@@ -1922,11 +1929,15 @@ assessment#:#tst_tab_results_objective_oriented#:#Risultati per obiettivi di app
 assessment#:#tst_tab_results_pass_oriented#:#Risultati per tentativi
 assessment#:#tst_tbl_col_answered_questions#:#Domande con risposta
 assessment#:#tst_tbl_col_final_mark#:#Voto
+assessment#:#tst_tbl_col_finished_passes#:#Finished Passes###31 08 2022 new variable
+assessment#:#tst_tbl_col_finished_passes_num_of#:#%s of %s###31 08 2022 new variable
+assessment#:#tst_tbl_col_last_scored_access#:#Last Scored Access###31 08 2022 new variable
 assessment#:#tst_tbl_col_pass_finished#:#Passaggio finito
 assessment#:#tst_tbl_col_passed_status#:#Votazione
 assessment#:#tst_tbl_col_percent_result#:#Risultato in percentuale
 assessment#:#tst_tbl_col_reached_points#:#Punti raggiunti
 assessment#:#tst_tbl_col_scored_pass#:#Passaggio segnato
+assessment#:#tst_tbl_col_started_passes#:#Started Passes###31 08 2022 new variable
 assessment#:#tst_tbl_invited_users#:#Partecipanti selezionati manualmente
 assessment#:#tst_tbl_participants#:#Partecipanti
 assessment#:#tst_tbl_results_grades#:#Risultati e voti
@@ -3146,14 +3157,16 @@ cmix#:#conf_own_window#:#Stessa finestra
 cmix#:#conf_own_window_info#:#Il contenuto viene aperto nella stessa finestra e sostituisce la schermata ILIAS. All'uscita dal contenuto l'utente torna su ILIAS.
 cmix#:#conf_privacy_comment_default#:#Indicazione all'utente
 cmix#:#conf_privacy_ident#:#Identificativo Utente
-cmix#:#conf_privacy_ident_il_uuid_SHA256#:#Hash combined with a unique ILIAS platform id formatted as an E-Mail address###29 07 2022 new variable
-cmix#:#conf_privacy_ident_il_uuid_SHA256_info#:#This is identical to each call, but does not permit any direct conclusions about the ILIAS user.###29 07 2022 new variable
 cmix#:#conf_privacy_ident_il_uuid_ext_account#:#ID utente esterno combinato con un identificativo di  piattaforma ILIAS univoco, formattato come indirizzo email
 cmix#:#conf_privacy_ident_il_uuid_ext_account_info#:#Questo è identico a ogni chiamata, ma può consentire di trarre conclusioni dirette sull'utente.
 cmix#:#conf_privacy_ident_il_uuid_login#:#ID utente esterno combinato con un identificativo di  piattaforma ILIAS univoco, formattato come indirizzo email
 cmix#:#conf_privacy_ident_il_uuid_login_info#:#Questo è identico a ogni chiamata, ma può consentire di trarre conclusioni dirette sull'utente.
 cmix#:#conf_privacy_ident_il_uuid_random#:#ID casuale combinato con un identificativo di piattaforma ILIAS univoco, che è formattato come un indirizzo email
 cmix#:#conf_privacy_ident_il_uuid_random_info#:#Viene generato un ID casuale per ogni oggetto ILIAS e utente ILIAS e rimane identico ogni volta che viene chiamato. Le conclusioni su un utente sono molto limitate, poiché è praticamente impossibile creare profili utente.
+cmix#:#conf_privacy_ident_il_uuid_sha256#:#Hash combined with a unique ILIAS platform id formatted as an E-Mail address###26 09 2022 new variable
+cmix#:#conf_privacy_ident_il_uuid_sha256_info#:#This is identical to each call, but does not permit any direct conclusions about the ILIAS user.###26 09 2022 new variable
+cmix#:#conf_privacy_ident_il_uuid_sha256url#:#Hash combined with the ILIAS Domain formatted as an E-Mail address###26 09 2022 new variable
+cmix#:#conf_privacy_ident_il_uuid_sha256url_info#:#This is identical to each call, with with a maximum of 80 characters significantly shorter than the variant with the ILIAS platform ID and allows only very limited conclusions about the ILIAS user.###26 09 2022 new variable
 cmix#:#conf_privacy_ident_il_uuid_user_id#:#ID utente ILIAS combinato con un identificativo di  piattaforma ILIAS univoco, formattato come indirizzo email
 cmix#:#conf_privacy_ident_il_uuid_user_id_info#:#Questo è identico a tutte le chiamate, ma non consente di trarre conclusioni dirette sull'utente ILIAS.
 cmix#:#conf_privacy_ident_info#:#L'indirizzo e-mail è spesso lo standard. L'ID univoco della piattaforma ILIAS è:
@@ -5986,6 +5999,7 @@ cont#:#cont_skill_do_not_set#:#Non impostare
 cont#:#cont_skill_members#:#Membri
 cont#:#cont_skill_no_profile_selected#:#Selezionare un profilo
 cont#:#cont_skill_no_skill#:#Nessun valore (Ripristina)
+cont#:#cont_skill_no_skills_selected#:#No competences have been selected yet. Please add at least one competence first under "Competence Selection".###09 11 2022 new variable
 cont#:#cont_skill_profile#:#Profilo
 cont#:#cont_skill_profiles#:#Profilo dei membri
 cont#:#cont_skill_publish#:#Pubblica
@@ -10353,12 +10367,14 @@ lti#:#activity_id#:#ID attività
 lti#:#activity_id_info#:#Questo ID attività viene utilizzato dal provider LTI per identificare gli statements.
 lti#:#auth_lti#:#Auth LTI
 lti#:#conf_privacy_ident#:#Identificativo utente
-lti#:#conf_privacy_ident_il_uuid_SHA256#:#Hash combined with a unique ILIAS platform id formatted as an E-Mail address###29 07 2022 new variable
-lti#:#conf_privacy_ident_il_uuid_SHA256_info#:#This is identical to each call, but does not permit any direct conclusions about the ILIAS user.###29 07 2022 new variable
 lti#:#conf_privacy_ident_il_uuid_ext_account#:#User ID esterno unito ad un identificativo univoco della piattaforma ILIAS, formattato come un indirizzo email.
 lti#:#conf_privacy_ident_il_uuid_ext_account_info#:#Questo è identico per ogni chiamata, ma permetterebbe una conclusione diretta sull'utente.
 lti#:#conf_privacy_ident_il_uuid_login#:#Nome utente in ILIAS unito ad un identificativo univoco della piattaforma ILIAS, formattato come un indirizzo email.
 lti#:#conf_privacy_ident_il_uuid_login_info#:#Questo è identico per ogni chiamata, ma permetterebbe una conclusione diretta sull'utente.
+lti#:#conf_privacy_ident_il_uuid_sha256#:#Hash combined with a unique ILIAS platform id formatted as an E-Mail address###26 09 2022 new variable
+lti#:#conf_privacy_ident_il_uuid_sha256_info#:#This is identical to each call, but does not permit any direct conclusions about the ILIAS user.###26 09 2022 new variable
+lti#:#conf_privacy_ident_il_uuid_sha256url#:#Hash combined with the ILIAS Domain formatted as an E-Mail address###26 09 2022 new variable
+lti#:#conf_privacy_ident_il_uuid_sha256url_info#:#This is identical to each call, with a maximum of 80 characters significantly shorter than the variant with the ILIAS platform ID and allows only very limited conclusions about the ILIAS user.###26 09 2022 new variable
 lti#:#conf_privacy_ident_il_uuid_user_id#:#User ID in ILIAS unito ad un identificativo univoco della piattaforma ILIAS, formattato come un indirizzo email.
 lti#:#conf_privacy_ident_il_uuid_user_id_info#:#Questo è identico per ogni chiamata, ma NON permette una conclusione diretta sull'utente.
 lti#:#conf_privacy_ident_info#:#Standard è spesso l'indirizzo email. L'identificativo univoco della piattaforma ILIAS è:
@@ -14519,6 +14535,7 @@ skmg#:#skmg_cert_skill_trigger_title#:#Titolo trigger competenze
 skmg#:#skmg_confirm_level_resources_removal#:#Vuoi veramente rimuovere le seguenti risorse dal livello di competenze?
 skmg#:#skmg_confirm_remove_level_ass#:#Vuoi davvero rimuovere i seguenti livelli di competenze da questo profilo?
 skmg#:#skmg_confirm_user_removal#:#Vuoi davvero rimuovere i seguenti utenti da questo profilo?
+skmg#:#skmg_cont_profiles_info#:#In this view, you can select the competence profiles with competence entries, which are related to the currently open object (course/group). To get to the global view with all competence profiles you are assigned to and all competence entries, click on the link below.###31 08 2022 new variable
 skmg#:#skmg_context_global#:#Global
 skmg#:#skmg_context_local#:#Local
 skmg#:#skmg_create_sctp#:#Crea una Categoria di Template
@@ -14564,9 +14581,11 @@ skmg#:#skmg_new_sktr#:#Nuova Relazione di Template di competenze.
 skmg#:#skmg_next_step#:#Prossima azione.
 skmg#:#skmg_no_nodes_selectable#:#Attualmente non ci sono competenze selezionabili.
 skmg#:#skmg_no_skills#:#Nessuna competenze.
+skmg#:#skmg_no_skills_selected_info#:#You have not selected or fulfilled any competences yet. Click on the "Add Competence"-button to select a competence. You can add any number of competences. If you fulfill competences by editing learning materials, they will be automatically listed here.###09 11 2022 new variable
 skmg#:#skmg_no_trigger#:#No Trigger.
 skmg#:#skmg_nr#:#Nr.
 skmg#:#skmg_number#:#Numero
+skmg#:#skmg_open_all_assigned_profiles#:#Open All Assigned Competence Profiles###31 08 2022 new variable
 skmg#:#skmg_order#:#Ordine.
 skmg#:#skmg_order_nr#:#Numero d'ordine.
 skmg#:#skmg_order_nr_info#:#Posizioni competenze nell'elenco delle competenze.
@@ -14605,6 +14624,8 @@ skmg#:#skmg_skill_levels#:#Livelli di competenze.
 skmg#:#skmg_skill_management_deactivated#:#La gestione delle Competenze è attualmente disattivata.
 skmg#:#skmg_skill_needs_impr_no_res#:#È necessario migliorare questa competenze. Sfortunatamente non sono attualmente disponibili risorse di apprendimento per fornire materiale didattico adeguato al livello di competenze di destinazione.
 skmg#:#skmg_skill_needs_impr_res#:#È necessario migliorare questa competenze. Le seguenti risorse forniscono materiale didattico adeguato al livello di competenze di destinazione.
+skmg#:#skmg_skill_needs_self_eval#:#Please conduct a self-evaluation first to see your competence target.###09 11 2022 new variable
+skmg#:#skmg_skill_needs_self_eval_box#:#Please note that you have not conducted a self-evaluation for at least one competence in this profile. You will not see the competence target for the affected competences until a self-evaluation is done.###09 11 2022 new variable
 skmg#:#skmg_skill_no_needs_impr#:#Il tuo livello di competenze è sufficiente per il profilo selezionato.
 skmg#:#skmg_skill_profiles#:#Profili
 skmg#:#skmg_skill_template#:#Template di competenze.
@@ -16220,6 +16241,7 @@ ui#:#ui_chars_max#:#Massimo:
 ui#:#ui_chars_min#:#Minimo:
 ui#:#ui_chars_remaining#:#Caratteri rimanenti:
 ui#:#ui_error_in_group#:#C'è un errore in questa parte.
+ui#:#ui_file_input_invalid_size#:#File exceeds the maximum size of %s MiB.###31 08 2022 new variable
 ui#:#ui_numeric_only#:#Per favore inserisci un numero intero.
 ui#:#ui_tag_required#:#Please insert at least one tag.###27 04 2022 new variable
 user#:#all_roles_has_starting_point#:#Tutti i ruoli hanno dei punti di inizio

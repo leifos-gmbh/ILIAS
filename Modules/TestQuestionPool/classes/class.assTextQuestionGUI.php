@@ -427,7 +427,7 @@ class assTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
         }
 
         $template->setVariable("QID", $this->object->getId());
-        $template->setVariable("ESSAY", ilUtil::prepareFormOutput($user_solution));
+        $template->setVariable("ESSAY", ilUtil::prepareFormOutput(html_entity_decode($user_solution)));
         $questiontext = $this->object->getQuestion();
         $template->setVariable("QUESTIONTEXT", $this->object->prepareTextareaOutput($questiontext, true));
         $questionoutput = $template->get();
@@ -553,6 +553,7 @@ class assTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionScoringA
         // maxchars
         $maxchars = new ilNumberInputGUI($this->lng->txt("maxchars"), "maxchars");
         $maxchars->setSize(5);
+        $maxchars->setMinValue(1);
         if ($this->object->getMaxNumOfChars() > 0) {
             $maxchars->setValue($this->object->getMaxNumOfChars());
         }

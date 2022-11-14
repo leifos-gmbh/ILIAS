@@ -1,30 +1,32 @@
+/* Copyright (c) 1998-2020 ILIAS open source eLearning e.V., Extended GPL, see docs/LICENSE */
+/**
+* This file is part of ILIAS, a powerful learning management system
+* published by ILIAS open source e-Learning e.V.
 *
+* ILIAS is licensed with the GPL-3.0,
+* see https://www.gnu.org/licenses/gpl-3.0.en.html
+* You should have received a copy of said license along with the
+* source code, too.
 *
+* If this is not the case or you just want to try ILIAS, you'll find
+* us at:
+* https://www.ilias.de
+* https://github.com/ILIAS-eLearning
 *
+/**
+* ILIAS language file
 *
-* @author 		Hendrik Dahmann <HDahmann@ovb.de>
 * @module		language file Slovenian
 * @modulegroup	language
+* @author 		Hendrik Dahmann <HDahmann@ovb.de>
 * @version		$Id$
-* ILIAS is licensed with the GPL-3.0,
-* ILIAS language file
-* If this is not the case or you just want to try ILIAS, you'll find
-* This file is part of ILIAS, a powerful learning management system
-* You should have received a copy of said license along with the
-* https://github.com/ILIAS-eLearning
-* https://www.ilias.de
-* published by ILIAS open source e-Learning e.V.
-* see https://www.gnu.org/licenses/gpl-3.0.en.html
-* source code, too.
-* us at:
 */
-/**
-// Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
-// NOTICE: Character coding of all ILIAS lang files is UTF-8! Please set your editor
 // The language file starts beyond the HTML-comment below. DO NOT modify this line!
 // To edit your language file with a spreadsheet (i.e. Excel or StarCalc) remove all lines
 // from the first line to the HTML-comment. After editing paste the lines in place again.
+// NOTICE: Character coding of all ILIAS lang files is UTF-8! Please set your editor
 // to the corresponding mode!
+// Language file names refer to ISO 639, see: http://www.oasis-open.org/cover/iso639a.html
 <!-- language file start -->
 acc#:#acc_access_key#:#Access Key
 acc#:#acc_access_keys#:#Access Keys
@@ -904,6 +906,7 @@ assessment#:#log_wrong_test_password_entered#:#Udeleženec je vnesel napačno te
 assessment#:#longmenu#:#Longmenu
 assessment#:#longmenu_text#:#Besedilo ‘Long Menu’
 assessment#:#mailnottype#:#Pošiljanje se izvede tudi ob zaključku posameznih opravljanj testa
+assessment#:#mailnottype_desc#:#Notify the owner of the test <strong>even if</strong> the number of test attempts has not been limited.###09 11 2022 new variable
 assessment#:#maintenance#:#Vzdrževanje
 assessment#:#manscoring#:#Ročno ocenjevanje
 assessment#:#manscoring_done#:#Udeleženci, ki so že bili ocenjeni
@@ -984,6 +987,7 @@ assessment#:#oq_btn_use_order_pictures#:#Uporabi odgovor s slikami
 assessment#:#oq_btn_use_order_terms#:#Uporabi odgovor z izrazi
 assessment#:#oq_header_ordering_elements#:#Elementi razporejanja
 assessment#:#or#:#ali
+assessment#:#order#:#Order###09 11 2022 new variable
 assessment#:#ordering_answer_sequence_info#:#Na tem mestu definirano zaporedje odgovorov se uporabi kot pravilen vrstni red rešitev.
 assessment#:#ordertext#:#Besedilo za razporeditev
 assessment#:#ordertext_info#:#Vnesite besedilo v takšnem zaporedju, kot naj bo razvrščeno horizontalno. Posamezne sestavine so ločene s presledki. Če potrebujete drugačno ločitev, namesto presledkov uporabite ločilo %s.
@@ -1305,10 +1309,10 @@ assessment#:#tst_activate_skill_service_desc#:#Podpira dodelitev vprašanj kompe
 assessment#:#tst_activation_limited_visibility_info#:#Izven določenega obdobja se prikaže ime testa. Testa ni mogoče zagnati.
 assessment#:#tst_activation_online_info#:#Udeleženci lahko opravljajo test le, če je na spletu.
 assessment#:#tst_add_quest_cont_edit_mode#:#Urednik za povratne informacije in namige glede rešitev.
+assessment#:#tst_add_quest_cont_edit_mode_IPE#:#Uporabite urejevalnik strani ILIAS za urejanje povratnih informacij in nasvetov
 assessment#:#tst_add_quest_cont_edit_mode_IPE_info#:#No formatting of text in question and answers. No use of LaTex either. But feedback and hints can be reused when question is embedded in ILIAS learning module.
+assessment#:#tst_add_quest_cont_edit_mode_RTE#:#Za urejanje povratnih informacij in nasvetov uporabite urejevalnik obogatenega besedila
 assessment#:#tst_add_quest_cont_edit_mode_RTE_info#:#Allows text formatting of questions, answers, feedbacks and hints. But feedback and hints cannot be reused when question is embedded in ILIAS learning module.
-assessment#:#tst_add_quest_cont_edit_mode_default#:#Za urejanje povratnih informacij in nasvetov uporabite urejevalnik obogatenega besedila
-assessment#:#tst_add_quest_cont_edit_mode_page_object#:#Uporabite urejevalnik strani ILIAS za urejanje povratnih informacij in nasvetov
 assessment#:#tst_addit_passes_blocked_after_passed_msg#:#You have passed the test. The test cannot be started again.
 assessment#:#tst_all_test_competences#:#Vse testne kompetence
 assessment#:#tst_all_user_data_deleted#:#Podatki vseh udeležencev testa so bili izbrisani!
@@ -1721,6 +1725,7 @@ assessment#:#tst_question_hints_ordering_clipboard_resetted#:#Odložišče za ra
 assessment#:#tst_question_hints_paste_after_success_msg#:#Namig za rešitev %s je bil po namigu za rešitev %s uspešno dodan.
 assessment#:#tst_question_hints_paste_before_success_msg#:#Namig za rešitev %s je bil pred namigom za rešitev %s uspešno dodan.
 assessment#:#tst_question_hints_request_confirmation#:#Ali ste prepričani, da želite zahtevati namig za rešitev %s? Za ta namig za rešitev se odšteje %s točk.
+assessment#:#tst_question_hints_request_confirmation_no_deduction#:#No points will be deducted for this hint.###09 11 2022 new variable
 assessment#:#tst_question_hints_requested_hint_count_header#:#Zahtevani namigi za rešitev
 assessment#:#tst_question_hints_save_order_success_msg#:#Zaporedje namigov za rešitev je bilo uspešno shranjeno.
 assessment#:#tst_question_hints_tab#:#Namigi za rešitev
@@ -3152,14 +3157,16 @@ cmix#:#conf_own_window#:#Own Window
 cmix#:#conf_own_window_info#:#The content is opened in the same window and replaces the ILIAS Screen. When leaving the content the user returns to ILIAS.
 cmix#:#conf_privacy_comment_default#:#Indication to user
 cmix#:#conf_privacy_ident#:#User identification
-cmix#:#conf_privacy_ident_il_uuid_SHA256#:#Hash combined with a unique ILIAS platform id formatted as an E-Mail address###20 07 2022 new variable
-cmix#:#conf_privacy_ident_il_uuid_SHA256_info#:#This is identical to each call, but does not permit any direct conclusions about the ILIAS user.###20 07 2022 new variable
 cmix#:#conf_privacy_ident_il_uuid_ext_account#:#External User Id combined with a unique ILIAS platform id formatted as an E-Mail adress
 cmix#:#conf_privacy_ident_il_uuid_ext_account_info#:#This is identical to each call, but may allow a direct conclusion about the user.
 cmix#:#conf_privacy_ident_il_uuid_login#:#ILIAS Login combined with a unique ILIAS platform id formatted as an E-Mail adress
 cmix#:#conf_privacy_ident_il_uuid_login_info#:#This is identical to each call, but may allow a direct conclusion about the ILIAS user.
 cmix#:#conf_privacy_ident_il_uuid_random#:#Random ID combined with a unique ILIAS platform ID formatted as an E-Mail address
 cmix#:#conf_privacy_ident_il_uuid_random_info#:#For each ILIAS object and ILIAS user a random ID is generated which remains identical for each call. Conclusions about a user are very limited because it is practically impossible to create user profiles across objects.
+cmix#:#conf_privacy_ident_il_uuid_sha256#:#Hash combined with a unique ILIAS platform id formatted as an E-Mail address###26 09 2022 new variable
+cmix#:#conf_privacy_ident_il_uuid_sha256_info#:#This is identical to each call, but does not permit any direct conclusions about the ILIAS user.###26 09 2022 new variable
+cmix#:#conf_privacy_ident_il_uuid_sha256url#:#Hash combined with the ILIAS Domain formatted as an E-Mail address###26 09 2022 new variable
+cmix#:#conf_privacy_ident_il_uuid_sha256url_info#:#This is identical to each call, with with a maximum of 80 characters significantly shorter than the variant with the ILIAS platform ID and allows only very limited conclusions about the ILIAS user.###26 09 2022 new variable
 cmix#:#conf_privacy_ident_il_uuid_user_id#:#ILIAS user id combined with a unique ILIAS platform id formatted as an E-Mail adress
 cmix#:#conf_privacy_ident_il_uuid_user_id_info#:#This is identical to each call, but doesn't allow a direct conclusion about the ILIAS user.
 cmix#:#conf_privacy_ident_info#:#Standard is frequently the email address. The unique ILIAS platform id is
@@ -5992,6 +5999,7 @@ cont#:#cont_skill_do_not_set#:#Ne nastavi
 cont#:#cont_skill_members#:#Člani
 cont#:#cont_skill_no_profile_selected#:#Please select a profile.###19 08 2022 new variable
 cont#:#cont_skill_no_skill#:#Ni vrednosti (ponastavi)
+cont#:#cont_skill_no_skills_selected#:#No competences have been selected yet. Please add at least one competence first under "Competence Selection".###09 11 2022 new variable
 cont#:#cont_skill_profile#:#Profile###19 08 2022 new variable
 cont#:#cont_skill_profiles#:#Assigned Profiles of Members###19 08 2022 new variable
 cont#:#cont_skill_publish#:#Objava
@@ -10359,12 +10367,14 @@ lti#:#activity_id#:#Activity ID
 lti#:#activity_id_info#:#This Activity ID is used by the LTI Provider to identify Statements.
 lti#:#auth_lti#:#LTI Auth
 lti#:#conf_privacy_ident#:#User identification
-lti#:#conf_privacy_ident_il_uuid_SHA256#:#Hash combined with a unique ILIAS platform id formatted as an E-Mail address###20 07 2022 new variable
-lti#:#conf_privacy_ident_il_uuid_SHA256_info#:#This is identical to each call, but does not permit any direct conclusions about the ILIAS user.###20 07 2022 new variable
 lti#:#conf_privacy_ident_il_uuid_ext_account#:#External User Id combined with a unique ILIAS platform id formated as an email adress.
 lti#:#conf_privacy_ident_il_uuid_ext_account_info#:#This is identical to each call, but may allow a direct conclusion about the user.
 lti#:#conf_privacy_ident_il_uuid_login#:#ILIAS Login combined with a unique ILIAS platform id formated as an email adress.
 lti#:#conf_privacy_ident_il_uuid_login_info#:#This is identical to each call, but may allow a direct conclusion about the ILIAS user.
+lti#:#conf_privacy_ident_il_uuid_sha256#:#Hash combined with a unique ILIAS platform id formatted as an E-Mail address###26 09 2022 new variable
+lti#:#conf_privacy_ident_il_uuid_sha256_info#:#This is identical to each call, but does not permit any direct conclusions about the ILIAS user.###26 09 2022 new variable
+lti#:#conf_privacy_ident_il_uuid_sha256url#:#Hash combined with the ILIAS Domain formatted as an E-Mail address###26 09 2022 new variable
+lti#:#conf_privacy_ident_il_uuid_sha256url_info#:#This is identical to each call, with a maximum of 80 characters significantly shorter than the variant with the ILIAS platform ID and allows only very limited conclusions about the ILIAS user.###26 09 2022 new variable
 lti#:#conf_privacy_ident_il_uuid_user_id#:#ILIAS user id combined with a unique ILIAS platform id formated as an email adress.
 lti#:#conf_privacy_ident_il_uuid_user_id_info#:#This is identical to each call, but doesn't allow a direct conclusion about the ILIAS user.
 lti#:#conf_privacy_ident_info#:#Standard is frequently the email address. The unique ILIAS platform id is
@@ -14571,6 +14581,7 @@ skmg#:#skmg_new_sktr#:#New Competence Template Reference
 skmg#:#skmg_next_step#:#Next Step
 skmg#:#skmg_no_nodes_selectable#:#Currently there are no competences selectable.
 skmg#:#skmg_no_skills#:#No Competences
+skmg#:#skmg_no_skills_selected_info#:#You have not selected or fulfilled any competences yet. Click on the "Add Competence"-button to select a competence. You can add any number of competences. If you fulfill competences by editing learning materials, they will be automatically listed here.###09 11 2022 new variable
 skmg#:#skmg_no_trigger#:#No Trigger
 skmg#:#skmg_nr#:#Nr
 skmg#:#skmg_number#:#Number
@@ -14613,6 +14624,8 @@ skmg#:#skmg_skill_levels#:#Competence Levels
 skmg#:#skmg_skill_management_deactivated#:#Competence Management is currently deactivated.
 skmg#:#skmg_skill_needs_impr_no_res#:#You need to improve this competence. Unfortunately there are currently no learning resources available providing learning material aligned to your target competence level.
 skmg#:#skmg_skill_needs_impr_res#:#You need to improve this competence. The following resources provide learning material aligned to your target competence level.
+skmg#:#skmg_skill_needs_self_eval#:#Please conduct a self-evaluation first to see your competence target.###09 11 2022 new variable
+skmg#:#skmg_skill_needs_self_eval_box#:#Please note that you have not conducted a self-evaluation for at least one competence in this profile. You will not see the competence target for the affected competences until a self-evaluation is done.###09 11 2022 new variable
 skmg#:#skmg_skill_no_needs_impr#:#Your competence level is sufficient for the selected profile.
 skmg#:#skmg_skill_profiles#:#Profiles
 skmg#:#skmg_skill_template#:#Competence Template

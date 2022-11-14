@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -38,10 +40,9 @@ class ilBookBulkCreationGUI
         $lng->loadLanguageModule("book");
         $this->objects_manager = $domain
             ->objects($pool->getId());
-
     }
 
-    public function executeCommand() : void
+    public function executeCommand(): void
     {
         $ctrl = $this->gui->ctrl();
 
@@ -61,7 +62,7 @@ class ilBookBulkCreationGUI
         }
     }
 
-    public function modifyToolbar(ilToolbarGUI $toolbar) : void
+    public function modifyToolbar(ilToolbarGUI $toolbar): void
     {
         $lng = $this->domain->lng();
         $ctrl = $this->gui->ctrl();
@@ -78,7 +79,7 @@ class ilBookBulkCreationGUI
         }
     }
 
-    protected function showCreationForm() : void
+    protected function showCreationForm(): void
     {
         $lng = $this->domain->lng();
         $this->gui
@@ -87,12 +88,12 @@ class ilBookBulkCreationGUI
             ->send();
     }
 
-    protected function getCreationForm() : \ILIAS\Repository\Form\FormAdapterGUI
+    protected function getCreationForm(): \ILIAS\Repository\Form\FormAdapterGUI
     {
         $lng = $this->domain->lng();
         $schedule_manager = $this->domain->schedules($this->pool->getId());
         $schedules = $schedule_manager->getScheduleList();
-        return $this
+        $form = $this
             ->gui
             ->form(self::class, "showConfirmationScreen")
             ->asyncModal()
@@ -102,18 +103,24 @@ class ilBookBulkCreationGUI
                 $lng->txt("book_title_description_nr"),
                 $lng->txt("book_title_description_nr_info"),
             )
-            ->required()
-            ->select(
+            ->required();
+
+        if ($this->pool->getScheduleType() === ilObjBookingPool::TYPE_FIX_SCHEDULE) {
+            $form->select(
                 "schedule_id",
                 $lng->txt("book_schedule"),
                 $schedules,
                 "",
                 (string) array_key_first($schedules)
             )
-            ->required();
+                ->required();
+        }
+
+
+        return $form;
     }
 
-    protected function showConfirmationScreen() : void
+    protected function showConfirmationScreen(): void
     {
         $form = $this->getCreationForm();
         $lng = $this->domain->lng();
@@ -123,15 +130,19 @@ class ilBookBulkCreationGUI
                       ->send();
         }
 
+        $schedule_id = 0;
+        if ($this->pool->getScheduleType() === ilObjBookingPool::TYPE_FIX_SCHEDULE) {
+            $schedule_id = (int) $form->getData("schedule_id");
+        }
         $this->gui->modal($lng->txt("book_bulk_creation"))
                   ->legacy($this->renderConfirmation(
                       $form->getData("data"),
-                      (int) $form->getData("schedule_id")
+                      $schedule_id
                   ))
                   ->send();
     }
 
-    protected function renderConfirmation(string $data, int $schedule_id) : string
+    protected function renderConfirmation(string $data, int $schedule_id = 0): string
     {
         $lng = $this->domain->lng();
         $ctrl = $this->gui->ctrl();
@@ -170,7 +181,7 @@ EOT;
             $table->getHTML();
     }
 
-    protected function createObjects() : void
+    protected function createObjects(): void
     {
         $main_tpl = $this->gui->mainTemplate();
         $ctrl = $this->gui->ctrl();
@@ -178,15 +189,18 @@ EOT;
         $request = $this->gui->standardRequest();
 
         $data = $request->getBulkCreationData();
-        $arr = $this->objects_manager->createObjectsFromBulkInputString($data, $request->getScheduleId());
+        $schedule_id = 0;
+        if ($this->pool->getScheduleType() === ilObjBookingPool::TYPE_FIX_SCHEDULE) {
+            $schedule_id = $request->getScheduleId();
+        }
+        $arr = $this->objects_manager->createObjectsFromBulkInputString($data, $schedule_id);
         $main_tpl->setOnScreenMessage("success", $lng->txt("msg_obj_modified"), true);
         $ctrl->returnToParent($this);
     }
 
-    protected function cancelCreation() : void
+    protected function cancelCreation(): void
     {
         $ctrl = $this->gui->ctrl();
         $ctrl->returnToParent($this);
     }
-
 }

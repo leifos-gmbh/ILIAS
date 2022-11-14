@@ -93,7 +93,9 @@ class ObjectsManager
             $object->setDescription($data["description"]);
             $object->setNrOfItems((int) $data["nr"]);
             $object->setPoolId($this->pool_id);
-            $object->setScheduleId($schedule_id);
+            if ($schedule_id > 0) {
+                $object->setScheduleId($schedule_id);
+            }
             $object->save();
         }
     }

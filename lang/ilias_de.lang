@@ -16985,3 +16985,8 @@ book#:#book_bulk_data#:#Objektdaten
 book#:#book_title_description_nr#:#Titel; Beschreibung; Anzahl
 book#:#book_title_description_nr_info#:#Geben Sie bitte Titel, Beschreibung und Anzahl getrennt durch ein Semikolon oder TAB ein. Nutzen Sie einen Zeile
 book#:#book_bulk_confirmation#:#Bitte überprüfen Sie die angegebenen Werte.
+book#:#book_message#:#Mitteilung
+book#:#book_show_message#:#Mitteilung anzeigen
+book#:#book_message_info#:#Sie können hier eine Mitteilung an den Organisator des Buchungspools eingeben.
+book#:#book_messages#:#Mitteilungen
+book#:#book_messages_info#:#Buchende können einer Reservierung eine Mitteilung mitgeben.

@@ -16981,3 +16981,8 @@ book#:#book_bulk_data#:#Object Data
 book#:#book_title_description_nr#:#Title; Description; Number of Objects
 book#:#book_title_description_nr_info#:#Enter title, description and number of objects separated by semicolon or TAB character. Use one line per object.
 book#:#book_bulk_confirmation#:#Please check, if all values are listed correctly.
+book#:#book_message#:#Message
+book#:#book_show_message#:#Show Message
+book#:#book_message_info#:#You may enter a message for the booking organisator here.
+book#:#book_messages#:#Messages
+book#:#book_messages_info#:#Users may add a message when booking an object.

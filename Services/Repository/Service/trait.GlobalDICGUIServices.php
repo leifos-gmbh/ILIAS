@@ -102,11 +102,13 @@ trait GlobalDICGUIServices
      */
     public function form(
         $class_path,
-        string $cmd
+        string $cmd,
+        string $submit_caption = ""
     ): FormAdapterGUI {
         return new FormAdapterGUI(
             $class_path,
-            $cmd
+            $cmd,
+            $submit_caption
         );
     }
 

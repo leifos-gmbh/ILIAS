@@ -422,7 +422,7 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
         if ($this->filter["status"]) {
             $filter["status"] = $this->filter["status"];
         }
-        if ($this->filter["user_id"]) {
+        if (isset($this->filter["user_id"])) {
             $filter["user_id"] = $this->filter["user_id"];
         }
         if (!is_null($this->context_obj_ids)) {
@@ -434,7 +434,7 @@ class ilBookingReservationsTableGUI extends ilTable2GUI
                 // needs distinct status because of aggregation
                 $filter["status"] = -ilBookingReservation::STATUS_CANCELLED;
             }
-            if ($this->filter["slot"]) {
+            if (isset($this->filter["slot"])) {
                 $filter["slot"] = $this->filter["slot"];
             }
 

@@ -111,7 +111,7 @@ class SkillProfileManager implements \ilSkillUsageInfo
      */
     public function getSkillLevels(int $profile_id): array
     {
-        $levels = $this->profile_levels_repo->get($profile_id);
+        $levels = $this->profile_levels_repo->getAll($profile_id);
         usort($levels, static function (SkillProfileLevel $level_a, SkillProfileLevel $level_b): int {
             return $level_a->getOrderNr() <=> $level_b->getOrderNr();
         });
@@ -119,9 +119,20 @@ class SkillProfileManager implements \ilSkillUsageInfo
         return $levels;
     }
 
+    public function getSkillLevel(int $profile_id, int $base_skill_id, int $tref_id): SkillProfileLevel
+    {
+        $level = $this->profile_levels_repo->get($profile_id, $base_skill_id, $tref_id);
+        return $level;
+    }
+
     public function addSkillLevel(SkillProfileLevel $skill_level_obj): void
     {
-        $this->profile_levels_repo->create($skill_level_obj);
+        $this->profile_levels_repo->createOrUpdate($skill_level_obj);
+    }
+
+    public function updateSkillLevel(SkillProfileLevel $skill_level_obj): void
+    {
+        $this->profile_levels_repo->createOrUpdate($skill_level_obj);
     }
 
     public function removeSkillLevel(SkillProfileLevel $skill_level_obj): void

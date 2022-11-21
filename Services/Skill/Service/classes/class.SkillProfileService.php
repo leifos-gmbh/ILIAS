@@ -107,6 +107,6 @@ class SkillProfileService
      */
     public function writeCompletionEntryForAllProfiles(int $user_id): void
     {
-        $this->profile_completion_manager->writeCompletionEntryForAllProfiles($user_id);
+        $this->profile_completion_manager->writeCompletionEntryForAllProfilesOfUser($user_id);
     }
 }

@@ -60,7 +60,7 @@ class ilSkillAppEventListener implements ilAppEventListener
                                 }
                             }
                             //write profile completion entries if fulfilment status has changed
-                            $profile_completion_manager->writeCompletionEntryForAllProfiles($usr_id);
+                            $profile_completion_manager->writeCompletionEntryForAllProfilesOfUser($usr_id);
                         }
                         break;
                 }

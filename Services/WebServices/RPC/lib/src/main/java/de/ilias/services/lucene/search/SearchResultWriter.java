@@ -22,16 +22,18 @@
 
 package de.ilias.services.lucene.search;
 
-import de.ilias.services.settings.ConfigurationException;
+import java.io.IOException;
+import java.util.Vector;
+
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
-import org.jdom2.output.XMLOutputter;
+import org.jdom.output.XMLOutputter;
 
-import java.io.IOException;
+import de.ilias.services.settings.ConfigurationException;
+import org.apache.logging.log4j.Logger;
 
 /**
  * 
@@ -105,7 +107,7 @@ public class SearchResultWriter {
 	 */
 	public String toXML() {
 
-		org.jdom2.Document doc = new org.jdom2.Document(result.addXML());
+		org.jdom.Document doc = new org.jdom.Document(result.addXML());
 		XMLOutputter outputter = new XMLOutputter();
 		return outputter.outputString(doc);
 		

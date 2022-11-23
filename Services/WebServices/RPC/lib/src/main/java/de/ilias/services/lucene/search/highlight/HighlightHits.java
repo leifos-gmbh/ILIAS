@@ -22,14 +22,15 @@
 
 package de.ilias.services.lucene.search.highlight;
 
-import de.ilias.services.lucene.search.ResultExport;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.output.XMLOutputter;
-
 import java.util.HashMap;
+
+import org.apache.logging.log4j.LogManager;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.XMLOutputter;
+
+import de.ilias.services.lucene.search.ResultExport;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Highlight results (top most xml element)
@@ -98,7 +99,7 @@ public class HighlightHits implements ResultExport {
 
 	/**
 	 * Add xml
-	 * @see de.ilias.services.lucene.search.highlight.HighlightResultExport#addXML(org.jdom2.Element)
+	 * @see de.ilias.services.lucene.search.highlight.HighlightResultExport#addXML(org.jdom.Element)
 	 */
 	public Element addXML() {
 

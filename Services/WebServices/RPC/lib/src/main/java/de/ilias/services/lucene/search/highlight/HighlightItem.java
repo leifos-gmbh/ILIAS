@@ -22,12 +22,13 @@
 
 package de.ilias.services.lucene.search.highlight;
 
-import de.ilias.services.lucene.search.ResultExport;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.jdom2.Element;
-
 import java.util.Vector;
+
+import org.apache.logging.log4j.LogManager;
+import org.jdom.Element;
+
+import de.ilias.services.lucene.search.ResultExport;
+import org.apache.logging.log4j.Logger;
 
 /**
  * 
@@ -110,7 +111,7 @@ public class HighlightItem implements ResultExport {
 
 	/**
 	 * Add xml
-	 * @see de.ilias.services.lucene.search.highlight.HighlightResultExport#addXML(org.jdom2.Element)
+	 * @see de.ilias.services.lucene.search.highlight.HighlightResultExport#addXML(org.jdom.Element)
 	 */
 	public Element addXML() {
 

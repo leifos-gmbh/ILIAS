@@ -8,14 +8,12 @@ package de.ilias.services.settings;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.RollingFileAppender;
 import org.apache.logging.log4j.core.appender.rolling.DefaultRolloverStrategy;
 import org.apache.logging.log4j.core.appender.rolling.SizeBasedTriggeringPolicy;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
-import org.apache.logging.log4j.core.filter.ThresholdFilter;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.ini4j.Ini;
 
@@ -23,14 +21,16 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class LogConfigManager {
+/**
+ *
+ * @author stefan
+ */
+public class LogConfigParser {
 
-	private final Logger logger = LogManager.getLogger(LogConfigManager.class);
+	private final Logger logger = LogManager.getLogger(LogConfigParser.class);
 	
-	private File file;
-	private Level level;
-
-	private boolean isInitialized = false;
+	File file;
+	Level level;
 	
 	
 	public Level getLogLevel()
@@ -43,9 +43,9 @@ public class LogConfigManager {
 		return this.file;
 	}
 
-	public void setLogLevel(String logLevel)
-	{
-		this.level = Level.toLevel(logLevel.trim(),Level.INFO);
+	public void setLogLevel(String logLevel) {
+
+		this.Level = Level.toLevel(logLevel.trim(),Level.INFO);
 	}
 
 	public void setLogFile(String logFile) throws ConfigurationException, IOException {
@@ -66,7 +66,7 @@ public class LogConfigManager {
 			logger.debug("Using existing log file: {}", this.file.getAbsolutePath());
 		}
 		if(!this.file.canWrite()) {
-			throw new ConfigurationException("Cannot write to log file: " + logFile);
+			throw new ConfigurationException("Cannot write to log file: {}",logFile);
 		}
 	}
 
@@ -77,6 +77,7 @@ public class LogConfigManager {
 		
 		Ini prefs;
 		try {
+
 			prefs = new Ini(new FileReader(path));
 			for(Ini.Section section : prefs.values()) {
 				
@@ -92,17 +93,18 @@ public class LogConfigManager {
 		}
 	}
 
-	public void initLogManager()
+	private void initLogManager()
 	{
-		if (isInitialized) {
-			logger.warn("Logging service already initialized");
-		}
-
 		LoggerContext context = (LoggerContext) LogManager.getContext(false);
 		Configuration config = context.getConfiguration();
+		// keep ERROR from properties
 		LoggerConfig rootConfig = config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME);
+		// set to ilServer.ini level
 		LoggerConfig iliasConfig = config.getLoggerConfig("de.ilias");
+		iliasConfig.setLevel(getLogLevel());
+		// keep INFO level
 		LoggerConfig iliasServerConfig = config.getLoggerConfig("de.ilias.ilServer");
+		iliasConfig.setLevel(Level.INFO);
 
 		// new rolling file appender
 		PatternLayout fileLayout = PatternLayout.newBuilder()
@@ -111,7 +113,7 @@ public class LogConfigManager {
 				.build();
 
 		DefaultRolloverStrategy strategy = DefaultRolloverStrategy.newBuilder()
-				.withMax("3")
+				.withMax("7")
 				.withMin("1")
 				.withFileIndex("max")
 				.withConfig(config)
@@ -128,28 +130,18 @@ public class LogConfigManager {
 				.build();
 		file.start();
 		config.addAppender(file);
-
-
-		rootConfig.addAppender(
-				file,
-				this.getLogLevel(),
-				ThresholdFilter.createFilter(Level.DEBUG, Filter.Result.ACCEPT, Filter.Result.NEUTRAL)
-		);
-		iliasConfig.addAppender(
-				file,
-				this.getLogLevel(),
-				ThresholdFilter.createFilter(Level.DEBUG, Filter.Result.ACCEPT, Filter.Result.NEUTRAL)
-		);
-		iliasServerConfig.addAppender(
-				file,
-				this.getLogLevel(),
-				ThresholdFilter.createFilter(Level.DEBUG, Filter.Result.ACCEPT, Filter.Result.NEUTRAL)
-		);
+		rootConfig.addAppender(file, getLogLevel(), null);
+		iliasConfig.addAppender(file, getLogLevel(), null);
+		iliasConfig.setAdditive(false);
 		context.updateLoggers();
-		this.isInitialized = true;
 	}
 
 	
+	/**
+	 * @param dirty
+	 * @param replaceQuotes
+	 * @return
+	 */
 	public String purgeString(String dirty,boolean replaceQuotes) {
 		
 		if(replaceQuotes) {
@@ -160,6 +152,11 @@ public class LogConfigManager {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param dirty
+	 * @return
+	 */
 	public String purgeString(String dirty) {
 		
 		return purgeString(dirty,false);

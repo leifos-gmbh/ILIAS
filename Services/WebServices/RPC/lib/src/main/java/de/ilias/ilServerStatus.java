@@ -22,10 +22,10 @@
 
 package de.ilias;
 
+import java.util.HashMap;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.HashMap;
 
 public class ilServerStatus {
 	
@@ -89,8 +89,7 @@ public class ilServerStatus {
 	}
 	
 	public static String getStatus() {
-
-		logger.warn("Get status called with status {}", isActive() ? RUNNING : STOPPED);
+		
 		if(getCountActiveIndexer() != 0) {
 			
 			return INDEXING + " (" + getCountActiveIndexer() + ")"; 

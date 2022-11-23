@@ -23,7 +23,7 @@
 package de.ilias.services.lucene.search.highlight;
 
 import org.apache.logging.log4j.LogManager;
-import org.jdom2.Element;
+import org.jdom.Element;
 
 import de.ilias.services.lucene.search.ResultExport;
 import de.ilias.services.xml.XMLUtils;
@@ -81,7 +81,7 @@ public class HighlightField implements ResultExport {
 
 	/**
 	 * Add xml
-	 * @see de.ilias.services.lucene.search.highlight.HighlightResultExport#addXML(org.jdom2.Element)
+	 * @see de.ilias.services.lucene.search.highlight.HighlightResultExport#addXML(org.jdom.Element)
 	 */
 	public Element addXML() {
 

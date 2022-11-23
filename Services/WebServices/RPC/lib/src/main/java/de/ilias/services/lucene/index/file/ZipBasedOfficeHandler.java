@@ -22,14 +22,6 @@
 
 package de.ilias.services.lucene.index.file;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.xpath.XPath;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -38,6 +30,13 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipInputStream;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+import org.jdom.xpath.XPath;
 
 /**
  * 
@@ -103,7 +102,7 @@ public abstract class ZipBasedOfficeHandler {
 		StringBuilder content = new StringBuilder();
 		
 		try {
-			Document doc = builder.build(is);
+			org.jdom.Document doc = builder.build(is);
 			XPath xpath = XPath.newInstance(getXPath());
 			List res = xpath.selectNodes(doc);
 			

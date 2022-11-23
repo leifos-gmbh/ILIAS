@@ -22,25 +22,25 @@
 
 package de.ilias.services.lucene.index.file;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.util.logging.Level;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.util.PDFTextStripper;
+import org.apache.tika.exception.TikaException;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.pdf.PDFParser;
+import org.apache.tika.sax.BodyContentHandler;
+import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
- * 
- *
  * @author Stefan Meyer <smeyer.ilias@gmx.de>
  * @version $Id$
  */
-public class PDFBoxPDFHandler implements FileHandler {
+public class TikaPDFHandler implements FileHandler {
 
-	protected Logger logger = LogManager.getLogger(PDFBoxPDFHandler.class);
+	protected Logger logger = LogManager.getLogger(TikaPDFHandler.class);
 	
 	
 	/**
@@ -49,41 +49,25 @@ public class PDFBoxPDFHandler implements FileHandler {
 	 */
 	public String getContent(InputStream is) throws FileHandlerException {
 
-		PDDocument pddo = null;
-		PDFTextStripper stripper = null;
-		String str = "";
-		
+		BodyContentHandler handler = new BodyContentHandler();
+		Metadata md = new Metadata();
+		PDFParser parser = new PDFParser();
+		ParseContext context = new ParseContext();
+
 		try {
-
-			pddo = PDDocument.load(is);
-
-			if(pddo.isEncrypted()) {
-				logger.warn("PDF Document is encrypted. Trying empty password...");
-				return "";
-			}
-			stripper = new PDFTextStripper();
-			str = stripper.getText(pddo);
-		}
-		catch (NumberFormatException e) {
-			logger.warn("Invalid PDF version number given. Aborting");
-		}
-		catch (IOException e) {
+			parser.parse(is, handler, md, context);
+			logger.debug("Parsed pdf content: {}", handler.toString());
+			return handler.toString();
+		} catch (IOException e) {
+			logger.warn(e.getMessage());
+			throw new FileHandlerException(e);
+		} catch (SAXException e) {
+			logger.warn(e.getMessage());
+			throw new FileHandlerException(e);
+		} catch (TikaException e) {
 			logger.warn(e.getMessage());
 			throw new FileHandlerException(e);
 		}
-		catch (Exception e) {
-			logger.error(e.getMessage());
-			throw new FileHandlerException(e);			
-		}
-		finally {
-			try {
-				if(pddo != null)
-					pddo.close();
-			}
-			catch (IOException e) {
-            }
-		}
-		return str;
 	}
 
 	/**

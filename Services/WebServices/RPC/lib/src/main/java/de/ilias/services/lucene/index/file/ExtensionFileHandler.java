@@ -250,12 +250,11 @@ public class ExtensionFileHandler {
      */
 	private String getPDFDocument(File file) throws FileHandlerException {
         
-    	FileHandler doch = new PDFBoxPDFHandler();
+    	FileHandler doch = new TikaPDFHandler();
     	FileInputStream fis = null;
-        logger.debug("Start PDFBoxPDFHandler...");
+        logger.debug("Starting TikaPDFHandler...");
 
         try {
-        
         	logger.debug(file.getAbsolutePath());
         	return doch.getContent(fis = new FileInputStream(file.getAbsolutePath()));
         }

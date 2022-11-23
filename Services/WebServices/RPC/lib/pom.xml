@@ -107,12 +107,6 @@
             <artifactId>fop</artifactId>
             <version>2.7</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox -->
-        <dependency>
-            <groupId>org.apache.pdfbox</groupId>
-            <artifactId>pdfbox</artifactId>
-            <version>1.8.17</version>
-        </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.avalon.framework/avalon-framework-api -->
         <dependency>
             <groupId>org.apache.avalon.framework</groupId>
@@ -150,6 +144,16 @@
             <groupId>org.jdom</groupId>
             <artifactId>jdom2</artifactId>
             <version>2.0.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-parser-pdf-module</artifactId>
+            <version>2.6.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+            <version>2.6.0</version>
         </dependency>
     </dependencies>
     <packaging>jar</packaging>

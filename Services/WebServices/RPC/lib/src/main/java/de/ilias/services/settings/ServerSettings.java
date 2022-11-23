@@ -23,15 +23,7 @@
 package de.ilias.services.settings;
 
 import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.appender.RollingFileAppender;
-import org.apache.logging.log4j.core.appender.rolling.DefaultRolloverStrategy;
-import org.apache.logging.log4j.core.appender.rolling.SizeBasedTriggeringPolicy;
-import org.apache.logging.log4j.core.config.Configuration;
-import org.apache.logging.log4j.core.config.LoggerConfig;
-import org.apache.logging.log4j.core.layout.PatternLayout;
 
 import java.io.File;
 import java.io.IOException;
@@ -255,43 +247,6 @@ public class ServerSettings {
 		}
 	}
 	
-	public void initLogManager()
-	{
-		LoggerContext context = (LoggerContext) LogManager.getContext(false);
-		Configuration config = context.getConfiguration();
-		// keep ERROR from properties
-		LoggerConfig rootConfig = config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME);
-		// set to ilServer.ini level
-		LoggerConfig iliasConfig = config.getLoggerConfig("de.ilias");
-		iliasConfig.setLevel(getLogLevel());
-
-		// new rolling file appender
-		PatternLayout fileLayout = PatternLayout.newBuilder()
-				.withConfiguration(config)
-				.withPattern("%d{ISO8601} %-5p %t (%F:%L) - %m%n")
-				.build();
-
-		DefaultRolloverStrategy strategy = DefaultRolloverStrategy.newBuilder()
-				.withMax("7")
-				.withMin("1")
-				.withFileIndex("max")
-				.withConfig(config)
-				.build();
-
-		RollingFileAppender file = RollingFileAppender.newBuilder()
-				.setName("RollingFile")
-				.withFileName(getLogFile().getAbsolutePath())
-				.withFilePattern(getLogFile().getName() + "%d")
-				.withStrategy(strategy)
-				.withPolicy(SizeBasedTriggeringPolicy.createPolicy("100MB"))
-				.setConfiguration(config)
-				.setLayout(fileLayout).build();
-		file.start();
-		config.addAppender(file);
-		rootConfig.addAppender(file, getLogLevel(), null);
-		iliasConfig.addAppender(file, getLogLevel(), null);
-		context.updateLoggers();
-	}
 
 	/**
 	 * @param purgeString

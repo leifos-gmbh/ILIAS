@@ -23,10 +23,7 @@
 package de.ilias;
 
 import de.ilias.services.rpc.RPCServer;
-import de.ilias.services.settings.ClientSettings;
-import de.ilias.services.settings.ConfigurationException;
-import de.ilias.services.settings.IniFileParser;
-import de.ilias.services.settings.ServerSettings;
+import de.ilias.services.settings.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcException;
@@ -47,7 +44,7 @@ import java.util.Vector;
  */
 public class ilServer {
 
-	private static final Logger logger = LogManager.getLogger(ilServer.class);
+	private static final Logger logger = LogManager.getLogger(ilServer.class );
 	private final String version = "4.4.0.1";
 	
 	private final String[] arguments;
@@ -69,9 +66,20 @@ public class ilServer {
 
 	private boolean handleRequest()
 	{
+		Boolean status;
+
 		if(arguments.length < 1) {
 			logger.error(this.getUsage());
 			return false;
+		}
+		if (arguments.length >= 1) {
+			LogConfigManager logConfigManager = new LogConfigManager();
+			try {
+				logConfigManager.parse(arguments[0]);
+				logConfigManager.initLogManager();
+			} catch (ConfigurationException e) {
+				logger.error("Logging to ?");
+			}
 		}
 
 		if(arguments.length == 1) {
@@ -101,7 +109,9 @@ public class ilServer {
 				System.err.println("Usage java -jar ilServer.jar PATH_TO_SERVER_INI createIndex CLIENT_KEY");
 				return false;
 			}
-			return createIndexer();
+			status = createIndexer();
+			logger.info("Finished creation of new index for client {}", arguments[2]);
+			return status;
 		}
 		else if(command.compareTo("updateIndex") == 0) {
 			if(arguments.length < 3) {
@@ -231,15 +241,14 @@ public class ilServer {
 		XmlRpcClient client;
 		IniFileParser parser;
 		String status;
+
 		try {
 
 			parser = new IniFileParser();
 			parser.parseServerSettings(arguments[0],true);
 			settings = ServerSettings.getInstance();
-			settings.initLogManager();
-
 			client = initRpcClient();
-			
+
 			// Check if server is already running
 			try {
 				status = (String) client.execute("RPCAdministration.status",new Vector());
@@ -258,6 +267,10 @@ public class ilServer {
 			client = initRpcClient();
 			client.execute("RPCAdministration.start",new Vector());
 
+			//Vector params = new Vector();
+			//params.add(arguments[0]);
+			//client.execute("RPCAdministration.initLogManager", params);
+
 			// Check if webserver is alive
 			// otherwise stop execution
 			while(true) {
@@ -270,7 +283,7 @@ public class ilServer {
 			logger.info("WebServer shutdown. Aborting...");
 			return true;
 			
-		} 
+		}
 		catch (ConfigurationException e) {
 			System.exit(1);
 			return false;
@@ -338,11 +351,14 @@ public class ilServer {
 		try {
 			parser = new IniFileParser();
 			parser.parseServerSettings(arguments[0],false);
-			
+
 			settings = ServerSettings.getInstance();
 			client = initRpcClient();
 			status = (String) client.execute("RPCAdministration.status",new Vector());
 			System.out.println(status);
+			logger.info("RPC Status is {}", status);
+			status = ilServerStatus.getStatus();
+			logger.info("Main Status is {}", status);
 			return true;
 		} 
 		catch (ConfigurationException e) {

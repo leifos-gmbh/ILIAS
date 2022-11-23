@@ -22,28 +22,26 @@
 
 package de.ilias.services.rpc;
 
-import java.sql.SQLException;
-
-import org.apache.logging.log4j.LogManager;
-
 import de.ilias.ilServerStatus;
 import de.ilias.services.db.DBFactory;
 import de.ilias.services.lucene.index.IndexHolder;
 import de.ilias.services.lucene.settings.LuceneSettings;
 import de.ilias.services.settings.ConfigurationException;
 import de.ilias.services.settings.LocalSettings;
+import de.ilias.services.settings.LogConfigManager;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.sql.SQLException;
 
 
 /**
- * 
  *
  * @author Stefan Meyer <smeyer.ilias@gmx.de>
- * @version $Id$
  */
 public class RPCAdministration {
 
-	private final Logger logger = LogManager.getLogger(this.getClass().getName());
+	private final Logger logger = LogManager.getLogger(RPCAdministration.class);
 
 	
 	/**
@@ -73,7 +71,6 @@ public class RPCAdministration {
 
 		// Set server status inactive
 		ilServerStatus.setActive(false);
-		
 		return true;
 	}
 	
@@ -82,8 +79,8 @@ public class RPCAdministration {
 	 * @param clientKey
 	 * @return
 	 */
-	public boolean refreshSettings(String clientKey) {
-		
+	public boolean refreshSettings(String clientKey)
+	{
 		LuceneSettings settings = null;
 		LocalSettings.setClientKey(clientKey);
 		DBFactory.init();
@@ -100,6 +97,21 @@ public class RPCAdministration {
 			return false;
 		}
 	}
+
+	public boolean initLogManager(String iniPath)
+	{
+		LogConfigManager logConfigManager = new LogConfigManager();
+		try {
+			logConfigManager.parse(iniPath);
+			logConfigManager.initLogManager();
+			return true;
+		} catch (ConfigurationException e) {
+			logger.error("Init logging service failed with message: {}", e.getMessage());
+			return false;
+		}
+	}
+
+
 	
 	public String status() {
 		

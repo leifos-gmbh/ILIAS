@@ -22,20 +22,17 @@
 
 package de.ilias.services.rpc;
 
-import java.net.InetAddress;
-
+import de.ilias.services.lucene.index.RPCIndexHandler;
+import de.ilias.services.settings.ConfigurationException;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.server.PropertyHandlerMapping;
 import org.apache.xmlrpc.server.XmlRpcServer;
 import org.apache.xmlrpc.server.XmlRpcServerConfigImpl;
 import org.apache.xmlrpc.webserver.WebServer;
 
-import de.ilias.services.lucene.index.RPCIndexHandler;
-import de.ilias.services.lucene.search.RPCSearchHandler;
-import de.ilias.services.settings.ConfigurationException;
-import de.ilias.services.transformation.RPCTransformationHandler;
-import org.apache.logging.log4j.Logger;
+import java.net.InetAddress;
 
 
 /**
@@ -47,7 +44,7 @@ import org.apache.logging.log4j.Logger;
 public class RPCServer {
 	
 	private static RPCServer instance = null;
-	private final Logger logger = LogManager.getLogger(this.getClass().getName());
+	private final Logger logger = LogManager.getLogger(RPCServer.class);
 
 	private WebServer server;
 	private InetAddress host = null;

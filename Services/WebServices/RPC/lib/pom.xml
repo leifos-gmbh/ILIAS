@@ -20,6 +20,16 @@
                               <goal>shade</goal>
                           </goals>
                           <configuration>
+                              <filters>
+                                  <filter>
+                                      <artifact>*:*</artifact>
+                                      <excludes>
+                                          <exclude>META-INF/*.SF</exclude>
+                                          <exclude>META-INF/*.DSA</exclude>
+                                          <exclude>META-INF/*.RSA</exclude>
+                                      </excludes>
+                                  </filter>
+                              </filters>
                               <transformers>
                                   <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                       <manifestEntries>
@@ -95,12 +105,6 @@
             <artifactId>ini4j</artifactId>
             <version>0.5.4</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/net.sf.jtidy/jtidy -->
-        <dependency>
-            <groupId>net.sf.jtidy</groupId>
-            <artifactId>jtidy</artifactId>
-            <version>r938</version>
-        </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/fop -->
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
@@ -112,12 +116,6 @@
             <groupId>org.apache.avalon.framework</groupId>
             <artifactId>avalon-framework-api</artifactId>
             <version>4.3.1</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi</artifactId>
-            <version>3.17</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client -->
         <dependency>
@@ -147,12 +145,12 @@
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
-            <artifactId>tika-parser-pdf-module</artifactId>
+            <artifactId>tika-core</artifactId>
             <version>2.6.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
-            <artifactId>tika-core</artifactId>
+            <artifactId>tika-parsers-standard-package</artifactId>
             <version>2.6.0</version>
         </dependency>
     </dependencies>

@@ -2,15 +2,16 @@
 
 package de.ilias.services.lucene.index.file.path;
 
-import java.io.File;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import de.ilias.services.lucene.index.CommandQueueElement;
 import de.ilias.services.settings.ClientSettings;
 import de.ilias.services.settings.ConfigurationException;
 import de.ilias.services.settings.LocalSettings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.io.File;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 
 /**
@@ -112,7 +113,7 @@ public class FileObjectPathCreator7  implements PathCreator
 	        if((dotIndex > 0) && (dotIndex < fileName.length())) {
 	            extension.append(fileName.substring(dotIndex + 1));
 			}
-			logger.info("Extraced extension: " + extension + " from file name: " + fileName);
+			logger.info("Extracted extension: " + extension + " from file name: " + fileName);
 
 		} catch (SQLException ex) {
 			logger.error(ex.toString());

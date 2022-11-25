@@ -92,12 +92,16 @@ class ilContainerGlobalProfiles
 
         $this->profiles = [];
         $set = $db->query(
-            "SELECT spr.profile_id, spr.role_id, sp.title, sp.skill_tree_id " .
+            "SELECT spr.profile_id, spr.role_id, sp.title, sp.description, sp.ref_id, sp.image_id, sp.skill_tree_id " .
             " FROM skl_profile_role spr INNER JOIN skl_profile sp ON spr.profile_id = sp.id " .
             " WHERE sp.ref_id = 0 " .
             " AND role_id  = " . $db->quote($this->getMemberRoleId(), "integer")
         );
         while ($rec = $db->fetchAssoc($set)) {
+            $rec["profile_id"] = (int) $rec["profile_id"];
+            $rec["role_id"] = (int) $rec["role_id"];
+            $rec["ref_id"] = (int) $rec["ref_id"];
+            $rec["skill_tree_id"] = (int) $rec["skill_tree_id"];
             $this->profiles[$rec["profile_id"]] = $rec;
         }
     }

@@ -6010,6 +6010,7 @@ cont#:#cont_really_remove_skill_from_course#:#Do you really want to remove these
 cont#:#cont_select_fields#:#Select Fields
 cont#:#cont_show_more#:#Show More
 cont#:#cont_skill#:#Competence
+cont#:#cont_skill_ass_profiles#:#Assigned Profiles of Members
 cont#:#cont_skill_assigned_comp#:#Competence Selection
 cont#:#cont_skill_assigned_profiles#:#Profile Selection
 cont#:#cont_skill_deletion_not_possible#:#Deletion of global competence profiles is not possible. Please select only local competence profiles.
@@ -6019,7 +6020,7 @@ cont#:#cont_skill_no_profile_selected#:#Please select a profile.
 cont#:#cont_skill_no_skill#:#No value (Reset)
 cont#:#cont_skill_no_skills_selected#:#No competences have been selected yet. Please add at least one competence first under "Competence Selection".
 cont#:#cont_skill_profile#:#Profile
-cont#:#cont_skill_profiles#:#Assigned Profiles of Members
+cont#:#cont_skill_profiles#:#Competence Profiles
 cont#:#cont_skill_publish#:#Publish
 cont#:#cont_skill_publish_auto#:#Automatic
 cont#:#cont_skill_publish_auto_info#:#Competence assignments for members are immediately visible for members.
@@ -6029,6 +6030,7 @@ cont#:#cont_skill_really_delete_profile_from_list#:#Do you really want to delete
 cont#:#cont_skill_really_delete_profiles_from_list#:#Do you really want to delete these profiles?
 cont#:#cont_skill_really_remove_profile_from_list#:#Do you really want to remove this profile from the list?
 cont#:#cont_skill_really_remove_profiles_from_list#:#Do you really want to remove these profiles from the list?
+cont#:#cont_skill_records#:#Competence Records
 cont#:#cont_skill_removal_not_possible#:#Removing of local competence profiles is not possible. Please select only global competence profiles.
 cont#:#cont_skill_show#:#Show
 cont#:#cont_std_filter_title_1#:#Title

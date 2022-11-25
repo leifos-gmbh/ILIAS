@@ -57,7 +57,7 @@ class ilContainerSkillGUI
         $ctrl = $this->ctrl;
 
         $next_class = $this->ctrl->getNextClass($this);
-        $cmd = $this->ctrl->getCmd("show");
+        $cmd = $this->ctrl->getCmd("showProfiles");
 
         $this->addTabs();
 
@@ -92,9 +92,14 @@ class ilContainerSkillGUI
 
         if ($this->access->checkAccess("read", "", $this->ref_id)) {
             $tabs->addSubTab(
-                "list",
-                $lng->txt("cont_skill_show"),
+                "mem_profiles",
+                $lng->txt("cont_skill_profiles"),
                 $ctrl->getLinkTargetByClass("ilContSkillPresentationGUI", "")
+            );
+            $tabs->addSubTab(
+                "mem_records",
+                $lng->txt("cont_skill_records"),
+                $ctrl->getLinkTargetByClass("ilContSkillPresentationGUI", "showRecords")
             );
         }
 

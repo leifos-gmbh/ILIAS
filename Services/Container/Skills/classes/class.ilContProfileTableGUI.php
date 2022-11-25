@@ -62,7 +62,7 @@ class ilContProfileTableGUI extends ilTable2GUI
 
         parent::__construct($a_parent_obj, $a_parent_cmd);
         $this->setData($this->getProfiles());
-        $this->setTitle($this->lng->txt("cont_skill_profiles"));
+        $this->setTitle($this->lng->txt("cont_skill_ass_profiles"));
 
         $this->addColumn("", "", "1", true);
         $this->addColumn($this->lng->txt("cont_skill_profile"), "", "1");

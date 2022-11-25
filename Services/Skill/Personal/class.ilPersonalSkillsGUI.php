@@ -295,29 +295,6 @@ class ilPersonalSkillsGUI
         $this->hidden_skills[] = $a_skill_id . ":" . $a_tref_id;
     }
 
-    public function determineCurrentProfile(): void
-    {
-        $ilCtrl = $this->ctrl;
-
-        if (count($this->cont_profiles) == 0) {
-            return;
-        }
-        $current_prof_id = 0;
-        if ($this->requested_profile_id > 0) {
-            foreach ($this->cont_profiles as $p) {
-                if ($p["profile_id"] == $this->requested_profile_id) {
-                    $current_prof_id = $this->requested_profile_id;
-                }
-            }
-        }
-
-        if ($current_prof_id == 0 && !(is_array($this->getObjectSkills()) && $this->getObjectId() > 0)) {
-            $current_prof_id = $this->cont_profiles[0]["profile_id"];
-        }
-        $ilCtrl->setParameter($this, "profile_id", $current_prof_id);
-        $this->setProfileId($current_prof_id);
-    }
-
     public function getObjectId(): int
     {
         return $this->obj_id;
@@ -375,7 +352,7 @@ class ilPersonalSkillsGUI
         $lng = $this->lng;
         $ilTabs = $this->tabs;
 
-        if (count($this->user_profiles) > 0) {
+        if (!empty($this->user_profiles)) {
             $ilCtrl->setParameter($this, "list_mode", self::LIST_PROFILES);
             $ilTabs->addTab(
                 "profile",
@@ -411,7 +388,7 @@ class ilPersonalSkillsGUI
 
     protected function render(): void
     {
-        if ($this->requested_list_mode == self::LIST_SELECTED || !count($this->user_profiles) > 0) {
+        if ($this->requested_list_mode == self::LIST_SELECTED || empty($this->user_profiles)) {
             $this->listSkills();
         } else {
             $this->listAllAssignedProfiles();
@@ -898,7 +875,7 @@ class ilPersonalSkillsGUI
         $ilToolbar = $this->toolbar;
         $ilTabs = $this->tabs;
 
-        $cmd = ($this->requested_list_mode == self::LIST_SELECTED || !count($this->user_profiles) > 0)
+        $cmd = ($this->requested_list_mode == self::LIST_SELECTED || empty($this->user_profiles))
             ? "render"
             : "listAssignedProfile";
         $ilTabs->setBackTarget(
@@ -1083,7 +1060,7 @@ class ilPersonalSkillsGUI
         $ilToolbar = $this->toolbar;
         $ilTabs = $this->tabs;
 
-        $cmd = ($this->requested_list_mode == self::LIST_SELECTED || !count($this->user_profiles) > 0)
+        $cmd = ($this->requested_list_mode == self::LIST_SELECTED || empty($this->user_profiles))
             ? "render"
             : "listAssignedProfile";
         $ilTabs->setBackTarget(
@@ -1165,7 +1142,7 @@ class ilPersonalSkillsGUI
                 $ilCtrl->saveParameter($this, "tref_id");
                 $ilCtrl->saveParameter($this, "basic_skill_id");*/
 
-        $cmd = ($this->requested_list_mode == self::LIST_SELECTED || !count($this->user_profiles) > 0)
+        $cmd = ($this->requested_list_mode == self::LIST_SELECTED || empty($this->user_profiles))
             ? "render" : "listAssignedProfile";
         $ilCtrl->redirect($this, $cmd);
     }
@@ -1196,68 +1173,96 @@ class ilPersonalSkillsGUI
         }
     }
 
-    public function listProfilesForGap(): void
+    public function showProfiles(): void
     {
-        $tpl = $this->tpl;
+        $this->ctrl->redirectByClass("ilContSkillPresentationGUI", "showProfiles");
+    }
 
-        //$a_user_id = $ilUser->getId();
-
-        //$profiles = ilSkillProfile::getProfilesOfUser($a_user_id);
-
-        if (count($this->cont_profiles) == 0 && $this->getObjectSkills() == null) {
+    public function listAllProfilesForGap(): void
+    {
+        if (empty($this->cont_profiles)) {
+            $this->tpl->setContent($this->showInfoBox());
             return;
         }
 
-        $this->determineCurrentProfile();
-        $this->showProfileSelectorToolbar();
+        $prof_items = [];
+
+        foreach ($this->cont_profiles as $p) {
+            $image_id = $p["image_id"];
+            if ($image_id) {
+                $identification = $this->storage->manage()->find($image_id);
+                $src = $this->storage->consume()->src($identification);
+                $image = $this->ui_fac->image()->responsive($src->getSrc(), $this->lng->txt("skmg_custom_image_alt"));
+            } else {
+                $image = $this->ui_fac->image()->responsive(
+                    "./templates/default/images/logo/ilias_logo_72x72.png",
+                    "ILIAS"
+                );
+            }
+
+            $this->ctrl->setParameter($this, "profile_id", $p["profile_id"]);
+            $link = $this->ui_fac->link()->standard(
+                $p["title"],
+                $this->ctrl->getLinkTarget($this, "listProfileForGap")
+            );
+            $this->ctrl->setParameter($this, "profile_id", "");
+
+            $chart_value = $this->profile_completion_manager->getProfileProgress($this->user->getId(), $p["profile_id"]);
+            $prof_item = $this->ui_fac->item()->standard($link)
+                                      ->withDescription($p["description"])
+                                      ->withLeadImage($image)
+                                      ->withProgress($this->ui_fac->chart()->progressMeter()->standard(100, $chart_value));
+
+            $prof_items[] = $prof_item;
+        }
+
+        $prof_list = $this->ui_fac->panel()->listing()->standard("", array(
+            $this->ui_fac->item()->group("", $prof_items)
+        ));
+
+        $html = $this->showInfoBox() . $this->ui_ren->render($prof_list);
+        $this->tpl->setContent($html);
+    }
+
+    public function listProfileForGap(): void
+    {
         // needed fix for profiles in gap view, because there is no filter shown (yet)
         $this->getFilter()->clear();
 
-        $html = $this->showInfoBox() . $this->getGapAnalysisHTML();
-        $tpl->setContent($html);
+        $this->tabs->clearTargets();
+        $this->tabs->setBackTarget(
+            $this->lng->txt("back"),
+            $this->ctrl->getLinkTarget($this, "showProfiles")
+        );
+        $this->setProfileId($this->requested_profile_id);
+        $this->tpl->setTitleIcon(ilUtil::getImagePath("icon_skmg.svg"));
+        $this->tpl->setTitle($this->profile_manager->lookupTitle($this->getProfileId()));
+
+        $this->tpl->setContent($this->getGapAnalysisHTML());
+    }
+
+    public function listRecordsForGap(): void
+    {
+        if (empty($this->getObjectSkills())) {
+            return;
+        }
+
+        $this->tpl->setContent($this->getGapAnalysisHTML());
     }
 
     public function showInfoBox(): string
     {
-        $link = $this->ui_fac->link()->standard(
-            $this->lng->txt("skmg_open_all_assigned_profiles"),
-            $this->ctrl->getLinkTargetByClass(["ilDashboardGUI", "ilAchievementsGUI", "ilPersonalSkillsGUI"])
-        );
-        $box = $this->ui_fac->messageBox()->info($this->lng->txt("skmg_cont_profiles_info"))->withLinks([$link]);
+        if (!empty($this->cont_profiles)) {
+            $link = $this->ui_fac->link()->standard(
+                $this->lng->txt("skmg_open_all_assigned_profiles"),
+                $this->ctrl->getLinkTargetByClass(["ilDashboardGUI", "ilAchievementsGUI", "ilPersonalSkillsGUI"])
+            );
+            $box = $this->ui_fac->messageBox()->info($this->lng->txt("skmg_cont_profiles_info"))->withLinks([$link]);
+        } else {
+            $box = $this->ui_fac->messageBox()->info($this->lng->txt("skmg_cont_profiles_info_empty"));
+        }
 
         return $this->ui_ren->render($box);
-    }
-
-    public function showProfileSelectorToolbar(): void
-    {
-        $ilToolbar = $this->toolbar;
-        $lng = $this->lng;
-        $ilCtrl = $this->ctrl;
-
-        $options = [];
-        $cont_options = [];
-        if (is_array($this->getObjectSkills()) && $this->getObjectId() > 0) {
-            $options[0] = $lng->txt("obj_" . ilObject::_lookupType($this->getObjectId()))
-                . ": " . ilObject::_lookupTitle($this->getObjectId());
-        }
-
-        foreach ($this->cont_profiles as $p) {
-            $tree = $this->tree_service->getObjSkillTreeById((int) $p["skill_tree_id"]);
-            $cont_options[$p["profile_id"]] = $tree->getTitle() . ": " . $p["title"];
-        }
-
-        asort($cont_options);
-        $options = $options + $cont_options;
-
-        $si = new ilSelectInputGUI($lng->txt("skmg_profile"), "profile_id");
-        $si->setOptions($options);
-        $si->setValue($this->getProfileId());
-        $ilToolbar->addInputItem($si, true);
-        $ilToolbar->addFormButton(
-            $lng->txt("select"),
-            "selectProfile"
-        );
-        $ilToolbar->setFormAction($ilCtrl->getFormAction($this));
     }
 
     public function setGapAnalysisActualStatusModePerType(string $a_type, string $a_cat_title = ""): void
@@ -1352,8 +1357,14 @@ class ilPersonalSkillsGUI
 
         $bc_skills = [];
         $html = "";
+        $not_all_self_evaluated = false;
 
         foreach ($skills_as_obj as $s) {
+            if ($this->skmg_settings->getHideProfileBeforeSelfEval() &&
+                !ilBasicSkill::hasSelfEvaluated($this->user->getId(), $s->getBaseSkillId(), $s->getTrefId())) {
+                $not_all_self_evaluated = true;
+            }
+
             $path = $this->tree_service->getSkillTreePath($s->getBaseSkillId());
 
             // check draft
@@ -1366,6 +1377,10 @@ class ilPersonalSkillsGUI
             $html .= $this->getSkillHTML($s->getBaseSkillId(), $user_id, false, $s->getTrefId());
         }
 
+        if ($not_all_self_evaluated) {
+            $box = $this->ui_fac->messageBox()->info($lng->txt("skmg_skill_needs_self_eval_box"));
+            $html = $this->ui_ren->render($box) . $html;
+        }
 
         // output bar charts
         $all_chart_html = $this->getBarChartHTML($bc_skills);
@@ -1403,7 +1418,7 @@ class ilPersonalSkillsGUI
 
         $incl_self_eval = false;
         $self_vals = [];
-        if (count($this->getGapAnalysisSelfEvalLevels()) > 0) {
+        if (!empty($this->getGapAnalysisSelfEvalLevels())) {
             $incl_self_eval = true;
             $self_vals = $this->getGapAnalysisSelfEvalLevels();
         }
@@ -1548,18 +1563,6 @@ class ilPersonalSkillsGUI
         return $all_chart_html;
     }
 
-    public function selectProfile(): void
-    {
-        $ilCtrl = $this->ctrl;
-
-        $ilCtrl->setParameter($this, "profile_id", $this->requested_profile_id);
-        if ($this->mode == "gap") {
-            $ilCtrl->redirect($this, "listProfilesForGap");
-        } else {
-            $ilCtrl->redirect($this, "listAssignedProfile");
-        }
-    }
-
     public function getMaterials(array $a_levels, int $a_tref_id = 0, int $a_user_id = 0): string
     {
         $ilUser = $this->user;
@@ -1680,7 +1683,7 @@ class ilPersonalSkillsGUI
         $lng = $this->lng;
 
         $self_vals = $this->getGapAnalysisSelfEvalLevels();
-        if (count($self_vals) == 0) {
+        if (empty($self_vals)) {
             return "";
         }
 
@@ -2089,7 +2092,7 @@ class ilPersonalSkillsGUI
                 $items[] = $this->ui_fac->item()->standard($link)->withLeadIcon($icon);
             }
             $item_group = $this->ui_fac->item()->group("", $items);
-            if (count($imp_resources) > 0) {
+            if (!empty($imp_resources)) {
                 $sec_panel = $this->ui_fac->panel()->secondary()->listing(
                     $lng->txt("skmg_recommended_learning_material"),
                     [$info_group, $item_group]
@@ -2151,6 +2154,10 @@ class ilPersonalSkillsGUI
 
     public function listAllAssignedProfiles(): void
     {
+        if (empty($this->user_profiles)) {
+            $this->ctrl->redirect($this, "listSkills");
+        }
+
         $this->setTabs("profile");
 
         $prof_items = [];

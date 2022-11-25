@@ -66,12 +66,9 @@ class ilContSkillPresentationGUI
     public function executeCommand(): void
     {
         $ctrl = $this->ctrl;
-        $tabs = $this->tabs;
-
-        $tabs->activateSubTab("list");
 
         $next_class = $this->ctrl->getNextClass($this);
-        $cmd = $this->ctrl->getCmd("show");
+        $cmd = $this->ctrl->getCmd("showProfiles");
         $this->setPermanentLink();
 
         switch ($next_class) {
@@ -80,7 +77,7 @@ class ilContSkillPresentationGUI
                 break;
 
             default:
-                if ($cmd === "show") {
+                if (in_array($cmd, ["showProfiles", "showRecords"])) {
                     $this->$cmd();
                 }
         }
@@ -107,10 +104,28 @@ class ilContSkillPresentationGUI
         return $gui;
     }
 
-    public function show(): void
+    public function showProfiles(): void
     {
+        $tabs = $this->tabs;
+
+        $tabs->activateSubTab("mem_profiles");
+
+        if (empty($this->container_global_profiles) && empty($this->container_local_profiles)) {
+            return;
+        }
+
         $gui = $this->getPersonalSkillsGUI();
-        $gui->listProfilesForGap();
+        $gui->listAllProfilesForGap();
+    }
+
+    public function showRecords(): void
+    {
+        $tabs = $this->tabs;
+
+        $tabs->activateSubTab("mem_records");
+
+        $gui = $this->getPersonalSkillsGUI();
+        $gui->listRecordsForGap();
     }
 
     protected function getSubtreeObjectIds(): array

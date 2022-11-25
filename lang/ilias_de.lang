@@ -6009,6 +6009,7 @@ cont#:#cont_really_remove_skill_from_course#:#Sollen die Kompetenzen wirklich au
 cont#:#cont_select_fields#:#Felder auswählen
 cont#:#cont_show_more#:#Mehr anzeigen
 cont#:#cont_skill#:#Kompetenz
+cont#:#cont_skill_ass_profiles#:#Profile der Mitglieder
 cont#:#cont_skill_assigned_comp#:#Kompetenzauswahl
 cont#:#cont_skill_assigned_profiles#:#Profilauswahl
 cont#:#cont_skill_deletion_not_possible#:#Das Löschen von globalen Kompetenzprofilen ist nicht möglich. Bitte wählen Sie ausschließlich lokale Kompetenzprofile aus.
@@ -6018,7 +6019,7 @@ cont#:#cont_skill_no_profile_selected#:#Bitte wählen Sie ein Profil aus.
 cont#:#cont_skill_no_skill#:#Kein Wert (zurücksetzen)
 cont#:#cont_skill_no_skills_selected#:#Es wurden noch keine Kompetenzen ausgewählt. Bitte fügen Sie zunächst mindestens eine Kompetenz hinzu unter "Kompetenzauswahl".
 cont#:#cont_skill_profile#:#Profil
-cont#:#cont_skill_profiles#:#Profile der Mitglieder
+cont#:#cont_skill_profiles#:#Kompetenzprofile
 cont#:#cont_skill_publish#:#Veröffentlichung
 cont#:#cont_skill_publish_auto#:#Automatisch
 cont#:#cont_skill_publish_auto_info#:#Zuweisungen von Kompetenzstufen zu Mitgliedern werden für diese sofort sichtbar.
@@ -6028,6 +6029,7 @@ cont#:#cont_skill_really_delete_profile_from_list#:#Soll das Profil wirklich gel
 cont#:#cont_skill_really_delete_profiles_from_list#:#Sollen die Profile wirklich gelöscht werden?
 cont#:#cont_skill_really_remove_profile_from_list#:#Soll das Profil wirklich aus der Liste entfernt werden?
 cont#:#cont_skill_really_remove_profiles_from_list#:#Sollen die Profile wirklich aus der Liste entfernt werden?
+cont#:#cont_skill_records#:#Kompeteneinträge
 cont#:#cont_skill_removal_not_possible#:#Das Entfernen von lokalen Kompetenzprofilen ist nicht möglich. Bitte wählen Sie ausschließlich globale Kompetenzprofile aus.
 cont#:#cont_skill_show#:#Anzeigen
 cont#:#cont_std_filter_title_1#:#Titel

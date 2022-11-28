@@ -1572,6 +1572,9 @@ class ilStartUpGUI
 
         $tpl = self::initStartUpTemplate('tpl.view_terms_of_service.html', $back_to_login, !$back_to_login);
 
+        $this->mainTemplate->setTitle($this->lng->txt('accept_usr_agreement'));
+        $this->mainTemplate->setOnScreenMessage('info', $this->lng->txt('accept_usr_agreement_intro'));
+
         $helper = new ilTermsOfServiceHelper();
         $handleDocument = $helper->isGloballyEnabled() && $this->termsOfServiceEvaluation->hasDocument();
         if ($handleDocument) {
@@ -2184,7 +2187,12 @@ class ilStartUpGUI
 
         $_POST['auth_mode'] = AUTH_SAML . '_' . $idpId;
 
-        $credentials = new ilAuthFrontendCredentialsSaml($auth);
+        $this->logger->debug(sprintf(
+            'Retrieved "target" parameter: %s',
+            print_r($_GET['target'], true)
+        ));
+
+        $credentials = new ilAuthFrontendCredentialsSaml($auth, $request);
         $credentials->initFromRequest();
 
         $provider_factory = new ilAuthProviderFactory();

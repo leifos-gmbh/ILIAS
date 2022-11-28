@@ -27,6 +27,8 @@ abstract class assQuestionGUI
     
     const SESSION_PREVIEW_DATA_BASE_INDEX = 'ilAssQuestionPreviewAnswers';
     
+    protected const HAS_SPECIAL_QUESTION_COMMANDS = false;
+    
     /**
     * Question object
     *
@@ -212,30 +214,32 @@ abstract class assQuestionGUI
         global $DIC;
         $DIC['ilHelp']->setScreenIdComponent('qpl');
 
-        $cmd = $this->ctrl->getCmd("editQuestion");
-
         $next_class = $this->ctrl->getNextClass($this);
 
         switch ($next_class) {
             case 'ilformpropertydispatchgui':
                 $form = $this->buildEditForm();
-
-                require_once 'Services/Form/classes/class.ilFormPropertyDispatchGUI.php';
                 $form_prop_dispatch = new ilFormPropertyDispatchGUI();
                 $form_prop_dispatch->setItem($form->getItemByPostVar(ilUtil::stripSlashes($_GET['postvar'])));
-                return $this->ctrl->forwardCommand($form_prop_dispatch);
+                $this->ctrl->forwardCommand($form_prop_dispatch);
                 break;
 
             default:
-                $ret = $this->$cmd();
-                break;
+                $cmd = $this->ctrl->getCmd('editQuestion');
+                if (method_exists($this, $cmd)) {
+                    $this->$cmd();
+                    return;
+                }
+
+                if ($this->hasSpecialQuestionCommands() === true) {
+                    $this->callSpecialQuestionCommands($cmd);
+                }
         }
-        return $ret;
     }
 
-    public function getCommand($cmd)
+    protected function hasSpecialQuestionCommands() : bool
     {
-        return $cmd;
+        return static::HAS_SPECIAL_QUESTION_COMMANDS;
     }
 
     /**
@@ -467,11 +471,8 @@ abstract class assQuestionGUI
          */
         global $DIC;
         $tpl = $DIC['tpl'];
-
-        require_once 'Modules/TestQuestionPool/classes/tables/class.ilQuestionCumulatedStatisticsTableGUI.php';
+        
         $stats_table = new ilQuestionCumulatedStatisticsTableGUI($this, 'assessment', '', $this->object);
-
-        require_once 'Modules/TestQuestionPool/classes/tables/class.ilQuestionUsagesTableGUI.php';
         $usage_table = new ilQuestionUsagesTableGUI($this, 'assessment', '', $this->object);
 
         $tpl->setContent(implode('<br />', array(
@@ -875,7 +876,6 @@ abstract class assQuestionGUI
                 require_once 'Modules/Test/classes/class.ilObjTest.php';
                 $test = new ilObjTest($_GET["calling_test"]);
                 if (!assQuestion::_questionExistsInTest($this->object->getId(), $test->getTestId())) {
-                    global $DIC;
                     $tree = $DIC['tree'];
                     $ilDB = $DIC['ilDB'];
                     $ilPluginAdmin = $DIC['ilPluginAdmin'];
@@ -923,7 +923,6 @@ abstract class assQuestionGUI
                         $test->moveQuestionAfter($_REQUEST['prev_qid'], $this->object->getId());
                     }
                     if ( /*$___test_express_mode || */ $_REQUEST['express_mode']) {
-                        global $DIC;
                         $tree = $DIC['tree'];
                         $ilDB = $DIC['ilDB'];
                         $ilPluginAdmin = $DIC['ilPluginAdmin'];
@@ -954,6 +953,8 @@ abstract class assQuestionGUI
                 $this->ctrl->redirect($this, 'editQuestion');
             }
         }
+        $tabs = $DIC['ilTabs'];
+        $tabs->setTabActive('edit_question');
     }
 
     /**
@@ -982,7 +983,6 @@ abstract class assQuestionGUI
                 $test = new ilObjTest($_GET["calling_test"]);
                 $q_id = $this->object->getId();
                 if (!assQuestion::_questionExistsInTest($this->object->getId(), $test->getTestId())) {
-                    global $DIC;
                     $tree = $DIC['tree'];
                     $ilDB = $DIC['ilDB'];
                     $ilPluginAdmin = $DIC['ilPluginAdmin'];
@@ -1024,6 +1024,8 @@ abstract class assQuestionGUI
                 $this->ctrl->redirectByClass('ilAssQuestionPreviewGUI', ilAssQuestionPreviewGUI::CMD_SHOW);
             }
         }
+        $tabs = $DIC['ilTabs'];
+        $tabs->setTabActive('edit_question');
     }
 
     /**
@@ -1225,7 +1227,7 @@ abstract class assQuestionGUI
         $question->setCols(80);
         
         if (!$this->object->getSelfAssessmentEditingMode()) {
-            if ($this->object->getAdditionalContentEditingMode() != assQuestion::ADDITIONAL_CONTENT_EDITING_MODE_PAGE_OBJECT) {
+            if ($this->object->getAdditionalContentEditingMode() != assQuestion::ADDITIONAL_CONTENT_EDITING_MODE_IPE) {
                 $question->setUseRte(true);
                 include_once "./Services/AdvancedEditing/classes/class.ilObjAdvancedEditing.php";
                 $question->setRteTags(ilObjAdvancedEditing::_getUsedHTMLTags("assessment"));
@@ -1942,17 +1944,6 @@ abstract class assQuestionGUI
         
         // add tab for question's suggested solution within common class assQuestionGUI
         $this->addTab_SuggestedSolution($ilTabs, $classname);
-        
-        // Assessment of questions sub menu entry
-        if ($_GET["q_id"]) {
-            $ilTabs->addTarget(
-                "statistics",
-                $this->ctrl->getLinkTargetByClass($classname, "assessment"),
-                array("assessment"),
-                $classname,
-                ""
-            );
-        }
     }
     
     protected function setQuestionSpecificTabs(ilTabsGUI $ilTabs)

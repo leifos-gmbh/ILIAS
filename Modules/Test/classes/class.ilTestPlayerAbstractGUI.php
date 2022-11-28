@@ -1200,9 +1200,18 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
             $this->testSession->getActiveId(),
             $solutionoutput
         );
-        
-        $this->tpl->setCurrentBlock('readonly_css_class');
-        $this->tpl->touchBlock('readonly_css_class');
+
+        //$this->tpl->setCurrentBlock('readonly_css_class');
+        //$this->tpl->touchBlock('readonly_css_class');
+        global $DIC;
+        $f = $DIC->ui()->factory();
+        $renderer = $DIC->ui()->renderer();
+
+        $this->tpl->setVariable(
+            'LOCKSTATE_INFOBOX',
+            $renderer->render($f->messageBox()->info("Answer is saved and locked and can no longer be changed"))
+        );
+
         $this->tpl->parseCurrentBlock();
 
         $this->tpl->setVariable('QUESTION_OUTPUT', $pageoutput);
@@ -1564,6 +1573,13 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
      */
     public function outQuestionSummaryCmd($fullpage = true, $contextFinishTest = false, $obligationsInfo = false, $obligationsFilter = false)
     {
+        global $DIC;
+        $help = $DIC->help();
+
+        $help->setScreenIdComponent("tst");
+        $help->setScreenId("assessment");
+        $help->setSubScreenId("question_summary");
+
         if ($fullpage) {
             $this->tpl->addBlockFile($this->getContentBlockName(), "adm_content", "tpl.il_as_tst_question_summary.html", "Modules/Test");
         }
@@ -2890,4 +2906,12 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
             unset($_SESSION['forced_feedback_navigation_url'][$this->testSession->getActiveId()]);
         }
     }
+
+    protected function handleFileUploadCmd()
+    {
+        $this->updateWorkingTime();
+        $this->saveQuestionSolution(false);
+        $this->ctrl->redirect($this, ilTestPlayerCommands::SUBMIT_SOLUTION );
+    }
+
 }

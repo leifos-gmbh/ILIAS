@@ -31,117 +31,100 @@ import org.xml.sax.SAXException;
 import javax.xml.transform.*;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public class FO2PDF {
-    
+
     private static FO2PDF instance = null;
-	
-	private final Logger logger = LogManager.getLogger(this.getClass().getName());
+
+    private final Logger logger = LogManager.getLogger(this.getClass().getName());
     private String foString = null;
     private byte[] pdfByteArray = null;
-	private FopFactory fopFactory = null;
+    private FopFactory fopFactory = null;
 
-	/**
-	 * Singleton contructor
-	 */
-    public FO2PDF() 
-	{
-		try 
-		{
-			// add font config
-			URL fopConfigUrl = getClass().getResource("/de/ilias/config/fopConfig.xml");
-			logger.info("Using config uri: " + fopConfigUrl.toURI());
-				
-			fopFactory = FopFactory.newInstance(fopConfigUrl.toURI());
-			fopFactory.getFontManager().deleteCache();
+    /**
+     * Singleton constructor
+     */
+    public FO2PDF() {
+        try {
+            fopFactory = FopFactory.newInstance(getClass().getResource("/de/ilias/config/fopConfig.xml").toURI());
+            fopFactory.getFontManager().deleteCache();
+            fopFactory.getFontManager().saveCache();
 
-		} 
-		catch (SAXException ex) {
-			logger.error("Cannot load fop configuration:" + ex);
-		} catch (URISyntaxException ex) {
-			logger.error("Cannot load fop configuration:" + ex);
-		}
-        
+        } catch (SAXException | URISyntaxException | NullPointerException ex) {
+            logger.error("Cannot load fop configuration:" + ex);
+        }
+
     }
-	
-	/**
-	 * clear fop uri cache
-	 */
-	public void clearCache() {
-		
-		fopFactory.getImageManager().getCache().clearCache();
-	}
-	
-	/**
-	 * Get FO2PDF instance
-	 * @return 
-	 */
-	public static FO2PDF getInstance() {
-		
-		if(instance == null) {
-			return instance = new FO2PDF();
-		}
-		return instance;
-	}
-    
-	/**
-	 * Transform 
-	 * @throws TransformationException 
-	 */
+
+    /**
+     * Get FO2PDF instance
+     */
+    public static FO2PDF getInstance() {
+
+        if (instance == null) {
+            return instance = new FO2PDF();
+        }
+        return instance;
+    }
+
+    /**
+     * clear fop uri cache
+     */
+    public void clearCache() {
+
+        fopFactory.getImageManager().getCache().clearCache();
+    }
+
     public void transform()
-        throws TransformationException {
-       
+            throws TransformationException {
+
         try {
 
-			logger.info("Starting fop transformation...");
-			
+            logger.info("Starting fop transformation...");
+
             FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
 //            foUserAgent.setTargetResolution(300);
             ByteArrayOutputStream out = new ByteArrayOutputStream();
-            
+
             Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, out);
-            
+
 //          Setup JAXP using identity transformer
             TransformerFactory factory = TransformerFactory.newInstance();
             Transformer transformer = factory.newTransformer(); // identity transformer
-            
+
             Source src = new StreamSource(getFoInputStream());
             Result res = new SAXResult(fop.getDefaultHandler());
-            
-            transformer.transform(src,res);
-            
+
+            transformer.transform(src, res);
+
             FormattingResults foResults = fop.getResults();
-            java.util.List pageSequences = foResults.getPageSequences();
-            for (java.util.Iterator it = pageSequences.iterator(); it.hasNext();) {
-                PageSequenceResults pageSequenceResults = (PageSequenceResults)it.next();
-                logger.debug("PageSequenze "
-                        + (String.valueOf(pageSequenceResults.getID()).length() > 0 
-                                ? pageSequenceResults.getID() : "<no id>") 
+            List pageSequences = foResults.getPageSequences();
+            for (Object pageSequence : pageSequences) {
+                PageSequenceResults pageSequenceResults = (PageSequenceResults) pageSequence;
+                logger.debug("PageSequence "
+                        + (String.valueOf(pageSequenceResults.getID()).length() > 0
+                        ? pageSequenceResults.getID() : "<no id>")
                         + " generated " + pageSequenceResults.getPageCount() + " pages.");
             }
             logger.info("Generated " + foResults.getPageCount() + " pages in total.");
-            
+
             this.setPdf(out.toByteArray());
 
+        } catch (TransformerConfigurationException e) {
+            logger.warn("Configuration exception: " + e);
+            throw new TransformationException(e);
+        } catch (TransformerException e) {
+            logger.warn("Transformer exception: " + e);
+            throw new TransformationException(e);
+        } catch (FOPException e) {
+            throw new TransformationException(e);
         }
-		catch (SAXException ex) { 
-			logger.error("Cannot load fop configuration:" + ex);
-		} 
-		catch (IOException ex) {
-			logger.error("Cannot load fop configuration:" + ex);
-		} 
-        catch (TransformerConfigurationException e) {
-        	logger.warn("Configuration exception: " + e);
-            throw new TransformationException(e);
-		} 
-        catch (TransformerException e) {
-        	logger.warn("Transformer exception: " + e);
-            throw new TransformationException(e);
-		}
     }
 
 
@@ -151,8 +134,8 @@ public class FO2PDF {
     public String getFoString() {
         return foString;
     }
-    
-    
+
+
     /**
      * @param foString The foString to set.
      */
@@ -163,15 +146,13 @@ public class FO2PDF {
     public byte[] getPdf() {
         return this.pdfByteArray;
     }
-    
+
     public void setPdf(byte[] ba) {
-        
         this.pdfByteArray = ba;
     }
 
-    
-    private InputStream getFoInputStream() throws UnsupportedEncodingException { 
-        
+
+    private InputStream getFoInputStream() {
         return new ByteArrayInputStream(getFoString().getBytes(StandardCharsets.UTF_8));
     }
 }

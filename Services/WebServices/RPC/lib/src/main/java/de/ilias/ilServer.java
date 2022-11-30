@@ -144,11 +144,11 @@ public class ilServer {
 	private boolean createIndexer() {
 
 		XmlRpcClient client;
-		IniFileParser parser;
+		CommonsIniFileParser parser;
 		
 		try {
-			parser = new IniFileParser();
-			parser.parseServerSettings(arguments[0],true);
+			parser = new CommonsIniFileParser();
+			parser.parseSettings(arguments[0],true);
 			
 			if(!ClientSettings.exists(arguments[2])) {
 				throw new ConfigurationException("Unknown client given: " + arguments[2]);
@@ -171,11 +171,11 @@ public class ilServer {
 	private boolean updateIndexer() {
 
 		XmlRpcClient client;
-		IniFileParser parser;
+		CommonsIniFileParser parser;
 
 		try {
-			parser = new IniFileParser();
-			parser.parseServerSettings(arguments[0],true);
+			parser = new CommonsIniFileParser();
+			parser.parseSettings(arguments[0],true);
 			
 			if(!ClientSettings.exists(arguments[2])) {
 				throw new ConfigurationException("Unknown client given: " + arguments[2]);
@@ -203,12 +203,11 @@ public class ilServer {
 	private boolean startSearch() {
 
 		XmlRpcClient client;
-		IniFileParser parser;
-		
-		
+		CommonsIniFileParser parser;
+
 		try {
-			parser = new IniFileParser();
-			parser.parseServerSettings(arguments[0],true);
+			parser = new CommonsIniFileParser();
+			parser.parseSettings(arguments[0],true);
 			
 			if(!ClientSettings.exists(arguments[2])) {
 				throw new ConfigurationException("Unknown client given: " + arguments[2]);
@@ -239,13 +238,16 @@ public class ilServer {
 		ServerSettings settings;
 		RPCServer rpc;
 		XmlRpcClient client;
-		IniFileParser parser;
+		CommonsIniFileParser parser;
 		String status;
 
 		try {
 
-			parser = new IniFileParser();
-			parser.parseServerSettings(arguments[0],true);
+			logger.debug("Start parsing");
+			parser = new CommonsIniFileParser();
+			logger.debug("Parser created");
+			parser.parseSettings(arguments[0], true);
+			logger.debug("Parser parsed");
 			settings = ServerSettings.getInstance();
 			client = initRpcClient();
 
@@ -316,11 +318,11 @@ public class ilServer {
 	private boolean stopServer() {
 		
 		XmlRpcClient client;
-		IniFileParser parser;
+		CommonsIniFileParser parser;
 
 		try {
-			parser = new IniFileParser();
-			parser.parseServerSettings(arguments[0],false);
+			parser = new CommonsIniFileParser();
+			parser.parseSettings(arguments[0],false);
 			
 			client = initRpcClient();
 			logger.debug("Client execute");
@@ -343,14 +345,14 @@ public class ilServer {
 	private boolean getStatus() {
 		
 		XmlRpcClient client;
-		IniFileParser parser;
+		CommonsIniFileParser parser;
 		ServerSettings settings;
 		
 		String status;
 
 		try {
-			parser = new IniFileParser();
-			parser.parseServerSettings(arguments[0],false);
+			parser = new CommonsIniFileParser();
+			parser.parseSettings(arguments[0],false);
 
 			settings = ServerSettings.getInstance();
 			client = initRpcClient();

@@ -5,6 +5,8 @@
  */
 package de.ilias.services.settings;
 
+import org.apache.commons.configuration2.INIConfiguration;
+import org.apache.commons.configuration2.SubnodeConfiguration;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,7 +19,6 @@ import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.filter.ThresholdFilter;
 import org.apache.logging.log4j.core.layout.PatternLayout;
-import org.ini4j.Ini;
 
 import java.io.File;
 import java.io.FileReader;
@@ -74,19 +75,23 @@ public class LogConfigManager {
 
 
 	public void parse(String path) throws ConfigurationException {
-		
-		Ini prefs;
-		try {
-			prefs = new Ini(new FileReader(path));
-			for(Ini.Section section : prefs.values()) {
-				
-				if(section.getName().equals("Server")) {
-					if(section.containsKey("LogFile"))
-						setLogFile(purgeString(section.get("LogFile")));
-					if(section.containsKey("LogLevel"))
-						setLogLevel(purgeString(section.get("LogLevel")));
+
+		INIConfiguration ini = new INIConfiguration();
+		try (FileReader fileReader = new FileReader(path)) {
+			ini.read(fileReader);
+			for (String section : ini.getSections()) {
+				if (section.equals("Server")) {
+					SubnodeConfiguration sectionConfig = ini.getSection(section);
+					if (sectionConfig.containsKey("LogLevel")) {
+						setLogLevel(purgeString(sectionConfig.getProperty("LogLevel").toString()));
+					}
+					if (sectionConfig.containsKey("LogFile")) {
+						setLogFile(purgeString(sectionConfig.getProperty("LogFile").toString()));
+					}
 				}
 			}
+		} catch (org.apache.commons.configuration2.ex.ConfigurationException e) {
+			throw new ConfigurationException(e);
 		} catch (IOException e) {
 			throw new ConfigurationException(e);
 		}

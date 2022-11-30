@@ -74,6 +74,12 @@
             <artifactId>log4j-jcl</artifactId>
             <version>2.19.0</version>
         </dependency>
+        <!-- used for ilServer.ini parsing -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-configuration2</artifactId>
+            <version>2.8.0</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/commons-httpclient/commons-httpclient -->
         <dependency>
             <groupId>commons-httpclient</groupId>
@@ -109,13 +115,6 @@
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-queryparser</artifactId>
             <version>7.7.2</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.ini4j/ini4j -->
-        <dependency>
-            <groupId>org.ini4j</groupId>
-            <artifactId>ini4j</artifactId>
-            <version>0.5.4</version>
-            <scope>compile</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client -->
         <dependency>
@@ -188,7 +187,7 @@
             <version>2.6.0</version>
         </dependency>
 
-        <!-- fop pdf generation -->
+        <!-- fop pdf generation: all in one jar produces class duplication warnings -->
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
             <artifactId>fop-core</artifactId>

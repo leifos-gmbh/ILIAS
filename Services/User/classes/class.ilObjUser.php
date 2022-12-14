@@ -614,7 +614,8 @@ class ilObjUser extends ilObject
             "last_password_change" => array("integer", $this->last_password_change_ts),
             "passwd_policy_reset" => array("integer", $this->passwd_policy_reset),
             "last_update" => array("timestamp", ilUtil::now()),
-            'inactivation_date' => array('timestamp', $this->inactivation_date)
+            'inactivation_date' => array('timestamp', $this->inactivation_date),
+            'reg_hash' => null
             );
             
         if ($this->agree_date === null || (is_string($this->agree_date) && strtotime($this->agree_date) !== false)) {
@@ -3288,10 +3289,16 @@ class ilObjUser extends ilObject
         while ($obj = $ilDB->fetchAssoc($objs)) {
             if ($obj["type"] == "mob") {
                 $obj["title"] = ilObject::_lookupTitle($obj["item_id"]);
+                if (ilObject::_lookupType((int) $obj["item_id"]) !== "mob") {
+                    continue;
+                }
             }
             if ($obj["type"] == "incl") {
                 include_once("./Modules/MediaPool/classes/class.ilMediaPoolPage.php");
                 $obj["title"] = ilMediaPoolPage::lookupTitle($obj["item_id"]);
+                if (!ilPageObject::_exists("mep", (int) $obj["item_id"], "-")) {
+                    continue;
+                }
             }
             $objects[] = array("id" => $obj["item_id"],
                 "type" => $obj["type"], "title" => $obj["title"],
@@ -5520,7 +5527,7 @@ class ilObjUser extends ilObject
             "SELECT * FROM usr_pref " .
                 " WHERE keyword = " . $ilDB->quote("public_profile", "text") .
                 " AND " . $ilDB->in("usr_id", $a_user_ids, false, "integer")
-            );
+        );
         $r = array(
             "global" => array(),
             "local" => array(),

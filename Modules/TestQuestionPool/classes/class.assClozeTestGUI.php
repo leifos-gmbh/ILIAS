@@ -310,7 +310,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
         $question->setRows(10);
         $question->setCols(80);
         if (!$this->object->getSelfAssessmentEditingMode()) {
-            if ($this->object->getAdditionalContentEditingMode() == assQuestion::ADDITIONAL_CONTENT_EDITING_MODE_DEFAULT) {
+            if ($this->object->getAdditionalContentEditingMode() == assQuestion::ADDITIONAL_CONTENT_EDITING_MODE_RTE) {
                 $question->setUseRte(true);
                 include_once "./Services/AdvancedEditing/classes/class.ilObjAdvancedEditing.php";
                 $question->setRteTags(ilObjAdvancedEditing::_getUsedHTMLTags("assessment"));
@@ -383,7 +383,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
         $cloze_text->setRows(10);
         $cloze_text->setCols(80);
         if (!$this->object->getSelfAssessmentEditingMode()) {
-            if ($this->object->getAdditionalContentEditingMode() == assQuestion::ADDITIONAL_CONTENT_EDITING_MODE_DEFAULT) {
+            if ($this->object->getAdditionalContentEditingMode() == assQuestion::ADDITIONAL_CONTENT_EDITING_MODE_RTE) {
                 $cloze_text->setUseRte(true);
                 include_once "./Services/AdvancedEditing/classes/class.ilObjAdvancedEditing.php";
                 $cloze_text->setRteTags(ilObjAdvancedEditing::_getUsedHTMLTags("assessment"));
@@ -508,7 +508,7 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
             $value = $content->getItemsRaw();
             $items = array();
             for ($j = 0;$j < count($value);$j++) {
-                if ($content->getType() == 2) {
+                if ($content->isNumericGap()) {
                     $items[$j] = array(
                         'answer' => $value[$j]->getAnswerText(),
                         'lower' => $value[$j]->getLowerBound(),
@@ -518,12 +518,12 @@ class assClozeTestGUI extends assQuestionGUI implements ilGuiQuestionScoringAdju
                     );
                 } else {
                     $items[$j] = array(
-                        'answer' => $value[$j]->getAnswerText(),
+                        'answer' => str_replace(['{','}'], ['&#123;','&#125;'], $value[$j]->getAnswerText()),
                         'points' => $value[$j]->getPoints(),
                         'error' => false
                     );
 
-                    if ($content->getType() == 1) {
+                    if ($content->isSelectGap()) {
                         $shuffle = $content->getShuffle();
                     }
                 }

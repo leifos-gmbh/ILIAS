@@ -7592,10 +7592,12 @@ a fieldset[disabled] .active {
   background-color: #75deea;
   color: #000000;
 }
-.btn-link {
+.btn.btn-link {
   padding: 0;
   text-align: left;
   white-space: normal;
+  vertical-align: baseline;
+  font-size: inherit;
 }
 .btn-bulky {
   width: 100%;
@@ -9638,6 +9640,13 @@ footer {
 .il-maincontrols-slate #ilHelpPanel .btn-bulky .bulky-label {
   margin-top: 3px;
 }
+.il-maincontrols-slate .panel-body::after {
+  content: "";
+  display: inline;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
 .il-maincontrols-slate.engaged[data-depth-level="2"] .btn-bulky:not(:hover),
 .il-maincontrols-slate.engaged[data-depth-level="2"] .link-bulky:not(:hover) {
   background-color: #f9f9f9;
@@ -10521,7 +10530,6 @@ footer {
 }
 .icon.small {
   height: 20px;
-  width: 20px;
   line-height: 20px;
 }
 .icon.small .abbreviation {
@@ -10534,7 +10542,6 @@ footer {
 }
 .icon.medium {
   height: 35px;
-  width: 35px;
   line-height: 35px;
 }
 .icon.medium .abbreviation {
@@ -10542,20 +10549,16 @@ footer {
   width: 35px;
 }
 .icon.medium img {
-  width: 35px;
   height: 35px;
 }
 .icon.large {
   height: 45px;
-  width: 45px;
   line-height: 45px;
 }
 .icon.large .abbreviation {
   font-size: 18px;
-  width: 45px;
 }
 .icon.large img {
-  width: 45px;
   height: 45px;
 }
 .icon.responsive {
@@ -10564,7 +10567,6 @@ footer {
 }
 .icon.responsive .abbreviation {
   font-size: 14px;
-  width: 35px;
 }
 .icon.responsive img {
   width: 100%;
@@ -19450,6 +19452,14 @@ div.ilc_Question {
   margin-top: 10px;
   margin-bottom: 10px;
 }
+.ilc_qinput_TextInput {
+  max-width: 65vw;
+}
+@media only screen and (max-width: 768px) {
+  .ilc_qinput_TextInput {
+    max-width: 100%;
+  }
+}
 .testSheet {
   background: #EEEEEE;
   border-spacing: 1px;
@@ -19584,29 +19594,6 @@ div.textbox {
   padding-left: 20px;
   background: none;
   cursor: default;
-}
-.clearfix:after,
-.dl-horizontal dd:after,
-.container:after,
-.container-fluid:after,
-.row:after,
-.form-horizontal .form-group:after,
-.btn-toolbar:after,
-.btn-group-vertical > .btn-group:after,
-.nav:after,
-.navbar:after,
-.navbar-header:after,
-.navbar-collapse:after,
-.pager:after,
-.panel-body:after,
-.modal-header:after,
-.modal-footer:after,
-.il-table-presentation-row .il-table-presentation-row-expanded:after {
-  content: ".";
-  display: block;
-  height: 0;
-  clear: both;
-  visibility: hidden;
 }
 div.odd {
   padding: 0.5em 0;
@@ -20194,4 +20181,3 @@ table.mceToolbar td {
   border: 1px solid #dddddd;
   border-radius: 0.25em;
 }
-/*# sourceMappingURL=./delos.css.map */

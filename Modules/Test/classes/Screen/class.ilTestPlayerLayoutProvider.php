@@ -123,7 +123,7 @@ class ilTestPlayerLayoutProvider extends AbstractModificationProvider implements
             return $this->globalScreen()->layout()->factory()->short_title()
             ->withModification(
                 function (string $content) use ($title): string {
-                    return $title;
+                    return (string) $title;
                 }
             )
             ->withHighPriority();
@@ -138,7 +138,7 @@ class ilTestPlayerLayoutProvider extends AbstractModificationProvider implements
             return $this->globalScreen()->layout()->factory()->view_title()
             ->withModification(
                 function (string $content) use ($title): string {
-                    return $title;
+                    return (string) $title;
                 }
             )
             ->withHighPriority();

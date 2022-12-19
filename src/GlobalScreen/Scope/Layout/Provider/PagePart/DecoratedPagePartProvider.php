@@ -57,12 +57,6 @@ class DecoratedPagePartProvider implements PagePartProvider
     {
         if ($this->isDecorated($purpose)) {
             $deco = $this->deco;
-            switch ($purpose) {
-                case self::PURPOSE_TITLE:
-                case self::PURPOSE_VIEWTITLE:
-                case self::PURPOSE_SHORTTITLE:
-                    return (string) $deco($original);
-            }
             return $deco($original);
         }
         return $original;
@@ -146,7 +140,7 @@ class DecoratedPagePartProvider implements PagePartProvider
      */
     public function getTitle() : string
     {
-        return $this->getDecoratedOrOriginal(self::PURPOSE_TITLE, $this->original->getTitle());
+        return (string) $this->getDecoratedOrOriginal(self::PURPOSE_TITLE, $this->original->getTitle());
     }
 
     /**
@@ -154,7 +148,7 @@ class DecoratedPagePartProvider implements PagePartProvider
      */
     public function getShortTitle() : string
     {
-        return $this->getDecoratedOrOriginal(self::PURPOSE_SHORTTITLE, $this->original->getShortTitle());
+        return (string) $this->getDecoratedOrOriginal(self::PURPOSE_SHORTTITLE, $this->original->getShortTitle());
     }
 
     /**
@@ -162,6 +156,6 @@ class DecoratedPagePartProvider implements PagePartProvider
      */
     public function getViewTitle() : string
     {
-        return $this->getDecoratedOrOriginal(self::PURPOSE_VIEWTITLE, $this->original->getViewTitle());
+        return (string) $this->getDecoratedOrOriginal(self::PURPOSE_VIEWTITLE, $this->original->getViewTitle());
     }
 }

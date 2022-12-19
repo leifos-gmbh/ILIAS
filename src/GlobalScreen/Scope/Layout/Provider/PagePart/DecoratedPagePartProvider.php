@@ -57,10 +57,14 @@ class DecoratedPagePartProvider implements PagePartProvider
     {
         if ($this->isDecorated($purpose)) {
             $deco = $this->deco;
-
+            switch ($purpose) {
+                case self::PURPOSE_TITLE:
+                case self::PURPOSE_VIEWTITLE:
+                case self::PURPOSE_SHORTTITLE:
+                    return (string) $deco($original);
+            }
             return $deco($original);
         }
-
         return $original;
     }
 

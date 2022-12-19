@@ -30,9 +30,9 @@ class ilVirusScannerClamAV extends ilVirusScanner
     /**
      * @return string $scanCommand
      */
-    protected function buildScanCommand($file = '-') // default means piping
+    protected function buildScanCommandArguments($file = '-') // default means piping
     {
-        return $this->scanCommand . ' ' . self::ADD_SCAN_PARAMS . ' ' . $file;
+        return ' ' . self::ADD_SCAN_PARAMS . ' ' . $file;
     }
     
     /**
@@ -82,7 +82,7 @@ class ilVirusScannerClamAV extends ilVirusScanner
         // 0 => writeable handle connected to child stdin
         // 1 => readable handle connected to child stdout
 
-        $process = proc_open($this->buildScanCommand(), $descriptorspec, $pipes);
+        $process = proc_open($this->scanCommand . $this->buildScanCommandArguments(), $descriptorspec, $pipes);
         
         if (!is_resource($process)) {
             return false; // no scan, no virus detected
@@ -141,9 +141,14 @@ class ilVirusScannerClamAV extends ilVirusScanner
         //end-patch skyguide
 
         // Call of antivir command
-        $cmd = $this->buildScanCommand($a_filepath) . " 2>&1";
-        exec($cmd, $out, $ret);
-        $this->scanResult = implode("\n", $out);
+        $a_filepath = realpath($a_filepath);
+        if(file_exists($a_filepath)) {
+            $args = ilUtil::escapeShellArg($a_filepath);
+            $arguments = $this->buildScanCommandArguments($args) . " 2>&1";
+            $cmd = ilUtil::escapeShellCmd($this->scanCommand);
+            $out = ilUtil::execQuoted($cmd, $arguments);
+	    $this->scanResult = implode("\n", $out);
+	}
 
         //begin-patch skyguide
         if (strlen($this->scanResult)) {
@@ -174,13 +179,11 @@ class ilVirusScannerClamAV extends ilVirusScanner
             }
             //end-patch skyguide
             return $this->scanResult;
-		}
-		else
-		{
+	} else {
             //begin-patch skyguide
             if ($GLOBALS['ilUser'] instanceof ilObjUser) {
                 $this->log->info('File is clean: ' . $this->scanFilePath . ' uploaded by ' . $GLOBALS['ilUser']->getLogin());
-        } else {
+            } else {
                 $this->log->info('File is clean: ' . $this->scanFilePath . ' uploaded by unknown.');
                 $this->log->logStack();
             }
@@ -189,9 +192,8 @@ class ilVirusScannerClamAV extends ilVirusScanner
             return "";
         }
 
-        // antivir has failed (todo)
         $this->log->write("ERROR (Virus Scanner failed): "
             . $this->scanResult
-            . "; COMMAMD=" . $cmd);
+            . "; Path=" . $a_filepath);
     }
 }

@@ -892,6 +892,7 @@ assessment#:#log_wrong_test_password_entered#:#Participant entered wrong test pa
 assessment#:#longmenu#:#Longmenu###10 11 2018 new variable
 assessment#:#longmenu_text#:#Long Menu Text###30 08 2015 new variable
 assessment#:#mailnottype#:#Saada märguanne isegi kui kasutaja lihtsalt lõpetab testi.
+assessment#:#mailnottype_desc#:#Notify the owner of the test <strong>even if</strong> the number of test attempts has not been limited.###09 11 2022 new variable
 assessment#:#maintenance#:#Säilitamine
 assessment#:#manscoring#:#Käsitsi punktihaldus
 assessment#:#manscoring_done#:#Hinnatud osalejad
@@ -972,6 +973,7 @@ assessment#:#oq_btn_use_order_pictures#:#Use answer pictures
 assessment#:#oq_btn_use_order_terms#:#Use answer terms
 assessment#:#oq_header_ordering_elements#:#Ordering Elements
 assessment#:#or#:#või
+assessment#:#order#:#Order###09 11 2022 new variable
 assessment#:#ordering_answer_sequence_info#:#Vastuste järjestust siin arvestatakse kui õige vastuse järjestust.
 assessment#:#ordertext#:#Teksti järjestamine
 assessment#:#ordertext_info#:#Palun sisesta tekst, mis peaks olema järjestatud horisontaalselt. Järjestatav tekst eraldatakse tekstis olevate valgete tühikutega. Kui vajad muud eraldajat, võid kasutada eraldajat %s oma tekstiosade eraldamiseks.
@@ -1632,6 +1634,7 @@ assessment#:#tst_pass_details#:#Vaata vastust!
 assessment#:#tst_pass_details_header_lo_initial#:#Initial Test Results for the Learning Objectives<br />%s - %s###30 08 2015 new variable
 assessment#:#tst_pass_details_header_lo_qualifying#:#Qualifying Test Results for the Learning Objectives<br />%s - %s###30 08 2015 new variable
 assessment#:#tst_pass_details_overview_table_title#:#Detailed Overview for Pass %s
+assessment#:#tst_pass_finished#:#Test pass finished###24 11 2022 new variable
 assessment#:#tst_pass_finished_on#:#Test pass finished on###08 10 2015 new variable
 assessment#:#tst_pass_last_pass#:#Arvestatakse kasutaja viimast sooritust.
 assessment#:#tst_pass_last_pass_desc#:#The last pass of a participant will be scored.
@@ -1709,6 +1712,7 @@ assessment#:#tst_question_hints_ordering_clipboard_resetted#:#The ordering clipb
 assessment#:#tst_question_hints_paste_after_success_msg#:#The hint %s has been pasted after hint %s successfully.
 assessment#:#tst_question_hints_paste_before_success_msg#:#The hint %s has been pasted before hint %s successfully.
 assessment#:#tst_question_hints_request_confirmation#:#Do you really want to request hint %s? For this hint %s point(s) will be deducted.
+assessment#:#tst_question_hints_request_confirmation_no_deduction#:#No points will be deducted for this hint.###09 11 2022 new variable
 assessment#:#tst_question_hints_requested_hint_count_header#:#Requested Hints
 assessment#:#tst_question_hints_save_order_success_msg#:#The order of hint was saved successfully.
 assessment#:#tst_question_hints_tab#:#Hints
@@ -3381,6 +3385,7 @@ common#:#HH#:#HH:MM
 common#:#absolute_path#:#Absoluuttee
 common#:#accept_usr_agreement#:#Kas nõustute kasutajatingimustega?
 common#:#accept_usr_agreement_btn#:#Accept###30 04 2021 new variable
+common#:#accept_usr_agreement_intro#:#There are new terms of service. You need to accept them before proceeding with the use of ILIAS. Read the following document carefully and give your consent or dissent at the bottom of the page.###24 11 2022 new variable
 common#:#access#:#Ligipääs
 common#:#accessFree#:#Eemalda piiratud ligipääs
 common#:#accessRestrict#:#Sea piiratud ligipääs
@@ -5797,6 +5802,7 @@ common#:#usr_account_inactive#:#Inactive Account
 common#:#usr_active_only#:#Näita aktiivseid kasutajaid
 common#:#usr_add#:#Lisa kasutaja
 common#:#usr_agreement#:#Kasutustingimused
+common#:#usr_agreement_footer_intro#:#You have declared your consent to these terms of service.###24 11 2022 new variable
 common#:#usr_edit#:#Muuda kasutajat
 common#:#usr_filter_coursemember#:#Kursuse liige
 common#:#usr_filter_groupmember#:#Grupi liige
@@ -5982,6 +5988,7 @@ cont#:#cont_skill_do_not_set#:#Do not set###31 08 2017 new variable
 cont#:#cont_skill_members#:#Members###31 08 2017 new variable
 cont#:#cont_skill_no_profile_selected#:#Please select a profile.###30 04 2021 new variable
 cont#:#cont_skill_no_skill#:#No value (Reset)###31 08 2017 new variable
+cont#:#cont_skill_no_skills_selected#:#No competences have been selected yet. Please add at least one competence first under "Competence Selection".###09 11 2022 new variable
 cont#:#cont_skill_profile#:#Profile###30 04 2021 new variable
 cont#:#cont_skill_profiles#:#Assigned Profiles of Members###30 04 2021 new variable
 cont#:#cont_skill_publish#:#Publish###31 08 2017 new variable
@@ -7783,9 +7790,11 @@ crs#:#crs_view_timing#:#Ajastuste vaade
 crs#:#crs_view_timing_absolute#:#Absolute Dates###07 02 2020 new variable
 crs#:#crs_view_timing_relative#:#Relative Dates###07 02 2020 new variable
 crs#:#crs_view_timings#:#Timings View Type###07 02 2020 new variable
+crs#:#crs_visibility#:#Visibility###24 11 2022 new variable
 crs#:#crs_visibility_limitless#:#Avatud
 crs#:#crs_visibility_until#:#Ajutiselt avatud
 crs#:#crs_visibility_until_info#:#The course will be visible to it's members in a specific period of time.###23 12 2015 new variable
+crs#:#crs_visibility_unvisible#:#The course is not visible.###24 11 2022 new variable
 crs#:#crs_wait_info#:#Kui märgitud siis kõik maksimaalse arvu ületanud taotlused saadetakse kursusel osaleda soovijate nimekirja.
 crs#:#crs_waiting_list#:#Kursusel osaleda soovijate nimekiri
 crs#:#crs_waiting_list_autofill#:#With Auto-Fill###30 08 2015 new variable
@@ -13847,9 +13856,11 @@ rep#:#rep_add_to_favourites#:#Add to Favourites###07 02 2020 new variable
 rep#:#rep_added_rec_content#:#Recommended content has been added.###07 02 2020 new variable
 rep#:#rep_added_to_favourites#:#The item has been added to your favourites.###07 02 2020 new variable
 rep#:#rep_breadcr_crs#:#Breadcrumb starts with course###10 11 2018 new variable
+rep#:#rep_breadcr_crs_config#:#Configuration###24 11 2022 new variable
 rep#:#rep_breadcr_crs_overwrite#:#Setting is changeable on course level###10 11 2018 new variable
 rep#:#rep_breadcr_crs_overwrite_not#:#Setting is not changeable on course level###10 11 2018 new variable
 rep#:#rep_configure#:#Configure###07 02 2020 new variable
+rep#:#rep_crs_default_shortened#:#Default: Breadcrumbs Shortened###24 11 2022 new variable
 rep#:#rep_custom_icons#:#Custom Icons
 rep#:#rep_default#:#Default###10 11 2018 new variable
 rep#:#rep_dependencies#:#Dependencies
@@ -14563,6 +14574,7 @@ skmg#:#skmg_new_sktr#:#Uus pädevuse malli viide
 skmg#:#skmg_next_step#:#Järgmine samm
 skmg#:#skmg_no_nodes_selectable#:#Currently there are no competences selectable.
 skmg#:#skmg_no_skills#:#Pädevused puuduvad
+skmg#:#skmg_no_skills_selected_info#:#You have not selected or fulfilled any competences yet. Click on the "Add Competence"-button to select a competence. You can add any number of competences. If you fulfill competences by editing learning materials, they will be automatically listed here.###09 11 2022 new variable
 skmg#:#skmg_no_trigger#:#Käiviteid pole
 skmg#:#skmg_nr#:#Nr
 skmg#:#skmg_number#:#Number
@@ -14605,6 +14617,8 @@ skmg#:#skmg_skill_levels#:#Pädevuste tasemed
 skmg#:#skmg_skill_management_deactivated#:#Pädevuste haldus pole aktiveeritud.
 skmg#:#skmg_skill_needs_impr_no_res#:#You need to improve this competence. Unfortunately there are currently no learning resources available providing learning material aligned to your target competence level.
 skmg#:#skmg_skill_needs_impr_res#:#You need to improve this competence. The following resources provide learning material aligned to your target competence level.
+skmg#:#skmg_skill_needs_self_eval#:#Please conduct a self-evaluation first to see your competence target.###09 11 2022 new variable
+skmg#:#skmg_skill_needs_self_eval_box#:#Please note that you have not conducted a self-evaluation for at least one competence in this profile. You will not see the competence target for the affected competences until a self-evaluation is done.###09 11 2022 new variable
 skmg#:#skmg_skill_no_needs_impr#:#Your competence level is sufficient for the selected profile.
 skmg#:#skmg_skill_profiles#:#Profiles
 skmg#:#skmg_skill_template#:#Pädevuste mall

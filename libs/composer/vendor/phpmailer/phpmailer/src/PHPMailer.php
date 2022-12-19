@@ -750,7 +750,7 @@ class PHPMailer
      *
      * @var string
      */
-    const VERSION = '6.6.4';
+    const VERSION = '6.6.5';
 
     /**
      * Error severity: message only, continue processing.
@@ -1677,7 +1677,7 @@ class PHPMailer
                     return $this->mailSend($this->MIMEHeader, $this->MIMEBody);
             }
         } catch (Exception $exc) {
-            if ($this->Mailer === 'smtp' && $this->SMTPKeepAlive == true) {
+            if ($this->Mailer === 'smtp' && $this->SMTPKeepAlive == true && $this->smtp->connected()) {
                 $this->smtp->reset();
             }
             $this->setError($exc->getMessage());
@@ -1869,7 +1869,7 @@ class PHPMailer
         if (!static::isPermittedPath($path)) {
             return false;
         }
-        $readable = file_exists($path);
+        $readable = is_file($path);
         //If not a UNC path (expected to start with \\), check read permission, see #2069
         if (strpos($path, '\\\\') !== 0) {
             $readable = $readable && is_readable($path);
@@ -2107,6 +2107,9 @@ class PHPMailer
         $this->smtp->setDebugLevel($this->SMTPDebug);
         $this->smtp->setDebugOutput($this->Debugoutput);
         $this->smtp->setVerp($this->do_verp);
+        if ($this->Host === null) {
+            $this->Host = 'localhost';
+        }
         $hosts = explode(';', $this->Host);
         $lastexception = null;
 
@@ -2603,22 +2606,19 @@ class PHPMailer
         $result = '';
 
         $result .= $this->headerLine('Date', '' === $this->MessageDate ? self::rfcDate() : $this->MessageDate);
-        // patch-mjansen: begin #30264
-        // To be created automatically by mail()
-        if ($this->SingleTo) {
-            if ('mail' !== $this->Mailer) {
+
+        //The To header is created automatically by mail(), so needs to be omitted here
+        if ('mail' !== $this->Mailer) {
+            if ($this->SingleTo) {
                 foreach ($this->to as $toaddr) {
                     $this->SingleToArray[] = $this->addrFormat($toaddr);
                 }
-            }
-        } elseif (count($this->to) > 0) {
-            if ('mail' !== $this->Mailer) {
+            } elseif (count($this->to) > 0) {
                 $result .= $this->addrAppend('To', $this->to);
+            } elseif (count($this->cc) === 0) {
+                $result .= $this->headerLine('To', 'undisclosed-recipients:;');
             }
-        } elseif (count($this->cc) === 0) {
-            $result .= $this->headerLine('To', 'undisclosed-recipients:;');
         }
-        // patch-mjansen: end
         $result .= $this->addrAppend('From', [[trim($this->From), $this->FromName]]);
 
         //sendmail and mail() extract Cc from the header before sending

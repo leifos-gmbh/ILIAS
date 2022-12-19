@@ -1684,14 +1684,16 @@ class ilPageObjectGUI
                 $par = $this->obj->getParagraphForPCID($this->abstract_pcid);
                 $content = "<dummy><PageObject><PageContent><Paragraph Characteristic='" . $par->getCharacteristic() . "'>" .
                     $par->getText() . $link_xml .
-                    "</Paragraph></PageContent></PageObject>".$this->obj->getMultimediaXML()."</dummy>";
+                    "</Paragraph></PageContent></PageObject>" . $this->obj->getMultimediaXML() . "</dummy>";
             }
         } else {
             $content = $this->obj->getXMLFromDom(
                 false,
                 true,
                 true,
-                $link_xml . $this->getQuestionXML() . $template_xml . $this->getComponentPluginsXML()
+                $link_xml . $this->getQuestionXML() . $template_xml . $this->getComponentPluginsXML(),
+                false,
+                $this->getStyleId()
             );
         }
 
@@ -1796,6 +1798,8 @@ class ilPageObjectGUI
                          'img_row' => $row_path,
                          'img_cell' => $cell_path,
                          'img_item' => $item_path,
+                         'acc_save_url' => "./ilias.php?baseClass=ilaccordionpropertiesstorage&cmd=setOpenedTab" .
+                             "&user_id=" . $this->user->getId(),
                          'append_footnotes' => $append_footnotes,
                          'compare_mode' => $this->getCompareMode() ? "y" : "n",
                          'enable_split_new' => $enable_split_new,

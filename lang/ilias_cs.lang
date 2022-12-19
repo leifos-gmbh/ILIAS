@@ -892,6 +892,7 @@ assessment#:#log_wrong_test_password_entered#:#Účastník zadal nesprávné hes
 assessment#:#longmenu#:#Dlouhé menu
 assessment#:#longmenu_text#:#Text dlouhého menu
 assessment#:#mailnottype#:#Zaslat oznámení vždy, když uživatel ukončil průchod testem
+assessment#:#mailnottype_desc#:#Notify the owner of the test <strong>even if</strong> the number of test attempts has not been limited.###09 11 2022 new variable
 assessment#:#maintenance#:#Údržba
 assessment#:#manscoring#:#Manuální hodnocení
 assessment#:#manscoring_done#:#Vyhodnocení účastníci
@@ -972,6 +973,7 @@ assessment#:#oq_btn_use_order_pictures#:#Použít obrázky odpovědi
 assessment#:#oq_btn_use_order_terms#:#Použít výrazy odpovědi
 assessment#:#oq_header_ordering_elements#:#Prvky uspořádání
 assessment#:#or#:#nebo
+assessment#:#order#:#Order###09 11 2022 new variable
 assessment#:#ordering_answer_sequence_info#:#Sekvence odpovědi Vámi zde definovaná bude považována za sekvenci správného řešení.
 assessment#:#ordertext#:#Řazení textu
 assessment#:#ordertext_info#:#Vložte prosím text, který má být řazen horizontálně. Řazený text bude oddělen pomocí značek mezer v textu. Pokud potřebujete jiné oddělení, můžete použít separátor %s k oddělení Vašich textových jednotek.
@@ -1632,6 +1634,7 @@ assessment#:#tst_pass_details#:#Detaily průchodu
 assessment#:#tst_pass_details_header_lo_initial#:#Výsledky počátečního testu pro cíle učení<br />%s - %s
 assessment#:#tst_pass_details_header_lo_qualifying#:#Výsledky kvalifikačního testu pro cíle učení<br />%s - %s
 assessment#:#tst_pass_details_overview_table_title#:#Podrobný přehled pro průchod %s
+assessment#:#tst_pass_finished#:#Test pass finished###24 11 2022 new variable
 assessment#:#tst_pass_finished_on#:#Průchod testem dokončen
 assessment#:#tst_pass_last_pass#:#Bodovat poslední průchod
 assessment#:#tst_pass_last_pass_desc#:#Bude hodnocen poslední průchod účastníka.
@@ -1709,6 +1712,7 @@ assessment#:#tst_question_hints_ordering_clipboard_resetted#:#Pořadí schránky
 assessment#:#tst_question_hints_paste_after_success_msg#:#Nápověda %s byla vložena za nápovědu %s úspěšně.
 assessment#:#tst_question_hints_paste_before_success_msg#:#Nápověda %s byla vložena před nápovědu %s úspěšně.
 assessment#:#tst_question_hints_request_confirmation#:#Skutečně požadujete nápovědu %s? Za tuto nápovědu Vám bude strženo %s bodů.
+assessment#:#tst_question_hints_request_confirmation_no_deduction#:#No points will be deducted for this hint.###09 11 2022 new variable
 assessment#:#tst_question_hints_requested_hint_count_header#:#Vyžádané nápovědy
 assessment#:#tst_question_hints_save_order_success_msg#:#Pořadí nápověd bylo uloženo úspěšně
 assessment#:#tst_question_hints_tab#:#Nápovědy
@@ -3381,6 +3385,7 @@ common#:#HH#:#HH:MM
 common#:#absolute_path#:#Absolutní cesta
 common#:#accept_usr_agreement#:#Akceptovat uživatelské ujednání?
 common#:#accept_usr_agreement_btn#:#Accept###30 04 2021 new variable
+common#:#accept_usr_agreement_intro#:#There are new terms of service. You need to accept them before proceeding with the use of ILIAS. Read the following document carefully and give your consent or dissent at the bottom of the page.###24 11 2022 new variable
 common#:#access#:#Přístup
 common#:#accessFree#:#Odstranit omezený přístup
 common#:#accessRestrict#:#Nastavit omezený přístup
@@ -5797,6 +5802,7 @@ common#:#usr_account_inactive#:#Neaktivní účet
 common#:#usr_active_only#:#Pouze aktivní uživatelé
 common#:#usr_add#:#Přidat uživatele
 common#:#usr_agreement#:#Uživatelské ujednání
+common#:#usr_agreement_footer_intro#:#You have declared your consent to these terms of service.###24 11 2022 new variable
 common#:#usr_edit#:#Upravit údaje uživatele
 common#:#usr_filter_coursemember#:#Člen kurzu
 common#:#usr_filter_groupmember#:#Člen skupiny
@@ -5982,6 +5988,7 @@ cont#:#cont_skill_do_not_set#:#Nenastaveno
 cont#:#cont_skill_members#:#Členové
 cont#:#cont_skill_no_profile_selected#:#Please select a profile.###30 04 2021 new variable
 cont#:#cont_skill_no_skill#:#Žádná hodnota (obnovit)
+cont#:#cont_skill_no_skills_selected#:#No competences have been selected yet. Please add at least one competence first under "Competence Selection".###09 11 2022 new variable
 cont#:#cont_skill_profile#:#Profile###30 04 2021 new variable
 cont#:#cont_skill_profiles#:#Assigned Profiles of Members###30 04 2021 new variable
 cont#:#cont_skill_publish#:#Publikovat
@@ -7783,9 +7790,11 @@ crs#:#crs_view_timing#:#Zobrazení časování
 crs#:#crs_view_timing_absolute#:#Absolutní data
 crs#:#crs_view_timing_relative#:#Relativní data
 crs#:#crs_view_timings#:#Typ zobrazení časování
+crs#:#crs_visibility#:#Visibility###24 11 2022 new variable
 crs#:#crs_visibility_limitless#:#Neomezeno
 crs#:#crs_visibility_until#:#Dočasně viditelné
 crs#:#crs_visibility_until_info#:#Kurz bude pro členy viditelný v určitém časovém období.
+crs#:#crs_visibility_unvisible#:#The course is not visible.###24 11 2022 new variable
 crs#:#crs_wait_info#:#Pokud je zapnuto a maximální počet uživatelů je překročen, nové registrace budou umístěny na seznam čekatelů.
 crs#:#crs_waiting_list#:#Seznam čekatelů
 crs#:#crs_waiting_list_autofill#:#S funkcí Auto-Fill
@@ -13847,9 +13856,11 @@ rep#:#rep_add_to_favourites#:#Add to Favourites###07 02 2020 new variable
 rep#:#rep_added_rec_content#:#Recommended content has been added.###07 02 2020 new variable
 rep#:#rep_added_to_favourites#:#The item has been added to your favourites.###07 02 2020 new variable
 rep#:#rep_breadcr_crs#:#Breadcrumb začíná kurzem
+rep#:#rep_breadcr_crs_config#:#Configuration###24 11 2022 new variable
 rep#:#rep_breadcr_crs_overwrite#:#Nastavení lze měnit na úrovni kurz
 rep#:#rep_breadcr_crs_overwrite_not#:#Nastavení nelze měnit na úrovni kurz
 rep#:#rep_configure#:#Configure###07 02 2020 new variable
+rep#:#rep_crs_default_shortened#:#Default: Breadcrumbs Shortened###24 11 2022 new variable
 rep#:#rep_custom_icons#:#Vlastní ikony
 rep#:#rep_default#:#Výchozí
 rep#:#rep_dependencies#:#Závislosti
@@ -14563,6 +14574,7 @@ skmg#:#skmg_new_sktr#:#Nová reference šablony způsobilosti
 skmg#:#skmg_next_step#:#Další krok
 skmg#:#skmg_no_nodes_selectable#:#V současné době nejsou žádné volitelné způsobilosti.
 skmg#:#skmg_no_skills#:#Žádné způsobilosti
+skmg#:#skmg_no_skills_selected_info#:#You have not selected or fulfilled any competences yet. Click on the "Add Competence"-button to select a competence. You can add any number of competences. If you fulfill competences by editing learning materials, they will be automatically listed here.###09 11 2022 new variable
 skmg#:#skmg_no_trigger#:#Žádný spouštěč
 skmg#:#skmg_nr#:#Čís.
 skmg#:#skmg_number#:#Číslo
@@ -14605,6 +14617,8 @@ skmg#:#skmg_skill_levels#:#Úroveň dovedností
 skmg#:#skmg_skill_management_deactivated#:#Management způsobilosti je právě deaktivován.
 skmg#:#skmg_skill_needs_impr_no_res#:#Je třeba, abyste tuto způsobilost zlepšili. Bohužel v současné době nejsou k dispozici žádné výukové zdroje, které by poskytovaly výukový materiál v souladu s cílovou úrovní způsobilosti.
 skmg#:#skmg_skill_needs_impr_res#:#Je třeba, abyste tuto způsobilost zlepšili. Následující zdroje obsahují výukový materiál, který je přiřazen vaší cílové úrovni způsobilosti.
+skmg#:#skmg_skill_needs_self_eval#:#Please conduct a self-evaluation first to see your competence target.###09 11 2022 new variable
+skmg#:#skmg_skill_needs_self_eval_box#:#Please note that you have not conducted a self-evaluation for at least one competence in this profile. You will not see the competence target for the affected competences until a self-evaluation is done.###09 11 2022 new variable
 skmg#:#skmg_skill_no_needs_impr#:#Vaše úroveň způsobilosti je pro vybraný profil dostatečná.
 skmg#:#skmg_skill_profiles#:#Profily
 skmg#:#skmg_skill_template#:#Šablona způsobilosti

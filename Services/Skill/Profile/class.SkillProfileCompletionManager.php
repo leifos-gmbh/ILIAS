@@ -21,6 +21,9 @@ declare(strict_types=1);
 
 namespace ILIAS\Skill\Profile;
 
+use ILIAS\Container\Skills\ContainerSkill;
+use ILIAS\Skill\GapAnalysisSkill;
+
 /**
  * Manages skill profile completion
  *
@@ -49,7 +52,7 @@ class SkillProfileCompletionManager
     }
 
     /**
-     * @param SkillProfileLevel[] $skills
+     * @param GapAnalysisSkill[] $skills
      * @return array<int, array<int, int>>
      */
     public function getActualMaxLevels(
@@ -104,7 +107,7 @@ class SkillProfileCompletionManager
     }
 
     /**
-     * @param SkillProfileLevel[] $skills
+     * @param GapAnalysisSkill[] $skills
      * @return array<int, array<int, float>>
      */
     public function getActualNextLevelFulfilments(

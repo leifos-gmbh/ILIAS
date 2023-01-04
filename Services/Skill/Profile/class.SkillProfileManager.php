@@ -384,9 +384,9 @@ class SkillProfileManager implements \ilSkillUsageInfo
             ];
 
             if (!$with_objects_in_trash && \ilObject::_hasUntrashedReference($obj_id)) {
-                $roles_as_obj_without_trash[] = $this->profile_role_repo->getFromRecord($role_restructured);
+                $roles_as_obj_without_trash[] = $this->profile_role_repo->getRoleAssignmentFromRecord($role_restructured);
             }
-            $roles_as_obj_with_trash[] = $this->profile_role_repo->getFromRecord($role_restructured);
+            $roles_as_obj_with_trash[] = $this->profile_role_repo->getRoleAssignmentFromRecord($role_restructured);
         }
 
         if ($with_objects_in_trash) {
@@ -412,7 +412,7 @@ class SkillProfileManager implements \ilSkillUsageInfo
 
     /**
      * Get global and local profiles of a role
-     * @return SkillProfile[]
+     * @return SkillRoleProfile[]
      */
     public function getAllProfilesOfRole(int $role_id): array
     {
@@ -421,7 +421,7 @@ class SkillProfileManager implements \ilSkillUsageInfo
     }
 
     /**
-     * @return SkillProfile[]
+     * @return SkillRoleProfile[]
      */
     public function getGlobalProfilesOfRole(int $role_id): array
     {
@@ -430,11 +430,11 @@ class SkillProfileManager implements \ilSkillUsageInfo
     }
 
     /**
-     * @return SkillProfile[]
+     * @return SkillRoleProfile[]
      */
-    public function getLocalProfilesOfRole(int $role_id, int $ref_id): array
+    public function getLocalProfilesOfRole(int $role_id): array
     {
-        $profiles = $this->profile_role_repo->getLocalProfilesOfRole($role_id, $ref_id);
+        $profiles = $this->profile_role_repo->getLocalProfilesOfRole($role_id);
         return $profiles;
     }
 

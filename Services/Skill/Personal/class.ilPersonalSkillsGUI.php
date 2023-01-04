@@ -29,6 +29,7 @@ use ILIAS\UI\Component\Chart\Bar\BarConfig;
 use ILIAS\UI\Component\Chart\Bar\XAxis;
 use ILIAS\Skill\Profile;
 use ILIAS\Skill\Personal;
+use ILIAS\Container\Skills as ContainerSkills;
 
 /**
  * Personal skills GUI class
@@ -109,7 +110,7 @@ class ilPersonalSkillsGUI
     protected array $user_profiles = [];
 
     /**
-     * @var array<int, array{profile_id: int, role_id: int, title: string}|{profile_id: int}>
+     * @var Profile\SkillRoleProfile[]
      */
     protected array $cont_profiles = [];
     protected bool $use_materials = false;
@@ -123,7 +124,7 @@ class ilPersonalSkillsGUI
     protected Personal\PersonalSkillManager $personal_manager;
     protected Personal\AssignedMaterialManager $assigned_material_manager;
     protected Personal\SelfEvaluationManager $self_evaluation_manager;
-    protected Service\SkillInternalFactoryService $factory_service;
+    protected ContainerSkills\ContainerSkillInternalFactoryService $cont_factory_service;
     protected string $requested_list_mode = self::LIST_PROFILES;
     protected int $requested_node_id = 0;
     protected int $requested_profile_id = 0;
@@ -175,7 +176,7 @@ class ilPersonalSkillsGUI
         $this->personal_manager = $DIC->skills()->internal()->manager()->getPersonalSkillManager();
         $this->assigned_material_manager = $DIC->skills()->internal()->manager()->getAssignedMaterialManager();
         $this->self_evaluation_manager = $DIC->skills()->internal()->manager()->getSelfEvaluationManager();
-        $this->factory_service = $DIC->skills()->internal()->factory();
+        $this->cont_factory_service = $DIC->skills()->internalContainer()->factory();
 
         $ilCtrl = $this->ctrl;
         $ilHelp = $this->help;
@@ -301,7 +302,7 @@ class ilPersonalSkillsGUI
     }
 
     /**
-     * @return array<string, array{base_skill_id: int, tref_id: int, title: int}>
+     * @return \ILIAS\Container\Skills\ContainerSkill[]
      */
     public function getObjectSkills(): array
     {
@@ -309,7 +310,7 @@ class ilPersonalSkillsGUI
     }
 
     /**
-     * @param array<string, array{base_skill_id: int, tref_id: int, title: int}> $a_skills
+     * @param \ILIAS\Container\Skills\ContainerSkill[] $a_skills
      */
     public function setObjectSkills(int $a_obj_id, array $a_skills): void
     {
@@ -318,10 +319,9 @@ class ilPersonalSkillsGUI
     }
 
     public function setObjectSkillProfiles(
-        ilContainerGlobalProfiles $a_g_profiles,
-        ilContainerLocalProfiles $a_l_profils
+        int $cont_member_role_id
     ): void {
-        $this->cont_profiles = array_merge($a_g_profiles->getProfiles(), $a_l_profils->getProfiles());
+        $this->cont_profiles = $this->profile_manager->getAllProfilesOfRole($cont_member_role_id);
     }
 
     public function executeCommand(): void
@@ -1185,40 +1185,7 @@ class ilPersonalSkillsGUI
             return;
         }
 
-        $prof_items = [];
-
-        foreach ($this->cont_profiles as $p) {
-            $image_id = $p["image_id"];
-            if ($image_id) {
-                $identification = $this->storage->manage()->find($image_id);
-                $src = $this->storage->consume()->src($identification);
-                $image = $this->ui_fac->image()->responsive($src->getSrc(), $this->lng->txt("skmg_custom_image_alt"));
-            } else {
-                $image = $this->ui_fac->image()->responsive(
-                    "./templates/default/images/logo/ilias_logo_72x72.png",
-                    "ILIAS"
-                );
-            }
-
-            $this->ctrl->setParameter($this, "profile_id", $p["profile_id"]);
-            $link = $this->ui_fac->link()->standard(
-                $p["title"],
-                $this->ctrl->getLinkTarget($this, "listProfileForGap")
-            );
-            $this->ctrl->setParameter($this, "profile_id", "");
-
-            $chart_value = $this->profile_completion_manager->getProfileProgress($this->user->getId(), $p["profile_id"]);
-            $prof_item = $this->ui_fac->item()->standard($link)
-                                      ->withDescription($p["description"])
-                                      ->withLeadImage($image)
-                                      ->withProgress($this->ui_fac->chart()->progressMeter()->standard(100, $chart_value));
-
-            $prof_items[] = $prof_item;
-        }
-
-        $prof_list = $this->ui_fac->panel()->listing()->standard("", array(
-            $this->ui_fac->item()->group("", $prof_items)
-        ));
+        $prof_list = $this->getProfilesListed($this->cont_profiles, true);
 
         $html = $this->showInfoBox() . $this->ui_ren->render($prof_list);
         $this->tpl->setContent($html);
@@ -1250,7 +1217,50 @@ class ilPersonalSkillsGUI
         $this->tpl->setContent($this->getGapAnalysisHTML());
     }
 
-    public function showInfoBox(): string
+    /**
+     * @param Profile\SkillProfile[] $profiles
+     */
+    protected function getProfilesListed(array $profiles, bool $gap_mode = false): ILIAS\UI\Component\Panel\Listing\Listing
+    {
+        $prof_items = [];
+
+        foreach ($profiles as $p) {
+            $image_id = $p->getImageId();
+            if ($image_id) {
+                $identification = $this->storage->manage()->find($image_id);
+                $src = $this->storage->consume()->src($identification);
+                $image = $this->ui_fac->image()->responsive($src->getSrc(), $this->lng->txt("skmg_custom_image_alt"));
+            } else {
+                $image = $this->ui_fac->image()->responsive(
+                    "./templates/default/images/logo/ilias_logo_72x72.png",
+                    "ILIAS"
+                );
+            }
+
+            $this->ctrl->setParameter($this, "profile_id", $p->getId());
+            $link = $this->ui_fac->link()->standard(
+                $p->getTitle(),
+                $this->ctrl->getLinkTarget($this, $gap_mode ? "listProfileForGap" : "listAssignedProfile")
+            );
+            $this->ctrl->setParameter($this, "profile_id", "");
+
+            $chart_value = $this->profile_completion_manager->getProfileProgress($this->user->getId(), $p->getId());
+            $prof_item = $this->ui_fac->item()->standard($link)
+                                      ->withDescription($p->getDescription())
+                                      ->withLeadImage($image)
+                                      ->withProgress($this->ui_fac->chart()->progressMeter()->standard(100, $chart_value));
+
+            $prof_items[] = $prof_item;
+        }
+
+        $prof_list = $this->ui_fac->panel()->listing()->standard("", array(
+            $this->ui_fac->item()->group("", $prof_items)
+        ));
+
+        return $prof_list;
+    }
+
+    protected function showInfoBox(): string
     {
         if (!empty($this->cont_profiles)) {
             $link = $this->ui_fac->link()->standard(
@@ -1281,14 +1291,21 @@ class ilPersonalSkillsGUI
         $this->mode = "gap";
     }
 
-    public function getGapAnalysisHTML(int $a_user_id = 0, array $a_skills = null): string
+    public function getGapAnalysisHTML(int $a_user_id = 0, ?array $a_skills = null): string
     {
         $ilUser = $this->user;
         $lng = $this->lng;
 
 
         if ($a_skills == null) {
-            $a_skills = $this->getObjectSkills();
+            foreach ($this->getObjectSkills() as $s) {
+                $a_skills[] = array(
+                    "cont_obj_id" => $s->getContainerObjectId(),
+                    "base_skill_id" => $s->getBaseSkillId(),
+                    "tref_id" => $s->getTrefId(),
+                    "title" => $s->getTitle()
+                );
+            }
         }
 
 
@@ -1309,26 +1326,21 @@ class ilPersonalSkillsGUI
         }
 
         $skills = [];
-        $skills_as_obj = [];
         if ($this->getProfileId() > 0) {
             $this->profile_levels = $this->profile_manager->getSkillLevels($this->getProfileId());
-            $skills_as_obj = $this->profile_levels;
-            foreach ($this->profile_levels as $l) {
-                $skills[] = array(
-                    "base_skill_id" => $l->getBaseSkillId(),
-                    "tref_id" => $l->getTrefId(),
-                    "level_id" => $l->getLevelId()
-                );
-            }
-        } elseif (is_array($a_skills)) {
-            $skills = $a_skills;
+            $skills = $this->profile_levels;
+        } else {
+            // order skills per virtual skill tree
+            $vtree = $this->tree_service->getGlobalVirtualSkillTree();
+            $a_skills = $vtree->getOrderedNodeset($a_skills, "base_skill_id", "tref_id");
+
             foreach ($a_skills as $s) {
-                $skills_as_obj[] = $this->factory_service->profile()->profileLevel(
-                    (int) ($s["profile_id"] ?? 0),
-                    (int) ($s["base_skill_id"] ?? 0),
-                    (int) ($s["tref_id"] ?? 0),
-                    (int) ($s["level_id"] ?? 0),
-                    (int) ($s["order_nr"] ?? 0)
+                /** @var XAxis $x_axis */
+                $skills[] = $this->cont_factory_service->containerSkill()->skill(
+                    (int) $s["cont_obj_id"],
+                    (int) $s["base_skill_id"],
+                    (int) $s["tref_id"],
+                    $s["title"]
                 );
             }
         }
@@ -1336,30 +1348,24 @@ class ilPersonalSkillsGUI
         // get actual levels for gap analysis
         $this->actual_levels = $this->profile_completion_manager->getActualMaxLevels(
             $user_id,
-            $skills_as_obj,
+            $skills,
             $this->gap_mode,
             $this->gap_mode_type,
             $this->gap_mode_obj_id
         );
         $this->next_level_fuls = $this->profile_completion_manager->getActualNextLevelFulfilments(
             $user_id,
-            $skills_as_obj,
+            $skills,
             $this->gap_mode,
             $this->gap_mode_type,
             $this->gap_mode_obj_id
         );
 
-        if (!$this->getProfileId() > 0) {
-            // order skills per virtual skill tree
-            $vtree = $this->tree_service->getGlobalVirtualSkillTree();
-            $skills = $vtree->getOrderedNodeset($skills, "base_skill_id", "tref_id");
-        }
-
         $bc_skills = [];
         $html = "";
         $not_all_self_evaluated = false;
 
-        foreach ($skills_as_obj as $s) {
+        foreach ($skills as $s) {
             if ($this->skmg_settings->getHideProfileBeforeSelfEval() &&
                 !ilBasicSkill::hasSelfEvaluated($this->user->getId(), $s->getBaseSkillId(), $s->getTrefId())) {
                 $not_all_self_evaluated = true;
@@ -1398,7 +1404,7 @@ class ilPersonalSkillsGUI
     }
 
     /**
-     * @param Profile\SkillProfileLevel[] $skills
+     * @param \ILIAS\Skill\GapAnalysisSkill[] $skills
      */
     protected function getBarChartHTML(array $skills): string
     {
@@ -2160,40 +2166,7 @@ class ilPersonalSkillsGUI
 
         $this->setTabs("profile");
 
-        $prof_items = [];
-
-        foreach ($this->user_profiles as $p) {
-            $image_id = $p->getImageId();
-            if ($image_id) {
-                $identification = $this->storage->manage()->find($image_id);
-                $src = $this->storage->consume()->src($identification);
-                $image = $this->ui_fac->image()->responsive($src->getSrc(), $this->lng->txt("skmg_custom_image_alt"));
-            } else {
-                $image = $this->ui_fac->image()->responsive(
-                    "./templates/default/images/logo/ilias_logo_72x72.png",
-                    "ILIAS"
-                );
-            }
-
-            $this->ctrl->setParameter($this, "profile_id", $p->getId());
-            $link = $this->ui_fac->link()->standard(
-                $p->getTitle(),
-                $this->ctrl->getLinkTarget($this, "listassignedprofile")
-            );
-            $this->ctrl->setParameter($this, "profile_id", "");
-
-            $chart_value = $this->profile_completion_manager->getProfileProgress($this->user->getId(), $p->getId());
-            $prof_item = $this->ui_fac->item()->standard($link)
-                                      ->withDescription($p->getDescription())
-                                      ->withLeadImage($image)
-                                      ->withProgress($this->ui_fac->chart()->progressMeter()->standard(100, $chart_value));
-
-            $prof_items[] = $prof_item;
-        }
-
-        $prof_list = $this->ui_fac->panel()->listing()->standard("", array(
-            $this->ui_fac->item()->group("", $prof_items)
-        ));
+        $prof_list = $this->getProfilesListed($this->user_profiles);
 
         $this->tpl->setContent($this->ui_ren->render($prof_list));
     }

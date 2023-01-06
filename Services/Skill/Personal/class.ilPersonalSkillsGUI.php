@@ -666,32 +666,19 @@ class ilPersonalSkillsGUI
                 }
             }
 
-            // materials (new)
-            if ($this->mode != "gap") {
-                $mat = "";
-                if ($this->getFilter()->showMaterialsRessources() && $this->use_materials) {
-                    $mat = $this->getMaterials($level_data, $bs["tref"], $user->getId());
-                }
-                if ($mat != "") {
-                    $panel_comps[] = $this->ui_fac->legacy($mat);
-                }
-            }
-
             // suggested resources
-            $sugg = "";
-            if ($this->getFilter()->showMaterialsRessources() && $this->getProfileId() == 0) {
-                // no profile, just list all resources
-                $sugg = $this->getAllSuggestedResources($bs["id"], $bs["tref"]);
-            }
-            if ($sugg != "") {
-                $panel_comps[] = $this->ui_fac->legacy($sugg);
-            }
 
             $sub = $this->ui_fac->panel()->sub($title, $panel_comps);
             if ($this->getFilter()->showMaterialsRessources() && $this->getProfileId() > 0) {
                 $sub = $sub->withFurtherInformation(
                     $this->getSuggestedResourcesForProfile($level_data, $bs["id"], $bs["tref"])
                 );
+            } elseif ($this->getFilter()->showMaterialsRessources() && $this->getProfileId() == 0) {
+                // no profile, just list all resources
+                $sugg = $this->getAllSuggestedResources($bs["id"], $bs["tref"]);
+                if ($sugg) {
+                    $sub = $sub->withFurtherInformation($sugg);
+                }
             }
             if ($a_edit) {
                 $actions = [];
@@ -713,6 +700,14 @@ class ilPersonalSkillsGUI
             }
 
             $sub_panels[] = $sub;
+
+            // materials
+            if ($this->mode != "gap" && $this->getFilter()->showMaterialsRessources() && $this->use_materials) {
+                $mat = $this->getMaterials($level_data, $bs["tref"], $user->getId());
+                if ($mat) {
+                    $sub_panels[] = $mat;
+                }
+            }
 
             $tpl->parseCurrentBlock();
         }
@@ -798,7 +793,7 @@ class ilPersonalSkillsGUI
             }
         }
 
-        return array($caption, $url);
+        return array($caption, $url, $obj_id);
     }
 
     public function addSkill(): void
@@ -1569,7 +1564,7 @@ class ilPersonalSkillsGUI
         return $all_chart_html;
     }
 
-    public function getMaterials(array $a_levels, int $a_tref_id = 0, int $a_user_id = 0): string
+    public function getMaterials(array $a_levels, int $a_tref_id = 0, int $a_user_id = 0): ?\ILIAS\UI\Component\Panel\Sub
     {
         $ilUser = $this->user;
         $lng = $this->lng;
@@ -1591,33 +1586,38 @@ class ilPersonalSkillsGUI
             }
         }
         if (!$got_mat) {
-            return "";
+            return null;
         }
 
-        $tpl = new ilTemplate("tpl.skill_materials.html", true, true, "Services/Skill");
+        $item_groups = [];
         foreach ($a_levels as $k => $v) {
             $got_mat = false;
+            $items = [];
             foreach ($this->assigned_material_manager->getAssignedMaterials(
                 $a_user_id,
                 $a_tref_id,
                 (int) $v["id"]
             ) as $item) {
-                $tpl->setCurrentBlock("material");
                 $mat_data = $this->getMaterialInfo($item->getWorkspaceId(), $a_user_id);
-                $tpl->setVariable("HREF_LINK", $mat_data[1]);
-                $tpl->setVariable("TXT_LINK", $mat_data[0]);
-                $tpl->parseCurrentBlock();
+                $title = $mat_data[0];
+                $icon = $this->ui_fac->symbol()->icon()->standard(
+                    ilObject::_lookupType($mat_data[2]),
+                    $lng->txt("icon") . " " . $lng->txt(ilObject::_lookupType($mat_data[2]))
+                );
+                $link = $this->ui_fac->link()->standard($title, $mat_data[1]);
+                $items[] = $this->ui_fac->item()->standard($link)->withLeadIcon($icon);
                 $got_mat = true;
             }
             if ($got_mat) {
-                $tpl->setCurrentBlock("level");
-                $tpl->setVariable("LEVEL_VAL", $v["title"]);
-                $tpl->parseCurrentBlock();
+                $item_groups[] = $this->ui_fac->item()->group($v["title"], $items);
             }
         }
-        $tpl->setVariable("TXT_MATERIAL", $lng->txt("skmg_materials"));
+        $mat_panel = $this->ui_fac->panel()->sub(
+            $lng->txt("skmg_materials"),
+            $item_groups
+        );
 
-        return $tpl->get();
+        return $mat_panel;
     }
 
     public function getProfileTargetItem(int $a_profile_id, array $a_levels, int $a_tref_id = 0): string
@@ -2115,47 +2115,49 @@ class ilPersonalSkillsGUI
         return $sec_panel;
     }
 
-    public function getAllSuggestedResources(int $a_base_skill, int $a_tref_id): string
-    {
+    public function getAllSuggestedResources(
+        int $a_base_skill,
+        int $a_tref_id
+    ): ?\ILIAS\UI\Component\Panel\Secondary\Secondary {
         $lng = $this->lng;
-
-        $tpl = new ilTemplate("tpl.suggested_resources.html", true, true, "Services/Skill");
 
         $skill_res = new ilSkillResources($a_base_skill, $a_tref_id);
         $res = $skill_res->getResources();
-        // add $r["level_id"] info
         $any = false;
+        $item_groups = [];
         foreach ($res as $level) {
             $available = false;
             $cl = 0;
+            $items = [];
             foreach ($level as $r) {
                 if ($r["imparting"]) {
                     $ref_id = $r["rep_ref_id"];
                     $obj_id = ilObject::_lookupObjId($ref_id);
                     $title = ilObject::_lookupTitle($obj_id);
-                    $tpl->setCurrentBlock("resource_item");
-                    $tpl->setVariable("TXT_RES", $title);
-                    $tpl->setVariable("HREF_RES", ilLink::_getLink($ref_id));
-                    $tpl->parseCurrentBlock();
+                    $icon = $this->ui_fac->symbol()->icon()->standard(
+                        ilObject::_lookupType($obj_id),
+                        $lng->txt("icon") . " " . $lng->txt(ilObject::_lookupType($obj_id))
+                    );
+                    $link = $this->ui_fac->link()->standard($title, ilLink::_getLink($ref_id));
+                    $items[] = $this->ui_fac->item()->standard($link)->withLeadIcon($icon);
                     $available = true;
                     $any = true;
                     $cl = $r["level_id"];
                 }
             }
             if ($available) {
-                $tpl->setCurrentBlock("resources_list_level");
-                $tpl->setVariable("TXT_LEVEL", $lng->txt("skmg_level"));
-                $tpl->setVariable("LEVEL_NAME", ilBasicSkill::lookupLevelTitle($cl));
-                $tpl->parseCurrentBlock();
-                $tpl->touchBlock("resources_list");
+                $item_groups[] = $this->ui_fac->item()->group(ilBasicSkill::lookupLevelTitle($cl), $items);
             }
         }
         if ($any) {
-            $tpl->setVariable("SUGGESTED_MAT_MESS", $lng->txt("skmg_suggested_resources"));
-            return $tpl->get();
+            $sec_panel = $this->ui_fac->panel()->secondary()->listing(
+                $lng->txt("skmg_suggested_resources"),
+                $item_groups
+            );
+            return $sec_panel;
         }
 
-        return "";
+        return null;
     }
 
     public function listAllAssignedProfiles(): void

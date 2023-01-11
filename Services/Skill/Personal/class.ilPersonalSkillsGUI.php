@@ -29,6 +29,7 @@ use ILIAS\UI\Component\Chart\Bar\BarConfig;
 use ILIAS\UI\Component\Chart\Bar\XAxis;
 use ILIAS\Skill\Profile;
 use ILIAS\Skill\Personal;
+use ILIAS\Skill\Resource;
 use ILIAS\Container\Skills as ContainerSkills;
 
 /**
@@ -124,6 +125,7 @@ class ilPersonalSkillsGUI
     protected Personal\PersonalSkillManager $personal_manager;
     protected Personal\AssignedMaterialManager $assigned_material_manager;
     protected Personal\SelfEvaluationManager $self_evaluation_manager;
+    protected Resource\SkillResourcesManager $resource_manager;
     protected ContainerSkills\ContainerSkillInternalFactoryService $cont_factory_service;
     protected string $requested_list_mode = self::LIST_PROFILES;
     protected int $requested_node_id = 0;
@@ -176,6 +178,7 @@ class ilPersonalSkillsGUI
         $this->personal_manager = $DIC->skills()->internal()->manager()->getPersonalSkillManager();
         $this->assigned_material_manager = $DIC->skills()->internal()->manager()->getAssignedMaterialManager();
         $this->self_evaluation_manager = $DIC->skills()->internal()->manager()->getSelfEvaluationManager();
+        $this->resource_manager = $DIC->skills()->internal()->manager()->getResourceManager();
         $this->cont_factory_service = $DIC->skills()->internalContainer()->factory();
 
         $ilCtrl = $this->ctrl;
@@ -2068,8 +2071,6 @@ class ilPersonalSkillsGUI
     ): \ILIAS\UI\Component\Panel\Secondary\Secondary {
         $lng = $this->lng;
 
-        $res_manager = new ilSkillResourcesManager($a_base_skill, $a_tref_id);
-
         // note for self-evaluation
         if ($this->skmg_settings->getHideProfileBeforeSelfEval() &&
             !ilBasicSkill::hasSelfEvaluated($this->user->getId(), $a_base_skill, $a_tref_id)) {
@@ -2079,14 +2080,19 @@ class ilPersonalSkillsGUI
         }
 
         // suggested resources
-        if ($res_manager->isLevelTooLow($a_levels, $this->profile_levels, $this->actual_levels)) {
-            $imp_resources = $res_manager->getSuggestedResources();
+        if ($this->resource_manager->isLevelTooLow($a_tref_id, $a_levels, $this->profile_levels, $this->actual_levels)) {
+            $imp_resources = $this->resource_manager->getSuggestedResources(
+                $a_base_skill,
+                $a_tref_id,
+                $a_levels,
+                $this->profile_levels
+            );
             $info[] = $this->ui_fac->item()->standard($lng->txt("skmg_recommended_learning_material_info"));
             $info_group = $this->ui_fac->item()->group("", $info);
             $items = [];
 
             foreach ($imp_resources as $r) {
-                $ref_id = $r["rep_ref_id"];
+                $ref_id = $r->getRepoRefId();
                 $obj_id = ilObject::_lookupObjId($ref_id);
                 $title = ilObject::_lookupTitle($obj_id);
                 $icon = $this->ui_fac->symbol()->icon()->standard(
@@ -2121,8 +2127,7 @@ class ilPersonalSkillsGUI
     ): ?\ILIAS\UI\Component\Panel\Secondary\Secondary {
         $lng = $this->lng;
 
-        $skill_res = new ilSkillResources($a_base_skill, $a_tref_id);
-        $res = $skill_res->getResources();
+        $res = $this->resource_manager->getResources($a_base_skill, $a_tref_id);
         $any = false;
         $item_groups = [];
         foreach ($res as $level) {
@@ -2130,8 +2135,8 @@ class ilPersonalSkillsGUI
             $cl = 0;
             $items = [];
             foreach ($level as $r) {
-                if ($r["imparting"]) {
-                    $ref_id = $r["rep_ref_id"];
+                if ($r->getImparting()) {
+                    $ref_id = $r->getRepoRefId();
                     $obj_id = ilObject::_lookupObjId($ref_id);
                     $title = ilObject::_lookupTitle($obj_id);
                     $icon = $this->ui_fac->symbol()->icon()->standard(
@@ -2142,7 +2147,7 @@ class ilPersonalSkillsGUI
                     $items[] = $this->ui_fac->item()->standard($link)->withLeadIcon($icon);
                     $available = true;
                     $any = true;
-                    $cl = $r["level_id"];
+                    $cl = $r->getLevelId();
                 }
             }
             if ($available) {

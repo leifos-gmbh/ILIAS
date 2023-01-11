@@ -1673,8 +1673,8 @@ class ilObjCmiXapi extends ilObject2
         $this->deleteMetaData();
 
         //delete results
-        $query = "DELETE FROM " . self::DB_RESULTS_TABLE_NAME . ' ' . 
-                "WHERE obj_id = " . $ilDB->quote($this->getId(), 'integer') . " ";
+        $query = "DELETE FROM " . self::DB_RESULTS_TABLE_NAME .
+                " WHERE obj_id = " . $ilDB->quote($this->getId(), 'integer') . " ";
         $ilDB->manipulate($query);
 
         // TODO check xapidel

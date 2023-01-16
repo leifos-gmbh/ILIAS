@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -18,22 +16,16 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
-use PHPUnit\Framework\TestSuite;
-
-require_once 'libs/composer/vendor/autoload.php';
-
 /**
+ * Shows all items in one block.
+ *
  * @author Alexander Killing <killing@leifos.de>
  */
-class ilServicesContainerSuite extends TestSuite
+class ilContainerSimpleContentGUI extends ilContainerContentGUI
 {
-    public static function suite(): self
+    public function renderItemList() : string
     {
-        $suite = new self();
-
-        require_once("./Services/Container/test/ContentModeManagerTest.php");
-        $suite->addTestSuite("ContentModeManagerTest");
-
-        return $suite;
+        $this->initRenderer();
+        return $this->renderer->renderItemBlockSequence($this->item_presentation->getItemBlockSequence());
     }
 }

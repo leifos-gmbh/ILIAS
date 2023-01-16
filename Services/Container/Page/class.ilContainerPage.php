@@ -33,4 +33,49 @@ class ilContainerPage extends ilPageObject
     {
         return "cont";
     }
+
+
+    public function addMissingContainerBlocks(?\ILIAS\Container\Content\ItemPresentationManager $manager) : void
+    {
+        if ($manager !== null) {
+            foreach ($manager->getItemBlockSequence()->getBlocks() as $block) {
+                if (!$block->getPageEmbedded()) {
+                    $this->buildDom();
+                    $this->addRepositoryBlockToPage($block->getId(), $block->getBlock());
+                }
+            }
+        }
+    }
+
+    protected function addRepositoryBlockToPage(string $id, \ILIAS\Container\Content\Block $block) : void
+    {
+        $pc_resources = new ilPCResources($this);
+        $this->addHierIDs();
+        $doc = $this->getDomDoc();
+        $xpath = new DOMXPath($doc);
+        $parent_hier_id = "pg";
+        $parent_pc_id = "";
+        $nodes = $xpath->query("//PageObject/PageContent[last()]");
+        foreach ($nodes as $node) {
+            $parent_hier_id = $node->getAttribute("HierId");
+            $parent_pc_id = $node->getAttribute("PCID");
+        }
+
+        $pc_resources->create($this, $parent_hier_id, $parent_pc_id);
+
+        if ($block instanceof \ILIAS\Container\Content\TypeBlock) {
+            $pc_resources->setResourceListType($id);
+        } elseif ($block instanceof \ILIAS\Container\Content\ItemGroupBlock) {
+            $pc_resources->setItemGroupRefId((int) $id);
+        } elseif ($block instanceof \ILIAS\Container\Content\OtherBlock) {
+            $pc_resources->setResourceListType("_other");
+        } elseif ($block instanceof \ILIAS\Container\Content\SessionBlock) {
+            $pc_resources->setResourceListType("sess");
+        } elseif ($block instanceof \ILIAS\Container\Content\ObjectivesBlock) {
+            $pc_resources->setResourceListType("_lobj");
+        } else {
+            throw new ilException("unknown type " . get_class($block));
+        }
+        $this->update();
+    }
 }

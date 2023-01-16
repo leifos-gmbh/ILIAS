@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -18,22 +16,23 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
-use PHPUnit\Framework\TestSuite;
-
-require_once 'libs/composer/vendor/autoload.php';
+namespace ILIAS\Container\Content;
 
 /**
+ * A block that holds a single item group
  * @author Alexander Killing <killing@leifos.de>
  */
-class ilServicesContainerSuite extends TestSuite
+class ItemGroupBlock implements Block
 {
-    public static function suite(): self
+    protected int $ref_id;
+
+    public function __construct(int $ref_id)
     {
-        $suite = new self();
+        $this->ref_id = $ref_id;
+    }
 
-        require_once("./Services/Container/test/ContentModeManagerTest.php");
-        $suite->addTestSuite("ContentModeManagerTest");
-
-        return $suite;
+    public function getRefId() : int
+    {
+        return $this->ref_id;
     }
 }

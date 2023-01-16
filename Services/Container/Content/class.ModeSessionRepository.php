@@ -26,7 +26,7 @@ use ilSession;
  * Stores view status
  * @author Alexander Killing <killing@leifos.de>
  */
-class ViewSessionRepository
+class ModeSessionRepository
 {
     protected const KEY = "cont_view";
     protected const VIEW_ADMIN = "admin";
@@ -36,25 +36,25 @@ class ViewSessionRepository
     {
     }
 
-    public function setAdminView(): void
+    public function setAdminMode() : void
     {
         ilSession::set(self::KEY, self::VIEW_ADMIN);
     }
 
-    public function setContentView(): void
+    public function setContentMode() : void
     {
         ilSession::clear(self::KEY);
     }
 
-    public function isAdminView(): bool
+    public function isAdminMode() : bool
     {
         if (ilSession::has(self::KEY)) {
-            return (ilSession::get(self::KEY) == self::VIEW_ADMIN);
+            return (ilSession::get(self::KEY) === self::VIEW_ADMIN);
         }
         return false;
     }
 
-    public function isContentView(): bool
+    public function isContentMode() : bool
     {
         return !ilSession::has(self::KEY);
     }

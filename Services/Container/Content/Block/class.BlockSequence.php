@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -23,33 +21,26 @@ namespace ILIAS\Container\Content;
 /**
  * @author Alexander Killing <killing@leifos.de>
  */
-class ViewManager
+class BlockSequence
 {
-    protected ViewSessionRepository $view_repo;
+    /**
+     * @var BlockSequencePart[]
+     */
+    protected array $parts;
 
-    public function __construct(
-        ViewSessionRepository $view_repo
-    ) {
-        $this->view_repo = $view_repo;
+    /**
+     * @param BlockSequencePart[] $parts
+     */
+    public function __construct(array $parts)
+    {
+        $this->parts = $parts;
     }
 
-    public function setAdminView(): void
+    /**
+     * @return BlockSequencePart[]
+     */
+    public function getParts() : array
     {
-        $this->view_repo->setAdminView();
-    }
-
-    public function setContentView(): void
-    {
-        $this->view_repo->setContentView();
-    }
-
-    public function isAdminView(): bool
-    {
-        return $this->view_repo->isAdminView();
-    }
-
-    public function isContentView(): bool
-    {
-        return $this->view_repo->isContentView();
+        return $this->parts;
     }
 }

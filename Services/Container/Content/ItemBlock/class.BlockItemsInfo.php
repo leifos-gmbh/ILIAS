@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /**
  * This file is part of ILIAS, a powerful learning management system
@@ -18,22 +16,32 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
-use PHPUnit\Framework\TestSuite;
-
-require_once 'libs/composer/vendor/autoload.php';
+namespace ILIAS\Container\Content\ItemBlock;
 
 /**
+ *
  * @author Alexander Killing <killing@leifos.de>
  */
-class ilServicesContainerSuite extends TestSuite
+class BlockItemsInfo
 {
-    public static function suite(): self
+    protected bool $limit_exhausted = false;
+    protected array $ref_ids = [];
+
+    public function __construct(
+        array $ref_ids,
+        bool $limit_exhausted
+    ) {
+        $this->ref_ids = $ref_ids;
+        $this->limit_exhausted = $limit_exhausted;
+    }
+
+    public function getRefIds() : array
     {
-        $suite = new self();
+        return $this->ref_ids;
+    }
 
-        require_once("./Services/Container/test/ContentModeManagerTest.php");
-        $suite->addTestSuite("ContentModeManagerTest");
-
-        return $suite;
+    public function getLimitExhausted() : bool
+    {
+        return $this->limit_exhausted;
     }
 }

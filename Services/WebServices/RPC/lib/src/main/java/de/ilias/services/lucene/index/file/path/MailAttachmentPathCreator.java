@@ -8,11 +8,12 @@ import de.ilias.services.lucene.index.CommandQueueElement;
 import de.ilias.services.settings.ClientSettings;
 import de.ilias.services.settings.ConfigurationException;
 import de.ilias.services.settings.LocalSettings;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -59,18 +60,6 @@ public class MailAttachmentPathCreator implements PathCreator {
 
 	}
 
-	/**
-	 * not used 
-	 * @todo check and throw exception
-	 * @param el
-	 * @return
-	 * @throws PathCreatorException 
-	 */
-	public File buildFile(CommandQueueElement el) throws PathCreatorException {
-		
-		return this.buildFile(el, null);
-		
-	}
 
 	@Override
 	public String getExtension(CommandQueueElement el, ResultSet res) {

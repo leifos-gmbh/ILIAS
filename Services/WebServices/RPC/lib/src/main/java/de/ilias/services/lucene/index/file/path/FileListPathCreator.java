@@ -22,23 +22,24 @@
 
 package de.ilias.services.lucene.index.file.path;
 
-import java.io.File;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import de.ilias.services.db.DBFactory;
 import de.ilias.services.lucene.index.CommandQueueElement;
 import de.ilias.services.settings.ClientSettings;
 import de.ilias.services.settings.ConfigurationException;
 import de.ilias.services.settings.LocalSettings;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.File;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
- * 
- *
  * @author Stefan Meyer <smeyer.ilias@gmx.de>
- * @version $Id$
  */
 public class FileListPathCreator implements PathCreator {
+
+	protected static Logger logger = LogManager.getLogger(FileListPathCreator.class);
 
 	protected String basePath = "ilFiles";
 	
@@ -72,14 +73,8 @@ public class FileListPathCreator implements PathCreator {
 	}
 	
 	
-	/**
-	 * @see de.ilias.services.lucene.index.file.path.PathCreator#buildPath(de.ilias.services.lucene.index.CommandQueueElement, java.sql.ResultSet)
-	 */
-	public File buildFile(CommandQueueElement el, ResultSet res)
-			throws PathCreatorException {
-
-		
-		
+	public File buildFile(CommandQueueElement el, ResultSet res) throws PathCreatorException
+	{
 		StringBuilder fullPath = new StringBuilder();
 		StringBuilder versionPath = new StringBuilder();
 		
@@ -134,14 +129,6 @@ public class FileListPathCreator implements PathCreator {
 		} 
 	}
 
-	/**
-	 * @see de.ilias.services.lucene.index.file.path.PathCreator#buildPath(de.ilias.services.lucene.index.CommandQueueElement)
-	 */
-	public File buildFile(CommandQueueElement el) throws PathCreatorException {
-
-		return buildFile(el, null);
-	}
-	
 	@Override
 	public String getExtension(CommandQueueElement el, ResultSet res) {
 		

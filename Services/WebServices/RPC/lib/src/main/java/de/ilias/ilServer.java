@@ -242,7 +242,6 @@ public class ilServer {
 		String status;
 
 		try {
-
 			logger.debug("Start parsing");
 			parser = new CommonsIniFileParser();
 			logger.debug("Parser created");

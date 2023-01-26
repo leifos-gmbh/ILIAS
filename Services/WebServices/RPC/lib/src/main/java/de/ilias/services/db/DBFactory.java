@@ -34,15 +34,18 @@ import java.util.HashMap;
 
 /**
  * A thread local singleton for db connections
- *
  * @author Stefan Meyer <smeyer.ilias@gmx.de>
- * @version $Id$
  */
 public class DBFactory {
 
 	private static final Logger logger = LogManager.getLogger(DBFactory.class);
 	
 	private static final String MARIA_DB_CONNECTOR = "jdbc:mariadb://";
+
+	// valid db types
+	private static final String DB_TYPE_MYSQL = "mysql";
+	private static final String DB_TYPE_INNODB = "innodb";
+
 	
 	private static final ThreadLocal<HashMap<String, PreparedStatement>> ps = new ThreadLocal<HashMap<String,PreparedStatement>>() {
 		protected HashMap<String, PreparedStatement> initialValue() {
@@ -64,35 +67,36 @@ public class DBFactory {
 				
 				logger.info("+++++++++++++++++++++++++++++++++++++++++++ New Thread local " + LocalSettings.getClientKey());
 
-				// MySQL
-				if(client.getDbType().equalsIgnoreCase("mysql")) {
-
-					logger.info("Loading maria db driver...");
-					logger.info("Using jdbc url: " +
-							client.getDbUrl() + "/" +
-							client.getDbUser() + "/" +
-							"******" + "?autoReconnect=true"
-					);
-
-					return DriverManager.getConnection(
-						DBFactory.MARIA_DB_CONNECTOR + 
-						client.getDbUrl() + "?autoReconnect=true",
-						client.getDbUser(),
-						client.getDbPass()
-					);
-				}
-				else {
+				if (!isValidDatabaseType(client.getDbType())) {
 					logger.error("Unsupported db type given." + client.getDbType());
 					throw new ConfigurationException("Unsupported db type given." + client.getDbType());
 				}
+				logger.info("Loading maria db driver...");
+				logger.info("Using jdbc url: " +
+						client.getDbUrl() + "/" +
+						client.getDbUser() + "/" +
+						"******" + "?autoReconnect=true"
+				);
+
+				return DriverManager.getConnection(
+					DBFactory.MARIA_DB_CONNECTOR +
+					client.getDbUrl() + "?autoReconnect=true",
+					client.getDbUser(),
+					client.getDbPass()
+				);
 			}
-			catch (SQLException e) {
-				logger.error("Cannot connect to database: " + e);
-			} 
-			catch (ConfigurationException e) {
+			catch (SQLException | ConfigurationException e) {
 				logger.error("Cannot connect to database: " + e);
 			}
 			return null;
+		}
+
+		protected boolean isValidDatabaseType(String dbType)
+		{
+			if (dbType.equalsIgnoreCase(DBFactory.DB_TYPE_MYSQL) || dbType.equalsIgnoreCase(DBFactory.DB_TYPE_INNODB)) {
+				return true;
+			}
+			return false;
 		}
 
 		/**
@@ -105,7 +109,7 @@ public class DBFactory {
 		
 	
 	};
-	
+
 	
 	/**
 	 * get singleton db connection for each url

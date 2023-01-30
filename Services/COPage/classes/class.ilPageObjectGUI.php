@@ -3122,4 +3122,9 @@ class ilPageObjectGUI
     {
         return [];
     }
+
+    public function afterDeleteContents(): void
+    {
+    }
+
 }

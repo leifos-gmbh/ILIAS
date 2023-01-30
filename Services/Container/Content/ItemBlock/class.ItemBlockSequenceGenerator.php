@@ -100,7 +100,10 @@ class ItemBlockSequenceGenerator
                     } else {
                         $ref_ids = $this->item_set_manager->getRefIdsOfType($id);
                         $block_items = $this->determineBlockItems($ref_ids, true);
-                        if (count($block_items->getRefIds()) > 0) {
+                        // we remove this check to prevent [list-cat] stuff from appearing in the list
+                        // this will output a message (is empty) in editing mode and
+                        // remove the block (empty string) in presentation mode
+                        //if (count($block_items->getRefIds()) > 0) {
                             $block = $this->data_service->itemBlock(
                                 $id,
                                 $this->data_service->typeBlock($id),
@@ -109,7 +112,7 @@ class ItemBlockSequenceGenerator
                             );
                             $block->setPageEmbedded(true);
                             $sorted_blocks[] = $block;
-                        }
+                        //}
                     }
                 } else {
                     // e.g. deleted item group

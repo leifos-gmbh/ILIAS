@@ -104,4 +104,9 @@ class ilContainerPageGUI extends ilPageObjectGUI
         $this->getPageObject()->addMissingContainerBlocks($this->item_presentation_mnager);
         return parent::edit();
     }
+
+    public function afterDeleteContents(): void
+    {
+        $this->getPageObject()->addMissingContainerBlocks($this->item_presentation_mnager);
+    }
 }

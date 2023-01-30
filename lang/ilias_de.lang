@@ -5723,6 +5723,7 @@ common#:#udf_delete_sure#:#Sind Sie sicher, dass Sie diese Feld und alle zugehö
 common#:#udf_duplicate_entries#:#Die Werte müssen eindeutig sein.
 common#:#udf_field_deleted#:#Das Feld wurde gelöscht.
 common#:#udf_name_already_exists#:#Ein Feld mit diesem Namen existiert bereits. Bitte wählen Sie einen anderen Feldnamen.
+common#:#udf_required_and_visible_requires_changeable#:#Wenn die Einstellungen "Erforderliche Angabe" und "Sichtbar in den persönlichen Daten" aktiviert sind, muss auch "Kann durch Benutzer selbst im Profil geändert werden" aktiviert sein
 common#:#udf_required_requires_visib_reg#:#Die Einstellung "Erforderliche Angabe" erfordert die Einstellung "Sichtbar im Registrierungsformular"
 common#:#udf_type_date#:#Datum
 common#:#udf_type_datetime#:#Datum und Uhrzeit
@@ -7117,7 +7118,7 @@ content#:#glo_presentation_mode#:#Ansicht
 content#:#glo_presentation_view#:#Präsentationsansicht
 content#:#glo_quick_navigation#:#Schnellzugriff
 content#:#glo_show_taxonomy#:#Taxonomie
-content#:#glo_show_taxonomy_info#:#Die Taxonomie wird in der Präsentationsansicht angezeigt und kann zur Auswahl von Begriffen genutzt werden.
+content#:#glo_show_taxonomy_info#:#Die Taxonomie wird in der Präsentationsansicht zum Filtern der Glossarbegriffe angeboten. Sie kann im Unterreiter „Taxonomie“ angelegt werden.
 content#:#glo_style#:#Glossar-Style
 content#:#glo_table_form#:#Tabelle
 content#:#glo_table_form_info#:#Begriffe und gekürzte Definitionen werden in einer Übersichtstabelle dargestellt. Beim Anklicken eines Begriffes wird dieser mit der vollständigen Definition angezeigt.

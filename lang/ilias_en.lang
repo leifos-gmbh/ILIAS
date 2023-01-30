@@ -5724,7 +5724,8 @@ common#:#udf_delete_sure#:#Are you sure you want to delete this field and all as
 common#:#udf_duplicate_entries#:#The values have to be unique.
 common#:#udf_field_deleted#:#Deleted field.
 common#:#udf_name_already_exists#:#This field name already exists. Please choose a different name.
-common#:#udf_required_requires_visib_reg#:#When field is set to ‘required’, it must be set to ‘visible in registration’
+common#:#udf_required_and_visible_requires_changeable#:#When a field is ‘Required’ and ‘Visible in Personal Data’, it must also be ‘Changeable in Profile’
+common#:#udf_required_requires_visib_reg#:#When a field is ‘Required’, it must also be ‘Visible in Registration’
 common#:#udf_type_date#:#Date
 common#:#udf_type_datetime#:#Date and Time
 common#:#udf_type_select#:#Selection List (Single Choice)
@@ -7117,8 +7118,8 @@ content#:#glo_online_info#:#Only if the glossary is online, users are able to us
 content#:#glo_presentation_mode#:#Presentation Mode
 content#:#glo_presentation_view#:#Presentation View
 content#:#glo_quick_navigation#:#Quick Navigation
-content#:#glo_show_taxonomy#:#Show Taxonomy
-content#:#glo_show_taxonomy_info#:#The taxonomy will be visible in the presentation view of the glossary and can be used to select referenced terms.
+content#:#glo_show_taxonomy#:#Taxonomy
+content#:#glo_show_taxonomy_info#:#The taxonomy is offered in the presentation view for filtering the glossary terms. It can be created in the sub-tab 'Taxonomy'.
 content#:#glo_style#:#Glossary Style
 content#:#glo_table_form#:#In Table Form
 content#:#glo_table_form_info#:#Terms and definition are first shown in a two-column overview. Clicking the term opens the full content of a term on a separate screen.

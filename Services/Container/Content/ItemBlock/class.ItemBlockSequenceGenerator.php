@@ -306,14 +306,17 @@ class ItemBlockSequenceGenerator
             fn ($i) => !isset($this->accumulated_ref_ids[$i])
         );
         $block_items = $this->determineBlockItems($remaining_ref_ids);
-        if (count($block_items->getRefIds()) > 0) {
+        // we remove this check to prevent [list-_other] stuff from appearing in the list
+        // this will output a message (is empty) in editing mode and
+        // remove the block (empty string) in presentation mode
+        //if (count($block_items->getRefIds()) > 0) {
             return $this->data_service->itemBlock(
                 "_other",
                 $this->data_service->otherBlock(),
                 $block_items->getRefIds(),
                 $block_items->getLimitExhausted()
             );
-        }
+        //}
         return null;
     }
 

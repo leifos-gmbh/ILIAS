@@ -187,6 +187,12 @@ class ItemPresentationManager
         return $this->sequence_generator->getSequence();
     }
 
+    public function getPageEmbeddedBlockIds() : array
+    {
+        $this->init();
+        return $this->sequence_generator->getPageEmbeddedBlockIds();
+    }
+
     public function getRawDataByRefId(int $ref_id) : ?array
     {
         $this->init();

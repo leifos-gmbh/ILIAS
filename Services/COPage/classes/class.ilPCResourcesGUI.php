@@ -306,7 +306,6 @@ class ilPCResourcesGUI extends ilPageContentGUI
         global $DIC;
 
         $lng = $DIC->language();
-
         $ref_id = $DIC
             ->copage()
             ->internal()

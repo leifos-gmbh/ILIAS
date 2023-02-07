@@ -796,6 +796,7 @@ class ilContainerRenderer
 
         $block_tpl = $this->initBlockTemplate();
 
+        $embedded_block_ids = $this->item_presentation->getPageEmbeddedBlockIds();
         foreach ($sequence->getBlocks() as $block) {
             $block_id = "";
             $force_item_even_if_already_rendered = false;
@@ -921,6 +922,15 @@ class ilContainerRenderer
                     $this->addSeparatorRow($block_tpl);
                 }
             }
+        }
+
+        // remove embedded, but unrendered blocks
+        foreach ($this->item_presentation->getPageEmbeddedBlockIds() as $id) {
+            $page_html = preg_replace(
+                '~\[list-'.$id.'\]~i',
+                "",
+                $page_html
+            );
         }
 
         if ($valid) {

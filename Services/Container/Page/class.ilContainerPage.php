@@ -44,7 +44,44 @@ class ilContainerPage extends ilPageObject
                     $this->addRepositoryBlockToPage($block->getId(), $block->getBlock());
                 }
             }
+            $this->removeUnsupportedBlockIds($manager);
         }
+    }
+
+    public function removeUnsupportedBlockIds(\ILIAS\Container\Content\ItemPresentationManager $manager) : void
+    {
+        $ids = $manager->getPageEmbeddedBlockIds();
+        $block_ids = [];
+        foreach ($manager->getItemBlockSequence()->getBlocks() as $block) {
+            $block_ids[] = $block->getId();
+        }
+        foreach ($ids as $id) {
+            if (!in_array($id, $block_ids)) {
+                $this->buildDom();
+                $doc = $this->getDomDoc();
+                $xpath_temp = new DOMXPath($doc);
+                if (is_numeric($id)) {
+                    $igs = $xpath_temp->query("//Resources/ItemGroup");
+                    foreach ($igs as $ig_node) {
+                        $ref_id = $ig_node->getAttribute("RefId");
+                        if ((int) $ref_id === (int) $id) {
+                            $pc_node = $ig_node->parentNode->parentNode;
+                            $node = $pc_node->parentNode->removeChild($pc_node);
+                        }
+                    }
+                } else {
+                    $igs = $xpath_temp->query("//Resources/ResourceList");
+                    foreach ($igs as $ig_node) {
+                        $type = $ig_node->getAttribute("Type");
+                        if ($type == $id) {
+                            $pc_node = $ig_node->parentNode->parentNode;
+                            $node = $pc_node->parentNode->removeChild($pc_node);
+                        }
+                    }
+                }
+            }
+        }
+        $this->update();
     }
 
     protected function addRepositoryBlockToPage(string $id, \ILIAS\Container\Content\Block $block) : void

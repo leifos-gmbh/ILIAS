@@ -117,9 +117,10 @@ class ilPCResourcesGUI extends ilPageContentGUI
 
 
         $op_type = new ilRadioOption($lng->txt("cont_resources_of_type"), "by_type", "");
-        if ($this->supportsTypeBlocks()) {
+        // all views support typed blocks
+        //if ($this->supportsTypeBlocks()) {
             $radg->addOption($op_type);
-        }
+        //}
 
         if ($this->supportsItemGroups() && count($item_groups) > 0) {
             $op_itemgroup = new ilRadioOption($lng->txt("obj_itgr"), "itgr", "");
@@ -169,7 +170,7 @@ class ilPCResourcesGUI extends ilPageContentGUI
             $lng->loadLanguageModule("crs");
             $op_lobj = new ilRadioOption($lng->txt("crs_objectives"), "_lobj", "");
             $radg->addOption($op_lobj);
-            if ($this->content_obj->getResourceListType() === "_lobj") {
+            if (!$a_insert && $this->content_obj->getResourceListType() === "_lobj") {
                 $radg->setValue("_lobj");
             }
         }
@@ -178,7 +179,7 @@ class ilPCResourcesGUI extends ilPageContentGUI
         if ($this->supportsOther()) {
             $op_other = new ilRadioOption($lng->txt("cont_other_resources"), "_other", "");
             $radg->addOption($op_other);
-            if ($this->content_obj->getResourceListType() === "_other") {
+            if (!$a_insert && $this->content_obj->getResourceListType() === "_other") {
                 $radg->setValue("_other");
             }
         }

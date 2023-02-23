@@ -1656,6 +1656,7 @@ assessment#:#tst_password_entered_wrong_password#:#You cannot start the test bec
 assessment#:#tst_password_form#:#Enter Test Password###26 09 2014 new variable
 assessment#:#tst_password_introduction#:#This test can only be accessed with a test password. Please enter the test password to start the test
 assessment#:#tst_percent_solved#:#Procent løst
+assessment#:#tst_player_answer_saved_and_locked#:#Answer is saved and locked and can no longer be changed###21 12 2022 new variable
 assessment#:#tst_please_select_target_for_pool_derives#:#Please select a target conatainer.###25 10 2016 new variable
 assessment#:#tst_position#:#Spørgsmål %s af %s
 assessment#:#tst_position_without_total#:#Question %s###23 12 2015 new variable
@@ -2791,7 +2792,7 @@ chatroom#:#banned#:#Du er blevet banlyst fra chatten. Farvel!
 chatroom#:#bans#:#Bans###06 08 2011 new variable
 chatroom#:#chat_address#:#Address###06 08 2011 new variable
 chatroom#:#chat_anonymous_not_allowed#:#Please login to use the chat.###10 11 2018 new variable
-chatroom#:#chat_auth_token_info#:#Please define unique strings used by ILIAS for authentication purposes when sending requests to the chat server. You can automatically create these strings by clicking the corresponding button. Please note that the chat server is able to communicate with multiple ILIAS clients, but each client id has to be <b>unique</b>.###25 10 2016 new variable
+chatroom#:#chat_auth_token_info#:#Please define unique strings used by ILIAS for authentication purposes when sending requests to the chat server. You can automatically create these strings by clicking the corresponding button. Please note that the chat server is able to communicate with multiple ILIAS clients, but each client name has to be <b>unique</b>.###25 10 2016 new variable
 chatroom#:#chat_ban#:#Ban###06 08 2011 new variable
 chatroom#:#chat_connection_disconnected#:#Disconnected###06 08 2011 new variable
 chatroom#:#chat_connection_established#:#Connection established###06 08 2011 new variable
@@ -5709,6 +5710,7 @@ common#:#udf_delete_sure#:#Er du sikker på du vil SLETTE dette felt og alle ind
 common#:#udf_duplicate_entries#:#Værdierne skal være unikke
 common#:#udf_field_deleted#:#Det brugerdefinerede felt blev slettet.
 common#:#udf_name_already_exists#:#Feltnavnet eksisterer i forvejen, så du skal vælge et andet.
+common#:#udf_required_and_visible_requires_changeable#:#When a field is ‘Required’ and ‘Visible in Personal Data’, it must also be ‘Changeable in Profile’###01 02 2023 new variable
 common#:#udf_required_requires_visib_reg#:#Når en feltindtastning er krævet skal det være synligt i brugeroprettelsen.
 common#:#udf_type_date#:#Datofelt
 common#:#udf_type_datetime#:#Dato og tid
@@ -9280,6 +9282,7 @@ exc#:#exc_team_log#:#Hold hændelseslog
 exc#:#exc_team_log_add_file#:#Tilføjede fil %s.
 exc#:#exc_team_log_add_member#:#Tilfjøjede medlem %s.
 exc#:#exc_team_log_create_team#:#Hold oprettet
+exc#:#exc_team_log_remove_file#:#Removed file %s.###21 12 2022 new variable
 exc#:#exc_team_log_remove_member#:#Fjernede medlem %s.
 exc#:#exc_team_management_tutor#:#Team Management by Tutors###30 08 2015 new variable
 exc#:#exc_team_management_tutor_info#:#If activated participants cannot organize teams themselves.###30 08 2015 new variable
@@ -10862,7 +10865,7 @@ mathjax#:#mathjax_limiter#:#Inline Delimiters###28 09 2012 new variable
 mathjax#:#mathjax_limiter_info#:#Select the inline delimiters as they are configured in your MathJax installation.###28 09 2012 new variable
 mathjax#:#mathjax_mathjax#:#MathJax
 mathjax#:#mathjax_path_to_mathjax#:#URL til MathJax
-mathjax#:#mathjax_path_to_mathjax_desc#:#E.g. https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML or a URL to your local installation.###28 09 2012 new variable
+mathjax#:#mathjax_path_to_mathjax_desc#:#E.g. https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML,Safe or a URL to your local installation.###28 09 2012 new variable
 mathjax#:#mathjax_server_address#:#Server Address###25 10 2016 new variable
 mathjax#:#mathjax_server_address_info#:#E.g. http://localhost:8003###25 10 2016 new variable
 mathjax#:#mathjax_server_cache_cleared#:#The MathJax cache was cleared.###25 10 2016 new variable
@@ -11065,7 +11068,9 @@ meta#:#md_adv_record_lng_table_lng#:#Language###30 04 2021 new variable
 meta#:#md_adv_records#:#Included Datasets###16 08 2007 new variable
 meta#:#md_adv_records_exported#:#En ny eksportfil er blevet lavet
 meta#:#md_adv_scope#:#Scope###31 08 2017 new variable
+meta#:#md_adv_scope_info#:#Usage of this custom metadata set will be limited to selected parts of the repository.###01 02 2023 new variable
 meta#:#md_adv_scope_list_header#:#Limited to:###31 08 2017 new variable
+meta#:#md_adv_scope_objects#:#Data Set Effective From###01 02 2023 new variable
 meta#:#md_adv_searchable#:#Søgbart
 meta#:#md_adv_select_one_file#:#Vælg venligst kun en fil
 meta#:#md_adv_show#:#Vis
@@ -13763,6 +13768,7 @@ registration#:#reg_confirmation_hash_life_time#:#Lifetime###20 08 2010 new varia
 registration#:#reg_confirmation_hash_life_time_expired#:#Bekræftelseslinket er ikke længere gyldigt.
 registration#:#reg_confirmation_hash_life_time_info#:#Tidsbegrænsning i sekunder som brugeren har til at bekræfte efter afsendelse.
 registration#:#reg_confirmation_hash_not_found#:#Ingen matchende brugerkonto til dette bekræftelseslink.
+registration#:#reg_confirmation_hash_not_passed#:#The confirmation link is incomplete.###01 02 2023 new variable
 registration#:#reg_confirmation_link_successful#:#You successfully submitted an account request to ILIAS. You have to confirm your registration by clicking the confirmation link.###26 06 2009 new variable
 registration#:#reg_default#:#Default
 registration#:#reg_deleted_assignment#:#Deleted assignment(s).

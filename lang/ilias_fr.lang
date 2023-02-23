@@ -1656,6 +1656,7 @@ assessment#:#tst_password_entered_wrong_password#:#Vous ne pouvez pas commencer 
 assessment#:#tst_password_form#:#Entrer le mot de passe du test
 assessment#:#tst_password_introduction#:#L'accès à ce test requiert la saisie d'un mot de passe. Veuillez saisir ce mot de passe pour commencer le test
 assessment#:#tst_percent_solved#:#Pourcentage de Réussite
+assessment#:#tst_player_answer_saved_and_locked#:#Answer is saved and locked and can no longer be changed###21 12 2022 new variable
 assessment#:#tst_please_select_target_for_pool_derives#:#Veuillez sélectionner un conteneur cible.
 assessment#:#tst_position#:#Question %s sur %s
 assessment#:#tst_position_without_total#:#Question %s
@@ -5709,6 +5710,7 @@ common#:#udf_delete_sure#:#Êtes-vous sûr de vouloir supprimer ce champ et tout
 common#:#udf_duplicate_entries#:#Ces valeurs doivent être uniques.
 common#:#udf_field_deleted#:#Zone supprimée.
 common#:#udf_name_already_exists#:#Ce nom de champ existe déjà. Veuillez en choisir un autre.
+common#:#udf_required_and_visible_requires_changeable#:#When a field is ‘Required’ and ‘Visible in Personal Data’, it must also be ‘Changeable in Profile’###01 02 2023 new variable
 common#:#udf_required_requires_visib_reg#:#Lorsque la zone est mise à  "requis", elle doit être mise "visible à  l'inscription"
 common#:#udf_type_date#:#Zone date
 common#:#udf_type_datetime#:#Date et Heure
@@ -9280,6 +9282,7 @@ exc#:#exc_team_log#:#Historique de l'Equipe
 exc#:#exc_team_log_add_file#:#Le fichier %s a été ajouté.
 exc#:#exc_team_log_add_member#:#L'équipier %s été ajouté.
 exc#:#exc_team_log_create_team#:#L'équipe a été créée.
+exc#:#exc_team_log_remove_file#:#Removed file %s.###21 12 2022 new variable
 exc#:#exc_team_log_remove_member#:#L'équipier %s a été retiré.
 exc#:#exc_team_management_tutor#:#Gestion d’équipes par les tuteurs
 exc#:#exc_team_management_tutor_info#:#Si cette option est activée, les participants ne peuvent pas organiser les équipes eux-mêmes.
@@ -10862,7 +10865,7 @@ mathjax#:#mathjax_limiter#:#Séparateurs
 mathjax#:#mathjax_limiter_info#:#Définissez les séparateurs tels qu'ils sont configurés dans votre installation MathJax.
 mathjax#:#mathjax_mathjax#:#MathJax
 mathjax#:#mathjax_path_to_mathjax#:#URL vers MathJax
-mathjax#:#mathjax_path_to_mathjax_desc#:#Ex. https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML ou une URL vers votre installation locale.
+mathjax#:#mathjax_path_to_mathjax_desc#:#Ex. https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML,Safe ou une URL vers votre installation locale.
 mathjax#:#mathjax_server_address#:#Adresse de serveur
 mathjax#:#mathjax_server_address_info#:#Par ex. http://localhost:8003
 mathjax#:#mathjax_server_cache_cleared#:#Le cache MathJax a été supprimé.
@@ -11065,7 +11068,9 @@ meta#:#md_adv_record_lng_table_lng#:#Language###30 04 2021 new variable
 meta#:#md_adv_records#:#Ensembles de données inclus
 meta#:#md_adv_records_exported#:#Un nouveau fichier d'export a été créé.
 meta#:#md_adv_scope#:#Étendue
+meta#:#md_adv_scope_info#:#Usage of this custom metadata set will be limited to selected parts of the repository.###01 02 2023 new variable
 meta#:#md_adv_scope_list_header#:#Limité à:
+meta#:#md_adv_scope_objects#:#Data Set Effective From###01 02 2023 new variable
 meta#:#md_adv_searchable#:#Consultable
 meta#:#md_adv_select_one_file#:#Veuillez sélectionner un fichier.
 meta#:#md_adv_show#:#Afficher
@@ -13763,6 +13768,7 @@ registration#:#reg_confirmation_hash_life_time#:#Durée de vie
 registration#:#reg_confirmation_hash_life_time_expired#:#Le lien de confirmation n'est plus valide. Veuillez vous enregistrer de nouveau !
 registration#:#reg_confirmation_hash_life_time_info#:#Saisir la durée de vie (secondes) des liens de confirmation.
 registration#:#reg_confirmation_hash_not_found#:#Aucun compte utilisateur ne correspond à ce lien de confirmation.
+registration#:#reg_confirmation_hash_not_passed#:#The confirmation link is incomplete.###01 02 2023 new variable
 registration#:#reg_confirmation_link_successful#:#Vous avez demandé un compte sur ILIAS. Vous allez recevoir un mail de confirmation d'ici peu.
 registration#:#reg_default#:#Défaut
 registration#:#reg_deleted_assignment#:#Assignation(s) supprimée(s).

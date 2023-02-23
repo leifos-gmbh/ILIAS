@@ -1657,6 +1657,7 @@ assessment#:#tst_password_entered_wrong_password#:#Δεν μπορείτε να 
 assessment#:#tst_password_form#:#Enter Test Password###26 09 2014 new variable
 assessment#:#tst_password_introduction#:#Μπορείτε να προσπαλάσετε το διαγώνισμα μόνο αφού δώσετε το σωστό κωδικό. Παρακαλώ δώστε το κωδικό του διαγωνίσματος για να ξεκινήσετε το τεστ
 assessment#:#tst_percent_solved#:#Ποσοστό που επιλύθηκε
+assessment#:#tst_player_answer_saved_and_locked#:#Answer is saved and locked and can no longer be changed###21 12 2022 new variable
 assessment#:#tst_please_select_target_for_pool_derives#:#Please select a target conatainer.###25 10 2016 new variable
 assessment#:#tst_position#:#Ερώτηση %s από %s
 assessment#:#tst_position_without_total#:#Question %s###23 12 2015 new variable
@@ -2792,7 +2793,7 @@ chatroom#:#banned#:#You have been banned from this chat###06 08 2011 new variabl
 chatroom#:#bans#:#Bans###06 08 2011 new variable
 chatroom#:#chat_address#:#Address###06 08 2011 new variable
 chatroom#:#chat_anonymous_not_allowed#:#Please login to use the chat.###10 11 2018 new variable
-chatroom#:#chat_auth_token_info#:#Please define unique strings used by ILIAS for authentication purposes when sending requests to the chat server. You can automatically create these strings by clicking the corresponding button. Please note that the chat server is able to communicate with multiple ILIAS clients, but each client id has to be <b>unique</b>.###25 10 2016 new variable
+chatroom#:#chat_auth_token_info#:#Please define unique strings used by ILIAS for authentication purposes when sending requests to the chat server. You can automatically create these strings by clicking the corresponding button. Please note that the chat server is able to communicate with multiple ILIAS clients, but each client name has to be <b>unique</b>.###25 10 2016 new variable
 chatroom#:#chat_ban#:#Ban###06 08 2011 new variable
 chatroom#:#chat_connection_disconnected#:#Disconnected###06 08 2011 new variable
 chatroom#:#chat_connection_established#:#Connection established###06 08 2011 new variable
@@ -5710,6 +5711,7 @@ common#:#udf_delete_sure#:#Είστε σίγουροι ότι θέλετε να 
 common#:#udf_duplicate_entries#:#Οι τιμές πρέπει να είναι μοναδικές.
 common#:#udf_field_deleted#:#Το πεδίο διαγράφηκε.
 common#:#udf_name_already_exists#:#Το όνομα του πεδίου υπάρχει ήδη. Παρακαλώ επιλέξτε ένα διαφορετικό όνομα.
+common#:#udf_required_and_visible_requires_changeable#:#When a field is ‘Required’ and ‘Visible in Personal Data’, it must also be ‘Changeable in Profile’###01 02 2023 new variable
 common#:#udf_required_requires_visib_reg#:#When field is set to "required", it must be set to "visible in registration"###29 09 2009 new variable
 common#:#udf_type_date#:#Date Field
 common#:#udf_type_datetime#:#Date and Time
@@ -9281,6 +9283,7 @@ exc#:#exc_team_log#:#Team Log###28 08 2012 new variable
 exc#:#exc_team_log_add_file#:#Added file %s.###28 08 2012 new variable
 exc#:#exc_team_log_add_member#:#Added member %s.###28 08 2012 new variable
 exc#:#exc_team_log_create_team#:#Team created.###28 08 2012 new variable
+exc#:#exc_team_log_remove_file#:#Removed file %s.###21 12 2022 new variable
 exc#:#exc_team_log_remove_member#:#Removed member %s.###28 08 2012 new variable
 exc#:#exc_team_management_tutor#:#Team Management by Tutors###30 08 2015 new variable
 exc#:#exc_team_management_tutor_info#:#If activated participants cannot organize teams themselves.###30 08 2015 new variable
@@ -10863,7 +10866,7 @@ mathjax#:#mathjax_limiter#:#Inline Delimiters###28 09 2012 new variable
 mathjax#:#mathjax_limiter_info#:#Select the inline delimiters as they are configured in your MathJax installation.###28 09 2012 new variable
 mathjax#:#mathjax_mathjax#:#MathJax###28 09 2012 new variable
 mathjax#:#mathjax_path_to_mathjax#:#URL to MathJax###28 09 2012 new variable
-mathjax#:#mathjax_path_to_mathjax_desc#:#E.g. https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML or a URL to your local installation.###28 09 2012 new variable
+mathjax#:#mathjax_path_to_mathjax_desc#:#E.g. https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML,Safe or a URL to your local installation.###28 09 2012 new variable
 mathjax#:#mathjax_server_address#:#Server Address###25 10 2016 new variable
 mathjax#:#mathjax_server_address_info#:#E.g. http://localhost:8003###25 10 2016 new variable
 mathjax#:#mathjax_server_cache_cleared#:#The MathJax cache was cleared.###25 10 2016 new variable
@@ -11066,7 +11069,9 @@ meta#:#md_adv_record_lng_table_lng#:#Language###30 04 2021 new variable
 meta#:#md_adv_records#:#Included Datasets
 meta#:#md_adv_records_exported#:#A new export file has been created.
 meta#:#md_adv_scope#:#Scope###31 08 2017 new variable
+meta#:#md_adv_scope_info#:#Usage of this custom metadata set will be limited to selected parts of the repository.###01 02 2023 new variable
 meta#:#md_adv_scope_list_header#:#Limited to:###31 08 2017 new variable
+meta#:#md_adv_scope_objects#:#Data Set Effective From###01 02 2023 new variable
 meta#:#md_adv_searchable#:#Searchable
 meta#:#md_adv_select_one_file#:#Please choose one file.
 meta#:#md_adv_show#:#Show
@@ -13764,6 +13769,7 @@ registration#:#reg_confirmation_hash_life_time#:#Lifetime###20 08 2010 new varia
 registration#:#reg_confirmation_hash_life_time_expired#:#The confirmation link is not valid anymore.###26 06 2009 new variable
 registration#:#reg_confirmation_hash_life_time_info#:#Enter the lifetime (seconds) of confirmation links.###26 06 2009 new variable
 registration#:#reg_confirmation_hash_not_found#:#No user account could be matched to this confirmation link.###26 06 2009 new variable
+registration#:#reg_confirmation_hash_not_passed#:#The confirmation link is incomplete.###01 02 2023 new variable
 registration#:#reg_confirmation_link_successful#:#You successfully submitted an account request to ILIAS. You have to confirm your registration by clicking the confirmation link.###26 06 2009 new variable
 registration#:#reg_default#:#Προκαθορισμένο
 registration#:#reg_deleted_assignment#:#Διαγραμμένες αναθέσεις.

@@ -28,6 +28,7 @@ final class ilEmployeeTalkTableGUI extends ilTable2GUI
     public const STATUS_COMPLETED = 2;
 
     private ilLanguage $language;
+    private ilObjEmployeeTalkAccess $talk_access;
 
     public function __construct(ControlFlowCommandHandler $a_parent_obj, $a_parent_cmd = "")
     {
@@ -39,6 +40,8 @@ final class ilEmployeeTalkTableGUI extends ilTable2GUI
         $this->language = $container->language();
         $this->language->loadLanguageModule('etal');
         $this->language->loadLanguageModule('orgu');
+
+        $this->talk_access = new ilObjEmployeeTalkAccess();
 
         $this->setPrefix('myst_etal_list_');
         $this->setFormName('myst_etal_list');
@@ -150,23 +153,7 @@ final class ilEmployeeTalkTableGUI extends ilTable2GUI
         $this->ctrl->setParameterByClass($class, "ref_id", $a_set["ref_id"]);
         $url = $this->ctrl->getLinkTargetByClass($classPath, ControlFlowCommand::DEFAULT);
 
-        $actions = new ilAdvancedSelectionListGUI();
-        $actions->setListTitle($this->language->txt("actions"));
-        $actions->setAsynch(true);
-        $actions->setId((string) $a_set["ref_id"]);
-
-        $actions->setAsynchUrl(
-            str_replace("\\", "\\\\", $this->ctrl->getLinkTargetByClass(
-                [
-                    strtolower(ilDashboardGUI::class),
-                    strtolower(ilMyStaffGUI::class),
-                    strtolower(ilEmployeeTalkMyStaffListGUI::class)
-                ],
-                ControlFlowCommand::TABLE_ACTIONS,
-                "",
-                true
-            )) . '&ref_id=' . $a_set["ref_id"]
-        );
+        $actions = $this->getActions((int) $a_set["ref_id"]);
 
         $this->tpl->setVariable("HREF_ETAL_TITLE", $url);
         $this->tpl->setVariable("VAL_ETAL_TITLE", $a_set['etal_title']);
@@ -175,7 +162,39 @@ final class ilEmployeeTalkTableGUI extends ilTable2GUI
         $this->tpl->setVariable("VAL_ETAL_SUPERIOR", $a_set['etal_superior']);
         $this->tpl->setVariable("VAL_ETAL_EMPLOYEE", $a_set['etal_employee']);
         $this->tpl->setVariable("VAL_ETAL_STATUS", $a_set['etal_status']);
-        $this->tpl->setVariable("ACTIONS", $actions->getHTML());
+        $this->tpl->setVariable("ACTIONS", $actions);
+    }
+
+    private function getActions(int $ref_id): string
+    {
+        /**
+         * @TODO clean up: get rid of ilEmployeeTalkStaffListGUI duplicated here
+         */
+        $listGUI = new ilAdvancedSelectionListGUI();
+        $listGUI->setListTitle($this->language->txt("actions"));
+        $listGUI->setId((string) $ref_id);
+
+        $class = strtolower(ilObjEmployeeTalkGUI::class);
+        $classPath = [
+            strtolower(ilDashboardGUI::class),
+            strtolower(ilMyStaffGUI::class),
+            strtolower(ilEmployeeTalkMyStaffListGUI::class),
+            $class
+        ];
+
+        $this->ctrl->setParameterByClass($class, "ref_id", $ref_id);
+        if ($this->talk_access->canEdit($ref_id)) {
+            $listGUI->addItem($this->language->txt('edit'), '', $this->ctrl->getLinkTargetByClass($classPath, ControlFlowCommand::UPDATE));
+        } else {
+            $listGUI->addItem($this->language->txt('view'), '', $this->ctrl->getLinkTargetByClass($classPath, ControlFlowCommand::INDEX));
+        }
+
+        if ($this->talk_access->canDelete($ref_id)) {
+            $this->ctrl->setParameterByClass($class, "item_ref_id", $ref_id);
+            $listGUI->addItem($this->language->txt('delete'), '', $this->ctrl->getLinkTargetByClass($classPath, ControlFlowCommand::DELETE_INDEX));
+        }
+
+        return $listGUI->getHTML();
     }
 
     public function setTalkData(array $talks): void

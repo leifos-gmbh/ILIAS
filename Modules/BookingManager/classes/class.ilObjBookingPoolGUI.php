@@ -16,6 +16,11 @@
 class ilObjBookingPoolGUI extends ilObjectGUI
 {
     /**
+     * @var \ILIAS\DI\UIServices
+     */
+    protected $ui;
+
+    /**
      * @var ilTabsGUI
      */
     protected $tabs;
@@ -58,9 +63,9 @@ class ilObjBookingPoolGUI extends ilObjectGUI
     /**
      * ilObjBookingPoolGUI constructor.
      * @param array $a_data
-     * @param int $a_id
-     * @param bool $a_call_by_reference
-     * @param bool $a_prepare_output
+     * @param int   $a_id
+     * @param bool  $a_call_by_reference
+     * @param bool  $a_prepare_output
      * @throws ilException
      */
     public function __construct($a_data, $a_id, $a_call_by_reference, $a_prepare_output = true)
@@ -90,6 +95,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
         $this->profile_user_id = (int) $_GET['user_id'];
 
         $this->service = $DIC->bookingManager()->internal();
+        $this->ui = $DIC->ui();
 
         $this->user_id_assigner = $this->user->getId();
         if ($_GET['bkusr']) {
@@ -117,7 +123,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
 
         $next_class = $this->ctrl->getNextClass($this);
         $cmd = $this->ctrl->getCmd();
-        
+
         if (!$next_class && $cmd == 'render') {
             if ($ilUser->getId() != ANONYMOUS_USER_ID) {
                 if ($this->object->getScheduleType() == ilObjBookingPool::TYPE_NO_SCHEDULE_PREFERENCES &&
@@ -188,20 +194,20 @@ class ilObjBookingPoolGUI extends ilObjectGUI
                 $this->checkPermission('visible');
                 $this->infoScreen();
                 break;
-            
+
             case "ilcommonactiondispatchergui":
                 $this->checkPermission('read');
                 $gui = ilCommonActionDispatcherGUI::getInstanceFromAjaxCall();
                 $this->ctrl->forwardCommand($gui);
                 break;
-            
+
             case "ilobjectcopygui":
                 $this->checkPermission('copy');
                 $cp = new ilObjectCopyGUI($this);
                 $cp->setType("book");
                 $this->ctrl->forwardCommand($cp);
                 break;
-            
+
             case 'ilobjectmetadatagui':
                 $this->checkPermission('write');
                 $this->tabs_gui->setTabActive('meta_data');
@@ -216,7 +222,6 @@ class ilObjBookingPoolGUI extends ilObjectGUI
                 $this->ctrl->forwardCommand($object_gui);
                 break;
 
-
             case "ilbookingreservationsgui":
                 $this->tabs_gui->setTabActive('log');
                 $res_gui = new ilBookingReservationsGUI($this->object, $this->help);
@@ -229,7 +234,6 @@ class ilObjBookingPoolGUI extends ilObjectGUI
                 $this->ctrl->forwardCommand($gui);
                 break;
 
-            
             default:
                 if (!in_array($cmd, ["create", "save", "infoScreen"])) {
                     $this->checkPermission('read');
@@ -239,7 +243,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
                 $this->$cmd();
                 break;
         }
-        
+
         $this->addHeaderAction();
         return true;
     }
@@ -248,7 +252,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
     {
         $forms = parent::initCreationForms($a_new_type);
         unset($forms[self::CFORM_IMPORT]);
-        
+
         return $forms;
     }
 
@@ -262,10 +266,11 @@ class ilObjBookingPoolGUI extends ilObjectGUI
         $this->ctrl->setParameter($this, "ref_id", $a_new_object->getRefId());
         $this->ctrl->redirect($this, "edit");
     }
-    
+
     public function editObject()
     {
         $this->showNoScheduleMessage();
+        $this->showRerunPreferenceAssignment();
         return parent::editObject();
     }
 
@@ -284,7 +289,6 @@ class ilObjBookingPoolGUI extends ilObjectGUI
         }
     }
 
-    
     protected function initEditCustomForm(ilPropertyFormGUI $a_form)
     {
         $obj_service = $this->getObjectService();
@@ -295,12 +299,12 @@ class ilObjBookingPoolGUI extends ilObjectGUI
         $type = new ilRadioGroupInputGUI($this->lng->txt("book_schedule_type"), "stype");
         $type->setRequired(true);
         $a_form->addItem($type);
-        
+
         // #14478
         if (sizeof(ilBookingObject::getList($this->object->getId()))) {
             $type->setDisabled(true);
         }
-        
+
         $fixed = new ilRadioOption($this->lng->txt("book_schedule_type_fixed"), ilObjBookingPool::TYPE_FIX_SCHEDULE);
         $fixed->setInfo($this->lng->txt("book_schedule_type_fixed_info"));
         $type->addOption($fixed);
@@ -332,10 +336,13 @@ class ilObjBookingPoolGUI extends ilObjectGUI
         $rmd->addSubItem($rmd_day);
 
         // no schedule, direct booking
-        $none = new ilRadioOption($this->lng->txt("book_schedule_type_none_direct"), ilObjBookingPool::TYPE_NO_SCHEDULE);
+        $none = new ilRadioOption(
+            $this->lng->txt("book_schedule_type_none_direct"),
+            ilObjBookingPool::TYPE_NO_SCHEDULE
+        );
         $none->setInfo($this->lng->txt("book_schedule_type_none_direct_info"));
         $type->addOption($none);
-        
+
         $limit = new ilNumberInputGUI($this->lng->txt("book_overall_limit"), "limit");
         $limit->setSize(4);
         $limit->setMinValue(1);
@@ -343,7 +350,10 @@ class ilObjBookingPoolGUI extends ilObjectGUI
         $none->addSubItem($limit);
 
         // no schedule, using preferences
-        $pref = new ilRadioOption($this->lng->txt("book_schedule_type_none_preference"), ilObjBookingPool::TYPE_NO_SCHEDULE_PREFERENCES);
+        $pref = new ilRadioOption(
+            $this->lng->txt("book_schedule_type_none_preference"),
+            ilObjBookingPool::TYPE_NO_SCHEDULE_PREFERENCES
+        );
         $pref->setInfo($this->lng->txt("book_schedule_type_none_preference_info"));
         $type->addOption($pref);
 
@@ -422,7 +432,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
             array(ilObjectServiceSettingsGUI::CUSTOM_METADATA)
         );
     }
-    
+
     public function addExternalEditFormCustom(ilPropertyFormGUI $a_form)
     {
         ilObjectServiceSettingsGUI::initServiceSettingsForm(
@@ -431,17 +441,17 @@ class ilObjBookingPoolGUI extends ilObjectGUI
             array(ilObjectServiceSettingsGUI::CUSTOM_METADATA)
         );
     }
-    
+
     /**
-    * get tabs
-    */
+     * get tabs
+     */
     public function setTabs()
     {
         $ilUser = $this->user;
 
         /** @var ilObjBookingPool $pool */
         $pool = $this->object;
-        
+
         if (in_array($this->ctrl->getCmd(), array("create", "save")) && !$this->ctrl->getNextClass()) {
             return;
         }
@@ -465,7 +475,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
                     );
                 }
             }
-        
+
             $this->tabs_gui->addTab(
                 "info",
                 $this->lng->txt("info_short"),
@@ -480,7 +490,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
                 );
             }
         }
-        
+
         if ($this->checkPermissionBool('write')) {
             if ($this->object->getScheduleType() == ilObjBookingPool::TYPE_FIX_SCHEDULE) {
                 $this->tabs_gui->addTab(
@@ -489,13 +499,13 @@ class ilObjBookingPoolGUI extends ilObjectGUI
                     $this->ctrl->getLinkTargetByClass("ilbookingschedulegui", "render")
                 );
             }
-            
+
             $this->tabs_gui->addTab(
                 "settings",
                 $this->lng->txt("settings"),
                 $this->ctrl->getLinkTarget($this, "edit")
             );
-            
+
             // meta data
             $mdgui = new ilObjectMetaDataGUI($this->object, "bobj");
             $mdtab = $mdgui->getTab();
@@ -525,7 +535,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
             );
         }
     }
-    
+
     protected function setHelpId($a_id)
     {
         $this->help->setHelpId($a_id);
@@ -533,9 +543,15 @@ class ilObjBookingPoolGUI extends ilObjectGUI
         $ilHelp = $this->help;
 
         switch ($this->object->getScheduleType()) {
-            case ilObjBookingPool::TYPE_FIX_SCHEDULE: $object_subtype = "-schedule"; break;
-            case ilObjBookingPool::TYPE_NO_SCHEDULE: $object_subtype = "-noschedule"; break;
-            case ilObjBookingPool::TYPE_NO_SCHEDULE_PREFERENCES: $object_subtype = "-noschedulepref"; break;
+            case ilObjBookingPool::TYPE_FIX_SCHEDULE:
+                $object_subtype = "-schedule";
+                break;
+            case ilObjBookingPool::TYPE_NO_SCHEDULE:
+                $object_subtype = "-noschedule";
+                break;
+            case ilObjBookingPool::TYPE_NO_SCHEDULE_PREFERENCES:
+                $object_subtype = "-noschedulepref";
+                break;
         }
 
         $ilHelp->setScreenIdComponent('book');
@@ -564,10 +580,10 @@ class ilObjBookingPoolGUI extends ilObjectGUI
     }
 
     /**
-    * this one is called from the info button in the repository
-    * not very nice to set cmdClass/Cmd manually, if everything
-    * works through ilCtrl in the future this may be changed
-    */
+     * this one is called from the info button in the repository
+     * not very nice to set cmdClass/Cmd manually, if everything
+     * works through ilCtrl in the future this may be changed
+     */
     public function infoScreenObject()
     {
         $this->ctrl->setCmd("showSummary");
@@ -580,7 +596,7 @@ class ilObjBookingPoolGUI extends ilObjectGUI
         $ilCtrl = $this->ctrl;
 
         $this->tabs_gui->setTabActive('info');
-        
+
         $this->checkPermission("visible");
 
         $info = new ilInfoScreenGUI($this);
@@ -610,28 +626,32 @@ class ilObjBookingPoolGUI extends ilObjectGUI
             return $ilCtrl->getHTML($info);
         }
     }
-    
 
     public function showProfileObject()
     {
         $tpl = $this->tpl;
         $ilCtrl = $this->ctrl;
-        
+
         $this->tabs_gui->clearTargets();
-        
+
         $user_id = $this->profile_user_id;
-        
+
         $profile = new ilPublicUserProfileGUI($user_id);
         $profile->setBackUrl($this->ctrl->getLinkTarget($this, 'log'));
         $tpl->setContent($ilCtrl->getHTML($profile));
     }
-    
+
     public function addLocatorItems()
     {
         $ilLocator = $this->locator;
-        
+
         if (is_object($this->object)) {
-            $ilLocator->addItem($this->object->getTitle(), $this->ctrl->getLinkTarget($this, "render"), "", $this->object->getRefId());
+            $ilLocator->addItem(
+                $this->object->getTitle(),
+                $this->ctrl->getLinkTarget($this, "render"),
+                "",
+                $this->object->getRefId()
+            );
         }
     }
 
@@ -653,7 +673,11 @@ class ilObjBookingPoolGUI extends ilObjectGUI
             // notification
             if ($this->object->getScheduleType() === ilObjBookingPool::TYPE_FIX_SCHEDULE &&
                 $this->object->getReminderStatus()) {
-                if (!ilNotification::hasNotification(ilNotification::TYPE_BOOK, $user->getId(), $this->object->getId())) {
+                if (!ilNotification::hasNotification(
+                    ilNotification::TYPE_BOOK,
+                    $user->getId(),
+                    $this->object->getId()
+                )) {
                     $lg->addHeaderIcon(
                         "not_icon",
                         ilUtil::getImagePath("notification_off.svg"),
@@ -693,16 +717,72 @@ class ilObjBookingPoolGUI extends ilObjectGUI
         $ctrl = $this->ctrl;
         $user = $this->user;
 
-
         switch ($_GET["ntf"]) {
             case 0:
-                ilNotification::setNotification(ilNotification::TYPE_BOOK, $user->getId(), $this->object->getId(), false);
+                ilNotification::setNotification(
+                    ilNotification::TYPE_BOOK,
+                    $user->getId(),
+                    $this->object->getId(),
+                    false
+                );
                 break;
 
             case 1:
-                ilNotification::setNotification(ilNotification::TYPE_BOOK, $user->getId(), $this->object->getId(), true);
+                ilNotification::setNotification(
+                    ilNotification::TYPE_BOOK,
+                    $user->getId(),
+                    $this->object->getId(),
+                    true
+                );
                 break;
         }
         $ctrl->redirect($this, "render");
+    }
+
+    protected function showRerunPreferenceAssignment() : void
+    {
+        if ($this->object->getScheduleType() === ilObjBookingPool::TYPE_NO_SCHEDULE_PREFERENCES) {
+            $pref_manager = $this->service->domain()->preferences($this->object);
+            if ($pref_manager->hasRun()) {
+                $this->toolbar->addComponent($this->ui->factory()->button()->standard(
+                    $this->lng->txt("book_rerun_assignments"),
+                    $this->ctrl->getLinkTarget($this, "confirmResetRun")
+                ));
+            }
+        }
+    }
+
+    protected function confirmResetRunObject()
+    {
+        $this->tabs_gui->activateTab("settings");
+        $mess = $this->ui->factory()->messageBox()->confirmation($this->lng->txt("book_rerun_confirmation"))->withButtons(
+            [
+                $this->ui->factory()->button()->standard(
+                    $this->lng->txt("book_rerun_assignments"),
+                    $this->ctrl->getLinkTarget($this, "resetRun")
+                ),
+                $this->ui->factory()->button()->standard(
+                    $this->lng->txt("cancel"),
+                    $this->ctrl->getLinkTarget($this, "edit")
+                )
+            ]
+        );
+        $this->tpl->setContent(
+            $this->ui->renderer()->render($mess)
+        );
+    }
+
+    protected function resetRunObject()
+    {
+        if ($this->object->getScheduleType() === ilObjBookingPool::TYPE_NO_SCHEDULE_PREFERENCES
+            && $this->access->checkAccess("write", "", $this->object->getRefId())) {
+            $pref_manager = $this->service->domain()->preferences($this->object);
+            $repo = $this->service->repo()->getPreferencesRepo();
+            $pref_manager->resetRun();
+            $pref_manager->storeBookings(
+                $repo->getPreferences($this->object->getId())
+            );
+        }
+        $this->ctrl->redirect($this, "edit");
     }
 }

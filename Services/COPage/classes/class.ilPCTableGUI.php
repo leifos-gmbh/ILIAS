@@ -28,7 +28,6 @@ class ilPCTableGUI extends ilPageContentGUI
     protected ilPropertyFormGUI $form;
     protected ilTabsGUI $tabs;
     protected ilObjUser $user;
-    protected \ILIAS\GlobalScreen\ScreenContext\ContextServices $tool_context;
 
     public function __construct(
         ilPageObject $a_pg_obj,
@@ -45,7 +44,6 @@ class ilPCTableGUI extends ilPageContentGUI
         $this->user = $DIC->user();
         parent::__construct($a_pg_obj, $a_content_obj, $a_hier_id, $a_pc_id);
         $this->setCharacteristics(array("StandardTable" => $this->lng->txt("cont_StandardTable")));
-        $this->tool_context = $DIC->globalScreen()->tool()->context();
     }
 
     public function setBasicTableCellStyles(): void
@@ -1019,32 +1017,17 @@ class ilPCTableGUI extends ilPageContentGUI
         $this->ctrl->redirect($this, "editCellAlignment");
     }
 
-    /**
-     * Set editor tool context
-     */
-    protected function setEditorToolContext(): void
-    {
-        $collection = $this->tool_context->current()->getAdditionalData();
-        if ($collection->exists(ilCOPageEditGSToolProvider::SHOW_EDITOR)) {
-            $collection->replace(ilCOPageEditGSToolProvider::SHOW_EDITOR, true);
-        } else {
-            $collection->add(ilCOPageEditGSToolProvider::SHOW_EDITOR, true);
-        }
-    }
 
     /**
      * Edit data of table
      */
     public function editData(): void
     {
-        $this->setEditorToolContext();
-
         $this->setTabs();
 
         $this->displayValidationError();
 
-        $editor_init = new \ILIAS\COPage\Editor\UI\Init();
-        $editor_init->initUI($this->tpl);
+        $this->initEditor();
 
         $this->tpl->setContent($this->getEditDataTable(true));
     }

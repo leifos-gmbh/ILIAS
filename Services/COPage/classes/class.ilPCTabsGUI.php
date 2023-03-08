@@ -275,7 +275,14 @@ class ilPCTabsGUI extends ilPageContentGUI
         return $this->form;
     }
 
-        public function getFormValues(): void
+    public function initEditingForm(): ilPropertyFormGUI
+    {
+        $this->initForm("edit");
+        $this->getFormValues();
+        return $this->form;
+    }
+
+    public function getFormValues(): void
     {
         $values["type"] = $this->content_obj->getTabType();
         $values["content_width"] = $this->content_obj->getContentWidth();
@@ -418,6 +425,8 @@ class ilPCTabsGUI extends ilPageContentGUI
         $ilToolbar = $this->toolbar;
         $lng = $this->lng;
 
+        $this->initEditor($this->pc_id, "Tabs");
+
         $ilToolbar->addButton(
             $lng->txt("cont_add_tab"),
             $ilCtrl->getLinkTarget($this, "addTab")
@@ -428,7 +437,7 @@ class ilPCTabsGUI extends ilPageContentGUI
         /** @var ilPCTabs $tabs */
         $tabs = $this->content_obj;
         $table_gui = new ilPCTabsTableGUI($this, "edit", $tabs);
-        $tpl->setContent($table_gui->getHTML());
+        $tpl->setContent($table_gui->getHTML().$this->getEditorScriptTag());
     }
 
     /**

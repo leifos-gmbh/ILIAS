@@ -52,6 +52,8 @@ class ilPageContentGUI
 
     public static string $style_selector_reset = "margin-top:2px; margin-bottom:2px; text-indent:0px; position:static; float:none; width: auto;";
 
+    protected \ILIAS\GlobalScreen\ScreenContext\ContextServices $tool_context;
+
     // common bb buttons (special ones are iln and wln)
     protected static array $common_bb_buttons = array(
         "str" => "Strong", "emp" => "Emph", "imp" => "Important",
@@ -97,6 +99,7 @@ class ilPageContentGUI
             //echo "-".$this->pc_id."-";
             $this->dom = $a_pg_obj->getDom();
         }
+        $this->tool_context = $DIC->globalScreen()->tool()->context();
     }
 
     public function setContentObject(ilPageContent $a_val): void
@@ -538,4 +541,34 @@ class ilPageContentGUI
     {
         return $this->edit_repo->getTextLang($this->requested_ref_id);
     }
+
+    protected function setEditorToolContext(): void
+    {
+        $collection = $this->tool_context->current()->getAdditionalData();
+        if ($collection->exists(ilCOPageEditGSToolProvider::SHOW_EDITOR)) {
+            $collection->replace(ilCOPageEditGSToolProvider::SHOW_EDITOR, true);
+        } else {
+            $collection->add(ilCOPageEditGSToolProvider::SHOW_EDITOR, true);
+        }
+    }
+
+    protected function initEditor(string $form_pc_id = "", string $form_cname = "") : void
+    {
+        $this->setEditorToolContext();
+        $editor_init = new \ILIAS\COPage\Editor\UI\Init();
+        $editor_init->initUI($this->tpl, "", $form_pc_id, $form_cname);
+    }
+
+    protected function getEditorScriptTag() : string
+    {
+        $tag = <<<EOT
+<script type="module">
+	import editor from './Services/COPage/Editor/js/src/editor.js';
+	window.il.copg = window.il.copg || {};
+	window.il.copg.editor = editor;
+</script>
+EOT;
+        return $tag;
+    }
+
 }

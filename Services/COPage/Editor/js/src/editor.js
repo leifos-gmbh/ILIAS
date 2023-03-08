@@ -41,7 +41,7 @@ export default (function ($, il) {
    * @param {string} form_action
    * @param {string} openPlaceHolderPcId
    */
-  function init(endpoint, form_action, openPlaceHolderPcId) {
+  function init(endpoint, form_action, openPlaceHolderPcId, openFormPcId, openFormCName) {
 
     // action factory (used to invoke actions from the ui)
     const actionFactory = new ActionFactory();
@@ -81,6 +81,11 @@ export default (function ($, il) {
         dispatcher.dispatch(actionFactory.page().editor().componentEdit(
             "PlaceHolder",
             openPlaceHolderPcId,
+            ""));
+      } else if (openFormPcId !== "") {
+        dispatcher.dispatch(actionFactory.page().editor().componentForm(
+          openFormCName,
+          openFormPcId,
             ""));
       }
     });

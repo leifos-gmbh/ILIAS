@@ -53,7 +53,25 @@ class ilPCTabsEditorGUI implements PageComponentEditor
         int $style_id,
         string $pcid
     ): string {
-        return "";
+        global $DIC;
+
+        $lng = $DIC->language();
+        $lng->loadLanguageModule("content");
+
+        /** @var ilPCTabs $pc_tabs */
+        $pc_tabs = $page_gui->getPageObject()->getContentObjectForPcId($pcid);
+        $tabs_gui = new ilPCTabsGUI($page_gui->getPageObject(), $pc_tabs, "", $pcid);
+
+        /** @var ilPropertyFormGUI $form */
+        $form = $tabs_gui->initEditingForm();
+
+        $html = $ui_wrapper->getRenderedForm(
+            $form,
+            [["Page", "component.update", $lng->txt("save")],
+             ["Page", "component.cancel", $lng->txt("cancel")]]
+        );
+
+        return $html;
     }
 
     protected function getCreationForm(

@@ -132,6 +132,10 @@ export default class PageUIActionHandler {
         }
         break;
 
+      case "component.form":
+        this.ui.loadGenericEditingForm(params.cname, params.pcid, params.hierid);
+        break;
+
       // legacy underworld, note MediaObject e.g. use component.edit to show the
       // generic editing form in the slate, then it is using component.settings to link to the
       // advanced settings in (legacy underworld) afterwards

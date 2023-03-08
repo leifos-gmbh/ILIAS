@@ -41,6 +41,7 @@ const ACTIONS = {
   DND_DROP: "dnd.drop",           // dropping
   COMPONENT_INSERT: "component.insert",       // hit add link in add dropdown
   COMPONENT_EDIT: "component.edit",         // hit component for editing, opens form in slate or legacy view
+  COMPONENT_FORM: "component.form",         // open generic form in slate
   COMPONENT_SWITCH: "component.switch",         // hit other component of same type while editing
   COMPONENT_CANCEL: "component.cancel",         // components cancel button is pressed
   COMPONENT_SAVE: "component.save",         // components save button is pressed (standard creation form)

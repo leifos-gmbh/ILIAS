@@ -90,6 +90,17 @@ export default class PageEditorActionFactory {
   /**
    * @returns {EditorAction}
    */
+  componentForm(cname, pcid, hierid) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.COMPONENT_FORM, {
+      cname: cname,
+      pcid: pcid,
+      hierid: hierid
+    });
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
   componentSwitch(cname, state, oldPcid, oldPara, newPcid, newHierid, switchToEnd = false) {
     return this.editorActionFactory.action(this.COMPONENT, ACTIONS.COMPONENT_SWITCH, {
       cname: cname,

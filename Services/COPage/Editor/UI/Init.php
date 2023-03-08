@@ -36,7 +36,9 @@ class Init
 
     public function initUI(
         \ilGlobalTemplateInterface $main_tpl,
-        string $openPlaceHolderPcId = ""
+        string $openPlaceHolderPcId = "",
+        string $openFormPcId = "",
+        string $openFormCName = ""
     ): void {
         $ctrl = $this->ctrl;
         $lng = $this->lng;
@@ -44,7 +46,7 @@ class Init
         $main_tpl->addOnLoadCode("il.copg.editor.init('" .
             ILIAS_HTTP_PATH . "/" . $ctrl->getLinkTargetByClass(["ilPageEditorGUI", "ilPageEditorServerAdapterGUI"], "invokeServer") . "','" .
             $this->ctrl->getFormActionByClass("ilPageEditorGUI")
-            . "', '" . $openPlaceHolderPcId . "');");
+            . "', '" . $openPlaceHolderPcId . "', '" . $openFormPcId . "', '" . $openFormCName . "');");
 
         $lang_vars = ["cont_last_update", "cont_error", "cont_sel_el_cut_use_paste", "cont_sel_el_copied_use_paste",
                       "cont_ed_new_col_before", "cont_ed_new_col_after", "cont_ed_col_left", "cont_ed_col_right", "cont_ed_delete_col",

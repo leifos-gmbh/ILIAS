@@ -140,6 +140,7 @@ class ilPCTabsGUI extends ilPageContentGUI
 
 
         // type: horizontal accordion
+        /*
         $op2 = new ilRadioOption($lng->txt("cont_tabs_acc_hor"), ilPCTabs::ACCORDION_HOR);
 
         $templ = $this->getTemplateOptions("haccordion");
@@ -162,7 +163,7 @@ class ilPCTabsGUI extends ilPageContentGUI
             $this->form->addItem($hchar_prop);
         }
 
-        $radg->addOption($op2);
+        $radg->addOption($op2);*/
 
         // type: carousel
         $op3 = new ilRadioOption($lng->txt("cont_tabs_carousel"), ilPCTabs::CAROUSEL);
@@ -202,6 +203,7 @@ class ilPCTabsGUI extends ilPageContentGUI
             $this->form->addItem($nr_prop);
         }
 
+        /*
         $ni = new ilNumberInputGUI($this->lng->txt("cont_tab_cont_width"), "content_width");
         $ni->setMaxLength(4);
         $ni->setSize(4);
@@ -210,7 +212,7 @@ class ilPCTabsGUI extends ilPageContentGUI
         $ni = new ilNumberInputGUI($this->lng->txt("cont_tab_cont_height"), "content_height");
         $ni->setMaxLength(4);
         $ni->setSize(4);
-        $this->form->addItem($ni);
+        $this->form->addItem($ni);*/
 
         // behaviour
         $options = array(
@@ -221,9 +223,10 @@ class ilPCTabsGUI extends ilPageContentGUI
         $si = new ilSelectInputGUI($this->lng->txt("cont_behavior"), "vbehavior");
         $si->setOptions($options);
         $op1->addSubItem($si);
+        /*
         $si = new ilSelectInputGUI($this->lng->txt("cont_behavior"), "hbehavior");
         $si->setOptions($options);
-        $op2->addSubItem($si);
+        $op2->addSubItem($si);*/
 
 
         // alignment
@@ -266,7 +269,13 @@ class ilPCTabsGUI extends ilPageContentGUI
         }
     }
 
-    public function getFormValues(): void
+    public function initCreationForm(): ilPropertyFormGUI
+    {
+        $this->initForm("create");
+        return $this->form;
+    }
+
+        public function getFormValues(): void
     {
         $values["type"] = $this->content_obj->getTabType();
         $values["content_width"] = $this->content_obj->getContentWidth();

@@ -26,6 +26,7 @@ use ILIAS\COPage\Editor\Components\Grid;
 use ILIAS\COPage\Editor\Components\Section;
 use ILIAS\COPage\Editor\Components\MediaObject;
 use ILIAS\COPage\Editor\Components\Table;
+use ILIAS\COPage\Editor\Components\Tabs;
 
 /**
  * Page editor json server
@@ -116,6 +117,9 @@ class Server
                 break;
             case "Grid":
                 $handler = new Grid\GridCommandActionHandler($this->page_gui);
+                break;
+            case "Tabs":
+                $handler = new Tabs\TabsCommandActionHandler($this->page_gui);
                 break;
             case "Section":
                 $handler = new Section\SectionCommandActionHandler($this->page_gui);

@@ -1,6 +1,4 @@
 <?php
-
-declare(strict_types=1);
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -15,7 +13,9 @@ declare(strict_types=1);
  * https://www.ilias.de
  * https://github.com/ILIAS-eLearning
  *
- *********************************************************************/
+ ********************************************************************
+ */
+declare(strict_types=1);
 
 /**
  * New PermissionGUI (extends from old ilPermission2GUI)
@@ -30,13 +30,16 @@ declare(strict_types=1);
 class ilPermissionGUI extends ilPermission2GUI
 {
     protected const CMD_PERM_POSITIONS = 'permPositions';
-    protected const CMD_SAVE_POSITIONS_PERMISSIONS = 'savePositionsPermissions';
+    public const CMD_SAVE_POSITIONS_PERMISSIONS = 'savePositionsPermissions';
 
     protected object $current_obj;
 
     protected ilRecommendedContentManager $recommended_content_manager;
     protected ilToolbarGUI $toolbar;
     protected \ILIAS\HTTP\Wrapper\WrapperFactory $wrapper;
+    protected \ilOrgUnitPositionDBRepository $positionRepo;
+    protected \ilOrgUnitPermissionDBRepository $permissionRepo;
+    protected \ilOrgUnitOperationDBRepository $operationRepo;
 
     public function __construct(object $a_gui_obj)
     {
@@ -46,6 +49,36 @@ class ilPermissionGUI extends ilPermission2GUI
         $this->toolbar = $DIC->toolbar();
         parent::__construct($a_gui_obj);
         $this->recommended_content_manager = new ilRecommendedContentManager();
+    }
+
+    private function getPositionRepo(): \ilOrgUnitPositionDBRepository
+    {
+        if (!isset($this->positionRepo)) {
+            $dic = ilOrgUnitLocalDIC::dic();
+            $this->positionRepo = $dic["repo.Positions"];
+        }
+
+        return $this->positionRepo;
+    }
+
+    private function getPermissionRepo(): \ilOrgUnitPermissionDBRepository
+    {
+        if (!isset($this->permissionRepo)) {
+            $dic = ilOrgUnitLocalDIC::dic();
+            $this->permissionRepo = $dic["repo.Permissions"];
+        }
+
+        return $this->permissionRepo;
+    }
+
+    private function getOperationRepo(): \ilOrgUnitOperationDBRepository
+    {
+        if (!isset($this->operationRepo)) {
+            $dic = ilOrgUnitLocalDIC::dic();
+            $this->operationRepo = $dic["repo.Operations"];
+        }
+
+        return $this->operationRepo;
     }
 
     /**
@@ -577,6 +610,7 @@ class ilPermissionGUI extends ilPermission2GUI
         $form->addCommandButton('perm', $this->lng->txt('cancel'));
 
         $zip = new ilFileInputGUI($this->lng->txt('import_file'), 'importfile');
+        $zip->setRequired(true);
         $zip->setSuffixes(['zip']);
         $form->addItem($zip);
 
@@ -698,7 +732,7 @@ class ilPermissionGUI extends ilPermission2GUI
             );
 
             // copy rights
-            $right_id_to_copy = $form->getInput("rights");
+            $right_id_to_copy = (int) $form->getInput("rights");
             if ($right_id_to_copy) {
                 $parentRoles = $this->rbacreview->getParentRoleIds($this->getCurrentObject()->getRefId(), true);
                 $this->rbacadmin->copyRoleTemplatePermissions(
@@ -798,7 +832,7 @@ class ilPermissionGUI extends ilPermission2GUI
     {
         $this->__initSubTabs(self::CMD_PERM_POSITIONS);
 
-        $positions = ilOrgUnitPosition::getArray(null, 'id');
+        $positions = $this->getPositionRepo()->getArray(null, 'id');
         $ref_id = $this->getCurrentObject()->getRefId();
 
         // handle local sets
@@ -811,31 +845,37 @@ class ilPermissionGUI extends ilPermission2GUI
 
         foreach ($positions as $position_id) {
             if (isset($local_post[$position_id])) {
-                ilOrgUnitPermissionQueries::findOrCreateSetForRefId($ref_id, $position_id);
+                $this->getPermissionRepo()->get($ref_id, $position_id);
             } else {
-                ilOrgUnitPermissionQueries::removeLocalSetForRefId($ref_id, $position_id);
+                $this->getPermissionRepo()->delete($ref_id, $position_id);
             }
         }
 
         $position_perm_post = $this->wrapper->post()->has('position_perm')
             ? $this->wrapper->post()->retrieve(
                 'position_perm',
-                $this->refinery->kindlyTo()->dictOf($this->refinery->kindlyTo()->int())
+                $this->refinery->kindlyTo()->dictOf(
+                    $this->refinery->kindlyTo()->dictOf(
+                        $this->refinery->kindlyTo()->int()
+                    )
+                )
             )
             : [];
-        ;
-        if ($position_perm_post) {
+
+        if ($position_perm_post) { // TODO: saving an empty (enabled) set is not working, as the POST variable is empty for that set
             foreach ($position_perm_post as $position_id => $ops) {
                 if (!isset($local_post[$position_id])) {
                     continue;
                 }
-                $ilOrgUnitPermission = ilOrgUnitPermissionQueries::getSetForRefId($ref_id, $position_id);
-                $new_ops = [];
-                foreach ($ops as $op_id => $op) {
-                    $new_ops[] = ilOrgUnitOperationQueries::findById($op_id);
+                $ilOrgUnitPermission = $this->getPermissionRepo()->getLocalorDefault($ref_id, $position_id);
+                if (!$ilOrgUnitPermission->isTemplate()) {
+                    $new_ops = [];
+                    foreach ($ops as $op_id => $op) {
+                        $new_ops[] = $this->getOperationRepo()->getById($op_id);
+                    }
+                    $ilOrgUnitPermission = $ilOrgUnitPermission->withOperations($new_ops);
+                    $ilOrgUnitPermission = $this->getPermissionRepo()->store($ilOrgUnitPermission);
                 }
-                $ilOrgUnitPermission->setOperations($new_ops);
-                $ilOrgUnitPermission->save();
             }
         }
         $this->tpl->setOnScreenMessage('success', $this->lng->txt('settings_saved'), true);

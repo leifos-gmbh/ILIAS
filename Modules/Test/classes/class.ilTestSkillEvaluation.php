@@ -20,6 +20,8 @@ use ILIAS\Skill\Service\SkillProfileService;
 use ILIAS\Skill\Service\SkillPersonalService;
 
 /**
+ * Logic for determining a learner’s competences based on the results of a test.
+ *
  * @author		Björn Heyser <bheyser@databay.de>
  * @version		$Id$
  *
@@ -281,8 +283,6 @@ class ilTestSkillEvaluation
                 $this->getActiveId(),
                 $this->getPass()
             );
-            // @PHP8-CR I have flat zero clue what is going on here. I like to leave this "intact" for further analysis
-            // and not remove eventually helpful hints.
             if ($compositeEvaluator->evaluate($conditionComposite)) {
                 return $expression->getPoints();
             }

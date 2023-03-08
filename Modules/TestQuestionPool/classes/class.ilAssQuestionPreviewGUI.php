@@ -20,6 +20,7 @@ use ILIAS\Refinery\Random\Group as RandomGroup;
 use ILIAS\Refinery\Random\Seed\RandomSeed;
 use ILIAS\Refinery\Random\Seed\GivenSeed;
 use ILIAS\Refinery\Transformation;
+use ILIAS\DI\RBACServices;
 
 /**
  * @author		Björn Heyser <bheyser@databay.de>
@@ -48,7 +49,10 @@ class ilAssQuestionPreviewGUI
 
     public const FEEDBACK_FOCUS_ANCHOR = 'focus';
 
+    private RBACServices $rbac_services;
+
     private ilCtrlInterface $ctrl;
+    private ilRbacSystem $rbac_system;
     private ilTabsGUI $tabs;
     private ilGlobalTemplateInterface $tpl;
     private ilLanguage $lng;
@@ -61,22 +65,34 @@ class ilAssQuestionPreviewGUI
     private ?ilAssQuestionPreviewHintTracking $hintTracking = null;
     private RandomGroup $randomGroup;
 
+    private int $parent_ref_id;
+
     public function __construct(
         ilCtrl $ctrl,
+        ilRbacSystem $rbac_system,
         ilTabsGUI $tabs,
         ilGlobalTemplateInterface $tpl,
         ilLanguage $lng,
         ilDBInterface $db,
         ilObjUser $user,
-        RandomGroup $randomGroup
+        RandomGroup $randomGroup,
+        int $parent_ref_id,
+        RBACServices $rbac_services
+
     ) {
         $this->ctrl = $ctrl;
+        $this->rbac_system = $rbac_system;
         $this->tabs = $tabs;
         $this->tpl = $tpl;
         $this->lng = $lng;
         $this->db = $db;
         $this->user = $user;
         $this->randomGroup = $randomGroup;
+        $this->rbac_services = $rbac_services;
+        $this->parent_ref_id = $parent_ref_id;
+
+        $this->tpl->addCss(ilObjStyleSheet::getContentStylePath(0));
+        $this->tpl->addCss(ilObjStyleSheet::getSyntaxStylePath());
     }
 
     public function initQuestion($questionId, $parentObjId): void
@@ -107,36 +123,23 @@ class ilAssQuestionPreviewGUI
                     $classname,
                     ""
                 );
-                if (($_GET["calling_test"] > 0) || ($_GET["test_ref_id"] > 0)) {
-                    $ref_id = $_GET["calling_test"];
+                if ((isset($_GET['calling_test']) && strlen($_GET['calling_test']) !== 0) ||
+                    (isset($_GET['test_ref_id']) && strlen($_GET['test_ref_id']) !== 0)) {
+                    $ref_id = $_GET['calling_test'];
                     if (strlen($ref_id) !== 0 && !is_numeric($ref_id)) {
                         $ref_id_array = explode('_', $ref_id);
                         $ref_id = array_pop($ref_id_array);
                     }
 
                     if (strlen($ref_id) === 0) {
-                        $ref_id = $_GET["test_ref_id"];
+                        $ref_id = $_GET['test_ref_id'];
                     }
-                    if (is_array($_GET) && !array_key_exists('test_express_mode', $_GET) ||
-                        !$_GET['test_express_mode'] &&
-                        (
-                            !array_key_exists('___test_express_mode', $GLOBALS) ||
-                            !$GLOBALS['___test_express_mode']
-                        )
-                    ) {
-                        $this->tabs->setBackTarget(
-                            $this->lng->txt("backtocallingtest"),
-                            "ilias.php?baseClass=ilObjTestGUI&cmd=questions&ref_id=$ref_id"
-                        );
-                    //BACK FROM Question Page to Test
-                    } else {
-                        $link = ilTestExpressPage::getReturnToPageLink();
-                        //$this->tabs->setBackTarget($this->lng->txt("backtocallingtest"), $link);
-                        $this->tabs->setBackTarget(
-                            $this->lng->txt("backtocallingtest"),
-                            "ilias.php?baseClass=ilObjTestGUI&cmd=questions&ref_id=$ref_id"
-                        );
-                    }
+
+                    $link = ilTestExpressPage::getReturnToPageLink();
+                    $this->tabs->setBackTarget(
+                        $this->lng->txt("backtocallingtest"),
+                        "ilias.php?baseClass=ilObjTestGUI&cmd=questions&ref_id=$ref_id"
+                    );
                 } elseif (isset($_GET['calling_consumer']) && (int) $_GET['calling_consumer']) {
                     $ref_id = (int) $_GET['calling_consumer'];
                     $consumer = ilObjectFactory::getInstanceByRefId($ref_id);
@@ -148,11 +151,8 @@ class ilAssQuestionPreviewGUI
                     } else {
                         $this->tabs->setBackTarget($this->lng->txt("qpl"), ilLink::_getLink($ref_id));
                     }
-                //} elseif (true) {
-                // We're in the underworld and want to go back to the question page
                 } else {
                     $this->tabs->setBackTarget($this->lng->txt("backtocallingpool"), $this->ctrl->getLinkTargetByClass("ilobjquestionpoolgui", "questions"));
-                    //BACK FROM Question Page to Pool
                 }
             }
         }
@@ -199,8 +199,8 @@ class ilAssQuestionPreviewGUI
 
     public function executeCommand(): void
     {
-        global $DIC; /* @var \ILIAS\DI\Container $DIC */
-        $ilHelp = $DIC['ilHelp']; /* @var ilHelpGUI $ilHelp */
+        global $DIC;
+        $ilHelp = $DIC['ilHelp'];
         $ilHelp->setScreenIdComponent('qpl');
 
         $this->tabs->setTabActive(self::TAB_ID_QUESTION);
@@ -212,31 +212,22 @@ class ilAssQuestionPreviewGUI
         switch ($nextClass) {
             case 'ilassquestionhintrequestgui':
                 $gui = new ilAssQuestionHintRequestGUI($this, self::CMD_SHOW, $this->questionGUI, $this->hintTracking);
-
                 $this->ctrl->forwardCommand($gui);
-
                 break;
-
             case 'ilassspecfeedbackpagegui':
             case 'ilassgenfeedbackpagegui':
                 $forwarder = new ilAssQuestionFeedbackPageObjectCommandForwarder($this->questionOBJ, $this->ctrl, $this->tabs, $this->lng);
                 $forwarder->forward();
                 break;
-
             case 'ilnotegui':
-
                 $notesGUI = new ilNoteGUI($this->questionOBJ->getObjId(), $this->questionOBJ->getId(), 'quest');
                 $notesGUI->enablePublicNotes(true);
                 $notesGUI->enablePublicNotesDeletion(true);
                 $notesPanelHTML = $this->ctrl->forwardCommand($notesGUI);
                 $this->showCmd($notesPanelHTML);
                 break;
-
-
             default:
-
                 $cmd = $this->ctrl->getCmd(self::CMD_SHOW) . 'Cmd';
-
                 $this->$cmd();
         }
     }
@@ -251,28 +242,20 @@ class ilAssQuestionPreviewGUI
 
     protected function isCommentingRequired(): bool
     {
-        global $DIC; /* @var ILIAS\DI\Container $DIC */
-
         if ($this->previewSettings->isTestRefId()) {
             return false;
         }
 
-        return $DIC->rbac()->system()->checkAccess(
-            'write',
-            $DIC->testQuestionPool()->internal()->request()->getRefId()
-        );
+        return (bool) $this->rbac_services->system()->checkAccess('write', (int) $_GET['ref_id']);
     }
 
     private function showCmd($notesPanelHTML = ''): void
     {
         $tpl = new ilTemplate('tpl.qpl_question_preview.html', true, true, 'Modules/TestQuestionPool');
-
         $tpl->setVariable('PREVIEW_FORMACTION', $this->buildPreviewFormAction());
 
         $this->populatePreviewToolbar($tpl);
-
         $this->populateQuestionOutput($tpl);
-
         $this->handleInstantResponseRendering($tpl);
 
         if ($this->isCommentingRequired()) {
@@ -362,16 +345,21 @@ class ilAssQuestionPreviewGUI
 
         $toolbarGUI->setFormAction($this->ctrl->getFormAction($this, self::CMD_SHOW));
         $toolbarGUI->setResetPreviewCmd(self::CMD_RESET);
-        $toolbarGUI->setEditPageCmd(
-            $this->ctrl->getLinkTargetByClass('ilAssQuestionPageGUI', 'edit')
-        );
 
-        $toolbarGUI->setEditQuestionCmd(
-            $this->ctrl->getLinkTargetByClass(
-                array('ilrepositorygui','ilobjquestionpoolgui', get_class($this->questionGUI)),
-                'editQuestion'
-            )
-        );
+        // Check Permissions first, some Toolbar Actions are only available for write access
+        if ($this->rbac_services->system()->checkAccess('write', (int) $_GET['ref_id'])) {
+            $toolbarGUI->setEditPageCmd(
+                $this->ctrl->getLinkTargetByClass('ilAssQuestionPageGUI', 'edit')
+            );
+
+            $toolbarGUI->setEditQuestionCmd(
+                $this->ctrl->getLinkTargetByClass(
+                    array('ilrepositorygui','ilobjquestionpoolgui', get_class($this->questionGUI)),
+                    'editQuestion'
+                )
+            );
+        }
+
         $toolbarGUI->build();
 
         $tpl->setVariable('PREVIEW_TOOLBAR', $this->ctrl->getHTML($toolbarGUI));
@@ -399,10 +387,6 @@ class ilAssQuestionPreviewGUI
 
         $questionHtml = $this->questionGUI->getPreview(true, $this->isShowSpecificQuestionFeedbackRequired());
         $this->questionGUI->magicAfterTestOutput();
-
-        if ($this->isShowSpecificQuestionFeedbackRequired() && $this->questionGUI->hasInlineFeedback()) {
-            $questionHtml = $this->questionGUI->buildFocusAnchorHtml() . $questionHtml;
-        }
 
         $questionHtml .= $this->getQuestionNavigationHtml();
 

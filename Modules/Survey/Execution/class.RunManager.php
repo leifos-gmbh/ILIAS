@@ -33,6 +33,7 @@ use ILIAS\Survey\Mode;
  */
 class RunManager
 {
+    protected \ilLanguage $lng;
     protected \ILIAS\Survey\Code\CodeManager $code_manager;
     protected RunSessionRepo $session_repo;
     protected RunDBRepository $repo;
@@ -60,6 +61,7 @@ class RunManager
         $this->appraisee_id = $appraisee_id;
         $this->session_repo = $repo_service->execution()->runSession();
         $this->code_manager = $domain_service->code($survey, $current_user_id);
+        $this->lng = $domain_service->lng();
     }
 
     protected function codeNeeded(): bool
@@ -99,7 +101,10 @@ class RunManager
         }
 
         if (!$this->feature_config->usesAppraisees() && $this->appraisee_id > 0) {
-            throw new \ilSurveyException("Appraisee ID given, but appraisees not supported");
+            // self eval currently uses current user as appraisee id
+            if ($this->survey->getMode() !== \ilObjSurvey::MODE_SELF_EVAL || $user_id !== $this->appraisee_id) {
+                throw new \ilSurveyException("Appraisee ID given, but appraisees not supported");
+            }
         }
 
         /* this fails on the info screen
@@ -247,7 +252,8 @@ class RunManager
             $code_input && // #11346
             (!$anonymous_code || !$this->code_manager->exists($anonymous_code))) {
             $anonymous_code = "";
-            throw new \ilWrongSurveyCodeException("Wrong Survey Code used.");
+            $this->clearCode();
+            throw new \ilWrongSurveyCodeException($this->lng->txt("svy_wrong_or_expired_code"));
         }
         $this->session_repo->setCode($survey->getId(), $anonymous_code);
     }

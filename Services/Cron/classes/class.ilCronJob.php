@@ -20,18 +20,56 @@ declare(strict_types=1);
 
 abstract class ilCronJob
 {
-    public const SCHEDULE_TYPE_DAILY = 1;
-    public const SCHEDULE_TYPE_IN_MINUTES = 2;
-    public const SCHEDULE_TYPE_IN_HOURS = 3;
-    public const SCHEDULE_TYPE_IN_DAYS = 4;
-    public const SCHEDULE_TYPE_WEEKLY = 5;
-    public const SCHEDULE_TYPE_MONTHLY = 6;
-    public const SCHEDULE_TYPE_QUARTERLY = 7;
-    public const SCHEDULE_TYPE_YEARLY = 8;
+    final public const SCHEDULE_TYPE_DAILY = 1;
+    final public const SCHEDULE_TYPE_IN_MINUTES = 2;
+    final public const SCHEDULE_TYPE_IN_HOURS = 3;
+    final public const SCHEDULE_TYPE_IN_DAYS = 4;
+    final public const SCHEDULE_TYPE_WEEKLY = 5;
+    final public const SCHEDULE_TYPE_MONTHLY = 6;
+    final public const SCHEDULE_TYPE_QUARTERLY = 7;
+    final public const SCHEDULE_TYPE_YEARLY = 8;
 
     protected ?int $schedule_type = null;
     protected ?int $schedule_value = null;
     protected ?Closure $date_time_provider = null;
+
+    private function checkWeeklySchedule(DateTimeImmutable $last_run, DateTimeImmutable $now): bool
+    {
+        $last_year = (int) $last_run->format('Y');
+        $now_year = (int) $now->format('Y');
+
+        if ($last_year > $now_year) {
+            // Should never happen, don't execute otherwise
+            return false;
+        }
+
+        $last_week = $last_run->format('W');
+        $now_week = $now->format('W');
+
+        if ($last_week !== $now_week) {
+            // Week differs, always execute the job
+            return true;
+        }
+
+        // For all following cases, the week number is always identical
+
+        $last_month = (int) $last_run->format('m');
+        $now_month = (int) $now->format('m');
+
+        $is_within_same_week_in_same_year = ($last_year . '-' . $last_week) === ($now_year . '-' . $now_week);
+        if ($is_within_same_week_in_same_year) {
+            // Same week in same year, only execute if the month differs (2022-52 is valid for January and December)
+            return $last_month !== $now_month && $now->diff($last_run)->d > 7;
+        }
+
+        if ($now_year - $last_year > 1) {
+            // Always execute if the difference of years is greater than 1
+            return true;
+        }
+
+        // Execute for week number 52 in 2022 (last run) and week number 52 in December of 2022 (now), but not for week number 52 in January of 2022 (now)
+        return $last_month === $now_month;
+    }
 
     private function checkSchedule(?DateTimeImmutable $last_run, ?int $schedule_type, ?int $schedule_value): bool
     {
@@ -55,9 +93,7 @@ abstract class ilCronJob
                 return ($last !== $ref);
 
             case self::SCHEDULE_TYPE_WEEKLY:
-                $last = $last_run->format('Y-W');
-                $ref = $now->format('Y-W');
-                return ($last !== $ref);
+                return $this->checkWeeklySchedule($last_run, $now);
 
             case self::SCHEDULE_TYPE_MONTHLY:
                 $last = $last_run->format('Y-n');
@@ -90,9 +126,6 @@ abstract class ilCronJob
         return false;
     }
 
-    /**
-     * @param Closure|null $date_time_provider
-     */
     public function setDateTimeProvider(?Closure $date_time_provider): void
     {
         if ($date_time_provider !== null) {
@@ -141,7 +174,6 @@ abstract class ilCronJob
 
     /**
      * Get current schedule type (if flexible)
-     * @return int|null
      */
     public function getScheduleType(): ?int
     {
@@ -154,7 +186,6 @@ abstract class ilCronJob
 
     /**
      * Get current schedule value (if flexible)
-     * @return int|null
      */
     public function getScheduleValue(): ?int
     {
@@ -167,8 +198,6 @@ abstract class ilCronJob
 
     /**
      * Update current schedule (if flexible)
-     * @param int|null $a_type
-     * @param int|null $a_value
      */
     public function setSchedule(?int $a_type, ?int $a_value): void
     {
@@ -247,10 +276,6 @@ abstract class ilCronJob
     /**
      * Important: This method is (also) called from the setup process, where the constructor of an ilCronJob ist NOT executed.
      * Furthermore only few dependencies may be available in the $DIC.
-     * @param ilDBInterface $db
-     * @param ilSetting $setting
-     * @param bool $a_currently_active
-     * @return void
      */
     public function activationWasToggled(ilDBInterface $db, ilSetting $setting, bool $a_currently_active): void
     {

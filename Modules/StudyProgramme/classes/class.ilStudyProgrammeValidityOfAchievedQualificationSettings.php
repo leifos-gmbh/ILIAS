@@ -27,11 +27,13 @@ class ilStudyProgrammeValidityOfAchievedQualificationSettings
     protected ?int $qualification_period;
     protected ?DateTimeImmutable $qualification_date;
     protected ?int $restart_period;
+    protected $restart_recheck;
 
     public function __construct(
         ?int $qualification_period,
         ?DateTimeImmutable $qualification_date,
-        ?int $restart_period
+        ?int $restart_period,
+        bool $restart_recheck
     ) {
         if (!is_null($qualification_period) && 0 > $qualification_period) {
             throw new InvalidArgumentException(
@@ -48,6 +50,7 @@ class ilStudyProgrammeValidityOfAchievedQualificationSettings
         $this->qualification_period = $qualification_period;
         $this->qualification_date = $qualification_date;
         $this->restart_period = $restart_period;
+        $this->restart_recheck = $restart_recheck;
     }
 
     public function getQualificationPeriod(): ?int
@@ -113,7 +116,7 @@ class ilStudyProgrammeValidityOfAchievedQualificationSettings
         $grp2 = $input->group(
             [
                 'vq_period' => $input->numeric(
-                    '',
+                    $lng->txt('vq_period_label'),
                     $lng->txt('validity_qualification_period_desc')
                 )
                 ->withAdditionalTransformation($refinery->int()->isGreaterThanOrEqual(1))
@@ -124,7 +127,7 @@ class ilStudyProgrammeValidityOfAchievedQualificationSettings
         $grp3 = $input->group(
             [
                 'vq_date' => $input->dateTime(
-                    '',
+                    $lng->txt('vq_date_label'),
                     $lng->txt('validity_qualification_date_desc')
                 )
                 ->withFormat($format)
@@ -137,11 +140,12 @@ class ilStudyProgrammeValidityOfAchievedQualificationSettings
         $grp5 = $input->group(
             [
                 'vq_restart_period' => $input->numeric(
-                    '',
+                    $lng->txt('restart_period_label'),
                     $lng->txt('restart_period_desc')
                 )
-                ->withAdditionalTransformation($refinery->int()->isGreaterThanOrEqual(1))
-                ->withValue($this->getRestartPeriod())
+                ->withAdditionalTransformation($refinery->int()->isGreaterThan(0))
+                ->withValue($this->getRestartPeriod() !== null ? $this->getRestartPeriod() : null)
+                ->withRequired(true)
             ],
             $lng->txt('restart_period')
         );
@@ -153,7 +157,7 @@ class ilStudyProgrammeValidityOfAchievedQualificationSettings
                 'opt_validity_qualification_date' => $grp3
             ],
             ''
-        );
+        )->withLabel($lng->txt('optgrp_label_validity'));
 
         $sg2 = $input->switchableGroup(
             [
@@ -161,7 +165,7 @@ class ilStudyProgrammeValidityOfAchievedQualificationSettings
                 'opt_restart_period' => $grp5,
             ],
             ''
-        );
+        )->withLabel($lng->txt('optgrp_label_restart'));
 
         $validity_qualification = "opt_no_validity_qualification";
         if (!is_null($this->getQualificationPeriod()) && $this->getQualificationPeriod() > 0) {
@@ -188,6 +192,7 @@ class ilStudyProgrammeValidityOfAchievedQualificationSettings
             $vq_period = null;
             $vq_date = null;
             $restart = null;
+            $restart_recheck = false;
 
             if (isset($vals['validity_qualification'][1]['vq_period'])) {
                 $vq_period = (int) $vals['validity_qualification'][1]['vq_period'];
@@ -207,8 +212,21 @@ class ilStudyProgrammeValidityOfAchievedQualificationSettings
             return new ilStudyProgrammeValidityOfAchievedQualificationSettings(
                 $vq_period,
                 $vq_date,
-                $restart
+                $restart,
+                $restart_recheck
             );
         }));
+    }
+
+    public function getRestartRecheck(): bool
+    {
+        return $this->restart_recheck;
+    }
+
+    public function withRestartRecheck(bool $restart_recheck): ilStudyProgrammeValidityOfAchievedQualificationSettings
+    {
+        $clone = clone $this;
+        $clone->restart_recheck = $restart_recheck;
+        return $clone;
     }
 }

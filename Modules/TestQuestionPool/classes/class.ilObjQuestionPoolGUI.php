@@ -18,6 +18,8 @@
 
 require_once './Modules/Test/classes/inc.AssessmentConstants.php';
 
+use ILIAS\Refinery\Random\Group as RandomGroup;
+
 /**
  * Class ilObjQuestionPoolGUI
  *
@@ -26,7 +28,7 @@ require_once './Modules/Test/classes/inc.AssessmentConstants.php';
  *
  * @version		$Id$
  *
- * @ilCtrl_Calls ilObjQuestionPoolGUI: ilAssQuestionPageGUI, ilQuestionBrowserTableGUI, ilToolbarGUI
+ * @ilCtrl_Calls ilObjQuestionPoolGUI: ilAssQuestionPageGUI, ilQuestionBrowserTableGUI, ilToolbarGUI, ilObjTestGUI
  * @ilCtrl_Calls ilObjQuestionPoolGUI: assMultipleChoiceGUI, assClozeTestGUI, assMatchingQuestionGUI
  * @ilCtrl_Calls ilObjQuestionPoolGUI: assOrderingQuestionGUI, assImagemapQuestionGUI
  * @ilCtrl_Calls ilObjQuestionPoolGUI: assNumericGUI, assTextSubsetGUI, assSingleChoiceGUI, ilPropertyFormGUI
@@ -44,7 +46,7 @@ require_once './Modules/Test/classes/inc.AssessmentConstants.php';
 class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterface
 {
     public ?ilObject $object;
-
+    protected ILIAS\TestQuestionPool\InternalRequestService $qplrequest;
 
     /**
     * Constructor
@@ -189,18 +191,28 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
                 break;
 
             case 'ilassquestionpreviewgui':
-                if (!$ilAccess->checkAccess('write', '', $this->object->getRefId())) {
+                if (!$ilAccess->checkAccess('read', '', $this->object->getRefId())) {
                     $this->redirectAfterMissingWrite();
                 }
 
                 $this->ctrl->saveParameter($this, "q_id");
-                $gui = new ilAssQuestionPreviewGUI($this->ctrl, $this->tabs_gui, $this->tpl, $this->lng, $ilDB, $ilUser, $randomGroup);
+                $gui = new ilAssQuestionPreviewGUI(
+                    $this->ctrl,
+                    $this->rbac_system,
+                    $this->tabs_gui,
+                    $this->tpl,
+                    $this->lng,
+                    $ilDB,
+                    $ilUser,
+                    $randomGroup,
+                    $this->ref_id,
+                    $DIC->rbac()
+                );
 
                 $gui->initQuestion((int) $this->qplrequest->raw('q_id'), $this->object->getId());
                 $gui->initPreviewSettings($this->object->getRefId());
                 $gui->initPreviewSession($ilUser->getId(), $this->fetchAuthoringQuestionIdParamater());
                 $gui->initHintTracking();
-                $gui->initStyleSheets();
 
                 global $DIC;
                 $ilHelp = $DIC['ilHelp'];
@@ -574,6 +586,12 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
             ilObjQuestionPool::_setImportDirectory($basedir);
             $xml_file = ilObjQuestionPool::_getImportDirectory() . '/' . $subdir . '/' . $subdir . ".xml";
             $qti_file = ilObjQuestionPool::_getImportDirectory() . '/' . $subdir . '/' . str_replace("qpl", "qti", $subdir) . ".xml";
+        }
+        if (!file_exists($qti_file)) {
+            ilFileUtils::delDir($basedir);
+            $this->tpl->setOnScreenMessage('failure', $this->lng->txt('cannot_find_xml'), true);
+            $this->ctrl->redirect($this, 'create');
+            return false;
         }
         $qtiParser = new ilQTIParser($qti_file, ilQTIParser::IL_MO_VERIFY_QTI, 0, "");
         $qtiParser->startParsing();
@@ -1233,25 +1251,24 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
      */
     public function printObject(): void
     {
-        /**
-         * @var $ilToolbar ilToolbarGUI
-         */
-        global $DIC;
-        $ilToolbar = $DIC['ilToolbar'];
-
+        $ilToolbar = $this->toolbar;
         $ilToolbar->setFormAction($this->ctrl->getFormAction($this, 'print'));
+
         $mode = new ilSelectInputGUI($this->lng->txt('output_mode'), 'output');
         $mode->setOptions(array(
             'overview' => $this->lng->txt('overview'),
             'detailed' => $this->lng->txt('detailed_output_solutions'),
             'detailed_printview' => $this->lng->txt('detailed_output_printview')
         ));
-        $mode->setValue(ilUtil::stripSlashes((string) $_POST['output']));
+
+        $output = $this->qplrequest->raw('output') ?? '';
+
+        $mode->setValue(ilUtil::stripSlashes($output));
 
         $ilToolbar->setFormName('printviewOptions');
         $ilToolbar->addInputItem($mode, true);
         $ilToolbar->addFormButton($this->lng->txt('submit'), 'print');
-        $table_gui = new ilQuestionPoolPrintViewTableGUI($this, 'print', $_POST['output']);
+        $table_gui = new ilQuestionPoolPrintViewTableGUI($this, 'print', $output);
         $data = $this->object->getPrintviewQuestions();
         $totalPoints = 0;
         foreach ($data as $d) {
@@ -1345,12 +1362,15 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
 
         $p_gui = new ilAssQuestionPreviewGUI(
             $this->ctrl,
+            $this->rbac_system,
             $this->tabs_gui,
             $this->tpl,
             $this->lng,
             $DIC->database(),
             $DIC->user(),
-            new ILIAS\Refinery\Random\Group()
+            new RandomGroup(),
+            $this->ref_id,
+            $DIC->rbac()
         );
         $this->ctrl->redirectByClass(get_class($p_gui), "show");
     }
@@ -1378,6 +1398,10 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
     */
     protected function importFileObject(int $parent_id = null, bool $catch_errors = true): void
     {
+        if (!$this->checkPermissionBool("create", "", $_REQUEST["new_type"])) {
+            $this->error->raiseError($this->lng->txt("no_create_permission"));
+        }
+
         $form = $this->initImportForm($this->qplrequest->raw("new_type"));
         if ($form->checkInput()) {
             $this->uploadQplObject();
@@ -1455,10 +1479,10 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
     public function getTabs(): void
     {
         global $DIC;
-        $ilAccess = $DIC['ilAccess'];
         $ilHelp = $DIC['ilHelp'];
 
-        $currentUserHasWriteAccess = $ilAccess->checkAccess("write", "", $this->object->getRefId());
+        $currentUserHasWriteAccess = $this->access->checkAccess("write", "", $this->object->getRefId());
+        $currentUserHasReadAccess = $this->access->checkAccess("read", "", $this->object->getRefId());
 
         $ilHelp->setScreenIdComponent("qpl");
 
@@ -1510,7 +1534,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
                 ? true
                 : false;
         }
-        if ($ilAccess->checkAccess("write", "", $this->qplrequest->getRefId())) {
+        if ($currentUserHasReadAccess) {
             $this->tabs_gui->addTarget(
                 "assQuestions",
                 $this->ctrl->getLinkTarget($this, "questions"),
@@ -1529,7 +1553,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
                 $force_active
             );
         }
-        if ($ilAccess->checkAccess("read", "", $this->ref_id) || $ilAccess->checkAccess("visible", "", $this->ref_id)) {
+        if ($currentUserHasReadAccess) {
             $this->tabs_gui->addTarget(
                 "info_short",
                 $this->ctrl->getLinkTarget($this, "infoScreen"),
@@ -1537,7 +1561,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
             );
         }
 
-        if ($ilAccess->checkAccess("write", "", $this->qplrequest->getRefId())) {
+        if ($currentUserHasWriteAccess) {
             // properties
             $this->tabs_gui->addTarget(
                 'settings',
@@ -1557,7 +1581,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
             }
         }
 
-        if ($ilAccess->checkAccess("write", "", $this->qplrequest->getRefId())) {
+        if ($currentUserHasReadAccess) {
             // print view
             $this->tabs_gui->addTarget(
                 "print_view",
@@ -1568,7 +1592,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
             );
         }
 
-        if ($ilAccess->checkAccess("write", "", $this->object->getRefId())) {
+        if ($currentUserHasWriteAccess) {
             $mdgui = new ilObjectMetaDataGUI($this->object);
             $mdtab = $mdgui->getTab();
             if ($mdtab) {
@@ -1579,11 +1603,6 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
                     "ilmdeditorgui"
                 );
             }
-
-            //			$this->tabs_gui->addTarget("export",
-            //				 $this->ctrl->getLinkTarget($this,'export'),
-            //				 array("export", "createExportFile", "confirmDeleteExportFile", "downloadExportFile"),
-            //				 "", "");
         }
 
         if ($currentUserHasWriteAccess) {
@@ -1595,7 +1614,7 @@ class ilObjQuestionPoolGUI extends ilObjectGUI implements ilCtrlBaseClassInterfa
             );
         }
 
-        if ($ilAccess->checkAccess("edit_permission", "", $this->object->getRefId())) {
+        if ($this->access->checkAccess("edit_permission", "", $this->object->getRefId())) {
             $this->tabs_gui->addTarget(
                 "perm_settings",
                 $this->ctrl->getLinkTargetByClass(array(get_class($this),'ilpermissiongui'), "perm"),

@@ -27,6 +27,7 @@
  */
 class ilLMPresentationGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInterface
 {
+    protected \ILIAS\COPage\Xsl\XslManager $xsl;
     protected \ILIAS\Notes\DomainService $notes;
     protected \ILIAS\LearningModule\ReadingTime\ReadingTimeManager $reading_time_manager;
     protected string $requested_url;
@@ -130,8 +131,6 @@ class ilLMPresentationGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInt
 
         $this->cs = $DIC->contentStyle();
 
-        // note: using $DIC->http()->request()->getQueryParams() here will
-        // fail, since the goto magic currently relies on setting $_GET
         $this->initByRequest($query_params, $embed_mode);
 
         // check, if learning module is online
@@ -175,6 +174,7 @@ class ilLMPresentationGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInt
         }
         $this->reading_time_manager = new \ILIAS\LearningModule\ReadingTime\ReadingTimeManager();
         $this->notes = $DIC->notes()->domain();
+        $this->xsl = $DIC->copage()->internal()->domain()->xsl();
     }
 
     public function getUnsafeGetCommands(): array
@@ -345,7 +345,11 @@ class ilLMPresentationGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInt
                     $ilUser->getId()
                 );
                 $this->ctrl->forwardCommand($new_gui);
-                $this->tpl->printToStdout();
+                // this is nasty, but the LP classes do "sometimes" a printToStdout
+                // sometimes not, (here editManual does, other commands not)
+                if ($this->ctrl->getCmd() !== "editManual") {
+                    $this->tpl->printToStdout();
+                }
                 break;
 
             case "ilratinggui":
@@ -1147,11 +1151,11 @@ class ilLMPresentationGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInt
             $rating_gui->setObject($this->lm->getId(), "lm", $this->getCurrentPageId(), "lm");
             $rating_gui->setYourRatingText($this->lng->txt("lm_rate_page"));
 
-            $this->ctrl->setParameter($this, "pgid", $this->getCurrentPageId());
+            $this->ctrl->setParameter($this, "pg_id", $this->getCurrentPageId());
             $this->tpl->addOnLoadCode("il.LearningModule.setRatingUrl('" .
                 $this->ctrl->getLinkTarget($this, "updatePageRating", "", true, false) .
                 "')");
-            $this->ctrl->setParameter($this, "pgid", "");
+            $this->ctrl->setParameter($this, "pg_id", "");
 
             $rating = '<div id="ilrtrpg" style="text-align:right">' .
                 $rating_gui->getHTML(true, true, "il.LearningModule.saveRating(%rating%);") .
@@ -1163,7 +1167,7 @@ class ilLMPresentationGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInt
     public function updatePageRating(): void
     {
         $ilUser = $this->user;
-        $pg_id = $this->getCurrentPageId();
+        $pg_id = $this->service->getRequest()->getPgId();
         if (!$this->ctrl->isAsynch() || !$pg_id) {
             exit();
         }
@@ -1279,10 +1283,6 @@ class ilLMPresentationGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInt
         $xml .= $link_xml;
         $xml .= "</dummy>";
 
-        $xsl = file_get_contents("./Services/COPage/xsl/page.xsl");
-        $args = array('/_xml' => $xml, '/_xsl' => $xsl);
-        $xh = xslt_create();
-
         if (!$this->offlineMode()) {
             $wb_path = ilFileUtils::getWebspaceDir("output") . "/";
         } else {
@@ -1303,9 +1303,7 @@ class ilLMPresentationGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInt
                         'pg_frame' => $pg_frame,
                         'webspace_path' => $wb_path
         );
-        $output = xslt_process($xh, "arg:/_xml", "arg:/_xsl", null, $args, $params);
-
-        xslt_free($xh);
+        $output = $this->xsl->process($xml, $params);
 
         // unmask user html
         $this->tpl->setVariable("MEDIA_CONTENT", $output);
@@ -1973,32 +1971,19 @@ class ilLMPresentationGUI implements ilCtrlBaseClassInterface, ilCtrlSecurityInt
             foreach ($terms as $t) {
                 $link = $t["link"];
                 $key = $t["key"];
-                $defs = ilGlossaryDefinition::getDefinitionList($link["id"]);
-                $def_cnt = 1;
 
-                // output all definitions of term
-                foreach ($defs as $def) {
-                    // definition + number, if more than 1 definition
-                    if (count($defs) > 1) {
-                        $tpl->setCurrentBlock("def_title");
-                        $tpl->setVariable(
-                            "TXT_DEFINITION",
-                            $this->lng->txt("cont_definition") . " " . ($def_cnt++)
-                        );
-                        $tpl->parseCurrentBlock();
-                    }
-                    $page_gui = new ilGlossaryDefPageGUI($def["id"]);
-                    $page_gui->setTemplateOutput(false);
-                    $page_gui->setOutputMode("print");
+                // output definition of term
+                $page_gui = new ilGlossaryDefPageGUI($link["id"]);
+                $page_gui->setTemplateOutput(false);
+                $page_gui->setOutputMode("print");
 
-                    $tpl->setCurrentBlock("definition");
-                    $page_gui->setFileDownloadLink("#");
-                    $page_gui->setFullscreenLink("#");
-                    $page_gui->setSourcecodeDownloadScript("#");
-                    $output = $page_gui->showPage();
-                    $tpl->setVariable("VAL_DEFINITION", $output);
-                    $tpl->parseCurrentBlock();
-                }
+                $tpl->setCurrentBlock("definition");
+                $page_gui->setFileDownloadLink("#");
+                $page_gui->setFullscreenLink("#");
+                $page_gui->setSourcecodeDownloadScript("#");
+                $output = $page_gui->showPage();
+                $tpl->setVariable("VAL_DEFINITION", $output);
+                $tpl->parseCurrentBlock();
 
                 // output term
                 $tpl->setCurrentBlock("term");

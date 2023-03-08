@@ -37,6 +37,7 @@ class ilLMPresentationStatus
     protected string $lang;
     protected int $focus_id = 0;
     protected $concrete_lang = "";
+    protected $embed_mode = false;
 
     public function __construct(
         ilObjUser $user,
@@ -48,7 +49,8 @@ class ilLMPresentationStatus
         string $requested_search_string = "",
         bool $offline = false,
         bool $export_all_languages = false,
-        string $export_format = ""
+        string $export_format = "",
+        bool $embed_mode = false
     ) {
         $this->lm = $lm;
         $this->ot = ilObjectTranslation::getInstance($lm->getId());
@@ -61,6 +63,7 @@ class ilLMPresentationStatus
         $this->offline = $offline;
         $this->export_all_languages = $export_all_languages;
         $this->export_format = $export_format;
+        $this->embed_mode = $embed_mode;
         $this->init();
     }
 
@@ -122,6 +125,11 @@ class ilLMPresentationStatus
         return $this->offline;
     }
 
+    public function getEmbedMode(): bool
+    {
+        return $this->embed_mode;
+    }
+
     public function exportAllLanguages(): bool
     {
         return $this->export_all_languages;
@@ -135,14 +143,18 @@ class ilLMPresentationStatus
     public function getLMPresentationTitle(): string
     {
         if ($this->offline() && $this->lang != "" && $this->lang != "-") {
+            $ltitle = "";
             $ot = $this->ot;
             $data = $ot->getLanguages();
             $ltitle = $data[$this->lang]->getTitle();
-            if ($ltitle != "") {
+            if ($ltitle !== "") {
                 return $ltitle;
             }
-            $ltitle = $data[$ot->getFallbackLanguage()]->getTitle();
-            if ($ltitle != "") {
+            $fb = $ot->getFallbackLanguage();
+            if (isset($data[$fb])) {
+                $ltitle = $data[$fb]->getTitle();
+            }
+            if ($ltitle !== "") {
                 return $ltitle;
             }
         }

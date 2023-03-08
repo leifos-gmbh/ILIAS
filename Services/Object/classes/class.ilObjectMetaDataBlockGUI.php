@@ -31,12 +31,16 @@ class ilObjectMetaDataBlockGUI extends ilBlockGUI
 
     protected ilAdvancedMDRecord $record;
     protected ilAdvancedMDValues $values;
-    protected ?string $callback;
+    protected ?array $callback;
 
     /**
-    * Constructor
-    */
-    public function __construct(ilAdvancedMDRecord $record, string $decorator_callback = null)
+     * Takes as an optional second input an array consisting of the object
+     * that the method that should be called back to belongs to, and
+     * a string with the name of the method.
+     * @param ilAdvancedMDRecord                    $record
+     * @param null|array{0: ilObject, 1: string}    $decorator_callback
+     */
+    public function __construct(ilAdvancedMDRecord $record, ?array $decorator_callback = null)
     {
         global $DIC;
 
@@ -135,10 +139,6 @@ class ilObjectMetaDataBlockGUI extends ilBlockGUI
                 $value = "-";
             } else {
                 $value = ilADTFactory::getInstance()->getPresentationBridgeForInstance($element);
-
-                if ($element instanceof ilADTLocation) {
-                    $value->setSize(100, 200);
-                }
 
                 if (in_array($element->getType(), array("MultiEnum", "Enum", "Text"))) {
                     $value->setDecoratorCallBack($this->callback);

@@ -150,7 +150,7 @@ class ilAnswerFrequencyStatisticTableGUI extends ilTable2GUI
     public function fillRow(array $a_set): void
     {
         $this->tpl->setCurrentBlock('answer');
-        $this->tpl->setVariable('ANSWER', ilLegacyFormElementsUtil::prepareFormOutput($a_set['answer']));
+        $this->tpl->setVariable('ANSWER', $a_set['answer']);
         $this->tpl->parseCurrentBlock();
 
         $this->tpl->setCurrentBlock('frequency');
@@ -180,6 +180,7 @@ class ilAnswerFrequencyStatisticTableGUI extends ilTable2GUI
         $showModalButton->setId('btnShow_' . $uid);
         $showModalButton->setCaption('tst_corr_add_as_answer_btn');
         $showModalButton->setOnClick("$('#{$modal->getId()}').modal('show')");
+        $showModalButton->setTarget('');
 
         // TODO: migrate stuff above to ui components when ui-form supports
         // - presentation in ui-roundtrip

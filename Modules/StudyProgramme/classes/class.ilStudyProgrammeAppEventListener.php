@@ -141,18 +141,7 @@ class ilStudyProgrammeAppEventListener
                         break;
                 }
                 break;
-            case "Modules/StudyProgramme":
-                switch ($event) {
-                    case "userReAssigned":
-                        self::sendReAssignedMail($parameter);
-                        break;
-                    case 'informUserToRestart':
-                        self::sendInformToReAssignMail($parameter);
-                        break;
-                    case 'userRiskyToFail':
-                        self::sendRiskyToFailMail($parameter);
-                }
-                break;
+
             default:
                 throw new ilException(
                     "ilStudyProgrammeAppEventListener::handleEvent: Won't handle events of '$component'."
@@ -162,13 +151,11 @@ class ilStudyProgrammeAppEventListener
 
     private static function onServiceUserDeleteUser(array $parameter): void
     {
-        $assignments = ilStudyProgrammeDIC::dic()['ilStudyProgrammeUserAssignmentDB']
-            ->getInstancesOfUser((int) $parameter["usr_id"])
-        ;
+        $repo = ilStudyProgrammeDIC::dic()['repo.assignment'];
+        $assignments = $repo->getForUser((int) $parameter["usr_id"]);
 
         foreach ($assignments as $ass) {
-            $prg = ilObjStudyProgramme::getInstanceByObjId($ass->getRootId());
-            $prg->removeAssignment($ass);
+            $repo->delete($ass);
         }
     }
 
@@ -308,29 +295,5 @@ class ilStudyProgrammeAppEventListener
         }
 
         ilObjStudyProgramme::removeMemberFromProgrammes($src_type, $id, $usr_id);
-    }
-
-    private static function sendReAssignedMail(array $params): void
-    {
-        $usr_id = $params['usr_id'];
-        $ref_id = $params['root_prg_ref_id'];
-        ilObjStudyProgramme::sendReAssignedMail($ref_id, $usr_id);
-    }
-
-    private static function sendInformToReAssignMail(array $params): void
-    {
-        $usr_id = $params['usr_id'];
-        $progress_id = $params['progress_id'];
-        ilObjStudyProgramme::sendInformToReAssignMail($progress_id, $usr_id);
-    }
-
-    /**
-     * @throws ilException
-     */
-    private static function sendRiskyToFailMail(array $params): void
-    {
-        $usr_id = $params['usr_id'];
-        $progress_id = $params['progress_id'];
-        ilObjStudyProgramme::sendRiskyToFailMail($progress_id, $usr_id);
     }
 }

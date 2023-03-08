@@ -179,23 +179,15 @@ class assOrderingHorizontalGUI extends assQuestionGUI implements ilGuiQuestionSc
                 $reached_points = $this->object->calculateReachedPoints($active_id, $pass);
             }
             if ($graphicalOutput) {
-                // output of ok/not ok icons for user entered solutions
+                $correctness_icon = $this->generateCorrectnessIconsForCorrectness(self::CORRECTNESS_NOT_OK);
                 if ($reached_points == $this->object->getMaximumPoints()) {
-                    $template->setCurrentBlock("icon_ok");
-                    $template->setVariable("ICON_OK", ilUtil::getImagePath("icon_ok.svg"));
-                    $template->setVariable("TEXT_OK", $this->lng->txt("answer_is_right"));
-                    $template->parseCurrentBlock();
-                } else {
-                    $template->setCurrentBlock("icon_ok");
-                    if ($reached_points > 0) {
-                        $template->setVariable("ICON_NOT_OK", ilUtil::getImagePath("icon_mostly_ok.svg"));
-                        $template->setVariable("TEXT_NOT_OK", $this->lng->txt("answer_is_not_correct_but_positive"));
-                    } else {
-                        $template->setVariable("ICON_NOT_OK", ilUtil::getImagePath("icon_not_ok.svg"));
-                        $template->setVariable("TEXT_NOT_OK", $this->lng->txt("answer_is_wrong"));
-                    }
-                    $template->parseCurrentBlock();
+                    $correctness_icon = $this->generateCorrectnessIconsForCorrectness(self::CORRECTNESS_OK);
+                } elseif ($reached_points > 0) {
+                    $correctness_icon = $this->generateCorrectnessIconsForCorrectness(self::CORRECTNESS_MOSTLY_OK);
                 }
+                $template->setCurrentBlock("icon_ok");
+                $template->setVariable("ICON_OK", $correctness_icon);
+                $template->parseCurrentBlock();
             }
         } else {
             $reached_points = $this->object->getPoints();
@@ -224,9 +216,6 @@ class assOrderingHorizontalGUI extends assQuestionGUI implements ilGuiQuestionSc
                 $fb = $this->getGenericFeedbackOutput((int) $active_id, $pass);
                 $feedback .= strlen($fb) ? $fb : '';
             }
-
-            $fb = $this->getSpecificFeedbackOutput(array());
-            $feedback .= strlen($fb) ? $fb : '';
         }
         if (strlen($feedback)) {
             $cssClass = (
@@ -257,12 +246,12 @@ class assOrderingHorizontalGUI extends assQuestionGUI implements ilGuiQuestionSc
 
         $template = new ilTemplate("tpl.il_as_qpl_orderinghorizontal_preview.html", true, true, "Modules/TestQuestionPool");
         $js = <<<JS
-    
+
         $('#horizontal_{QUESTION_ID}').ilHorizontalOrderingQuestion({
             result_value_selector  : '.ilOrderingValue',
             result_separator       : '{::}'
         });
-    
+
 JS;
         $js = str_replace('{QUESTION_ID}', $this->object->getId(), $js);
         $this->tpl->addOnLoadCode($js);
@@ -361,24 +350,6 @@ JS;
         return $pageoutput;
     }
 
-    /**
-    * Saves the feedback for a single choice question
-    *
-    * @access public
-    */
-    public function saveFeedback(): void
-    {
-        include_once "./Services/AdvancedEditing/classes/class.ilObjAdvancedEditing.php";
-        // @PHP8-CR: This appears as if the feedback feature was not implmented completely for the question type.
-        // Fixing this situation would require these calls to be intact and since it's always been here like this,
-        // I like to leave it and put the work-item on the to-do list.
-        $errors = $this->feedback(true);
-        $this->object->saveFeedbackGeneric(0, $_POST["feedback_incomplete"]);
-        $this->object->saveFeedbackGeneric(1, $_POST["feedback_complete"]);
-        $this->object->cleanupMediaObjectUsage();
-        parent::saveFeedback();
-    }
-
     public function getPresentationJavascripts(): array
     {
         global $DIC; /* @var ILIAS\DI\Container $DIC */
@@ -394,31 +365,7 @@ JS;
 
     public function getSpecificFeedbackOutput(array $userSolution): string
     {
-        if (strpos($this->object->getOrderText(), '::')) {
-            $answers = explode('::', $this->object->getOrderText());
-        } else {
-            $answers = explode(' ', $this->object->getOrderText());
-        }
-
-        if (!$this->object->feedbackOBJ->specificAnswerFeedbackExists()) {
-            return '';
-        }
-
-        $output = '<table class="test_specific_feedback"><tbody>';
-
-        foreach ($answers as $idx => $answer) {
-            $feedback = $this->object->feedbackOBJ->getSpecificAnswerFeedbackTestPresentation(
-                $this->object->getId(),
-                0,
-                $idx
-            );
-
-            $output .= "<tr><td>{$answer}</td><td>{$feedback}</td></tr>";
-        }
-
-        $output .= '</tbody></table>';
-
-        return $this->object->prepareTextareaOutput($output, true);
+        return '';
     }
 
     public function writeQuestionSpecificPostData(ilPropertyFormGUI $form): void
@@ -446,7 +393,7 @@ JS;
     {
         // ordertext
         $ordertext = new ilTextAreaInputGUI($this->lng->txt("ordertext"), "ordertext");
-        $ordertext->setValue(self::prepareTextareaOutput($this->object->getOrderText()));
+        $ordertext->setValue((string) self::prepareTextareaOutput($this->object->getOrderText(), false, true));
         $ordertext->setRequired(true);
         $ordertext->setInfo(sprintf($this->lng->txt("ordertext_info"), $this->object->separator));
         $ordertext->setRows(10);

@@ -35,7 +35,7 @@ class ilTermsOfServiceWithdrawalGUIHelper
     protected Factory $uiFactory;
     protected Renderer $uiRenderer;
     protected ilTermsOfServiceHelper $tosHelper;
-    private ilGlobalTemplateInterface $main_tpl;
+    private readonly ilGlobalTemplateInterface $main_tpl;
 
     public function __construct(protected ilObjUser $user)
     {
@@ -80,7 +80,16 @@ class ilTermsOfServiceWithdrawalGUIHelper
                 $footer = $footer->withAdditionalModalAndTrigger(
                     $this->uiFactory->modal()->roundtrip(
                         $entity->getTitle(),
-                        $this->uiFactory->legacy($entity->getText() . $this->getWithdrawalSectionForModal()->get())
+                        [
+                            $this->uiFactory->legacy($this->lng->txt('usr_agreement_footer_intro')),
+                            $this->uiFactory->divider()->horizontal(),
+                            $this->uiFactory->legacy(
+                                implode('', [
+                                    $entity->getText(),
+                                    $this->getWithdrawalSectionForModal()->get()
+                                ])
+                            )
+                        ]
                     ),
                     $this->uiFactory->button()->shy($this->lng->txt('usr_agreement'), '#')
                 );

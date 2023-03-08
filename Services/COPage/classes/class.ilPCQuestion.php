@@ -321,9 +321,16 @@ class ilPCQuestion extends ilPageContent
             $code[] = self::getJSTextInitCode($this->getPage()->getPageConfig()->getLocalizationLanguage()) . ' il.COPagePres.updateQuestionOverviews();';
         }
 
+        $q_ids = $this->getPage()->getQuestionIds();
+
+        // call renderers
+        foreach ($q_ids as $q_id) {
+            $code[] = "renderILQuestion$q_id();";
+        }
+
+        // init answer status
         $get_stored_tries = $this->getPage()->getPageConfig()->getUseStoredQuestionTries();
         if ($get_stored_tries) {
-            $q_ids = $this->getPage()->getQuestionIds();
             if (count($q_ids) > 0) {
                 foreach ($q_ids as $q_id) {
                     $as = ilPageQuestionProcessor::getAnswerStatus($q_id, $ilUser->getId());
@@ -357,6 +364,7 @@ class ilPCQuestion extends ilPageContent
 			ilias.questions.txt.all_answers_correct = "' . $lng->txtlng("content", "cont_all_answers_correct", $a_lang) . '";
 			ilias.questions.txt.enough_answers_correct = "' . $lng->txtlng("content", "cont_enough_answers_correct", $a_lang) . '";
 			ilias.questions.txt.nr_of_tries_exceeded = "' . $lng->txtlng("content", "cont_nr_of_tries_exceeded", $a_lang) . '";
+			ilias.questions.txt.correct_answers_separator = "' . $lng->txtlng("assessment", "or", $a_lang) . '";
 			ilias.questions.txt.correct_answers_shown = "' . $lng->txtlng("content", "cont_correct_answers_shown", $a_lang) . '";
 			ilias.questions.txt.correct_answers_also = "' . $lng->txtlng("content", "cont_correct_answers_also", $a_lang) . '";
 			ilias.questions.txt.correct_answer_also = "' . $lng->txtlng("content", "cont_correct_answer_also", $a_lang) . '";

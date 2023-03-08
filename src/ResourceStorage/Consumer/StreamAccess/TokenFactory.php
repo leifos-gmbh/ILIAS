@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace ILIAS\ResourceStorage\Consumer\StreamAccess;
 
 use ILIAS\Filesystem\Stream\FileStream;
+use ILIAS\ResourceStorage\Identification\ResourceIdentification;
 
 /**
  * @author Fabian Schmid <fabian@sr.solutions>
@@ -29,15 +30,13 @@ use ILIAS\Filesystem\Stream\FileStream;
 class TokenFactory
 {
     use Hasher;
+    private const SEPARATOR = '|';
 
     private string $storage_dir;
 
     public function __construct(string $storage_dir)
     {
         $this->storage_dir = $storage_dir;
-        if (!is_dir($this->storage_dir)) {
-            throw new \InvalidArgumentException('Storage directory does not exist');
-        }
     }
 
     public function check(string $access_key): Token
@@ -49,8 +48,11 @@ class TokenFactory
         return new Token($expanded_uri, $access_key);
     }
 
-    public function lease(FileStream $stream, bool $with_stream_attached = false): Token
-    {
+    public function lease(
+        FileStream $stream,
+        ResourceIdentification $for_rid,
+        bool $with_stream_attached = false
+    ): Token {
         $uri = $stream->getMetadata()['uri'] ?? '';
         $this->checkURI($uri);
         $reduced_uri = $this->reduceURI($uri);
@@ -68,6 +70,9 @@ class TokenFactory
 
     private function checkURI(string $uri): void
     {
+        if (!is_dir($this->storage_dir)) {
+            throw new \InvalidArgumentException('Storage directory does not exist');
+        }
         if ($this->isMemoryStream($uri)) {
             return;
         }

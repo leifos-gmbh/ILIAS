@@ -598,13 +598,13 @@ class ilCourseObjectivesGUI
 
         $this->__initQuestionObject($this->initObjectiveIdFromQuery());
 
-        $limit = 0;
-        if ($this->http->wrapper()->post()->has('limit')) {
-            $limit = $this->http->wrapper()->post()->retrieve(
-                'limit',
-                $this->refinery->kindlyTo()->int()
-            );
-        }
+        $limit = $this->http->wrapper()->post()->retrieve(
+            'limit',
+            $this->refinery->byTrying([
+                $this->refinery->kindlyTo()->int(),
+                $this->refinery->always(0)
+            ])
+        );
         if ($limit < 1 || $limit > 100) {
             $this->tpl->setOnScreenMessage('failure', $this->lng->txt('crs_objective_err_limit'));
             $this->selfAssessmentLimits();
@@ -725,7 +725,7 @@ class ilCourseObjectivesGUI
             $this->test_type
         );
 
-        $qpl->setValue($sequences[0]);
+        $qpl->setValue((string) ($sequences[0] ?? ''));
         $qpl->setMultiValues($sequences);
         $ass_qpl->addSubItem($qpl);
 

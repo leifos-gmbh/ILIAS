@@ -833,8 +833,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling, ilForu
                 $cmd,
                 $ref_id,
                 $topicData,
-                $this->is_moderator,
-                (int) (new ilSetting('frma'))->get('forum_overview', (string) ilForumProperties::FORUM_OVERVIEW_WITH_NEW_POSTS)
+                $this->is_moderator
             );
             $tbl->init();
             $tbl->setMapper($frm)->fetchData();
@@ -2186,7 +2185,6 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling, ilForu
 
         if ($this->objProperties->isFileUploadAllowed()) {
             $oFileUploadGUI = new ilFileWizardInputGUI($this->lng->txt('forums_attachments_add'), 'userfile');
-            $oFileUploadGUI->setSuffixes(['png', 'jpg']);
             $oFileUploadGUI->setFilenames([0 => '']);
             $this->replyEditForm->addItem($oFileUploadGUI);
         }
@@ -2445,7 +2443,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling, ilForu
                 $file = $_FILES['userfile'] ?? [];
                 if (is_array($file) && !empty($file)) {
                     $tmp_file_obj = new ilFileDataForum($this->object->getId(), $newPost);
-                    $tmp_file_obj->storeUploadedFile($file);
+                    $tmp_file_obj->storeUploadedFiles();
                 }
 
                 //move files of draft to posts directory
@@ -2628,7 +2626,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling, ilForu
                     $oFDForum = new ilFileDataForum($forumObj->getId(), $newPost);
                     $file = $_FILES['userfile'];
                     if (is_array($file) && !empty($file)) {
-                        $oFDForum->storeUploadedFile($file);
+                        $oFDForum->storeUploadedFiles();
                     }
                 }
 
@@ -2744,7 +2742,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling, ilForu
                     if ($this->objProperties->isFileUploadAllowed()) {
                         $file = $_FILES['userfile'];
                         if (is_array($file) && !empty($file)) {
-                            $oFDForum->storeUploadedFile($file);
+                            $oFDForum->storeUploadedFiles();
                         }
                     }
 
@@ -3008,8 +3006,6 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling, ilForu
                 'frm'
             );
         }
-
-        $forumObj->updateLastAccess($this->user->getId(), $this->objCurrentTopic->getId());
 
         $this->prepareThreadScreen($forumObj);
 
@@ -3979,7 +3975,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling, ilForu
                 $file = $_FILES['userfile'];
                 if (is_array($file) && !empty($file)) {
                     $fileData = new ilFileDataForum($this->object->getId(), $newPost);
-                    $fileData->storeUploadedFile($file);
+                    $fileData->storeUploadedFiles();
                 }
             }
 
@@ -4573,8 +4569,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling, ilForu
                 'mergeThreads',
                 (int) $this->httpRequest->getQueryParams()['ref_id'],
                 $topicData,
-                $this->is_moderator,
-                (int) (new ilSetting('frma'))->get('forum_overview', (string) ilForumProperties::FORUM_OVERVIEW_WITH_NEW_POSTS)
+                $this->is_moderator
             );
             $tbl->setSelectedThread($threadToMerge);
             $tbl->setMapper($frm)->fetchData();
@@ -4842,7 +4837,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling, ilForu
             $draft->setPostUserAlias($userAlias);
             $draft->setNotificationStatus((bool) $form->getInput('notify'));
             $draft->setPostAuthorId($this->user->getId());
-            $draft->setPostDisplayUserId(($this->objProperties->isAnonymized() ? 0 : $this->user->getId()));
+            $draft->setPostDisplayUserId($this->isWritingWithPseudonymAllowed() ? 0 : $this->user->getId());
 
             if (0 === $autoSavedDraftId) {
                 $draftId = $draft->saveDraft();
@@ -4916,7 +4911,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling, ilForu
             $draft->setPostUserAlias($userAlias);
             $draft->setNotificationStatus((bool) $form->getInput('notify'));
             $draft->setPostAuthorId($this->user->getId());
-            $draft->setPostDisplayUserId(($this->objProperties->isAnonymized() ? 0 : $this->user->getId()));
+            $draft->setPostDisplayUserId($this->isWritingWithPseudonymAllowed() ? 0 : $this->user->getId());
             $draft->updateDraft();
 
             $GLOBALS['ilAppEventHandler']->raise(
@@ -5041,7 +5036,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling, ilForu
                 $draftObj->setPostNotificationStatus((bool) $oReplyEditForm->getInput('notify_post'));
 
                 $draftObj->setPostAuthorId($this->user->getId());
-                $draftObj->setPostDisplayUserId(($this->objProperties->isAnonymized() ? 0 : $this->user->getId()));
+                $draftObj->setPostDisplayUserId(($this->isWritingWithPseudonymAllowed() ? 0 : $this->user->getId()));
 
                 if ($autosave_draft_id === 0) {
                     $draft_id = $draftObj->saveDraft();
@@ -5174,7 +5169,7 @@ class ilObjForumGUI extends ilObjectGUI implements ilDesktopItemHandling, ilForu
                 $update_draft->setNotificationStatus((bool) $oReplyEditForm->getInput('notify'));
                 $update_draft->setUpdateUserId($this->user->getId());
                 $update_draft->setPostAuthorId($this->user->getId());
-                $update_draft->setPostDisplayUserId(($this->objProperties->isAnonymized() ? 0 : $this->user->getId()));
+                $update_draft->setPostDisplayUserId($this->isWritingWithPseudonymAllowed() ? 0 : $this->user->getId());
 
                 $update_draft->updateDraft();
 

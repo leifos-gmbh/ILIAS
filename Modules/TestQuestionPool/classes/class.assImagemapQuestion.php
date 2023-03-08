@@ -894,16 +894,16 @@ class assImagemapQuestion extends assQuestion implements ilObjQuestionScoringAdj
     /**
      * {@inheritdoc}
      */
-    public function setExportDetailsXLS(ilAssExcelFormatHelper $worksheet, int $startrow, int $active_id, int $pass): int
+    public function setExportDetailsXLS(ilAssExcelFormatHelper $worksheet, int $startrow, int $col, int $active_id, int $pass): int
     {
-        parent::setExportDetailsXLS($worksheet, $startrow, $active_id, $pass);
+        parent::setExportDetailsXLS($worksheet, $startrow, $col, $active_id, $pass);
 
         $solution = $this->getSolutionValues($active_id, $pass);
 
         $i = 1;
         foreach ($this->getAnswers() as $id => $answer) {
-            $worksheet->setCell($startrow + $i, 0, $answer->getArea() . ": " . $answer->getCoords());
-            $worksheet->setBold($worksheet->getColumnCoord(0) . ($startrow + $i));
+            $worksheet->setCell($startrow + $i, $col, $answer->getArea() . ": " . $answer->getCoords());
+            $worksheet->setBold($worksheet->getColumnCoord($col) . ($startrow + $i));
 
             $cellValue = 0;
             foreach ($solution as $solIndex => $sol) {
@@ -913,7 +913,7 @@ class assImagemapQuestion extends assQuestion implements ilObjQuestionScoringAdj
                 }
             }
 
-            $worksheet->setCell($startrow + $i, 1, $cellValue);
+            $worksheet->setCell($startrow + $i, $col + 1, $cellValue);
 
             $i++;
         }
@@ -979,10 +979,13 @@ class assImagemapQuestion extends assQuestion implements ilObjQuestionScoringAdj
 
     /**
      * @param $found_values
-     * @return int
+     * @return float
      */
-    protected function calculateReachedPointsForSolution($found_values): int
+    protected function calculateReachedPointsForSolution($found_values): float
     {
+        if ($found_values == null) {
+            $found_values = [];
+        }
         $points = 0;
         if (count($found_values) > 0) {
             foreach ($this->answers as $key => $answer) {
@@ -1007,7 +1010,6 @@ class assImagemapQuestion extends assQuestion implements ilObjQuestionScoringAdj
      */
     public function getOperators($expression): array
     {
-        require_once "./Modules/TestQuestionPool/classes/class.ilOperatorsExpressionMapping.php";
         return ilOperatorsExpressionMapping::getOperatorsByExpression($expression);
     }
 

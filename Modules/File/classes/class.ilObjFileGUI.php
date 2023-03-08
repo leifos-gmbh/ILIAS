@@ -22,6 +22,7 @@ use ILIAS\ResourceStorage\Services;
 use ILIAS\ResourceStorage\Stakeholder\ResourceStakeholder;
 use ILIAS\UI\Implementation\Component\Input\Container\Form\Standard;
 use ILIAS\UI\Implementation\Component\Dropzone\File\File as Dropzone;
+use ILIAS\File\Icon\IconDatabaseRepository;
 
 /**
  * GUI class for file objects.
@@ -57,6 +58,8 @@ class ilObjFileGUI extends ilObject2GUI
     protected \ILIAS\Refinery\Factory $refinery;
     protected \ILIAS\HTTP\Wrapper\WrapperFactory $http;
     protected ilFileServicesSettings $file_service_settings;
+    protected ilObjFileAccessSettings $object_settings;
+    protected IconDatabaseRepository $icon_repo;
 
     /**
      * Constructor
@@ -75,9 +78,11 @@ class ilObjFileGUI extends ilObject2GUI
         $this->storage = $DIC->resourceStorage();
         $this->upload_handler = new ilObjFileUploadHandlerGUI();
         $this->stakeholder = new ilObjFileStakeholder();
+        $this->object_settings = new ilObjFileAccessSettings();
         parent::__construct($a_id, $a_id_type, $a_parent_node_id);
         $this->obj_service = $DIC->object();
         $this->lng->loadLanguageModule(ilObjFile::OBJECT_TYPE);
+        $this->icon_repo = new IconDatabaseRepository();
     }
 
     public function getType(): string
@@ -120,6 +125,10 @@ class ilObjFileGUI extends ilObject2GUI
         }
 
         $this->prepareOutput();
+
+        $suffix = ilObjFileAccess::getListGUIData($this->obj_id)["suffix"] ?? "";
+        $path_file_icon = $this->icon_repo->getIconFilePathBySuffix($suffix);
+        $this->tpl->setTitleIcon($path_file_icon);
 
         switch ($next_class) {
             case "ilinfoscreengui":
@@ -698,6 +707,14 @@ class ilObjFileGUI extends ilObject2GUI
                 $this->lng->txt("version_uploaded"),
                 (new ilDateTime($version->getDate(), IL_CAL_DATETIME))->get(IL_CAL_DATETIME)
             );
+        }
+
+        if ($this->object_settings->shouldShowAmountOfDownloads()) {
+            $info->addProperty($this->lng->txt("amount_of_downloads"), sprintf(
+                $this->lng->txt("amount_of_downloads_since"),
+                $this->object->getAmountOfDownloads(),
+                $this->object->getCreateDate(),
+            ));
         }
 
         if ($this->object->getPageCount() > 0) {

@@ -16,6 +16,9 @@
  *********************************************************************/
 
 use ILIAS\HTTP\Services;
+use ILIAS\UI\Factory;
+use ILIAS\UI\Renderer;
+use ILIAS\File\Icon\ilObjFileIconsOverviewGUI;
 
 /**
  * Class ilObjFileAccessSettingsGUI
@@ -25,6 +28,7 @@ use ILIAS\HTTP\Services;
  * @version      $Id$
  *
  * @ilCtrl_Calls ilObjFileAccessSettingsGUI: ilPermissionGUI
+ * @ilCtrl_Calls ilObjFileAccessSettingsGUI: ILIAS\File\Icon\ilObjFileIconsOverviewGUI
  *
  * @extends      ilObjectGUI
  */
@@ -32,7 +36,7 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI
 {
     public const CMD_EDIT_SETTINGS = 'editSettings';
     public const CMD_SHOW_PREVIEW_RENDERERS = 'showPreviewRenderers';
-
+    public const SUBTAB_SUFFIX_SPECIFIC_ICONS = 'suffix_specific_icons';
     protected ilSetting $folderSettings;
     protected Services $http;
 
@@ -79,6 +83,13 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI
                 $perm_gui = new ilPermissionGUI($this);
                 $this->ctrl->forwardCommand($perm_gui);
                 break;
+            case strtolower(ilObjFileIconsOverviewGUI::class):
+                $this->tabs_gui->setTabActive('file_objects');
+                $this->addFileObjectsSubTabs();
+                $this->tabs_gui->setSubTabActive(self::SUBTAB_SUFFIX_SPECIFIC_ICONS);
+                $icon_overview = new ilObjFileIconsOverviewGUI();
+                $this->ctrl->forwardCommand($icon_overview);
+                break;
             default:
                 if (!$cmd || $cmd == 'view') {
                     $cmd = self::CMD_EDIT_SETTINGS;
@@ -117,6 +128,11 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI
             "settings",
             $this->ctrl->getLinkTarget($this, self::CMD_EDIT_SETTINGS),
             array(self::CMD_EDIT_SETTINGS, "view")
+        );
+        $this->tabs_gui->addSubTabTarget(
+            self::SUBTAB_SUFFIX_SPECIFIC_ICONS,
+            $this->ctrl->getLinkTargetByClass(ilObjFileIconsOverviewGUI::class, ilObjFileIconsOverviewGUI::CMD_INDEX),
+            array(ilObjFileIconsOverviewGUI::CMD_INDEX, "view")
         );
         $this->tabs_gui->addSubTabTarget(
             "preview_renderers",
@@ -174,6 +190,17 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI
         $chk_prop->setChecked(ilPreviewSettings::isPreviewEnabled());
         $chk_prop->setInfo($lng->txt('enable_preview_info'));
         $form->addItem($chk_prop);
+
+        // show amount of downloads
+        $lng->loadLanguageModule(ilObjFile::OBJECT_TYPE);
+        $chk_prop_show_downloads = new ilCheckboxInputGUI(
+            $lng->txt(ilObjFileAccessSettings::SETTING_SHOW_AMOUNT_OF_DOWNLOADS),
+            ilObjFileAccessSettings::SETTING_SHOW_AMOUNT_OF_DOWNLOADS
+        );
+        $chk_prop_show_downloads->setValue('1');
+        $chk_prop_show_downloads->setChecked($this->object->shouldShowAmountOfDownloads());
+        $chk_prop_show_downloads->setInfo($lng->txt(ilObjFileAccessSettings::SETTING_SHOW_AMOUNT_OF_DOWNLOADS . '_info'));
+        $form->addItem($chk_prop_show_downloads);
 
         // max preview images
         $num_prop = new ilNumberInputGUI($lng->txt("max_previews_per_object"), "max_previews_per_object");
@@ -240,7 +267,10 @@ class ilObjFileAccessSettingsGUI extends ilObjectGUI
                 ilUtil::stripSlashes($post['download_with_uploaded_filename'] ?? '')
             );
             $this->object->setInlineFileExtensions(
-                ilUtil::stripSlashes($post['inline_file_extensions'] ?? '')
+                ilUtil::stripSlashes($post[ilObjFileAccessSettings::SETTING_INLINE_FILE_EXTENSIONS] ?? '')
+            );
+            $this->object->setShowAmountOfDownloads(
+                (bool) ($post[ilObjFileAccessSettings::SETTING_SHOW_AMOUNT_OF_DOWNLOADS] ?? false)
             );
             $this->object->update();
             $this->folderSettings->set("bgtask_download_limit", (int) $post["bg_limit"]);

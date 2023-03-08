@@ -1583,6 +1583,10 @@ class ilPCParagraph extends ilPageContent
     public static function handleAjaxContent(
         string $a_content
     ): ?array {
+        global $DIC;
+
+        $domutil = $DIC->copage()->internal()->domain()->domUtil();
+
         $a_content = "<dummy>" . $a_content . "</dummy>";
 
         $doc = new DOMDocument();
@@ -1611,22 +1615,22 @@ class ilPCParagraph extends ilPageContent
                 $class_arr = explode(" ", $class);
                 $tag = substr($class_arr[0], 16);
                 if (isset($tags[$tag])) {		// known tag like strong
-                    $cnode = ilDOM2Util::changeName($element, "il" . substr($class_arr[0], 16), false);
+                    $cnode = $domutil->changeName($element, "il" . substr($class_arr[0], 16), false);
                 } else {		// unknown tag -> marked text
-                    $cnode = ilDOM2Util::changeName($element, "ilMarked", false);
+                    $cnode = $domutil->changeName($element, "ilMarked", false);
                     $cnode->setAttribute("Class", substr($class_arr[0], 16));
                 }
                 for ($i = 1, $iMax = count($class_arr); $i < $iMax; $i++) {
                     $tag = substr($class_arr[$i], 16);
                     if (isset($tags[$tag])) {		// known tag like strong
-                        $cnode = ilDOM2Util::addParent($cnode, "il" . substr($class_arr[$i], 16));
+                        $cnode = $domutil->addParent($cnode, "il" . substr($class_arr[$i], 16));
                     } else {	// unknown tag -> marked element
-                        $cnode = ilDOM2Util::addParent($cnode, "ilMarked");
+                        $cnode = $domutil->addParent($cnode, "ilMarked");
                         $cnode->setAttribute("Class", substr($class_arr[$i], 16));
                     }
                 }
             } else {
-                ilDOM2Util::replaceByChilds($element);
+                $domutil->replaceByChilds($element);
             }
 
             $elements = $xpath->query("//span");
@@ -2114,7 +2118,7 @@ class ilPCParagraph extends ilPageContent
         DOMDocument $a_domdoc
     ): void {
         // not nice, should be set by context per method
-        if ($a_page->getParentType() == "gdf" ||
+        if ($a_page->getParentType() == "term" ||
             $a_page->getParentType() == "lm") {
             // get existing keywords
             $keywords = array();
@@ -2129,8 +2133,8 @@ class ilPCParagraph extends ilPageContent
                 }
             }
 
-            $meta_type = ($a_page->getParentType() == "gdf")
-                ? "gdf"
+            $meta_type = ($a_page->getParentType() == "term")
+                ? "term"
                 : "pg";
             $meta_rep_id = $a_page->getParentId();
             $meta_id = $a_page->getId();
@@ -2222,6 +2226,7 @@ class ilPCParagraph extends ilPageContent
         string $a_insert_at = "",
         string $a_new_pc_id = ""
     ) {
+        throw new ilCOPagePCEditException("ilPCParagraph->insert is deprecated.");
         $ilUser = $this->user;
 
         $this->log->debug("step 1: " . substr($a_content, 0, 1000));

@@ -13,8 +13,7 @@
  * https://www.ilias.de
  * https://github.com/ILIAS-eLearning
  *
- ********************************************************************
- */
+ *********************************************************************/
 
 /**
  * Class ilDclBaseFieldModel
@@ -28,7 +27,7 @@
  */
 class ilDclBaseRecordFieldModel
 {
-    protected int $id = 0;
+    protected ?int $id = null;
     protected ilDclBaseFieldModel $field;
     protected ilDclBaseRecordModel $record;
     protected ?ilDclBaseRecordRepresentation $record_representation = null;
@@ -115,11 +114,6 @@ class ilDclBaseRecordFieldModel
             $this->db->manipulate($query);
 
             $next_id = $this->db->nextId("il_dcl_stloc" . $storage_location . "_value");
-
-            // This is a workaround to ensure that date values in stloc3 are never stored as NULL, which is not allowed
-            if ($storage_location == 3 && (is_null($this->value) || empty($this->value))) {
-                $this->value = '0000-00-00 00:00:00';
-            }
 
             $value = $this->serializeData($this->value);
 
@@ -231,7 +225,7 @@ class ilDclBaseRecordFieldModel
 
     public function getFormulaValue(): string
     {
-        return $this->getExportValue();
+        return (string)$this->getExportValue();
     }
 
     /**
@@ -256,7 +250,7 @@ class ilDclBaseRecordFieldModel
     /**
      * Function to parse incoming data from form input value $value. returns the string/number/etc. to store in the database.
      * @param int|string $value
-     * @return int|string
+     * @return int|string|null
      */
     public function parseValue($value)
     {
@@ -301,7 +295,7 @@ class ilDclBaseRecordFieldModel
     {
         ;
         if (!is_array($this->getValue())) {
-            $confirmation->addHiddenItem('field_' . $this->field->getId(), $this->getValue());
+            $confirmation->addHiddenItem('field_' . $this->field->getId(), (string)$this->getValue());
         } else {
             foreach ($this->getValue() as $key => $value) {
                 $confirmation->addHiddenItem('field_' . $this->field->getId() . "[$key]", $value);
@@ -361,7 +355,7 @@ class ilDclBaseRecordFieldModel
         return $this->field;
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }

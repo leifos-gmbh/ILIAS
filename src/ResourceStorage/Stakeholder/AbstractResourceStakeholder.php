@@ -46,6 +46,12 @@ abstract class AbstractResourceStakeholder implements ResourceStakeholder
         return false;
     }
 
+    public function canBeAccessedByCurrentUser(ResourceIdentification $identification): bool
+    {
+        return true;
+    }
+
+
     /**
      * @inheritDoc
      */
@@ -81,5 +87,10 @@ abstract class AbstractResourceStakeholder implements ResourceStakeholder
         ) ? $matches[1] : self::class : self::class;
 
         return $this->provider_name_cache;
+    }
+
+    public function getLocationURIForResourceUsage(ResourceIdentification $identification): ?string
+    {
+        return null;
     }
 }

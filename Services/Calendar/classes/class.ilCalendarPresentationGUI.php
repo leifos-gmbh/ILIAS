@@ -90,7 +90,6 @@ class ilCalendarPresentationGUI
         $this->ctrl->saveParameter($this, 'backpd');
 
         $this->initCalendarView();
-
         $cats = ilCalendarCategories::_getInstance($this->user->getId());
 
         if ($a_ref_id > 0) {
@@ -167,12 +166,12 @@ class ilCalendarPresentationGUI
                 $visibility->showSelected($v);
                 $visibility->save();
                 $this->ctrl->setParameterByClass(ilCalendarMonthGUI::class, 'category_id', $info['cat_id']);
-                $this->ctrl->setParameterByClass(\ilCalendarMonthGUI::class, 'seed', $this->seed);
-                $this->ctrl->redirectToURL(
-                    $this->ctrl->getLinkTargetByClass(\ilCalendarMonthGUI::class, '')
-                );
+                $this->ctrl->setParameterByClass(\ilCalendarMonthGUI::class, 'seed', $this->getRequestedSeedAsString());
             }
         }
+        $this->ctrl->redirectToURL(
+            $this->ctrl->getLinkTargetByClass(\ilCalendarMonthGUI::class, '')
+        );
     }
 
     /**
@@ -204,13 +203,11 @@ class ilCalendarPresentationGUI
         $this->prepareOutput();
 
         $this->help->setScreenIdComponent("cal");
-
         switch ($cmd) {
             case 'selectCHCalendarOfUser':
                 $this->initAndRedirectToConsultationHours();
                 break;
         }
-
         switch ($next_class) {
             case 'ilcalendarinboxgui':
                 $this->tabs_gui->activateTab('cal_agenda');
@@ -428,7 +425,6 @@ class ilCalendarPresentationGUI
     public function readLastClass(): string
     {
         $ilUser = $this->user;
-
         switch ($this->cal_view) {
             case ilCalendarSettings::DEFAULT_CAL_DAY:
                 $class = "ilcalendardaygui";
@@ -445,7 +441,12 @@ class ilCalendarPresentationGUI
                 break;
         }
 
-        return $this->user->getPref('cal_last_class') ? $this->user->getPref('cal_last_class') : $class;
+        // see #34998, if cal_view is requested (e.g. through starting point)
+        // it must get high prio than history entry
+        $use_pref = ($this->user->getPref('cal_last_class') !== "")
+            && !$this->http->wrapper()->query()->has('cal_view');
+
+        return $use_pref ? $this->user->getPref('cal_last_class') : $class;
     }
 
     public function setCmdClass($a_class): void
@@ -460,7 +461,6 @@ class ilCalendarPresentationGUI
     protected function forwardToClass(string $a_class): ?ilCalendarViewGUI
     {
         $ilUser = $this->user;
-
         switch ($a_class) {
             case 'ilcalendarmonthgui':
                 $this->user->writePref('cal_last_class', $a_class);
@@ -725,10 +725,7 @@ class ilCalendarPresentationGUI
         }
     }
 
-    /**
-     * init the seed date for presentations (month view, minicalendar)
-     */
-    public function initSeed(): void
+    protected function getRequestedSeedAsString(): string
     {
         $seed = '';
         if ($this->http->wrapper()->query()->has('seed')) {
@@ -737,6 +734,15 @@ class ilCalendarPresentationGUI
                 $this->refinery->kindlyTo()->string()
             );
         }
+        return $seed;
+    }
+
+    /**
+     * init the seed date for presentations (month view, minicalendar)
+     */
+    public function initSeed(): void
+    {
+        $seed = $this->getRequestedSeedAsString();
 
         // default to today
         $now = new \ilDate(time(), IL_CAL_UNIX);

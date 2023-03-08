@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -18,6 +16,8 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
+declare(strict_types=1);
+
 use ILIAS\HTTP;
 use ILIAS\Refinery;
 
@@ -29,6 +29,7 @@ use ILIAS\Refinery;
  */
 class ilPropertyFormGUI extends ilFormGUI
 {
+    private array $kept_uploads = [];
     protected bool $required_text = false;
     protected ilLanguage $lng;
     protected ilCtrl $ctrl;
@@ -373,7 +374,7 @@ class ilPropertyFormGUI extends ilFormGUI
                 // only try to keep files that are ok
                 // see 25484: Wrong error handling when uploading icon instead of tile
                 $item = $this->getItemByPostVar($field);
-                if (is_bool($item) || !$item->checkInput()) {
+                if (is_null($item) || !$item->checkInput()) {
                     continue;
                 }
                 // we support up to 2 nesting levels (see test/assessment)
@@ -870,6 +871,10 @@ class ilPropertyFormGUI extends ilFormGUI
         ?string $a_index = null,
         ?string $a_sub_index = null
     ): void {
+        if (in_array($a_tmp_name, $this->kept_uploads)) {
+            return; // already kept
+        }
+
         if (trim($a_tmp_name) == "") {
             return;
         }
@@ -895,6 +900,7 @@ class ilPropertyFormGUI extends ilFormGUI
         /** @var ilFileInputGUI $file_input */
         $file_input = $this->getItemByPostVar($a_field);
         $file_input->setPending($a_name);
+        $this->kept_uploads[] = $a_tmp_name;
     }
 
     /**
@@ -993,7 +999,7 @@ class ilPropertyFormGUI extends ilFormGUI
                     return "";
                 }
             } else {
-                if (!rename($data["tmp_name"], $target_file)) {
+                if (!ilFileUtils::rename($data["tmp_name"], $target_file)) {
                     return "";
                 }
             }

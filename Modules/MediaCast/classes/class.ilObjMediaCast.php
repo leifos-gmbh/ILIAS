@@ -489,9 +489,16 @@ class ilObjMediaCast extends ilObject
     public function addMobToCast(
         int $mob_id,
         int $user_id,
-        string $long_desc = ""
+        string $long_desc = "",
+        bool $extract = false
     ): int {
         $mob = new ilObjMediaObject($mob_id);
+        if ($extract) {
+            try {
+                $mob->getExternalMetadata();
+            } catch (Exception $e) {
+            }
+        }
         $news_set = new ilSetting("news");
         $enable_internal_rss = $news_set->get("enable_rss_for_internal");
 
@@ -517,7 +524,11 @@ class ilObjMediaCast extends ilObject
 
         // see ilLPListOfSettingsGUI assign
         $collection = $lp->getCollectionInstance();
-        if ($collection && $collection->hasSelectableItems()) {
+        if (
+            $collection &&
+            $collection->hasSelectableItems() &&
+            $this->getNewItemsInLearningProgress()
+        ) {
             $collection->activateEntries([$mob_id]);
             $lp->resetCaches();
             ilLPStatusWrapper::_refreshStatus($this->getId());

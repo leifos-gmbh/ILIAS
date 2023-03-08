@@ -573,8 +573,10 @@ class ilTable2GUI extends ilTableGUI
             case self::FILTER_NUMBER_RANGE:
                 $item = new ilCombinationInputGUI($caption, $id);
                 $combi_item = new ilNumberInputGUI("", $id . "_from");
+                $combi_item->setSize(5);
                 $item->addCombinationItem("from", $combi_item, $lng->txt("from"));
                 $combi_item = new ilNumberInputGUI("", $id . "_to");
+                $combi_item->setSize(5);
                 $item->addCombinationItem("to", $combi_item, $lng->txt("to"));
                 $item->setComparisonMode(ilCombinationInputGUI::COMPARISON_ASCENDING);
                 //$item->setMaxLength(7);
@@ -1009,7 +1011,7 @@ class ilTable2GUI extends ilTableGUI
         $ilCtrl->setParameter(
             $this->parent_obj,
             $this->getNavParameter(),
-            $key . ":" . $order_dir . ":" . $this->offset
+            urlencode($key) . ":" . $order_dir . ":" . $this->offset
         );
         $this->tpl->setVariable(
             "TBL_ORDER_LINK",
@@ -1122,8 +1124,10 @@ class ilTable2GUI extends ilTableGUI
                 $this->tpl->setCurrentBlock("tbl_order_image");
                 if ($this->order_direction === "asc") {
                     $this->tpl->setVariable("ORDER_CLASS", "glyphicon glyphicon-arrow-up");
+                    $this->tpl->setVariable("ORDER_TXT", $this->lng->txt("sorting_asc"));
                 } else {
                     $this->tpl->setVariable("ORDER_CLASS", "glyphicon glyphicon-arrow-down");
+                    $this->tpl->setVariable("ORDER_TXT", $this->lng->txt("sorting_desc"));
                 }
                 $this->tpl->setVariable("IMG_ORDER_ALT", $this->lng->txt("change_sort_direction"));
                 $this->tpl->parseCurrentBlock();
@@ -1247,7 +1251,7 @@ class ilTable2GUI extends ilTableGUI
         if ($this->getOrderDirection() != "") {
             $this->storeProperty("direction", $this->getOrderDirection());
         }
-        if ($this->getOffset() > 0) {
+        if ($this->getOffset() >= 0) {
             $this->storeProperty("offset", (string) $this->getOffset());
         }
     }
@@ -1628,16 +1632,19 @@ class ilTable2GUI extends ilTableGUI
             $this->tpl->parseCurrentBlock();
 
             // (keep) filter hidden?
-            if (!$this->isFilterVisible()) {
-                if (!$this->getDisableFilterHiding()) {
-                    $id = $this->getId();
-                    $this->main_tpl->addOnLoadCode("
-                        ilTableHideFilter['atfil_$id'] = true;
-                        ilTableHideFilter['tfil_$id'] = true;
-                        ilTableHideFilter['dtfil_$id'] = true;
-                    ");
-                }
+            if (!$this->isFilterVisible() && !$this->getDisableFilterHiding()) {
+                $id = $this->getId();
+                $this->main_tpl->addOnLoadCode("
+                    ilTableHideFilter['atfil_$id'] = true;
+                    ilTableHideFilter['tfil_$id'] = true;
+                    ilTableHideFilter['dtfil_$id'] = true;
+                ");
             }
+            /*
+             * BT 35757: filter has to be initialized after it has a chance to get hidden,
+             * moving this here from ServiceTable.js to avoid timing weirdness with onLoadCode.
+             */
+            $this->main_tpl->addOnLoadCode("ilInitTableFilters()");
         }
     }
 

@@ -183,7 +183,7 @@ class assErrorText extends assQuestion implements ilObjQuestionScoringAdjustable
             $this->setOwner($data["owner"]);
             include_once("./Services/RTE/classes/class.ilRTE.php");
             $this->setQuestion(ilRTE::_replaceMediaObjectImageSrc((string) $data["question_text"], 1));
-            $this->setErrorText($data["errortext"]);
+            $this->setErrorText((string) $data["errortext"]);
             $this->setTextSize($data["textsize"]);
             $this->setPointsWrong($data["points_wrong"]);
             $this->setEstimatedWorkingTime(substr($data["working_time"], 0, 2), substr($data["working_time"], 3, 2), substr($data["working_time"], 6, 2));
@@ -208,7 +208,7 @@ class assErrorText extends assQuestion implements ilObjQuestionScoringAdjustable
         include_once "./Modules/TestQuestionPool/classes/class.assAnswerErrorText.php";
         if ($result->numRows() > 0) {
             while ($data = $ilDB->fetchAssoc($result)) {
-                array_push($this->errordata, new assAnswerErrorText($data["text_wrong"], $data["text_correct"], $data["points"]));
+                array_push($this->errordata, new assAnswerErrorText((string) $data["text_wrong"], (string) $data["text_correct"], (float) $data["points"]));
             }
         }
 
@@ -353,7 +353,7 @@ class assErrorText extends assQuestion implements ilObjQuestionScoringAdjustable
      * @param boolean $returndetails (deprecated !!)
      * @return integer/array $points/$details (array $details is deprecated !!)
      */
-    public function calculateReachedPoints($active_id, $pass = null, $authorizedSolution = true, $returndetails = false): int
+    public function calculateReachedPoints($active_id, $pass = null, $authorizedSolution = true, $returndetails = false): float
     {
         if ($returndetails) {
             throw new ilTestException('return details not implemented for ' . __METHOD__);
@@ -493,9 +493,9 @@ class assErrorText extends assQuestion implements ilObjQuestionScoringAdjustable
     /**
      * {@inheritdoc}
      */
-    public function setExportDetailsXLS(ilAssExcelFormatHelper $worksheet, int $startrow, int $active_id, int $pass): int
+    public function setExportDetailsXLS(ilAssExcelFormatHelper $worksheet, int $startrow, int $col, int $active_id, int $pass): int
     {
-        parent::setExportDetailsXLS($worksheet, $startrow, $active_id, $pass);
+        parent::setExportDetailsXLS($worksheet, $startrow, $col, $active_id, $pass);
 
         $i = 0;
         $selections = array();
@@ -508,7 +508,7 @@ class assErrorText extends assQuestion implements ilObjQuestionScoringAdjustable
         }
         $errortext = $this->createErrorTextExport($selections);
         $i++;
-        $worksheet->setCell($startrow + $i, 0, $errortext);
+        $worksheet->setCell($startrow + $i, $col, $errortext);
         $i++;
 
         return $startrow + $i + 1;
@@ -618,7 +618,11 @@ class assErrorText extends assQuestion implements ilObjQuestionScoringAdjustable
         ksort($this->errordata);
     }
 
-    public function createErrorTextOutput($selections = null, $graphicalOutput = false, $correct_solution = false, $use_link_tags = true): string
+    /**
+     * @param int[] $selections
+     * @param string[] $correctness_icons
+     */
+    public function createErrorTextOutput($selections = null, bool $graphicalOutput = false, bool $correct_solution = false, bool $use_link_tags = true, array $correctness_icons = []): string
     {
         $counter = 0;
         $errorcounter = 0;
@@ -731,11 +735,8 @@ class assErrorText extends assQuestion implements ilObjQuestionScoringAdjustable
                         "ilc_qetitem_ErrorTextSelected" : "ilc_qetitem_ErrorTextItem"
                     );
                     if ($graphicalOutput) {
-                        if ($group_selected) {
-                            $img = ' <img src="' . ilUtil::getImagePath("icon_ok.svg") . '" alt="' . $this->lng->txt("answer_is_right") . '" title="' . $this->lng->txt("answer_is_right") . '" /> ';
-                        } else {
-                            $img = ' <img src="' . ilUtil::getImagePath("icon_not_ok.svg") . '" alt="' . $this->lng->txt("answer_is_wrong") . '" title="' . $this->lng->txt("answer_is_wrong") . '" /> ';
-                        }
+                        $correctness = $group_selected ? 'correct' : 'not_correct';
+                        $img = $correctness_icons[$correctness];
                     }
 
                     $item_stack[] = $this->getErrorTokenHtml($item, $class, $use_link_tags) . $img;
@@ -754,15 +755,12 @@ class assErrorText extends assQuestion implements ilObjQuestionScoringAdjustable
 
                 // Errors markes with #, group errors (()) are handled above
                 $class = 'ilc_qetitem_ErrorTextItem';
-                $img = '';
                 if ($this->isTokenSelected($counter, $selections)) {
                     $class = "ilc_qetitem_ErrorTextSelected";
                     if ($graphicalOutput) {
-                        if ($this->getPointsForSelectedPositions(array($counter)) > 0) {
-                            $img = ' <img src="' . ilUtil::getImagePath("icon_ok.svg") . '" alt="' . $this->lng->txt("answer_is_right") . '" title="' . $this->lng->txt("answer_is_right") . '" /> ';
-                        } else {
-                            $img = ' <img src="' . ilUtil::getImagePath("icon_not_ok.svg") . '" alt="' . $this->lng->txt("answer_is_wrong") . '" title="' . $this->lng->txt("answer_is_wrong") . '" /> ';
-                        }
+                        $correctness = $this->getPointsForSelectedPositions(array($counter)) > 0 ?
+                            'correct' : 'not_correct';
+                        $img = $correctness_icons[$correctness];
                     }
                 }
 
@@ -819,8 +817,10 @@ class assErrorText extends assQuestion implements ilObjQuestionScoringAdjustable
                         }
                     } else {
                         $appendComma = "";
-                        if ($item[$posClosingBrackets + 2] == ',') {
-                            $appendComma = ",";
+                        if (isset($item[$posClosingBrackets + 2])) {
+                            if ($item[$posClosingBrackets + 2] == ',') {
+                                $appendComma = ",";
+                            }
                         }
 
                         $item = ilStr::substr($item, 0, $posClosingBrackets) . $appendComma;
@@ -1035,7 +1035,7 @@ class assErrorText extends assQuestion implements ilObjQuestionScoringAdjustable
     */
     public function setErrorText($a_value): void
     {
-        $this->errortext = $this->getHtmlQuestionContentPurifier()->purify($a_value);
+        $this->errortext = $this->getHtmlQuestionContentPurifier()->purify($a_value ?? '');
     }
 
     /**
@@ -1155,7 +1155,8 @@ class assErrorText extends assQuestion implements ilObjQuestionScoringAdjustable
 
                     // #14115 - add position to correct answer
                     foreach ($result["correct_answers"] as $aidx => $answer) {
-                        if ($answer["answertext_wrong"] == $item && !$answer["pos"]) {
+                        if ($answer["answertext_wrong"] == $item
+                            && (!isset($answer['pos']) || !$answer["pos"])) {
                             $result["correct_answers"][$aidx]["pos"] = $this->getId() . "_" . $textidx . "_" . ($idx + 1);
                             break;
                         }

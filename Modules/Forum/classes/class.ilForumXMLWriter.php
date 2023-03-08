@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 /**
  * XML writer class
@@ -80,6 +80,7 @@ class ilForumXMLWriter extends ilXmlWriter
         $this->xmlElement("PresetSubject", null, (int) $row->preset_subject);
         $this->xmlElement("PresetRe", null, (int) $row->add_re_subject);
         $this->xmlElement("NotificationType", null, $row->notification_type);
+        $this->xmlElement("NotificationEvents", null, (int) $row->interested_events);
         $this->xmlElement("ForceNotification", null, (int) $row->admin_force_noti);
         $this->xmlElement("ToggleNotification", null, (int) $row->user_toggle_noti);
         $this->xmlElement("LastPost", null, $row->top_last_post);
@@ -110,6 +111,7 @@ class ilForumXMLWriter extends ilXmlWriter
             $this->xmlElement("UpdateDate", null, $row->thr_date);
             $this->xmlElement("ImportName", null, $row->import_name);
             $this->xmlElement("Sticky", null, (int) $row->is_sticky);
+            $this->xmlElement("OrderSequenceIndex", null, (int) $row->thread_sorting);
             $this->xmlElement("Closed", null, (int) $row->is_closed);
 
             $query = 'SELECT frm_posts.*, frm_posts_tree.*
@@ -183,9 +185,8 @@ class ilForumXMLWriter extends ilXmlWriter
 
                 foreach ($tmp_file_obj->getFilesOfPost() as $file) {
                     $this->xmlStartTag("Attachment");
-
-                    copy($file['path'], $this->target_dir_absolute . "/" . basename($file['path']));
-                    $content = $this->target_dir_relative . "/" . basename($file['path']);
+                    copy($file['path'], $this->target_dir_absolute . "/" . basename($file['name']));
+                    $content = $this->target_dir_relative . "/" . basename($file['name']);
                     $this->xmlElement("Content", null, $content);
 
                     $this->xmlEndTag("Attachment");

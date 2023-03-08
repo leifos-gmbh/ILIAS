@@ -372,7 +372,7 @@ class ilContainer extends ilObject
                     ]
                 );
 
-                $a_xml->xmlData($value);
+                $a_xml->xmlData((string) $value);
                 $a_xml->xmlEndTag("ContainerSetting");
             }
 
@@ -395,6 +395,7 @@ class ilContainer extends ilObject
 
         // translations
         $ot = ilObjectTranslation::getInstance($this->getId());
+        $ot->setDefaultTitle($new_obj->getTitle());     // get possible "- COPY" extension
         $ot->copy($new_obj->getId());
 
         #18624 - copy all sorting settings
@@ -673,7 +674,6 @@ class ilContainer extends ilObject
 
         // TODO: check this
         // get items attached to a session
-        $event_items = ilEventItems::_getItemsOfContainer($this->getRefId());
 
         $classification_filter_active = $this->isClassificationFilterActive();
         foreach ($objects as $key => $object) {
@@ -707,11 +707,6 @@ class ilContainer extends ilObject
             // including event items!
             if (!self::$data_preloaded) {
                 $preloader->addItem($object["obj_id"], $object["type"], $object["child"]);
-            }
-
-            // filter out items that are attached to an event
-            if (!$classification_filter_active && in_array($object['ref_id'], $event_items)) {
-                continue;
             }
 
             // filter side block items

@@ -29,6 +29,9 @@ use ILIAS\ResourceStorage\Resource\Repository\CollectionDBRepository;
 use ILIAS\ResourceStorage\Resource\ResourceBuilder;
 use ILIAS\ResourceStorage\Stakeholder\ResourceStakeholder;
 use ILIAS\Setup\Environment;
+use ILIAS\ResourceStorage\Services;
+use ILIAS\ResourceStorage\Manager\Manager;
+use ILIAS\ResourceStorage\Preloader\StandardRepositoryPreloader;
 
 /**
  * Class ilResourceStorageMigrationHelper
@@ -41,6 +44,7 @@ class ilResourceStorageMigrationHelper
     protected ResourceBuilder $resource_builder;
     protected CollectionBuilder $collection_builder;
     protected ResourceStakeholder $stakeholder;
+    protected Manager $manager;
 
     /**
      * ilResourceStorageMigrationHelper constructor.
@@ -67,6 +71,9 @@ class ilResourceStorageMigrationHelper
         if (!defined("CLIENT_ID")) {
             define("CLIENT_ID", $client_id);
         }
+        if (!defined("ILIAS_DATA_DIR")) {
+            define("ILIAS_DATA_DIR", $data_dir);
+        }
         $this->client_data_dir = $client_data_dir;
         $this->database = $db;
 
@@ -81,6 +88,12 @@ class ilResourceStorageMigrationHelper
         $this->resource_builder = $init->getResourceBuilder($container);
         $this->collection_builder = new CollectionBuilder(
             new CollectionDBRepository($db)
+        );
+
+        $this->manager = new Manager(
+            $this->resource_builder,
+            $this->collection_builder,
+            $container[InitResourceStorage::D_REPOSITORY_PRELOADER]
         );
     }
 
@@ -119,6 +132,11 @@ class ilResourceStorageMigrationHelper
     public function getCollectionBuilder(): CollectionBuilder
     {
         return $this->collection_builder;
+    }
+
+    public function getManager(): Manager
+    {
+        return $this->manager;
     }
 
     public function moveFilesOfPathToCollection(
@@ -164,11 +182,7 @@ class ilResourceStorageMigrationHelper
     ): ?ResourceCollectionIdentification {
         $collection = $this->getCollectionBuilder()->new($collection_owner_user_id);
 
-        $regex_iterator = new RecursiveRegexIterator(
-            new RecursiveDirectoryIterator($absolute_base_path),
-            $pattern,
-            RecursiveRegexIterator::MATCH
-        );
+        $regex_iterator = $this->buildRecursivePatternIterator($absolute_base_path, $pattern);
 
         foreach ($regex_iterator as $file_info) {
             if (!$file_info->isFile()) {
@@ -191,6 +205,33 @@ class ilResourceStorageMigrationHelper
         if ($this->getCollectionBuilder()->store($collection)) {
             return $collection->getIdentification();
         }
+        return null;
+    }
+
+    public function moveFirstFileOfPatternToStorage(
+        string $absolute_base_path,
+        string $pattern,
+        int $resource_owner_id,
+        ?Closure $file_name_callback = null,
+        ?Closure $revision_name_callback = null
+    ): ?ResourceIdentification {
+        $regex_iterator = $this->buildRecursivePatternIterator($absolute_base_path, $pattern);
+
+        foreach ($regex_iterator as $file_info) {
+            if (!$file_info->isFile()) {
+                continue;
+            }
+            $resource_id = $this->movePathToStorage(
+                $file_info->getRealPath(),
+                $resource_owner_id,
+                $file_name_callback,
+                $revision_name_callback
+            );
+            if ($resource_id !== null) {
+                return $resource_id; // stop after first file
+            }
+        }
+
         return null;
     }
 
@@ -232,5 +273,16 @@ class ilResourceStorageMigrationHelper
         $this->resource_builder->store($resource);
 
         return $resource->getIdentification();
+    }
+
+    protected function buildRecursivePatternIterator(
+        string $absolute_base_path,
+        string $pattern = '.*'
+    ): RecursiveRegexIterator {
+        return new RecursiveRegexIterator(
+            new RecursiveDirectoryIterator($absolute_base_path),
+            $pattern,
+            RecursiveRegexIterator::MATCH
+        );
     }
 }

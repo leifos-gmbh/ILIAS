@@ -35,6 +35,8 @@ class assFileUpload extends assQuestion implements ilObjQuestionScoringAdjustabl
     public const DELETE_FILES_TBL_POSTVAR = 'deletefiles';
     // hey.
 
+    protected const HAS_SPECIFIC_FEEDBACK = false;
+
     protected ?int $maxsize = null;
 
     protected $allowedextensions;
@@ -322,7 +324,9 @@ class assFileUpload extends assQuestion implements ilObjQuestionScoringAdjustabl
 
     protected function calculateReachedPointsForSolution($userSolution)
     {
-        if ($this->isCompletionBySubmissionEnabled() && count($userSolution)) {
+        if ($this->isCompletionBySubmissionEnabled() &&
+            is_array($userSolution) &&
+            count($userSolution)) {
             return $this->getPoints();
         }
 
@@ -932,18 +936,18 @@ class assFileUpload extends assQuestion implements ilObjQuestionScoringAdjustabl
     /**
      * {@inheritdoc}
      */
-    public function setExportDetailsXLS(ilAssExcelFormatHelper $worksheet, int $startrow, int $active_id, int $pass): int
+    public function setExportDetailsXLS(ilAssExcelFormatHelper $worksheet, int $startrow, int $col, int $active_id, int $pass): int
     {
-        parent::setExportDetailsXLS($worksheet, $startrow, $active_id, $pass);
+        parent::setExportDetailsXLS($worksheet, $startrow, $col, $active_id, $pass);
 
         $i = 1;
         $solutions = $this->getSolutionValues($active_id, $pass);
         foreach ($solutions as $solution) {
-            $worksheet->setCell($startrow + $i, 0, $this->lng->txt("result"));
-            $worksheet->setBold($worksheet->getColumnCoord(0) . ($startrow + $i));
+            $worksheet->setCell($startrow + $i, $col, $this->lng->txt("result"));
+            $worksheet->setBold($worksheet->getColumnCoord($col) . ($startrow + $i));
             if (strlen($solution["value1"])) {
-                $worksheet->setCell($startrow + $i, 1, $solution["value1"]);
-                $worksheet->setCell($startrow + $i, 2, $solution["value2"]);
+                $worksheet->setCell($startrow + $i, $col + 1, $solution["value1"]);
+                $worksheet->setCell($startrow + $i, $col + 2, $solution["value2"]);
             }
             $i++;
         }

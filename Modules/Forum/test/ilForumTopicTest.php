@@ -48,6 +48,7 @@ class ilForumTopicTest extends TestCase
         $valueAsObject->thr_last_post = '';
         $valueAsObject->visits = 8;
         $valueAsObject->is_sticky = false;
+        $valueAsObject->thread_sorting = 0;
         $valueAsObject->is_closed = false;
         $valueAsObject->frm_obj_id = 8;
         $valueAsObject->avg_rating = 9;
@@ -90,7 +91,6 @@ class ilForumTopicTest extends TestCase
 
             'num_posts' => '',
             'num_unread_posts' => '',
-            'num_new_posts' => '',
             'usr_notification_is_enabled' => '',
         ];
 
@@ -114,7 +114,6 @@ class ilForumTopicTest extends TestCase
 
         $this->assertSame(0, $instance->getNumPosts());
         $this->assertSame(0, $instance->getNumUnreadPosts());
-        $this->assertSame(0, $instance->getNumNewPosts());
         $this->assertFalse($instance->isUserNotificationEnabled());
     }
 
@@ -150,6 +149,7 @@ class ilForumTopicTest extends TestCase
                 'thr_last_post' => ['text', 'ahssh'],
                 'thr_date' => ['timestamp', 'some date'],
                 'thr_update' => ['timestamp', null],
+                'thread_sorting' => ['integer', 0],
                 'import_name' => ['text', 'xaii'],
                 'is_sticky' => ['integer', 1],
                 'is_closed' => ['integer', 1],

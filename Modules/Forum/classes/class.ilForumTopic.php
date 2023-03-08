@@ -36,6 +36,7 @@ class ilForumTopic
     private int $visits = 0;
     private ?string $import_name = null;
     private bool $is_sticky = false;
+    private ?int $order_sequence_index = null;
     private bool $is_closed = false;
     private string $orderField = '';
     private ?ilForumPost $last_post = null;
@@ -45,7 +46,6 @@ class ilForumTopic
     private string $orderDirection = 'DESC';
     protected static array $possibleOrderDirections = ['ASC', 'DESC'];
     private ilObjUser $user;
-    private int $num_new_posts = 0;
     private int $num_unread_posts = 0;
     private bool $user_notification_enabled = false;
 
@@ -87,15 +87,16 @@ class ilForumTopic
         $this->setAverageRating(isset($data['avg_rating']) ? (float) $data['avg_rating'] : 0);
         $this->setThrAuthorId((int) $data['thr_author_id']);
 
+        if (isset($data['thread_sorting'])) {
+            $this->setOrderSequenceIndex((int) $data['thread_sorting']);
+        }
+
         // Aggregated values
         if (isset($data['num_posts'])) {
             $this->setNumPosts((int) $data['num_posts']);
         }
         if (isset($data['num_unread_posts'])) {
             $this->setNumUnreadPosts((int) $data['num_unread_posts']);
-        }
-        if (isset($data['num_new_posts'])) {
-            $this->setNumNewPosts((int) $data['num_new_posts']);
         }
         if (isset($data['usr_notification_is_enabled'])) {
             $this->setUserNotificationEnabled((bool) $data['usr_notification_is_enabled']);
@@ -119,6 +120,7 @@ class ilForumTopic
                     'thr_last_post' => ['text', $this->last_post_string],
                     'thr_date' => ['timestamp', $this->createdate],
                     'thr_update' => ['timestamp', null],
+                    'thread_sorting' => ['integer', (int) $this->order_sequence_index],
                     'import_name' => ['text', $this->import_name],
                     'is_sticky' => ['integer', (int) $this->is_sticky],
                     'is_closed' => ['integer', (int) $this->is_closed],
@@ -197,6 +199,7 @@ class ilForumTopic
                 $this->frm_obj_id = (int) $row->frm_obj_id;
                 $this->average_rating = (float) $row->avg_rating;
                 $this->thr_author_id = (int) $row->thr_author_id;
+                $this->order_sequence_index = (int) $row->thread_sorting;
 
                 return true;
             }
@@ -428,7 +431,7 @@ class ilForumTopic
         $query = '
 			SELECT 			is_author_moderator, pos_author_id, pos_pk, fpt_date, rgt, pos_top_fk, pos_thr_fk, 
 							pos_display_user_id, pos_usr_alias, pos_subject,
-							pos_status, pos_message, pos_date, pos_update,
+							pos_status, pos_message, pos_date, pos_update, rcid,
 							update_user, pos_cens, pos_cens_com, notify,
 							import_name, fpt_pk, parent_pos, lft, depth,
 							(CASE
@@ -538,7 +541,6 @@ class ilForumTopic
 
         $ilAtomQuery = $this->db->buildAtomQuery();
         $ilAtomQuery->addTableLock('frm_user_read');
-        $ilAtomQuery->addTableLock('frm_thread_access');
 
         $ilAtomQuery->addQueryCallable(static function (ilDBInterface $ilDB) use ($new_obj_id, $current_id): void {
             $ilDB->manipulateF(
@@ -549,18 +551,6 @@ class ilForumTopic
 
             $ilDB->manipulateF(
                 'UPDATE frm_user_read SET obj_id = %s WHERE thread_id = %s',
-                ['integer', 'integer'],
-                [$new_obj_id, $current_id]
-            );
-
-            $ilDB->manipulateF(
-                'DELETE FROM frm_thread_access WHERE obj_id = %s AND thread_id = %s',
-                ['integer', 'integer'],
-                [$new_obj_id, $current_id]
-            );
-
-            $ilDB->manipulateF(
-                'UPDATE frm_thread_access SET obj_id = %s WHERE thread_id =%s',
                 ['integer', 'integer'],
                 [$new_obj_id, $current_id]
             );
@@ -978,6 +968,16 @@ class ilForumTopic
         return $this->is_sticky;
     }
 
+    public function getOrderSequenceIndex(): ?int
+    {
+        return $this->order_sequence_index;
+    }
+
+    public function setOrderSequenceIndex(?int $order_sequence_index): void
+    {
+        $this->order_sequence_index = $order_sequence_index;
+    }
+
     public function setClosed(bool $a_closed): void
     {
         $this->is_closed = $a_closed;
@@ -1056,17 +1056,6 @@ class ilForumTopic
     public function getNumPosts(): int
     {
         return $this->num_posts;
-    }
-
-    public function setNumNewPosts(int $num_new_posts): ilForumTopic
-    {
-        $this->num_new_posts = $num_new_posts;
-        return $this;
-    }
-
-    public function getNumNewPosts(): int
-    {
-        return $this->num_new_posts;
     }
 
     public function setNumUnreadPosts(int $num_unread_posts): ilForumTopic

@@ -411,6 +411,13 @@ abstract class ilObjPortfolioBase extends ilObject2
         $copy_id = ilCopyWizardOptions::_allocateCopyId();
         ilAdvancedMDValues::_cloneValues($copy_id, $a_source->getId(), $a_target->getId());
 
+        // copy selection of global optional sets
+        ilAdvancedMDRecord::saveObjRecSelection(
+            $a_target->getId(),
+            'pfpg',
+            ilAdvancedMDRecord::getObjRecSelection($a_source->getId(), 'pfpg')
+        );
+
         // fix metadata record type assignment
         // e.g. if portfolio is created from template
         // we need to change this from prtt to prtf
@@ -420,13 +427,26 @@ abstract class ilObjPortfolioBase extends ilObject2
             "pfpg",
             false
         ) as $rec) {
-            $rec->setAssignedObjectTypes(
-                [[
-                    "obj_type" => ilObject::_lookupType($a_target->getId()),
-                    "sub_type" => "pfpg",
-                    "optional" => 0
-                ]]
-            );
+            /*
+             * BT 35494: reset assignement of the newly cloned local records,
+             * and only append what's needed to global ones
+             */
+            $target_type = ilObject::_lookupType($a_target->getId());
+            if ($rec->getParentObject() == $a_target->getId()) {
+                $rec->setAssignedObjectTypes(
+                    [[
+                         "obj_type" => $target_type,
+                         "sub_type" => "pfpg",
+                         "optional" => 0
+                     ]
+                    ]
+                );
+            } elseif (!$rec->isAssignedObjectType($target_type, 'pfpg')) {
+                $rec->appendAssignedObjectType(
+                    $target_type,
+                    "pfpg"
+                );
+            }
             $rec->update();
         }
 

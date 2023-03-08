@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,11 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
+
+use ILIAS\DI\Container;
+use ILIAS\File\Icon\IconDatabaseRepository;
 
 /**
  * @author       Thibeau Fuhrer <thibeau@sr.solutions>
@@ -52,6 +55,114 @@ class ilFileObjectDatabaseObjective implements ilDatabaseUpdateSteps
                     'length' => '1',
                     'notnull' => '1',
                     'default' => ilObjFile::CLICK_MODE_DOWNLOAD,
+                ]
+            );
+        }
+    }
+
+    /**
+     * adds a new table column called 'downloads' which is used to keep
+     * track of the actual amount of downloads of a file object.
+     * ---
+     * NOTE: the initial value will be the collective sum of read_count
+     * from the database table read_event of the tracking service. This
+     * will not be an accurate representation of the download count, but
+     * provides at least some insight.
+     */
+    public function step_2(): void
+    {
+        $this->abortIfNotPrepared();
+
+        if (!$this->database->tableExists('file_data') ||
+            $this->database->tableColumnExists('file_data', 'downloads')
+        ) {
+            return;
+        }
+
+        $this->database->addTableColumn(
+            'file_data',
+            'downloads',
+            [
+                'type' => 'integer',
+                'length' => 8,
+                'notnull' => false,
+                'default' => 0 // will be adjusted in an update query.
+            ]
+        );
+
+        $this->database->manipulate("
+            UPDATE file_data SET downloads = (
+                SELECT COALESCE(SUM(read_event.read_count), 0) FROM read_event 
+                    WHERE read_event.obj_id = file_data.file_id
+            );
+        ");
+    }
+
+    /**
+     * sets the default visibility of the amount of downloads to visible ('1' or true).
+     */
+    public function step_3(): void
+    {
+        $this->abortIfNotPrepared();
+
+        /** copied from @see ilSetting::set() */
+        $this->database->insert(
+            'settings',
+            [
+                'module' => ['text', ilObjFileAccessSettings::SETTING_MODULE],
+                'keyword' => ['text', ilObjFileAccessSettings::SETTING_SHOW_AMOUNT_OF_DOWNLOADS],
+                'value' => ['text', '1'],
+            ]
+        );
+    }
+
+    /**
+     * adds two new tables to store data concerning suffix-specific icons for files
+     */
+    public function step_4(): void
+    {
+        $this->abortIfNotPrepared();
+        if (!$this->database->tableExists(IconDatabaseRepository::ICON_TABLE_NAME)) {
+            $this->database->createTable(
+                IconDatabaseRepository::ICON_TABLE_NAME,
+                [
+                    IconDatabaseRepository::ICON_RESOURCE_IDENTIFICATION => [
+                        'type' => 'text',
+                        'length' => 64,
+                        'notnull' => true,
+                        'default' => '',
+                    ],
+                    IconDatabaseRepository::ICON_ACTIVE => [
+                        'type' => 'integer',
+                        'length' => 1,
+                        'notnull' => false,
+                        'default' => 0,
+                    ],
+                    IconDatabaseRepository::IS_DEFAULT_ICON => [
+                        'type' => 'integer',
+                        'length' => 1,
+                        'notnull' => false,
+                        'default' => 0,
+                    ]
+                ]
+            );
+        }
+        if (!$this->database->tableExists(IconDatabaseRepository::SUFFIX_TABLE_NAME)) {
+            $this->database->createTable(
+                IconDatabaseRepository::SUFFIX_TABLE_NAME,
+                [
+                    IconDatabaseRepository::ICON_RESOURCE_IDENTIFICATION => [
+                        'type' => 'text',
+                        'length' => 64,
+                        'notnull' => true,
+                        'default' => '',
+                    ],
+                    IconDatabaseRepository::SUFFIX => [
+                        'type' => 'text',
+                        'length' => 32,
+                        'notnull' => false,
+                        'default' => '',
+                    ]
                 ]
             );
         }

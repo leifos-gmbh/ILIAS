@@ -146,7 +146,7 @@ class assOrderingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
                 );
 
                 if (is_null($filename)) {
-                    $this->tpl->setOnScreenMessage('failure', $this->lng->txt('form_upload_error'));
+                    $this->tpl->setOnScreenMessage('failure', $this->lng->txt('file_no_valid_file_type'));
                 } else {
                     $submitted_element = $submitted_element->withContent($filename);
                 }
@@ -172,7 +172,7 @@ class assOrderingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 
         $this->object->setPoints((int)$this->request->raw("points"));
 
-        $use_nested = (bool) (int)$this->request->raw(self::F_USE_NESTED);
+        $use_nested = $this->request->raw(self::F_USE_NESTED) === "1";
         $this->object->setNestingType($use_nested);
     }
 
@@ -181,6 +181,29 @@ class assOrderingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
     {
         $list = $form->getItemByPostVar(assOrderingQuestion::ORDERING_ELEMENT_FORM_FIELD_POSTVAR)
             ->getElementList($this->object->getId());
+
+        $use_nested = $this->request->raw(self::F_USE_NESTED) === "1";
+
+        if ($use_nested) {
+            $existing_list = $this->object->getOrderingElementList();
+
+            $nu = [];
+            $parent_indent = -1;
+            foreach ($list->getElements() as $element) {
+                $element = $list->ensureValidIdentifiers($element);
+
+                if ($existing = $existing_list->getElementByRandomIdentifier($element->getRandomIdentifier())) {
+                    if ($existing->getIndentation() == $parent_indent + 1) {
+                        $element = $element
+                            ->withIndentation($existing->getIndentation());
+                    }
+                }
+                $parent_indent = $element->getIndentation();
+                $nu[] = $element;
+            }
+            $list = $list->withElements($nu);
+        }
+
         return $list;
     }
 
@@ -300,6 +323,8 @@ class assOrderingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
     {
         $this->renderEditForm($this->buildNestingForm());
         $this->addEditSubtabs(self::TAB_EDIT_NESTING);
+        $this->tpl->addCss(ilObjStyleSheet::getContentStylePath(0));
+        $this->tpl->addCss(ilObjStyleSheet::getSyntaxStylePath());
     }
 
 
@@ -339,7 +364,13 @@ class assOrderingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
         $orderingElementInput->setStylingDisabled($this->isRenderPurposePrintPdf());
 
         $this->object->initOrderingElementAuthoringProperties($orderingElementInput);
-        $orderingElementInput->setElementList($this->object->getOrderingElementList());
+
+        $list =  $this->object->getOrderingElementList();
+        foreach ($list->getElements() as $element) {
+            $element = $list->ensureValidIdentifiers($element);
+        }
+
+        $orderingElementInput->setElementList($list);
 
         $form->addItem($orderingElementInput);
         $form->addCommandButton(self::CMD_SAVE_NESTING, $this->lng->txt("save"));
@@ -396,9 +427,10 @@ class assOrderingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
         }
 
         $answers_gui->setInteractionEnabled(false);
-
         $answers_gui->setElementList($solutionOrderingList);
-
+        if ($graphicalOutput) {
+            $answers_gui->setShowCorrectnessIconsEnabled(true);
+        }
         $answers_gui->setCorrectnessTrueElementList(
             $solutionOrderingList->getParityTrueElementList($this->object->getOrderingElementList())
         );
@@ -422,9 +454,6 @@ class assOrderingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
                 $fb = $this->getGenericFeedbackOutput((int) $active_id, $pass);
                 $feedback .= strlen($fb) ? $fb : '';
             }
-
-            $fb = $this->getSpecificFeedbackOutput(array());
-            $feedback .= strlen($fb) ? $fb : '';
 
             if (strlen($feedback)) {
                 $cssClass = (
@@ -549,35 +578,7 @@ class assOrderingQuestionGUI extends assQuestionGUI implements ilGuiQuestionScor
 
     public function getSpecificFeedbackOutput(array $userSolution): string
     {
-        if (!$this->object->feedbackOBJ->specificAnswerFeedbackExists()) {
-            return '';
-        }
-
-        $tpl = new ilTemplate('tpl.il_as_qpl_ordering_elem_fb.html', true, true, 'Modules/TestQuestionPool');
-
-        foreach ($this->object->getOrderingElementList() as $element) {
-            $feedback = $this->object->feedbackOBJ->getSpecificAnswerFeedbackTestPresentation(
-                $this->object->getId(),
-                0,
-                $element->getPosition()
-            );
-
-            if ($this->object->isImageOrderingType()) {
-                $imgSrc = $this->object->getImagePathWeb() . $element->getContent();
-                $tpl->setCurrentBlock('image');
-                $tpl->setVariable('IMG_SRC', $imgSrc);
-            } else {
-                $tpl->setCurrentBlock('text');
-            }
-            $tpl->setVariable('CONTENT', $element->getContent());
-            $tpl->parseCurrentBlock();
-
-            $tpl->setCurrentBlock('element');
-            $tpl->setVariable('FEEDBACK', $feedback);
-            $tpl->parseCurrentBlock();
-        }
-
-        return $this->object->prepareTextareaOutput($tpl->get(), true);
+        return '';
     }
 
     /**

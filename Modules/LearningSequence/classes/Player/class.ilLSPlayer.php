@@ -80,6 +80,11 @@ class ilLSPlayer
     {
         //init state and current item
         $items = $this->ls_items->getItems();
+
+        if (count($items) === 0) {
+            return null;
+        }
+
         $current_item = $this->getCurrentItem($items);
 
         while ($current_item->getAvailability() !== Step::AVAILABLE) {
@@ -128,7 +133,7 @@ class ilLSPlayer
         $this->ls_items->storeState($state, $current_item_ref_id, $next_item->getRefId());
 
         //get proper view
-        if ($next_item !== $current_item) {
+        if ($next_item != $current_item) {
             $view = $this->view_factory->getViewFor($next_item);
             $state = $this->ls_items->getStateFor($next_item, $view);
         }

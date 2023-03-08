@@ -182,6 +182,7 @@ Answer options for each question. Hold Scale Values. Texts are in Question Categ
 * **Privacy**: With Names (0): Names are presented in the Participants and Results view. Without Names/Anonymous (2): Instead of the names the term "Anonymous" is printed out in the Participants and Results view. (`svy_svy.anonymize`, see Property Access Codes)
 * **List of Participants**: This suboption of Privacy/Anonymous is only available if activated in the Administration (List of Participants). This activates an additional Participants list with first-, lastname, login and status (finished) after the end date of the survey. Additionally a minimum number of participants can be set in the Administration (`svy_svy.anon_user_list`).
 * **Access Codes**: Use Access Codes yes/no (`svy_svy.anonymize`: 0: With Names/No Codes, 1: Anonymous/Codes, 2: Anonymous/No Codes, 3: With Names/Codes). If activated, all users have to enter an access code when starting the survey.
+* **Mail Notification**: Send mail each time a participant finishes a survey (`svy_svy.mailnotification`) to the users in `svy_svy.mailaddresses`, using ilSystemNotification->sendMail().
 
 
 [WIP]
@@ -281,7 +282,7 @@ If the constraint is met, show the question.
   * anonymous_id: this is the survey key, aka code, (NOT the field anonymous_id) from table svy_anonymous
   * state: 1 finished, 0 otherwise
   * lastpage:
-  * appr_id:
+  * appr_id: If a survey supports appraisees, this is the user ID of the appraisee. For self evaluations this is the user id of the current user.
 * table svy_times (Access times to survey pages during a run. Back and forward navigation lead to multiple entries per run for a page)
   * finished_fi: survey run -> svy_finished
   * first_question: first question id of page/block -> svy_question (does not seem to point to svy_svy_qst)
@@ -308,7 +309,8 @@ If the constraint is met, show the question.
   * active_fi: survey run -> svy_finished
   * question_fi: question -> svy_question (does not point to svy_svy_qst)
   * value: scale value of corresponding "variable" - 1 (!)
-    (metric question answers have the entered value stored, no "-1" !)
+    * metric question answers have the entered value stored, no "-1" !
+    * metric questions allow to enter floats like 2.5
   * textanswer: Text answer
   * rowvalue: Matrix question row, starting with 0
   
@@ -319,3 +321,8 @@ If the constraint is met, show the question.
 ### Properties
 * **User**: (`svy_invitation.user_id`)
 * **Survey**: (`svy_invitation.survey_id`)
+
+## Competences
+
+### Business Rules
+Results screen lists all profiles of the user. If other competences are used an additional dropdown "All competences of survey".

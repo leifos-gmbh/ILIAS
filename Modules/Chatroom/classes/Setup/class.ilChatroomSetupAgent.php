@@ -21,6 +21,8 @@ declare(strict_types=1);
 use ILIAS\Refinery;
 use ILIAS\Setup;
 use ILIAS\UI;
+use ILIAS\Setup\ObjectiveCollection;
+use ILIAS\Chatroom\Setup\UpdateSteps;
 
 class ilChatroomSetupAgent implements Setup\Agent
 {
@@ -50,11 +52,8 @@ class ilChatroomSetupAgent implements Setup\Agent
         'years'
     ];
 
-    protected Refinery\Factory $refinery;
-
-    public function __construct(Refinery\Factory $refinery)
+    public function __construct(protected Refinery\Factory $refinery)
     {
-        $this->refinery = $refinery;
     }
 
     /**
@@ -68,7 +67,7 @@ class ilChatroomSetupAgent implements Setup\Agent
     /**
      * @inheritdoc
      */
-    public function getConfigInput(Setup\Config $config = null): UI\Component\Input\Field\Input
+    public function getConfigInput(Setup\Config $config = null): never
     {
         throw new LogicException("Not yet implemented.");
     }
@@ -236,13 +235,17 @@ class ilChatroomSetupAgent implements Setup\Agent
      */
     public function getUpdateObjective(Setup\Config $config = null): Setup\Objective
     {
+        $objectives = [
+            new ilDatabaseUpdateStepsExecutedObjective(new UpdateSteps())
+        ];
+
         // null would be valid here, because our user might just not have passed
         // one during update.
-        if ($config === null || $config instanceof Setup\NullConfig) {
-            return new Setup\Objective\NullObjective();
+        if ($config !== null && !($config instanceof Setup\NullConfig)) {
+            $objectives[] = new ilChatroomServerConfigStoredObjective($config);
         }
 
-        return new ilChatroomServerConfigStoredObjective($config);
+        return new ObjectiveCollection('Update chatroom database and server config', false, ...$objectives);
     }
 
     /**

@@ -16,12 +16,9 @@
  *
  *********************************************************************/
 
-use ILIAS\DI\Container;
 use ILIAS\Filesystem\Stream\Streams;
 use ILIAS\FileUpload\Location;
-use ILIAS\ResourceStorage\Collection\CollectionBuilder;
 use ILIAS\ResourceStorage\Manager\Manager;
-use ILIAS\ResourceStorage\Repositories;
 use ILIAS\ResourceStorage\Resource\ResourceBuilder;
 use ILIAS\ResourceStorage\Lock\LockHandlerilDB;
 use ILIAS\ResourceStorage\Consumer\ConsumerFactory;
@@ -36,7 +33,7 @@ use ILIAS\ResourceStorage\Revision\Repository\RevisionDBRepository;
 use ILIAS\ResourceStorage\Resource\Repository\ResourceDBRepository;
 use ILIAS\ResourceStorage\Stakeholder\Repository\StakeholderDBRepository;
 use ILIAS\ResourceStorage\Preloader\StandardRepositoryPreloader;
-use ILIAS\ResourceStorage\Resource\Repository\CollectionDBRepository;
+use ILIAS\ResourceStorage\Stakeholder\ResourceStakeholder;
 
 class ilFileObjectToStorageMigrationRunner
 {
@@ -53,49 +50,26 @@ class ilFileObjectToStorageMigrationRunner
     protected ilDBInterface $database;
     protected bool $keep_originals = false;
     protected ?int $migrate_to_new_object_id = null;
-    protected ilObjFileStakeholder $stakeholder;
-    protected CollectionBuilder $collection_builder;
+    protected ResourceStakeholder $stakeholder;
 
-    /**
-     * ilFileObjectToStorageMigration constructor.
-     * @param Filesystem    $file_system
-     * @param ilDBInterface $database
-     */
     public function __construct(
         Filesystem $file_system,
-        ilDBInterface $database,
-        string $log_file_path,
-        string $storage_base_path
+        ilResourceStorageMigrationHelper $irss_helper,
+        string $log_file_name
     ) {
         $this->file_system = $file_system;
-        $this->database = $database;
-        $this->migration_log_handle = fopen($log_file_path, 'ab');
+        $this->database = $irss_helper->getDatabase();
 
-        // Build Container
-        $init = new InitResourceStorage();
-        $container = new Container();
-        $container['ilDB'] = $this->database;
-        $init->init($container);
+        $legacy_directory = $irss_helper->getClientDataDir() . '/ilFile/';
+        if (is_dir($legacy_directory)) {
+            $this->migration_log_handle = fopen($legacy_directory . $log_file_name, 'ab');
+        } else {
+            $this->migration_log_handle = false;
+        }
 
-        $storage_handler = new MaxNestingFileSystemStorageHandler($this->file_system, Location::STORAGE, true);
-        $storage_handler_factory = new StorageHandlerFactory([
-            $storage_handler
-        ], $storage_base_path);
-
-        $this->movement_implementation = $storage_handler->movementImplementation();
-
-        $this->resource_builder  = $init->getResourceBuilder($container);
-
-        $this->collection_builder = new CollectionBuilder(
-            $container[InitResourceStorage::D_REPOSITORIES]->getCollectionRepository(),
-        );
-        $this->storage_manager = new Manager(
-            $this->resource_builder,
-            $this->collection_builder,
-            $container[InitResourceStorage::D_REPOSITORY_PRELOADER]
-        );
-        $this->consumer_factory = new ConsumerFactory($storage_handler_factory);
-        $this->stakeholder = new ilObjFileStakeholder();
+        $this->resource_builder = $irss_helper->getResourceBuilder();
+        $this->storage_manager = $irss_helper->getManager();
+        $this->stakeholder = $irss_helper->getStakeholder();
     }
 
     /**
@@ -168,6 +142,9 @@ class ilFileObjectToStorageMigrationRunner
         string $movement_implementation,
         string $aditional_info = null
     ): void {
+        if (!$this->migration_log_handle) {
+            return;
+        }
         fputcsv($this->migration_log_handle, [
             $object_id,
             $old_path,
@@ -194,7 +171,9 @@ class ilFileObjectToStorageMigrationRunner
         );
         $d = $this->database->fetchObject($r);
 
-        if (isset($d->rid) && $d->rid !== '' && ($resource_identification = $this->storage_manager->find($d->rid)) && $resource_identification !== null) {
+        if (isset($d->rid) && $d->rid !== '' && ($resource_identification = $this->storage_manager->find(
+            $d->rid
+        )) && $resource_identification !== null) {
             $resource = $this->resource_builder->get($resource_identification);
         } else {
             $resource = $this->resource_builder->newBlank();

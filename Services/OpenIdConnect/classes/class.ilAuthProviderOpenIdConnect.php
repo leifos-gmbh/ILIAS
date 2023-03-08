@@ -2,19 +2,21 @@
 
 declare(strict_types=1);
 
-/******************************************************************************
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
  *
- * This file is part of ILIAS, a powerful learning management system.
- *
- * ILIAS is licensed with the GPL-3.0, you should have received a copy
- * of said license along with the source code.
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
  *
  * If this is not the case or you just want to try ILIAS, you'll find
  * us at:
- *      https://www.ilias.de
- *      https://github.com/ILIAS-eLearning
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
  *
- *****************************************************************************/
+ *********************************************************************/
 
 use Jumbojett\OpenIDConnectClient;
 
@@ -28,6 +30,7 @@ class ilAuthProviderOpenIdConnect extends ilAuthProvider
     /** @var array $body */
     private $body;
     private ilLogger $logger;
+    private ilLanguage $lng;
 
     public function __construct(ilAuthCredentials $credentials)
     {
@@ -37,6 +40,8 @@ class ilAuthProviderOpenIdConnect extends ilAuthProvider
         $this->logger = $DIC->logger()->auth();
         $this->settings = ilOpenIdConnectSettings::getInstance();
         $this->body = $DIC->http()->request()->getParsedBody();
+        $this->lng = $DIC->language();
+        $this->lng->loadLanguageModule('auth');
     }
 
     public function handleLogout(): void
@@ -114,7 +119,7 @@ class ilAuthProviderOpenIdConnect extends ilAuthProvider
             $this->logger->warning($e->getMessage());
             $this->logger->warning((string) $e->getCode());
             $status->setStatus(ilAuthStatus::STATUS_AUTHENTICATION_FAILED);
-            $status->setTranslatedReason($e->getMessage());
+            $status->setTranslatedReason($this->lng->txt("auth_oidc_failed"));
             return false;
         }
     }
@@ -154,7 +159,7 @@ class ilAuthProviderOpenIdConnect extends ilAuthProvider
                 return $status;
             }
             $sync->setExternalAccount($ext_account);
-            $sync->setInternalAccount($int_account);
+            $sync->setInternalAccount((string) $int_account);
             $sync->updateUser();
 
             $user_id = $sync->getUserId();

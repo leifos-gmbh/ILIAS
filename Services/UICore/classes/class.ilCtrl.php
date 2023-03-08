@@ -211,6 +211,10 @@ class ilCtrl implements ilCtrlInterface
             throw new ilCtrlException("$class_name doesn't implement getHTML().");
         }
 
+        $isolatad_structure = $this->structure;
+        $isolated_context = $this->context;
+        $isolated_object = $this->exec_object;
+
         $this->exec_object = $a_gui_object;
         $this->populateCall($class_name, self::CMD_MODE_HTML);
         $this->context
@@ -221,7 +225,9 @@ class ilCtrl implements ilCtrlInterface
             $a_gui_object->getHTML($a_parameters) :
             $a_gui_object->getHTML();
 
-        $this->context->popCmdClass();
+        $this->structure = $isolatad_structure;
+        $this->context = $isolated_context;
+        $this->exec_object = $isolated_object;
 
         return $html;
     }
@@ -660,6 +666,14 @@ class ilCtrl implements ilCtrlInterface
         }
 
         return $path;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function lookupOriginalClassName(string $a_class): ?string
+    {
+        return $this->structure->getObjNameByName($a_class);
     }
 
     /**

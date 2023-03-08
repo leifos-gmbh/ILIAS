@@ -25,6 +25,8 @@
 */
 class ilMultipleChoiceWizardInputGUI extends ilSingleChoiceWizardInputGUI
 {
+    private string $pending;
+
     public function setValue($a_value): void
     {
         $this->values = [];
@@ -69,7 +71,7 @@ class ilMultipleChoiceWizardInputGUI extends ilSingleChoiceWizardInputGUI
             // check answers
             if (is_array($foundvalues['answer'])) {
                 foreach ($foundvalues['answer'] as $aidx => $answervalue) {
-                    if (((strlen($answervalue)) == 0)  && (!isset($foundvalues['imagename']) || strlen($foundvalues['imagename'][$aidx]) == 0)) {
+                    if (((strlen($answervalue)) == 0)  && (!isset($foundvalues['imagename']) || !isset($foundvalues['imagename'][$aidx]) || strlen($foundvalues['imagename'][$aidx]) == 0)) {
                         $this->setAlert($lng->txt("msg_input_is_required"));
                         return false;
                     }
@@ -363,5 +365,15 @@ class ilMultipleChoiceWizardInputGUI extends ilSingleChoiceWizardInputGUI
         $tpl = $DIC['tpl'];
         $tpl->addJavascript("./Services/Form/js/ServiceFormWizardInput.js");
         $tpl->addJavascript("./Modules/TestQuestionPool/templates/default/multiplechoicewizard.js");
+    }
+
+    public function setPending(string $a_val): void
+    {
+        $this->pending = $a_val;
+    }
+
+    public function getPending(): string
+    {
+        return $this->pending;
     }
 }

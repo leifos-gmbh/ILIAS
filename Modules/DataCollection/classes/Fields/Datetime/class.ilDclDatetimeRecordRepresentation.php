@@ -26,20 +26,32 @@ class ilDclDatetimeRecordRepresentation extends ilDclBaseRecordRepresentation
     /**
      * Outputs html of a certain field
      */
-    public function getHTML(bool $link = true): string
+    public function getHTML(bool $link = true, array $options = []): string
     {
-        global $DIC;
-        $ilUser = $DIC['ilUser'];
-
         $value = $this->getRecordField()->getValue();
-        if ($value == '0000-00-00 00:00:00' or !$value) {
+        if ($value == '0000-00-00 00:00:00' || !$value) {
             return $this->lng->txt('no_date');
         }
 
-        return date(
-            (string) $ilUser->getDateFormat(),
-            strtotime($value)
-        );
+        return $this->formatDate($value, $this->user->getDateFormat());
+    }
+
+    /**
+     * @return bool|string
+     */
+    protected function formatDate(string $value, string $format)
+    {
+        $timestamp = strtotime($value);
+        switch ($format) {
+            case ilCalendarSettings::DATE_FORMAT_DMY:
+                return date("d.m.Y", $timestamp);
+            case ilCalendarSettings::DATE_FORMAT_YMD:
+                return date("Y-m-d", $timestamp);
+            case ilCalendarSettings::DATE_FORMAT_MDY:
+                return date("m/d/Y", $timestamp);
+        }
+
+        return $this->lng->txt('no_date');
     }
 
     /**

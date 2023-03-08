@@ -35,10 +35,16 @@ class ilOrgUnitPositionGUI extends BaseCommands
     private ilCtrl $ctrl;
     private ilGlobalTemplateInterface $tpl;
     private ilLanguage $language;
+    protected \ilOrgUnitPositionDBRepository $positionRepo;
+    protected \ilOrgUnitUserAssignmentDBRepository $assignmentRepo;
 
     public function __construct()
     {
         global $DIC;
+
+        $dic = ilOrgUnitLocalDIC::dic();
+        $this->positionRepo = $dic["repo.Positions"];
+        $this->assignmentRepo = $dic["repo.UserAssignments"];
 
         parent::__construct();
 
@@ -75,7 +81,6 @@ class ilOrgUnitPositionGUI extends BaseCommands
 
     protected function index(): void
     {
-        self::initAuthoritiesRenderer();
         $b = ilLinkButton::getInstance();
         $b->setUrl($this->ctrl->getLinkTarget($this, self::CMD_ADD));
         $b->setCaption('add_position');
@@ -87,13 +92,13 @@ class ilOrgUnitPositionGUI extends BaseCommands
 
     protected function add(): void
     {
-        $form = new ilOrgUnitPositionFormGUI($this, new ilOrgUnitPosition());
+        $form = new ilOrgUnitPositionFormGUI($this, $this->positionRepo->create());
         $this->tpl->setContent($form->getHTML());
     }
 
     protected function create(): void
     {
-        $form = new ilOrgUnitPositionFormGUI($this, new ilOrgUnitPosition());
+        $form = new ilOrgUnitPositionFormGUI($this, $this->positionRepo->create());
         if ($form->saveObject() === true) {
             $this->main_tpl->setOnScreenMessage('success', $this->language->txt('msg_position_created'), true);
             $this->ctrl->redirect($this, self::CMD_INDEX);
@@ -131,18 +136,11 @@ class ilOrgUnitPositionGUI extends BaseCommands
         if ($position->isCorePosition()) {
             $this->cancel();
         }
-        $ilOrgUnitUserAssignmentQueries = ilOrgUnitUserAssignmentQueries::getInstance();
-        $assignments = $ilOrgUnitUserAssignmentQueries->getUserAssignmentsOfPosition($position->getId());
 
-        $employee_position = ilOrgUnitPosition::getCorePosition(ilOrgUnitPosition::CORE_POSITION_EMPLOYEE);
-
+        $employee_position = $this->positionRepo->getSingle(ilOrgUnitPosition::CORE_POSITION_EMPLOYEE, 'core_identifier');
+        $assignments = $this->assignmentRepo->getByPosition($position->getId());
         foreach ($assignments as $assignment) {
-            ilOrgUnitUserAssignment::findOrCreateAssignment(
-                $assignment->getUserId(),
-                $employee_position->getId(),
-                $assignment->getOrguId()
-            );
-            $assignment->delete();
+            $this->assignmentRepo->store($assignment->withPositionId($employee_position->getId()));
         }
 
         $this->main_tpl->setOnScreenMessage('success', $this->language->txt('msg_assignment_to_employee_done'), true);
@@ -154,26 +152,24 @@ class ilOrgUnitPositionGUI extends BaseCommands
         if ($position->isCorePosition()) {
             $this->cancel();
         }
-        self::initAuthoritiesRenderer();
         $this->language->loadLanguageModule('orgu');
         $position_string = $this->language->txt("position") . ": ";
         $authority_string = $this->language->txt("authorities") . ": ";
         $user_string = $this->language->txt("user_assignments") . ": ";
-        $ilOrgUnitUserAssignmentQueries = ilOrgUnitUserAssignmentQueries::getInstance();
 
         $confirmation = new ilConfirmationGUI();
         $confirmation->setFormAction($this->ctrl->getFormAction($this));
         $confirmation->setCancel($this->language->txt(self::CMD_CANCEL), self::CMD_CANCEL);
         $confirmation->setConfirm($this->language->txt(self::CMD_DELETE), self::CMD_DELETE);
         $confirmation->setHeaderText($this->language->txt('msg_confirm_deletion'));
-        $confirmation->addItem(self::AR_ID, $position->getId(), $position_string
+        $confirmation->addItem(self::AR_ID, (string) $position->getId(), $position_string
             . $position->getTitle());
         // Authorities
-        $authority_string .= implode(", ", $position->getAuthorities());
+        $authority_string .= implode(", ", $this->getAuthorityDescription($position->getAuthorities()));
         $confirmation->addItem('authorities', true, $authority_string);
 
         // Amount uf user-assignments
-        $userIdsOfPosition = $ilOrgUnitUserAssignmentQueries->getUserIdsOfPosition($position->getId());
+        $userIdsOfPosition = $this->assignmentRepo->getUsersByPosition($position->getId());
         $ilOrgUnitUserQueries = new ilOrgUnitUserQueries();
         $usersOfPosition = $ilOrgUnitUserQueries->findAllUsersByUserIds($userIdsOfPosition);
         $userNames = $ilOrgUnitUserQueries->getAllUserNames($usersOfPosition);
@@ -195,7 +191,7 @@ class ilOrgUnitPositionGUI extends BaseCommands
             $this->assign();
         }
         $position = $this->getPositionFromRequest();
-        $position->deleteWithAllDependencies();
+        $this->positionRepo->delete($position->getId());
         $this->main_tpl->setOnScreenMessage('success', $this->language->txt('msg_deleted'), true);
         $this->ctrl->redirect($this, self::CMD_INDEX);
     }
@@ -205,55 +201,11 @@ class ilOrgUnitPositionGUI extends BaseCommands
         $this->ctrl->redirect($this, self::CMD_INDEX);
     }
 
-    protected function getPositionFromRequest(): ?ActiveRecord
+    protected function getPositionFromRequest(): ?ilOrgUnitPosition
     {
-        return ilOrgUnitPosition::find($this->str(self::AR_ID));
+        return $this->positionRepo->getSingle($this->int(self::AR_ID), 'id');
     }
 
-    public static function initAuthoritiesRenderer(): string
-    {
-        $lang = $GLOBALS['DIC']->language();
-        $lang->loadLanguageModule('orgu');
-        $lang_keys = array(
-            'in',
-            'scope_' . ilOrgUnitAuthority::SCOPE_SAME_ORGU,
-            'scope_' . ilOrgUnitAuthority::SCOPE_SUBSEQUENT_ORGUS,
-            'over_' . ilOrgUnitAuthority::OVER_EVERYONE,
-        );
-        $t = array();
-        foreach ($lang_keys as $key) {
-            $t[$key] = $lang->txt($key);
-        }
-
-        ilOrgUnitAuthority::replaceNameRenderer(function ($id) use ($t) {
-            /**
-             * @var $ilOrgUnitAuthority ilOrgUnitAuthority
-             */
-            $ilOrgUnitAuthority = ilOrgUnitAuthority::find($id);
-
-            switch ($ilOrgUnitAuthority->getScope()) {
-                case ilOrgUnitAuthority::SCOPE_SAME_ORGU:
-                case ilOrgUnitAuthority::SCOPE_ALL_ORGUS:
-                case ilOrgUnitAuthority::SCOPE_SUBSEQUENT_ORGUS:
-                default:
-                    $in_txt = $t["scope_" . $ilOrgUnitAuthority->getScope()];
-                    break;
-            }
-
-            switch ($ilOrgUnitAuthority->getOver()) {
-                case ilOrgUnitAuthority::OVER_EVERYONE:
-                    $over_txt = $t["over_" . $ilOrgUnitAuthority->getOver()];
-                    break;
-                default:
-                    $over_txt = ilOrgUnitPosition::findOrGetInstance($ilOrgUnitAuthority->getOver())
-                                                 ->getTitle();
-                    break;
-            }
-
-            return " " . $t["over"] . " " . $over_txt . " " . $t["in"] . " " . $in_txt;
-        });
-        return "";
-    }
 
     public function addSubTabs(): void
     {
@@ -266,5 +218,45 @@ class ilOrgUnitPositionGUI extends BaseCommands
                                                              ilOrgUnitDefaultPermissionGUI::class,
                                                              self::CMD_INDEX
                                                          ));
+    }
+
+    /**
+     * Returns descriptions for authorities as an array of strings
+     *
+     * @param ilOrgUnitAuthority[] $authorities
+     */
+    private function getAuthorityDescription(array $authorities): array
+    {
+        $lang = $this->language;
+        $lang->loadLanguageModule('orgu');
+        $lang_keys = array(
+            'in',
+            'over',
+            'scope_' . ilOrgUnitAuthority::SCOPE_SAME_ORGU,
+            'scope_' . ilOrgUnitAuthority::SCOPE_SUBSEQUENT_ORGUS,
+            'over_' . ilOrgUnitAuthority::OVER_EVERYONE,
+        );
+        $t = [];
+        foreach ($lang_keys as $key) {
+            $t[$key] = $lang->txt($key);
+        }
+
+        $authority_description =[];
+        foreach ($authorities as $authority) {
+            switch ($authority->getOver()) {
+                case ilOrgUnitAuthority::OVER_EVERYONE:
+                    $over_txt = $t["over_" . $authority->getOver()];
+                    break;
+                default:
+                    $over_txt = $this->positionRepo
+                        ->getSingle($authority->getOver(), 'id')
+                        ->getTitle();
+                    break;
+            }
+
+            $authority_description[] = " " . $t["over"] . " " . $over_txt . " " . $t["in"] . " " . $t["scope_" . $authority->getScope()];
+        }
+
+        return $authority_description;
     }
 }

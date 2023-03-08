@@ -87,7 +87,7 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
     {
         if ($checkonly) {
             // form posting is checked
-            return ($_POST['types'] == 0) ? true : false;
+            return (!isset($_POST['types']) || $_POST['types'] == 0) ? true : false;
         }
 
         $lastChange = $this->object->getLastChange();
@@ -274,37 +274,18 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
             $answer = $this->object->answers[$answer_id];
             if (($active_id > 0) && (!$show_correct_solution)) {
                 if ($graphicalOutput) {
-                    // output of ok/not ok icons for user entered solutions
-                    $ok = false;
+                    $correctness_icon = $this->generateCorrectnessIconsForCorrectness(self::CORRECTNESS_NOT_OK);
+
                     if (strcmp($user_solution, $answer_id) == 0) {
                         if ($answer->getPoints() == $this->object->getMaximumPoints()) {
-                            $ok = true;
-                        } else {
-                            $ok = false;
-                        }
-                        if ($ok) {
-                            $template->setCurrentBlock("icon_ok");
-                            $template->setVariable("ICON_OK", ilUtil::getImagePath("icon_ok.svg"));
-                            $template->setVariable("TEXT_OK", $this->lng->txt("answer_is_right"));
-                            $template->parseCurrentBlock();
-                        } else {
-                            $template->setCurrentBlock("icon_not_ok");
-                            if ($answer->getPoints() > 0) {
-                                $template->setVariable("ICON_NOT_OK", ilUtil::getImagePath("icon_mostly_ok.svg"));
-                                $template->setVariable("TEXT_NOT_OK", $this->lng->txt("answer_is_not_correct_but_positive"));
-                            } else {
-                                $template->setVariable("ICON_NOT_OK", ilUtil::getImagePath("icon_not_ok.svg"));
-                                $template->setVariable("TEXT_NOT_OK", $this->lng->txt("answer_is_wrong"));
-                            }
-                            $template->parseCurrentBlock();
+                            $correctness_icon = $this->generateCorrectnessIconsForCorrectness(self::CORRECTNESS_OK);
+                        } elseif ($answer->getPoints() > 0) {
+                            $correctness_icon = $this->generateCorrectnessIconsForCorrectness(self::CORRECTNESS_MOSTLY_OK);
                         }
                     }
-                    if (strlen($user_solution) == 0) {
-                        $template->setCurrentBlock("icon_not_ok");
-                        $template->setVariable("ICON_NOT_OK", ilUtil::getImagePath("icon_not_ok.svg"));
-                        $template->setVariable("TEXT_NOT_OK", $this->lng->txt("answer_is_wrong"));
-                        $template->parseCurrentBlock();
-                    }
+                    $template->setCurrentBlock("icon_ok");
+                    $template->setVariable("ICON_OK", $correctness_icon);
+                    $template->parseCurrentBlock();
                 }
             }
             if (strlen($answer->getImage())) {
@@ -354,6 +335,9 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
             $template->parseCurrentBlock();
         }
         $questiontext = $this->object->getQuestion();
+        if ($show_feedback && $this->hasInlineFeedback()) {
+            $questiontext .= $this->buildFocusAnchorHtml();
+        }
         if ($show_question_text == true) {
             $template->setVariable("QUESTIONTEXT", $this->object->prepareTextareaOutput($questiontext, true));
         }
@@ -371,10 +355,6 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
         $solutiontemplate->setVariable("SOLUTION_OUTPUT", $questionoutput);
 
         $solutionoutput = $solutiontemplate->get();
-
-        if ($show_feedback && $this->hasInlineFeedback()) {
-            $solutionoutput = $this->buildFocusAnchorHtml() . $solutionoutput;
-        }
 
         if (!$show_question_only) {
             // get page object output
@@ -441,6 +421,9 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
             $template->parseCurrentBlock();
         }
         $questiontext = $this->object->getQuestion();
+        if ($showInlineFeedback && $this->hasInlineFeedback()) {
+            $questiontext .= $this->buildFocusAnchorHtml();
+        }
         $template->setVariable("QUESTIONTEXT", $this->object->prepareTextareaOutput($questiontext, true));
         $questionoutput = $template->get();
         if (!$show_question_only) {
@@ -575,15 +558,15 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
 
     public function writeQuestionSpecificPostData(ilPropertyFormGUI $form): void
     {
-        $this->object->setShuffle($_POST["shuffle"]);
-        $this->object->setMultilineAnswerSetting($_POST["types"]);
+        $this->object->setShuffle($_POST["shuffle"] ?? '0');
+        $this->object->setMultilineAnswerSetting($_POST["types"] ?? '0');
         if (isset($_POST['choice']) && isset($_POST['choice']['imagename']) && is_array($_POST['choice']['imagename']) && $_POST["types"] == 1) {
             $this->object->setIsSingleline(true);
             $this->tpl->setOnScreenMessage('info', $this->lng->txt('info_answer_type_change'), true);
         } else {
             $this->object->setIsSingleline($_POST["types"] == 0 ? true : false);
         }
-        $this->object->setThumbSize((strlen($_POST["thumb_size"])) ? $_POST["thumb_size"] : "");
+        $this->object->setThumbSize((isset($_POST["thumb_size"]) && strlen($_POST["thumb_size"])) ? $_POST["thumb_size"] : "");
     }
 
     public function populateQuestionSpecificFormPart(\ilPropertyFormGUI $form): ilPropertyFormGUI
@@ -844,11 +827,11 @@ class assSingleChoiceGUI extends assQuestionGUI implements ilGuiQuestionScoringA
      */
     public function saveCorrectionsFormProperties(ilPropertyFormGUI $form): void
     {
-        $points = $form->getInput('choice')['points'];
+        $points = $form->getItemByPostVar('choice');
 
         foreach ($this->object->getAnswers() as $index => $answer) {
             /* @var ASS_AnswerMultipleResponseImage $answer */
-            $answer->setPoints((float) $points[$index]);
+            $answer->setPoints((float) $points[$index]->getPoints());
         }
     }
 }

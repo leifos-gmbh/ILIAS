@@ -166,7 +166,7 @@ class ilSurveyEvaluationGUI
             array("evaluationdetails")
         );
 
-        if ($this->hasResultsAccess()) {
+        if ($this->hasResultsAccess() && $this->object->getMode() !== ilObjSurvey::MODE_IND_FEEDB) {
             $ilTabs->addSubTabTarget(
                 "svy_eval_user",
                 $this->ctrl->getLinkTarget($this, "evaluationuser"),
@@ -694,7 +694,11 @@ class ilSurveyEvaluationGUI
         if ($this->object->getSkillService() && $skmg_set->isActivated()) {
             $this->competenceEval();
         } else {
-            $this->evaluation();
+            if ($this->object->getMode() === ilObjSurvey::MODE_IND_FEEDB) {
+                $this->evaluationdetails();
+            } else {
+                $this->evaluation();
+            }
         }
     }
 
@@ -1223,7 +1227,7 @@ class ilSurveyEvaluationGUI
                 $sskill = new ilSurveySkill($survey);
                 $self_levels = array();
                 foreach ($sskill->determineSkillLevelsForAppraisee($appr_id, true) as $sl) {
-                    $self_levels[$sl["base_skill_id"]][$sl["tref_id"]] = $sl["new_level_id"];
+                    $self_levels[$sl["base_skill_id"]][$sl["tref_id"]] = $sl["new_level_id"] ?? 0;
                 }
                 $pskills_gui->setGapAnalysisSelfEvalLevels($self_levels);
             }

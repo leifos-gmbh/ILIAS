@@ -1204,7 +1204,6 @@ assessment#:#showSuggestedSolution#:#Solución sugerida
 assessment#:#show_answer_overview#:#Mostrar resumen de respuesta
 assessment#:#show_detailed_results#:#Mostrar datos detallados del usuario (Marked Pass)
 assessment#:#show_examview_html#:#Mostrar vista del examen del test en la página de entrega.
-assessment#:#show_examview_pdf#:#Muestra la vista del examen automáticamente en un PDF descargable.
 assessment#:#show_pass_overview#:#Mostrar resumen de la ejecución seleccionada
 assessment#:#show_user_answers#:#Mostrar las respuestas marcadas del usuario
 assessment#:#showinfo#:#Mostrar propiedades del Test
@@ -10871,7 +10870,7 @@ mathjax#:#mathjax_polyfill_url#:#Url of a Polyfill###29 07 2022 new variable
 mathjax#:#mathjax_polyfill_url_desc_line1#:#For MathJax 2 not needed###29 07 2022 new variable
 mathjax#:#mathjax_polyfill_url_desc_line2#:#For MathJax 3 e.g. https://polyfill.io/v3/polyfill.min.js?features=es6###29 07 2022 new variable
 mathjax#:#mathjax_script_url#:#URL of the MathJax Script###29 07 2022 new variable
-mathjax#:#mathjax_script_url_desc_line1#:#For MathJax 2 e.g. https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_CHTML###29 07 2022 new variable
+mathjax#:#mathjax_script_url_desc_line1#:#For MathJax 2 e.g. https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML,Safe###29 07 2022 new variable
 mathjax#:#mathjax_script_url_desc_line2#:#For MathJax 3 e.g. https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/tex-mml-chtml.js###29 07 2022 new variable
 mathjax#:#mathjax_server_address#:#Dirección del servidor
 mathjax#:#mathjax_server_address_info#:#P. ej. http://localhost:8003

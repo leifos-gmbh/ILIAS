@@ -23,12 +23,20 @@
 class ilOrgUnitPermissionTableGUI extends ilTable2GUI
 {
     private int $ref_id = 0;
+    protected \ilOrgUnitPositionDBRepository $positionRepo;
+    protected \ilOrgUnitPermissionDBRepository $permissionRepo;
+    protected \ilOrgUnitOperationDBRepository $operationRepo;
 
     public function __construct(object $a_parent_obj, string $a_parent_cmd, int $a_ref_id)
     {
         global $ilCtrl, $tpl;
 
         parent::__construct($a_parent_obj, $a_parent_cmd);
+
+        $dic = \ilOrgUnitLocalDIC::dic();
+        $this->positionRepo = $dic["repo.Positions"];
+        $this->permissionRepo = $dic["repo.Permissions"];
+        $this->operationRepo = $dic["repo.Operations"];
 
         $this->lng->loadLanguageModule('rbac');
         $this->lng->loadLanguageModule("orgu");
@@ -49,7 +57,7 @@ class ilOrgUnitPermissionTableGUI extends ilTable2GUI
         $this->setDisableFilterHiding(true);
         $this->setNoEntriesText($this->lng->txt('msg_no_roles_of_type'));
 
-        $this->addCommandButton(\ILIAS\Modules\OrgUnit\ARHelper\BaseCommands::CMD_UPDATE, $this->lng->txt('save'));
+        $this->addCommandButton(\ilPermissionGUI::CMD_SAVE_POSITIONS_PERMISSIONS, $this->lng->txt('save'));
     }
 
     public function getRefId(): int
@@ -120,13 +128,13 @@ class ilOrgUnitPermissionTableGUI extends ilTable2GUI
 
     public function collectData(): void
     {
-        $positions = ilOrgUnitPosition::get();
+        $positions = $this->positionRepo->getAllPositions();
 
         $this->initColumns($positions);
 
         $perms = [];
 
-        $operations = ilOrgUnitOperationQueries::getOperationsForContextName($this->getObjType());
+        $operations = $this->operationRepo->getOperationsByContextName($this->getObjType());
         $ops_ids = [];
         $from_templates = [];
         foreach ($operations as $op) {
@@ -134,7 +142,7 @@ class ilOrgUnitPermissionTableGUI extends ilTable2GUI
 
             $ops = [];
             foreach ($positions as $position) {
-                $ilOrgUnitPermission = ilOrgUnitPermissionQueries::getSetForRefId(
+                $ilOrgUnitPermission = $this->permissionRepo->getLocalorDefault(
                     $this->getRefId(),
                     $position->getId()
                 );
@@ -219,7 +227,7 @@ class ilOrgUnitPermissionTableGUI extends ilTable2GUI
             $this->tpl->setVariable('HEADER_COMMAND_TXT', $this->dic()
                                                                ->language()
                                                                ->txt('positions_override_operations'));
-            if (ilOrgUnitPermissionQueries::hasLocalSet($this->getRefId(), $position->getId())) {
+            if ($this->permissionRepo->find($this->getRefId(), $position->getId())) {
                 $this->tpl->setVariable('HEADER_CHECKED', "checked='checked'");
             }
 

@@ -50,6 +50,9 @@ class TabsCommandActionHandler implements Server\CommandActionHandler
             case "insert":
                 return $this->insertCommand($body);
 
+            case "update":
+                return $this->updateCommand($body);
+
             default:
                 throw new Exception("Unknown action " . $body["action"]);
         }
@@ -97,4 +100,36 @@ class TabsCommandActionHandler implements Server\CommandActionHandler
 
         return $this->ui_wrapper->sendPage($this->page_gui, $updated);
     }
+
+    protected function updateCommand(array $body): Server\Response
+    {
+        $page = $this->page_gui->getPageObject();
+
+        /** @var \ilPCTabs $tabs */
+        $tabs = $page->getContentObjectForPcId($body["pcid"]);
+
+        $type = $body["type"];
+        $tabs->setTabType($type);
+        $tabs->setTemplate("");
+        switch ($type) {
+            case \ilPCTabs::ACCORDION_VER:
+                $t = explode(":", $body["vaccord_templ"] ?? "");
+                $tabs->setTemplate($t[2] ?? "");
+                $tabs->setBehavior($body["vbehavior"]);
+                $tabs->setHorizontalAlign($body["valign"]);
+                break;
+            case \ilPCTabs::CAROUSEL:
+                $t = explode(":", $body["carousel_templ"]);
+                $tabs->setTemplate($t[2] ?? "");
+                $tabs->setHorizontalAlign($body["calign"]);
+                $tabs->setAutoTime($body["auto_time"]);
+                $tabs->setRandomStart($body["rand_start"]);
+                break;
+        }
+
+        $updated = $page->update();
+
+        return $this->ui_wrapper->sendPage($this->page_gui, $updated);
+    }
+
 }

@@ -67,8 +67,8 @@ class ilPCTabsEditorGUI implements PageComponentEditor
 
         $html = $ui_wrapper->getRenderedForm(
             $form,
-            [["Page", "component.update", $lng->txt("save")],
-             ["Page", "component.cancel", $lng->txt("cancel")]]
+            [["Page", "component.update.back", $lng->txt("save")],
+             ["Page", "component.back", $lng->txt("cancel")]]
         );
 
         return $html;

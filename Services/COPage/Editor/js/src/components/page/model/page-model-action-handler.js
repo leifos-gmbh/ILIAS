@@ -155,6 +155,7 @@ export default class ModelActionHandler {
         break;
 
       case "component.update":
+      case "component.update.back":
         this.model.setState(this.model.STATE_SERVER_CMD);
         break;
 

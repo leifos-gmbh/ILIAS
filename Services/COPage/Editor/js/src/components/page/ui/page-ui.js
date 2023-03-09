@@ -1041,6 +1041,10 @@ export default class PageUI {
               dispatch.dispatch(action.page().editor().componentCancel());
               break;
 
+            case "component.back":
+              dispatch.dispatch(action.page().editor().componentBack());
+              break;
+
             case "component.save":
               const form = form_button.closest("form");
               const form_data = new FormData(form);
@@ -1063,6 +1067,18 @@ export default class PageUI {
                 model.getCurrentPCId(),
                 model.getCurrentPCName(),
                 uform_data
+              ));
+              break;
+
+            case "component.update.back":
+              const uform2 = form_button.closest("form");
+              const uform_data2 = new FormData(uform2);
+
+              //after_pcid, pcid, component, data
+              dispatch.dispatch(action.page().editor().componentUpdateBack(
+                model.getCurrentPCId(),
+                model.getCurrentPCName(),
+                uform_data2
               ));
               break;
           }

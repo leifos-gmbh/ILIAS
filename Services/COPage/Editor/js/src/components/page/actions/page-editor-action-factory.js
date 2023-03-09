@@ -123,6 +123,13 @@ export default class PageEditorActionFactory {
   /**
    * @returns {EditorAction}
    */
+  componentBack() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.COMPONENT_BACK, {});
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
   componentSave(afterPcid, pcid, component, data) {
     return this.editorActionFactory.action(this.COMPONENT, ACTIONS.COMPONENT_SAVE, {
       afterPcid: afterPcid,
@@ -149,6 +156,17 @@ export default class PageEditorActionFactory {
    */
   componentUpdate(pcid, component, data) {
     return this.editorActionFactory.action(this.COMPONENT, ACTIONS.COMPONENT_UPDATE, {
+      pcid: pcid,
+      component: component,
+      data: data
+    });
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  componentUpdateBack(pcid, component, data) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.COMPONENT_UPDATE_BACK, {
       pcid: pcid,
       component: component,
       data: data

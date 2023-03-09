@@ -114,12 +114,21 @@ export default class PageUIActionHandler {
         }
         break;
 
+      case "component.back":
+        const pcid = model.getCurrentPCId();
+        this.ui.pageModifier.redirectToPage(pcid);
+        break;
+
       case "component.save":
         this.sendInsertCommand(params, model);
         break;
 
       case "component.update":
         this.sendUpdateCommand(params);
+        break;
+
+      case "component.update.back":
+        this.sendUpdateBackCommand(params);
         break;
 
       case "component.edit":
@@ -429,6 +438,22 @@ export default class PageUIActionHandler {
     this.client.sendCommand(update_action).then(result => {
       this.ui.handlePageReloadResponse(result);
       dispatch.dispatch(af.page().editor().enablePageEditing());
+    });
+  }
+
+  sendUpdateBackCommand(params) {
+    let update_action;
+    const af = this.actionFactory;
+    const dispatch = this.dispatcher;
+
+    update_action = af.page().command().update(
+      params.pcid,
+      params.component,
+      params.data
+    );
+
+    this.client.sendCommand(update_action).then(result => {
+      this.ui.pageModifier.redirectToPage(params.pcid);
     });
   }
 

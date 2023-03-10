@@ -374,4 +374,91 @@ class ilPCTabs extends ilPageContent
         }
     }
 
+    public function moveUp(string $pc_id): void
+    {
+        $dom = $this->getPage()->getDomDoc();
+        $new_tab = $dom->createElement("Tab");
+        $tab = $this->getPage()->getDomNodeForPCId($pc_id);
+        if (!is_null($tab)) {
+            $prev = $tab->previousSibling;
+            if ($prev) {
+                $tab->parentNode->removeChild($tab);
+                $tab = $prev->parentNode->insertBefore($tab, $prev);
+            }
+        }
+    }
+
+    public function moveDown(string $pc_id): void
+    {
+        $dom = $this->getPage()->getDomDoc();
+        $new_tab = $dom->createElement("Tab");
+        $tab = $this->getPage()->getDomNodeForPCId($pc_id);
+        if (!is_null($tab)) {
+            $next = $tab->nextSibling;
+            if ($next) {
+                $next2 = $next->nextSibling;
+                $tab->parentNode->removeChild($tab);
+                if ($next2) {
+                    $tab = $next2->parentNode->insertBefore($tab, $next2);
+                } else {
+                    $tab = $next->parentNode->appendChild($tab);
+                }
+            }
+        }
+    }
+
+    public function moveTop(string $pc_id): void
+    {
+        $dom = $this->getPage()->getDomDoc();
+        $new_tab = $dom->createElement("Tab");
+        $tab = $this->getPage()->getDomNodeForPCId($pc_id);
+        if (!is_null($tab)) {
+            $prev = $tab->previousSibling;
+            if ($prev) {
+                $tab->parentNode->removeChild($tab);
+                $first = $prev->parentNode->childNodes->item(0);
+                $tab = $prev->parentNode->insertBefore($tab, $first);
+            }
+        }
+    }
+
+    public function moveBottom(string $pc_id): void
+    {
+        $dom = $this->getPage()->getDomDoc();
+        $new_tab = $dom->createElement("Tab");
+        $tab = $this->getPage()->getDomNodeForPCId($pc_id);
+        if (!is_null($tab)) {
+            $next = $tab->nextSibling;
+            if ($next) {
+                $tab->parentNode->removeChild($tab);
+                $tab = $next->parentNode->appendChild($tab);
+            }
+        }
+    }
+
+    public function deletePanel(string $pc_id): void
+    {
+        $dom = $this->getPage()->getDomDoc();
+        $new_tab = $dom->createElement("Tab");
+        $tab = $this->getPage()->getDomNodeForPCId($pc_id);
+        if (!is_null($tab)) {
+            $tab->parentNode->removeChild($tab);
+        }
+    }
+
+    public function getNodeXml(string $pc_id):string
+    {
+        $tab = $this->getPage()->getDomNodeForPCId($pc_id);
+        if (!is_null($tab)) {
+            $xml = "";
+            foreach ($tab->childNodes as $node) {
+                if ($node->nodeName === "PageContent") {
+                    $xml .= $node->ownerDocument->saveXml($node);
+                }
+            }
+            return $xml;
+        }
+        return "";
+    }
+
 }

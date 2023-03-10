@@ -29,6 +29,10 @@ use ILIAS\UI\Component\Input\Field\FormInput;
 class FormAdapterGUI
 {
     protected const DEFAULT_SECTION = "@internal_default_section";
+    /**
+     * @var true
+     */
+    protected bool $in_modal = false;
     protected string $submit_caption = "";
     protected \ilLanguage $lng;
     protected const ASYNC_NONE = 0;
@@ -118,7 +122,19 @@ class FormAdapterGUI
     public function asyncModal(): self
     {
         $this->async_mode = self::ASYNC_MODAL;
+        $this->in_modal = true;
         return $this;
+    }
+
+    public function syncModal(): self
+    {
+        $this->in_modal = true;
+        return $this;
+    }
+
+    public function isSentAsync(): bool
+    {
+        return ($this->async_mode !== self::ASYNC_NONE);
     }
 
     public function getTitle(): string
@@ -539,10 +555,12 @@ class FormAdapterGUI
         } else {
             $html = $this->ui->renderer()->renderAsync($this->getForm()) . "<script>" . $this->getOnLoadCode() . "</script>";
         }
-        switch ($this->async_mode) {
-            case self::ASYNC_MODAL:
-                $html = str_replace("<form ", "<form data-rep-form-async='modal' ", $html);
-                break;
+        if ($this->in_modal) {
+            if ($this->async_mode === self::ASYNC_MODAL) {
+                $html = str_replace("<form ", "<form data-rep-modal-form='async' ", $html);
+            } else {
+                $html = str_replace("<form ", "<form data-rep-modal-form='sync' ", $html);
+            }
         }
         return $html;
     }

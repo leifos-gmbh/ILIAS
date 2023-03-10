@@ -4919,7 +4919,7 @@ common#:#obj_orgu_description#:#Creating and editing organisational structure
 common#:#obj_page#:#Page
 common#:#obj_pdfg#:#PDF Generation
 common#:#obj_pdfg_desc#:#Options for generation PDF documents
-common#:#obj_peac#:#Accordion
+common#:#obj_peac#:#Accordion/Carousel
 common#:#obj_peadl#:#Advanced List
 common#:#obj_peadt#:#Advanced Table
 common#:#obj_pecd#:#Code
@@ -6336,7 +6336,7 @@ content#:#cont_ed_insert_sec#:#Insert Section
 content#:#cont_ed_insert_skills#:#Insert Competences
 content#:#cont_ed_insert_src#:#Insert Code
 content#:#cont_ed_insert_tab#:#Insert Advanced Table
-content#:#cont_ed_insert_tabs#:#Insert Accordion
+content#:#cont_ed_insert_tabs#:#Insert Accordion/Carousel
 content#:#cont_ed_insert_templ#:#Insert Content Template
 content#:#cont_ed_insert_vrfc#:#Insert Certificate
 content#:#cont_ed_item_down#:#Move Item Down
@@ -6769,7 +6769,7 @@ content#:#cont_pc_res#:#Resource
 content#:#cont_pc_sec#:#Section
 content#:#cont_pc_skills#:#Competence
 content#:#cont_pc_tab#:#Advanced Table
-content#:#cont_pc_tabs#:#Accordion
+content#:#cont_pc_tabs#:#Accordion/Carousel
 content#:#cont_pc_vacc#:#Accordion (Vertical)
 content#:#cont_pc_vrfc#:#Certificate
 content#:#cont_permission_object#:#Permission Object
@@ -16992,3 +16992,11 @@ wsp#:#wsp_type_scov#:#Certificate: SCORM
 wsp#:#wsp_type_tstv#:#Certificate: Test
 wsp#:#wsp_type_webr#:#Weblink
 wsp#:#wsp_type_wfld#:#Folder
+content#:#cont_edit_title#:#Change Title
+content#:#cont_tab_add_above#:#Add Panel Above
+content#:#cont_tab_add_below#:#Add Panel Below
+content#:#cont_tab_move_down#:#Move Downwards
+content#:#cont_tab_move_up#:#Move Upwards
+content#:#cont_tab_move_top#:#Move To Top
+content#:#cont_tab_move_bottom#:#Move To Bottom
+content#:#cont_tab_delete#:#Delete Panel

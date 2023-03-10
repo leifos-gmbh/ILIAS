@@ -107,17 +107,21 @@ class ModalAdapterGUI
     {
         if ($this->ctrl->isAsynch()) {
             $this->form = $form->asyncModal();
-            $button = $this->ui->factory()->button()->standard(
-                $this->form->getSubmitCaption(),
-                "#"
-            )->withOnLoadCode(function ($id) {
-                return
-                    "$('#$id').click(function(event) { il.repository.ui.submitModalForm(event); return false;});";
-            });
-            $this->action_buttons[] = $button;
         } else {
-            $this->form = $form;
+            $this->form = $form->syncModal();
         }
+
+        $async = $this->form->isSentAsync()
+            ? "true"
+            : "false";
+        $button = $this->ui->factory()->button()->standard(
+            $this->form->getSubmitCaption(),
+            "#"
+        )->withOnLoadCode(function ($id) use ($async) {
+            return
+                "$('#$id').click(function(event) { il.repository.ui.submitModalForm(event,$async); return false;});";
+        });
+        $this->action_buttons[] = $button;
         $this->ui_content = null;
         return $this;
     }

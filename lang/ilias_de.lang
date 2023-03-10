@@ -4925,7 +4925,7 @@ common#:#obj_orgu_description#:#Anlage und Verwaltung der Organisationsstruktur
 common#:#obj_page#:#Seite
 common#:#obj_pdfg#:#PDF-Erstellung
 common#:#obj_pdfg_desc#:#Administrationseinstellungen für die PDF-Erstellung
-common#:#obj_peac#:#Akkordeon
+common#:#obj_peac#:#Akkordeon/Karussell
 common#:#obj_peadl#:#Erweiterte Liste
 common#:#obj_peadt#:#Erweiterte Tabelle
 common#:#obj_pecd#:#Code
@@ -6342,7 +6342,7 @@ content#:#cont_ed_insert_sec#:#Block einfügen
 content#:#cont_ed_insert_skills#:#Kompetenzen einfügen
 content#:#cont_ed_insert_src#:#Programmcode einfügen
 content#:#cont_ed_insert_tab#:#Erweiterte Tabelle einfügen
-content#:#cont_ed_insert_tabs#:#Akkordeon einfügen
+content#:#cont_ed_insert_tabs#:#Akkordeon/Karussell einfügen
 content#:#cont_ed_insert_templ#:#Inhaltsvorlage einfügen
 content#:#cont_ed_insert_vrfc#:#Zertifikat einfügen
 content#:#cont_ed_item_down#:#Eintrag nach unten verschieben
@@ -6775,7 +6775,7 @@ content#:#cont_pc_res#:#Ressource
 content#:#cont_pc_sec#:#Block
 content#:#cont_pc_skills#:#Kompetenz
 content#:#cont_pc_tab#:#Erweiterte Tabelle
-content#:#cont_pc_tabs#:#Akkordeon
+content#:#cont_pc_tabs#:#Akkordeon/Karussell
 content#:#cont_pc_vacc#:#Akkordeon (vertikal)
 content#:#cont_pc_vrfc#:#Zertifikat
 content#:#cont_permission_object#:#Berechtigungsobjekt
@@ -17002,3 +17002,11 @@ wsp#:#wsp_type_scov#:#Zertifikat: SCORM
 wsp#:#wsp_type_tstv#:#Zertifikat: Test
 wsp#:#wsp_type_webr#:#Weblink
 wsp#:#wsp_type_wfld#:#Ordner
+content#:#cont_edit_title#:#Titel ändern
+content#:#cont_tab_add_above#:#Fach oberhalb einfügen
+content#:#cont_tab_add_below#:#Fach unterhalb einfügen
+content#:#cont_tab_move_down#:#Nach unten schieben
+content#:#cont_tab_move_up#:#Nach oben schieben
+content#:#cont_tab_move_top#:#An den Anfang schieben
+content#:#cont_tab_move_bottom#:#Ans Ende schieben
+content#:#cont_tab_delete#:#Fach löschen

@@ -82,12 +82,12 @@ class TabsCommandActionHandler implements Server\CommandActionHandler
                 $t = explode(":", $body["vaccord_templ"] ?? "");
                 $tabs->setTemplate($t[2] ?? "");
                 $tabs->setBehavior($body["vbehavior"]);
-                $tabs->setHorizontalAlign($body["valign"]);
+                //$tabs->setHorizontalAlign($body["valign"]);
                 break;
             case \ilPCTabs::CAROUSEL:
                 $t = explode(":", $body["carousel_templ"]);
                 $tabs->setTemplate($t[2] ?? "");
-                $tabs->setHorizontalAlign($body["calign"]);
+                //$tabs->setHorizontalAlign($body["calign"]);
                 $tabs->setAutoTime($body["auto_time"]);
                 $tabs->setRandomStart($body["rand_start"]);
                 break;
@@ -116,14 +116,14 @@ class TabsCommandActionHandler implements Server\CommandActionHandler
                 $t = explode(":", $body["vaccord_templ"] ?? "");
                 $tabs->setTemplate($t[2] ?? "");
                 $tabs->setBehavior($body["vbehavior"]);
-                $tabs->setHorizontalAlign($body["valign"]);
+                //$tabs->setHorizontalAlign($body["valign"]);
                 break;
             case \ilPCTabs::CAROUSEL:
                 $t = explode(":", $body["carousel_templ"]);
                 $tabs->setTemplate($t[2] ?? "");
-                $tabs->setHorizontalAlign($body["calign"]);
+                //$tabs->setHorizontalAlign($body["calign"]);
                 $tabs->setAutoTime($body["auto_time"]);
-                $tabs->setRandomStart($body["rand_start"]);
+                $tabs->setRandomStart((bool) ($body["rand_start"] ?? false));
                 break;
         }
 

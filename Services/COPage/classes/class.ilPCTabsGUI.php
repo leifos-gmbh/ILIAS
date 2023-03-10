@@ -22,6 +22,7 @@
  */
 class ilPCTabsGUI extends ilPageContentGUI
 {
+    protected \ILIAS\COPage\Xsl\XslManager $xsl;
     protected ilPropertyFormGUI $form;
     protected ilDBInterface $db;
     protected ilTabsGUI $tabs;
@@ -42,6 +43,7 @@ class ilPCTabsGUI extends ilPageContentGUI
         $this->tabs = $DIC->tabs();
         $this->toolbar = $DIC->toolbar();
         parent::__construct($a_pg_obj, $a_content_obj, $a_hier_id, $a_pc_id);
+        $this->xsl = $DIC->copage()->internal()->domain()->xsl();
     }
 
     public function executeCommand(): void
@@ -101,6 +103,7 @@ class ilPCTabsGUI extends ilPageContentGUI
 
         // edit form
         $this->form = new ilPropertyFormGUI();
+        $this->form->setShowTopButtons(false);
         $this->form->setFormAction($ilCtrl->getFormAction($this));
         if ($a_mode != "edit") {
             $this->form->setTitle($lng->txt("cont_ed_insert_tabs"));
@@ -230,6 +233,7 @@ class ilPCTabsGUI extends ilPageContentGUI
 
 
         // alignment
+        /*
         $align_opts = array("Left" => $lng->txt("cont_left"),
             "Right" => $lng->txt("cont_right"), "Center" => $lng->txt("cont_center"),
             "LeftFloat" => $lng->txt("cont_left_float"),
@@ -242,7 +246,7 @@ class ilPCTabsGUI extends ilPageContentGUI
         $align = new ilSelectInputGUI($this->lng->txt("cont_align"), "calign");
         $align->setOptions($align_opts);
         $align->setValue("Center");
-        $op3->addSubItem($align);
+        $op3->addSubItem($align);*/
 
         // carousel: time
         $ti = new ilNumberInputGUI($this->lng->txt("cont_auto_time"), "auto_time");
@@ -561,7 +565,7 @@ class ilPCTabsGUI extends ilPageContentGUI
     protected function getCaptionForm(string $caption = "") : \ILIAS\Repository\Form\FormAdapterGUI
     {
         return $this->gui->form([self::class], "saveCaption")
-                          ->text("caption", $this->lng->txt("cont_caption"), "", $caption);
+                          ->text("caption", $this->lng->txt("title"), "", $caption);
     }
 
     protected function getTabPanels() : string
@@ -606,7 +610,7 @@ class ilPCTabsGUI extends ilPageContentGUI
                 );
             }
             $dd = $ui->factory()->dropdown()->standard($dd_items);
-            $content = "Lore Ipsum";
+            $content = $this->getTabContent($cap["pc_id"]);
             $items[] = $ui->factory()->panel()->standard($cap["caption"],
                 $ui->factory()->legacy($content))
                 ->withActions($dd);
@@ -616,7 +620,23 @@ class ilPCTabsGUI extends ilPageContentGUI
         return $ui->renderer()->render($items);
     }
 
-    protected function saveCaption()
+    protected function getTabContent(string $pc_id) : string
+    {
+        /** @var ilPCTabs $tabs */
+        $tabs = $this->content_obj;
+        $xml = $tabs->getNodeXml($pc_id);
+
+        $xml = "<dummy>".$xml.$this->getPage()->getMultimediaXML()."</dummy>";
+
+        $wb_path = ilFileUtils::getWebspaceDir("output")."/";
+        $params = array('mode' => "presentation", 'enlarge_path' => "#",
+                        'fullscreen_link' => "#",
+                        'pg_frame' => "", 'webspace_path' => $wb_path);
+        $output = $this->xsl->process($xml, $params);
+        return $output;
+    }
+
+    protected function saveCaption() : void
     {
         /** @var ilPCTabs $tabs */
         $tabs = $this->content_obj;
@@ -630,7 +650,7 @@ class ilPCTabsGUI extends ilPageContentGUI
         $this->ctrl->redirect($this, "edit");
     }
 
-    protected function addAbove()
+    protected function addAbove() : void
     {
         /** @var ilPCTabs $tabs */
         $tabs = $this->content_obj;
@@ -640,12 +660,62 @@ class ilPCTabsGUI extends ilPageContentGUI
         $this->ctrl->redirect($this, "edit");
     }
 
-    protected function addBelow()
+    protected function addBelow() : void
     {
         /** @var ilPCTabs $tabs */
         $tabs = $this->content_obj;
         $pc_id = $this->request->getString("cap_pc_id");
         $tabs->addBelow($pc_id, $this->lng->txt("cont_new_tab"));
+        $this->updated = $this->pg_obj->update();
+        $this->ctrl->redirect($this, "edit");
+    }
+
+    protected function moveUp() : void
+    {
+        /** @var ilPCTabs $tabs */
+        $tabs = $this->content_obj;
+        $pc_id = $this->request->getString("cap_pc_id");
+        $tabs->moveUp($pc_id);
+        $this->updated = $this->pg_obj->update();
+        $this->ctrl->redirect($this, "edit");
+    }
+
+    protected function moveDown() : void
+    {
+        /** @var ilPCTabs $tabs */
+        $tabs = $this->content_obj;
+        $pc_id = $this->request->getString("cap_pc_id");
+        $tabs->moveDown($pc_id);
+        $this->updated = $this->pg_obj->update();
+        $this->ctrl->redirect($this, "edit");
+    }
+
+    protected function moveTop() : void
+    {
+        /** @var ilPCTabs $tabs */
+        $tabs = $this->content_obj;
+        $pc_id = $this->request->getString("cap_pc_id");
+        $tabs->moveTop($pc_id);
+        $this->updated = $this->pg_obj->update();
+        $this->ctrl->redirect($this, "edit");
+    }
+
+    protected function moveBottom() : void
+    {
+        /** @var ilPCTabs $tabs */
+        $tabs = $this->content_obj;
+        $pc_id = $this->request->getString("cap_pc_id");
+        $tabs->moveBottom($pc_id);
+        $this->updated = $this->pg_obj->update();
+        $this->ctrl->redirect($this, "edit");
+    }
+
+    protected function deletePanel() : void
+    {
+        /** @var ilPCTabs $tabs */
+        $tabs = $this->content_obj;
+        $pc_id = $this->request->getString("cap_pc_id");
+        $tabs->deletePanel($pc_id);
         $this->updated = $this->pg_obj->update();
         $this->ctrl->redirect($this, "edit");
     }

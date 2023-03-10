@@ -3512,7 +3512,7 @@
 		<div>
 		<xsl:choose>
 		<xsl:when test="$mode = 'edit' or $mode = 'print' or $compare_mode = 'y'">
-			<xsl:attribute name="class">ilEditVAccordCntr</xsl:attribute>
+			<xsl:attribute name="class">ilc_va_cntr_VAccordCntr</xsl:attribute>
 		</xsl:when>
 		<xsl:when test="@Type = 'VerticalAccordion'">
 			<xsl:attribute name="class">ilc_va_cntr_VAccordCntr</xsl:attribute>
@@ -3665,7 +3665,7 @@
 	<div>
 	<xsl:choose>
 	<xsl:when test="$mode = 'edit' or $mode = 'print' or $compare_mode = 'y'">
-		<xsl:attribute name="class">ilEditVAccordICntr</xsl:attribute>
+		<xsl:attribute name="class">ilc_va_icntr_VAccordICntr</xsl:attribute>
 	</xsl:when>
 	<xsl:when test="../@Type = 'VerticalAccordion'">
 		<xsl:attribute name="class">ilc_va_icntr_VAccordICntr</xsl:attribute>
@@ -3702,7 +3702,7 @@
 		<div tabindex="0" role="button" aria-expanded="false">
 		<xsl:choose>
 		<xsl:when test="$mode = 'edit' or $mode = 'print' or $compare_mode = 'y'">
-			<xsl:attribute name="class">ilEditVAccordIHead</xsl:attribute>
+			<xsl:attribute name="class">ilc_va_ihead_VAccordIHead ilc_va_iheada_VAccordIHeadActive</xsl:attribute>
 		</xsl:when>
 		<xsl:when test="../@Type = 'VerticalAccordion'">
 			<xsl:attribute name="class">ilc_va_ihead_VAccordIHead</xsl:attribute>
@@ -3727,7 +3727,7 @@
 		<div>
 			<xsl:choose>
 			<xsl:when test="$mode = 'edit' or $mode = 'print' or $compare_mode = 'y'">
-				<xsl:attribute name="class">ilEditVAccordIHeadCap</xsl:attribute>
+				<xsl:attribute name="class">ilc_va_ihcap_VAccordIHeadCap</xsl:attribute>
 			</xsl:when>
 			<xsl:when test="../@Type = 'VerticalAccordion'">
 				<xsl:attribute name="class">ilc_va_ihcap_VAccordIHeadCap</xsl:attribute>

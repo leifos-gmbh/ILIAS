@@ -24,6 +24,7 @@
  */
 abstract class ilPageContent
 {
+    protected \ILIAS\COPage\InternalDomainService $domain;
     protected string $pcid;
     protected string $type = "";
     protected ilPageObject $pg_obj;
@@ -42,6 +43,8 @@ abstract class ilPageContent
 
     final public function __construct(ilPageObject $a_pg_obj)
     {
+        global $DIC;
+
         $this->log = ilLoggerFactory::getLogger('copg');
         $this->setPage($a_pg_obj);
         $this->dom = $a_pg_obj->getDom();
@@ -49,6 +52,8 @@ abstract class ilPageContent
         if ($this->getType() == "") {
             die("Error: ilPageContent::init() did not set type");
         }
+
+        $this->domain = $DIC->copage()->internal()->domain();
     }
 
     public function setPage(ilPageObject $a_val): void

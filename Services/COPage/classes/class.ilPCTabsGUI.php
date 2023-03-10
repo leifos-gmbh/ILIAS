@@ -427,17 +427,21 @@ class ilPCTabsGUI extends ilPageContentGUI
 
         $this->initEditor($this->pc_id, "Tabs");
 
+        $this->tabs->setBackTarget("", "");
+
+        /*
         $ilToolbar->addButton(
             $lng->txt("cont_add_tab"),
             $ilCtrl->getLinkTarget($this, "addTab")
-        );
+        );*/
 
-        $this->setTabs();
-        $ilTabs->activateTab("cont_tabs");
+        //$this->setTabs();
+        //$ilTabs->activateTab("cont_tabs");
         /** @var ilPCTabs $tabs */
-        $tabs = $this->content_obj;
-        $table_gui = new ilPCTabsTableGUI($this, "edit", $tabs);
-        $tpl->setContent($table_gui->getHTML().$this->getEditorScriptTag());
+        //$tabs = $this->content_obj;
+        //$table_gui = new ilPCTabsTableGUI($this, "edit", $tabs);
+        //$tpl->setContent($table_gui->getHTML().$this->getEditorScriptTag());
+        $tpl->setContent($this->getTabPanels().$this->getEditorScriptTag());
     }
 
     /**
@@ -553,4 +557,97 @@ class ilPCTabsGUI extends ilPageContentGUI
             get_class($this)
         );
     }
+
+    protected function getCaptionForm(string $caption = "") : \ILIAS\Repository\Form\FormAdapterGUI
+    {
+        return $this->gui->form([self::class], "saveCaption")
+                          ->text("caption", $this->lng->txt("cont_caption"), "", $caption);
+    }
+
+    protected function getTabPanels() : string
+    {
+        /** @var ilPCTabs $tabs */
+        $tabs = $this->content_obj;
+        $items = [];
+        $ui = $this->gui->ui();
+
+        $actions = [
+            $this->lng->txt("cont_tab_add_above") => "addAbove",
+            $this->lng->txt("cont_tab_add_below") => "addBelow",
+            $this->lng->txt("cont_tab_move_up") => "moveUp",
+            $this->lng->txt("cont_tab_move_down") => "moveDown",
+            $this->lng->txt("cont_tab_move_top") => "moveTop",
+            $this->lng->txt("cont_tab_move_bottom") => "moveBottom",
+            $this->lng->txt("cont_tab_delete") => "deletePanel"
+        ];
+
+        $captions = $tabs->getCaptions();
+        $cnt = 1;
+        foreach ($captions as $cap) {
+            $this->ctrl->setParameter($this, "cap_pc_id", $cap["pc_id"]);
+            $form = $this->getCaptionForm($cap["caption"]);
+            $components = $this->gui->modal($this->lng->txt("cont_edit_title"))
+                ->form($form)->getTriggerButtonComponents(
+                    $this->lng->txt("cont_edit_title"),
+                    true
+                );
+            $items[] = $components["modal"];
+            $dd_items = [$components["button"]];
+            foreach ($actions as $lng => $act) {
+                if ($cnt === 1 && in_array($act, ["moveUp", "moveTop"])) {
+                    continue;
+                }
+                if ($cnt === count($captions) && in_array($act, ["moveDown", "moveBottom"])) {
+                    continue;
+                }
+                $dd_items[] = $ui->factory()->link()->standard(
+                    $lng,
+                    $this->ctrl->getLinkTarget($this, $act)
+                );
+            }
+            $dd = $ui->factory()->dropdown()->standard($dd_items);
+            $content = "Lore Ipsum";
+            $items[] = $ui->factory()->panel()->standard($cap["caption"],
+                $ui->factory()->legacy($content))
+                ->withActions($dd);
+            $cnt++;
+        }
+
+        return $ui->renderer()->render($items);
+    }
+
+    protected function saveCaption()
+    {
+        /** @var ilPCTabs $tabs */
+        $tabs = $this->content_obj;
+
+        $form = $this->getCaptionForm();
+        if ($form->isValid()) {
+            $pc_id = $this->request->getString("cap_pc_id");
+            $tabs->saveCaption($pc_id, $form->getData("caption"));
+            $this->updated = $this->pg_obj->update();
+        }
+        $this->ctrl->redirect($this, "edit");
+    }
+
+    protected function addAbove()
+    {
+        /** @var ilPCTabs $tabs */
+        $tabs = $this->content_obj;
+        $pc_id = $this->request->getString("cap_pc_id");
+        $tabs->addAbove($pc_id, $this->lng->txt("cont_new_tab"));
+        $this->updated = $this->pg_obj->update();
+        $this->ctrl->redirect($this, "edit");
+    }
+
+    protected function addBelow()
+    {
+        /** @var ilPCTabs $tabs */
+        $tabs = $this->content_obj;
+        $pc_id = $this->request->getString("cap_pc_id");
+        $tabs->addBelow($pc_id, $this->lng->txt("cont_new_tab"));
+        $this->updated = $this->pg_obj->update();
+        $this->ctrl->redirect($this, "edit");
+    }
+
 }

@@ -304,4 +304,74 @@ class ilPCTabs extends ilPageContent
     {
         return ilAccordionGUI::getLocalCssFiles();
     }
+
+    public function saveCaption(string $pc_id, string $caption): void
+    {
+        $tab_nodes = $this->tabs_node->child_nodes();
+        for ($i = 0; $i < count($tab_nodes); $i++) {
+            if ($tab_nodes[$i]->node_name() == "Tab") {
+                $current_pc_id = $tab_nodes[$i]->get_attribute("PCID");
+                if ($current_pc_id === $pc_id) {
+                    if ($caption !== "") {
+                        ilDOMUtil::setFirstOptionalElement(
+                            $this->dom,
+                            $tab_nodes[$i],
+                            "TabCaption",
+                            array(),
+                            $caption,
+                            array()
+                        );
+                    } else {
+                        ilDOMUtil::deleteAllChildsByName($tab_nodes[$i], array("TabCaption"));
+                    }
+                }
+            }
+        }
+    }
+
+    public function addAbove(string $pc_id, string $caption = ""): void
+    {
+        $dom = $this->getPage()->getDomDoc();
+        $new_tab = $dom->createElement("Tab");
+        $tab = $this->getPage()->getDomNodeForPCId($pc_id);
+        if (!is_null($tab)) {
+            $new_tab = $tab->parentNode->insertBefore($new_tab, $tab);
+            if ($caption !== "") {
+                $dom_util = $this->domain->domUtil();
+                $dom_util->setFirstOptionalElement(
+                    $new_tab,
+                    "TabCaption",
+                    array(),
+                    $caption,
+                    array()
+                );
+            }
+        }
+    }
+
+    public function addBelow(string $pc_id, string $caption = ""): void
+    {
+        $dom = $this->getPage()->getDomDoc();
+        $new_tab = $dom->createElement("Tab");
+        $tab = $this->getPage()->getDomNodeForPCId($pc_id);
+        if (!is_null($tab)) {
+            if ($next = $tab->nextSibling) {
+                $new_tab = $next->parentNode->insertBefore($new_tab, $next);
+            } else {
+                $new_tab = $tab->parentNode->appendChild($new_tab);
+            }
+
+            if ($caption !== "") {
+                $dom_util = $this->domain->domUtil();
+                $dom_util->setFirstOptionalElement(
+                    $new_tab,
+                    "TabCaption",
+                    array(),
+                    $caption,
+                    array()
+                );
+            }
+        }
+    }
+
 }

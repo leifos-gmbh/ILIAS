@@ -28,6 +28,7 @@ use ILIAS\Style;
  */
 class ilPageContentGUI
 {
+    protected \ILIAS\COPage\InternalGUIService $gui;
     protected EditSessionRepository $edit_repo;
     protected string $pc_id = "";
     protected array $chars;
@@ -92,6 +93,7 @@ class ilPageContentGUI
             ->edit();
         $this->sub_command = $this->request->getSubCmd();
         $this->requested_ref_id = $this->request->getRefId();
+        $this->gui = $service->gui();
 
         if ($a_hier_id !== "0") {
             $this->hier_id = $a_hier_id;

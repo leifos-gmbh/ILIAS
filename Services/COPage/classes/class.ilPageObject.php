@@ -820,6 +820,17 @@ abstract class ilPageObject
         return null;
     }
 
+    public function getDomNodeForPCId(string $a_pc_id = "") : ?DOMNode
+    {
+        $xpc = new DOMXPath($this->getDomDoc());
+        $path = "//*[@PCID = '$a_pc_id']";
+        $entries = $xpc->query($path);
+        if ($entries !== false && count($entries) == 1) {
+            return $entries->item(0);
+        }
+        return null;
+    }
+
 
     /**
      * Get content node from dom

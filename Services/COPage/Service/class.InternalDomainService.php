@@ -51,4 +51,9 @@ class InternalDomainService
             $this
         );
     }
+
+    public function domUtil(): Dom\DomUtil
+    {
+        return new Dom\DomUtil();
+    }
 }

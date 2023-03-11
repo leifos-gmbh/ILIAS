@@ -17010,3 +17010,5 @@ content#:#cont_tab_move_up#:#Nach oben schieben
 content#:#cont_tab_move_top#:#An den Anfang schieben
 content#:#cont_tab_move_bottom#:#Ans Ende schieben
 content#:#cont_tab_delete#:#Fach löschen
+content#:#cont_target#:#Ziel
+content#:#cont_permission_handling#:#Rechteabhängige Anzeige

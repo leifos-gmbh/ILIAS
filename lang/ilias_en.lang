@@ -17000,3 +17000,5 @@ content#:#cont_tab_move_up#:#Move Upwards
 content#:#cont_tab_move_top#:#Move To Top
 content#:#cont_tab_move_bottom#:#Move To Bottom
 content#:#cont_tab_delete#:#Delete Panel
+content#:#cont_target#:#Target
+content#:#cont_permission_handling#:#Permission Handling

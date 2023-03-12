@@ -6331,7 +6331,7 @@ content#:#cont_ed_insert_pcqst#:#Insert Question
 content#:#cont_ed_insert_plach#:#Insert Placeholder
 content#:#cont_ed_insert_prof#:#Insert Personal Data
 content#:#cont_ed_insert_qover#:#Insert Question Overview
-content#:#cont_ed_insert_repobj#:#Insert Resource List
+content#:#cont_ed_insert_repobj#:#Insert Item Group
 content#:#cont_ed_insert_sec#:#Insert Section
 content#:#cont_ed_insert_skills#:#Insert Competences
 content#:#cont_ed_insert_src#:#Insert Code
@@ -6507,7 +6507,7 @@ content#:#cont_insert_page_from_clip#:#Paste Pages from Clipboard
 content#:#cont_insert_pagelayout#:#Insert Template Page
 content#:#cont_insert_par#:#Insert Text
 content#:#cont_insert_profile#:#Publish Personal Data
-content#:#cont_insert_resources#:#Insert Resource List
+content#:#cont_insert_resources#:#Insert Item Group
 content#:#cont_insert_section#:#Insert Section
 content#:#cont_insert_skills#:#Insert Competence
 content#:#cont_insert_src#:#Insert source code
@@ -6831,8 +6831,8 @@ content#:#cont_resource#:#Resource
 content#:#cont_resource_size#:#Original Resource Size / No Size Declaration
 content#:#cont_resource_size_info#:#Without size declaration the size can be controlled by the content style. If neither a size is declared nor the content style contains a rule that determines the size, only images will be displayed in their default size.
 content#:#cont_resource_type#:#type
-content#:#cont_resources#:#Resources
-content#:#cont_resources_of_type#:#Resources of Type
+content#:#cont_resources#:#Item Group
+content#:#cont_resources_of_type#:#Item Group by Type
 content#:#cont_restrict_forw_nav#:#Restrict Forward Navigation
 content#:#cont_restrict_forw_nav_info#:#Learners cannot navigate to subsequent pages unless they answered all previous questions correctly.
 content#:#cont_revision#:#Revision
@@ -7059,7 +7059,7 @@ content#:#cont_update_login_page#:#Edit Login Page Element
 content#:#cont_update_map#:#Edit Map
 content#:#cont_update_my_courses#:#Edit My Courses
 content#:#cont_update_profile#:#Edit Published Data
-content#:#cont_update_resources#:#Update Resource List
+content#:#cont_update_resources#:#Update Item Group
 content#:#cont_update_section#:#Update Section
 content#:#cont_update_skills#:#Edit Competence
 content#:#cont_update_verification#:#Edit Certificate
@@ -17002,3 +17002,5 @@ content#:#cont_tab_move_bottom#:#Move To Bottom
 content#:#cont_tab_delete#:#Delete Panel
 content#:#cont_target#:#Target
 content#:#cont_permission_handling#:#Permission Handling
+content#:#cont_pc_repobj#:#Item Group
+content#:#cont_manual_item_group#:#Manually Create Item Group

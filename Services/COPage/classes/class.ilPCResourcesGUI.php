@@ -70,6 +70,15 @@ class ilPCResourcesGUI extends ilPageContentGUI
 
     public function edit(bool $a_insert = false): void
     {
+        $tpl = $this->tpl;
+        $this->displayValidationError();
+        $form = $this->initForm($a_insert);
+        $html = $form->getHTML();
+        $tpl->setContent($html);
+    }
+
+    public function initForm(bool $a_insert = false) : ilPropertyFormGUI
+    {
         $ilCtrl = $this->ctrl;
         $tpl = $this->tpl;
         $lng = $this->lng;
@@ -77,8 +86,6 @@ class ilPCResourcesGUI extends ilPageContentGUI
 
         $op_type = null;
         $op_itemgroup = null;
-
-        $this->displayValidationError();
 
         // edit form
         $form = new ilPropertyFormGUI();
@@ -109,6 +116,7 @@ class ilPCResourcesGUI extends ilPageContentGUI
 
         // radio group for type selection
         $radg = new ilRadioGroupInputGUI($lng->txt("cont_resources"), "res_type");
+        $form->addItem($radg);
         if (!$a_insert && $this->content_obj->getMainType() == "ItemGroup") {
             $radg->setValue("itgr");
         } else {
@@ -119,14 +127,14 @@ class ilPCResourcesGUI extends ilPageContentGUI
         $op_type = new ilRadioOption($lng->txt("cont_resources_of_type"), "by_type", "");
         // all views support typed blocks
         //if ($this->supportsTypeBlocks()) {
-            $radg->addOption($op_type);
         //}
 
         if ($this->supportsItemGroups() && count($item_groups) > 0) {
-            $op_itemgroup = new ilRadioOption($lng->txt("obj_itgr"), "itgr", "");
+            $op_itemgroup = new ilRadioOption($lng->txt("cont_manual_item_group"), "itgr", "");
             $radg->addOption($op_itemgroup);
         }
-        $form->addItem($radg);
+
+        $radg->addOption($op_type);
 
         // type selection
         $type_prop = new ilSelectInputGUI(
@@ -163,6 +171,9 @@ class ilPCResourcesGUI extends ilPageContentGUI
                 ? ""
                 : $this->content_obj->getItemGroupRefId();
             $op_itemgroup->addSubItem($si);
+            if ($a_insert) {
+                $radg->setValue("itgr");
+            }
         }
 
         // learning objectives
@@ -192,8 +203,19 @@ class ilPCResourcesGUI extends ilPageContentGUI
             $form->addCommandButton("update_resources", $lng->txt("save"));
             $form->addCommandButton("cancelUpdate", $lng->txt("cancel"));
         }
-        $html = $form->getHTML();
-        $tpl->setContent($html);
+        return $form;
+    }
+
+    public function initCreationForm(): ilPropertyFormGUI
+    {
+        $form = $this->initForm(true);
+        return $form;
+    }
+
+    public function initEditingForm(): ilPropertyFormGUI
+    {
+        $form = $this->initForm(false);
+        return $form;
     }
 
     /**

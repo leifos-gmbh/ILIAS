@@ -93,14 +93,14 @@ export default class PageUIActionHandler {
         // legacy
         console.log(model.getCurrentPCName());
 
-        if (!["Paragraph", "Grid", "MediaObject", "Section", "Tabs"].includes(model.getCurrentPCName())) {
+        if (!["Paragraph", "Grid", "MediaObject", "Section", "Tabs", "Resources"].includes(model.getCurrentPCName())) {
           let ctype = this.ui.getPCTypeForName(params.cname);
           client.sendForm(actionFactory.page().command().createLegacy(ctype, params.pcid,
             params.hierid, params.pluginName));
           form_sent = true;
         }
         // generic
-        if (["Grid", "MediaObject", "Section", "Tabs"].includes(model.getCurrentPCName())) {
+        if (["Grid", "MediaObject", "Section", "Tabs", "Resources"].includes(model.getCurrentPCName())) {
           this.ui.showGenericCreationForm();
         }
         break;
@@ -132,7 +132,7 @@ export default class PageUIActionHandler {
         break;
 
       case "component.edit":
-        if (["MediaObject", "Section"].includes(model.getCurrentPCName())) {   // generic load editing form
+        if (["MediaObject", "Section", "Resources"].includes(model.getCurrentPCName())) {   // generic load editing form
           this.ui.loadGenericEditingForm(params.cname, params.pcid, params.hierid);
         } else if (!["Paragraph", "PlaceHolder"].includes(model.getCurrentPCName())) {   // legacy underworld
           client.sendForm(actionFactory.page().command().editLegacy(params.cname, params.pcid,

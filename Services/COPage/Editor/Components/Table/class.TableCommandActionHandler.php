@@ -63,6 +63,10 @@ class TableCommandActionHandler implements Server\CommandActionHandler
 
     protected function insertCommand(array $body): Server\Response
     {
+        if (($body["import"] ?? "") === "1") {
+            return $this->importSpreadsheet($body);
+        }
+
         $page = $this->page_gui->getPageObject();
 
         $hier_id = "pg";
@@ -77,6 +81,7 @@ class TableCommandActionHandler implements Server\CommandActionHandler
         $tab->create($page, $hier_id, $pc_id);
         $tab->setLanguage($this->user->getLanguage());
 
+
         $tab->addRows(
             (int) ($body["nr_rows"] ?? 1),
             (int) ($body["nr_cols"] ?? 1)
@@ -85,7 +90,7 @@ class TableCommandActionHandler implements Server\CommandActionHandler
         if ($body["has_row_header"] ?? false) {
             $tab->setHeaderRows(1);
         }
-        $characteristic = ($body["has_row_header"] ?? "");
+        $characteristic = ($body["characteristic"] ?? "");
         if ($characteristic === "") {
             $characteristic = "StandardTable";
         }
@@ -103,6 +108,31 @@ class TableCommandActionHandler implements Server\CommandActionHandler
         return $this->ui_wrapper->sendPage($this->page_gui, $updated);
     }
 
+    protected function importSpreadsheet(array $body): Server\Response
+    {
+        $page = $this->page_gui->getPageObject();
+
+        $hier_id = "pg";
+        $pc_id = "";
+        if (!in_array($body["after_pcid"], ["", "pg"])) {
+            $hier_ids = $page->getHierIdsForPCIds([$body["after_pcid"]]);
+            $hier_id = $hier_ids[$body["after_pcid"]];
+            $pc_id = $body["after_pcid"];
+        }
+
+        $tab = new \ilPCDataTable($page);
+        $tab->create($page, $hier_id, $pc_id);
+        $tab->setLanguage($this->user->getLanguage());
+        $tab->setClass("StandardTable");
+
+        $table_data = $body["import_table"] ?? "";
+
+        $tab->importSpreadsheet($this->user->getLanguage(), trim($table_data));
+
+        $updated = $page->update();
+
+        return $this->ui_wrapper->sendPage($this->page_gui, $updated);
+    }
 
     protected function updateDataCommand(array $body): Server\Response
     {

@@ -47,7 +47,7 @@ class ilPCDataTableEditorGUI implements \ILIAS\COPage\Editor\Components\PageComp
 
         $acc = new ilAccordionGUI();
         $acc->addItem($lng->txt("cont_set_manuall"), $this->getCreationForm($page_gui, $ui_wrapper, $style_id));
-        $acc->addItem($lng->txt("cont_paste_from_spreadsheet"), "b");
+        $acc->addItem($lng->txt("cont_paste_from_spreadsheet"), $this->getImportForm($page_gui, $ui_wrapper, $style_id));
         $acc->setBehaviour(ilAccordionGUI::FIRST_OPEN);
 
         $form = $this->getCreationForm($page_gui, $ui_wrapper, $style_id);
@@ -65,9 +65,35 @@ class ilPCDataTableEditorGUI implements \ILIAS\COPage\Editor\Components\PageComp
         $lng = $this->lng;
 
         $tab_gui = new ilPCDataTableGUI($page_gui->getPageObject(), null, "", "");
+        $tab_gui->setStyleId($style_id);
 
         /** @var ilPropertyFormGUI $form */
         $form = $tab_gui->initCreationForm();
+
+        $html = $ui_wrapper->getRenderedForm(
+            $form,
+            [
+                ["Page", "component.save", $lng->txt("insert")],
+                ["Page", "component.cancel", $lng->txt("cancel")]
+            ]
+        );
+
+        return $html;
+    }
+
+
+    protected function getImportForm(
+        ilPageObjectGUI $page_gui,
+        UIWrapper $ui_wrapper,
+        int $style_id
+    ): string {
+        $lng = $this->lng;
+
+        $tab_gui = new ilPCDataTableGUI($page_gui->getPageObject(), null, "", "");
+        $tab_gui->setStyleId($style_id);
+
+        /** @var ilPropertyFormGUI $form */
+        $form = $tab_gui->initImportForm();
 
         $html = $ui_wrapper->getRenderedForm(
             $form,

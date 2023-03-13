@@ -359,4 +359,32 @@ class ilPCDataTableGUI extends ilPCTableGUI
         return $form;
     }
 
+    public function initImportForm(
+    ): ilPropertyFormGUI {
+
+        $a_seleted_value = "";
+        $ilCtrl = $this->ctrl;
+        $lng = $this->lng;
+        $ilUser = $this->user;
+
+        $form = new ilPropertyFormGUI();
+        $form->setFormAction($ilCtrl->getFormAction($this));
+        $form->setShowTopButtons(false);
+        $form->setTitle($this->getFormTitle("create"));
+
+        $hi = new ilHiddenInputGUI("import");
+        $hi->setValue("1");
+        $form->addItem($hi);
+
+        $import_data = new ilTextAreaInputGUI("", "import_table");
+        $import_data->setRows(8);
+        $import_data->setCols(50);
+        $form->addItem($import_data);
+
+        $form->addCommandButton("create_tab", $lng->txt("save"));
+        $form->addCommandButton("cancelCreate", $lng->txt("cancel"));
+
+        return $form;
+    }
+
 }

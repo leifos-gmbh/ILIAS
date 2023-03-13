@@ -21,7 +21,7 @@ use ILIAS\COPage\Editor\Server\UIWrapper;
 /**
  * @author Alexander Killing <killing@leifos.de>
  */
-class ilPCResourcesEditorGUI implements \ILIAS\COPage\Editor\Components\PageComponentEditor
+class ilPCDataTableEditorGUI implements \ILIAS\COPage\Editor\Components\PageComponentEditor
 {
     protected \ilLanguage $lng;
     protected \ilCtrl $ctrl;
@@ -40,10 +40,20 @@ class ilPCResourcesEditorGUI implements \ILIAS\COPage\Editor\Components\PageComp
         ilPageObjectGUI $page_gui,
         int $style_id
     ): array {
+        global $DIC;
+
+        $lng = $DIC->language();
+        $lng->loadLanguageModule("content");
+
+        $acc = new ilAccordionGUI();
+        $acc->addItem($lng->txt("cont_set_manuall"), $this->getCreationForm($page_gui, $ui_wrapper, $style_id));
+        $acc->addItem($lng->txt("cont_paste_from_spreadsheet"), "b");
+        $acc->setBehaviour(ilAccordionGUI::FIRST_OPEN);
+
         $form = $this->getCreationForm($page_gui, $ui_wrapper, $style_id);
         return [
-            "creation_form" => $form,
-            "icon" => $ui_wrapper->getRenderedIcon("perl")
+            "creation_form" => $acc->getHTML(true),
+            "icon" => $ui_wrapper->getRenderedIcon("pedt")
         ];
     }
 
@@ -54,10 +64,10 @@ class ilPCResourcesEditorGUI implements \ILIAS\COPage\Editor\Components\PageComp
     ): string {
         $lng = $this->lng;
 
-        $res_gui = new ilPCResourcesGUI($page_gui->getPageObject(), null, "", "");
+        $tab_gui = new ilPCDataTableGUI($page_gui->getPageObject(), null, "", "");
 
         /** @var ilPropertyFormGUI $form */
-        $form = $res_gui->initCreationForm();
+        $form = $tab_gui->initCreationForm();
 
         $html = $ui_wrapper->getRenderedForm(
             $form,

@@ -47,6 +47,9 @@ class TableCommandActionHandler implements Server\CommandActionHandler
     public function handle(array $query, array $body): Server\Response
     {
         switch ($body["action"]) {
+            case "insert":
+                return $this->insertCommand($body);
+
             case "update.data":
                 return $this->updateDataCommand($body);
 
@@ -57,6 +60,49 @@ class TableCommandActionHandler implements Server\CommandActionHandler
                 throw new Exception("Unknown action " . $body["action"]);
         }
     }
+
+    protected function insertCommand(array $body): Server\Response
+    {
+        $page = $this->page_gui->getPageObject();
+
+        $hier_id = "pg";
+        $pc_id = "";
+        if (!in_array($body["after_pcid"], ["", "pg"])) {
+            $hier_ids = $page->getHierIdsForPCIds([$body["after_pcid"]]);
+            $hier_id = $hier_ids[$body["after_pcid"]];
+            $pc_id = $body["after_pcid"];
+        }
+
+        $tab = new \ilPCDataTable($page);
+        $tab->create($page, $hier_id, $pc_id);
+        $tab->setLanguage($this->user->getLanguage());
+
+        $tab->addRows(
+            (int) ($body["nr_rows"] ?? 1),
+            (int) ($body["nr_cols"] ?? 1)
+        );
+
+        if ($body["has_row_header"] ?? false) {
+            $tab->setHeaderRows(1);
+        }
+        $characteristic = ($body["has_row_header"] ?? "");
+        if ($characteristic === "") {
+            $characteristic = "StandardTable";
+        }
+        if (strpos($characteristic, ":") > 0) {
+            $t = explode(":", $characteristic);
+            $tab->setTemplate($t[2]);
+            $tab->setClass("");
+        } else {
+            $tab->setClass($characteristic);
+            $tab->setTemplate("");
+        }
+
+        $updated = $page->update();
+
+        return $this->ui_wrapper->sendPage($this->page_gui, $updated);
+    }
+
 
     protected function updateDataCommand(array $body): Server\Response
     {

@@ -129,6 +129,7 @@ class Server
                 $handler = new MediaObject\MediaObjectCommandActionHandler($this->page_gui);
                 break;
             case "Table":
+            case "DataTable":
                 $handler = new Table\TableCommandActionHandler($this->page_gui);
                 break;
             case "Resources":

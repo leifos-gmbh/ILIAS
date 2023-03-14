@@ -25,6 +25,17 @@ export default class TableModel {
   //currentCol = null;
 
   constructor() {
+    this.STATE_DATA = "data";          // data editing
+    this.STATE_TABLE = "table";        // table properties editing
+    this.STATE_CELLS = "cells";        // cells properties editing
+    this.states = [
+      this.STATE_DATA,
+      this.STATE_TABLE,
+      this.STATE_CELLS,
+    ];
+
+    this.state = this.STATE_TABLE;
+    this.selectedCells = new Set(),
     this.debug = true;
     this.currentRow = null;
     this.currentCol = null;
@@ -34,6 +45,23 @@ export default class TableModel {
     if (this.debug) {
       console.log(message);
     }
+  }
+
+  /**
+   * @param {string} state
+   */
+  setState(state) {
+    if (this.states.includes(state)) {
+      this.log("table-model.setState " + state);
+      this.state = state;
+    }
+  }
+
+  /**
+   * @return {string}
+   */
+  getState() {
+    return this.state;
   }
 
 
@@ -60,4 +88,39 @@ export default class TableModel {
   getCurrentColumn() {
     return this.currentCol;
   }
+
+  /**
+   *
+   * @param {string} pcid
+   * @param {string} hierid
+   */
+  toggleSelect(row, col) {
+    const key = row + ":" + col;
+    if (this.model.selectedCells.has(key)) {
+      this.model.selectedCells.delete(key);
+    } else {
+      this.model.selectedCells.add(key);
+    }
+  }
+
+  selectNone() {
+    this.model.selectedCells.clear();
+  }
+
+  /**
+   * Do we have selected cells?
+   * @return {boolean}
+   */
+  hasSelected() {
+    return (this.model.selectedCells.size  > 0);
+  }
+
+  /**
+   * Get all selected cells
+   * @return {Set<string>}
+   */
+  getSelected() {
+    return this.model.selectedCells;
+  }
+
 }

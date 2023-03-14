@@ -174,4 +174,17 @@ export default class TableEditorActionFactory {
     return this.editorActionFactory.action(this.COMPONENT, ACTIONS.AUTO_SAVE);
   }
 
+  /**
+   * @returns {EditorAction}
+   */
+  switchEditTable() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.SWITCH_EDIT_TABLE);
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  switchFormatCells() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.SWITCH_FORMAT_CELLS);
+  }
 }

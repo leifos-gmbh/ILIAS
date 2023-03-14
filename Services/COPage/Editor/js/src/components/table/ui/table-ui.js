@@ -110,6 +110,7 @@ export default class TableUI {
     this.tinyWrapper = paragraphUI.tinyWrapper;
     this.autoSave = paragraphUI.autoSave;
     this.tableModel = tableModel;
+    this.in_data_table = false;
   }
 
   //
@@ -138,6 +139,13 @@ export default class TableUI {
     this.uiModel = uiModel;
     let t = this;
 
+    if (uiModel.initialComponent === "DataTable") {
+      this.in_data_table = true;
+    }
+
+    if (!this.in_data_table) {
+      return;
+    }
 
     // init wrapper in paragraphui
     //this.paragraphUI.initTinyWrapper();
@@ -153,6 +161,7 @@ export default class TableUI {
     });
 
     this.initWrapperCallbacks();
+    this.refreshUIFromModelState(pageModel, this.tableModel);
   }
 
   /**
@@ -248,7 +257,7 @@ export default class TableUI {
   initCellEditing() {
     const dispatch = this.dispatcher;
     const action = this.actionFactory;
-
+console.log("INIT CELL EDITING")
     document.querySelectorAll("[data-copg-ed-type='data-cell']").forEach((el) => {
       const column = el.dataset.column;
       const row = el.dataset.row;
@@ -384,6 +393,65 @@ export default class TableUI {
           newRow,
           newCol
       ));
+    }
+  }
+
+  refreshUIFromModelState(pageModel, table_model) {
+    switch (table_model.getState()) {
+      case table_model.STATE_TABLE:
+        this.showTableProperties();
+        break;
+      case table_model.STATE_CELLS:
+        this.showCellProperties();
+        break;
+    }
+  }
+
+  showTableProperties() {
+    {
+      this.toolSlate.setContent(this.uiModel.components["DataTable"]["top_actions"]);
+      this.initTopActions();
+      this.refreshModeSelector();
+    }
+  }
+
+  showCellProperties() {
+    {
+      this.toolSlate.setContent(this.uiModel.components["DataTable"]["top_actions"]);
+      this.initTopActions();
+      this.refreshModeSelector();
+    }
+  }
+
+  initTopActions() {
+    const dispatch = this.dispatcher;
+    const action = this.actionFactory;
+
+    document.querySelectorAll("[data-copg-ed-type='view-control']").forEach(button => {
+      const act = button.dataset.copgEdAction;
+      button.addEventListener("click", (event) => {
+        switch (act) {
+          case ACTIONS.SWITCH_EDIT_TABLE:
+            dispatch.dispatch(action.table().editor().switchEditTable());
+            break;
+          case ACTIONS.SWITCH_FORMAT_CELLS:
+            dispatch.dispatch(action.table().editor().switchFormatCells());
+            break;
+        }
+      });
+    });
+  }
+
+  refreshModeSelector() {
+    const model = this.tableModel;
+    const table = document.querySelector("[data-copg-ed-type='view-control'][data-copg-ed-action='switch.edit.table']");
+    const cells = document.querySelector("[data-copg-ed-type='view-control'][data-copg-ed-action='switch.format.cells']");
+    table.classList.remove("engaged");
+    cells.classList.remove("engaged");
+    if (model.getState() === model.STATE_TABLE) {
+      table.classList.add("engaged");
+    } else if (model.getState() === model.STATE_CELLS) {
+      cells.classList.add("engaged");
     }
   }
 

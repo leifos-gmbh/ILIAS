@@ -35,7 +35,9 @@ const ACTIONS = {
   ROW_DELETE: "row.delete",
   EDIT_CELL: "edit.cell",    // edit cell
   SAVE_RETURN: "save.return",
-  AUTO_SAVE: "save.auto"
+  AUTO_SAVE: "save.auto",
+  SWITCH_EDIT_TABLE: "switch.edit.table",
+  SWITCH_FORMAT_CELLS: "switch.format.cells",
 
 };
 export default ACTIONS;

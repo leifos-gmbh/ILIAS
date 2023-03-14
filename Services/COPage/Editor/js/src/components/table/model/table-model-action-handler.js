@@ -53,6 +53,15 @@ export default class TableModelActionHandler {
           this.pageModel.setCurrentPageComponent("Table", params.tablePcid, params.tableHierid);
           this.pageModel.setState(this.pageModel.STATE_COMPONENT);
           this.tableModel.setCurrentCell(parseInt(params.row), parseInt(params.column));
+          this.tableModel.setState(this.tableModel.STATE_DATA);
+          break;
+
+        case ACTIONS.SWITCH_EDIT_TABLE:
+          this.tableModel.setState(this.tableModel.STATE_TABLE);
+          break;
+
+        case ACTIONS.SWITCH_FORMAT_CELLS:
+          this.tableModel.setState(this.tableModel.STATE_CELLS);
           break;
       }
     }

@@ -73,7 +73,6 @@ export default class TableUIActionHandler {
    * @param {TableModel} table_model
    */
   handle(action, page_model, table_model) {
-
     const dispatcher = this.dispatcher;
     const actionFactory = this.actionFactory;
     const client = this.client;
@@ -132,6 +131,7 @@ export default class TableUIActionHandler {
           break;
       }
     }
+    this.tableUI.refreshUIFromModelState(page_model, table_model);
   }
 
   sendUpdateDataCommand(pcid, pcmodel, redirectToPage) {

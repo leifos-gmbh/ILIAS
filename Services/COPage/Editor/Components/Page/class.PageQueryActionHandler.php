@@ -29,6 +29,7 @@ use ILIAS\COPage\Editor\Components\MediaObject\MediaObjectStyleSelector;
  */
 class PageQueryActionHandler implements Server\QueryActionHandler
 {
+    protected string $pc_id = "";
     protected \ILIAS\DI\UIServices $ui;
     protected \ilLanguage $lng;
     protected \ilPageObjectGUI $page_gui;
@@ -37,7 +38,7 @@ class PageQueryActionHandler implements Server\QueryActionHandler
     protected \ilCtrl $ctrl;
     protected \ilComponentFactory $component_factory;
 
-    public function __construct(\ilPageObjectGUI $page_gui)
+    public function __construct(\ilPageObjectGUI $page_gui, string $pc_id = "")
     {
         global $DIC;
 
@@ -47,6 +48,7 @@ class PageQueryActionHandler implements Server\QueryActionHandler
         $this->user = $DIC->user();
         $this->ctrl = $DIC->ctrl();
         $this->component_factory = $DIC["component.factory"];
+        $this->pc_id = $pc_id;
 
         $this->ui_wrapper = new Server\UIWrapper($this->ui, $this->lng);
     }
@@ -97,6 +99,17 @@ class PageQueryActionHandler implements Server\QueryActionHandler
         $o->pasting = in_array(\ilEditClipboard::getAction(), ["copy", "cut"]) &&
             count($this->user->getPCClipboardContent()) > 0;
         $o->loaderUrl = \ilUtil::getImagePath("loader.svg");
+
+        if ($this->pc_id !== "") {
+            $type = $this->page_gui->getPageObject()->getContentObjectForPcId($this->pc_id)->getType();
+            $def = \ilCOPagePCDef::getPCDefinitionByType($type);
+            $o->initialComponent = $def["name"];
+            $o->initialPCId = $this->pc_id;
+        } else {
+            $o->initialComponent = "";
+            $o->initialPCId = "";
+        }
+
         return new Server\Response($o);
     }
 

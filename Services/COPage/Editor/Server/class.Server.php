@@ -93,7 +93,7 @@ class Server
 
         switch ($query["component"]) {
             case "Page":
-                $handler = new Page\PageQueryActionHandler($this->page_gui);
+                $handler = new Page\PageQueryActionHandler($this->page_gui, $query["pc_id"] ?? "");
                 break;
         }
 

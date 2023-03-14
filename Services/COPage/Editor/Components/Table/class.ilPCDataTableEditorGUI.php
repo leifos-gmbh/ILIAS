@@ -23,6 +23,7 @@ use ILIAS\COPage\Editor\Server\UIWrapper;
  */
 class ilPCDataTableEditorGUI implements \ILIAS\COPage\Editor\Components\PageComponentEditor
 {
+    protected \ILIAS\DI\UIServices $ui;
     protected \ilLanguage $lng;
     protected \ilCtrl $ctrl;
 
@@ -32,6 +33,7 @@ class ilPCDataTableEditorGUI implements \ILIAS\COPage\Editor\Components\PageComp
 
         $this->lng = $DIC->language();
         $this->ctrl = $DIC->ctrl();
+        $this->ui = $DIC->ui();
     }
 
     public function getEditorElements(
@@ -53,7 +55,8 @@ class ilPCDataTableEditorGUI implements \ILIAS\COPage\Editor\Components\PageComp
         $form = $this->getCreationForm($page_gui, $ui_wrapper, $style_id);
         return [
             "creation_form" => $acc->getHTML(true),
-            "icon" => $ui_wrapper->getRenderedIcon("pedt")
+            "icon" => $ui_wrapper->getRenderedIcon("pedt"),
+            "top_actions" => $this->getTopActions($ui_wrapper, $page_gui)
         ];
     }
 
@@ -133,4 +136,31 @@ class ilPCDataTableEditorGUI implements \ILIAS\COPage\Editor\Components\PageComp
 
         return $html;
     }
+
+    protected function getTopActions(UIWrapper $ui_wrapper, ilPageObjectGUI $page_gui): string
+    {
+        $ui = $this->ui;
+        $ctrl = $this->ctrl;
+
+        $lng = $this->lng;
+        $lng->loadLanguageModule("content");
+        $tpl = new \ilTemplate("tpl.table_top_actions.html", true, true, "Services/COPage/Editor");
+
+        $b = $ui->factory()->button()->standard(
+            $lng->txt("cont_table_editing"),
+            $ctrl->getLinkTarget($page_gui, "edit")
+        );
+        $tpl->setVariable("QUIT_BUTTON", $ui->renderer()->renderAsync($b));
+
+        $html = $ui_wrapper->getRenderedViewControl(
+            [
+                ["Table", "switch.edit.table", $lng->txt("cont_edit_table")],
+                ["Table", "switch.format.cells", $lng->txt("cont_format_cells")]
+            ]
+        );
+        $tpl->setVariable("SWITCH", $html);
+
+        return $tpl->get();
+    }
+
 }

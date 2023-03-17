@@ -58,10 +58,23 @@ export default class TableModelActionHandler {
 
         case ACTIONS.SWITCH_EDIT_TABLE:
           this.tableModel.setState(this.tableModel.STATE_TABLE);
+          this.tableModel.selectNone();
           break;
 
         case ACTIONS.SWITCH_FORMAT_CELLS:
           this.tableModel.setState(this.tableModel.STATE_CELLS);
+          break;
+
+        case ACTIONS.TOGGLE_CELL:
+          this.tableModel.toggleCell(parseInt(params.row), parseInt(params.col), params.expand);
+          break
+
+        case ACTIONS.TOGGLE_ROW:
+          this.tableModel.toggleRow(parseInt(params.nr), params.expand);
+          break;
+
+        case ACTIONS.TOGGLE_COL:
+          this.tableModel.toggleCol(parseInt(params.nr), params.expand);
           break;
       }
     }

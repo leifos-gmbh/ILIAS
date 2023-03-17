@@ -78,8 +78,10 @@ export default class TableUIActionHandler {
     const client = this.client;
     let form_sent = false;
 
+    if (!this.tableUI.in_data_table) {
+      return;
+    }
     const params = action.getParams();
-
     if (action.getComponent() === "Paragraph") {
       this.tableUI.updateModelFromCell();
     }
@@ -129,9 +131,30 @@ export default class TableUIActionHandler {
             false
           );
           break;
+
+        case ACTIONS.SWITCH_EDIT_TABLE:
+          this.tableUI.refreshUIFromModelState(page_model, table_model);
+          this.tableUI.initDropdowns();
+          this.tableUI.markSelectedCells();
+          break;
+
+        case ACTIONS.SWITCH_FORMAT_CELLS:
+          this.tableUI.refreshUIFromModelState(page_model, table_model);
+          this.tableUI.initHeadSelection();
+          break;
       }
     }
-    this.tableUI.refreshUIFromModelState(page_model, table_model);
+    if (action.getComponent() === "DataTable") {
+      switch (action.getType()) {
+        case PAGE_ACTIONS.COMPONENT_FORM_LOADED:
+          this.tableUI.initAfterFormLoaded();
+          break;
+      }
+    }
+
+    if (table_model.getState() === table_model.STATE_CELLS) {
+      this.tableUI.markSelectedCells();
+    }
   }
 
   sendUpdateDataCommand(pcid, pcmodel, redirectToPage) {

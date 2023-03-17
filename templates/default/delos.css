@@ -14730,6 +14730,9 @@ p#copg-auto-save {
 .ilPageAudio button.engaged {
   outline: none;
 }
+.il-copg-cell-selected {
+  outline: #B54F00 2px solid;
+}
 /* Services/Calendar */
 td.even {
   color: #161616;
@@ -20031,4 +20034,3 @@ table.mceToolbar td {
     content: "";
   }
 }
-/*# sourceMappingURL=delos.css.map */

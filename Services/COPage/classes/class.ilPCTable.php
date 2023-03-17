@@ -943,6 +943,16 @@ class ilPCTable extends ilPageContent
             }
         }
 
+        if ($this->getTemplate() != "") {
+            $model->template = $this->getTemplate();
+            $model->characteristic = "";
+        } else {
+            $model->characteristic = $this->getClass();
+            $model->template = "";
+        }
+
+        $model->hasHeaderRows = ($this->getHeaderRows() > 0);
+
         return $model;
     }
 }

@@ -187,4 +187,36 @@ export default class TableEditorActionFactory {
   switchFormatCells() {
     return this.editorActionFactory.action(this.COMPONENT, ACTIONS.SWITCH_FORMAT_CELLS);
   }
+
+  /**
+   * @returns {EditorAction}
+   */
+  toggleRow(nr,expand) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.TOGGLE_ROW,{
+      nr: nr,
+      expand: expand
+    });
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  toggleCol(nr,expand) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.TOGGLE_COL,{
+      nr: nr,
+      expand: expand
+    });
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  toggleCell(col,row,expand) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.TOGGLE_CELL,{
+      col: col,
+      row: row,
+      expand: expand
+    });
+  }
+
 }

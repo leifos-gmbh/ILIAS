@@ -42,7 +42,6 @@ class Init
     ): void {
         $ctrl = $this->ctrl;
         $lng = $this->lng;
-
         $main_tpl->addOnLoadCode("il.copg.editor.init('" .
             ILIAS_HTTP_PATH . "/" . $ctrl->getLinkTargetByClass(["ilPageEditorGUI", "ilPageEditorServerAdapterGUI"], "invokeServer") . "','" .
             $this->ctrl->getFormActionByClass("ilPageEditorGUI")

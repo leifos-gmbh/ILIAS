@@ -111,6 +111,7 @@ export default class TableUI {
     this.autoSave = paragraphUI.autoSave;
     this.tableModel = tableModel;
     this.in_data_table = false;
+    this.head_selection_initialised = false;
   }
 
   //
@@ -141,6 +142,7 @@ export default class TableUI {
 
     if (uiModel.initialComponent === "DataTable") {
       this.in_data_table = true;
+      pageModel.setCurrentPageComponent("DataTable", uiModel.initialPCId, '');
     }
 
     if (!this.in_data_table) {
@@ -171,14 +173,48 @@ export default class TableUI {
     this.initDropdowns();
   }
 
-
   /**
+   * Init add buttons
+   */
+  initHeadSelection() {
+    const action = this.actionFactory;
+    const dispatch = this.dispatcher;
+    const tableModel = this.tableModel;
+    const selector = "[data-copg-ed-type='data-column-head'],[data-copg-ed-type='data-row-head']";
+
+    // init add buttons
+    document.querySelectorAll(selector).forEach(head => {
+      const caption = head.dataset.caption;
+      const nr = parseInt(head.dataset.nr) - 1;
+      const headType = head.dataset.copgEdType;
+      head.innerHTML = caption;
+      if (!this.head_selection_initialised) {
+        head.addEventListener("click", (event) => {
+          if (tableModel.getState() !== tableModel.STATE_CELLS) {
+            return;
+          }
+          event.stopPropagation();
+          event.preventDefault();
+          document.getSelection().removeAllRanges();
+          const expand = (event.shiftKey || event.ctrlKey || event.metaKey);
+          if (headType === "data-row-head") {
+            dispatch.dispatch(action.table().editor().toggleRow(nr, expand));
+          } else {
+            dispatch.dispatch(action.table().editor().toggleCol(nr, expand));
+          }
+        });
+      }
+    });
+    this.head_selection_initialised = true;
+  }
+
+      /**
    * Init add buttons
    */
   initDropdowns() {
     const action = this.actionFactory;
 
-    const selector = "[data-copg-ed-type='data-column-head'],[data-copg-ed-type='data-row-head']"
+    const selector = "[data-copg-ed-type='data-column-head'],[data-copg-ed-type='data-row-head']";
 
     // init add buttons
     document.querySelectorAll(selector).forEach(head => {
@@ -264,14 +300,27 @@ console.log("INIT CELL EDITING")
       const table = el.closest("table");
       const table_pcid = table.dataset.pcid;
       const table_hierid = table.dataset.hierid;
+      const tableModel = this.tableModel;
       console.log(el.dataset);
       el.addEventListener("click", (event) => {
-        dispatch.dispatch(action.table().editor().editCell(
-          table_pcid,
-          table_hierid,
-          row,
-          column
-        ));
+        if (tableModel.getState() !== tableModel.STATE_CELLS) {
+          dispatch.dispatch(action.table().editor().editCell(
+            table_pcid,
+            table_hierid,
+            row,
+            column
+          ));
+        } else {
+          event.stopPropagation();
+          event.preventDefault();
+          document.getSelection().removeAllRanges();
+          const expand = (event.shiftKey || event.ctrlKey || event.metaKey);
+          dispatch.dispatch(action.table().editor().toggleCell(
+            column,
+            row,
+            expand
+          ));
+        }
       });
     });
   }
@@ -397,6 +446,8 @@ console.log("INIT CELL EDITING")
   }
 
   refreshUIFromModelState(pageModel, table_model) {
+    console.log("REFRESH");
+    console.log(table_model.getState());
     switch (table_model.getState()) {
       case table_model.STATE_TABLE:
         this.showTableProperties();
@@ -408,16 +459,29 @@ console.log("INIT CELL EDITING")
   }
 
   showTableProperties() {
-    {
-      this.toolSlate.setContent(this.uiModel.components["DataTable"]["top_actions"]);
-      this.initTopActions();
-      this.refreshModeSelector();
-    }
+    const dispatcher = this.dispatcher;
+    const actionFactory = this.actionFactory;
+
+    dispatcher.dispatch(actionFactory.page().editor().componentForm(
+      "DataTable",
+      this.uiModel.initialPCId,
+      ""));
+  }
+
+  initAfterFormLoaded() {
+    this.initTopActions();
+    this.refreshModeSelector();
   }
 
   showCellProperties() {
     {
-      this.toolSlate.setContent(this.uiModel.components["DataTable"]["top_actions"]);
+      let add = "";
+      if (this.tableModel.hasSelected()) {
+        add = this.uiModel.components["DataTable"]["cell_actions"];
+      } else {
+        add = this.uiModel.components["DataTable"]["cell_info"];
+      }
+      this.toolSlate.setContent(this.uiModel.components["DataTable"]["top_actions"] + add);
       this.initTopActions();
       this.refreshModeSelector();
     }
@@ -453,6 +517,23 @@ console.log("INIT CELL EDITING")
     } else if (model.getState() === model.STATE_CELLS) {
       cells.classList.add("engaged");
     }
+  }
+
+  markSelectedCells() {
+    const selected = this.tableModel.getSelected();
+    console.log("MARK SELECTED");
+    console.log(selected);
+    document.querySelectorAll("[data-copg-ed-type='data-cell']").forEach((el) => {
+      const col = el.dataset.column;
+      const row = el.dataset.row;
+      el.classList.remove("il-copg-cell-selected");
+      if (selected.top <= row &&
+        selected.bottom >= row &&
+        selected.left <= col &&
+        selected.right >= col) {
+        el.classList.add("il-copg-cell-selected");
+      }
+    });
   }
 
 }

@@ -154,6 +154,15 @@ export default class PageEditorActionFactory {
   /**
    * @returns {EditorAction}
    */
+  componentFormLoaded(component) {
+    return this.editorActionFactory.action(component, ACTIONS.COMPONENT_FORM_LOADED, {
+      component: component
+    });
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
   componentUpdate(pcid, component, data) {
     return this.editorActionFactory.action(this.COMPONENT, ACTIONS.COMPONENT_UPDATE, {
       pcid: pcid,

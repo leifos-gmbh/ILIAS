@@ -56,7 +56,9 @@ class ilPCDataTableEditorGUI implements \ILIAS\COPage\Editor\Components\PageComp
         return [
             "creation_form" => $acc->getHTML(true),
             "icon" => $ui_wrapper->getRenderedIcon("pedt"),
-            "top_actions" => $this->getTopActions($ui_wrapper, $page_gui)
+            "top_actions" => $this->getTopActions($ui_wrapper, $page_gui),
+            "cell_info" => $this->getCellInfo(),
+            "cell_actions" => $this->getCellActions()
         ];
     }
 
@@ -78,6 +80,33 @@ class ilPCDataTableEditorGUI implements \ILIAS\COPage\Editor\Components\PageComp
             [
                 ["Page", "component.save", $lng->txt("insert")],
                 ["Page", "component.cancel", $lng->txt("cancel")]
+            ]
+        );
+
+        return $html;
+    }
+
+    protected function getEditForm(
+        ilPageObjectGUI $page_gui,
+        UIWrapper $ui_wrapper,
+        int $style_id,
+        string $pcid
+    ): string {
+        $lng = $this->lng;
+
+        /** @var ilPCDataTable $tab */
+        $tab = $page_gui->getPageObject()->getContentObjectForPcId($pcid);
+        $tab_gui = new ilPCDataTableGUI($page_gui->getPageObject(), $tab, "", $pcid);
+        $tab_gui->setStyleId($style_id);
+
+        /** @var ilPropertyFormGUI $form */
+        $form = $tab_gui->initEditingForm();
+
+        $html = $ui_wrapper->getRenderedForm(
+            $form,
+            [
+                ["Page", "component.update.back", $lng->txt("save")],
+                ["Page", "component.back", $lng->txt("cancel")]
             ]
         );
 
@@ -109,34 +138,6 @@ class ilPCDataTableEditorGUI implements \ILIAS\COPage\Editor\Components\PageComp
         return $html;
     }
 
-    public function getEditComponentForm(
-        UIWrapper $ui_wrapper,
-        string $page_type,
-        \ilPageObjectGUI $page_gui,
-        int $style_id,
-        string $pcid
-    ): string {
-        global $DIC;
-
-        $lng = $DIC->language();
-        $lng->loadLanguageModule("content");
-
-        /** @var ilPCResources $pc_res */
-        $pc_res = $page_gui->getPageObject()->getContentObjectForPcId($pcid);
-        $res_gui = new ilPCResourcesGUI($page_gui->getPageObject(), $pc_res, "", $pcid);
-
-        /** @var ilPropertyFormGUI $form */
-        $form = $res_gui->initEditingForm();
-
-        $html = $ui_wrapper->getRenderedForm(
-            $form,
-            [["Page", "component.update", $lng->txt("save")],
-             ["Page", "component.cancel", $lng->txt("cancel")]]
-        );
-
-        return $html;
-    }
-
     protected function getTopActions(UIWrapper $ui_wrapper, ilPageObjectGUI $page_gui): string
     {
         $ui = $this->ui;
@@ -161,6 +162,27 @@ class ilPCDataTableEditorGUI implements \ILIAS\COPage\Editor\Components\PageComp
         $tpl->setVariable("SWITCH", $html);
 
         return $tpl->get();
+    }
+
+    public function getEditComponentForm(
+        UIWrapper $ui_wrapper,
+        string $page_type,
+        \ilPageObjectGUI $page_gui,
+        int $style_id,
+        string $pcid
+    ) : string {
+        return $this->getTopActions($ui_wrapper, $page_gui) .
+            $this->getEditForm($page_gui, $ui_wrapper, $style_id, $pcid);
+    }
+
+    protected function getCellInfo() : string
+    {
+        return "Cell Info";
+    }
+
+    protected function getCellActions() : string
+    {
+        return "Cell Actions";
     }
 
 }

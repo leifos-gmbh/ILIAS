@@ -56,6 +56,9 @@ class TableCommandActionHandler implements Server\CommandActionHandler
             case "modify.table":
                 return $this->modifyTableCommand($body);
 
+            case "update":
+                return $this->updateCommand($body);
+
             default:
                 throw new Exception("Unknown action " . $body["action"]);
         }
@@ -317,4 +320,24 @@ class TableCommandActionHandler implements Server\CommandActionHandler
         $data->pcModel = $page_gui->getPageObject()->getPCModel();
         return new Server\Response($data);
     }
+
+    protected function updateCommand(array $body): Server\Response
+    {
+        $page = $this->page_gui->getPageObject();
+
+        /** @var \ilPCDataTable $tab */
+        $tab = $page->getContentObjectForPcId($body["pcid"]);
+
+        $header_row = (bool) ($body["has_row_header"] ?? false);
+        if ($tab->getHeaderRows() === 0 && $header_row) {
+            $tab->setHeaderRows(1);
+        }
+        if ($tab->getHeaderRows() > 0 && !$header_row) {
+            $tab->setHeaderRows(0);
+        }
+
+        $updated = $page->update();
+        return $this->ui_wrapper->sendPage($this->page_gui, $updated);
+    }
+
 }

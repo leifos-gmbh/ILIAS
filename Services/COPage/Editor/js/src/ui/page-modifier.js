@@ -185,4 +185,89 @@ export default class PageModifier {
   clearError() {
     this.toolSlate.clearError();
   }
+
+  initFormButtonsAndSettingsLink(model) {
+
+    document.querySelectorAll("#copg-editor-slate-content [data-copg-ed-type='form-button']").forEach(form_button => {
+      const dispatch = this.pageUI.dispatcher;
+      const action = this.pageUI.actionFactory;
+      const act = form_button.dataset.copgEdAction;
+      const cname = form_button.dataset.copgEdComponent;
+      if (cname === "Page") {
+        form_button.addEventListener("click", (event) => {
+          event.preventDefault();
+          switch (act) {
+            case "component.cancel":
+              dispatch.dispatch(action.page().editor().componentCancel());
+              break;
+
+            case "component.back":
+              dispatch.dispatch(action.page().editor().componentBack());
+              break;
+
+            case "component.save":
+              const form = form_button.closest("form");
+              const form_data = new FormData(form);
+
+              //after_pcid, pcid, component, data
+              dispatch.dispatch(action.page().editor().componentSave(
+                model.getCurrentInsertPCId(),
+                model.getCurrentPCId(),
+                model.getCurrentPCName(),
+                form_data
+              ));
+              break;
+
+            case "component.update":
+              const uform = form_button.closest("form");
+              const uform_data = new FormData(uform);
+
+              //after_pcid, pcid, component, data
+              dispatch.dispatch(action.page().editor().componentUpdate(
+                model.getCurrentPCId(),
+                model.getCurrentPCName(),
+                uform_data
+              ));
+              break;
+
+            case "component.update.back":
+              const uform2 = form_button.closest("form");
+              const uform_data2 = new FormData(uform2);
+
+              //after_pcid, pcid, component, data
+              dispatch.dispatch(action.page().editor().componentUpdateBack(
+                model.getCurrentPCId(),
+                model.getCurrentPCName(),
+                uform_data2
+              ));
+              break;
+          }
+        });
+      }
+    });
+
+    document.querySelectorAll("#copg-editor-slate-content [data-copg-ed-type='link']").forEach(link => {
+      const dispatch = this.pageUI.dispatcher;
+      const action = this.pageUI.actionFactory;
+      const act = link.dataset.copgEdAction;
+      const cname = link.dataset.copgEdComponent;
+      if (cname === "Page") {
+        link.addEventListener("click", (event) => {
+          event.preventDefault();
+          switch (act) {
+            case "component.settings":
+              //after_pcid, pcid, component, data
+              dispatch.dispatch(action.page().editor().componentSettings(
+                model.getCurrentPCName(),
+                model.getCurrentPCId(),
+                model.getCurrenntHierId()
+              ));
+              break;
+
+          }
+        });
+      }
+    });
+  }
+
 }

@@ -1028,7 +1028,7 @@ class ilPCTableGUI extends ilPageContentGUI
         $this->displayValidationError();
 
         $this->initEditor();
-
+        $this->tpl->addJavaScript("./Services/UIComponent/AdvancedSelectionList/js/AdvancedSelectionList.js");
         $this->tpl->setContent($this->getEditDataTable(true));
     }
 
@@ -1036,10 +1036,18 @@ class ilPCTableGUI extends ilPageContentGUI
     {
         $ilCtrl = $this->ctrl;
 
+        /** @var ilPCTable $pc_tab */
+        $pc_tab = $this->content_obj;
+
         $dtpl = new ilTemplate("tpl.tabledata2.html", true, true, "Services/COPage");
         $dtpl->setVariable("FORMACTION", $this->ctrl->getFormAction($this, "tableAction"));
         $dtpl->setVariable("HIERID", $this->hier_id);
         $dtpl->setVariable("PCID", $this->pc_id);
+        $class = $pc_tab->getClass();
+        if ($class === "") {
+            $class = "StandartTable";
+        }
+        $dtpl->setVariable("TABLE_CLASS", "ilc_table" . $class);
 
         $dtpl->setVariable(
             "WYSIWYG_ACTION",
@@ -1125,22 +1133,40 @@ class ilPCTableGUI extends ilPageContentGUI
                     $dtpl->setVariable("PAR_ROW", (string) $i);
                     $dtpl->setVariable("PAR_COLUMN", (string) $j);
 
+                    // which tag to use?
+                    $tag = "td";
+                    // only from template
+                    if (false) {
+                        $tag = "th";
+                    }
+                    $dtpl->setVariable("CELL_TAG", "td");
+
+                    // which class to use?
+                    $class = $res2->nodeset[$j]->get_attribute("Class");
+                    if ($class !== "") {
+                        $dtpl->setVariable("CELL_CLASS", "ilc_table_cell_" . $class);
+                    }
+
                     $dtpl->setVariable(
                         "PAR_TA_CONTENT",
                         $this->getCellContent($i, $j)
                     );
 
+
+                    $width = $res2->nodeset[$j]->get_attribute("Width");
+                    $dtpl->setVariable("WIDTH", $width);
+
                     $cs = $res2->nodeset[$j]->get_attribute("ColSpan");
                     $rs = $res2->nodeset[$j]->get_attribute("RowSpan");
-                    $dtpl->setVariable("WIDTH", "140");
-                    $dtpl->setVariable("HEIGHT", "80");
+
+                    //$dtpl->setVariable("HEIGHT", "80");
                     if ($cs > 1) {
                         $dtpl->setVariable("COLSPAN", 'colspan="' . $cs . '"');
-                        $dtpl->setVariable("WIDTH", (140 + ($cs - 1) * 146));
+                        //$dtpl->setVariable("WIDTH", (140 + ($cs - 1) * 146));
                     }
                     if ($rs > 1) {
                         $dtpl->setVariable("ROWSPAN", 'rowspan="' . $rs . '"');
-                        $dtpl->setVariable("HEIGHT", (80 + ($rs - 1) * 86));
+                        //$dtpl->setVariable("HEIGHT", (80 + ($rs - 1) * 86));
                     }
                     $dtpl->parseCurrentBlock();
                 }

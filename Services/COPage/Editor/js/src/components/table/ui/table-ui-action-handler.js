@@ -51,6 +51,7 @@ export default class TableUIActionHandler {
     this.client = client;
     this.dispatcher = null;
     this.tableUI = null;
+    this.old_selected = false;
   }
 
   /**
@@ -154,6 +155,11 @@ export default class TableUIActionHandler {
 
     if (table_model.getState() === table_model.STATE_CELLS) {
       this.tableUI.markSelectedCells();
+      // switch info text and action buttons, if selected status changes
+      if (table_model.hasSelected() !== this.old_selected) {
+        this.tableUI.refreshUIFromModelState(page_model, table_model);
+      }
+      this.old_selected = table_model.hasSelected();
     }
   }
 

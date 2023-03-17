@@ -58,7 +58,7 @@ class ilPCDataTableEditorGUI implements \ILIAS\COPage\Editor\Components\PageComp
             "icon" => $ui_wrapper->getRenderedIcon("pedt"),
             "top_actions" => $this->getTopActions($ui_wrapper, $page_gui),
             "cell_info" => $this->getCellInfo(),
-            "cell_actions" => $this->getCellActions()
+            "cell_actions" => $this->getCellActions($ui_wrapper, $page_gui, $style_id)
         ];
     }
 
@@ -180,9 +180,29 @@ class ilPCDataTableEditorGUI implements \ILIAS\COPage\Editor\Components\PageComp
         return "Cell Info";
     }
 
-    protected function getCellActions() : string
+    protected function getCellActions(
+        UIWrapper $ui_wrapper,
+        ilPageObjectGUI $page_gui,
+        int $style_id = 0) : string
     {
-        return "Cell Actions";
+        $lng = $this->lng;
+
+        $tab_gui = new ilPCDataTableGUI($page_gui->getPageObject(), null, "", "");
+        $tab_gui->setStyleId($style_id);
+
+        /** @var ilPropertyFormGUI $form */
+        $form = $tab_gui->initCellPropertiesForm();
+
+        $html = $ui_wrapper->getRenderedForm(
+            $form,
+            [
+                ["Table", "toggle.merge", $lng->txt("cont_merge")],
+                ["Table", "properties.set", $lng->txt("cont_set_properties")],
+                ["Page", "component.back", $lng->txt("cancel")]
+            ]
+        );
+
+        return $html;
     }
 
 }

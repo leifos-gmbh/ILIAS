@@ -1045,7 +1045,16 @@ class ilPCTableGUI extends ilPageContentGUI
         $dtpl->setVariable("PCID", $this->pc_id);
         $class = $pc_tab->getClass();
         if ($class === "") {
-            $class = "StandartTable";
+            $class = "StandardTable";
+        }
+        $template_classes = [];
+        if ($this->getStyleId() > 0 && $pc_tab->getTemplate() != "") {
+            $id = ilObjStyleSheet::_lookupTemplateIdByName($this->getStyleId(), $pc_tab->getTemplate());
+            $style = new ilObjStyleSheet($this->getStyleId());
+            $template_classes = $style->getTemplateClasses($id);
+            if ($template_classes["table"] !== "") {
+                $class = $template_classes["table"];
+            }
         }
         $dtpl->setVariable("TABLE_CLASS", "ilc_table" . $class);
 
@@ -1059,7 +1068,7 @@ class ilPCTableGUI extends ilPageContentGUI
         $path = "//PageContent[@HierId='" . $this->getHierId() . "']" .
             "/Table/TableRow";
         $res = xpath_eval($xpc, $path);
-
+        $total_rows = count($res->nodeset);
         for ($i = 0; $i < count($res->nodeset); $i++) {
             $xpc2 = xpath_new_context($this->dom);
             $path2 = "//PageContent[@HierId='" . $this->getHierId() . "']" .
@@ -1068,6 +1077,7 @@ class ilPCTableGUI extends ilPageContentGUI
 
             // if this is the first row -> col icons
             if ($i == 0) {
+                $total_cols = count($res2->nodeset);
                 for ($j = 0; $j < count($res2->nodeset); $j++) {
                     if ($j == 0) {
                         $dtpl->touchBlock("empty_td");
@@ -1142,7 +1152,9 @@ class ilPCTableGUI extends ilPageContentGUI
                     $dtpl->setVariable("CELL_TAG", "td");
 
                     // which class to use?
-                    $class = $res2->nodeset[$j]->get_attribute("Class");
+                    $node_class = $res2->nodeset[$j]->get_attribute("Class");
+                    $class = $this->getCellClass($i, $j, $node_class, $template_classes,
+                        $total_rows, $total_cols);
                     if ($class !== "") {
                         $dtpl->setVariable("CELL_CLASS", "ilc_table_cell_" . $class);
                     }
@@ -1155,6 +1167,9 @@ class ilPCTableGUI extends ilPageContentGUI
 
                     $width = $res2->nodeset[$j]->get_attribute("Width");
                     $dtpl->setVariable("WIDTH", $width);
+
+                    $al = $res2->nodeset[$j]->get_attribute("HorizontalAlign");
+                    $dtpl->setVariable("ALIGN", strtolower($al));
 
                     $cs = $res2->nodeset[$j]->get_attribute("ColSpan");
                     $rs = $res2->nodeset[$j]->get_attribute("RowSpan");
@@ -1198,6 +1213,75 @@ class ilPCTableGUI extends ilPageContentGUI
         }
 
         return $dtpl->get();
+    }
+
+    protected function getCellClass(
+        int $i,
+        int $j,
+        string $node_class,
+        array $template_classes,
+        int $total_rows,
+        int $total_cols)
+    {
+        $class = "";
+        /** @var ilPCTable $pc_tab */
+        $pc_tab = $this->content_obj;
+
+        // ["col_foot"] ["row_foot"]
+
+        if (($template_classes["even_row"] ?? "") !== "") {
+            if ($i % 2 == 1) {
+                $class = $template_classes["even_row"];
+            }
+        }
+
+        if (($template_classes["odd_row"] ?? "") !== "") {
+            if ($i % 2 == 0) {
+                $class = $template_classes["odd_row"];
+            }
+        }
+
+        if (($template_classes["even_col"] ?? "") !== "") {
+            if ($j % 2 == 1) {
+                $class = $template_classes["even_col"];
+            }
+        }
+
+        if (($template_classes["odd_col"] ?? "") !== "") {
+            if ($j % 2 == 0) {
+                $class = $template_classes["odd_col"];
+            }
+        }
+
+        if (($template_classes["row_foot"] ?? "") !== "") {
+            if ($i + $pc_tab->getFooterRows() >= $total_rows) {
+                $class = $template_classes["row_foot"];
+            }
+        }
+
+        if (($template_classes["col_foot"] ?? "") !== "") {
+            if ($j + $pc_tab->getFooterCols() >= $total_cols) {
+                $class = $template_classes["col_foot"];
+            }
+        }
+
+        if (($template_classes["row_head"] ?? "") !== "") {
+            if ($i < $pc_tab->getHeaderRows()) {
+                $class = $template_classes["row_head"];
+            }
+        }
+
+        if (($template_classes["col_head"] ?? "") !== "") {
+            if ($j < $pc_tab->getHeaderCols()) {
+                $class = $template_classes["col_head"];
+            }
+        }
+
+
+        if ($node_class !== "") {
+            $class = $node_class;
+        }
+        return $class;
     }
 
     protected function getColumnCaption(int $nr): string

@@ -68,4 +68,21 @@ export default class TableCommandActionFactory {
     });
   }
 
+  /**
+   *
+   * @param {string} pcid
+   * @param {string} component
+   * @param {formData} data
+   * @return {CommandAction}
+   */
+  setProperties(pcid, component, selected, data) {
+    data.append("pcid", pcid);
+    data.append("top", selected.top);
+    data.append("bottom", selected.bottom);
+    data.append("left", selected.left);
+    data.append("right", selected.right);
+    return this.clientActionFactory.formCommand(component, ACTIONS.SET_PROPERTIES, data);
+  }
+
+
 }

@@ -21,6 +21,7 @@ const ACTIONS = {
   // command actions (being sent to the server to "change things")
   UPDATE_DATA: "update.data",
   MODIFY_TABLE: "modify.table",
+  SET_PROPERTIES: "set.properties",   // cell properties
 
   // editor actions (things happening in the editor client side)
   COL_AFTER: "col.after",
@@ -40,6 +41,8 @@ const ACTIONS = {
   SWITCH_FORMAT_CELLS: "switch.format.cells",
   TOGGLE_ROW: "toggle.row",
   TOGGLE_COL: "toggle.col",
-  TOGGLE_CELL: "toggle.cell"
+  TOGGLE_CELL: "toggle.cell",
+  PROPERTIES_SET: "properties.set",   // cell properties
+  TOGGLE_MERGE: "toggle.merge"
 };
 export default ACTIONS;

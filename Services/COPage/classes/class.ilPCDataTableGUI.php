@@ -474,6 +474,26 @@ class ilPCDataTableGUI extends ilPCTableGUI
             $form->addItem($style_cb);
         }
 
+        $width_cb = new ilCheckboxInputGUI($lng->txt("cont_width"), "width_cb");
+        $ti = new ilTextInputGUI($lng->txt("cont_width"), "width");
+        $ti->setMaxLength(20);
+        $ti->setSize(7);
+        $width_cb->addSubItem($ti);
+        $form->addItem($width_cb);
+
+        // alignment
+        $al_cb = new ilCheckboxInputGUI($lng->txt("cont_alignment"), "al_cb");
+        $options = array(
+            "" => $lng->txt("default"),
+            "Left" => $lng->txt("cont_left"),
+            "Center" => $lng->txt("cont_center"),
+            "Right" => $lng->txt("cont_right")
+        );
+        $si = new ilSelectInputGUI($lng->txt("cont_alignment"), "alignment");
+        $si->setOptions($options);
+        $al_cb->addSubItem($si);
+        $form->addItem($al_cb);
+
         return $form;
     }
 

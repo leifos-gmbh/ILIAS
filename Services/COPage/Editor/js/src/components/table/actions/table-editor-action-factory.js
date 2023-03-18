@@ -219,4 +219,22 @@ export default class TableEditorActionFactory {
     });
   }
 
+  /**
+   * @returns {EditorAction}
+   */
+  propertiesSet(pcid, selected, data) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.PROPERTIES_SET,{
+      pcid:pcid,
+      selected: selected,
+      data:data
+    });
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  toggleMerge() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.TOGGLE_MERGE);
+  }
+
 }

@@ -474,18 +474,56 @@ console.log("INIT CELL EDITING")
   }
 
   showCellProperties() {
-    {
-      let add = "";
-      if (this.tableModel.hasSelected()) {
-        add = this.uiModel.components["DataTable"]["cell_actions"];
-      } else {
-        add = this.uiModel.components["DataTable"]["cell_info"];
-      }
-      this.toolSlate.setContent(this.uiModel.components["DataTable"]["top_actions"] + add);
-      this.initTopActions();
-      this.refreshModeSelector();
+    let add = "";
+    if (this.tableModel.hasSelected()) {
+      add = this.uiModel.components["DataTable"]["cell_actions"];
+    } else {
+      add = this.uiModel.components["DataTable"]["cell_info"];
     }
+    this.toolSlate.setContent(this.uiModel.components["DataTable"]["top_actions"] + add);
+    this.initTopActions();
+    this.refreshModeSelector();
+    this.initCellPropertiesForm(this.page_model, this.tableModel);
   }
+
+  initCellPropertiesForm(pageModel,tableModel) {
+
+    document.querySelectorAll("#copg-editor-slate-content [data-copg-ed-type='form-button']").forEach(form_button => {
+      const dispatch = this.dispatcher;
+      const action = this.actionFactory;
+      const act = form_button.dataset.copgEdAction;
+      const cname = form_button.dataset.copgEdComponent;
+      if (cname === "Table") {
+        console.log("ATTACHING EVENT TO FORM BUTTON");
+        console.log(form_button);
+        form_button.addEventListener("click", (event) => {
+          event.preventDefault();
+          switch (act) {
+            case "properties.set":
+              const uform = form_button.closest("form");
+              const uform_data = new FormData(uform);
+
+              console.log("*** PROPERTIES SET");
+              console.log(uform_data);
+              console.log(pageModel.getCurrentPCId());
+              console.log(tableModel.getSelected());
+
+              //after_pcid, pcid, component, data
+              dispatch.dispatch(action.table().editor().propertiesSet(
+                pageModel.getCurrentPCId(),
+                tableModel.getSelected(),
+                uform_data
+              ));
+              break;
+
+            case "toggle.merge":
+              break;
+          }
+        });
+      }
+    });
+  }
+
 
   initTopActions() {
     const dispatch = this.dispatcher;

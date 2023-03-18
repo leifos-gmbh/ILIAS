@@ -114,7 +114,6 @@ export default class TableUIActionHandler {
         case ACTIONS.ROW_DELETE:
         case ACTIONS.ROW_UP:
         case ACTIONS.ROW_DOWN:
-          console.log(params);
           this.sendTableModificationCommand(
             params.tablePcid,
             page_model.getPCModel(params.tablePcid),
@@ -142,6 +141,16 @@ export default class TableUIActionHandler {
         case ACTIONS.SWITCH_FORMAT_CELLS:
           this.tableUI.refreshUIFromModelState(page_model, table_model);
           this.tableUI.initHeadSelection();
+          break;
+
+        case ACTIONS.PROPERTIES_SET:
+          this.sendPropertiesSet(
+            params.pcid,
+            params.selected,
+            params.data,
+            page_model,
+            table_model
+          );
           break;
       }
     }
@@ -217,8 +226,29 @@ export default class TableUIActionHandler {
       }
 
       //      il.IntLink.refresh();           // missing
+      this.tableUI.head_selection_initialised = false;
       this.tableUI.reInit();
     }
   }
+
+  sendPropertiesSet(pcid, selected, data, page_model, table_model) {
+    let setPropertiesAction;
+    const af = this.actionFactory;
+    const dispatch = this.dispatcher;
+
+    setPropertiesAction = af.table().command().setProperties(
+      pcid,
+      "Table",
+      selected,
+      data
+    );
+
+    this.client.sendCommand(setPropertiesAction).then(result => {
+      const pl = result.getPayload();
+      this.handleModificationResponse(pl, page_model);
+      dispatch.dispatch(af.table().editor().switchFormatCells());
+    });
+  }
+
 
 }

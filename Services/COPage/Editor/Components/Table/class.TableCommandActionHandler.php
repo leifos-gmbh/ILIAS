@@ -20,6 +20,7 @@ namespace ILIAS\COPage\Editor\Components\Table;
 
 use ILIAS\DI\Exceptions\Exception;
 use ILIAS\COPage\Editor\Server;
+use ILIAS\COPage\Editor\Server\Response;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
@@ -58,6 +59,9 @@ class TableCommandActionHandler implements Server\CommandActionHandler
 
             case "update":
                 return $this->updateCommand($body);
+
+            case "set.properties":
+                return $this->setCellProperties($body);
 
             default:
                 throw new Exception("Unknown action " . $body["action"]);
@@ -314,7 +318,7 @@ class TableCommandActionHandler implements Server\CommandActionHandler
                 $pcid
             );
         }
-
+        $table_gui->setStyleId($page_gui->getStyleId());
         $data = new \stdClass();
         $data->renderedContent = $table_gui->getEditDataTable();
         $data->pcModel = $page_gui->getPageObject()->getPCModel();
@@ -340,4 +344,54 @@ class TableCommandActionHandler implements Server\CommandActionHandler
         return $this->ui_wrapper->sendPage($this->page_gui, $updated);
     }
 
+    protected function setCellProperties(array $body): Server\Response
+    {
+        $page = $this->page_gui->getPageObject();
+
+        /** @var \ilPCDataTable $tab */
+        $tab = $page->getContentObjectForPcId($body["pcid"]);
+        $top = (int) ($body["top"] ?? -1);
+        $bottom = (int) ($body["bottom"] ?? -1);
+        $left = (int) ($body["left"] ?? -1);
+        $right = (int) ($body["right"] ?? -1);
+        if ($top !== -1 && $bottom !== -1 && $left !== -1 && $right !== -1) {
+            for ($i = $top; $i <= $bottom; $i++) {
+                for ($j = $left; $j <= $right; $j++) {
+                    $td_node = $tab->getTableDataNode($i, $j);
+                    if ($td_node) {
+                        // set class
+                        if (isset($body["style_cb"])) {
+                            $class = $body["style"] ?? "";
+                            if ($class === "") {
+                                $td_node->remove_attribute("Class");
+                            } else {
+                                $td_node->set_attribute("Class", $class);
+                            }
+                        }
+                        // set width
+                        if (isset($body["width_cb"])) {
+                            $width = $body["width"] ?? "";
+                            if ($width === "") {
+                                $td_node->remove_attribute("Width");
+                            } else {
+                                $td_node->set_attribute("Width", $width);
+                            }
+                        }
+                        // set alignment
+                        if (isset($body["al_cb"])) {
+                            $alignment = $body["alignment"] ?? "";
+                            if ($alignment === "") {
+                                $td_node->remove_attribute("HorizontalAlign");
+                            } else {
+                                $td_node->set_attribute("HorizontalAlign", $alignment);
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+        $updated = $page->update();
+        return $this->sendTable($this->page_gui, $body["pcid"]);
+    }
 }

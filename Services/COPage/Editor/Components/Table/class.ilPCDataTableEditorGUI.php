@@ -23,6 +23,7 @@ use ILIAS\COPage\Editor\Server\UIWrapper;
  */
 class ilPCDataTableEditorGUI implements \ILIAS\COPage\Editor\Components\PageComponentEditor
 {
+    protected \ILIAS\COPage\InternalGUIService $gui;
     protected \ILIAS\DI\UIServices $ui;
     protected \ilLanguage $lng;
     protected \ilCtrl $ctrl;
@@ -34,6 +35,7 @@ class ilPCDataTableEditorGUI implements \ILIAS\COPage\Editor\Components\PageComp
         $this->lng = $DIC->language();
         $this->ctrl = $DIC->ctrl();
         $this->ui = $DIC->ui();
+        $this->gui = $DIC->copage()->internal()->gui();
     }
 
     public function getEditorElements(
@@ -58,7 +60,8 @@ class ilPCDataTableEditorGUI implements \ILIAS\COPage\Editor\Components\PageComp
             "icon" => $ui_wrapper->getRenderedIcon("pedt"),
             "top_actions" => $this->getTopActions($ui_wrapper, $page_gui),
             "cell_info" => $this->getCellInfo(),
-            "cell_actions" => $this->getCellActions($ui_wrapper, $page_gui, $style_id)
+            "cell_actions" => $this->getCellActions($ui_wrapper, $page_gui, $style_id),
+            "number_input_modal" => $this->getModalNumberInputTemplate()
         ];
     }
 
@@ -203,6 +206,38 @@ class ilPCDataTableEditorGUI implements \ILIAS\COPage\Editor\Components\PageComp
         );
 
         return $html;
+    }
+
+    public function getModalNumberInputTemplate(): array
+    {
+        $form = $this
+            ->gui
+            ->form(["ilPCDataTableGUI"], "#")
+            ->select("number", "#select-title#", [
+                "1" => "1",
+                "2" => "2",
+                "3" => "3",
+                "4" => "4",
+                "5" => "5",
+                "6" => "6",
+                "7" => "7",
+                "8" => "8",
+                "9" => "9",
+                "10" => "10"
+            ]);
+        $components = $this
+            ->gui
+            ->modal("#modal-title#")
+            ->form($form)->getTriggerButtonComponents(
+                "#button-title#",
+                true
+            );
+
+        $modalt["signal"] = $components["modal"]->getShowSignal()->getId();
+        $modalt["modal"] = $this->ui->renderer()->renderAsync($components["modal"]);
+        $modalt["button"] = $this->ui->renderer()->renderAsync($components["button"]);
+
+        return $modalt;
     }
 
 }

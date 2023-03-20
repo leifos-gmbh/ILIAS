@@ -22,6 +22,7 @@ const ACTIONS = {
   UPDATE_DATA: "update.data",
   MODIFY_TABLE: "modify.table",
   SET_PROPERTIES: "set.properties",   // cell properties
+  CMD_TOGGLE_MERGE: "toggle.merge",
 
   // editor actions (things happening in the editor client side)
   COL_AFTER: "col.after",

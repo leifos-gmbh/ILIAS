@@ -84,5 +84,22 @@ export default class TableCommandActionFactory {
     return this.clientActionFactory.formCommand(component, ACTIONS.SET_PROPERTIES, data);
   }
 
+  /**
+   * @param {string} pcid
+   * @param {string} component
+   * @param {Object} selected
+   * @return {CommandAction}
+   */
+  toggleMerge(pcid, component, selected) {
+    let params = {
+      pcid: pcid,
+      top: selected.top,
+      bottom: selected.bottom,
+      left: selected.left,
+      right: selected.right
+    };
+    return this.clientActionFactory.command(component, ACTIONS.CMD_TOGGLE_MERGE, params);
+  }
+
 
 }

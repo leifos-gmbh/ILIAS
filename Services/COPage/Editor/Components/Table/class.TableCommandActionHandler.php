@@ -63,6 +63,9 @@ class TableCommandActionHandler implements Server\CommandActionHandler
             case "set.properties":
                 return $this->setCellProperties($body);
 
+            case "toggle.merge":
+                return $this->toggleMerge($body);
+
             default:
                 throw new Exception("Unknown action " . $body["action"]);
         }
@@ -393,5 +396,28 @@ class TableCommandActionHandler implements Server\CommandActionHandler
         }
         $updated = $page->update();
         return $this->sendTable($this->page_gui, $body["pcid"]);
+    }
+
+    protected function toggleMerge(array $body): Server\Response
+    {
+        $page = $this->page_gui->getPageObject();
+
+        $data = $body["data"];
+
+        /** @var \ilPCDataTable $tab */
+        $tab = $page->getContentObjectForPcId($data["pcid"]);
+        $top = (int) ($data["top"] ?? -1);
+        $bottom = (int) ($data["bottom"] ?? -1);
+        $left = (int) ($data["left"] ?? -1);
+        $right = (int) ($data["right"] ?? -1);
+
+        $td_node = $tab->getTableDataNode($top, $left);
+        $td_node->set_attribute("ColSpan", $right - $left + 1);
+        $td_node->set_attribute("RowSpan", $bottom - $top + 1);
+
+        $tab->fixHideAndSpans();
+
+        $updated = $page->update();
+        return $this->sendTable($this->page_gui, $data["pcid"]);
     }
 }

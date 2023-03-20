@@ -233,8 +233,11 @@ export default class TableEditorActionFactory {
   /**
    * @returns {EditorAction}
    */
-  toggleMerge() {
-    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.TOGGLE_MERGE);
+  toggleMerge(pcid, selected) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.TOGGLE_MERGE,{
+      pcid:pcid,
+      selected: selected
+    });
   }
 
 }

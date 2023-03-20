@@ -152,6 +152,15 @@ export default class TableUIActionHandler {
             table_model
           );
           break;
+
+        case ACTIONS.TOGGLE_MERGE:
+          this.sendToggleMerge(
+            params.pcid,
+            params.selected,
+            page_model,
+            table_model
+          );
+          break;
       }
     }
     if (action.getComponent() === "DataTable") {
@@ -250,5 +259,22 @@ export default class TableUIActionHandler {
     });
   }
 
+  sendToggleMerge(pcid, selected, page_model, table_model) {
+    let toggleMergeAction;
+    const af = this.actionFactory;
+    const dispatch = this.dispatcher;
+
+    toggleMergeAction = af.table().command().toggleMerge(
+      pcid,
+      "Table",
+      selected
+    );
+
+    this.client.sendCommand(toggleMergeAction).then(result => {
+      const pl = result.getPayload();
+      this.handleModificationResponse(pl, page_model);
+      dispatch.dispatch(af.table().editor().switchFormatCells());
+    });
+  }
 
 }

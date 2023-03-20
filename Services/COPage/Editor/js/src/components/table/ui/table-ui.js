@@ -502,13 +502,6 @@ console.log("INIT CELL EDITING")
             case "properties.set":
               const uform = form_button.closest("form");
               const uform_data = new FormData(uform);
-
-              console.log("*** PROPERTIES SET");
-              console.log(uform_data);
-              console.log(pageModel.getCurrentPCId());
-              console.log(tableModel.getSelected());
-
-              //after_pcid, pcid, component, data
               dispatch.dispatch(action.table().editor().propertiesSet(
                 pageModel.getCurrentPCId(),
                 tableModel.getSelected(),
@@ -517,6 +510,10 @@ console.log("INIT CELL EDITING")
               break;
 
             case "toggle.merge":
+              dispatch.dispatch(action.table().editor().toggleMerge(
+                pageModel.getCurrentPCId(),
+                tableModel.getSelected()
+              ));
               break;
           }
         });

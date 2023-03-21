@@ -6344,12 +6344,12 @@ content#:#cont_ed_item_up#:#Move Item Up
 content#:#cont_ed_list#:# Advanced List
 content#:#cont_ed_moveafter#:#Move After
 content#:#cont_ed_movebefore#:#Move Before
-content#:#cont_ed_new_col_after#:#New Column After
-content#:#cont_ed_new_col_before#:#New Column Before
+content#:#cont_ed_new_col_after#:#New Columns After
+content#:#cont_ed_new_col_before#:#New Columns Before
 content#:#cont_ed_new_item_after#:#New Item After
 content#:#cont_ed_new_item_before#:#New Item Before
-content#:#cont_ed_new_row_after#:#New Row After
-content#:#cont_ed_new_row_before#:#New Row Before
+content#:#cont_ed_new_row_after#:#New Rows After
+content#:#cont_ed_new_row_before#:#New Rows Before
 content#:#cont_ed_par#:#Text
 content#:#cont_ed_paste#:#Paste
 content#:#cont_ed_paste_clip#:#Paste From Clipboard
@@ -17007,3 +17007,5 @@ content#:#cont_manual_item_group#:#Manually Create Item Group
 content#:#cont_set_manuall#:#Set Manually
 content#:#cont_has_row_header#:#Has a Header Row
 content#:#cont_paste_from_spreadsheet#:#Paste From Spreadsheet
+content#:#cont_ed_nr_cols#:#Number of Columns
+content#:#cont_ed_nr_rows#:#Number of Rows

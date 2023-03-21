@@ -251,7 +251,12 @@ export default class TableUI {
               const th = b.closest("th");
               const first = !(th.previousElementSibling.previousElementSibling);
               const last = !(th.nextElementSibling);
-              this.addDropdownAction(li_templ, ul, "cont_ed_new_col_before", af.colBefore(nr, cellPcid, tablePcid));
+              this.addDropdownNumberAction(
+                li_templ,
+                ul,
+                "cont_ed_new_col_before",
+                "cont_ed_nr_cols",
+                af.colBefore(nr, cellPcid, tablePcid));
               this.addDropdownAction(li_templ, ul, "cont_ed_new_col_after", af.colAfter(nr, cellPcid, tablePcid));
               if (!first) {
                 this.addDropdownAction(li_templ, ul, "cont_ed_col_left", af.colLeft(nr, cellPcid, tablePcid));
@@ -288,6 +293,48 @@ export default class TableUI {
       dispatch.dispatch(action);
     });
     ul.appendChild(li);
+  }
+
+  addDropdownNumberAction(li_templ, ul, txtKey, txtKeyProp, action) {
+    const dispatch = this.dispatcher;
+    const li = li_templ.cloneNode(true);
+
+    li.querySelector("a").innerHTML = il.Language.txt(txtKey);
+    li.querySelector("a").addEventListener("click", (event) => {
+      this.showNumberModal(txtKey, txtKeyProp, action);
+    });
+    ul.appendChild(li);
+  }
+
+  showNumberModal(txtKey, txtKeyProp, action) {
+    const uiModel = this.uiModel;
+    const signal = uiModel.components.DataTable.number_input_modal.signal;
+
+    $("#il-copg-ed-table-modal").remove();
+    let modal_template = uiModel.components.DataTable.number_input_modal.modal;
+    modal_template = modal_template.replace("#modal-title#", il.Language.txt(txtKey));
+    modal_template = modal_template.replace("#select-title#", il.Language.txt(txtKeyProp));
+
+    $("body").append("<div id='il-copg-ed-table-modal'>" + modal_template + "</div>");
+
+    $(document).trigger(
+      signal,
+      {
+        'id': signal,
+        'triggerer': $(this),
+        'options': JSON.parse('[]')
+      }
+    );
+
+    /*
+    if (button_txt) {
+      const b = document.querySelector("#il-copg-ed-modal .modal-footer button");
+      b.addEventListener("click", onclick);
+    } else {
+      document.querySelectorAll("#il-copg-ed-modal .modal-footer").forEach((b) => {
+        b.remove();
+      });
+    }*/
   }
 
   initCellEditing() {

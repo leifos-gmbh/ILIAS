@@ -6350,12 +6350,12 @@ content#:#cont_ed_item_up#:#Eintrag nach oben verschieben
 content#:#cont_ed_list#:#Erweiterte Liste
 content#:#cont_ed_moveafter#:#Verschieben nach
 content#:#cont_ed_movebefore#:#Verschieben vor
-content#:#cont_ed_new_col_after#:#Neue Spalte rechts
-content#:#cont_ed_new_col_before#:#Neue Spalte links
+content#:#cont_ed_new_col_after#:#Neue Spalten rechts
+content#:#cont_ed_new_col_before#:#Neue Spalten links
 content#:#cont_ed_new_item_after#:#Neuen Eintrag unterhalb
 content#:#cont_ed_new_item_before#:#Neuen Eintrag oberhalb
-content#:#cont_ed_new_row_after#:#Neue Zeile unterhalb
-content#:#cont_ed_new_row_before#:#Neue Zeile oberhalb
+content#:#cont_ed_new_row_after#:#Neue Zeilen unterhalb
+content#:#cont_ed_new_row_before#:#Neue Zeilen oberhalb
 content#:#cont_ed_par#:#Text
 content#:#cont_ed_paste#:#Einfügen
 content#:#cont_ed_paste_clip#:#Aus Ablage einfügen
@@ -17017,3 +17017,5 @@ content#:#cont_manual_item_group#:#Manuell erstellter Objekteblock
 content#:#cont_set_manuall#:#Manuell setzen
 content#:#cont_has_row_header#:#Kopfzeile
 content#:#cont_paste_from_spreadsheet#:#Aus Tabellenkalkulation einfügen
+content#:#cont_ed_nr_cols#:#Anzahl Spalten
+content#:#cont_ed_nr_rows#:#Anzahl Zeilen

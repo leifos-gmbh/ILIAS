@@ -29,44 +29,48 @@ class ilPCTableData extends ilPageContent
         $this->setType("td");
     }
 
-    public function newRowAfter(): void
+    public function newRowAfter(int $cnt = 1): void
     {
         $this->initTablePCNode();
         $td = $this->getNode();
         $parent_tr = $td->parent_node();
-        $new_tr = $parent_tr->clone_node(true);
+        for ($j = 1; $j <= $cnt; $j++) {
+            $new_tr = $parent_tr->clone_node(true);
 
-        // remove pc ids
-        if ($new_tr->has_attribute("PCID")) {
-            $new_tr->remove_attribute("PCID");
-        }
-        if ($next_tr = $parent_tr->next_sibling()) {
-            $new_tr = $next_tr->insert_before($new_tr, $next_tr);
-        } else {
-            $parent_table = $parent_tr->parent_node();
-            $new_tr = $parent_table->append_child($new_tr);
-        }
+            // remove pc ids
+            if ($new_tr->has_attribute("PCID")) {
+                $new_tr->remove_attribute("PCID");
+            }
+            if ($next_tr = $parent_tr->next_sibling()) {
+                $new_tr = $next_tr->insert_before($new_tr, $next_tr);
+            } else {
+                $parent_table = $parent_tr->parent_node();
+                $new_tr = $parent_table->append_child($new_tr);
+            }
 
-        // remove td content of new row
-        $this->deleteRowContent($new_tr);
-        $this->fixHideAndSpans();
+            // remove td content of new row
+            $this->deleteRowContent($new_tr);
+            $this->fixHideAndSpans();
+        }
     }
 
 
-    public function newRowBefore(): void
+    public function newRowBefore(int $cnt = 1): void
     {
         $this->initTablePCNode();
         $td = $this->getNode();
         $parent_tr = $td->parent_node();
-        $new_tr = $parent_tr->clone_node(true);
-        $new_tr = $parent_tr->insert_before($new_tr, $parent_tr);
-        if ($new_tr->has_attribute("PCID")) {
-            $new_tr->remove_attribute("PCID");
-        }
+        for ($j = 1; $j <= $cnt; $j++) {
+            $new_tr = $parent_tr->clone_node(true);
+            $new_tr = $parent_tr->insert_before($new_tr, $parent_tr);
+            if ($new_tr->has_attribute("PCID")) {
+                $new_tr->remove_attribute("PCID");
+            }
 
-        // remove td content of new row
-        $this->deleteRowContent($new_tr);
-        $this->fixHideAndSpans();
+            // remove td content of new row
+            $this->deleteRowContent($new_tr);
+            $this->fixHideAndSpans();
+        }
     }
 
 
@@ -110,7 +114,7 @@ class ilPCTableData extends ilPageContent
         $this->fixHideAndSpans();
     }
 
-    public function newColAfter(): void
+    public function newColAfter(int $cnt = 1): void
     {
         $this->initTablePCNode();
         $td = $this->getNode();
@@ -126,26 +130,28 @@ class ilPCTableData extends ilPageContent
 
         // iterate all table rows
         $rows = $parent_table->child_nodes();
-        for ($i = 0; $i < count($rows); $i++) {
-            if ($rows[$i]->node_name() == "TableRow") {
-                // clone td at $col_nr
-                $tds = $rows[$i]->child_nodes();
-                $new_td = $tds[$col_nr]->clone_node(true);
+        for ($j = 1; $j <= $cnt; $j++) {
+            for ($i = 0; $i < count($rows); $i++) {
+                if ($rows[$i]->node_name() == "TableRow") {
+                    // clone td at $col_nr
+                    $tds = $rows[$i]->child_nodes();
+                    $new_td = $tds[$col_nr]->clone_node(true);
 
-                if ($new_td->has_attribute("PCID")) {
-                    $new_td->remove_attribute("PCID");
-                }
+                    if ($new_td->has_attribute("PCID")) {
+                        $new_td->remove_attribute("PCID");
+                    }
 
-                // insert clone after $col_nr
-                if ($next_td = $tds[$col_nr]->next_sibling()) {
-                    $new_td = $next_td->insert_before($new_td, $next_td);
-                } else {
-                    $new_td = $rows[$i]->append_child($new_td);
+                    // insert clone after $col_nr
+                    if ($next_td = $tds[$col_nr]->next_sibling()) {
+                        $new_td = $next_td->insert_before($new_td, $next_td);
+                    } else {
+                        $new_td = $rows[$i]->append_child($new_td);
+                    }
+                    $this->deleteTDContent($new_td);
                 }
-                $this->deleteTDContent($new_td);
             }
+            $this->fixHideAndSpans();
         }
-        $this->fixHideAndSpans();
     }
 
     public function newColBefore(int $cnt = 1): void

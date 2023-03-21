@@ -72,11 +72,12 @@ export default class TableEditorActionFactory {
   /**
    * @returns {EditorAction}
    */
-  colAfter(nr, cellPcid, tablePcid) {
+  colAfter(nr, cellPcid, tablePcid, cnt) {
     return this.editorActionFactory.action(this.COMPONENT, ACTIONS.COL_AFTER, {
       nr: nr,
       cellPcid: cellPcid,
-      tablePcid: tablePcid
+      tablePcid: tablePcid,
+      cnt: cnt
     });
   }
 
@@ -116,22 +117,24 @@ export default class TableEditorActionFactory {
   /**
    * @returns {EditorAction}
    */
-  rowBefore(nr, cellPcid, tablePcid) {
+  rowBefore(nr, cellPcid, tablePcid, cnt) {
     return this.editorActionFactory.action(this.COMPONENT, ACTIONS.ROW_BEFORE, {
       nr: nr,
       cellPcid: cellPcid,
-      tablePcid: tablePcid
+      tablePcid: tablePcid,
+      cnt: cnt
     });
   }
 
   /**
    * @returns {EditorAction}
    */
-  rowAfter(nr, cellPcid, tablePcid) {
+  rowAfter(nr, cellPcid, tablePcid, cnt) {
     return this.editorActionFactory.action(this.COMPONENT, ACTIONS.ROW_AFTER, {
       nr: nr,
       cellPcid: cellPcid,
-      tablePcid: tablePcid
+      tablePcid: tablePcid,
+      cnt: cnt
     });
   }
 

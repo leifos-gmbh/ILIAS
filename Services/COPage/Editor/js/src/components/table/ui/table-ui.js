@@ -260,7 +260,15 @@ export default class TableUI {
                 cellPcid,
                 tablePcid,
                 "colBefore");
-              this.addDropdownAction(li_templ, ul, "cont_ed_new_col_after", af.colAfter(nr, cellPcid, tablePcid));
+              this.addDropdownNumberAction(
+                li_templ,
+                ul,
+                "cont_ed_new_col_after",
+                "cont_ed_nr_cols",
+                nr,
+                cellPcid,
+                tablePcid,
+                "colAfter");
               if (!first) {
                 this.addDropdownAction(li_templ, ul, "cont_ed_col_left", af.colLeft(nr, cellPcid, tablePcid));
               }
@@ -272,8 +280,24 @@ export default class TableUI {
               const tr = b.closest("tr");
               const first = !(tr.previousElementSibling.previousElementSibling);
               const last = !(tr.nextElementSibling);
-              this.addDropdownAction(li_templ, ul, "cont_ed_new_row_before", af.rowBefore(nr, cellPcid, tablePcid));
-              this.addDropdownAction(li_templ, ul, "cont_ed_new_row_after", af.rowAfter(nr, cellPcid, tablePcid));
+              this.addDropdownNumberAction(
+                li_templ,
+                ul,
+                "cont_ed_new_row_before",
+                "cont_ed_nr_rows",
+                nr,
+                cellPcid,
+                tablePcid,
+                "rowBefore");
+              this.addDropdownNumberAction(
+                li_templ,
+                ul,
+                "cont_ed_new_row_after",
+                "cont_ed_nr_rows",
+                nr,
+                cellPcid,
+                tablePcid,
+                "rowAfter");
               if (!first) {
                 this.addDropdownAction(li_templ, ul, "cont_ed_row_up", af.rowUp(nr, cellPcid, tablePcid));
               }

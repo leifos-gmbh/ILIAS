@@ -224,7 +224,10 @@ class ilPCDataTableEditorGUI implements \ILIAS\COPage\Editor\Components\PageComp
                 "8" => "8",
                 "9" => "9",
                 "10" => "10"
-            ]);
+            ],
+            "",
+            "1")
+            ->required();
         $components = $this
             ->gui
             ->modal("#modal-title#")

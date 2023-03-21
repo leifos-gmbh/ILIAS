@@ -258,12 +258,13 @@ class TableCommandActionHandler implements Server\CommandActionHandler
         /** @var $td \ilPCTableData */
         $td = $page->getContentObjectForPcId($body["data"]["cellPcid"]);
 
+        $cnt = $body["data"]["cnt"] ?? 1;
         switch ($body["data"]["modification"]) {
             case "col.before":
-                $td->newColBefore($body["data"]["cnt"] ?? 1);
+                $td->newColBefore($cnt);
                 break;
             case "col.after":
-                $td->newColAfter();
+                $td->newColAfter($cnt);
                 break;
             case "col.left":
                 $td->moveColLeft();
@@ -275,10 +276,10 @@ class TableCommandActionHandler implements Server\CommandActionHandler
                 $td->deleteCol();
                 break;
             case "row.before":
-                $td->newRowBefore();
+                $td->newRowBefore($cnt);
                 break;
             case "row.after":
-                $td->newRowAfter();
+                $td->newRowAfter($cnt);
                 break;
             case "row.up":
                 $td->moveRowUp();

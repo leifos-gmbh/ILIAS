@@ -256,7 +256,10 @@ export default class TableUI {
                 ul,
                 "cont_ed_new_col_before",
                 "cont_ed_nr_cols",
-                af.colBefore(nr, cellPcid, tablePcid));
+                nr,
+                cellPcid,
+                tablePcid,
+                "colBefore");
               this.addDropdownAction(li_templ, ul, "cont_ed_new_col_after", af.colAfter(nr, cellPcid, tablePcid));
               if (!first) {
                 this.addDropdownAction(li_templ, ul, "cont_ed_col_left", af.colLeft(nr, cellPcid, tablePcid));
@@ -295,18 +298,19 @@ export default class TableUI {
     ul.appendChild(li);
   }
 
-  addDropdownNumberAction(li_templ, ul, txtKey, txtKeyProp, action) {
+  addDropdownNumberAction(li_templ, ul, txtKey, txtKeyProp, nr, cellPcid, tablePcid, func) {
     const dispatch = this.dispatcher;
     const li = li_templ.cloneNode(true);
 
     li.querySelector("a").innerHTML = il.Language.txt(txtKey);
     li.querySelector("a").addEventListener("click", (event) => {
-      this.showNumberModal(txtKey, txtKeyProp, action);
+      this.showNumberModal(txtKey, txtKeyProp, nr, cellPcid, tablePcid, func);
     });
     ul.appendChild(li);
   }
 
-  showNumberModal(txtKey, txtKeyProp, action) {
+  showNumberModal(txtKey, txtKeyProp, nr, cellPcid, tablePcid, func) {
+    const dispatch = this.dispatcher
     const uiModel = this.uiModel;
     const signal = uiModel.components.DataTable.number_input_modal.signal;
 
@@ -314,8 +318,24 @@ export default class TableUI {
     let modal_template = uiModel.components.DataTable.number_input_modal.modal;
     modal_template = modal_template.replace("#modal-title#", il.Language.txt(txtKey));
     modal_template = modal_template.replace("#select-title#", il.Language.txt(txtKeyProp));
+    modal_template = modal_template.replace("#on-form-submit-click#", "");
 
     $("body").append("<div id='il-copg-ed-table-modal'>" + modal_template + "</div>");
+    const modalEl = document.getElementById("il-copg-ed-table-modal");
+    const modalFormSubmit = modalEl.querySelector(".modal-footer button");
+
+    // hide standard form buttons
+    modalEl.querySelectorAll("form button").forEach(b => { b.style.display = "none" });
+    const closeEl = modalEl.querySelector(".modal-header button");
+    const af = this.actionFactory.table().editor();
+
+    // on submit click
+    modalFormSubmit.addEventListener("click", (event) => {
+      const selectEl = modalEl.querySelector("form select");
+      const cnt = parseInt(selectEl.value);
+      dispatch.dispatch(af[func](nr, cellPcid, tablePcid, cnt));
+      closeEl.click();
+    });
 
     $(document).trigger(
       signal,

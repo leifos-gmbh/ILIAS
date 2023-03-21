@@ -120,7 +120,8 @@ export default class TableUIActionHandler {
             page_model,
             action.getType(),
             params.nr,
-            params.cellPcid
+            params.cellPcid,
+            params.cnt
           );
           break;
 
@@ -203,14 +204,15 @@ export default class TableUIActionHandler {
     });
   }
 
-  sendTableModificationCommand(tablePcid, pcmodel, page_model, modification, nr, cellPcid) {
+  sendTableModificationCommand(tablePcid, pcmodel, page_model, modification, nr, cellPcid, cnt) {
     const af = this.actionFactory;
     const update_action = af.table().command().modifyTable(
       tablePcid,
       pcmodel.content,
       modification,
       nr,
-      cellPcid
+      cellPcid,
+      cnt
     );
     console.log(this.client);
     this.client.sendCommand(update_action).then(result => {

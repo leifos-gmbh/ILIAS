@@ -228,7 +228,7 @@ class ilPCDataTableEditorGUI implements \ILIAS\COPage\Editor\Components\PageComp
         $components = $this
             ->gui
             ->modal("#modal-title#")
-            ->form($form)->getTriggerButtonComponents(
+            ->form($form, "#on-form-submit-click#")->getTriggerButtonComponents(
                 "#button-title#",
                 true
             );

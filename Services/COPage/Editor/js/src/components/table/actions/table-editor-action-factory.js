@@ -60,11 +60,12 @@ export default class TableEditorActionFactory {
   /**
    * @returns {EditorAction}
    */
-  colBefore(nr, cellPcid, tablePcid) {
+  colBefore(nr, cellPcid, tablePcid, cnt) {
     return this.editorActionFactory.action(this.COMPONENT, ACTIONS.COL_BEFORE, {
       nr: nr,
       cellPcid: cellPcid,
-      tablePcid: tablePcid
+      tablePcid: tablePcid,
+      cnt: cnt
     });
   }
 

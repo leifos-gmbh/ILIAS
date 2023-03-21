@@ -260,7 +260,7 @@ class TableCommandActionHandler implements Server\CommandActionHandler
 
         switch ($body["data"]["modification"]) {
             case "col.before":
-                $td->newColBefore();
+                $td->newColBefore($body["data"]["cnt"] ?? 1);
                 break;
             case "col.after":
                 $td->newColAfter();

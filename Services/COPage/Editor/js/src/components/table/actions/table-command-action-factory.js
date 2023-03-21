@@ -58,13 +58,14 @@ export default class TableCommandActionFactory {
    * @param cellPcid
    * @return {CommandAction}
    */
-  modifyTable(tablePcid, content, modification, nr, cellPcid) {
+  modifyTable(tablePcid, content, modification, nr, cellPcid, cnt = 1) {
     return this.clientActionFactory.command(this.COMPONENT, ACTIONS.MODIFY_TABLE, {
       tablePcid: tablePcid,
       content: content,
       modification: modification,
       nr: nr,
-      cellPcid: cellPcid
+      cellPcid: cellPcid,
+      cnt: cnt
     });
   }
 

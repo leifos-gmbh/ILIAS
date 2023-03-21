@@ -103,7 +103,10 @@ class ModalAdapterGUI
         return $this;
     }
 
-    public function form(\ILIAS\Repository\Form\FormAdapterGUI $form): self
+    public function form(
+        \ILIAS\Repository\Form\FormAdapterGUI $form,
+        string $on_form_submit_click = ""
+    ): self
     {
         if ($this->ctrl->isAsynch()) {
             $this->form = $form->asyncModal();
@@ -114,12 +117,15 @@ class ModalAdapterGUI
         $async = $this->form->isSentAsync()
             ? "true"
             : "false";
+        if ($on_form_submit_click === "") {
+            $on_form_submit_click = "il.repository.ui.submitModalForm(event,$async); return false;";
+        }
         $button = $this->ui->factory()->button()->standard(
             $this->form->getSubmitCaption(),
             "#"
-        )->withOnLoadCode(function ($id) use ($async) {
+        )->withOnLoadCode(function ($id) use ($on_form_submit_click) {
             return
-                "$('#$id').click(function(event) { il.repository.ui.submitModalForm(event,$async); return false;});";
+                "$('#$id').click(function(event) {".$on_form_submit_click."});";
         });
         $this->action_buttons[] = $button;
         $this->ui_content = null;

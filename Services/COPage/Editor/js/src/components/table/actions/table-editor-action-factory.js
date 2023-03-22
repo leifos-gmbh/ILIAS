@@ -215,6 +215,15 @@ export default class TableEditorActionFactory {
   /**
    * @returns {EditorAction}
    */
+  toggleTable(expand) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.TOGGLE_TABLE, {
+        expand: expand
+    });
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
   toggleCell(col,row,expand) {
     return this.editorActionFactory.action(this.COMPONENT, ACTIONS.TOGGLE_CELL,{
       col: col,
@@ -242,6 +251,13 @@ export default class TableEditorActionFactory {
       pcid:pcid,
       selected: selected
     });
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  cancelCellEdit() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.CANCEL_CELL_EDIT);
   }
 
 }

@@ -65,12 +65,24 @@ export default class TableModelActionHandler {
           this.tableModel.setState(this.tableModel.STATE_CELLS);
           break;
 
+        case ACTIONS.SAVE_RETURN:
+          this.tableModel.setState(this.tableModel.STATE_TABLE);
+          break;
+
+        case ACTIONS.CANCEL_CELL_EDIT:
+          this.tableModel.setState(this.tableModel.STATE_TABLE);
+          break;
+
         case ACTIONS.TOGGLE_CELL:
           this.tableModel.toggleCell(parseInt(params.row), parseInt(params.col), params.expand);
           break
 
         case ACTIONS.TOGGLE_ROW:
           this.tableModel.toggleRow(parseInt(params.nr), params.expand);
+          break;
+
+        case ACTIONS.TOGGLE_TABLE:
+          this.tableModel.toggleTable(params.expand);
           break;
 
         case ACTIONS.TOGGLE_COL:

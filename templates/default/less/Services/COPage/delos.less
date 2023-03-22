@@ -589,6 +589,11 @@ a.nostyle:hover {
 	}
 }
 
+#copg-editor-slate-content #ilPageEditLegend > p {
+	padding: @il-padding-base-vertical @il-padding-xlarge-horizontal;
+}
+
+
 .ilPageEditLegendElement {
 	width: 40px;
 	border: 1px solid #d0d0d0;
@@ -680,7 +685,10 @@ div.ilCOPGMediaPrint {
 	right: auto;
 }
 
-#il_prop_cont_characteristic ul.dropdown-menu {
+#il_prop_cont_characteristic ul.dropdown-menu,
+#il_prop_cont_import_characteristic ul.dropdown-menu,
+#il_prop_cont_style ul.dropdown-menu
+{
 	right: auto;
 }
 
@@ -822,6 +830,8 @@ p#copg-auto-save {
 
 	th.il-copg-edit-table {
 		background-color: @il-main-dark-bg;
+		text-align: center;
+		min-width: 40px;
 		.dropdown button {
 			background-color: @il-main-dark-bg;
 			text-align: center;
@@ -891,4 +901,8 @@ p#copg-auto-save {
 
 .il-copg-cell-selected {
 	outline: @il-warning-color 2px solid;
+}
+
+#copg-table-top-actions {
+	padding: 0 @il-padding-xlarge-horizontal;
 }

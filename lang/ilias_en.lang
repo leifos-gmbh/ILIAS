@@ -17009,3 +17009,19 @@ content#:#cont_has_row_header#:#Has a Header Row
 content#:#cont_paste_from_spreadsheet#:#Paste From Spreadsheet
 content#:#cont_ed_nr_cols#:#Number of Columns
 content#:#cont_ed_nr_rows#:#Number of Rows
+content#:#cont_table_style#:#Style
+content#:#cont_table_import_info#:#Please enter the table data separated by semicolon or TAB character for each column. Start a new row for each table row. Spreadsheet applications will usually use TAB characters for separation when transfered via clipboard. It should be possible to paste this data directly into the input field. No further formattings will be imported.
+content#:#cont_finish_table_editing#:#Finish Data Table Editing
+content#:#cont_edit_table#:#Edit Table
+content#:#cont_format_cells#:#Format Cells
+content#:#cont_table_adv_settings#:#Erweiterte Einstellungen
+content#:#cont_table_cell_edit_info_1#:#Click on a table cell to select or deselect it.
+content#:#cont_table_cell_edit_info_2#:#Click on a row or column header to select or deselect the corresponding row or column.
+content#:#cont_table_cell_edit_info_3#:#Click on a second cell while holding shift to select all the cells in between.
+content#:#cont_cell_properties#:#Table Cell Properties
+content#:#cont_set_properties#:#Set Properties
+content#:#cont_merge_cells#:#Merge Cells
+content#:#cont_split_cell#:#Split Cell
+content#:#cont_change_style#:#Change Style
+content#:#cont_change_width#:#Change Width
+content#:#cont_change_alignment#:#Change Alignment

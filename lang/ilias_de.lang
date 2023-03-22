@@ -17019,3 +17019,19 @@ content#:#cont_has_row_header#:#Kopfzeile
 content#:#cont_paste_from_spreadsheet#:#Aus Tabellenkalkulation einfügen
 content#:#cont_ed_nr_cols#:#Anzahl Spalten
 content#:#cont_ed_nr_rows#:#Anzahl Zeilen
+content#:#cont_table_style#:#Style
+content#:#cont_table_import_info#:#Geben Sie die Daten je Spalte getrennt durch ein Semikolon oder TAB ein. Für jede Tabellenzeile beginnen Sie auch hier eine neue Zeile. Üblicherweise trennen Tabellenkalkulationen die Daten, wenn sie per Zwischenablage übertragen werden, mit einem TAB. Diese können dann direkt hier eingefügt werden. Weitere Formatierungen werden nicht importiert.
+content#:#cont_finish_table_editing#:#Editieren der Tabelle beenden
+content#:#cont_edit_table#:#Tabelle editieren
+content#:#cont_format_cells#:#Zellen formattieren
+content#:#cont_table_adv_settings#:#Erweiterte Eigenschaften
+content#:#cont_table_cell_edit_info_1#:#Klicken Sie auf eine Tabellenzelle um sie auszuwählen oder die Auswahl aufzuheben.
+content#:#cont_table_cell_edit_info_2#:#Klicken Sie auf einen Spalten- oder Zeilenkopf um die gesamte Spalte oder Zeile auszuwählen.
+content#:#cont_table_cell_edit_info_3#:#Halten Sie die Shift-Taste beim Klicken auf eine Zelle um den Bereich zu erweitern.
+content#:#cont_cell_properties#:#Eigenschaften der Tabellenzellen
+content#:#cont_set_properties#:#Eigenschaften setzen
+content#:#cont_merge_cells#:#Zellen verbinden
+content#:#cont_split_cell#:#Zelle auteilen
+content#:#cont_change_style#:#Style ändern
+content#:#cont_change_width#:#Breite ändern
+content#:#cont_change_alignment#:#Ausrichtung ändern

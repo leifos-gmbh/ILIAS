@@ -320,7 +320,7 @@ class ilPCDataTableGUI extends ilPCTableGUI
 
         // table templates and table classes
         $char_prop = new ilAdvSelectInputGUI(
-            $this->lng->txt("cont_characteristic"),
+            $this->lng->txt("cont_table_style"),
             "characteristic"
         );
         $chars = $this->getCharacteristics();
@@ -374,7 +374,7 @@ class ilPCDataTableGUI extends ilPCTableGUI
 
         // table templates and table classes
         $char_prop = new ilAdvSelectInputGUI(
-            $this->lng->txt("cont_characteristic"),
+            $this->lng->txt("cont_table_style"),
             "characteristic"
         );
         $chars = $this->getCharacteristics();
@@ -399,7 +399,14 @@ class ilPCDataTableGUI extends ilPCTableGUI
             $char_prop->addOption($k, $char, $html);
         }
         if (count($chars) > 1) {
-            $char_prop->setValue("StandardTable");
+            if ($this->content_obj->getTemplate() !== "") {
+                $val = "t:" .
+                    ilObjStyleSheet::_lookupTemplateIdByName($this->getStyleId(), $this->content_obj->getTemplate()) . ":" .
+                    $this->content_obj->getTemplate();
+            } else {
+                $val = $this->content_obj->getClass();
+            }
+            $char_prop->setValue($val);
             $form->addItem($char_prop);
         }
 
@@ -431,9 +438,46 @@ class ilPCDataTableGUI extends ilPCTableGUI
         $form->addItem($hi);
 
         $import_data = new ilTextAreaInputGUI("", "import_table");
+        $import_data->setInfo($this->lng->txt("cont_table_import_info"));
         $import_data->setRows(8);
         $import_data->setCols(50);
         $form->addItem($import_data);
+
+        // table templates and table classes
+        $char_prop = new ilAdvSelectInputGUI(
+            $this->lng->txt("cont_table_style"),
+            "import_characteristic"
+        );
+        $chars = $this->getCharacteristics();
+        $templates = $this->getTemplateOptions();
+        $chars = array_merge($templates, $chars);
+        if (is_object($this->content_obj)) {
+            if (($chars[$a_seleted_value] ?? "") == "" && ($this->content_obj->getClass() != "")) {
+                $chars = array_merge(
+                    array($this->content_obj->getClass() => $this->content_obj->getClass()),
+                    $chars
+                );
+            }
+        }
+        foreach ($chars as $k => $char) {
+            if (strpos($k, ":") > 0) {
+                $t = explode(":", $k);
+                $html = $this->style->lookupTemplatePreview($t[1]) . '<div style="clear:both;" class="small">' . $char . "</div>";
+            } else {
+                $html = '<table class="ilc_table_' . $k . '"><tr><td class="small">' .
+                    $char . '</td></tr></table>';
+            }
+            $char_prop->addOption($k, $char, $html);
+        }
+        if (count($chars) > 1) {
+            $char_prop->setValue("StandardTable");
+            $form->addItem($char_prop);
+        }
+
+        // row header
+        $cb = new ilCheckboxInputGUI($lng->txt("cont_has_row_header"), "has_row_header");
+        $form->addItem($cb);
+
 
         $form->addCommandButton("create_tab", $lng->txt("save"));
         $form->addCommandButton("cancelCreate", $lng->txt("cancel"));
@@ -453,7 +497,7 @@ class ilPCDataTableGUI extends ilPCTableGUI
         $form->setShowTopButtons(false);
         $form->setTitle($this->lng->txt("cont_cell_properties"));
 
-        $style_cb = new ilCheckboxInputGUI($lng->txt("cont_style"), "style_cb");
+        $style_cb = new ilCheckboxInputGUI($lng->txt("cont_change_style"), "style_cb");
 
         $style = new ilAdvSelectInputGUI(
             $this->lng->txt("cont_style"),
@@ -474,7 +518,7 @@ class ilPCDataTableGUI extends ilPCTableGUI
             $form->addItem($style_cb);
         }
 
-        $width_cb = new ilCheckboxInputGUI($lng->txt("cont_width"), "width_cb");
+        $width_cb = new ilCheckboxInputGUI($lng->txt("cont_change_width"), "width_cb");
         $ti = new ilTextInputGUI($lng->txt("cont_width"), "width");
         $ti->setMaxLength(20);
         $ti->setSize(7);
@@ -482,7 +526,7 @@ class ilPCDataTableGUI extends ilPCTableGUI
         $form->addItem($width_cb);
 
         // alignment
-        $al_cb = new ilCheckboxInputGUI($lng->txt("cont_alignment"), "al_cb");
+        $al_cb = new ilCheckboxInputGUI($lng->txt("cont_change_alignment"), "al_cb");
         $options = array(
             "" => $lng->txt("default"),
             "Left" => $lng->txt("cont_left"),

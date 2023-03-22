@@ -81,6 +81,13 @@ class ilPCTableGUI extends ilPageContentGUI
         $lng = $this->lng;
 
         $ilTabs->setBackTarget(
+            "",
+            ""
+        );
+
+        return;
+
+        $ilTabs->setBackTarget(
             $lng->txt("pg"),
             (string) $this->ctrl->getParentReturn($this)
         );
@@ -214,6 +221,7 @@ class ilPCTableGUI extends ilPageContentGUI
         $width->setMaxLength(6);
         $this->form->addItem($width);
 
+        /*
         // border
         $border = new ilTextInputGUI($this->lng->txt("cont_table_border"), "border");
         $border->setInfo($this->lng->txt("cont_table_border_info"));
@@ -233,7 +241,7 @@ class ilPCTableGUI extends ilPageContentGUI
         // spacing (deprecated, only hidden)
         $spacing = new ilHiddenInputGUI("spacing");
         $spacing->setValue("0px");
-        $this->form->addItem($spacing);
+        $this->form->addItem($spacing);*/
 
         // table templates and table classes
         $char_prop = new ilAdvSelectInputGUI(
@@ -373,6 +381,7 @@ class ilPCTableGUI extends ilPageContentGUI
             $this->form->addCommandButton("cancelCreate", $lng->txt("cancel"));
         } else {
             $this->form->addCommandButton("saveProperties", $lng->txt("save"));
+            $this->form->addCommandButton("editData", $lng->txt("cancel"));
         }
     }
 
@@ -380,9 +389,9 @@ class ilPCTableGUI extends ilPageContentGUI
     {
         $values = array();
         $values["width"] = $this->content_obj->getWidth();
-        $values["border"] = $this->content_obj->getBorder();
-        $values["padding"] = $this->content_obj->getCellPadding();
-        $values["spacing"] = $this->content_obj->getCellSpacing();
+        //$values["border"] = $this->content_obj->getBorder();
+        //$values["padding"] = $this->content_obj->getCellPadding();
+        //$values["spacing"] = $this->content_obj->getCellSpacing();
         $values["row_header"] = $this->content_obj->getHeaderRows();
         $values["row_footer"] = $this->content_obj->getFooterRows();
         $values["col_header"] = $this->content_obj->getHeaderCols();
@@ -802,9 +811,9 @@ class ilPCTableGUI extends ilPageContentGUI
 
         $this->content_obj->setLanguage($this->form->getInput("language"));
         $this->content_obj->setWidth($this->form->getInput("width"));
-        $this->content_obj->setBorder($this->form->getInput("border"));
-        $this->content_obj->setCellSpacing($this->form->getInput("spacing"));
-        $this->content_obj->setCellPadding($this->form->getInput("padding"));
+        //$this->content_obj->setBorder($this->form->getInput("border"));
+        //$this->content_obj->setCellSpacing($this->form->getInput("spacing"));
+        //$this->content_obj->setCellPadding($this->form->getInput("padding"));
         $this->content_obj->setHorizontalAlign($this->form->getInput("align"));
         $this->content_obj->setHeaderRows($this->form->getInput("row_header"));
         $this->content_obj->setHeaderCols($this->form->getInput("col_header"));
@@ -832,7 +841,7 @@ class ilPCTableGUI extends ilPageContentGUI
         $this->setProperties();
         $this->updated = $this->pg_obj->update();
         if ($this->updated === true) {
-            $this->ctrl->redirect($this, "editProperties");
+            $this->ctrl->redirect($this, "editData");
         //$this->ctrl->returnToParent($this, "jump".$this->hier_id);
         } else {
             $this->pg_obj->addHierIDs();
@@ -1275,6 +1284,16 @@ class ilPCTableGUI extends ilPageContentGUI
             if ($j < $pc_tab->getHeaderCols()) {
                 $class = $template_classes["col_head"];
             }
+        }
+
+        if ($class === "") {
+            if ($i < $pc_tab->getHeaderRows()) {
+                $class = "StandardHeader";
+            }
+        }
+
+        if ($class === "") {
+            $class = "StandardCell1";
         }
 
 

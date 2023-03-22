@@ -97,10 +97,23 @@ class TableCommandActionHandler implements Server\CommandActionHandler
             (int) ($body["nr_cols"] ?? 1)
         );
 
+
+        $this->setRowHeaderAndCharacteristic($tab, $body);
+
+        $updated = $page->update();
+
+        return $this->ui_wrapper->sendPage($this->page_gui, $updated);
+    }
+
+    protected function setRowHeaderAndCharacteristic(\ilPCDataTable $tab, array $body) : void
+    {
         if ($body["has_row_header"] ?? false) {
             $tab->setHeaderRows(1);
         }
         $characteristic = ($body["characteristic"] ?? "");
+        if ($characteristic === "" && isset($body["import_characteristic"])) {
+            $characteristic = $body["import_characteristic"];
+        }
         if ($characteristic === "") {
             $characteristic = "StandardTable";
         }
@@ -112,10 +125,6 @@ class TableCommandActionHandler implements Server\CommandActionHandler
             $tab->setClass($characteristic);
             $tab->setTemplate("");
         }
-
-        $updated = $page->update();
-
-        return $this->ui_wrapper->sendPage($this->page_gui, $updated);
     }
 
     protected function importSpreadsheet(array $body): Server\Response
@@ -133,7 +142,8 @@ class TableCommandActionHandler implements Server\CommandActionHandler
         $tab = new \ilPCDataTable($page);
         $tab->create($page, $hier_id, $pc_id);
         $tab->setLanguage($this->user->getLanguage());
-        $tab->setClass("StandardTable");
+
+        $this->setRowHeaderAndCharacteristic($tab, $body);
 
         $table_data = $body["import_table"] ?? "";
 
@@ -248,7 +258,7 @@ class TableCommandActionHandler implements Server\CommandActionHandler
         $table = $page->getContentObjectForPcId($body["data"]["tablePcid"]);
 
 
-        if ($table->getType() == "dtab") {
+        if ($table->getType() == "dtab" && $body["data"]["modification"] !== "none") {
             $this->updateData($body["data"]["tablePcid"], $body["data"]["content"]);
         }
 
@@ -256,7 +266,9 @@ class TableCommandActionHandler implements Server\CommandActionHandler
 
 
         /** @var $td \ilPCTableData */
-        $td = $page->getContentObjectForPcId($body["data"]["cellPcid"]);
+        if ($body["data"]["modification"] !== "none") {
+            $td = $page->getContentObjectForPcId($body["data"]["cellPcid"]);
+        }
 
         $cnt = $body["data"]["cnt"] ?? 1;
         switch ($body["data"]["modification"]) {
@@ -289,6 +301,8 @@ class TableCommandActionHandler implements Server\CommandActionHandler
                 break;
             case "row.delete":
                 $td->deleteRow();
+                break;
+            case "none":
                 break;
         }
 
@@ -335,6 +349,8 @@ class TableCommandActionHandler implements Server\CommandActionHandler
 
         /** @var \ilPCDataTable $tab */
         $tab = $page->getContentObjectForPcId($body["pcid"]);
+
+        $this->setRowHeaderAndCharacteristic($tab, $body);
 
         $header_row = (bool) ($body["has_row_header"] ?? false);
         if ($tab->getHeaderRows() === 0 && $header_row) {

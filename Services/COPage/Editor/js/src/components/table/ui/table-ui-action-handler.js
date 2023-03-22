@@ -99,9 +99,25 @@ export default class TableUIActionHandler {
           this.sendUpdateDataCommand(
             page_model.getCurrentPCId(),
             page_model.getPCModel(page_model.getCurrentPCId()),
-            true
+            false
           );
+          this.tableUI.refreshUIFromModelState(page_model, table_model);
+          this.tableUI.tinyWrapper.stopEditing();
 //          this.ui.handleSaveOnEdit();
+          break;
+
+        case ACTIONS.CANCEL_CELL_EDIT:
+          this.tableUI.refreshUIFromModelState(page_model, table_model);
+          this.tableUI.tinyWrapper.stopEditing();
+          this.sendTableModificationCommand(
+            page_model.getCurrentPCId(),
+            page_model.getPCModel(page_model.getCurrentPCId()),
+            page_model,
+            "none",
+            0,
+            0,
+            0
+          );
           break;
 
         case ACTIONS.COL_BEFORE:
@@ -162,7 +178,16 @@ export default class TableUIActionHandler {
             table_model
           );
           break;
+
+        case ACTIONS.TOGGLE_CELL:
+        case ACTIONS.TOGGLE_ROW:
+        case ACTIONS.TOGGLE_TABLE:
+        case ACTIONS.TOGGLE_COL:
+          this.tableUI.updateMergeButton(page_model,
+            table_model);
+          break;
       }
+
     }
     if (action.getComponent() === "DataTable") {
       switch (action.getType()) {
@@ -228,10 +253,6 @@ export default class TableUIActionHandler {
       this.tableUI.tinyWrapper.stopEditing();
       tableArea.outerHTML = pl.renderedContent;
 
-      console.log(pl.renderedContent);
-      console.log("PCMODEL---");
-      console.log(pl.pcModel);
-
       for (const [key, value] of Object.entries(pl.pcModel)) {
         page_model.setPCModel(key, value);
       }
@@ -275,6 +296,7 @@ export default class TableUIActionHandler {
     this.client.sendCommand(toggleMergeAction).then(result => {
       const pl = result.getPayload();
       this.handleModificationResponse(pl, page_model);
+      table_model.selectNone();
       dispatch.dispatch(af.table().editor().switchFormatCells());
     });
   }

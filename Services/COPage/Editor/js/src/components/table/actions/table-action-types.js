@@ -43,7 +43,9 @@ const ACTIONS = {
   TOGGLE_ROW: "toggle.row",
   TOGGLE_COL: "toggle.col",
   TOGGLE_CELL: "toggle.cell",
+  TOGGLE_TABLE: "toggle.table",
   PROPERTIES_SET: "properties.set",   // cell properties
-  TOGGLE_MERGE: "toggle.merge"
+  TOGGLE_MERGE: "toggle.merge",
+  CANCEL_CELL_EDIT: "cancel.cell.edit"    // cancel cell (paragraph) editing
 };
 export default ACTIONS;

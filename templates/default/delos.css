@@ -14459,6 +14459,9 @@ a.nostyle:hover {
   width: 22px;
   height: 22px;
 }
+#copg-editor-slate-content #ilPageEditLegend > p {
+  padding: 3px 15px;
+}
 .ilPageEditLegendElement {
   width: 40px;
   border: 1px solid #d0d0d0;
@@ -14535,7 +14538,9 @@ div.ilCOPGMediaPrint {
 .ilSectionClassSelector ul.dropdown-menu {
   right: auto;
 }
-#il_prop_cont_characteristic ul.dropdown-menu {
+#il_prop_cont_characteristic ul.dropdown-menu,
+#il_prop_cont_import_characteristic ul.dropdown-menu,
+#il_prop_cont_style ul.dropdown-menu {
   right: auto;
 }
 #iltinymenu .dropdown-menu li {
@@ -14658,6 +14663,8 @@ p#copg-auto-save {
 }
 #ed_datatable th.il-copg-edit-table {
   background-color: #f9f9f9;
+  text-align: center;
+  min-width: 40px;
 }
 #ed_datatable th.il-copg-edit-table .dropdown button {
   background-color: #f9f9f9;
@@ -14732,6 +14739,9 @@ p#copg-auto-save {
 }
 .il-copg-cell-selected {
   outline: #B54F00 2px solid;
+}
+#copg-table-top-actions {
+  padding: 0 15px;
 }
 /* Services/Calendar */
 td.even {

@@ -134,6 +134,18 @@ export default class TableModel {
     }, expand);
   }
 
+  /**
+   * @param {number} col
+   */
+  toggleTable(expand) {
+    this.updateSelection({
+      top: 0,
+      left: 0,
+      bottom: this.getNrOfRows() - 1,
+      right: this.getNrOfCols() - 1
+    }, expand);
+  }
+
   updateSelection(selection, expand) {
     // if area is identical with current area > remove selection
     if (this.hasSelected() && this.selected.top === selection.top

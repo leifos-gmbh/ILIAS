@@ -50,7 +50,8 @@ class Init
         $lang_vars = ["cont_last_update", "cont_error", "cont_sel_el_cut_use_paste", "cont_sel_el_copied_use_paste",
                       "cont_ed_new_col_before", "cont_ed_new_col_after", "cont_ed_col_left", "cont_ed_col_right", "cont_ed_delete_col",
                       "cont_ed_new_row_before", "cont_ed_new_row_after", "cont_ed_row_up", "cont_ed_row_down", "cont_ed_delete_row", "cont_saving",
-                      "cont_ed_nr_cols", "cont_ed_nr_rows"
+                      "cont_ed_nr_cols", "cont_ed_nr_rows",
+                      "cont_merge_cells", "cont_split_cell"
         ];
 
         foreach ($lang_vars as $l) {

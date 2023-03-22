@@ -150,11 +150,23 @@ class ilPCDataTableEditorGUI implements \ILIAS\COPage\Editor\Components\PageComp
         $lng->loadLanguageModule("content");
         $tpl = new \ilTemplate("tpl.table_top_actions.html", true, true, "Services/COPage/Editor");
 
-        $b = $ui->factory()->button()->standard(
-            $lng->txt("cont_table_editing"),
-            $ctrl->getLinkTarget($page_gui, "edit")
+        $quit_button = $ui_wrapper->getRenderedButton(
+            $lng->txt("cont_finish_table_editing"),
+            "button",
+            "component.back",
+            null,
+            "Table",
+            true
         );
-        $tpl->setVariable("QUIT_BUTTON", $ui->renderer()->renderAsync($b));
+
+        /*
+        $b = $ui->factory()->button()->primary(
+            $lng->txt("cont_finish_table_editing"),
+            $ctrl->getLinkTarget($page_gui, "edit")
+        );*/
+
+        //$tpl->setVariable("QUIT_BUTTON", $ui->renderer()->renderAsync($b));
+        $tpl->setVariable("QUIT_BUTTON", $quit_button);
 
         $html = $ui_wrapper->getRenderedViewControl(
             [
@@ -175,12 +187,32 @@ class ilPCDataTableEditorGUI implements \ILIAS\COPage\Editor\Components\PageComp
         string $pcid
     ) : string {
         return $this->getTopActions($ui_wrapper, $page_gui) .
-            $this->getEditForm($page_gui, $ui_wrapper, $style_id, $pcid);
+            $this->getEditForm($page_gui, $ui_wrapper, $style_id, $pcid) .
+            $this->getAdvancedSettingsLink($page_gui, $pcid);
+    }
+
+    protected function getAdvancedSettingsLink(
+        \ilPageObjectGUI $page_gui,
+        string $pcid):string
+    {
+        $page = $page_gui->getPageObject();
+        /** @var \ilPCDataTable $tab */
+        $tab = $page->getContentObjectForPcId($pcid);
+        $tab_gui = new ilPCDataTableGUI($page_gui->getPageObject(), $tab, "", $pcid);
+        $link = $this->ui->factory()->button()->shy(
+            $this->lng->txt("cont_table_adv_settings"),
+            $this->ctrl->getLinkTarget($tab_gui, "editProperties")
+        );
+        return $this->ui->renderer()->renderAsync($link);
     }
 
     protected function getCellInfo() : string
     {
-        return "Cell Info";
+        return "<div id='ilPageEditLegend' class='subtitle'>".
+            "<p>".$this->lng->txt("cont_table_cell_edit_info_1")."</p>".
+            "<p>".$this->lng->txt("cont_table_cell_edit_info_2")."</p>".
+            "<p>".$this->lng->txt("cont_table_cell_edit_info_3")."</p>".
+            "</div>";
     }
 
     protected function getCellActions(
@@ -199,7 +231,7 @@ class ilPCDataTableEditorGUI implements \ILIAS\COPage\Editor\Components\PageComp
         $html = $ui_wrapper->getRenderedForm(
             $form,
             [
-                ["Table", "toggle.merge", $lng->txt("cont_merge")],
+                ["Table", "toggle.merge", $lng->txt("cont_merge_cells")],
                 ["Table", "properties.set", $lng->txt("cont_set_properties")],
                 ["Page", "component.back", $lng->txt("cancel")]
             ]

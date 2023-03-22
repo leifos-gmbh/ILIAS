@@ -180,14 +180,16 @@ export default class TableUI {
     const action = this.actionFactory;
     const dispatch = this.dispatcher;
     const tableModel = this.tableModel;
-    const selector = "[data-copg-ed-type='data-column-head'],[data-copg-ed-type='data-row-head']";
+    const selector = "[data-copg-ed-type='data-table-head'],[data-copg-ed-type='data-column-head'],[data-copg-ed-type='data-row-head']";
 
     // init add buttons
     document.querySelectorAll(selector).forEach(head => {
       const caption = head.dataset.caption;
       const nr = parseInt(head.dataset.nr) - 1;
       const headType = head.dataset.copgEdType;
-      head.innerHTML = caption;
+      if (headType !== "data-table-head") {
+        head.innerHTML = caption;
+      }
       if (!this.head_selection_initialised) {
         head.addEventListener("click", (event) => {
           if (tableModel.getState() !== tableModel.STATE_CELLS) {
@@ -199,8 +201,10 @@ export default class TableUI {
           const expand = (event.shiftKey || event.ctrlKey || event.metaKey);
           if (headType === "data-row-head") {
             dispatch.dispatch(action.table().editor().toggleRow(nr, expand));
-          } else {
+          } else if (headType === "data-column-head") {
             dispatch.dispatch(action.table().editor().toggleCol(nr, expand));
+          } else {
+            dispatch.dispatch(action.table().editor().toggleTable(expand));
           }
         });
       }
@@ -572,6 +576,12 @@ console.log("INIT CELL EDITING")
       add = this.uiModel.components["DataTable"]["cell_info"];
     }
     this.toolSlate.setContent(this.uiModel.components["DataTable"]["top_actions"] + add);
+    if (this.tableModel.hasSelected()) {
+      this.updateMergeButton(this.page_model,
+        this.tableModel);
+      // init cancel button in cell prop form
+      this.pageModifier.initFormButtonsAndSettingsLink(this.page_model);
+    }
     this.initTopActions();
     this.refreshModeSelector();
     this.initCellPropertiesForm(this.page_model, this.tableModel);
@@ -612,6 +622,37 @@ console.log("INIT CELL EDITING")
     });
   }
 
+  updateMergeButton(pageModel,tableModel) {
+    console.log("UPDATE MERGE BUTTON");
+    const b = document.querySelector("#copg-editor-slate-content [data-copg-ed-action='toggle.merge']");
+    const sel = tableModel.getSelected();
+    if (!b) {
+      return;
+    }
+    if (sel.top  > -1 && sel.top === sel.bottom &&
+      sel.left  > -1 && sel.left === sel.right && this.isMerged(sel.top, sel.left)) {
+      b.value = il.Language.txt("cont_split_cell");
+      b.disabled = false;
+    } else if (sel.top < sel.bottom || sel.left < sel.right) {
+      b.value = il.Language.txt("cont_merge_cells");
+      b.disabled = false;
+    } else {
+      b.disabled = true;
+    }
+  }
+
+  isMerged(row, col) {
+    const td = document.querySelector("td[data-row='"+row+"'][data-column='"+col+"']");
+    console.log("ISMERGED");
+    console.log(td);
+    console.log(td.colSpan);
+    console.log(td.rowSpan);
+    if (td && (td.colSpan > 1 || td.rowSpan > 1)) {
+      return true;
+    }
+    return false;
+  }
+
 
   initTopActions() {
     const dispatch = this.dispatcher;
@@ -626,6 +667,16 @@ console.log("INIT CELL EDITING")
             break;
           case ACTIONS.SWITCH_FORMAT_CELLS:
             dispatch.dispatch(action.table().editor().switchFormatCells());
+            break;
+        }
+      });
+    });
+    document.querySelectorAll("#copg-table-top-actions [data-copg-ed-type='button']").forEach(button => {
+      const act = button.dataset.copgEdAction;
+      button.addEventListener("click", (event) => {
+        switch (act) {
+          case PAGE_ACTIONS.COMPONENT_BACK:
+            dispatch.dispatch(action.page().editor().componentBack());
             break;
         }
       });

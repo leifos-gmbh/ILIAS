@@ -41,11 +41,16 @@ class UIWrapper
         string $type,
         string $action,
         array $data = null,
-        string $component = ""
-    ): \ILIAS\UI\Component\Button\Standard {
+        string $component = "",
+        bool $primary = false
+    ): \ILIAS\UI\Component\Button\Button {
         $ui = $this->ui;
         $f = $ui->factory();
-        $b = $f->button()->standard($content, "");
+        if ($primary) {
+            $b = $f->button()->primary($content, "");
+        } else {
+            $b = $f->button()->standard($content, "");
+        }
         if ($data === null) {
             $data = [];
         }
@@ -86,10 +91,11 @@ class UIWrapper
         string $type,
         string $action,
         array $data = null,
-        string $component = ""
+        string $component = "",
+        bool $primary = false
     ): string {
         $ui = $this->ui;
-        $b = $this->getButton($content, $type, $action, $data, $component);
+        $b = $this->getButton($content, $type, $action, $data, $component, $primary);
         return $ui->renderer()->renderAsync($b);
     }
 

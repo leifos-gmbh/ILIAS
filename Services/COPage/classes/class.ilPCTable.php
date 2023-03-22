@@ -195,6 +195,9 @@ class ilPCTable extends ilPageContent
         // put data in target_row arrays
         foreach ($rows as $row) {
             $cells = explode("\t", $row);
+            if (count($cells) === 1) {
+                $cells = explode(";", $row);
+            }
             $max_cols = ($max_cols > count($cells))
                 ? $max_cols
                 : count($cells);

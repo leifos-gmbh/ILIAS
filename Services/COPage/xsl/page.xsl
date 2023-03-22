@@ -1585,14 +1585,22 @@
 		<!-- odd col -->
 		<xsl:when test="../../@Template and //StyleTemplates/StyleTemplate[@Name=$ttemp]/StyleClass[@Type='odd_col']/@Value and position() mod 2 = 1">
 			<xsl:attribute name = "class">ilc_table_cell_<xsl:value-of select = "//StyleTemplates/StyleTemplate[@Name=$ttemp]/StyleClass[@Type='odd_col']/@Value"/></xsl:attribute>
-		</xsl:when>						
+		</xsl:when>
+		<xsl:when test="number($headerrows) >= number($rowpos)">
+			<xsl:attribute name = "class">ilc_table_cell_StandardHeader</xsl:attribute>
+		</xsl:when>
+		<xsl:otherwise>
+			<xsl:attribute name = "class">ilc_table_cell_StandardCell1</xsl:attribute>
+		</xsl:otherwise>
 	</xsl:choose>
 	<xsl:attribute name = "width"><xsl:value-of select = "@Width"/></xsl:attribute>
-	
+
+	<!--
 	<xsl:attribute name = "style">
 		<xsl:if test="../../@CellPadding">padding: <xsl:value-of select="../../@CellPadding"/>;</xsl:if>
 		<xsl:if test="../../@Border">border: solid <xsl:value-of select="../../@Border"/>;</xsl:if>
 	</xsl:attribute>
+	-->
 	
 	<!-- insert commands -->
 	<!-- <xsl:value-of select="@HierId"/> -->

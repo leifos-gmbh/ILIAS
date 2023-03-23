@@ -160,7 +160,7 @@ class UIWrapper
             $cnt++;
             $form->addCommandButton("", $button[2], "cmd-" . $cnt);
         }
-        $html = $form->getHTML();
+        $html = $form->getHTMLAsync();
         $cnt = 0;
         foreach ($buttons as $button) {
             $cnt++;

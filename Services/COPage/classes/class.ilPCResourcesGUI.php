@@ -328,6 +328,8 @@ class ilPCResourcesGUI extends ilPageContentGUI
     ): string {
         global $DIC;
 
+        $item_ref_ids = [];
+
         $lng = $DIC->language();
         $ref_id = $DIC
             ->copage()
@@ -354,11 +356,18 @@ class ilPCResourcesGUI extends ilPageContentGUI
                 count($block->getItemRefIds()) > 0) {
                 foreach ($block->getItemRefIds() as $ref_id) {
                     $data = $item_presentation_manager->getRawDataByRefId($ref_id);
+                    if ($block->getBlock() instanceof \ILIAS\Container\Content\OtherBlock) {
+                        if ($data["type"] === "itgr" || in_array($ref_id, $item_ref_ids)) {
+                            continue;
+                        }
+                    }
+
                     $tpl->setCurrentBlock("row");
                     $tpl->setVariable("IMG", ilUtil::img(ilObject::_getIcon((int) $data["obj_id"], "small")));
                     $tpl->setVariable("TITLE", $data["title"]);
                     $tpl->parseCurrentBlock();
                     $cnt++;
+                    $item_ref_ids[$ref_id] = $ref_id;
                 }
             } elseif (count($block->getObjectiveIds()) > 0) {
                 foreach ($block->getObjectiveIds() as $objective_id) {

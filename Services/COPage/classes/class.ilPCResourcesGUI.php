@@ -351,7 +351,7 @@ class ilPCResourcesGUI extends ilPageContentGUI
             // render block
             $tpl = new ilTemplate("tpl.resource_block.html", true, true, "Services/COPage");
             $cnt = 0;
-
+            $max = 5;
             if (!($block->getBlock() instanceof \ILIAS\Container\Content\ObjectivesBlock) &&
                 count($block->getItemRefIds()) > 0) {
                 foreach ($block->getItemRefIds() as $ref_id) {
@@ -362,20 +362,36 @@ class ilPCResourcesGUI extends ilPageContentGUI
                         }
                     }
 
-                    $tpl->setCurrentBlock("row");
-                    $tpl->setVariable("IMG", ilUtil::img(ilObject::_getIcon((int) $data["obj_id"], "small")));
-                    $tpl->setVariable("TITLE", $data["title"]);
-                    $tpl->parseCurrentBlock();
+                    if ($cnt < $max) {
+                        $tpl->setCurrentBlock("row");
+                        $tpl->setVariable("IMG", ilUtil::img(ilObject::_getIcon((int) $data["obj_id"], "small")));
+                        $tpl->setVariable("TITLE", $data["title"]);
+                        $tpl->parseCurrentBlock();
+                    }
+                    if ($cnt == $max) {
+                        $tpl->setCurrentBlock("row");
+                        $tpl->setVariable("IMG", ilUtil::img(ilObject::_getIcon((int) $data["obj_id"], "small")));
+                        $tpl->setVariable("TITLE", "...");
+                        $tpl->parseCurrentBlock();
+                    }
                     $cnt++;
                     $item_ref_ids[$ref_id] = $ref_id;
                 }
             } elseif (count($block->getObjectiveIds()) > 0) {
                 foreach ($block->getObjectiveIds() as $objective_id) {
                     $title = \ilCourseObjective::lookupObjectiveTitle($objective_id);
-                    $tpl->setCurrentBlock("row");
-                    $tpl->setVariable("IMG", ilUtil::img(ilUtil::getImagePath("icon_lobj.svg")));
-                    $tpl->setVariable("TITLE", $title);
-                    $tpl->parseCurrentBlock();
+                    if ($cnt < $max) {
+                        $tpl->setCurrentBlock("row");
+                        $tpl->setVariable("IMG", ilUtil::img(ilUtil::getImagePath("icon_lobj.svg")));
+                        $tpl->setVariable("TITLE", $title);
+                        $tpl->parseCurrentBlock();
+                    }
+                    if ($cnt == $max) {
+                        $tpl->setCurrentBlock("row");
+                        $tpl->setVariable("IMG", ilUtil::img(ilUtil::getImagePath("icon_lobj.svg")));
+                        $tpl->setVariable("TITLE", "...");
+                        $tpl->parseCurrentBlock();
+                    }
                     $cnt++;
                 }
             } else {

@@ -351,7 +351,8 @@ class ItemBlockSequenceGenerator
         $ref_ids = $this->getItemGroupItemRefIds($item_group_ref_id);
         $this->accumulateRefIds($ref_ids);
         $block_items = $this->determineBlockItems($ref_ids);
-        if (count($block_items->getRefIds()) > 0) {
+        // otherwise empty item groups will simply "vanish" from the repository
+        if (count($block_items->getRefIds()) > 0 || $this->access->checkAccess('write', '', $item_group_ref_id)) {
             return $this->data_service->itemBlock(
                 (string) $item_group_ref_id,
                 $this->data_service->itemGroupBlock($item_group_ref_id),

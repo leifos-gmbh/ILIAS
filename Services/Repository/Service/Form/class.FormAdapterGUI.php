@@ -37,6 +37,7 @@ class FormAdapterGUI
     protected \ilLanguage $lng;
     protected const ASYNC_NONE = 0;
     protected const ASYNC_MODAL = 1;
+    protected const ASYNC_ON = 2;
     protected \ILIAS\Data\Factory $data;
     protected \ilObjUser $user;
     protected string $last_key = "";
@@ -126,6 +127,12 @@ class FormAdapterGUI
         return $this;
     }
 
+    public function async(): self
+    {
+        $this->async_mode = self::ASYNC_ON;
+        return $this;
+    }
+
     public function syncModal(): self
     {
         $this->in_modal = true;
@@ -170,6 +177,30 @@ class FormAdapterGUI
         if (!is_null($value)) {
             $field = $field->withValue($value);
         }
+        $this->addField($key, $field);
+        return $this;
+    }
+
+    public function checkbox(
+        string $key,
+        string $title,
+        string $description = "",
+        ?bool $value = null
+    ): self {
+        $field = $this->ui->factory()->input()->field()->checkbox($title, $description);
+        if (!is_null($value)) {
+            $field = $field->withValue($value);
+        }
+        $this->addField($key, $field);
+        return $this;
+    }
+
+    public function hidden(
+        string $key,
+        string $value
+    ): self {
+        $field = $this->ui->factory()->input()->field()->hidden();
+        $field = $field->withValue($value);
         $this->addField($key, $field);
         return $this;
     }
@@ -371,11 +402,15 @@ class FormAdapterGUI
         string $id_parameter,
         string $description = "",
         int $max_files = 1,
-        array $mime_types = []
+        array $mime_types = [],
+        array $ctrl_path = [],
+        string $logger_id = ""
     ): self {
         $this->upload_handler[$key] = new \ilRepoStandardUploadHandlerGUI(
             $result_handler,
-            $id_parameter
+            $id_parameter,
+            $logger_id,
+            $ctrl_path
         );
 
         if (count($mime_types) > 0) {
@@ -434,6 +469,9 @@ class FormAdapterGUI
             $field_path[] = $key;
             if ($field instanceof \ILIAS\UI\Component\Input\Field\SwitchableGroup) {
                 $field_path[] = 0;      // the value of the SwitchableGroup is in the 0 key of the raw data
+            }
+            if ($field instanceof \ILIAS\UI\Component\Input\Field\File) {
+                $field_path[] = 0;      // the value of File Inputs is in the 0 key of the raw data
             }
         }
         $this->fields[$key] = $field;

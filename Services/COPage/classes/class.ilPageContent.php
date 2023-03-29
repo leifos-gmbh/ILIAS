@@ -48,12 +48,11 @@ abstract class ilPageContent
         $this->log = ilLoggerFactory::getLogger('copg');
         $this->setPage($a_pg_obj);
         $this->dom = $a_pg_obj->getDom();
+        $this->domain = $DIC->copage()->internal()->domain();
         $this->init();
         if ($this->getType() == "") {
             die("Error: ilPageContent::init() did not set type");
         }
-
-        $this->domain = $DIC->copage()->internal()->domain();
     }
 
     public function setPage(ilPageObject $a_val): void
@@ -160,12 +159,12 @@ abstract class ilPageContent
         return $this->file_download_link;
     }
 
-    public function setProfileBackUrl(string $url) : void
+    public function setProfileBackUrl(string $url): void
     {
         $this->profile_back_url = $url;
     }
 
-    public function getProfileBackUrl() : string
+    public function getProfileBackUrl(): string
     {
         return $this->profile_back_url;
     }

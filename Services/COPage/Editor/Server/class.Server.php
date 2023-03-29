@@ -28,6 +28,7 @@ use ILIAS\COPage\Editor\Components\MediaObject;
 use ILIAS\COPage\Editor\Components\Table;
 use ILIAS\COPage\Editor\Components\Tabs;
 use ILIAS\COPage\Editor\Components\Resources;
+use ILIAS\COPage\Editor\Components\SourceCode;
 
 /**
  * Page editor json server
@@ -134,6 +135,9 @@ class Server
                 break;
             case "Resources":
                 $handler = new Resources\ResourcesCommandActionHandler($this->page_gui);
+                break;
+            case "SourceCode":
+                $handler = new SourceCode\SourceCodeCommandActionHandler($this->page_gui);
                 break;
         }
 

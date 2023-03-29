@@ -18,6 +18,8 @@
 
 namespace ILIAS\COPage\Editor\Server;
 
+use ILIAS\Repository\Form\FormAdapterGUI;
+
 /**
  *
  * @author Alexander Killing <killing@leifos.de>
@@ -170,6 +172,32 @@ class UIWrapper
                 $html
             );
         }
+        return $html;
+    }
+
+    public function getRenderedAdapterForm(
+        FormAdapterGUI $form,
+        array $buttons
+    ): string {
+        $button_html = "";
+        foreach ($buttons as $button) {
+            $button_html .= $this->getRenderedButton(
+                $button[2],
+                "form-button",
+                $button[1],
+                null,
+                $button[0]
+            );
+        }
+        $html = $form->render();
+        $tag = "button";
+        $html = preg_replace("#\\<" . $tag . "(.*)/" . $tag . ">#iUs", "", $html, 1);
+        $footer_pos = stripos($html, "il-standard-form-footer");
+
+        $html =
+            substr($html, 0, $footer_pos) .
+            preg_replace("#\\<" . $tag . "(.*)/" . $tag . ">#iUs", $button_html, substr($html, $footer_pos), 1);
+
         return $html;
     }
 

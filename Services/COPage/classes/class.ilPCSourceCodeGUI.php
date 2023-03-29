@@ -16,11 +16,17 @@
  *
  *********************************************************************/
 
+use ILIAS\FileUpload\Location;
+use ILIAS\FileUpload\FileUpload;
+use ILIAS\FileUpload\Handler\BasicHandlerResult;
+use ILIAS\FileUpload\DTO\UploadResult;
+use ILIAS\FileUpload\Handler\HandlerResult;
+
 /**
  * Class ilPCSourcecodeGUI
  *
  * User Interface for Paragraph Editing
- *
+ * @ilCtrl_Calls ilPCSourceCodeGUI: ilRepoStandardUploadHandlerGUI
  * @author Alexander Killing <killing@leifos.de>
  */
 class ilPCSourceCodeGUI extends ilPageContentGUI
@@ -53,6 +59,13 @@ class ilPCSourceCodeGUI extends ilPageContentGUI
         $cmd = $this->ctrl->getCmd();
 
         switch ($next_class) {
+
+            case strtolower(ilRepoStandardUploadHandlerGUI::class):
+                $form = $this->getImportFormAdapter();
+                $gui = $form->getRepoStandardUploadHandlerGUI("input_file");
+                $this->ctrl->forwardCommand($gui);
+                break;
+
             default:
                 $this->$cmd();
                 break;
@@ -313,5 +326,83 @@ class ilPCSourceCodeGUI extends ilPageContentGUI
         $form->addItem($file);
 
         return $form;
+    }
+
+    public function getImportFormAdapter(): \ILIAS\Repository\Form\FormAdapterGUI
+    {
+        $this->ctrl->setParameter($this, "cname", "SourceCode");
+        $form = $this->gui->form([self::class], "#")
+                          ->async()
+                          ->hidden("mode", "import")
+                          ->file(
+                              "input_file",
+                              $this->lng->txt("import_file"),
+                              \Closure::fromCallable([$this, 'handleUploadResult']),
+                              "filename",
+                              "",
+                              1,
+                              [],
+                              [self::class],
+                              "copg"
+                          )
+                          ->text(
+                              "title",
+                              $this->lng->txt("cont_download_title")
+                          )
+            ->select(
+                "subchar",
+                $this->lng->txt("cont_src"),
+                $this->getProgLangOptions()
+            )
+            ->checkbox(
+                "linenumbers",
+                $this->lng->txt("cont_show_line_numbers")
+            );
+        return $form;
+    }
+
+    public function getManualFormAdapter(): \ILIAS\Repository\Form\FormAdapterGUI
+    {
+        $this->ctrl->setParameter($this, "cname", "SourceCode");
+        $form = $this->gui->form([self::class], "#")
+                          ->async()
+                          ->hidden("mode", "manual")
+                          ->text(
+                              "title",
+                              $this->lng->txt("cont_download_title")
+                          )
+                          ->select(
+                              "subchar",
+                              $this->lng->txt("cont_src"),
+                              $this->getProgLangOptions()
+                          )
+                          ->checkbox(
+                              "linenumbers",
+                              $this->lng->txt("cont_show_line_numbers")
+                          );
+        return $form;
+    }
+
+    public function handleUploadResult(
+        FileUpload $upload,
+        UploadResult $result
+    ): BasicHandlerResult {
+        $fac = new ILIAS\Data\UUID\Factory();
+        $uuid = $fac->uuid4AsString();
+        $name = $uuid . ".txt";
+        $upload->moveOneFileTo(
+            $result,
+            "",
+            Location::TEMPORARY,
+            $name,
+            true
+        );
+
+        return new BasicHandlerResult(
+            "filename",
+            HandlerResult::STATUS_OK,
+            $name,
+            ''
+        );
     }
 }

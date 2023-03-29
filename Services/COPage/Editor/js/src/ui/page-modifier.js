@@ -207,14 +207,15 @@ export default class PageModifier {
 
             case "component.save":
               const form = form_button.closest("form");
-              const form_data = new FormData(form);
 
               //after_pcid, pcid, component, data
               dispatch.dispatch(action.page().editor().componentSave(
                 model.getCurrentInsertPCId(),
                 model.getCurrentPCId(),
                 model.getCurrentPCName(),
-                form_data
+                {
+                  form:form
+                }
               ));
               break;
 

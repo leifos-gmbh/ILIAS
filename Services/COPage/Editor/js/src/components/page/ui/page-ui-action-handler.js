@@ -93,14 +93,14 @@ export default class PageUIActionHandler {
         // legacy
         console.log(model.getCurrentPCName());
 
-        if (!["Paragraph", "Grid", "MediaObject", "Section", "Tabs", "Resources", "DataTable"].includes(model.getCurrentPCName())) {
+        if (!["Paragraph", "Grid", "MediaObject", "Section", "Tabs", "Resources", "DataTable", "SourceCode"].includes(model.getCurrentPCName())) {
           let ctype = this.ui.getPCTypeForName(params.cname);
           client.sendForm(actionFactory.page().command().createLegacy(ctype, params.pcid,
             params.hierid, params.pluginName));
           form_sent = true;
         }
         // generic
-        if (["Grid", "MediaObject", "Section", "Tabs", "Resources", "DataTable"].includes(model.getCurrentPCName())) {
+        if (["Grid", "MediaObject", "Section", "Tabs", "Resources", "DataTable", "SourceCode"].includes(model.getCurrentPCName())) {
           this.ui.showGenericCreationForm();
         }
         break;
@@ -392,35 +392,67 @@ export default class PageUIActionHandler {
     });
   }
 
+
+  /**
+   * @returns {Promise}
+   */
+  sendFiles(form) {
+    let input_id, dropzone, cnt = 0;
+    return new Promise((resolve, reject) => {
+      if (typeof Dropzone !== "undefined" && typeof Dropzone.instances !== "undefined" && Array.isArray(Dropzone.instances)) {
+        for (let i = 0; i < Dropzone.instances.length; i++) {
+          const el = Dropzone.instances[i].element;
+          // process only dropzones in our form with file data
+          if (form.contains(el) && Dropzone.instances[i].getQueuedFiles().length > 0) {
+            cnt++;
+            Dropzone.instances[i].on('queuecomplete', () => {
+              cnt--;
+              if (cnt === 0) {
+                resolve();
+              }
+            });
+            Dropzone.instances[i].processQueue();
+          }
+        }
+      }
+      if (cnt === 0) {
+        resolve();
+      }
+    });
+  }
+
   sendInsertCommand(params, model) {
     let insert_action;
     const af = this.actionFactory;
     const dispatch = this.dispatcher;
 
-    insert_action = af.page().command().insert(
-      params.afterPcid,
-      params.pcid,
-      params.component,
-      params.data
-    );
+    this.sendFiles(params.data.form).then(() => {
+      const data = new FormData(params.data.form);
+      insert_action = af.page().command().insert(
+        params.afterPcid,
+        params.pcid,
+        params.component,
+        data
+      );
 
-    this.ui.toolSlate.setContent("");
-    if (this.ui.uiModel.components[model.getCurrentPCName()] &&
-        this.ui.uiModel.components[model.getCurrentPCName()].icon) {
-      document.querySelector(".copg-new-content-placeholder img").src = this.ui.uiModel.loaderUrl;
-    }
+      this.ui.toolSlate.setContent("");
+      if (this.ui.uiModel.components[model.getCurrentPCName()] &&
+          this.ui.uiModel.components[model.getCurrentPCName()].icon) {
+        document.querySelector(".copg-new-content-placeholder img").src = this.ui.uiModel.loaderUrl;
+      }
 
-    this.client.sendCommand(insert_action).then(result => {
-      this.ui.handlePageReloadResponse(result);
+      this.client.sendCommand(insert_action).then(result => {
+        this.ui.handlePageReloadResponse(result);
 
-      //after_pcid, pcid, component, data
-      dispatch.dispatch(af.page().editor().componentAfterSave(
-          params.afterPcid,
-          params.pcid,
-          params.component,
-          params.data
-      ));
+        //after_pcid, pcid, component, data
+        dispatch.dispatch(af.page().editor().componentAfterSave(
+            params.afterPcid,
+            params.pcid,
+            params.component,
+            params.data
+        ));
 
+      });
     });
   }
 

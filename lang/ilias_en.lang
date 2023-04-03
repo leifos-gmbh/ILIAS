@@ -14952,7 +14952,7 @@ skmg#:#skmg_profile#:#Profile
 skmg#:#skmg_really_delete_levels#:#Do you really want to delete the following competence levels?
 skmg#:#skmg_really_remove_skills#:#Do you really want to remove the following competences from your list?
 skmg#:#skmg_recommended_learning_material#:#Learning Materials for target achievement
-skmg#:#skmg_recommended_learning_material_info#:#Select exactly one of the following learning materials. Please work through it to achieve the competence target.
+skmg#:#skmg_recommended_learning_material_info#:#Please work through the following learning materials to achieve the competence target. Select exactly one learning material per competence level.
 skmg#:#skmg_refresh_view#:#Refresh
 skmg#:#skmg_remove_levels#:#Remove Levels
 skmg#:#skmg_remove_skill#:#Remove Competence

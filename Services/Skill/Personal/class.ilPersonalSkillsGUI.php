@@ -121,6 +121,7 @@ class ilPersonalSkillsGUI
     protected ilPersonalSkillsFilterGUI $filter;
     protected Service\SkillPersonalGUIRequest $personal_gui_request;
     protected ilSkillTreeRepository $tree_repo;
+    protected ilSkillLevelRepository $level_repo;
     protected Service\SkillTreeService $tree_service;
     protected Profile\SkillProfileManager $profile_manager;
     protected Profile\SkillProfileCompletionManager $profile_completion_manager;
@@ -176,6 +177,7 @@ class ilPersonalSkillsGUI
         $this->obj_definition = $DIC["objDefinition"];
         $this->personal_gui_request = $DIC->skills()->internal()->gui()->personal_request();
         $this->tree_repo = $DIC->skills()->internal()->repo()->getTreeRepo();
+        $this->level_repo = $DIC->skills()->internal()->repo()->getLevelRepo();
         $this->tree_service = $DIC->skills()->tree();
         $this->profile_manager = $DIC->skills()->internal()->manager()->getProfileManager();
         $this->profile_completion_manager = $DIC->skills()->internal()->manager()->getProfileCompletionManager();
@@ -1225,7 +1227,6 @@ class ilPersonalSkillsGUI
 
     public function listProfileForGap(): void
     {
-
         $this->tabs->clearTargets();
         $this->tabs->setBackTarget(
             $this->lng->txt("back"),
@@ -2150,9 +2151,11 @@ class ilPersonalSkillsGUI
                 $a_levels,
                 $this->profile_levels
             );
-            $info[] = $this->ui_fac->item()->standard($lng->txt("skmg_recommended_learning_material_info"));
-            $info_group = $this->ui_fac->item()->group("", $info);
-            $items = [];
+            $info = $this->ui_fac->item()->standard($lng->txt("skmg_recommended_learning_material_info"));
+            $item_groups[] = $this->ui_fac->item()->group("", [$info]);
+
+            $at_least_one_item = false;
+            $highlighted_level = false;
 
             $sub_objects = [];
             $is_container = false;
@@ -2164,27 +2167,44 @@ class ilPersonalSkillsGUI
                 );
             }
 
-            foreach ($imp_resources as $r) {
-                $ref_id = $r->getRepoRefId();
-                // in containers: filter resources only by objects in sub tree
-                if ($is_container && !in_array($ref_id, $sub_objects)) {
+            foreach ($imp_resources as $order_level_id => $resources) {
+                $level_id = (int) substr(strrchr($order_level_id, '_'), 1);
+                // do not show level if already reached
+                if ($level_id <= $this->actual_levels[$a_base_skill][$a_tref_id]) {
                     continue;
                 }
-                $obj_id = ilObject::_lookupObjId($ref_id);
-                $title = ilObject::_lookupTitle($obj_id);
-                $icon = $this->ui_fac->symbol()->icon()->standard(
-                    ilObject::_lookupType($obj_id),
-                    $lng->txt("icon") . " " . $lng->txt(ilObject::_lookupType($obj_id))
+                if ($level_id === $this->resource_manager->determineCurrentTargetLevel($a_levels, $this->profile_levels)) {
+                    $highlighted_level = true;
+                }
+                $level_title = $this->level_repo->lookupLevelTitle($level_id);
+                $items = [];
+                foreach ($resources as $r) {
+                    $ref_id = $r->getRepoRefId();
+                    // in containers: filter resources only by objects in sub tree
+                    if ($is_container && !in_array($ref_id, $sub_objects)) {
+                        continue;
+                    }
+                    $obj_id = ilObject::_lookupObjId($ref_id);
+                    $title = ilObject::_lookupTitle($obj_id);
+                    $icon = $this->ui_fac->symbol()->icon()->standard(
+                        ilObject::_lookupType($obj_id),
+                        $lng->txt("icon") . " " . $lng->txt(ilObject::_lookupType($obj_id))
+                    );
+                    $link = $this->ui_fac->link()->standard($title, ilLink::_getLink($ref_id));
+                    $items[] = $this->ui_fac->item()->standard($link)->withLeadIcon($icon);
+                    $at_least_one_item = true;
+                }
+                $item_groups[] = $this->ui_fac->item()->group(
+                    $highlighted_level
+                        ? "<strong>" . $level_title . " (" . $lng->txt("skmg_target_level") . ")</strong>"
+                        : $level_title,
+                    $items
                 );
-                $link = $this->ui_fac->link()->standard($title, ilLink::_getLink($ref_id));
-
-                $items[] = $this->ui_fac->item()->standard($link)->withLeadIcon($icon);
             }
-            if (count($items) > 0) {
-                $item_group = $this->ui_fac->item()->group("", $items);
+            if ($at_least_one_item) {
                 $sec_panel = $this->ui_fac->panel()->secondary()->listing(
                     $lng->txt("skmg_recommended_learning_material"),
-                    [$info_group, $item_group]
+                    $item_groups
                 );
             } else {
                 $sec_panel_content = $this->ui_fac->legacy($lng->txt("skmg_skill_needs_impr_no_res"));

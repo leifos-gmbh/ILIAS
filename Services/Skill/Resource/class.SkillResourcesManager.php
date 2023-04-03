@@ -35,13 +35,18 @@ namespace ILIAS\Skill\Resource;
 class SkillResourcesManager implements \ilSkillUsageInfo
 {
     protected SkillResourceDBRepository $skill_res_repo;
+    protected \ilSkillLevelRepository $level_repo;
 
-    public function __construct(SkillResourceDBRepository $skill_res_repo = null)
-    {
+    public function __construct(
+        SkillResourceDBRepository $skill_res_repo = null,
+        \ilSkillLevelRepository $a_level_repo = null
+    ) {
         global $DIC;
 
         $this->skill_res_repo = ($skill_res_repo)
             ?: $DIC->skills()->internal()->repo()->getResourceRepo();
+        $this->level_repo = ($a_level_repo)
+            ?: $DIC->skills()->internal()->repo()->getLevelRepo();
     }
 
     /**
@@ -94,7 +99,7 @@ class SkillResourcesManager implements \ilSkillUsageInfo
     {
         $too_low = true;
 
-        foreach ($skill_levels as $k => $v) {
+        foreach ($skill_levels as $v) {
             $v["id"] = (int) $v["id"];
             $v["skill_id"] = (int) $v["skill_id"];
             foreach ($profile_levels as $pl) {
@@ -113,9 +118,8 @@ class SkillResourcesManager implements \ilSkillUsageInfo
 
     /**
      * @param \ILIAS\Skill\Profile\SkillProfileLevel[] $profile_levels
-     * @return SkillResource[]
      */
-    public function getSuggestedResources(int $skill_id, int $tref_id, array $skill_levels, array $profile_levels): array
+    public function determineCurrentTargetLevel(array $skill_levels, array $profile_levels): int
     {
         $target_level = 0;
         foreach ($skill_levels as $l) {
@@ -129,17 +133,30 @@ class SkillResourcesManager implements \ilSkillUsageInfo
             }
         }
 
+        return $target_level;
+    }
+
+    /**
+     * @param \ILIAS\Skill\Profile\SkillProfileLevel[] $profile_levels
+     * @return SkillResource[]
+     */
+    public function getSuggestedResources(int $skill_id, int $tref_id, array $skill_levels, array $profile_levels): array
+    {
+        $target_level = $this->determineCurrentTargetLevel($skill_levels, $profile_levels);
+        $target_level_order_nr = $this->level_repo->lookupLevelNumber($target_level);
         $resources = $this->getResources($skill_id, $tref_id);
         $imp_resources = [];
         foreach ($resources as $level) {
             foreach ($level as $r) {
+                $res_level_order_nr = $this->level_repo->lookupLevelNumber($r->getLevelId());
                 if ($r->getImparting() &&
-                    $target_level == $r->getLevelId()) {
-                    $imp_resources[] = $r;
+                    $target_level_order_nr >= $res_level_order_nr) {
+                    $imp_resources[$res_level_order_nr . "_" . $r->getLevelId()][] = $r;
                 }
             }
         }
 
+        ksort($imp_resources);
         return $imp_resources;
     }
 

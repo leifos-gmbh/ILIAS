@@ -77,6 +77,8 @@ class ilContainer extends ilObject
     protected bool $use_news = false;
     protected ilRecommendedContentManager $recommended_content_manager;
 
+    protected ?array $type_grps = null;
+
     public function __construct(int $a_id = 0, bool $a_reference = true)
     {
         /** @var \ILIAS\DI\Container $DIC */
@@ -1171,7 +1173,11 @@ class ilContainer extends ilObject
                             $field_form->getADT()->setSelection($val);
                         }
                     }
+                    if ($field instanceof ilAdvancedMDFieldDefinitionInteger) {
+                        $field_form->getADT()->setNumber((int) $val);
+                    }
 
+                    $query_parser->setCombination(ilQueryParser::QP_COMBINATION_OR);
                     $adv_md_search = ilObjectSearchFactory::_getAdvancedMDSearchInstance($query_parser);
                     //$adv_md_search->setFilter($this->filter);	// this could be set to an array of object types
                     $adv_md_search->setDefinition($field);            // e.g. ilAdvancedMDFieldDefinitionSelectMulti

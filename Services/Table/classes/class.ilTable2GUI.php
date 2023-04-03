@@ -268,7 +268,7 @@ class ilTable2GUI extends ilTableGUI
         $sel_fields = [];
         $stored = false;
         if ($old_sel != "") {
-            $sel_fields = unserialize($old_sel);
+            $sel_fields = unserialize((string) $old_sel);
             $stored = true;
         }
         if (!is_array($sel_fields)) {
@@ -701,7 +701,7 @@ class ilTable2GUI extends ilTableGUI
         $sel_filters = null;
         if ($old_sel != "") {
             $sel_filters =
-                unserialize($old_sel);
+                unserialize((string) $old_sel);
             $stored = true;
         }
         if (!is_array($sel_filters)) {
@@ -1742,7 +1742,7 @@ class ilTable2GUI extends ilTableGUI
     /**
      * Standard Version of Fill Row. Most likely to
      * be overwritten by derived class.
-     * @param array $a_set data array
+     * @param array<string, mixed> $a_set data array
      */
     protected function fillRow(array $a_set): void
     {
@@ -2523,7 +2523,7 @@ class ilTable2GUI extends ilTableGUI
                 }
             }
 
-            $data["filter_values"] = unserialize($data["filter_values"]);
+            $data["filter_values"] = unserialize((string) $data["filter_values"]);
             if ($data["filter_values"]) {
                 $this->restore_filter_values = $data["filter_values"];
             }

@@ -79,10 +79,11 @@ abstract class ilObjFileAbstractProcessor implements ilObjFileProcessorInterface
 
         $file_obj->create();
 
-        ilPreview::createPreview($file_obj, true);
         if ($create_reference) {
             $file_obj->createReference();
         }
+
+        $file_obj->processAutoRating();
         $this->gui_object->putObjectInTree($file_obj, $parent_id);
 
         return $file_obj;

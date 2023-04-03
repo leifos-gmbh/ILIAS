@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -18,6 +16,8 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
+declare(strict_types=1);
+
 use ILIAS\Filesystem\Exception\FileAlreadyExistsException;
 use ILIAS\Filesystem\Exception\FileNotFoundException;
 use ILIAS\Filesystem\Exception\IOException;
@@ -28,11 +28,7 @@ use ILIAS\Filesystem\Exception\IOException;
 class ilCertificateSettingsCourseFormRepository implements ilCertificateFormRepository
 {
     private readonly ilCertificateSettingsFormRepository $settingsFormFactory;
-    private readonly ilCertificateObjUserTrackingHelper $trackingHelper;
-    private readonly ilCertificateObjectHelper $objectHelper;
-    private readonly ilCertificateObjectLPHelper $lpHelper;
     private readonly ilTree $tree;
-    private readonly ilSetting $setting;
 
     public function __construct(
         private readonly ilObject $object,
@@ -44,11 +40,11 @@ class ilCertificateSettingsCourseFormRepository implements ilCertificateFormRepo
         ilToolbarGUI $toolbar,
         ilCertificatePlaceholderDescription $placeholderDescriptionObject,
         ?ilCertificateSettingsFormRepository $settingsFormFactory = null,
-        ?ilCertificateObjUserTrackingHelper $trackingHelper = null,
-        ?ilCertificateObjectHelper $objectHelper = null,
-        ?ilCertificateObjectLPHelper $lpHelper = null,
+        private readonly ilCertificateObjUserTrackingHelper $trackingHelper = new ilCertificateObjUserTrackingHelper(),
+        private readonly ilCertificateObjectHelper $objectHelper = new ilCertificateObjectHelper(),
+        private readonly ilCertificateObjectLPHelper $lpHelper = new ilCertificateObjectLPHelper(),
         ?ilTree $tree = null,
-        ?ilSetting $setting = null
+        private readonly ilSetting $setting = new ilSetting('crs')
     ) {
         global $DIC;
 
@@ -64,11 +60,7 @@ class ilCertificateSettingsCourseFormRepository implements ilCertificateFormRepo
             $DIC->ui()->factory(),
             $DIC->ui()->renderer()
         );
-        $this->trackingHelper = $trackingHelper ?? new ilCertificateObjUserTrackingHelper();
-        $this->objectHelper = $objectHelper ?? new ilCertificateObjectHelper();
-        $this->lpHelper = $lpHelper ?? new ilCertificateObjectLPHelper();
         $this->tree = $tree ?? $DIC->repositoryTree();
-        $this->setting = $setting ?? new ilSetting('crs');
     }
 
     /**

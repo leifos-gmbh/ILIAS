@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,9 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
+
 use ILIAS\Data\Factory as DataFactory;
 use ILIAS\Data\Clock\ClockInterface;
 
@@ -169,7 +170,7 @@ class ilMailOptions
         if ($this->settings->get('mail_notification', '0')) {
             $data['cronjob_notification'] = ['integer', (int) $this->isCronJobNotificationEnabled()];
         } else {
-            $data['cronjob_notification'] = ['integer', $this->lookupNotificationSetting($this->usrId)];
+            $data['cronjob_notification'] = ['integer', self::lookupNotificationSetting($this->usrId)];
         }
 
         $data['absence_status'] = ['integer', (int) $this->getAbsenceStatus()];

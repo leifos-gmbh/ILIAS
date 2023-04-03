@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 use ILIAS\Certificate\API\Repository\UserDataRepository;
 
@@ -35,7 +35,7 @@ class UserCertificateAPITest extends ilCertificateBaseTestCase
             5,
             'Some Title',
             100,
-            1234567890,
+            1_234_567_890,
             20,
             'Ilyas',
             'Homer',

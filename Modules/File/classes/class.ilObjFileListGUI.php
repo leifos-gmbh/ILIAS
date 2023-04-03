@@ -18,6 +18,10 @@
 
 use ILIAS\FileUpload\MimeType;
 use ILIAS\File\Icon\IconDatabaseRepository;
+use ILIAS\ResourceStorage\Flavour\Definition\CropToSquare;
+use ILIAS\ResourceStorage\Flavour\Definition\FlavourDefinition;
+use ILIAS\ResourceStorage\Flavour\Definition\PagesToExtract;
+use ILIAS\ResourceStorage\Services;
 
 /**
  * Class ilObjFileListGUI
@@ -30,8 +34,81 @@ class ilObjFileListGUI extends ilObjectListGUI
 {
     use ilObjFileSecureString;
 
+    private bool $use_flavor_for_cards = false;
     protected string $title;
-    protected IconDatabaseRepository $icon_repo;
+    private bool $persist = true;
+    private int $max_size = 512;
+    private FlavourDefinition $crop_definition;
+    private FlavourDefinition $extract_definition;
+    private IconDatabaseRepository $icon_repo;
+    private Services $irss;
+
+    public function __construct(int $context = self::CONTEXT_REPOSITORY)
+    {
+        global $DIC;
+        parent::__construct($context);
+
+        $this->irss = $DIC->resourceStorage();
+        $this->crop_definition = new CropToSquare($this->persist, $this->max_size);
+        $this->extract_definition = new PagesToExtract($this->persist, $this->max_size, 1, true);
+    }
+
+    protected function getTileImagePath(): string
+    {
+        if (!$this->use_flavor_for_cards) {
+            return parent::getTileImagePath();
+        }
+        // First we use a configured Tile Image
+        $img = $this->object_service->commonSettings()->tileImage()->getByObjId($this->obj_id);
+        if ($img->exists()) {
+            return $img->getFullPath();
+        }
+
+        // Fallback to use a flavour as tile image
+        if ($this->use_flavor_for_cards && ($flavour_path = $this->getCardImageFallbackPath(
+            $this->obj_id,
+            $this->type
+        )) !== '') {
+            return $flavour_path;
+        }
+
+        // Fallback to use a default tile image
+        return ilUtil::getImagePath('cont_tile/cont_tile_default_' . $this->type . '.svg');
+    }
+
+    /**
+     * @description Can be used to take preview flavours as card images
+     */
+    protected function getCardImageFallbackPath(int $obj_id, string $type): string
+    {
+        $rid = $this->irss->manage()->find(ilObjFileAccess::getListGUIData($obj_id)['rid'] ?? '');
+        if ($rid !== null) {
+            if ($this->irss->flavours()->possible($rid, $this->crop_definition)) {
+                $url = $this->irss->consume()->flavourUrls(
+                    $this->irss->flavours()->get(
+                        $rid,
+                        $this->crop_definition
+                    )
+                )->getURLs(false)->current();
+                if ($url !== null) {
+                    return $url;
+                }
+            }
+            if ($this->irss->flavours()->possible($rid, $this->extract_definition)) {
+                $url = $this->irss->consume()->flavourUrls(
+                    $this->irss->flavours()->get(
+                        $rid,
+                        $this->extract_definition
+                    )
+                )->getURLs(false)->current();
+                if ($url !== null) {
+                    return $url;
+                }
+            }
+        }
+        return '';
+    }
+
 
     /**
      * initialisation
@@ -79,7 +156,6 @@ class ilObjFileListGUI extends ilObjectListGUI
 
         return $frame;
     }
-
 
 
     /**
@@ -181,7 +257,7 @@ class ilObjFileListGUI extends ilObjectListGUI
             );
         }
 
-        if (isset($file_data["page_count"]) && (int) $file_data["page_count"] > 0) {
+        if (isset($file_data["page_count"]) && (int)$file_data["page_count"] > 0) {
             $props[] = array(
                 "alert" => false,
                 "property" => $DIC->language()->txt("page_count"),

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 use ILIAS\Filesystem\Filesystem;
 use ILIAS\Filesystem\Stream\Streams;
@@ -79,8 +79,6 @@ abstract class ilChatroomGUIHandler
     }
 
     /**
-     * @param string $key
-     * @param Transformation $trafo
      * @param mixed $default
      * @return mixed|null
      */
@@ -155,7 +153,6 @@ abstract class ilChatroomGUIHandler
 
     /**
      * Checks if a ilChatroom exists. If not, it will send a json encoded response with success = false
-     * @param ?ilChatroom $room
      */
     protected function exitIfNoRoomExists(?ilChatroom $room): void
     {
@@ -170,7 +167,6 @@ abstract class ilChatroomGUIHandler
     /**
      * Sends a json encoded response and exits the php process
      * @param mixed $response
-     * @param bool $isJson
      */
     public function sendResponse($response, bool $isJson = false): void
     {

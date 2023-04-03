@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -18,6 +16,8 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
+declare(strict_types=1);
+
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -30,7 +30,7 @@ class ilMailMemberSearchGUI
     private readonly ServerRequestInterface $httpRequest;
     /** @var array{role_id: int, mailbox: string, form_option_title: string, default_checked: bool}[] */
     private readonly array $mail_roles;
-    private ?ilParticipants $objParticipants;
+    private ?ilParticipants $objParticipants = null;
     private readonly ilCtrlInterface $ctrl;
     private readonly ilGlobalTemplateInterface $tpl;
     private readonly ilLanguage $lng;

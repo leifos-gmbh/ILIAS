@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 use ILIAS\Mail\Autoresponder\AutoresponderService;
 
@@ -129,7 +129,7 @@ class ilObjMailGUI extends ilObjectGUI
         if ($this->isPermissionChangeAllowed()) {
             $this->tabs->addTarget(
                 'perm_settings',
-                $this->ctrl->getLinkTargetByClass([$this::class, ilPermissionGUI::class], 'perm'),
+                $this->ctrl->getLinkTargetByClass([static::class, ilPermissionGUI::class], 'perm'),
                 ['perm', 'info', 'owner'],
                 ilPermissionGUI::class
             );

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -18,6 +16,8 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
+declare(strict_types=1);
+
 /**
  * @author Michael Jansen <mjansen@databay.de>
  * @ingroup ServicesMail
@@ -31,7 +31,7 @@ class ilMailingList
     private string $title = '';
     private string $description = '';
     private string $createdate;
-    private ?string $changedate;
+    private ?string $changedate = null;
     private readonly ilDBInterface $db;
 
     private int $mode;

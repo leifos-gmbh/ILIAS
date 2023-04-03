@@ -348,7 +348,10 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
         return $button;
     }
 
-    protected function populateSpecificFeedbackBlock(assQuestionGUI $question_gui)
+    /**
+     * @return bool     true, if there is some feedback populated
+     */
+    protected function populateSpecificFeedbackBlock(assQuestionGUI $question_gui): bool
     {
         $solutionValues = $question_gui->object->getSolutionValues(
             $this->testSession->getActiveId(),
@@ -359,12 +362,19 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
             $question_gui->object->fetchIndexedValuesFromValuePairs($solutionValues)
         );
 
-        $this->tpl->setCurrentBlock("specific_feedback");
-        $this->tpl->setVariable("SPECIFIC_FEEDBACK", $feedback);
-        $this->tpl->parseCurrentBlock();
+        if (!empty($feedback)) {
+            $this->tpl->setCurrentBlock("specific_feedback");
+            $this->tpl->setVariable("SPECIFIC_FEEDBACK", $feedback);
+            $this->tpl->parseCurrentBlock();
+            return true;
+        }
+        return false;
     }
 
-    protected function populateGenericFeedbackBlock(assQuestionGUI $question_gui, $solutionCorrect)
+    /**
+     * @return bool     true, if there is some feedback populated
+     */
+    protected function populateGenericFeedbackBlock(assQuestionGUI $question_gui, $solutionCorrect): bool
     {
         // fix #031263: add pass
         $feedback = $question_gui->getGenericFeedbackOutput($this->testSession->getActiveId(), $this->testSession->getPass());
@@ -379,7 +389,9 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
             $this->tpl->setVariable("ANSWER_FEEDBACK", $feedback);
             $this->tpl->setVariable("ILC_FB_CSS_CLASS", $cssClass);
             $this->tpl->parseCurrentBlock();
+            return true;
         }
+        return false;
     }
 
     protected function populateScoreBlock($reachedPoints, $maxPoints)
@@ -490,7 +502,8 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
             return;
         }
 
-        if ($this->testSession->isAnonymousUser() && !$this->testSession->getActiveId()) {
+        if ($this->testSession->isAnonymousUser()
+            && !$this->testSession->doesAccessCodeInSessionExists()) {
             $accessCode = $this->testSession->createNewAccessCode();
 
             $this->testSession->setAccessCodeToSession($accessCode);
@@ -500,7 +513,9 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
             $this->ctrl->redirect($this, ilTestPlayerCommands::DISPLAY_ACCESS_CODE);
         }
 
-        $this->testSession->unsetAccessCodeInSession();
+        if (!$this->testSession->isAnonymousUser()) {
+            $this->testSession->unsetAccessCodeInSession();
+        }
         $this->ctrl->redirect($this, ilTestPlayerCommands::START_TEST);
     }
 
@@ -886,140 +901,7 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
         $component_repository = $DIC["component.repository"];
         return $component_repository->getPluginSlotById("tsig")->hasActivePlugins();
     }
-
-    /**
-     * @param $active
-     *
-     * @return void
-     */
-    protected function archiveParticipantSubmission($active, $pass)
-    {
-        global $DIC;
-        $ilObjDataCache = $DIC['ilObjDataCache'];
-
-        $testResultHeaderLabelBuilder = new ilTestResultHeaderLabelBuilder($this->lng, $ilObjDataCache);
-
-        $objectivesList = null;
-
-        if ($this->getObjectiveOrientedContainer()->isObjectiveOrientedPresentationRequired()) {
-            $testSequence = $this->testSequenceFactory->getSequenceByActiveIdAndPass($this->testSession->getActiveId(), $this->testSession->getPass());
-            $testSequence->loadFromDb();
-            $testSequence->loadQuestions();
-
-            $objectivesAdapter = ilLOTestQuestionAdapter::getInstance($this->testSession);
-
-            $objectivesList = $this->buildQuestionRelatedObjectivesList($objectivesAdapter, $testSequence);
-            $objectivesList->loadObjectivesTitles();
-
-            $testResultHeaderLabelBuilder->setObjectiveOrientedContainerId($this->testSession->getObjectiveOrientedContainerId());
-            $testResultHeaderLabelBuilder->setUserId($this->testSession->getUserId());
-            $testResultHeaderLabelBuilder->setTestObjId($this->object->getId());
-            $testResultHeaderLabelBuilder->setTestRefId($this->object->getRefId());
-            $testResultHeaderLabelBuilder->initObjectiveOrientedMode();
-        }
-
-        $results = $this->object->getTestResult(
-            $active,
-            $pass,
-            false,
-            !$this->getObjectiveOrientedContainer()->isObjectiveOrientedPresentationRequired()
-        );
-
-        $testevaluationgui = new ilTestEvaluationGUI($this->object);
-        $results_output = $testevaluationgui->getPassListOfAnswers(
-            $results,
-            $active,
-            $pass,
-            false,
-            false,
-            false,
-            false,
-            false,
-            $objectivesList,
-            $testResultHeaderLabelBuilder
-        );
-
-        global $DIC;
-        $ilSetting = $DIC['ilSetting'];
-        $inst_id = $ilSetting->get('inst_id', null);
-        $archiver = new ilTestArchiver($this->object->getId());
-
-        $path = ilFileUtils::getWebspaceDir() . '/assessment/' . $this->object->getId() . '/exam_pdf';
-        if (!is_dir($path)) {
-            ilFileUtils::makeDirParents($path);
-        }
-        $filename = realpath($path) . '/exam_N' . $inst_id . '-' . $this->object->getId()
-                    . '-' . $active . '-' . $pass . '.pdf';
-
-        ilTestPDFGenerator::generatePDF($results_output, ilTestPDFGenerator::PDF_OUTPUT_FILE, $filename);
-        //$template->setVariable("PDF_FILE_LOCATION", $filename);
-        // Participant submission
-        $archiver->handInParticipantSubmission($active, $pass, $filename, $results_output);
-        //$archiver->handInParticipantMisc( $active, $pass, 'signature_gedoens.sig', $filename );
-        //$archiver->handInParticipantQuestionMaterial( $active, $pass, 123, 'file_upload.pdf', $filename );
-
-        global $DIC;
-        $ilias = $DIC['ilias'];
-        $questions = $this->object->getQuestions();
-        foreach ($questions as $question_id) {
-            $question_object = $this->object->getQuestionDataset($question_id);
-            if ($question_object->type_tag == 'assFileUpload') {
-                // Pfad: /data/default/assessment/tst_2/14/21/files/file_14_4_1370417414.png
-                // /data/ - klar
-                // /assessment/ - Konvention
-                // /tst_2/ = /tst_<test_id> (ilObjTest)
-                // /14/ = /<active_fi>/
-                // /21/ = /<question_id>/ (question_object)
-                // /files/ - Konvention
-                // file_14_4_1370417414.png = file_<active_fi>_<pass>_<some timestamp>.<ext>
-
-                $candidate_path =
-                    $ilias->ini_ilias->readVariable('server', 'absolute_path') . ilTestArchiver::DIR_SEP
-                        . $ilias->ini_ilias->readVariable('clients', 'path') . ilTestArchiver::DIR_SEP
-                        . $ilias->client_id . ilTestArchiver::DIR_SEP
-                        . 'assessment' . ilTestArchiver::DIR_SEP
-                        . 'tst_' . $this->object->test_id . ilTestArchiver::DIR_SEP
-                        . $active . ilTestArchiver::DIR_SEP
-                        . $question_id . ilTestArchiver::DIR_SEP
-                        . 'files' . ilTestArchiver::DIR_SEP;
-                $handle = opendir($candidate_path);
-                while ($handle != false && ($file = readdir($handle)) !== false) {
-                    if ($file != null) {
-                        $filename_start = 'file_' . $active . '_' . $pass . '_';
-
-                        if (strpos($file, $filename_start) === 0) {
-                            $archiver->handInParticipantQuestionMaterial($active, $pass, $question_id, $file, $file);
-                        }
-                    }
-                }
-            }
-        }
-        $passdata = $this->object->getTestResult(
-            $active,
-            $pass,
-            false,
-            !$this->getObjectiveOrientedContainer()->isObjectiveOrientedPresentationRequired()
-        );
-        $overview = $testevaluationgui->getPassListOfAnswers(
-            $passdata,
-            $active,
-            $pass,
-            true,
-            false,
-            false,
-            true,
-            false,
-            $objectivesList,
-            $testResultHeaderLabelBuilder
-        );
-        $filename = realpath(ilFileUtils::getWebspaceDir()) . '/assessment/scores-' . $this->object->getId() . '-' . $active . '-' . $pass . '.pdf';
-        ilTestPDFGenerator::generatePDF($overview, ilTestPDFGenerator::PDF_OUTPUT_FILE, $filename);
-        $archiver->handInTestResult($active, $pass, $filename);
-        unlink($filename);
-
-        return;
-    }
-
+    
     public function redirectBackCmd()
     {
         $testPassesSelector = new ilTestPassesSelector($this->db, $this->object);
@@ -2222,15 +2104,13 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
     }
     // fau;
 
-
     /**
-     * @param assQuestionGUI $questionGui
+     * @see ilAssQuestionPreviewGUI::handleInstantResponseRendering()
      */
     protected function populateInstantResponseBlocks(assQuestionGUI $questionGui, $authorizedSolution)
     {
-        $this->populateFeedbackBlockHeader(
-            !$this->object->getSpecificAnswerFeedback() || !$questionGui->hasInlineFeedback()
-        );
+        $response_available = false;
+        $jump_to_response = false;
 
         // This controls if the solution should be shown.
         // It gets the parameter "Scoring and Results" -> "Instant Feedback" -> "Show Solutions"
@@ -2251,6 +2131,8 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
             );
             $solutionoutput = str_replace('<h1 class="ilc_page_title_PageTitle"></h1>', '', $solutionoutput);
             $this->populateSolutionBlock($solutionoutput);
+            $response_available = true;
+            $jump_to_response = true;
         }
 
         $reachedPoints = $questionGui->object->getAdjustedReachedPoints(
@@ -2267,18 +2149,38 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
         // It gets the parameter "Scoring and Results" -> "Instant Feedback" -> "Show Results (Only Points)"
         if ($this->object->getAnswerFeedbackPoints()) {
             $this->populateScoreBlock($reachedPoints, $maxPoints);
+            $response_available = true;
+            $jump_to_response = true;
         }
 
         // This controls if the generic feedback should be shown.
         // It gets the parameter "Scoring and Results" -> "Instant Feedback" -> "Show Solutions"
         if ($this->object->getGenericAnswerFeedback()) {
-            $this->populateGenericFeedbackBlock($questionGui, $solutionCorrect);
+            if ($this->populateGenericFeedbackBlock($questionGui, $solutionCorrect)) {
+                $response_available = true;
+                $jump_to_response = true;
+            }
         }
 
         // This controls if the specific feedback should be shown.
         // It gets the parameter "Scoring and Results" -> "Instant Feedback" -> "Show Answer-Specific Feedback"
         if ($this->object->getSpecificAnswerFeedback()) {
-            $this->populateSpecificFeedbackBlock($questionGui);
+            if ($questionGui->hasInlineFeedback()) {
+                // Don't jump to the feedback below the question if some feedback is shown within the question
+                $jump_to_response = false;
+            } elseif ($this->populateSpecificFeedbackBlock($questionGui)) {
+                $response_available = true;
+                $jump_to_response = true;
+            }
+        }
+
+        $this->populateFeedbackBlockHeader($jump_to_response);
+        if (!$response_available) {
+            if ($questionGui->hasInlineFeedback()) {
+                $this->populateFeedbackBlockMessage($this->lng->txt('tst_feedback_is_given_inline'));
+            } else {
+                $this->populateFeedbackBlockMessage($this->lng->txt('tst_feedback_not_available_for_answer'));
+            }
         }
     }
 
@@ -2294,6 +2196,14 @@ abstract class ilTestPlayerAbstractGUI extends ilTestServiceGUI
         $this->tpl->setVariable('INSTANT_RESPONSE_HEADER', $this->lng->txt('tst_feedback'));
         $this->tpl->parseCurrentBlock();
     }
+
+    protected function populateFeedbackBlockMessage(string $a_message)
+    {
+        $this->tpl->setCurrentBlock('instant_response_message');
+        $this->tpl->setVariable('INSTANT_RESPONSE_MESSAGE', $a_message);
+        $this->tpl->parseCurrentBlock();
+    }
+
 
     protected function getCurrentSequenceElement()
     {

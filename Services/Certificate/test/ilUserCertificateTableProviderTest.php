@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 /**
  * @author  Niels Theen <ntheen@databay.de>
@@ -40,7 +40,7 @@ class ilUserCertificateTableProviderTest extends ilCertificateBaseTestCase
                     'obj_id' => 100,
                     'title' => 'CourseTest',
                     'obj_type' => 'crs',
-                    'acquired_timestamp' => 1539867618,
+                    'acquired_timestamp' => 1_539_867_618,
                     'thumbnail_image_path' => 'some/path/test.svg',
                     'description' => 'some description',
                     'firstname' => 'ilyas',
@@ -68,7 +68,7 @@ class ilUserCertificateTableProviderTest extends ilCertificateBaseTestCase
             'title' => 'CourseTest',
             'obj_id' => 100,
             'obj_type' => 'crs',
-            'date' => 1539867618,
+            'date' => 1_539_867_618,
             'thumbnail_image_path' => 'some/path/test.svg',
             'description' => 'some description',
             'firstname' => 'ilyas',
@@ -95,7 +95,7 @@ class ilUserCertificateTableProviderTest extends ilCertificateBaseTestCase
                     'obj_id' => 100,
                     'title' => 'CourseTest',
                     'obj_type' => 'crs',
-                    'acquired_timestamp' => 1539867618,
+                    'acquired_timestamp' => 1_539_867_618,
                     'thumbnail_image_path' => 'some/path/test.svg',
                     'description' => 'some description',
                     'firstname' => 'ilyas',
@@ -127,7 +127,7 @@ class ilUserCertificateTableProviderTest extends ilCertificateBaseTestCase
             'title' => 'CourseTest',
             'obj_id' => 100,
             'obj_type' => 'crs',
-            'date' => 1539867618,
+            'date' => 1_539_867_618,
             'thumbnail_image_path' => 'some/path/test.svg',
             'description' => 'some description',
             'firstname' => 'ilyas',
@@ -154,7 +154,7 @@ class ilUserCertificateTableProviderTest extends ilCertificateBaseTestCase
                     'obj_id' => 100,
                     'title' => 'CourseTest',
                     'obj_type' => 'crs',
-                    'acquired_timestamp' => 1539867618,
+                    'acquired_timestamp' => 1_539_867_618,
                     'thumbnail_image_path' => 'some/path/test.svg',
                     'description' => 'some description',
                     'firstname' => 'ilyas',
@@ -190,7 +190,7 @@ class ilUserCertificateTableProviderTest extends ilCertificateBaseTestCase
             'title' => 'CourseTest',
             'obj_id' => 100,
             'obj_type' => 'crs',
-            'date' => 1539867618,
+            'date' => 1_539_867_618,
             'thumbnail_image_path' => 'some/path/test.svg',
             'description' => 'some description',
             'firstname' => 'ilyas',
@@ -219,7 +219,7 @@ class ilUserCertificateTableProviderTest extends ilCertificateBaseTestCase
                     'obj_id' => 100,
                     'title' => 'CourseTest',
                     'obj_type' => 'crs',
-                    'acquired_timestamp' => 1539867618
+                    'acquired_timestamp' => 1_539_867_618
                 ],
                 null,
                 [
@@ -264,7 +264,7 @@ class ilUserCertificateTableProviderTest extends ilCertificateBaseTestCase
                     'obj_id' => 100,
                     'title' => 'CourseTest',
                     'obj_type' => 'crs',
-                    'acquired_timestamp' => 1539867618
+                    'acquired_timestamp' => 1_539_867_618
                 ],
                 null,
                 [
@@ -309,7 +309,7 @@ class ilUserCertificateTableProviderTest extends ilCertificateBaseTestCase
                     'obj_id' => 100,
                     'title' => 'CourseTest',
                     'obj_type' => 'crs',
-                    'acquired_timestamp' => 1539867618
+                    'acquired_timestamp' => 1_539_867_618
                 ],
                 null,
                 [
@@ -359,7 +359,7 @@ class ilUserCertificateTableProviderTest extends ilCertificateBaseTestCase
                     'obj_id' => 100,
                     'title' => 'CourseTest',
                     'obj_type' => 'crs',
-                    'acquired_timestamp' => 1539867618
+                    'acquired_timestamp' => 1_539_867_618
                 ],
                 null,
                 [
@@ -409,7 +409,7 @@ class ilUserCertificateTableProviderTest extends ilCertificateBaseTestCase
                     'obj_id' => 100,
                     'title' => 'CourseTest',
                     'obj_type' => 'crs',
-                    'acquired_timestamp' => 1539867618
+                    'acquired_timestamp' => 1_539_867_618
                 ],
                 null,
                 [

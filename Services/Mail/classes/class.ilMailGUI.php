@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,6 +15,8 @@ declare(strict_types=1);
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+declare(strict_types=1);
 
 use ILIAS\HTTP\GlobalHttpState;
 use ILIAS\Refinery\Factory as Refinery;
@@ -318,24 +318,12 @@ class ilMailGUI implements ilCtrlBaseClassInterface
             $this->ctrl->clearParametersByClass(ilMailOptionsGUI::class);
         }
 
-        switch (strtolower($this->forwardClass)) {
-            case strtolower(ilMailFormGUI::class):
-                $DIC->tabs()->setTabActive('compose');
-                break;
-
-            case strtolower(ilContactGUI::class):
-                $DIC->tabs()->setTabActive('mail_addressbook');
-                break;
-
-            case strtolower(ilMailOptionsGUI::class):
-                $DIC->tabs()->setTabActive('options');
-                break;
-
-            case strtolower(ilMailFolderGUI::class):
-            default:
-                $DIC->tabs()->setTabActive('fold');
-                break;
-        }
+        match (strtolower($this->forwardClass)) {
+            strtolower(ilMailFormGUI::class) => $DIC->tabs()->setTabActive('compose'),
+            strtolower(ilContactGUI::class) => $DIC->tabs()->setTabActive('mail_addressbook'),
+            strtolower(ilMailOptionsGUI::class) => $DIC->tabs()->setTabActive('options'),
+            default => $DIC->tabs()->setTabActive('fold'),
+        };
 
         if ($this->http->wrapper()->query()->has('message_sent')) {
             $DIC->tabs()->setTabActive('fold');

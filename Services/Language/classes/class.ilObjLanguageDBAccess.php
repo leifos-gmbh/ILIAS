@@ -18,14 +18,14 @@
  */
 class ilObjLanguageDBAccess
 {
-    protected ilDBInterface $ilDB;
-    protected string $key;
-    protected array $content;
-    protected string $scope;
-    protected array $local_changes;
-    protected ?string $change_date = null;
-    protected string $separator;
-    protected string $comment_separator;
+    protected $ilDB;
+    protected $key;
+    protected $content;
+    protected $scope;
+    protected $local_changes;
+    protected $change_date = null;
+    protected $separator;
+    protected $comment_separator;
     
     public function __construct(ilDBInterface $ilDB, string $key, array $content, array $local_changes, string $scope = "", string $separator = "#:#", string $comment_separator = "###")
     {
@@ -116,8 +116,9 @@ class ilObjLanguageDBAccess
     {
         // avoid flushing the whole cache (see mantis #28818)
         ilCachedLanguage::getInstance($this->key)->deleteInCache();
-        
+    
         $query = "INSERT INTO lng_modules (module, lang_key, lang_array) VALUES ";
+        $modules_to_delete = [];
         foreach ($lang_array as $module => $lang_arr) {
             if ($this->scope === "local") {
                 $q = "SELECT * FROM lng_modules WHERE " .
@@ -134,17 +135,19 @@ class ilObjLanguageDBAccess
                 "(%s,%s,%s),",
                 $this->ilDB->quote($module, "text"),
                 $this->ilDB->quote($this->key, "text"),
-                $this->ilDB->quote(serialize($lang_arr), "clob"),
+                $this->ilDB->quote(serialize($lang_arr), "clob")
             );
+            $modules_to_delete[] = $module;
         }
-        $this->ilDB->manipulate(sprintf(
-            "DELETE FROM lng_modules WHERE lang_key = %s",
-            $this->ilDB->quote($this->key, "text"),
+
+        $inModulesToDelete = $this->ilDB->in('module', $modules_to_delete, false, 'text');
+        $this->ilDB->manipulate(sprintf("DELETE FROM lng_modules WHERE lang_key = %s AND $inModulesToDelete",
+            $this->ilDB->quote($this->key, "text")
         ));
-        
+
         $query = rtrim($query, ",") . ";";
         $this->ilDB->manipulate($query);
-        
+
         // check if the module is correctly saved
         // see mantis #20046 and #19140
         $this->checkModules();

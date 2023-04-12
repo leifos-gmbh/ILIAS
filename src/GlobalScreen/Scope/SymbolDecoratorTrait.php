@@ -1,13 +1,32 @@
-<?php declare(strict_types=1);
+<?php
 
-namespace ILIAS\GlobalScreen\Scope\MainMenu\Factory;
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
+
+declare(strict_types=1);
+
+namespace ILIAS\GlobalScreen\Scope;
 
 use Closure;
-use ILIAS\UI\Component\Component;
 use ILIAS\UI\Component\Symbol\Symbol;
 use LogicException;
 use ReflectionFunction;
 use ReflectionType;
+use Throwable;
+use ILIAS\GlobalScreen\isGlobalScreenItem;
 
 /**
  * Trait SymbolDecoratorTrait
@@ -16,20 +35,19 @@ use ReflectionType;
  */
 trait SymbolDecoratorTrait
 {
-
     /**
-     * @var Closure
+     * @var \Closure|null
      */
     private $symbol_decorator;
 
     /**
      * @param Closure $symbol_decorator
-     * @return hasSymbol
+     * @return isGlobalScreenItem
      */
-    public function addSymbolDecorator(Closure $symbol_decorator) : hasSymbol
+    public function addSymbolDecorator(Closure $symbol_decorator) : isGlobalScreenItem
     {
         if (!$this->checkClosure($symbol_decorator)) {
-            throw new LogicException('first argument of closure must be type-hinted to \ILIAS\UI\Component\Symbol\Symbol');
+            throw new LogicException('first argument and return type of closure must be type-hinted to \ILIAS\UI\Component\Symbol\Symbol');
         }
         if ($this->symbol_decorator instanceof Closure) {
             $existing = $this->symbol_decorator;
@@ -65,15 +83,11 @@ trait SymbolDecoratorTrait
                 return false;
             }
             $return_type = $r->getReturnType();
-            if ($return_type === null) {
+            if (!$return_type instanceof \ReflectionType) {
                 return false;
             }
-            if ($return_type->getName() !== Symbol::class) {
-                return false;
-            }
-
-            return true;
-        } catch (\Throwable $i) {
+            return $return_type->getName() === Symbol::class;
+        } catch (Throwable $i) {
             return false;
         }
     }

@@ -999,7 +999,7 @@ class ilObjCourseGUI extends ilContainerGUI
                 $this->object->getId(),
                 $form,
                 array(
-                    ilObjectServiceSettingsGUI::CALENDAR_VISIBILITY,
+                    ilObjectServiceSettingsGUI::CALENDAR_CONFIGURATION,
                     ilObjectServiceSettingsGUI::USE_NEWS,
                     ilObjectServiceSettingsGUI::AUTO_RATING_NEW_OBJECTS,
                     ilObjectServiceSettingsGUI::TAG_CLOUD,
@@ -1007,6 +1007,8 @@ class ilObjCourseGUI extends ilContainerGUI
                     ilObjectServiceSettingsGUI::BADGES,
                     ilObjectServiceSettingsGUI::ORGU_POSITION_ACCESS,
                     ilObjectServiceSettingsGUI::SKILLS,
+                    ilObjectServiceSettingsGUI::BOOKING,
+                    ilObjectServiceSettingsGUI::EXTERNAL_MAIL_PREFIX,
                     ilObjectServiceSettingsGUI::PL_SKYDOC
                 )
             );

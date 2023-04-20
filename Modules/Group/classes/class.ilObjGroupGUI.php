@@ -697,7 +697,7 @@ class ilObjGroupGUI extends ilContainerGUI
                     $this->object->getId(),
                     $form,
                     array(
-                        ilObjectServiceSettingsGUI::CALENDAR_VISIBILITY,
+                        ilObjectServiceSettingsGUI::CALENDAR_CONFIGURATION,
                         ilObjectServiceSettingsGUI::USE_NEWS,
                         ilObjectServiceSettingsGUI::CUSTOM_METADATA,
                         ilObjectServiceSettingsGUI::AUTO_RATING_NEW_OBJECTS,

@@ -1506,6 +1506,8 @@ class ilObjCourseGUI extends ilContainerGUI
                     ilObjectServiceSettingsGUI::BADGES,
                     ilObjectServiceSettingsGUI::ORGU_POSITION_ACCESS,
                     ilObjectServiceSettingsGUI::SKILLS,
+                    ilObjectServiceSettingsGUI::BOOKING,
+                    ilObjectServiceSettingsGUI::EXTERNAL_MAIL_PREFIX,
                     ilObjectServiceSettingsGUI::PL_SKYDOC
                 )
             );

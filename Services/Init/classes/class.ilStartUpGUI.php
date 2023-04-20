@@ -196,9 +196,9 @@ class ilStartUpGUI
         /**
          * @var ilAuthSession
          */
-        if ($auth_session->isValid()) {
-            #$this->logger->debug('Valid session -> redirect to starting page');
-            #return ilInitialisation::redirectToStartingPage();
+        if ($auth_session->isValid() && $auth_session->getUserId() != ANONYMOUS_USER_ID) {
+            $this->logger->debug('Valid session -> redirect to starting page');
+            return ilInitialisation::redirectToStartingPage();
         }
         $this->logger->debug('No valid session -> show login');
         $this->showLoginPage();

@@ -31,10 +31,12 @@ export default class TableModel {
     this.STATE_DATA = "data";          // data editing
     this.STATE_TABLE = "table";        // table properties editing
     this.STATE_CELLS = "cells";        // cells properties editing
+    this.STATE_MERGE = "merge";        // merge/split cells
     this.states = [
       this.STATE_DATA,
       this.STATE_TABLE,
       this.STATE_CELLS,
+      this.STATE_MERGE
     ];
 
     this.state = this.STATE_TABLE;

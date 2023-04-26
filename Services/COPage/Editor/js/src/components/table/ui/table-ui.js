@@ -192,7 +192,8 @@ export default class TableUI {
       }
       if (!this.head_selection_initialised) {
         head.addEventListener("click", (event) => {
-          if (tableModel.getState() !== tableModel.STATE_CELLS) {
+          if (tableModel.getState() !== tableModel.STATE_CELLS
+            && tableModel.getState() !== tableModel.STATE_MERGE) {
             return;
           }
           event.stopPropagation();
@@ -398,7 +399,8 @@ console.log("INIT CELL EDITING")
       const tableModel = this.tableModel;
       console.log(el.dataset);
       el.addEventListener("click", (event) => {
-        if (tableModel.getState() !== tableModel.STATE_CELLS) {
+        if (tableModel.getState() !== tableModel.STATE_CELLS
+          && tableModel.getState() !== tableModel.STATE_MERGE) {
           dispatch.dispatch(action.table().editor().editCell(
             table_pcid,
             table_hierid,
@@ -550,6 +552,9 @@ console.log("INIT CELL EDITING")
       case table_model.STATE_CELLS:
         this.showCellProperties();
         break;
+      case table_model.STATE_MERGE:
+        this.showMergeActions();
+        break;
     }
   }
 
@@ -577,14 +582,44 @@ console.log("INIT CELL EDITING")
     }
     this.toolSlate.setContent(this.uiModel.components["DataTable"]["top_actions"] + add);
     if (this.tableModel.hasSelected()) {
-      this.updateMergeButton(this.page_model,
-        this.tableModel);
       // init cancel button in cell prop form
       this.pageModifier.initFormButtonsAndSettingsLink(this.page_model);
     }
     this.initTopActions();
     this.refreshModeSelector();
     this.initCellPropertiesForm(this.page_model, this.tableModel);
+  }
+
+  showMergeActions() {
+    let add = "";
+    add = this.uiModel.components["DataTable"]["cell_info"] +
+      this.uiModel.components["DataTable"]["merge_actions"];
+    this.toolSlate.setContent(this.uiModel.components["DataTable"]["top_actions"] + add);
+    this.updateMergeButton(this.page_model,
+      this.tableModel);
+    this.initTopActions();
+    this.refreshModeSelector();
+    document.querySelectorAll("#copg-editor-slate-content [data-copg-ed-type='button']").forEach(button => {
+      const dispatch = this.dispatcher;
+      const action = this.actionFactory;
+      const act = button.dataset.copgEdAction;
+      const cname = button.dataset.copgEdComponent;
+      const pageModel = this.page_model;
+      const tableModel = this.tableModel;
+      if (cname === "Table") {
+        button.addEventListener("click", (event) => {
+          event.preventDefault();
+          switch (act) {
+            case "toggle.merge":
+              dispatch.dispatch(action.table().editor().toggleMerge(
+                pageModel.getCurrentPCId(),
+                tableModel.getSelected()
+              ));
+              break;
+          }
+        });
+      }
+    });
   }
 
   initCellPropertiesForm(pageModel,tableModel) {
@@ -631,12 +666,15 @@ console.log("INIT CELL EDITING")
     }
     if (sel.top  > -1 && sel.top === sel.bottom &&
       sel.left  > -1 && sel.left === sel.right && this.isMerged(sel.top, sel.left)) {
-      b.value = il.Language.txt("cont_split_cell");
+      b.innerHTML = il.Language.txt("cont_split_cell");
       b.disabled = false;
+      console.log("--1--");
     } else if (sel.top < sel.bottom || sel.left < sel.right) {
-      b.value = il.Language.txt("cont_merge_cells");
+      console.log("--2--");
+      b.innerHTML = il.Language.txt("cont_merge_cells");
       b.disabled = false;
     } else {
+      console.log("--3--");
       b.disabled = true;
     }
   }
@@ -668,6 +706,9 @@ console.log("INIT CELL EDITING")
           case ACTIONS.SWITCH_FORMAT_CELLS:
             dispatch.dispatch(action.table().editor().switchFormatCells());
             break;
+          case ACTIONS.SWITCH_MERGE_CELLS:
+            dispatch.dispatch(action.table().editor().switchMergeCells());
+            break;
         }
       });
     });
@@ -687,12 +728,16 @@ console.log("INIT CELL EDITING")
     const model = this.tableModel;
     const table = document.querySelector("[data-copg-ed-type='view-control'][data-copg-ed-action='switch.edit.table']");
     const cells = document.querySelector("[data-copg-ed-type='view-control'][data-copg-ed-action='switch.format.cells']");
+    const merge = document.querySelector("[data-copg-ed-type='view-control'][data-copg-ed-action='switch.merge.cells']");
     table.classList.remove("engaged");
     cells.classList.remove("engaged");
+    merge.classList.remove("engaged");
     if (model.getState() === model.STATE_TABLE) {
       table.classList.add("engaged");
     } else if (model.getState() === model.STATE_CELLS) {
       cells.classList.add("engaged");
+    } else if (model.getState() === model.STATE_MERGE) {
+      merge.classList.add("engaged");
     }
   }
 

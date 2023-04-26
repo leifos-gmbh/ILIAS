@@ -160,6 +160,11 @@ export default class TableUIActionHandler {
           this.tableUI.initHeadSelection();
           break;
 
+        case ACTIONS.SWITCH_MERGE_CELLS:
+          this.tableUI.refreshUIFromModelState(page_model, table_model);
+          this.tableUI.initHeadSelection();
+          break;
+
         case ACTIONS.PROPERTIES_SET:
           this.sendPropertiesSet(
             params.pcid,
@@ -197,7 +202,8 @@ export default class TableUIActionHandler {
       }
     }
 
-    if (table_model.getState() === table_model.STATE_CELLS) {
+    if (table_model.getState() === table_model.STATE_CELLS ||
+      table_model.getState() === table_model.STATE_MERGE) {
       this.tableUI.markSelectedCells();
       // switch info text and action buttons, if selected status changes
       if (table_model.hasSelected() !== this.old_selected) {
@@ -297,7 +303,7 @@ export default class TableUIActionHandler {
       const pl = result.getPayload();
       this.handleModificationResponse(pl, page_model);
       table_model.selectNone();
-      dispatch.dispatch(af.table().editor().switchFormatCells());
+      dispatch.dispatch(af.table().editor().switchMergeCells());
     });
   }
 

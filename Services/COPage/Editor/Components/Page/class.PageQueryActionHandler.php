@@ -548,15 +548,18 @@ class PageQueryActionHandler implements Server\QueryActionHandler
     protected function getComponentsEditorUI(): array
     {
         $ui = [];
+        $config = $this->page_gui->getPageConfig();
         foreach (\ilCOPagePCDef::getPCDefinitions() as $def) {
             $pc_edit = \ilCOPagePCDef::getPCEditorInstanceByName($def["name"]);
-            if (!is_null($pc_edit)) {
-                $ui[$def["name"]] = $pc_edit->getEditorElements(
-                    $this->ui_wrapper,
-                    $this->page_gui->getPageObject()->getParentType(),
-                    $this->page_gui,
-                    $this->page_gui->getStyleId()
-                );
+            if ($config->getEnablePCType($def["name"])) {
+                if (!is_null($pc_edit)) {
+                    $ui[$def["name"]] = $pc_edit->getEditorElements(
+                        $this->ui_wrapper,
+                        $this->page_gui->getPageObject()->getParentType(),
+                        $this->page_gui,
+                        $this->page_gui->getStyleId()
+                    );
+                }
             }
         }
         return $ui;

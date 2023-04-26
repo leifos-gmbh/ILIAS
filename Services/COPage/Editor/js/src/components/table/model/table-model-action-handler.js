@@ -65,6 +65,10 @@ export default class TableModelActionHandler {
           this.tableModel.setState(this.tableModel.STATE_CELLS);
           break;
 
+        case ACTIONS.SWITCH_MERGE_CELLS:
+          this.tableModel.setState(this.tableModel.STATE_MERGE);
+          break;
+
         case ACTIONS.SAVE_RETURN:
           this.tableModel.setState(this.tableModel.STATE_TABLE);
           break;

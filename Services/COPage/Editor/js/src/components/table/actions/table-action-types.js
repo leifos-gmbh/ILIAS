@@ -40,6 +40,7 @@ const ACTIONS = {
   AUTO_SAVE: "save.auto",
   SWITCH_EDIT_TABLE: "switch.edit.table",
   SWITCH_FORMAT_CELLS: "switch.format.cells",
+  SWITCH_MERGE_CELLS: "switch.merge.cells",
   TOGGLE_ROW: "toggle.row",
   TOGGLE_COL: "toggle.col",
   TOGGLE_CELL: "toggle.cell",

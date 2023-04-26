@@ -61,6 +61,7 @@ class ilPCDataTableEditorGUI implements \ILIAS\COPage\Editor\Components\PageComp
             "top_actions" => $this->getTopActions($ui_wrapper, $page_gui),
             "cell_info" => $this->getCellInfo(),
             "cell_actions" => $this->getCellActions($ui_wrapper, $page_gui, $style_id),
+            "merge_actions" => $this->getMergeActions($ui_wrapper, $page_gui, $style_id),
             "number_input_modal" => $this->getModalNumberInputTemplate()
         ];
     }
@@ -109,7 +110,7 @@ class ilPCDataTableEditorGUI implements \ILIAS\COPage\Editor\Components\PageComp
             $form,
             [
                 ["Page", "component.update.back", $lng->txt("save")],
-                ["Page", "component.back", $lng->txt("cancel")]
+                /*["Page", "component.back", $lng->txt("cancel")]*/
             ]
         );
 
@@ -171,7 +172,8 @@ class ilPCDataTableEditorGUI implements \ILIAS\COPage\Editor\Components\PageComp
         $html = $ui_wrapper->getRenderedViewControl(
             [
                 ["Table", "switch.edit.table", $lng->txt("cont_edit_table")],
-                ["Table", "switch.format.cells", $lng->txt("cont_format_cells")]
+                ["Table", "switch.format.cells", $lng->txt("cont_format_cells")],
+                ["Table", "switch.merge.cells", $lng->txt("cont_merge_cells")]
             ]
         );
         $tpl->setVariable("SWITCH", $html);
@@ -228,6 +230,7 @@ class ilPCDataTableEditorGUI implements \ILIAS\COPage\Editor\Components\PageComp
         /** @var ilPropertyFormGUI $form */
         $form = $tab_gui->initCellPropertiesForm();
 
+        /*
         $html = $ui_wrapper->getRenderedForm(
             $form,
             [
@@ -235,9 +238,34 @@ class ilPCDataTableEditorGUI implements \ILIAS\COPage\Editor\Components\PageComp
                 ["Table", "properties.set", $lng->txt("cont_set_properties")],
                 ["Page", "component.back", $lng->txt("cancel")]
             ]
+        );*/
+
+        $html = $ui_wrapper->getRenderedForm(
+            $form,
+            [
+                ["Table", "properties.set", $lng->txt("cont_set_properties")],
+            ]
         );
 
         return $html;
+    }
+
+    protected function getMergeActions(
+        UIWrapper $ui_wrapper,
+        ilPageObjectGUI $page_gui,
+        int $style_id = 0) : string
+    {
+        $lng = $this->lng;
+
+        $html = $ui_wrapper->getRenderedButton(
+            $lng->txt("cont_merge_cells"),
+            "button",
+            "toggle.merge",
+            null,
+            "Table"
+        );
+
+        return '<div class="copg-edit-button-group">'.$html.'</div>';
     }
 
     public function getModalNumberInputTemplate(): array

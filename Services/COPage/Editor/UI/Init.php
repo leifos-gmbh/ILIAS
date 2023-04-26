@@ -23,6 +23,7 @@ namespace ILIAS\COPage\Editor\UI;
  */
 class Init
 {
+    protected \ILIAS\DI\UIServices $ui;
     protected \ilCtrl $ctrl;
     protected \ilLanguage $lng;
 
@@ -32,6 +33,7 @@ class Init
 
         $this->ctrl = $DIC->ctrl();
         $this->lng = $DIC->language();
+        $this->ui = $DIC->ui();
     }
 
     public function initUI(
@@ -70,5 +72,10 @@ class Init
         // ensure that form.js is loaded which is needed for file input (js that shows file names)
         $dummy = new \ilPropertyFormGUI();
         $dummy->getHTML();
+
+        // ensure modal.js from ui framework is loaded
+        $this->ui->renderer()->render(
+            $this->ui->factory()->modal()->roundtrip("", $this->ui->factory()->legacy(""))
+        );
     }
 }

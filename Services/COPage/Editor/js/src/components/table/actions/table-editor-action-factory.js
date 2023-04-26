@@ -195,6 +195,13 @@ export default class TableEditorActionFactory {
   /**
    * @returns {EditorAction}
    */
+  switchMergeCells() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.SWITCH_MERGE_CELLS);
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
   toggleRow(nr,expand) {
     return this.editorActionFactory.action(this.COMPONENT, ACTIONS.TOGGLE_ROW,{
       nr: nr,

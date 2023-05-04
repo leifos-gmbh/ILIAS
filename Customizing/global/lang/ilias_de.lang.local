@@ -1,0 +1,15 @@
+// Entfernen: glo_mode_level, glo_mode_subtree, glo_mode_level_info, glo_mode_subtree_info
+// Ändern: glo#:#glo_collection_info#:#Das Glossar sammelt Begriffe aus anderen Glossaren ein.
+
+<!-- language file start -->
+glo#:#glo_add_glossary#:#Glossar hinzufügen
+glo#:#glo_add_to_collection#:#Glossar zum Sammelglossar hinzufügen
+glo#:#glo_added_to_collection_info#:#Das Glossar wurde dem Sammelglossar hinzugefügt.
+glo#:#glo_change_to_collection_unavailable_info#:#Um die Zusammenstellung der Inhalte auf "Sammelglossar" zu ändern, müssen Sie zuerst alle bestehenden Begriffe innerhalb dieses Glossars im Reiter "Inhalt" löschen.
+glo#:#glo_change_to_standard_unavailable_info#:#Um die Zusammenstellung der Inhalte auf "Normales Glossar" zu ändern, müssen Sie zuerst die ausgewählten Glossare im Reiter "Inhalt" entfernen.
+glo#:#glo_collection_empty_info#:#Dieses Sammelglossar ist aktuell leer. Bitte fügen mindestens ein Glossar hinzu.
+glo#:#glo_really_remove_from_collection#:#Sind Sie sich sicher, dass Sie das folgende Glossar aus dem Sammelglossar entfernen wollen?
+glo#:#glo_removed_from_collection_info#:#Das Glossar wurde aus dem Sammelglossar entfernt.
+glo#:#glo_selected_glossaries#:#Ausgewählte Glossare
+glo#:#glo_selected_glossaries_info#:#Die Begriffe stammen aus den folgenden Glossaren:
+glo#:#glo_selected_glossary_is_current_info#:#Das ausgewählte Glossar entspricht dem aktuellen Glossar. Bitte wählen Sie ein anderes Glossar.

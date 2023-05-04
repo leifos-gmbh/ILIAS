@@ -1,0 +1,15 @@
+// Entfernen: glo_mode_level, glo_mode_subtree, glo_mode_level_info, glo_mode_subtree_info
+// Ändern: glo#:#glo_collection_info#:#The glossary collects terms of other glossaries.
+
+<!-- language file start -->
+glo#:#glo_add_glossary#:#Add Glossary
+glo#:#glo_add_to_collection#:#Add Glossary to Collection Glossary
+glo#:#glo_added_to_collection_info#:#The selected glossary has been added to the collection glossary.
+glo#:#glo_change_to_collection_unavailable_info#:#To change the type of content assembly to "Collection Glossary", you first have to delete all existing terms within this glossary in tab "Content".
+glo#:#glo_change_to_standard_unavailable_info#:#To change the type of content assembly to "Standard Glossary", you first have to remove the selected glossaries in tab "Content".
+glo#:#glo_collection_empty_info#:#This collection glossary is currently empty. Please add at least one glossary to it.
+glo#:#glo_really_remove_from_collection#:#Are you sure you want to remove the following glossary from the collection glossary?
+glo#:#glo_removed_from_collection_info#:#The glossary has been removed from the collection glossary.
+glo#:#glo_selected_glossaries#:#Selected Glossaries
+glo#:#glo_selected_glossaries_info#:#Terms are collected from the following glossaries:
+glo#:#glo_selected_glossary_is_current_info#:#The selected glossary corresponds to the current glossary. Please select another glossary.

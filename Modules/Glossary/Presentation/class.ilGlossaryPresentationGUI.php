@@ -1048,7 +1048,7 @@ class ilGlossaryPresentationGUI implements ilCtrlBaseClassInterface
                     }
                     $this->tabs_gui->addTab(
                         "terms",
-                        $lng->txt("cont_terms"),
+                        $lng->txt("content"),
                         $ilCtrl->getLinkTarget($this, "listTerms")
                     );
                 }

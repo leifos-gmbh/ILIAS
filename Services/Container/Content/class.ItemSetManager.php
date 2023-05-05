@@ -92,6 +92,7 @@ class ItemSetManager
         $this->applyClassificationFilter();
         $this->applySorting();
         $this->groupItems();
+        $this->sortSessions();
     }
 
     /**
@@ -183,6 +184,13 @@ class ItemSetManager
             if ($object["type"] !== "sess") {
                 $this->raw_by_type["_non_sess"][$new_key] = $object;
             }
+        }
+    }
+
+    protected function sortSessions() : void
+    {
+        if (isset($this->raw_by_type["sess"]) && count($this->raw_by_type["sess"]) > 0) {
+            $this->raw_by_type["sess"] = \ilArrayUtil::sortArray($this->raw_by_type["sess"], 'start', 'ASC', true, true);
         }
     }
 

@@ -23,6 +23,7 @@
  */
 class ilContainerSessionsContentGUI extends ilContainerContentGUI
 {
+    protected array $visible_sessions = [];
     protected bool $session_link_next = false;
     protected bool $session_link_prev = false;
     protected bool $session_limitation_initialised = false;
@@ -31,10 +32,13 @@ class ilContainerSessionsContentGUI extends ilContainerContentGUI
     {
         parent::initRenderer();
         $this->renderer->setBlockPostfixClosure(function (string $type) {
-            $this->getBlockPostfix($type);
+            return $this->getBlockPostfix($type);
         });
         $this->renderer->setBlockPrefixClosure(function (string $type) {
-            $this->getBlockPrefix($type);
+            return $this->getBlockPrefix($type);
+        });
+        $this->renderer->setItemHiddenClosure(function (string $type, int $ref_id) {
+            return $this->isItemHidden($type, $ref_id);
         });
     }
 
@@ -114,7 +118,6 @@ class ilContainerSessionsContentGUI extends ilContainerContentGUI
     protected function initSessionPresentationLimitation() : void
     {
         global $DIC;
-
         if ($this->session_limitation_initialised) {
             return;
         }
@@ -160,15 +163,14 @@ class ilContainerSessionsContentGUI extends ilContainerContentGUI
             return;
         }
 
-
         // do session limit
-        if ($request->getPreviousSession() > 0) {
+        if ($request->getPreviousSession() !== null) {
             $user->writePref(
                 'crs_sess_show_prev_' . $container->getId(),
                 (string) $request->getPreviousSession()
             );
         }
-        if ($request->getNextSession() > 0) {
+        if ($request->getNextSession() !== null) {
             $user->writePref(
                 'crs_sess_show_next_' . $container->getId(),
                 (string) $request->getNextSession()
@@ -178,7 +180,6 @@ class ilContainerSessionsContentGUI extends ilContainerContentGUI
         $sessions = array_map(function ($ref_id) {
             return $this->item_presentation->getRawDataByRefId($ref_id);
         }, $session_ref_ids);
-
         $sessions = ilArrayUtil::sortArray($sessions, 'start', 'ASC', true, false);
         //$sessions = ilUtil::sortArray($this->items['sess'],'start','ASC',true,false);
         $today = new ilDate(date('Ymd'), IL_CAL_DATE);
@@ -195,6 +196,7 @@ class ilContainerSessionsContentGUI extends ilContainerContentGUI
                 $next[] = $item;
             }
         }
+
         $num_previous_remove = max(
             count($previous) - $limit_prev,
             0
@@ -217,5 +219,20 @@ class ilContainerSessionsContentGUI extends ilContainerContentGUI
             // @fixme
             $this->session_link_next = true;
         }
+
+        $sessions = array_merge($previous, $current, $next);
+        $this->visible_sessions = array_map(static function ($item) {
+            return (int) $item["ref_id"];
+        }, $sessions);
     }
+
+    protected function isItemHidden(string $type, int $ref_id) : bool
+    {
+        if ($type === "sess") {
+            $this->initSessionPresentationLimitation();
+            return !in_array($ref_id, $this->visible_sessions, true);
+        }
+        return false;
+    }
+
 }

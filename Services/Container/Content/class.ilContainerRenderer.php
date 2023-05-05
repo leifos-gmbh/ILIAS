@@ -63,6 +63,7 @@ class ilContainerRenderer
     protected ilCtrl $ctrl;
     protected ?Closure $block_prefix_closure = null;
     protected ?Closure $block_postfix_closure = null;
+    protected ?Closure $item_hidden_closure = null;
     protected \ILIAS\Container\Content\BlockSessionRepository $block_repo;
 
     public function __construct(
@@ -125,6 +126,11 @@ class ilContainerRenderer
     public function setBlockPostfixClosure(Closure $f) : void
     {
         $this->block_postfix_closure = $f;
+    }
+
+    public function setItemHiddenClosure(Closure $f) : void
+    {
+        $this->item_hidden_closure = $f;
     }
 
     protected function getViewMode(): int
@@ -845,6 +851,9 @@ class ilContainerRenderer
 
             // (2) render and add items
             foreach ($block->getItemRefIds() as $ref_id) {
+                if ($this->isItemHidden($block_id, $ref_id)) {
+                    continue;
+                }
                 $item_data = $this->item_presentation->getRawDataByRefId($ref_id);
                 $html = $this->item_renderer->renderItem(
                     $item_data,
@@ -1035,4 +1044,14 @@ class ilContainerRenderer
         }
         return "";
     }
+
+    protected function isItemHidden(string $block_id, int $ref_id) : bool
+    {
+        if ($this->item_hidden_closure instanceof Closure) {
+            $c = $this->item_hidden_closure;
+            return (bool) $c($block_id, $ref_id);
+        }
+        return false;
+    }
+
 }

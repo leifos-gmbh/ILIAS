@@ -31,6 +31,7 @@ use ILIAS\FileUpload\Handler\HandlerResult;
  */
 class ilPCSourceCodeGUI extends ilPageContentGUI
 {
+    protected ilTabsGUI $tabs;
     /**
      * @var mixed
      */
@@ -48,6 +49,7 @@ class ilPCSourceCodeGUI extends ilPageContentGUI
 
         $this->user = $DIC->user();
         parent::__construct($a_pg_obj, $a_content_obj, $a_hier_id, $a_pc_id);
+        $this->tabs = $DIC->tabs();
     }
 
     public function executeCommand(): void
@@ -76,20 +78,16 @@ class ilPCSourceCodeGUI extends ilPageContentGUI
     {
         $form = $this->initPropertyForm($this->lng->txt("cont_edit_src"), "update", "cancelCreate");
 
-        if ($this->pg_obj->getParentType() == "lm") {
-            $this->tpl->setVariable(
-                "LINK_ILINK",
-                $this->ctrl->getLinkTargetByClass("ilInternalLinkGUI", "showLinkHelp")
-            );
-            $this->tpl->setVariable("TXT_ILINK", "[" . $this->lng->txt("cont_internal_link") . "]");
-        }
-
         $this->displayValidationError();
+
+        $this->initEditor($this->pc_id, "SourceCode");
+        $this->tabs->setBackTarget("", "");
 
         $cmd = $this->ctrl->getCmd();
         if ($cmd == "update") {
             $form->setValuesByPost();
         } else {
+            /*
             $form->getItemByPostVar("par_language")->setValue($this->content_obj->getLanguage());
             $form->getItemByPostVar("par_subcharacteristic")->setValue($this->content_obj->getSubCharacteristic());
             $form->getItemByPostVar("par_downloadtitle")->setValue($this->content_obj->getDownloadTitle());
@@ -98,7 +96,7 @@ class ilPCSourceCodeGUI extends ilPageContentGUI
             );
             //			$form->getItemByPostVar("par_autoindent")->setChecked(
             //				$this->content_obj->getAutoIndent()=="y"?true:false);
-
+            */
             $par_content = $this->content_obj->xml2output($this->content_obj->getText());
 
             //TODO: Find a better way to convert back curly brackets
@@ -108,8 +106,16 @@ class ilPCSourceCodeGUI extends ilPageContentGUI
             $form->getItemByPostVar("par_content")->setValue($par_content);
         }
 
+        $f = $this->gui
+            ->ui()
+            ->factory()->input()->field()
+                                ->textarea(
+                                    $this->lng->txt("cont_pc_code")
+                                )->withValue($par_content);
+        $t = $this->gui->ui()->renderer()->render($f);
+        $t = str_replace("<textarea ", "<textarea name='code' rows='20' form='copg-src-form' ", $t);
 
-        $this->tpl->setContent($form->getHTML());
+        $this->tpl->setContent($t.$this->getEditorScriptTag());
     }
 
     public function insert(): void
@@ -152,17 +158,18 @@ class ilPCSourceCodeGUI extends ilPageContentGUI
         $this->requested_par_content = $this->request->getRaw("par_content");
         $this->requested_par_downloadtitle = str_replace('"', '', $this->request->getString("par_downloadtitle"));
 
-        $this->upload_source();
+//        $this->upload_source();
 
         // set language and characteristic
 
+        /*
         $this->content_obj->setLanguage(
             $this->request->getString("par_language")
         );
-        $this->content_obj->setCharacteristic($this->request->getString("par_characteristic"));
+        $this->content_obj->setCharacteristic($this->request->getString("par_characteristic"));*/
 
         // set language and characteristic
-        $this->content_obj->setLanguage($this->request->getString("par_language"));
+        /*$this->content_obj->setLanguage($this->request->getString("par_language"));
         $this->content_obj->setSubCharacteristic($this->request->getString("par_subcharacteristic"));
         $this->content_obj->setDownloadTitle(
             str_replace('"', '', $this->requested_par_downloadtitle)
@@ -172,6 +179,8 @@ class ilPCSourceCodeGUI extends ilPageContentGUI
         );
         $this->content_obj->setSubCharacteristic($this->request->getString("par_subcharacteristic"));
         $this->content_obj->setCharacteristic("Code");
+
+        */
 
         $this->updated = $this->content_obj->setText(
             $this->content_obj->input2xml($this->requested_par_content, 0, false)
@@ -302,6 +311,7 @@ class ilPCSourceCodeGUI extends ilPageContentGUI
         $form->addCommandButton($a_cmd, $this->lng->txt("save"));
         $form->addCommandButton($a_cmd_cancel, $this->lng->txt("cancel"));
 
+        /*
         $lang_var = ilMDLanguageItem::_getLanguages();
         $lang = new ilSelectInputGUI($this->lng->txt("language"), "par_language");
         $lang->setOptions($lang_var);
@@ -313,17 +323,18 @@ class ilPCSourceCodeGUI extends ilPageContentGUI
         $form->addItem($code_style);
         $line_number = new ilCheckboxInputGUI($this->lng->txt("cont_show_line_numbers"), "par_showlinenumbers");
         $form->addItem($line_number);
-
+*/
         $code = new ilTextAreaInputGUI("", "par_content");
         $code->setRows(12);
         $form->addItem($code);
 
+        /*
         $downlaod_title = new ilTextInputGUI($this->lng->txt("cont_download_title"), "par_downloadtitle");
         $downlaod_title->setSize(40);
         $form->addItem($downlaod_title);
 
         $file = new ilFileInputGUI($this->lng->txt("import_file"), "userfile");
-        $form->addItem($file);
+        $form->addItem($file);*/
 
         return $form;
     }
@@ -361,7 +372,11 @@ class ilPCSourceCodeGUI extends ilPageContentGUI
         return $form;
     }
 
-    public function getManualFormAdapter(): \ILIAS\Repository\Form\FormAdapterGUI
+    public function getManualFormAdapter(
+        ?string $download_title = null,
+        ?string $subchar = null,
+        ?bool $line_numbers = null
+    ): \ILIAS\Repository\Form\FormAdapterGUI
     {
         $this->ctrl->setParameter($this, "cname", "SourceCode");
         $form = $this->gui->form([self::class], "#")
@@ -369,18 +384,33 @@ class ilPCSourceCodeGUI extends ilPageContentGUI
                           ->hidden("mode", "manual")
                           ->text(
                               "title",
-                              $this->lng->txt("cont_download_title")
+                              $this->lng->txt("cont_download_title"),
+                              "",
+                              $download_title
                           )
                           ->select(
                               "subchar",
                               $this->lng->txt("cont_src"),
-                              $this->getProgLangOptions()
+                              $this->getProgLangOptions(),
+                              "",
+                              $subchar
                           )
                           ->checkbox(
                               "linenumbers",
-                              $this->lng->txt("cont_show_line_numbers")
+                              $this->lng->txt("cont_show_line_numbers"),
+                              "",
+                              $line_numbers
                           );
         return $form;
+    }
+
+    public function getEditingFormAdapter(): \ILIAS\Repository\Form\FormAdapterGUI
+    {
+        return $this->getManualFormAdapter(
+            $this->content_obj->getDownloadTitle(),
+            $this->content_obj->getSubCharacteristic(),
+            ($this->content_obj->getShowLineNumbers() == "y")
+        );
     }
 
     public function handleUploadResult(

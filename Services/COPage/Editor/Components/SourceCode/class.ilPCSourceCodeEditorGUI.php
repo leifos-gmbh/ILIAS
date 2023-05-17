@@ -57,90 +57,22 @@ class ilPCSourceCodeEditorGUI implements PageComponentEditor
         string $pcid
     ): string {
         global $DIC;
+
         $lng = $DIC->language();
         $lng->loadLanguageModule("content");
 
-        $media_type = $DIC->mediaObjects()
-            ->internal()
-            ->domain()
-            ->mediaType();
+        /** @var ilPCSourceCode $pc_src */
+        $pc_src = $page_gui->getPageObject()->getContentObjectForPcId($pcid);
+        $src_gui = new ilPCSourceCodeGUI($page_gui->getPageObject(), $pc_src, "", $pcid);
 
-        $form = new ilPropertyFormGUI();
-        $form->setShowTopButtons(false);
-        $form->setTitle($lng->txt("cont_edit_mob"));
-
-        /** @var ilPCSourceCode $src_media */
-        $src_media = $page_gui->getPageObject()->getContentObjectForPcId($pcid);
-        $pc_media_gui = new ilPCMediaObjectGUI(
-            $page_gui->getPageObject(),
-            $pc_media,
-            $page_gui->getPageObject()->getHierIdForPcId($pcid),
-            $pcid
-        );
-        $pc_media_gui->setStyleId($style_id);
-        $pc_media_gui->getCharacteristicsOfCurrentStyle(["media_cont"]);
-
-        $media = $pc_media->getMediaObject()->getMediaItem("Standard");
-
-        // title
-        $title = new ilTextInputGUI($lng->txt("title"), "standard_title");
-        $title->setSize(40);
-        $title->setMaxLength(120);
-        $title->setValue($quick_edit->getTitle());
-        $form->addItem($title);
-
-        // style
-        if ($pc_media_gui->checkStyleSelection()) {
-            $style_input = $pc_media_gui->getStyleInput();
-            $form->addItem($style_input);
-        }
-
-        // horizonal align
-        $align_prop = new ilSelectInputGUI(
-            $lng->txt("cont_align"),
-            "horizontal_align"
-        );
-        $options = array(
-            "Left" => $lng->txt("cont_left"),
-            "Center" => $lng->txt("cont_center"),
-            "Right" => $lng->txt("cont_right"),
-            "LeftFloat" => $lng->txt("cont_left_float"),
-            "RightFloat" => $lng->txt("cont_right_float"));
-        $align_prop->setOptions($options);
-        $align_prop->setValue($quick_edit->getHorizontalAlign());
-        $form->addItem($align_prop);
-
-        // fullscreen
-        if ($media_type->isImage($media->getFormat())) {
-            $cb = new ilCheckboxInputGUI($lng->txt("cont_show_fullscreen"), "fullscreen");
-            $cb->setChecked($quick_edit->getUseFullscreen());
-            $form->addItem($cb);
-        }
-
-        // standard caption
-        $caption = new ilTextAreaInputGUI($lng->txt("cont_caption"), "standard_caption");
-        $caption->setRows(2);
-        $caption->setValue($quick_edit->getCaption());
-        $form->addItem($caption);
-
-        // text representation
-        if ($media_type->usesAltTextProperty($media->getFormat())) {
-            $ta = new ilTextAreaInputGUI($lng->txt("text_repr"), "text_representation");
-            $ta->setRows(2);
-            $ta->setInfo($lng->txt("text_repr_info"));
-            $ta->setValue($quick_edit->getTextRepresentation());
-            $form->addItem($ta);
-        }
-
-        $html = $ui_wrapper->getRenderedForm(
+        $form = $src_gui->getEditingFormAdapter();
+        $html = $ui_wrapper->getRenderedAdapterForm(
             $form,
-            [["Page", "component.update", $lng->txt("save")],
-             ["Page", "component.cancel", $lng->txt("cancel")]]
+            [["Page", "component.update.back", $lng->txt("save")],
+             ["Page", "component.back", $lng->txt("cancel")]],
+            "copg-src-form"
         );
-
-        $link = $ui_wrapper->getRenderedLink($lng->txt("cont_advanced_settings"), "Page", "link", "component.settings");
-
-        return $html . $link;
+        return $html;
     }
 
     protected function getRenderedImportForm(

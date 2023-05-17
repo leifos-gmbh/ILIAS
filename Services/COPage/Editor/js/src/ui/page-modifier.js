@@ -165,10 +165,11 @@ export default class PageModifier {
   }
 
   displayError(error) {
+    console.log("*** DISPLAY ERROR");
+    console.log(error);
     const uiModel = this.pageUI.uiModel;
     this.toolSlate.displayError(uiModel.errorMessage);
     const pm = this;
-
     const content =  uiModel.errorModalMessage + error;
 
     const link = document.querySelector("#copg-editor-slate-error ul li a");

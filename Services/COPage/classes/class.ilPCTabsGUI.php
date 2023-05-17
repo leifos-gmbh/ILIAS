@@ -430,21 +430,8 @@ class ilPCTabsGUI extends ilPageContentGUI
         $lng = $this->lng;
 
         $this->initEditor($this->pc_id, "Tabs");
-
         $this->tabs->setBackTarget("", "");
 
-        /*
-        $ilToolbar->addButton(
-            $lng->txt("cont_add_tab"),
-            $ilCtrl->getLinkTarget($this, "addTab")
-        );*/
-
-        //$this->setTabs();
-        //$ilTabs->activateTab("cont_tabs");
-        /** @var ilPCTabs $tabs */
-        //$tabs = $this->content_obj;
-        //$table_gui = new ilPCTabsTableGUI($this, "edit", $tabs);
-        //$tpl->setContent($table_gui->getHTML().$this->getEditorScriptTag());
         $tpl->setContent($this->getTabPanels().$this->getEditorScriptTag());
     }
 

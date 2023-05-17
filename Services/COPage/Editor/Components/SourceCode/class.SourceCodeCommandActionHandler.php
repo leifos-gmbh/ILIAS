@@ -74,6 +74,9 @@ class SourceCodeCommandActionHandler implements Server\CommandActionHandler
 
         $src = new \ilPCSourceCode($page);
         $src->create($page, $hier_id, $pc_id);
+        if (($body["pcid"] ?? "") !== "") {
+            $src->writePCId($body["pcid"]);
+        }
         $src_gui = new \ilPCSourceCodeGUI($page, $src, "", "");
         $src_gui->setPageConfig($page->getPageConfig());
         $src->setLanguage($this->user->getLanguage());
@@ -107,21 +110,20 @@ class SourceCodeCommandActionHandler implements Server\CommandActionHandler
     {
         $page = $this->page_gui->getPageObject();
 
-        /** @var \ilPCMediaObject $pc_media */
-        $pc_media = $page->getContentObjectForPcId($body["pcid"]);
-        $quick_edit = new \ilPCMediaObjectQuickEdit($pc_media);
+            /** @var \ilPCSourceCode $pc_src */
+        $pc_src = $page->getContentObjectForPcId($body["pcid"]);
+        $src_gui = new \ilPCSourceCodeGUI($page, $pc_src, "", $body["pcid"]);
 
-        $quick_edit->setTitle(\ilUtil::stripSlashes($body["standard_title"] ?? ""));
-        $quick_edit->setClass(\ilUtil::stripSlashes($body["characteristic"] ?? ""));
-        $quick_edit->setHorizontalAlign(\ilUtil::stripSlashes($body["horizontal_align"] ?? ""));
-
-        $quick_edit->setUseFullscreen((bool) ($body["fullscreen"] ?? false));
-        $quick_edit->setCaption(\ilUtil::stripSlashes($body["standard_caption"] ?? ""));
-        $quick_edit->setTextRepresentation(\ilUtil::stripSlashes($body["text_representation"] ?? ""));
-
-        $pc_media->getMediaObject()->update();
-        $updated = $page->update();
-
+        $form = $src_gui->getEditingFormAdapter();
+        if ($form->isValid()) {
+            $pc_src->setDownloadTitle(str_replace('"', '', $form->getData("title")));
+            $pc_src->setSubCharacteristic($form->getData("subchar"));
+            $pc_src->setShowLineNumbers($form->getData("linenumbers") ? "y" : "n");
+            $pc_src->setText(
+                $pc_src->input2xml($body["code"], 0, false)
+            );
+            $updated = $page->update();
+        }
         return $this->ui_wrapper->sendPage($this->page_gui, $updated);
     }
 }

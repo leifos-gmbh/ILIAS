@@ -177,7 +177,8 @@ class UIWrapper
 
     public function getRenderedAdapterForm(
         FormAdapterGUI $form,
-        array $buttons
+        array $buttons,
+        string $id = ""
     ): string {
         $button_html = "";
         foreach ($buttons as $button) {
@@ -198,6 +199,9 @@ class UIWrapper
             substr($html, 0, $footer_pos) .
             preg_replace("#\\<" . $tag . "(.*)/" . $tag . ">#iUs", $button_html, substr($html, $footer_pos), 1);
 
+        if ($id !== "") {
+            $html = str_replace("<form ", "<form id='$id' ", $html);
+        }
         return $html;
     }
 

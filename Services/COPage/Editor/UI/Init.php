@@ -44,6 +44,9 @@ class Init
     ): void {
         $ctrl = $this->ctrl;
         $lng = $this->lng;
+
+        \ILIAS\Repository\Form\FormAdapterGUI::initJavascript();
+
         $main_tpl->addOnLoadCode("il.copg.editor.init('" .
             ILIAS_HTTP_PATH . "/" . $ctrl->getLinkTargetByClass(["ilPageEditorGUI", "ilPageEditorServerAdapterGUI"], "invokeServer") . "','" .
             $this->ctrl->getFormActionByClass("ilPageEditorGUI")
@@ -72,7 +75,6 @@ class Init
         // ensure that form.js is loaded which is needed for file input (js that shows file names)
         $dummy = new \ilPropertyFormGUI();
         $dummy->getHTML();
-
         // ensure modal.js from ui framework is loaded
         $this->ui->renderer()->render(
             $this->ui->factory()->modal()->roundtrip("", $this->ui->factory()->legacy(""))

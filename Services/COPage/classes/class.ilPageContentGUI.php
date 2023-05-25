@@ -557,7 +557,6 @@ class ilPageContentGUI
     protected function initEditor(string $form_pc_id = "", string $form_cname = "") : void
     {
         $this->setEditorToolContext();
-        \ILIAS\Repository\Form\FormAdapterGUI::initJavascript();
         $editor_init = new \ILIAS\COPage\Editor\UI\Init();
         $editor_init->initUI($this->tpl, "", $form_pc_id, $form_cname);
     }

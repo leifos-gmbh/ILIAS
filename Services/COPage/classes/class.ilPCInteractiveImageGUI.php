@@ -16,11 +16,17 @@
  *
  *********************************************************************/
 
+use ILIAS\FileUpload\Location;
+use ILIAS\FileUpload\FileUpload;
+use ILIAS\FileUpload\Handler\BasicHandlerResult;
+use ILIAS\FileUpload\DTO\UploadResult;
+use ILIAS\FileUpload\Handler\HandlerResult;
+
 /**
  * User interface class for interactive images
  *
  * @author Alexander Killing <killing@leifos.de>
- * @ilCtrl_Calls ilPCInteractiveImageGUI: ilPCIIMTriggerEditorGUI
+ * @ilCtrl_Calls ilPCInteractiveImageGUI: ilPCIIMTriggerEditorGUI, ilRepoStandardUploadHandlerGUI
  */
 class ilPCInteractiveImageGUI extends ilPageContentGUI
 {
@@ -74,6 +80,12 @@ class ilPCInteractiveImageGUI extends ilPageContentGUI
                 if ($ret != "") {
                     $tpl->setContent($ret);
                 }
+                break;
+
+            case strtolower(ilRepoStandardUploadHandlerGUI::class):
+                $form = $this->getImportFormAdapter();
+                $gui = $form->getRepoStandardUploadHandlerGUI("input_file");
+                $this->ctrl->forwardCommand($gui);
                 break;
 
             default:
@@ -652,4 +664,47 @@ class ilPCInteractiveImageGUI extends ilPageContentGUI
         }
         $ilCtrl->redirect($this, "listContentPopups");
     }
+
+    public function getImportFormAdapter(): \ILIAS\Repository\Form\FormAdapterGUI
+    {
+        $this->ctrl->setParameter($this, "cname", "SourceCode");
+        $form = $this->gui->form([self::class], "#")
+                          ->async()
+                          ->file(
+                              "input_file",
+                              $this->lng->txt("import_file"),
+                              \Closure::fromCallable([$this, 'handleUploadResult']),
+                              "filename",
+                              "",
+                              1,
+                              [],
+                              [self::class],
+                              "copg"
+                          );
+        return $form;
+    }
+
+    public function handleUploadResult(
+        FileUpload $upload,
+        UploadResult $result
+    ): BasicHandlerResult {
+        $fac = new ILIAS\Data\UUID\Factory();
+        $uuid = $fac->uuid4AsString();
+        $name = $uuid . ".txt";
+        $upload->moveOneFileTo(
+            $result,
+            "",
+            Location::TEMPORARY,
+            $name,
+            true
+        );
+
+        return new BasicHandlerResult(
+            "filename",
+            HandlerResult::STATUS_OK,
+            $name,
+            ''
+        );
+    }
+
 }

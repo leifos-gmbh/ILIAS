@@ -550,17 +550,6 @@ export default class ParagraphUI {
   }
 
 
-  reInitUI() {
-    il.Tooltip.init();
-    il.COPagePres.updateQuestionOverviews();
-    if (il.AdvancedSelectionList != null)
-    {
-      il.AdvancedSelectionList.init['style_selection']();
-      il.AdvancedSelectionList.init['char_style_selection']();
-    }
-    il.copg.editor.reInitUI();
-  }
-
   ////
   //// Various stuff, needs to be reorganised
   ////

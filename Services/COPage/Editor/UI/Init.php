@@ -73,6 +73,11 @@ class Init
         );
     }
 
+    protected function sanitizeAttribute(string $attr) : string
+    {
+        return str_replace(["<", ">", "'", "\""], "", $attr);
+    }
+
     public function getInitHtml(
         string $openPlaceHolderPcId = "",
         string $openFormPcId = "",
@@ -81,11 +86,13 @@ class Init
     {
         $ctrl = $this->ctrl;
 
-        $p1 = ILIAS_HTTP_PATH . "/" . $ctrl->getLinkTargetByClass(["ilPageEditorGUI", "ilPageEditorServerAdapterGUI"], "invokeServer");
-        $p2 = $ctrl->getFormActionByClass("ilPageEditorGUI");
-        $p3 = $openPlaceHolderPcId;
-        $p4 = $openFormPcId;
-        $p5 = $openFormCName;
+        $p1 = $this->sanitizeAttribute(
+            ILIAS_HTTP_PATH . "/" . $ctrl->getLinkTargetByClass(["ilPageEditorGUI", "ilPageEditorServerAdapterGUI"], "invokeServer")
+        );
+        $p2 = $this->sanitizeAttribute($ctrl->getFormActionByClass("ilPageEditorGUI"));
+        $p3 = $this->sanitizeAttribute($openPlaceHolderPcId);
+        $p4 = $this->sanitizeAttribute($openFormPcId);
+        $p5 = $this->sanitizeAttribute($openFormCName);
 
         $init_span = <<<EOT
 <span id='il-copg-init'

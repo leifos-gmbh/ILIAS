@@ -37,6 +37,7 @@ class ilPageObjectGUI
     public const PREVIEW = "preview";
     public const OFFLINE = "offline";
     public const PRINTING = "print";
+    protected \ILIAS\COPage\Editor\GUIService $editor_gui;
     protected int $requested_ref_id;
     protected int $requested_pg_id;
     protected string $requested_file_id;
@@ -226,6 +227,7 @@ class ilPageObjectGUI
             ->edit();
 
         $this->afterConstructor();
+        $this->editor_gui = $DIC->copage()->internal()->gui()->edit();
     }
 
     public function afterConstructor(): void
@@ -1087,7 +1089,6 @@ class ilPageObjectGUI
 
             // show prepending html
             $tpl->setVariable("PREPENDING_HTML", $this->getPrependingHtml());
-            $tpl->setVariable("TXT_CONFIRM_DELETE", $this->lng->txt("cont_confirm_delete"));
 
 
             // get js files for JS enabled editing
@@ -1106,8 +1107,7 @@ class ilPageObjectGUI
                 ));
                 $tpl->parseCurrentBlock();
 
-                $editor_init = new \ILIAS\COPage\Editor\UI\Init();
-                $editor_init->initUI($main_tpl, $this->getOpenPlaceHolder());
+                $this->editor_gui->init()->initUI($main_tpl);
             }
         } else {
             // presentation or preview here
@@ -1287,16 +1287,6 @@ class ilPageObjectGUI
             }
         }
 
-        $reload_tree = $this->request->getString("reloadTree");
-        if ($reload_tree == "y") {
-            $tpl->setCurrentBlock("reload_tree");
-            $tpl->setVariable(
-                "LINK_TREE",
-                $this->ctrl->getLinkTargetByClass("ilobjlearningmodulegui", "explorer", "", false, false)
-            );
-            $tpl->parseCurrentBlock();
-        }
-        //		}
         // get content
         $builded = $this->obj->buildDom();
 
@@ -1320,39 +1310,6 @@ class ilPageObjectGUI
 
             // standard menues
             $hids = $this->obj->getHierIds();
-            foreach ($hids as $hid) {
-                $tpl->setCurrentBlock("add_dhtml");
-                $tpl->setVariable("CONTEXTMENU", "contextmenu_" . $hid);
-                $tpl->parseCurrentBlock();
-            }
-
-            // column menues for tables
-            foreach ($col1_ids as $hid) {
-                $tpl->setCurrentBlock("add_dhtml");
-                $tpl->setVariable("CONTEXTMENU", "contextmenu_r" . $hid);
-                $tpl->parseCurrentBlock();
-            }
-
-            // row menues for tables
-            foreach ($row1_ids as $hid) {
-                $tpl->setCurrentBlock("add_dhtml");
-                $tpl->setVariable("CONTEXTMENU", "contextmenu_c" . $hid);
-                $tpl->parseCurrentBlock();
-            }
-
-            // list item menues
-            foreach ($litem_ids as $hid) {
-                $tpl->setCurrentBlock("add_dhtml");
-                $tpl->setVariable("CONTEXTMENU", "contextmenu_i" . $hid);
-                $tpl->parseCurrentBlock();
-            }
-
-            // file item menues
-            foreach ($fitem_ids as $hid) {
-                $tpl->setCurrentBlock("add_dhtml");
-                $tpl->setVariable("CONTEXTMENU", "contextmenu_i" . $hid);
-                $tpl->parseCurrentBlock();
-            }
         } else {
             $this->obj->addFileSizes();
         }
@@ -1673,16 +1630,20 @@ class ilPageObjectGUI
             echo $tpl->get("edit_page");
             exit;
         }
+        $edit_init = "";
+        if ($this->getOutputMode() === "edit") {
+            $edit_init = $this->editor_gui->init()->getInitHtml($this->getOpenPlaceHolder());
+        }
         if ($this->outputToTemplate()) {
             $tpl->setVariable($this->getTemplateOutputVar(), $output);
-            $this->tpl->setVariable($this->getTemplateTargetVar(), $tpl->get());
+            $this->tpl->setVariable($this->getTemplateTargetVar(), $tpl->get().$edit_init);
             return $output;
         } else {
             if ($this->getRawPageContent()) {		// e.g. needed in glossaries
-                return $output;
+                return $output.$edit_init;
             } else {
                 $tpl->setVariable($this->getTemplateOutputVar(), $output);
-                return $tpl->get();
+                return $tpl->get().$edit_init;
             }
         }
     }
@@ -2766,11 +2727,11 @@ class ilPageObjectGUI
         $this->initActivationForm();
         $this->getActivationFormValues();
         $atpl->setVariable("FORM", $this->form->getHTML());
-        $atpl->setCurrentBlock("updater");
+        /*$atpl->setCurrentBlock("updater");
         $atpl->setVariable("UPDATER_FRAME", $this->exp_frame);
         $atpl->setVariable("EXP_ID_UPDATER", $this->exp_id);
         $atpl->setVariable("HREF_UPDATER", $this->exp_target_script);
-        $atpl->parseCurrentBlock();
+        $atpl->parseCurrentBlock();*/
         $this->tpl->setContent($atpl->get());
     }
 

@@ -37,20 +37,12 @@ class Init
     }
 
     public function initUI(
-        \ilGlobalTemplateInterface $main_tpl,
-        string $openPlaceHolderPcId = "",
-        string $openFormPcId = "",
-        string $openFormCName = ""
+        \ilGlobalTemplateInterface $main_tpl
     ): void {
         $ctrl = $this->ctrl;
         $lng = $this->lng;
 
         \ILIAS\Repository\Form\FormAdapterGUI::initJavascript();
-
-        $main_tpl->addOnLoadCode("il.copg.editor.init('" .
-            ILIAS_HTTP_PATH . "/" . $ctrl->getLinkTargetByClass(["ilPageEditorGUI", "ilPageEditorServerAdapterGUI"], "invokeServer") . "','" .
-            $this->ctrl->getFormActionByClass("ilPageEditorGUI")
-            . "', '" . $openPlaceHolderPcId . "', '" . $openFormPcId . "', '" . $openFormCName . "');");
 
         $lang_vars = ["cont_last_update", "cont_error", "cont_sel_el_cut_use_paste", "cont_sel_el_copied_use_paste",
                       "cont_ed_new_col_before", "cont_ed_new_col_after", "cont_ed_col_left", "cont_ed_col_right", "cont_ed_delete_col",
@@ -80,4 +72,35 @@ class Init
             $this->ui->factory()->modal()->roundtrip("", $this->ui->factory()->legacy(""))
         );
     }
+
+    public function getInitHtml(
+        string $openPlaceHolderPcId = "",
+        string $openFormPcId = "",
+        string $openFormCName = ""
+    ) : string
+    {
+        $ctrl = $this->ctrl;
+
+        $p1 = ILIAS_HTTP_PATH . "/" . $ctrl->getLinkTargetByClass(["ilPageEditorGUI", "ilPageEditorServerAdapterGUI"], "invokeServer");
+        $p2 = $ctrl->getFormActionByClass("ilPageEditorGUI");
+        $p3 = $openPlaceHolderPcId;
+        $p4 = $openFormPcId;
+        $p5 = $openFormCName;
+
+        $init_span = <<<EOT
+<span id='il-copg-init'
+	data-endpoint='$p1'
+	data-formaction='$p2'
+	data-open-place-holder-pc-id='$p3'
+	data-open-form-pc-id='$p4'
+	data-open-form-cname='$p5'
+></span>
+EOT;
+
+        $module_tag = <<<EOT
+<script type="module" src="./Services/COPage/Editor/js/src/editor.js"></script>
+EOT;
+        return $init_span.$module_tag;
+    }
+
 }

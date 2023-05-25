@@ -1217,11 +1217,12 @@ class ilPCTableGUI extends ilPageContentGUI
         );
         $dtpl->parseCurrentBlock();
 
+        $html = $dtpl->get();
         if ($initial) {
-            $dtpl->touchBlock("script");
+            $html.= $this->getEditorScriptTag();
         }
 
-        return $dtpl->get();
+        return $html;
     }
 
     protected function getCellClass(

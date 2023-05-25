@@ -80,7 +80,7 @@ class ilPCSourceCodeGUI extends ilPageContentGUI
 
         $this->displayValidationError();
 
-        $this->initEditor($this->pc_id, "SourceCode");
+        $this->initEditor();
         $this->tabs->setBackTarget("", "");
 
         $cmd = $this->ctrl->getCmd();
@@ -115,7 +115,7 @@ class ilPCSourceCodeGUI extends ilPageContentGUI
         $t = $this->gui->ui()->renderer()->render($f);
         $t = str_replace("<textarea ", "<textarea name='code' rows='20' form='copg-src-form' ", $t);
 
-        $this->tpl->setContent($t.$this->getEditorScriptTag());
+        $this->tpl->setContent($t.$this->getEditorScriptTag($this->pc_id, "SourceCode"));
     }
 
     public function insert(): void

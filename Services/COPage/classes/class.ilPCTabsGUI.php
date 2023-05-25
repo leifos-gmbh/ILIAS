@@ -429,10 +429,10 @@ class ilPCTabsGUI extends ilPageContentGUI
         $ilToolbar = $this->toolbar;
         $lng = $this->lng;
 
-        $this->initEditor($this->pc_id, "Tabs");
+        $this->initEditor();
         $this->tabs->setBackTarget("", "");
 
-        $tpl->setContent($this->getTabPanels().$this->getEditorScriptTag());
+        $tpl->setContent($this->getTabPanels().$this->getEditorScriptTag($this->pc_id, "Tabs"));
     }
 
     /**

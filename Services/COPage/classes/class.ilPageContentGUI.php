@@ -28,6 +28,7 @@ use ILIAS\Style;
  */
 class ilPageContentGUI
 {
+    protected \ILIAS\COPage\Editor\GUIService $editor_gui;
     protected \ILIAS\COPage\InternalGUIService $gui;
     protected EditSessionRepository $edit_repo;
     protected string $pc_id = "";
@@ -102,6 +103,7 @@ class ilPageContentGUI
             $this->dom = $a_pg_obj->getDom();
         }
         $this->tool_context = $DIC->globalScreen()->tool()->context();
+        $this->editor_gui = $DIC->copage()->internal()->gui()->edit();
     }
 
     public function setContentObject(ilPageContent $a_val): void
@@ -554,23 +556,15 @@ class ilPageContentGUI
         }
     }
 
-    protected function initEditor(string $form_pc_id = "", string $form_cname = "") : void
+    protected function initEditor() : void
     {
         $this->setEditorToolContext();
-        $editor_init = new \ILIAS\COPage\Editor\UI\Init();
-        $editor_init->initUI($this->tpl, "", $form_pc_id, $form_cname);
+        $this->editor_gui->init()->initUI($this->tpl);
     }
 
-    protected function getEditorScriptTag() : string
+    protected function getEditorScriptTag(string $form_pc_id = "", string $form_cname = "") : string
     {
-        $tag = <<<EOT
-<script type="module">
-	import editor from './Services/COPage/Editor/js/src/editor.js';
-	window.il.copg = window.il.copg || {};
-	window.il.copg.editor = editor;
-</script>
-EOT;
-        return $tag;
+        return $this->editor_gui->init()->getInitHtml("", $form_pc_id, $form_cname);
     }
 
 }

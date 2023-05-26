@@ -18,3 +18,5 @@ glo#:#glo_selected_glossaries_info#:#Die Begriffe stammen aus den folgenden Glos
 glo#:#glo_selected_glossary_is_current_info#:#Das ausgewählte Glossar entspricht dem aktuellen Glossar. Bitte wählen Sie ein anderes Glossar.
 glo#:#glo_term_definition_pairs#:#Begriff/Definition-Paare
 glo#:#glo_term_definition_pairs_info#:#Bitte geben Sie pro Zeile ein Begriff/Definition-Paar ein. Begriff und Definition müssen getrennt sein durch ein Semikolon oder ein TAB-Zeichen (werden überlicherweise durch Zwischenablage-Aktionen von Tabellenkalkulationsprogramm unterstützt).
+glo#:#glo_term_letter#:#Buchstabe
+glo#:#glo_terms_per_page#:#Begriffe pro Seite

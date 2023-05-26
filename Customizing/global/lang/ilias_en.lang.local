@@ -18,3 +18,5 @@ glo#:#glo_selected_glossaries_info#:#Terms are collected from the following glos
 glo#:#glo_selected_glossary_is_current_info#:#The selected glossary corresponds to the current glossary. Please select another glossary.
 glo#:#glo_term_definition_pairs#:#Term/Definition Pairs
 glo#:#glo_term_definition_pairs_info#:#Please enter a term and a definition pair in each line. Term and definition must be separated by a semicolon or a TAB character (usually provided by clipboard actions from spreadsheet applications).
+glo#:#glo_term_letter#:#Letter
+glo#:#glo_terms_per_page#:#Terms per Page

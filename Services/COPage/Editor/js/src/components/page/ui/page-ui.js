@@ -1021,7 +1021,9 @@ export default class PageUI {
       content,
       this.model.getCurrentPCName()
     );
+    console.log("AAAA");
     this.toolSlate.setContentFromComponent(this.model.getCurrentPCName(), "creation_form");
+    console.log("BBBB");
     this.initFormButtonsAndSettingsLink();
   }
 

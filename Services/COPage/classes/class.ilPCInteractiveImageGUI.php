@@ -674,7 +674,7 @@ class ilPCInteractiveImageGUI extends ilPageContentGUI
                               "input_file",
                               $this->lng->txt("import_file"),
                               \Closure::fromCallable([$this, 'handleUploadResult']),
-                              "filename",
+                              "mob_id",
                               "",
                               1,
                               [],
@@ -688,21 +688,44 @@ class ilPCInteractiveImageGUI extends ilPageContentGUI
         FileUpload $upload,
         UploadResult $result
     ): BasicHandlerResult {
-        $fac = new ILIAS\Data\UUID\Factory();
-        $uuid = $fac->uuid4AsString();
-        $name = $uuid . ".txt";
+        $title = $result->getName();
+
+        $mob = new ilObjMediaObject();
+        $mob->setTitle($title);
+        $mob->setDescription("");
+        $mob->create();
+
+        $mob->createDirectory();
+        $media_item = new ilMediaItem();
+        $mob->addMediaItem($media_item);
+        $media_item->setPurpose("Standard");
+
+        $mob_dir = ilObjMediaObject::_getRelativeDirectory($mob->getId());
+        $file_name = ilObjMediaObject::fixFilename($title);
+        $file = $mob_dir . "/" . $file_name;
+
         $upload->moveOneFileTo(
             $result,
-            "",
-            Location::TEMPORARY,
-            $name,
+            $mob_dir,
+            Location::WEB,
+            $file_name,
             true
         );
 
+        // get mime type
+        $format = ilObjMediaObject::getMimeType($file);
+        $location = $file_name;
+
+        // set real meta and object data
+        $media_item->setFormat($format);
+        $media_item->setLocation($location);
+        $media_item->setLocationType("LocalFile");
+        $mob->update();
+
         return new BasicHandlerResult(
-            "filename",
+            "mob_id",
             HandlerResult::STATUS_OK,
-            $name,
+            (string) $mob->getId(),
             ''
         );
     }

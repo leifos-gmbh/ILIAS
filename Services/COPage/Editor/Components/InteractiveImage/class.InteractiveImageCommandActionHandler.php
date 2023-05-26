@@ -73,18 +73,23 @@ class InteractiveImageCommandActionHandler implements Server\CommandActionHandle
         }
 
         $iim = new \ilPCInteractiveImage($page);
-        $iim->create($page, $hier_id, $pc_id);
-        if (($body["pcid"] ?? "") !== "") {
-            $iim->writePCId($body["pcid"]);
-        }
+        $iim->create();
         $iim_gui = new \ilPCInteractiveImageGUI($page, $iim, "", "");
         $iim_gui->setPageConfig($page->getPageConfig());
 
         $form = $iim_gui->getImportFormAdapter();
         if ($form->isValid()) {
-            $iim->importFile((string) $form->getData("input_file"));
-            $updated = $page->update();
+            $iim->createFromMobId(
+                $page,
+                (int) $form->getData("input_file"),
+                $hier_id,
+                $pc_id
+            );
+            if (($body["pcid"] ?? "") !== "") {
+                $iim->writePCId($body["pcid"]);
+            }
         }
+        $updated = $page->update();
 
         return $this->ui_wrapper->sendPage($this->page_gui, $updated);
     }

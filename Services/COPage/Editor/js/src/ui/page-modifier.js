@@ -188,6 +188,13 @@ export default class PageModifier {
   }
 
   initFormButtonsAndSettingsLink(model) {
+    let c;
+
+    // this removes all event listeners that have been already attached
+    document.querySelectorAll("#copg-editor-slate-content [data-copg-ed-type='form-button']").forEach(form_button => {
+      c = form_button.cloneNode(true);
+      form_button.parentNode.replaceChild(c, form_button);
+    });
 
     document.querySelectorAll("#copg-editor-slate-content [data-copg-ed-type='form-button']").forEach(form_button => {
       const dispatch = this.pageUI.dispatcher;
@@ -197,6 +204,9 @@ export default class PageModifier {
       if (cname === "Page") {
         form_button.addEventListener("click", (event) => {
           event.preventDefault();
+          // prevents event listeners being called, that are attached later
+          // especially standard file upload processing (which submits forms etc.)
+          event.stopPropagation();
           switch (act) {
             case "component.cancel":
               dispatch.dispatch(action.page().editor().componentCancel());

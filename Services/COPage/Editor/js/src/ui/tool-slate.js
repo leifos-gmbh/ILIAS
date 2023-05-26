@@ -42,14 +42,31 @@ export default class ToolSlate {
    * @param {string} html
    */
   setContent(html) {
-    // @todo hate to use jquery here, but only jquery evals the included script tags
-    //document.querySelector("#copg-editor-slate-content").innerHTML = html;
-    $("#copg-editor-slate-content").html(html);
+    const slateEl = document.getElementById('copg-editor-slate-content');
+    this.setInnerHTML(slateEl, html);
     $('body').trigger('il-copg-editor-slate');
-
     // this fixes #30378
     il.Form.registerFileUploadInputEventTrigger('#copg-editor-slate-content ');
   }
+
+  setInnerHTML(el, html) {
+    el.innerHTML = html;
+
+    Array.from(el.querySelectorAll("script"))
+    .forEach( oldScriptEl => {
+      const newScriptEl = document.createElement("script");
+
+      Array.from(oldScriptEl.attributes).forEach( attr => {
+        newScriptEl.setAttribute(attr.name, attr.value)
+      });
+
+      const scriptText = document.createTextNode(oldScriptEl.innerHTML);
+      newScriptEl.appendChild(scriptText);
+
+      oldScriptEl.parentNode.replaceChild(newScriptEl, oldScriptEl);
+    });
+  }
+
 
   /**
    * @param {string} component

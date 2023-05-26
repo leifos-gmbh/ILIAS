@@ -29,6 +29,7 @@ use ILIAS\COPage\Editor\Components\Table;
 use ILIAS\COPage\Editor\Components\Tabs;
 use ILIAS\COPage\Editor\Components\Resources;
 use ILIAS\COPage\Editor\Components\SourceCode;
+use ILIAS\COPage\Editor\Components\InteractiveImage;
 
 /**
  * Page editor json server
@@ -138,6 +139,9 @@ class Server
                 break;
             case "SourceCode":
                 $handler = new SourceCode\SourceCodeCommandActionHandler($this->page_gui);
+                break;
+            case "InteractiveImage":
+                $handler = new InteractiveImage\InteractiveImageCommandActionHandler($this->page_gui);
                 break;
         }
 

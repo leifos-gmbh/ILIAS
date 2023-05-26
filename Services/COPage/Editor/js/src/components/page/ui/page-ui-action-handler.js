@@ -254,7 +254,7 @@ export default class PageUIActionHandler {
 
     // if we sent a (legacy) form, deactivate everything
     if (form_sent === true) {
-      this.ui.showPageHelp();
+      //this.ui.showPageHelp();
       this.ui.hideAddButtons();
       this.ui.hideDropareas();
       this.ui.disableDragDrop();
@@ -265,6 +265,21 @@ export default class PageUIActionHandler {
       this.ui.refreshUIFromModelState(model);
 
       this.ui.markCurrent();
+    }
+
+    if (action.getComponent() === "Page") {
+      switch (action.getType()) {
+        case ACTIONS.COMPONENT_AFTER_SAVE:
+          if (["SourceCode", "InteractiveImage"].includes(params.component)) {
+            console.log(params.pcid);
+            dispatcher.dispatch(actionFactory.page().editor().componentEdit(
+              params.component,
+              params.pcid,
+              ""
+            ));
+          }
+          break;
+      }
     }
   }
 

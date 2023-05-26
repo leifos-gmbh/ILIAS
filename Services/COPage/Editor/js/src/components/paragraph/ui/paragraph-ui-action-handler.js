@@ -282,21 +282,6 @@ export default class ParagraphUIActionHandler {
       }
     }
 
-    if (action.getComponent() === "Page") {
-      switch (action.getType()) {
-        case PAGE_ACTIONS.COMPONENT_AFTER_SAVE:
-          if (params.component=="SourceCode") {
-            //params.pcid
-            dispatcher.dispatch(actionFactory.page().editor().componentEdit(
-              "SourceCode",
-              params.pcid,
-              ""
-            ));
-          }
-          break;
-      }
-    }
-
     switch (page_model.getComponentState()) {
       case page_model.STATE_COMPONENT_SERVER_CMD:
         this.ui.disableEditing();

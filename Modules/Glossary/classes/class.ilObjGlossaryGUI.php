@@ -655,7 +655,7 @@ class ilObjGlossaryGUI extends ilObjectGUI
             $this->object->setTitle($this->form->getInput("title"));
             $this->object->setDescription($this->form->getInput("description"));
             $this->object->setOnline(ilUtil::yn2tf($this->form->getInput("cobj_online")));
-            $glo_mode = $this->form->getInput("glo_mode");
+            $glo_mode = $this->form->getInput("glo_mode") ?: $this->object->getVirtualMode();
             $this->object->setVirtualMode($glo_mode);
             $this->object->setActiveDownloads(ilUtil::yn2tf($this->form->getInput("glo_act_downloads")));
             $this->object->setPresentationMode($this->form->getInput("pres_mode"));

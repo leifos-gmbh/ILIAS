@@ -112,6 +112,12 @@ class ilPCInteractiveImageGUI extends ilPageContentGUI
             );
 
             $ilTabs->addTab(
+                "editor",
+                $lng->txt("edit"),
+                $ilCtrl->getLinkTarget($this, "editor")
+            );
+
+            $ilTabs->addTab(
                 "triggers",
                 $lng->txt("cont_active_areas"),
                 $ilCtrl->getLinkTargetByClass("ilpciimtriggereditorgui", "editMapAreas")
@@ -162,7 +168,7 @@ class ilPCInteractiveImageGUI extends ilPageContentGUI
     public function edit(): void
     {
         $ilCtrl = $this->ctrl;
-        $ilCtrl->redirectByClass(array("ilpcinteractiveimagegui", "ilpciimtriggereditorgui"), "editMapAreas");
+        $ilCtrl->redirect($this, "editor");
     }
 
     public function editBaseImage(): void
@@ -728,6 +734,14 @@ class ilPCInteractiveImageGUI extends ilPageContentGUI
             (string) $mob->getId(),
             ''
         );
+    }
+
+    public function editor() : void
+    {
+
+        $ilTabs = $this->tabs;
+        $ilTabs->activateTab("editor");
+        $this->tpl->setContent("Editor");
     }
 
 }

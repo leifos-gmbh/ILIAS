@@ -842,15 +842,13 @@ class ilObjGlossaryGUI extends ilObjectGUI
 
     public function showModalForCollection(): ILIAS\UI\Component\Modal\RoundTrip
     {
-        $exp = new ilRepositorySelectorExplorerGUI(
+        $exp = new ilStandardGlossarySelectorGUI(
             $this,
             "showModalForCollection",
             $this,
             "saveGlossaryForCollection",
             "sel_glo_ref_id"
         );
-        $exp->setTypeWhiteList(["root", "cat", "grp", "crs", "glo", "fold"]);
-        $exp->setClickableTypes(["glo"]);
         $modal = $this->ui_fac->modal()->roundtrip(
             $this->lng->txt("glo_add_to_collection"),
             $this->ui_fac->legacy(!$exp->handleCommand() ? $exp->getHTML() : "")

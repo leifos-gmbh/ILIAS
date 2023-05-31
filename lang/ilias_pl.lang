@@ -1372,6 +1372,7 @@ assessment#:#tst_count_correct_solutions#:#Zliczaj tylko kompletne rozwiązania
 assessment#:#tst_count_correct_solutions_desc#:#Uczestnicy otrzymają maksymalną liczbę punktów za kompletne i prawidłowe odpowiedzi a we wszystkich pozostałych przypadkach 0 punktów. Ta zasada dotyczy również pytań, które definiują punkty za częściowe odpowiedzi.
 assessment#:#tst_count_partial_solutions#:#Zliczaj częściowe rozwiązania
 assessment#:#tst_count_partial_solutions_desc#:#Jeśli pytanie definiuje punkty za częściowe odpowiedzi, punkty za prawidłowe częściowe odpowiedzi na pytanie są sumowane. To znaczy, że punkty naliczane są również za niekompletne lub częściowo nieprawidłowe odpowiedzi.
+assessment#:#tst_current_run_no_longer_valid#:#Your current test run is no longer valid. <br>It was probably completed already or finished by a tutor.###16 03 2023 new variable
 assessment#:#tst_default_settings#:#Domyślne ustawienia osobiste
 assessment#:#tst_defaults_applied#:#Wybrane domyślne ustawienia testu zostały zastosowane.
 assessment#:#tst_defaults_apply_not_possible#:#ILIAS nie może zastosować wybranych ustawień domyślnych do tego testu! Może test już zawiera pytania i/lub dane uczestników.
@@ -1425,6 +1426,8 @@ assessment#:#tst_failed#:#Failed###07 02 2020 new variable
 assessment#:#tst_failed_imp_qst_skl_assign#:#Nie udało się w drodze importu przyporządkować pytań do następujących kompetencji. Nie udało się zidentyfikować odpowiednich kompetencji w tym systemie.
 assessment#:#tst_failed_imp_skl_thresholds#:#Import wartości progowych dla następujących kompetencji został pominięty, ponieważ w systemie lokalnym przynależna kompetencja wykazuje listę z innymi poziomami.
 assessment#:#tst_feedback#:#Komunikat zwrotny
+assessment#:#tst_feedback_is_given_inline#:#The feedback will be displayed along with your answer.###05 04 2023 new variable
+assessment#:#tst_feedback_not_available_for_answer#:#There is no feedback available for your answer.###05 04 2023 new variable
 assessment#:#tst_filter_lifecycle_enabled#:#Use Lifecycle as Filter###07 02 2020 new variable
 assessment#:#tst_filter_question_type#:#Typ pytania
 assessment#:#tst_filter_question_type_enabled#:#Użyj filtra dla typu pytań
@@ -1634,6 +1637,7 @@ assessment#:#tst_pass_details#:#Pokaż szczegóły
 assessment#:#tst_pass_details_header_lo_initial#:#Wyniki początkowe dla celów dydaktycznych<br />%s - %s
 assessment#:#tst_pass_details_header_lo_qualifying#:#Kwalifikujące wyniki dla celów dydaktycznych<br />%s - %s
 assessment#:#tst_pass_details_overview_table_title#:#Szczegółowe wyniki pytania %s
+assessment#:#tst_pass_finished#:#Test pass finished###24 11 2022 new variable
 assessment#:#tst_pass_finished_on#:#Przebieg testu zakończony w dniu
 assessment#:#tst_pass_last_pass#:#Punktacja ostatniego wykonania testu dla użytkownika
 assessment#:#tst_pass_last_pass_desc#:#Ocenie podlega zawsze ostatni przebieg testu uczestnika.
@@ -1655,6 +1659,7 @@ assessment#:#tst_password_entered_wrong_password#:#Nie możesz rozpocząć testu
 assessment#:#tst_password_form#:#Wprowadzenie hasła testu
 assessment#:#tst_password_introduction#:#Ten test jest zabezpieczony hasłem. Podaj hasło przed rozpoczęciem testu.
 assessment#:#tst_percent_solved#:#Procent rozwiązanych
+assessment#:#tst_player_answer_saved_and_locked#:#Answer is saved and locked and can no longer be changed###21 12 2022 new variable
 assessment#:#tst_please_select_target_for_pool_derives#:#Wybierz docelowy kontener.
 assessment#:#tst_position#:#Pytanie %s z %s
 assessment#:#tst_position_without_total#:#Pytanie %s
@@ -2025,6 +2030,7 @@ auth#:#auth_info_migrate#:#Jeśli już masz konto użytkownika ILIAS, podaj pros
 auth#:#auth_ldap_server_ds#:#Serwer LDAP
 auth#:#auth_login_editor#:#Zaprojektuj stronę logowania
 auth#:#auth_oidc#:#OpenId Connect
+auth#:#auth_oidc_failed#:#Login via OpenID Connect failed###16 03 2023 new variable
 auth#:#auth_oidc_login_element_info#:#Login to ILIAS via OpenID Connect###30 04 2021 new variable
 auth#:#auth_oidc_mapping_table#:#Zuordnung von ILIAS-Benutzerdaten zu OpenId Connect Attributen
 auth#:#auth_oidc_profile#:#Zuordnung der Profildaten
@@ -2040,6 +2046,8 @@ auth#:#auth_oidc_settings_custom_session_duration_option#:#Eigene Sitzungsdauer
 auth#:#auth_oidc_settings_custom_session_duration_type#:#Einstellungen zur Sitzungsdauer
 auth#:#auth_oidc_settings_default_role#:#Rollenzuordnung
 auth#:#auth_oidc_settings_default_role_info#:#Bitte wählen Sie eine globale Rolle für neu anzulegende ILIAS-Benutzer
+auth#:#auth_oidc_settings_discovery_error#:#Retrieving the Discovery URL failed with: %s###16 03 2023 new variable
+auth#:#auth_oidc_settings_discovery_url#:#Discovery URL of the provider###16 03 2023 new variable
 auth#:#auth_oidc_settings_img#:#Bild
 auth#:#auth_oidc_settings_img_file_info#:#Laden Sie ein Bild hoch das auf der Anmeldeseite angezeigt werden soll. Das Bild verlinkt automatisch auf das OpenId Connect Anmeldeskript.
 auth#:#auth_oidc_settings_invalid_scopes#:#The following values are no valid Scopes: %s###30 04 2021 new variable
@@ -2064,6 +2072,10 @@ auth#:#auth_oidc_settings_txt_val_info#:#Tragen Sie einen Text ein der auf der A
 auth#:#auth_oidc_settings_user_attr#:#Attributname der Benutzerzugänge
 auth#:#auth_oidc_settings_user_sync#:#Automatische Synchronisierung
 auth#:#auth_oidc_settings_user_sync_info#:#Wenn aktiviert, wird für Benutzer, die sich erfolgreich gegen Open ID Connect authentifiziert haben aber kein ILIAS-Benutzerkonto besitzen, automatisch ein neues Benutzerkonto erzeugt.
+auth#:#auth_oidc_settings_validate_scope_custom#:#Use custom OpenID Connect Discovery url###16 03 2023 new variable
+auth#:#auth_oidc_settings_validate_scope_default#:#Use :Provider-URL:/.well-known/openid-configuration###16 03 2023 new variable
+auth#:#auth_oidc_settings_validate_scope_none#:#Do not validate Scopes on saving###16 03 2023 new variable
+auth#:#auth_oidc_settings_validate_scopes#:#Validate Scopes upon saving###16 03 2023 new variable
 auth#:#auth_oidc_update_field_info#:#Automatisch aktualisieren
 auth#:#auth_oidc_update_role_info#:#Nur bei Erstanmeldung (automatische Synchronisierung) anwenden
 auth#:#auth_oidconnect#:#OpenID Connect
@@ -2503,6 +2515,7 @@ book#:#book_no_preferences_for_you#:#No preferences have been stored for you.###
 book#:#book_not#:#Nie
 book#:#book_not_enough_preferences#:#You selected not enough preferences. The preferences have not been saved.###07 02 2020 new variable
 book#:#book_notification#:#Send Reservation Notifications
+book#:#book_notification_cron_not_active#:#Note: The corresponding cron job "Send Reservation Notifications" is currently not activated.###16 03 2023 new variable
 book#:#book_notification_info#:#Send a list of reservations of the next day to users (own reservations) and admins (if activated).
 book#:#book_nr_of_preferences#:#Number of Preferences###07 02 2020 new variable
 book#:#book_nr_of_preferences_info#:#Number of preferences each participant can indicate.###07 02 2020 new variable
@@ -2539,6 +2552,8 @@ book#:#book_reminder_day#:#Before Reservation
 book#:#book_reminder_day_info#:#Send list of own reservations to users and full list of reservations to admins.
 book#:#book_reminder_days#:#Day(s)
 book#:#book_reminder_setting#:#Reminder
+book#:#book_rerun_assignments#:#Run Assignment Process###05 05 2023 new variable
+book#:#book_rerun_confirmation#:#Attention. The assignments via preference process has already run. You may restart the process, if any errors have occured, e.g. no assignments have been saved. To prevent multiple assignments delete all reservations before restarting the process.###05 05 2023 new variable
 book#:#book_reservation_available#:#%s dostępne
 book#:#book_reservation_confirmed#:#Udało się dokonać rejestracji.
 book#:#book_reservation_failed#:#Nie udało się dokonać rejestracji.
@@ -3384,6 +3399,7 @@ common#:#HH#:#HH:MM
 common#:#absolute_path#:#Ścieżka bezwzględna
 common#:#accept_usr_agreement#:#Akceptuję zasady korzystania z systemu
 common#:#accept_usr_agreement_btn#:#Accept###30 04 2021 new variable
+common#:#accept_usr_agreement_intro#:#There are new terms of service. You need to accept them before proceeding with the use of ILIAS. Read the following document carefully and give your consent or dissent at the bottom of the page.###24 11 2022 new variable
 common#:#access#:#Dostęp
 common#:#accessFree#:#Usuń ograniczony dostęp
 common#:#accessRestrict#:#Ustaw ograniczony dostęp
@@ -3637,7 +3653,6 @@ common#:#categories_imported#:#Zakończony import kategorii.
 common#:#catr#:#Odwołanie do kategorii
 common#:#catr_edit_info#:#Proszę, wybierz jedną kategorię w celu utworzenia nowego odwołania.
 common#:#catr_new#:#Twórz nowe odwołanie do kategorii
-common#:#cc#:#CC
 common#:#certificate#:#Certyfikat
 common#:#certificate_file_already_exists_error#:#The certificate file already exists in the file system.###07 02 2020 new variable
 common#:#certificate_file_input_output_error#:#The certificate file was found but couldn't be deleted because of internal errors. Please contact your administrator.###07 02 2020 new variable
@@ -3830,8 +3845,6 @@ common#:#day#:#Dzień
 common#:#days#:#Dni
 common#:#db_host#:#Serwer bazy danych
 common#:#db_name#:#Nazwa bazy danych
-common#:#db_need_hotfix#:#Hotfix jest dostępny. Otwórz <a href="setup/setup.php">»Setup</a>!
-common#:#db_need_update#:#Baza danych wymaga uaktualnienia!
 common#:#db_pass#:#Hasło do bazy danych
 common#:#db_type#:#Typ bazy danych
 common#:#db_user#:#Użytkownik bazy danych
@@ -5238,6 +5251,7 @@ common#:#predefined_template#:#Predefiniowany szablon roli
 common#:#preferences#:#Preferencje
 common#:#presentation_table_more#:#more
 common#:#preview#:#Podgląd
+common#:#preview_caption#:#Preview %sof %s###05 04 2023 new variable
 common#:#preview_create#:#Utwórz podgląd
 common#:#preview_delete#:#Usuń podgląd
 common#:#preview_learner_info#:#Jeśli opcja jest włączona, to administratorzy kursów i grup mają możliwość obejrzenia określonej zawartości z perspektywy uczącego się.
@@ -5557,6 +5571,7 @@ common#:#short_inst_name#:#Krótki tytuł
 common#:#short_inst_name_info#:#Ten tytuł będzie widniał w pasku tytułu przeglądarki. Jeśli nie wprowadzisz wartości, to będzie użyte 'ILIAS'.
 common#:#show#:#Pokaż
 common#:#show_all_details#:#Pokaż wszystkie szczegóły
+common#:#show_content#:#Show Content###05 05 2023 new variable
 common#:#show_details#:#Pokaż szczegóły
 common#:#show_filter#:#Zastosuj filtr
 common#:#show_hidden_sections#:#Pokaż dodatkowe informacje &raquo;
@@ -5580,8 +5595,10 @@ common#:#soap_user_administration_desc#:#Jeśli wybrane, to wszystkie konta mog�
 common#:#soap_wsdl_path#:#Ścieżka WSDL
 common#:#soap_wsdl_path_info#:#Tutaj możesz podać ścieżkę do pliku WSDL, którą ILIAS ma użyć dla usług sieciowych. Jeśli to pole pozostanie puste, jako domyślna zostanie wykorzystana poniższa ścieżka:%s
 common#:#sort_ascending#:#Sort Ascending###30 04 2021 new variable
+common#:#sort_ascending_long#:#Change Sort Direction to Ascending###31 05 2023 new variable
 common#:#sort_by_this_column#:#Sortuj wg tej kolumny
 common#:#sort_descending#:#Sort Descending###30 04 2021 new variable
+common#:#sort_descending_long#:#Change Sort Direction to Descending###31 05 2023 new variable
 common#:#sort_inherit_prefix#:#Domyślnie
 common#:#sorting_asc#:#Rosnąco
 common#:#sorting_creation_header#:#Wg daty utworzenia
@@ -5707,6 +5724,7 @@ common#:#udf_delete_sure#:#Czy na pewno chcesz usunąć pole i wszystkie przydzi
 common#:#udf_duplicate_entries#:#Wartość powinna być unikalna.
 common#:#udf_field_deleted#:#Pole usunięte.
 common#:#udf_name_already_exists#:#Ta nazwa pola już istnieje. Wybierz inną nazwę.
+common#:#udf_required_and_visible_requires_changeable#:#When a field is ‘Required’ and ‘Visible in Personal Data’, it must also be ‘Changeable in Profile’###01 02 2023 new variable
 common#:#udf_required_requires_visib_reg#:#Ustawienie "Pole niezbędne" wymaga ustawienia "Widoczne w formularzu rejestracyjnym"
 common#:#udf_type_date#:#Data
 common#:#udf_type_datetime#:#Data i godzina
@@ -5800,6 +5818,7 @@ common#:#usr_account_inactive#:#Nieaktywne konto
 common#:#usr_active_only#:#Tylko aktywni użytkownicy
 common#:#usr_add#:#Dodaj użytkownika
 common#:#usr_agreement#:#Zasady użytkowania
+common#:#usr_agreement_footer_intro#:#You have declared your consent to these terms of service.###24 11 2022 new variable
 common#:#usr_edit#:#Edytuj użytkownika
 common#:#usr_filter_coursemember#:#Członek kursu
 common#:#usr_filter_groupmember#:#Członek grupy
@@ -5957,6 +5976,7 @@ cont#:#cont_filter_fields#:#Filter Fields###07 02 2020 new variable
 cont#:#cont_filter_record#:#Record###07 02 2020 new variable
 cont#:#cont_found_objects#:#Found Objects###07 02 2020 new variable
 cont#:#cont_item_list#:#List
+cont#:#cont_item_list_info#:#Display content objects in a list.###16 03 2023 new variable
 cont#:#cont_list_presentation#:#Item Presentation
 cont#:#cont_mem_skills#:#Kompetencje
 cont#:#cont_news_edited#:#Skompletowane
@@ -6010,6 +6030,7 @@ cont#:#cont_std_filter_title_8#:#Object Type###07 02 2020 new variable
 cont#:#cont_std_filter_title_9#:#Online/Offline###07 02 2020 new variable
 cont#:#cont_std_record_title#:#Standard###07 02 2020 new variable
 cont#:#cont_tile_view#:#Tiles
+cont#:#cont_tile_view_info#:#Display content objects as thumbnail-style tiles. Images for these tiles can be uploaded in the settings of each individual object.###16 03 2023 new variable
 contact#:#contact_awrn_ap_contacts#:#Zatwierdzone kontakty
 contact#:#contact_awrn_ap_contacts_info#:#Wszystkie zatwierdzone kontakty użytkownika zostaną ujęte w liście.
 contact#:#contact_awrn_req_contacts#:#Zapytania dotyczące punktu kontaktowego
@@ -6447,6 +6468,8 @@ content#:#cont_grid_width_s#:#Mały (small)
 content#:#cont_grid_width_s_info#:#np. smartfon
 content#:#cont_grid_width_xl#:#Bardzo duży (extra large)
 content#:#cont_grid_width_xl_info#:#np. pulpit typu wide
+content#:#cont_hacc_needs_height#:#Please set a content height for horizontal accordions.###05 05 2023 new variable
+content#:#cont_hacc_needs_width#:#Please set a content width for horizontal accordions.###05 05 2023 new variable
 content#:#cont_header#:#Nagłówek
 content#:#cont_height#:#Wysokość
 content#:#cont_help_no_valid_tooltip_id#:#Wprowadzony numer ID porady jest nieważny.
@@ -7787,9 +7810,11 @@ crs#:#crs_view_timing#:#Widok czasowy
 crs#:#crs_view_timing_absolute#:#Absolute Dates###07 02 2020 new variable
 crs#:#crs_view_timing_relative#:#Relative Dates###07 02 2020 new variable
 crs#:#crs_view_timings#:#Timings View Type###07 02 2020 new variable
+crs#:#crs_visibility#:#Visibility###24 11 2022 new variable
 crs#:#crs_visibility_limitless#:#Widoczny (nielimitowany)
 crs#:#crs_visibility_until#:#Widoczny od - do
 crs#:#crs_visibility_until_info#:#Kurs wyświetla się członkom tylko przez określony czas.
+crs#:#crs_visibility_unvisible#:#The course is not visible.###24 11 2022 new variable
 crs#:#crs_wait_info#:#Jeśli zostanie osiągnięta maksymalna liczba uczestników kursu, to nowe rejestracje zostaną umieszczone na liście oczekujących.
 crs#:#crs_waiting_list#:#Lista oczekujących
 crs#:#crs_waiting_list_autofill#:#Z automatycznym przesuwaniem w górę
@@ -9275,6 +9300,7 @@ exc#:#exc_team_log#:#Log zespołu
 exc#:#exc_team_log_add_file#:#Dodano plik %s.
 exc#:#exc_team_log_add_member#:#Dodano członka %s.
 exc#:#exc_team_log_create_team#:#Utworzono zespół.
+exc#:#exc_team_log_remove_file#:#Removed file %s.###21 12 2022 new variable
 exc#:#exc_team_log_remove_member#:#Usunięto członka %s.
 exc#:#exc_team_management_tutor#:#Zarządzanie zespołem za pośrednictwem opiekunów
 exc#:#exc_team_management_tutor_info#:#Jeśli ta opcja jest aktywna, członkowie nie mogą samodzielnie zajmować się organizacją swoich zespołów.
@@ -10518,6 +10544,7 @@ lti#:#lti_object_consumer#:#Odbiorcy LTI
 lti#:#lti_object_release_settings_form#:#Edytuj udostępnienia LTI
 lti#:#lti_provider#:#Udostępnienia LTI
 lti#:#lti_provider_not_avail_msg#:#LTI Provider is set to 'Not Available'###07 02 2020 new variable
+lti#:#lti_provider_not_set_msg#:#LTI Provider is configured incompletely.###05 05 2023 new variable
 lti#:#lti_providing_tab#:#ILIAS as LTI Provider###07 02 2020 new variable
 lti#:#lti_released_objects#:#Udostępnienia obiektów
 lti#:#lti_select_provider#:#Select Provider###07 02 2020 new variable
@@ -10580,7 +10607,6 @@ lti#:#user_provider_subtab#:#Providers Defined by Users###07 02 2020 new variabl
 ltiv#:#ltiv_create#:#Create Certificate for LTI Consumer Object###07 02 2020 new variable
 ltiv#:#ltiv_create_info#:#Select a completed LTI consumer object to generate a certificate for it###07 02 2020 new variable
 mail#:#back_to_folder#:#Powrót do folderu
-mail#:#bc#:#BC
 mail#:#chat_users_have_been_invited#:#Użytkownicy zostali zaroszeni.
 mail#:#chat_users_without_login#:#Następujący użytkownicy nie mają konta w ILIAS, w związku z czym nie mogą być zaproszeni do pokoi czat.
 mail#:#chat_users_without_permission#:#Następujący użytkownicy nie mają dostępu do pokoi czat.
@@ -10605,9 +10631,11 @@ mail#:#mail_assign_entry_to_mailing_list#:#Przydział kontaktu do rozdzielnika
 mail#:#mail_attachment_file_not_exist#:#Nie udało się znaleźć jednego z poniższych załączników: %1$s
 mail#:#mail_attachments#:#Załączniki
 mail#:#mail_auto_generated_info#:#Ten e-mail został automatycznie wysłany do ciebie przez ILIAS %s, %s
+mail#:#mail_bcc#:#BCC###16 03 2023 new variable
 mail#:#mail_bg_task_desc#:#Subject: %s###07 02 2020 new variable
 mail#:#mail_bg_task_title#:#E-mail Delivery###07 02 2020 new variable
 mail#:#mail_both_email#:#Oba adresy mailowe
+mail#:#mail_cc#:#CC###16 03 2023 new variable
 mail#:#mail_change_to_folder#:#Przejdź do folderu:
 mail#:#mail_create_tpl#:#Utwórz szablon tekstu
 mail#:#mail_cronjob_notification_info#:#Aktywacja powiadomień o nowej poczcie.
@@ -10668,6 +10696,7 @@ mail#:#mail_generic_rcp_error#:#Wystąpił błąd przy walidacji odbiorców: %1$
 mail#:#mail_global_reply_to_addr#:#Reply-To###30 04 2021 new variable
 mail#:#mail_global_reply_to_addr_info#:#Please enter the desired 'Reply-To' address.###30 04 2021 new variable
 mail#:#mail_grp_roles#:#Wyślij wiadomość mailową do następujących ról grupy
+mail#:#mail_hint_add_placeholder_x#:#Add the placeholder '%s' to the message body.###05 04 2023 new variable
 mail#:#mail_incoming#:#Poczta przychodząca
 mail#:#mail_incoming_both#:#Lokalna i przesyłana dalej
 mail#:#mail_incoming_local#:#Tylko lokalna
@@ -10821,6 +10850,7 @@ mail#:#placeholders_advise#:#Osobiste pola do wypełnienia używane są wyłącz
 mail#:#search_content#:#Wynik szukania
 mail#:#search_recipients#:#Szukaj odbiorcy
 mail#:#second_email_missing_info#:#Wybór nie jest możliwy, ponieważ nie wpisano żadnego drugiego adresu mailowego
+mail#:#select_mail_with_subject_x#:#Select mail with subject „%s“###16 03 2023 new variable
 mail#:#send_mail_admins#:#Wszyscy administratorzy
 mail#:#send_mail_members#:#Wszyscy członkowie
 mail#:#send_mail_to#:#Wiadomość do
@@ -10857,7 +10887,7 @@ mathjax#:#mathjax_limiter#:#Separator
 mathjax#:#mathjax_limiter_info#:#Wybierz te separatory, które są skonfigurowane w MathJax.
 mathjax#:#mathjax_mathjax#:#MathJax
 mathjax#:#mathjax_path_to_mathjax#:#URL MathJax
-mathjax#:#mathjax_path_to_mathjax_desc#:#Np.: https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML lub adres URL dla lokalnej instalacji.
+mathjax#:#mathjax_path_to_mathjax_desc#:#Np.: https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML,Safe lub adres URL dla lokalnej instalacji.
 mathjax#:#mathjax_server_address#:#Adres serwera
 mathjax#:#mathjax_server_address_info#:#np. http://localhost:8003
 mathjax#:#mathjax_server_cache_cleared#:#Pamięć podręczna MathJax została opróżniona.
@@ -11060,7 +11090,9 @@ meta#:#md_adv_record_lng_table_lng#:#Language###30 04 2021 new variable
 meta#:#md_adv_records#:#Zawarte rekordy danych
 meta#:#md_adv_records_exported#:#Utworzono nowy plik eksportowy.
 meta#:#md_adv_scope#:#Obszar obowiązywania
+meta#:#md_adv_scope_info#:#Usage of this custom metadata set will be limited to selected parts of the repository.###01 02 2023 new variable
 meta#:#md_adv_scope_list_header#:#Ograniczony do:
+meta#:#md_adv_scope_objects#:#Data Set Effective From###01 02 2023 new variable
 meta#:#md_adv_searchable#:#Przeszukiwane
 meta#:#md_adv_select_one_file#:#Wybierz plik.
 meta#:#md_adv_show#:#Pokaż
@@ -13758,6 +13790,7 @@ registration#:#reg_confirmation_hash_life_time#:#Okres obowiązywania
 registration#:#reg_confirmation_hash_life_time_expired#:#Link potwierdzający rejestracje konta nie jest już ważny.
 registration#:#reg_confirmation_hash_life_time_info#:#Wpisz (w sekundach) ważność linku potwierdzającego aktywację konta.
 registration#:#reg_confirmation_hash_not_found#:#Żaden użytkownik nie pasuje do tego linku potwierdzającego rejestracje kota.
+registration#:#reg_confirmation_hash_not_passed#:#The confirmation link is incomplete.###01 02 2023 new variable
 registration#:#reg_confirmation_link_successful#:#Zarejestrowałeś się z powodzeniem na ILIAS. Teraz musisz jeszcze tylko aktywować swoje konto użytkownika. W tym celu wysłaliśmy Ci właśnie wiadomość mailową z linkiem potwierdzającym. W ciągu kolejnej minuty kliknij na ten link, aby aktywować konto. Następnie możesz zalogować się do ILIAS.
 registration#:#reg_default#:#Domyślnie
 registration#:#reg_deleted_assignment#:#Usunięto przydziały.
@@ -13851,9 +13884,11 @@ rep#:#rep_add_to_favourites#:#Add to Favourites###07 02 2020 new variable
 rep#:#rep_added_rec_content#:#Recommended content has been added.###07 02 2020 new variable
 rep#:#rep_added_to_favourites#:#The item has been added to your favourites.###07 02 2020 new variable
 rep#:#rep_breadcr_crs#:#Breadcrumb starts with course
+rep#:#rep_breadcr_crs_config#:#Configuration###24 11 2022 new variable
 rep#:#rep_breadcr_crs_overwrite#:#Setting is changeable on course level
 rep#:#rep_breadcr_crs_overwrite_not#:#Setting is not changeable on course level
 rep#:#rep_configure#:#Configure###07 02 2020 new variable
+rep#:#rep_crs_default_shortened#:#Default: Breadcrumbs Shortened###24 11 2022 new variable
 rep#:#rep_custom_icons#:#Dostosowane ikony
 rep#:#rep_default#:#Default
 rep#:#rep_dependencies#:#Zależności

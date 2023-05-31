@@ -1,5 +1,19 @@
 <?php
-/* Copyright (c) 1998-2009 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 // TODO:
 use ILIAS\BackgroundTasks\Dependencies\DependencyMap\BaseDependencyMap;
@@ -22,6 +36,8 @@ use ILIAS\ResourceStorage\Revision\Repository\RevisionDBRepository;
 use ILIAS\ResourceStorage\Information\Repository\InformationDBRepository;
 use ILIAS\ResourceStorage\Stakeholder\Repository\StakeholderDBRepository;
 use ILIAS\ResourceStorage\Preloader\DBRepositoryPreloader;
+use ILIAS\FileUpload\Processor\InsecureFilenameSanitizerPreProcessor;
+use ILIAS\FileUpload\Processor\SVGBlacklistPreProcessor;
 
 require_once("libs/composer/vendor/autoload.php");
 
@@ -85,7 +101,7 @@ class ilInitialisation
             )
         );
     }
-    
+
     /**
      * get common include code files
      */
@@ -95,17 +111,17 @@ class ilInitialisation
         if (ilContext::usesTemplate()) {
             require_once "./Services/UICore/classes/class.ilTemplate.php";
         }
-                
+
         // really always required?
         require_once "./Services/Utilities/classes/class.ilUtil.php";
         require_once "./Services/Calendar/classes/class.ilDatePresentation.php";
         require_once "include/inc.ilias_version.php";
-        
+
         include_once './Services/Authentication/classes/class.ilAuthUtils.php';
-        
+
         self::initGlobal("ilBench", "ilBenchmark", "./Services/Utilities/classes/class.ilBenchmark.php");
     }
-    
+
     /**
      * This is a hack for  authentication.
      *
@@ -190,10 +206,10 @@ class ilInitialisation
                 break;
             case "icap":
                 define("IL_VIRUS_SCANNER", "icap");
-                define("IL_ICAP_HOST", $ilIliasIniFile->readVariable("tools", "i_cap_host"));
-                define("IL_ICAP_PORT", $ilIliasIniFile->readVariable("tools", "i_cap_port"));
-                define("IL_ICAP_AV_COMMAND", $ilIliasIniFile->readVariable("tools", "i_cap_av_command"));
-                define("IL_ICAP_CLIENT", $ilIliasIniFile->readVariable("tools", "i_cap_client"));
+                define("IL_ICAP_HOST", $ilIliasIniFile->readVariable("tools", "icap_host"));
+                define("IL_ICAP_PORT", $ilIliasIniFile->readVariable("tools", "icap_port"));
+                define("IL_ICAP_AV_COMMAND", $ilIliasIniFile->readVariable("tools", "icap_service_name"));
+                define("IL_ICAP_CLIENT", $ilIliasIniFile->readVariable("tools", "icap_client_path"));
                 break;
 
             default:
@@ -362,7 +378,9 @@ class ilInitialisation
             }
 
             $fileUploadImpl->register(new FilenameSanitizerPreProcessor());
+            $fileUploadImpl->register(new InsecureFilenameSanitizerPreProcessor());
             $fileUploadImpl->register(new BlacklistExtensionPreProcessor(ilFileUtils::getExplicitlyBlockedFiles(), $c->language()->txt("msg_info_blacklisted")));
+            $fileUploadImpl->register(new SVGBlacklistPreProcessor());
 
             return $fileUploadImpl;
         };
@@ -412,12 +430,17 @@ class ilInitialisation
             }
         }
 
-        $iliasHttpPath = ilContext::modifyHttpPath(implode('', [$protocol, $host, $uri]));
+        $ilias_http_path = ilContext::modifyHttpPath(implode('', [$protocol, $host, $uri]));
+
+        // remove everything after the first .php in the path
+        $ilias_http_path = preg_replace('/(http|https)(:\/\/)(.*?\/.*?\.php).*/', '$1$2$3', $ilias_http_path);
 
         $f = new \ILIAS\Data\Factory();
-        $uri = $f->uri(ilUtil::removeTrailingPathSeparators($iliasHttpPath));
+        $uri = $f->uri(ilUtil::removeTrailingPathSeparators($ilias_http_path));
 
-        return define('ILIAS_HTTP_PATH', $uri->getBaseURI());
+        $base_URI = $uri->getBaseURI();
+
+        return define('ILIAS_HTTP_PATH', $base_URI);
     }
 
     /**
@@ -554,8 +577,8 @@ class ilInitialisation
             $mess = array(
                 "en" => "The server is not available due to maintenance." .
                     " We apologise for any inconvenience.",
-                "de" => "Der Server ist aufgrund von Wartungsarbeiten nicht verfügbar." .
-                    " Wir bitten um Verständnis."
+                "de" => "Der Server ist aufgrund von Wartungsarbeiten aktuell nicht verf&uuml;gbar." .
+                    " Wir bitten um Verst&auml;ndnis. Versuchen Sie es sp&auml;ter noch einmal."
             );
             $mess_id = "init_error_maintenance";
 
@@ -1096,6 +1119,8 @@ class ilInitialisation
 
             // add notices to error reporting
             error_reporting(E_ALL);
+        } else {
+            error_reporting(E_ALL & ~E_NOTICE);
         }
 
         if (defined('DEBUGTOOLS') && DEBUGTOOLS) {
@@ -1182,7 +1207,7 @@ class ilInitialisation
     public static function handleErrorReporting()
     {
         // push the error level as high as possible / sane
-        error_reporting(E_ALL & ~E_NOTICE);
+        error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED);
 
         // see handleDevMode() - error reporting might be overwritten again
         // but we need the client ini first
@@ -1467,7 +1492,7 @@ class ilInitialisation
     private static function initGlobalScreen(\ILIAS\DI\Container $c)
     {
         $c['global_screen'] = function () use ($c) {
-            return new Services(new ilGSProviderFactory($c), htmlentities(str_replace(" ", "_", ILIAS_VERSION)));
+            return new Services(new ilGSProviderFactory($c), htmlentities(str_replace([" ", ".", "-"], "_", ILIAS_VERSION_NUMERIC)));
         };
         $c->globalScreen()->tool()->context()->stack()->clear();
         $c->globalScreen()->tool()->context()->claim()->main();
@@ -1831,19 +1856,16 @@ class ilInitialisation
         }
     }
 
-    /**
-     * Extract current cmd from request
-     *
-     * @return string
-     */
-    protected static function getCurrentCmd()
+    protected static function getCurrentCmd() : string
     {
-        $cmd = $_REQUEST["cmd"];
+        $cmd = $_POST['cmd'] ?? ($_GET['cmd'] ?? '');
+
         if (is_array($cmd)) {
-            return array_shift(array_keys($cmd));
-        } else {
-            return $cmd;
+            $cmd_keys = array_keys($cmd);
+            $cmd = array_shift($cmd_keys) ?? '';
         }
+
+        return $cmd;
     }
 
     /**
@@ -1889,9 +1911,9 @@ class ilInitialisation
             return true;
         }
 
-        $requestBaseClass = strtolower((string) $_REQUEST['baseClass']);
+        $requestBaseClass = strtolower((string) ($_GET['baseClass'] ?? ''));
         if ($requestBaseClass == strtolower(ilStartUpGUI::class)) {
-            $requestCmdClass = strtolower((string) $_REQUEST['cmdClass']);
+            $requestCmdClass = strtolower((string) ($_GET['cmdClass'] ?? ''));
             if (
                 $requestCmdClass == strtolower(ilAccountRegistrationGUI::class) ||
                 $requestCmdClass == strtolower(ilPasswordAssistanceGUI::class)
@@ -2075,7 +2097,7 @@ class ilInitialisation
         };
 
         $c["bt.persistence"] = function ($c) {
-            return \ILIAS\BackgroundTasks\Implementation\Persistence\BasicPersistence::instance();
+            return \ILIAS\BackgroundTasks\Implementation\Persistence\BasicPersistence::instance($c->database());
         };
 
         $c["bt.injector"] = function ($c) {

@@ -169,7 +169,7 @@ class ilExAssignmentEditorGUI
 
         $ilToolbar->setFormAction($ilCtrl->getFormAction($this, "addAssignment"));
         
-        $ilToolbar->addStickyItem($this->getTypeDropdown());
+        $ilToolbar->addStickyItem($this->getTypeDropdown(), true);
         
         $button = ilSubmitButton::getInstance();
         $button->setCaption("exc_add_assignment");
@@ -393,8 +393,10 @@ class ilExAssignmentEditorGUI
 
         $desc_input = new ilTextAreaInputGUI($lng->txt("exc_instruction"), "instruction");
         $desc_input->setRows(20);
-        $desc_input->setUseRte(true);
-        $desc_input->setRteTagSet("mini");
+        if (ilObjAdvancedEditing::_getRichTextEditor() === "tinymce") {
+            $desc_input->setUseRte(true);
+            $desc_input->setRteTagSet("mini");
+        }
         $form->addItem($desc_input);
 
         // files
@@ -623,9 +625,9 @@ class ilExAssignmentEditorGUI
                 $a_form->getItemByPostVar("fb_file")->setRequired(false); // #15467
             }
         }
-        
+
         $valid = $a_form->checkInput();
-        
+
         if ($protected_peer_review_groups) {
             // checkInput() will add alert to disabled fields
             $a_form->getItemByPostVar("deadline")->setAlert(null);

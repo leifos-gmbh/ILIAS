@@ -97,7 +97,7 @@ class assLongMenu extends assQuestion implements ilObjQuestionScoringAdjustable
 
     public function setLongMenuTextValue($long_menu_text = "")
     {
-        $this->long_menu_text = $long_menu_text;
+        $this->long_menu_text = $this->getHtmlQuestionContentPurifier()->purify($long_menu_text);
     }
 
     public function getLongMenuTextValue()
@@ -805,10 +805,10 @@ class assLongMenu extends assQuestion implements ilObjQuestionScoringAdjustable
                             if ($value == -1) {
                                 $value = '';
                             }
-                            $worksheet->setCell($startrow + $i, 1, $value);
+                            $worksheet->setCell($startrow + $i, 2, $value);
                             break;
                         case self::ANSWER_TYPE_TEXT_VAL:
-                            $worksheet->setCell($startrow + $i, 1, $solutionvalue["value2"]);
+                            $worksheet->setCell($startrow + $i, 2, $solutionvalue["value2"]);
                             break;
                     }
                 }

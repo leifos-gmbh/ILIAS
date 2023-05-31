@@ -1372,6 +1372,7 @@ assessment#:#tst_count_correct_solutions#:#Bodove dobivaju samo točni i potpuni
 assessment#:#tst_count_correct_solutions_desc#:#Sudionici dobivaju ili maksimalan broj bodova za potpun i točan odgovor ili 0 bodova u svim drugim slučajevima. To vrijedi i za pitanja koja definiraju bodove za djelomične odgovore.
 assessment#:#tst_count_partial_solutions#:#Bodove dobivaju i djelomično pogrešni odgovori
 assessment#:#tst_count_partial_solutions_desc#:#Ako pitanje definira bodova za djelomične odgovore, bodovi za ispravne djelomične odgovore se zbrajaju: Dakle, ovisno o pitanju, daju se i bodovi za ukupno nepotpune ili djelomično pogrešne odgovore.
+assessment#:#tst_current_run_no_longer_valid#:#Your current test run is no longer valid. <br>It was probably completed already or finished by a tutor.###16 03 2023 new variable
 assessment#:#tst_default_settings#:#Osobne standardne postavke
 assessment#:#tst_defaults_applied#:#Primijenjene su odabrane osobne standardne postavke.
 assessment#:#tst_defaults_apply_not_possible#:#ILIAS nije mogao na ovaj test primijeniti odabrane standardne postavke! Test možda već sadrži skupove podataka sudionika koji sprječavaju preuzimanje određenih standardnih postavki.
@@ -1425,6 +1426,8 @@ assessment#:#tst_failed#:#Nije prošao
 assessment#:#tst_failed_imp_qst_skl_assign#:#Dodjela pitanja sljedećim kompetencijama nije se mogla kreirati. Odgovarajuće kompetencije nisu se mogle identificirati u lokalnom sustavu.
 assessment#:#tst_failed_imp_skl_thresholds#:#Uvoz pragova za sljedeće kompetencije je preskočen jer su odgovarajuće kompetencije unutar lokalnog sustava konfigurirane s različitim popisom razina.
 assessment#:#tst_feedback#:#Povratne informacije
+assessment#:#tst_feedback_is_given_inline#:#The feedback will be displayed along with your answer.###05 04 2023 new variable
+assessment#:#tst_feedback_not_available_for_answer#:#There is no feedback available for your answer.###05 04 2023 new variable
 assessment#:#tst_filter_lifecycle_enabled#:#Use Lifecycle as Filter###04 06 2021 new variable
 assessment#:#tst_filter_question_type#:#Tip pitanja
 assessment#:#tst_filter_question_type_enabled#:#Koristi filtar za tip pitanja
@@ -1634,6 +1637,7 @@ assessment#:#tst_pass_details#:#Detaljni rezultati
 assessment#:#tst_pass_details_header_lo_initial#:#Početni rezultati testa za ciljeve učenja<br />%s - %s
 assessment#:#tst_pass_details_header_lo_qualifying#:#Kvalifikacijski rezultati testa za ciljeve učenja<br />%s - %s
 assessment#:#tst_pass_details_overview_table_title#:#Detaljan pregled rezultata testa za prolaz %s
+assessment#:#tst_pass_finished#:#Test pass finished###24 11 2022 new variable
 assessment#:#tst_pass_finished_on#:#Prolaz testa završen dana
 assessment#:#tst_pass_last_pass#:#Ocijeni posljednji prolaz testa
 assessment#:#tst_pass_last_pass_desc#:#Ocjenjuje se uvijek posljednji prolaza testa sudionika.
@@ -1655,6 +1659,7 @@ assessment#:#tst_password_entered_wrong_password#:#Ne možete pokrenuti test jer
 assessment#:#tst_password_form#:#Unesi lozinku za test
 assessment#:#tst_password_introduction#:#Ovom se testu može pristupiti samo s lozinkom za test. Unesite lozinku za test kako biste ga pokrenuli.
 assessment#:#tst_percent_solved#:#Posto riješeno
+assessment#:#tst_player_answer_saved_and_locked#:#Answer is saved and locked and can no longer be changed###21 12 2022 new variable
 assessment#:#tst_please_select_target_for_pool_derives#:#Molimo odaberite ciljni kontejner.
 assessment#:#tst_position#:#Pitanje %s od %s
 assessment#:#tst_position_without_total#:#Pitanje %s
@@ -2025,6 +2030,7 @@ auth#:#auth_info_migrate#:#If you have already an ILIAS account, enter username 
 auth#:#auth_ldap_server_ds#:#LDAP-Server
 auth#:#auth_login_editor#:#Loginscreen Editor
 auth#:#auth_oidc#:#OpenId Connect
+auth#:#auth_oidc_failed#:#Login via OpenID Connect failed###16 03 2023 new variable
 auth#:#auth_oidc_login_element_info#:#Login to ILIAS via OpenID Connect###04 06 2021 new variable
 auth#:#auth_oidc_mapping_table#:#Zuordnung von ILIAS-Benutzerdaten zu OpenId Connect Attributen
 auth#:#auth_oidc_profile#:#Zuordnung der Profildaten
@@ -2040,6 +2046,8 @@ auth#:#auth_oidc_settings_custom_session_duration_option#:#Eigene Sitzungsdauer
 auth#:#auth_oidc_settings_custom_session_duration_type#:#Einstellungen zur Sitzungsdauer
 auth#:#auth_oidc_settings_default_role#:#Rollenzuordnung
 auth#:#auth_oidc_settings_default_role_info#:#Bitte wählen Sie eine globale Rolle für neu anzulegende ILIAS-Benutzer
+auth#:#auth_oidc_settings_discovery_error#:#Retrieving the Discovery URL failed with: %s###16 03 2023 new variable
+auth#:#auth_oidc_settings_discovery_url#:#Discovery URL of the provider###16 03 2023 new variable
 auth#:#auth_oidc_settings_img#:#Bild
 auth#:#auth_oidc_settings_img_file_info#:#Laden Sie ein Bild hoch das auf der Anmeldeseite angezeigt werden soll. Das Bild verlinkt automatisch auf das OpenId Connect Anmeldeskript.
 auth#:#auth_oidc_settings_invalid_scopes#:#The following values are no valid Scopes: %s###04 06 2021 new variable
@@ -2064,6 +2072,10 @@ auth#:#auth_oidc_settings_txt_val_info#:#Tragen Sie einen Text ein der auf der A
 auth#:#auth_oidc_settings_user_attr#:#Attributname der Benutzerzugänge
 auth#:#auth_oidc_settings_user_sync#:#Automatische Synchronisierung
 auth#:#auth_oidc_settings_user_sync_info#:#Wenn aktiviert, wird für Benutzer, die sich erfolgreich gegen Open ID Connect authentifiziert haben aber kein ILIAS-Benutzerkonto besitzen, automatisch ein neues Benutzerkonto erzeugt.
+auth#:#auth_oidc_settings_validate_scope_custom#:#Use custom OpenID Connect Discovery url###16 03 2023 new variable
+auth#:#auth_oidc_settings_validate_scope_default#:#Use :Provider-URL:/.well-known/openid-configuration###16 03 2023 new variable
+auth#:#auth_oidc_settings_validate_scope_none#:#Do not validate Scopes on saving###16 03 2023 new variable
+auth#:#auth_oidc_settings_validate_scopes#:#Validate Scopes upon saving###16 03 2023 new variable
 auth#:#auth_oidc_update_field_info#:#Automatisch aktualisieren
 auth#:#auth_oidc_update_role_info#:#Nur bei Erstanmeldung (automatische Synchronisierung) anwenden
 auth#:#auth_oidconnect#:#OpenID Connect
@@ -2503,6 +2515,7 @@ book#:#book_no_preferences_for_you#:#No preferences have been stored for you.###
 book#:#book_not#:#Ne
 book#:#book_not_enough_preferences#:#You selected not enough preferences. The preferences have not been saved.###04 06 2021 new variable
 book#:#book_notification#:#Pošalji obavijesti o rezervaciji
+book#:#book_notification_cron_not_active#:#Note: The corresponding cron job "Send Reservation Notifications" is currently not activated.###16 03 2023 new variable
 book#:#book_notification_info#:#Pošalji korisnicima (vlastite rezervacije) i administratorima (ako su aktivirani) popis rezervacija za sljedeći dan.
 book#:#book_nr_of_preferences#:#Number of Preferences###04 06 2021 new variable
 book#:#book_nr_of_preferences_info#:#Number of preferences each participant can indicate.###04 06 2021 new variable
@@ -2539,6 +2552,8 @@ book#:#book_reminder_day#:#Prije rezervacije
 book#:#book_reminder_day_info#:#Pošaljite popis vlastitih rezervacija korisnicima te potpuni popis rezervacija administratorima.
 book#:#book_reminder_days#:#Dan(i)
 book#:#book_reminder_setting#:#Podsjetnik
+book#:#book_rerun_assignments#:#Run Assignment Process###05 05 2023 new variable
+book#:#book_rerun_confirmation#:#Attention. The assignments via preference process has already run. You may restart the process, if any errors have occured, e.g. no assignments have been saved. To prevent multiple assignments delete all reservations before restarting the process.###05 05 2023 new variable
 book#:#book_reservation_available#:#Dostupno: %s
 book#:#book_reservation_confirmed#:#Vaša rezervacija je potvrđena.
 book#:#book_reservation_failed#:#Vaša rezervacija nije uspjela.
@@ -2790,7 +2805,7 @@ chatroom#:#banned#:#You have been banned from this chat room
 chatroom#:#bans#:#Bans
 chatroom#:#chat_address#:#Address
 chatroom#:#chat_anonymous_not_allowed#:#Please login to use the chat.
-chatroom#:#chat_auth_token_info#:#Please define unique strings used by ILIAS for authentication purposes when sending requests to the chat server. You can automatically create these strings by clicking the corresponding button. Please note that the chat server is able to communicate with multiple ILIAS clients, but each client id has to be <b>unique</b>.
+chatroom#:#chat_auth_token_info#:#Please define unique strings used by ILIAS for authentication purposes when sending requests to the chat server. You can automatically create these strings by clicking the corresponding button. Please note that the chat server is able to communicate with multiple ILIAS clients, but each client name has to be <b>unique</b>.
 chatroom#:#chat_ban#:#Ban
 chatroom#:#chat_connection_disconnected#:#--- <b>#username#</b> left the chat room ---
 chatroom#:#chat_connection_established#:#+++ <b>#username#</b> has entered chat room +++
@@ -3384,6 +3399,7 @@ common#:#HH#:#HH: MM
 common#:#absolute_path#:#Apsolutni put
 common#:#accept_usr_agreement#:#Prihvatiti uvjete usluge?
 common#:#accept_usr_agreement_btn#:#Accept###04 06 2021 new variable
+common#:#accept_usr_agreement_intro#:#There are new terms of service. You need to accept them before proceeding with the use of ILIAS. Read the following document carefully and give your consent or dissent at the bottom of the page.###24 11 2022 new variable
 common#:#access#:#Pristup
 common#:#accessFree#:#Uklonite datum 'Važi do'
 common#:#accessRestrict#:#Postavite datum 'Važi do'
@@ -3637,7 +3653,6 @@ common#:#categories_imported#:#Uvoz kategorije dovršen.
 common#:#catr#:#Poveznica kategorije
 common#:#catr_edit_info#:#Odaberite jednu kategoriju za koju želite izraditi poveznicu.
 common#:#catr_new#:#Izradite novu poveznicu kategorije
-common#:#cc#:#CC
 common#:#certificate#:#Certifikat
 common#:#certificate_file_already_exists_error#:#Datoteka certifikata već postoji u datotečnom sustavu.
 common#:#certificate_file_input_output_error#:#Datoteka certifikata je pronađena, ali se zbog internih pogrešaka ne može izbrisati. Molimo kontaktirajte svog administratora.
@@ -3830,8 +3845,6 @@ common#:#day#:#Dan
 common#:#days#:#Dani
 common#:#db_host#:#Domaćin baze podataka
 common#:#db_name#:#Naziv baze podataka
-common#:#db_need_hotfix#:#Dostupna je hotfix (hitna ispravka). Otvorite <a href="./setup/setup.php"> »Postavljanje </a>!
-common#:#db_need_update#:#Bazu podataka treba ažurirati!
 common#:#db_pass#:#Lozinka baze podataka
 common#:#db_type#:#Tip baze podataka
 common#:#db_user#:#Korisnik baze podataka
@@ -5238,6 +5251,7 @@ common#:#predefined_template#:#Preddefinirani predložak uloge
 common#:#preferences#:#Korisničke postavke
 common#:#presentation_table_more#:#Prikaži više
 common#:#preview#:#Pregled
+common#:#preview_caption#:#Preview %sof %s###05 04 2023 new variable
 common#:#preview_create#:#Kreiraj pregled
 common#:#preview_delete#:#Izbriši pregled
 common#:#preview_learner_info#:#Ako je omogućeno, administratori tečaja i skupine mogu vidjeti sadržaj iz perspektive sudionika tečaja odn. skupine.
@@ -5557,6 +5571,7 @@ common#:#short_inst_name#:#Kratki naslov
 common#:#short_inst_name_info#:#Ovaj će se naslov pojaviti na naslovnoj traci zaglavlja preglednika. Ako se ne unese vrijednost, koristi se ‘ILIAS’.
 common#:#show#:#Prikaži
 common#:#show_all_details#:#Prikaži sve detalje
+common#:#show_content#:#Show Content###05 05 2023 new variable
 common#:#show_details#:#Prikaži detalje
 common#:#show_filter#:#Prikaži filtar
 common#:#show_hidden_sections#:#Prikaži više informacija & raquo;
@@ -5580,8 +5595,10 @@ common#:#soap_user_administration_desc#:#Ako je omogućeno, ILIAS se može admin
 common#:#soap_wsdl_path#:#WSDL put
 common#:#soap_wsdl_path_info#:#Unesi put do datoteke ilias wsdl koja bi se trebala koristiti za web uslugu. Ako ovo polje ostavite prazno, prema zadanim postavkama koristit će se sljedeća staza: %s
 common#:#sort_ascending#:#Sort Ascending###04 06 2021 new variable
+common#:#sort_ascending_long#:#Change Sort Direction to Ascending###31 05 2023 new variable
 common#:#sort_by_this_column#:#Poredaj po ovom stupcu
 common#:#sort_descending#:#Sort Descending###04 06 2021 new variable
+common#:#sort_descending_long#:#Change Sort Direction to Descending###31 05 2023 new variable
 common#:#sort_inherit_prefix#:#Zadano
 common#:#sorting_asc#:#Uzlazni
 common#:#sorting_creation_header#:#Prema datumu stvaranja
@@ -5707,6 +5724,7 @@ common#:#udf_delete_sure#:#Jeste li sigurni da želite izbrisati ovo polje i sve
 common#:#udf_duplicate_entries#:#Vrijednosti moraju biti jedinstvene.
 common#:#udf_field_deleted#:#Izbrisano polje.
 common#:#udf_name_already_exists#:#Ovo ime polja već postoji. Odaberite drugo ime.
+common#:#udf_required_and_visible_requires_changeable#:#When a field is ‘Required’ and ‘Visible in Personal Data’, it must also be ‘Changeable in Profile’###01 02 2023 new variable
 common#:#udf_required_requires_visib_reg#:#Kada je polje postavljeno na 'obavezno', mora biti postavljeno na 'vidljivo u registraciji'
 common#:#udf_type_date#:#Datum
 common#:#udf_type_datetime#:#Datum i vrijeme
@@ -5800,6 +5818,7 @@ common#:#usr_account_inactive#:#Neaktivan račun
 common#:#usr_active_only#:#Samo aktivni korisnici
 common#:#usr_add#:#Dodaj korisnika
 common#:#usr_agreement#:#Uvjeti pružanja usluge
+common#:#usr_agreement_footer_intro#:#You have declared your consent to these terms of service.###24 11 2022 new variable
 common#:#usr_edit#:#Uredi korisnika
 common#:#usr_filter_coursemember#:#Član tečaja
 common#:#usr_filter_groupmember#:#Član grupe
@@ -5957,6 +5976,7 @@ cont#:#cont_filter_fields#:#Filter Fields###04 06 2021 new variable
 cont#:#cont_filter_record#:#Record###04 06 2021 new variable
 cont#:#cont_found_objects#:#Found Objects###04 06 2021 new variable
 cont#:#cont_item_list#:#Popis
+cont#:#cont_item_list_info#:#Display content objects in a list.###16 03 2023 new variable
 cont#:#cont_list_presentation#:#Prezentacija predmeta
 cont#:#cont_mem_skills#:#Kompetencije
 cont#:#cont_news_edited#:#Obrađeno
@@ -6010,6 +6030,7 @@ cont#:#cont_std_filter_title_8#:#Object Type###04 06 2021 new variable
 cont#:#cont_std_filter_title_9#:#Online/Offline###04 06 2021 new variable
 cont#:#cont_std_record_title#:#Standard###04 06 2021 new variable
 cont#:#cont_tile_view#:#Pločice
+cont#:#cont_tile_view_info#:#Display content objects as thumbnail-style tiles. Images for these tiles can be uploaded in the settings of each individual object.###16 03 2023 new variable
 contact#:#contact_awrn_ap_contacts#:#Approved Contacts
 contact#:#contact_awrn_ap_contacts_info#:#All contacts approved by the user are listed.
 contact#:#contact_awrn_req_contacts#:#Contact Requests
@@ -6447,6 +6468,8 @@ content#:#cont_grid_width_s#:#Mali
 content#:#cont_grid_width_s_info#:#Npr. pametni telefon
 content#:#cont_grid_width_xl#:#Jako veliki
 content#:#cont_grid_width_xl_info#:#Npr. široka radna površina
+content#:#cont_hacc_needs_height#:#Please set a content height for horizontal accordions.###05 05 2023 new variable
+content#:#cont_hacc_needs_width#:#Please set a content width for horizontal accordions.###05 05 2023 new variable
 content#:#cont_header#:#Zaglavlje
 content#:#cont_height#:#Visina u pikselima
 content#:#cont_help_no_valid_tooltip_id#:#ID opisa koji ste unijeli nije valjan.
@@ -7787,9 +7810,11 @@ crs#:#crs_view_timing#:#Prikaz vremenskog plana
 crs#:#crs_view_timing_absolute#:#Apsolutni datumi
 crs#:#crs_view_timing_relative#:#Relativni datumi
 crs#:#crs_view_timings#:#Vrsta prikaza vremenskog plana
+crs#:#crs_visibility#:#Visibility###24 11 2022 new variable
 crs#:#crs_visibility_limitless#:#Neograničen
 crs#:#crs_visibility_until#:#Ograničeno razdoblje dostupnosti
 crs#:#crs_visibility_until_info#:#Tečaj će svojim članovima biti vidljiv u određenom vremenskom razdoblju.
+crs#:#crs_visibility_unvisible#:#The course is not visible.###24 11 2022 new variable
 crs#:#crs_wait_info#:#Ako se premaši maksimalan broj korisnika, nove registracije stavit će se na listu čekanja.
 crs#:#crs_waiting_list#:#Lista čekanja
 crs#:#crs_waiting_list_autofill#:#Automatsko popunjavanje
@@ -9275,6 +9300,7 @@ exc#:#exc_team_log#:#Dnevnik tima
 exc#:#exc_team_log_add_file#:#Dodana datoteka %s.
 exc#:#exc_team_log_add_member#:#Dodan član %s.
 exc#:#exc_team_log_create_team#:#Tim stvoren.
+exc#:#exc_team_log_remove_file#:#Removed file %s.###21 12 2022 new variable
 exc#:#exc_team_log_remove_member#:#Uklonjeni član %s.
 exc#:#exc_team_management_tutor#:#Upravljanje timom od strane mentora
 exc#:#exc_team_management_tutor_info#:#Ako aktivirani sudionici ne mogu sami organizirati timove.
@@ -10518,6 +10544,7 @@ lti#:#lti_object_consumer#:#Potrošači LTI-ja
 lti#:#lti_object_release_settings_form#:#Uredi odobrenja LTI-ja
 lti#:#lti_provider#:#Odobrenja LTI-ja
 lti#:#lti_provider_not_avail_msg#:#LTI Provider is set to 'Not Available'###04 06 2021 new variable
+lti#:#lti_provider_not_set_msg#:#LTI Provider is configured incompletely.###05 05 2023 new variable
 lti#:#lti_providing_tab#:#ILIAS as LTI Provider###04 06 2021 new variable
 lti#:#lti_released_objects#:#Odobrenja objekta
 lti#:#lti_select_provider#:#Select Provider###04 06 2021 new variable
@@ -10580,7 +10607,6 @@ lti#:#user_provider_subtab#:#Providers Defined by Users###04 06 2021 new variabl
 ltiv#:#ltiv_create#:#Create Certificate for LTI Consumer Object###04 06 2021 new variable
 ltiv#:#ltiv_create_info#:#Select a completed LTI consumer object to generate a certificate for it###04 06 2021 new variable
 mail#:#back_to_folder#:#Povratak na mapu
-mail#:#bc#:#BCC
 mail#:#chat_users_have_been_invited#:#Pozvani su sljedeći korisnici:
 mail#:#chat_users_without_login#:#Sljedeći korisnici nemaju ILIAS račun i ne mogu biti pozvani u sobu za razgovor:
 mail#:#chat_users_without_permission#:#Sljedeći korisnici nemaju pristup odabranoj sobi za razgovor:
@@ -10605,9 +10631,11 @@ mail#:#mail_assign_entry_to_mailing_list#:#Dodijeli unos iz svojih kontakata na 
 mail#:#mail_attachment_file_not_exist#:#Barem jedan od sljedećih privitaka ne postoji: %1$s
 mail#:#mail_attachments#:#Prilozi
 mail#:#mail_auto_generated_info#:#Ovu vam je poruku automatski poslala instalacija ILIAS-a %s,%s
+mail#:#mail_bcc#:#BCC###16 03 2023 new variable
 mail#:#mail_bg_task_desc#:#Subject: %s###04 06 2021 new variable
 mail#:#mail_bg_task_title#:#E-mail Delivery###04 06 2021 new variable
 mail#:#mail_both_email#:#Obje adrese e-pošte
+mail#:#mail_cc#:#CC###16 03 2023 new variable
 mail#:#mail_change_to_folder#:#Prebaci na mapu: %s
 mail#:#mail_create_tpl#:#Kreiraj tekstualne predloške
 mail#:#mail_cronjob_notification_info#:#Ovdje možete aktivirati povremene obavijesti o novoj pošti.
@@ -10668,6 +10696,7 @@ mail#:#mail_generic_rcp_error#:#Došlo je do pogreške prilikom provjere valjano
 mail#:#mail_global_reply_to_addr#:#Reply-To###04 06 2021 new variable
 mail#:#mail_global_reply_to_addr_info#:#Please enter the desired 'Reply-To' address.###04 06 2021 new variable
 mail#:#mail_grp_roles#:#Pošaljite poštu ulogama grupe
+mail#:#mail_hint_add_placeholder_x#:#Add the placeholder '%s' to the message body.###05 04 2023 new variable
 mail#:#mail_incoming#:#Dolazna pošta
 mail#:#mail_incoming_both#:#lokalno i prosljeđivanje
 mail#:#mail_incoming_local#:#samo lokalni
@@ -10821,6 +10850,7 @@ mail#:#placeholders_advise#:#Osobna rezervirana mjesta zamjenjuju se samo za pri
 mail#:#search_content#:#Rezultat pretrage
 mail#:#search_recipients#:#Primatelji pretraživanja
 mail#:#second_email_missing_info#:#Odabir nije moguć jer nije unesena druga adresa e-pošte
+mail#:#select_mail_with_subject_x#:#Select mail with subject „%s“###16 03 2023 new variable
 mail#:#send_mail_admins#:#Svi administratori
 mail#:#send_mail_members#:#Svi članovi
 mail#:#send_mail_to#:#Pošalji za
@@ -10857,7 +10887,7 @@ mathjax#:#mathjax_limiter#:#Inline Delimiters
 mathjax#:#mathjax_limiter_info#:#Select the inline delimiters as they are configured in your MathJax installation.
 mathjax#:#mathjax_mathjax#:#MathJax
 mathjax#:#mathjax_path_to_mathjax#:#URL to MathJax
-mathjax#:#mathjax_path_to_mathjax_desc#:#E.g. https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML or a URL to your local installation.
+mathjax#:#mathjax_path_to_mathjax_desc#:#E.g. https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML,Safe or a URL to your local installation.
 mathjax#:#mathjax_server_address#:#Server Address
 mathjax#:#mathjax_server_address_info#:#E.g. http://localhost:8003
 mathjax#:#mathjax_server_cache_cleared#:#The MathJax cache was cleared.
@@ -11060,7 +11090,9 @@ meta#:#md_adv_record_lng_table_lng#:#Language###04 06 2021 new variable
 meta#:#md_adv_records#:#Uključeni skupovi podataka
 meta#:#md_adv_records_exported#:#Stvorena je nova izvozna datoteka.
 meta#:#md_adv_scope#:#Opseg
+meta#:#md_adv_scope_info#:#Usage of this custom metadata set will be limited to selected parts of the repository.###01 02 2023 new variable
 meta#:#md_adv_scope_list_header#:#Ograničeno na:
+meta#:#md_adv_scope_objects#:#Data Set Effective From###01 02 2023 new variable
 meta#:#md_adv_searchable#:#Može se pretraživati
 meta#:#md_adv_select_one_file#:#Odaberi jednu datoteku.
 meta#:#md_adv_show#:#Pokaži
@@ -13758,6 +13790,7 @@ registration#:#reg_confirmation_hash_life_time#:#Trajanje
 registration#:#reg_confirmation_hash_life_time_expired#:#Poveznica za potvrdu više nije važeća. Molimo registrirajte se ponovno!
 registration#:#reg_confirmation_hash_life_time_info#:#Unesite trajanje (sekunde) poveznice za potvrdu. Preporučena vrijednost je 1800 sekundi.
 registration#:#reg_confirmation_hash_not_found#:#Nijedan korisnički račun ne može se povezati s ovom poveznicom za potvrdu.
+registration#:#reg_confirmation_hash_not_passed#:#The confirmation link is incomplete.###01 02 2023 new variable
 registration#:#reg_confirmation_link_successful#:#Uspješno ste podnijeli zahtjev za račun ILIAS-u. U sljedećih nekoliko minuta primit ćete e-poruku s potvrdom. Potvrdite svoju registraciju klikom na poveznicu za potvrdu u ovoj poruci e-pošte.<br />Bit ćete preusmjereni na <a href="%s" title="login screen"> zaslon za prijavu </a> nakon 20 sekundi.
 registration#:#reg_default#:#Zadano
 registration#:#reg_deleted_assignment#:#Izbrisani zadatak(-ci).
@@ -13851,9 +13884,11 @@ rep#:#rep_add_to_favourites#:#Add to Favourites###04 06 2021 new variable
 rep#:#rep_added_rec_content#:#Recommended content has been added.###04 06 2021 new variable
 rep#:#rep_added_to_favourites#:#The item has been added to your favourites.###04 06 2021 new variable
 rep#:#rep_breadcr_crs#:#Breadcrumb starts with course
+rep#:#rep_breadcr_crs_config#:#Configuration###24 11 2022 new variable
 rep#:#rep_breadcr_crs_overwrite#:#Setting is changeable on course level
 rep#:#rep_breadcr_crs_overwrite_not#:#Setting is not changeable on course level
 rep#:#rep_configure#:#Configure###04 06 2021 new variable
+rep#:#rep_crs_default_shortened#:#Default: Breadcrumbs Shortened###24 11 2022 new variable
 rep#:#rep_custom_icons#:#Custom Icons
 rep#:#rep_default#:#Default
 rep#:#rep_dependencies#:#Dependencies

@@ -1207,8 +1207,6 @@ class ilPersonalSkillsGUI
 
         $this->determineCurrentProfile();
         $this->showProfileSelectorToolbar();
-        // needed fix for profiles in gap view, because there is no filter shown (yet)
-        $this->getFilter()->clear();
 
         $html = $this->showInfoBox() . $this->getGapAnalysisHTML();
         $tpl->setContent($html);
@@ -1237,19 +1235,20 @@ class ilPersonalSkillsGUI
         $ilCtrl = $this->ctrl;
 
         $options = array();
+        $cont_options = array();
         if (is_array($this->obj_skills) && $this->obj_id > 0) {
             $options[0] = $lng->txt("obj_" . ilObject::_lookupType($this->obj_id)) . ": " . ilObject::_lookupTitle($this->obj_id);
             foreach ($this->cont_profiles as $p) {
-                $options[$p["profile_id"]] = $p["title"];
+                $cont_options[$p["profile_id"]] = $p["title"];
             }
+            asort($cont_options);
+            $options = $options + $cont_options;
         }
         else {
             foreach ($this->user_profiles as $p) {
                 $options[$p["id"]] = $p["title"];
             }
         }
-
-        asort($options);
 
         $si = new ilSelectInputGUI($lng->txt("skmg_profile"), "profile_id");
         $si->setOptions($options);
@@ -1343,6 +1342,8 @@ class ilPersonalSkillsGUI
         $ilUser = $this->user;
         $lng = $this->lng;
 
+        // needed fix for profiles in gap view, because there is no filter shown (yet)
+        $this->getFilter()->clear();
 
         if ($a_skills == null) {
             $a_skills = $this->obj_skills;

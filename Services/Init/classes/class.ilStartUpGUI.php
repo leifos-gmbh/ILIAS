@@ -41,6 +41,12 @@ class ilStartUpGUI
 
     /** @var \ILIAS\DI\Container $dic */
     protected $dic;
+
+    /**
+     * @var ilHelpGUI
+     */
+    private $help;
+
     /**
      * ilStartUpGUI constructor.
      * @param \ilObjUser|null              $user
@@ -77,6 +83,7 @@ class ilStartUpGUI
             $httpRequest = $DIC->http()->request();
         }
         $this->httpRequest = $httpRequest;
+        $this->help = $DIC->help();
 
         $this->ctrl = $DIC->ctrl();
         $this->lng = $DIC->language();
@@ -86,6 +93,7 @@ class ilStartUpGUI
         $this->ctrl->saveParameter($this, array("rep_ref_id", "lang", "target", "client_id"));
 
         $this->user->setLanguage($this->lng->getLangKey());
+        $this->help->setScreenIdComponent('init');
     }
 
     /**
@@ -170,6 +178,7 @@ class ilStartUpGUI
         if ($force_login) {
             $this->logger->debug('Force login');
             if ($auth_session->isValid()) {
+                $messages = $this->retrieveMessagesFromSession();
                 $this->logger->debug('Valid session -> logout current user');
                 ilSession::setClosingContext(ilSession::SESSION_CLOSE_USER);
                 $auth_session->logout();
@@ -183,6 +192,12 @@ class ilStartUpGUI
                 );
             }
             $this->logger->debug('Show login page');
+            
+            if (isset($messages) && count($messages) > 0) {
+                foreach ($messages as $type => $content) {
+                    $this->mainTemplate->setOnScreenMessage($type, $content);
+                }
+            }
             return $this->showLoginPage();
         }
 
@@ -207,16 +222,17 @@ class ilStartUpGUI
     {
         global $tpl, $ilSetting;
 
+        $this->help->setSubScreenId('login');
 
         $this->getLogger()->debug('Showing login page');
 
         $extUid = '';
-        if (isset($_GET['ext_uid']) && is_string($_GET['ext_uid'])) {
-            $extUid = $_GET['ext_uid'];
-        }
         $soapPw = '';
-        if (isset($_GET['soap_pw']) && is_string($_GET['soap_pw'])) {
-            $soapPw = $_GET['soap_pw'];
+        if (isset($this->httpRequest->getQueryParams()['ext_uid'])) {
+            $extUid = $this->httpRequest->getQueryParams()['ext_uid'];
+        }
+        if (isset($this->httpRequest->getQueryParams()['soap_pw'])) {
+            $soapPw = $this->httpRequest->getQueryParams()['soap_pw'];
         }
 
         require_once 'Services/Authentication/classes/Frontend/class.ilAuthFrontendCredentialsSoap.php';
@@ -271,10 +287,30 @@ class ilStartUpGUI
         $gtpl->setContent($tpl->get());
         $gtpl->printToStdout("DEFAULT", false, true);
     }
+    
+    protected function retrieveMessagesFromSession() : array
+    {
+        $messages = [];
+        if (ilSession::get(ilGlobalTemplate::MESSAGE_TYPE_FAILURE)) {
+            $messages[ilGlobalTemplate::MESSAGE_TYPE_FAILURE] = ilSession::get(ilGlobalTemplate::MESSAGE_TYPE_FAILURE);
+        }
+        if (ilSession::get(ilGlobalTemplate::MESSAGE_TYPE_SUCCESS)) {
+            $messages[ilGlobalTemplate::MESSAGE_TYPE_SUCCESS] = ilSession::get(ilGlobalTemplate::MESSAGE_TYPE_SUCCESS);
+        }
+        if (ilSession::get(ilGlobalTemplate::MESSAGE_TYPE_INFO)) {
+            $messages[ilGlobalTemplate::MESSAGE_TYPE_INFO] = ilSession::get(ilGlobalTemplate::MESSAGE_TYPE_INFO);
+        }
+        if (ilSession::get(ilGlobalTemplate::MESSAGE_TYPE_QUESTION)) {
+            $messages[ilGlobalTemplate::MESSAGE_TYPE_QUESTION] = ilSession::get(ilGlobalTemplate::MESSAGE_TYPE_QUESTION);
+        }
+        return $messages;
+    }
 
     protected function showCodeForm($a_username = null, $a_form = null)
     {
         global $tpl, $lng;
+
+        $this->help->setSubScreenId('code_input');
 
         self::initStartUpTemplate("tpl.login_reactivate_code.html");
 
@@ -845,8 +881,8 @@ class ilStartUpGUI
             $tpl->setVariable('SHIB_FORMACTION', './shib_login.php'); // Bugfix http://ilias.de/mantis/view.php?id=10662 {$tpl->setVariable('SHIB_FORMACTION', $this->ctrl->getFormAction($this));}
             $federation_name = $ilSetting->get("shib_federation_name");
             $admin_mail = ' <a href="mailto:' . $ilSetting->get("admin_email") . '">ILIAS ' . $lng->txt(
-                    "administrator"
-                ) . '</a>.';
+                "administrator"
+            ) . '</a>.';
             if ($ilSetting->get("shib_hos_type") == 'external_wayf') {
                 $tpl->setCurrentBlock("shibboleth_login");
                 $tpl->setVariable("TXT_SHIB_LOGIN", $lng->txt("login_to_ilias_via_shibboleth"));
@@ -1088,6 +1124,8 @@ class ilStartUpGUI
      */
     public function showAccountMigration(string $message = '') : void
     {
+        $this->help->setSubScreenId('account_migration');
+
         $tpl = self::initStartUpTemplate('tpl.login_account_migration.html');
 
         $form = new ilPropertyFormGUI();
@@ -1282,6 +1320,8 @@ class ilStartUpGUI
         $lng = $DIC->language();
         $ilIliasIniFile = $DIC['ilIliasIniFile'];
 
+        $this->help->setSubScreenId('logout');
+
         $tpl = self::initStartUpTemplate("tpl.logout.html");
 
         $client_id = $_GET['client_id'];
@@ -1360,6 +1400,7 @@ class ilStartUpGUI
         );
 
         if ((int) $this->user->getAuthMode(true) == AUTH_SAML && $had_external_authentication) {
+            $this->logger->info('Redirecting user to SAML logout script');
             $this->ctrl->redirectToURL('saml.php?action=logout&logout_url=' . urlencode(ILIAS_HTTP_PATH . '/login.php'));
         }
 
@@ -1564,6 +1605,8 @@ class ilStartUpGUI
      */
     protected function showTermsOfService(bool $accepted = false) : void
     {
+        $this->help->setSubScreenId('terms_of_service');
+
         $back_to_login = ('getAcceptance' != $this->ctrl->getCmd());
 
         if (!$this->user->getId()) {
@@ -1571,6 +1614,9 @@ class ilStartUpGUI
         }
 
         $tpl = self::initStartUpTemplate('tpl.view_terms_of_service.html', $back_to_login, !$back_to_login);
+
+        $this->mainTemplate->setTitle($this->lng->txt('accept_usr_agreement'));
+        $this->mainTemplate->setOnScreenMessage('info', $this->lng->txt('accept_usr_agreement_intro'));
 
         $helper = new ilTermsOfServiceHelper();
         $handleDocument = $helper->isGloballyEnabled() && $this->termsOfServiceEvaluation->hasDocument();
@@ -1596,7 +1642,8 @@ class ilStartUpGUI
                 $tpl->setVariable('ACCEPT_TERMS_OF_SERVICE', $this->lng->txt('accept_usr_agreement'));
                 $tpl->setVariable('TXT_ACCEPT', $this->lng->txt('accept_usr_agreement_btn'));
                 $tpl->setVariable('DENY_TERMS_OF_SERVICE', $this->lng->txt('deny_usr_agreement'));
-                $tpl->setVariable('DENIAL_BUTTON',
+                $tpl->setVariable(
+                    'DENIAL_BUTTON',
                     $this->dic->ui()->renderer()->render(
                         $this->dic->ui()->factory()->button()->standard(
                             $this->dic->language()->txt('deny_usr_agreement_btn'),
@@ -1630,9 +1677,12 @@ class ilStartUpGUI
 
         // In case of an valid session, redirect to starting page
         if ($GLOBALS['DIC']['ilAuthSession']->isValid()) {
-            include_once './Services/Init/classes/class.ilInitialisation.php';
-            ilInitialisation::redirectToStartingPage();
-            return;
+            if (!$this->user->isAnonymous() || ilPublicSectionSettings::getInstance()->isEnabledForDomain(
+                $this->httpRequest->getServerParams()['SERVER_NAME']
+            )) {
+                ilInitialisation::redirectToStartingPage();
+                return;
+            }
         }
 
         // no valid session => show client list, if no client info is given
@@ -1826,8 +1876,14 @@ class ilStartUpGUI
     {
         ilUtil::setCookie('iltest', 'cookie', false);
 
+        $this->lng->loadLanguageModule('registration');
+
         if (!isset($_GET['rh']) || !strlen(trim($_GET['rh']))) {
-            $this->ctrl->redirectToURL('./login.php?cmd=force_login&reg_confirmation_msg=reg_confirmation_hash_not_passed');
+            $this->mainTemplate->setOnScreenMessage(ilGlobalTemplate::MESSAGE_TYPE_FAILURE, $this->lng->txt('reg_confirmation_hash_not_passed'), true);
+            $this->ctrl->redirectToURL(sprintf(
+                './login.php?cmd=force_login&lang=%s',
+                $this->lng->getLangKey()
+            ));
         }
 
         try {
@@ -1859,8 +1915,9 @@ class ilStartUpGUI
             );
             $accountMail->withEmailConfirmationRegistrationMode()->send($user, $password);
 
+            $this->mainTemplate->setOnScreenMessage(ilGlobalTemplate::MESSAGE_TYPE_SUCCESS, $this->lng->txt('reg_account_confirmation_successful'), true);
             $this->ctrl->redirectToURL(sprintf(
-                './login.php?cmd=force_login&reg_confirmation_msg=reg_account_confirmation_successful&lang=%s',
+                './login.php?cmd=force_login&lang=%s',
                 $user->getLanguage()
             ));
         } catch (ilRegConfirmationLinkExpiredException $exception) {
@@ -1879,14 +1936,16 @@ class ilStartUpGUI
                 ]
             );
 
+            $this->mainTemplate->setOnScreenMessage(ilGlobalTemplate::MESSAGE_TYPE_FAILURE, $this->lng->txt($exception->getMessage()), true);
             $this->ctrl->redirectToURL(sprintf(
-                './login.php?cmd=force_login&reg_confirmation_msg=%s',
-                $exception->getMessage()
+                './login.php?cmd=force_login&lang=%s',
+                $this->lng->getLangKey()
             ));
         } catch (ilRegistrationHashNotFoundException $exception) {
+            $this->mainTemplate->setOnScreenMessage(ilGlobalTemplate::MESSAGE_TYPE_FAILURE, $this->lng->txt($exception->getMessage()), true);
             $this->ctrl->redirectToURL(sprintf(
-                './login.php?cmd=force_login&reg_confirmation_msg=%s',
-                $exception->getMessage()
+                './login.php?cmd=force_login&lang=%s',
+                $this->lng->getLangKey()
             ));
         }
     }
@@ -2101,7 +2160,9 @@ class ilStartUpGUI
         $auth = $factory->auth();
 
         if (isset($params['action']) && $params['action'] == 'logout') {
-            $auth->logout(isset($params['logout_url']) ? $params['logout_url'] : '');
+            $logout_url = isset($params['logout_url']) ? $params['logout_url'] : '';
+            ilLoggerFactory::getLogger('auth')->info(sprintf('Requested SAML logout: %s', $logout_url));
+            $auth->logout($logout_url);
         }
 
         if (isset($params['target']) && !isset($params['returnTo'])) {
@@ -2235,6 +2296,8 @@ class ilStartUpGUI
     protected function showSamlIdpSelection(\ilSamlAuth $auth, array $idps)
     {
         global $DIC;
+
+        $this->help->setSubScreenId('saml_idp_selection');
 
         self::initStartUpTemplate(array('tpl.saml_idp_selection.html', 'Services/Saml'));
 

@@ -738,10 +738,17 @@ class ilPCInteractiveImageGUI extends ilPageContentGUI
 
     public function editor() : void
     {
-
         $ilTabs = $this->tabs;
         $ilTabs->activateTab("editor");
         $this->tpl->setContent("Editor");
+        $this->initInteractiveImageEditor();
     }
+
+    protected function initInteractiveImageEditor() : void
+    {
+        $this->setEditorToolContext();
+        $this->editor_gui->init()->initUI($this->tpl);
+    }
+
 
 }

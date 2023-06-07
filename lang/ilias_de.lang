@@ -14946,7 +14946,9 @@ skmg#:#skmg_previous_step#:#Voriger Schritt
 skmg#:#skmg_profile#:#Profil
 skmg#:#skmg_really_delete_levels#:#Sollen die folgenden Kompetenzstufen wirklich gelöscht werden?
 skmg#:#skmg_really_remove_skills#:#Möchten Sie die folgenden Kompetenzen wirklich entfernen?
-skmg#:#skmg_recommended_learning_material#:#Lerninhalte zur Zielerreichung
+skmg#:#skmg_recommended_learning_material_crs#:#Lerninhalte im Kurs zur Zielerreichung
+skmg#:#skmg_recommended_learning_material_global#:#Lerninhalte zur Zielerreichung
+skmg#:#skmg_recommended_learning_material_grp#:#Lerninhalte in der Gruppe zur Zielerreichung
 skmg#:#skmg_recommended_learning_material_info#:#Bearbeiten Sie folgende Lerninhalte um das Kompetenzziel zu erreichen. Wählen Sie genau einen Lerninhalt pro Kompetenzstufe aus.
 skmg#:#skmg_refresh_view#:#Ansicht aktualisieren
 skmg#:#skmg_remove_levels#:#Ausprägungen entfernen
@@ -14983,7 +14985,8 @@ skmg#:#skmg_skill_needs_self_eval#:#Bitte führen Sie zunächst eine Selbsteinsc
 skmg#:#skmg_skill_needs_self_eval_box#:#Bitte beachten Sie, dass für mindestens eine Kompetenz in diesem Profil noch keine Selbsteinschätzung durchgeführt wurde. Ihnen wird das Kompetenzziel für die betroffenen Kompetenzen angezeigt, sobald eine Selbsteinschätzung durchgeführt wurde.
 skmg#:#skmg_skill_no_needs_impr#:#Kompetenzziel erfüllt!
 skmg#:#skmg_skill_no_needs_impr_info#:#Sie haben das Ziel für diese Kompetenz erfüllt.
-skmg#:#skmg_skill_profile_comparison#:#Profilvergleich
+skmg#:#skmg_skill_overview#:#Übersicht
+skmg#:#skmg_skill_profile_records#:#Kompetenzeinträge
 skmg#:#skmg_skill_profiles#:#Kompetenzprofile
 skmg#:#skmg_skill_template#:#Vorlage
 skmg#:#skmg_skill_templates#:#Vorlagen

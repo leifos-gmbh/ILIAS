@@ -573,6 +573,9 @@ class ilPersonalSkillsGUI
                     $found = true;
                 }
             }
+            if (empty($title)) {
+                $title = $lng->txt("skmg_skill_overview");
+            }
 
             //  skill description
             $panel_comps[] = $this->ui_fac->legacy($this->getBasicSkillDescription((string) $description));
@@ -2063,7 +2066,7 @@ class ilPersonalSkillsGUI
             $tpl->parseCurrentBlock();
         } else {
             if ($this->getProfileId() > 0) {
-                $tpl->setVariable("HEADING", $this->lng->txt("skmg_skill_profile_comparison"));
+                $tpl->setVariable("HEADING", $this->lng->txt("skmg_skill_profile_records"));
             }
         }
 
@@ -2131,7 +2134,8 @@ class ilPersonalSkillsGUI
     ): ?\ILIAS\UI\Component\Panel\Secondary\Secondary {
         $lng = $this->lng;
 
-        if ($gap_mode_obj_id > 0 && !$this->obj_definition->isContainer(\ilObject::_lookupType($gap_mode_obj_id))) {
+        $gap_mode_obj_type = ilObject::_lookupType($gap_mode_obj_id);
+        if ($gap_mode_obj_id > 0 && !$this->obj_definition->isContainer($gap_mode_obj_type)) {
             return null;
         }
 
@@ -2159,7 +2163,7 @@ class ilPersonalSkillsGUI
 
             $sub_objects = [];
             $is_container = false;
-            if ($gap_mode_obj_id > 0 && $this->obj_definition->isContainer(\ilObject::_lookupType($gap_mode_obj_id))) {
+            if ($gap_mode_obj_id > 0 && $this->obj_definition->isContainer($gap_mode_obj_type)) {
                 $is_container = true;
                 $sub_objects = $this->tree->getSubTree(
                     $this->tree->getNodeData((int) current(\ilObject::_getAllReferences($gap_mode_obj_id))),
@@ -2202,8 +2206,19 @@ class ilPersonalSkillsGUI
                 );
             }
             if ($at_least_one_item) {
+                switch ($gap_mode_obj_type) {
+                    case "crs":
+                        $sec_panel_title = $lng->txt("skmg_recommended_learning_material_crs");
+                        break;
+                    case "grp":
+                        $sec_panel_title = $lng->txt("skmg_recommended_learning_material_grp");
+                        break;
+                    default:
+                        $sec_panel_title = $lng->txt("skmg_recommended_learning_material_global");
+                }
+
                 $sec_panel = $this->ui_fac->panel()->secondary()->listing(
-                    $lng->txt("skmg_recommended_learning_material"),
+                    $sec_panel_title,
                     $item_groups
                 );
             } else {

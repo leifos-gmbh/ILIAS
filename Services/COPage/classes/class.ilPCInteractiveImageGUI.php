@@ -30,6 +30,7 @@ use ILIAS\FileUpload\Handler\HandlerResult;
  */
 class ilPCInteractiveImageGUI extends ilPageContentGUI
 {
+    protected \ILIAS\COPage\PC\InteractiveImage\GUIService $iim_gui;
     protected ilTabsGUI $tabs;
     protected ilToolbarGUI $toolbar;
 
@@ -47,6 +48,7 @@ class ilPCInteractiveImageGUI extends ilPageContentGUI
         $this->ctrl = $DIC->ctrl();
         $this->toolbar = $DIC->toolbar();
         parent::__construct($a_pg_obj, $a_content_obj, $a_hier_id, $a_pc_id);
+        $this->iim_gui = $DIC->copage()->internal()->gui()->pc()->interactiveImage();
     }
 
     public function executeCommand(): void
@@ -740,14 +742,14 @@ class ilPCInteractiveImageGUI extends ilPageContentGUI
     {
         $ilTabs = $this->tabs;
         $ilTabs->activateTab("editor");
-        $this->tpl->setContent("Editor");
+        $this->tpl->setContent($this->iim_gui->editorInit()->getInitHtml());
         $this->initInteractiveImageEditor();
     }
 
     protected function initInteractiveImageEditor() : void
     {
         $this->setEditorToolContext();
-        $this->editor_gui->init()->initUI($this->tpl);
+        $this->iim_gui->editorInit()->initUI($this->tpl);
     }
 
 

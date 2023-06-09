@@ -16,7 +16,7 @@
  *
  *********************************************************************/
 
-namespace ILIAS\COPage\Editor\UI;
+namespace ILIAS\COPage\PC\InteractiveImage;
 
 /**
  * @author Alexander Killing <killing@leifos.de>
@@ -65,11 +65,7 @@ class IIMEditorInit
         return str_replace(["<", ">", "'", "\""], "", $attr);
     }
 
-    public function getInitHtml(
-        string $openPlaceHolderPcId = "",
-        string $openFormPcId = "",
-        string $openFormCName = ""
-    ) : string
+    public function getInitHtml() : string
     {
         $ctrl = $this->ctrl;
 

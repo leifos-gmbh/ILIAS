@@ -18,7 +18,7 @@ declare(strict_types=1);
  *
  *********************************************************************/
 
-namespace ILIAS\COPage\PC;
+namespace ILIAS\COPage\PC\InteractiveImage;
 
 use ILIAS\COPage\InternalGUIService;
 use ILIAS\COPage\InternalDomainService;
@@ -39,19 +39,8 @@ class GUIService
         $this->domain_service = $domain_service;
     }
 
-    public function editRequest(): EditGUIRequest
+    public function editorInit(): IIMEditorInit
     {
-        return new EditGUIRequest(
-            $this->gui_service->http(),
-            $this->domain_service->refinery()
-        );
-    }
-
-    public function interactiveImage(): InteractiveImage\GUIService
-    {
-        return new InteractiveImage\GUIService(
-            $this->domain_service,
-            $this->gui_service
-        );
+        return new IIMEditorInit();
     }
 }

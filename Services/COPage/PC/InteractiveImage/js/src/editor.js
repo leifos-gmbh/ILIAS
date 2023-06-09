@@ -15,12 +15,12 @@
  *********************************************************************/
 
 import UI from "./ui/ui.js";
-import Controller from "./controller.js";
-import Client from "./client/client.js";
+import Controller from "../../../../Editor/js/src/controller.js";
+import Client from "../../../../Editor/js/src/client/client.js";
 import ActionFactory from "./actions/action-factory.js";
-import ResponseFactory from "./client/response/response-factory.js";
+import ResponseFactory from "../../../../Editor/js/src/client/response/response-factory.js";
 import Model from "./model/model.js";
-import Dispatcher from "./dispatcher.js";
+import Dispatcher from "../../../../Editor/js/src/dispatcher.js";
 import ModelActionHandler from "./model/model-action-handler.js";
 import UIActionHandler from "./ui/ui-action-handler.js";
 import ToolSlate from "./ui/tool-slate.js";

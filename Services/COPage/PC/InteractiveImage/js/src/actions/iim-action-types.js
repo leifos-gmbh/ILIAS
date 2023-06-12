@@ -17,12 +17,13 @@
 const ACTIONS = {
 
   // query actions (being sent to the server to "ask for stuff")
+  Q_INIT: "init",
 
   // command actions (being sent to the server to "change things")
-  UPDATE_DATA: "update.data",
+  C_SAVE_PROPERTIES: "save.properties",
 
   // editor actions (things happening in the editor client side)
-  COL_AFTER: "col.after",
+  E_SWITCH_PROPERTIES: "col.after",
 
 };
 export default ACTIONS;

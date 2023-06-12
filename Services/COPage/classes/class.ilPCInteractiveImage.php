@@ -572,4 +572,13 @@ class ilPCInteractiveImage extends ilPageContent
         $this->setMediaObject(new ilObjMediaObject($mob_id));
         $this->createAlias($page, $hier_id, $pc_id);
     }
+
+    public function getIIMModel(): ?stdClass
+    {
+        $model = new \stdClass();
+        $model->triggers = $this->getTriggers();
+        $model->popups = $this->getPopups();
+        return $model;
+    }
+
 }

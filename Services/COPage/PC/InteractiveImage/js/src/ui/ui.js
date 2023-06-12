@@ -1,6 +1,3 @@
-import ACTIONS from "../actions/placeholder-action-types.js";
-import PAGE_ACTIONS from "../../page/actions/page-action-types.js";
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -17,28 +14,25 @@ import PAGE_ACTIONS from "../../page/actions/page-action-types.js";
  *
  *********************************************************************/
 
+import IIMUI from '../iim-ui.js';
+import ActionFactory from '../actions/action-factory';
+
 /**
- * interactive image ui
+ * editor ui
  */
 export default class UI {
-
-
-  /**
-   * @type {boolean}
-   */
-  //debug = true;
-
-  /**
-   * Model
-   * @type {PageModel}
-   */
-  //page_model = {};
 
   /**
    * UI model
    * @type {Object}
    */
   //uiModel = {};
+
+  /**
+   * Model
+   * @type {Model}
+   */
+  //model = {};
 
   /**
    * @type {Client}
@@ -56,6 +50,21 @@ export default class UI {
   //actionFactory;
 
   /**
+   * @type {PageUI}
+   */
+  //page;
+
+  /**
+   * @type {ParagraphUI}
+   */
+  //paragraph;
+
+  /**
+   * @type {MediaUI}
+   */
+  //media;
+
+  /**
    * @type {ToolSlate}
    */
   //toolSlate;
@@ -63,31 +72,50 @@ export default class UI {
   /**
    * @type {pageModifier}
    */
-  //  pageModifier;
-
+  //pageModifier;
 
   /**
    * @param {Client} client
    * @param {Dispatcher} dispatcher
    * @param {ActionFactory} actionFactory
-   * @param {IIMModel} page_model
+   * @param {Model} model
    * @param {ToolSlate} toolSlate
-   * @param {PageModifier} pageModifier
+   * @param {PageModifer} pageModifer
    */
-  constructor(client, dispatcher, actionFactory, iim_model, toolSlate, pageModifier) {
-    this.debug = true;
+  constructor(client, dispatcher, actionFactory, model, toolSlate,
+              pageModifer) {
+    this.uiModel = {};
     this.client = client;
     this.dispatcher = dispatcher;
     this.actionFactory = actionFactory;
-    this.iim_model = iim_model;
+    this.model = model;
     this.toolSlate = toolSlate;
-    this.pageModifier = pageModifier;   // todo: replace
-    this.uiModel = {};
+    this.pageModifer = pageModifer;
+    this.debug = true;
+
+    this.iim = new IIMUI(
+      this.client,
+      this.dispatcher,
+      this.actionFactory,
+      this.model.model("page"),
+      this.toolSlate,
+      this.pageModifer
+    );
+
+    /*
+    this.page.addComponentUI("Paragraph", this.paragraph);
+    this.page.addComponentUI("Media", this.media);
+    this.page.addComponentUI("Table", this.table);
+    this.page.addComponentUI("PlaceHolder", this.placeholder);
+    this.pageModifer.setPageUI(this.page);*/
   }
 
-  //
-  // Initialisation
-  //
+  /**
+   * @return {PageUI}
+   */
+  getPageUI() {
+    return this.page;
+  }
 
   /**
    * @param message
@@ -98,29 +126,45 @@ export default class UI {
     }
   }
 
+  //
+  // Initialisation
+  //
 
   /**
    */
-  init(uiModel) {
-    const action = this.actionFactory;
-    const dispatch = this.dispatcher;
+  init(after_init) {
+    const ui_all_action = this.actionFactory.interactiveImage().query().uiAll();
+    this.client.sendQuery(ui_all_action).then(result => {
 
-    this.uiModel = uiModel;
-    let t = this;
+      const p = result.getPayload();
+
+      /*
+      this.uiModel = result.getPayload();
+
+      // move page component model to model
+      this.log("ui.js, init, uiModel:");
+      this.log(this.uiModel);
+      this.log("ui.js, init, pcModel:");
+      this.log(this.uiModel.pcModel);
+      this.model.model("page").setComponentModel(this.uiModel.pcModel);
+      this.model.model("page").activatePasting(this.uiModel.pasting);
+      this.uiModel.pcModel = null;
+
+      this.toolSlate.init(this.uiModel);
+      this.page.init(this.uiModel);
+      this.paragraph.init(this.uiModel);
+      this.media.init(this.uiModel);
+      this.table.init(this.uiModel);
+      this.placeholder.init(this.uiModel);
+      if (after_init) {
+        after_init();
+      }*/
+    });
   }
 
   /**
    */
   reInit() {
+    this.iim.reInit();
   }
-
-  /*
-  hidePlaceholder(pcid) {
-    this.pageModifier.hideComponent(pcid);
-  }
-
-  showPlaceholder(pcid) {
-    this.pageModifier.showComponent(pcid);
-  }
-  */
 }

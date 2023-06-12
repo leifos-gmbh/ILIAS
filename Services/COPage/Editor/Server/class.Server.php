@@ -97,6 +97,9 @@ class Server
             case "Page":
                 $handler = new Page\PageQueryActionHandler($this->page_gui, $query["pc_id"] ?? "");
                 break;
+            case "InteractiveImage":
+                $handler = new InteractiveImage\InteractiveImageQueryActionHandler($this->page_gui, $query["pc_id"] ?? "");
+                break;
         }
 
         if ($handler === null) {

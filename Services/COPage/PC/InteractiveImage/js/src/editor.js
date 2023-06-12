@@ -14,7 +14,7 @@
  *
  *********************************************************************/
 
-import UI from "./ui/ui.js";
+import UI from "./ui/iim-ui.js";
 import Controller from "../../../../Editor/js/src/controller.js";
 import Client from "../../../../Editor/js/src/client/client.js";
 import ActionFactory from "./actions/action-factory.js";

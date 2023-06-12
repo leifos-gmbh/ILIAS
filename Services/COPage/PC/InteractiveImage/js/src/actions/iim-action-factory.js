@@ -18,11 +18,13 @@ import IIMEditorActionFactory from './iim-editor-action-factory.js';
 import IIMCommandActionFactory from './iim-command-action-factory.js';
 import ClientActionFactory from '../../../../../Editor/js/src/client/actions/client-action-factory.js';
 import EditorActionFactory from '../../../../../Editor/js/src/actions/editor-action-factory.js';
+import PageQueryActionFactory
+  from '../../../../../Editor/js/src/components/page/actions/page-query-action-factory';
 
 /**
  * action factory for calling the server
  */
-export default class TableActionFactory {
+export default class IIMActionFactory {
 
   /**
    * @type {EditorActionFactory}
@@ -38,6 +40,13 @@ export default class TableActionFactory {
   constructor(clientActionFactory, editorActionFactory) {
     this.clientActionFactory = clientActionFactory;
     this.editorActionFactory = editorActionFactory;
+  }
+
+  /**
+   * @returns {PageQueryActionFactory}
+   */
+  query() {
+    return new IIMQueryActionFactory(this.clientActionFactory);
   }
 
   /**

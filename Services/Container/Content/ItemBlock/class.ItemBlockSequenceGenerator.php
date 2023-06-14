@@ -32,6 +32,7 @@ use ILIAS\Container\InternalDomainService;
  */
 class ItemBlockSequenceGenerator
 {
+    protected bool $include_empty_blocks;
     protected Content\ModeManager $mode_manager;
     protected \ilAccessHandler $access;
     protected int $block_limit;
@@ -48,13 +49,15 @@ class ItemBlockSequenceGenerator
     protected static array $item_group_ref_ids = [];
     /** @var int[] */
     protected array $all_item_group_item_ref_ids = [];
+    protected array $all_ref_ids = [];
 
     public function __construct(
         DataService $data_service,
         InternalDomainService $domain_service,
         \ilContainer $container,
         BlockSequence $block_sequence,
-        ItemSetManager $item_set_manager
+        ItemSetManager $item_set_manager,
+        bool $include_empty_blocks = true
     ) {
         $this->access = $domain_service->access();
         $this->data_service = $data_service;
@@ -64,6 +67,7 @@ class ItemBlockSequenceGenerator
         $this->container = $container;
         $this->block_limit = (int) \ilContainer::_lookupContainerSetting($container->getId(), "block_limit");
         $this->mode_manager = $this->domain_service->content()->mode($container);
+        $this->include_empty_blocks = $include_empty_blocks;
     }
 
     public function getSequence() : ItemBlockSequence
@@ -80,14 +84,9 @@ class ItemBlockSequenceGenerator
                 }
             }
 
-            // get other block
-            $other_block = $this->getOtherBlock();
-            if (!is_null($other_block)) {
-                $item_blocks["_other"] = $other_block;
-            }
-
             // get blocks of page, put them to the start
             $embedded_ids = $this->getPageEmbeddedBlockIds();
+            $other_is_page_embedded = false;
             foreach ($embedded_ids as $id) {
                 if (isset($item_blocks[$id])) {
                     $item_blocks[$id]->setPageEmbedded(true);
@@ -97,13 +96,15 @@ class ItemBlockSequenceGenerator
                     // add item blocks of page, even if originally not in the block set
                     if ($id === "_other") {
                         $this->has_other_block = true;
+                        $other_is_page_embedded = true;
                     } else {
                         $ref_ids = $this->item_set_manager->getRefIdsOfType($id);
+                        $this->accumulateRefIds($ref_ids);
                         $block_items = $this->determineBlockItems($ref_ids, true);
                         // we remove this check to prevent [list-cat] stuff from appearing in the list
                         // this will output a message (is empty) in editing mode and
                         // remove the block (empty string) in presentation mode
-                        //if (count($block_items->getRefIds()) > 0) {
+                        if ($this->include_empty_blocks || count($block_items->getRefIds()) > 0) {
                             $block = $this->data_service->itemBlock(
                                 $id,
                                 $this->data_service->typeBlock($id),
@@ -112,12 +113,21 @@ class ItemBlockSequenceGenerator
                             );
                             $block->setPageEmbedded(true);
                             $sorted_blocks[] = $block;
-                        //}
+                        }
                     }
                 } else {
                     // e.g. deleted item group
                     //throw new \ilException("Missing item group data.");
                 }
+            }
+
+            // get other block
+            $other_block = $this->getOtherBlock();
+            if (!is_null($other_block)) {
+                if ($other_is_page_embedded) {
+                    $other_block->setPageEmbedded(true);
+                }
+                $item_blocks["_other"] = $other_block;
             }
 
             // manual sorting
@@ -267,11 +277,19 @@ class ItemBlockSequenceGenerator
         }
     }
 
-    protected function determineBlockItems(array $ref_ids, $filter_session_and_item_group_items = false) : BlockItemsInfo
+    protected function determineBlockItems(array $ref_ids, $filter_session_and_item_group_items = false,
+        bool $prevent_duplicats = false) : BlockItemsInfo
     {
         $exhausted = false;
         $accessible_ref_ids = [];
         foreach ($ref_ids as $ref_id) {
+            if ($prevent_duplicats && in_array($ref_id, $this->all_ref_ids)) {
+                continue;
+            }
+            if (\ilObject::_lookupType(\ilObject::_lookupObjId($ref_id)) === "itgr") {
+                continue;
+            }
+            $this->all_ref_ids[] = $ref_id;
             if ($exhausted) {
                 break;
             }
@@ -305,18 +323,18 @@ class ItemBlockSequenceGenerator
             $this->item_set_manager->getAllRefIds(),
             fn ($i) => !isset($this->accumulated_ref_ids[$i])
         );
-        $block_items = $this->determineBlockItems($remaining_ref_ids);
+        $block_items = $this->determineBlockItems($remaining_ref_ids, true, true);
         // we remove this check to prevent [list-_other] stuff from appearing in the list
         // this will output a message (is empty) in editing mode and
         // remove the block (empty string) in presentation mode
-        //if (count($block_items->getRefIds()) > 0) {
+        if ($this->include_empty_blocks || count($block_items->getRefIds()) > 0) {
             return $this->data_service->itemBlock(
                 "_other",
                 $this->data_service->otherBlock(),
                 $block_items->getRefIds(),
                 $block_items->getLimitExhausted()
             );
-        //}
+        }
         return null;
     }
 

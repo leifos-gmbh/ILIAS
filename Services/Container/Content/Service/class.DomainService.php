@@ -94,13 +94,15 @@ class DomainService
      */
     public function itemPresentation(
         \ilContainer $container,
-        ?\ilContainerUserFilter $container_user_filter
+        ?\ilContainerUserFilter $container_user_filter,
+        bool $include_empty_blocks = true
     ) : ItemPresentationManager {
         return new ItemPresentationManager(
             $this->domain_service,
             $container,
             $container_user_filter,
-            $this->repo_clipboard
+            $this->repo_clipboard,
+            $include_empty_blocks
         );
     }
 
@@ -240,14 +242,16 @@ class DomainService
     public function itemBlockSequenceGenerator(
         \ilContainer $container,
         BlockSequence $block_sequence,
-        ItemSetManager $item_set_manager
+        ItemSetManager $item_set_manager,
+        bool $include_empty_blocks = true
     ) : ItemBlockSequenceGenerator {
         return new ItemBlockSequenceGenerator(
             $this->data_service->content(),
             $this->domain_service,
             $container,
             $block_sequence,
-            $item_set_manager
+            $item_set_manager,
+            $include_empty_blocks
         );
     }
 }

@@ -134,14 +134,15 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
         return $this->mode_manager;
     }
 
-    protected function getItemPresentation() : \ILIAS\Container\Content\ItemPresentationManager
+    protected function getItemPresentation($include_empty_blocks = true) : \ILIAS\Container\Content\ItemPresentationManager
     {
         if (is_null($this->item_presentation)) {
             $this->item_presentation = $this->domain
                 ->content()
                 ->itemPresentation(
                     $this->getObject(),
-                    $this->container_user_filter
+                    $this->container_user_filter,
+                    $include_empty_blocks
                 );
         }
         return $this->item_presentation;
@@ -252,7 +253,7 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
         $page_gui->setStyleId(
             $style->getEffectiveStyleId()
         );
-        $page_gui->setItemPresentationManager($this->getItemPresentation());
+        $page_gui->setItemPresentationManager($this->getItemPresentation(false));
         $page_gui->setTemplateTargetVar("ADM_CONTENT");
         $page_gui->setFileDownloadLink("");
         //$page_gui->setLinkParams($this->ctrl->getUrlParameterString()); // todo

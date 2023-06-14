@@ -119,6 +119,9 @@ class ResourcesCommandActionHandler implements Server\CommandActionHandler
         }
 
         $updated = $page->update();
+        if ($page instanceof \ilContainerPage) {
+            $page->addMissingContainerBlocks($this->page_gui->getItemPresentationManager());
+        }
 
         return $this->ui_wrapper->sendPage($this->page_gui, $updated);
     }

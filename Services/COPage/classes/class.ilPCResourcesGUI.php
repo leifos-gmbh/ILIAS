@@ -146,13 +146,17 @@ class ilPCResourcesGUI extends ilPageContentGUI
         $sub_objs = $objDefinition->getGroupedRepositoryObjectTypes($obj_type);
         $types = array();
         foreach ($sub_objs as $k => $so) {
+            $cnt = (int) ($type_counts[$k] ?? 0);
+            if ($cnt === 0) {
+                continue;
+            }
             if (!$objDefinition->isPlugin($k)) {
                 if ($k != "itgr") {
-                    $types[$k] = $this->lng->txt("objs_" . $k) . " (" . (int) ($type_counts[$k] ?? 0) . ")";
+                    $types[$k] = $this->lng->txt("objs_" . $k) . " (" . $cnt . ")";
                 }
             } else {
                 $pl = ilObjectPlugin::getPluginObjectByType($k);
-                $types[$k] = $pl->txt("objs_" . $k) . " (" . (int) ($type_counts[$k] ?? 0) . ")";
+                $types[$k] = $pl->txt("objs_" . $k) . " (" . $cnt . ")";
             }
         }
         $type_prop->setOptions($types);
@@ -187,7 +191,7 @@ class ilPCResourcesGUI extends ilPageContentGUI
         }
 
         // other
-        if ($this->supportsOther()) {
+        if ($this->supportsOther() && $this->hasOtherBlock()) {
             $op_other = new ilRadioOption($lng->txt("cont_other_resources"), "_other", "");
             $radg->addOption($op_other);
             if (!$a_insert && $this->content_obj->getResourceListType() === "_other") {
@@ -318,6 +322,34 @@ class ilPCResourcesGUI extends ilPageContentGUI
             $this->pg_obj->addHierIDs();
             $this->edit();
         }
+    }
+
+    protected function hasOtherBlock() : bool
+    {
+        global $DIC;
+
+        $ref_id = $DIC
+            ->copage()
+            ->internal()
+            ->gui()
+            ->pc()
+            ->editRequest()
+            ->getRefId();
+        $item_presentation_manager = $DIC->container()->internal()
+                                         ->domain()
+                                         ->content()
+                                         ->itemPresentation(
+                                             \ilObjectFactory::getInstanceByRefId($ref_id),
+                                             null,
+                                             false
+                                         );
+        $block_sequence = $item_presentation_manager->getItemBlockSequence();
+        foreach ($block_sequence->getBlocks() as $block) {
+            if (($block->getBlock() instanceof \ILIAS\Container\Content\OtherBlock)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

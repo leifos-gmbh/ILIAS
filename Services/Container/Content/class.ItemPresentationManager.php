@@ -27,6 +27,7 @@ use ILIAS\Repository\Clipboard\ClipboardManager;
  */
 class ItemPresentationManager
 {
+    protected bool $include_empty_blocks;
     protected ModeManager $mode_manager;
     protected ?bool $can_order = null;
     protected ClipboardManager $repo_clipboard;
@@ -43,13 +44,15 @@ class ItemPresentationManager
         InternalDomainService $domain,
         \ilContainer $container,
         ?\ilContainerUserFilter $container_user_filter,
-        ClipboardManager $repo_clipboard
+        ClipboardManager $repo_clipboard,
+        bool $include_empty_blocks = true
     ) {
         $this->container = $container;
         $this->domain = $domain;
         $this->container_user_filter = $container_user_filter;
         $this->repo_clipboard = $repo_clipboard;
         $this->mode_manager = $domain->content()->mode($container);
+        $this->include_empty_blocks = $include_empty_blocks;
 
         // sequence from view manager
     }
@@ -171,7 +174,8 @@ class ItemPresentationManager
         $this->sequence_generator = $this->domain->content()->itemBlockSequenceGenerator(
             $this->container,
             $view->getBlockSequence(),
-            $this->item_set
+            $this->item_set,
+            $this->include_empty_blocks
         );
     }
 

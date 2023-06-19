@@ -16,6 +16,7 @@
  *
  *********************************************************************/
 
+namespace ILIAS\COPage\Editor\Components\InteractiveImage;
 
 use ILIAS\DI\Exceptions\Exception;
 use ILIAS\COPage\Editor\Server;
@@ -62,7 +63,7 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
         throw new Exception("Unknown action " . $query["action"]);
     }
 
-    protected function allCommand(): Server\Response
+    protected function init(): Server\Response
     {
         $ctrl = $this->ctrl;
         $f = $this->ui->factory();
@@ -91,7 +92,7 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
     /**
      * Get interactive image model
      */
-    protected function getIIMModel(): ?stdClass
+    protected function getIIMModel(): ?\stdClass
     {
         if ($this->pc_id !== "") {
             $pc = $this->page_gui->getPageObject()->getContentObjectForPcId($this->pc_id);

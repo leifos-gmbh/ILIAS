@@ -41,7 +41,7 @@ export default class ActionFactory {
   }
 
   /**
-   * @returns {PageActionFactory}
+   * @returns {InteractiveImageFactory}
    */
   interactiveImage() {
     return new InteractiveImageFactory(this.clientActionFactory, this.editorActionFactory);

@@ -14,7 +14,7 @@
  *
  *********************************************************************/
 
-import UI from "./ui/iim-ui.js";
+import UI from "./ui/ui.js";
 import Controller from "../../../../Editor/js/src/controller.js";
 import Client from "../../../../Editor/js/src/client/client.js";
 import ActionFactory from "./actions/action-factory.js";
@@ -23,8 +23,8 @@ import Model from "./model/model.js";
 import Dispatcher from "../../../../Editor/js/src/dispatcher.js";
 import ModelActionHandler from "./model/model-action-handler.js";
 import UIActionHandler from "./ui/ui-action-handler.js";
-import ToolSlate from "./ui/tool-slate.js";
-import PageModifier from "./ui/page-modifier.js";
+import ToolSlate from "../../../../Editor/js/src/ui/tool-slate.js";
+/* import PageModifier from "./ui/page-modifier.js"; */
 
 /**
  * Editor (mainly sets up dependency tree)
@@ -39,7 +39,6 @@ const editor = (function ($, il) {
   /**
    * @param {string} endpoint
    * @param {string} form_action
-   * @param {string} openPlaceHolderPcId
    */
   function init() {
 
@@ -67,21 +66,24 @@ const editor = (function ($, il) {
 
     // ui
     const toolSlate = new ToolSlate();
-    const pageModifier = new PageModifier(toolSlate);
-    const ui = new UI(client, dispatcher, actionFactory, model, toolSlate, pageModifier);
+    /* const pageModifier = new PageModifier(toolSlate); */
+    //const ui = new UI(client, dispatcher, actionFactory, model, toolSlate, pageModifier);
+    const ui = new UI(client, dispatcher, actionFactory, model, toolSlate);
 
     client.setDefaultErrorHandler((error) => {
-      pageModifier.displayError(error);
+      console.log("ERROR: ");
+      console.log(error);
+      //pageModifier.displayError(error);
     });
 
     // remaining dependecies for ui action handler
     uiActionHandler.setUI(ui);
     uiActionHandler.setDispatcher(dispatcher);
-
     // main controller
     controller = new Controller(ui);
     controller.init(() => {
       // initial placeholder
+      /*
       if (openPlaceHolderPcId !== "") {
         dispatcher.dispatch(actionFactory.page().editor().componentEdit(
             "PlaceHolder",
@@ -92,7 +94,7 @@ const editor = (function ($, il) {
           openFormCName,
           openFormPcId,
             ""));
-      }
+      }*/
     });
 
   }

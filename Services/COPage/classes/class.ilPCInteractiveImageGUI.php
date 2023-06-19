@@ -84,6 +84,16 @@ class ilPCInteractiveImageGUI extends ilPageContentGUI
                 }
                 break;
 
+            case "ilpageeditorserveradaptergui":
+                $adapter = new ilPageEditorServerAdapterGUI(
+                    $this->page_gui,
+                    $this->ctrl,
+                    $this->ui,
+                    $this->http_request
+                );
+                $this->ctrl->forwardCommand($adapter);
+                break;
+
             case strtolower(ilRepoStandardUploadHandlerGUI::class):
                 $form = $this->getImportFormAdapter();
                 $gui = $form->getRepoStandardUploadHandlerGUI("input_file");

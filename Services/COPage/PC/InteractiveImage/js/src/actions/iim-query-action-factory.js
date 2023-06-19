@@ -37,7 +37,7 @@ export default class IIMQueryActionFactory {
   }
 
   init() {
-    return this.clientActionFactory.query(this.COMPONENT, ACTIONS.INIT);
+    return this.clientActionFactory.query(this.COMPONENT, ACTIONS.Q_INIT);
   }
 
   /*

@@ -89,11 +89,7 @@ export default class UIActionHandler {
    */
   setDispatcher(dispatcher) {
     this.dispatcher = dispatcher;
-    this.pageActionHandler.setDispatcher(dispatcher);
-    this.paragraphActionHandler.setDispatcher(dispatcher);
-    this.mediaActionHandler.setDispatcher(dispatcher);
-    this.tableActionHandler.setDispatcher(dispatcher);
-    this.placeholderActionHandler.setDispatcher(dispatcher);
+    this.iimActionHandler.setDispatcher(dispatcher);
   }
 
   /**
@@ -101,10 +97,6 @@ export default class UIActionHandler {
    * @param {Model} model
    */
   handle(action, model) {
-    this.pageActionHandler.handle(action, model.model("page"));
-    this.paragraphActionHandler.handle(action, model.model("page"));
-    this.mediaActionHandler.handle(action, model.model("page"));
-    this.tableActionHandler.handle(action, model.model("page"), model.model("table"));
-    this.placeholderActionHandler.handle(action, model.model("page"));
+    this.iimActionHandler.handle(action, model.model("page"));
   }
 }

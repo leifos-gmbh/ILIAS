@@ -14,8 +14,8 @@
  *
  *********************************************************************/
 
-import IIMUI from '../iim-ui.js';
-import ActionFactory from '../actions/action-factory';
+import IIMUI from './iim-ui.js';
+import ActionFactory from '../actions/action-factory.js';
 
 /**
  * editor ui
@@ -83,23 +83,23 @@ export default class UI {
    * @param {PageModifer} pageModifer
    */
   constructor(client, dispatcher, actionFactory, model, toolSlate,
-              pageModifer) {
+              /*pageModifer*/) {
     this.uiModel = {};
     this.client = client;
     this.dispatcher = dispatcher;
     this.actionFactory = actionFactory;
     this.model = model;
     this.toolSlate = toolSlate;
-    this.pageModifer = pageModifer;
+    /*this.pageModifer = pageModifer;*/
     this.debug = true;
 
     this.iim = new IIMUI(
       this.client,
       this.dispatcher,
       this.actionFactory,
-      this.model.model("page"),
+      this.model,
       this.toolSlate,
-      this.pageModifer
+      /*this.pageModifer*/
     );
 
     /*
@@ -133,11 +133,12 @@ export default class UI {
   /**
    */
   init(after_init) {
-    const ui_all_action = this.actionFactory.interactiveImage().query().uiAll();
+    const ui_all_action = this.actionFactory.interactiveImage().query().init();
     this.client.sendQuery(ui_all_action).then(result => {
 
       const p = result.getPayload();
-
+      console.log("INIT PAYLOAD");
+      console.log(p);
       /*
       this.uiModel = result.getPayload();
 

@@ -15,11 +15,10 @@
  *********************************************************************/
 
 import IIMEditorActionFactory from './iim-editor-action-factory.js';
+import IIMQueryActionFactory from './iim-query-action-factory.js';
 import IIMCommandActionFactory from './iim-command-action-factory.js';
 import ClientActionFactory from '../../../../../Editor/js/src/client/actions/client-action-factory.js';
 import EditorActionFactory from '../../../../../Editor/js/src/actions/editor-action-factory.js';
-import PageQueryActionFactory
-  from '../../../../../Editor/js/src/components/page/actions/page-query-action-factory';
 
 /**
  * action factory for calling the server
@@ -43,7 +42,7 @@ export default class IIMActionFactory {
   }
 
   /**
-   * @returns {PageQueryActionFactory}
+   * @returns {IIMQueryActionFactory}
    */
   query() {
     return new IIMQueryActionFactory(this.clientActionFactory);

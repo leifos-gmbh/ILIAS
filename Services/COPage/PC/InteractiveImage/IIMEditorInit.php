@@ -70,7 +70,7 @@ class IIMEditorInit
         $ctrl = $this->ctrl;
 
         $p1 = $this->sanitizeAttribute(
-            ILIAS_HTTP_PATH . "/" . $ctrl->getLinkTargetByClass(["ilPCInteractiveImageGUI", "ilIIMEditorServerAdapterGUI"], "invokeServer")
+            ILIAS_HTTP_PATH . "/" . $ctrl->getLinkTargetByClass(["ilPageEditorGUI", "ilPageEditorServerAdapterGUI"], "invokeServer")
         );
         $p2 = $this->sanitizeAttribute($ctrl->getFormActionByClass("ilPCInteractiveImageGUI"));
 

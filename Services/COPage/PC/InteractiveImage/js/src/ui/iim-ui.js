@@ -1,6 +1,3 @@
-import ACTIONS from "../actions/placeholder-action-types.js";
-import PAGE_ACTIONS from "../../page/actions/page-action-types.js";
-
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -16,6 +13,8 @@ import PAGE_ACTIONS from "../../page/actions/page-action-types.js";
  * https://github.com/ILIAS-eLearning
  *
  *********************************************************************/
+
+import ACTIONS from "../actions/iim-action-types.js";
 
 /**
  * interactive image ui
@@ -81,7 +80,6 @@ export default class UI {
     this.actionFactory = actionFactory;
     this.iim_model = iim_model;
     this.toolSlate = toolSlate;
-    this.pageModifier = pageModifier;   // todo: replace
     this.uiModel = {};
   }
 

@@ -575,9 +575,11 @@ class ilPCInteractiveImage extends ilPageContent
 
     public function getIIMModel(): ?stdClass
     {
+        $alias_item = $this->getStandardAliasItem();
         $model = new \stdClass();
         $model->triggers = $this->getTriggers();
         $model->popups = $this->getPopups();
+        $model->media_item = $alias_item->getModel();
         return $model;
     }
 

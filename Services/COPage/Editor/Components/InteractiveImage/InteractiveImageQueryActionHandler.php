@@ -72,8 +72,9 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
         ]);
         $r = $this->ui->renderer();
         $o = new \stdClass();
-        $o->dropdown = $r->render($dd);
-        $o->iim_model = $this->getIIMModel();
+        $o->uiModel = new \stdClass();
+        $o->uiModel->dropdown = $r->render($dd);
+        $o->iimModel = $this->getIIMModel();
         /*
         $o->errorMessage = $this->getErrorMessage();
         $o->errorModalMessage = $this->getErrorModalMessage();

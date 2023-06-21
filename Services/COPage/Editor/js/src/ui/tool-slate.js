@@ -14,6 +14,8 @@
  *
  *********************************************************************/
 
+import Util from './util.js';
+
 /**
  * Editor tool slate
  */
@@ -29,6 +31,7 @@ export default class ToolSlate {
   constructor() {
     this.content_id = "copg-editor-slate-content";
     this.error_id = "copg-editor-slate-error";
+    this.util = new Util();
   }
 
   /**
@@ -43,30 +46,11 @@ export default class ToolSlate {
    */
   setContent(html) {
     const slateEl = document.getElementById('copg-editor-slate-content');
-    this.setInnerHTML(slateEl, html);
+    this.util.setInnerHTML(slateEl, html);
     $('body').trigger('il-copg-editor-slate');
     // this fixes #30378
     il.Form.registerFileUploadInputEventTrigger('#copg-editor-slate-content ');
   }
-
-  setInnerHTML(el, html) {
-    el.innerHTML = html;
-
-    Array.from(el.querySelectorAll("script"))
-    .forEach( oldScriptEl => {
-      const newScriptEl = document.createElement("script");
-
-      Array.from(oldScriptEl.attributes).forEach( attr => {
-        newScriptEl.setAttribute(attr.name, attr.value)
-      });
-
-      const scriptText = document.createTextNode(oldScriptEl.innerHTML);
-      newScriptEl.appendChild(scriptText);
-
-      oldScriptEl.parentNode.replaceChild(newScriptEl, oldScriptEl);
-    });
-  }
-
 
   /**
    * @param {string} component

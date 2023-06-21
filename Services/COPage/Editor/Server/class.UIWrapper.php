@@ -70,11 +70,14 @@ class UIWrapper
         return $b;
     }
 
-    public function getRenderedInfoBox(string $text): string
+    public function getRenderedInfoBox(string $text, array $buttons = []): string
     {
         $ui = $this->ui;
         $f = $ui->factory();
         $m = $f->messageBox()->info($text);
+        if (count($buttons)) {
+            $m = $m->withButtons($buttons);
+        }
         return $ui->renderer()->renderAsync($m);
     }
 

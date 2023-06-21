@@ -37,6 +37,11 @@ const editor = (function ($, il) {
   let controller;
 
   /**
+   * @type {Model}
+   */
+  let iimModel;
+
+  /**
    * @param {string} endpoint
    * @param {string} form_action
    */
@@ -57,10 +62,10 @@ const editor = (function ($, il) {
     const client = new Client(endpoint, endpoint, form_action, responseFactory);
 
     // model
-    const model = new Model();
+    this.iimModel = new Model();
 
     // action handler and dispatcher
-    const modelActionHandler = new ModelActionHandler(model);
+    const modelActionHandler = new ModelActionHandler(this.iimModel);
     const uiActionHandler = new UIActionHandler(actionFactory, client);
     const dispatcher = new Dispatcher(modelActionHandler, uiActionHandler);
 
@@ -68,7 +73,7 @@ const editor = (function ($, il) {
     const toolSlate = new ToolSlate();
     /* const pageModifier = new PageModifier(toolSlate); */
     //const ui = new UI(client, dispatcher, actionFactory, model, toolSlate, pageModifier);
-    const ui = new UI(client, dispatcher, actionFactory, model, toolSlate);
+    const ui = new UI(client, dispatcher, actionFactory, this.iimModel, toolSlate);
 
     client.setDefaultErrorHandler((error) => {
       console.log("ERROR: ");

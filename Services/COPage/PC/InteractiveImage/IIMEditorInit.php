@@ -51,9 +51,8 @@ class IIMEditorInit
         }
 
         // ensure that form.js is loaded which is needed for file input (js that shows file names)
-        /*
         $dummy = new \ilPropertyFormGUI();
-        $dummy->getHTML();*/
+        $dummy->getHTML();
         // ensure modal.js from ui framework is loaded
         /*$this->ui->renderer()->render(
             $this->ui->factory()->modal()->roundtrip("", $this->ui->factory()->legacy(""))
@@ -78,7 +77,7 @@ class IIMEditorInit
 <span id='il-copg-iim-init'
 	data-endpoint='$p1'
 	data-formaction='$p2'
-></span>
+></span><div id='il-copg-iim-main'></div>
 EOT;
 
         $module_tag = <<<EOT

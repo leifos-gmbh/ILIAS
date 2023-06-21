@@ -15,6 +15,8 @@
  *********************************************************************/
 
 import ACTIONS from "../actions/iim-action-types.js";
+import Util from "../../../../../Editor/js/src/ui/util.js";
+import ShapeEditor from "../shape-edit/shape-editor.js";
 
 /**
  * interactive image ui
@@ -73,14 +75,16 @@ export default class UI {
    * @param {ToolSlate} toolSlate
    * @param {PageModifier} pageModifier
    */
-  constructor(client, dispatcher, actionFactory, iim_model, toolSlate, pageModifier) {
+  constructor(client, dispatcher, actionFactory, iimModel, uiModel, toolSlate) {
     this.debug = true;
     this.client = client;
     this.dispatcher = dispatcher;
     this.actionFactory = actionFactory;
-    this.iim_model = iim_model;
+    this.iim_model = iimModel;
     this.toolSlate = toolSlate;
-    this.uiModel = {};
+    this.uiModel = uiModel;
+    this.util = new Util();
+    this.shapeEditor = null;
   }
 
   //
@@ -105,11 +109,43 @@ export default class UI {
 
     this.uiModel = uiModel;
     let t = this;
+    this.showMainScreen();
   }
 
   /**
    */
   reInit() {
+  }
+
+  showMainScreen() {
+    this.toolSlate.setContent(this.uiModel.mainSlate);
+    this.setMainContent(this.uiModel.backgroundImage);
+    this.initShapeEditor();
+    //this.initTopActions();
+  }
+
+  initShapeEditor() {
+    const el = document.getElementById('il-copg-iim-main');
+    const mob = el.querySelector(".ilc_Mob");
+    console.log("initShapeEditor");
+    if (mob) {
+      this.shapeEditor = new ShapeEditor(mob);
+      const ed = this.shapeEditor;
+      ed.addShape(ed.factory.rect(10,10, 200, 200));
+      ed.addShape(ed.factory.circle(210,210, 230,230));
+      const p = ed.factory.poly();
+      p.addHandle(ed.factory.handle(20,20));
+      p.addHandle(ed.factory.handle(30,200));
+      p.addHandle(ed.factory.handle(110,70));
+      p.addHandle(ed.factory.handle(60,30));
+      ed.addShape(p);
+      ed.repaint();
+    }
+  }
+
+  setMainContent(html) {
+    const el = document.getElementById('il-copg-iim-main');
+    this.util.setInnerHTML(el, html);
   }
 
   /*

@@ -754,7 +754,7 @@ class ilImageMapEditorGUI
                         $int_link = $this->map->getInternalLink();
                         $area->setType($int_link["type"]);
                         $area->setTarget($int_link["target"]);
-                        $area->setTargetFrame($int_link["type_frame"]);
+                        $area->setTargetFrame($int_link["type_frame"] ?? "");
                         break;
                 }
 

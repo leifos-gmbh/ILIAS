@@ -82,13 +82,13 @@ export default class UI {
    * @param {ToolSlate} toolSlate
    * @param {PageModifer} pageModifer
    */
-  constructor(client, dispatcher, actionFactory, model, toolSlate,
+  constructor(client, dispatcher, actionFactory, iimModel, toolSlate,
               /*pageModifer*/) {
     this.uiModel = {};
     this.client = client;
     this.dispatcher = dispatcher;
     this.actionFactory = actionFactory;
-    this.model = model;
+    this.iimModel = iimModel;
     this.toolSlate = toolSlate;
     /*this.pageModifer = pageModifer;*/
     this.debug = true;
@@ -97,9 +97,9 @@ export default class UI {
       this.client,
       this.dispatcher,
       this.actionFactory,
-      this.model,
-      this.toolSlate,
-      /*this.pageModifer*/
+      iimModel,
+      this.uiModel,
+      this.toolSlate
     );
 
     /*
@@ -139,6 +139,9 @@ export default class UI {
       const p = result.getPayload();
       console.log("INIT PAYLOAD");
       console.log(p);
+      this.iimModel = p.iimModel;
+      this.uiModel = p.uiModel;
+      this.iim.init(this.uiModel);
       /*
       this.uiModel = result.getPayload();
 

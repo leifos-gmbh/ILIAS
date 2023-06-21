@@ -74,6 +74,9 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
         $o = new \stdClass();
         $o->uiModel = new \stdClass();
         $o->uiModel->dropdown = $r->render($dd);
+        $o->uiModel->mainSlate = $this->getMainSlate();
+        $o->uiModel->backgroundImage = $this->getBackgroundImage();
+
         $o->iimModel = $this->getIIMModel();
         /*
         $o->errorMessage = $this->getErrorMessage();
@@ -102,89 +105,119 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
         return null;
     }
 
-    protected function componentEditFormResponse(array $query): Server\Response
+
+    public function getMainSlate(): string
     {
-        $pc_edit = \ilCOPagePCDef::getPCEditorInstanceByName($query["cname"]);
-        $form = "";
-        if (!is_null($pc_edit)) {
-            $form = $pc_edit->getEditComponentForm(
-                $this->ui_wrapper,
-                $this->page_gui->getPageObject()->getParentType(),
-                $this->page_gui,
-                $this->page_gui->getStyleId(),
-                $query["pcid"]
-            );
+        $lng = $this->lng;
+
+        $tpl = new \ilTemplate("tpl.main_slate.html", true, true, "Services/COPage/PC/InteractiveImage");
+        $tpl->setVariable("TITLE", $lng->txt("cont_iim_edit"));
+        $tpl->setVariable("HEAD_TRIGGER", $lng->txt("cont_iim_trigger"));
+        $tpl->setVariable("HEAD_SETTINGS", $lng->txt("cont_iim_settings"));
+        $tpl->setVariable("HEAD_OVERVIEW", $lng->txt("cont_iim_overview"));
+
+        $tpl->setVariable(
+            "CLOSE_BUTTON",
+            $this->ui_wrapper->getRenderedButton(
+                $lng->txt("cont_iim_finish_editing"),
+                "button",
+                "component.back",
+                null,
+                "InteractiveImage",
+                true
+            )
+        );
+
+        $b = $this->ui_wrapper->getButton(
+            $lng->txt("cont_iim_add_trigger"),
+            "button",
+            "trigger.add"
+        );
+
+        $tpl->setVariable(
+            "MSBOX_TRIGGER",
+            $this->ui_wrapper->getRenderedInfoBox(
+                $lng->txt("cont_iim_add_trigger_text"),
+                [$b]
+            )
+        );
+
+        $tpl->setVariable(
+            "LINK_SETTINGS",
+            $this->ui_wrapper->getRenderedLink(
+                $lng->txt("cont_iim_background_image_and_caption"),
+                "InteractiveImage",
+                "link",
+                "switch.settings",
+                null
+            )
+        );
+
+        $tpl->setVariable(
+            "LINK_OVERLAY",
+            $this->ui_wrapper->getRenderedLink(
+                $lng->txt("cont_iim_overlays"),
+                "InteractiveImage",
+                "link",
+                "switch.overlays",
+                null
+            )
+        );
+
+        $tpl->setVariable(
+            "LINK_POPUPS",
+            $this->ui_wrapper->getRenderedLink(
+                $lng->txt("cont_iim_popups"),
+                "InteractiveImage",
+                "link",
+                "switch.popups",
+                null
+            )
+        );
+
+        return $tpl->get();
+    }
+
+    public function getBackgroundImage(
+    ): string {
+
+        if ($this->pc_id !== "") {
+            /** @var \ilPCInteractiveImage $pc */
+            $pc = $this->page_gui->getPageObject()->getContentObjectForPcId($this->pc_id);
+        } else {
+            return "";
         }
-        $o = new \stdClass();
-        $o->editForm = $form;
-        return new Server\Response($o);
+
+        $mob = $pc->getMediaObject();
+
+        //$ilCtrl = $this->ctrl;
+
+        $st_item = $mob->getMediaItem("Standard");
+
+        // output image map
+        $xml = "<dummy>";
+        $xml .= $mob->getXML(IL_MODE_ALIAS);
+        $xml .= $mob->getXML(IL_MODE_OUTPUT);
+        $xml .= "</dummy>";
+        $xsl = file_get_contents("./Services/COPage/xsl/page.xsl");
+        //echo htmlentities($xml); exit;
+        $args = array( '/_xml' => $xml, '/_xsl' => $xsl );
+        $xh = xslt_create();
+        $wb_path = \ilFileUtils::getWebspaceDir("output") . "/";
+        $mode = "media";
+        //echo htmlentities($ilCtrl->getLinkTarget($this, "showImageMap"));
+
+        $random = new \ilRandom();
+        $params = array(
+                        'media_mode' => 'enable',
+                        'pg_frame' => "",
+                        'enlarge_path' => \ilUtil::getImagePath("enlarge.svg"),
+                        'webspace_path' => $wb_path);
+        $output = xslt_process($xh, "arg:/_xml", "arg:/_xsl", null, $args, $params);
+        xslt_error($xh);
+        xslt_free($xh);
+
+        return $output;
     }
 
-    /**
-     * Get components ui elements
-     */
-    protected function getComponentsEditorUI(): array
-    {
-        $ui = [];
-        $config = $this->page_gui->getPageConfig();
-        foreach (\ilCOPagePCDef::getPCDefinitions() as $def) {
-            $pc_edit = \ilCOPagePCDef::getPCEditorInstanceByName($def["name"]);
-            if ($config->getEnablePCType($def["name"])) {
-                if (!is_null($pc_edit)) {
-                    $ui[$def["name"]] = $pc_edit->getEditorElements(
-                        $this->ui_wrapper,
-                        $this->page_gui->getPageObject()->getParentType(),
-                        $this->page_gui,
-                        $this->page_gui->getStyleId()
-                    );
-                }
-            }
-        }
-        return $ui;
-    }
-
-    protected function getComponentsDefinitions(): array
-    {
-        $pcdef = [];
-        foreach (\ilCOPagePCDef::getPCDefinitions() as $def) {
-            $pcdef["types"][$def["name"]] = $def["pc_type"];
-            $pcdef["names"][$def["pc_type"]] = $def["name"];
-            $pcdef["txt"][$def["pc_type"]] = $this->lng->txt("cont_" . "pc_" . $def["pc_type"]);
-        }
-        return $pcdef;
-    }
-
-    public function getModalTemplate(): array
-    {
-        $ui = $this->ui;
-        $modal = $ui->factory()->modal()->roundtrip('#title#', $ui->factory()->legacy('#content#'))
-                    ->withActionButtons([
-                        $ui->factory()->button()->standard('#button_title#', '#'),
-                    ]);
-        $modalt["signal"] = $modal->getShowSignal()->getId();
-        $modalt["template"] = $ui->renderer()->renderAsync($modal);
-
-        return $modalt;
-    }
-
-    /**
-     * Get confirmation template
-     */
-    public function getConfirmationTemplate(): string
-    {
-        $ui = $this->ui;
-
-        $confirmation = $ui->factory()->messageBox()->confirmation("#text#");
-
-        return $ui->renderer()->renderAsync($confirmation);
-    }
-
-    /**
-     * Get auto save interval
-     */
-    protected function getAutoSaveInterval(): int
-    {
-        $aset = new \ilSetting("adve");
-        return (int) $aset->get("autosave");
-    }
 }

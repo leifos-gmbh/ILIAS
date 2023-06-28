@@ -14,6 +14,8 @@
  *
  *********************************************************************/
 
+import ACTIONS from "../actions/iim-action-types.js";
+
 
 /**
  * Model action handler
@@ -50,8 +52,9 @@ export default class ModelActionHandler {
 
     switch (action.getType()) {
 
-      case "dnd.drag":
-        this.model.setState(this.model.STATE_DRAG_DROP);
+      case ACTIONS.E_ADD_TRIGGER:
+        this.model.addStandardTrigger();
+        this.model.setState(this.model.STATE_TRIGGER_PROPERTIES);
         break;
     }
   }

@@ -139,7 +139,7 @@ export default class UI {
       const p = result.getPayload();
       console.log("INIT PAYLOAD");
       console.log(p);
-      this.iimModel = p.iimModel;
+      this.iimModel.initModel(p.iimModel);
       this.uiModel = p.uiModel;
       this.iim.init(this.uiModel);
       /*

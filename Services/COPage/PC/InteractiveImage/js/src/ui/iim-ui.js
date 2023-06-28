@@ -17,6 +17,7 @@
 import ACTIONS from "../actions/iim-action-types.js";
 import Util from "../../../../../Editor/js/src/ui/util.js";
 import ShapeEditor from "../shape-edit/shape-editor.js";
+import ActionFactory from "../actions/iim-editor-action-factory.js";
 
 /**
  * interactive image ui
@@ -119,10 +120,28 @@ export default class UI {
 
   showMainScreen() {
     this.toolSlate.setContent(this.uiModel.mainSlate);
+    this.initSlateActions();
     this.setMainContent(this.uiModel.backgroundImage);
     this.initShapeEditor();
-    //this.initTopActions();
   }
+
+  initSlateActions() {
+    const dispatch = this.dispatcher;
+    const action = this.actionFactory;
+
+    document.querySelectorAll("[data-copg-ed-type='button']").forEach(button => {
+      const act = button.dataset.copgEdAction;
+      button.addEventListener("click", (event) => {
+        switch (act) {
+          case ACTIONS.E_ADD_TRIGGER:
+            this.log(action);
+            dispatch.dispatch(action.interactiveImage().editor().addTrigger());
+            break;
+        }
+      });
+    });
+  }
+
 
   initShapeEditor() {
     const el = document.getElementById('il-copg-iim-main');
@@ -131,15 +150,15 @@ export default class UI {
     if (mob) {
       this.shapeEditor = new ShapeEditor(mob);
       const ed = this.shapeEditor;
-      ed.addShape(ed.factory.rect(10,10, 200, 200));
-      ed.addShape(ed.factory.circle(210,210, 230,230));
-      const p = ed.factory.poly();
-      p.addHandle(ed.factory.handle(20,20));
-      p.addHandle(ed.factory.handle(30,200));
-      p.addHandle(ed.factory.handle(110,70));
-      p.addHandle(ed.factory.handle(60,30));
-      ed.addShape(p);
-      ed.repaint();
+      //ed.addShape(ed.factory.rect(10,10, 200, 200));
+      //ed.addShape(ed.factory.circle(210,210, 230,230));
+      //const p = ed.factory.poly();
+      //p.addHandle(ed.factory.handle(20,20));
+      //p.addHandle(ed.factory.handle(30,200));
+      //p.addHandle(ed.factory.handle(110,70));
+      //p.addHandle(ed.factory.handle(60,30));
+      //ed.addShape(p);
+      //ed.repaint();
     }
   }
 
@@ -148,11 +167,14 @@ export default class UI {
     this.util.setInnerHTML(el, html);
   }
 
-  /*
-  hidePlaceholder(pcid) {
-    this.pageModifier.hideComponent(pcid);
+  addTrigger() {
+    const trigger = this.iim_model.getCurrentTrigger();
+    this.toolSlate.setContent("Trigger Properties");
+    this.shapeEditor.addShape(trigger.getShape());
+    this.shapeEditor.repaint();
   }
 
+  /*
   showPlaceholder(pcid) {
     this.pageModifier.showComponent(pcid);
   }

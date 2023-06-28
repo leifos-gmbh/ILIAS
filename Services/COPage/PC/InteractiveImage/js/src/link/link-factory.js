@@ -1,3 +1,4 @@
+
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -14,33 +15,24 @@
  *
  *********************************************************************/
 
-import ACTIONS from "./iim-action-types.js";
+import Link from "./link.js";
 
 /**
- * COPage action factory
- *
+ * Link Factory
  */
-export default class IIMEditorActionFactory {
+export default class LinkFactory {
 
-  /**
-   * @type {EditorActionFactory}
-   */
-  //editorActionFactory;
-
-  /**
-   *
-   * @param {EditorActionFactory} editorActionFactory
-   */
-  constructor(editorActionFactory) {
-    this.COMPONENT = "InteractiveImage";
-    this.editorActionFactory = editorActionFactory;
+  constructor() {
   }
 
   /**
-   * @returns {EditorAction}
    */
-  addTrigger() {
-    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_ADD_TRIGGER, {});
+  fromPropertiesObject(o) {
+    return new Link(
+      o.Href,
+      o.LinkType,
+      o.Title
+    );
   }
 
 }

@@ -75,15 +75,13 @@ export default class IIMUIActionHandler {
         const params = action.getParams();
 
         // page actions
-        /*
-        if (action.getComponent() === "Page" && page_model.getCurrentPCName() === "PlaceHolder") {
+        if (action.getComponent() === "InteractiveImage") {
             switch (action.getType()) {
 
-                case PAGE_ACTIONS.COMPONENT_EDIT:
-                    this.handleEditCommand(page_model, params);
+                case ACTIONS.E_ADD_TRIGGER:
+                    this.ui.addTrigger();
                     break;
             }
-        }*/
-
+        }
     }
 }

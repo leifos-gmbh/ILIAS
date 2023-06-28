@@ -131,7 +131,7 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
         $b = $this->ui_wrapper->getButton(
             $lng->txt("cont_iim_add_trigger"),
             "button",
-            "trigger.add"
+            "add.trigger"
         );
 
         $tpl->setVariable(

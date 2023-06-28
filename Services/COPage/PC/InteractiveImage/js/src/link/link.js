@@ -1,3 +1,4 @@
+
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -14,16 +15,29 @@
  *
  *********************************************************************/
 
-const ACTIONS = {
 
-  // query actions (being sent to the server to "ask for stuff")
-  Q_INIT: "init",
+/**
+ * Link
+ */
+export default class Link {
 
-  // command actions (being sent to the server to "change things")
-  C_SAVE_PROPERTIES: "save.properties",
+    /**
+     */
+    constructor(
+      href,
+      type,
+      title
+    ) {
+        this.href = href;
+        this.type = type;
+        this.title = title;
+    }
 
-  // editor actions (things happening in the editor client side)
-  E_ADD_TRIGGER: "add.trigger",
-
-};
-export default ACTIONS;
+    toPropertiesObject() {
+        return {
+            Href: this.href,
+            LinkType: this.type,
+            Title: this.title
+        };
+    }
+}

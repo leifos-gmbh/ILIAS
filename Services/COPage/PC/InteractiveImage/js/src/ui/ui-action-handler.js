@@ -81,7 +81,7 @@ export default class UIActionHandler {
    */
   setUI(ui) {
     this.ui = ui;
-    this.iimActionHandler.setUI(this.ui);
+    this.iimActionHandler.setUI(this.ui.iim);
   }
 
   /**
@@ -97,6 +97,6 @@ export default class UIActionHandler {
    * @param {Model} model
    */
   handle(action, model) {
-    this.iimActionHandler.handle(action, model.model("page"));
+    this.iimActionHandler.handle(action, model);
   }
 }

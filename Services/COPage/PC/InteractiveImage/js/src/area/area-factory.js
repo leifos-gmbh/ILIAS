@@ -1,3 +1,4 @@
+
 /**
  * This file is part of ILIAS, a powerful learning management system
  * published by ILIAS open source e-Learning e.V.
@@ -14,33 +15,45 @@
  *
  *********************************************************************/
 
-import ACTIONS from "./iim-action-types.js";
+import Area from "./area.js";
 
 /**
- * COPage action factory
- *
+ * Shape
  */
-export default class IIMEditorActionFactory {
+export default class AreaFactory {
 
-  /**
-   * @type {EditorActionFactory}
-   */
-  //editorActionFactory;
+  constructor() {
+  }
 
-  /**
-   *
-   * @param {EditorActionFactory} editorActionFactory
-   */
-  constructor(editorActionFactory) {
-    this.COMPONENT = "InteractiveImage";
-    this.editorActionFactory = editorActionFactory;
+  area(
+    shape,
+    coords,
+    hClass = '',
+    hMode= '',
+    id = 0,
+    link = null
+  ) {
+    return new Area(
+      shape,
+      coords,
+      hClass,
+      hMode,
+      id,
+      link
+    );
   }
 
   /**
-   * @returns {EditorAction}
    */
-  addTrigger() {
-    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_ADD_TRIGGER, {});
+  fromPropertiesObject(o, link = null) {
+    return new Area(
+      o.Shape,
+      o.Coords,
+      o.HighlightClass,
+      o.HighlightMode,
+      o.Id,
+      link
+    );
   }
 
 }

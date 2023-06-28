@@ -14,6 +14,9 @@
  *
  *********************************************************************/
 
+import AreaFactory from "../area/area-factory.js";
+import TriggerFactory from "../trigger/trigger-factory.js";
+
 /**
  * Interactive Image Model
  */
@@ -26,13 +29,17 @@ export default class Model {
     this.STATE_TRIGGER_PROPERTIES = "trigger_prop";   // drag drop
 
     this.model = {
-      state: this.STATE_PAGE,
-      selectedItems: new Set(),
+      state: this.STATE_OVERVIEW,
+      areaNr: 0,
+      iim: null,
+      currentTrigger: null
     };
     this.states = [
       this.STATE_OVERVIEW,
       this.STATE_TRIGGER_PROPERTIES,
     ];
+    this.areaFactory = new AreaFactory();
+    this.triggerFactory = new TriggerFactory();
   }
 
   log(message) {
@@ -42,11 +49,18 @@ export default class Model {
   }
 
   /**
+   * Note: area.Id = trigger.Nr
+   */
+  initModel(iimModel) {
+    this.model.iim = iimModel;
+  }
+
+  /**
    * @param {string} state
    */
   setState(state) {
     if (this.states.includes(state)) {
-      this.log("page-model.setState " + state);
+      this.log("model.setState " + state);
       this.model.state = state;
     }
   }
@@ -58,4 +72,27 @@ export default class Model {
     return this.model.state;
   }
 
+  getNextTriggerNr() {
+    let maxNr = 0;
+    this.model.iim.triggers.forEach((a) => {
+      maxNr = Math.max(maxNr, a.Nr);
+    });
+    return maxNr + 1;
+  }
+
+  addStandardTrigger() {
+    const area = this.areaFactory.area(
+      "Rect",
+      "10,10,50,50"
+    );
+    this.model.currentTrigger = this.triggerFactory.trigger(
+      this.getNextTriggerNr(),
+      area
+    );
+    this.log("addStandardTrigger");
+  }
+
+  getCurrentTrigger() {
+    return this.model.currentTrigger;
+  }
 }

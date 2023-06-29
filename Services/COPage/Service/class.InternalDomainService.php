@@ -61,4 +61,12 @@ class InternalDomainService
     {
         return new Dom\DomUtil();
     }
+
+    public function pc(): PC\DomainService
+    {
+        return new PC\DomainService(
+            $this
+        );
+    }
+
 }

@@ -55,8 +55,8 @@ class ilPCInteractiveImageEditorGUI implements PageComponentEditor
         ilLanguage $lng,
         ilPageObjectGUI $page_gui
     ): string {
-        $source_code_gui = new ilPCInteractiveImageGUI($page_gui->getPageObject(), null, "", "");
-        $form = $source_code_gui->getImportFormAdapter();
+        $iim_gui = new ilPCInteractiveImageGUI($page_gui->getPageObject(), null, "", "");
+        $form = $iim_gui->getImportFormAdapter();
         $html = $ui_wrapper->getRenderedAdapterForm(
             $form,
             [["Page", "component.save", $lng->txt("insert")],

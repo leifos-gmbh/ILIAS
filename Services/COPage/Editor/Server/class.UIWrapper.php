@@ -323,4 +323,33 @@ class UIWrapper
         $i = $f->symbol()->icon()->standard($type, $type, 'medium');
         return $r->render($i);
     }
+
+    public function getRenderedListingPanelTemplate(
+        string $title = "",
+        bool $leading_image = false
+    ): string
+    {
+        $ui = $this->ui;
+        $f = $ui->factory();
+        $r = $ui->renderer();
+        $dd = $f->dropdown()->standard([
+            $f->link()->standard("#link-label#", "#")
+        ]);
+
+        $item = $f->item()->standard("#item-title#");
+        if ($leading_image) {
+            $item = $item->withLeadImage(
+                $f->image()->responsive("#img-src#", "#img-alt#")
+            );
+        }
+        $p = $f->panel()->listing()->standard(
+            $title,
+            [$f->item()->group(
+                "",
+                [$item]
+            )]
+        )->withActions($dd);
+
+        return $r->render($p);
+    }
 }

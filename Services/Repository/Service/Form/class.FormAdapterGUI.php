@@ -506,7 +506,10 @@ class FormAdapterGUI
 
         if (is_null($this->form)) {
             $async = ($this->async_mode !== self::ASYNC_NONE);
-            $action = $ctrl->getLinkTargetByClass($this->class_path, $this->cmd, "", $async);
+            $action = "";
+            if (!is_null($this->class_path)) {
+                $action = $ctrl->getLinkTargetByClass($this->class_path, $this->cmd, "", $async);
+            }
             $inputs = [];
             foreach ($this->sections as $sec_key => $section) {
                 if ($sec_key === self::DEFAULT_SECTION) {

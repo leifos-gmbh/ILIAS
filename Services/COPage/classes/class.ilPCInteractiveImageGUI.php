@@ -30,6 +30,7 @@ use ILIAS\FileUpload\Handler\HandlerResult;
  */
 class ilPCInteractiveImageGUI extends ilPageContentGUI
 {
+    protected \ILIAS\COPage\PC\InteractiveImage\IIMManager $iim_manager;
     protected \ILIAS\COPage\PC\InteractiveImage\GUIService $iim_gui;
     protected ilTabsGUI $tabs;
     protected ilToolbarGUI $toolbar;
@@ -49,6 +50,7 @@ class ilPCInteractiveImageGUI extends ilPageContentGUI
         $this->toolbar = $DIC->toolbar();
         parent::__construct($a_pg_obj, $a_content_obj, $a_hier_id, $a_pc_id);
         $this->iim_gui = $DIC->copage()->internal()->gui()->pc()->interactiveImage();
+        $this->iim_manager = $DIC->copage()->internal()->domain()->pc()->interactiveImage();
     }
 
     public function executeCommand(): void
@@ -706,46 +708,7 @@ class ilPCInteractiveImageGUI extends ilPageContentGUI
         FileUpload $upload,
         UploadResult $result
     ): BasicHandlerResult {
-        $title = $result->getName();
-
-        $mob = new ilObjMediaObject();
-        $mob->setTitle($title);
-        $mob->setDescription("");
-        $mob->create();
-
-        $mob->createDirectory();
-        $media_item = new ilMediaItem();
-        $mob->addMediaItem($media_item);
-        $media_item->setPurpose("Standard");
-
-        $mob_dir = ilObjMediaObject::_getRelativeDirectory($mob->getId());
-        $file_name = ilObjMediaObject::fixFilename($title);
-        $file = $mob_dir . "/" . $file_name;
-
-        $upload->moveOneFileTo(
-            $result,
-            $mob_dir,
-            Location::WEB,
-            $file_name,
-            true
-        );
-
-        // get mime type
-        $format = ilObjMediaObject::getMimeType($file);
-        $location = $file_name;
-
-        // set real meta and object data
-        $media_item->setFormat($format);
-        $media_item->setLocation($location);
-        $media_item->setLocationType("LocalFile");
-        $mob->update();
-
-        return new BasicHandlerResult(
-            "mob_id",
-            HandlerResult::STATUS_OK,
-            (string) $mob->getId(),
-            ''
-        );
+        return $this->iim_manager->handleUploadResult($upload, $result);
     }
 
     public function editor() : void
@@ -761,6 +724,5 @@ class ilPCInteractiveImageGUI extends ilPageContentGUI
         $this->setEditorToolContext();
         $this->iim_gui->editorInit()->initUI($this->tpl);
     }
-
 
 }

@@ -285,7 +285,8 @@ class ilCourseMembershipGUI extends ilMembershipGUI
             $this->getParentObject(),
             $show_tracking,
             $timings_enabled,
-            $this->getParentObject()->getStatusDetermination() == ilObjCourse::STATUS_DETERMINATION_LP
+            $this->getParentObject()->getStatusDetermination() == ilObjCourse::STATUS_DETERMINATION_LP,
+            null
         );
     }
 

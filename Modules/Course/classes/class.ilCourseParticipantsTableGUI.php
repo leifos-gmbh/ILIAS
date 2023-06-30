@@ -33,18 +33,32 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
      * @param bool $a_show_lp_status_sync
      * @param ilCertificateUserForObjectPreloader|null $preloader
      */
+	// cdpatch: added plugin
     public function __construct(
         $a_parent_obj,
         ilObject $rep_object,
         $a_show_learning_progress = false,
         $a_show_timings = false,
         $a_show_lp_status_sync = false,
-        ilCertificateUserForObjectPreloader $preloader = null
-    ) {
+        ilCertificateUserForObjectPreloader $preloader = null,
+        $a_plugin = null)
+    {
         global $DIC;
 
         $lng = $DIC['lng'];
         $ilCtrl = $DIC['ilCtrl'];
+
+        // cdpatch start
+        global $ilPluginAdmin;
+        $this->pl = null;
+        $pl_names = $ilPluginAdmin->getActivePluginsForSlot(IL_COMP_SERVICE, "UIComponent", "uihk");
+        foreach ($pl_names as $pl) {
+            if ($pl == "CD") {
+                // course type information
+                $this->pl = ilPluginAdmin::getPluginObject(IL_COMP_SERVICE, "UIComponent", "uihk", $pl);
+            }
+        }
+        // cdpatch end
 
         $this->show_learning_progress = $a_show_learning_progress;
         if ($this->show_learning_progress) {
@@ -91,20 +105,30 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
 
         $this->setFormName('participants');
 
-        $this->addColumn('', 'f', '1', true);
-        $this->addColumn($this->lng->txt('name'), 'name', '20%');
-        
+        // cdpatch start
+        $this->addColumn('', 'f', "1");
+        $this->addColumn($this->lng->txt('name'), 'name', '10%');
+        // cdpatch end
+
         $all_cols = $this->getSelectableColumns();
         foreach ($this->getSelectedColumns() as $col) {
             $this->addColumn($all_cols[$col]['txt'], $col);
         }
 
-        if ($this->show_learning_progress) {
-            $this->addColumn($this->lng->txt('learning_progress'), 'progress');
+        // cdpatch: evaluations instead of learning progress
+        //if ($this->show_learning_progress) {
+        if (true) {
+            if (is_object($this->pl)) {
+                $this->pl->includeClass("class.cdParticipantEvaluation.php");
+                // cdpatch
+                $this->addColumn($this->pl->txt('evaluations'));
+            }
+            //$this->addColumn($this->lng->txt('learning_progress'), 'progress');
         }
 
         if ($this->privacy->enabledCourseAccessTimes()) {
-            $this->addColumn($this->lng->txt('last_access'), 'access_ut', '16em');
+            // cdpatch (next line)
+            $this->addColumn($this->lng->txt('last_access'), 'access_ut', '5%');
         }
         
         $this->addColumn($this->lng->txt('crs_member_passed'), 'passed');
@@ -264,7 +288,16 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
         if ($this->privacy->enabledCourseAccessTimes()) {
             $this->tpl->setVariable('VAL_ACCESS', $a_set['access_time']);
         }
-        if ($this->show_learning_progress) {
+        // cdpatch:  eval instead of lp
+        //if ($this->show_learning_progress) {
+        if (is_object($this->pl)) {
+            $this->tpl->setCurrentBlock('eval');
+            $this->tpl->setVariable("EVAL_NUM",
+                (int) cdParticipantEvaluation::countEvals($a_set["usr_id"],
+					$this->rep_object->getId()));
+            $this->tpl->parseCurrentBlock();
+
+            /*
             $this->tpl->setCurrentBlock('lp');
             $icons = ilLPStatusIcons::getInstance(ilLPStatusIcons::ICON_VARIANT_LONG);
             $icon_rendered = $icons->renderIconForStatus($icons->lookupNumStatus($a_set['progress']));
@@ -273,6 +306,7 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
             $this->tpl->setVariable('LP_STATUS_ICON', $icon_rendered);
 
             $this->tpl->parseCurrentBlock();
+            */
         }
         
         $this->tpl->setVariable('VAL_POSTNAME', 'participants');
@@ -330,6 +364,14 @@ class ilCourseParticipantsTableGUI extends ilParticipantTableGUI
             $this->tpl->setVariable('LINK_TXT', $this->lng->txt('download_certificate'));
             $this->tpl->parseCurrentBlock();
         }
+        // cdpatch begin
+        $this->tpl->setCurrentBlock('link');
+        $this->ctrl->setParameterByClass("cdparticipantevaluationgui", "member_id", $a_set["usr_id"]);
+        $this->tpl->setVariable('LINK_NAME', $this->ctrl->getLinkTargetByClass(array('ilcduihookgui', 'cdparticipantevaluationgui'), ''));
+        $this->tpl->setVariable('LINK_TXT', $this->lng->txt('edit_evaluations'));
+        $this->tpl->parseCurrentBlock();
+        // cdpatch end
+
         $this->ctrl->clearParameters($this->parent_obj);
 
         if ($this->show_timings) {

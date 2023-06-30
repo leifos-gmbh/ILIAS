@@ -580,7 +580,9 @@ class assLongMenuGUI extends assQuestionGUI implements ilGuiQuestionScoringAdjus
             $tpl->parseCurrentBlock();
         } else {
             $tpl->setVariable("PLEASE_SELECT", $this->lng->txt("please_select"));
-            foreach ($answers as $value) {
+            // cdpatch-start smeyer array cast
+            foreach ((array) $answers as $value) {
+                // cdpatch-end
                 $tpl->setCurrentBlock('select_option');
                 $tpl->setVariable('VALUE', $value);
                 if ($value == $user_value) {

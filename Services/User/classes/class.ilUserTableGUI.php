@@ -187,6 +187,10 @@ class ilUserTableGUI extends ilTable2GUI
         $up->skipGroup("interests");
         $up->skipGroup("settings");
 
+        // cdpatch start
+        $up->skipField("company_password");
+        // cdpatch end
+
         // default fields
         $cols = array();
 

@@ -22,6 +22,10 @@ class ilAccountRegistrationMail extends \ilMimeMailNotification
     /** @var int */
     private $mode = self::MODE_DIRECT_REGISTRATION;
 
+    // cdpatch start
+    protected $bcc = "";
+    // cdpatch end
+
     /**
      * ilAccountRegistrationMail constructor.
      * @param ilRegistrationSettings $settings
@@ -205,6 +209,13 @@ class ilAccountRegistrationMail extends \ilMimeMailNotification
 
         $this->initMimeMail();
 
+        // cdpatch start
+        if ($this->bcc != "") {
+            $this->mime_mail->Bcc($this->bcc);
+        }
+        // cdpatch end
+
+
         $this->initLanguageByIso2Code($user->getLanguage());
 
         $this->setSubject($this->language->txt('reg_mail_subject'));
@@ -253,9 +264,13 @@ class ilAccountRegistrationMail extends \ilMimeMailNotification
      * @param ilObjUser $user
      * @param string    $rawPassword
      * @param bool      $usedRegistrationCode
+     * cdpatch: added $bcc
      */
-    public function send(ilObjUser $user, $rawPassword = '', $usedRegistrationCode = false)
+    public function send(ilObjUser $user, $rawPassword = '', $usedRegistrationCode = false, $bcc = "")
     {
+        // cdpatch start
+        $this->bcc = $bcc;
+        // cdpatch end
         if (!$this->trySendingUserDefinedAccountMail($user, $rawPassword)) {
             $this->sendLanguageVariableBasedAccountMail($user, $rawPassword, $usedRegistrationCode);
         }

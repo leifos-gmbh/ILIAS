@@ -1,0 +1,229 @@
+//
+// English Language File for CD Plugin
+//
+
+<!-- language file start -->
+companyname#:#Company Name
+manage_center#:#Manage Centers
+centers#:#Centers
+title#:#Title
+actions#:#Actions
+add_center#:#Add Center
+center#:#Center
+edit_center#:#Edit Center
+sure_delete_center#:#Are you sure you want to delete the following centers?
+companies#:#Companies
+add_company#:#Add Company
+edit_company#:#Edit Company
+city#:#City
+street#:#Street
+postal_code#:#Postal Code
+country#:#Country
+po_box#:#Post Office Box
+fax#:#Fax
+contact_firstname#:#Contact Firstname
+contact_lastname#:#Contact Lastname
+contact_tel#:#Contact Telephone
+sure_delete_company#:#Are you sure you want to delete the following companies?
+company_password#:#Code
+password_already_exists#:#This password is already in use for another company.
+company_password_does_not_exist#:#The password you have entered does not exists.
+nr_users#:#Number of Users
+user_type#:#User Type
+employee#:#Employee
+customer#:#Customer
+standard_user#:#Standard User
+company#:#Company
+list_users#:#List Users
+needs_analysis#:#Needs Analysis
+needs_analysis_reiter#:#Your Analysis
+self_evaluation#:#Self Evaluation
+entry_level_test#:#Entry Level Test
+course_lang_q#:#For a language course in language
+course_lang#:#Course Language
+other_languages_q#:#What other languages do you speak?
+other_lang_free_q#:#Additional Languages
+last_course_q#:#When did you participate in a course of the choosen language the last time?
+lang_level_q#:#What level did you achieve in the course?
+present_projects#:#Present Projects
+conduct_negotiations#:#Conduct Negotiations
+participate_in_meetings#:#Participate in Meetings
+make_phone_calls#:#Make Phone Calls
+typewriting#:#Typewriting
+describe_processes#:#Describe Processes
+accompany_visitors#:#Accompany Visitors
+purchase_talk#:#Purchase Talk
+sales_talk#:#Sales Talk
+socializing#:#Socializing
+write_faxes_or_memos#:#Write Faxes or Memos
+write_letters_or_emails#:#Write Letters or E-Mails
+write_reports#:#Write Reports
+read_technical_specialized_text#:#Read Technical Specialized Text
+read_reports#:#Read Reports
+read_financial_documents#:#Read Financial Documents
+law#:#Law
+it#:#IT
+technology#:#Technology
+finance#:#Finance
+medicin#:#Medicin
+human_resources#:#Human Resources
+marketing_and_sales#:#Marketing and Sales
+management#:#Management
+freq_0#:#Never
+freq_1#:#Daily
+freq_2#:#Frequently
+freq_3#:#Rarely
+technical_language#:#Technical Language
+other_technical_language#:#Other Technical Language
+which_situations_q#:#Which of the following situations will appear in your future professional life in the choosen language?
+talk_and_understand#:#Talking and Understanding
+write_and_read#:#Writing and Reading
+technical_language_q#:#Do you need a technical language in your profession?
+your_recent_needs_analyses#:#Your recent Needs Analysis.
+created_on#:#Created On
+last_update#:#Last Change
+add_needs_analysis#:#Add Needs Analysis
+edit_needs_analysis#:#Edit Needs Analysis
+center_category#:#Center Category
+other_languages#:#Other Languages
+last_course#:#Last Course Participation in Choosen Language
+lang_level#:#Level of Achievement
+which_situations#:#Situations in Future Professional Life
+technical_language#:#Technical Language in Professional Life
+learn_data#:#Learning Data
+add_entry_level_test#:#New Entry Level Test
+your_recent_language_tests#:#Your Recent Language Tests
+points#:#Points
+achieved_level#:#Achieved Level
+sure_delete_entry_level_test#:#Do you really want to delete this tests?
+grammar#:#Grammar
+voca#:#Vocabulary
+read#:#Reading
+listen#:#Listening
+finished#:#Finished
+yes#:#Yes
+no#:#No
+language#:#Language
+duration#:#Duration
+test_in#:#In %s
+option_never#:#Never
+option_none#:#---
+internet#:#Internet
+add_user#:#Add User
+really_delete_users#:#Do you really want to delete these users?
+users_have_been_deleted#:#The selected users have been deleted
+added_user#:#The user account has been created.
+participants#:#Participants
+next_step#:#Next Step
+previous_step#:#Previous Step
+step#:#Step
+finish_needs_analysis#:#Finish Needs Analysis
+sure_delete_needs_analysis#:#Are you sure, that the following needs analyses should be deleted?
+online#:#Online
+avg_self#:#ØSelf
+mother_tongue#:#Mother T
+train_lang#:#Train Lang
+oral#:#Oral
+target#:#Target
+type_of_training#:#Type of Training
+tech_lang#:#TechnLang
+company_title#:#Company Name
+not_possible_to_create_user#:#It is currently not possible to add users for this center. Please create a center category first and for this category add a role named "Kunde".
+oral_target#:#Oral/Target/Course Type
+export_excel#:#Export (Excel)
+manage_course_types#:#Manage Course Types
+add_course_type#:#Add Course Type
+course_types#:#Course Types
+edit_course_type#:#Edit Course Type
+sure_delete_course_type#:#Do you really want to delete the following course types?
+course_type#:#Course Type
+parent_company#:#Parent Company
+freq_#:#No Input
+pointscdc#:#Points Test
+datumtest#:#Last Test
+company_title_amendment#:#Company Title Amendment
+company_address_amendment#:#Address Amendment
+creation_user#:#Created by
+participation_confirmation#:#Participation Confirmation
+generate_part_confirmation#:#Generate Participation Confirmation
+course_from#:#Participation from
+course_until#:#Participation until
+date#:#Date
+name_signature#:#Signature Name
+add_confirmation_template#:#Add Tempalte
+confirmation_templates#:#Participation Confirmation Tempaltes
+new_confirmation_template#:#New Template
+sure_delete_confirmations#:#Do you really want to delete the following templates?
+confirmations_deleted#:#The templates have been deleted.
+tab_addon#:#e-Learning
+addon_info#:#Willkommen zu unserem e-Learning Angebot.
+addon_start#:#Start
+function#:#Funktion
+participant_evaluation#:#Participant Evaluation
+participant#:#Participant
+trainer#:#Trainer
+course_level#:#Course Level
+after_x_lessons#:#Assessment after _ lessons
+starting_cef#:#Starting CEF Level
+current_cef#:#Current CEF Level
+starting_cef#:#Starting CEF Level
+skills#:#Skills
+listening#:#Listening
+speaking#:#Speaking
+reading#:#Reading
+language_fluency#:#Language Fluency
+writing#:#Writing
+business_communication#:#Business Communication
+needs_work#:#Needs Work
+satisfactory#:#Satisfactory
+good#:#Good
+very_good#:#Very Good
+excellent#:#Excellent
+participant_evaluations#:#Participant Evaluations
+add_participant_evaluation#:#Add Evaluation
+test_i_f_exam#:#Test (interims/final exam)
+result#:#Result
+test_attendance#:#Test Attendance
+recommendation#:#Recommendation
+stay_in_group#:#Should stay in group
+recommended_level#:#Recommended Level
+evaluation_list#:#Evaluation List
+evaluations#:#Evaluations
+evaluation_notifications#:#Pending Evaluations
+test_level#:#Test Level
+mid_of_course#:#Middle of Course
+end_of_course#:#End of Course
+na_max_elements#:#Please select a maximum of %s items.
+export_evaluations#:#Export Evaluations
+creation#:#Creation
+last_update#:#Last Update
+evaluations_course#:#Evaluations
+course_nr#:#Number
+cd_config#:#CD Configuration
+material_ref_id#:#Ref ID of Material Category
+material#:#Materials
+cdusername#:#Ersteller
+insurances#:#Versicherungen
+trainers#:#Trainer
+sure_delete_pe_evaluation#:#Wollen Sie wirklich die folgenden Beurteilungen von %1 löschen?
+change_company#:#Change Company
+new_company#:#Neue Firma
+sure_to_change_company#:#Sollen die Personen wirklich einen neuen Firma zugeordnet werden?
+learning_progress#:#Learning Progress
+part_eval_overview#:#Lernfortschrittsübersicht
+after_x_lessons_short#:#Stunden
+course#:#Kurs
+business_communication_short#:#Gesch.-Komm.
+published#:#Freigegeben
+publish#:#Zur Einsicht durch Lerner freigeben
+unpublish#:#Freigabe aufheben
+add_ot_entry#:#Add Entry
+sure_delete_ot#:#Sollen diese Einträge wirklich gelöscht werden?
+daf_how_long_german#:#How long have you been studying German? Where and when did you learn German? Which textbooks did you use?
+daf_why_learn_german#:#Why do you want to learn German (now)?
+daf_wishes_course#:#What are your wishes and goals regarding the language course?
+daf_stay_germany#:#Have you ever been to Germany before? Where? When? For how long?
+daf_hobbies#:#What do you like to do in your leisure time? Which hobbies do you have?
+daf_free_time#:#What leisure time activities would you like to do while doing your language course?
+learning_studio#:#Lernstudio
+open_learning_studio#:#Lernstudio öffnen

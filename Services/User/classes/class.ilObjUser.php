@@ -391,6 +391,12 @@ class ilObjUser extends ilObject
         $this->setPasswordEncodingType($a_data['passwd_enc_type']);
         $this->setPasswordSalt($a_data['passwd_salt']);
 
+        // cdpatch start
+        $this->setFieldOfResponsibility($a_data["field_of_responsibility"]);
+        $this->setBranch($a_data["branch"]);
+        $this->setProfession($a_data["profession"]);
+        // cdpatch end
+
         // other data
         $this->setLatitude($a_data["latitude"]);
         $this->setLongitude($a_data["longitude"]);
@@ -424,6 +430,15 @@ class ilObjUser extends ilObject
         $this->setExternalAccount($a_data['ext_account']);
         
         $this->setIsSelfRegistered((bool) $a_data['is_self_registered']);
+
+        // cdpatch start
+        $this->setCompanyId((int) $a_data['company_id']);
+        $this->setCenterId((int) $a_data['center_id']);
+        $this->setBranch($a_data['branch']);
+        $this->setProfession($a_data['profession']);
+        $this->setFieldOfResponsibility($a_data['field_of_responsibility']);
+        $this->setPasswordAddon($a_data['password_addon']);
+        // cdpatch end
     }
 
     /**
@@ -525,6 +540,16 @@ class ilObjUser extends ilObject
             'inactivation_date' => array('timestamp', $this->inactivation_date),
             'is_self_registered' => array('integer', (int) $this->is_self_registered),
             );
+
+        // cdpatch start
+        $insert_array["company_id"] = array("integer", (int) $this->getCompanyId());
+        $insert_array["center_id"] = array("integer", (int) $this->getCenterId());
+        $insert_array["branch"] = array("text", $this->getBranch());
+        $insert_array["profession"] = array("text", $this->getProfession());
+        $insert_array["field_of_responsibility"] = array("text", $this->getFieldOfResponsibility());
+        $insert_array["password_addon"] = array("text", $this->getPasswordAddon());
+        // cdpatch end
+
         $ilDB->insert("usr_data", $insert_array);
 
         $this->updateMultiTextFields(true);
@@ -619,6 +644,14 @@ class ilObjUser extends ilObject
             );
             
         if ($this->agree_date === null || (is_string($this->agree_date) && strtotime($this->agree_date) !== false)) {
+            // cdpatch start
+            $update_array["company_id"] = array("integer", (int) $this->getCompanyId());
+            $update_array["center_id"] = array("integer", (int) $this->getCenterId());
+            $update_array["branch"] = array("text", $this->getBranch());
+            $update_array["profession"] = array("text", $this->getProfession());
+            $update_array["field_of_responsibility"] = array("text", $this->getFieldOfResponsibility());
+            $update_array["password_addon"] = array("text", $this->getPasswordAddon());
+            // cdpatch end
             $update_array["agree_date"] = array("timestamp", $this->agree_date);
         }
         switch ($this->passwd_type) {
@@ -2398,6 +2431,126 @@ class ilObjUser extends ilObject
         }
         return $this->profile_incomplete;
     }
+
+
+    // cdpatch start
+
+    /**
+     * Set company id
+     * @param string    company id
+     */
+    function setCompanyId($a_val)
+    {
+        $this->company_id = $a_val;
+    }
+
+    /**
+     * Get company id
+     * @return    string    company id
+     */
+    function getCompanyId()
+    {
+        return $this->company_id;
+    }
+
+    /**
+     * Lookup company id
+     */
+    static function _lookupCompanyId($a_user_id)
+    {
+        return ilObjUser::_lookup($a_user_id, "company_id");
+    }
+
+    /**
+     * Set center_id
+     * @param string    center_id
+     */
+    function setCenterId($a_val)
+    {
+        $this->center_id = $a_val;
+    }
+
+    /**
+     * Get center_id
+     * @return    string    center_id
+     */
+    function getCenterId()
+    {
+        return $this->center_id;
+    }
+
+    /**
+     * Set branch
+     * @param stringq    branch
+     */
+    function setBranch($a_val)
+    {
+        $this->branch = $a_val;
+    }
+
+    /**
+     * Get branch
+     * @return    stringq    branch
+     */
+    function getBranch()
+    {
+        return $this->branch;
+    }
+
+    /**
+     * Set profession
+     * @param string    profession
+     */
+    function setProfession($a_val)
+    {
+        $this->profession = $a_val;
+    }
+
+    /**
+     * Get profession
+     * @return    string    profession
+     */
+    function getProfession()
+    {
+        return $this->profession;
+    }
+
+    /**
+     * Set field of responsibility
+     * @param string    field of responsibility
+     */
+    function setFieldOfResponsibility($a_val)
+    {
+        $this->field_of_responsibility = $a_val;
+    }
+
+    /**
+     * Get field of responsibility
+     * @return    string    field of responsibility
+     */
+    function getFieldOfResponsibility()
+    {
+        return $this->field_of_responsibility;
+    }
+
+    /**
+     * Set password addon
+     * @param string $a_val password addon
+     */
+    function setPasswordAddon($a_val)
+    {
+        $this->password_addon = $a_val;
+    }
+
+    /**
+     * Get password addon
+     * @return string password addon
+     */
+    function getPasswordAddon()
+    {
+        return $this->password_addon;
+    }
+    // cdpatch end
 
     /**
      * @return bool
@@ -5160,6 +5313,40 @@ class ilObjUser extends ilObject
     {
         return $this->inactivation_date;
     }
+
+    // cdpatch start
+
+    /**
+     * Get all users that are not in a company (should be staff of centers and admins)
+     * @param
+     * @return
+     */
+    static function getAllNonCompanyUsers($a_include_trainer = true)
+    {
+        global $ilDB;
+
+        $on = ($a_include_trainer)
+            ? " WHERE "
+            : " LEFT JOIN cd_trainer t ON (t.id = usr_data.usr_id) " .
+            " WHERE t.id IS NULL AND ";
+
+        $set = $ilDB->query("SELECT lastname, firstname, usr_id, usr_data.center_id FROM usr_data " .
+            $on . " company_id = " . $ilDB->quote(0, "integer") .
+            " ORDER BY lastname, firstname"
+        );
+        $users = array();
+        while ($rec = $ilDB->fetchAssoc($set)) {
+            $users[] = array(
+                "id" => $rec["usr_id"],
+                "lastname" => $rec["lastname"],
+                "firstname" => $rec["firstname"],
+                "center_id" => $rec["center_id"]
+            );
+        }
+
+        return $users;
+    }
+    // cdpatch end
 
     /**
      * @return bool

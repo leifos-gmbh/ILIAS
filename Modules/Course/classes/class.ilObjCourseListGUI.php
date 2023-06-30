@@ -14,10 +14,34 @@ include_once "Services/Object/classes/class.ilObjectListGUI.php";
  */
 class ilObjCourseListGUI extends ilObjectListGUI
 {
+
     /**
      * @var \ilCertificateObjectsForUserPreloader
      */
     private $certificatePreloader;
+
+    // cdpatch start
+
+    protected static $pl_loaded = false;
+    protected static $pl = null;
+
+    function __construct($a_context = self::CONTEXT_REPOSITORY)
+    {
+        parent::__construct($a_context);
+
+        if (!self::$pl_loaded) {
+            global $ilPluginAdmin;
+            $pl_names = $ilPluginAdmin->getActivePluginsForSlot(IL_COMP_SERVICE, "UIComponent", "uihk");
+            $plugin_html = false;
+            foreach ($pl_names as $pl) {
+                if ($pl == "CD") {
+                    self::$pl = ilPluginAdmin::getPluginObject(IL_COMP_SERVICE, "UIComponent", "uihk", $pl);
+                }
+            }
+            self::$pl_loaded = true;
+        }
+    }
+    // cdpatch end
 
     /**
     * initialisation
@@ -166,10 +190,48 @@ class ilObjCourseListGUI extends ilObjectListGUI
             ];
         }
 
+
         // booking information
         $repo = ilObjCourseAccess::getBookingInfoRepo();
         $book_info = new ilBookingInfoListItemPropertiesAdapter($repo);
         $props = $book_info->appendProperties($this->obj_id, $props);
+
+        // cdpatch start
+        $cd_prop = ilObjCourseAccess::_getCDProperties($this->obj_id);
+        if ($cd_prop["course_nr"] != "") {
+            $props[] = array(
+                "property" => self::$pl->txt('course_nr'),
+                "value" => $cd_prop["course_nr"]
+            );
+        }
+        if ($cd_prop["course_type"] > 0) {
+            self::$pl->includeClass("class.cdCourseType.php");
+            $props[] = array(
+                "property" => self::$pl->txt('course_type'),
+                "value" => cdCourseType::lookupTitle($cd_prop["course_type"])
+            );
+        }
+        if ($cd_prop["course_level"] > "") {
+            $props[] = array(
+                "property" => self::$pl->txt('course_level'),
+                "value" => $cd_prop["course_level"]
+            );
+        }
+
+        $part = ilCourseParticipants::_getInstanceByObjId($this->obj_id);
+        $tuts = $part->getTutors();
+        if (is_array($tuts) && count($tuts) > 0) {
+            $tut_arr = array();
+            foreach ($tuts as $t) {
+                $n = ilObjUser::_lookupName($t);
+                $tut_arr[] = $n["firstname"] . " " . $n["lastname"];
+            }
+            $props[] = array(
+                "property" => $lng->txt('tutors'),
+                "value" => implode(", ", $tut_arr)
+            );
+        }
+        // cdpatch end
 
         return $props;
     }

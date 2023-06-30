@@ -520,6 +520,14 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
             ? "tree"
             : "flat";
         $link = "ilias.php?baseClass=ilRepositoryGUI&amp;cmd=frameset&amp;set_mode=" . $mode . "&amp;ref_id=" . $this->object->getRefId();
+
+        // cdpatch start
+        global $ilUser;
+        if ($ilUser->getCompanyId() > 0 && $mode == "tree") {
+            return;
+        }
+        // cdpatch end
+
         $tpl->setTreeFlatIcon($link, $mode);
     }
     
@@ -745,10 +753,16 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
                     $this->lng->txt('copy_selected_items'),
                     'copy'
                 );
+
+                // cdpatch start
+                /*
                 $toolbar->addFormButton(
                     $this->lng->txt('link_selected_items'),
                     'link'
                 );
+                */
+                // cdpatch end
+
                 // add download button if multi download enabled
                 $folder_set = new ilSetting('fold');
                 if ((bool) $folder_set->get('enable_multi_download') === true) {
@@ -1399,12 +1413,16 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 
         // show clipboard
         if (strtolower($_GET["baseClass"]) == "ilrepositorygui" && !empty($_SESSION["clipboard"])) {
+            // cdpatch start (outcommented)
+            /*
             $this->tabs_gui->addTarget(
                 "clipboard",
                 $this->ctrl->getLinkTarget($this, "clipboard"),
                 "clipboard",
                 get_class($this)
             );
+            */
+            // cdpatch end
         }
     }
 
@@ -2107,7 +2125,9 @@ class ilContainerGUI extends ilObjectGUI implements ilDesktopItemHandling
 
         $t->addSeparator();
         $this->lng->loadLanguageModule('obj');
-        $t->addFormButton($this->lng->txt("obj_insert_into_clipboard"), "keepObjectsInClipboard");
+		// cdpatch start
+		//$t->addFormButton($this->lng->txt("obj_insert_into_clipboard"), "keepObjectsInClipboard");
+		// cdpatch end
 
         $t->addFormButton($this->lng->txt("cancel"), "cancelMoveLink");
         $t->setCloseFormTag(false);

@@ -1,0 +1,181 @@
+<!-- language file start -->
+common#:#reg_mail_body_salutation#:#Guten Tag,
+common#:#repository#:#Kursverwaltung
+common#:#reg_mail_body_text1#:#Willkommen im Carl Duisberg Teilnehmerportal!
+common#:#reg_mail_subject_confirmation#:#Carl Duisberg Teilnehmerportal - Ihr Bestätigungslink
+common#:#gender#:#Title
+common#:#gender_f#:#Ms.
+common#:#gender_m#:#Mr.
+common#:#login_to_ilias#:#Login
+common#:#personal_data#:#Personal Data
+common#:#phone_office#:#Phone
+common#:#registration#:#Register
+common#:#startpage#:#Carl Duisberg Teilnehmerportal
+common#:#street#:#Street and Number
+common#:#company_password#:#Code
+skmg#:#skmg_skill_level#:#Kannbeschreibung
+skmg#:#skmg_really_delete_levels#:#Sollen die folgenden Kannbeschreibungen wirklich gelöscht werden?
+skmg#:#skmg_skill_levels#:#Kannbeschreibungen
+skmg#:#skmg_please_select_self_skill#:#Neue Selbsteinschätzung anlegen für die Sprache
+skmg#:#skmg_save_self_evaluation#:#Selbsteinschätzung abschliessen
+adve#:#adve_grp_lm#:#Lernmodule
+adve#:#adve_page_editor_settings#:#Einstellungen Seiteneditor
+assessment#:#error_random_question_generation#:#Bei der Erzeugung von Zufallsfragen ist ein unbekannter Fehler aufgetreten. Bitte kontaktieren Sie Ihren Administrator und geben Sie die folgende Information weiter: Das System konnte keine Aktivitäts-ID für die Benutzer-ID %s und die Test-ID %s erzeugen.
+assessment#:#keywords_hint#:#Um eine automatische Punktevergabe für die Freitext-Frage zu erreichen, geben Sie hier bitte eine Liste von Schlagwörtern an, die durch Leerzeichen oder Zeilenumbrüche voneinander getrennt sind. Wenn eines der Schlagwörter in dem Antworttext gefunden wird, vergibt für die Frage eingetragene maximale Punktezahl anstelle der üblichen Bewertung von 0 Punkten.
+assessment#:#qpl_imagemap_preview_missing#:# Es konnte keine temporäre Vorschaudatei mit den Imagemap-Regionen erzeugen. Statt dessen wird das Original-Bild angezeigt. Das bedeutet, dass entweder das ImageMagick-Werkzeug auf dem Webserver nicht korrekt konfiguriert ist oder dass Sie im temporären Verzeichnis nicht über Schreibrechte verfügen! Bitte kontaktieren Sie den Systemadministrator.
+assessment#:#qpl_import_non_ilias_files#:#Fehler: Die Importdatei enthält QTI-Dateien, die nicht von einem System erstellt wurden. bitte kontaktieren Sie das Team, um einen Importfilter für Ihr QTI-Dateiformat zu bekommen.
+assessment#:#qpl_import_verify_found_questions#:#Es wurden folgendene Fragen in der Importdatei gefunden. Bitte wählen Sie die Fragen aus, die Sie importieren wollen.
+assessment#:#tst_defaults_apply_not_possible#:#Wir konnten die ausgewählten Standardeinstellungen nicht auf diesen Test anwenden! Eventuell enthält dieser Test bereits Fragen und/oder Teilnehmerdatensätze, die verhindern, dass bestimmte Standardeinstellungen übernommen werden können.
+assessment#:#tst_defaults_dont_use#:#--- Die Standardeinstellungen für Tests verwenden ---
+assessment#:#tst_import_verify_found_questions#:#Es wurden folgendene Fragen in der Importdatei gefunden. Bitte wählen Sie die Fragen aus, die Sie mit diesem Test importieren wollen.
+common#:#accesscount_registered_users#:#Gelesen von Benutzern (Anzahl)
+common#:#profile_changed#:#Carl Duisberg Teilnehmerportal - Ihre Profildaten wurden geändert
+common#:#reg_mail_subject#:#Carl Duisberg Teilnehmerportal - Ihre Zugangsdaten
+common#:#txt_registered#:#Sie haben sich erfolgreich beim Carl Duisberg Teilnehmerportal registriert. Klicken Sie bitte auf den untenstehenden Button, um sich einzuloggen.
+common#:#txt_registered_passw_gen#:#Sie haben sich erfolgreich beim Carl Duisberg Teilnehmerportal registriert. Sie werden in Kürze eine E-Mail mit Ihrem Passwort erhalten.
+common#:#txt_submitted#:#Sie haben sich erfolgreich beim Carl Duisberg Teilnehmerportal registriert. Ihr Benutzerkonto muss noch vom Systemadministrator freigegeben werden. Wir bitten um Ihre Geduld.
+common#:#accept_usr_agreement#:#Accept the User Agreements?
+pwassist#:#pwassist_enter_email#:#Geben Sie eine E-Mail-Adresse ein, und klicken Sie auf Abschicken.\n\nWir senden Ihnen eine E-Mail an diese Adresse. Die E-Mail enthält alle Benutzernamen, in deren Profil die Email eingegeben wurde.\n\nWählen Sie den passenden Benutzernamen aus und lassen Sie sich mit der "Passwort vergessen"-Funktion ein neues Passwort schicken. Falls Sie mit dieser Funktion keine E-Mail erhalten, benachrichtigen Sie bitte Ihre Kursleitung oder senden Sie ein E-Mail an %1$s.
+pwassist#:#pwassist_enter_username_and_email#:#Geben Sie einen Benutzernamen und die dazugehörende E-Mail-Adresse ein, und klicken Sie auf Abschicken.\n\nWir senden Ihnen eine E-Mail an diese Adresse. Die E-Mail enthält eine Adresse zu einer Webseite, mit der Sie ein neues Passwort für das Benutzerkonto eingeben können.\nFalls Sie mit dieser Funktion Ihr Passwort nicht setzen können, benachrichtigen Sie bitte Ihre Kursleitung oder senden Sie ein E-Mail an %1$s.
+pwassist#:#pwassist_invalid_auth_mode#:#Der angegebene Nutzer wird nicht direkt am Carl Duisberg Teilnehmerportal authentifiziert. Eine Zusendung des Kennworts ist daher nicht möglich.
+pwassist#:#pwassist_mail_body#:#Registrieren Sie ein neues Passwort für Ihr Benutzerkonto:\n\t%1$s\n\nDiese Nachricht ist automatisch von folgendem Carl Duisberg Teilnehmerportal-Server generiert worden:\n\t%2$s\n\nSie (oder jemand mit der Adresse %3$s) hat Passwort-Unterstützung für den Benutzernamen "%4$s" angefordert.\n\nBitte prüfen Sie sorgfältig die nachfolgend aufgeführten Fälle, und handeln Sie wie vorgeschlagen:\n\n-Sie haben die Passwort-Unterstützung auf dem Server versehentlich benutzt:\nLöschen Sie dieses E-Mail.\n\n-Sie sind sicher, dass Sie nie Passwort-Unterstützung für den angegebenen Carl Duisberg Teilnehmerportal-Server angefordert haben:\nBitte nehmen Sie mit %5$s Kontakt auf.\n\n- Sie haben um Passwort-Unterstützung angefragt.\nBitte gehen Sie wie folgt vor:\n\n1. Starten Sie Ihren Browser.\n\n2. Geben Sie folgende Adresse in Ihrem Browser ein:\n\t%6$s\n\nWichtig: Die Adresse besteht aus einer einzigen Zeile. Wenn Sie die Adresse aufgetrennt in mehrere Zeilen sehen, dann hat Ihr E-Mail Programm diese Zeilenumbrüche eingefügt.\n\n3. Ihr Browser zeigt nun eine Seite an, mit der Sie ein neues Passwort an das Benutzerkonto zuweisen können.\n\nBitte beachen Sie:\nAus Sicherheitsgründen können Sie diese drei Schritte nur exakt einmal und innerhalb einer begrenzten Zeit ausführen. Danach wird die Adresse ungültig, und Sie müssen die Passwort-Unterstützung auf dem Carl Duisberg Teilnehmerportal-Server erneut anfordern.
+pwassist#:#pwassist_mail_sent#:#Das Carl Duisberg Teilnehmerportal hat eine E-Mail an die Adresse %1$s versandt.\nWeitere Anweisungen finden Sie in diesem Mail.
+pwassist#:#pwassist_mail_subject#:#Carl Duisberg Teilnehmerportal -Passwort-Unterstützung
+pwassist#:#pwassist_username_mail_body#:#Dies sind die aktiven Benutzernamen, die das Carl Duisberg Teilnehmerportal für die E-Mail-Adresse verfügbar hat:\n%s\n\nDiese Nachricht ist automatisch von folgendem Carl Duisberg Teilnehmerportal-Server generiert worden:\n\t%s\n\nSie (oder jemand mit der Adresse %s) hat die Benutzernamenauflistung für die Emailadresse '%s' angefordert.\n\nBitte prüfen Sie sorgfältig die nachfolgend aufgeführten Fälle, und handeln Sie wie vorgeschlagen:\n\n-Sie haben die Benutzernamen-Unterstützung auf dem Server versehentlich benutzt:\nLöschen Sie dieses E-Mail.\n\n-Sie sind sicher, dass Sie nie Benutzernamen-Unterstützung für den angegebenen Carl Duisberg Teilnehmerportal-Server angefordert haben:\nBitte nehmen Sie mit %s Kontakt auf.\n\n- Sie haben um Benutzernamen-Unterstützung angefragt.\nBitte gehen Sie wie folgt vor:\n\n1. Starten Sie Ihren Browser.\n\n2. Geben Sie folgende Adresse in Ihrem Browser ein:\n\t%s\n\nWichtig: Die Adresse besteht aus einer einzigen Zeile. Wenn Sie die Adresse aufgetrennt in mehrere Zeilen sehen, dann hat Ihr E-Mail-Programm diese Zeilenumbrüche eingefügt.\n\n3. Ihr Browser zeigt nun die Passwort-Unterstützungs-Seite an. Verwenden Sie diese Funktion, um sich zu einer Kombination aus Benutzernamen und Email ein neues Passwort schicken zu lassen.
+rbac#:#rbac_role_delete_self#:#<strong>Achtung:</strong> Sie selbst sind dieser Rolle zugeordnet. Wenn Sie den Löschvorgang fortführen, kann es sein, dass Sie Zugriffsrechte an diesem oder anderen Carl Duisberg Teilnehmerportal-Materialien verlieren.
+rbac#:#root_create_lm#:#Neues Lernmodul anlegen
+registration#:#auth_radius_sync_info#:#Wenn aktiviert, wird automatisch ein Carl Duisberg Teilnehmerportal-Benutzerkonto für Anwender angelegt, wenn sich diese erfolgreich gegen RADIUS authentifiziert haben, bisher aber noch nicht über einen Carl Duisberg Teilnehmerportal-Account verfügen.
+registration#:#reg_confirmation_link_successful#:#Sie haben sich erfolgreich beim Carl Duisberg Teilnehmerportal registriert. Sie müssen Ihr Benutzerkonto durch Klicken des Bestätigungslink aktivieren um dieses zu aktivieren.<br />Sie werden in 20 Sekunden zur <a href="%s" title="Loginseite">Loginseite</a> weitergeleitet.
+registration#:#reg_mail_body_confirmation#:#Um das Benutzerkonto zu aktivieren, müssen Sie es in der Benutzerverwaltung freischalten.
+shib#:#shib_ilias_role#:#Rollenname
+shib#:#shib_missing_role#:#Bitte wählen Sie eine Rolle aus.
+shib#:#shib_role_ass_table#:#Neue Regel für die Rollenzuordnung
+shib#:#shib_role_name#:#Rollenname
+survey#:#anonymize_key_introduction#:#In dieser Umfrage werden alle Daten anonymisiert. Um Ihnen einen Zugang zur Umfrage zu gewähren, wurde vom System ein 5stelliger Schlüssel generiert, der Ihnen nach der Beantwortung der ersten Frage auch in Ihren Posteingang gesendet wird. Ihr Zugangsschlüssel lautet:<br /><span class="bold">%s</span><br />Bitte tragen Sie diesen Schlüssel im folgenden Textfeld ein, damit Sie an der Umfrage teilnehmen können.
+survey#:#anonymize_resume_introduction#:#Bitte geben Sie Ihren Zugangsschlüssel für die Umfrage ein, um die Umfrage wieder aufnehmen zu können. Der Zugangsschlüssel wurde Ihnen in Ihren Posteingang gesendet, nachdem Sie die Umfrage begonnen haben.
+survey#:#anonymize_survey_description#:#Die Anonymisierung entfernt alle persönlichen Daten aus der Umfragenstatistik. Ein Zugangsschlüssel ist eine fünfstellige Kennung, die benötigt wird, um an einer anonymisierten Umfrage teilzunehmen. Für registrierte Nutzer entfällt diese Eingabe, da der Zugangsschlüssel automatisch generiert wird.
+survey#:#anonymous_with_personalized_survey#:#Sie müssen im System angemeldet sein, um eine personalisierte Umfrage ausführen zu dürfen!
+survey#:#evaluation_access_all#:#Evaluationszugriff für alle Nutzer(innen)
+survey#:#evaluation_access_description#:#Normalerweise ist der Zugang zur Umfragestatistik nur Benutzern mit Schreibrechten für die Umfrage gestattet (Evaluationszugang = aus)
+survey#:#survey_codes_lang#:#Sprache der URL für direkten Zugriff
+survey#:#wrong_categories_selected_for_insert#:#Das Carl Duisberg Teilnehmerportal konnte die geplante Aktion nicht durchführen. Bitte stellen Sie sicher, dass nur genau eine Antwort als Zielposition ausgewählt wurde!
+user#:#user_screen_reader_optimization_info#:#Passt die Nutzung mit einem Screenreader / Bildschirmleseprogramm an.
+user#:#usr_public_profile_logged_in_info#:#Ihre Angaben sind nur für Benutzer sichtbar, die im Carl Duisberg Teilnehmerportal eingeloggt sind.
+common#:#password_addon#:#Passwort Language Academy
+common#:#refuse_exit#:#back
+crs#:#crs_new_file#:#Neue Datei
+crs#:#edit_evaluations#:#Beurteilungen
+crs#:#crs_member#:#Teilnehmer
+crs#:#crs_members#:#Teilnehmer
+crs#:#event_tbl_members#:#Teilnehmer
+cd#:#cd_sel_country#:#Nationality
+cd#:#tm_mp3#:#mp3
+cd#:#tm_skype#:#Skype
+cd#:#tm_podcasts#:#Podcasts
+cd#:#trainers#:#Trainer
+cd#:#tech_langs#:#Fachsprachen
+cd#:#employment_date#:#Einstellungsdatum
+cd#:#all#:#Alle
+cd#:#sure_deactivate_trainer#:#Sollen die Benutzeraccounts der folgenden Trainer wirklich deaktiviert werden?
+cd#:#sure_activate_trainer#:#Sollen die Benutzeraccounts der folgenden Trainer wirklich aktiviert werden?
+common#:#time_limit_reached#:#Ihr Benutzeraccount ist zurzeit (noch) deaktiviert. Neue Benutzeraccounts werden schnellstmöglich freigeschaltet.
+cd#:#no_edit_trainer_permission#:#Sie können die Daten zu diesem Trainer nicht bearbeiten und abspeichern, da er einem anderen Zentrum zugeordnet ist.
+cd#:#export_excel#:#Excel-Export
+cd#:#cd_enter_valid_date_format#:#Bitte tragen Sie gültige Daten im Format dd.mm.yyyy ein.
+cd#:#cd_reg_trainer#:#Application Form
+cd#:#cd_notes#:#Notizen
+cd#:#cd_edit#:#Editieren
+cd#:#cd_activate#:#<span style="color:green;">Aktivieren</span>
+cd#:#cd_deactivate#:#<span style="color:darkred;">Deaktivieren</span>
+cd#:#cd_trainer_yes#:#<span style="color:green;">Ja</span>
+cd#:#cd_trainer_no#:#<span style="color:red;">Nein</span>
+cd#:#cd_other#:#Andere
+cd#:#cd_qm_evaluation#:#QM Bewertung
+cd#:#cd_entry_date#:#Einstellungsdatum
+cd#:#cd_fee#:#Honorar
+cd#:#cd_date#:#Datum
+cd#:#permit_license#:#Work Permits/Drivers License
+cd#:#residence_permit#:#Residence permit for Germany
+cd#:#work_permit#:#Work permit for Germany
+cd#:#driving_license#:#Valid drivers license
+cd#:#car_owner#:#Have own car
+cd#:#work_experience#:#Work Experience
+cd#:#work_exp_lang_train#:#Work experience as a language teacher
+cd#:#work_experience_lang_train_desc#:#Please briefly indicate your work experience in time intervals, as well as key functions, responsibilities and language schools/employers.
+cd#:#given_lessons#:#Number of teaching hours to date
+cd#:#work_experience_other#:#Other work experience
+cd#:#further_education#:#Language Teaching Qualifications
+cd#:#further_education_desc#:#Please briefly provide the nature and extent of your qualifications, as well as the training institute/facility.
+cd#:#education#:#Education
+cd#:#general_education#:#Education level
+cd#:#general_education_desc#:#Please briefly provide your education, as well as your professional skills and the education institute/facility.
+cd#:#general_education_other#:#Other
+cd#:#language_education#:#Language teacher training
+cd#:#lang_education_other#:#Other
+cd#:#competences#:#Teaching Skills
+cd#:#teaching_experience#:#Teaching experience
+cd#:#teaching_experience_desc#:#General language teaching skills as well as Business English teaching experience: Industry/Time period (e.g. Advertising, 2008-2009)
+cd#:#teach_exp_tech_lang#:#Technical language teaching experience
+cd#:#other_tech_lang#:#Other technical language experience
+cd#:#teach_type_exp#:#Teaching method experience
+cd#:#cefr#:#Common European Framework of Reference for Languages (CEFR)
+cd#:#cefr_knowledge#:#I am familiar with the European Framework
+cd#:#favorite_cefr_levels#:#I prefer to teach students of the following level(s)
+cd#:#cefr_exam_prep_license#:#Approved exam preparation
+cd#:#cefr_exam_license#:#Valid examiner’s license
+cd#:#other_competences#:#Other skills, knowledge, experience
+cd#:#current_teaching_material#:#I currently use the following textbooks in my lessons
+cd#:#teaching_media#:#I currently use the following media in my lessons
+cd#:#other_teaching_media#:#Other media
+cd#:#teaching_methods#:#I use the following techniques and methods
+cd#:#trainer_role#:#My role as a language teacher is to…
+cd#:#my_potential#:#My areas of potential development
+cd#:#scenario#:#Scenario: “I am teaching a language course for a corporate client on behalf of Carl Duisberg Centren. The corporate client and/or a Carl Duisberg Centren educational consultant wishes to sit in on one of my classes.”
+cd#:#teaching_location#:#Deployment region(s), cities
+cd#:#mother_tongue#:#Mother tongue(s)
+cd#:#instruction_language#:#Teaching language(s)
+cd#:#language_skills#:#Skills in other languages
+cd#:#cd_before#:#Before
+cd#:#abitur_or_similar#:#High school diploma or similar
+cd#:#bachelor_or_similar#:#Bachelor’s degree or similar
+cd#:#master_or_similar#:#Master’s degree or similar
+cd#:#promotion_or_similar#:#Doctorate degree or similar
+cd#:#promotion_higher#:#Higher than doctorate degree
+cd#:#little#:#Some experience
+cd#:#much#:#Very experienced
+cd#:#group_work#:#Group lessons
+cd#:#individual_teach#:#One-to-one lessons
+cd#:#teach_top_management#:#Top executive lessons
+cd#:#edu_consultance#:#Educational counseling
+cd#:#blended_learning_products#:#Blended learning/e-learning
+cd#:#not#:#Not
+cd#:#good#:#Good
+cd#:#license_until#:#Valid through
+cd#:#tm_print#:#Print media (textbooks)
+cd#:#tm_cd#:#CD
+cd#:#tm_dvd#:#DVD
+cd#:#tm_internet#:#Internet
+common#:#branch#:#Niederlassung
+common#:#profession#:#Berufsbezeichnung
+common#:#field_of_responsibility#:#Aufgabenbereich
+common#:#cd_sel_country2#:#2. Staatsangehörigkeit
+cd#:#pdf_export_short#:#Short Profile (PDF)
+cd#:#pdf_export_full#:#Profile (PDF)
+cd#:#daf_certificate#:#DAF Certificate
+cd#:#tm_apps#:#Apps
+cd#:#cd_current_trainer#:#Current Trainers
+cd#:#cd_former_trainer#:#Former Trainers
+cd#:#cd_make_current_trainer#:#<< Current Trainer
+cd#:#cd_make_former_trainer#:#>> Former Trainer
+cd#:#cd_sure_former_trainer#:#Should the trainer really become a former trainer?
+cd#:#cd_sure_current_trainer#:#Should the trainer really become a current trainer again?
+cd#:#cd_confirm#:#Confirm
+cd#:#cd_assign_course#:#Assign to Course
+cd#:#cd_select_course#:#Please select a course.
+cd#:#cd_really_assign_as_trainer#:#Do you really want to assign the following users as trainers to the course?
+cd#:#cd_really_assign_as_member#:#Do you really want to assign the following users as members to the course?
+cd#:#cd_assign#:#Assign
+cd#:#cd_registration#:#Registration
+cd#:#cd_profile_changes#:#Profile Changes
+common#:#form_date_duration_start#:#Von
+common#:#form_date_duration_end#:#Bis

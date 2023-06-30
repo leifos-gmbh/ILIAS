@@ -1481,6 +1481,21 @@ class ilStartUpGUI
         self::printToGlobalTemplate($tpl);
     }
 
+    // cdpatch start
+
+    /**
+     * Deny acceptance
+     * @param
+     * @return
+     */
+    function denyAcceptance()
+    {
+		$GLOBALS['DIC']['ilAuthSession']->logout();
+		//session_destroy();
+        ilUtil::redirect("login.php");
+    }
+    // cdpatch end
+
     /**
      * Show terms of service
      * @param bool $accepted
@@ -1548,6 +1563,9 @@ class ilStartUpGUI
                     'mailto:' . ilUtil::prepareFormOutput(ilSystemSupportContacts::getMailsToAddress())
                 )
             );
+            // cdpatch start
+            $this->mainTemplate->setVariable("TXT_DENY_EXIT", $lng->txt("refuse_exit"));
+            // cdpatch end
         }
 
         self::printToGlobalTemplate($tpl);

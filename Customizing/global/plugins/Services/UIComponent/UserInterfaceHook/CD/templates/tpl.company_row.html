@@ -1,0 +1,29 @@
+<tr class="{CSS_ROW}">
+	<!--HELLER 10.09.2013 FIX - Firmen sollen nicht mehr gelöscht werden!!! - Wichtig da Daten verloren/falsch zugeordnet werden <td class="std small">
+		<input type="checkbox" name="company_id[]" value="{VAL_ID}" />
+	</td> --> 
+	<!-- <td><input type="checkbox" name="company_id[]" value="{VAL_ID}" /></td> -->
+	<td><a class="comp_edit" href="{CMD_EDIT}" title="{VAL_TITLE} -> editieren"><img src="./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/CD/img/edit.png" /></a>
+		</td>
+	<td class="std small">
+		<a class="company_row" href="{CMD_EDIT}" title="{VAL_TITLE} -> editieren">{VAL_TITLE}</a>
+		<!-- BEGIN parent_company --><div class="company_row_mother">({TXT_UNDER}: {PARENT_COMPANY})</div><!-- END parent_company -->
+	</td>
+	<td class="std small">
+		{VAL_CITY}
+	</td>
+	<td class="std small">
+		<!-- heller test 13.12.2012 -->
+		<span class="cd-creation-user">{VAL_CREATIONUSER}</span>
+	</td>
+	<td class="std small">
+		{VAL_CENTER}
+	</td>
+	<td class="std small">
+		{VAL_NR_USERS}
+	</td>
+	<td class="std">
+		<!-- <a class="comp_edit" href="{CMD_EDIT}" title="{VAL_TITLE} -> editieren"><img src="./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/CD/img/edit.png" /></a> -->
+		<a class="comp_edit" href="{CMD_LIST_USERS}" title="Benutzer des Kunden {VAL_TITLE} editieren"><img src="./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/CD/img/benutzer.png" /></a>
+	</td>
+</tr>

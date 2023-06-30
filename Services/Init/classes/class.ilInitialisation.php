@@ -184,6 +184,9 @@ class ilInitialisation
                 define("ERROR_EDITOR_PATH_TRANSLATIONS", $ilIliasIniFile->readVariable('error', 'editor_path_translations'));
             }
         }
+        // cdpatch start
+        define("PATH_TO_HTMLDOC", $ilIliasIniFile->readVariable("tools", "htmldoc"));
+        // cdpatch end
 
         // read virus scanner settings
         switch ($ilIliasIniFile->readVariable("tools", "vscantype")) {

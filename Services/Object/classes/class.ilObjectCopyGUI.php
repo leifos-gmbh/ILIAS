@@ -451,7 +451,9 @@ class ilObjectCopyGUI
         $clipboard_btn = ilSubmitButton::getInstance();
         $clipboard_btn->setCaption('obj_insert_into_clipboard');
         $clipboard_btn->setCommand('keepObjectsInClipboard');
-        $t->addButtonInstance($clipboard_btn);
+        // cdpatch start
+        //$t->addButtonInstance($clipboard_btn);
+        // cdpatch end
         $cancel_btn = ilSubmitButton::getInstance();
         $cancel_btn->setCaption('cancel');
         $cancel_btn->setCommand('cancel');

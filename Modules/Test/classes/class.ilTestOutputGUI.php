@@ -318,7 +318,12 @@ abstract class ilTestOutputGUI extends ilTestPlayerAbstractGUI
             $instantResponse = true;
         } else {
             $presentationMode = ilTestPlayerAbstractGUI::PRESENTATION_MODE_EDIT;
-            $instantResponse = $this->getInstantResponseParameter();
+            // #37025 don't show instant response if a request for it should fix the answer and answer is not yet fixed
+            if ($this->object->isInstantFeedbackAnswerFixationEnabled()) {
+                $instantResponse = false;
+            } else {
+                $instantResponse = $this->getInstantResponseParameter();
+            }
         }
         // fau.
 
@@ -688,7 +693,7 @@ abstract class ilTestOutputGUI extends ilTestPlayerAbstractGUI
             $this->getCurrentSequenceElement()
         );
 
-        if ($this->getAnswerChangedParameter() && !$this->isParticipantsAnswerFixed($questionId)) {
+        if (!$this->isParticipantsAnswerFixed($questionId)) {
             if ($this->saveQuestionSolution(true)) {
                 $this->removeIntermediateSolution();
                 $this->setAnswerChangedParameter(false);

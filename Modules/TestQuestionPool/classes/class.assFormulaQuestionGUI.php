@@ -580,8 +580,9 @@ class assFormulaQuestionGUI extends assQuestionGUI
                 }
             }
             $f = function ($k, $v) use ($check) {
-                return in_array($k, $check);
+                return in_array($v, $check);
             };
+
             $variables = array_filter($variables, $f, ARRAY_FILTER_USE_BOTH);
             $results = array_filter($results, $f, ARRAY_FILTER_USE_BOTH);
 
@@ -779,7 +780,7 @@ class assFormulaQuestionGUI extends assQuestionGUI
                     }
 
                     $this->ctrl->setParameter($this, 'q_id', $new_id);
-                    $this->ctrl->setParameter($this, 'calling_test', $this->request->raw("calling_test"));
+                    $this->ctrl->setParameter($this, 'calling_test', $this->request->getQueryParams()["calling_test"]);
                 }
                 $this->tpl->setOnScreenMessage('success', $this->lng->txt("msg_obj_modified"), true);
                 $this->ctrl->redirectByClass('ilAssQuestionPreviewGUI', ilAssQuestionPreviewGUI::CMD_SHOW);

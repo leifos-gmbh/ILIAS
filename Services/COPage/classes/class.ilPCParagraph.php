@@ -633,6 +633,7 @@ class ilPCParagraph extends ilPageContent
         }
         // external links
         while (preg_match("~\[(xln$ws(url$ws=$ws\"([^\"])*\")$ws(target$ws=$ws(\"(Glossary|FAQ|Media)\"))?$ws)\]~i", $a_text, $found)) {
+            $old_text = $a_text;
             $attribs = ilUtil::attribsToArray($found[2]);
             if (isset($attribs["url"])) {
                 $a_text = self::replaceBBTagByMatching(
@@ -644,8 +645,9 @@ class ilPCParagraph extends ilPageContent
                         "Href" => $attribs["url"]
                     ]
                 );
-            } else {
-                $a_text = str_replace("[" . $found[1] . "]", "[error: xln" . $found[1] . "]", $a_text);
+            }
+            if ($old_text === $a_text) {
+                $a_text = str_replace("[" . $found[1] . "]", "[error: " . $found[1] . "]", $a_text);
             }
         }
 
@@ -745,7 +747,7 @@ class ilPCParagraph extends ilPageContent
             ? "/"
             : "";
 
-        $slash_chars = '/[]?';
+        $slash_chars = '/[]?()$*';
 
         if ($ok) {
             $replace_str = addcslashes($start_tag, $slash_chars);
@@ -868,7 +870,8 @@ class ilPCParagraph extends ilPageContent
                     $a_text,
                     [
                         "Target" => "il_" . $inst_str . "_wpage_" . $attribs['wpage'],
-                        "Type" => "WikiPage"
+                        "Type" => "WikiPage",
+                        "Anchor" => $attribs["anchor"] ?? ""
                     ]
                 );
             }
@@ -1231,7 +1234,10 @@ class ilPCParagraph extends ilPageContent
 
                 case "WikiPage":
                     $tframestr = "";
-                    $a_text = preg_replace('~<IntLink' . $found[1] . '>~i', "[iln " . $inst_str . "wpage=\"" . $target_id . "\"" . $tframestr . "]", $a_text);
+                    $ancstr = (!empty($attribs["Anchor"]))
+                        ? ' anchor="' . $attribs["Anchor"] . '"'
+                        : "";
+                    $a_text = preg_replace('~<IntLink' . $found[1] . '>~i', "[iln " . $inst_str . "wpage=\"" . $target_id . "\"" . $tframestr . $ancstr . "]", $a_text);
                     break;
 
                 case "PortfolioPage":
@@ -1712,13 +1718,13 @@ class ilPCParagraph extends ilPageContent
                     $text
                 );
                 $text = str_replace(
-                    array('<sup class="ilc_sup_Sup">', "</sup>"),
-                    array("[sup]", "[/sup]"),
+                    array('<sup class="ilc_sup_Sup">', '<sup>', "</sup>"),
+                    array("[sup]", "[sup]", "[/sup]"),
                     $text
                 );
                 $text = str_replace(
-                    array('<sub class="ilc_sub_Sub">', "</sub>"),
-                    array("[sub]", "[/sub]"),
+                    array('<sub class="ilc_sub_Sub">', '<sub>', "</sub>"),
+                    array("[sub]", "[sub]", "[/sub]"),
                     $text
                 );
 

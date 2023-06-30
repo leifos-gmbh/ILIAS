@@ -78,9 +78,7 @@ class ilMailOptions
         }
         $this->mailTransportSettings = $mailTransportSettings;
 
-        if ($this->settings->get('show_mail_settings') === '1') {
-            $this->read();
-        }
+        $this->read();
     }
 
     /**
@@ -103,6 +101,14 @@ class ilMailOptions
             ]
         );
     }
+    
+    private function shouldUseIndividualSettings() : bool
+    {
+        return (
+            $this->settings->get('show_mail_settings') === '1' &&
+            $this->settings->get('usr_settings_disable_mail_incoming_mail') !== '1'
+        );
+    }
 
     protected function read() : void
     {
@@ -111,7 +117,7 @@ class ilMailOptions
             'mail_options.signature, mail_options.linebreak, mail_options.incoming_type,',
             'mail_options.mail_address_option, usr_data.email, usr_data.second_email',
             'FROM mail_options',
-            'LEFT JOIN usr_data ON mail_options.user_id = usr_data.usr_id',
+            'INNER JOIN usr_data ON mail_options.user_id = usr_data.usr_id',
             'WHERE mail_options.user_id = %s',
         ]);
         $res = $this->db->queryF(
@@ -120,7 +126,15 @@ class ilMailOptions
             [$this->usrId]
         );
         $row = $this->db->fetchObject($res);
-        if ($row !== null) {
+        if ($row === null) {
+            $this->mailTransportSettings->adjust($this->firstEmailAddress, $this->secondEmailAddress, false);
+            return;
+        }
+
+        $this->firstEmailAddress = (string) $row->email;
+        $this->secondEmailAddress = (string) $row->second_email;
+
+        if ($this->shouldUseIndividualSettings()) {
             $this->isCronJobNotificationEnabled = (bool) $row->cronjob_notification;
             $this->signature = (string) $row->signature;
             $this->linebreak = (int) $row->linebreak;
@@ -142,12 +156,9 @@ class ilMailOptions
             )) {
                 $this->emailAddressMode = self::FIRST_EMAIL;
             }
-
-            $this->firstEmailAddress = (string) $row->email;
-            $this->secondEmailAddress = (string) $row->second_email;
-
-            $this->mailTransportSettings->adjust($this->firstEmailAddress, $this->secondEmailAddress);
         }
+
+        $this->mailTransportSettings->adjust($this->firstEmailAddress, $this->secondEmailAddress);
     }
 
     public function updateOptions()

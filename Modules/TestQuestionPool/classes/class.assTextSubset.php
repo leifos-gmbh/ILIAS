@@ -452,9 +452,10 @@ class assTextSubset extends assQuestion implements ilObjQuestionScoringAdjustabl
             if ($this->answers[$key]->getPoints() <= 0) {
                 continue;
             }
+            $value = html_entity_decode($value); #SB
             switch ($textrating) {
                 case TEXTGAP_RATING_CASEINSENSITIVE:
-                    if (strcmp(ilStr::strToLower(html_entity_decode($value)), ilStr::strToLower($answer)) == 0) {
+                    if (strcmp(ilStr::strToLower($value), ilStr::strToLower($answer)) == 0) { #SB
                         return $key;
                     }
                     break;
@@ -773,7 +774,7 @@ class assTextSubset extends assQuestion implements ilObjQuestionScoringAdjustabl
 
         $i = 1;
         foreach ($solutions as $solution) {
-            $worksheet->setCell($startrow + $i, 0, $solution["value1"]);
+            $worksheet->setCell($startrow + $i, 2, $solution["value1"]);
             $i++;
         }
 

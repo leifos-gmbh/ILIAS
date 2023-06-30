@@ -1,10 +1,23 @@
 <?php
-/* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
+/**
+ * This file is part of ILIAS, a powerful learning management system
+ * published by ILIAS open source e-Learning e.V.
+ *
+ * ILIAS is licensed with the GPL-3.0,
+ * see https://www.gnu.org/licenses/gpl-3.0.en.html
+ * You should have received a copy of said license along with the
+ * source code, too.
+ *
+ * If this is not the case or you just want to try ILIAS, you'll find
+ * us at:
+ * https://www.ilias.de
+ * https://github.com/ILIAS-eLearning
+ *
+ *********************************************************************/
 
 /**
  * @defgroup ServicesUtilities Services/Utilities
  */
-
 use ILIAS\Filesystem\Util\LegacyPathHelper;
 use ILIAS\FileUpload\DTO\ProcessingStatus;
 use ILIAS\FileUpload\DTO\UploadResult;
@@ -198,7 +211,15 @@ class ilUtil
         if (strlen($filename) == 0 || !file_exists($filename)) {
             $filename = "./" . $a_css_location . "templates/default/" . $stylesheet_name;
         }
-        return $filename;
+        $skin_version_appendix = "";
+        if ($mode !== "filesystem") {
+            // use version from template xml to force reload on changes
+            $skin = ilStyleDefinition::getSkins()[ilStyleDefinition::getCurrentSkin()];
+            $skin_version = $skin->getVersion();
+            $skin_version_appendix .= ($skin_version !== '' ? str_replace(".", "-", $skin_version) : '0');
+            $skin_version_appendix = "?skin_version=" . $skin_version_appendix;
+        }
+        return $filename . $skin_version_appendix;
     }
 
     /**
@@ -232,12 +253,7 @@ class ilUtil
         if (strlen($filename) == 0 || !file_exists($filename)) {
             $filename = "./" . $a_js_location . "templates/default/" . $js_name;
         }
-        $vers = "";
-        if ($add_version) {
-            $vers = str_replace(" ", "-", $ilSetting->get("ilias_version"));
-            $vers = "?vers=" . str_replace(".", "-", $vers);
-        }
-        return $filename . $vers;
+        return $filename;
     }
 
     /**
@@ -278,12 +294,6 @@ class ilUtil
 
         $ilSetting = $DIC->settings();
 
-        // add version as parameter to force reload for new releases
-        if ($mode != "filesystem") {
-            $vers = str_replace(" ", "-", $ilSetting->get("ilias_version"));
-            $vers = "?vers=" . str_replace(".", "-", $vers);
-        }
-
         // use ilStyleDefinition instead of account to get the current skin and style
         require_once("./Services/Style/System/classes/class.ilStyleDefinition.php");
         if (ilStyleDefinition::getCurrentSkin() == "default") {
@@ -295,9 +305,9 @@ class ilUtil
         }
 
         if (is_file("./" . $in_style)) {
-            return $in_style . $vers;
+            return $in_style;
         } else {
-            return "templates/default/delos_cont.css" . $vers;
+            return "templates/default/delos_cont.css";
         }
     }
 
@@ -2063,8 +2073,19 @@ class ilUtil
         /// $ascii_filename = preg_replace('/\&(.)[^;]*;/','\\1', $ascii_filename);
 
         // #15914 - try to fix german umlauts
-        $umlauts = array("Ä" => "Ae", "Ö" => "Oe", "Ü" => "Ue",
-            "ä" => "ae", "ö" => "oe", "ü" => "ue", "ß" => "ss");
+        $umlauts = [
+            "Ä" => "Ae",
+            "Ö" => "Oe",
+            "Ü" => "Ue",
+            "ä" => "ae",
+            "ö" => "oe",
+            "ü" => "ue",
+            "é" => "e",
+            "è" => "e",
+            "é" => "e",
+            "ê" => "e",
+            "ß" => "ss"
+        ];
         foreach ($umlauts as $src => $tgt) {
             $a_filename = str_replace($src, $tgt, $a_filename);
         }
@@ -3581,6 +3602,12 @@ class ilUtil
         while ($file = readdir($dir)) {
             if ($file != "." and
             $file != "..") {
+                // triple dot is not allowed in filenames
+                if ($file === '...') {
+                    unlink($a_dir . "/" . $file);
+                    continue;
+                }
+
                 // directories
                 if (@is_dir($a_dir . "/" . $file)) {
                     ilUtil::rRenameSuffix($a_dir . "/" . $file, $a_old_suffix, $a_new_suffix);
@@ -3590,7 +3617,14 @@ class ilUtil
                 if (@is_file($a_dir . "/" . $file)) {
                     // first check for files with trailing dot
                     if (strrpos($file, '.') == (strlen($file) - 1)) {
-                        rename($a_dir . '/' . $file, substr($a_dir . '/' . $file, 0, -1));
+                        try {
+                            rename($a_dir . '/' . $file, substr($a_dir . '/' . $file, 0, -1));
+                        } catch (Throwable $t) {
+                            // to avoid exploits we do delete this file and continue renaming
+                            unlink($a_dir . '/' . $file);
+                            continue;
+                        }
+
                         $file = substr($file, 0, -1);
                     }
 
@@ -3600,6 +3634,14 @@ class ilUtil
                     strtolower($a_old_suffix)) {
                         $pos = strrpos($a_dir . "/" . $file, ".");
                         $new_name = substr($a_dir . "/" . $file, 0, $pos) . "." . $a_new_suffix;
+                        // check if file exists
+                        if (file_exists($new_name)) {
+                            if (is_dir($new_name)) {
+                                ilUtil::delDir($new_name);
+                            } else {
+                                unlink($new_name);
+                            }
+                        }
                         rename($a_dir . "/" . $file, $new_name);
                     }
                 }
@@ -3831,10 +3873,11 @@ class ilUtil
             if (!$upload->hasUploads()) {
                 throw new ilException($DIC->language()->txt("upload_error_file_not_found"));
             }
-            $upload_result = $upload->getResults()[$a_file];
+            $upload_result = $upload->getResults()[$a_file] ?? null;
             if ($upload_result instanceof UploadResult) {
                 $processing_status = $upload_result->getStatus();
-                if ($processing_status->getCode() === ProcessingStatus::REJECTED) {
+                if ($processing_status->getCode() === ProcessingStatus::REJECTED
+                    || $processing_status->getCode() === ProcessingStatus::DENIED) {
                     throw new ilException($processing_status->getMessage());
                 }
             } else {

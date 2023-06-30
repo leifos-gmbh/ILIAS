@@ -15,6 +15,7 @@
  *********************************************************************/
 
 import ACTIONS from "../actions/iim-action-types.js";
+import UI from "./iim-ui.js";
 
 /**
  * Interactive image UI action handler
@@ -48,7 +49,7 @@ export default class IIMUIActionHandler {
     }
 
     /**
-     * @param {PlaceHolderUI} ui
+     * @param {UI} ui
      */
     setUI(ui) {
         this.ui = ui;
@@ -80,6 +81,34 @@ export default class IIMUIActionHandler {
 
                 case ACTIONS.E_ADD_TRIGGER:
                     this.ui.addTrigger();
+                    break;
+
+                case ACTIONS.E_TRIGGER_PROPERTIES:
+                    this.ui.showTriggerProperties();
+                    break;
+
+                case ACTIONS.E_TRIGGER_OVERLAY:
+                    this.ui.showTriggerOverlay();
+                    break;
+
+                case ACTIONS.E_TRIGGER_POPUP:
+                    this.ui.showTriggerPopup();
+                    break;
+
+                case ACTIONS.E_TRIGGER_BACK:
+                    this.ui.showMainScreen();
+                    break;
+
+                case ACTIONS.E_SWITCH_SETTINGS:
+                    this.ui.showSettings();
+                    break;
+
+                case ACTIONS.E_SWITCH_OVERLAYS:
+                    this.ui.showOverlays();
+                    break;
+
+                case ACTIONS.E_SWITCH_POPUPS:
+                    this.ui.showPopups();
                     break;
             }
         }

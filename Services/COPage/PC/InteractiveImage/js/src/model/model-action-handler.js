@@ -56,6 +56,35 @@ export default class ModelActionHandler {
         this.model.addStandardTrigger();
         this.model.setState(this.model.STATE_TRIGGER_PROPERTIES);
         break;
+
+      case ACTIONS.E_TRIGGER_PROPERTIES:
+        this.model.setState(this.model.STATE_TRIGGER_PROPERTIES);
+        break;
+
+      case ACTIONS.E_TRIGGER_OVERLAY:
+        this.model.setState(this.model.STATE_TRIGGER_OVERLAY);
+        break;
+
+      case ACTIONS.E_TRIGGER_POPUP:
+        this.model.setState(this.model.STATE_TRIGGER_POPUP);
+        break;
+
+      case ACTIONS.E_TRIGGER_BACK:
+        this.model.setState(this.model.STATE_OVERVIEW);
+        break;
+
+      case ACTIONS.E_SWITCH_SETTINGS:
+        this.model.setState(this.model.STATE_SETTINGS);
+        break;
+
+      case ACTIONS.E_SWITCH_OVERLAYS:
+        this.model.setState(this.model.STATE_OVERLAYS);
+        break;
+
+      case ACTIONS.E_SWITCH_POPUPS:
+        this.model.setState(this.model.STATE_POPUPS);
+        break;
+
     }
   }
 

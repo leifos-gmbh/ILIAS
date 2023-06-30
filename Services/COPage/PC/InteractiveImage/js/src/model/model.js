@@ -26,7 +26,12 @@ export default class Model {
     this.debug = true;
 
     this.STATE_OVERVIEW = "overview";                 // overview
-    this.STATE_TRIGGER_PROPERTIES = "trigger_prop";   // drag drop
+    this.STATE_TRIGGER_PROPERTIES = "trigger_prop";   // trigger properties
+    this.STATE_TRIGGER_OVERLAY = "trigger_overlay";   // trigger overlay
+    this.STATE_TRIGGER_POPUP = "trigger_popup";   // trigger popup
+    this.STATE_SETTINGS = "settings";   // settings
+    this.STATE_OVERLAYS = "overlays";   // settings
+    this.STATE_POPUPS = "popups";   // settings
 
     this.model = {
       state: this.STATE_OVERVIEW,
@@ -37,6 +42,11 @@ export default class Model {
     this.states = [
       this.STATE_OVERVIEW,
       this.STATE_TRIGGER_PROPERTIES,
+      this.STATE_TRIGGER_OVERLAY,
+      this.STATE_TRIGGER_POPUP,
+      this.STATE_SETTINGS,
+      this.STATE_OVERLAYS,
+      this.STATE_POPUPS
     ];
     this.areaFactory = new AreaFactory();
     this.triggerFactory = new TriggerFactory();

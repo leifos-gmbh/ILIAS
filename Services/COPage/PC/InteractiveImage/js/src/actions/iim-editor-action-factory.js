@@ -43,4 +43,53 @@ export default class IIMEditorActionFactory {
     return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_ADD_TRIGGER, {});
   }
 
+  /**
+   * @returns {EditorAction}
+   */
+  triggerProperties() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_TRIGGER_PROPERTIES, {});
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  triggerOverlay() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_TRIGGER_OVERLAY, {});
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  triggerPopup() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_TRIGGER_POPUP, {});
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  triggerBack() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_TRIGGER_BACK, {});
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  switchSettings() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_SWITCH_SETTINGS, {});
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  switchOverlays() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_SWITCH_OVERLAYS, {});
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  switchPopups() {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_SWITCH_POPUPS, {});
+  }
+
 }

@@ -24,6 +24,12 @@ const ACTIONS = {
 
   // editor actions (things happening in the editor client side)
   E_ADD_TRIGGER: "add.trigger",
-
+  E_TRIGGER_PROPERTIES: "trigger.properties",
+  E_TRIGGER_OVERLAY: "trigger.overlay",
+  E_TRIGGER_POPUP: "trigger.popup",
+  E_TRIGGER_BACK: "trigger.back",
+  E_SWITCH_SETTINGS: "switch.settings",
+  E_SWITCH_OVERLAYS: "switch.overlays",
+  E_SWITCH_POPUPS: "switch.popups"
 };
 export default ACTIONS;

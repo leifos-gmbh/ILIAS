@@ -120,12 +120,12 @@ export default class UI {
 
   showMainScreen() {
     this.toolSlate.setContent(this.uiModel.mainSlate);
-    this.initSlateActions();
+    this.initMainScreenActions();
     this.setMainContent(this.uiModel.backgroundImage);
     this.initShapeEditor();
   }
 
-  initSlateActions() {
+  initMainScreenActions() {
     const dispatch = this.dispatcher;
     const action = this.actionFactory;
 
@@ -134,8 +134,23 @@ export default class UI {
       button.addEventListener("click", (event) => {
         switch (act) {
           case ACTIONS.E_ADD_TRIGGER:
-            this.log(action);
             dispatch.dispatch(action.interactiveImage().editor().addTrigger());
+            break;
+        }
+      });
+    });
+    document.querySelectorAll("[data-copg-ed-type='link']").forEach(button => {
+      const act = button.dataset.copgEdAction;
+      button.addEventListener("click", (event) => {
+        switch (act) {
+          case ACTIONS.E_SWITCH_SETTINGS:
+            dispatch.dispatch(action.interactiveImage().editor().switchSettings());
+            break;
+          case ACTIONS.E_SWITCH_OVERLAYS:
+            dispatch.dispatch(action.interactiveImage().editor().switchOverlays());
+            break;
+          case ACTIONS.E_SWITCH_POPUPS:
+            dispatch.dispatch(action.interactiveImage().editor().switchPopups());
             break;
         }
       });
@@ -169,14 +184,103 @@ export default class UI {
 
   addTrigger() {
     const trigger = this.iim_model.getCurrentTrigger();
-    this.toolSlate.setContent("Trigger Properties");
+    this.showTriggerProperties();
     this.shapeEditor.addShape(trigger.getShape());
     this.shapeEditor.repaint();
   }
 
-  /*
-  showPlaceholder(pcid) {
-    this.pageModifier.showComponent(pcid);
+  showTriggerProperties() {
+    this.toolSlate.setContent(this.uiModel.triggerProperties);
+    this.initTriggerViewControl();
+    this.initBackButton();
   }
-  */
+
+  showTriggerOverlay() {
+    this.toolSlate.setContent(this.uiModel.triggerOverlay);
+    this.initTriggerViewControl();
+    this.initBackButton();
+  }
+
+  showTriggerPopup() {
+    this.toolSlate.setContent(this.uiModel.triggerPopup);
+    this.initTriggerViewControl();
+    this.initBackButton();
+  }
+
+  initBackButton() {
+    const dispatch = this.dispatcher;
+    const action = this.actionFactory;
+    document.querySelectorAll("[data-copg-ed-type='button']").forEach(button => {
+      const act = button.dataset.copgEdAction;
+      button.addEventListener("click", (event) => {
+        switch (act) {
+          case ACTIONS.E_TRIGGER_BACK:
+            dispatch.dispatch(action.interactiveImage().editor().triggerBack());
+            break;
+        }
+      });
+    });
+  }
+
+  initTriggerViewControl() {
+    const dispatch = this.dispatcher;
+    const action = this.actionFactory;
+
+    document.querySelectorAll("[data-copg-ed-type='view-control']").forEach(button => {
+      const act = button.dataset.copgEdAction;
+      button.addEventListener("click", (event) => {
+        switch (act) {
+          case ACTIONS.E_TRIGGER_PROPERTIES:
+            dispatch.dispatch(action.interactiveImage().editor().triggerProperties());
+            break;
+          case ACTIONS.E_TRIGGER_OVERLAY:
+            dispatch.dispatch(action.interactiveImage().editor().triggerOverlay());
+            break;
+          case ACTIONS.E_TRIGGER_POPUP:
+            dispatch.dispatch(action.interactiveImage().editor().triggerPopup());
+            break;
+        }
+      });
+    });
+    this.refreshTriggerViewControl();
+  }
+
+  refreshTriggerViewControl() {
+    const model = this.iim_model;
+    const prop = document.querySelector("[data-copg-ed-type='view-control'][data-copg-ed-action='trigger.properties']");
+    const ov = document.querySelector("[data-copg-ed-type='view-control'][data-copg-ed-action='trigger.overlay']");
+    const pop = document.querySelector("[data-copg-ed-type='view-control'][data-copg-ed-action='trigger.popup']");
+    prop.classList.remove("engaged");
+    ov.classList.remove("engaged");
+    pop.classList.remove("engaged");
+    prop.disabled = false;
+    ov.disabled = false;
+    pop.disabled = false;
+    if (model.getState() === model.STATE_TRIGGER_PROPERTIES) {
+      prop.disabled = true;
+      prop.classList.add("engaged");
+    } else if (model.getState() === model.STATE_TRIGGER_OVERLAY) {
+      ov.disabled = true;
+      ov.classList.add("engaged");
+    } else if (model.getState() === model.STATE_TRIGGER_POPUP) {
+      pop.disabled = true;
+      pop.classList.add("engaged");
+    }
+  }
+
+  showSettings() {
+    this.toolSlate.setContent(this.uiModel.backgroundProperties);
+    this.initBackButton();
+  }
+
+  showOverlays() {
+    this.toolSlate.setContent(this.uiModel.overlayOverview);
+    this.initBackButton();
+  }
+
+  showPopups() {
+    this.toolSlate.setContent(this.uiModel.popupOverview);
+    this.initBackButton();
+  }
+
 }

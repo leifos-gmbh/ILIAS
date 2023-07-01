@@ -14745,8 +14745,12 @@ p#copg-auto-save {
 .il-copg-cell-selected {
   outline: #B54F00 2px solid;
 }
-#copg-table-top-actions {
+#copg-table-top-actions,
+.copg-slate-section {
   padding: 0 15px;
+}
+.copg-slate-section {
+  padding: 3px 15px;
 }
 /* Services/Calendar */
 td.even {
@@ -20049,4 +20053,3 @@ table.mceToolbar td {
     content: "";
   }
 }
-/*# sourceMappingURL=delos.css.map */

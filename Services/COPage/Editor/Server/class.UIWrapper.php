@@ -336,7 +336,7 @@ class UIWrapper
             $f->link()->standard("#link-label#", "#")
         ]);
 
-        $item = $f->item()->standard("#item-title#");
+        $item = $f->item()->standard("#item-title#")->withActions($dd);
         if ($leading_image) {
             $item = $item->withLeadImage(
                 $f->image()->responsive("#img-src#", "#img-alt#")
@@ -348,7 +348,7 @@ class UIWrapper
                 "",
                 [$item]
             )]
-        )->withActions($dd);
+        );
 
         return $r->render($p);
     }

@@ -690,9 +690,10 @@ class ilPCInteractiveImageGUI extends ilPageContentGUI
         $this->ctrl->setParameter($this, "cname", "SourceCode");
         $form = $this->gui->form([self::class], "#")
                           ->async()
+            ->section("f", $this->lng->txt("cont_ed_insert_iim"))
                           ->file(
                               "input_file",
-                              $this->lng->txt("import_file"),
+                              $this->lng->txt("file"),
                               \Closure::fromCallable([$this, 'handleUploadResult']),
                               "mob_id",
                               "",

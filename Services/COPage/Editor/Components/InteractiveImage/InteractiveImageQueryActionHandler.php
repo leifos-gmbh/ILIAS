@@ -123,19 +123,19 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
         $tpl = new \ilTemplate("tpl.main_slate.html", true, true, "Services/COPage/PC/InteractiveImage");
         $tpl->setVariable("TITLE", $lng->txt("cont_iim_edit"));
         $tpl->setVariable("HEAD_TRIGGER", $lng->txt("cont_iim_trigger"));
-        $tpl->setVariable("HEAD_SETTINGS", $lng->txt("cont_iim_settings"));
+        $tpl->setVariable("HEAD_SETTINGS", $lng->txt("settings"));
         $tpl->setVariable("HEAD_OVERVIEW", $lng->txt("cont_iim_overview"));
 
         $tpl->setVariable(
             "CLOSE_BUTTON",
-            $this->ui_wrapper->getRenderedButton(
+            $this->section($this->ui_wrapper->getRenderedButton(
                 $lng->txt("cont_iim_finish_editing"),
                 "button",
                 "component.back",
                 null,
                 "InteractiveImage",
                 true
-            )
+            ))
         );
 
         $b = $this->ui_wrapper->getButton(
@@ -146,43 +146,43 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
 
         $tpl->setVariable(
             "MSBOX_TRIGGER",
-            $this->ui_wrapper->getRenderedInfoBox(
+            $this->section($this->ui_wrapper->getRenderedInfoBox(
                 $lng->txt("cont_iim_add_trigger_text"),
                 [$b]
-            )
+            ))
         );
 
         $tpl->setVariable(
             "LINK_SETTINGS",
-            $this->ui_wrapper->getRenderedLink(
+            $this->section($this->ui_wrapper->getRenderedLink(
                 $lng->txt("cont_iim_background_image_and_caption"),
                 "InteractiveImage",
                 "link",
                 "switch.settings",
                 null
-            )
+            ))
         );
 
         $tpl->setVariable(
             "LINK_OVERLAY",
-            $this->ui_wrapper->getRenderedLink(
-                $lng->txt("cont_iim_overlays"),
+            $this->section($this->ui_wrapper->getRenderedLink(
+                $lng->txt("cont_overlay_images"),
                 "InteractiveImage",
                 "link",
                 "switch.overlays",
                 null
-            )
+            ))
         );
 
         $tpl->setVariable(
             "LINK_POPUPS",
-            $this->ui_wrapper->getRenderedLink(
-                $lng->txt("cont_iim_popups"),
+            $this->section($this->ui_wrapper->getRenderedLink(
+                $lng->txt("cont_content_popups"),
                 "InteractiveImage",
                 "link",
                 "switch.popups",
                 null
-            )
+            ))
         );
 
         return $tpl->get();
@@ -230,50 +230,62 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
         return $output;
     }
 
+    protected function section(string $content) : string
+    {
+        return "<div class='copg-slate-section'>" . $content . "</div>";
+    }
+
     protected function getTriggerBackButton() : string
     {
-        return $this->ui_wrapper->getRenderedButton(
+        return $this->section($this->ui_wrapper->getRenderedButton(
             $this->lng->txt("back"),
             "button",
             "trigger.back",
             null,
             "InteractiveImage"
-        );
+        ));
+    }
+
+    protected function getTriggerHeader() : string
+    {
+        return "<h2>" . $this->lng->txt("cont_iim_edit_trigger") . "</h2>";
     }
 
     protected function getTriggerViewControls() : string
     {
-        return $this->ui_wrapper->getRenderedViewControl(
+        return $this->section($this->ui_wrapper->getRenderedViewControl(
             [
-                ["InteractiveImage", "trigger.properties", $this->lng->txt("cont_iim_tr_properties")],
-                ["InteractiveImage", "trigger.overlay", $this->lng->txt("cont_iim_tr_overlay")],
-                ["InteractiveImage", "trigger.popup", $this->lng->txt("cont_iim_tr_popup")]
+                ["InteractiveImage", "trigger.properties", $this->lng->txt("properties")],
+                ["InteractiveImage", "trigger.overlay", $this->lng->txt("cont_overlay_image")],
+                ["InteractiveImage", "trigger.popup", $this->lng->txt("cont_content_popup")]
             ]
-        );
+        ));
     }
 
     protected function getTriggerPropertiesFormAdapter(): \ILIAS\Repository\Form\FormAdapterGUI {
         return $this->gui->form(null, "#")
                           ->text(
                               "title",
-                              $this->lng->txt("cont_iim_tr_title")
+                              $this->lng->txt("title")
                           )
                           ->select(
                               "shape",
-                              $this->lng->txt("cont_iim_tr_shape"),
+                              $this->lng->txt("cont_shape"),
                               [
-                                  "Rect" => $this->lng->txt("cont_iim_tr_rect"),
-                                  "Circle" => $this->lng->txt("cont_iim_tr_circle"),
-                                  "Poly" => $this->lng->txt("cont_iim_tr_poly"),
-                                  "Marker" => $this->lng->txt("cont_iim_tr_marker")
-                              ]
-                          );
+                                  "Rect" => $this->lng->txt("cont_Rect"),
+                                  "Circle" => $this->lng->txt("cont_Circle"),
+                                  "Poly" => $this->lng->txt("cont_Poly"),
+                                  "Marker" => $this->lng->txt("cont_marker")
+                              ], "", "Rect"
+                          )->required();
     }
 
     protected function getTriggerProperties() : string
     {
-        $content = $this->getTriggerBackButton().$this->getTriggerViewControls();
-        $content.= $this->ui_wrapper->getRenderedInfoBox($this->lng->txt("cont_iim_tr_properties_info"));
+        $content = $this->getTriggerBackButton().
+            $this->getTriggerHeader().
+            $this->getTriggerViewControls();
+        $content.= $this->section($this->ui_wrapper->getRenderedInfoBox($this->lng->txt("cont_iim_tr_properties_info")));
         $content.= $this->ui_wrapper->getRenderedAdapterForm(
             $this->getTriggerPropertiesFormAdapter(),
             [["InteractiveImage", "trigger.properties.save", $this->lng->txt("save")]],
@@ -287,23 +299,24 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
         return $this->gui->form(null, "#")
                          ->select(
                              "overlay",
-                             $this->lng->txt("cont_iim_tr_overlay"),
+                             $this->lng->txt("cont_iim_select_overlay"),
                              [
-                                 "" => $this->lng->txt("cont_iim_no_overlay")
                              ]
                          );
     }
 
     protected function getTriggerOverlay() : string
     {
-        $content = $this->getTriggerBackButton().$this->getTriggerViewControls();
-        $content.= $this->ui_wrapper->getRenderedButton(
-            $this->lng->txt("cont_iim_tr_add_overlay"),
+        $content = $this->getTriggerBackButton().
+            $this->getTriggerHeader().
+            $this->getTriggerViewControls();
+        $content.= $this->section($this->ui_wrapper->getRenderedButton(
+            $this->lng->txt("cont_iim_add_overlay"),
             "button",
             "trigger.add.overlay",
             null,
             "InteractiveImage"
-        );
+        ));
         $content.= $this->ui_wrapper->getRenderedAdapterForm(
             $this->getTriggerOverlayFormAdapter(),
             [["InteractiveImage", "trigger.overlay.save", $this->lng->txt("save")]],
@@ -317,30 +330,31 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
         return $this->gui->form(null, "#")
                          ->select(
                              "popup",
-                             $this->lng->txt("cont_iim_tr_popup"),
+                             $this->lng->txt("cont_content_popup"),
                              [
-                                 "" => $this->lng->txt("cont_iim_no_popup")
                              ]
                          )->select(
                 "position",
-                    $this->lng->txt("cont_iim_tr_position"),
+                    $this->lng->txt("cont_position"),
                     [
                         "Vertical" => $this->lng->txt("cont_iim_vertical"),
                         "Horizontal" => $this->lng->txt("cont_iim_horizontal")
-                    ]
-                );
+                    ], "", "Vertical"
+                )->required();
     }
 
     protected function getTriggerPopup() : string
     {
-        $content = $this->getTriggerBackButton().$this->getTriggerViewControls();
-        $content.= $this->ui_wrapper->getRenderedButton(
+        $content = $this->getTriggerBackButton().
+            $this->getTriggerHeader().
+            $this->getTriggerViewControls();
+        $content.= $this->section($this->ui_wrapper->getRenderedButton(
             $this->lng->txt("cont_iim_tr_add_popup"),
             "button",
             "trigger.add.popup",
             null,
             "InteractiveImage"
-        );
+        ));
         $content.= $this->ui_wrapper->getRenderedAdapterForm(
             $this->getTriggerPopupFormAdapter(),
             [["InteractiveImage", "trigger.popup.save", $this->lng->txt("save")]],
@@ -352,30 +366,30 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
     protected function getPopupOverview(): string
     {
         $content = $this->getTriggerBackButton();
-        $content.= "<h3>".$this->lng->txt("cont_iim_popups")."</h3>";
-        $content.= $this->ui_wrapper->getRenderedButton(
+        $content.= "<h3>".$this->lng->txt("cont_content_popups")."</h3>";
+        $content.= $this->section($this->ui_wrapper->getRenderedButton(
             $this->lng->txt("cont_iim_tr_add_popup"),
             "button",
             "trigger.add.popup",
             null,
             "InteractiveImage"
-        );
-        $content.= $this->ui_wrapper->getRenderedListingPanelTemplate($this->lng->txt("cont_iim_overview"));
+        ));
+        $content.= $this->section($this->ui_wrapper->getRenderedListingPanelTemplate($this->lng->txt("cont_iim_overview")));
         return $content;
     }
 
     protected function getOverlayOverview(): string
     {
         $content = $this->getTriggerBackButton();
-        $content.= "<h3>".$this->lng->txt("cont_iim_overlays")."</h3>";
-        $content.= $this->ui_wrapper->getRenderedButton(
-            $this->lng->txt("cont_iim_tr_add_overlay"),
+        $content.= "<h3>".$this->lng->txt("cont_overlay_images")."</h3>";
+        $content.= $this->section($this->ui_wrapper->getRenderedButton(
+            $this->lng->txt("cont_iim_add_overlay"),
             "button",
             "trigger.add.overlay",
             null,
             "InteractiveImage"
-        );
-        $content.= $this->ui_wrapper->getRenderedListingPanelTemplate($this->lng->txt("cont_iim_overview"), true);
+        ));
+        $content.= $this->section($this->ui_wrapper->getRenderedListingPanelTemplate($this->lng->txt("cont_iim_overview"), true));
 
         return $content;
     }
@@ -387,7 +401,7 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
                  ->async()
                  ->file(
                      "input_file",
-                     $this->lng->txt("import_file"),
+                     $this->lng->txt("file"),
                      \Closure::fromCallable([$this, 'handleUploadResult']),
                      "mob_id",
                      "",
@@ -397,7 +411,7 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
                      "copg"
                  )->text(
                 "caption",
-                    $this->lng->txt("cont_iim_tr_caption")
+                    $this->lng->txt("cont_caption")
                 );
     }
 

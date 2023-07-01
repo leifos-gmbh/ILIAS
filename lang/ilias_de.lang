@@ -6740,7 +6740,7 @@ content#:#cont_ov_all_correct#:#Sie haben alle Fragen richtig beantwortet.
 content#:#cont_ov_preview#:#Die Fragenübersicht funktioniert nicht im Seiteneditor-Kontext. Benutzen Sie stattdessen die Vorschau auf SCO- oder SCORM-Level.
 content#:#cont_ov_some_correct#:#Sie haben [x] von [y] Fragen richtig beantwortet.
 content#:#cont_ov_wrong_answered#:#Die folgenden Fragen wurden noch nicht oder falsch beantwortet
-content#:#cont_overlay_image#:#Bild für Overlay
+content#:#cont_overlay_image#:#Overlay-Bild
 content#:#cont_overlay_images#:#Overlay-Bilder
 content#:#cont_overlays_have_been_deleted#:#Overlays wurden gelöscht
 content#:#cont_page_activation#:#Seitenaktivierung
@@ -17040,3 +17040,19 @@ wsp#:#wsp_type_scov#:#Zertifikat: SCORM
 wsp#:#wsp_type_tstv#:#Zertifikat: Test
 wsp#:#wsp_type_webr#:#Weblink
 wsp#:#wsp_type_wfld#:#Ordner
+content#:#cont_iim_edit#:#Interaktives Bild bearbeiten
+content#:#cont_iim_finish_editing#:#Bearbeitung des interaktiven Bildes beenden
+content#:#cont_iim_trigger#:#Auslöser
+content#:#cont_iim_add_trigger_text#:#Bitte fügen Sie einen Auslöser hinzu. Passen Sie anschließen im rechten Bereich Größe und Position an.
+content#:#cont_iim_add_trigger#:#Auslöser hinzufügen
+content#:#cont_iim_overview#:#Übersicht
+content#:#cont_iim_background_image_and_caption#:#Hintergrundbild und Bildunterschrift
+content#:#cont_iim_edit_trigger#:#Auslöser bearbeiten
+content#:#cont_iim_add_overlay#:#Overlay-Bild hinzufügen
+content#:#cont_iim_select_overlay#:#Overlay-Bild auswählen
+content#:#cont_iim_no_overlay#:#Kein Overlay-Bild
+content#:#cont_iim_tr_properties_info#:#Der Auslöser wird Ihnen auf der rechten Seite angezeigt. Sie können dort Größe und Position per Maus ändern.
+content#:#cont_iim_tr_add_popup#:#Content-Popup hinzufügen
+content#:#cont_iim_vertical#:#Vertikal
+content#:#cont_iim_horizontal#:#Horizontal
+content#:#cont_iim_background_image#:#Hintergrundbild

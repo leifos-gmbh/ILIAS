@@ -17030,3 +17030,19 @@ wsp#:#wsp_type_scov#:#Certificate: SCORM
 wsp#:#wsp_type_tstv#:#Certificate: Test
 wsp#:#wsp_type_webr#:#Weblink
 wsp#:#wsp_type_wfld#:#Folder
+content#:#cont_iim_edit#:#Edit Interactive Image
+content#:#cont_iim_finish_editing#:#Finish Editing Interactive Image
+content#:#cont_iim_trigger#:#Trigger
+content#:#cont_iim_add_trigger_text#:#Please add a trigger. Afterwards edit size and position on the right screen.
+content#:#cont_iim_add_trigger#:#Add Trigger
+content#:#cont_iim_overview#:#Overview
+content#:#cont_iim_background_image_and_caption#:#Background Image and Caption
+content#:#cont_iim_edit_trigger#:#Edit Trigger
+content#:#cont_iim_add_overlay#:#Add Overlay
+content#:#cont_iim_select_overlay#:#Select Overlay
+content#:#cont_iim_no_overlay#:#No Overlay
+content#:#cont_iim_tr_properties_info#:#The trigger will be presented on the right side. You may alter position and size using the mouse.
+content#:#cont_iim_tr_add_popup#:#Add Content-Popup
+content#:#cont_iim_vertical#:#Vertical
+content#:#cont_iim_horizontal#:#Horizontal
+content#:#cont_iim_background_image#:#Background Image

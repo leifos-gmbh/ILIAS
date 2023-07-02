@@ -57,11 +57,36 @@ export default class Area {
         };
     }
 
-    getShape() {
+    getShape(triggerNr = null) {
         const coords = this.coords.split(",");
         switch (this.shapeType) {
             case "Rect":
-                return this.shapeFactory.rect(coords[0],coords[1],coords[2],coords[3]);
+                return this.shapeFactory.rect(
+                  parseInt(coords[0]),
+                  parseInt(coords[1]),
+                  parseInt(coords[2]),
+                  parseInt(coords[3]),
+                  {triggerNr : triggerNr, copgEdType : 'shape'}
+                );
+            case "Circle":
+                return this.shapeFactory.circle(
+                  parseInt(coords[0]),
+                  parseInt(coords[1]),
+                  parseInt(coords[0]) + parseInt(coords[2]),
+                  parseInt(coords[1]),
+                  {triggerNr : triggerNr, copgEdType : 'shape'}
+                );
+            case "Poly":
+                let co = [];
+                coords.forEach((c) => {
+                    co.push(parseInt(c));
+                });
+                return this.shapeFactory.poly(
+                  co,
+                  {
+                      triggerNr : triggerNr,
+                      copgEdType : 'shape'
+                  });
         }
         return null;
     }

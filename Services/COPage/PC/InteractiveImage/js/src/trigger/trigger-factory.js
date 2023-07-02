@@ -16,6 +16,7 @@
  *********************************************************************/
 
 import Trigger from "./trigger.js";
+import AreaFactory from "../area/area-factory.js"
 
 /**
  * Shape
@@ -23,6 +24,7 @@ import Trigger from "./trigger.js";
 export default class TriggerFactory {
 
   constructor() {
+    this.areaFactory = new AreaFactory();
   }
 
   trigger(
@@ -37,6 +39,7 @@ export default class TriggerFactory {
   ) {
     return new Trigger(
       nr,
+      area,
       markerX,
       markerY,
       overlay,
@@ -44,8 +47,7 @@ export default class TriggerFactory {
       '',
       popupNr,
       popupAlign,
-      title,
-      area
+      title
     );
   }
 
@@ -54,14 +56,25 @@ export default class TriggerFactory {
   fromPropertiesObject(o, area = null) {
     return new Trigger(
       o.Nr,
+      area,
       o.MarkerX,
       o.MarkerY,
       o.Overlay,
       o.PopupNr,
       o.PopupAlign,
-      o.Title,
-      o.area
+      o.Title
     );
+  }
+
+  fullTriggerFromModel(nr, model) {
+    let trigger = null;
+    model.triggers.forEach((tr) => {
+      if (tr.Nr == nr) {
+        const area = this.areaFactory.fromModelForId(tr.Nr, model);
+        trigger = this.fromPropertiesObject(tr, area);
+      }
+    });
+    return trigger;
   }
 
 }

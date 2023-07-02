@@ -37,12 +37,19 @@ export default class ShapeEditor {
         return this.factory;
     }
 
-    addShape(shape) {
+    removeAllShapes() {
+        this.shapes = [];
+        this.currentShape = null;
+    }
+    addShape(shape, asCurrent = false) {
         if (!shape) {
+            return;
             shape = this.factory.rect(10,10,50,50);
         }
         this.shapes.push(shape);
-        this.currentShape = this.shapes.length - 1;
+        if (asCurrent) {
+            this.currentShape = this.shapes.length - 1;
+        }
     }
 
     removeAllChilds(node) {
@@ -70,14 +77,43 @@ export default class ShapeEditor {
         return svg;
     }
 
+    addClickLayer() {
+        let click = document.getElementById("il-copg-iim-click");
+        if (!click) {
+            const img = this.mobElement.querySelector("img");
+            const click = img.cloneNode(true);
+            click.id = "il-copg-iim-click";
+            click.style.position = "absolute";
+            click.style.left = "0px";
+            click.style.top = "0px";
+            click.style.width = "100%";
+            click.style.height = "100%";
+            click.style.opacity = "1e-10";
+            this.mobElement.appendChild(click);
+
+            const map = document.createElement("map");
+            map.name = "il-copg-iim-map";
+            map.id = "il-copg-iim-map";
+            this.mobElement.appendChild(map);
+            let cnt = 0;
+            this.shapes.forEach((shape) => {
+                shape.addToMap(cnt++, map);
+            });
+            click.useMap = "#il-copg-iim-map";
+        };
+        return click;
+    }
+
     repaint() {
         this.repaintSvg();
-        this.shapes[this.currentShape].getHandles().forEach((h) => {
-            h.addHandleToMobElement(this.mobElement);
-            h.setOnDrag(() => {
-                this.repaintSvg();
+        if (this.currentShape !== null) {
+            this.shapes[this.currentShape].getHandles().forEach((h) => {
+                h.addHandleToMobElement(this.mobElement);
+                h.setOnDrag(() => {
+                    this.repaintSvg();
+                });
             });
-        });
+        }
     }
 
     repaintSvg() {

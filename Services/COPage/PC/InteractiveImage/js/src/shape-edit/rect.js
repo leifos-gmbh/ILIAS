@@ -26,8 +26,8 @@ export default class Rect extends Shape {
      * @param Handle topLeft
      * @param Handle bottomRight
      */
-    constructor(topLeft, bottomRight) {
-        super([topLeft, bottomRight]);
+    constructor(topLeft, bottomRight, data = {}) {
+        super([topLeft, bottomRight], data);
     }
 
     /**
@@ -55,8 +55,19 @@ export default class Rect extends Shape {
         r.setAttribute("y", y);
         r.setAttribute("width", w);
         r.setAttribute("height", h);
-        r.setAttribute("style", this.getStyle());
+        this.addDataAttributes(r);
         r.id = this.getElementId(nr);
+        this.setStyle(r);
     }
 
+    getAreaCoordsString() {
+        return this.getTopLeft().getX() + "," +
+          this.getTopLeft().getY() + "," +
+          this.getBottomRight().getX() + "," +
+          this.getBottomRight().getY();
+    }
+
+    getAreaShapeString() {
+        return "rect";
+    }
 }

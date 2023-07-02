@@ -22,8 +22,8 @@ import Shape from "./shape.js";
  */
 export default class Poly extends Shape {
 
-    constructor() {
-        super([]);
+    constructor(data = {}) {
+        super([], data);
     }
 
     /**
@@ -41,8 +41,24 @@ export default class Poly extends Shape {
         });
         p = svg.appendChild(p);
         p.setAttribute("points", points);
-        p.setAttribute("style", this.getStyle());
         p.id = this.getElementId(nr);
+        this.addDataAttributes(p);
+        this.setStyle(p);
+    }
+
+    getAreaCoordsString() {
+        let cstr = "";
+        this.handles.forEach((h) => {
+            if (cstr != "") {
+                cstr = cstr + ",";
+            }
+            cstr = cstr + h.getX() + "," + h.getY();
+        });
+        return cstr;
+    }
+
+    getAreaShapeString() {
+        return "poly";
     }
 
 }

@@ -25,8 +25,9 @@ export default class Shape {
     /**
      * @param Handle[] coords
      */
-    constructor(handles = []) {
+    constructor(handles = [], data = {}) {
         this.handles = handles;
+        this.data = data;
     }
 
     /**
@@ -37,7 +38,12 @@ export default class Shape {
     }
 
     getStyle () {
+        return "";
         return "stroke:red; stroke-width:1; fill:none;";
+    }
+
+    getStyleClass () {
+        return "copg-iim-area-shape-sel";
     }
 
     createSvgElement(name) {
@@ -52,6 +58,41 @@ export default class Shape {
      * @param int nr
      */
     addToSvg(nr, svg) {
+    }
+
+    addDataAttributes(el) {
+        for (const [key, value] of Object.entries(this.data)) {
+            el.dataset[key] = value;
+        }
+    }
+
+    setStyle(el) {
+        el.classList.add(this.getStyleClass());
+    }
+
+    /**
+     * @param int nr
+     */
+    addToMap(nr, map) {
+    }
+
+    getAreaCoordsString() {
+        return "";
+    }
+
+    getAreaShapeString() {
+        return "";
+    }
+
+    /**
+     * @param int nr
+     */
+    addToMap(nr, map) {
+        const area = document.createElement("area");
+        area.shape = this.getAreaShapeString();
+        area.coords = this.getAreaCoordsString();
+        area.href = "#";
+        map.appendChild(area);
     }
 
 }

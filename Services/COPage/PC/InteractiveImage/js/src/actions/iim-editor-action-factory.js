@@ -43,6 +43,12 @@ export default class IIMEditorActionFactory {
     return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_ADD_TRIGGER, {});
   }
 
+  editTrigger(nr) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_EDIT_TRIGGER, {
+      triggerNr : nr
+    });
+  }
+
   /**
    * @returns {EditorAction}
    */

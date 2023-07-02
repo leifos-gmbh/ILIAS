@@ -26,8 +26,8 @@ export default class Circle extends Shape {
      * @param Handle center
      * @param Handle point
      */
-    constructor(center, point) {
-        super([center, point]);
+    constructor(center, point, data = {}) {
+        super([center, point], data);
     }
 
     /**
@@ -44,20 +44,34 @@ export default class Circle extends Shape {
         return this.handles[1];
     }
 
+    getRadius() {
+        return Math.sqrt(
+          ((this.getCenter().getX() - this.getPoint().getX()) ** 2) +
+          ((this.getCenter().getY() - this.getPoint().getY()) ** 2)
+        );
+    }
     addToSvg(nr, svg) {
         let c = this.createSvgElement("circle");
         const cx = this.getCenter().getX();
         const cy = this.getCenter().getY();
-        const r = Math.sqrt(
-          ((this.getCenter().getX() - this.getPoint().getX()) ** 2) +
-          ((this.getCenter().getY() - this.getPoint().getY()) ** 2)
-        );
+        const r = this.getRadius();
         c = svg.appendChild(c);
         c.setAttribute("cx", cx);
         c.setAttribute("cy", cy);
         c.setAttribute("r", r);
-        c.setAttribute("style", this.getStyle());
         c.id = this.getElementId(nr);
+        this.addDataAttributes(c);
+        this.setStyle(c);
+    }
+
+    getAreaCoordsString() {
+        return this.getCenter().getX() + "," +
+          this.getCenter().getY() + "," +
+          this.getRadius();
+    }
+
+    getAreaShapeString() {
+        return "circle";
     }
 
 }

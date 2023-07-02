@@ -102,6 +102,13 @@ export default class Model {
     this.log("addStandardTrigger");
   }
 
+  setTriggerByNr(triggerNr) {
+    this.model.currentTrigger = this.triggerFactory.fullTriggerFromModel(
+      triggerNr,
+      this.model.iim
+    );
+  }
+
   getCurrentTrigger() {
     return this.model.currentTrigger;
   }

@@ -57,6 +57,11 @@ export default class ModelActionHandler {
         this.model.setState(this.model.STATE_TRIGGER_PROPERTIES);
         break;
 
+      case ACTIONS.E_EDIT_TRIGGER:
+        this.model.setTriggerByNr(params.triggerNr);
+        this.model.setState(this.model.STATE_TRIGGER_PROPERTIES);
+        break;
+
       case ACTIONS.E_TRIGGER_PROPERTIES:
         this.model.setState(this.model.STATE_TRIGGER_PROPERTIES);
         break;

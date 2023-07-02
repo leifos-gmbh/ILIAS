@@ -44,8 +44,8 @@ export default class ShapeFactory {
    * @param int y2
    * @return Rect
    */
-  rect(x1, y1, x2, y2) {
-    return new Rect(this.handle(x1, y1), this.handle(x2, y2));
+  rect(x1, y1, x2, y2, data = {}) {
+    return new Rect(this.handle(x1, y1), this.handle(x2, y2), data);
   }
 
   /**
@@ -55,15 +55,19 @@ export default class ShapeFactory {
    * @param int y2
    * @return Circle
    */
-  circle(x1, y1, x2, y2) {
-    return new Circle(this.handle(x1, y1), this.handle(x2, y2));
+  circle(x1, y1, x2, y2, data = {}) {
+    return new Circle(this.handle(x1, y1), this.handle(x2, y2), data);
   }
 
   /**
    * @return Poly
    */
-  poly() {
-    return new Poly();
+  poly(coords, data = {}) {
+    const p = new Poly(data);
+    for (let i=0; i < (coords.length / 2); i++) {
+      p.addHandle(this.handle(coords[i*2], coords[i*2+1]));
+    }
+    return p;
   }
 
 }

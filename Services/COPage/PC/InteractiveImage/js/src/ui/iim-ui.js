@@ -18,6 +18,7 @@ import ACTIONS from "../actions/iim-action-types.js";
 import Util from "../../../../../Editor/js/src/ui/util.js";
 import ShapeEditor from "../shape-edit/shape-editor.js";
 import ActionFactory from "../actions/iim-editor-action-factory.js";
+import TriggerFactory from "../trigger/trigger-factory.js";
 
 /**
  * interactive image ui
@@ -86,6 +87,7 @@ export default class UI {
     this.uiModel = uiModel;
     this.util = new Util();
     this.shapeEditor = null;
+    this.triggerFactory = new TriggerFactory();
   }
 
   //
@@ -123,6 +125,7 @@ export default class UI {
     this.initMainScreenActions();
     this.setMainContent(this.uiModel.backgroundImage);
     this.initShapeEditor();
+    this.showAllShapes();
   }
 
   initMainScreenActions() {
@@ -177,6 +180,32 @@ export default class UI {
     }
   }
 
+  showAllShapes() {
+    const m = this.iim_model.model.iim;
+    m.triggers.forEach((tr) => {
+      const trigger = this.triggerFactory.fullTriggerFromModel(tr.Nr, m);
+      if (trigger) {
+        console.log("ADDING SHAPE");
+        console.log(trigger.getShape());
+        this.shapeEditor.addShape(trigger.getShape());
+      }
+    });
+    this.shapeEditor.repaint();
+    this.initShapes();
+  }
+
+  initShapes() {
+    const dispatch = this.dispatcher;
+    const action = this.actionFactory;
+    document.querySelectorAll("[data-copg-ed-type='shape']").forEach(shape => {
+      shape.addEventListener("click", (event) => {
+          dispatch.dispatch(action.interactiveImage().editor().editTrigger(
+            shape.dataset.triggerNr
+          ));
+      });
+    });
+  }
+
   setMainContent(html) {
     const el = document.getElementById('il-copg-iim-main');
     this.util.setInnerHTML(el, html);
@@ -189,10 +218,34 @@ export default class UI {
     this.shapeEditor.repaint();
   }
 
+  editTrigger(nr) {
+    const trigger = this.iim_model.getCurrentTrigger();
+    this.showTriggerProperties();
+    this.shapeEditor.removeAllShapes();
+    this.shapeEditor.addShape(trigger.getShape(), true);
+    this.shapeEditor.repaint();
+  }
+
   showTriggerProperties() {
+    const tr = this.iim_model.getCurrentTrigger();
     this.toolSlate.setContent(this.uiModel.triggerProperties);
+    this.setInputValueByName('form_input_1', tr.title);
+    console.log(tr);
+    console.log(tr.area.shapeType);
+    this.setInputValueByName('form_input_2', tr.area.shapeType);
     this.initTriggerViewControl();
     this.initBackButton();
+  }
+
+  setInputValueByName(name, value) {
+    const path = "#copg-iim-trigger-prop-form input[name='" + name + "'],select[name='" + name + "']";
+    const el = document.querySelector(path);
+    if (el) {
+      console.log("SETTING");
+      console.log(el);
+      console.log(value);
+      el.value = value;
+    }
   }
 
   showTriggerOverlay() {

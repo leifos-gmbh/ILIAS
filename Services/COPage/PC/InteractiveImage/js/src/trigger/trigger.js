@@ -70,7 +70,7 @@ export default class Trigger {
 
     getShape() {
         if (this.area){
-            return this.area.getShape();
+            return this.area.getShape(this.nr);
         }
     }
 }

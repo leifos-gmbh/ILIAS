@@ -83,6 +83,10 @@ export default class IIMUIActionHandler {
                     this.ui.addTrigger();
                     break;
 
+                case ACTIONS.E_EDIT_TRIGGER:
+                    this.ui.editTrigger(params.triggerNr);
+                    break;
+
                 case ACTIONS.E_TRIGGER_PROPERTIES:
                     this.ui.showTriggerProperties();
                     break;

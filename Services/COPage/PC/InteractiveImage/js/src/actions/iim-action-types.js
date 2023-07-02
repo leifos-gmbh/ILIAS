@@ -24,6 +24,7 @@ const ACTIONS = {
 
   // editor actions (things happening in the editor client side)
   E_ADD_TRIGGER: "add.trigger",
+  E_EDIT_TRIGGER: "edit.trigger",
   E_TRIGGER_PROPERTIES: "trigger.properties",
   E_TRIGGER_OVERLAY: "trigger.overlay",
   E_TRIGGER_POPUP: "trigger.popup",

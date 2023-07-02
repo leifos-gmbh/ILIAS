@@ -14752,6 +14752,18 @@ p#copg-auto-save {
 .copg-slate-section {
   padding: 3px 15px;
 }
+.copg-iim-area-shape-sel {
+  stroke: #B54F00;
+  stroke-width: 1;
+  /*fill-opacity: 50%;*/
+  fill: transparent;
+}
+.copg-iim-area-shape-sel:hover {
+  stroke: #0078D7;
+  stroke-width: 2;
+  fill-opacity: 40%;
+  fill: white;
+}
 /* Services/Calendar */
 td.even {
   color: #161616;

@@ -56,4 +56,14 @@ export default class AreaFactory {
     );
   }
 
+  fromModelForId(id, model) {
+    let area = null;
+    model.media_item.areas.forEach((a) => {
+      if (a.Id == id) {
+        area = this.fromPropertiesObject(a, null);
+      }
+    });
+    return area;
+  }
+
 }

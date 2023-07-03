@@ -40,7 +40,7 @@ class ilMMCustomItemStorage extends CachedActiveRecord
      * @con_fieldtype  text
      * @con_length     4000
      */
-    protected string $global_role_ids = "";
+    protected $global_role_ids = "";
     /**
      * @con_has_field  true
      * @con_fieldtype  text

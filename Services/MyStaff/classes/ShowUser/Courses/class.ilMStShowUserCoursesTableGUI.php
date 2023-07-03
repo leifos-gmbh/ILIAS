@@ -49,6 +49,7 @@ class ilMStShowUserCoursesTableGUI extends ilTable2GUI
     protected array $filter = array();
     protected ilMyStaffAccess $access;
     protected ?array $columnDefinition = null;
+    protected ?array $orgu_names = null;
 
     /**
      * @param ilMStShowUserCoursesGUI $parent_obj
@@ -175,9 +176,7 @@ class ilMStShowUserCoursesTableGUI extends ilTable2GUI
             $this->addFilterItem($item);
             $item->readFromSession();
             $this->filter["lp_status"] = $item->getValue();
-            if ($this->filter["lp_status"]) {
-                $this->filter["lp_status"] = $this->filter["lp_status"] - 1;
-            }
+            $this->filter["lp_status"] = (int) $this->filter["lp_status"] - 1;
         }
     }
 
@@ -297,6 +296,15 @@ class ilMStShowUserCoursesTableGUI extends ilTable2GUI
                                                              )));
         $this->tpl->setVariable('ACTIONS', $actions->getHTML());
         $this->tpl->parseCurrentBlock();
+    }
+
+    protected function getTextRepresentationOfOrgUnits(): array
+    {
+        if (isset($this->orgu_names)) {
+            return $this->orgu_names;
+        }
+
+        return $this->orgu_names = ilOrgUnitPathStorage::getTextRepresentationOfOrgUnits();
     }
 
     protected function fillRowExcel(ilExcel $a_excel, int &$a_row, array $a_set): void

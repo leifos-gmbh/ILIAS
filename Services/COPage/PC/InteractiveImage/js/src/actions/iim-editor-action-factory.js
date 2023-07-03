@@ -98,4 +98,21 @@ export default class IIMEditorActionFactory {
     return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_SWITCH_POPUPS, {});
   }
 
+  /**
+   * @returns {EditorAction}
+   */
+  saveTriggerProperties(
+    nr,
+    title,
+    shapeType,
+    coords
+  ) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_TRIGGER_PROPERTIES_SAVE, {
+      nr: nr,
+      title: title,
+      shapeType: shapeType,
+      coords: coords
+    });
+  }
+
 }

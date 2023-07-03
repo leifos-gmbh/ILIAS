@@ -41,11 +41,12 @@ export default class IIMCommandActionFactory {
    * @param redirect
    * @return {CommandAction}
    */
-  updateData(pcid, content, redirect) {
-    return this.clientActionFactory.command(this.COMPONENT, ACTIONS.UPDATE_DATA, {
-      pcid: pcid,
-      content: content,
-      redirect: redirect
+  saveTriggerProperties(triggerNr, title, shapeType, coords) {
+    return this.clientActionFactory.command(this.COMPONENT, ACTIONS.C_SAVE_TRIGGER_PROPERTIES, {
+      trigger_nr: triggerNr,
+      title: title,
+      shape_type: shapeType,
+      coords: coords
     });
   }
 }

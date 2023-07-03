@@ -20,12 +20,13 @@ const ACTIONS = {
   Q_INIT: "init",
 
   // command actions (being sent to the server to "change things")
-  C_SAVE_PROPERTIES: "save.properties",
+  C_SAVE_TRIGGER_PROPERTIES: "save.trigger.properties",
 
   // editor actions (things happening in the editor client side)
   E_ADD_TRIGGER: "add.trigger",
   E_EDIT_TRIGGER: "edit.trigger",
   E_TRIGGER_PROPERTIES: "trigger.properties",
+  E_TRIGGER_PROPERTIES_SAVE: "trigger.properties.save",
   E_TRIGGER_OVERLAY: "trigger.overlay",
   E_TRIGGER_POPUP: "trigger.popup",
   E_TRIGGER_BACK: "trigger.back",

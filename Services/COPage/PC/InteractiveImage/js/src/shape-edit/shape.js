@@ -76,6 +76,10 @@ export default class Shape {
     addToMap(nr, map) {
     }
 
+    getCurrentCoordsAsString() {
+        return "";
+    }
+
     getAreaCoordsString() {
         return "";
     }

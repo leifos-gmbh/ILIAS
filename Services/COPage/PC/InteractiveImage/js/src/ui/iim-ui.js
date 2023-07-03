@@ -227,14 +227,40 @@ export default class UI {
   }
 
   showTriggerProperties() {
+    const dispatch = this.dispatcher;
+    const action = this.actionFactory;
     const tr = this.iim_model.getCurrentTrigger();
     this.toolSlate.setContent(this.uiModel.triggerProperties);
     this.setInputValueByName('form_input_1', tr.title);
-    console.log(tr);
-    console.log(tr.area.shapeType);
     this.setInputValueByName('form_input_2', tr.area.shapeType);
     this.initTriggerViewControl();
     this.initBackButton();
+    model = this.iim_model;
+    document.querySelectorAll("form [data-copg-ed-type='form-button']").forEach(button => {
+      const act = button.dataset.copgEdAction;
+      button.addEventListener("click", (event) => {
+        switch (act) {
+          case ACTIONS.E_TRIGGER_PROPERTIES_SAVE:
+            event.preventDefault();
+            dispatch.dispatch(action.interactiveImage().editor().saveTriggerProperties(
+              model.getCurrentTrigger().nr,
+              this.getInputValueByName('form_input_1'),
+              this.getInputValueByName('form_input_2'),
+              model.getCurrentTrigger().getShape().getAreaCoordsString()
+            ));
+            break;
+        }
+      });
+    });
+  }
+
+  getInputValueByName(name) {
+    const path = "#copg-iim-trigger-prop-form input[name='" + name + "'],select[name='" + name + "']";
+    const el = document.querySelector(path);
+    if (el) {
+      return el.value;
+    }
+    return null;
   }
 
   setInputValueByName(name, value) {

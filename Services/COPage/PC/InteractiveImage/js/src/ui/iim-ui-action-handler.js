@@ -15,6 +15,7 @@
  *********************************************************************/
 
 import ACTIONS from "../actions/iim-action-types.js";
+import ActionFactory from "../actions/iim-action-factory.js"
 import UI from "./iim-ui.js";
 
 /**
@@ -111,10 +112,31 @@ export default class IIMUIActionHandler {
                     this.ui.showOverlays();
                     break;
 
-                case ACTIONS.E_SWITCH_POPUPS:
-                    this.ui.showPopups();
+                case ACTIONS.E_TRIGGER_PROPERTIES_SAVE:
+                    this.sendSaveTriggerPropertiesCommand(
+                      params
+                    );
                     break;
             }
         }
     }
+
+    sendSaveTriggerPropertiesCommand(params) {
+        let update_action;
+        const af = this.actionFactory;
+        const dispatch = this.dispatcher;
+
+        update_action = af.interactiveImage().command().saveTriggerProperties(
+          params.nr,
+          params.title,
+          params.shapeType,
+          params.coords
+        );
+
+        this.client.sendCommand(update_action).then(result => {
+            this.ui.handlePageReloadResponse(result);
+            dispatch.dispatch(af.page().editor().enablePageEditing());
+        });
+    }
+
 }

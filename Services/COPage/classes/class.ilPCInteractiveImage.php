@@ -583,4 +583,38 @@ class ilPCInteractiveImage extends ilPageContent
         return $model;
     }
 
+    protected function getTriggerNode(string $nr)
+    {
+        $tr_nodes = $this->getTriggerNodes($this->hier_id, $this->getPCId());
+        for ($i = 0; $i < count($tr_nodes); $i++) {
+            $tr_node = $tr_nodes[$i];
+            if ($tr_node->get_attribute("Nr") == $nr) {
+                return $tr_node;
+            }
+        }
+        return null;
+    }
+
+    public function setTriggerProperties(string $nr, string $title, string $shape_type, string $coords) : void
+    {
+        $tr_node = $this->getTriggerNode($nr);
+        if ($tr_node) {
+            $tr_node->set_attribute(
+                "Title",
+                $title
+            );
+            $this->setExtLinkTitle(
+                $nr,
+                $title
+            );
+            $xpc = xpath_new_context($this->dom);
+            $path = "//PageContent[@HierId = '" . $this->hier_id . "']/InteractiveImage/MediaAliasItem/MapArea[@Id='" . $nr . "']";
+            $res = xpath_eval($xpc, $path);
+            if (count($res->nodeset) > 0) {
+                $res->nodeset[0]->set_attribute("Shape", $shape_type);
+                $res->nodeset[0]->set_attribute("Coords", $coords);
+            }
+        }
+    }
+
 }

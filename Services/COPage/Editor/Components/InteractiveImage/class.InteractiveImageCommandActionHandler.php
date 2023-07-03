@@ -52,8 +52,8 @@ class InteractiveImageCommandActionHandler implements Server\CommandActionHandle
             case "insert":
                 return $this->insertCommand($body);
 
-            case "update":
-                return $this->updateCommand($body);
+            case "save.trigger.properties":
+                return $this->saveTriggerProperties($query['pc_id'], $body);
 
             default:
                 throw new Exception("Unknown action " . $body["action"]);
@@ -93,4 +93,34 @@ class InteractiveImageCommandActionHandler implements Server\CommandActionHandle
 
         return $this->ui_wrapper->sendPage($this->page_gui, $updated);
     }
+    protected function saveTriggerProperties(string $pc_id, array $body): Server\Response
+    {
+        $page = $this->page_gui->getPageObject();
+        /** @var \ilPCInteractiveImage $pc */
+        $pc = $this->page_gui->getPageObject()->getContentObjectForPcId($pc_id);
+        $pc->setTriggerProperties($body["data"]["trigger_nr"], $body["data"]["title"], $body["data"]["shape_type"], $body["data"]["coords"]);
+        $updated = $page->update();
+
+        return $this->getStandardResponse($updated, $pc);
+    }
+
+    protected function getStandardResponse($updated, \ilPCInteractiveImage $pc): Server\Response
+    {
+        $error = false;
+        if ($updated !== true) {
+            if (is_array($updated)) {
+                $error = implode("<br />", $updated);
+            } elseif (is_string($updated)) {
+                $error = $updated;
+            } else {
+                $error = print_r($updated, true);
+            }
+        }
+
+        $data = new \stdClass();
+        $data->error = $error;
+        $data->model = $pc->getIIMModel();
+        return new Server\Response($data);
+    }
+
 }

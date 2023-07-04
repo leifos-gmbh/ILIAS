@@ -98,7 +98,7 @@ class InteractiveImageCommandActionHandler implements Server\CommandActionHandle
         $page = $this->page_gui->getPageObject();
         /** @var \ilPCInteractiveImage $pc */
         $pc = $this->page_gui->getPageObject()->getContentObjectForPcId($pc_id);
-        $pc->setTriggerProperties($body["data"]["trigger_nr"], $body["data"]["title"], $body["data"]["shape_type"], $body["data"]["coords"]);
+        $pc->setTriggerProperties((string) $body["data"]["trigger_nr"], $body["data"]["title"], $body["data"]["shape_type"], $body["data"]["coords"]);
         $updated = $page->update();
 
         return $this->getStandardResponse($updated, $pc);

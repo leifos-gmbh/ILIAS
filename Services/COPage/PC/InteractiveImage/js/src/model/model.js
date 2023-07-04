@@ -97,6 +97,12 @@ export default class Model {
     );
     this.model.currentTrigger = this.triggerFactory.trigger(
       this.getNextTriggerNr(),
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
       area
     );
     this.log("addStandardTrigger");

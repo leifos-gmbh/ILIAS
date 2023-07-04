@@ -614,7 +614,13 @@ class ilPCInteractiveImage extends ilPageContent
                 $res->nodeset[0]->set_attribute("Shape", $shape_type);
                 $res->nodeset[0]->set_attribute("Coords", $coords);
             }
+        } else {
+            $this->addTriggerArea(
+                $this->getStandardAliasItem(),
+                $shape_type,
+                $coords,
+                $title
+            );
         }
     }
-
 }

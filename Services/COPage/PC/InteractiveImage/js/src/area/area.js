@@ -40,6 +40,7 @@ export default class Area {
         this.id = id;
         this.link = link;
         this.shapeFactory = new ShapeFactory();
+        this.shape = {};
     }
 
     toPropertiesObject(nr) {
@@ -59,35 +60,45 @@ export default class Area {
 
     getShape(triggerNr = null) {
         const coords = this.coords.split(",");
+        let shape = null;
+        if (triggerNr && this.shape[triggerNr]) {
+            return this.shape[triggerNr];
+        }
         switch (this.shapeType) {
             case "Rect":
-                return this.shapeFactory.rect(
+                shape = this.shapeFactory.rect(
                   parseInt(coords[0]),
                   parseInt(coords[1]),
                   parseInt(coords[2]),
                   parseInt(coords[3]),
                   {triggerNr : triggerNr, copgEdType : 'shape'}
                 );
+                break;
             case "Circle":
-                return this.shapeFactory.circle(
+                shape = this.shapeFactory.circle(
                   parseInt(coords[0]),
                   parseInt(coords[1]),
                   parseInt(coords[0]) + parseInt(coords[2]),
                   parseInt(coords[1]),
                   {triggerNr : triggerNr, copgEdType : 'shape'}
                 );
+                break;
             case "Poly":
                 let co = [];
                 coords.forEach((c) => {
                     co.push(parseInt(c));
                 });
-                return this.shapeFactory.poly(
+                shape = this.shapeFactory.poly(
                   co,
                   {
                       triggerNr : triggerNr,
                       copgEdType : 'shape'
                   });
+                break;
         }
-        return null;
+        if (triggerNr) {
+            this.shape[triggerNr] = shape;
+        }
+        return shape;
     }
 }

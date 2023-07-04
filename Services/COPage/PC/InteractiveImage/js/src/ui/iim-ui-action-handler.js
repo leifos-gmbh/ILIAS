@@ -65,10 +65,9 @@ export default class IIMUIActionHandler {
 
     /**
      * @param {EditorAction} action
-     * @param {PageModel} page_model
+     * @param {IIMModel} model
      */
-    handle(action, page_model) {
-
+    handle(action, model) {
         const dispatcher = this.dispatcher;
         const actionFactory = this.actionFactory;
         const client = this.client;
@@ -81,7 +80,7 @@ export default class IIMUIActionHandler {
             switch (action.getType()) {
 
                 case ACTIONS.E_ADD_TRIGGER:
-                    this.ui.addTrigger();
+                    this.ui.editTrigger(model.getCurrentTrigger().nr);
                     break;
 
                 case ACTIONS.E_EDIT_TRIGGER:
@@ -114,14 +113,15 @@ export default class IIMUIActionHandler {
 
                 case ACTIONS.E_TRIGGER_PROPERTIES_SAVE:
                     this.sendSaveTriggerPropertiesCommand(
-                      params
+                      params,
+                      model
                     );
                     break;
             }
         }
     }
 
-    sendSaveTriggerPropertiesCommand(params) {
+    sendSaveTriggerPropertiesCommand(params, model) {
         let update_action;
         const af = this.actionFactory;
         const dispatch = this.dispatcher;
@@ -134,9 +134,20 @@ export default class IIMUIActionHandler {
         );
 
         this.client.sendCommand(update_action).then(result => {
-            this.ui.handlePageReloadResponse(result);
-            dispatch.dispatch(af.page().editor().enablePageEditing());
+            this.handleStandardResponse(result, model);
+            //dispatch.dispatch(af.page().editor().enablePageEditing());
         });
     }
+
+    handleStandardResponse(result, model)
+    {
+        const pl = result.getPayload();
+
+        if(pl.error === false)
+        {
+            model.initModel(pl.model);
+        }
+    }
+
 
 }

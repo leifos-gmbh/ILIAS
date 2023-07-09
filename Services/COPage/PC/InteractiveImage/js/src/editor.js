@@ -24,7 +24,7 @@ import Dispatcher from "../../../../Editor/js/src/dispatcher.js";
 import ModelActionHandler from "./model/model-action-handler.js";
 import UIActionHandler from "./ui/ui-action-handler.js";
 import ToolSlate from "../../../../Editor/js/src/ui/tool-slate.js";
-/* import PageModifier from "./ui/page-modifier.js"; */
+import IIMUIModifier from "./ui/iim-ui-modifier.js";
 
 /**
  * Editor (mainly sets up dependency tree)
@@ -71,9 +71,9 @@ const editor = (function ($, il) {
 
     // ui
     const toolSlate = new ToolSlate();
-    /* const pageModifier = new PageModifier(toolSlate); */
+    const uiModifier = new IIMUIModifier();
     //const ui = new UI(client, dispatcher, actionFactory, model, toolSlate, pageModifier);
-    const ui = new UI(client, dispatcher, actionFactory, this.iimModel, toolSlate);
+    const ui = new UI(client, dispatcher, actionFactory, this.iimModel, toolSlate, uiModifier);
 
     client.setDefaultErrorHandler((error) => {
       console.log("ERROR: ");

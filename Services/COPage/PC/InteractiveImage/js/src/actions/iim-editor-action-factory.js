@@ -115,4 +115,24 @@ export default class IIMEditorActionFactory {
     });
   }
 
+  /**
+   * @returns {EditorAction}
+   */
+  changeTriggerShape(
+    shape
+  ) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_TRIGGER_SHAPE_CHANGE, {
+      shape: shape
+    });
+  }
+
+  /**
+   * @returns {EditorAction}
+   */
+  addTriggerOverlay(
+  ) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_TRIGGER_OVERLAY_ADD, {
+    });
+  }
+
 }

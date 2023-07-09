@@ -32,6 +32,8 @@ export default class Model {
     this.STATE_SETTINGS = "settings";   // settings
     this.STATE_OVERLAYS = "overlays";   // settings
     this.STATE_POPUPS = "popups";   // settings
+    this.ACTION_STATE_ADD = "add";   // add
+    this.ACTION_STATE_EDIT = "edit";   // edit
 
     this.model = {
       state: this.STATE_OVERVIEW,
@@ -47,6 +49,10 @@ export default class Model {
       this.STATE_SETTINGS,
       this.STATE_OVERLAYS,
       this.STATE_POPUPS
+    ];
+    this.actionStates = [
+      this.ACTION_STATE_ADD,
+      this.ACTION_STATE_EDIT
     ];
     this.areaFactory = new AreaFactory();
     this.triggerFactory = new TriggerFactory();
@@ -82,6 +88,19 @@ export default class Model {
     return this.model.state;
   }
 
+  setActionState(state) {
+    if (this.actionStates.includes(state)) {
+      this.model.actionState = state;
+    }
+  }
+
+  /**
+   * @return {string}
+   */
+  getActionState() {
+    return this.model.actionState;
+  }
+
   getNextTriggerNr() {
     let maxNr = 0;
     this.model.iim.triggers.forEach((a) => {
@@ -106,6 +125,31 @@ export default class Model {
       area
     );
     this.log("addStandardTrigger");
+  }
+
+  changeTriggerShape(shape) {
+    let area;
+    switch (shape) {
+      case "Rect":
+        area = this.areaFactory.area(
+          "Rect",
+          "10,10,50,50"
+        );
+        break;
+      case "Circle":
+        area = this.areaFactory.area(
+          "Circle",
+          "100,100,50"
+        );
+        break;
+      case "Poly":
+        area = this.areaFactory.area(
+          "Poly",
+          ""
+        );
+        break;
+    }
+    this.model.currentTrigger.setArea(area);
   }
 
   setTriggerByNr(triggerNr) {

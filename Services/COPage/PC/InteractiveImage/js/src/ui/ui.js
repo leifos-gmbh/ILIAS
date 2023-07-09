@@ -16,6 +16,7 @@
 
 import IIMUI from './iim-ui.js';
 import ActionFactory from '../actions/action-factory.js';
+import IIMUIModifier from "./iim-ui-modifier.js";
 
 /**
  * editor ui
@@ -80,17 +81,17 @@ export default class UI {
    * @param {ActionFactory} actionFactory
    * @param {Model} model
    * @param {ToolSlate} toolSlate
-   * @param {PageModifer} pageModifer
+   * @param {IIMUIModifier} IIMUIModifier
    */
   constructor(client, dispatcher, actionFactory, iimModel, toolSlate,
-              /*pageModifer*/) {
+              uiModifier) {
     this.uiModel = {};
     this.client = client;
     this.dispatcher = dispatcher;
     this.actionFactory = actionFactory;
     this.iimModel = iimModel;
     this.toolSlate = toolSlate;
-    /*this.pageModifer = pageModifer;*/
+    this.uiModifier = uiModifier;
     this.debug = true;
 
     this.iim = new IIMUI(
@@ -99,7 +100,8 @@ export default class UI {
       this.actionFactory,
       iimModel,
       this.uiModel,
-      this.toolSlate
+      this.toolSlate,
+      this.uiModifier
     );
 
     /*
@@ -141,6 +143,7 @@ export default class UI {
       console.log(p);
       this.iimModel.initModel(p.iimModel);
       this.uiModel = p.uiModel;
+      this.uiModifier.setUIModel(p.uiModel);
       this.iim.init(this.uiModel);
       /*
       this.uiModel = result.getPayload();

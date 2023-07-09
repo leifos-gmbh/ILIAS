@@ -19,6 +19,8 @@ import Util from "../../../../../Editor/js/src/ui/util.js";
 import ShapeEditor from "../shape-edit/shape-editor.js";
 import ActionFactory from "../actions/iim-editor-action-factory.js";
 import TriggerFactory from "../trigger/trigger-factory.js";
+import Poly from "../shape-edit/poly.js";
+import IIMUIModifier from "./iim-ui-modifier.js";
 
 /**
  * interactive image ui
@@ -75,9 +77,9 @@ export default class UI {
    * @param {ActionFactory} actionFactory
    * @param {IIMModel} page_model
    * @param {ToolSlate} toolSlate
-   * @param {PageModifier} pageModifier
+   * @param {IIMUIModifier} uiModifier
    */
-  constructor(client, dispatcher, actionFactory, iimModel, uiModel, toolSlate) {
+  constructor(client, dispatcher, actionFactory, iimModel, uiModel, toolSlate, uiModifier) {
     this.debug = true;
     this.client = client;
     this.dispatcher = dispatcher;
@@ -88,6 +90,7 @@ export default class UI {
     this.util = new Util();
     this.shapeEditor = null;
     this.triggerFactory = new TriggerFactory();
+    this.uiModifier = uiModifier;
   }
 
   //
@@ -221,6 +224,24 @@ export default class UI {
   editTrigger(nr) {
     const trigger = this.iim_model.getCurrentTrigger();
     this.showTriggerProperties();
+    this.setEditorAddMode();
+    this.shapeEditor.removeAllShapes();
+    this.shapeEditor.addShape(trigger.getShape(), true);
+    this.shapeEditor.repaint();
+  }
+
+  setEditorAddMode () {
+    const trigger = this.iim_model.getCurrentTrigger();
+    this.shapeEditor.setAllowAdd(false);
+    if (this.iim_model.getActionState() === this.iim_model.ACTION_STATE_ADD &&
+      trigger.getShape() instanceof Poly) {
+      this.shapeEditor.setAllowAdd(true);
+    }
+  }
+
+  repaintTrigger() {
+    const trigger = this.iim_model.getCurrentTrigger();
+    this.setEditorAddMode();
     this.shapeEditor.removeAllShapes();
     this.shapeEditor.addShape(trigger.getShape(), true);
     this.shapeEditor.repaint();
@@ -252,6 +273,13 @@ export default class UI {
         }
       });
     });
+    document.querySelectorAll("form [name='form_input_2']").forEach(select => {
+      select.addEventListener("change", (event) => {
+        dispatch.dispatch(action.interactiveImage().editor().changeTriggerShape(
+          this.getInputValueByName('form_input_2')
+        ));
+      });
+    });
   }
 
   getInputValueByName(name) {
@@ -278,6 +306,22 @@ export default class UI {
     this.toolSlate.setContent(this.uiModel.triggerOverlay);
     this.initTriggerViewControl();
     this.initBackButton();
+    this.initTriggerOverlay();
+  }
+
+  initTriggerOverlay() {
+    const dispatch = this.dispatcher;
+    const action = this.actionFactory;
+    document.querySelectorAll("[data-copg-ed-type='button']").forEach(button => {
+      const act = button.dataset.copgEdAction;
+      button.addEventListener("click", (event) => {
+        switch (act) {
+          case ACTIONS.E_TRIGGER_OVERLAY_ADD:
+            dispatch.dispatch(action.interactiveImage().editor().addTriggerOverlay());
+            break;
+        }
+      });
+    });
   }
 
   showTriggerPopup() {
@@ -362,4 +406,13 @@ export default class UI {
     this.initBackButton();
   }
 
+  showOverlayModal() {
+    this.uiModifier.showModal(
+      il.Language.txt("cont_add_overlay"),
+      this.uiModel.overlayUpload,
+      il.Language.txt("add"),
+      () => {
+        console.log("UPLOAD");
+      });
+  }
 }

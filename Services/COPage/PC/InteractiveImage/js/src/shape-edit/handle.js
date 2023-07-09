@@ -45,7 +45,7 @@ export default class Handle {
         return this.y;
     }
 
-    addHandleToMobElement(mobEl) {
+    addHandleToMobElement(mobEl, drag = true) {
         const handleEl = document.createElement("a");
         handleEl.style.position = "absolute";
         handleEl.style.display = "block";
@@ -56,7 +56,9 @@ export default class Handle {
         handleEl.style.height = "5px";
         handleEl.style.width = "5px";
         handleEl.style.border = "black solid 2px";
-        this.draggable(handleEl);
+        if (drag) {
+            this.draggable(handleEl);
+        }
         mobEl.appendChild(handleEl);
     }
 
@@ -67,13 +69,7 @@ export default class Handle {
     draggable(elmnt) {
         var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
         const t = this;
-        if (document.getElementById(elmnt.id + "header")) {
-            // if present, the header is where you move the DIV from:
-            document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
-        } else {
-            // otherwise, move the DIV from anywhere inside the DIV:
-            elmnt.onmousedown = dragMouseDown;
-        }
+        elmnt.onmousedown = dragMouseDown;
 
         function dragMouseDown(e) {
             e = e || window.event;

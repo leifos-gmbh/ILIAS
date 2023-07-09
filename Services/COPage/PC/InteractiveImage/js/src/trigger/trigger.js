@@ -68,6 +68,10 @@ export default class Trigger {
         };
     }
 
+    setArea(area) {
+        this.area = area;
+    }
+
     getShape() {
         if (this.area){
             return this.area.getShape(this.nr);

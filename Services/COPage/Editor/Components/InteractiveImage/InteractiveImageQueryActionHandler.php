@@ -85,7 +85,9 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
         $o->uiModel->triggerPopup = $this->getTriggerPopup();
         $o->uiModel->popupOverview = $this->getPopupOverview();
         $o->uiModel->overlayOverview = $this->getOverlayOverview();
+        $o->uiModel->overlayUpload = $this->getOverlayUpload();
         $o->uiModel->backgroundProperties = $this->getBackgroundProperties();
+        $o->uiModel->modal = $this->getModalTemplate();
 
         $o->iimModel = $this->getIIMModel();
         /*
@@ -433,5 +435,52 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
 
         return $content;
     }
+
+    public function getModalTemplate(): array
+    {
+        $ui = $this->ui;
+        $modal = $ui->factory()->modal()->roundtrip('#title#', $ui->factory()->legacy('#content#'))
+                    ->withActionButtons([
+                        $ui->factory()->button()->standard('#button_title#', '#'),
+                    ]);
+        $modalt["signal"] = $modal->getShowSignal()->getId();
+        $modalt["template"] = $ui->renderer()->renderAsync($modal);
+
+        return $modalt;
+    }
+
+    protected function getOverlayUploadFormAdapter(): \ILIAS\Repository\Form\FormAdapterGUI {
+        return $this->gui->form([get_class($this->page_gui), \ilPageEditorGUI::class, \ilPCInteractiveImageGUI::class], "#")
+                         ->async()
+                         ->file(
+                             "input_file",
+                             $this->lng->txt("file"),
+                             \Closure::fromCallable([$this, 'handleOverlayUpload']),
+                             "mob_id",
+                             "",
+                             1,
+                             [],
+                             [get_class($this->page_gui), \ilPageEditorGUI::class, \ilPCInteractiveImageGUI::class],
+                             "copg"
+                         );
+    }
+
+    protected function getOverlayUpload(): string
+    {
+        $content = $this->ui_wrapper->getRenderedAdapterForm(
+            $this->getOverlayUploadFormAdapter(),
+            [["InteractiveImage", "overlay.upload", $this->lng->txt("add")]]
+        );
+
+        return $content;
+    }
+
+    public function handleOverlayUpload(
+        FileUpload $upload,
+        UploadResult $result
+    ): BasicHandlerResult {
+        return $this->iim_manager->handleOverlayUpload($upload, $result);
+    }
+
 
 }

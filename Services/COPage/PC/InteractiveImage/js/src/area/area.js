@@ -85,8 +85,12 @@ export default class Area {
                 break;
             case "Poly":
                 let co = [];
+                let i;
                 coords.forEach((c) => {
-                    co.push(parseInt(c));
+                    i = parseInt(c);
+                    if (!isNaN(i)) {
+                        co.push(parseInt(c));
+                    }
                 });
                 shape = this.shapeFactory.poly(
                   co,

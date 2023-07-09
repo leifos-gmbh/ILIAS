@@ -87,6 +87,10 @@ export default class IIMUIActionHandler {
                     this.ui.editTrigger(params.triggerNr);
                     break;
 
+                case ACTIONS.E_TRIGGER_SHAPE_CHANGE:
+                    this.ui.repaintTrigger();
+                    break;
+
                 case ACTIONS.E_TRIGGER_PROPERTIES:
                     this.ui.showTriggerProperties();
                     break;
@@ -116,6 +120,10 @@ export default class IIMUIActionHandler {
                       params,
                       model
                     );
+                    break;
+
+                case ACTIONS.E_TRIGGER_OVERLAY_ADD:
+                    this.ui.showOverlayModal();
                     break;
             }
         }

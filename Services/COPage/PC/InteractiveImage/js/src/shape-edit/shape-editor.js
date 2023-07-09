@@ -16,6 +16,7 @@
  *********************************************************************/
 
 import ShapeFactory from "./shape-factory.js";
+import Poly from "./poly.js";
 
 /**
  * Circle
@@ -31,6 +32,33 @@ export default class ShapeEditor {
         this.shapes = [];
         this.currentShape = null;
         this.factory = new ShapeFactory();
+        this.initEvents();
+        this.allowAdd = false
+    }
+
+    setAllowAdd(allow) {
+        this.allowAdd = allow;
+    }
+
+    initEvents() {
+        const t = this;
+        const f = this.factory;
+        const mob = this.mobElement;
+        mob.addEventListener("click", (e) => {
+            if (t.currentShape === null || !t.allowAdd) {
+                return;
+            }
+            const cs = t.shapes[t.currentShape];
+            if (cs instanceof Poly) {
+                e = e || window.event;
+                e.preventDefault();
+                let rect = mob.getBoundingClientRect();
+                let x = Math.round(e.clientX - rect.left);
+                let y = Math.round(e.clientY - rect.top);
+                cs.addHandle(f.handle(x, y));
+                t.repaint();
+            }
+        });
     }
 
     factory() {
@@ -104,11 +132,18 @@ export default class ShapeEditor {
         return click;
     }
 
+    removeAllHandles() {
+        this.removeAllChildsOfName(this.mobElement, "a");
+    }
+
     repaint() {
         this.repaintSvg();
+        console.log("Repaint");
+        this.removeAllHandles();
         if (this.currentShape !== null) {
-            this.shapes[this.currentShape].getHandles().forEach((h) => {
-                h.addHandleToMobElement(this.mobElement);
+            const cs = this.shapes[this.currentShape];
+            cs.getHandles().forEach((h) => {
+                h.addHandleToMobElement(this.mobElement, !this.allowAdd);
                 h.setOnDrag(() => {
                     this.repaintSvg();
                 });

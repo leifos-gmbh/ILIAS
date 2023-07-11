@@ -97,15 +97,29 @@ class ilPCInteractiveImageGUI extends ilPageContentGUI
                 break;
 
             case strtolower(ilRepoStandardUploadHandlerGUI::class):
-                $form = $this->getImportFormAdapter();
-                $gui = $form->getRepoStandardUploadHandlerGUI("input_file");
-                $this->ctrl->forwardCommand($gui);
+                $this->forwardFormToUploadHandler();
                 break;
 
             default:
                 $this->$cmd();
                 break;
         }
+    }
+
+    protected function forwardFormToUploadHandler() : void
+    {
+        switch($this->request->getString("mode")) {
+            case "overlayUpload":
+                $form = $this->getOverlayUploadFormAdapter();
+                $gui = $form->getRepoStandardUploadHandlerGUI("overlay_file");
+                break;
+
+            default:
+                $form = $this->getImportFormAdapter();
+                $gui = $form->getRepoStandardUploadHandlerGUI("input_file");
+                break;
+        }
+        $this->ctrl->forwardCommand($gui);
     }
 
     /**
@@ -687,7 +701,7 @@ class ilPCInteractiveImageGUI extends ilPageContentGUI
 
     public function getImportFormAdapter(): \ILIAS\Repository\Form\FormAdapterGUI
     {
-        $this->ctrl->setParameter($this, "cname", "SourceCode");
+        //$this->ctrl->setParameter($this, "cname", "SourceCode");
         $form = $this->gui->form([self::class], "#")
                           ->async()
             ->section("f", $this->lng->txt("cont_ed_insert_iim"))
@@ -724,6 +738,39 @@ class ilPCInteractiveImageGUI extends ilPageContentGUI
     {
         $this->setEditorToolContext();
         $this->iim_gui->editorInit()->initUI($this->tpl);
+    }
+
+    public function getOverlayUploadFormAdapter(array $path = null): \ILIAS\Repository\Form\FormAdapterGUI {
+        if (is_null($path)) {
+            $path = [self::class];
+        }
+
+        $f = $this->gui->form($path, "#")
+                       ->async()
+                       ->file(
+                           "overlay_file",
+                           $this->lng->txt("file"),
+                           \Closure::fromCallable([$this, 'handleOverlayUpload']),
+                           "mob_id",
+                           "",
+                           1,
+                           ["image/png", "image/jpeg", "image/gif"],
+                           $path,
+                           "copg"
+                       );
+        return $f;
+    }
+
+
+    public function handleOverlayUpload(
+        FileUpload $upload,
+        UploadResult $result
+    ): BasicHandlerResult {
+        return $this->iim_manager->handleOverlayUpload(
+            $this->content_obj->getMediaObject(),
+            $upload,
+            $result
+        );
     }
 
 }

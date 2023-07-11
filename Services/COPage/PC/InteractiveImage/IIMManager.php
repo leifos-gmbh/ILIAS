@@ -87,4 +87,49 @@ class IIMManager
             ''
         );
     }
+
+    public function handleOverlayUpload(
+        \ilObjMediaObject $mob,
+        FileUpload $upload,
+        UploadResult $result
+    ): BasicHandlerResult
+    {
+        $mob->addAdditionalFileFromUpload(
+            $upload,
+            $result,
+            "overlays"
+        );
+        $mob->makeThumbnail(
+            "overlays/" . $result->getName(),
+            $this->getOverlayThumbnailName($result->getName())
+        );
+        return new BasicHandlerResult(
+            "mob_id",
+            HandlerResult::STATUS_OK,
+            (string) $mob->getId(),
+            ''
+        );
+    }
+
+    public function getOverlayThumbnailPath($mob, string $file) : string {
+        return \ilObjMediaObject::getThumbnailPath(
+            $mob->getId(),
+            $this->getOverlayThumbnailName($file)
+        );
+    }
+
+    protected function getOverlayThumbnailName(string $file) : string {
+        $piname = pathinfo($file);
+        return basename($file, "." . $piname['extension']) . ".png";
+    }
+
+    public function getOverlays(\ilObjMediaObject $mob) : array {
+        return array_map(function($file) use ($mob){
+            return [
+                "name" => $file,
+                "webpath" => $this->getOverlayThumbnailPath($mob, $file)
+            ];
+        },
+        $mob->getFilesOfDirectory("overlays"));
+    }
 }

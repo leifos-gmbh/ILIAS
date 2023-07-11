@@ -14,6 +14,8 @@
  *
  *********************************************************************/
 
+import Util from "./util.js";
+
 /**
  * Page modifier is an adapter for components to
  *
@@ -32,6 +34,7 @@ export default class PageModifier {
   constructor(toolSlate) {
     this.pageUI = null;
     this.toolSlate = toolSlate;
+    this.util = new Util();
   }
 
   setPageUI(pageUI) {
@@ -109,40 +112,6 @@ export default class PageModifier {
     }
   }
 
-  showModal(title, content, button_txt, onclick) {
-    const uiModel = this.pageUI.uiModel;
-
-    $("#il-copg-ed-modal").remove();
-    let modal_template = uiModel.modal.template;
-    modal_template = modal_template.replace("#title#", title);
-    modal_template = modal_template.replace("#content#", content);
-    modal_template = modal_template.replace("#button_title#", button_txt);
-
-    $("body").append("<div id='il-copg-ed-modal'>" + modal_template + "</div>");
-
-    $(document).trigger(
-      uiModel.modal.signal,
-      {
-        'id': uiModel.modal.signal,
-        'triggerer': $(this),
-        'options': JSON.parse('[]')
-      }
-    );
-
-    if (button_txt) {
-      const b = document.querySelector("#il-copg-ed-modal .modal-footer button");
-      b.addEventListener("click", onclick);
-    } else {
-      document.querySelectorAll("#il-copg-ed-modal .modal-footer").forEach((b) => {
-        b.remove();
-      });
-    }
-  }
-
-  hideCurrentModal() {
-    $("#il-copg-ed-modal .modal").modal("hide");
-  }
-
   getConfirmation(text) {
     const uiModel = this.pageUI.uiModel;
 
@@ -170,11 +139,12 @@ export default class PageModifier {
     const uiModel = this.pageUI.uiModel;
     this.toolSlate.displayError(uiModel.errorMessage);
     const pm = this;
+    const util = this.util;
     const content =  uiModel.errorModalMessage + error;
 
     const link = document.querySelector("#copg-editor-slate-error ul li a");
     link.addEventListener("click", () => {
-      pm.showModal(il.Language.txt("copg_error"), content);
+      this.util.showModal(uiModel.modal, il.Language.txt("copg_error"), content);
       let m = document.querySelector("#il-copg-ed-modal .modal-dialog");
       if (m) {
         m.style.width = "90%";

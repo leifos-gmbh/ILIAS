@@ -21,6 +21,8 @@ const ACTIONS = {
 
   // command actions (being sent to the server to "change things")
   C_SAVE_TRIGGER_PROPERTIES: "save.trigger.properties",
+  C_UPLOAD_OVERLAY: "upload.overlay",
+  C_DELETE_OVERLAY: "delete.overlay",
 
   // editor actions (things happening in the editor client side)
   E_ADD_TRIGGER: "add.trigger",
@@ -30,6 +32,8 @@ const ACTIONS = {
   E_TRIGGER_SHAPE_CHANGE: "trigger.shape.change",
   E_TRIGGER_OVERLAY: "trigger.overlay",
   E_TRIGGER_OVERLAY_ADD: "trigger.add.overlay",
+  E_OVERLAY_UPLOAD: "overlay.upload",
+  E_OVERLAY_DELETE: "overlay.delete",
   E_TRIGGER_POPUP: "trigger.popup",
   E_TRIGGER_BACK: "trigger.back",
   E_SWITCH_SETTINGS: "switch.settings",

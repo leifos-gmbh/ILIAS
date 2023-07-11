@@ -450,37 +450,30 @@ class InteractiveImageQueryActionHandler implements Server\QueryActionHandler
     }
 
     protected function getOverlayUploadFormAdapter(): \ILIAS\Repository\Form\FormAdapterGUI {
-        return $this->gui->form([get_class($this->page_gui), \ilPageEditorGUI::class, \ilPCInteractiveImageGUI::class], "#")
-                         ->async()
-                         ->file(
-                             "input_file",
-                             $this->lng->txt("file"),
-                             \Closure::fromCallable([$this, 'handleOverlayUpload']),
-                             "mob_id",
-                             "",
-                             1,
-                             [],
-                             [get_class($this->page_gui), \ilPageEditorGUI::class, \ilPCInteractiveImageGUI::class],
-                             "copg"
-                         );
+
+        $pg = $this->page_gui->getPageObject();
+        $iim = new \ilPCInteractiveImage($pg);
+        $iim_gui = new \ilPCInteractiveImageGUI($pg, $iim, "", $this->pc_id);
+        $iim_gui->setPageConfig($pg->getPageConfig());
+        return $iim_gui->getOverlayUploadFormAdapter([get_class($this->page_gui), \ilPageEditorGUI::class, \ilPCInteractiveImageGUI::class]);
     }
 
     protected function getOverlayUpload(): string
     {
+        $this->ctrl->setParameterByClass(
+            \ilPCInteractiveImageGUI::class,
+            "mode",
+            "overlayUpload"
+        );
         $content = $this->ui_wrapper->getRenderedAdapterForm(
             $this->getOverlayUploadFormAdapter(),
             [["InteractiveImage", "overlay.upload", $this->lng->txt("add")]]
         );
-
+        $this->ctrl->setParameterByClass(
+            \ilPCInteractiveImageGUI::class,
+            "mode",
+            null
+        );
         return $content;
     }
-
-    public function handleOverlayUpload(
-        FileUpload $upload,
-        UploadResult $result
-    ): BasicHandlerResult {
-        return $this->iim_manager->handleOverlayUpload($upload, $result);
-    }
-
-
 }

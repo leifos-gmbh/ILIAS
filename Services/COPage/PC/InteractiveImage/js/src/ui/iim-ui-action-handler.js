@@ -17,6 +17,7 @@
 import ACTIONS from "../actions/iim-action-types.js";
 import ActionFactory from "../actions/iim-action-factory.js"
 import UI from "./iim-ui.js";
+import Util from "../../../../../Editor/js/src/ui/util.js";
 
 /**
  * Interactive image UI action handler
@@ -47,6 +48,7 @@ export default class IIMUIActionHandler {
         this.client = client;
         this.ui = null;
         this.dispatcher = null;
+        this.util = new Util();
     }
 
     /**
@@ -125,6 +127,15 @@ export default class IIMUIActionHandler {
                 case ACTIONS.E_TRIGGER_OVERLAY_ADD:
                     this.ui.showOverlayModal();
                     break;
+
+                case ACTIONS.E_OVERLAY_UPLOAD:
+                    this.sendUploadOverlay(params, model);
+                    break;
+
+                case ACTIONS.E_OVERLAY_DELETE:
+                    this.sendDeleteOverlay(params, model);
+                    break;
+
             }
         }
     }
@@ -157,5 +168,37 @@ export default class IIMUIActionHandler {
         }
     }
 
+    sendUploadOverlay(params, model) {
+        let upload_action;
+        const af = this.actionFactory;
+        const dispatch = this.dispatcher;
+        const util = this.util;
+
+        this.util.sendFiles(params.data.form).then(() => {
+            const data = new FormData(params.data.form);
+            upload_action = af.interactiveImage().command().uploadOverlay(
+              data
+            );
+
+            this.client.sendCommand(upload_action).then(result => {
+                util.hideCurrentModal();
+                this.handleStandardResponse(result, model);
+                //after_pcid, pcid, component, data
+                dispatch.dispatch(af.interactiveImage().editor().triggerOverlay());
+            });
+        });
+    }
+
+    sendDeleteOverlay(params, model) {
+        const af = this.actionFactory;
+        const dispatch = this.dispatcher;
+        const delete_action = af.interactiveImage().command().deleteOverlay(
+          params.overlay
+        );
+        this.client.sendCommand(delete_action).then(result => {
+            this.handleStandardResponse(result, model);
+            dispatch.dispatch(af.interactiveImage().editor().switchOverlays());
+        });
+    }
 
 }

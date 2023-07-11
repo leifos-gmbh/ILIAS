@@ -25,6 +25,7 @@ class ilPCInteractiveImage extends ilPageContent
 {
     public const AREA = "Area";
     public const MARKER = "Marker";
+    protected \ILIAS\COPage\PC\InteractiveImage\IIMManager $manager;
     protected php4DOMElement $mal_node;
     protected php4DOMElement $med_alias_node;
 
@@ -39,6 +40,7 @@ class ilPCInteractiveImage extends ilPageContent
 
         $this->lng = $DIC->language();
         $this->setType("iim");
+        $this->manager = $DIC->copage()->internal()->domain()->pc()->interactiveImage();
     }
 
     public function readMediaObject(int $a_mob_id = 0) : void
@@ -427,6 +429,20 @@ class ilPCInteractiveImage extends ilPageContent
         }
     }
 
+    public function deleteOverlay(string $file) : void
+    {
+        $file = str_replace("..", "", ilUtil::stripSlashes($file));
+        $this->getMediaObject()
+             ->removeAdditionalFile("overlays/" . $file);
+        $tr_nodes = $this->getTriggerNodes($this->hier_id, $this->getPCId());
+        for ($i = 0; $i < count($tr_nodes); $i++) {
+            $tr_node = $tr_nodes[$i];
+            if ($tr_node->get_attribute("Overlay") === $file) {
+                $tr_node->remove_attribute("Overlay");
+            }
+        }
+    }
+
     /**
      * Set trigger overlay position
      * @param array $a_pos array of strings (representing the overlays for the trigger)
@@ -580,6 +596,7 @@ class ilPCInteractiveImage extends ilPageContent
         $model->triggers = $this->getTriggers();
         $model->popups = $this->getPopups();
         $model->media_item = $alias_item->getModel();
+        $model->overlays = $this->manager->getOverlays($this->getMediaObject());
         return $model;
     }
 

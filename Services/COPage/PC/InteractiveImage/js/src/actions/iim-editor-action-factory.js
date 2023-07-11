@@ -135,4 +135,16 @@ export default class IIMEditorActionFactory {
     });
   }
 
+  uploadOverlay(data) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_OVERLAY_UPLOAD, {
+      data: data
+    });
+  }
+
+  deleteOverlay(overlay) {
+    return this.editorActionFactory.action(this.COMPONENT, ACTIONS.E_OVERLAY_DELETE, {
+      overlay: overlay
+    });
+  }
+
 }

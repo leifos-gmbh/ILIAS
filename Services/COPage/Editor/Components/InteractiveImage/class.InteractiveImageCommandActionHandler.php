@@ -55,6 +55,12 @@ class InteractiveImageCommandActionHandler implements Server\CommandActionHandle
             case "save.trigger.properties":
                 return $this->saveTriggerProperties($query['pc_id'], $body);
 
+            case "upload.overlay":
+                return $this->uploadOverlay($query['pc_id'], $body);
+
+            case "delete.overlay":
+                return $this->deleteOverlay($query['pc_id'], $body);
+
             default:
                 throw new Exception("Unknown action " . $body["action"]);
         }
@@ -121,6 +127,28 @@ class InteractiveImageCommandActionHandler implements Server\CommandActionHandle
         $data->error = $error;
         $data->model = $pc->getIIMModel();
         return new Server\Response($data);
+    }
+
+    protected function uploadOverlay(string $pc_id, array $body): Server\Response
+    {
+        $page = $this->page_gui->getPageObject();
+        /** @var \ilPCInteractiveImage $pc */
+        $pc = $this->page_gui->getPageObject()->getContentObjectForPcId($pc_id);
+
+        $updated = $page->update();
+
+        return $this->getStandardResponse($updated, $pc);
+    }
+
+    protected function deleteOverlay(string $pc_id, array $body): Server\Response
+    {
+        $page = $this->page_gui->getPageObject();
+        /** @var \ilPCInteractiveImage $pc */
+        $pc = $this->page_gui->getPageObject()->getContentObjectForPcId($pc_id);
+        $pc->deleteOverlay($body["data"]["overlay"]);
+        $updated = $page->update();
+
+        return $this->getStandardResponse($updated, $pc);
     }
 
 }

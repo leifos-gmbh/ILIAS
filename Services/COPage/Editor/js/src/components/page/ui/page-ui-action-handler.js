@@ -15,6 +15,7 @@
  *********************************************************************/
 
 import ACTIONS from "../actions/page-action-types.js";
+import Util from '../../../ui/util.js';
 
 /**
  * Page UI action handler
@@ -53,6 +54,7 @@ export default class PageUIActionHandler {
     this.client = client;
     this.dispatcher = null;
     this.ui = null;
+    this.util = new Util();
   }
 
   log(message) {
@@ -407,41 +409,12 @@ export default class PageUIActionHandler {
     });
   }
 
-
-  /**
-   * @returns {Promise}
-   */
-  sendFiles(form) {
-    let input_id, dropzone, cnt = 0;
-    return new Promise((resolve, reject) => {
-      if (typeof Dropzone !== "undefined" && typeof Dropzone.instances !== "undefined" && Array.isArray(Dropzone.instances)) {
-        for (let i = 0; i < Dropzone.instances.length; i++) {
-          const el = Dropzone.instances[i].element;
-          // process only dropzones in our form with file data
-          if (form.contains(el) && Dropzone.instances[i].getQueuedFiles().length > 0) {
-            cnt++;
-            Dropzone.instances[i].on('queuecomplete', () => {
-              cnt--;
-              if (cnt === 0) {
-                resolve();
-              }
-            });
-            Dropzone.instances[i].processQueue();
-          }
-        }
-      }
-      if (cnt === 0) {
-        resolve();
-      }
-    });
-  }
-
   sendInsertCommand(params, model) {
     let insert_action;
     const af = this.actionFactory;
     const dispatch = this.dispatcher;
 
-    this.sendFiles(params.data.form).then(() => {
+    this.util.sendFiles(params.data.form).then(() => {
       const data = new FormData(params.data.form);
       insert_action = af.page().command().insert(
         params.afterPcid,

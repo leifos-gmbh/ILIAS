@@ -162,4 +162,8 @@ export default class Model {
   getCurrentTrigger() {
     return this.model.currentTrigger;
   }
+
+  getOverlays() {
+    return this.model.iim.overlays;
+  }
 }

@@ -15,6 +15,7 @@
  *********************************************************************/
 
 import ACTIONS from "../actions/page-action-types.js";
+import Util from "../../../ui/util.js";
 
 /**
  * page ui
@@ -108,6 +109,7 @@ export default class PageUI {
     this.model = model;
     this.toolSlate = toolSlate;
     this.pageModifier = pageModifier;
+    this.util = new Util();
   }
 
   //
@@ -986,7 +988,8 @@ export default class PageUI {
     const dispatch = this.dispatcher;
     const action = this.actionFactory;
 
-    this.pageModifier.showModal(
+    this.util.showModal(
+      this.uiModel.modal,
       il.Language.txt("cont_delete_content"),
       content,
       il.Language.txt("delete"),
@@ -997,7 +1000,7 @@ export default class PageUI {
   }
 
   hideDeleteConfirmation() {
-    this.pageModifier.hideCurrentModal();
+    this.util.hideCurrentModal();
   }
 
   //

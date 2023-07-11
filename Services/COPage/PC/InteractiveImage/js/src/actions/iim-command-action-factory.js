@@ -49,4 +49,19 @@ export default class IIMCommandActionFactory {
       coords: coords
     });
   }
+
+  /**
+   * @param {formData} data
+   * @return {CommandAction}
+   */
+  uploadOverlay(data) {
+    return this.clientActionFactory.formCommand(this.COMPONENT, ACTIONS.C_UPLOAD_OVERLAY, data);
+  }
+
+  deleteOverlay(overlay) {
+    return this.clientActionFactory.command(this.COMPONENT, ACTIONS.C_DELETE_OVERLAY, {
+      overlay: overlay
+    });
+  }
+
 }
